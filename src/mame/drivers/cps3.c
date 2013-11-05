@@ -450,9 +450,9 @@ hardware modification to the security cart.....
 3. Power on the PCB and using the built-in cart flashROM menu re-program the SIMMs for your chosen game using the CD
    from set 'cps3boot' in MAME.
 4. That is all. Enjoy your working PCB.
- 
-*/ 
- 
+
+*/
+
 #include "emu.h"
 #include "cdrom.h"
 #include "cpu/sh2/sh2.h"
@@ -3853,5 +3853,3 @@ GAME( 1999, jojobaner1,jojoba,   jojoba,   cps3_jojo, cps3_state, jojoba,   ROT0
 GAME( 1999, cps3boot,  0,        sfiii3,   cps3_jojo, cps3_state, cps3boot,   ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure, Red Earth)", GAME_IMPERFECT_GRAPHICS )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
 GAME( 1999, cps3boota, cps3boot, sfiii3,   cps3_jojo, cps3_state, sfiii2,     ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (New Generation, 2nd Impact, 3rd Strike)", GAME_IMPERFECT_GRAPHICS )
-
-

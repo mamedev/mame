@@ -171,5 +171,5 @@ private:
 // device type definition
 extern const device_type MC146818;
 
-	
+
 #endif /* __MC146818_H__ */

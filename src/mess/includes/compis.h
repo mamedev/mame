@@ -32,41 +32,41 @@
 #include "machine/z80dart.h"
 #include "video/upd7220.h"
 
-#define I80186_TAG		"ic1"
-#define I80130_TAG		"ic15"
-#define I8251A_TAG		"ic59"
-#define I8253_TAG		"ic60"
+#define I80186_TAG      "ic1"
+#define I80130_TAG      "ic15"
+#define I8251A_TAG      "ic59"
+#define I8253_TAG       "ic60"
 #define I8274_TAG       "ic65"
-#define MM58174A_TAG	"ic66"
-#define I8255_TAG		"ic69"
+#define MM58174A_TAG    "ic66"
+#define I8255_TAG       "ic69"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
 #define CASSETTE_TAG    "cassette"
 #define CENTRONICS_TAG  "centronics"
-#define ISBX_0_TAG		"isbx0"
-#define ISBX_1_TAG		"isbx1"
-#define SCREEN_TAG		"screen"
+#define ISBX_0_TAG      "isbx0"
+#define ISBX_1_TAG      "isbx1"
+#define SCREEN_TAG      "screen"
 
 class compis_state : public driver_device
 {
 public:
 	compis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, I80186_TAG),
-		  m_osp(*this, I80130_TAG),
-		  m_pit(*this, I8253_TAG),
-		  m_ppi(*this, I8255_TAG),
-		  m_mpsc(*this, I8274_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_uart(*this, I8251A_TAG),
-		  m_rtc(*this, MM58174A_TAG),
-		  m_crtc(*this, "upd7220"),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_isbx0(*this, ISBX_0_TAG),
-		  m_isbx1(*this, ISBX_1_TAG),
-		  m_ram(*this, RAM_TAG),
-		  m_video_ram(*this, "video_ram"),
-		  m_s8(*this, "S8")
+			m_maincpu(*this, I80186_TAG),
+			m_osp(*this, I80130_TAG),
+			m_pit(*this, I8253_TAG),
+			m_ppi(*this, I8255_TAG),
+			m_mpsc(*this, I8274_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
+			m_uart(*this, I8251A_TAG),
+			m_rtc(*this, MM58174A_TAG),
+			m_crtc(*this, "upd7220"),
+			m_cassette(*this, CASSETTE_TAG),
+			m_isbx0(*this, ISBX_0_TAG),
+			m_isbx1(*this, ISBX_1_TAG),
+			m_ram(*this, RAM_TAG),
+			m_video_ram(*this, "video_ram"),
+			m_s8(*this, "S8")
 	{ }
 
 	required_device<i80186_cpu_device> m_maincpu;

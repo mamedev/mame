@@ -4844,7 +4844,7 @@ The CG2298 graphics can support the following XnnnnnnP Data game types:
   Joker Poker, Double Joker Poker, Deuces Joker Wild Poker, Sevens or Better, Tens or Better, Jacks or Better
   Nevada Draw Poker, Nevada Bonus Poker, White Hot Aces, Double Double Aces & Faces, Odds & Ends Poker
   Two Pair, Crazy Eights and Full House Bonus
- 
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00017.u67",   0x00000, 0x10000, CRC(129e6eaa) SHA1(1dd2b83a672a618f338b553a6cbd598b6d4ce672) )

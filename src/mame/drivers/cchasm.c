@@ -175,7 +175,7 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 
 
 	/* sound hardware */
-	
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1818182)

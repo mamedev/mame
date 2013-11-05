@@ -6,7 +6,7 @@
 		<description>PC DOS 2000</description>
 		<year>1998</year>
 		<publisher>IBM</publisher>
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pcdos2k" sha1="ae69e305e82f24d908296ba9f45a1321a1c9dd58" />
@@ -18,7 +18,7 @@
 		<description>Windows Software Development Kit Version 3.1</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="050-151-320" sha1="4840cb3624e4032456434e099cd0362bc278e680" />
@@ -30,7 +30,7 @@
 		<description>Windows Device Development Kit Version 3.1</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="win31ddk" sha1="0208c3299cb206ea8b9b7d99e75131661898bae2" />
@@ -42,7 +42,7 @@
 		<description>Windows Resource Kit for Operating System Version 3.1</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="win31rk" sha1="0813d90cf00e296676ecd0259cd425ab50670e8a" />
@@ -54,7 +54,7 @@
 		<description>Windows Multimedia Extensions 1.0</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="win30me" sha1="0ef02709c3ed3544fc01983921eaace878cf5d80" />

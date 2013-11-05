@@ -4842,14 +4842,14 @@ ROM_END
 /* B-Board 89625B-1 */
 ROM_START( ffightj3 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "ff_36.12f",              0x00000, 0x20000, CRC(ed988977) SHA1(c718e989206bd2b68832c8fcb5667397d500ebac) )	// == ffu_30.11f
-	ROM_LOAD16_BYTE( "ffj_42(__ffightj3).12h", 0x00001, 0x20000, CRC(07bf1c21) SHA1(f21a939fd92607c7f54816dedbcb3c5818cf4183) )	// == ffu_35.11h
-	ROM_LOAD16_BYTE( "ff_37.13f",              0x40000, 0x20000, CRC(dba5a476) SHA1(2f0176dd050f9630b914f1c1ca5d96215bcf567f) )	// == ffu_31.12f
+	ROM_LOAD16_BYTE( "ff_36.12f",              0x00000, 0x20000, CRC(ed988977) SHA1(c718e989206bd2b68832c8fcb5667397d500ebac) ) // == ffu_30.11f
+	ROM_LOAD16_BYTE( "ffj_42(__ffightj3).12h", 0x00001, 0x20000, CRC(07bf1c21) SHA1(f21a939fd92607c7f54816dedbcb3c5818cf4183) ) // == ffu_35.11h
+	ROM_LOAD16_BYTE( "ff_37.13f",              0x40000, 0x20000, CRC(dba5a476) SHA1(2f0176dd050f9630b914f1c1ca5d96215bcf567f) ) // == ffu_31.12f
 	ROM_LOAD16_BYTE( "ffj_43(__ffightj3).13h", 0x40001, 0x20000, CRC(fbeca028) SHA1(85eeed6a25b401d73d12896ca1e2bf7402c921ee) )
-	ROM_LOAD16_BYTE( "ff_34.10f",              0x80000, 0x20000, CRC(0c8dc3fc) SHA1(edcce3efd9cdd131ef0c96df15a68722d5c3498e) )	// == ff-32m.8h
-	ROM_LOAD16_BYTE( "ffj_40.10h",             0x80001, 0x20000, CRC(8075bab9) SHA1(f9c7405133f6fc5557c90e60e8ccc459e4f6fd7d) )	// == ff-32m.8h
-	ROM_LOAD16_BYTE( "ff_35.11f",              0xc0000, 0x20000, CRC(4a934121) SHA1(3982c261582755a0eac340d6d7ed96e6c263c8b6) )	// == ff-32m.8h
-	ROM_LOAD16_BYTE( "ffj_41.11h",             0xc0001, 0x20000, CRC(2af68154) SHA1(7d549cb38650b4b79c68ad6d0dfcefdd62be4e99) )	// == ff-32m.8h
+	ROM_LOAD16_BYTE( "ff_34.10f",              0x80000, 0x20000, CRC(0c8dc3fc) SHA1(edcce3efd9cdd131ef0c96df15a68722d5c3498e) ) // == ff-32m.8h
+	ROM_LOAD16_BYTE( "ffj_40.10h",             0x80001, 0x20000, CRC(8075bab9) SHA1(f9c7405133f6fc5557c90e60e8ccc459e4f6fd7d) ) // == ff-32m.8h
+	ROM_LOAD16_BYTE( "ff_35.11f",              0xc0000, 0x20000, CRC(4a934121) SHA1(3982c261582755a0eac340d6d7ed96e6c263c8b6) ) // == ff-32m.8h
+	ROM_LOAD16_BYTE( "ffj_41.11h",             0xc0001, 0x20000, CRC(2af68154) SHA1(7d549cb38650b4b79c68ad6d0dfcefdd62be4e99) ) // == ff-32m.8h
 
 	ROM_REGION( 0x200000, "gfx", 0 )
 	ROMX_LOAD( "ff_09.4b",  0x000000, 0x20000, CRC(5b116d0d) SHA1(a24e829fdfa043bd27b508d7cc0788ad80fd180e) , ROM_SKIP(7) )
@@ -4886,7 +4886,7 @@ ROM_START( ffightj3 )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "s222b.1a",     0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )	// pal verification required
+	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )    // pal verification required
 ROM_END
 
 /* B-Board 91634B-2 */
@@ -5864,7 +5864,7 @@ ROM_END
 ROM_START( sf2ed )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "sf2e_30d.11e", 0x00000, 0x20000, CRC(4bb2657c) SHA1(b2d077296b77be7db371f953b7fc446a67d8a9d6) )
-	ROM_LOAD16_BYTE( "sf2e_37d.11f", 0x00001, 0x20000, CRC(102f4561) SHA1(2fc77cd3b2ecf8fadc4f8614cb200cf2cba4c616) )	//only rom different from sf2ud
+	ROM_LOAD16_BYTE( "sf2e_37d.11f", 0x00001, 0x20000, CRC(102f4561) SHA1(2fc77cd3b2ecf8fadc4f8614cb200cf2cba4c616) )   //only rom different from sf2ud
 	ROM_LOAD16_BYTE( "sf2e_31d.12e", 0x40000, 0x20000, CRC(d57b67d7) SHA1(43d0b47c9fada8d9b445caa4b96ac8493061aa8b) )
 	ROM_LOAD16_BYTE( "sf2e_38d.12f", 0x40001, 0x20000, CRC(9c8916ef) SHA1(a4629356a816454bcc1d7b41e70e147d4769a682) )
 	ROM_LOAD16_BYTE( "sf2e_28d.9e",  0x80000, 0x20000, CRC(175819d1) SHA1(c98b6b7af4e57735dbfb3d1e61ba1bfb9f145d33) )

@@ -997,7 +997,6 @@ void scudsp_cpu_device::device_start()
 
 void scudsp_cpu_device::device_reset()
 {
-
 }
 
 void scudsp_cpu_device::execute_set_input(int irqline, int state)

@@ -97,7 +97,7 @@ void speech_sound_device::device_config_complete()
 void speech_sound_device::device_start()
 {
 		m_speech = machine().root_device().memregion("speech")->base();
-		
+
 		save_item(NAME(m_latch));
 		save_item(NAME(m_t0));
 		save_item(NAME(m_p2));
@@ -155,7 +155,7 @@ WRITE8_MEMBER( speech_sound_device::p2_w )
 void speech_sound_device::drq_w(device_t *device, int level)
 {
 	speech_sound_device *speech = device->machine().device<speech_sound_device>("segaspeech");
-	
+
 	speech->m_drq = (level == ASSERT_LINE);
 }
 
@@ -220,9 +220,9 @@ static ADDRESS_MAP_START( speech_portmap, AS_IO, 8, driver_device )
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("segaspeech", speech_sound_device, rom_r)
 	AM_RANGE(0x00, 0xff) AM_DEVWRITE("speech", sp0250_device, write)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREADWRITE("segaspeech", speech_sound_device, p1_r, p1_w)
- 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("segaspeech", speech_sound_device, p2_w)
- 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVREAD("segaspeech", speech_sound_device, t0_r)
- 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_DEVREAD("segaspeech", speech_sound_device, t1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("segaspeech", speech_sound_device, p2_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVREAD("segaspeech", speech_sound_device, t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_DEVREAD("segaspeech", speech_sound_device, t1_r)
 ADDRESS_MAP_END
 
 
@@ -286,7 +286,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 		m_noise_subcount(0)
 {
 }
-	
+
 usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SEGAUSB, "Sega Universal Sound Board", tag, owner, clock, "segausb", __FILE__),
 		device_sound_interface(mconfig, *this),
@@ -310,14 +310,13 @@ void usb_sound_device::device_config_complete()
 
 void usb_sound_device::device_start()
 {
-	
 	filter_state temp;
 	int tchan, tgroup;
 
 	/* find the CPU we are associated with */
 	m_maincpu = machine().device("maincpu");
 	assert(m_maincpu != NULL);
-	
+
 	/* allocate RAM */
 	m_program_ram = (UINT8 *)memshare("pgmram")->ptr();
 	m_work_ram = auto_alloc_array(machine(), UINT8, 0x400);
@@ -918,7 +917,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor usb_sound_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( segausb );		
+	return MACHINE_CONFIG_NAME( segausb );
 }
 
 const device_type SEGAUSBROM = &device_creator<usb_rom_sound_device>;
@@ -927,7 +926,7 @@ usb_rom_sound_device::usb_rom_sound_device(const machine_config &mconfig, const 
 	: usb_sound_device(mconfig, SEGAUSBROM, "Sega Universal Sound Board with ROM", tag, owner, clock, "segausbrom", __FILE__)
 {
 }
-	
+
 static ADDRESS_MAP_START( usb_map_rom, AS_PROGRAM, 8, usb_sound_device )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(":usbcpu", 0)
 ADDRESS_MAP_END
@@ -941,8 +940,8 @@ MACHINE_CONFIG_FRAGMENT( segausb_rom )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("usb_timer", usb_sound_device, increment_t1_clock_timer_cb, attotime::from_hz(USB_2MHZ_CLOCK / 256))
 MACHINE_CONFIG_END
-		
+
 machine_config_constructor usb_rom_sound_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( segausb_rom );		
+	return MACHINE_CONFIG_NAME( segausb_rom );
 }

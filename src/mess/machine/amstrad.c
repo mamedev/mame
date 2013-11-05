@@ -1428,7 +1428,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 		}
 		if(offset == 0x0800)  // Programmable raster interrupt
 		{
-	     // logerror("ASIC: Wrote %02x to PRI\n",data);
+			// logerror("ASIC: Wrote %02x to PRI\n",data);
 			m_asic.pri = data;
 		}
 		if(offset >= 0x0801 && offset <= 0x0803)  // Split screen registers

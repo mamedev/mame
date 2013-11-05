@@ -37,7 +37,7 @@ public:
 	int     m_bg2_on;
 
 	/* protection */
-	UINT8 	m_prot_value;
+	UINT8   m_prot_value;
 	DECLARE_WRITE8_MEMBER(c1943_protection_w);
 	DECLARE_READ8_MEMBER(c1943_protection_r);
 	DECLARE_READ8_MEMBER(_1943b_c007_r);

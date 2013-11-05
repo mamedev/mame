@@ -35,9 +35,9 @@ struct mb_vcu_interface
 // ======================> mb_vcu_device
 
 class mb_vcu_device : public device_t,
- 					  public device_memory_interface,
-					  public device_video_interface,
-					  public mb_vcu_interface
+						public device_memory_interface,
+						public device_video_interface,
+						public mb_vcu_interface
 {
 public:
 	// construction/destruction

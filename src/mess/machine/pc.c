@@ -425,15 +425,15 @@ const struct pit8253_interface pcjr_pit8253_config =
 
 const i8251_interface mc1502_i8251_interface =
 {
-	DEVCB_NULL,	/* XXX RxD data are accessible via PPI port C, bit 7 */
+	DEVCB_NULL, /* XXX RxD data are accessible via PPI port C, bit 7 */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),	/* default handler does nothing */
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w), /* default handler does nothing */
 	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
 	DEVCB_NULL,
-	DEVCB_NULL	/* XXX SYNDET triggers NMI */
+	DEVCB_NULL  /* XXX SYNDET triggers NMI */
 };
 
 WRITE_LINE_MEMBER(pc_state::mc1502_pit8253_out1_changed)
@@ -1534,7 +1534,7 @@ MACHINE_RESET_MEMBER(pc_state,pc)
 	m_speaker->level_w(0);
 
 	// ec1841-specific code
-	m_memboards = m_ram->size()/(512*1024) - 1; 
+	m_memboards = m_ram->size()/(512*1024) - 1;
 	if (m_memboards > 3)
 		m_memboards = 3;
 	memset(m_memboard,0,sizeof(m_memboard));

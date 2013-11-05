@@ -4,7 +4,7 @@
 
     sh2drc.c
     Universal machine language-based SH-2 emulator.
- 
+
 ***************************************************************************/
 
 #include "emu.h"

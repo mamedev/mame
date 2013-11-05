@@ -497,9 +497,9 @@ int luxor_55_21046_device::abcbus_csb()
 UINT8 luxor_55_21046_device::abcbus_stat()
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       3A pin 8
 	    1       4B Q1
 	    2       4B Q2
@@ -508,7 +508,7 @@ UINT8 luxor_55_21046_device::abcbus_stat()
 	    5       PAL16R4 pin 17
 	    6       S1/A: PREN*, S1/B: 4B Q6
 	    7       S5/A: PAL16R4 pin 16 inverted, S5/B: 4B Q7
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -730,11 +730,11 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	/*
 	if (BIT(data, 2))
 	{
-		m_fdc->set_unscaled_clock(XTAL_16MHz/16);
+	    m_fdc->set_unscaled_clock(XTAL_16MHz/16);
 	}
 	else
 	{
-		m_fdc->set_unscaled_clock(XTAL_16MHz/8);
+	    m_fdc->set_unscaled_clock(XTAL_16MHz/8);
 	}
 	*/
 }

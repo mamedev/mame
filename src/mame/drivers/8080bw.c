@@ -7,7 +7,7 @@
     Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni
     Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari, and others
 
-    Much information about Space Invaders PCBs and other Taito and Midway 
+    Much information about Space Invaders PCBs and other Taito and Midway
     sets and hardware contributed by Andrew Welburn
 
 
@@ -78,10 +78,10 @@
            for this set.
            Does support flipscreen.
            Does not have the color overlay circuitry nor places for it on the pcbs.
-           (Later TVNxxxxx are actually rebadged CVNxxxxx, see below)   
+           (Later TVNxxxxx are actually rebadged CVNxxxxx, see below)
            Came from factory with one of the SV or TV romsets.
            Capable of running TV, SV or CV romsets.
-           This pcb set is probably the oldest one and was designed at Taito. 
+           This pcb set is probably the oldest one and was designed at Taito.
          * SVNxxxxx? (L-shaped pcbset) - B&W only, used on "Space Invaders" Upright
            with 3-separate-sheets-of-gel 'strips' color overlay.
      ***TODO: this overlay might not be supported properly yet!
@@ -94,10 +94,10 @@
            which had a similar board shape?
          * CVNxxxxx (3 layer pcbset) - Color, used on "T.T Space Invaders Color"
            cocktail with electronic color overlay.
-           Does support flipscreen.  
+           Does support flipscreen.
            Note that later TVNxxxxx pcbsets are actually 'rebadged' CVNxxxxx
            pcbsets with the color overlay circuitry unpopulated, and can be
-           'upgraded' to CVNxxxxx by adding a few components and proms.   
+           'upgraded' to CVNxxxxx by adding a few components and proms.
            Came from factory with one of the CV romsets.
            Capable of running TV, SV or CV romsets.
          * PVNxxxxx (2&3 layer pcbsets) - Color, used on "T.T Space Invaders Part
@@ -113,7 +113,7 @@
          SV0H, SV02, SV10, SV04, SV09, SV06 - sisv3 (rev 3) (Andy W calls this 'SV2')
          SV0H, SV11, SV12, SV04, SV13, SV14 - sisv (rev 4, 5-digit scoring) (Andy W calls this 'SV3') (this set is likely newer than the TV0x sets)
          TV01, TV02, TV03, TV04 - sitv1 (rev 1)
-         TV0H, TV02, TV03, TV04 - sitv (rev 2 with bug fixes) 
+         TV0H, TV02, TV03, TV04 - sitv (rev 2 with bug fixes)
          CV03, CV04, CV05, CV06 w/proms - undumped (but may be the same as one of the sisv sets with the roms combined to 2716 size)
          CV17, CV18, CV19, CV20 w/proms - sicv
          UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - undumped (probably same as pvxx set just split differently)
@@ -4016,7 +4016,7 @@ ROM_START( cosmicmo ) /*  Roms stamped with "II", denoting version II  */
 	ROM_LOAD( "ii-7.h7",   0x4800, 0x0400, CRC(6a13b15b) SHA1(dc03a6c3e938cfd08d16bd1660899f951ba72ea2) )
 
 	/* There is no colour circuits or tracking on the game pcb, its a black and white composite video signal only */
-        /* The PCB is etched with Universal 7814A-3 */
+		/* The PCB is etched with Universal 7814A-3 */
 ROM_END
 
 ROM_START( cosmicm2 )

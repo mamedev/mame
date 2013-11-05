@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 
 void pgm_028_025_state::igs025_to_igs028_callback( void )
 {
-//	printf("igs025_to_igs028_callback\n");
+//  printf("igs025_to_igs028_callback\n");
 	m_igs028->IGS028_handle();
 }
 

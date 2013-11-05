@@ -4,9 +4,9 @@
     SGI/Nintendo Reality Display Processor
     -------------------
 
-	by MooglyGuy
-	based on initial C code by Ville Linde
-	contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
+    by MooglyGuy
+    based on initial C code by Ville Linde
+    contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
 
 
 *******************************************************************************

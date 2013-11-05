@@ -32,7 +32,7 @@
 // ======================> luxor_55_21056_device
 
 class luxor_55_21056_device :  public device_t,
-							   public device_abcbus_card_interface
+								public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
@@ -64,7 +64,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sasi_bsy_w );
 	DECLARE_WRITE_LINE_MEMBER( sasi_io_w );
 	DECLARE_WRITE_LINE_MEMBER( sasi_req_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_start();

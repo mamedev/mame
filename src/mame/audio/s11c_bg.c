@@ -12,12 +12,12 @@ const device_type S11C_BG = &device_creator<s11c_bg_device>;
 
 s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig,S11C_BG,"Williams System 11C background music",tag,owner,clock, "s11c_bg", __FILE__),
-	  m_cpu(*this,"bgcpu"),
-	  m_ym2151(*this,"ym2151"),
-	  m_hc55516(*this,"hc55516_bg"),
-	  m_dac1(*this,"dac1"),
-	  m_pia40(*this,"pia40"),
-	  m_cpubank(*this,"bgbank")
+		m_cpu(*this,"bgcpu"),
+		m_ym2151(*this,"ym2151"),
+		m_hc55516(*this,"hc55516_bg"),
+		m_dac1(*this,"dac1"),
+		m_pia40(*this,"pia40"),
+		m_cpubank(*this,"bgbank")
 {
 }
 
@@ -54,12 +54,12 @@ WRITE8_MEMBER( s11c_bg_device::pia40_pa_w )
 
 WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
 {
-//	m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
+//  m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
 }
 
 WRITE8_MEMBER( s11c_bg_device::pia40_pb_w )
 {
-//	m_pia34->portb_w(data);
+//  m_pia34->portb_w(data);
 }
 
 WRITE_LINE_MEMBER( s11c_bg_device::pia40_ca2_w)

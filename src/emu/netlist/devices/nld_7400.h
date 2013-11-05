@@ -35,9 +35,9 @@
 #define NLD_7400_H_
 
 #define TTL_7400_NAND(_name, _A, _B)                                                \
-        NET_REGISTER_DEV(7400, _name)                                               \
-        NET_CONNECT(_name, A, _A)                                                   \
-        NET_CONNECT(_name, B, _B)
+		NET_REGISTER_DEV(7400, _name)                                               \
+		NET_CONNECT(_name, A, _A)                                                   \
+		NET_CONNECT(_name, B, _B)
 
 NETLIB_SIGNAL(7400, 2, 0, 0);
 

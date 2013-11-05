@@ -4,9 +4,9 @@
 
     Gunpey (c) 2000 Banpresto
 
-	TODO:
-	- compression scheme used by the Axell video chip, game is playable but several gfxs are
-	  still broken.
+    TODO:
+    - compression scheme used by the Axell video chip, game is playable but several gfxs are
+      still broken.
 
 =============================================================================================
 ASM code study:

@@ -110,10 +110,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<n2a03_device> m_dev_n2a03a;	/* dkong3 */
+	optional_device<n2a03_device> m_dev_n2a03a; /* dkong3 */
 	optional_device<n2a03_device> m_dev_n2a03b; /* dkong3 */
-	optional_device<latch8_device> m_dev_vp2;	/* dkong2, virtual port 2 */
-	optional_device<latch8_device> m_dev_6h;	/* dkong2 */
+	optional_device<latch8_device> m_dev_vp2;   /* dkong2, virtual port 2 */
+	optional_device<latch8_device> m_dev_6h;    /* dkong2 */
 	optional_device<discrete_device> m_discrete;
 
 	/* memory pointers */
@@ -248,14 +248,14 @@ public:
 	INTERRUPT_GEN_MEMBER(s2650_interrupt);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
-	
+
 	void braze_decrypt_rom(UINT8 *dest);
 	void drakton_decrypt_rom(UINT8 mod, int offs, int *bs);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	void dkong_init_device_driver_data(  );
 	double CD4049(double x);
-	
+
 private:
 	// video/dkong.c
 	void radarscp_step(int line_cnt);

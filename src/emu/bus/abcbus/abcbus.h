@@ -204,7 +204,7 @@ public:
 // ======================> abcbus_slot_device
 
 class abcbus_slot_device : public device_t,
-						   public device_slot_interface
+							public device_slot_interface
 {
 public:
 	// construction/destruction

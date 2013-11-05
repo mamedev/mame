@@ -102,6 +102,6 @@ extern const device_type SERIAL;
 
 
 #define MCFG_SERIAL_ADD(_tag,_config) \
- MCFG_DEVICE_ADD(_tag, SERIAL, 0) \
+	MCFG_DEVICE_ADD(_tag, SERIAL, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 #endif /* __IMAGEDEV_SERIAL_H__ */

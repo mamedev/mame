@@ -2,8 +2,8 @@
 
     ACT Apricot PC/Xi
 
-	license: MAME, GPL-2.0+
-	copyright-holders: Dirk Best
+    license: MAME, GPL-2.0+
+    copyright-holders: Dirk Best
 
     - Error 29 (timer failed)
     - Dump of the keyboard MCU ROM needed (can be dumped using test mode)

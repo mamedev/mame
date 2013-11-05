@@ -118,8 +118,8 @@ public:
 	}
 	// profiling
 
-	INT32  	m_prof_start;
-	INT32	m_prof_end;
+	INT32   m_prof_start;
+	INT32   m_prof_end;
 	INT32   m_prof_sortmove;
 	INT32   m_prof_sort;
 private:

@@ -198,7 +198,7 @@ int c64_partner_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, i
 	{
 		switch ((offset >> 13) & 0x03)
 		{
-		case 0: case 1:	case 3:
+		case 0: case 1: case 3:
 			game = 0;
 			break;
 		}

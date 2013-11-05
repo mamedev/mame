@@ -574,7 +574,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 	{
 		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
-		
+
 		myo = offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);     /* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
@@ -611,7 +611,7 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 	{
 		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
-		
+
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00, data);           /* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
@@ -864,8 +864,8 @@ void bbc_state::bbcb_IC32_initialise(bbc_state *state)
 	m_b0_sound=0x01;             // Write Enable to the sound generator IC
 	m_b1_speech_read=0x01;       // READ select on the speech processor
 	m_b2_speech_write=0x01;      // WRITE select on the speech processor
-	m_b3_keyboard=0x01;          // Keyboard write enable 
-	m_b4_video0=0x01;            // These two outputs define the number to be added to the start of screen address 
+	m_b3_keyboard=0x01;          // Keyboard write enable
+	m_b4_video0=0x01;            // These two outputs define the number to be added to the start of screen address
 	m_b5_video1=0x01;            // in hardware to control hardware scrolling
 	m_b6_caps_lock_led=0x01;     // Operates the CAPS lock LED
 	m_b7_shift_lock_led=0x01;    // Operates the SHIFT lock LED

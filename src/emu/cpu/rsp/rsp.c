@@ -66,11 +66,11 @@ INLINE rsp_state *get_safe_token(device_t *device)
 #define ACCUM_M(x)      rsp->accum[((x))].w[2]
 #define ACCUM_L(x)      rsp->accum[((x))].w[1]
 
-#define CARRY		0
-#define COMPARE		1
-#define CLIP1		2
-#define ZERO		3
-#define CLIP2		4
+#define CARRY       0
+#define COMPARE     1
+#define CLIP1       2
+#define ZERO        3
+#define CLIP2       4
 
 #define CARRY_FLAG(x)           (rsp->vflag[CARRY][x & 7] != 0 ? 0xffff : 0)
 #define COMPARE_FLAG(x)         (rsp->vflag[COMPARE][x & 7] != 0 ? 0xffff : 0)
@@ -78,7 +78,7 @@ INLINE rsp_state *get_safe_token(device_t *device)
 #define ZERO_FLAG(x)            (rsp->vflag[ZERO][x & 7] != 0 ? 0xffff : 0)
 #define CLIP2_FLAG(x)           (rsp->vflag[CLIP2][x & 7] != 0 ? 0xffff : 0)
 
-#define CLEAR_CARRY_FLAGS()   	{ memset(rsp->vflag[0], 0, 16); }
+#define CLEAR_CARRY_FLAGS()     { memset(rsp->vflag[0], 0, 16); }
 #define CLEAR_COMPARE_FLAGS()   { memset(rsp->vflag[1], 0, 16); }
 #define CLEAR_CLIP1_FLAGS()     { memset(rsp->vflag[2], 0, 16); }
 #define CLEAR_ZERO_FLAGS()      { memset(rsp->vflag[3], 0, 16); }
@@ -309,11 +309,11 @@ static CPU_INIT( rsp )
 		rsp->v[regIdx].d[0] = 0;
 		rsp->v[regIdx].d[1] = 0;
 	}
-    CLEAR_CARRY_FLAGS();
-    CLEAR_COMPARE_FLAGS();
-    CLEAR_CLIP1_FLAGS();
-    CLEAR_ZERO_FLAGS();
-    CLEAR_CLIP2_FLAGS();
+	CLEAR_CARRY_FLAGS();
+	CLEAR_COMPARE_FLAGS();
+	CLEAR_CLIP1_FLAGS();
+	CLEAR_ZERO_FLAGS();
+	CLEAR_CLIP2_FLAGS();
 	//rsp->square_root_res = 0;
 	//rsp->square_root_high = 0;
 	rsp->reciprocal_res = 0;

@@ -2338,7 +2338,7 @@ gunfrontj       // 1991.01 C71 (c) 1990 Taito Corporation (Japan)
 growl           // 1991.?? C74 (c) 1990 Taito Corporation Japan (World)
 growlu          // 1991.02 C74 (c) 1990 Taito America Corporation (US)
 runark          // 1991.02 C74 (c) 1990 Taito Corporation (Japan)
-growlp			// 1991.?? C74 (c) 1990 Taito Corporation Japan (World, prototype)
+growlp          // 1991.?? C74 (c) 1990 Taito Corporation Japan (World, prototype)
 mjnquest        // 1991.05 C77 (c) 1990 Taito Corporation (Japan)
 mjnquestb       // 1991.05 C77 (c) 1990 Taito Corporation (Japan)
 footchmp        // 1991.?? C80 (c) 1990 Taito Corporation Japan (World)
@@ -3460,8 +3460,8 @@ jojoban         // 27/09/1999 (c) 1999 (Japan)
 jojobanr1       // 13/09/1999 (c) 1999 (Japan)
 jojobane        // 27/09/1999 (c) 1999 (Euro)
 jojobaner1      // 13/09/1999 (c) 1999 (Euro)
-cps3boot		// bootleg
-cps3boota		// bootleg
+cps3boot        // bootleg
+cps3boota       // bootleg
 
 // Capcom ZN1
 cpzn1
@@ -5905,7 +5905,7 @@ wondl96         // (c) 1996 SemiCom
 htchctch        // (c) 1995 SemiCom
 cookbib         // (c) 1995 SemiCom
 chokchok        // (c) 1995 SemiCom
-carket			//
+carket          //
 bcstry          // (c) 1997 SemiCom
 bcstrya         // (c) 1997 SemiCom
 semibase        // (c) 1997 SemiCom
@@ -8986,7 +8986,7 @@ hrdtimes        // (c) 1994
 hrdtimesa       // (c) 1994
 drtomy          // (c) 1993 no copyright message (1993 on pcb), some code taken from 'Big Karnak'
 sderby          // (c) 1996
-sderby2			// (c) 1996
+sderby2         // (c) 1996
 croupier        // (c) 1997 Playmark
 croupiera       // (c) 1997 Playmark
 spacewin
@@ -9990,7 +9990,7 @@ thedeep         // (c) 1987 Wood Place
 rundeep         // (c) 1988 Cream (bootleg?)
 wallc           // (c) 1984 Midcoin
 wallca          // (c) 1984 Midcoin
-sidampkr		//
+sidampkr        //
 wink            // (c) 1985 Midcoin
 winka           // (c) 1985 Midcoin
 24cdjuke        // (c) 1988 Midcoin
@@ -10231,7 +10231,7 @@ pntnpuzl        // Century?
 trucocl         // (c) 1991 Miky SRL
 ertictac        // (c) 1992 Sisteme
 ertictaca       // (c) 1992 Sisteme
-ertictacb		// (c) 1992 Sisteme
+ertictacb       // (c) 1992 Sisteme
 poizone         // (c) 1990 Sisteme
 ssfindo         // (c) 1999 Icarus
 ppcar           // (c) 1999 Icarus
@@ -10242,7 +10242,7 @@ dambustr        // (c) 1981 South West Research
 dambustra       // (c) 1981 South West Research
 dambustruk      // (c) 1981 South West Research
 gunpey          // (c) 2000 Banpresto
-hideseek		//
+hideseek        //
 spaceg          // (c) 19??
 gldarrow        // (c) 1984 Meyco Games
 wldarrow        // (c) 1982 Meyco Games

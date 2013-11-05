@@ -57,7 +57,7 @@
 #include "nld_7400.h"
 
 // this is a bad hack
-#define USE_OLD7493	(0)
+#define USE_OLD7493 (0)
 
 // ----------------------------------------------------------------------------------------
 // Special chips
@@ -87,8 +87,8 @@
 		NET_CONNECT(_name, S, _S)                                                   \
 		NET_CONNECT(_name, R, _R)
 
-#define NETDEV_LOG(_name, _I)  	                                                    \
-		NET_REGISTER_DEV(netdev_log, _name)											\
+#define NETDEV_LOG(_name, _I)                                                       \
+		NET_REGISTER_DEV(netdev_log, _name)                                         \
 		NET_CONNECT(_name, I, _I)
 
 
@@ -356,7 +356,7 @@ NETLIB_SUBDEVICE(nic7474sub,
 );
 
 NETLIB_DEVICE(nic7474,
-    NETLIB_NAME(nic7474sub) sub;
+	NETLIB_NAME(nic7474sub) sub;
 
 	ttl_input_t m_D;
 	ttl_input_t m_clrQ;
@@ -389,7 +389,7 @@ NETLIB_SUBDEVICE(nic74107Asub,
 );
 
 NETLIB_DEVICE(nic74107A,
-    NETLIB_NAME(nic74107Asub) sub;
+	NETLIB_NAME(nic74107Asub) sub;
 
 	ttl_input_t m_J;
 	ttl_input_t m_K;
@@ -400,7 +400,7 @@ NETLIB_DEVICE(nic74107A,
 class NETLIB_NAME(nic74107) : public NETLIB_NAME(nic74107A)
 {
 public:
-    NETLIB_NAME(nic74107) ()
+	NETLIB_NAME(nic74107) ()
 	:   NETLIB_NAME(nic74107A) () {}
 
 };
@@ -480,7 +480,7 @@ NETLIB_SUBDEVICE(nic9316_sub,
 );
 
 NETLIB_DEVICE(nic9316,
-    NETLIB_NAME(nic9316_sub) sub;
+	NETLIB_NAME(nic9316_sub) sub;
 	ttl_input_t m_ENP;
 	ttl_input_t m_ENT;
 	ttl_input_t m_CLRQ;
@@ -543,7 +543,7 @@ NETLIB_SUBDEVICE(nic7448_sub,
 
 NETLIB_DEVICE(nic7448,
 
-    NETLIB_NAME(nic7448_sub) sub;
+	NETLIB_NAME(nic7448_sub) sub;
 
 	ttl_input_t m_LTQ;
 	ttl_input_t m_BIQ;

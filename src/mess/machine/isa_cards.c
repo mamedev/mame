@@ -2,8 +2,8 @@
 
     ISA cards
 
-	license: MAME, GPL-2.0+
-	copyright-holders: Dirk Best
+    license: MAME, GPL-2.0+
+    copyright-holders: Dirk Best
 
 **********************************************************************/
 

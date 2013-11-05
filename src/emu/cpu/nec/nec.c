@@ -364,14 +364,14 @@ void nec_common_device::device_start()
 		Mod_RM.RM.b[i] = breg_name[i & 7];
 	}
 
-    m_no_interrupt = 0;
-    m_prefetch_count = 0;
-    m_prefetch_reset = 0;
-    m_prefix_base = 0;
-    m_seg_prefix = 0;
-    m_EA = 0;
-    m_EO = 0;
-    m_E16 = 0;
+	m_no_interrupt = 0;
+	m_prefetch_count = 0;
+	m_prefetch_reset = 0;
+	m_prefix_base = 0;
+	m_seg_prefix = 0;
+	m_EA = 0;
+	m_EO = 0;
+	m_E16 = 0;
 
 	save_item(NAME(m_regs.w));
 	save_item(NAME(m_sregs));
@@ -522,4 +522,3 @@ void nec_common_device::execute_run()
 		do_prefetch(prev_ICount);
 	}
 }
-

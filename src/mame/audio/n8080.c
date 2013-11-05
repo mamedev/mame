@@ -569,7 +569,7 @@ MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 
 	MCFG_SOUND_START_OVERRIDE(n8080_state,spacefev)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,spacefev)
-	
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
@@ -590,10 +590,10 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( sheriff_sound )
-	
+
 	MCFG_SOUND_START_OVERRIDE(n8080_state,sheriff)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,sheriff)
-	
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
@@ -615,7 +615,7 @@ MACHINE_CONFIG_FRAGMENT( helifire_sound )
 
 	MCFG_SOUND_START_OVERRIDE(n8080_state,helifire)
 	MCFG_SOUND_RESET_OVERRIDE(n8080_state,helifire)
-	
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
 	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)

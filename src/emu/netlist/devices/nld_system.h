@@ -17,12 +17,12 @@
 // ----------------------------------------------------------------------------------------
 
 #define NETDEV_TTL_CONST(_name, _v)                                                 \
-        NET_REGISTER_DEV(netdev_ttl_const, _name)                                   \
-        NETDEV_PARAM(_name.CONST, _v)
+		NET_REGISTER_DEV(netdev_ttl_const, _name)                                   \
+		NETDEV_PARAM(_name.CONST, _v)
 
 #define NETDEV_ANALOG_CONST(_name, _v)                                              \
-        NET_REGISTER_DEV(netdev_analog_const, _name)                                \
-        NETDEV_PARAM(_name.CONST, _v)
+		NET_REGISTER_DEV(netdev_analog_const, _name)                                \
+		NETDEV_PARAM(_name.CONST, _v)
 
 // ----------------------------------------------------------------------------------------
 // netdev_*_const
@@ -58,7 +58,7 @@ NETLIB_DEVICE_WITH_PARAMS(netdev_mainclock,
 class NETLIB_NAME(netdev_analog_callback) : public net_device_t
 {
 public:
-    NETLIB_NAME(netdev_analog_callback)()
+	NETLIB_NAME(netdev_analog_callback)()
 		: net_device_t() { }
 
 	ATTR_COLD void start()

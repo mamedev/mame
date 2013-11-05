@@ -22,7 +22,7 @@ public:
 	required_device<vector_device> m_vector;
 	required_shared_ptr<UINT16> m_nvram;
 	required_shared_ptr<UINT16> m_vectorram;
-	
+
 	int m_sound_status;
 	int m_xcenter;
 	int m_ycenter;

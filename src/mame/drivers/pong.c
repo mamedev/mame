@@ -48,7 +48,7 @@ TODO:
  */
 
 #define MASTER_CLOCK    7159000
-#define V_TOTAL         (0x105+1)		// 262
+#define V_TOTAL         (0x105+1)       // 262
 #define H_TOTAL         (0x1C6+1)       // 454
 
 #define HBSTART                 (H_TOTAL)
@@ -334,7 +334,7 @@ static NETLIST_START(pong_schematics)
 	NE555N_MSTABLE(ic_b9, 256VQ, P1)
 	NETDEV_PARAM(ic_b9.R, RES_K(90))
 	NETDEV_PARAM(ic_b9.C, CAP_U(.1))
-	NETDEV_PARAM(ic_b9.VL, 0.5)			// 1N914
+	NETDEV_PARAM(ic_b9.VL, 0.5)         // 1N914
 	TTL_7404_INVERT(ic_c9b, ic_b9.Q)
 	TTL_7400_NAND(ic_b7b, ic_a7b.Q, hsyncQ)
 	TTL_7493(ic_b8, ic_b7b.Q, ic_b8.QA, ic_b9.Q, ic_b9.Q)
@@ -351,7 +351,7 @@ static NETLIST_START(pong_schematics)
 	NE555N_MSTABLE(ic_a9, 256VQ, P2)
 	NETDEV_PARAM(ic_a9.R, RES_K(90))
 	NETDEV_PARAM(ic_a9.C, CAP_U(.1))
-	NETDEV_PARAM(ic_a9.VL, 0.5)			// 1N914
+	NETDEV_PARAM(ic_a9.VL, 0.5)         // 1N914
 	TTL_7404_INVERT(ic_c9a, ic_a9.Q)
 	TTL_7400_NAND(ic_b7c, ic_a7a.Q, hsyncQ)
 	TTL_7493(ic_a8, ic_b7c.Q, ic_a8.QA, ic_a9.Q, ic_a9.Q)

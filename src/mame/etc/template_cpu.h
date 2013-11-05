@@ -52,8 +52,8 @@ protected:
 private:
 	address_space_config m_program_config;
 
-	UINT8	m_pc;   /* registers */
-	UINT8	m_flags;  /* flags */
+	UINT8   m_pc;   /* registers */
+	UINT8   m_flags;  /* flags */
 	address_space *m_program;
 	address_space *m_data;
 	int m_icount;

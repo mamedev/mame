@@ -59,7 +59,7 @@ union SCUDSPREG16 {
 };
 
 class scudsp_cpu_device :  public cpu_device,
-                           public scudsp_interface
+							public scudsp_interface
 {
 public:
 	// construction/destruction
@@ -75,7 +75,7 @@ public:
 	/* port 3 */
 	DECLARE_READ32_MEMBER( ram_address_r );
 	DECLARE_WRITE32_MEMBER( ram_address_w );
-//	virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
+//  virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
 
 protected:
 	// device-level overrides
@@ -108,17 +108,17 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 
-	UINT8	m_pc;   /* registers */
-	UINT32	m_flags;  /* flags */
+	UINT8   m_pc;   /* registers */
+	UINT32  m_flags;  /* flags */
 	UINT8   m_ra;
 	UINT8   m_ct0,m_ct1,m_ct2,m_ct3;
-	UINT8	m_delay;                                   /* Delay */
-	UINT8	m_top;                                     /*Jump Command memory*/
-	UINT16	m_lop;                                    /*Counter Register*/   /*12-bits*/
+	UINT8   m_delay;                                   /* Delay */
+	UINT8   m_top;                                     /*Jump Command memory*/
+	UINT16  m_lop;                                    /*Counter Register*/   /*12-bits*/
 	SCUDSPREG32 m_rx;                                /*X-Bus register*/
-	INT64 	m_mul;                                     /*Multiplier register*//*48-bits*/
+	INT64   m_mul;                                     /*Multiplier register*//*48-bits*/
 	SCUDSPREG32 m_ry;                                /*Y-Bus register*/
-	INT64  	m_alu;                                    /*ALU register*/       /*48-bits*/
+	INT64   m_alu;                                    /*ALU register*/       /*48-bits*/
 	SCUDSPREG16 m_ph;                                /*ALU high register*/
 	SCUDSPREG32 m_pl;                                /*ALU low register*/
 	SCUDSPREG16 m_ach;                               /*ALU external high register*/

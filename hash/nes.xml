@@ -37501,11 +37501,11 @@
 			<feature name="batt?" value="BATTERY" />
 			<dataarea name="prg" size="262144">
 			<!-- The PRG split ROMs have to be confirmed -->
-				<rom name="8-27 0 5-20.u1" size="131072" crc="06074289" sha1="7c5b4a7f51eb79458cbe7cb7e77aae4df6eac4f3" offset="0x00000" status="baddump" />	<!-- Actual label: 8/27 0 5:20 -->
-				<rom name="8-27 1 5-20.u2" size="131072" crc="937992d7" sha1="e335b4c2dc3fc21effaa8a12d47677090c8b30c4" offset="0x20000" status="baddump" />	<!-- Actual label: 8/27 1 5:20 -->
+				<rom name="8-27 0 5-20.u1" size="131072" crc="06074289" sha1="7c5b4a7f51eb79458cbe7cb7e77aae4df6eac4f3" offset="0x00000" status="baddump" />    <!-- Actual label: 8/27 0 5:20 -->
+				<rom name="8-27 1 5-20.u2" size="131072" crc="937992d7" sha1="e335b4c2dc3fc21effaa8a12d47677090c8b30c4" offset="0x20000" status="baddump" />    <!-- Actual label: 8/27 1 5:20 -->
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="t.s.b. chr 8-27.u5" size="131072" crc="e5f74c77" sha1="3657693f08c66d2db84bcf62fdd4c439603778f5" offset="00000" />	<!-- Actual label: T.S.B. CHR 8/27 -->
+				<rom name="t.s.b. chr 8-27.u5" size="131072" crc="e5f74c77" sha1="3657693f08c66d2db84bcf62fdd4c439603778f5" offset="00000" />   <!-- Actual label: T.S.B. CHR 8/27 -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">

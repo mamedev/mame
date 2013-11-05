@@ -1493,7 +1493,7 @@ static MACHINE_CONFIG_DERIVED( mars, scramble )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mars_map)
-	
+
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_I8255A_ADD( "ppi8255_1", stratgyx_ppi_1_intf )
 

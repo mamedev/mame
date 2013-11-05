@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *	TTL74145
+ *  TTL74145
  *
- *	license: MAME, GPL-2.0+
- *	copyright-holders: Dirk Best
+ *  license: MAME, GPL-2.0+
+ *  copyright-holders: Dirk Best
  *
- *	BCD-to-Decimal decoder
+ *  BCD-to-Decimal decoder
  *
  *        __ __
  *     0-|  v  |-VCC

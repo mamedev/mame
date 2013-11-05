@@ -60,7 +60,7 @@ saturn_device::saturn_device(const machine_config &mconfig, const char *tag, dev
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_out_func(*this)
 	, m_in_func(*this)
-	, m_reset_func(*this) 
+	, m_reset_func(*this)
 	, m_config_func(*this)
 	, m_unconfig_func(*this)
 	, m_id_func(*this)
@@ -97,7 +97,7 @@ void saturn_device::device_start()
 
 	m_out_func.resolve_safe();
 	m_in_func.resolve_safe(0);
-	m_reset_func.resolve_safe();         
+	m_reset_func.resolve_safe();
 	m_config_func.resolve_safe();
 	m_unconfig_func.resolve_safe();
 	m_id_func.resolve_safe(0);
@@ -420,4 +420,3 @@ INT64 saturn_device::Reg64Int(Saturn64 r)
 		x |= (INT64) r[i] << (4*i);
 	return x;
 }
-

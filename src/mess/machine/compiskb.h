@@ -25,7 +25,7 @@
 //**************************************************************************
 
 #define COMPIS_KEYBOARD_TAG "compiskb"
-#define SPEAKER_TAG			"speaker"
+#define SPEAKER_TAG         "speaker"
 
 
 

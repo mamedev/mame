@@ -12,8 +12,8 @@
     Video Technology Laser 310
       Dick Smith Electronics VZ-300
 
-	license: MAME
-	copyright-holders: Juergen Buchmueller, Dirk Best
+    license: MAME
+    copyright-holders: Juergen Buchmueller, Dirk Best
 
 Thanks go to:
 

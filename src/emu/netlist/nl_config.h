@@ -16,27 +16,27 @@
 //  SETUP
 //============================================================
 
-#define USE_DELEGATES			(0)
+#define USE_DELEGATES           (0)
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc
  * This is intended for non-mame usage.
  *
  */
-#define USE_PMFDELEGATES		(0)
+#define USE_PMFDELEGATES        (0)
 
 // Next if enabled adds 20% performance ... but is not guaranteed to be absolutely timing correct.
-#define USE_DEACTIVE_DEVICE		(0)
+#define USE_DEACTIVE_DEVICE     (0)
 
-#define OUTPUT_MAX_CONNECTIONS	(48)
+#define OUTPUT_MAX_CONNECTIONS  (48)
 
 // Use nano-second resolution - Sufficient for now
-#define NETLIST_INTERNAL_RES		(U64(1000000000))
-#define NETLIST_DIV_BITS			(0)
-//#define NETLIST_INTERNAL_RES		(U64(1000000000000))
-//#define NETLIST_DIV_BITS			(10)
-#define NETLIST_DIV					(U64(1) << NETLIST_DIV_BITS)
-#define NETLIST_MASK				(NETLIST_DIV-1)
-#define NETLIST_CLOCK              	(NETLIST_INTERNAL_RES / NETLIST_DIV)
+#define NETLIST_INTERNAL_RES        (U64(1000000000))
+#define NETLIST_DIV_BITS            (0)
+//#define NETLIST_INTERNAL_RES      (U64(1000000000000))
+//#define NETLIST_DIV_BITS          (10)
+#define NETLIST_DIV                 (U64(1) << NETLIST_DIV_BITS)
+#define NETLIST_MASK                (NETLIST_DIV-1)
+#define NETLIST_CLOCK               (NETLIST_INTERNAL_RES / NETLIST_DIV)
 
 #define NETLIST_HIGHIMP_V   (1.23456e20)        /* some voltage we should never see */
 
@@ -54,7 +54,7 @@ typedef delegate<void (const double)> netlist_output_delegate;
 
 #define NL_VERBOSE                 (0)
 #define NL_KEEP_STATISTICS         (0)
-#define FATAL_ERROR_AFTER_NS	 (0) //(1000)
+#define FATAL_ERROR_AFTER_NS     (0) //(1000)
 
 #if (NL_VERBOSE)
 	#define NL_VERBOSE_OUT(x)      printf x

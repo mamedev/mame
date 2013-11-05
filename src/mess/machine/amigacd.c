@@ -431,7 +431,7 @@ static const amiga_autoconfig_device dmac_device =
 READ8_DEVICE_HANDLER( amigacd_tpi6525_portc_r )
 {
 	int ret = 0;
-	
+
 	tpi6525_device *tpi = space.machine().device<tpi6525_device>("tpi6525");
 
 	if ( (tpi->get_ddr_c() & 0x04) == 0 ) /* if pin 2 is set to input */
@@ -448,7 +448,7 @@ READ8_DEVICE_HANDLER( amigacd_tpi6525_portc_r )
 WRITE8_DEVICE_HANDLER( amigacd_tpi6525_portb_w )
 {
 	tpi6525_device *tpi = space.machine().device<tpi6525_device>("tpi6525");
-	
+
 	if ( tpi->get_ddr_b() & 0x01 ) /* if pin 0 is set to output */
 		matsucd_cmd_w( data & 1 ); /* write to the /CMD signal */
 

@@ -64,9 +64,9 @@ inline void mb_vcu_device::write_byte(offs_t address, UINT8 data)
 
 mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB_VCU, "Mazer Blazer custom VCU", tag, owner, clock, "mb_vcu", __FILE__),
-	  device_memory_interface(mconfig, *this),
-	  device_video_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram))
+		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram))
 {
 }
 
@@ -144,7 +144,7 @@ void mb_vcu_device::device_reset()
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
-//	UINT8 *pcg = memregion("sub2")->base();
+//  UINT8 *pcg = memregion("sub2")->base();
 
 READ8_MEMBER( mb_vcu_device::read_ram )
 {
@@ -296,7 +296,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 {
 	int xi,yi;
 	int dstx,dsty;
-//	UINT8 dot;
+//  UINT8 dot;
 	int bits = 0;
 	if(m_mode == 0x13 || m_mode == 0x03)
 	{

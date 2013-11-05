@@ -114,8 +114,8 @@ HT-01B
 
 *************************************************************
 
-	       Desert Dan (C)1982 by Video Optics 
-			     pinout
+           Desert Dan (C)1982 by Video Optics
+                 pinout
                           -------------
 
        ---------------------------------------------------
@@ -124,21 +124,21 @@ HT-01B
                        GND |  A | 1  | GND
                         +5 |  B | 2  | +5
                         +5 |  C | 3  | +5
-                           |  D | 4  | 
+                           |  D | 4  |
                   1P START |  E | 5  | 2P START
-                           |  F | 6  | 
+                           |  F | 6  |
                            |  H | 7  | COIN
-                           |  J | 8  | 
-                           |  K | 9  | 
+                           |  J | 8  |
+                           |  K | 9  |
                            |  L | 10 | ATTACK
-                           |  M | 11 | 
-                           |  N | 12 | 
-                        UP |  P | 13 | 
-                      DOWN |  R | 14 | 
-                      LEFT |  S | 15 | 
-                     RIGHT |  T | 16 | 
+                           |  M | 11 |
+                           |  N | 12 |
+                        UP |  P | 13 |
+                      DOWN |  R | 14 |
+                      LEFT |  S | 15 |
+                     RIGHT |  T | 16 |
                      SPK + |  U | 17 | SPK - (GND)
-                     	   |  V | 18 | 
+                           |  V | 18 |
                SYNC (COMP) |  W | 19 | RED
                      GREEN |  X | 20 | BLUE
                       + 12 |  Y | 21 | + 12

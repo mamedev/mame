@@ -2,7 +2,7 @@
 
     fixfreq.h
 
-	2013 Couriersud
+    2013 Couriersud
 
     Fixed frequency monochrome monitor emulation
 
@@ -57,13 +57,13 @@ const device_type FIXFREQ = &device_creator<fixedfreq_device>;
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	  device_video_interface(mconfig, *this, false)
+		device_video_interface(mconfig, *this, false)
 {
 }
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FIXFREQ, "FIXFREQ", tag, owner, clock, "fixfreq", __FILE__),
-	  device_video_interface(mconfig, *this, false)
+		device_video_interface(mconfig, *this, false)
 {
 }
 
@@ -85,7 +85,6 @@ void fixedfreq_device::device_config_complete()
 
 void fixedfreq_device::device_start()
 {
-
 	m_htotal = 0;
 	m_vtotal = 0;
 
@@ -167,8 +166,8 @@ void fixedfreq_device::recompute_parameters(bool postload)
 void fixedfreq_device::update_screen_parameters(attotime refresh)
 {
 	rectangle visarea(
-//			m_hsync - m_hvisible,
-//			m_hsync - 1 ,
+//          m_hsync - m_hvisible,
+//          m_hsync - 1 ,
 			m_hbackporch - m_hfrontporch,
 			m_hbackporch - m_hfrontporch + m_hvisible - 1,
 			m_vbackporch - m_vfrontporch,
@@ -222,7 +221,6 @@ UINT32 fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void fixedfreq_device::update_vid(double newval, attotime cur_time)
 {
-
 	bitmap_rgb32 *bm = m_bitmap[m_cur_bm];
 
 	int pixels = round((cur_time - m_line_time).as_double() / m_clock_period.as_double());
@@ -292,5 +290,3 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 
 
 /***************************************************************************/
-
-

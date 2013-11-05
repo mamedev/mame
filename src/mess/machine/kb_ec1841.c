@@ -2,7 +2,7 @@
 
     EC-1841 92-key keyboard emulation
 
-    Sends 9 non-standard scan codes (54..5C) and reassigns 3 standard 
+    Sends 9 non-standard scan codes (54..5C) and reassigns 3 standard
     ones (2A, 36, 3A).  EC-1841 BIOS converts scan codes into Cyrillic
     by default; 'Lat' key (mapped to F11) switches it to Latin mode.
     'Rus' (F12) switches back.

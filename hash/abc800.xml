@@ -158,7 +158,7 @@
 		<year>198?</year>
 		<publisher>Luxor</publisher>
 		<info name="usage" value="RUN&quot;LIB&quot;" />
-		
+
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="119474">
 				<rom name="ufd619.td0" size="119474" crc="d3f9487e" sha1="ad22609421d9abb4c803899b405d087ff3b91c38" offset="0" />

@@ -475,7 +475,7 @@ MACHINE_RESET_MEMBER(n8080_state,n8080)
 MACHINE_RESET_MEMBER(n8080_state,spacefev)
 {
 	MACHINE_RESET_CALL_MEMBER(n8080);
-	
+
 	m_spacefev_red_screen = 0;
 	m_spacefev_red_cannon = 0;
 }
@@ -483,7 +483,7 @@ MACHINE_RESET_MEMBER(n8080_state,spacefev)
 MACHINE_RESET_MEMBER(n8080_state,sheriff)
 {
 	MACHINE_RESET_CALL_MEMBER(n8080);
-	
+
 	m_sheriff_color_mode = 0;
 	m_sheriff_color_data = 0;
 }
@@ -491,7 +491,7 @@ MACHINE_RESET_MEMBER(n8080_state,sheriff)
 MACHINE_RESET_MEMBER(n8080_state,helifire)
 {
 	MACHINE_RESET_CALL_MEMBER(n8080);
-	
+
 	m_helifire_mv = 0;
 	m_helifire_sc = 0;
 	m_helifire_flash = 0;

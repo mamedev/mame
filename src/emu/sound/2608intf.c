@@ -226,7 +226,7 @@ ROM_START( ym2608 )
 	It was verified, using real YM2608, that this ADPCM stream produces 100% correct output signal.
 	*/
 	// see YM2608_ADPCM_ROM_addr table in fm.c for current sample offsets
-	// original offset comments from Jarek: 
+	// original offset comments from Jarek:
 	// offset 0:
 		/* Source: 01BD.ROM */
 		/* Length: 448 / 0x000001C0 */
@@ -257,5 +257,3 @@ const rom_entry *ym2608_device::device_rom_region() const
 {
 	return ROM_NAME( ym2608 );
 }
-
-

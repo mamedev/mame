@@ -410,7 +410,7 @@ public:
 	required_device<er59256_device> m_eeprom;
 
 	UINT32 m_debug_machine;
-//	i186_state m_i186;
+//  i186_state m_i186;
 	keyboard_t m_keyboard;
 	nimbus_drives_t m_nimbus_drives;
 	ipc_interface_t m_ipc_interface;

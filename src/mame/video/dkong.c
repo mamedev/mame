@@ -837,9 +837,9 @@ void dkong_state::radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle
 void dkong_state::radarscp_scanline(int scanline)
 {
 	const UINT8 *table = m_gfx3;
-	int 		table_len = m_gfx3_len;
-	int 			x,y,offset;
-	UINT16			*pixel;
+	int         table_len = m_gfx3_len;
+	int             x,y,offset;
+	UINT16          *pixel;
 	const rectangle &visarea = m_screen->visible_area();
 
 	y = scanline;
@@ -853,9 +853,9 @@ void dkong_state::radarscp_scanline(int scanline)
 		pixel = &m_bg_bits.pix16(y, x);
 		if ((m_counter < table_len) && (x == 4 * (table[m_counter|offset] & 0x7f)))
 		{
-			if ( m_star_ff && (table[m_counter|offset] & 0x80) )	/* star */
+			if ( m_star_ff && (table[m_counter|offset] & 0x80) )    /* star */
 				*pixel = RADARSCP_STAR_COL;
-			else if (m_grid_sig && !(table[m_counter|offset] & 0x80))			/* radar */
+			else if (m_grid_sig && !(table[m_counter|offset] & 0x80))           /* radar */
 				*pixel = RADARSCP_GRID_COL_OFFSET+m_grid_col;
 			else
 				*pixel = RADARSCP_BCK_COL_OFFSET + m_blue_level;

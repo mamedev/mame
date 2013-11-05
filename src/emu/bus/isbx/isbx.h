@@ -99,7 +99,7 @@ protected:
 // ======================> isbx_slot_device
 
 class isbx_slot_device : public device_t,
-						 public device_slot_interface
+							public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -109,7 +109,7 @@ public:
 	template<class _mintr1> void set_mintr1_callback(_mintr1 mintr1) { m_write_mintr1.set_callback(mintr1); }
 	template<class _mdrqt> void set_mdrqt_callback(_mdrqt mdrqt) { m_write_mdrqt.set_callback(mdrqt); }
 	template<class _mwait> void set_mwait_callback(_mwait mwait) { m_write_mwait.set_callback(mwait); }
-	
+
 	// computer interface
 	DECLARE_READ8_MEMBER( mcs0_r ) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
 	DECLARE_WRITE8_MEMBER( mcs0_w ) { if (m_card) m_card->mcs0_w(space, offset, data); }

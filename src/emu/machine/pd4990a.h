@@ -20,14 +20,14 @@ class upd4990a_old_device : public device_t
 public:
 	upd4990a_old_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~upd4990a_old_device() {}
-	
+
 	/* this should be refactored, once RTCs get unified */
 	void addretrace();
 
 	DECLARE_READ8_MEMBER( testbit_r );
 	DECLARE_READ8_MEMBER( databit_r );
 	DECLARE_WRITE16_MEMBER( control_16_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -59,7 +59,7 @@ private:
 
 	int m_clock_line;
 	int m_command_line;   //??
-	
+
 	void increment_month();
 	void increment_day();
 	void readbit();

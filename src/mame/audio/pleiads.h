@@ -6,7 +6,7 @@ struct pl_t_state
 		counter(0),
 		output(0),
 		max_freq(0) {}
-		
+
 	int counter;
 	int output;
 	int max_freq;
@@ -18,8 +18,8 @@ struct pl_c_state
 		counter(0),
 		level(0),
 		charge_time(0),
-		discharge_time(0) {}	
-		
+		discharge_time(0) {}
+
 	int counter;
 	int level;
 	double charge_time;
@@ -32,7 +32,7 @@ struct pl_n_state
 		counter(0),
 		polyoffs(0),
 		freq(0) {}
-	
+
 	int counter;
 	int polyoffs;
 	int freq;
@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER( control_a_w );
 	DECLARE_WRITE8_MEMBER( control_b_w );
 	DECLARE_WRITE8_MEMBER( control_c_w );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -57,7 +57,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 	void common_start();
 	inline int tone1(int samplerate);
 	inline int update_pb4(int samplerate);
@@ -68,7 +68,7 @@ protected:
 	inline int tone4(int samplerate);
 	inline int update_c_pa6(int samplerate);
 	inline int noise(int samplerate);
-	
+
 	// internal state
 	tms36xx_device *m_tms;
 	sound_stream *m_channel;

@@ -25,13 +25,13 @@ public:
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_vectorram;
-	
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<samples_device> m_samples;
 	optional_device<speech_sound_device> m_speech;
 	optional_device<usb_sound_device> m_usb;
 	required_device<vector_device> m_vector;
-	
+
 	UINT8 m_mult_data[2];
 	UINT16 m_mult_result;
 	UINT8 m_spinner_select;

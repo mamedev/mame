@@ -466,7 +466,7 @@ ifeq ($(findstring rpi,$(TEST_GCC)),rpi)
 	CCOMFLAGS += -Wno-cast-align
 endif
 
-else	# compiler is specifically Clang
+else    # compiler is specifically Clang
 	CCOMFLAGS += -Wno-cast-align -Wno-constant-logical-operand -Wno-shift-count-overflow -Wno-tautological-constant-out-of-range-compare -Wno-tautological-compare -Wno-self-assign-field
 endif
 

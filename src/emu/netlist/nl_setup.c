@@ -87,7 +87,7 @@ void netlist_setup_t::remove_dev(const astring &name)
 
 void netlist_setup_t::register_callback(const astring &devname, netlist_output_delegate delegate)
 {
-    NETLIB_NAME(netdev_analog_callback) *dev = (NETLIB_NAME(netdev_analog_callback) *) m_devices.find(devname);
+	NETLIB_NAME(netdev_analog_callback) *dev = (NETLIB_NAME(netdev_analog_callback) *) m_devices.find(devname);
 	if (dev == NULL)
 		fatalerror("did not find device %s\n", devname.cstr());
 	dev->register_callback(delegate);
@@ -315,4 +315,3 @@ void netlist_setup_t::print_stats()
 		printf("Queue Move  %15d\n", m_netlist.m_queue.m_prof_sortmove);
 	}
 }
-

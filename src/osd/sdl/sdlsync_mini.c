@@ -9,11 +9,11 @@
 #include "osdcore.h"
 #include "sdlsync.h"
 
-#define USE_SCALABLE_LOCKS		(0)
+#define USE_SCALABLE_LOCKS      (0)
 
 struct _osd_event
 {
-	void *	ptr;
+	void *  ptr;
 };
 
 struct _osd_thread {

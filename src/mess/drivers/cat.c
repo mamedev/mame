@@ -7,29 +7,29 @@
     Copyright (C) 2009-2013 Miodrag Milanovic and Jonathan Gevaryahu AKA Lord Nightmare
     With information and help from John "Sandy" Bumgarner, Dwight Elvey,
     Charles Springer, Terry Holmes, Jonathan Sand, Aza Raskin and others.
-  
-  
+
+
     This source file is dual-licensed under the following licenses:
     1. The MAME license as of September 2013
     2. The GNU LGPLv2.1:
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
     License as published by the Free Software Foundation; either
     version 2.1 of the License, or (at your option) any later version.
-    
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Lesser General Public License for more details.
-    
+
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-  
+
     Please contact the authors if you require other licensing.
-  
-  
+
+
     This driver is dedicated in memory of Jef Raskin and Dave Boulton
 
     12/06/2009 Skeleton driver.
@@ -234,7 +234,7 @@ J9: unpopulated DIL 40-pin straight connector for a ROM debug/expansion/RAM-shad
     /HICE is most likely !(a19|a18)&!a15
     pin 1 (GND) is in the lower left and the pins count low-high then to the right
     (gnd ? ? ? ?   ? vcc a14 a13 a8 a9 a11 /OE a10 /LOCE d7 d6 d5 d4 d3 )
-    (GND ? ? ? gnd ? vcc a12 a7  a6 a5 a4  a3  a2  a1    a0 d0 d1 d2 gnd) 
+    (GND ? ? ? gnd ? vcc a12 a7  a6 a5 a4  a3  a2  a1    a0 d0 d1 d2 gnd)
 Jx: 4 pin on top side, 6 pin on bottom side edge ?debug? connector (doesn't have a Jx number)
     (trace me!)
 B1: a cut-able trace on the pcb. Not cut, affects one of the pins on the unpopulated J9 connector only.
@@ -453,9 +453,9 @@ public:
 	DECLARE_READ16_MEMBER(cat_2e80_r);
 	DECLARE_READ16_MEMBER(cat_0080_r);
 	DECLARE_READ16_MEMBER(cat_0000_r);
-	
+
 	DECLARE_READ8_MEMBER(swyft_d0000);
-	
+
 	DECLARE_READ8_MEMBER(swyft_via0_r);
 	DECLARE_WRITE8_MEMBER(swyft_via0_w);
 	DECLARE_READ8_MEMBER(via0_pa_r);
@@ -471,7 +471,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(via0_cb2_r);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via0_int_w);
-	
+
 	DECLARE_READ8_MEMBER(swyft_via1_r);
 	DECLARE_WRITE8_MEMBER(swyft_via1_w);
 	DECLARE_READ8_MEMBER(via1_pa_r);
@@ -1200,7 +1200,7 @@ rom:
 ...-0xC951: ?
 0xC952: boot vector
 0xC952-0xCAAE: binary code (purpose?)
-	0xCD26-0xCD3B: ?init forth bytecode?
+    0xCD26-0xCD3B: ?init forth bytecode?
 0xCD3C-0xCEBA: 0xFF fill (unused?)
 0xCEEB-0xFFFE: Forth dictionaries for compiling, with <word> then <3 bytes> afterward? (or before it? most likely afterward)
 
@@ -1243,7 +1243,7 @@ Add A0 low word to itself
 Add A0 low word to itself again
 move the long word from address pointed to by A0 (i.e. the specific opcode's area at the 46xxx part of ram) to A1
 Jump to A1(CD06)
- 
+
 CD06: jump to A3 (E94)
 
 E94: subtract D5 from A5 (cd28 - cd22 = 0x0006)
@@ -1358,8 +1358,8 @@ READ8_MEMBER( cat_state::swyft_d0000 )
 
 // if bit is 1 enable: (obviously don't set more than one bit or you get bus contention!)
 //                                           acia
-//                                       via0 
-//                                    via1 
+//                                       via0
+//                                    via1
 // x   x   x   x   1   1  ?1? ?0?  ?   ^   ^   ^   ?   ?   *   *   *   *  ?*?  ?   ?   ?   ?   ?
 //                                                         ^   ^   ^   ^  <- these four bits address the VIA registers? is this correct?
 static const char *const swyft_via_regnames[] = { "0: ORB/IRB", "1: ORA/IRA", "2: DDRB", "3: DDRA", "4: T1C-L", "5: T1C-H", "6: T1L-L", "7: T1L-H", "8: T2C-L" "9: T2C-H", "A: SR", "B: ACR", "C: PCR", "D: IFR", "E: IER", "F: ORA/IRA*" };

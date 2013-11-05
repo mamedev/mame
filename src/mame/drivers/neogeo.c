@@ -672,7 +672,7 @@ void neogeo_state::neogeo_audio_cpu_banking_init()
 	m_bank_audio_cart[1] = membank("audio_e000");
 	m_bank_audio_cart[2] = membank("audio_c000");
 	m_bank_audio_cart[3] = membank("audio_8000");
-	
+
 	address_mask = (memregion("audiocpu")->bytes() - 0x10000 - 1) & 0x3ffff;
 	rgn = memregion("audiocpu")->base();
 
@@ -1058,7 +1058,7 @@ static INPUT_PORTS_START( neogeo )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, get_memcard_status, NULL)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1) Some games check this and show */
-	                                               /* a piracy warning screen if the hardware and BIOS don't match */
+													/* a piracy warning screen if the hardware and BIOS don't match */
 
 	PORT_START("AUDIO/COIN")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )

@@ -1114,40 +1114,40 @@ TODO: this needs to be device-ized, of course ...
 ---- ---- ---- ---x set to enable irq
 [0x04]: DSA control register
 [0x0a]: DSA TX/RX data (sends commands with this)
-	0x01 Play Title (?)
-	0x02 Stop
-	0x03 Read TOC
-	0x04 Pause
-	0x05 Unpause
-	0x09 Get Title Len
-	0x0a Open Tray
-	0x0b Close Tray
-	0x0d Get Comp Time
-	0x10 Goto ABS Min
-	0x11 Goto ABS Sec
-	0x12 Goto ABS Frame
-	0x14 Read Long TOC
-	0x15 Set Mode
-	0x16 Get Error
-	0x17 Clear Error
-	0x18 Spin Up
-	0x20 Play AB Min
-	0x21 Play AB Sec
-	0x22 Play AB Frame
-	0x23 Stop AB Min
-	0x24 Stop AB Sec
-	0x25 Stop AB Frame
-	0x26 AB Release
-	0x50 Get Disc Status
-	0x51 Set Volume
-	0x54 Get Maxsession
-	0x70 Set DAC mode (?)
-	0xa0-0xaf User Define (???)
-	0xf0 Service
-	0xf1 Sledge
-	0xf2 Focus
-	0xf3 Turntable
-	0xf4 Radial
+    0x01 Play Title (?)
+    0x02 Stop
+    0x03 Read TOC
+    0x04 Pause
+    0x05 Unpause
+    0x09 Get Title Len
+    0x0a Open Tray
+    0x0b Close Tray
+    0x0d Get Comp Time
+    0x10 Goto ABS Min
+    0x11 Goto ABS Sec
+    0x12 Goto ABS Frame
+    0x14 Read Long TOC
+    0x15 Set Mode
+    0x16 Get Error
+    0x17 Clear Error
+    0x18 Spin Up
+    0x20 Play AB Min
+    0x21 Play AB Sec
+    0x22 Play AB Frame
+    0x23 Stop AB Min
+    0x24 Stop AB Sec
+    0x25 Stop AB Frame
+    0x26 AB Release
+    0x50 Get Disc Status
+    0x51 Set Volume
+    0x54 Get Maxsession
+    0x70 Set DAC mode (?)
+    0xa0-0xaf User Define (???)
+    0xf0 Service
+    0xf1 Sledge
+    0xf2 Focus
+    0xf3 Turntable
+    0xf4 Radial
 
 [0x10]: I2S bus control register
 [0x14]: CD subcode control register
@@ -1930,7 +1930,7 @@ DRIVER_INIT_MEMBER(jaguar_state,jaguarcd)
 {
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
-//	cart_start();
+//  cart_start();
 	m_is_jagcd = true;
 
 	for (int i=0;i<0x20000/4;i++) // the cd bios is bigger.. check

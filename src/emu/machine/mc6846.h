@@ -52,7 +52,7 @@ public:
 
 	/* partial access to internal state */
 	UINT16 get_preset(); /* timer interval - 1 in us */
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -61,7 +61,7 @@ protected:
 
 private:
 	// internal state
-	
+
 	/* registers */
 	UINT8    m_csr;      /* 0,4: combination status register */
 	UINT8    m_pcr;      /* 1:   peripheral control register */
@@ -104,12 +104,12 @@ private:
 
 	int m_old_cif;
 	int m_old_cto;
-	
+
 	inline UINT16 counter();
 	inline void update_irq();
 	inline void update_cto();
 	inline void timer_launch();
-	
+
 	TIMER_CALLBACK_MEMBER(timer_expire);
 	TIMER_CALLBACK_MEMBER(timer_one_shot);
 };

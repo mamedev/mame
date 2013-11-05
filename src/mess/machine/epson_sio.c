@@ -2,8 +2,8 @@
 
     EPSON SIO port emulation
 
-	license: MAME, GPL-2.0+
-	copyright-holders: Dirk Best
+    license: MAME, GPL-2.0+
+    copyright-holders: Dirk Best
 
 **********************************************************************/
 

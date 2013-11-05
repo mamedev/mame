@@ -1912,7 +1912,7 @@ static INPUT_PORTS_START( carket )
 	PORT_DIPSETTING(      0x0006, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:5,4,3") /* Tested correct */
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:5,4,3") /* Tested correct */
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
@@ -1924,7 +1924,7 @@ static INPUT_PORTS_START( carket )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2") /* Test Mode shows Language: Korean / English, but doesn't work?? */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -2854,7 +2854,7 @@ sound Z80 (Xtal 4.096Mhz)
 6116 sound ram
 
 
-27010.uc1 audio data  
+27010.uc1 audio data
 
 
 sound hardware

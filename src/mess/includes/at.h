@@ -50,11 +50,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
-	
+
 	DECLARE_DRIVER_INIT(at586);
-	
+
 	UINT8 m_at_offset1;
-	
+
 	enum {
 		TYPE_586
 	};

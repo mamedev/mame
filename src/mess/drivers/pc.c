@@ -157,7 +157,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-  AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)   // not working yet
+	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)   // not working yet
 	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE("upd8251", i8251_device, status_r, control_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	// BIOS 5.31, 5.33
@@ -902,7 +902,7 @@ static INPUT_PORTS_START( ec1841 )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 
-//	PORT_START("DSW1") /* SA2 */
+//  PORT_START("DSW1") /* SA2 */
 
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END

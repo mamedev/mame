@@ -151,13 +151,13 @@ public:
 	UINT8         m_asic3_reg;
 	UINT8         m_asic3_latch[3];
 	UINT8         m_asic3_x;
-	UINT8		  m_asic3_y;
-	UINT8		  m_asic3_z;
+	UINT8         m_asic3_y;
+	UINT8         m_asic3_z;
 	UINT16        m_asic3_h1;
 	UINT16        m_asic3_h2;
 	UINT16        m_asic3_hold;
 
-	
+
 
 	DECLARE_DRIVER_INIT(orlegend);
 	void asic3_compute_hold();
@@ -284,7 +284,7 @@ public:
 	UINT8 coverage[256]; // coverage is how much of the table we've managed to verify using known facts about the table structure
 
 	int command_31_write_type;
-	
+
 
 	// the maximum level size returned or read by the device appears to be this size
 	UINT16 level_structure[8][10];
@@ -447,7 +447,7 @@ public:
 			m_sharedprotram(*this, "sharedprotram"),
 			m_igs025(*this,"igs025"),
 			m_igs028(*this,"igs028")
-	
+
 	{
 	}
 

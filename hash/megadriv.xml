@@ -29474,7 +29474,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="topfight">
 		<description>Top Fighter 2000 MK VIII</description>
 		<year>199?</year>

@@ -186,11 +186,11 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 	m_fpos(0)
 {
 	for (int i = 0; i < MC6854_FIFO_SIZE; i++)
-	{	
+	{
 		m_tfifo[i] = 0;
 		m_rfifo[i] = 0;
 	}
-	
+
 	for (int i = 0; i < MAX_FRAME_LENGTH; i++)
 	{
 		m_frame[i] = 0;
@@ -379,7 +379,7 @@ void mc6854_device::tfifo_terminate( )
 TIMER_CALLBACK_MEMBER(mc6854_device::tfifo_cb)
 {
 	device_t* device = (device_t*) ptr;
-	
+
 	int i, data = m_tfifo[ MC6854_FIFO_SIZE - 1 ];
 
 	if ( ! m_tstate )

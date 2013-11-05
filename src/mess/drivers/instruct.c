@@ -373,7 +373,7 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 					read_ = 0xfff;
 					if (quick_length < 0xfff)
 						read_ = quick_length;
-					m_p_ram[0] = 0x1f;	// add jump for RST key
+					m_p_ram[0] = 0x1f;  // add jump for RST key
 					for (i = 1; i < read_; i++)
 						m_p_ram[i] = quick_data[i];
 

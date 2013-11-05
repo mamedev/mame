@@ -29,7 +29,6 @@ er59256_device::er59256_device(const machine_config &mconfig, const char *tag, d
 	m_command(0),
 	m_flags(0)
 {
-
 }
 
 //-------------------------------------------------
@@ -54,7 +53,7 @@ void er59256_device::device_start()
 	m_command=CMD_INVALID;
 
 	m_flags&= ~FLAG_DATA_LOADED;
-	
+
 	save_item(NAME(m_eerom));
 	save_item(NAME(m_io_bits));
 	save_item(NAME(m_old_io_bits));

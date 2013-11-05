@@ -321,9 +321,9 @@ static ADDRESS_MAP_START( sderby2_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w) /* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x300001) AM_WRITENOP    /* unknown... write 0x01 in game, and 0x00 on reset */		//MOD
+	AM_RANGE(0x300000, 0x300001) AM_WRITENOP    /* unknown... write 0x01 in game, and 0x00 on reset */      //MOD
 	AM_RANGE(0xcf0000, 0xcf07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xcfc000, 0xcfffff) AM_RAM																		//MOD
+	AM_RANGE(0xcfc000, 0xcfffff) AM_RAM                                                                     //MOD
 ADDRESS_MAP_END
 
 

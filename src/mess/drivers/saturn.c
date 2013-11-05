@@ -764,7 +764,7 @@ static MACHINE_CONFIG_START( saturn, sat_console_state )
 	MCFG_CPU_DATA_MAP(scudsp_data)
 	MCFG_CPU_CONFIG(scudsp_config)
 
-//	SH-1
+//  SH-1
 
 //  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
 

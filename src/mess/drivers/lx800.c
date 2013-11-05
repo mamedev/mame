@@ -2,8 +2,8 @@
 
     Epson LX-800 dot matrix printer
 
-	license: MAME, GPL-2.0+
-	copyright-holders: Dirk Best
+    license: MAME, GPL-2.0+
+    copyright-holders: Dirk Best
 
     Skeleton driver
 

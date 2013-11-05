@@ -340,7 +340,6 @@ NETLIB_START(nic7448)
 
 NETLIB_UPDATE(nic7448)
 {
-
 	if (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ))
 	{
 		sub.update_outputs(8);
@@ -502,7 +501,6 @@ NETLIB_UPDATE(nic7474)
 
 NETLIB_START(nic7474)
 {
-
 	register_sub(sub, "sub");
 	register_input(sub, "CLK",  sub.m_clk, net_input_t::INP_STATE_LH);
 	register_input("D",    m_D);
@@ -817,7 +815,7 @@ NETLIB_UPDATE(nic74107A)
 	else if (!sub.m_Q2)
 		sub.m_clk.activate_hl();
 	//if (!sub.m_Q2 & INPLOGIC(m_clrQ))
-	//	sub.m_clk.activate_hl();
+	//  sub.m_clk.activate_hl();
 }
 
 NETLIB_START(nic74153)
@@ -977,7 +975,7 @@ static const net_device_t_base_factory *netregistry[] =
 	ENTRY(netdev_analog_const,  NETDEV_ANALOG_CONST)
 	ENTRY(netdev_logic_input,   NETDEV_LOGIC_INPUT)
 	ENTRY(netdev_analog_input,  NETDEV_ANALOG_INPUT)
-	ENTRY(netdev_log,		   	NETDEV_LOG)
+	ENTRY(netdev_log,           NETDEV_LOG)
 	ENTRY(netdev_clock,         NETDEV_CLOCK)
 	ENTRY(netdev_mainclock,     NETDEV_MAINCLOCK)
 	ENTRY(netdev_analog_callback,NETDEV_CALLBACK)
@@ -1040,4 +1038,3 @@ net_device_t *net_create_device_by_name(const astring &name, netlist_setup_t &se
 	fatalerror("Class %s required for IC %s not found!\n", name.cstr(), icname.cstr());
 	return NULL; // appease code analysis
 }
-

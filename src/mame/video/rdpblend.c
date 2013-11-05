@@ -4,9 +4,9 @@
     SGI/Nintendo Reality Display Processor Blend Unit (BL)
     -------------------
 
-	by MooglyGuy
-	based on initial C code by Ville Linde
-	contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
+    by MooglyGuy
+    based on initial C code by Ville Linde
+    contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
 
 
 ******************************************************************************/
@@ -282,11 +282,11 @@ bool N64BlenderT::Blend2CycleBlendACVGDither(UINT32* fr, UINT32* fg, UINT32* fb,
 	return true;
 }
 
-#define BLEND_PIPE(cycle, special, sum, shift)	\
-	BLEND_FACTORS(cycle, special, sum);			\
-	BLEND_MUL(cycle);							\
-	BLEND_ADD(cycle, special);					\
-	BLEND_SHIFT(shift);							\
+#define BLEND_PIPE(cycle, special, sum, shift)  \
+	BLEND_FACTORS(cycle, special, sum);         \
+	BLEND_MUL(cycle);                           \
+	BLEND_ADD(cycle, special);                  \
+	BLEND_SHIFT(shift);                         \
 	BLEND_SCALE_CLAMP(sum);
 
 void N64BlenderT::BlendEquationCycle0NoForceNoSpecial(int* r, int* g, int* b, rdp_span_aux *userdata, const rdp_poly_state& object)

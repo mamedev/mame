@@ -26,16 +26,16 @@ public:
 	UINT8 get_iobits();
 	void preload_rom(const UINT16 *rom_data, int count);
 	UINT8 data_loaded();
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
-	
+
 private:
 	// internal state
-	
+
 	/* The actual memory */
 	UINT16  m_eerom[EEROM_WORDS];
 
@@ -58,7 +58,7 @@ private:
 
 	/* Write enable and write in progress flags */
 	UINT8   m_flags;
-	
+
 	void decode_command();
 };
 

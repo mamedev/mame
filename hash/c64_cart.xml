@@ -6920,12 +6920,12 @@
 		<year>1985</year>
 		<publisher>Timeworks</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="partner" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="1" />
-	
+
 			<dataarea name="romh" size="0x4000">
 				<rom name="timeworks c-64 ver 2-16-87" size="0x4000" crc="d40ec888" sha1="c9050ce93f9375b81800953a38450b0de3751bca" offset="0" />
 			</dataarea>
@@ -6937,15 +6937,15 @@
 		<year>1987</year>
 		<publisher>ICS Electronics</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="2.5 v low" size="0x2000" crc="66986152" sha1="ee4ad8ec165a9a3dfad1337a530df64170ad7522" offset="0" />
 			</dataarea>
-	
+
 			<dataarea name="romh" size="0x2000">
 				<rom name="2.5 v. high" size="0x2000" crc="bc62db7f" sha1="4a3c97174b9912588009de28b0c9040e013f020e" offset="0" />
 			</dataarea>

@@ -62,7 +62,7 @@
 		<publisher>Skyles Electric Works Inc.</publisher>
 
 		<part name="rom" interface="pet_9000_rom">
-			<dataarea name="rom" size="0x1000"> 
+			<dataarea name="rom" size="0x1000">
 				<rom name="com80u-9000.bin" size="0x1000" crc="7699b86b" sha1="51d43d05b7a657899d471371496de36e447c3ea4" offset="0" />
 			</dataarea>
 		</part>

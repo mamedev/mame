@@ -243,7 +243,7 @@ READ32_MEMBER(pgm_arm_type3_state::killbldp_speedup_r )
 {
 	int pc = space.device().safe_pc();
 	if (pc == 0x7d8) space.device().execute().eat_cycles(500);
-  //else printf("killbldp_speedup_r %08x\n", pc);
+	//else printf("killbldp_speedup_r %08x\n", pc);
 	return m_arm_ram2[0x00c/4];
 }
 

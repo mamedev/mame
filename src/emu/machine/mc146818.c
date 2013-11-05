@@ -186,7 +186,7 @@ void mc146818_device::nvram_default()
 	if (m_region != NULL)
 	{
 		UINT32 bytes = m_region->bytes();
-		
+
 		if (bytes > data_size())
 			bytes = data_size();
 
@@ -237,7 +237,7 @@ int mc146818_device::to_ram(int a)
 {
 	if (!(m_data[REG_B] & REG_B_DM))
 		return dec_2_bcd(a);
-	
+
 	return a;
 }
 
@@ -250,7 +250,7 @@ int mc146818_device::from_ram(int a)
 {
 	if (!(m_data[REG_B] & REG_B_DM))
 		return bcd_2_dec(a);
-	
+
 	return a;
 }
 

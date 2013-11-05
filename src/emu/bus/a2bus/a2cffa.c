@@ -35,7 +35,7 @@ MACHINE_CONFIG_FRAGMENT( cffa2 )
 	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", NULL, false)
 
 // not yet, the core explodes
-//	MCFG_SOFTWARE_LIST_ADD("hdd_list", "apple2gs_hdd")
+//  MCFG_SOFTWARE_LIST_ADD("hdd_list", "apple2gs_hdd")
 MACHINE_CONFIG_END
 
 ROM_START( cffa2 )

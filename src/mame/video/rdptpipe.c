@@ -4,9 +4,9 @@
     SGI/Nintendo Reality Display Texture Fetch Unit (TF)
     -------------------
 
-	by MooglyGuy
-	based on initial C code by Ville Linde
-	contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
+    by MooglyGuy
+    based on initial C code by Ville Linde
+    contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
 
 
 ******************************************************************************/
@@ -62,23 +62,23 @@ void N64TexturePipeT::Mask(INT32* S, INT32* T, INT32 num, const rdp_poly_state& 
 }
 
 #define MASK_COUPLED(param, param1, num, coord) \
-	if (tiles[num].mask_##coord)					\
-	{											\
-		INT32 maskbits_##coord = m_maskbits_table[tiles[num].mask_##coord];	\
-		if (tiles[num].m##coord)					\
-		{										\
-			INT32 wrapthreshold = tiles[num].mask_##coord > 10 ? 10 : tiles[num].mask_##coord;	\
-			if ((param >> wrapthreshold) & 1)	\
-			{									\
-				param = ~param;					\
-			}									\
-			if ((param1 >> wrapthreshold) & 1)	\
-			{									\
-				param1 = ~param1;				\
-			}									\
-		}										\
-		param &= maskbits_##coord;				\
-		param1 &= maskbits_##coord;				\
+	if (tiles[num].mask_##coord)                    \
+	{                                           \
+		INT32 maskbits_##coord = m_maskbits_table[tiles[num].mask_##coord]; \
+		if (tiles[num].m##coord)                    \
+		{                                       \
+			INT32 wrapthreshold = tiles[num].mask_##coord > 10 ? 10 : tiles[num].mask_##coord;  \
+			if ((param >> wrapthreshold) & 1)   \
+			{                                   \
+				param = ~param;                 \
+			}                                   \
+			if ((param1 >> wrapthreshold) & 1)  \
+			{                                   \
+				param1 = ~param1;               \
+			}                                   \
+		}                                       \
+		param &= maskbits_##coord;              \
+		param1 &= maskbits_##coord;             \
 	}
 
 void N64TexturePipeT::MaskCoupled(INT32* S, INT32* S1, INT32* T, INT32* T1, INT32 num, const rdp_poly_state& object)
@@ -128,17 +128,17 @@ void N64TexturePipeT::MaskCoupled(INT32* S, INT32* S1, INT32* T, INT32* T1, INT3
 	}
 }
 
-#define SHIFT_CYCLE(param, max, num, coord)			\
-	param = SIGN16(param);							\
-	if (tiles[num].shift_##coord < 11)				\
-	{												\
-		param >>= tiles[num].shift_##coord;			\
-	}												\
-	else											\
-	{												\
-		param <<= (16 - tiles[num].shift_##coord);	\
-	}												\
-	param = SIGN16(param);							\
+#define SHIFT_CYCLE(param, max, num, coord)         \
+	param = SIGN16(param);                          \
+	if (tiles[num].shift_##coord < 11)              \
+	{                                               \
+		param >>= tiles[num].shift_##coord;         \
+	}                                               \
+	else                                            \
+	{                                               \
+		param <<= (16 - tiles[num].shift_##coord);  \
+	}                                               \
+	param = SIGN16(param);                          \
 	max = ((param >> 3) >= tiles[num].coord##h);
 
 void N64TexturePipeT::ShiftCycle(INT32* S, INT32* T, INT32* maxs, INT32* maxt, UINT32 num, const rdp_poly_state& object)
@@ -194,27 +194,27 @@ void N64TexturePipeT::ShiftCopy(INT32* S, INT32* T, UINT32 num, const rdp_poly_s
 	*T = SIGN16(*T);
 }
 
-#define CLAMP_CYCLE(param, frac, max, num, coord)		\
-	if (tiles[num].c##coord || !tiles[num].mask_##coord)	\
-	{													\
-		if (param & 0x10000)							\
-		{												\
-			param = 0;									\
-			frac = 0;									\
-		}												\
-		else if (max)									\
-		{												\
-			param = m_clamp_##coord##_diff[num];		\
-			frac = 0;									\
-		}												\
-		else											\
-		{												\
-			param = (SIGN17(param) >> 5) & 0x1fff;		\
-		}												\
-	}													\
-	else												\
-	{													\
-		param = (SIGN17(param) >> 5) & 0x1fff;			\
+#define CLAMP_CYCLE(param, frac, max, num, coord)       \
+	if (tiles[num].c##coord || !tiles[num].mask_##coord)    \
+	{                                                   \
+		if (param & 0x10000)                            \
+		{                                               \
+			param = 0;                                  \
+			frac = 0;                                   \
+		}                                               \
+		else if (max)                                   \
+		{                                               \
+			param = m_clamp_##coord##_diff[num];        \
+			frac = 0;                                   \
+		}                                               \
+		else                                            \
+		{                                               \
+			param = (SIGN17(param) >> 5) & 0x1fff;      \
+		}                                               \
+	}                                                   \
+	else                                                \
+	{                                                   \
+		param = (SIGN17(param) >> 5) & 0x1fff;          \
 	}
 
 void N64TexturePipeT::ClampCycle(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, INT32 num, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff)

@@ -36,7 +36,6 @@
 #define NETLIST_START(_name) \
 ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 {
-
 #define NETLIST_END  }
 
 #define NETLIST_INCLUDE(_name)                                                      \

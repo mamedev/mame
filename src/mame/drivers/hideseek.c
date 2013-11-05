@@ -49,7 +49,6 @@ public:
 
 void hideseek_state::video_start()
 {
-
 }
 
 
@@ -66,7 +65,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 32, hideseek_state )
 	AM_RANGE(0x01000000, 0x01ffffff) AM_RAM // DRAM
 	AM_RANGE(0xffff8000, 0xffff87ff) AM_RAM // HD64F7045F28 i/os
 	AM_RANGE(0xfffff000, 0xffffffff) AM_RAM // on-chip RAM
-//	AM_RANGE(0x06000000, 0x07ffffff) AM_ROM AM_REGION("blit_data", 0)
+//  AM_RANGE(0x06000000, 0x07ffffff) AM_ROM AM_REGION("blit_data", 0)
 ADDRESS_MAP_END
 
 
@@ -98,7 +97,7 @@ static MACHINE_CONFIG_START( hideseek, hideseek_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, 7372800 * 4 )
 	MCFG_CPU_PROGRAM_MAP(mem_map)
-//	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hideseek_state, hideseek_scanline, "screen", 0, 1)
+//  MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hideseek_state, hideseek_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -148,7 +147,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(hideseek_state,hideseek)
 {
-
 }
 
 

@@ -57,8 +57,8 @@ void pleiads_sound_device::device_config_complete()
 void pleiads_sound_device::device_start()
 {
 		/* The real values are _unknown_!
-	 * I took the ones from Naughty Boy / Pop Flamer
-	 */
+		* I took the ones from Naughty Boy / Pop Flamer
+		*/
 
 	/* charge 10u?? (C??) through 330K?? (R??) -> 3.3s */
 	m_pa5.charge_time = 3.3;
@@ -669,7 +669,7 @@ void pleiads_sound_device::common_start()
 	}
 
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
-	
+
 	save_item(NAME(m_sound_latch_a));
 	save_item(NAME(m_sound_latch_b));
 	save_item(NAME(m_sound_latch_c));

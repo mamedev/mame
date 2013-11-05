@@ -745,4 +745,3 @@ void v25_common_device::execute_run()
 		do_prefetch(prev_ICount);
 	}
 }
-

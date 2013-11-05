@@ -28,7 +28,7 @@
 // ======================> compis_fdc_device
 
 class compis_fdc_device : public device_t,
-						  public device_isbx_card_interface
+							public device_isbx_card_interface
 {
 public:
 	// construction/destruction

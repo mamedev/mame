@@ -23,7 +23,7 @@ public:
 	optional_device<ay8910_device> m_ay1;
 	required_device<vector_device> m_vector;
 	optional_shared_ptr<UINT16> m_rambase;
-	
+
 	UINT8 m_sound_control;
 	void (*m_sound_handler)(running_machine &,UINT8 sound_val, UINT8 bits_changed);
 	UINT32 m_current_shift;

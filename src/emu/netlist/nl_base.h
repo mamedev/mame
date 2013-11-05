@@ -38,7 +38,7 @@ typedef delegate<void ()> net_update_delegate;
 #define NETLIB_UPDATE(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update(void)
 #define NETLIB_START(_chip) ATTR_COLD void NETLIB_NAME(_chip) :: start(void)
 //#define NETLIB_CONSTRUCTOR(_chip) ATTR_COLD _chip :: _chip (netlist_setup_t &setup, const char *name)
-//			: net_device_t(setup, name)
+//          : net_device_t(setup, name)
 
 #define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN inline void NETLIB_NAME(_chip) :: _name _params
@@ -47,8 +47,8 @@ typedef delegate<void ()> net_update_delegate;
 	class NETLIB_NAME(_name) : public net_device_t                                  \
 	{                                                                               \
 	public:                                                                         \
-	    NETLIB_NAME(_name) ()           											\
-		: net_device_t()	{ }														\
+		NETLIB_NAME(_name) ()                                                       \
+		: net_device_t()    { }                                                     \
 	protected:                                                                      \
 		ATTR_HOT void update();                                                     \
 		ATTR_HOT void start();                                                      \
@@ -59,9 +59,9 @@ typedef delegate<void ()> net_update_delegate;
 	class NETLIB_NAME(_name) : public netlist_core_device_t                         \
 	{                                                                               \
 	public:                                                                         \
-	    NETLIB_NAME(_name) ()							 							\
-		: netlist_core_device_t()		 											\
-		  { }																		\
+		NETLIB_NAME(_name) ()                                                       \
+		: netlist_core_device_t()                                                   \
+			{ }                                                                     \
 	/*protected:*/                                                                  \
 		ATTR_HOT void update();                                                     \
 		_priv                                                                       \
@@ -71,8 +71,8 @@ typedef delegate<void ()> net_update_delegate;
 	class NETLIB_NAME(_name) : public net_device_t                                  \
 	{                                                                               \
 	public:                                                                         \
-	    NETLIB_NAME(_name) ()							 							\
-		: net_device_t() { }														\
+		NETLIB_NAME(_name) ()                                                       \
+		: net_device_t() { }                                                        \
 		ATTR_HOT void update_param();                                               \
 		ATTR_HOT void update();                                                     \
 		ATTR_HOT void start();                                                      \
@@ -319,7 +319,7 @@ public:
 		: net_output_t(OUTPUT | SIGNAL_DIGITAL)
 	{
 		// Default to TTL
-		m_low_V = 0.1;	// these depend on sinked/sourced current. Values should be suitable for typical applications.
+		m_low_V = 0.1;  // these depend on sinked/sourced current. Values should be suitable for typical applications.
 		m_high_V = 4.8;
 	}
 
@@ -774,34 +774,34 @@ ATTR_HOT inline const bool analog_input_t::is_highz() const
 class net_device_t_base_factory
 {
 public:
-    net_device_t_base_factory(const astring &name, const astring &classname)
-    : m_name(name), m_classname(classname)
-    {}
+	net_device_t_base_factory(const astring &name, const astring &classname)
+	: m_name(name), m_classname(classname)
+	{}
 
-    virtual ~net_device_t_base_factory() {}
+	virtual ~net_device_t_base_factory() {}
 
-    virtual net_device_t *Create() const = 0;
+	virtual net_device_t *Create() const = 0;
 
-    const astring &name() const { return m_name; }
-    const astring &classname() const { return m_classname; }
+	const astring &name() const { return m_name; }
+	const astring &classname() const { return m_classname; }
 protected:
-    astring m_name;                             /* device name */
-    astring m_classname;                        /* device class name */
+	astring m_name;                             /* device name */
+	astring m_classname;                        /* device class name */
 };
 
 template <class C>
 class net_device_t_factory : public net_device_t_base_factory
 {
 public:
-    net_device_t_factory(const astring &name, const astring &classname)
-    : net_device_t_base_factory(name, classname) { }
+	net_device_t_factory(const astring &name, const astring &classname)
+	: net_device_t_base_factory(name, classname) { }
 
-    net_device_t *Create() const
-    {
-        net_device_t *r = new C();
-        //r->init(setup, name);
-        return r;
-    }
+	net_device_t *Create() const
+	{
+		net_device_t *r = new C();
+		//r->init(setup, name);
+		return r;
+	}
 };
 
 net_device_t *net_create_device_by_classname(const astring &classname, netlist_setup_t &setup, const astring &icname);

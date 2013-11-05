@@ -15,18 +15,18 @@
     C0na = RAM and ROM bank switching
     C0nb = reset 5380
     C0nc = set IIgs block mode
-	C0nd = set pseudo-DMA
+    C0nd = set pseudo-DMA
     C0ne = read DRQ status in bit 7
- 
+
     In IIgs block mode, any read from C800-CBFF window fetches
     the next byte from the 5380's DMA port.  This lets you use the
     65816 MVN/MVP operations to burst-transfer up to 1K at a time.
     (Requires a cycle-by-cycle haltable 65816 core; don't install the
-	GS/OS driver right now to avoid this)
- 
+    GS/OS driver right now to avoid this)
+
     Pseudo-DMA works similarly to the Mac implementation; use C0n8
     to read/write "DMA" bytes in that mode.
- 
+
 *********************************************************************/
 
 #include "a2scsi.h"

@@ -24,7 +24,6 @@ void igs028_device::device_validity_check(validity_checker &valid) const
 
 void igs028_device::device_start()
 {
-
 	m_sharedprotram = 0;
 
 
@@ -32,7 +31,6 @@ void igs028_device::device_start()
 
 void igs028_device::device_reset()
 {
-
 	//printf("igs028_device::device_reset()");
 
 
@@ -123,7 +121,7 @@ void igs028_device::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mo
 				if (mode==0) dat2 -= extraxor;
 				else if (mode==1) dat2  = ((dat2 & 0xf0f0) >> 4)|((dat2 & 0x0f0f) << 4);
 				else if (mode==2) dat2 ^= extraxor;
-			    else if (mode==5) dat2  = ((dat2 &0x00ff) << 8) | ((dat2 &0xff00) >> 8);
+				else if (mode==5) dat2  = ((dat2 &0x00ff) << 8) | ((dat2 &0xff00) >> 8);
 				else if (mode==6) dat2 += extraxor;
 				else
 				{
@@ -150,14 +148,13 @@ void igs028_device::IGS028_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mo
 		}
 		break;
 
-	   default: // >=8
-	      printf ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
+		default: // >=8
+			printf ("DMA mode unknown!!!\nsrc:%4.4x, dst: %4.4x, size: %4.4x, mode: %4.4x\n", src, dst, size, mode);
 	}
 }
 
 void igs028_device::IGS028_handle()
 {
-
 	UINT16 cmd = m_sharedprotram[0x3026 / 2];
 
 	//  logerror ("command: %x\n", cmd);
@@ -221,6 +218,3 @@ void igs028_device::IGS028_handle()
 
 
 const device_type IGS028 = &device_creator<igs028_device>;
-
-
-

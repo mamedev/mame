@@ -12,15 +12,15 @@ const device_type WPCASIC = &device_creator<wpc_device>;
 
 wpc_device::wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig,WPCASIC,"Williams WPC ASIC",tag,owner,clock, "wpc", __FILE__),
-	  m_irq_cb(*this),
-	  m_firq_cb(*this),
-	  m_sounddata_r(*this),
-	  m_sounddata_w(*this),
-	  m_soundctrl_r(*this),
-	  m_soundctrl_w(*this),
-	  m_sounds11_w(*this),
-	  m_bank_w(*this),
-	  m_dmdbank_w(*this)
+		m_irq_cb(*this),
+		m_firq_cb(*this),
+		m_sounddata_r(*this),
+		m_sounddata_w(*this),
+		m_soundctrl_r(*this),
+		m_soundctrl_w(*this),
+		m_sounds11_w(*this),
+		m_bank_w(*this),
+		m_dmdbank_w(*this)
 {
 }
 
@@ -81,11 +81,11 @@ READ8_MEMBER(wpc_device::read)
 	case WPC_SWROWREAD:
 		sprintf(kbdrow,":INP%X",m_switch_col);
 		ret = ~ioport(kbdrow)->read();
-//		for(x=0;x<8;x++)
-//		{
-//			if(m_switch_col & (1<<x))
-//				ret = m_switches[3+x];
-//		}
+//      for(x=0;x<8;x++)
+//      {
+//          if(m_switch_col & (1<<x))
+//              ret = m_switches[3+x];
+//      }
 		break;
 	case WPC_SWCOINDOOR:
 		ret = ~ioport(":COIN")->read();
@@ -239,4 +239,3 @@ WRITE8_MEMBER(wpc_device::write)
 		break;
 	}
 }
-

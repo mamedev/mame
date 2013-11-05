@@ -107,18 +107,18 @@ private:
 	   5 = 8-bit logical control field(s)
 	   6 = variable-length data field(s)
 	*/
-	
+
 	void send_bits( UINT32 data, int len, int zi );
 	void tfifo_push( UINT8 data );
 	void tfifo_terminate( );
 	TIMER_CALLBACK_MEMBER(tfifo_cb);
 	void tfifo_clear( );
-	
+
 	void rfifo_push( UINT8 d );
 	void rfifo_terminate( );
 	UINT8 rfifo_pop( );
 	void rfifo_clear( );
-	
+
 	void update_sr2( );
 	void update_sr1( );
 };

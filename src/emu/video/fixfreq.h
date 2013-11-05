@@ -45,10 +45,9 @@ extern fixedfreq_interface fixedfreq_mode_ntsc720;
 // ======================> vga_device
 
 class fixedfreq_device :  public device_t,
-						  public device_video_interface,
-						  public fixedfreq_interface
+							public device_video_interface,
+							public fixedfreq_interface
 {
-
 public:
 	// construction/destruction
 	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

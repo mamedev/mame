@@ -1,4 +1,4 @@
-/* 
+/*
 
  IGS022 is an encrypted DMA device, most likely an MCU of some sort
  it can safely be swapped between games so doesn't appear to have
@@ -34,7 +34,6 @@ void igs022_device::device_start()
 
 void igs022_device::device_reset()
 {
-
 	//printf("igs022_device::device_reset()");
 
 
@@ -249,7 +248,7 @@ void igs022_device::IGS022_handle_command()
 			m_sharedprotram[0x29e/2] = m_kb_regs[reg] & 0xffff;
 		}
 
-		m_sharedprotram[0x202 / 2] = 0x7c;	// this mode complete?
+		m_sharedprotram[0x202 / 2] = 0x7c;  // this mode complete?
 	}
 
 	// Is this actually what this is suppose to do? Complete guess.
@@ -258,7 +257,7 @@ void igs022_device::IGS022_handle_command()
 		m_sharedprotram[0x28c / 2] = m_sharedprotram[0x288 / 2];
 		m_sharedprotram[0x28e / 2] = m_sharedprotram[0x28a / 2];
 
-		m_sharedprotram[0x202 / 2] = 0x23; 	// this mode complete?
+		m_sharedprotram[0x202 / 2] = 0x23;  // this mode complete?
 	}
 
 	// what do these do? write the completion byte for now...
@@ -275,12 +274,9 @@ void igs022_device::IGS022_handle_command()
 
 		IGS022_do_dma(src,dst,size,mode);
 
-		m_sharedprotram[0x202 / 2] = 0x5e;	// this mode complete?
+		m_sharedprotram[0x202 / 2] = 0x5e;  // this mode complete?
 	}
 }
 
 
 const device_type IGS022 = &device_creator<igs022_device>;
-
-
-

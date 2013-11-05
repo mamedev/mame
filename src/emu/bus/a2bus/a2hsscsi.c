@@ -3,10 +3,10 @@
     a2hsscsi.c
 
     Implementation of the Apple II High Speed SCSI Card
- 
+
     This uses an ASIC called "Sandwich II"; the card itself is
     sometimes known as "Cocoon".
- 
+
     Notes:
     C0n0-C0n7 = NCR5380 registers in normal order
     C0n8 = DMA address low
@@ -17,7 +17,7 @@
     C0nD = Enable DMA / reset 5380
     C0nE = Priority (read bits 5-7) / Fire watchdog (write bit 7) / RAM bank (write bits 0-3)
     C0nF = DMA speed (bit 7 = 0 for fast, 1 for slow) / ROM bank (write bits 0-4)
- 
+
     DMA control register (C0nC):
     0x01 = pseudo-DMA enable
     0x02 = DMA enable
@@ -27,13 +27,13 @@
     0x20 = 5380 IRQ enable
     0x40 = system DMA status (read only)
     0x80 = DMA stopped due to IRQ
- 
+
     Enable DMA / reset 5380 register (C0nD):
     0x01 = Resume DMA after rollover or IRQ
     0x02 = Reset the 5380
     0x40 = Clear test mode
     0x80 = Set test mode
- 
+
 *********************************************************************/
 
 #include "a2hsscsi.h"
@@ -182,9 +182,9 @@ UINT8 a2bus_hsscsi_device::read_c0nx(address_space &space, UINT8 offset)
 			break;
 
 		case 0xc:
-			return 0x00;	// indicate watchdog?
+			return 0x00;    // indicate watchdog?
 
-		case 0xe: 	// code at cf32 wants to RMW this without killing the ROM bank
+		case 0xe:   // code at cf32 wants to RMW this without killing the ROM bank
 			return m_c0ne;
 
 		case 0xf:

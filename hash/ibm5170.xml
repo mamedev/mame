@@ -304,7 +304,7 @@ Missing files come here
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="1stword">
 		<description>1st Word Plus 2.0</description>
 		<year>19??</year>
@@ -804,7 +804,7 @@ Missing files come here
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="os2_20">
 		<description>OS/2 2.0</description>
 		<year>1992</year>
@@ -3991,7 +3991,7 @@ Missing files come here
 		<description>Riki Coverdisk (June 1995) (Slovak)</description>
 		<year>1995</year>
 		<publisher>Riki</publisher>
-	    <info name="Contents" value="Pyrotechnika" />
+		<info name="Contents" value="Pyrotechnika" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0695-10.ima" size="1474560" crc="632e1b1b" sha1="c61bc9516d7c39cf785ab5e9d496907f9b5f6e45" offset="0" status="baddump" />
@@ -4003,7 +4003,7 @@ Missing files come here
 		<description>Riki Coverdisk (July 1995) (Slovak)</description>
 		<year>1995</year>
 		<publisher>Riki</publisher>
-	    <info name="Contents" value="Super Stardust" />
+		<info name="Contents" value="Super Stardust" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0795-11.ima" size="1474560" crc="8cb11858" sha1="492d5c9df9ff4e6a85797295d4d8e5b12ed24b04" offset="0" status="baddump" />
@@ -4039,7 +4039,7 @@ Missing files come here
 		<description>Riki Coverdisk (November 1995) (Slovak)</description>
 		<year>1995</year>
 		<publisher>Riki</publisher>
-	    <info name="Contents" value="Bleifuss" />
+		<info name="Contents" value="Bleifuss" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki1195-14.ima" size="1474560" crc="bad9bdca" sha1="4425c59acb4c47fdb9f3f9b3322ef9cd5984ec5b" offset="0" status="baddump" />
@@ -4063,7 +4063,7 @@ Missing files come here
 		<description>Riki Coverdisk (January 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-	    <info name="Contents" value="Jungle Book" />
+		<info name="Contents" value="Jungle Book" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0196-16.ima" size="1474560" crc="2d363851" sha1="5b1d8fc2bd16ecad559f15ada6c477241d5a4848" offset="0" status="baddump" />
@@ -4075,7 +4075,7 @@ Missing files come here
 		<description>Riki Coverdisk (February 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-	    <info name="Contents" value="Turrican II" />
+		<info name="Contents" value="Turrican II" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0296-17.ima" size="1474560" crc="0397885e" sha1="fbeb23616a222a87d0d3f1e1bb01d9468ea2e2d9" offset="0" status="baddump" />
@@ -4087,7 +4087,7 @@ Missing files come here
 		<description>Riki Coverdisk (March 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-	    <info name="Contents" value="Worms" />
+		<info name="Contents" value="Worms" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0396-18.ima" size="1474560" crc="1884a1a5" sha1="3a3d1c942b7bdced7a65b0a3e3f65c583abdf03f" offset="0" status="baddump" />
@@ -4099,7 +4099,7 @@ Missing files come here
 		<description>Riki Coverdisk (April 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-	    <info name="Contents" value="Tempest 2000" />
+		<info name="Contents" value="Tempest 2000" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0496-19.ima" size="1474560" crc="5df023bd" sha1="684baaaa927db7102dec1872da18bc20ff4c780b" offset="0" status="baddump" />
@@ -4111,7 +4111,7 @@ Missing files come here
 		<description>Riki Coverdisk (May 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-	    <info name="Contents" value="Virtual Snooker" />
+		<info name="Contents" value="Virtual Snooker" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0596-20.ima" size="1474560" crc="5704d5cd" sha1="c283c7dc070fc9cb8b90fec096a980f4c713746c" offset="0" status="baddump" />
@@ -4123,7 +4123,7 @@ Missing files come here
 		<description>Riki Coverdisk (June 1996) (Slovak)</description>
 		<year>1996</year>
 		<publisher>Riki</publisher>
-	    <info name="Contents" value="World Rally Fever" />
+		<info name="Contents" value="World Rally Fever" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="riki0696-21.ima" size="1474560" crc="e00c21c8" sha1="b05f84ecc7b8e42528395ac5282de8bd36b986b8" offset="0" status="baddump" />

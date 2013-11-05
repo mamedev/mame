@@ -1457,7 +1457,7 @@ DRIVER_INIT_MEMBER(segag80r_state,astrob)
 
 	/* install Astro Blaster sound board */
 	iospace.install_write_handler(0x3e, 0x3f, write8_delegate(FUNC(segag80r_state::astrob_sound_w),this));
-	
+
 	save_item(NAME(m_sound_state));
 	save_item(NAME(m_sound_rate));
 }
@@ -1470,7 +1470,7 @@ DRIVER_INIT_MEMBER(segag80r_state,005)
 
 	/* configure video */
 	m_background_pcb = G80_BACKGROUND_NONE;
-	
+
 	save_item(NAME(m_sound_state));
 	save_item(NAME(m_sound_addr));
 	save_item(NAME(m_sound_data));
@@ -1498,7 +1498,7 @@ DRIVER_INIT_MEMBER(segag80r_state,spaceod)
 	/* install our wacky mangled ports */
 	iospace.install_read_handler(0xf8, 0xfb, read8_delegate(FUNC(segag80r_state::spaceod_mangled_ports_r),this));
 	iospace.install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(segag80r_state::spaceod_port_fc_r),this));
-	
+
 	save_item(NAME(m_sound_state));
 }
 
@@ -1518,7 +1518,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monsterb)
 	/* install background board handlers */
 	iospace.install_write_handler(0xb8, 0xbd, write8_delegate(FUNC(segag80r_state::monsterb_back_port_w),this));
 	pgmspace.install_write_handler(0xe000, 0xffff, write8_delegate(FUNC(segag80r_state::monsterb_vidram_w),this));
-	
+
 	save_item(NAME(m_sound_state));
 	save_item(NAME(m_sound_addr));
 	save_item(NAME(m_n7751_command));
@@ -1543,7 +1543,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monster2)
 	iospace.install_write_handler(0xb4, 0xb5, write8_delegate(FUNC(segag80r_state::pignewt_back_color_w),this));
 	iospace.install_write_handler(0xb8, 0xbd, write8_delegate(FUNC(segag80r_state::pignewt_back_port_w),this));
 	pgmspace.install_write_handler(0xe000, 0xffff, write8_delegate(FUNC(segag80r_state::pignewt_vidram_w),this));
-	
+
 	save_item(NAME(m_sound_state));
 	save_item(NAME(m_sound_addr));
 	save_item(NAME(m_n7751_command));

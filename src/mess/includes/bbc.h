@@ -75,15 +75,15 @@ public:
 	int m_SWRAMtype;        // this stores the DIP switch setting for the SWRAM type being used
 	int m_Speech;           // this stores the CONF setting for Speech enabled/disabled
 	int m_Master;           // if 0 then we are emulating a BBC B style machine
-                          // if 1 then we are emulating a BBC Master style machine
+							// if 1 then we are emulating a BBC Master style machine
 
 	int m_ACCCON_IRR;       // IRQ inputs
 
 	int m_rombank;          // This is the latch that holds the sideways ROM bank to read
 
 	int m_userport;         // This stores the sideways RAM latch type.
-                          // Acorn and others use the bbc_rombank latch to select the write bank to be used.(type 0)
-                          // Solidisc use the BBC's userport to select the write bank to be used (type 1)
+							// Acorn and others use the bbc_rombank latch to select the write bank to be used.(type 0)
+							// Solidisc use the BBC's userport to select the write bank to be used (type 1)
 
 	int m_pagedRAM;         // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling

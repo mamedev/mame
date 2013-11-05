@@ -30,7 +30,7 @@
 // ======================> c2031_device
 
 class c2031_device :  public device_t,
-					  public device_ieee488_interface
+						public device_ieee488_interface
 {
 public:
 	// construction/destruction

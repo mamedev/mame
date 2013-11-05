@@ -75,7 +75,7 @@ void pt68k4_state::machine_reset()
 
 //UINT32 pt68k4_state::screen_update_pt68k4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 //{
-//	return 0;
+//  return 0;
 //}
 
 READ16_MEMBER( pt68k4_state::status_r )

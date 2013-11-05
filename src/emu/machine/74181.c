@@ -46,7 +46,7 @@ void ttl74181_device::device_start()
 	save_item(NAME(m_s));
 	save_item(NAME(m_m));
 	save_item(NAME(m_c));
-	
+
 	update();
 }
 

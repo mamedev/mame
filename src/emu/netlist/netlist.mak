@@ -22,4 +22,4 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/nl_base.o \
 	$(NETLISTOBJ)/nl_parser.o \
 	$(NETLISTOBJ)/devices/net_lib.o \
-	
+

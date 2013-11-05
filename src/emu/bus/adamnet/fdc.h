@@ -29,7 +29,7 @@
 // ======================> adam_fdc_device
 
 class adam_fdc_device :  public device_t,
-						 public device_adamnet_card_interface
+							public device_adamnet_card_interface
 {
 public:
 	// construction/destruction

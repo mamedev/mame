@@ -2,8 +2,8 @@
 
     Intel 8089 I/O Processor
 
-	license: MAME, GPL-2.0+
-	copyright-holders: Dirk Best
+    license: MAME, GPL-2.0+
+    copyright-holders: Dirk Best
 
     Disassembler
 

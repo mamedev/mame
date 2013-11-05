@@ -1814,7 +1814,7 @@ void ioport_field::get_user_settings(user_settings &settings)
 		settings.centerdelta = m_live->analog->centerdelta();
 		settings.reverse = m_live->analog->reverse();
 	}
-	
+
 	// non-analog settings
 	else
 	{
@@ -3207,7 +3207,7 @@ bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int pla
 					{
 						// fetch the value
 						field->live().value = xml_get_attribute_int(portnode, "value", field->defvalue());
-						
+
 						// fetch yes/no for toggle setting
 						const char *togstring = xml_get_attribute_string(portnode, "toggle", NULL);
 						if (togstring != NULL)

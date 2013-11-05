@@ -9,31 +9,31 @@
 
     TODO:
     - clean this up!
-	- Properly emulate the protection chips, used by several games (check stvprot.c for more info)
+    - Properly emulate the protection chips, used by several games (check stvprot.c for more info)
 
-	(per-game issues)
-	- stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
+    (per-game issues)
+    - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
 
-	- smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
-	  SH-2 synching or it's actually a m68k comms issue.
+    - smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
+      SH-2 synching or it's actually a m68k comms issue.
 
-	- groovef: ugly back screen color, caused by incorrect usage of the Color Calculation function.
+    - groovef: ugly back screen color, caused by incorrect usage of the Color Calculation function.
 
-	- myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
-	  10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
-	  Likely to not be a bug but an in-game design issue.
+    - myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
+      10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
+      Likely to not be a bug but an in-game design issue.
 
-	- danchih / danchiq: currently hangs randomly (regression).
+    - danchih / danchiq: currently hangs randomly (regression).
 
-	- batmanfr: Missing sound,caused by an extra ADSP chip which is on the cart.The CPU is a
-	  ADSP-2181,and it's the same used by NBA Jam Extreme (ZN game).
+    - batmanfr: Missing sound,caused by an extra ADSP chip which is on the cart.The CPU is a
+      ADSP-2181,and it's the same used by NBA Jam Extreme (ZN game).
 
-	- vfremix: when you play as Akira, there is a problem with third match: game doesn't upload all textures
-	  and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
-	  to title screen after losing a match
+    - vfremix: when you play as Akira, there is a problem with third match: game doesn't upload all textures
+      and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
+      to title screen after losing a match
 
-	- vfremix: various problems with SCU DSP: Jeffry causes a black screen hang. Akira's kick sometimes
-	  sends the opponent out of the ring from whatever position.
+    - vfremix: various problems with SCU DSP: Jeffry causes a black screen hang. Akira's kick sometimes
+      sends the opponent out of the ring from whatever position.
 
 ************************************************************************************************************************/
 

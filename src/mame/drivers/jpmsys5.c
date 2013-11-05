@@ -6,8 +6,8 @@
 
     driver by Phil Bennett
 
-	AWP bits J.Wallace, D. Haywood
-	
+    AWP bits J.Wallace, D. Haywood
+
     Video System Games supported:
         * Monopoly
         * Monopoly Classic
@@ -306,7 +306,7 @@ READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
 	AM_RANGE(0x0460c0, 0x0460c1) AM_WRITENOP \
 	AM_RANGE(0x048000, 0x04801f) AM_READWRITE(coins_r, coins_w) \
 	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)
-	
+
 static ADDRESS_MAP_START( 68000_awp_map, AS_PROGRAM, 16, jpmsys5_state )
 	JPM_SYS5_COMMON_MAP
 	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
@@ -490,7 +490,6 @@ WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
 
 READ8_MEMBER(jpmsys5_state::u29_porta_r)
 {
-
 	int combined_meter = MechMtr_GetActivity(0) | MechMtr_GetActivity(1) |
 							MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
 							MechMtr_GetActivity(4) | MechMtr_GetActivity(5) |

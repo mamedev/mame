@@ -92,26 +92,26 @@ Drive cable pinout
 ULA pinout
 ----------
             _____   _____
-         1 |*    \_/     | 40  
-         2 |             | 39  
-         3 |             | 38  
-         4 |             | 37  
+         1 |*    \_/     | 40
+         2 |             | 39
+         3 |             | 38
+         4 |             | 37
          5 |             | 36  GND
-         6 |             | 35  
-    RD   7 |             | 34  
-   _D5   8 |             | 33  
-   RxC   9 |             | 32  
-   RxD  10 |  XZ-2085-1  | 31  
-        11 |             | 30  
-    WD  12 |             | 29  
-   TxC  13 |             | 28  
-   TxD  14 |             | 27  
-    D7  15 |             | 26  
+         6 |             | 35
+    RD   7 |             | 34
+   _D5   8 |             | 33
+   RxC   9 |             | 32
+   RxD  10 |  XZ-2085-1  | 31
+        11 |             | 30
+    WD  12 |             | 29
+   TxC  13 |             | 28
+   TxD  14 |             | 27
+    D7  15 |             | 26
     WG  16 |             | 25  +5V
         17 |             | 24  XTAL2
         18 |             | 23  XTAL1
     RS  19 |             | 22  GND
-        20 |_____________| 21  
+        20 |_____________| 21
 
 
 BASIC commands (SYS 32768 to activate)
@@ -281,18 +281,18 @@ UINT8 c64_tdos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, U
 
 		case 2:
 			/*
-			
+
 			    bit     description
-			
-			    0       
-			    1       
-			    2       
-			    3       
-			    4       
+
+			    0
+			    1
+			    2
+			    3
+			    4
 			    5       drive MS
 			    6       drive WP
 			    7       drive RY
-			
+
 			*/
 			break;
 		}
@@ -320,18 +320,18 @@ void c64_tdos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UI
 
 		case 1:
 			/*
-			
+
 			    bit     description
-			
-			    0       
-			    1       
-			    2       
-			    3       
-			    4       
+
+			    0
+			    1
+			    2
+			    3
+			    4
 			    5       ULA pin 8, inverted
 			    6       drive MO
 			    7       ULA pin 15
-			
+
 			*/
 			break;
 

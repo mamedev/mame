@@ -4,9 +4,9 @@
     SGI/Nintendo Reality Display Texture Fetch Unit (TF)
     -------------------
 
-	by MooglyGuy
-	based on initial C code by Ville Linde
-	contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
+    by MooglyGuy
+    based on initial C code by Ville Linde
+    contains additional improvements from angrylion, Ziggy, Gonetz and Orkin
 
 
 ******************************************************************************/
@@ -98,7 +98,7 @@ class N64TexturePipeT
 		void                CycleLinear(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff);
 		void                CycleLinearLerp(Color* TEX, Color* prev, INT32 SSS, INT32 SST, UINT32 tilenum, UINT32 cycle, rdp_span_aux *userdata, const rdp_poly_state& object, INT32 *m_clamp_s_diff, INT32 *m_clamp_t_diff);
 
-		Cycler				cycle[4];
+		Cycler              cycle[4];
 
 		void                Copy(Color* TEX, INT32 SSS, INT32 SST, UINT32 tilenum, const rdp_poly_state& object, rdp_span_aux *userdata);
 		UINT32              Fetch(INT32 SSS, INT32 SST, INT32 tile, const rdp_poly_state& object, rdp_span_aux *userdata);

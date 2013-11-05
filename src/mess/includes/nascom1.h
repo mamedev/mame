@@ -1,9 +1,9 @@
 /***************************************************************************
 
-	Nascom 1 and Nascom 2
+    Nascom 1 and Nascom 2
 
-	license: MAME
-	copyright-holders: (Original Author?), Dirk Best
+    license: MAME
+    copyright-holders: (Original Author?), Dirk Best
 
 ***************************************************************************/
 

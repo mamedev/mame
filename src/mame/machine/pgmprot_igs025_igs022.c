@@ -317,7 +317,7 @@ MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
 
 void pgm_022_025_state::igs025_to_igs022_callback( void )
 {
-//	printf("igs025_to_igs022_callback\n");
+//  printf("igs025_to_igs022_callback\n");
 	m_igs022->IGS022_handle_command();
 }
 
@@ -340,7 +340,7 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
 {
 	pgm_basic_init();
 	pgm_dw3_decrypt();
-	
+
 	// install and configure protection device(s)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
 	m_igs022->m_sharedprotram = m_sharedprotram;
@@ -381,12 +381,12 @@ INPUT_PORTS_START( killbld )
 	PORT_DIPSETTING(      0x0017, DEF_STR( China ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Hong_Kong ) )
 	PORT_DIPSETTING(      0x0019, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(      0x001a, "1a" ) // invalid
-//	PORT_DIPSETTING(      0x001b, "1b" ) // invalid
-//	PORT_DIPSETTING(      0x001c, "1c" ) // invalid
-//	PORT_DIPSETTING(      0x001d, "1d" ) // invalid
-//	PORT_DIPSETTING(      0x001e, "1e" ) // invalid
-//	PORT_DIPSETTING(      0x001f, "1f" ) // invalid
+//  PORT_DIPSETTING(      0x001a, "1a" ) // invalid
+//  PORT_DIPSETTING(      0x001b, "1b" ) // invalid
+//  PORT_DIPSETTING(      0x001c, "1c" ) // invalid
+//  PORT_DIPSETTING(      0x001d, "1d" ) // invalid
+//  PORT_DIPSETTING(      0x001e, "1e" ) // invalid
+//  PORT_DIPSETTING(      0x001f, "1f" ) // invalid
 	PORT_DIPSETTING(      0x0020, DEF_STR( Korea ) )
 	PORT_DIPSETTING(      0x0021, DEF_STR( World ) )
 INPUT_PORTS_END
@@ -396,7 +396,7 @@ INPUT_PORTS_START( dw3 )
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
 	PORT_CONFNAME( 0x000f, 0x0006, DEF_STR( Region ) )
-//	PORT_CONFSETTING(      0x0000, "0" )
+//  PORT_CONFSETTING(      0x0000, "0" )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Japan ) )
 	PORT_CONFSETTING(      0x0002, DEF_STR( Korea ))
 	PORT_CONFSETTING(      0x0003, DEF_STR( Taiwan ) )
@@ -413,13 +413,13 @@ INPUT_PORTS_START( dw3j ) // for dw3100 set
 
 	PORT_MODIFY("Region")   /* Region - supplied by protection device */
 	PORT_CONFNAME( 0x000f, 0x0001, DEF_STR( Region ) )
-//	PORT_CONFSETTING(      0x0000, "0" )
+//  PORT_CONFSETTING(      0x0000, "0" )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Japan ) )
-//	PORT_CONFSETTING(      0x0002, DEF_STR( Korea ))
-//	PORT_CONFSETTING(      0x0003, DEF_STR( Taiwan ) )
-//	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) ) // typo Hokg Kong
-//	PORT_CONFSETTING(      0x0005, DEF_STR( China ) )
-//	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
-//	PORT_CONFSETTING(      0x0007, "Singapore" )
+//  PORT_CONFSETTING(      0x0002, DEF_STR( Korea ))
+//  PORT_CONFSETTING(      0x0003, DEF_STR( Taiwan ) )
+//  PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) ) // typo Hokg Kong
+//  PORT_CONFSETTING(      0x0005, DEF_STR( China ) )
+//  PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
+//  PORT_CONFSETTING(      0x0007, "Singapore" )
 
 INPUT_PORTS_END

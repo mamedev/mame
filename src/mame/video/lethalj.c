@@ -142,7 +142,7 @@ void lethalj_state::do_blit()
 				int pix = source[sx % BLITTER_SOURCE_WIDTH];
 				if (pix)
 					dest[dx] = pix;
-	
+
 			}
 		}
 	}

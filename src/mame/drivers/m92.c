@@ -46,9 +46,9 @@ System notes:
 
 Glitch list!
 
-	All games:
-		Flip screen/Cocktail Mode is unsupported (offsetted screens, and also Irem Skins Game
-		hangs at title screen when flip is enabled), it's also unknown where exactly it's tied.
+    All games:
+        Flip screen/Cocktail Mode is unsupported (offsetted screens, and also Irem Skins Game
+        hangs at title screen when flip is enabled), it's also unknown where exactly it's tied.
 
     Gunforce:
         Animated water sometimes doesn't appear on level 5 (but it

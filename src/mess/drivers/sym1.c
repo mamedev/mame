@@ -2,8 +2,8 @@
 
     Synertek Systems Corp. SYM-1
 
-	license: MAME, GPL-2.0+
-	copyright-holders: Dirk Best
+    license: MAME, GPL-2.0+
+    copyright-holders: Dirk Best
 
 ***************************************************************************/
 
@@ -22,9 +22,9 @@
 //**************************************************************************
 
 // SYM-1 main (and only) oscillator Y1
-#define SYM1_CLOCK	XTAL_1MHz
+#define SYM1_CLOCK  XTAL_1MHz
 
-#define LED_REFRESH_DELAY	attotime::from_usec(70)
+#define LED_REFRESH_DELAY   attotime::from_usec(70)
 
 
 //**************************************************************************
@@ -180,7 +180,7 @@ const ttl74145_interface sym1_ttl74145_intf =
 
 
 //**************************************************************************
-//	INPUT PORTS
+//  INPUT PORTS
 //**************************************************************************
 
 static INPUT_PORTS_START( sym1 )
@@ -246,10 +246,10 @@ INPUT_PORTS_END
 //**************************************************************************
 
 /*
-	PA0: Write protect R6532 RAM
- 	PA1: Write protect RAM 0x400-0x7ff
- 	PA2: Write protect RAM 0x800-0xbff
- 	PA3: Write protect RAM 0xc00-0xfff
+    PA0: Write protect R6532 RAM
+    PA1: Write protect RAM 0x400-0x7ff
+    PA2: Write protect RAM 0x800-0xbff
+    PA3: Write protect RAM 0xc00-0xfff
  */
 WRITE8_MEMBER( sym1_state::sym1_via2_a_w )
 {
@@ -358,16 +358,16 @@ const via6522_interface sym1_via2 =
 //**************************************************************************
 
 static ADDRESS_MAP_START( sym1_map, AS_PROGRAM, 8, sym1_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM	// U12/U13 RAM
+	AM_RANGE(0x0000, 0x03ff) AM_RAM // U12/U13 RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAMBANK("bank2") AM_SHARE("ram_1k")
 	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK("bank3") AM_SHARE("ram_2k")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK("bank4") AM_SHARE("ram_3k")
-	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_SHARE("monitor")	// U20 Monitor ROM
-	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	// U25 VIA #1
-	AM_RANGE(0xa400, 0xa40f) AM_DEVREADWRITE("riot", riot6532_device, read, write)	// U27 RIOT
-	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_SHARE("riot_ram")	// U27 RIOT RAM
-	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	// U28 VIA #2
-	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)	// U29 VIA #3
+	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_SHARE("monitor") // U20 Monitor ROM
+	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)  // U25 VIA #1
+	AM_RANGE(0xa400, 0xa40f) AM_DEVREADWRITE("riot", riot6532_device, read, write)  // U27 RIOT
+	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_SHARE("riot_ram")   // U27 RIOT RAM
+	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)  // U28 VIA #2
+	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)  // U29 VIA #3
 	AM_RANGE(0xb000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 

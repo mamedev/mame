@@ -21,12 +21,12 @@
 *  modify it under the terms of the GNU Lesser General Public
 *  License as published by the Free Software Foundation; either
 *  version 2.1 of the License, or (at your option) any later version.
-*  
+*
 *  This library is distributed in the hope that it will be useful,
 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 *  Lesser General Public License for more details.
-*  
+*
 *  You should have received a copy of the GNU Lesser General Public
 *  License along with this library; if not, write to the Free Software
 *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -37,7 +37,7 @@
 *  This driver dedicated in memory of Dennis Klatt and Jonathan Allen, without whose
 *  original work MITalk and hence KlattTalk and DECtalk would never have existed,
 *  in memory of Martin Minow, who wrote much of the DECtalk DTC-01 code, and
-*  in memory of Tony Vitale, who was one of the architects of the DECtalk project. 
+*  in memory of Tony Vitale, who was one of the architects of the DECtalk project.
 *
 *  Staff behind DECtalk itself: (mostly from http://amhistory.si.edu/archives/speechsynthesis/ss_dec.htm ):
 *     John C. Broihier
@@ -131,7 +131,7 @@ DTC-01 LEDs
 *    unknown date: Version 1.1 roms released to fix a bug with insufficient stack space, see ss_dec1 above
 *    October 11 1983: Second half of Version 1.8 rom finalized
 *    December 05 1983: First half of Version 1.8 rom finalized
-*    March 1984: Hardware version B done 
+*    March 1984: Hardware version B done
        (integrates the output fifo sync error check onto the pcb;
        Version A units are retrofitted when sent in for firmware upgrades)
        (most of the schematics come from this time, and have the version 1.8 roms listed on them)
@@ -738,7 +738,7 @@ READ16_MEMBER(dectalk_state::spc_infifo_data_r)
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
 	if (m_infifo_count > 0)
 	{
-		m_infifo_tail_ptr++; 
+		m_infifo_tail_ptr++;
 		m_infifo_count--;
 	}
 	m_infifo_tail_ptr&=0x1F;

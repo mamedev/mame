@@ -305,21 +305,21 @@ READ8_MEMBER( compis_keyboard_device::bus_r )
 //  bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( compis_keyboard_device::bus_w ) 
+WRITE8_MEMBER( compis_keyboard_device::bus_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       keyboard row bit 0
 	    1       keyboard row bit 1
 	    2       keyboard row bit 2
 	    3       keyboard row bit 3
-	    4       
+	    4
 	    5       speaker
 	    6       CAPS LED
 	    7       data out
-	
+
 	*/
 
 	m_bus = data;

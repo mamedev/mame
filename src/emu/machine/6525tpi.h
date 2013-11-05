@@ -78,7 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pa_w );
 	DECLARE_WRITE8_MEMBER( pb_w );
 	DECLARE_WRITE8_MEMBER( pc_w );
-	
+
 	UINT8 get_ddr_a();
 	UINT8 get_ddr_b();
 	UINT8 get_ddr_c();
@@ -88,7 +88,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 private:
 	// internal state
 	devcb_resolved_write_line   m_out_irq_func;
@@ -111,7 +111,7 @@ private:
 	UINT8 m_air;
 
 	UINT8 m_irq_level[5];
-	
+
 	void set_interrupt();
 	void clear_interrupt();
 };

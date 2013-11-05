@@ -96,7 +96,7 @@ READ16_MEMBER( compis_state::isbx1_tdma_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		if (offset < 2) 
+		if (offset < 2)
 			return m_crtc->read(space, offset & 0x01);
 		else
 			return 0;
@@ -280,8 +280,8 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE(0x0000, 0x0007) /* PCS0 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8255_TAG, i8255_device, read, write, 0xff00)
 	AM_RANGE(0x0080, 0x0087) /* PCS1 */ AM_MIRROR(0x78) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
 	AM_RANGE(0x0100, 0x011f) /* PCS2 */ AM_MIRROR(0x60) AM_DEVREADWRITE8(MM58174A_TAG, mm58274c_device, read, write, 0x00ff)
-  //AM_RANGE(0x0180, 0x0181) /* PCS3 */ AM_MIRROR(0x7e)
-  //AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
+	//AM_RANGE(0x0180, 0x0181) /* PCS3 */ AM_MIRROR(0x7e)
+	//AM_RANGE(0x0200, 0x0201) /* PCS4 */ AM_MIRROR(0x7e)
 	AM_RANGE(0x0280, 0x028f) /* PCS5 */ AM_MIRROR(0x70) AM_DEVICE(I80130_TAG, i80130_device, io_map)
 	AM_RANGE(0x0300, 0x0301) /* PCS6:0 */ AM_MIRROR(0xe) AM_WRITE8(tape_mon_w, 0x00ff)
 	AM_RANGE(0x0310, 0x0311) /* PCS6:3 */ AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0xff00)
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( compis_io, AS_IO, 16, compis_state )
 	AM_RANGE(0x0330, 0x0333) /* PCS6:6 */ AM_DEVREADWRITE8("upd7220", upd7220_device, read, write, 0x00ff)
 	AM_RANGE(0x0330, 0x0331) /* PCS6:7 */ AM_MIRROR(0xe) AM_READWRITE8(isbx1_tdma_r, isbx1_tdma_w, 0xff00) // DMA-TERMINATE J9 (iSBX1)
 	AM_RANGE(0x0340, 0x034f) /* PCS6:8 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs0_r, mcs0_w, 0x00ff) // 8272 CS0 (8/16-bit) J8 (iSBX0)
-  	AM_RANGE(0x0340, 0x034f) /* PCS6:9 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0xff00) // CS1 (16-bit) J8 (iSBX0)
+	AM_RANGE(0x0340, 0x034f) /* PCS6:9 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0xff00) // CS1 (16-bit) J8 (iSBX0)
 	AM_RANGE(0x0350, 0x035f) /* PCS6:10 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mcs1_r, mcs1_w, 0x00ff) // CS1 (8-bit) J8 (iSBX0)
 	AM_RANGE(0x0350, 0x035f) /* PCS6:11 */ AM_DEVREADWRITE8(ISBX_0_TAG, isbx_slot_device, mdack_r, mdack_w, 0xff00) // DMA-ACK J8 (iSBX0)
 	AM_RANGE(0x0360, 0x036f) /* PCS6:13 */ AM_DEVREADWRITE8(ISBX_1_TAG, isbx_slot_device, mcs0_r, mcs0_w, 0x00ff) // CS0 (8/16-bit) J9 (iSBX1)
@@ -483,7 +483,7 @@ READ8_MEMBER( compis_state::compis_irq_callback )
 WRITE_LINE_MEMBER( compis_state::tmr0_w )
 {
 	m_tmr0 = state;
-	
+
 	m_cassette->output(m_tmr0 ? -1 : 1);
 
 	m_maincpu->tmrin0_w(state);
@@ -563,10 +563,10 @@ static const i8251_interface usart_intf =
 READ8_MEMBER( compis_state::ppi_pb_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       J5-4 
+
+	    0       J5-4
 	    1       J5-5
 	    2       J6-3 Cassette read
 	    3       J2-6 DSR / S8-4 Test
@@ -574,7 +574,7 @@ READ8_MEMBER( compis_state::ppi_pb_r )
 	    5       J7-11 Centronics BUSY
 	    6       J7-13 Centronics SELECT
 	    7       Tmr0
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -598,9 +598,9 @@ READ8_MEMBER( compis_state::ppi_pb_r )
 WRITE8_MEMBER( compis_state::ppi_pc_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       J5-1
 	    1       J5-2
 	    2       Select: 1=time measure, DSR from J2/J4 pin 6. 0=read cassette
@@ -609,7 +609,7 @@ WRITE8_MEMBER( compis_state::ppi_pc_w )
 	    5       J7-1 Centronics STROBE
 	    6       V2-4 Floppy Soft reset
 	    7       V2-3 Floppy Terminal count
-	
+
 	*/
 
 	m_isbx0->opt1_w(BIT(data, 4));

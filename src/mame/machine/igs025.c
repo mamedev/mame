@@ -1,4 +1,4 @@
-/* 
+/*
 
  IGS025 is some kind of state machine / logic device which the game
  uses for various security checks, and to determine the region of the
@@ -33,7 +33,7 @@ void igs025_device::no_callback_setup()
 	printf("igs025 trigger external callback with no external callback setup\n");
 }
 
-	
+
 
 void igs025_device::set_external_cb(device_t &device,igs025_execute_external newcb)
 {
@@ -178,7 +178,7 @@ WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
 			{
 				if (data == 0x0002) { // Execute command
 					//printf("execute\n");
-					m_execute_external();	
+					m_execute_external();
 				}
 			}
 			break;
@@ -187,7 +187,7 @@ WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
 			{
 				if (data == 0x0001) { // Execute command
 					//printf("execute\n");
-					m_execute_external();	
+					m_execute_external();
 					m_kb_reg++;
 				}
 			}
@@ -198,7 +198,7 @@ WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
 			break;
 
 			case 0x04:
-		//		m_kb_ptr = data; // Suspect. Not good for drgw3
+		//      m_kb_ptr = data; // Suspect. Not good for drgw3
 			break;
 
 			case 0x20:
@@ -213,8 +213,8 @@ WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
 				killbld_protection_calculate_hold(m_kb_cmd & 0x0f, data & 0xff);
 			break;
 
-		//	default:
-		//		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space.device().safe_pc(), m_kb_cmd, data);
+		//  default:
+		//      logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space.device().safe_pc(), m_kb_cmd, data);
 		}
 	}
 }
@@ -258,8 +258,8 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r )
 				killbld_protection_calculate_hilo();
 				return 0; // Read and then discarded
 
-		//	default:
-		//		logerror("%06X: ASIC25 R CMD %X\n", space.device().safe_pc(), m_kb_cmd);
+		//  default:
+		//      logerror("%06X: ASIC25 R CMD %X\n", space.device().safe_pc(), m_kb_cmd);
 		}
 	}
 
@@ -325,7 +325,7 @@ WRITE16_MEMBER(igs025_device::olds_w )
 
 			case 0x03:
 			{
-				m_execute_external();	
+				m_execute_external();
 
 				m_olds_cmd3 = ((data >> 4) + 1) & 0x3;
 			}
@@ -523,6 +523,3 @@ WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
 
 
 const device_type IGS025 = &device_creator<igs025_device>;
-
-
-

@@ -81,7 +81,7 @@ enum machine_type_t
 	TK2000,             // Microdigital TK2000
 	LASER128,           // Laser 128/128EX/128EX2
 	SPACE84,            // "Space 84" with flipped text mode
-	LABA2P				// lab equipment (?) II Plus with flipped text mode
+	LABA2P              // lab equipment (?) II Plus with flipped text mode
 };
 
 enum bank_disposition_t

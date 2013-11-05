@@ -55,7 +55,7 @@ void sega005_sound_device::device_config_complete()
 void sega005_sound_device::device_start()
 {
 	segag80r_state *state = machine().driver_data<segag80r_state>();
-	
+
 	/* create the stream */
 	m_sega005_stream = machine().sound().stream_alloc(*this, 0, 1, SEGA005_COUNTER_FREQ, this);
 
@@ -454,7 +454,7 @@ MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_005_intf )
 
 	/* sound hardware */
-	
+
 	MCFG_SAMPLES_ADD("samples", sega005_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -617,7 +617,7 @@ static const samples_interface spaceod_samples_interface =
 MACHINE_CONFIG_FRAGMENT( spaceod_sound_board )
 
 	/* sound hardware */
-	
+
 	MCFG_SAMPLES_ADD("samples", spaceod_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -764,7 +764,7 @@ MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 	MCFG_I8243_ADD("audio_8243", NOOP, WRITE8(segag80r_state,n7751_rom_control_w))
 
 	/* sound hardware */
-	
+
 	MCFG_SAMPLES_ADD("samples", monsterb_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

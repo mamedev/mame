@@ -51,7 +51,7 @@
 // ======================> luxor_55_21046_device
 
 class luxor_55_21046_device :  public device_t,
-							   public device_abcbus_card_interface
+								public device_abcbus_card_interface
 {
 public:
 	// construction/destruction

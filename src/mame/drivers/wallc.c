@@ -362,17 +362,17 @@ ROM_END
 
 /*
 
-It use a epoxy brick like wallc 
+It use a epoxy brick like wallc
 Inside the brick there are:
 - 74245
 - 74368
 - Pal16r4
 
 74368 is a tristate not, it's used to:
--nagate D0 that goes to the CPU if A15 is low 
--nagate D1 that goes to the CPU if A15 is low 
--nagate D2 that goes to the CPU if A15 is low 
--nagate D3 that goes to the CPU if A15 is low 
+-nagate D0 that goes to the CPU if A15 is low
+-nagate D1 that goes to the CPU if A15 is low
+-nagate D2 that goes to the CPU if A15 is low
+-nagate D3 that goes to the CPU if A15 is low
 
 -negate cpu clk to feed the pal clk ALWAYS
 -negate A15 to feed 74245 /EN ALWAYS
@@ -395,8 +395,8 @@ A15 (Output enable, not in equation)
 D2
 D3
 D4
-D5	(2 times)
-D7	(2 times)
+D5  (2 times)
+D7  (2 times)
 
 Pal output
 D2 (via not to cpu)
@@ -432,7 +432,6 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 
 	for (i=0; i<0x2000; i++)
 	{
-
 		switch (i & 0x4a)  // A1, A3, A6
 		{
 			case 0x00:
@@ -456,20 +455,20 @@ DRIVER_INIT_MEMBER(wallc_state,sidam)
 		}
 
 
-		
+
 		if (count==16)
 		{
 			count = 0;
 			logerror("\n");
 		}
 
-		c = ROM[ i ] ^ 0x0f; 
+		c = ROM[ i ] ^ 0x0f;
 		ROM[ i ] = c;
 	}
 
 
 }
- 
+
 GAME( 1984, wallc,  0,      wallc,  wallc, wallc_state, wallc,  ROT0, "Midcoin", "Wall Crash (set 1)", 0 )
 GAME( 1984, wallca, wallc,  wallc,  wallc, wallc_state, wallca, ROT0, "Midcoin", "Wall Crash (set 2)", 0 )
 GAME( 1984, sidampkr,0,     wallc,  wallc, wallc_state, sidam,  ROT270, "Sidam", "Unknown Sidam Poker", GAME_NOT_WORKING )

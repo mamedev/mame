@@ -13,13 +13,13 @@ const device_type WPCSND = &device_creator<wpcsnd_device>;
 
 wpcsnd_device::wpcsnd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig,WPCSND,"Williams WPC Sound",tag,owner,clock, "wpcsnd", __FILE__),
-	  m_cpu(*this,"bgcpu"),
-	  m_ym2151(*this,"ym2151"),
-	  m_hc55516(*this,"hc55516"),
-	  m_dac(*this,"dac"),
-	  m_cpubank(*this,"rombank"),
-	  m_fixedbank(*this,"fixed"),
-	  m_reply_cb(*this)
+		m_cpu(*this,"bgcpu"),
+		m_ym2151(*this,"ym2151"),
+		m_hc55516(*this,"hc55516"),
+		m_dac(*this,"dac"),
+		m_cpubank(*this,"rombank"),
+		m_fixedbank(*this,"fixed"),
+		m_reply_cb(*this)
 {
 }
 
@@ -164,6 +164,4 @@ WRITE8_MEMBER(wpcsnd_device::latch_w)
 
 WRITE8_MEMBER(wpcsnd_device::volume_w)
 {
-
 }
-

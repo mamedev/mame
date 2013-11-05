@@ -11,47 +11,47 @@
 
 /*
 
-	Use the CHDMAN utility to create a 5MB image for ABC 850:
+    Use the CHDMAN utility to create a 5MB image for ABC 850:
 
-	$ chdman createhd -o /path/to/ro202.chd -chs 321,4,17 -ss 512
-	$ chdman createhd -o /path/to/basf6185.chd -chs 440,6,32 -ss 256
+    $ chdman createhd -o /path/to/ro202.chd -chs 321,4,17 -ss 512
+    $ chdman createhd -o /path/to/basf6185.chd -chs 440,6,32 -ss 256
 
-	or a 10MB image for ABC 852:
+    or a 10MB image for ABC 852:
 
-	$ chdman createhd -o /path/to/nec5126.chd -chs 615,4,17 -ss 512
+    $ chdman createhd -o /path/to/nec5126.chd -chs 615,4,17 -ss 512
 
-	or a 20MB image for ABC 856:
+    or a 20MB image for ABC 856:
 
-	$ chdman createhd -o /path/to/micr1325.chd -chs 1024,8,33 -ss 256
+    $ chdman createhd -o /path/to/micr1325.chd -chs 1024,8,33 -ss 256
 
-	Start the abc800 emulator with the ABC 850 attached on the ABC bus,
-	with the new CHD and a UFD-DOS floppy mounted:
-	
-	$ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=ro202 -flop1 ufd631 -hard ro202.chd
-	$ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=basf6185 -flop1 ufd631 -hard basf6185.chd
-	$ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=nec5126 -flop1 ufd631 -hard nec5126.chd
-	$ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=micr1325 -flop1 ufd631 -hard micr1325.chd
+    Start the abc800 emulator with the ABC 850 attached on the ABC bus,
+    with the new CHD and a UFD-DOS floppy mounted:
 
-	Configure the floppy controller for use with an ABC 850:
+    $ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=ro202 -flop1 ufd631 -hard ro202.chd
+    $ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=basf6185 -flop1 ufd631 -hard basf6185.chd
+    $ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=nec5126 -flop1 ufd631 -hard nec5126.chd
+    $ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=micr1325 -flop1 ufd631 -hard micr1325.chd
 
-	- Drive 0 Sides: Double
-	- Drive 1 Sides: Double
-	- Drive 0 Tracks: 40 or 80 depending on the UFD DOS image used
-	- Drive 1 Tracks: 40 or 80 depending on the UFD DOS image used
-	- Card Address: 44 (ABC 832/834/850)
+    Configure the floppy controller for use with an ABC 850:
 
-	Reset the emulated machine by pressing F3.
+    - Drive 0 Sides: Double
+    - Drive 1 Sides: Double
+    - Drive 0 Tracks: 40 or 80 depending on the UFD DOS image used
+    - Drive 1 Tracks: 40 or 80 depending on the UFD DOS image used
+    - Card Address: 44 (ABC 832/834/850)
 
-	You should now see the following text at the top of the screen:
+    Reset the emulated machine by pressing F3.
 
-	DOS är UFD-DOS ver. 19
-	DR_: motsvarar MF_:
+    You should now see the following text at the top of the screen:
 
-	Enter "BYE" to get into the UFD-DOS command prompt.
-	Enter "DOSGEN,F HD0:" to start the formatting utility.
-	Enter "J", and enter "J" to confirm the formatting.
+    DOS ??r UFD-DOS ver. 19
+    DR_: motsvarar MF_:
 
-	To Be Continued...
+    Enter "BYE" to get into the UFD-DOS command prompt.
+    Enter "DOSGEN,F HD0:" to start the formatting utility.
+    Enter "J", and enter "J" to confirm the formatting.
+
+    To Be Continued...
 
 */
 
@@ -68,7 +68,7 @@
 #define SASIBUS_TAG     "sasi"
 
 #define STAT_DIR \
-    BIT(m_stat, 6)
+	BIT(m_stat, 6)
 
 
 
@@ -445,19 +445,19 @@ void luxor_55_21056_device::abcbus_c3(UINT8 data)
 READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       RDY
 	    1       REQ
 	    2       I/O
 	    3       C/D
 	    4       MSG
 	    5       BSY
-	    6       
-	    7       
-	
-	*/	
+	    6
+	    7
+
+	*/
 
 	UINT8 data = 0;
 

@@ -173,7 +173,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( molecula_file_io, AS_IO, 8, molecula_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x40, 0x43) AM_READWRITE(sio_r,sio_w)
+//  AM_RANGE(0x40, 0x43) AM_READWRITE(sio_r,sio_w)
 	AM_RANGE(0x72, 0x73) AM_WRITE(file_output_w) // unknown
 ADDRESS_MAP_END
 
@@ -257,7 +257,7 @@ static const gfx_layout charlayout =
 #endif
 
 static GFXDECODE_START( molecula )
-//	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+//  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
 
@@ -293,10 +293,10 @@ static MACHINE_CONFIG_START( molecula, molecula_state )
 	MCFG_CPU_PROGRAM_MAP(molecula_app_map)
 	MCFG_CPU_IO_MAP(molecula_app_io)
 
-//	MCFG_CPU_ADD("sub",I8086,I86_CLOCK/2)
-//	MCFG_CPU_PROGRAM_MAP(molecula_map)
-//	MCFG_CPU_IO_MAP(molecula_io)
-//	MCFG_DEVICE_DISABLE()
+//  MCFG_CPU_ADD("sub",I8086,I86_CLOCK/2)
+//  MCFG_CPU_PROGRAM_MAP(molecula_map)
+//  MCFG_CPU_IO_MAP(molecula_io)
+//  MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

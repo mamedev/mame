@@ -917,7 +917,7 @@ ROM_END
 
 ROM_START( eps16p )
 	ROM_REGION(0x20000, "osrom", 0)
-	ROM_LOAD16_BYTE( "eps16plus-100f-lower.u27", 0x000000, 0x010000, CRC(78568d3f) SHA1(ac737e093f422e109e8f06d44548629a12d6418c) ) 
+	ROM_LOAD16_BYTE( "eps16plus-100f-lower.u27", 0x000000, 0x010000, CRC(78568d3f) SHA1(ac737e093f422e109e8f06d44548629a12d6418c) )
 	ROM_LOAD16_BYTE( "eps16plus-100f-upper.u28", 0x000001, 0x010000, CRC(1264465f) SHA1(71604da091bd90a32f0d93698d70b9e114ec1697) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // EPS-16 Plus has no ROM sounds
@@ -979,4 +979,3 @@ CONS( 1990, sd1,   0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (
 CONS( 1990, sq1,   0, 0,   sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // 2x16 LCD
 CONS( 1990, sqrack,sq1, 0, sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-Rack", GAME_NOT_WORKING )   // 2x16 LCD
 CONS( 1991, sd132, sd1,0,  vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (32 voice)", GAME_NOT_WORKING )  // 2x40 VFD
-

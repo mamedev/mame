@@ -13,7 +13,7 @@
     be 16, 32, or 48k. The FDC is a FD1791.
 
     All the articles and doco (what there is of it) is all in Italian.
-        
+
 ***********************************************************************************/
 
 #include "emu.h"

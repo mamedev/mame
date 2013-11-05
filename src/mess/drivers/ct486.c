@@ -2,8 +2,8 @@
 
     PC/AT 486 with Chips & Technologies CS4031 chipset
 
-	license: MAME, GPL-2.0+
-	copyright-holders: Dirk Best
+    license: MAME, GPL-2.0+
+    copyright-holders: Dirk Best
 
 ***************************************************************************/
 

@@ -13,9 +13,9 @@
 
 netlist_base_t::netlist_base_t()
 	: m_mainclock(NULL),
-	  m_time_ps(netlist_time::zero),
-	  m_rem(0),
-	  m_div(NETLIST_DIV)
+		m_time_ps(netlist_time::zero),
+		m_rem(0),
+		m_div(NETLIST_DIV)
 {
 }
 
@@ -30,11 +30,11 @@ ATTR_COLD void netlist_base_t::set_mainclock_dev(NETLIB_NAME(netdev_mainclock) *
 
 ATTR_COLD void netlist_base_t::reset()
 {
-	  m_time_ps = netlist_time::zero;
-	  m_rem = 0;
-	  m_queue.clear();
-	  if (m_mainclock != NULL)
-		  m_mainclock->m_Q.set_time(netlist_time::zero);
+		m_time_ps = netlist_time::zero;
+		m_rem = 0;
+		m_queue.clear();
+		if (m_mainclock != NULL)
+			m_mainclock->m_Q.set_time(netlist_time::zero);
 }
 
 
@@ -195,9 +195,9 @@ ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(
 
 net_device_t::net_device_t()
 	: netlist_core_device_t(),
-	  m_inputs(20),
-	  m_setup(NULL),
-	  m_variable_input_count(false)
+		m_inputs(20),
+		m_setup(NULL),
+		m_variable_input_count(false)
 {
 }
 
@@ -311,7 +311,6 @@ ATTR_HOT inline void net_output_t::update_dev(const net_input_t *inp, const UINT
 
 ATTR_HOT inline void net_output_t::update_devs()
 {
-
 	assert(m_num_cons != 0);
 
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
