@@ -1718,7 +1718,7 @@
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="163840">
+			<dataarea name="flop" size="327680">
 				<rom name="ann disk - december 2010-2.dsk" size="327680" crc="85e501fe" sha1="faa082fa756b7f27845962b700fd1d666a39f143" offset="0" />
 			</dataarea>
 		</part>
