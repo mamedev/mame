@@ -136,7 +136,7 @@ vector_device::vector_device(const machine_config &mconfig, device_type type, co
 }
 
 vector_device::vector_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VECTOR, "VECTOR", tag, owner, clock, "vector", __FILE__),
+	: device_t(mconfig, VECTOR, "VECTOR", tag, owner, clock, "vector_device", __FILE__),
 		device_video_interface(mconfig, *this)
 {
 }
