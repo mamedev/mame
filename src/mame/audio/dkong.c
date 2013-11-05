@@ -6,7 +6,7 @@
 #include "sound/tms5110.h"
 
 #include "includes/dkong.h"
-#include "drivlgcy.h"
+
 
 /****************************************************************
  *

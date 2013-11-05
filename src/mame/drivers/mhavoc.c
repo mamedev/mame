@@ -193,7 +193,7 @@
 #include "machine/nvram.h"
 #include "includes/mhavoc.h"
 #include "drivlgcy.h"
-#include "scrlegcy.h"
+
 
 READ8_MEMBER(mhavoc_state::quad_pokeyn_r)
 {

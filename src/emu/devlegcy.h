@@ -23,7 +23,6 @@
 
 #define DEVICE_STOP_NAME(name)      device_stop_##name
 #define DEVICE_STOP(name)           void DEVICE_STOP_NAME(name)(device_t *device)
-#define DEVICE_STOP_CALL(name)      DEVICE_STOP_NAME(name)(device)
 
 #define DEVICE_RESET_NAME(name)     device_reset_##name
 #define DEVICE_RESET(name)          void DEVICE_RESET_NAME(name)(device_t *device)

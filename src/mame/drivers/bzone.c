@@ -212,7 +212,6 @@
 #include "includes/bzone.h"
 #include "sound/pokey.h"
 #include "drivlgcy.h"
-#include "scrlegcy.h"
 
 #include "bzone.lh"
 #include "redbaron.lh"

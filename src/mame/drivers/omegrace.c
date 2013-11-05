@@ -220,7 +220,6 @@
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "drivlgcy.h"
-#include "scrlegcy.h"
 
 #include "omegrace.lh"
 
