@@ -1,14 +1,6 @@
 /***************************************************************************
 
-    Neo-Geo hardware
-
-    Many of the NeoGeo bootlegs use their own form of encryption and
-    protection, presumably to make them harder for other bootleggser to
-    copy.  This encryption often involves non-trivial scrambling of the
-    program roms and the games are protected using an Altera chip which
-    provides some kind of rom overlay, patching parts of the code.
-    The graphics roms are usually scrambled in a different way to the
-    official SNK cartridges too.
+    Neo-Geo hardware encryption devices
 
     NeoGeo 'C' (Graphics) Rom encryption
       CMC42 and CMC50 protection chips

@@ -20,40 +20,37 @@
 
 void neogeo_state::set_videoram_offset( UINT16 data )
 {
-	m_videoram_offset = data;
+	m_vram_offset = (data & 0x8000 ? data & 0x87ff : data);
 
 	/* the read happens right away */
-	m_videoram_read_buffer = m_videoram[m_videoram_offset];
+	m_vram_read_buffer = m_videoram[m_vram_offset];
 }
 
 
 UINT16 neogeo_state::get_videoram_data(  )
 {
-	return m_videoram_read_buffer;
+	return m_vram_read_buffer;
 }
 
 
 void neogeo_state::set_videoram_data( UINT16 data)
 {
-	m_videoram[m_videoram_offset] = data;
+	m_videoram[m_vram_offset] = data;
 
-	/* auto increment/decrement the current offset - A15 is NOT effected */
-	m_videoram_offset = (m_videoram_offset & 0x8000) | ((m_videoram_offset + m_videoram_modulo) & 0x7fff);
-
-	/* read next value right away */
-	m_videoram_read_buffer = m_videoram[m_videoram_offset];
+	/* auto increment/decrement the current offset - A15 is NOT affected */
+	set_videoram_offset((m_vram_offset & 0x8000) | ((m_vram_offset + m_vram_modulo) & 0x7fff));
 }
 
 
 void neogeo_state::set_videoram_modulo( UINT16 data)
 {
-	m_videoram_modulo = data;
+	m_vram_modulo = data;
 }
 
 
 UINT16 neogeo_state::get_videoram_modulo(  )
 {
-	return m_videoram_modulo;
+	return m_vram_modulo;
 }
 
 
@@ -674,13 +671,8 @@ void neogeo_state::optimize_sprite_data()
 		mask >>= 1;
 	}
 
-	if (mask > m_sprite_gfx_address_mask)
-	{
-		if (m_sprite_gfx != NULL)
-			auto_free(machine(), m_sprite_gfx);
-		m_sprite_gfx = auto_alloc_array_clear(machine(), UINT8, mask + 1);
-		m_sprite_gfx_address_mask = mask;
-	}
+	m_sprite_gfx.resize(mask + 1);
+	m_sprite_gfx_address_mask = mask;
 
 	src = m_region_sprites->base();
 	dest = m_sprite_gfx;
@@ -828,26 +820,25 @@ void neogeo_state::video_start()
 	m_palettes[0] = auto_alloc_array(machine(), UINT16, NUM_PENS);
 	m_palettes[1] = auto_alloc_array(machine(), UINT16, NUM_PENS);
 	m_pens = auto_alloc_array(machine(), pen_t, NUM_PENS);
-	m_videoram = auto_alloc_array(machine(), UINT16, 0x20000/2);
+	m_videoram = auto_alloc_array(machine(), UINT16, 0x8000 + 0x800);
 
 	/* clear allocated memory */
 	memset(m_palettes[0], 0x00, NUM_PENS * sizeof(UINT16));
 	memset(m_palettes[1], 0x00, NUM_PENS * sizeof(UINT16));
 	memset(m_pens, 0x00, NUM_PENS * sizeof(pen_t));
-	memset(m_videoram, 0x00, 0x20000);
+	memset(m_videoram, 0x00, (0x8000 + 0x800) * 2);
 
 	compute_rgb_weights();
 	create_sprite_line_timer();
 	create_auto_animation_timer();
 
-	m_sprite_gfx = NULL;
 	m_sprite_gfx_address_mask = 0;
 	optimize_sprite_data();
 
 	/* initialize values that are not modified on a reset */
-	m_videoram_read_buffer = 0;
-	m_videoram_offset = 0;
-	m_videoram_modulo = 0;
+	m_vram_offset = 0;
+	m_vram_read_buffer = 0;
+	m_vram_modulo = 0;
 	m_auto_animation_speed = 0;
 	m_auto_animation_disabled = 0;
 	m_auto_animation_counter = 0;
@@ -857,9 +848,9 @@ void neogeo_state::video_start()
 	save_pointer(NAME(m_palettes[0]), NUM_PENS);
 	save_pointer(NAME(m_palettes[1]), NUM_PENS);
 	save_pointer(NAME(m_videoram), 0x20000/2);
-	save_item(NAME(m_videoram_read_buffer));
-	save_item(NAME(m_videoram_modulo));
-	save_item(NAME(m_videoram_offset));
+	save_item(NAME(m_vram_offset));
+	save_item(NAME(m_vram_read_buffer));
+	save_item(NAME(m_vram_modulo));
 	save_item(NAME(m_fixed_layer_source));
 	save_item(NAME(m_screen_dark));
 	save_item(NAME(m_palette_bank));
@@ -897,12 +888,12 @@ void neogeo_state::video_reset()
 
 UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* fill with background color first */
+	// fill with background color first
 	bitmap.fill(m_pens[0x0fff], cliprect);
 
-	if (m_has_sprite_bus) draw_sprites(bitmap, cliprect.min_y);
+	draw_sprites(bitmap, cliprect.min_y);
 
-	if (m_has_text_bus) draw_fixed_layer(bitmap, cliprect.min_y);
+	draw_fixed_layer(bitmap, cliprect.min_y);
 
 	return 0;
 }

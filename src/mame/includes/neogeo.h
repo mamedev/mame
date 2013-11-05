@@ -20,17 +20,6 @@
 #define NEOGEO_VSSTART                          (0x000)
 #define NEOGEO_VBLANK_RELOAD_HPOS               (0x11f)
 
-#define NEOGEO_BANK_AUDIO_CPU_CART_BANK         "audio_cart"
-#define NEOGEO_BANK_AUDIO_CPU_CART_BANK0        "audio_cart0"
-#define NEOGEO_BANK_AUDIO_CPU_CART_BANK1        "audio_cart1"
-#define NEOGEO_BANK_AUDIO_CPU_CART_BANK2        "audio_cart2"
-#define NEOGEO_BANK_AUDIO_CPU_CART_BANK3        "audio_cart3"
-/* do not use 2, 3 and 4 */
-#define NEOGEO_BANK_CARTRIDGE                   "cartridge"
-#define NEOGEO_BANK_BIOS                        "bios"
-#define NEOGEO_BANK_VECTORS                     "vectors"
-#define NEOGEO_BANK_AUDIO_CPU_MAIN_BANK         "audio_main"
-
 
 
 class neogeo_state : public driver_device
@@ -38,136 +27,36 @@ class neogeo_state : public driver_device
 public:
 	neogeo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_save_ram(*this, "save_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_upd4990a(*this, "upd4990a"),
+
 		m_region_maincpu(*this, "maincpu"),
 		m_region_sprites(*this, "sprites"),
 		m_region_fixed(*this, "fixed"),
 		m_region_fixedbios(*this, "fixedbios"),
-		m_bank_vectors(*this, NEOGEO_BANK_VECTORS),
-		m_bank_bios(*this, NEOGEO_BANK_BIOS),
-		m_bank_cartridge(*this, NEOGEO_BANK_CARTRIDGE),
-		m_bank_audio_main(*this, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK) {
-			m_has_audio_banking = true;
-			m_is_mvs = true;
-			m_is_cartsys = true;
-			m_has_sprite_bus = true;
-			m_has_text_bus = true;
-			m_has_ymrom_bus = true;
-			m_has_z80_bus = true;
-			m_bank_audio_cart[0] = NULL;
-			m_bank_audio_cart[1] = NULL;
-			m_bank_audio_cart[2] = NULL;
-			m_bank_audio_cart[3] = NULL;
-		}
+		m_bank_vectors(*this, "vectors"),
+		m_bank_cartridge(*this, "cartridge"),
+		m_bank_audio_main(*this, "audio_main"),
+		m_upd4990a(*this, "upd4990a"),
+		m_save_ram(*this, "saveram") { }
 
-	/* memory pointers */
-//  UINT8      *memcard_data;   // this currently uses generic handlers
-	required_shared_ptr<UINT16> m_save_ram;       // this currently uses generic handlers
-
-	/* video-related */
-	UINT8      *m_sprite_gfx;
-	UINT32     m_sprite_gfx_address_mask;
-	UINT16     *m_videoram;
-	UINT16     *m_palettes[2]; /* 0x100*16 2 byte palette entries */
-	pen_t      *m_pens;
-	UINT8      m_palette_bank;
-	UINT8      m_screen_dark;
-	UINT16     m_videoram_read_buffer;
-	UINT16     m_videoram_modulo;
-	UINT16     m_videoram_offset;
-
-	UINT8      m_fixed_layer_source;
-
-	UINT8      m_auto_animation_speed;
-	UINT8      m_auto_animation_disabled;
-	UINT8      m_auto_animation_counter;
-	UINT8      m_auto_animation_frame_counter;
-
-	const UINT8 *m_region_zoomy;
-
-
-	/* palette */
-	double     m_rgb_weights_normal[5];
-	double     m_rgb_weights_normal_bit15[5];
-	double     m_rgb_weights_dark[5];
-	double     m_rgb_weights_dark_bit15[5];
-
-	/* timers */
-	emu_timer  *m_display_position_interrupt_timer;
-	emu_timer  *m_display_position_vblank_timer;
-	emu_timer  *m_vblank_interrupt_timer;
-	emu_timer  *m_auto_animation_timer;
-	emu_timer  *m_sprite_line_timer;
-	UINT8      m_display_position_interrupt_control;
-	UINT32     m_display_counter;
-	UINT32     m_vblank_interrupt_pending;
-	UINT32     m_display_position_interrupt_pending;
-	UINT32     m_irq3_pending;
-
-	/* misc */
-	UINT8      m_controller_select;
-
-	UINT32     m_main_cpu_bank_address;
-	UINT8      m_main_cpu_vector_table_source;
-
-	UINT8      m_audio_result;
-	UINT8      m_audio_cpu_banks[4];
-	UINT8      m_audio_cpu_rom_source;
-	UINT8      m_audio_cpu_rom_source_last;
-
-	UINT8      m_save_ram_unlocked;
-
-	UINT8      m_output_data;
-	UINT8      m_output_latch;
-	UINT8      m_el_value;
-	UINT8      m_led1_value;
-	UINT8      m_led2_value;
-	UINT8      m_recurse;
-
-	UINT8      m_vblank_level;
-	UINT8      m_raster_level;
-
-	/* protection */
-	UINT32     m_fatfury2_prot_data;
-	UINT16     m_neogeo_rng;
-	UINT16     *m_pvc_cartridge_ram;
-	int        m_fixed_layer_bank_type;
-	UINT16     m_mslugx_counter;
-	UINT16     m_mslugx_command;
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<upd4990a_old_device> m_upd4990a;
-
-	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
 	DECLARE_WRITE16_MEMBER(io_control_w);
-	DECLARE_WRITE16_MEMBER(save_ram_w);
 	DECLARE_READ16_MEMBER(memcard_r);
 	DECLARE_WRITE16_MEMBER(memcard_w);
 	DECLARE_WRITE16_MEMBER(audio_command_w);
 	DECLARE_READ8_MEMBER(audio_command_r);
-	DECLARE_WRITE8_MEMBER(audio_result_w);
 	DECLARE_WRITE16_MEMBER(main_cpu_bank_select_w);
-	DECLARE_READ8_MEMBER(audio_cpu_bank_select_f000_f7ff_r);
-	DECLARE_READ8_MEMBER(audio_cpu_bank_select_e000_efff_r);
-	DECLARE_READ8_MEMBER(audio_cpu_bank_select_c000_dfff_r);
-	DECLARE_READ8_MEMBER(audio_cpu_bank_select_8000_bfff_r);
+	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
 	DECLARE_WRITE16_MEMBER(system_control_w);
-	DECLARE_WRITE16_MEMBER(watchdog_w);
 	DECLARE_READ16_MEMBER(neogeo_unmapped_r);
 	DECLARE_READ16_MEMBER(neogeo_paletteram_r);
 	DECLARE_WRITE16_MEMBER(neogeo_paletteram_w);
 	DECLARE_READ16_MEMBER(neogeo_video_register_r);
 	DECLARE_WRITE16_MEMBER(neogeo_video_register_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(multiplexed_controller_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_controller_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_calendar_status);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
+
 	DECLARE_DRIVER_INIT(neogeo);
 	DECLARE_DRIVER_INIT(fatfury2);
 	DECLARE_DRIVER_INIT(zupapa);
@@ -234,75 +123,44 @@ public:
 	DECLARE_DRIVER_INIT(sbp);
 	DECLARE_DRIVER_INIT(mvs);
 	void mvs_install_protection(device_image_interface& image);
-	virtual void machine_start();
-	virtual void machine_reset();
-	virtual void video_start();
-	virtual void video_reset();
-	UINT32 screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void update_interrupts();
-	void create_interrupt_timers();
-	void start_interrupt_timers();
+
 	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
 	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(neo_cartridge);
-	void neogeo_postload();
-	void regenerate_pens();
-	DECLARE_WRITE_LINE_MEMBER(audio_cpu_irq);
 
-	bool m_has_audio_banking; // does the system use Audio Banking (the NeoCD doesn't?)
-	bool m_is_mvs; // is the system an MVS (watchdog, SRAM etc.)
-	bool m_is_cartsys; // does the system use Cartridges? (MVS and AES)
+	// MVS-specific
+	DECLARE_WRITE16_MEMBER(watchdog_w);
+	DECLARE_WRITE16_MEMBER(save_ram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_calendar_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_controller_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(multiplexed_controller_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_controller_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_start_r);
+	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
 
-	// the NeoCD can steal the bus during uploads
-	bool m_has_sprite_bus;
-	bool m_has_text_bus;
-	bool m_has_ymrom_bus;
-	bool m_has_z80_bus;
+	UINT32 screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void neogeo_set_main_cpu_bank_address( UINT32 bank_address );
-
-	// protection data
-	UINT16 kof2003_tbl[4096];
-	UINT16 kof10thExtraRAMB[0x01000];
-	const UINT8 *type0_t03;
-	const UINT8 *type0_t12;
-	const UINT8 *type1_t03;
-	const UINT8 *type1_t12;
-	const UINT8 *address_8_15_xor1;
-	const UINT8 *address_8_15_xor2;
-	const UINT8 *address_16_23_xor1;
-	const UINT8 *address_16_23_xor2;
-	const UINT8 *address_0_7_xor;
+	// this has to be public for the legacy MEMCARD_HANDLER
+	UINT8      *m_memcard_data;
 
 protected:
-	required_memory_region m_region_maincpu;
-	required_memory_region m_region_sprites;
-	required_memory_region m_region_fixed;
-	required_memory_region m_region_fixedbios;
-	required_memory_bank m_bank_vectors;
-	required_memory_bank m_bank_bios;
-	optional_memory_bank m_bank_cartridge;  // optional because of neocd
-	optional_memory_bank m_bank_audio_main; // optional because of neocd
-	memory_bank *m_bank_audio_cart[4];
-
+	void neogeo_postload();
+	void update_interrupts();
+	void create_interrupt_timers();
+	void start_interrupt_timers();
 	void neogeo_acknowledge_interrupt(UINT16 data);
+	void neogeo_set_main_cpu_bank_address( UINT32 bank_address );
 	void _set_main_cpu_bank_address();
 	void neogeo_main_cpu_banking_init();
 	void neogeo_audio_cpu_banking_init();
-	void set_audio_cpu_banking();
-	void audio_cpu_bank_select( int region, UINT8 bank );
 	void adjust_display_position_interrupt_timer();
 	void neogeo_set_display_position_interrupt_control(UINT16 data);
 	void neogeo_set_display_counter_msb(UINT16 data);
 	void neogeo_set_display_counter_lsb(UINT16 data);
-	void neogeo_set_main_cpu_vector_table_source( UINT8 data );
 	void set_video_control( UINT16 data );
-	void _set_audio_cpu_rom_source();
-	void set_audio_cpu_rom_source( UINT8 data );
-	void _set_main_cpu_vector_table_source();
 	void optimize_sprite_data();
 	void draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline );
 	void set_videoram_offset( UINT16 data );
@@ -311,6 +169,7 @@ protected:
 	void set_videoram_modulo( UINT16 data);
 	UINT16 get_videoram_modulo(  );
 	void compute_rgb_weights(  );
+	void regenerate_pens();
 	pen_t get_pen( UINT16 data );
 	void neogeo_set_palette_bank( UINT8 data );
 	void neogeo_set_screen_dark( UINT8 data );
@@ -328,13 +187,13 @@ protected:
 	void start_sprite_line_timer(  );
 	UINT16 get_video_control(  );
 	void audio_cpu_assert_nmi();
+	void audio_cpu_clear_nmi();
 	void select_controller( UINT8 data );
 	void set_save_ram_unlock( UINT8 data );
 	void set_outputs(  );
 	void set_output_latch( UINT8 data );
 	void set_output_data( UINT8 data );
-	TIMER_CALLBACK_MEMBER( ms5pcb_bios_timer_callback );
-	TIMER_CALLBACK_MEMBER( svcpcb_bios_timer_callback );
+	void install_banked_bios();
 
 	// protections implementation
 	DECLARE_READ16_MEMBER( sbp_lowerrom_r );
@@ -354,7 +213,7 @@ protected:
 	DECLARE_WRITE16_MEMBER( kof2000_bankswitch_w );
 	DECLARE_READ16_MEMBER( prot_9a37_r );
 	DECLARE_READ16_MEMBER( sma_random_r );
-	void neogeo_reset_rng();
+	void reset_sma_rng();
 	void sma_install_random_read_handler( int addr1, int addr2 );
 	void kof99_install_protection();
 	void garou_install_protection();
@@ -377,7 +236,7 @@ protected:
 	DECLARE_WRITE16_MEMBER( kof10th_bankswitch_w );
 	void install_kof10th_protection ();
 	void decrypt_kof10th();
-	void decrypt_kf10thep();
+	void kf10thep_px_decrypt();
 	void kf2k5uni_px_decrypt();
 	void kf2k5uni_sx_decrypt();
 	void kf2k5uni_mx_decrypt();
@@ -416,7 +275,6 @@ protected:
 	void kf2k3pl_px_decrypt();
 	void kf2k3pl_install_protection();
 	void kf2k3upl_px_decrypt();
-	void kf2k3upl_install_protection();
 	void samsho5b_px_decrypt();
 	void samsho5b_vx_decrypt();
 	void matrimbl_decrypt();
@@ -452,9 +310,114 @@ protected:
 	void neo_pcm2_snk_1999(int value);
 	void neo_pcm2_swap(int value);
 	void kf2k3pcb_sp1_decrypt();
+
+	// device overrides
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+
+	// memory
+	required_memory_region m_region_maincpu;
+	required_memory_region m_region_sprites;
+	required_memory_region m_region_fixed;
+	optional_memory_region m_region_fixedbios;
+	required_memory_bank   m_bank_vectors;
+	optional_memory_bank   m_bank_cartridge;  // optional because of neocd
+	optional_memory_bank   m_bank_audio_main; // optional because of neocd
+	memory_bank           *m_bank_audio_cart[4];
+
+	// MVS-specific devices
+	optional_device<upd4990a_old_device> m_upd4990a;
+	optional_shared_ptr<UINT16> m_save_ram;
+
+	// configuration
+	enum {NEOGEO_MVS, NEOGEO_AES, NEOGEO_CD} m_type;
+
+	// internal state
+	UINT32     m_main_cpu_bank_address;
+	UINT8      m_controller_select;
+	bool       m_recurse;
+
+	// MVS-specific state
+	UINT8      m_save_ram_unlocked;
+	UINT8      m_output_data;
+	UINT8      m_output_latch;
+	UINT8      m_el_value;
+	UINT8      m_led1_value;
+	UINT8      m_led2_value;
+
+	// video hardware, including maincpu interrupts
+	// TODO: make into a device
+	virtual void video_start();
+	virtual void video_reset();
+
+	emu_timer  *m_display_position_interrupt_timer;
+	emu_timer  *m_display_position_vblank_timer;
+	emu_timer  *m_vblank_interrupt_timer;
+	emu_timer  *m_auto_animation_timer;
+	emu_timer  *m_sprite_line_timer;
+	UINT32     m_display_counter;
+	UINT8      m_vblank_interrupt_pending;
+	UINT8      m_display_position_interrupt_pending;
+	UINT8      m_irq3_pending;
+	UINT8      m_display_position_interrupt_control;
+	UINT8      m_vblank_level;
+	UINT8      m_raster_level;
+
+	UINT16     *m_videoram;
+	UINT16     m_vram_offset;
+	UINT16     m_vram_read_buffer;
+	UINT16     m_vram_modulo;
+
+	const UINT8 *m_region_zoomy;
+
+	dynamic_array<UINT8> m_sprite_gfx;
+	UINT32     m_sprite_gfx_address_mask;
+
+	UINT8      m_auto_animation_speed;
+	UINT8      m_auto_animation_disabled;
+	UINT8      m_auto_animation_counter;
+	UINT8      m_auto_animation_frame_counter;
+
+	UINT8      m_fixed_layer_source;
+	UINT8      m_fixed_layer_bank_type;
+
+	// color/palette related
+	// TODO: disentangle from the rest of the video emulation
+	double     m_rgb_weights_normal[5];
+	double     m_rgb_weights_normal_bit15[5];
+	double     m_rgb_weights_dark[5];
+	double     m_rgb_weights_dark_bit15[5];
+	UINT16     *m_palettes[2]; /* 0x100*16 2 byte palette entries */
+	pen_t      *m_pens;
+	UINT8      m_palette_bank;
+	UINT8      m_screen_dark;
+
+	// cartridge-specific hardware
+	// TODO: move into separate devices
+	UINT32     m_fatfury2_prot_data;
+	UINT16     m_sma_rng;
+	UINT16     m_mslugx_counter;
+	UINT16     m_mslugx_command;
+
+	const UINT8 *type0_t03;
+	const UINT8 *type0_t12;
+	const UINT8 *type1_t03;
+	const UINT8 *type1_t12;
+	const UINT8 *address_8_15_xor1;
+	const UINT8 *address_8_15_xor2;
+	const UINT8 *address_16_23_xor1;
+	const UINT8 *address_16_23_xor2;
+	const UINT8 *address_0_7_xor;
+
+	UINT16 m_cartridge_ram[0x1000];
 };
 
 
 /*----------- defined in drivers/neogeo.c -----------*/
 
 MACHINE_CONFIG_EXTERN( neogeo_base );
+MEMCARD_HANDLER( neogeo );

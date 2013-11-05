@@ -703,37 +703,30 @@
 	ROM_LOAD16_WORD_SWAP_BIOS( 9, "japan-j3.bin",0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) ) /* Latest Japan bios; correct chip label unknown */ \
 	ROM_SYSTEM_BIOS( 10, "japan-hotel","Custom Japanese Hotel" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 10, "sp-1v1_3db8c.bin",0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271) ) /* 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
-	ROM_SYSTEM_BIOS( 11, "uni-bios_2_3","Universe Bios (Hack, Ver. 2.3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11, "uni-bios_2_3.rom",  0x00000, 0x020000, CRC(27664eb5) SHA1(5b02900a3ccf3df168bdcfc98458136fd2b92ac0) ) /* Universe Bios v2.3 (hack) */ \
-	ROM_SYSTEM_BIOS( 12, "uni-bios_2_3o","Universe Bios (Hack, Ver. 2.3, older?)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12, "uni-bios_2_3o.rom",  0x00000, 0x020000, CRC(601720ae) SHA1(1b8a72c720cdb5ee3f1d735bbcf447b09204b8d9) ) /* Universe Bios v2.3 (hack) alt version, withdrawn? */ \
-	ROM_SYSTEM_BIOS( 13, "uni-bios_2_2","Universe Bios (Hack, Ver. 2.2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13, "uni-bios_2_2.rom",  0x00000, 0x020000, CRC(2d50996a) SHA1(5241a4fb0c63b1a23fd1da8efa9c9a9bd3b4279c) ) /* Universe Bios v2.2 (hack) */ \
-	ROM_SYSTEM_BIOS( 14, "uni-bios_2_1","Universe Bios (Hack, Ver. 2.1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 14, "uni-bios_2_1.rom",  0x00000, 0x020000, CRC(8dabf76b) SHA1(c23732c4491d966cf0373c65c83c7a4e88f0082c) ) /* Universe Bios v2.1 (hack) */ \
-	ROM_SYSTEM_BIOS( 15, "uni-bios_2_0","Universe Bios (Hack, Ver. 2.0)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 15, "uni-bios_2_0.rom",  0x00000, 0x020000, CRC(0c12c2ad) SHA1(37bcd4d30f3892078b46841d895a6eff16dc921e) ) /* Universe Bios v2.0 (hack) */ \
-	ROM_SYSTEM_BIOS( 16, "uni-bios_1_3","Universe Bios (Hack, Ver. 1.3)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 16, "uni-bios_1_3.rom",  0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e) ) /* Universe Bios v1.3 (hack) */ \
-	ROM_SYSTEM_BIOS( 17, "uni-bios_1_2","Universe Bios (Hack, Ver. 1.2)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 17, "uni-bios_1_2.rom",  0x00000, 0x020000, CRC(4fa698e9) SHA1(682e13ec1c42beaa2d04473967840c88fd52c75a) ) /* Universe Bios v1.2 (hack) */ \
-	ROM_SYSTEM_BIOS( 18, "uni-bios_1_2o","Universe Bios (Hack, Ver. 1.2, older)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 18, "uni-bios_1_2o.rom", 0x00000, 0x020000, CRC(e19d3ce9) SHA1(af88ef837f44a3af2d7144bb46a37c8512b67770) ) /* Universe Bios v1.2 (hack) alt version */ \
-	ROM_SYSTEM_BIOS( 19, "uni-bios_1_1","Universe Bios (Hack, Ver. 1.1)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 19, "uni-bios_1_1.rom",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */ \
-	ROM_SYSTEM_BIOS( 20, "uni-bios_1_0","Universe Bios (Hack, Ver. 1.0)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 20, "uni-bios_1_0.rom",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */ \
-	ROM_SYSTEM_BIOS( 21, "uni-bios_3_0","Universe Bios (Hack, Ver. 3.0)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 21, "uni-bios_3_0.rom",  0x00000, 0x020000, CRC(a97c89a9) SHA1(97a5eff3b119062f10e31ad6f04fe4b90d366e7f) ) /* Universe Bios v3.0 (hack) */ \
+	ROM_SYSTEM_BIOS( 11, "unibios30","Universe Bios (Hack, Ver. 3.0)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11, "uni-bios_3_0.rom",  0x00000, 0x020000, CRC(a97c89a9) SHA1(97a5eff3b119062f10e31ad6f04fe4b90d366e7f) ) /* Universe Bios v3.0 (hack) */ \
+	ROM_SYSTEM_BIOS( 12, "unibios23","Universe Bios (Hack, Ver. 2.3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "uni-bios_2_3.rom",  0x00000, 0x020000, CRC(27664eb5) SHA1(5b02900a3ccf3df168bdcfc98458136fd2b92ac0) ) /* Universe Bios v2.3 (hack) */ \
+	ROM_SYSTEM_BIOS( 13, "unibios23o","Universe Bios (Hack, Ver. 2.3, older?)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13, "uni-bios_2_3o.rom",  0x00000, 0x020000, CRC(601720ae) SHA1(1b8a72c720cdb5ee3f1d735bbcf447b09204b8d9) ) /* Universe Bios v2.3 (hack) alt version, withdrawn? */ \
+	ROM_SYSTEM_BIOS( 14, "unibios22","Universe Bios (Hack, Ver. 2.2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 14, "uni-bios_2_2.rom",  0x00000, 0x020000, CRC(2d50996a) SHA1(5241a4fb0c63b1a23fd1da8efa9c9a9bd3b4279c) ) /* Universe Bios v2.2 (hack) */ \
+	ROM_SYSTEM_BIOS( 15, "unibios21","Universe Bios (Hack, Ver. 2.1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 15, "uni-bios_2_1.rom",  0x00000, 0x020000, CRC(8dabf76b) SHA1(c23732c4491d966cf0373c65c83c7a4e88f0082c) ) /* Universe Bios v2.1 (hack) */ \
+	ROM_SYSTEM_BIOS( 16, "unibios20","Universe Bios (Hack, Ver. 2.0)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 16, "uni-bios_2_0.rom",  0x00000, 0x020000, CRC(0c12c2ad) SHA1(37bcd4d30f3892078b46841d895a6eff16dc921e) ) /* Universe Bios v2.0 (hack) */ \
+	ROM_SYSTEM_BIOS( 17, "unibios13","Universe Bios (Hack, Ver. 1.3)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 17, "uni-bios_1_3.rom",  0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e) ) /* Universe Bios v1.3 (hack) */ \
+	ROM_SYSTEM_BIOS( 18, "unibios12","Universe Bios (Hack, Ver. 1.2)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 18, "uni-bios_1_2.rom",  0x00000, 0x020000, CRC(4fa698e9) SHA1(682e13ec1c42beaa2d04473967840c88fd52c75a) ) /* Universe Bios v1.2 (hack) */ \
+	ROM_SYSTEM_BIOS( 19, "unibios12o","Universe Bios (Hack, Ver. 1.2, older)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 19, "uni-bios_1_2o.rom", 0x00000, 0x020000, CRC(e19d3ce9) SHA1(af88ef837f44a3af2d7144bb46a37c8512b67770) ) /* Universe Bios v1.2 (hack) alt version */ \
+	ROM_SYSTEM_BIOS( 20, "unibios11","Universe Bios (Hack, Ver. 1.1)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 20, "uni-bios_1_1.rom",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */ \
+	ROM_SYSTEM_BIOS( 21, "unibios10","Universe Bios (Hack, Ver. 1.0)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 21, "uni-bios_1_0.rom",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */
 //  ROM_SYSTEM_BIOS( 22, "debug",      "Debug MVS (Hack?)" )
 //  ROM_LOAD16_WORD_SWAP_BIOS( 22, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Debug (Development) Bios */
-//  ROM_SYSTEM_BIOS( 23, "asia-aes",   "Asia AES" )
-//  ROM_LOAD16_WORD_SWAP_BIOS( 23, "neo-epo.sp1", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
-//  ROM_SYSTEM_BIOS( 24, "japan-aes",  "Japan AES" )
-//  ROM_LOAD16_WORD_SWAP_BIOS( 24, "neo-po.sp1", 0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c) ) /* AES Console (Japan) Bios */
-
-/*  Note you'll have to modify the last for lines of each block to use the extra bios roms,
-    they're hacks / homebrew / console bios roms so MAME doesn't list them by default. */
 
 
 #define NEO_BIOS_AUDIO_64K(name, hash) \
@@ -1911,6 +1904,8 @@ ROM_START( minasan ) /* MVS AND AES VERSION */
 
 	NEO_BIOS_AUDIO_128K( "027-m1.m1", CRC(add5a226) SHA1(99995bef2584abbba16777bac52f55523f7aa97d) ) /* HN62321AP */
 
+	ROM_DEFAULT_BIOS( "japan" ) /* so the mahjong panel will work in the service menu */
+
 	ROM_REGION( 0x100000, "ymsnd", 0 )
 	ROM_LOAD( "027-v11.v11", 0x000000, 0x100000, CRC(59ad4459) SHA1(bbb8ba8a8e337dd2946eefda4757e80d0547d54a) ) /* HN62308BPC */
 
@@ -2212,6 +2207,8 @@ ROM_START( bakatono ) /* MVS AND AES VERSION */
 	NEO_SFIX_128K( "036-s1.s1", CRC(f3ef4485) SHA1(c30bfceed7e669e4c97b0b3ec2e9f4271e5b6662) ) /* CXK381000 */
 
 	NEO_BIOS_AUDIO_128K( "036-m1.m1", CRC(f1385b96) SHA1(e7e3d1484188a115e262511116aaf466b8b1f428) ) /* CXK381003 */
+
+	ROM_DEFAULT_BIOS( "japan" ) /* so the mahjong panel will work in the service menu */
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
 	ROM_LOAD( "036-v1.v1", 0x000000, 0x100000, CRC(1c335dce) SHA1(493c273fa71bf81861a20af4c4eaae159e169f39) ) /* CXK388000 */
@@ -2673,6 +2670,8 @@ ROM_START( janshin ) /* MVS ONLY RELEASE */
 	NEO_SFIX_128K( "048-s1.s1", CRC(8285b25a) SHA1(d983640cda3e346e38469b4d3ec8048b116a7bb7) ) /* mask rom TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "048-m1.m1", CRC(310467c7) SHA1(c529961195c9bdf5d1ce70a38ad129002d1f3b5f) ) /* mask rom TC531001 */
+
+	ROM_DEFAULT_BIOS( "japan" ) /* so the mahjong panel will work in the service menu */
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
 	ROM_LOAD( "048-v1.v1", 0x000000, 0x200000, CRC(f1947d2b) SHA1(955ff91ab24eb2a7ec51ff46c9f9f2ec060456b2) ) /* mask rom TC5316200 */
@@ -4847,6 +4846,47 @@ ROM_START( kizuna )
 	ROM_LOAD16_BYTE( "059-c8.c8", 0x1800001, 0x200000, CRC(484ce3ba) SHA1(4f21ed20ce6e2b67e2b079404599310c94f591ff) ) /* Plane 2,3 */ /* TC538200 */
 ROM_END
 
+
+ROM_START( kizuna4p ) /* same cartridge as kizuna - 4-player mode is enabled by an extension board that plugs into a compatible MVS */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "216-p1.p1", 0x100000, 0x100000, CRC(75d2b3de) SHA1(ee778656c26828935ee2a2bfd0ce5a22aa681c10) ) /* mask rom TC5316200 */
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
+	NEO_SFIX_128K( "216-s1.s1", CRC(efdc72d7) SHA1(be37cbf1852e2e4c907cc799b754b538544b6703) ) /* mask rom TC531000 */
+
+	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
+	/* these two BIOSes are the only ones we have that are compatible with the 4-player extension board */
+	ROM_SYSTEM_BIOS( 0, "asia",        "NEO-MVH MV1C" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "sp-45.sp1",0x00000, 0x080000, CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1) )
+	ROM_SYSTEM_BIOS( 1, "japan",    "Japan MVS (J3)" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "japan-j3.bin",0x00000, 0x020000, CRC(dff6d41f) SHA1(e92910e20092577a4523a6b39d578a71d4de7085) )
+
+	ROM_REGION( 0x30000, "audiocpu", 0 )
+	ROM_LOAD( "216-m1.m1", 0x00000, 0x20000, CRC(1b096820) SHA1(72852e78c620038f8dafde5e54e02e418c31be9c) ) /* mask rom TC531001 */
+	ROM_RELOAD( 0x10000, 0x20000 )
+
+	ROM_REGION( 0x800000, "ymsnd", 0 )
+	ROM_LOAD( "059-v1.v1", 0x000000, 0x200000, CRC(530c50fd) SHA1(29401cee7f7d2c199c7cb58092e86b28205e81ad) ) /* TC5316200 */
+	ROM_LOAD( "216-v2.v2", 0x200000, 0x200000, CRC(03667a8d) SHA1(3b0475e553a49f8788f32b0c84f82645cc6b4273) ) /* mask rom TC5316200 */
+	ROM_LOAD( "059-v3.v3", 0x400000, 0x200000, CRC(7038c2f9) SHA1(c1d6f86b24feba03fe009b58199d2eeabe572f4e) ) /* TC5316200 */
+	ROM_LOAD( "216-v4.v4", 0x600000, 0x200000, CRC(31b99bd6) SHA1(5871751f8e9e6b98337472c22b5e1c7ede0a9311) ) /* mask rom TC5316200 */
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x1c00000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "059-c1.c1", 0x0000000, 0x200000, CRC(763ba611) SHA1(d3262e0332c894ee149c5963f882cc5e5562ee57) ) /* Plane 0,1 */ /* TC5316200 */
+	ROM_LOAD16_BYTE( "059-c2.c2", 0x0000001, 0x200000, CRC(e05e8ca6) SHA1(986a9b16ff92bc101ab567d2d01348e093abea9a) ) /* Plane 2,3 */ /* TC5316200 */
+	/* 400000-7fffff empty */
+	ROM_LOAD16_BYTE( "216-c3.c3", 0x0800000, 0x400000, CRC(665c9f16) SHA1(7ec781a49a462f395b450460b29493f55134eac2) ) /* Plane 0,1 */ /* mask rom TC5332205 */
+	ROM_LOAD16_BYTE( "216-c4.c4", 0x0800001, 0x400000, CRC(7f5d03db) SHA1(365ed266c121f4df0bb76898955a8ae0e668a216) ) /* Plane 2,3 */ /* mask rom TC5332205 */
+	ROM_LOAD16_BYTE( "059-c5.c5", 0x1000000, 0x200000, CRC(59013f9e) SHA1(5bf48fcc450da72a8c4685f6e3887e67eae49988) ) /* Plane 0,1 */ /* TC5316200 */
+	ROM_LOAD16_BYTE( "059-c6.c6", 0x1000001, 0x200000, CRC(1c8d5def) SHA1(475d89a5c4922a9f6bd756d23c2624d57b6e9d62) ) /* Plane 2,3 */ /* TC5316200 */
+	/* 1400000-17fffff empty */
+	ROM_LOAD16_BYTE( "059-c7.c7", 0x1800000, 0x200000, CRC(c88f7035) SHA1(c29a428b741f4fe7b71a3bc23c87925b6bc1ca8f) ) /* Plane 0,1 */ /* TC538200 */
+	ROM_LOAD16_BYTE( "059-c8.c8", 0x1800001, 0x200000, CRC(484ce3ba) SHA1(4f21ed20ce6e2b67e2b079404599310c94f591ff) ) /* Plane 2,3 */ /* TC538200 */
+ROM_END
+
+
 /****************************************
  ID-0217
  . ADM-012
@@ -5555,11 +5595,8 @@ ROM_START( irrmaze ) /* MVS ONLY RELEASE */
 	/* special BIOS with trackball support, we only have one Irritating Maze bios and thats asia */
 	ROM_LOAD16_WORD_SWAP("236-bios.sp1", 0x00000, 0x020000, CRC(853e6b96) SHA1(de369cb4a7df147b55168fa7aaf0b98c753b735e) )
 
-	ROM_REGION( 0x20000, "audiobios", 0 )
-	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) )
-
-	ROM_REGION( 0x50000, "audiocpu", 0 )
-	ROM_LOAD( "236-m1.m1", 0x00000, 0x20000, CRC(880a1abd) SHA1(905afa157aba700e798243b842792e50729b19a0) ) /* so overwrite it with the real thing */
+	ROM_REGION( 0x30000, "audiocpu", 0 )
+	ROM_LOAD( "236-m1.m1", 0x00000, 0x20000, CRC(880a1abd) SHA1(905afa157aba700e798243b842792e50729b19a0) )
 	ROM_RELOAD( 0x10000, 0x20000 )
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -8466,11 +8503,9 @@ ROM_END
 
 ROM_START( kf10thep ) /* this is a hack of kof2002 much like the various korean hacks / bootlegs of games */
 	ROM_REGION( 0x800000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "5008-p2.bin", 0x100000, 0x400000, CRC(a649ec38) SHA1(5c63ed5e5c848940f587c966da4908d04cf1293c) )
-	ROM_LOAD16_WORD_SWAP( "5008-p3.bin", 0x500000, 0x200000, CRC(e629e13c) SHA1(6ebe080ce01c51064cb2f4d89315ba98a45ae727) )
-
-	ROM_REGION( 0x200000, "audiocrypt", 0 )
-	ROM_LOAD( "5008-p1.bin", 0x000000, 0x200000, CRC(bf5469ba) SHA1(f05236d8fffab5836c0d27becdeeb80def32ee49) )
+	ROM_LOAD16_WORD_SWAP( "5008-p1.bin", 0x000000, 0x200000, CRC(bf5469ba) SHA1(f05236d8fffab5836c0d27becdeeb80def32ee49) )
+	ROM_LOAD16_WORD_SWAP( "5008-p2.bin", 0x200000, 0x400000, CRC(a649ec38) SHA1(5c63ed5e5c848940f587c966da4908d04cf1293c) )
+	ROM_LOAD16_WORD_SWAP( "5008-p3.bin", 0x600000, 0x200000, CRC(e629e13c) SHA1(6ebe080ce01c51064cb2f4d89315ba98a45ae727) )
 
 	NEO_SFIX_128K( "5008-s1.bin", CRC(92410064) SHA1(1fb800b46341858207d3b6961a760289fbec7faa) )
 
@@ -8986,27 +9021,14 @@ ROM_END
 ****************************************************************************/
 
 
-static INPUT_PORTS_START( ms5pcb )
+static INPUT_PORTS_START( dualbios )
 	PORT_INCLUDE( neogeo )
 
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/* the rom banking is tied directly to the dipswitch?, or is there a bank write somewhere? */
-	PORT_START("HARDDIP")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Region ) ) PORT_DIPLOCATION("HARDDIP:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Asia ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Japan ) )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( kf2k3pcb )
-	PORT_INCLUDE( neogeo )
-
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	/* the rom banking seems to be tied directly to the dipswitch */
+	PORT_MODIFY("P1/DSW")
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW:3") PORT_CHANGED_MEMBER(DEVICE_SELF, neogeo_state, select_bios, 0)
+	PORT_DIPSETTING(    0x0000, DEF_STR( Asia ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Japan ) )
 INPUT_PORTS_END
 
 
@@ -9027,10 +9049,10 @@ static INPUT_PORTS_START( mjneogeo )
 	PORT_INCLUDE( neogeo )
 
 	PORT_MODIFY("P1/DSW")
-	PORT_DIPNAME( 0x0004, 0x0000, "Mahjong Control Panel" ) PORT_DIPLOCATION("SW:3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,mahjong_controller_r, NULL)
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Controller ) ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(      0x0000, "Mahjong Panel" )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,mahjong_controller_r, NULL)
 
 	PORT_START("MAHJONG1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
@@ -9077,12 +9099,74 @@ static INPUT_PORTS_START( mjneogeo )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kizuna4p )
+	PORT_INCLUDE( neogeo )
+
+	PORT_MODIFY("P1/DSW")
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Players ) ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING(      0x0002, "2" )
+	PORT_DIPSETTING(      0x0000, "4" )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)0)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_controller_r, (void *)1)
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state, kizuna4p_start_r, NULL)
+
+	/* Fake inputs read by CUSTOM_INPUT handlers */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
+
+	PORT_START("IN1-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+
+	PORT_START("IN1-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
+
+	PORT_START("START")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( irrmaze )
 	PORT_INCLUDE( neogeo )
 
 	PORT_MODIFY("P1/DSW")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -9094,8 +9178,6 @@ static INPUT_PORTS_START( irrmaze )
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-0")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(20) PORT_REVERSE
@@ -9109,10 +9191,10 @@ static INPUT_PORTS_START( popbounc )
 	PORT_INCLUDE( neogeo )
 
 	PORT_MODIFY("P1/DSW")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)1)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)1)
 
 	/* Fake inputs read by CUSTOM_INPUT handlers */
 	PORT_START("IN0-0")
@@ -9459,7 +9541,8 @@ DRIVER_INIT_MEMBER(neogeo_state,kof10th)
 DRIVER_INIT_MEMBER(neogeo_state,kf10thep)
 {
 	DRIVER_INIT_CALL(neogeo);
-	decrypt_kf10thep();
+	kf10thep_px_decrypt();
+	neogeo_bootleg_sx_decrypt(1);
 }
 
 DRIVER_INIT_MEMBER(neogeo_state,kf2k5uni)
@@ -9513,19 +9596,21 @@ DRIVER_INIT_MEMBER(neogeo_state,mslug5)
 	install_pvc_protection();
 }
 
-TIMER_CALLBACK_MEMBER(neogeo_state::ms5pcb_bios_timer_callback)
+void neogeo_state::install_banked_bios()
 {
-	int harddip3 = ioport("HARDDIP")->read() & 1;
-	membank(NEOGEO_BANK_BIOS)->set_base(memregion("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc1ffff, 0, 0x0e0000, "bankedbios");
+	membank("bankedbios")->configure_entries(0, 2, memregion("mainbios")->base(), 0x20000);
+	membank("bankedbios")->set_entry(1);
+}
+
+INPUT_CHANGED_MEMBER(neogeo_state::select_bios)
+{
+	membank("bankedbios")->set_entry(newval ? 0 : 1);
 }
 
 DRIVER_INIT_MEMBER(neogeo_state,ms5pcb)
 {
 	DRIVER_INIT_CALL(neogeo);
-
-	/* start a timer that will check the BIOS select DIP every second */
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(neogeo_state::ms5pcb_bios_timer_callback),this));
-	machine().scheduler().timer_pulse(attotime::from_msec(1000), timer_expired_delegate(FUNC(neogeo_state::ms5pcb_bios_timer_callback),this));
 
 	mslug5_decrypt_68k();
 	svcpcb_gfx_decrypt();
@@ -9535,6 +9620,7 @@ DRIVER_INIT_MEMBER(neogeo_state,ms5pcb)
 	svcpcb_s1data_decrypt();
 	neo_pcm2_swap(2);
 	install_pvc_protection();
+	install_banked_bios();
 }
 
 DRIVER_INIT_MEMBER(neogeo_state,ms5plus)
@@ -9548,19 +9634,9 @@ DRIVER_INIT_MEMBER(neogeo_state,ms5plus)
 	install_ms5plus_protection();
 }
 
-TIMER_CALLBACK_MEMBER(neogeo_state::svcpcb_bios_timer_callback)
-{
-	int harddip3 = ioport("HARDDIP")->read() & 1;
-	membank(NEOGEO_BANK_BIOS)->set_base(memregion("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
-}
-
 DRIVER_INIT_MEMBER(neogeo_state,svcpcb)
 {
 	DRIVER_INIT_CALL(neogeo);
-
-	/* start a timer that will check the BIOS select DIP every second */
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(neogeo_state::svcpcb_bios_timer_callback),this));
-	machine().scheduler().timer_pulse(attotime::from_msec(1000), timer_expired_delegate(FUNC(neogeo_state::svcpcb_bios_timer_callback),this));
 
 	svc_px_decrypt();
 	svcpcb_gfx_decrypt();
@@ -9570,6 +9646,7 @@ DRIVER_INIT_MEMBER(neogeo_state,svcpcb)
 	neo_pcm2_swap(3);
 	m_fixed_layer_bank_type = 2;
 	install_pvc_protection();
+	install_banked_bios();
 }
 
 DRIVER_INIT_MEMBER(neogeo_state,svc)
@@ -9662,7 +9739,7 @@ DRIVER_INIT_MEMBER(neogeo_state,kf2k3pcb)
 	neo_pcm2_swap(5);
 	m_fixed_layer_bank_type = 2;
 	install_pvc_protection();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc7ffff, "bios" );  // 512k bios
+	m_maincpu->space(AS_PROGRAM).install_rom(0xc00000, 0xc7ffff, 0, 0x080000, memregion("mainbios")->base());  // 512k bios
 }
 
 DRIVER_INIT_MEMBER(neogeo_state,kof2003)
@@ -9713,7 +9790,7 @@ DRIVER_INIT_MEMBER(neogeo_state,kf2k3upl)
 	neo_pcm2_swap(5);
 	kf2k3upl_px_decrypt();
 	neogeo_bootleg_sx_decrypt(2);
-	kf2k3upl_install_protection();
+	kf2k3bl_install_protection();
 }
 
 DRIVER_INIT_MEMBER(neogeo_state,samsh5sp)
@@ -9937,7 +10014,7 @@ GAME( 1990, nam1975,    neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   RO
 GAME( 1990, bstars,     neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Baseball Stars Professional (NGM-002)", GAME_SUPPORTS_SAVE )
 GAME( 1990, bstarsh,    bstars,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Baseball Stars Professional (NGH-002)", GAME_SUPPORTS_SAVE )
 GAME( 1990, tpgolf,     neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Top Player's Golf (NGM-003)(NGH-003)", GAME_SUPPORTS_SAVE )
-GAME( 1990, mahretsu,   neogeo,   neogeo,   mjneogeo, neogeo_state, neogeo,   ROT0, "SNK", "Mahjong Kyo Retsuden (NGM-004)(NGH-004)", GAME_SUPPORTS_SAVE )
+GAME( 1990, mahretsu,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Mahjong Kyo Retsuden (NGM-004)(NGH-004)", GAME_SUPPORTS_SAVE ) // does not support mahjong panel in MVS mode
 GAME( 1990, ridhero,    neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Riding Hero (NGM-006)(NGH-006)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ridheroh,   ridhero,  neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Riding Hero (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1991, alpham2,    neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Alpha Mission II / ASO II - Last Guardian (NGM-007)(NGH-007)", GAME_SUPPORTS_SAVE )
@@ -10007,6 +10084,7 @@ GAME( 1996, kof96,      neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   RO
 GAME( 1996, kof96h,     kof96,    neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '96 (NGH-214)", GAME_SUPPORTS_SAVE )
 GAME( 1996, ssideki4,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Ultimate 11 - The SNK Football Championship / Tokuten Ou - Honoo no Libero", GAME_SUPPORTS_SAVE )
 GAME( 1996, kizuna,     neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Kizuna Encounter - Super Tag Battle / Fu'un Super Tag Battle", GAME_SUPPORTS_SAVE )
+GAME( 1996, kizuna4p,   kizuna,   neogeo,   kizuna4p, neogeo_state, neogeo,   ROT0, "SNK", "Kizuna Encounter - Super Tag Battle 4 Way Battle Version / Fu'un Super Tag Battle Special Version", GAME_SUPPORTS_SAVE )
 GAME( 1996, samsho4,    neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Samurai Shodown IV - Amakusa's Revenge / Samurai Spirits - Amakusa Kourin (NGM-222)(NGH-222)", GAME_SUPPORTS_SAVE )
 GAME( 1996, samsho4k,   samsho4,  neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)", GAME_SUPPORTS_SAVE )
 GAME( 1996, rbffspec,   neogeo,   neogeo,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special", GAME_SUPPORTS_SAVE )
@@ -10065,10 +10143,10 @@ GAME( 2004, kf2k5uni,   kof2002,  neogeo,   neogeo, neogeo_state,   kf2k5uni, RO
 GAME( 2004, kof2k4se,   kof2002,  neogeo,   neogeo, neogeo_state,   kof2k4se, ROT0, "bootleg", "The King of Fighters Special Edition 2004 (The King of Fighters 2002 bootleg)", GAME_SUPPORTS_SAVE ) /* Hack / Bootleg of kof2002 */
 GAME( 2003, mslug5,     neogeo,   neogeo,   neogeo, neogeo_state,   mslug5,   ROT0, "SNK Playmore", "Metal Slug 5 (NGM-2680)", GAME_SUPPORTS_SAVE )
 GAME( 2003, mslug5h,    mslug5,   neogeo,   neogeo, neogeo_state,   mslug5,   ROT0, "SNK Playmore", "Metal Slug 5 (NGH-2680)", GAME_SUPPORTS_SAVE ) /* Also found in later MVS carts */
-GAME( 2003, ms5pcb,     0,        neogeo,   ms5pcb, neogeo_state,   ms5pcb,   ROT0, "SNK Playmore", "Metal Slug 5 (JAMMA PCB)", GAME_SUPPORTS_SAVE )
+GAME( 2003, ms5pcb,     0,        neogeo,   dualbios, neogeo_state, ms5pcb,   ROT0, "SNK Playmore", "Metal Slug 5 (JAMMA PCB)", GAME_SUPPORTS_SAVE )
 GAME( 2003, ms5plus,    mslug5,   neogeo,   neogeo, neogeo_state,   ms5plus,  ROT0, "bootleg", "Metal Slug 5 Plus (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 2003, svcpcb,     0,        neogeo,   ms5pcb, neogeo_state,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 1)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
-GAME( 2003, svcpcba,    svcpcb,   neogeo,   ms5pcb, neogeo_state,   svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 2)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code */
+GAME( 2003, svcpcb,     0,        neogeo,   dualbios, neogeo_state, svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 1)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
+GAME( 2003, svcpcba,    svcpcb,   neogeo,   dualbios, neogeo_state, svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 2)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code */
 GAME( 2003, svc,        neogeo,   neogeo,   neogeo, neogeo_state,   svc,      ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (NGM-2690)(NGH-2690)", GAME_SUPPORTS_SAVE )
 GAME( 2003, svcboot,    svc,      neogeo,   neogeo, neogeo_state,   svcboot,  ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 2003, svcplus,    svc,      neogeo,   neogeo, neogeo_state,   svcplus,  ROT0, "bootleg", "SNK vs. Capcom - SVC Chaos Plus (bootleg set 1)", GAME_SUPPORTS_SAVE )
@@ -10077,7 +10155,7 @@ GAME( 2003, svcsplus,   svc,      neogeo,   neogeo, neogeo_state,   svcsplus, RO
 GAME( 2003, samsho5,    neogeo,   neogeo,   neogeo, neogeo_state,   samsho5,  ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V / Samurai Spirits Zero (NGM-2700)", GAME_SUPPORTS_SAVE )
 GAME( 2003, samsho5h,   samsho5,  neogeo,   neogeo, neogeo_state,   samsho5,  ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V / Samurai Spirits Zero (NGH-2700)", GAME_SUPPORTS_SAVE )
 GAME( 2003, samsho5b,   samsho5,  neogeo,   neogeo, neogeo_state,   samsho5b, ROT0, "bootleg", "Samurai Shodown V / Samurai Spirits Zero (bootleg)", GAME_SUPPORTS_SAVE ) // different program scrambling
-GAME( 2003, kf2k3pcb,   0,        neogeo,   kf2k3pcb, neogeo_state, kf2k3pcb, ROT0, "SNK Playmore", "The King of Fighters 2003 (Japan, JAMMA PCB)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
+GAME( 2003, kf2k3pcb,   0,        neogeo,   neogeo, neogeo_state,   kf2k3pcb, ROT0, "SNK Playmore", "The King of Fighters 2003 (Japan, JAMMA PCB)", GAME_SUPPORTS_SAVE ) // not a clone of neogeo because it's NOT a neogeo cart.
 GAME( 2003, kof2003,    neogeo,   neogeo,   neogeo, neogeo_state,   kof2003,  ROT0, "SNK Playmore", "The King of Fighters 2003 (NGM-2710)", GAME_SUPPORTS_SAVE )
 GAME( 2003, kof2003h,   kof2003,  neogeo,   neogeo, neogeo_state,   kof2003h, ROT0, "SNK Playmore", "The King of Fighters 2003 (NGH-2710)", GAME_SUPPORTS_SAVE )
 GAME( 2003, kf2k3bl,    kof2003,  neogeo,   neogeo, neogeo_state,   kf2k3bl , ROT0, "bootleg", "The King of Fighters 2003 (bootleg set 1)", GAME_SUPPORTS_SAVE ) // zooming is wrong because its a bootleg of the pcb version on a cart (unless it was a bootleg pcb with the new bios?)

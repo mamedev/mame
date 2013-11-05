@@ -405,32 +405,32 @@ READ16_MEMBER( neogeo_state::prot_9a37_r )
 
 READ16_MEMBER( neogeo_state::sma_random_r )
 {
-	UINT16 old = m_neogeo_rng;
+	UINT16 old = m_sma_rng;
 
-	UINT16 newbit = ((m_neogeo_rng >> 2) ^
-						(m_neogeo_rng >> 3) ^
-						(m_neogeo_rng >> 5) ^
-						(m_neogeo_rng >> 6) ^
-						(m_neogeo_rng >> 7) ^
-						(m_neogeo_rng >>11) ^
-						(m_neogeo_rng >>12) ^
-						(m_neogeo_rng >>15)) & 1;
+	UINT16 newbit = ((m_sma_rng >> 2) ^
+						(m_sma_rng >> 3) ^
+						(m_sma_rng >> 5) ^
+						(m_sma_rng >> 6) ^
+						(m_sma_rng >> 7) ^
+						(m_sma_rng >>11) ^
+						(m_sma_rng >>12) ^
+						(m_sma_rng >>15)) & 1;
 
-	m_neogeo_rng = (m_neogeo_rng << 1) | newbit;
+	m_sma_rng = (m_sma_rng << 1) | newbit;
 
 	return old;
 }
 
 
-void neogeo_state::neogeo_reset_rng()
+void neogeo_state::reset_sma_rng()
 {
-	m_neogeo_rng = 0x2345;
+	m_sma_rng = 0x2345;
 }
 
 
 void neogeo_state::sma_install_random_read_handler(int addr1, int addr2 )
 {
-	save_item(NAME(m_neogeo_rng));
+	save_item(NAME(m_sma_rng));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(addr1, addr1 + 1, read16_delegate(FUNC(neogeo_state::sma_random_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(addr2, addr2 + 1, read16_delegate(FUNC(neogeo_state::sma_random_r),this));
@@ -489,24 +489,24 @@ void neogeo_state::kof2000_install_protection()
 
 void neogeo_state::pvc_write_unpack_color()
 {
-	UINT16 pen = m_pvc_cartridge_ram[0xff0];
+	UINT16 pen = m_cartridge_ram[0xff0];
 
 	UINT8 b = ((pen & 0x000f) << 1) | ((pen & 0x1000) >> 12);
 	UINT8 g = ((pen & 0x00f0) >> 3) | ((pen & 0x2000) >> 13);
 	UINT8 r = ((pen & 0x0f00) >> 7) | ((pen & 0x4000) >> 14);
 	UINT8 s = (pen & 0x8000) >> 15;
 
-	m_pvc_cartridge_ram[0xff1] = (g << 8) | b;
-	m_pvc_cartridge_ram[0xff2] = (s << 8) | r;
+	m_cartridge_ram[0xff1] = (g << 8) | b;
+	m_cartridge_ram[0xff2] = (s << 8) | r;
 }
 
 
 void neogeo_state::pvc_write_pack_color()
 {
-	UINT16 gb = m_pvc_cartridge_ram[0xff4];
-	UINT16 sr = m_pvc_cartridge_ram[0xff5];
+	UINT16 gb = m_cartridge_ram[0xff4];
+	UINT16 sr = m_cartridge_ram[0xff5];
 
-	m_pvc_cartridge_ram[0xff6] = ((gb & 0x001e) >> 1) |
+	m_cartridge_ram[0xff6] = ((gb & 0x001e) >> 1) |
 									((gb & 0x1e00) >> 5) |
 									((sr & 0x001e) << 7) |
 									((gb & 0x0001) << 12) |
@@ -520,22 +520,22 @@ void neogeo_state::pvc_write_bankswitch( address_space &space )
 {
 	UINT32 bankaddress;
 
-	bankaddress = ((m_pvc_cartridge_ram[0xff8] >> 8)|(m_pvc_cartridge_ram[0xff9] << 8));
-	m_pvc_cartridge_ram[0xff8] = (m_pvc_cartridge_ram[0xff8] & 0xfe00) | 0x00a0;
-	m_pvc_cartridge_ram[0xff9] &= 0x7fff;
+	bankaddress = ((m_cartridge_ram[0xff8] >> 8)|(m_cartridge_ram[0xff9] << 8));
+	m_cartridge_ram[0xff8] = (m_cartridge_ram[0xff8] & 0xfe00) | 0x00a0;
+	m_cartridge_ram[0xff9] &= 0x7fff;
 	neogeo_set_main_cpu_bank_address(bankaddress + 0x100000);
 }
 
 
 READ16_MEMBER( neogeo_state::pvc_prot_r )
 {
-	return m_pvc_cartridge_ram[offset];
+	return m_cartridge_ram[offset];
 }
 
 
 WRITE16_MEMBER( neogeo_state::pvc_prot_w )
 {
-	COMBINE_DATA(&m_pvc_cartridge_ram[offset] );
+	COMBINE_DATA(&m_cartridge_ram[offset] );
 	if (offset == 0xff0)
 		pvc_write_unpack_color();
 	else if(offset >= 0xff4 && offset <= 0xff5)
@@ -547,8 +547,7 @@ WRITE16_MEMBER( neogeo_state::pvc_prot_w )
 
 void neogeo_state::install_pvc_protection()
 {
-	m_pvc_cartridge_ram = auto_alloc_array(machine(), UINT16, 0x2000 / 2);
-	save_pointer(NAME(m_pvc_cartridge_ram), 0x2000 / 2);
+	save_item(NAME(m_cartridge_ram));
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::pvc_prot_r),this), write16_delegate(FUNC(neogeo_state::pvc_prot_w),this));
 }

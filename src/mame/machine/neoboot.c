@@ -1,9 +1,9 @@
 /***************************************************************************
 
-    Neo-Geo hardware
+    Neo-Geo hardware encryption and protection used on bootleg cartridges
 
     Many of the NeoGeo bootlegs use their own form of encryption and
-    protection, presumably to make them harder for other bootleggser to
+    protection, presumably to make them harder for other bootleggers to
     copy.  This encryption often involves non-trivial scrambling of the
     program roms and the games are protected using an Altera chip which
     provides some kind of rom overlay, patching parts of the code.
@@ -165,12 +165,12 @@ void neogeo_state::kof10thBankswitch(address_space &space, UINT16 nBank)
 
 READ16_MEMBER( neogeo_state::kof10th_RAMB_r )
 {
-	return kof10thExtraRAMB[offset];
+	return m_cartridge_ram[offset];
 }
 
 WRITE16_MEMBER( neogeo_state::kof10th_custom_w )
 {
-	if (!kof10thExtraRAMB[0xFFE]) { // Write to RAM bank A
+	if (!m_cartridge_ram[0xFFE]) { // Write to RAM bank A
 		UINT16 *prom = (UINT16*)memregion( "maincpu" )->base();
 		COMBINE_DATA(&prom[(0xE0000/2) + (offset & 0xFFFF)]);
 	} else { // Write S data on-the-fly
@@ -184,16 +184,18 @@ WRITE16_MEMBER( neogeo_state::kof10th_bankswitch_w )
 	if (offset >= 0x5F000) {
 		if (offset == 0x5FFF8) { // Standard bankswitch
 			kof10thBankswitch(space, data);
-		} else if (offset == 0x5FFFC && kof10thExtraRAMB[0xFFC] != data) { // Special bankswitch
+		} else if (offset == 0x5FFFC && m_cartridge_ram[0xFFC] != data) { // Special bankswitch
 			UINT8 *src = memregion( "maincpu" )->base();
 			memcpy (src + 0x10000,  src + ((data & 1) ? 0x810000 : 0x710000), 0xcffff);
 		}
-		COMBINE_DATA(&kof10thExtraRAMB[offset & 0xFFF]);
+		COMBINE_DATA(&m_cartridge_ram[offset & 0xFFF]);
 	}
 }
 
 void neogeo_state::install_kof10th_protection ()
 {
+	save_item(NAME(m_cartridge_ram));
+
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof10th_RAMB_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x23ffff, write16_delegate(FUNC(neogeo_state::kof10th_custom_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x240000, 0x2fffff, write16_delegate(FUNC(neogeo_state::kof10th_bankswitch_w),this));
@@ -228,41 +230,32 @@ void neogeo_state::decrypt_kof10th()
 /* The King of Fighters 10th Anniversary Extra Plus (The King of Fighters 2002 bootleg) */
 
 
-void neogeo_state::decrypt_kf10thep()
+void neogeo_state::kf10thep_px_decrypt()
 {
-	int i;
 	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
-	UINT8  *src = memregion("maincpu")->base();
-	UINT16 *buf = (UINT16*)memregion("audiocrypt")->base();
-	UINT8 *srom = (UINT8*)memregion("fixed")->base();
-	UINT8 *sbuf = auto_alloc_array(machine(), UINT8, 0x20000);
+	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x100000/2);
 
-	UINT8 *dst = auto_alloc_array(machine(), UINT8, 0x200000);
+	memcpy(&buf[0x000000/2], &rom[0x060000/2], 0x20000);
+	memcpy(&buf[0x020000/2], &rom[0x100000/2], 0x20000);
+	memcpy(&buf[0x040000/2], &rom[0x0e0000/2], 0x20000);
+	memcpy(&buf[0x060000/2], &rom[0x180000/2], 0x20000);
+	memcpy(&buf[0x080000/2], &rom[0x020000/2], 0x20000);
+	memcpy(&buf[0x0a0000/2], &rom[0x140000/2], 0x20000);
+	memcpy(&buf[0x0c0000/2], &rom[0x0c0000/2], 0x20000);
+	memcpy(&buf[0x0e0000/2], &rom[0x1a0000/2], 0x20000);
+	memcpy(&buf[0x0002e0/2], &rom[0x0402e0/2], 0x6a);  // copy banked code to a new memory region
+	memcpy(&buf[0x0f92bc/2], &rom[0x0492bc/2], 0xb9e); // copy banked code to a new memory region
+	memcpy(rom, buf, 0x100000);
+	auto_free(machine(), buf);
 
-	memcpy(dst,buf,0x200000);
-	memcpy(src+0x000000,dst+0x060000,0x20000);
-	memcpy(src+0x020000,dst+0x100000,0x20000);
-	memcpy(src+0x040000,dst+0x0e0000,0x20000);
-	memcpy(src+0x060000,dst+0x180000,0x20000);
-	memcpy(src+0x080000,dst+0x020000,0x20000);
-	memcpy(src+0x0a0000,dst+0x140000,0x20000);
-	memcpy(src+0x0c0000,dst+0x0c0000,0x20000);
-	memcpy(src+0x0e0000,dst+0x1a0000,0x20000);
-	memcpy(src+0x0002e0,dst+0x0402e0,0x6a); // copy banked code to a new memory region
-	memcpy(src+0x0f92bc,dst+0x0492bc,0xb9e); // copy banked code to a new memory region
-	for (i=0xf92bc/2;i < 0xf9e58/2 ;i++)
+	for (int i = 0xf92bc/2; i < 0xf9e58/2; i++)
 	{
 		if (rom[i+0] == 0x4eb9 && rom[i+1] == 0x0000) rom[i+1] = 0x000F; // correct JSR in moved code
 		if (rom[i+0] == 0x4ef9 && rom[i+1] == 0x0000) rom[i+1] = 0x000F; // correct JMP in moved code
 	}
 	rom[0x00342/2] = 0x000f;
-	auto_free(machine(), dst);
 
-	for (i=0;i<0x20000;i++)
-		sbuf[i]=srom[i^0x8];
-
-	memcpy(srom,sbuf,0x20000);
-	auto_free(machine(), sbuf);
+	memmove(&rom[0x100000/2], &rom[0x200000/2], 0x600000);
 }
 
 
@@ -321,7 +314,7 @@ void neogeo_state::decrypt_kf2k5uni()
 void neogeo_state::kof2002b_gfx_decrypt(UINT8 *src, int size)
 {
 	int i, j;
-	int t[ 8 ][ 10 ] =
+	static const UINT8 t[ 8 ][ 6 ] =
 	{
 		{ 0, 8, 7, 6, 2, 1 },
 		{ 1, 0, 8, 7, 6, 2 },
@@ -836,15 +829,8 @@ void neogeo_state::svcplus_px_decrypt()
 void neogeo_state::svcplus_px_hack()
 {
 	/* patched by the protection chip? */
-	UINT8 *src = memregion( "maincpu" )->base();
-	src[ 0x0f8010 ] = 0x40;
-	src[ 0x0f8011 ] = 0x04;
-	src[ 0x0f8012 ] = 0x00;
-	src[ 0x0f8013 ] = 0x10;
-	src[ 0x0f8014 ] = 0x40;
-	src[ 0x0f8015 ] = 0x46;
-	src[ 0x0f8016 ] = 0xc1;
-	src[ 0x0f802c ] = 0x16;
+	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
+	mem16[0x0f8016/2] = 0x33c1;
 }
 
 
@@ -926,14 +912,14 @@ WRITE16_MEMBER( neogeo_state::mv0_bankswitch_w )
 
 READ16_MEMBER( neogeo_state::kof2003_r)
 {
-	return kof2003_tbl[offset];
+	return m_cartridge_ram[offset];
 }
 
 WRITE16_MEMBER( neogeo_state::kof2003_w )
 {
-	data = COMBINE_DATA(&kof2003_tbl[offset]);
+	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2) {
-		UINT8* cr = (UINT8 *)kof2003_tbl;
+		UINT8* cr = (UINT8 *)m_cartridge_ram;
 		UINT32 address = (cr[BYTE_XOR_LE(0x1ff3)]<<16)|(cr[BYTE_XOR_LE(0x1ff2)]<<8)|cr[BYTE_XOR_LE(0x1ff1)];
 		UINT8 prt = cr[BYTE_XOR_LE(0x1ff2)];
 		UINT8* mem = (UINT8 *)memregion("maincpu")->base();
@@ -949,9 +935,9 @@ WRITE16_MEMBER( neogeo_state::kof2003_w )
 
 WRITE16_MEMBER( neogeo_state::kof2003p_w )
 {
-	data = COMBINE_DATA(&kof2003_tbl[offset]);
+	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2) {
-		UINT8* cr = (UINT8 *)kof2003_tbl;
+		UINT8* cr = (UINT8 *)m_cartridge_ram;
 		UINT32 address = (cr[BYTE_XOR_LE(0x1ff3)]<<16)|(cr[BYTE_XOR_LE(0x1ff2)]<<8)|cr[BYTE_XOR_LE(0x1ff0)];
 		UINT8 prt = cr[BYTE_XOR_LE(0x1ff2)];
 		UINT8* mem = (UINT8 *)memregion("maincpu")->base();
@@ -984,6 +970,8 @@ void neogeo_state::kf2k3bl_px_decrypt()
 
 void neogeo_state::kf2k3bl_install_protection()
 {
+	save_item(NAME(m_cartridge_ram));
+
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof2003_r),this), write16_delegate(FUNC(neogeo_state::kof2003_w),this) );
 }
 
@@ -1012,6 +1000,8 @@ void neogeo_state::kf2k3pl_px_decrypt()
 
 void neogeo_state::kf2k3pl_install_protection()
 {
+	save_item(NAME(m_cartridge_ram));
+
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof2003_r),this), write16_delegate(FUNC(neogeo_state::kof2003p_w),this) );
 }
 
@@ -1038,11 +1028,6 @@ void neogeo_state::kf2k3upl_px_decrypt()
 			memcpy( &rom[ i * 2 ], &buf[ ofst * 2 ], 2 );
 		}
 	}
-}
-
-void neogeo_state::kf2k3upl_install_protection()
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof2003_r),this), write16_delegate(FUNC(neogeo_state::kof2003_w),this) );
 }
 
 

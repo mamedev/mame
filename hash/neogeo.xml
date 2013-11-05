@@ -9075,11 +9075,9 @@
 			<!-- this is a hack of kof2002 much like the various korean hacks / bootlegs of games -->
 			<feature name="crypt" value="kf10thep_prot" />
 			<dataarea name="maincpu" size="0x800000">
-				<rom loadflag="load16_word_swap" name="5008-p2.bin" offset="0x100000" size="0x400000" crc="a649ec38" sha1="5c63ed5e5c848940f587c966da4908d04cf1293c" />
-				<rom loadflag="load16_word_swap" name="5008-p3.bin" offset="0x500000" size="0x200000" crc="e629e13c" sha1="6ebe080ce01c51064cb2f4d89315ba98a45ae727" />
-			</dataarea>
-			<dataarea name="audiocrypt" size="0x200000">
-				<rom name="5008-p1.bin" offset="0x000000" size="0x200000" crc="bf5469ba" sha1="f05236d8fffab5836c0d27becdeeb80def32ee49" />
+				<rom loadflag="load16_word_swap" name="5008-p1.bin" offset="0x000000" size="0x200000" crc="bf5469ba" sha1="f05236d8fffab5836c0d27becdeeb80def32ee49" />
+				<rom loadflag="load16_word_swap" name="5008-p2.bin" offset="0x200000" size="0x400000" crc="a649ec38" sha1="5c63ed5e5c848940f587c966da4908d04cf1293c" />
+				<rom loadflag="load16_word_swap" name="5008-p3.bin" offset="0x600000" size="0x200000" crc="e629e13c" sha1="6ebe080ce01c51064cb2f4d89315ba98a45ae727" />
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="5008-s1.bin" crc="92410064" sha1="1fb800b46341858207d3b6961a760289fbec7faa" />
