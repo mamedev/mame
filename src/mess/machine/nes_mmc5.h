@@ -63,7 +63,7 @@ protected:
 	// MMC-5 contains 1K of internal ram
 	UINT8 *m_exram;
 
-//  int m_nes_vram_sprite[8];
+	//  int m_nes_vram_sprite[8];
 };
 
 

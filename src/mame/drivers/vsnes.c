@@ -142,9 +142,7 @@ Changes:
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "rendlay.h"
-#include "video/ppu2c0x.h"
 #include "sound/dac.h"
-#include "sound/nes_apu.h"
 #include "includes/vsnes.h"
 
 /******************************************************************************/
@@ -153,15 +151,13 @@ Changes:
 WRITE8_MEMBER(vsnes_state::sprite_dma_0_w)
 {
 	int source = ( data & 7 );
-	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu1");
-	ppu->spriteram_dma( space, source );
+	m_ppu1->spriteram_dma( space, source );
 }
 
 WRITE8_MEMBER(vsnes_state::sprite_dma_1_w)
 {
 	int source = ( data & 7 );
-	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu2");
-	ppu->spriteram_dma( space, source );
+	m_ppu2->spriteram_dma( space, source );
 }
 
 WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_w)
@@ -196,44 +192,38 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 
 READ8_MEMBER(vsnes_state::psg1_4015_r)
 {
-	device_t *device = machine().device("nes1");
-	return nes_psg_r(device, space, 0x15);
+	return m_nesapu1->read(space, 0x15);
 }
 
 WRITE8_MEMBER(vsnes_state::psg1_4015_w)
 {
-	device_t *device = machine().device("nes1");
-	nes_psg_w(device, space, 0x15, data);
+	m_nesapu1->write(space, 0x15, data);
 }
 
 WRITE8_MEMBER(vsnes_state::psg1_4017_w)
 {
-	device_t *device = machine().device("nes1");
-	nes_psg_w(device, space, 0x17, data);
+	m_nesapu1->write(space, 0x17, data);
 }
 
 READ8_MEMBER(vsnes_state::psg2_4015_r)
 {
-	device_t *device = machine().device("nes2");
-	return nes_psg_r(device, space, 0x15);
+	return m_nesapu2->read(space, 0x15);
 }
 
 WRITE8_MEMBER(vsnes_state::psg2_4015_w)
 {
-	device_t *device = machine().device("nes2");
-	nes_psg_w(device, space, 0x15, data);
+	m_nesapu2->write(space, 0x15, data);
 }
 
 WRITE8_MEMBER(vsnes_state::psg2_4017_w)
 {
-	device_t *device = machine().device("nes2");
-	nes_psg_w(device, space, 0x17, data);
+	m_nesapu2->write(space, 0x17, data);
 }
 static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes1", nes_psg_r, nes_psg_w)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu1", nesapu_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_r, vsnes_in0_w)
@@ -247,7 +237,7 @@ static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram_1")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu2", ppu2c0x_device, read, write)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes2", nes_psg_r, nes_psg_w)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu2", nesapu_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_1_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg2_4015_r, psg2_4015_w) /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_1_r, vsnes_in0_1_w)
@@ -264,7 +254,7 @@ static ADDRESS_MAP_START( vsnes_cpu1_bootleg_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes1", nes_psg_r, nes_psg_w)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nesapu1", nesapu_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_r, vsnes_in0_w)
@@ -1706,12 +1696,12 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "RP2C04-0004" )
 INPUT_PORTS_END
 
-static const nes_interface nes_interface_1 =
+static const nesapu_interface nes_interface_1 =
 {
 	"maincpu"
 };
 
-static const nes_interface nes_interface_2 =
+static const nesapu_interface nes_interface_2 =
 {
 	"sub"
 };
@@ -1744,7 +1734,7 @@ static MACHINE_CONFIG_START( vsnes, vsnes_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("nes1", NES, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_ADD("nesapu1", NES_APU, N2A03_DEFAULTCLOCK)
 	MCFG_SOUND_CONFIG(nes_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1825,11 +1815,11 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("nes1", NES, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_ADD("nesapu1", NES_APU, N2A03_DEFAULTCLOCK)
 	MCFG_SOUND_CONFIG(nes_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("nes2", NES, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_ADD("nesapu2", NES_APU, N2A03_DEFAULTCLOCK)
 	MCFG_SOUND_CONFIG(nes_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -1881,7 +1871,7 @@ static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("nes1", NES, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_ADD("nesapu1", NES_APU, N2A03_DEFAULTCLOCK)
 	MCFG_SOUND_CONFIG(nes_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

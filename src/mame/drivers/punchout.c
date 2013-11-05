@@ -370,7 +370,7 @@ static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(0x4000, 0x4017) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r,nes_psg_w)
+	AM_RANGE(0x4000, 0x4017) AM_DEVREADWRITE("nesapu", nesapu_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -912,7 +912,7 @@ GFXDECODE_END
 
 
 
-static const nes_interface nes_config =
+static const nesapu_interface nes_config =
 {
 	"audiocpu"
 };
@@ -968,7 +968,7 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("nes", NES, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_ADD("nesapu", NES_APU, N2A03_DEFAULTCLOCK)
 	MCFG_SOUND_CONFIG(nes_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

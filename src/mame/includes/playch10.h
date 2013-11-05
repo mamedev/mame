@@ -1,4 +1,6 @@
 #include "machine/rp5h01.h"
+#include "sound/nes_apu.h"
+#include "video/ppu2c0x.h"
 
 struct chr_bank
 {
@@ -12,6 +14,8 @@ public:
 	playch10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_nesapu(*this, "nesapu"),
+		m_ppu(*this, "ppu"),
 		m_rp5h01(*this, "rp5h01"),
 		m_ram_8w(*this, "ram_8w"),
 		m_videoram(*this, "videoram"),
@@ -20,6 +24,8 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<nesapu_device> m_nesapu;
+	required_device<ppu2c0x_device> m_ppu;
 	optional_device<rp5h01_device> m_rp5h01;
 
 	required_shared_ptr<UINT8> m_ram_8w;

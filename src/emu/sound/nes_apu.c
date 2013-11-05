@@ -47,36 +47,8 @@
 #include "emu.h"
 #include "nes_apu.h"
 #include "cpu/m6502/n2a03.h"
-#include "devlegcy.h"
-
-#include "nes_defs.h"
-
-/* GLOBAL CONSTANTS */
-#define  SYNCS_MAX1     0x20
-#define  SYNCS_MAX2     0x80
-
-/* GLOBAL VARIABLES */
-struct nesapu_state
-{
-	apu_t   APU;                   /* Actual APUs */
-	float   apu_incsize;           /* Adjustment increment */
-	uint32  samps_per_sync;        /* Number of samples per vsync */
-	uint32  buffer_size;           /* Actual buffer size in bytes */
-	uint32  real_rate;             /* Actual playback rate */
-	uint8   noise_lut[NOISE_LONG]; /* Noise sample lookup table */
-	uint32  vbl_times[0x20];       /* VBL durations in samples */
-	uint32  sync_times1[SYNCS_MAX1]; /* Samples per sync table */
-	uint32  sync_times2[SYNCS_MAX2]; /* Samples per sync table */
-	sound_stream *stream;
-};
 
 
-INLINE nesapu_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == NES);
-	return (nesapu_state *)downcast<nesapu_device *>(device)->token();
-}
 
 /* INTERNAL FUNCTIONS */
 
@@ -90,22 +62,22 @@ static void create_vbltimes(uint32 * table,const uint8 *vbl,unsigned int rate)
 }
 
 /* INITIALIZE SAMPLE TIMES IN TERMS OF VSYNCS */
-static void create_syncs(nesapu_state *info, unsigned long sps)
+void nesapu_device::create_syncs(unsigned long sps)
 {
 	int i;
 	unsigned long val = sps;
 
 	for (i = 0; i < SYNCS_MAX1; i++)
 	{
-		info->sync_times1[i] = val;
+		m_sync_times1[i] = val;
 		val += sps;
 	}
 
 	val = 0;
 	for (i = 0; i < SYNCS_MAX2; i++)
 	{
-		info->sync_times2[i] = val;
-		info->sync_times2[i] >>= 2;
+		m_sync_times2[i] = val;
+		m_sync_times2[i] >>= 2;
 		val += sps;
 	}
 }
@@ -127,10 +99,147 @@ static void create_noise(uint8 *buf, const int bits, int size)
 	}
 }
 
+const device_type NES_APU = &device_creator<nesapu_device>;
+
+nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NES_APU, "N2A03 APU", tag, owner, clock, "nesapu", __FILE__),
+		device_sound_interface(mconfig, *this),
+		m_apu_incsize(0.0d),
+		m_samps_per_sync(0),
+		m_buffer_size(0),
+		m_real_rate(0),
+		m_stream(NULL)
+{
+	for (int i = 0; i < NOISE_LONG; i++)
+	{
+		m_noise_lut[i] = 0;
+	}
+	
+	for (int i = 0; i < 0X20; i++)
+	{
+		m_vbl_times[i] = 0;
+	}
+	
+	for (int i = 0; i < SYNCS_MAX1; i++)
+	{
+		m_sync_times1[i] = 0;
+	}
+	
+	for (int i = 0; i < SYNCS_MAX2; i++)
+	{
+		m_sync_times2[i] = 0;
+	}
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void nesapu_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const nesapu_interface *intf = reinterpret_cast<const nesapu_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<nesapu_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		m_cpu_tag = "";
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void nesapu_device::device_start()
+{
+	int rate = clock() / 4;
+	int i;
+
+	/* Initialize global variables */
+	m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds);
+	m_buffer_size = m_samps_per_sync;
+	m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(machine().primary_screen->frame_period().attoseconds);
+	m_apu_incsize = (float) (clock() / (float) m_real_rate);
+
+	/* Use initializer calls */
+	create_noise(m_noise_lut, 13, NOISE_LONG);
+	create_vbltimes(m_vbl_times,vbl_length,m_samps_per_sync);
+	create_syncs(m_samps_per_sync);
+
+	/* Adjust buffer size if 16 bits */
+	m_buffer_size+=m_samps_per_sync;
+
+	/* Initialize individual chips */
+	(m_APU.dpcm).memory = &machine().device(m_cpu_tag)->memory().space(AS_PROGRAM);
+
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, rate, this);
+
+	/* register for save */
+	for (i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_APU.squ[i].regs), i);
+		save_item(NAME(m_APU.squ[i].vbl_length), i);
+		save_item(NAME(m_APU.squ[i].freq), i);
+		save_item(NAME(m_APU.squ[i].phaseacc), i);
+		save_item(NAME(m_APU.squ[i].output_vol), i);
+		save_item(NAME(m_APU.squ[i].env_phase), i);
+		save_item(NAME(m_APU.squ[i].sweep_phase), i);
+		save_item(NAME(m_APU.squ[i].adder), i);
+		save_item(NAME(m_APU.squ[i].env_vol), i);
+		save_item(NAME(m_APU.squ[i].enabled), i);
+	}
+
+	save_item(NAME(m_APU.tri.regs));
+	save_item(NAME(m_APU.tri.linear_length));
+	save_item(NAME(m_APU.tri.vbl_length));
+	save_item(NAME(m_APU.tri.write_latency));
+	save_item(NAME(m_APU.tri.phaseacc));
+	save_item(NAME(m_APU.tri.output_vol));
+	save_item(NAME(m_APU.tri.adder));
+	save_item(NAME(m_APU.tri.counter_started));
+	save_item(NAME(m_APU.tri.enabled));
+
+	save_item(NAME(m_APU.noi.regs));
+	save_item(NAME(m_APU.noi.cur_pos));
+	save_item(NAME(m_APU.noi.vbl_length));
+	save_item(NAME(m_APU.noi.phaseacc));
+	save_item(NAME(m_APU.noi.output_vol));
+	save_item(NAME(m_APU.noi.env_phase));
+	save_item(NAME(m_APU.noi.env_vol));
+	save_item(NAME(m_APU.noi.enabled));
+
+	save_item(NAME(m_APU.dpcm.regs));
+	save_item(NAME(m_APU.dpcm.address));
+	save_item(NAME(m_APU.dpcm.length));
+	save_item(NAME(m_APU.dpcm.bits_left));
+	save_item(NAME(m_APU.dpcm.phaseacc));
+	save_item(NAME(m_APU.dpcm.output_vol));
+	save_item(NAME(m_APU.dpcm.cur_byte));
+	save_item(NAME(m_APU.dpcm.enabled));
+	save_item(NAME(m_APU.dpcm.irq_occurred));
+	save_item(NAME(m_APU.dpcm.vol));
+
+	save_item(NAME(m_APU.regs));
+
+	#ifdef USE_QUEUE
+	save_item(NAME(m_APU.queue));
+	save_item(NAME(m_APU.head));
+	save_item(NAME(m_APU.tail));
+	#else
+	save_item(NAME(m_APU.buf_pos));
+	save_item(NAME(m_APU.step_mode));
+	#endif	
+}
+
 /* TODO: sound channels should *ALL* have DC volume decay */
 
 /* OUTPUT SQUARE WAVE SAMPLE (VALUES FROM -16 to +15) */
-static int8 apu_square(nesapu_state *info, square_t *chan)
+int8 nesapu_device::apu_square(square_t *chan)
 {
 	int env_delay;
 	int sweep_delay;
@@ -146,7 +255,7 @@ static int8 apu_square(nesapu_state *info, square_t *chan)
 		return 0;
 
 	/* enveloping */
-	env_delay = info->sync_times1[chan->regs[0] & 0x0F];
+	env_delay = m_sync_times1[chan->regs[0] & 0x0F];
 
 	/* decay is at a rate of (env_regs + 1) / 240 secs */
 	chan->env_phase -= 4;
@@ -169,7 +278,7 @@ static int8 apu_square(nesapu_state *info, square_t *chan)
 	/* freqsweeps */
 	if ((chan->regs[1] & 0x80) && (chan->regs[1] & 7))
 	{
-		sweep_delay = info->sync_times1[(chan->regs[1] >> 4) & 7];
+		sweep_delay = m_sync_times1[(chan->regs[1] >> 4) & 7];
 		chan->sweep_phase -= 2;
 		while (chan->sweep_phase < 0)
 		{
@@ -185,7 +294,7 @@ static int8 apu_square(nesapu_state *info, square_t *chan)
 			|| (chan->freq >> 16) < 4)
 		return 0;
 
-	chan->phaseacc -= (float) info->apu_incsize; /* # of cycles per sample */
+	chan->phaseacc -= (float) m_apu_incsize; /* # of cycles per sample */
 
 	while (chan->phaseacc < 0)
 	{
@@ -205,7 +314,7 @@ static int8 apu_square(nesapu_state *info, square_t *chan)
 }
 
 /* OUTPUT TRIANGLE WAVE SAMPLE (VALUES FROM -16 to +15) */
-static int8 apu_triangle(nesapu_state *info, triangle_t *chan)
+int8 nesapu_device::apu_triangle(triangle_t *chan)
 {
 	int freq;
 	int8 output;
@@ -244,7 +353,7 @@ static int8 apu_triangle(nesapu_state *info, triangle_t *chan)
 	if (freq < 4) /* inaudible */
 		return 0;
 
-	chan->phaseacc -= (float) info->apu_incsize; /* # of cycles per sample */
+	chan->phaseacc -= (float) m_apu_incsize; /* # of cycles per sample */
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
@@ -263,7 +372,7 @@ static int8 apu_triangle(nesapu_state *info, triangle_t *chan)
 }
 
 /* OUTPUT NOISE WAVE SAMPLE (VALUES FROM -16 to +15) */
-static int8 apu_noise(nesapu_state *info, noise_t *chan)
+int8 nesapu_device::apu_noise(noise_t *chan)
 {
 	int freq, env_delay;
 	uint8 outvol;
@@ -278,7 +387,7 @@ static int8 apu_noise(nesapu_state *info, noise_t *chan)
 		return 0;
 
 	/* enveloping */
-	env_delay = info->sync_times1[chan->regs[0] & 0x0F];
+	env_delay = m_sync_times1[chan->regs[0] & 0x0F];
 
 	/* decay is at a rate of (env_regs + 1) / 240 secs */
 	chan->env_phase -= 4;
@@ -302,7 +411,7 @@ static int8 apu_noise(nesapu_state *info, noise_t *chan)
 		return 0;
 
 	freq = noise_freq[chan->regs[2] & 0x0F];
-	chan->phaseacc -= (float) info->apu_incsize; /* # of cycles per sample */
+	chan->phaseacc -= (float) m_apu_incsize; /* # of cycles per sample */
 	while (chan->phaseacc < 0)
 	{
 		chan->phaseacc += freq;
@@ -319,11 +428,11 @@ static int8 apu_noise(nesapu_state *info, noise_t *chan)
 	else
 		outvol = 0x0F - chan->env_vol;
 
-	output = info->noise_lut[chan->cur_pos];
+	output = m_noise_lut[chan->cur_pos];
 	if (output > outvol)
 		output = outvol;
 
-	if (info->noise_lut[chan->cur_pos] & 0x80) /* make it negative */
+	if (m_noise_lut[chan->cur_pos] & 0x80) /* make it negative */
 		output = -output;
 
 	return (int8) output;
@@ -342,7 +451,7 @@ INLINE void apu_dpcmreset(dpcm_t *chan)
 
 /* OUTPUT DPCM WAVE SAMPLE (VALUES FROM -64 to +63) */
 /* TODO: centerline naughtiness */
-static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
+int8 nesapu_device::apu_dpcm(dpcm_t *chan)
 {
 	int freq, bit_pos;
 
@@ -355,7 +464,7 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 	if (chan->enabled)
 	{
 		freq = dpcm_clocks[chan->regs[0] & 0x0F];
-		chan->phaseacc -= (float) info->apu_incsize; /* # of cycles per sample */
+		chan->phaseacc -= (float) m_apu_incsize; /* # of cycles per sample */
 
 		while (chan->phaseacc < 0)
 		{
@@ -372,7 +481,7 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 					if (chan->regs[0] & 0x80) /* IRQ Generator */
 					{
 						chan->irq_occurred = TRUE;
-						downcast<n2a03_device &>(info->APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, ASSERT_LINE);
+						downcast<n2a03_device &>(m_APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, ASSERT_LINE);
 					}
 					break;
 				}
@@ -383,7 +492,7 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 			bit_pos = 7 - (chan->bits_left & 7);
 			if (7 == bit_pos)
 			{
-				chan->cur_byte = info->APU.dpcm.memory->read_byte(chan->address);
+				chan->cur_byte = m_APU.dpcm.memory->read_byte(chan->address);
 				chan->address++;
 				chan->length--;
 			}
@@ -406,7 +515,7 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 }
 
 /* WRITE REGISTER VALUE */
-INLINE void apu_regwrite(nesapu_state *info,int address, uint8 value)
+inline void nesapu_device::apu_regwrite(int address, uint8 value)
 {
 	int chan = (address & 4) ? 1 : 0;
 
@@ -415,57 +524,57 @@ INLINE void apu_regwrite(nesapu_state *info,int address, uint8 value)
 	/* squares */
 	case APU_WRA0:
 	case APU_WRB0:
-		info->APU.squ[chan].regs[0] = value;
+		m_APU.squ[chan].regs[0] = value;
 		break;
 
 	case APU_WRA1:
 	case APU_WRB1:
-		info->APU.squ[chan].regs[1] = value;
+		m_APU.squ[chan].regs[1] = value;
 		break;
 
 	case APU_WRA2:
 	case APU_WRB2:
-		info->APU.squ[chan].regs[2] = value;
-		if (info->APU.squ[chan].enabled)
-			info->APU.squ[chan].freq = ((((info->APU.squ[chan].regs[3] & 7) << 8) + value) + 1) << 16;
+		m_APU.squ[chan].regs[2] = value;
+		if (m_APU.squ[chan].enabled)
+			m_APU.squ[chan].freq = ((((m_APU.squ[chan].regs[3] & 7) << 8) + value) + 1) << 16;
 		break;
 
 	case APU_WRA3:
 	case APU_WRB3:
-		info->APU.squ[chan].regs[3] = value;
+		m_APU.squ[chan].regs[3] = value;
 
-		if (info->APU.squ[chan].enabled)
+		if (m_APU.squ[chan].enabled)
 		{
-			info->APU.squ[chan].vbl_length = info->vbl_times[value >> 3];
-			info->APU.squ[chan].env_vol = 0;
-			info->APU.squ[chan].freq = ((((value & 7) << 8) + info->APU.squ[chan].regs[2]) + 1) << 16;
+			m_APU.squ[chan].vbl_length = m_vbl_times[value >> 3];
+			m_APU.squ[chan].env_vol = 0;
+			m_APU.squ[chan].freq = ((((value & 7) << 8) + m_APU.squ[chan].regs[2]) + 1) << 16;
 		}
 
 		break;
 
 	/* triangle */
 	case APU_WRC0:
-		info->APU.tri.regs[0] = value;
+		m_APU.tri.regs[0] = value;
 
-		if (info->APU.tri.enabled)
+		if (m_APU.tri.enabled)
 		{                                          /* ??? */
-			if (FALSE == info->APU.tri.counter_started)
-				info->APU.tri.linear_length = info->sync_times2[value & 0x7F];
+			if (FALSE == m_APU.tri.counter_started)
+				m_APU.tri.linear_length = m_sync_times2[value & 0x7F];
 		}
 
 		break;
 
 	case 0x4009:
 		/* unused */
-		info->APU.tri.regs[1] = value;
+		m_APU.tri.regs[1] = value;
 		break;
 
 	case APU_WRC2:
-		info->APU.tri.regs[2] = value;
+		m_APU.tri.regs[2] = value;
 		break;
 
 	case APU_WRC3:
-		info->APU.tri.regs[3] = value;
+		m_APU.tri.regs[3] = value;
 
 		/* this is somewhat of a hack.  there is some latency on the Real
 		** Thing between when trireg0 is written to and when the linear
@@ -483,121 +592,121 @@ INLINE void apu_regwrite(nesapu_state *info,int address, uint8 value)
 		*/
 
 	/* used to be 3, but now we run the clock faster, so base it on samples/sync */
-		info->APU.tri.write_latency = (info->samps_per_sync + 239) / 240;
+		m_APU.tri.write_latency = (m_samps_per_sync + 239) / 240;
 
-		if (info->APU.tri.enabled)
+		if (m_APU.tri.enabled)
 		{
-			info->APU.tri.counter_started = FALSE;
-			info->APU.tri.vbl_length = info->vbl_times[value >> 3];
-			info->APU.tri.linear_length = info->sync_times2[info->APU.tri.regs[0] & 0x7F];
+			m_APU.tri.counter_started = FALSE;
+			m_APU.tri.vbl_length = m_vbl_times[value >> 3];
+			m_APU.tri.linear_length = m_sync_times2[m_APU.tri.regs[0] & 0x7F];
 		}
 
 		break;
 
 	/* noise */
 	case APU_WRD0:
-		info->APU.noi.regs[0] = value;
+		m_APU.noi.regs[0] = value;
 		break;
 
 	case 0x400D:
 		/* unused */
-		info->APU.noi.regs[1] = value;
+		m_APU.noi.regs[1] = value;
 		break;
 
 	case APU_WRD2:
-		info->APU.noi.regs[2] = value;
+		m_APU.noi.regs[2] = value;
 		break;
 
 	case APU_WRD3:
-		info->APU.noi.regs[3] = value;
+		m_APU.noi.regs[3] = value;
 
-		if (info->APU.noi.enabled)
+		if (m_APU.noi.enabled)
 		{
-			info->APU.noi.vbl_length = info->vbl_times[value >> 3];
-			info->APU.noi.env_vol = 0; /* reset envelope */
+			m_APU.noi.vbl_length = m_vbl_times[value >> 3];
+			m_APU.noi.env_vol = 0; /* reset envelope */
 		}
 		break;
 
 	/* DMC */
 	case APU_WRE0:
-		info->APU.dpcm.regs[0] = value;
+		m_APU.dpcm.regs[0] = value;
 		if (0 == (value & 0x80)) {
-			downcast<n2a03_device &>(info->APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, CLEAR_LINE);
-			info->APU.dpcm.irq_occurred = FALSE;
+			downcast<n2a03_device &>(m_APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, CLEAR_LINE);
+			m_APU.dpcm.irq_occurred = FALSE;
 		}
 		break;
 
 	case APU_WRE1: /* 7-bit DAC */
-		//info->APU.dpcm.regs[1] = value - 0x40;
-		info->APU.dpcm.regs[1] = value & 0x7F;
-		info->APU.dpcm.vol = (info->APU.dpcm.regs[1]-64);
+		//m_APU.dpcm.regs[1] = value - 0x40;
+		m_APU.dpcm.regs[1] = value & 0x7F;
+		m_APU.dpcm.vol = (m_APU.dpcm.regs[1]-64);
 		break;
 
 	case APU_WRE2:
-		info->APU.dpcm.regs[2] = value;
-		//apu_dpcmreset(info->APU.dpcm);
+		m_APU.dpcm.regs[2] = value;
+		//apu_dpcmreset(m_APU.dpcm);
 		break;
 
 	case APU_WRE3:
-		info->APU.dpcm.regs[3] = value;
+		m_APU.dpcm.regs[3] = value;
 		break;
 
 	case APU_IRQCTRL:
 		if(value & 0x80)
-			info->APU.step_mode = 5;
+			m_APU.step_mode = 5;
 		else
-			info->APU.step_mode = 4;
+			m_APU.step_mode = 4;
 		break;
 
 	case APU_SMASK:
 		if (value & 0x01)
-			info->APU.squ[0].enabled = TRUE;
+			m_APU.squ[0].enabled = TRUE;
 		else
 		{
-			info->APU.squ[0].enabled = FALSE;
-			info->APU.squ[0].vbl_length = 0;
+			m_APU.squ[0].enabled = FALSE;
+			m_APU.squ[0].vbl_length = 0;
 		}
 
 		if (value & 0x02)
-			info->APU.squ[1].enabled = TRUE;
+			m_APU.squ[1].enabled = TRUE;
 		else
 		{
-			info->APU.squ[1].enabled = FALSE;
-			info->APU.squ[1].vbl_length = 0;
+			m_APU.squ[1].enabled = FALSE;
+			m_APU.squ[1].vbl_length = 0;
 		}
 
 		if (value & 0x04)
-			info->APU.tri.enabled = TRUE;
+			m_APU.tri.enabled = TRUE;
 		else
 		{
-			info->APU.tri.enabled = FALSE;
-			info->APU.tri.vbl_length = 0;
-			info->APU.tri.linear_length = 0;
-			info->APU.tri.counter_started = FALSE;
-			info->APU.tri.write_latency = 0;
+			m_APU.tri.enabled = FALSE;
+			m_APU.tri.vbl_length = 0;
+			m_APU.tri.linear_length = 0;
+			m_APU.tri.counter_started = FALSE;
+			m_APU.tri.write_latency = 0;
 		}
 
 		if (value & 0x08)
-			info->APU.noi.enabled = TRUE;
+			m_APU.noi.enabled = TRUE;
 		else
 		{
-			info->APU.noi.enabled = FALSE;
-			info->APU.noi.vbl_length = 0;
+			m_APU.noi.enabled = FALSE;
+			m_APU.noi.vbl_length = 0;
 		}
 
 		if (value & 0x10)
 		{
 			/* only reset dpcm values if DMA is finished */
-			if (FALSE == info->APU.dpcm.enabled)
+			if (FALSE == m_APU.dpcm.enabled)
 			{
-				info->APU.dpcm.enabled = TRUE;
-				apu_dpcmreset(&info->APU.dpcm);
+				m_APU.dpcm.enabled = TRUE;
+				apu_dpcmreset(&m_APU.dpcm);
 			}
 		}
 		else
-			info->APU.dpcm.enabled = FALSE;
+			m_APU.dpcm.enabled = FALSE;
 
-		info->APU.dpcm.irq_occurred = FALSE;
+		m_APU.dpcm.irq_occurred = FALSE;
 
 		break;
 	default:
@@ -608,192 +717,52 @@ logerror("invalid apu write: $%02X at $%04X\n", value, address);
 	}
 }
 
-/* UPDATE SOUND BUFFER USING CURRENT DATA */
-INLINE void apu_update(nesapu_state *info, stream_sample_t *buffer16, int samples)
-{
-	int accum;
 
-	while (samples--)
-	{
-		accum = apu_square(info, &info->APU.squ[0]);
-		accum += apu_square(info, &info->APU.squ[1]);
-		accum += apu_triangle(info, &info->APU.tri);
-		accum += apu_noise(info, &info->APU.noi);
-		accum += apu_dpcm(info, &info->APU.dpcm);
-
-		/* 8-bit clamps */
-		if (accum > 127)
-			accum = 127;
-		else if (accum < -128)
-			accum = -128;
-
-		*(buffer16++)=accum<<8;
-	}
-}
 
 /* READ VALUES FROM REGISTERS */
-INLINE uint8 apu_read(nesapu_state *info,int address)
+inline uint8 nesapu_device::apu_read(int address)
 {
 	if (address == 0x15) /*FIXED* Address $4015 has different behaviour*/
 	{
 		int readval = 0;
-		if (info->APU.squ[0].vbl_length > 0)
+		if (m_APU.squ[0].vbl_length > 0)
 			readval |= 0x01;
 
-		if (info->APU.squ[1].vbl_length > 0)
+		if (m_APU.squ[1].vbl_length > 0)
 			readval |= 0x02;
 
-		if (info->APU.tri.vbl_length > 0)
+		if (m_APU.tri.vbl_length > 0)
 			readval |= 0x04;
 
-		if (info->APU.noi.vbl_length > 0)
+		if (m_APU.noi.vbl_length > 0)
 			readval |= 0x08;
 
-		if (info->APU.dpcm.enabled == TRUE)
+		if (m_APU.dpcm.enabled == TRUE)
 			readval |= 0x10;
 
-		if (info->APU.dpcm.irq_occurred == TRUE)
+		if (m_APU.dpcm.irq_occurred == TRUE)
 			readval |= 0x80;
 
 		return readval;
 	}
 	else
-		return info->APU.regs[address];
+		return m_APU.regs[address];
 }
 
 /* WRITE VALUE TO TEMP REGISTRY AND QUEUE EVENT */
-INLINE void apu_write(nesapu_state *info,int address, uint8 value)
+inline void nesapu_device::apu_write(int address, uint8 value)
 {
-	info->APU.regs[address]=value;
-	info->stream->update();
-	apu_regwrite(info,address,value);
+	m_APU.regs[address]=value;
+	m_stream->update();
+	apu_regwrite(address,value);
 }
 
 /* EXTERNAL INTERFACE FUNCTIONS */
 
 /* REGISTER READ/WRITE FUNCTIONS */
-READ8_DEVICE_HANDLER( nes_psg_r ) {return apu_read(get_safe_token(device),offset);}
-WRITE8_DEVICE_HANDLER( nes_psg_w ) {apu_write(get_safe_token(device),offset,data);}
+READ8_MEMBER( nesapu_device::read ) {return apu_read(offset);}
+WRITE8_MEMBER( nesapu_device::write ) {apu_write(offset,data);}
 
-/* UPDATE APU SYSTEM */
-static STREAM_UPDATE( nes_psg_update_sound )
-{
-	nesapu_state *info = (nesapu_state *)param;
-	apu_update(info, outputs[0], samples);
-}
-
-
-/* INITIALIZE APU SYSTEM */
-static DEVICE_START( nesapu )
-{
-	const nes_interface *intf = (const nes_interface *)device->static_config();
-	nesapu_state *info = get_safe_token(device);
-	int rate = device->clock() / 4;
-	int i;
-
-	/* Initialize global variables */
-	info->samps_per_sync = rate / ATTOSECONDS_TO_HZ(device->machine().primary_screen->frame_period().attoseconds);
-	info->buffer_size = info->samps_per_sync;
-	info->real_rate = info->samps_per_sync * ATTOSECONDS_TO_HZ(device->machine().primary_screen->frame_period().attoseconds);
-	info->apu_incsize = (float) (device->clock() / (float) info->real_rate);
-
-	/* Use initializer calls */
-	create_noise(info->noise_lut, 13, NOISE_LONG);
-	create_vbltimes(info->vbl_times,vbl_length,info->samps_per_sync);
-	create_syncs(info, info->samps_per_sync);
-
-	/* Adjust buffer size if 16 bits */
-	info->buffer_size+=info->samps_per_sync;
-
-	/* Initialize individual chips */
-	(info->APU.dpcm).memory = &device->machine().device(intf->cpu_tag)->memory().space(AS_PROGRAM);
-
-	info->stream = device->machine().sound().stream_alloc(*device, 0, 1, rate, info, nes_psg_update_sound);
-
-	/* register for save */
-	for (i = 0; i < 2; i++)
-	{
-		device->save_item(NAME(info->APU.squ[i].regs), i);
-		device->save_item(NAME(info->APU.squ[i].vbl_length), i);
-		device->save_item(NAME(info->APU.squ[i].freq), i);
-		device->save_item(NAME(info->APU.squ[i].phaseacc), i);
-		device->save_item(NAME(info->APU.squ[i].output_vol), i);
-		device->save_item(NAME(info->APU.squ[i].env_phase), i);
-		device->save_item(NAME(info->APU.squ[i].sweep_phase), i);
-		device->save_item(NAME(info->APU.squ[i].adder), i);
-		device->save_item(NAME(info->APU.squ[i].env_vol), i);
-		device->save_item(NAME(info->APU.squ[i].enabled), i);
-	}
-
-	device->save_item(NAME(info->APU.tri.regs));
-	device->save_item(NAME(info->APU.tri.linear_length));
-	device->save_item(NAME(info->APU.tri.vbl_length));
-	device->save_item(NAME(info->APU.tri.write_latency));
-	device->save_item(NAME(info->APU.tri.phaseacc));
-	device->save_item(NAME(info->APU.tri.output_vol));
-	device->save_item(NAME(info->APU.tri.adder));
-	device->save_item(NAME(info->APU.tri.counter_started));
-	device->save_item(NAME(info->APU.tri.enabled));
-
-	device->save_item(NAME(info->APU.noi.regs));
-	device->save_item(NAME(info->APU.noi.cur_pos));
-	device->save_item(NAME(info->APU.noi.vbl_length));
-	device->save_item(NAME(info->APU.noi.phaseacc));
-	device->save_item(NAME(info->APU.noi.output_vol));
-	device->save_item(NAME(info->APU.noi.env_phase));
-	device->save_item(NAME(info->APU.noi.env_vol));
-	device->save_item(NAME(info->APU.noi.enabled));
-
-	device->save_item(NAME(info->APU.dpcm.regs));
-	device->save_item(NAME(info->APU.dpcm.address));
-	device->save_item(NAME(info->APU.dpcm.length));
-	device->save_item(NAME(info->APU.dpcm.bits_left));
-	device->save_item(NAME(info->APU.dpcm.phaseacc));
-	device->save_item(NAME(info->APU.dpcm.output_vol));
-	device->save_item(NAME(info->APU.dpcm.cur_byte));
-	device->save_item(NAME(info->APU.dpcm.enabled));
-	device->save_item(NAME(info->APU.dpcm.irq_occurred));
-	device->save_item(NAME(info->APU.dpcm.vol));
-
-	device->save_item(NAME(info->APU.regs));
-
-#ifdef USE_QUEUE
-	device->save_item(NAME(info->APU.queue));
-	device->save_item(NAME(info->APU.head));
-	device->save_item(NAME(info->APU.tail));
-#else
-	device->save_item(NAME(info->APU.buf_pos));
-	device->save_item(NAME(info->APU.step_mode));
-#endif
-}
-
-const device_type NES = &device_creator<nesapu_device>;
-
-nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NES, "N2A03 APU", tag, owner, clock, "nesapu", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(nesapu_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void nesapu_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void nesapu_device::device_start()
-{
-	DEVICE_START_NAME( nesapu )(this);
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -801,6 +770,23 @@ void nesapu_device::device_start()
 
 void nesapu_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	int accum;
+	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );
+
+	while (samples--)
+	{
+		accum = apu_square(&m_APU.squ[0]);
+		accum += apu_square(&m_APU.squ[1]);
+		accum += apu_triangle(&m_APU.tri);
+		accum += apu_noise(&m_APU.noi);
+		accum += apu_dpcm(&m_APU.dpcm);
+
+		/* 8-bit clamps */
+		if (accum > 127)
+			accum = 127;
+		else if (accum < -128)
+			accum = -128;
+
+		*(outputs[0]++)=accum<<8;
+	}
 }

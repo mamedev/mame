@@ -12,6 +12,7 @@
 
 #include "video/ppu2c0x.h"
 #include "machine/nes_slot.h"
+#include "sound/nes_apu.h"
 #include "imagedev/cassette.h"
 
 // official PCBs
@@ -490,7 +491,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
-	required_device<device_t> m_sound;
+	required_device<nesapu_device> m_sound;
 	optional_device<nes_cart_slot_device> m_cartslot;
 	optional_device<cassette_image_device> m_cassette;
 

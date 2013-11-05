@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "includes/nes.h"
 #include "cpu/m6502/n2a03.h"
-#include "sound/nes_apu.h"
 #include "imagedev/flopdrv.h"
 #include "formats/nes_dsk.h"
 
@@ -22,20 +21,17 @@
 
 READ8_MEMBER(nes_state::psg_4015_r)
 {
-	device_t *device = machine().device("nessound");
-	return nes_psg_r(device, space, 0x15);
+	return m_sound->read(space, 0x15);
 }
 
 WRITE8_MEMBER(nes_state::psg_4015_w)
 {
-	device_t *device = machine().device("nessound");
-	nes_psg_w(device, space, 0x15, data);
+	m_sound->write(space, 0x15, data);
 }
 
 WRITE8_MEMBER(nes_state::psg_4017_w)
 {
-	device_t *device = machine().device("nessound");
-	nes_psg_w(device, space, 0x17, data);
+	m_sound->write(space, 0x17, data);
 }
 
 WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
@@ -46,7 +42,7 @@ WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
 static ADDRESS_MAP_START( nes_map, AS_PROGRAM, 8, nes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)                   /* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nessound", nes_psg_r, nes_psg_w)       /* PSG primary registers */
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nessound", nesapu_device, read, write)       /* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(nes_vh_sprite_dma_w)              /* stupid address space hole */
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)       /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)         /* IN0 - input port 1 */
@@ -647,7 +643,7 @@ static INPUT_PORTS_START( famicom )
 INPUT_PORTS_END
 
 
-static const nes_interface nes_apu_interface =
+static const nesapu_interface nes_apu_interface =
 {
 	"maincpu"
 };
@@ -721,7 +717,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("nessound", NES, NTSC_CLOCK)
+	MCFG_SOUND_ADD("nessound", NES_APU, NTSC_CLOCK)
 	MCFG_SOUND_CONFIG(nes_apu_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
@@ -748,7 +744,7 @@ static MACHINE_CONFIG_DERIVED( nespal, nes )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("nessound", NES, PAL_CLOCK)
+	MCFG_SOUND_REPLACE("nessound", NES_APU, PAL_CLOCK)
 	MCFG_SOUND_CONFIG(nes_apu_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
@@ -769,7 +765,7 @@ static MACHINE_CONFIG_DERIVED( dendy, nes )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_CLOCK/1000000)) * (PPU_VBLANK_LAST_SCANLINE_PAL-PPU_VBLANK_FIRST_SCANLINE+1+2)))
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("nessound", NES, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
+	MCFG_SOUND_REPLACE("nessound", NES_APU, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
 	MCFG_SOUND_CONFIG(nes_apu_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END

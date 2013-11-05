@@ -26,6 +26,8 @@
 #ifndef __NES_DEFS_H__
 #define __NES_DEFS_H__
 
+#include "nes_defs.h"
+
 /* BOOLEAN CONSTANTS */
 #ifndef TRUE
 #define TRUE   1
@@ -50,8 +52,12 @@ typedef UINT8         boolean;
 
 struct queue_t
 {
+		queue_t():
+		pos(0),
+		reg(""),val("") {}
+	
 	int pos;
-	unsigned char reg,val;
+	unsigned char reg, val;
 };
 
 #endif
@@ -86,6 +92,23 @@ struct queue_t
 /* Square Wave */
 struct square_t
 {
+		square_t()
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				regs[i] = 0;
+			}
+			vbl_length =0;
+			freq = 0;
+			phaseacc = 0.0d;
+			output_vol = 0.0d;
+			env_phase = 0.0d;
+			sweep_phase = 0.0d;
+			adder = 0;
+			env_vol = 0;
+			enabled = false;
+		}
+			
 	uint8 regs[4];
 	int vbl_length;
 	int freq;
@@ -101,6 +124,22 @@ struct square_t
 /* Triangle Wave */
 struct triangle_t
 {
+		triangle_t()
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				regs[i] = 0;
+			}
+			linear_length =0;
+			vbl_length =0;
+			write_latency = 0;
+			phaseacc = 0.0d;
+			output_vol = 0.0d;
+			adder = 0;
+			counter_started = false;
+			enabled = false;
+		}
+	
 	uint8 regs[4]; /* regs[1] unused */
 	int linear_length;
 	int vbl_length;
@@ -115,6 +154,21 @@ struct triangle_t
 /* Noise Wave */
 struct noise_t
 {
+		noise_t()
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				regs[i] = 0;
+			}
+			cur_pos =0;
+			vbl_length =0;
+			phaseacc = 0.0d;
+			output_vol = 0.0d;
+			env_phase = 0.0d;
+			env_vol = 0;
+			enabled = false;
+		}
+
 	uint8 regs[4]; /* regs[1] unused */
 	int cur_pos;
 	int vbl_length;
@@ -128,6 +182,24 @@ struct noise_t
 /* DPCM Wave */
 struct dpcm_t
 {
+		dpcm_t()
+		{
+		for (int i = 0; i < 4; i++)
+		{
+			regs[i] = 0;
+		}
+		address = 0;
+		length = 0;
+		bits_left = 0;
+		phaseacc = 0.0d;
+		output_vol = 0.0d;
+		cur_byte = 0;
+		enabled = false;
+		irq_occurred = false;
+		memory = NULL;
+		vol = '\u0000';
+		}
+		
 	uint8 regs[4];
 	uint32 address;
 	uint32 length;
@@ -144,6 +216,14 @@ struct dpcm_t
 /* APU type */
 struct apu_t
 {
+		apu_t()
+		{
+		memset(regs, 0, sizeof(regs));
+		buffer = NULL;
+		buf_pos = 0;
+		step_mode = 0;
+		}
+		
 	/* Sound channels */
 	square_t   squ[2];
 	triangle_t tri;

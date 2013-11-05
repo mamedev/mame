@@ -403,10 +403,10 @@ endif
 
 #-------------------------------------------------
 # Nintendo custom sound chips
-#@src/emu/sound/nes_apu.h,SOUNDS += NES
+#@src/emu/sound/nes_apu.h,SOUNDS += NES_APU
 #-------------------------------------------------
 
-ifneq ($(filter NES,$(SOUNDS)),)
+ifneq ($(filter NES_APU,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/nes_apu.o
 endif
 

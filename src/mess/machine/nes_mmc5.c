@@ -41,11 +41,9 @@ const device_type NES_EXROM = &device_creator<nes_exrom_device>;
 
 
 nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_EXROM, "NES Cart ExROM (MMC-5) PCB", tag, owner, clock, "nes_exrom", __FILE__)
+					: nes_nrom_device(mconfig, NES_EXROM, "NES Cart ExROM (MMC-5) PCB", tag, owner, clock, "nes_exrom", __FILE__)					
 {
 }
-
-
 
 
 void nes_exrom_device::device_start()
@@ -333,8 +331,8 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 	/* Send $5000-$5015 to the sound chip */
 	if ((offset >= 0xf00) && (offset <= 0xf15))
 	{
-		device_t *m_sound = machine().device("nessound");
-		nes_psg_w(m_sound, space, offset & 0x1f, data);
+		nesapu_device *m_sound = machine().device<nesapu_device>("nessound");
+		m_sound->write(space, offset & 0x1f, data);
 		return;
 	}
 
