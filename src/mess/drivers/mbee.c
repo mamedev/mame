@@ -880,12 +880,6 @@ MACHINE_CONFIG_END
     ROM_LOAD_OPTIONAL("telcom11.rom", 0xe000,  0x1000, CRC(15516499) SHA1(2d4953f994b66c5d3b1d457b8c92d9a0a69eb8b8) )
     Telcom 1.1 for the mbeeic (It could have 1.0, 1.1 or 1.2)
 
-    ROM_LOAD("bn54.bin",              0x0000,  0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af) )
-    ROM_LOAD("bn55.bin",              0x0000,  0x2000, CRC(ca2c1073) SHA1(355d90d181de899cc7af892df96305fead9c81b4) )
-    ROM_LOAD("bn56.bin",              0x0000,  0x2000, CRC(3f76769d) SHA1(cfae2069d739c26fe39f734d9f705a3c965d1e6f) )
-    These are alternate boot roms for the 128k. They have no menu, and look just like the 64k/56k bootup.
-
-
 */
 
 
@@ -1150,7 +1144,18 @@ ROM_START( mbee128 ) // 128K
 	ROM_REGION(0x20000,"maincpu", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x7000,"bootrom", ROMREGION_ERASEFF)
-	ROM_LOAD("bn60.bin",              0x0000,  0x2000, CRC(ed15d4ee) SHA1(3ea42b63d42b9a4c5402676dee8912ad1f906bda) )
+	ROM_SYSTEM_BIOS( 0, "bn60", "Version 2.03" )
+	ROMX_LOAD("bn60.rom",     0x0000, 0x2000, CRC(ed15d4ee) SHA1(3ea42b63d42b9a4c5402676dee8912ad1f906bda), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "bn59", "Version 2.02" )
+	ROMX_LOAD("bn59.rom",     0x0000, 0x2000, CRC(97384116) SHA1(87f2c4ab1a1f2964ba4f2bb60e62dc9c163831ba), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "bn56", "bn56" )
+	ROMX_LOAD("bn56.rom",     0x0000, 0x2000, CRC(3f76769d) SHA1(cfae2069d739c26fe39f734d9f705a3c965d1e6f), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "bn55", "bn55" )
+	ROMX_LOAD("bn55.rom",     0x0000, 0x2000, CRC(ca2c1073) SHA1(355d90d181de899cc7af892df96305fead9c81b4), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "bn54", "bn54" )
+	ROMX_LOAD("bn54.rom",     0x0000, 0x2000, CRC(995c53db) SHA1(46e1a5cfd5795b8cf528bacf9dc79398ff7d64af), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 5, "hd18", "Hard Disk System" )
+	ROMX_LOAD("hd18.rom",     0x0000, 0x2000, CRC(ed53ace7) SHA1(534e2e00cc527197c76b3c106b3c9ff7f1328487), ROM_BIOS(6) )
 
 	ROM_REGION(0x9800, "gfx", 0)
 	ROM_LOAD("charrom.bin",           0x1000,  0x1000, CRC(1f9fcee4) SHA1(e57ac94e03638075dde68a0a8c834a4f84ba47b0) )

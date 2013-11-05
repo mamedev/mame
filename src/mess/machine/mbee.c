@@ -398,8 +398,9 @@ WRITE8_MEMBER( mbee_state::mbee128_50_w )
 			m_bank8h->set_entry(0); // rom
 			break;
 		case 0x04:
-			mem.install_read_bank (0x8000, 0x87ff, "bank8l");
-			mem.install_read_bank (0x8800, 0x8fff, "bank8h");
+			// these 2 lines were read_bank but readwrite is needed for bios 2,3,4,5 to boot
+			mem.install_readwrite_bank (0x8000, 0x87ff, "bank8l");
+			mem.install_readwrite_bank (0x8800, 0x8fff, "bank8h");
 			mem.install_readwrite_handler (0xf000, 0xf7ff, read8_delegate(FUNC(mbee_state::mbeeppc_low_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_low_w),this));
 			mem.install_readwrite_handler (0xf800, 0xffff, read8_delegate(FUNC(mbee_state::mbeeppc_high_r),this), write8_delegate(FUNC(mbee_state::mbeeppc_high_w),this));
 			m_bank8l->set_entry(1); // ram
