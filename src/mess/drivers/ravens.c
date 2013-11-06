@@ -124,7 +124,12 @@ WRITE8_MEMBER( ravens_state::display_w )
 
 WRITE8_MEMBER( ravens_state::leds_w )
 {
-	output_set_digit_value(6, data);
+	char ledname[8];
+	for (int i = 0; i < 8; i++)
+	{
+		sprintf(ledname,"led%d",i);
+		output_set_value(ledname, !BIT(data, i));
+	}
 }
 
 READ8_MEMBER( ravens_state::port07_r )
@@ -361,6 +366,9 @@ static MACHINE_CONFIG_START( ravens2, ravens_state )
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
