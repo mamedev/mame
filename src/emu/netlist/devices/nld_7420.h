@@ -1,0 +1,49 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
+/*
+ * nld_7420.h
+ *
+ *  DM7420: Dual 4-Input NAND Gates
+ *
+ *          +--------------+
+ *       A1 |1     ++    14| VCC
+ *       B1 |2           13| D2
+ *       NC |3           12| C2
+ *       C1 |4    7420   11| NC
+ *       D1 |5           10| B2
+ *       Y! |6            9| A2
+ *      GND |7            8| Y2
+ *          +--------------+
+ *                  ____
+ *              Y = ABCD
+ *          +---+---+---+---++---+
+ *          | A | B | C | D || Y |
+ *          +===+===+===+===++===+
+ *          | X | X | X | 0 || 1 |
+ *          | X | X | 0 | X || 1 |
+ *          | X | 0 | X | X || 1 |
+ *          | 0 | X | X | X || 1 |
+ *          | 1 | 1 | 1 | 1 || 0 |
+ *          +---+---+---+---++---+
+ *
+ *  Naming conventions follow National Semiconductor datasheet
+ *
+ */
+
+
+#include "nld_signal.h"
+
+#ifndef NLD_7420_H_
+#define NLD_7420_H_
+
+#define TTL_7420_NAND(_name, _I1, _I2, _I3, _I4)                                    \
+        NET_REGISTER_DEV(nic7420, _name)                                            \
+        NET_CONNECT(_name, A, _I1)                                                  \
+        NET_CONNECT(_name, B, _I2)                                                  \
+        NET_CONNECT(_name, C, _I3)                                                  \
+        NET_CONNECT(_name, D, _I4)
+
+
+NETLIB_SIGNAL(nic7420, 4, 0, 0);
+
+#endif /* NLD_7420_H_ */

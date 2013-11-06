@@ -57,6 +57,7 @@
 #include "nld_7400.h"
 #include "nld_7402.h"
 #include "nld_7410.h"
+#include "nld_7420.h"
 
 // this is a bad hack
 #define USE_OLD7493 (0)
@@ -103,13 +104,6 @@
 #define TTL_7404_INVERT(_name, _I1)                                                 \
 		NET_REGISTER_DEV(nic7404, _name)                                            \
 		NET_CONNECT(_name, I1, _I1)
-
-#define TTL_7420_NAND(_name, _I1, _I2, _I3, _I4)                                    \
-		NET_REGISTER_DEV(nic7420, _name)                                            \
-		NET_CONNECT(_name, A, _I1)                                                  \
-		NET_CONNECT(_name, B, _I2)                                                  \
-		NET_CONNECT(_name, C, _I3)                                                  \
-		NET_CONNECT(_name, D, _I4)
 
 #define TTL_7425_NOR(_name, _I1, _I2, _I3, _I4)                                     \
 		NET_REGISTER_DEV(nic7425, _name)                                            \
@@ -318,7 +312,6 @@ NETLIB_DEVICE_WITH_PARAMS(nicNE555N_MSTABLE,
 	net_param_t m_VL;
 );
 
-NETLIB_SIGNAL(nic7420, 4, 0, 0);
 NETLIB_SIGNAL(nic7425, 4, 1, 0);
 NETLIB_SIGNAL(nic7427, 3, 1, 0);
 NETLIB_SIGNAL(nic7430, 8, 0, 0);

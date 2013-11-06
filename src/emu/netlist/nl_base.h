@@ -248,6 +248,11 @@ class net_output_t : public net_terminal_t
 {
 public:
 
+    typedef struct {
+        double        Analog;
+        netlist_sig_t Q;
+    } hybrid_t;
+
 	net_output_t(int atype);
 
 	friend const netlist_sig_t logic_input_t::Q() const;
@@ -255,12 +260,13 @@ public:
 	friend const bool analog_input_t::is_highz() const;
 	friend class NETLIB_NAME(netdev_mainclock);
 
-	ATTR_HOT inline const netlist_sig_t last_Q() const  { return m_last_Q;  }
-	ATTR_HOT inline const netlist_sig_t new_Q() const   { return m_new_Q;   }
+	ATTR_HOT inline const netlist_sig_t last_Q() const  { return m_last.Q;  }
+	ATTR_HOT inline const netlist_sig_t new_Q() const   { return m_new.Q;   }
 
 	ATTR_COLD void register_con(net_input_t &inp);
 
-	ATTR_HOT inline void update_devs();
+	/* inline not always works out */
+	ATTR_HOT /*inline*/ void update_devs();
 
 	ATTR_HOT inline void inc_active();
 	ATTR_HOT inline void dec_active();
@@ -280,24 +286,22 @@ protected:
 	ATTR_HOT inline const netlist_sig_t Q() const
 	{
 		assert(object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
-		return m_Q;
+		return m_cur.Q;
 	}
 	ATTR_HOT inline const double Q_Analog() const
 	{
 		assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
-		return m_Q_analog;
+        return m_cur.Analog;
 	}
 
 	ATTR_HOT inline void push_to_queue(const netlist_time &delay);
 
-	netlist_sig_t m_last_Q;
-	netlist_sig_t m_Q;
-	netlist_sig_t m_new_Q;
-
-	double m_Q_analog;
-	double m_new_Q_analog;
+	hybrid_t m_last;
+	hybrid_t m_cur;
+	hybrid_t m_new;
 
 	UINT32 m_num_cons;
+
 private:
 	ATTR_HOT void update_dev(const net_input_t *inp, const UINT32 mask);
 
@@ -323,13 +327,13 @@ public:
 		m_high_V = 4.8;
 	}
 
-	ATTR_COLD void initial(const netlist_sig_t val) { m_Q = val; m_new_Q = val; m_last_Q = !val; }
+	ATTR_COLD void initial(const netlist_sig_t val) { m_cur.Q = val; m_new.Q = val; m_last.Q = !val; }
 
 	ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time &delay)
 	{
-		if (EXPECTED(newQ != m_new_Q))
+		if (EXPECTED(newQ != m_new.Q))
 		{
-			m_new_Q = newQ;
+			m_new.Q = newQ;
 			if (m_num_cons)
 				push_to_queue(delay);
 		}
@@ -359,13 +363,13 @@ public:
 	analog_output_t()
 		: net_output_t(OUTPUT | SIGNAL_ANALOG) { }
 
-	ATTR_COLD void initial(const double val) { m_Q_analog = val; m_new_Q_analog = val; }
+    ATTR_COLD void initial(const double val) { m_cur.Analog = val; m_new.Analog = val; }
 
 	ATTR_HOT inline void set_Q(const double newQ, const netlist_time &delay)
 	{
-		if (newQ != m_new_Q_analog)
+		if (newQ != m_new.Analog)
 		{
-			m_new_Q_analog = newQ;
+            m_new.Analog = newQ;
 			push_to_queue(delay);
 		}
 	}
@@ -716,9 +720,9 @@ ATTR_HOT inline void net_output_t::inc_active()
 #if USE_DEACTIVE_DEVICE
 	if (m_active == 1 && m_in_queue > 0)
 	{
-		m_last_Q = m_Q;
+		m_last = m_cur;
 		netdev()->inc_active();
-		m_Q = m_new_Q;
+		m_cur = m_new;
 	}
 #endif
 
@@ -731,8 +735,7 @@ ATTR_HOT inline void net_output_t::inc_active()
 		}
 		else
 		{
-			m_Q = m_last_Q = m_new_Q;
-			m_Q_analog = m_new_Q_analog;
+			m_cur = m_last = m_new;
 			m_in_queue = 2;
 		}
 	}

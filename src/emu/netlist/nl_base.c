@@ -284,16 +284,19 @@ net_output_t::net_output_t(int atype)
 	: net_terminal_t(atype)
 	, m_low_V(0.0)
 	, m_high_V(0.0)
-	, m_last_Q(0)
-	, m_Q(0)
-	, m_new_Q(0)
-	, m_Q_analog(0.0)
-	, m_new_Q_analog(0.0)
+	//, m_last_Q(0)
+	//, m_Q(0)
+	//, m_new_Q(0)
+	//, m_Q_analog(0.0)
+	//, m_new_Q_analog(0.0)
 	, m_num_cons(0)
 	, m_time(netlist_time::zero)
 	, m_active(0)
 	, m_in_queue(2)
 {
+    m_cur.Q = 0;
+    m_new.Q = 0;
+    m_last.Q = 0;
 	//m_cons = global_alloc_array(net_input_t *, OUTPUT_MAX_CONNECTIONS);
 }
 
@@ -314,11 +317,10 @@ ATTR_HOT inline void net_output_t::update_devs()
 	assert(m_num_cons != 0);
 
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
-	m_Q = m_new_Q;
-	m_Q_analog = m_new_Q_analog;
+	m_cur = m_new;
 	m_in_queue = 2; /* mark as taken ... */
 
-	const UINT32 mask = masks[ (m_last_Q  << 1) | m_Q ];
+	const UINT32 mask = masks[ (m_last.Q  << 1) | m_cur.Q ];
 
 	switch (m_num_cons)
 	{
@@ -335,7 +337,7 @@ ATTR_HOT inline void net_output_t::update_devs()
 		break;
 	}
 
-	m_last_Q = m_Q;
+	m_last = m_cur;
 }
 
 ATTR_COLD void net_output_t::register_con(net_input_t &input)
@@ -399,15 +401,13 @@ NETLIB_UPDATE(netdev_analog_callback)
 		m_callback(INPANALOG(m_in));
 }
 
-// license:GPL-2.0+
-// copyright-holders:Couriersud
 // ----------------------------------------------------------------------------------------
 // netdev_mainclock
 // ----------------------------------------------------------------------------------------
 
 ATTR_HOT inline void NETLIB_NAME(netdev_mainclock)::mc_update(net_output_t &Q, const netlist_time curtime)
 {
-	Q.m_new_Q = !Q.m_new_Q;
+	Q.m_new.Q = !Q.m_new.Q;
 	Q.set_time(curtime);
 	Q.update_devs();
 }
@@ -429,6 +429,6 @@ ATTR_HOT NETLIB_UPDATE_PARAM(netdev_mainclock)
 ATTR_HOT NETLIB_UPDATE(netdev_mainclock)
 {
 	// this is only called during setup ...
-	m_Q.m_new_Q = !m_Q.m_new_Q;
+	m_Q.m_new.Q = !m_Q.m_new.Q;
 	m_Q.set_time(m_netlist->time() + m_inc);
 }

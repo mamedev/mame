@@ -2119,6 +2119,7 @@ src/emu/netlist/devices/net_lib.h svneol=native#text/plain
 src/emu/netlist/devices/nld_7400.h svneol=native#text/plain
 src/emu/netlist/devices/nld_7402.h svneol=native#text/plain
 src/emu/netlist/devices/nld_7410.h svneol=native#text/plain
+src/emu/netlist/devices/nld_7420.h svneol=native#text/plain
 src/emu/netlist/devices/nld_signal.h svneol=native#text/plain
 src/emu/netlist/devices/nld_system.h svneol=native#text/plain
 src/emu/netlist/netlist.mak svneol=native#text/plain
