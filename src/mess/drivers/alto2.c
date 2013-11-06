@@ -1,0 +1,367 @@
+// license:MAME
+// copyright-holders:Juergen Buchmueller
+/***************************************************************************
+ *    alto2.c
+ *
+ *    Original driver by:
+ *    Juergen Buchmueller, Nov 2013
+ *
+ ***************************************************************************/
+
+#include "includes/alto2.h"
+
+/* Memory Maps */
+
+#if	(ALTO2_CRAM_CONFIG==1)
+#define	ALTO2_UCODE_ROM_PAGES	1		//!< number of microcode ROM pages
+#define	ALTO2_UCODE_RAM_PAGES	1		//!< number of microcode RAM pages
+#elif (ALTO2_CRAM_CONFIG==2)
+#define	ALTO2_UCODE_ROM_PAGES	2		//!< number of microcode ROM pages
+#define	ALTO2_UCODE_RAM_PAGES	1		//!< number of microcode RAM pages
+#elif (ALTO2_CRAM_CONFIG==3)
+#define	ALTO2_UCODE_ROM_PAGES	1		//!< number of microcode ROM pages
+#define	ALTO2_UCODE_RAM_PAGES	3		//!< number of microcode RAM pages
+#else
+#error "Undefined CROM/CRAM configuration"
+#endif
+
+static ADDRESS_MAP_START( alto2_ucode_map, AS_PROGRAM, 32, alto2_state )
+	AM_RANGE(0x0000, ALTO2_UCODE_RAM_BASE-1) AM_ROM
+	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE-1) AM_READWRITE(alto2_ucode_r, alto2_ucode_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( alto2_ram_map, AS_IO, 16, alto2_state )
+	AM_RANGE(0x0000, ALTO2_RAM_SIZE/2-1) AM_READWRITE(alto2_ram_r, alto2_ram_w)
+ADDRESS_MAP_END
+
+/* Input Ports */
+
+/** @brief make an Alto key int from 1 << bit */
+#define	MAKE_KEY(a,b) (1 << (b))
+
+/** @brief no key assigned is -1 */
+#define	A2_KEY_NONE	(-1)
+
+#define	A2_KEY_5			MAKE_KEY(0,017)		//!< normal: 5    shifted: %
+#define	A2_KEY_4			MAKE_KEY(0,016)		//!< normal: 4    shifted: $
+#define	A2_KEY_6			MAKE_KEY(0,015)		//!< normal: 6    shifted: ~
+#define	A2_KEY_E			MAKE_KEY(0,014)		//!< normal: e    shifted: E
+#define	A2_KEY_7			MAKE_KEY(0,013)		//!< normal: 7    shifted: &
+#define	A2_KEY_D			MAKE_KEY(0,012)		//!< normal: d    shifted: D
+#define	A2_KEY_U			MAKE_KEY(0,011)		//!< normal: u    shifted: U
+#define	A2_KEY_V			MAKE_KEY(0,010)		//!< normal: v    shifted: V
+#define	A2_KEY_0			MAKE_KEY(0,007)		//!< normal: 0    shifted: )
+#define	A2_KEY_K			MAKE_KEY(0,006)		//!< normal: k    shifted: K
+#define	A2_KEY_MINUS		MAKE_KEY(0,005)		//!< normal: -    shifted: _
+#define	A2_KEY_P			MAKE_KEY(0,004)		//!< normal: p    shifted: P
+#define	A2_KEY_SLASH		MAKE_KEY(0,003)		//!< normal: /    shifted: ?
+#define	A2_KEY_BACKSLASH	MAKE_KEY(0,002)		//!< normal: \    shifted: |
+#define	A2_KEY_LF			MAKE_KEY(0,001)		//!< normal: LF   shifted: ?
+#define	A2_KEY_BS			MAKE_KEY(0,000)		//!< normal: BS   shifted: ?
+
+#define	A2_KEY_FR2			MAKE_KEY(0,002)		//!< ADL right function key 2
+#define	A2_KEY_FL2			MAKE_KEY(0,001)		//!< ADL left function key 1
+
+#define	A2_KEY_3			MAKE_KEY(1,017)		//!< normal: 3    shifted: #
+#define	A2_KEY_2			MAKE_KEY(1,016)		//!< normal: 2    shifted: @
+#define	A2_KEY_W			MAKE_KEY(1,015)		//!< normal: w    shifted: W
+#define	A2_KEY_Q			MAKE_KEY(1,014)		//!< normal: q    shifted: Q
+#define	A2_KEY_S			MAKE_KEY(1,013)		//!< normal: s    shifted: S
+#define	A2_KEY_A			MAKE_KEY(1,012)		//!< normal: a    shifted: A
+#define	A2_KEY_9			MAKE_KEY(1,011)		//!< normal: 9    shifted: (
+#define	A2_KEY_I			MAKE_KEY(1,010)		//!< normal: i    shifted: I
+#define	A2_KEY_X			MAKE_KEY(1,007)		//!< normal: x    shifted: X
+#define	A2_KEY_O			MAKE_KEY(1,006)		//!< normal: o    shifted: O
+#define	A2_KEY_L			MAKE_KEY(1,005)		//!< normal: l    shifted: L
+#define	A2_KEY_COMMA		MAKE_KEY(1,004)		//!< normal: ,    shifted: <
+#define	A2_KEY_QUOTE		MAKE_KEY(1,003)		//!< normal: '    shifted: "
+#define	A2_KEY_RBRACKET		MAKE_KEY(1,002)		//!< normal: ]    shifted: }
+#define	A2_KEY_BLANK_MID	MAKE_KEY(1,001)		//!< middle blank key
+#define	A2_KEY_BLANK_TOP	MAKE_KEY(1,000)		//!< top blank key
+
+#define	A2_KEY_FR4			MAKE_KEY(1,001)		//!< ADL right funtion key 4
+#define	A2_KEY_BW			MAKE_KEY(1,000)		//!< ADL BW (?)
+
+#define	A2_KEY_1			MAKE_KEY(2,017)		//!< normal: 1    shifted: !
+#define	A2_KEY_ESCAPE		MAKE_KEY(2,016)		//!< normal: ESC  shifted: ?
+#define	A2_KEY_TAB			MAKE_KEY(2,015)		//!< normal: TAB  shifted: ?
+#define	A2_KEY_F			MAKE_KEY(2,014)		//!< normal: f    shifted: F
+#define	A2_KEY_CTRL			MAKE_KEY(2,013)		//!< CTRL
+#define	A2_KEY_C			MAKE_KEY(2,012)		//!< normal: c    shifted: C
+#define	A2_KEY_J			MAKE_KEY(2,011)		//!< normal: j    shifted: J
+#define	A2_KEY_B			MAKE_KEY(2,010)		//!< normal: b    shifted: B
+#define	A2_KEY_Z			MAKE_KEY(2,007)		//!< normal: z    shifted: Z
+#define	A2_KEY_LSHIFT		MAKE_KEY(2,006)		//!< LSHIFT
+#define	A2_KEY_PERIOD		MAKE_KEY(2,005)		//!< normal: .    shifted: >
+#define	A2_KEY_SEMICOLON	MAKE_KEY(2,004)		//!< normal: ;    shifted: :
+#define	A2_KEY_RETURN		MAKE_KEY(2,003)		//!< RETURN
+#define	A2_KEY_LEFTARROW	MAKE_KEY(2,002)		//!< normal: left arrow   shifted: up arrow (caret)
+#define	A2_KEY_DEL			MAKE_KEY(2,001)		//!< normal: DEL  shifted: ?
+#define	A2_KEY_MSW_2_17		MAKE_KEY(2,000)		//!< unused on Microswitch KDB
+
+#define	A2_KEY_FR3			MAKE_KEY(2,002)		//!< ADL right function key 3
+#define	A2_KEY_FL1			MAKE_KEY(2,001)		//!< ADL left function key 1
+#define	A2_KEY_FL3			MAKE_KEY(2,000)		//!< ADL left function key 3
+
+#define	A2_KEY_R			MAKE_KEY(3,017)		//!< normal: r    shifted: R
+#define	A2_KEY_T			MAKE_KEY(3,016)		//!< normal: t    shifted: T
+#define	A2_KEY_G			MAKE_KEY(3,015)		//!< normal: g    shifted: G
+#define	A2_KEY_Y			MAKE_KEY(3,014)		//!< normal: y    shifted: Y
+#define	A2_KEY_H			MAKE_KEY(3,013)		//!< normal: h    shifted: H
+#define	A2_KEY_8			MAKE_KEY(3,012)		//!< normal: 8    shifted: *
+#define	A2_KEY_N			MAKE_KEY(3,011)		//!< normal: n    shifted: N
+#define	A2_KEY_M			MAKE_KEY(3,010)		//!< normal: m    shifted: M
+#define	A2_KEY_LOCK			MAKE_KEY(3,007)		//!< LOCK
+#define	A2_KEY_SPACE		MAKE_KEY(3,006)		//!< SPACE
+#define	A2_KEY_LBRACKET		MAKE_KEY(3,005)		//!< normal: [    shifted: {
+#define	A2_KEY_EQUALS		MAKE_KEY(3,004)		//!< normal: =    shifted: +
+#define	A2_KEY_RSHIFT		MAKE_KEY(3,003)		//!< RSHIFT
+#define	A2_KEY_BLANK_BOT	MAKE_KEY(3,002)		//!< bottom blank key
+#define	A2_KEY_MSW_3_16		MAKE_KEY(3,001)		//!< unused on Microswitch KDB
+#define	A2_KEY_MSW_3_17		MAKE_KEY(3,000)		//!< unused on Microswitch KDB
+
+#define	A2_KEY_FR1			MAKE_KEY(3,002)		//!< ADL right function key 4
+#define	A2_KEY_FL4			MAKE_KEY(3,001)		//!< ADL left function key 4
+#define	A2_KEY_FR5			MAKE_KEY(3,000)		//!< ADL right function key 5
+
+static INPUT_PORTS_START( alto2 )
+	PORT_START("ROW0")
+	PORT_BIT(A2_KEY_5,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')	//!< normal: 5    shifted: %
+	PORT_BIT(A2_KEY_4,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')	//!< normal: 4    shifted: $
+	PORT_BIT(A2_KEY_6,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 ~") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('~')	//!< normal: 6    shifted: ~
+	PORT_BIT(A2_KEY_E,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e E") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')	//!< normal: e    shifted: E
+	PORT_BIT(A2_KEY_7,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')	//!< normal: 7    shifted: &
+	PORT_BIT(A2_KEY_D,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d D") PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')	//!< normal: d    shifted: D
+	PORT_BIT(A2_KEY_U,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')	//!< normal: u    shifted: U
+	PORT_BIT(A2_KEY_V,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')	//!< normal: v    shifted: V
+	PORT_BIT(A2_KEY_0,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')	//!< normal: 0    shifted: )
+	PORT_BIT(A2_KEY_K,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')	//!< normal: k    shifted: K
+	PORT_BIT(A2_KEY_MINUS,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')	//!< normal: -    shifted: _
+	PORT_BIT(A2_KEY_P,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')	//!< normal: p    shifted: P
+	PORT_BIT(A2_KEY_SLASH,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')	//!< normal: /    shifted: ?
+	PORT_BIT(A2_KEY_BACKSLASH,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')	//!< normal: \    shifted: |
+	PORT_BIT(A2_KEY_LF,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_DOWN) PORT_CHAR('\012')				//!< normal: LF   shifted: ?
+	PORT_BIT(A2_KEY_BS,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('\010')			//!< normal: BS   shifted: ?
+
+	PORT_START("ROW1")
+	PORT_BIT(A2_KEY_3,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')	//!< normal: 3    shifted: #
+	PORT_BIT(A2_KEY_2,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')	//!< normal: 2    shifted: @
+	PORT_BIT(A2_KEY_W,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')	//!< normal: w    shifted: W
+	PORT_BIT(A2_KEY_Q,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')	//!< normal: q    shifted: Q
+	PORT_BIT(A2_KEY_S,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s S") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')	//!< normal: s    shifted: S
+	PORT_BIT(A2_KEY_A,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')	//!< normal: a    shifted: A
+	PORT_BIT(A2_KEY_9,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')	//!< normal: 9    shifted: (
+	PORT_BIT(A2_KEY_I,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')	//!< normal: i    shifted: I
+	PORT_BIT(A2_KEY_X,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')	//!< normal: x    shifted: X
+	PORT_BIT(A2_KEY_O,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')	//!< normal: o    shifted: O
+	PORT_BIT(A2_KEY_L,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l L") PORT_CODE(KEYCODE_E) PORT_CHAR('l') PORT_CHAR('L')	//!< normal: l    shifted: L
+	PORT_BIT(A2_KEY_COMMA,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')	//!< normal: ,    shifted: <
+	PORT_BIT(A2_KEY_QUOTE,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("' \"") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\x27') PORT_CHAR('"')	//!< normal: '    shifted: "
+	PORT_BIT(A2_KEY_RBRACKET,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')	//!< normal: ]    shifted: }
+	PORT_BIT(A2_KEY_BLANK_MID,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M[ ]") PORT_CODE(KEYCODE_END)								//!< middle blank key
+	PORT_BIT(A2_KEY_BLANK_TOP,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T[ ]") PORT_CODE(KEYCODE_PGUP)								//!< top blank key
+
+	PORT_START("ROW2")
+	PORT_BIT(A2_KEY_1,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')	//!< normal: 1    shifted: !
+	PORT_BIT(A2_KEY_ESCAPE,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR('\x1b')				//!< normal: ESC  shifted: ?
+	PORT_BIT(A2_KEY_TAB,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\011')				//!< normal: TAB  shifted: ?
+	PORT_BIT(A2_KEY_F,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')	//!< normal: f    shifted: F
+	PORT_BIT(A2_KEY_CTRL,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)							//!< CTRL
+	PORT_BIT(A2_KEY_C,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')	//!< normal: c    shifted: C
+	PORT_BIT(A2_KEY_J,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')	//!< normal: j    shifted: J
+	PORT_BIT(A2_KEY_B,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')	//!< normal: b    shifted: B
+	PORT_BIT(A2_KEY_Z,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')	//!< normal: z    shifted: Z
+	PORT_BIT(A2_KEY_LSHIFT,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LSHIFT") PORT_CODE(KEYCODE_LSHIFT)							//!< LSHIFT
+	PORT_BIT(A2_KEY_P,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')	//!< normal: .    shifted: >
+	PORT_BIT(A2_KEY_S,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')//!< normal: ;    shifted: :
+	PORT_BIT(A2_KEY_RETURN,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\013')			//!< RETURN
+	PORT_BIT(A2_KEY_L,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("← ↑") PORT_CODE(KEYCODE_LEFT)								//!< normal: left arrow   shifted: up arrow (caret)
+	PORT_BIT(A2_KEY_DEL,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)								//!< normal: DEL  shifted: ?
+	PORT_BIT(A2_KEY_MSW_2_17,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2/17") PORT_CODE(KEYCODE_MENU)								//!< unused on Microswitch KDB
+
+	PORT_START("ROW3")
+	PORT_BIT(A2_KEY_R,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')	//!< normal: r    shifted: R
+	PORT_BIT(A2_KEY_T,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')	//!< normal: t    shifted: T
+	PORT_BIT(A2_KEY_G,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')	//!< normal: g    shifted: G
+	PORT_BIT(A2_KEY_Y,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')	//!< normal: y    shifted: Y
+	PORT_BIT(A2_KEY_H,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')	//!< normal: h    shifted: H
+	PORT_BIT(A2_KEY_8,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 *") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')	//!< normal: 8    shifted: *
+	PORT_BIT(A2_KEY_N,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')	//!< normal: n    shifted: N
+	PORT_BIT(A2_KEY_M,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')	//!< normal: m    shifted: M
+	PORT_BIT(A2_KEY_LOCK,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LOCK") PORT_CODE(KEYCODE_SCRLOCK)							//!< LOCK
+	PORT_BIT(A2_KEY_SPACE,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_E) PORT_CHAR(' ')					//!< SPACE
+	PORT_BIT(A2_KEY_L,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')	//!< normal: [    shifted: {
+	PORT_BIT(A2_KEY_EQUALS,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')	//!< normal: =    shifted: +
+	PORT_BIT(A2_KEY_RSHIFT,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_RSHIFT)							//!< RSHIFT
+	PORT_BIT(A2_KEY_BLANK_BOT,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B[ ]") PORT_CODE(KEYCODE_PGDN)								//!< bottom blank key
+	PORT_BIT(A2_KEY_MSW_3_16,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3/16") PORT_CODE(KEYCODE_HOME)								//!< unused on Microswitch KDB
+	PORT_BIT(A2_KEY_MSW_3_17,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3/17") PORT_CODE(KEYCODE_INSERT)							//!< unused on Microswitch KDB
+
+	PORT_START("ROW4")
+	PORT_BIT(A2_KEY_FR2,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR2") PORT_CODE(KEYCODE_F6)									//!< ADL right function key 2
+	PORT_BIT(A2_KEY_FL2,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FL2") PORT_CODE(KEYCODE_F2)									//!< ADL left function key 2
+
+	PORT_START("ROW5")
+	PORT_BIT(A2_KEY_FR4,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR4") PORT_CODE(KEYCODE_F8)									//!< ADL right funtion key 4
+	PORT_BIT(A2_KEY_BW,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BW")  PORT_CODE(KEYCODE_F10)								//!< ADL BW (?)
+
+	PORT_START("ROW6")
+	PORT_BIT(A2_KEY_FR3,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR3") PORT_CODE(KEYCODE_F7)									//!< ADL right function key 3
+	PORT_BIT(A2_KEY_FL1,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FL1") PORT_CODE(KEYCODE_F1)									//!< ADL left function key 1
+	PORT_BIT(A2_KEY_FL3,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FL3") PORT_CODE(KEYCODE_F3)									//!< ADL left function key 3
+
+	PORT_START("ROW7")
+	PORT_BIT(A2_KEY_FR1,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR1") PORT_CODE(KEYCODE_F5)									//!< ADL right function key 1
+	PORT_BIT(A2_KEY_FL4,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FL4") PORT_CODE(KEYCODE_F4)									//!< ADL left function key 4
+	PORT_BIT(A2_KEY_FR5,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR5") PORT_CODE(KEYCODE_F9)									//!< ADL right function key 5
+
+	PORT_START("CONFIG")    /* config diode on main board */
+	PORT_CONFNAME( 0x40, 0x40, "TV system")
+	PORT_CONFSETTING(    0x00, "NTSC")
+	PORT_CONFSETTING(    0x40, "PAL")
+INPUT_PORTS_END
+
+
+/* F4 character display */
+
+static const gfx_layout alto2_gfx_layout =
+{
+	16, 1,								/* 16x1 pixels */
+	65536,								/* 65536 codes */
+	1,									/* 1 bit per pixel */
+	{0},								/* no bitplanes */
+	/* x offsets */
+	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
+	/* y offsets */
+	{0},
+	16									/* two bytes per code */
+};
+
+
+/* Graphics Decode Information */
+
+static GFXDECODE_START( alto2 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, alto2_gfx_layout,  0, 2 )
+GFXDECODE_END
+
+
+/* Palette Initialization */
+
+void alto2_state::palette_init()
+{
+	palette_set_color(machine(),0,RGB_WHITE); /* white */
+	palette_set_color(machine(),1,RGB_BLACK); /* black */
+}
+
+static MACHINE_CONFIG_START( alto2, alto2_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", ALTO2, 20160000)
+	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
+	MCFG_CPU_IO_MAP(alto2_ram_map)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(ALTO2_DISPLAY_VBLANK_TIME))
+
+	/* video hardware */
+	MCFG_SCREEN_UPDATE_DRIVER(alto2_state, screen_update)
+	MCFG_SCREEN_SIZE(ALTO2_DISPLAY_TOTAL_WIDTH, ALTO2_DISPLAY_HLC_END-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, ALTO2_DISPLAY_WIDTH-1, 0, ALTO2_DISPLAY_HEIGHT-1)
+	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
+
+	MCFG_GFXDECODE(alto2)
+	MCFG_PALETTE_LENGTH(2)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256K")
+MACHINE_CONFIG_END
+
+/* ROMs */
+
+ROM_START(alto2)
+	ROM_REGION( 01440, "2k_ctrl", 0 )
+	ROMX_LOAD( "2kctl.u3",   00000, 00377, CRC(5f8d89e8) SHA1(487cd944ab074290aea73425e81ef4900d92e250), ROM_NIBBLE)	//!< 3601-1 256x4 BPROM; Emulator address modifier
+	ROMX_LOAD( "2kctl.u76",  00400, 00777, CRC(1edef867) SHA1(928b8a15ac515a99109f32672441832173883b81), ROM_NIBBLE)	//!< 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
+	ROMX_LOAD( "3kcram.a37", 01000, 01377, CRC(9417360d) SHA1(bfcdbc56ee4ffafd0f2f672c0c869a55d6dd194b), ROM_NIBBLE)
+	ROMX_LOAD( "2kctl.u38",  01400, 01437, CRC(fc51b1d1) SHA1(e36c2a12a5da377394264899b5ae504e2ffda46e), 0)				//!< 82S23 32x8 BPROM; task priority and initial address
+
+	ROM_REGION16_LE( 0400, "const", 0 )
+	// constant PROMs, 4 x 4bit
+	// UINT16 src = BITS(addr, 3,2,1,4,5,6,7,0);
+	// UINT16 u16 = ~((const[src] << 8) | (const[src+0x100));
+	// m_const[addr] = u16;
+	ROMX_LOAD( "madr.a6",    00000, 00377, CRC(c2c196b2) SHA1(8b2a599ac839ec2a070dbfef2f1626e645c858ca), ROM_NIBBLE | ROM_BITSHIFT(12))	//!< 0000-0377 C(00)',C(01)',C(02)',C(03)'
+	ROMX_LOAD( "madr.a5",    00000, 00377, CRC(42336101) SHA1(c77819cf40f063af3abf66ea43f17cc1a62e928b), ROM_NIBBLE | ROM_BITSHIFT( 8))	//!< 0000-0377 C(04)',C(05)',C(06)',C(07)'
+	ROMX_LOAD( "madr.a4",    00000, 00377, CRC(b957e490) SHA1(c72660ad3ada4ca0ed8697c6bb6275a4fe703184), ROM_NIBBLE | ROM_BITSHIFT( 4))	//!< 0000-0377 C(08)',C(09)',C(10)',C(11)'
+	ROMX_LOAD( "madr.a3",    00000, 00377, CRC(e0992757) SHA1(5c45ea824970663cb9ee672dc50861539c860249), ROM_NIBBLE | ROM_BITSHIFT( 0))	//!< 0000-0377 C(12)',C(13)',C(14)',C(15)'
+
+#if	0	// FIXME: just different names(?)
+	ROM_REGION16_LE( 0400, "const_alt", 0 )
+	// alternate constant PROMs, 4 x 4bit
+	// UINT16 src = BITS(addr, 3,2,1,4,5,6,7,0);
+	// UINT16 u16 = ~((const[src] << 8) | (const[src+0x100));
+	// m_const[addr] = u16;
+	ROMX_LOAD( "c3.3",       00000, 00377, CRC(c2c196b2) SHA1(8b2a599ac839ec2a070dbfef2f1626e645c858ca), ROM_NIBBLE | ROM_BITSHIFT(12))	//!< 0000-0377 C(00)',C(01)',C(02)',C(03)'
+	ROMX_LOAD( "c2.3",       00000, 00377, CRC(42336101) SHA1(c77819cf40f063af3abf66ea43f17cc1a62e928b), ROM_NIBBLE | ROM_BITSHIFT( 8))	//!< 0000-0377 C(04)',C(05)',C(06)',C(07)'
+	ROMX_LOAD( "c1.3",       00000, 00377, CRC(b957e490) SHA1(c72660ad3ada4ca0ed8697c6bb6275a4fe703184), ROM_NIBBLE | ROM_BITSHIFT( 4))	//!< 0000-0377 C(08)',C(09)',C(10)',C(11)'
+	ROMX_LOAD( "c0.3",       00000, 00377, CRC(e0992757) SHA1(5c45ea824970663cb9ee672dc50861539c860249), ROM_NIBBLE | ROM_BITSHIFT( 0))	//!< 0000-0377 C(12)',C(13)',C(14)',C(15)'
+#endif
+
+	ROM_REGION32_LE( 02000, "ucode", ROMREGION_INVERT )
+	// micro code PROMs, 8 x 4bit
+	// UINT32 src = addr ^ 0x3ff;
+	// UINT32 u32 = ~((ucode[src] << 24) | (ucode[src+0x400] << 16) | (ucode[src+0x800] << 8) | (ucode[src+0xc00));
+	// m_ucode[addr] = u32 ^ ALTO2_UCODE_INVERTED;
+	ROMX_LOAD( "55x.3",      00000, 01777, CRC(de870d75) SHA1(2b98cc769d8302cb39948711424d987d94e4159b), ROM_NIBBLE | ROM_BITSHIFT(28))	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROMX_LOAD( "64x.3",      00000, 01777, CRC(51b444c0) SHA1(8756e51f7f3253a55d75886465beb7ee1be6e1c4), ROM_NIBBLE | ROM_BITSHIFT(24))	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+	ROMX_LOAD( "65x.3",      00000, 01777, CRC(741d1437) SHA1(01f7cf07c2173ac93799b2475180bfbbe7e0149b), ROM_NIBBLE | ROM_BITSHIFT(20))	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+	ROMX_LOAD( "63x.3",      00000, 01777, CRC(f22d5028) SHA1(c65a42baef702d4aff2d9ad8e363daec27de6801), ROM_NIBBLE | ROM_BITSHIFT(16))	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+	ROMX_LOAD( "53x.3",      00000, 01777, CRC(3c89a740) SHA1(95d812d489b2bde03884b2f126f961caa6c8ec45), ROM_NIBBLE | ROM_BITSHIFT(12))	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+	ROMX_LOAD( "60x.3",      00000, 01777, CRC(a35de0bf) SHA1(7fa4aead44dcf5393bbfd1706c0ada24aa6fd3ac), ROM_NIBBLE | ROM_BITSHIFT( 8))	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+	ROMX_LOAD( "61x.3",      00000, 01777, CRC(f25bcb2d) SHA1(acb57f3104a8dc4ba750dd1bf22ccc81cce9f084), ROM_NIBBLE | ROM_BITSHIFT( 4))	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+	ROMX_LOAD( "62x.3",      00000, 01777, CRC(1b20a63f) SHA1(41dc86438e91c12b0fe42ffcce6b2ac2eb9e714a), ROM_NIBBLE | ROM_BITSHIFT( 0))	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+
+	ROM_REGION32_LE( 02000, "xm_mesa_5.1", ROMREGION_INVERT )
+	// extended memory Mesa 5.1 micro code PROMs, 8 x 4bit
+	ROMX_LOAD( "xm51.u54",   00000, 01777, CRC(11086ae9) SHA1(c394e3fadbfb91801ddc1a70cb25dc6f606c4f76), ROM_NIBBLE | ROM_BITSHIFT(28))	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROMX_LOAD( "xm51.u74",   00000, 01777, CRC(be8224f2) SHA1(ea9abcc3832b26a094319796901237e1e3f238b6), ROM_NIBBLE | ROM_BITSHIFT(24))	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+	ROMX_LOAD( "xm51.u75",   00000, 01777, CRC(dfe3e3ac) SHA1(246fd29f92150a5d5d7627fbb4f2504c7b6cd5ec), ROM_NIBBLE | ROM_BITSHIFT(20))	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+	ROMX_LOAD( "xm51.u73",   00000, 01777, CRC(6c20fa46) SHA1(a054330c65048011f12209aaed5c6da73d95f029), ROM_NIBBLE | ROM_BITSHIFT(16))	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+	ROMX_LOAD( "xm51.u52",   00000, 01777, CRC(0a31eec8) SHA1(4e2ad5daa5e6a6f2143ee4de00c7b625d096fb02), ROM_NIBBLE | ROM_BITSHIFT(12))	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+	ROMX_LOAD( "xm51.u70",   00000, 01777, CRC(5c64ee54) SHA1(0eb16d1b5e5967be7c1bf8c8ef6efdf0518a752c), ROM_NIBBLE | ROM_BITSHIFT( 8))	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+	ROMX_LOAD( "xm51.u71",   00000, 01777, CRC(7283bf71) SHA1(819fdcc407ed0acdd8f12b02db6efbcab7bec19a), ROM_NIBBLE | ROM_BITSHIFT( 4))	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+	ROMX_LOAD( "xm51.u72",   00000, 01777, CRC(a28e5251) SHA1(44dd8ad4ad56541b5394d30ce3521b4d1d561394), ROM_NIBBLE | ROM_BITSHIFT( 0))	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+
+	ROM_REGION32_LE( 02000, "xm_mesa_4.1", ROMREGION_INVERT )
+	// extended memory Mesa 4.1 (?) micro code PROMs, 8 x 4bit
+	ROMX_LOAD( "xm654.41",   00000, 01777, CRC(beace302) SHA1(0002fea03a0261f57365095c4b87385d833f7063), ROM_NIBBLE | ROM_BITSHIFT(28))	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROMX_LOAD( "xm674.41",   00000, 01777, CRC(7db5c097) SHA1(364bc41951baa3ad274031bd49abec1cf5b7a980), ROM_NIBBLE | ROM_BITSHIFT(24))	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+	ROMX_LOAD( "xm675.41",   00000, 01777, CRC(26eac1e7) SHA1(9220a1386afae8de96bdb2cf084afbadeeb61d42), ROM_NIBBLE | ROM_BITSHIFT(20))	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+	ROMX_LOAD( "xm673.41",   00000, 01777, CRC(8173d7e3) SHA1(7fbacf6dccb60dfe9cef88a248c3a1660efddcf4), ROM_NIBBLE | ROM_BITSHIFT(16))	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+	ROMX_LOAD( "xm652.41",   00000, 01777, CRC(ddfa94bb) SHA1(38625e269400aaf38cd07b5dbf36c0087a0f1b92), ROM_NIBBLE | ROM_BITSHIFT(12))	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+	ROMX_LOAD( "xm670.41",   00000, 01777, CRC(1cd187f3) SHA1(0fd5eff7c6b5c2383aa20148a795b80286554675), ROM_NIBBLE | ROM_BITSHIFT( 8))	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+	ROMX_LOAD( "xm671.41",   00000, 01777, CRC(f21b1ad7) SHA1(1e18bdb35de7802892ac373c128f900786d40886), ROM_NIBBLE | ROM_BITSHIFT( 4))	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+	ROMX_LOAD( "xm672.41",   00000, 01777, CRC(110ee075) SHA1(bb72fceba5ce9e5e8c8a0024915006bdd011a3f3), ROM_NIBBLE | ROM_BITSHIFT( 0))	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+
+	ROM_REGION( 01040, "displ", 0 )
+	ROMX_LOAD( "displ.a38",  00000, 00377, CRC(fd30beb7) SHA1(65e4a19ba4ff748d525122128c514abedd55d866), ROM_NIBBLE)	//!< P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
+	ROMX_LOAD( "displ.a66",  00400, 00777, CRC(9f91aad9) SHA1(69b1d4c71f4e18103112e8601850c2654e9265cf), ROM_NIBBLE)	//!< P3601 256x4 BPROM; display VSYNC and VBLANK
+	ROMX_LOAD( "displ.a63",  01000, 01037, CRC(82a20d60) SHA1(39d90703568be5419ada950e112d99227873fdea), 0)				//!< 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
+
+	ROM_REGION( 01400, "ether", 0 )
+	ROMX_LOAD( "enet.a41",   00000, 00377, CRC(d5de8d86) SHA1(c134a4c898c73863124361a9b0218f7a7f00082a), ROM_NIBBLE)
+	ROMX_LOAD( "enet.a42",   00400, 00777, CRC(9d5c81bd) SHA1(ac7e63332a3dad0bef7cd0349b24e156a96a4bf0), ROM_NIBBLE)
+	ROMX_LOAD( "enet.a49",   01000, 01377, CRC(4d2dcdb2) SHA1(583327a7d70cd02702c941c0e43c1e9408ff7fd0), ROM_NIBBLE)
+
+	ROM_REGION( 0x0300, "memory", 0 )
+	ROMX_LOAD( "madr.a32",   0x0000, 0x00ff, CRC(a0e3b4a7) SHA1(24e50afdeb637a6a8588f8d3a3493c9188b8da2c), ROM_NIBBLE)	//! P3601 256x4 BPROM; mouse motion signals MX1, MX2, MY1, MY2
+	ROMX_LOAD( "madr.a64",   0x0100, 0x01ff, CRC(a66b0eda) SHA1(4d9088f592caa3299e90966b17765be74e523144), ROM_NIBBLE)	//! P3601 256x4 BPROM; memory addressing
+	ROMX_LOAD( "madr.a65",   0x0200, 0x02ff, CRC(ba37febd) SHA1(82e9db1cb65f451755295f0d179e6f8fe3349d4d), ROM_NIBBLE)	//! P3601 256x4 BPROM; memory addressing
+	ROMX_LOAD( "madr.a90",   0x0300, 0x03ff, CRC(7a2d8799) SHA1(c3760dba147740729d33b9b88e59088a4cc7437a), ROM_NIBBLE)
+	ROMX_LOAD( "madr.a91",   0x0400, 0x04ff, CRC(dd556aeb) SHA1(900f333a091e3ccde0843019c25f25fba62e6023), ROM_NIBBLE)
+ROM_END
+
+/* Game Drivers */
+
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                     FULLNAME                FLAGS */
+COMP( 1974, alto2,      0,      0,      alto2,      alto2, alto2_state, alto2,    "Xerox Alto-II",            "Alto2",               0 )

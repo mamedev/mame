@@ -129,6 +129,7 @@ CPUS += SCORE
 CPUS += ES5510
 CPUS += SCUDSP
 CPUS += IE15
+CPUS += ALTO2
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -2099,6 +2100,7 @@ $(MESSOBJ)/wavemate.a:          \
 $(MESSOBJ)/xerox.a:             \
 	$(MESS_DRIVERS)/xerox820.o  \
 	$(MESS_DRIVERS)/bigbord2.o  \
+	$(MESS_DRIVERS)/alto2.o     \
 
 $(MESSOBJ)/yamaha.a:            \
 	$(MESS_DRIVERS)/ymmu100.o   \

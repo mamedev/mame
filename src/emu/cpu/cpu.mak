@@ -2268,3 +2268,78 @@ $(CPUOBJ)/score/score.o:    $(CPUSRC)/score/score.c \
 $(CPUOBJ)/score/scoredsm.o: $(CPUSRC)/score/scoredsm.c \
 							$(CPUSRC)/score/scorem.h
 
+
+#-------------------------------------------------
+# Xerox Alto-II
+#@src/emu/cpu/alto2/alto2.h,CPUS += ALTO2
+#-------------------------------------------------
+
+ifneq ($(filter ALTO2,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/alto2
+CPUOBJS += $(CPUOBJ)/alto2/alto2.o \
+	$(CPUOBJ)/alto2/a2disk.o \
+	$(CPUOBJ)/alto2/a2disp.o \
+	$(CPUOBJ)/alto2/a2curt.o \
+	$(CPUOBJ)/alto2/a2dht.o \
+	$(CPUOBJ)/alto2/a2dvt.o \
+	$(CPUOBJ)/alto2/a2dwt.o \
+	$(CPUOBJ)/alto2/a2emu.o \
+	$(CPUOBJ)/alto2/a2ether.o \
+	$(CPUOBJ)/alto2/a2ksec.o \
+	$(CPUOBJ)/alto2/a2kwd.o \
+	$(CPUOBJ)/alto2/a2mem.o \
+	$(CPUOBJ)/alto2/a2mouse.o \
+	$(CPUOBJ)/alto2/a2part.o \
+	$(CPUOBJ)/alto2/a2ram.o
+	
+DASMOBJS += $(CPUOBJ)/alto2/alto2dsm.o
+endif
+
+$(CPUOBJ)/alto2/alto2.o:    $(CPUSRC)/alto2/alto2.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2disk.o:   $(CPUSRC)/alto2/a2disk.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2disp.o:   $(CPUSRC)/alto2/a2disp.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2curt.o:   $(CPUSRC)/alto2/a2curt.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2dht.o:    $(CPUSRC)/alto2/a2dht.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2dvt.o:    $(CPUSRC)/alto2/a2dvt.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2dwt.o:    $(CPUSRC)/alto2/a2dwt.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2emu.o:    $(CPUSRC)/alto2/a2emu.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2ether.o:  $(CPUSRC)/alto2/a2ether.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2ksec.o:   $(CPUSRC)/alto2/a2ksec.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2kwd.o:    $(CPUSRC)/alto2/a2kwd.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2mem.o:    $(CPUSRC)/alto2/a2mem.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2mouse.o:  $(CPUSRC)/alto2/a2mouse.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2part.o:   $(CPUSRC)/alto2/a2part.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2ram.o:    $(CPUSRC)/alto2/a2ram.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/alto2dsm.o: $(CPUSRC)/alto2/alto2dsm.c \
+							$(CPUSRC)/alto2/alto2.h
+ 
