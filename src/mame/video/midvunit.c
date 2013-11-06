@@ -120,7 +120,7 @@ void midvunit_renderer::render_flat(INT32 scanline, const extent_t &extent, cons
 
 void midvunit_renderer::render_tex(INT32 scanline, const extent_t &extent, const midvunit_object_data &objectdata, int threadid)
 {
-	UINT16 pixdata = objectdata.pixdata & 0xff00;
+	UINT16 pixdata = objectdata.pixdata;
 	const UINT8 *texbase = objectdata.texbase;
 	int xstep = objectdata.dither + 1;
 	UINT16 *dest = objectdata.destbase + scanline * 512;
@@ -148,7 +148,7 @@ void midvunit_renderer::render_tex(INT32 scanline, const extent_t &extent, const
 	/* general case; render every pixel */
 	for (x = startx; x < stopx; x += xstep)
 	{
-		dest[x] = pixdata | texbase[((v >> 8) & 0xff00) + (u >> 16)];
+		dest[x] = pixdata + texbase[((v >> 8) & 0xff00) + (u >> 16)];
 		u += dudx;
 		v += dvdx;
 	}
@@ -157,7 +157,7 @@ void midvunit_renderer::render_tex(INT32 scanline, const extent_t &extent, const
 
 void midvunit_renderer::render_textrans(INT32 scanline, const extent_t &extent, const midvunit_object_data &objectdata, int threadid)
 {
-	UINT16 pixdata = objectdata.pixdata & 0xff00;
+	UINT16 pixdata = objectdata.pixdata;
 	const UINT8 *texbase = objectdata.texbase;
 	int xstep = objectdata.dither + 1;
 	UINT16 *dest = objectdata.destbase + scanline * 512;
@@ -187,7 +187,7 @@ void midvunit_renderer::render_textrans(INT32 scanline, const extent_t &extent, 
 	{
 		UINT8 pix = texbase[((v >> 8) & 0xff00) + (u >> 16)];
 		if (pix != 0)
-			dest[x] = pixdata | pix;
+			dest[x] = pixdata + pix;
 		u += dudx;
 		v += dvdx;
 	}
@@ -306,16 +306,22 @@ void midvunit_renderer::process_dma_queue()
 	/* make the vertices inclusive of right/bottom points */
 	make_vertices_inclusive(vert);
 
-	/* handle flat-shaded quads here */
+	/* set the palette base */
+	UINT16 pixdata = m_state.m_dma_data[1];
+
 	render_delegate callback;
 	bool textured = ((m_state.m_dma_data[0] & 0x300) == 0x100);
-	if (!textured)
-		callback = render_delegate(FUNC(midvunit_renderer::render_flat), this);
 
+	/* handle flat-shaded quads here */
+	if (!textured)
+	{
+		callback = render_delegate(FUNC(midvunit_renderer::render_flat), this);
+		pixdata += (m_state.m_dma_data[0] & 0x00ff);
+	}
 	/* handle textured quads here */
 	else
 	{
-		/* if textured, add the texture info */
+		/* add the texture info */
 		vert[0].p[0] = (float)(m_state.m_dma_data[10] & 0xff) * 65536.0f + 32768.0f;
 		vert[0].p[1] = (float)(m_state.m_dma_data[10] >> 8) * 65536.0f + 32768.0f;
 		vert[1].p[0] = (float)(m_state.m_dma_data[11] & 0xff) * 65536.0f + 32768.0f;
@@ -327,26 +333,33 @@ void midvunit_renderer::process_dma_queue()
 
 		/* handle non-masked, non-transparent quads */
 		if ((m_state.m_dma_data[0] & 0xc00) == 0x000)
+		{
 			callback = render_delegate(FUNC(midvunit_renderer::render_tex), this);
-
+		}
 		/* handle non-masked, transparent quads */
 		else if ((m_state.m_dma_data[0] & 0xc00) == 0x800)
+		{
 			callback = render_delegate(FUNC(midvunit_renderer::render_textrans), this);
-
+		}
 		/* handle masked, transparent quads */
 		else if ((m_state.m_dma_data[0] & 0xc00) == 0xc00)
+		{
 			callback = render_delegate(FUNC(midvunit_renderer::render_textransmask), this);
-
-		/* handle masked, non-transparent quads */
+			pixdata += (m_state.m_dma_data[0] & 0x00ff);
+		}
+		/* handle masked, non-transparent quads (invalid?) */
 		else
+		{
 			callback = render_delegate(FUNC(midvunit_renderer::render_flat), this);
+			pixdata += (m_state.m_dma_data[0] & 0x00ff);
+		}
 	}
 
 	/* set up the object data for this triangle */
 	midvunit_object_data &objectdata = object_data_alloc();
 	objectdata.destbase = &m_state.m_videoram[(m_state.m_page_control & 4) ? 0x40000 : 0x00000];
 	objectdata.texbase = (UINT8 *)m_state.m_textureram.target() + (m_state.m_dma_data[14] * 256);
-	objectdata.pixdata = m_state.m_dma_data[1] | (m_state.m_dma_data[0] & 0x00ff);
+	objectdata.pixdata = pixdata;
 	objectdata.dither = ((m_state.m_dma_data[0] & 0x2000) != 0);
 
 	/* render as a quad */
