@@ -14,7 +14,7 @@
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
 #include "machine/pc_lpt.h"
-#include "machine/pc_keyboards.h"
+#include "bus/pc_kbd/keyboards.h"
 
 class genpc_state : public driver_device
 {

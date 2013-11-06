@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/southbridge.h"
-#include "machine/pc_keyboards.h"
+#include "bus/pc_kbd/keyboards.h"
 
 
 const struct pit8253_interface at_pit8254_config =

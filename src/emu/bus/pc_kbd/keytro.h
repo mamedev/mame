@@ -8,7 +8,7 @@
 #define __KB_KEYTRO_H__
 
 #include "devcb.h"
-#include "machine/pc_kbdc.h"
+#include "pc_kbdc.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

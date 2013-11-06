@@ -11,7 +11,7 @@
 
 
 #include "includes/at.h"
-#include "machine/pc_keyboards.h"
+#include "bus/pc_kbd/keyboards.h"
 
 
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )

@@ -12,7 +12,7 @@
 #include "machine/am9517a.h"
 #include "machine/isa.h"
 #include "machine/isa_cards.h"
-#include "machine/pc_kbdc.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "sound/speaker.h"

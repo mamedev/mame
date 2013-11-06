@@ -66,7 +66,7 @@ are attached to two switches. The keys appear twice in the keyboard matrix.
 ***************************************************************************/
 
 #include "emu.h"
-#include "kb_keytro.h"
+#include "keytro.h"
 #include "cpu/mcs51/mcs51.h"
 
 

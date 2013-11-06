@@ -1,12 +1,12 @@
 
 #include "emu.h"
-#include "machine/pc_keyboards.h"
-#include "machine/kb_ec1841.h"
-#include "machine/kb_keytro.h"
-#include "machine/kb_msnat.h"
-#include "machine/kb_pc83.h"
-#include "machine/kb_pcxt83.h"
-#include "machine/kb_pcat84.h"
+#include "keyboards.h"
+#include "ec1841.h"
+#include "keytro.h"
+#include "msnat.h"
+#include "pc83.h"
+#include "pcxt83.h"
+#include "pcat84.h"
 
 SLOT_INTERFACE_START(pc_xt_keyboards)
 	SLOT_INTERFACE(STR_KBD_KEYTRONIC_PC3270, PC_KBD_KEYTRONIC_PC3270)

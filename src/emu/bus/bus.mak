@@ -303,6 +303,22 @@ BUSOBJS += $(BUSOBJ)/kc/ram.o
 BUSOBJS += $(BUSOBJ)/kc/rom.o
 endif
 
+#-------------------------------------------------
+#
+#@src/emu/bus/pc_kbd/pc_kbdc.h,BUSES += PC_KBD
+#-------------------------------------------------
+
+ifneq ($(filter PC_KBD,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/pc_kbd/pc_kbdc.o
+BUSOBJS += $(BUSOBJ)/pc_kbd/keyboards.o
+BUSOBJS += $(BUSOBJ)/pc_kbd/ec1841.o
+BUSOBJS += $(BUSOBJ)/pc_kbd/keytro.o
+BUSOBJS += $(BUSOBJ)/pc_kbd/msnat.o
+BUSOBJS += $(BUSOBJ)/pc_kbd/pc83.o
+BUSOBJS += $(BUSOBJ)/pc_kbd/pcat84.o
+BUSOBJS += $(BUSOBJ)/pc_kbd/pcxt83.o
+endif
+
 
 #-------------------------------------------------
 #

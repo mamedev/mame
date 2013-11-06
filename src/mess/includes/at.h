@@ -30,7 +30,6 @@
 #include "imagedev/harddriv.h"
 #include "machine/am9517a.h"
 #include "machine/pci.h"
-#include "machine/kb_keytro.h"
 
 #include "sound/dac.h"
 #include "sound/speaker.h"
@@ -40,7 +39,7 @@
 #include "machine/isa_cards.h"
 
 #include "machine/pc_lpt.h"
-#include "machine/pc_kbdc.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 
 
 class at586_state : public driver_device

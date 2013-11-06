@@ -9,7 +9,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/kb_msnat.h"
+#include "msnat.h"
 #include "cpu/mcs51/mcs51.h"
 
 

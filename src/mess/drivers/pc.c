@@ -103,7 +103,7 @@ video HW too.
 #include "machine/kb_7007_3.h"
 
 #include "machine/ram.h"
-#include "machine/pc_keyboards.h"
+#include "bus/pc_kbd/keyboards.h"
 
 #include "mcfglgcy.h"
 

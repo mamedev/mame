@@ -12,7 +12,7 @@
 
 *********************************************************************/
 
-#include "kb_ec1841.h"
+#include "ec1841.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
 

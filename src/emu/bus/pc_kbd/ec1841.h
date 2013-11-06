@@ -1,8 +1,6 @@
-// license:BSD-3-Clause
-// copyright-holders:Curt Coder
 /**********************************************************************
 
-    IBM Model F PC/XT 83-key keyboard emulation
+    EC-1841 92-key keyboard emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,12 +9,12 @@
 
 #pragma once
 
-#ifndef __PC_KBD_IBM_PC_XT_83__
-#define __PC_KBD_IBM_PC_XT_83__
+#ifndef __PC_KBD_EC_1841__
+#define __PC_KBD_EC_1841__
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/pc_kbdc.h"
+#include "pc_kbdc.h"
 #include "machine/rescap.h"
 
 
@@ -25,25 +23,24 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ibm_pc_xt_83_keyboard_device
+// ======================> ec_1841_keyboard_device
 
-class ibm_pc_xt_83_keyboard_device :  public device_t,
+class ec_1841_keyboard_device :  public device_t,
 										public device_pc_kbd_interface
 {
 public:
 	// construction/destruction
-	ibm_pc_xt_83_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_READ8_MEMBER( bus_r );
 	DECLARE_WRITE8_MEMBER( bus_w );
+	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t0_r );
 	DECLARE_READ8_MEMBER( t1_r );
 
 protected:
@@ -69,17 +66,20 @@ private:
 	required_ioport m_md09;
 	required_ioport m_md10;
 	required_ioport m_md11;
+	required_ioport m_md12;
+	required_ioport m_md13;
+	required_ioport m_md14;
+	required_ioport m_md15;
 
 	UINT8 m_bus;
 	UINT8 m_p1;
 	UINT8 m_p2;
-	int m_sense;
 	int m_q;
 };
 
 
 // device type definition
-extern const device_type PC_KBD_IBM_PC_XT_83;
+extern const device_type PC_KBD_EC_1841;
 
 
 

@@ -7,7 +7,7 @@
 #ifndef __KB_MSNAT_H__
 #define __KB_MSNAT_H__
 
-#include "machine/pc_kbdc.h"
+#include "pc_kbdc.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

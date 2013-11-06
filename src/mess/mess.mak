@@ -495,6 +495,7 @@ BUSES += ECONET
 BUSES += EP64
 BUSES += IEEE488
 BUSES += ISBX
+BUSES += PC_KBD
 BUSES += PET
 BUSES += PLUS4
 BUSES += S100
@@ -801,7 +802,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/ne1000.o    \
 	$(MESS_MACHINE)/ne2000.o    \
 	$(MESS_MACHINE)/null_modem.o\
-	$(MESS_MACHINE)/pc_kbdc.o   \
 	$(MESS_MACHINE)/pc_lpt.o    \
 	$(MESS_MACHINE)/s1410.o     \
 	$(MESS_MACHINE)/sa1403d.o   \
@@ -1634,13 +1634,6 @@ $(MESSOBJ)/pcshare.a:           \
 	$(MESS_MACHINE)/pc_fdc.o    \
 	$(MESS_MACHINE)/pc_joy.o    \
 	$(MESS_MACHINE)/pc_joy_sw.o \
-	$(MESS_MACHINE)/pc_keyboards.o \
-	$(MESS_MACHINE)/kb_ec1841.o \
-	$(MESS_MACHINE)/kb_keytro.o \
-	$(MESS_MACHINE)/kb_msnat.o  \
-	$(MESS_MACHINE)/kb_pc83.o   \
-	$(MESS_MACHINE)/kb_pcxt83.o \
-	$(MESS_MACHINE)/kb_pcat84.o \
 	$(MESS_MACHINE)/ser_mouse.o \
 	$(MESS_VIDEO)/crtc_ega.o    \
 	$(MESS_MACHINE)/i82371ab.o  \

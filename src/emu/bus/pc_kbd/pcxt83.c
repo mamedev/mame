@@ -19,7 +19,7 @@
 
 */
 
-#include "kb_pcxt83.h"
+#include "pcxt83.h"
 
 
 
