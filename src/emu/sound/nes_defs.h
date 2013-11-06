@@ -197,7 +197,7 @@ struct dpcm_t
 		enabled = false;
 		irq_occurred = false;
 		memory = NULL;
-		vol = NULL;
+		vol = 0;
 		}
 
 	uint8 regs[4];
