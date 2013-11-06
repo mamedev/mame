@@ -250,6 +250,16 @@ public:
 	DECLARE_READ16_MEMBER(hdsnddsp_rom_r);
 	DECLARE_READ16_MEMBER(hdsnddsp_comram_r);
 	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
+	void init_driver();
+	void init_multisync(int compact_inputs);
+	void init_adsp();
+	void init_ds3();
+	void init_dsk();
+	void init_dsk2();
+	void init_dspcom();
+	void init_driver_sound();
+	void racedrivc_init_common(offs_t gsp_protection);
+	void steeltal_init_common(offs_t ds3_transfer_pc, int proto_sloop);
 	DECLARE_DRIVER_INIT(strtdriv);
 	DECLARE_DRIVER_INIT(harddrivc);
 	DECLARE_DRIVER_INIT(hdrivairp);
@@ -273,6 +283,10 @@ public:
 	optional_device<dac_device> m_dac;
 	required_device<duartn68681_device> m_duart;
 	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
+	
+	/*----------- defined in audio/harddriv.c -----------*/
+
+	void hdsnd_init();
 	
 	/*----------- defined in machine/harddriv.c -----------*/
 
@@ -437,9 +451,6 @@ INT32 hdds3xdsp_serial_rx_callback(adsp21xx_device &device, int port);
 /* DSK board */
 void hddsk_update_pif(dsp32c_device &device, UINT32 pins);
 
-/*----------- defined in audio/harddriv.c -----------*/
-
-void hdsnd_init(running_machine &machine);
 
 /*----------- defined in video/harddriv.c -----------*/
 

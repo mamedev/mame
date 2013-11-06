@@ -23,11 +23,10 @@
  *
  *************************************/
 
-void hdsnd_init(running_machine &machine)
+void harddriv_state::hdsnd_init()
 {
-	harddriv_state *state = machine.driver_data<harddriv_state>();
-	state->m_rombase = (UINT8 *)state->memregion("serialroms")->base();
-	state->m_romsize = state->memregion("serialroms")->bytes();
+	m_rombase = (UINT8 *)memregion("serialroms")->base();
+	m_romsize = memregion("serialroms")->bytes();
 }
 
 
