@@ -563,7 +563,7 @@ UINT32 mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void mb_vcu_device::screen_eof(void)
 {
-	for(int i=0;i<0x10000;i++)
+	//for(int i=0;i<0x10000;i++)
 	{
 		//write_byte(i|0x00000|m_vbank<<18,0x0f);
 		//write_byte(i|0x10000|m_vbank<<18,0x0f);
