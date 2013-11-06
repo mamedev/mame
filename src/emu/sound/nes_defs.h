@@ -55,7 +55,7 @@ struct queue_t
 		queue_t():
 		pos(0),
 		reg(""),val("") {}
-	
+
 	int pos;
 	unsigned char reg, val;
 };
@@ -108,7 +108,7 @@ struct square_t
 			env_vol = 0;
 			enabled = false;
 		}
-			
+
 	uint8 regs[4];
 	int vbl_length;
 	int freq;
@@ -139,7 +139,7 @@ struct triangle_t
 			counter_started = false;
 			enabled = false;
 		}
-	
+
 	uint8 regs[4]; /* regs[1] unused */
 	int linear_length;
 	int vbl_length;
@@ -199,7 +199,7 @@ struct dpcm_t
 		memory = NULL;
 		vol = NULL;
 		}
-		
+
 	uint8 regs[4];
 	uint32 address;
 	uint32 length;
@@ -223,7 +223,7 @@ struct apu_t
 		buf_pos = 0;
 		step_mode = 0;
 		}
-		
+
 	/* Sound channels */
 	square_t   squ[2];
 	triangle_t tri;

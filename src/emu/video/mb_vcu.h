@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER( background_color_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( vbank_w );
+	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(void);
@@ -65,10 +66,13 @@ protected:
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 private:
-	inline UINT16 read_byte(offs_t address);
+	inline UINT8 read_byte(offs_t address);
 	inline void write_byte(offs_t address, UINT8 data);
+	inline UINT8 read_io(offs_t address);
+	inline void write_io(offs_t address, UINT8 data);
 
-	const address_space_config      m_space_config;
+	const address_space_config      m_videoram_space_config;
+	const address_space_config      m_paletteram_space_config;
 	UINT8 m_status;
 	UINT8 *m_ram;
 	cpu_device *m_cpu;

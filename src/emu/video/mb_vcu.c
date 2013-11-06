@@ -4,6 +4,20 @@
 
 Device for Mazer Blazer/Great Guns custom Video Controller Unit
 
+Written by Angelo Salese, based off old implementation by Jarek Burczynski
+
+TODO:
+- understand what exactly modes 0x03 and 0x13 really reads in set_clr() and
+  where it puts results (yeah, shared VCU RAM, but exactly where?). Almost
+  surely Mazer Blazer tries to read the pixel data for collision detection and
+  Great Guns read backs VRAM for VCU test (patched for now, btw).
+- Understand look-up tables in i/o space.
+- Understand how to handle layer clearance.
+- Understand how planes are really handled.
+- Understand how transparent pens are handled (is 0x0f always transparent or
+  there's some clut gimmick? Great Guns title screen makes me think of the
+  latter option)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -22,6 +36,40 @@ static ADDRESS_MAP_START( mb_vcu_vram, AS_0, 8, mb_vcu_device )
 	AM_RANGE(0x00000,0x7ffff) AM_RAM // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( mb_vcu_pal_ram, AS_1, 8, mb_vcu_device )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM
+	AM_RANGE(0x0200, 0x02ff) AM_RAM
+	AM_RANGE(0x0400, 0x04ff) AM_RAM
+	AM_RANGE(0x0600, 0x06ff) AM_WRITE(mb_vcu_paletteram_w)
+ADDRESS_MAP_END
+
+WRITE8_MEMBER( mb_vcu_device::mb_vcu_paletteram_w )
+{
+	int r,g,b, bit0, bit1, bit2;
+
+	UINT8 colour = data;
+
+	/* red component */
+	bit1 = (colour >> 7) & 0x01;
+	bit0 = (colour >> 6) & 0x01;
+	r = combine_2_weights(m_weights_r, bit0, bit1);
+
+	/* green component */
+	bit2 = (colour >> 5) & 0x01;
+	bit1 = (colour >> 4) & 0x01;
+	bit0 = (colour >> 3) & 0x01;
+	g = combine_3_weights(m_weights_g, bit0, bit1, bit2);
+
+	/* blue component */
+	bit2 = (colour >> 2) & 0x01;
+	bit1 = (colour >> 1) & 0x01;
+	bit0 = (colour >> 0) & 0x01;
+	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
+
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
+}
+
 //-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
@@ -29,7 +77,12 @@ ADDRESS_MAP_END
 
 const address_space_config *mb_vcu_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_0) ? &m_space_config : NULL;
+	switch (spacenum)
+	{
+		case AS_0: return &m_videoram_space_config;
+		case AS_1: return &m_paletteram_space_config;
+		default: return NULL;
+	}
 }
 
 //**************************************************************************
@@ -40,19 +93,38 @@ const address_space_config *mb_vcu_device::memory_space_config(address_spacenum 
 //  read_byte - read a byte at the given address
 //-------------------------------------------------
 
-inline UINT16 mb_vcu_device::read_byte(offs_t address)
+inline UINT8 mb_vcu_device::read_byte(offs_t address)
 {
-	return space().read_byte(address);
+	return space(AS_0).read_byte(address);
 }
 
 //-------------------------------------------------
-//  write_word - write a word at the given address
+//  write_byte - write a byte at the given address
 //-------------------------------------------------
 
 inline void mb_vcu_device::write_byte(offs_t address, UINT8 data)
 {
-	space().write_byte(address, data);
+	space(AS_0).write_byte(address, data);
 }
+
+//-------------------------------------------------
+//  read_byte - read a byte at the given i/o
+//-------------------------------------------------
+
+inline UINT8 mb_vcu_device::read_io(offs_t address)
+{
+	return space(AS_1).read_byte(address);
+}
+
+//-------------------------------------------------
+//  write_byte - write a byte at the given i/o
+//-------------------------------------------------
+
+inline void mb_vcu_device::write_io(offs_t address, UINT8 data)
+{
+	space(AS_1).write_byte(address, data);
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -66,7 +138,8 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MB_VCU, "Mazer Blazer custom VCU", tag, owner, clock, "mb_vcu", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram))
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_vram)),
+		m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(mb_vcu_pal_ram))
 {
 }
 
@@ -256,9 +329,8 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 					if(dstx >= 0 && dsty >= 0 && dstx < 256 && dsty < 256)
 					{
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (6-(bits & 7));
-						dot&= 3;
 
-						switch(dot)
+						switch(dot & 3)
 						{
 							case 0:
 								pen = m_color1 & 0xf;
@@ -292,6 +364,11 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	return 0; // open bus?
 }
 
+/*
+---0 -111 (0x07) write to i/o?
+---0 -011 (0x03) read to i/o?
+---1 -011 (0x13) read to vram?
+*/
 READ8_MEMBER( mb_vcu_device::load_set_clr )
 {
 	int xi,yi;
@@ -355,35 +432,9 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 			break;
 
 		case 0x07:
-			switch(m_ypos)
-			{
-				case 6:
-					int r,g,b, bit0, bit1, bit2;
+			for(int i=0;i<m_pix_xsize;i++)
+				write_io(i+(m_ypos<<8),m_ram[offset + i]);
 
-					for(int i=0;i<m_pix_xsize;i++)
-					{
-						UINT8 colour = m_ram[offset + i];
-						/* red component */
-						bit1 = (colour >> 7) & 0x01;
-						bit0 = (colour >> 6) & 0x01;
-						r = combine_2_weights(m_weights_r, bit0, bit1);
-
-						/* green component */
-						bit2 = (colour >> 5) & 0x01;
-						bit1 = (colour >> 4) & 0x01;
-						bit0 = (colour >> 3) & 0x01;
-						g = combine_3_weights(m_weights_g, bit0, bit1, bit2);
-
-						/* blue component */
-						bit2 = (colour >> 2) & 0x01;
-						bit1 = (colour >> 1) & 0x01;
-						bit0 = (colour >> 0) & 0x01;
-						b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
-
-						palette_set_color(machine(), i, MAKE_RGB(r, g, b));
-					}
-					break;
-			}
 			break;
 	}
 

@@ -114,17 +114,17 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	{
 		m_noise_lut[i] = 0;
 	}
-	
+
 	for (int i = 0; i < 0X20; i++)
 	{
 		m_vbl_times[i] = 0;
 	}
-	
+
 	for (int i = 0; i < SYNCS_MAX1; i++)
 	{
 		m_sync_times1[i] = 0;
 	}
-	
+
 	for (int i = 0; i < SYNCS_MAX2; i++)
 	{
 		m_sync_times2[i] = 0;
@@ -233,7 +233,7 @@ void nesapu_device::device_start()
 	#else
 	save_item(NAME(m_APU.buf_pos));
 	save_item(NAME(m_APU.step_mode));
-	#endif	
+	#endif
 }
 
 /* TODO: sound channels should *ALL* have DC volume decay */
