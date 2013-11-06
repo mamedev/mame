@@ -104,7 +104,7 @@ const device_type NES_APU = &device_creator<nesapu_device>;
 nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NES_APU, "N2A03 APU", tag, owner, clock, "nesapu", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_apu_incsize(0.0d),
+		m_apu_incsize(0.0),
 		m_samps_per_sync(0),
 		m_buffer_size(0),
 		m_real_rate(0),
