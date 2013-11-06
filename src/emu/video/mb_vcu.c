@@ -41,30 +41,35 @@ static ADDRESS_MAP_START( mb_vcu_pal_ram, AS_1, 8, mb_vcu_device )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM
 	AM_RANGE(0x0400, 0x04ff) AM_RAM
-	AM_RANGE(0x0600, 0x06ff) AM_WRITE(mb_vcu_paletteram_w)
+	AM_RANGE(0x0600, 0x06ff) AM_READWRITE(mb_vcu_paletteram_r,mb_vcu_paletteram_w)
 ADDRESS_MAP_END
+
+READ8_MEMBER( mb_vcu_device::mb_vcu_paletteram_r )
+{
+	return m_palram[offset];
+}
 
 WRITE8_MEMBER( mb_vcu_device::mb_vcu_paletteram_w )
 {
 	int r,g,b, bit0, bit1, bit2;
 
-	UINT8 colour = data;
+	m_palram[offset] = data;
 
 	/* red component */
-	bit1 = (colour >> 7) & 0x01;
-	bit0 = (colour >> 6) & 0x01;
+	bit1 = (m_palram[offset] >> 7) & 0x01;
+	bit0 = (m_palram[offset] >> 6) & 0x01;
 	r = combine_2_weights(m_weights_r, bit0, bit1);
 
 	/* green component */
-	bit2 = (colour >> 5) & 0x01;
-	bit1 = (colour >> 4) & 0x01;
-	bit0 = (colour >> 3) & 0x01;
+	bit2 = (m_palram[offset] >> 5) & 0x01;
+	bit1 = (m_palram[offset] >> 4) & 0x01;
+	bit0 = (m_palram[offset] >> 3) & 0x01;
 	g = combine_3_weights(m_weights_g, bit0, bit1, bit2);
 
 	/* blue component */
-	bit2 = (colour >> 2) & 0x01;
-	bit1 = (colour >> 1) & 0x01;
-	bit0 = (colour >> 0) & 0x01;
+	bit2 = (m_palram[offset] >> 2) & 0x01;
+	bit1 = (m_palram[offset] >> 1) & 0x01;
+	bit0 = (m_palram[offset] >> 0) & 0x01;
 	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
 	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
@@ -185,6 +190,7 @@ void mb_vcu_device::device_start()
 	// TODO: m_screen_tag
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	m_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_palram = auto_alloc_array_clear(machine(), UINT8, 0x100);
 
 	{
 		static const int resistances_r[2]  = { 4700, 2200 };

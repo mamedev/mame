@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER( background_color_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( vbank_w );
+	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
 	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -75,6 +76,7 @@ private:
 	const address_space_config      m_paletteram_space_config;
 	UINT8 m_status;
 	UINT8 *m_ram;
+	UINT8 *m_palram;
 	cpu_device *m_cpu;
 	UINT16 m_param_offset_latch;
 
