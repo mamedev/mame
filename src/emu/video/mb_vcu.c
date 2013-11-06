@@ -275,7 +275,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	int dstx,dsty;
 	UINT8 dot;
 	int bits = 0;
-	UINT8 pen;
+	UINT8 pen = 0;
 	UINT8 cur_layer;
 
 	cur_layer = 0;//(m_mode & 0x3) << 16;

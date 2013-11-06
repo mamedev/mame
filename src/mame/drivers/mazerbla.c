@@ -343,7 +343,7 @@ WRITE8_MEMBER(mazerbla_state::cfb_vbank_w)
 #endif
 
 
-WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)/* mazer blazer */
+WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)
 {
 	m_gfx_rom_bank = data;
 
