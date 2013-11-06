@@ -10,6 +10,27 @@
 
 #include "includes/alto2.h"
 
+
+READ32_MEMBER( alto2_state::alto2_ucode_r )
+{
+	return 0;
+}
+
+WRITE32_MEMBER( alto2_state::alto2_ucode_w )
+{
+
+}
+
+READ16_MEMBER( alto2_state::alto2_ram_r )
+{
+	return 0;
+}
+
+WRITE16_MEMBER( alto2_state::alto2_ram_w )
+{
+
+}
+
 /* Memory Maps */
 
 #if	(ALTO2_CRAM_CONFIG==1)
@@ -33,6 +54,27 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( alto2_ram_map, AS_IO, 16, alto2_state )
 	AM_RANGE(0x0000, ALTO2_RAM_SIZE/2-1) AM_READWRITE(alto2_ram_r, alto2_ram_w)
 ADDRESS_MAP_END
+
+
+/* Video */
+
+UINT32 alto2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
+
+void alto2_state::screen_eof_alto2(screen_device &screen, bool state)
+{
+
+}
+
+/* Driver Init */
+
+DRIVER_INIT_MEMBER( alto2_state, alto2 )
+{
+
+}
+
 
 /* Input Ports */
 
@@ -175,7 +217,7 @@ static INPUT_PORTS_START( alto2 )
 	PORT_BIT(A2_KEY_P,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')	//!< normal: .    shifted: >
 	PORT_BIT(A2_KEY_S,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')//!< normal: ;    shifted: :
 	PORT_BIT(A2_KEY_RETURN,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\013')			//!< RETURN
-	PORT_BIT(A2_KEY_L,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("← ↑") PORT_CODE(KEYCODE_LEFT)								//!< normal: left arrow   shifted: up arrow (caret)
+	PORT_BIT(A2_KEY_L,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("â†� â†‘") PORT_CODE(KEYCODE_LEFT)								//!< normal: left arrow   shifted: up arrow (caret)
 	PORT_BIT(A2_KEY_DEL,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)								//!< normal: DEL  shifted: ?
 	PORT_BIT(A2_KEY_MSW_2_17,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2/17") PORT_CODE(KEYCODE_MENU)								//!< unused on Microswitch KDB
 
@@ -255,17 +297,14 @@ void alto2_state::palette_init()
 
 static MACHINE_CONFIG_START( alto2, alto2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ALTO2, 20160000)
+	MCFG_CPU_ADD("maincpu", ALTO2, XTAL_20_16MHz)
 	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
 	MCFG_CPU_IO_MAP(alto2_ram_map)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(ALTO2_DISPLAY_VBLANK_TIME))
 
 	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz, ALTO2_DISPLAY_TOTAL_WIDTH, 0, ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_TOTAL_HEIGHT, 0, ALTO2_DISPLAY_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(alto2_state, screen_update)
-	MCFG_SCREEN_SIZE(ALTO2_DISPLAY_TOTAL_WIDTH, ALTO2_DISPLAY_HLC_END-1)
-	MCFG_SCREEN_VISIBLE_AREA(0, ALTO2_DISPLAY_WIDTH-1, 0, ALTO2_DISPLAY_HEIGHT-1)
 	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
 
 	MCFG_GFXDECODE(alto2)
@@ -363,5 +402,5 @@ ROM_END
 
 /* Game Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                     FULLNAME                FLAGS */
-COMP( 1974, alto2,      0,      0,      alto2,      alto2, alto2_state, alto2,    "Xerox Alto-II",            "Alto2",               0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME   FLAGS
+COMP( 1974, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", GAME_NOT_WORKING )

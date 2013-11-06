@@ -9,12 +9,158 @@
  *****************************************************************************/
 #include "alto2.h"
 
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type ALTO2 = &device_creator<alto2_cpu_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  alto2_cpu_device - constructor
+//-------------------------------------------------
+
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 	m_ucode_config("program", ENDIANNESS_BIG, 8, 32, 0),
 	m_ram_config("io", ENDIANNESS_BIG, 8, 16, 0)
 {
 }
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+// FIXME
+void alto2_cpu_device::device_start()
+{
+
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+// FIXME
+void alto2_cpu_device::device_reset()
+{
+
+}
+
+//-------------------------------------------------
+//  execute_set_input - act on a changed input/
+//  interrupt line
+//-------------------------------------------------
+
+// FIXME
+void alto2_cpu_device::execute_set_input(int inputnum, int state)
+{
+
+}
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
+
+// FIXME
+void alto2_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+}
+
+// FIXME
+void alto2_cpu_device::fatal(int level, const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	fatalerror(format, ap);
+	va_end(ap);
+}
+
+#if 0
+// FIXME
+void alto2_cpu_device::init_mrt(int task)
+{
+
+}
+
+// FIXME
+int alto2_cpu_device::drive_ready_0(int unit)
+{
+	return 0;
+}
+
+// FIXME
+int alto2_cpu_device::drive_sector_mark_0(int unit)
+{
+	return 0;
+}
+
+// FIxME
+void alto2_cpu_device::drive_egate(int unit, int gate)
+{
+
+}
+
+// FIXME
+void alto2_cpu_device::drive_wrgate(int unit, int gate)
+{
+
+}
+
+// FIXME
+void alto2_cpu_device::drive_rdgate(int unit, int gate)
+{
+
+}
+
+// FIXME
+int alto2_cpu_device::drive_bits_per_sector() const
+{
+	return 0;
+}
+
+// FIXME
+attotime alto2_cpu_device::drive_bit_time(int unit)
+{
+	return attotime::from_double(0);
+}
+
+// FIXME
+void alto2_cpu_device::drive_wrdata(int unit, int index, int wrdata)
+{
+
+}
+
+// FIXME
+int alto2_cpu_device::drive_rddata(int unit, int index)
+{
+	return 0;
+}
+
+// FIXME
+int alto2_cpu_device::drive_rdclk(int unit, int index)
+{
+	return 0;
+}
+
+// FIXME
+int alto2_cpu_device::drive_sector(int unit)
+{
+	return 0;
+}
+
+// FIXME
+void alto2_cpu_device::drive_strobe(int unit, int cylinder, int restore, int strobe)
+{
+
+}
+#endif
 
 /** @brief task names */
 const char* alto2_cpu_device::task_name(int task)

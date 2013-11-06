@@ -26,7 +26,7 @@ extern void logprintf(int type, int level, const char* format, ...);
 #define	LOG(x)
 #endif
 
-extern void fatal(int level, const char* format, ...);
+//extern void fatal(int level, const char* format, ...);
 
 #define	USE_PRIO_F9318	0			//!< define to 1 to use the F9318 priority encoder code
 #define	USE_ALU_74181	1			//!< define to 1 to use the SN74181 ALU code
@@ -235,6 +235,8 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 private:
+	void fatal(int level, const char *format, ...);
+
 	address_space_config m_ucode_config;
 	address_space_config m_ram_config;
 

@@ -43,15 +43,15 @@ public:
 	DECLARE_READ16_MEMBER(alto2_ram_r);
 	DECLARE_WRITE16_MEMBER(alto2_ram_w);
 	DECLARE_DRIVER_INIT(alto2);
-	virtual void machine_reset();
-	virtual void video_start();
+//	virtual void machine_reset();
+//	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_MACHINE_RESET(alto2);
 	void screen_eof_alto2(screen_device &screen, bool state);
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ucode;
+//	required_device<ram_device> m_ucode;
 	required_device<ram_device> m_ram;
 #if	0	// FIXME: write a harddisk_image_device like device_t for the DIABLO31
 	required_device<diablo_device> m_disk0;
@@ -70,7 +70,7 @@ protected:
 	optional_ioport m_io_config;
 
 	// FIXME: use device timers instead of individual emu_timer* in alto2 code(?)
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+//	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 #endif /* _INCLUDES_ALTO2_H_ */
