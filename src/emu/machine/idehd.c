@@ -434,12 +434,11 @@ void ata_mass_storage_device::read_first_sector()
 
 		/* just set a timer */
 		int new_lba = lba_address();
-		attotime seek_time;
+		int diff = abs(m_cur_lba - new_lba);
+		int total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
+		attotime seek_time = TIME_NO_SEEK_MULTISECTOR + ((TIME_SEEK_MULTISECTOR * diff) / total_sectors);
 
-		if (new_lba == m_cur_lba || new_lba == m_cur_lba + 1)
-			start_busy(TIME_NO_SEEK_MULTISECTOR, PARAM_COMMAND);
-		else
-			start_busy(TIME_SEEK_MULTISECTOR, PARAM_COMMAND);
+		start_busy(seek_time, PARAM_COMMAND);
 
 		m_cur_lba = new_lba;
 	}
