@@ -7,17 +7,6 @@
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
-**********************************************************************
-
-    D9060: Tandon TM602S
-    chdman createhd -o d9060.chd -chs 153,4,32 -ss 256
-
-    D9090: Tandon TM603S
-    chdman createhd -o d9090.chd -chs 153,6,32 -ss 256
-
-    How to format the disk:
-    HEADER "LABEL",D0,I01
-
 **********************************************************************/
 
 #pragma once
@@ -69,7 +58,6 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
-	DECLARE_READ_LINE_MEMBER( req_r );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
 	DECLARE_WRITE8_MEMBER( scsi_data_w );

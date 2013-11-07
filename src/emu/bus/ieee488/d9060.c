@@ -9,6 +9,27 @@
 
 **********************************************************************/
 
+/*
+
+    Use the CHDMAN utility to create a 5MB image for D9060:
+
+    $ chdman createhd -o tm602s.chd -chs 153,4,32 -ss 256
+
+    or a 10MB image for D9090:
+
+    $ chdman createhd -o tm603s.chd -chs 153,6,32 -ss 256
+
+    Start the PET emulator with the D9060 attached on the IEEE-488 bus,
+    with the new CHD mounted:
+
+    $ mess pet8032 -ieee8 d9060 -hard tm602s.chd
+    $ mess pet8032 -ieee8 d9090 -hard tm603s.chd
+
+    Enter 'HEADER "LABEL",D0,I01' to format the hard drive.
+    Wait up to 1 hour and 20 minutes.
+
+*/
+
 #include "d9060.h"
 #include "d9060hd.h"
 #include "machine/scsibus.h"
@@ -54,12 +75,16 @@ const device_type D9090 = &device_creator<d9090_device>;
 
 ROM_START( d9060 )
 	ROM_REGION( 0x4000, M6502_DOS_TAG, 0 )
-	ROM_LOAD( "300516-001.7c", 0x0000, 0x2000, CRC(2d758a14) SHA1(c959cc9dde84fc3d64e95e58a0a096a26d8107fd) ) // Revision A
-	ROM_LOAD( "300517-001.7d", 0x2000, 0x2000, CRC(566df630) SHA1(b1602dfff408b165ee52a6a4ca3e2ec27e689ba9) ) // Revision A
-	ROM_LOAD( "300516-002.7c", 0x0000, 0x2000, CRC(2d758a14) SHA1(c959cc9dde84fc3d64e95e58a0a096a26d8107fd) ) // Revision B
-	ROM_LOAD( "300517-002.7d", 0x2000, 0x2000, CRC(f0382bc3) SHA1(0b0a8dc520f5b41ffa832e4a636b3d226ccbb7f1) ) // Revision B
-	ROM_LOAD( "300516-003.7c", 0x0000, 0x2000, CRC(d6a3e88f) SHA1(bb1ddb5da94a86266012eca54818aa21dc4cef6a) ) // Revision C
-	ROM_LOAD( "300517-003.7d", 0x2000, 0x2000, CRC(2a9ad4ad) SHA1(4c17d014de48c906871b9b6c7d037d8736b1fd52) ) // Revision C
+	ROM_DEFAULT_BIOS("rc")
+	ROM_SYSTEM_BIOS( 0, "ra", "Revision A" )
+	ROMX_LOAD( "300516-001.7c", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "300517-001.7d", 0x2000, 0x2000, CRC(566df630) SHA1(b1602dfff408b165ee52a6a4ca3e2ec27e689ba9), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "rb", "Revision B" )
+	ROMX_LOAD( "300516-002.7c", 0x0000, 0x2000, CRC(2d758a14) SHA1(c959cc9dde84fc3d64e95e58a0a096a26d8107fd), ROM_BIOS(2) )
+	ROMX_LOAD( "300517-002.7d", 0x2000, 0x2000, CRC(f0382bc3) SHA1(0b0a8dc520f5b41ffa832e4a636b3d226ccbb7f1), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "rc", "Revision C" )
+	ROMX_LOAD( "300516-003.7c", 0x0000, 0x2000, CRC(d6a3e88f) SHA1(bb1ddb5da94a86266012eca54818aa21dc4cef6a), ROM_BIOS(3) )
+	ROMX_LOAD( "300517-003.7d", 0x2000, 0x2000, CRC(2a9ad4ad) SHA1(4c17d014de48c906871b9b6c7d037d8736b1fd52), ROM_BIOS(3) )
 
 	ROM_REGION( 0x800, M6502_HDC_TAG, 0 )
 	ROM_LOAD( "300515-001.4c", 0x000, 0x800, CRC(99e096f7) SHA1(a3d1deb27bf5918b62b89c27fa3e488eb8f717a4) ) // Revision A
@@ -115,12 +140,6 @@ static ADDRESS_MAP_START( d9060_hdc_mem, AS_PROGRAM, 8, base_d9060_device )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION(M6502_HDC_TAG, 0)
 ADDRESS_MAP_END
-
-
-WRITE_LINE_MEMBER( base_d9060_device::req_w )
-{
-	m_via->write_ca1(state);
-}
 
 
 //-------------------------------------------------
@@ -372,11 +391,6 @@ WRITE8_MEMBER( base_d9060_device::via_pb_w )
 	m_sasibus->scsi_rst_w(BIT(data, 1));
 }
 
-READ_LINE_MEMBER( base_d9060_device::req_r )
-{
-	return m_sasibus->scsi_req_r();
-}
-
 WRITE_LINE_MEMBER( base_d9060_device::ack_w )
 {
 	m_sasibus->scsi_ack_w(!state);
@@ -406,11 +420,16 @@ WRITE8_MEMBER( base_d9060_device::scsi_data_w )
 	}
 }
 
+WRITE_LINE_MEMBER( base_d9060_device::req_w )
+{
+	m_via->write_ca1(state);
+}
+
 static const via6522_interface via_intf =
 {
 	DEVCB_DEVICE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_data_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, req_r),
+	DEVCB_DEVICE_LINE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_req_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

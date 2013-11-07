@@ -463,11 +463,11 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 
 	data |= m_rdy;
 
-	data |= (m_req || !m_sasibus->scsi_req_r()) << 1;
-	data |= m_sasibus->scsi_io_r() << 2;
-	data |= !m_sasibus->scsi_cd_r() << 3;
-	data |= !m_sasibus->scsi_msg_r() << 4;
-	data |= !m_sasibus->scsi_bsy_r() << 5;
+	data |= (m_req || m_sasibus->scsi_req_r()) << 1;
+	data |= !m_sasibus->scsi_io_r() << 2;
+	data |= m_sasibus->scsi_cd_r() << 3;
+	data |= m_sasibus->scsi_msg_r() << 4;
+	data |= m_sasibus->scsi_bsy_r() << 5;
 
 	return data ^ 0xff;
 }
