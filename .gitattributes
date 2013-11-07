@@ -933,6 +933,7 @@ src/emu/cpu/alto2/a2ksec.c svneol=native#text/plain
 src/emu/cpu/alto2/a2kwd.c svneol=native#text/plain
 src/emu/cpu/alto2/a2mem.c svneol=native#text/plain
 src/emu/cpu/alto2/a2mouse.c svneol=native#text/plain
+src/emu/cpu/alto2/a2mrt.c svneol=native#text/plain
 src/emu/cpu/alto2/a2part.c svneol=native#text/plain
 src/emu/cpu/alto2/a2ram.c svneol=native#text/plain
 src/emu/cpu/alto2/alto2.c svneol=native#text/plain
