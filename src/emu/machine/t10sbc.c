@@ -12,6 +12,10 @@ void t10sbc::t10_reset()
 {
 	t10spc::t10_reset();
 
+	lba = 0;
+	blocks = 0;
+	m_sector_bytes = 512;
+
 	disk = m_image->get_hard_disk_file();
 	if (!disk)
 	{
@@ -23,10 +27,6 @@ void t10sbc::t10_reset()
 		const hard_disk_info *hdinfo = hard_disk_get_info(disk);
 		m_sector_bytes = hdinfo->sectorbytes;
 	}
-
-	lba = 0;
-	blocks = 0;
-	m_sector_bytes = 512;
 }
 
 // scsihd_exec_command
