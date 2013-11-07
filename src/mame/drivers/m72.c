@@ -356,7 +356,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::m72_main_mcu_w),this));
 	membank("bank1")->set_base(m_protection_ram);
 
-	//io.install_legacy_write_handler(0xc0, 0xc1, FUNC(loht_sample_trigger_w));
+	//io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::loht_sample_trigger_w),this));
 	io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::m72_main_mcu_sound_w),this));
 
 	/* sound cpu */

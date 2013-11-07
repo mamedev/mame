@@ -3,7 +3,10 @@
     Bally Astrocade-based hardware
 
 ***************************************************************************/
+#include "sound/astrocde.h"
 #include "sound/samples.h"
+#include "sound/votrax.h"
+
 #define ASTROCADE_CLOCK     (XTAL_14_31818MHz/2)
 
 #define AC_SOUND_PRESENT    (0x01)
@@ -25,20 +28,28 @@ public:
 
 	astrocde_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_protected_ram(*this, "protected_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_votrax(*this, "votrax"),
+		m_astrocade_sound1(*this, "astrocade1"),
+		m_videoram(*this, "videoram"),
+		m_protected_ram(*this, "protected_ram") { }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
+	optional_device<samples_device> m_samples;
+	optional_device<votrax_sc01_device> m_votrax;
+	optional_device<astrocade_device> m_astrocade_sound1;
 	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_protected_ram;
+	
 	UINT8 m_video_config;
 	UINT8 m_sparkle[4];
 	char m_totalword[256];
 	char *m_totalword_ptr;
 	char m_oldword[256];
 	int m_plural;
-	optional_shared_ptr<UINT8> m_protected_ram;
 	UINT8 m_port_1_last;
 	UINT8 m_port_2_last;
 	UINT8 m_ram_write_enable;
@@ -141,9 +152,14 @@ public:
 	void execute_blit(address_space &space);
 	void init_sparklestar();
 	virtual void machine_start();
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
-	optional_device<samples_device> m_samples;
+	
+	/*----------- defined in audio/wow.c -----------*/
+	DECLARE_READ8_MEMBER( wow_speech_r );
+	CUSTOM_INPUT_MEMBER( wow_speech_status_r );
+	
+	/*----------- defined in audio/gorf.c -----------*/
+	DECLARE_READ8_MEMBER( gorf_speech_r );
+	CUSTOM_INPUT_MEMBER( gorf_speech_status_r );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -153,12 +169,6 @@ protected:
 
 extern const char *const wow_sample_names[];
 
-DECLARE_READ8_HANDLER( wow_speech_r );
-CUSTOM_INPUT( wow_speech_status_r );
-
 /*----------- defined in audio/gorf.c -----------*/
 
 extern const char *const gorf_sample_names[];
-
-DECLARE_READ8_HANDLER( gorf_speech_r );
-CUSTOM_INPUT( gorf_speech_status_r );

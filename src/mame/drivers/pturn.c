@@ -557,8 +557,8 @@ ROM_END
 DRIVER_INIT_MEMBER(pturn_state,pturn)
 {
 	/*
-	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0xc0dd, 0xc0dd, FUNC(pturn_protection_r));
-	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0xc0db, 0xc0db, FUNC(pturn_protection2_r));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0dd, 0xc0dd, read8_delegate(FUNC(pturn_state::pturn_protection_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0db, 0xc0db, read8_delegate(FUNC(pturn_state::pturn_protection2_r), this));
 	*/
 }
 

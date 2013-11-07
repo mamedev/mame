@@ -19,8 +19,6 @@ gorf_sh_ update- Null
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/samples.h"
-#include "sound/votrax.h"
 #include "includes/astrocde.h"
 
 
@@ -110,16 +108,15 @@ const char *const gorf_sample_names[] =
 };
 
 
-READ8_HANDLER( gorf_speech_r )
+READ8_MEMBER( astrocde_state::gorf_speech_r )
 {
 	UINT8 data = offset >> 8;
 #if USE_FAKE_VOTRAX
-	astrocde_state *state = space.machine().driver_data<astrocde_state>();
-	int Phoneme, Intonation;
+		int Phoneme, Intonation;
 	int i = 0;
 	offset &= 0xff;
 
-	state->m_totalword_ptr = state->m_totalword;
+	m_totalword_ptr = m_totalword;
 
 	Phoneme = data & 0x3F;
 	Intonation = data >> 6;
@@ -127,53 +124,52 @@ READ8_HANDLER( gorf_speech_r )
 	logerror("Date : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
 
 	if(Phoneme==63) {
-		state->m_samples->stop(0);
-		if (strlen(state->m_totalword)>2) logerror("Clearing sample %s\n",state->m_totalword);
-		state->m_totalword[0] = 0;                 /* Clear the total word stack */
+		m_samples->stop(0);
+		if (strlen(m_totalword)>2) logerror("Clearing sample %s\n",m_totalword);
+		m_totalword[0] = 0;                 /* Clear the total word stack */
 		return data;
 	}
 
 	/* Phoneme to word translation */
 
-	if (*(state->m_totalword) == 0) {
-		strcpy(state->m_totalword,PhonemeTable[Phoneme]);                      /* Copy over the first phoneme */
-		if (state->m_plural != 0) {
-			logerror("found a possible plural at %d\n",state->m_plural-1);
-			if (!strcmp("S",state->m_totalword)) {         /* Plural check */
-				state->m_samples->start(0, num_samples-2);      /* play the sample at position of word */
-				state->m_samples->set_frequency(0, 11025);    /* play at correct rate */
-				state->m_totalword[0] = 0;                 /* Clear the total word stack */
-				state->m_oldword[0] = 0;                   /* Clear the total word stack */
+	if (*(m_totalword) == 0) {
+		strcpy(m_totalword,PhonemeTable[Phoneme]);                      /* Copy over the first phoneme */
+		if (m_plural != 0) {
+			logerror("found a possible plural at %d\n",m_plural-1);
+			if (!strcmp("S",m_totalword)) {         /* Plural check */
+				m_samples->start(0, num_samples-2);      /* play the sample at position of word */
+				m_samples->set_frequency(0, 11025);    /* play at correct rate */
+				m_totalword[0] = 0;                 /* Clear the total word stack */
+				m_oldword[0] = 0;                   /* Clear the total word stack */
 				return data;
 			} else {
-				state->m_plural=0;
+				m_plural=0;
 			}
 		}
 	} else
-		strcat(state->m_totalword,PhonemeTable[Phoneme]);                      /* Copy over the first phoneme */
+		strcat(m_totalword,PhonemeTable[Phoneme]);                      /* Copy over the first phoneme */
 
-	logerror("Total word = %s\n",state->m_totalword);
+	logerror("Total word = %s\n",m_totalword);
 
 	for (i=0; GorfWordTable[i]; i++) {
-		if (!strcmp(GorfWordTable[i],state->m_totalword)) {        /* Scan the word (sample) table for the complete word */
-			if ((!strcmp("GDTO1RFYA2N",state->m_totalword)) || (!strcmp("RO1U1BAH1T",state->m_totalword)) || (!strcmp("KO1UH3I3E1N",state->m_totalword)) || (!strcmp("WORAYY1EH3R",state->m_totalword)) || (!strcmp("IN",state->m_totalword)) ) {              /* May be state->m_plural */
-				state->m_plural=i+1;
-				strcpy(state->m_oldword,state->m_totalword);
-				logerror("Storing sample position %d and copying string %s\n",state->m_plural,state->m_oldword);
+		if (!strcmp(GorfWordTable[i],m_totalword)) {        /* Scan the word (sample) table for the complete word */
+			if ((!strcmp("GDTO1RFYA2N",m_totalword)) || (!strcmp("RO1U1BAH1T",m_totalword)) || (!strcmp("KO1UH3I3E1N",m_totalword)) || (!strcmp("WORAYY1EH3R",m_totalword)) || (!strcmp("IN",m_totalword)) ) {              /* May be m_plural */
+				m_plural=i+1;
+				strcpy(m_oldword,m_totalword);
+				logerror("Storing sample position %d and copying string %s\n",m_plural,m_oldword);
 			} else {
-				state->m_plural=0;
+				m_plural=0;
 			}
-			state->m_samples->start(0, i);                      /* play the sample at position of word */
-			state->m_samples->set_frequency(0, 11025);       /* play at correct rate */
+			m_samples->start(0, i);                      /* play the sample at position of word */
+			m_samples->set_frequency(0, 11025);       /* play at correct rate */
 			logerror("Playing sample %d",i);
-			state->m_totalword[0] = 0;                 /* Clear the total word stack */
+			m_totalword[0] = 0;                 /* Clear the total word stack */
 			return data;
 		}
 	}
 #else
-	votrax_sc01_device *votrax = space.machine().device<votrax_sc01_device>("votrax");
-	votrax->inflection_w(space, 0, data >> 6);
-	votrax->write(space, 0, data);
+	m_votrax->inflection_w(space, 0, data >> 6);
+	m_votrax->write(space, 0, data);
 #endif
 
 	/* Note : We should really also use volume in this as well as frequency */
@@ -181,13 +177,11 @@ READ8_HANDLER( gorf_speech_r )
 }
 
 
-CUSTOM_INPUT( gorf_speech_status_r )
+CUSTOM_INPUT_MEMBER( astrocde_state::gorf_speech_status_r )
 {
 #if USE_FAKE_VOTRAX
-	samples_device *samples = field.machine().device<samples_device>("samples");
-	return !samples->playing(0);
+	return !m_samples->playing(0);
 #else
-	votrax_sc01_device *votrax = field.machine().device<votrax_sc01_device>("votrax");
-	return votrax->request();
+	return m_votrax->request();
 #endif
 }
