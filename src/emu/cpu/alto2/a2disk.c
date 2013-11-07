@@ -143,14 +143,14 @@ enum {
 	RWC_WRITE2
 };
 
-#if	DEBUG
+#if	ALTO2_DEBUG
 /** @brief human readable names for the KADR<- modes */
 static const char *rwc_name[4] = {"read", "check", "write", "write2"};
 #endif
 
 #if	JKFF_FUNCTION
 
-#if	DEBUG
+#if	ALTO2_DEBUG
 static const char *jkff_name;
 /** @brief macro to set the name of a FF in DEBUG=1 builds only */
 #define	DEBUG_NAME(x)	jkff_name = x
@@ -2281,7 +2281,7 @@ void alto2_cpu_device::disk_sector_start(int unit)
 	}
 
 	/* KSTAT[0-3] update the current sector in the kstat field */
-	PUT_KSTAT_SECTOR(m_dsk.kstat, drive_sector(unit) ^ DRIVE_SECTOR_MASK);
+	PUT_KSTAT_SECTOR(m_dsk.kstat, drive_sector(unit) ^ DIABLO_DRIVE_SECTOR_MASK);
 
 	/* clear input and output shift registers (?) */
 	m_dsk.shiftin = 0;

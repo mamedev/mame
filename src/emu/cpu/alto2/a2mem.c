@@ -670,7 +670,7 @@ UINT16 alto2_cpu_device::read_mem()
 		m_mem.md = ((*this).*mmio_read_fn[base_addr - ALTO2_IO_PAGE_BASE])(base_addr);
 		LOG((0,6,"	MD = MMIO[%#o] (%#o)\n", base_addr, m_mem.md));
 		m_mem.access = ALTO2_MEM_NONE;
-#if	DEBUG
+#if	ALTO2_DEBUG
 		if (m_mem.watch_read)
 			(*m_mem.watch_read)(m_mem.mar, m_mem.md);
 #endif
@@ -685,7 +685,7 @@ UINT16 alto2_cpu_device::read_mem()
 	m_mem.md = (m_mem.mar & ALTO2_MEM_ODD) ? GET_ODD(m_mem.rmdd) : GET_EVEN(m_mem.rmdd);
 	LOG((0,6,"	MD = RAM[%#o] (%#o)\n", mem.mar, mem.md));
 
-#if	DEBUG
+#if	ALTO2_DEBUG
 	if (m_mem.watch_read)
 		(*m_mem.watch_read)(m_mem.mar, m_mem.md);
 #endif
@@ -726,7 +726,7 @@ void alto2_cpu_device::write_mem(UINT16 data)
 		LOG((0,6, "	MMIO[%#o] = MD (%#o)\n", base_addr, m_mem.md));
 		((*this).*mmio_write_fn[base_addr - ALTO2_IO_PAGE_BASE])(base_addr, m_mem.md);
 		m_mem.access = ALTO2_MEM_NONE;
-#if	DEBUG
+#if	ALTO2_DEBUG
 		if (m_mem.watch_write)
 			((*this).*m_mem.watch_write)(m_mem.mar, m_mem.md);
 #endif
@@ -747,7 +747,7 @@ void alto2_cpu_device::write_mem(UINT16 data)
 		m_mem.ram[m_mem.mar/2] = m_mem.wmdd;
 #endif
 
-#if	DEBUG
+#if	ALTO2_DEBUG
 	if (m_mem.watch_write)
 		((*this).*m_mem.watch_write)(m_mem.mar, m_mem.md);
 #endif

@@ -9,117 +9,12 @@
  *****************************************************************************/
 #include "alto2.h"
 
-#define	DIABLO31 1
-
-#define	PAGENO_WORDS	1		//!< number of words in a page number (this doesn't really belong here)
-#define	HEADER_WORDS	2		//!< number of words in a header (this doesn't really belong here)
-#define	LABEL_WORDS		8		//!< number of words in a label (this doesn't really belong here)
-#define	DATA_WORDS		256		//!< number of data words (this doesn't really belong here)
-#define	CKSUM_WORDS		1		//!< number of words for a checksum (this doesn't really belong here)
 #define	MFROBL			34		//!< from the microcode: disk header preamble is 34 words
 #define	MFRRDL			21		//!< from the microcode: disk header read delay is 21 words
 #define	MIRRDL			4		//!< from the microcode: interrecord read delay is 4 words
 #define	MIROBL			3		//!< from the microcode: disk interrecord preamble is 3 words
 #define	MRPAL			3		//!< from the microcode: disk read postamble length is 3 words
 #define	MWPAL			5		//!< from the microcode: disk write postamble length is 5 words
-/**
- * @brief description of the sector layout
- * <PRE>
- *
- *                                   xx.x msec sector mark pulses
- * -+   +-------------------------------------------------------------------------------+   +--
- *  |   |                                                                               |   |
- *  +---+                                                                               +---+
- *
- *    |                                                                                   |
- *
- *    +------+----+------+-----+------+----+-------+-----+------+----+-------+-----+------+
- *    | PRE- |SYNC|HEADER|CKSUM| PRE- |SYNC| LABEL |CKSUM| PRE- |SYNC| DATA  |CKSUM| POST |
- *    |AMBLE1|  1 |      |  1  |AMBLE2|  2 |       |  2  |AMBLE3|  3 |       |  3  |AMBLE |
- *    +------+----+------+-----+------+----+-------+-----+------+----+-------+-----+------+
- *
- *    |                                                                                   |
- *
- *    +-----------------------------------------------------------------------------------+
- *    |                                                                                   |
- * ---+                                                                                   +----
- *      FORMAT WRITE GATE FOR INITIALIZING
- *    |                                                                                   |
- *
- *    |                                                    +------------------------------+
- *                                                         |                              |
- * ---|----------------------------------------------------+                              +----
- *      WRITE GATE FOR DATA XFER (*)
- *    |                                                                                   |
- *
- *    |                          +-----------------------+-+------------------------------+
- *                               |                       | | may be continuous (?)        |
- * ------------------------------+                       +-+                              +----
- * ???  WRITE GATE FOR LABEL AND DATA XFER (*)
- *    |                                                                                   |
- *
- *    |   +--------------------+   +---------------------+   +----------------------------+
- *        |                    |   |                     |   |                            |
- * -------+                    +---+                     +---+                            +----
- *      READ GATE FOR INITIALIZING OR DATA XFER (**)
- *
- *
- *  (*) Enable should be delayed 1 byte/word time from last bit of checks sum.
- *  (**) Read Gate should be enabled half way through the preamble area. This
- *       ensures reading a zero field for data separator synchronization.
- *
- * </PRE>
- */
-#if	DIABLO31
-
-/** @brief DIABLO 31 rotation time is approx. 40ms */
-#define	ROTATION_TIME attotime::from_msec(39.9999)
-
-/** @brief DIABLO 31 sector time */
-#define	SECTOR_TIME attotime::from_msec(39.9999/DRIVE_SPT)
-
-/** @brief DIABLO 31 bit clock is 3330kHz ~= 300ns per bit
- * ~= 133333 bits/track (?)
- * ~= 11111 bits/sector
- * ~= 347 words/sector
- */
-#define	BIT_TIME(bits) attotime::from_nsec(300*(bits))
-
-/** @brief DIABLO 31 possible sector words */
-#define	SECTOR_WORDS (int)(SECTOR_TIME / BIT_TIME(1) / 32)
-
-
-/** @brief pulse width of sector mark before the next sector begins */
-#define	SECTOR_MARK_PULSE_PRE	BIT_TIME(16)
-
-/** @brief pulse width of sector mark after the next sector began */
-#define	SECTOR_MARK_PULSE_POST	BIT_TIME(16)
-
-#else	/* DIABLO31 */
-
-/** @brief DIABLO 44 rotation time is approx. 25ms */
-#define	ROTATION_TIME attotime::from_msec(25)
-
-/** @brief DIABLO 44 sector time */
-#define	SECTOR_TIME	attotime::from_msec(25/DRIVE_SPT)
-
-/** @brief DIABLO 44 bit clock is 5000kHz ~= 200ns per bit
- * ~= 125184 bits/track (?)
- * ~= 10432 bits/sector
- * ~= 325 words/sector
- */
-#define	BIT_TIME attotime::from_nsec(200)
-
-/** @brief DIABLO 44 possible sector words */
-#define	SECTOR_WORDS	(int)(SECTOR_TIME / BIT_TIME / 32)
-
-/** @brief pulse width of sector mark before the next sector begins */
-#define	SECTOR_MARK_PULSE_PRE	(16 * BIT_TIME)
-
-/** @brief pulse width of sector mark after the next sector began */
-#define	SECTOR_MARK_PULSE_POST	(16 * BIT_TIME)
-#endif
-
 
 /** @brief end of the guard zone at the beginning of a sector (wild guess!) */
 #define	GUARD_ZONE_BITS	(16*32)
@@ -137,152 +32,6 @@
 #define	RDBIT(bits,src) ((bits[(src)/32] >> ((src) % 32)) & 1)
 
 /**
- * @brief format of the cooked disk image sectors, i.e. pure data
- *
- * The available images are a multiple of 267 words per sector,
- * 1 word page number
- * 2 words header
- * 8 words label
- * 256 words data
- */
-typedef struct {
-	/** @brief sector page number */
-	UINT8 pageno[2*PAGENO_WORDS];
-
-	/** @brief sector header words */
-	UINT8 header[2*HEADER_WORDS];
-
-	/** @brief sector label words */
-	UINT8 label[2*LABEL_WORDS];
-
-	/** @brief sector data words */
-	UINT8 data[2*DATA_WORDS];
-}	diablo_sector_t;
-
-
-/**
- * @brief Structure of the disk drive context (2 drives or packs per system)
- */
-typedef struct {
-	/** @brief disk image, made up of 203 x 2 x 12 sectors */
-	diablo_sector_t *image;
-
-	/** @brief drive unit number (0 or 1) */
-	int unit;
-
-	/** @brief description of the drive(s) */
-	char description[32];
-
-	/** @brief basename of the drive image */
-	char basename[80];
-
-	/** @brief number of packs in drive (1 or 2) */
-	int packs;
-
-	/** @brief rotation time */
-	attotime rotation_time;
-
-	/** @brief bit time in atto seconds */
-	attotime bit_time;
-
-	/** @brief drive seek/read/write signal (active 0) */
-	int s_r_w_0;
-
-	/** @brief drive ready signal (active 0) */
-	int ready_0;
-
-	/** @brief sector mark (0 if new sector) */
-	int sector_mark_0;
-
-	/** @brief address acknowledge, i.e. seek successful (active 0) */
-	int addx_acknowledge_0;
-
-	/** @brief log address interlock, i.e. seek in progress (active 0) */
-	int log_addx_interlock_0;
-
-	/** @brief seek incomplete, i.e. seek in progress (active 0) */
-	int seek_incomplete_0;
-
-	/** @brief erase gate */
-	int egate_0;
-
-	/** @brief write gate */
-	int wrgate_0;
-
-	/** @brief read gate */
-	int rdgate_0;
-
-	/** @brief current cylinder number */
-	int cylinder;
-
-	/** @brief current head (track) number on cylinder */
-	int head;
-
-	/** @brief current sector number in track */
-	int sector;
-
-	/** @brief sectors expanded to bits */
-	UINT32 *bits[DRIVE_CYLINDERS * DRIVE_HEADS * DRIVE_SPT];
-
-	/** @brief current page = (cylinder * HEADS + head) * SPT + sector */
-	int page;
-
-	/** @brief set to first bit of a sector that is read from */
-	int rdfirst;
-
-	/** @brief set to last bit of a sector that was read from */
-	int rdlast;
-
-	/** @brief set to non-zero if a sector is written to */
-	int wrfirst;
-
-	/** @brief set to last bit of a sector that was written to */
-	int wrlast;
-}	diablo_drive_t;
-
-#if	DIABLO31
-static diablo_drive_t drive[DRIVE_MAX] = {
-	{
-		NULL,
-		0,
-		"DIABLO31", "",
-		1,
-		ROTATION_TIME,
-		BIT_TIME,
-		0,
-	},{
-		NULL,
-		1,
-		"DIABLO31", "",
-		1,
-		ROTATION_TIME,
-		BIT_TIME,
-		0,
-	}
-};
-#else
-static drive_t drive[DRIVE_MAX] = {
-	{
-		NULL,
-		0,
-		"DIABLO44", "",
-		1,
-		ROTATION_TIME,
-		BIT_TIME,
-		0,
-	},{
-		NULL,
-		1,
-		"DIABLO44", "",
-		1,
-		ROTATION_TIME,
-		BIT_TIME,
-		0,
-	}
-};
-#endif
-
-/**
  * @brief calculate the sector from the logical block address
  *
  * Modifies drive's page by calculating the logical
@@ -290,10 +39,10 @@ static drive_t drive[DRIVE_MAX] = {
  *
  * @param unit unit number
  */
-static void drive_get_sector(int unit)
+void alto2_cpu_device::drive_get_sector(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_get_sector()\n", unit);
 
 	/* If there's no image, just reset the page number */
@@ -301,9 +50,8 @@ static void drive_get_sector(int unit)
 		d->page = -1;
 		return;
 	}
-	if (d->cylinder < 0 || d->cylinder >= DRIVE_CYLINDERS) {
-		LOG((log_DRV,9,"	DRIVE C/H/S:%d/%d/%d => invalid cylinder\n",
-			d->cylinder, d->head, d->sector));
+	if (d->cylinder < 0 || d->cylinder >= DIABLO_DRIVE_CYLINDERS) {
+		LOG((log_DRV,9,"	DRIVE C/H/S:%d/%d/%d => invalid cylinder\n", d->cylinder, d->head, d->sector));
 		d->page = -1;
 		return;
 	}
@@ -439,17 +187,17 @@ static size_t expand_cksum(UINT32 *bits, size_t dst, UINT8 *field, size_t size)
  * @param unit drive unit number (0 or 1)
  * @param page page number (0 to DRIVE_PAGES-1)
  */
-static void expand_sector(int unit, int page)
+void alto2_cpu_device::expand_sector(int unit, int page)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	diablo_sector_t *s;
 	UINT32 *bits;
 	size_t dst;
 
-	if (unit < 0 || unit >= DRIVE_MAX)
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to expand_sector()\n", unit);
 
-	if (page < 0 || page >= DRIVE_PAGES)
+	if (page < 0 || page >= DIABLO_DRIVE_PAGES)
 		return;
 
 	/* already expanded this sector? */
@@ -457,8 +205,7 @@ static void expand_sector(int unit, int page)
 		return;
 
 	if (-1 == page || !d->image) {
-		LOG((log_DRV,0,"	no sector for #%d: %d/%d/%d\n",
-			d->unit, d->cylinder, d->head, d->sector));
+		LOG((log_DRV,0,"	no sector for #%d: %d/%d/%d\n", d->unit, d->cylinder, d->head, d->sector));
 		return;
 	}
 
@@ -466,7 +213,7 @@ static void expand_sector(int unit, int page)
 	s = &d->image[page];
 
 	/* allocate a bits image */
-	bits = (UINT32 *)calloc(400, sizeof(UINT32));
+	bits = (UINT32 *)auto_alloc_array(machine(), UINT32, 400);
 	if (!bits) {
 		fatal(1, "failed to malloc(%d) bytes bits for drive #%d page #%d\n",
 			sizeof(bits), unit, page);
@@ -517,7 +264,7 @@ static void expand_sector(int unit, int page)
 
 }
 
-#if	DEBUG
+#if	ALTO2_DEBUG
 static void drive_dump_ascii(UINT8 *src, size_t size)
 {
 	size_t offs;
@@ -698,17 +445,17 @@ static size_t squeeze_cksum(UINT32 *bits, size_t src, int *cksum)
 }
 
 /**
- * @brief squeeze a array of clock and data bits into a sector's data
+ * @brief Squeeze a array of clock and data bits into a sector's data
  */
-static void squeeze_sector(int unit)
+void alto2_cpu_device::squeeze_sector(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	diablo_sector_t *s;
 	UINT32 *bits;
 	size_t src;
 	int cksum_header, cksum_label, cksum_data;
 
-	if (unit < 0 || unit >= DRIVE_MAX)
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to squeeze_sector()\n", unit);
 
 	if (d->rdfirst >= 0) {
@@ -745,9 +492,8 @@ static void squeeze_sector(int unit)
 	d->wrfirst = -1;
 	d->wrlast = -1;
 
-	if (d->page < 0 || d->page >= DRIVE_PAGES) {
-		LOG((log_DRV,0,"	no sector for #%d: %d/%d/%d\n",
-			d->unit, d->cylinder, d->head, d->sector));
+	if (d->page < 0 || d->page >= DIABLO_DRIVE_PAGES) {
+		LOG((log_DRV,0,"	no sector for #%d: %d/%d/%d\n", d->unit, d->cylinder, d->head, d->sector));
 		return;
 	}
 
@@ -759,8 +505,7 @@ static void squeeze_sector(int unit)
 
 	/* no bits to write? */
 	if (!bits) {
-		LOG((log_DRV,0,"	no sector for #%d: %d/%d/%d\n",
-			d->unit, d->cylinder, d->head, d->sector));
+		LOG((log_DRV,0,"	no sector for #%d: %d/%d/%d\n", d->unit, d->cylinder, d->head, d->sector));
 		return;
 	}
 
@@ -778,7 +523,7 @@ static void squeeze_sector(int unit)
 		src, src / 32, src % 32));
 	src = squeeze_record(bits, src, s->header, sizeof(s->header));
 	src = squeeze_cksum(bits, src, &cksum_header);
-#if	DEBUG
+#if	ALTO2_DEBUG
 	dump_record(s->header, 0, sizeof(s->header), "header", 0);
 #endif
 
@@ -790,7 +535,7 @@ static void squeeze_sector(int unit)
 		src, src / 32, src % 32));
 	src = squeeze_record(bits, src, s->label, sizeof(s->label));
 	src = squeeze_cksum(bits, src, &cksum_label);
-#if	DEBUG
+#if	ALTO2_DEBUG
 	dump_record(s->label, 0, sizeof(s->label), "label", 0);
 #endif
 
@@ -802,7 +547,7 @@ static void squeeze_sector(int unit)
 		src, src / 32, src % 32));
 	src = squeeze_record(bits, src, s->data, sizeof(s->data));
 	src = squeeze_cksum(bits, src, &cksum_data);
-#if	DEBUG
+#if	ALTO2_DEBUG
 	dump_record(s->data, 0, sizeof(s->data), "data", 1);
 #endif
 
@@ -812,12 +557,10 @@ static void squeeze_sector(int unit)
 	cksum_data ^= cksum(s->data, sizeof(s->data), 0521);
 
 	if (cksum_header || cksum_label || cksum_data) {
-#if	DEBUG
-		LOG((log_DRV,0,"	cksum check - header:%06o label:%06o data:%06o\n",
-			cksum_header, cksum_label, cksum_data));
+#if	ALTO2_DEBUG
+		LOG((log_DRV,0,"	cksum check - header:%06o label:%06o data:%06o\n", cksum_header, cksum_label, cksum_data));
 #else
-		printf("	cksum check - header:%06o label:%06o data:%06o\n",
-			cksum_header, cksum_label, cksum_data);
+		printf("	cksum check - header:%06o label:%06o data:%06o\n", cksum_header, cksum_label, cksum_data);
 #endif
 	}
 }
@@ -829,7 +572,7 @@ static void squeeze_sector(int unit)
  */
 int alto2_cpu_device::drive_bits_per_sector() const
 {
-	return SECTOR_WORDS * 32;
+	return DIABLO_SECTOR_WORDS * 32;
 }
 
 /**
@@ -840,8 +583,8 @@ int alto2_cpu_device::drive_bits_per_sector() const
  */
 const char* alto2_cpu_device::drive_description(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_description()\n", unit);
 	return d->description;
 }
@@ -854,8 +597,8 @@ const char* alto2_cpu_device::drive_description(int unit)
  */
 const char* alto2_cpu_device::drive_basename(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_description()\n", unit);
 	return d->basename;
 }
@@ -870,8 +613,8 @@ const char* alto2_cpu_device::drive_basename(int unit)
  */
 int alto2_cpu_device::drive_unit(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_unit()\n", unit);
 	return d->unit;
 }
@@ -884,8 +627,8 @@ int alto2_cpu_device::drive_unit(int unit)
  */
 attotime alto2_cpu_device::drive_rotation_time(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_rotation_time()\n", unit);
 	return d->rotation_time;
 }
@@ -898,8 +641,8 @@ attotime alto2_cpu_device::drive_rotation_time(int unit)
  */
 attotime alto2_cpu_device::drive_bit_time(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_bit_time()\n", unit);
 	return d->bit_time;
 }
@@ -912,8 +655,8 @@ attotime alto2_cpu_device::drive_bit_time(int unit)
  */
 int alto2_cpu_device::drive_seek_read_write_0(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_seek_read_write_0()\n", unit);
 	return d->s_r_w_0;
 }
@@ -926,8 +669,8 @@ int alto2_cpu_device::drive_seek_read_write_0(int unit)
  */
 int alto2_cpu_device::drive_ready_0(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_ready_0()\n", unit);
 	return d->ready_0;
 }
@@ -942,8 +685,8 @@ int alto2_cpu_device::drive_ready_0(int unit)
  */
 int alto2_cpu_device::drive_sector_mark_0(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_sector_mark_0()\n", unit);
 	/* no sector marks while seeking (?) */
 	if (d->s_r_w_0)
@@ -960,8 +703,8 @@ int alto2_cpu_device::drive_sector_mark_0(int unit)
  */
 int alto2_cpu_device::drive_addx_acknowledge_0(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_addx_acknowledge_0()\n", unit);
 	return d->addx_acknowledge_0;
 }
@@ -974,8 +717,8 @@ int alto2_cpu_device::drive_addx_acknowledge_0(int unit)
  */
 int alto2_cpu_device::drive_log_addx_interlock_0(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_log_addx_interlock_0()\n", unit);
 	return d->log_addx_interlock_0;
 }
@@ -988,8 +731,8 @@ int alto2_cpu_device::drive_log_addx_interlock_0(int unit)
  */
 int alto2_cpu_device::drive_seek_incomplete_0(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_addx_acknowledge_0()\n", unit);
 	return d->seek_incomplete_0;
 }
@@ -1004,10 +747,10 @@ int alto2_cpu_device::drive_seek_incomplete_0(int unit)
  */
 int alto2_cpu_device::drive_cylinder(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_cylinder()\n", unit);
-	return d->cylinder ^ DRIVE_CYLINDER_MASK;
+	return d->cylinder ^ DIABLO_DRIVE_CYLINDER_MASK;
 }
 
 /**
@@ -1020,10 +763,10 @@ int alto2_cpu_device::drive_cylinder(int unit)
  */
 int alto2_cpu_device::drive_head(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_head()\n", unit);
-	return d->head ^ DRIVE_HEAD_MASK;
+	return d->head ^ DIABLO_DRIVE_HEAD_MASK;
 }
 
 /**
@@ -1039,10 +782,10 @@ int alto2_cpu_device::drive_head(int unit)
  */
 int alto2_cpu_device::drive_sector(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_sector()\n", unit);
-	return d->sector ^ DRIVE_SECTOR_MASK;
+	return d->sector ^ DIABLO_DRIVE_SECTOR_MASK;
 }
 
 /**
@@ -1056,8 +799,8 @@ int alto2_cpu_device::drive_sector(int unit)
  */
 int alto2_cpu_device::drive_page(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
-	if (unit < 0 || unit >= DRIVE_MAX)
+	diablo_drive_t *d = m_drive[unit];
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_page()\n", unit);
 	return d->page;
 }
@@ -1070,9 +813,9 @@ int alto2_cpu_device::drive_page(int unit)
  */
 void alto2_cpu_device::drive_select(int unit, int head)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 
-	if (unit < 0 || unit >= DRIVE_MAX)
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_select()\n", unit);
 
 	if (unit != m_unit_selected || head != m_head_selected) {
@@ -1103,7 +846,7 @@ void alto2_cpu_device::drive_select(int unit, int head)
 	}
 
 	/* Note: head select input is active low (0: selects head 1, 1: selects head 0) */
-	head = head & DRIVE_HEAD_MASK;
+	head = head & DIABLO_DRIVE_HEAD_MASK;
 	if (head != d->head) {
 		d->head = head;
 		LOG((log_DRV,1,"	HEAD %d select on unit %d\n", head, unit));
@@ -1123,10 +866,10 @@ void alto2_cpu_device::drive_select(int unit, int head)
  */
 void alto2_cpu_device::drive_strobe(int unit, int cylinder, int restore, int strobe)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	int seekto = restore ? 0 : cylinder;
 
-	if (unit < 0 || unit >= DRIVE_MAX)
+	if (unit < 0 || unit >= DIABLO_DRIVE_MAX)
 		fatal(1, "invalid unit %d in call to drive_strobe()\n", unit);
 
 	if (strobe == 1) {
@@ -1162,8 +905,8 @@ void alto2_cpu_device::drive_strobe(int unit, int cylinder, int restore, int str
 	} else {
 		/* increment cylinder */
 		d->cylinder += 1;
-		if (d->cylinder >= DRIVE_CYLINDERS) {
-			d->cylinder = DRIVE_CYLINDERS - 1;
+		if (d->cylinder >= DIABLO_DRIVE_CYLINDERS) {
+			d->cylinder = DIABLO_DRIVE_CYLINDERS - 1;
 			d->log_addx_interlock_0 = 1;	/* deassert the log address interlock */
 			d->seek_incomplete_0 = 1;	/* deassert seek incomplete */
 			d->addx_acknowledge_0 = 0;	/* assert address acknowledge  */
@@ -1197,7 +940,7 @@ void alto2_cpu_device::drive_sector_callback(a2cb callback)
  */
 void alto2_cpu_device::drive_egate(int unit, int gate)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	d->egate_0 = gate;
 }
 
@@ -1209,7 +952,7 @@ void alto2_cpu_device::drive_egate(int unit, int gate)
  */
 void alto2_cpu_device::drive_wrgate(int unit, int gate)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	d->wrgate_0 = gate;
 }
 
@@ -1221,7 +964,7 @@ void alto2_cpu_device::drive_wrgate(int unit, int gate)
  */
 void alto2_cpu_device::drive_rdgate(int unit, int gate)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	d->rdgate_0 = gate;
 }
 
@@ -1245,7 +988,7 @@ void alto2_cpu_device::drive_rdgate(int unit, int gate)
  */
 void alto2_cpu_device::drive_wrdata(int unit, int index, int wrdata)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	UINT32 *bits;
 
 	if (d->wrgate_0) {
@@ -1296,7 +1039,7 @@ void alto2_cpu_device::drive_wrdata(int unit, int index, int wrdata)
  */
 int alto2_cpu_device::drive_rddata(int unit, int index)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	UINT32 *bits;
 	int bit = 0;
 
@@ -1348,7 +1091,7 @@ int alto2_cpu_device::drive_rddata(int unit, int index)
  */
 int alto2_cpu_device::drive_rdclk(int unit, int index)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	UINT32 *bits;
 	int clk;
 
@@ -1399,7 +1142,7 @@ int alto2_cpu_device::drive_rdclk(int unit, int index)
  */
 int alto2_cpu_device::debug_read_sync(int unit, int page, int offs)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	UINT32 *bits;
 	UINT32 accu;
 
@@ -1411,7 +1154,7 @@ int alto2_cpu_device::debug_read_sync(int unit, int page, int offs)
 		return 0;
 
 	/* check for invalid page */
-	if (page < 0 || page >= DRIVE_CYLINDERS * DRIVE_HEADS * DRIVE_SPT)
+	if (page < 0 || page >= DIABLO_DRIVE_CYLINDERS * DIABLO_DRIVE_HEADS * DIABLO_DRIVE_SPT)
 		return 0;
 
 	bits = d->bits[page];
@@ -1445,7 +1188,7 @@ int alto2_cpu_device::debug_read_sync(int unit, int page, int offs)
  */
 int alto2_cpu_device::debug_read_sec(int unit, int page, int offs)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 	UINT32 *bits;
 	int i, clks, word;
 
@@ -1457,7 +1200,7 @@ int alto2_cpu_device::debug_read_sec(int unit, int page, int offs)
 		return 0177777;
 
 	/* check for invalid page */
-	if (page < 0 || page >= DRIVE_CYLINDERS * DRIVE_HEADS * DRIVE_SPT)
+	if (page < 0 || page >= DIABLO_DRIVE_CYLINDERS * DIABLO_DRIVE_HEADS * DIABLO_DRIVE_SPT)
 		return 0177777;
 
 	bits = d->bits[page];
@@ -1488,23 +1231,25 @@ void alto2_cpu_device::drive_next_sector(void* ptr, int arg)
 {
 	(void)ptr;
 	int unit = m_unit_selected;
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 
 	LOG((log_DRV,5, "	next sector (unit #%d sector %d)\n", unit, d->sector));
+	(void)d;
 
-	/* deassert sector mark after pulse width */
 	switch (arg) {
 	case 0:
-		/* next sector starting soon now */
-		m_sector_timer->adjust(SECTOR_MARK_PULSE_PRE, 1);
+		m_sector_timer->adjust(DIABLO_SECTOR_MARK_PULSE_PRE, 1);
+		/* deassert sector mark */
 		sector_mark_1(unit);
 		break;
 	case 1:
-		m_sector_timer->adjust(SECTOR_MARK_PULSE_POST, 2);
+		m_sector_timer->adjust(DIABLO_SECTOR_MARK_PULSE_POST, 2);
+		/* assert sector mark */
 		sector_mark_0(unit);
 		break;
 	case 2:
-		m_sector_timer->adjust(SECTOR_TIME - SECTOR_MARK_PULSE_PRE, 0);
+		/* next sector starting soon now */
+		m_sector_timer->adjust(DIABLO_SECTOR_TIME - DIABLO_SECTOR_MARK_PULSE_PRE, 0);
 		/* call the sector_callback, if any */
 		if (m_sector_callback)
 			((*this).*m_sector_callback)(unit);
@@ -1518,7 +1263,7 @@ void alto2_cpu_device::drive_next_sector(void* ptr, int arg)
  */
 void alto2_cpu_device::sector_mark_1(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 
 	LOG((log_DRV,5, "	sector mark 1 (unit #%d sector %d)\n", unit, d->sector));
 	/* set sector mark to 1 */
@@ -1532,7 +1277,7 @@ void alto2_cpu_device::sector_mark_1(int unit)
  */
 void alto2_cpu_device::sector_mark_0(int unit)
 {
-	diablo_drive_t *d = &drive[unit];
+	diablo_drive_t *d = m_drive[unit];
 
 	LOG((log_DRV,5,"	sector mark 0 (unit #%d sector %d)\n", unit, d->sector));
 
@@ -1548,9 +1293,11 @@ void alto2_cpu_device::sector_mark_0(int unit)
 	d->wrlast = -1;
 
 	/* count sectors */
-	d->sector = (d->sector + 1) % DRIVE_SPT;
+	d->sector = (d->sector + 1) % DIABLO_DRIVE_SPT;
 	drive_get_sector(unit);
 }
+
+#if	0	// FIXME: unused loading of the disk image
 /**
  * @brief pass down command line arguments to the drive emulation
  *
@@ -1611,7 +1358,7 @@ int drive_args(const char *arg)
 	if (unit == DRIVE_MAX)
 		return -1;
 
-	d = &drive[unit];
+	d = reinterpret_cast<diablo_drive_t *>(m_drive[unit]);
 
 	snprintf(d->basename, sizeof(d->basename), "%s", basename);
 
@@ -1722,6 +1469,7 @@ int drive_args(const char *arg)
 
 	return 0;
 }
+#endif
 
 /**
  * @brief initialize the disk drive context and insert a disk word timer
@@ -1736,16 +1484,21 @@ void alto2_cpu_device::drive_init()
 		fatal(1, "sizeof(sector_t) is not %d (%d)\n",
 			267 * 2, sizeof(diablo_sector_t));
 
-	for (i = 0; i < DRIVE_MAX; i++) {
-		diablo_drive_t *d = &drive[i];
+	for (i = 0; i < DIABLO_DRIVE_MAX; i++) {
+		// FIXME: use MAME resource system(?)
+		diablo_drive_t *d = reinterpret_cast<diablo_drive_t *>(auto_alloc_clear(machine(), diablo_drive_t));
+		m_drive[i] = d;
 
-		d->unit = i;			/* set the unit number */
-		d->s_r_w_0 = 1;			/* seek/read/write not ready */
-		d->ready_0 = 1;			/* drive is not ready */
-		d->sector_mark_0 = 1;		/* sector mark clear */
-		d->addx_acknowledge_0 = 1;	/* drive address acknowledge is not active */
+		d->unit = i;					/* set the unit number */
+		snprintf(d->description, sizeof(d->description), "DIABLO31");
+		d->rotation_time = DIABLO_ROTATION_TIME;
+		d->bit_time = DIABLO_BIT_TIME(1);
+		d->s_r_w_0 = 1;					/* seek/read/write not ready */
+		d->ready_0 = 1;					/* drive is not ready */
+		d->sector_mark_0 = 1;			/* sector mark clear */
+		d->addx_acknowledge_0 = 1;		/* drive address acknowledge is not active */
 		d->log_addx_interlock_0 = 1;	/* drive log address interlock is not active */
-		d->seek_incomplete_0 = 1;	/* drive seek incomplete is not active */
+		d->seek_incomplete_0 = 1;		/* drive seek incomplete is not active */
 
 		/* reset the disk drive's address */
 		d->cylinder = 0;
@@ -1765,5 +1518,5 @@ void alto2_cpu_device::drive_init()
 
 	m_sector_callback = 0;
 	m_sector_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::drive_next_sector),this));
-	m_sector_timer->adjust(SECTOR_TIME - SECTOR_MARK_PULSE_PRE, 0);
+	m_sector_timer->adjust(DIABLO_SECTOR_TIME - DIABLO_SECTOR_MARK_PULSE_PRE, 0);
 }

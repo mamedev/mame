@@ -27,8 +27,8 @@ const device_type ALTO2 = &device_creator<alto2_cpu_device>;
 
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
-	m_ucode_config("program", ENDIANNESS_BIG, 8, 32, 0),
-	m_ram_config("io", ENDIANNESS_BIG, 8, 16, 0)
+	m_ucode_config("program", ENDIANNESS_BIG, 32, 32, 0),
+	m_ram_config("io", ENDIANNESS_BIG, 16, 16, 0)
 {
 }
 
@@ -74,93 +74,20 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, astr
 }
 
 // FIXME
-void alto2_cpu_device::fatal(int level, const char *format, ...)
+#if	ALTO2_DEBUG
+void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
+{
+}
+#endif
+
+// FIXME
+void alto2_cpu_device::fatal(int exitcode, const char *format, ...)
 {
 	va_list ap;
 	va_start(ap, format);
-	fatalerror(format, ap);
+	emu_fatalerror error(exitcode, format, ap);
 	va_end(ap);
 }
-
-#if 0
-// FIXME
-void alto2_cpu_device::init_mrt(int task)
-{
-
-}
-
-// FIXME
-int alto2_cpu_device::drive_ready_0(int unit)
-{
-	return 0;
-}
-
-// FIXME
-int alto2_cpu_device::drive_sector_mark_0(int unit)
-{
-	return 0;
-}
-
-// FIxME
-void alto2_cpu_device::drive_egate(int unit, int gate)
-{
-
-}
-
-// FIXME
-void alto2_cpu_device::drive_wrgate(int unit, int gate)
-{
-
-}
-
-// FIXME
-void alto2_cpu_device::drive_rdgate(int unit, int gate)
-{
-
-}
-
-// FIXME
-int alto2_cpu_device::drive_bits_per_sector() const
-{
-	return 0;
-}
-
-// FIXME
-attotime alto2_cpu_device::drive_bit_time(int unit)
-{
-	return attotime::from_double(0);
-}
-
-// FIXME
-void alto2_cpu_device::drive_wrdata(int unit, int index, int wrdata)
-{
-
-}
-
-// FIXME
-int alto2_cpu_device::drive_rddata(int unit, int index)
-{
-	return 0;
-}
-
-// FIXME
-int alto2_cpu_device::drive_rdclk(int unit, int index)
-{
-	return 0;
-}
-
-// FIXME
-int alto2_cpu_device::drive_sector(int unit)
-{
-	return 0;
-}
-
-// FIXME
-void alto2_cpu_device::drive_strobe(int unit, int cylinder, int restore, int strobe)
-{
-
-}
-#endif
 
 /** @brief task names */
 const char* alto2_cpu_device::task_name(int task)
@@ -435,7 +362,7 @@ void alto2_cpu_device::bs_load_r_1()
  */
 void alto2_cpu_device::bs_read_md_0()
 {
-#if	DEBUG
+#if	ALTO2_DEBUG
 	UINT32 mar = m_mem.mar;
 #endif
 	UINT16 md = read_mem();
@@ -837,7 +764,7 @@ void alto2_cpu_device::f2_alucy_1()
  */
 void alto2_cpu_device::f2_load_md_1()
 {
-#if	DEBUG
+#if	ALTO2_DEBUG
 	UINT16 mar = m_mem.mar;
 #endif
 	if (MIR_F1(m_mir) == f1_load_mar) {

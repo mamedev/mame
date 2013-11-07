@@ -15,15 +15,10 @@
 #ifndef _CPU_ALTO2_H_
 #define _CPU_ALTO2_H
 
-#ifndef	DEBUG
-#define	DEBUG			0
-#endif
+#define	ALTO2_TAG "alto2"
 
-#if	DEBUG
-extern void logprintf(int type, int level, const char* format, ...);
-#define	LOG(x) logprintf x
-#else
-#define	LOG(x)
+#ifndef	ALTO2_DEBUG
+#define	ALTO2_DEBUG			0
 #endif
 
 //extern void fatal(int level, const char* format, ...);
@@ -76,7 +71,9 @@ extern void logprintf(int type, int level, const char* format, ...);
 #define	ALTO2_UCODE_SIZE		((ALTO2_UCODE_ROM_PAGES + ALTO2_UCODE_RAM_PAGES) * ALTO2_UCODE_PAGE_SIZE)	//!< total number of words of microcode
 #define	ALTO2_UCODE_RAM_BASE	(ALTO2_UCODE_ROM_PAGES * ALTO2_UCODE_PAGE_SIZE)	//!< base offset for the RAM page(s)
 #define	ALTO2_CONST_SIZE		256							//!< number words in the constant ROM
-#define	ALTO2_RAM_SIZE			262144						//!< size of main memory in bytes
+#define	ALTO2_RAM_SIZE			0200000						//!< size of main memory in words
+#define	ALTO2_IO_PAGE_BASE		0177000						//!< base address of the memory mapped io range
+#define	ALTO2_IO_PAGE_SIZE		01000						//!< size of the memory mapped io range
 
 /**
  * @brief start value for the horizontal line counter
@@ -235,6 +232,13 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 private:
+#if	ALTO2_DEBUG
+	void logprintf(int type, int level, const char* format, ...);
+#	define	LOG(x) logprintf x
+#else
+#	define	LOG(x)
+#endif
+
 	void fatal(int level, const char *format, ...);
 
 	address_space_config m_ucode_config;
@@ -729,7 +733,7 @@ private:
 	int m_unload_time;								//!< unload word time accu
 	int m_unload_word;								//!< unload word number
 
-	static const char *task_name(int task);		//!< human readable task names
+	static const char *task_name(int task);			//!< human readable task names
 	static const char *r_name(UINT8 reg);			//!< human readable register names
 	static const char *aluf_name(UINT8 aluf);		//!< human readable ALU function names
 	static const char *bs_name(UINT8 bs);			//!< human readable bus source names
@@ -1270,22 +1274,174 @@ private:
 	// ************************************************
 	// diablo31 drive stuff
 	// ************************************************
-	static const int DRIVE_MAX = 2;						//!< max number of drive units
-	static const int DRIVE_CYLINDERS = 203;				//!< number of cylinders per drive
-	static const int DRIVE_CYLINDER_MASK = 0777;		//!< bit maks for cylinder number (9 bits)
-	static const int DRIVE_SPT = 12;					//!< number of sectors per track
-	static const int DRIVE_SECTOR_MASK = 017;			//!< bit maks for cylinder number (4 bits)
-	static const int DRIVE_HEADS = 2;					//!< number of heads per drive
-	static const int DRIVE_PAGES = 203*2*12;			//!< number of pages per drive
-	static const int DRIVE_HEAD_MASK = 1;				//!< bit maks for cylinder number (4 bits)
+	#define	DIABLO31 1
+	static const int DIABLO_DRIVE_MAX = 2;					//!< max number of drive units
+	static const int DIABLO_DRIVE_CYLINDERS = 203;			//!< number of cylinders per drive
+	static const int DIABLO_DRIVE_CYLINDER_MASK = 0777;		//!< bit maks for cylinder number (9 bits)
+	static const int DIABLO_DRIVE_SPT = 12;					//!< number of sectors per track
+	static const int DIABLO_DRIVE_SECTOR_MASK = 017;		//!< bit maks for cylinder number (4 bits)
+	static const int DIABLO_DRIVE_HEADS = 2;				//!< number of heads per drive
+	static const int DIABLO_DRIVE_PAGES = 203*2*12;			//!< number of pages per drive
+	static const int DIABLO_DRIVE_HEAD_MASK = 1;			//!< bit maks for cylinder number (4 bits)
 	//! convert a cylinder/head/sector to a logical block address (page)
-	static inline int DRIVE_PAGE(int c,int h,int s)	{ return (c * DRIVE_HEADS + h) * DRIVE_SPT + s; }
+	static inline int DRIVE_PAGE(int c,int h,int s)	{ return (c * DIABLO_DRIVE_HEADS + h) * DIABLO_DRIVE_SPT + s; }
+	/**
+	 * @brief description of the sector layout
+	 * <PRE>
+	 *
+	 *                                   xx.x msec sector mark pulses
+	 * -+   +-------------------------------------------------------------------------------+   +--
+	 *  |   |                                                                               |   |
+	 *  +---+                                                                               +---+
+	 *
+	 *    |                                                                                   |
+	 *
+	 *    +------+----+------+-----+------+----+-------+-----+------+----+-------+-----+------+
+	 *    | PRE- |SYNC|HEADER|CKSUM| PRE- |SYNC| LABEL |CKSUM| PRE- |SYNC| DATA  |CKSUM| POST |
+	 *    |AMBLE1|  1 |      |  1  |AMBLE2|  2 |       |  2  |AMBLE3|  3 |       |  3  |AMBLE |
+	 *    +------+----+------+-----+------+----+-------+-----+------+----+-------+-----+------+
+	 *
+	 *    |                                                                                   |
+	 *
+	 *    +-----------------------------------------------------------------------------------+
+	 *    |                                                                                   |
+	 * ---+                                                                                   +----
+	 *      FORMAT WRITE GATE FOR INITIALIZING
+	 *    |                                                                                   |
+	 *
+	 *    |                                                    +------------------------------+
+	 *                                                         |                              |
+	 * ---|----------------------------------------------------+                              +----
+	 *      WRITE GATE FOR DATA XFER (*)
+	 *    |                                                                                   |
+	 *
+	 *    |                          +-----------------------+-+------------------------------+
+	 *                               |                       | | may be continuous (?)        |
+	 * ------------------------------+                       +-+                              +----
+	 * ???  WRITE GATE FOR LABEL AND DATA XFER (*)
+	 *    |                                                                                   |
+	 *
+	 *    |   +--------------------+   +---------------------+   +----------------------------+
+	 *        |                    |   |                     |   |                            |
+	 * -------+                    +---+                     +---+                            +----
+	 *      READ GATE FOR INITIALIZING OR DATA XFER (**)
+	 *
+	 *
+	 *  (*) Enable should be delayed 1 byte/word time from last bit of checks sum.
+	 *  (**) Read Gate should be enabled half way through the preamble area. This
+	 *       ensures reading a zero field for data separator synchronization.
+	 *
+	 * </PRE>
+	 */
+	static const int DIABLO_PAGENO_WORDS = 1;		//!< number of words in a page number (this doesn't really belong here)
+	static const int DIABLO_HEADER_WORDS = 2;		//!< number of words in a header (this doesn't really belong here)
+	static const int DIABLO_LABEL_WORDS = 8;		//!< number of words in a label (this doesn't really belong here)
+	static const int DIABLO_DATA_WORDS = 256;		//!< number of data words (this doesn't really belong here)
+	static const int DIABLO_CKSUM_WORDS = 1;		//!< number of words for a checksum (this doesn't really belong here)
 
-	void* m_drive[2];									//!< private drive data
+	#if	DIABLO31
+	/** @brief DIABLO 31 rotation time is approx. 40ms */
+	#define	DIABLO_ROTATION_TIME attotime::from_msec(39.9999)
+
+	/** @brief DIABLO 31 sector time */
+	#define	DIABLO_SECTOR_TIME attotime::from_msec(39.9999/DIABLO_DRIVE_SPT)
+
+	/** @brief DIABLO 31 bit clock is 3330kHz ~= 300ns per bit
+	 * ~= 133333 bits/track (?)
+	 * ~= 11111 bits/sector
+	 * ~= 347 words/sector
+	 */
+	#define	DIABLO_BIT_TIME(bits) attotime::from_nsec(300*(bits))
+
+	/** @brief DIABLO 31 possible sector words */
+	#define	DIABLO_SECTOR_WORDS 347
+
+	/** @brief pulse width of sector mark before the next sector begins */
+	#define	DIABLO_SECTOR_MARK_PULSE_PRE DIABLO_BIT_TIME(16)
+
+	/** @brief pulse width of sector mark after the next sector began */
+	#define	DIABLO_SECTOR_MARK_PULSE_POST DIABLO_BIT_TIME(16)
+
+	#else	/* DIABLO31 */
+
+	/** @brief DIABLO 44 rotation time is approx. 25ms */
+	#define	DIABLO_ROTATION_TIME attotime::from_msec(25)
+
+	/** @brief DIABLO 44 sector time */
+	#define	DIABLO_SECTOR_TIME	attotime::from_msec(25/DIABLO_DRIVE_SPT)
+
+	/** @brief DIABLO 44 bit clock is 5000kHz ~= 200ns per bit
+	 * ~= 125184 bits/track (?)
+	 * ~= 10432 bits/sector
+	 * ~= 325 words/sector
+	 */
+	#define	DIABLO_BIT_TIME attotime::from_nsec(200)
+
+	/** @brief DIABLO 44 possible sector words */
+	#define	DIABLO_SECTOR_WORDS	325
+
+	/** @brief pulse width of sector mark before the next sector begins */
+	#define	DIABLO_SECTOR_MARK_PULSE_PRE DIABLO_BIT_TIME(16)
+
+	/** @brief pulse width of sector mark after the next sector began */
+	#define	DIABLO_SECTOR_MARK_PULSE_POST DIABLO_BIT_TIME(16)
+	#endif
+
+	/**
+	 * @brief format of the cooked disk image sectors, i.e. pure data
+	 *
+	 * The available images are a multiple of 267 words per sector,
+	 * 1 word page number
+	 * 2 words header
+	 * 8 words label
+	 * 256 words data
+	 */
+	typedef struct {
+		UINT8 pageno[2*DIABLO_PAGENO_WORDS];	//!< sector page number
+		UINT8 header[2*DIABLO_HEADER_WORDS];	//!< sector header words
+		UINT8 label[2*DIABLO_LABEL_WORDS];		//!< sector label words
+		UINT8 data[2*DIABLO_DATA_WORDS];		//!< sector data words
+	}	diablo_sector_t;
+
+	/**
+	 * @brief Structure of the disk drive context (2 drives or packs per system)
+	 */
+	typedef struct {
+		diablo_sector_t *image;		//!< disk image, made up of 203 x 2 x 12 sectors
+		int unit;					//!< drive unit number (0 or 1)
+		char description[32];		//!< description of the drive(s)
+		char basename[80];			//!< basename of the drive image
+		int packs;					//!< number of packs in drive (1 or 2)
+		attotime rotation_time;		//!< rotation time
+		attotime bit_time;			//!< bit time in atto seconds
+		int s_r_w_0;				//!< drive seek/read/write signal (active 0)
+		int ready_0;				//!< drive ready signal (active 0)
+		int sector_mark_0;			//!< sector mark (0 if new sector)
+		int addx_acknowledge_0;		//!< address acknowledge, i.e. seek successful (active 0)
+		int log_addx_interlock_0;	//!< log address interlock, i.e. seek in progress (active 0)
+		int seek_incomplete_0;		//!< seek incomplete, i.e. seek in progress (active 0)
+		int egate_0;				//!< erase gate
+		int wrgate_0;				//!< write gate
+		int rdgate_0;				//!< read gate
+		int cylinder;				//!< current cylinder number
+		int head;					//!< current head (track) number on cylinder
+		int sector;					//!< current sector number in track
+		UINT32 *bits[DIABLO_DRIVE_CYLINDERS * DIABLO_DRIVE_HEADS * DIABLO_DRIVE_SPT];		//!< sectors expanded to bits
+		int page;					//!< current page = (cylinder * HEADS + head) * SPT + sector
+		int rdfirst;				//!< set to first bit of a sector that is read from
+		int rdlast;					//!< set to last bit of a sector that was read from
+		int wrfirst;				//!< set to non-zero if a sector is written to
+		int wrlast;					//!< set to last bit of a sector that was written to
+	}	diablo_drive_t;
+
+	diablo_drive_t* m_drive[2];							//!< per drive data
 	int m_unit_selected;								//!< selected drive unit
 	int m_head_selected;								//!< selected drive head
 	a2cb m_sector_callback;								//!< callback to call at the start of each sector
 	emu_timer* m_sector_timer;							//!< sector timer
+	void drive_get_sector(int unit);					//!< calculate the sector from the logical block address
+	void expand_sector(int unit, int page);				//!< Expand a sector into an array of clock and data bits
+	void squeeze_sector(int unit);						//!< Squeeze a array of clock and data bits into a sector's data
 	int drive_bits_per_sector() const;					//!< return number of bitclk edges for a sector
 	const char* drive_description(int unit);			//!< return a pointer to a drive's description
 	const char* drive_basename(int unit);				//!< return a pointer to a drive's image basename
@@ -1690,9 +1846,6 @@ private:
 	/** @brief set non-zero to incorporate the Hamming code and Parity check */
 	#define	ALTO2_HAMMING_CHECK	1
 
-	#define	ALTO2_IO_PAGE_SIZE	01000
-	#define	ALTO2_IO_PAGE_BASE	0177000
-
 	enum {
 		ALTO2_MEM_NONE,
 		ALTO2_MEM_ODD	= (1 << 0),
@@ -1724,7 +1877,7 @@ private:
 		UINT16 mesr;						//!< memory error status register
 		UINT16 mecr;						//!< memory error control register
 
-#if	DEBUG
+#if	ALTO2_DEBUG
 		void (*watch_read)(int mar, int md);	//!< watch read function (debugging)
 		void (*watch_write)(int mar, int md);	//!< watch write function (debugging)
 #endif
@@ -1981,6 +2134,8 @@ private:
 	void init_ether(int task);						//!< 007 initialize ethernet task
 
 	// memory refresh task
+	void f1_mrt_block_0();							//!< f1_mrt_block early: block the display word task
+	void mrt_activate();							//!< called by the CPU when MRT becomes active
 	void init_mrt(int task);						//!< 010 initialize memory refresh task
 
 	// display word task

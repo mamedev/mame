@@ -509,7 +509,7 @@ void alto2_cpu_device::f2_acdest_0()
 	LOG((0,2,"	ACDEST<-; mux (rsel:%#o %s)\n", m_rsel, r_name[m_rsel]));
 }
 
-#if	DEBUG
+#if	ALTO2_DEBUG
 void alto2_cpu_device::bitblt_info()
 {
 	static const char *type_name[4] = {"bitmap","complement","and gray","gray"};
@@ -560,7 +560,7 @@ void alto2_cpu_device::f2_load_ir_1()
 {
 	UINT16 r = (A2_BIT32(m_bus,16,0) << 3) | A2_GET32(m_bus,16,5,7);
 
-#if	DEBUG
+#if	ALTO2_DEBUG
 	if (ll[task_emu].level > 1) {
 		char dasm[64];
 		dbg_dasm(dasm, sizeof(dasm), 0, m_r[6], m_bus);
@@ -568,7 +568,7 @@ void alto2_cpu_device::f2_load_ir_1()
 		/* disassembled instruction */
 		LOG((0,2,"		%06o: %06o %s\n", m_mem_mar, m_bus, dasm));
 	}
-#endif	/* DEBUG */
+#endif	/* ALTO2_DEBUG */
 
 	/* special logging of some opcodes */
 	switch (m_bus) {
@@ -602,7 +602,7 @@ void alto2_cpu_device::f2_load_ir_1()
 			m_r[rsel_ac2], m_r[rsel_ac3]));
 		break;
 	case op_BITBLT:
-#if	DEBUG
+#if	ALTO2_DEBUG
 		bitblt_info();
 #endif
 		break;
