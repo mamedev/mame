@@ -640,6 +640,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("echoiiplus", A2BUS_ECHOPLUS)    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
 	SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
+	SLOT_INTERFACE("aesms", A2BUS_AESMS)    /* Applied Engineering Super Music Synthesizer */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)

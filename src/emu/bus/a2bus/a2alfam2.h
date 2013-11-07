@@ -2,7 +2,7 @@
 
     a2alfam2.h
 
-    Implementation of the ALF Apple Music II card
+    Implementation of the ALF Apple Music II card and compatibles
 
 *********************************************************************/
 
@@ -17,14 +17,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class a2bus_alfam2_device:
+class a2bus_sn76489_device:
 	public device_t,
 	public device_a2bus_card_interface
 {
 public:
 	// construction/destruction
-	a2bus_alfam2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	a2bus_alfam2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2bus_sn76489_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -32,6 +31,7 @@ public:
 	required_device<sn76489_device> m_sn1;
 	required_device<sn76489_device> m_sn2;
 	required_device<sn76489_device> m_sn3;
+	optional_device<sn76489_device> m_sn4;
 
 protected:
 	virtual void device_start();
@@ -43,10 +43,28 @@ protected:
 	virtual bool take_c800();
 
 private:
-	UINT8 m_latch0, m_latch1, m_latch2;
+	UINT8 m_latch0, m_latch1, m_latch2, m_latch3;
+
+protected:
+	bool m_has4thsn;
+};
+
+class a2bus_alfam2_device : public a2bus_sn76489_device
+{
+public:
+	a2bus_alfam2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class a2bus_aesms_device : public a2bus_sn76489_device
+{
+public:
+	a2bus_aesms_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 // device type definition
 extern const device_type A2BUS_ALFAM2;
+extern const device_type A2BUS_AESMS;
 
 #endif /* __A2BUS_ALFAM2__ */
