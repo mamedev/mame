@@ -9,6 +9,7 @@
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/asic65.h"
 
 class atarig42_state : public atarigen_state
 {
@@ -20,6 +21,7 @@ public:
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
 			m_rle(*this, "rle"),
+			m_asic65(*this, "asic65"),
 			m_mo_command(*this, "mo_command") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -28,6 +30,7 @@ public:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_rle_objects_device> m_rle;
+	required_device<asic65_device> m_asic65;
 
 	UINT16          m_playfield_base;
 

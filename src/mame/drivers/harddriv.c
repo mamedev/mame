@@ -326,8 +326,6 @@ Notes:
 
 
 #include "emu.h"
-#include "machine/atarigen.h"
-#include "machine/asic65.h"
 #include "sound/dac.h"
 #include "includes/slapstic.h"
 #include "includes/harddriv.h"
@@ -1482,7 +1480,7 @@ static MACHINE_CONFIG_FRAGMENT( dsk )
 	MCFG_CPU_PROGRAM_MAP(dsk_dsp32_map)
 
 	/* ASIC65 */
-	MCFG_FRAGMENT_ADD( asic65 )
+	MCFG_ASIC65_ADD("asic65", ASIC65_STANDARD)
 MACHINE_CONFIG_END
 
 
@@ -1495,7 +1493,7 @@ static MACHINE_CONFIG_FRAGMENT( dsk2 )
 	MCFG_CPU_PROGRAM_MAP(dsk2_dsp32_map)
 
 	/* ASIC65 */
-	MCFG_FRAGMENT_ADD( asic65 )
+	MCFG_ASIC65_ADD("asic65", ASIC65_STANDARD)
 MACHINE_CONFIG_END
 
 
@@ -1597,8 +1595,8 @@ static MACHINE_CONFIG_DERIVED( steeltal, multisync_msp )
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
 
-	MCFG_FRAGMENT_ADD( asic65 )         /* ASIC65 on DSPCOM board */
-
+	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
+	
 	/* sund hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -2562,7 +2560,7 @@ ROM_START( racedriv )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-4015.210y", 0x0e0001, 0x010000, CRC(725806f3) SHA1(0fa4601465dc94f27c71db789ad625bbcd254169) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -2610,7 +2608,7 @@ ROM_START( racedrivb )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-4015.210y", 0x0e0001, 0x010000, CRC(725806f3) SHA1(0fa4601465dc94f27c71db789ad625bbcd254169) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -2658,7 +2656,7 @@ ROM_START( racedrivg )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-4015.210y", 0x0e0001, 0x010000, CRC(725806f3) SHA1(0fa4601465dc94f27c71db789ad625bbcd254169) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -2706,7 +2704,7 @@ ROM_START( racedriv4 )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-4015.210y", 0x0e0001, 0x010000, CRC(725806f3) SHA1(0fa4601465dc94f27c71db789ad625bbcd254169) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -2754,7 +2752,7 @@ ROM_START( racedrivb4 )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-4015.210y", 0x0e0001, 0x010000, CRC(725806f3) SHA1(0fa4601465dc94f27c71db789ad625bbcd254169) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -2802,7 +2800,7 @@ ROM_START( racedrivg4 )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-4015.210y", 0x0e0001, 0x010000, CRC(725806f3) SHA1(0fa4601465dc94f27c71db789ad625bbcd254169) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -2850,7 +2848,7 @@ ROM_START( racedriv3 )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-1015.210y", 0x0e0001, 0x010000, CRC(c51f2702) SHA1(2279f15c4c09af92fe9b87dc0ed842092ca64906) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -2898,7 +2896,7 @@ ROM_START( racedriv2 )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-1015.210y", 0x0e0001, 0x010000, CRC(c51f2702) SHA1(2279f15c4c09af92fe9b87dc0ed842092ca64906) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -2946,7 +2944,7 @@ ROM_START( racedriv1 )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-1015.210y", 0x0e0001, 0x010000, CRC(c51f2702) SHA1(2279f15c4c09af92fe9b87dc0ed842092ca64906) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -2994,7 +2992,7 @@ ROM_START( racedrivg1 )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-1015.210y", 0x0e0001, 0x010000, CRC(c51f2702) SHA1(2279f15c4c09af92fe9b87dc0ed842092ca64906) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3042,7 +3040,7 @@ ROM_START( racedrivb1 )
 	ROM_LOAD16_BYTE( "136077-1016.200y", 0x0e0000, 0x010000, CRC(e83a9c99) SHA1(1d4093902133bb6da981f294e6947544c3564393) )
 	ROM_LOAD16_BYTE( "136077-1015.210y", 0x0e0001, 0x010000, CRC(c51f2702) SHA1(2279f15c4c09af92fe9b87dc0ed842092ca64906) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3090,7 +3088,7 @@ ROM_START( racedrivc )
 	ROM_LOAD16_BYTE( "136078-4016.200y", 0x0e0000, 0x010000, CRC(aa296776) SHA1(991e33568e47a82cb183724f7df1f835850c30fa) )
 	ROM_LOAD16_BYTE( "136078-4015.210y", 0x0e0001, 0x010000, CRC(030c803d) SHA1(bb249c9d1d28f6851a529b93c4f96d80665f2bce) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3138,7 +3136,7 @@ ROM_START( racedrivcb )
 	ROM_LOAD16_BYTE( "136078-4016.200y", 0x0e0000, 0x010000, CRC(aa296776) SHA1(991e33568e47a82cb183724f7df1f835850c30fa) )
 	ROM_LOAD16_BYTE( "136078-4015.210y", 0x0e0001, 0x010000, CRC(030c803d) SHA1(bb249c9d1d28f6851a529b93c4f96d80665f2bce) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3186,7 +3184,7 @@ ROM_START( racedrivcg )
 	ROM_LOAD16_BYTE( "136078-4016.200y", 0x0e0000, 0x010000, CRC(aa296776) SHA1(991e33568e47a82cb183724f7df1f835850c30fa) )
 	ROM_LOAD16_BYTE( "136078-4015.210y", 0x0e0001, 0x010000, CRC(030c803d) SHA1(bb249c9d1d28f6851a529b93c4f96d80665f2bce) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3234,7 +3232,7 @@ ROM_START( racedrivc4 )
 	ROM_LOAD16_BYTE( "136078-4016.200y", 0x0e0000, 0x010000, CRC(aa296776) SHA1(991e33568e47a82cb183724f7df1f835850c30fa) )
 	ROM_LOAD16_BYTE( "136078-4015.210y", 0x0e0001, 0x010000, CRC(030c803d) SHA1(bb249c9d1d28f6851a529b93c4f96d80665f2bce) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3282,7 +3280,7 @@ ROM_START( racedrivcb4 )
 	ROM_LOAD16_BYTE( "136078-4016.200y", 0x0e0000, 0x010000, CRC(aa296776) SHA1(991e33568e47a82cb183724f7df1f835850c30fa) )
 	ROM_LOAD16_BYTE( "136078-4015.210y", 0x0e0001, 0x010000, CRC(030c803d) SHA1(bb249c9d1d28f6851a529b93c4f96d80665f2bce) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3330,7 +3328,7 @@ ROM_START( racedrivcg4 )
 	ROM_LOAD16_BYTE( "136078-4016.200y", 0x0e0000, 0x010000, CRC(aa296776) SHA1(991e33568e47a82cb183724f7df1f835850c30fa) )
 	ROM_LOAD16_BYTE( "136078-4015.210y", 0x0e0001, 0x010000, CRC(030c803d) SHA1(bb249c9d1d28f6851a529b93c4f96d80665f2bce) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3378,7 +3376,7 @@ ROM_START( racedrivc2 )
 	ROM_LOAD16_BYTE( "136078-1015.210y", 0x0e0001, 0x010000, CRC(64dd6040) SHA1(bcadf4f1d9a0685ca39af903d3342d590850513c) )
 	ROM_LOAD16_BYTE( "136078-1016.200y", 0x0e0000, 0x010000, CRC(a2a0ed28) SHA1(6f308a38594f7e54ebdd6983d28664ba595bc525) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3426,7 +3424,7 @@ ROM_START( racedrivc1 )
 	ROM_LOAD16_BYTE( "136078-1015.210y", 0x0e0001, 0x010000, CRC(64dd6040) SHA1(bcadf4f1d9a0685ca39af903d3342d590850513c) )
 	ROM_LOAD16_BYTE( "136078-1016.200y", 0x0e0000, 0x010000, CRC(a2a0ed28) SHA1(6f308a38594f7e54ebdd6983d28664ba595bc525) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )        /* 2*64k for audio 68000 code */
@@ -3578,7 +3576,7 @@ ROM_START( racedrivpan )
 
 	/* ----------------------- */
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136077-1027.30j", 0x00000, 0x02000, NO_DUMP )
 
 	/* ADSP board */
@@ -3627,7 +3625,7 @@ ROM_START( steeltal )
 	ROM_LOAD( "136087-5001.1f",  0x010000, 0x004000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
 	ROM_CONTINUE(                0x004000, 0x00c000 )
 
-	ROM_REGION( 0x2000, "asic65", 0 )       /* 64k for ASIC65 */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )       /* 64k for ASIC65 */
 	ROM_LOAD( "136087-9007.10c", 0x000000, 0x002000, CRC(2956984f) SHA1(63c9a99b00c3cbb63aca908b076c2c4d3f70f386) )
 
 	ROM_REGION( 0x10000, "cpu6", 0 )        /* 64k for DSP communications */
@@ -3688,7 +3686,7 @@ ROM_START( steeltalg )
 	ROM_LOAD( "136087-5001.1f",  0x010000, 0x004000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
-	ROM_REGION( 0x2000, "asic65", 0 )       /* 64k for ASIC65 */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )       /* 64k for ASIC65 */
 	ROM_LOAD( "136087-9007.10c", 0x000000, 0x002000, CRC(2956984f) SHA1(63c9a99b00c3cbb63aca908b076c2c4d3f70f386) )
 
 	ROM_REGION( 0x10000, "cpu6", 0 )        /* 64k for DSP communications */
@@ -3749,7 +3747,7 @@ ROM_START( steeltal1 )
 	ROM_LOAD( "136087-5001.1f",  0x010000, 0x004000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
-	ROM_REGION( 0x2000, "asic65", 0 )       /* 64k for ASIC65 */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )       /* 64k for ASIC65 */
 	ROM_LOAD( "136087-9007.10c", 0x000000, 0x002000, CRC(2956984f) SHA1(63c9a99b00c3cbb63aca908b076c2c4d3f70f386) )
 
 	ROM_REGION( 0x10000, "cpu6", 0 )        /* 64k for DSP communications */
@@ -3810,7 +3808,7 @@ ROM_START( steeltalp )
 	ROM_LOAD( "136087-5001.1f",  0x010000, 0x004000, CRC(c52d8218) SHA1(3511c8c65583c7e44242f4cc48d7cc46fc748868) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
-	ROM_REGION( 0x2000, "asic65", 0 )       /* 64k for ASIC65 */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )       /* 64k for ASIC65 */
 	ROM_LOAD( "136087-9007.10c", 0x000000, 0x002000, CRC(2956984f) SHA1(63c9a99b00c3cbb63aca908b076c2c4d3f70f386) )
 
 	ROM_REGION( 0x10000, "cpu6", 0 )        /* 64k for DSP communications */
@@ -3867,7 +3865,7 @@ ROM_START( strtdriv )
 	ROM_LOAD16_BYTE( "136091-0016.200y", 0x0e0000, 0x010000, CRC(f85ad532) SHA1(f9d2480104a7487c23d33b05aa044b7f4ca08c67) )
 	ROM_LOAD16_BYTE( "136091-0015.210y", 0x0e0001, 0x010000, CRC(a2e406f3) SHA1(a7266508011c892cb1032fa4d77ccbafedc844e8) )
 
-	ROM_REGION( 0x10000 + 0x10000, "asic65", 0 )    /* dummy region for ADSP 2105 */
+	ROM_REGION( 0x10000 + 0x10000, "asic65:asic65cpu", 0 )    /* dummy region for ADSP 2105 */
 	ROM_LOAD( "136091-0033.10j", 0x000000, 0x010000, CRC(57504ab6) SHA1(ec8361b7da964c07ca0da48a87537badc3986fe0) )
 
 	ROM_REGION( 0x60000, "user1", 0 )       /* 384k for object ROM */
@@ -3920,7 +3918,7 @@ ROM_START( hdrivair )
 	ROM_LOAD16_BYTE( "coprochi.bin",0x1c0000, 0x20000, CRC(5d2ca109) SHA1(e1a94d3fbfd5d542732555bf60268e73d66b3a06) )
 	ROM_LOAD16_BYTE( "coproclo.bin",0x1c0001, 0x20000, CRC(5f98b04d) SHA1(9c4fa4092fd85f1d67be44f2ff91a907a87db51a) )
 
-	ROM_REGION( 0x10000 + 0x10000, "asic65", 0 )    /* dummy region for ADSP 2105 */
+	ROM_REGION( 0x10000 + 0x10000, "asic65:asic65cpu", 0 )    /* dummy region for ADSP 2105 */
 	ROM_LOAD( "sboot.bin", 0x000000, 0x010000, CRC(cde4d010) SHA1(853f4b813ff70fe74cd87e92131c46fca045610d) )
 
 	ROM_REGION( 0xc0000, "user1", 0 )       /* 768k for object ROM */
@@ -3980,7 +3978,7 @@ ROM_START( hdrivairp )
 	ROM_REGION( 0x10000 + 0x10000, "dsp32", 0 ) /* dummy region for ADSP 2105 */
 	ROM_LOAD( "sboota.bin", 0x10000 + 0x00000, 0x10000, CRC(3ef819cd) SHA1(c547b869a3a37a82fb46584fe0ef0cfe21a4f882) )
 
-	ROM_REGION( 0x10000 + 0x10000, "asic65", 0 )    /* dummy region for ADSP 2105 */
+	ROM_REGION( 0x10000 + 0x10000, "asic65:asic65cpu", 0 )    /* dummy region for ADSP 2105 */
 	ROM_LOAD( "xboota.bin", 0x10000 + 0x00000, 0x10000, CRC(d9c49901) SHA1(9f90ae3a47eb1ef00c3ec3661f60402c2eae2108) )
 
 	ROM_REGION( 0xc0000, "user1", 0 )       /* 768k for object ROM */
@@ -4191,16 +4189,13 @@ void harddriv_state::init_dsk()
 	m_dsk_zram = (UINT16 *)(usr3 + 0x50000);
 
 	/* install ASIC65 */
-	m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x914000, 0x917fff, FUNC(asic65_data_w));
-	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x914000, 0x917fff, FUNC(asic65_r));
-	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x918000, 0x91bfff, FUNC(asic65_io_r));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x914000, 0x917fff, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x914000, 0x917fff, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x918000, 0x91bfff, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
 
 	/* install extra ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x940000, 0x9fffff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_small_rom_r), this));
 	m_dsk_rom = (UINT16 *)(usr3 + 0x00000);
-
-	/* set up the ASIC65 */
-	asic65_config(machine(), ASIC65_STANDARD);
 }
 
 
@@ -4210,9 +4205,9 @@ void harddriv_state::init_dsk2()
 	UINT8 *usr3 = memregion("user3")->base();
 
 	/* install ASIC65 */
-	m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x824000, 0x824003, FUNC(asic65_data_w));
-	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x824000, 0x824003, FUNC(asic65_r));
-	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x825000, 0x825001, FUNC(asic65_io_r));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x824000, 0x824003, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x824000, 0x824003, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x825000, 0x825001, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
 
 	/* install ASIC61 */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x827000, 0x8277ff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_dsp32_r), this), write16_delegate(FUNC(harddriv_state::hd68k_dsk_dsp32_w), this));
@@ -4227,9 +4222,6 @@ void harddriv_state::init_dsk2()
 	/* install extra ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x900000, 0x9fffff, read16_delegate(FUNC(harddriv_state::hd68k_dsk_rom_r), this));
 	m_dsk_rom = (UINT16 *)(usr3 + 0x000000);
-
-	/* set up the ASIC65 */
-	asic65_config(machine(), ASIC65_STANDARD);
 }
 
 
@@ -4237,12 +4229,9 @@ void harddriv_state::init_dsk2()
 void harddriv_state::init_dspcom()
 {
 	 /* install ASIC65 */
-	m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x900000, 0x900003, FUNC(asic65_data_w));
-	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x900000, 0x900003, FUNC(asic65_r));
-	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x901000, 0x910001, FUNC(asic65_io_r));
-
-	/* set up the ASIC65 */
-	asic65_config(machine(), ASIC65_STEELTAL);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x900000, 0x900003, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x900000, 0x900003, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x901000, 0x910001, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));
 
 	/* install DSPCOM control */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x904000, 0x90401f, write16_delegate(FUNC(harddriv_state::hddspcom_control_w), this));

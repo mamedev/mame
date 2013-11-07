@@ -7,13 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/adsp2100/adsp2100.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/dsp32/dsp32.h"
 #include "sound/dac.h"
-#include "machine/atarigen.h"
-#include "machine/asic65.h"
 #include "includes/slapstic.h"
 #include "includes/harddriv.h"
 
@@ -1543,7 +1537,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_dsk_control_w )
 			break;
 
 		case 4: /* ASIC65 reset */
-			asic65_reset(space.machine(), !val);
+			m_asic65->reset_line(!val);
 			break;
 
 		case 7: /* LED */
@@ -1686,7 +1680,7 @@ WRITE16_MEMBER( harddriv_state::hddspcom_control_w )
 	switch (offset & 7)
 	{
 		case 2: /* ASIC65 reset */
-			asic65_reset(space.machine(), !val);
+			m_asic65->reset_line(!val);
 			break;
 
 		default:

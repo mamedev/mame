@@ -20,7 +20,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/asic65.h"
 #include "video/atarirle.h"
 #include "includes/atarig42.h"
 
@@ -92,7 +91,7 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 14 controls the ASIC65 reset line */
-		asic65_reset(machine(), (~data >> 14) & 1);
+		m_asic65->reset_line((~data >> 14) & 1);
 
 		/* bits 13-11 are the MO control bits */
 		m_rle->control_write(space, 0, (data >> 11) & 7);
@@ -344,9 +343,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xe03800, 0xe03801) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
-	AM_RANGE(0xf40000, 0xf40001) AM_READ_LEGACY(asic65_io_r)
-	AM_RANGE(0xf60000, 0xf60001) AM_READ_LEGACY(asic65_r)
-	AM_RANGE(0xf80000, 0xf80003) AM_WRITE_LEGACY(asic65_data_w)
+	AM_RANGE(0xf40000, 0xf40001) AM_DEVREAD("asic65", asic65_device, io_r)
+	AM_RANGE(0xf60000, 0xf60001) AM_DEVREAD("asic65", asic65_device, read)
+	AM_RANGE(0xf80000, 0xf80003) AM_DEVWRITE("asic65", asic65_device, data_w)
 	AM_RANGE(0xfa0000, 0xfa0fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_WRITE(paletteram_666_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
@@ -539,9 +538,6 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigen_state, video_int_gen)
 
-	/* ASIC65 */
-	MCFG_FRAGMENT_ADD(asic65)
-
 	MCFG_MACHINE_START_OVERRIDE(atarig42_state,atarig42)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig42_state,atarig42)
 
@@ -573,10 +569,16 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atarig42_0x200, atarig42 )
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
+	
+	/* ASIC65 */
+	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atarig42_0x400, atarig42 )
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
+	
+	/* ASIC65 */
+	MCFG_ASIC65_ADD("asic65", ASIC65_GUARDIANS)
 MACHINE_CONFIG_END
 
 
@@ -595,7 +597,7 @@ ROM_START( roadriot )
 	ROM_LOAD16_BYTE( "136089-2016.9d", 0x40000, 0x20000, CRC(6191653c) SHA1(97d1a84a585149e8f2c49cab7af22dc755dff350) )
 	ROM_LOAD16_BYTE( "136089-2015.9c", 0x40001, 0x20000, CRC(0d34419a) SHA1(f16e9fb4cd537d727611cb7dd5537c030671fe1e) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
 
 	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 6502 code */
@@ -653,7 +655,7 @@ ROM_START( roadrioto )
 	ROM_LOAD16_BYTE( "136089-2016.9d", 0x40000, 0x20000, CRC(6191653c) SHA1(97d1a84a585149e8f2c49cab7af22dc755dff350) ) /* PALs & BPROMs in White labels */
 	ROM_LOAD16_BYTE( "136089-2015.9c", 0x40001, 0x20000, CRC(0d34419a) SHA1(f16e9fb4cd537d727611cb7dd5537c030671fe1e) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
 
 	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 6502 code */
@@ -712,7 +714,7 @@ ROM_START( guardian )
 	ROM_LOAD16_BYTE( "136092-2023.9e",  0x40000, 0x20000, CRC(cfa29316) SHA1(4e0e76304e29ee59bc2ce9a704e3f651dc9d473c) )
 	ROM_LOAD16_BYTE( "136092-2022.9cd", 0x40001, 0x20000, CRC(ed2abc91) SHA1(81531040d5663f6ab82e924210056e3737e17a8d) )
 
-	ROM_REGION( 0x2000, "asic65", 0 )   /* ASIC65 TMS32015 code */
+	ROM_REGION( 0x2000, "asic65:asic65cpu", 0 )   /* ASIC65 TMS32015 code */
 	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, NO_DUMP )
 
 	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 6502 code */
@@ -780,8 +782,7 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 	m_sloop_base = main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),this));
 	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 
-	asic65_config(machine(), ASIC65_ROMBASED);
-/*
+	/*
     Road Riot color MUX
 
     CRA10=!MGEP*!AN.VID7*AN.0               -- if (mopri < pfpri) && (!alpha)
@@ -816,8 +817,7 @@ DRIVER_INIT_MEMBER(atarig42_state,guardian)
 	m_sloop_base = main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),this));
 	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 
-	asic65_config(machine(), ASIC65_GUARDIANS);
-/*
+	/*
     Guardians color MUX
 
     CRA10=MGEP*!AN.VID7*AN.0*!MO.0          -- if (mopri >= pfpri) && (!alpha) && (mopix != 0)

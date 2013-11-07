@@ -15,6 +15,7 @@
 #include "sound/dac.h"
 #include "machine/atarigen.h"
 #include "machine/n68681.h"
+#include "machine/asic65.h"
 
 #define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
 #define HARDDRIV_GSP_CLOCK      XTAL_48MHz
@@ -53,7 +54,8 @@ public:
 			m_ds3sdsp_internal_timer(*this, "ds3sdsp_timer"),
 			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
 			m_dac(*this, "dac"),
-			m_duart(*this, "duartn68681") { }
+			m_duart(*this, "duartn68681"),
+			m_asic65(*this, "asic65") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -282,6 +284,7 @@ public:
 	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
 	optional_device<dac_device> m_dac;
 	required_device<duartn68681_device> m_duart;
+	optional_device<asic65_device> m_asic65;
 	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
 	
 	/*----------- defined in audio/harddriv.c -----------*/
