@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="v1050_hdd" description="Visual Technology Visual 1050 hard disks">
+
+	<software name="cpm3hd10">
+		<description>CP/M Plus v3.0 (BIOS 2.0, 10MB)</description>
+		<year>1982</year>
+		<publisher>Digital Research</publisher>
+		<info name="serial" value="CP2768-1"/>
+
+		<!-- CMI CM-5412 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="cm-5412" sha1="65708f2c715ac6e887bf1a5ebc940cc842b0d9e1" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cpm3hd5" cloneof="cpm3hd10">
+		<description>CP/M Plus v3.0 (BIOS 2.0, 5MB)</description>
+		<year>1982</year>
+		<publisher>Digital Research</publisher>
+		<info name="serial" value="CP2768-1"/>
+
+		<!-- Tandon TM-501 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="tm501" sha1="05be122ba238b47b700554bf8bfa0dd39bf920fb" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

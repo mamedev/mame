@@ -105,14 +105,15 @@ Notes:
 
     Start the Visual 1050 emulator with the floppy and hard disk images mounted:
 
-    $??mess v1050 -flop1 cpm3:flop2 -hard cm5412.chd
+    $ mess v1050 -flop1 cpm3:flop2 -hard tm501.chd
+    $ mess v1050 -flop1 cpm3:flop2 -hard cm5412.chd
 
     Start the Winchester Format Program from the CP/M prompt:
 
     A>fmtwinch
 
     Enter Y to continue.
-    Ener A for 5MB, or B for 10MB hard disk.
+    Enter A for 5MB, or B for 10MB hard disk.
     Enter C to start formatting.
 
     Once the formatting is complete, the CP/M system files need to be copied over to the hard disk:
@@ -125,9 +126,15 @@ Notes:
     Enter "y" at the prompt for CCP.COM.
     Press RETURN to return to CP/M.
 
-    The hard disk can now be booted from with the following command line:
+    You can now boot from the hard disk with:
 
+    $ mess v1050 -hard tm501.chd
     $ mess v1050 -hard cm5412.chd
+
+    Or skip all of the above and use the preformatted images in the software list:
+
+    $ mess v1050 -hard cpm3hd5
+    $ mess v1050 -hard cpm3hd10
 
 */
 
@@ -135,6 +142,7 @@ Notes:
 
     TODO:
 
+	- floppy 1 is broken
     - write to banked RAM at 0x0000-0x1fff when ROM is active
     - real keyboard w/i8049
     - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
@@ -1157,7 +1165,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_V1050_KEYBOARD_ADD()
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("disk_list","v1050")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "v1050_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "v1050_hdd")
 
 	// printer
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
