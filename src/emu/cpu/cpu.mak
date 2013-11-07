@@ -2290,13 +2290,17 @@ CPUOBJS += $(CPUOBJ)/alto2/alto2.o \
 	$(CPUOBJ)/alto2/a2kwd.o \
 	$(CPUOBJ)/alto2/a2mem.o \
 	$(CPUOBJ)/alto2/a2mouse.o \
+	$(CPUOBJ)/alto2/a2mrt.o \
 	$(CPUOBJ)/alto2/a2part.o \
 	$(CPUOBJ)/alto2/a2ram.o
-	
+
 DASMOBJS += $(CPUOBJ)/alto2/alto2dsm.o
 endif
 
 $(CPUOBJ)/alto2/alto2.o:    $(CPUSRC)/alto2/alto2.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2drive.o:  $(CPUSRC)/alto2/a2drive.c \
 							$(CPUSRC)/alto2/alto2.h
 
 $(CPUOBJ)/alto2/a2disk.o:   $(CPUSRC)/alto2/a2disk.c \
@@ -2335,6 +2339,9 @@ $(CPUOBJ)/alto2/a2mem.o:    $(CPUSRC)/alto2/a2mem.c \
 $(CPUOBJ)/alto2/a2mouse.o:  $(CPUSRC)/alto2/a2mouse.c \
 							$(CPUSRC)/alto2/alto2.h
 
+$(CPUOBJ)/alto2/a2mrt.o:    $(CPUSRC)/alto2/a2mrt.c \
+							$(CPUSRC)/alto2/alto2.h
+
 $(CPUOBJ)/alto2/a2part.o:   $(CPUSRC)/alto2/a2part.c \
 							$(CPUSRC)/alto2/alto2.h
 
@@ -2343,4 +2350,3 @@ $(CPUOBJ)/alto2/a2ram.o:    $(CPUSRC)/alto2/a2ram.c \
 
 $(CPUOBJ)/alto2/alto2dsm.o: $(CPUSRC)/alto2/alto2dsm.c \
 							$(CPUSRC)/alto2/alto2.h
- 
