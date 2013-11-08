@@ -190,7 +190,6 @@ void speaker_sound_device::device_start()
 void speaker_sound_device::device_reset()
 {
 	int i;
-	double x;
 
 	m_level = 0;
 	for (i = 0; i < FILTER_LENGTH; i++)
