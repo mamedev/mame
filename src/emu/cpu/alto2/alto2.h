@@ -21,8 +21,6 @@
 #define	ALTO2_DEBUG			0
 #endif
 
-//extern void fatal(int level, const char* format, ...);
-
 #define	USE_PRIO_F9318	0			//!< define to 1 to use the F9318 priority encoder code
 #define	USE_ALU_74181	1			//!< define to 1 to use the SN74181 ALU code
 #define	DEBUG_DISPLAY_TIMING	0	//!< define to 1 to debug the display timing
@@ -224,6 +222,9 @@ protected:
 			return &m_ram_config;
 		return NULL;
 	}
+
+	//! device (P)ROMs
+	virtual const rom_entry *device_rom_region() const;
 
 	//! device_state_interface overrides
 	void state_string_export(const device_state_entry &entry, astring &string);

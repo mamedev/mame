@@ -35,8 +35,65 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 }
 
 //-------------------------------------------------
+//  device_rom_region - device-specific (P)ROMs
+//-------------------------------------------------
+
+ROM_START( alto2_cpu )
+	ROM_REGION( 01100, "ctrl2k", 0 )
+	ROMX_LOAD( "2kctl.u3",   00000, 00400, CRC(5f8d89e8) SHA1(487cd944ab074290aea73425e81ef4900d92e250), ROM_NIBBLE)	//!< 3601-1 256x4 BPROM; Emulator address modifier
+	ROMX_LOAD( "2kctl.u76",  00400, 00400, CRC(1edef867) SHA1(928b8a15ac515a99109f32672441832173883b81), ROM_NIBBLE)	//!< 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
+	ROMX_LOAD( "2kctl.u38",  01000, 00040, CRC(fc51b1d1) SHA1(e36c2a12a5da377394264899b5ae504e2ffda46e), 0)				//!< 82S23 32x8 BPROM; task priority and initial address
+	ROMX_LOAD( "alu.a10",    01040, 00040, CRC(e0857892) SHA1(dcd389767139f0acc1f87cf074459115abc5b90b), ROM_NIBBLE)
+
+	ROM_REGION( 00400, "cram3k", 0 )
+	ROMX_LOAD( "3kcram.a37", 00000, 00400, CRC(9417360d) SHA1(bfcdbc56ee4ffafd0f2f672c0c869a55d6dd194b), ROM_NIBBLE)
+
+	ROM_REGION( 02400, "madr", 0 )
+	ROMX_LOAD( "madr.a32",   00000, 00400, CRC(a0e3b4a7) SHA1(24e50afdeb637a6a8588f8d3a3493c9188b8da2c), ROM_NIBBLE)	//! P3601 256x4 BPROM; mouse motion signals MX1, MX2, MY1, MY2
+	ROMX_LOAD( "madr.a64",   00400, 00400, CRC(a66b0eda) SHA1(4d9088f592caa3299e90966b17765be74e523144), ROM_NIBBLE)	//! P3601 256x4 BPROM; memory addressing
+	ROMX_LOAD( "madr.a65",   01000, 00400, CRC(ba37febd) SHA1(82e9db1cb65f451755295f0d179e6f8fe3349d4d), ROM_NIBBLE)	//! P3601 256x4 BPROM; memory addressing
+	ROMX_LOAD( "madr.a90",   01400, 00400, CRC(7a2d8799) SHA1(c3760dba147740729d33b9b88e59088a4cc7437a), ROM_NIBBLE)
+	ROMX_LOAD( "madr.a91",   02000, 00400, CRC(dd556aeb) SHA1(900f333a091e3ccde0843019c25f25fba62e6023), ROM_NIBBLE)
+
+	ROM_REGION( 01040, "displ", 0 )
+	ROMX_LOAD( "displ.a38",  00000, 00400, CRC(fd30beb7) SHA1(65e4a19ba4ff748d525122128c514abedd55d866), ROM_NIBBLE)	//!< P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
+	ROMX_LOAD( "displ.a66",  00400, 00400, CRC(9f91aad9) SHA1(69b1d4c71f4e18103112e8601850c2654e9265cf), ROM_NIBBLE)	//!< P3601 256x4 BPROM; display VSYNC and VBLANK
+	ROMX_LOAD( "displ.a63",  01000, 00040, CRC(82a20d60) SHA1(39d90703568be5419ada950e112d99227873fdea), 0)				//!< 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
+
+	ROM_REGION( 01400, "ether", 0 )
+	ROMX_LOAD( "enet.a41",   00000, 00400, CRC(d5de8d86) SHA1(c134a4c898c73863124361a9b0218f7a7f00082a), ROM_NIBBLE)
+	ROMX_LOAD( "enet.a42",   00400, 00400, CRC(9d5c81bd) SHA1(ac7e63332a3dad0bef7cd0349b24e156a96a4bf0), ROM_NIBBLE)
+	ROMX_LOAD( "enet.a49",   01000, 00400, CRC(4d2dcdb2) SHA1(583327a7d70cd02702c941c0e43c1e9408ff7fd0), ROM_NIBBLE)
+ROM_END
+
+const rom_entry *alto2_cpu_device::device_rom_region() const
+{
+	return ROM_NAME( alto2_cpu );
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
+
+#define	DEBUG_PROMS	1		// define to 1 to enable debugging of loaded PROMs
+
+#if	DEBUG_PROMS
+static void dump_prom(const char* name, UINT8* data, size_t size)
+{
+	printf("UINT8 %s[%05o] = {\n", name, (unsigned)size);
+	for (size_t addr = 0; addr < size; addr++) {
+		if (0 == addr % 16)
+			printf("\t");
+		printf("%04o", data[addr]);
+		if (addr + 1 < size)
+			printf(",");
+		if (15 == addr % 16)
+			printf("\n");
+	}
+	printf("};\n");
+	printf("\n");
+}
+#endif
 
 // FIXME
 void alto2_cpu_device::device_start()
@@ -44,6 +101,62 @@ void alto2_cpu_device::device_start()
 	m_ucode = &space(AS_PROGRAM);
 	m_const = &space(AS_DATA);
 	m_ram = &space(AS_IO);
+
+	// resolve the pointers to the various PROMs
+	UINT8 *ctrl2k = memregion("ctrl2k")->base();
+	m_ctl2k_u3 = ctrl2k;			// region=ctrl2k offset=00000 size=00400
+	m_ctl2k_u76 = ctrl2k + 00400;	// region=ctrl2k offset=00400 size=00400
+	m_ctl2k_u38 = ctrl2k + 01000;	// region=ctrl2k offset=01000 size=00040
+	m_alu_a10 = ctrl2k + 01040;		// region=ctrl2k offset=01040 size=00040
+
+#if	DEBUG_PROMS
+	dump_prom("m_ctl2k_u3", m_ctl2k_u3, 00400);
+	dump_prom("m_ctl2k_u76", m_ctl2k_u76, 00400);
+	dump_prom("m_ctl2k_u38", m_ctl2k_u38, 00040);
+	dump_prom("m_alu_a10", m_alu_a10, 00040);
+#endif
+
+	UINT8 *cram3k = memregion("cram3k")->base();
+	m_cram3k_a37 = cram3k;			// region=cram3k offset=00000 size=00400
+
+#if	DEBUG_PROMS
+	dump_prom("m_cram3k_a37", m_ctl2k_u3, 00400);
+#endif
+
+	UINT8 *madr = memregion("madr")->base();
+	m_madr_a32 = madr;				// region=madr offset=00000 size=00400
+	m_madr_a64 = madr + 00400;		// region=madr offset=00400 size=00400
+	m_madr_a65 = madr + 01000;		// region=madr offset=01000 size=00400
+	// m_madr_a90 = madr + 01400;	// region=madr offset=01400 size=00400 - unused
+	// m_madr_a91 = madr + 02000;	// region=madr offset=02000 size=00400 - unused
+
+#if	DEBUG_PROMS
+	dump_prom("m_madr_a32", m_madr_a32, 00400);
+	dump_prom("m_madr_a64", m_madr_a64, 00400);
+	dump_prom("m_madr_a65", m_madr_a65, 00400);
+#endif
+
+	UINT8* displ = memregion("displ")->base();
+	m_disp_a38 = displ;				// region=displ offset=00000 size=00400
+	m_disp_a66 = displ + 00400;		// region=displ offset=00400 size=00400
+	m_disp_a63 = displ + 01000;		// region=displ offset=01000 size=00040
+
+#if	DEBUG_PROMS
+	dump_prom("m_disp_a38", m_disp_a38, 00400);
+	dump_prom("m_disp_a66", m_disp_a66, 00400);
+	dump_prom("m_disp_a63", m_disp_a63, 00040);
+#endif
+
+	UINT8* ether = memregion("ether")->base();
+	m_ether_a41 = ether;			// region=ether offset=00000 size=00400
+	m_ether_a42 = ether + 00400;	// region=ether offset=00400 size=00400
+	m_ether_a49 = ether + 01000;	// region=ether offset=01000 size=00400
+
+#if	DEBUG_PROMS
+	dump_prom("m_ether_a41", m_ether_a41, 00400);
+	dump_prom("m_ether_a42", m_ether_a42, 00400);
+	dump_prom("m_ether_a49", m_ether_a49, 00400);
+#endif
 
 	save_item(NAME(m_task_mpc));
 	save_item(NAME(m_task_next2));
@@ -1969,28 +2082,6 @@ void alto2_cpu_device::execute_run()
 /** @brief reset the various registers */
 void alto2_cpu_device::hard_reset()
 {
-	UINT8* ctl2k = machine().root_device().memregion("2k_ctrl")->base();
-	m_ctl2k_u3 = ctl2k;				// FIXME: region=2k_ctrl offset=00000
-	m_ctl2k_u76 = ctl2k + 00400;	// FIXME: region=2k_ctrl offset=00400
-	m_cram3k_a37 = ctl2k + 01000;	// FIXME: region=2k_ctrl offset=01000
-	m_ctl2k_u38 = ctl2k + 01400;	// FIXME: region=2k_ctrl offset=01400
-	m_alu_a10 = ctl2k + 01440;		// FIXME: region=2k_ctrl offset=01440
-
-	UINT8* memory = machine().root_device().memregion("memory")->base();
-	m_madr_a32 = memory;			// FIXME: region=memory offset=00000
-	m_madr_a64 = memory + 00400;	// FIXME: region=memory offset=00400
-	m_madr_a65 = memory + 01000;	// FIXME: region=memory offset=01000
-
-	UINT8* displ = machine().root_device().memregion("displ")->base();
-	m_disp_a38 = displ;				// FIXME: region=displ offset=00000
-	m_disp_a66 = displ + 00400;		// FIXME: region=displ offset=00400
-	m_disp_a63 = displ + 01000;		// FIXME: region=displ offset=01000
-
-	UINT8* ether = machine().root_device().memregion("ether")->base();
-	m_ether_a41 = ether;			// FIXME: region=ether offset=00000
-	m_ether_a42 = ether + 00400;	// FIXME: region=ether offset=00400
-	m_ether_a49 = ether + 01000;	// FIXME: region=ether offset=01000
-
 	/* all tasks start in ROM0 */
 	m_reset_mode = 0xffff;
 
