@@ -748,8 +748,6 @@ private:
 	static const char *f1_name(UINT8 f1);			//!< human readable F1 function names
 	static const char *f2_name(UINT8 f2);			//!< human readable F2 function names
 
-	UINT16 m_const_prom[ALTO2_CONST_SIZE];			//!< constant PROM, decoded
-
 	/**
 	 * @brief 2KCTL PROM u3 - 256x4
 	 * <PRE>

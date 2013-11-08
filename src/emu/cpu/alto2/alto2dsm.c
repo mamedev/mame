@@ -212,7 +212,6 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	char *dst = buffer;
 	int pa;
 
-	dst += snprintf(dst, len - (size_t)(dst - buffer), "[%08X] ", mir);
 	switch (aluf) {
 	case  0: // T?: BUS
 		if (t)
@@ -455,5 +454,5 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-F2_%02o ", f2);
 		break;
 	}
-	return 4;
+	return 1;
 }

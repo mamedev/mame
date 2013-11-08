@@ -28,9 +28,9 @@ const device_type ALTO2 = &device_creator<alto2_cpu_device>;
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 	/* name, endianness_t endian, datawidth, addrwidth, addrshift = 0, address_map_constructor internal = NULL, address_map_constructor defmap = NULL */
-	m_ucode_config("microcode", ENDIANNESS_BIG, 32, 16, 0),
-	m_const_config("constants", ENDIANNESS_BIG, 16, 8, 0),
-	m_ram_config("memory", ENDIANNESS_BIG, 16, 17, 0)
+	m_ucode_config("program", ENDIANNESS_BIG, 32, 12, -2),
+	m_const_config("constants", ENDIANNESS_BIG, 16, 8, -1),
+	m_ram_config("memory", ENDIANNESS_BIG, 16, 17, -1)
 {
 }
 
@@ -211,10 +211,10 @@ void alto2_cpu_device::device_start()
 		ucode ^= ALTO2_UCODE_INVERTED;
 		m_ucode->write_dword(4*addr, ucode);
 	}
-	for (UINT32 addr = 0; addr < ALTO2_UCODE_PAGE_SIZE; addr++) {
-		UINT32 ucode = m_ucode->read_dword(4*(ALTO2_UCODE_PAGE_SIZE+addr));
+	for (UINT32 addr = ALTO2_UCODE_PAGE_SIZE; addr < 2*ALTO2_UCODE_PAGE_SIZE; addr++) {
+		UINT32 ucode = m_ucode->read_dword(4*addr);
 		ucode ^= ALTO2_UCODE_INVERTED;
-		m_ucode->write_dword(4*(ALTO2_UCODE_PAGE_SIZE+addr), ucode);
+		m_ucode->write_dword(4*addr, ucode);
 	}
 
 	for (UINT32 addr = 0; addr < 256; addr++) {
@@ -1540,8 +1540,9 @@ void alto2_cpu_device::execute_run()
 		 */
 		if (!do_bs || bs >= 4) {
 			int addr = 8 * m_rsel + bs;
-			LOG((0,2,"	%#o; BUS &= CONST[%03o]\n", m_const_prom[addr], addr));
-			m_bus &= m_const_prom[addr];
+			UINT16 data = m_const->read_word(addr);
+			LOG((0,2,"	%#o; BUS &= CONST[%03o]\n", data, addr));
+			m_bus &= data;
 		}
 
 		/*
