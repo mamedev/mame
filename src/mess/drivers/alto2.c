@@ -61,7 +61,7 @@ ADDRESS_MAP_END
 
 /* constant PROM with 256 16-bit words */
 static ADDRESS_MAP_START( alto2_const_map, AS_DATA, 16, alto2_state )
-	AM_RANGE(0, 255) AM_ROM
+	AM_RANGE(0, 0377) AM_ROM
 ADDRESS_MAP_END
 
 /* main memory and memory mapped i/o in range ALTO2_IO_PAGE_BASE ... ALTO2_IO_PAGE_BASE + ALTO2_IO_PAGE_SIZE - 1 */
@@ -307,9 +307,6 @@ MACHINE_CONFIG_END
 
 ROM_START(alto2)
 	// micro code PROMs, 8 x 4bit
-	// UINT32 src = addr ^ 0x3ff;
-	// UINT32 u32 = ~((ucode[src] << 24) | (ucode[src+0x400] << 16) | (ucode[src+0x800] << 8) | (ucode[src+0xc00));
-	// m_ucode[addr] = u32 ^ ALTO2_UCODE_INVERTED;
 	ROM_REGION( 4*ALTO2_UCODE_SIZE, "maincpu", ROMREGION_INVERT )
 	ROMX_LOAD( "62x.3",      00000, 02000, CRC(1b20a63f) SHA1(41dc86438e91c12b0fe42ffcce6b2ac2eb9e714a), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 0))	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
 	ROMX_LOAD( "61x.3",      00000, 02000, CRC(f25bcb2d) SHA1(acb57f3104a8dc4ba750dd1bf22ccc81cce9f084), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 4))	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
@@ -332,8 +329,6 @@ ROM_START(alto2)
 
 	// constant PROMs, 4 x 4bit
 	// UINT16 src = BITS(addr, 3,2,1,4,5,6,7,0);
-	// UINT16 u16 = ~((const[src] << 8) | (const[src+0x100));
-	// m_const[addr] = u16;
 	ROM_REGION( 0400, "const", ROMREGION_INVERT )
 	ROMX_LOAD( "madr.a3",    00000, 00400, CRC(e0992757) SHA1(5c45ea824970663cb9ee672dc50861539c860249), ROM_NIBBLE | ROM_GROUPWORD | ROM_NOSKIP | ROM_BITSHIFT( 0))	//!< 0000-0377 C(12)',C(13)',C(14)',C(15)'
 	ROMX_LOAD( "madr.a4",    00000, 00400, CRC(b957e490) SHA1(c72660ad3ada4ca0ed8697c6bb6275a4fe703184), ROM_NIBBLE | ROM_GROUPWORD | ROM_NOSKIP | ROM_BITSHIFT( 4))	//!< 0000-0377 C(08)',C(09)',C(10)',C(11)'

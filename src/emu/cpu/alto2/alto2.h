@@ -807,7 +807,7 @@ private:
 	 * access it. Also both, address and data lines, are inverted.
 	 * </PRE>
 	 */
-	UINT8 m_ctl2k_u3[256];
+	UINT8* m_ctl2k_u3;
 
 	/**
 	 * @brief 2KCTL PROM u38; 82S23; 32x8 bit
@@ -856,7 +856,7 @@ private:
 	 *	B7     9      NEXT[06]'
 	 * </PRE>
 	 */
-	UINT8 m_ctl2k_u38[32];
+	UINT8* m_ctl2k_u38;
 
 	//! output lines of the 2KCTL U38 PROM
 	enum {
@@ -928,22 +928,22 @@ private:
 	 * depending on the current NEXT[01]' level.
 	 * </PRE>
 	 */
-	UINT8 m_ctl2k_u76[256];
+	UINT8* m_ctl2k_u76;
 
 	/**
 	 * @brief 3k CRAM PROM a37
 	 */
-	UINT8 m_cram3k_a37[256];
+	UINT8* m_cram3k_a37;
 
 	/**
 	 * @brief memory addressing PROM a64
 	 */
-	UINT8 m_madr_a64[256];
+	UINT8* m_madr_a64;
 
 	/**
 	 * @brief memory addressing PROM a65
 	 */
-	UINT8 m_madr_a65[256];
+	UINT8* m_madr_a65;
 
 	//! per task bus source function pointers, early (0) and late (1)
 	a2func m_bs[2][ALTO2_TASKS][ALTO2_BUSSRC];
@@ -1003,6 +1003,7 @@ private:
 	void f2_alucy_1();								//!< f2_alucy late: branch on latched ALU carry
 	void f2_load_md_1();							//!< f2_load_md late: load memory data
 
+	UINT8* m_alu_a10;								//!< ALU function to 74181 operation lookup PROM
 	UINT32 alu_74181(UINT32 smc);
 
 	void rdram();									//!< read the microcode ROM/RAM halfword
@@ -1262,7 +1263,7 @@ private:
 	 * 0360: 017,007,013,017,013,017,017,007,007,017,017,013,017,013,007,017
 	 * </PRE>
 	 */
-	UINT8 m_madr_a32[256];
+	UINT8* m_madr_a32;
 	struct {
 		int x;
 		int y;
@@ -1723,7 +1724,7 @@ private:
 	 * 	O3 (010) = MBEMPTY'
 	 * </PRE>
 	 */
-	UINT8 m_disp_a38[256];
+	UINT8* m_disp_a38;
 
 	//! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
 	inline int FIFO_STOPWAKE_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & 002; }
@@ -1758,7 +1759,7 @@ private:
 	 * which happens to be very close to every 7th CPU micrcocycle.
 	 * </PRE>
 	 */
-	UINT8 m_disp_a63[32];
+	UINT8* m_disp_a63;
 
 	enum {
 		A63_HBLANK	= (1 << 0),				//!< PROM a63 B0 is latched as HBLANK signal
@@ -1802,7 +1803,7 @@ private:
 	 * Q3 (004) is VBLANK for the odd field (with H1024=1)
 	 * Q4 (010) is VBLANK for the even field (with H1024=0)
 	 */
-	UINT8 m_disp_a66[256];
+	UINT8* m_disp_a66;
 
 	enum {
 		A66_VSYNC_ODD	= (1 << 0),
@@ -2053,8 +2054,8 @@ private:
 	 * D2 (10) XDATA
 	 * D3  (9) XCLOCK
 	 */
-	UINT8 m_ether_a41[256];
-	UINT8 m_ether_a42[256];
+	UINT8* m_ether_a41;
+	UINT8* m_ether_a42;
 
 	/**
 	 * @brief BPROM; P3601-1; 265x4 enet.a49 "AFIFO"
@@ -2102,7 +2103,7 @@ private:
 	 * 340: 017 017 017 017 017 017 017 017 017 017 017 017 013 011 010 007
 	 * 360: 007 017 017 017 017 017 017 017 017 017 017 017 017 013 011 010
 	 */
-	UINT8 m_ether_a49[256];
+	UINT8* m_ether_a49;
 
 	static const int m_duckbreath_sec = 15;			//!< send duckbreath every 15 seconds
 
