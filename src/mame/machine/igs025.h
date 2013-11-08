@@ -26,7 +26,7 @@ public:
 
 	DECLARE_READ16_MEMBER( olds_r );
 	DECLARE_WRITE16_MEMBER( olds_w );
-	//const UINT8  *m_olds_prot_hilo_source2;
+	//const UINT8  *m_kb_prot_hilo_source2;
 	const UINT8 (*olds_source_data)[0xec];
 
 	DECLARE_READ16_MEMBER( drgw2_d80000_protection_r );
@@ -55,14 +55,9 @@ protected:
 
 	void no_callback_setup(void);
 
-	int           m_olds_cmd;
-	int           m_olds_reg;
-	int           m_olds_ptr;
+
 	UINT16        m_olds_bs;
-	UINT16        m_olds_cmd3;
-	UINT16        m_olds_prot_hold;
-	UINT16        m_olds_prot_hilo;
-	UINT16        m_olds_prot_hilo_select;
+	UINT16        m_kb_cmd3;
 
 
 	void olds_protection_calculate_hilo();
@@ -72,11 +67,6 @@ protected:
 
 
 
-	UINT16        m_drgw2_prot_hold;
-	UINT16        m_drgw2_prot_hilo;
-	UINT16        m_drgw2_prot_hilo_select;
-	int           m_drgw2_cmd;
-	int           m_drgw2_ptr;
 
 
 	void drgw2_protection_calculate_hilo();
