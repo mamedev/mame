@@ -133,6 +133,7 @@ void speaker_sound_device::device_start()
 	m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
 	m_next_interm_sample_time = m_channel_last_sample_time + attotime(0, m_interm_sample_period);
 	m_interm_sample_index = 0;
+	m_prevx = m_prevy = 0.0;
 
 	/* Note: To avoid time drift due to floating point inaccuracies,
 	 * it is good if the speaker time synchronizes itself with the stream timing regularly.
@@ -180,8 +181,32 @@ void speaker_sound_device::device_start()
 	save_item(NAME(m_channel_last_sample_time));
 	save_item(NAME(m_interm_sample_index));
 	save_item(NAME(m_last_update_time));
+	save_item(NAME(m_prevx));
+	save_item(NAME(m_prevy));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(speaker_sound_device::speaker_postload), this));
+}
+
+void speaker_sound_device::device_reset()
+{
+	int i;
+	double x;
+
+	m_level = 0;
+	for (i = 0; i < FILTER_LENGTH; i++)
+		m_composed_volume[i] = 0;
+
+	m_composed_sample_index = 0;
+	m_last_update_time = machine().time();
+	m_channel_sample_period = HZ_TO_ATTOSECONDS(machine().sample_rate());
+	m_channel_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(m_channel_sample_period);
+	m_interm_sample_period = m_channel_sample_period / RATE_MULTIPLIER;
+	m_interm_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(m_interm_sample_period);
+	m_channel_last_sample_time = m_channel->sample_time();
+	m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
+	m_next_interm_sample_time = m_channel_last_sample_time + attotime(0, m_interm_sample_period);
+	m_interm_sample_index = 0;
+	m_prevx = m_prevy = 0.0;
 }
 
 void speaker_sound_device::speaker_postload()
@@ -317,7 +342,7 @@ void speaker_sound_device::update_interm_samples(attotime time, int volume)
 
 double speaker_sound_device::update_interm_samples_get_filtered_volume(int volume)
 {
-	double filtered_volume;
+	double filtered_volume, tempx;
 
 	/* We may have one or more interm. samples to go */
 	if (m_interm_sample_index < RATE_MULTIPLIER)
@@ -337,6 +362,12 @@ double speaker_sound_device::update_interm_samples_get_filtered_volume(int volum
 	init_next_interm_sample();
 	/* Reset counter to next stream sample: */
 	m_interm_sample_index = 0;
+
+	/* simple DC blocker filter */
+	tempx = filtered_volume;
+	filtered_volume = tempx - m_prevx + 0.995 * m_prevy;
+	m_prevx = tempx;
+	m_prevy = filtered_volume;
 
 	return filtered_volume;
 }
