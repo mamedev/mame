@@ -1,11 +1,11 @@
 /*********************************************************************
 
-    romload.h
+	romload.h
 
-    ROM loading functions.
+	ROM loading functions.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+	Copyright Nicola Salmoria and the MAME Team.
+	Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
@@ -21,7 +21,7 @@
 
 
 /***************************************************************************
-    CONSTANTS
+	CONSTANTS
 ***************************************************************************/
 
 /* ----- type constants ----- */
@@ -116,7 +116,7 @@ enum
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
+	TYPE DEFINITIONS
 ***************************************************************************/
 
 class machine_config;
@@ -136,7 +136,7 @@ struct rom_entry
 
 
 /***************************************************************************
-    MACROS
+	MACROS
 ***************************************************************************/
 
 /* ----- per-entry macros ----- */
@@ -183,7 +183,7 @@ struct rom_entry
 #define ROM_GETBITWIDTH(r)          (((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) >> 16) + 8 * ((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) == 0))
 #define ROM_GETBITSHIFT(r)          ((ROM_GETFLAGS(r) & ROM_BITSHIFTMASK) >> 20)
 #define ROM_INHERITSFLAGS(r)        ((ROM_GETFLAGS(r) & ROM_INHERITFLAGSMASK) == ROM_INHERITFLAGS)
-#define ROM_GETBIOSFLAGS(r)         ((ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 24)
+#define ROM_GETBIOSFLAGS(r)         ((ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 25)
 
 
 /* ----- per-disk macros ----- */
@@ -252,7 +252,7 @@ struct rom_entry
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
+	FUNCTION PROTOTYPES
 ***************************************************************************/
 
 
