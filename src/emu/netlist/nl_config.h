@@ -16,6 +16,8 @@
 //  SETUP
 //============================================================
 
+#define USE_LINKED_LIST         (1)
+
 #define USE_DELEGATES           (0)
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc

@@ -37,13 +37,13 @@
 #define NLD_7420_H_
 
 #define TTL_7420_NAND(_name, _I1, _I2, _I3, _I4)                                    \
-        NET_REGISTER_DEV(nic7420, _name)                                            \
+        NET_REGISTER_DEV(7420, _name)                                               \
         NET_CONNECT(_name, A, _I1)                                                  \
         NET_CONNECT(_name, B, _I2)                                                  \
         NET_CONNECT(_name, C, _I3)                                                  \
         NET_CONNECT(_name, D, _I4)
 
 
-NETLIB_SIGNAL(nic7420, 4, 0, 0);
+NETLIB_SIGNAL(7420, 4, 0, 0);
 
 #endif /* NLD_7420_H_ */

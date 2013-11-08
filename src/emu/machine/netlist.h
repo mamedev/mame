@@ -95,7 +95,8 @@ private:
 // ======================> netlist_mame_device
 
 class netlist_mame_device : public device_t,
-						public device_execute_interface
+						    public device_execute_interface
+						    //, public device_memory_interface
 {
 public:
 

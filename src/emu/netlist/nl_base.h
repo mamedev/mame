@@ -164,8 +164,11 @@ public:
 
 	ATTR_COLD net_input_t(const int atype)
 		: net_terminal_t(atype)
-		, m_low_thresh_V(0)
-		, m_high_thresh_V(0)
+        , m_low_thresh_V(0)
+        , m_high_thresh_V(0)
+#if USE_LINKED_LIST
+	    , m_next(NULL)
+#endif
 		, m_state(INP_STATE_ACTIVE)
 		, m_output(NULL)
 	{}
@@ -184,6 +187,10 @@ public:
 
 	double m_low_thresh_V;
 	double m_high_thresh_V;
+
+#if USE_LINKED_LIST
+	net_input_t *m_next;
+#endif
 
 private:
 	net_input_state m_state;
@@ -248,9 +255,11 @@ class net_output_t : public net_terminal_t
 {
 public:
 
-    typedef struct {
-        double        Analog;
+    // FIXME: union does not work
+    typedef struct
+    {
         netlist_sig_t Q;
+        double        Analog;
     } hybrid_t;
 
 	net_output_t(int atype);
@@ -300,6 +309,9 @@ protected:
 	hybrid_t m_cur;
 	hybrid_t m_new;
 
+#if USE_LINKED_LIST
+	net_input_t *m_head;
+#endif
 	UINT32 m_num_cons;
 
 private:
@@ -311,7 +323,9 @@ private:
 
 	UINT32 m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
+#if !USE_LINKED_LIST
 	net_input_t *  RESTRICT m_cons[OUTPUT_MAX_CONNECTIONS];
+#endif
 };
 
 
@@ -333,7 +347,7 @@ public:
 	{
 		if (EXPECTED(newQ != m_new.Q))
 		{
-			m_new.Q = newQ;
+	        m_new.Q = newQ;
 			if (m_num_cons)
 				push_to_queue(delay);
 		}
@@ -352,7 +366,9 @@ public:
 
 	ttl_output_t()
 		: logic_output_t()
-	{ set_levels(0.3, 3.4); }
+	{
+	    set_levels(0.3, 3.4);
+	}
 
 };
 
@@ -361,9 +377,17 @@ class analog_output_t : public net_output_t
 public:
 
 	analog_output_t()
-		: net_output_t(OUTPUT | SIGNAL_ANALOG) { }
+		: net_output_t(OUTPUT | SIGNAL_ANALOG)
+    {
+        m_cur.Analog = 0.0;
+        m_new.Analog = 0.0;
+    }
 
-    ATTR_COLD void initial(const double val) { m_cur.Analog = val; m_new.Analog = val; }
+    ATTR_COLD void initial(const double val)
+    {
+        m_cur.Analog = val;
+        m_new.Analog = val;
+    }
 
 	ATTR_HOT inline void set_Q(const double newQ, const netlist_time &delay)
 	{

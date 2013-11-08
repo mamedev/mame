@@ -289,7 +289,10 @@ net_output_t::net_output_t(int atype)
 	//, m_new_Q(0)
 	//, m_Q_analog(0.0)
 	//, m_new_Q_analog(0.0)
-	, m_num_cons(0)
+#if USE_LINKED_LIST
+    , m_head(NULL)
+#endif
+    , m_num_cons(0)
 	, m_time(netlist_time::zero)
 	, m_active(0)
 	, m_in_queue(2)
@@ -322,6 +325,26 @@ ATTR_HOT inline void net_output_t::update_devs()
 
 	const UINT32 mask = masks[ (m_last.Q  << 1) | m_cur.Q ];
 
+#if USE_LINKED_LIST
+    net_input_t *p = m_head;
+    switch (m_num_cons)
+    {
+    case 2:
+        update_dev(p, mask);
+        p = p->m_next;
+    case 1:
+        update_dev(p, mask);
+        break;
+    default:
+        do
+        {
+            update_dev(p, mask);
+            p = p->m_next;
+        } while (p != NULL);
+        break;
+    }
+
+#else
 	switch (m_num_cons)
 	{
 	case 2:
@@ -336,16 +359,26 @@ ATTR_HOT inline void net_output_t::update_devs()
 		}
 		break;
 	}
-
+#endif
 	m_last = m_cur;
 }
 
 ATTR_COLD void net_output_t::register_con(net_input_t &input)
 {
-	int i;
+#if USE_LINKED_LIST
+    if (m_head == NULL)
+        m_head = &input;
+    else
+    {
+        input.m_next = m_head;
+        m_head = &input;
+    }
+#else
 	if (m_num_cons >= OUTPUT_MAX_CONNECTIONS)
 		fatalerror("Connections exceeded for %s\n", netdev()->name().cstr());
 
+#if 0
+    int i;
 	/* keep similar devices together */
 	for (i = 0; i < m_num_cons; i++)
 		if (m_cons[i]->netdev() == input.netdev())
@@ -355,9 +388,13 @@ ATTR_COLD void net_output_t::register_con(net_input_t &input)
 		m_cons[j] = m_cons[j - 1];
 
 	m_cons[i] = &input;
-	m_num_cons++;
-	if (input.state() != net_input_t::INP_STATE_PASSIVE)
-		m_active++;
+#else
+    m_cons[m_num_cons] = &input;
+#endif
+#endif
+    m_num_cons++;
+    if (input.state() != net_input_t::INP_STATE_PASSIVE)
+        m_active++;
 }
 
 // ----------------------------------------------------------------------------------------

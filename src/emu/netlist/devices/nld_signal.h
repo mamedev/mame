@@ -191,7 +191,7 @@ public:
 
 	ATTR_HOT ATTR_ALIGN void update()
 	{
-		const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+		static const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
 		int res = _invert ^ 1 ^_check;
 		m_i[0].activate();
