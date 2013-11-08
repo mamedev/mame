@@ -1245,14 +1245,14 @@ ROM_END
 /-------------------------------------------------*/
 ROM_START(mdntmrdr)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "u2.bin", 0x1000, 0x0800, NO_DUMP)
+	ROM_LOAD( "mdru2.532", 0x1000, 0x0800, CRC(f72668bc) SHA1(25b984e1828905190c73c359ee6c9858ed1b2224))
 	ROM_CONTINUE( 0x5000, 0x0800)
-	ROM_LOAD( "u6.bin", 0x1800, 0x0800, CRC(ff55fb57) SHA1(4a44fc8732c8cbce38c9605c7958b02a6bc95da1) )
+	ROM_LOAD( "mdru6.732", 0x1800, 0x0800, CRC(ff55fb57) SHA1(4a44fc8732c8cbce38c9605c7958b02a6bc95da1))
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0xf000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("u3.bin", 0xd000, 0x1000, NO_DUMP)
-	ROM_LOAD("u5.bin", 0xf000, 0x1000, NO_DUMP)
+	ROM_LOAD("u3.bin", 0xd000, 0x1000, CRC(3ba474e4) SHA1(4ee5c3ad2c9dca49e9394521506e97a95e3d9a17))
+	ROM_LOAD("u5.bin", 0xf000, 0x1000, CRC(3ab40e35) SHA1(63b2ee074e5993a2616e67d3383bc3d3ac51b400))
 ROM_END
 
 /*----------------------------
