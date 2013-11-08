@@ -27,8 +27,10 @@ const device_type ALTO2 = &device_creator<alto2_cpu_device>;
 
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
-	m_ucode_config("program", ENDIANNESS_BIG, 32, 32, 0),
-	m_ram_config("io", ENDIANNESS_BIG, 16, 16, 0)
+	/* name, endianness_t endian, datawidth, addrwidth, addrshift = 0, address_map_constructor internal = NULL, address_map_constructor defmap = NULL */
+	m_ucode_config("microcode", ENDIANNESS_BIG, 32, 16, 0),
+	m_const_config("constants", ENDIANNESS_BIG, 16, 8, 0),
+	m_ram_config("memory", ENDIANNESS_BIG, 16, 17, 0)
 {
 }
 
@@ -39,7 +41,187 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 // FIXME
 void alto2_cpu_device::device_start()
 {
+	m_ucode = &space(AS_PROGRAM);
+	m_const = &space(AS_DATA);
+	m_ram = &space(AS_IO);
 
+	save_item(NAME(m_task_mpc));
+	save_item(NAME(m_task_next2));
+	save_item(NAME(m_ntime));
+	save_item(NAME(m_task));
+	save_item(NAME(m_next_task));
+	save_item(NAME(m_next2_task));
+	save_item(NAME(m_mpc));
+	save_item(NAME(m_mir));
+	save_item(NAME(m_rsel));
+	save_item(NAME(m_next));
+	save_item(NAME(m_next2));
+	save_item(NAME(m_r));
+	save_item(NAME(m_s));
+	save_item(NAME(m_bus));
+	save_item(NAME(m_t));
+	save_item(NAME(m_alu));
+	save_item(NAME(m_aluc0));
+	save_item(NAME(m_l));
+	save_item(NAME(m_shifter));
+	save_item(NAME(m_laluc0));
+	save_item(NAME(m_m));
+	save_item(NAME(m_cram_addr));
+	save_item(NAME(m_task_wakeup));
+	save_item(NAME(m_reset_mode));
+	save_item(NAME(m_rdram_flag));
+	save_item(NAME(m_wrtram_flag));
+	save_item(NAME(m_s_reg_bank));
+	save_item(NAME(m_bank_reg));
+	save_item(NAME(m_ether_enable));
+	save_item(NAME(m_ewfct));
+	save_item(NAME(m_dsp_time));
+	save_item(NAME(m_dsp_state));
+	save_item(NAME(m_unload_time));
+	save_item(NAME(m_unload_word));
+	save_item(NAME(m_mouse.x));
+	save_item(NAME(m_mouse.y));
+	save_item(NAME(m_mouse.dx));
+	save_item(NAME(m_mouse.dy));
+	save_item(NAME(m_mouse.latch));
+	save_item(NAME(m_unit_selected));
+	save_item(NAME(m_head_selected));
+	save_item(NAME(m_dsk.drive));
+	save_item(NAME(m_dsk.kaddr));
+	save_item(NAME(m_dsk.kadr));
+	save_item(NAME(m_dsk.kstat));
+	save_item(NAME(m_dsk.kcom));
+	save_item(NAME(m_dsk.krecno));
+	save_item(NAME(m_dsk.shiftin));
+	save_item(NAME(m_dsk.shiftout));
+	save_item(NAME(m_dsk.datain));
+	save_item(NAME(m_dsk.dataout));
+	save_item(NAME(m_dsk.krwc));
+	save_item(NAME(m_dsk.kfer));
+	save_item(NAME(m_dsk.wdtskena));
+	save_item(NAME(m_dsk.wdinit0));
+	save_item(NAME(m_dsk.wdinit));
+	save_item(NAME(m_dsk.strobe));
+	save_item(NAME(m_dsk.bitclk));
+	save_item(NAME(m_dsk.datin));
+	save_item(NAME(m_dsk.bitcount));
+	save_item(NAME(m_dsk.carry));
+	save_item(NAME(m_dsk.seclate));
+	save_item(NAME(m_dsk.seekok));
+	save_item(NAME(m_dsk.ok_to_run));
+	save_item(NAME(m_dsk.ready_mf31a));
+	save_item(NAME(m_dsk.seclate_mf31b));
+#if	0
+	save_item(NAME(m_dsk.ff_21a));
+	save_item(NAME(m_dsk.ff_21a_old));
+	save_item(NAME(m_dsk.ff_21b));
+	save_item(NAME(m_dsk.ff_22a));
+	save_item(NAME(m_dsk.ff_22b));
+	save_item(NAME(m_dsk.ff_43b));
+	save_item(NAME(m_dsk.ff_53a));
+	save_item(NAME(m_dsk.ff_43a));
+	save_item(NAME(m_dsk.ff_53b));
+	save_item(NAME(m_dsk.ff_44a));
+	save_item(NAME(m_dsk.ff_44b));
+	save_item(NAME(m_dsk.ff_45a));
+	save_item(NAME(m_dsk.ff_45b));
+#endif
+	save_item(NAME(m_dsp.hlc));
+	save_item(NAME(m_dsp.a63));
+	save_item(NAME(m_dsp.a66));
+	save_item(NAME(m_dsp.setmode));
+	save_item(NAME(m_dsp.inverse));
+	save_item(NAME(m_dsp.halfclock));
+	save_item(NAME(m_dsp.clr));
+	save_item(NAME(m_dsp.fifo));
+	save_item(NAME(m_dsp.fifo_wr));
+	save_item(NAME(m_dsp.fifo_rd));
+	save_item(NAME(m_dsp.dht_blocks));
+	save_item(NAME(m_dsp.dwt_blocks));
+	save_item(NAME(m_dsp.curt_blocks));
+	save_item(NAME(m_dsp.curt_wakeup));
+	save_item(NAME(m_dsp.vblank));
+	save_item(NAME(m_dsp.xpreg));
+	save_item(NAME(m_dsp.csr));
+	save_item(NAME(m_dsp.curword));
+	save_item(NAME(m_dsp.curdata));
+	save_item(NAME(m_mem.mar));
+	save_item(NAME(m_mem.rmdd));
+	save_item(NAME(m_mem.wmdd));
+	save_item(NAME(m_mem.md));
+	save_item(NAME(m_mem.cycle));
+	save_item(NAME(m_mem.access));
+	save_item(NAME(m_mem.error));
+	save_item(NAME(m_mem.mear));
+	save_item(NAME(m_mem.mecr));
+	save_item(NAME(m_emu.ir));
+	save_item(NAME(m_emu.skip));
+	save_item(NAME(m_emu.cy));
+	save_item(NAME(m_eth.fifo));
+	save_item(NAME(m_eth.fifo_rd));
+	save_item(NAME(m_eth.fifo_wr));
+	save_item(NAME(m_eth.status));
+	save_item(NAME(m_eth.rx_crc));
+	save_item(NAME(m_eth.tx_crc));
+	save_item(NAME(m_eth.rx_count));
+	save_item(NAME(m_eth.tx_count));
+	save_item(NAME(m_eth.duckbreath));
+
+	state_add( A2_AC3, "AC(3)", m_r[A2_AC3]).formatstr("%04X");
+	state_add( A2_AC2, "AC(2)", m_r[A2_AC2]).formatstr("%04X");
+	state_add( A2_AC1, "AC(1)", m_r[A2_AC1]).formatstr("%04X");
+	state_add( A2_AC0, "AC(0)", m_r[A2_AC0]).formatstr("%04X");
+	state_add( A2_R04, "R04",   m_r[A2_R04]).formatstr("%04X");
+	state_add( A2_R05, "R05",   m_r[A2_R05]).formatstr("%04X");
+	state_add( A2_PC,  "PC",    m_r[A2_PC]).formatstr("%04X");
+	state_add( A2_R07, "R07",   m_r[A2_R07]).formatstr("%04X");
+	state_add( A2_R10, "R10",   m_r[A2_R10]).formatstr("%04X");
+	state_add( A2_R11, "R11",   m_r[A2_R11]).formatstr("%04X");
+	state_add( A2_R12, "R12",   m_r[A2_R12]).formatstr("%04X");
+	state_add( A2_R13, "R13",   m_r[A2_R13]).formatstr("%04X");
+	state_add( A2_R14, "R14",   m_r[A2_R14]).formatstr("%04X");
+	state_add( A2_R15, "R15",   m_r[A2_R15]).formatstr("%04X");
+	state_add( A2_R16, "R16",   m_r[A2_R16]).formatstr("%04X");
+	state_add( A2_R17, "R17",   m_r[A2_R17]).formatstr("%04X");
+	state_add( A2_R20, "R20",   m_r[A2_R20]).formatstr("%04X");
+	state_add( A2_R21, "R21",   m_r[A2_R21]).formatstr("%04X");
+	state_add( A2_R22, "R22",   m_r[A2_R22]).formatstr("%04X");
+	state_add( A2_R23, "R23",   m_r[A2_R23]).formatstr("%04X");
+	state_add( A2_R24, "R24",   m_r[A2_R24]).formatstr("%04X");
+	state_add( A2_R25, "R25",   m_r[A2_R25]).formatstr("%04X");
+	state_add( A2_R26, "R26",   m_r[A2_R26]).formatstr("%04X");
+	state_add( A2_R27, "R27",   m_r[A2_R27]).formatstr("%04X");
+	state_add( A2_R30, "R30",   m_r[A2_R30]).formatstr("%04X");
+	state_add( A2_R31, "R31",   m_r[A2_R31]).formatstr("%04X");
+	state_add( A2_R32, "R32",   m_r[A2_R32]).formatstr("%04X");
+	state_add( A2_R33, "R33",   m_r[A2_R33]).formatstr("%04X");
+	state_add( A2_R34, "R34",   m_r[A2_R34]).formatstr("%04X");
+	state_add( A2_R35, "R35",   m_r[A2_R35]).formatstr("%04X");
+	state_add( A2_R36, "R36",   m_r[A2_R36]).formatstr("%04X");
+	state_add( A2_R37, "R37",   m_r[A2_R37]).formatstr("%04X");
+
+	state_add(STATE_GENPC, "curpc", m_mpc).formatstr("%03X").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_aluc0).formatstr("%5s").noshow();
+
+	m_icountptr = &m_icount;
+
+	// reverse dwords and invert hardware specific bits
+	for (UINT32 addr = 0; addr < ALTO2_UCODE_PAGE_SIZE; addr++) {
+		UINT32 ucode = m_ucode->read_dword(4*addr);
+		ucode ^= ALTO2_UCODE_INVERTED;
+		m_ucode->write_dword(4*addr, ucode);
+	}
+	for (UINT32 addr = 0; addr < ALTO2_UCODE_PAGE_SIZE; addr++) {
+		UINT32 ucode = m_ucode->read_dword(4*(ALTO2_UCODE_PAGE_SIZE+addr));
+		ucode ^= ALTO2_UCODE_INVERTED;
+		m_ucode->write_dword(4*(ALTO2_UCODE_PAGE_SIZE+addr), ucode);
+	}
+
+	for (UINT32 addr = 0; addr < 256; addr++) {
+		printf("%02x: %04x\n", addr, m_const->read_word(addr));
+	}
+
+	hard_reset();
 }
 
 //-------------------------------------------------
@@ -49,7 +231,7 @@ void alto2_cpu_device::device_start()
 // FIXME
 void alto2_cpu_device::device_reset()
 {
-
+	soft_reset();
 }
 
 //-------------------------------------------------
@@ -60,7 +242,6 @@ void alto2_cpu_device::device_reset()
 // FIXME
 void alto2_cpu_device::execute_set_input(int inputnum, int state)
 {
-
 }
 
 //-------------------------------------------------
@@ -852,7 +1033,7 @@ void alto2_cpu_device::rdram()
 		LOG((0,0,"invalid address (%06o)\n", val));
 		return;
 	}
-	val = m_ucode_raw[addr] ^ ALTO2_UCODE_INVERTED;
+	val = m_ucode->read_dword(addr) ^ ALTO2_UCODE_INVERTED;
 	if (GET_CRAM_HALFSEL(m_cram_addr)) {
 		val = val >> 16;
 		LOG((0,0,"upper:%06o\n", val));
@@ -889,7 +1070,7 @@ void alto2_cpu_device::wrtram()
 		return;
 	}
 	LOG((0,0,"\n"));
-	m_ucode_raw[addr] = ((m_m << 16) | m_alu) ^ ALTO2_UCODE_INVERTED;
+	m_ucode->write_dword(addr, ((m_m << 16) | m_alu) ^ ALTO2_UCODE_INVERTED);
 }
 
 #if	USE_ALU_74181
@@ -1264,7 +1445,7 @@ void alto2_cpu_device::execute_run()
 	m_next = m_task_mpc[m_task];		// get current task's next mpc and address modifier
 	m_next2 = m_task_next2[m_task];
 
-	for (;;) {
+	do {
 		int do_bs, flags;
 		UINT32 alu;
 		UINT8 aluf;
@@ -1306,10 +1487,11 @@ void alto2_cpu_device::execute_run()
 
 		/* next instruction's mpc */
 		m_mpc = m_next;
-		m_mir	= m_ucode_raw[m_mpc];
+		debugger_instruction_hook(this, m_next);
+		m_mir = m_ucode->read_dword(m_mpc);
 		m_rsel = MIR_RSEL(m_mir);
 		m_next = MIR_NEXT(m_mir) | m_next2;
-		m_next2 = A2_GET32(m_ucode_raw[m_next], 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
+		m_next2 = A2_GET32(m_ucode->read_dword(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
 		aluf = MIR_ALUF(m_mir);
 		bs = MIR_BS(m_mir);
 		f1 = MIR_F1(m_mir);
@@ -1778,7 +1960,7 @@ void alto2_cpu_device::execute_run()
 				}
 			}
 		}
-	}
+	} while (m_icount-- > 0);
 
 	/* save this task's mpc and address modifier */
 	m_task_mpc[m_task] = m_next;

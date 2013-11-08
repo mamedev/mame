@@ -218,6 +218,8 @@ protected:
 	{
 		if (AS_PROGRAM == spacenum)
 			return &m_ucode_config;
+		if (AS_DATA == spacenum)
+			return &m_const_config;
 		if (AS_IO == spacenum)
 			return &m_ram_config;
 		return NULL;
@@ -242,7 +244,13 @@ private:
 	void fatal(int level, const char *format, ...);
 
 	address_space_config m_ucode_config;
+	address_space_config m_const_config;
 	address_space_config m_ram_config;
+
+	address_space *m_ucode;
+	address_space *m_const;
+	address_space *m_ram;
+	int m_icount;
 
 	static const UINT8 m_ether_id = 0121;
 
@@ -740,7 +748,6 @@ private:
 	static const char *f1_name(UINT8 f1);			//!< human readable F1 function names
 	static const char *f2_name(UINT8 f2);			//!< human readable F2 function names
 
-	UINT32 m_ucode_raw[ALTO2_UCODE_SIZE];			//!< raw microcode words, decoded
 	UINT16 m_const_prom[ALTO2_CONST_SIZE];			//!< constant PROM, decoded
 
 	/**
