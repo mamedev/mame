@@ -206,17 +206,17 @@ void alto2_cpu_device::device_start()
 	m_icountptr = &m_icount;
 
 	// reverse dwords and invert hardware specific bits
-	const UINT32 addrxor = 2 * (ALTO2_UCODE_PAGE_SIZE - 1);
+	const UINT32 addrxor = 4 * (ALTO2_UCODE_PAGE_SIZE - 1);
 	UINT32* temp = auto_alloc_array(machine(), UINT32, 2 * ALTO2_UCODE_PAGE_SIZE);
 	UINT32 ucode;
 	for (UINT32 addr = 0; addr < ALTO2_UCODE_PAGE_SIZE; addr++) {
-		ucode = m_ucode->read_dword(2*addr ^ addrxor);
+		ucode = m_ucode->read_dword(4*addr ^ addrxor);
 		temp[addr] = ucode ^ ALTO2_UCODE_INVERTED;
-		ucode = m_ucode->read_dword(2*(ALTO2_UCODE_PAGE_SIZE+addr) ^ addrxor);
+		ucode = m_ucode->read_dword(4*(ALTO2_UCODE_PAGE_SIZE+addr) ^ addrxor);
 		temp[ALTO2_UCODE_PAGE_SIZE+addr] = ucode ^ ALTO2_UCODE_INVERTED;
 	}
 	for (UINT32 addr = 0; addr < 2*ALTO2_UCODE_PAGE_SIZE; addr++) {
-		m_ucode->write_dword(2*addr, temp[addr]);
+		m_ucode->write_dword(4*addr, temp[addr]);
 	}
 
 	hard_reset();
