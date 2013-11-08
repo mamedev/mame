@@ -23,7 +23,7 @@
 
 // tables are xored by table at $1998dc
 // tables are the same as drgw3 and drgw2
-static const UINT8 olds_source_data[8][0xec] = // table addresses $2951CA
+static const UINT8 m_olds_source_data[8][0xec] = // table addresses $2951CA
 {
 	{ // region 0, unused...
 		0,
@@ -153,7 +153,7 @@ MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 {
 	int region = (ioport(":Region")->read()) & 0xff;
 
-	m_igs025->m_drgw2_protection_region = region;
+	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = 0x00900000 | region;
 
 	MACHINE_RESET_CALL_MEMBER(pgm);
@@ -165,7 +165,7 @@ DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(igs025_device::olds_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::olds_w), (igs025_device*)m_igs025));
 	m_igs028->m_sharedprotram = m_sharedprotram;
-	m_igs025->olds_source_data = olds_source_data;
+	m_igs025->m_kb_source_data = m_olds_source_data;
 
 }
 

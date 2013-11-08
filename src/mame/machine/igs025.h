@@ -17,8 +17,9 @@ public:
 	DECLARE_READ16_MEMBER( killbld_igs025_prot_r );
 	// use setters instead of making public?
 	const UINT8 (*m_kb_source_data)[0xec];
-	INT32 m_kb_source_data_offset;
 	UINT32 m_kb_game_id;
+	UINT32 m_kb_region;
+
 
 	igs025_execute_external m_execute_external;
 	static void set_external_cb(device_t &device,igs025_execute_external newcb);
@@ -27,12 +28,10 @@ public:
 	DECLARE_READ16_MEMBER( olds_r );
 	DECLARE_WRITE16_MEMBER( olds_w );
 	//const UINT8  *m_kb_prot_hilo_source2;
-	const UINT8 (*olds_source_data)[0xec];
 
 	DECLARE_READ16_MEMBER( drgw2_d80000_protection_r );
 	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );
-	UINT32 m_drgw2_protection_region;
-	const UINT8 (*m_drgw2_source_data)[0xec];
+	
 
 protected:
 	virtual void device_config_complete();

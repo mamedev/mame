@@ -115,7 +115,7 @@ void pgm_012_025_state::drgw2_common_init()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd80000, 0xd80003, read16_delegate(FUNC(igs025_device::drgw2_d80000_protection_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::drgw2_d80000_protection_w), (igs025_device*)m_igs025));
 
 
-	m_igs025->m_drgw2_source_data = drgw2_source_data;
+	m_igs025->m_kb_source_data = drgw2_source_data;
 
 	pgm_basic_init();
 	pgm_drgw2_decrypt();
@@ -150,7 +150,7 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2)
 	drgw2_common_init();
 
 	int region = 0x06;
-	m_igs025->m_drgw2_protection_region = region;
+	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
 	mem16[0x131098 / 2] = 0x4e93;
@@ -165,7 +165,7 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,dw2v100x)
 	drgw2_common_init();
 
 	int region = 0x06;
-	m_igs025->m_drgw2_protection_region = region;
+	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
 	mem16[0x131084 / 2] = 0x4e93;
@@ -180,7 +180,7 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2c)
 	drgw2_common_init();
 
 	int region = 0x05;
-	m_igs025->m_drgw2_protection_region = region;
+	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
 	mem16[0x1303bc / 2] = 0x4e93;
@@ -195,7 +195,7 @@ DRIVER_INIT_MEMBER(pgm_012_025_state,drgw2j)
 	drgw2_common_init();
 
 	int region = 0x01;
-	m_igs025->m_drgw2_protection_region = region;
+	m_igs025->m_kb_region = region;
 	m_igs025->m_kb_game_id = region | (region << 8) | (region << 16) | (region << 24);
 
 	mem16[0x1302c0 / 2] = 0x4e93;

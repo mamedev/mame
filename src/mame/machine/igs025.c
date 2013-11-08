@@ -94,28 +94,9 @@ void igs025_device::device_reset()
 
 }
 
-
-void igs025_device::killbld_protection_calculate_hilo()
-{
-	UINT8 source;
-
-	m_kb_prot_hilo_select++;
-
-	if (m_kb_prot_hilo_select > 0xeb) {
-		m_kb_prot_hilo_select = 0;
-	}
-
-	source = m_kb_source_data[m_drgw2_protection_region][m_kb_prot_hilo_select];
-
-	if (m_kb_prot_hilo_select & 1)
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0x00ff) | (source << 8);
-	}
-	else
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0xff00) | (source << 0);
-	}
-}
+/****************************************/
+/* WRITE */
+/****************************************/
 
 WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
 {
@@ -176,78 +157,6 @@ WRITE16_MEMBER(igs025_device::killbld_igs025_prot_w )
 	}
 }
 
-READ16_MEMBER(igs025_device::killbld_igs025_prot_r )
-{
-	if (offset)
-	{
-		switch (m_kb_cmd)
-		{
-			case 0x00:
-				return BITSWAP8((m_kb_swap+1) & 0x7f, 0,1,2,3,4,5,6,7); // drgw3
-
-			case 0x01:
-				return m_kb_reg & 0x7f;
-
-			case 0x05:
-			{
-				switch (m_kb_ptr)
-				{
-					case 1:
-						return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
-
-					case 2:
-						return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
-
-					case 3:
-						return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
-
-					case 4:
-						return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
-
-					default: // >= 5
-						return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5,2,9,7,10,13,12,15);
-				}
-
-				return 0;
-			}
-
-			case 0x40:
-				killbld_protection_calculate_hilo();
-				return 0; // Read and then discarded
-
-		//  default:
-		//      logerror("%06X: ASIC25 R CMD %X\n", space.device().safe_pc(), m_kb_cmd);
-		}
-	}
-
-	return 0;
-}
-
-
-/* todo, collapse this all into above */
-
-
-void igs025_device::olds_protection_calculate_hilo() // calculated in routine $12dbc2 in olds
-{
-	UINT8 source;
-
-	m_kb_prot_hilo_select++;
-	if (m_kb_prot_hilo_select > 0xeb) {
-		m_kb_prot_hilo_select = 0;
-	}
-
-	source = olds_source_data[m_drgw2_protection_region][m_kb_prot_hilo_select];
-
-	if (m_kb_prot_hilo_select & 1)    // $8178fa
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0x00ff) | (source << 8);     // $8178d8
-	}
-	else
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0xff00) | (source << 0);     // $8178d8
-	}
-}
-
 WRITE16_MEMBER(igs025_device::olds_w )
 {
 	if (offset == 0)
@@ -296,124 +205,10 @@ WRITE16_MEMBER(igs025_device::olds_w )
 	}
 }
 
-READ16_MEMBER(igs025_device::olds_r )
-{
-	if (offset)
-	{
-		switch (m_kb_cmd)
-		{
-			case 0x01:
-				return m_kb_reg & 0x7f;
-
-			case 0x02:
-				return m_olds_bs | 0x80;
-
-			case 0x03:
-				return m_kb_cmd3;
-
-			case 0x05:
-			{
-				switch (m_kb_ptr)
-				{
-					case 1:
-						return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
-
-					case 2:
-						return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
-
-					case 3:
-						return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
-
-					case 4:
-						return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
 
 
 
 
-					case 5:
-					default: // >= 5
-						return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5,2,9,7,10,13,12,15);    // $817906
-				}
-			}
-
-			case 0x40:
-				olds_protection_calculate_hilo();
-				return 0; // unused?
-		}
-	}
-
-	return 0;
-}
-
-
-
-
-void igs025_device::drgw2_protection_calculate_hilo()
-{
-	UINT8 source;
-
-	m_kb_prot_hilo_select++;
-	if (m_kb_prot_hilo_select > 0xeb) {
-		m_kb_prot_hilo_select = 0;
-	}
-
-	source = m_drgw2_source_data[m_drgw2_protection_region][m_kb_prot_hilo_select];
-
-	if (m_kb_prot_hilo_select & 1)
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0x00ff) | (source << 8);
-	}
-	else
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0xff00) | (source << 0);
-	}
-}
-
-READ16_MEMBER(igs025_device::drgw2_d80000_protection_r )
-{
-	switch (m_kb_cmd)
-	{
-		case 0x05:
-		{
-			switch (m_kb_ptr)
-			{
-				case 1:
-					return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
-
-				case 2:
-					return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
-
-				case 3:
-					return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
-
-				case 4:
-					return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
-
-				case 5:
-				default:
-					return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5,2,9,7,10,13,12,15);
-			}
-
-			return 0x3f00;
-		}
-
-		case 0x40:
-			drgw2_protection_calculate_hilo();
-			return 0;
-
-	//  case 0x13: // Read to $80eeb8
-	//  case 0x1f: // Read to $80eeb8
-	//  case 0xf4: // Read to $80eeb8
-	//  case 0xf6: // Read to $80eeb8
-	//  case 0xf8: // Read to $80eeb8
-	//      return 0;
-
-	//  default:
-	//      logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_kb_cmd);
-	}
-
-	return 0;
-}
 
 WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
 {
@@ -453,6 +248,155 @@ WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
 	//      logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_kb_cmd, data);
 	}
 }
+
+/****************************************/
+/* READ */
+/****************************************/
+
+READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
+{
+	if (offset)
+	{
+		switch (m_kb_cmd)
+		{
+		case 0x00:
+			return BITSWAP8((m_kb_swap + 1) & 0x7f, 0, 1, 2, 3, 4, 5, 6, 7); // drgw3
+
+		case 0x01:
+			return m_kb_reg & 0x7f;
+
+		case 0x05:
+		{
+					 switch (m_kb_ptr)
+					 {
+					 case 1:
+						 return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
+
+					 case 2:
+						 return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
+
+					 case 3:
+						 return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
+
+					 case 4:
+						 return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
+
+					 default: // >= 5
+						 return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
+					 }
+
+					 return 0;
+		}
+
+		case 0x40:
+			killbld_protection_calculate_hilo();
+			return 0; // Read and then discarded
+
+			//  default:
+			//      logerror("%06X: ASIC25 R CMD %X\n", space.device().safe_pc(), m_kb_cmd);
+		}
+	}
+
+	return 0;
+}
+
+
+READ16_MEMBER(igs025_device::olds_r)
+{
+	if (offset)
+	{
+		switch (m_kb_cmd)
+		{
+		case 0x01:
+			return m_kb_reg & 0x7f;
+
+		case 0x02:
+			return m_olds_bs | 0x80;
+
+		case 0x03:
+			return m_kb_cmd3;
+
+		case 0x05:
+		{
+					 switch (m_kb_ptr)
+					 {
+					 case 1:
+						 return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
+
+					 case 2:
+						 return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
+
+					 case 3:
+						 return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
+
+					 case 4:
+						 return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
+
+
+
+
+					 case 5:
+					 default: // >= 5
+						 return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);    // $817906
+					 }
+		}
+
+		case 0x40:
+			olds_protection_calculate_hilo();
+			return 0; // unused?
+		}
+	}
+
+	return 0;
+}
+
+
+READ16_MEMBER(igs025_device::drgw2_d80000_protection_r)
+{
+	switch (m_kb_cmd)
+	{
+	case 0x05:
+	{
+				 switch (m_kb_ptr)
+				 {
+				 case 1:
+					 return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
+
+				 case 2:
+					 return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
+
+				 case 3:
+					 return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
+
+				 case 4:
+					 return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
+
+				 case 5:
+				 default:
+					 return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
+				 }
+
+				 return 0x3f00;
+	}
+
+	case 0x40:
+		drgw2_protection_calculate_hilo();
+		return 0;
+
+		//  case 0x13: // Read to $80eeb8
+		//  case 0x1f: // Read to $80eeb8
+		//  case 0xf4: // Read to $80eeb8
+		//  case 0xf6: // Read to $80eeb8
+		//  case 0xf8: // Read to $80eeb8
+		//      return 0;
+
+		//  default:
+		//      logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_kb_cmd);
+	}
+
+	return 0;
+}
+
 
 
 
@@ -500,6 +444,73 @@ void igs025_device::killbld_protection_calculate_hold(int y, int z)
 	m_kb_prot_hold ^= BIT(old, 3) << 11;
 
 	m_kb_prot_hold ^= (m_kb_prot_hilo & ~0x0408) << 1;
+}
+
+
+
+void igs025_device::killbld_protection_calculate_hilo()
+{
+	UINT8 source;
+
+	m_kb_prot_hilo_select++;
+
+	if (m_kb_prot_hilo_select > 0xeb) {
+		m_kb_prot_hilo_select = 0;
+	}
+
+	source = m_kb_source_data[m_kb_region][m_kb_prot_hilo_select];
+
+	if (m_kb_prot_hilo_select & 1)
+	{
+		m_kb_prot_hilo = (m_kb_prot_hilo & 0x00ff) | (source << 8);
+	}
+	else
+	{
+		m_kb_prot_hilo = (m_kb_prot_hilo & 0xff00) | (source << 0);
+	}
+}
+
+
+void igs025_device::drgw2_protection_calculate_hilo()
+{
+	UINT8 source;
+
+	m_kb_prot_hilo_select++;
+	if (m_kb_prot_hilo_select > 0xeb) {
+		m_kb_prot_hilo_select = 0;
+	}
+
+	source = m_kb_source_data[m_kb_region][m_kb_prot_hilo_select];
+
+	if (m_kb_prot_hilo_select & 1)
+	{
+		m_kb_prot_hilo = (m_kb_prot_hilo & 0x00ff) | (source << 8);
+	}
+	else
+	{
+		m_kb_prot_hilo = (m_kb_prot_hilo & 0xff00) | (source << 0);
+	}
+}
+
+void igs025_device::olds_protection_calculate_hilo() // calculated in routine $12dbc2 in olds
+{
+	UINT8 source;
+
+	m_kb_prot_hilo_select++;
+	if (m_kb_prot_hilo_select > 0xeb) {
+		m_kb_prot_hilo_select = 0;
+	}
+
+	source = m_kb_source_data[m_kb_region][m_kb_prot_hilo_select];
+
+	if (m_kb_prot_hilo_select & 1)    // $8178fa
+	{
+		m_kb_prot_hilo = (m_kb_prot_hilo & 0x00ff) | (source << 8);     // $8178d8
+	}
+	else
+	{
+		m_kb_prot_hilo = (m_kb_prot_hilo & 0xff00) | (source << 0);     // $8178d8
+	}
 }
 
 

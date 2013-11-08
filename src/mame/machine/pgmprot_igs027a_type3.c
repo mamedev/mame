@@ -169,12 +169,12 @@ MACHINE_CONFIG_END
 void pgm_arm_type3_state::svg_basic_init()
 {
 	pgm_basic_init();
-	m_svg_shareram[0] = auto_alloc_array(machine(), UINT32, 0x10000 / 4);
-	m_svg_shareram[1] = auto_alloc_array(machine(), UINT32, 0x10000 / 4);
+	m_svg_shareram[0] = auto_alloc_array(machine(), UINT32, 0x20000 / 4);
+	m_svg_shareram[1] = auto_alloc_array(machine(), UINT32, 0x20000 / 4);
 	m_svg_ram_sel = 0;
 
-	save_pointer(NAME(m_svg_shareram[0]), 0x10000 / 4);
-	save_pointer(NAME(m_svg_shareram[1]), 0x10000 / 4);
+	save_pointer(NAME(m_svg_shareram[0]), 0x20000 / 4);
+	save_pointer(NAME(m_svg_shareram[1]), 0x20000 / 4);
 	save_item(NAME(m_svg_ram_sel));
 }
 
