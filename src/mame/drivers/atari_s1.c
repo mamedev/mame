@@ -315,6 +315,9 @@ ROM_START(atarians)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("atarian.e00", 0x7000, 0x0800, CRC(6066bd63) SHA1(e993497d0ca9f056e18838494089def8bdc265c9))
 	ROM_LOAD("atarian.e0", 0x7800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
+
+	ROM_REGION(0x1000, "sound1", 0)
+	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -324,6 +327,9 @@ ROM_END
 //  ROM_REGION(0x10000, "maincpu", 0)
 //  ROM_LOAD("atarianb.e00", 0x7000, 0x0800, CRC(74fc86e4) SHA1(135d75e5c03feae0929fa84caa3c802353cdd94e))
 //  ROM_LOAD("atarian.e0", 0x7800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
+//
+//	ROM_REGION(0x1000, "sound1", 0)
+//	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 //ROM_END
 
 /*-------------------------------------------------------------------
@@ -333,6 +339,9 @@ ROM_START(time2000)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("time.e00", 0x7000, 0x0800, CRC(e380f35c) SHA1(f2b4c508c8b7a2ce9924da97c05fb31d5115f36f))
 	ROM_LOAD("time.e0", 0x7800, 0x0800, CRC(1e79c133) SHA1(54ce5d59a00334fcec8b12c077d70e3629549af0))
+
+	ROM_REGION(0x1000, "sound1", 0)
+	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -342,6 +351,9 @@ ROM_START(aavenger)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("airborne.e00", 0x7000, 0x0800, CRC(05ac26b8) SHA1(114d587923ade9370d606e428af02a407d272c85))
 	ROM_LOAD("airborne.e0", 0x7800, 0x0800, CRC(44e67c54) SHA1(7f94189c12e322c41908d651cf6a3b6061426959))
+
+	ROM_REGION(0x1000, "sound1", 0)
+	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -351,6 +363,9 @@ ROM_START(midearth)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("609.bin", 0x7000, 0x0800, CRC(589df745) SHA1(4bd3e4f177e8d86bab41f3a14c169b936eeb480a))
 	ROM_LOAD("608.bin", 0x7800, 0x0800, CRC(28b92faf) SHA1(8585770f4059049f1dcbc0c6ef5718b6ff1a5431))
+
+	ROM_REGION(0x1000, "sound1", 0)
+	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -360,6 +375,9 @@ ROM_START(spcrider)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("spacer.bin", 0x7000, 0x0800, CRC(3cf1cd73) SHA1(c46044fb815b439f12fb3e21c470c8b93ebdfd55))
 	ROM_LOAD("spacel.bin", 0x7800, 0x0800, CRC(66ffb04e) SHA1(42d8b7fb7206b30478f631d0e947c0908dcf5419))
+
+	ROM_REGION(0x1000, "sound1", 0)
+	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
 ROM_END
 
 
