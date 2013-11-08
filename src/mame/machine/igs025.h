@@ -13,7 +13,6 @@ class igs025_device : public device_t
 public:
 	igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_WRITE16_MEMBER( killbld_igs025_prot_w );
 	DECLARE_READ16_MEMBER( killbld_igs025_prot_r );
 	// use setters instead of making public?
 	const UINT8 (*m_kb_source_data)[0xec];
@@ -24,14 +23,10 @@ public:
 	igs025_execute_external m_execute_external;
 	static void set_external_cb(device_t &device,igs025_execute_external newcb);
 
-
-	DECLARE_READ16_MEMBER( olds_r );
 	DECLARE_WRITE16_MEMBER( olds_w );
-	//const UINT8  *m_kb_prot_hilo_source2;
-
-	DECLARE_READ16_MEMBER( drgw2_d80000_protection_r );
 	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );
-	
+	DECLARE_WRITE16_MEMBER( killbld_igs025_prot_w);
+
 
 protected:
 	virtual void device_config_complete();
@@ -57,19 +52,6 @@ protected:
 
 	UINT16        m_olds_bs;
 	UINT16        m_kb_cmd3;
-
-
-	void olds_protection_calculate_hilo();
-	void olds_protection_calculate_hold(int y, int z);
-
-
-
-
-
-
-
-	void drgw2_protection_calculate_hilo();
-	void drgw2_protection_calculate_hold(int y, int z);
 
 };
 

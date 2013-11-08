@@ -196,7 +196,7 @@ WRITE16_MEMBER(igs025_device::olds_w )
 			case 0x26:
 			case 0x27:
 				m_kb_ptr++;
-				olds_protection_calculate_hold(m_kb_cmd & 0x0f, data & 0xff);
+				killbld_protection_calculate_hold(m_kb_cmd & 0x0f, data & 0xff);
 			break;
 
 		//  default:
@@ -229,7 +229,7 @@ WRITE16_MEMBER(igs025_device::drgw2_d80000_protection_w )
 		case 0x26:
 		case 0x27:
 			m_kb_ptr++;
-			drgw2_protection_calculate_hold(m_kb_cmd & 0x0f, data & 0xff);
+			killbld_protection_calculate_hold(m_kb_cmd & 0x0f, data & 0xff);
 		break;
 
 	//  case 0x08: // Used only on init..
@@ -265,51 +265,6 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
 		case 0x01:
 			return m_kb_reg & 0x7f;
 
-		case 0x05:
-		{
-					 switch (m_kb_ptr)
-					 {
-					 case 1:
-						 return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
-
-					 case 2:
-						 return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
-
-					 case 3:
-						 return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
-
-					 case 4:
-						 return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
-
-					 default: // >= 5
-						 return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
-					 }
-
-					 return 0;
-		}
-
-		case 0x40:
-			killbld_protection_calculate_hilo();
-			return 0; // Read and then discarded
-
-			//  default:
-			//      logerror("%06X: ASIC25 R CMD %X\n", space.device().safe_pc(), m_kb_cmd);
-		}
-	}
-
-	return 0;
-}
-
-
-READ16_MEMBER(igs025_device::olds_r)
-{
-	if (offset)
-	{
-		switch (m_kb_cmd)
-		{
-		case 0x01:
-			return m_kb_reg & 0x7f;
-
 		case 0x02:
 			return m_olds_bs | 0x80;
 
@@ -332,104 +287,39 @@ READ16_MEMBER(igs025_device::olds_r)
 					 case 4:
 						 return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
 
-
-
-
-					 case 5:
 					 default: // >= 5
-						 return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);    // $817906
+						 return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
 					 }
+
+					 return 0x3f00;
+					 //return 0;
 		}
 
 		case 0x40:
-			olds_protection_calculate_hilo();
-			return 0; // unused?
+			killbld_protection_calculate_hilo();
+			return 0; // Read and then discarded
+
+			//  default:
+			//      logerror("%06X: ASIC25 R CMD %X\n", space.device().safe_pc(), m_kb_cmd);
+
+			// drgw2 notes
+			//  case 0x13: // Read to $80eeb8
+			//  case 0x1f: // Read to $80eeb8
+			//  case 0xf4: // Read to $80eeb8
+			//  case 0xf6: // Read to $80eeb8
+			//  case 0xf8: // Read to $80eeb8
+			//      return 0;
+
+			//  default:
+			//      logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_kb_cmd);
+
+
 		}
 	}
 
 	return 0;
 }
 
-
-READ16_MEMBER(igs025_device::drgw2_d80000_protection_r)
-{
-	switch (m_kb_cmd)
-	{
-	case 0x05:
-	{
-				 switch (m_kb_ptr)
-				 {
-				 case 1:
-					 return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
-
-				 case 2:
-					 return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
-
-				 case 3:
-					 return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
-
-				 case 4:
-					 return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
-
-				 case 5:
-				 default:
-					 return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
-				 }
-
-				 return 0x3f00;
-	}
-
-	case 0x40:
-		drgw2_protection_calculate_hilo();
-		return 0;
-
-		//  case 0x13: // Read to $80eeb8
-		//  case 0x1f: // Read to $80eeb8
-		//  case 0xf4: // Read to $80eeb8
-		//  case 0xf6: // Read to $80eeb8
-		//  case 0xf8: // Read to $80eeb8
-		//      return 0;
-
-		//  default:
-		//      logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_kb_cmd);
-	}
-
-	return 0;
-}
-
-
-
-
-void igs025_device::drgw2_protection_calculate_hold(int y, int z)
-{
-	unsigned short old = m_kb_prot_hold;
-
-	m_kb_prot_hold = ((old << 1) | (old >> 15));
-
-	m_kb_prot_hold ^= 0x2bad;
-	m_kb_prot_hold ^= BIT(z, y);
-	m_kb_prot_hold ^= BIT(old, 7) << 0;
-	m_kb_prot_hold ^= BIT(~old, 13) << 4;
-	m_kb_prot_hold ^= BIT(old, 3) << 11;
-
-	m_kb_prot_hold ^= (m_kb_prot_hilo & ~0x0408) << 1;
-}
-
-
-void igs025_device::olds_protection_calculate_hold(int y, int z) // calculated in routine $12dbc2 in olds
-{
-	unsigned short old = m_kb_prot_hold;
-
-	m_kb_prot_hold = ((old << 1) | (old >> 15));
-
-	m_kb_prot_hold ^= 0x2bad;
-	m_kb_prot_hold ^= BIT(z, y);
-	m_kb_prot_hold ^= BIT(old, 7) << 0;
-	m_kb_prot_hold ^= BIT(~old, 13) << 4;
-	m_kb_prot_hold ^= BIT(old, 3) << 11;
-
-	m_kb_prot_hold ^= (m_kb_prot_hilo & ~0x0408) << 1; // $81790c
-}
 
 void igs025_device::killbld_protection_calculate_hold(int y, int z)
 {
@@ -471,47 +361,6 @@ void igs025_device::killbld_protection_calculate_hilo()
 }
 
 
-void igs025_device::drgw2_protection_calculate_hilo()
-{
-	UINT8 source;
-
-	m_kb_prot_hilo_select++;
-	if (m_kb_prot_hilo_select > 0xeb) {
-		m_kb_prot_hilo_select = 0;
-	}
-
-	source = m_kb_source_data[m_kb_region][m_kb_prot_hilo_select];
-
-	if (m_kb_prot_hilo_select & 1)
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0x00ff) | (source << 8);
-	}
-	else
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0xff00) | (source << 0);
-	}
-}
-
-void igs025_device::olds_protection_calculate_hilo() // calculated in routine $12dbc2 in olds
-{
-	UINT8 source;
-
-	m_kb_prot_hilo_select++;
-	if (m_kb_prot_hilo_select > 0xeb) {
-		m_kb_prot_hilo_select = 0;
-	}
-
-	source = m_kb_source_data[m_kb_region][m_kb_prot_hilo_select];
-
-	if (m_kb_prot_hilo_select & 1)    // $8178fa
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0x00ff) | (source << 8);     // $8178d8
-	}
-	else
-	{
-		m_kb_prot_hilo = (m_kb_prot_hilo & 0xff00) | (source << 0);     // $8178d8
-	}
-}
 
 
 
