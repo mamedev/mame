@@ -148,7 +148,7 @@ void igs025_device::killbld_protection_calculate_hilo()
 		m_kb_prot_hilo_select = 0;
 	}
 
-	source = m_kb_source_data[(ioport(":Region")->read() - m_kb_source_data_offset)][m_kb_prot_hilo_select];
+	source = m_kb_source_data[m_drgw2_protection_region][m_kb_prot_hilo_select];
 
 	if (m_kb_prot_hilo_select & 1)
 	{
@@ -236,7 +236,7 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r )
 				switch (m_kb_ptr)
 				{
 					case 1:
-						return 0x3f00 | ioport(":Region")->read();
+						return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
 
 					case 2:
 						return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
@@ -293,7 +293,7 @@ void igs025_device::olds_protection_calculate_hilo() // calculated in routine $1
 		m_olds_prot_hilo_select = 0;
 	}
 
-	source = olds_source_data[(ioport(":Region")->read())][m_olds_prot_hilo_select];
+	source = olds_source_data[m_drgw2_protection_region][m_olds_prot_hilo_select];
 
 	if (m_olds_prot_hilo_select & 1)    // $8178fa
 	{
@@ -372,16 +372,20 @@ READ16_MEMBER(igs025_device::olds_r )
 			{
 				switch (m_olds_ptr)
 				{
-					case 1: return 0x3f00 | ioport(":Region")->read();
+					case 1:
+						return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
 
 					case 2:
-						return 0x3f00 | 0x00;
+						return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
 
 					case 3:
-						return 0x3f00 | 0x90;
+						return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
 
 					case 4:
-						return 0x3f00 | 0x00;
+						return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
+
+
+
 
 					case 5:
 					default: // >= 5
@@ -443,16 +447,17 @@ READ16_MEMBER(igs025_device::drgw2_d80000_protection_r )
 		{
 			switch (m_drgw2_ptr)
 			{
-				case 1: return 0x3f00 | ((m_drgw2_protection_region >> 0) & 0xff);
+				case 1:
+					return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
 
 				case 2:
-					return 0x3f00 | ((m_drgw2_protection_region >> 8) & 0xff);
+					return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
 
 				case 3:
-					return 0x3f00 | ((m_drgw2_protection_region >> 16) & 0xff);
+					return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
 
 				case 4:
-					return 0x3f00 | ((m_drgw2_protection_region >> 24) & 0xff);
+					return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
 
 				case 5:
 				default:

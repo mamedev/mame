@@ -405,6 +405,7 @@ public:
 	DECLARE_DRIVER_INIT(killbld);
 	DECLARE_DRIVER_INIT(drgw3);
 	DECLARE_MACHINE_RESET(killbld);
+	DECLARE_MACHINE_RESET(dw3);
 
 	void igs025_to_igs022_callback( void );
 
@@ -532,7 +533,8 @@ MACHINE_CONFIG_EXTERN( pgm_arm_type3 );
 
 /*----------- defined in machine/pgmprot4.c -----------*/
 
-MACHINE_CONFIG_EXTERN( pgm_022_025 );
+MACHINE_CONFIG_EXTERN(pgm_022_025_dw3);
+MACHINE_CONFIG_EXTERN(pgm_022_025_killbld);
 
 INPUT_PORTS_EXTERN( killbld );
 INPUT_PORTS_EXTERN( dw3 );
