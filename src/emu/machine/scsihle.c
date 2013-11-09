@@ -372,12 +372,12 @@ void scsihle_device::scsi_in( UINT32 data, UINT32 mask )
 				{
 					// check to see if we have reached the end of the block buffer
 					// and that there is more data to read from the scsi disk
-					if(data_idx == m_sector_bytes)
+					if(data_idx == m_sector_bytes && bytes_left > 0)
 					{
 						scsibus_read_data();
+						scsi_out_req_delay( 1 );
 					}
-
-					if(data_idx == data_last && bytes_left == 0)
+					else if(data_idx == data_last && bytes_left == 0)
 					{
 						scsi_change_phase(SCSI_PHASE_STATUS);
 					}
