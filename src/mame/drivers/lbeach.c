@@ -6,8 +6,11 @@
 
   PCB was broken, and there are no known references.
   16MHz XTAL, M6800 @ 500kHz
-  2x 5101 sram 256x4bit (256 byte)
+  2x 5101 sram 256x4bit (256 byte) battery backed
   4x 4045 sram 1kx4 (2K byte)
+  
+  Game should be in b&w? But then highlighted blocks in testmode
+  would be invisible.
 
   6800 hits many illegal opcodes (0x02), though it's harmless.
   Maybe they meant to inserts nops (0x01) to remove debug stuff
@@ -23,6 +26,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/nvram.h"
 
 
 class lbeach_state : public driver_device
@@ -206,7 +210,7 @@ READ8_MEMBER(lbeach_state::lbeach_in2_r)
 }
 
 static ADDRESS_MAP_START( lbeach_map, AS_PROGRAM, 8, lbeach_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0x4000) AM_READ(lbeach_in1_r)
 	AM_RANGE(0x4000, 0x41ff) AM_RAM_WRITE(lbeach_bg_vram_w) AM_SHARE("bg_vram")
 	AM_RANGE(0x4200, 0x43ff) AM_RAM
@@ -320,13 +324,15 @@ static MACHINE_CONFIG_START( lbeach, lbeach_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_16MHz / 32) // Motorola MC6800P, 500kHz
 	MCFG_CPU_PROGRAM_MAP(lbeach_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(lbeach_state, nmi_line_pulse, 50) // unknown freq, it affects steering speed
+	MCFG_CPU_PERIODIC_INT_DRIVER(lbeach_state, nmi_line_pulse, 50) // unknown freq, it affects steering speed, glitchy if it's too fast
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60) // ?
 	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511-32, 0, 255-16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511-32, 0, 255-24)
 	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
 
