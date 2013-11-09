@@ -364,4 +364,4 @@ ROM_START( lbeach )
 ROM_END
 
 
-GAME( 1979, lbeach, 0, lbeach, lbeach, driver_device, 0, ROT0, "Olympia / Seletron", "Long Beach", GAME_WRONG_COLORS | GAME_NO_SOUND )
+GAME( 1979, lbeach, 0, lbeach, lbeach, driver_device, 0, ROT0, "Olympia / Seletron", "Long Beach", GAME_WRONG_COLORS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
