@@ -18,7 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_region_ucode(*this, "maincpu"),
-		m_region_const(*this, "const"),
+		m_region_const(*this, "data"),
 		m_region_ram(*this, "ram"),
 		m_io_row0(*this, "ROW0"),
 		m_io_row1(*this, "ROW1"),

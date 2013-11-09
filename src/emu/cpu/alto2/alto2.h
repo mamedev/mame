@@ -73,6 +73,9 @@
 #define	ALTO2_IO_PAGE_BASE		0177000						//!< base address of the memory mapped io range
 #define	ALTO2_IO_PAGE_SIZE		01000						//!< size of the memory mapped io range
 
+//! inverted bits in the micro instruction 32 bit word
+#define	ALTO2_UCODE_INVERTED	((1 << 10) | (1 << 15) | (1 << 19))
+
 /**
  * @brief start value for the horizontal line counter
  *
@@ -147,16 +150,19 @@
 #define	ALTO2_DISPLAY_VBLANK_TIME ((ALTO2_DISPLAY_TOTAL_HEIGHT-ALTO2_DISPLAY_HEIGHT)*HZ_TO_ATTOSECONDS(26250))
 #define	ALTO2_DISPLAY_FIFO 16											//!< the display fifo has 16 words
 
-//! 32 R registers
 enum {
-	A2_AC3, A2_AC2, A2_AC1, A2_AC0,
-	A2_R04, A2_R05, A2_PC,  A2_R07,
-	A2_R10, A2_R11, A2_R12, A2_R13,
-	A2_R14, A2_R15, A2_R16, A2_R17,
-	A2_R20, A2_R21, A2_R22, A2_R23,
-	A2_R24, A2_R25, A2_R26, A2_R27,
-	A2_R30, A2_R31, A2_R32, A2_R33,
-	A2_R34, A2_R35, A2_R36, A2_R37
+	A2_TASK, A2_BUS, A2_T, A2_ALU, A2_ALUC0,
+	A2_L, A2_SHIFTER, A2_LALUC0, A2_M,
+	A2_R,	// 32 R registers
+	A2_AC3 = A2_R, A2_AC2, A2_AC1, A2_AC0, A2_R04, A2_R05, A2_PC,  A2_R07,
+	A2_R10, A2_R11, A2_R12, A2_R13, A2_R14, A2_R15, A2_R16, A2_R17,
+	A2_R20, A2_R21, A2_R22, A2_R23, A2_R24, A2_R25, A2_R26, A2_R27,
+	A2_R30, A2_R31, A2_R32, A2_R33, A2_R34, A2_R35, A2_R36, A2_R37,
+	A2_S,	// 32 S registers
+	A2_S00 = A2_S, A2_S01, A2_S02, A2_S03, A2_S04, A2_S05, A2_S06, A2_S07,
+	A2_S10, A2_S11, A2_S12, A2_S13, A2_S14, A2_S15, A2_S16, A2_S17,
+	A2_S20, A2_S21, A2_S22, A2_S23, A2_S24, A2_S25, A2_S26, A2_S27,
+	A2_S30, A2_S31, A2_S32, A2_S33, A2_S34, A2_S35, A2_S36, A2_S37
 };
 
 /**
@@ -648,9 +654,6 @@ private:
 		NEXT0, NEXT1, NEXT2, NEXT3, NEXT4, NEXT5, NEXT6, NEXT7, NEXT8, NEXT9
 	};
 
-	//! inverted bits in the micro instruction 32 bit word
-	static const UINT32 ALTO2_UCODE_INVERTED = ((1 << (31 - DF1_0)) | (1 << (31 - DF2_0)) | (1 << (31 - LOADL)));
-
 	//! get the RSEL value from a micro instruction word
 	static inline UINT32 MIR_RSEL(UINT32 mir) { return A2_GET32(mir, 32, DRSEL0, DRSEL4); }
 
@@ -970,7 +973,6 @@ private:
 	bool m_ram_related[ALTO2_TASKS];				//!< set when task is RAM related
 
 	UINT64 m_cycle;									//!< number of cycles executed in the current slice
-	int m_alto_leave;								//!< flag set by timer.c if alto_execute() shall leave its loop
 
 	UINT64 cycle() { return m_cycle; }				//!< return the current CPU cycle
 

@@ -9,6 +9,8 @@
  ***************************************************************************/
 
 #include "includes/alto2.h"
+#include "cpu/alto2/alto2.h"
+#include "cpu/alto2/a2roms.h"
 
 
 // FIXME: Is this required? How to access the address space dwords?
@@ -61,7 +63,7 @@ ADDRESS_MAP_END
 
 /* constant PROM with 256 16-bit words */
 static ADDRESS_MAP_START( alto2_const_map, AS_DATA, 16, alto2_state )
-	AM_RANGE(0, 0377) AM_ROM
+	AM_RANGE(0, ALTO2_CONST_SIZE-1) AM_ROM
 ADDRESS_MAP_END
 
 /* main memory and memory mapped i/o in range ALTO2_IO_PAGE_BASE ... ALTO2_IO_PAGE_BASE + ALTO2_IO_PAGE_SIZE - 1 */
@@ -82,14 +84,6 @@ void alto2_state::screen_eof_alto2(screen_device &screen, bool state)
 {
 
 }
-
-/* Driver Init */
-
-DRIVER_INIT_MEMBER( alto2_state, alto2 )
-{
-
-}
-
 
 /* Input Ports */
 
@@ -306,48 +300,379 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( alto2 )
-	// micro code PROMs, 8 x 4bit
-	ROM_REGION( 4*ALTO2_UCODE_SIZE, "maincpu", ROMREGION_INVERT )
-	ROMX_LOAD( "62x.3",      00000, 02000, CRC(1b20a63f) SHA1(41dc86438e91c12b0fe42ffcce6b2ac2eb9e714a), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 0))	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
-	ROMX_LOAD( "61x.3",      00000, 02000, CRC(f25bcb2d) SHA1(acb57f3104a8dc4ba750dd1bf22ccc81cce9f084), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 4))	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
-	ROMX_LOAD( "60x.3",      00000, 02000, CRC(a35de0bf) SHA1(7fa4aead44dcf5393bbfd1706c0ada24aa6fd3ac), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 8))	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
-	ROMX_LOAD( "53x.3",      00000, 02000, CRC(3c89a740) SHA1(95d812d489b2bde03884b2f126f961caa6c8ec45), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(12))	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
-	ROMX_LOAD( "63x.3",      00000, 02000, CRC(f22d5028) SHA1(c65a42baef702d4aff2d9ad8e363daec27de6801), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(16))	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
-	ROMX_LOAD( "65x.3",      00000, 02000, CRC(741d1437) SHA1(01f7cf07c2173ac93799b2475180bfbbe7e0149b), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(20))	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
-	ROMX_LOAD( "64x.3",      00000, 02000, CRC(51b444c0) SHA1(8756e51f7f3253a55d75886465beb7ee1be6e1c4), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(24))	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
-	ROMX_LOAD( "55x.3",      00000, 02000, CRC(de870d75) SHA1(2b98cc769d8302cb39948711424d987d94e4159b), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(28))	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	// FIXME: how to allocate initally empty regions for AS_PROGRAM, AS_DATA and AS_IO?
+	ROM_REGION( 4*ALTO2_UCODE_SIZE, "maincpu", 0)
+	ROM_REGION( 2*ALTO2_CONST_SIZE, "data", 0)
+	ROM_REGION( ALTO2_RAM_SIZE, "ram", 0 )
+
+	// Alto-II micro code PROMs, 8 x 4bit
+	ROM_REGION( 16 * 02000, "ucode", 0 )
+	ROM_LOAD( "55x.3",     0*02000, 0x400, CRC(de870d75) SHA1(2b98cc769d8302cb39948711424d987d94e4159b) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROM_LOAD( "64x.3",     1*02000, 0x400, CRC(51b444c0) SHA1(8756e51f7f3253a55d75886465beb7ee1be6e1c4) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+	ROM_LOAD( "65x.3",     2*02000, 0x400, CRC(741d1437) SHA1(01f7cf07c2173ac93799b2475180bfbbe7e0149b) )	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+	ROM_LOAD( "63x.3",     3*02000, 0x400, CRC(f22d5028) SHA1(c65a42baef702d4aff2d9ad8e363daec27de6801) )	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+	ROM_LOAD( "53x.3",     4*02000, 0x400, CRC(3c89a740) SHA1(95d812d489b2bde03884b2f126f961caa6c8ec45) )	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+	ROM_LOAD( "60x.3",     5*02000, 0x400, CRC(a35de0bf) SHA1(7fa4aead44dcf5393bbfd1706c0ada24aa6fd3ac) )	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+	ROM_LOAD( "61x.3",     6*02000, 0x400, CRC(f25bcb2d) SHA1(acb57f3104a8dc4ba750dd1bf22ccc81cce9f084) )	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+	ROM_LOAD( "62x.3",     7*02000, 0x400, CRC(1b20a63f) SHA1(41dc86438e91c12b0fe42ffcce6b2ac2eb9e714a) )	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
 
 	// extended memory Mesa 5.1 micro code PROMs, 8 x 4bit
-	ROMX_LOAD( "xm51.u72",   02000, 02000, CRC(a28e5251) SHA1(44dd8ad4ad56541b5394d30ce3521b4d1d561394), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 0))	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
-	ROMX_LOAD( "xm51.u71",   02000, 02000, CRC(7283bf71) SHA1(819fdcc407ed0acdd8f12b02db6efbcab7bec19a), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 4))	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
-	ROMX_LOAD( "xm51.u70",   02000, 02000, CRC(5c64ee54) SHA1(0eb16d1b5e5967be7c1bf8c8ef6efdf0518a752c), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 8))	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
-	ROMX_LOAD( "xm51.u52",   02000, 02000, CRC(0a31eec8) SHA1(4e2ad5daa5e6a6f2143ee4de00c7b625d096fb02), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(12))	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
-	ROMX_LOAD( "xm51.u73",   02000, 02000, CRC(6c20fa46) SHA1(a054330c65048011f12209aaed5c6da73d95f029), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(16))	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
-	ROMX_LOAD( "xm51.u75",   02000, 02000, CRC(dfe3e3ac) SHA1(246fd29f92150a5d5d7627fbb4f2504c7b6cd5ec), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(20))	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
-	ROMX_LOAD( "xm51.u74",   02000, 02000, CRC(be8224f2) SHA1(ea9abcc3832b26a094319796901237e1e3f238b6), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(24))	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
-	ROMX_LOAD( "xm51.u54",   02000, 02000, CRC(11086ae9) SHA1(c394e3fadbfb91801ddc1a70cb25dc6f606c4f76), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(28))	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROM_LOAD( "xm51.u54",  8*02000, 02000, CRC(11086ae9) SHA1(c394e3fadbfb91801ddc1a70cb25dc6f606c4f76) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROM_LOAD( "xm51.u74",  9*02000, 02000, CRC(be8224f2) SHA1(ea9abcc3832b26a094319796901237e1e3f238b6) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+	ROM_LOAD( "xm51.u75", 10*02000, 02000, CRC(dfe3e3ac) SHA1(246fd29f92150a5d5d7627fbb4f2504c7b6cd5ec) )	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+	ROM_LOAD( "xm51.u73", 11*02000, 02000, CRC(6c20fa46) SHA1(a054330c65048011f12209aaed5c6da73d95f029) )	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+	ROM_LOAD( "xm51.u52", 12*02000, 02000, CRC(0a31eec8) SHA1(4e2ad5daa5e6a6f2143ee4de00c7b625d096fb02) )	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+	ROM_LOAD( "xm51.u70", 13*02000, 02000, CRC(5c64ee54) SHA1(0eb16d1b5e5967be7c1bf8c8ef6efdf0518a752c) )	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+	ROM_LOAD( "xm51.u71", 14*02000, 02000, CRC(7283bf71) SHA1(819fdcc407ed0acdd8f12b02db6efbcab7bec19a) )	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+	ROM_LOAD( "xm51.u72", 15*02000, 02000, CRC(a28e5251) SHA1(44dd8ad4ad56541b5394d30ce3521b4d1d561394) )	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
 
 	// constant PROMs, 4 x 4bit
 	// UINT16 src = BITS(addr, 3,2,1,4,5,6,7,0);
-	ROM_REGION( 0400, "const", ROMREGION_INVERT )
-	ROMX_LOAD( "madr.a3",    00000, 00400, CRC(e0992757) SHA1(5c45ea824970663cb9ee672dc50861539c860249), ROM_NIBBLE | ROM_GROUPWORD | ROM_NOSKIP | ROM_BITSHIFT( 0))	//!< 0000-0377 C(12)',C(13)',C(14)',C(15)'
-	ROMX_LOAD( "madr.a4",    00000, 00400, CRC(b957e490) SHA1(c72660ad3ada4ca0ed8697c6bb6275a4fe703184), ROM_NIBBLE | ROM_GROUPWORD | ROM_NOSKIP | ROM_BITSHIFT( 4))	//!< 0000-0377 C(08)',C(09)',C(10)',C(11)'
-	ROMX_LOAD( "madr.a5",    00000, 00400, CRC(42336101) SHA1(c77819cf40f063af3abf66ea43f17cc1a62e928b), ROM_NIBBLE | ROM_GROUPWORD | ROM_NOSKIP | ROM_BITSHIFT( 8))	//!< 0000-0377 C(04)',C(05)',C(06)',C(07)'
-	ROMX_LOAD( "madr.a6",    00000, 00400, CRC(c2c196b2) SHA1(8b2a599ac839ec2a070dbfef2f1626e645c858ca), ROM_NIBBLE | ROM_GROUPWORD | ROM_NOSKIP | ROM_BITSHIFT(12))	//!< 0000-0377 C(00)',C(01)',C(02)',C(03)'
-
-	ROM_REGION( ALTO2_RAM_SIZE, "ram", 0 )
+	ROM_REGION( 4 * 0400, "const", 0 )
+	ROM_LOAD( "madr.a6",   0*00400, 00400, CRC(c2c196b2) SHA1(8b2a599ac839ec2a070dbfef2f1626e645c858ca) )	//!< 0000-0377 C(00)',C(01)',C(02)',C(03)'
+	ROM_LOAD( "madr.a5",   1*00400, 00400, CRC(42336101) SHA1(c77819cf40f063af3abf66ea43f17cc1a62e928b) )	//!< 0000-0377 C(04)',C(05)',C(06)',C(07)'
+	ROM_LOAD( "madr.a4",   2*00400, 00400, CRC(b957e490) SHA1(c72660ad3ada4ca0ed8697c6bb6275a4fe703184) )	//!< 0000-0377 C(08)',C(09)',C(10)',C(11)'
+	ROM_LOAD( "madr.a3",   3*00400, 00400, CRC(e0992757) SHA1(5c45ea824970663cb9ee672dc50861539c860249) )	//!< 0000-0377 C(12)',C(13)',C(14)',C(15)'
 
 	// extended memory Mesa 4.1 (?) micro code PROMs, 8 x 4bit (unused)
-	ROM_REGION32_BE( 02000, "xm_mesa_4.1", ROMREGION_INVERT )
-	ROMX_LOAD( "xm672.41",   00000, 02000, CRC(110ee075) SHA1(bb72fceba5ce9e5e8c8a0024915006bdd011a3f3), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 0))	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
-	ROMX_LOAD( "xm671.41",   00000, 02000, CRC(f21b1ad7) SHA1(1e18bdb35de7802892ac373c128f900786d40886), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 4))	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
-	ROMX_LOAD( "xm670.41",   00000, 02000, CRC(1cd187f3) SHA1(0fd5eff7c6b5c2383aa20148a795b80286554675), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT( 8))	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
-	ROMX_LOAD( "xm652.41",   00000, 02000, CRC(ddfa94bb) SHA1(38625e269400aaf38cd07b5dbf36c0087a0f1b92), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(12))	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
-	ROMX_LOAD( "xm673.41",   00000, 02000, CRC(8173d7e3) SHA1(7fbacf6dccb60dfe9cef88a248c3a1660efddcf4), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(16))	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
-	ROMX_LOAD( "xm675.41",   00000, 02000, CRC(26eac1e7) SHA1(9220a1386afae8de96bdb2cf084afbadeeb61d42), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(20))	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
-	ROMX_LOAD( "xm674.41",   00000, 02000, CRC(7db5c097) SHA1(364bc41951baa3ad274031bd49abec1cf5b7a980), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(24))	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
-	ROMX_LOAD( "xm654.41",   00000, 02000, CRC(beace302) SHA1(0002fea03a0261f57365095c4b87385d833f7063), ROM_NIBBLE | ROM_GROUPDWORD | ROM_NOSKIP | ROM_BITSHIFT(28))	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROM_REGION32_BE( 8 * 02000, "xm_mesa_4.1", ROMREGION_INVERT )
+	ROM_LOAD( "xm654.41",  0*02000, 02000, CRC(beace302) SHA1(0002fea03a0261f57365095c4b87385d833f7063) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROM_LOAD( "xm674.41",  1*02000, 02000, CRC(7db5c097) SHA1(364bc41951baa3ad274031bd49abec1cf5b7a980) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+	ROM_LOAD( "xm675.41",  2*02000, 02000, CRC(26eac1e7) SHA1(9220a1386afae8de96bdb2cf084afbadeeb61d42) )	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+	ROM_LOAD( "xm673.41",  3*02000, 02000, CRC(8173d7e3) SHA1(7fbacf6dccb60dfe9cef88a248c3a1660efddcf4) )	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+	ROM_LOAD( "xm652.41",  4*02000, 02000, CRC(ddfa94bb) SHA1(38625e269400aaf38cd07b5dbf36c0087a0f1b92) )	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+	ROM_LOAD( "xm670.41",  5*02000, 02000, CRC(1cd187f3) SHA1(0fd5eff7c6b5c2383aa20148a795b80286554675) )	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+	ROM_LOAD( "xm671.41",  6*02000, 02000, CRC(f21b1ad7) SHA1(1e18bdb35de7802892ac373c128f900786d40886) )	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+	ROM_LOAD( "xm672.41",  7*02000, 02000, CRC(110ee075) SHA1(bb72fceba5ce9e5e8c8a0024915006bdd011a3f3) )	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
 ROM_END
+
+/**
+ * @brief list of microcoode PROM loading options
+ */
+static const prom_load_t ucode_prom_list[] = {
+	{	// 0000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+		"55x.3",
+		0,
+		"de870d75",
+		"2b98cc769d8302cb39948711424d987d94e4159b",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	28,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	ZERO,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+		"64x.3",
+		0,
+		"51b444c0",
+		"8756e51f7f3253a55d75886465beb7ee1be6e1c4",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	24,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+		"65x.3",
+		0,
+		"741d1437",
+		"01f7cf07c2173ac93799b2475180bfbbe7e0149b",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	20,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+		"63x.3",
+		0,
+		"f22d5028",
+		"c65a42baef702d4aff2d9ad8e363daec27de6801",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	007,						// keep D0, invert D1-D3
+/* width */	4,
+/* shift */	16,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+		"53x.3",
+		0,
+		"3c89a740",
+		"95d812d489b2bde03884b2f126f961caa6c8ec45",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	007,						// keep D0, invert D1-D3
+/* width */	4,
+/* shift */	12,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+		"60x.3",
+		0,
+		"a35de0bf",
+		"7fa4aead44dcf5393bbfd1706c0ada24aa6fd3ac",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	013,						// invert D0 and D2-D3
+/* width */	4,
+/* shift */	8,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+		"61x.3",
+		0,
+		"f25bcb2d",
+		"acb57f3104a8dc4ba750dd1bf22ccc81cce9f084",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	4,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+		"62x.3",
+		0,
+		"1b20a63f",
+		"41dc86438e91c12b0fe42ffcce6b2ac2eb9e714a",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	0,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	}
+
+#if	(ALTO2_UCODE_ROM_PAGES > 1)
+	,
+	{	// 02000-03777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+		"xm51.u54",
+		0,
+		"11086ae9",
+		"c394e3fadbfb91801ddc1a70cb25dc6f606c4f76",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	28,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	ZERO,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+		"xm51.u74",
+		0,
+		"be8224f2",
+		"ea9abcc3832b26a094319796901237e1e3f238b6",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	24,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+		"xm51.u75",
+		0,
+		"dfe3e3ac",
+		"246fd29f92150a5d5d7627fbb4f2504c7b6cd5ec",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	20,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 F1(0),F1(1)',F1(2)',F1(3)'
+		"xm51.u73",
+		0,
+		"6c20fa46",
+		"a054330c65048011f12209aaed5c6da73d95f029",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	007,						// keep D0, invert D1-D3
+/* width */	4,
+/* shift */	16,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 F2(0),F2(1)',F2(2)',F2(3)'
+		"xm51.u52",
+		0,
+		"0a31eec8",
+		"4e2ad5daa5e6a6f2143ee4de00c7b625d096fb02",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	007,						// keep D0, invert D1-D3
+/* width */	4,
+/* shift */	12,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+		"xm51.u70",
+		0,
+		"5c64ee54",
+		"0eb16d1b5e5967be7c1bf8c8ef6efdf0518a752c",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	013,						// invert D0 and D2-D3
+/* width */	4,
+/* shift */	8,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+		"xm51.u71",
+		0,
+		"7283bf71",
+		"819fdcc407ed0acdd8f12b02db6efbcab7bec19a",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	4,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+		"xm51.u72",
+		0,
+		"a28e5251",
+		"44dd8ad4ad56541b5394d30ce3521b4d1d561394",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	0,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	}
+#endif	// (UCODE_ROM_PAGES > 1)
+};
+
+static const prom_load_t const_prom_list[] = {
+	{	// constant prom D0-D3
+		"madr.a6",
+		"c3.3",
+		"c2c196b2",
+		"8b2a599ac839ec2a070dbfef2f1626e645c858ca",
+/* size */	ALTO2_CONST_SIZE,
+/* amap */	AMAP_CONST_PROM,			// descramble constant address
+/* axor */	0,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	0,
+/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+/* dand */	ZERO,
+/* type */	sizeof(UINT16)
+	},
+	{	// constant prom D4-D7
+		"madr.a5",
+		"c2.3",
+		"42336101",
+		"c77819cf40f063af3abf66ea43f17cc1a62e928b",
+/* size */	ALTO2_CONST_SIZE,
+/* amap */	AMAP_CONST_PROM,			// descramble constant address
+/* axor */	0,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	4,
+/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+/* dand */	KEEP,
+/* type */	sizeof(UINT16)
+	},
+	{	// constant prom D8-D11
+		"madr.a4",
+		"c1.3",
+		"b957e490",
+		"c72660ad3ada4ca0ed8697c6bb6275a4fe703184",
+/* size */	ALTO2_CONST_SIZE,
+/* amap */	AMAP_CONST_PROM,			// descramble constant address
+/* axor */	0,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	8,
+/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+/* dand */	KEEP,
+/* type */	sizeof(UINT16)
+	},
+	{	// constant PROM D12-D15
+		"madr.a3",
+		"c0.3",
+		"e0992757",
+		"5c45ea824970663cb9ee672dc50861539c860249",
+/* size */	ALTO2_CONST_SIZE,
+/* amap */	AMAP_CONST_PROM,			// descramble constant address
+/* axor */	0,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	12,
+/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+/* dand */	KEEP,
+/* type */	sizeof(UINT16)
+	}
+};
+
+/* Driver Init */
+
+DRIVER_INIT_MEMBER( alto2_state, alto2 )
+{
+	UINT32* maincpu = reinterpret_cast<UINT32 *>(memregion("maincpu")->base());
+	for (UINT32 addr = 0; addr < ALTO2_UCODE_SIZE; addr++)
+		maincpu[addr] = ALTO2_UCODE_INVERTED;
+
+	UINT8* ucode_prom = prom_load(this, ucode_prom_list, memregion("ucode")->base(), 2, 8);
+	memcpy(memregion("maincpu")->base(), ucode_prom, ALTO2_UCODE_RAM_BASE);
+
+	UINT8* const_prom = prom_load(this, const_prom_list, memregion("const")->base(), 1, 4);
+	memcpy(memregion("data")->base(), const_prom, ALTO2_CONST_SIZE);
+}
 
 /* Game Drivers */
 

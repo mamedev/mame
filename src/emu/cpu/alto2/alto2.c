@@ -8,7 +8,7 @@
  *
  *****************************************************************************/
 #include "alto2.h"
-
+#include "a2roms.h"
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -27,10 +27,83 @@ const device_type ALTO2 = &device_creator<alto2_cpu_device>;
 
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
-	/* name, endianness_t endian, datawidth, addrwidth, addrshift = 0, address_map_constructor internal = NULL, address_map_constructor defmap = NULL */
 	m_ucode_config("program", ENDIANNESS_BIG, 32, 12, -2),
 	m_const_config("constants", ENDIANNESS_BIG, 16, 8, -1),
-	m_ram_config("memory", ENDIANNESS_BIG, 16, 17, -1)
+	m_ram_config("memory", ENDIANNESS_BIG, 16, 17, -1),
+	m_ucode(0),
+	m_const(0),
+	m_ram(0),
+	m_icount(0),
+	m_task_mpc(),
+	m_task_next2(),
+	m_ntime(),
+	m_task(0),
+	m_next_task(0),
+	m_next2_task(0),
+	m_mpc(0),
+	m_mir(0),
+	m_rsel(0),
+	m_next(0),
+	m_next2(0),
+	m_r(),
+	m_s(),
+	m_bus(0),
+	m_t(0),
+	m_alu(0),
+	m_aluc0(0),
+	m_l(0),
+	m_shifter(0),
+	m_laluc0(0),
+	m_m(0),
+	m_cram_addr(0),
+	m_task_wakeup(0),
+	m_active_callback(),
+	m_reset_mode(0xffff),
+	m_rdram_flag(false),
+	m_wrtram_flag(false),
+	m_s_reg_bank(),
+	m_bank_reg(),
+	m_ether_enable(true),
+	m_ewfct(false),
+	m_dsp_time(0),
+	m_dsp_state(0),
+	m_unload_time(0),
+	m_unload_word(0),
+	m_ctl2k_u3(0),
+	m_ctl2k_u38(0),
+	m_ctl2k_u76(0),
+	m_cram3k_a37(0),
+	m_madr_a64(0),
+	m_madr_a65(0),
+	m_bs(),
+	m_f1(),
+	m_f2(),
+	m_ram_related(),
+	m_cycle(0),
+	m_hw(),
+	m_mouse(),
+	m_drive(),
+	m_unit_selected(0),
+	m_head_selected(0),
+	m_sector_callback(),
+	m_sector_timer(0),
+	m_dsk(),
+	m_sysclka0(),
+	m_sysclka1(),
+	m_sysclkb0(),
+	m_sysclkb1(),
+	m_dsp(),
+	m_disp_a38(0),
+	m_disp_a63(0),
+	m_disp_a66(0),
+	m_mem(),
+	mmio_read_fn(),
+	mmio_write_fn(),
+	m_emu(),
+	m_ether_a41(0),
+	m_ether_a42(0),
+	m_ether_a49(0),
+	m_eth()
 {
 }
 
@@ -39,31 +112,53 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 //-------------------------------------------------
 
 ROM_START( alto2_cpu )
-	ROM_REGION( 01100, "ctrl2k", 0 )
-	ROMX_LOAD( "2kctl.u3",   00000, 00400, CRC(5f8d89e8) SHA1(487cd944ab074290aea73425e81ef4900d92e250), ROM_NIBBLE)	//!< 3601-1 256x4 BPROM; Emulator address modifier
-	ROMX_LOAD( "2kctl.u76",  00400, 00400, CRC(1edef867) SHA1(928b8a15ac515a99109f32672441832173883b81), ROM_NIBBLE)	//!< 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
-	ROMX_LOAD( "2kctl.u38",  01000, 00040, CRC(fc51b1d1) SHA1(e36c2a12a5da377394264899b5ae504e2ffda46e), 0)				//!< 82S23 32x8 BPROM; task priority and initial address
-	ROMX_LOAD( "alu.a10",    01040, 00040, CRC(e0857892) SHA1(dcd389767139f0acc1f87cf074459115abc5b90b), ROM_NIBBLE)
+	ROM_REGION( 0400, "2kctl_u3", 0 )
+	ROM_LOAD( "2kctl.u3",   00000, 00400, CRC(5f8d89e8) SHA1(487cd944ab074290aea73425e81ef4900d92e250) )	//!< 3601-1 256x4 BPROM; Emulator address modifier
 
-	ROM_REGION( 00400, "cram3k", 0 )
-	ROMX_LOAD( "3kcram.a37", 00000, 00400, CRC(9417360d) SHA1(bfcdbc56ee4ffafd0f2f672c0c869a55d6dd194b), ROM_NIBBLE)
+	ROM_REGION( 0400, "2kctl_u38", 0 )
+	ROM_LOAD( "2kctl.u38",  00000, 00040, CRC(fc51b1d1) SHA1(e36c2a12a5da377394264899b5ae504e2ffda46e) )	//!< 82S23 32x8 BPROM; task priority and initial address
 
-	ROM_REGION( 02400, "madr", 0 )
-	ROMX_LOAD( "madr.a32",   00000, 00400, CRC(a0e3b4a7) SHA1(24e50afdeb637a6a8588f8d3a3493c9188b8da2c), ROM_NIBBLE)	//! P3601 256x4 BPROM; mouse motion signals MX1, MX2, MY1, MY2
-	ROMX_LOAD( "madr.a64",   00400, 00400, CRC(a66b0eda) SHA1(4d9088f592caa3299e90966b17765be74e523144), ROM_NIBBLE)	//! P3601 256x4 BPROM; memory addressing
-	ROMX_LOAD( "madr.a65",   01000, 00400, CRC(ba37febd) SHA1(82e9db1cb65f451755295f0d179e6f8fe3349d4d), ROM_NIBBLE)	//! P3601 256x4 BPROM; memory addressing
-	ROMX_LOAD( "madr.a90",   01400, 00400, CRC(7a2d8799) SHA1(c3760dba147740729d33b9b88e59088a4cc7437a), ROM_NIBBLE)
-	ROMX_LOAD( "madr.a91",   02000, 00400, CRC(dd556aeb) SHA1(900f333a091e3ccde0843019c25f25fba62e6023), ROM_NIBBLE)
+	ROM_REGION( 0400, "2kctl_u76", 0 )
+	ROM_LOAD( "2kctl.u76",  00000, 00400, CRC(1edef867) SHA1(928b8a15ac515a99109f32672441832173883b81) )	//!< 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
 
-	ROM_REGION( 01040, "displ", 0 )
-	ROMX_LOAD( "displ.a38",  00000, 00400, CRC(fd30beb7) SHA1(65e4a19ba4ff748d525122128c514abedd55d866), ROM_NIBBLE)	//!< P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
-	ROMX_LOAD( "displ.a66",  00400, 00400, CRC(9f91aad9) SHA1(69b1d4c71f4e18103112e8601850c2654e9265cf), ROM_NIBBLE)	//!< P3601 256x4 BPROM; display VSYNC and VBLANK
-	ROMX_LOAD( "displ.a63",  01000, 00040, CRC(82a20d60) SHA1(39d90703568be5419ada950e112d99227873fdea), 0)				//!< 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
+	ROM_REGION( 0400, "alu_a10", 0 )
+	ROM_LOAD( "alu.a10",    00000, 00040, CRC(e0857892) SHA1(dcd389767139f0acc1f87cf074459115abc5b90b) )
 
-	ROM_REGION( 01400, "ether", 0 )
-	ROMX_LOAD( "enet.a41",   00000, 00400, CRC(d5de8d86) SHA1(c134a4c898c73863124361a9b0218f7a7f00082a), ROM_NIBBLE)
-	ROMX_LOAD( "enet.a42",   00400, 00400, CRC(9d5c81bd) SHA1(ac7e63332a3dad0bef7cd0349b24e156a96a4bf0), ROM_NIBBLE)
-	ROMX_LOAD( "enet.a49",   01000, 00400, CRC(4d2dcdb2) SHA1(583327a7d70cd02702c941c0e43c1e9408ff7fd0), ROM_NIBBLE)
+	ROM_REGION( 0400, "3kcram_a37", 0 )
+	ROM_LOAD( "3kcram.a37", 00000, 00400, CRC(9417360d) SHA1(bfcdbc56ee4ffafd0f2f672c0c869a55d6dd194b) )
+
+	ROM_REGION( 0400, "madr_a32", 0 )
+	ROM_LOAD( "madr.a32",   00000, 00400, CRC(a0e3b4a7) SHA1(24e50afdeb637a6a8588f8d3a3493c9188b8da2c) )	//! P3601 256x4 BPROM; mouse motion signals MX1, MX2, MY1, MY2
+
+	ROM_REGION( 0400, "madr_a64", 0 )
+	ROM_LOAD( "madr.a64",   00000, 00400, CRC(a66b0eda) SHA1(4d9088f592caa3299e90966b17765be74e523144) )	//! P3601 256x4 BPROM; memory addressing
+
+	ROM_REGION( 0400, "madr_a65", 0 )
+	ROM_LOAD( "madr.a65",   00000, 00400, CRC(ba37febd) SHA1(82e9db1cb65f451755295f0d179e6f8fe3349d4d) )	//! P3601 256x4 BPROM; memory addressing
+
+	ROM_REGION( 0400, "madr_a90", 0 )
+	ROM_LOAD( "madr.a90",   00000, 00400, CRC(7a2d8799) SHA1(c3760dba147740729d33b9b88e59088a4cc7437a) )
+
+	ROM_REGION( 0400, "madr_a91", 0 )
+	ROM_LOAD( "madr.a91",   00000, 00400, CRC(dd556aeb) SHA1(900f333a091e3ccde0843019c25f25fba62e6023) )
+
+	ROM_REGION( 0400, "displ_a38", 0 )
+	ROM_LOAD( "displ.a38",  00000, 00400, CRC(fd30beb7) SHA1(65e4a19ba4ff748d525122128c514abedd55d866) )	//!< P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
+
+	ROM_REGION( 0040, "displ_a63", 0 )
+	ROM_LOAD( "displ.a63",  00000, 00040, CRC(82a20d60) SHA1(39d90703568be5419ada950e112d99227873fdea) )	//!< 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
+
+	ROM_REGION( 0400, "displ_a66", 0 )
+	ROM_LOAD( "displ.a66",  00000, 00400, CRC(9f91aad9) SHA1(69b1d4c71f4e18103112e8601850c2654e9265cf) )	//!< P3601 256x4 BPROM; display VSYNC and VBLANK
+
+	ROM_REGION( 0400, "ether_a41", 0 )
+	ROM_LOAD( "enet.a41",   00000, 00400, CRC(d5de8d86) SHA1(c134a4c898c73863124361a9b0218f7a7f00082a) )
+
+	ROM_REGION( 0400, "ether_a42", 0 )
+	ROM_LOAD( "enet.a42",   00000, 00400, CRC(9d5c81bd) SHA1(ac7e63332a3dad0bef7cd0349b24e156a96a4bf0) )
+
+	ROM_REGION( 0400, "ether_a49", 0 )
+	ROM_LOAD( "enet.a49",   00000, 00400, CRC(4d2dcdb2) SHA1(583327a7d70cd02702c941c0e43c1e9408ff7fd0) )
 ROM_END
 
 const rom_entry *alto2_cpu_device::device_rom_region() const
@@ -75,26 +170,6 @@ const rom_entry *alto2_cpu_device::device_rom_region() const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-#define	DEBUG_PROMS	1		// define to 1 to enable debugging of loaded PROMs
-
-#if	DEBUG_PROMS
-static void dump_prom(const char* name, UINT8* data, size_t size)
-{
-	printf("UINT8 %s[%05o] = {\n", name, (unsigned)size);
-	for (size_t addr = 0; addr < size; addr++) {
-		if (0 == addr % 16)
-			printf("\t");
-		printf("%04o", data[addr]);
-		if (addr + 1 < size)
-			printf(",");
-		if (15 == addr % 16)
-			printf("\n");
-	}
-	printf("};\n");
-	printf("\n");
-}
-#endif
-
 // FIXME
 void alto2_cpu_device::device_start()
 {
@@ -102,61 +177,303 @@ void alto2_cpu_device::device_start()
 	m_const = &space(AS_DATA);
 	m_ram = &space(AS_IO);
 
-	// resolve the pointers to the various PROMs
-	UINT8 *ctrl2k = memregion("ctrl2k")->base();
-	m_ctl2k_u3 = ctrl2k;			// region=ctrl2k offset=00000 size=00400
-	m_ctl2k_u76 = ctrl2k + 00400;	// region=ctrl2k offset=00400 size=00400
-	m_ctl2k_u38 = ctrl2k + 01000;	// region=ctrl2k offset=01000 size=00040
-	m_alu_a10 = ctrl2k + 01040;		// region=ctrl2k offset=01040 size=00040
+	//! P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
+	static const prom_load_t pl_displ_a38 =
+	{
+		"displ.a38",
+		0,
+		"fd30beb7",
+		"65e4a19ba4ff748d525122128c514abedd55d866",
+		/* size */	0400,
+		/* amap */	AMAP_REVERSE_0_7,			// reverse address lines A0-A7
+		/* axor */	0,
+		/* dxor */	0,
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_disp_a38 = prom_load(this, &pl_displ_a38, memregion("displ_a38")->base(), 1, 1);
 
-#if	DEBUG_PROMS
-	dump_prom("m_ctl2k_u3", m_ctl2k_u3, 00400);
-	dump_prom("m_ctl2k_u76", m_ctl2k_u76, 00400);
-	dump_prom("m_ctl2k_u38", m_ctl2k_u38, 00040);
-	dump_prom("m_alu_a10", m_alu_a10, 00040);
+	//! 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
+	static const prom_load_t pl_displ_a63 =
+	{
+		"displ.a63",
+		0,
+		"82a20d60",
+		"39d90703568be5419ada950e112d99227873fdea",
+		/* size */	0040,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	0,
+		/* width */	8,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_disp_a63 = prom_load(this, &pl_displ_a63, memregion("displ_a63")->base(), 1, 1);
+
+	//! P3601 256x4 BPROM; display VSYNC and VBLANK
+	static const prom_load_t pl_displ_a66 =
+	{
+		"displ.a66",
+		0,
+		"9f91aad9",
+		"69b1d4c71f4e18103112e8601850c2654e9265cf",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	0,
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_disp_a66 = prom_load(this, &pl_displ_a66, memregion("displ_a66")->base(), 1, 1);
+
+	//! 3601-1 256x4 BPROM; Emulator address modifier
+	static const prom_load_t pl_2kctl_u3 =
+	{
+		"2kctl.u3",
+		0,
+		"5f8d89e8",
+		"487cd944ab074290aea73425e81ef4900d92e250",
+		/* size */	0400,
+		/* amap */	AMAP_REVERSE_0_7,			// reverse address lines A0-A7
+		/* axor */	0377,						// invert address lines A0-A7
+		/* dxor */	017,						// invert data lines D0-D3
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_ctl2k_u3 = prom_load(this, &pl_2kctl_u3, memregion("2kctl_u3")->base(), 1, 1);
+
+	//! 82S23 32x8 BPROM; task priority and initial address
+	static const prom_load_t pl_2kctl_u38 =
+	{
+		"2kctl.u38",
+		0,
+		"fc51b1d1",
+		"e36c2a12a5da377394264899b5ae504e2ffda46e",
+		/* size */	0040,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	0,
+		/* width */	8,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_ctl2k_u38 = prom_load(this, &pl_2kctl_u38, memregion("2kctl_u38")->base(), 1, 1);
+
+	//! 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
+	static const prom_load_t pl_2kctl_u76 =
+	{
+		"2kctl.u76",
+		0,
+		"1edef867",
+		"928b8a15ac515a99109f32672441832173883b81",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0077,						// invert address lines A0-A5
+		/* dxor */	0,
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_ctl2k_u76 = prom_load(this, &pl_2kctl_u76, memregion("2kctl_u76")->base(), 1, 1);
+
+	//! ALUF to ALU 741818 functions and carry in mapper
+	static const prom_load_t pl_alu_a10 =
+	{
+		"alu.a10",
+		0,
+		"e0857892",
+		"dcd389767139f0acc1f87cf074459115abc5b90b",
+		/* size */	0040,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	0,
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_alu_a10 = prom_load(this, &pl_alu_a10, memregion("alu_a10")->base(), 1, 1);
+
+	static const prom_load_t pl_3kcram_a37 =
+	{
+		"3kcram.a37",
+		0,
+		"9417360d",
+		"bfcdbc56ee4ffafd0f2f672c0c869a55d6dd194b",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	017,						// invert D0-D3
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_cram3k_a37 = prom_load(this, &pl_3kcram_a37, memregion("3kcram_a37")->base(), 1, 1);
+
+	static const prom_load_t pl_madr_a32 =
+	{
+		"madr.a32",
+		0,
+		"a0e3b4a7",
+		"24e50afdeb637a6a8588f8d3a3493c9188b8da2c",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	017,						// invert D0-D3
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+
+	m_madr_a32 = prom_load(this, &pl_madr_a32, memregion("madr_a32")->base(), 1, 1);
+
+	static const prom_load_t pl_madr_a64 =
+	{
+		"madr.a64",
+		0,
+		"a66b0eda",
+		"4d9088f592caa3299e90966b17765be74e523144",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	017,						// invert D0-D3
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_madr_a64 = prom_load(this, &pl_madr_a64, memregion("madr_a64")->base(), 1, 1);
+
+	static const prom_load_t pl_madr_a65 =
+	{
+		"madr.a65",
+		0,
+		"ba37febd",
+		"82e9db1cb65f451755295f0d179e6f8fe3349d4d",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	017,						// invert D0-D3
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_madr_a65 = prom_load(this, &pl_madr_a65, memregion("madr_a65")->base(), 1, 1);
+
+#if	0	// FIXME: add to alto2_cpu_device
+	static const prom_load_t pl_madr_a90 =
+	{
+		"madr.a90",
+		0,
+		"7a2d8799",
+		"c3760dba147740729d33b9b88e59088a4cc7437a",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	017,						// invert D0-D3
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_madr_a90 = prom_load(this, &pl_madr_a90, memregion("madr_a90")->base(), 1 ,1);
+
+	static const prom_load_t pl_madr_a91 =
+	{
+		"madr.a91",
+		0,
+		"dd556aeb",
+		"900f333a091e3ccde0843019c25f25fba62e6023",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	017,						// invert D0-D3
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_madr_a91 = prom_load(this, &pl_madr_a91, memregion("madr_a91")->base(), 1, 1);
 #endif
 
-	UINT8 *cram3k = memregion("cram3k")->base();
-	m_cram3k_a37 = cram3k;			// region=cram3k offset=00000 size=00400
+	static const prom_load_t pl_enet_a41 =
+	{	/* P3601 256x4 BPROM; Ethernet phase encoder 1 "PE1" */
+		"enet.a41",
+		0,
+		"d5de8d86",
+		"c134a4c898c73863124361a9b0218f7a7f00082a",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	0,
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_ether_a41 = prom_load(this, &pl_enet_a41, memregion("ether_a41")->base(), 1, 1);
 
-#if	DEBUG_PROMS
-	dump_prom("m_cram3k_a37", m_ctl2k_u3, 00400);
-#endif
+	static const prom_load_t pl_enet_a42 =
+	{	/* P3601 256x4 BPROM; Ethernet phase encoder 2 "PE2" */
+		"enet.a42",
+		0,
+		"9d5c81bd",
+		"ac7e63332a3dad0bef7cd0349b24e156a96a4bf0",
+		/* size */	0400,
+		/* amap */	AMAP_DEFAULT,
+		/* axor */	0,
+		/* dxor */	0,
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_ether_a42 = prom_load(this, &pl_enet_a42, memregion("ether_a42")->base(), 1, 1);
 
-	UINT8 *madr = memregion("madr")->base();
-	m_madr_a32 = madr;				// region=madr offset=00000 size=00400
-	m_madr_a64 = madr + 00400;		// region=madr offset=00400 size=00400
-	m_madr_a65 = madr + 01000;		// region=madr offset=01000 size=00400
-	// m_madr_a90 = madr + 01400;	// region=madr offset=01400 size=00400 - unused
-	// m_madr_a91 = madr + 02000;	// region=madr offset=02000 size=00400 - unused
-
-#if	DEBUG_PROMS
-	dump_prom("m_madr_a32", m_madr_a32, 00400);
-	dump_prom("m_madr_a64", m_madr_a64, 00400);
-	dump_prom("m_madr_a65", m_madr_a65, 00400);
-#endif
-
-	UINT8* displ = memregion("displ")->base();
-	m_disp_a38 = displ;				// region=displ offset=00000 size=00400
-	m_disp_a66 = displ + 00400;		// region=displ offset=00400 size=00400
-	m_disp_a63 = displ + 01000;		// region=displ offset=01000 size=00040
-
-#if	DEBUG_PROMS
-	dump_prom("m_disp_a38", m_disp_a38, 00400);
-	dump_prom("m_disp_a66", m_disp_a66, 00400);
-	dump_prom("m_disp_a63", m_disp_a63, 00040);
-#endif
-
-	UINT8* ether = memregion("ether")->base();
-	m_ether_a41 = ether;			// region=ether offset=00000 size=00400
-	m_ether_a42 = ether + 00400;	// region=ether offset=00400 size=00400
-	m_ether_a49 = ether + 01000;	// region=ether offset=01000 size=00400
-
-#if	DEBUG_PROMS
-	dump_prom("m_ether_a41", m_ether_a41, 00400);
-	dump_prom("m_ether_a42", m_ether_a42, 00400);
-	dump_prom("m_ether_a49", m_ether_a49, 00400);
-#endif
+	static const prom_load_t pl_enet_a49 =
+	{	/* P3601 256x4 BPROM; Ethernet FIFO control "AFIFO" */
+		"enet.a49",
+		0,
+		"4d2dcdb2",
+		"583327a7d70cd02702c941c0e43c1e9408ff7fd0",
+		/* size */	0400,
+		/* amap */	AMAP_REVERSE_0_7,				// reverse address lines A0-A7
+		/* axor */	0,
+		/* dxor */	0,
+		/* width */	4,
+		/* shift */	0,
+		/* dmap */	DMAP_DEFAULT,
+		/* dand */	ZERO,
+		/* type */	sizeof(UINT8)
+	};
+	m_ether_a49 = prom_load(this, &pl_enet_a49, memregion("ether_a49")->base(), 1, 1);
 
 	save_item(NAME(m_task_mpc));
 	save_item(NAME(m_task_next2));
@@ -280,38 +597,81 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_eth.tx_count));
 	save_item(NAME(m_eth.duckbreath));
 
-	state_add( A2_AC3, "AC(3)", m_r[A2_AC3]).formatstr("%04X");
-	state_add( A2_AC2, "AC(2)", m_r[A2_AC2]).formatstr("%04X");
-	state_add( A2_AC1, "AC(1)", m_r[A2_AC1]).formatstr("%04X");
-	state_add( A2_AC0, "AC(0)", m_r[A2_AC0]).formatstr("%04X");
-	state_add( A2_R04, "R04",   m_r[A2_R04]).formatstr("%04X");
-	state_add( A2_R05, "R05",   m_r[A2_R05]).formatstr("%04X");
-	state_add( A2_PC,  "PC",    m_r[A2_PC]).formatstr("%04X");
-	state_add( A2_R07, "R07",   m_r[A2_R07]).formatstr("%04X");
-	state_add( A2_R10, "R10",   m_r[A2_R10]).formatstr("%04X");
-	state_add( A2_R11, "R11",   m_r[A2_R11]).formatstr("%04X");
-	state_add( A2_R12, "R12",   m_r[A2_R12]).formatstr("%04X");
-	state_add( A2_R13, "R13",   m_r[A2_R13]).formatstr("%04X");
-	state_add( A2_R14, "R14",   m_r[A2_R14]).formatstr("%04X");
-	state_add( A2_R15, "R15",   m_r[A2_R15]).formatstr("%04X");
-	state_add( A2_R16, "R16",   m_r[A2_R16]).formatstr("%04X");
-	state_add( A2_R17, "R17",   m_r[A2_R17]).formatstr("%04X");
-	state_add( A2_R20, "R20",   m_r[A2_R20]).formatstr("%04X");
-	state_add( A2_R21, "R21",   m_r[A2_R21]).formatstr("%04X");
-	state_add( A2_R22, "R22",   m_r[A2_R22]).formatstr("%04X");
-	state_add( A2_R23, "R23",   m_r[A2_R23]).formatstr("%04X");
-	state_add( A2_R24, "R24",   m_r[A2_R24]).formatstr("%04X");
-	state_add( A2_R25, "R25",   m_r[A2_R25]).formatstr("%04X");
-	state_add( A2_R26, "R26",   m_r[A2_R26]).formatstr("%04X");
-	state_add( A2_R27, "R27",   m_r[A2_R27]).formatstr("%04X");
-	state_add( A2_R30, "R30",   m_r[A2_R30]).formatstr("%04X");
-	state_add( A2_R31, "R31",   m_r[A2_R31]).formatstr("%04X");
-	state_add( A2_R32, "R32",   m_r[A2_R32]).formatstr("%04X");
-	state_add( A2_R33, "R33",   m_r[A2_R33]).formatstr("%04X");
-	state_add( A2_R34, "R34",   m_r[A2_R34]).formatstr("%04X");
-	state_add( A2_R35, "R35",   m_r[A2_R35]).formatstr("%04X");
-	state_add( A2_R36, "R36",   m_r[A2_R36]).formatstr("%04X");
-	state_add( A2_R37, "R37",   m_r[A2_R37]).formatstr("%04X");
+	state_add( A2_TASK,    "TASK",    m_task).formatstr("%02X");
+	state_add( A2_BUS,     "BUS",     m_bus).formatstr("%04X");
+	state_add( A2_T,       "T",       m_t).formatstr("%04X");
+	state_add( A2_ALU,     "ALU",     m_alu).formatstr("%04X");
+	state_add( A2_ALUC0,   "ALUC0",   m_aluc0).formatstr("%1u");
+	state_add( A2_L,       "L",       m_l).formatstr("%04X");
+	state_add( A2_SHIFTER, "SHIFTER", m_shifter).formatstr("%04X");
+	state_add( A2_LALUC0,  "LALUC0",  m_laluc0).formatstr("%1u");
+	state_add( A2_M,       "M",       m_m).formatstr("%04X");
+
+	state_add( A2_AC3,     "AC(3)",   m_r[000]).formatstr("%04X");
+	state_add( A2_AC2,     "AC(2)",   m_r[001]).formatstr("%04X");
+	state_add( A2_AC1,     "AC(1)",   m_r[002]).formatstr("%04X");
+	state_add( A2_AC0,     "AC(0)",   m_r[003]).formatstr("%04X");
+	state_add( A2_R04,     "R04",     m_r[004]).formatstr("%04X");
+	state_add( A2_R05,     "R05",     m_r[005]).formatstr("%04X");
+	state_add( A2_PC,      "PC",      m_r[006]).formatstr("%04X");
+	state_add( A2_R07,     "R07",     m_r[007]).formatstr("%04X");
+	state_add( A2_R10,     "R10",     m_r[010]).formatstr("%04X");
+	state_add( A2_R11,     "R11",     m_r[011]).formatstr("%04X");
+	state_add( A2_R12,     "R12",     m_r[012]).formatstr("%04X");
+	state_add( A2_R13,     "R13",     m_r[013]).formatstr("%04X");
+	state_add( A2_R14,     "R14",     m_r[014]).formatstr("%04X");
+	state_add( A2_R15,     "R15",     m_r[015]).formatstr("%04X");
+	state_add( A2_R16,     "R16",     m_r[016]).formatstr("%04X");
+	state_add( A2_R17,     "R17",     m_r[017]).formatstr("%04X");
+	state_add( A2_R20,     "R20",     m_r[020]).formatstr("%04X");
+	state_add( A2_R21,     "R21",     m_r[021]).formatstr("%04X");
+	state_add( A2_R22,     "R22",     m_r[022]).formatstr("%04X");
+	state_add( A2_R23,     "R23",     m_r[023]).formatstr("%04X");
+	state_add( A2_R24,     "R24",     m_r[024]).formatstr("%04X");
+	state_add( A2_R25,     "R25",     m_r[025]).formatstr("%04X");
+	state_add( A2_R26,     "R26",     m_r[026]).formatstr("%04X");
+	state_add( A2_R27,     "R27",     m_r[027]).formatstr("%04X");
+	state_add( A2_R30,     "R30",     m_r[030]).formatstr("%04X");
+	state_add( A2_R31,     "R31",     m_r[031]).formatstr("%04X");
+	state_add( A2_R32,     "R32",     m_r[032]).formatstr("%04X");
+	state_add( A2_R33,     "R33",     m_r[033]).formatstr("%04X");
+	state_add( A2_R34,     "R34",     m_r[034]).formatstr("%04X");
+	state_add( A2_R35,     "R35",     m_r[035]).formatstr("%04X");
+	state_add( A2_R36,     "R36",     m_r[036]).formatstr("%04X");
+	state_add( A2_R37,     "R37",     m_r[037]).formatstr("%04X");
+
+	state_add( A2_S00,     "S00",     m_s[0][000]).formatstr("%04X");
+	state_add( A2_S01,     "S01",     m_s[0][001]).formatstr("%04X");
+	state_add( A2_S02,     "S02",     m_s[0][002]).formatstr("%04X");
+	state_add( A2_S03,     "S03",     m_s[0][003]).formatstr("%04X");
+	state_add( A2_S04,     "S04",     m_s[0][004]).formatstr("%04X");
+	state_add( A2_S05,     "S05",     m_s[0][005]).formatstr("%04X");
+	state_add( A2_S06,     "S06",     m_s[0][006]).formatstr("%04X");
+	state_add( A2_S07,     "S07",     m_s[0][007]).formatstr("%04X");
+	state_add( A2_S10,     "S10",     m_s[0][010]).formatstr("%04X");
+	state_add( A2_S11,     "S11",     m_s[0][011]).formatstr("%04X");
+	state_add( A2_S12,     "S12",     m_s[0][012]).formatstr("%04X");
+	state_add( A2_S13,     "S13",     m_s[0][013]).formatstr("%04X");
+	state_add( A2_S14,     "S14",     m_s[0][014]).formatstr("%04X");
+	state_add( A2_S15,     "S15",     m_s[0][015]).formatstr("%04X");
+	state_add( A2_S16,     "S16",     m_s[0][016]).formatstr("%04X");
+	state_add( A2_S17,     "S17",     m_s[0][017]).formatstr("%04X");
+	state_add( A2_S20,     "S20",     m_s[0][020]).formatstr("%04X");
+	state_add( A2_S21,     "S21",     m_s[0][021]).formatstr("%04X");
+	state_add( A2_S22,     "S22",     m_s[0][022]).formatstr("%04X");
+	state_add( A2_S23,     "S23",     m_s[0][023]).formatstr("%04X");
+	state_add( A2_S24,     "S24",     m_s[0][024]).formatstr("%04X");
+	state_add( A2_S25,     "S25",     m_s[0][025]).formatstr("%04X");
+	state_add( A2_S26,     "S26",     m_s[0][026]).formatstr("%04X");
+	state_add( A2_S27,     "S27",     m_s[0][027]).formatstr("%04X");
+	state_add( A2_S30,     "S30",     m_s[0][030]).formatstr("%04X");
+	state_add( A2_S31,     "S31",     m_s[0][031]).formatstr("%04X");
+	state_add( A2_S32,     "S32",     m_s[0][032]).formatstr("%04X");
+	state_add( A2_S33,     "S33",     m_s[0][033]).formatstr("%04X");
+	state_add( A2_S34,     "S34",     m_s[0][034]).formatstr("%04X");
+	state_add( A2_S35,     "S35",     m_s[0][035]).formatstr("%04X");
+	state_add( A2_S36,     "S36",     m_s[0][036]).formatstr("%04X");
+	state_add( A2_S37,     "S37",     m_s[0][037]).formatstr("%04X");
 
 	state_add(STATE_GENPC, "curpc", m_mpc).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_aluc0).formatstr("%5s").noshow();
@@ -1551,8 +1911,6 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 /** @brief execute the CPU for at most nsecs nano seconds */
 void alto2_cpu_device::execute_run()
 {
-	m_alto_leave = 0;
-
 	m_next = m_task_mpc[m_task];		// get current task's next mpc and address modifier
 	m_next2 = m_task_next2[m_task];
 
@@ -1563,10 +1921,6 @@ void alto2_cpu_device::execute_run()
 		UINT8 bs;
 		UINT8 f1;
 		UINT8 f2;
-
-		// FIXME: cycle counting?
-		if (m_alto_leave)
-			break;
 
 		/*
 		 * Subtract the microcycle time from the display time accu.

@@ -102,14 +102,14 @@ enum
 #define     ROM_NIBBLE              ROM_BITWIDTH(4)
 #define     ROM_FULLBYTE            ROM_BITWIDTH(8)
 
-#define ROM_BITSHIFTMASK            0x01f00000          /* left-shift count for the bits */
-#define     ROM_BITSHIFT(n)         (((n) & 31) << 20)
+#define ROM_BITSHIFTMASK            0x00f00000          /* left-shift count for the bits */
+#define     ROM_BITSHIFT(n)         (((n) & 15) << 20)
 #define     ROM_NOSHIFT             ROM_BITSHIFT(0)
 #define     ROM_SHIFT_NIBBLE_LO     ROM_BITSHIFT(0)
 #define     ROM_SHIFT_NIBBLE_HI     ROM_BITSHIFT(4)
 
-#define ROM_BIOSFLAGSMASK           0xfe000000          /* only loaded if value matches global bios value */
-#define     ROM_BIOS(n)             (((n) & 127) << 25)
+#define ROM_BIOSFLAGSMASK           0xff000000          /* only loaded if value matches global bios value */
+#define     ROM_BIOS(n)             (((n) & 255) << 24)
 
 #define ROM_INHERITEDFLAGS          (ROM_GROUPMASK | ROM_SKIPMASK | ROM_REVERSEMASK | ROM_BITWIDTHMASK | ROM_BITSHIFTMASK | ROM_BIOSFLAGSMASK)
 
@@ -183,7 +183,7 @@ struct rom_entry
 #define ROM_GETBITWIDTH(r)          (((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) >> 16) + 8 * ((ROM_GETFLAGS(r) & ROM_BITWIDTHMASK) == 0))
 #define ROM_GETBITSHIFT(r)          ((ROM_GETFLAGS(r) & ROM_BITSHIFTMASK) >> 20)
 #define ROM_INHERITSFLAGS(r)        ((ROM_GETFLAGS(r) & ROM_INHERITFLAGSMASK) == ROM_INHERITFLAGS)
-#define ROM_GETBIOSFLAGS(r)         ((ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 25)
+#define ROM_GETBIOSFLAGS(r)         ((ROM_GETFLAGS(r) & ROM_BIOSFLAGSMASK) >> 24)
 
 
 /* ----- per-disk macros ----- */
