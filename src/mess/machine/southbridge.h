@@ -109,7 +109,6 @@ public:
 		DECLARE_READ8_MEMBER(pc_dma_read_word);
 		DECLARE_WRITE8_MEMBER(pc_dma_write_word);
 protected:
-		int m_poll_delay;
 		UINT8 m_at_spkrdata;
 		UINT8 m_at_speaker_input;
 		int m_dma_channel;
@@ -118,7 +117,6 @@ protected:
 		UINT8 m_at_pages[0x10];
 		UINT16 m_dma_high_byte;
 		UINT8 m_at_speaker;
-		UINT8 m_at_offset1;
 		void at_speaker_set_spkrdata(UINT8 data);
 		void at_speaker_set_input(UINT8 data);
 

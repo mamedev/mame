@@ -51,14 +51,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_DRIVER_INIT(at586);
-
-	UINT8 m_at_offset1;
-
-	enum {
-		TYPE_586
-	};
-
-	int m_type;
 };
 
 class at_state : public driver_device
@@ -137,7 +129,6 @@ public:
 	DECLARE_WRITE16_MEMBER(neat_chipset_w);
 	DECLARE_WRITE_LINE_MEMBER(at_mc146818_irq);
 	DECLARE_WRITE8_MEMBER(write_rtc);
-	int m_poll_delay;
 	UINT8 m_at_spkrdata;
 	UINT8 m_at_speaker_input;
 	int m_dma_channel;
@@ -146,7 +137,6 @@ public:
 	UINT8 m_at_pages[0x10];
 	UINT16 m_dma_high_byte;
 	UINT8 m_at_speaker;
-	UINT8 m_at_offset1;
 	UINT16 m_ps1_reg[2];
 	DECLARE_READ16_MEMBER(ps1_unk_r);
 	DECLARE_WRITE16_MEMBER(ps1_unk_w);
@@ -171,14 +161,6 @@ public:
 	IRQ_CALLBACK_MEMBER(at_irq_callback);
 	void init_at_common();
 	UINT32 at_286_a20(bool state);
-
-	enum {
-		TYPE_286,
-		TYPE_386,
-		TYPE_486,
-	};
-
-	int m_type;
 };
 
 

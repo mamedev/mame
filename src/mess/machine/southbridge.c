@@ -224,7 +224,6 @@ void southbridge_device::device_start()
 	spaceio.nop_readwrite(0x00e0, 0x00ef);
 
 
-	m_at_offset1 = 0xff;
 	machine().device(":maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(southbridge_device::at_irq_callback),this));
 }
 
@@ -234,7 +233,6 @@ void southbridge_device::device_start()
 
 void southbridge_device::device_reset()
 {
-	m_poll_delay = 4;
 	m_at_spkrdata = 0;
 	m_at_speaker_input = 0;
 	m_dma_channel = -1;
@@ -454,15 +452,10 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dack7_w ) { pc_select_dma_channel(7, s
 READ8_MEMBER( southbridge_device::at_portb_r )
 {
 	UINT8 data = m_at_speaker;
-	data &= ~0xc0; /* AT BIOS don't likes this being set */
+	data &= ~0xd0; /* AT BIOS don't likes this being set */
 
-	/* This needs fixing/updating not sure what this is meant to fix */
-	if ( --m_poll_delay < 0 )
-	{
-		m_poll_delay = 25;
-		m_at_offset1 ^= 0x10;
-	}
-	data = (data & ~0x10) | ( m_at_offset1 & 0x10 );
+	/* 0x10 is the dram refresh line bit on the 5170, just a timer here, 15.085us. */
+	data |= (machine().time().as_ticks(110000) & 1) ? 0x10 : 0;
 
 	if (m_pit8254->get_output(2))
 		data |= 0x20;

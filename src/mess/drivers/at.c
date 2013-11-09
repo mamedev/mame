@@ -121,10 +121,7 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 
 READ8_MEMBER( at_state::ps1_kbdc_r )
 {
-	int old_delay = m_poll_delay;
 	UINT8 ret = at_keybc_r(space, offset, mem_mask);
-	if(old_delay == 0)
-		m_poll_delay = 8;
 	return ret;
 }
 
