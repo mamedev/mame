@@ -223,13 +223,16 @@ protected:
 	//! device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
 	{
-		if (AS_PROGRAM == spacenum)
+		switch (spacenum) {
+		case AS_PROGRAM:
 			return &m_ucode_config;
-		if (AS_DATA == spacenum)
+		case AS_DATA:
 			return &m_const_config;
-		if (AS_IO == spacenum)
+		case AS_IO:
 			return &m_ram_config;
-		return NULL;
+		default:
+			return NULL;
+		}
 	}
 
 	//! device (P)ROMs

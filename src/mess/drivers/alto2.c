@@ -12,19 +12,6 @@
 #include "cpu/alto2/alto2.h"
 #include "cpu/alto2/a2roms.h"
 
-
-// FIXME: Is this required? How to access the address space dwords?
-READ32_MEMBER( alto2_state::alto2_ucode_r )
-{
-	return 0;
-}
-
-// FIXME: Is this required? How to access the address space dwords?
-WRITE32_MEMBER( alto2_state::alto2_ucode_w )
-{
-
-}
-
 // FIXME: Is this required? How to access the address space words?
 // This has to somehow be mapped to the a2mem half DWORD accesses
 // and (optionally) Hamming code and parity flag updating
@@ -57,19 +44,19 @@ WRITE16_MEMBER( alto2_state::alto2_mmio_w )
 
 /* micro code from ALTO2_UCODE_ROM_PAGES times PROMs and ALTO2_UCODE_RAM_PAGES times RAMs of ALTO2_UCODE_PAGE_SIZE 32-bit words each */
 static ADDRESS_MAP_START( alto2_ucode_map, AS_PROGRAM, 32, alto2_state )
-	AM_RANGE(0, ALTO2_UCODE_RAM_BASE-1) AM_ROM
-	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE-1) AM_READWRITE(alto2_ucode_r, alto2_ucode_w)
+	AM_RANGE(0,                    ALTO2_UCODE_RAM_BASE-1) AM_ROM
+	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE-1)     AM_RAM
 ADDRESS_MAP_END
 
 /* constant PROM with 256 16-bit words */
 static ADDRESS_MAP_START( alto2_const_map, AS_DATA, 16, alto2_state )
-	AM_RANGE(0, ALTO2_CONST_SIZE-1) AM_ROM
+	AM_RANGE(0,                    ALTO2_CONST_SIZE-1)     AM_ROM
 ADDRESS_MAP_END
 
 /* main memory and memory mapped i/o in range ALTO2_IO_PAGE_BASE ... ALTO2_IO_PAGE_BASE + ALTO2_IO_PAGE_SIZE - 1 */
 static ADDRESS_MAP_START( alto2_ram_map, AS_IO, 16, alto2_state )
-	AM_RANGE(0, ALTO2_IO_PAGE_BASE - 1) AM_READWRITE(alto2_ram_r, alto2_ram_w)
-	AM_RANGE(ALTO2_IO_PAGE_BASE, 0177777) AM_READWRITE(alto2_mmio_r, alto2_mmio_w)
+	AM_RANGE(0,                    ALTO2_IO_PAGE_BASE - 1) AM_READWRITE(alto2_ram_r,  alto2_ram_w)
+	AM_RANGE(ALTO2_IO_PAGE_BASE,   0177777)                AM_READWRITE(alto2_mmio_r, alto2_mmio_w)
 ADDRESS_MAP_END
 
 
@@ -302,8 +289,8 @@ MACHINE_CONFIG_END
 ROM_START( alto2 )
 	// FIXME: how to allocate initally empty regions for AS_PROGRAM, AS_DATA and AS_IO?
 	ROM_REGION( 4*ALTO2_UCODE_SIZE, "maincpu", 0)
-	ROM_REGION( 2*ALTO2_CONST_SIZE, "data", 0)
-	ROM_REGION( ALTO2_RAM_SIZE, "ram", 0 )
+	ROM_REGION( 2*ALTO2_CONST_SIZE, "constants", 0)
+	ROM_REGION( ALTO2_RAM_SIZE, "memory", 0 )
 
 	// Alto-II micro code PROMs, 8 x 4bit
 	ROM_REGION( 16 * 02000, "ucode", 0 )
@@ -671,7 +658,7 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 	memcpy(memregion("maincpu")->base(), ucode_prom, sizeof(UINT32)*ALTO2_UCODE_RAM_BASE);
 
 	UINT8* const_prom = prom_load(this, const_prom_list, memregion("const")->base(), 1, 4);
-	memcpy(memregion("data")->base(), const_prom, sizeof(UINT16)*ALTO2_CONST_SIZE);
+	memcpy(memregion("constants")->base(), const_prom, sizeof(UINT16)*ALTO2_CONST_SIZE);
 }
 
 /* Game Drivers */

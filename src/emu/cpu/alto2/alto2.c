@@ -32,7 +32,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_log_level(9),
 	m_log_newline(false),
 #endif
-	m_ucode_config("program", ENDIANNESS_BIG, 32, 14, -2),
+	m_ucode_config("maincpu", ENDIANNESS_BIG, 32, 14, -2),
 	m_const_config("constants", ENDIANNESS_BIG, 16, 8, -1),
 	m_ram_config("memory", ENDIANNESS_BIG, 16, 17, -1),
 	m_ucode(0),

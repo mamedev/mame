@@ -18,8 +18,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_region_ucode(*this, "maincpu"),
-		m_region_const(*this, "data"),
-		m_region_ram(*this, "ram"),
+		m_region_const(*this, "constants"),
+		m_region_ram(*this, "memory"),
 		m_io_row0(*this, "ROW0"),
 		m_io_row1(*this, "ROW1"),
 		m_io_row2(*this, "ROW2"),
@@ -39,8 +39,6 @@ public:
 
 	bitmap_ind16 m_bitmap;
 
-	DECLARE_READ32_MEMBER(alto2_ucode_r);
-	DECLARE_WRITE32_MEMBER(alto2_ucode_w);
 	DECLARE_READ16_MEMBER(alto2_ram_r);
 	DECLARE_WRITE16_MEMBER(alto2_ram_w);
 	DECLARE_READ16_MEMBER(alto2_mmio_r);
