@@ -668,10 +668,10 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 		maincpu[addr] = ALTO2_UCODE_INVERTED;
 
 	UINT8* ucode_prom = prom_load(this, ucode_prom_list, memregion("ucode")->base(), 2, 8);
-	memcpy(memregion("maincpu")->base(), ucode_prom, ALTO2_UCODE_RAM_BASE);
+	memcpy(memregion("maincpu")->base(), ucode_prom, sizeof(UINT32)*ALTO2_UCODE_RAM_BASE);
 
 	UINT8* const_prom = prom_load(this, const_prom_list, memregion("const")->base(), 1, 4);
-	memcpy(memregion("data")->base(), const_prom, ALTO2_CONST_SIZE);
+	memcpy(memregion("data")->base(), const_prom, sizeof(UINT16)*ALTO2_CONST_SIZE);
 }
 
 /* Game Drivers */

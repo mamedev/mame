@@ -27,7 +27,7 @@ const device_type ALTO2 = &device_creator<alto2_cpu_device>;
 
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
-	m_ucode_config("program", ENDIANNESS_BIG, 32, 12, -2),
+	m_ucode_config("program", ENDIANNESS_BIG, 32, 14, -2),
 	m_const_config("constants", ENDIANNESS_BIG, 16, 8, -1),
 	m_ram_config("memory", ENDIANNESS_BIG, 16, 17, -1),
 	m_ucode(0),
