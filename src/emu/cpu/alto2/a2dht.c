@@ -17,7 +17,7 @@ void alto2_cpu_device::f1_dht_block_0()
 	m_dsp.dht_blocks = 1;
 	/* clear the wakeup for the display horizontal task */
 	m_task_wakeup &= ~(1 << m_task);
-	LOG((0,2,"	BLOCK %s\n", task_name(m_task)));
+	LOG((LOG_DHT,2,"	BLOCK %s\n", task_name(m_task)));
 }
 
 /**
@@ -32,7 +32,7 @@ void alto2_cpu_device::f2_dht_setmode_1()
 {
 	UINT16 r = A2_GET32(m_bus,16,0,0);
 	m_dsp.setmode = m_bus;
-	LOG((0,2,"	SETMODE<- BUS (%#o), branch on BUS[0] (%#o | %#o)\n", m_bus, m_next2, r));
+	LOG((LOG_DHT,2,"	SETMODE<- BUS (%#o), branch on BUS[0] (%#o | %#o)\n", m_bus, m_next2, r));
 	m_next2 |= r;
 }
 

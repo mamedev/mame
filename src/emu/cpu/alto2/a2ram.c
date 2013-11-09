@@ -23,10 +23,10 @@ void alto2_cpu_device::bs_read_sreg_0()
 	if (reg) {
 		UINT8 bank = m_s_reg_bank[m_task];
 		r = m_s[bank][reg];
-		LOG((0,2,"	<-S%02o; bus &= S[%o][%02o] (%#o)\n", reg, bank, reg, r));
+		LOG((LOG_RAM,2,"	<-S%02o; bus &= S[%o][%02o] (%#o)\n", reg, bank, reg, r));
 	} else {
 		r = m_m;
-		LOG((0,2,"	<-S%02o; bus &= M (%#o)\n", reg, r));
+		LOG((LOG_RAM,2,"	<-S%02o; bus &= M (%#o)\n", reg, r));
 	}
 	m_bus &= r;
 }
@@ -37,7 +37,7 @@ void alto2_cpu_device::bs_read_sreg_0()
 void alto2_cpu_device::bs_load_sreg_0()
 {
 	int r = 0;	/* ??? */
-	LOG((0,2,"	S%02o<- BUS &= garbage (%#o)\n", MIR_RSEL(m_mir), r));
+	LOG((LOG_RAM,2,"	S%02o<- BUS &= garbage (%#o)\n", MIR_RSEL(m_mir), r));
 	m_bus &= r;
 }
 
@@ -49,7 +49,7 @@ void alto2_cpu_device::bs_load_sreg_1()
 	UINT8 reg = MIR_RSEL(m_mir);
 	UINT8 bank = m_s_reg_bank[m_task];
 	m_s[bank][reg] = m_m;
-	LOG((0,2,"	S%02o<- S[%o][%02o] := %#o\n", reg, bank, reg, m_m));
+	LOG((LOG_RAM,2,"	S%02o<- S[%o][%02o] := %#o\n", reg, bank, reg, m_m));
 }
 
 /**
@@ -59,7 +59,7 @@ void alto2_cpu_device::branch_ROM(const char *from, int page)
 {
 	(void)from;
 	m_next2 = (m_next2 & ALTO2_UCODE_PAGE_MASK) + page * ALTO2_UCODE_PAGE_SIZE;
-	LOG((0,2,"	SWMODE: branch from %s to ROM%d (%#o)\n", from, page, m_next2));
+	LOG((LOG_RAM,2,"	SWMODE: branch from %s to ROM%d (%#o)\n", from, page, m_next2));
 }
 
 /**
@@ -69,7 +69,7 @@ void alto2_cpu_device::branch_RAM(const char *from, int page)
 {
 	(void)from;
 	m_next2 = (m_next2 & ALTO2_UCODE_PAGE_MASK) + ALTO2_UCODE_RAM_BASE + page * ALTO2_UCODE_PAGE_SIZE;
-	LOG((0,2,"	SWMODE: branch from %s to RAM%d\n", from, page, m_next2));
+	LOG((LOG_RAM,2,"	SWMODE: branch from %s to RAM%d\n", from, page, m_next2));
 }
 
 /**
@@ -235,7 +235,7 @@ void alto2_cpu_device::f1_swmode_1()
 void alto2_cpu_device::f1_wrtram_1()
 {
 	m_wrtram_flag = 1;
-	LOG((0,2,"	WRTRAM\n"));
+	LOG((LOG_RAM,2,"	WRTRAM\n"));
 }
 
 /**
@@ -244,7 +244,7 @@ void alto2_cpu_device::f1_wrtram_1()
 void alto2_cpu_device::f1_rdram_1()
 {
 	m_rdram_flag = 1;
-	LOG((0,2,"	RDRAM\n"));
+	LOG((LOG_RAM,2,"	RDRAM\n"));
 }
 
 #if	(ALTO2_UCODE_RAM_PAGES == 3)
@@ -258,7 +258,7 @@ void alto2_cpu_device::f1_rdram_1()
  */
 void alto2_cpu_device::f1_load_rmr_1()
 {
-	LOG((0,2,"	RMR<-; BUS (%#o)\n", m_bus));
+	LOG((LOG_RAM,2,"	RMR<-; BUS (%#o)\n", m_bus));
 	m_reset_mode = m_bus;
 }
 #else	// ALTO2_UCODE_RAM_PAGES != 3
@@ -268,7 +268,7 @@ void alto2_cpu_device::f1_load_rmr_1()
 void alto2_cpu_device::f1_load_srb_1()
 {
 	m_s_reg_bank[m_task] = A2_GET16(m_bus,16,12,14) % ALTO2_SREG_BANKS;
-	LOG((0,2,"	SRB<-; srb[%d] := %#o\n", m_task, m_s_reg_bank[m_task]));
+	LOG((LOG_RAM,2,"	SRB<-; srb[%d] := %#o\n", m_task, m_s_reg_bank[m_task]));
 }
 #endif
 

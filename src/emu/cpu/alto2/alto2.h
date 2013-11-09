@@ -20,6 +20,9 @@
 #ifndef	ALTO2_DEBUG
 #define	ALTO2_DEBUG			1
 #endif
+#if	ALTO2_DEBUG
+#include "debug/debugcon.h"
+#endif
 
 #define	USE_PRIO_F9318	0			//!< define to 1 to use the F9318 priority encoder code
 #define	USE_ALU_74181	1			//!< define to 1 to use the SN74181 ALU code
@@ -188,14 +191,14 @@ enum {
  * </PRE>
  */
 typedef enum {
-	JKFF_0		= 0000,		//!< no inputs or outputs
-	JKFF_CLK	= 0001,		//!< clock signal
-	JKFF_J		= 0002,		//!< J input
-	JKFF_K		= 0004,		//!< K' input
-	JKFF_S		= 0010,		//!< S' input
-	JKFF_C		= 0020,		//!< C' input
-	JKFF_Q		= 0040,		//!< Q  output
-	JKFF_Q0		= 0100		//!< Q' output
+	JKFF_0,					//!< no inputs or outputs
+	JKFF_CLK	= (1 << 0),	//!< clock signal
+	JKFF_J		= (1 << 1),	//!< J input
+	JKFF_K		= (1 << 2),	//!< K' input
+	JKFF_S		= (1 << 3),	//!< S' input
+	JKFF_C		= (1 << 4),	//!< C' input
+	JKFF_Q		= (1 << 5),	//!< Q  output
+	JKFF_Q0		= (1 << 6)	//!< Q' output
 }	jkff_t;
 
 class alto2_cpu_device :  public cpu_device
@@ -242,6 +245,35 @@ protected:
 
 private:
 #if	ALTO2_DEBUG
+	enum {
+		LOG_0,
+		LOG_CPU		= (1 <<  0),
+		LOG_EMU		= (1 <<  1),
+		LOG_T01		= (1 <<  2),
+		LOG_T02		= (1 <<  3),
+		LOG_T03		= (1 <<  4),
+		LOG_KSEC	= (1 <<  5),
+		LOG_T05		= (1 <<  6),
+		LOG_T06		= (1 <<  7),
+		LOG_ETH		= (1 <<  8),
+		LOG_MRT		= (1 <<  9),
+		LOG_DWT		= (1 << 10),
+		LOG_CURT	= (1 << 11),
+		LOG_DHT		= (1 << 12),
+		LOG_DVT		= (1 << 13),
+		LOG_PART	= (1 << 14),
+		LOG_KWD		= (1 << 15),
+		LOG_T17		= (1 << 16),
+		LOG_MEM		= (1 << 17),
+		LOG_RAM		= (1 << 18),
+		LOG_DRIVE	= (1 << 19),
+		LOG_DISK	= (1 << 20),
+		LOG_DISPL	= (1 << 21),
+		LOG_MOUSE	= (1 << 22),
+		LOG_ALL		= ((1 << 23) - 1)
+	};
+	int m_log_types;
+	int m_log_level;
 	void logprintf(int type, int level, const char* format, ...);
 #	define	LOG(x) logprintf x
 #else

@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/alto2/alto2.h"
-#include "machine/ram.h"
+//#include "machine/ram.h"
 
 class alto2_state : public driver_device
 {

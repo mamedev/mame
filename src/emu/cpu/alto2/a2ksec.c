@@ -12,7 +12,7 @@
 /** @brief block the disk sector task */
 void alto2_cpu_device::f1_ksec_block_0()
 {
-	LOG((0,2,"	BLOCK %s\n", task_name(m_task)));
+	LOG((LOG_KSEC,2,"	BLOCK %s\n", task_name(m_task)));
 	disk_block(m_task);
 }
 

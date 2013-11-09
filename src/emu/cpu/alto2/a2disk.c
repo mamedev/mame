@@ -176,7 +176,7 @@ static inline jkff_t update_jkff(jkff_t s0, jkff_t s1)
 				/* both J and K' are 0: set Q to 0, Q' to 1 */
 				s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
 				if (s0 & JKFF_Q) {
-					LOG((0,5,"%s J:0 K':0 -> Q:0\n", jkff_name));
+					LOG((LOG_DISK,5,"%s J:0 K':0 -> Q:0\n", jkff_name));
 				}
 				break;
 			case JKFF_J:
@@ -185,12 +185,12 @@ static inline jkff_t update_jkff(jkff_t s0, jkff_t s1)
 					s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
 				else
 					s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
-				LOG((0,5,"%s J:0 K':1 flip-flop Q:%d\n",
+				LOG((LOG_DISK,5,"%s J:0 K':1 flip-flop Q:%d\n",
 					jkff_name, (s1 & JKFF_Q) ? 1 : 0));
 				break;
 			case JKFF_K:
 				if ((s0 ^ s1) & JKFF_Q) {
-					LOG((0,5,"%s J:0 K':1 keep Q:%d\n",
+					LOG((LOG_DISK,5,"%s J:0 K':1 keep Q:%d\n",
 						jkff_name, (s1 & JKFF_Q) ? 1 : 0));
 				}
 				/* J is 0, and K' is 1: keep Q as is */
@@ -203,7 +203,7 @@ static inline jkff_t update_jkff(jkff_t s0, jkff_t s1)
 				/* both J and K' are 1: set Q to 1 */
 				s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
 				if (!(s0 & JKFF_Q)) {
-					LOG((0,5,"%s J:1 K':1 -> Q:1\n",
+					LOG((LOG_DISK,5,"%s J:1 K':1 -> Q:1\n",
 					jkff_name));
 				}
 				break;
@@ -217,21 +217,21 @@ static inline jkff_t update_jkff(jkff_t s0, jkff_t s1)
 		/* S' is 1, C' is 0: set Q to 0, Q' to 1 */
 		s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
 		if (s0 & JKFF_Q) {
-			LOG((0,5,"%s C':0 -> Q:0\n", jkff_name));
+			LOG((LOG_DISK,5,"%s C':0 -> Q:0\n", jkff_name));
 		}
 		break;
 	case JKFF_C:
 		/* S' is 0, C' is 1: set Q to 1, Q' to 0 */
 		s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
 		if (!(s0 & JKFF_Q)) {
-			LOG((0,5,"%s S':0 -> Q:1\n", jkff_name));
+			LOG((LOG_DISK,5,"%s S':0 -> Q:1\n", jkff_name));
 		}
 		break;
 	case 0:
 	default:
 		/* unstable state (what to do?) */
 		s1 = s1 | JKFF_Q | JKFF_Q0;
-		LOG((0,5,"%s C':0 S':0 -> Q:1 and Q':1 <unstable>\n", jkff_name));
+		LOG((LOG_DISK,5,"%s C':0 S':0 -> Q:1 and Q':1 <unstable>\n", jkff_name));
 		break;
 	}
 	return s1;
@@ -1087,11 +1087,11 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	int i;
 	UINT8 s0, s1;
 
-	LOG((0,5,"	>>> KWD timing bitclk:%d datin:%d sect4:%d\n", bitclk, datin, drive_sector_mark_0(m_dsk.drive)));
+	LOG((LOG_DISK,5,"	>>> KWD timing bitclk:%d datin:%d sect4:%d\n", bitclk, datin, drive_sector_mark_0(m_dsk.drive)));
 
 	if (0 == m_dsk.seclate) {
 		/* If SECLATE is 0, WDDONE' never goes low (counter's clear has precedence). */
-		LOG((0,3,"	SECLATE:0 clears bitcount:0\n"));
+		LOG((LOG_DISK,3,"	SECLATE:0 clears bitcount:0\n"));
 		m_dsk.bitcount = 0;
 		m_dsk.carry = 0;
 	} else if (m_dsk.bitclk && !bitclk) {
@@ -1105,7 +1105,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			 * counter. It has been loaded with 15, so it counts to 16 on
 			 * the next rising edge and makes WDDONE' go to 0.
 			 */
-			LOG((0,3,"	HIORDBIT:1 sets WFFO:1\n"));
+			LOG((LOG_DISK,3,"	HIORDBIT:1 sets WFFO:1\n"));
 			PUT_KCOM_WFFO(m_dsk.kcom, 1);
 		}
 		/*
@@ -1121,7 +1121,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			 */
 			m_dsk.bitcount = (m_dsk.bitcount + 1) % 16;
 			m_dsk.carry = m_dsk.bitcount == 15;
-			LOG((0,3,"	WFFO:1 count bitcount:%2d\n", m_dsk.bitcount));
+			LOG((LOG_DISK,3,"	WFFO:1 count bitcount:%2d\n", m_dsk.bitcount));
 		} else {
 			/*
 			 * If BUS[4] (WFFO) was 0, both J and K' will be 0, and Q
@@ -1129,7 +1129,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			 */
 			m_dsk.bitcount = 15;
 			m_dsk.carry = 1;
-			LOG((0,3,"	WFFO:0 load bitcount:%2d\n", m_dsk.bitcount));
+			LOG((LOG_DISK,3,"	WFFO:0 load bitcount:%2d\n", m_dsk.bitcount));
 		}
 	} else if (!m_dsk.bitclk && bitclk) {
 		/* clock the shift register on the rising edge of bitclk */
@@ -1139,7 +1139,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	}
 
 	if (wddone0 != wddone1) {
-		LOG((0,2,"	WDDONE':%d->%d\n", wddone0, wddone1));
+		LOG((LOG_DISK,2,"	WDDONE':%d->%d\n", wddone0, wddone1));
 	}
 
 	if (m_dsk.carry) {
@@ -1156,7 +1156,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			m_dsk.datain = m_dsk.shiftin & 0177777;
 			/* load the output shift register */
 			m_dsk.shiftout = m_dsk.dataout;
-			LOG((0,6," 	LATCH in:%06o (0x%04x) out:%06o (0x%04x)\n", m_dsk.datain, m_dsk.datain, m_dsk.dataout, m_dsk.dataout));
+			LOG((LOG_DISK,6," 	LATCH in:%06o (0x%04x) out:%06o (0x%04x)\n", m_dsk.datain, m_dsk.datain, m_dsk.dataout, m_dsk.dataout));
 		}
 	} else {
 		/* CARRY = 0 -> WDDONE' = 1 */
@@ -1189,10 +1189,10 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	for (i = 0; i < 4; i++) {
 
 		if (m_sysclka0[i] != m_sysclka1[i]) {
-			LOG((0,7,"	SYSCLKA':%d->%d\n", m_sysclka0[i], m_sysclka1[i]));
+			LOG((LOG_DISK,7,"	SYSCLKA':%d->%d\n", m_sysclka0[i], m_sysclka1[i]));
 		}
 		if (m_sysclkb0[i] != m_sysclkb1[i]) {
-			LOG((0,7,"	SYSCLKB':%d->%d\n", m_sysclkb0[i], m_sysclkb1[i]));
+			LOG((LOG_DISK,7,"	SYSCLKB':%d->%d\n", m_sysclkb0[i], m_sysclkb1[i]));
 		}
 
 		/**
@@ -1379,7 +1379,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		/* rising edge immediately */
 		if ((m_dsk.wdinit = WDINIT) == 1)
 			m_dsk.wdinit0 = 1;
-		LOG((0,2,"	WDINIT:%d\n", m_dsk.wdinit));
+		LOG((LOG_DISK,2,"	WDINIT:%d\n", m_dsk.wdinit));
 	}
 
 	/*
@@ -1388,7 +1388,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 */
 	if (m_dsk.ff_53a & m_dsk.ff_43a & JKFF_Q) {
 		if (m_dsk.wdtskena == 1) {
-			LOG((0,2,"	WDTSKENA':0 and WAKEKWDT':0 wake KWD\n"));
+			LOG((LOG_DISK,2,"	WDTSKENA':0 and WAKEKWDT':0 wake KWD\n"));
 			m_dsk.wdtskena = 0;
 			m_task_wakeup |= 1 << task_kwd;
 		}
@@ -1397,7 +1397,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * If Q (43a) is 1, the WDTSKENA' signal is deasserted.
 		 */
 		if (m_dsk.wdtskena == 0) {
-			LOG((0,2,"	WDTSKENA':1\n"));
+			LOG((LOG_DISK,2,"	WDTSKENA':1\n"));
 			m_dsk.wdtskena = 1;
 			m_task_wakeup &= ~(1 << task_kwd);
 		}
@@ -1406,19 +1406,19 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	if (m_dsk.kfer) {
 		/* no fatal error: ready and not seqerr and seekok */
 		if (!RDYLAT && !SEQERR && SEEKOK) {
-			LOG((0,2,"	reset KFER\n"));
+			LOG((LOG_DISK,2,"	reset KFER\n"));
 			m_dsk.kfer = 0;
 		}
 	} else {
 		/* fatal error: not ready or seqerr or not seekok */
 		if (RDYLAT) {
-			LOG((0,2,"	RDYLAT sets KFER\n"));
+			LOG((LOG_DISK,2,"	RDYLAT sets KFER\n"));
 			m_dsk.kfer = 1;
 		} else if (SEQERR) {
-			LOG((0,2,"	SEQERR sets KFER\n"));
+			LOG((LOG_DISK,2,"	SEQERR sets KFER\n"));
 			m_dsk.kfer = 1;
 		} else if (!SEEKOK) {
-			LOG((0,2,"	not SEEKOK sets KFER\n"));
+			LOG((LOG_DISK,2,"	not SEEKOK sets KFER\n"));
 			m_dsk.kfer = 1;
 		}
 	}
@@ -1429,12 +1429,12 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 */
 	if (m_dsk.ff_22b & JKFF_Q) {
 		if (!(m_task_wakeup & (1 << task_ksec))) {
-			LOG((0,2,"	STSKENA:1; WAKEST':0 wake KSEC\n"));
+			LOG((LOG_DISK,2,"	STSKENA:1; WAKEST':0 wake KSEC\n"));
 			m_task_wakeup |= 1 << task_kwd;
 		}
 	} else {
 		if (m_task_wakeup & (1 << task_ksec)) {
-			LOG((0,2,"	STSKENA:0; WAKEST':1\n"));
+			LOG((LOG_DISK,2,"	STSKENA:0; WAKEST':1\n"));
 			m_task_wakeup &= ~(1 << task_kwd);
 		}
 	}
@@ -1472,7 +1472,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1, attotime::never);
 		if (m_dsk.seclate) {
 			m_dsk.seclate = 0;
-			LOG((0,4,"	SECLATE -> 0 pulse until %lldns\n", ntime() + TW_SECLATE));
+			LOG((LOG_DISK,4,"	SECLATE -> 0 pulse until %lldns\n", ntime() + TW_SECLATE));
 		}
 	}
 
@@ -1500,7 +1500,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	m_dsk.ff_21a_old = m_dsk.ff_21a;
 	m_dsk.bitclk = bitclk;
 	m_dsk.datin = datin;
-	LOG((0,5,"	<<< KWD timing\n"));
+	LOG((LOG_DISK,5,"	<<< KWD timing\n"));
 }
 
 
@@ -1508,7 +1508,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 void alto2_cpu_device::disk_seclate(void* ptr, INT32 arg)
 {
 	(void)ptr;
-	LOG((0,2,"	SECLATE -> %d\n", arg));
+	LOG((LOG_DISK,2,"	SECLATE -> %d\n", arg));
 	m_dsk.seclate = arg;
 	m_dsk.seclate_timer->enable(false);
 }
@@ -1517,7 +1517,7 @@ void alto2_cpu_device::disk_seclate(void* ptr, INT32 arg)
 void alto2_cpu_device::disk_ok_to_run(void* ptr, INT32 arg)
 {
 	(void)ptr;
-	LOG((0,2,"	OK TO RUN -> %d\n", arg));
+	LOG((LOG_DISK,2,"	OK TO RUN -> %d\n", arg));
 	m_dsk.ok_to_run = arg;
 	m_dsk.ok_to_run_timer->enable(false);
 }
@@ -1552,7 +1552,7 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 	int lai;
 	int strobe;
 
-	LOG((0,2,"	STROBE #%d restore:%d cylinder:%d\n", unit, restore, cylinder));
+	LOG((LOG_DISK,2,"	STROBE #%d restore:%d cylinder:%d\n", unit, restore, cylinder));
 
 	/* This is really monoflop 52a generating a very short 0 pulse */
 	for (strobe = 0; strobe < 2; strobe++) {
@@ -1561,7 +1561,7 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 		drive_strobe(unit, cylinder, restore, strobe);
 
 		lai = drive_log_addx_interlock_0(unit);
-		LOG((0,6,"		LAI':%d\n", lai));
+		LOG((LOG_DISK,6,"		LAI':%d\n", lai));
 		/**
 		 * JK flip-flop 44a (LAI' clocked)
 		 * <PRE>
@@ -1593,17 +1593,17 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 
 	} else {
 		/* clear the monoflop 52b, i.e. no timer restart */
-		LOG((0,2,"		STROBON:%d\n", m_dsk.strobe));
+		LOG((LOG_DISK,2,"		STROBON:%d\n", m_dsk.strobe));
 
 		/* update the seekok status: SKINC' && LAI' && Q' of FF 44a */
 		seekok = drive_seek_incomplete_0(unit);
 		if (seekok != m_dsk.seekok) {
 			m_dsk.seekok = seekok;
-			LOG((0,2,"		SEEKOK:%d\n", m_dsk.seekok));
+			LOG((LOG_DISK,2,"		SEEKOK:%d\n", m_dsk.seekok));
 		}
 	}
 
-	LOG((0,2,"	current cylinder:%d\n", drive_cylinder(unit) ^ DIABLO_DRIVE_CYLINDER_MASK));
+	LOG((LOG_DISK,2,"	current cylinder:%d\n", drive_cylinder(unit) ^ DIABLO_DRIVE_CYLINDER_MASK));
 
 	/* if the strobe is still set, restart the timer */
 	if (m_dsk.strobe) {
@@ -1619,7 +1619,7 @@ void alto2_cpu_device::disk_ready_mf31a(void* ptr, INT32 arg)
 {
 	m_dsk.ready_mf31a = arg & drive_ready_0(m_dsk.drive);
 	/* log the not ready result with level 0, else 2 */
-	LOG((0,m_dsk.ready_mf31a ? 0 : 2,"	ready mf31a:%d\n", m_dsk.ready_mf31a));
+	LOG((LOG_DISK,m_dsk.ready_mf31a ? 0 : 2,"	ready mf31a:%d\n", m_dsk.ready_mf31a));
 }
 
 /**
@@ -1671,16 +1671,16 @@ void alto2_cpu_device::bs_read_kstat_0()
 
 	r = m_dsk.kstat;
 
-	LOG((0,1,"	<-KSTAT; BUS &= %#o\n", r));
-	LOG((0,2,"		sector:    %d\n", GET_KSTAT_SECTOR(m_dsk.kstat)));
-	LOG((0,2,"		done:      %d\n", GET_KSTAT_DONE(m_dsk.kstat)));
-	LOG((0,2,"		seekfail:  %d\n", GET_KSTAT_SEEKFAIL(m_dsk.kstat)));
-	LOG((0,2,"		seek:      %d\n", GET_KSTAT_SEEK(m_dsk.kstat)));
-	LOG((0,2,"		notrdy:    %d\n", GET_KSTAT_NOTRDY(m_dsk.kstat)));
-	LOG((0,2,"		datalate:  %d\n", GET_KSTAT_DATALATE(m_dsk.kstat)));
-	LOG((0,2,"		idle:      %d\n", GET_KSTAT_IDLE(m_dsk.kstat)));
-	LOG((0,2,"		cksum:     %d\n", GET_KSTAT_CKSUM(m_dsk.kstat)));
-	LOG((0,2,"		completion:%d\n", GET_KSTAT_COMPLETION(m_dsk.kstat)));
+	LOG((LOG_DISK,1,"	<-KSTAT; BUS &= %#o\n", r));
+	LOG((LOG_DISK,2,"		sector:    %d\n", GET_KSTAT_SECTOR(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		done:      %d\n", GET_KSTAT_DONE(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		seekfail:  %d\n", GET_KSTAT_SEEKFAIL(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		seek:      %d\n", GET_KSTAT_SEEK(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		notrdy:    %d\n", GET_KSTAT_NOTRDY(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		datalate:  %d\n", GET_KSTAT_DATALATE(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		idle:      %d\n", GET_KSTAT_IDLE(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		cksum:     %d\n", GET_KSTAT_CKSUM(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		completion:%d\n", GET_KSTAT_COMPLETION(m_dsk.kstat)));
 
 	m_bus &= r;
 }
@@ -1698,7 +1698,7 @@ void alto2_cpu_device::bs_read_kdata_0()
 	UINT16 r;
 	/* get the current word from the drive */
 	r = m_dsk.datain;
-	LOG((0,1,"	<-KDATA (%#o)\n", r));
+	LOG((LOG_DISK,1,"	<-KDATA (%#o)\n", r));
 	m_bus &= r;
 }
 
@@ -1712,7 +1712,7 @@ void alto2_cpu_device::bs_read_kdata_0()
 void alto2_cpu_device::f1_strobe_1()
 {
 	if (GET_KCOM_SENDADR(m_dsk.kcom)) {
-		LOG((0,1,"	STROBE (SENDADR:1)\n"));
+		LOG((LOG_DISK,1,"	STROBE (SENDADR:1)\n"));
 		/* Set the STROBON flag and start the STROBON monoflop */
 		m_dsk.strobe = 1;
 		disk_strobon(0,
@@ -1720,7 +1720,7 @@ void alto2_cpu_device::f1_strobe_1()
 			2 * GET_KADDR_RESTORE(m_dsk.kaddr) +
 			m_dsk.drive);
 	} else {
-		LOG((0,1,"	STROBE (w/o SENDADR)\n"));
+		LOG((LOG_DISK,1,"	STROBE (w/o SENDADR)\n"));
 		/* FIXME: what to do if SENDADR isn't set? */
 	}
 }
@@ -1736,10 +1736,10 @@ void alto2_cpu_device::f1_strobe_1()
 void alto2_cpu_device::f1_load_kstat_1()
 {
 	int i;
-	LOG((0,1,"	KSTAT<-; BUS[12-15] %#o\n", m_bus));
-	LOG((0,2,"		idle:      %d\n", GET_KSTAT_IDLE(m_bus)));
-	LOG((0,2,"		cksum:     %d\n", GET_KSTAT_CKSUM(m_bus)));
-	LOG((0,2,"		completion:%d\n", GET_KSTAT_COMPLETION(m_bus)));
+	LOG((LOG_DISK,1,"	KSTAT<-; BUS[12-15] %#o\n", m_bus));
+	LOG((LOG_DISK,2,"		idle:      %d\n", GET_KSTAT_IDLE(m_bus)));
+	LOG((LOG_DISK,2,"		cksum:     %d\n", GET_KSTAT_CKSUM(m_bus)));
+	LOG((LOG_DISK,2,"		completion:%d\n", GET_KSTAT_COMPLETION(m_bus)));
 
 	/* KSTAT[12] is just taken from BUS[12] */
 	PUT_KSTAT_IDLE(m_dsk.kstat, GET_KSTAT_IDLE(m_bus));
@@ -1787,7 +1787,7 @@ void alto2_cpu_device::f1_load_kdata_1()
 		PUT_KADDR_DRIVE(m_dsk.kaddr, GET_KADDR_DRIVE(m_bus));
 		m_dsk.drive = GET_KADDR_DRIVE(m_dsk.kaddr);
 
-		LOG((0,1,"	KDATA<-; BUS (%#o) (drive:%d restore:%d %d/%d/%02d page:%d)\n",
+		LOG((LOG_DISK,1,"	KDATA<-; BUS (%#o) (drive:%d restore:%d %d/%d/%02d page:%d)\n",
 			m_bus,
 			GET_KADDR_DRIVE(m_dsk.kaddr),
 			GET_KADDR_RESTORE(m_dsk.kaddr),
@@ -1813,7 +1813,7 @@ void alto2_cpu_device::f1_load_kdata_1()
 		}
 #endif
 	} else {
-		LOG((0,1,"	KDATA<-; BUS %#o (%#x)\n", m_bus, m_bus));
+		LOG((LOG_DISK,1,"	KDATA<-; BUS %#o (%#x)\n", m_bus, m_bus));
 	}
 }
 
@@ -1855,25 +1855,25 @@ void alto2_cpu_device::f1_increcno_1()
 	case RECNO_HEADER:
 		m_dsk.krecno = RECNO_LABEL;
 		m_dsk.krwc = GET_KADR_LABEL(m_dsk.kadr);
-		LOG((0,2,"	INCRECNO; HEADER -> LABEL (%o, rwc:%o)\n",
+		LOG((LOG_DISK,2,"	INCRECNO; HEADER -> LABEL (%o, rwc:%o)\n",
 			m_dsk.krecno, m_dsk.krwc));
 		break;
 	case RECNO_PAGENO:
 		m_dsk.krecno = RECNO_HEADER;
 		m_dsk.krwc = GET_KADR_HEADER(m_dsk.kadr);
-		LOG((0,2,"	INCRECNO; PAGENO -> HEADER (%o, rwc:%o)\n",
+		LOG((LOG_DISK,2,"	INCRECNO; PAGENO -> HEADER (%o, rwc:%o)\n",
 			m_dsk.krecno, m_dsk.krwc));
 		break;
 	case RECNO_LABEL:
 		m_dsk.krecno = RECNO_DATA;
 		m_dsk.krwc = GET_KADR_DATA(m_dsk.kadr);
-		LOG((0,2,"	INCRECNO; LABEL -> DATA (%o, rwc:%o)\n",
+		LOG((LOG_DISK,2,"	INCRECNO; LABEL -> DATA (%o, rwc:%o)\n",
 			m_dsk.krecno, m_dsk.krwc));
 		break;
 	case RECNO_DATA:
 		m_dsk.krecno = RECNO_PAGENO;
 		m_dsk.krwc = 0;	/* read (?) */
-		LOG((0,2,"	INCRECNO; DATA -> PAGENO (%o, rwc:%o)\n",
+		LOG((LOG_DISK,2,"	INCRECNO; DATA -> PAGENO (%o, rwc:%o)\n",
 			m_dsk.krecno, m_dsk.krwc));
 		break;
 	}
@@ -1890,7 +1890,7 @@ void alto2_cpu_device::f1_increcno_1()
  */
 void alto2_cpu_device::f1_clrstat_1()
 {
-	LOG((0,1,"	CLRSTAT\n"));
+	LOG((LOG_DISK,1,"	CLRSTAT\n"));
 
 	/* clears the LAI clocked flip-flop 44a
 	 * JK flip-flop 44a (LAI' clocked)
@@ -1990,12 +1990,12 @@ void alto2_cpu_device::f1_load_kcom_1()
 {
 	if (m_dsk.kcom != m_bus) {
 		m_dsk.kcom = m_bus;
-		LOG((0,2,"	KCOM<-; BUS %06o\n", m_dsk.kcom));
-		LOG((0,2,"		xferoff: %d\n", GET_KCOM_XFEROFF(m_dsk.kcom)));
-		LOG((0,2,"		wdinhib: %d\n", GET_KCOM_WDINHIB(m_dsk.kcom)));
-		LOG((0,2,"		bclksrc: %d\n", GET_KCOM_BCLKSRC(m_dsk.kcom)));
-		LOG((0,2,"		wffo:    %d\n", GET_KCOM_WFFO(m_dsk.kcom)));
-		LOG((0,2,"		sendadr: %d\n", GET_KCOM_SENDADR(m_dsk.kcom)));
+		LOG((LOG_DISK,2,"	KCOM<-; BUS %06o\n", m_dsk.kcom));
+		LOG((LOG_DISK,2,"		xferoff: %d\n", GET_KCOM_XFEROFF(m_dsk.kcom)));
+		LOG((LOG_DISK,2,"		wdinhib: %d\n", GET_KCOM_WDINHIB(m_dsk.kcom)));
+		LOG((LOG_DISK,2,"		bclksrc: %d\n", GET_KCOM_BCLKSRC(m_dsk.kcom)));
+		LOG((LOG_DISK,2,"		wffo:    %d\n", GET_KCOM_WFFO(m_dsk.kcom)));
+		LOG((LOG_DISK,2,"		sendadr: %d\n", GET_KCOM_SENDADR(m_dsk.kcom)));
 
 		// TODO: show disk indicator
 	}
@@ -2036,13 +2036,13 @@ void alto2_cpu_device::f1_load_kadr_1()
 	/* current read/write/check is that for the header */
 	m_dsk.krwc = GET_KADR_HEADER(m_dsk.kadr);
 
-	LOG((0,1,"	KADR<-; BUS[8-14] #%o\n", m_dsk.kadr));
-	LOG((0,2,"		seal:   %#o\n", GET_KADR_SEAL(m_dsk.kadr)));
-	LOG((0,2,"		header: %s\n",  rwc_name[GET_KADR_HEADER(m_dsk.kadr)]));
-	LOG((0,2,"		label:  %s\n",  rwc_name[GET_KADR_LABEL(m_dsk.kadr)]));
-	LOG((0,2,"		data:   %s\n",  rwc_name[GET_KADR_DATA(m_dsk.kadr)]));
-	LOG((0,2,"		noxfer: %d\n",  GET_KADR_NOXFER(m_dsk.kadr)));
-	LOG((0,2,"		unused: %d (drive?)\n",  GET_KADR_UNUSED(m_dsk.kadr)));
+	LOG((LOG_DISK,1,"	KADR<-; BUS[8-14] #%o\n", m_dsk.kadr));
+	LOG((LOG_DISK,2,"		seal:   %#o\n", GET_KADR_SEAL(m_dsk.kadr)));
+	LOG((LOG_DISK,2,"		header: %s\n",  rwc_name[GET_KADR_HEADER(m_dsk.kadr)]));
+	LOG((LOG_DISK,2,"		label:  %s\n",  rwc_name[GET_KADR_LABEL(m_dsk.kadr)]));
+	LOG((LOG_DISK,2,"		data:   %s\n",  rwc_name[GET_KADR_DATA(m_dsk.kadr)]));
+	LOG((LOG_DISK,2,"		noxfer: %d\n",  GET_KADR_NOXFER(m_dsk.kadr)));
+	LOG((LOG_DISK,2,"		unused: %d (drive?)\n",  GET_KADR_UNUSED(m_dsk.kadr)));
 
 	// TODO: show disk indicator
 }
@@ -2055,7 +2055,7 @@ void alto2_cpu_device::f1_load_kadr_1()
 void alto2_cpu_device::f2_init_1()
 {
 	UINT16 r = INIT ? 037 : 0;
-	LOG((0,1,"	INIT; %sbranch (%#o | %#o)\n", r ? "" : "no ", m_next2, r));
+	LOG((LOG_DISK,1,"	INIT; %sbranch (%#o | %#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 	m_dsk.wdinit0 = 0;
 }
@@ -2091,22 +2091,22 @@ void alto2_cpu_device::f2_rwc_1()
 
 	switch (m_dsk.krecno) {
 	case RECNO_HEADER:
-		LOG((0,1,"	RWC; %sbranch header(%d):%s (%#o|%#o|%#o)\n",
+		LOG((LOG_DISK,1,"	RWC; %sbranch header(%d):%s (%#o|%#o|%#o)\n",
 			(r | init) ? "" : "no ", m_dsk.krecno,
 			rwc_name[m_dsk.krwc], m_next2, r, init));
 		break;
 	case RECNO_PAGENO:
-		LOG((0,1,"	RWC; %sbranch pageno(%d):%s (%#o|%#o|%#o)\n",
+		LOG((LOG_DISK,1,"	RWC; %sbranch pageno(%d):%s (%#o|%#o|%#o)\n",
 			(r | init) ? "" : "no ", m_dsk.krecno,
 			rwc_name[m_dsk.krwc], m_next2, r, init));
 		break;
 	case RECNO_LABEL:
-		LOG((0,1,"	RWC; %sbranch label(%d):%s (%#o|%#o|%#o)\n",
+		LOG((LOG_DISK,1,"	RWC; %sbranch label(%d):%s (%#o|%#o|%#o)\n",
 			(r | init) ? "" : "no ", m_dsk.krecno,
 			rwc_name[m_dsk.krwc], m_next2, r, init));
 		break;
 	case RECNO_DATA:
-		LOG((0,1,"	RWC; %sbranch data(%d):%s (%#o|%#o|%#o)\n",
+		LOG((LOG_DISK,1,"	RWC; %sbranch data(%d):%s (%#o|%#o|%#o)\n",
 			(r | init) ? "" : "no ", m_dsk.krecno,
 			rwc_name[m_dsk.krwc], m_next2, r, init));
 		break;
@@ -2130,7 +2130,7 @@ void alto2_cpu_device::f2_recno_1()
 {
 	UINT16 r = m_dsk.krecno;
 	UINT16 init = INIT ? 037 : 0;
-	LOG((0,1,"	RECNO; %sbranch recno:%d (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_dsk.krecno, m_next2, r, init));
+	LOG((LOG_DISK,1,"	RECNO; %sbranch recno:%d (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_dsk.krecno, m_next2, r, init));
 	m_next2 |= r | init;
 	m_dsk.wdinit0 = 0;
 }
@@ -2144,7 +2144,7 @@ void alto2_cpu_device::f2_xfrdat_1()
 {
 	UINT16 r = GET_KADR_NOXFER(m_dsk.kadr) ? 0 : 1;
 	UINT16 init = INIT ? 037 : 0;
-	LOG((0,1,"	XFRDAT; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
+	LOG((LOG_DISK,1,"	XFRDAT; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
 	m_dsk.wdinit0 = 0;
 }
@@ -2159,7 +2159,7 @@ void alto2_cpu_device::f2_swrnrdy_1()
 	UINT16 r = drive_seek_read_write_0(m_dsk.drive);
 	UINT16 init = INIT ? 037 : 0;
 
-	LOG((0,1,"	SWRNRDY; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
+	LOG((LOG_DISK,1,"	SWRNRDY; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
 	m_dsk.wdinit0 = 0;
 }
@@ -2174,7 +2174,7 @@ void alto2_cpu_device::f2_nfer_1()
 	UINT16 r = m_dsk.kfer ? 0 : 1;
 	UINT16 init = INIT ? 037 : 0;
 
-	LOG((0,1,"	NFER; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
+	LOG((LOG_DISK,1,"	NFER; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
 	m_dsk.wdinit0 = 0;
 }
@@ -2203,7 +2203,7 @@ void alto2_cpu_device::f2_strobon_1()
 	UINT16 r = m_dsk.strobe;
 	UINT16 init = INIT ? 037 : 0;
 
-	LOG((0,2,"	STROBON; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
+	LOG((LOG_DISK,2,"	STROBON; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
 	m_dsk.wdinit0 = 0;
 }
@@ -2238,7 +2238,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		if (GET_KCOM_XFEROFF(m_dsk.kcom)) {
 			/* do anything, if the transfer is off? */
 		} else {
-			LOG((0,7,"	BITCLK#%d bit:%d (write) @%lldns\n", arg, bit, ntime()));
+			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (write) @%lldns\n", arg, bit, ntime()));
 			if (clk)
 				drive_wrdata(m_dsk.drive, arg, bit);
 			else
@@ -2247,7 +2247,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	} else if (GET_KCOM_BCLKSRC(m_dsk.kcom)) {
 		/* always select the crystal clock */
 		bit = drive_rddata(m_dsk.drive, arg);
-		LOG((0,7,"	BITCLK#%d bit:%d (read, crystal) @%lldns\n", arg, bit, ntime()));
+		LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (read, crystal) @%lldns\n", arg, bit, ntime()));
 		kwd_timing(clk, bit, 0);
 	} else {
 		/* if XFEROFF is set, keep the bit at 1 (RDGATE' is high) */
@@ -2256,7 +2256,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		} else {
 			clk = drive_rdclk(m_dsk.drive, arg);
 			bit = drive_rddata(m_dsk.drive, arg);
-			LOG((0,7,"	BITCLK#%d bit:%d (read, driveclk) @%lldns\n", arg, bit, ntime()));
+			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (read, driveclk) @%lldns\n", arg, bit, ntime()));
 		}
 		kwd_timing(clk, bit, 0);
 	}
@@ -2276,7 +2276,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 void alto2_cpu_device::disk_sector_start(int unit)
 {
 	if (m_dsk.bitclk_timer) {
-		LOG((0,0,"	unit #%d stop bitclk\n", m_dsk.bitclk));
+		LOG((LOG_DISK,0,"	unit #%d stop bitclk\n", m_dsk.bitclk));
 		m_dsk.bitclk_timer->enable(false);
 	}
 
@@ -2287,7 +2287,7 @@ void alto2_cpu_device::disk_sector_start(int unit)
 	m_dsk.shiftin = 0;
 	m_dsk.shiftout = 0;
 
-	LOG((0,1,"	unit #%d sector %d start\n", unit, GET_KSTAT_SECTOR(m_dsk.kstat)));
+	LOG((LOG_DISK,1,"	unit #%d sector %d start\n", unit, GET_KSTAT_SECTOR(m_dsk.kstat)));
 
 	/* HACK: no command, no bit clock */
 	if (debug_read_mem(0521))

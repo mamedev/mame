@@ -15,7 +15,7 @@
 void alto2_cpu_device::f1_curt_block_0()
 {
 	m_task_wakeup &= ~(1 << m_task);
-	LOG((0,2,"	BLOCK %s\n", task_name(m_task)));
+	LOG((LOG_CURT,2,"	BLOCK %s\n", task_name(m_task)));
 	m_dsp.curt_blocks = 1;
 }
 
@@ -25,7 +25,7 @@ void alto2_cpu_device::f1_curt_block_0()
 void alto2_cpu_device::f2_load_xpreg_1()
 {
 	m_dsp.xpreg = A2_GET32(m_bus,16,6,15);
-	LOG((0,2,"	XPREG<- BUS[6-15] (%#o)\n", m_dsp.xpreg));
+	LOG((LOG_CURT,2,"	XPREG<- BUS[6-15] (%#o)\n", m_dsp.xpreg));
 }
 
 /**
@@ -48,7 +48,7 @@ void alto2_cpu_device::f2_load_xpreg_1()
 void alto2_cpu_device::f2_load_csr_1()
 {
 	m_dsp.csr = m_bus;
-	LOG((0,2,"	CSR<- BUS (%#o)\n", m_dsp.csr));
+	LOG((LOG_CURT,2,"	CSR<- BUS (%#o)\n", m_dsp.csr));
 	int x = 1023 - m_dsp.xpreg; \
 	m_dsp.curdata = m_dsp.csr << (16 - (x & 15)); \
 	m_dsp.curword = x / 16; \

@@ -199,11 +199,11 @@ int alto2_cpu_device::unload_word(int x)
 
 	word = m_dsp.inverse;
 	if (FIFO_MBEMPTY_0() == 0) {
-		LOG((0,1, "	DSP FIFO underrun y:%d x:%d\n", y, x));
+		LOG((LOG_DISPL,1, "	DSP FIFO underrun y:%d x:%d\n", y, x));
 	} else {
 		word ^= m_dsp.fifo[m_dsp.fifo_rd];
 		m_dsp.fifo_rd = (m_dsp.fifo_rd + 1) % ALTO2_DISPLAY_FIFO;
-		LOG((0,3, "	DSP pull %04x from FIFO[%02o] y:%d x:%d\n",
+		LOG((LOG_DISPL,3, "	DSP pull %04x from FIFO[%02o] y:%d x:%d\n",
 			word, (m_dsp.fifo_rd - 1) & (ALTO2_DISPLAY_FIFO - 1), y, x));
 	}
 
@@ -269,9 +269,9 @@ int alto2_cpu_device::display_state_machine(int arg)
 {
 	int next, a63, a66;
 
-	LOG((0,5,"DSP%03o:", arg));
+	LOG((LOG_DISPL,5,"DSP%03o:", arg));
 	if (020 == arg) {
-		LOG((0,2," HLC=%d", m_dsp.hlc));
+		LOG((LOG_DISPL,2," HLC=%d", m_dsp.hlc));
 	}
 
 	a63 = m_disp_a63[arg];
@@ -304,12 +304,12 @@ int alto2_cpu_device::display_state_machine(int arg)
 		/* VBLANK: remember hlc */
 		m_dsp.vblank = m_dsp.hlc | 1;
 
-		LOG((0,1, " VBLANK"));
+		LOG((LOG_DISPL,1, " VBLANK"));
 
 		/* VSYNC is always within VBLANK */
 		if (A2_VSYNC_HI(a66)) {
 			if (A2_VSYNC_LO(m_dsp.a66)) {
-				LOG((0,1, " VSYNC/ (wake DVT)"));
+				LOG((LOG_DISPL,1, " VSYNC/ (wake DVT)"));
 				/*
 				 * The display vertical task DVT is awakened once per field,
 				 * at the beginning of vertical retrace.
@@ -317,7 +317,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 				m_task_wakeup |= 1 << task_dvt;
 				// sdl_update(HLC1024()); // FIXME: upade odd or even field
 			} else {
-				LOG((0,1, " VSYNC"));
+				LOG((LOG_DISPL,1, " VSYNC"));
 			}
 		}
 	} else {
@@ -331,7 +331,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 			 * the word task can be awakened until the start of the
 			 * next field.
 			 */
-			LOG((0,1, " VBLANKPULSE (wake DHT)"));
+			LOG((LOG_DISPL,1, " VBLANKPULSE (wake DHT)"));
 			m_dsp.dht_blocks = 0;
 			m_dsp.dwt_blocks = 0;
 			m_task_wakeup |= 1 << task_dht;
@@ -343,7 +343,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 		}
 		if (A2_HBLANK_LO(a63) && A2_HBLANK_HI(m_dsp.a63)) {
 			/* falling edge of a63 HBLANK starts unload */
-			LOG((0,1, " HBLANK\\ UNLOAD"));
+			LOG((LOG_DISPL,1, " HBLANK\\ UNLOAD"));
 			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
 			m_unload_word = 0;
 #if	DEBUG_DISPLAY_TIMING
@@ -363,20 +363,20 @@ int alto2_cpu_device::display_state_machine(int arg)
 	if (!m_dsp.dwt_blocks && !m_dsp.dht_blocks && FIFO_STOPWAKE_0() != 0) {
 		if (!(m_task_wakeup & (1 << task_dwt))) {
 			m_task_wakeup |= 1 << task_dwt;
-			LOG((0,1, " (wake DWT)"));
+			LOG((LOG_DISPL,1, " (wake DWT)"));
 		}
 	}
 
 	if (A2_SCANEND_HI(a63)) {
-		LOG((0,1, " SCANEND"));
+		LOG((LOG_DISPL,1, " SCANEND"));
 		m_task_wakeup &= ~(1 << task_dwt);
 	}
 
-	LOG((0,1, "%s", (a63 & A63_HBLANK) ? " HBLANK": ""));
+	LOG((LOG_DISPL,1, "%s", (a63 & A63_HBLANK) ? " HBLANK": ""));
 
 	if (A2_HSYNC_HI(a63)) {
 		if (A2_HSYNC_LO(m_dsp.a63)) {
-			LOG((0,1, " HSYNC/ (CLRBUF)"));
+			LOG((LOG_DISPL,1, " HSYNC/ (CLRBUF)"));
 			/*
 			 * The hardware sets the buffer empty and clears the DWT block
 			 * flip-flop at the beginning of horizontal retrace for
@@ -391,7 +391,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 			/* stop the CPU from calling unload_word() */
 			m_unload_time = -1;
 		} else {
-			LOG((0,1, " HSYNC"));
+			LOG((LOG_DISPL,1, " HSYNC"));
 		}
 	} else if (A2_HSYNC_HI(m_dsp.a63)) {
 		/*
@@ -408,7 +408,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 	}
 
 
-	LOG((0,1, " NEXT:%03o\n", next));
+	LOG((LOG_DISPL,1, " NEXT:%03o\n", next));
 
 	m_dsp.a63 = a63;
 	m_dsp.a66 = a66;
@@ -424,7 +424,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 void alto2_cpu_device::f2_evenfield_1()
 {
 	UINT16 r = HLC1024() ^ 1;
-	LOG((0,2,"	evenfield branch on HLC1024 (%#o | %#o)\n", m_next2, r));
+	LOG((LOG_DISPL,2,"	evenfield branch on HLC1024 (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 }
 

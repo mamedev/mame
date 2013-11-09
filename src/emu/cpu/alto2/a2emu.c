@@ -268,7 +268,7 @@ void alto2_cpu_device::bs_emu_disp_0()
 	if (IR_X(m_emu.ir)) {
 		r = ((signed char)r) & 0177777;
 	}
-	LOG((0,2, "	<-DISP (%06o)\n", r));
+	LOG((LOG_EMU,2, "	<-DISP (%06o)\n", r));
 	m_bus &= r;
 }
 
@@ -281,7 +281,7 @@ void alto2_cpu_device::f1_emu_block_0()
 {
 #if	0
 	CPU_CLR_TASK_WAKEUP(m_task);
-	LOG((0,2, "	BLOCK %02o:%s\n", m_task, task_name(m_task)));
+	LOG((LOG_EMU,2, "	BLOCK %02o:%s\n", m_task, task_name(m_task)));
 #elif	0
 	fatal(1, "Emulator task want's to BLOCK.\n" \
 		"%s-%04o: r:%02o af:%02o bs:%02o f1:%02o f2:%02o" \
@@ -302,7 +302,7 @@ void alto2_cpu_device::f1_emu_block_0()
  */
 void alto2_cpu_device::f1_emu_load_rmr_1()
 {
-	LOG((0,2,"	RMR<-; BUS (%#o)\n", m_bus));
+	LOG((LOG_EMU,2,"	RMR<-; BUS (%#o)\n", m_bus));
 	m_reset_mode = m_bus;
 }
 
@@ -311,7 +311,7 @@ void alto2_cpu_device::f1_emu_load_rmr_1()
  */
 void alto2_cpu_device::f1_emu_load_esrb_1()
 {
-	LOG((0,2,"	ESRB<-; BUS[12-14] (%#o)\n", m_bus));
+	LOG((LOG_EMU,2,"	ESRB<-; BUS[12-14] (%#o)\n", m_bus));
 	m_s_reg_bank[m_task] = A2_GET32(m_bus,16,12,14);
 }
 
@@ -324,7 +324,7 @@ void alto2_cpu_device::f1_emu_load_esrb_1()
 void alto2_cpu_device::f1_rsnf_0()
 {
 	UINT16 r = 0177400 | m_ether_id;
-	LOG((0,2,"	<-RSNF; (%#o)\n", r));
+	LOG((LOG_EMU,2,"	<-RSNF; (%#o)\n", r));
 	m_bus &= r;
 }
 
@@ -357,10 +357,10 @@ void alto2_cpu_device::f1_rsnf_0()
  */
 void alto2_cpu_device::f1_startf_0()
 {
-	LOG((0,2,"	STARTF (BUS is %06o)\n", m_bus));
+	LOG((LOG_EMU,2,"	STARTF (BUS is %06o)\n", m_bus));
 	/* TODO: what do we do here? reset the CPU on bit 0? */
 	if (A2_BIT32(m_bus,16,0)) {
-		LOG((0,2,"****	Software boot feature\n"));
+		LOG((LOG_EMU,2,"****	Software boot feature\n"));
 		soft_reset();
 	} else {
 		eth_startf();
@@ -373,7 +373,7 @@ void alto2_cpu_device::f1_startf_0()
 void alto2_cpu_device::f2_busodd_1()
 {
 	UINT16 r = m_bus & 1;
-	LOG((0,2,"	BUSODD; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
+	LOG((LOG_EMU,2,"	BUSODD; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
 
@@ -389,13 +389,13 @@ void alto2_cpu_device::f2_magic_1()
 		XC = (m_t >> 15) & 1;
 		m_shifter = (m_l << 1) & 0177777;
 		m_shifter |= XC;
-		LOG((0,2,"	<-L MLSH 1 (shifer:%06o XC:%o)", m_shifter, XC));
+		LOG((LOG_EMU,2,"	<-L MLSH 1 (shifer:%06o XC:%o)", m_shifter, XC));
 		break;
 	case f1_l_rsh_1:	// <-L MRSH 1
 		XC = m_t & 1;
 		m_shifter = m_l >> 1;
 		m_shifter |= XC << 15;
-		LOG((0,2,"	<-L MRSH 1 (shifter:%06o XC:%o)", m_shifter, XC));
+		LOG((LOG_EMU,2,"	<-L MRSH 1 (shifter:%06o XC:%o)", m_shifter, XC));
 		break;
 	case f1_l_lcy_8:	// <-L LCY 8
 	default:			// other
@@ -415,7 +415,7 @@ void alto2_cpu_device::f2_load_dns_0()
 #else
 	A2_PUT8(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
 #endif
-	LOG((0,2,"	DNS<-; rsel := DstAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
+	LOG((LOG_EMU,2,"	DNS<-; rsel := DstAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 /**
@@ -469,17 +469,17 @@ void alto2_cpu_device::f2_load_dns_1()
 	case f1_l_rsh_1:	// <-L RSH 1
 		NEWCARRY = m_l & 1;
 		m_shifter = ((m_l >> 1) | (XC << 15)) & 0177777;
-		LOG((0,2,"	DNS; <-L RSH 1 (shifter:%06o XC:%o NEWCARRY:%o)", m_shifter, XC, NEWCARRY));
+		LOG((LOG_EMU,2,"	DNS; <-L RSH 1 (shifter:%06o XC:%o NEWCARRY:%o)", m_shifter, XC, NEWCARRY));
 		break;
 	case f1_l_lsh_1:	// <-L LSH 1
 		NEWCARRY = (m_l >> 15) & 1;
 		m_shifter = ((m_l << 1) | XC) & 0177777;
-		LOG((0,2,"	DNS; <-L LSH 1 (shifter:%06o XC:%o NEWCARRY:%o)", m_shifter, XC, NEWCARRY));
+		LOG((LOG_EMU,2,"	DNS; <-L LSH 1 (shifter:%06o XC:%o NEWCARRY:%o)", m_shifter, XC, NEWCARRY));
 		break;
 	case f1_l_lcy_8:	// <-L LCY 8
 	default:		/* other */
 		NEWCARRY = XC;
-		LOG((0,2,"	DNS; (shifter:%06o NEWCARRY:%o)", m_shifter, NEWCARRY));
+		LOG((LOG_EMU,2,"	DNS; (shifter:%06o NEWCARRY:%o)", m_shifter, NEWCARRY));
 		break;
 	}
 	SHZERO = (m_shifter == 0);
@@ -506,7 +506,7 @@ void alto2_cpu_device::f2_acdest_0()
 #else
 	A2_PUT8(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
 #endif
-	LOG((0,2,"	ACDEST<-; mux (rsel:%#o %s)\n", m_rsel, r_name(m_rsel)));
+	LOG((LOG_EMU,2,"	ACDEST<-; mux (rsel:%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 #if	ALTO2_DEBUG
@@ -517,35 +517,35 @@ void alto2_cpu_device::bitblt_info()
 	int bbt = m_r[rsel_ac2];
 	int val = debug_read_mem(bbt);
 
-	LOG((0,3,"	BITBLT AC1:%06o AC2:%06o\n", m_r[rsel_ac1], m_r[rsel_ac2]));
-	LOG((0,3,"		function  : %06o\n", val));
-	LOG((0,3,"			src extRAM: %o\n", A2_BIT16(val,16,10)));
-	LOG((0,3,"			dst extRAM: %o\n", A2_BIT16(val,16,11)));
-	LOG((0,3,"			src type  : %o (%s)\n", A2_GET16(val,16,12,13), type_name[A2_GET16(val,16,12,13)]));
-	LOG((0,3,"			operation : %o (%s)\n", A2_GET16(val,16,14,15), oper_name[A2_GET16(val,16,14,15)]));
+	LOG((LOG_EMU,3,"	BITBLT AC1:%06o AC2:%06o\n", m_r[rsel_ac1], m_r[rsel_ac2]));
+	LOG((LOG_EMU,3,"		function  : %06o\n", val));
+	LOG((LOG_EMU,3,"			src extRAM: %o\n", A2_BIT16(val,16,10)));
+	LOG((LOG_EMU,3,"			dst extRAM: %o\n", A2_BIT16(val,16,11)));
+	LOG((LOG_EMU,3,"			src type  : %o (%s)\n", A2_GET16(val,16,12,13), type_name[A2_GET16(val,16,12,13)]));
+	LOG((LOG_EMU,3,"			operation : %o (%s)\n", A2_GET16(val,16,14,15), oper_name[A2_GET16(val,16,14,15)]));
 	val = debug_read_mem(bbt+1);
-	LOG((0,3,"		unused AC2: %06o (%d)\n", val, val));
+	LOG((LOG_EMU,3,"		unused AC2: %06o (%d)\n", val, val));
 	val = debug_read_mem(bbt+2);
-	LOG((0,3,"		DBCA      : %06o (%d)\n", val, val));
+	LOG((LOG_EMU,3,"		DBCA      : %06o (%d)\n", val, val));
 	val = debug_read_mem(bbt+3);
-	LOG((0,3,"		DBMR      : %06o (%d words)\n", val, val));
+	LOG((LOG_EMU,3,"		DBMR      : %06o (%d words)\n", val, val));
 	val = debug_read_mem(bbt+4);
-	LOG((0,3,"		DLX       : %06o (%d bits)\n", val, val));
+	LOG((LOG_EMU,3,"		DLX       : %06o (%d bits)\n", val, val));
 	val = debug_read_mem(bbt+5);
-	LOG((0,3,"		DTY       : %06o (%d scanlines)\n", val, val));
+	LOG((LOG_EMU,3,"		DTY       : %06o (%d scanlines)\n", val, val));
 	val = debug_read_mem(bbt+6);
-	LOG((0,3,"		DW        : %06o (%d bits)\n", val, val));
+	LOG((LOG_EMU,3,"		DW        : %06o (%d bits)\n", val, val));
 	val = debug_read_mem(bbt+7);
-	LOG((0,3,"		DH        : %06o (%d scanlines)\n", val, val));
+	LOG((LOG_EMU,3,"		DH        : %06o (%d scanlines)\n", val, val));
 	val = debug_read_mem(bbt+8);
-	LOG((0,3,"		SBCA      : %06o (%d)\n", val, val));
+	LOG((LOG_EMU,3,"		SBCA      : %06o (%d)\n", val, val));
 	val = debug_read_mem(bbt+9);
-	LOG((0,3,"		SBMR      : %06o (%d words)\n", val, val));
+	LOG((LOG_EMU,3,"		SBMR      : %06o (%d words)\n", val, val));
 	val = debug_read_mem(bbt+10);
-	LOG((0,3,"		SLX       : %06o (%d bits)\n", val, val));
+	LOG((LOG_EMU,3,"		SLX       : %06o (%d bits)\n", val, val));
 	val = debug_read_mem(bbt+11);
-	LOG((0,3,"		STY       : %06o (%d scanlines)\n", val, val));
-	LOG((0,3,"		GRAY0-3   : %06o %06o %06o %06o\n",
+	LOG((LOG_EMU,3,"		STY       : %06o (%d scanlines)\n", val, val));
+	LOG((LOG_EMU,3,"		GRAY0-3   : %06o %06o %06o %06o\n",
 		debug_read_mem(bbt+12), debug_read_mem(bbt+13),
 		debug_read_mem(bbt+14), debug_read_mem(bbt+15)));
 }
@@ -563,31 +563,31 @@ void alto2_cpu_device::f2_load_ir_1()
 	/* special logging of some opcodes */
 	switch (m_bus) {
 	case op_CYCLE:
-		LOG((0,3,"	CYCLE AC0:#o\n", m_r[rsel_ac0]));
+		LOG((LOG_EMU,3,"	CYCLE AC0:#o\n", m_r[rsel_ac0]));
 		break;
 	case op_CYCLE + 1: case op_CYCLE + 2: case op_CYCLE + 3: case op_CYCLE + 4:
 	case op_CYCLE + 5: case op_CYCLE + 6: case op_CYCLE + 7: case op_CYCLE + 8:
 	case op_CYCLE + 9: case op_CYCLE +10: case op_CYCLE +11: case op_CYCLE +12:
 	case op_CYCLE +13: case op_CYCLE +14: case op_CYCLE +15:
-		LOG((0,3,"	CYCLE %#o\n", m_bus - op_CYCLE));
+		LOG((LOG_EMU,3,"	CYCLE %#o\n", m_bus - op_CYCLE));
 		break;
 	case op_BLT:
-		LOG((0,3,"	BLT dst:%#o src:%#o size:%#o\n",
+		LOG((LOG_EMU,3,"	BLT dst:%#o src:%#o size:%#o\n",
 			(m_r[rsel_ac1] + m_r[rsel_ac3] + 1) & 0177777,
 			(m_r[rsel_ac0] + 1) & 017777, -m_r[rsel_ac3] & 0177777));
 		break;
 	case op_BLKS:
-		LOG((0,3,"	BLKS dst:%#o val:%#o size:%#o\n",
+		LOG((LOG_EMU,3,"	BLKS dst:%#o val:%#o size:%#o\n",
 			(m_r[rsel_ac1] + m_r[rsel_ac3] + 1) & 0177777,
 			m_r[rsel_ac0], -m_r[rsel_ac3] & 0177777));
 		break;
 	case op_DIAGNOSE1:
-		LOG((0,3,"	DIAGNOSE1 AC0:%06o AC1:%06o AC2:%06o AC3:%06o\n",
+		LOG((LOG_EMU,3,"	DIAGNOSE1 AC0:%06o AC1:%06o AC2:%06o AC3:%06o\n",
 			m_r[rsel_ac0], m_r[rsel_ac1],
 			m_r[rsel_ac2], m_r[rsel_ac3]));
 		break;
 	case op_DIAGNOSE2:
-		LOG((0,3,"	DIAGNOSE2 AC0:%06o AC1:%06o AC2:%06o AC3:%06o\n",
+		LOG((LOG_EMU,3,"	DIAGNOSE2 AC0:%06o AC1:%06o AC2:%06o AC3:%06o\n",
 			m_r[rsel_ac0], m_r[rsel_ac1],
 			m_r[rsel_ac2], m_r[rsel_ac3]));
 		break;
@@ -597,19 +597,19 @@ void alto2_cpu_device::f2_load_ir_1()
 #endif
 		break;
 	case op_RDRAM:
-		LOG((0,3,"	RDRAM addr:%#o\n", m_r[rsel_ac1]));
+		LOG((LOG_EMU,3,"	RDRAM addr:%#o\n", m_r[rsel_ac1]));
 		break;
 	case op_WRTRAM:
-		LOG((0,3,"	WRTAM addr:%#o upper:%06o lower:%06o\n", m_r[rsel_ac1], m_r[rsel_ac0], m_r[rsel_ac3]));
+		LOG((LOG_EMU,3,"	WRTAM addr:%#o upper:%06o lower:%06o\n", m_r[rsel_ac1], m_r[rsel_ac0], m_r[rsel_ac3]));
 		break;
 	case op_JMPRAM:
-		LOG((0,3,"	JMPRAM addr:%#o\n", m_r[rsel_ac1]));
+		LOG((LOG_EMU,3,"	JMPRAM addr:%#o\n", m_r[rsel_ac1]));
 		break;
 	case op_XMLDA:
-		LOG((0,3,"	XMLDA AC0 = [bank:%o AC1:#o]\n", m_bank_reg[m_task] & 3, m_r[rsel_ac1]));
+		LOG((LOG_EMU,3,"	XMLDA AC0 = [bank:%o AC1:#o]\n", m_bank_reg[m_task] & 3, m_r[rsel_ac1]));
 		break;
 	case op_XMSTA:
-		LOG((0,3,"	XMSTA [bank:%o AC1:#o] = AC0 (%#o)\n", m_bank_reg[m_task] & 3, m_r[rsel_ac1], m_r[rsel_ac0]));
+		LOG((LOG_EMU,3,"	XMSTA [bank:%o AC1:#o] = AC0 (%#o)\n", m_bank_reg[m_task] & 3, m_r[rsel_ac1], m_r[rsel_ac0]));
 		break;
 	}
 	m_emu.ir = m_bus;
@@ -628,12 +628,12 @@ void alto2_cpu_device::f2_idisp_1()
 	if (IR_ARITH(m_emu.ir)) {
 		/* 1xxxxxxxxxxxxxxx */
 		r = IR_SH(m_emu.ir) ^ 3;			/* complement of SH */
-		LOG((0,2,"	IDISP<-; branch on SH^3 (%#o|%#o)\n", m_next2, r));
+		LOG((LOG_EMU,2,"	IDISP<-; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
 		int addr = CTL2K_U3(f2_emu_idisp) + A2_GET32(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
-		LOG((0,2,"	IDISP<-; IR (%#o) branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", m_emu.ir, addr, m_next2, r));
+		LOG((LOG_EMU,2,"	IDISP<-; IR (%#o) branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", m_emu.ir, addr, m_next2, r));
 	}
 	m_next2 |= r;
 }
@@ -649,7 +649,7 @@ void alto2_cpu_device::f2_acsource_0()
 #else
 	A2_PUT8(m_rsel, 5, 3, 4, IR_SrcAC(m_emu.ir) ^ 3);
 #endif
-	LOG((0,2,"	<-ACSOURCE; rsel := SrcAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
+	LOG((LOG_EMU,2,"	<-ACSOURCE; rsel := SrcAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 /**
@@ -662,12 +662,12 @@ void alto2_cpu_device::f2_acsource_1()
 	if (IR_ARITH(m_emu.ir)) {
 		/* 1xxxxxxxxxxxxxxx */
 		r = IR_SH(m_emu.ir) ^ 3;			/* complement of SH */
-		LOG((0,2,"	<-ACSOURCE; branch on SH^3 (%#o|%#o)\n", m_next2, r));
+		LOG((LOG_EMU,2,"	<-ACSOURCE; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
 		int addr = CTL2K_U3(f2_emu_acsource) + A2_GET32(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
-		LOG((0,2,"	<-ACSOURCE; branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", addr, m_next2, r));
+		LOG((LOG_EMU,2,"	<-ACSOURCE; branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", addr, m_next2, r));
 	}
 	m_next2 |= r;
 }

@@ -18,7 +18,7 @@ void alto2_cpu_device::f1_dwt_block_0()
 
 	/* clear the wakeup for the display word task */
 	m_task_wakeup &= ~(1 << m_task);
-	LOG((0,2,"	BLOCK %s\n", task_name(m_task)));
+	LOG((LOG_DWT,2,"	BLOCK %s\n", task_name(m_task)));
 
 	/* wakeup the display horizontal task, if it didn't block itself */
 	if (!m_dsp.dht_blocks)
@@ -30,12 +30,12 @@ void alto2_cpu_device::f1_dwt_block_0()
  */
 void alto2_cpu_device::f2_dwt_load_ddr_1()
 {
-	LOG((0,2,"	DDR<- BUS (%#o)\n", m_bus));
+	LOG((LOG_DWT,2,"	DDR<- BUS (%#o)\n", m_bus));
 	m_dsp.fifo[m_dsp.fifo_wr] = m_bus;
 	m_dsp.fifo_wr = (m_dsp.fifo_wr + 1) % ALTO2_DISPLAY_FIFO;
 	if (FIFO_STOPWAKE_0() == 0)
 		m_task_wakeup &= ~(1 << task_dwt);
-	LOG((0,2, "	DWT push %04x into FIFO[%02o]%s\n",
+	LOG((LOG_DWT,2, "	DWT push %04x into FIFO[%02o]%s\n",
 		m_bus, (m_dsp.fifo_wr - 1) & (ALTO2_DISPLAY_FIFO - 1),
 		FIFO_STOPWAKE_0() == 0 ? " STOPWAKE" : ""));
 }

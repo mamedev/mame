@@ -12,7 +12,7 @@
 //! f1_kwd_block early: block the disk word task
 void alto2_cpu_device::f1_kwd_block_0()
 {
-	LOG((0,2,"	BLOCK %s\n", task_name(m_task)));
+	LOG((LOG_KWD,2,"	BLOCK %s\n", task_name(m_task)));
 	disk_block(m_task);
 }
 
