@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    distate.c
+	distate.c
 
-    Device state interfaces.
+	Device state interfaces.
 
 ***************************************************************************/
 
@@ -240,6 +240,31 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 					{
 						static const char hexchars[] = "0123456789ABCDEF";
 						dest.cat(&hexchars[digit], 1);
+						hitnonzero = true;
+					}
+					else if (hitnonzero || (leadzero && digitnum < width) || digitnum == 0)
+						dest.cat("0");
+				}
+				reset = true;
+				break;
+
+			// O outputs as octal
+			case 'O':
+				if (width == 0)
+					throw emu_fatalerror("Width required for %%O formats\n");
+				hitnonzero = false;
+				while (leadzero && width > 22)
+				{
+					dest.cat(" ");
+					width--;
+				}
+				for (int digitnum = 21; digitnum >= 0; digitnum--)
+				{
+					int digit = (result >> (3 * digitnum)) & 07;
+					if (digit != 0)
+					{
+						static const char octchars[] = "01234567";
+						dest.cat(&octchars[digit], 1);
 						hitnonzero = true;
 					}
 					else if (hitnonzero || (leadzero && digitnum < width) || digitnum == 0)
