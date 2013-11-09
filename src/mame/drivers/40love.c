@@ -229,18 +229,25 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 #include "sound/dac.h"
 #include "includes/40love.h"
 
-TIMER_CALLBACK_MEMBER(fortyl_state::nmi_callback)
+void fortyl_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	else
-		m_pending_nmi = 1;
+	switch(id)
+	{
+	case TIMER_NMI_CALLBACK:
+		if (m_sound_nmi_enable)
+			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		else
+			m_pending_nmi = 1;
+		break;
+	default:
+			assert_always(FALSE, "Unknown id in fortyl_state::device_timer");
+	}
 }
 
 WRITE8_MEMBER(fortyl_state::sound_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(fortyl_state::nmi_callback),this), data);
+	synchronize(TIMER_NMI_CALLBACK, data);
 }
 
 WRITE8_MEMBER(fortyl_state::nmi_disable_w)

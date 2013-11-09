@@ -50,7 +50,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_iodata;
-
+	
 	/* input-related */
 	UINT16        m_defender_sensor;
 	UINT16        m_shutter_sensor;
@@ -68,10 +68,18 @@ public:
 	DECLARE_MACHINE_RESET(drill);
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
-	TIMER_CALLBACK_MEMBER(shutter_req);
-	TIMER_CALLBACK_MEMBER(defender_req);
 	void tile_decode();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	#ifdef UNUSED_FUNCTION
+	enum
+	{
+		TIMER_SHUTTER_REQ,
+		TIMER_DEFENDER_REQ
+	};
+	
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	#endif
 };
 
 
@@ -136,14 +144,19 @@ WRITE16_MEMBER(_2mindril_state::drill_io_w)
     PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
 */
 #ifdef UNUSED_FUNCTION
-TIMER_CALLBACK_MEMBER(_2mindril_state::shutter_req)
+void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_shutter_sensor = param;
-}
-
-TIMER_CALLBACK_MEMBER(_2mindril_state::defender_req)
-{
-	m_defender_sensor = param;
+	switch (id)
+	{
+	case TIMER_SHUTTER_REQ:
+			m_shutter_sensor = param;
+			break;
+	case TIMER_DEFENDER_REQ:
+ 			m_defender_sensor = param;
+			break;
+	default:
+			assert_always(FALSE, "Unknown id in _2mindril_state::device_timer");
+	}
 }
 #endif
 
@@ -153,23 +166,23 @@ WRITE16_MEMBER(_2mindril_state::sensors_w)
 	/*---- ---- ---- -x-- lamp*/
 	if (data & 1)
 	{
-		//machine().scheduler().timer_set(attotime::from_seconds(2), FUNC(shutter_req ), 0x100);
+		//timer_set( attotime::from_seconds(2), TIMER_SHUTTER_REQ, 0x100);
 		m_shutter_sensor = 0x100;
 	}
 	else if (data & 2)
 	{
-		//machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(shutter_req ), 0x200);
+		//timer_set( attotime::from_seconds(2), TIMER_SHUTTER_REQ, 0x200);
 		m_shutter_sensor = 0x200;
 	}
 
 	if (data & 0x1000 || data & 0x4000)
 	{
-		//machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x800);
+		//timer_set( attotime::from_seconds(2), TIMER_DEFENDER_REQ, 0x800);
 		m_defender_sensor = 0x800;
 	}
 	else if (data & 0x2000 || data & 0x8000)
 	{
-		//machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x400);
+		//timer_set( attotime::from_seconds(2), TIMER_DEFENDER_REQ, 0x400);
 		m_defender_sensor = 0x400;
 	}
 }

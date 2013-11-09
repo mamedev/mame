@@ -20,11 +20,12 @@ class acefruit_state : public driver_device
 public:
 	acefruit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_spriteram(*this, "spriteram") { }
 
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -42,9 +43,15 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(acefruit_vblank);
-	TIMER_CALLBACK_MEMBER(acefruit_refresh);
 	void acefruit_update_irq(int vpos);
-	required_device<cpu_device> m_maincpu;
+	
+	enum
+	{
+		TIMER_ACEFRUIT_REFRESH
+	};
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);	
 };
 
 
@@ -69,21 +76,29 @@ void acefruit_state::acefruit_update_irq(int vpos)
 }
 
 
-TIMER_CALLBACK_MEMBER(acefruit_state::acefruit_refresh)
+void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	int vpos = m_screen->vpos();
 
-	m_screen->update_partial(vpos );
-	acefruit_update_irq(vpos);
+	switch(id)
+	{
+	case TIMER_ACEFRUIT_REFRESH:
+			
+			m_screen->update_partial(vpos );
+			acefruit_update_irq(vpos);
 
-	vpos = ( ( vpos / 8 ) + 1 ) * 8;
+			vpos = ( ( vpos / 8 ) + 1 ) * 8;
 
-	m_refresh_timer->adjust( m_screen->time_until_pos(vpos) );
+			m_refresh_timer->adjust( m_screen->time_until_pos(vpos) );
+			break;
+	default:
+			assert_always(FALSE, "Unknown id in acefruit_state::device_timer");
+	}
 }
 
 void acefruit_state::video_start()
 {
-	m_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(acefruit_state::acefruit_refresh),this));
+	m_refresh_timer = timer_alloc(TIMER_ACEFRUIT_REFRESH);
 }
 
 INTERRUPT_GEN_MEMBER(acefruit_state::acefruit_vblank)
