@@ -210,7 +210,11 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 			(static_cast<UINT32>(src[3]));
 	UINT16 prefetch = next2 & 1023;
 	char *dst = buffer;
+	offs_t result = 1 | DASMFLAG_SUPPORTED;
 	int pa;
+
+	if (next != pc + 1)
+		result |= DASMFLAG_STEP_OUT;
 
 	switch (aluf) {
 	case  0: // T?: BUS
@@ -454,5 +458,5 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-F2_%02o ", f2);
 		break;
 	}
-	return 1;
+	return result;
 }

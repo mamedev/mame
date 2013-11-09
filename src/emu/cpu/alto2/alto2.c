@@ -678,20 +678,6 @@ void alto2_cpu_device::device_start()
 
 	m_icountptr = &m_icount;
 
-	// reverse dwords and invert hardware specific bits
-	const UINT32 addrxor = 4 * (ALTO2_UCODE_PAGE_SIZE - 1);
-	UINT32* temp = auto_alloc_array(machine(), UINT32, 2 * ALTO2_UCODE_PAGE_SIZE);
-	UINT32 ucode;
-	for (UINT32 addr = 0; addr < ALTO2_UCODE_PAGE_SIZE; addr++) {
-		ucode = m_ucode->read_dword(4*addr ^ addrxor);
-		temp[addr] = ucode ^ ALTO2_UCODE_INVERTED;
-		ucode = m_ucode->read_dword(4*(ALTO2_UCODE_PAGE_SIZE+addr) ^ addrxor);
-		temp[ALTO2_UCODE_PAGE_SIZE+addr] = ucode ^ ALTO2_UCODE_INVERTED;
-	}
-	for (UINT32 addr = 0; addr < 2*ALTO2_UCODE_PAGE_SIZE; addr++) {
-		m_ucode->write_dword(4*addr, temp[addr]);
-	}
-
 	hard_reset();
 }
 
@@ -893,11 +879,15 @@ const char* alto2_cpu_device::f2_name(UINT8 f2)
 	return "???";
 }
 
-UINT8 cram3k_a37[256];
+void alto2_cpu_device::watch_read(UINT32 addr, UINT32 data)
+{
+	LOG((0,0,"mem: rd[%06o] = %06o\n", addr, data));
+}
 
-UINT8 madr_a64[256];
-
-UINT8 madr_a65[256];
+void alto2_cpu_device::watch_write(UINT32 addr, UINT32 data)
+{
+	LOG((0,0,"mem: wr[%06o] = %06o\n", addr, data));
+}
 
 /** @brief fatal exit on unitialized dynamic phase BUS source */
 void alto2_cpu_device::fn_bs_bad_0()
@@ -1951,8 +1941,8 @@ void alto2_cpu_device::execute_run()
 		m_ntime[m_task] += ALTO2_UCYCLE;
 
 		/* next instruction's mpc */
+		debugger_instruction_hook(this, m_mpc);
 		m_mpc = m_next;
-		debugger_instruction_hook(this, m_next);
 		m_mir = m_ucode->read_dword(m_mpc);
 		m_rsel = MIR_RSEL(m_mir);
 		m_next = MIR_NEXT(m_mir) | m_next2;

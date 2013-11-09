@@ -51,13 +51,13 @@ void alto2_cpu_device::drive_get_sector(int unit)
 		return;
 	}
 	if (d->cylinder < 0 || d->cylinder >= DIABLO_DRIVE_CYLINDERS) {
-		LOG((log_DRV,9,"	DRIVE C/H/S:%d/%d/%d => invalid cylinder\n", d->cylinder, d->head, d->sector));
+		LOG((0,9,"	DRIVE C/H/S:%d/%d/%d => invalid cylinder\n", d->cylinder, d->head, d->sector));
 		d->page = -1;
 		return;
 	}
 	/* calculate the new disk relative sector offset */
 	d->page = DRIVE_PAGE(d->cylinder, d->head, d->sector);
-	LOG((log_DRV,9,"	DRIVE C/H/S:%d/%d/%d => page:%d\n", d->cylinder, d->head, d->sector, d->page));
+	LOG((0,9,"	DRIVE C/H/S:%d/%d/%d => page:%d\n", d->cylinder, d->head, d->sector, d->page));
 }
 
 /**
@@ -205,7 +205,7 @@ void alto2_cpu_device::expand_sector(int unit, int page)
 		return;
 
 	if (-1 == page || !d->image) {
-		LOG((log_DRV,0,"	no sector for #%d: %d/%d/%d\n", d->unit, d->cylinder, d->head, d->sector));
+		LOG((0,0,"	no sector for #%d: %d/%d/%d\n", d->unit, d->cylinder, d->head, d->sector));
 		return;
 	}
 
@@ -258,22 +258,22 @@ void alto2_cpu_device::expand_sector(int unit, int page)
 #endif
 	d->bits[page] = bits;
 
-	LOG((log_DRV,0,"	BITS #%d: %03d/%d/%02d #%-5d bits (@%03d.%02d)\n",
+	LOG((0,0,"	BITS #%d: %03d/%d/%02d #%-5d bits (@%03d.%02d)\n",
 		d->unit, d->cylinder, d->head, d->sector,
 		dst, dst / 32, dst % 32));
 
 }
 
 #if	ALTO2_DEBUG
-static void drive_dump_ascii(UINT8 *src, size_t size)
+void alto2_cpu_device::drive_dump_ascii(UINT8 *src, size_t size)
 {
 	size_t offs;
-	LOG((log_DRV,0," ["));
+	LOG((0,0," ["));
 	for (offs = 0; offs < size; offs++) {
 		char ch = (char)src[offs ^ 1];
-		LOG((log_DRV,0, "%c", ch < 32 || ch > 126 ? '.' : ch));
+		LOG((0,0, "%c", ch < 32 || ch > 126 ? '.' : ch));
 	}
-	LOG((log_DRV,0,"]\n"));
+	LOG((0,0,"]\n"));
 }
 
 
@@ -284,18 +284,18 @@ static void drive_dump_ascii(UINT8 *src, size_t size)
  * @param size size of the record in bytes
  * @param name name to print before the dump
  */
-static size_t dump_record(UINT8 *src, size_t addr, size_t size, const char *name, int cr)
+size_t alto2_cpu_device::dump_record(UINT8 *src, size_t addr, size_t size, const char *name, int cr)
 {
 	size_t offs;
-	LOG((log_DRV,0,"%s:", name));
+	LOG((0,0,"%s:", name));
 	for (offs = 0; offs < size; offs += 2) {
 		int word = src[offs] + 256 * src[offs + 1];
 		if (offs % 16) {
-			LOG((log_DRV,0," %06o", word));
+			LOG((0,0," %06o", word));
 		} else {
 			if (offs > 0)
 				drive_dump_ascii(&src[offs-16], 16);
-			LOG((log_DRV,0,"\t%05o: %06o", (addr + offs) / 2, word));
+			LOG((0,0,"\t%05o: %06o", (addr + offs) / 2, word));
 		}
 	}
 	if (offs % 16) {
@@ -304,7 +304,7 @@ static size_t dump_record(UINT8 *src, size_t addr, size_t size, const char *name
 		drive_dump_ascii(&src[offs-16], 16);
 	}
 	if (cr) {
-		LOG((log_DRV,0,"\n"));
+		LOG((0,0,"\n"));
 	}
 	return size;
 }
@@ -318,7 +318,7 @@ static size_t dump_record(UINT8 *src, size_t addr, size_t size, const char *name
  * @param size number of words to scan for a sync word
  * @result next src pointer
  */
-static size_t squeeze_sync(UINT32 *bits, size_t src, size_t size)
+size_t alto2_cpu_device::squeeze_sync(UINT32 *bits, size_t src, size_t size)
 {
 	size_t offs, bitcount;
 	UINT32 accu = 0;
@@ -343,7 +343,7 @@ static size_t squeeze_sync(UINT32 *bits, size_t src, size_t size)
 		}
 	}
 	/* return if no sync found within size*32 clock and data bits */
-	LOG((log_DRV,0,"	no sync within %d words\n", size));
+	LOG((0,0,"	no sync within %d words\n", size));
 	return src;
 }
 
@@ -355,7 +355,7 @@ static size_t squeeze_sync(UINT32 *bits, size_t src, size_t size)
  * @param size number of words to scan for a sync word
  * @result next src pointer
  */
-static size_t squeeze_unsync(UINT32 *bits, size_t src, size_t size)
+size_t alto2_cpu_device::squeeze_unsync(UINT32 *bits, size_t src, size_t size)
 {
 	size_t offs, bitcount;
 	UINT32 accu = 0;
@@ -380,7 +380,7 @@ static size_t squeeze_unsync(UINT32 *bits, size_t src, size_t size)
 		}
 	}
 	/* return if no sync found within size*32 clock and data bits */
-	LOG((log_DRV,0,"	no unsync within %d words\n", size));
+	LOG((0,0,"	no unsync within %d words\n", size));
 	return src;
 }
 
@@ -393,7 +393,7 @@ static size_t squeeze_unsync(UINT32 *bits, size_t src, size_t size)
  * @param size size of the record in bytes
  * @result next src pointer
  */
-static size_t squeeze_record(UINT32 *bits, size_t src, UINT8 *field, size_t size)
+size_t alto2_cpu_device::squeeze_record(UINT32 *bits, size_t src, UINT8 *field, size_t size)
 {
 	size_t offs, bitcount;
 	UINT32 accu = 0;
@@ -425,7 +425,7 @@ static size_t squeeze_record(UINT32 *bits, size_t src, UINT8 *field, size_t size
  * @param cksum pointer to an int to receive the checksum word
  * @result next src pointer
  */
-static size_t squeeze_cksum(UINT32 *bits, size_t src, int *cksum)
+size_t alto2_cpu_device::squeeze_cksum(UINT32 *bits, size_t src, int *cksum)
 {
 	size_t bitcount;
 	UINT32 accu = 0;
@@ -459,7 +459,7 @@ void alto2_cpu_device::squeeze_sector(int unit)
 		fatal(1, "invalid unit %d in call to squeeze_sector()\n", unit);
 
 	if (d->rdfirst >= 0) {
-		LOG((log_DRV,0,
+		LOG((0,0,
 			"	RD #%d %03d/%d/%02d bit#%-5d (@%03d.%02d) ... bit#%-5d (@%03d.%02d)\n",
 			d->unit, d->cylinder, d->head, d->sector,
 			d->rdfirst, d->rdfirst / 32, d->rdfirst % 32,
@@ -483,7 +483,7 @@ void alto2_cpu_device::squeeze_sector(int unit)
 	}
 
 	if (d->wrfirst >= 0) {
-		LOG((log_DRV,0,
+		LOG((0,0,
 			"	WR #%d %03d/%d/%02d bit#%-5d (@%03d.%02d) ... bit#%-5d (@%03d.%02d)\n",
 			d->unit, d->cylinder, d->head, d->sector,
 			d->wrfirst, d->wrfirst / 32, d->wrfirst % 32,
@@ -493,7 +493,7 @@ void alto2_cpu_device::squeeze_sector(int unit)
 	d->wrlast = -1;
 
 	if (d->page < 0 || d->page >= DIABLO_DRIVE_PAGES) {
-		LOG((log_DRV,0,"	no sector for #%d: %d/%d/%d\n", d->unit, d->cylinder, d->head, d->sector));
+		LOG((0,0,"	no sector for #%d: %d/%d/%d\n", d->unit, d->cylinder, d->head, d->sector));
 		return;
 	}
 
@@ -505,7 +505,7 @@ void alto2_cpu_device::squeeze_sector(int unit)
 
 	/* no bits to write? */
 	if (!bits) {
-		LOG((log_DRV,0,"	no sector for #%d: %d/%d/%d\n", d->unit, d->cylinder, d->head, d->sector));
+		LOG((0,0,"	no sector for #%d: %d/%d/%d\n", d->unit, d->cylinder, d->head, d->sector));
 		return;
 	}
 
@@ -519,7 +519,7 @@ void alto2_cpu_device::squeeze_sector(int unit)
 	src = squeeze_unsync(bits, src, 40);
 	/* sync on header preamble */
 	src = squeeze_sync(bits, src, 40);
-	LOG((log_DRV,0,"	header sync bit #%d (@%03d.%02d)\n",
+	LOG((0,0,"	header sync bit #%d (@%03d.%02d)\n",
 		src, src / 32, src % 32));
 	src = squeeze_record(bits, src, s->header, sizeof(s->header));
 	src = squeeze_cksum(bits, src, &cksum_header);
@@ -531,7 +531,7 @@ void alto2_cpu_device::squeeze_sector(int unit)
 	src = squeeze_unsync(bits, src, 40);
 	/* sync on label preamble */
 	src = squeeze_sync(bits, src, 40);
-	LOG((log_DRV,0,"	label  sync bit #%d (@%03d.%02d)\n",
+	LOG((0,0,"	label  sync bit #%d (@%03d.%02d)\n",
 		src, src / 32, src % 32));
 	src = squeeze_record(bits, src, s->label, sizeof(s->label));
 	src = squeeze_cksum(bits, src, &cksum_label);
@@ -543,7 +543,7 @@ void alto2_cpu_device::squeeze_sector(int unit)
 	src = squeeze_unsync(bits, src, 40);
 	/* sync on data preamble */
 	src = squeeze_sync(bits, src, 40);
-	LOG((log_DRV,0,"	data   sync bit #%d (@%03d.%02d)\n",
+	LOG((0,0,"	data   sync bit #%d (@%03d.%02d)\n",
 		src, src / 32, src % 32));
 	src = squeeze_record(bits, src, s->data, sizeof(s->data));
 	src = squeeze_cksum(bits, src, &cksum_data);
@@ -558,7 +558,7 @@ void alto2_cpu_device::squeeze_sector(int unit)
 
 	if (cksum_header || cksum_label || cksum_data) {
 #if	ALTO2_DEBUG
-		LOG((log_DRV,0,"	cksum check - header:%06o label:%06o data:%06o\n", cksum_header, cksum_label, cksum_data));
+		LOG((0,0,"	cksum check - header:%06o label:%06o data:%06o\n", cksum_header, cksum_label, cksum_data));
 #else
 		printf("	cksum check - header:%06o label:%06o data:%06o\n", cksum_header, cksum_label, cksum_data);
 #endif
@@ -834,7 +834,7 @@ void alto2_cpu_device::drive_select(int unit, int head)
 		d->addx_acknowledge_0 = 0;
 		/* clear log address interlock (?) */
 		d->log_addx_interlock_0 = 1;
-		LOG((log_DRV,1,"	UNIT select %d ready\n", unit));
+		LOG((0,1,"	UNIT select %d ready\n", unit));
 	} else {
 		/* it is not ready (?) */
 		d->ready_0 = 1;
@@ -842,14 +842,14 @@ void alto2_cpu_device::drive_select(int unit, int head)
 		d->s_r_w_0 = 1;
 		/* address acknowledge (?) */
 		d->addx_acknowledge_0 = 0;
-		LOG((log_DRV,1,"	UNIT select %d not ready (no image)\n", unit));
+		LOG((0,1,"	UNIT select %d not ready (no image)\n", unit));
 	}
 
 	/* Note: head select input is active low (0: selects head 1, 1: selects head 0) */
 	head = head & DIABLO_DRIVE_HEAD_MASK;
 	if (head != d->head) {
 		d->head = head;
-		LOG((log_DRV,1,"	HEAD %d select on unit %d\n", head, unit));
+		LOG((0,1,"	HEAD %d select on unit %d\n", head, unit));
 	}
 	drive_get_sector(unit);
 }
@@ -873,7 +873,7 @@ void alto2_cpu_device::drive_strobe(int unit, int cylinder, int restore, int str
 		fatal(1, "invalid unit %d in call to drive_strobe()\n", unit);
 
 	if (strobe == 1) {
-		LOG((log_DRV,1,"	STROBE end of interlock\n", seekto));
+		LOG((0,1,"	STROBE end of interlock\n", seekto));
 		/* deassert the log address interlock */
 		d->log_addx_interlock_0 = 1;
 		return;
@@ -883,7 +883,7 @@ void alto2_cpu_device::drive_strobe(int unit, int cylinder, int restore, int str
 	d->log_addx_interlock_0 = 0;
 
 	if (seekto == d->cylinder) {
-		LOG((log_DRV,1,"	STROBE to cylinder %d acknowledge\n", seekto));
+		LOG((0,1,"	STROBE to cylinder %d acknowledge\n", seekto));
 		d->addx_acknowledge_0 = 0;	/* address acknowledge, if cylinder is reached */
 		d->seek_incomplete_0 = 1;	/* reset seek incomplete */
 		return;
@@ -899,7 +899,7 @@ void alto2_cpu_device::drive_strobe(int unit, int cylinder, int restore, int str
 			d->log_addx_interlock_0 = 1;	/* deassert the log address interlock */
 			d->seek_incomplete_0 = 1;	/* deassert seek incomplete */
 			d->addx_acknowledge_0 = 0;	/* assert address acknowledge  */
-			LOG((log_DRV,1,"	STROBE to cylinder %d incomplete\n", seekto));
+			LOG((0,1,"	STROBE to cylinder %d incomplete\n", seekto));
 			return;
 		}
 	} else {
@@ -910,11 +910,11 @@ void alto2_cpu_device::drive_strobe(int unit, int cylinder, int restore, int str
 			d->log_addx_interlock_0 = 1;	/* deassert the log address interlock */
 			d->seek_incomplete_0 = 1;	/* deassert seek incomplete */
 			d->addx_acknowledge_0 = 0;	/* assert address acknowledge  */
-			LOG((log_DRV,1,"	STROBE to cylinder %d incomplete\n", seekto));
+			LOG((0,1,"	STROBE to cylinder %d incomplete\n", seekto));
 			return;
 		}
 	}
-	LOG((log_DRV,1,"	STROBE to cylinder %d (now %d) - interlock\n", seekto, d->cylinder));
+	LOG((0,1,"	STROBE to cylinder %d (now %d) - interlock\n", seekto, d->cylinder));
 
 	d->addx_acknowledge_0 = 1;	/* deassert address acknowledge  */
 	d->seek_incomplete_0 = 1;	/* deassert seek incomplete */
@@ -1017,7 +1017,7 @@ void alto2_cpu_device::drive_wrdata(int unit, int index, int wrdata)
 	if (-1 == d->wrfirst)
 		d->wrfirst = index;
 
-	LOG((log_DRV,7,"	write #%d %d/%d/%d bit #%d bit:%d\n", unit, d->cylinder, d->head, d->sector, index, wrdata));
+	LOG((0,7,"	write #%d %d/%d/%d bit #%d bit:%d\n", unit, d->cylinder, d->head, d->sector, index, wrdata));
 
 	if (index < GUARD_ZONE_BITS) {
 		/* don't write in the guard zone (?) */
@@ -1074,7 +1074,7 @@ int alto2_cpu_device::drive_rddata(int unit, int index)
 		d->rdfirst = index;
 
 	bit = RDBIT(bits,index);
-	LOG((log_DRV,7,"	read #%d %d/%d/%d bit #%d:%d\n", unit, d->cylinder, d->head, d->sector, index, bit));
+	LOG((0,7,"	read #%d %d/%d/%d bit #%d:%d\n", unit, d->cylinder, d->head, d->sector, index, bit));
 	d->rdlast = index;
 	return bit;
 }
@@ -1126,7 +1126,7 @@ int alto2_cpu_device::drive_rdclk(int unit, int index)
 		clk = RDBIT(bits,index);
 	}
 
-	LOG((log_DRV,7,	"	read #%d %d/%d/%d clk #%d:%d\n", unit, d->cylinder, d->head, d->sector, index, clk));
+	LOG((0,7,	"	read #%d %d/%d/%d clk #%d:%d\n", unit, d->cylinder, d->head, d->sector, index, clk));
 
 	d->rdlast = index;
 	return clk ^ 1;
@@ -1233,7 +1233,7 @@ void alto2_cpu_device::drive_next_sector(void* ptr, int arg)
 	int unit = m_unit_selected;
 	diablo_drive_t *d = m_drive[unit];
 
-	LOG((log_DRV,5, "	next sector (unit #%d sector %d)\n", unit, d->sector));
+	LOG((0,5, "	next sector (unit #%d sector %d)\n", unit, d->sector));
 	(void)d;
 
 	switch (arg) {
@@ -1265,7 +1265,7 @@ void alto2_cpu_device::sector_mark_1(int unit)
 {
 	diablo_drive_t *d = m_drive[unit];
 
-	LOG((log_DRV,5, "	sector mark 1 (unit #%d sector %d)\n", unit, d->sector));
+	LOG((0,5, "	sector mark 1 (unit #%d sector %d)\n", unit, d->sector));
 	/* set sector mark to 1 */
 	d->sector_mark_0 = 1;
 }
@@ -1279,7 +1279,7 @@ void alto2_cpu_device::sector_mark_0(int unit)
 {
 	diablo_drive_t *d = m_drive[unit];
 
-	LOG((log_DRV,5,"	sector mark 0 (unit #%d sector %d)\n", unit, d->sector));
+	LOG((0,5,"	sector mark 0 (unit #%d sector %d)\n", unit, d->sector));
 
 	/* squeeze previous sector, if it was written to */
 	squeeze_sector(unit);
@@ -1340,11 +1340,11 @@ int drive_args(const char *arg)
 	if (!strcmp(p, ".z") || !strcmp(p, ".Z") ||
 		!strcmp(p, ".gz") || !strcmp(p, ".GZ")) {
 		/* compress (LZW) or gzip compressed image */
-		LOG((log_DRV,0,"loading compressed disk image %s\n", arg));
+		LOG((0,0,"loading compressed disk image %s\n", arg));
 		zcat = 1;
 	} else if (!strcmp(p, ".dsk") || !strcmp(p, ".DSK")) {
 		/* uncompressed .dsk extension */
-		LOG((log_DRV,0,"loading uncompressed disk image %s\n", arg));
+		LOG((0,0,"loading uncompressed disk image %s\n", arg));
 		zcat = 0;
 	} else {
 		return -1;
@@ -1388,7 +1388,7 @@ int drive_args(const char *arg)
 	}
 	fclose(fp);
 
-	LOG((log_DRV,0, "got %d (%#x) bytes\n", done, done));
+	LOG((0,0, "got %d (%#x) bytes\n", done, done));
 
 	cooked = (diablo_sector_t *)malloc(csize);
 	if (!cooked)
@@ -1422,7 +1422,7 @@ int drive_args(const char *arg)
 	ip = NULL;
 
 	if (csize != size * sizeof(diablo_sector_t)) {
-		LOG((log_DRV,0,"disk image %s size mismatch (%d bytes)\n", arg, csize));
+		LOG((0,0,"disk image %s size mismatch (%d bytes)\n", arg, csize));
 		free(cooked);
 		return -1;
 	}
@@ -1438,7 +1438,7 @@ int drive_args(const char *arg)
 		hdr = cooked->header[2] + 256 * cooked->header[3];
 		chs = (s << 12) | (c << 3) | (h << 2) | (unit << 1);
 		if (chs != hdr) {
-			LOG((log_DRV,0,"WARNING: header mismatch C/H/S: %3d/%d/%2d chs:%06o hdr:%06o\n",
+			LOG((0,0,"WARNING: header mismatch C/H/S: %3d/%d/%2d chs:%06o hdr:%06o\n",
 				c, h, s, chs, hdr));
 		}
 		if (++s == DRIVE_SPT) {
@@ -1454,7 +1454,7 @@ int drive_args(const char *arg)
 	/* set drive image */
 	d->image = (diablo_sector_t *)cp;
 
-	LOG((log_DRV,0,"drive #%d successfully created image for %s\n", unit, arg));
+	LOG((0,0,"drive #%d successfully created image for %s\n", unit, arg));
 
 	drive_select(unit, 0);
 
@@ -1463,9 +1463,9 @@ int drive_args(const char *arg)
 	/* drive address acknowledge is active now */
 	d->addx_acknowledge_0 = 0;
 
-	LOG((log_DRV,0,"possible %s sector size is %#o (%d) words\n", d->description, SECTOR_WORDS, SECTOR_WORDS));
+	LOG((0,0,"possible %s sector size is %#o (%d) words\n", d->description, SECTOR_WORDS, SECTOR_WORDS));
 
-	LOG((log_DRV,0,"sector mark pulse length is %lldns\n", SECTOR_MARK_PULSE_PRE + SECTOR_MARK_PULSE_POST));
+	LOG((0,0,"sector mark pulse length is %lldns\n", SECTOR_MARK_PULSE_PRE + SECTOR_MARK_PULSE_POST));
 
 	return 0;
 }

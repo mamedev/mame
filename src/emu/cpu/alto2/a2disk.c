@@ -1603,7 +1603,7 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 		}
 	}
 
-	LOG((0,2,"	current cylinder:%d\n", drive_cylinder(unit) ^ DRIVE_CYLINDER_MASK));
+	LOG((0,2,"	current cylinder:%d\n", drive_cylinder(unit) ^ DIABLO_DRIVE_CYLINDER_MASK));
 
 	/* if the strobe is still set, restart the timer */
 	if (m_dsk.strobe) {

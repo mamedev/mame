@@ -424,7 +424,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 void alto2_cpu_device::f2_evenfield_1()
 {
 	UINT16 r = HLC1024() ^ 1;
-	LOG((0,2,"	evenfield branch on HLC1024 (%#o | %#o)\n", cpu.next2, r));
+	LOG((0,2,"	evenfield branch on HLC1024 (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 }
 

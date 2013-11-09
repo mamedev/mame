@@ -18,7 +18,7 @@
 #define	ALTO2_TAG "alto2"
 
 #ifndef	ALTO2_DEBUG
-#define	ALTO2_DEBUG			0
+#define	ALTO2_DEBUG			1
 #endif
 
 #define	USE_PRIO_F9318	0			//!< define to 1 to use the F9318 priority encoder code
@@ -975,6 +975,7 @@ private:
 	UINT64 m_cycle;									//!< number of cycles executed in the current slice
 
 	UINT64 cycle() { return m_cycle; }				//!< return the current CPU cycle
+	UINT64 ntime() { return m_cycle*ALTO2_UCYCLE; }	//!< return the current nano seconds
 
 	void hard_reset();								//!< reset the various registers
 	int soft_reset();								//!< soft reset
@@ -1448,8 +1449,16 @@ private:
 	int m_head_selected;								//!< selected drive head
 	a2cb m_sector_callback;								//!< callback to call at the start of each sector
 	emu_timer* m_sector_timer;							//!< sector timer
+#if	ALTO2_DEBUG
+	void drive_dump_ascii(UINT8 *src, size_t size);
+	size_t dump_record(UINT8 *src, size_t addr, size_t size, const char *name, int cr);
+#endif
 	void drive_get_sector(int unit);					//!< calculate the sector from the logical block address
 	void expand_sector(int unit, int page);				//!< Expand a sector into an array of clock and data bits
+	size_t squeeze_sync(UINT32 *bits, size_t src, size_t size);
+	size_t squeeze_unsync(UINT32 *bits, size_t src, size_t size);
+	size_t squeeze_record(UINT32 *bits, size_t src, UINT8 *field, size_t size);
+	size_t squeeze_cksum(UINT32 *bits, size_t src, int *cksum);
 	void squeeze_sector(int unit);						//!< Squeeze a array of clock and data bits into a sector's data
 	int drive_bits_per_sector() const;					//!< return number of bitclk edges for a sector
 	const char* drive_description(int unit);			//!< return a pointer to a drive's description
@@ -1885,11 +1894,6 @@ private:
 		int mear;							//!< memory error address register
 		UINT16 mesr;						//!< memory error status register
 		UINT16 mecr;						//!< memory error control register
-
-#if	ALTO2_DEBUG
-		void (*watch_read)(int mar, int md);	//!< watch read function (debugging)
-		void (*watch_write)(int mar, int md);	//!< watch write function (debugging)
-#endif
 	}	m_mem;
 
 	/**
@@ -1987,6 +1991,11 @@ private:
 
 	//! debugger interface to write memory
 	void debug_write_mem(UINT32 addr, UINT16 data);
+
+#if	ALTO2_DEBUG
+	void watch_write(UINT32 addr, UINT32 data);
+	void watch_read(UINT32 addr, UINT32 data);
+#endif
 
 	//! initialize the memory system
 	void init_memory();

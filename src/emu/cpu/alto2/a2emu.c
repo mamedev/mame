@@ -395,7 +395,7 @@ void alto2_cpu_device::f2_magic_1()
 		XC = m_t & 1;
 		m_shifter = m_l >> 1;
 		m_shifter |= XC << 15;
-		LOG((0,2,"	<-L MRSH 1 (shifter:%06o XC:%o)", m_shifer, XC));
+		LOG((0,2,"	<-L MRSH 1 (shifter:%06o XC:%o)", m_shifter, XC));
 		break;
 	case f1_l_lcy_8:	// <-L LCY 8
 	default:			// other
@@ -415,7 +415,7 @@ void alto2_cpu_device::f2_load_dns_0()
 #else
 	A2_PUT8(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
 #endif
-	LOG((0,2,"	DNS<-; rsel := DstAC (%#o %s)\n", m_rsel, r_name[m_rsel]));
+	LOG((0,2,"	DNS<-; rsel := DstAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 /**
@@ -506,7 +506,7 @@ void alto2_cpu_device::f2_acdest_0()
 #else
 	A2_PUT8(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
 #endif
-	LOG((0,2,"	ACDEST<-; mux (rsel:%#o %s)\n", m_rsel, r_name[m_rsel]));
+	LOG((0,2,"	ACDEST<-; mux (rsel:%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 #if	ALTO2_DEBUG
@@ -519,10 +519,10 @@ void alto2_cpu_device::bitblt_info()
 
 	LOG((0,3,"	BITBLT AC1:%06o AC2:%06o\n", m_r[rsel_ac1], m_r[rsel_ac2]));
 	LOG((0,3,"		function  : %06o\n", val));
-	LOG((0,3,"			src extRAM: %o\n", ALTO2_BIT(val,16,10)));
-	LOG((0,3,"			dst extRAM: %o\n", ALTO2_BIT(val,16,11)));
-	LOG((0,3,"			src type  : %o (%s)\n", ALTO2_GET(val,16,12,13), type_name[ALTO2_GET(val,16,12,13)]));
-	LOG((0,3,"			operation : %o (%s)\n", ALTO2_GET(val,16,14,15), oper_name[ALTO2_GET(val,16,14,15)]));
+	LOG((0,3,"			src extRAM: %o\n", A2_BIT16(val,16,10)));
+	LOG((0,3,"			dst extRAM: %o\n", A2_BIT16(val,16,11)));
+	LOG((0,3,"			src type  : %o (%s)\n", A2_GET16(val,16,12,13), type_name[A2_GET16(val,16,12,13)]));
+	LOG((0,3,"			operation : %o (%s)\n", A2_GET16(val,16,14,15), oper_name[A2_GET16(val,16,14,15)]));
 	val = debug_read_mem(bbt+1);
 	LOG((0,3,"		unused AC2: %06o (%d)\n", val, val));
 	val = debug_read_mem(bbt+2);
@@ -559,16 +559,6 @@ void alto2_cpu_device::bitblt_info()
 void alto2_cpu_device::f2_load_ir_1()
 {
 	UINT16 r = (A2_BIT32(m_bus,16,0) << 3) | A2_GET32(m_bus,16,5,7);
-
-#if	ALTO2_DEBUG
-	if (ll[task_emu].level > 1) {
-		char dasm[64];
-		dbg_dasm(dasm, sizeof(dasm), 0, m_r[6], m_bus);
-		LOG((0,2,"	IR<-; IR = %06o, branch on IR[0,5-7] (%#o|%#o)\n", m_bus, m_next2, r));
-		/* disassembled instruction */
-		LOG((0,2,"		%06o: %06o %s\n", m_mem_mar, m_bus, dasm));
-	}
-#endif	/* ALTO2_DEBUG */
 
 	/* special logging of some opcodes */
 	switch (m_bus) {
@@ -659,7 +649,7 @@ void alto2_cpu_device::f2_acsource_0()
 #else
 	A2_PUT8(m_rsel, 5, 3, 4, IR_SrcAC(m_emu.ir) ^ 3);
 #endif
-	LOG((0,2,"	<-ACSOURCE; rsel := SrcAC (%#o %s)\n", m_rsel, r_name[m_rsel]));
+	LOG((0,2,"	<-ACSOURCE; rsel := SrcAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 /**
