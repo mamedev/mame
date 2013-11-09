@@ -1599,40 +1599,147 @@ raw angle|angle compare|angle mod value| res |
 #define seibu_cop_log logerror
 #define LOG_CMDS 1
 
-static UINT16 *cop_mcu_ram;
+const device_type SEIBU_COP_LEGACY = &device_creator<seibu_cop_legacy_device>;
 
-static UINT16 copd2_table[0x100];
-static UINT16 copd2_table_2[0x100/8];
-static UINT16 copd2_table_3[0x100/8];
-static UINT16 copd2_table_4[0x100/8];
+seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SEIBU_COP_LEGACY, "Seibu COP Legacy", tag, owner, clock, "seibu_cop_legacy", __FILE__),
+	m_cop_mcu_ram(NULL),
+	m_cop_438(0),
+	m_cop_43a(0),
+	m_cop_43c(0),
+	m_cop_dma_fade_table(0),
+	m_cop_dma_trigger(0),
+	m_cop_scale(0),
+	m_cop_rng_max_value(0),
+	m_copd2_offs(0),
+	m_cop_status(0),
+	m_cop_dist(0),
+	m_cop_angle(0),
+	m_cop_hit_status(0),
+	m_cop_hit_val_x(0),
+	m_cop_hit_val_y(0),
+	m_cop_hit_val_z(0),
+	m_cop_hit_val_unk(0),
+	m_cop_sort_lookup(0),
+	m_cop_sort_ram_addr(0),
+	m_cop_sort_param(0),
+	m_cop_angle_compare(0),
+	m_cop_angle_mod_val(0),
+	m_r0(0),
+	m_r1(0),
+	m_cop_rom_addr_lo(0),
+	m_cop_rom_addr_hi(0),
+	m_cop_rom_addr_unk(0),
+	m_u1(0),
+	m_u2(0),
+	m_fill_val(0),
+	m_pal_brightness_val(0),
+	m_pal_brightness_mode(0),
+	m_cop_sprite_dma_src(0),
+	m_cop_sprite_dma_abs_x(0),
+	m_cop_sprite_dma_abs_y(0),
+	m_cop_sprite_dma_size(0),
+	m_cop_sprite_dma_param(0)
+{
+	memset(m_copd2_table, 0, sizeof(UINT16)*0x100);
+	memset(m_copd2_table_2, 0, sizeof(UINT16)*0x100/8);
+	memset(m_copd2_table_3, 0, sizeof(UINT16)*0x100/8);
+	memset(m_copd2_table_4, 0, sizeof(UINT16)*0x100/8);
+	memset(m_cop_dma_src, 0, sizeof(UINT16)*0x200);
+	memset(m_cop_dma_size, 0, sizeof(UINT16)*0x200);
+	memset(m_cop_dma_dst, 0, sizeof(UINT16)*0x200);
+	memset(m_seibu_vregs, 0, sizeof(UINT16)*0x50/2);
+	
+	for (int i = 0; i < 8; i++)
+	{
+		m_cop_register[i] = 0;
+	}
+}
 
-static UINT16 cop_438;
-static UINT16 cop_43a;
-static UINT16 cop_43c;
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-static UINT16 cop_dma_src[0x200];
-static UINT16 cop_dma_size[0x200];
-static UINT16 cop_dma_dst[0x200];
-static UINT16 cop_dma_fade_table;
-static UINT16 cop_dma_trigger = 0;
-static UINT16 cop_scale;
+void seibu_cop_legacy_device::device_config_complete()
+{
+}
 
-static UINT8 cop_rng_max_value;
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-static UINT16 copd2_offs = 0;
+void seibu_cop_legacy_device::device_start()
+{
+	m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
+	
+	save_item(NAME(m_cop_438));
+	save_item(NAME(m_cop_43a));
+	save_item(NAME(m_cop_43c));
+	save_item(NAME(m_cop_dma_fade_table));
+	save_item(NAME(m_cop_dma_trigger));
+	save_item(NAME(m_cop_scale));
+	save_item(NAME(m_cop_rng_max_value));
+	save_item(NAME(m_copd2_offs));
+	save_item(NAME(m_cop_status));
+	save_item(NAME(m_cop_dist));
+	save_item(NAME(m_cop_angle));
+	save_item(NAME(m_cop_hit_status));
+	save_item(NAME(m_cop_hit_val_x));
+	save_item(NAME(m_cop_hit_val_y));
+	save_item(NAME(m_cop_hit_val_z));
+	save_item(NAME(m_cop_hit_val_unk));
+	save_item(NAME(m_cop_sort_lookup));
+	save_item(NAME(m_cop_sort_ram_addr));
+	save_item(NAME(m_cop_sort_param));
+	save_item(NAME(m_cop_angle_compare));
+	save_item(NAME(m_cop_angle_mod_val));
+	save_item(NAME(m_r0));
+	save_item(NAME(m_r1));
+	save_item(NAME(m_cop_rom_addr_lo));
+	save_item(NAME(m_cop_rom_addr_hi));
+	save_item(NAME(m_cop_rom_addr_unk));
+	save_item(NAME(m_u1));
+	save_item(NAME(m_u2));
+	save_item(NAME(m_fill_val));
+	save_item(NAME(m_pal_brightness_val));
+	save_item(NAME(m_pal_brightness_mode));
+	save_item(NAME(m_cop_sprite_dma_src));
+	save_item(NAME(m_cop_sprite_dma_abs_x));
+	save_item(NAME(m_cop_sprite_dma_abs_y));
+	save_item(NAME(m_cop_sprite_dma_size));
+	save_item(NAME(m_cop_sprite_dma_param));
+	save_item(NAME(m_copd2_table));
+	save_item(NAME(m_copd2_table_2));
+	save_item(NAME(m_copd2_table_3));
+	save_item(NAME(m_copd2_table_4));
+	save_item(NAME(m_cop_dma_src));
+	save_item(NAME(m_cop_dma_size));
+	save_item(NAME(m_cop_dma_dst));
+	save_item(NAME(m_seibu_vregs));
+}
 
-static void copd2_set_tableoffset(running_machine &machine, UINT16 data)
+//-------------------------------------------------
+//  device_reset - device-specific startup
+//-------------------------------------------------
+
+void seibu_cop_legacy_device::device_reset()
+{
+}
+
+void seibu_cop_legacy_device::copd2_set_tableoffset(UINT16 data)
 {
 	//logerror("mcu_offs %04x\n", data);
-	copd2_offs = data;
-	if (copd2_offs>0xff)
+	m_copd2_offs = data;
+	if (m_copd2_offs>0xff)
 	{
 		logerror("copd2 offs > 0x100\n");
 	}
 
-	copd2_table_2[copd2_offs/8] = cop_438;
-	copd2_table_3[copd2_offs/8] = cop_43a;
-	copd2_table_4[copd2_offs/8] = cop_43c;
+	m_copd2_table_2[m_copd2_offs/8] = m_cop_438;
+	m_copd2_table_3[m_copd2_offs/8] = m_cop_43a;
+	m_copd2_table_4[m_copd2_offs/8] = m_cop_43c;
 #if 0
 
 	{
@@ -1642,7 +1749,7 @@ static void copd2_set_tableoffset(running_machine &machine, UINT16 data)
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
-			fwrite(copd2_table_2, 0x200/8, 1, fp);
+			fwrite(m_copd2_table_2, 0x200/8, 1, fp);
 			fclose(fp);
 		}
 	}
@@ -1653,7 +1760,7 @@ static void copd2_set_tableoffset(running_machine &machine, UINT16 data)
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
-			fwrite(copd2_table_3, 0x200/8, 1, fp);
+			fwrite(m_copd2_table_3, 0x200/8, 1, fp);
 			fclose(fp);
 		}
 	}
@@ -1664,7 +1771,7 @@ static void copd2_set_tableoffset(running_machine &machine, UINT16 data)
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
-			fwrite(copd2_table_4, 0x200/8, 1, fp);
+			fwrite(m_copd2_table_4, 0x200/8, 1, fp);
 			fclose(fp);
 		}
 	}
@@ -1677,12 +1784,12 @@ static void copd2_set_tableoffset(running_machine &machine, UINT16 data)
 		for (i=0;i<0x20;i++)
 		{
 			int ii;
-			printf("%02x | %01x | %04x | %04x | ", i, copd2_table_2[i], copd2_table_3[i], copd2_table_4[i]);
+			printf("%02x | %01x | %04x | %04x | ", i, m_copd2_table_2[i], m_copd2_table_3[i], m_copd2_table_4[i]);
 
 
 			for (ii=0;ii<0x8;ii++)
 			{
-				printf("%03x ", copd2_table[i*8 + ii]);
+				printf("%03x ", m_copd2_table[i*8 + ii]);
 
 			}
 			printf("\n");
@@ -1693,24 +1800,24 @@ static void copd2_set_tableoffset(running_machine &machine, UINT16 data)
 
 }
 
-static void copd2_set_tabledata(running_machine &machine, UINT16 data)
+void seibu_cop_legacy_device::copd2_set_tabledata(UINT16 data)
 {
-	copd2_table[copd2_offs] = data;
+	m_copd2_table[m_copd2_offs] = data;
 
 	if(data) {
 		int off = data & 31;
 		int reg = (data >> 5) & 3;
 		int op = (data >> 7) & 31;
 
-		logerror("COPDIS: %04x s=%02x f1=%x l=%x f2=%02x %x %04x %02x %03x %02x.%x.%02x ", cop_43c,  (cop_43c >> 11) << 3, (cop_43c >> 10) & 1, ((cop_43c >> 7) & 7)+1, cop_43c & 0x7f, cop_438, cop_43a, copd2_offs, data, op, reg, off);
+		logerror("COPDIS: %04x s=%02x f1=%x l=%x f2=%02x %x %04x %02x %03x %02x.%x.%02x ", m_cop_43c,  (m_cop_43c >> 11) << 3, (m_cop_43c >> 10) & 1, ((m_cop_43c >> 7) & 7)+1, m_cop_43c & 0x7f, m_cop_438, m_cop_43a, m_copd2_offs, data, op, reg, off);
 
 		off *= 2;
 
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 00 188 03.0.08 read32 10(r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 01 282 05.0.02 add32 4(r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 02 082 01.0.02 write32 4(r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 03 b8e 17.0.0e add16h 1c(r0)
-		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 04 98e 13.0.0e write16h 1c(r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 00 188 03.0.08 read32 10(m_r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 01 282 05.0.02 add32 4(m_r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 02 082 01.0.02 write32 4(m_r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 03 b8e 17.0.0e add16h 1c(m_r0)
+		// COPDIS: 0205 s=00 f1=0 l=5 f2=05 6 ffeb 04 98e 13.0.0e write16h 1c(m_r0)
 
 		// 188 182 082 b8e 98e -> 04  = 04+04    1ch = 1c+04
 		// 188 188 082 b8e 98e -> 04  = 04+10    1ch = 1c+10
@@ -1773,31 +1880,28 @@ static void copd2_set_tabledata(running_machine &machine, UINT16 data)
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
-			fwrite(copd2_table, 0x200, 1, fp);
+			fwrite(m_copd2_table, 0x200, 1, fp);
 			fclose(fp);
 		}
 	}
 #endif
 }
 
-static UINT32 cop_register[8];
-static UINT16 seibu_vregs[0x50/2];
-
-static WRITE16_HANDLER( seibu_common_video_regs_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::seibu_common_video_regs_w )
 {
 	legionna_state *state = space.machine().driver_data<legionna_state>();
-	COMBINE_DATA(&seibu_vregs[offset]);
+	COMBINE_DATA(&m_seibu_vregs[offset]);
 
 	switch(offset)
 	{
-		case (0x01a/2): { state->flip_screen_set(seibu_vregs[offset] & 0x01); break; }
-		case (0x01c/2): { state->m_layer_disable =  seibu_vregs[offset]; break; }
-		case (0x020/2): { state->m_scrollram16[0] = seibu_vregs[offset]; break; }
-		case (0x022/2): { state->m_scrollram16[1] = seibu_vregs[offset]; break; }
-		case (0x024/2): { state->m_scrollram16[2] = seibu_vregs[offset]; break; }
-		case (0x026/2): { state->m_scrollram16[3] = seibu_vregs[offset]; break; }
-		case (0x028/2): { state->m_scrollram16[4] = seibu_vregs[offset]; break; }
-		case (0x02a/2): { state->m_scrollram16[5] = seibu_vregs[offset]; break; }
+		case (0x01a/2): { state->flip_screen_set(m_seibu_vregs[offset] & 0x01); break; }
+		case (0x01c/2): { state->m_layer_disable =  m_seibu_vregs[offset]; break; }
+		case (0x020/2): { state->m_scrollram16[0] = m_seibu_vregs[offset]; break; }
+		case (0x022/2): { state->m_scrollram16[1] = m_seibu_vregs[offset]; break; }
+		case (0x024/2): { state->m_scrollram16[2] = m_seibu_vregs[offset]; break; }
+		case (0x026/2): { state->m_scrollram16[3] = m_seibu_vregs[offset]; break; }
+		case (0x028/2): { state->m_scrollram16[4] = m_seibu_vregs[offset]; break; }
+		case (0x02a/2): { state->m_scrollram16[5] = m_seibu_vregs[offset]; break; }
 		default: { logerror("seibu_common_video_regs_w unhandled offset %02x %04x\n",offset*2,data); break; }
 	}
 }
@@ -1919,16 +2023,10 @@ No known explanation to this so far ...
 
  *******************************************************************************************/
 
-// temporary hack until this is a proper device
-inline void get_ram(running_machine &machine)
-{
-	if (cop_mcu_ram == NULL) cop_mcu_ram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("cop_mcu_ram")->ptr());
-}
 
-READ16_HANDLER( copdxbl_0_r )
+READ16_MEMBER( seibu_cop_legacy_device::copdxbl_0_r )
 {
-	get_ram(space.machine());
-	UINT16 retvalue = cop_mcu_ram[offset];
+	UINT16 retvalue = m_cop_mcu_ram[offset];
 
 	switch(offset)
 	{
@@ -1941,7 +2039,7 @@ READ16_HANDLER( copdxbl_0_r )
 		//case (0x47e/2):
 		//case (0x5b0/2):
 		//case (0x5b4/2):
-		//  return cop_mcu_ram[offset];
+		//  return m_cop_mcu_ram[offset];
 
 		case (0x700/2): return space.machine().root_device().ioport("DSW1")->read();
 		case (0x704/2): return space.machine().root_device().ioport("PLAYERS12")->read();
@@ -1951,11 +2049,10 @@ READ16_HANDLER( copdxbl_0_r )
 	}
 }
 
-WRITE16_HANDLER( copdxbl_0_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::copdxbl_0_w )
 {
 	legionna_state *state = space.machine().driver_data<legionna_state>();
-	get_ram(space.machine());
-	COMBINE_DATA(&cop_mcu_ram[offset]);
+	COMBINE_DATA(&m_cop_mcu_ram[offset]);
 
 	switch(offset)
 	{
@@ -1966,14 +2063,14 @@ WRITE16_HANDLER( copdxbl_0_w )
 		}
 
 		/*TODO: kludge on x-axis.*/
-		case (0x660/2): { state->m_scrollram16[0] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x662/2): { state->m_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x664/2): { state->m_scrollram16[2] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x666/2): { state->m_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x668/2): { state->m_scrollram16[4] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x66a/2): { state->m_scrollram16[5] = cop_mcu_ram[offset]; break; }
-		case (0x66c/2): { state->m_scrollram16[6] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x66e/2): { state->m_scrollram16[7] = cop_mcu_ram[offset]; break; }
+		case (0x660/2): { state->m_scrollram16[0] = m_cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x662/2): { state->m_scrollram16[1] = m_cop_mcu_ram[offset]; break; }
+		case (0x664/2): { state->m_scrollram16[2] = m_cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x666/2): { state->m_scrollram16[3] = m_cop_mcu_ram[offset]; break; }
+		case (0x668/2): { state->m_scrollram16[4] = m_cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x66a/2): { state->m_scrollram16[5] = m_cop_mcu_ram[offset]; break; }
+		case (0x66c/2): { state->m_scrollram16[6] = m_cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x66e/2): { state->m_scrollram16[7] = m_cop_mcu_ram[offset]; break; }
 
 		case (0x740/2):
 		{
@@ -1990,23 +2087,6 @@ WRITE16_HANDLER( copdxbl_0_w )
      which seems common to all the games
 */
 
-static UINT16 cop_status,cop_dist,cop_angle;
-static UINT16 cop_hit_status;
-static INT16 cop_hit_val_x,cop_hit_val_y,cop_hit_val_z,cop_hit_val_unk;
-static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
-static INT8 cop_angle_compare;
-static INT8 cop_angle_mod_val;
-static struct
-{
-	int x,y;
-	INT16 min_x,min_y,max_x,max_y;
-	UINT16 hitbox;
-	UINT16 hitbox_x,hitbox_y;
-}cop_collision_info[2];
-static int r0, r1;
-
-static UINT16 cop_rom_addr_lo,cop_rom_addr_hi,cop_rom_addr_unk;
-
 /* RE from Seibu Cup Soccer bootleg */
 static const UINT8 fade_table(int v)
 {
@@ -2016,12 +2096,11 @@ static const UINT8 fade_table(int v)
 	return (low * (high | (high >> 5)) + 0x210) >> 10;
 }
 
-static UINT16 u1,u2;
 
-#define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_u1_,_u2_) \
-	(copd2_table[command+0] == _1_ && copd2_table[command+1] == _2_ && copd2_table[command+2] == _3_ && copd2_table[command+3] == _4_ && \
-	copd2_table[command+4] == _5_ && copd2_table[command+5] == _6_ && copd2_table[command+6] == _7_ && copd2_table[command+7] == _8_ && \
-	u1 == _u1_ && u2 == _u2_)
+#define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_m_u1_,_m_u2_) \
+	(m_copd2_table[command+0] == _1_ && m_copd2_table[command+1] == _2_ && m_copd2_table[command+2] == _3_ && m_copd2_table[command+3] == _4_ && \
+	m_copd2_table[command+4] == _5_ && m_copd2_table[command+5] == _6_ && m_copd2_table[command+6] == _7_ && m_copd2_table[command+7] == _8_ && \
+	m_u1 == _m_u1_ && m_u2 == _m_u2_)
 
 /*
 Godzilla 0x12c0 X = 0x21ed Y = 0x57da
@@ -2040,64 +2119,63 @@ X = collides between 0xb0 and 0x50 (inclusive)
 Y = collides between 0xd0 and 0x30 (not inclusive)
 0x588 bits 2 & 3 = 0x580 bits 0 & 1
 */
-static void cop_take_hit_box_params(UINT8 offs)
+void seibu_cop_legacy_device::cop_take_hit_box_params(UINT8 offs)
 {
 	INT16 start_x,start_y,height,width;
 
 	{
-		height = UINT8(cop_collision_info[offs].hitbox_y >> 8);
-		start_y = INT8(cop_collision_info[offs].hitbox_y);
-		width = UINT8(cop_collision_info[offs].hitbox_x >> 8);
-		start_x = INT8(cop_collision_info[offs].hitbox_x);
+		height = UINT8(m_cop_collision_info[offs].hitbox_y >> 8);
+		start_y = INT8(m_cop_collision_info[offs].hitbox_y);
+		width = UINT8(m_cop_collision_info[offs].hitbox_x >> 8);
+		start_x = INT8(m_cop_collision_info[offs].hitbox_x);
 	}
 
-	cop_collision_info[offs].min_x = (cop_collision_info[offs].x >> 16) + start_x;
-	cop_collision_info[offs].max_x = cop_collision_info[offs].min_x + width;
-	cop_collision_info[offs].min_y = (cop_collision_info[offs].y >> 16) + start_y;
-	cop_collision_info[offs].max_y = cop_collision_info[offs].min_y + height;
+	m_cop_collision_info[offs].min_x = (m_cop_collision_info[offs].x >> 16) + start_x;
+	m_cop_collision_info[offs].max_x = m_cop_collision_info[offs].min_x + width;
+	m_cop_collision_info[offs].min_y = (m_cop_collision_info[offs].y >> 16) + start_y;
+	m_cop_collision_info[offs].max_y = m_cop_collision_info[offs].min_y + height;
 }
 
 
-static UINT8 cop_calculate_collsion_detection(running_machine &machine)
+UINT8 seibu_cop_legacy_device::cop_calculate_collsion_detection()
 {
 	static UINT8 res;
 
 	res = 3;
 
 	/* outbound X check */
-	if(cop_collision_info[0].max_x >= cop_collision_info[1].min_x && cop_collision_info[0].min_x <= cop_collision_info[1].max_x)
+	if(m_cop_collision_info[0].max_x >= m_cop_collision_info[1].min_x && m_cop_collision_info[0].min_x <= m_cop_collision_info[1].max_x)
 		res &= ~2;
 
-	if(cop_collision_info[1].max_x >= cop_collision_info[0].min_x && cop_collision_info[1].min_x <= cop_collision_info[0].max_x)
+	if(m_cop_collision_info[1].max_x >= m_cop_collision_info[0].min_x && m_cop_collision_info[1].min_x <= m_cop_collision_info[0].max_x)
 		res &= ~2;
 
 	/* outbound Y check */
-	if(cop_collision_info[0].max_y >= cop_collision_info[1].min_y && cop_collision_info[0].min_y <= cop_collision_info[1].max_y)
+	if(m_cop_collision_info[0].max_y >= m_cop_collision_info[1].min_y && m_cop_collision_info[0].min_y <= m_cop_collision_info[1].max_y)
 		res &= ~1;
 
-	if(cop_collision_info[1].max_y >= cop_collision_info[0].min_y && cop_collision_info[1].min_y <= cop_collision_info[0].max_y)
+	if(m_cop_collision_info[1].max_y >= m_cop_collision_info[0].min_y && m_cop_collision_info[1].min_y <= m_cop_collision_info[0].max_y)
 		res &= ~1;
 
-	cop_hit_val_x = (cop_collision_info[0].x - cop_collision_info[1].x) >> 16;
-	cop_hit_val_y = (cop_collision_info[0].y - cop_collision_info[1].y) >> 16;
-	cop_hit_val_z = 1;
-	cop_hit_val_unk = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
+	m_cop_hit_val_x = (m_cop_collision_info[0].x - m_cop_collision_info[1].x) >> 16;
+	m_cop_hit_val_y = (m_cop_collision_info[0].y - m_cop_collision_info[1].y) >> 16;
+	m_cop_hit_val_z = 1;
+	m_cop_hit_val_unk = res; // TODO: there's also bit 2 and 3 triggered in the tests, no known meaning
 
-	//popmessage("%d %d %04x %04x %04x %04x",cop_hit_val_x,cop_hit_val_y,cop_collision_info[0].hitbox_x,cop_collision_info[0].hitbox_y,cop_collision_info[1].hitbox_x,cop_collision_info[1].hitbox_y);
+	//popmessage("%d %d %04x %04x %04x %04x",m_cop_hit_val_x,m_cop_hit_val_y,m_cop_collision_info[0].hitbox_x,m_cop_collision_info[0].hitbox_y,m_cop_collision_info[1].hitbox_x,m_cop_collision_info[1].hitbox_y);
 
 	//if(res == 0)
-	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",cop_collision_info[0].x,cop_collision_info[0].y,cop_collision_info[0].hitbox,cop_collision_info[1].x,cop_collision_info[1].y,cop_collision_info[1].hitbox);
-//  popmessage("0:%08x %08x %08x %08x 1:%08x %08x %08x %08x\n",cop_collision_info[0].min_x,cop_collision_info[0].max_x,cop_collision_info[0].min_y, cop_collision_info[0].max_y,
-//                                                   cop_collision_info[1].min_x,cop_collision_info[1].max_x,cop_collision_info[1].min_y, cop_collision_info[1].max_y);
+	//popmessage("0:%08x %08x %08x 1:%08x %08x %08x\n",m_cop_collision_info[0].x,m_cop_collision_info[0].y,m_cop_collision_info[0].hitbox,m_cop_collision_info[1].x,m_cop_collision_info[1].y,m_cop_collision_info[1].hitbox);
+//  popmessage("0:%08x %08x %08x %08x 1:%08x %08x %08x %08x\n",m_cop_collision_info[0].min_x,m_cop_collision_info[0].max_x,m_cop_collision_info[0].min_y, m_cop_collision_info[0].max_y,
+//                                                   m_cop_collision_info[1].min_x,m_cop_collision_info[1].max_x,m_cop_collision_info[1].min_y, m_cop_collision_info[1].max_y);
 
 	return res;
 }
 
-static READ16_HANDLER( generic_cop_r )
+READ16_MEMBER( seibu_cop_legacy_device::generic_cop_r )
 {
 	UINT16 retvalue;
-	get_ram(space.machine());
-	retvalue = cop_mcu_ram[offset];
+	retvalue = m_cop_mcu_ram[offset];
 
 
 	switch (offset)
@@ -2111,21 +2189,21 @@ static READ16_HANDLER( generic_cop_r )
 			return retvalue;
 
 		case 0x180/2:
-			return cop_hit_status;
+			return m_cop_hit_status;
 
 		/* these two controls facing direction in Godzilla opponents (only vs.) - x value compare? */
 		case 0x182/2:
-			return (cop_hit_val_y);
+			return (m_cop_hit_val_y);
 
 		case 0x184/2:
-			return (cop_hit_val_x);
+			return (m_cop_hit_val_x);
 
 		/* Legionnaire only - z value compare? */
 		case 0x186/2:
-			return (cop_hit_val_z);
+			return (m_cop_hit_val_z);
 
 		case 0x188/2:
-			return cop_hit_val_unk;
+			return m_cop_hit_val_unk;
 
 		/* BCD */
 		case 0x190/2:
@@ -2140,16 +2218,16 @@ static READ16_HANDLER( generic_cop_r )
 		case 0x1a2/2:
 		case 0x1a4/2:
 		case 0x1a6/2:
-			return space.machine().firstcpu->total_cycles() % (cop_rng_max_value+1);
+			return space.machine().firstcpu->total_cycles() % (m_cop_rng_max_value+1);
 
 		case 0x1b0/2:
-			return cop_status;
+			return m_cop_status;
 
 		case 0x1b2/2:
-			return cop_dist;
+			return m_cop_dist;
 
 		case 0x1b4/2:
-			return cop_angle;
+			return m_cop_angle;
 
 		default:
 			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", space.device().safe_pc(), retvalue, offset*2);
@@ -2157,17 +2235,10 @@ static READ16_HANDLER( generic_cop_r )
 	}
 }
 
-static UINT32 fill_val;
-static UINT8 pal_brightness_val,pal_brightness_mode;
-static UINT32 cop_sprite_dma_src;
-static int cop_sprite_dma_abs_x,cop_sprite_dma_abs_y,cop_sprite_dma_size;
-static UINT32 cop_sprite_dma_param;
-
-static WRITE16_HANDLER( generic_cop_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 {
 	UINT32 temp32;
-	get_ram(space.machine());
-
+	
 	switch (offset)
 	{
 		default:
@@ -2177,11 +2248,11 @@ static WRITE16_HANDLER( generic_cop_w )
 		/* Sprite DMA */
 		case (0x000/2):
 		case (0x002/2):
-			cop_sprite_dma_param = (cop_mcu_ram[0x000/2]) | (cop_mcu_ram[0x002/2] << 16);
-			//popmessage("%08x",cop_sprite_dma_param & 0xffffffc0);
+			m_cop_sprite_dma_param = (m_cop_mcu_ram[0x000/2]) | (m_cop_mcu_ram[0x002/2] << 16);
+			//popmessage("%08x",m_cop_sprite_dma_param & 0xffffffc0);
 			break;
 
-		case (0x00c/2): { cop_sprite_dma_size = cop_mcu_ram[offset]; break; }
+		case (0x00c/2): { m_cop_sprite_dma_size = m_cop_mcu_ram[offset]; break; }
 		case (0x010/2):
 		{
 			if(data)
@@ -2189,37 +2260,37 @@ static WRITE16_HANDLER( generic_cop_w )
 			else
 			{
 				/* guess */
-				cop_register[4]+=8;
-				cop_sprite_dma_src+=6;
+				m_cop_register[4]+=8;
+				m_cop_sprite_dma_src+=6;
 
-				cop_sprite_dma_size--;
+				m_cop_sprite_dma_size--;
 
-				if(cop_sprite_dma_size > 0)
-					cop_status &= ~2;
+				if(m_cop_sprite_dma_size > 0)
+					m_cop_status &= ~2;
 				else
-					cop_status |= 2;
+					m_cop_status |= 2;
 			}
 			break;
 		}
 
 		case (0x012/2):
 		case (0x014/2):
-			cop_sprite_dma_src = (cop_mcu_ram[0x014/2]) | (cop_mcu_ram[0x012/2] << 16);
+			m_cop_sprite_dma_src = (m_cop_mcu_ram[0x014/2]) | (m_cop_mcu_ram[0x012/2] << 16);
 			break;
 
 		/* triggered before 0x6200 in Seibu Cup, looks like an angle value ... */
-		case (0x01c/2): cop_angle_compare = INT8(cop_mcu_ram[0x1c/2]);  break;
-		case (0x01e/2): cop_angle_mod_val = INT8(cop_mcu_ram[0x1e/2]); break;
+		case (0x01c/2): m_cop_angle_compare = INT8(m_cop_mcu_ram[0x1c/2]);  break;
+		case (0x01e/2): m_cop_angle_mod_val = INT8(m_cop_mcu_ram[0x1e/2]); break;
 
 		/* BCD Protection */
 		case (0x020/2):
 		case (0x022/2):
-			temp32 = (cop_mcu_ram[0x020/2]) | (cop_mcu_ram[0x022/2] << 16);
-			cop_mcu_ram[0x190/2] = (((temp32 / 1) % 10) + (((temp32 / 10) % 10) << 8) + 0x3030);
-			cop_mcu_ram[0x192/2] = (((temp32 / 100) % 10) + (((temp32 / 1000) % 10) << 8) + 0x3030);
-			cop_mcu_ram[0x194/2] = (((temp32 / 10000) % 10) + (((temp32 / 100000) % 10) << 8) + 0x3030);
-			cop_mcu_ram[0x196/2] = (((temp32 / 1000000) % 10) + (((temp32 / 10000000) % 10) << 8) + 0x3030);
-			cop_mcu_ram[0x198/2] = (((temp32 / 100000000) % 10) + (((temp32 / 1000000000) % 10) << 8) + 0x3030);
+			temp32 = (m_cop_mcu_ram[0x020/2]) | (m_cop_mcu_ram[0x022/2] << 16);
+			m_cop_mcu_ram[0x190/2] = (((temp32 / 1) % 10) + (((temp32 / 10) % 10) << 8) + 0x3030);
+			m_cop_mcu_ram[0x192/2] = (((temp32 / 100) % 10) + (((temp32 / 1000) % 10) << 8) + 0x3030);
+			m_cop_mcu_ram[0x194/2] = (((temp32 / 10000) % 10) + (((temp32 / 100000) % 10) << 8) + 0x3030);
+			m_cop_mcu_ram[0x196/2] = (((temp32 / 1000000) % 10) + (((temp32 / 10000000) % 10) << 8) + 0x3030);
+			m_cop_mcu_ram[0x198/2] = (((temp32 / 100000000) % 10) + (((temp32 / 1000000000) % 10) << 8) + 0x3030);
 			break;
 		case (0x024/2):
 			/*
@@ -2232,18 +2303,18 @@ static WRITE16_HANDLER( generic_cop_w )
 
 		case (0x028/2):
 		case (0x02a/2):
-			fill_val = (cop_mcu_ram[0x028/2]) | (cop_mcu_ram[0x02a/2] << 16);
+			m_fill_val = (m_cop_mcu_ram[0x028/2]) | (m_cop_mcu_ram[0x02a/2] << 16);
 			break;
 
 		/* max possible value returned by the RNG at 0x5a*, trusted */
-		case (0x02c/2): cop_rng_max_value = cop_mcu_ram[0x2c/2] & 0xff; break;
+		case (0x02c/2): m_cop_rng_max_value = m_cop_mcu_ram[0x2c/2] & 0xff; break;
 
 		/* Command tables for 0x500 / 0x502 commands */
-		case (0x032/2): { copd2_set_tabledata(space.machine(), data); break; }
-		case (0x034/2): { copd2_set_tableoffset(space.machine(), data); break; }
-		case (0x038/2): { cop_438 = data; break; }
-		case (0x03a/2): { cop_43a = data; break; }
-		case (0x03c/2): { cop_43c = data; break; }
+		case (0x032/2): { copd2_set_tabledata(data); break; }
+		case (0x034/2): { copd2_set_tableoffset(data); break; }
+		case (0x038/2): { m_cop_438 = data; break; }
+		case (0x03a/2): { m_cop_43a = data; break; }
+		case (0x03c/2): { m_cop_43c = data; break; }
 		case (0x03e/2):
 			/*
 			0 in all 68k based games
@@ -2253,14 +2324,14 @@ static WRITE16_HANDLER( generic_cop_w )
 			*/
 			break;
 
-		case (0x044/2): { cop_scale = data & 3; break; }
-		case (0x046/2): { cop_rom_addr_unk = data & 0xffff; break; }
-		case (0x048/2): { cop_rom_addr_lo = data & 0xffff; break; }
-		case (0x04a/2): { cop_rom_addr_hi = data & 0xffff; break; }
+		case (0x044/2): { m_cop_scale = data & 3; break; }
+		case (0x046/2): { m_cop_rom_addr_unk = data & 0xffff; break; }
+		case (0x048/2): { m_cop_rom_addr_lo = data & 0xffff; break; }
+		case (0x04a/2): { m_cop_rom_addr_hi = data & 0xffff; break; }
 
 		/* brightness control */
-		case (0x05a/2): pal_brightness_val = data & 0xff; break;
-		case (0x05c/2): pal_brightness_mode = data & 0xff; break;
+		case (0x05a/2): m_pal_brightness_val = data & 0xff; break;
+		case (0x05c/2): m_pal_brightness_mode = data & 0xff; break;
 
 		/* DMA / layer clearing section */
 		case (0x074/2):
@@ -2277,67 +2348,67 @@ static WRITE16_HANDLER( generic_cop_w )
 
 		/* used in palette DMAs, for fading effects */
 		case (0x076/2):
-			cop_dma_fade_table = data;
+			m_cop_dma_fade_table = data;
 			break;
 
 		case (0x078/2): /* DMA source address */
 		{
-			cop_dma_src[cop_dma_trigger] = data; // << 6 to get actual address
+			m_cop_dma_src[m_cop_dma_trigger] = data; // << 6 to get actual address
 			//seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", space.device().safe_pc(), data, data<<6);
 			break;
 		}
 
 		case (0x07a/2): /* DMA length */
 		{
-			cop_dma_size[cop_dma_trigger] = data;
+			m_cop_dma_size[m_cop_dma_trigger] = data;
 			//seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", space.device().safe_pc(), data, data<<5);
 			break;
 		}
 
 		case (0x07c/2): /* DMA destination */
 		{
-			cop_dma_dst[cop_dma_trigger] = data;
+			m_cop_dma_dst[m_cop_dma_trigger] = data;
 			//seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", space.device().safe_pc(), data, data<<6);
 			break;
 		}
 
 		case (0x07e/2): /* DMA parameter */
 		{
-			cop_dma_trigger = data;
+			m_cop_dma_trigger = data;
 			//seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", space.device().safe_pc(), data);
 			if (data>=0x1ff)
 			{
 				seibu_cop_log("invalid DMA trigger!, >0x1ff\n");
-				cop_dma_trigger = 0;
+				m_cop_dma_trigger = 0;
 			}
 
 			break;
 		}
 
-		case (0x08c/2): cop_sprite_dma_abs_y = (cop_mcu_ram[0x08c/2]); break;
-		case (0x08e/2): cop_sprite_dma_abs_x = (cop_mcu_ram[0x08e/2]); break;
+		case (0x08c/2): m_cop_sprite_dma_abs_y = (m_cop_mcu_ram[0x08c/2]); break;
+		case (0x08e/2): m_cop_sprite_dma_abs_x = (m_cop_mcu_ram[0x08e/2]); break;
 
 		/* Registers */
-		case (0x0a0/2): { cop_register[0] = (cop_register[0]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c0/2): { cop_register[0] = (cop_register[0]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x0a0/2): { m_cop_register[0] = (m_cop_register[0]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x0c0/2): { m_cop_register[0] = (m_cop_register[0]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
 
-		case (0x0a2/2): { cop_register[1] = (cop_register[1]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c2/2): { cop_register[1] = (cop_register[1]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x0a2/2): { m_cop_register[1] = (m_cop_register[1]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x0c2/2): { m_cop_register[1] = (m_cop_register[1]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
 
-		case (0x0a4/2): { cop_register[2] = (cop_register[2]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c4/2): { cop_register[2] = (cop_register[2]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x0a4/2): { m_cop_register[2] = (m_cop_register[2]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x0c4/2): { m_cop_register[2] = (m_cop_register[2]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
 
-		case (0x0a6/2): { cop_register[3] = (cop_register[3]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c6/2): { cop_register[3] = (cop_register[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x0a6/2): { m_cop_register[3] = (m_cop_register[3]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x0c6/2): { m_cop_register[3] = (m_cop_register[3]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
 
-		case (0x0a8/2): { cop_register[4] = (cop_register[4]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c8/2): { cop_register[4] = (cop_register[4]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x0a8/2): { m_cop_register[4] = (m_cop_register[4]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x0c8/2): { m_cop_register[4] = (m_cop_register[4]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
 
-		case (0x0aa/2): { cop_register[5] = (cop_register[5]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0ca/2): { cop_register[5] = (cop_register[5]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x0aa/2): { m_cop_register[5] = (m_cop_register[5]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x0ca/2): { m_cop_register[5] = (m_cop_register[5]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
 
-		case (0x0ac/2): { cop_register[6] = (cop_register[6]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0cc/2): { cop_register[6] = (cop_register[6]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x0ac/2): { m_cop_register[6] = (m_cop_register[6]&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x0cc/2): { m_cop_register[6] = (m_cop_register[6]&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
 
 
 		case (0x100/2):
@@ -2348,7 +2419,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			int command;
 
 			#if LOG_CMDS
-			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", space.device().safe_pc(), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
+			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", space.device().safe_pc(), data, m_cop_mcu_ram[offset], m_cop_register[0], m_cop_register[1], m_cop_register[2], m_cop_register[3], m_cop_register[4]);
 			#endif
 
 			command = -1;
@@ -2358,21 +2429,21 @@ static WRITE16_HANDLER( generic_cop_w )
 			   it isn't supposed to do anything, especially in the former case (it definitely NEEDS that sprites have an arc movement when they are knocked down). */
 			for (i=0;i<32;i++)
 			{
-				if ((cop_mcu_ram[offset] & 0xff00) == (copd2_table_4[i] & 0xff00))
+				if ((m_cop_mcu_ram[offset] & 0xff00) == (m_copd2_table_4[i] & 0xff00))
 				{
 					#if LOG_CMDS
-					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
+					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", m_cop_mcu_ram[offset], i, m_copd2_table_2[i], m_copd2_table_3[i]);
 					#endif
 
-					u1 = copd2_table_2[i] & 0x000f;
-					u2 = copd2_table_3[i] & 0xffff;
+					m_u1 = m_copd2_table_2[i] & 0x000f;
+					m_u2 = m_copd2_table_3[i] & 0xffff;
 					command = i;
 				}
 			}
 
 			if (command==-1)
 			{
-				seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", cop_mcu_ram[offset]);
+				seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", m_cop_mcu_ram[offset]);
 				break;
 			}
 			else
@@ -2384,14 +2455,14 @@ static WRITE16_HANDLER( generic_cop_w )
 					seibu_cop_log("     Sequence: ");
 					for (j=0;j<0x8;j++)
 					{
-						seibu_cop_log("%04x ", copd2_table[command+j]);
+						seibu_cop_log("%04x ", m_copd2_table[command+j]);
 					}
 					seibu_cop_log("\n");
 				}
 				#endif
 			}
 
-			//printf("%04x %04x %04x\n",cop_mcu_ram[offset],u1,u2);
+			//printf("%04x %04x %04x\n",m_cop_mcu_ram[offset],m_u1,m_u2);
 
 			/*
 			Macro notes:
@@ -2415,8 +2486,8 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				offs = (offset & 3) * 4;
 
-				space.write_dword(cop_register[0] + 0x04 + offs, space.read_dword(cop_register[0] + 0x04 + offs) + space.read_dword(cop_register[0] + 0x10 + offs));
-				space.write_dword(cop_register[0] + 0x1c + offs, space.read_dword(cop_register[0] + 0x10 + offs) + space.read_dword(cop_register[0] + 0x1c + offs));
+				space.write_dword(m_cop_register[0] + 0x04 + offs, space.read_dword(m_cop_register[0] + 0x04 + offs) + space.read_dword(m_cop_register[0] + 0x10 + offs));
+				space.write_dword(m_cop_register[0] + 0x1c + offs, space.read_dword(m_cop_register[0] + 0x10 + offs) + space.read_dword(m_cop_register[0] + 0x1c + offs));
 				return;
 			}
 
@@ -2431,7 +2502,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				/* add 0x10 + offs */
 				/* write 0x10 + offs */
 
-				space.write_dword(cop_register[0] + 0x10 + offs, space.read_dword(cop_register[0] + 0x10 + offs) + space.read_dword(cop_register[0] + 0x28 + offs));
+				space.write_dword(m_cop_register[0] + 0x10 + offs, space.read_dword(m_cop_register[0] + 0x10 + offs) + space.read_dword(m_cop_register[0] + 0x28 + offs));
 				return;
 			}
 
@@ -2449,18 +2520,18 @@ static WRITE16_HANDLER( generic_cop_w )
 			*/
 			if(COP_CMD(0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
-				int raw_angle = (space.read_word(cop_register[0]+(0x34^2)) & 0xff);
+				int raw_angle = (space.read_word(m_cop_register[0]+(0x34^2)) & 0xff);
 				double angle = raw_angle * M_PI / 128;
-				double amp = (65536 >> 5)*(space.read_word(cop_register[0]+(0x36^2)) & 0xff);
+				double amp = (65536 >> 5)*(space.read_word(m_cop_register[0]+(0x36^2)) & 0xff);
 				int res;
 
 				/* TODO: up direction, why? */
 				if(raw_angle == 0xc0)
 					amp*=2;
 
-				res = int(amp*sin(angle)) << cop_scale;
+				res = int(amp*sin(angle)) << m_cop_scale;
 
-				space.write_dword(cop_register[0] + 0x10, res);
+				space.write_dword(m_cop_register[0] + 0x10, res);
 				return;
 			}
 
@@ -2478,44 +2549,44 @@ static WRITE16_HANDLER( generic_cop_w )
 			*/
 			if(COP_CMD(0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
-				int raw_angle = (space.read_word(cop_register[0]+(0x34^2)) & 0xff);
+				int raw_angle = (space.read_word(m_cop_register[0]+(0x34^2)) & 0xff);
 				double angle = raw_angle * M_PI / 128;
-				double amp = (65536 >> 5)*(space.read_word(cop_register[0]+(0x36^2)) & 0xff);
+				double amp = (65536 >> 5)*(space.read_word(m_cop_register[0]+(0x36^2)) & 0xff);
 				int res;
 
 				/* TODO: left direction, why? */
 				if(raw_angle == 0x80)
 					amp*=2;
 
-				res = int(amp*cos(angle)) << cop_scale;
+				res = int(amp*cos(angle)) << m_cop_scale;
 
-				space.write_dword(cop_register[0] + 20, res);
+				space.write_dword(m_cop_register[0] + 20, res);
 				return;
 			}
 
 			/* 0x130e / 0x138e */
 			if(COP_CMD(0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xa9a,5,0xbf7f))
 			{
-				int dy = space.read_dword(cop_register[1]+4) - space.read_dword(cop_register[0]+4);
-				int dx = space.read_dword(cop_register[1]+8) - space.read_dword(cop_register[0]+8);
+				int dy = space.read_dword(m_cop_register[1]+4) - space.read_dword(m_cop_register[0]+4);
+				int dx = space.read_dword(m_cop_register[1]+8) - space.read_dword(m_cop_register[0]+8);
 
-				cop_status = 7;
+				m_cop_status = 7;
 				if(!dx) {
-					cop_status |= 0x8000;
-					cop_angle = 0;
+					m_cop_status |= 0x8000;
+					m_cop_angle = 0;
 				} else {
-					cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+					m_cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
 					if(dx<0)
-						cop_angle += 0x80;
+						m_cop_angle += 0x80;
 				}
 
-				r0 = dy;
-				r1 = dx;
+				m_r0 = dy;
+				m_r1 = dx;
 
-				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
+				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,m_cop_angle);
 
-				if(cop_mcu_ram[offset] & 0x80)
-					space.write_word(cop_register[0]+(0x34^2), cop_angle);
+				if(m_cop_mcu_ram[offset] & 0x80)
+					space.write_word(m_cop_register[0]+(0x34^2), m_cop_angle);
 				return;
 			}
 
@@ -2523,24 +2594,24 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
 			if(COP_CMD(0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xb9a,5,0xbf7f))
 			{
-				int dy = space.read_dword(cop_register[1]+4) - space.read_dword(cop_register[0]+4);
-				int dx = space.read_dword(cop_register[1]+8) - space.read_dword(cop_register[0]+8);
+				int dy = space.read_dword(m_cop_register[1]+4) - space.read_dword(m_cop_register[0]+4);
+				int dx = space.read_dword(m_cop_register[1]+8) - space.read_dword(m_cop_register[0]+8);
 
-				cop_status = 7;
+				m_cop_status = 7;
 				if(!dx) {
-					cop_status |= 0x8000;
-					cop_angle = 0;
+					m_cop_status |= 0x8000;
+					m_cop_angle = 0;
 				} else {
-					cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+					m_cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
 					if(dx<0)
-						cop_angle += 0x80;
+						m_cop_angle += 0x80;
 				}
 
-				r0 = dy;
-				r1 = dx;
+				m_r0 = dy;
+				m_r1 = dx;
 
-				if(cop_mcu_ram[offset] & 0x80)
-					space.write_word(cop_register[0]+(0x34^2), cop_angle);
+				if(m_cop_mcu_ram[offset] & 0x80)
+					space.write_word(m_cop_register[0]+(0x34^2), m_cop_angle);
 				return;
 			}
 
@@ -2554,15 +2625,15 @@ static WRITE16_HANDLER( generic_cop_w )
 			*/
 			if(COP_CMD(0xf9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0xb9c,0x99c,4,0x007f))
 			{
-				int dy = r0;
-				int dx = r1;
+				int dy = m_r0;
+				int dx = m_r1;
 
 				dx >>= 16;
 				dy >>= 16;
-				cop_dist = sqrt((double)(dx*dx+dy*dy));
+				m_cop_dist = sqrt((double)(dx*dx+dy*dy));
 
-				if(cop_mcu_ram[offset] & 0x80)
-					space.write_word(cop_register[0]+(0x38), cop_dist);
+				if(m_cop_mcu_ram[offset] & 0x80)
+					space.write_word(m_cop_register[0]+(0x38), m_cop_dist);
 				return;
 			}
 
@@ -2579,11 +2650,11 @@ static WRITE16_HANDLER( generic_cop_w )
 			*/
 			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
 			{
-				int dy = r0;
-				int dx = r1;
-				int div = space.read_word(cop_register[0]+(0x36^2));
+				int dy = m_r0;
+				int dx = m_r1;
+				int div = space.read_word(m_cop_register[0]+(0x36^2));
 				int res;
-				int cop_dist_raw;
+				int m_cop_dist_raw;
 
 				if(!div)
 				{
@@ -2592,74 +2663,74 @@ static WRITE16_HANDLER( generic_cop_w )
 				}
 
 				/* TODO: calculation of this one should occur at 0x3b30/0x3bb0 I *think* */
-				/* TODO: recheck if cop_scale still masks at 3 with this command */
-				dx >>= 11 + cop_scale;
-				dy >>= 11 + cop_scale;
-				cop_dist_raw = sqrt((double)(dx*dx+dy*dy));
+				/* TODO: recheck if m_cop_scale still masks at 3 with this command */
+				dx >>= 11 + m_cop_scale;
+				dy >>= 11 + m_cop_scale;
+				m_cop_dist_raw = sqrt((double)(dx*dx+dy*dy));
 
-				res = cop_dist_raw;
+				res = m_cop_dist_raw;
 				res /= div;
 
-				cop_dist = (1 << (5 - cop_scale)) / div;
+				m_cop_dist = (1 << (5 - m_cop_scale)) / div;
 
 				/* TODO: bits 5-6-15 */
-				cop_status = 7;
+				m_cop_status = 7;
 
-				space.write_word(cop_register[0]+(0x38^2), res);
+				space.write_word(m_cop_register[0]+(0x38^2), res);
 				return;
 			}
 
 			/*
 			    collision detection:
 
-			    int dy_0 = space.read_dword(cop_register[0]+4);
-			    int dx_0 = space.read_dword(cop_register[0]+8);
-			    int dy_1 = space.read_dword(cop_register[1]+4);
-			    int dx_1 = space.read_dword(cop_register[1]+8);
-			    int hitbox_param1 = space.read_dword(cop_register[2]);
-			    int hitbox_param2 = space.read_dword(cop_register[3]);
+			    int dy_0 = space.read_dword(m_cop_register[0]+4);
+			    int dx_0 = space.read_dword(m_cop_register[0]+8);
+			    int dy_1 = space.read_dword(m_cop_register[1]+4);
+			    int dx_1 = space.read_dword(m_cop_register[1]+8);
+			    int hitbox_param1 = space.read_dword(m_cop_register[2]);
+			    int hitbox_param2 = space.read_dword(m_cop_register[3]);
 
-			    TODO: we are ignoring the u1 / u2 params for now
+			    TODO: we are ignoring the m_u1 / m_u2 params for now
 			*/
 
-			if(COP_CMD(0xb80,0xb82,0xb84,0xb86,0x000,0x000,0x000,0x000,u1,u2))
+			if(COP_CMD(0xb80,0xb82,0xb84,0xb86,0x000,0x000,0x000,0x000,m_u1,m_u2))
 			{
-				cop_collision_info[0].y = (space.read_dword(cop_register[0]+4));
-				cop_collision_info[0].x = (space.read_dword(cop_register[0]+8));
+				m_cop_collision_info[0].y = (space.read_dword(m_cop_register[0]+4));
+				m_cop_collision_info[0].x = (space.read_dword(m_cop_register[0]+8));
 				return;
 			}
 
 			//(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2
-			if(COP_CMD(0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,u1,u2))
+			if(COP_CMD(0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,m_u1,m_u2))
 			{
-				cop_collision_info[0].hitbox = space.read_word(cop_register[2]);
-				cop_collision_info[0].hitbox_y = space.read_word((cop_register[2]&0xffff0000)|(cop_collision_info[0].hitbox));
-				cop_collision_info[0].hitbox_x = space.read_word(((cop_register[2]&0xffff0000)|(cop_collision_info[0].hitbox))+2);
+				m_cop_collision_info[0].hitbox = space.read_word(m_cop_register[2]);
+				m_cop_collision_info[0].hitbox_y = space.read_word((m_cop_register[2]&0xffff0000)|(m_cop_collision_info[0].hitbox));
+				m_cop_collision_info[0].hitbox_x = space.read_word(((m_cop_register[2]&0xffff0000)|(m_cop_collision_info[0].hitbox))+2);
 
 				/* do the math */
 				cop_take_hit_box_params(0);
-				cop_hit_status = cop_calculate_collsion_detection(space.machine());
+				m_cop_hit_status = cop_calculate_collsion_detection();
 
 				return;
 			}
 
-			if(COP_CMD(0xba0,0xba2,0xba4,0xba6,0x000,0x000,0x000,0x000,u1,u2))
+			if(COP_CMD(0xba0,0xba2,0xba4,0xba6,0x000,0x000,0x000,0x000,m_u1,m_u2))
 			{
-				cop_collision_info[1].y = (space.read_dword(cop_register[1]+4));
-				cop_collision_info[1].x = (space.read_dword(cop_register[1]+8));
+				m_cop_collision_info[1].y = (space.read_dword(m_cop_register[1]+4));
+				m_cop_collision_info[1].x = (space.read_dword(m_cop_register[1]+8));
 				return;
 			}
 
 			//(heatbrl)  | 6 | ffff | b880 | b60 be0 be2
-			if(COP_CMD(0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,u1,u2))
+			if(COP_CMD(0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,m_u1,m_u2))
 			{
-				cop_collision_info[1].hitbox = space.read_word(cop_register[3]);
-				cop_collision_info[1].hitbox_y = space.read_word((cop_register[3]&0xffff0000)|(cop_collision_info[1].hitbox));
-				cop_collision_info[1].hitbox_x = space.read_word(((cop_register[3]&0xffff0000)|(cop_collision_info[1].hitbox))+2);
+				m_cop_collision_info[1].hitbox = space.read_word(m_cop_register[3]);
+				m_cop_collision_info[1].hitbox_y = space.read_word((m_cop_register[3]&0xffff0000)|(m_cop_collision_info[1].hitbox));
+				m_cop_collision_info[1].hitbox_x = space.read_word(((m_cop_register[3]&0xffff0000)|(m_cop_collision_info[1].hitbox))+2);
 
 				/* do the math */
 				cop_take_hit_box_params(1);
-				cop_hit_status = cop_calculate_collsion_detection(space.machine());
+				m_cop_hit_status = cop_calculate_collsion_detection();
 				return;
 			}
 
@@ -2672,19 +2743,19 @@ static WRITE16_HANDLER( generic_cop_w )
 				offs = (offset & 3) * 4;
 
 				/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
-				abs_x = space.read_word(cop_register[0] + 8) - cop_sprite_dma_abs_x;
-				abs_y = space.read_word(cop_register[0] + 4) - cop_sprite_dma_abs_y;
-				rel_xy = space.read_word(cop_sprite_dma_src + 4 + offs);
+				abs_x = space.read_word(m_cop_register[0] + 8) - m_cop_sprite_dma_abs_x;
+				abs_y = space.read_word(m_cop_register[0] + 4) - m_cop_sprite_dma_abs_y;
+				rel_xy = space.read_word(m_cop_sprite_dma_src + 4 + offs);
 
 				//if(rel_xy & 0x0706)
 				//  printf("sprite rel_xy = %04x\n",rel_xy);
 
 				if(rel_xy & 1)
-					space.write_word(cop_register[4] + offs + 4,0xc0 + abs_x - (rel_xy & 0xf8));
+					space.write_word(m_cop_register[4] + offs + 4,0xc0 + abs_x - (rel_xy & 0xf8));
 				else
-					space.write_word(cop_register[4] + offs + 4,(((rel_xy & 0x78) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0))));
+					space.write_word(m_cop_register[4] + offs + 4,(((rel_xy & 0x78) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0))));
 
-				space.write_word(cop_register[4] + offs + 6,(((rel_xy & 0x7800) >> 8) + (abs_y) - ((rel_xy & 0x8000) ? 0x80 : 0)));
+				space.write_word(m_cop_register[4] + offs + 6,(((rel_xy & 0x7800) >> 8) + (abs_y) - ((rel_xy & 0x8000) ? 0x80 : 0)));
 				return;
 			}
 
@@ -2695,8 +2766,8 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				offs = (offset & 3) * 4;
 
-				space.write_word(cop_register[4] + offs + 0,space.read_word(cop_sprite_dma_src + offs) + (cop_sprite_dma_param & 0x3f));
-				//space.write_word(cop_register[4] + offs + 2,space.read_word(cop_sprite_dma_src+2 + offs));
+				space.write_word(m_cop_register[4] + offs + 0,space.read_word(m_cop_sprite_dma_src + offs) + (m_cop_sprite_dma_param & 0x3f));
+				//space.write_word(m_cop_register[4] + offs + 2,space.read_word(m_cop_sprite_dma_src+2 + offs));
 				return;
 			}
 
@@ -2716,17 +2787,17 @@ static WRITE16_HANDLER( generic_cop_w )
 				/* 8 + [4] */
 				/* 4 + [6] */
 
-				//printf("%08x %08x %08x %08x %08x %08x %08x\n",cop_register[0],cop_register[1],cop_register[2],cop_register[3],cop_register[4],cop_register[5],cop_register[6]);
+				//printf("%08x %08x %08x %08x %08x %08x %08x\n",m_cop_register[0],m_cop_register[1],m_cop_register[2],m_cop_register[3],m_cop_register[4],m_cop_register[5],m_cop_register[6]);
 
 				offs = (offset & 3) * 4;
 
-				div = space.read_word(cop_register[4] + offs) + 1;
-//              offs_val = space.read_word(cop_register[3] + offs);
+				div = space.read_word(m_cop_register[4] + offs) + 1;
+//              offs_val = space.read_word(m_cop_register[3] + offs);
 				//420 / 180 = 500 : 400 = 30 / 50 = 98 / 18
 
 				if(div == 0) { div = 1; }
 
-				space.write_word((cop_register[6] + offs + 4), ((space.read_word(cop_register[5] + offs + 4)) / div));
+				space.write_word((m_cop_register[6] + offs + 4), ((space.read_word(m_cop_register[5] + offs + 4)) / div));
 				return;
 			}
 
@@ -2741,29 +2812,29 @@ static WRITE16_HANDLER( generic_cop_w )
 				/* 0 [1] */
 				/* 0xc [1] */
 
-				cur_angle = space.read_byte(cop_register[1] + (0xc ^ 3));
-				//space.write_byte(cop_register[1] + (0^3),space.read_byte(cop_register[1] + (0^3)) & 0xfb); //correct?
+				cur_angle = space.read_byte(m_cop_register[1] + (0xc ^ 3));
+				//space.write_byte(m_cop_register[1] + (0^3),space.read_byte(m_cop_register[1] + (0^3)) & 0xfb); //correct?
 
-				if(cur_angle >= cop_angle_compare)
+				if(cur_angle >= m_cop_angle_compare)
 				{
-					cur_angle -= cop_angle_mod_val;
-					if(cur_angle <= cop_angle_compare)
+					cur_angle -= m_cop_angle_mod_val;
+					if(cur_angle <= m_cop_angle_compare)
 					{
-						cur_angle = cop_angle_compare;
-						//space.write_byte(cop_register[1] + (0^3),space.read_byte(cop_register[1] + (0^3)) | 2);
+						cur_angle = m_cop_angle_compare;
+						//space.write_byte(m_cop_register[1] + (0^3),space.read_byte(m_cop_register[1] + (0^3)) | 2);
 					}
 				}
-				else if(cur_angle <= cop_angle_compare)
+				else if(cur_angle <= m_cop_angle_compare)
 				{
-					cur_angle += cop_angle_mod_val;
-					if(cur_angle >= cop_angle_compare)
+					cur_angle += m_cop_angle_mod_val;
+					if(cur_angle >= m_cop_angle_compare)
 					{
-						cur_angle = cop_angle_compare;
-						//space.write_byte(cop_register[1] + (0^3),space.read_byte(cop_register[1] + (0^3)) | 2);
+						cur_angle = m_cop_angle_compare;
+						//space.write_byte(m_cop_register[1] + (0^3),space.read_byte(m_cop_register[1] + (0^3)) | 2);
 					}
 				}
 
-				space.write_byte(cop_register[1] + (0xc ^ 3),cur_angle);
+				space.write_byte(m_cop_register[1] + (0xc ^ 3),cur_angle);
 				return;
 			}
 
@@ -2774,8 +2845,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				INT8 cur_angle;
 
-				cur_angle = INT8(space.read_byte(cop_register[0] + (0x34 ^ 3)));
-				//space.write_byte(cop_register[0] + (0^3),space.read_byte(cop_register[0] + (0^3)) & 0xfb); //correct?
+				cur_angle = INT8(space.read_byte(m_cop_register[0] + (0x34 ^ 3)));
+				//space.write_byte(m_cop_register[0] + (0^3),space.read_byte(m_cop_register[0] + (0^3)) & 0xfb); //correct?
 				/*
 				0x00      0x00          0x60            0x00
 				0x00      0x20          0x60            0x20
@@ -2787,48 +2858,48 @@ static WRITE16_HANDLER( generic_cop_w )
 				0x00      0xe0          0x60            0xe0
 				*/
 
-				if(cur_angle > cop_angle_compare)
+				if(cur_angle > m_cop_angle_compare)
 				{
-					cur_angle -= cop_angle_mod_val;
+					cur_angle -= m_cop_angle_mod_val;
 
-					if(cur_angle < cop_angle_compare)
-						cur_angle = cop_angle_compare;
+					if(cur_angle < m_cop_angle_compare)
+						cur_angle = m_cop_angle_compare;
 				}
-				else if(cur_angle < cop_angle_compare)
+				else if(cur_angle < m_cop_angle_compare)
 				{
-					cur_angle += cop_angle_mod_val;
+					cur_angle += m_cop_angle_mod_val;
 
-					if(cur_angle > cop_angle_compare)
-						cur_angle = cop_angle_compare;
+					if(cur_angle > m_cop_angle_compare)
+						cur_angle = m_cop_angle_compare;
 				}
 
-				space.write_byte(cop_register[0] + (0x34 ^ 3),cur_angle);
+				space.write_byte(m_cop_register[0] + (0x34 ^ 3),cur_angle);
 				return;
 			}
 
 			//(cupsoc) 1c | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
 			if(COP_CMD(0x984,0xac4,0xd82,0xac2,0x39b,0xb9a,0xb9a,0xa9a,5,0xb07f))
 			{
-				int dy = space.read_dword(cop_register[2]+4) - space.read_dword(cop_register[0]+4);
-				int dx = space.read_dword(cop_register[2]+8) - space.read_dword(cop_register[0]+8);
+				int dy = space.read_dword(m_cop_register[2]+4) - space.read_dword(m_cop_register[0]+4);
+				int dx = space.read_dword(m_cop_register[2]+8) - space.read_dword(m_cop_register[0]+8);
 
-				cop_status = 7;
+				m_cop_status = 7;
 				if(!dx) {
-					cop_status |= 0x8000;
-					cop_angle = 0;
+					m_cop_status |= 0x8000;
+					m_cop_angle = 0;
 				} else {
-					cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
+					m_cop_angle = atan(double(dy)/double(dx)) * 128.0 / M_PI;
 					if(dx<0)
-						cop_angle += 0x80;
+						m_cop_angle += 0x80;
 				}
 
-				r0 = dy;
-				r1 = dx;
+				m_r0 = dy;
+				m_r1 = dx;
 
-				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,cop_angle);
+				//printf("%d %d %f %04x\n",dx,dy,atan(double(dy)/double(dx)) * 128 / M_PI,m_cop_angle);
 
-				if(cop_mcu_ram[offset] & 0x80)
-					space.write_word(cop_register[0]+(0x34^2), cop_angle);
+				if(m_cop_mcu_ram[offset] & 0x80)
+					space.write_word(m_cop_register[0]+(0x34^2), m_cop_angle);
 				return;
 			}
 
@@ -2837,17 +2908,17 @@ static WRITE16_HANDLER( generic_cop_w )
 			if(COP_CMD(0xac2,0x9e0,0x0a2,0x000,0x000,0x000,0x000,0x000,5,0xfffb))
 			{
 				UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
-				UINT32 rom_addr = (cop_rom_addr_hi << 16 | cop_rom_addr_lo) & ~1;
+				UINT32 rom_addr = (m_cop_rom_addr_hi << 16 | m_cop_rom_addr_lo) & ~1;
 				UINT16 rom_data = (ROM[rom_addr + 0]) | (ROM[rom_addr + 1]<<8);
 
 				/* writes to some unemulated COP registers, then puts the result in here, adding a parameter taken from ROM */
-				//space.write_word(cop_register[0]+(0x44 + offset * 4), rom_data);
+				//space.write_word(m_cop_register[0]+(0x44 + offset * 4), rom_data);
 
-				printf("%04x%04x %04x %04x\n",cop_rom_addr_hi,cop_rom_addr_lo,cop_rom_addr_unk,rom_data);
+				printf("%04x%04x %04x %04x\n",m_cop_rom_addr_hi,m_cop_rom_addr_lo,m_cop_rom_addr_unk,rom_data);
 				return;
 			}
 
-			printf("%04x\n",cop_mcu_ram[offset]);
+			printf("%04x\n",m_cop_mcu_ram[offset]);
 			break;
 		}
 
@@ -2856,12 +2927,12 @@ static WRITE16_HANDLER( generic_cop_w )
 		{
 			//seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", space.device().safe_pc(), data);
 
-			if (cop_dma_trigger >= 0x80 && cop_dma_trigger <= 0x87)
+			if (m_cop_dma_trigger >= 0x80 && m_cop_dma_trigger <= 0x87)
 			{
 				UINT32 src,dst,size,i;
 
 				/*
-				Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the pal_brightness_val / mode
+				Apparently all of those are just different DMA channels, brightness effects are done through a RAM table and the m_pal_brightness_val / mode
 				0x80 is used by Legionnaire
 				0x81 is used by SD Gundam and Godzilla
 				0x82 is used by Zero Team and X Se Dae
@@ -2875,11 +2946,11 @@ static WRITE16_HANDLER( generic_cop_w )
 				*/
 
 				//if(dma_trigger != 0x87)
-				//printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x %02x %02x\n",cop_dma_src[cop_dma_trigger] << 6,cop_dma_fade_table * 0x400,cop_dma_dst[cop_dma_trigger] << 6,cop_dma_size[cop_dma_trigger] << 5,cop_dma_trigger,pal_brightness_val,pal_brightness_mode);
+				//printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x %02x %02x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table * 0x400,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger,m_pal_brightness_val,m_pal_brightness_mode);
 
-				src = (cop_dma_src[cop_dma_trigger] << 6);
-				dst = (cop_dma_dst[cop_dma_trigger] << 6);
-				size = ((cop_dma_size[cop_dma_trigger] << 5) - (cop_dma_dst[cop_dma_trigger] << 6) + 0x20)/2;
+				src = (m_cop_dma_src[m_cop_dma_trigger] << 6);
+				dst = (m_cop_dma_dst[m_cop_dma_trigger] << 6);
+				size = ((m_cop_dma_size[m_cop_dma_trigger] << 5) - (m_cop_dma_dst[m_cop_dma_trigger] << 6) + 0x20)/2;
 
 				for(i = 0;i < size;i++)
 				{
@@ -2887,53 +2958,53 @@ static WRITE16_HANDLER( generic_cop_w )
 					int r,g,b;
 					int rt,gt,bt;
 
-					if(pal_brightness_mode == 5)
+					if(m_pal_brightness_mode == 5)
 					{
-						bt = ((space.read_word(src + (cop_dma_fade_table * 0x400))) & 0x7c00) >> 5;
-						bt = fade_table(bt|(pal_brightness_val ^ 0));
+						bt = ((space.read_word(src + (m_cop_dma_fade_table * 0x400))) & 0x7c00) >> 5;
+						bt = fade_table(bt|(m_pal_brightness_val ^ 0));
 						b = ((space.read_word(src)) & 0x7c00) >> 5;
-						b = fade_table(b|(pal_brightness_val ^ 0x1f));
+						b = fade_table(b|(m_pal_brightness_val ^ 0x1f));
 						pal_val = ((b + bt) & 0x1f) << 10;
-						gt = ((space.read_word(src + (cop_dma_fade_table * 0x400))) & 0x03e0);
-						gt = fade_table(gt|(pal_brightness_val ^ 0));
+						gt = ((space.read_word(src + (m_cop_dma_fade_table * 0x400))) & 0x03e0);
+						gt = fade_table(gt|(m_pal_brightness_val ^ 0));
 						g = ((space.read_word(src)) & 0x03e0);
-						g = fade_table(g|(pal_brightness_val ^ 0x1f));
+						g = fade_table(g|(m_pal_brightness_val ^ 0x1f));
 						pal_val |= ((g + gt) & 0x1f) << 5;
-						rt = ((space.read_word(src + (cop_dma_fade_table * 0x400))) & 0x001f) << 5;
-						rt = fade_table(rt|(pal_brightness_val ^ 0));
+						rt = ((space.read_word(src + (m_cop_dma_fade_table * 0x400))) & 0x001f) << 5;
+						rt = fade_table(rt|(m_pal_brightness_val ^ 0));
 						r = ((space.read_word(src)) & 0x001f) << 5;
-						r = fade_table(r|(pal_brightness_val ^ 0x1f));
+						r = fade_table(r|(m_pal_brightness_val ^ 0x1f));
 						pal_val |= ((r + rt) & 0x1f);
 					}
-					else if(pal_brightness_mode == 4) //Denjin Makai
+					else if(m_pal_brightness_mode == 4) //Denjin Makai
 					{
-						bt =(space.read_word(src + (cop_dma_fade_table * 0x400)) & 0x7c00) >> 10;
+						bt =(space.read_word(src + (m_cop_dma_fade_table * 0x400)) & 0x7c00) >> 10;
 						b = (space.read_word(src) & 0x7c00) >> 10;
-						gt =(space.read_word(src + (cop_dma_fade_table * 0x400)) & 0x03e0) >> 5;
+						gt =(space.read_word(src + (m_cop_dma_fade_table * 0x400)) & 0x03e0) >> 5;
 						g = (space.read_word(src) & 0x03e0) >> 5;
-						rt =(space.read_word(src + (cop_dma_fade_table * 0x400)) & 0x001f) >> 0;
+						rt =(space.read_word(src + (m_cop_dma_fade_table * 0x400)) & 0x001f) >> 0;
 						r = (space.read_word(src) & 0x001f) >> 0;
 
-						if(pal_brightness_val == 0x10)
+						if(m_pal_brightness_val == 0x10)
 							pal_val = bt << 10 | gt << 5 | rt << 0;
-						else if(pal_brightness_val == 0xff) // TODO: might be the back plane or it still doesn't do any mod, needs PCB tests
+						else if(m_pal_brightness_val == 0xff) // TODO: might be the back plane or it still doesn't do any mod, needs PCB tests
 							pal_val = 0;
 						else
 						{
-							bt = fade_table(bt<<5|((pal_brightness_val*2) ^ 0));
-							b =  fade_table(b<<5|((pal_brightness_val*2) ^ 0x1f));
+							bt = fade_table(bt<<5|((m_pal_brightness_val*2) ^ 0));
+							b =  fade_table(b<<5|((m_pal_brightness_val*2) ^ 0x1f));
 							pal_val = ((b + bt) & 0x1f) << 10;
-							gt = fade_table(gt<<5|((pal_brightness_val*2) ^ 0));
-							g =  fade_table(g<<5|((pal_brightness_val*2) ^ 0x1f));
+							gt = fade_table(gt<<5|((m_pal_brightness_val*2) ^ 0));
+							g =  fade_table(g<<5|((m_pal_brightness_val*2) ^ 0x1f));
 							pal_val |= ((g + gt) & 0x1f) << 5;
-							rt = fade_table(rt<<5|((pal_brightness_val*2) ^ 0));
-							r =  fade_table(r<<5|((pal_brightness_val*2) ^ 0x1f));
+							rt = fade_table(rt<<5|((m_pal_brightness_val*2) ^ 0));
+							r =  fade_table(r<<5|((m_pal_brightness_val*2) ^ 0x1f));
 							pal_val |= ((r + rt) & 0x1f);
 						}
 					}
 					else
 					{
-						printf("Warning: palette DMA used with mode %02x!\n",pal_brightness_mode);
+						printf("Warning: palette DMA used with mode %02x!\n",m_pal_brightness_mode);
 						pal_val = space.read_word(src);
 					}
 
@@ -2946,13 +3017,13 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/* Seibu Cup Soccer trigger this*/
-			if (cop_dma_trigger == 0x0e)
+			if (m_cop_dma_trigger == 0x0e)
 			{
 				UINT32 src,dst,size,i;
 
-				src = (cop_dma_src[cop_dma_trigger] << 6);
-				dst = (cop_dma_dst[cop_dma_trigger] << 6);
-				size = ((cop_dma_size[cop_dma_trigger] << 5) - (cop_dma_dst[cop_dma_trigger] << 6) + 0x20)/2;
+				src = (m_cop_dma_src[m_cop_dma_trigger] << 6);
+				dst = (m_cop_dma_dst[m_cop_dma_trigger] << 6);
+				size = ((m_cop_dma_size[m_cop_dma_trigger] << 5) - (m_cop_dma_dst[m_cop_dma_trigger] << 6) + 0x20)/2;
 
 				for(i = 0;i < size;i++)
 				{
@@ -2965,66 +3036,66 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/* do the fill  */
-			if (cop_dma_trigger >= 0x118 && cop_dma_trigger <= 0x11f)
+			if (m_cop_dma_trigger >= 0x118 && m_cop_dma_trigger <= 0x11f)
 			{
 				UINT32 length, address;
 				int i;
-				if(cop_dma_dst[cop_dma_trigger] != 0x0000) // Invalid?
+				if(m_cop_dma_dst[m_cop_dma_trigger] != 0x0000) // Invalid?
 					return;
 
-				address = (cop_dma_src[cop_dma_trigger] << 6);
-				length = (cop_dma_size[cop_dma_trigger]+1) << 5;
+				address = (m_cop_dma_src[m_cop_dma_trigger] << 6);
+				length = (m_cop_dma_size[m_cop_dma_trigger]+1) << 5;
 
 				//printf("%08x %08x\n",address,length);
 
 				for (i=address;i<address+length;i+=4)
 				{
-					space.write_dword(i, fill_val);
+					space.write_dword(i, m_fill_val);
 				}
 
 				return;
 			}
 
 			/* Godzilla specific */
-			if (cop_dma_trigger == 0x116)
+			if (m_cop_dma_trigger == 0x116)
 			{
 				UINT32 length, address;
 				int i;
 
-				//if(cop_dma_dst[cop_dma_trigger] != 0x0000) // Invalid?
+				//if(m_cop_dma_dst[m_cop_dma_trigger] != 0x0000) // Invalid?
 				//  return;
 
-				address = (cop_dma_src[cop_dma_trigger] << 6);
-				length = ((cop_dma_size[cop_dma_trigger]+1) << 4);
+				address = (m_cop_dma_src[m_cop_dma_trigger] << 6);
+				length = ((m_cop_dma_size[m_cop_dma_trigger]+1) << 4);
 
 				for (i=address;i<address+length;i+=4)
 				{
-					space.write_dword(i, fill_val);
+					space.write_dword(i, m_fill_val);
 				}
 
 				return;
 			}
 
 			/* private buffer copies */
-			if ((cop_dma_trigger==0x14) || (cop_dma_trigger==0x15)) return;
+			if ((m_cop_dma_trigger==0x14) || (m_cop_dma_trigger==0x15)) return;
 
-			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",cop_dma_src[cop_dma_trigger] << 6,cop_dma_fade_table,cop_dma_dst[cop_dma_trigger] << 6,cop_dma_size[cop_dma_trigger] << 5,cop_dma_trigger);
+			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",m_cop_dma_src[m_cop_dma_trigger] << 6,m_cop_dma_fade_table,m_cop_dma_dst[m_cop_dma_trigger] << 6,m_cop_dma_size[m_cop_dma_trigger] << 5,m_cop_dma_trigger);
 
 			break;
 		}
 
 		/* sort-DMA, oh my ... */
-		case (0x054/2): { cop_sort_lookup = (cop_sort_lookup&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x056/2): { cop_sort_lookup = (cop_sort_lookup&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
-		case (0x050/2): { cop_sort_ram_addr = (cop_sort_ram_addr&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x052/2): { cop_sort_ram_addr = (cop_sort_ram_addr&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
-		case (0x058/2): { cop_sort_param = cop_mcu_ram[offset]; break; }
+		case (0x054/2): { m_cop_sort_lookup = (m_cop_sort_lookup&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x056/2): { m_cop_sort_lookup = (m_cop_sort_lookup&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
+		case (0x050/2): { m_cop_sort_ram_addr = (m_cop_sort_ram_addr&0x0000ffff)|(m_cop_mcu_ram[offset]<<16); break; }
+		case (0x052/2): { m_cop_sort_ram_addr = (m_cop_sort_ram_addr&0xffff0000)|(m_cop_mcu_ram[offset]<<0);  break; }
+		case (0x058/2): { m_cop_sort_param = m_cop_mcu_ram[offset]; break; }
 
 		case (0x2fe/2):
 		{
 			UINT16 sort_size;
 
-			sort_size = cop_mcu_ram[offset];
+			sort_size = m_cop_mcu_ram[offset];
 
 			{
 				int i,j;
@@ -3037,29 +3108,29 @@ static WRITE16_HANDLER( generic_cop_w )
 				{
 					for(j=i-2;j<sort_size;j+=2)
 					{
-						addri = cop_sort_ram_addr+space.read_word(cop_sort_lookup+i);
-						addrj = cop_sort_ram_addr+space.read_word(cop_sort_lookup+j);
+						addri = m_cop_sort_ram_addr+space.read_word(m_cop_sort_lookup+i);
+						addrj = m_cop_sort_ram_addr+space.read_word(m_cop_sort_lookup+j);
 
 						vali = space.read_word(addri);
 						valj = space.read_word(addrj);
 
 						//printf("%08x %08x %04x %04x\n",addri,addrj,vali,valj);
 
-						switch(cop_sort_param)
+						switch(m_cop_sort_param)
 						{
 							case 2: xchg_flag = (vali > valj); break;
 							case 1: xchg_flag = (vali < valj); break;
 							case 0: xchg_flag = 0; break; /* ??? */
-							default: xchg_flag = 0; printf("Warning: sort-DMA used with param %02x\n",cop_sort_param); break;
+							default: xchg_flag = 0; printf("Warning: sort-DMA used with param %02x\n",m_cop_sort_param); break;
 						}
 
 						if(xchg_flag)
 						{
 							UINT16 xch_val;
 
-							xch_val = space.read_word(cop_sort_lookup+i);
-							space.write_word(cop_sort_lookup+i,space.read_word(cop_sort_lookup+j));
-							space.write_word(cop_sort_lookup+j,xch_val);
+							xch_val = space.read_word(m_cop_sort_lookup+i);
+							space.write_word(m_cop_sort_lookup+i,space.read_word(m_cop_sort_lookup+j));
+							space.write_word(m_cop_sort_lookup+j,xch_val);
 						}
 					}
 				}
@@ -3075,7 +3146,7 @@ static WRITE16_HANDLER( generic_cop_w )
   Heated Barrel
 **********************************************************************************************/
 
-READ16_HANDLER( heatbrl_mcu_r )
+READ16_MEMBER( seibu_cop_legacy_device::heatbrl_mcu_r )
 {
 	if(offset >= 0x3c0/2 && offset <= 0x3df/2)
 			return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
@@ -3090,15 +3161,14 @@ READ16_HANDLER( heatbrl_mcu_r )
 	return generic_cop_r(space, offset, mem_mask);
 }
 
-WRITE16_HANDLER( heatbrl_mcu_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::heatbrl_mcu_w )
 {
-	get_ram(space.machine());
-	COMBINE_DATA(&cop_mcu_ram[offset]);
+	COMBINE_DATA(&m_cop_mcu_ram[offset]);
 
 	/* external pin register, used for banking */
 	if(offset == 0x070/2)
 	{
-		heatbrl_setgfxbank(space.machine(), cop_mcu_ram[offset]);
+		heatbrl_setgfxbank(space.machine(), m_cop_mcu_ram[offset]);
 		return;
 	}
 
@@ -3107,13 +3177,13 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 
 	if(offset >= 0x240/2 && offset <= 0x28f/2)
 	{
-		seibu_common_video_regs_w(space,offset-0x240/2,cop_mcu_ram[offset],mem_mask);
+		seibu_common_video_regs_w(space,offset-0x240/2,m_cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
 	if(offset >= 0x3c0/2 && offset <= 0x3df/2)
 	{
-		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,m_cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3126,7 +3196,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
   Seibu Cup Soccer
 **********************************************************************************************/
 
-READ16_HANDLER( cupsoc_mcu_r )
+READ16_MEMBER( seibu_cop_legacy_device::cupsoc_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
@@ -3146,30 +3216,29 @@ READ16_HANDLER( cupsoc_mcu_r )
 	return generic_cop_r(space, offset, mem_mask);
 }
 
-WRITE16_HANDLER( cupsoc_mcu_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::cupsoc_mcu_w )
 {
-	get_ram(space.machine());
-	COMBINE_DATA(&cop_mcu_ram[offset]);
+	COMBINE_DATA(&m_cop_mcu_ram[offset]);
 
 	if(offset == 0x280/2) //irq ack / sprite buffering?
 		return;
 
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
-		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,m_cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
 	generic_cop_w(space, offset, data, mem_mask);
 }
 
-READ16_HANDLER( cupsocs_mcu_r )
+READ16_MEMBER( seibu_cop_legacy_device::cupsocs_mcu_r )
 {
 	if(offset >= 0x340/2 && offset <= 0x35f/2)
 		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
@@ -3189,29 +3258,28 @@ READ16_HANDLER( cupsocs_mcu_r )
 	return generic_cop_r(space, offset, mem_mask);
 }
 
-WRITE16_HANDLER( cupsocs_mcu_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::cupsocs_mcu_w )
 {
-	get_ram(space.machine());
-	COMBINE_DATA(&cop_mcu_ram[offset]);
+	COMBINE_DATA(&m_cop_mcu_ram[offset]);
 
 	if(offset == 0x280/2) //irq ack / sprite buffering?
 		return;
 
 	if(offset >= 0x240/2 && offset <= 0x27f/2)
 	{
-		seibu_common_video_regs_w(space,offset-0x240/2,cop_mcu_ram[offset],mem_mask);
+		seibu_common_video_regs_w(space,offset-0x240/2,m_cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
 	if(offset >= 0x200/2 && offset <= 0x20f/2)
 	{
-		seibu_common_video_regs_w(space,(offset-0x200/2)+(0x40/2),cop_mcu_ram[offset],mem_mask);
+		seibu_common_video_regs_w(space,(offset-0x200/2)+(0x40/2),m_cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
 	if(offset >= 0x340/2 && offset <= 0x35f/2)
 	{
-		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,m_cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3222,7 +3290,7 @@ WRITE16_HANDLER( cupsocs_mcu_w )
   Godzilla
 **********************************************************************************************/
 
-READ16_HANDLER( godzilla_mcu_r )
+READ16_MEMBER( seibu_cop_legacy_device::godzilla_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
@@ -3237,14 +3305,13 @@ READ16_HANDLER( godzilla_mcu_r )
 	return generic_cop_r(space, offset, mem_mask);
 }
 
-WRITE16_HANDLER( godzilla_mcu_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::godzilla_mcu_w )
 {
-	get_ram(space.machine());
-	COMBINE_DATA(&cop_mcu_ram[offset]);
+	COMBINE_DATA(&m_cop_mcu_ram[offset]);
 
 	if(offset == 0x070/2)
 	{
-		denjinmk_setgfxbank(space.machine(), cop_mcu_ram[offset]);
+		denjinmk_setgfxbank(space.machine(), m_cop_mcu_ram[offset]);
 		return;
 	}
 
@@ -3253,13 +3320,13 @@ WRITE16_HANDLER( godzilla_mcu_w )
 
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
-		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,m_cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3270,7 +3337,7 @@ WRITE16_HANDLER( godzilla_mcu_w )
   Denjin Makai
 **********************************************************************************************/
 
-READ16_HANDLER( denjinmk_mcu_r )
+READ16_MEMBER( seibu_cop_legacy_device::denjinmk_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
@@ -3290,29 +3357,28 @@ READ16_HANDLER( denjinmk_mcu_r )
 	return generic_cop_r(space, offset, mem_mask);
 }
 
-WRITE16_HANDLER( denjinmk_mcu_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::denjinmk_mcu_w )
 {
-	get_ram(space.machine());
-	COMBINE_DATA(&cop_mcu_ram[offset]);
+	COMBINE_DATA(&m_cop_mcu_ram[offset]);
 
 	if(offset == 0x280/2) //irq ack / sprite buffering?
 		return;
 
 	if(offset == 0x070/2)
 	{
-		denjinmk_setgfxbank(space.machine(), cop_mcu_ram[offset]);
+		denjinmk_setgfxbank(space.machine(), m_cop_mcu_ram[offset]);
 		return;
 	}
 
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
-		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,m_cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3323,7 +3389,7 @@ WRITE16_HANDLER( denjinmk_mcu_w )
   SD Gundam Sangokushi Rainbow Tairiku Senki
 **********************************************************************************************/
 
-READ16_HANDLER( grainbow_mcu_r )
+READ16_MEMBER( seibu_cop_legacy_device::grainbow_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
@@ -3344,23 +3410,22 @@ READ16_HANDLER( grainbow_mcu_r )
 }
 
 
-WRITE16_HANDLER( grainbow_mcu_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::grainbow_mcu_w )
 {
-	get_ram(space.machine());
-	COMBINE_DATA(&cop_mcu_ram[offset]);
+	COMBINE_DATA(&m_cop_mcu_ram[offset]);
 
 	if(offset == 0x280/2) //irq ack / sprite buffering?
 		return;
 
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
-		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,m_cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
@@ -3372,7 +3437,7 @@ WRITE16_HANDLER( grainbow_mcu_w )
 **********************************************************************************************/
 
 
-READ16_HANDLER( legionna_mcu_r )
+READ16_MEMBER( seibu_cop_legacy_device::legionna_mcu_r )
 {
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 		return space.machine().device<seibu_sound_device>("seibu_sound")->main_word_r(space,(offset >> 1) & 7,0xffff);
@@ -3387,10 +3452,9 @@ READ16_HANDLER( legionna_mcu_r )
 	return generic_cop_r(space, offset, mem_mask);
 }
 
-WRITE16_HANDLER( legionna_mcu_w )
+WRITE16_MEMBER( seibu_cop_legacy_device::legionna_mcu_w )
 {
-	get_ram(space.machine());
-	COMBINE_DATA(&cop_mcu_ram[offset]);
+	COMBINE_DATA(&m_cop_mcu_ram[offset]);
 
 	if(offset == 0x070/2) //external pin: puts bit 13 high, delay, reads 0x748, writes bit 13 low
 		return;
@@ -3400,13 +3464,13 @@ WRITE16_HANDLER( legionna_mcu_w )
 
 	if(offset >= 0x200/2 && offset <= 0x24f/2)
 	{
-		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		seibu_common_video_regs_w(space,offset-0x200/2,m_cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
 	if(offset >= 0x300/2 && offset <= 0x31f/2)
 	{
-		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,cop_mcu_ram[offset],0x00ff);
+		space.machine().device<seibu_sound_device>("seibu_sound")->main_word_w(space,(offset >> 1) & 7,m_cop_mcu_ram[offset],0x00ff);
 		return;
 	}
 
