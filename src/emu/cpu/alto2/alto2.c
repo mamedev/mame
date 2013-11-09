@@ -711,10 +711,15 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, astr
 {
 }
 
-// FIXME
 #if	ALTO2_DEBUG
+// FIXME: define types (sections) and print the section like [emu] [kwd] ...
+// FIXME: use the level to suppress messages if logging is less verbose than level
 void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
 {
+	va_list ap;
+	va_start(ap, format);
+	vprintf(format, ap);
+	va_end(ap);
 }
 #endif
 
