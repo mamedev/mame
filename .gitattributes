@@ -210,6 +210,7 @@ hash/pecom_cass.xml svneol=native#text/xml
 hash/pentagon_cass.xml svneol=native#text/xml
 hash/pet_cass.xml svneol=native#text/xml
 hash/pet_flop.xml svneol=native#text/xml
+hash/pet_hdd.xml svneol=native#text/xml
 hash/pet_rom.xml svneol=native#text/xml
 hash/pico.xml svneol=native#text/xml
 hash/pippin.xml svneol=native#text/xml

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pet_hdd" description="Commodore PET hard disks">
+
+	<software name="d9060">
+		<description>Commodore D9060</description>
+		<year>1983</year>
+		<publisher>Commodore</publisher>
+
+		<!-- Tandon TM602S -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="tm602s" sha1="9125cb84213ffbeafaa2868b79ffcda5a29fad7a" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="d9090">
+		<description>Commodore D9090</description>
+		<year>1983</year>
+		<publisher>Commodore</publisher>
+
+		<!-- Tandon TM603S -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="tm603s" sha1="6ef9e04bd7e6a128d07a75ce4fd0af9258bd2e9f" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+	
+</softwarelist>

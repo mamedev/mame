@@ -1480,6 +1480,7 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "pet_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pet_hdd")
 MACHINE_CONFIG_END
 
 
@@ -1767,6 +1768,7 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "pet_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pet_hdd")
 	MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
 MACHINE_CONFIG_END
 
