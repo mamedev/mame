@@ -3936,6 +3936,7 @@ src/mame/drivers/lastbank.c svneol=native#text/plain
 src/mame/drivers/lastduel.c svneol=native#text/plain
 src/mame/drivers/lastfght.c svneol=native#text/plain
 src/mame/drivers/lazercmd.c svneol=native#text/plain
+src/mame/drivers/lbeach.c svneol=native#text/plain
 src/mame/drivers/legionna.c svneol=native#text/plain
 src/mame/drivers/leland.c svneol=native#text/plain
 src/mame/drivers/lemmings.c svneol=native#text/plain

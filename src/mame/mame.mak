@@ -1438,6 +1438,7 @@ $(MAMEOBJ)/nmk.a: \
 
 $(MAMEOBJ)/olympia.a: \
 	$(DRIVERS)/dday.o $(VIDEO)/dday.o \
+	$(DRIVERS)/lbeach.o \
 	$(DRIVERS)/monzagp.o \
 	$(DRIVERS)/portrait.o $(VIDEO)/portrait.o \
 	$(DRIVERS)/vega.o \
