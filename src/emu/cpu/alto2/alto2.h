@@ -274,6 +274,7 @@ private:
 	};
 	int m_log_types;
 	int m_log_level;
+	bool m_log_newline;
 	void logprintf(int type, int level, const char* format, ...);
 #	define	LOG(x) logprintf x
 #else

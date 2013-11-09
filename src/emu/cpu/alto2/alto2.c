@@ -30,6 +30,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 #if	ALTO2_DEBUG
 	m_log_types(LOG_ALL),
 	m_log_level(9),
+	m_log_newline(false),
 #endif
 	m_ucode_config("program", ENDIANNESS_BIG, 32, 14, -2),
 	m_const_config("constants", ENDIANNESS_BIG, 16, 8, -1),
@@ -749,13 +750,17 @@ void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
 		return;
 	if (level > m_log_level)
 		return;
-	for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
-		if (type & (1 << i))
-			debug_console_printf(machine(), "%-7s ", type_name[i]);
+	if (m_log_newline) {
+		// last line had a \n - print type name
+		for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
+			if (type & (1 << i))
+				debug_console_printf(machine(), "%-7s ", type_name[i]);
+	}
 	va_list ap;
 	va_start(ap, format);
 	debug_console_vprintf(machine(), format, ap);
 	va_end(ap);
+	m_log_newline = format[strlen(format) - 1] == '\n';
 }
 #endif
 
