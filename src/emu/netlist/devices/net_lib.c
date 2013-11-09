@@ -98,7 +98,7 @@ NETLIB_UPDATE_PARAM(netdev_clock)
 NETLIB_UPDATE(netdev_clock)
 {
 	//m_Q.setToNoCheck(!m_Q.new_Q(), m_inc  );
-	OUTLOGIC(m_Q, !m_Q.new_Q(), m_inc  );
+	OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 }
 
 NETLIB_START(nicMultiSwitch)
@@ -112,8 +112,8 @@ NETLIB_START(nicMultiSwitch)
 	for (i=0; i<8; i++)
 	{
 		register_input(sIN[i], m_I[i]);
-		//register_link_internal(m_I[i], m_low);
-		m_I[i].set_output(m_low);
+		m_low.net().register_con(m_I[i]);
+		//m_I[i].set_net(m_low.m_net);
 	}
 	register_param("POS", m_POS);
 	register_output("Q", m_Q);
@@ -144,7 +144,8 @@ NETLIB_START(nicMixer8)
 	for (i=0; i<8; i++)
 	{
 		register_input(sI[i], m_I[i]);
-		m_I[i].set_output(m_low);
+		m_low.net().register_con(m_I[i]);
+		//m_I[i].set_output(m_low);
 		register_param(sR[i], m_R[i], 1e12);
 	}
 	register_output("Q", m_Q);
@@ -215,7 +216,7 @@ NETLIB_START(nicNE555N_MSTABLE)
 	register_param("VS", m_VS, 5.0);
 	register_param("VL", m_VL, 0.0 *5.0);
 
-	m_THRESHOLD_OUT.init_terminal(this);
+	m_THRESHOLD_OUT.init_terminal(*this);
 	register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT, net_input_t::INP_STATE_ACTIVE);
 
 	m_Q.initial(5.0 * 0.4);
@@ -632,7 +633,7 @@ NETLIB_START(nic7493)
 NETLIB_UPDATE(nic7493ff)
 {
 	if (m_reset == 0)
-		OUTLOGIC(m_Q, !m_Q.new_Q(), NLTIME_FROM_NS(18));
+		OUTLOGIC(m_Q, !m_Q.net().new_Q(), NLTIME_FROM_NS(18));
 }
 
 NETLIB_UPDATE(nic7493)
@@ -773,7 +774,7 @@ ATTR_HOT inline void NETLIB_NAME(nic74107Asub)::newstate(const netlist_sig_t sta
 NETLIB_UPDATE(nic74107Asub)
 {
 	{
-		netlist_sig_t t = m_Q.new_Q();
+		const netlist_sig_t t = m_Q.net().new_Q();
 		newstate((!t & m_Q1) | (t & m_Q2) | m_F);
 		if (!m_Q1)
 			m_clk.inactivate();

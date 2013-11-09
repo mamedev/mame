@@ -105,7 +105,7 @@ void netlist_setup_t::register_output(netlist_core_device_t &dev, netlist_core_d
 	astring temp = dev.name();
 	temp.cat(".");
 	temp.cat(name);
-	out.init_terminal(&upd_dev);
+	out.init_terminal(upd_dev);
 	if (!(m_terminals.add(temp, &out, false)==TMERR_NONE))
 		fatalerror("Error adding output %s to output list\n", name.cstr());
 }
@@ -116,7 +116,7 @@ void netlist_setup_t::register_input(net_device_t &dev, netlist_core_device_t &u
 	astring temp = dev.name();
 	temp.cat(".");
 	temp.cat(name);
-	inp.init_input(&upd_dev, type);
+	inp.init_input(upd_dev, type);
 	dev.m_inputs.add(temp);
 	if (!(m_terminals.add(temp, &inp, false) == TMERR_NONE))
 		fatalerror("Error adding input %s to input list\n", name.cstr());
@@ -211,10 +211,8 @@ void netlist_setup_t::resolve_inputs(void)
 			proxy->init(*this, x.cstr());
 			register_dev(proxy);
 
-			in->set_output(proxy->m_Q);
-			proxy->m_Q.register_con(*in);
-			proxy->m_I.set_output(out);
-			out.register_con(proxy->m_I);
+			proxy->m_Q.net().register_con(*in);
+			out.net().register_con(proxy->m_I);
 
 		}
 		else if (out.object_type(net_output_t::SIGNAL_MASK) == net_output_t::SIGNAL_DIGITAL
@@ -227,16 +225,12 @@ void netlist_setup_t::resolve_inputs(void)
 			proxy->init(*this, x.cstr());
 			register_dev(proxy);
 
-			in->set_output(proxy->m_Q);
-			proxy->m_Q.register_con(*in);
-			proxy->m_I.set_output(out);
-			out.register_con(proxy->m_I);
-			//printf("here 2\n");
+            proxy->m_Q.net().register_con(*in);
+            out.net().register_con(proxy->m_I);
 		}
 		else
 		{
-			in->set_output(out);
-			out.register_con(*in);
+		    out.net().register_con(*in);
 		}
 	}
 
@@ -249,23 +243,6 @@ void netlist_setup_t::resolve_inputs(void)
 			m_netlist.set_mainclock_dev(dynamic_cast<NETLIB_NAME(netdev_mainclock)*>(dev));
 		}
 	}
-
-#if 1
-
-#else
-	/* make sure all outputs are triggered once */
-	for (tagmap_output_t::entry_t *entry = m_outputs.first(); entry != NULL; entry = m_outputs.next(entry))
-	{
-		net_output_t *out = entry->object();
-		//if (dynamic_cast<const netdev_clock *>(out->netdev()) == NULL )
-		{
-			out->update_devs_force();
-			INT32 time = 10000;
-			m_netlist.process_list(time);
-		}
-	}
-	//m_netlist.m_queue.clear();
-#endif
 
 	/* print all outputs */
 	for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))

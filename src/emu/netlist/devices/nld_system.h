@@ -48,7 +48,7 @@ NETLIB_DEVICE_WITH_PARAMS(netdev_mainclock,
 	net_param_t m_freq;
 	netlist_time m_inc;
 
-	ATTR_HOT inline static void mc_update(net_output_t &Q, const netlist_time curtime);
+	ATTR_HOT inline static void mc_update(net_net_t &net, const netlist_time curtime);
 );
 
 // ----------------------------------------------------------------------------------------
