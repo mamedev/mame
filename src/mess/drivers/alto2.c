@@ -42,6 +42,15 @@ WRITE16_MEMBER( alto2_state::alto2_mmio_w )
 
 /* Memory Maps */
 
+static ADDRESS_MAP_START( alto2_ucode_map, AS_PROGRAM, 32, alto2_state )
+	AM_RANGE(0,                    ALTO2_UCODE_RAM_BASE-1) AM_ROM
+	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE-1)     AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( alto2_const_map, AS_DATA, 16, alto2_state )
+	AM_RANGE(0,                    ALTO2_CONST_SIZE-1)     AM_ROM
+ADDRESS_MAP_END
+
 /* main memory and memory mapped i/o in range ALTO2_IO_PAGE_BASE ... ALTO2_IO_PAGE_BASE + ALTO2_IO_PAGE_SIZE - 1 */
 static ADDRESS_MAP_START( alto2_ram_map, AS_IO, 16, alto2_state )
 	AM_RANGE(0,                    ALTO2_IO_PAGE_BASE - 1) AM_READWRITE(alto2_ram_r,  alto2_ram_w)
@@ -248,6 +257,13 @@ static INPUT_PORTS_START( alto2 )
 	PORT_CONFSETTING(    0x40, "PAL")
 INPUT_PORTS_END
 
+/* ROM */
+ROM_START( alto2 )
+	// decoded micro code region
+	ROM_REGION( ALTO2_RAM_SIZE, "maincpu", 0 )
+	// 2 x 64K x 39 bit memory
+	ROM_REGION( 2*ALTO2_RAM_SIZE, "memory", 0 )
+ROM_END
 
 /* Palette Initialization */
 
@@ -260,6 +276,8 @@ void alto2_state::palette_init()
 static MACHINE_CONFIG_START( alto2, alto2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ALTO2, XTAL_20_16MHz)
+	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
+	MCFG_CPU_DATA_MAP(alto2_const_map)
 	MCFG_CPU_IO_MAP(alto2_ram_map)
 
 	/* video hardware */
@@ -269,13 +287,11 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
 
 	MCFG_PALETTE_LENGTH(2)
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
-
-/* ROMs */
-
-ROM_START( alto2 )
-	ROM_REGION( 2*ALTO2_RAM_SIZE, "memory", 0 )
-ROM_END
 
 /* Driver Init */
 

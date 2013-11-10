@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/alto2/alto2.h"
-//#include "machine/ram.h"
+#include "machine/ram.h"
 
 class alto2_state : public driver_device
 {
@@ -17,7 +17,6 @@ public:
 	alto2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_region_memory(*this, "memory"),
 		m_io_row0(*this, "ROW0"),
 		m_io_row1(*this, "ROW1"),
 		m_io_row2(*this, "ROW2"),
@@ -42,13 +41,13 @@ public:
 	DECLARE_READ16_MEMBER(alto2_mmio_r);
 	DECLARE_WRITE16_MEMBER(alto2_mmio_w);
 	DECLARE_DRIVER_INIT(alto2);
+
 	virtual void palette_init();
 	DECLARE_MACHINE_RESET(alto2);
 	void screen_eof_alto2(screen_device &screen, bool state);
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_memory_region m_region_memory;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;

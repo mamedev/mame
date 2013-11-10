@@ -49,15 +49,6 @@ WRITE16_MEMBER( alto2_cpu_device::alto2_mmio_w )
 
 }
 
-static ADDRESS_MAP_START( alto2_ucode, AS_PROGRAM, 32, alto2_cpu_device )
-	AM_RANGE(0,                    ALTO2_UCODE_RAM_BASE-1) AM_ROM
-	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE-1)     AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( alto2_constants, AS_DATA, 16, alto2_cpu_device )
-	AM_RANGE(0,                    ALTO2_CONST_SIZE-1)     AM_ROM
-ADDRESS_MAP_END
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -73,12 +64,12 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_log_level(9),
 	m_log_newline(true),
 #endif
-	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 14, -2, ADDRESS_MAP_NAME(alto2_ucode)),
-	m_const_config("constants", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(alto2_constants)),
+	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 14, -2),
+	m_const_config("const", ENDIANNESS_BIG, 16, 8, -1),
 	m_ucode(0),
 	m_const(0),
 	m_ucode_map(*this, "ucode"),
-	m_const_map(*this, "constants"),
+	m_const_map(*this, "const"),
 	m_icount(0),
 	m_task_mpc(),
 	m_task_next2(),
@@ -161,10 +152,15 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 //-------------------------------------------------
 
 ROM_START( alto2_cpu )
-	ROM_REGION( sizeof(UINT32)*ALTO2_UCODE_SIZE, "ucode", 0 )
-	ROM_REGION( sizeof(UINT16)*ALTO2_CONST_SIZE, "constants", 0 )
+	// decoded micro code region
+	ROM_REGION( 16 * 02000, "ucode", 0 )
 
-	// Alto-II micro code PROMs, 8 x 4bit
+	// decoded constant PROMs region
+	ROM_REGION( 4 * 00400, "const", 0 )
+
+	// 2 x 64K x 39 bit memory
+	ROM_REGION( 2*ALTO2_RAM_SIZE, "memory", 0 )
+
 	ROM_REGION( 16 * 02000, "ucode_proms", 0 )
 	ROM_LOAD( "55x.3",     0*02000, 0x400, CRC(de870d75) SHA1(2b98cc769d8302cb39948711424d987d94e4159b) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
 	ROM_LOAD( "64x.3",     1*02000, 0x400, CRC(51b444c0) SHA1(8756e51f7f3253a55d75886465beb7ee1be6e1c4) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
@@ -866,10 +862,25 @@ void alto2_cpu_device::device_start()
 	m_ucode_proms = prom_load(ucode_prom_list, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
 	m_const_proms = prom_load(const_prom_list, memregion("const_proms")->base(), 1, 4);
 
-	for (offs_t offs = 0; offs < sizeof(UINT32)*ALTO2_UCODE_RAM_BASE; offs++)
-		memory_write(AS_0, offs, 1, m_ucode_proms[offs]);
-	for (offs_t offs = 0; offs < sizeof(UINT16)*ALTO2_CONST_SIZE; offs++)
-		memory_write(AS_1, offs, 1, m_const_proms[offs]);
+	for (offs_t offs = 0; offs < ALTO2_UCODE_RAM_BASE; offs++) {
+		UINT32 data = (m_ucode_proms[4*offs+0] << 0) | (m_ucode_proms[4*offs+1] << 8) |
+				 (m_ucode_proms[4*offs+2] << 16) | (m_ucode_proms[4*offs+3] << 24);
+		if (0 == offs % 8)
+			printf("%04x:", offs);
+		printf(" %08x",  data);
+		if (7 == offs % 8)
+			printf("\n");
+		m_ucode->write_dword(offs, data);
+	}
+	for (offs_t offs = 0; offs < ALTO2_CONST_SIZE; offs++) {
+		UINT32 data = (m_const_proms[2*offs+0] << 0) | (m_const_proms[2*offs+1] << 8);
+		if (0 == offs % 8)
+			printf("%04x:", offs);
+		printf(" %04x",  data);
+		if (7 == offs % 8)
+			printf("\n");
+		m_const->write_word(offs, data);
+	}
 
 	m_disp_a38 = prom_load(&pl_displ_a38, memregion("displ_a38")->base());
 	m_disp_a63 = prom_load(&pl_displ_a63, memregion("displ_a63")->base());
@@ -882,7 +893,7 @@ void alto2_cpu_device::device_start()
 	m_madr_a32 = prom_load(&pl_madr_a32, memregion("madr_a32")->base());
 	m_madr_a64 = prom_load(&pl_madr_a64, memregion("madr_a64")->base());
 	m_madr_a65 = prom_load(&pl_madr_a65, memregion("madr_a65")->base());
-	m_madr_a90 = prom_load(&pl_madr_a90, memregion("madr_a90")->base(), 1 ,1);
+	m_madr_a90 = prom_load(&pl_madr_a90, memregion("madr_a90")->base());
 	m_madr_a91 = prom_load(&pl_madr_a91, memregion("madr_a91")->base());
 	m_ether_a41 = prom_load(&pl_enet_a41, memregion("ether_a41")->base());
 	m_ether_a42 = prom_load(&pl_enet_a42, memregion("ether_a42")->base());
