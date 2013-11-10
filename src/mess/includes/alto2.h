@@ -17,9 +17,7 @@ public:
 	alto2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_region_ucode(*this, "maincpu"),
-		m_region_const(*this, "constants"),
-		m_region_ram(*this, "memory"),
+		m_region_memory(*this, "memory"),
 		m_io_row0(*this, "ROW0"),
 		m_io_row1(*this, "ROW1"),
 		m_io_row2(*this, "ROW2"),
@@ -50,9 +48,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_memory_region m_region_ucode;
-	required_memory_region m_region_const;
-	required_memory_region m_region_ram;
+	required_memory_region m_region_memory;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;

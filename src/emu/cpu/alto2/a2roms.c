@@ -90,7 +90,7 @@ static void write_type_and_xor(void *base, int type, UINT32 addr, UINT32 dand, U
 	}
 }
 
-UINT8* prom_load(const device_t* device, const prom_load_t* prom, UINT8* src, int pages, int segments)
+UINT8* prom_load(const prom_load_t* prom, const UINT8* src, int pages, int segments)
 {
 	void* array = 0;
 	size_t type = prom->type;
@@ -101,13 +101,13 @@ UINT8* prom_load(const device_t* device, const prom_load_t* prom, UINT8* src, in
 
 	switch (type) {
 	case sizeof(UINT8):
-		array = auto_alloc_array(device->machine(), UINT8, pages * size);
+		array = global_alloc_array(UINT8, pages * size);
 		break;
 	case sizeof(UINT16):
-		array = auto_alloc_array(device->machine(), UINT16, pages * size);
+		array = global_alloc_array(UINT16, pages * size);
 		break;
 	case sizeof(UINT32):
-		array = auto_alloc_array(device->machine(), UINT32, pages * size);
+		array = global_alloc_array(UINT32, pages * size);
 		break;
 	}
 
@@ -141,7 +141,7 @@ UINT8* prom_load(const device_t* device, const prom_load_t* prom, UINT8* src, in
 	case sizeof(UINT8):
 		{
 			UINT8* data = reinterpret_cast<UINT8*>(array);
-			for (int addr = 0; addr < size; addr++) {
+			for (int addr = 0; addr < pages*size; addr++) {
 				if (0 == (addr % 16))
 					printf("%04x:", addr);
 				if (width <= 4)
@@ -156,7 +156,7 @@ UINT8* prom_load(const device_t* device, const prom_load_t* prom, UINT8* src, in
 	case sizeof(UINT16):
 		{
 			UINT16* data = reinterpret_cast<UINT16*>(array);
-			for (int addr = 0; addr < size; addr++) {
+			for (int addr = 0; addr < pages*size; addr++) {
 				if (0 == (addr % 8))
 					printf("%04x:", addr);
 				printf(" %04x", data[addr]);
@@ -168,7 +168,7 @@ UINT8* prom_load(const device_t* device, const prom_load_t* prom, UINT8* src, in
 	case sizeof(UINT32):
 		{
 			UINT32* data = reinterpret_cast<UINT32*>(array);
-			for (int addr = 0; addr < size; addr++) {
+			for (int addr = 0; addr < pages*size; addr++) {
 				if (0 == (addr % 4))
 					printf("%04x:", addr);
 				printf(" %08x", data[addr]);

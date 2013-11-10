@@ -16,6 +16,47 @@
 
 const device_type ALTO2 = &device_creator<alto2_cpu_device>;
 
+/***************************************************************************
+	ADDRESS MAPS
+***************************************************************************/
+
+
+// FIXME: Is this required? How to access the address space words?
+// This has to somehow be mapped to the a2mem half DWORD accesses
+// and (optionally) Hamming code and parity flag updating
+READ16_MEMBER( alto2_cpu_device::alto2_ram_r )
+{
+	return 0;
+}
+
+// FIXME: Is this required? How to access the address space words?
+// This has to somehow be mapped to the a2mem half DWORD accesses
+// and (optionally) Hamming code and parity flag updating
+WRITE16_MEMBER( alto2_cpu_device::alto2_ram_w )
+{
+
+}
+
+// FIXME: Dispatch to the a2mem mmio handlers
+READ16_MEMBER( alto2_cpu_device::alto2_mmio_r )
+{
+	return 0;
+}
+
+// FIXME: Dispatch to the a2mem mmio handlers
+WRITE16_MEMBER( alto2_cpu_device::alto2_mmio_w )
+{
+
+}
+
+static ADDRESS_MAP_START( alto2_ucode, AS_PROGRAM, 32, alto2_cpu_device )
+	AM_RANGE(0,                    ALTO2_UCODE_RAM_BASE-1) AM_ROM
+	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE-1)     AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( alto2_constants, AS_DATA, 16, alto2_cpu_device )
+	AM_RANGE(0,                    ALTO2_CONST_SIZE-1)     AM_ROM
+ADDRESS_MAP_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -30,14 +71,14 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 #if	ALTO2_DEBUG
 	m_log_types(LOG_ALL),
 	m_log_level(9),
-	m_log_newline(false),
+	m_log_newline(true),
 #endif
-	m_ucode_config("maincpu", ENDIANNESS_BIG, 32, 14, -2),
-	m_const_config("constants", ENDIANNESS_BIG, 16, 8, -1),
-	m_ram_config("memory", ENDIANNESS_BIG, 16, 17, -1),
+	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 14, -2, ADDRESS_MAP_NAME(alto2_ucode)),
+	m_const_config("constants", ENDIANNESS_BIG, 16, 8, -1, ADDRESS_MAP_NAME(alto2_constants)),
 	m_ucode(0),
 	m_const(0),
-	m_ram(0),
+	m_ucode_map(*this, "ucode"),
+	m_const_map(*this, "constants"),
 	m_icount(0),
 	m_task_mpc(),
 	m_task_next2(),
@@ -110,6 +151,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_ether_a49(0),
 	m_eth()
 {
+	m_is_octal = true;
 }
 
 //-------------------------------------------------
@@ -117,6 +159,49 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 //-------------------------------------------------
 
 ROM_START( alto2_cpu )
+	ROM_REGION( sizeof(UINT32)*ALTO2_UCODE_SIZE, "ucode", 0 )
+	ROM_REGION( sizeof(UINT16)*ALTO2_CONST_SIZE, "constants", 0 )
+
+	// Alto-II micro code PROMs, 8 x 4bit
+	ROM_REGION( 16 * 02000, "ucode_proms", 0 )
+	ROM_LOAD( "55x.3",     0*02000, 0x400, CRC(de870d75) SHA1(2b98cc769d8302cb39948711424d987d94e4159b) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROM_LOAD( "64x.3",     1*02000, 0x400, CRC(51b444c0) SHA1(8756e51f7f3253a55d75886465beb7ee1be6e1c4) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+	ROM_LOAD( "65x.3",     2*02000, 0x400, CRC(741d1437) SHA1(01f7cf07c2173ac93799b2475180bfbbe7e0149b) )	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+	ROM_LOAD( "63x.3",     3*02000, 0x400, CRC(f22d5028) SHA1(c65a42baef702d4aff2d9ad8e363daec27de6801) )	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+	ROM_LOAD( "53x.3",     4*02000, 0x400, CRC(3c89a740) SHA1(95d812d489b2bde03884b2f126f961caa6c8ec45) )	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+	ROM_LOAD( "60x.3",     5*02000, 0x400, CRC(a35de0bf) SHA1(7fa4aead44dcf5393bbfd1706c0ada24aa6fd3ac) )	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+	ROM_LOAD( "61x.3",     6*02000, 0x400, CRC(f25bcb2d) SHA1(acb57f3104a8dc4ba750dd1bf22ccc81cce9f084) )	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+	ROM_LOAD( "62x.3",     7*02000, 0x400, CRC(1b20a63f) SHA1(41dc86438e91c12b0fe42ffcce6b2ac2eb9e714a) )	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+
+	// extended memory Mesa 5.1 micro code PROMs, 8 x 4bit
+	ROM_LOAD( "xm51.u54",  8*02000, 02000, CRC(11086ae9) SHA1(c394e3fadbfb91801ddc1a70cb25dc6f606c4f76) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROM_LOAD( "xm51.u74",  9*02000, 02000, CRC(be8224f2) SHA1(ea9abcc3832b26a094319796901237e1e3f238b6) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+	ROM_LOAD( "xm51.u75", 10*02000, 02000, CRC(dfe3e3ac) SHA1(246fd29f92150a5d5d7627fbb4f2504c7b6cd5ec) )	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+	ROM_LOAD( "xm51.u73", 11*02000, 02000, CRC(6c20fa46) SHA1(a054330c65048011f12209aaed5c6da73d95f029) )	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+	ROM_LOAD( "xm51.u52", 12*02000, 02000, CRC(0a31eec8) SHA1(4e2ad5daa5e6a6f2143ee4de00c7b625d096fb02) )	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+	ROM_LOAD( "xm51.u70", 13*02000, 02000, CRC(5c64ee54) SHA1(0eb16d1b5e5967be7c1bf8c8ef6efdf0518a752c) )	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+	ROM_LOAD( "xm51.u71", 14*02000, 02000, CRC(7283bf71) SHA1(819fdcc407ed0acdd8f12b02db6efbcab7bec19a) )	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+	ROM_LOAD( "xm51.u72", 15*02000, 02000, CRC(a28e5251) SHA1(44dd8ad4ad56541b5394d30ce3521b4d1d561394) )	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+
+	// constant PROMs, 4 x 4bit
+	// UINT16 src = BITS(addr, 3,2,1,4,5,6,7,0);
+	ROM_REGION( 4 * 0400, "const_proms", 0 )
+	ROM_LOAD( "madr.a6",   0*00400, 00400, CRC(c2c196b2) SHA1(8b2a599ac839ec2a070dbfef2f1626e645c858ca) )	//!< 0000-0377 C(00)',C(01)',C(02)',C(03)'
+	ROM_LOAD( "madr.a5",   1*00400, 00400, CRC(42336101) SHA1(c77819cf40f063af3abf66ea43f17cc1a62e928b) )	//!< 0000-0377 C(04)',C(05)',C(06)',C(07)'
+	ROM_LOAD( "madr.a4",   2*00400, 00400, CRC(b957e490) SHA1(c72660ad3ada4ca0ed8697c6bb6275a4fe703184) )	//!< 0000-0377 C(08)',C(09)',C(10)',C(11)'
+	ROM_LOAD( "madr.a3",   3*00400, 00400, CRC(e0992757) SHA1(5c45ea824970663cb9ee672dc50861539c860249) )	//!< 0000-0377 C(12)',C(13)',C(14)',C(15)'
+
+	// extended memory Mesa 4.1 (?) micro code PROMs, 8 x 4bit (unused)
+	ROM_REGION32_BE( 8 * 02000, "xm_mesa_4.1", ROMREGION_INVERT )
+	ROM_LOAD( "xm654.41",  0*02000, 02000, CRC(beace302) SHA1(0002fea03a0261f57365095c4b87385d833f7063) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+	ROM_LOAD( "xm674.41",  1*02000, 02000, CRC(7db5c097) SHA1(364bc41951baa3ad274031bd49abec1cf5b7a980) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+	ROM_LOAD( "xm675.41",  2*02000, 02000, CRC(26eac1e7) SHA1(9220a1386afae8de96bdb2cf084afbadeeb61d42) )	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+	ROM_LOAD( "xm673.41",  3*02000, 02000, CRC(8173d7e3) SHA1(7fbacf6dccb60dfe9cef88a248c3a1660efddcf4) )	//!< 00000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+	ROM_LOAD( "xm652.41",  4*02000, 02000, CRC(ddfa94bb) SHA1(38625e269400aaf38cd07b5dbf36c0087a0f1b92) )	//!< 00000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+	ROM_LOAD( "xm670.41",  5*02000, 02000, CRC(1cd187f3) SHA1(0fd5eff7c6b5c2383aa20148a795b80286554675) )	//!< 00000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+	ROM_LOAD( "xm671.41",  6*02000, 02000, CRC(f21b1ad7) SHA1(1e18bdb35de7802892ac373c128f900786d40886) )	//!< 00000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+	ROM_LOAD( "xm672.41",  7*02000, 02000, CRC(110ee075) SHA1(bb72fceba5ce9e5e8c8a0024915006bdd011a3f3) )	//!< 00000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+
 	ROM_REGION( 0400, "2kctl_u3", 0 )
 	ROM_LOAD( "2kctl.u3",   00000, 00400, CRC(5f8d89e8) SHA1(487cd944ab074290aea73425e81ef4900d92e250) )	//!< 3601-1 256x4 BPROM; Emulator address modifier
 
@@ -171,6 +256,322 @@ const rom_entry *alto2_cpu_device::device_rom_region() const
 	return ROM_NAME( alto2_cpu );
 }
 
+/**
+ * @brief list of microcode PROM loading options
+ */
+static const prom_load_t ucode_prom_list[] = {
+	{	// 0000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+		"55x.3",
+		0,
+		"de870d75",
+		"2b98cc769d8302cb39948711424d987d94e4159b",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	28,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	ZERO,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+		"64x.3",
+		0,
+		"51b444c0",
+		"8756e51f7f3253a55d75886465beb7ee1be6e1c4",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	24,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+		"65x.3",
+		0,
+		"741d1437",
+		"01f7cf07c2173ac93799b2475180bfbbe7e0149b",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	20,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 F1(0),F1(1)',F1(2)',F1(3)'
+		"63x.3",
+		0,
+		"f22d5028",
+		"c65a42baef702d4aff2d9ad8e363daec27de6801",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	007,						// keep D0, invert D1-D3
+/* width */	4,
+/* shift */	16,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 F2(0),F2(1)',F2(2)',F2(3)'
+		"53x.3",
+		0,
+		"3c89a740",
+		"95d812d489b2bde03884b2f126f961caa6c8ec45",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	007,						// keep D0, invert D1-D3
+/* width */	4,
+/* shift */	12,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+		"60x.3",
+		0,
+		"a35de0bf",
+		"7fa4aead44dcf5393bbfd1706c0ada24aa6fd3ac",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	013,						// invert D0 and D2-D3
+/* width */	4,
+/* shift */	8,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+		"61x.3",
+		0,
+		"f25bcb2d",
+		"acb57f3104a8dc4ba750dd1bf22ccc81cce9f084",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	4,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 0000-01777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+		"62x.3",
+		0,
+		"1b20a63f",
+		"41dc86438e91c12b0fe42ffcce6b2ac2eb9e714a",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	0,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	}
+
+#if	(ALTO2_UCODE_ROM_PAGES > 1)
+	,
+	{	// 02000-03777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
+		"xm51.u54",
+		0,
+		"11086ae9",
+		"c394e3fadbfb91801ddc1a70cb25dc6f606c4f76",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	28,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	ZERO,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
+		"xm51.u74",
+		0,
+		"be8224f2",
+		"ea9abcc3832b26a094319796901237e1e3f238b6",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	24,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 ALUF(3)',BS(0)',BS(1)',BS(2)'
+		"xm51.u75",
+		0,
+		"dfe3e3ac",
+		"246fd29f92150a5d5d7627fbb4f2504c7b6cd5ec",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	20,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 F1(0),F1(1)',F1(2)',F1(3)'
+		"xm51.u73",
+		0,
+		"6c20fa46",
+		"a054330c65048011f12209aaed5c6da73d95f029",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	007,						// keep D0, invert D1-D3
+/* width */	4,
+/* shift */	16,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 F2(0),F2(1)',F2(2)',F2(3)'
+		"xm51.u52",
+		0,
+		"0a31eec8",
+		"4e2ad5daa5e6a6f2143ee4de00c7b625d096fb02",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	007,						// keep D0, invert D1-D3
+/* width */	4,
+/* shift */	12,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 LOADT',LOADL,NEXT(0)',NEXT(1)'
+		"xm51.u70",
+		0,
+		"5c64ee54",
+		"0eb16d1b5e5967be7c1bf8c8ef6efdf0518a752c",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	013,						// invert D0 and D2-D3
+/* width */	4,
+/* shift */	8,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 NEXT(2)',NEXT(3)',NEXT(4)',NEXT(5)'
+		"xm51.u71",
+		0,
+		"7283bf71",
+		"819fdcc407ed0acdd8f12b02db6efbcab7bec19a",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	4,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	},
+	{	// 02000-03777 NEXT(6)',NEXT(7)',NEXT(8)',NEXT(9)'
+		"xm51.u72",
+		0,
+		"a28e5251",
+		"44dd8ad4ad56541b5394d30ce3521b4d1d561394",
+/* size */	ALTO2_UCODE_PAGE_SIZE,
+/* amap */	AMAP_DEFAULT,
+/* axor */	ALTO2_UCODE_PAGE_MASK,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	0,
+/* dmap */	DMAP_DEFAULT,
+/* dand */	KEEP,
+/* type */	sizeof(UINT32)
+	}
+#endif	// (UCODE_ROM_PAGES > 1)
+};
+
+/**
+ * @brief list of constant PROM loading options
+ */
+static const prom_load_t const_prom_list[] = {
+	{	// constant prom D0-D3
+		"madr.a6",
+		"c3.3",
+		"c2c196b2",
+		"8b2a599ac839ec2a070dbfef2f1626e645c858ca",
+/* size */	ALTO2_CONST_SIZE,
+/* amap */	AMAP_CONST_PROM,			// descramble constant address
+/* axor */	0,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	0,
+/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+/* dand */	ZERO,
+/* type */	sizeof(UINT16)
+	},
+	{	// constant prom D4-D7
+		"madr.a5",
+		"c2.3",
+		"42336101",
+		"c77819cf40f063af3abf66ea43f17cc1a62e928b",
+/* size */	ALTO2_CONST_SIZE,
+/* amap */	AMAP_CONST_PROM,			// descramble constant address
+/* axor */	0,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	4,
+/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+/* dand */	KEEP,
+/* type */	sizeof(UINT16)
+	},
+	{	// constant prom D8-D11
+		"madr.a4",
+		"c1.3",
+		"b957e490",
+		"c72660ad3ada4ca0ed8697c6bb6275a4fe703184",
+/* size */	ALTO2_CONST_SIZE,
+/* amap */	AMAP_CONST_PROM,			// descramble constant address
+/* axor */	0,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	8,
+/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+/* dand */	KEEP,
+/* type */	sizeof(UINT16)
+	},
+	{	// constant PROM D12-D15
+		"madr.a3",
+		"c0.3",
+		"e0992757",
+		"5c45ea824970663cb9ee672dc50861539c860249",
+/* size */	ALTO2_CONST_SIZE,
+/* amap */	AMAP_CONST_PROM,			// descramble constant address
+/* axor */	0,
+/* dxor */	017,						// invert D0-D3
+/* width */	4,
+/* shift */	12,
+/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+/* dand */	KEEP,
+/* type */	sizeof(UINT16)
+	}
+};
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -180,7 +581,9 @@ void alto2_cpu_device::device_start()
 {
 	m_ucode = &space(AS_PROGRAM);
 	m_const = &space(AS_DATA);
-	m_ram = &space(AS_IO);
+
+	m_ucode_proms = prom_load(ucode_prom_list, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
+	m_const_proms = prom_load(const_prom_list, memregion("const_proms")->base(), 1, 4);
 
 	//! P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
 	static const prom_load_t pl_displ_a38 =
@@ -199,7 +602,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_disp_a38 = prom_load(this, &pl_displ_a38, memregion("displ_a38")->base(), 1, 1);
+	m_disp_a38 = prom_load(&pl_displ_a38, memregion("displ_a38")->base(), 1, 1);
 
 	//! 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
 	static const prom_load_t pl_displ_a63 =
@@ -218,7 +621,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_disp_a63 = prom_load(this, &pl_displ_a63, memregion("displ_a63")->base(), 1, 1);
+	m_disp_a63 = prom_load(&pl_displ_a63, memregion("displ_a63")->base(), 1, 1);
 
 	//! P3601 256x4 BPROM; display VSYNC and VBLANK
 	static const prom_load_t pl_displ_a66 =
@@ -237,7 +640,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_disp_a66 = prom_load(this, &pl_displ_a66, memregion("displ_a66")->base(), 1, 1);
+	m_disp_a66 = prom_load(&pl_displ_a66, memregion("displ_a66")->base(), 1, 1);
 
 	//! 3601-1 256x4 BPROM; Emulator address modifier
 	static const prom_load_t pl_2kctl_u3 =
@@ -256,7 +659,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_ctl2k_u3 = prom_load(this, &pl_2kctl_u3, memregion("2kctl_u3")->base(), 1, 1);
+	m_ctl2k_u3 = prom_load(&pl_2kctl_u3, memregion("2kctl_u3")->base(), 1, 1);
 
 	//! 82S23 32x8 BPROM; task priority and initial address
 	static const prom_load_t pl_2kctl_u38 =
@@ -275,7 +678,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_ctl2k_u38 = prom_load(this, &pl_2kctl_u38, memregion("2kctl_u38")->base(), 1, 1);
+	m_ctl2k_u38 = prom_load(&pl_2kctl_u38, memregion("2kctl_u38")->base(), 1, 1);
 
 	//! 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
 	static const prom_load_t pl_2kctl_u76 =
@@ -294,7 +697,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_ctl2k_u76 = prom_load(this, &pl_2kctl_u76, memregion("2kctl_u76")->base(), 1, 1);
+	m_ctl2k_u76 = prom_load(&pl_2kctl_u76, memregion("2kctl_u76")->base(), 1, 1);
 
 	//! ALUF to ALU 741818 functions and carry in mapper
 	static const prom_load_t pl_alu_a10 =
@@ -313,7 +716,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_alu_a10 = prom_load(this, &pl_alu_a10, memregion("alu_a10")->base(), 1, 1);
+	m_alu_a10 = prom_load(&pl_alu_a10, memregion("alu_a10")->base(), 1, 1);
 
 	static const prom_load_t pl_3kcram_a37 =
 	{
@@ -331,7 +734,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_cram3k_a37 = prom_load(this, &pl_3kcram_a37, memregion("3kcram_a37")->base(), 1, 1);
+	m_cram3k_a37 = prom_load(&pl_3kcram_a37, memregion("3kcram_a37")->base(), 1, 1);
 
 	static const prom_load_t pl_madr_a32 =
 	{
@@ -350,7 +753,7 @@ void alto2_cpu_device::device_start()
 		/* type */	sizeof(UINT8)
 	};
 
-	m_madr_a32 = prom_load(this, &pl_madr_a32, memregion("madr_a32")->base(), 1, 1);
+	m_madr_a32 = prom_load(&pl_madr_a32, memregion("madr_a32")->base(), 1, 1);
 
 	static const prom_load_t pl_madr_a64 =
 	{
@@ -368,7 +771,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_madr_a64 = prom_load(this, &pl_madr_a64, memregion("madr_a64")->base(), 1, 1);
+	m_madr_a64 = prom_load(&pl_madr_a64, memregion("madr_a64")->base(), 1, 1);
 
 	static const prom_load_t pl_madr_a65 =
 	{
@@ -386,7 +789,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_madr_a65 = prom_load(this, &pl_madr_a65, memregion("madr_a65")->base(), 1, 1);
+	m_madr_a65 = prom_load(&pl_madr_a65, memregion("madr_a65")->base(), 1, 1);
 
 #if	0	// FIXME: add to alto2_cpu_device
 	static const prom_load_t pl_madr_a90 =
@@ -405,7 +808,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_madr_a90 = prom_load(this, &pl_madr_a90, memregion("madr_a90")->base(), 1 ,1);
+	m_madr_a90 = prom_load(&pl_madr_a90, memregion("madr_a90")->base(), 1 ,1);
 
 	static const prom_load_t pl_madr_a91 =
 	{
@@ -423,7 +826,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_madr_a91 = prom_load(this, &pl_madr_a91, memregion("madr_a91")->base(), 1, 1);
+	m_madr_a91 = prom_load(&pl_madr_a91, memregion("madr_a91")->base(), 1, 1);
 #endif
 
 	static const prom_load_t pl_enet_a41 =
@@ -442,7 +845,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_ether_a41 = prom_load(this, &pl_enet_a41, memregion("ether_a41")->base(), 1, 1);
+	m_ether_a41 = prom_load(&pl_enet_a41, memregion("ether_a41")->base(), 1, 1);
 
 	static const prom_load_t pl_enet_a42 =
 	{	/* P3601 256x4 BPROM; Ethernet phase encoder 2 "PE2" */
@@ -460,7 +863,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_ether_a42 = prom_load(this, &pl_enet_a42, memregion("ether_a42")->base(), 1, 1);
+	m_ether_a42 = prom_load(&pl_enet_a42, memregion("ether_a42")->base(), 1, 1);
 
 	static const prom_load_t pl_enet_a49 =
 	{	/* P3601 256x4 BPROM; Ethernet FIFO control "AFIFO" */
@@ -478,7 +881,7 @@ void alto2_cpu_device::device_start()
 		/* dand */	ZERO,
 		/* type */	sizeof(UINT8)
 	};
-	m_ether_a49 = prom_load(this, &pl_enet_a49, memregion("ether_a49")->base(), 1, 1);
+	m_ether_a49 = prom_load(&pl_enet_a49, memregion("ether_a49")->base(), 1, 1);
 
 	save_item(NAME(m_task_mpc));
 	save_item(NAME(m_task_next2));
@@ -693,7 +1096,14 @@ void alto2_cpu_device::device_start()
 // FIXME
 void alto2_cpu_device::device_reset()
 {
+	UINT8* raw;
 	soft_reset();
+	raw = m_ucode->direct().raw();
+	if (raw)
+		memcpy(raw, m_ucode_proms, sizeof(UINT32)*ALTO2_UCODE_RAM_BASE);
+	raw = m_const->direct().raw();
+	if (raw)
+		memcpy(raw, m_const_proms, sizeof(UINT16)*ALTO2_CONST_SIZE);
 }
 
 //-------------------------------------------------
@@ -714,6 +1124,16 @@ void alto2_cpu_device::execute_set_input(int inputnum, int state)
 // FIXME
 void alto2_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
 {
+	switch (entry.index())
+	{
+	case STATE_GENFLAGS:
+		string.printf("%s%s%s%s",
+					  m_aluc0 ? "C":"-",
+					  m_laluc0 ? "c":"-",
+					  m_shifter == 0 ? "0":"-",
+					  m_shifter < 0 ? "<":"-");
+		break;
+	}
 }
 
 #if	ALTO2_DEBUG

@@ -228,8 +228,6 @@ protected:
 			return &m_ucode_config;
 		case AS_DATA:
 			return &m_const_config;
-		case AS_IO:
-			return &m_ram_config;
 		default:
 			return NULL;
 		}
@@ -245,7 +243,6 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-
 private:
 #if	ALTO2_DEBUG
 	enum {
@@ -288,12 +285,22 @@ private:
 
 	address_space_config m_ucode_config;
 	address_space_config m_const_config;
-	address_space_config m_ram_config;
 
 	address_space *m_ucode;
 	address_space *m_const;
-	address_space *m_ram;
+
+	required_memory_region m_ucode_map;
+	required_memory_region m_const_map;
+
+	UINT8* m_ucode_proms;
+	UINT8* m_const_proms;
+
 	int m_icount;
+
+	DECLARE_READ16_MEMBER ( alto2_ram_r );
+	DECLARE_WRITE16_MEMBER( alto2_ram_w );
+	DECLARE_READ16_MEMBER ( alto2_mmio_r );
+	DECLARE_WRITE16_MEMBER( alto2_mmio_w );
 
 	static const UINT8 m_ether_id = 0121;
 
