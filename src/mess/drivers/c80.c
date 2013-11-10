@@ -2,22 +2,58 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    C-80
+C-80
 
-    Pasting:
-        0-F : as is
-        + (inc) : ^
-        - (dec) : V
-        M : -
-        GO : X
+Pasting:
+    0-F : as is
+    + (inc) : ^
+    - (dec) : V
+    M : -
+    GO : X
 
-    Test Paste:
-        -800^11^22^33^44^55^66^77^88^99^-800
-        Now press up-arrow to confirm the data has been entered.
+Test Paste:
+    -800^11^22^33^44^55^66^77^88^99^-800
+    Now press up-arrow to confirm the data has been entered.
+
+Commands:
+    R : REGister
+    M : MEMory manipulation
+    G : GO
+  F10 : RESet
+  ESC : BRK    
+
+Functions (press F1 then the indicated number):
+    0 : FILL
+    1 : SAVE
+    2 : LOAD
+    3 : LOADP
+    4 : MOVE
+    5 : IN
+    6 : OUT
+
+When REG is chosen, use UP to scroll through the list of regs,
+or press 0 thru C to choose one directly:
+    0 : SP
+    1 : PC
+    2 : AF
+    3 : BC
+    4 : DE
+    5 : HL
+    6 : AF'
+    7 : BC'
+    8 : DE'
+    9 : HL'
+    A : IFF
+    B : IX
+    C : IY
+
+When MEM is chosen, enter the address, press UP, enter data, press UP, enter
+data of next byte, and so on.
 
 ****************************************************************************/
 
 #include "includes/c80.h"
+#include "sound/wave.h"
 #include "c80.lh"
 
 /* Memory Maps */
@@ -236,7 +272,7 @@ static const cassette_interface c80_cassette_interface =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED ),
 	NULL,
 	NULL
 };
@@ -255,6 +291,9 @@ static MACHINE_CONFIG_START( c80, c80_state )
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 2500000, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 2500000, pio2_intf)
 	MCFG_CASSETTE_ADD("cassette", c80_cassette_interface)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -271,5 +310,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT  COMPANY      FULLNAME    FLAGS */
-COMP( 1986, c80,    0,      0,      c80,    c80, driver_device,    0, "Joachim Czepa", "C-80", GAME_SUPPORTS_SAVE | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  CLASS            INIT  COMPANY      FULLNAME    FLAGS */
+COMP( 1986, c80,    0,      0,      c80,    c80,   driver_device,    0, "Joachim Czepa", "C-80", GAME_SUPPORTS_SAVE )
