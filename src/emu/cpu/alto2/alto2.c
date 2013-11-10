@@ -121,6 +121,8 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_cram3k_a37(0),
 	m_madr_a64(0),
 	m_madr_a65(0),
+	m_madr_a90(0),
+	m_madr_a91(0),
 	m_bs(),
 	m_f1(),
 	m_f2(),
@@ -211,7 +213,7 @@ ROM_START( alto2_cpu )
 	ROM_REGION( 0400, "2kctl_u76", 0 )
 	ROM_LOAD( "2kctl.u76",  00000, 00400, CRC(1edef867) SHA1(928b8a15ac515a99109f32672441832173883b81) )	//!< 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
 
-	ROM_REGION( 0400, "alu_a10", 0 )
+	ROM_REGION( 0040, "alu_a10", 0 )
 	ROM_LOAD( "alu.a10",    00000, 00040, CRC(e0857892) SHA1(dcd389767139f0acc1f87cf074459115abc5b90b) )
 
 	ROM_REGION( 0400, "3kcram_a37", 0 )
@@ -572,6 +574,285 @@ static const prom_load_t const_prom_list[] = {
 	}
 };
 
+//! 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
+static const prom_load_t pl_displ_a63 =
+{
+	"displ.a63",
+	0,
+	"82a20d60",
+	"39d90703568be5419ada950e112d99227873fdea",
+	/* size */	0040,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	8,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+//! P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
+static const prom_load_t pl_displ_a38 =
+{
+	"displ.a38",
+	0,
+	"fd30beb7",
+	"65e4a19ba4ff748d525122128c514abedd55d866",
+	/* size */	0400,
+	/* amap */	AMAP_REVERSE_0_7,			// reverse address lines A0-A7
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+//! P3601 256x4 BPROM; display VSYNC and VBLANK
+static const prom_load_t pl_displ_a66 =
+{
+	"displ.a66",
+	0,
+	"9f91aad9",
+	"69b1d4c71f4e18103112e8601850c2654e9265cf",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+//! 3601-1 256x4 BPROM; Emulator address modifier
+static const prom_load_t pl_2kctl_u3 =
+{
+	"2kctl.u3",
+	0,
+	"5f8d89e8",
+	"487cd944ab074290aea73425e81ef4900d92e250",
+	/* size */	0400,
+	/* amap */	AMAP_REVERSE_0_7,			// reverse address lines A0-A7
+	/* axor */	0377,						// invert address lines A0-A7
+	/* dxor */	017,						// invert data lines D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+//! 82S23 32x8 BPROM; task priority and initial address
+static const prom_load_t pl_2kctl_u38 =
+{
+	"2kctl.u38",
+	0,
+	"fc51b1d1",
+	"e36c2a12a5da377394264899b5ae504e2ffda46e",
+	/* size */	0040,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	8,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+//! 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
+static const prom_load_t pl_2kctl_u76 =
+{
+	"2kctl.u76",
+	0,
+	"1edef867",
+	"928b8a15ac515a99109f32672441832173883b81",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0077,						// invert address lines A0-A5
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+//! ALUF to ALU 741818 functions and carry in mapper
+static const prom_load_t pl_alu_a10 =
+{
+	"alu.a10",
+	0,
+	"e0857892",
+	"dcd389767139f0acc1f87cf074459115abc5b90b",
+	/* size */	0040,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_3kcram_a37 =
+{
+	"3kcram.a37",
+	0,
+	"9417360d",
+	"bfcdbc56ee4ffafd0f2f672c0c869a55d6dd194b",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	017,						// invert D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_madr_a32 =
+{
+	"madr.a32",
+	0,
+	"a0e3b4a7",
+	"24e50afdeb637a6a8588f8d3a3493c9188b8da2c",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	017,						// invert D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_madr_a64 =
+{
+	"madr.a64",
+	0,
+	"a66b0eda",
+	"4d9088f592caa3299e90966b17765be74e523144",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	017,						// invert D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_madr_a65 =
+{
+	"madr.a65",
+	0,
+	"ba37febd",
+	"82e9db1cb65f451755295f0d179e6f8fe3349d4d",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	017,						// invert D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_madr_a90 =
+{
+	"madr.a90",
+	0,
+	"7a2d8799",
+	"c3760dba147740729d33b9b88e59088a4cc7437a",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	017,						// invert D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_madr_a91 =
+{
+	"madr.a91",
+	0,
+	"dd556aeb",
+	"900f333a091e3ccde0843019c25f25fba62e6023",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	017,						// invert D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_enet_a41 =
+{	/* P3601 256x4 BPROM; Ethernet phase encoder 1 "PE1" */
+	"enet.a41",
+	0,
+	"d5de8d86",
+	"c134a4c898c73863124361a9b0218f7a7f00082a",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_enet_a42 =
+{	/* P3601 256x4 BPROM; Ethernet phase encoder 2 "PE2" */
+	"enet.a42",
+	0,
+	"9d5c81bd",
+	"ac7e63332a3dad0bef7cd0349b24e156a96a4bf0",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_enet_a49 =
+{	/* P3601 256x4 BPROM; Ethernet FIFO control "AFIFO" */
+	"enet.a49",
+	0,
+	"4d2dcdb2",
+	"583327a7d70cd02702c941c0e43c1e9408ff7fd0",
+	/* size */	0400,
+	/* amap */	AMAP_REVERSE_0_7,				// reverse address lines A0-A7
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -579,309 +860,33 @@ static const prom_load_t const_prom_list[] = {
 // FIXME
 void alto2_cpu_device::device_start()
 {
-	m_ucode = &space(AS_PROGRAM);
-	m_const = &space(AS_DATA);
+	m_ucode = &space(AS_0);
+	m_const = &space(AS_1);
 
 	m_ucode_proms = prom_load(ucode_prom_list, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
 	m_const_proms = prom_load(const_prom_list, memregion("const_proms")->base(), 1, 4);
 
-	//! P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
-	static const prom_load_t pl_displ_a38 =
-	{
-		"displ.a38",
-		0,
-		"fd30beb7",
-		"65e4a19ba4ff748d525122128c514abedd55d866",
-		/* size */	0400,
-		/* amap */	AMAP_REVERSE_0_7,			// reverse address lines A0-A7
-		/* axor */	0,
-		/* dxor */	0,
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_disp_a38 = prom_load(&pl_displ_a38, memregion("displ_a38")->base(), 1, 1);
+	for (offs_t offs = 0; offs < sizeof(UINT32)*ALTO2_UCODE_RAM_BASE; offs++)
+		memory_write(AS_0, offs, 1, m_ucode_proms[offs]);
+	for (offs_t offs = 0; offs < sizeof(UINT16)*ALTO2_CONST_SIZE; offs++)
+		memory_write(AS_1, offs, 1, m_const_proms[offs]);
 
-	//! 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
-	static const prom_load_t pl_displ_a63 =
-	{
-		"displ.a63",
-		0,
-		"82a20d60",
-		"39d90703568be5419ada950e112d99227873fdea",
-		/* size */	0040,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	0,
-		/* width */	8,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_disp_a63 = prom_load(&pl_displ_a63, memregion("displ_a63")->base(), 1, 1);
-
-	//! P3601 256x4 BPROM; display VSYNC and VBLANK
-	static const prom_load_t pl_displ_a66 =
-	{
-		"displ.a66",
-		0,
-		"9f91aad9",
-		"69b1d4c71f4e18103112e8601850c2654e9265cf",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	0,
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_disp_a66 = prom_load(&pl_displ_a66, memregion("displ_a66")->base(), 1, 1);
-
-	//! 3601-1 256x4 BPROM; Emulator address modifier
-	static const prom_load_t pl_2kctl_u3 =
-	{
-		"2kctl.u3",
-		0,
-		"5f8d89e8",
-		"487cd944ab074290aea73425e81ef4900d92e250",
-		/* size */	0400,
-		/* amap */	AMAP_REVERSE_0_7,			// reverse address lines A0-A7
-		/* axor */	0377,						// invert address lines A0-A7
-		/* dxor */	017,						// invert data lines D0-D3
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_ctl2k_u3 = prom_load(&pl_2kctl_u3, memregion("2kctl_u3")->base(), 1, 1);
-
-	//! 82S23 32x8 BPROM; task priority and initial address
-	static const prom_load_t pl_2kctl_u38 =
-	{
-		"2kctl.u38",
-		0,
-		"fc51b1d1",
-		"e36c2a12a5da377394264899b5ae504e2ffda46e",
-		/* size */	0040,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	0,
-		/* width */	8,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_ctl2k_u38 = prom_load(&pl_2kctl_u38, memregion("2kctl_u38")->base(), 1, 1);
-
-	//! 3601-1 256x4 BPROM; 2KCTL replacement for u51 (1KCTL)
-	static const prom_load_t pl_2kctl_u76 =
-	{
-		"2kctl.u76",
-		0,
-		"1edef867",
-		"928b8a15ac515a99109f32672441832173883b81",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0077,						// invert address lines A0-A5
-		/* dxor */	0,
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_ctl2k_u76 = prom_load(&pl_2kctl_u76, memregion("2kctl_u76")->base(), 1, 1);
-
-	//! ALUF to ALU 741818 functions and carry in mapper
-	static const prom_load_t pl_alu_a10 =
-	{
-		"alu.a10",
-		0,
-		"e0857892",
-		"dcd389767139f0acc1f87cf074459115abc5b90b",
-		/* size */	0040,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	0,
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_alu_a10 = prom_load(&pl_alu_a10, memregion("alu_a10")->base(), 1, 1);
-
-	static const prom_load_t pl_3kcram_a37 =
-	{
-		"3kcram.a37",
-		0,
-		"9417360d",
-		"bfcdbc56ee4ffafd0f2f672c0c869a55d6dd194b",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	017,						// invert D0-D3
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_cram3k_a37 = prom_load(&pl_3kcram_a37, memregion("3kcram_a37")->base(), 1, 1);
-
-	static const prom_load_t pl_madr_a32 =
-	{
-		"madr.a32",
-		0,
-		"a0e3b4a7",
-		"24e50afdeb637a6a8588f8d3a3493c9188b8da2c",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	017,						// invert D0-D3
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-
-	m_madr_a32 = prom_load(&pl_madr_a32, memregion("madr_a32")->base(), 1, 1);
-
-	static const prom_load_t pl_madr_a64 =
-	{
-		"madr.a64",
-		0,
-		"a66b0eda",
-		"4d9088f592caa3299e90966b17765be74e523144",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	017,						// invert D0-D3
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_madr_a64 = prom_load(&pl_madr_a64, memregion("madr_a64")->base(), 1, 1);
-
-	static const prom_load_t pl_madr_a65 =
-	{
-		"madr.a65",
-		0,
-		"ba37febd",
-		"82e9db1cb65f451755295f0d179e6f8fe3349d4d",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	017,						// invert D0-D3
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_madr_a65 = prom_load(&pl_madr_a65, memregion("madr_a65")->base(), 1, 1);
-
-#if	0	// FIXME: add to alto2_cpu_device
-	static const prom_load_t pl_madr_a90 =
-	{
-		"madr.a90",
-		0,
-		"7a2d8799",
-		"c3760dba147740729d33b9b88e59088a4cc7437a",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	017,						// invert D0-D3
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
+	m_disp_a38 = prom_load(&pl_displ_a38, memregion("displ_a38")->base());
+	m_disp_a63 = prom_load(&pl_displ_a63, memregion("displ_a63")->base());
+	m_disp_a66 = prom_load(&pl_displ_a66, memregion("displ_a66")->base());
+	m_ctl2k_u3 = prom_load(&pl_2kctl_u3, memregion("2kctl_u3")->base());
+	m_ctl2k_u38 = prom_load(&pl_2kctl_u38, memregion("2kctl_u38")->base());
+	m_ctl2k_u76 = prom_load(&pl_2kctl_u76, memregion("2kctl_u76")->base());
+	m_alu_a10 = prom_load(&pl_alu_a10, memregion("alu_a10")->base());
+	m_cram3k_a37 = prom_load(&pl_3kcram_a37, memregion("3kcram_a37")->base());
+	m_madr_a32 = prom_load(&pl_madr_a32, memregion("madr_a32")->base());
+	m_madr_a64 = prom_load(&pl_madr_a64, memregion("madr_a64")->base());
+	m_madr_a65 = prom_load(&pl_madr_a65, memregion("madr_a65")->base());
 	m_madr_a90 = prom_load(&pl_madr_a90, memregion("madr_a90")->base(), 1 ,1);
-
-	static const prom_load_t pl_madr_a91 =
-	{
-		"madr.a91",
-		0,
-		"dd556aeb",
-		"900f333a091e3ccde0843019c25f25fba62e6023",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	017,						// invert D0-D3
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_madr_a91 = prom_load(&pl_madr_a91, memregion("madr_a91")->base(), 1, 1);
-#endif
-
-	static const prom_load_t pl_enet_a41 =
-	{	/* P3601 256x4 BPROM; Ethernet phase encoder 1 "PE1" */
-		"enet.a41",
-		0,
-		"d5de8d86",
-		"c134a4c898c73863124361a9b0218f7a7f00082a",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	0,
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_ether_a41 = prom_load(&pl_enet_a41, memregion("ether_a41")->base(), 1, 1);
-
-	static const prom_load_t pl_enet_a42 =
-	{	/* P3601 256x4 BPROM; Ethernet phase encoder 2 "PE2" */
-		"enet.a42",
-		0,
-		"9d5c81bd",
-		"ac7e63332a3dad0bef7cd0349b24e156a96a4bf0",
-		/* size */	0400,
-		/* amap */	AMAP_DEFAULT,
-		/* axor */	0,
-		/* dxor */	0,
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_ether_a42 = prom_load(&pl_enet_a42, memregion("ether_a42")->base(), 1, 1);
-
-	static const prom_load_t pl_enet_a49 =
-	{	/* P3601 256x4 BPROM; Ethernet FIFO control "AFIFO" */
-		"enet.a49",
-		0,
-		"4d2dcdb2",
-		"583327a7d70cd02702c941c0e43c1e9408ff7fd0",
-		/* size */	0400,
-		/* amap */	AMAP_REVERSE_0_7,				// reverse address lines A0-A7
-		/* axor */	0,
-		/* dxor */	0,
-		/* width */	4,
-		/* shift */	0,
-		/* dmap */	DMAP_DEFAULT,
-		/* dand */	ZERO,
-		/* type */	sizeof(UINT8)
-	};
-	m_ether_a49 = prom_load(&pl_enet_a49, memregion("ether_a49")->base(), 1, 1);
+	m_madr_a91 = prom_load(&pl_madr_a91, memregion("madr_a91")->base());
+	m_ether_a41 = prom_load(&pl_enet_a41, memregion("ether_a41")->base());
+	m_ether_a42 = prom_load(&pl_enet_a42, memregion("ether_a42")->base());
+	m_ether_a49 = prom_load(&pl_enet_a49, memregion("ether_a49")->base());
 
 	save_item(NAME(m_task_mpc));
 	save_item(NAME(m_task_next2));
@@ -1096,14 +1101,7 @@ void alto2_cpu_device::device_start()
 // FIXME
 void alto2_cpu_device::device_reset()
 {
-	UINT8* raw;
 	soft_reset();
-	raw = m_ucode->direct().raw();
-	if (raw)
-		memcpy(raw, m_ucode_proms, sizeof(UINT32)*ALTO2_UCODE_RAM_BASE);
-	raw = m_const->direct().raw();
-	if (raw)
-		memcpy(raw, m_const_proms, sizeof(UINT16)*ALTO2_CONST_SIZE);
 }
 
 //-------------------------------------------------

@@ -224,9 +224,9 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
 	{
 		switch (spacenum) {
-		case AS_PROGRAM:
+		case AS_0:
 			return &m_ucode_config;
-		case AS_DATA:
+		case AS_1:
 			return &m_const_config;
 		default:
 			return NULL;
@@ -991,6 +991,16 @@ private:
 	 * @brief memory addressing PROM a65
 	 */
 	UINT8* m_madr_a65;
+
+	/**
+	 * @brief unused PROM a90
+	 */
+	UINT8* m_madr_a90;
+
+	/**
+	 * @brief unused PROM a91
+	 */
+	UINT8* m_madr_a91;
 
 	//! per task bus source function pointers, early (0) and late (1)
 	a2func m_bs[2][ALTO2_TASKS][ALTO2_BUSSRC];
