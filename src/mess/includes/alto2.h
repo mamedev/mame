@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "cpu/alto2/alto2.h"
-#include "machine/ram.h"
 
 class alto2_state : public driver_device
 {
@@ -38,8 +37,6 @@ public:
 
 	DECLARE_READ16_MEMBER(alto2_ram_r);
 	DECLARE_WRITE16_MEMBER(alto2_ram_w);
-	DECLARE_READ16_MEMBER(alto2_mmio_r);
-	DECLARE_WRITE16_MEMBER(alto2_mmio_w);
 	DECLARE_DRIVER_INIT(alto2);
 
 	virtual void palette_init();

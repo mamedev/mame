@@ -207,6 +207,10 @@ public:
 	// construction/destruction
 	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	//! driver interface to RAM
+	UINT16 read_ram(offs_t offset);
+	void write_ram(offs_t offset, UINT16 data);
+
 protected:
 	//! device-level override for start
 	virtual void device_start();
@@ -221,23 +225,10 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	//! device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
-	{
-		switch (spacenum) {
-		case AS_0:
-			return &m_ucode_config;
-		case AS_1:
-			return &m_const_config;
-		default:
-			return NULL;
-		}
-	}
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	//! device (P)ROMs
 	virtual const rom_entry *device_rom_region() const;
-	//! device_memory_interface overrides
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value);
-	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value);
 	//! device_state_interface overrides
 	void state_string_export(const device_state_entry &entry, astring &string);
 
@@ -245,6 +236,7 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
 private:
 #if	ALTO2_DEBUG
 	enum {
@@ -286,23 +278,16 @@ private:
 	void fatal(int level, const char *format, ...);
 
 	address_space_config m_ucode_config;
-	address_space_config m_const_config;
-
-	address_space *m_ucode;
-	address_space *m_const;
 
 	required_memory_region m_ucode_map;
-	required_memory_region m_const_map;
+
+	address_space *m_ucode;
+	UINT16* m_const;
 
 	UINT8* m_ucode_proms;
 	UINT8* m_const_proms;
 
 	int m_icount;
-
-	DECLARE_READ16_MEMBER ( alto2_ram_r );
-	DECLARE_WRITE16_MEMBER( alto2_ram_w );
-	DECLARE_READ16_MEMBER ( alto2_mmio_r );
-	DECLARE_WRITE16_MEMBER( alto2_mmio_w );
 
 	static const UINT8 m_ether_id = 0121;
 
