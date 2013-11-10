@@ -6903,6 +6903,7 @@ src/mess/drivers/elwro800.c svneol=native#text/plain
 src/mess/drivers/ep64.c svneol=native#text/plain
 src/mess/drivers/esq1.c svneol=native#text/plain
 src/mess/drivers/esq5505.c svneol=native#text/plain
+src/mess/drivers/esqasr.c svneol=native#text/plain
 src/mess/drivers/esqkt.c svneol=native#text/plain
 src/mess/drivers/esqmr.c svneol=native#text/plain
 src/mess/drivers/et3400.c svneol=native#text/plain

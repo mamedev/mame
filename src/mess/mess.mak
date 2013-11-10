@@ -1212,6 +1212,7 @@ $(MESSOBJ)/ensoniq.a:           \
 	$(MESS_DRIVERS)/esq5505.o   \
 	$(MESS_DRIVERS)/esqkt.o     \
 	$(MESS_DRIVERS)/esqmr.o     \
+	$(MESS_DRIVERS)/esqasr.o    \
 	$(MESS_MACHINE)/esqvfd.o    \
 	$(MESS_MACHINE)/esqpanel.o  \
 
