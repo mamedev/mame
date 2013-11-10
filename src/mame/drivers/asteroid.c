@@ -10,6 +10,11 @@
     Known bugs:
         * the ERROR message in Asteroids Deluxe self test is related to a pokey problem
 
+    Original bugs:
+        * Language ROMS for Lunar Lander are not dumped.  Attempting to use alternate
+          languages by changing through DIP menu will result in a game freeze, as the
+          original game would.
+
 Information from a Tech Tip:
 
 Asteroids Modification:

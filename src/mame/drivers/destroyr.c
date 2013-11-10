@@ -6,6 +6,7 @@ TODO:
 - discrete sound
 - accurate implementation of scanline counter as documented in schematics,
   generate irqs from there, and refresh rate 15750/262 (~60.1) instead of 60
+- missing language roms means DIP switches related to these do not function
 
 ***************************************************************************/
 
