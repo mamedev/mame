@@ -17,7 +17,7 @@
 #include <stdlib.h>
 
 
-#define MAX_FILES 100
+#define MAX_FILES 1000
 
 #ifndef MAX_FILENAME_LEN
 #define MAX_FILENAME_LEN 255
@@ -471,9 +471,9 @@ static int load_files(int i, int *found, const char *path)
 			{
 				UINT64 size = d->size;
 				while (size && (size & 1) == 0) size >>= 1;
-				if (size & ~1)
-					printf("%-23s %-23s ignored (not a ROM)\n",i ? "" : d_name,i ? d_name : "");
-				else
+				//if (size & ~1)
+				//	printf("%-23s %-23s ignored (not a ROM)\n",i ? "" : d_name,i ? d_name : "");
+				//else
 				{
 					strcpy(files[i][found[i]].name,d_name);
 					files[i][found[i]].size = d->size;
@@ -513,7 +513,7 @@ static int load_files(int i, int *found, const char *path)
 
 			size = zipent->uncompressed_length;
 			while (size && (size & 1) == 0) size >>= 1;
-			if (zipent->uncompressed_length == 0 || (size & ~1))
+			if (zipent->uncompressed_length == 0) // || (size & ~1))
 				printf("%-23s %-23s ignored (not a ROM)\n",
 					i ? "" : zipent->filename, i ? zipent->filename : "");
 			else

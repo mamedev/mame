@@ -46,14 +46,12 @@ Quickload: Load the program then press Y. There are 6 that work and
            6 that do nothing.
 
 ToDo:
-- Fix display of 8 round leds
 - Cassette
 
 Version V2.0
 ------------
 This used a terminal interface with a few non-standard control codes.
-The pushbuttons and LEDs appear to have been done away with. The list
-is the same as on the CD2650.
+The pushbuttons and LEDs appear to have been done away with.
 
 Commands (must be in uppercase):
 A    Examine memory; press C to alter memory
@@ -394,5 +392,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS        INIT     COMPANY    FULLNAME       FLAGS */
-COMP( 1984, ravens,  0,       0,       ravens,  ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
-COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1984, ravens,  0,       0,       ravens,  ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", GAME_NO_SOUND_HW )
+COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", GAME_NO_SOUND_HW )
