@@ -11,18 +11,26 @@
 
 /*
 
+	TODO:
+
+	- vendor specific SASI command 0c: 00 00 00 00 00 01 40 04 00 84 00
+
+*/
+
+/*
+
     Use the CHDMAN utility to create a 5MB image for ABC 850:
 
-    $ chdman createhd -o /path/to/ro202.chd -chs 321,4,17 -ss 512
-    $ chdman createhd -o /path/to/basf6185.chd -chs 440,6,32 -ss 256
+    $ chdman createhd -o ro202.chd -chs 321,4,17 -ss 512
+    $ chdman createhd -o basf6185.chd -chs 440,6,32 -ss 256
 
     or a 10MB image for ABC 852:
 
-    $ chdman createhd -o /path/to/nec5126.chd -chs 615,4,17 -ss 512
+    $ chdman createhd -o nec5126.chd -chs 615,4,17 -ss 512
 
     or a 20MB image for ABC 856:
 
-    $ chdman createhd -o /path/to/micr1325.chd -chs 1024,8,33 -ss 256
+    $ chdman createhd -o micr1325.chd -chs 1024,8,33 -ss 256
 
     Start the abc800 emulator with the ABC 850 attached on the ABC bus,
     with the new CHD and a UFD-DOS floppy mounted:
@@ -44,7 +52,7 @@
 
     You should now see the following text at the top of the screen:
 
-    DOS ??r UFD-DOS ver. 19
+    DOS ar UFD-DOS ver. 19
     DR_: motsvarar MF_:
 
     Enter "BYE" to get into the UFD-DOS command prompt.
@@ -198,7 +206,7 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::sasi_io_w )
 {
 	if (!state)
 	{
-		m_sasibus->scsi_data_w(m_sasi_data ^ 0xff);
+		m_sasibus->scsi_data_w(m_sasi_data);
 	}
 }
 
@@ -250,19 +258,19 @@ machine_config_constructor luxor_55_21056_device::device_mconfig_additions() con
 
 INPUT_PORTS_START( luxor_55_21056 )
 	PORT_START("S1")
-	PORT_DIPNAME( 0x3f, 0x2b, "Card Address" )
+	PORT_DIPNAME( 0x3f, 0x24, "Card Address" )
 	PORT_DIPSETTING(    0x20, "32" )
 	PORT_DIPSETTING(    0x21, "33" )
 	PORT_DIPSETTING(    0x22, "34" )
 	PORT_DIPSETTING(    0x23, "35" )
-	PORT_DIPSETTING(    0x24, "36" )
+	PORT_DIPSETTING(    0x24, "36 (ABC 850)" )
 	PORT_DIPSETTING(    0x25, "37" )
 	PORT_DIPSETTING(    0x26, "38" )
 	PORT_DIPSETTING(    0x27, "39" )
 	PORT_DIPSETTING(    0x28, "40" )
 	PORT_DIPSETTING(    0x29, "41" )
 	PORT_DIPSETTING(    0x2a, "42" )
-	PORT_DIPSETTING(    0x2b, "43 (ABC 850)" )
+	PORT_DIPSETTING(    0x2b, "43" )
 	PORT_DIPSETTING(    0x2c, "44" )
 	PORT_DIPSETTING(    0x2d, "45" )
 	PORT_DIPSETTING(    0x2e, "46" )
@@ -464,10 +472,10 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 	data |= m_rdy;
 
 	data |= (m_req || m_sasibus->scsi_req_r()) << 1;
-	data |= !m_sasibus->scsi_io_r() << 2;
+	data |= m_sasibus->scsi_io_r() << 2;
 	data |= m_sasibus->scsi_cd_r() << 3;
 	data |= m_sasibus->scsi_msg_r() << 4;
-	data |= m_sasibus->scsi_bsy_r() << 5;
+	data |= !m_sasibus->scsi_bsy_r() << 5;
 
 	return data ^ 0xff;
 }
@@ -534,7 +542,7 @@ WRITE8_MEMBER( luxor_55_21056_device::sasi_data_w )
 
 	if (!m_sasibus->scsi_io_r())
 	{
-		m_sasibus->scsi_data_w(m_sasi_data ^ 0xff);
+		m_sasibus->scsi_data_w(m_sasi_data);
 	}
 
 	m_req = !m_sasibus->scsi_req_r();
