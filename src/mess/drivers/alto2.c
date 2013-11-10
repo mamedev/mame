@@ -43,16 +43,19 @@ WRITE16_MEMBER( alto2_state::alto2_mmio_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( alto2_ucode_map, AS_PROGRAM, 32, alto2_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0,                    ALTO2_UCODE_RAM_BASE-1) AM_ROM
 	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE-1)     AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alto2_const_map, AS_DATA, 16, alto2_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0,                    ALTO2_CONST_SIZE-1)     AM_ROM
 ADDRESS_MAP_END
 
 /* main memory and memory mapped i/o in range ALTO2_IO_PAGE_BASE ... ALTO2_IO_PAGE_BASE + ALTO2_IO_PAGE_SIZE - 1 */
 static ADDRESS_MAP_START( alto2_ram_map, AS_IO, 16, alto2_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0,                    ALTO2_IO_PAGE_BASE - 1) AM_READWRITE(alto2_ram_r,  alto2_ram_w)
 	AM_RANGE(ALTO2_IO_PAGE_BASE,   0177777)                AM_READWRITE(alto2_mmio_r, alto2_mmio_w)
 ADDRESS_MAP_END
@@ -260,9 +263,9 @@ INPUT_PORTS_END
 /* ROM */
 ROM_START( alto2 )
 	// decoded micro code region
-	ROM_REGION( ALTO2_RAM_SIZE, "maincpu", 0 )
-	// 2 x 64K x 39 bit memory
-	ROM_REGION( 2*ALTO2_RAM_SIZE, "memory", 0 )
+	ROM_REGION( sizeof(UINT32)*ALTO2_UCODE_SIZE, "maincpu", 0 )
+	// decoded constant PROMs region
+	ROM_REGION( sizeof(UINT16)*ALTO2_CONST_SIZE, "const", 0 )
 ROM_END
 
 /* Palette Initialization */

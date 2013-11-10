@@ -235,7 +235,9 @@ protected:
 
 	//! device (P)ROMs
 	virtual const rom_entry *device_rom_region() const;
-
+	//! device_memory_interface overrides
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value);
+	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value);
 	//! device_state_interface overrides
 	void state_string_export(const device_state_entry &entry, astring &string);
 

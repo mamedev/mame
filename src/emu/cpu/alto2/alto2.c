@@ -64,12 +64,12 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_log_level(9),
 	m_log_newline(true),
 #endif
-	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 14, -2),
+	m_ucode_config("maincpu", ENDIANNESS_BIG, 32, 14, -2),
 	m_const_config("const", ENDIANNESS_BIG, 16, 8, -1),
 	m_ucode(0),
 	m_const(0),
-	m_ucode_map(*this, "ucode"),
-	m_const_map(*this, "const"),
+	m_ucode_map(*this, "^maincpu"),
+	m_const_map(*this, "^const"),
 	m_icount(0),
 	m_task_mpc(),
 	m_task_next2(),
@@ -152,15 +152,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 //-------------------------------------------------
 
 ROM_START( alto2_cpu )
-	// decoded micro code region
-	ROM_REGION( 16 * 02000, "ucode", 0 )
-
-	// decoded constant PROMs region
-	ROM_REGION( 4 * 00400, "const", 0 )
-
-	// 2 x 64K x 39 bit memory
-	ROM_REGION( 2*ALTO2_RAM_SIZE, "memory", 0 )
-
 	ROM_REGION( 16 * 02000, "ucode_proms", 0 )
 	ROM_LOAD( "55x.3",     0*02000, 0x400, CRC(de870d75) SHA1(2b98cc769d8302cb39948711424d987d94e4159b) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
 	ROM_LOAD( "64x.3",     1*02000, 0x400, CRC(51b444c0) SHA1(8756e51f7f3253a55d75886465beb7ee1be6e1c4) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
@@ -253,6 +244,83 @@ const rom_entry *alto2_cpu_device::device_rom_region() const
 {
 	return ROM_NAME( alto2_cpu );
 }
+
+//-------------------------------------------------
+// device_memory_interface overrides
+//-------------------------------------------------
+
+bool alto2_cpu_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
+{
+//	printf("%s: spacenum=%d offset=%#x size=%d\n", __FUNCTION__, int(spacenum), unsigned(offset), size);
+	switch (spacenum) {
+	case AS_0:
+		switch (size) {
+		case 1:
+			value = m_ucode_proms[offset];
+			return true;
+		case 2:
+			value = m_ucode_proms[offset+0] | (m_ucode_proms[offset+1] << 8);
+			return true;
+		case 4:
+			value = m_ucode_proms[offset+0] |
+					(m_ucode_proms[offset+1] << 8) |
+					(m_ucode_proms[offset+2] << 16) |
+					(m_ucode_proms[offset+3] << 24);
+			return true;
+		}
+		return false;
+	case AS_1:
+		switch (size) {
+		case 1:
+			value = m_const_proms[offset];
+			return true;
+		case 2:
+			value = m_const_proms[offset+0] | (m_ucode_proms[offset+1] << 8);
+			return true;
+		}
+		return false;
+	default:
+		return false;
+	}
+}
+
+bool alto2_cpu_device::memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value)
+{
+//	printf("%s: spacenum=%d offset=%#x size=%d\n", __FUNCTION__, int(spacenum), unsigned(offset), size);
+	switch (spacenum) {
+	case AS_0:
+		switch (size) {
+		case 1:
+			m_ucode_proms[offset] = value;
+			return true;
+		case 2:
+			m_ucode_proms[offset+0] = value;
+			m_ucode_proms[offset+1] = value >> 8;
+			return true;
+		case 4:
+			m_ucode_proms[offset+0] = value;
+			m_ucode_proms[offset+1] = value >> 8;
+			m_ucode_proms[offset+2] = value >> 16;
+			m_ucode_proms[offset+3] = value >> 24;
+			return true;
+		}
+		return false;
+	case AS_1:
+		switch (size) {
+		case 1:
+			m_const_proms[offset] = value;
+			return true;
+		case 2:
+			m_const_proms[offset+0] = value;
+			m_ucode_proms[offset+1] = value >> 8;
+			return true;
+		}
+		return false;
+	default:
+		return false;
+	}
+}
+
 
 /**
  * @brief list of microcode PROM loading options
@@ -861,27 +929,6 @@ void alto2_cpu_device::device_start()
 
 	m_ucode_proms = prom_load(ucode_prom_list, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
 	m_const_proms = prom_load(const_prom_list, memregion("const_proms")->base(), 1, 4);
-
-	for (offs_t offs = 0; offs < ALTO2_UCODE_RAM_BASE; offs++) {
-		UINT32 data = (m_ucode_proms[4*offs+0] << 0) | (m_ucode_proms[4*offs+1] << 8) |
-				 (m_ucode_proms[4*offs+2] << 16) | (m_ucode_proms[4*offs+3] << 24);
-		if (0 == offs % 8)
-			printf("%04x:", offs);
-		printf(" %08x",  data);
-		if (7 == offs % 8)
-			printf("\n");
-		m_ucode->write_dword(offs, data);
-	}
-	for (offs_t offs = 0; offs < ALTO2_CONST_SIZE; offs++) {
-		UINT32 data = (m_const_proms[2*offs+0] << 0) | (m_const_proms[2*offs+1] << 8);
-		if (0 == offs % 8)
-			printf("%04x:", offs);
-		printf(" %04x",  data);
-		if (7 == offs % 8)
-			printf("\n");
-		m_const->write_word(offs, data);
-	}
-
 	m_disp_a38 = prom_load(&pl_displ_a38, memregion("displ_a38")->base());
 	m_disp_a63 = prom_load(&pl_displ_a63, memregion("displ_a63")->base());
 	m_disp_a66 = prom_load(&pl_displ_a66, memregion("displ_a66")->base());
@@ -1112,6 +1159,24 @@ void alto2_cpu_device::device_start()
 // FIXME
 void alto2_cpu_device::device_reset()
 {
+	for (offs_t offs = 0; offs < ALTO2_UCODE_RAM_BASE; offs++) {
+		UINT32 data = (m_ucode_proms[4*offs+0] << 0) | (m_ucode_proms[4*offs+1] << 8) |
+				 (m_ucode_proms[4*offs+2] << 16) | (m_ucode_proms[4*offs+3] << 24);
+		if (0 == offs % 8)
+			printf("%04x:", offs);
+		printf(" %08x",  data);
+		if (7 == offs % 8)
+			printf("\n");
+	}
+	for (offs_t offs = 0; offs < ALTO2_CONST_SIZE; offs++) {
+		UINT32 data = (m_const_proms[2*offs+0] << 0) | (m_const_proms[2*offs+1] << 8);
+		if (0 == offs % 8)
+			printf("%04x:", offs);
+		printf(" %04x",  data);
+		if (7 == offs % 8)
+			printf("\n");
+	}
+
 	soft_reset();
 }
 
