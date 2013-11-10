@@ -16,7 +16,12 @@ isbc86 commands: BYTE WORD REAL EREAL ROMTEST. ROMTEST works, the others hang.
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "machine/terminal.h"
-
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/i8255.h"
+#include "machine/i8251.h"
+#include "machine/z80dart.h"
+#include "machine/serial.h"
 
 class isbc_state : public driver_device
 {
@@ -24,31 +29,22 @@ public:
 	isbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG)
+	m_terminal(*this, "terminal"),
+	m_uart8251(*this, "uart8251"),
+	m_uart8274(*this, "uart8274"),
+	m_pic_1(*this, "pic_1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER(isbc_terminal_status_r);
-	DECLARE_READ16_MEMBER(isbc_terminal_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT8 m_term_data;
-	virtual void machine_reset();
+	required_device<serial_terminal_device> m_terminal;
+	optional_device<i8251_device> m_uart8251;
+	optional_device<i8274_device> m_uart8274;
+	optional_device<pic8259_device> m_pic_1;
+
+	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
+	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
+	DECLARE_READ8_MEMBER(get_slave_ack);
 };
-
-
-
-READ16_MEMBER( isbc_state::isbc_terminal_status_r )
-{
-	return (m_term_data) ? 3 : 1;
-}
-
-READ16_MEMBER( isbc_state::isbc_terminal_r )
-{
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -66,10 +62,25 @@ static ADDRESS_MAP_START(isbc86_mem, AS_PROGRAM, 16, isbc_state)
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc86_io, AS_IO, 16, isbc_state)
+static ADDRESS_MAP_START(isbc_io, AS_IO, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00d8, 0x00d9) AM_READ(isbc_terminal_r) AM_DEVWRITE8(TERMINAL_TAG, generic_terminal_device, write, 0xff)
-	AM_RANGE(0x00da, 0x00db) AM_READ(isbc_terminal_status_r)
+	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8253_device, read, write, 0x00ff)
+	AM_RANGE(0x00d8, 0x00d9) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x00da, 0x00db) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
+	AM_RANGE(0x00dc, 0x00dd) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x00de, 0x00df) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_1", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
+	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
+	AM_RANGE(0x00d8, 0x00df) AM_DEVREADWRITE8("uart8274", i8274_device, cd_ba_r, cd_ba_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc286_mem, AS_PROGRAM, 16, isbc_state)
@@ -79,79 +90,188 @@ static ADDRESS_MAP_START(isbc286_mem, AS_PROGRAM, 16, isbc_state)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START(isbc2861_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xeffff) AM_RAM
+	AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(isbc2861_io, AS_IO, 16, isbc_state)
-	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( isbc )
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( isbc86_terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x01 ) // 300
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x20 ) // 8N2
+DEVICE_INPUT_DEFAULTS_END
 
-void isbc_state::machine_reset()
-{
-	m_term_data = 0;
-}
+static DEVICE_INPUT_DEFAULTS_START( isbc286_terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x00 ) // 8N1
+DEVICE_INPUT_DEFAULTS_END
 
-WRITE8_MEMBER( isbc_state::kbd_put )
+static const serial_terminal_interface terminal_intf =
 {
-	m_term_data = data;
-}
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(isbc_state, kbd_put)
+	DEVCB_NULL
 };
+
+static const struct pit8253_interface isbc86_pit_config =
+{
+	{
+		{
+			XTAL_22_1184MHz/18,
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir0_w)
+		}, {
+			XTAL_22_1184MHz/18,
+			DEVCB_NULL,
+			DEVCB_NULL
+		}, {
+			XTAL_22_1184MHz/18,
+			DEVCB_NULL,
+			DEVCB_DRIVER_LINE_MEMBER(isbc_state, isbc86_tmr2_w)
+		}
+	}
+};
+
+WRITE_LINE_MEMBER( isbc_state::isbc86_tmr2_w )
+{
+	m_uart8251->rxc_w(state);
+	m_uart8251->txc_w(state);
+}
+
+static const struct pit8253_interface isbc286_pit_config =
+{
+	{
+		{
+			XTAL_22_1184MHz/18,
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir0_w)
+		}, {
+			XTAL_22_1184MHz/18,
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE_MEMBER("uart8274", z80dart_device, rxtxcb_w)
+		}, {
+			XTAL_22_1184MHz/18,
+			DEVCB_NULL,
+			DEVCB_DRIVER_LINE_MEMBER(isbc_state, isbc286_tmr2_w)
+		}
+	}
+};
+
+WRITE_LINE_MEMBER( isbc_state::isbc286_tmr2_w )
+{
+	m_uart8274->rxca_w(state);
+	m_uart8274->txca_w(state);
+}
+
+static const i8255_interface isbc_ppi_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static I8274_INTERFACE(isbc_uart8274_interface)
+{
+	0, 0, 0, 0,
+
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DEVICE_LINE_MEMBER("terminal", serial_terminal_device, tx_r),
+	DEVCB_DEVICE_LINE_MEMBER("terminal", serial_terminal_device, rx_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir6_w)
+};
+
+static const i8251_interface isbc_uart8251_interface =
+{
+	DEVCB_DEVICE_LINE_MEMBER("terminal", serial_terminal_device, tx_r),
+	DEVCB_DEVICE_LINE_MEMBER("terminal", serial_terminal_device, rx_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir6_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("uart8274", z80dart_device, dcda_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("uart8274", z80dart_device, ctsa_w)
+};
+
+READ8_MEMBER( isbc_state::get_slave_ack )
+{
+	if (offset == 7)
+		return m_pic_1->inta_r();
+
+	return 0x00;
+}
 
 static MACHINE_CONFIG_START( isbc86, isbc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_9_8304MHz)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(isbc86_mem)
-	MCFG_CPU_IO_MAP(isbc86_io)
+	MCFG_CPU_IO_MAP(isbc_io)
+	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
+	MCFG_PIT8253_ADD("pit", isbc86_pit_config)
+	MCFG_I8255A_ADD("ppi", isbc_ppi_interface)
+	MCFG_I8251_ADD("uart8251", isbc_uart8251_interface)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD("terminal", terminal_intf, 300)
+	MCFG_DEVICE_INPUT_DEFAULTS(isbc86_terminal)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( rpc86, isbc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_9_8304MHz)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(rpc86_mem)
 	MCFG_CPU_IO_MAP(rpc86_io)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD("terminal", terminal_intf, 300)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( isbc286, isbc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_9_8304MHz)
+	MCFG_CPU_ADD("maincpu", I80286, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
 	MCFG_CPU_IO_MAP(isbc286_io)
+	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, READ8(isbc_state, get_slave_ack))
+	MCFG_PIC8259_ADD("pic_1", DEVWRITELINE("pic_0", pic8259_device, ir7_w), GND, NULL)
+	MCFG_PIT8254_ADD("pit", isbc286_pit_config)
+	MCFG_I8255A_ADD("ppi", isbc_ppi_interface)
+	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, isbc_uart8274_interface)
+	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, NULL)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD("terminal", terminal_intf, 9600)
+	MCFG_DEVICE_INPUT_DEFAULTS(isbc286_terminal)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( isbc2861, isbc_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_9_8304MHz)
+static MACHINE_CONFIG_DERIVED( isbc2861, isbc286 )
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(isbc2861_mem)
-	MCFG_CPU_IO_MAP(isbc2861_io)
-
-	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -191,6 +311,6 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
 COMP( 19??, rpc86,    0,       0,    rpc86,      isbc, driver_device,    0,   "Intel",   "RPC 86",GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 19??, isbc86,   0,       0,    isbc86,     isbc, driver_device,    0,   "Intel",   "iSBC 86/12A",GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1978, isbc86,   0,       0,    isbc86,     isbc, driver_device,    0,   "Intel",   "iSBC 86/12A",GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 19??, isbc286,  0,       0,    isbc286,    isbc, driver_device,    0,   "Intel",   "iSBC 286",GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 19??, isbc2861, 0,       0,    isbc2861,   isbc, driver_device,    0,   "Intel",   "iSBC 286-10",GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, isbc2861, 0,       0,    isbc2861,    isbc, driver_device,    0,   "Intel",   "iSBC 286-10",GAME_NOT_WORKING | GAME_NO_SOUND)
