@@ -37,7 +37,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900l.h"
-#include "machine/ti990.h"
+#include "machine/ti99/ti990.h"
 #if VIDEO_911
 #include "video/911_vdt.h"
 #include "sound/beep.h"
@@ -45,7 +45,7 @@ TODO:
 #include "video/733_asr.h"
 #endif
 #include "imagedev/flopdrv.h"
-#include "machine/990_dk.h"
+#include "machine/ti99/990_dk.h"
 
 
 class ti990_4_state : public driver_device

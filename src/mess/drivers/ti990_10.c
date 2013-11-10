@@ -71,9 +71,9 @@ TODO :
 
 #include "cpu/tms9900/tms9900l.h"
 #include "sound/beep.h"
-#include "machine/ti990.h"
-#include "machine/990_hd.h"
-#include "machine/990_tap.h"
+#include "machine/ti99/ti990.h"
+#include "machine/ti99/990_hd.h"
+#include "machine/ti99/990_tap.h"
 #include "video/911_vdt.h"
 
 

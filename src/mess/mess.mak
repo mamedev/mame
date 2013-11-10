@@ -808,6 +808,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/sed1200.o   \
 	$(MESS_MACHINE)/serial.o    \
 	$(MESS_MACHINE)/smartmed.o  \
+	$(MESS_MACHINE)/strata.o    \
 	$(MESS_MACHINE)/smc92x4.o   \
 	$(MESS_MACHINE)/sonydriv.o  \
 	$(MESS_MACHINE)/teleprinter.o   \
@@ -1932,9 +1933,10 @@ $(MESSOBJ)/ti.a:                \
 	$(MESS_VIDEO)/t6a04.o       \
 	$(MESS_MACHINE)/ti85.o      \
 	$(MESS_DRIVERS)/ti89.o      \
-	$(MESS_MACHINE)/990_hd.o    \
-	$(MESS_MACHINE)/990_tap.o   \
-	$(MESS_MACHINE)/ti990.o     \
+	$(MESS_MACHINE)/ti99/990_dk.o    \
+	$(MESS_MACHINE)/ti99/990_hd.o    \
+	$(MESS_MACHINE)/ti99/990_tap.o   \
+	$(MESS_MACHINE)/ti99/ti990.o     \
 	$(MESS_MACHINE)/ti99/datamux.o  \
 	$(MESS_MACHINE)/ti99/videowrp.o \
 	$(MESS_MACHINE)/ti99/grom.o \
@@ -1962,17 +1964,15 @@ $(MESSOBJ)/ti.a:                \
 	$(MESS_MACHINE)/ti99/genboard.o \
 	$(MESS_MACHINE)/ti99/memex.o    \
 	$(MESS_MACHINE)/ti99/horizon.o  \
-	$(MESS_MACHINE)/strata.o    \
-	$(MESS_MACHINE)/990_dk.o    \
 	$(MESS_DRIVERS)/ti990_4.o   \
 	$(MESS_DRIVERS)/ti99_4x.o   \
 	$(MESS_DRIVERS)/ti99_4p.o   \
 	$(MESS_DRIVERS)/ti99_8.o    \
 	$(MESS_DRIVERS)/geneve.o    \
 	$(MESS_DRIVERS)/tm990189.o  \
+	$(MESS_DRIVERS)/ti990_10.o  \
 	$(MESS_VIDEO)/911_vdt.o     \
 	$(MESS_VIDEO)/733_asr.o     \
-	$(MESS_DRIVERS)/ti990_10.o  \
 	$(MESS_DRIVERS)/ti99_2.o    \
 	$(MESS_VIDEO)/avigo.o       \
 	$(MESS_DRIVERS)/avigo.o     \
