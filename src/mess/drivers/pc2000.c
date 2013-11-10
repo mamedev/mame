@@ -604,6 +604,30 @@ ROM_START( pc2000 )
 	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
+ROM_START( gl2000 )
+	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_LOAD( "lh532hez_9416_d.bin", 0x000000, 0x040000, CRC(532f219e) SHA1(4044f0cf098087af4cc9d1b2a80c3c9ec06f154e))
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+ROM_END
+
+ROM_START( gl2000p )
+	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_LOAD( "27-5615-00_9534_d.bin", 0x000000, 0x040000, CRC(481c1000) SHA1(da6f60e5bb25145ec5239310296bedaabeeaee28))
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+ROM_END
+
+ROM_START( gln )
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD( "27-5308-00_9524_d.bin", 0x000000, 0x080000, CRC(d1b994ee) SHA1(b5cf0810df0676712e4f30e279cc46c19b4277dd))
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+ROM_END
+
 ROM_START( misterx )
 	ROM_REGION( 0x20000, "bios", 0 )
 	ROM_LOAD( "27-00882-001.bin", 0x000000, 0x020000, CRC(30e0dc94) SHA1(2f4675746a41399b3d9e3e8001a9b4a0dcc5b620))
@@ -616,3 +640,6 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1988, misterx, 0,       0,    misterx,    pc1000, driver_device,   0,  "Video Technology / Yeno",     "MisterX",      GAME_NOT_WORKING)
 COMP( 1993, pc2000,  0,       0,    pc2000,     pc2000, driver_device,   0,  "Video Technology",   "PreComputer 2000",      GAME_NOT_WORKING)
+COMP( 1993, gl2000,  0,       0,    pc2000,     pc2000, driver_device,   0,  "Video Technology",   "Genius Leader 2000",      GAME_NOT_WORKING)
+COMP( 1993, gl2000p,  gl2000,       0,    pc2000,     pc2000, driver_device,   0,  "Video Technology",   "Genius Leader 2000 Plus",      GAME_NOT_WORKING)
+COMP( 199?, gln,  0,       0,    pc2000,     pc2000, driver_device,   0,  "Video Technology",   "Genius Leader Notebook",      GAME_NOT_WORKING)
