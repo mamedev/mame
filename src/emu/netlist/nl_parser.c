@@ -60,7 +60,7 @@ void netlist_parser::netdev_param()
 void netlist_parser::netdev_const(const astring &dev_name)
 {
 	astring name;
-	net_device_t *dev;
+	netlist_device_t *dev;
 	astring paramfq;
 	double val;
 
@@ -80,7 +80,7 @@ void netlist_parser::netdev_const(const astring &dev_name)
 void netlist_parser::netdev_device(const astring &dev_type)
 {
 	astring devname;
-	net_device_t *dev;
+	netlist_device_t *dev;
 	int cnt;
 
 	skipws();
@@ -96,12 +96,12 @@ void netlist_parser::netdev_device(const astring &dev_type)
 		skipws();
 		astring output_name = getname2(',', ')');
 		NL_VERBOSE_OUT(("Parser: ID: %s %s\n", output_name.cstr(), dev->m_inputs.item(cnt)->cstr()));
-		m_setup.register_link(*dev->m_inputs.item(cnt), output_name);
+		m_setup.register_link(*dev->m_terminals.item(cnt), output_name);
 		skipws();
 		cnt++;
 	}
-	if (cnt != dev->m_inputs.count() && !dev->variable_input_count())
-		fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), dev->m_inputs.count(), cnt);
+	if (cnt != dev->m_terminals.count() && !dev->variable_input_count())
+		fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), dev->m_terminals.count(), cnt);
 	if (dev->variable_input_count())
 	{
 		NL_VERBOSE_OUT(("variable inputs %s: %d\n", dev->name().cstr(), cnt));

@@ -48,7 +48,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 // FIXME: Clean this up
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(netdev_analog_callback);
+//class NETLIB_NAME(analog_callback);
 
 // ----------------------------------------------------------------------------------------
 // netlist_setup_t
@@ -58,28 +58,28 @@ class netlist_setup_t
 {
 public:
 
-	typedef tagmap_t<net_device_t *, 393> tagmap_devices_t;
+	typedef tagmap_t<netlist_device_t *, 393> tagmap_devices_t;
 	typedef tagmap_t<const astring *, 393> tagmap_astring_t;
-	typedef tagmap_t<net_param_t *, 393> tagmap_param_t;
-	typedef tagmap_t<net_terminal_t *, 393> tagmap_terminal_t;
+	typedef tagmap_t<netlist_param_t *, 393> tagmap_param_t;
+	typedef tagmap_t<netlist_terminal_t *, 393> tagmap_terminal_t;
 
 	netlist_setup_t(netlist_base_t &netlist);
 	~netlist_setup_t();
 
 	netlist_base_t &netlist() { return m_netlist; }
 
-	net_device_t *register_dev(net_device_t *dev);
+	netlist_device_t *register_dev(netlist_device_t *dev);
 	void remove_dev(const astring &name);
 
-	void register_output(netlist_core_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, net_output_t &out);
-	void register_input(net_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, net_input_t &inp, net_input_t::net_input_state type);
+	void register_output(netlist_core_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, netlist_output_t &out);
+	void register_input(netlist_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, netlist_input_t &inp, netlist_input_t::net_input_state type);
 	void register_alias(const astring &alias, const astring &out);
-	void register_param(const astring &sname, net_param_t *param);
+	void register_param(const astring &sname, netlist_param_t *param);
 
 	void register_link(const astring &sin, const astring &sout);
 
-	net_output_t &find_output(const astring &outname_in);
-	net_param_t &find_param(const astring &param_in);
+	netlist_output_t &find_output(const astring &outname_in);
+	netlist_param_t &find_param(const astring &param_in);
 
 	void register_callback(const astring &devname, netlist_output_delegate delegate);
 
@@ -105,7 +105,7 @@ private:
 	tagmap_param_t  m_params;
 	tagmap_astring_t  m_links;
 
-	net_output_t *find_output_exact(const astring &outname_in);
+	netlist_output_t *find_output_exact(const astring &outname_in);
 	const astring &resolve_alias(const astring &name) const;
 };
 

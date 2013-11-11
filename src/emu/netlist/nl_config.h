@@ -16,8 +16,6 @@
 //  SETUP
 //============================================================
 
-#define USE_LINKED_LIST         (1)
-
 #define USE_DELEGATES           (0)
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc
@@ -28,8 +26,6 @@
 
 // Next if enabled adds 20% performance ... but is not guaranteed to be absolutely timing correct.
 #define USE_DEACTIVE_DEVICE     (0)
-
-#define OUTPUT_MAX_CONNECTIONS  (48)
 
 // Use nano-second resolution - Sufficient for now
 #define NETLIST_INTERNAL_RES        (U64(1000000000))

@@ -27,11 +27,11 @@
 // ----------------------------------------------------------------------------------------
 
 template <int _numdev>
-class net_signal_base_t : public net_device_t
+class net_signal_base_t : public netlist_device_t
 {
 public:
 	net_signal_base_t()
-	: net_device_t(), m_active(1) { }
+	: netlist_device_t(), m_active(1) { }
 
 	ATTR_COLD void start()
 	{
@@ -40,7 +40,7 @@ public:
 		register_output("Q", m_Q);
 		for (int i=0; i < _numdev; i++)
 		{
-			register_input(sIN[i], m_i[i], net_input_t::INP_STATE_ACTIVE);
+			register_input(sIN[i], m_i[i], netlist_input_t::INP_STATE_ACTIVE);
 		}
 		m_Q.initial(1);
 	}
@@ -67,18 +67,18 @@ public:
 #endif
 
 public:
-	ttl_input_t m_i[_numdev];
-	ttl_output_t m_Q;
+	netlist_ttl_input_t m_i[_numdev];
+	netlist_ttl_output_t m_Q;
 	INT8 m_active;
 };
 
 
 template <int _numdev, int _check, int _invert>
-class net_signal_t : public net_device_t
+class net_signal_t : public netlist_device_t
 {
 public:
 	net_signal_t()
-	: net_device_t(), m_active(1)
+	: netlist_device_t(), m_active(1)
 	{
 		m_Q.initial(1);
 	}
@@ -90,7 +90,7 @@ public:
 		register_output("Q", m_Q);
 		for (int i=0; i < _numdev; i++)
 		{
-			register_input(sIN[i], m_i[i], net_input_t::INP_STATE_ACTIVE);
+			register_input(sIN[i], m_i[i], netlist_input_t::INP_STATE_ACTIVE);
 		}
 	}
 
@@ -140,18 +140,18 @@ public:
 	}
 
 public:
-	ttl_input_t m_i[_numdev];
-	ttl_output_t m_Q;
+	netlist_ttl_input_t m_i[_numdev];
+	netlist_ttl_output_t m_Q;
 	INT8 m_active;
 };
 
 #if 1
 template <int _check, int _invert>
-class xx_net_signal_t: public net_device_t
+class xx_net_signal_t: public netlist_device_t
 {
 public:
 	xx_net_signal_t()
-	: net_device_t(), m_active(1)
+	: netlist_device_t(), m_active(1)
 	{
 		m_Q.initial(1);
 	}
@@ -163,7 +163,7 @@ public:
 		register_output("Q", m_Q);
 		for (int i=0; i < 2; i++)
 		{
-			register_input(sIN[i], m_i[i], net_input_t::INP_STATE_ACTIVE);
+			register_input(sIN[i], m_i[i], netlist_input_t::INP_STATE_ACTIVE);
 		}
 	}
 
@@ -212,8 +212,8 @@ public:
 	}
 
 public:
-	ttl_input_t m_i[2];
-	ttl_output_t m_Q;
+	netlist_ttl_input_t m_i[2];
+	netlist_ttl_output_t m_Q;
 	INT8 m_active;
 
 };
@@ -223,10 +223,10 @@ public:
 #if 0
 
 template <UINT8 _check, UINT8 _invert>
-class net_signal_t<3, _check, _invert> : public net_device_t
+class net_signal_t<3, _check, _invert> : public netlist_device_t
 {
 public:
-	net_signal_t() : net_device_t(), m_active(1) { }
+	net_signal_t() : netlist_device_t(), m_active(1) { }
 
 	ATTR_COLD void start()
 	{
@@ -235,7 +235,7 @@ public:
 		register_output("Q", m_Q);
 		for (int i=0; i < 3; i++)
 		{
-			register_input(sIN[i], m_i[i], net_input_t::INP_STATE_ACTIVE);
+			register_input(sIN[i], m_i[i], netlist_input_t::INP_STATE_ACTIVE);
 		}
 		m_Q.initial(1);
 	}
@@ -275,8 +275,8 @@ public:
 		OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
 	}
 public:
-	ttl_input_t m_i[3];
-	ttl_output_t m_Q;
+	netlist_ttl_input_t m_i[3];
+	netlist_ttl_output_t m_Q;
 	INT8 m_active;
 
 };

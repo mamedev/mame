@@ -515,9 +515,9 @@ public:
 	required_device<dac_device> m_dac; /* just to have a sound device */
 
 	// sub devices
-	netlist_mame_device::required_output<logic_output_t> m_srst;
-	netlist_mame_device::required_output<analog_output_t> m_p_V0;
-	netlist_mame_device::required_output<analog_output_t> m_p_V1;
+	netlist_mame_device::required_output<netlist_logic_output_t> m_srst;
+	netlist_mame_device::required_output<netlist_analog_output_t> m_p_V0;
+	netlist_mame_device::required_output<netlist_analog_output_t> m_p_V1;
 	netlist_mame_device::required_param m_sw1a;
 	netlist_mame_device::required_param m_sw1b;
 	netlist_mame_device::required_param m_p_R0;
