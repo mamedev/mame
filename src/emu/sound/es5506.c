@@ -84,8 +84,6 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 #include "emu.h"
 #include "es5506.h"
-#include "devlegcy.h"
-
 
 
 /**********************************************************************************************
@@ -96,7 +94,6 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 #define LOG_COMMANDS            0
 #define RAINE_CHECK             0
-#define MAKE_WAVS               0
 
 #if MAKE_WAVS
 #include "wavwrite.h"
@@ -130,97 +127,329 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 #define CONTROL_STOPMASK        (CONTROL_STOP1 | CONTROL_STOP0)
 
 
-
-/**********************************************************************************************
-
-     INTERNAL DATA STRUCTURES
-
-***********************************************************************************************/
-
-/* struct describing a single playing voice */
-struct es5506_voice
+es550x_device::es550x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_sample_rate(0),
+		m_write_latch(0),
+		m_read_latch(0),
+		m_master_clock(0),
+		m_current_page(0),
+		m_active_voices(0),
+		m_mode(0),
+		m_wst(0),
+		m_wend(0),
+		m_lrend(0),
+		m_irqv(0),
+		m_scratch(NULL),
+		m_ulaw_lookup(NULL),
+		m_volume_lookup(NULL),
+		#if MAKE_WAVS
+		m_wavraw(NULL),
+		#endif
+		m_eslog(NULL)
 {
-	/* external state */
-	UINT32      control;                /* control register */
-	UINT32      freqcount;              /* frequency count register */
-	UINT32      start;                  /* start register */
-	UINT32      lvol;                   /* left volume register */
-	UINT32      end;                    /* end register */
-	UINT32      lvramp;                 /* left volume ramp register */
-	UINT32      accum;                  /* accumulator register */
-	UINT32      rvol;                   /* right volume register */
-	UINT32      rvramp;                 /* right volume ramp register */
-	UINT32      ecount;                 /* envelope count register */
-	UINT32      k2;                     /* k2 register */
-	UINT32      k2ramp;                 /* k2 ramp register */
-	UINT32      k1;                     /* k1 register */
-	UINT32      k1ramp;                 /* k1 ramp register */
-	INT32       o4n1;                   /* filter storage O4(n-1) */
-	INT32       o3n1;                   /* filter storage O3(n-1) */
-	INT32       o3n2;                   /* filter storage O3(n-2) */
-	INT32       o2n1;                   /* filter storage O2(n-1) */
-	INT32       o2n2;                   /* filter storage O2(n-2) */
-	INT32       o1n1;                   /* filter storage O1(n-1) */
-	UINT32      exbank;                 /* external address bank */
-
-	/* internal state */
-	UINT8       index;                  /* index of this voice */
-	UINT8       filtcount;              /* filter count */
-	UINT32      accum_mask;
-};
-
-struct es5506_state
-{
-	sound_stream *stream;               /* which stream are we using */
-	int         sample_rate;            /* current sample rate */
-	UINT16 *    region_base[4];         /* pointer to the base of the region */
-	UINT32      write_latch;            /* currently accumulated data for write */
-	UINT32      read_latch;             /* currently accumulated data for read */
-	UINT32      master_clock;           /* master clock frequency */
-	devcb_resolved_write_line irq_callback;   /* IRQ callback */
-	devcb_resolved_read16     port_read;       /* input port read */
-
-	UINT8       current_page;           /* current register page */
-	UINT8       active_voices;          /* number of active voices */
-	UINT8       mode;                   /* MODE register */
-	UINT8       wst;                    /* W_ST register */
-	UINT8       wend;                   /* W_END register */
-	UINT8       lrend;                  /* LR_END register */
-	UINT8       irqv;                   /* IRQV register */
-
-	es5506_voice voice[32];             /* the 32 voices */
-
-	INT32 *     scratch;
-
-	INT16 *     ulaw_lookup;
-	UINT16 *    volume_lookup;
-	device_t *device;
-
-	int         channels;               /* the number of output stereo channels: 1..4 for 5505, 1..6 for 5506 */
-
-#if MAKE_WAVS
-	void *      wavraw;                 /* raw waveform */
-#endif
-};
-
-
-INLINE es5506_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == ES5505 || device->type() == ES5506);
-	return (es5506_state *)downcast<es5506_device *>(device)->token();
+	for (int i = 0; i < 4; i++)
+	{
+		m_region_base[i] = NULL;
+	}
 }
 
+const device_type ES5506 = &device_creator<es5506_device>;
 
+es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: es550x_device(mconfig, ES5506, "ES5506", tag, owner, clock, "es5506", __FILE__)
+{
+}
 
-/**********************************************************************************************
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-     GLOBAL VARIABLES
+void es550x_device::device_config_complete()
+{
+}
 
-***********************************************************************************************/
+void es5506_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const es5506_interface *intf = reinterpret_cast<const es5506_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<es5506_interface *>(this) = *intf;
 
-static FILE *eslog;
+	// or initialize to defaults if none provided
+	else
+	{
+		m_region0 = "";
+		m_region1 = "";
+		m_region2 = "";
+		m_region3 = "";
+		m_channels = 0;
+		memset(&m_irq_callback, 0, sizeof(m_irq_callback));
+		memset(&m_read_port, 0, sizeof(m_read_port));
+	}
+}
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+void es550x_device::device_start()
+{
+}
+
+void es5506_device::device_start()
+{
+	int j;
+	UINT32 accum_mask;
+	int channels = 1;  /* 1 channel by default, for backward compatibility */
+
+	/* only override the number of channels if the value is in the valid range 1 .. 6 */
+	if (1 <= m_channels && m_channels <= 6)
+		channels = m_channels;
+
+	/* debugging */
+	if (LOG_COMMANDS && !m_eslog)
+		m_eslog = fopen("es.log", "w");
+
+	/* create the stream */
+	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32), this);
+
+	/* initialize the regions */
+	m_region_base[0] = m_region0 ? (UINT16 *)machine().root_device().memregion(m_region0)->base() : NULL;
+	m_region_base[1] = m_region1 ? (UINT16 *)machine().root_device().memregion(m_region1)->base() : NULL;
+	m_region_base[2] = m_region2 ? (UINT16 *)machine().root_device().memregion(m_region2)->base() : NULL;
+	m_region_base[3] = m_region3 ? (UINT16 *)machine().root_device().memregion(m_region3)->base() : NULL;
+
+	/* initialize the rest of the structure */
+	m_master_clock = clock();
+	m_irq_callback_func.resolve(m_irq_callback, *this);
+	m_port_read_func.resolve(m_read_port, *this);
+	m_irqv = 0x80;
+	m_channels = channels;
+
+	/* compute the tables */
+	compute_tables();
+
+	/* init the voices */
+	accum_mask = 0xffffffff;
+	for (j = 0; j < 32; j++)
+	{
+		m_voice[j].index = j;
+		m_voice[j].control = CONTROL_STOPMASK;
+		m_voice[j].lvol = 0xffff;
+		m_voice[j].rvol = 0xffff;
+		m_voice[j].exbank = 0;
+		m_voice[j].accum_mask = accum_mask;
+	}
+
+	/* allocate memory */
+	m_scratch = auto_alloc_array_clear(machine(), INT32, 2 * MAX_SAMPLE_CHUNK);
+
+	/* register save */
+	save_item(NAME(m_sample_rate));
+	save_item(NAME(m_write_latch));
+	save_item(NAME(m_read_latch));
+
+	save_item(NAME(m_current_page));
+	save_item(NAME(m_active_voices));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_wst));
+	save_item(NAME(m_wend));
+	save_item(NAME(m_lrend));
+	save_item(NAME(m_irqv));
+
+	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
+
+	for (j = 0; j < 32; j++)
+	{
+		save_item(NAME(m_voice[j].control), j);
+		save_item(NAME(m_voice[j].freqcount), j);
+		save_item(NAME(m_voice[j].start), j);
+		save_item(NAME(m_voice[j].lvol), j);
+		save_item(NAME(m_voice[j].end), j);
+		save_item(NAME(m_voice[j].lvramp), j);
+		save_item(NAME(m_voice[j].accum), j);
+		save_item(NAME(m_voice[j].rvol), j);
+		save_item(NAME(m_voice[j].rvramp), j);
+		save_item(NAME(m_voice[j].ecount), j);
+		save_item(NAME(m_voice[j].k2), j);
+		save_item(NAME(m_voice[j].k2ramp), j);
+		save_item(NAME(m_voice[j].k1), j);
+		save_item(NAME(m_voice[j].k1ramp), j);
+		save_item(NAME(m_voice[j].o4n1), j);
+		save_item(NAME(m_voice[j].o3n1), j);
+		save_item(NAME(m_voice[j].o3n2), j);
+		save_item(NAME(m_voice[j].o2n1), j);
+		save_item(NAME(m_voice[j].o2n2), j);
+		save_item(NAME(m_voice[j].o1n1), j);
+		save_item(NAME(m_voice[j].exbank), j);
+		save_item(NAME(m_voice[j].filtcount), j);
+	}
+
+	/* success */
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void es550x_device::device_reset()
+{
+}
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void es550x_device::device_stop()
+{
+	/* debugging */
+	if (LOG_COMMANDS && m_eslog)
+	{
+		fclose(m_eslog);
+		m_eslog = NULL;
+	}
+
+	#if MAKE_WAVS
+	{
+		int i;
+
+		for (i = 0; i < MAX_ES5506; i++)
+		{
+			if (es5506[i].m_wavraw)
+				wav_close(es5506[i].m_wavraw);
+		}
+	}
+	#endif
+}
+
+const device_type ES5505 = &device_creator<es5505_device>;
+
+es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: es550x_device(mconfig, ES5505, "ES5505", tag, owner, clock, "es5505", __FILE__)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void es5505_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const es5505_interface *intf = reinterpret_cast<const es5505_interface *>(static_config());
+	if (intf != NULL)
+	*static_cast<es5505_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		m_es5505_region0 = "";
+		m_es5505_region1 = "";
+		m_es5505_channels = 0;
+		memset(&m_es5505_irq_callback, 0, sizeof(m_es5505_irq_callback));
+		memset(&m_es5505_read_port, 0, sizeof(m_es5505_read_port));
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void es5505_device::device_start()
+{
+	int j;
+	UINT32 accum_mask;
+	int channels = 1;  /* 1 channel by default, for backward compatibility */
+
+	/* only override the number of channels if the value is in the valid range 1 .. 4 */
+	if (1 <= m_es5505_channels && m_es5505_channels <= 4)
+		channels = m_es5505_channels;
+
+	/* debugging */
+	if (LOG_COMMANDS && !m_eslog)
+		m_eslog = fopen("es.log", "w");
+
+	/* create the stream */
+	m_stream = machine().sound().stream_alloc(*this, 0, 2 * channels, clock() / (16*32), this);
+
+	/* initialize the regions */
+	m_region_base[0] = m_es5505_region0 ? (UINT16 *)machine().root_device().memregion(m_es5505_region0)->base() : NULL;
+	m_region_base[1] = m_es5505_region1 ? (UINT16 *)machine().root_device().memregion(m_es5505_region1)->base() : NULL;
+	
+	/* initialize the rest of the structure */
+	m_master_clock = clock();
+	m_irq_callback_func.resolve(m_es5505_irq_callback, *this);
+	m_port_read_func.resolve(m_es5505_read_port, *this);
+	m_irqv = 0x80;
+	m_es5505_channels = channels;
+
+	/* compute the tables */
+	compute_tables();
+
+	/* init the voices */
+	accum_mask = 0x7fffffff;
+	for (j = 0; j < 32; j++)
+	{
+		m_voice[j].index = j;
+		m_voice[j].control = CONTROL_STOPMASK;
+		m_voice[j].lvol = 0xffff;
+		m_voice[j].rvol = 0xffff;
+		m_voice[j].exbank = 0;
+		m_voice[j].accum_mask = accum_mask;
+	}
+
+	/* allocate memory */
+	m_scratch = auto_alloc_array_clear(machine(), INT32, 2 * MAX_SAMPLE_CHUNK);
+
+	/* register save */
+	save_item(NAME(m_sample_rate));
+	save_item(NAME(m_write_latch));
+	save_item(NAME(m_read_latch));
+
+	save_item(NAME(m_current_page));
+	save_item(NAME(m_active_voices));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_wst));
+	save_item(NAME(m_wend));
+	save_item(NAME(m_lrend));
+	save_item(NAME(m_irqv));
+
+	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
+
+	for (j = 0; j < 32; j++)
+	{
+		save_item(NAME(m_voice[j].control), j);
+		save_item(NAME(m_voice[j].freqcount), j);
+		save_item(NAME(m_voice[j].start), j);
+		save_item(NAME(m_voice[j].lvol), j);
+		save_item(NAME(m_voice[j].end), j);
+		save_item(NAME(m_voice[j].lvramp), j);
+		save_item(NAME(m_voice[j].accum), j);
+		save_item(NAME(m_voice[j].rvol), j);
+		save_item(NAME(m_voice[j].rvramp), j);
+		save_item(NAME(m_voice[j].ecount), j);
+		save_item(NAME(m_voice[j].k2), j);
+		save_item(NAME(m_voice[j].k2ramp), j);
+		save_item(NAME(m_voice[j].k1), j);
+		save_item(NAME(m_voice[j].k1ramp), j);
+		save_item(NAME(m_voice[j].o4n1), j);
+		save_item(NAME(m_voice[j].o3n1), j);
+		save_item(NAME(m_voice[j].o3n2), j);
+		save_item(NAME(m_voice[j].o2n1), j);
+		save_item(NAME(m_voice[j].o2n2), j);
+		save_item(NAME(m_voice[j].o1n1), j);
+		save_item(NAME(m_voice[j].exbank), j);
+		save_item(NAME(m_voice[j].filtcount), j);
+	}
+
+	/* success */
+}
 
 
 /**********************************************************************************************
@@ -229,14 +458,15 @@ static FILE *eslog;
 
 ***********************************************************************************************/
 
-static void update_irq_state(es5506_state *chip)
+
+void es550x_device::update_irq_state()
 {
 	/* ES5505/6 irq line has been set high - inform the host */
-	if (!chip->irq_callback.isnull())
-		chip->irq_callback(1); /* IRQB set high */
+	if (!m_irq_callback_func.isnull())
+		m_irq_callback_func(1); /* IRQB set high */
 }
 
-static void update_internal_irq_state(es5506_state *chip)
+void es550x_device::update_internal_irq_state()
 {
 	/*  Host (cpu) has just read the voice interrupt vector (voice IRQ ack).
 
@@ -247,10 +477,10 @@ static void update_internal_irq_state(es5506_state *chip)
 	    terms they get updated next time generate_samples() is called.
 	*/
 
-	chip->irqv=0x80;
+	m_irqv=0x80;
 
-	if (!chip->irq_callback.isnull())
-		chip->irq_callback(0); /* IRQB set low */
+	if (!m_irq_callback_func.isnull())
+		m_irq_callback_func(0); /* IRQB set low */
 }
 
 /**********************************************************************************************
@@ -259,12 +489,12 @@ static void update_internal_irq_state(es5506_state *chip)
 
 ***********************************************************************************************/
 
-static void compute_tables(es5506_state *chip)
+void es550x_device::compute_tables()
 {
 	int i;
 
 	/* allocate ulaw lookup table */
-	chip->ulaw_lookup = auto_alloc_array(chip->device->machine(), INT16, 1 << ULAW_MAXBITS);
+	m_ulaw_lookup = auto_alloc_array_clear(machine(), INT16, 1 << ULAW_MAXBITS);
 
 	/* generate ulaw lookup table */
 	for (i = 0; i < (1 << ULAW_MAXBITS); i++)
@@ -274,16 +504,16 @@ static void compute_tables(es5506_state *chip)
 		UINT32 mantissa = (rawval << 3) & 0xffff;
 
 		if (exponent == 0)
-			chip->ulaw_lookup[i] = (INT16)mantissa >> 7;
+			m_ulaw_lookup[i] = (INT16)mantissa >> 7;
 		else
 		{
 			mantissa = (mantissa >> 1) | (~mantissa & 0x8000);
-			chip->ulaw_lookup[i] = (INT16)mantissa >> (7 - exponent);
+			m_ulaw_lookup[i] = (INT16)mantissa >> (7 - exponent);
 		}
 	}
 
 	/* allocate volume lookup table */
-	chip->volume_lookup = auto_alloc_array(chip->device->machine(), UINT16, 4096);
+	m_volume_lookup = auto_alloc_array_clear(machine(), UINT16, 4096);
 
 	/* generate volume lookup table */
 	for (i = 0; i < 4096; i++)
@@ -291,7 +521,7 @@ static void compute_tables(es5506_state *chip)
 		UINT8 exponent = i >> 8;
 		UINT32 mantissa = (i & 0xff) | 0x100;
 
-		chip->volume_lookup[i] = (mantissa << 11) >> (20 - exponent);
+		m_volume_lookup[i] = (mantissa << 11) >> (20 - exponent);
 	}
 }
 
@@ -523,7 +753,7 @@ do                                                                              
 
 ***********************************************************************************************/
 
-static void generate_dummy(es5506_state *chip, es5506_voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
+void es550x_device::generate_dummy(es550x_voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
 {
 	UINT32 freqcount = voice->freqcount;
 	UINT32 accum = voice->accum & voice->accum_mask;
@@ -584,12 +814,12 @@ alldone:
 
 ***********************************************************************************************/
 
-static void generate_ulaw(es5506_state *chip, es5506_voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
+void es550x_device::generate_ulaw(es550x_voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
 {
 	UINT32 freqcount = voice->freqcount;
 	UINT32 accum = voice->accum & voice->accum_mask;
-	INT32 lvol = chip->volume_lookup[voice->lvol >> 4];
-	INT32 rvol = chip->volume_lookup[voice->rvol >> 4];
+	INT32 lvol = m_volume_lookup[voice->lvol >> 4];
+	INT32 rvol = m_volume_lookup[voice->rvol >> 4];
 
 	/* pre-add the bank offset */
 	base += voice->exbank;
@@ -609,8 +839,8 @@ reverse:
 				INT32 val2 = base[((accum + (1 << 11)) & voice->accum_mask) >> 11];
 
 				/* decompress u-law */
-				val1 = chip->ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)];
-				val2 = chip->ulaw_lookup[val2 >> (16 - ULAW_MAXBITS)];
+				val1 = m_ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)];
+				val2 = m_ulaw_lookup[val2 >> (16 - ULAW_MAXBITS)];
 
 				/* interpolate */
 				val1 = interpolate(val1, val2, accum);
@@ -623,8 +853,8 @@ reverse:
 				if (voice->ecount != 0)
 				{
 					update_envelopes(voice, 1);
-					lvol = chip->volume_lookup[voice->lvol >> 4];
-					rvol = chip->volume_lookup[voice->rvol >> 4];
+					lvol = m_volume_lookup[voice->lvol >> 4];
+					rvol = m_volume_lookup[voice->rvol >> 4];
 				}
 
 				/* apply volumes and add */
@@ -647,8 +877,8 @@ reverse:
 				INT32 val2 = base[((accum + (1 << 11)) & voice->accum_mask) >> 11];
 
 				/* decompress u-law */
-				val1 = chip->ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)];
-				val2 = chip->ulaw_lookup[val2 >> (16 - ULAW_MAXBITS)];
+				val1 = m_ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)];
+				val2 = m_ulaw_lookup[val2 >> (16 - ULAW_MAXBITS)];
 
 				/* interpolate */
 				val1 = interpolate(val1, val2, accum);
@@ -661,8 +891,8 @@ reverse:
 				if (voice->ecount != 0)
 				{
 					update_envelopes(voice, 1);
-					lvol = chip->volume_lookup[voice->lvol >> 4];
-					rvol = chip->volume_lookup[voice->rvol >> 4];
+					lvol = m_volume_lookup[voice->lvol >> 4];
+					rvol = m_volume_lookup[voice->rvol >> 4];
 				}
 
 				/* apply volumes and add */
@@ -690,12 +920,12 @@ alldone:
 
 ***********************************************************************************************/
 
-static void generate_pcm(es5506_state *chip, es5506_voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
+void es550x_device::generate_pcm(es550x_voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
 {
 	UINT32 freqcount = voice->freqcount;
 	UINT32 accum = voice->accum & voice->accum_mask;
-	INT32 lvol = chip->volume_lookup[voice->lvol >> 4];
-	INT32 rvol = chip->volume_lookup[voice->rvol >> 4];
+	INT32 lvol = m_volume_lookup[voice->lvol >> 4];
+	INT32 rvol = m_volume_lookup[voice->rvol >> 4];
 
 	/* pre-add the bank offset */
 	base += voice->exbank;
@@ -725,8 +955,8 @@ reverse:
 				if (voice->ecount != 0)
 				{
 					update_envelopes(voice, 1);
-					lvol = chip->volume_lookup[voice->lvol >> 4];
-					rvol = chip->volume_lookup[voice->rvol >> 4];
+					lvol = m_volume_lookup[voice->lvol >> 4];
+					rvol = m_volume_lookup[voice->rvol >> 4];
 				}
 
 				/* apply volumes and add */
@@ -759,8 +989,8 @@ reverse:
 				if (voice->ecount != 0)
 				{
 					update_envelopes(voice, 1);
-					lvol = chip->volume_lookup[voice->lvol >> 4];
-					rvol = chip->volume_lookup[voice->rvol >> 4];
+					lvol = m_volume_lookup[voice->lvol >> 4];
+					rvol = m_volume_lookup[voice->rvol >> 4];
 				}
 
 				/* apply volumes and add */
@@ -788,7 +1018,7 @@ alldone:
 
 ***********************************************************************************************/
 
-static void generate_samples(es5506_state *chip, INT32 **outputs, int offset, int samples)
+void es5506_device::generate_samples(INT32 **outputs, int offset, int samples)
 {
 	int v;
 
@@ -797,23 +1027,23 @@ static void generate_samples(es5506_state *chip, INT32 **outputs, int offset, in
 		return;
 
 	/* clear out the accumulators */
-	for (int i = 0; i < chip->channels << 1; i++)
+	for (int i = 0; i < m_channels << 1; i++)
 	{
 		memset(outputs[i] + offset, 0, sizeof(INT32) * samples);
 	}
 
 	/* loop over voices */
-	for (v = 0; v <= chip->active_voices; v++)
+	for (v = 0; v <= m_active_voices; v++)
 	{
-		es5506_voice *voice = &chip->voice[v];
-		UINT16 *base = chip->region_base[voice->control >> 14];
+		es550x_voice *voice = &m_voice[v];
+		UINT16 *base = m_region_base[voice->control >> 14];
 
 		/* special case: if end == start, stop the voice */
 		if (voice->start == voice->end)
 			voice->control |= CONTROL_STOP0;
 
 		int voice_channel = (voice->control & CONTROL_CAMASK) >> 10;
-		int channel = voice_channel % chip->channels;
+		int channel = voice_channel % m_channels;
 		int l = channel << 1;
 		int r = l + 1;
 		INT32 *left = outputs[l] + offset;
@@ -823,12 +1053,12 @@ static void generate_samples(es5506_state *chip, INT32 **outputs, int offset, in
 		if (!base)
 		{
 			logerror("es5506: NULL region base %d\n",voice->control >> 14);
-			generate_dummy(chip, voice, base, left, right, samples);
+			generate_dummy(voice, base, left, right, samples);
 		}
 		else if (voice->control & 0x2000)
-			generate_ulaw(chip, voice, base, left, right, samples);
+			generate_ulaw(voice, base, left, right, samples);
 		else
-			generate_pcm(chip, voice, base, left, right, samples);
+			generate_pcm(voice, base, left, right, samples);
 
 		/* does this voice have it's IRQ bit raised? */
 		if (voice->control&CONTROL_IRQ)
@@ -836,16 +1066,79 @@ static void generate_samples(es5506_state *chip, INT32 **outputs, int offset, in
 			logerror("es5506: IRQ raised on voice %d!!\n",v);
 
 			/* only update voice vector if existing IRQ is acked by host */
-			if (chip->irqv&0x80)
+			if (m_irqv&0x80)
 			{
 				/* latch voice number into vector, and set high bit low */
-				chip->irqv=v&0x7f;
+				m_irqv=v&0x7f;
 
 				/* take down IRQ bit on voice */
 				voice->control&=~CONTROL_IRQ;
 
 				/* inform host of irq */
-				update_irq_state(chip);
+				update_irq_state();
+			}
+		}
+	}
+}
+
+void es5505_device::generate_samples(INT32 **outputs, int offset, int samples)
+{
+	int v;
+
+	/* skip if nothing to do */
+	if (!samples)
+		return;
+
+	/* clear out the accumulators */
+	for (int i = 0; i < m_es5505_channels << 1; i++)
+	{
+		memset(outputs[i] + offset, 0, sizeof(INT32) * samples);
+	}
+
+	/* loop over voices */
+	for (v = 0; v <= m_active_voices; v++)
+	{
+		es550x_voice *voice = &m_voice[v];
+		UINT16 *base = m_region_base[voice->control >> 14];
+
+		/* special case: if end == start, stop the voice */
+		if (voice->start == voice->end)
+			voice->control |= CONTROL_STOP0;
+
+		int voice_channel = (voice->control & CONTROL_CAMASK) >> 10;
+		int channel = voice_channel % m_es5505_channels;
+		int l = channel << 1;
+		int r = l + 1;
+		INT32 *left = outputs[l] + offset;
+		INT32 *right = outputs[r] + offset;
+
+		/* generate from the appropriate source */
+		if (!base)
+		{
+			logerror("es5506: NULL region base %d\n",voice->control >> 14);
+			generate_dummy(voice, base, left, right, samples);
+		}
+		else if (voice->control & 0x2000)
+			generate_ulaw(voice, base, left, right, samples);
+		else
+			generate_pcm(voice, base, left, right, samples);
+
+		/* does this voice have it's IRQ bit raised? */
+		if (voice->control&CONTROL_IRQ)
+		{
+			logerror("es5506: IRQ raised on voice %d!!\n",v);
+
+			/* only update voice vector if existing IRQ is acked by host */
+			if (m_irqv&0x80)
+			{
+				/* latch voice number into vector, and set high bit low */
+				m_irqv=v&0x7f;
+
+				/* take down IRQ bit on voice */
+				voice->control&=~CONTROL_IRQ;
+
+				/* inform host of irq */
+				update_irq_state();
 			}
 		}
 	}
@@ -855,288 +1148,94 @@ static void generate_samples(es5506_state *chip, INT32 **outputs, int offset, in
 
 /**********************************************************************************************
 
-     es5506_update -- update the sound chip so that it is in sync with CPU execution
+     reg_write -- handle a write to the selected ES5506 register
 
 ***********************************************************************************************/
 
-STREAM_UPDATE( es5506_update )
-{
-	es5506_state *chip = (es5506_state *)param;
-
-#if MAKE_WAVS
-	/* start the logging once we have a sample rate */
-	if (chip->sample_rate)
-	{
-		if (!chip->wavraw)
-			chip->wavraw = wav_open("raw.wav", chip->sample_rate, 2);
-	}
-#endif
-
-	/* loop until all samples are output */
-	int offset = 0;
-	while (samples)
-	{
-		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
-
-		generate_samples(chip, outputs, offset, length);
-
-#if MAKE_WAVS
-		/* log the raw data */
-		if (chip->wavraw) {
-			/* determine left/right source data */
-			INT32 *lsrc = chip->scratch, *rsrc = chip->scratch + length;
-			int channel;
-			memset(lsrc, 0, sizeof(INT32) * length * 2);
-			/* loop over the output channels */
-			for (channel = 0; channel < chip->channels; channel++) {
-				INT32 *l = outputs[(channel << 1)] + offset;
-				INT32 *r = outputs[(channel << 1) + 1] + offset;
-				/* add the current channel's samples to the WAV data */
-				for (samp = 0; samp < length; samp++) {
-					lsrc[samp] += l[samp];
-					rsrc[samp] += r[samp];
-				}
-			}
-			wav_add_data_32lr(chip->wavraw, lsrc, rsrc, length, 4);
-		}
-#endif
-
-		/* account for these samples */
-		offset += length;
-		samples -= length;
-	}
-}
-
-
-/**********************************************************************************************
-
-     DEVICE_START( es5506 ) -- start emulation of the ES5506
-
-***********************************************************************************************/
-
-static void es5506_start_common(device_t *device, const void *config, device_type sndtype)
-{
-	const es5506_interface *intf = (const es5506_interface *)config;
-	es5506_state *chip = get_safe_token(device);
-	int j;
-	UINT32 accum_mask;
-	int channels = 1;  /* 1 channel by default, for backward compatibility */
-
-	/* only override the number of channels if the value is in the valid range 1 .. 6 */
-	if (1 <= intf->channels && intf->channels <= 6)
-		channels = intf->channels;
-
-	/* debugging */
-	if (LOG_COMMANDS && !eslog)
-		eslog = fopen("es.log", "w");
-
-	/* create the stream */
-	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2 * channels, device->clock() / (16*32), chip, es5506_update);
-
-	/* initialize the regions */
-	chip->region_base[0] = intf->region0 ? (UINT16 *)device->machine().root_device().memregion(intf->region0)->base() : NULL;
-	chip->region_base[1] = intf->region1 ? (UINT16 *)device->machine().root_device().memregion(intf->region1)->base() : NULL;
-	chip->region_base[2] = intf->region2 ? (UINT16 *)device->machine().root_device().memregion(intf->region2)->base() : NULL;
-	chip->region_base[3] = intf->region3 ? (UINT16 *)device->machine().root_device().memregion(intf->region3)->base() : NULL;
-
-	/* initialize the rest of the structure */
-	chip->device = device;
-	chip->master_clock = device->clock();
-	chip->irq_callback.resolve(intf->irq_callback,*device);
-	chip->port_read.resolve(intf->read_port,*device);
-	chip->irqv = 0x80;
-	chip->channels = channels;
-
-	/* compute the tables */
-	compute_tables(chip);
-
-	/* init the voices */
-	accum_mask = (sndtype == ES5506) ? 0xffffffff : 0x7fffffff;
-	for (j = 0; j < 32; j++)
-	{
-		chip->voice[j].index = j;
-		chip->voice[j].control = CONTROL_STOPMASK;
-		chip->voice[j].lvol = 0xffff;
-		chip->voice[j].rvol = 0xffff;
-		chip->voice[j].exbank = 0;
-		chip->voice[j].accum_mask = accum_mask;
-	}
-
-	/* allocate memory */
-	chip->scratch = auto_alloc_array(device->machine(), INT32, 2 * MAX_SAMPLE_CHUNK);
-
-	/* register save */
-	device->save_item(NAME(chip->sample_rate));
-	device->save_item(NAME(chip->write_latch));
-	device->save_item(NAME(chip->read_latch));
-
-	device->save_item(NAME(chip->current_page));
-	device->save_item(NAME(chip->active_voices));
-	device->save_item(NAME(chip->mode));
-	device->save_item(NAME(chip->wst));
-	device->save_item(NAME(chip->wend));
-	device->save_item(NAME(chip->lrend));
-	device->save_item(NAME(chip->irqv));
-
-	device->save_pointer(NAME(chip->scratch), 2 * MAX_SAMPLE_CHUNK);
-
-	for (j = 0; j < 32; j++)
-	{
-		device->save_item(NAME(chip->voice[j].control), j);
-		device->save_item(NAME(chip->voice[j].freqcount), j);
-		device->save_item(NAME(chip->voice[j].start), j);
-		device->save_item(NAME(chip->voice[j].lvol), j);
-		device->save_item(NAME(chip->voice[j].end), j);
-		device->save_item(NAME(chip->voice[j].lvramp), j);
-		device->save_item(NAME(chip->voice[j].accum), j);
-		device->save_item(NAME(chip->voice[j].rvol), j);
-		device->save_item(NAME(chip->voice[j].rvramp), j);
-		device->save_item(NAME(chip->voice[j].ecount), j);
-		device->save_item(NAME(chip->voice[j].k2), j);
-		device->save_item(NAME(chip->voice[j].k2ramp), j);
-		device->save_item(NAME(chip->voice[j].k1), j);
-		device->save_item(NAME(chip->voice[j].k1ramp), j);
-		device->save_item(NAME(chip->voice[j].o4n1), j);
-		device->save_item(NAME(chip->voice[j].o3n1), j);
-		device->save_item(NAME(chip->voice[j].o3n2), j);
-		device->save_item(NAME(chip->voice[j].o2n1), j);
-		device->save_item(NAME(chip->voice[j].o2n2), j);
-		device->save_item(NAME(chip->voice[j].o1n1), j);
-		device->save_item(NAME(chip->voice[j].exbank), j);
-		device->save_item(NAME(chip->voice[j].filtcount), j);
-	}
-
-	/* success */
-}
-
-
-static DEVICE_START( es5506 )
-{
-	es5506_start_common(device, device->static_config(), ES5506);
-}
-
-
-
-/**********************************************************************************************
-
-     DEVICE_STOP( es5506 ) -- stop emulation of the ES5506
-
-***********************************************************************************************/
-
-static DEVICE_STOP( es5506 )
-{
-	/* debugging */
-	if (LOG_COMMANDS && eslog)
-	{
-		fclose(eslog);
-		eslog = NULL;
-	}
-
-#if MAKE_WAVS
-{
-	int i;
-
-	for (i = 0; i < MAX_ES5506; i++)
-	{
-		if (es5506[i].wavraw)
-			wav_close(es5506[i].wavraw);
-	}
-}
-#endif
-}
-
-
-
-/**********************************************************************************************
-
-     es5506_reg_write -- handle a write to the selected ES5506 register
-
-***********************************************************************************************/
-
-INLINE void es5506_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT32 data)
+inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, UINT32 data)
 {
 	switch (offset)
 	{
 		case 0x00/8:    /* CR */
 			voice->control = data & 0xffff;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, control=%04x\n", chip->current_page & 0x1f, voice->control);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, control=%04x\n", m_current_page & 0x1f, voice->control);
 			break;
 
 		case 0x08/8:    /* FC */
 			voice->freqcount = data & 0x1ffff;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, freq count=%08x\n", chip->current_page & 0x1f, voice->freqcount);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, freq count=%08x\n", m_current_page & 0x1f, voice->freqcount);
 			break;
 
 		case 0x10/8:    /* LVOL */
 			voice->lvol = data & 0xffff;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, left vol=%04x\n", chip->current_page & 0x1f, voice->lvol);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, left vol=%04x\n", m_current_page & 0x1f, voice->lvol);
 			break;
 
 		case 0x18/8:    /* LVRAMP */
 			voice->lvramp = (data & 0xff00) >> 8;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, left vol ramp=%04x\n", chip->current_page & 0x1f, voice->lvramp);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, left vol ramp=%04x\n", m_current_page & 0x1f, voice->lvramp);
 			break;
 
 		case 0x20/8:    /* RVOL */
 			voice->rvol = data & 0xffff;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, right vol=%04x\n", chip->current_page & 0x1f, voice->rvol);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, right vol=%04x\n", m_current_page & 0x1f, voice->rvol);
 			break;
 
 		case 0x28/8:    /* RVRAMP */
 			voice->rvramp = (data & 0xff00) >> 8;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, right vol ramp=%04x\n", chip->current_page & 0x1f, voice->rvramp);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, right vol ramp=%04x\n", m_current_page & 0x1f, voice->rvramp);
 			break;
 
 		case 0x30/8:    /* ECOUNT */
 			voice->ecount = data & 0x1ff;
 			voice->filtcount = 0;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, envelope count=%04x\n", chip->current_page & 0x1f, voice->ecount);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, envelope count=%04x\n", m_current_page & 0x1f, voice->ecount);
 			break;
 
 		case 0x38/8:    /* K2 */
 			voice->k2 = data & 0xffff;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, K2=%04x\n", chip->current_page & 0x1f, voice->k2);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, K2=%04x\n", m_current_page & 0x1f, voice->k2);
 			break;
 
 		case 0x40/8:    /* K2RAMP */
 			voice->k2ramp = ((data & 0xff00) >> 8) | ((data & 0x0001) << 31);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, K2 ramp=%04x\n", chip->current_page & 0x1f, voice->k2ramp);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, K2 ramp=%04x\n", m_current_page & 0x1f, voice->k2ramp);
 			break;
 
 		case 0x48/8:    /* K1 */
 			voice->k1 = data & 0xffff;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, K1=%04x\n", chip->current_page & 0x1f, voice->k1);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, K1=%04x\n", m_current_page & 0x1f, voice->k1);
 			break;
 
 		case 0x50/8:    /* K1RAMP */
 			voice->k1ramp = ((data & 0xff00) >> 8) | ((data & 0x0001) << 31);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, K1 ramp=%04x\n", chip->current_page & 0x1f, voice->k1ramp);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, K1 ramp=%04x\n", m_current_page & 0x1f, voice->k1ramp);
 			break;
 
 		case 0x58/8:    /* ACTV */
 		{
-			chip->active_voices = data & 0x1f;
-			chip->sample_rate = chip->master_clock / (16 * (chip->active_voices + 1));
-			chip->stream->set_sample_rate(chip->sample_rate);
+			m_active_voices = data & 0x1f;
+			m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
+			m_stream->set_sample_rate(m_sample_rate);
 
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "active voices=%d, sample_rate=%d\n", chip->active_voices, chip->sample_rate);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			break;
 		}
 
 		case 0x60/8:    /* MODE */
-			chip->mode = data & 0x1f;
+			m_mode = data & 0x1f;
 			break;
 
 		case 0x68/8:    /* PAR - read only */
@@ -1144,86 +1243,85 @@ INLINE void es5506_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 			break;
 
 		case 0x78/8:    /* PAGE */
-			chip->current_page = data & 0x7f;
+			m_current_page = data & 0x7f;
 			break;
 	}
 }
 
-
-INLINE void es5506_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT32 data)
+inline void es5506_device::reg_write_high(es550x_voice *voice, offs_t offset, UINT32 data)
 {
 	switch (offset)
 	{
 		case 0x00/8:    /* CR */
 			voice->control = data & 0xffff;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, control=%04x\n", chip->current_page & 0x1f, voice->control);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, control=%04x\n", m_current_page & 0x1f, voice->control);
 			break;
 
 		case 0x08/8:    /* START */
 			voice->start = data & 0xfffff800;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, loop start=%08x\n", chip->current_page & 0x1f, voice->start);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, loop start=%08x\n", m_current_page & 0x1f, voice->start);
 			break;
 
 		case 0x10/8:    /* END */
 			voice->end = data & 0xffffff80;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, loop end=%08x\n", chip->current_page & 0x1f, voice->end);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, loop end=%08x\n", m_current_page & 0x1f, voice->end);
 			break;
 
 		case 0x18/8:    /* ACCUM */
 			voice->accum = data;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, accum=%08x\n", chip->current_page & 0x1f, voice->accum);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, accum=%08x\n", m_current_page & 0x1f, voice->accum);
 			break;
 
 		case 0x20/8:    /* O4(n-1) */
 			voice->o4n1 = (INT32)(data << 14) >> 14;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, O4(n-1)=%05x\n", chip->current_page & 0x1f, voice->o4n1 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, O4(n-1)=%05x\n", m_current_page & 0x1f, voice->o4n1 & 0x3ffff);
 			break;
 
 		case 0x28/8:    /* O3(n-1) */
 			voice->o3n1 = (INT32)(data << 14) >> 14;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, O3(n-1)=%05x\n", chip->current_page & 0x1f, voice->o3n1 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, O3(n-1)=%05x\n", m_current_page & 0x1f, voice->o3n1 & 0x3ffff);
 			break;
 
 		case 0x30/8:    /* O3(n-2) */
 			voice->o3n2 = (INT32)(data << 14) >> 14;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, O3(n-2)=%05x\n", chip->current_page & 0x1f, voice->o3n2 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, O3(n-2)=%05x\n", m_current_page & 0x1f, voice->o3n2 & 0x3ffff);
 			break;
 
 		case 0x38/8:    /* O2(n-1) */
 			voice->o2n1 = (INT32)(data << 14) >> 14;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, O2(n-1)=%05x\n", chip->current_page & 0x1f, voice->o2n1 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, O2(n-1)=%05x\n", m_current_page & 0x1f, voice->o2n1 & 0x3ffff);
 			break;
 
 		case 0x40/8:    /* O2(n-2) */
 			voice->o2n2 = (INT32)(data << 14) >> 14;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, O2(n-2)=%05x\n", chip->current_page & 0x1f, voice->o2n2 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, O2(n-2)=%05x\n", m_current_page & 0x1f, voice->o2n2 & 0x3ffff);
 			break;
 
 		case 0x48/8:    /* O1(n-1) */
 			voice->o1n1 = (INT32)(data << 14) >> 14;
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "voice %d, O1(n-1)=%05x\n", chip->current_page & 0x1f, voice->o1n1 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "voice %d, O1(n-1)=%05x\n", m_current_page & 0x1f, voice->o1n1 & 0x3ffff);
 			break;
 
 		case 0x50/8:    /* W_ST */
-			chip->wst = data & 0x7f;
+			m_wst = data & 0x7f;
 			break;
 
 		case 0x58/8:    /* W_END */
-			chip->wend = data & 0x7f;
+			m_wend = data & 0x7f;
 			break;
 
 		case 0x60/8:    /* LR_END */
-			chip->lrend = data & 0x7f;
+			m_lrend = data & 0x7f;
 			break;
 
 		case 0x68/8:    /* PAR - read only */
@@ -1231,78 +1329,78 @@ INLINE void es5506_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 			break;
 
 		case 0x78/8:    /* PAGE */
-			chip->current_page = data & 0x7f;
+			m_current_page = data & 0x7f;
 			break;
 	}
 }
 
-INLINE void es5506_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT32 data)
+inline void es5506_device::reg_write_test(es550x_voice *voice, offs_t offset, UINT32 data)
 {
 	switch (offset)
 	{
 		case 0x00/8:    /* CHANNEL 0 LEFT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 0 left test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 0 left test write %08x\n", data);
 			break;
 
 		case 0x08/8:    /* CHANNEL 0 RIGHT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 0 right test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 0 right test write %08x\n", data);
 			break;
 
 		case 0x10/8:    /* CHANNEL 1 LEFT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 1 left test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 1 left test write %08x\n", data);
 			break;
 
 		case 0x18/8:    /* CHANNEL 1 RIGHT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 1 right test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 1 right test write %08x\n", data);
 			break;
 
 		case 0x20/8:    /* CHANNEL 2 LEFT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 2 left test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 2 left test write %08x\n", data);
 			break;
 
 		case 0x28/8:    /* CHANNEL 2 RIGHT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 2 right test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 2 right test write %08x\n", data);
 			break;
 
 		case 0x30/8:    /* CHANNEL 3 LEFT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 3 left test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 3 left test write %08x\n", data);
 			break;
 
 		case 0x38/8:    /* CHANNEL 3 RIGHT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 3 right test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 3 right test write %08x\n", data);
 			break;
 
 		case 0x40/8:    /* CHANNEL 4 LEFT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 4 left test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 4 left test write %08x\n", data);
 			break;
 
 		case 0x48/8:    /* CHANNEL 4 RIGHT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 4 right test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 4 right test write %08x\n", data);
 			break;
 
 		case 0x50/8:    /* CHANNEL 5 LEFT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 5 left test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 5 left test write %08x\n", data);
 			break;
 
 		case 0x58/8:    /* CHANNEL 6 RIGHT */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Channel 5 right test write %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Channel 5 right test write %08x\n", data);
 			break;
 
 		case 0x60/8:    /* EMPTY */
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "Test write EMPTY %08x\n", data);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "Test write EMPTY %08x\n", data);
 			break;
 
 		case 0x68/8:    /* PAR - read only */
@@ -1310,48 +1408,47 @@ INLINE void es5506_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_
 			break;
 
 		case 0x78/8:    /* PAGE */
-			chip->current_page = data & 0x7f;
+			m_current_page = data & 0x7f;
 			break;
 	}
 }
 
-WRITE8_DEVICE_HANDLER( es5506_w )
+WRITE8_MEMBER( es5506_device::write )
 {
-	es5506_state *chip = get_safe_token(device);
-	es5506_voice *voice = &chip->voice[chip->current_page & 0x1f];
+	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
 	int shift = 8 * (offset & 3);
 
 	/* accumulate the data */
-	chip->write_latch = (chip->write_latch & ~(0xff000000 >> shift)) | (data << (24 - shift));
+	m_write_latch = (m_write_latch & ~(0xff000000 >> shift)) | (data << (24 - shift));
 
 	/* wait for a write to complete */
 	if (shift != 24)
 		return;
 
 	/* force an update */
-	chip->stream->update();
+	m_stream->update();
 
 	/* switch off the page and register */
-	if (chip->current_page < 0x20)
-		es5506_reg_write_low(chip, voice, offset / 4, chip->write_latch);
-	else if (chip->current_page < 0x40)
-		es5506_reg_write_high(chip, voice, offset / 4, chip->write_latch);
+	if (m_current_page < 0x20)
+		reg_write_low(voice, offset / 4, m_write_latch);
+	else if (m_current_page < 0x40)
+		reg_write_high(voice, offset / 4, m_write_latch);
 	else
-		es5506_reg_write_test(chip, voice, offset / 4, chip->write_latch);
+		reg_write_test(voice, offset / 4, m_write_latch);
 
 	/* clear the write latch when done */
-	chip->write_latch = 0;
+	m_write_latch = 0;
 }
 
 
 
 /**********************************************************************************************
 
-     es5506_reg_read -- read from the specified ES5506 register
+     reg_read -- read from the specified ES5506 register
 
 ***********************************************************************************************/
 
-INLINE UINT32 es5506_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_t offset)
+inline UINT32 es5506_device::reg_read_low(es550x_voice *voice, offs_t offset)
 {
 	UINT32 result = 0;
 
@@ -1402,32 +1499,32 @@ INLINE UINT32 es5506_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_
 			break;
 
 		case 0x58/8:    /* ACTV */
-			result = chip->active_voices;
+			result = m_active_voices;
 			break;
 
 		case 0x60/8:    /* MODE */
-			result = chip->mode;
+			result = m_mode;
 			break;
 
 		case 0x68/8:    /* PAR */
-			if (!chip->port_read.isnull())
-				result = chip->port_read(0);
+			if (!m_port_read_func.isnull())
+				result = m_port_read_func(0);
 			break;
 
 		case 0x70/8:    /* IRQV */
-			result = chip->irqv;
-			update_internal_irq_state(chip);
+			result = m_irqv;
+			update_internal_irq_state();
 			break;
 
 		case 0x78/8:    /* PAGE */
-			result = chip->current_page;
+			result = m_current_page;
 			break;
 	}
 	return result;
 }
 
 
-INLINE UINT32 es5506_reg_read_high(es5506_state *chip, es5506_voice *voice, offs_t offset)
+inline UINT32 es5506_device::reg_read_high(es550x_voice *voice, offs_t offset)
 {
 	UINT32 result = 0;
 
@@ -1474,134 +1571,101 @@ INLINE UINT32 es5506_reg_read_high(es5506_state *chip, es5506_voice *voice, offs
 			break;
 
 		case 0x50/8:    /* W_ST */
-			result = chip->wst;
+			result = m_wst;
 			break;
 
 		case 0x58/8:    /* W_END */
-			result = chip->wend;
+			result = m_wend;
 			break;
 
 		case 0x60/8:    /* LR_END */
-			result = chip->lrend;
+			result = m_lrend;
 			break;
 
 		case 0x68/8:    /* PAR */
-			if (!chip->port_read.isnull())
-				result = chip->port_read(0);
+			if (!m_port_read_func.isnull())
+				result = m_port_read_func(0);
 			break;
 
 		case 0x70/8:    /* IRQV */
-			result = chip->irqv;
-			update_internal_irq_state(chip);
+			result = m_irqv;
+			update_internal_irq_state();
 			break;
 
 		case 0x78/8:    /* PAGE */
-			result = chip->current_page;
+			result = m_current_page;
 			break;
 	}
 	return result;
 }
-
-INLINE UINT32 es5506_reg_read_test(es5506_state *chip, es5506_voice *voice, offs_t offset)
+inline UINT32 es5506_device::reg_read_test(es550x_voice *voice, offs_t offset)
 {
 	UINT32 result = 0;
 
 	switch (offset)
 	{
 		case 0x68/8:    /* PAR */
-			if (!chip->port_read.isnull())
-				result = chip->port_read(0);
+			if (!m_port_read_func.isnull())
+				result = m_port_read_func(0);
 			break;
 
 		case 0x70/8:    /* IRQV */
-			result = chip->irqv;
+			result = m_irqv;
 			break;
 
 		case 0x78/8:    /* PAGE */
-			result = chip->current_page;
+			result = m_current_page;
 			break;
 	}
 	return result;
 }
 
-READ8_DEVICE_HANDLER( es5506_r )
+READ8_MEMBER( es5506_device::read )
 {
-	es5506_state *chip = get_safe_token(device);
-	es5506_voice *voice = &chip->voice[chip->current_page & 0x1f];
+	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
 	int shift = 8 * (offset & 3);
 
 	/* only read on offset 0 */
 	if (shift != 0)
-		return chip->read_latch >> (24 - shift);
+		return m_read_latch >> (24 - shift);
 
-	if (LOG_COMMANDS && eslog)
-		fprintf(eslog, "read from %02x/%02x -> ", chip->current_page, offset / 4 * 8);
+	if (LOG_COMMANDS && m_eslog)
+		fprintf(m_eslog, "read from %02x/%02x -> ", m_current_page, offset / 4 * 8);
 
 	/* force an update */
-	chip->stream->update();
+	m_stream->update();
 
 	/* switch off the page and register */
-	if (chip->current_page < 0x20)
-		chip->read_latch = es5506_reg_read_low(chip, voice, offset / 4);
-	else if (chip->current_page < 0x40)
-		chip->read_latch = es5506_reg_read_high(chip, voice, offset / 4);
+	if (m_current_page < 0x20)
+		m_read_latch = reg_read_low(voice, offset / 4);
+	else if (m_current_page < 0x40)
+		m_read_latch = reg_read_high(voice, offset / 4);
 	else
-		chip->read_latch = es5506_reg_read_test(chip, voice, offset / 4);
+		m_read_latch = reg_read_test(voice, offset / 4);
 
-	if (LOG_COMMANDS && eslog)
-		fprintf(eslog, "%08x\n", chip->read_latch);
+	if (LOG_COMMANDS && m_eslog)
+		fprintf(m_eslog, "%08x\n", m_read_latch);
 
 	/* return the high byte */
-	return chip->read_latch >> 24;
+	return m_read_latch >> 24;
 }
 
 
 
-void es5506_voice_bank_w(device_t *device, int voice, int bank)
+void es5506_device::voice_bank_w(int voice, int bank)
 {
-	es5506_state *chip = get_safe_token(device);
-	chip->voice[voice].exbank=bank;
-}
-
-
-/**********************************************************************************************
-
-     DEVICE_START( es5505 ) -- start emulation of the ES5505
-
-***********************************************************************************************/
-
-static DEVICE_START( es5505 )
-{
-	const es5505_interface *intf = (const es5505_interface *)device->static_config();
-	es5506_interface es5506intf;
-	int channels = 1;  /* 1 channel by default, for backward compatibility */
-
-	/* only override the number of channels if the value is in the valid range 1 .. 4 */
-	if (1 <= intf->channels && intf->channels <= 4)
-		channels = intf->channels;
-
-	memset(&es5506intf, 0, sizeof(es5506intf));
-
-	es5506intf.region0 = intf->region0;
-	es5506intf.region1 = intf->region1;
-	es5506intf.channels = channels;
-	es5506intf.irq_callback = intf->irq_callback;
-	es5506intf.read_port = intf->read_port;
-
-	es5506_start_common(device, &es5506intf, ES5505);
+	m_voice[voice].exbank=bank;
 }
 
 
 /**********************************************************************************************
 
-     es5505_reg_write -- handle a write to the selected ES5505 register
+     reg_write -- handle a write to the selected ES5505 register
 
 ***********************************************************************************************/
 
-INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
+inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
-	running_machine &machine = chip->device->machine();
-
 	switch (offset)
 	{
 		case 0x00:  /* CR */
@@ -1622,8 +1686,8 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 									((data << 2) & (CONTROL_CA0 | CONTROL_CA1));
 			}
 
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine.describe_context(), chip->current_page & 0x1f, voice->control, data, mem_mask ^ 0xffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine().describe_context(), m_current_page & 0x1f, voice->control, data, mem_mask ^ 0xffff);
 			break;
 
 		case 0x01:  /* FC */
@@ -1631,8 +1695,8 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				voice->freqcount = (voice->freqcount & ~0x001fe) | ((data & 0x00ff) << 1);
 			if (ACCESSING_BITS_8_15)
 				voice->freqcount = (voice->freqcount & ~0x1fe00) | ((data & 0xff00) << 1);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, freq count=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->freqcount);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, freq count=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->freqcount);
 			break;
 
 		case 0x02:  /* STRT (hi) */
@@ -1640,8 +1704,8 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				voice->start = (voice->start & ~0x03fc0000) | ((data & 0x00ff) << 18);
 			if (ACCESSING_BITS_8_15)
 				voice->start = (voice->start & ~0x7c000000) | ((data & 0x1f00) << 18);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, loop start=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->start);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->start);
 			break;
 
 		case 0x03:  /* STRT (lo) */
@@ -1649,8 +1713,8 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				voice->start = (voice->start & ~0x00000380) | ((data & 0x00e0) << 2);
 			if (ACCESSING_BITS_8_15)
 				voice->start = (voice->start & ~0x0003fc00) | ((data & 0xff00) << 2);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, loop start=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->start);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->start);
 			break;
 
 		case 0x04:  /* END (hi) */
@@ -1661,8 +1725,8 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 #if RAINE_CHECK
 			voice->control |= CONTROL_STOP0;
 #endif
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, loop end=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->end);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->end);
 			break;
 
 		case 0x05:  /* END (lo) */
@@ -1673,8 +1737,8 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 #if RAINE_CHECK
 			voice->control |= CONTROL_STOP0;
 #endif
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, loop end=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->end);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->end);
 			break;
 
 		case 0x06:  /* K2 */
@@ -1682,8 +1746,8 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				voice->k2 = (voice->k2 & ~0x00f0) | (data & 0x00f0);
 			if (ACCESSING_BITS_8_15)
 				voice->k2 = (voice->k2 & ~0xff00) | (data & 0xff00);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, K2=%04x\n", machine.describe_context(), chip->current_page & 0x1f, voice->k2);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, K2=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->k2);
 			break;
 
 		case 0x07:  /* K1 */
@@ -1691,22 +1755,22 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				voice->k1 = (voice->k1 & ~0x00f0) | (data & 0x00f0);
 			if (ACCESSING_BITS_8_15)
 				voice->k1 = (voice->k1 & ~0xff00) | (data & 0xff00);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, K1=%04x\n", machine.describe_context(), chip->current_page & 0x1f, voice->k1);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, K1=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->k1);
 			break;
 
 		case 0x08:  /* LVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->lvol = (voice->lvol & ~0xff00) | (data & 0xff00);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, left vol=%04x\n", machine.describe_context(), chip->current_page & 0x1f, voice->lvol);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, left vol=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->lvol);
 			break;
 
 		case 0x09:  /* RVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->rvol = (voice->rvol & ~0xff00) | (data & 0xff00);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, right vol=%04x\n", machine.describe_context(), chip->current_page & 0x1f, voice->rvol);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, right vol=%04x\n", machine().describe_context(), m_current_page & 0x1f, voice->rvol);
 			break;
 
 		case 0x0a:  /* ACC (hi) */
@@ -1714,8 +1778,8 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				voice->accum = (voice->accum & ~0x03fc0000) | ((data & 0x00ff) << 18);
 			if (ACCESSING_BITS_8_15)
 				voice->accum = (voice->accum & ~0x7c000000) | ((data & 0x1f00) << 18);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, accum=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->accum);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->accum);
 			break;
 
 		case 0x0b:  /* ACC (lo) */
@@ -1723,8 +1787,8 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 				voice->accum = (voice->accum & ~0x000003fc) | ((data & 0x00ff) << 2);
 			if (ACCESSING_BITS_8_15)
 				voice->accum = (voice->accum & ~0x0003fc00) | ((data & 0xff00) << 2);
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, accum=%08x\n", machine.describe_context(), chip->current_page & 0x1f, voice->accum);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, voice->accum);
 			break;
 
 		case 0x0c:  /* unused */
@@ -1733,12 +1797,12 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 		case 0x0d:  /* ACT */
 			if (ACCESSING_BITS_0_7)
 			{
-				chip->active_voices = data & 0x1f;
-				chip->sample_rate = chip->master_clock / (16 * (chip->active_voices + 1));
-				chip->stream->set_sample_rate(chip->sample_rate);
+				m_active_voices = data & 0x1f;
+				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
+				m_stream->set_sample_rate(m_sample_rate);
 
-				if (LOG_COMMANDS && eslog)
-					fprintf(eslog, "active voices=%d, sample_rate=%d\n", chip->active_voices, chip->sample_rate);
+				if (LOG_COMMANDS && m_eslog)
+					fprintf(m_eslog, "active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
 			break;
 
@@ -1747,16 +1811,14 @@ INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t
 
 		case 0x0f:  /* PAGE */
 			if (ACCESSING_BITS_0_7)
-				chip->current_page = data & 0x7f;
+				m_current_page = data & 0x7f;
 			break;
 	}
 }
 
 
-INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
+inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
-	running_machine &machine = chip->device->machine();
-
 	switch (offset)
 	{
 		case 0x00:  /* CR */
@@ -1772,8 +1834,8 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				voice->control |= ((data >> 2) & CONTROL_LPMASK) |
 									((data << 2) & (CONTROL_CA0 | CONTROL_CA1));
 			}
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine.describe_context(), chip->current_page & 0x1f, voice->control, data, mem_mask);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine().describe_context(), m_current_page & 0x1f, voice->control, data, mem_mask);
 			break;
 
 		case 0x01:  /* O4(n-1) */
@@ -1781,8 +1843,8 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				voice->o4n1 = (voice->o4n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o4n1 = (INT16)((voice->o4n1 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, O4(n-1)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o4n1 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, O4(n-1)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o4n1 & 0x3ffff);
 			break;
 
 		case 0x02:  /* O3(n-1) */
@@ -1790,8 +1852,8 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				voice->o3n1 = (voice->o3n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o3n1 = (INT16)((voice->o3n1 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, O3(n-1)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o3n1 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, O3(n-1)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o3n1 & 0x3ffff);
 			break;
 
 		case 0x03:  /* O3(n-2) */
@@ -1799,8 +1861,8 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				voice->o3n2 = (voice->o3n2 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o3n2 = (INT16)((voice->o3n2 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, O3(n-2)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o3n2 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, O3(n-2)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o3n2 & 0x3ffff);
 			break;
 
 		case 0x04:  /* O2(n-1) */
@@ -1808,8 +1870,8 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				voice->o2n1 = (voice->o2n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o2n1 = (INT16)((voice->o2n1 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, O2(n-1)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o2n1 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, O2(n-1)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n1 & 0x3ffff);
 			break;
 
 		case 0x05:  /* O2(n-2) */
@@ -1817,8 +1879,8 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				voice->o2n2 = (voice->o2n2 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o2n2 = (INT16)((voice->o2n2 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, O2(n-2)=%05x\n", machine.describe_context(), chip->current_page & 0x1f, voice->o2n2 & 0x3ffff);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, O2(n-2)=%05x\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n2 & 0x3ffff);
 			break;
 
 		case 0x06:  /* O1(n-1) */
@@ -1826,8 +1888,8 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 				voice->o1n1 = (voice->o1n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o1n1 = (INT16)((voice->o1n1 & ~0xff00) | (data & 0xff00));
-			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%s:voice %d, O1(n-1)=%05x (accum=%08x)\n", machine.describe_context(), chip->current_page & 0x1f, voice->o2n1 & 0x3ffff, voice->accum);
+			if (LOG_COMMANDS && m_eslog)
+				fprintf(m_eslog, "%s:voice %d, O1(n-1)=%05x (accum=%08x)\n", machine().describe_context(), m_current_page & 0x1f, voice->o2n1 & 0x3ffff, voice->accum);
 			break;
 
 		case 0x07:
@@ -1841,12 +1903,12 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 		case 0x0d:  /* ACT */
 			if (ACCESSING_BITS_0_7)
 			{
-				chip->active_voices = data & 0x1f;
-				chip->sample_rate = chip->master_clock / (16 * (chip->active_voices + 1));
-				chip->stream->set_sample_rate(chip->sample_rate);
+				m_active_voices = data & 0x1f;
+				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
+				m_stream->set_sample_rate(m_sample_rate);
 
-				if (LOG_COMMANDS && eslog)
-					fprintf(eslog, "active voices=%d, sample_rate=%d\n", chip->active_voices, chip->sample_rate);
+				if (LOG_COMMANDS && m_eslog)
+					fprintf(m_eslog, "active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
 			break;
 
@@ -1855,13 +1917,13 @@ INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_
 
 		case 0x0f:  /* PAGE */
 			if (ACCESSING_BITS_0_7)
-				chip->current_page = data & 0x7f;
+				m_current_page = data & 0x7f;
 			break;
 	}
 }
 
 
-INLINE void es5505_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
+inline void es5505_device::reg_write_test(es550x_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	switch (offset)
 	{
@@ -1876,7 +1938,7 @@ INLINE void es5505_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_
 			break;
 
 		case 0x08:  /* SERMODE */
-			chip->mode = data & 0x0007;
+			m_mode = data & 0x0007;
 			break;
 
 		case 0x09:  /* PAR */
@@ -1885,12 +1947,12 @@ INLINE void es5505_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_
 		case 0x0d:  /* ACT */
 			if (ACCESSING_BITS_0_7)
 			{
-				chip->active_voices = data & 0x1f;
-				chip->sample_rate = chip->master_clock / (16 * (chip->active_voices + 1));
-				chip->stream->set_sample_rate(chip->sample_rate);
+				m_active_voices = data & 0x1f;
+				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
+				m_stream->set_sample_rate(m_sample_rate);
 
-				if (LOG_COMMANDS && eslog)
-					fprintf(eslog, "active voices=%d, sample_rate=%d\n", chip->active_voices, chip->sample_rate);
+				if (LOG_COMMANDS && m_eslog)
+					fprintf(m_eslog, "active voices=%d, sample_rate=%d\n", m_active_voices, m_sample_rate);
 			}
 			break;
 
@@ -1899,40 +1961,39 @@ INLINE void es5505_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_
 
 		case 0x0f:  /* PAGE */
 			if (ACCESSING_BITS_0_7)
-				chip->current_page = data & 0x7f;
+				m_current_page = data & 0x7f;
 			break;
 	}
 }
 
 
-WRITE16_DEVICE_HANDLER( es5505_w )
+WRITE16_MEMBER( es5505_device::write )
 {
-	es5506_state *chip = get_safe_token(device);
-	es5506_voice *voice = &chip->voice[chip->current_page & 0x1f];
+	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
 
-//  logerror("%s:ES5505 write %02x/%02x = %04x & %04x\n", machine.describe_context(), chip->current_page, offset, data, mem_mask);
+//  logerror("%s:ES5505 write %02x/%02x = %04x & %04x\n", machine().describe_context(), m_current_page, offset, data, mem_mask);
 
 	/* force an update */
-	chip->stream->update();
+	m_stream->update();
 
 	/* switch off the page and register */
-	if (chip->current_page < 0x20)
-		es5505_reg_write_low(chip, voice, offset, data, mem_mask);
-	else if (chip->current_page < 0x40)
-		es5505_reg_write_high(chip, voice, offset, data, mem_mask);
+	if (m_current_page < 0x20)
+		reg_write_low(voice, offset, data, mem_mask);
+	else if (m_current_page < 0x40)
+		reg_write_high(voice, offset, data, mem_mask);
 	else
-		es5505_reg_write_test(chip, voice, offset, data, mem_mask);
+		reg_write_test(voice, offset, data, mem_mask);
 }
 
 
 
 /**********************************************************************************************
 
-     es5505_reg_read -- read from the specified ES5505 register
+     reg_read -- read from the specified ES5505 register
 
 ***********************************************************************************************/
 
-INLINE UINT16 es5505_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_t offset)
+inline UINT16 es5505_device::reg_read_low(es550x_voice *voice, offs_t offset)
 {
 	UINT16 result = 0;
 
@@ -1994,23 +2055,23 @@ INLINE UINT16 es5505_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_
 			break;
 
 		case 0x0d:  /* ACT */
-			result = chip->active_voices;
+			result = m_active_voices;
 			break;
 
 		case 0x0e:  /* IRQV */
-			result = chip->irqv;
-			update_internal_irq_state(chip);
+			result = m_irqv;
+			update_internal_irq_state();
 			break;
 
 		case 0x0f:  /* PAGE */
-			result = chip->current_page;
+			result = m_current_page;
 			break;
 	}
 	return result;
 }
 
 
-INLINE UINT16 es5505_reg_read_high(es5506_state *chip, es5506_voice *voice, offs_t offset)
+inline UINT16 es5505_device::reg_read_high(es550x_voice *voice, offs_t offset)
 {
 	UINT16 result = 0;
 
@@ -2051,9 +2112,9 @@ INLINE UINT16 es5505_reg_read_high(es5506_state *chip, es5506_voice *voice, offs
 			/* want to waste time filtering stopped channels, we just look for a read from */
 			/* this register on a stopped voice, and return the raw sample data at the */
 			/* accumulator */
-			if ((voice->control & CONTROL_STOPMASK) && chip->region_base[voice->control >> 14])
+			if ((voice->control & CONTROL_STOPMASK) && m_region_base[voice->control >> 14])
 			{
-				voice->o1n1 = chip->region_base[voice->control >> 14][voice->exbank + (voice->accum >> 11)];
+				voice->o1n1 = m_region_base[voice->control >> 14][voice->exbank + (voice->accum >> 11)];
 				// logerror("%02x %08x ==> %08x\n",voice->o1n1,voice->control >> 14,voice->exbank + (voice->accum >> 11));
 			}
 			result = voice->o1n1;
@@ -2068,23 +2129,23 @@ INLINE UINT16 es5505_reg_read_high(es5506_state *chip, es5506_voice *voice, offs
 			break;
 
 		case 0x0d:  /* ACT */
-			result = chip->active_voices;
+			result = m_active_voices;
 			break;
 
 		case 0x0e:  /* IRQV */
-			result = chip->irqv;
-			update_internal_irq_state(chip);
+			result = m_irqv;
+			update_internal_irq_state();
 			break;
 
 		case 0x0f:  /* PAGE */
-			result = chip->current_page;
+			result = m_current_page;
 			break;
 	}
 	return result;
 }
 
 
-INLINE UINT16 es5505_reg_read_test(es5506_state *chip, es5506_voice *voice, offs_t offset)
+inline UINT16 es5505_device::reg_read_test(es550x_voice *voice, offs_t offset)
 {
 	UINT16 result = 0;
 
@@ -2101,44 +2162,43 @@ INLINE UINT16 es5505_reg_read_test(es5506_state *chip, es5506_voice *voice, offs
 			break;
 
 		case 0x08:  /* SERMODE */
-			result = chip->mode;
+			result = m_mode;
 			break;
 
 		case 0x09:  /* PAR */
-			if (!chip->port_read.isnull())
-				result = chip->port_read(0);
+			if (!m_port_read_func.isnull())
+				result = m_port_read_func(0);
 			break;
 
 		case 0x0f:  /* PAGE */
-			result = chip->current_page;
+			result = m_current_page;
 			break;
 	}
 	return result;
 }
 
 
-READ16_DEVICE_HANDLER( es5505_r )
+READ16_MEMBER( es5505_device::read )
 {
-	es5506_state *chip = get_safe_token(device);
-	es5506_voice *voice = &chip->voice[chip->current_page & 0x1f];
+	es550x_voice *voice = &m_voice[m_current_page & 0x1f];
 	UINT16 result = 0;
 
-	if (LOG_COMMANDS && eslog)
-		fprintf(eslog, "read from %02x/%02x -> ", chip->current_page, offset);
+	if (LOG_COMMANDS && m_eslog)
+		fprintf(m_eslog, "read from %02x/%02x -> ", m_current_page, offset);
 
 	/* force an update */
-	chip->stream->update();
+	m_stream->update();
 
 	/* switch off the page and register */
-	if (chip->current_page < 0x20)
-		result = es5505_reg_read_low(chip, voice, offset);
-	else if (chip->current_page < 0x40)
-		result = es5505_reg_read_high(chip, voice, offset);
+	if (m_current_page < 0x20)
+		result = reg_read_low(voice, offset);
+	else if (m_current_page < 0x40)
+		result = reg_read_high(voice, offset);
 	else
-		result = es5505_reg_read_test(chip, voice, offset);
+		result = reg_read_test(voice, offset);
 
-	if (LOG_COMMANDS && eslog)
-		fprintf(eslog, "%04x (accum=%08x)\n", result, voice->accum);
+	if (LOG_COMMANDS && m_eslog)
+		fprintf(m_eslog, "%04x (accum=%08x)\n", result, voice->accum);
 
 	/* return the high byte */
 	return result;
@@ -2146,89 +2206,114 @@ READ16_DEVICE_HANDLER( es5505_r )
 
 
 
-void es5505_voice_bank_w(device_t *device, int voice, int bank)
+void es5505_device::voice_bank_w(int voice, int bank)
 {
-	es5506_state *chip = get_safe_token(device);
+	
 #if RAINE_CHECK
-	chip->voice[voice].control = CONTROL_STOPMASK;
+	m_voice[voice].control = CONTROL_STOPMASK;
 #endif
-	chip->voice[voice].exbank=bank;
+	m_voice[voice].exbank=bank;
 }
 
-const device_type ES5506 = &device_creator<es5506_device>;
-
-es5506_device::es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ES5506, "ES5506", tag, owner, clock, "es5506", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(es5506_state);
-}
-
-es5506_device::es5506_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(es5506_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void es5506_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void es5506_device::device_start()
-{
-	DEVICE_START_NAME( es5506 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void es5506_device::device_reset()
-{
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void es5506_device::device_stop()
-{
-	DEVICE_STOP_NAME( es5506 )(this);
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
+void es550x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+}
+
 void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+		
+#if MAKE_WAVS
+	/* start the logging once we have a sample rate */
+	if (m_sample_rate)
+	{
+		if (!m_wavraw)
+			m_wavraw = wav_open("raw.wav", m_sample_rate, 2);
+	}
+#endif
+
+	/* loop until all samples are output */
+	int offset = 0;
+	while (samples)
+	{
+		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
+
+		generate_samples(outputs, offset, length);
+
+#if MAKE_WAVS
+		/* log the raw data */
+		if (m_wavraw) {
+			/* determine left/right source data */
+			INT32 *lsrc = m_scratch, *rsrc = m_scratch + length;
+			int channel;
+			memset(lsrc, 0, sizeof(INT32) * length * 2);
+			/* loop over the output channels */
+			for (channel = 0; channel < m_channels; channel++) {
+				INT32 *l = outputs[(channel << 1)] + offset;
+				INT32 *r = outputs[(channel << 1) + 1] + offset;
+				/* add the current channel's samples to the WAV data */
+				for (samp = 0; samp < length; samp++) {
+					lsrc[samp] += l[samp];
+					rsrc[samp] += r[samp];
+				}
+			}
+			wav_add_data_32lr(m_wavraw, lsrc, rsrc, length, 4);
+		}
+#endif
+
+		/* account for these samples */
+		offset += length;
+		samples -= length;
+	}
 }
 
-const device_type ES5505 = &device_creator<es5505_device>;
-
-es5505_device::es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: es5506_device(mconfig, ES5505, "ES5505", tag, owner, clock, "es5505", __FILE__)
+void es5505_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-}
+		
+#if MAKE_WAVS
+	/* start the logging once we have a sample rate */
+	if (m_sample_rate)
+	{
+		if (!m_wavraw)
+			m_wavraw = wav_open("raw.wav", m_sample_rate, 2);
+	}
+#endif
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+	/* loop until all samples are output */
+	int offset = 0;
+	while (samples)
+	{
+		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
 
-void es5505_device::device_start()
-{
-	DEVICE_START_NAME( es5505 )(this);
+		generate_samples(outputs, offset, length);
+
+#if MAKE_WAVS
+		/* log the raw data */
+		if (m_wavraw) {
+			/* determine left/right source data */
+			INT32 *lsrc = m_scratch, *rsrc = m_scratch + length;
+			int channel;
+			memset(lsrc, 0, sizeof(INT32) * length * 2);
+			/* loop over the output channels */
+			for (channel = 0; channel < m_channels; channel++) {
+				INT32 *l = outputs[(channel << 1)] + offset;
+				INT32 *r = outputs[(channel << 1) + 1] + offset;
+				/* add the current channel's samples to the WAV data */
+				for (samp = 0; samp < length; samp++) {
+					lsrc[samp] += l[samp];
+					rsrc[samp] += r[samp];
+				}
+			}
+			wav_add_data_32lr(m_wavraw, lsrc, rsrc, length, 4);
+		}
+#endif
+
+		/* account for these samples */
+		offset += length;
+		samples -= length;
+	}
 }

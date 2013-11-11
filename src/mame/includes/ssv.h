@@ -1,7 +1,7 @@
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
 #include "machine/eepromser.h"
-
+#include "sound/es5506.h"
 
 class ssv_state : public driver_device
 {
@@ -37,7 +37,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ensoniq;
+	required_device<es5506_device> m_ensoniq;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<upd96050_device> m_dsp;
 

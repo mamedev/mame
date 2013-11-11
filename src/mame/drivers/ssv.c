@@ -163,7 +163,6 @@ Notes:
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"
 #include "machine/nvram.h"
-#include "sound/es5506.h"
 #include "includes/ssv.h"
 
 /***************************************************************************
@@ -412,7 +411,7 @@ READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_SHARE("irq_vectors")                       /*  IRQ Vec */  \
 	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                                           /*  IRQ Ack */  \
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                                         /*  IRQ En  */  \
-	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8_LEGACY("ensoniq", es5506_r, es5506_w, 0x00ff)         /*  Sound   */  \
+	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0x00ff)         /*  Sound   */  \
 	AM_RANGE(_ROM, 0xffffff) AM_ROMBANK("bank1")                                                        /*  ROM     */
 /***************************************************************************
                                 Drift Out '94
@@ -666,7 +665,7 @@ WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 		int bank = 0x400000/2 * (data & 1); // UINT16 address
 		int voice;
 		for (voice = 0; voice < 32; voice++)
-			es5506_voice_bank_w(m_ensoniq, voice, bank);
+			m_ensoniq->voice_bank_w(voice, bank);
 	}
 //  popmessage("%04X",data);
 }

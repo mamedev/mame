@@ -124,7 +124,7 @@ WRITE16_MEMBER( taito_en_device::en_es5505_bank_w )
 
 	/* mask out unused bits */
 	data &= max_banks_this_game;
-	es5505_voice_bank_w(space.machine().device("ensoniq"),offset,data<<20);
+	space.machine().device<es5505_device>("ensoniq")->voice_bank_w(offset,data<<20);
 }
 
 WRITE16_MEMBER( taito_en_device::en_volume_w )
@@ -250,7 +250,7 @@ WRITE16_MEMBER( taito_en_device::es5510_dsp_w )
 static ADDRESS_MAP_START( en_sound_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1")
 	AM_RANGE(0x140000, 0x140fff) AM_DEVREADWRITE("taito_en", taito_en_device, en_68000_share_r, en_68000_share_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
+	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_device, read, write)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE("taito_en", taito_en_device, es5510_dsp_r, es5510_dsp_w) //todo: hook up cpu/es5510
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0x00ff)
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("taito_en", taito_en_device, en_es5505_bank_w)
