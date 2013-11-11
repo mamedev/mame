@@ -11,14 +11,6 @@
 
 /*
 
-	TODO:
-
-	- vendor specific SASI command 0c: 00 00 00 00 00 01 40 04 00 84 00
-
-*/
-
-/*
-
     Use the CHDMAN utility to create a 5MB image for ABC 850:
 
     $ chdman createhd -o ro202.chd -chs 321,4,17 -ss 512
@@ -233,7 +225,7 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21056 )
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
-	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", S1410, SCSI_ID_0)
 	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
 	MCFG_SCSICB_BSY_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, luxor_55_21056_device, sasi_bsy_w))
 	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, luxor_55_21056_device, sasi_io_w))
@@ -473,8 +465,8 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 
 	data |= (m_req || m_sasibus->scsi_req_r()) << 1;
 	data |= m_sasibus->scsi_io_r() << 2;
-	data |= m_sasibus->scsi_cd_r() << 3;
-	data |= m_sasibus->scsi_msg_r() << 4;
+	data |= !m_sasibus->scsi_cd_r() << 3;
+	data |= !m_sasibus->scsi_msg_r() << 4;
 	data |= !m_sasibus->scsi_bsy_r() << 5;
 
 	return data ^ 0xff;
@@ -528,7 +520,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_data_r )
 	m_req = !m_sasibus->scsi_req_r();
 	m_sasibus->scsi_ack_w(!m_req);
 
-	return data ^ 0xff;
+	return data;
 }
 
 
