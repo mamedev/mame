@@ -188,10 +188,10 @@ protected:
 };
 
 // optional device finder
-class netlist_mame_device::optional_output : public netlist_mame_device::output_finder<false, net_output_t>
+class netlist_mame_device::optional_output : public netlist_mame_device::output_finder<false, netlist_output_t>
 {
 public:
-	optional_output(device_t &base, const char *tag, const char *output) : output_finder<false, net_output_t>(base, tag, output) { }
+	optional_output(device_t &base, const char *tag, const char *output) : output_finder<false, netlist_output_t>(base, tag, output) { }
 
 	virtual ~optional_output() {};
 
@@ -221,10 +221,10 @@ public:
 };
 
 // optional device finder
-class netlist_mame_device::optional_param : public netlist_mame_device::output_finder<false, net_param_t>
+class netlist_mame_device::optional_param : public netlist_mame_device::output_finder<false, netlist_param_t>
 {
 public:
-	optional_param(device_t &base, const char *tag, const char *output) : output_finder<false, net_param_t>(base, tag, output) { }
+	optional_param(device_t &base, const char *tag, const char *output) : output_finder<false, netlist_param_t>(base, tag, output) { }
 
 	virtual bool OnDeviceStart()
 	{
@@ -235,10 +235,10 @@ public:
 };
 
 // required devices are similar but throw an error if they are not found
-class netlist_mame_device::required_param : public netlist_mame_device::output_finder<true, net_param_t>
+class netlist_mame_device::required_param : public netlist_mame_device::output_finder<true, netlist_param_t>
 {
 public:
-	required_param(device_t &base, const char *tag, const char *output) : output_finder<true, net_param_t>(base, tag, output) { }
+	required_param(device_t &base, const char *tag, const char *output) : output_finder<true, netlist_param_t>(base, tag, output) { }
 
 	virtual bool OnDeviceStart()
 	{
