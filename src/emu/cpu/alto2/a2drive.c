@@ -20,16 +20,22 @@
 #define	GUARD_ZONE_BITS	(16*32)
 
 /** @brief write a bit into an array of UINT32 */
-#define	WRBIT(bits,dst,bit) do { \
-	if (bit) { \
-		bits[(dst)/32] |= 1 << ((dst) % 32); \
-	} else { \
-		bits[(dst)/32] &= ~(1 << ((dst) % 32)); \
-	} \
-} while (0)
+static inline size_t WRBIT(UINT32* bits, size_t dst, int bit)
+{
+	if (bit) {
+		bits[(dst)/32] |= 1 << ((dst) % 32);
+	} else {
+		bits[(dst)/32] &= ~(1 << ((dst) % 32));
+	}
+	return ++dst;
+}
 
 /** @brief read a bit from an array of UINT32 */
-#define	RDBIT(bits,src) ((bits[(src)/32] >> ((src) % 32)) & 1)
+static inline size_t RDBIT(UINT32* bits, size_t src, int& bit)
+{
+	bit = (bits[src/32] >> (src % 32)) & 1;
+	return ++src;
+}
 
 /**
  * @brief calculate the sector from the logical block address
@@ -70,13 +76,10 @@ void alto2_cpu_device::drive_get_sector(int unit)
  */
 static int cksum(UINT8 *src, size_t size, int start)
 {
-	size_t offs;
 	int sum = start;
-	int word;
-
 	/* compute XOR of all words */
-	for (offs = 0; offs < size; offs += 2) {
-		word = src[size - 2 - offs] + 256 * src[size - 2 - offs + 1];
+	for (size_t offs = 0; offs < size; offs += 2) {
+		int word = src[size - 2 - offs] + 256 * src[size - 2 - offs + 1];
 		sum ^= word;
 	}
 	return sum;
@@ -92,15 +95,10 @@ static int cksum(UINT8 *src, size_t size, int start)
  */
 static size_t expand_zeroes(UINT32 *bits, size_t dst, size_t size)
 {
-	size_t offs;
-
-	for (offs = 0; offs < 32 * size; offs += 2) {
-		WRBIT(bits, dst, 1);		// write the clock bit
-		dst++;
-		WRBIT(bits, dst, 0);		// write the 0 data bit
-		dst++;
+	for (size_t offs = 0; offs < 32 * size; offs += 2) {
+		dst = WRBIT(bits, dst, 1);		// write the clock bit
+		dst = WRBIT(bits, dst, 0);		// write the 0 data bit
 	}
-
 	return dst;
 }
 
@@ -114,18 +112,12 @@ static size_t expand_zeroes(UINT32 *bits, size_t dst, size_t size)
  */
 static size_t expand_sync(UINT32 *bits, size_t dst, size_t size)
 {
-	size_t offs;
-
-	for (offs = 0; offs < 32 * size - 2; offs += 2) {
-		WRBIT(bits, dst, 1);		// write the clock bit
-		dst++;
-		WRBIT(bits, dst, 0);		// write the 0 data bit
-		dst++;
+	for (size_t offs = 0; offs < 32 * size - 2; offs += 2) {
+		dst = WRBIT(bits, dst, 1);		// write the clock bit
+		dst = WRBIT(bits, dst, 0);		// write the 0 data bit
 	}
-	WRBIT(bits, dst, 1);	// write the final clock bit
-	dst++;
-	WRBIT(bits, dst, 1);	// write the 1 data bit
-	dst++;
+	dst = WRBIT(bits, dst, 1);	// write the final clock bit
+	dst = WRBIT(bits, dst, 1);	// write the 1 data bit
 	return dst;
 }
 
@@ -140,15 +132,11 @@ static size_t expand_sync(UINT32 *bits, size_t dst, size_t size)
  */
 static size_t expand_record(UINT32 *bits, size_t dst, UINT8 *field, size_t size)
 {
-	size_t offs, bit;
-
-	for (offs = 0; offs < size; offs += 2) {
+	for (size_t offs = 0; offs < size; offs += 2) {
 		int word = field[size - 2 - offs] + 256 * field[size - 2 - offs + 1];
-		for (bit = 0; bit < 16; bit++) {
-			WRBIT(bits, dst, 1);				// write the clock bit
-			dst++;
-			WRBIT(bits, dst, (word >> 15) & 1);	// write the data bit
-			dst++;
+		for (size_t bit = 0; bit < 16; bit++) {
+			dst = WRBIT(bits, dst, 1);					// write the clock bit
+			dst = WRBIT(bits, dst, (word >> 15) & 1);	// write the data bit
 			word <<= 1;
 		}
 	}
@@ -166,16 +154,10 @@ static size_t expand_record(UINT32 *bits, size_t dst, UINT8 *field, size_t size)
  */
 static size_t expand_cksum(UINT32 *bits, size_t dst, UINT8 *field, size_t size)
 {
-	size_t bit;
 	int word = cksum(field, size, 0521);
-
-	for (bit = 0; bit < 32; bit += 2) {
-		/* write the clock bit */
-		WRBIT(bits, dst, 1);
-		dst++;
-		/* write the data bit */
-		WRBIT(bits, dst, (word >> 15) & 1);
-		dst++;
+	for (size_t bit = 0; bit < 32; bit += 2) {
+		dst = WRBIT(bits, dst, 1);				// write the clock bit
+		dst = WRBIT(bits, dst, (word >> 15) & 1);	// write the data bit
 		word <<= 1;
 	}
 	return dst;
@@ -320,17 +302,16 @@ size_t alto2_cpu_device::dump_record(UINT8 *src, size_t addr, size_t size, const
  */
 size_t alto2_cpu_device::squeeze_sync(UINT32 *bits, size_t src, size_t size)
 {
-	size_t offs, bitcount;
 	UINT32 accu = 0;
-
 	/* hunt for the first 0x0001 word */
-	for (bitcount = 0, offs = 0; offs < size; /* */) {
+	for (size_t bitcount = 0, offs = 0; offs < size; /* */) {
 		/*
 		 * accumulate clock and data bits until we are
 		 * on the clock bit boundary
 		 */
-		accu = (accu << 1) | RDBIT(bits,src);
-		src++;
+		int bit;
+		src = RDBIT(bits,src,bit);
+		accu = (accu << 1) | bit;
 		/*
 		 * look for 15 alternating clocks and 0-bits
 		 * and the 16th clock with a 1-bit
@@ -348,7 +329,7 @@ size_t alto2_cpu_device::squeeze_sync(UINT32 *bits, size_t src, size_t size)
 }
 
 /**
- * @brief find a 0 bit sequence in an array of clock and data bits
+ * @brief find a 16 x 0 bits sequence in an array of clock and data bits
  *
  * @param bits pointer to the sector's bits
  * @param src source offset into bits (bit number)
@@ -357,20 +338,18 @@ size_t alto2_cpu_device::squeeze_sync(UINT32 *bits, size_t src, size_t size)
  */
 size_t alto2_cpu_device::squeeze_unsync(UINT32 *bits, size_t src, size_t size)
 {
-	size_t offs, bitcount;
 	UINT32 accu = 0;
-
-	/* hunt for the first 0x0000 word */
-	for (bitcount = 0, offs = 0; offs < size; /* */) {
+	/* hunt for the first 0 word (16 x 0 bits) */
+	for (size_t bitcount = 0, offs = 0; offs < size; /* */) {
 		/*
 		 * accumulate clock and data bits until we are
 		 * on the clock bit boundary
 		 */
-		accu = (accu << 1) | RDBIT(bits,src);
-		src++;
+		int bit;
+		src = RDBIT(bits,src,bit);
+		accu = (accu << 1) | bit;
 		/*
-		 * look for 15 alternating clocks and 0-bits
-		 * and the 16th clock with a 1-bit
+		 * look for 16 alternating clocks and 0 data bits
 		 */
 		if (accu == 0xaaaaaaaa)
 			return src;
@@ -395,16 +374,13 @@ size_t alto2_cpu_device::squeeze_unsync(UINT32 *bits, size_t src, size_t size)
  */
 size_t alto2_cpu_device::squeeze_record(UINT32 *bits, size_t src, UINT8 *field, size_t size)
 {
-	size_t offs, bitcount;
 	UINT32 accu = 0;
-
-
-	for (bitcount = 0, offs = 0; offs < size; /* */) {
-		/* skip clock */
-		src++;
-		/* get data bit */
-		accu = (accu << 1) | RDBIT(bits,src);
-		src++;
+	for (size_t bitcount = 0, offs = 0; offs < size; /* */) {
+		int bit;
+		src = RDBIT(bits,src,bit);		// skip clock
+		assert(bit == 1);
+		src = RDBIT(bits,src,bit);		// get data bit
+		accu = (accu << 1) | bit;
 		bitcount += 2;
 		if (bitcount == 32) {
 			/* collected a word */
@@ -427,16 +403,14 @@ size_t alto2_cpu_device::squeeze_record(UINT32 *bits, size_t src, UINT8 *field, 
  */
 size_t alto2_cpu_device::squeeze_cksum(UINT32 *bits, size_t src, int *cksum)
 {
-	size_t bitcount;
 	UINT32 accu = 0;
 
-
-	for (bitcount = 0; bitcount < 32; bitcount += 2) {
-		/* skip clock */
-		src++;
-		/* get data bit */
-		accu = (accu << 1) | RDBIT(bits,src);
-		src++;
+	for (size_t bitcount = 0; bitcount < 32; bitcount += 2) {
+		int bit;
+		src = RDBIT(bits,src,bit);		// skip clock
+		assert(bit == 1);
+		src = RDBIT(bits,src,bit);		// get data bit
+		accu = (accu << 1) | bit;
 	}
 
 	/* set the cksum to the extracted word */
@@ -1073,7 +1047,7 @@ int alto2_cpu_device::drive_rddata(int unit, int index)
 	if (-1 == d->rdfirst)
 		d->rdfirst = index;
 
-	bit = RDBIT(bits,index);
+	RDBIT(bits,index,bit);
 	LOG((LOG_DRIVE,7,"	read #%d %d/%d/%d bit #%d:%d\n", unit, d->cylinder, d->head, d->sector, index, bit));
 	d->rdlast = index;
 	return bit;
@@ -1123,11 +1097,9 @@ int alto2_cpu_device::drive_rdclk(int unit, int index)
 	if (index & 1) {
 		clk = 0;
 	} else {
-		clk = RDBIT(bits,index);
+		RDBIT(bits,index,clk);
 	}
-
 	LOG((LOG_DRIVE,7,	"	read #%d %d/%d/%d clk #%d:%d\n", unit, d->cylinder, d->head, d->sector, index, clk));
-
 	d->rdlast = index;
 	return clk ^ 1;
 }
@@ -1144,7 +1116,6 @@ int alto2_cpu_device::debug_read_sync(int unit, int page, int offs)
 {
 	diablo_drive_t *d = m_drive[unit];
 	UINT32 *bits;
-	UINT32 accu;
 
 	if (unit < 0 || unit > 1)
 		return 0;
@@ -1167,10 +1138,11 @@ int alto2_cpu_device::debug_read_sync(int unit, int page, int offs)
 			return 0;
 	}
 
-	accu = 0;
+	UINT32 accu = 0;
 	while (offs < 400 * 32) {
-		accu = (accu << 1) | RDBIT(bits,offs);
-		offs++;
+		int bit;
+		offs = RDBIT(bits,offs,bit);
+		accu = (accu << 1) | bit;
 		if (accu == 0xaaaaaaab)
 			break;
 	}
@@ -1213,9 +1185,12 @@ int alto2_cpu_device::debug_read_sec(int unit, int page, int offs)
 			return 0177777;
 	}
 
-	for (i = 0, clks = 0, word = 0; i < 16; i++, offs += 2) {
-		clks = (clks << 1) | RDBIT(bits,offs);
-		word = (word << 1) | RDBIT(bits,offs+1);
+	for (i = 0, clks = 0, word = 0; i < 16; i++) {
+		int bit;
+		offs = RDBIT(bits,offs,bit);
+		clks = (clks << 1) | bit;
+		offs = RDBIT(bits,offs,bit);
+		word = (word << 1) | bit;
 	}
 
 	return word;
@@ -1358,7 +1333,7 @@ int drive_args(const char *arg)
 	if (unit == DRIVE_MAX)
 		return -1;
 
-	d = reinterpret_cast<diablo_drive_t *>(m_drive[unit]);
+	d = m_drive[unit];
 
 	snprintf(d->basename, sizeof(d->basename), "%s", basename);
 
@@ -1485,7 +1460,6 @@ void alto2_cpu_device::drive_init()
 			267 * 2, sizeof(diablo_sector_t));
 
 	for (i = 0; i < DIABLO_DRIVE_MAX; i++) {
-		// FIXME: use MAME resource system(?)
 		diablo_drive_t *d = reinterpret_cast<diablo_drive_t *>(auto_alloc_clear(machine(), diablo_drive_t));
 		m_drive[i] = d;
 
