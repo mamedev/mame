@@ -4,20 +4,33 @@
 
     Driver-in-progress by R. Belmont and Miodrag Milanovic with additions by Karl-Ludwig Deisenhofer.
 
-    STATE AS OF SEPTEMBER 2013
+    STATE AS OF NOVEMBER 2013
     --------------------------
     - FATAL: keyboard emulation needs love (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
     - NOT WORKING: serial (ERROR 60)
     - NOT WORKING: printer interface (ERROR 40).
 
-    - NON-CRITICAL: NVRAM currently saves changes instantly.  A switch to EEPROM (load, store...) might be in order.
-    - NON-CRITICAL: no code for W18 (DSR) jumper.
+    - NON-CRITICAL: no code for W18 (DSR) jumper. W90 jumper probably not relevant for emulation (VBIAS pin 2 => to unknown register).
     - NON-CRITICAL: watchdog logic not implemented. MHFLU - ERROR 16 indicated hardware problems or (most often) software crashes on real hardware.
 
-    - FUTURE IMPROVEMENTS (=> DIP switches currently disabled):
-            * Color graphics option (NEC 7220)
-            * Extended communication option ( = Bundle option ?)
+    - SHOULD BE IMPLEMENTED AS SLOT DEVICES (for now, DIP settings affect 'system_parameter_r' only and are disabled):
+            * Color graphics option (uses NEC upd7220 GDC)
+            * Extended communication option (same as BUNDLE_OPTION ?)
 
+    - OTHER UPGRADES (NEC_V20 should be easy, the TURBOW is harder to come by)
+			* Suitable Solutions TURBOW286 (12 Mhz, 68-pin, low power AMD N80L286-12 and WAYLAND/EDSUN EL286-88-10-B ( 80286 to 8088 Processor Signal Converter )
+			  / replacement for main cpu with on-board DC 7174 or DT 7174 (?) RTC and changed BOOT ROM labeled 'TBSS1.3 - 3ED4').
+
+			* NEC_V20 (requires modded BOOT ROM because of - at least 2 - hard coded timing loops): 
+                 100A:         100B/100+:						100B+ ALTERNATE RECOMMENDATION (fixes RAM size auto-detection problems when V20 is in place.
+				                                                                                Tested on a 30+ year old live machine. Your mileage may vary)
+                 Location Data	Location Data                   Loc.|Data								
+																00C6 46 [ increases 'wait for Z80' from approx. 27,5 ms (old value 40) to 30,5 ms ]
+																0303 00 [ disable CHECKSUM ]
+                 043F     64    072F     64	<----------------->	072F 73 [ increases minimum cycle time from 2600 (64) to 3000 ms (73) ]
+                 067D	  20	0B36     20	<-----------------> 0B36 20 [ use a value of 20 for NEC_V20 - as in the initial patch. Changes cause VFR - ERROR 10. ]
+                 1FFE     2B	3FFE     1B  (BIOS CHECKSUM)    
+                 1FFF     70	3FFF     88  (BIOS CHECKSUM)    
 
     Meaning of Diagnostics LEDs (from PC100ESV1.PDF found, e.g.,
     on ftp://ftp.update.uu.se/pub/rainbow/doc/rainbow-docs/
@@ -75,37 +88,43 @@ PCB layout
 ----------
 
 DEC-100 model B
+= part no.70-19974-02 according to document EK-RB100-TM_001
 
 PCB # 5416206 / 5016205-01C1:
 
         7-6-5-4 |3-2-1
         DIAGNOSTIC-LEDs |J3   | |J2     | |J1    |
-|------|----8088|Z80-|-|VIDEO|-|PRINTER|-|SERIAL||
-|  2 x 64 K                                      |
-|  R  A  M         NEC D7201C            |P| [??]|
-|                                        |O|     |
-|     23-020e5-00  INTEL 8088            |W|     |
-|                                        |E|     |
-|     23-022e5-00                        |R|     |
-|     -BOOT EPROM                                |
-|                                                |
-|     INTEL 8251A   ZILOG Z 80                   |
-|                [W18 ??]                        |
-| A  4x                74 LS 244                 |
-| M  S           [W15]                           |
-| 9  -   DEC_011C      74 LS 245                 |
-| 1  R           [W14]                           |
-| 2  A                  [W13]                    |
-| 8  M   CHARGEN.-                               |
-|        ROM (4K)                                |
-|------------PCB# 5416206 / 5016205-01C1---------|
+|------|----8088|Z80-|--|VIDEO|-|PRINTER|-|SERIAL|---|
+|  2 x 64 K             |/KBD.|                      |
+|  R  A  M             NEC D7201C            |P|[W90]|
+|                                            |O|     |
+|   [W6]   ROM 1       INTEL 8088            |W|     |
+|          (23-020e5-00)                     |E|     |
+|                                            |R|     |
+| ...J5..  BOOT ROM 0      ...J4...          =J8     |
+| ...J6... (23-022e5-00)                             |
+| [W5]                                               |
+|                                                    |
+|     INTEL 8251A   ZILOG Z 80A                      |
+|                [W18]                               |
+| A  4x                74 LS 244                     |
+| M  S           [W15]                               |
+| 9  -   DEC-DC011     74 LS 245                     |
+| 1  R           [W14]                               |
+| 2  A                  [W13]                        |
+| 8  M   CHARGEN.-                                   |
+|        ROM (4K)           ...J7...  | ...J9 = RX50 |
+|------------PCB# 5416206 / 5016205-01C1-------------|
 NOTES
-[??] indicates an untested jumper or 2-pin connector
+W5 + W6 are out when 16K x 8 EPROMS are used  
+/ W5 + W6 installed => 32 K x 8 EPROMs (pin 27 = A14)
 
-W18 pulls DSR to ground and affects 8251A - port $11 (bit 7).
-W18 jumper location is unverified. There is no code to pull DSR yet!
-
-W13 - W15 affect diagnostic read register (port $0a)
+W13, W14, W15, W18, W90 = for manufacturing tests.
+=> W13 - W15 affect diagnostic read register (port $0a)
+=> W18 pulls DSR to ground and affects 8251A - port $11 (bit 7)
+   NOTE: THERE IS NO CODE TO PULL DSR YET.
+=> W90 connects pin 2 (Voltage Bias on PWR connector J8) with the communications control register 
+(SH1 - IOWR4 L line according to page 21 of the DEC-100-B field manual)
 
 SEEN ON SCHEMATICS - NOT PRESENT ON THIS PCB:
 W16 pulls J2 printer port pin 1 to GND when set (otherwise pin unconnected)
@@ -149,7 +168,10 @@ public:
 		m_kbd8251(*this, "kbdser"),
 		m_lk201(*this, LK201_TAG),
 		m_p_ram(*this, "p_ram"),
+
+		m_p_vol_ram(*this, "vol_ram"),
 		m_p_nvram(*this, "nvram"),
+
 		m_shared(*this, "sh_ram"),
 		m_maincpu(*this, "maincpu") { }
 
@@ -171,6 +193,7 @@ public:
 	required_device<i8251_device> m_kbd8251;
 	required_device<lk201_device> m_lk201;
 	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<UINT8> m_p_vol_ram;
 	required_shared_ptr<UINT8> m_p_nvram;
 	required_shared_ptr<UINT8> m_shared;
 	UINT8 m_diagnostic;
@@ -213,6 +236,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
 
+	bool m_SCREEN_BLANK;
 	bool m_COLDBOOT;
 
 	bool m_zflip;                   // Z80 alternate memory map with A15 inverted
@@ -236,7 +260,9 @@ public:
 };
 
 void rainbow_state::machine_start()
-{   m_COLDBOOT = true;
+{  
+	m_SCREEN_BLANK = false;
+	m_COLDBOOT = true;
 
 	save_item(NAME(m_z80_private));
 	save_item(NAME(m_z80_mailbox));
@@ -283,14 +309,19 @@ static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	AM_RANGE(0x20000, 0xdffff) AM_READWRITE(floating_bus_r,floating_bus_w)
 	AM_RANGE(0x20000, 0xdffff) AM_RAM
 
-	// TODO: handle shadowing 100% correctly.
-	// PDF says there is a 256 x 4 bit NVRAM from 0xed000 to 0xed040.
-	// * SHOULD * be shadowed from $ec00 - $ecfff AND FROM $ed040 - $edfff.
-	// "address bits 8-12 are not decoded when accessing the NVM"
+	// Documentation claims there is a 256 x 4 bit NVRAM from 0xed000 to 0xed040 (*)
+	//   shadowed at $ec000 - $ecfff and from $ed040 - $edfff.
 
-	// ROM code gives an error if NVRAM isn't 256 x 8 bit
-	// with address bits 8-12 ignored, so do that.
-	AM_RANGE(0xec000, 0xec0ff) AM_MIRROR(0x1f00) AM_RAM AM_SHARE("nvram")
+	//  - PC-100 A might have had a smaller (NV-)RAM (*)
+	//  - ED000 - ED0FF is the area the _DEC-100-B BIOS_ accesses - and checks.
+
+	//  - Specs claim that the CPU has direct access to volatile RAM only.
+	//    So NVRAM is hidden now and loads & saves are triggered within the 
+	//    'diagnostic_w' handler (like on real hardware).
+
+	//  - Address bits 8-12 are ignored (-> AM_MIRROR). Remove for debugging.
+	AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00) 
+	AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram") 
 
 	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
@@ -423,7 +454,10 @@ void rainbow_state::machine_reset()
 
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_crtc->video_update(bitmap, cliprect);
+	if (m_SCREEN_BLANK)
+		bitmap.fill(get_black_pen(machine()), cliprect);
+ 	else 
+		m_crtc->video_update(bitmap, cliprect);
 	return 0;
 }
 
@@ -690,16 +724,30 @@ READ8_MEMBER( rainbow_state::diagnostic_r )
 {
 //    printf("%02x DIP value ORed to diagnostic\n", ( m_inp1->read() | m_inp2->read() | m_inp3->read()   )  );
 
-	return ( (m_diagnostic & (0xf1)) | (     m_inp1->read() |
-												m_inp2->read() |
-												m_inp3->read()   )
+	return ( (m_diagnostic & (0xf1)) | (    m_inp1->read() |
+											m_inp2->read() |
+											m_inp3->read()   
+									   )
 			);
 }
 
 WRITE8_MEMBER( rainbow_state::diagnostic_w )
 {
 //    printf("%02x to diag port (PC=%x)\n", data, space.device().safe_pc());
+	m_SCREEN_BLANK = (data & 2) ? false : true;
 
+	if ( !(data & 0x40)  && (m_diagnostic & 0x40) ) // if set to 1 (first) and later set to 0...
+	{  
+		//  SAVE / PROGRAM NVM: transfer data from volatile memory to NVM 
+		memcpy( m_p_nvram, m_p_vol_ram, 256); 
+	}
+
+	if ( (data & 0x80)  && !(m_diagnostic & 0x80) ) // if set to 0 (first) and later set to 1...
+	{
+	    // READ / RECALL NVM: transfer data from NVM to volatile memory 
+		memcpy( m_p_vol_ram, m_p_nvram, 256);
+	}
+		
 	if (!(data & 1))
 	{
 		m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -717,6 +765,8 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 	m_diagnostic = data;
 }
 
+
+// KEYBOARD
 void rainbow_state::update_kbd_irq()
 {
 	if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
@@ -728,6 +778,7 @@ void rainbow_state::update_kbd_irq()
 		m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
 	}
 }
+
 
 READ_LINE_MEMBER(rainbow_state::kbd_rx)
 {
