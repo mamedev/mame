@@ -777,6 +777,7 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 	}
 
 	m_line_count = 0;
+	
 	// loop over primitives
 	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
 		if (prim->type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim->flags))
@@ -793,7 +794,10 @@ void renderer::process_primitives()
 			case render_primitive::LINE:
 				if (PRIMFLAG_GET_VECTOR(prim->flags))
 				{
-					continue;
+					if (m_line_count > 0)
+						batch_vectors();
+					else
+						continue;
 				}
 				else
 				{
@@ -809,8 +813,6 @@ void renderer::process_primitives()
 				throw emu_fatalerror("Unexpected render_primitive type");
 		}
 	}
-
-	batch_vectors();
 }
 
 void renderer::end_frame()
@@ -1483,6 +1485,8 @@ void renderer::batch_vectors()
 	{
 		start_index %= m_line_count;
 	}
+	
+	m_line_count = 0;
 }
 
 void renderer::batch_vector(const render_primitive *prim, float line_time)
