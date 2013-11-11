@@ -54,8 +54,6 @@
 #include "machine/ti99/joyport.h"
 #include "machine/ti99/peribox.h"
 
-#include "drivlgcy.h"
-
 #define LOG logerror
 #define VERBOSE 1
 
@@ -67,45 +65,43 @@ class ti99_4x_state : public driver_device
 public:
 	ti99_4x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_cpu(*this, "maincpu"),
+		m_tms9901(*this, TMS9901_TAG),
+		m_gromport(*this, GROMPORT_TAG),
+		m_peribox(*this, PERIBOX_TAG),
+		m_joyport(*this, JOYPORT_TAG),
+		m_datamux(*this, DATAMUX_TAG),
+		m_video(*this, VIDEO_SYSTEM_TAG),
 		m_cassette1(*this, "cassette"),
-		m_cassette2(*this, "cassette2") { }
+		m_cassette2(*this, "cassette2")
+		{ }
 
-	// CRU (Communication Register Unit) handling
-	DECLARE_READ8_MEMBER(cruread);
-	DECLARE_WRITE8_MEMBER(cruwrite);
-	DECLARE_WRITE8_MEMBER(external_operation);
+	// Machine management
+	DECLARE_MACHINE_START(ti99_4);
+	DECLARE_MACHINE_START(ti99_4a);
+	DECLARE_MACHINE_START(ti99_4qi);
+	DECLARE_MACHINE_RESET(ti99_4);
+	DECLARE_MACHINE_RESET(ti99_4a);
 
-	// Forwarding interrupts to the CPU or CRU
+	// Processor connections with the main board
+	DECLARE_READ8_MEMBER( cruread );
+	DECLARE_READ8_MEMBER( interrupt_level );
+	DECLARE_WRITE8_MEMBER( cruwrite );
+	DECLARE_WRITE8_MEMBER( external_operation );
+	DECLARE_WRITE_LINE_MEMBER( clock_out );
+	DECLARE_WRITE_LINE_MEMBER( dbin_line );
+
+	// Connections from outside towards the CPU (callbacks)
 	DECLARE_WRITE_LINE_MEMBER( console_ready );
 	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
 	DECLARE_WRITE_LINE_MEMBER( console_reset );
 
+	// Connections with the system interface chip 9901
 	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT2 );
 	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT12 );
 	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT2_from_v9938);
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
-
-	DECLARE_READ8_MEMBER( interrupt_level );
-	DECLARE_READ_LINE_MEMBER( ready_connect );
-	DECLARE_WRITE_LINE_MEMBER( clock_out );
-	DECLARE_WRITE_LINE_MEMBER( dbin_line );
-
-	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
-	TIMER_DEVICE_CALLBACK_MEMBER(ti99_4ev_hblank_interrupt);
-
-	// Some values to keep
-	tms9900_device*     m_cpu;
-	tms9901_device*     m_tms9901;
-	gromport_device*    m_gromport;
-	peribox_device*     m_peribox;
-	joyport_device*     m_joyport;
-	ti99_datamux_device* m_datamux;
-	ti_video_device*    m_video;
-
-	int     m_ready_line, m_ready_line_dmux;
-
-	int     m_firstjoy;         // First joystick. 6 for TI-99/4A, 5 for TI-99/4
 
 	// Connections with the system interface TMS9901
 	DECLARE_READ8_MEMBER(read_by_9901);
@@ -119,20 +115,44 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(handset_ack);
 	DECLARE_WRITE_LINE_MEMBER(cs2_motor);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
-	DECLARE_MACHINE_START(ti99_4);
-	DECLARE_MACHINE_START(ti99_4a);
-	DECLARE_MACHINE_START(ti99_4qi);
-	DECLARE_MACHINE_RESET(ti99_4);
-	DECLARE_MACHINE_RESET(ti99_4a);
+
+	// Interrupt triggers
+	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+	TIMER_DEVICE_CALLBACK_MEMBER(ti99_4ev_hblank_interrupt);
+
 private:
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
 	int     m_check_alphalock;
-	bool    m_qi_version;
 
 	int     m_ready_prev;       // for debugging purposes only
+
+	// Latches the ready line from different sources
+	int     m_ready_line, m_ready_line_dmux;
+
+	// Console type
+	int    m_console;
+
+	// Connected devices
+	required_device<tms9900_device>     m_cpu;
+	required_device<tms9901_device>     m_tms9901;
+	required_device<gromport_device>    m_gromport;
+	required_device<peribox_device>     m_peribox;
+	required_device<joyport_device>     m_joyport;
+	required_device<ti99_datamux_device> m_datamux;
+	required_device<ti_video_device>    m_video;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+};
+
+/*
+    Console models.
+*/
+enum
+{
+	MODEL_4,
+	MODEL_4A,
+	MODEL_4QI
 };
 
 /*
@@ -362,7 +382,7 @@ READ8_MEMBER( ti99_4x_state::cruread )
 	// Also, we translate the bit addresses to base addresses
 
 	// The QI version does not propagate the CRU signals to the cartridge slot
-	if (!m_qi_version) m_gromport->crureadz(space, offset<<4, &value);
+	if (m_console != MODEL_4QI) m_gromport->crureadz(space, offset<<4, &value);
 	m_peribox->crureadz(space, offset<<4, &value);
 
 	return value;
@@ -372,7 +392,7 @@ WRITE8_MEMBER( ti99_4x_state::cruwrite )
 {
 	if (VERBOSE>6) LOG("ti99_4x: write access to CRU address %04x\n", offset << 1);
 	// The QI version does not propagate the CRU signals to the cartridge slot
-	if (!m_qi_version) m_gromport->cruwrite(space, offset<<1, data);
+	if (m_console != MODEL_4QI) m_gromport->cruwrite(space, offset<<1, data);
 	m_peribox->cruwrite(space, offset<<1, data);
 }
 
@@ -430,7 +450,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 		//
 		// |K|K|K|K|K|I2|I1|C|
 		//
-		if (m_keyboard_column >= m_firstjoy) // joy 1, 2, handset
+		if (m_keyboard_column >= (m_console==MODEL_4? 5:6)) // joy 1, 2, handset
 		{
 			answer = m_joyport->read_port();
 			// The hardware bug of the TI-99/4A: you have to release the
@@ -441,7 +461,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 			// the line enough to make the TMS9901 sense the low level.
 			// A reported, feasible fix was to cut the line and insert a diode
 			// below the Alphalock key.
-			if ((ioport("ALPHABUG")!=0) && m_firstjoy==6) answer |= ioport("ALPHA")->read();
+			if ((ioport("ALPHABUG")!=0) && (m_console!=MODEL_4)) answer |= ioport("ALPHA")->read();
 		}
 		else
 		{
@@ -457,7 +477,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 
 	case TMS9901_INT8_INT15:
 		// |1|1|1|1|0|K|K|K|
-		if (m_keyboard_column >= m_firstjoy) answer = 0x07;
+		if (m_keyboard_column >= (m_console==MODEL_4? 5:6)) answer = 0x07;
 		else answer = ((ioport(column[m_keyboard_column])->read())>>5) & 0x07;
 		answer |= 0xf0;
 		break;
@@ -505,9 +525,9 @@ void ti99_4x_state::set_keyboard_column(int number, int data)
 	else
 		m_keyboard_column &= ~ (1 << number);
 
-	if (m_keyboard_column >= m_firstjoy)
+	if (m_keyboard_column >= (m_console==MODEL_4? 5:6))
 	{
-		m_joyport->write_port(m_keyboard_column - m_firstjoy + 1);
+		m_joyport->write_port(m_keyboard_column - (m_console==MODEL_4? 5:6) + 1);
 	}
 
 	// TI-99/4:  joystick 1 = column 5
@@ -870,25 +890,11 @@ static JOYPORT_CONFIG( joyport4a_50 )
 
 MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
 {
-	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
-	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
-
-	m_gromport = static_cast<gromport_device*>(machine().device(GROMPORT_TAG));
-
-	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
-	m_datamux = static_cast<ti99_datamux_device*>(machine().device(DATAMUX_TAG));
-
-	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
-
-	m_video = static_cast<ti_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
-
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
-	m_firstjoy = 5;
-
 	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
 
-	m_qi_version = false;
+	m_console = MODEL_4;
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
@@ -989,22 +995,10 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
 {
-	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
-	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
-
-	m_gromport = static_cast<gromport_device*>(machine().device(GROMPORT_TAG));
-	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
-
-	m_datamux = static_cast<ti99_datamux_device*>(machine().device(DATAMUX_TAG));
-	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
-	m_video = static_cast<ti_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
-	m_firstjoy = 6;
-
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
 	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
-
-	m_qi_version = false;
+	m_console = MODEL_4A;
 }
 
 MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
@@ -1108,22 +1102,10 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
 {
-	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
-	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
-
-	m_gromport = static_cast<gromport_device*>(machine().device(GROMPORT_TAG));
-	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
-
-	m_datamux = static_cast<ti99_datamux_device*>(machine().device(DATAMUX_TAG));
-	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
-	m_video = static_cast<ti_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
-	m_firstjoy = 6;
-
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
 	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
-
-	m_qi_version = true;
+	m_console = MODEL_4QI;
 }
 
 static MACHINE_CONFIG_START( ti99_4qi_60hz, ti99_4x_state )
