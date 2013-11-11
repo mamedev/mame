@@ -5049,10 +5049,10 @@ ROM_END
 ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC17  CEHCK SUM: 551B  9/12-'99
-	ROM_LOAD64_WORD_SWAP( "qq.ic17", 0x000006, 0x200000, CRC(1db889e0) SHA1(b9a5f344685e1d8b5711d8ab426bb886c1008e48) ) /* Check sum: 551B, dated "9/12-'99" */
-	ROM_LOAD64_WORD_SWAP( "qq.ic18", 0x000004, 0x200000, CRC(e33da02f) SHA1(2adf9b65b2f56db7f050115d002f520159364983) ) /* Check sum: AC51, dated "9/12-'99" */
-	ROM_LOAD64_WORD_SWAP( "qq.ic19", 0x000002, 0x200000, CRC(ca02f571) SHA1(cd797d750d4ef3534225ceb83ad2840421efd192) ) /* Check sum: 9DB5, dated "9/12-'99" */
+	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC17  CHECK SUM: 551B  9/12-'99
+	ROM_LOAD64_WORD_SWAP( "qq.ic17", 0x000006, 0x200000, BAD_DUMP CRC(1db889e0) SHA1(b9a5f344685e1d8b5711d8ab426bb886c1008e48) ) /* Check sum: 551B, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic18", 0x000004, 0x200000, BAD_DUMP CRC(e33da02f) SHA1(2adf9b65b2f56db7f050115d002f520159364983) ) /* Check sum: AC51, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic19", 0x000002, 0x200000, BAD_DUMP CRC(ca02f571) SHA1(cd797d750d4ef3534225ceb83ad2840421efd192) ) /* Check sum: 9DB5, dated "9/12-'99" */
 	ROM_LOAD64_WORD_SWAP( "qq.ic20", 0x000000, 0x200000, CRC(b12fe61c) SHA1(da8bb643a2b08857265f01a909f46bef98dab9cb) ) /* Check sum: C247, dated "9/12-'99" */
 
 	// CROM0
@@ -5068,10 +5068,10 @@ ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
 	ROM_LOAD64_WORD_SWAP( "mpr-22877.8",  0x1800000, 0x400000, CRC(e53b8764) SHA1(03756ef0526aa0b56c2944336590918d8ff9a9b8) )
 
 	// CROM3
-	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC13  CEHCK SUM: 6B84  9/12-'99
-	ROM_LOAD64_WORD_SWAP( "qq.ic13", 0x3800006, 0x400000, CRC(75413a76) SHA1(3c6d1c385938687f8c91c1f293e5e1e1874f5496) ) /* Check sum: 6B84, dated "9/12-'99" */
-	ROM_LOAD64_WORD_SWAP( "qq.ic14", 0x3800004, 0x400000, CRC(678b9c2c) SHA1(04168df377850fd496cbd5eb2a3effa05c7c2e7b) ) /* Check sum: 3DC1, dated "9/12-'99" */
-	ROM_LOAD64_WORD_SWAP( "qq.ic15", 0x3800002, 0x400000, CRC(6ee8af07) SHA1(1f7d01ad6094e9204d5e1e1674a0ea7b53832263) ) /* Check sum: 4988, dated "9/12-'99" */
+	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC13  CHECK SUM: 6B84  9/12-'99
+	ROM_LOAD64_WORD_SWAP( "qq.ic13", 0x3800006, 0x400000, BAD_DUMP CRC(75413a76) SHA1(3c6d1c385938687f8c91c1f293e5e1e1874f5496) ) /* Check sum: 6B84, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic14", 0x3800004, 0x400000, BAD_DUMP CRC(678b9c2c) SHA1(04168df377850fd496cbd5eb2a3effa05c7c2e7b) ) /* Check sum: 3DC1, dated "9/12-'99" */
+	ROM_LOAD64_WORD_SWAP( "qq.ic15", 0x3800002, 0x400000, BAD_DUMP CRC(6ee8af07) SHA1(1f7d01ad6094e9204d5e1e1674a0ea7b53832263) ) /* Check sum: 4988, dated "9/12-'99" */
 	ROM_LOAD64_WORD_SWAP( "qq.ic16", 0x3800000, 0x400000, CRC(3634f178) SHA1(ac32cfb47c8a33e5f62cc99a99d5c6bebbc6b601) ) /* Check sum: 0461, dated "9/12-'99" */
 
 	ROM_REGION( 0x2000000, "user3", 0 )  /* Video ROMs Part 1 */
@@ -5096,7 +5096,7 @@ ROM_START( ecap )   /* Step 2.1 - Proto or Location test - No security dongle */
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )   /* 68000 code */
 	// Hand written SEGA labels in this form:  TITLE: QQ  ROM NO: IC21  CEHCK SUM: 0994  9/12-'99
-	ROM_LOAD16_WORD_SWAP( "qq.ic21",  0x080000, 0x080000, CRC(d8496bca) SHA1(3fa76e2210f04b75c048979f90055854311e306c) ) /* Check sum: 0994, dated "9/12-'99" */
+	ROM_LOAD16_WORD_SWAP( "qq.ic21",  0x080000, 0x080000, BAD_DUMP CRC(d8496bca) SHA1(3fa76e2210f04b75c048979f90055854311e306c) ) /* Check sum: 0994, dated "9/12-'99" */
 
 	ROM_REGION( 0x1000000, "samples", 0 )   /* SCSP samples */
 	ROM_LOAD( "mpr-22887.22",  0x000000, 0x400000, CRC(7d04a867) SHA1(053de98105880188b4daff183710d7932617547f) )
