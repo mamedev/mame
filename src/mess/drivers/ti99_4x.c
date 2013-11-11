@@ -54,8 +54,11 @@
 #include "machine/ti99/joyport.h"
 #include "machine/ti99/peribox.h"
 
+// Debugging
+#define TRACE_READY 0
+#define TRACE_INTERRUPTS 0
+#define TRACE_CRU 0
 #define LOG logerror
-#define VERBOSE 1
 
 /*
     The console.
@@ -92,16 +95,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// Connections from outside towards the CPU (callbacks)
-	DECLARE_WRITE_LINE_MEMBER( console_ready );
 	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
+	DECLARE_WRITE_LINE_MEMBER( console_ready_sound );
+	DECLARE_WRITE_LINE_MEMBER( console_ready_pbox );
+	DECLARE_WRITE_LINE_MEMBER( console_ready_cart );
+	DECLARE_WRITE_LINE_MEMBER( console_ready_grom );
 	DECLARE_WRITE_LINE_MEMBER( console_reset );
+	DECLARE_WRITE_LINE_MEMBER( extint );
+	DECLARE_WRITE_LINE_MEMBER( notconnected );
 
 	// Connections with the system interface chip 9901
 	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT2 );
 	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT12 );
 	DECLARE_WRITE_LINE_MEMBER( set_tms9901_INT2_from_v9938);
-	DECLARE_WRITE_LINE_MEMBER( extint );
-	DECLARE_WRITE_LINE_MEMBER( notconnected );
 
 	// Connections with the system interface TMS9901
 	DECLARE_READ8_MEMBER(read_by_9901);
@@ -125,10 +131,10 @@ private:
 	int     m_keyboard_column;
 	int     m_check_alphalock;
 
-	int     m_ready_prev;       // for debugging purposes only
-
-	// Latches the ready line from different sources
-	int     m_ready_line, m_ready_line_dmux;
+	// READY handling
+	int     m_nready_combined;
+	int     m_nready_prev;
+	void    console_ready_join(int id, int state);
 
 	// Console type
 	int    m_console;
@@ -153,6 +159,18 @@ enum
 	MODEL_4,
 	MODEL_4A,
 	MODEL_4QI
+};
+
+/*
+    READY bits.
+*/
+enum
+{
+	READY_GROM = 1,
+	READY_DMUX = 2,
+	READY_PBOX = 4,
+	READY_SOUND = 8,
+	READY_CART = 16
 };
 
 /*
@@ -340,22 +358,22 @@ INPUT_PORTS_END
 
 static GROM_CONFIG(grom0_config)
 {
-	false, 0, region_grom, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready), GROMFREQ
+	false, 0, region_grom, 0x0000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_grom), GROMFREQ
 };
 
 static GROM_CONFIG(grom1_config)
 {
-	false, 1, region_grom, 0x2000, 0x1800,  DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready), GROMFREQ
+	false, 1, region_grom, 0x2000, 0x1800,  DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_grom), GROMFREQ
 };
 
 static GROM_CONFIG(grom2_config)
 {
-	false, 2, region_grom, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready), GROMFREQ
+	false, 2, region_grom, 0x4000, 0x1800, DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_grom), GROMFREQ
 };
 
 static GROMPORT_CONFIG(console_cartslot)
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready),
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_cart),
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_reset)
 };
 
@@ -363,18 +381,18 @@ static PERIBOX_CONFIG( peribox_conf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, extint),            // INTA
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, notconnected),  // INTB
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready), // READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_pbox), // READY
 	0x70000                                             // Address bus prefix (AMA/AMB/AMC)
 };
 
 static TI_SOUND_CONFIG( sound_conf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready)  // READY
+	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_sound)  // READY
 };
 
 READ8_MEMBER( ti99_4x_state::cruread )
 {
-//  if (VERBOSE>6) LOG("read access to CRU address %04x\n", offset << 4);
+//  if (TRACE_CRU) LOG("read access to CRU address %04x\n", offset << 4);
 	UINT8 value = 0;
 
 	// Similar to the bus8z_devices, just let the gromport and the p-box
@@ -390,7 +408,7 @@ READ8_MEMBER( ti99_4x_state::cruread )
 
 WRITE8_MEMBER( ti99_4x_state::cruwrite )
 {
-	if (VERBOSE>6) LOG("ti99_4x: write access to CRU address %04x\n", offset << 1);
+	if (TRACE_CRU) LOG("ti99_4x: write access to CRU address %04x\n", offset << 1);
 	// The QI version does not propagate the CRU signals to the cartridge slot
 	if (m_console != MODEL_4QI) m_gromport->cruwrite(space, offset<<1, data);
 	m_peribox->cruwrite(space, offset<<1, data);
@@ -403,7 +421,7 @@ WRITE8_MEMBER( ti99_4x_state::external_operation )
 	if (offset == IDLE_OP) return;
 	else
 	{
-		if (VERBOSE>1) LOG("ti99_4x: External operation %s not implemented on TI-99 board\n", extop[offset]);
+		LOG("ti99_4x: External operation %s not implemented on TI-99 board\n", extop[offset]);
 	}
 }
 
@@ -637,12 +655,13 @@ WRITE_LINE_MEMBER( ti99_4x_state::dbin_line )
 */
 WRITE_LINE_MEMBER( ti99_4x_state::set_tms9901_INT2 )
 {
-	if (VERBOSE>6) LOG("ti99_4x: VDP int 2 on tms9901, level=%d\n", state);
+	if (TRACE_INTERRUPTS) LOG("ti99_4x: VDP int 2 on tms9901, level=%d\n", state);
 	m_tms9901->set_single_int(2, state);
 }
 
 WRITE_LINE_MEMBER(ti99_4x_state::set_tms9901_INT2_from_v9938)
 {
+	if (TRACE_INTERRUPTS) LOG("ti99_4x: VDP int 2 on tms9901, level=%d\n", state);
 	m_tms9901->set_single_int(2, state);
 }
 
@@ -651,6 +670,7 @@ WRITE_LINE_MEMBER(ti99_4x_state::set_tms9901_INT2_from_v9938)
 */
 WRITE_LINE_MEMBER( ti99_4x_state::set_tms9901_INT12)
 {
+	if (TRACE_INTERRUPTS) LOG("ti99_4x: joyport INT 12 on tms9901, level=%d\n", state);
 	m_tms9901->set_single_int(12, state);
 }
 
@@ -660,6 +680,7 @@ WRITE_LINE_MEMBER( ti99_4x_state::set_tms9901_INT12)
 */
 INPUT_CHANGED_MEMBER( ti99_4x_state::load_interrupt )
 {
+	LOG("ti99_4x: LOAD interrupt, level=%d\n", newval);
 	m_cpu->set_input_line(INT_9900_LOAD, (newval==0)? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -667,31 +688,59 @@ INPUT_CHANGED_MEMBER( ti99_4x_state::load_interrupt )
     Links to external devices
 ***********************************************************/
 
-// FIXME: The sound chip is one of the devices that may operate the ready line
-// at some later time and thus mess up the READY handling (raises the READY
-// line without bothering about the rest). We need to do a proper AND here.
-
 /*
-    We may have lots of devices pulling down this line; so we should use a AND
-    gate to do it right. On the other hand, when READY is down, there is just
-    no chance to make another device pull down the same line; the CPU just
-    won't access any other device in this time.
+    We combine the incoming READY signals and propagate them to the CPU.
+    An alternative would be to let the CPU get the READY state, but this would
+    be a much higher overhead, as this happens in each clock tick.
 */
-WRITE_LINE_MEMBER( ti99_4x_state::console_ready )
+void ti99_4x_state::console_ready_join(int id, int state)
 {
-	m_ready_line = state;
-	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
+	if (state==CLEAR_LINE)
+		m_nready_combined |= id;
+	else
+		m_nready_combined &= ~id;
 
-	if (VERBOSE>6)
+	if (TRACE_READY)
 	{
-		if (m_ready_prev != combined) LOG("ti99_4x: READY level = %d\n", combined);
+		if (m_nready_prev != m_nready_combined) LOG("ti99_4x: READY bits = %04x\n", ~m_nready_combined);
 	}
-	m_ready_prev = combined;
-	m_cpu->set_ready(combined);
+
+	m_nready_prev = m_nready_combined;
+	m_cpu->set_ready(m_nready_combined==0);
 }
 
 /*
-    The RESET line leading to a reset of the CPU.
+    Connections to the READY line. This might look a bit ugly; we need an
+    implementation of a "Wired AND" device.
+*/
+WRITE_LINE_MEMBER( ti99_4x_state::console_ready_grom )
+{
+	console_ready_join(READY_GROM, state);
+}
+
+WRITE_LINE_MEMBER( ti99_4x_state::console_ready_dmux )
+{
+	console_ready_join(READY_DMUX, state);
+}
+
+WRITE_LINE_MEMBER( ti99_4x_state::console_ready_pbox )
+{
+	console_ready_join(READY_PBOX, state);
+}
+
+WRITE_LINE_MEMBER( ti99_4x_state::console_ready_sound )
+{
+	console_ready_join(READY_SOUND, state);
+}
+
+WRITE_LINE_MEMBER( ti99_4x_state::console_ready_cart )
+{
+	console_ready_join(READY_CART, state);
+}
+
+/*
+    The RESET line leading to a reset of the CPU. This is asserted when a
+    cartridge is plugged in.
 */
 WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 {
@@ -702,34 +751,16 @@ WRITE_LINE_MEMBER( ti99_4x_state::console_reset )
 	}
 }
 
-/*
-    The exception of the above rule. Memory access over the datamux also operates
-    the READY line, and the datamux raises READY depending on the clock pulse.
-    So we must make sure this does not interfere.
-*/
-WRITE_LINE_MEMBER( ti99_4x_state::console_ready_dmux )
-{
-	m_ready_line_dmux = state;
-	int combined = (m_ready_line == ASSERT_LINE && m_ready_line_dmux == ASSERT_LINE)? ASSERT_LINE : CLEAR_LINE;
-
-	if (VERBOSE>7)
-	{
-		if (m_ready_prev != combined) LOG("ti99_4x: READY dmux level = %d\n", state);
-	}
-	m_ready_prev = combined;
-	m_cpu->set_ready(combined);
-}
-
 WRITE_LINE_MEMBER( ti99_4x_state::extint )
 {
-	if (VERBOSE>6) LOG("ti99_4x: EXTINT level = %02x\n", state);
+	if (TRACE_INTERRUPTS) LOG("ti99_4x: EXTINT level = %02x\n", state);
 	if (m_tms9901 != NULL)
 		m_tms9901->set_single_int(1, state);
 }
 
 WRITE_LINE_MEMBER( ti99_4x_state::notconnected )
 {
-	if (VERBOSE>6) LOG("ti99_4x: Setting a not connected line ... ignored\n");
+	if (TRACE_INTERRUPTS) LOG("ti99_4x: Setting a not connected line ... ignored\n");
 }
 
 /*****************************************************************************/
@@ -892,8 +923,7 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
-	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
-
+	m_nready_combined = 0;
 	m_console = MODEL_4;
 }
 
@@ -997,7 +1027,7 @@ MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
-	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
+	m_nready_combined = 0;
 	m_console = MODEL_4A;
 }
 
@@ -1104,8 +1134,8 @@ MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
-	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
 	m_console = MODEL_4QI;
+	m_nready_combined = 0;
 }
 
 static MACHINE_CONFIG_START( ti99_4qi_60hz, ti99_4x_state )
