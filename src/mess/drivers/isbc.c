@@ -22,6 +22,8 @@ isbc86 commands: BYTE WORD REAL EREAL ROMTEST. ROMTEST works, the others hang.
 #include "machine/i8251.h"
 #include "machine/z80dart.h"
 #include "machine/serial.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/isbx/isbx.h"
 
 class isbc_state : public driver_device
 {
@@ -32,7 +34,8 @@ public:
 	m_terminal(*this, "terminal"),
 	m_uart8251(*this, "uart8251"),
 	m_uart8274(*this, "uart8274"),
-	m_pic_1(*this, "pic_1")
+	m_pic_1(*this, "pic_1"),
+	m_centronics(*this, "centronics")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -40,10 +43,14 @@ public:
 	optional_device<i8251_device> m_uart8251;
 	optional_device<i8274_device> m_uart8274;
 	optional_device<pic8259_device> m_pic_1;
+	optional_device<centronics_device> m_centronics;
 
+	DECLARE_WRITE_LINE_MEMBER(lpt_ack);
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
 	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_READ8_MEMBER(ppi_b_r);
+	DECLARE_WRITE8_MEMBER(ppi_c_w);
 };
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
@@ -76,6 +83,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
+	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs0_r, mcs0_w, 0xff00)
+	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
+	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE8("sbx1", isbx_slot_device, mcs1_r, mcs1_w, 0xff00)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs0_r, mcs0_w, 0xff00)
+	AM_RANGE(0x00b0, 0x00bf) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
+	AM_RANGE(0x00b0, 0x00bf) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs1_r, mcs1_w, 0xff00)
 	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic_0", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00c4, 0x00c7) AM_DEVREADWRITE8("pic_1", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
@@ -166,7 +181,7 @@ WRITE_LINE_MEMBER( isbc_state::isbc286_tmr2_w )
 	m_uart8274->txca_w(state);
 }
 
-static const i8255_interface isbc_ppi_interface =
+static const i8255_interface isbc86_ppi_interface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -175,6 +190,33 @@ static const i8255_interface isbc_ppi_interface =
 	DEVCB_NULL,
 	DEVCB_NULL
 };
+
+static const i8255_interface isbc286_ppi_interface =
+{
+	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
+	DEVCB_DRIVER_MEMBER(isbc_state, ppi_b_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(isbc_state, ppi_c_w),
+};
+
+READ8_MEMBER( isbc_state::ppi_b_r )
+{
+	UINT8 data = 0;
+	data |= m_centronics->ack_r() ? 0x10 : 0;
+	data |= m_centronics->fault_r() ? 0x40 : 0;
+	data |= m_centronics->busy_r() ? 0x80 : 0;
+	return data;
+}
+
+WRITE8_MEMBER( isbc_state::ppi_c_w )
+{
+	m_centronics->strobe_w(data & 1);
+
+	if(data & 0x80)
+		m_pic_1->ir7_w(0);
+}
 
 static I8274_INTERFACE(isbc_uart8274_interface)
 {
@@ -227,6 +269,19 @@ READ8_MEMBER( isbc_state::get_slave_ack )
 	return 0x00;
 }
 
+static const centronics_interface isbc_centronics =
+{
+	DEVCB_DRIVER_LINE_MEMBER(isbc_state, lpt_ack),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+WRITE_LINE_MEMBER( isbc_state::lpt_ack )
+{
+	if(state)
+		m_pic_1->ir7_w(1);
+}
+
 static MACHINE_CONFIG_START( isbc86, isbc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
@@ -234,7 +289,7 @@ static MACHINE_CONFIG_START( isbc86, isbc_state )
 	MCFG_CPU_IO_MAP(isbc_io)
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
 	MCFG_PIT8253_ADD("pit", isbc86_pit_config)
-	MCFG_I8255A_ADD("ppi", isbc_ppi_interface)
+	MCFG_I8255A_ADD("ppi", isbc86_ppi_interface)
 	MCFG_I8251_ADD("uart8251", isbc_uart8251_interface)
 
 	/* video hardware */
@@ -254,15 +309,23 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( isbc286, isbc_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", I80286, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(isbc286_mem)
 	MCFG_CPU_IO_MAP(isbc286_io)
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, READ8(isbc_state, get_slave_ack))
 	MCFG_PIC8259_ADD("pic_1", DEVWRITELINE("pic_0", pic8259_device, ir7_w), GND, NULL)
 	MCFG_PIT8254_ADD("pit", isbc286_pit_config)
-	MCFG_I8255A_ADD("ppi", isbc_ppi_interface)
+	MCFG_I8255A_ADD("ppi", isbc286_ppi_interface)
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", isbc_centronics)
 	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, isbc_uart8274_interface)
 	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, NULL)
+
+	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, "fdc")
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir3_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir4_w))
+	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir5_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir6_w))
 
 	/* video hardware */
 	MCFG_SERIAL_TERMINAL_ADD("terminal", terminal_intf, 9600)
@@ -313,4 +376,4 @@ ROM_END
 COMP( 19??, rpc86,    0,       0,    rpc86,      isbc, driver_device,    0,   "Intel",   "RPC 86",GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1978, isbc86,   0,       0,    isbc86,     isbc, driver_device,    0,   "Intel",   "iSBC 86/12A",GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 19??, isbc286,  0,       0,    isbc286,    isbc, driver_device,    0,   "Intel",   "iSBC 286",GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, isbc2861, 0,       0,    isbc2861,    isbc, driver_device,    0,   "Intel",   "iSBC 286-10",GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, isbc2861, 0,       0,    isbc2861,    isbc, driver_device,    0,   "Intel",   "iSBC 286/10",GAME_NOT_WORKING | GAME_NO_SOUND)
