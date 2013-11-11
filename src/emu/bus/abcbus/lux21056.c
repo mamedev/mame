@@ -200,6 +200,10 @@ WRITE_LINE_MEMBER( luxor_55_21056_device::sasi_io_w )
 	{
 		m_sasibus->scsi_data_w(m_sasi_data);
 	}
+	else
+	{
+		m_sasibus->scsi_data_w(0);
+	}
 }
 
 WRITE_LINE_MEMBER( luxor_55_21056_device::sasi_req_w )
@@ -338,9 +342,13 @@ void luxor_55_21056_device::device_start()
 
 void luxor_55_21056_device::device_reset()
 {
+	m_maincpu->reset();
+
 	m_cs = false;
 	m_stat = 0;
 	m_sasi_data = 0;
+
+	set_rdy(m_rdy);
 }
 
 
@@ -370,7 +378,7 @@ UINT8 luxor_55_21056_device::abcbus_stat()
 	if (m_cs)
 	{
 		data = m_stat & 0xfe;
-		data |= m_rdy;
+		data |= m_rdy ^ STAT_DIR;
 	}
 
 	return data;
@@ -389,7 +397,7 @@ UINT8 luxor_55_21056_device::abcbus_inp()
 	{
 		data = m_inp;
 
-		set_rdy(!m_rdy);
+		if (m_rdy) set_rdy(!m_rdy);
 	}
 
 	return data;
@@ -406,7 +414,7 @@ void luxor_55_21056_device::abcbus_out(UINT8 data)
 	{
 		m_out = data;
 
-		set_rdy(!m_rdy);
+		if (STAT_DIR && !m_rdy) set_rdy(!m_rdy);
 	}
 }
 
@@ -433,7 +441,7 @@ void luxor_55_21056_device::abcbus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
-		m_maincpu->reset();
+		device_reset();
 	}
 }
 
@@ -461,7 +469,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 
 	UINT8 data = 0;
 
-	data |= m_rdy;
+	data |= m_rdy ^ STAT_DIR;
 
 	data |= (m_req || m_sasibus->scsi_req_r()) << 1;
 	data |= m_sasibus->scsi_io_r() << 2;
@@ -480,6 +488,8 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 WRITE8_MEMBER( luxor_55_21056_device::stat_w )
 {
 	m_stat = data;
+
+	set_rdy(m_rdy);
 }
 
 
@@ -491,7 +501,7 @@ READ8_MEMBER( luxor_55_21056_device::out_r )
 {
 	UINT8 data = m_out;
 
-	set_rdy(!m_rdy);
+	if (STAT_DIR && m_rdy) set_rdy(!m_rdy);
 
 	return data;
 }
@@ -505,7 +515,7 @@ WRITE8_MEMBER( luxor_55_21056_device::inp_w )
 {
 	m_inp = data;
 
-	set_rdy(!m_rdy);
+	if (!STAT_DIR && !m_rdy) set_rdy(!m_rdy);
 }
 
 
@@ -560,7 +570,7 @@ READ8_MEMBER( luxor_55_21056_device::rdy_reset_r )
 
 WRITE8_MEMBER( luxor_55_21056_device::rdy_reset_w )
 {
-	set_rdy(STAT_DIR);
+	set_rdy(0);
 }
 
 
@@ -617,5 +627,5 @@ void luxor_55_21056_device::set_rdy(int state)
 {
 	m_rdy = state;
 
-	m_dma->rdy_w(m_rdy);
+	m_dma->rdy_w(m_rdy ^ STAT_DIR);
 }
