@@ -10,6 +10,8 @@
 #include "alto2.h"
 #include "a2roms.h"
 
+#define	DEBUG_UCODE_CONST_DATA	0	//!< define to 1 to dump decoded micro code and constants
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -36,8 +38,8 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_log_level(9),
 	m_log_newline(true),
 #endif
-	m_ucode_config("maincpu", ENDIANNESS_BIG, 32, 14, -2, ADDRESS_MAP_NAME(alto2_ucode_map)),
-	m_ucode_map(*this, "maincpu"),
+	m_ucode_config("alto2", ENDIANNESS_BIG, 32, 14, -2, ADDRESS_MAP_NAME(alto2_ucode_map)),
+	m_ucode_map(*this, ":maincpu:ucode"),
 	m_ucode(0),
 	m_ucode_proms(0),
 	m_const_proms(0),
@@ -124,7 +126,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 
 ROM_START( alto2_cpu )
 	// decoded micro code region
-	ROM_REGION32_BE( sizeof(UINT32)*ALTO2_UCODE_SIZE, "maincpu", 0 )
+	ROM_REGION32_BE( sizeof(UINT32)*ALTO2_UCODE_SIZE, "ucode", 0 )
 	ROM_FILL(0, sizeof(UINT32)*ALTO2_UCODE_SIZE, ALTO2_UCODE_INVERTED)
 
 	ROM_REGION( 16 * 02000, "ucode_proms", 0 )
@@ -156,7 +158,7 @@ ROM_START( alto2_cpu )
 	ROM_LOAD( "madr.a3",   3*00400, 00400, CRC(e0992757) SHA1(5c45ea824970663cb9ee672dc50861539c860249) )	//!< 0000-0377 C(12)',C(13)',C(14)',C(15)'
 
 	// extended memory Mesa 4.1 (?) micro code PROMs, 8 x 4bit (unused)
-	ROM_REGION32_BE( 8 * 02000, "xm_mesa_4.1", ROMREGION_INVERT )
+	ROM_REGION( 8 * 02000, "xm_mesa_4.1", 0 )
 	ROM_LOAD( "xm654.41",  0*02000, 02000, CRC(beace302) SHA1(0002fea03a0261f57365095c4b87385d833f7063) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
 	ROM_LOAD( "xm674.41",  1*02000, 02000, CRC(7db5c097) SHA1(364bc41951baa3ad274031bd49abec1cf5b7a980) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
 	ROM_LOAD( "xm675.41",  2*02000, 02000, CRC(26eac1e7) SHA1(9220a1386afae8de96bdb2cf084afbadeeb61d42) )	//!< 00000-01777 ALUF(3)',BS(0)',BS(1)',BS(2)'
@@ -845,27 +847,34 @@ void alto2_cpu_device::device_start()
 {
 	m_ucode = &space(AS_0);
 	m_ucode_proms = prom_load(pl_ucode, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
-	UINT32* p_ucode = reinterpret_cast<UINT32 *>(memregion("maincpu")->base());
+	UINT32* p_ucode = reinterpret_cast<UINT32 *>(memregion(":maincpu:ucode")->base());
 	for (offs_t offs = 0; offs < ALTO2_UCODE_RAM_BASE; offs++) {
 		UINT32 data = (m_ucode_proms[4*offs+0] << 0) | (m_ucode_proms[4*offs+1] << 8) |
 				 (m_ucode_proms[4*offs+2] << 16) | (m_ucode_proms[4*offs+3] << 24);
+#if	DEBUG_UCODE_CONST_DATA
 		if (0 == offs % 8)
 			printf("%04x:", offs);
 		printf(" %08x",  data);
 		if (7 == offs % 8)
 			printf("\n");
+#endif
 		p_ucode[offs] = data;
+	}
+	for (offs_t offs = ALTO2_UCODE_RAM_BASE; offs < ALTO2_UCODE_SIZE; offs++) {
+		p_ucode[offs] = ALTO2_UCODE_INVERTED;
 	}
 
 	m_const_proms = prom_load(pl_const, memregion("const_proms")->base(), 1, 4);
 	m_const = reinterpret_cast<UINT16 *>(global_alloc_array(UINT16, ALTO2_CONST_SIZE));
 	for (offs_t offs = 0; offs < ALTO2_CONST_SIZE; offs++) {
 		UINT16 data = (m_const_proms[2*offs+0] << 0) | (m_const_proms[2*offs+1] << 8);
+#if	DEBUG_UCODE_CONST_DATA
 		if (0 == offs % 8)
 			printf("%04x:", offs);
 		printf(" %04x",  data);
 		if (7 == offs % 8)
 			printf("\n");
+#endif
 		m_const[offs] = data;
 	}
 

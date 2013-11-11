@@ -10,23 +10,21 @@
 #include "cpu/alto2/alto2.h"
 #include "cpu/alto2/a2roms.h"
 
-// FIXME: Is this required? How to access the address space words?
-// This has to somehow be mapped to the a2mem half DWORD accesses
-// and (optionally) Hamming code and parity flag updating
+// FIXME: Is this required? The driver does not have/need access to RAM
 READ16_MEMBER( alto2_state::alto2_ram_r )
 {
 	return downcast<alto2_cpu_device *>(m_maincpu.target())->read_ram(offset);
 }
 
-// FIXME: Is this required? How to access the address space words?
-// This has to somehow be mapped to the a2mem half DWORD accesses
-// and (optionally) Hamming code and parity flag updating
+// FIXME: Is this required? The driver does not have/need access to RAM
 WRITE16_MEMBER( alto2_state::alto2_ram_w )
 {
 	downcast<alto2_cpu_device *>(m_maincpu.target())->write_ram(offset, data);
 }
 
 /* Memory Maps */
+
+ADDRESS_MAP_EXTERN( alto2_ucode_map, 32 );
 
 /* main memory and memory mapped i/o in range ALTO2_IO_PAGE_BASE ... ALTO2_IO_PAGE_BASE + ALTO2_IO_PAGE_SIZE - 1 */
 ADDRESS_MAP_START( alto2_ram_map, AS_2, 16, alto2_state )
@@ -234,6 +232,13 @@ static INPUT_PORTS_START( alto2 )
 	PORT_CONFSETTING(    0x40, "PAL")
 INPUT_PORTS_END
 
+/* ROM */
+ROM_START( alto2 )
+	// decoded micro code region - driver side view on the memory
+	ROM_REGION32_BE( sizeof(UINT32)*ALTO2_UCODE_SIZE, "maincpu", 0 )
+	ROM_FILL(0, sizeof(UINT32)*ALTO2_UCODE_SIZE, ALTO2_UCODE_INVERTED)
+ROM_END
+
 /* Palette Initialization */
 
 void alto2_state::palette_init()
@@ -245,6 +250,7 @@ void alto2_state::palette_init()
 static MACHINE_CONFIG_START( alto2, alto2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ALTO2, XTAL_20_16MHz)
+	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
 	MCFG_CPU_IO_MAP(alto2_ram_map)
 
 	/* video hardware */
@@ -256,14 +262,12 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_PALETTE_LENGTH(2)
 MACHINE_CONFIG_END
 
-/* ROM */
-ROM_START( alto2 )
-ROM_END
-
 /* Driver Init */
 
 DRIVER_INIT_MEMBER( alto2_state, alto2 )
 {
+	// make a copy for the front end, i.e. the driver view on the micro code
+	memcpy(memregion("maincpu"), memregion("maincpu:ucode"), sizeof(UINT32)*ALTO2_UCODE_SIZE);
 }
 
 /* Game Drivers */
