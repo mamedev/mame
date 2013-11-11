@@ -192,6 +192,7 @@ EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/cartslot.o   \
 	$(EMUIMAGEDEV)/cassette.o   \
 	$(EMUIMAGEDEV)/chd_cd.o     \
+	$(EMUIMAGEDEV)/diablo.o     \
 	$(EMUIMAGEDEV)/flopdrv.o    \
 	$(EMUIMAGEDEV)/floppy.o     \
 	$(EMUIMAGEDEV)/harddriv.o   \

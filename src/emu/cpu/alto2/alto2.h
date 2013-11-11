@@ -1425,7 +1425,7 @@ private:
 	 * ~= 10432 bits/sector
 	 * ~= 325 words/sector
 	 */
-	#define	DIABLO_BIT_TIME attotime::from_nsec(200)
+	#define	DIABLO_BIT_TIME(bits) attotime::from_nsec(200*(bits))
 
 	/** @brief DIABLO 44 possible sector words */
 	#define	DIABLO_SECTOR_WORDS	325
