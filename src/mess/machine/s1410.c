@@ -161,6 +161,7 @@ static ADDRESS_MAP_START( s1410_io, AS_IO, 8, s1410_device )
 	AM_RANGE(0xc3, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
+
 //-------------------------------------------------
 //  MACHINE_DRIVER( s1410 )
 //-------------------------------------------------
@@ -185,6 +186,8 @@ machine_config_constructor s1410_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( s1410 );
 }
 
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -199,6 +202,8 @@ s1410_device::s1410_device(const machine_config &mconfig, const char *tag, devic
 }
 
 #define S1410_CMD_CHECK_TRACK_FORMAT ( 0x05 )
+#define S1410_CMD_FORMAT_TRACK ( 0x06 )
+#define S1410_CMD_SEEK ( 0x0b )
 #define S1410_CMD_INIT_DRIVE_PARAMS ( 0x0c )
 #define S1410_CMD_FORMAT_ALT_TRACK ( 0x0E )
 #define S1410_CMD_WRITE_SEC_BUFFER ( 0x0F )
@@ -215,6 +220,43 @@ void s1410_device::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
+	case S1410_CMD_FORMAT_TRACK:
+		{
+		lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
+
+		switch( m_sector_bytes )
+		{
+		case 256:
+			blocks = 32;
+			break;
+
+		case 512:
+			blocks = 17;
+			break;
+		}
+
+		logerror("S1410: FORMAT TRACK at LBA %x for %x blocks\n", lba, blocks);
+
+		int dataLength = blocks * m_sector_bytes;
+		UINT8 data[dataLength];
+		memset(data, 0xc6, dataLength);
+
+		WriteData(data, dataLength);
+
+		m_phase = SCSI_PHASE_STATUS;
+		m_transfer_length = 0;
+		}
+		break;
+
+	case S1410_CMD_SEEK:
+		lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
+		
+		logerror("S1410: SEEK to LBA %x\n", lba);
+		
+		m_phase = SCSI_PHASE_STATUS;
+		m_transfer_length = 0;
+		break;
+
 	case S1410_CMD_INIT_DRIVE_PARAMS:
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_transfer_length = TRANSFERLENGTH_INIT_DRIVE_PARAMS;
@@ -253,6 +295,23 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
+	case S1410_CMD_FORMAT_TRACK:
+		if ((disk) && (blocks))
+		{
+			while (dataLength > 0)
+			{
+				if (!hard_disk_write(disk, lba, data))
+				{
+					logerror("S1410: HD write error!\n");
+				}
+				lba++;
+				blocks--;
+				dataLength -= m_sector_bytes;
+				data += m_sector_bytes;
+			}
+		}
+		break;
+
 	case S1410_CMD_INIT_DRIVE_PARAMS:
 		{
 			int sectorsPerTrack = 0;

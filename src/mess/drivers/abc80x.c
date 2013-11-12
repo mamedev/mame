@@ -1191,6 +1191,7 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc800")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "abc800_hdd")
 MACHINE_CONFIG_END
 
 
@@ -1234,6 +1235,7 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc800")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "abc800_hdd")
 MACHINE_CONFIG_END
 
 
@@ -1273,6 +1275,10 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+
+	// software list
+	//MCFG_SOFTWARE_LIST_ADD("flop_list", "abc802")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "abc800_hdd")
 MACHINE_CONFIG_END
 
 
@@ -1310,6 +1316,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc806")
+	MCFG_SOFTWARE_LIST_ADD("hdd_list", "abc800_hdd")
 MACHINE_CONFIG_END
 
 

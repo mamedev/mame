@@ -25,7 +25,6 @@ protected:
 
 	harddisk_image_device *m_image;
 
-private:
 	UINT32 lba;
 	UINT32 blocks;
 

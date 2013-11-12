@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="abc800_hdd" description="Luxor ABC-800 hard disks">
+
+	<software name="abc852">
+		<description>ABC 852</description>
+		<year>1986</year>
+		<publisher>Luxor</publisher>
+
+		<!-- BASF 6185 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="basf6185" sha1="0f01c5ca209a358bb665d782eb99e944e09f673e" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="abc856">
+		<description>ABC 856</description>
+		<year>1986</year>
+		<publisher>Luxor</publisher>
+
+		<!-- Micropolis 1325 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="micr1325" sha1="41acd70baa34b62df5fd53a8b7abcba185c67389" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

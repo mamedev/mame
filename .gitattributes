@@ -24,6 +24,7 @@ hash/a800_flop.xml svneol=native#text/plain
 hash/abc1600.xml svneol=native#text/xml
 hash/abc80.xml svneol=native#text/xml
 hash/abc800.xml svneol=native#text/xml
+hash/abc800_hdd.xml svneol=native#text/plain
 hash/abc806.xml svneol=native#text/xml
 hash/adam_cart.xml svneol=native#text/xml
 hash/adam_cass.xml svneol=native#text/xml
