@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( svg_68k_mem, AS_PROGRAM, 16, pgm_arm_type3_state )
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")  /* Game ROM */
 
-	AM_RANGE(0x500000, 0x51ffff) AM_READWRITE(svg_m68k_ram_r, svg_m68k_ram_w)    /* ARM7 Shared RAM */
+	AM_RANGE(0x500000, 0x50ffff) AM_READWRITE(svg_m68k_ram_r, svg_m68k_ram_w)    /* ARM7 Shared RAM */
 	AM_RANGE(0x5c0000, 0x5c0001) AM_READWRITE(svg_68k_nmi_r, svg_68k_nmi_w)      /* ARM7 FIQ */
 	AM_RANGE(0x5c0300, 0x5c0301) AM_READWRITE(svg_latch_68k_r, svg_latch_68k_w) /* ARM7 Latch */
 ADDRESS_MAP_END
@@ -134,10 +134,13 @@ static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32, pgm_arm_type3_state )
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_SHARE("arm_ram2")
 	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM AM_SHARE("arm_ram")
-	AM_RANGE(0x38000000, 0x3801ffff) AM_READWRITE(svg_arm7_shareram_r, svg_arm7_shareram_w)
+	AM_RANGE(0x38000000, 0x3800ffff) AM_READWRITE(svg_arm7_shareram_r, svg_arm7_shareram_w)
 	AM_RANGE(0x48000000, 0x48000003) AM_READWRITE(svg_latch_arm_r, svg_latch_arm_w) /* 68k Latch */
 	AM_RANGE(0x40000018, 0x4000001b) AM_WRITE(svg_arm7_ram_sel_w) /* RAM SEL */
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
+
+//	AM_RANGE(0xc0000000, 0xffffffff) AM_RAM
+
 ADDRESS_MAP_END
 
 
@@ -223,6 +226,10 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 
 	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
 
+
+
+
+
 	temp16[(0xe8)/2] = 0xE004; // based on killbldp
 	temp16[(0xea)/2] = 0xE52D;
 	temp16[(0xec)/2] = 0x00D3;
@@ -248,31 +255,119 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 
 	// the interrupt code appears to be at 0x08000010
 	// although this still crashes for now..
+	int base = 0x1c;
+	temp16[(base) /2] = 0xf000; base += 2;
+	temp16[(base) /2] = 0xe59f; base += 2;
+	temp16[(base) /2] = 0x0010; base += 2;
+	temp16[(base) /2] = 0x0800; base += 2;
+	temp16[(base) /2] = 0x0010; base += 2;
+	temp16[(base) /2] = 0x0800; base += 2;
+	 
 
-	temp16[(0x14) / 2] = 0x0010;
-	temp16[(0x16) / 2] = 0x0800;
+	base = 0x30;
+	temp16[(base) /2] = 0x00D3; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0x1A01; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x2B01; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xD801; base += 2;
+	temp16[(base) /2] = 0xE082; base += 2;
+	temp16[(base) /2] = 0x00D2; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
 
-	temp16[(0x18) / 2] = 0x0014;
-	temp16[(0x1a) / 2] = 0x0000;
+	temp16[(base) /2] = 0x4001; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x4B06; base += 2;
+	temp16[(base) /2] = 0xE284; base += 2;
+	temp16[(base) /2] = 0x0CFA; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xD804; base += 2;
+	temp16[(base) /2] = 0xE080; base += 2;
+	temp16[(base) /2] = 0x00D1; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0x0CF6; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xD804; base += 2;
+	temp16[(base) /2] = 0xE080; base += 2;
+	temp16[(base) /2] = 0x00D7; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0x0CFF; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xD804; base += 2;
+	temp16[(base) /2] = 0xE080; base += 2;
+	temp16[(base) /2] = 0x00DB; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0x4140; base += 2;
+	temp16[(base) /2] = 0xE1C4; base += 2;
+	temp16[(base) /2] = 0x0CFE; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xD804; base += 2;
+	temp16[(base) /2] = 0xE080; base += 2;
+	temp16[(base) /2] = 0x00D3; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0x4A01; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x0B01; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xD804; base += 2;
+	temp16[(base) /2] = 0xE080; base += 2;
+	temp16[(base) /2] = 0x5A0F; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x0008; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x8805; base += 2;
+	temp16[(base) / 2] = 0xE080; base += 2;
+	temp16[(base) /2] = 0x0010; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x0000; base += 2;
+	temp16[(base) /2] = 0xE5C8; base += 2;
+	temp16[(base) /2] = 0x7805; base += 2;
+	temp16[(base) /2] = 0xE1A0; base += 2;
+	temp16[(base) /2] = 0x6A01; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x0012; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x0A02; base += 2;
+	temp16[(base) /2] = 0xE280; base += 2;
+	temp16[(base) /2] = 0x6806; base += 2;
+	temp16[(base) /2] = 0xE080; base += 2;
+	temp16[(base) /2] = 0x6000; base += 2;
+	temp16[(base) /2] = 0xE587; base += 2;
+	temp16[(base) /2] = 0x002c; base += 2;
+	temp16[(base) /2] = 0xEA00; base += 2;
 
 
 	
+	base = 0;
+	temp16[(base) /2] = 0x000a; base += 2;
+	temp16[(base) /2] = 0xEA00; base += 2;
 
+#if 0
+	m_svg_ram_sel = 1;
 
-	temp16[(0x1c) / 2] = 0x500F;
-	temp16[(0x1e) / 2] = 0xE92D;
-	temp16[(0x20) / 2] = 0x0010;
-	temp16[(0x22) / 2] = 0xE51F;
-	temp16[(0x24) / 2] = 0x0000;
-	temp16[(0x26) / 2] = 0xE590;
-	temp16[(0x28) / 2] = 0xE00F;
-	temp16[(0x2a) / 2] = 0xE1A0;
-	temp16[(0x2c) / 2] = 0xFF10;
-	temp16[(0x2e) / 2] = 0xE12F;
-
-
-
-
+	for (int i = 0; i < 0x100; i++)
+	{
+		UINT16 *share16;
+		share16 = (UINT16 *)(m_svg_shareram[1]);
+		share16[i / 2] = 0x0002;
+		share16 = (UINT16 *)(m_svg_shareram[0]);
+		share16[i / 2] = 0x0002;
+	}
+#endif
 }
 
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
