@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( lbeach_map, AS_PROGRAM, 8, lbeach_state )
 //	AM_RANGE(0x8003, 0x8003) AM_WRITENOP // ?
 //	AM_RANGE(0x8004, 0x8004) AM_WRITENOP // ?
 //	AM_RANGE(0x8005, 0x8005) AM_WRITENOP // ?
-	AM_RANGE(0x8007, 0x8007) AM_WRITENOP // watchdog?
+	AM_RANGE(0x8007, 0x8007) AM_WRITENOP // probably watchdog
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 //	AM_RANGE(0xa003, 0xa003) AM_READNOP // ? tests d7 at game over
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
@@ -240,10 +240,10 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( lbeach )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gas Pedal")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Shifter 1st Gear")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Shifter 2nd Gear")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Shifter 3rd Gear")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Shifter 4th Gear")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shifter 1st Gear")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shifter 2nd Gear")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Shifter 3rd Gear")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Shifter 4th Gear")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Record") // called RR in testmode
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Coin Counter") // called CC in testmode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -324,7 +324,7 @@ static MACHINE_CONFIG_START( lbeach, lbeach_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_16MHz / 32) // Motorola MC6800P, 500kHz
 	MCFG_CPU_PROGRAM_MAP(lbeach_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(lbeach_state, nmi_line_pulse, 50) // unknown freq, it affects steering speed, glitchy if it's too fast
+	MCFG_CPU_PERIODIC_INT_DRIVER(lbeach_state, nmi_line_pulse, 50) // unknown freq, it affects game speed, glitchy if it's too fast
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
