@@ -454,12 +454,14 @@ protected:
      */
     ATTR_HOT inline const netlist_sig_t Q() const
     {
-        assert(object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
+        //assert(object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
+		assert(family() == LOGIC);
         return m_cur.Q;
     }
     ATTR_HOT inline const double Q_Analog() const
     {
-        assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
+        //assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
+		assert(family() == ANALOG);
         return m_cur.Analog;
     }
 
@@ -779,7 +781,8 @@ public:
 	nld_a_to_d_proxy(netlist_input_t &in_proxied)
 			: netlist_device_t()
 	{
-		assert(in_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
+		//assert(in_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
+		assert(in_proxied.family() == LOGIC);
 		m_I.m_high_thresh_V = in_proxied.m_high_thresh_V;
 		m_I.m_low_thresh_V = in_proxied.m_low_thresh_V;
 	}
@@ -818,7 +821,8 @@ public:
 	nld_d_to_a_proxy(netlist_output_t &out_proxied)
 			: netlist_device_t()
 	{
-		assert(out_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
+		//assert(out_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
+		assert(out_proxied.family() == LOGIC);
 		m_low_V = out_proxied.m_low_V;
 		m_high_V = out_proxied.m_high_V;
 	}
