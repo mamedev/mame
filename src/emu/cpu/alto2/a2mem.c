@@ -666,7 +666,9 @@ UINT16 alto2_cpu_device::read_mem()
 
 	base_addr = m_mem.mar & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE) {
-		m_mem.md = ((*this).*mmio_read_fn[base_addr - ALTO2_IO_PAGE_BASE])(base_addr);
+		offs_t offset = base_addr - ALTO2_IO_PAGE_BASE;
+		if (mmio_read_fn[offset])
+			m_mem.md = ((*this).*mmio_read_fn[offset])(base_addr);
 		LOG((LOG_MEM,6,"	MD = MMIO[%#o] (%#o)\n", base_addr, m_mem.md));
 		m_mem.access = ALTO2_MEM_NONE;
 #if	ALTO2_DEBUG
@@ -720,8 +722,10 @@ void alto2_cpu_device::write_mem(UINT16 data)
 
 	base_addr = m_mem.mar & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE) {
+		offs_t offset = base_addr - ALTO2_IO_PAGE_BASE;
 		LOG((LOG_MEM,6, "	MMIO[%#o] = MD (%#o)\n", base_addr, m_mem.md));
-		((*this).*mmio_write_fn[base_addr - ALTO2_IO_PAGE_BASE])(base_addr, m_mem.md);
+		if (mmio_write_fn[offset])
+			((*this).*mmio_write_fn[offset])(base_addr, m_mem.md);
 		m_mem.access = ALTO2_MEM_NONE;
 #if	ALTO2_DEBUG
 		watch_write(m_mem.mar, m_mem.md);
@@ -787,7 +791,9 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 	int base_addr = addr & 0177777;
 	int data;
 	if (base_addr >= ALTO2_IO_PAGE_BASE) {
-		data = ((*this).*mmio_read_fn[base_addr - ALTO2_IO_PAGE_BASE])(addr);
+		offs_t offset = base_addr - ALTO2_IO_PAGE_BASE;
+		if (mmio_read_fn[offset])
+			data = ((*this).*mmio_read_fn[offset])(addr);
 	} else {
 		data = (addr & ALTO2_MEM_ODD) ? GET_ODD(m_mem.ram[addr/2]) : GET_EVEN(m_mem.ram[addr/2]);
 	}
@@ -804,7 +810,9 @@ void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
 {
 	int base_addr = addr & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE) {
-		((*this).*mmio_write_fn[base_addr - ALTO2_IO_PAGE_BASE])(addr, data);
+		offs_t offset = base_addr - ALTO2_IO_PAGE_BASE;
+		if (mmio_write_fn[offset])
+			((*this).*mmio_write_fn[offset])(addr, data);
 	} else if (addr & ALTO2_MEM_ODD) {
 		PUT_ODD(m_mem.ram[addr/2], data);
 	} else {

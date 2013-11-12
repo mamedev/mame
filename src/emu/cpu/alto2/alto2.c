@@ -1965,7 +1965,7 @@ void alto2_cpu_device::rdram()
 		LOG((LOG_CPU,0,"invalid address (%06o)\n", val));
 		return;
 	}
-	val = m_ucode->read_dword(addr) ^ ALTO2_UCODE_INVERTED;
+	val = m_ucode->read_dword(m_ucode->address_to_byte(addr)) ^ ALTO2_UCODE_INVERTED;
 	if (GET_CRAM_HALFSEL(m_cram_addr)) {
 		val = val >> 16;
 		LOG((LOG_CPU,0,"upper:%06o\n", val));
@@ -2002,7 +2002,7 @@ void alto2_cpu_device::wrtram()
 		return;
 	}
 	LOG((LOG_CPU,0,"\n"));
-	m_ucode->write_dword(addr, ((m_m << 16) | m_alu) ^ ALTO2_UCODE_INVERTED);
+	m_ucode->write_dword(m_ucode->address_to_byte(addr), ((m_m << 16) | m_alu) ^ ALTO2_UCODE_INVERTED);
 }
 
 #if	USE_ALU_74181
@@ -2413,10 +2413,10 @@ void alto2_cpu_device::execute_run()
 
 		/* next instruction's mpc */
 		m_mpc = m_next;
-		m_mir = m_ucode->read_dword(m_mpc);
+		m_mir = m_ucode->read_dword(m_ucode->address_to_byte(m_mpc));
 		m_rsel = MIR_RSEL(m_mir);
 		m_next = MIR_NEXT(m_mir) | m_next2;
-		m_next2 = A2_GET32(m_ucode->read_dword(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
+		m_next2 = A2_GET32(m_ucode->read_dword(m_ucode->address_to_byte(m_next)), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
 		aluf = MIR_ALUF(m_mir);
 		bs = MIR_BS(m_mir);
 		f1 = MIR_F1(m_mir);
