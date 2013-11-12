@@ -95,10 +95,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_hw(),
 	m_mouse(),
 	m_drive(),
-	m_unit_selected(0),
-	m_head_selected(0),
-	m_sector_callback(),
-	m_sector_timer(0),
 	m_dsk(),
 	m_sysclka0(),
 	m_sysclka1(),
@@ -934,8 +930,6 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_mouse.dx));
 	save_item(NAME(m_mouse.dy));
 	save_item(NAME(m_mouse.latch));
-	save_item(NAME(m_unit_selected));
-	save_item(NAME(m_head_selected));
 	save_item(NAME(m_dsk.drive));
 	save_item(NAME(m_dsk.kaddr));
 	save_item(NAME(m_dsk.kadr));

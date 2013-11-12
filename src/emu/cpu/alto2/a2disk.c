@@ -12,58 +12,6 @@
 /** @brief 1 to debug the JK flip-flops, 0 to use a lookup table */
 #define	JKFF_FUNCTION	0
 
-/**
- *
- * Just for completeness' sake:
- * The mapping of disk controller connector P2 pins to the
- * Winchester disk drive signals (see drive.h)
- * <PRE>
- * Alto Controller     Winchester
- * P2 signal           disk bus
- * -----------------------------------------------
- *  1 GND              D_GROUND
- *  2 RDCLK'           A_READ_CLOCK
- *  3 WRDATA'          B_WRITE_DATA_AND_CLOCK
- *  4 SRWRDY'          F_S_R_W
- *  5 DISK             L_SELECT_LINE_UNIT_1
- *  6 CYL(7)'          N_CYL_7
- *  7 DISK'            R_SELECT_LINE_UNIT_2
- *  8 CYL(2)'          T_CYL_2
- *  9 ???              V_SELECT_LINE_UNIT_3
- * 10 CYL(4)'          X_CYL_4
- * 11 CYL(0)'          Z_CYL_0
- * 12 CYL(1)'          BB_CYL_1
- * 13 CYL(3)'          FF_CYL_3
- * 14 ???              KK_BIT_2
- * 15 CYL(8)'          LL_CYL_8
- * 16 ADRACK'          NN_ADDX_ACKNOWLEDGE
- * 17 SKINC'           TT_SEEK_INCOMPLETE
- * 18 LAI'             XX_LOG_ADDX_INTERLOCK
- * 19 CYL(6)'          RR_CYL_6
- * 20 RESTOR'          VV_RESTORE
- * 21 ???              UU_BIT_16
- * 22 STROBE'          SS_STROBE
- * 23 ???              MM_BIT_8
- * 24 ???              KK_BIT_4
- * 25 ???              HH_WRITE_CHK
- * 26 WRTGATE'         EE_WRITE_GATE
- * 27 ???              CC_BIT_SECTOR_ADDX
- * 28 HEAD'            AA_HEAD_SELECT
- * 29 ???              Y_INDEX_MARK
- * 30 SECT(4)'         W_SECTOR_MARK
- * 31 READY'           U_FILE_READY
- * 32 ???              S_PSEUDO_SECTOR_MARK
- * 33 ???              P_WRITE_PROTECT_IND
- * 34 ???              H_WRITE_PROTECT_INPUT_ATTENTION
- * 35 ERGATE'          K_ERASE_GATE
- * 36 ???              M_HIGH_DENSITY
- * 37 CYL(5)'          J_CYL_5
- * 38 RDDATA'          C_READ_DATA
- * 39 RDGATE'          E_READ_GATE
- * 40 GND              ??
- * </PRE>
- */
-
 #define	GET_KADDR_SECTOR(kaddr)			A2_GET16(kaddr,16, 0, 3)			//!< get sector number from address register
 #define	PUT_KADDR_SECTOR(kaddr,val)		A2_PUT16(kaddr,16, 0, 3,val)		//!< put sector number into address register
 #define	GET_KADDR_CYLINDER(kaddr)		A2_GET16(kaddr,16, 4,12)			//!< get cylinder number from address register
@@ -1087,7 +1035,8 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	int i;
 	UINT8 s0, s1;
 
-	LOG((LOG_DISK,5,"	>>> KWD timing bitclk:%d datin:%d sect4:%d\n", bitclk, datin, drive_sector_mark_0(m_dsk.drive)));
+	diablo_hd_device* dhd = m_drive[m_dsk.drive];
+	LOG((LOG_DISK,5,"	>>> KWD timing bitclk:%d datin:%d sect4:%d\n", bitclk, datin, dhd->get_sector_mark_0()));
 
 	if (0 == m_dsk.seclate) {
 		/* If SECLATE is 0, WDDONE' never goes low (counter's clear has precedence). */
@@ -1276,7 +1225,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		DEBUG_NAME("		RDYLAT 45a");
 		s0 = m_dsk.ff_45a;
 		s1 = m_sysclka1[i];
-		if (drive_ready_0(m_dsk.drive))
+		if (dhd->get_ready_0())
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
@@ -1452,7 +1401,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 */
 	DEBUG_NAME("		KSEC 21a");
 	s0 = m_dsk.ff_21a;
-	s1 = drive_sector_mark_0(m_dsk.drive) ? 0 : JKFF_CLK;
+	s1 = dhd->get_sector_mark_0() ? 0 : JKFF_CLK;
 	if (!(m_dsk.ff_22b & JKFF_Q))
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
@@ -1480,20 +1429,20 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 * check if write and erase gate, or read gate are changed
 	 */
 	if ((m_task_wakeup & (1 << task_ksec)) || GET_KCOM_XFEROFF(m_dsk.kcom) || m_dsk.kfer) {
-		drive_egate(m_dsk.drive, 1);
-		drive_wrgate(m_dsk.drive, 1);
-		drive_rdgate(m_dsk.drive, 1);
+		dhd->set_egate(1);
+		dhd->set_wrgate(1);
+		dhd->set_rdgate(1);
 	} else {
 		/* enable either read or write gates depending on current record R/W */
 		if (m_dsk.krwc & RWC_WRITE) {
 			/* enable erase and write gates only if OKTORUN is high */
 			if (m_dsk.ok_to_run) {
-				drive_egate(m_dsk.drive, 0);
-				drive_wrgate(m_dsk.drive, 0);
+				dhd->set_egate(0);
+				dhd->set_wrgate(0);
 			}
 		} else {
 			/* enable read gate */
-			drive_rdgate(m_dsk.drive, 0);
+			dhd->set_rdgate(0);
 		}
 	}
 
@@ -1552,15 +1501,16 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 	int lai;
 	int strobe;
 
+	diablo_hd_device* dhd = m_drive[unit];
 	LOG((LOG_DISK,2,"	STROBE #%d restore:%d cylinder:%d\n", unit, restore, cylinder));
 
 	/* This is really monoflop 52a generating a very short 0 pulse */
 	for (strobe = 0; strobe < 2; strobe++) {
 		UINT8 s0, s1;
 		/* pulse the strobe signal to the unit */
-		drive_strobe(unit, cylinder, restore, strobe);
+		dhd->set_strobe(cylinder, restore, strobe);
 
-		lai = drive_log_addx_interlock_0(unit);
+		lai = dhd->get_log_addx_interlock_0();
 		LOG((LOG_DISK,6,"		LAI':%d\n", lai));
 		/**
 		 * JK flip-flop 44a (LAI' clocked)
@@ -1581,13 +1531,13 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 		s1 |= JKFF_S;
 		s1 |= JKFF_C;
 		m_dsk.ff_44a = update_jkff(s0, s1);
-		if (drive_addx_acknowledge_0(unit) == 0 && (m_dsk.ff_44a & JKFF_Q)) {
+		if (dhd->get_addx_acknowledge_0() == 0 && (m_dsk.ff_44a & JKFF_Q)) {
 			/* if address is acknowledged, and Q' of FF 44a, clear the strobe */
 			m_dsk.strobe = 0;
 		}
 	}
 
-	if (drive_addx_acknowledge_0(unit)) {
+	if (dhd->get_addx_acknowledge_0()) {
 
 		/* no acknowledge yet */
 
@@ -1596,14 +1546,14 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 		LOG((LOG_DISK,2,"		STROBON:%d\n", m_dsk.strobe));
 
 		/* update the seekok status: SKINC' && LAI' && Q' of FF 44a */
-		seekok = drive_seek_incomplete_0(unit);
+		seekok = dhd->get_seek_incomplete_0();
 		if (seekok != m_dsk.seekok) {
 			m_dsk.seekok = seekok;
 			LOG((LOG_DISK,2,"		SEEKOK:%d\n", m_dsk.seekok));
 		}
 	}
 
-	LOG((LOG_DISK,2,"	current cylinder:%d\n", drive_cylinder(unit) ^ DIABLO_DRIVE_CYLINDER_MASK));
+	LOG((LOG_DISK,2,"	current cylinder:%d\n", dhd->get_cylinder()));
 
 	/* if the strobe is still set, restart the timer */
 	if (m_dsk.strobe) {
@@ -1617,7 +1567,8 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 /** @brief timer callback to change the READY monoflop 31a */
 void alto2_cpu_device::disk_ready_mf31a(void* ptr, INT32 arg)
 {
-	m_dsk.ready_mf31a = arg & drive_ready_0(m_dsk.drive);
+	diablo_hd_device* dhd = m_drive[m_dsk.drive];
+	m_dsk.ready_mf31a = arg & dhd->get_ready_0();
 	/* log the not ready result with level 0, else 2 */
 	LOG((LOG_DISK,m_dsk.ready_mf31a ? 0 : 2,"	ready mf31a:%d\n", m_dsk.ready_mf31a));
 }
@@ -1650,6 +1601,7 @@ void alto2_cpu_device::bs_read_kstat_0()
 {
 	UINT16 r;
 	int unit = m_dsk.drive;
+	diablo_hd_device* dhd = m_drive[unit];
 
 	/* KSTAT[4-7] bus is open */
 	PUT_KSTAT_DONE(m_dsk.kstat, 017);
@@ -1658,7 +1610,7 @@ void alto2_cpu_device::bs_read_kstat_0()
 	PUT_KSTAT_SEEKFAIL(m_dsk.kstat, m_dsk.seekok ? 0 : 1);
 
 	/* KSTAT[9] latch the drive seek/read/write status */
-	PUT_KSTAT_SEEK(m_dsk.kstat, drive_seek_read_write_0(unit));
+	PUT_KSTAT_SEEK(m_dsk.kstat, dhd->get_seek_read_write_0());
 
 	/* KSTAT[10] latch the latched (FF 45a at CLRSTAT) ready status */
 	PUT_KSTAT_NOTRDY(m_dsk.kstat, m_dsk.ff_45a & JKFF_Q ? 1 : 0);
@@ -1787,14 +1739,13 @@ void alto2_cpu_device::f1_load_kdata_1()
 		PUT_KADDR_DRIVE(m_dsk.kaddr, GET_KADDR_DRIVE(m_bus));
 		m_dsk.drive = GET_KADDR_DRIVE(m_dsk.kaddr);
 
-		LOG((LOG_DISK,1,"	KDATA<-; BUS (%#o) (drive:%d restore:%d %d/%d/%02d page:%d)\n",
+		LOG((LOG_DISK,1,"	KDATA<-; BUS (%#o) (drive:%d restore:%d %d/%d/%02d)\n",
 			m_bus,
 			GET_KADDR_DRIVE(m_dsk.kaddr),
 			GET_KADDR_RESTORE(m_dsk.kaddr),
 			GET_KADDR_CYLINDER(m_dsk.kaddr),
 			GET_KADDR_HEAD(m_dsk.kaddr),
-			GET_KADDR_SECTOR(m_dsk.kaddr),
-			DRIVE_PAGE(GET_KADDR_CYLINDER(m_dsk.kaddr),GET_KADDR_HEAD(m_dsk.kaddr),GET_KADDR_SECTOR(m_dsk.kaddr))));
+			GET_KADDR_SECTOR(m_dsk.kaddr)));
 #if	0
 		/* printing changes in the disk address */
 		{
@@ -1890,6 +1841,7 @@ void alto2_cpu_device::f1_increcno_1()
  */
 void alto2_cpu_device::f1_clrstat_1()
 {
+	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	LOG((LOG_DISK,1,"	CLRSTAT\n"));
 
 	/* clears the LAI clocked flip-flop 44a
@@ -1938,7 +1890,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	DEBUG_NAME("		RDYLAT 45a");
 	m_dsk.ff_45a = update_jkff(m_dsk.ff_45a,
 		(m_dsk.ff_45a & JKFF_CLK) |
-		drive_ready_0(m_dsk.drive) |
+		dhd->get_ready_0() |
 		JKFF_K |
 		JKFF_S |
 		0);
@@ -1961,7 +1913,7 @@ void alto2_cpu_device::f1_clrstat_1()
 		JKFF_C);
 
 	/* set or reset monoflop 31a, depending on drive READY' */
-	m_dsk.ready_mf31a = drive_ready_0(m_dsk.drive);
+	m_dsk.ready_mf31a = dhd->get_ready_0();
 
 	/* start monoflop 31a, which resets ready_mf31a */
 	if (!m_dsk.ready_timer)
@@ -2024,12 +1976,12 @@ void alto2_cpu_device::f1_load_kadr_1()
 
 	/* get selected drive from DATA[14] output (FF 67a really) */
 	unit = GET_KADDR_DRIVE(m_dsk.kaddr);
-
-	/* get the selected head, and select drive unit and head */
 	/* latch head from DATA[13] */
 	head = GET_KADDR_HEAD(m_dsk.dataout);
 	PUT_KADDR_HEAD(m_dsk.kaddr, head);
-	drive_select(unit, head);
+	/* get the selected head, and select drive unit and head */
+	diablo_hd_device* dhd = m_drive[unit];
+	dhd->select(unit, head);
 
 	/* On KDAR<- bit 0 of parts #36 and #37 is reset to 0, i.e. recno = 0 */
 	m_dsk.krecno = 0;
@@ -2156,7 +2108,8 @@ void alto2_cpu_device::f2_xfrdat_1()
  */
 void alto2_cpu_device::f2_swrnrdy_1()
 {
-	UINT16 r = drive_seek_read_write_0(m_dsk.drive);
+	diablo_hd_device* dhd = m_drive[m_dsk.drive];
+	UINT16 r = dhd->get_seek_read_write_0();
 	UINT16 init = INIT ? 037 : 0;
 
 	LOG((LOG_DISK,1,"	SWRNRDY; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
@@ -2217,7 +2170,8 @@ void alto2_cpu_device::f2_strobon_1()
 void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 {
 	(void)ptr;
-	int bits = drive_bits_per_sector();
+	diablo_hd_device* dhd = m_drive[m_dsk.drive];
+	int bits = dhd->bits_per_sector();
 	int clk = arg & 1;
 	int bit = 0;
 
@@ -2240,13 +2194,13 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		} else {
 			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (write) @%lldns\n", arg, bit, ntime()));
 			if (clk)
-				drive_wrdata(m_dsk.drive, arg, bit);
+				dhd->wr_data(arg, bit);
 			else
-				drive_wrdata(m_dsk.drive, arg, 1);
+				dhd->wr_data(arg, 1);
 		}
 	} else if (GET_KCOM_BCLKSRC(m_dsk.kcom)) {
 		/* always select the crystal clock */
-		bit = drive_rddata(m_dsk.drive, arg);
+		bit = dhd->rd_data(arg);
 		LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (read, crystal) @%lldns\n", arg, bit, ntime()));
 		kwd_timing(clk, bit, 0);
 	} else {
@@ -2254,8 +2208,8 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		if (GET_KCOM_XFEROFF(m_dsk.kcom)) {
 			bit = 1;
 		} else {
-			clk = drive_rdclk(m_dsk.drive, arg);
-			bit = drive_rddata(m_dsk.drive, arg);
+			clk = dhd->rd_clock(arg & ~1);
+			bit = dhd->rd_data(arg | 1);
 			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (read, driveclk) @%lldns\n", arg, bit, ntime()));
 		}
 		kwd_timing(clk, bit, 0);
@@ -2263,7 +2217,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 
 	/* more bits to clock? */
 	if (++arg < bits) {
-		m_dsk.bitclk_timer->adjust(drive_bit_time(m_dsk.drive), arg);
+		m_dsk.bitclk_timer->adjust(dhd->bit_time(), arg);
 		m_dsk.bitclk_timer->enable();
 	}
 }
@@ -2275,13 +2229,14 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
  */
 void alto2_cpu_device::disk_sector_start(int unit)
 {
+	diablo_hd_device* dhd = m_drive[unit];
 	if (m_dsk.bitclk_timer) {
 		LOG((LOG_DISK,0,"	unit #%d stop bitclk\n", m_dsk.bitclk));
 		m_dsk.bitclk_timer->enable(false);
 	}
 
 	/* KSTAT[0-3] update the current sector in the kstat field */
-	PUT_KSTAT_SECTOR(m_dsk.kstat, drive_sector(unit) ^ DIABLO_DRIVE_SECTOR_MASK);
+	PUT_KSTAT_SECTOR(m_dsk.kstat, dhd->get_sector());
 
 	/* clear input and output shift registers (?) */
 	m_dsk.shiftin = 0;
@@ -2344,6 +2299,7 @@ void alto2_cpu_device::init_disk()
 	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(15 * ALTO2_UCYCLE), 1);
 
 	/* install a callback to be called whenever a drive sector starts */
-	drive_sector_callback(&alto2_cpu_device::disk_sector_start);
+//	diablo_hd_device* dhd = m_drive[m_dsk.drive];
+//	dhd->sector_callback(&alto2_cpu_device::disk_sector_start);
 }
 

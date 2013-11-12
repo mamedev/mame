@@ -789,7 +789,7 @@ void alto2_cpu_device::install_mmio_fn(int first, int last, a2io_rd rfn, a2io_wr
 UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 {
 	int base_addr = addr & 0177777;
-	int data;
+	int data = 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE) {
 		offs_t offset = base_addr - ALTO2_IO_PAGE_BASE;
 		if (mmio_read_fn[offset])
@@ -830,10 +830,9 @@ void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
  */
 void alto2_cpu_device::init_memory()
 {
-	int addr;
 	memset(&m_mem, 0, sizeof(m_mem));
 
-	for (addr = 0; addr < ALTO2_IO_PAGE_SIZE; addr++) {
+	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_SIZE; addr++) {
 		mmio_read_fn[addr] = &alto2_cpu_device::bad_mmio_read_fn;
 		mmio_write_fn[addr] = &alto2_cpu_device::bad_mmio_write_fn;
 	}
@@ -886,4 +885,10 @@ void alto2_cpu_device::init_memory()
 	install_mmio_fn(0177024, 0177024, &alto2_cpu_device::mear_r, 0);
 	install_mmio_fn(0177025, 0177025, &alto2_cpu_device::mesr_r, &alto2_cpu_device::mesr_w);
 	install_mmio_fn(0177026, 0177026, &alto2_cpu_device::mecr_r, &alto2_cpu_device::mecr_w);
+
+#if	ALTO2_HAMMING_CHECK
+	// Initialize the hamming codes and parity bit
+	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_BASE; addr++)
+		hamming_code(1, addr, 0);
+#endif
 }

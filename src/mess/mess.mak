@@ -2101,6 +2101,7 @@ $(MESSOBJ)/xerox.a:             \
 	$(MESS_DRIVERS)/xerox820.o  \
 	$(MESS_DRIVERS)/bigbord2.o  \
 	$(MESS_DRIVERS)/alto2.o     \
+	$(MESS_MACHINE)/diablo_hd.o	\
 
 $(MESSOBJ)/yamaha.a:            \
 	$(MESS_DRIVERS)/ymmu100.o   \

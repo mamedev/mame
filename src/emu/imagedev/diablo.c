@@ -1,15 +1,10 @@
-/*********************************************************************
-
-	Code to interface the image code with harddisk core.
-
-	Raphael Nabet 2003
-
-	Update: 23-Feb-2004 - Unlike floppy disks, for which we support
-	myriad formats on many systems, it is my intention for MESS to
-	standardize on the CHD file format for hard drives so I made a few
-	changes to support this
-
-*********************************************************************/
+/**********************************************************
+ *   Portable DIABLO drive image to hard disk interface
+ *
+ *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *
+ *   Licenses: MAME, GPLv2
+ **********************************************************/
 
 #include "emu.h"
 #include "emuopts.h"
