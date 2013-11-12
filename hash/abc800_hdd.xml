@@ -2,6 +2,19 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="abc800_hdd" description="Luxor ABC-800 hard disks">
 
+	<software name="abc850">
+		<description>ABC 850</description>
+		<year>1983</year>
+		<publisher>Luxor</publisher>
+
+		<!-- Rodime RO202 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="ro202" sha1="622142fd96e62fc7751c4c97e1921561c308ca5a" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="abc852">
 		<description>ABC 852</description>
 		<year>1986</year>
@@ -23,7 +36,7 @@
 		<!-- Micropolis 1325 -->
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="micr1325" sha1="41acd70baa34b62df5fd53a8b7abcba185c67389" writeable="yes" />
+				<disk name="micr1325" sha1="bb96f8b3d367ebee731cdc967baf4efb0f213913" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>

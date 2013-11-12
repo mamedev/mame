@@ -13,17 +13,17 @@
 
     Use the CHDMAN utility to create a 10MB image for ABC 850:
 
-    $ chdman createhd -o ro202.chd -chs 321,4,17 -ss 512
+    $ chdman createhd -o ro202.chd -chs 321,4,32 -ss 256
     $ chdman createhd -o basf6186.chd -chs 440,4,32 -ss 256
 
     or a 20MB image for ABC 852:
 
     $ chdman createhd -o basf6185.chd -chs 440,6,32 -ss 256
-    $ chdman createhd -o nec5126.chd -chs 615,4,17 -ss 512
+    $ chdman createhd -o nec5126.chd -chs 615,4,32 -ss 256
 
     or a 60MB image for ABC 856:
 
-    $ chdman createhd -o micr1325.chd -chs 1024,8,33 -ss 256
+    $ chdman createhd -o micr1325.chd -chs 1024,8,32 -ss 256
 
     Start the abc800 emulator with the ABC 850 attached on the ABC bus,
     with the new CHD and a UFD-DOS floppy mounted:
@@ -68,6 +68,7 @@
 
     Or skip all of the above and use the preformatted images in the software list:
 
+    $ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=ro202 -flop1 ufd631 -hard abc850
     $ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=basf6185 -flop1 ufd631 -hard abc852
     $ mess abc800m -bus hdd -bus:hdd:io2 xebec,bios=micr1325 -flop1 ufd631 -hard abc856
 
@@ -104,17 +105,17 @@ const device_type LUXOR_55_21056 = &device_creator<luxor_55_21056_device>;
 ROM_START( luxor_55_21056 )
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	// ABC 850
-	ROM_SYSTEM_BIOS( 0, "ro202", "Rodime RO202 (CHS: 321,4,17,512)" )
+	ROM_SYSTEM_BIOS( 0, "ro202", "Rodime RO202 (CHS: 321,4,32,256)" )
 	ROMX_LOAD( "rodi202.bin", 0x0000, 0x0800, CRC(337b4dcf) SHA1(791ebeb4521ddc11fb9742114018e161e1849bdf), ROM_BIOS(1) ) // Rodime RO202 (http://stason.org/TULARC/pc/hard-drives-hdd/rodime/RO202-11MB-5-25-FH-MFM-ST506.html)
 	ROM_SYSTEM_BIOS( 1, "basf6186", "BASF 6186 (CHS: 440,4,32,256)" )
 	ROMX_LOAD( "basf6186.bin", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(2) ) // BASF 6186 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6186-14MB-5-25-FH-MFM-ST412.html)
 	// ABC 852
 	ROM_SYSTEM_BIOS( 2, "basf6185", "BASF 6185 (CHS: 440,6,32,256)" )
 	ROMX_LOAD( "basf6185.bin", 0x0000, 0x0800, CRC(06f8fe2e) SHA1(e81f2a47c854e0dbb096bee3428d79e63591059d), ROM_BIOS(3) ) // BASF 6185 (http://stason.org/TULARC/pc/hard-drives-hdd/basf-magnetics/6185-22MB-5-25-FH-MFM-ST412.html)
-	ROM_SYSTEM_BIOS( 3, "nec5126", "NEC 5126 (CHS: 615,4,17,512)" )
+	ROM_SYSTEM_BIOS( 3, "nec5126", "NEC 5126 (CHS: 615,4,32,256)" )
 	ROMX_LOAD( "nec5126.bin", 0x0000, 0x1000, CRC(17c247e7) SHA1(7339738b87751655cb4d6414422593272fe72f5d), ROM_BIOS(4) ) // NEC 5126 (http://stason.org/TULARC/pc/hard-drives-hdd/nec/D5126-20MB-5-25-HH-MFM-ST506.html)
 	// ABC 856
-	ROM_SYSTEM_BIOS( 4, "micr1325", "Micropolis 1325 (CHS: 1024,8,33,256)" )
+	ROM_SYSTEM_BIOS( 4, "micr1325", "Micropolis 1325 (CHS: 1024,8,32,256)" )
 	ROMX_LOAD( "micr1325.bin", 0x0000, 0x0800, CRC(084af409) SHA1(342b8e214a8c4c2b014604e53c45ef1bd1c69ea3), ROM_BIOS(5) ) // Micropolis 1325 (http://stason.org/TULARC/pc/hard-drives-hdd/micropolis/1325-69MB-5-25-FH-MFM-ST506.html)
 ROM_END
 
@@ -136,7 +137,7 @@ const rom_entry *luxor_55_21056_device::device_rom_region() const
 static ADDRESS_MAP_START( luxor_55_21056_mem, AS_PROGRAM, 8, luxor_55_21056_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_ROM AM_REGION(Z80_TAG, 0)
+	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x1800) AM_RAM
 ADDRESS_MAP_END
 
