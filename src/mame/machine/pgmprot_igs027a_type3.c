@@ -238,31 +238,13 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 
 
 
-	temp16[(0xe8)/2] = 0xE004; // based on killbldp
-	temp16[(0xea)/2] = 0xE52D;
-	temp16[(0xec)/2] = 0x00D3;
-	temp16[(0xee)/2] = 0xE3A0;
-	temp16[(0xf0)/2] = 0xF000;
-	temp16[(0xf2)/2] = 0xE121;
-	temp16[(0xf4)/2] = 0xE004;
-	temp16[(0xf6)/2] = 0xE49D;
-	temp16[(0xf8)/2] = 0xFF1E;
-	temp16[(0xfa)/2] = 0xE12F;
 
-	temp16[(0xfc) / 2] = 0xE004;// based on killbldp
-	temp16[(0xfe) / 2] = 0xE52D;
-	temp16[(0x100) / 2] = 0x0013;
-	temp16[(0x102) / 2] = 0xE3A0;
-	temp16[(0x104) / 2] = 0xF000;
-	temp16[(0x106) / 2] = 0xE121;
-	temp16[(0x108) / 2] = 0xE004;
-	temp16[(0x10a) / 2] = 0xE49D;
-	temp16[(0x10c) / 2] = 0xFF1E;
-	temp16[(0x10e) / 2] = 0xE12F;
 
 
 	// the interrupt code appears to be at 0x08000010
-	// although this still crashes for now..
+	// so point the FIQ vector to jump there, the actual internal EO area code
+	// would not look like this because this reads from the EO area to get the jump address which is verified
+	// as impossible
 	int base = 0x1c;
 	temp16[(base) /2] = 0xf000; base += 2;
 	temp16[(base) /2] = 0xe59f; base += 2;
@@ -272,6 +254,9 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	temp16[(base) /2] = 0x0800; base += 2;
 	 
 
+	// some startup code to set up the stacks etc. we're assuming
+	// behavior is basically the same as killing blade plus here, this code
+	// could be very wrong
 	base = 0x30;
 	temp16[(base) /2] = 0x00D3; base += 2;
 	temp16[(base) /2] = 0xE3A0; base += 2;
@@ -338,7 +323,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	temp16[(base) /2] = 0x0008; base += 2;
 	temp16[(base) /2] = 0xE3A0; base += 2;
 	temp16[(base) /2] = 0x8805; base += 2;
-	temp16[(base) / 2] = 0xE080; base += 2;
+	temp16[(base) /2] = 0xE080; base += 2;
 	temp16[(base) /2] = 0x0010; base += 2;
 	temp16[(base) /2] = 0xE3A0; base += 2;
 	temp16[(base) /2] = 0x0000; base += 2;
@@ -363,6 +348,52 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	base = 0;
 	temp16[(base) /2] = 0x000a; base += 2;
 	temp16[(base) /2] = 0xEA00; base += 2;
+
+	// see table at ~080824A4 in The Gladiator (ARM space)
+	// there are pointers to
+	// 0000 00FC
+	// 0000 00E8
+	// 0000 0110
+	// 0000 0150
+	// in the table.. for e8 / fc we can deduce from the calling code and size of the functions expected that they should be the
+	// same as those in the killing blade plus 'killbldp'  (there are also explicit jumps to these addresses in the code)
+	//
+	// 0x110 is called after the 'continue' screen, I suspect it is unique code to the gladiator, probably 0x40 bytes long due to next entry being at 0x150
+	// 0x150 I haven't seen called, I guess it is 0x38 in size because the execute-only area ends at 0x188
+
+
+	base = 0xe8;
+	temp16[(base) /2] = 0xE004; base += 2; // based on killbldp
+	temp16[(base) /2] = 0xE52D; base += 2;
+	temp16[(base) /2] = 0x00D3; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0xE004; base += 2;
+	temp16[(base) /2] = 0xE49D; base += 2;
+	temp16[(base) /2] = 0xFF1E; base += 2;
+	temp16[(base) /2] = 0xE12F; base += 2;
+
+//	base = 0xfc; // already at 0xfc
+	temp16[(base) /2] = 0xE004; base += 2; // based on killbldp
+	temp16[(base) /2] = 0xE52D; base += 2;
+	temp16[(base) /2] = 0x0013; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0xE004; base += 2;
+	temp16[(base) /2] = 0xE49D; base += 2;
+	temp16[(base) /2] = 0xFF1E; base += 2;
+	temp16[(base) /2] = 0xE12F; base += 2;
+
+//	base = 0x110; // already at 0x110
+	temp16[(base) /2] = 0xff1e; base += 2;
+	temp16[(base) /2] = 0xe12f; base += 2;
+
+	base = 0x150;
+	temp16[(base) /2] = 0xff1e; base += 2;
+	temp16[(base) /2] = 0xe12f; base += 2;
+
 
 #if 0
 	m_svg_ram_sel = 1;
