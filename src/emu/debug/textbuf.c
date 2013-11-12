@@ -53,7 +53,7 @@ INLINE int utf8_strlen(const char* src)
 {
 	int total = 0;
 	while (*src) {
-		UINT32 uchar;
+		unicode_char uchar;
 		int len = uchar_from_utf8(&uchar, src, strlen(src));
 		if (len < 0)
 			break;	// invalid UTF-8
