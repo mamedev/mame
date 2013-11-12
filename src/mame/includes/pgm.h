@@ -377,7 +377,7 @@ public:
 	DECLARE_READ32_MEMBER( svg_latch_arm_r );
 	DECLARE_WRITE32_MEMBER( svg_latch_arm_w );
 	void svg_basic_init();
-	void pgm_create_dummy_internal_arm_region();
+	void pgm_create_dummy_internal_arm_region(int size);
 	void svg_latch_init();
 	DECLARE_READ32_MEMBER( dmnfrnt_speedup_r );
 	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );

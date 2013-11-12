@@ -178,13 +178,13 @@ void pgm_arm_type3_state::svg_basic_init()
 	save_item(NAME(m_svg_ram_sel));
 }
 
-void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region()
+void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region(int size)
 {
 	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
 
 	// fill with RX 14
 	int i;
-	for (i=0;i<0x4000/2;i+=2)
+	for (i=0;i<size/2;i+=2)
 	{
 		temp16[i] = 0xff1e;
 		temp16[i+1] = 0xe12f;
@@ -219,7 +219,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	svg_basic_init();
 	pgm_theglad_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region();
+	pgm_create_dummy_internal_arm_region(0x188);
 }
 
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
@@ -227,7 +227,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
 	svg_basic_init();
 	pgm_svg_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region();
+	pgm_create_dummy_internal_arm_region(0x4000);
 }
 
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
@@ -235,7 +235,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
 	svg_basic_init();
 	pgm_svgpcb_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region();
+	pgm_create_dummy_internal_arm_region(0x4000);
 }
 
 
@@ -281,7 +281,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 	svg_latch_init();
 
 	/* put some fake code for the ARM here ... */
-	pgm_create_dummy_internal_arm_region();
+	pgm_create_dummy_internal_arm_region(0x4000);
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x18000444, 0x18000447, read32_delegate(FUNC(pgm_arm_type3_state::dmnfrnt_speedup_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80a03c, 0x80a03d, read16_delegate(FUNC(pgm_arm_type3_state::dmnfrnt_main_speedup_r),this));
@@ -303,5 +303,5 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
 	svg_basic_init();
 	pgm_happy6_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region();
+	pgm_create_dummy_internal_arm_region(0x4000);
 }
