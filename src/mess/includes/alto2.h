@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/alto2/alto2.h"
-#include "imagedev/diablo.h"
+#include "machine/diablo_hd.h"
 
 class alto2_state : public driver_device
 {
@@ -17,8 +17,8 @@ public:
 	alto2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_diablo0(*this, DIABLO_TAG(0)),
-		m_diablo1(*this, DIABLO_TAG(1)),
+		m_diablo0(*this, DIABLO_HD_0),
+		m_diablo1(*this, DIABLO_HD_1),
 		m_io_row0(*this, "ROW0"),
 		m_io_row1(*this, "ROW1"),
 		m_io_row2(*this, "ROW2"),
@@ -44,8 +44,8 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	optional_device<diablo_image_device> m_diablo0;
-	optional_device<diablo_image_device> m_diablo1;
+	optional_device<diablo_hd_device> m_diablo0;		// should become required_device() once the devices work right
+	optional_device<diablo_hd_device> m_diablo1;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;

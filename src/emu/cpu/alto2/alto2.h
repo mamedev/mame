@@ -213,6 +213,9 @@ public:
 	UINT16 read_ram(offs_t offset);
 	void write_ram(offs_t offset, UINT16 data);
 
+	//! driver interface to set diablo_hd_device
+	void set_diablo(int unit, diablo_hd_device* ptr);
+
 protected:
 	//! device-level override for start
 	virtual void device_start();
@@ -1323,15 +1326,11 @@ private:
 	void mouse_button(int b);						//!< register a mouse button change
 	void mouse_init();								//!< initialize the mouse context to useful values
 
-	// ************************************************
-	// diablo31 drive stuff
-	// ************************************************
-	diablo_hd_device* m_drive[2];					//!< two diablo drives
-	void init_drive();								//!< initialize the disk drives context
 
 	// ************************************************
 	// disk controller stuff
 	// ************************************************
+	diablo_hd_device* m_drive[2];		//!< two diablo_hd_device drives
 
 	//! disk controller context
 	struct {

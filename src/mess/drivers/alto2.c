@@ -266,6 +266,11 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 {
 	// make a copy for the front end, i.e. the driver view on the micro code
 	memcpy(memregion("maincpu"), memregion("maincpu:ucode"), sizeof(UINT32)*ALTO2_UCODE_SIZE);
+
+	// make the diablo drives known to the CPU core
+	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
+	cpu->set_diablo(0, m_diablo0);
+	cpu->set_diablo(1, m_diablo1);
 }
 
 /* Game Drivers */

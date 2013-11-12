@@ -1,13 +1,13 @@
-/*********************************************************************
+/**********************************************************
+ *   DIABLO drive image to hard disk interface
+ *
+ *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *
+ *   Licenses: MAME, GPLv2
+ **********************************************************/
 
-	diablo.h
-
-	Interface to the CHD code
-
-*********************************************************************/
-
-#ifndef DIABLO_H
-#define DIABLO_H
+#ifndef _IMAGEDEV_DIABLO_H_
+#define _IMAGEDEV_DIABLO_H_
 
 #include "harddisk.h"
 
@@ -88,4 +88,4 @@ extern const device_type DIABLO;
 #define MCFG_DIABLO_CONFIG_ADD(_tag,_config) \
 	MCFG_DEVICE_ADD(_tag, DIABLO, 0) \
 	MCFG_DEVICE_CONFIG(_config)
-#endif /* DIABLO_H */
+#endif /* _IMAGEDEV_DIABLO_H_ */

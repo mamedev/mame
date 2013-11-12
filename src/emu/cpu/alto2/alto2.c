@@ -117,6 +117,30 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 }
 
 //-------------------------------------------------
+// driver interface to RAM
+//-------------------------------------------------
+
+UINT16 alto2_cpu_device::read_ram(offs_t offset)
+{
+	return debug_read_mem(offset);
+}
+
+void alto2_cpu_device::write_ram(offs_t offset, UINT16 data)
+{
+	debug_write_mem(offset, data);
+}
+
+//-------------------------------------------------
+// driver interface to set diablo_hd_device
+//-------------------------------------------------
+
+void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
+{
+	m_drive[unit] = ptr;
+}
+
+
+//-------------------------------------------------
 //  device_rom_region - device-specific (P)ROMs
 //-------------------------------------------------
 
@@ -227,16 +251,6 @@ const address_space_config*alto2_cpu_device::memory_space_config(address_spacenu
 	if (AS_0 == spacenum)
 		return &m_ucode_config;
 	return NULL;
-}
-
-UINT16 alto2_cpu_device::read_ram(offs_t offset)
-{
-	return debug_read_mem(offset);
-}
-
-void alto2_cpu_device::write_ram(offs_t offset, UINT16 data)
-{
-	debug_write_mem(offset, data);
 }
 
 /**

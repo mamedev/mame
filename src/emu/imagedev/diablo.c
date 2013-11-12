@@ -1,5 +1,5 @@
 /**********************************************************
- *   Portable DIABLO drive image to hard disk interface
+ *   DIABLO drive image to hard disk interface
  *
  *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
  *

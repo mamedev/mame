@@ -1036,6 +1036,10 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	UINT8 s0, s1;
 
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
+	if (!dhd) {
+		// FIXME: set all signals for a not connected drive
+		return;
+	}
 	LOG((LOG_DISK,5,"	>>> KWD timing bitclk:%d datin:%d sect4:%d\n", bitclk, datin, dhd->get_sector_mark_0()));
 
 	if (0 == m_dsk.seclate) {
@@ -1502,6 +1506,10 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 	int strobe;
 
 	diablo_hd_device* dhd = m_drive[unit];
+	if (!dhd) {
+		// FIXME: set all signals for a not connected drive
+		return;
+	}
 	LOG((LOG_DISK,2,"	STROBE #%d restore:%d cylinder:%d\n", unit, restore, cylinder));
 
 	/* This is really monoflop 52a generating a very short 0 pulse */
@@ -1568,7 +1576,10 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 void alto2_cpu_device::disk_ready_mf31a(void* ptr, INT32 arg)
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	m_dsk.ready_mf31a = arg & dhd->get_ready_0();
+	if (dhd)
+		m_dsk.ready_mf31a = arg & dhd->get_ready_0();
+	else
+		m_dsk.ready_mf31a = arg;
 	/* log the not ready result with level 0, else 2 */
 	LOG((LOG_DISK,m_dsk.ready_mf31a ? 0 : 2,"	ready mf31a:%d\n", m_dsk.ready_mf31a));
 }
@@ -1610,7 +1621,7 @@ void alto2_cpu_device::bs_read_kstat_0()
 	PUT_KSTAT_SEEKFAIL(m_dsk.kstat, m_dsk.seekok ? 0 : 1);
 
 	/* KSTAT[9] latch the drive seek/read/write status */
-	PUT_KSTAT_SEEK(m_dsk.kstat, dhd->get_seek_read_write_0());
+	PUT_KSTAT_SEEK(m_dsk.kstat, dhd ? dhd->get_seek_read_write_0() : 1);
 
 	/* KSTAT[10] latch the latched (FF 45a at CLRSTAT) ready status */
 	PUT_KSTAT_NOTRDY(m_dsk.kstat, m_dsk.ff_45a & JKFF_Q ? 1 : 0);
@@ -1890,7 +1901,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	DEBUG_NAME("		RDYLAT 45a");
 	m_dsk.ff_45a = update_jkff(m_dsk.ff_45a,
 		(m_dsk.ff_45a & JKFF_CLK) |
-		dhd->get_ready_0() |
+		(dhd ? dhd->get_ready_0() : 1) |
 		JKFF_K |
 		JKFF_S |
 		0);
@@ -1913,7 +1924,7 @@ void alto2_cpu_device::f1_clrstat_1()
 		JKFF_C);
 
 	/* set or reset monoflop 31a, depending on drive READY' */
-	m_dsk.ready_mf31a = dhd->get_ready_0();
+	m_dsk.ready_mf31a = dhd ? dhd->get_ready_0() : 1;
 
 	/* start monoflop 31a, which resets ready_mf31a */
 	if (!m_dsk.ready_timer)
@@ -1981,7 +1992,8 @@ void alto2_cpu_device::f1_load_kadr_1()
 	PUT_KADDR_HEAD(m_dsk.kaddr, head);
 	/* get the selected head, and select drive unit and head */
 	diablo_hd_device* dhd = m_drive[unit];
-	dhd->select(unit, head);
+	if (dhd)
+		dhd->select(unit, head);
 
 	/* On KDAR<- bit 0 of parts #36 and #37 is reset to 0, i.e. recno = 0 */
 	m_dsk.krecno = 0;
@@ -2109,7 +2121,7 @@ void alto2_cpu_device::f2_xfrdat_1()
 void alto2_cpu_device::f2_swrnrdy_1()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	UINT16 r = dhd->get_seek_read_write_0();
+	UINT16 r = dhd ? dhd->get_seek_read_write_0() : 1;
 	UINT16 init = INIT ? 037 : 0;
 
 	LOG((LOG_DISK,1,"	SWRNRDY; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
@@ -2171,7 +2183,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 {
 	(void)ptr;
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	int bits = dhd->bits_per_sector();
+	int bits = dhd ? dhd->bits_per_sector() : 0;
 	int clk = arg & 1;
 	int bit = 0;
 
@@ -2193,14 +2205,17 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 			/* do anything, if the transfer is off? */
 		} else {
 			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (write) @%lldns\n", arg, bit, ntime()));
-			if (clk)
-				dhd->wr_data(arg, bit);
-			else
-				dhd->wr_data(arg, 1);
+			if (dhd) {
+				if (clk)
+					dhd->wr_data(arg, bit);
+				else
+					dhd->wr_data(arg, 1);
+			}
 		}
 	} else if (GET_KCOM_BCLKSRC(m_dsk.kcom)) {
 		/* always select the crystal clock */
-		bit = dhd->rd_data(arg);
+		if (dhd)
+			bit = dhd->rd_data(arg);
 		LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (read, crystal) @%lldns\n", arg, bit, ntime()));
 		kwd_timing(clk, bit, 0);
 	} else {
@@ -2208,8 +2223,10 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		if (GET_KCOM_XFEROFF(m_dsk.kcom)) {
 			bit = 1;
 		} else {
-			clk = dhd->rd_clock(arg & ~1);
-			bit = dhd->rd_data(arg | 1);
+			if (dhd) {
+				clk = dhd->rd_clock(arg & ~1);
+				bit = dhd->rd_data(arg | 1);
+			}
 			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (read, driveclk) @%lldns\n", arg, bit, ntime()));
 		}
 		kwd_timing(clk, bit, 0);
@@ -2217,6 +2234,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 
 	/* more bits to clock? */
 	if (++arg < bits) {
+		assert(dhd != NULL);
 		m_dsk.bitclk_timer->adjust(dhd->bit_time(), arg);
 		m_dsk.bitclk_timer->enable();
 	}
@@ -2236,7 +2254,7 @@ void alto2_cpu_device::disk_sector_start(int unit)
 	}
 
 	/* KSTAT[0-3] update the current sector in the kstat field */
-	PUT_KSTAT_SECTOR(m_dsk.kstat, dhd->get_sector());
+	PUT_KSTAT_SECTOR(m_dsk.kstat, dhd ? dhd->get_sector() : 017);
 
 	/* clear input and output shift registers (?) */
 	m_dsk.shiftin = 0;
@@ -2257,6 +2275,14 @@ void alto2_cpu_device::disk_sector_start(int unit)
  */
 void alto2_cpu_device::init_disk()
 {
+//	diablo_hd_device* dhd;
+//	for (int unit = 0; unit < 2; unit++) {
+//		dhd = m_drive[unit];
+//		if (!dhd)
+//			continue;
+//		dhd->sector_callback(&alto2_cpu_device::disk_sector_start);
+//	}
+
 	memset(&m_dsk, 0, sizeof(m_dsk));
 
 	/** @brief simulate previous sysclka */
@@ -2297,9 +2323,5 @@ void alto2_cpu_device::init_disk()
 	m_dsk.ok_to_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ok_to_run),this));
 	m_dsk.ok_to_run_timer->set_param(1);
 	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(15 * ALTO2_UCYCLE), 1);
-
-	/* install a callback to be called whenever a drive sector starts */
-//	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-//	dhd->sector_callback(&alto2_cpu_device::disk_sector_start);
 }
 
