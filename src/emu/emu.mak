@@ -185,6 +185,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ram.o         \
 	$(EMUMACHINE)/nvram.o       \
 	$(EMUMACHINE)/laserdsc.o    \
+	$(EMUMACHINE)/diablo_hd.o   \
 	$(EMUMACHINE)/netlist.o     \
 
 EMUIMAGEDEVOBJS = \

@@ -100,10 +100,10 @@ struct square_t
 			}
 			vbl_length =0;
 			freq = 0;
-			phaseacc = 0.0d;
-			output_vol = 0.0d;
-			env_phase = 0.0d;
-			sweep_phase = 0.0d;
+			phaseacc = 0.0;
+			output_vol = 0.0;
+			env_phase = 0.0;
+			sweep_phase = 0.0;
 			adder = 0;
 			env_vol = 0;
 			enabled = false;
@@ -133,8 +133,8 @@ struct triangle_t
 			linear_length =0;
 			vbl_length =0;
 			write_latency = 0;
-			phaseacc = 0.0d;
-			output_vol = 0.0d;
+			phaseacc = 0.0;
+			output_vol = 0.0;
 			adder = 0;
 			counter_started = false;
 			enabled = false;
@@ -162,9 +162,9 @@ struct noise_t
 			}
 			cur_pos =0;
 			vbl_length =0;
-			phaseacc = 0.0d;
-			output_vol = 0.0d;
-			env_phase = 0.0d;
+			phaseacc = 0.0;
+			output_vol = 0.0;
+			env_phase = 0.0;
 			env_vol = 0;
 			enabled = false;
 		}
@@ -191,8 +191,8 @@ struct dpcm_t
 		address = 0;
 		length = 0;
 		bits_left = 0;
-		phaseacc = 0.0d;
-		output_vol = 0.0d;
+		phaseacc = 0.0;
+		output_vol = 0.0;
 		cur_byte = 0;
 		enabled = false;
 		irq_occurred = false;
