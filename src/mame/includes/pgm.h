@@ -382,6 +382,7 @@ public:
 	DECLARE_READ32_MEMBER( dmnfrnt_speedup_r );
 	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );
 	DECLARE_READ32_MEMBER( killbldp_speedup_r );
+	DECLARE_READ32_MEMBER( theglad_speedup_r );
 };
 
 

@@ -216,6 +216,14 @@ void pgm_arm_type3_state::svg_latch_init()
 	save_item(NAME(m_svg_latchdata_arm_w));
 }
 
+READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
+{
+	int pc = space.device().safe_pc();
+	if (pc == 0x7c4) space.device().execute().eat_cycles(500);
+	//else printf("theglad_speedup_r %08x\n", pc);
+	return m_arm_ram2[0x00c/4];
+}
+
 
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 {
@@ -368,6 +376,8 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 		share16[i / 2] = 0x0002;
 	}
 #endif
+
+	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
 }
 
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
