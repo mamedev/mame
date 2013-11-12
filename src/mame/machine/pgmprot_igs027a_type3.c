@@ -230,7 +230,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	svg_basic_init();
 	pgm_theglad_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region(0x188);
+//	pgm_create_dummy_internal_arm_region(0x188);
 
 	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
 
