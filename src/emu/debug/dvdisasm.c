@@ -13,6 +13,8 @@
 #include "dvdisasm.h"
 #include "debugcpu.h"
 
+// FIXME: should be known to disassemblers to not exceed buffer
+#define	DISASM_BUFFSIZE	128
 
 //**************************************************************************
 //  UNICODE HELPERS
@@ -320,7 +322,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 			instlen = 1;
 			if (debug_cpu_translate(source.m_space, TRANSLATE_FETCH, &physpcbyte))
 			{
-				char dasmbuffer[100];
+				char dasmbuffer[DISASM_BUFFSIZE];
 				instlen = source.m_device.debug()->disassemble(dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
 			}
 
@@ -381,7 +383,6 @@ void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes
 //  disassembly view
 //-------------------------------------------------
 
-#define	DISASM_BUFFSIZE	128
 bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 {
 	bool changed = false;
@@ -465,7 +466,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		else
 			strcpy(buffer, "<unmapped>");
 
-		// append the disassembly to the buffer
+		// append the UTF-8 decoded disassembly to the buffer
 		const char* src = buffer;
 		for (UINT32 offs = 0; offs < m_dasm_width + 2; offs++)
 		{

@@ -211,7 +211,7 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	UINT16 prefetch = next2 & 1023;
 	char *dst = buffer;
 	offs_t result = 1 | DASMFLAG_SUPPORTED;
-	int pa;
+	UINT8 pa;
 
 	if (next != pc + 1)
 		result |= DASMFLAG_STEP_OUT;
@@ -368,7 +368,7 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS←%s ", regname[rsel]);
 		break;
 	case 1:	// load R from shifter output
-		// dst += snprintf(dst, len - (size_t)(dst - buffer), "; %s←", rn[rsel]);
+		// dst += snprintf(dst, len - (size_t)(dst - buffer), "; %s←", regname[rsel]);
 		break;
 	case 2: // enables no source to the BUS, leaving it all ones
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS←177777 ");
@@ -424,18 +424,18 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	switch (f2) {
 	case 0:	// no operation
 		break;
-	case 1:	// NEXT ← NEXT OR (if (BUS=0) then 1 else 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[(BUS=0) ? %s : %s] ",
+	case 1:	// NEXT ← NEXT OR (BUS==0 ? 1 : 0)
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "[BUS==0 ? %s : %s] ",
 			addrname((prefetch | 1) & MCODE_MASK),
 			addrname(prefetch & MCODE_MASK));
 		break;
-	case 2:	// NEXT ← NEXT OR (if (SHIFTER OUTPUT<0) then 1 else 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[(SH=0) ? %s : %s] ",
+	case 2:	// NEXT ← NEXT OR (SHIFTER==0 ? 1 : 0)
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH==0 ? %s : %s] ",
 			addrname((prefetch | 1) & MCODE_MASK),
 			addrname(prefetch & MCODE_MASK));
 		break;
-	case 3:	// NEXT ← NEXT OR (if (SHIFTER OUTPUT<0) then 1 else 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[(SH<0) ? %s : %s] ",
+	case 3:	// NEXT ← NEXT OR (SHIFTER<0 ? 1 : 0)
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH<0 ? %s : %s] ",
 			addrname((prefetch | 1) & MCODE_MASK),
 			addrname(prefetch & MCODE_MASK));
 		break;
@@ -443,7 +443,7 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "NEXT←BUS ");
 		break;
 	case 5:	// NEXT ← NEXT OR ALUC0. ALUC0 is the carry produced by last L loading microinstruction.
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[(ALUC0) ? %s : %s] ",
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "[ALUC0 ? %s : %s] ",
 			addrname((prefetch | 1) & MCODE_MASK),
 			addrname(prefetch & MCODE_MASK));
 		break;
@@ -451,8 +451,8 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "MD←BUS ");
 		break;
 	case 7:	// put on the bus the constant from PROM (RSELECT,BS)
-		pa = (rsel << 3) | bs;
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS←[%03o]%05o ", pa, const_prom[pa]);
+		pa = 8 * rsel + bs;
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS←%05o CONST[%03o]", const_prom[pa], pa);
 		break;
 	default:
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS←F2_%02o ", f2);

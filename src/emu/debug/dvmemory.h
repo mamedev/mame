@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvmemory.h
+	dvmemory.h
 
-    Memory debugger view.
+	Memory debugger view.
 
 ***************************************************************************/
 
@@ -58,6 +58,7 @@ public:
 	bool reverse() const { return m_reverse_view; }
 	bool ascii() const { return m_ascii_view; }
 	bool physical() const { return m_no_translation; }
+	const unicode_char* unicode() { return m_unicode; }
 	offs_t addressAtCursorPosition(const debug_view_xy& pos) { return get_cursor_pos(pos).m_address; }
 
 	// setters
@@ -65,8 +66,9 @@ public:
 	void set_bytes_per_chunk(UINT8 chunkbytes);
 	void set_chunks_per_row(UINT32 rowchunks);
 	void set_reverse(bool reverse);
-	void set_ascii(bool reverse);
+	void set_ascii(bool ascii);
 	void set_physical(bool physical);
+	void set_unicode(const unicode_char* unicode);
 
 protected:
 	// view overrides
@@ -105,6 +107,7 @@ private:
 	bool                m_reverse_view;         // reverse-endian view?
 	bool                m_ascii_view;           // display ASCII characters?
 	bool                m_no_translation;       // don't run addresses through the cpu translation hook
+	const unicode_char* m_unicode;              // (optional) pointer to unicode lookup table for 256 entries
 	offs_t              m_maxaddr;              // (derived) maximum address to display
 	UINT32              m_bytes_per_row;        // (derived) number of bytes displayed per line
 	UINT32              m_byte_offset;          // (derived) offset of starting visible byte

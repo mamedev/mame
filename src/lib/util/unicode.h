@@ -2,16 +2,16 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    unicode.h
+	unicode.h
 
-    Unicode related functions
+	Unicode related functions
 
-    This code is for converting between UTF-8, UTF-16, and 32-bit
-    Unicode strings.  These functions roughly parallel C runtime
-    library functions like mbtowc() and similar functions, but are
-    specific for these Unicode encodings.  Specifically, there are
-    functions that convert UTF-8 and UTF-16 char clusters to and from
-    singular 32-bit Unicode chars.
+	This code is for converting between UTF-8, UTF-16, and 32-bit
+	Unicode strings.  These functions roughly parallel C runtime
+	library functions like mbtowc() and similar functions, but are
+	specific for these Unicode encodings.  Specifically, there are
+	functions that convert UTF-8 and UTF-16 char clusters to and from
+	singular 32-bit Unicode chars.
 
 ***************************************************************************/
 
@@ -26,7 +26,7 @@
 
 
 /***************************************************************************
-    CONSTANTS
+	CONSTANTS
 ***************************************************************************/
 
 /* these defines specify the maximum size of different types of Unicode
@@ -59,7 +59,7 @@
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
+	TYPE DEFINITIONS
 ***************************************************************************/
 
 typedef UINT16 utf16_char;
@@ -68,7 +68,7 @@ typedef UINT32 unicode_char;
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
+	FUNCTION PROTOTYPES
 ***************************************************************************/
 
 /* tests to see if a unicode char is a valid code point */
@@ -88,10 +88,27 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 const char *utf8_previous_char(const char *utf8string);
 int utf8_is_valid_string(const char *utf8string);
 
+/***************************************************************************
+	8BIT CODE LOOKUP TABLES
+***************************************************************************/
 
+/* ISO-8859 page to Unicode lookup tables */
+const unicode_char* unicode_iso8859(int code);
+
+/* Atari ST to Unicode lookup table */
+const unicode_char* unicode_atari_st();
+
+/* ZX-81 to Unicode lookup table */
+const unicode_char* unicode_zx81();
+
+/* KOI8-R to Unicode lookup table */
+const unicode_char* unicode_koi8_r();
+
+/* KOI8-U to Unicode lookup table */
+const unicode_char* unicode_koi8_u();
 
 /***************************************************************************
-    MACROS
+	MACROS
 ***************************************************************************/
 
 #ifdef LSB_FIRST

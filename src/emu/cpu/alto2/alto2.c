@@ -2411,7 +2411,6 @@ void alto2_cpu_device::execute_run()
 		/* nano seconds per cycle */
 		m_ntime[m_task] += ALTO2_UCYCLE;
 
-		debugger_instruction_hook(this, m_mpc);
 		/* next instruction's mpc */
 		m_mpc = m_next;
 		m_mir = m_ucode->read_dword(m_mpc);
@@ -2422,8 +2421,9 @@ void alto2_cpu_device::execute_run()
 		bs = MIR_BS(m_mir);
 		f1 = MIR_F1(m_mir);
 		f2 = MIR_F2(m_mir);
-		LOG((LOG_CPU,2,"\n%s-%04o: r:%02o af:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o cycle:%lld\n",
-			task_name(m_task), m_mpc, m_rsel, aluf, bs, f1, f2, MIR_T(m_mir), MIR_L(m_mir), m_next, m_next2, cycle()));
+		LOG((LOG_CPU,2,"\n%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
+			task_name(m_task), m_mpc, m_mir, m_rsel, aluf, bs, f1, f2, MIR_T(m_mir), MIR_L(m_mir), m_next, m_next2));
+		debugger_instruction_hook(this, m_mpc);
 
 		/*
 		 * This bus source decoding is not performed if f1 = 7 or f2 = 7.

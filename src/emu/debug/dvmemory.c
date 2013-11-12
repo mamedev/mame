@@ -14,8 +14,6 @@
 #include "debugcpu.h"
 #include <ctype.h>
 
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -97,6 +95,7 @@ debug_view_memory::debug_view_memory(running_machine &machine, debug_view_osd_up
 		m_reverse_view(false),
 		m_ascii_view(true),
 		m_no_translation(false),
+		m_unicode(0),
 		m_maxaddr(0),
 		m_bytes_per_row(16),
 		m_byte_offset(0)
@@ -261,7 +260,7 @@ void debug_view_memory::view_update()
 					}
 			}
 
-			// generate the ASCII data
+			// generate the ASCII or Unicode lookup table data
 			if (m_section[2].m_width > 0)
 			{
 				dest = destrow + m_section[2].m_pos + 1;
@@ -270,7 +269,10 @@ void debug_view_memory::view_update()
 					{
 						UINT64 chval;
 						bool ismapped = read(1, addrbyte + ch, chval);
-						dest->uchar = (ismapped && isprint(chval)) ? chval : '.';
+						if (m_unicode)
+							dest->uchar = ismapped ? m_unicode[chval & 255] : 0xfffe;
+						else
+							dest->uchar = (ismapped && isprint(chval)) ? chval : '.';
 					}
 			}
 		}
@@ -808,4 +810,18 @@ void debug_view_memory::set_physical(bool physical)
 	m_no_translation = physical;
 	m_recompute = m_update_pending = true;
 	end_update_and_set_cursor_pos(pos);
+}
+
+//-------------------------------------------------
+//  set_unicode - specify a unsigned char to
+//  unicode lookup table address, i.e. a code
+//  page lookup table or generic translation
+//-------------------------------------------------
+
+void debug_view_memory::set_unicode(const unicode_char* unicode)
+{
+	begin_update();
+	m_unicode = unicode;
+	m_update_pending = true;
+	end_update();
 }
