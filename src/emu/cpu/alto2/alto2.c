@@ -1026,6 +1026,9 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_eth.duckbreath));
 
 	state_add( A2_TASK,    "TASK",    m_task).formatstr("%03O");
+	state_add( A2_MPC,     "MPC",     m_mpc).formatstr("%06O");
+	state_add( A2_NEXT,    "NEXT",    m_next).formatstr("%06O");
+	state_add( A2_NEXT2,   "NEXT2",   m_next2).formatstr("%06O");
 	state_add( A2_BUS,     "BUS",     m_bus).formatstr("%06O");
 	state_add( A2_T,       "T",       m_t).formatstr("%06O");
 	state_add( A2_ALU,     "ALU",     m_alu).formatstr("%06O");

@@ -156,8 +156,10 @@
 #define	ALTO2_DISPLAY_FIFO 16											//!< the display fifo has 16 words
 
 enum {
-	A2_TASK, A2_BUS, A2_T, A2_ALU, A2_ALUC0,
-	A2_L, A2_SHIFTER, A2_LALUC0, A2_M,
+	// micro code task, micro program counter, next and next2
+	A2_TASK, A2_MPC, A2_NEXT, A2_NEXT2,
+	// BUS, ALU, temp, latch, memory latch and carry flags
+	A2_BUS, A2_T, A2_ALU, A2_ALUC0,	A2_L, A2_SHIFTER, A2_LALUC0, A2_M,
 	A2_R,	// 32 R registers
 	A2_AC3 = A2_R, A2_AC2, A2_AC1, A2_AC0, A2_R04, A2_R05, A2_PC,  A2_R07,
 	A2_R10, A2_R11, A2_R12, A2_R13, A2_R14, A2_R15, A2_R16, A2_R17,
