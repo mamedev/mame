@@ -1,20 +1,21 @@
 /***************************************************************************
 
-    textbuf.h
+	textbuf.h
 
-    Debugger text buffering engine.
+	Debugger text buffering engine.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+	Copyright Nicola Salmoria and the MAME Team.
+	Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
 #ifndef __TEXTBUF_H__
 #define __TEXTBUF_H__
 
+#include "unicode.h"
 
 /***************************************************************************
-    TYPE DEFINITIONS
+	TYPE DEFINITIONS
 ***************************************************************************/
 
 struct text_buffer;
@@ -22,7 +23,7 @@ struct text_buffer;
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
+	FUNCTION PROTOTYPES
 ***************************************************************************/
 
 /* allocate a new text buffer */
@@ -50,7 +51,7 @@ UINT32 text_buffer_num_lines(text_buffer *text);
 UINT32 text_buffer_line_index_to_seqnum(text_buffer *text, UINT32 index);
 
 /* get a sequenced line from the text buffer */
-const char *text_buffer_get_seqnum_line(text_buffer *text, UINT32 seqnum);
+const unicode_char *text_buffer_get_seqnum_line(text_buffer *text, UINT32 seqnum);
 
 
 #endif  /* __TEXTBUF_H__ */

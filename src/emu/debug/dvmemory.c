@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvmemory.c
+	dvmemory.c
 
-    Memory debugger view.
+	Memory debugger view.
 
 ***************************************************************************/
 
@@ -220,7 +220,7 @@ void debug_view_memory::view_update()
 		for (int ch = 0; ch < m_visible.x; ch++, dest++)
 		{
 			UINT32 effcol = m_topleft.x + ch;
-			dest->byte = ' ';
+			dest->uchar = ' ';
 			dest->attrib = DCA_ANCILLARY;
 			if (m_section[1].contains(effcol))
 			{
@@ -242,7 +242,7 @@ void debug_view_memory::view_update()
 			dest = destrow + m_section[0].m_pos + 1;
 			for (int ch = 0; addrtext[ch] != 0 && ch < m_section[0].m_width - 1; ch++, dest++)
 				if (dest >= destmin && dest < destmax)
-					dest->byte = addrtext[ch];
+					dest->uchar = addrtext[ch];
 
 			// generate the data
 			for (int chunknum = 0; chunknum < m_chunks_per_row; chunknum++)
@@ -257,7 +257,7 @@ void debug_view_memory::view_update()
 					{
 						UINT8 shift = posdata.m_shift[ch];
 						if (shift < 64)
-							dest->byte = ismapped ? "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f] : '*';
+							dest->uchar = ismapped ? "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f] : '*';
 					}
 			}
 
@@ -270,7 +270,7 @@ void debug_view_memory::view_update()
 					{
 						UINT64 chval;
 						bool ismapped = read(1, addrbyte + ch, chval);
-						dest->byte = (ismapped && isprint(chval)) ? chval : '.';
+						dest->uchar = (ismapped && isprint(chval)) ? chval : '.';
 					}
 			}
 		}

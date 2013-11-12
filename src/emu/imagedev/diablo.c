@@ -145,7 +145,7 @@ bool diablo_image_device::call_create(int create_format, option_resolution *crea
 	cylinders   = option_resolution_lookup_int(create_args, 'C');
 	heads       = option_resolution_lookup_int(create_args, 'H');
 	sectors     = option_resolution_lookup_int(create_args, 'S');
-	sectorsize  = option_resolution_lookup_int(create_args, 'L');
+	sectorsize  = option_resolution_lookup_int(create_args, 'L') * sizeof(UINT16);
 	hunksize    = option_resolution_lookup_int(create_args, 'K');
 
 	totalsectors = cylinders * heads * sectors;

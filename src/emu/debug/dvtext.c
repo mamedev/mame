@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvtext.c
+	dvtext.c
 
-    Debugger simple text-based views.
+	Debugger simple text-based views.
 
 ***************************************************************************/
 
@@ -13,6 +13,17 @@
 #include "dvtext.h"
 #include "debugcon.h"
 
+
+//**************************************************************************
+//  UNICODE HELPERS
+//**************************************************************************
+static int unicode_strlen(const unicode_char* src)
+{
+	int len = 0;
+	while (*src++)
+		len++;
+	return len;
+}
 
 
 //**************************************************************************
@@ -75,19 +86,19 @@ void debug_view_textbuf::view_update()
 	debug_view_char *dest = m_viewdata;
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
-		const char *line = text_buffer_get_seqnum_line(&m_textbuf, curseq++);
+		const unicode_char *line = text_buffer_get_seqnum_line(&m_textbuf, curseq++);
 		UINT32 col = 0;
 
 		// if this visible row is valid, add it to the buffer
 		if (line != NULL)
 		{
-			size_t len = strlen(line);
+			size_t len = unicode_strlen(line);
 			UINT32 effcol = m_topleft.x;
 
 			// copy data
 			while (col < m_visible.x && effcol < len)
 			{
-				dest->byte = line[effcol++];
+				dest->uchar = line[effcol++];
 				dest->attrib = DCA_NORMAL;
 				dest++;
 				col++;
@@ -97,7 +108,7 @@ void debug_view_textbuf::view_update()
 		// fill the rest with blanks
 		while (col < m_visible.x)
 		{
-			dest->byte = ' ';
+			dest->uchar = ' ';
 			dest->attrib = DCA_NORMAL;
 			dest++;
 			col++;

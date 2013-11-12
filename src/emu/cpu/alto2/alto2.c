@@ -1436,7 +1436,7 @@ void alto2_cpu_device::bank_reg_w(UINT32 address, UINT16 data)
 void alto2_cpu_device::bs_read_r_0()
 {
 	UINT16 r = m_r[m_rsel];
-	LOG((LOG_CPU,2,"	<-R%02o; %s (%#o)\n", m_rsel, r_name(m_rsel), r));
+	LOG((LOG_CPU,2,"	←R%02o; %s (%#o)\n", m_rsel, r_name(m_rsel), r));
 	m_bus &= r;
 }
 
@@ -1446,7 +1446,7 @@ void alto2_cpu_device::bs_read_r_0()
 void alto2_cpu_device::bs_load_r_0()
 {
 	UINT16 r = 0;
-	LOG((LOG_CPU,2,"	R%02o<-; %s (BUS&=0)\n", m_rsel, r_name(m_rsel)));
+	LOG((LOG_CPU,2,"	R%02o←; %s (BUS&=0)\n", m_rsel, r_name(m_rsel)));
 	m_bus &= r;
 }
 
@@ -1457,7 +1457,7 @@ void alto2_cpu_device::bs_load_r_1()
 {
 	if (MIR_F2(m_mir) != f2_emu_load_dns) {
 		m_r[m_rsel] = m_shifter;
-		LOG((LOG_CPU,2,"	R%02o<-; %s = SHIFTER (%#o)\n", m_rsel, r_name(m_rsel), m_shifter));
+		LOG((LOG_CPU,2,"	R%02o←; %s = SHIFTER (%#o)\n", m_rsel, r_name(m_rsel), m_shifter));
 		/* HACK: programs writing r37 with xxx3 make the cursor
 		 * display go nuts. Until I found the real reason for this
 		 * obviously buggy display, I just clear the two
@@ -1479,7 +1479,7 @@ void alto2_cpu_device::bs_read_md_0()
 	UINT32 mar = m_mem.mar;
 #endif
 	UINT16 md = read_mem();
-	LOG((LOG_CPU,2,"	<-MD; BUS&=MD (%#o=[%#o])\n", md, mar));
+	LOG((LOG_CPU,2,"	←MD; BUS&=MD (%#o=[%#o])\n", md, mar));
 	m_bus &= md;
 }
 
@@ -1489,7 +1489,7 @@ void alto2_cpu_device::bs_read_md_0()
 void alto2_cpu_device::bs_mouse_0()
 {
 	UINT16 r = mouse_read();
-	LOG((LOG_CPU,2,"	<-MOUSE; BUS&=MOUSE (%#o)\n", r));
+	LOG((LOG_CPU,2,"	←MOUSE; BUS&=MOUSE (%#o)\n", r));
 	m_bus &= r;
 }
 
@@ -1499,8 +1499,8 @@ void alto2_cpu_device::bs_mouse_0()
 void alto2_cpu_device::bs_disp_0()
 {
 	UINT16 r = 0177777;
-	LOG((LOG_CPU,0,"BS <-DISP not handled by task %s mpc:%04x\n", task_name(m_task), m_mpc));
-	LOG((LOG_CPU,2,"	<-DISP; BUS&=DISP ?? (%#o)\n", r));
+	LOG((LOG_CPU,0,"BS ←DISP not handled by task %s mpc:%04x\n", task_name(m_task), m_mpc));
+	LOG((LOG_CPU,2,"	←DISP; BUS&=DISP ?? (%#o)\n", r));
 	m_bus &= r;
 }
 
@@ -1885,7 +1885,7 @@ void alto2_cpu_device::f2_load_md_1()
 		LOG((LOG_CPU,2, "	XMAR %#o (%#o)\n", mar, m_bus));
 	} else {
 		write_mem(m_bus);
-		LOG((LOG_CPU,2, "	MD<- BUS ([%#o]=%#o)\n", mar, m_bus));
+		LOG((LOG_CPU,2, "	MD← BUS ([%#o]=%#o)\n", mar, m_bus));
 	}
 }
 
@@ -2411,8 +2411,8 @@ void alto2_cpu_device::execute_run()
 		/* nano seconds per cycle */
 		m_ntime[m_task] += ALTO2_UCYCLE;
 
-		/* next instruction's mpc */
 		debugger_instruction_hook(this, m_mpc);
+		/* next instruction's mpc */
 		m_mpc = m_next;
 		m_mir = m_ucode->read_dword(m_mpc);
 		m_rsel = MIR_RSEL(m_mir);
@@ -2434,14 +2434,14 @@ void alto2_cpu_device::execute_run()
 
 		if (f1 == f1_load_mar) {
 			if (check_mem_load_mar_stall(m_rsel)) {
-				LOG((LOG_CPU,3, "	MAR<- stall\n"));
+				LOG((LOG_CPU,3, "	MAR← stall\n"));
 				m_next2 = m_next;
 				m_next = m_mpc;
 				continue;
 			}
 		} else if (f2 == f2_load_md) {
 			if (check_mem_write_stall()) {
-				LOG((LOG_CPU,3, "	MD<- stall\n"));
+				LOG((LOG_CPU,3, "	MD← stall\n"));
 				m_next2 = m_next;
 				m_next = m_mpc;
 				continue;
@@ -2449,7 +2449,7 @@ void alto2_cpu_device::execute_run()
 		}
 		if (do_bs && bs == bs_read_md) {
 			if (check_mem_read_stall()) {
-				LOG((LOG_CPU,3, "	<-MD stall\n"));
+				LOG((LOG_CPU,3, "	←MD stall\n"));
 				m_next2 = m_next;
 				m_next = m_mpc;
 				continue;
@@ -2494,7 +2494,7 @@ void alto2_cpu_device::execute_run()
 		/* compute the ALU function */
 		switch (aluf) {
 		/**
-		 * 00: ALU <- BUS
+		 * 00: ALU ← BUS
 		 * PROM data for S3-0:1111 M:1 C:0
 		 * 74181 function F=A
 		 * T source is ALU
@@ -2507,11 +2507,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = 1;
 #endif
 			flags = TSELECT;
-			LOG((LOG_CPU,2,"	ALU<- BUS (%#o := %#o)\n", alu, m_bus));
+			LOG((LOG_CPU,2,"	ALU← BUS (%#o := %#o)\n", alu, m_bus));
 			break;
 
 		/**
-		 * 01: ALU <- T
+		 * 01: ALU ← T
 		 * PROM data for S3-0:1010 M:1 C:0
 		 * 74181 function F=B
 		 * T source is BUS
@@ -2524,11 +2524,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = 1;
 #endif
 			flags = 0;
-			LOG((LOG_CPU,2,"	ALU<- T (%#o := %#o)\n", alu, m_t));
+			LOG((LOG_CPU,2,"	ALU← T (%#o := %#o)\n", alu, m_t));
 			break;
 
 		/**
-		 * 02: ALU <- BUS | T
+		 * 02: ALU ← BUS | T
 		 * PROM data for S3-0:1110 M:1 C:0
 		 * 74181 function F=A|B
 		 * T source is ALU
@@ -2541,11 +2541,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = 1;
 #endif
 			flags = TSELECT;
-			LOG((LOG_CPU,2,"	ALU<- BUS OR T (%#o := %#o | %#o)\n", alu, m_bus, m_t));
+			LOG((LOG_CPU,2,"	ALU← BUS OR T (%#o := %#o | %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 03: ALU <- BUS & T
+		 * 03: ALU ← BUS & T
 		 * PROM data for S3-0:1011 M:1 C:0
 		 * 74181 function F=A&B
 		 * T source is BUS
@@ -2558,11 +2558,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = 1;
 #endif
 			flags = 0;
-			LOG((LOG_CPU,2,"	ALU<- BUS AND T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
+			LOG((LOG_CPU,2,"	ALU← BUS AND T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 04: ALU <- BUS ^ T
+		 * 04: ALU ← BUS ^ T
 		 * PROM data for S3-0:0110 M:1 C:0
 		 * 74181 function F=A^B
 		 * T source is BUS
@@ -2575,11 +2575,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = 1;
 #endif
 			flags = 0;
-			LOG((LOG_CPU,2,"	ALU<- BUS XOR T (%#o := %#o ^ %#o)\n", alu, m_bus, m_t));
+			LOG((LOG_CPU,2,"	ALU← BUS XOR T (%#o := %#o ^ %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 05: ALU <- BUS + 1
+		 * 05: ALU ← BUS + 1
 		 * PROM data for S3-0:0000 M:0 C:0
 		 * 74181 function F=A+1
 		 * T source is ALU
@@ -2592,11 +2592,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = (alu >> 16) & 1;
 #endif
 			flags = ALUM2 | TSELECT;
-			LOG((LOG_CPU,2,"	ALU<- BUS + 1 (%#o := %#o + 1)\n", alu, m_bus));
+			LOG((LOG_CPU,2,"	ALU← BUS + 1 (%#o := %#o + 1)\n", alu, m_bus));
 			break;
 
 		/**
-		 * 06: ALU <- BUS - 1
+		 * 06: ALU ← BUS - 1
 		 * PROM data for S3-0:1111 M:0 C:1
 		 * 74181 function F=A-1
 		 * T source is ALU
@@ -2609,11 +2609,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = (~m_alu >> 16) & 1;
 #endif
 			flags = ALUM2 | TSELECT;
-			LOG((LOG_CPU,2,"	ALU<- BUS - 1 (%#o := %#o - 1)\n", alu, m_bus));
+			LOG((LOG_CPU,2,"	ALU← BUS - 1 (%#o := %#o - 1)\n", alu, m_bus));
 			break;
 
 		/**
-		 * 07: ALU <- BUS + T
+		 * 07: ALU ← BUS + T
 		 * PROM data for S3-0:1001 M:0 C:1
 		 * 74181 function F=A+B
 		 * T source is BUS
@@ -2626,11 +2626,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = (m_alu >> 16) & 1;
 #endif
 			flags = ALUM2;
-			LOG((LOG_CPU,2,"	ALU<- BUS + T (%#o := %#o + %#o)\n", alu, m_bus, m_t));
+			LOG((LOG_CPU,2,"	ALU← BUS + T (%#o := %#o + %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 10: ALU <- BUS - T
+		 * 10: ALU ← BUS - T
 		 * PROM data for S3-0:0110 M:0 C:0
 		 * 74181 function F=A-B
 		 * T source is BUS
@@ -2643,11 +2643,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = (~m_alu >> 16) & 1;
 #endif
 			flags = ALUM2;
-			LOG((LOG_CPU,2,"	ALU<- BUS - T (%#o := %#o - %#o)\n", alu, m_bus, m_t));
+			LOG((LOG_CPU,2,"	ALU← BUS - T (%#o := %#o - %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 11: ALU <- BUS - T - 1
+		 * 11: ALU ← BUS - T - 1
 		 * PROM data for S3-0:0110 M:0 C:1
 		 * 74181 function F=A-B-1
 		 * T source is BUS
@@ -2660,11 +2660,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = (~m_alu >> 16) & 1;
 #endif
 			flags = ALUM2;
-			LOG((LOG_CPU,2,"	ALU<- BUS - T - 1 (%#o := %#o - %#o - 1)\n", alu, m_bus, m_t));
+			LOG((LOG_CPU,2,"	ALU← BUS - T - 1 (%#o := %#o - %#o - 1)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 12: ALU <- BUS + T + 1
+		 * 12: ALU ← BUS + T + 1
 		 * PROM data for S3-0:1001 M:0 C:0
 		 * 74181 function F=A+B+1
 		 * T source is ALU
@@ -2677,11 +2677,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = (m_alu >> 16) & 1;
 #endif
 			flags = ALUM2 | TSELECT;
-			LOG((LOG_CPU,2,"	ALU<- BUS + T + 1 (%#o := %#o + %#o + 1)\n", alu, m_bus, m_t));
+			LOG((LOG_CPU,2,"	ALU← BUS + T + 1 (%#o := %#o + %#o + 1)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 13: ALU <- BUS + SKIP
+		 * 13: ALU ← BUS + SKIP
 		 * PROM data for S3-0:0000 M:0 C:SKIP
 		 * 74181 function F=A (SKIP=1) or F=A+1 (SKIP=0)
 		 * T source is ALU
@@ -2694,11 +2694,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = (m_alu >> 16) & 1;
 #endif
 			flags = ALUM2 | TSELECT;
-			LOG((LOG_CPU,2,"	ALU<- BUS + SKIP (%#o := %#o + %#o)\n", alu, m_bus, m_emu.skip));
+			LOG((LOG_CPU,2,"	ALU← BUS + SKIP (%#o := %#o + %#o)\n", alu, m_bus, m_emu.skip));
 			break;
 
 		/**
-		 * 14: ALU <- BUS,T
+		 * 14: ALU ← BUS,T
 		 * PROM data for S3-0:1011 M:1 C:0
 		 * 74181 function F=A&B
 		 * T source is ALU
@@ -2711,11 +2711,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = 1;
 #endif
 			flags = TSELECT;
-			LOG((LOG_CPU,2,"	ALU<- BUS,T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
+			LOG((LOG_CPU,2,"	ALU← BUS,T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 15: ALU <- BUS & ~T
+		 * 15: ALU ← BUS & ~T
 		 * PROM data for S3-0:0111 M:1 C:0
 		 * 74181 function F=A&~B
 		 * T source is BUS
@@ -2728,11 +2728,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = 1;
 #endif
 			flags = 0;
-			LOG((LOG_CPU,2,"	ALU<- BUS AND NOT T (%#o := %#o & ~%#o)\n", alu, m_bus, m_t));
+			LOG((LOG_CPU,2,"	ALU← BUS AND NOT T (%#o := %#o & ~%#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 16: ALU <- ???
+		 * 16: ALU ← ???
 		 * PROM data for S3-0:???? M:? C:?
 		 * 74181 perhaps F=0 (0011/0/0)
 		 * T source is BUS
@@ -2745,11 +2745,11 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = 1;
 #endif
 			flags = ALUM2;
-			LOG((LOG_CPU,0,"	ALU<- 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
+			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
 			break;
 
 		/**
-		 * 17: ALU <- ???
+		 * 17: ALU ← ???
 		 * PROM data for S3-0:???? M:? C:?
 		 * 74181 perhaps F=~0 (0011/0/1)
 		 * T source is BUS
@@ -2763,7 +2763,7 @@ void alto2_cpu_device::execute_run()
 			m_aluc0 = 1;
 #endif
 			flags = ALUM2;
-			LOG((LOG_CPU,0,"	ALU<- 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
+			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
 		}
 		m_alu = static_cast<UINT16>(alu);
 
@@ -2776,7 +2776,7 @@ void alto2_cpu_device::execute_run()
 			if (m_task == task_emu) {
 				if (f2 == f2_emu_magic) {
 					m_shifter = ((m_l << 1) | (m_t >> 15)) & 0177777;
-					LOG((LOG_CPU,2,"	SHIFTER <-L MLSH 1 (%#o := %#o<<1|%#o)\n", m_shifter, m_l, m_t >> 15));
+					LOG((LOG_CPU,2,"	SHIFTER ←L MLSH 1 (%#o := %#o<<1|%#o)\n", m_shifter, m_l, m_t >> 15));
 					break;
 				}
 				if (f2 == f2_emu_load_dns) {
@@ -2785,14 +2785,14 @@ void alto2_cpu_device::execute_run()
 				}
 			}
 			m_shifter = (m_l << 1) & 0177777;
-			LOG((LOG_CPU,2,"	SHIFTER <-L LSH 1 (%#o := %#o<<1)\n", m_shifter, m_l));
+			LOG((LOG_CPU,2,"	SHIFTER ←L LSH 1 (%#o := %#o<<1)\n", m_shifter, m_l));
 			break;
 
 		case f1_l_rsh_1:
 			if (m_task == task_emu) {
 				if (f2 == f2_emu_magic) {
 					m_shifter = ((m_l >> 1) | (m_t << 15)) & 0177777;
-					LOG((LOG_CPU,2,"	SHIFTER <-L MRSH 1 (%#o := %#o>>1|%#o)\n", m_shifter, m_l, (m_t << 15) & 0100000));
+					LOG((LOG_CPU,2,"	SHIFTER ←L MRSH 1 (%#o := %#o>>1|%#o)\n", m_shifter, m_l, (m_t << 15) & 0100000));
 					break;
 				}
 				if (f2 == f2_emu_load_dns) {
@@ -2801,12 +2801,12 @@ void alto2_cpu_device::execute_run()
 				}
 			}
 			m_shifter = m_l >> 1;
-			LOG((LOG_CPU,2,"	SHIFTER <-L RSH 1 (%#o := %#o>>1)\n", m_shifter, m_l));
+			LOG((LOG_CPU,2,"	SHIFTER ←L RSH 1 (%#o := %#o>>1)\n", m_shifter, m_l));
 			break;
 
 		case f1_l_lcy_8:
 			m_shifter = ((m_l >> 8) | (m_l << 8)) & 0177777;
-			LOG((LOG_CPU,2,"	SHIFTER <-L LCY 8 (%#o := bswap %#o)\n", m_shifter, m_l));
+			LOG((LOG_CPU,2,"	SHIFTER ←L LCY 8 (%#o := bswap %#o)\n", m_shifter, m_l));
 			break;
 
 		default:
@@ -2836,17 +2836,17 @@ void alto2_cpu_device::execute_run()
 			m_l = m_alu;
 			if (flags & ALUM2) {
 				m_laluc0 = m_aluc0;
-				LOG((LOG_CPU,2, "	L<- ALU (%#o); LALUC0<- ALUC0 (%o)\n", m_alu, m_laluc0));
+				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← ALUC0 (%o)\n", m_alu, m_aluc0));
 			} else {
 				m_laluc0 = 0;
-				LOG((LOG_CPU,2, "	L<- ALU (%#o); LALUC0<- %o\n", m_alu, m_laluc0));
+				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← %o\n", m_alu, 0));
 			}
 			if (m_ram_related[m_task]) {
 				/* load M from ALU, if 'GOODTASK' */
 				m_m = m_alu;
 				/* also writes to S[bank][0], which can't be read */
 				m_s[m_s_reg_bank[m_task]][0] = m_alu;
-				LOG((LOG_CPU,2, "	M<- ALU (%#o)\n", m_alu));
+				LOG((LOG_CPU,2, "	M← ALU (%#o)\n", m_alu));
 			}
 		}
 
@@ -2854,10 +2854,10 @@ void alto2_cpu_device::execute_run()
 		if (MIR_T(m_mir)) {
 			m_cram_addr = m_alu;
 			if (flags & TSELECT) {
-				LOG((LOG_CPU,2, "	T<- ALU (%#o)\n", m_alu));
+				LOG((LOG_CPU,2, "	T← ALU (%#o)\n", m_alu));
 				m_t = m_alu;
 			} else {
-				LOG((LOG_CPU,2, "	T<- BUS (%#o)\n", m_bus));
+				LOG((LOG_CPU,2, "	T← BUS (%#o)\n", m_bus));
 				m_t = m_bus;
 			}
 		}

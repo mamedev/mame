@@ -135,7 +135,7 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
 			painter.drawText(x*fontWidth,
 								(y*fontHeight + (fontHeight*0.80)),
-								QString(m_view->viewdata()[viewDataOffset].byte));
+								QString(QChar(m_view->viewdata()[viewDataOffset].uchar)));
 			viewDataOffset++;
 		}
 	}

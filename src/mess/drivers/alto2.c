@@ -7,8 +7,6 @@
  ***************************************************************************/
 
 #include "includes/alto2.h"
-#include "cpu/alto2/alto2.h"
-#include "cpu/alto2/a2roms.h"
 
 // FIXME: Is this required? The driver does not have/need access to RAM
 READ16_MEMBER( alto2_state::alto2_ram_r )

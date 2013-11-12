@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvdisasm.h
+	dvdisasm.h
 
-    Disassembly debugger view.
+	Disassembly debugger view.
 
 ***************************************************************************/
 
@@ -106,7 +106,7 @@ private:
 	debug_view_expression m_expression;         // expression-related information
 	debug_view_xy       m_allocated;            // allocated rows/columns
 	offs_t *            m_byteaddress;          // addresses of the instructions
-	char *              m_dasm;                 // disassembled instructions
+	unicode_char *      m_dasm;                 // disassembled instructions
 
 	// constants
 	static const int DEFAULT_DASM_LINES = 1000;

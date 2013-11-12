@@ -25,7 +25,7 @@
 #endif
 
 #define	USE_PRIO_F9318	0			//!< define to 1 to use the F9318 priority encoder code
-#define	USE_ALU_74181	1			//!< define to 1 to use the SN74181 ALU code
+#define	USE_ALU_74181	0			//!< define to 1 to use the SN74181 ALU code
 #define	DEBUG_DISPLAY_TIMING	0	//!< define to 1 to debug the display timing
 
 #define	ALTO2_TASKS		16			//!< 16 task slots

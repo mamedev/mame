@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvwpoints.c
+	dvwpoints.c
 
-    Watchpoint debugger view.
+	Watchpoint debugger view.
 
 ***************************************************************************/
 
@@ -444,7 +444,7 @@ void debug_view_watchpoints::view_update()
 
 			for (int i = 0; i < m_visible.x; i++)
 			{
-				dest->byte = (i < header.len()) ? header[i] : ' ';
+				dest->uchar = (i < header.len()) ? header[i] : ' ';
 				dest->attrib = DCA_ANCILLARY;
 				dest++;
 			}
@@ -486,11 +486,11 @@ void debug_view_watchpoints::view_update()
 
 			for (int i = 0; i < m_visible.x; i++)
 			{
-				dest->byte = (i < buffer.len()) ? buffer[i] : ' ';
+				dest->uchar = (i < buffer.len()) ? buffer[i] : ' ';
 				dest->attrib = DCA_NORMAL;
 
 				// Color disabled watchpoints red
-				if (i == 5 && dest->byte == 'O')
+				if (i == 5 && dest->uchar == 'O')
 					dest->attrib = DCA_CHANGED;
 
 				dest++;
@@ -501,7 +501,7 @@ void debug_view_watchpoints::view_update()
 		// Fill the remaining vertical space
 		for (int i = 0; i < m_visible.x; i++)
 		{
-			dest->byte = ' ';
+			dest->uchar = ' ';
 			dest->attrib = DCA_NORMAL;
 			dest++;
 		}

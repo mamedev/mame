@@ -17,6 +17,8 @@ public:
 	alto2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_diablo0(*this, DIABLO_TAG(0)),
+		m_diablo1(*this, DIABLO_TAG(1)),
 		m_io_row0(*this, "ROW0"),
 		m_io_row1(*this, "ROW1"),
 		m_io_row2(*this, "ROW2"),
@@ -25,8 +27,6 @@ public:
 		m_io_row5(*this, "ROW5"),
 		m_io_row6(*this, "ROW6"),
 		m_io_row7(*this, "ROW7"),
-		m_disk0(*this, DIABLO_TAG(0)),
-		m_disk1(*this, DIABLO_TAG(1)),
 		m_io_config(*this, "CONFIG")
 		{ }
 
@@ -44,6 +44,8 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	optional_device<diablo_image_device> m_diablo0;
+	optional_device<diablo_image_device> m_diablo1;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
@@ -52,8 +54,6 @@ protected:
 	required_ioport m_io_row5;
 	required_ioport m_io_row6;
 	required_ioport m_io_row7;
-	optional_device<diablo_image_device> m_disk0;
-	optional_device<diablo_image_device> m_disk1;
 	optional_ioport m_io_config;
 
 	// FIXME: use device timers instead of individual emu_timer* in alto2 code(?)

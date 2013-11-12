@@ -1,11 +1,11 @@
 /*********************************************************************
 
-    debugint.c
+	debugint.c
 
-    Internal debugger frontend using render interface.
+	Internal debugger frontend using render interface.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+	Copyright Nicola Salmoria and the MAME Team.
+	Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
@@ -24,7 +24,7 @@
 
 
 /***************************************************************************
-    CONSTANTS
+	CONSTANTS
 ***************************************************************************/
 
 #define BORDER_YTHICKNESS 1
@@ -53,7 +53,7 @@ enum
 };
 
 /***************************************************************************
-    MACROS
+	MACROS
 ***************************************************************************/
 
 //#define NX(_dv, _x) ((float) (_x)/(float)(_dv)->bounds.width())
@@ -105,7 +105,7 @@ enum
 	} while (0)
 
 /***************************************************************************
-    TYPE DEFINITIONS
+	TYPE DEFINITIONS
 ***************************************************************************/
 
 struct adjustment
@@ -136,7 +136,7 @@ public:
 };
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
+	FUNCTION PROTOTYPES
 ***************************************************************************/
 
 static void dview_update(debug_view &dw, void *osdprivate);
@@ -212,7 +212,7 @@ public:
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
+	INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE int dview_is_state(DView *dv, int state)
@@ -234,7 +234,7 @@ INLINE void dview_set_state(DView *dv, int state, int onoff)
 }
 
 /***************************************************************************
-    LOCAL VARIABLES
+	LOCAL VARIABLES
 ***************************************************************************/
 
 static render_font *    debug_font;
@@ -709,7 +709,7 @@ static void dview_draw(DView *dv)
 		for(i=0; i<vsize.x; i++)
 		{
 			UINT16 s;
-			unsigned char v = viewdata->byte;
+			unsigned char v = viewdata->uchar;	// FIXME: uchar is 32 bit unicode
 
 			if (v != ' ')
 			{
@@ -908,7 +908,7 @@ static void set_view_by_name(render_target *target, const char *name)
 #endif
 
 /*-------------------------------------------------
-    Menu Callbacks
+	Menu Callbacks
   -------------------------------------------------*/
 
 static void process_string(DView *dv, const char *str)
@@ -1080,7 +1080,7 @@ static void on_run_to_cursor_activate(DView *dv, const ui_menu_event *event)
 }
 
 /*-------------------------------------------------
-    editor
+	editor
   -------------------------------------------------*/
 
 static void render_editor(DView_edit *editor)
@@ -1117,7 +1117,7 @@ static void render_editor(DView_edit *editor)
 }
 
 /*-------------------------------------------------
-    menu_main_populate - populate the main menu
+	menu_main_populate - populate the main menu
   -------------------------------------------------*/
 
 class ui_menu_debug : public ui_menu {
@@ -1256,7 +1256,7 @@ static void handle_mouse(running_machine &machine)
 
 
 /*-------------------------------------------------
-    handle_editor - handle the editor
+	handle_editor - handle the editor
 -------------------------------------------------*/
 
 static void handle_editor(running_machine &machine)
@@ -1312,7 +1312,7 @@ static void handle_editor(running_machine &machine)
 
 
 /*-------------------------------------------------
-    menu_main - handle the main menu
+	menu_main - handle the main menu
 -------------------------------------------------*/
 
 static void handle_menus(running_machine &machine)

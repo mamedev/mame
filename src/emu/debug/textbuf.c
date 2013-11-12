@@ -1,11 +1,11 @@
 /***************************************************************************
 
-    textbuf.c
+	textbuf.c
 
-    Debugger text buffering engine.
+	Debugger text buffering engine.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+	Copyright Nicola Salmoria and the MAME Team.
+	Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -13,9 +13,8 @@
 #include "textbuf.h"
 
 
-
 /***************************************************************************
-    CONSTANTS
+	CONSTANTS
 ***************************************************************************/
 
 #define MAX_LINE_LENGTH         250
@@ -23,12 +22,12 @@
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
+	TYPE DEFINITIONS
 ***************************************************************************/
 
 struct text_buffer
 {
-	char *                  buffer;
+	unicode_char *          buffer;
 	INT32 *                 lineoffs;
 	INT32                   bufsize;
 	INT32                   bufstart;
@@ -43,12 +42,30 @@ struct text_buffer
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
+	INLINE FUNCTIONS
 ***************************************************************************/
 
 /*-------------------------------------------------
-    buffer_used - return the number of bytes
-    currently held in the buffer
+	utf8_strlen - return the number of unicode
+	characters in UTF-8 encoded string
+-------------------------------------------------*/
+INLINE int utf8_strlen(const char* src)
+{
+	int total = 0;
+	while (*src) {
+		UINT32 uchar;
+		int len = uchar_from_utf8(&uchar, src, strlen(src));
+		if (len < 0)
+			break;	// invalid UTF-8
+		total++;
+		src += len;
+	}
+	return total;
+}
+
+/*-------------------------------------------------
+	buffer_used - return the number of bytes
+	currently held in the buffer
 -------------------------------------------------*/
 
 INLINE INT32 buffer_used(text_buffer *text)
@@ -61,8 +78,8 @@ INLINE INT32 buffer_used(text_buffer *text)
 
 
 /*-------------------------------------------------
-    buffer_space - return the number of bytes
-    available in the buffer
+	buffer_space - return the number of bytes
+	available in the buffer
 -------------------------------------------------*/
 
 INLINE INT32 buffer_space(text_buffer *text)
@@ -74,12 +91,12 @@ INLINE INT32 buffer_space(text_buffer *text)
 
 /***************************************************************************
 
-    Buffer object management
+	Buffer object management
 
 ***************************************************************************/
 
 /*-------------------------------------------------
-    text_buffer_alloc - allocate a new text buffer
+	text_buffer_alloc - allocate a new text buffer
 -------------------------------------------------*/
 
 text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
@@ -92,7 +109,7 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 		return NULL;
 
 	/* allocate memory for the buffer itself */
-	text->buffer = (char *)osd_malloc_array(bytes);
+	text->buffer = (unicode_char *)osd_malloc_array(sizeof(unicode_char) * bytes);
 	if (!text->buffer)
 	{
 		osd_free(text);
@@ -118,8 +135,8 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 
 
 /*-------------------------------------------------
-    text_buffer_free - free a previously allocated
-    text buffer
+	text_buffer_free - free a previously allocated
+	text buffer
 -------------------------------------------------*/
 
 void text_buffer_free(text_buffer *text)
@@ -133,7 +150,7 @@ void text_buffer_free(text_buffer *text)
 
 
 /*-------------------------------------------------
-    text_buffer_clear - clear a text buffer
+	text_buffer_clear - clear a text buffer
 -------------------------------------------------*/
 
 void text_buffer_clear(text_buffer *text)
@@ -157,13 +174,13 @@ void text_buffer_clear(text_buffer *text)
 
 /***************************************************************************
 
-    Adding data to the buffer
+	Adding data to the buffer
 
 ***************************************************************************/
 
 /*-------------------------------------------------
-    text_buffer_print - print data to the text
-    buffer
+	text_buffer_print - print data to the text
+	buffer
 -------------------------------------------------*/
 
 void text_buffer_print(text_buffer *text, const char *data)
@@ -173,9 +190,9 @@ void text_buffer_print(text_buffer *text, const char *data)
 
 
 /*-------------------------------------------------
-    text_buffer_print_wrap - print data to the
-    text buffer with word wrapping to a given
-    column
+	text_buffer_print_wrap - print data to the
+	text buffer with word wrapping to a given
+	column
 -------------------------------------------------*/
 
 void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
@@ -184,7 +201,7 @@ void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
 	INT32 needed_space;
 
 	/* we need to ensure there is enough space for this string plus enough for the max line length */
-	needed_space = (INT32)strlen(data) + MAX_LINE_LENGTH;
+	needed_space = utf8_strlen(data) + MAX_LINE_LENGTH;
 
 	/* make space in the buffer if we need to */
 	while (buffer_space(text) < needed_space && text->linestart != text->lineend)
@@ -196,10 +213,13 @@ void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
 	}
 
 	/* now add the data */
-	for ( ; *data; data++)
+	while (*data)
 	{
-		int ch = *data;
+		unicode_char ch;
 		int linelen;
+		int utf8len = uchar_from_utf8(&ch, data, strlen(data));
+		if (utf8len > 0)
+			data += utf8len;
 
 		/* a CR resets our position */
 		if (ch == '\r')
@@ -270,13 +290,13 @@ void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
 
 /***************************************************************************
 
-    Reading data from the buffer
+	Reading data from the buffer
 
 ***************************************************************************/
 
 /*-------------------------------------------------
-    text_buffer_max_width - return the maximum
-    width of all lines seen so far
+	text_buffer_max_width - return the maximum
+	width of all lines seen so far
 -------------------------------------------------*/
 
 UINT32 text_buffer_max_width(text_buffer *text)
@@ -286,8 +306,8 @@ UINT32 text_buffer_max_width(text_buffer *text)
 
 
 /*-------------------------------------------------
-    text_buffer_num_lines - return the number of
-    lines in the text buffer
+	text_buffer_num_lines - return the number of
+	lines in the text buffer
 -------------------------------------------------*/
 
 UINT32 text_buffer_num_lines(text_buffer *text)
@@ -300,8 +320,8 @@ UINT32 text_buffer_num_lines(text_buffer *text)
 
 
 /*-------------------------------------------------
-    text_buffer_line_index_to_seqnum - convert a
-    line index into a sequence number
+	text_buffer_line_index_to_seqnum - convert a
+	line index into a sequence number
 -------------------------------------------------*/
 
 UINT32 text_buffer_line_index_to_seqnum(text_buffer *text, UINT32 index)
@@ -311,11 +331,11 @@ UINT32 text_buffer_line_index_to_seqnum(text_buffer *text, UINT32 index)
 
 
 /*-------------------------------------------------
-    text_buffer_get_seqnum_line - get a pointer to
-    an indexed line in the buffer
+	text_buffer_get_seqnum_line - get a pointer to
+	an indexed line in the buffer
 -------------------------------------------------*/
 
-const char *text_buffer_get_seqnum_line(text_buffer *text, UINT32 seqnum)
+const unicode_char *text_buffer_get_seqnum_line(text_buffer *text, UINT32 seqnum)
 {
 	UINT32 numlines = text_buffer_num_lines(text);
 	UINT32 index = seqnum - text->linestartseq;

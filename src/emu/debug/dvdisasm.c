@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvdisasm.c
+	dvdisasm.c
 
-    Disassembly debugger view.
+	Disassembly debugger view.
 
 ***************************************************************************/
 
@@ -14,6 +14,53 @@
 #include "debugcpu.h"
 
 
+//**************************************************************************
+//  UNICODE HELPERS
+//**************************************************************************
+static int unicode_strlen(const unicode_char* src)
+{
+	int len = 0;
+	while (*src++)
+		len++;
+	return len;
+}
+
+static int unicode_strncmp(const unicode_char* dst, const unicode_char* src, size_t len)
+{
+	while (*src && *dst && *src == *dst && len > 0) {
+		src++;
+		dst++;
+		len--;
+	}
+	if (*src != *dst)
+		return *src < *dst ? -1 : +1;
+	return 0;
+}
+
+static int unicode_sprintf(unicode_char* dst, const char* format, ...)
+{
+	va_list ap;
+	char buff[256];
+	va_start(ap, format);
+	int len = vsnprintf(buff, sizeof(buff), format, ap);
+	va_end(ap);
+	for (int i = 0; i < len; i++)
+		*dst++ = buff[i];
+	*dst = 0;
+	return len;
+}
+
+static unicode_char* unicode_strncpy(unicode_char* dst, const unicode_char* src, size_t len)
+{
+	unicode_char* str = dst;
+	while (*src && len > 0) {
+		*dst++ = *src++;
+		len--;
+	}
+	if (len > 0)
+		*dst = 0;
+	return str;
+}
 
 //**************************************************************************
 //  DEBUG VIEW DISASM SOURCE
@@ -334,6 +381,7 @@ void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes
 //  disassembly view
 //-------------------------------------------------
 
+#define	DISASM_BUFFSIZE	128
 bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 {
 	bool changed = false;
@@ -376,7 +424,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 		// allocate disassembly buffer
 		auto_free(machine(), m_dasm);
-		m_dasm = auto_alloc_array(machine(), char, m_allocated.x * m_allocated.y);
+		m_dasm = auto_alloc_array(machine(), unicode_char, m_allocated.x * m_allocated.y);
 	}
 
 	// iterate over lines
@@ -387,17 +435,17 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 		// save a copy of the previous line as a backup if we're only doing one line
 		int instr = startline + line;
-		char *destbuf = &m_dasm[instr * m_allocated.x];
-		char oldbuf[100];
+		unicode_char *destbuf = &m_dasm[instr * m_allocated.x];
+		unicode_char oldbuf[DISASM_BUFFSIZE];
 		if (lines == 1)
-			strncpy(oldbuf, destbuf, MIN(sizeof(oldbuf), m_allocated.x));
+			unicode_strncpy(oldbuf, destbuf, MIN(DISASM_BUFFSIZE, m_allocated.x));
 
 		// convert back and set the address of this instruction
 		m_byteaddress[instr] = pcbyte;
-		sprintf(&destbuf[0], " %s  ", core_i64_format(source.m_space.byte_to_address(pcbyte), source.m_space.logaddrchars()/2*char_num, source.is_octal()));
+		unicode_sprintf(&destbuf[0], " %s  ", core_i64_format(source.m_space.byte_to_address(pcbyte), source.m_space.logaddrchars()/2*char_num, source.is_octal()));
 
 		// make sure we can translate the address, and then disassemble the result
-		char buffer[100];
+		char buffer[DISASM_BUFFSIZE];
 		int numbytes = 0;
 		offs_t physpcbyte = pcbyte;
 		if (debug_cpu_translate(source.m_space, TRANSLATE_FETCH_DEBUG, &physpcbyte))
@@ -418,14 +466,24 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			strcpy(buffer, "<unmapped>");
 
 		// append the disassembly to the buffer
-		sprintf(&destbuf[m_divider1 + 1], "%-*s  ", m_dasm_width, buffer);
+		const char* src = buffer;
+		for (UINT32 offs = 0; offs < m_dasm_width + 2; offs++)
+		{
+			destbuf[m_divider1 + 1 + offs] = ' ';
+			if (!*src)
+				continue;
+			int len = uchar_from_utf8(&destbuf[m_divider1 + 1 + offs], src, strlen(src));
+			if (len > 0)
+				src += len;
+		}
 
 		// output the right column
 		if (m_right_column == DASM_RIGHTCOL_RAW || m_right_column == DASM_RIGHTCOL_ENCRYPTED)
 		{
 			// get the bytes
 			numbytes = source.m_space.address_to_byte(numbytes) & source.m_space.logbytemask();
-			generate_bytes(pcbyte, numbytes, minbytes, &destbuf[m_divider2], m_allocated.x - m_divider2, m_right_column == DASM_RIGHTCOL_ENCRYPTED);
+			generate_bytes(pcbyte, numbytes, minbytes, buffer, m_allocated.x - m_divider2, m_right_column == DASM_RIGHTCOL_ENCRYPTED);
+			unicode_sprintf(&destbuf[m_divider2], "%s", buffer);
 		}
 		else if (m_right_column == DASM_RIGHTCOL_COMMENTS)
 		{
@@ -433,11 +491,11 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			offs_t comment_address = source.m_space.byte_to_address(m_byteaddress[instr]);
 			const char *text = source.m_device.debug()->comment_text(comment_address);
 			if (text != NULL)
-				sprintf(&destbuf[m_divider2], "// %.*s", m_allocated.x - m_divider2 - 1, text);
+				unicode_sprintf(&destbuf[m_divider2], "// %.*s", m_allocated.x - m_divider2 - 1, text);
 		}
 
 		// see if the line changed at all
-		if (lines == 1 && strncmp(oldbuf, destbuf, MIN(sizeof(oldbuf), m_allocated.x)) != 0)
+		if (lines == 1 && unicode_strncmp(oldbuf, destbuf, MIN(DISASM_BUFFSIZE, m_allocated.x)) != 0)
 			changed = true;
 	}
 
@@ -585,14 +643,14 @@ recompute:
 				attrib |= DCA_VISITED;
 
 			// get the effective string
-			const char *data = &m_dasm[effrow * m_allocated.x];
-			UINT32 len = (UINT32)strlen(data);
+			const unicode_char *data = &m_dasm[effrow * m_allocated.x];
+			UINT32 len = unicode_strlen(data);
 
 			// copy data
 			UINT32 effcol = m_topleft.x;
 			while (col < m_visible.x && effcol < len)
 			{
-				dest->byte = data[effcol++];
+				dest->uchar = data[effcol++];
 				dest->attrib = (effcol <= m_divider1 || effcol >= m_divider2) ? (attrib | DCA_ANCILLARY) : attrib;
 
 				// comments are just green for now - maybe they shouldn't even be this?
@@ -607,7 +665,7 @@ recompute:
 		// fill the rest with blanks
 		while (col < m_visible.x)
 		{
-			dest->byte = ' ';
+			dest->uchar = ' ';
 			dest->attrib = (effrow < m_total.y) ? (attrib | DCA_ANCILLARY) : attrib;
 			dest++;
 			col++;

@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    debugvw.h
+	debugvw.h
 
-    Debugger view engine.
+	Debugger view engine.
 
 ***************************************************************************/
 
@@ -12,6 +12,7 @@
 #define __DEBUGVIEW_H__
 
 #include "express.h"
+#include "unicode.h"
 
 
 //**************************************************************************
@@ -92,7 +93,7 @@ typedef void (*debug_view_osd_update_func)(debug_view &view, void *osdprivate);
 // a single "character" in the debug view has an ASCII value and an attribute byte
 struct debug_view_char
 {
-	UINT8               byte;
+	unicode_char        uchar;
 	UINT8               attrib;
 };
 

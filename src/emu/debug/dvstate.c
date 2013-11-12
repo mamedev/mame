@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvstate.c
+	dvstate.c
 
-    State debugger view.
+	State debugger view.
 
 ***************************************************************************/
 
@@ -306,7 +306,7 @@ void debug_view_state::view_update()
 			// copy data
 			while (col < m_visible.x && effcol < len)
 			{
-				dest->byte = temp[effcol++];
+				dest->uchar = temp[effcol++];
 				dest->attrib = attrib | ((effcol <= m_divider) ? DCA_ANCILLARY : DCA_NORMAL);
 				dest++;
 				col++;
@@ -319,7 +319,7 @@ void debug_view_state::view_update()
 		// fill the rest with blanks
 		while (col < m_visible.x)
 		{
-			dest->byte = ' ';
+			dest->uchar = ' ';
 			dest->attrib = DCA_NORMAL;
 			dest++;
 			col++;
