@@ -220,6 +220,59 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	pgm_theglad_decrypt(machine());
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region(0x188);
+
+	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
+
+	temp16[(0xe8)/2] = 0xE004; // based on killbldp
+	temp16[(0xea)/2] = 0xE52D;
+	temp16[(0xec)/2] = 0x00D3;
+	temp16[(0xee)/2] = 0xE3A0;
+	temp16[(0xf0)/2] = 0xF000;
+	temp16[(0xf2)/2] = 0xE121;
+	temp16[(0xf4)/2] = 0xE004;
+	temp16[(0xf6)/2] = 0xE49D;
+	temp16[(0xf8)/2] = 0xFF1E;
+	temp16[(0xfa)/2] = 0xE12F;
+
+	temp16[(0xfc) / 2] = 0xE004;// based on killbldp
+	temp16[(0xfe) / 2] = 0xE52D;
+	temp16[(0x100) / 2] = 0x0013;
+	temp16[(0x102) / 2] = 0xE3A0;
+	temp16[(0x104) / 2] = 0xF000;
+	temp16[(0x106) / 2] = 0xE121;
+	temp16[(0x108) / 2] = 0xE004;
+	temp16[(0x10a) / 2] = 0xE49D;
+	temp16[(0x10c) / 2] = 0xFF1E;
+	temp16[(0x10e) / 2] = 0xE12F;
+
+
+	// the interrupt code appears to be at 0x08000010
+	// although this still crashes for now..
+
+	temp16[(0x14) / 2] = 0x0010;
+	temp16[(0x16) / 2] = 0x0800;
+
+	temp16[(0x18) / 2] = 0x0014;
+	temp16[(0x1a) / 2] = 0x0000;
+
+
+	
+
+
+	temp16[(0x1c) / 2] = 0x500F;
+	temp16[(0x1e) / 2] = 0xE92D;
+	temp16[(0x20) / 2] = 0x0010;
+	temp16[(0x22) / 2] = 0xE51F;
+	temp16[(0x24) / 2] = 0x0000;
+	temp16[(0x26) / 2] = 0xE590;
+	temp16[(0x28) / 2] = 0xE00F;
+	temp16[(0x2a) / 2] = 0xE1A0;
+	temp16[(0x2c) / 2] = 0xFF10;
+	temp16[(0x2e) / 2] = 0xE12F;
+
+
+
+
 }
 
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
