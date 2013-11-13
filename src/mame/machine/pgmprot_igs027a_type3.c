@@ -34,8 +34,6 @@
  55857G is also used on the Cave single board PGM systems, but in those
  cases it behaves like the 55857E (pgmprot1.c)
 
-
-
  ***********************************************************************/
 
 #include "emu.h"
@@ -50,11 +48,14 @@ WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_ram_sel_w )
 
 READ32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_r )
 {
-	return m_svg_shareram[m_svg_ram_sel & 1][offset];
+	UINT32 retdata = m_svg_shareram[m_svg_ram_sel & 1][offset];
+//	printf("(%08x) ARM7: shared read (bank %02x) offset - %08x retdata - %08x mask - %08x\n", space.device().safe_pc(), m_svg_ram_sel, offset*4, retdata, mem_mask );
+	return retdata;
 }
 
 WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_w )
 {
+//	printf("(%08x) ARM7: shared write (bank %02x) offset - %08x retdata - %08x mask - %08x\n", space.device().safe_pc(), m_svg_ram_sel, offset*4, data, mem_mask );
 	COMBINE_DATA(&m_svg_shareram[m_svg_ram_sel & 1][offset]);
 }
 
@@ -409,10 +410,12 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	temp16[(base) /2] = 0x105c; base += 2;
 	temp16[(base) /2] = 0xE59F; base += 2;
 
+	// this is the location of the region in the internal rom, for some reaosn Japan doesn't play attract music (original game feature? bad code flow?)
+	base = 0x3316;
+	temp16[(base) / 2] = 0x0005; base += 2;
 
 
-
-#if 1
+#if 0
 	m_svg_ram_sel = 1;
 
 	for (int i = 0; i < 0x8000; i++)
