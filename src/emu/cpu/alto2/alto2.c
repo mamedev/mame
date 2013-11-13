@@ -1190,11 +1190,11 @@ void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
 		// last line had a \n - print type name
 		for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
 			if (type & (1 << i))
-				debug_console_printf(machine(), "%-7s ", type_name[i]);
+				logerror("%-7s ", type_name[i]);
 	}
 	va_list ap;
 	va_start(ap, format);
-	debug_console_vprintf(machine(), format, ap);
+	vlogerror(format, ap);
 	va_end(ap);
 	m_log_newline = format[strlen(format) - 1] == '\n';
 }

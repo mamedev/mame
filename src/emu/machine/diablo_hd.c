@@ -134,7 +134,7 @@ void diablo_hd_device::logprintf(int level, const char* format, ...)
 		return;
 	va_list ap;
 	va_start(ap, format);
-	debug_console_vprintf(machine(), format, ap);
+	vlogerror(format, ap);
 	va_end(ap);
 }
 #endif

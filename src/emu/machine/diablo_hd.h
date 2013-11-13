@@ -12,10 +12,8 @@
 #include "emu.h"
 #include "imagedev/diablo.h"
 
-#define	DIABLO_DEBUG	1
-
-#if	DIABLO_DEBUG
-#include "debug/debugcon.h"
+#ifndef	DIABLO_DEBUG
+#define	DIABLO_DEBUG	1		//!< set to 1 to enable debug log output
 #endif
 
 #define DIABLO_HD_0 "diablo0"

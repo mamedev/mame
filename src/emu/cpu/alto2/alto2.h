@@ -22,9 +22,6 @@
 #ifndef	ALTO2_DEBUG
 #define	ALTO2_DEBUG			1
 #endif
-#if	ALTO2_DEBUG
-#include "debug/debugcon.h"
-#endif
 
 #define	USE_PRIO_F9318	0			//!< define to 1 to use the F9318 priority encoder code
 #define	USE_ALU_74181	0			//!< define to 1 to use the SN74181 ALU code
