@@ -771,23 +771,24 @@ static UINT8 jkff_lookup[64][64] = {
 
 jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
 {
+	static const char* raise_lower[2] = {"↗","↘"};
 	UINT8 result = jkff_lookup[s1 & 63][ s0 & 63];
 #if	ALTO2_DEBUG
-	LOG((LOG_DISK,8,"%s : ", jkff_name));
+	LOG((LOG_DISK,8,"%s\t: ", jkff_name));
 	if ((s0 ^ result) & JKFF_CLK)
-		LOG((LOG_DISK,8," CLK:%d→%d", s0 & 1, result & 1));
+		LOG((LOG_DISK,8," CLK%s", raise_lower[result & 1]));
 	if ((s0 ^ result) & JKFF_J)
-		LOG((LOG_DISK,8," J:%d→%d", (s0 >> 1) & 1, (result >> 1) & 1));
+		LOG((LOG_DISK,8," J%s", raise_lower[(result >> 1) & 1]));
 	if ((s0 ^ result) & JKFF_K)
-		LOG((LOG_DISK,8," K:%d→%d", (s0 >> 2) & 1, (result >> 2) & 1));
+		LOG((LOG_DISK,8," K'%s", raise_lower[(result >> 2) & 1]));
 	if ((s0 ^ result) & JKFF_S)
-		LOG((LOG_DISK,8," S:%d→%d", (s0 >> 3) & 1, (result >> 3) & 1));
+		LOG((LOG_DISK,8," S'%s", raise_lower[(result >> 3) & 1]));
 	if ((s0 ^ result) & JKFF_C)
-		LOG((LOG_DISK,8," C:%d→%d", (s0 >> 4) & 1, (result >> 4) & 1));
+		LOG((LOG_DISK,8," C'%s", raise_lower[(result >> 4) & 1]));
 	if ((s0 ^ result) & JKFF_Q)
-		LOG((LOG_DISK,8," Q:%d→%d", (s0 >> 5) & 1, (result >> 5) & 1));
+		LOG((LOG_DISK,8," Q%s", raise_lower[(result >> 5) & 1]));
 	if ((s0 ^ result) & JKFF_Q0)
-		LOG((LOG_DISK,8," Q':%d→%d", (s0 >> 6) & 1, (result >> 6) & 1));
+		LOG((LOG_DISK,8," Q'%s", raise_lower[(result >> 6) & 1]));
 	LOG((LOG_DISK,8,"\n"));
 #endif
 	return static_cast<jkff_t>(result);
@@ -1943,8 +1944,6 @@ void alto2_cpu_device::f1_clrstat_1()
 	m_dsk.ready_mf31a = dhd ? dhd->get_ready_0() : 1;
 
 	/* start monoflop 31a, which resets ready_mf31a */
-	if (!m_dsk.ready_timer)
-		m_dsk.ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ready_mf31a),this));
 	m_dsk.ready_timer->adjust(TW_READY, 1);
 	m_dsk.ready_timer->enable();
 }
@@ -2337,12 +2336,13 @@ void alto2_cpu_device::init_disk()
 	m_dsk.bitclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_bitclk),this));
 
 	m_dsk.seclate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_seclate),this));
-	m_dsk.seclate_timer->set_param(1);
 	m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);
 
 	m_dsk.ok_to_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ok_to_run),this));
-	m_dsk.ok_to_run_timer->set_param(1);
 	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(15 * ALTO2_UCYCLE), 1);
+
+	m_dsk.ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ready_mf31a),this));
+	m_dsk.ready_timer->adjust(attotime::never, 0);
 
 	diablo_hd_device* dhd;
 	for (int unit = 0; unit < diablo_hd_device::DIABLO_UNIT_MAX; unit++) {
