@@ -14,10 +14,10 @@
 
 #define TIME_PER_SECTOR                     (attotime::from_usec(100))
 #define TIME_PER_ROTATION                   (attotime::from_hz(5400/60))
-#define TIME_MULTIPLE_SECTORS               (attotime::from_usec(1))
+#define TIME_MULTIPLE_SECTORS               (attotime::from_usec(50))
 
-#define TIME_SEEK_MULTISECTOR               (attotime::from_msec(13))
-#define TIME_NO_SEEK_MULTISECTOR            (attotime::from_nsec(16300))
+#define TIME_SEEK_MULTISECTOR               (attotime::from_usec(13000))
+#define TIME_NO_SEEK_MULTISECTOR            (attotime::from_usec(1000))
 
 ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
 	: ata_hle_device(mconfig, type, name, tag, owner, clock, shortname, source),
@@ -354,16 +354,7 @@ void ata_mass_storage_device::fill_buffer()
 		{
 			set_dasp(ASSERT_LINE);
 
-			if (m_command == IDE_COMMAND_READ_MULTIPLE)
-			{
-				if (m_sectors_until_int != 1)
-					/* make ready now */
-					finished_read();
-				else
-					start_busy(TIME_MULTIPLE_SECTORS, PARAM_COMMAND);
-			}
-			else
-				start_busy(TIME_MULTIPLE_SECTORS, PARAM_COMMAND);
+			start_busy(TIME_MULTIPLE_SECTORS, PARAM_COMMAND);
 		}
 		break;
 	}
