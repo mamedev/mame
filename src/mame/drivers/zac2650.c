@@ -2,10 +2,14 @@
  * Signetics 2650 CPU Games
  *
  * Zaccaria - The Invaders
- * Zaccaria - Super Invader Attack
+ * Sidam    - Super Invader Attack
  * Zaccaria - Dodgem
  *
  * mike@the-coates.com
+ *
+ *
+ * TODO: discrete sound
+ *
  */
 
 #include "emu.h"
@@ -15,6 +19,7 @@
 #include "includes/zac2650.h"
 
 
+/***********************************************************************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zac2650_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
@@ -248,7 +253,6 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 	MCFG_GFXDECODE(tinvader)
 	MCFG_PALETTE_LENGTH(4)
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -308,6 +312,6 @@ ROM_START( dodgem )
 ROM_END
 
 
-GAME( 1978, sia2650,  0,       tinvader, sinvader, driver_device, 0, ROT270, "Zaccaria / Zelco", "Super Invader Attack", 0 )
-GAMEL(1978, tinv2650, sia2650, tinvader, tinvader, driver_device, 0, ROT270, "Zaccaria / Zelco", "The Invaders",         0, layout_tinv2650 )
-GAME( 1979, dodgem,   0,       tinvader, dodgem, driver_device,   0, ROT0,   "Zaccaria",         "Dodgem",               0 )
+GAMEL(1978, tinv2650, 0,        tinvader, tinvader, driver_device, 0, ROT270, "Zaccaria / Zelco", "The Invaders", GAME_IMPERFECT_SOUND, layout_tinv2650 )
+GAME( 1978, sia2650,  tinv2650, tinvader, sinvader, driver_device, 0, ROT270, "bootleg (Sidam)", "Super Invader Attack (bootleg of The Invaders)", GAME_IMPERFECT_SOUND ) // 1980?
+GAME( 1979, dodgem,   0,        tinvader, dodgem,   driver_device, 0, ROT0,   "Zaccaria", "Dodgem", GAME_IMPERFECT_SOUND )
