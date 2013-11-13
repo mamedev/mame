@@ -273,7 +273,9 @@ private:
 		LOG_DISK	= (1 << 20),
 		LOG_DISPL	= (1 << 21),
 		LOG_MOUSE	= (1 << 22),
-		LOG_ALL		= ((1 << 23) - 1)
+		LOG_HW		= (1 << 23),
+		LOG_KBD		= (1 << 24),
+		LOG_ALL		= ((1 << 25) - 1)
 	};
 	int m_log_types;
 	int m_log_level;
@@ -1255,6 +1257,16 @@ private:
 	void init_hardware();						//!< initialize miscellaneous hardware
 
 	// ************************************************
+	// keyboard stuff
+	// ************************************************
+	struct {
+		UINT16 bootkey;							//!< boot key - key code pressed before power on
+		UINT16 matrix[4];						//!< a bit map of the keys pressed (ioports ROW0 ... ROW3)
+	}	m_kbd;
+	UINT16 kbd_ad_r(UINT32 addr);				//!< read the keyboard matrix
+	void init_kbd(UINT16 bootkey = 0177777);	//!< initialize the keyboard hardware, optinally set the boot key
+
+	// ************************************************
 	// mouse stuff
 	// ************************************************
 	/**
@@ -1387,6 +1399,8 @@ private:
 	jkff_t m_sysclka1[4];				//!< simulate current sysclka
 	jkff_t m_sysclkb0[4];				//!< simulate previous sysclkb
 	jkff_t m_sysclkb1[4];				//!< simulate current sysclkb
+	//! lookup JK flip-flop state change from s0 to s1
+	inline jkff_t update_jkff(UINT8 s0, UINT8 s1);
 
 	void kwd_timing(int bitclk, int datin, int block);	//!< disk word timing
 	TIMER_CALLBACK_MEMBER( disk_seclate );			//!< timer callback to take away the SECLATE pulse (monoflop)

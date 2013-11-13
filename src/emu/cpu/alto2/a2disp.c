@@ -12,7 +12,7 @@
 /**
  * @brief PROM a38 contains the STOPWAKE' and MBEMBPTY' signals for the FIFO
  * <PRE>
- * The inputs to a38 are the UNLOAD counter RA[0-3] and the DDR<- counter
+ * The inputs to a38 are the UNLOAD counter RA[0-3] and the DDR← counter
  * WA[0-3], and the designer decided to reverse the address lines :-)
  *
  *	a38  counter

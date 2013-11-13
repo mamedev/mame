@@ -60,8 +60,8 @@ static UINT32 map_lines(const UINT8 *map, int lines, UINT32 val)
  * @param base ROM base address in memory
  * @param type one of 1 for UINT8, 2 for UINT16, 4 for UINT32
  * @param addr address offset into base
- * @param dand value to AND to contents before ORing
- * @param dor value to OR before writing back
+ * @param dand value to AND to contents before XORing
+ * @param dxor value to XOR before writing back
  */
 static void write_type_and_xor(void *base, int type, UINT32 addr, UINT32 dand, UINT32 dxor)
 {
@@ -90,6 +90,14 @@ static void write_type_and_xor(void *base, int type, UINT32 addr, UINT32 dand, U
 	}
 }
 
+/**
+ * @brief load a PROM from a (list of) source region(s) shifting, swapping and inverting address and data bits
+ * @param prom PROM loading definition
+ * @param src source ROM region where to load data from
+ * @param pages number of pages of definitions
+ * @param segments number of segments in one page of the result
+ * @return pointer to the newly allocated memory filled with source bits
+ */
 UINT8* prom_load(const prom_load_t* prom, const UINT8* src, int pages, int segments)
 {
 	void* array = 0;

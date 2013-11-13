@@ -18,7 +18,7 @@ typedef struct {
 	UINT8 width;			//!< width in bits
 	UINT8 shift;			//!< left shift in bits
 	const UINT8 dmap[16];	//!< data bit mapping
-	UINT32 dand;			//!< ANDing destination with this value, before ORing the data
+	UINT32 dand;			//!< ANDing destination with this value, before XORing the data
 	size_t type;			//!< type of the destination, i.e. sizeof(type)
 }	prom_load_t;
 

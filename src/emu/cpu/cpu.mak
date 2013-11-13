@@ -2285,6 +2285,8 @@ CPUOBJS += $(CPUOBJ)/alto2/alto2.o \
 	$(CPUOBJ)/alto2/a2dwt.o \
 	$(CPUOBJ)/alto2/a2emu.o \
 	$(CPUOBJ)/alto2/a2ether.o \
+	$(CPUOBJ)/alto2/a2hw.o \
+	$(CPUOBJ)/alto2/a2kbd.o \
 	$(CPUOBJ)/alto2/a2ksec.o \
 	$(CPUOBJ)/alto2/a2kwd.o \
 	$(CPUOBJ)/alto2/a2mem.o \
@@ -2322,6 +2324,12 @@ $(CPUOBJ)/alto2/a2emu.o:    $(CPUSRC)/alto2/a2emu.c \
 							$(CPUSRC)/alto2/alto2.h
 
 $(CPUOBJ)/alto2/a2ether.o:  $(CPUSRC)/alto2/a2ether.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2hw.o:     $(CPUSRC)/alto2/a2hw.c \
+							$(CPUSRC)/alto2/alto2.h
+
+$(CPUOBJ)/alto2/a2kbd.o:    $(CPUSRC)/alto2/a2kbd.c \
 							$(CPUSRC)/alto2/alto2.h
 
 $(CPUOBJ)/alto2/a2ksec.o:   $(CPUSRC)/alto2/a2ksec.c \

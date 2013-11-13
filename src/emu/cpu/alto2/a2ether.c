@@ -440,7 +440,7 @@ void alto2_cpu_device::bs_eidfct_0()
 {
 	UINT16 r = m_eth.fifo[m_eth.fifo_rd];
 
-	LOG((LOG_ETH,3, "	<-EIDFCT; pull %06o from FIFO[%02o]\n", r, m_eth.fifo_rd));
+	LOG((LOG_ETH,3, "	←EIDFCT; pull %06o from FIFO[%02o]\n", r, m_eth.fifo_rd));
 	m_eth.fifo_rd = (m_eth.fifo_rd + 1) % ALTO2_ETHER_FIFO_SIZE;
 	m_bus &= r;
 	m_eth.rx_count++;
@@ -466,7 +466,7 @@ void alto2_cpu_device::f1_eth_block_0()
 void alto2_cpu_device::f1_eilfct_0()
 {
 	UINT16 r = m_eth.fifo[m_eth.fifo_rd];
-	LOG((LOG_ETH,3, "	<-EILFCT; %06o at FIFO[%02o]\n", r, m_eth.fifo_rd));
+	LOG((LOG_ETH,3, "	←EILFCT; %06o at FIFO[%02o]\n", r, m_eth.fifo_rd));
 	m_bus &= r;
 }
 
@@ -487,7 +487,7 @@ void alto2_cpu_device::f1_epfct_0()
 {
 	UINT16 r = ~A2_GET16(m_eth.status,16,10,15) & 0177777;
 
-	LOG((LOG_ETH,3, "	<-EPFCT; BUS[8-15] = STATUS (%#o)\n", r));
+	LOG((LOG_ETH,3, "	←EPFCT; BUS[8-15] = STATUS (%#o)\n", r));
 	m_bus &= r;
 
 	m_eth.status = 0;
@@ -519,7 +519,7 @@ void alto2_cpu_device::f1_ewfct_1()
  */
 void alto2_cpu_device::f2_eodfct_1()
 {
-	LOG((LOG_ETH,3, "	EODFCT<-; push %06o into FIFO[%02o]\n", m_bus, m_eth.fifo_wr));
+	LOG((LOG_ETH,3, "	EODFCT←; push %06o into FIFO[%02o]\n", m_bus, m_eth.fifo_wr));
 
 	m_eth.fifo[m_eth.fifo_wr] = m_bus;
 	m_eth.fifo_wr = (m_eth.fifo_wr + 1) % ALTO2_ETHER_FIFO_SIZE;

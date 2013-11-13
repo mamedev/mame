@@ -29,6 +29,17 @@ public:
 	diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~diablo_hd_device();
 
+	static const int DIABLO_UNIT_MAX = 2;			//!< max number of drive units
+	static const int DIABLO_CYLINDERS = 203;		//!< number of cylinders per drive
+	static const int DIABLO_CYLINDER_MASK = 0777;	//!< bit maks for cylinder number (9 bits)
+	static const int DIABLO_SPT = 12;				//!< number of sectors per track
+	static const int DIABLO_SECTOR_MASK = 017;		//!< bit maks for cylinder number (4 bits)
+	static const int DIABLO_HEADS = 2;				//!< number of heads per drive
+	static const int DIABLO_HEAD_MASK = 1;			//!< bit maks for cylinder number (4 bits)
+	static const int DIABLO_PAGES = 203*2*12;		//!< number of pages per drive
+	//! convert a cylinder/head/sector to a logical block address (page)
+	static inline int DRIVE_PAGE(int c,int h,int s)	{ return (c * DIABLO_HEADS + h) * DIABLO_SPT + s; }
+
 	void set_sector_callback(void* cookie, void(*callback)(void*, int));
 
 	int bits_per_sector() const;
@@ -71,18 +82,6 @@ private:
 #else
 #	define	LOG_DRIVE(x)
 #endif
-
-	static const int DIABLO_UNIT_MAX = 2;			//!< max number of drive units
-	static const int DIABLO_CYLINDERS = 203;		//!< number of cylinders per drive
-	static const int DIABLO_CYLINDER_MASK = 0777;	//!< bit maks for cylinder number (9 bits)
-	static const int DIABLO_SPT = 12;				//!< number of sectors per track
-	static const int DIABLO_SECTOR_MASK = 017;		//!< bit maks for cylinder number (4 bits)
-	static const int DIABLO_HEADS = 2;				//!< number of heads per drive
-	static const int DIABLO_HEAD_MASK = 1;			//!< bit maks for cylinder number (4 bits)
-	static const int DIABLO_PAGES = 203*2*12;		//!< number of pages per drive
-	//! convert a cylinder/head/sector to a logical block address (page)
-	static inline int DRIVE_PAGE(int c,int h,int s)	{ return (c * DIABLO_HEADS + h) * DIABLO_SPT + s; }
-
 	bool m_diablo31;						//!< true, if this is a DIABLO31 drive
 	int m_unit;								//!< drive unit number (0 or 1)
 	char m_description[32];					//!< description of the drive(s)

@@ -451,17 +451,17 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 			LOG((LOG_MEM,5,"	memory error at dword addr:%07o data:%011o check:%03o\n", dw_addr * 2, dw_data, hpb));
 			LOG((LOG_MEM,6,"	MEAR: %06o\n", m_mem.mear));
 			LOG((LOG_MEM,6,"	MESR: %06o\n", m_mem.mesr ^ 0177777));
-			LOG((LOG_MEM,6,"		Hamming code read    : %#o\n", GET_MESR_HAMMING(m_mem.mesr)));
-			LOG((LOG_MEM,6,"		Parity error         : %o\n", GET_MESR_PERR(m_mem.mesr)));
-			LOG((LOG_MEM,6,"		Memory parity bit    : %o\n", GET_MESR_PARITY(m_mem.mesr)));
-			LOG((LOG_MEM,6,"		Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(m_mem.mesr), hamming_lut[GET_MESR_SYNDROME(m_mem.mesr)]));
-			LOG((LOG_MEM,6,"		Memory bank          : %#o\n", GET_MESR_BANK(m_mem.mesr)));
+			LOG((LOG_MEM,7,"		Hamming code read    : %#o\n", GET_MESR_HAMMING(m_mem.mesr)));
+			LOG((LOG_MEM,7,"		Parity error         : %o\n", GET_MESR_PERR(m_mem.mesr)));
+			LOG((LOG_MEM,7,"		Memory parity bit    : %o\n", GET_MESR_PARITY(m_mem.mesr)));
+			LOG((LOG_MEM,7,"		Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(m_mem.mesr), hamming_lut[GET_MESR_SYNDROME(m_mem.mesr)]));
+			LOG((LOG_MEM,7,"		Memory bank          : %#o\n", GET_MESR_BANK(m_mem.mesr)));
 			LOG((LOG_MEM,6,"	MECR: %06o\n", m_mem.mecr ^ 0177777));
-			LOG((LOG_MEM,6,"		Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));
-			LOG((LOG_MEM,6,"		Test mode            : %s\n", GET_MECR_TEST_MODE(m_mem.mecr) ? "on" : "off"));
-			LOG((LOG_MEM,6,"		INT on single-bit err: %s\n", GET_MECR_INT_SBERR(m_mem.mecr) ? "on" : "off"));
-			LOG((LOG_MEM,6,"		INT on double-bit err: %s\n", GET_MECR_INT_DBERR(m_mem.mecr) ? "on" : "off"));
-			LOG((LOG_MEM,6,"		Error correction     : %s\n", GET_MECR_ERRCORR(m_mem.mecr) ? "off" : "on"));
+			LOG((LOG_MEM,7,"		Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));
+			LOG((LOG_MEM,7,"		Test mode            : %s\n", GET_MECR_TEST_MODE(m_mem.mecr) ? "on" : "off"));
+			LOG((LOG_MEM,7,"		INT on single-bit err: %s\n", GET_MECR_INT_SBERR(m_mem.mecr) ? "on" : "off"));
+			LOG((LOG_MEM,7,"		INT on double-bit err: %s\n", GET_MECR_INT_DBERR(m_mem.mecr) ? "on" : "off"));
+			LOG((LOG_MEM,7,"		Error correction     : %s\n", GET_MECR_ERRCORR(m_mem.mecr) ? "off" : "on"));
 		}
 		if (-1 == hamming_lut[syndrome]) {
 			/* double-bit error: wake task_part, if we're told so */
@@ -629,9 +629,9 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 		 * starting a memory refresh cycle
 		 * currently we don't do anything special
 		 */
-		LOG((LOG_MEM,5, "	MAR<-; refresh cycle @ %#o\n", addr));
+		LOG((LOG_MEM,5, "	MAR←; refresh cycle @ %#o\n", addr));
 	} else if (addr < ALTO2_RAM_SIZE) {
-		LOG((LOG_MEM,2, "	MAR<-; mar = %#o\n", addr));
+		LOG((LOG_MEM,2, "	MAR←; mar = %#o\n", addr));
 		m_mem.access = ALTO2_MEM_RAM;
 		m_mem.mar = addr;
 		/* fetch memory double-word to read/write latches */

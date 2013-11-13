@@ -30,7 +30,7 @@ void alto2_cpu_device::f1_dwt_block_0()
  */
 void alto2_cpu_device::f2_dwt_load_ddr_1()
 {
-	LOG((LOG_DWT,2,"	DDR<- BUS (%#o)\n", m_bus));
+	LOG((LOG_DWT,2,"	DDR← BUS (%#o)\n", m_bus));
 	m_dsp.fifo[m_dsp.fifo_wr] = m_bus;
 	m_dsp.fifo_wr = (m_dsp.fifo_wr + 1) % ALTO2_DISPLAY_FIFO;
 	if (FIFO_STOPWAKE_0() == 0)

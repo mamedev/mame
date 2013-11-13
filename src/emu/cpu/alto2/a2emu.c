@@ -164,8 +164,8 @@
  * From the schematics: 08_ALU, page 6 (PDF page 4)
  *
  * EMACT            emulator task active
- * F2[0-2]=111b     <-ACSOURCE and F2_17
- * F2[0-2]=101b     DNS<- and ACDEST<-
+ * F2[0-2]=111b     ←ACSOURCE and F2_17
+ * F2[0-2]=101b     DNS← and ACDEST←
  *
  *  u49 (8 input NAND 74S30)
  *  ----------------------------------------------
@@ -254,7 +254,7 @@
  *
  * The high order bits of IR cannot be read directly, but the
  * displacement field of IR (8 low order bits) may be read with
- * the <-DISP bus source. If the X field of the instruction is
+ * the ←DISP bus source. If the X field of the instruction is
  * zero (i.e., it specifies page 0 addressing), then the DISP
  * field of the instruction is put on BUS[8-15] and BUS[0-7]
  * is zeroed. If the X field of the instruction is non-zero
@@ -268,7 +268,7 @@ void alto2_cpu_device::bs_emu_disp_0()
 	if (IR_X(m_emu.ir)) {
 		r = ((signed char)r) & 0177777;
 	}
-	LOG((LOG_EMU,2, "	<-DISP (%06o)\n", r));
+	LOG((LOG_EMU,2, "	←DISP (%06o)\n", r));
 	m_bus &= r;
 }
 
@@ -302,7 +302,7 @@ void alto2_cpu_device::f1_emu_block_0()
  */
 void alto2_cpu_device::f1_emu_load_rmr_1()
 {
-	LOG((LOG_EMU,2,"	RMR<-; BUS (%#o)\n", m_bus));
+	LOG((LOG_EMU,2,"	RMR←; BUS (%#o)\n", m_bus));
 	m_reset_mode = m_bus;
 }
 
@@ -311,7 +311,7 @@ void alto2_cpu_device::f1_emu_load_rmr_1()
  */
 void alto2_cpu_device::f1_emu_load_esrb_1()
 {
-	LOG((LOG_EMU,2,"	ESRB<-; BUS[12-14] (%#o)\n", m_bus));
+	LOG((LOG_EMU,2,"	ESRB←; BUS[12-14] (%#o)\n", m_bus));
 	m_s_reg_bank[m_task] = A2_GET32(m_bus,16,12,14);
 }
 
@@ -324,7 +324,7 @@ void alto2_cpu_device::f1_emu_load_esrb_1()
 void alto2_cpu_device::f1_rsnf_0()
 {
 	UINT16 r = 0177400 | m_ether_id;
-	LOG((LOG_EMU,2,"	<-RSNF; (%#o)\n", r));
+	LOG((LOG_EMU,2,"	←RSNF; (%#o)\n", r));
 	m_bus &= r;
 }
 
@@ -385,19 +385,19 @@ void alto2_cpu_device::f2_magic_1()
 {
 	int XC;
 	switch (MIR_F1(m_mir)) {
-	case f1_l_lsh_1:	// <-L MLSH 1
+	case f1_l_lsh_1:	// ←L MLSH 1
 		XC = (m_t >> 15) & 1;
 		m_shifter = (m_l << 1) & 0177777;
 		m_shifter |= XC;
-		LOG((LOG_EMU,2,"	<-L MLSH 1 (shifer:%06o XC:%o)", m_shifter, XC));
+		LOG((LOG_EMU,2,"	←L MLSH 1 (shifer:%06o XC:%o)", m_shifter, XC));
 		break;
-	case f1_l_rsh_1:	// <-L MRSH 1
+	case f1_l_rsh_1:	// ←L MRSH 1
 		XC = m_t & 1;
 		m_shifter = m_l >> 1;
 		m_shifter |= XC << 15;
-		LOG((LOG_EMU,2,"	<-L MRSH 1 (shifter:%06o XC:%o)", m_shifter, XC));
+		LOG((LOG_EMU,2,"	←L MRSH 1 (shifter:%06o XC:%o)", m_shifter, XC));
 		break;
-	case f1_l_lcy_8:	// <-L LCY 8
+	case f1_l_lcy_8:	// ←L LCY 8
 	default:			// other
 		break;
 	}
@@ -415,7 +415,7 @@ void alto2_cpu_device::f2_load_dns_0()
 #else
 	A2_PUT8(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
 #endif
-	LOG((LOG_EMU,2,"	DNS<-; rsel := DstAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
+	LOG((LOG_EMU,2,"	DNS←; rsel := DstAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 /**
@@ -437,7 +437,7 @@ void alto2_cpu_device::f2_load_dns_0()
  *  XC        = !(!(DNS & exorD) & !(MAGIC & OUTza))
  *            = (DNS & exorD) | (MAGIC & OUTza)
  *            = exorD, because this is DNS
- *  NEWCARRY  = [XC, L(00), L(15), XC] for F1 = no shift, <-L RSH 1, <-L LSH 1, LCY 8
+ *  NEWCARRY  = [XC, L(00), L(15), XC] for F1 = no shift, ←L RSH 1, ←L LSH 1, LCY 8
  *  SHZERO    = shifter == 0
  *  DCARRY    = !((!IR12 & NEWCARRY) | (IR12 & CARRY))
  *            = (((IR12 ^ 1) & NEWCARRY) | (IR12 & CARRY)) ^ 1
@@ -466,17 +466,17 @@ void alto2_cpu_device::f2_load_dns_1()
 	UINT8 SHZERO;
 
 	switch (MIR_F1(m_mir)) {
-	case f1_l_rsh_1:	// <-L RSH 1
+	case f1_l_rsh_1:	// ←L RSH 1
 		NEWCARRY = m_l & 1;
 		m_shifter = ((m_l >> 1) | (XC << 15)) & 0177777;
-		LOG((LOG_EMU,2,"	DNS; <-L RSH 1 (shifter:%06o XC:%o NEWCARRY:%o)", m_shifter, XC, NEWCARRY));
+		LOG((LOG_EMU,2,"	DNS; ←L RSH 1 (shifter:%06o XC:%o NEWCARRY:%o)", m_shifter, XC, NEWCARRY));
 		break;
-	case f1_l_lsh_1:	// <-L LSH 1
+	case f1_l_lsh_1:	// ←L LSH 1
 		NEWCARRY = (m_l >> 15) & 1;
 		m_shifter = ((m_l << 1) | XC) & 0177777;
-		LOG((LOG_EMU,2,"	DNS; <-L LSH 1 (shifter:%06o XC:%o NEWCARRY:%o)", m_shifter, XC, NEWCARRY));
+		LOG((LOG_EMU,2,"	DNS; ←L LSH 1 (shifter:%06o XC:%o NEWCARRY:%o)", m_shifter, XC, NEWCARRY));
 		break;
-	case f1_l_lcy_8:	// <-L LCY 8
+	case f1_l_lcy_8:	// ←L LCY 8
 	default:		/* other */
 		NEWCARRY = XC;
 		LOG((LOG_EMU,2,"	DNS; (shifter:%06o NEWCARRY:%o)", m_shifter, NEWCARRY));
@@ -506,7 +506,7 @@ void alto2_cpu_device::f2_acdest_0()
 #else
 	A2_PUT8(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
 #endif
-	LOG((LOG_EMU,2,"	ACDEST<-; mux (rsel:%#o %s)\n", m_rsel, r_name(m_rsel)));
+	LOG((LOG_EMU,2,"	ACDEST←; mux (rsel:%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 #if	ALTO2_DEBUG
@@ -628,12 +628,12 @@ void alto2_cpu_device::f2_idisp_1()
 	if (IR_ARITH(m_emu.ir)) {
 		/* 1xxxxxxxxxxxxxxx */
 		r = IR_SH(m_emu.ir) ^ 3;			/* complement of SH */
-		LOG((LOG_EMU,2,"	IDISP<-; branch on SH^3 (%#o|%#o)\n", m_next2, r));
+		LOG((LOG_EMU,2,"	IDISP←; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
 		int addr = CTL2K_U3(f2_emu_idisp) + A2_GET32(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
-		LOG((LOG_EMU,2,"	IDISP<-; IR (%#o) branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", m_emu.ir, addr, m_next2, r));
+		LOG((LOG_EMU,2,"	IDISP←; IR (%#o) branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", m_emu.ir, addr, m_next2, r));
 	}
 	m_next2 |= r;
 }
@@ -649,7 +649,7 @@ void alto2_cpu_device::f2_acsource_0()
 #else
 	A2_PUT8(m_rsel, 5, 3, 4, IR_SrcAC(m_emu.ir) ^ 3);
 #endif
-	LOG((LOG_EMU,2,"	<-ACSOURCE; rsel := SrcAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
+	LOG((LOG_EMU,2,"	←ACSOURCE; rsel := SrcAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 /**
@@ -662,12 +662,12 @@ void alto2_cpu_device::f2_acsource_1()
 	if (IR_ARITH(m_emu.ir)) {
 		/* 1xxxxxxxxxxxxxxx */
 		r = IR_SH(m_emu.ir) ^ 3;			/* complement of SH */
-		LOG((LOG_EMU,2,"	<-ACSOURCE; branch on SH^3 (%#o|%#o)\n", m_next2, r));
+		LOG((LOG_EMU,2,"	←ACSOURCE; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
 		int addr = CTL2K_U3(f2_emu_acsource) + A2_GET32(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
-		LOG((LOG_EMU,2,"	<-ACSOURCE; branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", addr, m_next2, r));
+		LOG((LOG_EMU,2,"	←ACSOURCE; branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", addr, m_next2, r));
 	}
 	m_next2 |= r;
 }

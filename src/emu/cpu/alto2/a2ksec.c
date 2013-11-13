@@ -9,16 +9,14 @@
  *****************************************************************************/
 #include "alto2.h"
 
-/** @brief block the disk sector task */
+//! f1_ksec_block early: block the disk sector task
 void alto2_cpu_device::f1_ksec_block_0()
 {
 	LOG((LOG_KSEC,2,"	BLOCK %s\n", task_name(m_task)));
 	disk_block(m_task);
 }
 
-/**
- * @brief disk sector task slot initialization
- */
+//! disk sector task slot initialization
 void alto2_cpu_device::init_ksec(int task)
 {
 	set_bs(task, bs_ksec_read_kstat,	&alto2_cpu_device::bs_read_kstat_0, 0);
