@@ -12,7 +12,11 @@
 #include "emu.h"
 #include "imagedev/diablo.h"
 
-#define	DIABLO_DEBUG	0
+#define	DIABLO_DEBUG	1
+
+#if	DIABLO_DEBUG
+#include "debug/debugcon.h"
+#endif
 
 #define DIABLO_HD_0 "diablo0"
 #define DIABLO_HD_1 "diablo1"
@@ -61,11 +65,12 @@ private:
 	int m_log_level;
 	void logprintf(int level, const char* format, ...);
 #	define	LOG_DRIVE(x) logprintf x
+
+	void dump_ascii(UINT8 *src, size_t size);
+	size_t dump_record(UINT8 *src, size_t addr, size_t size, const char *name, int cr);
 #else
 #	define	LOG_DRIVE(x)
 #endif
-
-	required_device<diablo_image_device> m_chd;		//!< image device
 
 	static const int DIABLO_UNIT_MAX = 2;			//!< max number of drive units
 	static const int DIABLO_CYLINDERS = 203;		//!< number of cylinders per drive
@@ -101,7 +106,7 @@ private:
 	int m_sector;					//!< current sector number in track
 	int m_page;						//!< current page
 	int m_pages;					//!< total number of pages
-	UINT8** m_image;				//!< pages raw bytes
+	UINT8** m_cache;				//!< pages raw bytes
 	UINT32** m_bits;				//!< pages expanded to bits
 	int m_rdfirst;					//!< set to first bit of a sector that is read from
 	int m_rdlast;					//!< set to last bit of a sector that was read from
@@ -109,7 +114,9 @@ private:
 	int m_wrlast;					//!< set to last bit of a sector that was written to
 	void (*m_sector_callback)();	//!< callback to call at the start of each sector
 	emu_timer* m_sector_timer;		//!< sector timer
-	diablo_image_device *m_drive;
+	diablo_image_device* m_image;	//!< diablo_image_device interfacing the CHD
+	chd_file* m_handle;				//!< underlying CHD handle
+	hard_disk_file* m_disk;			//!< underlying hard disk file
 
 	void read_sector();				//!< translate C/H/S to a page and read the sector
 	int cksum(UINT8 *src, size_t size, int start);
