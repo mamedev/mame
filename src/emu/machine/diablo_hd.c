@@ -65,6 +65,7 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 #if	DIABLO_DEBUG
 	m_log_level(9),
 #endif
+	m_chd(*this, tag),
 	m_diablo31(true),
 	m_unit(0),
 	m_description(),
@@ -87,8 +88,9 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_head(-1),
 	m_sector(-1),
 	m_page(-1),
-	m_image(),
-	m_bits(),
+	m_pages(DIABLO_PAGES),
+	m_image(0),
+	m_bits(0),
 	m_rdfirst(-1),
 	m_rdlast(-1),
 	m_wrfirst(-1),
@@ -97,6 +99,24 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_sector_timer(0),
 	m_drive(0)
 {
+}
+
+diablo_hd_device::~diablo_hd_device()
+{
+	for (int page = 0; page < m_pages; page++) {
+		if (m_image && m_image[page])
+			global_free(m_image[page]);
+		if (m_bits && m_bits[page])
+			global_free(m_bits[page]);
+	}
+	if (m_image) {
+		global_free(m_image);
+		m_image = 0;
+	}
+	if (m_bits) {
+		global_free(m_bits);
+		m_bits = 0;
+	}
 }
 
 #if	DIABLO_DEBUG
@@ -278,8 +298,9 @@ void diablo_hd_device::read_sector()
 		return;
 	}
 
-	/* allocate a sector buffer */
+	/* allocate a buffer for this page */
 	m_image[m_page] = global_alloc_array(UINT8, sizeof(diablo_sector_t));
+	/* and read the page from the hard_disk image */
 	if (!hard_disk_read(file, m_page, m_image[m_page])) {
 		LOG_DRIVE((0,"	read failed for #%d page #%d\n", m_unit, m_page));
 		global_free(m_image[m_page]);
@@ -740,6 +761,16 @@ void diablo_hd_device::squeeze_sector()
 	}
 	global_free(m_bits[m_page]);
 	m_bits[m_page] = 0;
+
+	hard_disk_file *file = m_drive->get_hard_disk_file();
+	if (!file) {
+		LOG_DRIVE((0,"	no file for unit #%d\n", m_unit));
+		return;
+	}
+
+	if (!hard_disk_write(file, m_page, m_image[m_page])) {
+		LOG_DRIVE((0,"	write failed for #%d page #%d\n", m_unit, m_page));
+	}
 }
 
 /**
@@ -1168,7 +1199,12 @@ int diablo_hd_device::rd_clock(int index)
 }
 
 /**
- * @brief timer callback that is called once per sector in the rotation
+ * @brief timer callback that is called thrice per sector in the rotation
+ *
+ * The timer is called three times at the events:
+ * 0: sector mark goes inactive
+ * 1: sector mark goes active
+ * 2: in the middle of the active phase
  *
  * @param id timer id
  * @param arg argument supplied to timer_insert (unused)
@@ -1251,7 +1287,6 @@ void diablo_hd_device::device_start()
 		m_sector_mark_1_time = DIABLO44_SECTOR_MARK_PULSE_PRE;
 		m_bit_time = DIABLO44_BIT_TIME(1);
 	}
-
 	m_sector_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(diablo_hd_device::next_sector),this));
 	m_sector_timer->adjust(m_sector_time - m_sector_mark_0_time, 0);
 }
@@ -1282,11 +1317,11 @@ void diablo_hd_device::device_reset()
 	m_rdfirst = -1;
 	m_rdlast = -1;
 
-	m_drive = static_cast<harddisk_image_device *>(subdevice("drive"));
+	m_drive = static_cast<diablo_image_device *>(subdevice("drive"));
 }
 
 MACHINE_CONFIG_FRAGMENT( diablo_drive )
-	MCFG_HARDDISK_ADD("drive")
+	MCFG_DIABLO_ADD("drive")
 MACHINE_CONFIG_END
 
 machine_config_constructor diablo_hd_device::device_mconfig_additions() const

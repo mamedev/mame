@@ -11,7 +11,7 @@
 
 #include "harddisk.h"
 
-#define	DIABLO_TAG(_id) "diablo:"#_id
+#define	DIABLO_TAG(_id) "diablo"#_id
 
 /***************************************************************************
 	TYPE DEFINITIONS

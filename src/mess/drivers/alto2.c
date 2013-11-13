@@ -258,6 +258,8 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
 
 	MCFG_PALETTE_LENGTH(2)
+
+	MCFG_DIABLO_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 /* Driver Init */
@@ -269,8 +271,8 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 
 	// make the diablo drives known to the CPU core
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
-	cpu->set_diablo(0, m_diablo0);
-	cpu->set_diablo(1, m_diablo1);
+	cpu->set_diablo(0, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_0)));
+	cpu->set_diablo(1, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_1)));
 }
 
 /* Game Drivers */

@@ -10,12 +10,12 @@
 #define _DIABLO_HD_DEVICE_
 
 #include "emu.h"
-#include "imagedev/harddriv.h"
+#include "imagedev/diablo.h"
 
 #define	DIABLO_DEBUG	0
 
-#define DIABLO_HD_0 "diablo:0"
-#define DIABLO_HD_1 "diablo:1"
+#define DIABLO_HD_0 "diablo0"
+#define DIABLO_HD_1 "diablo1"
 
 extern const device_type DIABLO_HD;
 
@@ -23,6 +23,7 @@ class diablo_hd_device : public device_t
 {
 public:
 	diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~diablo_hd_device();
 
 	int bits_per_sector() const;
 	const char* description() const;
@@ -64,6 +65,8 @@ private:
 #	define	LOG_DRIVE(x)
 #endif
 
+	required_device<diablo_image_device> m_chd;		//!< image device
+
 	static const int DIABLO_UNIT_MAX = 2;			//!< max number of drive units
 	static const int DIABLO_CYLINDERS = 203;		//!< number of cylinders per drive
 	static const int DIABLO_CYLINDER_MASK = 0777;	//!< bit maks for cylinder number (9 bits)
@@ -97,15 +100,16 @@ private:
 	int m_head;						//!< current head (track) number on cylinder
 	int m_sector;					//!< current sector number in track
 	int m_page;						//!< current page
-	UINT8* m_image[DIABLO_PAGES];	//!< page raw bytes
-	UINT32* m_bits[DIABLO_PAGES];	//!< page expanded to bits
+	int m_pages;					//!< total number of pages
+	UINT8** m_image;				//!< pages raw bytes
+	UINT32** m_bits;				//!< pages expanded to bits
 	int m_rdfirst;					//!< set to first bit of a sector that is read from
 	int m_rdlast;					//!< set to last bit of a sector that was read from
 	int m_wrfirst;					//!< set to non-zero if a sector is written to
 	int m_wrlast;					//!< set to last bit of a sector that was written to
 	void (*m_sector_callback)();	//!< callback to call at the start of each sector
 	emu_timer* m_sector_timer;		//!< sector timer
-	harddisk_image_device *m_drive;
+	diablo_image_device *m_drive;
 
 	void read_sector();				//!< translate C/H/S to a page and read the sector
 	int cksum(UINT8 *src, size_t size, int start);
