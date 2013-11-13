@@ -171,10 +171,12 @@ protected:
 		// find spriteram
 		memory_share *spriteram = owner()->memshare(tag());
 		if (spriteram != NULL)
+		{
 			set_spriteram(reinterpret_cast<_SpriteRAMType *>(spriteram->ptr()), spriteram->bytes());
 
-		// save states
-		save_item(NAME(m_buffer));
+			// save states
+			save_item(NAME(m_buffer));
+		}
 	}
 
 	// subclass overrides
