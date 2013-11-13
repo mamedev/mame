@@ -218,6 +218,8 @@ public:
 	//! driver interface to set diablo_hd_device
 	void set_diablo(int unit, diablo_hd_device* ptr);
 
+	void next_sector(int unit);
+
 protected:
 	//! device-level override for start
 	virtual void device_start();
@@ -1409,7 +1411,6 @@ private:
 	void f2_nfer_1();								//!< f2_nfer late: branch on the disk fatal error condition
 	void f2_strobon_1();							//!< f2_strobon late: branch on the seek busy status
 	TIMER_CALLBACK_MEMBER( disk_bitclk );			//!< callback to update the disk controller with a new bitclk
-	void disk_sector_start(int unit);				//!< callback is called by the drive timer whenever a new sector starts
 	void init_disk();								//!< initialize the disk context and insert a disk wort timer
 
 	// ************************************************

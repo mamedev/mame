@@ -94,6 +94,7 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_rdlast(-1),
 	m_wrfirst(-1),
 	m_wrlast(-1),
+	m_sector_callback_cookie(0),
 	m_sector_callback(0),
 	m_sector_timer(0),
 	m_image(0),
@@ -118,6 +119,12 @@ diablo_hd_device::~diablo_hd_device()
 		global_free(m_bits);
 		m_bits = 0;
 	}
+}
+
+void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *, int))
+{
+	m_sector_callback_cookie = cookie;
+	m_sector_callback = callback;
 }
 
 #if	DIABLO_DEBUG
@@ -382,7 +389,7 @@ size_t diablo_hd_device::expand_record(UINT32 *bits, size_t dst, UINT8 *field, s
 }
 
 /**
- * @brief Expand a record's checksum word to 32 bits
+ * @brief expand a record's checksum word to 32 bits
  *
  * @param bits pointer to the sector bits
  * @param dst destination offset into bits (bit number)
@@ -402,7 +409,7 @@ size_t diablo_hd_device::expand_cksum(UINT32 *bits, size_t dst, UINT8 *field, si
 }
 
 /**
- * @brief Expand a sector into an array of clock and data bits
+ * @brief expand a sector into an array of clock and data bits
  *
  * @param page page number (0 to DRIVE_PAGES-1)
  */
@@ -484,7 +491,7 @@ void diablo_hd_device::dump_ascii(UINT8 *src, size_t size)
 
 
 /**
- * @brief Dump a record's contents
+ * @brief dump a record's contents
  *
  * @param src pointer to a record (header, label, data)
  * @param size size of the record in bytes
@@ -643,7 +650,11 @@ size_t diablo_hd_device::squeeze_cksum(UINT32 *bits, size_t src, int *cksum)
 }
 
 /**
- * @brief Squeeze a array of clock and data bits into a sector's data
+ * @brief squeeze a array of clock and data bits into a sector's data
+ *
+ * Find and squeeze header, label and data and verify for
+ * zero checksums (starting with 0521)
+ * Write the page back to the media and free the bitmap
  */
 void diablo_hd_device::squeeze_sector()
 {
@@ -1218,14 +1229,13 @@ void diablo_hd_device::next_sector(void* ptr, int arg)
 		m_sector_timer->adjust(m_sector_time - m_sector_mark_0_time, 0);
 		/* call the sector_callback, if any */
 		if (m_sector_callback)
-			(*m_sector_callback)();
+			(void)(*m_sector_callback)(m_sector_callback_cookie, m_unit);
 	}
 }
 
 /**
- * @brief timer callback that deasserts the sector mark
+ * @brief deassert the sector mark
  *
- * @param unit drive unit number
  */
 void diablo_hd_device::sector_mark_1()
 {
@@ -1235,9 +1245,12 @@ void diablo_hd_device::sector_mark_1()
 }
 
 /**
- * @brief timer callback that asserts the sector mark
+ * @brief assert the sector mark and read the next sector
  *
- * @param unit drive unit number
+ * Assert the sector mark and reset the read and write
+ * first and last bit indices.
+ * Increment the sector number, wrap and read the
+ * next sector from the media.
  */
 void diablo_hd_device::sector_mark_0()
 {

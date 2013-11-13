@@ -92,7 +92,7 @@ enum {
 };
 
 #if	ALTO2_DEBUG
-/** @brief human readable names for the KADR<- modes */
+/** @brief human readable names for the KADR← modes */
 static const char *rwc_name[4] = {"read", "check", "write", "write2"};
 #endif
 
@@ -973,10 +973,10 @@ static UINT8 jkff_lookup[64][64] = {
  * 15, so it counts to 16 on the next rising edge and makes WDDONE' go to 0.
  *
  * If HIORDBIT is 0 at the falling edge of BITCLK, counting continues as it was
- * preset with BUS[4] at the last KCOM<- load:
+ * preset with BUS[4] at the last KCOM← load:
  *
  * If BUS[4] was 1, both J and K' of the FF (74109) will be 1 at the rising edge
- * of LDCOM' (at the end of KCOM<-) and Q will be 1 => LOAD' is deasserted.
+ * of LDCOM' (at the end of KCOM←) and Q will be 1 => LOAD' is deasserted.
  *
  * If BUS[4] was 0, both J and K' will be 0, and Q will be 0 => LOAD' asserted.
  *
@@ -1063,13 +1063,13 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		}
 		/*
 		 * Falling edge of BITCLK, counting continues as it was preset
-		 * with BUS[4] (WFFO) at the last KCOM<- load, or as set by a
+		 * with BUS[4] (WFFO) at the last KCOM← load, or as set by a
 		 * 1 bit being read in HIORDBIT.
 		 */
 		if (WFFO) {
 			/*
 			 * If BUS[4] (WFFO) was 1, both J and K' of the FF (74109) will
-			 * be 1 at the rising edge of LDCOM' (at the end of KCOM<-)
+			 * be 1 at the rising edge of LDCOM' (at the end of KCOM←)
 			 * and Q will be 1. LOAD' is deassterted: count on clock.
 			 */
 			m_dsk.bitcount = (m_dsk.bitcount + 1) % 16;
@@ -1604,7 +1604,7 @@ void alto2_cpu_device::disk_block(int task)
  *     BUS[9]     SRWRDY' from the Winchester drive
  *     BUS[10]    RDYLAT' (latched READY' at last CLRSTAT, FF 45a output Q)
  *     BUS[11]    SEQERR (latched SEQERR at last CLRSTAT, FF 45b output Q')
- * The signals BUS[12,14-15] are just as they were loaded at KSTAT<- time.
+ * The signals BUS[12,14-15] are just as they were loaded at KSTAT← time.
  *     BUS[13]    CHSEMERROR (FF 44b output Q' inverted)
  * </PRE>
  */
@@ -1629,12 +1629,12 @@ void alto2_cpu_device::bs_read_kstat_0()
 	/* KSTAT[11] latch the latched (FF 45b at CLRSTAT) seqerr status (Q') */
 	PUT_KSTAT_DATALATE(m_dsk.kstat, m_dsk.ff_45b & JKFF_Q ? 0 : 1);
 
-	/* KSTAT[13] latch the latched (FF 44b at CLRSTAT/KSTAT<-) checksum status */
+	/* KSTAT[13] latch the latched (FF 44b at CLRSTAT/KSTAT←) checksum status */
 	PUT_KSTAT_CKSUM(m_dsk.kstat, m_dsk.ff_44b & JKFF_Q ? 1 : 0);
 
 	r = m_dsk.kstat;
 
-	LOG((LOG_DISK,1,"	<-KSTAT; BUS &= %#o\n", r));
+	LOG((LOG_DISK,1,"	←KSTAT; BUS &= %#o\n", r));
 	LOG((LOG_DISK,2,"		sector:    %d\n", GET_KSTAT_SECTOR(m_dsk.kstat)));
 	LOG((LOG_DISK,2,"		done:      %d\n", GET_KSTAT_DONE(m_dsk.kstat)));
 	LOG((LOG_DISK,2,"		seekfail:  %d\n", GET_KSTAT_SEEKFAIL(m_dsk.kstat)));
@@ -1661,7 +1661,7 @@ void alto2_cpu_device::bs_read_kdata_0()
 	UINT16 r;
 	/* get the current word from the drive */
 	r = m_dsk.datain;
-	LOG((LOG_DISK,1,"	<-KDATA (%#o)\n", r));
+	LOG((LOG_DISK,1,"	←KDATA (%#o)\n", r));
 	m_bus &= r;
 }
 
@@ -1699,7 +1699,7 @@ void alto2_cpu_device::f1_strobe_1()
 void alto2_cpu_device::f1_load_kstat_1()
 {
 	int i;
-	LOG((LOG_DISK,1,"	KSTAT<-; BUS[12-15] %#o\n", m_bus));
+	LOG((LOG_DISK,1,"	KSTAT←; BUS[12-15] %#o\n", m_bus));
 	LOG((LOG_DISK,2,"		idle:      %d\n", GET_KSTAT_IDLE(m_bus)));
 	LOG((LOG_DISK,2,"		cksum:     %d\n", GET_KSTAT_CKSUM(m_bus)));
 	LOG((LOG_DISK,2,"		completion:%d\n", GET_KSTAT_COMPLETION(m_bus)));
@@ -1711,13 +1711,13 @@ void alto2_cpu_device::f1_load_kstat_1()
 	PUT_KSTAT_COMPLETION(m_dsk.kstat, GET_KSTAT_COMPLETION(m_bus));
 
 	/* May set the the CKSUM flip-flop 44b
-	 * JK flip-flop 44b (KSTAT<- clocked)
+	 * JK flip-flop 44b (KSTAT← clocked)
 	 * CLK	SYSCLKA'
 	 * J	!BUS[13]
 	 * K'	1
 	 * S'	1
 	 * C'	CLRSTAT' (not now)
-	 * Q	Q' inverted to BUS[13] on <-KSTAT
+	 * Q	Q' inverted to BUS[13] on ←KSTAT
 	 */
 	for (i = 0; i < 2; i++) {
 		UINT8 s0, s1;
@@ -1750,7 +1750,7 @@ void alto2_cpu_device::f1_load_kdata_1()
 		PUT_KADDR_DRIVE(m_dsk.kaddr, GET_KADDR_DRIVE(m_bus));
 		m_dsk.drive = GET_KADDR_DRIVE(m_dsk.kaddr);
 
-		LOG((LOG_DISK,1,"	KDATA<-; BUS (%#o) (drive:%d restore:%d %d/%d/%02d)\n",
+		LOG((LOG_DISK,1,"	KDATA←; BUS (%#o) (drive:%d restore:%d %d/%d/%02d)\n",
 			m_bus,
 			GET_KADDR_DRIVE(m_dsk.kaddr),
 			GET_KADDR_RESTORE(m_dsk.kaddr),
@@ -1775,7 +1775,7 @@ void alto2_cpu_device::f1_load_kdata_1()
 		}
 #endif
 	} else {
-		LOG((LOG_DISK,1,"	KDATA<-; BUS %#o (%#x)\n", m_bus, m_bus));
+		LOG((LOG_DISK,1,"	KDATA←; BUS %#o (%#x)\n", m_bus, m_bus));
 	}
 }
 
@@ -1792,7 +1792,7 @@ void alto2_cpu_device::f1_load_kdata_1()
  * Vcc, BUS[08], BUS[10], BUS[12] go to #36 A,B,C,D
  * Vcc, BUS[09], BUS[11], BUS[13] go to #37 A,B,C,D
  * A is connected to ground on both chips;
- * both shifters are loaded with KADR<-
+ * both shifters are loaded with KADR←
  *
  * The QA outputs are #36 -> RECNO(0) and #37 -> RECNO(1)
  *
@@ -1873,9 +1873,9 @@ void alto2_cpu_device::f1_clrstat_1()
 		0);
 
 	/* clears the CKSUM flip-flop 44b
-	 * JK flip-flop 44b (KSTAT<- clocked)
+	 * JK flip-flop 44b (KSTAT← clocked)
 	 * CLK	SYSCLKA' (not used here, just clearing)
-	 * J	1 (BUS[13] during KSTAT<-)
+	 * J	1 (BUS[13] during KSTAT←)
 	 * K'	1
 	 * S'	1
 	 * C'	CLRSTAT'
@@ -1953,7 +1953,7 @@ void alto2_cpu_device::f1_load_kcom_1()
 {
 	if (m_dsk.kcom != m_bus) {
 		m_dsk.kcom = m_bus;
-		LOG((LOG_DISK,2,"	KCOM<-; BUS %06o\n", m_dsk.kcom));
+		LOG((LOG_DISK,2,"	KCOM←; BUS %06o\n", m_dsk.kcom));
 		LOG((LOG_DISK,2,"		xferoff: %d\n", GET_KCOM_XFEROFF(m_dsk.kcom)));
 		LOG((LOG_DISK,2,"		wdinhib: %d\n", GET_KCOM_WDINHIB(m_dsk.kcom)));
 		LOG((LOG_DISK,2,"		bclksrc: %d\n", GET_KCOM_BCLKSRC(m_dsk.kcom)));
@@ -1995,12 +1995,12 @@ void alto2_cpu_device::f1_load_kadr_1()
 	if (dhd)
 		dhd->select(unit, head);
 
-	/* On KDAR<- bit 0 of parts #36 and #37 is reset to 0, i.e. recno = 0 */
+	/* On KDAR← bit 0 of parts #36 and #37 is reset to 0, i.e. recno = 0 */
 	m_dsk.krecno = 0;
 	/* current read/write/check is that for the header */
 	m_dsk.krwc = GET_KADR_HEADER(m_dsk.kadr);
 
-	LOG((LOG_DISK,1,"	KADR<-; BUS[8-14] #%o\n", m_dsk.kadr));
+	LOG((LOG_DISK,1,"	KADR←; BUS[8-14] #%o\n", m_dsk.kadr));
 	LOG((LOG_DISK,2,"		seal:   %#o\n", GET_KADR_SEAL(m_dsk.kadr)));
 	LOG((LOG_DISK,2,"		header: %s\n",  rwc_name[GET_KADR_HEADER(m_dsk.kadr)]));
 	LOG((LOG_DISK,2,"		label:  %s\n",  rwc_name[GET_KADR_LABEL(m_dsk.kadr)]));
@@ -2014,7 +2014,7 @@ void alto2_cpu_device::f1_load_kadr_1()
 /**
  * @brief f2_init late: branch on disk word task active and init
  *
- * NEXT <- NEXT OR (WDTASKACT && WDINIT ? 037 : 0)
+ * NEXT ← NEXT OR (WDTASKACT && WDINIT ? 037 : 0)
  */
 void alto2_cpu_device::f2_init_1()
 {
@@ -2027,7 +2027,7 @@ void alto2_cpu_device::f2_init_1()
 /**
  * @brief f2_rwc late: branch on read/write/check state of the current record
  * <PRE>
- * NEXT <- NEXT OR (current record to be written ? 3 :
+ * NEXT ← NEXT OR (current record to be written ? 3 :
  *	current record to be checked ? 2 : 0);
  *
  * NB: note how krecno counts 0,2,3,1 ... etc.
@@ -2082,7 +2082,7 @@ void alto2_cpu_device::f2_rwc_1()
 /**
  * @brief f2_recno late: branch on the current record number by a lookup table
  * <PRE>
- * NEXT <- NEXT OR MAP (current record number) where
+ * NEXT ← NEXT OR MAP (current record number) where
  *   MAP(0) = 0		(header)
  *   MAP(1) = 2		(label)
  *   MAP(2) = 3		(pageno)
@@ -2102,7 +2102,7 @@ void alto2_cpu_device::f2_recno_1()
 /**
  * @brief f2_xfrdat late: branch on the data transfer state
  *
- * NEXT <- NEXT OR (if current command wants data transfer ? 1 : 0)
+ * NEXT ← NEXT OR (if current command wants data transfer ? 1 : 0)
  */
 void alto2_cpu_device::f2_xfrdat_1()
 {
@@ -2116,7 +2116,7 @@ void alto2_cpu_device::f2_xfrdat_1()
 /**
  * @brief f2_swrnrdy late: branch on the disk ready signal
  *
- * NEXT <- NEXT OR (if disk not ready to accept command ? 1 : 0)
+ * NEXT ← NEXT OR (if disk not ready to accept command ? 1 : 0)
  */
 void alto2_cpu_device::f2_swrnrdy_1()
 {
@@ -2132,7 +2132,7 @@ void alto2_cpu_device::f2_swrnrdy_1()
 /**
  * @brief f2_nfer late: branch on the disk fatal error condition
  *
- * NEXT <- NEXT OR (if fatal error in latches ? 0 : 1)
+ * NEXT ← NEXT OR (if fatal error in latches ? 0 : 1)
  */
 void alto2_cpu_device::f2_nfer_1()
 {
@@ -2147,7 +2147,7 @@ void alto2_cpu_device::f2_nfer_1()
 /**
  * @brief f2_strobon late: branch on the seek busy status
  *
- * NEXT <- NEXT OR (if seek strobe still on ? 1 : 0)
+ * NEXT ← NEXT OR (if seek strobe still on ? 1 : 0)
  * <PRE>
  * The STROBE signal is elongated with the help of two monoflops.
  * The first one has a rather short pulse duration:
@@ -2245,7 +2245,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
  *
  * @param unit the unit number
  */
-void alto2_cpu_device::disk_sector_start(int unit)
+void alto2_cpu_device::next_sector(int unit)
 {
 	diablo_hd_device* dhd = m_drive[unit];
 	if (m_dsk.bitclk_timer) {
@@ -2269,19 +2269,30 @@ void alto2_cpu_device::disk_sector_start(int unit)
 }
 
 /**
+ * @brief callback is called by the drive timer whenever a new sector starts
+ *
+ * @param unit the unit number
+ */
+static void disk_sector_start(void* cookie, int unit)
+{
+	alto2_cpu_device* cpu = reinterpret_cast<alto2_cpu_device *>(cookie);
+	cpu->next_sector(unit);
+}
+
+/**
  * @brief initialize the disk context and insert a disk wort timer
  *
  * @result returns 0 on success, fatal() on error
  */
 void alto2_cpu_device::init_disk()
 {
-//	diablo_hd_device* dhd;
-//	for (int unit = 0; unit < 2; unit++) {
-//		dhd = m_drive[unit];
-//		if (!dhd)
-//			continue;
-//		dhd->sector_callback(&alto2_cpu_device::disk_sector_start);
-//	}
+	diablo_hd_device* dhd;
+	for (int unit = 0; unit < 2; unit++) {
+		dhd = m_drive[unit];
+		if (!dhd)
+			continue;
+		dhd->set_sector_callback(this, &disk_sector_start);
+	}
 
 	memset(&m_dsk, 0, sizeof(m_dsk));
 

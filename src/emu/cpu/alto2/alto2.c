@@ -139,7 +139,6 @@ void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
 	m_drive[unit] = ptr;
 }
 
-
 //-------------------------------------------------
 //  device_rom_region - device-specific (P)ROMs
 //-------------------------------------------------
