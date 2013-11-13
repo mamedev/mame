@@ -185,8 +185,6 @@ void text_buffer_clear(text_buffer *text)
 
 void text_buffer_print(text_buffer *text, const char *data)
 {
-	if (!text)
-		return;
 	text_buffer_print_wrap(text, data, 10000);
 }
 

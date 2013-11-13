@@ -1180,7 +1180,8 @@ void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
 		"[DISK]",
 		"[DISPL]",
 		"[MOUSE]",
-		"[HW]"
+		"[HW]",
+		"[KBD]"
 	};
 	if (!(m_log_types & type))
 		return;
