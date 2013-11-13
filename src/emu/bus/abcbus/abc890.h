@@ -60,12 +60,10 @@ protected:
 	virtual void abcbus_c4(UINT8 data);
 	virtual UINT8 abcbus_xmemfl(offs_t offset);
 	virtual void abcbus_xmemw(offs_t offset, UINT8 data);
-
-	int m_slots;
-
-	abcbus_slot_device *m_expansion_slot[MAX_SLOTS];
 };
 
+
+// ======================> abc894_device
 
 class abc894_device :  public abc890_device
 {
@@ -75,12 +73,10 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-
-protected:
-	// device-level overrides
-	virtual void device_start();
 };
 
+
+// ======================> abc850_device
 
 class abc850_device :  public abc890_device
 {
@@ -90,10 +86,32 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
+};
 
-protected:
-	// device-level overrides
-	virtual void device_start();
+
+// ======================> abc852_device
+
+class abc852_device :  public abc890_device
+{
+public:
+	// construction/destruction
+	abc852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+
+// ======================> abc856_device
+
+class abc856_device :  public abc890_device
+{
+public:
+	// construction/destruction
+	abc856_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 
@@ -101,6 +119,8 @@ protected:
 extern const device_type ABC890;
 extern const device_type ABC894;
 extern const device_type ABC850;
+extern const device_type ABC852;
+extern const device_type ABC856;
 
 
 

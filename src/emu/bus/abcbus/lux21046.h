@@ -55,6 +55,7 @@ class luxor_55_21046_device :  public device_t,
 {
 public:
 	// construction/destruction
+	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
@@ -117,15 +118,68 @@ private:
 };
 
 
+// ======================> abc830_device
+
+class abc830_device :  public luxor_55_21046_device
+{
+public:
+	// construction/destruction
+	abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const;
+};
+
+
+// ======================> abc832_device
+
+class abc832_device :  public luxor_55_21046_device
+{
+public:
+	// construction/destruction
+	abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const;
+};
+
+
+// ======================> abc834_device
+
+class abc834_device :  public luxor_55_21046_device
+{
+public:
+	// construction/destruction
+	abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const;
+};
+
+
+// ======================> abc838_device
+
+class abc838_device :  public luxor_55_21046_device
+{
+public:
+	// construction/destruction
+	abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
+};
+
+
 // device type definition
 extern const device_type LUXOR_55_21046;
+extern const device_type ABC830;
+extern const device_type ABC832;
+extern const device_type ABC834;
+extern const device_type ABC838;
 
 
 // default input ports
-extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc830_fast )[];
-extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc832_fast )[];
-extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc834_fast )[];
-extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc838_fast )[];
 extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc850_fast )[];
 
 
