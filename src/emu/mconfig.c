@@ -65,6 +65,12 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 							device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, slot->card_clock(selval));
 							found = true;
 
+							const char *default_bios = slot->card_default_bios(selval);
+							if (default_bios != NULL)
+							{
+								device_t::static_set_default_bios_tag(*new_dev, default_bios);
+							}
+
 							machine_config_constructor additions = slot->card_machine_config(selval);
 							if (additions != NULL)
 								(*additions)(const_cast<machine_config &>(*this), new_dev);

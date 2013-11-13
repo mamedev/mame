@@ -92,6 +92,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_machine_config(mconfig),
 		m_static_config(NULL),
 		m_input_defaults(NULL),
+		m_default_bios_tag(""),
 
 		m_machine(NULL),
 		m_save(NULL),

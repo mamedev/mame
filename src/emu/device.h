@@ -141,6 +141,7 @@ public:
 	ioport_constructor input_ports() const { return device_input_ports(); }
 	UINT8 default_bios() const { return m_default_bios; }
 	UINT8 system_bios() const { return m_system_bios; }
+	astring default_bios_tag() const { return m_default_bios_tag; }
 
 	// interface helpers
 	template<class _DeviceClass> bool interface(_DeviceClass *&intf) { intf = dynamic_cast<_DeviceClass *>(this); return (intf != NULL); }
@@ -175,6 +176,7 @@ public:
 	static void static_set_clock(device_t &device, UINT32 clock);
 	static void static_set_static_config(device_t &device, const void *config) { device.m_static_config = config; }
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
+	static void static_set_default_bios_tag(device_t &device, const char *tag) { astring default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
 
 	// state helpers
 	void config_complete();
@@ -278,6 +280,8 @@ protected:
 
 	UINT8                   m_system_bios;          // the system BIOS we wish to load
 	UINT8                   m_default_bios;         // the default system BIOS
+	astring                 m_default_bios_tag;     // tag of the default system BIOS
+
 private:
 	// private helpers
 	device_t *add_subdevice(device_type type, const char *tag, UINT32 clock);

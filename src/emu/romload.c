@@ -282,15 +282,15 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
     from SystemBios structure and OPTION_BIOS
 -------------------------------------------------*/
 
-static void determine_bios_rom(romload_private *romdata, device_t *device,const char *specbios)
+static void determine_bios_rom(romload_private *romdata, device_t *device, const char *specbios)
 {
 	const char *defaultname = NULL;
 	const rom_entry *rom;
 	int default_no = 1;
 	int bios_count = 0;
 
-
 	device->set_system_bios(0);
+
 	/* first determine the default BIOS name */
 	for (rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
@@ -1498,6 +1498,9 @@ void rom_init(running_machine &machine)
 				specbios = romdata->machine().options().bios();
 			} else {
 				specbios = romdata->machine().options().sub_value(temp,device->owner()->tag()+1,"bios");
+				if (strlen(specbios) == 0) {
+					specbios = device->default_bios_tag().cstr();
+				}
 			}
 			determine_bios_rom(romdata, device, specbios);
 		}
