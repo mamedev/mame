@@ -14,10 +14,10 @@
 
 #define TIME_PER_SECTOR                     (attotime::from_usec(100))
 #define TIME_PER_ROTATION                   (attotime::from_hz(5400/60))
-#define TIME_MULTIPLE_SECTORS               (attotime::from_usec(50))
+#define TIME_MULTIPLE_SECTORS               (attotime::from_nsec(400))
 
 #define TIME_SEEK_MULTISECTOR               (attotime::from_usec(13000))
-#define TIME_NO_SEEK_MULTISECTOR            (attotime::from_usec(1000))
+#define TIME_NO_SEEK_MULTISECTOR            (attotime::from_usec(1500))
 
 ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
 	: ata_hle_device(mconfig, type, name, tag, owner, clock, shortname, source),
