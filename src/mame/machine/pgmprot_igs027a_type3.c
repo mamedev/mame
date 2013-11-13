@@ -265,16 +265,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	// behavior is basically the same as killing blade plus here, this code
 	// could be very wrong
 	base = 0x30;
-	temp16[(base) /2] = 0x00D3; base += 2;
-	temp16[(base) /2] = 0xE3A0; base += 2;
-	temp16[(base) /2] = 0xF000; base += 2;
-	temp16[(base) /2] = 0xE121; base += 2;
-	temp16[(base) /2] = 0x1A01; base += 2;
-	temp16[(base) /2] = 0xE3A0; base += 2;
-	temp16[(base) /2] = 0x2B01; base += 2;
-	temp16[(base) /2] = 0xE3A0; base += 2;
-	temp16[(base) /2] = 0xD801; base += 2;
-	temp16[(base) /2] = 0xE082; base += 2;
+
 	temp16[(base) /2] = 0x00D2; base += 2;
 	temp16[(base) /2] = 0xE3A0; base += 2;
 	temp16[(base) /2] = 0xF000; base += 2;
@@ -348,8 +339,28 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	temp16[(base) /2] = 0x6000; base += 2;
 	temp16[(base) /2] = 0xE587; base += 2;
 	
-	
-	temp16[(base) /2] = 0x002b; base += 2; // jump to 0x184
+	// set the SR13 to something sensible
+	temp16[(base) /2] = 0x00D3; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0x4001; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x4B06; base += 2;
+	temp16[(base) /2] = 0xE284; base += 2;
+	temp16[(base) /2] = 0x0CF2; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xD804; base += 2;
+	temp16[(base) /2] = 0xE080; base += 2;
+
+	temp16[(base) /2] = 0x0013; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+
+
+
+	temp16[(base) /2] = 0x0028; base += 2; // jump to 0x184
 	temp16[(base) /2] = 0xEA00; base += 2;
 
 
@@ -412,7 +423,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 
 	// this is the location of the region in the internal rom, for some reaosn Japan doesn't play attract music (original game feature? bad code flow?)
 	base = 0x3316;
-	temp16[(base) / 2] = 0x0005; base += 2;
+	temp16[(base) / 2] = 0x0006; base += 2;
 
 
 #if 0
