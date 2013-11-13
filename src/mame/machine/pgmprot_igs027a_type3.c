@@ -234,9 +234,15 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 
 	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
 
+	int i;
+	for (i=0;i<0x188/2;i+=2)
+	{
+		temp16[i] = 0xFFFE;
+		temp16[i+1] = 0xEAFF;
 
+	}
 
-
+	 
 
 
 
@@ -340,7 +346,9 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	temp16[(base) /2] = 0xE080; base += 2;
 	temp16[(base) /2] = 0x6000; base += 2;
 	temp16[(base) /2] = 0xE587; base += 2;
-	temp16[(base) /2] = 0x002c; base += 2;
+	
+	
+	temp16[(base) /2] = 0x002b; base += 2; // jump to 0x184
 	temp16[(base) /2] = 0xEA00; base += 2;
 
 
@@ -394,17 +402,26 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	temp16[(base) /2] = 0xff1e; base += 2;
 	temp16[(base) /2] = 0xe12f; base += 2;
 
+	// the non-EO area starts in the middle of a function that seems similar to those  at 000037E4 / 000037D4 in killbldp.. by setting this up we allow the intro to run, but can no longer can get in game..
+	// it sets '0x10000038' to a value ot 1
+	// maybe this flag needs to be flipped on interrupts or similar??
+	base = 0x184;
+	temp16[(base) /2] = 0x105c; base += 2;
+	temp16[(base) /2] = 0xE59F; base += 2;
 
-#if 0
+
+
+
+#if 1
 	m_svg_ram_sel = 1;
 
-	for (int i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		UINT16 *share16;
 		share16 = (UINT16 *)(m_svg_shareram[1]);
-		share16[i / 2] = 0x0002;
+		share16[i / 2] = 0x0003;
 		share16 = (UINT16 *)(m_svg_shareram[0]);
-		share16[i / 2] = 0x0002;
+		share16[i / 2] = 0x0003;
 	}
 #endif
 
@@ -443,6 +460,19 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
 	svg_latch_init();
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::killbldp_speedup_r),this));
+
+	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
+	int base = 0xfc;
+	temp16[(base) /2] = 0x0000; base += 2;	
+	temp16[(base) /2] = 0xE1A0; base += 2;	
+	
+	base = 0xd4;
+	temp16[(base) /2] = 0x0000; base += 2;	
+	temp16[(base) /2] = 0xE1A0; base += 2;	
+
+//	base = 0x120;
+//	temp16[(base) /2] = 0x0000; base += 2;	
+//	temp16[(base) /2] = 0xE1A0; base += 2;	
 
 }
 
