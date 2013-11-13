@@ -77,8 +77,7 @@ machine_config_constructor abc894_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc850 )
-	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "fast")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc850_fast)
+	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "abc850fdd")
 	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, "xebec")
 	MCFG_DEVICE_CARD_DEFAULT_BIOS("xebec", "ro202")
 	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_cards, NULL)
@@ -105,8 +104,7 @@ machine_config_constructor abc850_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc852 )
-	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "fast")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc850_fast)
+	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "abc850fdd")
 	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, "xebec")
 	MCFG_DEVICE_CARD_DEFAULT_BIOS("xebec", "basf6185")
 	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_cards, NULL)
@@ -133,8 +131,7 @@ machine_config_constructor abc852_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc856 )
-	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "fast")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fast", abc850_fast)
+	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_cards, "abc850fdd")
 	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_cards, "xebec")
 	MCFG_DEVICE_CARD_DEFAULT_BIOS("xebec", "micr1325")
 	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_cards, NULL)

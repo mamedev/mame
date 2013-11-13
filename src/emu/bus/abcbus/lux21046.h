@@ -171,16 +171,27 @@ public:
 };
 
 
+// ======================> abc850_floppy_device
+
+class abc850_floppy_device :  public luxor_55_21046_device
+{
+public:
+	// construction/destruction
+	abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
+};
+
+
 // device type definition
 extern const device_type LUXOR_55_21046;
 extern const device_type ABC830;
 extern const device_type ABC832;
 extern const device_type ABC834;
 extern const device_type ABC838;
-
-
-// default input ports
-extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc850_fast )[];
+extern const device_type ABC850_FLOPPY;
 
 
 

@@ -101,6 +101,7 @@ const device_type ABC830 = &device_creator<abc830_device>;
 const device_type ABC832 = &device_creator<abc832_device>;
 const device_type ABC834 = &device_creator<abc834_device>;
 const device_type ABC838 = &device_creator<abc838_device>;
+const device_type ABC850_FLOPPY = &device_creator<abc850_floppy_device>;
 
 
 //-------------------------------------------------
@@ -317,6 +318,16 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
+//  MACHINE_CONFIG( abc850 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( abc850, luxor_55_21046 )
+	MCFG_DEVICE_MODIFY(SAB1793_TAG":1")
+	MCFG_DEVICE_SLOT_INTERFACE(abc_floppies, NULL, false)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
 //-------------------------------------------------
@@ -329,6 +340,11 @@ machine_config_constructor luxor_55_21046_device::device_mconfig_additions() con
 machine_config_constructor abc838_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( abc838 );
+}
+
+machine_config_constructor abc850_floppy_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( abc850 );
 }
 
 
@@ -599,6 +615,56 @@ INPUT_PORTS_END
 
 
 //-------------------------------------------------
+//  INPUT_PORTS( abc850 )
+//-------------------------------------------------
+
+INPUT_PORTS_START( abc850 )
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x01, "Double" )
+	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x02, "Double" )
+	PORT_DIPNAME( 0x04, 0x04, "Drive 0 Tracks" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPSETTING(    0x04, "80" )
+	PORT_DIPNAME( 0x08, 0x08, "Drive 1 Tracks" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPSETTING(    0x08, "80" )
+
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x0f, 0x02, "Drive Type" ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x01, "TEAC FD55F" )
+	PORT_DIPSETTING(    0x02, "BASF 6138" )
+
+	PORT_START("SW3")
+	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
+	PORT_DIPSETTING(    0x2c, "44" )
+	
+	PORT_START("S1") // also S3,S5
+	PORT_DIPNAME( 0x01, 0x01, "Interface Type" )
+	PORT_DIPSETTING(    0x00, "ABC 1600" )
+	PORT_DIPSETTING(    0x01, "ABC 80/800/802/806" )
+
+	PORT_START("S6")
+	PORT_DIPNAME( 0x01, 0x01, "RAM Size" )
+	PORT_DIPSETTING(    0x00, "2 KB" )
+	PORT_DIPSETTING(    0x01, "8 KB" )
+
+	PORT_START("S8")
+	PORT_DIPNAME( 0x01, 0x01, "Drive Type" )
+	PORT_DIPSETTING(    0x00, "8\"" )
+	PORT_DIPSETTING(    0x01, "5.25\"" )
+
+	PORT_START("S9")
+	PORT_DIPNAME( 0x01, 0x01, "RDY Pin" )
+	PORT_DIPSETTING(    0x00, "P2-6 (8\")" )
+	PORT_DIPSETTING(    0x01, "P2-34 (5.25\")" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
@@ -625,6 +691,11 @@ ioport_constructor abc834_device::device_input_ports() const
 ioport_constructor abc838_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( abc838 );
+}
+
+ioport_constructor abc850_floppy_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( abc850 );
 }
 
 
@@ -694,6 +765,11 @@ abc834_device::abc834_device(const machine_config &mconfig, const char *tag, dev
 
 abc838_device::abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: luxor_55_21046_device(mconfig, ABC838, "ABC 838", tag, owner, clock, "lux21046", __FILE__)
+{
+}
+
+abc850_floppy_device::abc850_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: luxor_55_21046_device(mconfig, ABC850_FLOPPY, "ABC 850 floppy", tag, owner, clock, "lux21046", __FILE__)
 {
 }
 
@@ -1057,19 +1133,3 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 
 	return data ^ 0xff;
 }
-
-
-
-//**************************************************************************
-//  LUXOR 55 21046 DEVICE INPUT DEFAULTS
-//**************************************************************************
-
-//-------------------------------------------------
-//  DEVICE_INPUT_DEFAULTS( abc850_fast )
-//-------------------------------------------------
-
-DEVICE_INPUT_DEFAULTS_START( abc850_fast )
-	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x0f)
-	DEVICE_INPUT_DEFAULTS("SW2", 0x0f, DRIVE_BASF_6138)
-	DEVICE_INPUT_DEFAULTS("SW3", 0x7f, ADDRESS_ABC832)
-DEVICE_INPUT_DEFAULTS_END
