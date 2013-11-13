@@ -126,11 +126,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vax11 )
 INPUT_PORTS_END
 
-static const struct t11_setup vax11_data =
-{
-	0 << 13
-};
-
 WRITE8_MEMBER( vax11_state::kbd_put )
 {
 	m_term_data = data;
@@ -145,7 +140,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 static MACHINE_CONFIG_START( vax11, vax11_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
-	MCFG_CPU_CONFIG(vax11_data)
+	MCFG_T11_INITIAL_MODE(0 << 13)
 	MCFG_CPU_PROGRAM_MAP(vax11_mem)
 
 	/* video hardware */

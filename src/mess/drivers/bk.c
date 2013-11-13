@@ -154,10 +154,6 @@ static INPUT_PORTS_START( bk0010 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS)   // this alone acts like Enter and gives no result with Shift
 INPUT_PORTS_END
 
-static const struct t11_setup t11_data =
-{
-	0x36ff          /* initial mode word has DAL15,14,11,8 pulled low */
-};
 
 /* Machine driver */
 static const cassette_interface bk0010_cassette_interface =
@@ -173,7 +169,7 @@ static const cassette_interface bk0010_cassette_interface =
 static MACHINE_CONFIG_START( bk0010, bk_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", T11, 3000000)
-	MCFG_CPU_CONFIG(t11_data)
+	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
 	MCFG_CPU_PROGRAM_MAP(bk0010_mem)
 
 

@@ -85,15 +85,11 @@ UINT32 terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static const struct t11_setup t11_data =
-{
-	6 << 13
-};
 
 static MACHINE_CONFIG_START( terak, terak_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz)
-	MCFG_CPU_CONFIG(t11_data)
+	MCFG_T11_INITIAL_MODE(6 << 13)
 	MCFG_CPU_PROGRAM_MAP(terak_mem)
 
 

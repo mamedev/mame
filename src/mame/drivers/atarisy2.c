@@ -1217,17 +1217,11 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static const struct t11_setup t11_data =
-{
-	0x36ff          /* initial mode word has DAL15,14,11,8 pulled low */
-};
-
-
 static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", T11, MASTER_CLOCK/2)
-	MCFG_CPU_CONFIG(t11_data)
+	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy2_state,  vblank_int)
 

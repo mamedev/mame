@@ -133,10 +133,6 @@ void ms0515_state::machine_reset()
 static INPUT_PORTS_START( ms0515 )
 INPUT_PORTS_END
 
-static const struct t11_setup ms0515_data =
-{
-	0xf2ff
-};
 
 static const wd17xx_interface ms0515_wd17xx_interface =
 {
@@ -254,7 +250,7 @@ I8255A_INTERFACE( ms0515_ppi8255_interface_1 )
 static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
-	MCFG_CPU_CONFIG(ms0515_data)
+	MCFG_T11_INITIAL_MODE(0xf2ff)
 	MCFG_CPU_PROGRAM_MAP(ms0515_mem)
 
 	MCFG_FD1793_ADD( "vg93", ms0515_wd17xx_interface )

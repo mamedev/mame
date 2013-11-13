@@ -322,16 +322,11 @@ void galaxygame_state::machine_reset()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxygame_state::galaxygame_irq_callback),this));
 }
 
-static const struct t11_setup t11_data =
-{
-	5 << 13
-};
-
 static MACHINE_CONFIG_START( galaxygame, galaxygame_state )
 
 	MCFG_CPU_ADD("maincpu", T11, 3000000 )
 	MCFG_CPU_PROGRAM_MAP(galaxygame_map)
-	MCFG_CPU_CONFIG(t11_data)
+	MCFG_T11_INITIAL_MODE(5 << 13)
 	MCFG_CPU_PERIODIC_INT_DRIVER(galaxygame_state, galaxygame_irq, 60)
 
 	/* video hardware */

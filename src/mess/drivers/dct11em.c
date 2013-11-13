@@ -46,15 +46,11 @@ UINT32 dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static const struct t11_setup t11_data =
-{
-	0x1403          /* according to specs */
-};
 
 static MACHINE_CONFIG_START( dct11em, dct11em_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, 7500000) // 7.5MHz XTAL
-	MCFG_CPU_CONFIG(t11_data)
+	MCFG_T11_INITIAL_MODE(0x1403)  /* according to specs */
 	MCFG_CPU_PROGRAM_MAP(dct11em_mem)
 
 

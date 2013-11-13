@@ -331,15 +331,6 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 	m_maincpu->set_state_int(T11_PC, 0xea00);
 }
 
-static const struct t11_setup pdp11_data =
-{
-	6 << 13
-};
-
-static const struct t11_setup mxv11_data =
-{
-	0 << 13
-};
 
 WRITE8_MEMBER( pdp11_state::kbd_put )
 {
@@ -355,7 +346,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 static MACHINE_CONFIG_START( pdp11, pdp11_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
-	MCFG_CPU_CONFIG(pdp11_data)
+	MCFG_T11_INITIAL_MODE(6 << 13)
 	MCFG_CPU_PROGRAM_MAP(pdp11_mem)
 
 
@@ -373,7 +364,7 @@ static MACHINE_CONFIG_DERIVED( pdp11qb, pdp11 )
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CONFIG(mxv11_data)
+	MCFG_T11_INITIAL_MODE(0 << 13)
 	MCFG_CPU_PROGRAM_MAP(pdp11qb_mem)
 MACHINE_CONFIG_END
 
