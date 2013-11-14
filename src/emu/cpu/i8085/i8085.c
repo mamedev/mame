@@ -219,7 +219,7 @@ const device_type I8085A = &device_creator<i8085a_cpu_device>;
 
 
 i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, I8085A, "MCS-85 8085A", tag, owner, clock, "i8085a", __FILE__)
+	: cpu_device(mconfig, I8085A, "8085A", tag, owner, clock, "i8085a", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	, m_out_status_func(*this)
@@ -245,13 +245,13 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 
 
 i8080_cpu_device::i8080_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: i8085a_cpu_device(mconfig, I8080, "MCS-80 8080", tag, owner, clock, "i8080", __FILE__, CPUTYPE_8080)
+	: i8085a_cpu_device(mconfig, I8080, "8080", tag, owner, clock, "i8080", __FILE__, CPUTYPE_8080)
 {
 }
 
 
 i8080a_cpu_device::i8080a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: i8085a_cpu_device(mconfig, I8080A, "MCS-80 8080A", tag, owner, clock, "i8080a", __FILE__, CPUTYPE_8080)
+	: i8085a_cpu_device(mconfig, I8080A, "8080A", tag, owner, clock, "i8080a", __FILE__, CPUTYPE_8080)
 {
 }
 
