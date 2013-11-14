@@ -208,14 +208,14 @@ public:
 	// construction/destruction
 	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	//! driver interface to RAM
-	UINT16 read_ram(offs_t offset);
-	void write_ram(offs_t offset, UINT16 data);
-
 	//! driver interface to set diablo_hd_device
 	void set_diablo(int unit, diablo_hd_device* ptr);
 
 	void next_sector(int unit);
+
+	DECLARE_ADDRESS_MAP( ucode_map, 32 );
+	DECLARE_ADDRESS_MAP( const_map, 16 );
+	DECLARE_ADDRESS_MAP( iomem_map, 16 );
 
 protected:
 	//! device-level override for start
@@ -286,14 +286,40 @@ private:
 	void fatal(int level, const char *format, ...);
 
 	address_space_config m_ucode_config;
-
-	required_memory_region m_ucode_map;
+	address_space_config m_const_config;
+	address_space_config m_iomem_config;
 
 	address_space *m_ucode;
-	UINT16* m_const;
+	address_space *m_const;
+	address_space *m_iomem;
 
-	UINT8* m_ucode_proms;
-	UINT8* m_const_proms;
+	UINT8* m_ucode_crom;
+	UINT8* m_ucode_cram;
+	UINT8* m_const_data;
+
+	//! read microcode CROM
+	DECLARE_READ32_MEMBER ( crom_r );
+
+	//! read microcode CRAM
+	DECLARE_READ32_MEMBER ( cram_r );
+
+	//! write microcode CRAM
+	DECLARE_WRITE32_MEMBER( cram_w );
+
+	//! read constants PROM
+	DECLARE_READ16_MEMBER ( const_r );
+
+	//! read i/o space RAM
+	DECLARE_READ16_MEMBER ( ioram_r );
+
+	//!< write i/o space RAM
+	DECLARE_WRITE16_MEMBER( ioram_w );
+
+	//!< read memory mapped i/o
+	DECLARE_READ16_MEMBER ( mmio_r );
+
+	//!< write memory mapped i/o
+	DECLARE_WRITE16_MEMBER( mmio_w );
 
 	int m_icount;
 
@@ -1723,8 +1749,8 @@ private:
 	};
 
 	struct {
-		UINT32 ram[ALTO2_RAM_SIZE/4];		//!< main memory organized as double-words
-		UINT8 hpb[ALTO2_RAM_SIZE/4];		//!< Hamming code (6) and Parity bits (1) per double word
+		UINT32* ram;						//!< main memory organized as double-words
+		UINT8* hpb;							//!< Hamming Code bits (6) and Parity bits (1) per double word
 		UINT32 mar;							//!< memory address register
 		UINT32 rmdd;						//!< read memory data double-word
 		UINT32 wmdd;						//!< write memory data double-word

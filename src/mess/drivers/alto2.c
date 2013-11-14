@@ -8,29 +8,6 @@
 
 #include "includes/alto2.h"
 
-// FIXME: Is this required? The driver does not have/need access to RAM
-READ16_MEMBER( alto2_state::alto2_ram_r )
-{
-	return downcast<alto2_cpu_device *>(m_maincpu.target())->read_ram(offset);
-}
-
-// FIXME: Is this required? The driver does not have/need access to RAM
-WRITE16_MEMBER( alto2_state::alto2_ram_w )
-{
-	downcast<alto2_cpu_device *>(m_maincpu.target())->write_ram(offset, data);
-}
-
-/* Memory Maps */
-
-ADDRESS_MAP_EXTERN( alto2_ucode_map, 32 );
-
-/* main memory and memory mapped i/o in range ALTO2_IO_PAGE_BASE ... ALTO2_IO_PAGE_BASE + ALTO2_IO_PAGE_SIZE - 1 */
-ADDRESS_MAP_START( alto2_ram_map, AS_2, 16, alto2_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0, ALTO2_RAM_SIZE-1) AM_READWRITE(alto2_ram_r,  alto2_ram_w)
-ADDRESS_MAP_END
-
-
 /* Video */
 
 UINT32 alto2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -232,10 +209,27 @@ INPUT_PORTS_END
 
 /* ROM */
 ROM_START( alto2 )
-	// decoded micro code region - driver side view on the memory
-	ROM_REGION32_BE( sizeof(UINT32)*ALTO2_UCODE_SIZE, "maincpu", 0 )
-	ROM_FILL(0, sizeof(UINT32)*ALTO2_UCODE_SIZE, ALTO2_UCODE_INVERTED)
+	// dummy region for the maincpu
+	ROM_REGION( 1, "maincpu", 0 )
+	ROM_FILL(0, 1, ALTO2_UCODE_INVERTED)
 ROM_END
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
+
+ADDRESS_MAP_START( alto2_ucode_map, AS_0, 32, alto2_state )
+	AM_RANGE(0, ALTO2_UCODE_SIZE-1) AM_DEVICE32( "maincpu", alto2_cpu_device, ucode_map, 0xffffffffUL )
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START( alto2_const_map, AS_1, 16, alto2_state )
+	AM_RANGE(0, ALTO2_CONST_SIZE-1) AM_DEVICE16( "maincpu", alto2_cpu_device, const_map, 0xffffU )
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START( alto2_iomem_map, AS_2, 16, alto2_state )
+	AM_RANGE(0, ALTO2_RAM_SIZE-1)   AM_DEVICE16( "maincpu", alto2_cpu_device, iomem_map, 0xffffU )
+ADDRESS_MAP_END
+
 
 /* Palette Initialization */
 
@@ -249,7 +243,8 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ALTO2, XTAL_20_16MHz)
 	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
-	MCFG_CPU_IO_MAP(alto2_ram_map)
+	MCFG_CPU_DATA_MAP(alto2_const_map)
+	MCFG_CPU_IO_MAP(alto2_iomem_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -266,16 +261,13 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER( alto2_state, alto2 )
 {
-	// make a copy for the front end, i.e. the driver view on the micro code
-	memcpy(memregion("maincpu"), memregion("maincpu:ucode"), sizeof(UINT32)*ALTO2_UCODE_SIZE);
-
 	// make the diablo drives known to the CPU core
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
 	cpu->set_diablo(0, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_0)));
 	cpu->set_diablo(1, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_1)));
 
 #define	UNICODE_TESTING	0
-#ifdef	UNICODE_TESTING
+#if	UNICODE_TESTING
 	const char* filename = "docs/UnicodeData.txt";
 	int res = unicode_data_load(filename);
 	logerror("%s: unicode_data_load(\"%s\") result %d\n", filename, __FUNCTION__, res);

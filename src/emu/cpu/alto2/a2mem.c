@@ -837,6 +837,10 @@ void alto2_cpu_device::init_memory()
 		mmio_write_fn[addr] = &alto2_cpu_device::bad_mmio_write_fn;
 	}
 
+	// allocate 128KB of main memory
+	m_mem.ram = global_alloc_array(UINT32, ALTO2_RAM_SIZE);
+	m_mem.hpb = global_alloc_array(UINT8,  ALTO2_RAM_SIZE);
+
 	/**
 	 * <PRE>
 	 * TODO: use madr.a65 and madr.a64 to determine the actual I/O address ranges

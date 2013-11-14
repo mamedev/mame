@@ -32,8 +32,6 @@ public:
 
 	bitmap_ind16 m_bitmap;
 
-	DECLARE_READ16_MEMBER(alto2_ram_r);
-	DECLARE_WRITE16_MEMBER(alto2_ram_w);
 	DECLARE_DRIVER_INIT(alto2);
 
 	virtual void palette_init();

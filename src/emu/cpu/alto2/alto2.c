@@ -17,15 +17,23 @@
 //**************************************************************************
 
 const device_type ALTO2 = &device_creator<alto2_cpu_device>;
-
-ADDRESS_MAP_START( alto2_ucode_map, AS_0, 32, alto2_cpu_device )
-	AM_RANGE(0,                    ALTO2_UCODE_RAM_BASE-1) AM_ROM
-	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE-1)     AM_RAM
-ADDRESS_MAP_END
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
+
+DEVICE_ADDRESS_MAP_START( ucode_map, 32, alto2_cpu_device )
+	AM_RANGE(0,                    ALTO2_UCODE_RAM_BASE - 1)  AM_READ     ( crom_r )
+	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE - 1)      AM_READWRITE( cram_r, cram_w )
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START( const_map, 16, alto2_cpu_device )
+	AM_RANGE(0,                    ALTO2_CONST_SIZE - 1)      AM_READ     ( const_r )
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START( iomem_map, 16, alto2_cpu_device )
+	AM_RANGE(0,                    ALTO2_IO_PAGE_BASE - 1)    AM_READWRITE( ioram_r, ioram_w )
+	AM_RANGE(ALTO2_IO_PAGE_BASE,   0177777)                   AM_READWRITE( mmio_r,  mmio_w )
+ADDRESS_MAP_END
 
 //-------------------------------------------------
 //  alto2_cpu_device - constructor
@@ -38,11 +46,17 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_log_level(9),
 	m_log_newline(true),
 #endif
-	m_ucode_config("alto2", ENDIANNESS_BIG, 32, 14, -2, ADDRESS_MAP_NAME(alto2_ucode_map)),
-	m_ucode_map(*this, ":maincpu:ucode"),
+	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
+	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
+	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
 	m_ucode(0),
-	m_ucode_proms(0),
-	m_const_proms(0),
+	m_const(0),
+	m_iomem(0),
+//	m_ucode_map(*this, "^maincpu"),
+//	m_const_map(*this, "^const"),
+//	m_iomem_map(*this, "^iomem"),
+	m_ucode_crom(0),
+	m_const_data(0),
 	m_icount(0),
 	m_task_mpc(),
 	m_task_next2(),
@@ -117,20 +131,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 }
 
 //-------------------------------------------------
-// driver interface to RAM
-//-------------------------------------------------
-
-UINT16 alto2_cpu_device::read_ram(offs_t offset)
-{
-	return debug_read_mem(offset);
-}
-
-void alto2_cpu_device::write_ram(offs_t offset, UINT16 data)
-{
-	debug_write_mem(offset, data);
-}
-
-//-------------------------------------------------
 // driver interface to set diablo_hd_device
 //-------------------------------------------------
 
@@ -144,10 +144,6 @@ void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
 //-------------------------------------------------
 
 ROM_START( alto2_cpu )
-	// decoded micro code region
-	ROM_REGION32_BE( sizeof(UINT32)*ALTO2_UCODE_SIZE, "ucode", 0 )
-	ROM_FILL(0, sizeof(UINT32)*ALTO2_UCODE_SIZE, ALTO2_UCODE_INVERTED)
-
 	ROM_REGION( 16 * 02000, "ucode_proms", 0 )
 	ROM_LOAD( "55x.3",     0*02000, 0x400, CRC(de870d75) SHA1(2b98cc769d8302cb39948711424d987d94e4159b) )	//!< 00000-01777 RSEL(0)',RSEL(1)',RSEL(2)',RSEL(3)'
 	ROM_LOAD( "64x.3",     1*02000, 0x400, CRC(51b444c0) SHA1(8756e51f7f3253a55d75886465beb7ee1be6e1c4) )	//!< 00000-01777 RSEL(4)',ALUF(0)',ALUF(1)',ALUF(2)'
@@ -249,6 +245,10 @@ const address_space_config*alto2_cpu_device::memory_space_config(address_spacenu
 {
 	if (AS_0 == spacenum)
 		return &m_ucode_config;
+	if (AS_1 == spacenum)
+		return &m_const_config;
+	if (AS_2 == spacenum)
+		return &m_iomem_config;
 	return NULL;
 }
 
@@ -855,37 +855,20 @@ static const prom_load_t pl_enet_a49 =
 void alto2_cpu_device::device_start()
 {
 	m_ucode = &space(AS_0);
-	m_ucode_proms = prom_load(pl_ucode, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
-	UINT32* p_ucode = reinterpret_cast<UINT32 *>(memregion(":maincpu:ucode")->base());
-	for (offs_t offs = 0; offs < ALTO2_UCODE_RAM_BASE; offs++) {
-		UINT32 data = (m_ucode_proms[4*offs+0] << 0) | (m_ucode_proms[4*offs+1] << 8) |
-				 (m_ucode_proms[4*offs+2] << 16) | (m_ucode_proms[4*offs+3] << 24);
-#if	DEBUG_UCODE_CONST_DATA
-		if (0 == offs % 8)
-			printf("%04x:", offs);
-		printf(" %08x",  data);
-		if (7 == offs % 8)
-			printf("\n");
-#endif
-		p_ucode[offs] = data;
-	}
-	for (offs_t offs = ALTO2_UCODE_RAM_BASE; offs < ALTO2_UCODE_SIZE; offs++) {
-		p_ucode[offs] = ALTO2_UCODE_INVERTED;
-	}
+	m_const = &space(AS_1);
+	m_iomem = &space(AS_2);
 
-	m_const_proms = prom_load(pl_const, memregion("const_proms")->base(), 1, 4);
-	m_const = reinterpret_cast<UINT16 *>(global_alloc_array(UINT16, ALTO2_CONST_SIZE));
-	for (offs_t offs = 0; offs < ALTO2_CONST_SIZE; offs++) {
-		UINT16 data = (m_const_proms[2*offs+0] << 0) | (m_const_proms[2*offs+1] << 8);
-#if	DEBUG_UCODE_CONST_DATA
-		if (0 == offs % 8)
-			printf("%04x:", offs);
-		printf(" %04x",  data);
-		if (7 == offs % 8)
-			printf("\n");
-#endif
-		m_const[offs] = data;
-	}
+	// decode micro code PROMs to CROM
+	m_ucode_crom = prom_load(pl_ucode, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
+
+	// allocate micro code CRAM
+	m_ucode_cram = global_alloc_array(UINT8, sizeof(UINT32) * ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE);
+	// fill with inverted bits value
+	for (offs_t offset = 0; offset < ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE; offset++)
+		*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = ALTO2_UCODE_INVERTED;
+
+	// decode constant PROMs to const data
+	m_const_data = prom_load(pl_const, memregion("const_proms")->base(), 1, 4);
 
 	m_disp_a38 = prom_load(&pl_displ_a38, memregion("displ_a38")->base());
 	m_disp_a63 = prom_load(&pl_displ_a63, memregion("displ_a63")->base());
@@ -1109,6 +1092,67 @@ void alto2_cpu_device::device_start()
 	m_icountptr = &m_icount;
 
 	hard_reset();
+}
+
+//! read microcode CROM
+READ32_MEMBER ( alto2_cpu_device::crom_r )
+{
+	return *reinterpret_cast<UINT32 *>(m_ucode_crom + offset * 4);
+}
+
+//! read microcode CRAM
+READ32_MEMBER ( alto2_cpu_device::cram_r )
+{
+	return *reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4);
+}
+
+//! write microcode CRAM
+WRITE32_MEMBER( alto2_cpu_device::cram_w )
+{
+	*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = data;
+}
+
+//! read constants PROM
+READ16_MEMBER ( alto2_cpu_device::const_r )
+{
+	return *reinterpret_cast<UINT16 *>(m_const_data + offset * 2);
+}
+
+#define	PUT_EVEN(dword,word)			A2_PUT32(dword,32, 0,15,word)
+#define	GET_EVEN(dword)					A2_GET32(dword,32, 0,15)
+#define	PUT_ODD(dword,word)				A2_PUT32(dword,32,16,31,word)
+#define	GET_ODD(dword)					A2_GET32(dword,32,16,31)
+
+//! read i/o space RAM
+READ16_MEMBER ( alto2_cpu_device::ioram_r )
+{
+	offs_t dword_addr = offset / 2;
+	return offset & 1 ? GET_ODD(m_mem.ram[dword_addr]) : GET_EVEN(m_mem.ram[dword_addr]);
+}
+
+//! write i/o space RAM
+WRITE16_MEMBER( alto2_cpu_device::ioram_w )
+{
+	offs_t dword_addr = offset / 2;
+	if (offset & 1)
+		PUT_ODD(m_mem.ram[dword_addr], data);
+	else
+		PUT_EVEN(m_mem.ram[dword_addr], data);
+}
+
+//! read memory mapped i/o
+READ16_MEMBER ( alto2_cpu_device::mmio_r )
+{
+	if (mmio_read_fn[offset])
+		return ((*this).*mmio_read_fn[offset])(offset);
+	return 0177777;
+}
+
+//! write memory mapped i/o
+WRITE16_MEMBER( alto2_cpu_device::mmio_w )
+{
+	if (mmio_write_fn[offset])
+		return ((*this).*mmio_write_fn[offset])(offset, data);
 }
 
 //-------------------------------------------------
@@ -2478,7 +2522,7 @@ void alto2_cpu_device::execute_run()
 		 */
 		if (!do_bs || bs >= 4) {
 			int addr = 8 * m_rsel + bs;
-			UINT16 data = m_const[addr];
+			UINT16 data = m_const->read_dword(m_const->address_to_byte(addr));
 			LOG((LOG_CPU,2,"	%#o; BUS &= CONST[%03o]\n", data, addr));
 			m_bus &= data;
 		}
@@ -2968,6 +3012,7 @@ void alto2_cpu_device::hard_reset()
 
 	init_disk();
 	init_disp();
+	init_memory();
 	init_hardware();
 	init_kbd();
 
