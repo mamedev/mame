@@ -63,7 +63,7 @@
 diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, DIABLO_HD, "Diablo Disk", tag, owner, clock, "diablo_hd", __FILE__),
 #if	DIABLO_DEBUG
-	m_log_level(9),
+	m_log_level(6),
 #endif
 	m_diablo31(true),
 	m_unit(0),
@@ -273,40 +273,43 @@ void diablo_hd_device::read_sector()
 {
 	/* If there's no drive, just reset the page number */
 	if (!m_image) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d => no image\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 		m_page = -1;
 		return;
 	}
 	if (m_cylinder < 0 || m_cylinder >= DIABLO_CYLINDERS) {
-		LOG_DRIVE((9,"	DRIVE C/H/S:%d/%d/%d => invalid cylinder\n", m_cylinder, m_head, m_sector));
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d => invalid cylinder\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 		m_page = -1;
 		return;
 	}
 	if (m_head < 0 || m_head >= DIABLO_HEADS) {
-		LOG_DRIVE((9,"	DRIVE C/H/S:%d/%d/%d => invalid head\n", m_cylinder, m_head, m_sector));
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d => invalid head\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 		m_page = -1;
 		return;
 	}
 	if (m_sector < 0 || m_sector >= DIABLO_SPT) {
-		LOG_DRIVE((9,"	DRIVE C/H/S:%d/%d/%d => invalid sector\n", m_cylinder, m_head, m_sector));
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d => invalid sector\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 		m_page = -1;
 		return;
 	}
 	/* calculate the new disk relative sector offset */
 	m_page = DRIVE_PAGE(m_cylinder, m_head, m_sector);
-	LOG_DRIVE((9,"	DRIVE C/H/S:%d/%d/%d => page:%d\n", m_cylinder, m_head, m_sector, m_page));
 
 	// already have the sector image?
-	if (m_cache[m_page])
+	if (m_cache[m_page]) {
+		LOG_DRIVE((6,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d => page:%d is cached\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector, m_page));
 		return;
+	}
 
 	/* allocate a buffer for this page */
 	m_cache[m_page] = global_alloc_array(UINT8, sizeof(diablo_sector_t));
 	/* and read the page from the hard_disk image */
-	if (!hard_disk_read(m_disk, m_page, m_cache[m_page])) {
-		LOG_DRIVE((0,"	read failed for #%d page #%d\n", m_unit, m_page));
+	if (hard_disk_read(m_disk, m_page, m_cache[m_page])) {
+		LOG_DRIVE((2,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d => page:%d loaded\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector, m_page));
+	} else {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d => page:%d read failed\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector, m_page));
 		global_free(m_cache[m_page]);
 		m_cache[m_page] = 0;
-		return;
 	}
 }
 
@@ -422,7 +425,7 @@ UINT32* diablo_hd_device::expand_sector()
 
 	/* allocate a sector buffer */
 	if (!m_cache[m_page]) {
-		LOG_DRIVE((0,"	no image for #%d page #%d\n", m_unit, m_page));
+		LOG_DRIVE((0,"[DHD]	%s: no image for #%d page #%d\n", __FUNCTION__, m_unit, m_page));
 		return NULL;
 	}
 	diablo_sector_t *s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page]);
@@ -469,9 +472,8 @@ UINT32* diablo_hd_device::expand_sector()
 	}
 	m_bits[m_page] = bits;
 
-	LOG_DRIVE((0,"	BITS #%d: %03d/%d/%02d #%-5d bits (@%03d.%02d)\n",
-		m_unit, m_cylinder, m_head, m_sector,
-		dst, dst / 32, dst % 32));
+	LOG_DRIVE((0,"[DHD]	%s: BITS #%d: %03d/%d/%02d #%-5d bits (@%03d.%02d)\n",
+		__FUNCTION__, m_unit, m_cylinder, m_head, m_sector, dst, dst / 32, dst % 32));
 
 	return bits;
 }
@@ -554,7 +556,7 @@ size_t diablo_hd_device::squeeze_sync(UINT32 *bits, size_t src, size_t size)
 		}
 	}
 	/* return if no sync found within size*32 clock and data bits */
-	LOG_DRIVE((0,"	no sync within %d words\n", size));
+	LOG_DRIVE((0,"[DHD]	%s: no sync within %d words\n", __FUNCTION__, size));
 	return src;
 }
 
@@ -589,7 +591,7 @@ size_t diablo_hd_device::squeeze_unsync(UINT32 *bits, size_t src, size_t size)
 		}
 	}
 	/* return if no sync found within size*32 clock and data bits */
-	LOG_DRIVE((0,"	no unsync within %d words\n", size));
+	LOG_DRIVE((0,"[DHD]	%s: no unsync within %d words\n", __FUNCTION__, size));
 	return src;
 }
 
@@ -662,9 +664,8 @@ void diablo_hd_device::squeeze_sector()
 	int cksum_header, cksum_label, cksum_data;
 
 	if (m_rdfirst >= 0) {
-		LOG_DRIVE((0,
-			"	RD #%d %03d/%d/%02d bit#%-5d (@%03d.%02d) ... bit#%-5d (@%03d.%02d)\n",
-			m_unit, m_cylinder, m_head, m_sector,
+		LOG_DRIVE((0, "[DHD]	%s: RD #%d %03d/%d/%02d bit#%-5d (@%03d.%02d) ... bit#%-5d (@%03d.%02d)\n",
+			__FUNCTION__, m_unit, m_cylinder, m_head, m_sector,
 			m_rdfirst, m_rdfirst / 32, m_rdfirst % 32,
 			m_rdlast, m_rdlast / 32, m_rdlast % 32));
 	}
@@ -686,9 +687,8 @@ void diablo_hd_device::squeeze_sector()
 	}
 
 	if (m_wrfirst >= 0) {
-		LOG_DRIVE((0,
-			"	WR #%d %03d/%d/%02d bit#%-5d (@%03d.%02d) ... bit#%-5d (@%03d.%02d)\n",
-			m_unit, m_cylinder, m_head, m_sector,
+		LOG_DRIVE((0, "[DHD]	%s: WR #%d %03d/%d/%02d bit#%-5d (@%03d.%02d) ... bit#%-5d (@%03d.%02d)\n",
+			__FUNCTION__, m_unit, m_cylinder, m_head, m_sector,
 			m_wrfirst, m_wrfirst / 32, m_wrfirst % 32,
 			m_wrlast, m_wrlast / 32, m_wrlast % 32));
 	}
@@ -696,18 +696,18 @@ void diablo_hd_device::squeeze_sector()
 	m_wrlast = -1;
 
 	if (m_page < 0 || m_page >= DIABLO_PAGES) {
-		LOG_DRIVE((0,"	no sector for #%d: %d/%d/%d\n", m_unit, m_cylinder, m_head, m_sector));
+		LOG_DRIVE((0,"[DHD]	%s: no sector for #%d: %d/%d/%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 		return;
 	}
 
 	if (!m_cache[m_page]) {
-		LOG_DRIVE((0,"	no image for #%d: %d/%d/%d\n", m_unit, m_cylinder, m_head, m_sector));
+		LOG_DRIVE((0,"[DHD]	%s: no image for #%d: %d/%d/%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 		return;
 	}
 
 	/* no bits to write? */
 	if (!m_bits[m_page]) {
-		LOG_DRIVE((0,"	no bits for #%d: %d/%d/%d\n", m_unit, m_cylinder, m_head, m_sector));
+		LOG_DRIVE((0,"[DHD]	%s: no bits for #%d: %d/%d/%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 		return;
 	}
 	UINT32 *bits = m_bits[m_page];
@@ -723,7 +723,7 @@ void diablo_hd_device::squeeze_sector()
 	src = squeeze_unsync(bits, src, 40);
 	/* sync on header preamble */
 	src = squeeze_sync(bits, src, 40);
-	LOG_DRIVE((0,"	header sync bit #%d (@%03d.%02d)\n", src, src / 32, src % 32));
+	LOG_DRIVE((0,"[DHD]	%s: header sync bit #%d (@%03d.%02d)\n", __FUNCTION__, src, src / 32, src % 32));
 	src = squeeze_record(bits, src, s->header, sizeof(s->header));
 	src = squeeze_cksum(bits, src, &cksum_header);
 #if	DIABLO_DEBUG
@@ -734,7 +734,7 @@ void diablo_hd_device::squeeze_sector()
 	src = squeeze_unsync(bits, src, 40);
 	/* sync on label preamble */
 	src = squeeze_sync(bits, src, 40);
-	LOG_DRIVE((0,"	label  sync bit #%d (@%03d.%02d)\n", src, src / 32, src % 32));
+	LOG_DRIVE((0,"[DHD]	%s: label  sync bit #%d (@%03d.%02d)\n", __FUNCTION__, src, src / 32, src % 32));
 	src = squeeze_record(bits, src, s->label, sizeof(s->label));
 	src = squeeze_cksum(bits, src, &cksum_label);
 #if	DIABLO_DEBUG
@@ -745,7 +745,7 @@ void diablo_hd_device::squeeze_sector()
 	src = squeeze_unsync(bits, src, 40);
 	/* sync on data preamble */
 	src = squeeze_sync(bits, src, 40);
-	LOG_DRIVE((0,"	data   sync bit #%d (@%03d.%02d)\n", src, src / 32, src % 32));
+	LOG_DRIVE((0,"[DHD]	%s: data   sync bit #%d (@%03d.%02d)\n", __FUNCTION__, src, src / 32, src % 32));
 	src = squeeze_record(bits, src, s->data, sizeof(s->data));
 	src = squeeze_cksum(bits, src, &cksum_data);
 #if	DIABLO_DEBUG
@@ -759,16 +759,14 @@ void diablo_hd_device::squeeze_sector()
 
 	if (cksum_header || cksum_label || cksum_data) {
 #if	DIABLO_DEBUG
-		LOG_DRIVE((0,"	cksum check - header:%06o label:%06o data:%06o\n", cksum_header, cksum_label, cksum_data));
-#else
-		printf("	cksum check - header:%06o label:%06o data:%06o\n", cksum_header, cksum_label, cksum_data);
+		LOG_DRIVE((0,"[DHD]	%s: cksum check - header:%06o label:%06o data:%06o\n", __FUNCTION__, cksum_header, cksum_label, cksum_data));
 #endif
 	}
 	global_free(m_bits[m_page]);
 	m_bits[m_page] = 0;
 
 	if (!hard_disk_write(m_disk, m_page, m_cache[m_page])) {
-		LOG_DRIVE((0,"	write failed for #%d page #%d\n", m_unit, m_page));
+		LOG_DRIVE((0,"[DHD]	%s: write failed for #%d page #%d\n", __FUNCTION__, m_unit, m_page));
 	}
 }
 
@@ -964,7 +962,7 @@ void diablo_hd_device::select(int unit, int head)
 		m_addx_acknowledge_0 = 0;
 		/* clear log address interlock (?) */
 		m_log_addx_interlock_0 = 1;
-		LOG_DRIVE((1,"	UNIT select %d ready\n", unit));
+		LOG_DRIVE((1,"[DHD]	%s: UNIT select %d ready\n", __FUNCTION__, unit));
 	} else {
 		/* it is not ready (?) */
 		m_ready_0 = 1;
@@ -972,7 +970,7 @@ void diablo_hd_device::select(int unit, int head)
 		m_s_r_w_0 = 1;
 		/* address acknowledge (?) */
 		m_addx_acknowledge_0 = 0;
-		LOG_DRIVE((1,"	UNIT select %d not ready (no image)\n", unit));
+		LOG_DRIVE((1,"[DHD]	%s: UNIT select %d not ready (no image)\n", __FUNCTION__, unit));
 	}
 	read_sector();
 }
@@ -991,7 +989,7 @@ void diablo_hd_device::set_strobe(int cylinder, bool restore, int strobe)
 {
 	int seekto = restore ? 0 : cylinder;
 	if (strobe) {
-		LOG_DRIVE((1,"	STROBE end of interlock\n", seekto));
+		LOG_DRIVE((1,"[DHD]	%s: STROBE end of interlock\n", __FUNCTION__, seekto));
 		/* deassert the log address interlock */
 		m_log_addx_interlock_0 = 1;
 		return;
@@ -1001,7 +999,7 @@ void diablo_hd_device::set_strobe(int cylinder, bool restore, int strobe)
 	m_log_addx_interlock_0 = 0;
 
 	if (seekto == m_cylinder) {
-		LOG_DRIVE((1,"	STROBE to cylinder %d acknowledge\n", seekto));
+		LOG_DRIVE((1,"[DHD]	%s: STROBE to cylinder %d acknowledge\n", __FUNCTION__, seekto));
 		m_addx_acknowledge_0 = 0;	/* address acknowledge, if cylinder is reached */
 		m_seek_incomplete_0 = 1;	/* reset seek incomplete */
 		return;
@@ -1017,7 +1015,7 @@ void diablo_hd_device::set_strobe(int cylinder, bool restore, int strobe)
 			m_log_addx_interlock_0 = 1;	/* deassert the log address interlock */
 			m_seek_incomplete_0 = 1;	/* deassert seek incomplete */
 			m_addx_acknowledge_0 = 0;	/* assert address acknowledge  */
-			LOG_DRIVE((1,"	STROBE to cylinder %d incomplete\n", seekto));
+			LOG_DRIVE((1,"[DHD]	%s: STROBE to cylinder %d incomplete\n", __FUNCTION__, seekto));
 			return;
 		}
 	} else {
@@ -1028,11 +1026,11 @@ void diablo_hd_device::set_strobe(int cylinder, bool restore, int strobe)
 			m_log_addx_interlock_0 = 1;	/* deassert the log address interlock */
 			m_seek_incomplete_0 = 1;	/* deassert seek incomplete */
 			m_addx_acknowledge_0 = 0;	/* assert address acknowledge  */
-			LOG_DRIVE((1,"	STROBE to cylinder %d incomplete\n", seekto));
+			LOG_DRIVE((1,"[DHD]	%s: STROBE to cylinder %d incomplete\n", __FUNCTION__, seekto));
 			return;
 		}
 	}
-	LOG_DRIVE((1,"	STROBE to cylinder %d (now %d) - interlock\n", seekto, m_cylinder));
+	LOG_DRIVE((1,"[DHD]	%s: STROBE to cylinder %d (now %d) - interlock\n", __FUNCTION__, seekto, m_cylinder));
 
 	m_addx_acknowledge_0 = 1;	/* deassert address acknowledge  */
 	m_seek_incomplete_0 = 1;	/* deassert seek incomplete */
@@ -1103,7 +1101,7 @@ void diablo_hd_device::wr_data(int index, int wrdata)
 	if (-1 == m_wrfirst)
 		m_wrfirst = index;
 
-	LOG_DRIVE((7,"	write #%d %d/%d/%d bit #%d bit:%d\n", m_unit, m_cylinder, m_head, m_sector, index, wrdata));
+	LOG_DRIVE((7,"[DHD]	%s: write #%d %d/%d/%d bit #%d bit:%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector, index, wrdata));
 
 	if (index < GUARD_ZONE_BITS) {
 		/* don't write in the guard zone (?) */
@@ -1150,7 +1148,7 @@ int diablo_hd_device::rd_data(int index)
 		m_rdfirst = index;
 
 	RDBIT(bits,index,bit);
-	LOG_DRIVE((7,"	read #%d %d/%d/%d bit #%d:%d\n", m_unit, m_cylinder, m_head, m_sector, index, bit));
+	LOG_DRIVE((7,"[DHD]	%s: read #%d %d/%d/%d bit #%d:%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector, index, bit));
 	m_rdlast = index;
 	return bit;
 }
@@ -1192,7 +1190,7 @@ int diablo_hd_device::rd_clock(int index)
 	} else {
 		RDBIT(bits,index,clk);
 	}
-	LOG_DRIVE((7,	"	read #%d %d/%d/%d clk #%d:%d\n", m_unit, m_cylinder, m_head, m_sector, index, clk));
+	LOG_DRIVE((7,"[DHD]	%s: read #%d %d/%d/%d clk #%d:%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector, index, clk));
 	m_rdlast = index;
 	return clk ^ 1;
 }
@@ -1203,7 +1201,7 @@ int diablo_hd_device::rd_clock(int index)
  */
 void diablo_hd_device::sector_mark_1()
 {
-	LOG_DRIVE((5, "	%s (unit #%d C/H/S:%d/%d/%d)\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
+	LOG_DRIVE((9,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 	/* set sector mark to 1 */
 	m_sector_mark_0 = 1;
 }
@@ -1218,7 +1216,7 @@ void diablo_hd_device::sector_mark_1()
  */
 void diablo_hd_device::sector_mark_0()
 {
-	LOG_DRIVE((5,"	%s (unit #%d C/H/S:%d/%d/%d)\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
+	LOG_DRIVE((9,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 
 	/* squeeze previous sector, if it was written to */
 	squeeze_sector();
@@ -1233,6 +1231,7 @@ void diablo_hd_device::sector_mark_0()
 
 	/* count sectors */
 	m_sector = (m_sector + 1) % DIABLO_SPT;
+	/* read the sector */
 	read_sector();
 }
 
@@ -1244,7 +1243,9 @@ void diablo_hd_device::device_start()
 	m_packs = 1;		// FIXME: get from configuration?
 
 	m_cache = global_alloc_array(UINT8*, DIABLO_PAGES);
+	memset(m_cache, 0, sizeof(UINT8*) * DIABLO_PAGES);
 	m_bits = global_alloc_array(UINT32*, DIABLO_PAGES);
+	memset(m_bits, 0, sizeof(UINT32*) * DIABLO_PAGES);
 
 	m_timer = timer_alloc(1, 0);
 }
@@ -1253,7 +1254,7 @@ void diablo_hd_device::device_reset()
 {
 	m_handle = m_image->get_chd_file();
 	m_disk = m_image->get_hard_disk_file();
-	LOG_DRIVE((0,"[DIABLO] m_image=%p m_handle=%p m_disk=%p\n", m_image, m_handle, m_disk));
+	LOG_DRIVE((0,"[DHD]	%s: m_image=%p m_handle=%p m_disk=%p\n", __FUNCTION__, m_image, m_handle, m_disk));
 
 	if (m_diablo31) {
 		snprintf(m_description, sizeof(m_description), "DIABLO31");
@@ -1270,11 +1271,11 @@ void diablo_hd_device::device_reset()
 		m_sector_mark_1_time = DIABLO44_SECTOR_MARK_PULSE_PRE;
 		m_bit_time = DIABLO44_BIT_TIME(1);
 	}
-	LOG_DRIVE((0,"[DIABLO] rotation time       : %.0fns\n", 1e9 * m_rotation_time.as_double()));
-	LOG_DRIVE((0,"[DIABLO] sector time         : %.0fns\n", 1e9 * m_sector_time.as_double()));
-	LOG_DRIVE((0,"[DIABLO] sector mark 0 time  : %.0fns\n", 1e9 * m_sector_mark_0_time.as_double()));
-	LOG_DRIVE((0,"[DIABLO] sector mark 1 time  : %.0fns\n", 1e9 * m_sector_mark_1_time.as_double()));
-	LOG_DRIVE((0,"[DIABLO] bit time            : %.0fns\n", 1e9 * m_bit_time.as_double()));
+	LOG_DRIVE((0,"[DHD]	%s: rotation time       : %.0fns\n", __FUNCTION__, 1e9 * m_rotation_time.as_double()));
+	LOG_DRIVE((0,"[DHD]	%s: sector time         : %.0fns\n", __FUNCTION__, 1e9 * m_sector_time.as_double()));
+	LOG_DRIVE((0,"[DHD]	%s: sector mark 0 time  : %.0fns\n", __FUNCTION__, 1e9 * m_sector_mark_0_time.as_double()));
+	LOG_DRIVE((0,"[DHD]	%s: sector mark 1 time  : %.0fns\n", __FUNCTION__, 1e9 * m_sector_mark_1_time.as_double()));
+	LOG_DRIVE((0,"[DHD]	%s: bit time            : %.0fns\n", __FUNCTION__, 1e9 * m_bit_time.as_double()));
 
 	m_s_r_w_0 = 1;					/* seek/read/write not ready */
 	m_ready_0 = 1;					/* drive is not ready */
@@ -1286,7 +1287,7 @@ void diablo_hd_device::device_reset()
 	/* reset the disk drive's address */
 	m_cylinder = 0;
 	m_head = 0;
-	m_sector = 0;
+	m_sector = DIABLO_SPT - 1;
 	m_page = -1;
 
 	/* disable the gates */
@@ -1300,7 +1301,8 @@ void diablo_hd_device::device_reset()
 	m_rdfirst = -1;
 	m_rdlast = -1;
 
-	timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
+	if (m_handle)
+		timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
 }
 
 /**
@@ -1316,7 +1318,7 @@ void diablo_hd_device::device_reset()
  */
 void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	LOG_DRIVE((0,"[DIABLO] id=%d param=%d ptr=%p timer expires in %lldns\n", id, param, ptr));
+	LOG_DRIVE((6,"[DHD]	%s: id=%d param=%d ptr=%p\n", __FUNCTION__, id, param, ptr));
 
 	switch (param) {
 	case 0:

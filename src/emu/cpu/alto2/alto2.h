@@ -33,7 +33,8 @@
 #define	ALTO2_BUSSRC	8			//!< 8 bus sources
 #define	ALTO2_F1MAX		16			//!< 16 F1 functions
 #define	ALTO2_F2MAX		16			//!< 16 F2 functions
-#define	ALTO2_UCYCLE	170			//!< time in nano seconds for a CPU micro cycle
+//! time in nano seconds for a CPU micro cycle
+#define	ALTO2_UCYCLE	static_cast<int>(clocks_to_attotime(1).as_double()/ATTOSECONDS_PER_NANOSECOND)
 
 #define	ALTO2_ETHER_FIFO_SIZE	16
 

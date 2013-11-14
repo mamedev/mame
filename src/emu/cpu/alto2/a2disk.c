@@ -2252,7 +2252,6 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	if (++arg < bits) {
 		assert(dhd != NULL);
 		m_dsk.bitclk_timer->adjust(dhd->bit_time(), arg);
-		m_dsk.bitclk_timer->enable();
 	}
 }
 
@@ -2267,7 +2266,7 @@ void alto2_cpu_device::next_sector(int unit)
 	LOG((LOG_DISK,0,"%s dhd=%p\n", __FUNCTION__, dhd));
 	if (m_dsk.bitclk_timer) {
 		LOG((LOG_DISK,0,"	unit #%d stop bitclk\n", m_dsk.bitclk));
-		m_dsk.bitclk_timer->enable(false);
+		m_dsk.bitclk_timer->reset();
 	}
 
 	/* KSTAT[0-3] update the current sector in the kstat field */
@@ -2280,9 +2279,9 @@ void alto2_cpu_device::next_sector(int unit)
 	LOG((LOG_DISK,1,"	unit #%d sector %d start\n", unit, GET_KSTAT_SECTOR(m_dsk.kstat)));
 
 	/* HACK: no command, no bit clock */
-	if (debug_read_mem(0521))
-		/* start a timer chain for the bit clock */
-		disk_bitclk(0, 0);
+//	if (debug_read_mem(0521))
+	/* start a timer chain for the bit clock */
+	disk_bitclk(0, 0);
 }
 
 /**
@@ -2343,7 +2342,7 @@ void alto2_cpu_device::init_disk()
 	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(15 * ALTO2_UCYCLE), 1);
 
 	m_dsk.ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ready_mf31a),this));
-	m_dsk.ready_timer->adjust(attotime::never, 0);
+	m_dsk.ready_timer->reset();
 
 	diablo_hd_device* dhd;
 	for (int unit = 0; unit < diablo_hd_device::DIABLO_UNIT_MAX; unit++) {
