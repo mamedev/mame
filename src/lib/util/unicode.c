@@ -350,7 +350,7 @@ int utf8_is_valid_string(const char *utf8string)
 	The expected format is "Format A" defined
 	by unicode.org
 -------------------------------------------------*/
-unicode_char* unicode_load_table(const char* name)
+unicode_char * uchar_table_load(const char* name)
 {
 	FILE* file = fopen(name, "r");
 	if (NULL == file)
@@ -384,7 +384,16 @@ unicode_char* unicode_load_table(const char* name)
 	return table;
 }
 
-void unicode_free_table(unicode_char* table)
+UINT8 uchar_table_index(unicode_char* table, unicode_char uchar)
+{
+	UINT8 index;
+	for (index = 0; index < 254; index++)
+		if (uchar == table[index])
+			return index;
+	return index;
+}
+
+void uchar_table_free(unicode_char* table)
 {
 	if (table)
 		free(table);

@@ -90,29 +90,93 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 const char *utf8_previous_char(const char *utf8string);
 int utf8_is_valid_string(const char *utf8string);
 
+/* Unicode lookup table loader */
+//! load a table translating UINT8 (unsigned char) to Unicode values
+unicode_char * uchar_table_load(const char* name);
+
+//! reverse lookup of uchar in a Unicode table - returns 255 if not found
+UINT8 uchar_table_index(unicode_char* table, unicode_char uchar);
+
+//! free a unicode table
+void uchar_table_free(unicode_char* table);
+
 /***************************************************************************
- *	unicode.org published UnicodeData.txt parser and accessors
+ *	unicode.org published UnicodeData.txt
+ *  parser and accessors
  ***************************************************************************/
+
+//! load the UnicodeData.txt file an parse it
+int unicode_data_load(const char* name);
+
+//! free the UnicodeData.txt table memory
+void unicode_data_free();
 
 //! size of the first 17 Unicode planes
 #define	UNICODE_PLANESIZE		0x110000
 
+#ifndef	NEED_UNICODE_RANGES
 #define	NEED_UNICODE_RANGES		1		//!< define to 1, if the name, first or last of the range of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_NAME
 #define	NEED_UNICODE_NAME		1		//!< define to 1, if the name of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_NAME10
 #define	NEED_UNICODE_NAME10		1		//!< define to 1, if the short name of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_GCAT
 #define	NEED_UNICODE_GCAT		1		//!< define to 1, if the general category of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_CCOM
 #define	NEED_UNICODE_CCOM		1		//!< define to 1, if the canonical combining (name) of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_BIDI
 #define	NEED_UNICODE_BIDI		1		//!< define to 1, if the bidirectional category of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_DECO
 #define	NEED_UNICODE_DECO		1		//!< define to 1, if the decomposition codes of a code are needed
+#endif
+
+#ifndef	NEED_UNICODE_DECIMAL
 #define	NEED_UNICODE_DECIMAL	1		//!< define to 1, if the decimal value of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_DIGIT
 #define	NEED_UNICODE_DIGIT		1		//!< define to 1, if the digit value of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_NUMERIC
 #define	NEED_UNICODE_NUMERIC	1		//!< define to 1, if the numeric value of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_MIRRORED
 #define	NEED_UNICODE_MIRRORED	1		//!< define to 1, if the mirrored flag of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_DECN
 #define	NEED_UNICODE_DECN		1		//!< define to 1, if access to decomposed code [n] of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_UCASE
 #define	NEED_UNICODE_UCASE		1		//!< define to 1, if the upper case value of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_LCASE
 #define	NEED_UNICODE_LCASE		1		//!< define to 1, if the lower case value of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_TCASE
 #define	NEED_UNICODE_TCASE		1		//!< define to 1, if the title case value of a code is needed
+#endif
+
+#ifndef	NEED_UNICODE_WIDTH
 #define	NEED_UNICODE_WIDTH		1		//!< define to 1, if the glyph width of a code is needed
+#endif
 
 #if	NEED_UNICODE_GCAT
 typedef enum {
@@ -291,12 +355,6 @@ unicode_char unicode_tcase(unicode_char uchar);
 //! return (printing) glyph width for a unicode char
 int unicode_width(unicode_char uchar);
 #endif
-
-//! load the UnicodeData.txt file an parse it
-int unicode_data_load(const char* name);
-
-//! free the parse UnicodeData.txt memory
-void unicode_data_free();
 
 /***************************************************************************
 	MACROS
