@@ -21,6 +21,8 @@
 #define UNICODE_H
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
 #include "osdcore.h"
 
 
@@ -89,23 +91,212 @@ const char *utf8_previous_char(const char *utf8string);
 int utf8_is_valid_string(const char *utf8string);
 
 /***************************************************************************
-	8BIT CODE LOOKUP TABLES
-***************************************************************************/
+ *	unicode.org published UnicodeData.txt parser and accessors
+ ***************************************************************************/
 
-/* ISO-8859 page to Unicode lookup tables */
-const unicode_char* unicode_iso8859(int code);
+//! size of the first 17 Unicode planes
+#define	UNICODE_PLANESIZE		0x110000
 
-/* Atari ST to Unicode lookup table */
-const unicode_char* unicode_atari_st();
+#define	NEED_UNICODE_RANGES		1		//!< define to 1, if the name, first or last of the range of a code is needed
+#define	NEED_UNICODE_NAME		1		//!< define to 1, if the name of a code is needed
+#define	NEED_UNICODE_NAME10		1		//!< define to 1, if the short name of a code is needed
+#define	NEED_UNICODE_GCAT		1		//!< define to 1, if the general category of a code is needed
+#define	NEED_UNICODE_CCOM		1		//!< define to 1, if the canonical combining (name) of a code is needed
+#define	NEED_UNICODE_BIDI		1		//!< define to 1, if the bidirectional category of a code is needed
+#define	NEED_UNICODE_DECO		1		//!< define to 1, if the decomposition codes of a code are needed
+#define	NEED_UNICODE_DECIMAL	1		//!< define to 1, if the decimal value of a code is needed
+#define	NEED_UNICODE_DIGIT		1		//!< define to 1, if the digit value of a code is needed
+#define	NEED_UNICODE_NUMERIC	1		//!< define to 1, if the numeric value of a code is needed
+#define	NEED_UNICODE_MIRRORED	1		//!< define to 1, if the mirrored flag of a code is needed
+#define	NEED_UNICODE_DECN		1		//!< define to 1, if access to decomposed code [n] of a code is needed
+#define	NEED_UNICODE_UCASE		1		//!< define to 1, if the upper case value of a code is needed
+#define	NEED_UNICODE_LCASE		1		//!< define to 1, if the lower case value of a code is needed
+#define	NEED_UNICODE_TCASE		1		//!< define to 1, if the title case value of a code is needed
+#define	NEED_UNICODE_WIDTH		1		//!< define to 1, if the glyph width of a code is needed
 
-/* ZX-81 to Unicode lookup table */
-const unicode_char* unicode_zx81();
+#if	NEED_UNICODE_GCAT
+typedef enum {
+	gcat_0,		//!< invalid value
+	gcat_Lu,	//!< Letter, Uppercase
+	gcat_Ll,	//!< Letter, Lowercase
+	gcat_Lt,	//!< Letter, Titlecase
+	gcat_Mn,	//!< Mark, Non-Spacing
+	gcat_Mc,	//!< Mark, Spacing Combining
+	gcat_Me,	//!< Mark, Enclosing
+	gcat_Nd,	//!< Number, Decimal Digit
+	gcat_Nl,	//!< Number, Letter
+	gcat_No,	//!< Number, Other
+	gcat_Zs,	//!< Separator, Space
+	gcat_Zl,	//!< Separator, Line
+	gcat_Zp,	//!< Separator, Paragraph
+	gcat_Cc,	//!< Other, Control
+	gcat_Cf,	//!< Other, Format
+	gcat_Cs,	//!< Other, Surrogate
+	gcat_Co,	//!< Other, Private Use
+	gcat_Cn,	//!< Other, Not Assigned (no characters have this property)
+	gcat_Lm,	//!< Letter, Modifier
+	gcat_Lo,	//!< Letter, Other
+	gcat_Pc,	//!< Punctuation, Connector
+	gcat_Pd,	//!< Punctuation, Dash
+	gcat_Ps,	//!< Punctuation, Open
+	gcat_Pe,	//!< Punctuation, Close
+	gcat_Pi,	//!< Punctuation, Initial quote (may behave like Ps or Pe depending on usage)
+	gcat_Pf,	//!< Punctuation, Final quote (may behave like Ps or Pe depending on usage)
+	gcat_Po,	//!< Punctuation, Other
+	gcat_Sm,	//!< Symbol, Math
+	gcat_Sc,	//!< Symbol, Currency
+	gcat_Sk,	//!< Symbol, Modifier
+	gcat_So		//!< Symbol, Other
+}	unicode_general_category;
+#endif
 
-/* KOI8-R to Unicode lookup table */
-const unicode_char* unicode_koi8_r();
+#if	NEED_UNICODE_BIDI
+typedef enum {
+	bidi_0,		//!< invalid value
+	bidi_L,		//!< Left-to-Right
+	bidi_LRE,	//!< Left-to-Right Embedding
+	bidi_LRO,	//!< Left-to-Right Override
+	bidi_R,		//!< Right-to-Left
+	bidi_AL,	//!< Right-to-Left Arabic
+	bidi_RLE,	//!< Right-to-Left Embedding
+	bidi_RLO,	//!< Right-to-Left Override
+	bidi_PDF,	//!< Pop Directional Format
+	bidi_EN,	//!< European Number
+	bidi_ES,	//!< European Number Separator
+	bidi_ET,	//!< European Number Terminator
+	bidi_AN,	//!< Arabic Number
+	bidi_CS,	//!< Common Number Separator
+	bidi_NSM,	//!< Non-Spacing Mark
+	bidi_BN,	//!< Boundary Neutral
+	bidi_B,		//!< Paragraph Separator
+	bidi_S,		//!< Segment Separator
+	bidi_WS,	//!< Whitespace
+	bidi_ON		//!< Other Neutrals
+}	unicode_bidirectional_category;
+#endif
 
-/* KOI8-U to Unicode lookup table */
-const unicode_char* unicode_koi8_u();
+#if	NEED_UNICODE_DECO
+typedef enum {
+	deco_0,			//!< invalid value
+	deco_canonical, //!< canonical mapping
+	deco_font,		//!< A font variant (e.g. a blackletter form)
+	deco_noBreak,	//!< A no-break version of a space or hyphen
+	deco_initial,	//!< An initial presentation form (Arabic)
+	deco_medial,	//!< A medial presentation form (Arabic)
+	deco_final, 	//!< A final presentation form (Arabic)
+	deco_isolated,	//!< An isolated presentation form (Arabic)
+	deco_circle,	//!< An encircled form
+	deco_super, 	//!< A superscript form
+	deco_sub,		//!< A subscript form
+	deco_vertical,	//!< A vertical layout presentation form
+	deco_wide,		//!< A wide (or zenkaku) compatibility character
+	deco_narrow,	//!< A narrow (or hankaku) compatibility character
+	deco_small, 	//!< A small variant form (CNS compatibility)
+	deco_square,	//!< A CJK squared font variant
+	deco_fraction,	//!< A vulgar fraction form
+	deco_compat 	//!< Otherwise unspecified compatibility character
+}	unicode_decomposition_mapping;
+#endif
+
+#if	NEED_UNICODE_RANGES
+//! return the name of a range for a unicode char
+const char * unicode_range_name(unicode_char uchar);
+//! return the first value of a range for a unicode char
+unicode_char unicode_range_first(unicode_char uchar);
+//! return the last value of a range for a unicode char
+unicode_char unicode_range_last(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_NAME
+//! return the name for a unicode char
+const char * unicode_name(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_NAME10
+//! return the name10 for a unicode char
+const char * unicode_name10(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_GCAT
+//! return the general category for a unicode char
+unicode_general_category unicode_gcat(unicode_char uchar);
+//! return a name for the general category for a unicode char
+const char * unicode_gcat_name(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_CCOM
+//! return the type of canonical combining that is needed
+UINT8 unicode_ccom(unicode_char uchar);
+//! return a name for the type of canonical combining that is needed
+const char * unicode_ccom_name(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_BIDI
+//! return the bidirectional category for a unicode char
+unicode_bidirectional_category unicode_bidi(unicode_char uchar);
+//! return a name for the bidirectional category for a unicode char
+const char * unicode_bidi_name(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_DECO
+//! return the decomposition mapping for a unicode char
+unicode_decomposition_mapping unicode_deco(unicode_char uchar);
+//! return a name for the decomposition mapping for a unicode char
+const char * unicode_deco_name(unicode_char uchar);
+#if	NEED_UNICODE_DECN
+//! return the n'th decomposed unicode character for uchar
+unicode_char unicode_deco_n(unicode_char uchar, int n);
+#endif
+#endif
+
+#if	NEED_UNICODE_DECIMAL
+#define	UNICODE_NOT_DECIMAL	255
+//! return the decimal value for a unicode char
+UINT8 unicode_decimal(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_DIGIT
+#define	UNICODE_NOT_DIGIT	255
+//! return the digit value for a unicode char
+UINT8 unicode_digit(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_NUMERIC
+#define	UNICODE_NOT_NUMERIC	255
+//! return the numeric value for a unicode char
+UINT8 unicode_numeric(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_MIRRORED
+//! return the is-mirrored flag for a unicode char
+bool unicode_mirrored(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_UCASE
+//! return the upper case value for a unicode char
+unicode_char unicode_ucase(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_LCASE
+//! return the lower case value for a unicode char
+unicode_char unicode_lcase(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_TCASE
+//! return the title case value for a unicode char
+unicode_char unicode_tcase(unicode_char uchar);
+#endif
+
+#if	NEED_UNICODE_WIDTH
+//! return (printing) glyph width for a unicode char
+int unicode_width(unicode_char uchar);
+#endif
+
+//! load the UnicodeData.txt file an parse it
+int unicode_data_load(const char* name);
+
+//! free the parse UnicodeData.txt memory
+void unicode_data_free();
 
 /***************************************************************************
 	MACROS

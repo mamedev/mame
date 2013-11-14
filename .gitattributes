@@ -2,6 +2,7 @@
 artwork/aperture.png -text
 artwork/white.png -text
 docs/SDL.txt svneol=native#text/plain
+docs/UnicodeData.txt svneol=native#text/plain
 docs/config.txt svneol=native#text/plain
 docs/hlsl.txt svneol=native#text/plain
 docs/imgtool.txt svneol=native#text/plain

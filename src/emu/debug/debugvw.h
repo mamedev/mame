@@ -90,7 +90,7 @@ class debug_view;
 typedef void (*debug_view_osd_update_func)(debug_view &view, void *osdprivate);
 
 
-// a single "character" in the debug view has an ASCII value and an attribute byte
+// a single "character" in the debug view has an Unicode value and an attribute byte
 struct debug_view_char
 {
 	unicode_char        uchar;
