@@ -1022,14 +1022,18 @@ endif
 #-------------------------------------------------
 #
 #@src/emu/machine/nscsi_bus.h,MACHINES += NSCSI
+#@src/emu/machine/nscsi_cb.h,MACHINES += NSCSI
 #@src/emu/machine/nscsi_cd.h,MACHINES += NSCSI
 #@src/emu/machine/nscsi_hd.h,MACHINES += NSCSI
+#@src/emu/machine/nscsi_s1410.h,MACHINES += NSCSI
 #-------------------------------------------------
 
 ifneq ($(filter NSCSI,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/nscsi_bus.o
+MACHINEOBJS += $(MACHINEOBJ)/nscsi_cb.o
 MACHINEOBJS += $(MACHINEOBJ)/nscsi_cd.o
 MACHINEOBJS += $(MACHINEOBJ)/nscsi_hd.o
+MACHINEOBJS += $(MACHINEOBJ)/nscsi_s1410.o
 endif
 
 #-------------------------------------------------

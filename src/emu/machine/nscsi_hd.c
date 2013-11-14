@@ -8,6 +8,11 @@ nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, cons
 {
 }
 
+nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	nscsi_full_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
 void nscsi_harddisk_device::device_start()
 {
 	nscsi_full_device::device_start();
