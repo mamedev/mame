@@ -212,6 +212,8 @@ s1410_device::s1410_device(const machine_config &mconfig, const char *tag, devic
 #define S1410_CMD_DRIVE_DIAGS ( 0xe3 )
 #define S1410_CMD_CONTROLER_DIAGS ( 0xe4 )
 
+#define S1410_STATUS_NOT_READY ( 0x04 )
+
 #define TRANSFERLENGTH_INIT_DRIVE_PARAMS ( 0x08 )
 #define TRANSFERLENGTH_FORMAT_ALT_TRACK ( 0x03 )
 #define TRANSFERLENGTH_SECTOR_BUFFER ( 0x0200 )
@@ -220,6 +222,26 @@ void s1410_device::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
+	case SCSI_CMD_RECALIBRATE:
+		if (command[1] >> 5)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_sense_asc = S1410_STATUS_NOT_READY;
+			m_transfer_length = 0;
+		}
+		else
+		{
+			scsihd_device::ExecCommand();
+		}
+		break;
+
+	case SCSI_CMD_REQUEST_SENSE:
+		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = 4;
+		break;
+
 	case S1410_CMD_FORMAT_TRACK:
 		{
 		lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
@@ -342,6 +364,23 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 
 	default:
 		scsihd_device::WriteData( data, dataLength );
+		break;
+	}
+}
+
+void s1410_device::ReadData( UINT8 *data, int dataLength )
+{
+	switch( command[ 0 ] )
+	{
+	case SCSI_CMD_REQUEST_SENSE:
+		data[0] = m_sense_asc & 0x7f;
+		data[1] = (m_sense_information >> 16) & 0x1f;
+		data[2] = (m_sense_information >> 8) & 0xff;
+		data[3] = (m_sense_information >> 0) & 0xff;
+		break;
+
+	default:
+		scsihd_device::ReadData( data, dataLength );
 		break;
 	}
 }

@@ -29,6 +29,7 @@ public:
 
 	virtual void ExecCommand();
 	virtual void WriteData( UINT8 *data, int dataLength );
+	virtual void ReadData( UINT8 *data, int dataLength );
 };
 
 
