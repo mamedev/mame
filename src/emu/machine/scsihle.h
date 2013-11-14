@@ -66,11 +66,6 @@ private:
 // Status / Sense data taken from Adaptec ACB40x0 documentation.
 //
 
-#define SCSI_STATUS_OK              0x00
-#define SCSI_STATUS_CHECK           0x02
-#define SCSI_STATUS_EQUAL           0x04
-#define SCSI_STATUS_BUSY            0x08
-
 // SCSI IDs
 enum
 {

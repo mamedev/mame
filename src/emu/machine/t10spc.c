@@ -15,6 +15,7 @@ void t10spc::t10_start(device_t &device)
 void t10spc::t10_reset()
 {
 	m_phase = SCSI_PHASE_BUS_FREE;
+	m_status_code = SCSI_STATUS_CODE_GOOD;
 	m_sense_key = 0;
 	m_sense_asc = 0;
 	m_sense_ascq = 0;
@@ -35,16 +36,19 @@ void t10spc::ExecCommand()
 	{
 	case SCSI_CMD_TEST_UNIT_READY:
 		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
 		break;
 
 	case SCSI_CMD_RECALIBRATE:
 		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
 		break;
 
 	case SCSI_CMD_REQUEST_SENSE:
 		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		if (command[4] == 0)
 		{
 			m_transfer_length = 4;
@@ -61,11 +65,13 @@ void t10spc::ExecCommand()
 
 	case SCSI_CMD_SEND_DIAGNOSTIC:
 		m_phase = SCSI_PHASE_DATAOUT;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = SCSILengthFromUINT16(&command[3]);
 		break;
 
 	default:
 		logerror( "SCSIDEV unknown command %02x\n", command[ 0 ] );
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
 		break;
 	}

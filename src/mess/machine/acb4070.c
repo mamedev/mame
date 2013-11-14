@@ -25,16 +25,19 @@ void acb4070_device::ExecCommand()
 	{
 	case ACB4070_CMD_WRITE_DATA_BUFFER:
 		m_phase = SCSI_PHASE_DATAOUT;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = TRANSFERLENGTH_DATA_BUFFER;
 		break;
 
 	case ACB4070_CMD_READ_DATA_BUFFER:
 		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = TRANSFERLENGTH_DATA_BUFFER;
 		break;
 
 	case SCSI_CMD_MODE_SELECT:
 		m_phase = SCSI_PHASE_DATAOUT;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 		break;
 

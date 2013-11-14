@@ -45,12 +45,27 @@ protected:
 		SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK = 0x6400
 	};
 
+	enum status_code_t
+	{
+		SCSI_STATUS_CODE_GOOD = 0x00,
+		SCSI_STATUS_CODE_CHECK_CONDITION = 0x02,
+		SCSI_STATUS_CODE_CONDITION_MET = 0x04,
+		SCSI_STATUS_CODE_BUSY = 0x08,
+		SCSI_STATUS_CODE_INTERMEDIATE = 0x14,
+		SCSI_STATUS_CODE_RESERVATION_CONFLICT = 0x18,
+		SCSI_STATUS_CODE_COMMAND_TERMINATED = 0x22,
+		SCSI_STATUS_CODE_TASK_SET_FULL = 0x28,
+		SCSI_STATUS_CODE_ACA_ACTIVE = 0x30,
+		SCSI_STATUS_CODE_TASK_ABORTED = 0x40
+	};
+
 	void set_sense(sense_key_t key, sense_asc_ascq_t asc_ascq);
 
 	UINT8 command[ 32 ];
 	int commandLength;
 	int m_transfer_length;
 	int m_phase;
+	status_code_t m_status_code;
 	UINT8 m_sense_key;
 	UINT8 m_sense_asc;
 	UINT8 m_sense_ascq;

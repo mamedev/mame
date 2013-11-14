@@ -110,6 +110,7 @@ void gdrom_device::ExecCommand()
 	{
 		case 0x11: // REQ_MODE
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			printf("REQ_MODE %02x %02x %02x %02x %02x %02x\n",
 				command[0], command[1],
 				command[2], command[3],
@@ -122,6 +123,7 @@ void gdrom_device::ExecCommand()
 		case 0x12: // SET_MODE
 			logerror("GDROM: SET_MODE\n");
 			m_phase = SCSI_PHASE_DATAOUT;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			//transferOffset = command[2];
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			printf("SET_MODE %02x %02x\n",command[2],command[4]);
@@ -169,6 +171,7 @@ void gdrom_device::ExecCommand()
 				}
 
 				m_phase = SCSI_PHASE_DATAIN;
+				m_status_code = SCSI_STATUS_CODE_GOOD;
 				m_transfer_length = blocks * m_sector_bytes;
 			}
 			break;
@@ -206,17 +209,20 @@ void gdrom_device::ExecCommand()
 			}
 
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = length;
 			break;
 		}
 
 		case 0x70:
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 
 		case 0x71:
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = sizeof(GDROM_Cmd71_Reply);
 			break;
 
@@ -224,6 +230,7 @@ void gdrom_device::ExecCommand()
 			if(command[1] & 0xf)
 			{
 				m_phase = SCSI_PHASE_DATAIN;
+				m_status_code = SCSI_STATUS_CODE_GOOD;
 				m_transfer_length = 0xe;
 			}
 			else

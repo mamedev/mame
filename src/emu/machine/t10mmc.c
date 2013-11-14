@@ -112,6 +112,7 @@ void t10mmc::ExecCommand()
 		case 0x12: // INQUIRY
 			logerror("T10MMC: INQUIRY\n");
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			if (m_transfer_length > 36)
 				m_transfer_length = 36;
@@ -120,27 +121,32 @@ void t10mmc::ExecCommand()
 		case 0x15: // MODE SELECT(6)
 			logerror("T10MMC: MODE SELECT(6) length %x control %x\n", command[4], command[5]);
 			m_phase = SCSI_PHASE_DATAOUT;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
 		case 0x1a: // MODE SENSE(6)
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
 		case 0x1b: // START STOP UNIT
 			abort_audio();
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 
 		case 0x1e: // PREVENT ALLOW MEDIUM REMOVAL
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 
 		case 0x25: // READ CAPACITY
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 8;
 			break;
 
@@ -164,12 +170,14 @@ void t10mmc::ExecCommand()
 			abort_audio();
 
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = blocks * m_sector_bytes;
 			break;
 
 		case 0x42: // READ SUB-CHANNEL
 //                      logerror("T10MMC: READ SUB-CHANNEL type %d\n", command[3]);
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT16( &command[ 7 ] );
 			break;
 
@@ -203,6 +211,7 @@ void t10mmc::ExecCommand()
 			abort_audio();
 
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = length;
 			break;
 		}
@@ -236,6 +245,7 @@ void t10mmc::ExecCommand()
 			}
 
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 
@@ -269,6 +279,7 @@ void t10mmc::ExecCommand()
 			}
 
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 
@@ -280,6 +291,7 @@ void t10mmc::ExecCommand()
 
 			logerror("T10MMC: PAUSE/RESUME: %s\n", command[8]&1 ? "RESUME" : "PAUSE");
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 
@@ -288,17 +300,20 @@ void t10mmc::ExecCommand()
 
 			logerror("T10MMC: STOP_PLAY_SCAN\n");
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 
 		case 0x55: // MODE SELECT(10)
 			logerror("T10MMC: MODE SELECT length %x control %x\n", command[7]<<8 | command[8], command[1]);
 			m_phase = SCSI_PHASE_DATAOUT;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT16( &command[ 7 ] );
 			break;
 
 		case 0x5a: // MODE SENSE(10)
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT16( &command[ 7 ] );
 			break;
 
@@ -332,6 +347,7 @@ void t10mmc::ExecCommand()
 			}
 
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 
@@ -354,12 +370,14 @@ void t10mmc::ExecCommand()
 			abort_audio();
 
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = blocks * m_sector_bytes;
 			break;
 
 		case 0xbb: // SET CD SPEED
 			logerror("T10MMC: SET CD SPEED to %d kbytes/sec.\n", command[2]<<8 | command[3]);
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 

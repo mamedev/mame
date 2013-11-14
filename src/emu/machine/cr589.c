@@ -48,17 +48,20 @@ void matsushita_cr589_device::ExecCommand()
 		case 0x3b: // WRITE BUFFER
 			bufferOffset = ( command[ 3 ] << 16 ) | ( command[ 4 ] << 8 ) | command[ 5 ];
 			m_phase = SCSI_PHASE_DATAOUT;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
 			break;
 
 		case 0x3c: // READ BUFFER
 			bufferOffset = ( command[ 3 ] << 16 ) | ( command[ 4 ] << 8 ) | command[ 5 ];
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
 			break;
 
 		case 0xcc: // FIRMWARE DOWNLOAD ENABLE
 			m_phase = SCSI_PHASE_DATAOUT;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT16( &command[7] );
 			break;
 

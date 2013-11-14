@@ -7,6 +7,7 @@ void sony_cdu76s_device::ExecCommand()
 		case 0x12: // INQUIRY
 			logerror("CDU76S: INQUIRY\n");
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 	}

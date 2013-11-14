@@ -24,6 +24,7 @@ void d9060hd_device::ExecCommand()
 	case D9060HD_CMD_PHYSICAL_DEVICE_ID:
 	case D9060HD_CMD_DRIVE_DIAGS:
 		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
 		break;
 

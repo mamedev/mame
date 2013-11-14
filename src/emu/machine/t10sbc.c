@@ -36,6 +36,7 @@ void t10sbc::ExecCommand()
 	{
 		case 0x04: // FORMAT UNIT
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;
 			break;
 
@@ -46,6 +47,7 @@ void t10sbc::ExecCommand()
 			logerror("T10SBC: READ at LBA %x for %x blocks\n", lba, blocks);
 
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = blocks * m_sector_bytes;
 			break;
 
@@ -56,27 +58,32 @@ void t10sbc::ExecCommand()
 			logerror("T10SBC: WRITE to LBA %x for %x blocks\n", lba, blocks);
 
 			m_phase = SCSI_PHASE_DATAOUT;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = blocks * m_sector_bytes;
 			break;
 
 		case 0x12: // INQUIRY
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
 		case 0x15: // MODE SELECT (used to set CDDA volume)
 			logerror("T10SBC: MODE SELECT length %x control %x\n", command[4], command[5]);
 			m_phase = SCSI_PHASE_DATAOUT;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
 		case 0x1a: // MODE SENSE(6)
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
 			break;
 
 		case 0x25: // READ CAPACITY
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 8;
 			break;
 
@@ -87,6 +94,7 @@ void t10sbc::ExecCommand()
 			logerror("T10SBC: READ at LBA %x for %x blocks\n", lba, blocks);
 
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = blocks * m_sector_bytes;
 			break;
 
@@ -97,6 +105,7 @@ void t10sbc::ExecCommand()
 			logerror("T10SBC: WRITE to LBA %x for %x blocks\n", lba, blocks);
 
 			m_phase = SCSI_PHASE_DATAOUT;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = blocks * m_sector_bytes;
 			break;
 
@@ -107,6 +116,7 @@ void t10sbc::ExecCommand()
 			logerror("T10SBC: READ at LBA %x for %x blocks\n", lba, blocks);
 
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = blocks * m_sector_bytes;
 			break;
 

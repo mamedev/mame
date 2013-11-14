@@ -178,6 +178,7 @@ void scsihle_device::scsibus_exec_command()
 			else
 				m_phase = SCSI_PHASE_STATUS;
 
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			bytes_left=4;
 			dataout_timer->adjust(attotime::from_seconds(FORMAT_UNIT_TIMEOUT));
 			break;
@@ -187,6 +188,7 @@ void scsihle_device::scsibus_exec_command()
 			command_local=1;
 			bytes_left=0;
 			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			break;
 
 		case SCSI_CMD_READ_DEFECT:
@@ -200,6 +202,7 @@ void scsihle_device::scsibus_exec_command()
 
 			bytes_left=4;
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			break;
 
 		// write buffer
@@ -208,6 +211,7 @@ void scsihle_device::scsibus_exec_command()
 			command_local=1;
 			bytes_left=(command[7]<<8)+command[8];
 			m_phase = SCSI_PHASE_DATAOUT;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			break;
 
 		// read buffer
@@ -216,6 +220,7 @@ void scsihle_device::scsibus_exec_command()
 			command_local=1;
 			bytes_left=(command[7]<<8)+command[8];
 			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
 			break;
 	}
 
@@ -287,7 +292,7 @@ void scsihle_device::scsi_change_phase(UINT8 newphase)
 			break;
 
 		case SCSI_PHASE_STATUS:
-			scsi_out( SCSI_STATUS_OK | SCSI_MASK_CD | SCSI_MASK_IO, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
+			scsi_out( m_status_code | SCSI_MASK_CD | SCSI_MASK_IO, SCSI_MASK_DATA | SCSI_MASK_CD | SCSI_MASK_IO | SCSI_MASK_MSG );
 			scsi_out_req_delay( 1 );
 			break;
 

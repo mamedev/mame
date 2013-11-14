@@ -259,21 +259,25 @@ void s1410_device::ExecCommand()
 
 	case S1410_CMD_INIT_DRIVE_PARAMS:
 		m_phase = SCSI_PHASE_DATAOUT;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = TRANSFERLENGTH_INIT_DRIVE_PARAMS;
 		break;
 
 	case S1410_CMD_FORMAT_ALT_TRACK:
 		m_phase = SCSI_PHASE_DATAOUT;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = TRANSFERLENGTH_FORMAT_ALT_TRACK;
 		break;
 
 	case S1410_CMD_WRITE_SEC_BUFFER:
 		m_phase = SCSI_PHASE_DATAOUT;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = TRANSFERLENGTH_SECTOR_BUFFER;
 		break;
 
 	case S1410_CMD_READ_SEC_BUFFER:
 		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = TRANSFERLENGTH_SECTOR_BUFFER;
 		break;
 
@@ -282,6 +286,7 @@ void s1410_device::ExecCommand()
 	case S1410_CMD_DRIVE_DIAGS:
 	case S1410_CMD_CONTROLER_DIAGS:
 		m_phase = SCSI_PHASE_STATUS;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
 		break;
 
