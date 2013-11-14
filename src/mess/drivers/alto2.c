@@ -274,7 +274,7 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 	cpu->set_diablo(0, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_0)));
 	cpu->set_diablo(1, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_1)));
 
-#define	UNICODE_TESTING	1
+#define	UNICODE_TESTING	0
 #ifdef	UNICODE_TESTING
 	const char* filename = "docs/UnicodeData.txt";
 	int res = unicode_data_load(filename);
@@ -286,6 +286,8 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 			logerror("%s: U+%04x (%s) is digit %u\n", __FUNCTION__, uchar, unicode_name(uchar), unicode_digit(uchar));
 		if (UNICODE_NOT_NUMERIC != unicode_digit(uchar))
 			logerror("%s: U+%04x (%s) is numeric %u\n", __FUNCTION__, uchar, unicode_name(uchar), unicode_numeric(uchar));
+		if (uchar != unicode_lcase(uchar))
+			logerror("%s: U+%04x (%s) lower chase is U+%04x (%s)\n", __FUNCTION__, uchar, unicode_name(uchar), unicode_lcase(uchar), unicode_name(unicode_lcase(uchar)));
 	}
 	unicode_data_free();
 #endif

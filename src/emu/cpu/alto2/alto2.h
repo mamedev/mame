@@ -1360,6 +1360,7 @@ private:
 		UINT8 krwc;						//!< read/write/check for current record
 		UINT8 kfer;						//!< disk fatal error signal state
 		UINT8 wdtskena;					//!< disk word task enable (active low)
+		UINT8 wddone;					//!< previous state of WDDONE
 		UINT8 wdinit0;					//!< disk word task init at the early microcycle
 		UINT8 wdinit;					//!< disk word task init at the late microcycle
 		UINT8 strobe;					//!< strobe (still) active

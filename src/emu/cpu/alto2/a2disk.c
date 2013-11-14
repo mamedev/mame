@@ -134,13 +134,11 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
 					s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
 				else
 					s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
-				LOG((LOG_DISK,5,"%s J:0 K':1 flip-flop Q:%d\n",
-					jkff_name, (s1 & JKFF_Q) ? 1 : 0));
+				LOG((LOG_DISK,5,"%s J:0 K':1 flip-flop Q:%d\n", jkff_name, (s1 & JKFF_Q) ? 1 : 0));
 				break;
 			case JKFF_K:
 				if ((s0 ^ s1) & JKFF_Q) {
-					LOG((LOG_DISK,5,"%s J:0 K':1 keep Q:%d\n",
-						jkff_name, (s1 & JKFF_Q) ? 1 : 0));
+					LOG((LOG_DISK,5,"%s J:0 K':1 keep Q:%d\n", jkff_name, (s1 & JKFF_Q) ? 1 : 0));
 				}
 				/* J is 0, and K' is 1: keep Q as is */
 				if (s0 & JKFF_Q)
@@ -152,8 +150,7 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
 				/* both J and K' are 1: set Q to 1 */
 				s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
 				if (!(s0 & JKFF_Q)) {
-					LOG((LOG_DISK,5,"%s J:1 K':1 → Q:1\n",
-					jkff_name));
+					LOG((LOG_DISK,5,"%s J:1 K':1 → Q:1\n", jkff_name));
 				}
 				break;
 			}
@@ -1047,8 +1044,7 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
  */
 void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 {
-	static int wddone0;
-	int wddone1 = wddone0;
+	int wddone = m_dsk.wddone;
 	int i;
 	UINT8 s0, s1;
 
@@ -1078,6 +1074,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			 */
 			LOG((LOG_DISK,3,"	HIORDBIT:1 sets WFFO:1\n"));
 			PUT_KCOM_WFFO(m_dsk.kcom, 1);
+			// TODO: show disk indicators
 		}
 		/*
 		 * Falling edge of BITCLK, counting continues as it was preset
@@ -1103,20 +1100,20 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			LOG((LOG_DISK,3,"	WFFO:0 load bitcount:%2d\n", m_dsk.bitcount));
 		}
 	} else if (!m_dsk.bitclk && bitclk) {
-		/* clock the shift register on the rising edge of bitclk */
+		// clock the shift register on the rising edge of bitclk
 		m_dsk.shiftin = (m_dsk.shiftin << 1) | datin;
-		/* and the output shift register, too */
+		// and the output shift register too
 		m_dsk.shiftout = m_dsk.shiftout << 1;
 	}
 
-	if (wddone0 != wddone1) {
-		LOG((LOG_DISK,2,"	WDDONE':%d→%d\n", wddone0, wddone1));
+	if (m_dsk.wddone != wddone) {
+		LOG((LOG_DISK,2,"	WDDONE':%d→%d\n", m_dsk.wddone, wddone));
 	}
 
 	if (m_dsk.carry) {
 		/* CARRY = 1 -> WDDONE' = 0 */
-		wddone1 = 0;
-		if (wddone0 == 0) {
+		wddone = 0;
+		if (wddone == 0) {
 			/*
 			 * Latch a new data word while WDDONE is 0
 			 * Note: The shifter outputs for bits 0 to 14 are connected
@@ -1131,11 +1128,11 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		}
 	} else {
 		/* CARRY = 0 -> WDDONE' = 1 */
-		wddone1 = 1;
+		wddone = 1;
 	}
 
 	/* remember previous state of wddone */
-	wddone0 = wddone1;
+	m_dsk.wddone = wddone;
 
 	/**
 	 * JK flip-flop 43b (word task)
@@ -1150,7 +1147,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 */
 	DEBUG_NAME("\t\t43b KWD   ");
 	s0 = m_dsk.ff_43b;
-	s1 = wddone1 ? JKFF_CLK : 0;
+	s1 = wddone ? JKFF_CLK : 0;
 	s1 |= JKFF_J;
 	s1 |= JKFF_K;
 	if (m_dsk.ok_to_run)
@@ -1159,7 +1156,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		s1 |= JKFF_C;
 	m_dsk.ff_43b = update_jkff(s0, s1);
 
-	/* count for the 4 stages of sysclka and sysclkb transitions */
+	// loop over the 4 stages of sysclka and sysclkb transitions
 	for (i = 0; i < 4; i++) {
 
 		if (m_sysclka0[i] != m_sysclka1[i]) {
@@ -1250,7 +1247,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		DEBUG_NAME("\t\t45a RDYLAT");
 		s0 = m_dsk.ff_45a;
 		s1 = m_sysclka1[i] ? JKFF_CLK : JKFF_0;
-		if (0 == dhd->get_ready_0())
+		if (dhd->get_ready_0())
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
@@ -1341,15 +1338,15 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
-		if (!(m_dsk.ff_22b & JKFF_Q))
+		if (m_dsk.ff_22b & JKFF_Q0)
 			s1 |= JKFF_C;
 		m_dsk.ff_21b = update_jkff(s0, s1);
 	}
 
-	/* The 53b FF Q output is the WDINIT signal. */
+	// The 53b FF Q output is the WDINIT signal.
 	if (WDINIT != m_dsk.wdinit) {
 		m_dsk.wdinit0 = m_dsk.wdinit;
-		/* rising edge immediately */
+		// rising edge immediately
 		if ((m_dsk.wdinit = WDINIT) == 1)
 			m_dsk.wdinit0 = 1;
 		LOG((LOG_DISK,2,"	WDINIT:%d\n", m_dsk.wdinit));
@@ -1377,36 +1374,38 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	}
 
 	if (m_dsk.kfer) {
-		/* no fatal error: ready and not seqerr and seekok */
+		// no fatal error: ready AND not seqerr AND seekok
 		if (!RDYLAT && !SEQERR && SEEKOK) {
 			LOG((LOG_DISK,2,"	reset KFER\n"));
 			m_dsk.kfer = 0;
 		}
 	} else {
-		/* fatal error: not ready or seqerr or not seekok */
+		// fatal error: not ready OR seqerr OR not seekok
 		if (RDYLAT) {
 			LOG((LOG_DISK,2,"	RDYLAT sets KFER\n"));
 			m_dsk.kfer = 1;
-		} else if (SEQERR) {
+		}
+		if (SEQERR) {
 			LOG((LOG_DISK,2,"	SEQERR sets KFER\n"));
 			m_dsk.kfer = 1;
-		} else if (!SEEKOK) {
+		}
+		if (!SEEKOK) {
 			LOG((LOG_DISK,2,"	not SEEKOK sets KFER\n"));
 			m_dsk.kfer = 1;
 		}
 	}
 
 	/*
-	 * The FF 22b Q output is the STSKENA signal,
-	 * the Q' is the WAKEKST' signal.
+	 * The FF 22b Q output is the STSKENA (sector task enable)
+	 * signal, the Q' is the WAKEKST' signal.
 	 */
 	if (m_dsk.ff_22b & JKFF_Q) {
-		if (!(m_task_wakeup & (1 << task_ksec))) {
+		if (0 == (m_task_wakeup & (1 << task_ksec))) {
 			LOG((LOG_DISK,2,"	STSKENA:1; WAKEST':0 wake KSEC\n"));
 			m_task_wakeup |= 1 << task_kwd;
 		}
 	} else {
-		if (m_task_wakeup & (1 << task_ksec)) {
+		if (0 != (m_task_wakeup & (1 << task_ksec))) {
 			LOG((LOG_DISK,2,"	STSKENA:0; WAKEST':1\n"));
 			m_task_wakeup &= ~(1 << task_kwd);
 		}
@@ -1425,7 +1424,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 */
 	DEBUG_NAME("\t\t21a KSEC  ");
 	s0 = m_dsk.ff_21a;
-	s1 = dhd->get_sector_mark_0() ? JKFF_0 : JKFF_CLK;
+	s1 = 0 == dhd->get_sector_mark_0() ? JKFF_CLK : JKFF_0;
 	if (m_dsk.ff_22b & JKFF_Q0)
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
@@ -1440,9 +1439,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 * some time.
 	 */
 	if ((m_dsk.ff_21a_old & JKFF_Q0) && (m_dsk.ff_21a & JKFF_Q)) {
-		if (!m_dsk.seclate_timer)
-			m_dsk.seclate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_seclate),this));;
-		m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1, attotime::never);
+		m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);
 		if (m_dsk.seclate) {
 			m_dsk.seclate = 0;
 			LOG((LOG_DISK,4,"	SECLATE -> 0 pulse until %lldns\n", ntime() + TW_SECLATE));
@@ -1453,19 +1450,20 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 * check if write and erase gate, or read gate are changed
 	 */
 	if ((m_task_wakeup & (1 << task_ksec)) || GET_KCOM_XFEROFF(m_dsk.kcom) || m_dsk.kfer) {
+		// sector task is active OR xferoff is set OR fatal error
 		dhd->set_egate(1);
 		dhd->set_wrgate(1);
 		dhd->set_rdgate(1);
 	} else {
-		/* enable either read or write gates depending on current record R/W */
+		// assert either read or write gates depending on current record R/W
 		if (m_dsk.krwc & RWC_WRITE) {
-			/* enable erase and write gates only if OKTORUN is high */
+			// assert erase and write gates only if OKTORUN is high
 			if (m_dsk.ok_to_run) {
 				dhd->set_egate(0);
 				dhd->set_wrgate(0);
 			}
 		} else {
-			/* enable read gate */
+			// assert read gate
 			dhd->set_rdgate(0);
 		}
 	}
