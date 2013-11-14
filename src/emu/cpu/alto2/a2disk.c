@@ -9,8 +9,8 @@
  *****************************************************************************/
 #include "alto2.h"
 
-/** @brief 1 to debug the JK flip-flops, 0 to use a lookup table */
-#define	JKFF_FUNCTION	0
+
+#define	JKFF_FUNCTION	1	//!< define 1 to debug the JK flip-flops, 0 to use a lookup table
 
 #define	GET_KADDR_SECTOR(kaddr)			A2_GET16(kaddr,16, 0, 3)			//!< get sector number from address register
 #define	PUT_KADDR_SECTOR(kaddr,val)		A2_PUT16(kaddr,16, 0, 3,val)		//!< put sector number into address register
@@ -97,7 +97,8 @@ static const char *rwc_name[4] = {"read", "check", "write", "write2"};
 #endif
 
 #if	ALTO2_DEBUG
-static const char *jkff_name;
+static const char* raise_lower[2] = {"↗","↘"};
+static const char* jkff_name;
 /** @brief macro to set the name of a FF in DEBUG=1 builds only */
 #define	DEBUG_NAME(x)	jkff_name = x
 #else
@@ -182,7 +183,7 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
 		LOG((LOG_DISK,5,"%s C':0 S':0 → Q:1 and Q':1 <unstable>\n", jkff_name));
 		break;
 	}
-	return s1;
+	return static_cast<jkff_t>(s1);
 }
 
 #else
@@ -767,14 +768,12 @@ static UINT8 jkff_lookup[64][64] = {
 		0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f
 	}
 };
-#endif
 
 jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
 {
-	static const char* raise_lower[2] = {"↗","↘"};
 	UINT8 result = jkff_lookup[s1 & 63][ s0 & 63];
 #if	ALTO2_DEBUG
-	LOG((LOG_DISK,8,"%s\t: ", jkff_name));
+	LOG((LOG_DISK,8,"%s : ", jkff_name));
 	if ((s0 ^ result) & JKFF_CLK)
 		LOG((LOG_DISK,8," CLK%s", raise_lower[result & 1]));
 	if ((s0 ^ result) & JKFF_J)
@@ -793,6 +792,7 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
 #endif
 	return static_cast<jkff_t>(result);
 }
+#endif
 
 /**
  * <PRE>
@@ -1148,22 +1148,25 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 * Q	to 53a J
 	 * </PRE>
 	 */
-	DEBUG_NAME("		KWD 43b");
-	m_dsk.ff_43b = update_jkff(m_dsk.ff_43b,
-		(wddone1 ? JKFF_CLK : 0) |
-		JKFF_J |
-		JKFF_K |
-		(m_dsk.ok_to_run ? JKFF_S : 0) |
-		((m_dsk.ff_43a & JKFF_Q) ? 0 : JKFF_C));
+	DEBUG_NAME("\t\t43b KWD   ");
+	s0 = m_dsk.ff_43b;
+	s1 = wddone1 ? JKFF_CLK : 0;
+	s1 |= JKFF_J;
+	s1 |= JKFF_K;
+	if (m_dsk.ok_to_run)
+		s1 |= JKFF_S;
+	if (m_dsk.ff_43a & JKFF_Q0)
+		s1 |= JKFF_C;
+	m_dsk.ff_43b = update_jkff(s0, s1);
 
 	/* count for the 4 stages of sysclka and sysclkb transitions */
 	for (i = 0; i < 4; i++) {
 
 		if (m_sysclka0[i] != m_sysclka1[i]) {
-			LOG((LOG_DISK,7,"	SYSCLKA'   : %d→%d\n", m_sysclka0[i], m_sysclka1[i]));
+			LOG((LOG_DISK,7,"	SYSCLKA' %s\n", raise_lower[m_sysclka1[i]]));
 		}
 		if (m_sysclkb0[i] != m_sysclkb1[i]) {
-			LOG((LOG_DISK,7,"	SYSCLKB'   : %d→%d\n", m_sysclkb0[i], m_sysclkb1[i]));
+			LOG((LOG_DISK,7,"	SYSCLKB' %s\n", raise_lower[m_sysclkb1[i]]));
 		}
 
 		/**
@@ -1177,9 +1180,9 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	WDINIT
 		 * </PRE>
 		 */
-		DEBUG_NAME("		KWD 53b");
+		DEBUG_NAME("\t\t53b KWD   ");
 		s0 = m_dsk.ff_53b;
-		s1 = m_sysclkb1[i];
+		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
 		if (block != task_kwd)
 			s1 |= JKFF_K;			// (BLOCK & WDTSKACT)'
 		if (WDALLOW)
@@ -1198,9 +1201,9 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	to 43a J and K'
 		 * </PRE>
 		 */
-		DEBUG_NAME("		KWD 53a");
+		DEBUG_NAME("\t\t53a KWD   ");
 		s0 = m_dsk.ff_53a;
-		s1 = m_sysclkb1[i];
+		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
 		if (m_dsk.ff_43b & JKFF_Q)
 			s1 |= JKFF_J;
 		if (block != task_kwd)
@@ -1221,9 +1224,9 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	WDTSKENA', Q' WDTSKENA
 		 * </PRE>
 		 */
-		DEBUG_NAME("		KWD 43a");
+		DEBUG_NAME("\t\t43a KWD   ");
 		s0 = m_dsk.ff_43a;
-		s1 = m_sysclka1[i];
+		s1 = m_sysclka1[i] ? JKFF_CLK : JKFF_0;
 		if (m_dsk.ff_53a & JKFF_Q)
 			s1 |= JKFF_J;
 		if (m_dsk.ff_53a & JKFF_Q)
@@ -1244,10 +1247,10 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	RDYLAT'
 		 * </PRE>
 		 */
-		DEBUG_NAME("		RDYLAT 45a");
+		DEBUG_NAME("\t\t45a RDYLAT");
 		s0 = m_dsk.ff_45a;
-		s1 = m_sysclka1[i];
-		if (dhd->get_ready_0())
+		s1 = m_sysclka1[i] ? JKFF_CLK : JKFF_0;
+		if (0 == dhd->get_ready_0())
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
@@ -1266,9 +1269,9 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	to KSTAT[11] DATALATE
 		 * </PRE>
 		 */
-		DEBUG_NAME("		SEQERR 45b");
+		DEBUG_NAME("\t\t45b SEQERR");
 		s0 = m_dsk.ff_45b;
-		s1 = m_sysclka1[i];
+		s1 = m_sysclka1[i] ? JKFF_CLK : JKFF_0;
 		s1 |= JKFF_J;
 		if (SEQERR)
 			s1 |= JKFF_K;
@@ -1287,9 +1290,9 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	STSKENA; Q' WAKEKST'
 		 * </PRE>
 		 */
-		DEBUG_NAME("		KSEC 22b");
+		DEBUG_NAME("\t\t22b KSEC  ");
 		s0 = m_dsk.ff_22b;
-		s1 = m_sysclkb1[i];
+		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
 		if (m_dsk.ff_22a & JKFF_Q)
 			s1 |= JKFF_J;
 		if (block != task_ksec)
@@ -1309,14 +1312,14 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	to 22b J
 		 * </PRE>
 		 */
-		DEBUG_NAME("		KSEC 22a");
+		DEBUG_NAME("\t\t22a KSEC  ");
 		s0 = m_dsk.ff_22a;
-		s1 = m_sysclkb1[i];
+		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
 		if (m_dsk.ff_21b & JKFF_Q)
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
-		if (!(m_dsk.ff_22b & JKFF_Q))
+		if (m_dsk.ff_22b & JKFF_Q0)
 			s1 |= JKFF_C;
 		m_dsk.ff_22a = update_jkff(s0, s1);
 
@@ -1331,9 +1334,9 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	to 22a J
 		 * </PRE>
 		 */
-		DEBUG_NAME("		KSEC 21b");
+		DEBUG_NAME("\t\t21b KSEC  ");
 		s0 = m_dsk.ff_21b;
-		s1 = m_sysclkb1[i];
+		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
 		if (m_dsk.ff_21a & JKFF_Q)
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
@@ -1420,15 +1423,15 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 * Q	to seclate monoflop
 	 * </PRE>
 	 */
-	DEBUG_NAME("		KSEC 21a");
+	DEBUG_NAME("\t\t21a KSEC  ");
 	s0 = m_dsk.ff_21a;
-	s1 = dhd->get_sector_mark_0() ? 0 : JKFF_CLK;
-	if (!(m_dsk.ff_22b & JKFF_Q))
+	s1 = dhd->get_sector_mark_0() ? JKFF_0 : JKFF_CLK;
+	if (m_dsk.ff_22b & JKFF_Q0)
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
 	if (!ERRWAKE)
 		s1 |= JKFF_S;
-	if (!(m_dsk.ff_22b & JKFF_Q))
+	if (m_dsk.ff_22b & JKFF_Q0)
 		s1 |= JKFF_C;
 	m_dsk.ff_21a = update_jkff(s0, s1);
 
@@ -1436,7 +1439,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 * If the KSEC FF 21a Q goes 1, pulse the SECLATE signal for
 	 * some time.
 	 */
-	if (!(m_dsk.ff_21a_old & JKFF_Q) && (m_dsk.ff_21a & JKFF_Q)) {
+	if ((m_dsk.ff_21a_old & JKFF_Q0) && (m_dsk.ff_21a & JKFF_Q)) {
 		if (!m_dsk.seclate_timer)
 			m_dsk.seclate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_seclate),this));;
 		m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1, attotime::never);
@@ -1548,7 +1551,7 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 		 * Q	to seekok
 		 * </PRE>
 		 */
-		DEBUG_NAME("		LAI 44a");
+		DEBUG_NAME("\t\t44a LAI   ");
 		s0 = m_dsk.ff_44a;
 		s1 = lai ? JKFF_CLK : JKFF_0;
 		s1 |= JKFF_J;
@@ -1738,7 +1741,7 @@ void alto2_cpu_device::f1_load_kstat_1()
 	 */
 	for (i = 0; i < 2; i++) {
 		UINT8 s0, s1;
-		DEBUG_NAME("		CKSUM 44b");
+		DEBUG_NAME("\t\t44b CKSUM ");
 		s0 = m_dsk.ff_44b;
 		s1 = i ? JKFF_CLK : 0;
 		if (!A2_GET16(m_bus,16,13,13))
@@ -1878,7 +1881,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	 * C'	CLRSTAT'
 	 * Q	to seekok
 	 */
-	DEBUG_NAME("		LAI 44a");
+	DEBUG_NAME("\t\t44a LAI   ");
 	s0 = m_dsk.ff_44a;
 	s1 = m_dsk.ff_44a & JKFF_CLK;
 	s1 |= JKFF_J;
@@ -1895,7 +1898,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	 * C'	CLRSTAT'
 	 * Q	to seekok
 	 */
-	DEBUG_NAME("		CKSUM 44b");
+	DEBUG_NAME("\t\t44b CKSUM ");
 	s0 = m_dsk.ff_44b;
 	s1 = m_dsk.ff_44b & JKFF_CLK;
 	s1 |= m_dsk.ff_44b & JKFF_J;
@@ -1912,7 +1915,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	 * C'	CLRSTAT'
 	 * Q	RDYLAT'
 	 */
-	DEBUG_NAME("		RDYLAT 45a");
+	DEBUG_NAME("\t\t45a RDYLAT");
 	s0 = m_dsk.ff_45a;
 	s1 = m_dsk.ff_45a & JKFF_CLK;
 	if (dhd)
@@ -1932,7 +1935,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	 * C'	1
 	 * Q	to KSTAT[11] DATALATE
 	 */
-	DEBUG_NAME("		SEQERR 45b");
+	DEBUG_NAME("\t\t45b SEQERR");
 	s0 = m_dsk.ff_45b;
 	s1 = m_dsk.ff_45b & JKFF_CLK;
 	s1 |= JKFF_J;
