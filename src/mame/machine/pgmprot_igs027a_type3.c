@@ -145,6 +145,28 @@ static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32, pgm_arm_type3_state )
 ADDRESS_MAP_END
 
 
+
+
+MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
+{
+	// this is the location of the region in the internal rom, for some reaosn Japan doesn't play attract music (original game feature? bad code flow?)
+	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
+	int base = -1;
+
+	if (!strcmp(machine().system().name, "theglad")) base = 0x3316;
+	if (!strcmp(machine().system().name, "thegladpcb")) base = 0x3316;
+
+	if (base != -1)
+	{
+		int regionhack = ioport("RegionHack")->read();
+		if (regionhack != 0xff)
+		{
+			temp16[(base) / 2] = regionhack; base += 2;
+		}
+	}
+	MACHINE_RESET_CALL_MEMBER(pgm);
+}
+
 MACHINE_START_MEMBER(pgm_arm_type3_state,pgm_arm_type3)
 {
 	MACHINE_START_CALL_MEMBER(pgm);
@@ -166,6 +188,7 @@ MACHINE_CONFIG_START( pgm_arm_type3, pgm_arm_type3_state )
 	MCFG_CPU_ADD("prot", ARM7, 33333333)    // 55857G
 	MCFG_CPU_PROGRAM_MAP(55857G_arm7_map)
 
+	MCFG_MACHINE_RESET_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3_reset)
 MACHINE_CONFIG_END
 
 
@@ -378,7 +401,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	// in the table.. for e8 / fc we can deduce from the calling code and size of the functions expected that they should be the
 	// same as those in the killing blade plus 'killbldp'  (there are also explicit jumps to these addresses in the code)
 	//
-	// 0x110 is called after the 'continue' screen, I suspect it is unique code to the gladiator, probably 0x40 bytes long due to next entry being at 0x150
+	// 0x110 is called after the 'continue' screen, and on inserting coin, I guess it should change the game state, causing it to jump to the title screen when you insert a coin, and back to the attract after the game.. some kind of 'soft reset'
 	// 0x150 I haven't seen called, I guess it is 0x38 in size because the execute-only area ends at 0x188
 
 
@@ -407,8 +430,34 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	temp16[(base) /2] = 0xE12F; base += 2;
 
 //	base = 0x110; // already at 0x110
-	temp16[(base) /2] = 0xff1e; base += 2;
-	temp16[(base) /2] = 0xe12f; base += 2;
+//	temp16[(base) /2] = 0xff1e; base += 2;
+//	temp16[(base) /2] = 0xe12f; base += 2;
+//	temp16[(base) /2] = 0xf302; base += 2;
+//	temp16[(base) /2] = 0xe3a0; base += 2;
+	// set up stack again, soft-reset reset with a ram variable set to 0
+	temp16[(base) /2] = 0x00D1; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0xD0b8; base += 2;
+	temp16[(base) /2] = 0xE59F; base += 2;
+	temp16[(base) /2] = 0x00D3; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0xF000; base += 2;
+	temp16[(base) /2] = 0xE121; base += 2;
+	temp16[(base) /2] = 0xD0b0; base += 2;
+	temp16[(base) /2] = 0xE59F; base += 2;
+	temp16[(base) /2] = 0x10b8; base += 2;
+	temp16[(base) /2] = 0xE59F; base += 2;
+	temp16[(base) /2] = 0x0000; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+	temp16[(base) /2] = 0x0000; base += 2;
+	temp16[(base) /2] = 0xE581; base += 2;
+	temp16[(base) /2] = 0xF302; base += 2;
+	temp16[(base) /2] = 0xE3A0; base += 2;
+
+
+	 
 
 	base = 0x150;
 	temp16[(base) /2] = 0xff1e; base += 2;
@@ -421,26 +470,27 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	temp16[(base) /2] = 0x105c; base += 2;
 	temp16[(base) /2] = 0xE59F; base += 2;
 
-	// this is the location of the region in the internal rom, for some reaosn Japan doesn't play attract music (original game feature? bad code flow?)
-	base = 0x3316;
-	temp16[(base) / 2] = 0x0006; base += 2;
 
 
-#if 0
-	m_svg_ram_sel = 1;
-
-	for (int i = 0; i < 0x8000; i++)
-	{
-		UINT16 *share16;
-		share16 = (UINT16 *)(m_svg_shareram[1]);
-		share16[i / 2] = 0x0003;
-		share16 = (UINT16 *)(m_svg_shareram[0]);
-		share16[i / 2] = 0x0003;
-	}
-#endif
+	
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
 }
+
+INPUT_PORTS_START( theglad )
+	PORT_INCLUDE ( pgm )
+
+	PORT_START("RegionHack")    /* Region - actually supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x0006, DEF_STR( Region ) ) // oddly the game has no music when set to Japan, might be an emulation bug.. hack it to another region until we figure that out
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
+	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x0005, "Spanish Territories" )
+	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
+INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
 {
@@ -475,16 +525,16 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::killbldp_speedup_r),this));
 
-	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
-	int base = 0xfc;
-	temp16[(base) /2] = 0x0000; base += 2;	
-	temp16[(base) /2] = 0xE1A0; base += 2;	
+//	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
+//	int base = 0xfc; // startup table uploads
+//	temp16[(base) /2] = 0x0000; base += 2;	
+//	temp16[(base) /2] = 0xE1A0; base += 2;	
 	
-	base = 0xd4;
-	temp16[(base) /2] = 0x0000; base += 2;	
-	temp16[(base) /2] = 0xE1A0; base += 2;	
-
-//	base = 0x120;
+//	base = 0xd4; // startup table uploads
+//	temp16[(base) /2] = 0x0000; base += 2;	
+//	temp16[(base) /2] = 0xE1A0; base += 2;	
+//
+//	base = 0x120; // reset game state, uncomment this to break boot sequence how theglad was broken...
 //	temp16[(base) /2] = 0x0000; base += 2;	
 //	temp16[(base) /2] = 0xE1A0; base += 2;	
 

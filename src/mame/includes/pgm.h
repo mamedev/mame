@@ -383,6 +383,7 @@ public:
 	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );
 	DECLARE_READ32_MEMBER( killbldp_speedup_r );
 	DECLARE_READ32_MEMBER( theglad_speedup_r );
+	DECLARE_MACHINE_RESET(pgm_arm_type3_reset);
 };
 
 
@@ -531,6 +532,7 @@ INPUT_PORTS_EXTERN( dw2001 );
 /*----------- defined in machine/pgmprot3.c -----------*/
 
 MACHINE_CONFIG_EXTERN( pgm_arm_type3 );
+INPUT_PORTS_EXTERN(theglad);
 
 /*----------- defined in machine/pgmprot4.c -----------*/
 
