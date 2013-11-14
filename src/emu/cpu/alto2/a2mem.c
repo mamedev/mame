@@ -893,6 +893,6 @@ void alto2_cpu_device::init_memory()
 #if	ALTO2_HAMMING_CHECK
 	// Initialize the hamming codes and parity bit
 	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_BASE; addr++)
-		hamming_code(1, addr, 0);
+		hamming_code(1, addr, m_mem.ram[addr]);
 #endif
 }

@@ -96,7 +96,7 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_wrlast(-1),
 	m_sector_callback_cookie(0),
 	m_sector_callback(0),
-	m_sector_timer(0),
+	m_timer(0),
 	m_image(0),
 	m_handle(0),
 	m_disk(0)
@@ -153,8 +153,7 @@ void diablo_hd_device::logprintf(int level, const char* format, ...)
 #define	DIABLO31_SECTOR_MARK_PULSE_POST DIABLO31_BIT_TIME(16)	//!< pulse width of sector mark after the next sector began
 
 #define	DIABLO44_ROTATION_TIME attotime::from_msec(25)			//!< DIABLO 44 rotation time is approx. 25ms
-#define	DIABLO44_SECTOR_TIME	attotime::from_msec(25/12)		//!< DIABLO 44 sector time
-
+#define	DIABLO44_SECTOR_TIME attotime::from_msec(25/12)			//!< DIABLO 44 sector time
 /**
  * @brief DIABLO 44 bit clock is 5000kHz ~= 200ns per bit
  * ~= 125184 bits/track (?)
@@ -1199,41 +1198,6 @@ int diablo_hd_device::rd_clock(int index)
 }
 
 /**
- * @brief timer callback that is called thrice per sector in the rotation
- *
- * The timer is called three times at the events:
- * 0: sector mark goes inactive
- * 1: sector mark goes active
- * 2: in the middle of the active phase
- *
- * @param id timer id
- * @param arg argument supplied to timer_insert (unused)
- */
-void diablo_hd_device::next_sector(void* ptr, int arg)
-{
-	(void)ptr;
-
-	switch (arg) {
-	case 0:
-		m_sector_timer->adjust(m_sector_mark_0_time, 1);
-		/* deassert sector mark */
-		sector_mark_1();
-		break;
-	case 1:
-		m_sector_timer->adjust(m_sector_mark_1_time, 2);
-		/* assert sector mark */
-		sector_mark_0();
-		break;
-	case 2:
-		/* next sector starting soon now */
-		m_sector_timer->adjust(m_sector_time - m_sector_mark_0_time, 0);
-		/* call the sector_callback, if any */
-		if (m_sector_callback)
-			(void)(*m_sector_callback)(m_sector_callback_cookie, m_unit);
-	}
-}
-
-/**
  * @brief deassert the sector mark
  *
  */
@@ -1275,10 +1239,21 @@ void diablo_hd_device::sector_mark_0()
 void diablo_hd_device::device_start()
 {
 	m_image = static_cast<diablo_image_device *>(subdevice("drive"));
-	LOG_DRIVE((0,"	m_image=%p\n", m_image));
 
 	m_diablo31 = true;	// FIXME: get from m_handle meta data?
 	m_packs = 1;		// FIXME: get from configuration?
+
+	m_cache = global_alloc_array(UINT8*, DIABLO_PAGES);
+	m_bits = global_alloc_array(UINT32*, DIABLO_PAGES);
+
+	m_timer = timer_alloc(1, 0);
+}
+
+void diablo_hd_device::device_reset()
+{
+	m_handle = m_image->get_chd_file();
+	m_disk = m_image->get_hard_disk_file();
+	LOG_DRIVE((0,"[DIABLO] m_image=%p m_handle=%p m_disk=%p\n", m_image, m_handle, m_disk));
 
 	if (m_diablo31) {
 		snprintf(m_description, sizeof(m_description), "DIABLO31");
@@ -1295,19 +1270,11 @@ void diablo_hd_device::device_start()
 		m_sector_mark_1_time = DIABLO44_SECTOR_MARK_PULSE_PRE;
 		m_bit_time = DIABLO44_BIT_TIME(1);
 	}
-
-	m_cache = global_alloc_array(UINT8*, DIABLO_PAGES);
-	m_bits = global_alloc_array(UINT32*, DIABLO_PAGES);
-
-	m_sector_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(diablo_hd_device::next_sector),this));
-	m_sector_timer->adjust(m_sector_time - m_sector_mark_0_time, 0);
-}
-
-void diablo_hd_device::device_reset()
-{
-	m_handle = m_image->get_chd_file();
-	m_disk = m_image->get_hard_disk_file();
-	LOG_DRIVE((0,"	m_handle=%p m_disk=%p\n", m_image, m_handle, m_disk));
+	LOG_DRIVE((0,"[DIABLO] rotation time       : %.0fns\n", 1e9 * m_rotation_time.as_double()));
+	LOG_DRIVE((0,"[DIABLO] sector time         : %.0fns\n", 1e9 * m_sector_time.as_double()));
+	LOG_DRIVE((0,"[DIABLO] sector mark 0 time  : %.0fns\n", 1e9 * m_sector_mark_0_time.as_double()));
+	LOG_DRIVE((0,"[DIABLO] sector mark 1 time  : %.0fns\n", 1e9 * m_sector_mark_1_time.as_double()));
+	LOG_DRIVE((0,"[DIABLO] bit time            : %.0fns\n", 1e9 * m_bit_time.as_double()));
 
 	m_s_r_w_0 = 1;					/* seek/read/write not ready */
 	m_ready_0 = 1;					/* drive is not ready */
@@ -1332,6 +1299,43 @@ void diablo_hd_device::device_reset()
 	m_wrlast = -1;
 	m_rdfirst = -1;
 	m_rdlast = -1;
+
+	timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
+}
+
+/**
+ * @brief timer callback that is called thrice per sector in the rotation
+ *
+ * The timer is called three times at the events:
+ * 0: sector mark goes inactive
+ * 1: sector mark goes active
+ * 2: in the middle of the active phase
+ *
+ * @param id timer id
+ * @param arg argument supplied to timer_insert (unused)
+ */
+void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	LOG_DRIVE((0,"[DIABLO] id=%d param=%d ptr=%p timer expires in %lldns\n", id, param, ptr));
+
+	switch (param) {
+	case 0:
+		timer.adjust(m_sector_mark_0_time, 1);
+		/* deassert sector mark */
+		sector_mark_1();
+		break;
+	case 1:
+		timer.adjust(m_sector_mark_1_time, 2);
+		/* assert sector mark */
+		sector_mark_0();
+		break;
+	case 2:
+		/* next sector starting soon now */
+		timer.adjust(m_sector_time - m_sector_mark_0_time, 0);
+		/* call the sector_callback, if any */
+		if (m_sector_callback)
+			(void)(*m_sector_callback)(m_sector_callback_cookie, m_unit);
+	}
 }
 
 MACHINE_CONFIG_FRAGMENT( diablo_drive )

@@ -67,8 +67,9 @@ public:
 	int rd_clock(int index);
 
 protected:
-	virtual void    device_start();
-	virtual void    device_reset();
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
@@ -111,7 +112,7 @@ private:
 	int m_wrlast;							//!< set to last bit of a sector that was written to
 	void *m_sector_callback_cookie;			//!< cookie to pass to callback
 	void (*m_sector_callback)(void*,int);	//!< callback to call at the start of each sector
-	emu_timer* m_sector_timer;				//!< sector timer
+	emu_timer* m_timer;						//!< sector timer
 	diablo_image_device* m_image;			//!< diablo_image_device interfacing the CHD
 	chd_file* m_handle;						//!< underlying CHD handle
 	hard_disk_file* m_disk;					//!< underlying hard disk file
@@ -160,9 +161,6 @@ private:
 	//! squeeze a array of clock and data bits into a sector's data
 	void squeeze_sector();
 
-	//! timer callback that is called thrice per sector in the rotation
-	TIMER_CALLBACK_MEMBER( next_sector );
-
 	//! deassert the sector mark
 	void sector_mark_1();
 
@@ -171,7 +169,7 @@ private:
 };
 
 #define MCFG_DIABLO_DRIVES_ADD()	\
-	MCFG_DEVICE_ADD(DIABLO_HD_0, DIABLO_HD, 0)	\
-	MCFG_DEVICE_ADD(DIABLO_HD_1, DIABLO_HD, 0)	\
+	MCFG_DEVICE_ADD(DIABLO_HD_0, DIABLO_HD, ATTOSECONDS_TO_HZ(attotime::from_nsec(300).as_double()))	\
+	MCFG_DEVICE_ADD(DIABLO_HD_1, DIABLO_HD, ATTOSECONDS_TO_HZ(attotime::from_nsec(300).as_double()))	\
 
 #endif	// !defined(_DIABLO_HD_DEVICE_)
