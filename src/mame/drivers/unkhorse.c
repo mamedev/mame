@@ -91,7 +91,6 @@ static ADDRESS_MAP_START( horse_map, AS_PROGRAM, 8, horse_state )
 	AM_RANGE(0x4000, 0x40ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x8000, 0x879f) AM_RAM AM_SHARE("color_ram") AM_MIRROR(0x0860)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( horse_io_map, AS_IO, 8, horse_state )

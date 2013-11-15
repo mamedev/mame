@@ -27,7 +27,7 @@ Year + Game           License       PCB         Tilemaps        Sprites         
 96 Air Gallet         Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
 96 Hotdog Storm       Marble        ASTC9501    038 9341EX702   013             Z80
 96 Pac-Slot           Namco         A0442       038 9444WX010   013 9345E7006
-96 Poka Poka Satan    <unknown>     PPS-MAIN    038 9444WX010   013 9607EX013
+96 Poka Poka Satan    Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
 97 Dodonpachi         Atlus         ATC03D2     038             013
 98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
 98 ESP Ra.De.         Atlus         ATC04       038 9841WX002   013 9838EX002
@@ -5052,7 +5052,7 @@ GAME( 1996, hotdogst,   0,        hotdogst, cave, cave_state,     hotdogst, ROT9
 
 GAME( 1996, pacslot,    0,        pacslot,  pacslot, cave_state,  tjumpman, ROT0,   "Namco",                                  "Pac-Slot", GAME_SUPPORTS_SAVE )
 
-GAME( 1996, ppsatan,    0,        ppsatan,  ppsatan, cave_state,  ppsatan,  ROT0,   "<unknown>",                              "Poka Poka Satan", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, ppsatan,    0,        ppsatan,  ppsatan, cave_state,  ppsatan,  ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1997, ddonpach,   0,        ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)", GAME_SUPPORTS_SAVE )
 GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave, cave_state,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",         GAME_SUPPORTS_SAVE )

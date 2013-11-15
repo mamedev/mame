@@ -312,6 +312,6 @@ ROM_START( dodgem )
 ROM_END
 
 
-GAMEL(1978, tinv2650, 0,        tinvader, tinvader, driver_device, 0, ROT270, "Zaccaria / Zelco", "The Invaders", GAME_IMPERFECT_SOUND, layout_tinv2650 )
-GAME( 1978, sia2650,  tinv2650, tinvader, sinvader, driver_device, 0, ROT270, "bootleg (Sidam)", "Super Invader Attack (bootleg of The Invaders)", GAME_IMPERFECT_SOUND ) // 1980?
+GAMEL(1979?,tinv2650, 0,        tinvader, tinvader, driver_device, 0, ROT270, "Zaccaria / Zelco", "The Invaders", GAME_IMPERFECT_SOUND, layout_tinv2650 )
+GAME( 1979?,sia2650,  tinv2650, tinvader, sinvader, driver_device, 0, ROT270, "bootleg (Sidam)", "Super Invader Attack (bootleg of The Invaders)", GAME_IMPERFECT_SOUND ) // 1980?
 GAME( 1979, dodgem,   0,        tinvader, dodgem,   driver_device, 0, ROT0,   "Zaccaria", "Dodgem", GAME_IMPERFECT_SOUND )

@@ -59,11 +59,8 @@ static ADDRESS_MAP_START( io_mem, AS_IO, 8, forte2_state )
 	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE( "tms9928a", tms9928a_device, register_read, register_write )
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_device, data_r)
-
-/* Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
-Since this arcade board doesn't have one, those ports should be unmapped. */
-//  AM_RANGE(0xa8, 0xa8) AM_RAM
-//  AM_RANGE(0xa9, 0xab) AM_NOP
+//  AM_RANGE(0xa8, 0xa8) AM_RAM // Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
+//  AM_RANGE(0xa9, 0xab) AM_NOP // Since this arcade board doesn't have one, those ports should be unmapped.
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pesadelo )
@@ -126,10 +123,10 @@ void forte2_state::machine_start()
 
 static MACHINE_CONFIG_START( pesadelo, forte2_state )
 
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
-
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, forte2_tms9928a_interface )

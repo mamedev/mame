@@ -2536,7 +2536,7 @@ INPUT_PORTS_END
 GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, winrun,   ROT0,    "Namco", "Winning Run",                           GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, driveyes,  0,        driveyes, winrungp,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (US)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, driveyes,  0,        driveyes, winrungp,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, starblad,  0,        namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (World)",                     GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, starbladj, starblad, namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (Japan)",                     GAME_IMPERFECT_GRAPHICS )
