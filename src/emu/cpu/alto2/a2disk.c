@@ -1036,7 +1036,6 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
  */
 #define	INIT	(m_task == task_kwd && m_dsk.wdinit0)
 
-#define	WFFO	(GET_KCOM_WFFO(m_dsk.kcom))
 #define	WDALLOW	(!GET_KCOM_WDINHIB(m_dsk.kcom))
 #define	WDINIT	((m_dsk.ff_53b & JKFF_Q) ? 1 : 0)
 #define	RDYLAT	((m_dsk.ff_45a & JKFF_Q) ? 1 : 0)
@@ -1077,8 +1076,8 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		}
 	}
 	if (0 != m_dsk.seclate && m_dsk.bitclk && !bitclk) {
-		// if SECLATE is 1, the counter will count or load:
-		if ((m_dsk.shiftin & (1 << 16)) && !WFFO) {
+		// if SECLATE is 1, the counter will count or be loaded
+		if ((m_dsk.shiftin & (1 << 16)) && !GET_KCOM_WFFO(m_dsk.kcom)) {
 			/*
 			 * If HIORDBIT is 1 at the falling edge of BITCLK, it sets the
 			 * JK-FF 67b, and thus takes away the LOAD' assertion from the
@@ -1094,7 +1093,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * with BUS[4] (WFFO) at the last KCOM← load, or as set by a
 		 * 1 bit being read in HIORDBIT.
 		 */
-		if (WFFO) {
+		if (GET_KCOM_WFFO(m_dsk.kcom)) {
 			/*
 			 * If BUS[4] (WFFO) was 1, both J and K' of the FF (74109) will
 			 * be 1 at the rising edge of LDCOM' (at the end of KCOM←)
@@ -1106,7 +1105,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		} else {
 			/*
 			 * If BUS[4] (WFFO) was 0, both J and K' will be 0, and Q
-			 * will be 0. LOAD' is asserted: load on clock.
+			 * will be 0. LOAD' is asserted and will load on rising bitclock (now)
 			 */
 			m_dsk.bitcount = 15;
 			m_dsk.carry = 1;
@@ -1448,10 +1447,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		s1 |= JKFF_C;
 	m_dsk.ff_21a = update_jkff(s0, s1);
 
-	/*
-	 * If the KSEC FF 21a Q goes 1, pulse the SECLATE signal for
-	 * some time.
-	 */
+	// If the KSEC FF 21a Q goes 1, pulse the SECLATE signal for some time.
 	if ((m_dsk.ff_21a_old & JKFF_Q0) && (m_dsk.ff_21a & JKFF_Q)) {
 		m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);
 		if (m_dsk.seclate) {
@@ -1481,12 +1477,30 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		dhd->set_egate(m_dsk.egate = 1);
 		dhd->set_wrgate(m_dsk.wrgate = 1);
 		dhd->set_rdgate(m_dsk.rdgate = 1);
-	} else if (m_dsk.ok_to_run) {
-		 if (m_dsk.krwc & RWC_WRITE) {
-			// assert erase and write gates
-			dhd->set_egate(m_dsk.egate = 0);
-			dhd->set_wrgate(m_dsk.wrgate = 0);
+	} else {
+		if (m_dsk.krwc & RWC_WRITE) {
+			if (m_dsk.ok_to_run) {
+#if	ALTO2_DEBUG
+				if (1 == m_dsk.egate || 1 == m_dsk.wrgate) {
+					LOG((LOG_DISK,6,"	assert "));
+					if (m_dsk.egate) {
+						LOG((LOG_DISK,6," EGATE"));
+					}
+					if (m_dsk.wrgate) {
+						LOG((LOG_DISK,6," WRGATE"));
+					}
+				}
+#endif
+				// assert erase and write gates
+				dhd->set_egate(m_dsk.egate = 0);
+				dhd->set_wrgate(m_dsk.wrgate = 0);
+			}
 		} else {
+#if	ALTO2_DEBUG
+			if (1 == m_dsk.rdgate) {
+				LOG((LOG_DISK,6,"	assert RDGATE"));
+			}
+#endif
 			// assert read gate
 			dhd->set_rdgate(m_dsk.rdgate = 0);
 		}
@@ -1514,7 +1528,7 @@ void alto2_cpu_device::disk_ok_to_run(void* ptr, INT32 arg)
 	(void)ptr;
 	LOG((LOG_DISK,2,"	OK TO RUN -> %d\n", arg));
 	m_dsk.ok_to_run = arg;
-	m_dsk.ok_to_run_timer->enable(false);
+	m_dsk.ok_to_run_timer->reset();
 
 	for (int unit = 0; unit < diablo_hd_device::DIABLO_UNIT_MAX; unit++) {
 		diablo_hd_device* dhd = m_drive[unit];
@@ -1985,13 +1999,12 @@ void alto2_cpu_device::f1_clrstat_1()
  * KCOM register has the following interpretation:
  *	(1) XFEROFF = 1 inhibits data transmission to/from the m_dsk.
  *	(2) WDINHIB = 1 prevents the disk word task from awakening.
- * 	(3) BCLKSRC = 0 takes bit clock from disk input or crystal clock,
- * 	    as appropriate. BCLKSRC = 1 force use of crystal clock.
+ * 	(3) BCLKSRC = 0 takes bit clock from disk input or crystal clock, as appropriate.
+ *      BCLKSRC = 1 force use of crystal clock.
  *	(4) WFFO = 0 holds the disk bit counter at -1 until a 1 bit is read.
  *	    WFFO = 1 allows the bit counter to proceed normally.
- *	(5) SENDADR = 1 causes KDATA[4-12] and KDATA[15] to be transmitted
- *	    to disk unit as track address. SENDADR = 0 inhibits such
- *	    transmission.
+ *	(5) SENDADR = 1 causes KDATA[4-12] and KDATA[15] to be signalled to disk unit as track address.
+ *      SENDADR = 0 inhibits such signalling.
  * </PRE>
  */
 void alto2_cpu_device::f1_load_kcom_1()
