@@ -911,7 +911,7 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
  * @brief monoflop 31a pulse duration
  * Rt = 15k, Cext = .47µF (=470000pF) => 2066120ns (~2ms)
  */
-#define	TW_READY	attotime::from_nsec(2066120)
+#define	TW_READY	2066120
 
 /**
  * @brief monoflop 31b pulse duration
@@ -1460,20 +1460,22 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	// check if write and erase gate, or read gate are changed
 	if ((m_task_wakeup & (1 << task_ksec)) || GET_KCOM_XFEROFF(m_dsk.kcom) || m_dsk.kfer) {
 		// sector task is active OR xferoff is set OR fatal error
-		dhd->set_egate(1);
-		dhd->set_wrgate(1);
-		dhd->set_rdgate(1);
+		dhd->set_egate(m_dsk.egate = 1);
+		dhd->set_wrgate(m_dsk.wrgate = 1);
+		dhd->set_rdgate(m_dsk.rdgate = 1);
 	} else {
 		// assert either erase and read or write gates depending on current record R/W
 		if (m_dsk.krwc & RWC_WRITE) {
 			// assert erase and write gates only if OKTORUN is high
 			if (m_dsk.ok_to_run) {
-				dhd->set_egate(0);
-				dhd->set_wrgate(0);
+				dhd->set_egate(m_dsk.egate = 0);
+				dhd->set_wrgate(m_dsk.wrgate = 0);
 			}
 		} else {
-			// assert read gate
-			dhd->set_rdgate(0);
+			// assert read gate only if OKTORUN is high
+			if (m_dsk.ok_to_run) {
+				dhd->set_rdgate(m_dsk.rdgate = 0);
+			}
 		}
 	}
 
@@ -1653,7 +1655,7 @@ void alto2_cpu_device::bs_read_kstat_0()
 	PUT_KSTAT_SEEKFAIL(m_dsk.kstat, m_dsk.seekok ? 0 : 1);
 
 	/* KSTAT[9] latch the drive seek/read/write status */
-	PUT_KSTAT_SEEK(m_dsk.kstat, dhd ? dhd->get_seek_read_write_0() : 1);
+	PUT_KSTAT_SEEK(m_dsk.kstat, dhd->get_seek_read_write_0());
 
 	/* KSTAT[10] latch the latched (FF 45a at CLRSTAT) ready status */
 	PUT_KSTAT_NOTRDY(m_dsk.kstat, m_dsk.ff_45a & JKFF_Q ? 1 : 0);
@@ -1669,12 +1671,12 @@ void alto2_cpu_device::bs_read_kstat_0()
 	LOG((LOG_DISK,1,"	←KSTAT; BUS &= %#o\n", r));
 	LOG((LOG_DISK,2,"		sector     : %#o\n", GET_KSTAT_SECTOR(m_dsk.kstat)));
 	LOG((LOG_DISK,2,"		done       : %#o\n", GET_KSTAT_DONE(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		seekfail   : %#o\n", GET_KSTAT_SEEKFAIL(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		seek       : %#o\n", GET_KSTAT_SEEK(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		notrdy     : %#o\n", GET_KSTAT_NOTRDY(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		datalate   : %#o\n", GET_KSTAT_DATALATE(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		idle       : %#o\n", GET_KSTAT_IDLE(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		cksum      : %#o\n", GET_KSTAT_CKSUM(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		seekfail   : %d\n", GET_KSTAT_SEEKFAIL(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		seek       : %d\n", GET_KSTAT_SEEK(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		notrdy     : %d\n", GET_KSTAT_NOTRDY(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		datalate   : %d\n", GET_KSTAT_DATALATE(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		idle       : %d\n", GET_KSTAT_IDLE(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		cksum      : %d\n", GET_KSTAT_CKSUM(m_dsk.kstat)));
 	LOG((LOG_DISK,2,"		completion : %#o\n", GET_KSTAT_COMPLETION(m_dsk.kstat)));
 
 	m_bus &= r;
@@ -1956,10 +1958,10 @@ void alto2_cpu_device::f1_clrstat_1()
 	m_dsk.ff_45b = update_jkff(s0, s1);
 
 	/* set or reset monoflop 31a, depending on drive READY' */
-	m_dsk.ready_mf31a = dhd ? dhd->get_ready_0() : 1;
+	m_dsk.ready_mf31a = dhd->get_ready_0();
 
 	/* start monoflop 31a, which resets ready_mf31a */
-	m_dsk.ready_timer->adjust(TW_READY, 1);
+	m_dsk.ready_timer->adjust(attotime::from_nsec(TW_READY), 1);
 	m_dsk.ready_timer->enable();
 }
 
@@ -2015,17 +2017,15 @@ void alto2_cpu_device::f1_load_kadr_1()
 	PUT_KADR_NOXFER(m_dsk.kadr, GET_KADR_NOXFER(m_bus));
 	PUT_KADR_UNUSED(m_dsk.kadr, GET_KADR_UNUSED(m_bus));
 
-	/* get selected drive from DATA[14] output (FF 67a really) */
-	unit = GET_KADDR_DRIVE(m_dsk.kaddr);
-	/* latch head from DATA[13] */
-	head = GET_KADDR_HEAD(m_dsk.dataout);
-	PUT_KADDR_HEAD(m_dsk.kaddr, head);
-	/* get the selected head, and select drive unit and head */
-	diablo_hd_device* dhd = m_drive[unit];
-	if (dhd)
-		dhd->select(unit, head);
+	unit = GET_KADDR_DRIVE(m_dsk.kaddr);	// get selected drive from DATA[14] output (FF 67a really)
+	head = GET_KADDR_HEAD(m_dsk.dataout);	// latch head from DATA[13]
+	PUT_KADDR_HEAD(m_dsk.kaddr, head);		// store in KADDR
 
-	/* On KDAR← bit 0 of parts #36 and #37 is reset to 0, i.e. recno = 0 */
+	/* take the selected head and select drive unit and head in the DIABLO HD */
+	diablo_hd_device* dhd = m_drive[unit];
+	dhd->select(unit, head);
+
+	/* On KDAR← load bit 0 of parts #36 and #37 is reset to 0, i.e. recno = 0 */
 	m_dsk.krecno = 0;
 	/* current read/write/check is that for the header */
 	m_dsk.krwc = GET_KADR_HEADER(m_dsk.kadr);
@@ -2037,7 +2037,6 @@ void alto2_cpu_device::f1_load_kadr_1()
 	LOG((LOG_DISK,2,"		data       : %s (%#o)\n",  rwc_name[GET_KADR_DATA(m_dsk.kadr)], GET_KADR_DATA(m_dsk.kadr)));
 	LOG((LOG_DISK,2,"		noxfer     : %#o\n",  GET_KADR_NOXFER(m_dsk.kadr)));
 	LOG((LOG_DISK,2,"		unused     : %#o (drive?)\n",  GET_KADR_UNUSED(m_dsk.kadr)));
-
 	// TODO: show disk indicator in the GUI?
 }
 
@@ -2350,6 +2349,9 @@ void alto2_cpu_device::init_disk()
 	m_sysclkb1[3] = JKFF_CLK;
 
 	m_dsk.wdtskena = 1;
+	m_dsk.egate = 1;
+	m_dsk.wrgate = 1;
+	m_dsk.rdgate = 1;
 
 	m_dsk.seclate = 0;
 	m_dsk.ok_to_run = 0;

@@ -1383,6 +1383,9 @@ private:
 		UINT16 kstat;					//!< S[0-15] disk status
 		UINT16 kcom;					//!< disk command (5 bits kcom[1-5])
 		UINT8 krecno;					//!< record number (2 bits indexing header, label, data, -/-)
+		UINT8 egate;					//!< current erase gate signal to the DIABLO hd
+		UINT8 wrgate;					//!< current write gate signal to the DIABLO hd
+		UINT8 rdgate;					//!< current read gate signal to the DIABLO hd
 		UINT32 shiftin;					//!< input shift register
 		UINT32 shiftout;				//!< output shift register
 		UINT32 datain;					//!< disk data in latch

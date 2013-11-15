@@ -1088,20 +1088,26 @@ void diablo_hd_device::set_rdgate(int gate)
  */
 void diablo_hd_device::wr_data(int index, int wrdata)
 {
-	if (m_wrgate_0)
+	if (m_wrgate_0) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d wrgate not asserted\n", __FUNCTION__, m_unit));
 		return;	// write gate is not asserted (active 0)
+	}
 
-	if (index < 0 || index >= bits_per_sector())
+	if (index < 0 || index >= bits_per_sector()) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d index out of range (%d)\n", __FUNCTION__, m_unit, index));
 		return;	// don't write before or beyond the sector
+	}
 
-	if (-1 == m_page)
+	if (-1 == m_page) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d invalid page\n", __FUNCTION__, m_unit));
 		return;	// invalid page
+	}
 
 	UINT32 *bits = expand_sector();
 	if (-1 == m_wrfirst)
 		m_wrfirst = index;
 
-	LOG_DRIVE((7,"[DHD]	%s: write #%d %d/%d/%d bit #%d bit:%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector, index, wrdata));
+	LOG_DRIVE((7,"[DHD]	%s: unit #%d %d/%d/%d bit #%d bit:%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector, index, wrdata));
 
 	if (index < GUARD_ZONE_BITS) {
 		/* don't write in the guard zone (?) */
@@ -1124,17 +1130,25 @@ int diablo_hd_device::rd_data(int index)
 {
 	int bit = 0;
 
-	if (m_rdgate_0)
-		return 0;	// read gate is not asserted (active 0)
+	if (m_rdgate_0) {
+		LOG_DRIVE((9,"[DHD]	%s: unit #%d rdgate not asserted\n", __FUNCTION__, m_unit));
+		return 1;	// read gate is not asserted (active 0)
+	}
 
-	if (index < 0 || index >= bits_per_sector())
+	if (index < 0 || index >= bits_per_sector()) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d index out of range (%d)\n", __FUNCTION__, m_unit, index));
 		return 1;	// don't read before or beyond the sector
+	}
 
-	if (0 == m_sector_mark_0)
-		return 1;	// no data while sector mark is low (?)
+	if (0 == m_sector_mark_0) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d read while sector mark is asserted\n", __FUNCTION__, m_unit));
+		return 1;	// no data while sector mark is asserted
+	}
 
-	if (-1 == m_page)
+	if (-1 == m_page) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d invalid page\n", __FUNCTION__, m_unit));
 		return 1;	// invalid page
+	}
 
 	UINT32 *bits = expand_sector();
 	if (-1 == m_rdfirst)
@@ -1159,14 +1173,20 @@ int diablo_hd_device::rd_clock(int index)
 {
 	int clk = 0;
 
-	if (index < 0 || index >= bits_per_sector())
+	if (index < 0 || index >= bits_per_sector()) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d index out of range (%d)\n", __FUNCTION__, m_unit, index));
 		return 1;	// don't read before or beyond the sector
+	}
 
-	if (0 == m_sector_mark_0)
+	if (0 == m_sector_mark_0) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d read while sector mark is asserted\n", __FUNCTION__, m_unit));
 		return 1;	// no clock while sector mark is low (?)
+	}
 
-	if (-1 == m_page)
+	if (-1 == m_page) {
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d invalid page\n", __FUNCTION__, m_unit));
 		return 1;	// invalid page
+	}
 
 	UINT32 *bits = expand_sector();
 	if (-1 == m_rdfirst)
@@ -1272,10 +1292,10 @@ void diablo_hd_device::device_reset()
 	m_seek_incomplete_0 = 1;		// deassert drive seek incomplete
 
 	// reset the disk drive's address
-	m_cylinder = -1;
-	m_head = -1;
-	m_sector = -1;
-	m_page = -1;
+	m_cylinder = 0;
+	m_head = 0;
+	m_sector = 0;
+	m_page = 0;
 
 	// disable the erase, write and read gates
 	m_egate_0 = 1;
@@ -1306,7 +1326,7 @@ void diablo_hd_device::device_reset()
  */
 void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	LOG_DRIVE((6,"[DHD]	%s: id=%d param=%d ptr=%p\n", __FUNCTION__, id, param, ptr));
+	LOG_DRIVE((6,"[DHD]	%s: id=%d param=%d ptr=%p @%lldns\n", __FUNCTION__, id, param, ptr, (long long int)(timer.elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND)));
 
 	switch (param) {
 	case 0:
