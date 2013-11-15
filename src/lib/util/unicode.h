@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <ctype.h>
 #include "osdcore.h"
 
@@ -31,32 +32,82 @@
 	CONSTANTS
 ***************************************************************************/
 
-/* these defines specify the maximum size of different types of Unicode
- * character encodings */
-#define UTF8_CHAR_MAX   6
-#define UTF16_CHAR_MAX  2
+//! size of the first 17 Unicode planes
+#define	UNICODE_PLANESIZE		0x110000
+
+#ifndef	NEED_UNICODE_RANGES
+#define	NEED_UNICODE_RANGES		1		//!< define to 1, if the name, first or last of the range of a code is needed
+#endif
+#ifndef	NEED_UNICODE_NAME
+#define	NEED_UNICODE_NAME		1		//!< define to 1, if the name of a code is needed
+#endif
+#ifndef	NEED_UNICODE_NAME10
+#define	NEED_UNICODE_NAME10		1		//!< define to 1, if the short name of a code is needed
+#endif
+#ifndef	NEED_UNICODE_GCAT
+#define	NEED_UNICODE_GCAT		1		//!< define to 1, if the general category of a code is needed
+#endif
+#ifndef	NEED_UNICODE_CCOM
+#define	NEED_UNICODE_CCOM		1		//!< define to 1, if the canonical combining (name) of a code is needed
+#endif
+#ifndef	NEED_UNICODE_BIDI
+#define	NEED_UNICODE_BIDI		1		//!< define to 1, if the bidirectional category of a code is needed
+#endif
+#ifndef	NEED_UNICODE_DECO
+#define	NEED_UNICODE_DECO		1		//!< define to 1, if the decomposition codes of a code are needed
+#endif
+#ifndef	NEED_UNICODE_DECIMAL
+#define	NEED_UNICODE_DECIMAL	1		//!< define to 1, if the decimal value of a code is needed
+#endif
+#ifndef	NEED_UNICODE_DIGIT
+#define	NEED_UNICODE_DIGIT		1		//!< define to 1, if the digit value of a code is needed
+#endif
+#ifndef	NEED_UNICODE_NUMERIC
+#define	NEED_UNICODE_NUMERIC	1		//!< define to 1, if the numeric value of a code is needed
+#endif
+#ifndef	NEED_UNICODE_MIRRORED
+#define	NEED_UNICODE_MIRRORED	1		//!< define to 1, if the mirrored flag of a code is needed
+#endif
+#ifndef	NEED_UNICODE_DECN
+#define	NEED_UNICODE_DECN		1		//!< define to 1, if access to decomposed code [n] of a code is needed
+#endif
+#ifndef	NEED_UNICODE_UCASE
+#define	NEED_UNICODE_UCASE		1		//!< define to 1, if the upper case value of a code is needed
+#endif
+#ifndef	NEED_UNICODE_LCASE
+#define	NEED_UNICODE_LCASE		1		//!< define to 1, if the lower case value of a code is needed
+#endif
+#ifndef	NEED_UNICODE_TCASE
+#define	NEED_UNICODE_TCASE		1		//!< define to 1, if the title case value of a code is needed
+#endif
+#ifndef	NEED_UNICODE_WIDTH
+#define	NEED_UNICODE_WIDTH		1		//!< define to 1, if the glyph width of a code is needed
+#endif
+
+#define UTF8_CHAR_MAX			6		//!< maximum size of Unicode UTF-8 encoding
+#define UTF16_CHAR_MAX			2		//!< maximum size of Unicode UTF-16 encoding
 
 /* these are UTF-8 encoded strings for common characters */
-#define UTF8_NBSP           "\xc2\xa0"          /* non-breaking space */
-#define UTF8_MULTIPLY       "\xc3\x97"          /* multiplication symbol */
-#define UTF8_DEGREES        "\xc2\xb0"          /* degrees symbol */
+#define UTF8_NBSP           "\xc2\xa0"          //!< non-breaking space
+#define UTF8_MULTIPLY       "\xc3\x97"          //!< multiplication symbol
+#define UTF8_DEGREES        "\xc2\xb0"          //!< degrees symbol
 
-#define a_RING              "\xc3\xa5"          /* small a with a ring */
-#define a_UMLAUT            "\xc3\xa4"          /* small a with an umlaut */
-#define o_UMLAUT            "\xc3\xb6"          /* small o with an umlaut */
-#define u_UMLAUT            "\xc3\xbc"          /* small u with an umlaut */
-#define e_ACUTE             "\xc3\xa9"          /* small e with an acute */
+#define a_RING              "\xc3\xa5"          //!< small a with a ring
+#define a_UMLAUT            "\xc3\xa4"          //!< small a with an umlaut
+#define o_UMLAUT            "\xc3\xb6"          //!< small o with an umlaut
+#define u_UMLAUT            "\xc3\xbc"          //!< small u with an umlaut
+#define e_ACUTE             "\xc3\xa9"          //!< small e with an acute
 
-#define A_RING              "\xc3\x85"          /* capital A with a ring */
-#define A_UMLAUT            "\xc3\x84"          /* capital A with an umlaut */
-#define O_UMLAUT            "\xc3\x96"          /* capital O with an umlaut */
-#define U_UMLAUT            "\xc3\x9c"          /* capital U with an umlaut */
-#define E_ACUTE             "\xc3\x89"          /* capital E with an acute */
+#define A_RING              "\xc3\x85"          //!< capital A with a ring
+#define A_UMLAUT            "\xc3\x84"          //!< capital A with an umlaut
+#define O_UMLAUT            "\xc3\x96"          //!< capital O with an umlaut
+#define U_UMLAUT            "\xc3\x9c"          //!< capital U with an umlaut
+#define E_ACUTE             "\xc3\x89"          //!< capital E with an acute
 
-#define UTF8_LEFT           "\xe2\x86\x90"      /* cursor left */
-#define UTF8_RIGHT          "\xe2\x86\x92"      /* cursor right */
-#define UTF8_UP             "\xe2\x86\x91"      /* cursor up */
-#define UTF8_DOWN           "\xe2\x86\x93"      /* cursor down */
+#define UTF8_LEFT           "\xe2\x86\x90"      //!< cursor left
+#define UTF8_RIGHT          "\xe2\x86\x92"		//!< cursor right
+#define UTF8_UP             "\xe2\x86\x91"      //!< cursor up
+#define UTF8_DOWN           "\xe2\x86\x93"      //!< cursor down
 
 
 
@@ -64,8 +115,8 @@
 	TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT16 utf16_char;
-typedef UINT32 unicode_char;
+typedef UINT16 utf16_char;						//!< type used for UTF-16 encoded values
+typedef UINT32 unicode_char;					//!< type used for full width Unicode values
 
 
 
@@ -73,112 +124,81 @@ typedef UINT32 unicode_char;
 	FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* tests to see if a unicode char is a valid code point */
+//! tests to see if a unicode char is a valid code point
 int uchar_isvalid(unicode_char uchar);
 
-/* converting strings to 32-bit Unicode chars */
+//! convert an UTF-8 sequence into an unicode character
 int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count);
+
+//! convert a UTF-16 sequence into an unicode character
 int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t count);
+
+//! convert a UTF-16 sequence into an unicode character from a flipped byte order
 int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t count);
 
-/* converting 32-bit Unicode chars to strings */
+//! convert an unicode character into a UTF-8 sequence
 int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar);
+
+//! convert an unicode character into a UTF-16 sequence
 int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
+
+//! convert an unicode character into a UTF-16 sequence with flipped endianness
 int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
 
 /* misc UTF-8 helpers */
+//! return a pointer to the previous character in a string
 const char *utf8_previous_char(const char *utf8string);
+
+//! return true if the given string is a properly formed sequence of UTF-8 characters
 int utf8_is_valid_string(const char *utf8string);
 
-/* Unicode lookup table loader */
+//! return the number of decoded Unicode values in UTF-8 encoded string
+size_t utf8_strlen(const char* src);
+
+/* 8 bit code to Unicode value lookup table handling (e.g. ISO-8859-1 aka Latin1) */
 //! load a table translating UINT8 (unsigned char) to Unicode values
 unicode_char * uchar_table_load(const char* name);
 
-//! reverse lookup of uchar in a Unicode table - returns 255 if not found
+//! reverse lookup of uchar in a Unicode table
 UINT8 uchar_table_index(unicode_char* table, unicode_char uchar);
 
 //! free a unicode table
 void uchar_table_free(unicode_char* table);
 
+/* unicode_char array functions - string.h like */
+//! return the unicode_char array length
+size_t uchar_strlen(const unicode_char* src);
+
+//! compare two unicode_char arrays
+int uchar_strcmp(const unicode_char* dst, const unicode_char* src);
+
+//! compare two unicode_char arrays with length limiting
+int uchar_strncmp(const unicode_char* dst, const unicode_char* src, size_t len);
+
+//! print a formatted string of ASCII characters to an unicode_char array (max 256 characters)
+int uchar_sprintf(unicode_char* dst, const char* format, ...);
+
+//! copy an array of unicode_char from source to destination
+unicode_char* uchar_strcpy(unicode_char* dst, const unicode_char* src);
+
+//! copy a length limited array of unicode_char from source to destination
+unicode_char* uchar_strncpy(unicode_char* dst, const unicode_char* src, size_t len);
+
 /***************************************************************************
  *	unicode.org published UnicodeData.txt
- *  parser and accessors
+ *  Parser and property accessors
  ***************************************************************************/
 
-//! load the UnicodeData.txt file an parse it
+//! load the specified UnicodeData.txt file an parse it
 int unicode_data_load(const char* name);
 
 //! free the UnicodeData.txt table memory
 void unicode_data_free();
 
-//! size of the first 17 Unicode planes
-#define	UNICODE_PLANESIZE		0x110000
-
-#ifndef	NEED_UNICODE_RANGES
-#define	NEED_UNICODE_RANGES		1		//!< define to 1, if the name, first or last of the range of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_NAME
-#define	NEED_UNICODE_NAME		1		//!< define to 1, if the name of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_NAME10
-#define	NEED_UNICODE_NAME10		1		//!< define to 1, if the short name of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_GCAT
-#define	NEED_UNICODE_GCAT		1		//!< define to 1, if the general category of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_CCOM
-#define	NEED_UNICODE_CCOM		1		//!< define to 1, if the canonical combining (name) of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_BIDI
-#define	NEED_UNICODE_BIDI		1		//!< define to 1, if the bidirectional category of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_DECO
-#define	NEED_UNICODE_DECO		1		//!< define to 1, if the decomposition codes of a code are needed
-#endif
-
-#ifndef	NEED_UNICODE_DECIMAL
-#define	NEED_UNICODE_DECIMAL	1		//!< define to 1, if the decimal value of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_DIGIT
-#define	NEED_UNICODE_DIGIT		1		//!< define to 1, if the digit value of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_NUMERIC
-#define	NEED_UNICODE_NUMERIC	1		//!< define to 1, if the numeric value of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_MIRRORED
-#define	NEED_UNICODE_MIRRORED	1		//!< define to 1, if the mirrored flag of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_DECN
-#define	NEED_UNICODE_DECN		1		//!< define to 1, if access to decomposed code [n] of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_UCASE
-#define	NEED_UNICODE_UCASE		1		//!< define to 1, if the upper case value of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_LCASE
-#define	NEED_UNICODE_LCASE		1		//!< define to 1, if the lower case value of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_TCASE
-#define	NEED_UNICODE_TCASE		1		//!< define to 1, if the title case value of a code is needed
-#endif
-
-#ifndef	NEED_UNICODE_WIDTH
-#define	NEED_UNICODE_WIDTH		1		//!< define to 1, if the glyph width of a code is needed
-#endif
-
 #if	NEED_UNICODE_GCAT
+/**
+ * @brief enumeration of the possible general categories
+ */
 typedef enum {
 	gcat_0,		//!< invalid value
 	gcat_Lu,	//!< Letter, Uppercase
@@ -215,6 +235,9 @@ typedef enum {
 #endif
 
 #if	NEED_UNICODE_BIDI
+/**
+ * @brief enumeration of the possible bidirectional categories
+ */
 typedef enum {
 	bidi_0,		//!< invalid value
 	bidi_L,		//!< Left-to-Right
@@ -240,6 +263,9 @@ typedef enum {
 #endif
 
 #if	NEED_UNICODE_DECO
+/**
+ * @brief enumeration of the possible decomposition mappings
+ */
 typedef enum {
 	deco_0,			//!< invalid value
 	deco_canonical, //!< canonical mapping

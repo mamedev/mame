@@ -46,24 +46,6 @@ struct text_buffer
 ***************************************************************************/
 
 /*-------------------------------------------------
-	utf8_strlen - return the number of unicode
-	characters in UTF-8 encoded string
--------------------------------------------------*/
-INLINE int utf8_strlen(const char* src)
-{
-	int total = 0;
-	while (*src) {
-		unicode_char uchar;
-		int len = uchar_from_utf8(&uchar, src, strlen(src));
-		if (len < 0)
-			break;	// invalid UTF-8
-		total++;
-		src += len;
-	}
-	return total;
-}
-
-/*-------------------------------------------------
 	buffer_used - return the number of bytes
 	currently held in the buffer
 -------------------------------------------------*/

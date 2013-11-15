@@ -15,18 +15,6 @@
 
 
 //**************************************************************************
-//  UNICODE HELPERS
-//**************************************************************************
-static int unicode_strlen(const unicode_char* src)
-{
-	int len = 0;
-	while (*src++)
-		len++;
-	return len;
-}
-
-
-//**************************************************************************
 //  DEBUG VIEW TEXTBUF
 //**************************************************************************
 
@@ -92,7 +80,7 @@ void debug_view_textbuf::view_update()
 		// if this visible row is valid, add it to the buffer
 		if (line != NULL)
 		{
-			size_t len = unicode_strlen(line);
+			size_t len = uchar_strlen(line);
 			UINT32 effcol = m_topleft.x;
 
 			// copy data

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Jürgen Buchmüller
 /*********************************************************************
 
 	unicode.c
@@ -11,22 +11,27 @@
 #include "unicode.h"
 
 
-/*-------------------------------------------------
-	uchar_isvalid - return true if a given
-	character is a legitimate unicode character
--------------------------------------------------*/
-
+/**
+ * @brief test for legitimate unicode values
+ *
+ * return true if a given character is a legitimate unicode character
+ *
+ * @param uchar value to inspect
+ * @return non zero (true) if uchar is valid, 0 otherwise
+ */
 int uchar_isvalid(unicode_char uchar)
 {
 	return (uchar < 0x110000) && !((uchar >= 0xd800) && (uchar <= 0xdfff));
 }
 
 
-/*-------------------------------------------------
-	uchar_from_utf8 - convert a UTF-8 sequence
-	into a unicode character
--------------------------------------------------*/
-
+/**
+ * @brief convert an UTF-8 sequence into an unicode character
+ * @param uchar pointer to the resulting unicode_char
+ * @param utf8char pointer to the source string (may be NULL)
+ * @param count number of characters available in utf8char
+ * @return the number of characters used
+ */
 int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 {
 	unicode_char c, minchar;
@@ -117,11 +122,13 @@ int uchar_from_utf8(unicode_char *uchar, const char *utf8char, size_t count)
 }
 
 
-/*-------------------------------------------------
-	uchar_from_utf16 - convert a UTF-16 sequence
-	into a unicode character
--------------------------------------------------*/
-
+/**
+ * @brief convert a UTF-16 sequence	into an unicode character
+ * @param uchar pointer to the resulting unicode_char
+ * @param utf16char pointer to the source string (may be NULL)
+ * @param count number of characters available in utf16char
+ * @return the number of characters used
+ */
 int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t count)
 {
 	int rc = -1;
@@ -151,12 +158,17 @@ int uchar_from_utf16(unicode_char *uchar, const utf16_char *utf16char, size_t co
 }
 
 
-/*-------------------------------------------------
-	uchar_from_utf16f - convert a UTF-16 sequence
-	into a unicode character from a flipped
-	byte order
--------------------------------------------------*/
-
+/**
+ * @brief convert a UTF-16 sequence	into an unicode character from a flipped byte order
+ *
+ * This flips endianness of the first two utf16_char in a local
+ * copy and then calls uchar_from_utf16.
+ *
+ * @param uchar pointer to the resulting unicode_char
+ * @param utf16char pointer to the source string (may be NULL)
+ * @param count number of characters available in utf16char
+ * @return the number of characters used
+ */
 int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t count)
 {
 	utf16_char buf[2] = {0};
@@ -168,11 +180,13 @@ int uchar_from_utf16f(unicode_char *uchar, const utf16_char *utf16char, size_t c
 }
 
 
-/*-------------------------------------------------
-	utf8_from_uchar - convert a unicode character
-	into a UTF-8 sequence
--------------------------------------------------*/
-
+/**
+ * @brief convert an unicode character into a UTF-8 sequence
+ * @param utf8string pointer to the result char array
+ * @param count number of characters that can be written to utf8string
+ * @param uchar unciode_char value to convert
+ * @return -1 on error, or the number of chars written on success (1 to 6)
+ */
 int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 {
 	int rc = 0;
@@ -245,12 +259,13 @@ int utf8_from_uchar(char *utf8string, size_t count, unicode_char uchar)
 	return rc;
 }
 
-
-/*-------------------------------------------------
-	utf16_from_uchar - convert a unicode character
-	into a UTF-16 sequence
--------------------------------------------------*/
-
+/**
+ * @brief convert an unicode character into a UTF-16 sequence
+ * @param utf16string pointer to the result array of utf16_char
+ * @param count number of characters that can be written to utf16string
+ * @param uchar unciode_char value to convert
+ * @return -1 on error, or the number of utf16_char written on success (1 or 2)
+ */
 int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 {
 	int rc;
@@ -282,32 +297,33 @@ int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 	return rc;
 }
 
-
-/*-------------------------------------------------
-	utf16_from_uchar - convert a unicode character
-	into a UTF-16 sequence with flipped endianness
--------------------------------------------------*/
-
+/**
+ * @brief convert an unicode character into a UTF-16 sequence with flipped endianness
+ * @param utf16string pointer to the result array of utf16_char
+ * @param count number of characters that can be written to utf16string
+ * @param uchar unciode_char value to convert
+ * @return -1 on error, or the number of utf16_char written on success (1 or 2)
+ */
 int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 {
 	int rc;
 	utf16_char buf[2] = { 0, 0 };
 
-	rc = utf16_from_uchar(buf, count, uchar);
+	rc = utf16_from_uchar(buf, 2, uchar);
 
-	if (rc >= 1)
+	if (rc >= 1 && count >= 1)
 		utf16string[0] = FLIPENDIAN_INT16(buf[0]);
-	if (rc >= 2)
+	if (rc >= 2 && count >= 2)
 		utf16string[1] = FLIPENDIAN_INT16(buf[1]);
-	return rc;
+	return rc < count ? rc : count;
 }
 
 
-/*-------------------------------------------------
-	utf8_previous_char - return a pointer to the
-	previous character in a string
--------------------------------------------------*/
-
+/**
+ * @brief return a pointer to the previous character in a string
+ * @param utf8string const pointer to the starting position in the string
+ * @return pointer to the character which is not an UTF-8 auxiliary character
+ */
 const char *utf8_previous_char(const char *utf8string)
 {
 	while ((*--utf8string & 0xc0) == 0x80)
@@ -315,13 +331,11 @@ const char *utf8_previous_char(const char *utf8string)
 	return utf8string;
 }
 
-
-/*-------------------------------------------------
-	utf8_is_valid_string - return true if the
-	given string is a properly formed sequence of
-	UTF-8 characters
--------------------------------------------------*/
-
+/**
+ * @brief return true if the given string is a properly formed sequence of UTF-8 characters
+ * @param utf8string const pointer to the source string
+ * @return TRUE if the string is valid, FALSE otherwise
+ */
 int utf8_is_valid_string(const char *utf8string)
 {
 	int remaining_length = strlen(utf8string);
@@ -344,12 +358,38 @@ int utf8_is_valid_string(const char *utf8string)
 	return TRUE;
 }
 
-/*-------------------------------------------------
-	unicode_load_table - load a lookup table
-	for e.g. ISO-8859-1 to Unicode from a file
-	The expected format is "Format A" defined
-	by unicode.org
--------------------------------------------------*/
+/**
+ * @brief return the number of decoded Unicode values in UTF-8 encoded string
+ * @param src pointer to the array of UTF-8 encoded characters
+ * @return number of unicode_char values decoded from the UTF-8 string
+ */
+size_t utf8_strlen(const char* src)
+{
+	int total = 0;
+	while (*src) {
+		unicode_char uchar;
+		int len = uchar_from_utf8(&uchar, src, strlen(src));
+		if (len < 0)
+			break;	// invalid UTF-8
+		total++;
+		src += len;
+	}
+	return total;
+}
+
+/**
+ * @brief load a lookup table 8 bit codes to Unicode values
+ *
+ * This opens and reads a file %name which has to be in the
+ * unicode.org defined "Format A".
+ * That is three columns
+ *   column 1: hex encoded 8 bit value of the code
+ *   column 2: hex encoded 32 bit (max) unicode value
+ *   column 3: a hash (#) and optional comment until the end-of-line
+ *
+ * @param name name of the (text) file to parse
+ * @return pointer to a newly allocated array of 256 unicode_char values
+ */
 unicode_char * uchar_table_load(const char* name)
 {
 	FILE* file = fopen(name, "r");
@@ -384,6 +424,12 @@ unicode_char * uchar_table_load(const char* name)
 	return table;
 }
 
+/**
+ * @brief return the 8 bit code that is mapped to the specified unicode_char
+ * @param table table of 256 unicode_char values to use for the reverse lookup
+ * @param uchar unicode value to revers lookup
+ * @return UINT8 with the 8 bit code, or 255 if uchar wasn't found
+ */
 UINT8 uchar_table_index(unicode_char* table, unicode_char uchar)
 {
 	UINT8 index;
@@ -393,10 +439,124 @@ UINT8 uchar_table_index(unicode_char* table, unicode_char uchar)
 	return index;
 }
 
+/**
+ * @brief free an unicode lookup table
+ * @param table
+ */
 void uchar_table_free(unicode_char* table)
 {
 	if (table)
 		free(table);
+}
+
+/**
+ * @brief return the unicode_char array length
+ * @param src pointer to an array of unicode_char
+ * @return length of the array until the first 0
+ */
+size_t uchar_strlen(const unicode_char* src)
+{
+	int len = 0;
+	while (*src++)
+		len++;
+	return len;
+}
+
+/**
+ * @brief compare two unicode_char arrays
+ * @param dst pointer to the first array of unicode_char
+ * @param src pointer to the second array of unicode_char
+ * @return 0 if dst == src, -1 if dst < src or +1 otherwise
+ */
+int uchar_strcmp(const unicode_char* dst, const unicode_char* src)
+{
+	while (*src && *dst && *src == *dst)
+	{
+		src++;
+		dst++;
+	}
+	if (*src != *dst)
+		return *src < *dst ? -1 : +1;
+	return 0;
+}
+
+/**
+ * @brief compare two unicode_char arrays with length limiting
+ * @param dst pointer to the first array of unicode_char
+ * @param src pointer to the second array of unicode_char
+ * @param len maximum number of unicode_char to compare
+ * @return 0 if dst == src, -1 if dst < src or +1 otherwise
+ */
+int uchar_strncmp(const unicode_char* dst, const unicode_char* src, size_t len)
+{
+	while (*src && *dst && *src == *dst && len > 0)
+	{
+		src++;
+		dst++;
+		len--;
+	}
+	if (*src != *dst)
+		return *src < *dst ? -1 : +1;
+	return 0;
+}
+
+/**
+ * @brief print a formatted string of ASCII characters to an unicode_char array
+ * @param dst pointer to the array
+ * @param format format string followed by optional parameters
+ * @return number of unicode_char stored in dst
+ */
+int uchar_sprintf(unicode_char* dst, const char* format, ...)
+{
+	va_list ap;
+	char buff[256];
+	va_start(ap, format);
+	int len = vsnprintf(buff, sizeof(buff), format, ap);
+	va_end(ap);
+	for (int i = 0; i < len; i++)
+		*dst++ = buff[i];
+	*dst = 0;
+	return len;
+}
+
+/**
+ * @brief copy an array of unicode_char from source to destination
+ *
+ * @param dst pointer to destination array
+ * @param src const pointer to the source array
+ * @return a pointer to the original destination
+ */
+unicode_char* uchar_strcpy(unicode_char* dst, const unicode_char* src)
+{
+	unicode_char* str = dst;
+	while (*src)
+		*dst++ = *src++;
+	return str;
+}
+
+/**
+ * @brief copy a length limited array of unicode_char from source to destination
+ *
+ * This function always terminates dst with a 0 unicode_char, unlike some
+ * classic libc implementations of strncpy(). This means that actually at
+ * most len-1 unicode_char are copied from src to leave room for the 0 code.
+ *
+ * @param dst pointer to destination array
+ * @param src const pointer to the source array
+ * @param len maximum number of unicode_char to copy
+ * @return a pointer to the original destination
+ */
+unicode_char* uchar_strncpy(unicode_char* dst, const unicode_char* src, size_t len)
+{
+	unicode_char* str = dst;
+	while (*src && len > 1)
+	{
+		*dst++ = *src++;
+		len--;
+	}
+	if (len > 0)
+		*dst = 0;
+	return str;
 }
 
 /***************************************************************************
@@ -405,7 +565,7 @@ void uchar_table_free(unicode_char* table)
  *
  ***************************************************************************/
 
-//! Information about a unicode_char
+//! Information about an unicode_char
 typedef struct {
 #if	NEED_UNICODE_NAME
 	char *name;									//!< name of the character
@@ -552,13 +712,15 @@ static const unicode_range_t unicode_ranges[] =
 	{0xfe70, 0xfeff, "Arabic Presentation Forms-B"},
 	{0xff00, 0xffef, "Halfwidth and Fullwidth Forms"},
 	{0xfff0, 0xffff, "Specials"}
+	// FIXME: add ranges for the Unicode planes 1 to 16
 };
 #endif
 
 #if	NEED_UNICODE_CCOM
 static const char *canonical_combining_str(UINT8 val)
 {
-	switch (val) {
+	switch (val)
+	{
 	case 0:		return "Spacing, split, enclosing, reordrant, and Tibetan subjoined";
 	case 1:		return "Overlays and interior";
 	case 7:		return "Nuktas";
@@ -620,7 +782,8 @@ const char * unicode_gcat_name(unicode_char uchar)
 {
 	if (!unicode_data || uchar >= UNICODE_PLANESIZE || !unicode_data[uchar])
 		return "";
-	switch (unicode_data[uchar]->gen_cat) {
+	switch (unicode_data[uchar]->gen_cat)
+	{
 	case gcat_Lu:	return "Lu: Letter, Uppercase";
 	case gcat_Ll:	return "Ll: Letter, Lowercase";
 	case gcat_Lt:	return "Lt: Letter, Titlecase";
@@ -685,7 +848,8 @@ const char * unicode_bidi_name(unicode_char uchar)
 {
 	if (!unicode_data || uchar >= UNICODE_PLANESIZE || !unicode_data[uchar])
 		return "";
-	switch (unicode_data[uchar]->bidi) {
+	switch (unicode_data[uchar]->bidi)
+	{
 	case bidi_L:	return "L: Left-to-Right";
 	case bidi_LRE:	return "LRE: Left-to-Right Embedding";
 	case bidi_LRO:	return "LRO: Left-to-Right Override";
@@ -723,7 +887,8 @@ const char * unicode_deco_name(unicode_char uchar)
 {
 	if (!unicode_data || uchar >= UNICODE_PLANESIZE || !unicode_data[uchar])
 		return "";
-	switch (unicode_data[uchar]->decomp_map) {
+	switch (unicode_data[uchar]->decomp_map)
+	{
 	case deco_canonical:	return "Canonical mapping";
 	case deco_font:			return "A font variant (e.g. a blackletter form)";
 	case deco_noBreak:		return "A no-break version of a space or hyphen";
@@ -915,14 +1080,18 @@ const char * unicode_range_name(unicode_char uchar)
 	static UINT32 hit = 0;
 	UINT32 i;
 
-	for (i = hit; i < sizeof(unicode_ranges)/sizeof(unicode_ranges[0]); i++) {
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last) {
+	for (i = hit; i < sizeof(unicode_ranges)/sizeof(unicode_ranges[0]); i++)
+	{
+		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
+		{
 			hit = i;
 			return unicode_ranges[i].name;
 		}
 	}
-	for (i = 0; i < hit; i++) {
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last) {
+	for (i = 0; i < hit; i++)
+	{
+		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
+		{
 			hit = i;
 			return unicode_ranges[i].name;
 		}
@@ -936,15 +1105,18 @@ unicode_char unicode_range_first(unicode_char uchar)
 	static UINT32 hit = 0;
 	UINT32 i;
 
-	for (i = hit; i < sizeof(unicode_ranges)/sizeof(unicode_ranges[0]); i++) {
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last) {
+	for (i = hit; i < sizeof(unicode_ranges)/sizeof(unicode_ranges[0]); i++)
+	{
+		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
+		{
 			hit = i;
 			return unicode_ranges[i].first;
 		}
 	}
-
-	for (i = 0; i < hit; i++) {
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last) {
+	for (i = 0; i < hit; i++)
+	{
+		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
+		{
 			hit = i;
 			return unicode_ranges[i].first;
 		}
@@ -958,15 +1130,18 @@ unicode_char unicode_range_last(unicode_char uchar)
 	static UINT32 hit = 0;
 	UINT32 i;
 
-	for (i = hit; i < sizeof(unicode_ranges)/sizeof(unicode_ranges[0]); i++) {
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last) {
+	for (i = hit; i < sizeof(unicode_ranges)/sizeof(unicode_ranges[0]); i++)
+	{
+		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
+		{
 			hit = i;
 			return unicode_ranges[i].last;
 		}
 	}
-
-	for (i = 0; i < hit; i++) {
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last) {
+	for (i = 0; i < hit; i++)
+	{
+		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
+		{
 			hit = i;
 			return unicode_ranges[i].last;
 		}
@@ -985,10 +1160,13 @@ static char *parse_strtok(char *src, const char *delim)
 	if (src)
 		token = src;
 	start = token;
-	while (token && *token) {
+	while (token && *token)
+	{
 		const char *d = delim;
-		while (*d) {
-			if (*token == *d) {
+		while (*d)
+		{
+			if (*token == *d)
+			{
 				*token++ = '\0';
 				return start;
 			}
@@ -1016,7 +1194,8 @@ int unicode_data_load(const char* name)
 	unicode_char first = 0;
 	unicode_char last = 0;
 
-	while (fgets(line, 1024, file)) {
+	while (fgets(line, 1024, file))
+	{
 		unicode_data_t u;
 		unicode_char code;
 		int tokennum = 1;
@@ -1034,17 +1213,21 @@ int unicode_data_load(const char* name)
 		tokennum++;
 		if (NULL == (token = parse_strtok(NULL, ";\r\n")))
 			fprintf(stderr, "%s: token #%d failed on line %d\n%s", __FUNCTION__, tokennum, linenum, line);
-		if (NULL != token) {
+		if (NULL != token)
+		{
 			// check for a range description
-			if (token[0] == '<') {
+			if (token[0] == '<')
+			{
 				// strip a trailing ", First>" string fragment
-				if (0 == strcmp(token + strlen(token) - 8,", First>")) {
+				if (0 == strcmp(token + strlen(token) - 8,", First>"))
+				{
 					strcpy(token, token + 1);
 					token[strlen(token) - 8] = '\0';
 					first = code;
 				}
 				// strip a trailing ", Last>" string fragment
-				if (0 == strcmp(token + strlen(token) - 7,", Last>")) {
+				if (0 == strcmp(token + strlen(token) - 7,", Last>"))
+				{
 					strcpy(token, token + 1);
 					token[strlen(token) - 7] = '\0';
 					last = code;
@@ -1062,7 +1245,8 @@ int unicode_data_load(const char* name)
 #if	NEED_UNICODE_GCAT
 		// parse general category
 		u.gen_cat = gcat_0;
-		if (NULL != token) {
+		if (NULL != token)
+		{
 			if (0 == strcmp(token, "Lu"))
 				u.gen_cat = gcat_Lu;
 			if (0 == strcmp(token, "Ll"))
@@ -1140,7 +1324,8 @@ int unicode_data_load(const char* name)
 #if	NEED_UNICODE_BIDI
 		// parse bidirectional category
 		u.bidi = bidi_0;
-		if (NULL != token) {
+		if (NULL != token)
+		{
 			if (0 == strcmp(token, "L"))
 				u.bidi = bidi_L;	// Left-to-Right
 			if (0 == strcmp(token, "LRE"))
@@ -1187,7 +1372,8 @@ int unicode_data_load(const char* name)
 			fprintf(stderr, "%s: token #%d failed on line %d\n%s", __FUNCTION__, tokennum, linenum, line);
 #if	NEED_UNICODE_DECO
 		// parse decomposition mapping
-		if (NULL != token) {
+		if (NULL != token)
+		{
 			unicode_char decomposed[256];
 			UINT8 n = 0;
 			char *p = token;
@@ -1229,7 +1415,8 @@ int unicode_data_load(const char* name)
 				while (isspace(*p))
 					p++;
 			// parse decomposition codes
-			while (*p) {
+			while (*p)
+			{
 				// skip initial whitespace
 				while (isspace(*p))
 					p++;
@@ -1242,7 +1429,8 @@ int unicode_data_load(const char* name)
 				if (n >= 255)
 					break;
 			}
-			if (n > 0) {
+			if (n > 0)
+			{
 				u.n_decomp = n;
 				u.decomp_codes = (unicode_char*)malloc(sizeof(unicode_char) * n);
 				memcpy(u.decomp_codes, decomposed, sizeof(unicode_char) * n);
@@ -1296,7 +1484,8 @@ int unicode_data_load(const char* name)
 		tokennum++;
 		if (NULL == (token = parse_strtok(NULL, ";\r\n")))
 			fprintf(stderr, "%s: token #%d failed on line %d\n%s", __FUNCTION__, tokennum, linenum, line);
-		if (NULL != token && *token) {
+		if (NULL != token && *token)
+		{
 			/* FIXME: hmm ... don't know what this token means */
 		}
 
@@ -1324,10 +1513,14 @@ int unicode_data_load(const char* name)
 			u.titlecase = strtoul(token, NULL, 16);
 #endif
 
-		if (first > 0 && last > 0) {
-			if (first + 1 >= UNICODE_PLANESIZE) {
+		if (first > 0 && last > 0)
+		{
+			if (first + 1 >= UNICODE_PLANESIZE)
+			{
 				fprintf(stderr, "%s: range %#07x-%#07x outside planes\n", __FUNCTION__, first + 1, last);
-			} else {
+			}
+			else
+			{
 				for (code = first + 1; code <= last && code < UNICODE_PLANESIZE; code++)
 					unicode_data[code] = unicode_data[first];
 			}
@@ -1335,7 +1528,8 @@ int unicode_data_load(const char* name)
 			last = 0;
 			code = UNICODE_PLANESIZE;
 		}
-		if (code < UNICODE_PLANESIZE) {
+		if (code < UNICODE_PLANESIZE)
+		{
 			unicode_data[code] = (unicode_data_t *)malloc(sizeof(unicode_data_t));
 			memcpy(unicode_data[code], &u, sizeof(u));
 		}
