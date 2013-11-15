@@ -1060,7 +1060,8 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	int i;
 	UINT8 s0, s1;
 
-	LOG((LOG_DISK,8,"	>>> KWD timing bitclk:%d datin:%d sect4:%d\n", bitclk, datin, m_dsk.sect4));
+	LOG((LOG_DISK,8,"	>>> KWD timing bitclk:%d datin:%d block:%d SECT[4]:%d\n", bitclk, datin, block, m_dsk.sect4));
+
 	if (m_dsk.sect4 != dhd->get_sector_mark_0()) {
 		// SECT[4] transition
 		m_dsk.sect4 = dhd->get_sector_mark_0();
@@ -1076,7 +1077,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		}
 	}
 	if (0 != m_dsk.seclate && m_dsk.bitclk && !bitclk) {
-		 // if SECLATE is 1, the counter will count or load:
+		// if SECLATE is 1, the counter will count or load:
 		if ((m_dsk.shiftin & (1 << 16)) && !WFFO) {
 			/*
 			 * If HIORDBIT is 1 at the falling edge of BITCLK, it sets the
@@ -1101,7 +1102,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			 */
 			m_dsk.bitcount = (m_dsk.bitcount + 1) % 16;
 			m_dsk.carry = m_dsk.bitcount == 15;
-			LOG((LOG_DISK,7,"	WFFO:1 count bitcount:%2d\n", m_dsk.bitcount));
+			LOG((LOG_DISK,6,"	WFFO:1 count bitcount:%2d\n", m_dsk.bitcount));
 		} else {
 			/*
 			 * If BUS[4] (WFFO) was 0, both J and K' will be 0, and Q
@@ -1109,10 +1110,11 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			 */
 			m_dsk.bitcount = 15;
 			m_dsk.carry = 1;
-			LOG((LOG_DISK,7,"	WFFO:0 load bitcount:%2d\n", m_dsk.bitcount));
+			LOG((LOG_DISK,6,"	WFFO:0 load bitcount:%2d\n", m_dsk.bitcount));
 		}
 	} else if (!m_dsk.bitclk && bitclk) {
-		m_dsk.shiftin = (m_dsk.shiftin << 1) | datin;		// clock the shift register on the rising edge of bitclk
+		// rising edge of bitclk
+		m_dsk.shiftin = (m_dsk.shiftin << 1) | datin;		// clock the input shift register
 		m_dsk.shiftout = m_dsk.shiftout << 1;				// and the output shift register too
 	}
 
@@ -1413,12 +1415,13 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	if (m_dsk.ff_22b & JKFF_Q) {
 		if (0 == (m_task_wakeup & (1 << task_ksec))) {
 			LOG((LOG_DISK,6,"	STSKENA:1; WAKEST':0 wake KSEC\n"));
-			m_task_wakeup |= 1 << task_kwd;
+			m_task_wakeup |= 1 << task_ksec;
 		}
-	} else {
+	}
+	if (m_dsk.ff_22b & JKFF_Q0) {
 		if (0 != (m_task_wakeup & (1 << task_ksec))) {
 			LOG((LOG_DISK,6,"	STSKENA:0; WAKEST':1\n"));
-			m_task_wakeup &= ~(1 << task_kwd);
+			m_task_wakeup &= ~(1 << task_ksec);
 		}
 	}
 
@@ -1459,23 +1462,33 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 
 	// check if write and erase gate, or read gate are changed
 	if ((m_task_wakeup & (1 << task_ksec)) || GET_KCOM_XFEROFF(m_dsk.kcom) || m_dsk.kfer) {
+#if	ALTO2_DEBUG
+		if (0 == m_dsk.egate || 0 == m_dsk.wrgate || 0 == m_dsk.rdgate) {
+			// log the reason why gates are deasserted
+			LOG((LOG_DISK,6,"	deassert gates because of"));
+			if (m_task_wakeup & (1 << task_ksec)) {
+				LOG((LOG_DISK,6," wake KSEC"));
+			}
+			if (GET_KCOM_XFEROFF(m_dsk.kcom)) {
+				LOG((LOG_DISK,6," XFEROFF"));
+			}
+			if (m_dsk.kfer) {
+				LOG((LOG_DISK,6," KFER"));
+			}
+		}
+#endif
 		// sector task is active OR xferoff is set OR fatal error
 		dhd->set_egate(m_dsk.egate = 1);
 		dhd->set_wrgate(m_dsk.wrgate = 1);
 		dhd->set_rdgate(m_dsk.rdgate = 1);
-	} else {
-		// assert either erase and read or write gates depending on current record R/W
-		if (m_dsk.krwc & RWC_WRITE) {
-			// assert erase and write gates only if OKTORUN is high
-			if (m_dsk.ok_to_run) {
-				dhd->set_egate(m_dsk.egate = 0);
-				dhd->set_wrgate(m_dsk.wrgate = 0);
-			}
+	} else if (m_dsk.ok_to_run) {
+		 if (m_dsk.krwc & RWC_WRITE) {
+			// assert erase and write gates
+			dhd->set_egate(m_dsk.egate = 0);
+			dhd->set_wrgate(m_dsk.wrgate = 0);
 		} else {
-			// assert read gate only if OKTORUN is high
-			if (m_dsk.ok_to_run) {
-				dhd->set_rdgate(m_dsk.rdgate = 0);
-			}
+			// assert read gate
+			dhd->set_rdgate(m_dsk.rdgate = 0);
 		}
 	}
 
@@ -1669,15 +1682,15 @@ void alto2_cpu_device::bs_read_kstat_0()
 	r = m_dsk.kstat;
 
 	LOG((LOG_DISK,1,"	←KSTAT; BUS &= %#o\n", r));
-	LOG((LOG_DISK,2,"		sector     : %#o\n", GET_KSTAT_SECTOR(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		done       : %#o\n", GET_KSTAT_DONE(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		seekfail   : %d\n", GET_KSTAT_SEEKFAIL(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		seek       : %d\n", GET_KSTAT_SEEK(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		notrdy     : %d\n", GET_KSTAT_NOTRDY(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		datalate   : %d\n", GET_KSTAT_DATALATE(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		idle       : %d\n", GET_KSTAT_IDLE(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		cksum      : %d\n", GET_KSTAT_CKSUM(m_dsk.kstat)));
-	LOG((LOG_DISK,2,"		completion : %#o\n", GET_KSTAT_COMPLETION(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		SECTOR     : %#o\n", GET_KSTAT_SECTOR(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		DONE       : %#o\n", GET_KSTAT_DONE(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		SEEKFAIL   : %d\n", GET_KSTAT_SEEKFAIL(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		SEEK       : %d\n", GET_KSTAT_SEEK(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		NOTRDY     : %d\n", GET_KSTAT_NOTRDY(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		DATALATE   : %d\n", GET_KSTAT_DATALATE(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		IDLE       : %d\n", GET_KSTAT_IDLE(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		CKSUM      : %d\n", GET_KSTAT_CKSUM(m_dsk.kstat)));
+	LOG((LOG_DISK,2,"		COMPLETION : %#o\n", GET_KSTAT_COMPLETION(m_dsk.kstat)));
 
 	m_bus &= r;
 }
@@ -1734,9 +1747,9 @@ void alto2_cpu_device::f1_load_kstat_1()
 {
 	int i;
 	LOG((LOG_DISK,1,"	KSTAT←; BUS[12-15] %#o\n", m_bus));
-	LOG((LOG_DISK,2,"		idle       : %#o\n", GET_KSTAT_IDLE(m_bus)));
-	LOG((LOG_DISK,2,"		cksum      : %#o\n", GET_KSTAT_CKSUM(m_bus)));
-	LOG((LOG_DISK,2,"		completion : %#o\n", GET_KSTAT_COMPLETION(m_bus)));
+	LOG((LOG_DISK,2,"		IDLE       : %d\n", GET_KSTAT_IDLE(m_bus)));
+	LOG((LOG_DISK,2,"		CKSUM      : %d\n", GET_KSTAT_CKSUM(m_bus)));
+	LOG((LOG_DISK,2,"		COMPLETION : %#o\n", GET_KSTAT_COMPLETION(m_bus)));
 
 	/* KSTAT[12] is just taken from BUS[12] */
 	PUT_KSTAT_IDLE(m_dsk.kstat, GET_KSTAT_IDLE(m_bus));
@@ -1983,17 +1996,14 @@ void alto2_cpu_device::f1_clrstat_1()
  */
 void alto2_cpu_device::f1_load_kcom_1()
 {
-	if (m_dsk.kcom != m_bus) {
-		m_dsk.kcom = m_bus;
-		LOG((LOG_DISK,2,"	KCOM←; BUS %06o\n", m_dsk.kcom));
-		LOG((LOG_DISK,2,"		xferoff    : %#o\n", GET_KCOM_XFEROFF(m_dsk.kcom)));
-		LOG((LOG_DISK,2,"		wdinhib    : %#o\n", GET_KCOM_WDINHIB(m_dsk.kcom)));
-		LOG((LOG_DISK,2,"		bclksrc    : %#o\n", GET_KCOM_BCLKSRC(m_dsk.kcom)));
-		LOG((LOG_DISK,2,"		wffo       : %#o\n", GET_KCOM_WFFO(m_dsk.kcom)));
-		LOG((LOG_DISK,2,"		sendadr    : %#o\n", GET_KCOM_SENDADR(m_dsk.kcom)));
-
-		// TODO: show disk indicator in the GUI?
-	}
+	m_dsk.kcom = m_bus;
+	LOG((LOG_DISK,2,"	KCOM←; BUS %06o\n", m_dsk.kcom));
+	LOG((LOG_DISK,2,"		XFEROFF    : %d\n", GET_KCOM_XFEROFF(m_dsk.kcom)));
+	LOG((LOG_DISK,2,"		WDINHIB    : %d\n", GET_KCOM_WDINHIB(m_dsk.kcom)));
+	LOG((LOG_DISK,2,"		BCLKSRC    : %d\n", GET_KCOM_BCLKSRC(m_dsk.kcom)));
+	LOG((LOG_DISK,2,"		WFFO       : %d\n", GET_KCOM_WFFO(m_dsk.kcom)));
+	LOG((LOG_DISK,2,"		SENDADR    : %d\n", GET_KCOM_SENDADR(m_dsk.kcom)));
+	// TODO: show disk indicator in the GUI?
 }
 
 /**
@@ -2031,12 +2041,12 @@ void alto2_cpu_device::f1_load_kadr_1()
 	m_dsk.krwc = GET_KADR_HEADER(m_dsk.kadr);
 
 	LOG((LOG_DISK,1,"	KADR←; BUS[8-14] #%o\n", m_dsk.kadr));
-	LOG((LOG_DISK,2,"		seal       : %#o\n", GET_KADR_SEAL(m_dsk.kadr)));
-	LOG((LOG_DISK,2,"		header     : %s (%#o)\n",  rwc_name[GET_KADR_HEADER(m_dsk.kadr)], GET_KADR_HEADER(m_dsk.kadr)));
-	LOG((LOG_DISK,2,"		label      : %s (%#o)\n",  rwc_name[GET_KADR_LABEL(m_dsk.kadr)], GET_KADR_LABEL(m_dsk.kadr)));
-	LOG((LOG_DISK,2,"		data       : %s (%#o)\n",  rwc_name[GET_KADR_DATA(m_dsk.kadr)], GET_KADR_DATA(m_dsk.kadr)));
-	LOG((LOG_DISK,2,"		noxfer     : %#o\n",  GET_KADR_NOXFER(m_dsk.kadr)));
-	LOG((LOG_DISK,2,"		unused     : %#o (drive?)\n",  GET_KADR_UNUSED(m_dsk.kadr)));
+	LOG((LOG_DISK,2,"		SEAL       : %d\n", GET_KADR_SEAL(m_dsk.kadr)));
+	LOG((LOG_DISK,2,"		HEADER     : %s (%#o)\n",  rwc_name[GET_KADR_HEADER(m_dsk.kadr)], GET_KADR_HEADER(m_dsk.kadr)));
+	LOG((LOG_DISK,2,"		LABEL      : %s (%#o)\n",  rwc_name[GET_KADR_LABEL(m_dsk.kadr)], GET_KADR_LABEL(m_dsk.kadr)));
+	LOG((LOG_DISK,2,"		DATA       : %s (%#o)\n",  rwc_name[GET_KADR_DATA(m_dsk.kadr)], GET_KADR_DATA(m_dsk.kadr)));
+	LOG((LOG_DISK,2,"		NOXFER     : %d\n",  GET_KADR_NOXFER(m_dsk.kadr)));
+	LOG((LOG_DISK,2,"		unused     : %d (drive?)\n",  GET_KADR_UNUSED(m_dsk.kadr)));
 	// TODO: show disk indicator in the GUI?
 }
 

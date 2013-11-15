@@ -103,6 +103,10 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 {
 }
 
+/**
+ * @brief diablo_hd_device destructor
+ * Free all m_cache and m_bits pages and the arrays
+ */
 diablo_hd_device::~diablo_hd_device()
 {
 	for (int page = 0; page < m_pages; page++) {
@@ -121,13 +125,6 @@ diablo_hd_device::~diablo_hd_device()
 	}
 }
 
-void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *, int))
-{
-	LOG_DRIVE((0,"[DHD] %s cookie=%p callback=%p\n", __FUNCTION__, cookie, callback));
-	m_sector_callback_cookie = cookie;
-	m_sector_callback = callback;
-}
-
 #if	DIABLO_DEBUG
 void diablo_hd_device::logprintf(int level, const char* format, ...)
 {
@@ -139,6 +136,13 @@ void diablo_hd_device::logprintf(int level, const char* format, ...)
 	va_end(ap);
 }
 #endif
+
+void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *, int))
+{
+	LOG_DRIVE((0,"[DHD] %s cookie=%p callback=%p\n", __FUNCTION__, cookie, callback));
+	m_sector_callback_cookie = cookie;
+	m_sector_callback = callback;
+}
 
 #define	DIABLO31_ROTATION_TIME attotime::from_msec(39.9999)		//!< DIABLO 31 rotation time is approx. 40ms
 #define	DIABLO31_SECTOR_TIME attotime::from_msec(39.9999/12)	//!< DIABLO 31 sector time
@@ -246,7 +250,13 @@ typedef struct {
 	UINT8 data[2*DIABLO_DATA_WORDS];		//!< sector data words
 }	diablo_sector_t;
 
-/** @brief write a bit into an array of UINT32 */
+/**
+ * @brief write a bit into an array of UINT32
+ * @param bits pointer to array of bits
+ * @param dst destination index
+ * @param bit bit value
+ * @return next destination index
+ */
 static inline size_t WRBIT(UINT32* bits, size_t dst, int bit)
 {
 	if (bit) {
@@ -257,7 +267,13 @@ static inline size_t WRBIT(UINT32* bits, size_t dst, int bit)
 	return ++dst;
 }
 
-/** @brief read a bit from an array of UINT32 */
+/**
+ * @brief read a bit from an array of UINT32
+ * @param bits pointer to array of bits
+ * @param src source index
+ * @param bit reference to the bit to set
+ * @return next source index
+ */
 static inline size_t RDBIT(UINT32* bits, size_t src, int& bit)
 {
 	bit = (bits[src/32] >> (src % 32)) & 1;
@@ -415,6 +431,7 @@ size_t diablo_hd_device::expand_cksum(UINT32 *bits, size_t dst, UINT8 *field, si
  * @brief expand a sector into an array of clock and data bits
  *
  * @param page page number (0 to DRIVE_PAGES-1)
+ * @return pointer to the newly allocated array of bits
  */
 UINT32* diablo_hd_device::expand_sector()
 {
@@ -529,9 +546,9 @@ size_t diablo_hd_device::dump_record(UINT8 *src, size_t addr, size_t size, const
  * @brief find a sync bit in an array of clock and data bits
  *
  * @param bits pointer to the sector's bits
- * @param src source offset into bits (bit number)
+ * @param src source index into bits (bit number)
  * @param size number of words to scan for a sync word
- * @return next source offset for reading
+ * @return next source index for reading
  */
 size_t diablo_hd_device::squeeze_sync(UINT32 *bits, size_t src, size_t size)
 {
@@ -565,9 +582,9 @@ size_t diablo_hd_device::squeeze_sync(UINT32 *bits, size_t src, size_t size)
  * @brief find a 16 x 0 bits sequence in an array of clock and data bits
  *
  * @param bits pointer to the sector's bits
- * @param src source offset into bits (bit number)
+ * @param src source index into bits (bit number)
  * @param size number of words to scan for a sync word
- * @return next source offset for reading
+ * @return next source index for reading
  */
 size_t diablo_hd_device::squeeze_unsync(UINT32 *bits, size_t src, size_t size)
 {
@@ -600,10 +617,10 @@ size_t diablo_hd_device::squeeze_unsync(UINT32 *bits, size_t src, size_t size)
  * @brief squeeze an array of clock and data bits into a sector's record
  *
  * @param bits pointer to the sector's bits
- * @param src source offset into bits (bit number)
+ * @param src source index into bits (bit number)
  * @param field pointer to the record data (bytes)
  * @param size size of the record in bytes
- * @return next source offset for reading
+ * @return next source index for reading
  */
 size_t diablo_hd_device::squeeze_record(UINT32 *bits, size_t src, UINT8 *field, size_t size)
 {
@@ -630,9 +647,9 @@ size_t diablo_hd_device::squeeze_record(UINT32 *bits, size_t src, UINT8 *field, 
  * @brief squeeze an array of 32 clock and data bits into a checksum word
  *
  * @param bits pointer to the sector's bits
- * @param src source offset into bits (bit number)
+ * @param src source index into bits (bit number)
  * @param cksum pointer to an int to receive the checksum word
- * @return next source offset for reading
+ * @return next source index for reading
  */
 size_t diablo_hd_device::squeeze_cksum(UINT32 *bits, size_t src, int *cksum)
 {
@@ -654,8 +671,8 @@ size_t diablo_hd_device::squeeze_cksum(UINT32 *bits, size_t src, int *cksum)
 /**
  * @brief squeeze a array of clock and data bits into a sector's data
  *
- * Find and squeeze header, label and data and verify for
- * zero checksums (starting with 0521)
+ * Find and squeeze header, label and data fields and verify for
+ * zero checksums, starting with a value of 0521.
  * Write the page back to the media and free the bitmap
  */
 void diablo_hd_device::squeeze_sector()
@@ -773,7 +790,7 @@ void diablo_hd_device::squeeze_sector()
 
 /**
  * @brief return number of bitclk edges for a sector
- * @return number of bitclk edges for a sector
+ * @return number of bitclks for a sector
  */
 int diablo_hd_device::bits_per_sector() const
 {
@@ -791,7 +808,7 @@ const char* diablo_hd_device::description() const
 
 /**
  * @brief return the number of a drive unit
- * @return the unit number
+ * @return the unit number of this instance
  */
 int diablo_hd_device::unit() const
 {
@@ -847,6 +864,8 @@ int diablo_hd_device::get_ready_0() const
  * @brief return the current sector mark status of a drive
  *
  * The sector mark is derived from the offset into the current sector.
+ * It is deasserted except for a short time (a few micro seconds)
+ * around each new sector.
  *
  * @return the current sector mark for the drive (0:active 1:inactive)
  */
@@ -862,7 +881,7 @@ int diablo_hd_device::get_sector_mark_0() const
 
 /**
  * @brief return the address acknowledge state
- * @return the address acknowledge state (0:active 1:inactive)
+ * @return address acknowledge state (0:active 1:inactive)
  */
 int diablo_hd_device::get_addx_acknowledge_0() const
 {
@@ -871,7 +890,7 @@ int diablo_hd_device::get_addx_acknowledge_0() const
 
 /**
  * @brief return the log address interlock state
- * @return the log address interlock state (0:active 1:inactive)
+ * @return log address interlock state (0:active 1:inactive)
  */
 int diablo_hd_device::get_log_addx_interlock_0() const
 {
@@ -880,7 +899,7 @@ int diablo_hd_device::get_log_addx_interlock_0() const
 
 /**
  * @brief return the seek incomplete state
- * @return the address acknowledge state (0:active 1:inactive)
+ * @return address acknowledge state (0:active 1:inactive)
  */
 int diablo_hd_device::get_seek_incomplete_0() const
 {
@@ -892,8 +911,9 @@ int diablo_hd_device::get_seek_incomplete_0() const
  *
  * Note: The bus lines are active low
  * The value on the BUS needs an XOR with DIABLO_CYLINDER_MASK
+ * to resemble the physical line levels.
  *
- * @return the current cylinder number for the drive
+ * @return current cylinder number for the drive
  */
 int diablo_hd_device::get_cylinder() const
 {
@@ -905,8 +925,9 @@ int diablo_hd_device::get_cylinder() const
  *
  * Note: The bus lines are active low
  * The value on the BUS needs an XOR with DIABLO_HEAD_MASK
+ * to resemble the physical line levels.
  *
- * @return the currently selected head for the drive
+ * @return currently selected head for the drive
  */
 int diablo_hd_device::get_head() const
 {
@@ -918,12 +939,13 @@ int diablo_hd_device::get_head() const
  *
  * The current sector number is derived from the time since the
  * most recent track rotation started.
- * It counts modulo DIABLO_SPT
+ * It counts modulo DIABLO_SPT (12).
  *
  * Note: The bus lines are active low
  * The value on the BUS needs an XOR with DIABLO_SECTOR_MASK
+ * to resemble the physical line levels.
  *
- * @return the current sector for the drive
+ * @return current sector for the drive
  */
 int diablo_hd_device::get_sector() const
 {
@@ -933,8 +955,9 @@ int diablo_hd_device::get_sector() const
 /**
  * @brief return the current page of a drive unit
  *
- * The current page number is derived from the cylinder, head,
- * and sector numbers.
+ * The current page number is derived from the cylinder, head, and sector numbers.
+ * This is a convenience function.
+ * There is no such signal on the BUS.
  *
  * @return the current page for the drive
  */
@@ -1131,7 +1154,7 @@ int diablo_hd_device::rd_data(int index)
 	int bit = 0;
 
 	if (m_rdgate_0) {
-		LOG_DRIVE((9,"[DHD]	%s: unit #%d rdgate not asserted\n", __FUNCTION__, m_unit));
+		LOG_DRIVE((0,"[DHD]	%s: unit #%d rdgate not asserted\n", __FUNCTION__, m_unit));
 		return 1;	// read gate is not asserted (active 0)
 	}
 
