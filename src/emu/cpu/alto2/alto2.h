@@ -23,9 +23,10 @@
 #define	ALTO2_DEBUG			1
 #endif
 
-#define	USE_PRIO_F9318	0			//!< define to 1 to use the F9318 priority encoder code
-#define	USE_ALU_74181	0			//!< define to 1 to use the SN74181 ALU code
+#define	USE_PRIO_F9318			0	//!< define to 1 to use the F9318 priority encoder code
+#define	USE_ALU_74181			0	//!< define to 1 to use the SN74181 ALU code
 #define	DEBUG_DISPLAY_TIMING	0	//!< define to 1 to debug the display timing
+#define	USE_BITCLK_TIMER		0	//!< define to 1 to use a very high rate timer for the disk bit clock
 
 #define	ALTO2_TASKS		16			//!< 16 task slots
 #define	ALTO2_REGS		32			//!< 32 16-bit words in the R register file
@@ -34,7 +35,7 @@
 #define	ALTO2_F1MAX		16			//!< 16 F1 functions
 #define	ALTO2_F2MAX		16			//!< 16 F2 functions
 //! time in nano seconds for a CPU micro cycle
-#define	ALTO2_UCYCLE	static_cast<int>(clocks_to_attotime(1).as_double()/ATTOSECONDS_PER_NANOSECOND)
+#define	ALTO2_UCYCLE	271			//!< 29.4912MHz/8 -> 3.6864MHz ~= 271ns/clock
 
 #define	ALTO2_ETHER_FIFO_SIZE	16
 
@@ -809,6 +810,8 @@ private:
 	int m_dsp_state;								//!< display_state_machine() previous state
 	int m_unload_time;								//!< unload word time accu
 	int m_unload_word;								//!< unload word number
+	int	m_bitclk_time;								//!< bitclk call time accu
+	int m_bitclk_index;								//!< bitclk index (bit number)
 
 	static const char *task_name(int task);			//!< human readable task names
 	static const char *r_name(UINT8 reg);			//!< human readable register names
@@ -1393,7 +1396,12 @@ private:
 		UINT8 strobe;					//!< strobe (still) active
 		emu_timer* strobon_timer;		//!< set strobe on timer
 		UINT8 bitclk;					//!< current bitclk state (either crystal clock, or rdclk from the drive)
+#if	USE_BITCLK_TIMER
 		emu_timer* bitclk_timer;		//!< bit clock timer
+#else
+		int bitclk_time;				//!< time in clocks per bit
+#endif
+		UINT8 sect4;					//!< current sector_mark_0 (aka SECT[4]) from the drive
 		UINT8 datin;					//!< current datin from the drive
 		UINT8 bitcount;					//!< bit counter
 		UINT8 carry;					//!< carry output of the bitcounter
@@ -1432,6 +1440,11 @@ private:
 	TIMER_CALLBACK_MEMBER( disk_ok_to_run );		//!< timer callback to take away the OK TO RUN pulse (reset)
 	TIMER_CALLBACK_MEMBER( disk_strobon );			//!< timer callback to pulse the STROBE' signal to the drive
 	TIMER_CALLBACK_MEMBER( disk_ready_mf31a );		//!< timer callback to change the READY monoflop 31a
+#if	USE_BITCLK_TIMER
+	TIMER_CALLBACK_MEMBER( disk_bitclk );			//!< callback to update the disk controller with a new bitclk
+#else
+	void disk_bitclk(void *ptr, int arg);			//!< function to update the disk controller with a new bitclk
+#endif
 	void disk_block(int task);						//!< called if one of the disk tasks (task_kwd or task_ksec) blocks
 	void bs_read_kstat_0();							//!< bs_read_kstat early: bus driven by disk status register KSTAT
 	void bs_read_kdata_0();							//!< bs_read_kdata early: bus driven by disk data register KDATA input
@@ -1449,7 +1462,6 @@ private:
 	void f2_swrnrdy_1();							//!< f2_swrnrdy late: branch on the disk ready signal
 	void f2_nfer_1();								//!< f2_nfer late: branch on the disk fatal error condition
 	void f2_strobon_1();							//!< f2_strobon late: branch on the seek busy status
-	TIMER_CALLBACK_MEMBER( disk_bitclk );			//!< callback to update the disk controller with a new bitclk
 	void init_disk();								//!< initialize the disk context and insert a disk wort timer
 
 	// ************************************************

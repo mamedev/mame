@@ -42,8 +42,8 @@ ADDRESS_MAP_END
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
-	m_log_types(LOG_0),
-	m_log_level(9),
+	m_log_types(LOG_ALL),
+	m_log_level(8),
 	m_log_newline(true),
 #endif
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
@@ -90,6 +90,8 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_dsp_state(0),
 	m_unload_time(0),
 	m_unload_word(0),
+	m_bitclk_time(0),
+	m_bitclk_index(0),
 	m_ctl2k_u3(0),
 	m_ctl2k_u38(0),
 	m_ctl2k_u76(0),
@@ -126,6 +128,56 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 {
 	m_is_octal = true;
 }
+
+#if	ALTO2_DEBUG
+// FIXME: define types (sections) and print the section like [emu] [kwd] ...
+// FIXME: use the level to suppress messages if logging is less verbose than level
+void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
+{
+	static const char* type_name[] = {
+		"[CPU]",
+		"[EMU]",
+		"[T01]",
+		"[T02]",
+		"[T03]",
+		"[KSEC]",
+		"[T05]",
+		"[T06]",
+		"[ETH]",
+		"[MRT]",
+		"[DWT]",
+		"[CURT]",
+		"[DHT]",
+		"[DVT]",
+		"[PART]",
+		"[KWD]",
+		"[T17]",
+		"[MEM]",
+		"[RAM]",
+		"[DRIVE]",
+		"[DISK]",
+		"[DISPL]",
+		"[MOUSE]",
+		"[HW]",
+		"[KBD]"
+	};
+	if (!(m_log_types & type))
+		return;
+	if (level > m_log_level)
+		return;
+	if (m_log_newline) {
+		// last line had a \n - print type name
+		for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
+			if (type & (1 << i))
+				logerror("%-7s ", type_name[i]);
+	}
+	va_list ap;
+	va_start(ap, format);
+	vlogerror(format, ap);
+	va_end(ap);
+	m_log_newline = format[strlen(format) - 1] == '\n';
+}
+#endif
 
 //-------------------------------------------------
 // driver interface to set diablo_hd_device
@@ -918,6 +970,10 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_dsp_state));
 	save_item(NAME(m_unload_time));
 	save_item(NAME(m_unload_word));
+#if	(USE_BITCLK_TIMER == 0)
+	save_item(NAME(m_bitclk_time));
+	save_item(NAME(m_bitclk_index));
+#endif
 	save_item(NAME(m_mouse.x));
 	save_item(NAME(m_mouse.y));
 	save_item(NAME(m_mouse.dx));
@@ -1191,56 +1247,6 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, astr
 		break;
 	}
 }
-
-#if	ALTO2_DEBUG
-// FIXME: define types (sections) and print the section like [emu] [kwd] ...
-// FIXME: use the level to suppress messages if logging is less verbose than level
-void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
-{
-	static const char* type_name[] = {
-		"[CPU]",
-		"[EMU]",
-		"[T01]",
-		"[T02]",
-		"[T03]",
-		"[KSEC]",
-		"[T05]",
-		"[T06]",
-		"[ETH]",
-		"[MRT]",
-		"[DWT]",
-		"[CURT]",
-		"[DHT]",
-		"[DVT]",
-		"[PART]",
-		"[KWD]",
-		"[T17]",
-		"[MEM]",
-		"[RAM]",
-		"[DRIVE]",
-		"[DISK]",
-		"[DISPL]",
-		"[MOUSE]",
-		"[HW]",
-		"[KBD]"
-	};
-	if (!(m_log_types & type))
-		return;
-	if (level > m_log_level)
-		return;
-	if (m_log_newline) {
-		// last line had a \n - print type name
-		for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
-			if (type & (1 << i))
-				logerror("%-7s ", type_name[i]);
-	}
-	va_list ap;
-	va_start(ap, format);
-	vlogerror(format, ap);
-	va_end(ap);
-	m_log_newline = format[strlen(format) - 1] == '\n';
-}
-#endif
 
 // FIXME
 void alto2_cpu_device::fatal(int exitcode, const char *format, ...)
@@ -2450,7 +2456,7 @@ void alto2_cpu_device::execute_run()
 		if (m_unload_time >= 0) {
 			/*
 			 * Subtract the microcycle time from the unload time accu.
-			 * If it underflows call the unload word function which adds
+			 * If it underflows, call the unload word function which adds
 			 * the time for 16 or 32 pixel clocks to the accu, or ends
 			 * the unloading by leaving m_unload_time at -1.
 			 */
@@ -2459,6 +2465,19 @@ void alto2_cpu_device::execute_run()
 				m_unload_word = unload_word(m_unload_word);
 			}
 		}
+#if	(USE_BITCLK_TIMER == 0)
+		if (m_bitclk_time >= 0) {
+			/*
+			 * Subtract the microcycle time from the bitclk time accu.
+			 * If it underflows, call the disk bitclk function which adds
+			 * the time for one bit as clocks to the accu, or ends
+			 * the bitclk sequence by leaving m_bitclk_time at -1.
+			 */
+			m_bitclk_time -= ALTO2_UCYCLE;
+			disk_bitclk(0, m_bitclk_index);
+			m_bitclk_index++;
+		}
+#endif
 
 		m_cycle++;
 		/* nano seconds per cycle */

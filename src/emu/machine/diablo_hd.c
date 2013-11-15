@@ -123,6 +123,7 @@ diablo_hd_device::~diablo_hd_device()
 
 void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *, int))
 {
+	LOG_DRIVE((0,"[DHD] %s cookie=%p callback=%p\n", __FUNCTION__, cookie, callback));
 	m_sector_callback_cookie = cookie;
 	m_sector_callback = callback;
 }
@@ -826,7 +827,7 @@ attotime diablo_hd_device::bit_time() const
 
 /**
  * @brief return the seek/read/write status of a drive
- * @return the seek/read/write status for the drive unit (0: active, 1: inactive)
+ * @return the seek/read/write status for the drive unit (0:active 1:inactive)
  */
 int diablo_hd_device::get_seek_read_write_0() const
 {
@@ -835,7 +836,7 @@ int diablo_hd_device::get_seek_read_write_0() const
 
 /**
  * @brief return the ready status of a drive
- * @return the ready status for the drive unit (0: ready, 1: not ready)
+ * @return the ready status for the drive unit (0:ready 1:not ready)
  */
 int diablo_hd_device::get_ready_0() const
 {
@@ -861,7 +862,7 @@ int diablo_hd_device::get_sector_mark_0() const
 
 /**
  * @brief return the address acknowledge state
- * @return the address acknowledge state
+ * @return the address acknowledge state (0:active 1:inactive)
  */
 int diablo_hd_device::get_addx_acknowledge_0() const
 {
@@ -889,25 +890,27 @@ int diablo_hd_device::get_seek_incomplete_0() const
 /**
  * @brief return the current cylinder of a drive unit
  *
- * Note: the bus lines are active low, thus the XOR with DRIVE_CYLINDER_MASK.
+ * Note: The bus lines are active low
+ * The value on the BUS needs an XOR with DIABLO_CYLINDER_MASK
  *
  * @return the current cylinder number for the drive
  */
 int diablo_hd_device::get_cylinder() const
 {
-	return m_cylinder ^ DIABLO_CYLINDER_MASK;
+	return m_cylinder;
 }
 
 /**
  * @brief return the current head of a drive unit
  *
- * Note: the bus lines are active low, thus the XOR with DRIVE_HEAD_MASK.
+ * Note: The bus lines are active low
+ * The value on the BUS needs an XOR with DIABLO_HEAD_MASK
  *
  * @return the currently selected head for the drive
  */
 int diablo_hd_device::get_head() const
 {
-	return m_head ^ DIABLO_HEAD_MASK;
+	return m_head;
 }
 
 /**
@@ -915,14 +918,16 @@ int diablo_hd_device::get_head() const
  *
  * The current sector number is derived from the time since the
  * most recent track rotation started.
+ * It counts modulo DIABLO_SPT
  *
- * Note: the bus lines are active low, thus the XOR with DRIVE_SECTOR_MASK.
+ * Note: The bus lines are active low
+ * The value on the BUS needs an XOR with DIABLO_SECTOR_MASK
  *
  * @return the current sector for the drive
  */
 int diablo_hd_device::get_sector() const
 {
-	return m_sector ^ DIABLO_SECTOR_MASK;
+	return m_sector;
 }
 
 /**
@@ -950,7 +955,7 @@ void diablo_hd_device::select(int unit, int head)
 	/* this drive is selected */
 	if ((head & DIABLO_HEAD_MASK) != m_head) {
 		m_head = head & DIABLO_HEAD_MASK;
-		printf("select unit:%d head:%d\n", unit, head);
+		LOG_DRIVE((0,"[DHD]	%s: unit:%d head:%d\n", __FUNCTION__, unit, head));
 	}
 
 	if (m_image) {
@@ -978,7 +983,7 @@ void diablo_hd_device::select(int unit, int head)
 /**
  * @brief strobe a seek operation
  *
- * Seek to the cylinder cylinder, or restore.
+ * Seek to the cylinder %cylinder, or restore to cylinder 0.
  *
  * @param unit unit number
  * @param cylinder cylinder number to seek to
@@ -990,50 +995,50 @@ void diablo_hd_device::set_strobe(int cylinder, bool restore, int strobe)
 	int seekto = restore ? 0 : cylinder;
 	if (strobe) {
 		LOG_DRIVE((1,"[DHD]	%s: STROBE end of interlock\n", __FUNCTION__, seekto));
-		/* deassert the log address interlock */
+		// deassert the log address interlock
 		m_log_addx_interlock_0 = 1;
 		return;
 	}
 
-	/* assert the log address interlock */
+	// assert the log address interlock
 	m_log_addx_interlock_0 = 0;
 
 	if (seekto == m_cylinder) {
 		LOG_DRIVE((1,"[DHD]	%s: STROBE to cylinder %d acknowledge\n", __FUNCTION__, seekto));
-		m_addx_acknowledge_0 = 0;	/* address acknowledge, if cylinder is reached */
-		m_seek_incomplete_0 = 1;	/* reset seek incomplete */
+		m_addx_acknowledge_0 = 0;	// address acknowledge, if cylinder is reached
+		m_seek_incomplete_0 = 1;	// reset seek incomplete
 		return;
 	}
-
+	// assert the seek-read-write signal
 	m_s_r_w_0 = 0;
 
 	if (seekto < m_cylinder) {
-		/* decrement cylinder */
-		m_cylinder--;
+		m_cylinder--;					// previous cylinder
 		if (m_cylinder < 0) {
 			m_cylinder = 0;
-			m_log_addx_interlock_0 = 1;	/* deassert the log address interlock */
-			m_seek_incomplete_0 = 1;	/* deassert seek incomplete */
-			m_addx_acknowledge_0 = 0;	/* assert address acknowledge  */
+			m_log_addx_interlock_0 = 1;	// deassert the log address interlock signal
+			m_seek_incomplete_0 = 1;	// deassert seek incomplete signal
+			m_addx_acknowledge_0 = 0;	// assert address acknowledge signal
 			LOG_DRIVE((1,"[DHD]	%s: STROBE to cylinder %d incomplete\n", __FUNCTION__, seekto));
 			return;
 		}
-	} else {
+	}
+	if (seekto > m_cylinder) {
 		/* increment cylinder */
 		m_cylinder++;
 		if (m_cylinder >= DIABLO_CYLINDERS) {
 			m_cylinder = DIABLO_CYLINDERS - 1;
-			m_log_addx_interlock_0 = 1;	/* deassert the log address interlock */
-			m_seek_incomplete_0 = 1;	/* deassert seek incomplete */
-			m_addx_acknowledge_0 = 0;	/* assert address acknowledge  */
+			m_log_addx_interlock_0 = 1;	// deassert the log address interlock signal
+			m_seek_incomplete_0 = 1;	// deassert seek incomplete signal
+			m_addx_acknowledge_0 = 0;	// assert address acknowledge signal
 			LOG_DRIVE((1,"[DHD]	%s: STROBE to cylinder %d incomplete\n", __FUNCTION__, seekto));
 			return;
 		}
 	}
 	LOG_DRIVE((1,"[DHD]	%s: STROBE to cylinder %d (now %d) - interlock\n", __FUNCTION__, seekto, m_cylinder));
 
-	m_addx_acknowledge_0 = 1;	/* deassert address acknowledge  */
-	m_seek_incomplete_0 = 1;	/* deassert seek incomplete */
+	m_addx_acknowledge_0 = 1;	// deassert address acknowledge signal
+	m_seek_incomplete_0 = 1;	// deassert seek incomplete signal
 	read_sector();
 }
 
@@ -1083,19 +1088,14 @@ void diablo_hd_device::set_rdgate(int gate)
  */
 void diablo_hd_device::wr_data(int index, int wrdata)
 {
-	if (m_wrgate_0) {
-		/* write gate is not asserted (active 0) */
-		return;
-	}
+	if (m_wrgate_0)
+		return;	// write gate is not asserted (active 0)
 
-	/* don't write before or beyond the sector */
 	if (index < 0 || index >= bits_per_sector())
-		return;
+		return;	// don't write before or beyond the sector
 
-	if (-1 == m_page) {
-		/* invalid page */
-		return;
-	}
+	if (-1 == m_page)
+		return;	// invalid page
 
 	UINT32 *bits = expand_sector();
 	if (-1 == m_wrfirst)
@@ -1124,26 +1124,19 @@ int diablo_hd_device::rd_data(int index)
 {
 	int bit = 0;
 
-	if (m_rdgate_0) {
-		/* read gate is not asserted (active 0) */
-		return 0;
-	}
+	if (m_rdgate_0)
+		return 0;	// read gate is not asserted (active 0)
 
-	/* don't read before or beyond the sector */
 	if (index < 0 || index >= bits_per_sector())
-		return 1;
+		return 1;	// don't read before or beyond the sector
 
-	/* no data while sector mark is low (?) */
 	if (0 == m_sector_mark_0)
-		return 1;
+		return 1;	// no data while sector mark is low (?)
 
-	if (-1 == m_page) {
-		/* invalid page */
-		return 1;
-	}
+	if (-1 == m_page)
+		return 1;	// invalid page
 
 	UINT32 *bits = expand_sector();
-
 	if (-1 == m_rdfirst)
 		m_rdfirst = index;
 
@@ -1166,21 +1159,16 @@ int diablo_hd_device::rd_clock(int index)
 {
 	int clk = 0;
 
-	/* don't read before or beyond the sector */
 	if (index < 0 || index >= bits_per_sector())
-		return 1;
+		return 1;	// don't read before or beyond the sector
 
-	/* no clock while sector mark is low (?) */
 	if (0 == m_sector_mark_0)
-		return 1;
+		return 1;	// no clock while sector mark is low (?)
 
-	if (-1 == m_page) {
-		/* invalid page */
-		return 1;
-	}
+	if (-1 == m_page)
+		return 1;	// invalid page
 
 	UINT32 *bits = expand_sector();
-
 	if (-1 == m_rdfirst)
 		m_rdfirst = index;
 
@@ -1218,20 +1206,19 @@ void diablo_hd_device::sector_mark_0()
 {
 	LOG_DRIVE((9,"[DHD]	%s: unit #%d C/H/S:%d/%d/%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector));
 
-	/* squeeze previous sector, if it was written to */
+	// squeeze previous sector bits, if it was written to
 	squeeze_sector();
 
 	m_sector_mark_0 = 0;
 
-	/* reset read and write bit locations */
+	// reset read and write bit locations
 	m_rdfirst = -1;
 	m_rdlast = -1;
 	m_wrfirst = -1;
 	m_wrlast = -1;
 
-	/* count sectors */
+	// count up the sector number
 	m_sector = (m_sector + 1) % DIABLO_SPT;
-	/* read the sector */
 	read_sector();
 }
 
@@ -1277,30 +1264,31 @@ void diablo_hd_device::device_reset()
 	LOG_DRIVE((0,"[DHD]	%s: sector mark 1 time  : %.0fns\n", __FUNCTION__, 1e9 * m_sector_mark_1_time.as_double()));
 	LOG_DRIVE((0,"[DHD]	%s: bit time            : %.0fns\n", __FUNCTION__, 1e9 * m_bit_time.as_double()));
 
-	m_s_r_w_0 = 1;					/* seek/read/write not ready */
-	m_ready_0 = 1;					/* drive is not ready */
-	m_sector_mark_0 = 1;			/* sector mark clear */
-	m_addx_acknowledge_0 = 1;		/* drive address acknowledge is not active */
-	m_log_addx_interlock_0 = 1;	/* drive log address interlock is not active */
-	m_seek_incomplete_0 = 1;		/* drive seek incomplete is not active */
+	m_s_r_w_0 = 1;					// deassert seek/read/write ready
+	m_ready_0 = 1;					// deassert drive ready
+	m_sector_mark_0 = 1;			// deassert sector mark
+	m_addx_acknowledge_0 = 1;		// deassert drive address acknowledge
+	m_log_addx_interlock_0 = 1;		// deassert drive log address interlock
+	m_seek_incomplete_0 = 1;		// deassert drive seek incomplete
 
-	/* reset the disk drive's address */
-	m_cylinder = 0;
-	m_head = 0;
-	m_sector = DIABLO_SPT - 1;
+	// reset the disk drive's address
+	m_cylinder = -1;
+	m_head = -1;
+	m_sector = -1;
 	m_page = -1;
 
-	/* disable the gates */
+	// disable the erase, write and read gates
 	m_egate_0 = 1;
 	m_wrgate_0 = 1;
 	m_rdgate_0 = 1;
 
-	/* reset read/write first and last indices */
+	// reset read and write first and last indices
 	m_wrfirst = -1;
 	m_wrlast = -1;
 	m_rdfirst = -1;
 	m_rdlast = -1;
 
+	// for units with a CHD assigned to them start the timer
 	if (m_handle)
 		timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
 }
