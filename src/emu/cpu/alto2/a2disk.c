@@ -1438,7 +1438,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	m_dsk.ff_21a = update_jkff(s0, s1);
 
 	// If the KSEC FF 21a Q goes 1, pulse the SECLATE signal for some time.
-	if ((m_dsk.ff_21a_old & JKFF_Q0) && (m_dsk.ff_21a & JKFF_Q)) {
+	if (!(m_dsk.ff_21a_old & JKFF_Q) && (m_dsk.ff_21a & JKFF_Q)) {
 		m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);
 		if (m_dsk.seclate) {
 			m_dsk.seclate = 0;
@@ -2256,9 +2256,9 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	} else {
 		/* if XFEROFF is set, keep the bit at 1 (RDGATE' is high) */
 		if (GET_KCOM_XFEROFF(m_dsk.kcom)) {
-			clk = dhd->rd_clock(arg);
 			bit = 1;
 		} else {
+			clk = dhd->rd_clock(arg);
 			bit = dhd->rd_data(arg);
 			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (read, driveclk) @%lldns\n", arg, bit, ntime()));
 		}
@@ -2274,6 +2274,9 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 			m_dsk.bitclk_time = static_cast<int>(dhd->bit_time().as_double() * ATTOSECONDS_PER_NANOSECOND);
 		m_bitclk_time += m_dsk.bitclk_time;
 #endif
+	} else {
+		// stop the bitclock timer
+		m_bitclk_time = -1;
 	}
 }
 
@@ -2295,11 +2298,12 @@ void alto2_cpu_device::next_sector(int unit)
 	if (m_bitclk_time >= 0) {
 		LOG((LOG_DISK,0,"	unit #%d stop bitclk\n", unit));
 		m_bitclk_time = -1;
+		m_bitclk_index = -1;
 	}
 #endif
 
 	/* KSTAT[0-3] update the current sector in the kstat field */
-	PUT_KSTAT_SECTOR(m_dsk.kstat, dhd->get_sector() ^ 017);
+	PUT_KSTAT_SECTOR(m_dsk.kstat, dhd->get_sector());
 
 	/* clear input and output shift registers (?) */
 	m_dsk.shiftin = 0;
@@ -2316,7 +2320,8 @@ void alto2_cpu_device::next_sector(int unit)
 #else
 	// TODO: verify current sector == requested sector and only then run the bitclk?
 	// HACK: no command, no bit clock
-	if (debug_read_mem(0521)) {
+//	if (debug_read_mem(0521))
+	{
 		// Make the CPU execution loop call disk_bitclk
 		m_bitclk_time = 0;
 		m_bitclk_index = 0;
@@ -2370,7 +2375,7 @@ void alto2_cpu_device::init_disk()
 #endif
 
 	m_dsk.strobon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_strobon),this));
-	m_dsk.strobon_timer->adjust(attotime::from_nsec(TW_STROBON));
+	m_dsk.strobon_timer->adjust(attotime::from_nsec(TW_STROBON), (1<<1));
 
 	m_dsk.seclate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_seclate),this));
 	m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);

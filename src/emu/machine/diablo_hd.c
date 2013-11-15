@@ -1155,7 +1155,7 @@ int diablo_hd_device::rd_data(int index)
 
 	if (m_rdgate_0) {
 		LOG_DRIVE((8,"[DHD]	%s: unit #%d rdgate not asserted\n", __FUNCTION__, m_unit));
-		return 1;	// read gate is not asserted (active 0)
+		return 0;	// read gate is not asserted (active 0)
 	}
 
 	if (index < 0 || index >= bits_per_sector()) {
@@ -1218,8 +1218,10 @@ int diablo_hd_device::rd_clock(int index)
 	if (index & 1) {
 		// clock bits are on even bit positions only
 		clk = 0;
-	} else {
+	} else if (bits) {
 		RDBIT(bits,index,clk);
+	} else {
+		clk = 0;
 	}
 	LOG_DRIVE((7,"[DHD]	%s: read #%d %d/%d/%d clk #%d:%d\n", __FUNCTION__, m_unit, m_cylinder, m_head, m_sector, index, clk));
 	m_rdlast = index;
@@ -1330,8 +1332,10 @@ void diablo_hd_device::device_reset()
 	m_rdlast = -1;
 
 	// for units with a CHD assigned to them start the timer
-	if (m_handle)
+	if (m_handle) {
 		timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
+		read_sector();
+	}
 }
 
 /**
@@ -1352,20 +1356,21 @@ void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	switch (param) {
 	case 0:
 		timer.adjust(m_sector_mark_0_time, 1);
-		/* deassert sector mark */
-		sector_mark_1();
-		break;
-	case 1:
-		timer.adjust(m_sector_mark_1_time, 2);
 		/* assert sector mark */
 		sector_mark_0();
 		break;
-	case 2:
+	case 1:
 		/* next sector starting soon now */
-		timer.adjust(m_sector_time - m_sector_mark_0_time, 0);
+		timer.adjust(m_sector_mark_1_time, 2);
 		/* call the sector_callback, if any */
 		if (m_sector_callback)
 			(void)(*m_sector_callback)(m_sector_callback_cookie, m_unit);
+		break;
+	case 2:
+		timer.adjust(m_sector_time - m_sector_mark_0_time, 0);
+		/* deassert sector mark */
+		sector_mark_1();
+		break;
 	}
 }
 

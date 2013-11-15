@@ -45,7 +45,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
 	m_log_types(LOG_DISK|LOG_KSEC|LOG_KWD),
-	m_log_level(7),
+	m_log_level(6),
 	m_log_newline(true),
 #endif
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
@@ -1062,6 +1062,31 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_eth.tx_count));
 	save_item(NAME(m_eth.duckbreath));
 
+	state_add( A2_DRIVE,   "DRIVE",   m_dsk.drive).formatstr("%1u");
+	state_add( A2_KADDR,   "KADDR",   m_dsk.kaddr).formatstr("%06O");
+	state_add( A2_KADR,    "KADR",    m_dsk.kadr).formatstr("%06O");
+	state_add( A2_KSTAT,   "KSTAT",   m_dsk.kstat).formatstr("%06O");
+	state_add( A2_KCOM,    "KCOM",    m_dsk.kcom).formatstr("%06O");
+	state_add( A2_KRECNO,  "KRECNO",  m_dsk.krecno).formatstr("%02O");
+	state_add( A2_SHIFTIN, "SHIFTIN", m_dsk.shiftin).formatstr("%07O");
+	state_add( A2_SHIFTOUT,"SHIFTOUT",m_dsk.shiftout).formatstr("%07O");
+	state_add( A2_DATAIN,  "DATAIN",  m_dsk.datain).formatstr("%06O");
+	state_add( A2_DATAOUT, "DATAOUT", m_dsk.dataout).formatstr("%06O");
+	state_add( A2_KRWC,    "KRWC",    m_dsk.krwc).formatstr("%1u");
+	state_add( A2_KFER,    "KFER",    m_dsk.kfer).formatstr("%1u");
+	state_add( A2_WDTSKENA,"WDTSKENA",m_dsk.wdtskena).formatstr("%1u");
+	state_add( A2_WDINIT0, "WDINIT0", m_dsk.wdinit0).formatstr("%1u");
+	state_add( A2_WDINIT,  "WDINIT",  m_dsk.wdinit).formatstr("%1u");
+	state_add( A2_STROBE,  "STROBE",  m_dsk.strobe).formatstr("%1u");
+	state_add( A2_BITCLK,  "BITCLK",  m_dsk.bitclk).formatstr("%1u");
+	state_add( A2_DATIN,   "DATIN",   m_dsk.datin).formatstr("%06O");
+	state_add( A2_BITCNT,  "BITCNT",  m_dsk.bitcount).formatstr("%02O");
+	state_add( A2_CARRY,   "CARRY",   m_dsk.carry).formatstr("%1u");
+	state_add( A2_SECLATE, "SECLATE", m_dsk.seclate).formatstr("%1u");
+	state_add( A2_SEEKOK,  "SEEKOK",  m_dsk.seekok).formatstr("%1u");
+	state_add( A2_OKTORUN, "OKTORUN", m_dsk.ok_to_run).formatstr("%1u");
+	state_add( A2_READY,   "READY",   m_dsk.kstat).formatstr("%1u");
+	state_add_divider(-1);
 	state_add( A2_TASK,    "TASK",    m_task).formatstr("%03O");
 	state_add( A2_MPC,     "MPC",     m_mpc).formatstr("%06O");
 	state_add( A2_NEXT,    "NEXT",    m_next).formatstr("%06O");
@@ -1074,7 +1099,7 @@ void alto2_cpu_device::device_start()
 	state_add( A2_SHIFTER, "SHIFTER", m_shifter).formatstr("%06O");
 	state_add( A2_LALUC0,  "LALUC0",  m_laluc0).formatstr("%1u");
 	state_add( A2_M,       "M",       m_m).formatstr("%06O");
-
+	state_add_divider(-1);
 	state_add( A2_AC3,     "AC(3)",   m_r[000]).formatstr("%06O");
 	state_add( A2_AC2,     "AC(2)",   m_r[001]).formatstr("%06O");
 	state_add( A2_AC1,     "AC(1)",   m_r[002]).formatstr("%06O");
@@ -1107,7 +1132,7 @@ void alto2_cpu_device::device_start()
 	state_add( A2_R35,     "R35",     m_r[035]).formatstr("%06O");
 	state_add( A2_R36,     "R36",     m_r[036]).formatstr("%06O");
 	state_add( A2_R37,     "R37",     m_r[037]).formatstr("%06O");
-
+	state_add_divider(-1);
 	state_add( A2_S00,     "S00",     m_s[0][000]).formatstr("%06O");
 	state_add( A2_S01,     "S01",     m_s[0][001]).formatstr("%06O");
 	state_add( A2_S02,     "S02",     m_s[0][002]).formatstr("%06O");
