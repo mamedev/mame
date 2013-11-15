@@ -2299,7 +2299,7 @@ void alto2_cpu_device::next_sector(int unit)
 #endif
 
 	/* KSTAT[0-3] update the current sector in the kstat field */
-	PUT_KSTAT_SECTOR(m_dsk.kstat, dhd->get_sector());
+	PUT_KSTAT_SECTOR(m_dsk.kstat, dhd->get_sector() ^ 017);
 
 	/* clear input and output shift registers (?) */
 	m_dsk.shiftin = 0;
@@ -2368,6 +2368,9 @@ void alto2_cpu_device::init_disk()
 #if	USE_BITCLK_TIMER
 	m_dsk.bitclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_bitclk),this));
 #endif
+
+	m_dsk.strobon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_strobon),this));
+	m_dsk.strobon_timer->adjust(attotime::from_nsec(TW_STROBON));
 
 	m_dsk.seclate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_seclate),this));
 	m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);

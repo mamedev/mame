@@ -1404,7 +1404,6 @@ private:
 #else
 		int bitclk_time;				//!< time in clocks per bit
 #endif
-		UINT8 sect4;					//!< current sector_mark_0 (aka SECT[4]) from the drive
 		UINT8 datin;					//!< current datin from the drive
 		UINT8 bitcount;					//!< bit counter
 		UINT8 carry;					//!< carry output of the bitcounter

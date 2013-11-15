@@ -838,8 +838,8 @@ void alto2_cpu_device::init_memory()
 	}
 
 	// allocate 128KB of main memory
-	m_mem.ram = global_alloc_array(UINT32, ALTO2_RAM_SIZE);
-	m_mem.hpb = global_alloc_array(UINT8,  ALTO2_RAM_SIZE);
+	m_mem.ram = global_alloc_array(UINT32, sizeof(UINT16)*ALTO2_RAM_SIZE);
+	m_mem.hpb = global_alloc_array(UINT8,  sizeof(UINT16)*ALTO2_RAM_SIZE);
 
 	/**
 	 * <PRE>
@@ -892,7 +892,9 @@ void alto2_cpu_device::init_memory()
 
 #if	ALTO2_HAMMING_CHECK
 	// Initialize the hamming codes and parity bit
-	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_BASE; addr++)
-		hamming_code(1, addr, m_mem.ram[addr]);
+	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_BASE; addr++) {
+		hamming_code(1, addr, 0);
+		hamming_code(1, 0200000 + addr, 0);
+	}
 #endif
 }

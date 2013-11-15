@@ -1154,7 +1154,7 @@ int diablo_hd_device::rd_data(int index)
 	int bit = 0;
 
 	if (m_rdgate_0) {
-		LOG_DRIVE((0,"[DHD]	%s: unit #%d rdgate not asserted\n", __FUNCTION__, m_unit));
+		LOG_DRIVE((8,"[DHD]	%s: unit #%d rdgate not asserted\n", __FUNCTION__, m_unit));
 		return 1;	// read gate is not asserted (active 0)
 	}
 
