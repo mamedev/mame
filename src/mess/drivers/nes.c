@@ -794,13 +794,15 @@ ROM_END
 
 ROM_START( famicom )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM */
-	ROM_LOAD_OPTIONAL( "rp2c33-01.bin", 0xe000, 0x2000, CRC(1c7ae5d5) SHA1(af5af53f66982e749643fdf8b2acbb7d4d3ed229) ) // older, Nintendo logo has shadow
-	ROM_LOAD_OPTIONAL( "rp2c33a-01a.bin", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62) ) // newer, Nintendo logo has no shadow
+	ROM_SYSTEM_BIOS( 0, "2c33a-01a", "Famicom Disk System Bios")
+	ROMX_LOAD( "rp2c33a-01a.bin", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62), ROM_BIOS(1)) // newer, Nintendo logo has no shadow
+	ROM_SYSTEM_BIOS( 1, "2c33-01", "Famicom Disk System Bios, older")
+	ROMX_LOAD( "rp2c33-01.bin", 0xe000, 0x2000, CRC(1c7ae5d5) SHA1(af5af53f66982e749643fdf8b2acbb7d4d3ed229), ROM_BIOS(2)) // older, Nintendo logo has shadow
 ROM_END
 
 ROM_START( famitwin )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM */
-	ROM_LOAD_OPTIONAL( "rp2c33a-02.bin", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1) ) // "Famicom" logo instead of Nintendo logo
+	ROM_LOAD( "rp2c33a-02.bin", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1) ) // "Famicom" logo instead of Nintendo logo
 ROM_END
 
 ROM_START( m82 )
