@@ -44,7 +44,7 @@ ADDRESS_MAP_END
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
-	m_log_types(LOG_DISK|LOG_KSEC|LOG_KWD),
+	m_log_types(LOG_CPU|LOG_DISK|LOG_KSEC|LOG_KWD),
 	m_log_level(6),
 	m_log_newline(true),
 #endif
@@ -2574,21 +2574,18 @@ void alto2_cpu_device::execute_run()
 		 * early f2 has to be done before early bs, because the
 		 * emulator f2 acsource or acdest may change rsel
 		 */
-		if (m_f2[0][m_task][f2])
-			((*this).*m_f2[0][m_task][f2])();
+		((*this).*m_f2[0][m_task][f2])();
 
 		/*
 		 * early bs can be done now
 		 */
 		if (do_bs)
-			if (m_bs[0][m_task][bs])
-				((*this).*m_bs[0][m_task][bs])();
+			((*this).*m_bs[0][m_task][bs])();
 
 		/*
 		 * early f1
 		 */
-		if (m_f1[0][m_task][f1])
-			((*this).*m_f1[0][m_task][f1])();
+		((*this).*m_f1[0][m_task][f1])();
 
 		/* compute the ALU function */
 		switch (aluf) {
@@ -2914,17 +2911,14 @@ void alto2_cpu_device::execute_run()
 		}
 
 		/* late F1 is done now, if any */
-		if (m_f1[1][m_task][f1])
-			((*this).*m_f1[1][m_task][f1])();
+		((*this).*m_f1[1][m_task][f1])();
 
 		/* late F2 is done now, if any */
-		if (m_f2[1][m_task][f2])
-			((*this).*m_f2[1][m_task][f2])();
+		((*this).*m_f2[1][m_task][f2])();
 
 		/* late BS is done now, if no constant was put on the bus */
 		if (do_bs)
-			if (m_bs[1][m_task][bs])
-				((*this).*m_bs[1][m_task][bs])();
+			((*this).*m_bs[1][m_task][bs])();
 
 		/*
 		 * update L register and LALUC0, and also M register,
@@ -2977,13 +2971,11 @@ void alto2_cpu_device::execute_run()
 				/* get address modifier after task switch (?) */
 				m_next2 = m_task_next2[m_task];
 
-				if (m_active_callback[m_task]) {
-					/*
-					 * let the task know it becomes active now
-					 * and (most probably) reset the wakeup
-					 */
-					((*this).*m_active_callback[m_task])();
-				}
+				/*
+				 * let the task know it becomes active now
+				 * and (most probably) reset the wakeup
+				 */
+				((*this).*m_active_callback[m_task])();
 			}
 		}
 	} while (m_icount-- > 0);
@@ -3006,6 +2998,7 @@ void alto2_cpu_device::hard_reset()
 
 		// every task starts at mpc = task number, in either ROM0 or RAM0
 		m_task_mpc[task] = (m_ctl2k_u38[task] >> 4) ^ 017;
+		m_active_callback[task] = &alto2_cpu_device::noop;
 		if (0 == (m_reset_mode & (1 << task)))
 			m_task_mpc[task] |= ALTO2_UCODE_RAM_BASE;
 

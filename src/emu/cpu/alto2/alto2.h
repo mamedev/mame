@@ -1034,25 +1034,28 @@ private:
 	 */
 	UINT8* m_madr_a91;
 
+	//! no operating function to put in the m_bs, m_f1 and m_f2 slots
+	void noop() {}
+
 	//! per task bus source function pointers, early (0) and late (1)
 	a2func m_bs[2][ALTO2_TASKS][ALTO2_BUSSRC];
 	void set_bs(UINT8 task, UINT8 fn, a2func f0, a2func f1) {
-		m_bs[0][task][fn] = f0;
-		m_bs[1][task][fn] = f1;
+		m_bs[0][task][fn] = f0 ? f0 : &alto2_cpu_device::noop;
+		m_bs[1][task][fn] = f1 ? f1 : &alto2_cpu_device::noop;
 	}
 
 	//! per task f1 function pointers, early (0) and late (1)
 	a2func m_f1[2][ALTO2_TASKS][ALTO2_F1MAX];
 	void set_f1(UINT8 task, UINT8 fn, a2func f0, a2func f1) {
-		m_f1[0][task][fn] = f0;
-		m_f1[1][task][fn] = f1;
+		m_f1[0][task][fn] = f0 ? f0 : &alto2_cpu_device::noop;
+		m_f1[1][task][fn] = f1 ? f1 : &alto2_cpu_device::noop;
 	}
 
 	//! per task f2 function pointers, early (0) and late (1)
 	a2func m_f2[2][ALTO2_TASKS][ALTO2_F2MAX];
 	void set_f2(UINT8 task, UINT8 fn, a2func f0, a2func f1) {
-		m_f2[0][task][fn] = f0;
-		m_f2[1][task][fn] = f1;
+		m_f2[0][task][fn] = f0 ? f0 : &alto2_cpu_device::noop;
+		m_f2[1][task][fn] = f1 ? f1 : &alto2_cpu_device::noop;
 	}
 
 	bool m_ram_related[ALTO2_TASKS];				//!< set when task is RAM related
