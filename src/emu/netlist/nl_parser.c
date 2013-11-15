@@ -95,7 +95,7 @@ void netlist_parser::netdev_device(const astring &dev_type)
 		m_p++;
 		skipws();
 		astring output_name = getname2(',', ')');
-		NL_VERBOSE_OUT(("Parser: ID: %s %s\n", output_name.cstr(), dev->m_inputs.item(cnt)->cstr()));
+		NL_VERBOSE_OUT(("Parser: ID: %s %s\n", output_name.cstr(), dev->m_terminals.item(cnt)->cstr()));
 		m_setup.register_link(*dev->m_terminals.item(cnt), output_name);
 		skipws();
 		cnt++;

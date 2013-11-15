@@ -78,28 +78,6 @@ NETLIB_UPDATE(log)
 	printf("%s: %d %d\n", name().cstr(), (UINT32) (netlist().time().as_raw() / 1000000), INPLOGIC(m_I));
 }
 
-NETLIB_START(clock)
-{
-	register_output("Q", m_Q);
-	//register_input("FB", m_feedback);
-
-	register_param("FREQ", m_freq, 7159000.0 * 5);
-	m_inc = netlist_time::from_hz(m_freq.Value()*2);
-
-	register_link_internal(m_feedback, m_Q, netlist_input_t::INP_STATE_ACTIVE);
-
-}
-
-NETLIB_UPDATE_PARAM(clock)
-{
-	m_inc = netlist_time::from_hz(m_freq.Value()*2);
-}
-
-NETLIB_UPDATE(clock)
-{
-	//m_Q.setToNoCheck(!m_Q.new_Q(), m_inc  );
-	OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
-}
 
 NETLIB_START(nicMultiSwitch)
 {
@@ -223,16 +201,16 @@ NETLIB_START(nicNE555N_MSTABLE)
 	m_last = false;
 }
 
-INLINE double nicNE555N_cv(NETLIB_NAME(nicNE555N_MSTABLE) &dev)
+inline double NETLIB_NAME(nicNE555N_MSTABLE)::nicNE555N_cv()
 {
-	return (dev.m_CV.is_highz() ? 0.67 * dev.m_VS.Value() : dev.INPANALOG(dev.m_CV));
+	return (m_CV.is_highz() ? 0.67 * m_VS.Value() : INPANALOG(m_CV));
 }
 
-INLINE double nicNE555N_clamp(NETLIB_NAME(nicNE555N_MSTABLE) &dev, const double v, const double a, const double b)
+inline double NETLIB_NAME(nicNE555N_MSTABLE)::nicNE555N_clamp(const double v, const double a, const double b)
 {
 	double ret = v;
-	if (ret >  dev.m_VS.Value() - a)
-		ret = dev.m_VS.Value() - a;
+	if (ret >  m_VS.Value() - a)
+		ret = m_VS.Value() - a;
 	if (ret < b)
 		ret = b;
 	return ret;
@@ -246,9 +224,9 @@ NETLIB_UPDATE(nicNE555N_MSTABLE)
 {
 	update_param(); // FIXME : m_CV should be on a sub device ...
 
-	double vt = nicNE555N_clamp(*this, nicNE555N_cv(*this), 0.7, 1.4);
+	double vt = nicNE555N_clamp(nicNE555N_cv(), 0.7, 1.4);
 	bool bthresh = (INPANALOG(m_THRESHOLD) > vt);
-	bool btrig = (INPANALOG(m_trigger) > nicNE555N_clamp(*this, nicNE555N_cv(*this) * 0.5, 0.7, 1.4));
+	bool btrig = (INPANALOG(m_trigger) > nicNE555N_clamp(nicNE555N_cv() * 0.5, 0.7, 1.4));
 	bool out = m_last;
 
 	if (!btrig)
@@ -624,7 +602,6 @@ NETLIB_START(nic7493)
 	register_output(C, "QC", C.m_Q);
 	register_output(D, "QD", D.m_Q);
 
-	//B.register_link_internal(B.m_I, A.m_Q);
 	register_link_internal(C, C.m_I, B.m_Q, netlist_input_t::INP_STATE_HL);
 	register_link_internal(D, D.m_I, C.m_Q, netlist_input_t::INP_STATE_HL);
 
@@ -972,6 +949,7 @@ NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
 
 static const net_device_t_base_factory *netregistry[] =
 {
+    ENTRY(R,                    NETDEV_R)
 	ENTRY(ttl_const,            NETDEV_TTL_CONST)
 	ENTRY(analog_const,         NETDEV_ANALOG_CONST)
 	ENTRY(logic_input,          NETDEV_LOGIC_INPUT)

@@ -216,6 +216,11 @@ void netlist_device_t::register_output(netlist_core_device_t &dev, const astring
 	m_setup->register_output(*this, dev, name, port);
 }
 
+void netlist_device_t::register_terminal(const astring &name, netlist_terminal_t &port)
+{
+    m_setup->register_terminal(*this,*this,name, port);
+}
+
 void netlist_device_t::register_output(const astring &name, netlist_output_t &port)
 {
 	m_setup->register_output(*this,*this,name, port);
@@ -234,7 +239,9 @@ void netlist_device_t::register_input(const astring &name, netlist_input_t &inp,
 void netlist_device_t::register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::net_input_state aState)
 {
     in.init_input(dev, aState);
-    out.init_terminal(dev);
+    // ensure we are not yet initialized ...
+    if (!out.net().isRailNet())
+        out.init_terminal(dev);
 	//if (in.state() != net_input_t::INP_STATE_PASSIVE)
 		out.net().register_con(in);
 }
@@ -274,6 +281,39 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
     m_last.Q = 0;
 };
 
+ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
+{
+    if (othernet == NULL)
+        return; // Nothing to do
+
+    if (this->isRailNet() && othernet->isRailNet())
+        fatalerror("Trying to merge to rail nets\n");
+
+    if (othernet->isRailNet())
+        othernet->merge_net(this);
+    else
+    {
+        netlist_terminal_t *p = othernet->m_head;
+        if (p == NULL)
+            return;
+        if (m_head == NULL)
+        {
+            m_head = p;
+            m_head->set_net(*this);
+            p = p->m_update_list_next;
+        }
+        while (p != NULL)
+        {
+            netlist_terminal_t *pn = p->m_update_list_next;
+            p->m_update_list_next = m_head;
+            p->set_net(*this);
+            m_head = p;
+            p = pn;
+        }
+        othernet->m_head = NULL; // FIXME: othernet needs to be free'd from memory
+    }
+}
+
 ATTR_COLD void netlist_net_t::register_con(netlist_terminal_t &terminal)
 {
     terminal.set_net(*this);
@@ -306,30 +346,61 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 {
 	assert(m_num_cons != 0);
 
-	const UINT32 masks[4] = { 1, 5, 3, 1 };
-	m_cur = m_new;
-	m_in_queue = 2; /* mark as taken ... */
-
-	const UINT32 mask = masks[ (m_last.Q  << 1) | m_cur.Q ];
-
-    netlist_terminal_t *p = m_head;
-    switch (m_num_cons)
-    {
-    case 2:
-        update_dev(p, mask);
-        p = p->m_update_list_next;
-    case 1:
-        update_dev(p, mask);
-        break;
-    default:
+	//assert(this->isRailNet());
+	if (UNEXPECTED(!this->isRailNet()))
+	{
+	    /* only inputs and terminals connected
+	     * approach:
+	     *
+	     * a) Update voltage on this net
+	     * b) Update devices
+	     * c) If difference old - new > trigger schedule immediate update
+	     *    of number of updates < max_update_count
+	     *    else clear number of updates
+	     */
+        m_in_queue = 2; /* mark as taken ... */
+	    double gtot = 0;
+	    double iIdr = 0;
+	    netlist_terminal_t *p = m_head;
         do
         {
-            update_dev(p, mask);
+            p->netdev().update_dev();
+            gtot += p->m_g;
+            iIdr += p->m_Idr;
+
             p = p->m_update_list_next;
         } while (p != NULL);
-        break;
-    }
-	m_last = m_cur;
+        m_new.Analog = iIdr / gtot;
+        printf("New: %f\n", m_new.Analog);
+	}
+	else
+	{
+
+	    const UINT32 masks[4] = { 1, 5, 3, 1 };
+	    m_cur = m_new;
+	    m_in_queue = 2; /* mark as taken ... */
+
+	    const UINT32 mask = masks[ (m_last.Q  << 1) | m_cur.Q ];
+
+	    netlist_terminal_t *p = m_head;
+	    switch (m_num_cons)
+	    {
+	    case 2:
+	        update_dev(p, mask);
+	        p = p->m_update_list_next;
+	    case 1:
+	        update_dev(p, mask);
+	        break;
+	    default:
+	        do
+	        {
+	            update_dev(p, mask);
+	            p = p->m_update_list_next;
+	        } while (p != NULL);
+	        break;
+	    }
+	    m_last = m_cur;
+	}
 }
 
 // ----------------------------------------------------------------------------------------

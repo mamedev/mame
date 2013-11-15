@@ -23,6 +23,7 @@ NETLIST_END
 
 netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 	: m_netlist(netlist)
+    , m_proxy_cnt(0)
 {
 	NETLIST_NAME(base)(*this);
 }
@@ -110,6 +111,18 @@ void netlist_setup_t::register_output(netlist_core_device_t &dev, netlist_core_d
 		fatalerror("Error adding output %s to terminal list\n", name.cstr());
 }
 
+void netlist_setup_t::register_terminal(netlist_core_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, netlist_terminal_t &out)
+{
+    NL_VERBOSE_OUT(("output %s\n", name.cstr()));
+    assert(out.isType(netlist_terminal_t::TERMINAL));
+    astring temp = dev.name();
+    temp.cat(".");
+    temp.cat(name);
+    out.init_terminal(upd_dev);
+    if (!(m_terminals.add(temp, &out, false)==TMERR_NONE))
+        fatalerror("Error adding output %s to terminal list\n", name.cstr());
+}
+
 void netlist_setup_t::register_input(netlist_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, netlist_input_t &inp, netlist_input_t::net_input_state type)
 {
 	NL_VERBOSE_OUT(("input %s\n", name.cstr()));
@@ -176,6 +189,26 @@ netlist_output_t &netlist_setup_t::find_output(const astring &outname_in)
 	return *ret;
 }
 
+netlist_terminal_t &netlist_setup_t::find_terminal(const astring &terminal_in)
+{
+	const astring &tname = resolve_alias(terminal_in);
+	netlist_terminal_t *ret;
+
+	ret = dynamic_cast<netlist_terminal_t *>(m_terminals.find(tname));
+	/* look for default */
+	if (ret == NULL)
+	{
+		/* look for ".Q" std output */
+		astring s = tname;
+		s.cat(".Q");
+		ret = dynamic_cast<netlist_terminal_t *>(m_terminals.find(s));
+	}
+	if (ret == NULL)
+		fatalerror("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
+	NL_VERBOSE_OUT(("Found input %s\n", tname.cstr()));
+	return *ret;
+}
+
 netlist_param_t &netlist_setup_t::find_param(const astring &param_in)
 {
 	const astring &outname = resolve_alias(param_in);
@@ -188,68 +221,163 @@ netlist_param_t &netlist_setup_t::find_param(const astring &param_in)
 	return *ret;
 }
 
+
+void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t &out)
+{
+    if (out.isFamily(netlist_terminal_t::ANALOG) && in.isFamily(netlist_terminal_t::LOGIC))
+    {
+        nld_a_to_d_proxy *proxy = new nld_a_to_d_proxy(in);
+        astring x = "";
+        x.printf("proxy_ad_%d", m_proxy_cnt++);
+
+        proxy->init(*this, x.cstr());
+        register_dev(proxy);
+
+        proxy->m_Q.net().register_con(in);
+        out.net().register_con(proxy->m_I);
+
+    }
+    else if (out.isFamily(netlist_terminal_t::LOGIC) && in.isFamily(netlist_terminal_t::ANALOG))
+    {
+        //printf("here 1\n");
+        nld_d_to_a_proxy *proxy = new nld_d_to_a_proxy(out);
+        astring x = "";
+        x.printf("proxy_da_%d", m_proxy_cnt++);
+        proxy->init(*this, x.cstr());
+        register_dev(proxy);
+
+        proxy->m_Q.net().register_con(in);
+        out.net().register_con(proxy->m_I);
+    }
+    else
+    {
+        out.net().register_con(in);
+    }
+}
+
+// FIXME: optimize code  ...
+void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_output_t &out)
+{
+    if (out.isFamily(netlist_terminal_t::ANALOG))
+    {
+        /* no proxy needed, just merge existing terminal net */
+        if (in.has_net())
+            out.net().merge_net(&in.net());
+        else
+            out.net().register_con(in);
+
+    }
+    else if (out.isFamily(netlist_terminal_t::LOGIC))
+    {
+        //printf("here 1\n");
+        nld_d_to_a_proxy *proxy = new nld_d_to_a_proxy(out);
+        astring x = "";
+        x.printf("proxy_da_%d", m_proxy_cnt++);
+        proxy->init(*this, x.cstr());
+        register_dev(proxy);
+
+        out.net().register_con(proxy->m_I);
+
+        if (in.has_net())
+            proxy->m_Q.net().merge_net(&in.net());
+        else
+            proxy->m_Q.net().register_con(in);
+    }
+    else
+    {
+        fatalerror("Netlist: Severe Error");
+    }
+}
+
+void netlist_setup_t::connect_terminals(netlist_terminal_t &in, netlist_terminal_t &out)
+{
+    assert(in.isType(netlist_terminal_t::TERMINAL));
+    assert(out.isType(netlist_terminal_t::TERMINAL));
+
+    if (in.has_net() && out.has_net())
+    {
+        in.net().merge_net(&out.net());
+        //in.net().register_con(out);
+        //in.net().register_con(in);
+    }
+    else if (out.has_net())
+    {
+        out.net().register_con(in);
+        //out.net().register_con(out);
+    }
+    else if (in.has_net())
+    {
+        in.net().register_con(out);
+        //in.net().register_con(in);
+    }
+    else
+    {
+        NL_VERBOSE_OUT(("adding net ...\n"));
+        in.set_net(*(new netlist_net_t(netlist_object_t::NET, netlist_object_t::ANALOG)));
+        in.net().init_object(netlist());
+        in.net().register_con(out);
+        in.net().register_con(in);
+    }
+}
+
 void netlist_setup_t::resolve_inputs(void)
 {
-	NL_VERBOSE_OUT(("Resolving ...\n"));
-	int proxy_cnt = 0;
-	for (tagmap_astring_t::entry_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
-	{
-		const astring *sout = entry->object();
-		astring sin = entry->tag();
-		netlist_input_t *in = dynamic_cast<netlist_input_t *>(m_terminals.find(sin));
+    NL_VERBOSE_OUT(("Searching for clocks ...\n"));
+    /* find the main clock ... */
+    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+    {
+        netlist_device_t *dev = entry->object();
+        if (dynamic_cast<NETLIB_NAME(mainclock)*>(dev) != NULL)
+        {
+            m_netlist.set_mainclock_dev(dynamic_cast<NETLIB_NAME(mainclock)*>(dev));
+        }
+    }
 
-		if (in == NULL)
-			fatalerror("Unable to find %s\n", sin.cstr());
+    NL_VERBOSE_OUT(("Resolving ...\n"));
+    for (tagmap_astring_t::entry_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
+    {
+        const astring t1s = *entry->object();
+        const astring t2s = entry->tag();
+        netlist_terminal_t &t1 = find_terminal(t1s);
+        netlist_terminal_t &t2 = find_terminal(t2s);
 
-		netlist_output_t  &out = find_output(sout->cstr());
-		if (out.isFamily(netlist_terminal_t::ANALOG) && in->isFamily(netlist_terminal_t::LOGIC))
-		{
-			nld_a_to_d_proxy *proxy = new nld_a_to_d_proxy(*in);
-			astring x = "";
-			x.printf("proxy_ad_%d", proxy_cnt++);
+        // FIXME: amend device design so that warnings can be turned into errors
+        //        Only variable inputs have this issue
+        if (t1.isType(netlist_terminal_t::OUTPUT) && t2.isType(netlist_terminal_t::INPUT))
+        {
+            if (t2.has_net())
+                mame_printf_warning("Input %s already connected\n", t2s.cstr());
+            connect_input_output(dynamic_cast<netlist_input_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
+        }
+        else if (t1.isType(netlist_terminal_t::INPUT) && t2.isType(netlist_terminal_t::OUTPUT))
+        {
+            if (t1.has_net())
+                mame_printf_warning("Input %s already connected\n", t1s.cstr());
+            connect_input_output(dynamic_cast<netlist_input_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
+        }
+        else if (t1.isType(netlist_terminal_t::OUTPUT) && t2.isType(netlist_terminal_t::TERMINAL))
+        {
+            connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
+        }
+        else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::OUTPUT))
+        {
+            connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
+        }
+        else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::TERMINAL))
+        {
+            connect_terminals(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_terminal_t &>(t2));
+        }
+        else
+            fatalerror("Connecting %s to %s not supported!\n", t1s.cstr(), t2s.cstr());
+    }
 
-			proxy->init(*this, x.cstr());
-			register_dev(proxy);
-
-			proxy->m_Q.net().register_con(*in);
-			out.net().register_con(proxy->m_I);
-
-		}
-		else if (out.isFamily(netlist_terminal_t::LOGIC) && in->isFamily(netlist_terminal_t::ANALOG))
-		{
-			//printf("here 1\n");
-			nld_d_to_a_proxy *proxy = new nld_d_to_a_proxy(out);
-			astring x = "";
-			x.printf("proxy_da_%d", proxy_cnt++);
-			proxy->init(*this, x.cstr());
-			register_dev(proxy);
-
-            proxy->m_Q.net().register_con(*in);
-            out.net().register_con(proxy->m_I);
-		}
-		else
-		{
-		    out.net().register_con(*in);
-		}
-	}
-
-	/* find the main clock ... */
-	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-	{
-		netlist_device_t *dev = entry->object();
-		if (dynamic_cast<NETLIB_NAME(mainclock)*>(dev) != NULL)
-		{
-			m_netlist.set_mainclock_dev(dynamic_cast<NETLIB_NAME(mainclock)*>(dev));
-		}
-	}
-
-	/* print all outputs */
-	for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
-	{
-		ATTR_UNUSED netlist_output_t *out = dynamic_cast<netlist_output_t *>(entry->object());
-		//if (out != NULL)
-			//VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
-	}
+    /* print all outputs */
+    for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
+    {
+        ATTR_UNUSED netlist_output_t *out = dynamic_cast<netlist_output_t *>(entry->object());
+        //if (out != NULL)
+            //VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
+    }
 
 
 }

@@ -64,6 +64,16 @@
 // this is a bad hack
 #define USE_OLD7493 (0)
 
+
+// ----------------------------------------------------------------------------------------
+// 2 terminal devices
+// ----------------------------------------------------------------------------------------
+
+#define NETDEV_R(_name, _R)                                                         \
+        NET_REGISTER_DEV(R, _name)                                                  \
+        NETDEV_PARAMI(_name, R, _R)                                           \
+
+
 // ----------------------------------------------------------------------------------------
 // Special chips
 // ----------------------------------------------------------------------------------------
@@ -77,7 +87,7 @@
 #define NETDEV_ANALOG_INPUT(_name)                                                  \
 		NET_REGISTER_DEV(analog_input, _name)
 #define NETDEV_CALLBACK(_name, _IN)                                                 \
-		NET_REGISTER_DEV(analog_callback, _name)                             \
+		NET_REGISTER_DEV(analog_callback, _name)                                    \
 		NET_CONNECT(_name, IN, _IN)
 #define NETDEV_SWITCH2(_name, _i1, _i2)                                             \
 		NET_REGISTER_DEV(nicMultiSwitch, _name)                                     \
@@ -241,13 +251,7 @@ NETLIB_DEVICE(log,
 // ----------------------------------------------------------------------------------------
 
 
-NETLIB_DEVICE_WITH_PARAMS(clock,
-	netlist_ttl_input_t m_feedback;
-	netlist_ttl_output_t m_Q;
 
-	netlist_param_t m_freq;
-	netlist_time m_inc;
-);
 
 NETLIB_DEVICE_WITH_PARAMS(nicMultiSwitch,
 	netlist_analog_input_t m_I[8];
@@ -301,6 +305,10 @@ NETLIB_DEVICE_WITH_PARAMS(nicNE555N_MSTABLE,
 	netlist_param_t m_C;
 	netlist_param_t m_VS;
 	netlist_param_t m_VL;
+
+	double nicNE555N_cv();
+	double nicNE555N_clamp(const double v, const double a, const double b);
+
 );
 
 NETLIB_SIGNAL(nic7430, 8, 0, 0);

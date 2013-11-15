@@ -43,12 +43,33 @@ NETLIB_DEVICE_WITH_PARAMS(analog_const,
 // ----------------------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(mainclock,
-	netlist_ttl_output_t m_Q;
+public:
+    netlist_ttl_output_t m_Q;
 
 	netlist_param_t m_freq;
 	netlist_time m_inc;
 
 	ATTR_HOT inline static void mc_update(netlist_net_t &net, const netlist_time curtime);
+);
+
+// ----------------------------------------------------------------------------------------
+// clock
+// ----------------------------------------------------------------------------------------
+
+NETLIB_DEVICE_WITH_PARAMS(clock,
+    netlist_ttl_input_t m_feedback;
+    netlist_ttl_output_t m_Q;
+
+    netlist_param_t m_freq;
+    netlist_time m_inc;
+);
+
+// ----------------------------------------------------------------------------------------
+// solver_clock
+// ----------------------------------------------------------------------------------------
+
+NETLIB_DEVICE_WITH_PARAMS_DERIVED(solver_clock, clock,
+public:
 );
 
 // ----------------------------------------------------------------------------------------

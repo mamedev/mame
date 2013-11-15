@@ -38,6 +38,8 @@
 
 #define NETLIST_HIGHIMP_V   (1.23456e20)        /* some voltage we should never see */
 
+#define NETLIST_GMIN    (1e-9)
+
 typedef UINT8 netlist_sig_t;
 
 /* FIXME: We need a different solution to output delegates !

@@ -464,6 +464,16 @@ static NETLIST_START(pong_schematics)
 	NETDEV_PARAM(videomix.R1, RES_K(1))
 	NETDEV_PARAM(videomix.R2, RES_K(1.2))
 	NETDEV_PARAM(videomix.R3, RES_K(22))
+
+#if 0
+	NETDEV_ANALOG_CONST(V5, 5)
+    NETDEV_ANALOG_CONST(V0, 0)
+    NETDEV_R(R1, 10)
+    NETDEV_R(R2, 10)
+    NET_C(V5,R1.1)
+    NET_C(R1.2, R2.1)
+    NET_C(R2.2, V0)
+#endif
 NETLIST_END
 
 static NETLIST_START(pong)

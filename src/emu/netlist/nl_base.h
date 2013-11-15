@@ -170,17 +170,24 @@ typedef delegate<void ()> net_update_delegate;
 #define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN inline void NETLIB_NAME(_chip) :: _name _params
 
+#define NETLIB_DEVICE_BASE(_name, _pclass, _extra, _priv)                           \
+    class _name : public _pclass                                                    \
+    {                                                                               \
+    public:                                                                         \
+        _name()                                                                     \
+        : _pclass()    { }                                                          \
+    protected:                                                                      \
+        _extra                                                                      \
+        ATTR_HOT void update();                                                     \
+        ATTR_HOT void start();                                                      \
+        _priv                                                                       \
+    }
+
+#define NETLIB_DEVICE_DERIVED(_name, _pclass, _priv)                                \
+		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), NETLIB_NAME(_pclass), , _priv)
+
 #define NETLIB_DEVICE(_name, _priv)                                                 \
-	class NETLIB_NAME(_name) : public netlist_device_t                              \
-	{                                                                               \
-	public:                                                                         \
-		NETLIB_NAME(_name) ()                                                       \
-		: netlist_device_t()    { }                                                 \
-	protected:                                                                      \
-		ATTR_HOT void update();                                                     \
-		ATTR_HOT void start();                                                      \
-		_priv                                                                       \
-	}
+		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), netlist_device_t, , _priv)
 
 #define NETLIB_SUBDEVICE(_name, _priv)                                              \
 	class NETLIB_NAME(_name) : public netlist_core_device_t                         \
@@ -195,17 +202,14 @@ typedef delegate<void ()> net_update_delegate;
 	}
 
 #define NETLIB_DEVICE_WITH_PARAMS(_name, _priv)                                     \
-	class NETLIB_NAME(_name) : public netlist_device_t                              \
-	{                                                                               \
-	public:                                                                         \
-		NETLIB_NAME(_name) ()                                                       \
-		: netlist_device_t() { }                                                    \
-		ATTR_HOT void update_param();                                               \
-		ATTR_HOT void update();                                                     \
-		ATTR_HOT void start();                                                      \
-	/* protected: */                                                                \
-		_priv                                                                       \
-	}
+        NETLIB_DEVICE_BASE(NETLIB_NAME(_name), netlist_device_t,                    \
+        	ATTR_HOT void update_param();                                           \
+	    , _priv)
+
+#define NETLIB_DEVICE_WITH_PARAMS_DERIVED(_name, _pclass, _priv)                    \
+        NETLIB_DEVICE_BASE(NETLIB_NAME(_name), NETLIB_NAME(_pclass),                \
+            ATTR_HOT void update_param();                                           \
+        , _priv)
 
 // ----------------------------------------------------------------------------------------
 // forward definitions
@@ -287,15 +291,27 @@ public:
 
 	ATTR_COLD netlist_terminal_t(const type_t atype, const family_t afamily)
 	: netlist_object_t(atype, afamily)
+	, m_Idr(0.0)
+	, m_g(NETLIST_GMIN)
     , m_update_list_next(NULL)
 	, m_netdev(NULL)
     , m_net(NULL)
     , m_state(INP_STATE_ACTIVE)
 	{}
 
+    ATTR_COLD netlist_terminal_t()
+    : netlist_object_t(TERMINAL, ANALOG)
+    , m_Idr(0.0)
+    , m_update_list_next(NULL)
+    , m_netdev(NULL)
+    , m_net(NULL)
+    , m_state(INP_STATE_ACTIVE)
+    {}
+
 	ATTR_COLD virtual void init_terminal(netlist_core_device_t &dev);
 
     ATTR_COLD void set_net(netlist_net_t &anet)   { m_net = &anet; }
+    ATTR_COLD bool has_net() { return (m_net != NULL); }
 
     ATTR_HOT inline const netlist_net_t & RESTRICT net() const { return *m_net;}
     ATTR_HOT inline netlist_net_t & RESTRICT net() { return *m_net;}
@@ -305,6 +321,9 @@ public:
     ATTR_HOT inline void set_state(const net_input_state astate) { m_state = astate; }
 
     ATTR_HOT inline netlist_core_device_t & RESTRICT netdev() const { return *m_netdev; }
+
+    double m_Idr; // drive current
+    double m_g; // conductance
 
     netlist_terminal_t *m_update_list_next;
 
@@ -421,6 +440,7 @@ public:
     ATTR_COLD netlist_net_t(const type_t atype, const family_t afamily);
 
     ATTR_COLD void register_con(netlist_terminal_t &terminal);
+    ATTR_COLD void merge_net(netlist_net_t *othernet);
     ATTR_COLD void register_railterminal(netlist_terminal_t &mr)
     {
         assert(m_railterminal == NULL);
@@ -447,6 +467,16 @@ public:
     ATTR_HOT inline const netlist_sig_t last_Q() const  { return m_last.Q;  }
     ATTR_HOT inline const netlist_sig_t new_Q() const   { return m_new.Q;   }
 
+    ATTR_HOT inline const double Q_Analog() const
+    {
+        //assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
+        assert(family() == ANALOG);
+        return m_cur.Analog;
+    }
+
+    ATTR_HOT inline void push_to_queue(const netlist_time &delay);
+    ATTR_HOT bool is_queued() { return m_in_queue == 1; }
+
 protected:
 
     /* prohibit use in device functions
@@ -458,14 +488,6 @@ protected:
 		assert(family() == LOGIC);
         return m_cur.Q;
     }
-    ATTR_HOT inline const double Q_Analog() const
-    {
-        //assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
-		assert(family() == ANALOG);
-        return m_cur.Analog;
-    }
-
-    ATTR_HOT inline void push_to_queue(const netlist_time &delay);
 
     hybrid_t m_last;
     hybrid_t m_cur;
@@ -670,6 +692,8 @@ public:
 
 	ATTR_COLD void register_sub(netlist_core_device_t &dev, const astring &name);
 
+    ATTR_COLD void register_terminal(const astring &name, netlist_terminal_t &port);
+
 	ATTR_COLD void register_output(const astring &name, netlist_output_t &out);
 	ATTR_COLD void register_output(netlist_core_device_t &dev, const astring &name, netlist_output_t &out);
 
@@ -850,6 +874,71 @@ private:
 	double m_high_V;
 };
 
+// ----------------------------------------------------------------------------------------
+// nld_twoterm
+// ----------------------------------------------------------------------------------------
+
+class nld_twoterm : public netlist_device_t
+{
+public:
+    nld_twoterm()
+    : netlist_device_t(), m_g(0.0), m_V(0.0), m_I(0.0)
+    {
+    }
+
+    netlist_terminal_t m_P;
+    netlist_terminal_t m_N;
+
+protected:
+    virtual void start()
+    {
+    }
+
+    ATTR_HOT ATTR_ALIGN virtual void update()
+    {
+        m_N.m_Idr = (m_P.net().Q_Analog() - m_V) * m_g + m_I;
+        m_P.m_Idr = (m_N.net().Q_Analog() + m_V) * m_g - m_I;
+        printf("%f %f %f %f\n", m_N.m_Idr, m_P.m_Idr, m_N.net().Q_Analog(), m_P.net().Q_Analog());
+        if (!m_N.net().is_queued() && !m_N.net().isRailNet())
+            m_N.net().push_to_queue(NLTIME_FROM_NS(10));
+        if (!m_P.net().is_queued() && !m_P.net().isRailNet() )
+            m_P.net().push_to_queue(NLTIME_FROM_NS(10));
+    }
+
+    double m_g; // conductance
+    double m_V; // internal voltage source
+    double m_I; // internal current source
+private:
+};
+
+class nld_R : public nld_twoterm
+{
+public:
+    nld_R()
+    : nld_twoterm()
+    {
+    }
+
+    netlist_param_t m_R;
+
+protected:
+    void start()
+    {
+        register_terminal("1", m_P);
+        register_terminal("2", m_N);
+
+        register_param("R", m_R, NETLIST_GMIN);
+    }
+
+    virtual void update_param()
+    {
+        m_g = 1.0 / m_R.Value();
+        m_P.m_g = m_g;
+        m_N.m_g = m_g;
+    }
+
+private:
+};
 
 // ----------------------------------------------------------------------------------------
 // Inline implementations

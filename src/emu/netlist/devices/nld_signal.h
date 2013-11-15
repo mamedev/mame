@@ -90,7 +90,7 @@ public:
 		register_output("Q", m_Q);
 		for (int i=0; i < _numdev; i++)
 		{
-			register_input(sIN[i], m_i[i], netlist_input_t::INP_STATE_ACTIVE);
+			register_input(sIN[i], m_i[i]);
 		}
 	}
 

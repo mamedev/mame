@@ -28,8 +28,13 @@
 		NET_REGISTER_DEV(_type ## _ ## sig, _name)
 #define NET_CONNECT(_name, _input, _output)                                         \
 		netlist.register_link(# _name "." # _input, # _output);
+#define NET_C(_input, _output)                                                      \
+        netlist.register_link(# _input , # _output);
 #define NETDEV_PARAM(_name, _val)                                                   \
 		netlist.find_param(# _name).initial(_val);
+#define NETDEV_PARAMI(_name, _param, _val)                                           \
+        netlist.find_param(# _name "." # _param).initial(_val);
+
 
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
@@ -71,6 +76,7 @@ public:
 	netlist_device_t *register_dev(netlist_device_t *dev);
 	void remove_dev(const astring &name);
 
+    void register_terminal(netlist_core_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, netlist_terminal_t &out);
 	void register_output(netlist_core_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, netlist_output_t &out);
 	void register_input(netlist_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, netlist_input_t &inp, netlist_input_t::net_input_state type);
 	void register_alias(const astring &alias, const astring &out);
@@ -79,6 +85,7 @@ public:
 	void register_link(const astring &sin, const astring &sout);
 
 	netlist_output_t &find_output(const astring &outname_in);
+    netlist_terminal_t &find_terminal(const astring &outname_in);
 	netlist_param_t &find_param(const astring &param_in);
 
 	void register_callback(const astring &devname, netlist_output_delegate delegate);
@@ -104,6 +111,12 @@ private:
 	//tagmap_input_t  m_inputs;
 	tagmap_param_t  m_params;
 	tagmap_astring_t  m_links;
+
+	int m_proxy_cnt;
+
+	void connect_terminals(netlist_terminal_t &in, netlist_terminal_t &out);
+	void connect_input_output(netlist_input_t &in, netlist_output_t &out);
+    void connect_terminal_output(netlist_terminal_t &in, netlist_output_t &out);
 
 	netlist_output_t *find_output_exact(const astring &outname_in);
 	const astring &resolve_alias(const astring &name) const;
