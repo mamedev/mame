@@ -1602,7 +1602,7 @@ GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   eolith_state, landbrka, RO
 GAME( 1999, nhidctch,  0,        eolith45, hidctch2,  eolith_state, eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_IMPERFECT_SOUND ) // or New Teurrin Geurim Chajgi '98
 GAME( 1999, penfan,    0,        eolith45, penfan,    eolith_state, eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 1)",  GAME_IMPERFECT_SOUND ) // alt title of Ribbon
 GAME( 1999, penfana,   penfan,   eolith45, penfan,    eolith_state, eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 2)",  GAME_IMPERFECT_SOUND )
-GAME( 2000, stealsee,  0,        eolith45, stealsee,  eolith_state, eolith,   ROT0, "Moov Generation / Eolith", "Steal See (& Get Land)",  GAME_IMPERFECT_SOUND )
+GAME( 2000, stealsee,  0,        eolith45, stealsee,  eolith_state, eolith,   ROT0, "Moov Generation / Eolith", "Steal See",  GAME_IMPERFECT_SOUND )
 GAME( 2000, hidctch3,  0,        eolith50, hidctch3,  eolith_state, hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_IMPERFECT_SOUND )
 GAME( 2001, fort2b,    0,        eolith50, common,    eolith_state, eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_IMPERFECT_SOUND )
 GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith_state, eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_IMPERFECT_SOUND )
