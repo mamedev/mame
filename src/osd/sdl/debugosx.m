@@ -537,7 +537,7 @@ void console_create_window(running_machine &machine)
 					[text setString:@""];
 				}
 				attr = data[col - origin.x].attrib;
-				[text appendFormat:@"%c", data[col - origin.x].uchar];
+				[text appendFormat:@"%C", data[col - origin.x].uchar];
 			}
 			if ([text length] > 0) {
 				if (pass == 0) {
