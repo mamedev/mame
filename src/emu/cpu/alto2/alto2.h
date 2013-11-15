@@ -27,6 +27,7 @@
 #define	USE_ALU_74181			0	//!< define to 1 to use the SN74181 ALU code
 #define	DEBUG_DISPLAY_TIMING	0	//!< define to 1 to debug the display timing
 #define	USE_BITCLK_TIMER		0	//!< define to 1 to use a very high rate timer for the disk bit clock
+#define	ALTO2_HAMMING_CHECK		0	//!< define to 1 to incorporate the Hamming code and Parity check
 
 #define	ALTO2_TASKS		16			//!< 16 task slots
 #define	ALTO2_REGS		32			//!< 32 16-bit words in the R register file
@@ -1753,8 +1754,6 @@ private:
 	// ************************************************
 	// memory stuff
 	// ************************************************
-	/** @brief set non-zero to incorporate the Hamming code and Parity check */
-	#define	ALTO2_HAMMING_CHECK	1
 
 	enum {
 		ALTO2_MEM_NONE,

@@ -839,7 +839,9 @@ void alto2_cpu_device::init_memory()
 
 	// allocate 128KB of main memory
 	m_mem.ram = global_alloc_array(UINT32, sizeof(UINT16)*ALTO2_RAM_SIZE);
+	memset(m_mem.ram, 0, sizeof(UINT32)*sizeof(UINT16)*ALTO2_RAM_SIZE);
 	m_mem.hpb = global_alloc_array(UINT8,  sizeof(UINT16)*ALTO2_RAM_SIZE);
+	memset(m_mem.hpb, 0, sizeof(UINT8)*sizeof(UINT16)*ALTO2_RAM_SIZE);
 
 	/**
 	 * <PRE>

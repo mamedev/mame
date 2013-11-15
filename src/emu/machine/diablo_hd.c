@@ -1269,7 +1269,6 @@ void diablo_hd_device::device_start()
 {
 	m_image = static_cast<diablo_image_device *>(subdevice("drive"));
 
-	m_diablo31 = true;	// FIXME: get from m_handle meta data?
 	m_packs = 1;		// FIXME: get from configuration?
 
 	m_cache = global_alloc_array(UINT8*, DIABLO_PAGES);
@@ -1283,9 +1282,8 @@ void diablo_hd_device::device_start()
 void diablo_hd_device::device_reset()
 {
 	m_handle = m_image->get_chd_file();
+	m_diablo31 = true;	// FIXME: get from m_handle meta data?
 	m_disk = m_image->get_hard_disk_file();
-	LOG_DRIVE((0,"[DHD]	%s: m_image=%p m_handle=%p m_disk=%p\n", __FUNCTION__, m_image, m_handle, m_disk));
-
 	if (m_diablo31) {
 		snprintf(m_description, sizeof(m_description), "DIABLO31");
 		m_rotation_time = DIABLO31_ROTATION_TIME;

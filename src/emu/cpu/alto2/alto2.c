@@ -22,17 +22,19 @@ const device_type ALTO2 = &device_creator<alto2_cpu_device>;
 //**************************************************************************
 
 DEVICE_ADDRESS_MAP_START( ucode_map, 32, alto2_cpu_device )
-	AM_RANGE(0,                    ALTO2_UCODE_RAM_BASE - 1)  AM_READ     ( crom_r )
-	AM_RANGE(ALTO2_UCODE_RAM_BASE, ALTO2_UCODE_SIZE - 1)      AM_READWRITE( cram_r, cram_w )
+	AM_RANGE(0,                          ALTO2_UCODE_RAM_BASE - 1)          AM_READ     ( crom_r )
+	AM_RANGE(ALTO2_UCODE_RAM_BASE,       ALTO2_UCODE_SIZE - 1)              AM_READWRITE( cram_r, cram_w )
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( const_map, 16, alto2_cpu_device )
-	AM_RANGE(0,                    ALTO2_CONST_SIZE - 1)      AM_READ     ( const_r )
+	AM_RANGE(0,                          ALTO2_CONST_SIZE - 1)              AM_READ     ( const_r )
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( iomem_map, 16, alto2_cpu_device )
-	AM_RANGE(0,                    ALTO2_IO_PAGE_BASE - 1)    AM_READWRITE( ioram_r, ioram_w )
-	AM_RANGE(ALTO2_IO_PAGE_BASE,   0177777)                   AM_READWRITE( mmio_r,  mmio_w )
+	AM_RANGE(0,                          ALTO2_IO_PAGE_BASE - 1)            AM_READWRITE( ioram_r, ioram_w )
+	AM_RANGE(ALTO2_IO_PAGE_BASE,         0177777)                           AM_READWRITE( mmio_r,  mmio_w  )
+	AM_RANGE(0200000,                    0200000+ALTO2_IO_PAGE_BASE - 1)    AM_READWRITE( ioram_r, ioram_w )
+	AM_RANGE(0200000+ALTO2_IO_PAGE_BASE, 0377777)                           AM_READWRITE( mmio_r,  mmio_w  )
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -1180,7 +1182,7 @@ READ16_MEMBER ( alto2_cpu_device::const_r )
 READ16_MEMBER ( alto2_cpu_device::ioram_r )
 {
 	offs_t dword_addr = offset / 2;
-	return offset & 1 ? GET_ODD(m_mem.ram[dword_addr]) : GET_EVEN(m_mem.ram[dword_addr]);
+	return static_cast<UINT16>(offset & 1 ? GET_ODD(m_mem.ram[dword_addr]) : GET_EVEN(m_mem.ram[dword_addr]));
 }
 
 //! write i/o space RAM
