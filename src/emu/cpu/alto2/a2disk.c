@@ -1059,14 +1059,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	int i;
 	UINT8 s0, s1;
 
-	LOG((LOG_DISK,8,"	>>> KWD timing bitclk:%d datin:%d block:%d SECT[4]:%d\n", bitclk, datin, block, m_dsk.sect4));
-
-	if (m_dsk.sect4 != dhd->get_sector_mark_0()) {
-		// SECT[4] transition
-		m_dsk.sect4 = dhd->get_sector_mark_0();
-		LOG((LOG_DISK,7,"	SECT[4]:%d changed\n", m_dsk.sect4));
-	}
-
+	LOG((LOG_DISK,8,"	>>> KWD timing bitclk:%d datin:%d block:%d SECT[4]:%d\n", bitclk, datin, block, dhd->get_sector_mark_0()));
 	if (0 == m_dsk.seclate) {
 		// if SECLATE is 0, WDDONE' never goes low (counter's clear has precedence).
 		if (m_dsk.bitcount || m_dsk.carry) {
@@ -1074,8 +1067,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			m_dsk.bitcount = 0;
 			m_dsk.carry = 0;
 		}
-	}
-	if (0 != m_dsk.seclate && m_dsk.bitclk && !bitclk) {
+	} else if (m_dsk.bitclk && !bitclk) {
 		// if SECLATE is 1, the counter will count or be loaded
 		if ((m_dsk.shiftin & (1 << 16)) && !GET_KCOM_WFFO(m_dsk.kcom)) {
 			/*
@@ -1163,7 +1155,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	s1 |= JKFF_K;
 	if (m_dsk.ok_to_run)
 		s1 |= JKFF_S;
-	if (m_dsk.ff_43a & JKFF_Q0)
+	if (!(m_dsk.ff_43a & JKFF_Q))
 		s1 |= JKFF_C;
 	m_dsk.ff_43b = update_jkff(s0, s1);
 
@@ -1327,7 +1319,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
-		if (m_dsk.ff_22b & JKFF_Q0)
+		if (!(m_dsk.ff_22b & JKFF_Q))
 			s1 |= JKFF_C;
 		m_dsk.ff_22a = update_jkff(s0, s1);
 
@@ -1349,7 +1341,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
-		if (m_dsk.ff_22b & JKFF_Q0)
+		if (!(m_dsk.ff_22b & JKFF_Q))
 			s1 |= JKFF_C;
 		m_dsk.ff_21b = update_jkff(s0, s1);
 	}
@@ -1390,8 +1382,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			LOG((LOG_DISK,6,"	reset KFER\n"));
 			m_dsk.kfer = 0;
 		}
-	}
-	if (0 == m_dsk.kfer) {
+	} else {
 		// fatal error: not ready OR seqerr OR not seekok
 		if (RDYLAT) {
 			LOG((LOG_DISK,6,"	RDYLAT sets KFER\n"));
@@ -1416,8 +1407,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			LOG((LOG_DISK,6,"	STSKENA:1; WAKEST':0 wake KSEC\n"));
 			m_task_wakeup |= 1 << task_ksec;
 		}
-	}
-	if (m_dsk.ff_22b & JKFF_Q0) {
+	} else {
 		if (0 != (m_task_wakeup & (1 << task_ksec))) {
 			LOG((LOG_DISK,6,"	STSKENA:0; WAKEST':1\n"));
 			m_task_wakeup &= ~(1 << task_ksec);
@@ -1437,13 +1427,13 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 */
 	DEBUG_NAME("\t\t21a KSEC  ");
 	s0 = m_dsk.ff_21a;
-	s1 = 0 == m_dsk.sect4 ? JKFF_CLK : JKFF_0;
-	if (m_dsk.ff_22b & JKFF_Q0)
+	s1 = dhd->get_sector_mark_0() ? JKFF_0 : JKFF_CLK;
+	if (!(m_dsk.ff_22b & JKFF_Q))
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
 	if (!ERRWAKE)
 		s1 |= JKFF_S;
-	if (m_dsk.ff_22b & JKFF_Q0)
+	if (!(m_dsk.ff_22b & JKFF_Q))
 		s1 |= JKFF_C;
 	m_dsk.ff_21a = update_jkff(s0, s1);
 
@@ -1627,9 +1617,8 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 	/* if the strobe is still set, restart the timer */
 	if (m_dsk.strobe) {
 		m_dsk.strobon_timer->adjust(attotime::from_nsec(TW_STROBON), arg);
-		m_dsk.strobon_timer->enable();
 	} else {
-		m_dsk.strobon_timer->enable(false);
+		m_dsk.strobon_timer->reset();
 	}
 }
 
@@ -1637,10 +1626,7 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 void alto2_cpu_device::disk_ready_mf31a(void* ptr, INT32 arg)
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	if (dhd)
-		m_dsk.ready_mf31a = arg & dhd->get_ready_0();
-	else
-		m_dsk.ready_mf31a = arg;
+	m_dsk.ready_mf31a = arg & dhd->get_ready_0();
 	/* log the not ready result with level 0, else 2 */
 	LOG((LOG_DISK,m_dsk.ready_mf31a ? 0 : 2,"	ready mf31a:%d\n", m_dsk.ready_mf31a));
 }
@@ -1980,7 +1966,8 @@ void alto2_cpu_device::f1_clrstat_1()
 	s0 = m_dsk.ff_45b;
 	s1 = m_dsk.ff_45b & JKFF_CLK;
 	s1 |= JKFF_J;
-	s1 |= m_dsk.ff_45b & JKFF_K;
+	if (!SEQERR)
+		s1 |= JKFF_K;
 	s1 |= JKFF_C;
 	m_dsk.ff_45b = update_jkff(s0, s1);
 
@@ -1989,7 +1976,6 @@ void alto2_cpu_device::f1_clrstat_1()
 
 	/* start monoflop 31a, which resets ready_mf31a */
 	m_dsk.ready_timer->adjust(attotime::from_nsec(TW_READY), 1);
-	m_dsk.ready_timer->enable();
 }
 
 /**
