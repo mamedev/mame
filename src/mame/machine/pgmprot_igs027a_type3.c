@@ -154,6 +154,7 @@ MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 	int base = -1;
 
 	if (!strcmp(machine().system().name, "theglad")) base = 0x3316;
+	if (!strcmp(machine().system().name, "theglad101")) base = 0x3316;
 	if (!strcmp(machine().system().name, "thegladpcb")) base = 0x3316;
 
 	if (base != -1)
