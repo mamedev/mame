@@ -103,7 +103,7 @@ const rom_entry *hardbox_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( hardbox_mem, AS_PROGRAM, 8, hardbox_device )
-	AM_RANGE(0x0000, 0xdfff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION(Z80_TAG, 0)
 ADDRESS_MAP_END
 
