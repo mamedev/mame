@@ -1270,7 +1270,7 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, astr
 					  m_aluc0 ? "C":"-",
 					  m_laluc0 ? "c":"-",
 					  m_shifter == 0 ? "0":"-",
-					  m_shifter < 0 ? "<":"-");
+					  static_cast<INT16>(m_shifter) < 0 ? "<":"-");
 		break;
 	}
 }
