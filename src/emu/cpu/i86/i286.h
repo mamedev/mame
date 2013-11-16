@@ -80,7 +80,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 	bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
 
-	virtual void interrupt(int int_num, int trap = 1) { if(trap) throw TRAP(int_num, -1); else interrupt_descriptor(int_num, 0, 0); }
+	virtual void interrupt(int int_num, int trap = 1) { if(trap) throw TRAP(int_num, (UINT16)-1); else interrupt_descriptor(int_num, 0, 0); }
 	virtual UINT8 read_port_byte(UINT16 port);
 	virtual UINT16 read_port_word(UINT16 port);
 	virtual void write_port_byte(UINT16 port, UINT8 data);

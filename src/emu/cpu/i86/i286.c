@@ -1057,7 +1057,7 @@ void i80286_cpu_device::execute_run()
 					{
 						case 0:
 							if(!PM)
-								throw TRAP(FAULT_UD, -1);
+								throw TRAP(FAULT_UD, (UINT16)-1);
 							m_modrm = fetch();
 							switch (m_modrm & 0x38)
 							{
@@ -1150,7 +1150,7 @@ void i80286_cpu_device::execute_run()
 									break;
 
 								default:
-									throw TRAP(FAULT_UD, -1);
+									throw TRAP(FAULT_UD, (UINT16)-1);
 							}
 							break;
 						case 1:
@@ -1158,7 +1158,7 @@ void i80286_cpu_device::execute_run()
 							UINT32 ea;
 							m_modrm = fetch();
 							if((m_modrm >= 0xc0) && (m_modrm < 0xe0))
-								throw TRAP(FAULT_UD, -1);
+								throw TRAP(FAULT_UD, (UINT16)-1);
 							switch (m_modrm & 0x38)
 							{
 								case 0: /* sgdt */
@@ -1197,13 +1197,13 @@ void i80286_cpu_device::execute_run()
 									m_msw = (m_msw & 1) | msw;
 									break;
 								default:
-									throw TRAP(FAULT_UD, -1);
+									throw TRAP(FAULT_UD, (UINT16)-1);
 							}
 							break;
 						}
 						case 2: /* LAR */
 							if(!PM)
-								throw TRAP(FAULT_UD, -1);
+								throw TRAP(FAULT_UD, (UINT16)-1);
 							m_modrm = fetch_op();
 							tmp = GetRMWord();
 							if((addr = selector_address(tmp)) == -1)
@@ -1226,7 +1226,7 @@ void i80286_cpu_device::execute_run()
 							break;
 						case 3: /* LSL */
 							if(!PM)
-								throw TRAP(FAULT_UD, -1);
+								throw TRAP(FAULT_UD, (UINT16)-1);
 							m_modrm = fetch_op();
 							tmp = GetRMWord();
 							if((addr = selector_address(tmp)) == -1)
@@ -1291,7 +1291,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							m_msw &= ~8;
 							break;
 						default:
-							throw TRAP(FAULT_UD, -1);
+							throw TRAP(FAULT_UD, (UINT16)-1);
 					}
 					break;
 				}
@@ -1358,7 +1358,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0x63: // arpl
 				{
 					UINT16 tmp, source;
-					if (!PM) throw TRAP(FAULT_UD,-1);
+					if (!PM) throw TRAP(FAULT_UD,(UINT16)-1);
 
 					m_modrm=fetch_op();
 					tmp=GetRMWord();
@@ -1442,7 +1442,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							break;
 						default:
 							logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
-							throw TRAP(FAULT_UD, -1);
+							throw TRAP(FAULT_UD, (UINT16)-1);
 					}
 					break;
 
@@ -1471,7 +1471,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0x9b: // i_wait
 					if((m_msw & 0x0a) == 0x0a)
-						throw TRAP(FAULT_NM, -1);
+						throw TRAP(FAULT_NM, (UINT16)-1);
 					CLK(WAIT);
 					break;
 
@@ -1550,7 +1550,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				{
 					m_modrm = fetch();
 					if(m_modrm >= 0xc0)
-						throw TRAP(FAULT_UD, -1);
+						throw TRAP(FAULT_UD, (UINT16)-1);
 					UINT16 tmp = GetRMWord();
 					data_descriptor(ES, GetnextRMWord());
 					RegWord(tmp);
@@ -1562,7 +1562,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				{
 					m_modrm = fetch();
 					if(m_modrm >= 0xc0)
-						throw TRAP(FAULT_UD, -1);
+						throw TRAP(FAULT_UD, (UINT16)-1);
 					UINT16 tmp = GetRMWord();
 					data_descriptor(DS, GetnextRMWord());
 					RegWord(tmp);
@@ -1684,7 +1684,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 				case 0xde:
 				case 0xdf:
 					if((m_msw & 8) || (m_msw & 4))
-						throw TRAP(FAULT_NM, -1);
+						throw TRAP(FAULT_NM, (UINT16)-1);
 					m_modrm = fetch();
 					GetRMByte();
 					CLK(NOP);
@@ -1782,7 +1782,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 							break;
 						default:
 							logerror("%s: %06x: FF Pre with unimplemented mod\n", tag(), pc());
-							throw TRAP(FAULT_UD,-1);
+							throw TRAP(FAULT_UD,(UINT16)-1);
 						}
 					}
 					break;
@@ -1819,7 +1819,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 						m_icount -= 10; // UD fault timing?
 						logerror("%s: %06x: Invalid Opcode %02x\n", tag(), pc(), op);
 						m_ip = m_prev_ip;
-						throw TRAP(FAULT_UD, -1);
+						throw TRAP(FAULT_UD, (UINT16)-1);
 					}
 					break;
 			}
