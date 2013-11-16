@@ -19,12 +19,12 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 
-	DECLARE_WRITE8_MEMBER(pload_w);
-	DECLARE_WRITE8_MEMBER(cload_w);
-	DECLARE_READ8_MEMBER(empty_r);
-	DECLARE_READ8_MEMBER(dready_r);
-
-	void sync();
+	DECLARE_WRITE_LINE_MEMBER(pload_w);
+	DECLARE_WRITE_LINE_MEMBER(cload_w);
+	DECLARE_READ_LINE_MEMBER(empty_r);
+	DECLARE_READ_LINE_MEMBER(dready_r);
+	DECLARE_READ_LINE_MEMBER(pc0_r);
+	DECLARE_WRITE_LINE_MEMBER(sync_w);
 
 protected:
 	virtual void device_start();
@@ -89,6 +89,8 @@ private:
 
 	enum { IBS = 8192, HBS = 4096 };
 
+	enum { INC_CA = 1, INC_ID = 2 };
+
 	struct icd {
 		unsigned short op;
 		short next;
@@ -110,6 +112,7 @@ private:
 
 	struct cstate {
 		int branch;
+		int inc;
 		short hnode;
 		short ipc;
 	};
@@ -125,7 +128,7 @@ private:
 	UINT32 st0, st1, sti;
 	UINT32 aacc, xoa, xba, xwr, xrd, creg;
 
-	UINT8 pc, ca, id, ba0, ba1, rptc, rptc_next, sa;
+	UINT8 pc, hpc, ca, id, ba0, ba1, rptc, rptc_next, sa;
 
 	UINT32 xm_adr;
 
@@ -145,7 +148,7 @@ private:
 	void decode_cat3(UINT32 opcode, unsigned short *op, cstate *cs);
 	void decode_cat2_post(UINT32 opcode, unsigned short *op, cstate *cs);
 
-	inline int xmode(UINT32 opcode, char type);
+	inline int xmode(UINT32 opcode, char type, cstate *cs);
 	inline int sfao(UINT32 st1);
 	inline int dbp(UINT32 st1);
 	inline int crm(UINT32 st1);
@@ -185,7 +188,29 @@ private:
 };
 
 enum {
-	TMS57002_PC=1
+	TMS57002_PC=1,
+	TMS57002_AACC,
+	TMS57002_BA0,
+	TMS57002_BA1,
+	TMS57002_CREG,
+	TMS57002_CA,
+	TMS57002_DREG,
+	TMS57002_ID,
+	TMS57002_MACC,
+	TMS57002_HIDX,
+	TMS57002_HOST0,
+	TMS57002_HOST1,
+	TMS57002_HOST2,
+	TMS57002_HOST3,
+	TMS57002_RPTC,
+	TMS57002_SA,
+	TMS57002_ST0,
+	TMS57002_ST1,
+	TMS57002_TREG,
+	TMS57002_XBA,
+	TMS57002_XOA,
+	TMS57002_XRD,
+	TMS57002_XWR,
 };
 
 extern const device_type TMS57002;

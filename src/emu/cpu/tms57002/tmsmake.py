@@ -20,17 +20,17 @@ TYPES = {
 }
 
 def expand_c(v):
-    fmt =  ["%s", "(%s & 0xffff0000)", "(%s << 16)", "%s"][v["crm"]]
-    param = ["cmem[i->param]", "cmem[ca]", "cmem[ca++]"][v["cmode"]]
+    fmt =  ["%s", "(%s & 0xffff0000)", "(%s << 16)"][v["crm"]]
+    param = ["cmem[i->param]", "cmem[ca]"][v["cmode"]]
     return fmt %  param
 
 def expand_d(v):
-    index = ["(i->param + ", "(id + ", "((id++) + "][v["dmode"]]
+    index = ["(i->param + ", "(id + "][v["dmode"]]
     mask =  ["ba0) & 0xff] << 8)", "ba1) & 0x1f] << 8)"][v["dbp"]]
     return "(dmem%d[" % v["dbp"] + index + mask
 
 def expand_d24(v):
-    index = ["(i->param + ", "(id + ", "((id++) + "][v["dmode"]]
+    index = ["(i->param + ", "(id + "][v["dmode"]]
     mask =  ["ba0) & 0xff]", "ba1) & 0x1f]"][v["dbp"]]
     return "dmem%d[" % v["dbp"] + index + mask
 
@@ -40,11 +40,11 @@ def expand_mv(v):
     c = ["", "s"][v["movm"]]
     return "check_macc_overflow_%d%s()" % (v["sfmo"], c)
 
-EXPAND_WC = ["cmem[i->param] =", "cmem[ca] =", "cmem[ca++] ="]
+EXPAND_WC = ["cmem[i->param] =", "cmem[ca] ="]
 
 
 ROUNDING = [ 0, 1 << (48-32-1), 1 << (48-24-1), 1 << (48-30-1),
-             1 << (48-16-1), 0, 0, 0]
+             1 << (48-16-1)]
 
 A = (1 << 64) - 1
 RMASK= [A,
@@ -52,9 +52,6 @@ RMASK= [A,
         A - (1 << (48-24)) + 1,
         A - (1 << (48-30)) + 1,
         A - (1 << (48-16)) + 1,
-        A,
-        A,
-        A,
         ]
 
 def expand_mo(v):
@@ -64,7 +61,7 @@ def expand_mo(v):
 
 
 def expand_wd1(v):
-    index = ["(i->param + ", "(id + ", "((id++) + "][v["dmode"]]
+    index = ["(i->param + ", "(id + "][v["dmode"]]
     mask =  ["ba0) & 0xff] =", "ba1) & 0x1f] ="][v["dbp"]]
     return "dmem%d[" % v["dbp"] + index + mask
 
@@ -111,14 +108,14 @@ PDESC = {
 }
 
 VARIANTS = {
-    "cmode": (3, "xmode(opcode, 'c')" ),
-    "dmode": (3, "xmode(opcode, 'd')" ),
+    "cmode": (2, "xmode(opcode, 'c', cs)" ),
+    "dmode": (2, "xmode(opcode, 'd', cs)" ),
     "sfai":  (2, "sfai(st1)"),
-    "crm":   (4, "crm(st1)"),
+    "crm":   (3, "crm(st1)"),
     "dbp":   (2, "dbp(st1)"),
     "sfao":  (2, "sfao(st1)"),
     "sfmo":  (4, "sfmo(st1)"),
-    "rnd":   (8, "rnd(st1)"),
+    "rnd":   (5, "rnd(st1)"),
     "movm":  (2, "movm(st1)"),
     "sfma":  (4, "sfma(st1)"),
     # dummy
@@ -364,7 +361,7 @@ def EmitDasm(f, ins_list):
 
 def EmitCdec(f, ins_list):
     ins_list.sort(cmp=ins_cmp_dasm)
-    no = 1
+    no = 4
     last_cat = ""
     for i in ins_list:
         if not i._run: continue
@@ -383,7 +380,7 @@ def EmitCdec(f, ins_list):
         no += i._variants
         print >>f
 
-    no = 1
+    no = 4
     for i in ins_list:
         if not i._run: continue
         cat = i._cat.upper()
@@ -409,7 +406,7 @@ def EmitCdec(f, ins_list):
 def EmitCintrp(f, ins_list):
     ins_list.sort(cmp=ins_cmp_dasm)
     print >>f, "#ifdef CINTRP"
-    no = 1
+    no = 4
     for i in ins_list:
         no = i.EmitCintrp(f, "", no)
     print >>f, "#endif"

@@ -1250,7 +1250,7 @@ WRITE16_MEMBER(konamigx_state::sndcomm68k_w)
 
 INTERRUPT_GEN_MEMBER(konamigx_state::tms_sync)
 {
-	downcast<tms57002_device *>(&device)->sync();
+	m_dasp->sync_w(1);
 }
 
 READ16_MEMBER(konamigx_state::tms57002_data_word_r)
@@ -1266,16 +1266,17 @@ WRITE16_MEMBER(konamigx_state::tms57002_data_word_w)
 
 READ16_MEMBER(konamigx_state::tms57002_status_word_r)
 {
-	return (m_dasp->dready_r(space, 0) ? 4 : 0) |
-		(m_dasp->empty_r(space, 0) ? 1 : 0);
+	return (m_dasp->dready_r() ? 4 : 0) |
+		(m_dasp->pc0_r() ? 2 : 0) |
+		(m_dasp->empty_r() ? 1 : 0);
 }
 
 WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_dasp->pload_w(space, 0, data & 4);
-		m_dasp->cload_w(space, 0, data & 8);
+		m_dasp->pload_w(data & 4);
+		m_dasp->cload_w(data & 8);
 		m_dasp->set_input_line(INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
