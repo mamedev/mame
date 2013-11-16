@@ -218,7 +218,7 @@ int alto2_cpu_device::unload_word(int x)
 				word1 ^= m_dsp.curdata & 0177777;
 			if (word1 != m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x]) {
 				m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x] = word1;
-				m_dsp.scanline_dirty[y] = 0;
+				m_dsp.scanline_dirty[y] = 1;
 			}
 			x++;
 			if (x < ALTO2_DISPLAY_VISIBLE_WORDS) {
@@ -229,7 +229,7 @@ int alto2_cpu_device::unload_word(int x)
 					word2 ^= m_dsp.curdata & 0177777;
 				if (word2 != m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x]) {
 					m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x] = word2;
-					m_dsp.scanline_dirty[y] = 0;
+					m_dsp.scanline_dirty[y] = 1;
 				}
 				x++;
 			}
@@ -241,7 +241,7 @@ int alto2_cpu_device::unload_word(int x)
 				word ^= m_dsp.curdata & 0177777;
 			if (word != m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x]) {
 				m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x] = word;
-				m_dsp.scanline_dirty[y] = 0;
+				m_dsp.scanline_dirty[y] = 1;
 			}
 			x++;
 		}
@@ -451,8 +451,8 @@ int alto2_cpu_device::init_disp()
 	return 0;
 }
 
-#define	BLACK	0
-#define	WHITE	1
+#define	BLACK	1
+#define	WHITE	0
 
 //! update the internal bitmap to the MAME bitmap.pix16
 void alto2_cpu_device::screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect)

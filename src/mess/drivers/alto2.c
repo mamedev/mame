@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz, 768,   0, 606, 875, 150, 958)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz, 768,   0, 606, 875,   0, 808)
 	MCFG_SCREEN_UPDATE_DRIVER(alto2_state, screen_update)
 	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
 

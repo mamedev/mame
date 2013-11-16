@@ -1491,6 +1491,7 @@ const char* alto2_cpu_device::f2_name(UINT8 f2)
 	return "???";
 }
 
+#if	ALTO2_DEBUG
 void alto2_cpu_device::watch_read(UINT32 addr, UINT32 data)
 {
 	LOG((LOG_MEM,0,"mem: rd[%06o] = %06o\n", addr, data));
@@ -1500,6 +1501,7 @@ void alto2_cpu_device::watch_write(UINT32 addr, UINT32 data)
 {
 	LOG((LOG_MEM,0,"mem: wr[%06o] = %06o\n", addr, data));
 }
+#endif
 
 /** @brief fatal exit on unitialized dynamic phase BUS source */
 void alto2_cpu_device::fn_bs_bad_0()
