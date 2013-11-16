@@ -547,7 +547,7 @@ unicode_char* uchar_strfrom_utf8(const char *utf8src)
 	unicode_char* result = (unicode_char *)calloc(sizeof(unicode_char), size + 1);
 	unicode_char* dst = result;
 	while (*utf8src) {
-		unicode_char uchar;
+		unicode_char uchar = 0;
 		int len = uchar_from_utf8(&uchar, utf8src, available);
 		utf8src += len;
 		available -= len;
@@ -570,7 +570,7 @@ unicode_char* uchar_strfrom_utf16(const utf16_char *utf16src)
 	unicode_char* result = (unicode_char *)calloc(sizeof(unicode_char), size + 1);
 	unicode_char* dst = result;
 	while (*utf16src) {
-		unicode_char uchar;
+		unicode_char uchar = 0;
 		int len = uchar_from_utf16(&uchar, utf16src, available);
 		utf16src += len;
 		available -= len;
