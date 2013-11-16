@@ -269,8 +269,10 @@ SDL_NETWORK = pcap
 MAINLDFLAGS = -Xlinker -all_load
 NO_X11 = 1
 NO_USE_XINPUT = 1
+
 ifdef BIGENDIAN
 DEFS += -DOSX_PPC=1
+CCOMFLAGS += -Wno-unused-label
 ifdef SYMBOLS
 CCOMFLAGS += -mlong-branch
 endif   # SYMBOLS
