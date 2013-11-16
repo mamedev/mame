@@ -232,6 +232,9 @@ protected:
 	//! device-level override for reset
 	virtual void device_reset();
 
+	//! device-level override for post reset
+	void interface_post_reset();
+
 	//! device_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 1; }

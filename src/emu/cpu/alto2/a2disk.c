@@ -66,17 +66,6 @@
 #define	GET_KCOM_SENDADR(kcom)			A2_GET16(kcom,16,5,5)				//!< get send address flag from controller command (hardware command register)
 #define	PUT_KCOM_SENDADR(kcom,val)		A2_PUT16(kcom,16,5,5,val)			//!< put send address flag into controller command (hardware command register)
 
-/**
- * @brief callback is called by the drive timer whenever a new sector starts
- *
- * @param unit the unit number
- */
-static void disk_sector_start(void* cookie, int unit)
-{
-	alto2_cpu_device* cpu = reinterpret_cast<alto2_cpu_device *>(cookie);
-	cpu->next_sector(unit);
-}
-
 /** @brief completion codes (only for documentation, since this is microcode defined) */
 enum {
 	STATUS_COMPLETION_GOOD,
@@ -1519,11 +1508,6 @@ void alto2_cpu_device::disk_ok_to_run(void* ptr, INT32 arg)
 	LOG((LOG_DISK,2,"	OK TO RUN -> %d\n", arg));
 	m_dsk.ok_to_run = arg;
 	m_dsk.ok_to_run_timer->reset();
-
-	for (int unit = 0; unit < diablo_hd_device::DIABLO_UNIT_MAX; unit++) {
-		diablo_hd_device* dhd = m_drive[unit];
-		dhd->set_sector_callback(this, &disk_sector_start);
-	}
 }
 
 /**

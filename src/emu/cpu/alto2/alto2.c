@@ -1245,6 +1245,27 @@ void alto2_cpu_device::device_reset()
 	soft_reset();
 }
 
+/**
+ * @brief callback is called by the drive timer whenever a new sector starts
+ *
+ * @param unit the unit number
+ */
+static void disk_sector_start(void* cookie, int unit)
+{
+	alto2_cpu_device* cpu = reinterpret_cast<alto2_cpu_device *>(cookie);
+	cpu->next_sector(unit);
+}
+
+void alto2_cpu_device::interface_post_reset()
+{
+
+	// set the disk unit sector callbacks
+	for (int unit = 0; unit < diablo_hd_device::DIABLO_UNIT_MAX; unit++) {
+		diablo_hd_device* dhd = m_drive[unit];
+		dhd->set_sector_callback(this, &disk_sector_start);
+	}
+}
+
 //-------------------------------------------------
 //  execute_set_input - act on a changed input/
 //  interrupt line
@@ -3081,9 +3102,8 @@ void alto2_cpu_device::hard_reset()
 /** @brief software initiated reset (STARTF) */
 int alto2_cpu_device::soft_reset()
 {
-	int task;
 
-	for (task = 0; task < ALTO2_TASKS; task++) {
+	for (int task = 0; task < ALTO2_TASKS; task++) {
 		// every task starts at mpc = task number, in either ROM0 or RAM0
 		m_task_mpc[task] = (m_ctl2k_u38[task] >> 4) ^ 017;
 		if (0 == (m_reset_mode & (1 << task)))
