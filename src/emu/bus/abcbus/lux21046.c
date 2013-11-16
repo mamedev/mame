@@ -381,11 +381,11 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x02, "Double" )
 	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x04, "Double" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Density" ) PORT_DIPLOCATION("SW1:4") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x08, "Double" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	// ABC 832/834/850
 	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
@@ -446,18 +446,18 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( abc830 )
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x01, "Double" )
-	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x02, "Double" )
 	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x04, "Double" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x08, 0x00, "Drive 1 Density" ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x08, "Double" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x0f, 0x08, "Drive Type" ) PORT_DIPLOCATION("SW2:1,2,3,4")
@@ -1090,7 +1090,6 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	// density select
 	m_fdc->dden_w(BIT(data, 1));
 
-	/*
 	if (BIT(data, 2))
 	{
 	    m_fdc->set_unscaled_clock(XTAL_16MHz/16);
@@ -1099,7 +1098,6 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	{
 	    m_fdc->set_unscaled_clock(XTAL_16MHz/8);
 	}
-	*/
 }
 
 
