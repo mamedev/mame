@@ -210,6 +210,29 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 }
 
 
+DRIVER_INIT_MEMBER(suna8_state,brickzn11)
+{
+	UINT8   *RAM    =   memregion("maincpu")->base();
+	UINT8   *decrypt =  memregion("maincpu")->base();
+	int i;
+
+	for (i = 0; i < 0x8000; i++)
+	{
+		{
+			decrypt[i] = RAM[i];
+		}
+	}
+
+
+
+	// Data banks: 00-0f normal data decryption, 10-1f alternate data decryption:
+	membank("bank1")->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
+	// Opcode banks: 00-1f normal opcode decryption:
+	membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
+	membank("bank1")->configure_decrypted_entries(16, 16, decrypt + 0x10000, 0x4000);
+}
+
+
 /***************************************************************************
                                 Hard Head 2
 ***************************************************************************/
@@ -2534,7 +2557,26 @@ ROM_START( brickznv4 )
 	ROM_LOAD( "brickzon.006", 0xa0000, 0x20000, CRC(bbf31081) SHA1(1fdbd0e0853082345225e18df340184a7a604b78) )
 ROM_END
 
+ROM_START( brickzn11 )
+	ROM_REGION( 0x50000 + 0x40000, "maincpu", 0 )       /* Main Z80 Code */
+	ROM_LOAD( "9.bin", 0x00000, 0x08000, CRC(24f88cfd) SHA1(dfa7313ab6696042bab2e6cc8ff97b331d526c6b) )
+	ROM_LOAD( "8.bin", 0x10000, 0x20000, CRC(e2c7f7ac) SHA1(43377daf6957829ef9bb7a81708c2f18f5d7ced6) )
+	ROM_LOAD( "7.bin", 0x30000, 0x20000, CRC(7af5b25c) SHA1(9e98e99bdc5be1602144c83f40b2ccf6b90a729a) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Music Z80 Code */
+	ROM_LOAD( "10.bin", 0x00000, 0x10000, CRC(494adf0f) SHA1(eb28ccf0c5f38c2299f55e379ff73ba84bb793c6) )
+
+	ROM_REGION( 0x10000, "pcm", 0 )     /* PCM Z80 Code */
+	ROM_LOAD( "11.bin", 0x00000, 0x10000, CRC(6c54161a) SHA1(ea216d9f45b441acd56b9fed81a83e3bfe299fbd) )
+
+	ROM_REGION( 0xc0000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_LOAD( "5.bin", 0x00000, 0x20000, CRC(e9f73ba1) SHA1(4b5e294ae160ba3ca28b8956a797330234ace576) )
+	ROM_LOAD( "4.bin", 0x20000, 0x20000, CRC(2be5f335) SHA1(dc870a3c5303cb2ea1fea4a25f53db016ed5ecee) )
+	ROM_LOAD( "3.bin", 0x40000, 0x20000, CRC(2e4f194b) SHA1(86da1a582ea274f2af96d3e3e2ac72bcaf3638cb) )
+	ROM_LOAD( "2.bin", 0x60000, 0x20000, CRC(0e994fbf) SHA1(62e059a5ca5f7199e597841f94519a466affe098) )
+	ROM_LOAD( "1.bin", 0x80000, 0x20000, CRC(6970ada9) SHA1(5cfe5dcf25af7aff67ee5d78eb963d598251025f) )
+	ROM_LOAD( "6.bin", 0xa0000, 0x20000, CRC(bbf31081) SHA1(1fdbd0e0853082345225e18df340184a7a604b78) )
+ROM_END
 
 /***************************************************************************
 
@@ -2796,3 +2838,4 @@ GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, hardhea2,  ROT
 
 GAME( 1992, brickzn,   0,        brickzn,  brickzn,  suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", 0 )
 GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, brickznv4, ROT90, "SunA",                       "Brick Zone (v4.0, Spinner)",  0 )
+GAME( 1992, brickzn11, brickzn,  brickzn,  brickzn,  suna8_state, brickzn11, ROT90, "SunA",                       "Brick Zone (v1.1)",  GAME_NOT_WORKING )
