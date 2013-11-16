@@ -79,6 +79,7 @@ public:
 	DECLARE_DRIVER_INIT(airh);
 	DECLARE_DRIVER_INIT(ldrb);
 	DECLARE_DRIVER_INIT(socc);
+	DECLARE_DRIVER_INIT(blast);
 	void arcadia_init();
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 };
@@ -804,6 +805,20 @@ ROM_START( ar_xeon )
 ROM_END
 
 
+ROM_START( ar_blast )
+	ARCADIA_BIOS
+
+	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "blsb-v2-1_1-hi.bin", 0x00000, 0x10000, CRC(6d2e38e5) SHA1(ef9b9ae7644b10892b09f15a3e916c3f51cbbe06) )
+	ROM_LOAD16_BYTE( "blsb-v2-1_1-lo.bin", 0x00001, 0x10000, CRC(28b6db63) SHA1(09c4998f021ae7e25ec4a4009e6c8177fb6649c8) )
+	ROM_LOAD16_BYTE( "blsb-v2-1_2-hi.bin", 0x20000, 0x10000, CRC(8b3c629c) SHA1(34872cd6cf5627517f43c7174f2b263bb1cf33ef) )
+	ROM_LOAD16_BYTE( "blsb-v2-1_2-lo.bin", 0x20001, 0x10000, CRC(966c733c) SHA1(32d711fdea43d9c61532b71627afa5e518d3fb11) )
+	ROM_LOAD16_BYTE( "blsb-v2-1_3-hi.bin", 0x40000, 0x10000, CRC(6013b0d2) SHA1(88b2adb76a60d8160673a3abfe97a4f3f97c1825) )
+	ROM_LOAD16_BYTE( "blsb-v2-1_3-lo.bin", 0x40001, 0x10000, CRC(8c5d602d) SHA1(17f7fb2727210286f85d0b356411ee5302f59bef) )
+	ROM_LOAD16_BYTE( "blsb-v2-1_4-hi.bin", 0x60000, 0x10000, CRC(cc091362) SHA1(2a3e945a17bd8b7b70b3a7efb00d62a37f0ececa) )
+	ROM_LOAD16_BYTE( "blsb-v2-1_4-lo.bin", 0x60001, 0x10000, CRC(16b7618a) SHA1(9857255eb47aff683893d6fe1bdf64a2ea2492a7) )
+ROM_END
+
 
 /*************************************
  *
@@ -883,6 +898,7 @@ void arcadia_amiga_state::arcadia_init()
 DRIVER_INIT_MEMBER(arcadia_amiga_state,none) { arcadia_init(); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,airh) { arcadia_init(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,bowl) { arcadia_init(); generic_decode("user3", 7, 6, 0, 1, 2, 3, 4, 5); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,blast){ arcadia_init(); generic_decode("user3", 4, 6, 5, 7, 3, 2, 1, 0); generic_decode("user3", 7,6,0,4, 3,2,1,5 );  generic_decode("user3", 7,6,5,4, 1,2,3,0 );  generic_decode("user3", 7,6,2,4,3,5,1,0);  generic_decode("user3", 7,6,3,4,5,2,1,0 );  generic_decode("user3", 7,6,4,5,3,2,1,0 );generic_decode("user3", 7,4,5,6,3,2,1,0 );  } // todo reduce to single bitswap
 DRIVER_INIT_MEMBER(arcadia_amiga_state,dart) { arcadia_init(); generic_decode("user3", 4, 0, 7, 6, 3, 1, 2, 5); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,ldrb) { arcadia_init(); generic_decode("user3", 2, 3, 4, 1, 0, 7, 5, 6); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,ninj) { arcadia_init(); generic_decode("user3", 1, 6, 5, 7, 4, 2, 0, 3); }
@@ -891,6 +907,9 @@ DRIVER_INIT_MEMBER(arcadia_amiga_state,sdwr) { arcadia_init(); generic_decode("u
 DRIVER_INIT_MEMBER(arcadia_amiga_state,socc) { arcadia_init(); generic_decode("user3", 0, 7, 1, 6, 5, 4, 3, 2); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg) { arcadia_init(); generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon) { arcadia_init(); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
+
+
+
 
 /*************************************
  *
@@ -901,6 +920,7 @@ DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon) { arcadia_init(); generic_decode("u
 /* BIOS */
 GAME( 1988, ar_bios,    0, arcadia, arcadia, arcadia_amiga_state, none,  ROT0, "Arcadia Systems", "Arcadia System BIOS", GAME_IS_BIOS_ROOT )
 
+GAME( 1988, ar_blast,    ar_bios, arcadia, arcadia, arcadia_amiga_state, blast,  ROT0, "Arcadia Systems", "Blastaball (Arcadia, V 2.1)", 0 )
 
 GAME( 1988, ar_airh,    ar_bios, arcadia, arcadia, arcadia_amiga_state, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 1, V 2.1)", 0 )
 GAME( 1988, ar_airh2,   ar_airh, arcadia, arcadia, arcadia_amiga_state, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 2)", 0 )
