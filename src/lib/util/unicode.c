@@ -318,6 +318,109 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
 	return rc < count ? rc : count;
 }
 
+/**
+ * @brief return the number of decoded Unicode values in UTF-8 encoded string
+ * @param src pointer to the array of UTF-8 encoded characters
+ * @param plen optional pointer to a size_t variable to receive the source string length
+ * @return number of unicode_char values decoded from the UTF-8 string
+ */
+size_t utf8_ucharlen(const char* utf8src, size_t * plen)
+{
+	size_t len = 0;
+	size_t total = 0;
+	while (*utf8src) {
+		unsigned char c = (unsigned char) *utf8src;
+		size_t auxlen;
+
+		/* determine how many additional bytes we need */
+		if (c < 0x80)
+		{
+			/* unicode char 0x00000000 - 0x0000007F */
+			auxlen = 0;
+		}
+		else if (c >= 0xc0 && c < 0xe0)
+		{
+			/* unicode char 0x00000080 - 0x000007FF */
+			if (0 == utf8src[1])
+				return -1;
+			auxlen = 1;
+		}
+		else if (c >= 0xe0 && c < 0xf0)
+		{
+			/* unicode char 0x00000800 - 0x0000FFFF */
+			if (0 == utf8src[1] || 0 == utf8src[2])
+				return -1;
+			auxlen = 2;
+		}
+		else if (c >= 0xf0 && c < 0xf8)
+		{
+			/* unicode char 0x00010000 - 0x001FFFFF */
+			if (0 == utf8src[1] || 0 == utf8src[2] || 0 == utf8src[3])
+				return -1;
+			auxlen = 3;
+		}
+		else if (c >= 0xf8 && c < 0xfc)
+		{
+			/* unicode char 0x00200000 - 0x03FFFFFF */
+			if (0 == utf8src[1] || 0 == utf8src[2] || 0 == utf8src[3] || 0 == utf8src[4])
+				return -1;
+			auxlen = 4;
+		}
+		else if (c >= 0xfc && c < 0xfe)
+		{
+			/* unicode char 0x04000000 - 0x7FFFFFFF */
+			if (0 == utf8src[1] || 0 == utf8src[2] || 0 == utf8src[3] || 0 == utf8src[4] || 0 == utf8src[5])
+				return -1;
+			auxlen = 5;
+		}
+		else
+		{
+			/* invalid */
+			return -1;
+		}
+		total++;
+		len += auxlen + 1;
+		utf8src += auxlen + 1;
+	}
+	if (plen)
+		*plen = len;
+	return total;
+}
+
+/**
+ * @brief return the number of decoded Unicode values in UTF-16 encoded string
+ * @param src pointer to the array of UTF-16 encoded characters
+ * @param plen optional pointer to a size_t variable to receive the source string length
+ * @return number of unicode_char values decoded from the UTF-8 string
+ */
+size_t utf16_ucharlen(const utf16_char* utf16src, size_t * plen)
+{
+	size_t len = 0;
+	size_t total = 0;
+	while (*utf16src) {
+		utf16_char c = (utf16_char) *utf16src;
+		size_t auxlen;
+
+		if (c >= 0xd800 && c <= 0xdbff)
+		{
+			if (0 == utf16src[1])
+				return -1;
+			auxlen = 1;
+		}
+		else if (utf16src[0] < 0xdc00 || utf16src[0] > 0xdfff)
+		{
+			auxlen = 0;
+		}
+		else
+			return -1;
+		total++;
+		len += auxlen + 1;
+		utf16src += auxlen + 1;
+	}
+	if (plen)
+		*plen = len;
+	return total;
+}
 
 /**
  * @brief return a pointer to the previous character in a string
@@ -356,25 +459,6 @@ int utf8_is_valid_string(const char *utf8string)
 	}
 
 	return TRUE;
-}
-
-/**
- * @brief return the number of decoded Unicode values in UTF-8 encoded string
- * @param src pointer to the array of UTF-8 encoded characters
- * @return number of unicode_char values decoded from the UTF-8 string
- */
-size_t utf8_strlen(const char* src)
-{
-	int total = 0;
-	while (*src) {
-		unicode_char uchar;
-		int len = uchar_from_utf8(&uchar, src, strlen(src));
-		if (len < 0)
-			break;	// invalid UTF-8
-		total++;
-		src += len;
-	}
-	return total;
 }
 
 /**
@@ -447,6 +531,52 @@ void uchar_table_free(unicode_char* table)
 {
 	if (table)
 		free(table);
+}
+
+/**
+ * @brief return an unicode_char array allocated while converted from UTF-8
+ * @param utf8char source string encoded in UTF-8
+ * @return newly allocated unicode_char string
+ */
+unicode_char* uchar_strfrom_utf8(const char *utf8src)
+{
+	size_t available;
+	size_t size = utf8_ucharlen(utf8src, &available);
+	if (-1 == size)
+		return NULL;
+	unicode_char* result = (unicode_char *)calloc(sizeof(unicode_char), size + 1);
+	unicode_char* dst = result;
+	while (*utf8src) {
+		unicode_char uchar;
+		int len = uchar_from_utf8(&uchar, utf8src, available);
+		utf8src += len;
+		available -= len;
+		*dst++ = uchar;
+	}
+	return result;
+}
+
+/**
+ * @brief return an unicode_char array allocated while converted from UTF-16
+ * @param utf16src source string encoded in UTF-16
+ * @return newly allocated unicode_char string
+ */
+unicode_char* uchar_strfrom_utf16(const utf16_char *utf16src)
+{
+	size_t available;
+	size_t size = utf16_ucharlen(utf16src, &available);
+	if (-1 == size)
+		return NULL;
+	unicode_char* result = (unicode_char *)calloc(sizeof(unicode_char), size + 1);
+	unicode_char* dst = result;
+	while (*utf16src) {
+		unicode_char uchar;
+		int len = uchar_from_utf16(&uchar, utf16src, available);
+		utf16src += len;
+		available -= len;
+		*dst++ = uchar;
+	}
+	return result;
 }
 
 /**
@@ -617,141 +747,6 @@ typedef struct {
 
 static unicode_data_t** unicode_data = NULL;
 
-#if	NEED_UNICODE_RANGES
-typedef struct {
-	unicode_char first, last;
-	const char *name;
-}	unicode_range_t;
-
-static const unicode_range_t unicode_ranges[] =
-{
-	{0x0000, 0x007f, "Basic Latin"},
-	{0x0080, 0x00ff, "Latin-1 Supplement"},
-	{0x0100, 0x017f, "Latin Extended-A"},
-	{0x0180, 0x024f, "Latin Extended-B"},
-	{0x0250, 0x02af, "IPA Extensions"},
-	{0x02b0, 0x02ff, "Spacing Modifier Letters"},
-	{0x0300, 0x036f, "Combining Diacritical Marks"},
-	{0x0370, 0x03ff, "Greek"},
-	{0x0400, 0x04ff, "Cyrillic"},
-	{0x0530, 0x058f, "Armenian"},
-	{0x0590, 0x05ff, "Hebrew"},
-	{0x0600, 0x06ff, "Arabic"},
-	{0x0700, 0x074f, "Syriac"},
-	{0x0780, 0x07bf, "Thaana"},
-	{0x0900, 0x097f, "Devanagari"},
-	{0x0980, 0x09ff, "Bengali"},
-	{0x0a00, 0x0a7f, "Gurmukhi"},
-	{0x0a80, 0x0aff, "Gujarati"},
-	{0x0b00, 0x0b7f, "Oriya"},
-	{0x0b80, 0x0bff, "Tamil"},
-	{0x0c00, 0x0c7f, "Telugu"},
-	{0x0c80, 0x0cff, "Kannada"},
-	{0x0d00, 0x0d7f, "Malayalam"},
-	{0x0d80, 0x0dff, "Sinhala"},
-	{0x0e00, 0x0e7f, "Thai"},
-	{0x0e80, 0x0eff, "Lao"},
-	{0x0f00, 0x0fff, "Tibetan"},
-	{0x1000, 0x109f, "Myanmar"},
-	{0x10a0, 0x10ff, "Georgian"},
-	{0x1100, 0x11ff, "Hangul Jamo"},
-	{0x1200, 0x137f, "Ethiopic"},
-	{0x13a0, 0x13ff, "Cherokee"},
-	{0x1400, 0x167f, "Unified Canadian Aboriginal Syllabic"},
-	{0x1680, 0x169f, "Ogham"},
-	{0x16a0, 0x16ff, "Runic"},
-	{0x1780, 0x17ff, "Khmer"},
-	{0x1800, 0x18af, "Mongolian"},
-	{0x1e00, 0x1eff, "Latin Extended Additional"},
-	{0x1f00, 0x1fff, "Greek Extended"},
-	{0x2000, 0x206f, "General Punctuation"},
-	{0x2070, 0x208f, "Superscripts and Subscripts"},
-	{0x20a0, 0x20cf, "Currency Symbols"},
-	{0x20d0, 0x20ff, "Combining Marks for Symbols"},
-	{0x2100, 0x214f, "Letterlike Symbols"},
-	{0x2150, 0x218f, "Number Forms"},
-	{0x2190, 0x21ff, "Arrows"},
-	{0x2200, 0x22ff, "Mathematical Operators"},
-	{0x2300, 0x23ff, "Miscellaneous Technical"},
-	{0x2400, 0x243f, "Control Pictures"},
-	{0x2440, 0x245f, "Optical Character Recognition"},
-	{0x2460, 0x24ff, "Enclosed Alphanumerics"},
-	{0x2500, 0x257f, "Box Drawing"},
-	{0x2580, 0x259f, "Block Elements"},
-	{0x25a0, 0x25ff, "Geometric Shapes"},
-	{0x2600, 0x26ff, "Miscellaneous Symbols"},
-	{0x2700, 0x27bf, "Dingbats"},
-	{0x2800, 0x28ff, "Braille Patterns"},
-	{0x2e80, 0x2eff, "CJK Radicals Supplement"},
-	{0x2f00, 0x2fdf, "Kangxi Radicals"},
-	{0x2ff0, 0x2fff, "Ideographic Description Characters"},
-	{0x3000, 0x303f, "CJK Symbols and Punctuation"},
-	{0x3040, 0x309f, "Hiragana"},
-	{0x30a0, 0x30ff, "Katakana"},
-	{0x3100, 0x312f, "Bopomofo"},
-	{0x3130, 0x318f, "Hangul Compatibility Jamo"},
-	{0x3190, 0x319f, "Kanbun"},
-	{0x31a0, 0x31bf, "Bopomofo Extended"},
-	{0x3200, 0x32ff, "Enclosed CJK Letters and Months"},
-	{0x3300, 0x33ff, "CJK Compatibility"},
-	{0x3400, 0x4dbf, "CJK Unified Ideographs Extension A"},
-	{0x4e00, 0x9faf, "CJK Unified Ideographs"},
-	{0xa000, 0xa48f, "Yi Syllables"},
-	{0xa490, 0xa4cf, "Yi Radicals"},
-	{0xac00, 0xd7af, "Hangul Syllables"},
-	{0xd800, 0xdb7f, "High Surrogates"},
-	{0xdb80, 0xdbff, "High Private Use Surrogates"},
-	{0xdc00, 0xdfff, "Low Surrogates"},
-	{0xe000, 0xf8ff, "Private Use"},
-	{0xf900, 0xfaff, "CJK Compatibility Ideographs"},
-	{0xfb00, 0xfb4f, "Alphabetic Presentation Forms"},
-	{0xfb50, 0xfdff, "Arabic Presentation Forms-A"},
-	{0xfe20, 0xfe2f, "Combining Half Marks"},
-	{0xfe30, 0xfe4f, "CJK Compatibility Forms"},
-	{0xfe50, 0xfe6f, "Small Form Variants"},
-	{0xfe70, 0xfeff, "Arabic Presentation Forms-B"},
-	{0xff00, 0xffef, "Halfwidth and Fullwidth Forms"},
-	{0xfff0, 0xffff, "Specials"}
-	// FIXME: add ranges for the Unicode planes 1 to 16
-};
-#endif
-
-#if	NEED_UNICODE_CCOM
-static const char *canonical_combining_str(UINT8 val)
-{
-	switch (val)
-	{
-	case 0:		return "Spacing, split, enclosing, reordrant, and Tibetan subjoined";
-	case 1:		return "Overlays and interior";
-	case 7:		return "Nuktas";
-	case 8:		return "Hiragana/Katakana voicing marks";
-	case 9:		return "Viramas";
-	case 10:	return "Start of fixed position classes";
-	case 199:	return "End of fixed position classes";
-	case 200:	return "Below left attached";
-	case 202:	return "Below attached";
-	case 204:	return "Below right attached";
-	case 208:	return "Left attached (reordrant around single base character)";
-	case 210:	return "Right attached";
-	case 212:	return "Above left attached";
-	case 214:	return "Above attached";
-	case 216:	return "Above right attached";
-	case 218:	return "Below left";
-	case 220:	return "Below";
-	case 222:	return "Below right";
-	case 224:	return "Left (reordrant around single base character)";
-	case 226:	return "Right";
-	case 228:	return "Above left";
-	case 230:	return "Above";
-	case 232:	return "Above right";
-	case 233:	return "Double below";
-	case 234:	return "Double above";
-	case 240:	return "Below (iota subscript)";
-	}
-	return "INVALID";
-}
-#endif
-
 #if	NEED_UNICODE_NAME
 const char * unicode_name(unicode_char uchar)
 {
@@ -832,7 +827,36 @@ const char * unicode_ccom_name(unicode_char uchar)
 {
 	if (!unicode_data || uchar >= UNICODE_PLANESIZE || !unicode_data[uchar])
 		return "";
-	return canonical_combining_str(unicode_data[uchar]->canonical_comb);
+	switch (unicode_data[uchar]->canonical_comb)
+	{
+	case 0:		return "Spacing, split, enclosing, reordrant, and Tibetan subjoined";
+	case 1:		return "Overlays and interior";
+	case 7:		return "Nuktas";
+	case 8:		return "Hiragana/Katakana voicing marks";
+	case 9:		return "Viramas";
+	case 10:	return "Start of fixed position classes";
+	case 199:	return "End of fixed position classes";
+	case 200:	return "Below left attached";
+	case 202:	return "Below attached";
+	case 204:	return "Below right attached";
+	case 208:	return "Left attached (reordrant around single base character)";
+	case 210:	return "Right attached";
+	case 212:	return "Above left attached";
+	case 214:	return "Above attached";
+	case 216:	return "Above right attached";
+	case 218:	return "Below left";
+	case 220:	return "Below";
+	case 222:	return "Below right";
+	case 224:	return "Left (reordrant around single base character)";
+	case 226:	return "Right";
+	case 228:	return "Above left";
+	case 230:	return "Above";
+	case 232:	return "Above right";
+	case 233:	return "Double below";
+	case 234:	return "Double above";
+	case 240:	return "Below (iota subscript)";
+	}
+	return "INVALID";
 }
 #endif
 
@@ -1075,78 +1099,160 @@ int unicode_width(unicode_char uchar)
 #endif
 
 #if	NEED_UNICODE_RANGES
+typedef struct {
+	unicode_char first, last;
+	const char *name;
+}	unicode_range_t;
+
+static const unicode_range_t unicode_ranges[] =
+{
+	{0x0000, 0x007f, "Basic Latin"},
+	{0x0080, 0x00ff, "Latin-1 Supplement"},
+	{0x0100, 0x017f, "Latin Extended-A"},
+	{0x0180, 0x024f, "Latin Extended-B"},
+	{0x0250, 0x02af, "IPA Extensions"},
+	{0x02b0, 0x02ff, "Spacing Modifier Letters"},
+	{0x0300, 0x036f, "Combining Diacritical Marks"},
+	{0x0370, 0x03ff, "Greek"},
+	{0x0400, 0x04ff, "Cyrillic"},
+	{0x0530, 0x058f, "Armenian"},
+	{0x0590, 0x05ff, "Hebrew"},
+	{0x0600, 0x06ff, "Arabic"},
+	{0x0700, 0x074f, "Syriac"},
+	{0x0780, 0x07bf, "Thaana"},
+	{0x0900, 0x097f, "Devanagari"},
+	{0x0980, 0x09ff, "Bengali"},
+	{0x0a00, 0x0a7f, "Gurmukhi"},
+	{0x0a80, 0x0aff, "Gujarati"},
+	{0x0b00, 0x0b7f, "Oriya"},
+	{0x0b80, 0x0bff, "Tamil"},
+	{0x0c00, 0x0c7f, "Telugu"},
+	{0x0c80, 0x0cff, "Kannada"},
+	{0x0d00, 0x0d7f, "Malayalam"},
+	{0x0d80, 0x0dff, "Sinhala"},
+	{0x0e00, 0x0e7f, "Thai"},
+	{0x0e80, 0x0eff, "Lao"},
+	{0x0f00, 0x0fff, "Tibetan"},
+	{0x1000, 0x109f, "Myanmar"},
+	{0x10a0, 0x10ff, "Georgian"},
+	{0x1100, 0x11ff, "Hangul Jamo"},
+	{0x1200, 0x137f, "Ethiopic"},
+	{0x13a0, 0x13ff, "Cherokee"},
+	{0x1400, 0x167f, "Unified Canadian Aboriginal Syllabic"},
+	{0x1680, 0x169f, "Ogham"},
+	{0x16a0, 0x16ff, "Runic"},
+	{0x1780, 0x17ff, "Khmer"},
+	{0x1800, 0x18af, "Mongolian"},
+	{0x1e00, 0x1eff, "Latin Extended Additional"},
+	{0x1f00, 0x1fff, "Greek Extended"},
+	{0x2000, 0x206f, "General Punctuation"},
+	{0x2070, 0x208f, "Superscripts and Subscripts"},
+	{0x20a0, 0x20cf, "Currency Symbols"},
+	{0x20d0, 0x20ff, "Combining Marks for Symbols"},
+	{0x2100, 0x214f, "Letterlike Symbols"},
+	{0x2150, 0x218f, "Number Forms"},
+	{0x2190, 0x21ff, "Arrows"},
+	{0x2200, 0x22ff, "Mathematical Operators"},
+	{0x2300, 0x23ff, "Miscellaneous Technical"},
+	{0x2400, 0x243f, "Control Pictures"},
+	{0x2440, 0x245f, "Optical Character Recognition"},
+	{0x2460, 0x24ff, "Enclosed Alphanumerics"},
+	{0x2500, 0x257f, "Box Drawing"},
+	{0x2580, 0x259f, "Block Elements"},
+	{0x25a0, 0x25ff, "Geometric Shapes"},
+	{0x2600, 0x26ff, "Miscellaneous Symbols"},
+	{0x2700, 0x27bf, "Dingbats"},
+	{0x2800, 0x28ff, "Braille Patterns"},
+	{0x2e80, 0x2eff, "CJK Radicals Supplement"},
+	{0x2f00, 0x2fdf, "Kangxi Radicals"},
+	{0x2ff0, 0x2fff, "Ideographic Description Characters"},
+	{0x3000, 0x303f, "CJK Symbols and Punctuation"},
+	{0x3040, 0x309f, "Hiragana"},
+	{0x30a0, 0x30ff, "Katakana"},
+	{0x3100, 0x312f, "Bopomofo"},
+	{0x3130, 0x318f, "Hangul Compatibility Jamo"},
+	{0x3190, 0x319f, "Kanbun"},
+	{0x31a0, 0x31bf, "Bopomofo Extended"},
+	{0x3200, 0x32ff, "Enclosed CJK Letters and Months"},
+	{0x3300, 0x33ff, "CJK Compatibility"},
+	{0x3400, 0x4dbf, "CJK Unified Ideographs Extension A"},
+	{0x4e00, 0x9faf, "CJK Unified Ideographs"},
+	{0xa000, 0xa48f, "Yi Syllables"},
+	{0xa490, 0xa4cf, "Yi Radicals"},
+	{0xac00, 0xd7af, "Hangul Syllables"},
+	{0xd800, 0xdb7f, "High Surrogates"},
+	{0xdb80, 0xdbff, "High Private Use Surrogates"},
+	{0xdc00, 0xdfff, "Low Surrogates"},
+	{0xe000, 0xf8ff, "Private Use"},
+	{0xf900, 0xfaff, "CJK Compatibility Ideographs"},
+	{0xfb00, 0xfb4f, "Alphabetic Presentation Forms"},
+	{0xfb50, 0xfdff, "Arabic Presentation Forms-A"},
+	{0xfe20, 0xfe2f, "Combining Half Marks"},
+	{0xfe30, 0xfe4f, "CJK Compatibility Forms"},
+	{0xfe50, 0xfe6f, "Small Form Variants"},
+	{0xfe70, 0xfeff, "Arabic Presentation Forms-B"},
+	{0xff00, 0xffef, "Halfwidth and Fullwidth Forms"},
+	{0xfff0, 0xffff, "Specials"}
+	// FIXME: add ranges for the Unicode planes 1 to 16
+};
+
 const char * unicode_range_name(unicode_char uchar)
 {
-	static UINT32 hit = 0;
-	UINT32 i;
+	int _min = 0;
+	int _max = sizeof(unicode_ranges) / sizeof(unicode_ranges[0]) - 1;
+	int _mid;
 
-	for (i = hit; i < sizeof(unicode_ranges)/sizeof(unicode_ranges[0]); i++)
+	/* binary search in table of unicode ranges */
+	while (_max >= _min)
 	{
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
-		{
-			hit = i;
-			return unicode_ranges[i].name;
-		}
+		_mid = (_min + _max) / 2;
+		if (unicode_ranges[_mid].last < uchar)
+			_min = _mid + 1;
+		else if (unicode_ranges[_mid].first > uchar)
+			_max = _mid - 1;
+		else if (unicode_ranges[_mid].first <= uchar && unicode_ranges[_mid].last >= uchar)
+			return unicode_ranges[_mid].name;
 	}
-	for (i = 0; i < hit; i++)
-	{
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
-		{
-			hit = i;
-			return unicode_ranges[i].name;
-		}
-	}
-
 	return NULL;
 }
 
 unicode_char unicode_range_first(unicode_char uchar)
 {
-	static UINT32 hit = 0;
-	UINT32 i;
+	int _min = 0;
+	int _max = sizeof(unicode_ranges) / sizeof(unicode_ranges[0]) - 1;
+	int _mid;
 
-	for (i = hit; i < sizeof(unicode_ranges)/sizeof(unicode_ranges[0]); i++)
+	/* binary search in table of unicode ranges */
+	while (_max >= _min)
 	{
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
-		{
-			hit = i;
-			return unicode_ranges[i].first;
-		}
+		_mid = (_min + _max) / 2;
+		if (unicode_ranges[_mid].last < uchar)
+			_min = _mid + 1;
+		else if (unicode_ranges[_mid].first > uchar)
+			_max = _mid - 1;
+		else if (unicode_ranges[_mid].first <= uchar && unicode_ranges[_mid].last >= uchar)
+			return unicode_ranges[_mid].first;
 	}
-	for (i = 0; i < hit; i++)
-	{
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
-		{
-			hit = i;
-			return unicode_ranges[i].first;
-		}
-	}
-
 	return uchar;
 }
 
 unicode_char unicode_range_last(unicode_char uchar)
 {
-	static UINT32 hit = 0;
-	UINT32 i;
+	int _min = 0;
+	int _max = sizeof(unicode_ranges) / sizeof(unicode_ranges[0]) - 1;
+	int _mid;
 
-	for (i = hit; i < sizeof(unicode_ranges)/sizeof(unicode_ranges[0]); i++)
+	/* binary search in table of unicode ranges */
+	while (_max >= _min)
 	{
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
-		{
-			hit = i;
-			return unicode_ranges[i].last;
-		}
+		_mid = (_min + _max) / 2;
+		if (unicode_ranges[_mid].last < uchar)
+			_min = _mid + 1;
+		else if (unicode_ranges[_mid].first > uchar)
+			_max = _mid - 1;
+		else if (unicode_ranges[_mid].first <= uchar && unicode_ranges[_mid].last >= uchar)
+			return unicode_ranges[_mid].last;
 	}
-	for (i = 0; i < hit; i++)
-	{
-		if (unicode_ranges[i].first <= uchar && uchar <= unicode_ranges[i].last)
-		{
-			hit = i;
-			return unicode_ranges[i].last;
-		}
-	}
-
 	return uchar;
 }
 #endif

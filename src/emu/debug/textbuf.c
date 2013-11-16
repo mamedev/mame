@@ -183,7 +183,7 @@ void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
 	INT32 needed_space;
 
 	/* we need to ensure there is enough space for this string plus enough for the max line length */
-	needed_space = utf8_strlen(data) + MAX_LINE_LENGTH;
+	needed_space = utf8_ucharlen(data) + MAX_LINE_LENGTH;
 
 	/* make space in the buffer if we need to */
 	while (buffer_space(text) < needed_space && text->linestart != text->lineend)
