@@ -18,6 +18,7 @@
 #include "abcbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "formats/abc800_dsk.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
 
@@ -80,6 +81,8 @@ public:
 
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides

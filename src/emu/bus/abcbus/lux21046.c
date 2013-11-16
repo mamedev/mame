@@ -151,14 +151,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( luxor_55_21046_io, AS_IO, 8, luxor_55_21046_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff07) AM_READ(out_r)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff07) AM_WRITE(inp_w)
-	AM_RANGE(0x28, 0x28) AM_MIRROR(0xff07) AM_WRITE(_4b_w)
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff07) AM_WRITE(_9b_w)
-	AM_RANGE(0x48, 0x48) AM_MIRROR(0xff07) AM_WRITE(_8a_w)
-	AM_RANGE(0x58, 0x58) AM_MIRROR(0xff07) AM_MASK(0xff00) AM_READ(_9a_r)
-	AM_RANGE(0x68, 0x6b) AM_MIRROR(0xff04) AM_DEVREAD(SAB1793_TAG, fd1793_t, read)
-	AM_RANGE(0x78, 0x7b) AM_MIRROR(0xff04) AM_DEVWRITE(SAB1793_TAG, fd1793_t, write)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_READ(out_r)
+	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff03) AM_WRITE(inp_w)
+	AM_RANGE(0x2c, 0x2c) AM_MIRROR(0xff03) AM_WRITE(_4b_w)
+	AM_RANGE(0x3c, 0x3c) AM_MIRROR(0xff03) AM_WRITE(_9b_w)
+	AM_RANGE(0x4c, 0x4c) AM_MIRROR(0xff03) AM_WRITE(_8a_w)
+	AM_RANGE(0x5c, 0x5c) AM_MIRROR(0xff07) AM_MASK(0xff00) AM_READ(_9a_r)
+	AM_RANGE(0x68, 0x6b) AM_MIRROR(0xff00) AM_DEVREAD(SAB1793_TAG, fd1793_t, read)
+	AM_RANGE(0x78, 0x7b) AM_MIRROR(0xff00) AM_DEVWRITE(SAB1793_TAG, fd1793_t, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff77) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 ADDRESS_MAP_END
 
@@ -266,6 +266,10 @@ static Z80DMA_INTERFACE( dma_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
+FLOPPY_FORMATS_MEMBER( luxor_55_21046_device::floppy_formats )
+	FLOPPY_ABC800_FORMAT
+FLOPPY_FORMATS_END
+
 static SLOT_INTERFACE_START( abc_floppies )
 	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
 	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
@@ -289,19 +293,31 @@ void luxor_55_21046_device::fdc_drq_w(bool state)
 
 
 //-------------------------------------------------
+//  z80_daisy_config z80_daisy_chain
+//-------------------------------------------------
+
+static const z80_daisy_config z80_daisy_chain[] =
+{
+	{ Z80DMA_TAG },
+	{ NULL }
+};
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG( luxor_55_21046 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
+	MCFG_CPU_CONFIG(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21046_mem)
 	MCFG_CPU_IO_MAP(luxor_55_21046_io)
 
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_FD1793x_ADD(SAB1793_TAG, XTAL_16MHz/16)
 
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525dd", luxor_55_21046_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525dd", luxor_55_21046_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -398,9 +414,9 @@ INPUT_PORTS_START( luxor_55_21046 )
 
 	PORT_START("SW3")
 	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
-	PORT_DIPSETTING(    0x2c, "44 (ABC 832/834/850)" )
-	PORT_DIPSETTING(    0x2d, "45 (ABC 830)" )
-	PORT_DIPSETTING(    0x2e, "46 (ABC 838)" )
+	PORT_DIPSETTING(    0x2c, "44 (ABC 832/834/850)" ) // MF0: MF1:
+	PORT_DIPSETTING(    0x2d, "45 (ABC 830)" ) // MO0: MO1:
+	PORT_DIPSETTING(    0x2e, "46 (ABC 838)" ) // SF0: SF1:
 
 	PORT_START("S1") // also S3,S5
 	PORT_DIPNAME( 0x01, 0x01, "Interface Type" )

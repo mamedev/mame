@@ -97,6 +97,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/basicdsk.o    \
 	$(LIBOBJ)/formats/a26_cas.o     \
 	$(LIBOBJ)/formats/a5105_dsk.o   \
+	$(LIBOBJ)/formats/abc800_dsk.o  \
 	$(LIBOBJ)/formats/ace_tap.o     \
 	$(LIBOBJ)/formats/adam_cas.o    \
 	$(LIBOBJ)/formats/adam_dsk.o    \
