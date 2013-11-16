@@ -961,6 +961,11 @@ void alto2_cpu_device::device_start()
 	// decode constant PROMs to const data
 	m_const_data = prom_load(pl_const, memregion("const_proms")->base(), 1, 4);
 
+	for (UINT32 offs = 0; offs < 256; offs++) {
+		UINT16 cdata = m_const->read_word(m_const->address_to_byte(offs));
+		printf("%04o: %06o\n", offs, cdata);
+	}
+
 	m_disp_a38 = prom_load(&pl_displ_a38, memregion("displ_a38")->base());
 	m_disp_a63 = prom_load(&pl_displ_a63, memregion("displ_a63")->base());
 	m_disp_a66 = prom_load(&pl_displ_a66, memregion("displ_a66")->base());
@@ -2690,9 +2695,13 @@ void alto2_cpu_device::execute_run()
 		 */
 		if (!do_bs || bs >= 4) {
 			int addr = 8 * m_rsel + bs;
-			UINT16 data = m_const->read_dword(m_const->address_to_byte(addr));
-			LOG((LOG_CPU,2,"	%#o; BUS &= CONST[%03o]\n", data, addr));
+			// There is something going wrong with using:
+			// m_const->read_word(m_const->address_to_byte(addr));
+			// because for addr=0160 it returns const[0161] instead of const[0160]
+			// For now fall back to reading the const data from the byte array
+			UINT16 data = m_const_data[2*addr+0] | (m_const_data[2*addr+1] << 8);
 			m_bus &= data;
+			LOG((LOG_CPU,2,"	%#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
 		}
 
 		/*
