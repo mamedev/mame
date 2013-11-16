@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
  *
  *   Portable Xerox AltoII CPU core interface
  *
@@ -220,6 +220,10 @@ public:
 	//! driver interface to set diablo_hd_device
 	void set_diablo(int unit, diablo_hd_device* ptr);
 
+	//! update the internal bitmap to the MAME bitmap.pix16
+	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	//! call in for the next sector callback
 	void next_sector(int unit);
 
 	DECLARE_ADDRESS_MAP( ucode_map, 32 );
@@ -1402,10 +1406,10 @@ private:
 		UINT8 egate;					//!< current erase gate signal to the DIABLO hd
 		UINT8 wrgate;					//!< current write gate signal to the DIABLO hd
 		UINT8 rdgate;					//!< current read gate signal to the DIABLO hd
-		UINT32 shiftin;					//!< input shift register
-		UINT32 shiftout;				//!< output shift register
-		UINT32 datain;					//!< disk data in latch
-		UINT32 dataout;					//!< disk data out latch
+		UINT16 shiftin;					//!< input shift register
+		UINT16 shiftout;				//!< output shift register
+		UINT16 datain;					//!< disk data in latch
+		UINT16 dataout;					//!< disk data out latch
 		UINT8 krwc;						//!< read/write/check for current record
 		UINT8 kfer;						//!< disk fatal error signal state
 		UINT8 wdtskena;					//!< disk word task enable (active low)
@@ -1592,6 +1596,7 @@ private:
 		UINT32 curword;						//!< helper: first cursor word in current scanline
 		UINT32 curdata;						//!< helper: shifted cursor data (32-bit)
 		UINT16 *raw_bitmap;					//!< array of words of the raw bitmap that is displayed
+		UINT8 *scanline_dirty;				//!< array of flags indicating whenever the scanline contents changed
 	}	m_dsp;
 
 	//! horizontal line counter bit 0

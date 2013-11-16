@@ -1113,8 +1113,8 @@ void alto2_cpu_device::device_start()
 	state_add( A2_KSTAT,   "KSTAT",   m_dsk.kstat).formatstr("%06O");
 	state_add( A2_KCOM,    "KCOM",    m_dsk.kcom).formatstr("%06O");
 	state_add( A2_KRECNO,  "KRECNO",  m_dsk.krecno).formatstr("%02O");
-	state_add( A2_SHIFTIN, "SHIFTIN", m_dsk.shiftin).formatstr("%07O");
-	state_add( A2_SHIFTOUT,"SHIFTOUT",m_dsk.shiftout).formatstr("%07O");
+	state_add( A2_SHIFTIN, "SHIFTIN", m_dsk.shiftin).formatstr("%06O");
+	state_add( A2_SHIFTOUT,"SHIFTOUT",m_dsk.shiftout).formatstr("%06O");
 	state_add( A2_DATAIN,  "DATAIN",  m_dsk.datain).formatstr("%06O");
 	state_add( A2_DATAOUT, "DATAOUT", m_dsk.dataout).formatstr("%06O");
 	state_add( A2_KRWC,    "KRWC",    m_dsk.krwc).formatstr("%1u");
@@ -1236,6 +1236,10 @@ WRITE32_MEMBER( alto2_cpu_device::cram_w )
 {
 	*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = data;
 }
+
+#define	RD_CROM(addr) crom_r(space(AS_0), addr, 0xffffffff)
+#define	RD_CRAM(addr) cram_r(space(AS_0), addr, 0xffffffff)
+#define	WR_CRAM(addr,data) cram_w(space(AS_0), addr, data)
 
 //! read constants PROM
 READ16_MEMBER ( alto2_cpu_device::const_r )
@@ -2181,7 +2185,7 @@ void alto2_cpu_device::rdram()
 		LOG((LOG_CPU,0,"invalid address (%06o)\n", val));
 		return;
 	}
-	val = m_ucode->read_dword(m_ucode->address_to_byte(addr)) ^ ALTO2_UCODE_INVERTED;
+	val = RD_CRAM(addr) ^ ALTO2_UCODE_INVERTED;
 	if (GET_CRAM_HALFSEL(m_cram_addr)) {
 		val = val >> 16;
 		LOG((LOG_CPU,0,"upper:%06o\n", val));
@@ -2218,7 +2222,7 @@ void alto2_cpu_device::wrtram()
 		return;
 	}
 	LOG((LOG_CPU,0,"\n"));
-	m_ucode->write_dword(m_ucode->address_to_byte(addr), ((m_m << 16) | m_alu) ^ ALTO2_UCODE_INVERTED);
+	WR_CRAM(addr, ((m_m << 16) | m_alu) ^ ALTO2_UCODE_INVERTED);
 }
 
 #if	USE_ALU_74181
@@ -2642,10 +2646,10 @@ void alto2_cpu_device::execute_run()
 
 		/* next instruction's mpc */
 		m_mpc = m_next;
-		m_mir = m_ucode->read_dword(m_ucode->address_to_byte(m_mpc));
+		m_mir = RD_CROM(m_mpc);
 		m_rsel = MIR_RSEL(m_mir);
 		m_next = MIR_NEXT(m_mir) | m_next2;
-		m_next2 = A2_GET32(m_ucode->read_dword(m_ucode->address_to_byte(m_next)), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
+		m_next2 = A2_GET32(RD_CROM(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
 		aluf = MIR_ALUF(m_mir);
 		bs = MIR_BS(m_mir);
 		f1 = MIR_F1(m_mir);

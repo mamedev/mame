@@ -218,7 +218,7 @@ int alto2_cpu_device::unload_word(int x)
 				word1 ^= m_dsp.curdata & 0177777;
 			if (word1 != m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x]) {
 				m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x] = word1;
-				// sdl_write(x * 16, y, word1);	// FIXME: invalidate bitmap word
+				m_dsp.scanline_dirty[y] = 0;
 			}
 			x++;
 			if (x < ALTO2_DISPLAY_VISIBLE_WORDS) {
@@ -229,7 +229,7 @@ int alto2_cpu_device::unload_word(int x)
 					word2 ^= m_dsp.curdata & 0177777;
 				if (word2 != m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x]) {
 					m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x] = word2;
-					// sdl_write(x * 16, y, word2);	// FIXME: invalidate bitmap word
+					m_dsp.scanline_dirty[y] = 0;
 				}
 				x++;
 			}
@@ -241,7 +241,7 @@ int alto2_cpu_device::unload_word(int x)
 				word ^= m_dsp.curdata & 0177777;
 			if (word != m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x]) {
 				m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x] = word;
-				// sdl_write(x * 16, y, word);	// FIXME: invalidate bitmap word
+				m_dsp.scanline_dirty[y] = 0;
 			}
 			x++;
 		}
@@ -441,12 +441,46 @@ int alto2_cpu_device::init_disp()
 
 	memset(&m_dsp, 0, sizeof(m_dsp));
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
-	m_dsp.raw_bitmap = (UINT16*)malloc(ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS * sizeof(UINT16));
-	if (NULL == m_dsp.raw_bitmap)
-		return -1;
 
+	m_dsp.raw_bitmap = global_alloc_array(UINT16, ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
 	for (y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
-		memset(m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS, 0x55, ALTO2_DISPLAY_VISIBLE_WORDS * sizeof(UINT16));
+		memset(m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS, 0, ALTO2_DISPLAY_VISIBLE_WORDS * sizeof(UINT16));
 
+	m_dsp.scanline_dirty = global_alloc_array(UINT8, ALTO2_DISPLAY_HEIGHT);
+	memset(m_dsp.scanline_dirty, 1, sizeof(UINT8) * ALTO2_DISPLAY_HEIGHT);
 	return 0;
+}
+
+#define	BLACK	0
+#define	WHITE	1
+
+//! update the internal bitmap to the MAME bitmap.pix16
+void alto2_cpu_device::screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (UINT32 y = 0; y < ALTO2_DISPLAY_HEIGHT; y++) {
+		if (0 == m_dsp.scanline_dirty[y])
+			continue;
+		m_dsp.scanline_dirty[y] = 0;
+		UINT16* src = &m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS];
+		UINT16* pix = &bitmap.pix16(y);
+		for (UINT32 x = 0; x < ALTO2_DISPLAY_WIDTH; x += 16) {
+			UINT16 w = *src++;
+			*pix++ = (w & 0100000) ? BLACK : WHITE;
+			*pix++ = (w & 0040000) ? BLACK : WHITE;
+			*pix++ = (w & 0020000) ? BLACK : WHITE;
+			*pix++ = (w & 0010000) ? BLACK : WHITE;
+			*pix++ = (w & 0004000) ? BLACK : WHITE;
+			*pix++ = (w & 0002000) ? BLACK : WHITE;
+			*pix++ = (w & 0001000) ? BLACK : WHITE;
+			*pix++ = (w & 0000400) ? BLACK : WHITE;
+			*pix++ = (w & 0000200) ? BLACK : WHITE;
+			*pix++ = (w & 0000100) ? BLACK : WHITE;
+			*pix++ = (w & 0000040) ? BLACK : WHITE;
+			*pix++ = (w & 0000020) ? BLACK : WHITE;
+			*pix++ = (w & 0000010) ? BLACK : WHITE;
+			*pix++ = (w & 0000004) ? BLACK : WHITE;
+			*pix++ = (w & 0000002) ? BLACK : WHITE;
+			*pix++ = (w & 0000001) ? BLACK : WHITE;
+		}
+	}
 }
