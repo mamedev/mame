@@ -212,6 +212,15 @@ static ADDRESS_MAP_START( superchs_cpub_map, AS_PROGRAM, 16, superchs_state )
 	AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( chase3_cpub_map, AS_PROGRAM, 16, superchs_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM
+	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */
+	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
+ADDRESS_MAP_END
+
 /***********************************************************/
 
 static INPUT_PORTS_START( superchs )
@@ -263,7 +272,7 @@ static INPUT_PORTS_START( superchs )
 	PORT_ADJUSTER( 75, "PCB - Sound Volume" )
 
 	PORT_START("UNKNOWN") // unused?
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /***********************************************************
@@ -344,6 +353,13 @@ static MACHINE_CONFIG_START( superchs, superchs_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( chase3, superchs )
+
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_PROGRAM_MAP(chase3_cpub_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -498,6 +514,64 @@ ROM_START( superchsj )
 	ROM_LOAD( "palce20v8h-d46-22.ic24", 0x1200, 0x157, CRC(c6a10b06) SHA1(d0b8e79dac0805720b16e1225eb568d7532291ef) ) /* Located on the sound board */
 ROM_END
 
+ROM_START( superchsp )
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2048K for 68020 code (CPU A) */
+	ROM_LOAD32_BYTE( "ic21 ffd1.bin", 0x00003, 0x40000, CRC(7a8199ac) SHA1(ab5e9dd34e17ebdbe1b091b9be12b47914164582) )
+	ROM_LOAD32_BYTE( "ic23 5935.bin", 0x00002, 0x40000, CRC(2b262660) SHA1(36c772d7dab4a635db9acc7a2cd657a7964ce8e4) )
+	ROM_LOAD32_BYTE( "ic25 a56c.bin", 0x00001, 0x40000, CRC(553ebaa9) SHA1(cfa544cb147218c3b3d9be313d83350bed34b348) )
+	ROM_LOAD32_BYTE( "ic27 1a46.bin", 0x00000, 0x40000, CRC(544e34c0) SHA1(57039063fa547e650fc66baf132988fb23ba0565) )
+
+	ROM_REGION( 0x140000, "audiocpu", 0 )   /* Sound cpu */
+	ROM_LOAD16_BYTE( "sound ic7 lower.bin", 0x100001, 0x20000, CRC(e70902cc) SHA1(ee3d31c4e2c92c4a338d08d379cb80f42f8fa9cf) )
+	ROM_LOAD16_BYTE( "sound ic8 upper.bin", 0x100000, 0x20000, CRC(86eea635) SHA1(49615a152c215e1f940ab16be3b0f1120822969c) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 256K for 68000 code (CPU B) */
+	ROM_LOAD16_BYTE( "ic112 3a05.bin", 0x00001, 0x40000, CRC(f95a477d) SHA1(c3ad1987ecd1f48084fba08687bd75ae804342b3) )
+	ROM_LOAD16_BYTE( "ic127 ae27.bin", 0x00000, 0x40000, CRC(8c8cd2a1) SHA1(178ab2df0ea7371ce275d38051643ea19ba88047) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* SCR 16x16 tiles */
+	ROM_LOAD32_BYTE( "0scn.ic9",    0x00000, 0x080000, CRC(d54e80ec) SHA1(83460cf97b0da8523486ede5bd504710c790b1a6) )   
+	ROM_LOAD32_BYTE( "8scn.ic8",    0x00002, 0x080000, CRC(b3da122d) SHA1(1e4198b2d5ce2144a7ca01f418aca33f799dcad2) )   
+	ROM_LOAD32_BYTE( "16scn.ic12",  0x00001, 0x080000, CRC(dd26932c) SHA1(31bcc4e0195a6d966829976b89e81e6eb7dde8b6) )   
+	ROM_LOAD32_BYTE( "24scn.ic13",  0x00003, 0x080000, CRC(4f560680) SHA1(6398013b8fa5aebc905bf31918e990dd7f5d9490) )   
+
+	ROM_REGION( 0x800000, "gfx2", 0 )
+	ROMX_LOAD( "0lobj.ic14",   0x000003, 0x80000, CRC(972d0866) SHA1(7787312ba99d971eee30d50ddff12629e3bdc8b9) , ROM_SKIP(7) )
+	ROMX_LOAD( "16lobj.ic15",  0x000002, 0x80000, CRC(ceefdf0d) SHA1(4463f5d1d81b0fcaa29276c995c31dc89cb97680) , ROM_SKIP(7) )
+	ROMX_LOAD( "32lobj.ic16",  0x000001, 0x80000, CRC(1e86a77a) SHA1(886080d3872fe2d592269f6541569a290885a475) , ROM_SKIP(7) )
+	ROMX_LOAD( "48lobj.ic17",  0x000000, 0x80000, CRC(1d8f3c72) SHA1(92670fc4d331d1243457b67ec7d98a273d9c9540) , ROM_SKIP(7) )
+	ROMX_LOAD( "8lobj.ic4",    0x000007, 0x80000, CRC(e138a3f7) SHA1(94f1deb05286af73f5af60a08944017540ae3387) , ROM_SKIP(7) )
+	ROMX_LOAD( "24lobj.ic5",   0x000006, 0x80000, CRC(927e0539) SHA1(8adbd77ae5bf8fa3761ac7c315d1c96f616a0197) , ROM_SKIP(7) )
+	ROMX_LOAD( "40lobj.ic6",   0x000005, 0x80000, CRC(3810a203) SHA1(f269c5bea5db18626b716d8c204dace7ab681e28) , ROM_SKIP(7) )
+	ROMX_LOAD( "56lobj.ic7",   0x000004, 0x80000, CRC(d66d6b30) SHA1(32e08dacffa706e0b3634fc52cabb2a5fe0f5cf5) , ROM_SKIP(7) )
+	ROMX_LOAD( "0h-obj.ic22",  0x400003, 0x80000, CRC(985d31b0) SHA1(8e3c899792de0530f1176af992a90dbbbd3938a8) , ROM_SKIP(7) )
+	ROMX_LOAD( "16h-obj.ic23", 0x400002, 0x80000, CRC(1be705e8) SHA1(497ee154ee43e81ee7d7e8106663374be0d5a550) , ROM_SKIP(7) )
+	ROMX_LOAD( "32h-obj.ic24", 0x400001, 0x80000, CRC(f9fde123) SHA1(8cdd4c98e2eaca542c9916da1fb933606d3c8e3f) , ROM_SKIP(7) )
+	ROMX_LOAD( "48h-obj.ic25", 0x400000, 0x80000, CRC(1c5d28c6) SHA1(9844fd41f7d190b8b11b23e01687f7c40cf8b18a) , ROM_SKIP(7) )
+	ROMX_LOAD( "8h-obj.ic30",  0x400007, 0x80000, CRC(5559a1a1) SHA1(cdc2f2f0b086cf2468fb5e2289c2308313be6668) , ROM_SKIP(7) )
+	ROMX_LOAD( "24h-obj.ic31", 0x400006, 0x80000, CRC(83e724fb) SHA1(0f93163afa4af328b813502cecaf6824b3717bc7) , ROM_SKIP(7) )
+	ROMX_LOAD( "40h-obj.ic32", 0x400005, 0x80000, CRC(6a3b2fa0) SHA1(5a8e7875afe3ba8443811729ede21d23fa7b5082) , ROM_SKIP(7) )
+	ROMX_LOAD( "56h-obj.ic33", 0x400004, 0x80000, CRC(3e78a619) SHA1(b37bd46b2098db6c8857ffac7444216c617e4e97) , ROM_SKIP(7) )
+
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_LOAD16_BYTE( "0style.ic28", 0x00000, 0x40000, CRC(161263e5) SHA1(3b501dd9c543a9505c3fd7627aa42434eeb1a531) )
+	ROM_LOAD16_BYTE( "8style.ic27", 0x00001, 0x40000, CRC(b32f246c) SHA1(be950f0da5d839978961cb77745427ac0bd83a5c) )
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE("0wave.ic1", 0x000000, 0x080000, CRC(3ffdc22e) SHA1(16cc02895a0219fdecec5da3ce37bb246e511a1f) )
+	ROM_LOAD16_BYTE("1wave.ic2", 0x100000, 0x080000, CRC(2ffc7b82) SHA1(e7837753bf4b85fc2973ef4d70afac47a614830c) )
+	ROM_LOAD16_BYTE("2wave.ic3", 0x200000, 0x080000, CRC(ab976601) SHA1(2edfceb3bfbc65b61a0f8358b24242c2cf0eebcf) )
+	ROM_LOAD16_BYTE("3wave.ic4", 0x300000, 0x080000, CRC(0d4a5994) SHA1(3c44dd47e6598efba844554ff5eefb5264876abb) )
+	ROM_LOAD16_BYTE("4wave.ic5", 0x400000, 0x080000, CRC(8d803555) SHA1(e58c3673a1e047f8dede605f44ac29990b41c35e) )
+	ROM_LOAD16_BYTE("5wave.ic6", 0x500000, 0x080000, CRC(8e486d83) SHA1(5edad7490596d303686babc930455044dc3c53b9) )
+	ROM_LOAD16_BYTE("6wave.ic7", 0x600000, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )    // -std-
+	ROM_LOAD16_BYTE("7wave.ic8", 0x700000, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )    // -std-
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "chase3_defaults.nv", 0x0000, 0x0080, CRC(4b37c69f) SHA1(5c8567441ca12c120c157cb3339165586d4c7ce9 ) )
+ROM_END
+
+
 
 READ32_MEMBER(superchs_state::main_cycle_r)
 {
@@ -522,6 +596,7 @@ DRIVER_INIT_MEMBER(superchs_state,superchs)
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16_delegate(FUNC(superchs_state::sub_cycle_r),this));
 }
 
-GAMEL( 1992, superchs,         0, superchs, superchs, superchs_state, superchs, ROT0, "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs )
-GAMEL( 1992, superchsu, superchs, superchs, superchs, superchs_state, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)",    0, layout_superchs )
-GAMEL( 1992, superchsj, superchs, superchs, superchs, superchs_state, superchs, ROT0, "Taito Corporation",         "Super Chase - Criminal Termination (Japan)", 0, layout_superchs )
+GAMEL( 1992, superchs,         0, superchs, superchs, superchs_state, superchs, ROT0,               "Taito Corporation Japan",   "Super Chase - Criminal Termination (World)", 0, layout_superchs )
+GAMEL( 1992, superchsu, superchs, superchs, superchs, superchs_state, superchs, ROT0,               "Taito America Corporation", "Super Chase - Criminal Termination (US)",    0, layout_superchs )
+GAMEL( 1992, superchsj, superchs, superchs, superchs, superchs_state, superchs, ROT0,               "Taito Corporation",         "Super Chase - Criminal Termination (Japan)", 0, layout_superchs )
+GAMEL( 1992, superchsp, superchs, chase3,   superchs, driver_device,  0,        ORIENTATION_FLIP_X, "Taito Corporation",         "Super Chase - Criminal Termination (1992/10/26 20:24:29 CHASE 3 VER 1.1, prototype)", 0, layout_superchs ) // has CHASE 3 as the internal description
