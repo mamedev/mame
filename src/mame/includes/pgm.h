@@ -348,6 +348,8 @@ public:
 	void pgm_create_dummy_internal_arm_region(int size);
 	void pgm_patch_external_arm_rom_jumptable_theglada(int base);
 	void pgm_create_dummy_internal_arm_region_theglad(void);
+	void pgm_descramble_happy6(UINT8* src);
+	void pgm_descramble_happy6_2(UINT8* src);
 	void svg_latch_init();
 	DECLARE_READ32_MEMBER( dmnfrnt_speedup_r );
 	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );
@@ -503,6 +505,7 @@ INPUT_PORTS_EXTERN( dw2001 );
 
 MACHINE_CONFIG_EXTERN( pgm_arm_type3 );
 INPUT_PORTS_EXTERN(theglad);
+INPUT_PORTS_EXTERN(happy6);
 
 /*----------- defined in machine/pgmprot4.c -----------*/
 

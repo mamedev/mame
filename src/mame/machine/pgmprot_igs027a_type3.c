@@ -159,6 +159,7 @@ MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 	if (!strcmp(machine().system().name, "theglad")) base = 0x3316;
 	if (!strcmp(machine().system().name, "theglad100")) base = 0x3316;
 	if (!strcmp(machine().system().name, "theglad101")) base = 0x3316;
+	if (!strcmp(machine().system().name, "happy6")) base = 0x3316;
 
 	if (base != -1)
 	{
@@ -643,12 +644,87 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 	share16[0x158/2] = 0x0005;
 }
 
+// todo, collapse these to an address swap
+void pgm_arm_type3_state::pgm_descramble_happy6(UINT8* src)
+{
+	UINT8* buffer = auto_alloc_array(machine(), UINT8, 0x800000);
+	int writeaddress = 0;
+	
+	for (int j = 0; j < 0x800; j += 0x200)
+	{
+		for (int i = j; i < 0x800000; i += 0x800)
+		{
+			memcpy(buffer + writeaddress, src + i, 0x200);
+			writeaddress += 0x200;
+		}
+	}
+	memcpy(src, buffer, 0x800000);
+	auto_free(machine(), buffer);
+}
+
+
+
+void pgm_arm_type3_state::pgm_descramble_happy6_2(UINT8* src)
+{
+	UINT8* buffer = auto_alloc_array(machine(), UINT8, 0x800000);
+	int writeaddress = 0;
+	for (int k = 0; k < 0x800000; k += 0x100000)
+	{
+		for (int j = 0; j < 0x40000; j += 0x10000)
+		{
+			for (int i = j; i < 0x100000; i += 0x40000)
+			{
+				memcpy(buffer + writeaddress, src + i + k, 0x10000);
+				writeaddress += 0x10000;
+			}
+		}
+	}
+	memcpy(src, buffer, 0x800000);
+	auto_free(machine(), buffer);
+}
+
+INPUT_PORTS_START( happy6 )
+	PORT_INCLUDE ( pgm )
+
+	PORT_START("RegionHack")    /* Region - actually supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x0000, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x0003, "Singapore" )
+	PORT_CONFSETTING(      0x0004, "Oversea" ) // unlikely this actually exists, there's no english anything!
+	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
+INPUT_PORTS_END
+
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
 {
+	UINT8 *src;
+	
+	src = (UINT8 *)(machine().root_device().memregion("tiles")->base()) + 0x180000;
+	pgm_descramble_happy6(src);
+	pgm_descramble_happy6_2(src);
+
+	src = (UINT8 *)(machine().root_device().memregion("sprcol")->base()) + 0x000000;
+	pgm_descramble_happy6(src);
+	pgm_descramble_happy6_2(src);
+
+	src = (UINT8 *)(machine().root_device().memregion("sprcol")->base()) + 0x0800000;
+	pgm_descramble_happy6(src);
+	pgm_descramble_happy6_2(src);
+
+	src = (UINT8 *)(machine().root_device().memregion("sprmask")->base());
+	pgm_descramble_happy6(src);
+	pgm_descramble_happy6_2(src);
+
+	src = (UINT8 *)(machine().root_device().memregion("ics")->base()) + 0x400000;
+	pgm_descramble_happy6(src);
+	pgm_descramble_happy6_2(src);
+
 	svg_basic_init();
 	pgm_happy6_decrypt(machine());
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad();
 	pgm_patch_external_arm_rom_jumptable_theglada(0x5f1c0);
-	
+
+	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
 }
