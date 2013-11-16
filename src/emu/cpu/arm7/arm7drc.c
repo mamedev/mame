@@ -637,9 +637,9 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_JMPc(block, uml::COND_Z, nopabt = label++);                          // jmpz     nound
 
 	UML_ROLINS(block, uml::mem(&GET_CPSR), eARM7_MODE_UND, 0, MODE_FLAG);     // rolins   CPSR, eARM7_MODE_UND, 0, MODE_FLAG
-	UML_MOV(block, uml::I1, -4);                                             // mov      i1, -4
+	UML_MOV(block, uml::I1, (UINT64)-4);                                             // mov      i1, -4
 	UML_TEST(block, uml::mem(&GET_CPSR), T_MASK);                            // test     CPSR, T_MASK
-	UML_MOVc(block, uml::COND_NZ, uml::I1, -2);                                   // movnz    i1, -2
+	UML_MOVc(block, uml::COND_NZ, uml::I1, (UINT64)-2);                                   // movnz    i1, -2
 	UML_ADD(block, uml::mem(&GET_REGISTER(14)), uml::I0, uml::I1);                // add      LR, i0, i1
 	UML_MOV(block, uml::mem(&GET_REGISTER(SPSR)), uml::mem(&GET_CPSR));      // mov      SPSR, CPSR
 	UML_OR(block, uml::mem(&GET_CPSR), uml::mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
@@ -655,9 +655,9 @@ void arm7_cpu_device::static_generate_check_irq()
 	UML_JMPc(block, uml::COND_Z, done = label++);                            // jmpz     done
 
 	UML_ROLINS(block, uml::mem(&GET_CPSR), eARM7_MODE_SVC, 0, MODE_FLAG);     // rolins   CPSR, eARM7_MODE_SVC, 0, MODE_FLAG
-	UML_MOV(block, uml::I1, -4);                                             // mov      i1, -4
+	UML_MOV(block, uml::I1, (UINT64)-4);                                             // mov      i1, -4
 	UML_TEST(block, uml::mem(&GET_CPSR), T_MASK);                            // test     CPSR, T_MASK
-	UML_MOVc(block, uml::COND_NZ, uml::I1, -2);                                   // movnz    i1, -2
+	UML_MOVc(block, uml::COND_NZ, uml::I1, (UINT64)-2);                                   // movnz    i1, -2
 	UML_ADD(block, uml::mem(&GET_REGISTER(14)), uml::I0, uml::I1);                // add      LR, i0, i1
 
 	UML_TEST(block, uml::mem(&GET_CPSR), SR_MODE32);                         // test     CPSR, MODE32
