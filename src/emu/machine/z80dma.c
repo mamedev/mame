@@ -123,6 +123,7 @@ const int TM_SEARCH_TRANSFER    = 0x03;
 #define EOB_F_CLEAR             (m_status |= 0x20)
 
 #define READY_ACTIVE_HIGH       ((WR5>>3) & 0x01)
+#define AUTO_RESTART			((WR5>>5) & 0x01)
 
 #define INTERRUPT_ENABLE        (WR3 & 0x20)
 #define INT_ON_MATCH            (INTERRUPT_CTRL & 0x01)
@@ -292,13 +293,10 @@ int z80dma_device::z80daisy_irq_ack()
 		// set interrupt under service flag
 		m_ius = 1;
 
-		// disable DMA
-		m_dma_enabled = 0;
-
 		return m_vector;
 	}
 
-	logerror("z80dma_irq_ack: failed to find an interrupt to ack!\n");
+	//logerror("z80dma_irq_ack: failed to find an interrupt to ack!\n");
 
 	return 0;
 }
@@ -322,7 +320,7 @@ void z80dma_device::z80daisy_irq_reti()
 		return;
 	}
 
-	logerror("z80dma_irq_reti: failed to find an interrupt to clear IEO on!\n");
+	//logerror("z80dma_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
 
@@ -550,6 +548,17 @@ void z80dma_device::timerproc()
 		{
 			trigger_interrupt(INT_END_OF_BLOCK);
 		}
+
+		if (AUTO_RESTART)
+		{
+			if (LOG) logerror("Z80DMA '%s' Auto Restart\n", tag());
+
+			m_dma_enabled = 1;
+			m_addressA = PORTA_ADDRESS;
+			m_addressB = PORTB_ADDRESS;
+			m_count = BLOCKLEN;
+			m_status |= 0x30;
+		}
 	}
 }
 
@@ -626,26 +635,27 @@ UINT8 z80dma_device::read()
 
 void z80dma_device::write(UINT8 data)
 {
-	if (LOG) logerror("Z80DMA '%s' Write %02x\n", tag(), data);
-
 	if (m_num_follow == 0)
 	{
 		m_reset_pointer = 0;
 
 		if ((data & 0x87) == 0) // WR2
 		{
+			if (LOG) logerror("Z80DMA '%s' WR2 %02x\n", tag(), data);
 			WR2 = data;
 			if (data & 0x40)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(PORTB_TIMING);
 		}
 		else if ((data & 0x87) == 0x04) // WR1
 		{
+			if (LOG) logerror("Z80DMA '%s' WR1 %02x\n", tag(), data);
 			WR1 = data;
 			if (data & 0x40)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(PORTA_TIMING);
 		}
 		else if ((data & 0x80) == 0) // WR0
 		{
+			if (LOG) logerror("Z80DMA '%s' WR0 %02x\n", tag(), data);
 			WR0 = data;
 			if (data & 0x08)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(PORTA_ADDRESS_L);
@@ -658,6 +668,7 @@ void z80dma_device::write(UINT8 data)
 		}
 		else if ((data & 0x83) == 0x80) // WR3
 		{
+			if (LOG) logerror("Z80DMA '%s' WR3 %02x\n", tag(), data);
 			WR3 = data;
 			if (data & 0x08)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(MASK_BYTE);
@@ -666,6 +677,7 @@ void z80dma_device::write(UINT8 data)
 		}
 		else if ((data & 0x83) == 0x81) // WR4
 		{
+			if (LOG) logerror("Z80DMA '%s' WR4 %02x\n", tag(), data);
 			WR4 = data;
 			if (data & 0x04)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(PORTB_ADDRESS_L);
@@ -676,10 +688,12 @@ void z80dma_device::write(UINT8 data)
 		}
 		else if ((data & 0xC7) == 0x82) // WR5
 		{
+			if (LOG) logerror("Z80DMA '%s' WR5 %02x\n", tag(), data);
 			WR5 = data;
 		}
 		else if ((data & 0x83) == 0x83) // WR6
 		{
+			if (LOG) logerror("Z80DMA '%s' WR6 %02x\n", tag(), data);
 			m_dma_enabled = 0;
 
 			WR6 = data;
@@ -802,6 +816,8 @@ void z80dma_device::write(UINT8 data)
 	}
 	else
 	{
+		if (LOG) logerror("Z80DMA '%s' Write %02x\n", tag(), data);
+
 		int nreg = m_regs_follow[m_cur_follow];
 		m_regs[nreg] = data;
 		m_cur_follow++;
