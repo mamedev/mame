@@ -299,7 +299,7 @@ int z80dart_device::z80daisy_irq_ack()
 		}
 	}
 
-	logerror("z80dart_irq_ack: failed to find an interrupt to ack!\n");
+	//logerror("z80dart_irq_ack: failed to find an interrupt to ack!\n");
 
 	return m_chanB->m_rr[2];
 }
@@ -328,7 +328,7 @@ void z80dart_device::z80daisy_irq_reti()
 		}
 	}
 
-	logerror("z80dart_irq_reti: failed to find an interrupt to clear IEO on!\n");
+	//logerror("z80dart_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
 

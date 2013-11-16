@@ -130,7 +130,7 @@ int z80_daisy_chain::call_ack_device()
 		if (state & Z80_DAISY_INT)
 			return vector;
 	}
-	logerror("z80daisy_call_ack_device: failed to find an device to ack!\n");
+	//logerror("z80daisy_call_ack_device: failed to find an device to ack!\n");
 	return vector;
 }
 
