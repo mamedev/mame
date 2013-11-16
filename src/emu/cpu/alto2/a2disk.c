@@ -1023,8 +1023,6 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
  * Whoa there! :-)
  * </PRE>
  */
-#define	INIT	(m_task == task_kwd && m_dsk.wdinit0)
-
 #define	WDALLOW	(!GET_KCOM_WDINHIB(m_dsk.kcom))
 #define	WDINIT	((m_dsk.ff_53b & JKFF_Q) ? 1 : 0)
 #define	RDYLAT	((m_dsk.ff_45a & JKFF_Q) ? 1 : 0)
@@ -1171,7 +1169,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 */
 		DEBUG_NAME("\t\t53b KWD   ");
 		s0 = m_dsk.ff_53b;
-		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
+		s1 = m_sysclkb1[i];
 		if (block != task_kwd)
 			s1 |= JKFF_K;			// (BLOCK & WDTSKACT)'
 		if (WDALLOW)
@@ -1192,7 +1190,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 */
 		DEBUG_NAME("\t\t53a KWD   ");
 		s0 = m_dsk.ff_53a;
-		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
+		s1 = m_sysclkb1[i];
 		if (m_dsk.ff_43b & JKFF_Q)
 			s1 |= JKFF_J;
 		if (block != task_kwd)
@@ -1215,7 +1213,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 */
 		DEBUG_NAME("\t\t43a KWD   ");
 		s0 = m_dsk.ff_43a;
-		s1 = m_sysclka1[i] ? JKFF_CLK : JKFF_0;
+		s1 = m_sysclka1[i];
 		if (m_dsk.ff_53a & JKFF_Q)
 			s1 |= JKFF_J;
 		if (m_dsk.ff_53a & JKFF_Q)
@@ -1238,7 +1236,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 */
 		DEBUG_NAME("\t\t45a RDYLAT");
 		s0 = m_dsk.ff_45a;
-		s1 = m_sysclka1[i] ? JKFF_CLK : JKFF_0;
+		s1 = m_sysclka1[i];
 		if (dhd->get_ready_0())
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
@@ -1260,7 +1258,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 */
 		DEBUG_NAME("\t\t45b SEQERR");
 		s0 = m_dsk.ff_45b;
-		s1 = m_sysclka1[i] ? JKFF_CLK : JKFF_0;
+		s1 = m_sysclka1[i];
 		s1 |= JKFF_J;
 		if (SEQERR)
 			s1 |= JKFF_K;
@@ -1281,7 +1279,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 */
 		DEBUG_NAME("\t\t22b KSEC  ");
 		s0 = m_dsk.ff_22b;
-		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
+		s1 = m_sysclkb1[i];
 		if (m_dsk.ff_22a & JKFF_Q)
 			s1 |= JKFF_J;
 		if (block != task_ksec)
@@ -1303,7 +1301,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 */
 		DEBUG_NAME("\t\t22a KSEC  ");
 		s0 = m_dsk.ff_22a;
-		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
+		s1 = m_sysclkb1[i];
 		if (m_dsk.ff_21b & JKFF_Q)
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
@@ -1325,7 +1323,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 */
 		DEBUG_NAME("\t\t21b KSEC  ");
 		s0 = m_dsk.ff_21b;
-		s1 = m_sysclkb1[i] ? JKFF_CLK : JKFF_0;
+		s1 = m_sysclkb1[i];
 		if (m_dsk.ff_21a & JKFF_Q)
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
@@ -1654,7 +1652,7 @@ void alto2_cpu_device::bs_read_kstat_0()
 	/* KSTAT[9] latch the drive seek/read/write status */
 	PUT_KSTAT_SEEK(m_dsk.kstat, dhd->get_seek_read_write_0());
 
-	/* KSTAT[10] latch the latched (FF 45a at CLRSTAT) ready status */
+	/* KSTAT[10] latch the latched (FF 45a at CLRSTAT) ready status (Q) */
 	PUT_KSTAT_NOTRDY(m_dsk.kstat, m_dsk.ff_45a & JKFF_Q ? 1 : 0);
 
 	/* KSTAT[11] latch the latched (FF 45b at CLRSTAT) seqerr status (Q') */
@@ -1754,8 +1752,8 @@ void alto2_cpu_device::f1_load_kstat_1()
 		UINT8 s0, s1;
 		DEBUG_NAME("\t\t44b CKSUM ");
 		s0 = m_dsk.ff_44b;
-		s1 = i ? JKFF_CLK : 0;
-		if (!A2_GET16(m_bus,16,13,13))
+		s1 = i ? JKFF_CLK : JKFF_0;
+		if (!GET_KSTAT_CKSUM(m_bus))
 			s1 |= JKFF_J;
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
@@ -1880,7 +1878,6 @@ void alto2_cpu_device::f1_increcno_1()
 void alto2_cpu_device::f1_clrstat_1()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	LOG((LOG_DISK,1,"	CLRSTAT\n"));
 	UINT8 s0, s1;
 
 	/* clears the LAI clocked flip-flop 44a
@@ -1898,6 +1895,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	s1 |= JKFF_J;
 	s1 |= JKFF_K;
 	s1 |= JKFF_S;
+	s1 &= ~JKFF_C;
 	m_dsk.ff_44a = update_jkff(s0, s1);
 
 	/* clears the CKSUM flip-flop 44b
@@ -1915,6 +1913,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	s1 |= m_dsk.ff_44b & JKFF_J;
 	s1 |= JKFF_K;
 	s1 |= JKFF_S;
+	s1 &= ~JKFF_C;
 	m_dsk.ff_44b = update_jkff(s0, s1);
 
 	/* clears the rdylat flip-flop 45a
@@ -1935,6 +1934,7 @@ void alto2_cpu_device::f1_clrstat_1()
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
 	s1 |= JKFF_S;
+	s1 &= ~JKFF_C;
 	m_dsk.ff_45a = update_jkff(s0, s1);
 
 	/* sets the seqerr flip-flop 45b (Q' is SEQERR)
@@ -1952,6 +1952,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	s1 |= JKFF_J;
 	if (!SEQERR)
 		s1 |= JKFF_K;
+	s1 &= ~JKFF_S;
 	s1 |= JKFF_C;
 	m_dsk.ff_45b = update_jkff(s0, s1);
 
@@ -1960,6 +1961,11 @@ void alto2_cpu_device::f1_clrstat_1()
 
 	/* start monoflop 31a, which resets ready_mf31a */
 	m_dsk.ready_timer->adjust(attotime::from_nsec(TW_READY), 1);
+
+	LOG((LOG_DISK,1,"	CLRSTAT (44a_Q:%d 44b_Q:%d 45a_Q:%d 45b_Q:%d 31a_Q:%d)\n",
+		 m_dsk.ff_44a & JKFF_Q ? 1 : 0, m_dsk.ff_44b & JKFF_Q ? 1 : 0,
+		 m_dsk.ff_45a & JKFF_Q ? 1 : 0, m_dsk.ff_45b & JKFF_Q ? 1 : 0,
+		 m_dsk.ready_mf31a));
 }
 
 /**
@@ -2040,7 +2046,8 @@ void alto2_cpu_device::f1_load_kadr_1()
  */
 void alto2_cpu_device::f2_init_1()
 {
-	UINT16 r = INIT ? 037 : 0;
+	// INIT = current task == KWD and WDINIT
+	UINT16 r = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 	LOG((LOG_DISK,1,"	INIT; %sbranch (%#o | %#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 	m_dsk.wdinit0 = 0;
@@ -2049,8 +2056,7 @@ void alto2_cpu_device::f2_init_1()
 /**
  * @brief f2_rwc late: branch on read/write/check state of the current record
  * <PRE>
- * NEXT ← NEXT OR (current record to be written ? 3 :
- *	current record to be checked ? 2 : 0);
+ * NEXT ← NEXT OR (current record to be written ? 3 : current record to be checked ? 2 : 0);
  *
  * NB: note how krecno counts 0,2,3,1 ... etc.
  * on 0: it presents the RWC for HEADER
@@ -2073,7 +2079,7 @@ void alto2_cpu_device::f2_rwc_1()
 {
 	static UINT16 branch_map[4] = {0,2,3,3};
 	UINT16 r = branch_map[m_dsk.krwc];;
-	UINT16 init = INIT ? 037 : 0;
+	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	switch (m_dsk.krecno) {
 	case RECNO_HEADER:
@@ -2115,7 +2121,7 @@ void alto2_cpu_device::f2_rwc_1()
 void alto2_cpu_device::f2_recno_1()
 {
 	UINT16 r = m_dsk.krecno;
-	UINT16 init = INIT ? 037 : 0;
+	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 	LOG((LOG_DISK,1,"	RECNO; %sbranch recno:%d (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_dsk.krecno, m_next2, r, init));
 	m_next2 |= r | init;
 	m_dsk.wdinit0 = 0;
@@ -2129,7 +2135,7 @@ void alto2_cpu_device::f2_recno_1()
 void alto2_cpu_device::f2_xfrdat_1()
 {
 	UINT16 r = GET_KADR_NOXFER(m_dsk.kadr) ? 0 : 1;
-	UINT16 init = INIT ? 037 : 0;
+	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 	LOG((LOG_DISK,1,"	XFRDAT; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
 	m_dsk.wdinit0 = 0;
@@ -2144,7 +2150,7 @@ void alto2_cpu_device::f2_swrnrdy_1()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	UINT16 r = dhd ? dhd->get_seek_read_write_0() : 1;
-	UINT16 init = INIT ? 037 : 0;
+	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	LOG((LOG_DISK,1,"	SWRNRDY; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
@@ -2159,7 +2165,7 @@ void alto2_cpu_device::f2_swrnrdy_1()
 void alto2_cpu_device::f2_nfer_1()
 {
 	UINT16 r = m_dsk.kfer ? 0 : 1;
-	UINT16 init = INIT ? 037 : 0;
+	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	LOG((LOG_DISK,1,"	NFER; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
@@ -2188,7 +2194,7 @@ void alto2_cpu_device::f2_nfer_1()
 void alto2_cpu_device::f2_strobon_1()
 {
 	UINT16 r = m_dsk.strobe;
-	UINT16 init = INIT ? 037 : 0;
+	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	LOG((LOG_DISK,2,"	STROBON; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
 	m_next2 |= r | init;
@@ -2361,10 +2367,11 @@ void alto2_cpu_device::init_disk()
 #endif
 
 	m_dsk.strobon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_strobon),this));
-	m_dsk.strobon_timer->adjust(attotime::from_nsec(TW_STROBON), (1<<1));
+	m_dsk.strobon_timer->reset();
 
 	m_dsk.seclate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_seclate),this));
-	m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);
+	// m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);
+	m_dsk.seclate_timer->reset();
 
 	m_dsk.ok_to_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ok_to_run),this));
 	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(15 * ALTO2_UCYCLE), 1);

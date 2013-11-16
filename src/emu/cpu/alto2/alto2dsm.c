@@ -245,7 +245,7 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	switch (aluf) {
 	case  0: // T?: BUS
 		// this is somehow redundant and just wasting space
-		// dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS) ");
 		break;
 	case  1: //   : T
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(T) ");

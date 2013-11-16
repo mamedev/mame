@@ -139,6 +139,8 @@ void diablo_hd_device::logprintf(int level, const char* format, ...)
 
 void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *, int))
 {
+	if (m_sector_callback_cookie == cookie && m_sector_callback == callback)
+		return;
 	LOG_DRIVE((0,"[DHD] %s cookie=%p callback=%p\n", __FUNCTION__, cookie, callback));
 	m_sector_callback_cookie = cookie;
 	m_sector_callback = callback;
@@ -982,22 +984,16 @@ void diablo_hd_device::select(int unit, int head)
 	}
 
 	if (m_image) {
-		/* it is ready */
-		m_ready_0 = 0;
-		/* and can take seek/read/write commands */
-		m_s_r_w_0 = 0;
-		/* address acknowledge (?) */
-		m_addx_acknowledge_0 = 0;
-		/* clear log address interlock (?) */
-		m_log_addx_interlock_0 = 1;
+		m_ready_0 = 0;					// it is ready
+		m_s_r_w_0 = 0;					// and can take seek/read/write commands
+		m_addx_acknowledge_0 = 0;		// assert address acknowledge (?)
+		m_log_addx_interlock_0 = 1;		// deassert log address interlock (?)
 		LOG_DRIVE((1,"[DHD]	%s: UNIT select %d ready\n", __FUNCTION__, unit));
 	} else {
-		/* it is not ready (?) */
-		m_ready_0 = 1;
-		/* can't take seek/read/write commands (?) */
-		m_s_r_w_0 = 1;
-		/* address acknowledge (?) */
-		m_addx_acknowledge_0 = 0;
+		m_ready_0 = 1;					// it is not ready (?)
+		m_s_r_w_0 = 1;					// can't take seek/read/write commands (?)
+		m_addx_acknowledge_0 = 0;		// assert address acknowledge (?)
+		m_log_addx_interlock_0 = 1;		// deassert log address interlock (?)
 		LOG_DRIVE((1,"[DHD]	%s: UNIT select %d not ready (no image)\n", __FUNCTION__, unit));
 	}
 	read_sector();

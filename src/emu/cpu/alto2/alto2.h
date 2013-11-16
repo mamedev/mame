@@ -1080,8 +1080,8 @@ private:
 	void fn_f2_bad_0();								//! f2 dummy early function
 	void fn_f2_bad_1();								//! f2 dummy late function
 
-	UINT16 bank_reg_r(UINT32 address);				//!< read bank register in memory mapped I/O range
-	void bank_reg_w(UINT32 address, UINT16 data);	//!< write bank register in memory mapped I/O range
+	DECLARE_READ16_MEMBER( bank_reg_r );			//!< read bank register in memory mapped I/O range
+	DECLARE_WRITE16_MEMBER( bank_reg_w );			//!< write bank register in memory mapped I/O range
 
 	void bs_read_r_0();								//!< bs_read_r early: drive bus by R register
 	void bs_load_r_0();								//!< bs_load_r early: load R places 0 on the BUS
@@ -1289,12 +1289,12 @@ private:
 		UINT16 utilin;			//!< the UTILIN port at 0177030 to 0177033 (same value on all addresses)
 	}	m_hw;
 
-	UINT16 utilin_r(UINT32 addr);				//!< read an UTILIN address
-	UINT16 utilout_r(UINT32 addr);				//!< read the UTILOUT address
-	void utilout_w(UINT32 addr, UINT16 data);	//!< write the UTILOUT address
-	UINT16 xbus_r(UINT32 addr);					//!< read an XBUS address
-	void xbus_w(UINT32 addr, UINT16 data);		//!< write an XBUS address (?)
-	void init_hardware();						//!< initialize miscellaneous hardware
+	DECLARE_READ16_MEMBER( utilin_r );			//!< read an UTILIN address
+	DECLARE_READ16_MEMBER( utilout_r );			//!< read the UTILOUT address
+	DECLARE_WRITE16_MEMBER( utilout_w );		//!< write the UTILOUT address
+	DECLARE_READ16_MEMBER( xbus_r );			//!< read an XBUS address
+	DECLARE_WRITE16_MEMBER( xbus_w );			//!< write an XBUS address (?)
+	void init_hw();								//!< initialize miscellaneous hardware
 
 	// ************************************************
 	// keyboard stuff
@@ -1303,7 +1303,7 @@ private:
 		UINT16 bootkey;							//!< boot key - key code pressed before power on
 		UINT16 matrix[4];						//!< a bit map of the keys pressed (ioports ROW0 ... ROW3)
 	}	m_kbd;
-	UINT16 kbd_ad_r(UINT32 addr);				//!< read the keyboard matrix
+	DECLARE_READ16_MEMBER( kbd_ad_r );			//!< read the keyboard matrix
 	void init_kbd(UINT16 bootkey = 0177777);	//!< initialize the keyboard hardware, optinally set the boot key
 
 	// ************************************************
@@ -1847,32 +1847,20 @@ private:
 		return (ALTO2_MEM_NONE == m_mem.access ? false : cycle() < m_mem.cycle+2);
 	}
 
-	//! memory mapped I/O read functions - FIXME: use MAME memory handlers for AS_IO
-	a2io_rd mmio_read_fn[ALTO2_IO_PAGE_SIZE];
-
-	//! memory mapped I/O write functions - FIXME: use MAME memory handlers for AS_IO
-	a2io_wr mmio_write_fn[ALTO2_IO_PAGE_SIZE];
-
-	//! catch unmapped memory mapped I/O reads
-	UINT16 bad_mmio_read_fn(UINT32 address);
-
-	//! catch unmapped memory mapped I/O writes
-	void bad_mmio_write_fn(UINT32 address, UINT16 data);
-
 	//! memory error address register read
-	UINT16 mear_r(UINT32 address);
+	DECLARE_READ16_MEMBER( mear_r );
 
 	//! memory error status register read
-	UINT16 mesr_r(UINT32 address);
+	DECLARE_READ16_MEMBER( mesr_r );
 
 	//! memory error status register write (clear)
-	void mesr_w(UINT32 address, UINT16 data);
+	DECLARE_WRITE16_MEMBER( mesr_w );
 
 	//! memory error control register read
-	UINT16 mecr_r(UINT32 address);
+	DECLARE_READ16_MEMBER( mecr_r );
 
 	//! memory error control register write
-	void mecr_w(UINT32 address, UINT16 data);
+	DECLARE_WRITE16_MEMBER( mecr_w );
 
 	//! read or write a memory double-word and caluclate its Hamming code
 	UINT32 hamming_code(int write, UINT32 dw_addr, UINT32 dw_data);
@@ -1885,9 +1873,6 @@ private:
 
 	//! write memory or memory mapped I/O from md to the address in mar
 	void write_mem(UINT16 data);
-
-	//! install read and/or write memory mapped I/O handler(s) for a range first to last
-	void install_mmio_fn(int first, int last, a2io_rd rfn, a2io_wr wfn);
 
 	//! debugger interface to read memory
 	UINT16 debug_read_mem(UINT32 addr);
@@ -2089,13 +2074,6 @@ private:
 	// disk word task
 	void f1_kwd_block_0(void);
 	void init_kwd(int task);						//!< 016 initialize disk word task
-
-	void init_001(int task);						//!< 001 initialize unused task
-	void init_002(int task);						//!< 002 initialize unused task
-	void init_003(int task);						//!< 003 initialize unused task
-	void init_005(int task);						//!< 005 initialize unused task
-	void init_006(int task);						//!< 006 initialize unused task
-	void init_017(int task);						//!< 017 initialize unused task
 };
 
 extern const device_type ALTO2;

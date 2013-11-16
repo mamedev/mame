@@ -482,32 +482,6 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 }
 #endif	/* ALTO2_HAMMING_CHECK */
 
-
-/**
- * @brief catch unmapped memory mapped I/O reads
- *
- * @param address address that is read from
- */
-UINT16 alto2_cpu_device::bad_mmio_read_fn(UINT32 address)
-{
-	LOG((LOG_MEM,1,"	stray I/O read of address %#o\n", address));
-	(void)address;
-	return 0177777;
-}
-
-/**
- * @brief catch unmapped memory mapped I/O writes
- *
- * @param address address that is written to
- * @param data data that is written
- */
-void alto2_cpu_device::bad_mmio_write_fn(UINT32 address, UINT16 data)
-{
-	LOG((LOG_MEM,1,"	stray I/O write of address %06o, data %#o\n", address, data));
-	(void)address;
-	(void)data;
-}
-
 /**
  * @brief memory error address register read
  *
@@ -517,7 +491,7 @@ void alto2_cpu_device::bad_mmio_write_fn(UINT32 address, UINT16 data)
  * memory access. Note that MEAR is set whenever an error of
  * _any kind_ (single-bit or double-bit) is detected.
  */
-UINT16 alto2_cpu_device::mear_r(UINT32 address)
+READ16_MEMBER( alto2_cpu_device::mear_r )
 {
 	int data = m_mem.error ? m_mem.mear : m_mem.mar;
 	LOG((LOG_MEM,2,"	MEAR read %07o\n", data));
@@ -540,10 +514,9 @@ UINT16 alto2_cpu_device::mear_r(UINT32 address)
  * MESR[14-15]	Bank number in which error occured
  * </PRE>
  */
-UINT16 alto2_cpu_device::mesr_r(UINT32 address)
+READ16_MEMBER( alto2_cpu_device::mesr_r )
 {
 	UINT16 data = m_mem.mesr ^ 0177777;
-	(void)address;
 	LOG((LOG_MEM,2,"	MESR read %07o\n", data));
 	LOG((LOG_MEM,6,"		Hamming code read    : %#o\n", GET_MESR_HAMMING(data)));
 	LOG((LOG_MEM,6,"		Parity error         : %o\n", GET_MESR_PERR(data)));
@@ -557,7 +530,7 @@ UINT16 alto2_cpu_device::mesr_r(UINT32 address)
 	return data;
 }
 
-void alto2_cpu_device::mesr_w(UINT32 address, UINT16 data)
+WRITE16_MEMBER( alto2_cpu_device::mesr_w )
 {
 	LOG((LOG_MEM,2,"	MESR write %07o (clear MESR; was %07o)\n", data, m_mem.mesr));
 	m_mem.mesr = 0;		// set all bits to 0
@@ -586,10 +559,9 @@ void alto2_cpu_device::mesr_w(UINT32 address, UINT16 data)
  * MECR[15]	Spare
  * </PRE>
  */
-void alto2_cpu_device::mecr_w(UINT32 address, UINT16 data)
+WRITE16_MEMBER( alto2_cpu_device::mecr_w )
 {
 	m_mem.mecr = data ^ 0177777;
-	(void)address;
 	A2_PUT16(m_mem.mecr,16, 0, 3,0);
 	A2_PUT16(m_mem.mecr,16,15,15,0);
 	LOG((LOG_MEM,2,"	MECR write %07o\n", data));
@@ -603,7 +575,7 @@ void alto2_cpu_device::mecr_w(UINT32 address, UINT16 data)
 /**
  * @brief memory error control register read
  */
-UINT16 alto2_cpu_device::mecr_r(UINT32 address)
+READ16_MEMBER( alto2_cpu_device::mecr_r )
 {
 	UINT16 data = m_mem.mecr ^ 0177777;
 	/* set all spare bits */
@@ -666,9 +638,7 @@ UINT16 alto2_cpu_device::read_mem()
 
 	base_addr = m_mem.mar & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE) {
-		offs_t offset = base_addr - ALTO2_IO_PAGE_BASE;
-		if (mmio_read_fn[offset])
-			m_mem.md = ((*this).*mmio_read_fn[offset])(base_addr);
+		m_mem.md = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
 		LOG((LOG_MEM,6,"	MD = MMIO[%#o] (%#o)\n", base_addr, m_mem.md));
 		m_mem.access = ALTO2_MEM_NONE;
 #if	ALTO2_DEBUG
@@ -722,10 +692,8 @@ void alto2_cpu_device::write_mem(UINT16 data)
 
 	base_addr = m_mem.mar & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE) {
-		offs_t offset = base_addr - ALTO2_IO_PAGE_BASE;
+		m_iomem->write_word(m_iomem->address_to_byte(base_addr), m_mem.md);
 		LOG((LOG_MEM,6, "	MMIO[%#o] = MD (%#o)\n", base_addr, m_mem.md));
-		if (mmio_write_fn[offset])
-			((*this).*mmio_write_fn[offset])(base_addr, m_mem.md);
 		m_mem.access = ALTO2_MEM_NONE;
 #if	ALTO2_DEBUG
 		watch_write(m_mem.mar, m_mem.md);
@@ -757,30 +725,6 @@ void alto2_cpu_device::write_mem(UINT16 data)
 }
 
 /**
- * @brief install read and/or writte memory mapped I/O handler(s) for a range first to last
- *
- * This function fatal()s, if you specify a bad address for first and/or last.
- *
- * @param first first memory address to map
- * @param last last memory address to map
- * @param rfn pointer to a read function of type 'UINT16 (*read)(UINT32)'
- * @param wfn pointer to a write function of type 'void (*write)(UINT32,UINT16)'
- */
-void alto2_cpu_device::install_mmio_fn(int first, int last, a2io_rd rfn, a2io_wr wfn)
-{
-	int address;
-
-	if (first <= ALTO2_IO_PAGE_BASE || last >= (ALTO2_IO_PAGE_BASE + ALTO2_IO_PAGE_SIZE) || first > last) {
-		fatal(3, "internal error - bad memory-mapped I/O address\n");
-	}
-
-	for (address = first; address <= last; address++) {
-		mmio_read_fn[address - ALTO2_IO_PAGE_BASE] = rfn ? rfn : &alto2_cpu_device::bad_mmio_read_fn;
-		mmio_write_fn[address - ALTO2_IO_PAGE_BASE] = wfn ? wfn : &alto2_cpu_device::bad_mmio_write_fn;
-	}
-}
-
-/**
  * @brief debugger interface to read memory
  *
  * @param addr address to read
@@ -791,9 +735,7 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 	int base_addr = addr & 0177777;
 	int data = 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE) {
-		offs_t offset = base_addr - ALTO2_IO_PAGE_BASE;
-		if (mmio_read_fn[offset])
-			data = ((*this).*mmio_read_fn[offset])(addr);
+		data = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
 	} else {
 		data = (addr & ALTO2_MEM_ODD) ? GET_ODD(m_mem.ram[addr/2]) : GET_EVEN(m_mem.ram[addr/2]);
 	}
@@ -810,9 +752,7 @@ void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
 {
 	int base_addr = addr & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE) {
-		offs_t offset = base_addr - ALTO2_IO_PAGE_BASE;
-		if (mmio_write_fn[offset])
-			((*this).*mmio_write_fn[offset])(addr, data);
+		m_iomem->write_word(m_iomem->address_to_byte(base_addr), data);
 	} else if (addr & ALTO2_MEM_ODD) {
 		PUT_ODD(m_mem.ram[addr/2], data);
 	} else {
@@ -831,11 +771,6 @@ void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
 void alto2_cpu_device::init_memory()
 {
 	memset(&m_mem, 0, sizeof(m_mem));
-
-	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_SIZE; addr++) {
-		mmio_read_fn[addr] = &alto2_cpu_device::bad_mmio_read_fn;
-		mmio_write_fn[addr] = &alto2_cpu_device::bad_mmio_write_fn;
-	}
 
 	// allocate 128KB of main memory
 	m_mem.ram = global_alloc_array(UINT32, sizeof(UINT16)*ALTO2_RAM_SIZE);
@@ -888,9 +823,6 @@ void alto2_cpu_device::init_memory()
 	 *	D3		& MISYSCLK -> LOADERC
 	 * </PRE>
 	 */
-	install_mmio_fn(0177024, 0177024, &alto2_cpu_device::mear_r, 0);
-	install_mmio_fn(0177025, 0177025, &alto2_cpu_device::mesr_r, &alto2_cpu_device::mesr_w);
-	install_mmio_fn(0177026, 0177026, &alto2_cpu_device::mecr_r, &alto2_cpu_device::mecr_w);
 
 #if	ALTO2_HAMMING_CHECK
 	// Initialize the hamming codes and parity bit

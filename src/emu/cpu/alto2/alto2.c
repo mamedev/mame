@@ -32,9 +32,16 @@ ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( iomem_map, 16, alto2_cpu_device )
 	AM_RANGE(0,                          ALTO2_IO_PAGE_BASE - 1)            AM_READWRITE( ioram_r, ioram_w )
-	AM_RANGE(ALTO2_IO_PAGE_BASE,         0177777)                           AM_READWRITE( mmio_r,  mmio_w  )
-	AM_RANGE(0200000,                    0200000+ALTO2_IO_PAGE_BASE - 1)    AM_READWRITE( ioram_r, ioram_w )
-	AM_RANGE(0200000+ALTO2_IO_PAGE_BASE, 0377777)                           AM_READWRITE( mmio_r,  mmio_w  )
+	AM_RANGE(ALTO2_IO_PAGE_BASE,         0177777)                           AM_NOP
+	AM_RANGE(0177016,                    0177016)                           AM_READWRITE( utilout_r, utilout_w )
+	AM_RANGE(0177020,                    0177023)                           AM_READWRITE( xbus_r,  xbus_w )
+	AM_RANGE(0177024,                    0177024)                           AM_READ     ( mear_r )
+	AM_RANGE(0177025,                    0177025)                           AM_READWRITE( mesr_r,  mesr_w  )
+	AM_RANGE(0177026,                    0177026)                           AM_READWRITE( mecr_r,  mecr_w  )
+	AM_RANGE(0177030,                    0177033)                           AM_READ     ( utilin_r )
+	AM_RANGE(0177034,                    0177037)                           AM_READ     ( kbd_ad_r )
+	AM_RANGE(0177040,                    0177057)                           AM_READWRITE( bank_reg_r, bank_reg_w )
+	AM_RANGE(0200000,                    0377777)                           AM_READWRITE( ioram_r, ioram_w )
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -44,7 +51,7 @@ ADDRESS_MAP_END
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
-	m_log_types(LOG_CPU|LOG_DISK|LOG_KSEC|LOG_KWD),
+	m_log_types(LOG_DISK|LOG_KSEC|LOG_KWD|LOG_KBD),
 	m_log_level(6),
 	m_log_newline(true),
 #endif
@@ -120,8 +127,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_disp_a63(0),
 	m_disp_a66(0),
 	m_mem(),
-	mmio_read_fn(),
-	mmio_write_fn(),
 	m_emu(),
 	m_ether_a41(0),
 	m_ether_a42(0),
@@ -1220,21 +1225,6 @@ WRITE16_MEMBER( alto2_cpu_device::ioram_w )
 		PUT_EVEN(m_mem.ram[dword_addr], data);
 }
 
-//! read memory mapped i/o
-READ16_MEMBER ( alto2_cpu_device::mmio_r )
-{
-	if (mmio_read_fn[offset])
-		return ((*this).*mmio_read_fn[offset])(offset);
-	return 0177777;
-}
-
-//! write memory mapped i/o
-WRITE16_MEMBER( alto2_cpu_device::mmio_w )
-{
-	if (mmio_write_fn[offset])
-		return ((*this).*mmio_write_fn[offset])(offset, data);
-}
-
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -1514,9 +1504,9 @@ void alto2_cpu_device::fn_f2_bad_1()
  *
  * The bank registers are stored in a 16x4-bit RAM 74S189.
  */
-UINT16 alto2_cpu_device::bank_reg_r(UINT32 address)
+READ16_MEMBER( alto2_cpu_device::bank_reg_r )
 {
-	int task = address & 017;
+	int task = offset & 017;
 	int bank = m_bank_reg[task] | 0177760;
 	return bank;
 }
@@ -1526,9 +1516,9 @@ UINT16 alto2_cpu_device::bank_reg_r(UINT32 address)
  *
  * The bank registers are stored in a 16x4-bit RAM 74S189.
  */
-void alto2_cpu_device::bank_reg_w(UINT32 address, UINT16 data)
+WRITE16_MEMBER( alto2_cpu_device::bank_reg_w )
 {
-	int task = address & 017;
+	int task = offset & 017;
 	m_bank_reg[task] = data & 017;
 	LOG((LOG_CPU,0,"	write bank[%02o]=%#o normal:%o extended:%o (%s)\n",
 		task, data,
@@ -3067,19 +3057,14 @@ void alto2_cpu_device::hard_reset()
 		set_f2(task, f2_task_17,		&alto2_cpu_device::fn_f2_bad_0,	&alto2_cpu_device::fn_f2_bad_1);	// f2_task_10 to f2_task_17 are task specific
 	}
 
+	init_memory();
 	init_disk();
 	init_disp();
-	init_memory();
-	init_hardware();
 	init_kbd();
+	init_hw();
 
 	init_emu(task_emu);
-	init_001(task_1);
-	init_002(task_2);
-	init_003(task_3);
 	init_ksec(task_ksec);
-	init_005(task_5);
-	init_006(task_6);
 	init_ether(task_ether);
 	init_mrt(task_mrt);
 	init_dwt(task_dwt);
@@ -3088,9 +3073,6 @@ void alto2_cpu_device::hard_reset()
 	init_dvt(task_dvt);
 	init_part(task_part);
 	init_kwd(task_kwd);
-	init_017(task_17);
-
-	install_mmio_fn(0177740, 0177757, &alto2_cpu_device::bank_reg_r, &alto2_cpu_device::bank_reg_w);
 
 	m_dsp_time = 0;			// reset the display state machine values
 	m_dsp_state = 020;
@@ -3116,34 +3098,4 @@ int alto2_cpu_device::soft_reset()
 	m_dsp_state = 020;
 
 	return m_next_task;		// return next task (?)
-}
-
-void alto2_cpu_device::init_001(int task)
-{
-
-}
-
-void alto2_cpu_device::init_002(int task)
-{
-
-}
-
-void alto2_cpu_device::init_003(int task)
-{
-
-}
-
-void alto2_cpu_device::init_005(int task)
-{
-
-}
-
-void alto2_cpu_device::init_006(int task)
-{
-
-}
-
-void alto2_cpu_device::init_017(int task)
-{
-
 }
