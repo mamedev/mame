@@ -346,6 +346,8 @@ public:
 	DECLARE_WRITE32_MEMBER( svg_latch_arm_w );
 	void svg_basic_init();
 	void pgm_create_dummy_internal_arm_region(int size);
+	void pgm_patch_external_arm_rom_jumptable_theglada(int base);
+	void pgm_create_dummy_internal_arm_region_theglad(void);
 	void svg_latch_init();
 	DECLARE_READ32_MEMBER( dmnfrnt_speedup_r );
 	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );

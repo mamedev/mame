@@ -7,7 +7,7 @@
  used by
 
  Demon Front (dmnfrnt) *1
- The Gladiator (theglad)
+ The Gladiator (theglad) *2
  Spectral vs. Generation (svg)
  Happy 6-in-1 (happy6)
  The Killing Blade Plus (killbldp) *2
@@ -15,7 +15,8 @@
  None of these work at all, with the following exception.
 
  *1 - We bypass the internal ROM entirely! Game doesn't jump back
- *2 - Partial dump of the internal ROM is used, but 'Execute Only' region is missing
+ *2 - Partial dump of internal ROM is used (currently only dumped from a Japan PCB, patched for other types) The missing code from the EO area is replaced with our own fake code with the same function
+ *2 - Complete dump of IGS027A ROM sourced from a bootleg, looks to be legitimate.
 
  ----
 
@@ -33,6 +34,8 @@
 
  55857G is also used on the Cave single board PGM systems, but in those
  cases it behaves like the 55857E (pgmprot1.c)
+
+ Most of these games run almost entirely on the ARM, simply passing display lists back to the 68k to process and reading inputs from the 68k into the shared RAM.
 
  ***********************************************************************/
 
@@ -230,8 +233,6 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region(int size)
 	temp16[(0x0092)/2] = 0x1000;
 }
 
-
-
 void pgm_arm_type3_state::svg_latch_init()
 {
 	m_svg_latchdata_68k_w = 0;
@@ -250,13 +251,8 @@ READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
 }
 
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
+void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(void)
 {
-	svg_basic_init();
-	pgm_theglad_decrypt(machine());
-	svg_latch_init();
-//	pgm_create_dummy_internal_arm_region(0x188);
-
 	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
 
 	int i;
@@ -266,11 +262,6 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 		temp16[i+1] = 0xEAFF;
 
 	}
-
-	 
-
-
-
 
 	// the interrupt code appears to be at 0x08000010
 	// so point the FIQ vector to jump there, the actual internal EO area code
@@ -470,18 +461,23 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	base = 0x184;
 	temp16[(base) /2] = 0x105c; base += 2;
 	temp16[(base) /2] = 0xE59F; base += 2;
+}
 
+DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
+{
+	svg_basic_init();
+	pgm_theglad_decrypt(machine());
+	svg_latch_init();
+//	pgm_create_dummy_internal_arm_region(0x188);
 
-
+	pgm_create_dummy_internal_arm_region_theglad();
 	
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state, theglada)
+void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base)
 {
-	DRIVER_INIT_CALL(theglad);
-
 	// we don't have the correct internal ROM for this version, so insead we use the one we have and patch the jump table in the external ROM
 	UINT32 subroutine_addresses[] =
 	{
@@ -504,7 +500,6 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state, theglada)
 		0x2BF4, 0x2CD8, 0x2E2C
 	};
 	UINT16 *extprot = (UINT16 *)memregion("user1")->base();
-	int base = 0x82078;
 	/*
 	0x00C8,0x00B4,0x00DC,0x011C,0x0160,0x02DC,0x0330,0x033C,
 	0x0348,0x0354,0x0398,0x03A8,0x0410,0x0454,0x0480,0x059C,
@@ -534,7 +529,13 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state, theglada)
 		base += 4;
 //		printf("%04x (%08x)\n", subroutine_addresses[i], addr );
 	}
+}
 
+DRIVER_INIT_MEMBER(pgm_arm_type3_state, theglada)
+{
+	DRIVER_INIT_CALL(theglad);
+
+	pgm_patch_external_arm_rom_jumptable_theglada(0x82078);
 	
 }
 
@@ -647,5 +648,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
 	svg_basic_init();
 	pgm_happy6_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region(0x4000);
+	pgm_create_dummy_internal_arm_region_theglad();
+	pgm_patch_external_arm_rom_jumptable_theglada(0x5f1c0);
+	
 }
