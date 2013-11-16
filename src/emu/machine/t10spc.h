@@ -12,6 +12,7 @@ t10spc.h
 class t10spc
 {
 public:
+	virtual ~t10spc() {};
 	virtual void SetDevice( void *device ) = 0;
 	virtual void GetDevice( void **device ) = 0;
 
