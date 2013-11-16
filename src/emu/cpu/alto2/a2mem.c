@@ -494,7 +494,9 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 READ16_MEMBER( alto2_cpu_device::mear_r )
 {
 	int data = m_mem.error ? m_mem.mear : m_mem.mar;
-	LOG((LOG_MEM,2,"	MEAR read %07o\n", data));
+	if (!space.debugger_access()) {
+		LOG((LOG_MEM,2,"	MEAR read %07o\n", data));
+	}
 	return data;
 }
 
@@ -517,22 +519,26 @@ READ16_MEMBER( alto2_cpu_device::mear_r )
 READ16_MEMBER( alto2_cpu_device::mesr_r )
 {
 	UINT16 data = m_mem.mesr ^ 0177777;
-	LOG((LOG_MEM,2,"	MESR read %07o\n", data));
-	LOG((LOG_MEM,6,"		Hamming code read    : %#o\n", GET_MESR_HAMMING(data)));
-	LOG((LOG_MEM,6,"		Parity error         : %o\n", GET_MESR_PERR(data)));
-	LOG((LOG_MEM,6,"		Memory parity bit    : %o\n", GET_MESR_PARITY(data)));
+	if (!space.debugger_access()) {
+		LOG((LOG_MEM,2,"	MESR read %07o\n", data));
+		LOG((LOG_MEM,6,"		Hamming code read    : %#o\n", GET_MESR_HAMMING(data)));
+		LOG((LOG_MEM,6,"		Parity error         : %o\n", GET_MESR_PERR(data)));
+		LOG((LOG_MEM,6,"		Memory parity bit    : %o\n", GET_MESR_PARITY(data)));
 #if	ALTO2_HAMMING_CHECK
-	LOG((LOG_MEM,6,"		Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(data), hamming_lut[GET_MESR_SYNDROME(data)]));
+		LOG((LOG_MEM,6,"		Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(data), hamming_lut[GET_MESR_SYNDROME(data)]));
 #else
-	LOG((LOG_MEM,6,"		Hamming syndrome     : %#o\n", GET_MESR_SYNDROME(data)));
+		LOG((LOG_MEM,6,"		Hamming syndrome     : %#o\n", GET_MESR_SYNDROME(data)));
 #endif
-	LOG((LOG_MEM,6,"		Memory bank          : %#o\n", GET_MESR_BANK(data)));
+		LOG((LOG_MEM,6,"		Memory bank          : %#o\n", GET_MESR_BANK(data)));
+	}
 	return data;
 }
 
 WRITE16_MEMBER( alto2_cpu_device::mesr_w )
 {
-	LOG((LOG_MEM,2,"	MESR write %07o (clear MESR; was %07o)\n", data, m_mem.mesr));
+	if (!space.debugger_access()) {
+		LOG((LOG_MEM,2,"	MESR write %07o (clear MESR; was %07o)\n", data, m_mem.mesr));
+	}
 	m_mem.mesr = 0;		// set all bits to 0
 	m_mem.error = 0;	// reset the error flag
 	m_task_wakeup &= ~(1 << task_part);	// clear the task wakeup for the parity error task
@@ -564,12 +570,14 @@ WRITE16_MEMBER( alto2_cpu_device::mecr_w )
 	m_mem.mecr = data ^ 0177777;
 	A2_PUT16(m_mem.mecr,16, 0, 3,0);
 	A2_PUT16(m_mem.mecr,16,15,15,0);
-	LOG((LOG_MEM,2,"	MECR write %07o\n", data));
-	LOG((LOG_MEM,6,"		Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));
-	LOG((LOG_MEM,6,"		Test mode            : %s\n", GET_MECR_TEST_MODE(m_mem.mecr) ? "on" : "off"));
-	LOG((LOG_MEM,6,"		INT on single-bit err: %s\n", GET_MECR_INT_SBERR(m_mem.mecr) ? "on" : "off"));
-	LOG((LOG_MEM,6,"		INT on double-bit err: %s\n", GET_MECR_INT_DBERR(m_mem.mecr) ? "on" : "off"));
-	LOG((LOG_MEM,6,"		Error correction     : %s\n", GET_MECR_ERRCORR(m_mem.mecr) ? "off" : "on"));
+	if (!space.debugger_access()) {
+		LOG((LOG_MEM,2,"	MECR write %07o\n", data));
+		LOG((LOG_MEM,6,"		Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));
+		LOG((LOG_MEM,6,"		Test mode            : %s\n", GET_MECR_TEST_MODE(m_mem.mecr) ? "on" : "off"));
+		LOG((LOG_MEM,6,"		INT on single-bit err: %s\n", GET_MECR_INT_SBERR(m_mem.mecr) ? "on" : "off"));
+		LOG((LOG_MEM,6,"		INT on double-bit err: %s\n", GET_MECR_INT_DBERR(m_mem.mecr) ? "on" : "off"));
+		LOG((LOG_MEM,6,"		Error correction     : %s\n", GET_MECR_ERRCORR(m_mem.mecr) ? "off" : "on"));
+	}
 }
 
 /**
@@ -579,12 +587,14 @@ READ16_MEMBER( alto2_cpu_device::mecr_r )
 {
 	UINT16 data = m_mem.mecr ^ 0177777;
 	/* set all spare bits */
-	LOG((LOG_MEM,2,"	MECR read %07o\n", data));
-	LOG((LOG_MEM,6,"		Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(data)));
-	LOG((LOG_MEM,6,"		Test mode            : %s\n", GET_MECR_TEST_MODE(data) ? "on" : "off"));
-	LOG((LOG_MEM,6,"		INT on single-bit err: %s\n", GET_MECR_INT_SBERR(data) ? "on" : "off"));
-	LOG((LOG_MEM,6,"		INT on double-bit err: %s\n", GET_MECR_INT_DBERR(data) ? "on" : "off"));
-	LOG((LOG_MEM,6,"		Error correction     : %s\n", GET_MECR_ERRCORR(data) ? "off" : "on"));
+	if (!space.debugger_access()) {
+		LOG((LOG_MEM,2,"	MECR read %07o\n", data));
+		LOG((LOG_MEM,6,"		Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(data)));
+		LOG((LOG_MEM,6,"		Test mode            : %s\n", GET_MECR_TEST_MODE(data) ? "on" : "off"));
+		LOG((LOG_MEM,6,"		INT on single-bit err: %s\n", GET_MECR_INT_SBERR(data) ? "on" : "off"));
+		LOG((LOG_MEM,6,"		INT on double-bit err: %s\n", GET_MECR_INT_DBERR(data) ? "on" : "off"));
+		LOG((LOG_MEM,6,"		Error correction     : %s\n", GET_MECR_ERRCORR(data) ? "off" : "on"));
+	}
 	return data;
 }
 

@@ -1080,6 +1080,9 @@ private:
 	void fn_f2_bad_0();								//! f2 dummy early function
 	void fn_f2_bad_1();								//! f2 dummy late function
 
+	DECLARE_READ16_MEMBER( noop_r );				//!< read open bus (0177777)
+	DECLARE_WRITE16_MEMBER( noop_w );				//!< write open bus
+
 	DECLARE_READ16_MEMBER( bank_reg_r );			//!< read bank register in memory mapped I/O range
 	DECLARE_WRITE16_MEMBER( bank_reg_w );			//!< write bank register in memory mapped I/O range
 

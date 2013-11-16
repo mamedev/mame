@@ -32,15 +32,50 @@ ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( iomem_map, 16, alto2_cpu_device )
 	AM_RANGE(0,                          ALTO2_IO_PAGE_BASE - 1)            AM_READWRITE( ioram_r, ioram_w )
-	AM_RANGE(ALTO2_IO_PAGE_BASE,         0177777)                           AM_NOP
-	AM_RANGE(0177016,                    0177016)                           AM_READWRITE( utilout_r, utilout_w )
-	AM_RANGE(0177020,                    0177023)                           AM_READWRITE( xbus_r,  xbus_w )
-	AM_RANGE(0177024,                    0177024)                           AM_READ     ( mear_r )
-	AM_RANGE(0177025,                    0177025)                           AM_READWRITE( mesr_r,  mesr_w  )
-	AM_RANGE(0177026,                    0177026)                           AM_READWRITE( mecr_r,  mecr_w  )
-	AM_RANGE(0177030,                    0177033)                           AM_READ     ( utilin_r )
-	AM_RANGE(0177034,                    0177037)                           AM_READ     ( kbd_ad_r )
-	AM_RANGE(0177040,                    0177057)                           AM_READWRITE( bank_reg_r, bank_reg_w )
+	// page 0376
+	AM_RANGE(0177000,                    0177015)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177016,                    0177016)                           AM_READWRITE( utilout_r, utilout_w )    // UTILOUT register
+	AM_RANGE(0177017,                    0177017)                           AM_READWRITE( noop_r, noop_w )          // unused range
+	AM_RANGE(0177020,                    0177023)                           AM_READWRITE( xbus_r,  xbus_w )         // XBUS[0-3] registers
+	AM_RANGE(0177024,                    0177024)                           AM_READ     ( mear_r )                  // MEAR (memory error address register)
+	AM_RANGE(0177025,                    0177025)                           AM_READWRITE( mesr_r,  mesr_w  )        // MESR (memory error status register)
+	AM_RANGE(0177026,                    0177026)                           AM_READWRITE( mecr_r,  mecr_w  )        // MECR (memory error control register)
+	AM_RANGE(0177027,                    0177027)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177030,                    0177033)                           AM_READ     ( utilin_r )                // UTILIN register
+	AM_RANGE(0177034,                    0177037)                           AM_READ     ( kbd_ad_r )                // KBD_AD[0-3] matrix
+	AM_RANGE(0177040,                    0177057)                           AM_READWRITE( bank_reg_r, bank_reg_w )  // BANK[0-17] registers (4 bit)
+	AM_RANGE(0177060,                    0177077)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177100,                    0177101)                           AM_READWRITE( noop_r, noop_w )          // { Summagraphics tablet X, Y }
+	AM_RANGE(0177102,                    0177137)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177140,                    0177157)                           AM_READWRITE( noop_r, noop_w )          // { Organ keyboard }
+	AM_RANGE(0177160,                    0177177)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177200,                    0177204)                           AM_READWRITE( noop_r, noop_w )          // { PROM programmer }
+	AM_RANGE(0177205,                    0177233)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177234,                    0177237)                           AM_READWRITE( noop_r, noop_w )          // { Experimental cursor control }
+	AM_RANGE(0177240,                    0177257)                           AM_READWRITE( noop_r, noop_w )          // { Alto-II debugger }
+//  AM_RANGE(0177244,                    0177247)                           AM_READWRITE( noop_r, noop_w )          // { Graphics keyboard }
+	AM_RANGE(0177260,                    0177377)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	// page 0377
+//	AM_RANGE(0177400,                    0177405)                           AM_READWRITE( noop_r, noop_w )          // { Maxc2 maintenance interface }
+	AM_RANGE(0177400,                    0177400)                           AM_READWRITE( noop_r, noop_w )          // { Alto DLS input }
+	AM_RANGE(0177401,                    0177417)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177420,                    0177420)                           AM_READWRITE( noop_r, noop_w )          // { "" }
+	AM_RANGE(0177421,                    0177437)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177440,                    0177440)                           AM_READWRITE( noop_r, noop_w )          // { "" }
+	AM_RANGE(0177441,                    0177457)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177460,                    0177460)                           AM_READWRITE( noop_r, noop_w )          // { "" }
+	AM_RANGE(0177461,                    0177577)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177600,                    0177677)                           AM_READWRITE( noop_r, noop_w )          // { Alto DLS output }
+	AM_RANGE(0177700,                    0177700)                           AM_READWRITE( noop_r, noop_w )          // { EIA interface output bit }
+	AM_RANGE(0177701,                    0177701)                           AM_READWRITE( noop_r, noop_w )          // { EIA interface input bit }
+	AM_RANGE(0177702,                    0177717)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177720,                    0177737)                           AM_READWRITE( noop_r, noop_w )          // { TV camera interface }
+	AM_RANGE(0177740,                    0177763)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177764,                    0177773)                           AM_READWRITE( noop_r, noop_w )          // { Redactron tape drive }
+	AM_RANGE(0177774,                    0177775)                           AM_READWRITE( noop_r, noop_w )          // UNUSED RANGE
+	AM_RANGE(0177776,                    0177776)                           AM_READWRITE( noop_r, noop_w )          // { Digital-Analog Converter, Joystick }
+	AM_RANGE(0177777,                    0177777)                           AM_READWRITE( noop_r, noop_w )          // { Digital-Analog Converter, Joystick }
+
 	AM_RANGE(0200000,                    0377777)                           AM_READWRITE( ioram_r, ioram_w )
 ADDRESS_MAP_END
 
@@ -1497,6 +1532,85 @@ void alto2_cpu_device::fn_f2_bad_1()
 {
 	fatal(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",
 		  task_name(m_task), m_mpc, f2_name(MIR_F2(m_mir)));
+}
+
+#if	ALTO2_DEBUG
+typedef struct {
+	UINT16 first, last;
+	const char* name;
+}	memory_range_name_t;
+
+memory_range_name_t memory_range_name_table[] = {
+	{0177016, 0177017,	"UTILOUT    Printer output (Std. Hardware)"},
+	{0177020, 0177023,	"XBUS       Utility input bus (Alto II Std. Hardware)"},
+	{0177024, 0177024,	"MEAR       Memory Error Address Register (Alto II Std. Hardware)"},
+	{0177025, 0177025,	"MESR       Memory error status register (Alto II Std. Hardware)"},
+	{0177026, 0177026,  "MECR       Memory error control register (Alto II Std. Hardware)"},
+	{0177030, 0177033,	"UTILIN     Printer status, mouse, keyset (all 4 locations return same thing)"},
+	{0177034, 0177037,	"KBDAD      Undecoded keyboard (Std. Hardware)"},
+	{0177740, 0177757,	"BANKREGS   Extended memory option bank registers"},
+	{0177100, 0177100,	"-          Sumagraphics tablet X"},
+	{0177101, 0177101,	"-          Sumagraphics tablet Y"},
+	{0177140, 0177157,	"-          Organ keyboard"},
+	{0177200, 0177204,	"-          PROM programmer"},
+	{0177234, 0177237,	"-          Experimental ursor control"},
+	{0177240, 0177257,	"-          Alto II debugger"},
+	{0177244, 0177247,	"-          Graphics keyboard"},
+	{0177400, 0177405,	"-          Maxc2 maintenance interface"},
+	{0177400, 0177400,	"-          Alto DLS input (0)"},
+	{0177420, 0177420,	"-          Alto DLS input (1)"},
+	{0177440, 0177440,	"-          Alto DLS input (2)"},
+	{0177460, 0177460,	"-          Alto DLS input (3)"},
+	{0177600, 0177677,	"-          Alto DLS output"},
+	{0177700, 0177700,	"-          EIA interface output bit"},
+	{0177701, 0177701,	"EIALOC     EIA interface input bit"},
+	{0177720, 0177737,	"-          TV Camera Interface"},
+	{0177764, 0177773,	"-          Redactron tape drive"},
+	{0177776, 0177776,	"-          Digital-Analog Converter, Joystick"},
+	{0177777, 0177777,	"-          Digital-Analog Converter, Joystick"}
+};
+
+static const char* memory_range_name(offs_t offset)
+{
+	int _min = 0;
+	int _max = sizeof(memory_range_name_table) / sizeof(memory_range_name_table[0]) - 1;
+	int _mid;
+
+	offset %= ALTO2_IO_PAGE_SIZE;
+	offset += ALTO2_IO_PAGE_BASE;
+
+	/* binary search in table of unicode ranges */
+	while (_max >= _min)
+	{
+		_mid = (_min + _max) / 2;
+		if (memory_range_name_table[_mid].last < offset)
+			_min = _mid + 1;
+		else if (memory_range_name_table[_mid].first > offset)
+			_max = _mid - 1;
+		else if (memory_range_name_table[_mid].first <= offset &&
+				 memory_range_name_table[_mid].last >= offset)
+			return memory_range_name_table[_mid].name;
+	}
+	return "-          UNUSED";
+}
+
+#endif
+
+/**
+ * @brief read the open bus for unused MMIO range
+ */
+READ16_MEMBER( alto2_cpu_device::noop_r )
+{
+	LOG((LOG_CPU,0,"	MMIO rd %s\n", memory_range_name(offset)));
+	return 0177777;
+}
+
+/**
+ * @brief write nowhere for unused MMIO range
+ */
+WRITE16_MEMBER( alto2_cpu_device::noop_w )
+{
+	LOG((LOG_CPU,0,"	MMIO wr %s\n", memory_range_name(offset)));
 }
 
 /**
