@@ -31,16 +31,54 @@ const char *abc800_format::extensions() const
 }
 
 const abc800_format::format abc800_format::formats[] = {
-/*	{   //  80K 5 1/4 inch single density double sided
-		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
-		2000,  8, 40, 2, 256, {}, 1, {}, 54, 22, 0
+	// track description
+	// 28xff 6x00 fe 2x00 01 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 02 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 03 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 04 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 05 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 06 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 07 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 08 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 09 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 0a 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 0b 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 0c 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 0d 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 0e 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 0f 00 f7 11xff 6x00 fb 128xe5 f7
+	// 27xff 6x00 fe 2x00 10 00 f7 11xff 6x00 fb 128xe5 f7
+	// 117xff
+
+	{   //  80K 5 1/4 inch single density single sided
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		2000, 16, 40, 1, 128, {}, 1, {}, 27, 11, 0
 	},
 
-	{   //  160K 5 1/4 inch double density double sided
-		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000,  8, 40, 2, 256, {}, 1, {}, 54, 22, 0
+	// track description
+	// 55x4e 12x00 3xf5 fe 2x00 2x01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 02 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 03 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 04 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 05 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 06 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 07 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 08 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 09 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 0a 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 0b 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 0c 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 0d 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 0e 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 0f 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 54x4e 12x00 3xf5 fe 2x00 10 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 298x4e
+
+	{   //  160K 5 1/4 inch double density single sided
+		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
+		2000, 16, 40, 1, 256, {}, 1, {}, 54, 22, 0
 	},
-*/
+
 	// track description 
 	// 55x4e 12x00 3xf5 fe 2x00 2x01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 2x00 02 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
