@@ -155,7 +155,7 @@ private:
 	{
 	public:
 		sam_space(sam6883_device &owner);
-		void point(const sam_bank *bank, UINT16 offset, UINT16 mask = 0);
+		void point(const sam_bank *bank, UINT16 offset, UINT16 mask);
 
 	private:
 		sam6883_device &    m_owner;

@@ -152,19 +152,19 @@ void sam6883_device::configure_bank(int bank, UINT8 *memory, UINT32 memory_size,
 	switch(bank)
 	{
 		case 4:
-			m_space_FF00.point(&m_banks[4], 0x0000);
+			m_space_FF00.point(&m_banks[4], 0x0000, 0);
 			break;
 		case 5:
-			m_space_FF20.point(&m_banks[5], 0x0000);
+			m_space_FF20.point(&m_banks[5], 0x0000, 0);
 			break;
 		case 6:
-			m_space_FF40.point(&m_banks[6], 0x0000);
+			m_space_FF40.point(&m_banks[6], 0x0000, 0);
 			break;
 		case 7:
-			m_space_FF60.point(&m_banks[7], 0x0000);
+			m_space_FF60.point(&m_banks[7], 0x0000, 0);
 			break;
 		case 2:
-			m_space_FFE0.point(&m_banks[2], 0x1FE0);
+			m_space_FFE0.point(&m_banks[2], 0x1FE0, 0);
 			break;
 	}
 }
@@ -268,9 +268,9 @@ void sam6883_device::update_memory(void)
 			{
 				// full 64k RAM
 				m_space_0000.point(&m_banks[0], 0x0000, ram_mask);
-				m_space_8000.point(&m_banks[0], 0x8000);
-				m_space_A000.point(&m_banks[0], 0xA000);
-				m_space_C000.point(&m_banks[0], 0xC000);
+				m_space_8000.point(&m_banks[0], 0x8000, 0);
+				m_space_A000.point(&m_banks[0], 0xA000, 0);
+				m_space_C000.point(&m_banks[0], 0xC000, 0);
 				m_counter_mask = 0xFFFF;
 				m_counter_or = 0x0000;
 				setup_rom = false;
@@ -288,13 +288,13 @@ void sam6883_device::update_memory(void)
 
 	if (setup_rom)
 	{
-		m_space_8000.point(&m_banks[1], m_banks[1].m_memory_offset);
-		m_space_A000.point(&m_banks[2], m_banks[2].m_memory_offset);
-		m_space_C000.point(&m_banks[3], m_banks[3].m_memory_offset);
+		m_space_8000.point(&m_banks[1], m_banks[1].m_memory_offset, 0);
+		m_space_A000.point(&m_banks[2], m_banks[2].m_memory_offset, 0);
+		m_space_C000.point(&m_banks[3], m_banks[3].m_memory_offset, 0);
 	}
 
 	// update $FFE0-$FFFF
-	m_space_FFE0.point(&m_banks[2], m_banks[2].m_memory_offset + 0x1FE0);
+	m_space_FFE0.point(&m_banks[2], m_banks[2].m_memory_offset + 0x1FE0, 0);
 }
 
 
