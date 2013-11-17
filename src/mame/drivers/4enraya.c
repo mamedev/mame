@@ -358,7 +358,21 @@ ROM_START( 4enraya )
 	ROM_LOAD( "4.bin",   0x8000, 0x4000, CRC(f9ec1be7) SHA1(189159129ecbc4f6909c086867b0e02821f5b976) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(87f92552) SHA1(d16afd963c30f2e60951876b843e5c1dcbee1cfc) )
+	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(87f92552) SHA1(d16afd963c30f2e60951876b843e5c1dcbee1cfc) ) // this dump might be bad, blue line on '8' character, 1 byte different from set below
+	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(2b0a3793) SHA1(2c3d224251557824bb9641dc2f98a000ab72c4a2) )
+	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(f6940836) SHA1(afde21ffa0c141cf73243e50da62ecfd474aaac2) )
+
+	ROM_REGION( 0x0020,  "pal_prom", 0 )
+	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) /* system control: used for memory mapping */
+ROM_END
+
+ROM_START( 4enrayaa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "(__4enrayaa)5.bin",   0x0000, 0x8000, CRC(76e8656c) SHA1(8c92bf083abe5f669b1bff47444294820b711f1a) )
+	ROM_LOAD( "4.bin",   0x8000, 0x4000, CRC(f9ec1be7) SHA1(189159129ecbc4f6909c086867b0e02821f5b976) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "(__4enrayaa)1.bin",   0x0000, 0x2000, CRC(0e5072fd) SHA1(0960e81f7fd52b38111eab2c124cfded5b35aa0b) )
 	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(2b0a3793) SHA1(2c3d224251557824bb9641dc2f98a000ab72c4a2) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(f6940836) SHA1(afde21ffa0c141cf73243e50da62ecfd474aaac2) )
 
@@ -392,5 +406,6 @@ DRIVER_INIT_MEMBER(_4enraya_state,unkpacg)
 	}
 }
 
-GAME( 1990, 4enraya,  0,   4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya", GAME_SUPPORTS_SAVE )
-GAME( 199?, unkpacg,  0,   unkpacg,  unkpacg, _4enraya_state,  unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", GAME_IMPERFECT_SOUND )
+GAME( 1990, 4enraya,  0,       4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa, 4enraya, 4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state,  unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", GAME_IMPERFECT_SOUND )
