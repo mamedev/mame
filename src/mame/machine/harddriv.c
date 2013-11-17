@@ -438,14 +438,28 @@ WRITE16_MEMBER( harddriv_state::hdc68k_wheel_edge_reset_w )
 
 READ16_MEMBER( harddriv_state::hd68k_zram_r )
 {
-	return m_zram[offset];
+	UINT16 data = 0;
+
+	if (ACCESSING_BITS_0_7)
+		data |= m_210e->read(space, offset, mem_mask);
+
+	if (ACCESSING_BITS_8_15)
+		data |= m_200e->read(space, offset, mem_mask >> 8) << 8;
+
+	return data;
 }
 
 
 WRITE16_MEMBER( harddriv_state::hd68k_zram_w )
 {
 	if (m_m68k_zp1 == 0 && m_m68k_zp2 == 1)
-		COMBINE_DATA(&m_zram[offset]);
+	{
+		if (ACCESSING_BITS_0_7)
+			m_210e->write(space, offset, data, mem_mask);
+
+		if (ACCESSING_BITS_8_15)
+			m_200e->write(space, offset, data >> 8, mem_mask >> 8);
+	}
 }
 
 

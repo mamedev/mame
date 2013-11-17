@@ -16,6 +16,7 @@
 #include "machine/atarigen.h"
 #include "machine/n68681.h"
 #include "machine/asic65.h"
+#include "machine/timekpr.h"
 
 #define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
 #define HARDDRIV_GSP_CLOCK      XTAL_48MHz
@@ -39,7 +40,8 @@ public:
 			m_ds3dac2(*this, "ds3dac2"),
 			m_jsa(*this, "jsa"),
 			m_msp_ram(*this, "msp_ram"),
-			m_zram(*this, "zram"),
+			m_200e(*this, "200e"),
+			m_210e(*this, "210e"),
 			m_adsp_data_memory(*this, "adsp_data"),
 			m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
 			m_ds3sdsp_data_memory(*this, "ds3sdsp_data"),
@@ -81,7 +83,8 @@ public:
 	UINT16 *                m_m68k_slapstic_base;
 	UINT16 *                m_m68k_sloop_alt_base;
 
-	required_shared_ptr<UINT16> m_zram;
+	required_device<timekeeper_device> m_200e;
+	required_device<eeprom_parallel_28xx_device> m_210e;
 
 	optional_shared_ptr<UINT16> m_adsp_data_memory;
 	optional_shared_ptr<UINT32> m_adsp_pgm_memory;
