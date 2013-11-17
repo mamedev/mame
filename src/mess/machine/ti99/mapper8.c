@@ -2,7 +2,7 @@
 // copyright-holders:Michael Zapf
 /***************************************************************************
 
-    TI-99/8 Address decoder and mapper
+    TI-99/8 main board logic
 
     This component implements the address decoder and mapper logic from the
     TI-99/8 console.
@@ -37,6 +37,87 @@
     [1] ARMADILLO PRODUCT SPECIFICATIONS
     [2] TI-99/8 Graphics Programming Language interpreter
 
+    Format of map table entry (not emulated)
+
+    * bit 0: WTPROT: page is write protected if 1
+    * bit 1: XPROT: page is execute protected if 1
+    * bit 2: RDPROT: page is read protected if 1
+    * bit 3: reserved, value is ignored
+    * bits 4-7: reserved, always forced to 0
+    * bits 8-23: page base address in 24-bit virtual address space
+
+    Format of mapper control register:
+    * bit 0-4: unused???
+    * bit 5-6: map file to load/save (0 for file 0, 1 for file 1, etc.)
+    * bit 7: 0 -> load map file from RAM, 1 -> save map file to RAM
+
+    Format of mapper status register (cleared by read):
+    * bit 0: WPE - Write-Protect Error
+    * bit 1: XCE - eXeCute Error
+    * bit 2: RPE - Read-Protect Error
+    * bits 3-7: unused???
+
+    Memory error interrupts are enabled by setting WTPROT/XPROT/RDPROT.  When
+    an error occurs, the tms9901 INT1* pin is pulled low (active).  The pin
+    remains low until the mapper status register is read.
+
+24-bit address map:
+    * >000000->00ffff: console RAM
+    * >010000->feffff: expansion?
+    * >ff0000->ff0fff: empty???
+    * >ff1000->ff3fff: unused???
+    * >ff4000->ff5fff: DSR space
+    * >ff6000->ff7fff: cartridge space
+    * >ff8000->ff9fff(???): >4000 ROM (normally enabled with a write to CRU >2700)
+    * >ffa000->ffbfff(?): >2000 ROM
+    * >ffc000->ffdfff(?): >6000 ROM
+
+
+CRU map:
+    Since the tms9995 supports full 15-bit CRU addresses, the >1000->17ff
+    (>2000->2fff) range was assigned to support up to 16 extra expansion slot.
+    The good thing with using >1000->17ff is the fact that older expansion
+    cards that only decode 12 address bits will think that addresses
+    >1000->17ff refer to internal TI99 peripherals (>000->7ff range), which
+    suppresses any risk of bus contention.
+    * >0000->001f (>0000->003e): tms9901
+      - P4: 1 -> MMD (Memory Mapped Devices?) at >8000, ROM enabled
+      - P5: 1 -> no P-CODE GROMs
+    * >0800->17ff (>1000->2ffe): Peripheral CRU space
+    * >1380->13ff (>2700->27fe): Internal DSR, with two output bits:
+      - >2700: Internal DSR select (parts of Basic and various utilities)
+      - >2702: SBO -> hardware reset
+
+
+Memory map (TMS9901 P4 == 1):
+    When TMS9901 P4 output is set, locations >8000->9fff are ignored by mapper.
+    * >8000->83ff: SRAM (>8000->80ff is used by the mapper DMA controller
+      to hold four map files) (r/w)
+    * >8400: sound port (w)
+    * >8410->87ff: SRAM (r/w)
+    * >8800: VDP data read port (r)
+    * >8802: VDP status read port (r)
+    * >8810: memory mapper status and control registers (r/w)
+    * >8c00: VDP data write port (w)
+    * >8c02: VDP address and register write port (w)
+    * >9000: speech synthesizer read port (r)
+    * >9400: speech synthesizer write port (w)
+    * >9800 GPL data read port (r)
+    * >9802 GPL address read port (r)
+    * >9c00 GPL data write port -- unused (w)
+    * >9c02 GPL address write port (w)
+
+
+Memory map (TMS9901 P5 == 0):
+    When TMS9901 P5 output is cleared, locations >f840->f8ff(?) are ignored by
+    mapper.
+    * >f840: data port for P-code grom library 0 (r?)
+    * >f850: data port for P-code grom library 1 (r?)
+    * >f860: data port for P-code grom library 2 (r?)
+    * >f842: address port for P-code grom library 0 (r/w?)
+    * >f852: address port for P-code grom library 1 (r/w?)
+    * >f862: address port for P-code grom library 2 (r/w?)
+
     Michael Zapf, October 2010
     February 2012: Rewritten as class
 
@@ -44,13 +125,17 @@
 
 #include "mapper8.h"
 
-#define VERBOSE 1
+#define TRACE_CRU 0
+#define TRACE_MEM 0
+#define TRACE_MAP 0
+#define TRACE_CONFIG 0
+
 #define LOG logerror
 
-ti998_mapper_device::ti998_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, MAPPER8, "TI-99/8 Memory mapper", tag, owner, clock, "ti99_mapper8", __FILE__)
-{
-}
+mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: bus8z_device(mconfig, MAINBOARD8, "TI-99/8 Main board", tag, owner, clock, "ti998_mainboard", __FILE__),
+	m_oso(*this, OSO_TAG)
+	{ }
 
 /***************************************************************************
     CRU access
@@ -59,9 +144,9 @@ ti998_mapper_device::ti998_mapper_device(const machine_config &mconfig, const ch
 #define HEXBUS_CRU_BASE 0x1700
 #define MAPPER_CRU_BASE 0x2700
 
-READ8Z_MEMBER(ti998_mapper_device::crureadz)
+READ8Z_MEMBER(mainboard8_device::crureadz)
 {
-	if (VERBOSE>8) LOG("mapper8: read CRU %04x ignored\n", offset);
+	if (TRACE_CRU) LOG("mainboard_998: read CRU %04x ignored\n", offset);
 	// Nothing here.
 }
 
@@ -69,7 +154,7 @@ READ8Z_MEMBER(ti998_mapper_device::crureadz)
     CRU handling. We handle the internal device at CRU address 0x2700 via
     this mapper component.
 */
-WRITE8_MEMBER(ti998_mapper_device::cruwrite)
+WRITE8_MEMBER(mainboard8_device::cruwrite)
 {
 	if ((offset & 0xff00)==MAPPER_CRU_BASE)
 	{
@@ -79,10 +164,10 @@ WRITE8_MEMBER(ti998_mapper_device::cruwrite)
 		case 0:
 			// Turn on/off the internal DSR
 			m_dsr_selected = (data!=0);
-			if (VERBOSE>7) LOG("mapper8: DSR select = %d\n", data);
+			if (TRACE_CRU) LOG("mainboard_998: DSR select = %d\n", data);
 			break;
 		case 1:
-			if (VERBOSE>2) LOG("mapper8: System reset by CRU request\n");
+			if (TRACE_CRU) LOG("mainboard_998: System reset by CRU request\n");
 			machine().schedule_soft_reset();
 			break;
 		}
@@ -91,29 +176,40 @@ WRITE8_MEMBER(ti998_mapper_device::cruwrite)
 
 	if ((offset & 0xff00)==HEXBUS_CRU_BASE)
 	{
-		if (VERBOSE>5) LOG("mapper8: Set CRU>%04x (Hexbus) to %d\n",offset,data);
+		int bit = (offset & 0xff)>>1;
+		switch (bit)
+		{
+		case 0:
+			// Turn on/off the Hexbus DSR
+			m_hexbus_selected = (data!=0);
+			if (TRACE_CRU) LOG("mainboard_998: Hexbus select = %d\n", data);
+			break;
+		default:
+			if (TRACE_CRU) LOG("mainboard_998: Set CRU>%04x (Hexbus) to %d\n",offset,data);
+			break;
+		}
 		return;
 	}
 
 	if ((offset & 0xff00)>=0x0100)
 	{
-		if (VERBOSE>5) LOG("mapper8: Set CRU>%04x (unknown) to %d\n",offset,data);
+		if (TRACE_CRU) LOG("mainboard_998: Set CRU>%04x (unknown) to %d\n",offset,data);
 		return;
 	}
 }
 
-void ti998_mapper_device::CRUS_set(bool state)
+void mainboard8_device::CRUS_set(bool state)
 {
-	if (VERBOSE>7) LOG("mapper8: set CRUS=%d\n", state);
+	if (TRACE_CRU) LOG("mainboard_998: set CRUS=%d\n", state);
 	m_CRUS = state;
 }
 
 /*
     Note that PTGEN is negative logic. We invert these semantics here.
 */
-void ti998_mapper_device::PTGE_set(bool state)
+void mainboard8_device::PTGE_set(bool state)
 {
-	if (VERBOSE>7) LOG("mapper8: set PTGEN=%d\n", state? 1:0);
+	if (TRACE_CRU) LOG("mainboard_998: set PTGEN=%d\n", state? 1:0);
 	m_PTGE = state;
 }
 
@@ -124,11 +220,11 @@ void ti998_mapper_device::PTGE_set(bool state)
 /*
     This method is called via the address map.
 */
-READ8_MEMBER( ti998_mapper_device::readm )
+READ8_MEMBER( mainboard8_device::readm )
 {
 	UINT8 value = 0;
 	bool found = false;
-	if (VERBOSE>5) LOG("mapper8: read from %04x\n", offset);
+	if (TRACE_MEM) LOG("mainboard_998: read from %04x\n", offset);
 	found = access_logical_r(space, offset, &value, mem_mask);
 	m_waitcount = 2;
 
@@ -153,7 +249,7 @@ READ8_MEMBER( ti998_mapper_device::readm )
 	return value;
 }
 
-WRITE8_MEMBER( ti998_mapper_device::writem )
+WRITE8_MEMBER( mainboard8_device::writem )
 {
 	bool found = false;
 
@@ -189,22 +285,38 @@ WRITE8_MEMBER( ti998_mapper_device::writem )
     8810 (TI99EM): mapper: ignore
     ff4000 (PHYSIC): DSR
 */
-READ8Z_MEMBER( ti998_mapper_device::readz )
+READ8Z_MEMBER( mainboard8_device::readz )
 {
 	if ((offset & 0xffe000)==0xff4000)
 	{
 		if (m_dsr_selected)
 		{
 			//  Starts at 0x4000 in the image
-			*value = m_rom[0x4000 | (offset & 0x1fff)];
-			if (VERBOSE>7) LOG("mapper8: (DSR)  %04x -> %02x\n", offset, *value);
+			*value = m_rom1[0x4000 | (offset & 0x1fff)];
+			if (TRACE_MEM) LOG("mainboard_998: (intDSR)  %04x -> %02x\n", offset, *value);
+		}
+		else
+		{
+			if (m_hexbus_selected)
+			{
+				if ((offset & 0x1ff0)==0x1ff0)
+				{
+					*value = m_oso->read(space, (offset>>1) & 0x0003);
+				}
+				else
+				{
+					//  Starts at 0x6000 in the image
+					*value = m_rom1[0x6000 | (offset & 0x1fff)];
+					if (TRACE_MEM) LOG("mainboard_998: (HexDSR)  %04x -> %02x\n", offset, *value);
+				}
+			}
 		}
 	}
 	else
 	{
 		if (((offset & 0xfff0)==0xf870 && m_CRUS==false)||(((offset & 0xfff0)==0x8810 && m_CRUS==true)))
 		{
-			if (VERBOSE>4) LOG("mapper8: read access to mapper ignored: %04x\n", offset);
+			if (TRACE_MEM) LOG("mainboard_998: read access to mapper ignored: %04x\n", offset);
 		}
 	}
 }
@@ -214,11 +326,32 @@ READ8Z_MEMBER( ti998_mapper_device::readz )
     ff4000 (PHYSIC): DSR. ignore
 
 */
-WRITE8_MEMBER( ti998_mapper_device::write )
+WRITE8_MEMBER( mainboard8_device::write )
 {
 	if ((offset & 0xffe000)==0xff4000)
 	{
-		if (VERBOSE>4) LOG("mapper8: Write access to DSR space %06x ignored\n", offset);
+		if (m_hexbus_selected)
+		{
+			if ((offset & 0x1ff0)==0x1ff0)
+			{
+				m_oso->write(space, (offset>>1) & 0x0003, data);
+			}
+			else
+			{
+				LOG("mainboard_998: Write access to Hexbus DSR address %06x ignored\n", offset);
+			}
+		}
+		else
+		{
+			if (m_dsr_selected)
+			{
+				LOG("mainboard_998: Write access to internal DSR address %06x ignored\n", offset);
+			}
+			else
+			{
+				LOG("mainboard_998: Write access to unmapped DSR space at address %06x ignored\n", offset);
+			}
+		}
 	}
 	else
 	{
@@ -234,15 +367,17 @@ WRITE8_MEMBER( ti998_mapper_device::write )
     SRAM into the mapper and vice versa.
     Format:
     0000 bbbl; bbb=bank, l=load
+
+    TODO: Emulate properly, making use of HOLD
 */
-void ti998_mapper_device::mapwrite(int offset, UINT8 data)
+void mainboard8_device::mapwrite(int offset, UINT8 data)
 {
 	if ((data & 0xf0)==0x00)
 	{
 		int bankindx = (data & 0x0e)>>1;
 		if (data & 1)
 		{
-			if (VERBOSE>7) LOG("mapper8: load mapper from SRAM, bank %d\n", bankindx);
+			if (TRACE_MAP) LOG("mainboard_998: load mapper from SRAM, bank %d\n", bankindx);
 			// Load from SRAM
 			// In reality the CPU is put on HOLD during this transfer
 			for (int i=0; i < 16; i++)
@@ -250,12 +385,12 @@ void ti998_mapper_device::mapwrite(int offset, UINT8 data)
 				int ptr = (bankindx << 6);
 				m_pas_offset[i] =   (m_sram[(i<<2) + ptr] << 24) | (m_sram[(i<<2)+ ptr+1] << 16)
 				| (m_sram[(i<<2) + ptr+2] << 8) | (m_sram[(i<<2) + ptr+3]);
-				if (VERBOSE>7) LOG("mapper8: load %d=%08x\n", i, m_pas_offset[i]);
+				if (TRACE_MAP) LOG("mainboard_998: load %d=%08x\n", i, m_pas_offset[i]);
 			}
 		}
 		else
 		{
-			if (VERBOSE>7) LOG("mapper8: store mapper to SRAM, bank %d\n", bankindx);
+			if (TRACE_MAP) LOG("mainboard_998: store mapper to SRAM, bank %d\n", bankindx);
 			// Store in SRAM
 			for (int i=0; i < 16; i++)
 			{
@@ -264,7 +399,7 @@ void ti998_mapper_device::mapwrite(int offset, UINT8 data)
 				m_sram[(i<<2) + ptr +1] =  (m_pas_offset[i] >> 16)& 0xff;
 				m_sram[(i<<2) + ptr +2] =  (m_pas_offset[i] >> 8)& 0xff;
 				m_sram[(i<<2) + ptr +3] =  (m_pas_offset[i])& 0xff;
-				if (VERBOSE>7) LOG("mapper8: save %d=%08x\n", i, m_pas_offset[i]);
+				if (TRACE_MAP) LOG("mainboard_998: save %d=%08x\n", i, m_pas_offset[i]);
 			}
 		}
 	}
@@ -274,16 +409,16 @@ void ti998_mapper_device::mapwrite(int offset, UINT8 data)
     Lookup methods.
 ***************************************************************************/
 
-bool ti998_mapper_device::access_logical_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask )
+bool mainboard8_device::access_logical_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask )
 {
 	bool found = false;
 	logically_addressed_device *ldev = m_logcomp.first();
 	bus8z_device *bdev = NULL;
 
-	if (VERBOSE>8) LOG("mapper8: offset=%04x; CRUS=%d, PTGEN=%d\n", offset, m_CRUS? 1:0, m_PTGE? 0:1);
+	if (TRACE_MEM) LOG("mainboard_998: offset=%04x; CRUS=%d, PTGEN=%d\n", offset, m_CRUS? 1:0, m_PTGE? 0:1);
 	while (ldev != NULL)
 	{
-		if (VERBOSE>5) LOG("mapper8: checking node=%s\n", ldev->m_config->name);
+		if (TRACE_MEM) LOG("mainboard_998: checking node=%s\n", ldev->m_config->name);
 		// Check the mode
 		if (((ldev->m_config->mode == NATIVE) && (m_CRUS==false))
 			|| ((ldev->m_config->mode == TI99EM) && (m_CRUS==true))
@@ -295,21 +430,21 @@ bool ti998_mapper_device::access_logical_r(address_space& space, offs_t offset, 
 				{
 				case MAP8_SRAM:
 					*value = m_sram[offset & ~ldev->m_config->address_mask];
-					if (VERBOSE>7) LOG("mapper8: (SRAM) %04x -> %02x\n", offset, *value);
+					if (TRACE_MEM) LOG("mainboard_998: (SRAM) %04x -> %02x\n", offset, *value);
 					break;
 				case MAP8_ROM0:
 					// Starts at 0000
-					*value = m_rom[offset & ~ldev->m_config->address_mask];
-					if (VERBOSE>7) LOG("mapper8: (ROM)  %04x -> %02x\n", offset, *value);
+					*value = m_rom0[offset & ~ldev->m_config->address_mask];
+					if (TRACE_MEM) LOG("mainboard_998: (ROM0)  %04x -> %02x\n", offset, *value);
 					break;
 				case MAP8_DEV:
 					// device
 					bdev = static_cast<bus8z_device*>(ldev->m_device);
 					bdev->readz(space, offset, value, mem_mask);
-					if (VERBOSE>7) LOG("mapper8: (dev %s)  %04x -> %02x\n", ldev->m_config->name, offset, *value);
+					if (TRACE_MEM) LOG("mainboard_998: (dev %s)  %04x -> %02x\n", ldev->m_config->name, offset, *value);
 					break;
 				default:
-					if (VERBOSE>1) LOG("mapper8: Invalid kind for read access: %d\n", ldev->m_kind);
+					if (TRACE_MEM) LOG("mainboard_998: Invalid kind for read access: %d\n", ldev->m_kind);
 				}
 				found = true;
 				if (ldev->m_config->stop==STOP) break;
@@ -320,7 +455,7 @@ bool ti998_mapper_device::access_logical_r(address_space& space, offs_t offset, 
 	return found;
 }
 
-bool ti998_mapper_device::access_logical_w(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask )
+bool mainboard8_device::access_logical_w(address_space& space, offs_t offset, UINT8 data, UINT8 mem_mask )
 {
 	bool found = false;
 	logically_addressed_device *ldev = m_logcomp.first();
@@ -339,19 +474,19 @@ bool ti998_mapper_device::access_logical_w(address_space& space, offs_t offset, 
 				{
 				case MAP8_SRAM:
 					m_sram[offset & ~ldev->m_config->address_mask] = data;
-					if (VERBOSE>7) LOG("mapper8: (SRAM) %04x <- %02x\n", offset, data);
+					if (TRACE_MEM) LOG("mainboard_998: (SRAM) %04x <- %02x\n", offset, data);
 					break;
 				case MAP8_ROM0:
-					if (VERBOSE>7) LOG("mapper8: (ROM)  %04x <- %02x (ignored)\n", offset, data);
+					if (TRACE_MEM) LOG("mainboard_998: (ROM0)  %04x <- %02x (ignored)\n", offset, data);
 					break;
 				case MAP8_DEV:
 					// device
 					bdev = static_cast<bus8z_device*>(ldev->m_device);
 					bdev->write(space, offset, data, mem_mask);
-					if (VERBOSE>7) LOG("mapper8: (dev %s)  %04x <- %02x\n", ldev->m_config->name, offset, data);
+					if (TRACE_MEM) LOG("mainboard_998: (dev %s)  %04x <- %02x\n", ldev->m_config->name, offset, data);
 					break;
 				default:
-					if (VERBOSE>1) LOG("mapper8: Invalid kind for write access: %d\n", ldev->m_kind);
+					if (TRACE_MEM) LOG("mainboard_998: Invalid kind for write access: %d\n", ldev->m_kind);
 				}
 				found = true;
 				if (ldev->m_config->stop==STOP) break;
@@ -363,7 +498,7 @@ bool ti998_mapper_device::access_logical_w(address_space& space, offs_t offset, 
 }
 
 
-void ti998_mapper_device::access_physical_r( address_space& space, offs_t pas_address, UINT8 *value, UINT8 mem_mask )
+void mainboard8_device::access_physical_r( address_space& space, offs_t pas_address, UINT8 *value, UINT8 mem_mask )
 {
 	physically_addressed_device *pdev = m_physcomp.first();
 	bus8z_device *bdev = NULL;
@@ -376,30 +511,30 @@ void ti998_mapper_device::access_physical_r( address_space& space, offs_t pas_ad
 			{
 			case MAP8_DRAM:
 				*value = m_dram[pas_address & ~pdev->m_config->address_mask];
-				if (VERBOSE>3) LOG("mapper8: (DRAM) %06x -> %02x\n", pas_address, *value);
+				if (TRACE_MEM) LOG("mainboard_998: (DRAM) %06x -> %02x\n", pas_address, *value);
 				break;
-			case MAP8_ROM1:
+			case MAP8_ROM1A0:
+				// Starts at 0000 in the image, 8K
+				*value = m_rom1[pas_address & 0x1fff];
+				if (TRACE_MEM) LOG("mainboard_998: (ROM) %06x -> %02x\n", pas_address, *value);
+				break;
+			case MAP8_ROM1C0:
 				// Starts at 2000 in the image, 8K
-				*value = m_rom[0x2000 | (pas_address & 0x1fff)];
-				if (VERBOSE>3) LOG("mapper8: (ROM) %06x -> %02x\n", pas_address, *value);
-				break;
-			case MAP8_ROM1A:
-				// Starts at 6000 in the image, 8K
-				*value = m_rom[0x6000 | (pas_address & 0x1fff)];
-				if (VERBOSE>3) LOG("mapper8: (ROM)  %06x -> %02x\n", pas_address, *value);
+				*value = m_rom1[0x2000 | (pas_address & 0x1fff)];
+				if (TRACE_MEM) LOG("mainboard_998: (ROM)  %06x -> %02x\n", pas_address, *value);
 				break;
 			case MAP8_INTS:
 				// Interrupt sense
-				if (VERBOSE>1) LOG("ti99_8: ILSENSE not implemented.\n");
+				LOG("mainboard_998: ILSENSE not implemented.\n");
 				break;
 			case MAP8_DEV:
 				// devices
 				bdev = static_cast<bus8z_device*>(pdev->m_device);
 				bdev->readz(space, pas_address, value, mem_mask);
-				if (VERBOSE>7) LOG("mapper8: (dev %s)  %06x -> %02x\n", pdev->m_config->name, pas_address, *value);
+				if (TRACE_MEM) LOG("mainboard_998: (dev %s)  %06x -> %02x\n", pdev->m_config->name, pas_address, *value);
 				break;
 			default:
-				if (VERBOSE>1) LOG("mapper8: Invalid kind for physical read access: %d\n", pdev->m_kind);
+				LOG("mainboard_998: Invalid kind for physical read access: %d\n", pdev->m_kind);
 			}
 			if (pdev->m_config->stop==STOP) break;
 		}
@@ -407,7 +542,7 @@ void ti998_mapper_device::access_physical_r( address_space& space, offs_t pas_ad
 	}
 }
 
-void ti998_mapper_device::access_physical_w( address_space& space, offs_t pas_address, UINT8 data, UINT8 mem_mask )
+void mainboard8_device::access_physical_w( address_space& space, offs_t pas_address, UINT8 data, UINT8 mem_mask )
 {
 	physically_addressed_device *pdev = m_physcomp.first();
 	bus8z_device *bdev = NULL;
@@ -420,24 +555,24 @@ void ti998_mapper_device::access_physical_w( address_space& space, offs_t pas_ad
 			{
 			case MAP8_DRAM:
 				m_dram[pas_address & ~pdev->m_config->address_mask] = data;
-				if (VERBOSE>3) LOG("mapper8: (DRAM) %06x <- %02x\n", pas_address, data);
+				if (TRACE_MEM) LOG("mainboard_998: (DRAM) %06x <- %02x\n", pas_address, data);
 				break;
-			case MAP8_ROM1:
-			case MAP8_ROM1A:
-				if (VERBOSE>7) LOG("mapper8: (ROM)  %06x <- %02x (ignored)\n", pas_address, data);
+			case MAP8_ROM1A0:
+			case MAP8_ROM1C0:
+				if (TRACE_MEM) LOG("mainboard_998: (ROM1)  %06x <- %02x (ignored)\n", pas_address, data);
 				break;
 			case MAP8_INTS:
 				// Interrupt sense
-				if (VERBOSE>1) LOG("ti99_8: write to ilsense ignored\n");
+				LOG("ti99_8: write to ilsense ignored\n");
 				break;
 			case MAP8_DEV:
 				// devices
 				bdev = static_cast<bus8z_device*>(pdev->m_device);
-				if (VERBOSE>7) LOG("mapper8: (dev %s)  %06x <- %02x\n", pdev->m_config->name, pas_address, data);
+				if (TRACE_MEM) LOG("mainboard_998: (dev %s)  %06x <- %02x\n", pdev->m_config->name, pas_address, data);
 				bdev->write(space, pas_address, data, mem_mask);
 				break;
 			default:
-				if (VERBOSE>1) LOG("mapper8: Invalid kind for physical write access: %d\n", pdev->m_kind);
+				LOG("mainboard_998: Invalid kind for physical write access: %d\n", pdev->m_kind);
 			}
 			if (pdev->m_config->stop==STOP) break;
 		}
@@ -449,7 +584,7 @@ void ti998_mapper_device::access_physical_w( address_space& space, offs_t pas_ad
     The mapper is connected to the clock line in order to operate
     the wait state counter.
 */
-void ti998_mapper_device::clock_in(int clock)
+void mainboard8_device::clock_in(int clock)
 {
 	if (clock==ASSERT_LINE && m_waitcount!=0)
 	{
@@ -468,12 +603,12 @@ void ti998_mapper_device::clock_in(int clock)
 
     Note that device_reset is too late; the initial context switch occurs earlier.
 */
-void ti998_mapper_device::device_start()
+void mainboard8_device::device_start()
 {
-	if (VERBOSE>5) LOG("ti99_8: Starting mapper\n");
+	LOG("ti99_8: Starting mapper\n");
 
 	// String values of the pseudo constants, used in the configuration.
-	const char *const pseudodev[6] = { SRAMNAME, ROM0NAME, ROM1NAME, ROM1ANAME, DRAMNAME, INTSNAME };
+	const char *const pseudodev[6] = { SRAMNAME, ROM0NAME, ROM1A0NAME, ROM1C0NAME, DRAMNAME, INTSNAME };
 
 	const mapper8_config *conf = reinterpret_cast<const mapper8_config *>(static_config());
 
@@ -482,7 +617,8 @@ void ti998_mapper_device::device_start()
 
 	m_sram = machine().root_device().memregion(SRAM_TAG)->base();
 	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
-	m_rom  = machine().root_device().memregion("maincpu")->base();
+	m_rom0  = machine().root_device().memregion(ROM0_TAG)->base();
+	m_rom1  = machine().root_device().memregion(ROM1_TAG)->base();
 
 	// Clear the lists
 	m_logcomp.reset();
@@ -521,24 +657,24 @@ void ti998_mapper_device::device_start()
 					{
 						logically_addressed_device *ad = new logically_addressed_device(kind, (device_t*)dev, entry[i]);
 						m_logcomp.append(*ad);
-						if (VERBOSE>6) LOG("mapper8: Device %s mounted into logical address space.\n", entry[i].name);
+						if (TRACE_CONFIG) LOG("mainboard_998: Device %s mounted into logical address space.\n", entry[i].name);
 					}
 					else
 					{
 						physically_addressed_device *ad = new physically_addressed_device(kind, (device_t*)dev, entry[i]);
 						m_physcomp.append(*ad);
-						if (VERBOSE>6) LOG("mapper8: Device %s mounted into physical address space.\n", entry[i].name);
+						if (TRACE_CONFIG) LOG("mainboard_998: Device %s mounted into physical address space.\n", entry[i].name);
 					}
 				}
 				else
 				{
-					if (VERBOSE>1) LOG("mapper8: Device %s not found.\n", entry[i].name);
+					if (TRACE_CONFIG) LOG("mainboard_998: Device %s not found.\n", entry[i].name);
 				}
 			}
 		}
 	}
-	if (VERBOSE>4) LOG("Mapper logical device count = %d\n", m_logcomp.count());
-	if (VERBOSE>4) LOG("Mapper physical device count = %d\n", m_physcomp.count());
+	if (TRACE_CONFIG) LOG("Mapper logical device count = %d\n", m_logcomp.count());
+	if (TRACE_CONFIG) LOG("Mapper physical device count = %d\n", m_physcomp.count());
 
 	m_dsr_selected = false;
 	m_CRUS = true;
@@ -548,7 +684,7 @@ void ti998_mapper_device::device_start()
 	for (int i=0; i < 16; i++) m_pas_offset[i] = 0;
 }
 
-void ti998_mapper_device::device_reset()
+void mainboard8_device::device_reset()
 {
 	m_dsr_selected = false;
 	m_CRUS = true;
@@ -561,4 +697,69 @@ void ti998_mapper_device::device_reset()
 	m_ready(ASSERT_LINE);
 }
 
-const device_type MAPPER8 = &device_creator<ti998_mapper_device>;
+MACHINE_CONFIG_FRAGMENT( ti998_mainboard )
+	MCFG_DEVICE_ADD(OSO_TAG, OSO, 0)
+MACHINE_CONFIG_END
+
+machine_config_constructor mainboard8_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( ti998_mainboard );
+}
+
+const device_type MAINBOARD8 = &device_creator<mainboard8_device>;
+
+/***************************************************************************
+
+  Custom chips of the TI-99/8
+  OSO: Hexbus interface
+
+****************************************************************************/
+
+enum
+{
+	HSKWT = 0x80
+};
+
+ti998_oso_device::ti998_oso_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: device_t(mconfig, OSO, "OSO Hexbus interface", tag, owner, clock, "ti998_oso", __FILE__)
+{
+	LOG("ti998/oso: Creating OSO\n");
+}
+
+READ8_MEMBER( ti998_oso_device::read )
+{
+	int value = 0;
+	offset &= 0x03;
+	LOG("ti998/oso: OSO chip read access %04x -> %02x\n", (offset<<1) | 0x5ff0, value);
+	switch (offset)
+	{
+	case 0:
+		// read 5FF8: read data register
+		break;
+	case 1:
+		// read 5FFA: read status register
+		// We return handshake_write=1 to prevent lock-ups (until the hexbus is properly implemented)
+		value = HSKWT;
+		break;
+	case 2:
+		// read 5FFC: read control register
+		break;
+	case 3:
+		// read 5FFE: read transmit register
+		break;
+	}
+
+	return value;
+}
+
+WRITE8_MEMBER( ti998_oso_device::write )
+{
+	offset &= 0x03;
+	LOG("ti998/oso: OSO chip write access %04x <- %02x\n", (offset<<1) | 0x5ff0, data);
+}
+
+void ti998_oso_device::device_start()
+{
+}
+
+const device_type OSO = &device_creator<ti998_oso_device>;

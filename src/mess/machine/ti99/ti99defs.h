@@ -38,7 +38,10 @@
 #define SRAM_TAG        "sram8"
 #define DRAM_TAG        "dram8"
 #define MAPPER_TAG      "mapper"
+#define MAINBOARD8_TAG  "mainboard8"
 #define SPEECH_TAG      "speech"
+#define ROM0_TAG        "rom0"
+#define ROM1_TAG        "rom1"
 
 // Geneve
 #define GKEYBOARD_TAG   "gkeyboard"
