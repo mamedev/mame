@@ -168,6 +168,78 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_is_octal = true;
 }
 
+alto2_cpu_device::~alto2_cpu_device()
+{
+	// call all subdevice's exit code
+	exit_kwd();
+	exit_part();
+	exit_dvt();
+	exit_dht();
+	exit_curt();
+	exit_dwt();
+	exit_mrt();
+	exit_ether();
+	exit_ksec();
+	exit_emu();
+	exit_hw();
+	exit_mouse();
+	exit_kbd();
+	exit_disp();
+	exit_disk();
+	exit_memory();
+
+	if (m_ucode_crom) {
+		global_free(m_ucode_crom);
+		m_ucode_crom = 0;
+	}
+	if (m_ucode_cram) {
+		global_free(m_ucode_cram);
+		m_ucode_cram = 0;
+	}
+	if (m_const_data) {
+		global_free(m_const_data);
+		m_const_data = 0;
+	}
+
+	if (m_ctl2k_u3) {
+		global_free(m_ctl2k_u3);
+		m_ctl2k_u3 = 0;
+	}
+	if (m_ctl2k_u38) {
+		global_free(m_ctl2k_u38);
+		m_ctl2k_u38 = 0;
+	}
+	if (m_ctl2k_u76) {
+		global_free(m_ctl2k_u76);
+		m_ctl2k_u76 = 0;
+	}
+	if (m_cram3k_a37) {
+		global_free(m_cram3k_a37);
+		m_cram3k_a37 = 0;
+	}
+	if (m_madr_a64) {
+		global_free(m_madr_a64);
+		m_madr_a64 = 0;
+	}
+	if (m_madr_a65) {
+		global_free(m_madr_a65);
+		m_madr_a65 = 0;
+	}
+	if (m_madr_a90) {
+		global_free(m_madr_a90);
+		m_madr_a90 = 0;
+	}
+	if (m_madr_a91) {
+		global_free(m_madr_a91);
+		m_madr_a91 = 0;
+	}
+	if (m_alu_a10) {
+		global_free(m_alu_a10);
+		m_alu_a10 = 0;
+	}
+
+}
+
 #if	ALTO2_DEBUG
 // FIXME: define types (sections) and print the section like [emu] [kwd] ...
 // FIXME: use the level to suppress messages if logging is less verbose than level
@@ -3181,6 +3253,7 @@ void alto2_cpu_device::hard_reset()
 	init_disk();
 	init_disp();
 	init_kbd();
+	init_mouse();
 	init_hw();
 
 	init_emu(task_emu);

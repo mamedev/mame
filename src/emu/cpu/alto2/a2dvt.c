@@ -38,3 +38,8 @@ void alto2_cpu_device::init_dvt(int task)
 	m_active_callback[task] = &alto2_cpu_device::activate_dvt;
 }
 
+void alto2_cpu_device::exit_dvt()
+{
+	// nothing to do yet
+}
+

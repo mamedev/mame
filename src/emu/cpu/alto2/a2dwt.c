@@ -45,3 +45,8 @@ void alto2_cpu_device::init_dwt(int task)
 	set_f1(task, f1_block,			&alto2_cpu_device::f1_dwt_block_0, 0);
 	set_f2(task, f2_dwt_load_ddr,	0, &alto2_cpu_device::f2_dwt_load_ddr_1);
 }
+
+void alto2_cpu_device::exit_dwt()
+{
+	// nothing to do yet
+}

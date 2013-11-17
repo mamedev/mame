@@ -704,3 +704,8 @@ void alto2_cpu_device::init_emu(int task)
 	set_f2(task, f2_emu_acsource,		&alto2_cpu_device::f2_acsource_0, &alto2_cpu_device::f2_acsource_1);
 }
 
+void alto2_cpu_device::exit_emu()
+{
+	// nothing to do yet
+}
+

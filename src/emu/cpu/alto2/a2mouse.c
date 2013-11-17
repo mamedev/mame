@@ -201,7 +201,14 @@ void alto2_cpu_device::mouse_button(int b)
  * per inch.
  * </PRE>
  */
-void alto2_cpu_device::mouse_init()
+void alto2_cpu_device::init_mouse()
 {
-	memset(&m_mouse, 0, sizeof(m_mouse));
+    memset(&m_mouse, 0, sizeof(m_mouse));
+}
+
+void alto2_cpu_device::exit_mouse()
+{
+    if (m_madr_a32)
+        global_free(m_madr_a32);
+    m_madr_a32 = 0;
 }

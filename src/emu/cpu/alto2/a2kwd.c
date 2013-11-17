@@ -43,4 +43,9 @@ void alto2_cpu_device::init_kwd(int task)
 	set_f2(task, f2_task_17,			0, 0);
 }
 
+void alto2_cpu_device::exit_kwd()
+{
+	// nothing to do yet
+}
+
 

@@ -913,8 +913,9 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
  *
  *  TW_SECLATE	(85960 nsec)
  *  TW_SECLATE	(46*ALTO2_UCYCLE)
-*/
-#define	TW_SECLATE	8596
+ *  TW_SECLATE	8596
+ */
+#define TW_SECLATE  85960
 
 /** @brief monoflop 52b pulse duration
  * Rt = 20k, Cext = 0.01µF (=10000pF) => 57960ns (~58us)
@@ -1429,7 +1430,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);
 		if (m_dsk.seclate) {
 			m_dsk.seclate = 0;
-			LOG((LOG_DISK,6,"	SECLATE -> 0 pulse until %lldns\n", ntime() + TW_SECLATE));
+			LOG((LOG_DISK,6,"	SECLATE -> 0 pulse until cycle %lld\n", cycle() + TW_SECLATE / ALTO2_UCYCLE));
 		}
 	}
 
@@ -1491,7 +1492,11 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 }
 
 
-/** @brief timer callback to take away the SECLATE pulse (monoflop) */
+/**
+ * @brief timer callback to take away the SECLATE pulse (monoflop)
+ * @param ptr some unused pointer
+ * @param arg contains the seclate value
+ */
 void alto2_cpu_device::disk_seclate(void* ptr, INT32 arg)
 {
 	(void)ptr;
@@ -1500,7 +1505,11 @@ void alto2_cpu_device::disk_seclate(void* ptr, INT32 arg)
 	m_dsk.seclate_timer->enable(false);
 }
 
-/** @brief timer callback to take away the OK TO RUN pulse (reset) */
+/**
+ * @brief timer callback to take away the OK TO RUN pulse (reset)
+ * @param ptr some unused pointer
+ * @param arg contains the ok_to_run value
+ */
 void alto2_cpu_device::disk_ok_to_run(void* ptr, INT32 arg)
 {
 	(void)ptr;
@@ -1526,7 +1535,7 @@ void alto2_cpu_device::disk_ok_to_run(void* ptr, INT32 arg)
  * flag 0 (SKINC, active low). If the seek would go beyond the last cylinder,
  * the drive deasserts seek_incomplete, but does not assert the addx_acknowledge.
  *
- * @param id timer id
+ * @param ptr some unused pointer
  * @param arg contains the drive, cylinder, and restore flag
  */
 void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
@@ -1611,7 +1620,7 @@ void alto2_cpu_device::disk_ready_mf31a(void* ptr, INT32 arg)
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	m_dsk.ready_mf31a = arg & dhd->get_ready_0();
 	/* log the not ready result with level 0, else 2 */
-	LOG((LOG_DISK,m_dsk.ready_mf31a ? 0 : 2,"	ready mf31a:%d\n", m_dsk.ready_mf31a));
+	LOG((LOG_DISK,m_dsk.ready_mf31a ? 0 : 2,"	mf31a:%d %sready\n", m_dsk.ready_mf31a, m_dsk.ready_mf31a ? "not " : ""));
 }
 
 /**
@@ -2150,8 +2159,7 @@ void alto2_cpu_device::f2_xfrdat_1()
 void alto2_cpu_device::f2_swrnrdy_1()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-//	UINT16 r = dhd->get_seek_read_write_0();
-	UINT16 r = dhd->get_ready_0();
+	UINT16 r = dhd->get_seek_read_write_0();
 	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	LOG((LOG_DISK,1,"	SWRNRDY; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
@@ -2380,5 +2388,13 @@ void alto2_cpu_device::init_disk()
 
 	m_dsk.ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ready_mf31a),this));
 	m_dsk.ready_timer->reset();
+}
+
+/**
+ * @brief exit disk controller - free all timers
+ */
+void alto2_cpu_device::exit_disk()
+{
+    // nothing to do yet
 }
 

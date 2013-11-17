@@ -22,3 +22,8 @@ void alto2_cpu_device::init_part(int task)
 	m_active_callback[task] = &alto2_cpu_device::activate_part;
 }
 
+void alto2_cpu_device::exit_part()
+{
+	// nothing to do yet
+}
+

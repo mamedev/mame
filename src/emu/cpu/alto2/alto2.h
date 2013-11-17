@@ -215,6 +215,7 @@ class alto2_cpu_device :  public cpu_device
 public:
 	// construction/destruction
 	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~alto2_cpu_device();
 
 	//! driver interface to set diablo_hd_device
 	void set_diablo(int unit, diablo_hd_device* ptr);
@@ -1124,7 +1125,8 @@ private:
 #else	// ALTO2_UCODE_RAM_PAGES != 3
 	void f1_load_srb_1();							//!< f1_load_srb late: load the S register bank from BUS[12-14]
 #endif
-	void init_ram(int task);						//!<
+	void init_ram(int task);						//!< called by RAM related tasks
+	void exit_ram();
 
 	// ************************************************
 	// memory mapped i/o stuff
@@ -1299,6 +1301,7 @@ private:
 	DECLARE_READ16_MEMBER( xbus_r );			//!< read an XBUS address
 	DECLARE_WRITE16_MEMBER( xbus_w );			//!< write an XBUS address (?)
 	void init_hw();								//!< initialize miscellaneous hardware
+	void exit_hw();								//!< deinitialize miscellaneous hardware
 
 	// ************************************************
 	// keyboard stuff
@@ -1309,6 +1312,7 @@ private:
 	}	m_kbd;
 	DECLARE_READ16_MEMBER( kbd_ad_r );			//!< read the keyboard matrix
 	void init_kbd(UINT16 bootkey = 0177777);	//!< initialize the keyboard hardware, optinally set the boot key
+	void exit_kbd();							//!< deinitialize the keyboard hardware
 
 	// ************************************************
 	// mouse stuff
@@ -1373,6 +1377,8 @@ private:
 	 * </PRE>
 	 */
 	UINT8* m_madr_a32;
+
+	//! mouse context
 	struct {
 		int x;
 		int y;
@@ -1384,8 +1390,8 @@ private:
 	UINT16 mouse_read();							//!< return the mouse motion flags
 	void mouse_motion(int x, int y);				//!< register a mouse motion
 	void mouse_button(int b);						//!< register a mouse button change
-	void mouse_init();								//!< initialize the mouse context to useful values
-
+	void init_mouse();								//!< initialize the mouse context to useful values
+	void exit_mouse();								//!< deinitialize the mouse
 
 	// ************************************************
 	// disk controller stuff
@@ -1481,7 +1487,8 @@ private:
 	void f2_swrnrdy_1();							//!< f2_swrnrdy late: branch on the disk ready signal
 	void f2_nfer_1();								//!< f2_nfer late: branch on the disk fatal error condition
 	void f2_strobon_1();							//!< f2_strobon late: branch on the seek busy status
-	void init_disk();								//!< initialize the disk context and insert a disk wort timer
+	void init_disk();								//!< initialize the disk context
+	void exit_disk();								//!< deinitialize the disk context
 
 	// ************************************************
 	// display stuff
@@ -1758,15 +1765,17 @@ private:
 	 * There are 32 states per scanline and 875 scanlines per frame.
 	 *
 	 * @param arg the current m_disp_a63 PROM address
-	 * @result returns the next state of the display state machine
+	 * @return next state of the display state machine
 	 */
 	int display_state_machine(int arg);
 
-	/** @brief branch on the evenfield flip-flop */
+	//! branch on the evenfield flip-flop
 	void f2_evenfield_1(void);
 
-	/** @brief initialize the display context */
-	int init_disp();
+	//! initialize the display context
+	void init_disp();
+	//! deinitialize the display context
+	void exit_disp();
 
 	// ************************************************
 	// memory stuff
@@ -1889,9 +1898,8 @@ private:
 	void watch_write(UINT32 addr, UINT32 data);
 	void watch_read(UINT32 addr, UINT32 data);
 #endif
-
-	//! initialize the memory system
-	void init_memory();
+	void init_memory();								//!< initialize the memory system
+	void exit_memory();								//!< deinitialize the memory system
 
 	// ************************************************
 	// emulator task
@@ -1918,10 +1926,14 @@ private:
 	void f2_acsource_0();							//!< f2_acsource early: modify RSELECT with SrcAC = (3 - IR[1-2])
 	void f2_acsource_1();							//!< f2_acsource late: branch on arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
 	void init_emu(int task);						//!< 000 initialize emulator task
+	void exit_emu();								//!< deinitialize emulator task
 
+	// ************************************************
 	// ksec task
+	// ************************************************
 	void f1_ksec_block_0(void);
 	void init_ksec(int task);						//!< 004 initialize disk sector task
+	void exit_ksec();
 
 	// ************************************************
 	// ethernet task
@@ -2041,44 +2053,66 @@ private:
 	void f2_ebfct_1();								//!< f2_ebfct late: Ethernet branch function
 	void f2_ecbfct_1();								//!< f2_ecbfct late: Ethernet countdown branch function
 	void f2_eisfct_1();								//!< f2_eisfct late: Ethernet input start function
-	void eth_activate();							//!< called by the CPU when the Ethernet task becomes active
+	void activate_eth();							//!< called by the CPU when the Ethernet task becomes active
 	void init_ether(int task);						//!< 007 initialize ethernet task
+	void exit_ether();								//!< deinitialize ethernet task
 
+	// ************************************************
 	// memory refresh task
+	// ************************************************
 	void f1_mrt_block_0();							//!< f1_mrt_block early: block the display word task
-	void mrt_activate();							//!< called by the CPU when MRT becomes active
+	void activate_mrt();							//!< called by the CPU when MRT becomes active
 	void init_mrt(int task);						//!< 010 initialize memory refresh task
+	void exit_mrt();								//!< deinitialize memory refresh task
 
+	// ************************************************
 	// display word task
+	// ************************************************
 	void f1_dwt_block_0();							//!< f1_dwt_block early: block the display word task
 	void f2_dwt_load_ddr_1();						//!< f2_dwt_load_ddr late: load the display data register
 	void init_dwt(int task);						//!< 011 initialize display word task
+	void exit_dwt();								//!< deinitialize display word task
 
+	// ************************************************
 	// cursor task
+	// ************************************************
 	void f1_curt_block_0();							//!< f1_curt_block early: disable the cursor task and set the curt_blocks flag
 	void f2_load_xpreg_1();							//!< f2_load_xpreg late: load the x position register from BUS[6-15]
 	void f2_load_csr_1();							//!< f2_load_csr late: load the cursor shift register from BUS[0-15]
-	void curt_activate();							//!< curt_activate: called by the CPU when the cursor task becomes active
+	void activate_curt();							//!< curt_activate: called by the CPU when the cursor task becomes active
 	void init_curt(int task);					 	//!< 012 initialize cursor task
+	void exit_curt();								//!< deinitialize cursor task
 
+	// ************************************************
 	// display horizontal task
+	// ************************************************
 	void f1_dht_block_0();							//!< f1_dht_block early: disable the display word task
 	void f2_dht_setmode_1();						//!< f2_dht_setmode late: set the next scanline's mode inverse and half clock and branch
 	void activate_dht();							//!< called by the CPU when the display horizontal task becomes active
 	void init_dht(int task);						//!< 013 initialize display horizontal task
+	void exit_dht();								//!< deinitialize display horizontal task
 
+	// ************************************************
 	// display vertical task
+	// ************************************************
 	void f1_dvt_block_0();							//!< f1_dvt_block early: disable the display word task
 	void activate_dvt();							//!< called by the CPU when the display vertical task becomes active
 	void init_dvt(int task);						//!< 014 initialize display vertical task
+	void exit_dvt();								//!< deinitialize display vertical task
 
+	// ************************************************
 	// parity task
+	// ************************************************
 	void activate_part();
 	void init_part(int task);						//!< 015 initialize parity task
+	void exit_part();								//!< deinitialize parity task
 
+	// ************************************************
 	// disk word task
+	// ************************************************
 	void f1_kwd_block_0(void);
 	void init_kwd(int task);						//!< 016 initialize disk word task
+	void exit_kwd();								//!< deinitialize disk word task
 };
 
 extern const device_type ALTO2;

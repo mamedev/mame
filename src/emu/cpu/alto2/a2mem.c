@@ -842,3 +842,15 @@ void alto2_cpu_device::init_memory()
 	}
 #endif
 }
+
+void alto2_cpu_device::exit_memory()
+{
+	if (m_mem.hpb) {
+		global_free(m_mem.hpb);
+		m_mem.hpb = 0;
+	}
+	if (m_mem.ram) {
+		global_free(m_mem.ram);
+		m_mem.ram = 0;
+	}
+}

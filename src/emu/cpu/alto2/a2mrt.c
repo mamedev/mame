@@ -18,7 +18,7 @@ void alto2_cpu_device::f1_mrt_block_0()
 }
 
 //! called by the CPU when MRT becomes active
-void alto2_cpu_device::mrt_activate()
+void alto2_cpu_device::activate_mrt()
 {
 	/* TODO: what do we do here? */
 	m_task_wakeup &= ~(1 << m_task);
@@ -29,5 +29,10 @@ void alto2_cpu_device::init_mrt(int task)
 {
 	set_f1(task, f1_block,		&alto2_cpu_device::f1_mrt_block_0, 0);
 	/* auto block */
-	m_active_callback[task] = &alto2_cpu_device::mrt_activate;
+	m_active_callback[task] = &alto2_cpu_device::activate_mrt;
+}
+
+void alto2_cpu_device::exit_mrt()
+{
+	// nothing to do yet
 }

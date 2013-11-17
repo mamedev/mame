@@ -45,3 +45,8 @@ void alto2_cpu_device::init_ksec(int task)
 	m_task_wakeup |= 1 << task;
 }
 
+void alto2_cpu_device::exit_ksec()
+{
+	// nothing to do yet
+}
+

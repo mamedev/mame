@@ -112,3 +112,8 @@ void alto2_cpu_device::init_hw()
 	m_hw.xbus[3] = 0177777;
 }
 
+void alto2_cpu_device::exit_hw()
+{
+	// nothing to do yet
+}
+

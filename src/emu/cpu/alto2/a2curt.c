@@ -57,7 +57,7 @@ void alto2_cpu_device::f2_load_csr_1()
 /**
  * @brief curt_activate: called by the CPU when the cursor task becomes active
  */
-void alto2_cpu_device::curt_activate()
+void alto2_cpu_device::activate_curt()
 {
 	m_task_wakeup &= ~(1 << m_task);
 	m_dsp.curt_wakeup = 0;
@@ -69,6 +69,11 @@ void alto2_cpu_device::init_curt(int task)
 	set_f1(task, f1_block,				&alto2_cpu_device::f1_curt_block_0, 0);
 	set_f2(task, f2_curt_load_xpreg,	0, &alto2_cpu_device::f2_load_xpreg_1);
 	set_f2(task, f2_curt_load_csr,		0, &alto2_cpu_device::f2_load_csr_1);
-	m_active_callback[task] = &alto2_cpu_device::curt_activate;
+	m_active_callback[task] = &alto2_cpu_device::activate_curt;
+}
+
+void alto2_cpu_device::exit_curt()
+{
+	// nothing to do yet
 }
 

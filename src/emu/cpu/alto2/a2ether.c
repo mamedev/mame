@@ -645,9 +645,9 @@ void alto2_cpu_device::f2_eisfct_1()
  *
  * Reset the Ether wake flip flop
  */
-void alto2_cpu_device::eth_activate()
+void alto2_cpu_device::activate_eth()
 {
-	m_ewfct = 0;
+    m_ewfct = 0;
 }
 
 /**
@@ -673,6 +673,22 @@ void alto2_cpu_device::init_ether(int task)
 	set_f2(task, f2_ether_ecbfct,	0, &alto2_cpu_device::f2_ecbfct_1);
 	set_f2(task, f2_ether_eisfct,	0, &alto2_cpu_device::f2_eisfct_1);
 
-	m_active_callback[task] = &alto2_cpu_device::eth_activate;
+	m_active_callback[task] = &alto2_cpu_device::activate_eth;
+}
+
+void alto2_cpu_device::exit_ether()
+{
+	if (m_ether_a41) {
+		global_free(m_ether_a41);
+		m_ether_a41 = 0;
+	}
+	if (m_ether_a42) {
+		global_free(m_ether_a42);
+		m_ether_a42 = 0;
+	}
+	if (m_ether_a49) {
+		global_free(m_ether_a49);
+		m_ether_a49 = 0;
+	}
 }
 

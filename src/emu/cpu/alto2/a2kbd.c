@@ -55,3 +55,8 @@ void alto2_cpu_device::init_kbd(UINT16 bootkey)
 	m_kbd.matrix[3] = 0177777;
 }
 
+void alto2_cpu_device::exit_kbd()
+{
+	// nothing to do yet
+}
+

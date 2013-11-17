@@ -292,3 +292,8 @@ void alto2_cpu_device::init_ram(int task)
 #endif
 }
 
+void alto2_cpu_device::exit_ram()
+{
+	// nothing to do yet
+}
+

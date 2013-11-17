@@ -435,20 +435,40 @@ void alto2_cpu_device::f2_evenfield_1()
  * Allocate a raw_bitmap array to save blitting to the screen when
  * there is no change in the data words.
  */
-int alto2_cpu_device::init_disp()
+void alto2_cpu_device::init_disp()
 {
-	int y;
-
 	memset(&m_dsp, 0, sizeof(m_dsp));
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
-
 	m_dsp.raw_bitmap = global_alloc_array(UINT16, ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
-	for (y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
+	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
 		memset(m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS, 0, ALTO2_DISPLAY_VISIBLE_WORDS * sizeof(UINT16));
 
 	m_dsp.scanline_dirty = global_alloc_array(UINT8, ALTO2_DISPLAY_HEIGHT);
 	memset(m_dsp.scanline_dirty, 1, sizeof(UINT8) * ALTO2_DISPLAY_HEIGHT);
-	return 0;
+}
+
+void alto2_cpu_device::exit_disp()
+{
+	if (m_dsp.scanline_dirty) {
+		global_free(m_dsp.scanline_dirty);
+		m_dsp.scanline_dirty = 0;
+	}
+	if (m_dsp.raw_bitmap) {
+		global_free(m_dsp.raw_bitmap);
+		m_dsp.raw_bitmap = 0;
+	}
+	if (m_disp_a38) {
+		global_free(m_disp_a38);
+		m_disp_a38 = 0;
+	}
+	if (m_disp_a63) {
+		global_free(m_disp_a63);
+		m_disp_a63 = 0;
+	}
+	if (m_disp_a66) {
+		global_free(m_disp_a66);
+		m_disp_a66 = 0;
+	}
 }
 
 #define	BLACK	1
