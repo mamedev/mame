@@ -915,7 +915,7 @@ jkff_t alto2_cpu_device::update_jkff(UINT8 s0, UINT8 s1)
  *  TW_SECLATE	(46*ALTO2_UCYCLE)
  *  TW_SECLATE	8596
  */
-#define TW_SECLATE  85960
+#define TW_SECLATE  (50*ALTO2_UCYCLE)
 
 /** @brief monoflop 52b pulse duration
  * Rt = 20k, Cext = 0.01µF (=10000pF) => 57960ns (~58us)
@@ -2221,7 +2221,6 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 {
 	(void)ptr;
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	int bits = dhd->bits_per_sector();
 	int clk = arg & 1;
 	int bit = 0;
 
@@ -2266,13 +2265,14 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	}
 
 	/* more bits to clock? */
-	if (++arg < bits) {
+	if (++arg < dhd->bits_per_sector()) {
 #if	USE_BITCLK_TIMER
 		m_dsk.bitclk_timer->adjust(dhd->bit_time(), arg);
 #else
 		if (!m_dsk.bitclk_time)
 			m_dsk.bitclk_time = static_cast<int>(dhd->bit_time().as_double() * ATTOSECONDS_PER_NANOSECOND);
 		m_bitclk_time += m_dsk.bitclk_time;
+		m_bitclk_index = arg;
 #endif
 	} else {
 		// stop the bitclock timer

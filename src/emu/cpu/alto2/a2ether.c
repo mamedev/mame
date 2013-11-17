@@ -678,17 +678,6 @@ void alto2_cpu_device::init_ether(int task)
 
 void alto2_cpu_device::exit_ether()
 {
-	if (m_ether_a41) {
-		global_free(m_ether_a41);
-		m_ether_a41 = 0;
-	}
-	if (m_ether_a42) {
-		global_free(m_ether_a42);
-		m_ether_a42 = 0;
-	}
-	if (m_ether_a49) {
-		global_free(m_ether_a49);
-		m_ether_a49 = 0;
-	}
+	// nothing to do yet
 }
 

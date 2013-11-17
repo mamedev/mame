@@ -208,7 +208,5 @@ void alto2_cpu_device::init_mouse()
 
 void alto2_cpu_device::exit_mouse()
 {
-    if (m_madr_a32)
-        global_free(m_madr_a32);
-    m_madr_a32 = 0;
+    // nothing to do yet
 }

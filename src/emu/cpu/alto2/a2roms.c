@@ -98,7 +98,7 @@ static void write_type_and_xor(void *base, int type, UINT32 addr, UINT32 dand, U
  * @param segments number of segments in one page of the result
  * @return pointer to the newly allocated memory filled with source bits
  */
-UINT8* prom_load(const prom_load_t* prom, const UINT8* src, int pages, int segments)
+UINT8* prom_load(running_machine& machine, const prom_load_t* prom, const UINT8* src, int pages, int segments)
 {
 	void* array = 0;
 	size_t type = prom->type;
@@ -109,13 +109,13 @@ UINT8* prom_load(const prom_load_t* prom, const UINT8* src, int pages, int segme
 
 	switch (type) {
 	case sizeof(UINT8):
-		array = global_alloc_array(UINT8, pages * size);
+		array = auto_alloc_array(machine, UINT8, pages * size);
 		break;
 	case sizeof(UINT16):
-		array = global_alloc_array(UINT16, pages * size);
+		array = auto_alloc_array(machine, UINT16, pages * size);
 		break;
 	case sizeof(UINT32):
-		array = global_alloc_array(UINT32, pages * size);
+		array = auto_alloc_array(machine, UINT32, pages * size);
 		break;
 	}
 

@@ -187,57 +187,6 @@ alto2_cpu_device::~alto2_cpu_device()
 	exit_disp();
 	exit_disk();
 	exit_memory();
-
-	if (m_ucode_crom) {
-		global_free(m_ucode_crom);
-		m_ucode_crom = 0;
-	}
-	if (m_ucode_cram) {
-		global_free(m_ucode_cram);
-		m_ucode_cram = 0;
-	}
-	if (m_const_data) {
-		global_free(m_const_data);
-		m_const_data = 0;
-	}
-
-	if (m_ctl2k_u3) {
-		global_free(m_ctl2k_u3);
-		m_ctl2k_u3 = 0;
-	}
-	if (m_ctl2k_u38) {
-		global_free(m_ctl2k_u38);
-		m_ctl2k_u38 = 0;
-	}
-	if (m_ctl2k_u76) {
-		global_free(m_ctl2k_u76);
-		m_ctl2k_u76 = 0;
-	}
-	if (m_cram3k_a37) {
-		global_free(m_cram3k_a37);
-		m_cram3k_a37 = 0;
-	}
-	if (m_madr_a64) {
-		global_free(m_madr_a64);
-		m_madr_a64 = 0;
-	}
-	if (m_madr_a65) {
-		global_free(m_madr_a65);
-		m_madr_a65 = 0;
-	}
-	if (m_madr_a90) {
-		global_free(m_madr_a90);
-		m_madr_a90 = 0;
-	}
-	if (m_madr_a91) {
-		global_free(m_madr_a91);
-		m_madr_a91 = 0;
-	}
-	if (m_alu_a10) {
-		global_free(m_alu_a10);
-		m_alu_a10 = 0;
-	}
-
 }
 
 #if	ALTO2_DEBUG
@@ -1018,33 +967,33 @@ void alto2_cpu_device::device_start()
 	m_iomem = &space(AS_2);
 
 	// decode micro code PROMs to CROM
-	m_ucode_crom = prom_load(pl_ucode, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
+	m_ucode_crom = prom_load(machine(), pl_ucode, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
 
 	// allocate micro code CRAM
-	m_ucode_cram = global_alloc_array(UINT8, sizeof(UINT32) * ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE);
+	m_ucode_cram = auto_alloc_array(machine(), UINT8, sizeof(UINT32) * ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE);
 	// fill with inverted bits value
 	for (offs_t offset = 0; offset < ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE; offset++)
 		*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = ALTO2_UCODE_INVERTED;
 
 	// decode constant PROMs to const data
-	m_const_data = prom_load(pl_const, memregion("const_proms")->base(), 1, 4);
+	m_const_data = prom_load(machine(), pl_const, memregion("const_proms")->base(), 1, 4);
 
-	m_disp_a38 = prom_load(&pl_displ_a38, memregion("displ_a38")->base());
-	m_disp_a63 = prom_load(&pl_displ_a63, memregion("displ_a63")->base());
-	m_disp_a66 = prom_load(&pl_displ_a66, memregion("displ_a66")->base());
-	m_ctl2k_u3 = prom_load(&pl_2kctl_u3, memregion("2kctl_u3")->base());
-	m_ctl2k_u38 = prom_load(&pl_2kctl_u38, memregion("2kctl_u38")->base());
-	m_ctl2k_u76 = prom_load(&pl_2kctl_u76, memregion("2kctl_u76")->base());
-	m_alu_a10 = prom_load(&pl_alu_a10, memregion("alu_a10")->base());
-	m_cram3k_a37 = prom_load(&pl_3kcram_a37, memregion("3kcram_a37")->base());
-	m_madr_a32 = prom_load(&pl_madr_a32, memregion("madr_a32")->base());
-	m_madr_a64 = prom_load(&pl_madr_a64, memregion("madr_a64")->base());
-	m_madr_a65 = prom_load(&pl_madr_a65, memregion("madr_a65")->base());
-	m_madr_a90 = prom_load(&pl_madr_a90, memregion("madr_a90")->base());
-	m_madr_a91 = prom_load(&pl_madr_a91, memregion("madr_a91")->base());
-	m_ether_a41 = prom_load(&pl_enet_a41, memregion("ether_a41")->base());
-	m_ether_a42 = prom_load(&pl_enet_a42, memregion("ether_a42")->base());
-	m_ether_a49 = prom_load(&pl_enet_a49, memregion("ether_a49")->base());
+	m_disp_a38 = prom_load(machine(), &pl_displ_a38, memregion("displ_a38")->base());
+	m_disp_a63 = prom_load(machine(), &pl_displ_a63, memregion("displ_a63")->base());
+	m_disp_a66 = prom_load(machine(), &pl_displ_a66, memregion("displ_a66")->base());
+	m_ctl2k_u3 = prom_load(machine(), &pl_2kctl_u3, memregion("2kctl_u3")->base());
+	m_ctl2k_u38 = prom_load(machine(), &pl_2kctl_u38, memregion("2kctl_u38")->base());
+	m_ctl2k_u76 = prom_load(machine(), &pl_2kctl_u76, memregion("2kctl_u76")->base());
+	m_alu_a10 = prom_load(machine(), &pl_alu_a10, memregion("alu_a10")->base());
+	m_cram3k_a37 = prom_load(machine(), &pl_3kcram_a37, memregion("3kcram_a37")->base());
+	m_madr_a32 = prom_load(machine(), &pl_madr_a32, memregion("madr_a32")->base());
+	m_madr_a64 = prom_load(machine(), &pl_madr_a64, memregion("madr_a64")->base());
+	m_madr_a65 = prom_load(machine(), &pl_madr_a65, memregion("madr_a65")->base());
+	m_madr_a90 = prom_load(machine(), &pl_madr_a90, memregion("madr_a90")->base());
+	m_madr_a91 = prom_load(machine(), &pl_madr_a91, memregion("madr_a91")->base());
+	m_ether_a41 = prom_load(machine(), &pl_enet_a41, memregion("ether_a41")->base());
+	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
+	m_ether_a49 = prom_load(machine(), &pl_enet_a49, memregion("ether_a49")->base());
 
 	save_item(NAME(m_task_mpc));
 	save_item(NAME(m_task_next2));
@@ -2701,7 +2650,6 @@ void alto2_cpu_device::execute_run()
 			 */
 			m_bitclk_time -= ALTO2_UCYCLE;
 			disk_bitclk(0, m_bitclk_index);
-			m_bitclk_index++;
 		}
 #endif
 

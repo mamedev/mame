@@ -109,20 +109,6 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
  */
 diablo_hd_device::~diablo_hd_device()
 {
-	for (int page = 0; page < m_pages; page++) {
-		if (m_cache && m_cache[page])
-			global_free(m_cache[page]);
-		if (m_bits && m_bits[page])
-			global_free(m_bits[page]);
-	}
-	if (m_cache) {
-		global_free(m_cache);
-		m_cache = 0;
-	}
-	if (m_bits) {
-		global_free(m_bits);
-		m_bits = 0;
-	}
 }
 
 #if	DIABLO_DEBUG
@@ -323,13 +309,13 @@ void diablo_hd_device::read_sector()
 	}
 
 	/* allocate a buffer for this page */
-	m_cache[m_page] = global_alloc_array(UINT8, sizeof(diablo_sector_t));
+	m_cache[m_page] = auto_alloc_array(machine(), UINT8, sizeof(diablo_sector_t));
 	/* and read the page from the hard_disk image */
 	if (hard_disk_read(m_disk, m_page, m_cache[m_page])) {
 		LOG_DRIVE((2,"[DHD%u]	C/H/S:%d/%d/%d => page:%d loaded\n", m_unit, m_cylinder, m_head, m_sector, m_page));
 	} else {
 		LOG_DRIVE((0,"[DHD%u]	C/H/S:%d/%d/%d => page:%d read failed\n", m_unit, m_cylinder, m_head, m_sector, m_page));
-		global_free(m_cache[m_page]);
+		auto_free(machine(), m_cache[m_page]);
 		m_cache[m_page] = 0;
 	}
 }
@@ -453,7 +439,7 @@ UINT32* diablo_hd_device::expand_sector()
 	diablo_sector_t *s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page]);
 
 	/* allocate a bits image */
-	UINT32 *bits = reinterpret_cast<UINT32 *>(global_alloc_array(UINT32, 400));
+	UINT32 *bits = reinterpret_cast<UINT32 *>(auto_alloc_array(machine(), UINT32, 400));
 
 	if (m_diablo31) {
 		/* write sync bit after 31 words - 1 bit */
@@ -784,7 +770,7 @@ void diablo_hd_device::squeeze_sector()
 		LOG_DRIVE((0,"[DHD%u]	cksum check - header:%06o label:%06o data:%06o\n", m_unit, cksum_header, cksum_label, cksum_data));
 #endif
 	}
-	global_free(m_bits[m_page]);
+	auto_free(machine(), m_bits[m_page]);
 	m_bits[m_page] = 0;
 
 	if (!hard_disk_write(m_disk, m_page, m_cache[m_page])) {
@@ -1152,7 +1138,7 @@ int diablo_hd_device::rd_data(int index)
 	int bit = 0;
 
 	if (m_rdgate_0) {
-		LOG_DRIVE((8,"[DHD%u]	rdgate not asserted\n", m_unit));
+		LOG_DRIVE((0,"[DHD%u]	rdgate not asserted\n", m_unit));
 		return 1;	// read gate is not asserted (active 0)
 	}
 
@@ -1196,17 +1182,17 @@ int diablo_hd_device::rd_clock(int index)
 
 	if (index < 0 || index >= bits_per_sector()) {
 		LOG_DRIVE((0,"[DHD%u]	index out of range (%d)\n", m_unit, index));
-		return 1;	// don't read before or beyond the sector
+		return 0;	// don't read before or beyond the sector
 	}
 
 	if (0 == m_sector_mark_0) {
 		LOG_DRIVE((0,"[DHD%u]	read while sector mark is asserted\n", m_unit));
-		return 1;	// no clock while sector mark is low (?)
+		return 0;	// no clock while sector mark is low (?)
 	}
 
 	if (-1 == m_page) {
 		LOG_DRIVE((0,"[DHD%u]	invalid page\n", m_unit));
-		return 1;	// invalid page
+		return 0;	// invalid page
 	}
 
 	UINT32 *bits = expand_sector();
@@ -1268,9 +1254,9 @@ void diablo_hd_device::device_start()
 	m_packs = 1;		// FIXME: get from configuration?
 	m_unit = strstr(m_image->tag(), "diablo0") ? 0 : 1;
 
-	m_cache = global_alloc_array(UINT8*, DIABLO_PAGES);
+	m_cache = auto_alloc_array(machine(), UINT8*, DIABLO_PAGES);
 	memset(m_cache, 0, sizeof(UINT8*) * DIABLO_PAGES);
-	m_bits = global_alloc_array(UINT32*, DIABLO_PAGES);
+	m_bits = auto_alloc_array(machine(), UINT32*, DIABLO_PAGES);
 	memset(m_bits, 0, sizeof(UINT32*) * DIABLO_PAGES);
 
 	m_timer = timer_alloc(1, 0);

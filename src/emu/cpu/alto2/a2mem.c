@@ -783,9 +783,9 @@ void alto2_cpu_device::init_memory()
 	memset(&m_mem, 0, sizeof(m_mem));
 
 	// allocate 128KB of main memory
-	m_mem.ram = global_alloc_array(UINT32, sizeof(UINT16)*ALTO2_RAM_SIZE);
+	m_mem.ram = auto_alloc_array(machine(), UINT32, sizeof(UINT16)*ALTO2_RAM_SIZE);
 	memset(m_mem.ram, 0, sizeof(UINT32)*sizeof(UINT16)*ALTO2_RAM_SIZE);
-	m_mem.hpb = global_alloc_array(UINT8,  sizeof(UINT16)*ALTO2_RAM_SIZE);
+	m_mem.hpb = auto_alloc_array(machine(), UINT8,  sizeof(UINT16)*ALTO2_RAM_SIZE);
 	memset(m_mem.hpb, 0, sizeof(UINT8)*sizeof(UINT16)*ALTO2_RAM_SIZE);
 
 	/**
@@ -845,12 +845,5 @@ void alto2_cpu_device::init_memory()
 
 void alto2_cpu_device::exit_memory()
 {
-	if (m_mem.hpb) {
-		global_free(m_mem.hpb);
-		m_mem.hpb = 0;
-	}
-	if (m_mem.ram) {
-		global_free(m_mem.ram);
-		m_mem.ram = 0;
-	}
+	// nothing to do yet
 }
