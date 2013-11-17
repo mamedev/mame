@@ -1139,7 +1139,7 @@ int diablo_hd_device::rd_data(int index)
 
 	if (m_rdgate_0) {
 		LOG_DRIVE((0,"[DHD%u]	rdgate not asserted\n", m_unit));
-		return 1;	// read gate is not asserted (active 0)
+		return 0;	// read gate is not asserted (active 0)
 	}
 
 	if (index < 0 || index >= bits_per_sector()) {
@@ -1182,17 +1182,17 @@ int diablo_hd_device::rd_clock(int index)
 
 	if (index < 0 || index >= bits_per_sector()) {
 		LOG_DRIVE((0,"[DHD%u]	index out of range (%d)\n", m_unit, index));
-		return 0;	// don't read before or beyond the sector
+		return 1;	// don't read before or beyond the sector
 	}
 
 	if (0 == m_sector_mark_0) {
 		LOG_DRIVE((0,"[DHD%u]	read while sector mark is asserted\n", m_unit));
-		return 0;	// no clock while sector mark is low (?)
+		return 1;	// no clock while sector mark is low (?)
 	}
 
 	if (-1 == m_page) {
 		LOG_DRIVE((0,"[DHD%u]	invalid page\n", m_unit));
-		return 0;	// invalid page
+		return 1;	// invalid page
 	}
 
 	UINT32 *bits = expand_sector();
@@ -1298,8 +1298,8 @@ void diablo_hd_device::device_reset()
 	// reset the disk drive's address
 	m_cylinder = 0;
 	m_head = 0;
-	m_sector = 10;
-	m_page = 10;
+	m_sector = 0;
+	m_page = 0;
 
 	// disable the erase, write and read gates
 	m_egate_0 = 1;

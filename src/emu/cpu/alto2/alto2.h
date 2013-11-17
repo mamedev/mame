@@ -26,7 +26,7 @@
 #define	USE_PRIO_F9318			0	//!< define to 1 to use the F9318 priority encoder code
 #define	USE_ALU_74181			0	//!< define to 1 to use the SN74181 ALU code
 #define	DEBUG_DISPLAY_TIMING	0	//!< define to 1 to debug the display timing
-#define	USE_BITCLK_TIMER		1	//!< define to 1 to use a very high rate timer for the disk bit clock
+#define	USE_BITCLK_TIMER		0	//!< define to 1 to use a very high rate timer for the disk bit clock
 #define	ALTO2_HAMMING_CHECK		0	//!< define to 1 to incorporate the Hamming code and Parity check
 
 #define	ALTO2_TASKS		16			//!< 16 task slots
@@ -1409,10 +1409,10 @@ private:
 		UINT8 egate;					//!< current erase gate signal to the DIABLO hd
 		UINT8 wrgate;					//!< current write gate signal to the DIABLO hd
 		UINT8 rdgate;					//!< current read gate signal to the DIABLO hd
-		UINT16 shiftin;					//!< input shift register
-		UINT16 shiftout;				//!< output shift register
-		UINT16 datain;					//!< disk data in latch
-		UINT16 dataout;					//!< disk data out latch
+		UINT32 shiftin;					//!< input shift register
+		UINT32 shiftout;				//!< output shift register
+		UINT32 datain;					//!< disk data in latch
+		UINT32 dataout;					//!< disk data out latch
 		UINT8 krwc;						//!< read/write/check for current record
 		UINT8 kfer;						//!< disk fatal error signal state
 		UINT8 wdtskena;					//!< disk word task enable (active low)
