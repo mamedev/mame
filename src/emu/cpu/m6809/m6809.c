@@ -87,8 +87,8 @@ March 2013 NPW:
 #define LOG_INTERRUPTS  0
 
 // turn off 'unreferenced label' errors
-// this pragma doesn't work on older GCCs, so cut off at 4.4
-#if defined(__GNUC__) && __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+// this pragma doesn't work on older GCCs, so cut off at 4.2
+#if defined(__GNUC__) && __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2)
 #pragma GCC diagnostic ignored "-Wunused-label"
 #endif
 #ifdef _MSC_VER
