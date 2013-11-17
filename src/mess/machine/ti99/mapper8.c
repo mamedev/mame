@@ -129,6 +129,7 @@ Memory map (TMS9901 P5 == 0):
 #define TRACE_MEM 0
 #define TRACE_MAP 0
 #define TRACE_CONFIG 0
+#define TRACE_OSO 0
 
 #define LOG logerror
 
@@ -711,55 +712,136 @@ const device_type MAINBOARD8 = &device_creator<mainboard8_device>;
 /***************************************************************************
 
   Custom chips of the TI-99/8
-  OSO: Hexbus interface
+
+  ===== OSO: Hexbus interface =====
+
+  The Hexbus is a 4-bit peripheral bus with master/slave coordination. Bytes
+  are written over the bus in two passes. Hexbus was the designated standard
+  peripheral bus for TI computers before TI left the home computer market.
+
+  Existing devices are floppy drive, RS232 serial adapter, and
+  a "Wafertape" drive (kind of tape streamer)
+
+  Registers:  Read   Write  Bits of register
+  ----------------------------------------------------------------------------
+  Data     :  5FF8     -    ADB3  ADB2  ADB1    ADB0    ADB3  ADB2  ADB1  ADB0
+  Status   :  5FFA     -    HSKWT HSKRD BAVIAS  BAVAIS  SBAV  WBUSY RBUSY SHSK
+  Control  :  5FFC   5FFA   WIEN  RIEN  BAVIAEN BAVAIEN BAVC  WEN   REN   CR7
+  Xmit     :  5FFE   5FF8   XDR0  XDR1  XDR2    XDR3    XDR4  XDR5  XDR6  XDR7
+
+  ADBx = Hexbus data bit X
+  HSKWT = Set when a byte has been sent over the bus and HSK has been asserted
+  HSKRD = Set when a byte has been received
+  BAVIAS = set when the BAV* signal (bus available) transits to active state
+  BAVAIS = set when the BAV* signal transits to inactive state (=1)
+  SBAV = set when BAV* = 0 (active)
+  WBUSY = set when a write action is in progress (two transfers @ 4 bits)
+  Reset when HSKWT is set
+  RBUSY = set when a read action is in progress (two transfers @ 4 bits)
+  Reset when HSKRD is set
+  SHSK = set when HSK* is active (0)
+
+  WIEN = Enable interrupt for write completion
+  RIEN = Enable interrupt for read completion
+  BAVIAEN = BAVIA enable (slave mode)
+  BAVAIEN = BAVAI enable (slave mode)
+  BAVC = set BAV* line (0=active)
+  WEN = set write enable (byte is written from xmit reg)
+  REN = set read enable (latch HSK and read byte into data reg)
+  CR7 = future extension
+  XDRx = transmit register bit
+
+  Hexbus connector (console)
+  +---+---+---+---+
+  | 4 | 3 | 2 | 1 |      4 = L;    3 = BAV*; 2 = ADB1; 1 = ADB0
+  +---+---+---+---+
+  | 8 | 7 | 6 | 5 |      8 = ADB3; 7 = ADB2; 6 = nc;   5 = HSK*
+  +---+---+---+---+
+
+  TODO: This is just a preliminary implementation to satisfy the operating
+        system. When completed we can hopefully emulate a Hexbus floppy and
+        use it in Extended Basic II which refuses to work with the PEB cards.
+        The Hexbus should then be designed as a slot device.
 
 ****************************************************************************/
 
+/* Status register bits */
 enum
 {
-	HSKWT = 0x80
+	HSKWT = 0x80,
+	HSKRD = 0x40,
+	BAVIAS = 0x20,
+	BAVAIS = 0x10,
+	SBAV = 0x08,
+	WBUSY = 0x04,
+	RBUSY = 0x02,
+	SHSK = 0x01
 };
 
 ti998_oso_device::ti998_oso_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 : device_t(mconfig, OSO, "OSO Hexbus interface", tag, owner, clock, "ti998_oso", __FILE__)
 {
-	LOG("ti998/oso: Creating OSO\n");
+	if (TRACE_OSO) LOG("ti998/oso: Creating OSO\n");
 }
 
 READ8_MEMBER( ti998_oso_device::read )
 {
 	int value = 0;
 	offset &= 0x03;
-	LOG("ti998/oso: OSO chip read access %04x -> %02x\n", (offset<<1) | 0x5ff0, value);
 	switch (offset)
 	{
 	case 0:
 		// read 5FF8: read data register
+		if (TRACE_OSO) LOG("ti998/oso: Read data register = %02x\n", value);
+		value = m_data;
 		break;
 	case 1:
 		// read 5FFA: read status register
-		// We return handshake_write=1 to prevent lock-ups (until the hexbus is properly implemented)
-		value = HSKWT;
+		value = m_status;
+		if (TRACE_OSO) LOG("ti998/oso: Read status %02x\n", value);
 		break;
 	case 2:
 		// read 5FFC: read control register
+		value = m_control;
+		if (TRACE_OSO) LOG("ti998/oso: Read control register = %02x\n", value);
 		break;
 	case 3:
 		// read 5FFE: read transmit register
+		value = m_xmit;
+		if (TRACE_OSO) LOG("ti998/oso: Read transmit register = %02x\n", value);
 		break;
 	}
-
 	return value;
 }
 
 WRITE8_MEMBER( ti998_oso_device::write )
 {
 	offset &= 0x03;
-	LOG("ti998/oso: OSO chip write access %04x <- %02x\n", (offset<<1) | 0x5ff0, data);
+	switch (offset)
+	{
+	case 0:
+		// write 5FF8: write transmit register
+		if (TRACE_OSO) LOG("ti998/oso: Write transmit register %02x\n", data);
+		m_xmit = data;
+		// We set the status register directly in order to prevent lock-ups
+		// until we have a complete Hexbus implementation
+		m_status |= HSKWT;
+		break;
+	case 1:
+		// write 5FFA: write control register
+		if (TRACE_OSO) LOG("ti998/oso: Write control register %02x\n", data);
+		m_control = data;
+		break;
+	default:
+		// write 5FFC, 5FFE: undefined
+		if (TRACE_OSO) LOG("ti998/oso: Invalid write on %04x: %02x\n", (offset<<1) | 0x5ff0, data);
+		break;
+	}
 }
 
 void ti998_oso_device::device_start()
 {
+	m_status = m_xmit = m_control = m_data = 0;
 }
 
 const device_type OSO = &device_creator<ti998_oso_device>;

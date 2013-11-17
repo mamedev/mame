@@ -121,6 +121,12 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	void device_start();
+
+private:
+	UINT8 m_data;
+	UINT8 m_status;
+	UINT8 m_control;
+	UINT8 m_xmit;
 };
 
 

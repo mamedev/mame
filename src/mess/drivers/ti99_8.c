@@ -1134,7 +1134,7 @@ ROM_START(ti99_8)
 
 	// Physical memory space: ROM1
 	ROM_REGION(0x8000, ROM1_TAG, 0)
-	ROM_LOAD("u25_rom1.bin", 0x0000, 0x8000, CRC(5df17dfa) SHA1(134ae025f1b43f8e0e2aef4278f9d0c9fcffd68e))
+	ROM_LOAD("u25_rom1.bin", 0x0000, 0x8000, CRC(b574461a) SHA1(42c6aed44802cfabdd26b565d6e5ddfcd689f11e))
 
 	// Speech ROMs
 	ROM_REGION(0x8000, SPEECH_TAG, 0)
