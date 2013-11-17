@@ -4,7 +4,7 @@
 
     formats/abc800_dsk.h
 
-    Luxor ABC 830/832/838 disk image formats
+    Luxor ABC 830/832/834/838 disk image formats
 
 *********************************************************************/
 

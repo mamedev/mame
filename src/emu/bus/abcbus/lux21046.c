@@ -275,6 +275,7 @@ static SLOT_INTERFACE_START( abc_floppies )
 	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
 	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
@@ -315,9 +316,26 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_FD1793x_ADD(SAB1793_TAG, XTAL_16MHz/16)
+MACHINE_CONFIG_END
 
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525dd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525dd", luxor_55_21046_device::floppy_formats)
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( abc830 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( abc830, luxor_55_21046 )
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  MACHINE_CONFIG( abc832 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( abc832, luxor_55_21046 )
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -326,10 +344,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( abc838, luxor_55_21046 )
-	MCFG_DEVICE_MODIFY(SAB1793_TAG":0")
-	MCFG_DEVICE_SLOT_INTERFACE(abc_floppies, "8dsdd", false)
-	MCFG_DEVICE_MODIFY(SAB1793_TAG":1")
-	MCFG_DEVICE_SLOT_INTERFACE(abc_floppies, "8dsdd", false)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -338,8 +354,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( abc850, luxor_55_21046 )
-	MCFG_DEVICE_MODIFY(SAB1793_TAG":1")
-	MCFG_DEVICE_SLOT_INTERFACE(abc_floppies, NULL, false)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, NULL, luxor_55_21046_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -351,6 +367,21 @@ MACHINE_CONFIG_END
 machine_config_constructor luxor_55_21046_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( luxor_55_21046 );
+}
+
+machine_config_constructor abc830_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( abc830 );
+}
+
+machine_config_constructor abc832_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( abc832 );
+}
+
+machine_config_constructor abc834_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( abc832 );
 }
 
 machine_config_constructor abc838_device::device_mconfig_additions() const
@@ -374,12 +405,12 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2e)
 	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) ) PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2e)
 	// ABC 830
-	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x01, "Double" )
-	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x02, "Double" )
+	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x01, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
+	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2d)
 	PORT_DIPSETTING(    0x04, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, "Double" )
@@ -387,12 +418,12 @@ INPUT_PORTS_START( luxor_55_21046 )
 	PORT_DIPSETTING(    0x08, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, "Double" )
 	// ABC 832/834/850
-	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x01, "Double" )
-	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x02, "Double" )
+	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x01, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
+	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x04, 0x04, "Drive 0 Tracks" ) PORT_DIPLOCATION("SW1:3") PORT_CONDITION("SW3", 0x7f, EQUALS, 0x2c)
 	PORT_DIPSETTING(    0x00, "40" )
 	PORT_DIPSETTING(    0x04, "80" )
@@ -446,12 +477,12 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( abc830 )
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x01, "Double" )
-	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x02, "Double" )
+	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
+	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x04, 0x00, "Drive 0 Density" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, "Double" )
@@ -496,12 +527,12 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( abc832 )
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x01, "Double" )
-	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x02, "Double" )
+	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
+	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x04, 0x04, "Drive 0 Tracks" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "40" )
 	PORT_DIPSETTING(    0x04, "80" )
@@ -547,12 +578,12 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( abc834 )
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x01, 0x01, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x01, "Double" )
-	PORT_DIPNAME( 0x02, 0x02, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x02, "Double" )
+	PORT_DIPNAME( 0x01, 0x00, "Drive 0 Sides" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
+	PORT_DIPNAME( 0x02, 0x00, "Drive 1 Sides" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, "Double" )
 	PORT_DIPNAME( 0x04, 0x04, "Drive 0 Tracks" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "40" )
 	PORT_DIPSETTING(    0x04, "80" )

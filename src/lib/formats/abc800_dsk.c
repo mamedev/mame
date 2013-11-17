@@ -4,7 +4,7 @@
 
     formats/abc800_dsk.c
 
-    Luxor ABC 830/832/838 disk image formats
+    Luxor ABC 830/832/834/838 disk image formats
 
 *********************************************************************/
 
@@ -22,7 +22,7 @@ const char *abc800_format::name() const
 
 const char *abc800_format::description() const
 {
-	return "Luxor ABC 830/832/838 disk image";
+	return "Luxor ABC 830/832/834/838 disk image";
 }
 
 const char *abc800_format::extensions() const
