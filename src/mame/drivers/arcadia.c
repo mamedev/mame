@@ -80,6 +80,7 @@ public:
 	DECLARE_DRIVER_INIT(ldrb);
 	DECLARE_DRIVER_INIT(socc);
 	DECLARE_DRIVER_INIT(blast);
+	DECLARE_DRIVER_INIT(pm);
 	void arcadia_init();
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 };
@@ -819,6 +820,16 @@ ROM_START( ar_blast )
 	ROM_LOAD16_BYTE( "blsb-v2-1_4-lo.bin", 0x60001, 0x10000, CRC(16b7618a) SHA1(9857255eb47aff683893d6fe1bdf64a2ea2492a7) )
 ROM_END
 
+ROM_START( ar_pm )
+	ARCADIA_BIOS
+
+	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "pm-1hi.bin", 0x00000, 0x10000, CRC(ed65f3db) SHA1(71022cd9f379e9511e472aa1cc60d9629dfb69d5) )
+	ROM_LOAD16_BYTE( "pm-1lo.bin", 0x00001, 0x10000, CRC(7189a482) SHA1(d2daba2f3ce7991b0a6f4f5fbda44e1c95554cfc) )
+	ROM_LOAD16_BYTE( "pm-2hi.bin", 0x20000, 0x10000, CRC(a33fd701) SHA1(9101c2bedefc7f480adf02542d335fadc28ba7bc) )
+	ROM_LOAD16_BYTE( "pm-2lo.bin", 0x20001, 0x10000, CRC(17dee8b9) SHA1(695c53c3317f8b82414101404950fe6b7f93912a) )
+ROM_END
+
 
 /*************************************
  *
@@ -907,7 +918,7 @@ DRIVER_INIT_MEMBER(arcadia_amiga_state,sdwr) { arcadia_init(); generic_decode("u
 DRIVER_INIT_MEMBER(arcadia_amiga_state,socc) { arcadia_init(); generic_decode("user3", 0, 7, 1, 6, 5, 4, 3, 2); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg) { arcadia_init(); generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon) { arcadia_init(); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
-
+DRIVER_INIT_MEMBER(arcadia_amiga_state,pm)   { arcadia_init(); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
 
 
 
@@ -952,3 +963,5 @@ GAME( 1990, ar_spot,    ar_bios, arcadia, arcadia, arcadia_amiga_state, none,  R
 GAME( 1987, ar_sprg,    ar_bios, arcadia, arcadia, arcadia_amiga_state, sprg,  ROT0, "Arcadia Systems", "Space Ranger (Arcadia, V 2.0)", 0 )
 
 GAME( 1988, ar_xeon,    ar_bios, arcadia, arcadia, arcadia_amiga_state, xeon,  ROT0, "Arcadia Systems", "Xenon (Arcadia, V 2.3)", 0 )
+
+GAME( 1988, ar_pm,      ar_bios, arcadia, arcadia, arcadia_amiga_state, pm,  ROT0, "Arcadia Systems", "Pharaohs Match (Arcadia)", 0 )

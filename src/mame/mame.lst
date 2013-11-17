@@ -9719,6 +9719,7 @@ ar_ldrba        // (c) 1988 v2.4
 ar_ldrbb        // (c) 1988
 ar_ninj         // (c) 1987
 ar_ninj2        // (c) 1987
+ar_pm			// (c) 198?
 ar_rdwr         // (c) 1988
 ar_sdwr         // (c) 1988
 ar_sdwr2        // (c) 1988
