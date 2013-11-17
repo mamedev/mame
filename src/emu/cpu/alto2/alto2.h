@@ -20,7 +20,7 @@
 #define	ALTO2_TAG "alto2"
 
 #ifndef	ALTO2_DEBUG
-#define	ALTO2_DEBUG			1
+#define	ALTO2_DEBUG             0   //!< define to 1 to enable logerror() output
 #endif
 
 #define	USE_PRIO_F9318			0	//!< define to 1 to use the F9318 priority encoder code
@@ -147,7 +147,7 @@
 #define	ALTO2_DISPLAY_WIDTH 606											//!< visible width of the display
 #define	ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)		//!< visible words per scanline
 #define	ALTO2_DISPLAY_BITCLOCK 20160000ll								//!< display bit clock in in Hertz (20.16MHz)
-#define	ALTO2_DISPLAY_BITTIME(n) (HZ_TO_ATTOSECONDS(ALTO2_DISPLAY_BITCLOCK)*(n))		//!< display bit time in in atto seconds (~= 49.6031ns)
+#define	ALTO2_DISPLAY_BITTIME(n) ((n)*U64(1000000000)/ALTO2_DISPLAY_BITCLOCK)	//!< display bit time in in atto seconds (~= 49.6031ns)
 #define	ALTO2_DISPLAY_SCANLINE_TIME	ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)	//!< time for a scanline in nano seconds (768 * 49.6031ns)
 #define	ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)	//!< time of the visible part of a scanline (606 * 49.6031ns)
 #define	ALTO2_DISPLAY_WORD_TIME	ALTO2_DISPLAY_BITTIME(16)				//!< time for a word (16 pixels * 49.6031ns)
@@ -1600,6 +1600,7 @@ private:
 		UINT32 curword;						//!< helper: first cursor word in current scanline
 		UINT32 curdata;						//!< helper: shifted cursor data (32-bit)
 		UINT16 *raw_bitmap;					//!< array of words of the raw bitmap that is displayed
+		UINT16 **scanline;					//!< array of pointers to the scanlines
 		UINT8 *scanline_dirty;				//!< array of flags indicating whenever the scanline contents changed
 	}	m_dsp;
 

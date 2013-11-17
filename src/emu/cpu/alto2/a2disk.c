@@ -10,7 +10,7 @@
 #include "alto2.h"
 
 
-#define	JKFF_FUNCTION	1	//!< define 1 to debug the JK flip-flops, 0 to use a lookup table
+#define	JKFF_FUNCTION	0	//!< define 1 to debug the JK flip-flops, 0 to use a lookup table
 
 #define	GET_KADDR_SECTOR(kaddr)			A2_GET16(kaddr,16, 0, 3)			//!< get sector number from address register
 #define	PUT_KADDR_SECTOR(kaddr,val)		A2_PUT16(kaddr,16, 0, 3,val)		//!< put sector number into address register
@@ -2316,7 +2316,7 @@ void alto2_cpu_device::next_sector(int unit)
 #else
 	// TODO: verify current sector == requested sector and only then run the bitclk?
 	// HACK: no command, no bit clock
-//	if (debug_read_mem(0521))
+	if (debug_read_mem(0521))
 	{
 		// Make the CPU execution loop call disk_bitclk
 		m_bitclk_time = 0;

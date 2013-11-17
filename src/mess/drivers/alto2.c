@@ -17,10 +17,12 @@ UINT32 alto2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+#if	0
 void alto2_state::screen_eof_alto2(screen_device &screen, bool state)
 {
 	// FIXME: what do we do here?
 }
+#endif
 
 /* Input Ports */
 
@@ -253,7 +255,7 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz, 768,   0, 606, 875,   0, 808)
 	MCFG_SCREEN_UPDATE_DRIVER(alto2_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
+//	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
 
 	MCFG_PALETTE_LENGTH(2)
 

@@ -194,10 +194,11 @@ static const UINT16 double_bits[256] = {
  */
 int alto2_cpu_device::unload_word(int x)
 {
-	UINT32 word, word1, word2;
 	int y = ((m_dsp.hlc - m_dsp.vblank) & ~(1024|1)) + HLC1024();
+	UINT16* scanline = m_dsp.scanline[y];
+	UINT8 dirty = m_dsp.scanline_dirty[y];
 
-	word = m_dsp.inverse;
+	UINT32 word = m_dsp.inverse;
 	if (FIFO_MBEMPTY_0() == 0) {
 		LOG((LOG_DISPL,1, "	DSP FIFO underrun y:%d x:%d\n", y, x));
 	} else {
@@ -209,16 +210,16 @@ int alto2_cpu_device::unload_word(int x)
 
 	if (y >= 0 && y < ALTO2_DISPLAY_HEIGHT && x < ALTO2_DISPLAY_VISIBLE_WORDS) {
 		if (m_dsp.halfclock) {
-			word1 = double_bits[word / 256];
-			word2 = double_bits[word % 256];
+			UINT32 word1 = double_bits[word / 256];
+			UINT32 word2 = double_bits[word % 256];
 			/* mixing with the cursor */
 			if (x == m_dsp.curword + 0)
 				word1 ^= m_dsp.curdata >> 16;
 			if (x == m_dsp.curword + 1)
 				word1 ^= m_dsp.curdata & 0177777;
-			if (word1 != m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x]) {
-				m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x] = word1;
-				m_dsp.scanline_dirty[y] = 1;
+			if (word1 != scanline[x]) {
+				scanline[x] = word1;
+				dirty = 1;
 			}
 			x++;
 			if (x < ALTO2_DISPLAY_VISIBLE_WORDS) {
@@ -227,9 +228,9 @@ int alto2_cpu_device::unload_word(int x)
 					word2 ^= m_dsp.curdata >> 16;
 				if (x == m_dsp.curword + 1)
 					word2 ^= m_dsp.curdata & 0177777;
-				if (word2 != m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x]) {
-					m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x] = word2;
-					m_dsp.scanline_dirty[y] = 1;
+				if (word2 != scanline[x]) {
+					scanline[x] = word2;
+					dirty = 1;
 				}
 				x++;
 			}
@@ -239,14 +240,14 @@ int alto2_cpu_device::unload_word(int x)
 				word ^= m_dsp.curdata >> 16;
 			if (x == m_dsp.curword + 1)
 				word ^= m_dsp.curdata & 0177777;
-			if (word != m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x]) {
-				m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS + x] = word;
-				m_dsp.scanline_dirty[y] = 1;
+			if (word != scanline[x]) {
+				scanline[x] = word;
+				dirty = 1;
 			}
 			x++;
 		}
 	}
-
+	m_dsp.scanline_dirty[y] = dirty;
 	if (x < ALTO2_DISPLAY_VISIBLE_WORDS) {
 		m_unload_time += ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
 		return x;
@@ -440,9 +441,11 @@ void alto2_cpu_device::init_disp()
 	memset(&m_dsp, 0, sizeof(m_dsp));
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 	m_dsp.raw_bitmap = auto_alloc_array(machine(), UINT16, ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
-	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
-		memset(m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS, 0, ALTO2_DISPLAY_VISIBLE_WORDS * sizeof(UINT16));
-
+	m_dsp.scanline = auto_alloc_array(machine(), UINT16*, ALTO2_DISPLAY_HEIGHT);
+	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++) {
+		m_dsp.scanline[y] = m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS;
+		memset(m_dsp.scanline[y], 0, sizeof(UINT16) * ALTO2_DISPLAY_VISIBLE_WORDS);
+	}
 	m_dsp.scanline_dirty = auto_alloc_array(machine(), UINT8, ALTO2_DISPLAY_HEIGHT);
 	memset(m_dsp.scanline_dirty, 1, sizeof(UINT8) * ALTO2_DISPLAY_HEIGHT);
 }
@@ -462,7 +465,7 @@ void alto2_cpu_device::screen_update(bitmap_ind16 &bitmap, const rectangle &clip
 		if (0 == m_dsp.scanline_dirty[y])
 			continue;
 		m_dsp.scanline_dirty[y] = 0;
-		UINT16* src = &m_dsp.raw_bitmap[y * ALTO2_DISPLAY_SCANLINE_WORDS];
+		UINT16* src = m_dsp.scanline[y];
 		UINT16* pix = &bitmap.pix16(y);
 		for (UINT32 x = 0; x < ALTO2_DISPLAY_WIDTH; x += 16) {
 			UINT16 w = *src++;
