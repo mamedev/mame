@@ -237,6 +237,7 @@ static const struct
 	{ "sfexpj",   cp01, cp04 }, /* OK */
 	{ "sfexpj1",  cp01, cp04 }, /* OK */
 	{ "glpracr",  cp01, cp05 }, /* OK */
+	{ "glpracrj", cp01, cp05 }, /* OK */
 	{ "rvschool", cp10, cp06 }, /* OK */
 	{ "rvschoolu",cp10, cp06 }, /* OK */
 	{ "rvschoola",cp10, cp06 }, /* OK */
@@ -2808,7 +2809,41 @@ ROM_START( stargladj )
 ROM_END
 
 /* 95681-2 */
+/*
+Labeled with an offical TECMO project label as listed below. Indented info is hand written:
+
+PROJECT
+  GRA
+ROM No.
+  EP-ENG
+DATE
+  96 / 10/ 17
+TIME
+  16:30
+
+As well as a hand written sum16 checksum of D04B (which matches dump)
+*/
 ROM_START( glpracr )
+	CPZN1_BIOS
+
+	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
+	ROM_LOAD( "gra_ep-eng.2h", 0x0000000, 0x080000, CRC(f3ab9c85) SHA1(ce9d5d0406a6854975d5c71935fe917706334429) )
+
+	ROM_REGION32_LE( 0x2400000, "maskroms", 0 )
+	ROM_LOAD( "gra-05m.3h", 0x0000000, 0x400000, CRC(78053700) SHA1(38727c8cc34bb57b7b7e73041e382fb0361f184e) )
+	ROM_LOAD( "gra-06m.4h", 0x0400000, 0x400000, CRC(d73b392b) SHA1(241ddf474cea035e81a2abc580d3c0395ee925bb) )
+	ROM_LOAD( "gra-07m.5h", 0x0800000, 0x400000, CRC(acaefe3a) SHA1(32d596b0f975e1558fa7929c3166d8dad40a1c80) )
+
+	/* Sockets 2.2E, 3.3E are not populated, pcb verified */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_FILL( 0, 0x50000, 0x76 )
+
+	/* Socket 1.3B is not populated, pcb verified */
+	ROM_REGION( 0x400000, "qsound", ROMREGION_ERASE00 ) /* Q Sound Samples */
+ROM_END
+
+/* 95681-2 */
+ROM_START( glpracrj )
 	CPZN1_BIOS
 
 	ROM_REGION32_LE( 0x80000, "countryrom", 0 )
@@ -3825,7 +3860,7 @@ ROM_END
 
 /*
 
-There is known to exist (but not dumped) USA version with hand written labels:
+There is known to exist (but not dumped) an USA version with hand written labels:
 
 1/8 PROG 0 USA AA9E @ IC5
 1/8 PROG 1 USA 0A1E @ IC6
@@ -4632,7 +4667,8 @@ GAME( 1995, ts2a,      ts2,      coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capc
 GAME( 1995, ts2j,      ts2,      coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (Japan 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, starglad,  cpzn1,    coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (USA 960627)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, stargladj, starglad, coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom", "Star Gladiator Episode I: Final Crusade (Japan 960627)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, glpracr,   cpzn1,    coh1000c, zn,   zn_state, coh1000c, ROT0, "Tecmo", "Gallop Racer (Japan Ver 9.01.12)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, glpracr,   cpzn1,    coh1000c, zn,   zn_state, coh1000c, ROT0, "Tecmo", "Gallop Racer (English Ver 10.17.K)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, glpracrj,  glpracr,  coh1000c, zn,   zn_state, coh1000c, ROT0, "Tecmo", "Gallop Racer (Japanese Ver 9.01.12)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, sfex,      cpzn1,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (Euro 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, sfexu,     sfex,     coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (USA 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, sfexa,     sfex,     coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Arika", "Street Fighter EX (Asia 961219)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
