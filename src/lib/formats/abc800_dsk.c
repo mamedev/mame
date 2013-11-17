@@ -52,7 +52,7 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  80K 5 1/4 inch single density single sided
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		2000, 16, 40, 1, 128, {}, 1, {}, 27, 11, 0
+		4000, 16, 40, 1, 128, {}, 1, {}, 27, 11, 0
 	},
 
 	// track description
