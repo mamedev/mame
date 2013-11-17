@@ -63,7 +63,7 @@
 diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, DIABLO_HD, "Diablo Disk", tag, owner, clock, "diablo_hd", __FILE__),
 #if	DIABLO_DEBUG
-	m_log_level(9),
+	m_log_level(0),
 #endif
 	m_diablo31(true),
 	m_unit(0),
@@ -677,7 +677,7 @@ void diablo_hd_device::squeeze_sector()
 
 	if (m_rdfirst >= 0) {
 		LOG_DRIVE((0, "[DHD%u]	RD CHS:%03d/%d/%02d bit#%-5d ... bit#%-5d\n",
-			m_cylinder, m_head, m_sector, m_rdfirst, m_rdlast));
+			m_unit, m_cylinder, m_head, m_sector, m_rdfirst, m_rdlast));
 	}
 	m_rdfirst = -1;
 	m_rdlast = -1;
@@ -1138,7 +1138,7 @@ int diablo_hd_device::rd_data(int index)
 	int bit = 0;
 
 	if (m_rdgate_0) {
-		LOG_DRIVE((0,"[DHD%u]	rdgate not asserted\n", m_unit));
+		LOG_DRIVE((1,"[DHD%u]	rdgate not asserted\n", m_unit));
 		return 0;	// read gate is not asserted (active 0)
 	}
 

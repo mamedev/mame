@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
-	m_log_types(LOG_DISK|LOG_KSEC|LOG_KWD),
+	m_log_types(LOG_DISPL),
 	m_log_level(8),
 	m_log_newline(true),
 #endif
