@@ -235,3 +235,55 @@ UINT32 _1942_state::screen_update_1942(screen_device &screen, bitmap_ind16 &bitm
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
+
+
+void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	int offs;
+
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int i, code, col, sx, sy, dir;
+
+		code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
+				+ 2 * (m_spriteram[offs] & 0x80);
+		col = m_spriteram[offs + 1] & 0x0f;
+		
+		
+		sx = m_spriteram[offs + 2];
+		sy = m_spriteram[offs + 1];
+		dir = 1;
+
+		if (flip_screen())
+		{
+			sx = 240 - sx;
+			sy = 240 - sy;
+			dir = -1;
+		}
+
+		/* handle double / quadruple height */
+		i = (m_spriteram[offs + 1] & 0xc0) >> 6;
+		if (i == 2)
+			i = 3;
+
+		do
+		{
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
+					code + i,col,
+					flip_screen(),flip_screen(),
+					sx,sy + 16 * i * dir,15);
+
+			i--;
+		} while (i >= 0);
+	}
+
+
+}
+
+UINT32 _1942_state::screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites_p(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}

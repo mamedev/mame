@@ -105,6 +105,33 @@ static ADDRESS_MAP_START( c1942_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(c1942_fgvideoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(c1942_bgvideoram_w) AM_SHARE("bg_videoram")
+
+	AM_RANGE(0xe000, 0xefff) AM_RAM
+
+	AM_RANGE(0xce00, 0xcfff) AM_RAM AM_SHARE("spriteram")
+
+	AM_RANGE(0xdc02, 0xdc03) AM_WRITE(c1942_scroll_w)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1942_c804_w)
+	AM_RANGE(0xc805, 0xc805) AM_WRITE(c1942_palette_bank_w)
+
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM
+
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(c1942_bankswitch_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(soundlatch_byte_w)
+
+	AM_RANGE(0xf700, 0xf700) AM_READ_PORT("DSWA")
+	AM_RANGE(0xf701, 0xf701) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xf702, 0xf702) AM_READ_PORT("DSWB")
+	AM_RANGE(0xf703, 0xf703) AM_READ_PORT("P1")
+	AM_RANGE(0xf704, 0xf704) AM_READ_PORT("P2")  
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -191,6 +218,113 @@ static INPUT_PORTS_START( 1942 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( 1942p )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x0001, 0x0001, "B" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SWA:8,7,6")
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SWA:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SWA:4,3")
+	PORT_DIPSETTING(    0x30, "20K 80K 80K+" )
+	PORT_DIPSETTING(    0x20, "20K 100K 100K+" )
+	PORT_DIPSETTING(    0x10, "30K 80K 80K+" )
+	PORT_DIPSETTING(    0x00, "30K 100K 100K+" )
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWA:2,1")
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SWB:8,7,6")
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_SERVICE_DIPLOC(0x08, IP_ACTIVE_LOW, "SWB:5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SWB:3,2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x80, 0x80, "Screen Stop" )           PORT_DIPLOCATION("SWB:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
@@ -234,6 +368,38 @@ static GFXDECODE_START( 1942 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          64*4, 4*32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 64*4+4*32*8, 16 )
 GFXDECODE_END
+
+static const gfx_layout tilelayout_p =
+{
+	16,16,
+	RGN_FRAC(1,12),
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+			0x2000*8, 0x2000*8 +1, 0x2000*8 +2, 0x2000*8 +3, 0x2000*8 +4, 0x2000*8 +5, 0x2000*8 + 6, 0x2000*8 +7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,    0x1000*8 + 0*8, 0x1000*8 + 1*8, 0x1000*8 + 2*8,  0x1000*8 + 3*8,  0x1000*8 + 4*8,  0x1000*8 + 5*8,  0x1000*8 + 6*8,  0x1000*8 + 7*8     },
+	8*8
+};
+
+static const gfx_layout spritelayout_p =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+			8*16+0, 8*16+1, 8*16+2, 8*16+3, 8*16+4, 8*16+5, 8*16+6, 8*16+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			8*8, 9*8, 10*8 , 11*8, 12*8, 13*8, 14*8, 15*8 },
+	32*8
+};
+
+static GFXDECODE_START( 1942p )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_p,          64*4, 4*32 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_p, 64*4+4*32*8, 16 )
+GFXDECODE_END
+
 
 
 void _1942_state::machine_start()
@@ -282,6 +448,39 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_START( 1942p, _1942_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(c1942p_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", _1942_state, c1942_scanline, "screen", 0, 1)
+
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)  /* 3 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
+
+
+	/* video hardware */
+	MCFG_GFXDECODE(1942p)
+	MCFG_PALETTE_LENGTH(64*4+4*32*8+16*16)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(_1942_state, screen_update_1942p)
+
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -493,6 +692,45 @@ ROM_START( 1942w )
 ROM_END
 
 
+
+ROM_START( 1942p )
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF ) /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_LOAD( "(__1942p)1.bin", 0x00000, 0x8000, CRC(d8506aee) SHA1(aebdce3203e7743d70a8465a5e5766f9f47cb33f) )//
+	ROM_LOAD( "(__1942p)2.bin", 0x10000, 0x4000, CRC(793a8fbc) SHA1(57f27a2b59cbc7e82e41683ddfd58055350f80bc) )//
+	ROM_CONTINUE(0x18000,0x4000)
+	ROM_LOAD( "(__1942p)3.bin", 0x14000, 0x4000, CRC(108fda63) SHA1(6ffdf57a04bcfae9fdb2343f30cff50926188cbf) )//
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "(__1942p)snd.bin", 0x0000, 0x4000, CRC(43d6df9f) SHA1(c34579c73faa7e9552a6721ef8050b33ca158588) )//
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "(__1942p)8.bin", 0x0000, 0x2000, CRC(6ebca191) SHA1(0dbddadde54a0ab66994c4a8726be05c6ca88a0e) )   /* characters */ //
+
+	ROM_REGION( 0xc000, "gfx2", 0 )
+	ROM_LOAD( "(__1942p)5.bin", 0x0000, 0x4000, CRC(1081b88c) SHA1(f3026e72206c96573fd6ba28d15e865b51735004) )  /* tiles */
+	ROM_LOAD( "(__1942p)6.bin", 0x4000, 0x4000, CRC(2d6acd8c) SHA1(914bb971c8f1364d0c44bd11f5f7e8da1f4953bb) )
+	ROM_LOAD( "(__1942p)7.bin", 0x8000, 0x4000, CRC(30f13e78) SHA1(51b9c0dfc53db705b75dd7ce643cec807533af5a) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_INVERT )
+	ROM_LOAD( "(__1942p)9.bin", 0x0000, 0x4000, CRC(755a4762) SHA1(b8747e02854a2dd8fa1251e206dbf0a0fc017b38) )  /* tiles */
+	ROM_LOAD( "(__1942p)10.bin", 0x4000, 0x4000, CRC(4a5a9084) SHA1(dcf9834e58324f9c94206728a055083e335bc862) )
+	ROM_LOAD( "(__1942p)11.bin", 0x8000, 0x4000, CRC(d2ce3eb6) SHA1(ebe71bd413b169ff2cea6973faf48527a8283eef) )
+	ROM_LOAD( "(__1942p)12.bin", 0xc000, 0x4000, CRC(aaa86493) SHA1(b0f6c59b5369b565bf863544a26cde2105aa35be) )
+
+	ROM_REGION( 0x0a00, "proms", 0 ) // only one prom was in the dump
+	ROM_LOAD( "sb-5.e8",  0x0000, 0x0100, BAD_DUMP CRC(93ab8153) SHA1(a792f24e5c0c3c4a6b436102e7a98199f878ece1) )    /* red component */
+	ROM_LOAD( "sb-6.e9",  0x0100, 0x0100, BAD_DUMP CRC(8ab44f7d) SHA1(f74680a6a987d74b3acb32e6396f20e127874149) )    /* green component */
+	ROM_LOAD( "sb-7.e10", 0x0200, 0x0100, BAD_DUMP CRC(f4ade9a4) SHA1(62ad31d31d183cce213b03168daa035083b2f28e) )    /* blue component */
+	ROM_LOAD( "sb-0.f1",  0x0300, 0x0100, BAD_DUMP CRC(6047d91b) SHA1(1ce025f9524c1033e48c5294ee7d360f8bfebe8d) )    /* char lookup table */
+	ROM_LOAD( "sb-4.d6",  0x0400, 0x0100, BAD_DUMP CRC(4858968d) SHA1(20b5dbcaa1a4081b3139e7e2332d8fe3c9e55ed6) )    /* tile lookup table */
+	ROM_LOAD( "(__1942p)ic22.bin",  0x0500, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )    /* sprite lookup table */ //
+	ROM_LOAD( "sb-2.d1",  0x0600, 0x0100, BAD_DUMP CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )    /* tile palette selector? (not used) */
+	ROM_LOAD( "sb-3.d2",  0x0700, 0x0100, BAD_DUMP CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )    /* tile palette selector? (not used) */
+	ROM_LOAD( "sb-1.k6",  0x0800, 0x0100, BAD_DUMP CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )    /* interrupt timing (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0900, 0x0100, BAD_DUMP CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
+ROM_END
+
+
 DRIVER_INIT_MEMBER(_1942_state,1942)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -505,3 +743,4 @@ GAME( 1984, 1942a,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom", "19
 GAME( 1984, 1942abl,  1942, 1942, 1942, _1942_state, 1942, ROT270, "bootleg", "1942 (Revision A, bootleg)", GAME_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
 GAME( 1984, 1942b,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom", "1942 (First Version)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 1942w,    1942, 1942, 1942, _1942_state, 1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", GAME_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
+GAME( 1984, 1942p,    1942, 1942p,1942p,_1942_state, 1942, ROT270, "Capcom", "1942 (prototype?)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // possibly bootleg of prototype
