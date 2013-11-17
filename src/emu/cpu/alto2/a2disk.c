@@ -1046,7 +1046,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	int i;
 	UINT8 s0, s1;
 
-	LOG((LOG_DISK,8,"	>>> KWD timing bitclk:%d datin:%d block:%d SECT[4]:%d\n", bitclk, datin, block, dhd->get_sector_mark_0()));
+	LOG((LOG_DISK,9,"	*** KWD timing bitclk:%d datin:%d block:%d\n", bitclk, datin, block));
 	if (0 == m_dsk.seclate) {
 		// if SECLATE is 0, WDDONE' never goes low (counter's clear has precedence).
 		if (m_dsk.bitcount || m_dsk.carry) {
@@ -1414,7 +1414,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 */
 	DEBUG_NAME("\t\t21a KSEC  ");
 	s0 = m_dsk.ff_21a;
-	s1 = dhd->get_sector_mark_0() ? JKFF_0 : JKFF_CLK;
+	s1 = dhd->get_sector_mark_0() ? JKFF_CLK : JKFF_0;
 	if (!(m_dsk.ff_22b & JKFF_Q))
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
@@ -1440,7 +1440,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			// log the reason why gates are deasserted
 			LOG((LOG_DISK,6,"	deassert gates because of"));
 			if (m_task_wakeup & (1 << task_ksec)) {
-				LOG((LOG_DISK,6," wake KSEC"));
+				LOG((LOG_DISK,6," KSECWAKE"));
 			}
 			if (GET_KCOM_XFEROFF(m_dsk.kcom)) {
 				LOG((LOG_DISK,6," XFEROFF"));
@@ -1448,6 +1448,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			if (m_dsk.kfer) {
 				LOG((LOG_DISK,6," KFER"));
 			}
+			LOG((LOG_DISK,6,"\n"));
 		}
 #endif
 		// sector task is active OR xferoff is set OR fatal error
@@ -1466,6 +1467,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 					if (m_dsk.wrgate) {
 						LOG((LOG_DISK,6," WRGATE"));
 					}
+					LOG((LOG_DISK,6,"\n"));
 				}
 #endif
 				// assert erase and write gates
@@ -1475,7 +1477,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		} else {
 #if	ALTO2_DEBUG
 			if (1 == m_dsk.rdgate) {
-				LOG((LOG_DISK,6,"	assert RDGATE"));
+				LOG((LOG_DISK,6,"	assert RDGATE\n"));
 			}
 #endif
 			// assert read gate
@@ -1486,7 +1488,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	m_dsk.ff_21a_old = m_dsk.ff_21a;
 	m_dsk.bitclk = bitclk;
 	m_dsk.datin = datin;
-	LOG((LOG_DISK,8,"	<<< KWD timing\n"));
 }
 
 
@@ -1620,7 +1621,7 @@ void alto2_cpu_device::disk_ready_mf31a(void* ptr, INT32 arg)
  */
 void alto2_cpu_device::disk_block(int task)
 {
-	kwd_timing(m_dsk.bitclk, m_dsk.datin, task);
+    kwd_timing(m_dsk.bitclk, m_dsk.datin, task);
 }
 
 /**
@@ -2149,7 +2150,8 @@ void alto2_cpu_device::f2_xfrdat_1()
 void alto2_cpu_device::f2_swrnrdy_1()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
-	UINT16 r = dhd ? dhd->get_seek_read_write_0() : 1;
+//	UINT16 r = dhd->get_seek_read_write_0();
+	UINT16 r = dhd->get_ready_0();
 	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	LOG((LOG_DISK,1,"	SWRNRDY; %sbranch (%#o|%#o|%#o)\n", (r | init) ? "" : "no ", m_next2, r, init));
@@ -2310,7 +2312,7 @@ void alto2_cpu_device::next_sector(int unit)
 #else
 	// TODO: verify current sector == requested sector and only then run the bitclk?
 	// HACK: no command, no bit clock
-	if (debug_read_mem(0521))
+//	if (debug_read_mem(0521))
 	{
 		// Make the CPU execution loop call disk_bitclk
 		m_bitclk_time = 0;
@@ -2374,7 +2376,7 @@ void alto2_cpu_device::init_disk()
 	m_dsk.seclate_timer->reset();
 
 	m_dsk.ok_to_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ok_to_run),this));
-	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(15 * ALTO2_UCYCLE), 1);
+	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(35 * ALTO2_UCYCLE), 1);
 
 	m_dsk.ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ready_mf31a),this));
 	m_dsk.ready_timer->reset();

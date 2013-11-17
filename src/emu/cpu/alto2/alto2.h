@@ -35,8 +35,7 @@
 #define	ALTO2_BUSSRC	8			//!< 8 bus sources
 #define	ALTO2_F1MAX		16			//!< 16 F1 functions
 #define	ALTO2_F2MAX		16			//!< 16 F2 functions
-//! time in nano seconds for a CPU micro cycle
-#define	ALTO2_UCYCLE	271			//!< 29.4912MHz/8 -> 3.6864MHz ~= 271ns/clock
+#define	ALTO2_UCYCLE	271			//!< time in nano seconds for a CPU micro cycle: 29.4912MHz/8 -> 3.6864MHz ~= 271ns/clock
 
 #define	ALTO2_ETHER_FIFO_SIZE	16
 
@@ -305,9 +304,7 @@ private:
 	address_space_config m_const_config;
 	address_space_config m_iomem_config;
 
-	address_space *m_ucode;
-	address_space *m_const;
-	address_space *m_iomem;
+	address_space* m_iomem;
 
 	UINT8* m_ucode_crom;
 	UINT8* m_ucode_cram;
@@ -339,7 +336,7 @@ private:
 
 	int m_icount;
 
-	static const UINT8 m_ether_id = 0121;
+	static const UINT8 m_ether_id = 0377;
 
 	typedef void (alto2_cpu_device::*a2func)();
 	typedef void (alto2_cpu_device::*a2cb)(int unit);

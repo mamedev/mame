@@ -76,7 +76,7 @@ DEVICE_ADDRESS_MAP_START( iomem_map, 16, alto2_cpu_device )
 	AM_RANGE(0177776,                    0177776)                           AM_READWRITE( noop_r, noop_w )          // { Digital-Analog Converter, Joystick }
 	AM_RANGE(0177777,                    0177777)                           AM_READWRITE( noop_r, noop_w )          // { Digital-Analog Converter, Joystick }
 
-	AM_RANGE(0200000,                    0377777)                           AM_READWRITE( ioram_r, ioram_w )
+//	AM_RANGE(0200000,                    0377777)                           AM_READWRITE( ioram_r, ioram_w )
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -86,16 +86,13 @@ ADDRESS_MAP_END
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
-	m_log_types(LOG_DISK|LOG_KSEC|LOG_KWD|LOG_KBD),
-	m_log_level(6),
+	m_log_types(LOG_DISK|LOG_KSEC|LOG_KWD),
+	m_log_level(8),
 	m_log_newline(true),
 #endif
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
-	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
-	m_ucode(0),
-	m_const(0),
-	m_iomem(0),
+	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 16, -1 ),
 	m_ucode_crom(0),
 	m_const_data(0),
 	m_icount(0),
@@ -211,7 +208,7 @@ void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
 		// last line had a \n - print type name
 		for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
 			if (type & (1 << i))
-				logerror("%-7s ", type_name[i]);
+				logerror("%-7s %11lld ", type_name[i], cycle());
 	}
 	va_list ap;
 	va_start(ap, format);
@@ -945,8 +942,7 @@ static const prom_load_t pl_enet_a49 =
 // FIXME
 void alto2_cpu_device::device_start()
 {
-	m_ucode = &space(AS_0);
-	m_const = &space(AS_1);
+	// get a pointer to the IO address space
 	m_iomem = &space(AS_2);
 
 	// decode micro code PROMs to CROM
@@ -960,11 +956,6 @@ void alto2_cpu_device::device_start()
 
 	// decode constant PROMs to const data
 	m_const_data = prom_load(pl_const, memregion("const_proms")->base(), 1, 4);
-
-	for (UINT32 offs = 0; offs < 256; offs++) {
-		UINT16 cdata = m_const->read_word(m_const->address_to_byte(offs));
-		printf("%04o: %06o\n", offs, cdata);
-	}
 
 	m_disp_a38 = prom_load(&pl_displ_a38, memregion("displ_a38")->base());
 	m_disp_a63 = prom_load(&pl_displ_a63, memregion("displ_a63")->base());
