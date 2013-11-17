@@ -2611,7 +2611,7 @@ void alto2_cpu_device::execute_run()
 
 	do {
 		int do_bs, flags;
-		UINT16 alu;
+		UINT32 alu;
 		UINT8 aluf;
 		UINT8 bs;
 		UINT8 f1;
