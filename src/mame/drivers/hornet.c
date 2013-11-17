@@ -343,8 +343,9 @@ public:
 		m_k037122_2(*this, "k037122_2" ),
 		m_adc12138(*this, "adc12138") { }
 
-	UINT8 m_led_reg0;
-	UINT8 m_led_reg1;
+	// TODO: Needs verification on real hardware
+	static const int m_sound_timer_usec = 2800;
+
 	required_shared_ptr<UINT32> m_workram;
 	required_shared_ptr<UINT32> m_sharc_dataram0;
 	optional_shared_ptr<UINT32> m_sharc_dataram1;
@@ -358,12 +359,16 @@ public:
 	optional_device<k037122_device> m_k037122_1;
 	optional_device<k037122_device> m_k037122_2;
 	required_device<adc12138_device> m_adc12138;
+
+	emu_timer *m_sound_irq_timer;
+	UINT8 m_led_reg0;
+	UINT8 m_led_reg1;
 	UINT8 *m_jvs_sdata;
 	UINT32 m_jvs_sdata_ptr;
-	emu_timer *m_sound_irq_timer;
 	UINT16 m_gn680_latch;
 	UINT16 m_gn680_ret0;
 	UINT16 m_gn680_ret1;
+
 	DECLARE_READ32_MEMBER(hornet_k037122_sram_r);
 	DECLARE_WRITE32_MEMBER(hornet_k037122_sram_w);
 	DECLARE_READ32_MEMBER(hornet_k037122_char_r);
@@ -386,6 +391,9 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
+	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
+	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+	
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
 	virtual void machine_start();
@@ -393,7 +401,7 @@ public:
 	DECLARE_MACHINE_RESET(hornet_2board);
 	UINT32 screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_CALLBACK_MEMBER(sound_irq);
 	int jvs_encode_data(UINT8 *in, int length);
 	int jvs_decode_data(UINT8 *in, UINT8 *out, int length);
 	void jamma_jvs_cmd_exec();
@@ -646,6 +654,36 @@ WRITE32_MEMBER(hornet_state::gun_w)
 	}
 }
 
+/******************************************************************/
+
+TIMER_CALLBACK_MEMBER(hornet_state::sound_irq)
+{
+	m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+}
+
+
+WRITE16_MEMBER(hornet_state::soundtimer_en_w)
+{
+	if (data & 1)
+	{
+		// Reset and disable timer
+		m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
+		m_sound_irq_timer->enable(false);
+	}
+	else
+	{
+		// Enable timer
+		m_sound_irq_timer->enable(true);
+	}
+}
+
+WRITE16_MEMBER(hornet_state::soundtimer_count_w)
+{
+	// Reset the count
+	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
+	m_audiocpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+}
+
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
@@ -659,7 +697,7 @@ static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffff)  /* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREADWRITE("k056800", k056800_device, host_r, host_w)
+	AM_RANGE(0x7d030000, 0x7d03000f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
 	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM             /* COMM BOARD 0 */
 	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
 	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
@@ -676,11 +714,11 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, hornet_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     /* Work RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_device, sound_r, sound_w)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0x00ff)
 	AM_RANGE(0x480000, 0x480001) AM_WRITENOP
 	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP
-	AM_RANGE(0x500000, 0x500001) AM_WRITENOP
-	AM_RANGE(0x600000, 0x600001) AM_NOP
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(soundtimer_en_w) AM_READNOP
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(soundtimer_count_w) AM_READNOP
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -879,7 +917,7 @@ void hornet_state::machine_start()
 	save_pointer(NAME(m_jvs_sdata), 1024);
 	save_item(NAME(m_jvs_sdata_ptr));
 
-	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::irq_off),this));
+	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::sound_irq), this));
 }
 
 void hornet_state::machine_reset()
@@ -912,25 +950,6 @@ static double adc12138_input_callback( device_t *device, UINT8 input )
 
 static const adc12138_interface hornet_adc_interface = {
 	adc12138_input_callback
-};
-
-TIMER_CALLBACK_MEMBER(hornet_state::irq_off)
-{
-	m_audiocpu->set_input_line(param, CLEAR_LINE);
-}
-
-static void sound_irq_callback( running_machine &machine, int irq )
-{
-	hornet_state *state = machine.driver_data<hornet_state>();
-	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-
-	state->m_audiocpu->set_input_line(line, ASSERT_LINE);
-	state->m_sound_irq_timer->adjust(attotime::from_usec(5), line);
-}
-
-static const k056800_interface hornet_k056800_interface =
-{
-	sound_irq_callback
 };
 
 static const k033906_interface hornet_k033906_intf_0 =
@@ -988,7 +1007,8 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_K037122_ADD("k037122_1", "screen", 0)
 
-	MCFG_K056800_ADD("k056800", hornet_k056800_interface, XTAL_64MHz/4)
+	MCFG_K056800_ADD("k056800", XTAL_16_9344MHz)
+	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

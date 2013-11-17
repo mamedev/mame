@@ -12,11 +12,14 @@
 #define MCFG_K054539_ADD(_tag, _clock, _interface) \
 	MCFG_DEVICE_ADD(_tag, K054539, _clock) \
 	k054539_device::static_set_interface(*device, _interface);
+
+#define MCFG_K054539_TIMER_HANDLER(_devcb) \
+	devcb = &k054539_device::set_timer_handler(*device, DEVCB2_##_devcb);
+
 struct k054539_interface
 {
 	const char *rgnoverride;
 	void (*apan)(device_t *, double, double);   /* Callback for analog output mixing levels (0..1 for each channel) */
-	void (*irq)(device_t *);
 };
 
 
@@ -46,7 +49,9 @@ public:
 	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
-	static void static_set_interface(device_t &device, const k054539_interface &interface);
+	static void static_set_interface(device_t &device, const k054539_interface &interface);	
+	template<class _Object> static devcb2_base &set_timer_handler(device_t &device, _Object object) { return downcast<k054539_device &>(device).m_timer_handler.set_callback(object); }
+	
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
@@ -104,6 +109,10 @@ private:
 
 	channel channels[8];
 	sound_stream *stream;
+	
+	emu_timer			*m_timer;
+	UINT32				m_timer_state;
+	devcb2_write_line	m_timer_handler;
 
 	bool regupdate();
 	void keyon(int channel);

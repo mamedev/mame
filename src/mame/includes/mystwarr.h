@@ -23,6 +23,7 @@ public:
 	required_device<k055673_device> m_k055673;
 	required_shared_ptr<UINT16> m_gx_workram;
 	optional_shared_ptr<UINT16> m_spriteram;
+
 	UINT8 m_mw_irq_control;
 	int m_cur_sound_region;
 	int m_layer_colorbase[6];
@@ -36,6 +37,9 @@ public:
 	int m_roz_rombank;
 	tilemap_t *m_ult_936_tilemap;
 	UINT16 m_clip;
+
+	UINT8 m_sound_ctrl;
+	UINT8 m_sound_nmi_clk;
 
 	DECLARE_READ16_MEMBER(eeprom_r);
 	DECLARE_WRITE16_MEMBER(mweeprom_w);
@@ -55,7 +59,7 @@ public:
 	DECLARE_WRITE16_MEMBER(k053247_martchmp_word_w);
 	DECLARE_READ16_MEMBER(mccontrol_r);
 	DECLARE_WRITE16_MEMBER(mccontrol_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
 
 	DECLARE_WRITE16_MEMBER(ddd_053936_enable_w);
 	DECLARE_WRITE16_MEMBER(ddd_053936_clip_w);
@@ -84,6 +88,7 @@ public:
 	UINT32 screen_update_dadandrn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_martchmp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddd_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(metamrph_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mchamp_interrupt);

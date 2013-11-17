@@ -523,21 +523,23 @@ ADDRESS_MAP_END
 
 /**********************************************************************************/
 
-
 void mystwarr_state::reset_sound_region()
 {
-	membank("bank2")->set_base(memregion("soundcpu")->base() + 0x10000 + m_cur_sound_region*0x4000);
+	membank("bank2")->set_base(memregion("soundcpu")->base() + 0x10000 + (m_sound_ctrl & 0xf)*0x4000);
 }
 
-WRITE8_MEMBER(mystwarr_state::sound_bankswitch_w)
+WRITE8_MEMBER(mystwarr_state::sound_ctrl_w)
 {
-	m_cur_sound_region = (data & 0xf);
+	if (!(data & 0x10))
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_sound_ctrl = data;
 	reset_sound_region();
 }
 
 /* sound memory maps
 
-   there are 2 sound boards: the martial champion single-'539 version
+   there are 2 sound systems: the martial champion single-'539 version
    and the dual-'539 version used by run and gun, violent storm, monster maulers,
    gaiapolous, metamorphic force, and mystic warriors.  Their memory maps are
    quite similar to xexex/gijoe/asterix's sound.
@@ -555,10 +557,24 @@ static ADDRESS_MAP_START( mystwarr_sound_map, AS_PROGRAM, 8, mystwarr_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_byte_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP    // unknown write
 ADDRESS_MAP_END
 
+
+WRITE_LINE_MEMBER(mystwarr_state::k054539_nmi_gen)
+{
+	if (m_sound_ctrl & 0x10)
+	{
+		// Trigger an /NMI on the rising edge
+		if (!m_sound_nmi_clk && state)
+		{
+			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		}
+	}
+
+	m_sound_nmi_clk = state;
+}
 
 static const k054539_interface k054539_config =
 {
@@ -809,13 +825,15 @@ GFXDECODE_END
 MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 {
 	/* set default bankswitch */
-	m_cur_sound_region = 2;
+	m_sound_ctrl = 2;
 	reset_sound_region();
 
 	m_mw_irq_control = 0;
 
 	save_item(NAME(m_mw_irq_control));
-	save_item(NAME(m_cur_sound_region));
+	save_item(NAME(m_sound_ctrl));
+	save_item(NAME(m_sound_nmi_clk));
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(mystwarr_state::reset_sound_region), this));
 }
 
@@ -945,7 +963,6 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(mystwarr_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mystwarr_state, nmi_line_pulse,  480)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
@@ -976,11 +993,12 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(mystwarr_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 
-	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END

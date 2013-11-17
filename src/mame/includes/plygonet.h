@@ -26,7 +26,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_dsp;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<k053936_device> m_k053936;
 
 	/* 68k-side shared ram */
@@ -37,7 +37,6 @@ public:
 	ioport_port *m_inputs[4];
 	UINT8 m_sys0;
 	UINT8 m_sys1;
-	UINT8 m_sound_bank;
 
 	direct_update_delegate m_dsp56k_update_handler;
 
@@ -47,6 +46,10 @@ public:
 	tilemap_t *m_roz_tilemap;
 	UINT16 m_ttl_vram[0x800];
 	UINT16 m_roz_vram[0x800];
+	
+	/* sound */
+	UINT8 m_sound_ctrl;	
+	UINT8 m_sound_intck;
 
 	/* memory buffers */
 	UINT16 m_dsp56k_bank00_ram[2 * 8 * dsp56k_bank00_size]; /* 2 bank sets, 8 potential banks each */
@@ -77,7 +80,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dsp56k_shared_ram_write);
 	DECLARE_READ16_MEMBER(dsp56k_ram_bank04_read);
 	DECLARE_WRITE16_MEMBER(dsp56k_ram_bank04_write);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(sound_ctrl_w);
 	DECLARE_READ32_MEMBER(polygonet_ttl_ram_r);
 	DECLARE_WRITE32_MEMBER(polygonet_ttl_ram_w);
 	DECLARE_READ32_MEMBER(polygonet_roz_ram_r);
@@ -93,4 +96,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(polygonet_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 };

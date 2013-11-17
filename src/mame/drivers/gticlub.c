@@ -239,32 +239,29 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 class gticlub_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_IRQ_OFF
-	};
-
 	gticlub_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_work_ram(*this, "work_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_k056800(*this, "k056800"),
 		m_dsp(*this, "dsp"),
 		m_dsp2(*this, "dsp2"),
+		m_k056800(*this, "k056800"),
 		m_adc1038(*this, "adc1038"),
 		m_eeprom(*this, "eeprom")  { }
+
+	// TODO: Needs verification on real hardware
+	static const int m_sound_timer_usec = 2400;
 
 	required_shared_ptr<UINT32> m_work_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<k056800_device> m_k056800;
 	required_device<cpu_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
+	required_device<k056800_device> m_k056800;
 	required_device<adc1038_device> m_adc1038;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	UINT32 *m_sharc_dataram_0;
-	UINT32 *m_sharc_dataram_1;
+
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);
 	DECLARE_WRITE32_MEMBER(gticlub_k001604_tile_w);
@@ -280,6 +277,9 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
+	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
+	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+
 	void init_hangplt_common();
 	DECLARE_DRIVER_INIT(hangplt);
 	DECLARE_DRIVER_INIT(hangpltu);
@@ -289,16 +289,18 @@ public:
 	DECLARE_MACHINE_RESET(hangplt);
 	DECLARE_VIDEO_START(gticlub);
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
+	TIMER_CALLBACK_MEMBER(sound_irq);
 
 	UINT32 screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 private:
 	void gticlub_led_setreg(int offset, UINT8 data);
 
 	UINT8 gticlub_led_reg[2];
+	emu_timer *m_sound_irq_timer;
+	UINT32 *m_sharc_dataram_0;
+	UINT32 *m_sharc_dataram_1;
 };
 
 
@@ -424,6 +426,36 @@ WRITE8_MEMBER(gticlub_state::sysreg_w)
 
 /******************************************************************/
 
+TIMER_CALLBACK_MEMBER(gticlub_state::sound_irq)
+{
+	m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+}
+
+
+WRITE16_MEMBER(gticlub_state::soundtimer_en_w)
+{
+	if (data & 1)
+	{
+		// Reset and disable timer
+		m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
+		m_sound_irq_timer->enable(false);
+	}
+	else
+	{
+		// Enable timer
+		m_sound_irq_timer->enable(true);
+	}
+}
+
+WRITE16_MEMBER(gticlub_state::soundtimer_count_w)
+{
+	// Reset the count
+	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
+	m_audiocpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+}
+
+/******************************************************************/
+
 MACHINE_START_MEMBER(gticlub_state,gticlub)
 {
 	/* set conservative DRC options */
@@ -431,6 +463,8 @@ MACHINE_START_MEMBER(gticlub_state,gticlub)
 
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x000fffff, FALSE, m_work_ram);
+
+	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gticlub_state::sound_irq), this));
 }
 
 static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
@@ -446,9 +480,7 @@ static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, k056230_r, k056230_w, 0xffffffff)
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE("k056800", k056800_device, host_w)
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVREAD("k056800", k056800_device, host_r)       // Hang Pilot
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_DEVREAD("k056800", k056800_device, host_r)
+	AM_RANGE(0x7e00c000, 0x7e00c00f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_REGION("user2", 0)   /* Data ROM */
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")    /* Program ROM */
@@ -459,10 +491,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, gticlub_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_device, sound_r, sound_w)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0x00ff)
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
-	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
-	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(soundtimer_en_w) AM_READNOP
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(soundtimer_count_w) AM_READNOP
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -722,33 +754,6 @@ static const sharc_config sharc_cfg =
 };
 
 
-void gticlub_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_IRQ_OFF:
-		m_audiocpu->set_input_line(param, CLEAR_LINE);
-		break;
-	default:
-		assert_always(FALSE, "Unknown id in gticlub_state::device_timer");
-	}
-}
-
-static void sound_irq_callback( running_machine &machine, int irq )
-{
-	gticlub_state *state = machine.driver_data<gticlub_state>();
-	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-
-	state->m_audiocpu->set_input_line(line, ASSERT_LINE);
-	state->timer_set(attotime::from_usec(5), gticlub_state::TIMER_IRQ_OFF, line);
-}
-
-static const k056800_interface gticlub_k056800_interface =
-{
-	sound_irq_callback
-};
-
-
 static int adc1038_input_callback( device_t *device, int input )
 {
 	int value = 0;
@@ -986,7 +991,8 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_K001604_ADD("k001604_1", gticlub_k001604_intf)
 
-	MCFG_K056800_ADD("k056800", gticlub_k056800_interface, XTAL_64MHz/4)
+	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
+	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1103,7 +1109,8 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
 	MCFG_K001604_ADD("k001604_2", hangplt_k001604_intf_r)
 
-	MCFG_K056800_ADD("k056800", gticlub_k056800_interface, XTAL_64MHz/4)
+	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
+	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

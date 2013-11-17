@@ -198,22 +198,34 @@ WRITE8_MEMBER(rungun_state::sound_status_w)
 	m_sound_status = data;
 }
 
-WRITE8_MEMBER(rungun_state::z80ctrl_w)
+WRITE8_MEMBER(rungun_state::sound_ctrl_w)
 {
-	m_z80_control = data;
+	/*
+		.... xxxx - Z80 ROM bank
+		...x .... - NMI enable/acknowledge
+		xx.. .... - BLT2/1 (?)
+	*/
 
 	membank("bank2")->set_entry(data & 0x07);
 
-	if (data & 0x10)
+	if (!(data & 0x10))
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_sound_ctrl = data;
 }
 
-INTERRUPT_GEN_MEMBER(rungun_state::audio_interrupt)
+WRITE_LINE_MEMBER(rungun_state::k054539_nmi_gen)
 {
-	if (m_z80_control & 0x80)
-		return;
+	if (m_sound_ctrl & 0x10)
+	{
+		// Trigger an /NMI on the rising edge
+		if (!m_sound_nmi_clk && state)
+		{
+			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		}
+	}
 
-	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_sound_nmi_clk = state;
 }
 
 /* sound (this should be split into audio/xexex.c or pregx.c or so someday) */
@@ -224,12 +236,12 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(z80ctrl_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -347,8 +359,9 @@ void rungun_state::machine_start()
 
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	save_item(NAME(m_z80_control));
+	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_status));
+	save_item(NAME(m_sound_nmi_clk));
 	save_item(NAME(m_ttl_vram));
 }
 
@@ -359,7 +372,7 @@ void rungun_state::machine_reset()
 	memset(m_sysreg, 0, 0x20);
 	memset(m_ttl_vram, 0, 0x1000 * sizeof(UINT16));
 
-	m_z80_control = 0;
+	m_sound_ctrl = 0;
 	m_sound_status = 0;
 }
 
@@ -368,11 +381,10 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(rungun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rungun_state,  rng_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rungun_state, rng_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 10000000) // 8Mhz (10Mhz is much safer in self-test due to heavy sync)
+	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(rungun_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(rungun_state, audio_interrupt,  480)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // higher if sound stutters
 
@@ -392,7 +404,6 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 
 	MCFG_PALETTE_LENGTH(1024)
 
-
 	MCFG_K053936_ADD("k053936", rng_k053936_intf)
 	MCFG_K055673_ADD("k055673", rng_k055673_intf)
 	MCFG_K053252_ADD("k053252", 16000000/2, rng_k053252_intf)
@@ -400,11 +411,12 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(rungun_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -239,6 +239,9 @@ public:
 		m_k001604(*this, "k001604"),
 		m_adc12138(*this, "adc12138") { }
 
+	// TODO: Needs verification on real hardware
+	static const int m_sound_timer_usec = 2400;
+
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
 	required_shared_ptr<UINT32> m_work_ram;
@@ -263,12 +266,15 @@ public:
 	DECLARE_WRITE32_MEMBER(lanc2_w);
 	DECLARE_READ32_MEMBER(dsp_dataram_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
+	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
+	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
+	TIMER_CALLBACK_MEMBER(sound_irq);
 	DECLARE_DRIVER_INIT(nwktr);
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(irq_off);
+
 	void lanc2_init();
 };
 
@@ -521,10 +527,34 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 
 /*****************************************************************************/
 
-TIMER_CALLBACK_MEMBER(nwktr_state::irq_off)
+TIMER_CALLBACK_MEMBER(nwktr_state::sound_irq)
 {
-	m_audiocpu->set_input_line(param, CLEAR_LINE);
+	m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
+
+
+WRITE16_MEMBER(nwktr_state::soundtimer_en_w)
+{
+	if (data & 1)
+	{
+		// Reset and disable timer
+		m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
+		m_sound_irq_timer->enable(false);
+	}
+	else
+	{
+		// Enable timer
+		m_sound_irq_timer->enable(true);
+	}
+}
+
+WRITE16_MEMBER(nwktr_state::soundtimer_count_w)
+{
+	// Reset the count
+	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
+	m_audiocpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+}
+
 
 void nwktr_state::machine_start()
 {
@@ -534,7 +564,7 @@ void nwktr_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x003fffff, FALSE, m_work_ram);
 
-	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::irq_off),this));
+	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::sound_irq), this));
 }
 
 static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )
@@ -548,9 +578,7 @@ static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ(sysreg_r)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE(sysreg_w)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffff)  /* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREAD("k056800", k056800_device, host_r)
-	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVWRITE("k056800", k056800_device, host_w)
-	AM_RANGE(0x7d030008, 0x7d03000f) AM_DEVWRITE("k056800", k056800_device, host_w)
+	AM_RANGE(0x7d030000, 0x7d03000f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
 	AM_RANGE(0x7d040000, 0x7d04ffff) AM_READWRITE(lanc1_r, lanc1_w)
 	AM_RANGE(0x7d050000, 0x7d05ffff) AM_READWRITE(lanc2_r, lanc2_w)
 	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION("user2", 0)   /* Data ROM */
@@ -562,10 +590,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, nwktr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM     /* Work RAM */
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_device, sound_r, sound_w)
-	AM_RANGE(0x600000, 0x600001) AM_NOP
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0x00ff)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(soundtimer_en_w) AM_READNOP
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(soundtimer_count_w) AM_READNOP
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -682,19 +711,6 @@ static const adc12138_interface nwktr_adc_interface = {
 	adc12138_input_callback
 };
 
-static void sound_irq_callback(running_machine &machine, int irq)
-{
-	nwktr_state *state = machine.driver_data<nwktr_state>();
-	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-
-	state->m_audiocpu->set_input_line(line, ASSERT_LINE);
-	state->m_sound_irq_timer->adjust(attotime::from_usec(5), line);
-}
-
-static const k056800_interface nwktr_k056800_interface =
-{
-	sound_irq_callback
-};
 
 static const k033906_interface nwktr_k033906_interface =
 {
@@ -734,24 +750,25 @@ static const voodoo_config voodoo_intf =
 static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(nwktr_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, 64000000/4)    /* 16MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, 36000000)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
 
-
-	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_intf)
-
+	MCFG_M48T58_ADD( "m48t58" )
+	MCFG_ADC12138_ADD( "adc12138", nwktr_adc_interface )
 	MCFG_K033906_ADD("k033906_1", nwktr_k033906_interface)
 
 	/* video hardware */
+	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, voodoo_intf)
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 384)
@@ -762,17 +779,14 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	MCFG_K001604_ADD("k001604", racingj_k001604_intf)
 
-	MCFG_K056800_ADD("k056800", nwktr_k056800_interface, 64000000/4)
-
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", 16934400)  // as per Guru readme above
+	MCFG_K056800_ADD("k056800", XTAL_16_9344MHz)
+	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+
+	MCFG_RF5C400_ADD("rfsnd", XTAL_16_9344MHz)  // as per Guru readme above
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_M48T58_ADD( "m48t58" )
-
-	MCFG_ADC12138_ADD( "adc12138", nwktr_adc_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( thrilld, nwktr )

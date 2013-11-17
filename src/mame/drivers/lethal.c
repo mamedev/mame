@@ -212,12 +212,6 @@ READ8_MEMBER(lethal_state::sound_status_r)
 	return 0xf;
 }
 
-static void sound_nmi( device_t *device )
-{
-	lethal_state *state = device->machine().driver_data<lethal_state>();
-	state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 WRITE8_MEMBER(lethal_state::le_bankswitch_w)
 {
 	membank("bank1")->set_entry(data);
@@ -460,12 +454,12 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
-	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xfc03, 0xfc03) AM_READNOP
+	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lethalen )
@@ -557,7 +551,6 @@ static const k054539_interface k054539_config =
 {
 	NULL,
 	NULL,
-	sound_nmi
 };
 
 void lethal_state::machine_start()
@@ -643,7 +636,6 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 
 	MCFG_PALETTE_LENGTH(7168+1)
 
-
 	MCFG_K056832_ADD("k056832", lethalen_k056832_intf)
 	MCFG_K053244_ADD("k053244", lethalen_k05324x_intf)
 	MCFG_K054000_ADD("k054000")
@@ -651,7 +643,8 @@ static MACHINE_CONFIG_START( lethalen, lethal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
+	MCFG_K054539_TIMER_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -182,28 +182,32 @@ Check gticlub.c for details on the bottom board.
 class zr107_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_IRQ_OFF
-	};
-
 	zr107_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
 		m_k001604(*this, "k001604"),
 		m_k056800(*this, "k056800"),
-		m_k056832(*this, "k056832") { }
+		m_k056832(*this, "k056832"),
+		m_workram(*this, "workram") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_dsp;
+	optional_device<k001604_device> m_k001604;
+	required_device<k056800_device> m_k056800;
+	optional_device<k056832_device> m_k056832;
+	optional_shared_ptr<UINT32> m_workram;
+
+	UINT32 *m_sharc_dataram;
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
 	int m_ccu_vcth;
 	int m_ccu_vctl;
-	optional_shared_ptr<UINT32> m_workram;
-	emu_timer *m_sound_irq_timer;
-	UINT32 *m_sharc_dataram;
+	UINT8 m_sound_ctrl;
+	UINT8 m_sound_intck;
+	
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ8_MEMBER(sysreg_r);
 	DECLARE_WRITE8_MEMBER(sysreg_w);
@@ -212,25 +216,21 @@ public:
 	DECLARE_WRITE32_MEMBER(jetwave_palette_w);
 	DECLARE_READ32_MEMBER(dsp_dataram_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
+	DECLARE_WRITE16_MEMBER(sound_ctrl_w);
+
 	DECLARE_DRIVER_INIT(common);
 	DECLARE_DRIVER_INIT(zr107);
 	DECLARE_DRIVER_INIT(jetwave);
-	virtual void machine_start();
-	virtual void machine_reset();
 	DECLARE_VIDEO_START(zr107);
 	DECLARE_VIDEO_START(jetwave);
 	UINT32 screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_dsp;
-	optional_device<k001604_device> m_k001604;
-	required_device<k056800_device> m_k056800;
-	optional_device<k056832_device> m_k056832;
+	WRITE_LINE_MEMBER(k054539_irq_gen);
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -431,8 +431,6 @@ void zr107_state::machine_start()
 	/* set conservative DRC options */
 	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
 
-	m_sound_irq_timer = timer_alloc(TIMER_IRQ_OFF);
-
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x000fffff, FALSE, m_workram);
 }
@@ -451,8 +449,7 @@ static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8("k056230", k056230_device, k056230_r, k056230_w, 0xffffffff)               /* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)      /* LANC Buffer RAM (27E) */
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE("k056800", k056800_device, host_w)
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_DEVREAD("k056800", k056800_device, host_r)
+	AM_RANGE(0x7e00c000, 0x7e00c00f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")    /* Program ROM */
 ADDRESS_MAP_END
@@ -479,8 +476,7 @@ static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8("k056230", k056230_device, k056230_r, k056230_w, 0xffffffff)             /* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k056230", k056230_device, lanc_ram_r, lanc_ram_w)    /* LANC Buffer RAM (27E) */
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_DEVWRITE("k056800", k056800_device, host_w)
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_DEVREAD("k056800", k056800_device, host_r)
+	AM_RANGE(0x7e00c000, 0x7e00c00f) AM_MIRROR(0x80000000) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x80000000) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")  /* Program ROM */
@@ -490,14 +486,25 @@ ADDRESS_MAP_END
 
 /**********************************************************************/
 
+WRITE16_MEMBER(zr107_state::sound_ctrl_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		if (!(data & 1))
+			m_audiocpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+
+		m_sound_ctrl = data;
+	}
+}
+
 static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, zr107_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM     /* Work RAM */
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00)
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_2", k054539_device, read, write, 0x00ff)
-	AM_RANGE(0x400000, 0x40000f) AM_DEVWRITE("k056800", k056800_device, sound_w)
-	AM_RANGE(0x400010, 0x40001f) AM_DEVREAD("k056800", k056800_device, sound_r)
-	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0x00ff)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(sound_ctrl_w)
+	AM_RANGE(0x580000, 0x580001) AM_WRITENOP // 'NRES' - D2: K056602 /RESET
 ADDRESS_MAP_END
 
 static const k054539_interface k054539_config =
@@ -694,31 +701,19 @@ static double adc0838_callback( device_t *device, UINT8 input )
 }
 
 
-void zr107_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+
+WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
 {
-	switch (id)
+	if (m_sound_ctrl & 1)
 	{
-	case TIMER_IRQ_OFF:
-		m_audiocpu->set_input_line(param, CLEAR_LINE);
-		break;
-	default:
-		assert_always(FALSE, "Unknown id in zr107_state::device_timer");
+		// Trigger an interrupt on the rising edge
+		if (!m_sound_intck && state)
+			m_audiocpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	}
+
+	m_sound_intck = state;
 }
 
-static void sound_irq_callback( running_machine &machine, int irq )
-{
-	zr107_state *state = machine.driver_data<zr107_state>();
-	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-
-	state->m_audiocpu->set_input_line(line, ASSERT_LINE);
-	state->timer_set(attotime::from_usec(5), zr107_state::TIMER_IRQ_OFF, line);
-}
-
-static const k056800_interface zr107_k056800_interface =
-{
-	sound_irq_callback
-};
 
 static const k056832_interface zr107_k056832_intf =
 {
@@ -766,7 +761,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(750000))// Very high sync needed to prevent lockups - why?
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -785,15 +780,17 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 
-	MCFG_K056800_ADD("k056800", zr107_k056800_interface, XTAL_64MHz/4)
+	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
+	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(zr107_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
@@ -824,7 +821,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_CPU_CONFIG(sharc_cfg)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(2000000)) // Very high sync needed to prevent lockups - why?
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -843,15 +840,17 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 
-	MCFG_K056800_ADD("k056800", zr107_k056800_interface, XTAL_64MHz/4)
+	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
+	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))	
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(zr107_state, k054539_irq_gen))	
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
 	MCFG_SOUND_CONFIG(k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1069,10 +1068,10 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run (Euro v1.11)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, windheata,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, waveshrk, 0,        jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 1996, jetwave,  waveshrk, jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 1995, midnrun,  0,        zr107,   midnrun,  zr107_state, zr107,   ROT0, "Konami", "Midnight Run (Euro v1.11)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, windheata,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, waveshrk, 0,        jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, jetwave,  waveshrk, jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", GAME_IMPERFECT_GRAPHICS )

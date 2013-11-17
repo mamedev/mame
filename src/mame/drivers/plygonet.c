@@ -90,9 +90,7 @@ WRITE8_MEMBER(polygonet_state::polygonet_sys_w)
 		    D25 = EEPROM CS
 		    D24 = EEPROM DATA
 		*/
-			m_eeprom->di_write(data & 1);
-			m_eeprom->cs_write((data & 2) ? ASSERT_LINE : CLEAR_LINE);
-			m_eeprom->clk_write((data & 4) ? ASSERT_LINE : CLEAR_LINE);
+			ioport("EEPROMOUT")->write(data, 0xffff);
 
 			m_sys0 = data;
 			break;
@@ -187,7 +185,8 @@ WRITE8_MEMBER(polygonet_state::sound_comms_w)
 
 WRITE32_MEMBER(polygonet_state::sound_irq_w)
 {
-	m_audiocpu->set_input_line(0, HOLD_LINE); // where is ack?
+	// Auto-acknowledged interrupt
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 /* DSP communications */
@@ -543,14 +542,19 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 
 
-WRITE8_MEMBER(polygonet_state::sound_bankswitch_w)
+WRITE8_MEMBER(polygonet_state::sound_ctrl_w)
 {
-	// d0-d2: bank
-	// higher bits: ? (only used in plygonet)
-	if ((m_sound_bank & 7) != (data & 7))
+	// .... .xxx - Sound bank
+	// ...x .... - NMI clear (clocked?)
+	
+	if ((m_sound_ctrl & 7) != (data & 7))
 		membank("bank1")->set_entry(data & 7);
 
-	m_sound_bank = data;
+	// This behaves differently to the other games of this era
+	if (!(m_sound_ctrl & 0x10) && (data & 0x10))
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+
+	m_sound_ctrl = data;
 }
 
 
@@ -561,27 +565,19 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_device, read, write)
+	AM_RANGE(0xe400, 0xe62f) AM_READNOP AM_WRITENOP // Second 054539 (not present)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch3_byte_r)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
 ADDRESS_MAP_END
-
-
-static void sound_nmi( device_t *device )
-{
-	polygonet_state *state = device->machine().driver_data<polygonet_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // where is ack?
-}
 
 
 static const k054539_interface k054539_config =
 {
 	"shared",
 	NULL,
-	sound_nmi
 };
 
 /**********************************************************************************/
@@ -607,10 +603,11 @@ GFXDECODE_END
 void polygonet_state::machine_reset()
 {
 	membank("bank1")->set_entry(0);
-	m_sound_bank = 0;
 
 	m_sys0 = 0;
 	m_sys1 = 0;
+	m_sound_intck = 0;
+	m_sound_ctrl = 0;
 
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
 	m_dsp->set_input_line(DSP56K_IRQ_RESET, ASSERT_LINE);
@@ -633,8 +630,19 @@ void polygonet_state::machine_start()
 	save_item(NAME(m_dsp56k_bank04_ram));
 	save_item(NAME(m_sys0));
 	save_item(NAME(m_sys1));
-	save_item(NAME(m_sound_bank));
+	save_item(NAME(m_sound_ctrl));
+	save_item(NAME(m_sound_intck));
 }
+
+WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
+{
+	// Trigger interrupt on rising clock edge
+	if (!m_sound_intck && state)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+
+	m_sound_intck = state;
+}
+
 
 static const k053936_interface polygonet_k053936_intf =
 {
@@ -656,7 +664,7 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
-	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	MCFG_GFXDECODE(plygonet)
 
@@ -675,11 +683,8 @@ static MACHINE_CONFIG_START( plygonet, polygonet_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
-
-	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(polygonet_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -711,8 +716,8 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // Start 2, unused
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -729,6 +734,11 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( polynetw )
@@ -781,7 +791,7 @@ ROM_START( plygonet )
 	ROM_REGION( 0x200000, "shared", 0 ) /* sound data */
 	ROM_LOAD( "305b08.2e", 0x000000, 0x200000, CRC(874607df) SHA1(763b44a80abfbc355bcb9be8bf44373254976019) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASEFF )
 	ROM_LOAD( "plygonet.nv", 0x0000, 0x0080, CRC(627748ac) SHA1(ea1b06739fee235b049ff8daffff7d43cb093112) )
 ROM_END
 
@@ -805,7 +815,7 @@ ROM_START( polynetw )
 	ROM_LOAD( "305a08.2e", 0x000000, 0x200000, CRC(7ddb8a52) SHA1(3199b347fc433ffe0de8521001df77672d40771e) )
 	ROM_LOAD( "305a09.3e", 0x200000, 0x200000, CRC(6da1be58) SHA1(d63ac16ac551193ff8a6036724fb59e1d702e06b) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASEFF )
 	ROM_LOAD( "polynetw.nv", 0x0000, 0x0080, CRC(8f39d644) SHA1(8733e1a288ba20c4b04b3aedde52801d05cebdf9) )
 ROM_END
 

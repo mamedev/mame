@@ -1,8 +1,7 @@
 /***********************************************************************
 
     Konami K056800 (MIRAC)
-    Sound interface
-
+    Sound interface and audio control
 
 ***********************************************************************/
 
@@ -10,32 +9,21 @@
 #include "sound/k056800.h"
 
 
+
 const device_type K056800 = &device_creator<k056800_device>;
 
+
+
+//-------------------------------------------------
+//  k056800_device - constructor
+//-------------------------------------------------
+
 k056800_device::k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-				: device_t(mconfig, K056800, "Konami 056800 MIRAC", tag, owner, clock, "k056800", __FILE__)
+				: device_t(mconfig, K056800, "Konami 056800 MIRAC", tag, owner, clock, "k056800", __FILE__),
+	m_int_handler(*this)
 {
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k056800_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const k056800_interface *intf = reinterpret_cast<const k056800_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<k056800_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_irq_cb = NULL;
-	}
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -43,17 +31,13 @@ void k056800_device::device_config_complete()
 
 void k056800_device::device_start()
 {
-	attotime timer_period = attotime::from_hz(clock()) * 14700 * 3;
+	m_int_handler.resolve_safe();
 
-	m_irq_cb_func = m_irq_cb;
-
-	m_sound_cpu_timer = timer_alloc(TIMER_TICK_SOUND_CPU);
-	m_sound_cpu_timer->adjust(timer_period, 0, timer_period);
-
-	save_item(NAME(m_host_reg));
-	save_item(NAME(m_sound_reg));
-	save_item(NAME(m_sound_cpu_irq1_enable));
+	save_item(NAME(m_int_pending));
+	save_item(NAME(m_host_to_snd_regs));
+	save_item(NAME(m_snd_to_host_regs));
 }
+
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -61,10 +45,9 @@ void k056800_device::device_start()
 
 void k056800_device::device_reset()
 {
-	memset(m_host_reg, 0, sizeof(m_host_reg));
-	memset(m_sound_reg, 0, sizeof(m_sound_reg));
-
-	m_sound_cpu_irq1_enable = 0;
+	m_int_pending = false;
+	memset(m_host_to_snd_regs, 0, sizeof(m_host_to_snd_regs));
+	memset(m_snd_to_host_regs, 0, sizeof(m_snd_to_host_regs));
 }
 
 
@@ -72,93 +55,121 @@ void k056800_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-
-UINT8 k056800_device::host_reg_r( int reg )
+READ8_MEMBER( k056800_device::host_r )
 {
-	UINT8 value = m_host_reg[reg];
-	if (reg == 2)
-		value &= ~3; // suppress VOLWR busy flags
-
-	return value;
-}
-
-void k056800_device::host_reg_w( int reg, UINT8 data )
-{
-	m_sound_reg[reg] = data;
-
-	if (reg == 7)
-		m_irq_cb(machine(), 1);
-}
-
-UINT8 k056800_device::sound_reg_r( int reg )
-{
-	return m_sound_reg[reg];
-}
-
-void k056800_device::sound_reg_w( int reg, UINT8 data )
-{
-	if (reg == 4)
-		m_sound_cpu_irq1_enable = data & 0x01;
-
-	m_host_reg[reg] = data;
-}
-
-void k056800_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
+	UINT32 r = offset & 7;
+	UINT8 data = 0;
+	
+	switch (r)
 	{
-		case TIMER_TICK_SOUND_CPU:
-			if (m_sound_cpu_irq1_enable)
-				m_irq_cb_func(machine(), 0);
+		case 0:
+		case 1:
+			data = m_snd_to_host_regs[r];
 			break;
 
-			default:
-			assert_always(FALSE, "Unknown id in k056800_device::device_timer");
+		case 2:
+			// .... ...x - Front volume busy
+			// .... ..x. - Rear volume busy
+			break;
+	}
+
+	return data;
+}
+
+
+WRITE8_MEMBER( k056800_device::host_w )
+{
+	UINT32 r = offset & 7;
+
+	switch (r)
+	{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			m_host_to_snd_regs[r] = data;
+			break;
+
+		case 4:
+			// xxxx xxxx - Front volume (CAh increments, 35h decrements)
+			break;
+
+		case 5:
+			// xxxx xxxx - Rear volume (as above)
+			break;
+
+		case 6:
+			// .... ...x - Mute front
+			// .... ..x. - Mute rear
+			break;
+			
+		case 7:
+			// Sound interrupt
+			m_int_pending = true;
+
+			if (m_int_enabled)
+				m_int_handler(ASSERT_LINE);
+
+			break;
 	}
 }
 
-READ32_MEMBER( k056800_device::host_r )
+
+READ8_MEMBER( k056800_device::sound_r )
 {
-	UINT32 r = 0;
+	UINT32 r = offset & 7;
+	UINT8 data = 0;
+	
+	switch (r)
+	{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			data = m_host_to_snd_regs[r];
+			break;
+	}
 
-	if (ACCESSING_BITS_24_31)
-		r |= host_reg_r((offset * 4) + 0) << 24;
-
-	if (ACCESSING_BITS_16_23)
-		r |= host_reg_r((offset * 4) + 1) << 16;
-
-	if (ACCESSING_BITS_8_15)
-		r |= host_reg_r((offset * 4) + 2) << 8;
-
-	if (ACCESSING_BITS_0_7)
-		r |= host_reg_r((offset * 4) + 3) << 0;
-
-
-	return r;
+	return data;
 }
 
-WRITE32_MEMBER( k056800_device::host_w )
+
+WRITE8_MEMBER( k056800_device::sound_w )
 {
-	if (ACCESSING_BITS_24_31)
-		host_reg_w((offset * 4) + 0, (data >> 24) & 0xff);
+	UINT32 r = offset & 7;
 
-	if (ACCESSING_BITS_16_23)
-		host_reg_w((offset * 4) + 1, (data >> 16) & 0xff);
+	switch (r)
+	{
+		case 0:
+		case 1:
+			m_snd_to_host_regs[r] = data;
+			break;
+			
+		case 2:
+		case 3:
+			// TODO: Unknown
+			break;
 
-	if (ACCESSING_BITS_8_15)
-		host_reg_w((offset * 4) + 2, (data >> 8) & 0xff);
+		case 4:
+			// Sound CPU interrupt control
+			m_int_enabled = (data & 1) != 0;
 
-	if (ACCESSING_BITS_0_7)
-		host_reg_w((offset * 4) + 3, (data >> 0) & 0xff);
-
-}
-
-READ16_MEMBER( k056800_device::sound_r )
-{
-	return sound_reg_r(offset);
-}
-
-WRITE16_MEMBER( k056800_device::sound_w )
-{
-	sound_reg_w(offset, data);
+			if (m_int_enabled)
+			{
+				// Enable interrupt
+				if (m_int_pending)
+					m_int_handler(ASSERT_LINE);
+			}
+			else
+			{
+				// Disable/acknowledge interrupt
+				m_int_pending = false;
+				m_int_handler(CLEAR_LINE);
+			}
+			break;
+			
+		case 5:
+			// TODO: Unknown
+			break;
+	}
 }

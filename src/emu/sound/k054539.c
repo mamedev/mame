@@ -1,19 +1,9 @@
 /*********************************************************
 
-    Konami 054539 PCM Sound Chip
+    Konami 054539 (TOP) PCM Sound Chip
 
     A lot of information comes from Amuse.
     Big thanks to them.
-
-
-
-CHANNEL_DEBUG enables the following keys:
-
-    PAD.   : toggle debug mode
-    PAD0   : toggle chip    (0 / 1)
-    PAD4,6 : select channel (0 - 7)
-    PAD8,2 : adjust gain    (00=0.0 10=1.0, 20=2.0, etc.)
-    PAD5   : reset gain factor to 1.0
 
 *********************************************************/
 
@@ -22,13 +12,13 @@ CHANNEL_DEBUG enables the following keys:
 
 const device_type K054539 = &device_creator<k054539_device>;
 
-#define CHANNEL_DEBUG 0
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K054539, "K054539", tag, owner, clock, "k054539", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_timer_handler(*this)
 {
 }
 
@@ -61,15 +51,26 @@ void k054539_device::static_set_interface(device_t &device, const k054539_interf
      00: type (b2-3), reverse (b5)
      01: loop (b0)
 
-   214: keyon (b0-7 = channel 0-7)
-   215: keyoff          ""
-   22c: channel active? ""
-   22d: data read/write port
-   22e: rom/ram select (00..7f == rom banks, 80 = ram)
-   22f: enable pcm (b0), disable register ram updating (b7)
+   214: Key on (b0-7 = channel 0-7)
+   215: Key off          ""
+   225: ?
+   227: Timer frequency
+   228: ?
+   229: ?
+   22a: ?
+   22b: ?
+   22c: Channel active? (b0-7 = channel 0-7)
+   22d: Data read/write port
+   22e: ROM/RAM select (00..7f == ROM banks, 80 = Reverb RAM)
+   22f: Global control:
+		.......x - Enable PCM
+		......x. - Timer related?
+		...x.... - Enable ROM/RAM readback from 0x22d
+		..x..... - Timer output enable?
+		x....... - Disable register RAM updates
 
-   The chip has a 0x4000 bytes reverb buffer (the ram from 0x22e).
-   The reverb delay is actually an offset in this buffer.
+	The chip has an optional 0x8000 byte reverb buffer.
+	The reverb delay is actually an offset in this buffer.
 */
 
 void k054539_device::init_flags(int _flags)
@@ -302,8 +303,8 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 void k054539_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(regs[0x22f] & 0x20)
-		irq(this);
+	if (regs[0x22f] & 0x20)
+		m_timer_handler(m_timer_state ^= 1);
 }
 
 void k054539_device::init_chip()
@@ -327,16 +328,7 @@ void k054539_device::init_chip()
 			break;
 		}
 
-	if(irq) {
-		// One or more of the registers must be the timer period
-		// And anyway, this particular frequency is probably wrong
-		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
-		emu_timer *tm = timer_alloc();
-		tm->adjust(attotime::from_hz(480), 0, attotime::from_hz(480));
-	}
-
-	// If the clock is anything else than 48000, things are going to go wrong.
-	stream = stream_alloc(0, 2, clock());
+	stream = stream_alloc(0, 2, clock() / 384);
 
 	save_item(NAME(regs));
 	save_pointer(NAME(ram), 0x4000);
@@ -422,6 +414,17 @@ WRITE8_MEMBER(k054539_device::write)
 					keyoff(ch);
 		break;
 
+		case 0x227:
+		{
+			attotime period = attotime::from_hz((float)(38 + data) * (clock()/384.0f/14400.0f)) / 2.0f;
+
+			m_timer->adjust(period, 0, period);
+
+			m_timer_state = 0;
+			m_timer_handler(m_timer_state);
+		}
+		break;
+
 		case 0x22d:
 			if(regs[0x22e] == 0x80)
 				cur_zone[cur_ptr] = data;
@@ -436,6 +439,14 @@ WRITE8_MEMBER(k054539_device::write)
 				rom + 0x20000*data;
 			cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 			cur_ptr = 0;
+		break;
+		
+		case 0x22f:
+			if (!(data & 0x20)) // Disable timer output?
+			{
+				m_timer_state = 0;
+				m_timer_handler(m_timer_state);
+			}
 		break;
 
 		default:
@@ -489,8 +500,13 @@ READ8_MEMBER(k054539_device::read)
 
 void k054539_device::device_start()
 {
+	m_timer = timer_alloc(0);
+
+	m_timer_handler.resolve_safe();
+
 	for (int i = 0; i < 8; i++)
 		gain[i] = 1.0;
+
 	flags = RESET_FLAGS;
 
 	/*
@@ -520,4 +536,5 @@ void k054539_device::device_start()
 
 void k054539_device::device_reset()
 {
+	m_timer->enable(false);
 }

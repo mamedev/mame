@@ -9,68 +9,52 @@
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
+    DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-typedef void (*k056800_irq_cb)(running_machine &, int);
+#define MCFG_K056800_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, K056800, _clock) \
 
-
-struct k056800_interface
-{
-	k056800_irq_cb       m_irq_cb;
-};
-
-class k056800_device : public device_t,
-						public k056800_interface
-{
-public:
-	k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~k056800_device() {}
-
-	enum
-	{
-		TIMER_TICK_SOUND_CPU
-	};
-
-	DECLARE_READ32_MEMBER( host_r );
-	DECLARE_WRITE32_MEMBER( host_w );
-	DECLARE_READ16_MEMBER( sound_r );
-	DECLARE_WRITE16_MEMBER( sound_w );
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
-private:
-	// internal state
-	UINT8                m_host_reg[8];
-	UINT8                m_sound_reg[8];
-	emu_timer            *m_sound_cpu_timer;
-	UINT8                m_sound_cpu_irq1_enable;
-	k056800_irq_cb       m_irq_cb_func;
-
-	UINT8 host_reg_r( int reg );
-	void host_reg_w( int reg, UINT8 data );
-	UINT8 sound_reg_r( int reg );
-	void sound_reg_w( int reg, UINT8 data );
-
-};
-
-extern const device_type K056800;
+#define MCFG_K056800_INT_HANDLER(_devcb) \
+	devcb = &k056800_device::set_int_handler(*device, DEVCB2_##_devcb);
 
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
-#define MCFG_K056800_ADD(_tag, _interface, _clock) \
-	MCFG_DEVICE_ADD(_tag, K056800, _clock) \
-	MCFG_DEVICE_CONFIG(_interface)
+class k056800_device : public device_t
+{
+public:
+	// construction/destruction
+	k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_int_handler(device_t &device, _Object object) { return downcast<k056800_device &>(device).m_int_handler.set_callback(object); }
+
+	DECLARE_READ8_MEMBER( host_r );
+	DECLARE_WRITE8_MEMBER( host_w );
+	DECLARE_READ8_MEMBER( sound_r );
+	DECLARE_WRITE8_MEMBER( sound_w );
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	// internal state
+	bool				m_int_pending;
+	bool				m_int_enabled;
+	UINT8				m_host_to_snd_regs[4];
+	UINT8				m_snd_to_host_regs[2];
+
+	devcb2_write_line	m_int_handler;
+};
+
+extern const device_type K056800;
+
 
 
 #endif /* __K056800_H__ */
