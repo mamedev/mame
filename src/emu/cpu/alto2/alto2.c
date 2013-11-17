@@ -76,7 +76,7 @@ DEVICE_ADDRESS_MAP_START( iomem_map, 16, alto2_cpu_device )
 	AM_RANGE(0177776,                    0177776)                           AM_READWRITE( noop_r, noop_w )          // { Digital-Analog Converter, Joystick }
 	AM_RANGE(0177777,                    0177777)                           AM_READWRITE( noop_r, noop_w )          // { Digital-Analog Converter, Joystick }
 
-//	AM_RANGE(0200000,                    0377777)                           AM_READWRITE( ioram_r, ioram_w )
+	AM_RANGE(0200000,                    0377777)                           AM_READWRITE( ioram_r, ioram_w )
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -86,13 +86,13 @@ ADDRESS_MAP_END
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
-	m_log_types(LOG_DISK|LOG_KSEC|LOG_KWD),
+	m_log_types(LOG_ALL),
 	m_log_level(8),
 	m_log_newline(true),
 #endif
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
-	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 16, -1 ),
+	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
 	m_ucode_crom(0),
 	m_const_data(0),
 	m_icount(0),
@@ -2611,7 +2611,7 @@ void alto2_cpu_device::execute_run()
 
 	do {
 		int do_bs, flags;
-		UINT32 alu;
+		UINT16 alu;
 		UINT8 aluf;
 		UINT8 bs;
 		UINT8 f1;
@@ -2853,7 +2853,7 @@ void alto2_cpu_device::execute_run()
 			alu = alu_74181(SMC(1,1,1,1, 0, 1));
 #else
 			alu = m_bus + 0177777;
-			m_aluc0 = (~m_alu >> 16) & 1;
+			m_aluc0 = (~alu >> 16) & 1;
 #endif
 			flags = ALUM2 | TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS - 1 (%#o := %#o - 1)\n", alu, m_bus));
@@ -2870,7 +2870,7 @@ void alto2_cpu_device::execute_run()
 			alu = alu_74181(SMC(1,0,0,1, 0, 1));
 #else
 			alu = m_bus + m_t;
-			m_aluc0 = (m_alu >> 16) & 1;
+			m_aluc0 = (alu >> 16) & 1;
 #endif
 			flags = ALUM2;
 			LOG((LOG_CPU,2,"	ALU← BUS + T (%#o := %#o + %#o)\n", alu, m_bus, m_t));
@@ -2887,7 +2887,7 @@ void alto2_cpu_device::execute_run()
 			alu = alu_74181(SMC(0,1,1,0, 0, 0));
 #else
 			alu = m_bus + ~m_t + 1;
-			m_aluc0 = (~m_alu >> 16) & 1;
+			m_aluc0 = (~alu >> 16) & 1;
 #endif
 			flags = ALUM2;
 			LOG((LOG_CPU,2,"	ALU← BUS - T (%#o := %#o - %#o)\n", alu, m_bus, m_t));
@@ -2904,7 +2904,7 @@ void alto2_cpu_device::execute_run()
 			alu = alu_74181(SMC(0,1,1,0, 0, 1));
 #else
 			alu = m_bus + ~m_t;
-			m_aluc0 = (~m_alu >> 16) & 1;
+			m_aluc0 = (~alu >> 16) & 1;
 #endif
 			flags = ALUM2;
 			LOG((LOG_CPU,2,"	ALU← BUS - T - 1 (%#o := %#o - %#o - 1)\n", alu, m_bus, m_t));
@@ -2921,7 +2921,7 @@ void alto2_cpu_device::execute_run()
 			alu = alu_74181(SMC(1,0,0,1, 0, 0));
 #else
 			alu = m_bus + m_t + 1;
-			m_aluc0 = (m_alu >> 16) & 1;
+			m_aluc0 = (alu >> 16) & 1;
 #endif
 			flags = ALUM2 | TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS + T + 1 (%#o := %#o + %#o + 1)\n", alu, m_bus, m_t));
@@ -2938,7 +2938,7 @@ void alto2_cpu_device::execute_run()
 			alu = alu_74181(SMC(0,0,0,0, 0, m_emu.skip^1));
 #else
 			alu = m_bus + m_emu.skip;
-			m_aluc0 = (m_alu >> 16) & 1;
+			m_aluc0 = (alu >> 16) & 1;
 #endif
 			flags = ALUM2 | TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS + SKIP (%#o := %#o + %#o)\n", alu, m_bus, m_emu.skip));
