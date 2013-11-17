@@ -45,6 +45,7 @@ public:
 	ATTR_HOT inline const netlist_time &operator+=(const netlist_time &right) { m_time += right.m_time; return *this; }
 
 	ATTR_HOT inline const INTERNALTYPE as_raw() const { return m_time; }
+    ATTR_HOT inline const double as_double() const { return (double) m_time / (double) RESOLUTION; }
 
 	ATTR_HOT static inline const netlist_time from_nsec(const int ns) { return netlist_time((UINT64) ns * (RESOLUTION / U64(1000000000))); }
 	ATTR_HOT static inline const netlist_time from_usec(const int us) { return netlist_time((UINT64) us * (RESOLUTION / U64(1000000))); }

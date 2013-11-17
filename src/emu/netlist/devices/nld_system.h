@@ -11,7 +11,6 @@
 
 #include "../nl_setup.h"
 #include "../nl_base.h"
-#include "../nl_lists.h"
 
 // ----------------------------------------------------------------------------------------
 // Macros
@@ -83,17 +82,24 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
         netlist_ttl_output_t m_Q;
 
         netlist_time m_inc;
+        netlist_time m_last_step;
+        netlist_list_t<netlist_terminal_t *> m_terms;
+        netlist_list_t<netlist_terminal_t *> m_inps;
+
 public:
         netlist_list_t<netlist_net_t *> m_nets;
 
         ATTR_HOT inline void schedule();
+
+        ATTR_COLD void post_start();
 );
 
 inline void NETLIB_NAME(solver)::schedule()
 {
     // FIXME: time should be parameter;
-    if (!m_Q.net().is_queued())
+    if (!m_Q.net().is_queued()) {
         m_Q.net().push_to_queue(NLTIME_FROM_NS(10));
+    }
 }
 
 // ----------------------------------------------------------------------------------------
@@ -154,13 +160,8 @@ protected:
 
     ATTR_HOT ATTR_ALIGN virtual void update()
     {
-        netlist().solver().schedule();
-#if 0
-        if (!m_N.net().is_queued() && !m_N.net().isRailNet())
-            m_N.net().push_to_queue(NLTIME_FROM_NS(10));
-        if (!m_P.net().is_queued() && !m_P.net().isRailNet() )
-            m_P.net().push_to_queue(NLTIME_FROM_NS(10));
-#endif
+        /* only called if connected to a rail net ==> notify the solver to recalculate */
+        netlist().solver()->schedule();
     }
 
     double m_g; // conductance
@@ -195,6 +196,40 @@ protected:
         m_N.m_g = m_g;
     }
 
+private:
+};
+
+class nld_C : public nld_twoterm
+{
+public:
+    nld_C()
+    : nld_twoterm()
+    {
+    }
+
+    netlist_param_t m_C;
+
+protected:
+    void start()
+    {
+        register_terminal("1", m_P);
+        register_terminal("2", m_N);
+
+        register_param("C", m_C, NETLIST_GMIN);
+    }
+
+    virtual void update_param()
+    {
+        // set to some very big step time for now
+        // ==> large resistance
+        step_time(1e-9);
+    }
+
+    ATTR_HOT virtual void step_time(const double st)
+    {
+        m_g = m_P.m_g = m_N.m_g = m_C.Value() / st;
+        m_I = -m_g * (m_P.net().Q_Analog()- m_N.net().Q_Analog());
+    }
 private:
 };
 

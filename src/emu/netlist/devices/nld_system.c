@@ -85,9 +85,10 @@ NETLIB_START(solver)
     register_output("Q", m_Q);
     //register_input("FB", m_feedback);
 
-    m_inc = netlist_time::from_hz(48000);
+    m_inc = netlist_time::from_hz(50000);
 
     register_link_internal(m_feedback, m_Q, netlist_input_t::STATE_INP_ACTIVE);
+    m_last_step = netlist_time::zero;
 
 }
 
@@ -96,40 +97,78 @@ NETLIB_UPDATE_PARAM(solver)
     //m_inc = netlist_time::from_hz(m_freq.Value()*2);
 }
 
+NETLIB_FUNC_VOID(solver, post_start, ())
+{
+    for (netlist_net_t **pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+    {
+        for (netlist_terminal_t *p = (*pn)->m_head; p != NULL; p = p->m_update_list_next)
+        {
+            switch (p->type())
+            {
+                case netlist_terminal_t::TERMINAL:
+                    m_terms.add(p);
+                    break;
+                case netlist_terminal_t::INPUT:
+                    m_inps.add(p);
+                    break;
+                default:
+                    fatalerror("unhandled element found\n");
+                    break;
+            }
+        }
+    }
+}
+
 NETLIB_UPDATE(solver)
 {
     //m_Q.setToNoCheck(!m_Q.new_Q(), m_inc  );
     //OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 
-    netlist_net_t **pn = m_nets.first();
     bool resched = false;
+    netlist_time now = netlist().time();
+    netlist_time delta = now - m_last_step;
 
-    while (pn <= m_nets.last())
+    if (delta >= m_inc)
+    {
+        /* update all terminals for new time step */
+        m_last_step = now;
+        for (netlist_terminal_t **p = m_terms.first(); p != NULL; p = m_terms.next(p))
+            (*p)->netdev().step_time(delta.as_double());
+    }
+    for (netlist_net_t **pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
     {
         double gtot = 0;
         double iIdr = 0;
 
-        netlist_terminal_t *p = (*pn)->m_head;
-        do
+        for (netlist_terminal_t *p = (*pn)->m_head; p != NULL; p = p->m_update_list_next)
         {
             p->netdev().update_terminals();
             gtot += p->m_g;
             iIdr += p->m_Idr;
+        }
 
-            p = p->m_update_list_next;
-        } while (p != NULL);
-        (*pn)->m_new.Analog = iIdr / gtot;
-        if (fabs((*pn)->m_new.Analog - (*pn)->m_cur.Analog) > 1e-4)
+        double new_val = iIdr / gtot;
+        if (fabs(new_val - (*pn)->m_cur.Analog) > 1e-4)
             resched = true;
-        (*pn)->m_cur.Analog = (*pn)->m_new.Analog;
+        (*pn)->m_cur.Analog = (*pn)->m_new.Analog = new_val;
 
-        //printf("New: %f\n", (*pn)->m_new.Analog);
-        pn++;
+        //printf("New: %d %lld %f %f\n", ts_cnt, netlist().time().as_raw(), netlist().time().as_double(), new_val);
     }
     if (resched)
+    {
         schedule();
+    }
     else
-      m_Q.net().push_to_queue(m_inc); // step circuit
+    {
+        /* update all inputs connected to this drive */
+        for (netlist_terminal_t **p = m_inps.first(); p != NULL; p = m_inps.next(p))
+            (*p)->netdev().update_dev();
+        /* step circuit */
+        if (!m_Q.net().is_queued())
+        {
+            m_Q.net().push_to_queue(m_inc);
+        }
+    }
 
         /* only inputs and terminals connected
          * approach:

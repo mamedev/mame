@@ -36,6 +36,15 @@ public:
 
 		*(++m_ptr) = elem;
 	}
+	ATTR_HOT inline void resize(const int new_size)
+	{
+	    int cnt = count();
+	    _ListClass *m_new = new _ListClass[new_size];
+	    memcpy(m_new, m_list, new_size * sizeof(_ListClass));
+	    delete[] m_list;
+	    m_list = m_new;
+	    m_ptr = m_list + cnt - 1;
+	}
     ATTR_HOT inline void del(const _ListClass elem)
     {
         for (_ListClass * i=m_list; i<=m_ptr; i++)
@@ -52,7 +61,8 @@ public:
             }
         }
     }
-	ATTR_HOT inline _ListClass *first() { return &m_list[0]; }
+	ATTR_HOT inline _ListClass *first() { return (m_ptr >= m_list ? &m_list[0] : NULL ); }
+    ATTR_HOT inline _ListClass *next(_ListClass *lc) { return (lc < last() ? lc + 1 : NULL ); }
 	ATTR_HOT inline _ListClass *last()  { return m_ptr; }
 	ATTR_HOT inline _ListClass *item(int i) { return &m_list[i]; }
 	ATTR_HOT inline int count() const { return m_ptr - m_list + 1; }

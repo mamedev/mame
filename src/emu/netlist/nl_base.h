@@ -168,7 +168,7 @@ typedef delegate<void ()> net_update_delegate;
 //          : net_device_t(setup, name)
 
 #define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
-#define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN inline void NETLIB_NAME(_chip) :: _name _params
+#define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: _name _params
 
 #define NETLIB_DEVICE_BASE(_name, _pclass, _extra, _priv)                           \
     class _name : public _pclass                                                    \
@@ -661,6 +661,7 @@ public:
 
 	ATTR_HOT virtual void dec_active() { /*printf("DeActivate %s\n", m_name);*/ }
 
+	ATTR_HOT virtual void step_time(const double st) { }
     ATTR_HOT virtual void update_terminals() { }
 
 	/* stats */
@@ -774,7 +775,7 @@ public:
 		m_queue.push(queue_t::entry_t(attime, out));
 	}
 
-	ATTR_HOT NETLIB_NAME(solver) &solver() { return *m_solver; }
+	ATTR_HOT NETLIB_NAME(solver) *solver() { return m_solver; }
 
 	ATTR_HOT void process_queue(INT32 &atime);
 

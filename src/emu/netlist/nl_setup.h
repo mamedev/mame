@@ -63,7 +63,19 @@ class netlist_setup_t
 {
 public:
 
+    struct link_t
+    {
+        link_t(const astring &ae1, const astring &ae2)
+        {
+            e1 = ae1;
+            e2 = ae2;
+        }
+        astring e1;
+        astring e2;
+    };
+
 	typedef tagmap_t<netlist_device_t *, 393> tagmap_devices_t;
+    typedef tagmap_t<link_t *, 393> tagmap_link_t;
 	typedef tagmap_t<const astring *, 393> tagmap_astring_t;
 	typedef tagmap_t<netlist_param_t *, 393> tagmap_param_t;
 	typedef tagmap_t<netlist_terminal_t *, 393> tagmap_terminal_t;
@@ -108,13 +120,14 @@ private:
 	tagmap_devices_t m_devices;
 	tagmap_astring_t m_alias;
 	tagmap_param_t  m_params;
-	tagmap_astring_t  m_links;
+	tagmap_link_t  m_links;
 
 	int m_proxy_cnt;
 
 	void connect_terminals(netlist_terminal_t &in, netlist_terminal_t &out);
 	void connect_input_output(netlist_input_t &in, netlist_output_t &out);
     void connect_terminal_output(netlist_terminal_t &in, netlist_output_t &out);
+    void connect_terminal_input(netlist_terminal_t &term, netlist_input_t &inp);
 
     // helpers
     astring objtype_as_astr(netlist_object_t &in);

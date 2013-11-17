@@ -75,7 +75,7 @@ NETLIB_START(log)
 
 NETLIB_UPDATE(log)
 {
-	printf("%s: %d %d\n", name().cstr(), (UINT32) (netlist().time().as_raw() / 1000000), INPLOGIC(m_I));
+	printf("%s: %f %f\n", name().cstr(), netlist().time().as_double(), INPANALOG(m_I));
 }
 
 
@@ -950,6 +950,7 @@ NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
 static const net_device_t_base_factory *netregistry[] =
 {
     ENTRY(R,                    NETDEV_R)
+    ENTRY(C,                    NETDEV_C)
 	ENTRY(ttl_const,            NETDEV_TTL_CONST)
 	ENTRY(analog_const,         NETDEV_ANALOG_CONST)
 	ENTRY(logic_input,          NETDEV_LOGIC_INPUT)

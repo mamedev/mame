@@ -71,7 +71,11 @@
 
 #define NETDEV_R(_name, _R)                                                         \
         NET_REGISTER_DEV(R, _name)                                                  \
-        NETDEV_PARAMI(_name, R, _R)                                           \
+        NETDEV_PARAMI(_name, R, _R)
+
+#define NETDEV_C(_name, _C)                                                         \
+        NET_REGISTER_DEV(C, _name)                                                  \
+        NETDEV_PARAMI(_name, C, _C)
 
 
 // ----------------------------------------------------------------------------------------
@@ -238,7 +242,7 @@ NETLIB_DEVICE(analog_input,
 );
 
 NETLIB_DEVICE(log,
-	netlist_ttl_input_t m_I;
+	netlist_analog_input_t m_I;
 );
 
 

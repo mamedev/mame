@@ -233,6 +233,7 @@ ATTR_COLD void netlist_device_t::register_output(const astring &name, netlist_ou
 
 ATTR_COLD void netlist_device_t::register_input(netlist_core_device_t &dev, const astring &name, netlist_input_t &inp, netlist_input_t::state_e type)
 {
+    m_terminals.add(name);
 	m_setup->register_object(*this, dev, name, inp, type);
 }
 

@@ -41,7 +41,7 @@ static void tagmap_free_entries(T &tm)
 netlist_setup_t::~netlist_setup_t()
 {
 	tagmap_free_entries<tagmap_devices_t>(m_devices);
-	tagmap_free_entries<tagmap_astring_t>(m_links);
+	tagmap_free_entries<tagmap_link_t>(m_links);
 	tagmap_free_entries<tagmap_astring_t>(m_alias);
 	m_params.reset();
 	m_terminals.reset();
@@ -82,7 +82,15 @@ void netlist_setup_t::remove_dev(const astring &name)
 	//remove_start_with<tagmap_input_t>(m_inputs, temp);
 	remove_start_with<tagmap_terminal_t>(m_terminals, temp);
 	remove_start_with<tagmap_param_t>(m_params, temp);
-	remove_start_with<tagmap_astring_t>(m_links, temp);
+
+	tagmap_link_t::entry_t *p = m_links.first();
+	while (p != NULL)
+	{
+	    tagmap_link_t::entry_t *n = m_links.next(p);
+	    if (temp.cmpsubstr(p->object()->e1,0,temp.len()) == 0 || temp.cmpsubstr(p->object()->e2,0,temp.len()) == 0)
+	        m_links.remove(p->object());
+	    p = n;
+	}
 	m_devices.remove(name);
 }
 
@@ -141,7 +149,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
                 term.init_terminal(upd_dev);
                 term.set_state(state);
                 if (!(m_terminals.add(temp, &term, false)==TMERR_NONE))
-                    fatalerror("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), name.cstr());
+                    fatalerror("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), temp.cstr());
                 NL_VERBOSE_OUT(("%s %s\n", objtype_as_astr(term).cstr(), name.cstr()));
             }
             break;
@@ -164,9 +172,9 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
 
 void netlist_setup_t::register_link(const astring &sin, const astring &sout)
 {
-	const astring *temp = new astring(sout);
+	link_t *temp = new link_t(sin, sout);
 	NL_VERBOSE_OUT(("link %s <== %s\n", sin.cstr(), sout.cstr()));
-	if (!(m_links.add(sin, temp, false)==TMERR_NONE))
+	if (!(m_links.add(sin + "." + sout, temp, false)==TMERR_NONE))
 		fatalerror("Error adding link %s<==%s to link list\n", sin.cstr(), sout.cstr());
 }
 
@@ -266,6 +274,34 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
     }
 }
 
+void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_input_t &inp)
+{
+    if (inp.isFamily(netlist_terminal_t::ANALOG))
+    {
+        connect_terminals(term, inp);
+    }
+    else if (inp.isFamily(netlist_terminal_t::LOGIC))
+    {
+        //printf("here 1\n");
+        nld_a_to_d_proxy *proxy = new nld_a_to_d_proxy(inp);
+        astring x = "";
+        x.printf("proxy_da_%d", m_proxy_cnt++);
+        proxy->init(*this, x.cstr());
+        register_dev(proxy);
+
+        connect_terminals(term, proxy->m_I);
+
+        if (inp.has_net())
+            proxy->m_Q.net().merge_net(&inp.net());
+        else
+            proxy->m_Q.net().register_con(inp);
+    }
+    else
+    {
+        fatalerror("Netlist: Severe Error");
+    }
+}
+
 // FIXME: optimize code  ...
 void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_output_t &out)
 {
@@ -322,7 +358,7 @@ void netlist_setup_t::connect_terminals(netlist_terminal_t &in, netlist_terminal
         NL_VERBOSE_OUT(("adding net ...\n"));
         netlist_net_t *anet =  new netlist_net_t(netlist_object_t::NET, netlist_object_t::ANALOG);
         in.set_net(*anet);
-        m_netlist.solver().m_nets.add(anet);
+        m_netlist.solver()->m_nets.add(anet);
         in.net().init_object(netlist());
         in.net().register_con(out);
         in.net().register_con(in);
@@ -347,10 +383,10 @@ void netlist_setup_t::resolve_inputs(void)
     }
 
     NL_VERBOSE_OUT(("Resolving ...\n"));
-    for (tagmap_astring_t::entry_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
+    for (tagmap_link_t::entry_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
     {
-        const astring t1s = *entry->object();
-        const astring t2s = entry->tag();
+        const astring t1s = entry->object()->e1;
+        const astring t2s = entry->object()->e2;
         netlist_terminal_t &t1 = find_terminal(t1s);
         netlist_terminal_t &t2 = find_terminal(t2s);
 
@@ -376,6 +412,14 @@ void netlist_setup_t::resolve_inputs(void)
         {
             connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
         }
+        else if (t1.isType(netlist_terminal_t::INPUT) && t2.isType(netlist_terminal_t::TERMINAL))
+        {
+            connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t2), dynamic_cast<netlist_input_t &>(t1));
+        }
+        else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::INPUT))
+        {
+            connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_input_t &>(t2));
+        }
         else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::TERMINAL))
         {
             connect_terminals(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_terminal_t &>(t2));
@@ -391,6 +435,9 @@ void netlist_setup_t::resolve_inputs(void)
         //if (out != NULL)
             //VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
     }
+
+    if (m_netlist.solver() != NULL)
+        m_netlist.solver()->post_start();
 
 
 }
