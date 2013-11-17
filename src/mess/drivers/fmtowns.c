@@ -2946,6 +2946,18 @@ ROM_START( fmtownssj )
 	ROM_LOAD("mytownssj.rom",  0x00, 0x20, CRC(d0ed8936) SHA1(bf9eeef25e9a1dc4a9ce1c70f4155ac973cae3f9) )
 ROM_END
 
+/* 66MHz 80486DX2, dumped from an FM-Towns II MX */
+ROM_START( fmtownsmx )
+	ROM_REGION32_LE( 0x280000, "user", 0)
+	ROM_LOAD("fmtownsiimxbios.m79",  0x000000, 0x080000, CRC(f3fc636e) SHA1(a35a11ab56b1f11e3f69d70b61648ab83699a2df) )
+	ROM_CONTINUE(0x180000,0x40000)
+	ROM_CONTINUE(0x200000,0x40000)
+	ROM_CONTINUE(0x080000,0x80000)
+	ROM_CONTINUE(0x100000,0x80000)
+	ROM_REGION( 0x20, "serial", 0)
+	ROM_LOAD("mytownsmx.rom",  0x00, 0x20, CRC(16e78766) SHA1(38e8810bee9ee6b54c3999d27f499b89e4a4c33f) )
+ROM_END
+
 ROM_START( fmtmarty )
 	ROM_REGION32_LE( 0x480000, "user", 0)
 	ROM_LOAD("mrom.m36",  0x000000, 0x080000, CRC(9c0c060c) SHA1(5721c5f9657c570638352fa9acac57fa8d0b94bd) )
@@ -2977,6 +2989,7 @@ COMP( 1989, fmtowns,  0,        0,      towns,      towns, driver_device,    0, 
 COMP( 1989, fmtownsa, fmtowns,  0,      towns,      towns, driver_device,    0,  "Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
 COMP( 1991, fmtownsux,fmtowns,  0,      townsux,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II UX", GAME_NOT_WORKING)
 COMP( 1992, fmtownshr,fmtowns,  0,      townshr,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II HR", GAME_NOT_WORKING)
+COMP( 1992, fmtownsmx,fmtowns,  0,      townshr,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II MX", GAME_NOT_WORKING)
 COMP( 19??, fmtownssj,fmtowns,  0,      townssj,    towns, driver_device,    0,  "Fujitsu",   "FM-Towns II SJ", GAME_NOT_WORKING)
 CONS( 1993, fmtmarty, 0,        0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Marty",  GAME_NOT_WORKING)
 CONS( 1994, carmarty, fmtmarty, 0,      marty,      marty, driver_device,    0,  "Fujitsu",   "FM-Towns Car Marty",  GAME_NOT_WORKING)
