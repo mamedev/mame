@@ -588,7 +588,7 @@ WRITE8_MEMBER( e01_device::floppy_w )
 	m_fdc->dden_w(BIT(data, 4));
 
 	// floppy master reset
-	if (!BIT(data, 5)) m_fdc->reset();
+	if (!BIT(data, 5)) m_fdc->soft_reset();
 
 	// TODO floppy test
 

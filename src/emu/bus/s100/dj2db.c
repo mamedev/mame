@@ -448,7 +448,7 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 d
 		m_access_enbl = BIT(data, 6);
 
 		// master reset
-		if (!BIT(data, 7)) m_fdc->reset();
+		if (!BIT(data, 7)) m_fdc->soft_reset();
 	}
 	else if (offset == 0xfbfa) // FUNCTION SEL
 	{
