@@ -19,7 +19,7 @@ template <class _ListClass>
 struct netlist_list_t
 {
 public:
-	ATTR_COLD netlist_list_t(int numElements)
+	ATTR_COLD netlist_list_t(int numElements = 100)
 	{
 		m_num_elements = numElements;
 		m_list = new _ListClass[m_num_elements];
@@ -36,6 +36,22 @@ public:
 
 		*(++m_ptr) = elem;
 	}
+    ATTR_HOT inline void del(const _ListClass elem)
+    {
+        for (_ListClass * i=m_list; i<=m_ptr; i++)
+        {
+            if (*i == elem)
+            {
+                while (i <= m_ptr)
+                {
+                    *i = *(i+1);
+                    i++;
+                }
+                m_ptr--;
+                return;
+            }
+        }
+    }
 	ATTR_HOT inline _ListClass *first() { return &m_list[0]; }
 	ATTR_HOT inline _ListClass *last()  { return m_ptr; }
 	ATTR_HOT inline _ListClass *item(int i) { return &m_list[i]; }

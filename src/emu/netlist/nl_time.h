@@ -35,6 +35,7 @@ public:
 	ATTR_HOT friend inline const netlist_time operator-(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline const netlist_time operator+(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline const netlist_time operator*(const netlist_time &left, const UINT32 factor);
+    ATTR_HOT friend inline const UINT32 operator/(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline bool operator>(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline bool operator<(const netlist_time &left, const netlist_time &right);
 	ATTR_HOT friend inline bool operator>=(const netlist_time &left, const netlist_time &right);
@@ -68,6 +69,11 @@ ATTR_HOT inline const netlist_time operator-(const netlist_time &left, const net
 ATTR_HOT inline const netlist_time operator*(const netlist_time &left, const UINT32 factor)
 {
 	return netlist_time::from_raw(left.m_time * factor);
+}
+
+ATTR_HOT inline const UINT32 operator/(const netlist_time &left, const netlist_time &right)
+{
+    return left.m_time / right.m_time;
 }
 
 ATTR_HOT inline const netlist_time operator+(const netlist_time &left, const netlist_time &right)

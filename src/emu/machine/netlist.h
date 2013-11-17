@@ -197,7 +197,7 @@ public:
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = &m_netlist->setup().find_output(m_output);
+		this->m_target = dynamic_cast<netlist_output_t *>(&m_netlist->setup().find_terminal(m_output, netlist_object_t::OUTPUT));
 		return this->report_missing(this->m_target != NULL, "output", false);
 	}
 
@@ -214,7 +214,7 @@ public:
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = (C *) &(this->m_netlist->setup().find_output(this->m_output));
+		this->m_target = (C *) &(this->m_netlist->setup().find_terminal(this->m_output, netlist_object_t::OUTPUT));
 		return this->report_missing(this->m_target != NULL, "output", true);
 	}
 

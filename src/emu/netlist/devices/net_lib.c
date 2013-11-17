@@ -195,7 +195,7 @@ NETLIB_START(nicNE555N_MSTABLE)
 	register_param("VL", m_VL, 0.0 *5.0);
 
 	m_THRESHOLD_OUT.init_terminal(*this);
-	register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT, netlist_input_t::INP_STATE_ACTIVE);
+	register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT, netlist_input_t::STATE_INP_ACTIVE);
 
 	m_Q.initial(5.0 * 0.4);
 	m_last = false;
@@ -481,7 +481,7 @@ NETLIB_UPDATE(nic7474)
 NETLIB_START(nic7474)
 {
 	register_sub(sub, "sub");
-	register_input(sub, "CLK",  sub.m_clk, netlist_input_t::INP_STATE_LH);
+	register_input(sub, "CLK",  sub.m_clk, netlist_input_t::STATE_INP_LH);
 	register_input("D",    m_D);
 	register_input("CLRQ", m_clrQ);
 	register_input("PREQ", m_preQ);
@@ -592,8 +592,8 @@ NETLIB_START(nic7493)
 	register_sub(C, "C");
 	register_sub(D, "D");
 
-	register_input(A, "CLKA", A.m_I, netlist_input_t::INP_STATE_HL);
-	register_input(B, "CLKB", B.m_I, netlist_input_t::INP_STATE_HL);
+	register_input(A, "CLKA", A.m_I, netlist_input_t::STATE_INP_HL);
+	register_input(B, "CLKB", B.m_I, netlist_input_t::STATE_INP_HL);
 	register_input("R1",  m_R1);
 	register_input("R2",  m_R2);
 
@@ -602,8 +602,8 @@ NETLIB_START(nic7493)
 	register_output(C, "QC", C.m_Q);
 	register_output(D, "QD", D.m_Q);
 
-	register_link_internal(C, C.m_I, B.m_Q, netlist_input_t::INP_STATE_HL);
-	register_link_internal(D, D.m_I, C.m_Q, netlist_input_t::INP_STATE_HL);
+	register_link_internal(C, C.m_I, B.m_Q, netlist_input_t::STATE_INP_HL);
+	register_link_internal(D, D.m_I, C.m_Q, netlist_input_t::STATE_INP_HL);
 
 }
 
@@ -642,8 +642,8 @@ NETLIB_START(nic7493)
 {
 	m_cnt = 0;
 
-	register_input("CLKA", m_CLK, netlist_input_t::INP_STATE_HL);
-	register_input("CLKB", m_CLKB, netlist_input_t::INP_STATE_HL);
+	register_input("CLKA", m_CLK, netlist_input_t::STATE_INP_HL);
+	register_input("CLKB", m_CLKB, netlist_input_t::STATE_INP_HL);
 	register_input("R1",  m_R1);
 	register_input("R2",  m_R2);
 
@@ -722,7 +722,7 @@ NETLIB_START(nic74107A)
 {
 	register_sub(sub, "sub");
 
-	register_input(sub, "CLK", sub.m_clk, netlist_input_t::INP_STATE_HL);
+	register_input(sub, "CLK", sub.m_clk, netlist_input_t::STATE_INP_HL);
 	register_input("J", m_J);
 	register_input("K", m_K);
 	register_input("CLRQ", m_clrQ);
@@ -832,17 +832,17 @@ NETLIB_START(nic9316)
 	sub.m_loadq = 1;
 	sub.m_ent = 1;
 
-	register_input(sub, "CLK", sub.m_clk, netlist_input_t::INP_STATE_LH);
+	register_input(sub, "CLK", sub.m_clk, netlist_input_t::STATE_INP_LH);
 
 	register_input("ENP", m_ENP);
 	register_input("ENT", m_ENT);
 	register_input("CLRQ", m_CLRQ);
 	register_input("LOADQ", m_LOADQ);
 
-	register_input(sub, "A", sub.m_A, netlist_input_t::INP_STATE_PASSIVE);
-	register_input(sub, "B", sub.m_B, netlist_input_t::INP_STATE_PASSIVE);
-	register_input(sub, "C", sub.m_C, netlist_input_t::INP_STATE_PASSIVE);
-	register_input(sub, "D", sub.m_D, netlist_input_t::INP_STATE_PASSIVE);
+	register_input(sub, "A", sub.m_A, netlist_input_t::STATE_INP_PASSIVE);
+	register_input(sub, "B", sub.m_B, netlist_input_t::STATE_INP_PASSIVE);
+	register_input(sub, "C", sub.m_C, netlist_input_t::STATE_INP_PASSIVE);
+	register_input(sub, "D", sub.m_D, netlist_input_t::STATE_INP_PASSIVE);
 
 	register_output(sub, "QA", sub.m_QA);
 	register_output(sub, "QB", sub.m_QB);
@@ -957,6 +957,7 @@ static const net_device_t_base_factory *netregistry[] =
 	ENTRY(log,                  NETDEV_LOG)
 	ENTRY(clock,                NETDEV_CLOCK)
 	ENTRY(mainclock,            NETDEV_MAINCLOCK)
+    ENTRY(solver,               NETDEV_SOLVER)
 	ENTRY(analog_callback,      NETDEV_CALLBACK)
 	ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
 	ENTRY(nicRSFF,              NETDEV_RSFF)

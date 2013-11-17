@@ -28,6 +28,11 @@ ATTR_COLD void netlist_base_t::set_mainclock_dev(NETLIB_NAME(mainclock) *dev)
 	m_mainclock = dev;
 }
 
+ATTR_COLD void netlist_base_t::set_solver_dev(NETLIB_NAME(solver) *dev)
+{
+    m_solver = dev;
+}
+
 ATTR_COLD void netlist_base_t::reset()
 {
 		m_time_ps = netlist_time::zero;
@@ -173,7 +178,7 @@ netlist_core_device_t::~netlist_core_device_t()
 
 ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
 {
-	if (inp.state() == netlist_input_t::INP_STATE_PASSIVE)
+	if (inp.state() == netlist_input_t::STATE_INP_PASSIVE)
 	{
 		inp.activate();
 		const netlist_sig_t ret = inp.Q();
@@ -211,34 +216,35 @@ ATTR_COLD void netlist_device_t::register_sub(netlist_core_device_t &dev, const 
 	dev.init(*m_setup, name);
 }
 
-void netlist_device_t::register_output(netlist_core_device_t &dev, const astring &name, netlist_output_t &port)
+ATTR_COLD void netlist_device_t::register_output(netlist_core_device_t &dev, const astring &name, netlist_output_t &port)
 {
-	m_setup->register_output(*this, dev, name, port);
+	m_setup->register_object(*this, dev, name, port, netlist_terminal_t::STATE_NONE);
 }
 
-void netlist_device_t::register_terminal(const astring &name, netlist_terminal_t &port)
+ATTR_COLD void netlist_device_t::register_terminal(const astring &name, netlist_terminal_t &port)
 {
-    m_setup->register_terminal(*this,*this,name, port);
+    m_setup->register_object(*this,*this,name, port, netlist_terminal_t::STATE_NONE);
 }
 
-void netlist_device_t::register_output(const astring &name, netlist_output_t &port)
+ATTR_COLD void netlist_device_t::register_output(const astring &name, netlist_output_t &port)
 {
-	m_setup->register_output(*this,*this,name, port);
+	m_setup->register_object(*this,*this,name, port, netlist_terminal_t::STATE_NONE);
 }
 
-void netlist_device_t::register_input(netlist_core_device_t &dev, const astring &name, netlist_input_t &inp, netlist_input_t::net_input_state type)
+ATTR_COLD void netlist_device_t::register_input(netlist_core_device_t &dev, const astring &name, netlist_input_t &inp, netlist_input_t::state_e type)
 {
-	m_setup->register_input(*this, dev, name, inp, type);
+	m_setup->register_object(*this, dev, name, inp, type);
 }
 
-void netlist_device_t::register_input(const astring &name, netlist_input_t &inp, netlist_input_t::net_input_state type)
+ATTR_COLD void netlist_device_t::register_input(const astring &name, netlist_input_t &inp, netlist_input_t::state_e type)
 {
 	register_input(*this, name, inp, type);
 }
 
-void netlist_device_t::register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::net_input_state aState)
+ATTR_COLD void netlist_device_t::register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState)
 {
-    in.init_input(dev, aState);
+    in.init_terminal(dev);
+    in.set_state(aState);
     // ensure we are not yet initialized ...
     if (!out.net().isRailNet())
         out.init_terminal(dev);
@@ -246,19 +252,19 @@ void netlist_device_t::register_link_internal(netlist_core_device_t &dev, netlis
 		out.net().register_con(in);
 }
 
-void netlist_device_t::register_link_internal(netlist_input_t &in, netlist_output_t &out, netlist_input_t::net_input_state aState)
+ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState)
 {
 	register_link_internal(*this, in, out, aState);
 }
 
-void netlist_device_t::register_param(netlist_core_device_t &dev, const astring &name, netlist_param_t &param, double initialVal)
+ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const astring &name, netlist_param_t &param, double initialVal)
 {
 	param.set_netdev(dev);
 	param.initial(initialVal);
-	m_setup->register_param(name, &param);
+	m_setup->register_object(*this, *this, name, param, netlist_terminal_t::STATE_NONE);
 }
 
-void netlist_device_t::register_param(const astring &name, netlist_param_t &param, double initialVal)
+ATTR_COLD void netlist_device_t::register_param(const astring &name, netlist_param_t &param, double initialVal)
 {
 	register_param(*this,name, param, initialVal);
 }
@@ -326,7 +332,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_terminal_t &terminal)
     }
     m_num_cons++;
 
-    if (terminal.state() != netlist_input_t::INP_STATE_PASSIVE)
+    if (terminal.state() != netlist_input_t::STATE_INP_PASSIVE)
         m_active++;
 }
 
@@ -346,34 +352,7 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 {
 	assert(m_num_cons != 0);
 
-	//assert(this->isRailNet());
-	if (UNEXPECTED(!this->isRailNet()))
-	{
-	    /* only inputs and terminals connected
-	     * approach:
-	     *
-	     * a) Update voltage on this net
-	     * b) Update devices
-	     * c) If difference old - new > trigger schedule immediate update
-	     *    of number of updates < max_update_count
-	     *    else clear number of updates
-	     */
-        m_in_queue = 2; /* mark as taken ... */
-	    double gtot = 0;
-	    double iIdr = 0;
-	    netlist_terminal_t *p = m_head;
-        do
-        {
-            p->netdev().update_dev();
-            gtot += p->m_g;
-            iIdr += p->m_Idr;
-
-            p = p->m_update_list_next;
-        } while (p != NULL);
-        m_new.Analog = iIdr / gtot;
-        printf("New: %f\n", m_new.Analog);
-	}
-	else
+	assert(this->isRailNet());
 	{
 
 	    const UINT32 masks[4] = { 1, 5, 3, 1 };
@@ -416,12 +395,6 @@ ATTR_COLD void netlist_terminal_t::init_terminal(netlist_core_device_t &dev)
 // ----------------------------------------------------------------------------------------
 // net_input_t
 // ----------------------------------------------------------------------------------------
-
-ATTR_COLD void netlist_input_t::init_input(netlist_core_device_t &dev, net_input_state astate)
-{
-	init_terminal(dev);
-	set_state(astate);
-}
 
 // ----------------------------------------------------------------------------------------
 // net_output_t

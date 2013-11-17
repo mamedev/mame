@@ -257,7 +257,7 @@ public:
         m_netlist = &nl;
     }
 
-	ATTR_HOT inline const type_t object_type() const { return m_objtype; }
+	ATTR_HOT inline const type_t type() const { return m_objtype; }
     ATTR_HOT inline const family_t family() const { return m_family; }
 
 	ATTR_HOT inline const bool isType(const type_t atype) const { return (m_objtype == atype); }
@@ -282,11 +282,12 @@ public:
 
     /* needed here ... */
 
-    enum net_input_state {
-        INP_STATE_PASSIVE = 0,
-        INP_STATE_ACTIVE = 1,
-        INP_STATE_HL = 2,
-        INP_STATE_LH = 4,
+    enum state_e {
+        STATE_INP_PASSIVE = 0,
+        STATE_INP_ACTIVE = 1,
+        STATE_INP_HL = 2,
+        STATE_INP_LH = 4,
+        STATE_NONE = 128
     };
 
 	ATTR_COLD netlist_terminal_t(const type_t atype, const family_t afamily)
@@ -296,7 +297,7 @@ public:
     , m_update_list_next(NULL)
 	, m_netdev(NULL)
     , m_net(NULL)
-    , m_state(INP_STATE_ACTIVE)
+    , m_state(STATE_NONE)
 	{}
 
     ATTR_COLD netlist_terminal_t()
@@ -305,7 +306,7 @@ public:
     , m_update_list_next(NULL)
     , m_netdev(NULL)
     , m_net(NULL)
-    , m_state(INP_STATE_ACTIVE)
+    , m_state(STATE_NONE)
     {}
 
 	ATTR_COLD virtual void init_terminal(netlist_core_device_t &dev);
@@ -316,9 +317,9 @@ public:
     ATTR_HOT inline const netlist_net_t & RESTRICT net() const { return *m_net;}
     ATTR_HOT inline netlist_net_t & RESTRICT net() { return *m_net;}
 
-    ATTR_HOT inline const bool is_state(const net_input_state astate) const { return (m_state == astate); }
-    ATTR_HOT inline const net_input_state state() const { return m_state; }
-    ATTR_HOT inline void set_state(const net_input_state astate) { m_state = astate; }
+    ATTR_HOT inline const bool is_state(const state_e astate) const { return (m_state == astate); }
+    ATTR_HOT inline const state_e state() const { return m_state; }
+    ATTR_HOT inline void set_state(const state_e astate) { m_state = astate; }
 
     ATTR_HOT inline netlist_core_device_t & RESTRICT netdev() const { return *m_netdev; }
 
@@ -330,7 +331,7 @@ public:
 private:
 	netlist_core_device_t * RESTRICT m_netdev;
     netlist_net_t * RESTRICT m_net;
-    net_input_state m_state;
+    state_e m_state;
 };
 
 
@@ -347,9 +348,9 @@ public:
 		: netlist_terminal_t(atype, afamily)
         , m_low_thresh_V(0)
         , m_high_thresh_V(0)
-	{}
-
-	ATTR_COLD void init_input(netlist_core_device_t &dev, net_input_state astate = INP_STATE_ACTIVE);
+	{
+	    set_state(STATE_INP_ACTIVE);
+	}
 
 	ATTR_HOT inline void inactivate();
 	ATTR_HOT inline void activate();
@@ -423,6 +424,7 @@ class netlist_net_t : public netlist_object_t
 public:
 
     friend class NETLIB_NAME(mainclock);
+    friend class NETLIB_NAME(solver);
     friend class netlist_output_t;
     friend class netlist_input_t;
     friend class netlist_logic_output_t;
@@ -512,6 +514,7 @@ private:
 // ----------------------------------------------------------------------------------------
 
 class NETLIB_NAME(mainclock);
+class NETLIB_NAME(solver);
 
 class netlist_output_t : public netlist_terminal_t
 {
@@ -628,7 +631,7 @@ public:
 
 	ATTR_HOT inline const netlist_sig_t INPLOGIC(const netlist_logic_input_t &inp) const
 	{
-		assert(inp.state() != netlist_input_t::INP_STATE_PASSIVE);
+		assert(inp.state() != netlist_input_t::STATE_INP_PASSIVE);
 		return inp.Q();
 	}
 
@@ -657,6 +660,8 @@ public:
 	ATTR_HOT virtual void inc_active() {  }
 
 	ATTR_HOT virtual void dec_active() { /*printf("DeActivate %s\n", m_name);*/ }
+
+    ATTR_HOT virtual void update_terminals() { }
 
 	/* stats */
 	osd_ticks_t total_time;
@@ -697,13 +702,15 @@ public:
 	ATTR_COLD void register_output(const astring &name, netlist_output_t &out);
 	ATTR_COLD void register_output(netlist_core_device_t &dev, const astring &name, netlist_output_t &out);
 
-	ATTR_COLD void register_input(const astring &name, netlist_input_t &in, netlist_input_t::net_input_state state = netlist_input_t::INP_STATE_ACTIVE);
-	ATTR_COLD void register_input(netlist_core_device_t &dev, const astring &name, netlist_input_t &in, netlist_input_t::net_input_state state = netlist_input_t::INP_STATE_ACTIVE);
+	ATTR_COLD void register_input(const astring &name, netlist_input_t &in, netlist_input_t::state_e state = netlist_input_t::STATE_INP_ACTIVE);
+	ATTR_COLD void register_input(netlist_core_device_t &dev, const astring &name, netlist_input_t &in, netlist_input_t::state_e state = netlist_input_t::STATE_INP_ACTIVE);
 
-	ATTR_COLD void register_link_internal(netlist_input_t &in, netlist_output_t &out, netlist_input_t::net_input_state aState);
-	ATTR_COLD void register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::net_input_state aState);
+	ATTR_COLD void register_link_internal(netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState);
+	ATTR_COLD void register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState);
 
-	/* driving logic outputs don't count in here */
+    ATTR_HOT virtual void update_terminals() { }
+
+    /* driving logic outputs don't count in here */
 	netlist_list_t<astring> m_terminals;
 
 protected:
@@ -767,11 +774,14 @@ public:
 		m_queue.push(queue_t::entry_t(attime, out));
 	}
 
+	ATTR_HOT NETLIB_NAME(solver) &solver() { return *m_solver; }
+
 	ATTR_HOT void process_queue(INT32 &atime);
 
 	ATTR_HOT inline const netlist_time &time() const { return m_time_ps; }
 
 	ATTR_COLD void set_mainclock_dev(NETLIB_NAME(mainclock) *dev);
+    ATTR_COLD void set_solver_dev(NETLIB_NAME(solver) *dev);
 
 	ATTR_COLD void reset();
 
@@ -785,11 +795,11 @@ protected:
 	int m_perf_inp_active;
 
 private:
-	NETLIB_NAME(mainclock) *m_mainclock;
-	netlist_time m_time_ps;
-	UINT32   m_rem;
-	UINT32  m_div;
-
+	NETLIB_NAME(mainclock) *    m_mainclock;
+    NETLIB_NAME(solver) *       m_solver;
+	netlist_time                m_time_ps;
+	UINT32                      m_rem;
+	UINT32                      m_div;
 
 	ATTR_HOT void update_time(const netlist_time t, INT32 &atime);
 
@@ -819,7 +829,7 @@ public:
 protected:
 	void start()
 	{
-		m_I.init_input(*this);
+		m_I.init_terminal(*this);
 
 		m_Q.init_terminal(*this);
 		m_Q.initial(1);
@@ -859,7 +869,7 @@ public:
 protected:
 	void start()
 	{
-		m_I.init_input(*this);
+		m_I.init_terminal(*this);
 		m_Q.init_terminal(*this);
 		m_Q.initial(0);
 	}
@@ -875,108 +885,42 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// nld_twoterm
-// ----------------------------------------------------------------------------------------
-
-class nld_twoterm : public netlist_device_t
-{
-public:
-    nld_twoterm()
-    : netlist_device_t(), m_g(0.0), m_V(0.0), m_I(0.0)
-    {
-    }
-
-    netlist_terminal_t m_P;
-    netlist_terminal_t m_N;
-
-protected:
-    virtual void start()
-    {
-    }
-
-    ATTR_HOT ATTR_ALIGN virtual void update()
-    {
-        m_N.m_Idr = (m_P.net().Q_Analog() - m_V) * m_g + m_I;
-        m_P.m_Idr = (m_N.net().Q_Analog() + m_V) * m_g - m_I;
-        printf("%f %f %f %f\n", m_N.m_Idr, m_P.m_Idr, m_N.net().Q_Analog(), m_P.net().Q_Analog());
-        if (!m_N.net().is_queued() && !m_N.net().isRailNet())
-            m_N.net().push_to_queue(NLTIME_FROM_NS(10));
-        if (!m_P.net().is_queued() && !m_P.net().isRailNet() )
-            m_P.net().push_to_queue(NLTIME_FROM_NS(10));
-    }
-
-    double m_g; // conductance
-    double m_V; // internal voltage source
-    double m_I; // internal current source
-private:
-};
-
-class nld_R : public nld_twoterm
-{
-public:
-    nld_R()
-    : nld_twoterm()
-    {
-    }
-
-    netlist_param_t m_R;
-
-protected:
-    void start()
-    {
-        register_terminal("1", m_P);
-        register_terminal("2", m_N);
-
-        register_param("R", m_R, NETLIST_GMIN);
-    }
-
-    virtual void update_param()
-    {
-        m_g = 1.0 / m_R.Value();
-        m_P.m_g = m_g;
-        m_N.m_g = m_g;
-    }
-
-private:
-};
-
-// ----------------------------------------------------------------------------------------
 // Inline implementations
 // ----------------------------------------------------------------------------------------
 
 ATTR_HOT inline void netlist_input_t::inactivate()
 {
-	if (!is_state(INP_STATE_PASSIVE))
+	if (!is_state(STATE_INP_PASSIVE))
 	{
-		set_state(INP_STATE_PASSIVE);
+		set_state(STATE_INP_PASSIVE);
 		net().dec_active();
 	}
 }
 
 ATTR_HOT inline void netlist_input_t::activate()
 {
-	if (is_state(INP_STATE_PASSIVE))
+	if (is_state(STATE_INP_PASSIVE))
 	{
 		net().inc_active();
-		set_state(INP_STATE_ACTIVE);
+		set_state(STATE_INP_ACTIVE);
 	}
 }
 
 ATTR_HOT inline void netlist_input_t::activate_hl()
 {
-	if (is_state(INP_STATE_PASSIVE))
+	if (is_state(STATE_INP_PASSIVE))
 	{
 		net().inc_active();
-		set_state(INP_STATE_HL);
+		set_state(STATE_INP_HL);
 	}
 }
 
 ATTR_HOT inline void netlist_input_t::activate_lh()
 {
-	if (is_state(INP_STATE_PASSIVE))
+	if (is_state(STATE_INP_PASSIVE))
 	{
 		net().inc_active();
-		set_state(INP_STATE_LH);
+		set_state(STATE_INP_LH);
 	}
 }
 

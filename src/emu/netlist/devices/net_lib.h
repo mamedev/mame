@@ -78,10 +78,6 @@
 // Special chips
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_MAINCLOCK(_name)                                                     \
-		NET_REGISTER_DEV(mainclock, _name)
-#define NETDEV_CLOCK(_name)                                                         \
-		NET_REGISTER_DEV(clock, _name)
 #define NETDEV_LOGIC_INPUT(_name)                                                   \
 		NET_REGISTER_DEV(logic_input, _name)
 #define NETDEV_ANALOG_INPUT(_name)                                                  \
