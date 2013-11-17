@@ -117,6 +117,8 @@ public:
 
 	wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
+	void soft_reset();
+
 	void dden_w(bool dden);
 	void set_floppy(floppy_image_device *floppy);
 	void setup_intrq_cb(line_cb cb);

@@ -821,6 +821,8 @@ void luxor_55_21046_device::device_reset()
 	m_cs = false;
 	m_out = 0;
 
+	m_maincpu->reset();
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	_4b_w(space, 0, 0);
 	_9b_w(space, 0, 0);
@@ -940,7 +942,7 @@ void luxor_55_21046_device::abcbus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
-		m_maincpu->reset();
+		device_reset();
 	}
 }
 
@@ -1085,7 +1087,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	*/
 
 	// FDC master reset
-	if (!BIT(data, 0)) m_fdc->reset();
+	if (!BIT(data, 0)) m_fdc->soft_reset();
 
 	// density select
 	m_fdc->dden_w(BIT(data, 1));
