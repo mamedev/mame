@@ -2367,7 +2367,8 @@ $(DRIVERS)/cinemat.o:   $(LAYOUT)/armora.lh \
 			$(LAYOUT)/solarq.lh \
 			$(LAYOUT)/starcas.lh \
 			$(LAYOUT)/sundance.lh \
-			$(LAYOUT)/tailg.lh
+			$(LAYOUT)/tailg.lh \
+			$(LAYOUT)/wotw.lh
 
 $(DRIVERS)/cischeat.o:  $(LAYOUT)/cischeat.lh \
 			$(LAYOUT)/f1gpstar.lh

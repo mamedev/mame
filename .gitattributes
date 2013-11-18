@@ -5614,6 +5614,7 @@ src/mame/layout/wecleman.lay svneol=native#text/plain
 src/mame/layout/wico.lay svneol=native#text/plain
 src/mame/layout/wildone.lay svneol=native#text/plain
 src/mame/layout/wldarrow.lay svneol=native#text/plain
+src/mame/layout/wotw.lay svneol=native#text/plain
 src/mame/layout/wpc_an.lay svneol=native#text/plain
 src/mame/layout/zac_1.lay svneol=native#text/plain
 src/mame/layout/zac_2.lay svneol=native#text/plain

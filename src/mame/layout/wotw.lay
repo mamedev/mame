@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+	<element name="overlay">
+
+<!-- backdrop -->
+
+		<rect>
+			<color red="1.0" green="0.16" blue="0.16" />
+			<bounds x="0" y="0" width="500" height="300" />
+		</rect>
+
+<!-- gradient -->
+
+		<disk>
+			<color red="1.0" green="0.30" blue="0.16" />
+			<bounds x="0" y="66" width="500" height="170" />
+		</disk>
+		<disk>
+			<color red="1.0" green="0.44" blue="0.16" />
+			<bounds x="0" y="68" width="500" height="170" />
+		</disk>
+		<disk>
+			<color red="1.0" green="0.58" blue="0.16" />
+			<bounds x="0" y="70" width="500" height="170" />
+		</disk>
+		<disk>
+			<color red="1.0" green="0.72" blue="0.16" />
+			<bounds x="0" y="72" width="500" height="170" />
+		</disk>
+		<disk>
+			<color red="1.0" green="0.86" blue="0.16" />
+			<bounds x="0" y="74" width="500" height="170" />
+		</disk>
+		<disk>
+			<color red="1.0" green="1.0" blue="0.16" />
+			<bounds x="0" y="76" width="500" height="170" />
+		</disk>
+
+<!-- ground -->
+
+<!-- note: obviously missing the destroyed city skyline here, -->
+<!-- you'd need external artwork for that -->
+
+		<rect>
+			<color red="1.0" green="1.0" blue="0.16" />
+			<bounds left="0" top="166" right="500" bottom="300" />
+		</rect>
+		<rect>
+			<color red="1.0" green="0.3" blue="0.5" />
+			<bounds left="0" top="223" right="500" bottom="300" />
+		</rect>
+	</element>
+
+	<view name="Color Overlay">
+		<bounds left="0" top="0" right="400" bottom="300" />
+		<screen index="0">
+			<bounds left="0" top="0" right="400" bottom="300" />
+		</screen>
+
+		<overlay element="overlay">
+			<bounds x="-50" y="0" width="500" height="300" />
+		</overlay>
+
+	</view>
+</mamelayout>
