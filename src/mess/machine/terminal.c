@@ -481,7 +481,7 @@ void serial_terminal_device::device_start()
 	m_timer = timer_alloc();
 	set_rcv_rate(baud);
 	set_tra_rate(baud);
-	set_data_frame(8, 1, SERIAL_PARITY_NONE);
+	set_data_frame(8, 1, PARITY_NONE, false);
 }
 
 INPUT_CHANGED_MEMBER(serial_terminal_device::update_frame)
@@ -505,17 +505,17 @@ void serial_terminal_device::device_reset()
 	switch(val & 0x30)
 	{
 	case 0x10:
-		set_data_frame(7, 1, SERIAL_PARITY_EVEN);
+		set_data_frame(7, 1, PARITY_EVEN, false);
 		break;
 	case 0x00:
 	default:
-		set_data_frame(8, 1, SERIAL_PARITY_NONE);
+		set_data_frame(8, 1, PARITY_NONE, false);
 		break;
 	case 0x20:
-		set_data_frame(8, 2, SERIAL_PARITY_NONE);
+		set_data_frame(8, 2, PARITY_NONE, false);
 		break;
 	case 0x30:
-		set_data_frame(8, 1, SERIAL_PARITY_EVEN);
+		set_data_frame(8, 1, PARITY_EVEN, false);
 		break;
 	}
 }

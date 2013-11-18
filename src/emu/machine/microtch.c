@@ -292,7 +292,7 @@ microtouch_serial_device::microtouch_serial_device(const machine_config &mconfig
 void microtouch_serial_device::device_start()
 {
 	microtouch_device::device_start();
-	set_data_frame(8, 1, SERIAL_PARITY_NONE); //8N1?
+	set_data_frame(8, 1, PARITY_NONE, false); //8N1?
 	set_tra_rate(clock());
 	set_rcv_rate(clock());
 	m_out_stx_func.resolve_safe();
@@ -300,6 +300,14 @@ void microtouch_serial_device::device_start()
 
 	save_item(NAME(m_output_valid));
 	save_item(NAME(m_output));
+}
+
+void microtouch_serial_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if(id)
+		device_serial_interface::device_timer(timer, id, param, ptr);
+	else
+		microtouch_device::device_timer(timer, id, param, ptr);
 }
 
 void microtouch_serial_device::tx(UINT8 data)

@@ -255,6 +255,7 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_serial_interface overrides
 	virtual void tra_callback();

@@ -41,6 +41,7 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_serial overrides
 	virtual void rcv_complete();    // Rx completed receiving byte

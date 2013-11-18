@@ -46,7 +46,7 @@ void midiin_device::device_reset()
 	// we don't Rx, we Tx at 31250 8-N-1
 	set_rcv_rate(0);
 	set_tra_rate(31250);
-	set_data_frame(8, 1, SERIAL_PARITY_NONE);
+	set_data_frame(8, 1, PARITY_NONE, false);
 }
 
 /*-------------------------------------------------
@@ -73,6 +73,11 @@ void midiin_device::device_config_complete(void)
 
 void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	if (id) {
+		device_serial_interface::device_timer(timer, id, param, ptr);
+		return;
+	}
+
 	UINT8 buf[8192*4];
 	int bytesRead;
 

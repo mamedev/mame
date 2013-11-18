@@ -533,6 +533,11 @@ void duart68681_channel::device_reset()
 	CSR = 0;
 }
 
+void duart68681_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
+}
+
 // serial device virtual overrides
 void duart68681_channel::rcv_complete()
 {
@@ -810,27 +815,27 @@ void duart68681_channel::recalc_framing()
 		case 0: // with parity
 			if (MR1 & 4)
 			{
-				parity = SERIAL_PARITY_ODD;
+				parity = PARITY_ODD;
 			}
 			else
 			{
-				parity = SERIAL_PARITY_EVEN;
+				parity = PARITY_EVEN;
 			}
 			break;
 
 		case 1: // force parity
 			if (MR1 & 4)
 			{
-				parity = SERIAL_PARITY_MARK;
+				parity = PARITY_MARK;
 			}
 			else
 			{
-				parity = SERIAL_PARITY_SPACE;
+				parity = PARITY_SPACE;
 			}
 			break;
 
 		case 2: // no parity
-			parity = SERIAL_PARITY_NONE;
+			parity = PARITY_NONE;
 			break;
 
 		case 3: // multidrop mode
@@ -840,7 +845,7 @@ void duart68681_channel::recalc_framing()
 
 	//printf("ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
 
-	set_data_frame((MR1 & 3)+5, stopbits, parity);
+	set_data_frame((MR1 & 3)+5, stopbits, parity, false);
 }
 
 void duart68681_channel::write_CR(UINT8 data)

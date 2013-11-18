@@ -686,9 +686,9 @@ WRITE8_MEMBER( to7_io_line_device::porta_out )
 
 	LOG_IO(( "%s %f to7_io_porta_out: tx=%i, dtr=%i\n",  machine().describe_context(), machine().time().as_double(), tx, dtr ));
 	if ( dtr )
-		m_connection_state |=  SERIAL_STATE_DTR;
+		m_connection_state |=  device_serial_interface::DTR;
 	else
-		m_connection_state &= ~SERIAL_STATE_DTR;
+		m_connection_state &= ~device_serial_interface::DTR;
 
 	set_out_data_bit(tx);
 	serial_connection_out();
@@ -700,11 +700,11 @@ READ8_MEMBER( to7_io_line_device::porta_in )
 {
 	centronics_device *printer = machine().device<centronics_device>("centronics");
 	int cts = 1;
-	int dsr = ( m_input_state & SERIAL_STATE_DSR ) ? 0 : 1;
+	int dsr = ( m_input_state & device_serial_interface::DSR ) ? 0 : 1;
 	int rd  = get_in_data_bit();
 
 	if ( machine().driver_data<thomson_state>()->to7_io_mode() == TO7_IO_RS232 )
-		cts = m_input_state & SERIAL_STATE_CTS ? 0 : 1;
+		cts = m_input_state & device_serial_interface::CTS ? 0 : 1;
 	else
 		cts = !printer->busy_r();
 
@@ -738,7 +738,7 @@ void to7_io_line_device::input_callback(UINT8 state)
 {
 	m_input_state = state;
 
-	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", machine().time().as_double(), (state & SERIAL_STATE_CTS) ? 1 : 0, (state & SERIAL_STATE_DSR) ? 1 : 0, (int)get_in_data_bit() ));
+	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", machine().time().as_double(), (state & device_serial_interface::CTS) ? 1 : 0, (state & device_serial_interface::DSR) ? 1 : 0, (int)get_in_data_bit() ));
 }
 
 
@@ -775,9 +775,9 @@ void to7_io_line_device::device_reset()
 	LOG (( "to7_io_reset called\n" ));
 
 	if (io_pia) io_pia->set_port_a_z_mask(0x03 );
-	m_input_state = SERIAL_STATE_CTS;
-	m_connection_state &= ~SERIAL_STATE_DTR;
-	m_connection_state |=  SERIAL_STATE_RTS;  /* always ready to send */
+	m_input_state = device_serial_interface::CTS;
+	m_connection_state &= ~device_serial_interface::DTR;
+	m_connection_state |=  device_serial_interface::RTS;  /* always ready to send */
 	set_out_data_bit(1);
 	serial_connection_out();
 }

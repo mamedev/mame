@@ -182,6 +182,10 @@ void im6402_device::device_reset()
 	set_tre(ASSERT_LINE);
 }
 
+void im6402_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
+}
 
 //-------------------------------------------------
 //  tra_callback -
@@ -255,7 +259,8 @@ void im6402_device::input_callback(UINT8 state)
 {
 	m_input_state = state;
 
-	rcv_clock(); // HACK for Wang PC keyboard
+	rx_clock_w(1); // HACK for Wang PC keyboard
+	rx_clock_w(0);
 }
 
 
@@ -293,13 +298,8 @@ WRITE_LINE_MEMBER( im6402_device::rrc_w )
 {
 	if (state)
 	{
-		m_rrc_count++;
-
-		if (m_rrc_count == 16)
-		{
-			rcv_clock();
-			m_rrc_count = 0;
-		}
+		rx_clock_w(m_rrc_count < 8);
+		m_rrc_count = (m_rrc_count + 1) & 15;
 	}
 }
 
@@ -312,13 +312,8 @@ WRITE_LINE_MEMBER( im6402_device::trc_w )
 {
 	if (state)
 	{
-		m_trc_count++;
-
-		if (m_trc_count == 16)
-		{
-			tra_clock();
-			m_trc_count = 0;
-		}
+		tx_clock_w(m_trc_count < 8);
+		m_trc_count = (m_trc_count + 1) & 15;
 	}
 }
 
@@ -381,11 +376,11 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 		float stop_bits = 1 + (m_sbs ? ((word_length == 5) ? 0.5 : 1) : 0);
 		int parity_code;
 
-		if (m_pi) parity_code = SERIAL_PARITY_NONE;
-		else if (m_epe) parity_code = SERIAL_PARITY_EVEN;
-		else parity_code = SERIAL_PARITY_ODD;
+		if (m_pi) parity_code = PARITY_NONE;
+		else if (m_epe) parity_code = PARITY_EVEN;
+		else parity_code = PARITY_ODD;
 
-		set_data_frame(word_length, stop_bits, parity_code);
+		set_data_frame(word_length, stop_bits, parity_code, false);
 	}
 }
 

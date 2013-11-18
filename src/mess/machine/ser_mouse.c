@@ -72,6 +72,12 @@ void serial_mouse_device::tra_callback()
  **************************************************************************/
 void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	if (id)
+	{
+		device_serial_interface::device_timer(timer, id, param, ptr);
+		return;
+	}
+
 	static int ox = 0, oy = 0;
 	int nx,ny;
 	int dx, dy, nb;

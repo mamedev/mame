@@ -104,7 +104,7 @@ class ns16550_device : public ins8250_uart_device
 public:
 	ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	virtual void device_start() { m_timeout = timer_alloc(); ins8250_uart_device::device_start(); }
+	virtual void device_start();
 	virtual void device_reset();
 	virtual void rcv_complete();
 	virtual void tra_complete();

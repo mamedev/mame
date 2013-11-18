@@ -51,7 +51,7 @@ void serial_image_device::device_config_complete()
 		m_baud_rate = 2400;
 		m_data_bits = 8;
 		m_stop_bits = 2;
-		m_parity = SERIAL_PARITY_NONE;
+		m_parity = PARITY_NONE;
 		m_transmit_on_start = FALSE;
 		m_tag_connected = NULL;
 	}
@@ -80,17 +80,17 @@ void serial_image_device::input_callback(UINT8 state)
 
 void serial_image_device::device_start()
 {
-	set_data_frame(m_data_bits, m_stop_bits,m_parity);
+	set_data_frame(m_data_bits, m_stop_bits, m_parity, false);
 
 	m_timer = machine().scheduler().timer_alloc(FUNC(serial_device_baud_rate_callback), this);
 
 	/* signal to other end it is clear to send! */
 	/* data is initially high state */
 	/* set /rts */
-	m_connection_state |= SERIAL_STATE_RTS;
+	m_connection_state |= RTS;
 	/* signal to other end data is ready to be accepted */
 	/* set /dtr */
-	m_connection_state |= SERIAL_STATE_DTR;
+	m_connection_state |= DTR;
 
 	set_out_data_bit(1);
 	serial_connection_out();
@@ -241,7 +241,7 @@ void serial_image_device::timer_callback()
 	}
 
 	/* other side says it is clear to send? */
-	if (m_connection_state & SERIAL_STATE_CTS)
+	if (m_connection_state & CTS)
 	{
 		/* send bit */
 		transmit_register_send_bit();

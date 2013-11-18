@@ -604,17 +604,17 @@ const cassette_interface mo5_cassette_interface =
 
 const serial_image_interface to7_cc90232_config =
 {
-	2400, 7, 2, SERIAL_PARITY_NONE, 1, "to7_io"
+	2400, 7, 2, device_serial_interface::PARITY_NONE, 1, "to7_io"
 };
 
 const serial_image_interface to7_rf57932_config =
 {
-	2400, 7, 2, SERIAL_PARITY_NONE, 1, "acia"
+	2400, 7, 2, device_serial_interface::PARITY_NONE, 1, "acia"
 };
 
 const serial_image_interface to7_modem_config =
 {
-	2400, 7, 2, SERIAL_PARITY_NONE, 1, NULL
+	2400, 7, 2, device_serial_interface::PARITY_NONE, 1, NULL
 };
 
 /* ------------ driver ------------ */

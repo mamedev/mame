@@ -40,7 +40,7 @@ void i8251_device::input_callback(UINT8 state)
 	m_input_state = state;
 
 	/* did cts change state? */
-	if (changed & SERIAL_STATE_CTS)
+	if (changed & CTS)
 	{
 		/* yes */
 		/* update tx ready */
@@ -208,7 +208,7 @@ void i8251_device::transmit_clock()
 			//transmit_register_send_bit();
 			m_out_txd_func(data);
 
-			m_connection_state &=~SERIAL_STATE_TX_DATA;
+			m_connection_state &= ~TX;
 			m_connection_state|=(data<<5);
 			serial_connection_out();
 		}
@@ -265,7 +265,7 @@ void i8251_device::update_tx_ready()
 	if ((m_command & (1<<0))!=0)
 	{
 		/* other side has rts set (comes in as CTS at this side) */
-		if (m_input_state & SERIAL_STATE_CTS)
+		if (m_input_state & CTS)
 		{
 			if (m_status & I8251_STATUS_TX_EMPTY)
 			{
@@ -313,7 +313,7 @@ void i8251_device::device_reset()
 	set_out_data_bit(1);
 
 	/* assumption, rts is set to 1 */
-	m_connection_state &= ~SERIAL_STATE_RTS;
+	m_connection_state &= ~RTS;
 	serial_connection_out();
 
 	transmit_register_reset();
@@ -406,7 +406,7 @@ WRITE8_MEMBER(i8251_device::control_w)
 
 				LOG(("Character length: %d\n", (((data>>2) & 0x03)+5)));
 
-				int parity = SERIAL_PARITY_NONE;
+				int parity = PARITY_NONE;
 
 				if (data & (1<<4))
 				{
@@ -415,12 +415,12 @@ WRITE8_MEMBER(i8251_device::control_w)
 					if (data & (1<<5))
 					{
 						LOG(("even parity\n"));
-						parity = SERIAL_PARITY_EVEN;
+						parity = PARITY_EVEN;
 					}
 					else
 					{
 						LOG(("odd parity\n"));
-						parity = SERIAL_PARITY_ODD;
+						parity = PARITY_ODD;
 					}
 				}
 				else
@@ -478,7 +478,7 @@ WRITE8_MEMBER(i8251_device::control_w)
 						stop_bit_count =  2;
 						break;
 				}
-				set_data_frame(word_length,stop_bit_count,parity);
+				set_data_frame(word_length,stop_bit_count,parity,false);
 
 				switch (data & 0x03)
 				{
@@ -624,17 +624,17 @@ WRITE8_MEMBER(i8251_device::control_w)
 		        1 = transmit enable
 		*/
 
-		m_connection_state &=~SERIAL_STATE_RTS;
+		m_connection_state &= ~RTS;
 		if (data & (1<<5))
 		{
 			/* rts set to 0 */
-			m_connection_state |= SERIAL_STATE_RTS;
+			m_connection_state |= RTS;
 		}
 
-		m_connection_state &=~SERIAL_STATE_DTR;
+		m_connection_state &= ~DTR;
 		if (data & (1<<1))
 		{
-			m_connection_state |= SERIAL_STATE_DTR;
+			m_connection_state |= DTR;
 		}
 
 		if ((data & (1<<0))==0)
@@ -740,4 +740,10 @@ READ8_MEMBER(i8251_device::data_r)
 
 	update_rx_ready();
 	return m_data;
+}
+
+
+void i8251_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
 }

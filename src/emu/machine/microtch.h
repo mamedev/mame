@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }
 protected:
 	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void tx(UINT8 data);
 	virtual void input_callback(UINT8 state) { m_input_state = state; }
 	virtual void tra_callback();

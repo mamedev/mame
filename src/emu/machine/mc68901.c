@@ -800,7 +800,10 @@ void mc68901_device::device_reset()
 
 void mc68901_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	timer_count(id);
+	if(id >= TIMER_A && id <= TIMER_D)
+		timer_count(id);
+	else
+		device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 
@@ -1227,7 +1230,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 	case REGISTER_UCR:
 		{
-		int parity_code = SERIAL_PARITY_NONE;
+		int parity_code = PARITY_NONE;
 
 		if (data & UCR_PARITY_ENABLED)
 		{
@@ -1235,13 +1238,13 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			{
 				if (LOG) logerror("MC68901 '%s' Parity : Even\n", tag());
 
-				parity_code = SERIAL_PARITY_EVEN;
+				parity_code = PARITY_EVEN;
 			}
 			else
 			{
 				if (LOG) logerror("MC68901 '%s' Parity : Odd\n", tag());
 
-				parity_code = SERIAL_PARITY_ODD;
+				parity_code = PARITY_ODD;
 			}
 		}
 		else
@@ -1259,11 +1262,13 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 		if (LOG) logerror("MC68901 '%s' Word Length : %u bits\n", tag(), m_rxtx_word);
 
+		bool sync = false;
 		switch (data & 0x18)
 		{
 		case UCR_START_STOP_0_0:
 			m_rxtx_start = 0;
 			m_rxtx_stop = 0;
+			sync = true;
 			if (LOG) logerror("MC68901 '%s' Start Bits : 0, Stop Bits : 0, Format : synchronous\n", tag());
 			break;
 		case UCR_START_STOP_1_1:
@@ -1292,7 +1297,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			if (LOG) logerror("MC68901 '%s' Rx/Tx Clock Divisor : 1\n", tag());
 		}
 
-		set_data_frame(m_rxtx_word, m_rxtx_stop, parity_code);
+		set_data_frame(m_rxtx_word, m_rxtx_stop, parity_code, sync);
 
 		m_ucr = data;
 		}
@@ -1433,22 +1438,4 @@ WRITE_LINE_MEMBER( mc68901_device::tai_w )
 WRITE_LINE_MEMBER( mc68901_device::tbi_w )
 {
 	timer_input(TIMER_B, state);
-}
-
-
-WRITE_LINE_MEMBER( mc68901_device::rc_w )
-{
-	if (state)
-	{
-		rcv_clock();
-	}
-}
-
-
-WRITE_LINE_MEMBER( mc68901_device::tc_w )
-{
-	if (state)
-	{
-		tra_clock();
-	}
 }

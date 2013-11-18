@@ -2051,8 +2051,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER( x68k_state::mfp_tdo_w )
 {
-	m_mfpdev->tc_w(state);
-	m_mfpdev->rc_w(state);
+	m_mfpdev->clock_w(state);
 }
 
 static MC68901_INTERFACE( mfp_interface )

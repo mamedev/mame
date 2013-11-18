@@ -122,9 +122,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tai_w );
 	DECLARE_WRITE_LINE_MEMBER( tbi_w );
 
-	DECLARE_WRITE_LINE_MEMBER( rc_w );
-	DECLARE_WRITE_LINE_MEMBER( tc_w );
-
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

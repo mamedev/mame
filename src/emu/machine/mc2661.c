@@ -339,11 +339,11 @@ WRITE8_MEMBER( mc2661_device::write )
 			case STOP_BITS_2:   stop_bits = 2;      break;
 			}
 
-			if (!MODE_PARITY) parity_code = SERIAL_PARITY_NONE;
-			else if (MODE_PARITY_EVEN) parity_code = SERIAL_PARITY_EVEN;
-			else parity_code = SERIAL_PARITY_ODD;
+			if (!MODE_PARITY) parity_code = PARITY_NONE;
+			else if (MODE_PARITY_EVEN) parity_code = PARITY_EVEN;
+			else parity_code = PARITY_ODD;
 
-			set_data_frame(word_length, stop_bits, parity_code);
+			set_data_frame(word_length, stop_bits, parity_code, false);
 		}
 
 		m_mode_index++;
@@ -365,27 +365,6 @@ WRITE8_MEMBER( mc2661_device::write )
 		break;
 	}
 }
-
-
-//-------------------------------------------------
-//  rxc_w - receiver clock
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mc2661_device::rxc_w )
-{
-	rcv_clock();
-}
-
-
-//-------------------------------------------------
-//  txc_w - transmitter clock
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( mc2661_device::txc_w )
-{
-	tra_clock();
-}
-
 
 //-------------------------------------------------
 //  dsr_w - data set ready
@@ -452,4 +431,10 @@ READ_LINE_MEMBER( mc2661_device::rxrdy_r )
 READ_LINE_MEMBER( mc2661_device::txemt_r )
 {
 	return (m_sr & STATUS_TXEMT) ? ASSERT_LINE : CLEAR_LINE;
+}
+
+
+void mc2661_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
 }

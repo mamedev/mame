@@ -1378,7 +1378,7 @@ static const cassette_interface mc1502_cassette_interface =
 
 static const serial_image_interface mc1502_serial =
 {
-	9600, 8, 1, SERIAL_PARITY_NONE, 1, "upd8251"
+	9600, 8, 1, device_serial_interface::PARITY_NONE, 1, "upd8251"
 };
 
 static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )

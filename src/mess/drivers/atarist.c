@@ -1955,8 +1955,7 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 
 WRITE_LINE_MEMBER( st_state::mfp_tdo_w )
 {
-	m_mfp->rc_w(state);
-	m_mfp->tc_w(state);
+	m_mfp->clock_w(state);
 }
 
 static MC68901_INTERFACE( mfp_intf )

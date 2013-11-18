@@ -66,12 +66,17 @@ void esqpanel_device::device_reset()
 	// panel comms is at 62500 baud (double the MIDI rate), 8N2
 	set_rcv_rate(62500);
 	set_tra_rate(62500);
-	set_data_frame(8, 2, SERIAL_PARITY_NONE);
+	set_data_frame(8, 2, PARITY_NONE, false);
 
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
 	m_bCalibSecondByte = false;
 	m_bButtonLightSecondByte = false;
+}
+
+void esqpanel_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void esqpanel_device::rcv_complete()    // Rx completed receiving byte

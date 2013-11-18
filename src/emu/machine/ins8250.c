@@ -242,23 +242,23 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			switch ((m_regs.lcr>>3) & 7)
 			{
 			case 1:
-				tmp = SERIAL_PARITY_ODD;
+				tmp = PARITY_ODD;
 				break;
 			case 3:
-				tmp = SERIAL_PARITY_EVEN;
+				tmp = PARITY_EVEN;
 				break;
 			case 5:
-				tmp = SERIAL_PARITY_MARK;
+				tmp = PARITY_MARK;
 				break;
 			case 7:
-				tmp = SERIAL_PARITY_SPACE;
+				tmp = PARITY_SPACE;
 				break;
 			default:
-				tmp = SERIAL_PARITY_NONE;
+				tmp = PARITY_NONE;
 				break;
 			}
 			// if 5 data bits and stb = 1, stop bits is supposed to be 1.5
-			set_data_frame((m_regs.lcr & 3) + 5, (m_regs.lcr & 4)?2:1, tmp);
+			set_data_frame((m_regs.lcr & 3) + 5, (m_regs.lcr & 4)?2:1, tmp, false);
 			break;
 		case 4:
 			if ( ( m_regs.mcr & 0x1f ) != ( data & 0x1f ) )
@@ -539,6 +539,12 @@ void ins8250_uart_device::device_config_complete()
 	}
 }
 
+void ns16550_device::device_start()
+{
+	m_timeout = timer_alloc();
+	ins8250_uart_device::device_start();
+}
+
 void ns16550_device::device_reset()
 {
 	memset(&m_rfifo, '\0', sizeof(m_rfifo));
@@ -551,8 +557,13 @@ void ns16550_device::device_reset()
 
 void ns16550_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	trigger_int(COM_INT_PENDING_CHAR_TIMEOUT);
-	m_timeout->adjust(attotime::never);
+	if(id)
+		device_serial_interface::device_timer(timer, id, param, ptr);
+	else
+	{
+		trigger_int(COM_INT_PENDING_CHAR_TIMEOUT);
+		m_timeout->adjust(attotime::never);
+	}
 }
 
 void ns16550_device::push_tx(UINT8 data)

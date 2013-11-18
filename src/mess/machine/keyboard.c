@@ -436,7 +436,7 @@ void serial_keyboard_device::device_start()
 	m_slot = m_owner && 1;
 	m_timer = timer_alloc();
 	set_tra_rate(baud);
-	set_data_frame(8, 1, SERIAL_PARITY_NONE);
+	set_data_frame(8, 1, PARITY_NONE, false);
 }
 
 INPUT_CHANGED_MEMBER(serial_keyboard_device::update_frame)
@@ -459,19 +459,27 @@ void serial_keyboard_device::device_reset()
 	switch(val & 0x30)
 	{
 	case 0x10:
-		set_data_frame(7, 1, SERIAL_PARITY_EVEN);
+		set_data_frame(7, 1, PARITY_EVEN, false);
 		break;
 	case 0x00:
 	default:
-		set_data_frame(8, 1, SERIAL_PARITY_NONE);
+		set_data_frame(8, 1, PARITY_NONE, false);
 		break;
 	case 0x20:
-		set_data_frame(8, 2, SERIAL_PARITY_NONE);
+		set_data_frame(8, 2, PARITY_NONE, false);
 		break;
 	case 0x30:
-		set_data_frame(8, 1, SERIAL_PARITY_EVEN);
+		set_data_frame(8, 1, PARITY_EVEN, false);
 		break;
 	}
+}
+
+void serial_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id)
+		device_serial_interface::device_timer(timer, id, param, ptr);
+	else
+		generic_keyboard_device::device_timer(timer, id, param, ptr);
 }
 
 void serial_keyboard_device::send_key(UINT8 code)

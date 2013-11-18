@@ -40,6 +40,8 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	}
 	m_rcv_clock = NULL;
 	m_tra_clock = NULL;
+	m_rcv_clock_state = false;
+	m_tra_clock_state = false;
 	m_tra_rate = attotime::never;
 	m_rcv_rate = attotime::never;
 	m_tra_flags = 0;
@@ -54,15 +56,12 @@ device_serial_interface::~device_serial_interface()
 {
 }
 
-//-------------------------------------------------
-//  interface_pre_start - work to be done prior to
-//  actually starting a device
-//-------------------------------------------------
-
 void device_serial_interface::interface_pre_start()
 {
-	m_rcv_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::rcv_timer), this));
-	m_tra_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::tra_timer), this));
+	m_rcv_clock = device().timer_alloc(RCV_TIMER_ID);
+	m_tra_clock = device().timer_alloc(TRA_TIMER_ID);
+	m_rcv_clock_state = false;
+	m_tra_clock_state = false;
 }
 
 void device_serial_interface::set_rcv_rate(attotime rate)
@@ -79,7 +78,7 @@ void device_serial_interface::set_tra_rate(attotime rate)
 	m_tra_clock->adjust(attotime::never);
 }
 
-void device_serial_interface::tra_clock()
+void device_serial_interface::tra_edge()
 {
 	tra_callback();
 	if(is_transmit_register_empty())
@@ -89,12 +88,7 @@ void device_serial_interface::tra_clock()
 	}
 }
 
-void device_serial_interface::tra_timer(void *ptr, int param)
-{
-	tra_clock();
-}
-
-void device_serial_interface::rcv_clock()
+void device_serial_interface::rcv_edge()
 {
 	rcv_callback();
 	if(is_receive_register_full())
@@ -104,20 +98,49 @@ void device_serial_interface::rcv_clock()
 	}
 }
 
-void device_serial_interface::rcv_timer(void *ptr, int param)
+WRITE_LINE_MEMBER(device_serial_interface::tx_clock_w)
 {
-	rcv_clock();
+	if(state != m_tra_clock_state) {
+		m_tra_clock_state = state;
+		if(m_tra_clock_state)
+			tra_edge();
+	}
 }
 
-void device_serial_interface::set_data_frame(int num_data_bits, int stop_bit_count, int parity_code)
+WRITE_LINE_MEMBER(device_serial_interface::rx_clock_w)
+{
+	if(state != m_rcv_clock_state) {
+		m_rcv_clock_state = state;
+		if(!m_rcv_clock_state)
+			rcv_edge();
+	}
+}
+
+WRITE_LINE_MEMBER(device_serial_interface::clock_w)
+{
+	tx_clock_w(state);
+	rx_clock_w(state);
+}
+
+void device_serial_interface::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id) {
+	case TRA_TIMER_ID: tx_clock_w(!m_tra_clock_state); break;
+	case RCV_TIMER_ID: rx_clock_w(!m_rcv_clock_state); break;
+	}
+}
+
+
+void device_serial_interface::set_data_frame(int num_data_bits, int stop_bit_count, int parity_code, bool synchronous)
 {
 	m_df_word_length = num_data_bits;
 	m_df_stop_bit_count = stop_bit_count;
 	m_df_parity = parity_code;
+	m_synchronous = synchronous;
 
 	m_rcv_bit_count = m_df_word_length + m_df_stop_bit_count;
 
-	if (m_df_parity != SERIAL_PARITY_NONE)
+	if (m_df_parity != PARITY_NONE)
 	{
 		m_rcv_bit_count++;
 	}
@@ -127,8 +150,16 @@ void device_serial_interface::receive_register_reset()
 {
 	m_rcv_bit_count_received = 0;
 	m_rcv_flags &=~RECEIVE_REGISTER_FULL;
-	m_rcv_flags &=~RECEIVE_REGISTER_SYNCHRONISED;
-	m_rcv_flags |= RECEIVE_REGISTER_WAITING_FOR_START_BIT;
+	if (m_synchronous)
+	{
+		m_rcv_flags |= RECEIVE_REGISTER_SYNCHRONISED;
+		m_rcv_flags &=~RECEIVE_REGISTER_WAITING_FOR_START_BIT;
+	}
+	else
+	{
+		m_rcv_flags &=~RECEIVE_REGISTER_SYNCHRONISED;
+		m_rcv_flags |= RECEIVE_REGISTER_WAITING_FOR_START_BIT;
+	}
 }
 
 WRITE_LINE_MEMBER(device_serial_interface::rx_w)
@@ -165,7 +196,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 	/* update bit count received */
 	m_rcv_bit_count_received++;
 
-	/* asyncrhonouse mode */
+	/* asynchronous mode */
 	if (m_rcv_flags & RECEIVE_REGISTER_WAITING_FOR_START_BIT)
 	{
 		/* the previous bit is stored in uart.receive char bit 0 */
@@ -216,7 +247,7 @@ void device_serial_interface::receive_register_extract()
 
 	m_rcv_byte_received  = data;
 
-	if(m_df_parity == SERIAL_PARITY_NONE)
+	if(m_df_parity == PARITY_NONE)
 		return;
 
 	//unsigned char computed_parity;
@@ -229,13 +260,13 @@ void device_serial_interface::receive_register_extract()
 	switch (m_df_parity)
 	{
 		/* check parity */
-		case SERIAL_PARITY_ODD:
-		case SERIAL_PARITY_EVEN:
+		case PARITY_ODD:
+		case PARITY_EVEN:
 		{
 			/* compute parity for received bits */
 			//computed_parity = serial_helper_get_parity(data);
 
-			if (m_df_parity == SERIAL_PARITY_ODD)
+			if (m_df_parity == PARITY_ODD)
 			{
 				/* odd parity */
 
@@ -250,8 +281,8 @@ void device_serial_interface::receive_register_extract()
 
 		}
 		break;
-		case SERIAL_PARITY_MARK:
-		case SERIAL_PARITY_SPACE:
+		case PARITY_MARK:
+		case PARITY_SPACE:
 			//computed_parity = parity_received;
 			break;
 	}
@@ -289,8 +320,9 @@ void device_serial_interface::transmit_register_setup(UINT8 data_byte)
 	m_tra_bit_count = 0;
 	m_tra_flags &=~TRANSMIT_REGISTER_EMPTY;
 
-	/* start bit */
-	transmit_register_add_bit(0);
+	if (!m_synchronous)
+		/* start bit */
+		transmit_register_add_bit(0);
 
 	/* data bits */
 	transmit_data = data_byte;
@@ -306,24 +338,24 @@ void device_serial_interface::transmit_register_setup(UINT8 data_byte)
 	}
 
 	/* parity */
-	if (m_df_parity!=SERIAL_PARITY_NONE)
+	if (m_df_parity!=PARITY_NONE)
 	{
 		/* odd or even parity */
 		unsigned char parity = 0;
 		switch(m_df_parity)
 		{
-		case SERIAL_PARITY_EVEN:
-		case SERIAL_PARITY_ODD:
+		case PARITY_EVEN:
+		case PARITY_ODD:
 
 			/* get parity */
 			/* if parity = 0, data has even parity - i.e. there is an even number of one bits in the data */
 			/* if parity = 1, data has odd parity - i.e. there is an odd number of one bits in the data */
 			parity = serial_helper_get_parity(data_byte);
 			break;
-		case SERIAL_PARITY_MARK:
+		case PARITY_MARK:
 			parity = 1;
 			break;
-		case SERIAL_PARITY_SPACE:
+		case PARITY_SPACE:
 			parity = 0;
 			break;
 		}
@@ -362,7 +394,7 @@ UINT8 device_serial_interface::transmit_register_send_bit()
 	UINT8 data = transmit_register_get_data_bit();
 
 	/* set tx data bit */
-	m_connection_state &=~SERIAL_STATE_TX_DATA;
+	m_connection_state &= ~TX;
 	m_connection_state|=(data<<5);
 
 	/* state out through connection */
@@ -455,6 +487,11 @@ serial_source_device::serial_source_device(const machine_config &mconfig, const 
 
 void serial_source_device::device_start()
 {
+}
+
+void serial_source_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void serial_source_device::input_callback(UINT8 state)

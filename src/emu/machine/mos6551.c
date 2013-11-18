@@ -114,6 +114,12 @@ void mos6551_device::device_reset()
 }
 
 
+void mos6551_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
+}
+
+
 //-------------------------------------------------
 //  tra_callback -
 //-------------------------------------------------
@@ -223,7 +229,7 @@ void mos6551_device::update_serial()
 
 		int num_data_bits = 8;
 		int stop_bit_count = 1;
-		int parity_code = SERIAL_PARITY_NONE;
+		int parity_code = PARITY_NONE;
 
 		switch (m_ctrl & CTRL_WL_MASK)
 		{
@@ -233,22 +239,22 @@ void mos6551_device::update_serial()
 		case CTRL_WL_5: num_data_bits = 5; break;
 		}
 
-		set_data_frame(num_data_bits, stop_bit_count, parity_code);
+		set_data_frame(num_data_bits, stop_bit_count, parity_code, false);
 	}
 
 	if (m_cmd & CMD_DTR)
-		m_connection_state |= SERIAL_STATE_DTR;
+		m_connection_state |= DTR;
 	else
-		m_connection_state &= ~SERIAL_STATE_DTR;
+		m_connection_state &= ~DTR;
 
-	m_write_dtr((m_connection_state & SERIAL_STATE_DTR) ? 0 : 1);
+	m_write_dtr((m_connection_state & DTR) ? 0 : 1);
 
 	if ((m_cmd & CMD_TC_MASK) == CMD_TC_RTS_HI)
-		m_connection_state &= ~SERIAL_STATE_RTS;
+		m_connection_state &= ~RTS;
 	else
-		m_connection_state |= SERIAL_STATE_RTS;
+		m_connection_state |= RTS;
 
-	m_write_rts((m_connection_state & SERIAL_STATE_RTS) ? 0 : 1);
+	m_write_rts((m_connection_state & RTS) ? 0 : 1);
 
 	serial_connection_out();
 }
@@ -366,8 +372,8 @@ WRITE_LINE_MEMBER( mos6551_device::rxd_w )
 
 WRITE_LINE_MEMBER( mos6551_device::rxc_w )
 {
-	rcv_clock();
-	tra_clock();
+	rx_clock_w(state);
+	tx_clock_w(state);
 }
 
 

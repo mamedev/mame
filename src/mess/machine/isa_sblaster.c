@@ -1284,9 +1284,8 @@ void sb_device::device_reset()
 	m_rx_waiting = m_tx_waiting = 0;
 
 	// MIDI is 31250 baud, 8-N-1
-	set_rcv_rate(31250);
-	set_tra_rate(31250);
-	set_data_frame(8, 1, SERIAL_PARITY_NONE);
+	set_rate(31250);
+	set_data_frame(8, 1, PARITY_NONE, false);
 }
 
 UINT8 sb_device::dack_r(int line)
@@ -1423,6 +1422,11 @@ void sb_device::dack_w(int line, UINT8 data)
 void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
 //    printf("DMA timer expire\n");
+	if (tid)
+	{
+		device_serial_interface::device_timer(timer, tid, param, ptr);
+		return;
+	}
 
 	UINT16 lsample, rsample;
 	switch (m_dsp.flags) {

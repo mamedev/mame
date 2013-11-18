@@ -742,7 +742,7 @@ WRITE_LINE_MEMBER( z80sti_device::i7_w ) { gpip_input(7, state); }
 
 WRITE_LINE_MEMBER( z80sti_device::rc_w )
 {
-	rcv_clock();
+	rx_clock_w(state);
 }
 
 
@@ -752,5 +752,5 @@ WRITE_LINE_MEMBER( z80sti_device::rc_w )
 
 WRITE_LINE_MEMBER( z80sti_device::tc_w )
 {
-	tra_clock();
+	tx_clock_w(state);
 }
