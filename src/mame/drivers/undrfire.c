@@ -62,8 +62,6 @@
     Todo
     ----
 
-    This game needs a fake aim target!
-
     What does the 0xb00000 area do... alpha blending ??
 
     What is the unknown hardware at 0x600000... an alternative
@@ -73,6 +71,9 @@
     seen changing except in game inits. Perhaps only used
     in later levels?
 
+    Chase Bombers title screen has wrong Taito logo;
+
+    Chase Bombers proto sports lots of gfx bugs;
 
     Gun calibration
     ---------------
@@ -449,11 +450,14 @@ READ32_MEMBER(undrfire_state::cbombers_adc_r)
 	return (ioport("STEER")->read() << 24);
 }
 
-WRITE32_MEMBER(undrfire_state::cbombers_adc_w)
+WRITE8_MEMBER(undrfire_state::cbombers_adc_w)
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
 	    1000 cycle delay is arbitrary */
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), TIMER_INTERRUPT5);
+	/* TODO: hook it up to offset 0 only otherwise cbomber proto keeps sending irqs.
+	         Could or could not be right. */
+	if(offset == 0)
+		timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), TIMER_INTERRUPT5);
 }
 
 /***********************************************************
@@ -487,7 +491,7 @@ static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(cbombers_cpua_ctrl_w)
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)
-	AM_RANGE(0x600000, 0x600007) AM_READWRITE(cbombers_adc_r, cbombers_adc_w)
+	AM_RANGE(0x600000, 0x600007) AM_READ(cbombers_adc_r) AM_WRITE8(cbombers_adc_w,0xffffffff)
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("snd_shared")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)        /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
@@ -1033,7 +1037,7 @@ ROM_START( cbombersp )
 	ROM_LOAD32_BYTE( "scp1hh_ic36.bin",         0x200003, 0x80000, CRC(24f545d8) SHA1(c5ae0e714ed4765f3416cb58bc9cfccfbf78081c) )
 
 	ROM_REGION( 0x1800000, "gfx2", 0 )
-	// tiles 0x00000 - 0x07fff 
+	// tiles 0x00000 - 0x07fff
 	ROMX_LOAD( "obj0l_ic29.bin",   0x0000003, 0x80000, CRC(4b954950) SHA1(cafd9ba3128aa2e7dbde959a705aff8db6c311fa) , ROM_SKIP(7) ) // bp 1
 	ROMX_LOAD( "obj16l_ic20.bin",  0x0000002, 0x80000, CRC(b53932c0) SHA1(94ea6ccc29bd7b7e94d7494aaf0cc19b67c4ce72) , ROM_SKIP(7) ) // bp 2
 	ROMX_LOAD( "obj32l_ic51.bin",  0x0000001, 0x80000, CRC(f23f7253) SHA1(cbff5aee79d1b4990a35d5fc55e348aa81b2b5d3) , ROM_SKIP(7) ) // bp 3
@@ -1066,7 +1070,7 @@ ROM_START( cbombersp )
 	ROMX_LOAD( "ic80_d511.bin",    0x0800004, 0x80000, CRC(37da5baf) SHA1(a78ac413de08a1ff70ab14561b75df633a9e5be8) , ROM_SKIP(7) ) // bp 4
 	ROMX_LOAD( "ic81_e150.bin",    0x1400000, 0x80000, CRC(48dbc4fb) SHA1(acec207d05a8ea615f27216fbfd567cc630e5191) , ROM_SKIP(7) ) // bp 5
 	ROMX_LOAD( "ic82_3d3d.bin",    0x1400004, 0x80000, CRC(3e62970e) SHA1(82970accb4ce29034e7b97b74c831ec0314c5a8f) , ROM_SKIP(7) ) // bp 5
-	
+
 	ROM_REGION( 0x400000, "gfx3", 0 )
 	ROM_LOAD16_BYTE( "ic44_scc1.bin",  0x000001, 0x080000, CRC(868d0d3d) SHA1(29251d545548856296b5ae32a96f2eeef2418dc4) )
 	ROM_LOAD16_BYTE( "ic43_scc4.bin",  0x000000, 0x080000, CRC(2f170ee4) SHA1(2b8f07186c9f7589e1af131b8c377443a29bd149) )
@@ -1167,6 +1171,6 @@ DRIVER_INIT_MEMBER(undrfire_state,cbombers)
 GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation Japan",   "Under Fire (World)", 0 )
 GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)", 0 )
 GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)", 0 )
-GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)", GAME_IMPERFECT_GRAPHICS, layout_cbombers )
-GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)", GAME_IMPERFECT_GRAPHICS, layout_cbombers )
-GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (prototype)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS, layout_cbombers )
+GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS, layout_cbombers )
+GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS, layout_cbombers )
+GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS, layout_cbombers )

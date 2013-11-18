@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE32_MEMBER(motor_control_w);
 	DECLARE_WRITE32_MEMBER(cbombers_cpua_ctrl_w);
 	DECLARE_READ32_MEMBER(cbombers_adc_r);
-	DECLARE_WRITE32_MEMBER(cbombers_adc_w);
+	DECLARE_WRITE8_MEMBER(cbombers_adc_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_DRIVER_INIT(undrfire);
 	DECLARE_DRIVER_INIT(cbombers);
