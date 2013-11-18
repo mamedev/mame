@@ -18,7 +18,7 @@ ADDRESS_MAP_END
 
 mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock, "mb8795", __FILE__),
-		device_network_interface(mconfig, *this, 10)
+	  device_network_interface(mconfig, *this, 10)
 {
 }
 
@@ -81,7 +81,7 @@ void mb8795_device::recv_cb(UINT8 *buf, int len)
 
 READ8_MEMBER(mb8795_device::txstat_r)
 {
-	//  fprintf(stderr, "mb8795: txstat_r %02x (%08x)\n", txstat, space.device().safe_pc());
+	//  logerror("%s: txstat_r %02x (%08x)\n", tag(), txstat, space.device().safe_pc());
 	return txstat;
 }
 
@@ -89,12 +89,12 @@ WRITE8_MEMBER(mb8795_device::txstat_w)
 {
 	txstat = txstat & (0xf0 | ~data);
 	check_irq();
-	fprintf(stderr, "mb8795: txstat_w %02x (%08x)\n", txstat, space.device().safe_pc());
+	logerror("%s: txstat_w %02x (%08x)\n", tag(), txstat, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::txmask_r)
 {
-	fprintf(stderr, "mb8795: txmask_r %02x (%08x)\n", txmask, space.device().safe_pc());
+	logerror("%s: txmask_r %02x (%08x)\n", tag(), txmask, space.device().safe_pc());
 	return txmask;
 }
 
@@ -102,12 +102,12 @@ WRITE8_MEMBER(mb8795_device::txmask_w)
 {
 	txmask = data & 0xaf;
 	check_irq();
-	fprintf(stderr, "mb8795: txmask_w %02x (%08x)\n", txmask, space.device().safe_pc());
+	logerror("%s: txmask_w %02x (%08x)\n", tag(), txmask, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::rxstat_r)
 {
-	fprintf(stderr, "mb8795: rxstat_r %02x (%08x)\n", rxstat, space.device().safe_pc());
+	logerror("%s: rxstat_r %02x (%08x)\n", tag(), rxstat, space.device().safe_pc());
 	return rxstat;
 }
 
@@ -115,12 +115,12 @@ WRITE8_MEMBER(mb8795_device::rxstat_w)
 {
 	rxstat = rxstat & (0x70 | ~data);
 	check_irq();
-	fprintf(stderr, "mb8795: rxstat_w %02x (%08x)\n", rxstat, space.device().safe_pc());
+	logerror("%s: rxstat_w %02x (%08x)\n", tag(), rxstat, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::rxmask_r)
 {
-	fprintf(stderr, "mb8795: rxmask_r %02x (%08x)\n", rxmask, space.device().safe_pc());
+	logerror("%s: rxmask_r %02x (%08x)\n", tag(), rxmask, space.device().safe_pc());
 	return rxmask;
 }
 
@@ -128,31 +128,31 @@ WRITE8_MEMBER(mb8795_device::rxmask_w)
 {
 	rxmask = data & 0x9f;
 	check_irq();
-	fprintf(stderr, "mb8795: rxmask_w %02x (%08x)\n", rxmask, space.device().safe_pc());
+	logerror("%s: rxmask_w %02x (%08x)\n", tag(), rxmask, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::txmode_r)
 {
-	fprintf(stderr, "mb8795: txmode_r %02x (%08x)\n", txmode, space.device().safe_pc());
+	logerror("%s: txmode_r %02x (%08x)\n", tag(), txmode, space.device().safe_pc());
 	return txmode;
 }
 
 WRITE8_MEMBER(mb8795_device::txmode_w)
 {
 	txmode = data;
-	fprintf(stderr, "mb8795: txmode_w %02x (%08x)\n", txmode, space.device().safe_pc());
+	logerror("%s: txmode_w %02x (%08x)\n", tag(), txmode, space.device().safe_pc());
 }
 
 READ8_MEMBER(mb8795_device::rxmode_r)
 {
-	fprintf(stderr, "mb8795: rxmode_r %02x (%08x)\n", rxmode, space.device().safe_pc());
+	logerror("%s: rxmode_r %02x (%08x)\n", tag(), rxmode, space.device().safe_pc());
 	return rxmode;
 }
 
 WRITE8_MEMBER(mb8795_device::rxmode_w)
 {
 	rxmode = data;
-	fprintf(stderr, "mb8795: rxmode_w %02x (%08x)\n", rxmode, space.device().safe_pc());
+	logerror("%s: rxmode_w %02x (%08x)\n", tag(), rxmode, space.device().safe_pc());
 }
 
 WRITE8_MEMBER(mb8795_device::reset_w)
@@ -163,7 +163,7 @@ WRITE8_MEMBER(mb8795_device::reset_w)
 
 READ8_MEMBER(mb8795_device::tdc_lsb_r)
 {
-	fprintf(stderr, "mb8795: tdc_lsb_r %02x (%08x)\n", txcount & 0xff, space.device().safe_pc());
+	logerror("%s: tdc_lsb_r %02x (%08x)\n", tag(), txcount & 0xff, space.device().safe_pc());
 	return txcount;
 }
 
@@ -172,7 +172,7 @@ READ8_MEMBER(mb8795_device::mac_r)
 	if(offset < 6)
 		return mac[offset];
 	if(offset == 7) {
-		fprintf(stderr, "mb8795: tdc_msb_r %02x (%08x)\n", txcount >> 8, space.device().safe_pc());
+		logerror("%s: tdc_msb_r %02x (%08x)\n", tag(), txcount >> 8, space.device().safe_pc());
 		return (txcount >> 8) & 0x3f;
 	}
 	return 0;
@@ -204,11 +204,13 @@ void mb8795_device::tx_dma_w(UINT8 data, bool eof)
 		drq_tx_cb(drq_tx);
 
 	if(eof) {
-		fprintf(stderr, "mb8795: send packet, dest=%02x.%02x.%02x.%02x.%02x.%02x len=%04x\n",
-				txbuf[0], txbuf[1], txbuf[2], txbuf[3], txbuf[4], txbuf[5],
-				txlen);
-		if(!(txmode & EN_TMD_LB_DISABLE))
-			fprintf(stderr, " -> loopback active\n");
+		logerror("%s: send packet, dest=%02x.%02x.%02x.%02x.%02x.%02x len=%04x loopback=%s\n", tag(),
+				 txbuf[0], txbuf[1], txbuf[2], txbuf[3], txbuf[4], txbuf[5],
+				 txlen,
+				 txmode & EN_TMD_LB_DISABLE ? "off" : "on");
+
+		if(txlen > 1500)
+			txlen = 1500; // Weird packet send on loopback test in the next
 
 		if(!(txmode & EN_TMD_LB_DISABLE)) {
 			memcpy(rxbuf, txbuf, txlen);
@@ -246,9 +248,6 @@ void mb8795_device::rx_dma_r(UINT8 &data, bool &eof)
 
 void mb8795_device::receive()
 {
-	fprintf(stderr, "mb8975: received packet for %02x.%02x.%02x.%02x.%02x.%02x len=%04x, mode=%d\n",
-			rxbuf[0], rxbuf[1], rxbuf[2], rxbuf[3], rxbuf[4], rxbuf[5],
-			rxlen, rxmode & 3);
 	bool keep = false;
 	switch(rxmode & EN_RMD_WHATRECV) {
 	case EN_RMD_RECV_NONE:
@@ -264,7 +263,9 @@ void mb8795_device::receive()
 		keep = true;
 		break;
 	}
-	fprintf(stderr, " -> %s\n", keep ? "kept" : "dropped");
+	logerror("%s: received packet for %02x.%02x.%02x.%02x.%02x.%02x len=%04x, mode=%d -> %s\n", tag(),
+			rxbuf[0], rxbuf[1], rxbuf[2], rxbuf[3], rxbuf[4], rxbuf[5],
+			rxlen, rxmode & 3, keep ? "kept" : "dropped");
 	if(!keep)
 		rxlen = false;
 	else {

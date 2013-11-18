@@ -4,6 +4,8 @@
 
     TODO:
 
+    - Find out why we get a segfault in the middle of the install
+
     - Hook up the mouse (not before the system boots though, see the first problem)
 
     - Find why the kernel doesn't manage to change the nvram at boot (readback error)
@@ -348,9 +350,13 @@ void next_state::dma_read(int slot, UINT8 &val, bool &eof, bool &err)
 	eof = false;
 	switch(slot) {
 	case 1:
-		if(fdc && fdc->get_drq())
+		if(fdc && fdc->get_drq()) {
 			val = fdc->dma_r();
-		else
+			if(eof) {
+				fdc->tc_w(true);
+				fdc->tc_w(false);
+			}
+		} else
 			val = scsi->dma_r();
 		break;
 
@@ -360,6 +366,7 @@ void next_state::dma_read(int slot, UINT8 &val, bool &eof, bool &err)
 
 	case 21:
 		net->rx_dma_r(val, eof);
+		logerror("dma read net %02x %s\n", val, eof ? "eof" : "");
 		break;
 
 	default:
@@ -374,7 +381,14 @@ void next_state::dma_write(int slot, UINT8 data, bool eof, bool &err)
 	err = false;
 	switch(slot) {
 	case 1:
-		scsi->dma_w(data);
+		if(fdc && fdc->get_drq()) {
+			fdc->dma_w(data);
+			if(eof) {
+				fdc->tc_w(true);
+				fdc->tc_w(false);
+			}
+		} else
+			scsi->dma_w(data);
 		break;
 
 	case 4:
@@ -422,6 +436,7 @@ void next_state::dma_end(int slot)
 		ds.state &= ~DMA_SUPDATE;
 	}
 	ds.state |= DMA_COMPLETE;
+	logerror("dma end slot %d irq %d\n", slot, dma_irqs[slot]);
 	if(dma_irqs[slot] >= 0)
 		irq_set(dma_irqs[slot], true);
 }
@@ -952,7 +967,7 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_MCCS1850_ADD("rtc", XTAL_32_768kHz,
-						line_cb_t(), line_cb_t(), line_cb_t())
+					  line_cb_t(), line_cb_t(), line_cb_t())
 	MCFG_SCC8530_ADD("scc", XTAL_25MHz, line_cb_t(FUNC(next_state::scc_irq), static_cast<next_state *>(owner)))
 	MCFG_NEXTKBD_ADD("keyboard",
 						line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),
