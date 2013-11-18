@@ -1583,18 +1583,6 @@ WRITE16_MEMBER( harddriv_state::hd68k_dsk_ram_w )
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_dsk_zram_r )
-{
-	return m_dsk_zram[offset];
-}
-
-
-WRITE16_MEMBER( harddriv_state::hd68k_dsk_zram_w )
-{
-	COMBINE_DATA(&m_dsk_zram[offset]);
-}
-
-
 READ16_MEMBER( harddriv_state::hd68k_dsk_small_rom_r )
 {
 	return m_dsk_rom[offset & 0x1ffff];

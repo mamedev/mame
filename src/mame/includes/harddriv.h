@@ -40,6 +40,8 @@ public:
 			m_ds3dac2(*this, "ds3dac2"),
 			m_jsa(*this, "jsa"),
 			m_msp_ram(*this, "msp_ram"),
+			m_dsk_10c(*this, "dsk_10c"),
+			m_dsk_30c(*this, "dsk_30c"),
 			m_200e(*this, "200e"),
 			m_210e(*this, "210e"),
 			m_adsp_data_memory(*this, "adsp_data"),
@@ -57,7 +59,7 @@ public:
 			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
 			m_dac(*this, "dac"),
 			m_duart(*this, "duartn68681"),
-			m_asic65(*this, "asic65") { }
+			m_asic65(*this, "asic65") {}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -79,7 +81,8 @@ public:
 	optional_shared_ptr<UINT16> m_msp_ram;
 	UINT16 *                m_dsk_ram;
 	UINT16 *                m_dsk_rom;
-	UINT16 *                m_dsk_zram;
+	optional_device<eeprom_parallel_28xx_device> m_dsk_10c;
+	optional_device<eeprom_parallel_28xx_device> m_dsk_30c;
 	UINT16 *                m_m68k_slapstic_base;
 	UINT16 *                m_m68k_sloop_alt_base;
 
@@ -379,8 +382,6 @@ public:
 	DECLARE_WRITE16_MEMBER( hd68k_dsk_control_w );
 	DECLARE_READ16_MEMBER( hd68k_dsk_ram_r );
 	DECLARE_WRITE16_MEMBER( hd68k_dsk_ram_w );
-	DECLARE_READ16_MEMBER( hd68k_dsk_zram_r );
-	DECLARE_WRITE16_MEMBER( hd68k_dsk_zram_w );
 	DECLARE_READ16_MEMBER( hd68k_dsk_small_rom_r );
 	DECLARE_READ16_MEMBER( hd68k_dsk_rom_r );
 	DECLARE_WRITE16_MEMBER( hd68k_dsk_dsp32_w );
