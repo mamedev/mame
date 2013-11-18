@@ -852,4 +852,4 @@ GAME( 1980, tempest3,  tempest, tempest, tempest, driver_device, 0, ROT270, "Ata
 GAME( 1980, tempest2,  tempest, tempest, tempest, driver_device, 0, ROT270, "Atari", "Tempest (rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, tempest1,  tempest, tempest, tempest, driver_device, 0, ROT270, "Atari", "Tempest (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, tempest1r, tempest, tempest, tempest, driver_device, 0, ROT270, "Atari", "Tempest (rev 1, Revised Hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1980, temptube,  tempest, tempest, tempest, driver_device, 0, ROT270, "hack",  "Tempest Tubes", GAME_SUPPORTS_SAVE )
+GAME( 1980, temptube,  tempest, tempest, tempest, driver_device, 0, ROT270, "hack (Duncan Brown)", "Tempest Tubes", GAME_SUPPORTS_SAVE )
