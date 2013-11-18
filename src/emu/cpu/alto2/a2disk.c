@@ -1731,7 +1731,6 @@ void alto2_cpu_device::f1_strobe_1()
  */
 void alto2_cpu_device::f1_load_kstat_1()
 {
-	int i;
 	LOG((LOG_DISK,1,"	KSTAT←; BUS[12-15] %#o\n", m_bus));
 	LOG((LOG_DISK,2,"		IDLE       : %d\n", GET_KSTAT_IDLE(m_bus)));
 	LOG((LOG_DISK,2,"		CKSUM      : %d\n", GET_KSTAT_CKSUM(m_bus)));
@@ -1752,7 +1751,7 @@ void alto2_cpu_device::f1_load_kstat_1()
 	 * C'	CLRSTAT' (not now)
 	 * Q	Q' inverted to BUS[13] on ←KSTAT
 	 */
-	for (i = 0; i < 2; i++) {
+	for (int i = 0; i < 2; i++) {
 		UINT8 s0, s1;
 		DEBUG_NAME("\t\t44b CKSUM ");
 		s0 = m_dsk.ff_44b;
@@ -1932,9 +1931,7 @@ void alto2_cpu_device::f1_clrstat_1()
 	DEBUG_NAME("\t\t45a RDYLAT");
 	s0 = m_dsk.ff_45a;
 	s1 = m_dsk.ff_45a & JKFF_CLK;
-	if (dhd)
-		s1 |= dhd->get_ready_0() ? JKFF_J : 0;
-	else
+	if (dhd->get_ready_0())
 		s1 |= JKFF_J;
 	s1 |= JKFF_K;
 	s1 |= JKFF_S;

@@ -796,8 +796,8 @@ static const prom_load_t pl_alu_a10 =
 	/* size */	0040,
 	/* amap */	AMAP_DEFAULT,
 	/* axor */	0,
-	/* dxor */	0,
-	/* width */	4,
+	/* dxor */	0372,						// invert D7-D3 and D1
+	/* width */	8,
 	/* shift */	0,
 	/* dmap */	DMAP_DEFAULT,
 	/* dand */	ZERO,
@@ -996,6 +996,14 @@ void alto2_cpu_device::device_start()
 	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
 	m_ether_a49 = prom_load(machine(), &pl_enet_a49, memregion("ether_a49")->base());
 
+#if	0	// dump ALU a10 PROM after loading
+	for (UINT8 i = 0; i < 32; i++) {
+		UINT8 a = m_alu_a10[i];
+		printf("%03o: S3-S0:%u%u%u%u M:%u CI:%u T:%u ?:%u\n",
+			   i, (a >> 7) & 1, (a >> 6) & 1, (a >> 5) & 1, (a >> 4) & 1,
+			   (a >> 3) & 1, (a >> 2) & 1, (a >> 1) & 1, (a >> 0) & 1);
+	}
+#endif
 	save_item(NAME(m_task_mpc));
 	save_item(NAME(m_task_next2));
 	save_item(NAME(m_ntime));
@@ -1333,7 +1341,6 @@ void alto2_cpu_device::execute_set_input(int inputnum, int state)
 //  for the debugger
 //-------------------------------------------------
 
-// FIXME
 void alto2_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
 {
 	switch (entry.index())
@@ -1348,7 +1355,6 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, astr
 	}
 }
 
-// FIXME
 void alto2_cpu_device::fatal(int exitcode, const char *format, ...)
 {
 	va_list ap;
@@ -2157,27 +2163,27 @@ void alto2_cpu_device::f2_load_md_1()
  *         |         |
  *         +---------+
  *
- *	chip	out pin	BUS	in pin HSEL=0		in pin HSEL=1
+ *	chip  out pin  BUS in   pin HSEL=0      in   pin HSEL=1
  *	--------------------------------------------------------------
- *	u8	QA  15	0	A1   3 DRSEL(0)'	A2   2 DF2(0)
- *	u8	QB  14	1	B1   4 DRSEL(1)'	B2   1 DF2(1)'
- *	u8	QC  13	2	C1   9 DRSEL(2)'	C2   5 DF2(2)'
- *	u8	QD  12	3	D1   7 DRSEL(3)'	D2   6 DF2(3)'
+ *  u8    QA  15   0   A1   3   DRSEL(0)'   A2   2   DF2(0)
+ *  u8    QB  14   1   B1   4   DRSEL(1)'   B2   1   DF2(1)'
+ *  u8    QC  13   2   C1   9   DRSEL(2)'   C2   5   DF2(2)'
+ *  u8    QD  12   3   D1   7   DRSEL(3)'   D2   6   DF2(3)'
  *
- *	u18	QA  15	4	A1   3 DRSEL(4)'	A2   2 LOADT'
- *	u18	QB  14	5	B1   4 DALUF(0)'	B2   1 LOADL
- *	u18	QC  13	6	C1   9 DALUF(1)'	C2   5 NEXT(00)'
- *	u18	QD  12	7	D1   7 DALUF(2)'	D2   6 NEXT(01)'
+ *  u18   QA  15   4   A1   3   DRSEL(4)'   A2   2   LOADT'
+ *  u18   QB  14   5   B1   4   DALUF(0)'   B2   1   LOADL
+ *  u18   QC  13   6   C1   9   DALUF(1)'   C2   5   NEXT(00)'
+ *  u18   QD  12   7   D1   7   DALUF(2)'   D2   6   NEXT(01)'
  *
- *	u28	QA  15	8	A1   3 DALUF(3)'	A2   2 NEXT(02)'
- *	u28	QB  14	9	B1   4 DBS(0)'		B2   1 NEXT(03)'
- *	u28	QC  13	10	C1   9 DBS(1)'		C2   5 NEXT(04)'
- *	u28	QD  12	11	D1   7 DBS(2)'		D2   6 NEXT(05)'
+ *  u28   QA  15   8   A1   3   DALUF(3)'   A2   2   NEXT(02)'
+ *  u28   QB  14   9   B1   4   DBS(0)'     B2   1   NEXT(03)'
+ *  u28   QC  13   10  C1   9   DBS(1)'     C2   5   NEXT(04)'
+ *  u28   QD  12   11  D1   7   DBS(2)'     D2   6   NEXT(05)'
  *
- *	u38	QA  15	12	A1   3 DF1(0)		A2   2 NEXT(06)'
- *	u38	QB  14	13	B1   4 DF1(1)'		B2   1 NEXT(07)'
- *	u38	QC  13	14	C1   9 DF1(2)'		C2   5 NEXT(08)'
- *	u38	QD  12	15	D1   7 DF1(3)'		D2   6 NEXT(09)'
+ *  u38   QA  15   12  A1   3   DF1(0)      A2   2   NEXT(06)'
+ *  u38   QB  14   13  B1   4   DF1(1)'     B2   1   NEXT(07)'
+ *  u38   QC  13   14  C1   9   DF1(2)'     C2   5   NEXT(08)'
+ *  u38   QD  12   15  D1   7   DF1(3)'     D2   6   NEXT(09)'
  *
  * The HALFSEL signal to the demultiplexers is the inverted bit BUS(5):
  * BUS(5)=1, HALFSEL=0, A1,B1,C1,D1 inputs, upper half of the 32-bit word
@@ -2339,11 +2345,13 @@ void alto2_cpu_device::wrtram()
  * +-------------------+-------------+------------------------+------------------------+
  * </PRE>
  */
-#define	SMC(s3,s2,s1,s0,m,c) (32*(s3)+16*(s2)+8*(s1)+4*(s0)+2*(m)+(c))
+
+//! S function, M flag and C carry in
+#define	SMC(s3,s2,s1,s0,m,c) (((s3)<<7)|((s2)<<6)|((s1)<<5)|((s0)<<4)|((m)<<3)|((c)<<2))
 
 /**
  * @brief Compute the 74181 ALU operation smc
- * @param smc S function, arithmetic/logic flag, carry
+ * @param smc S function [0-15], M arithmetic/logic flag, C carry
  * @return resulting ALU output
  */
 UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
@@ -2353,34 +2361,28 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 	register UINT32 s = 0;
 	register UINT32 f = 0;
 
-	switch (smc) {
+	switch (smc & SMC(1,1,1,1, 1, 1)) {
 	case SMC(0,0,0,0, 0, 0): // 0000: A + 1
-		s = 0;
 		f = a + 1;
 		break;
 
 	case SMC(0,0,0,0, 0, 1): // 0000: A
-		s = 0;
 		f = a;
 		break;
 
 	case SMC(0,0,0,1, 0, 0): // 0001: (A | B) + 1
-		s = 0;
 		f = (a | b) + 1;
 		break;
 
 	case SMC(0,0,0,1, 0, 1): // 0001: A | B
-		s = 0;
 		f = a | b;
 		break;
 
 	case SMC(0,0,1,0, 0, 0): // 0010: (A | B') + 1
-		s = 0;
 		f = (a | ~b) + 1;
 		break;
 
 	case SMC(0,0,1,0, 0, 1): // 0010: A | B'
-		s = 0;
 		f = a | ~b;
 		break;
 
@@ -2395,22 +2397,18 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		break;
 
 	case SMC(0,1,0,0, 0, 0): // 0100: A + (A & B') + 1
-		s = 0;
 		f = a + (a & ~b) + 1;
 		break;
 
 	case SMC(0,1,0,0, 0, 1): // 0100: A + (A & B')
-		s = 0;
 		f = a + (a & ~b);
 		break;
 
 	case SMC(0,1,0,1, 0, 0): // 0101: (A | B) + (A & B') + 1
-		s = 0;
 		f = (a | b) + (a & ~b) + 1;
 		break;
 
 	case SMC(0,1,0,1, 0, 1): // 0101: (A | B) + (A & B')
-		s = 0;
 		f = (a | b) + (a & ~b);
 		break;
 
@@ -2435,32 +2433,26 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		break;
 
 	case SMC(1,0,0,0, 0, 0): // 1000: A + (A & B) + 1
-		s = 0;
 		f = a + (a & b) + 1;
 		break;
 
 	case SMC(1,0,0,0, 0, 1): // 1000: A + (A & B)
-		s = 0;
 		f = a + (a & b);
 		break;
 
 	case SMC(1,0,0,1, 0, 0): // 1001: A + B + 1
-		s = 0;
 		f = a + b + 1;
 		break;
 
 	case SMC(1,0,0,1, 0, 1): // 1001: A + B
-		s = 0;
 		f = a + b;
 		break;
 
 	case SMC(1,0,1,0, 0, 0): // 1010: (A | B') + (A & B) + 1
-		s = 0;
 		f = (a | ~b) + (a & b) + 1;
 		break;
 
 	case SMC(1,0,1,0, 0, 1): // 1010: (A | B') + (A & B)
-		s = 0;
 		f = (a | ~b) + (a & b);
 		break;
 
@@ -2475,32 +2467,26 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		break;
 
 	case SMC(1,1,0,0, 0, 0): // 1100: A + A + 1
-		s = 0;
 		f = a + a + 1;
 		break;
 
 	case SMC(1,1,0,0, 0, 1): // 1100: A + A
-		s = 0;
 		f = a + a;
 		break;
 
 	case SMC(1,1,0,1, 0, 0): // 1101: (A | B) + A + 1
-		s = 0;
 		f = (a | b) + a + 1;
 		break;
 
 	case SMC(1,1,0,1, 0, 1): // 1101: (A | B) + A
-		s = 0;
 		f = (a | b) + a;
 		break;
 
 	case SMC(1,1,1,0, 0, 0): // 1110: (A | B') + A + 1
-		s = 0;
 		f = (a | ~b) + a + 1;
 		break;
 
 	case SMC(1,1,1,0, 0, 1): // 1110: (A | B') + A
-		s = 0;
 		f = (a | ~b) + a;
 		break;
 
@@ -2604,10 +2590,10 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 #endif
 
 /** @brief flag that tells whether to load the T register from BUS or ALU */
-#define	TSELECT	1
+#define	TSELECT	(1 << 1)
 
 /** @brief flag that tells wheter operation was 0: logic (M=1) or 1: arithmetic (M=0) */
-#define	ALUM2	2
+#define	ALUM2	(1 << 3)
 
 /** @brief execute the CPU for at most nsecs nano seconds */
 void alto2_cpu_device::execute_run()
@@ -2740,280 +2726,228 @@ void alto2_cpu_device::execute_run()
 		 */
 		((*this).*m_f1[0][m_task][f1])();
 
+#if	USE_ALU_74181
+		// The ALU a10 PROM address lines are
+		// A4:SKIP      A3:ALUF0     A2:ALUF1     A1:ALUF2     A0:ALUF3
+		// The PROM output lines are
+		// B0: unused   B1: TSELECT  B2: ALUCI'   B3: ALUM'
+		// B4: ALUS0'   B5: ALUS1'   B6: ALUS2'   B7: ALUS3'
+		// B3-B7 are inverted on loading the PROM
+		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | aluf];
+		alu = alu_74181(a10);
+		flags = (a10 ^ ALUM2) & (TSELECT | ALUM2);
+#else
 		/* compute the ALU function */
 		switch (aluf) {
 		/**
 		 * 00: ALU ← BUS
-		 * PROM data for S3-0:1111 M:1 C:0
+		 * PROM data for S3-0:1111 M:1 C:0 T:0
 		 * 74181 function F=A
-		 * T source is ALU
+		 * T source is BUS
 		 */
 		case aluf_bus__alut:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(1,1,1,1, 1, 0));
-#else
 			alu = m_bus;
 			m_aluc0 = 1;
-#endif
-			flags = TSELECT;
+			flags = 0;
 			LOG((LOG_CPU,2,"	ALU← BUS (%#o := %#o)\n", alu, m_bus));
 			break;
 
 		/**
 		 * 01: ALU ← T
-		 * PROM data for S3-0:1010 M:1 C:0
+		 * PROM data for S3-0:1010 M:1 C:0 T:0
 		 * 74181 function F=B
 		 * T source is BUS
 		 */
 		case aluf_treg:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(1,0,1,0, 1, 0));
-#else
 			alu = m_t;
 			m_aluc0 = 1;
-#endif
 			flags = 0;
 			LOG((LOG_CPU,2,"	ALU← T (%#o := %#o)\n", alu, m_t));
 			break;
 
 		/**
 		 * 02: ALU ← BUS | T
-		 * PROM data for S3-0:1110 M:1 C:0
+		 * PROM data for S3-0:1110 M:1 C:0 T:1
 		 * 74181 function F=A|B
 		 * T source is ALU
 		 */
 		case aluf_bus_or_t__alut:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(1,1,1,0, 1, 0));
-#else
 			alu = m_bus | m_t;
 			m_aluc0 = 1;
-#endif
 			flags = TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS OR T (%#o := %#o | %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
 		 * 03: ALU ← BUS & T
-		 * PROM data for S3-0:1011 M:1 C:0
+		 * PROM data for S3-0:1011 M:1 C:0 T:0
 		 * 74181 function F=A&B
 		 * T source is BUS
 		 */
 		case aluf_bus_and_t:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(1,0,1,1, 1, 0));
-#else
 			alu = m_bus & m_t;
 			m_aluc0 = 1;
-#endif
 			flags = 0;
 			LOG((LOG_CPU,2,"	ALU← BUS AND T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
 		 * 04: ALU ← BUS ^ T
-		 * PROM data for S3-0:0110 M:1 C:0
+		 * PROM data for S3-0:0110 M:1 C:0 T:0
 		 * 74181 function F=A^B
 		 * T source is BUS
 		 */
 		case aluf_bus_xor_t:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(0,1,1,0, 1, 0));
-#else
 			alu = m_bus ^ m_t;
 			m_aluc0 = 1;
-#endif
 			flags = 0;
 			LOG((LOG_CPU,2,"	ALU← BUS XOR T (%#o := %#o ^ %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
 		 * 05: ALU ← BUS + 1
-		 * PROM data for S3-0:0000 M:0 C:0
+		 * PROM data for S3-0:0000 M:0 C:0 T:1
 		 * 74181 function F=A+1
 		 * T source is ALU
 		 */
 		case aluf_bus_plus_1__alut:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(0,0,0,0, 0, 0));
-#else
 			alu = m_bus + 1;
 			m_aluc0 = (alu >> 16) & 1;
-#endif
 			flags = ALUM2 | TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS + 1 (%#o := %#o + 1)\n", alu, m_bus));
 			break;
 
 		/**
 		 * 06: ALU ← BUS - 1
-		 * PROM data for S3-0:1111 M:0 C:1
+		 * PROM data for S3-0:1111 M:0 C:1 T:1
 		 * 74181 function F=A-1
 		 * T source is ALU
 		 */
 		case aluf_bus_minus_1__alut:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(1,1,1,1, 0, 1));
-#else
 			alu = m_bus + 0177777;
 			m_aluc0 = (~alu >> 16) & 1;
-#endif
 			flags = ALUM2 | TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS - 1 (%#o := %#o - 1)\n", alu, m_bus));
 			break;
 
 		/**
 		 * 07: ALU ← BUS + T
-		 * PROM data for S3-0:1001 M:0 C:1
+		 * PROM data for S3-0:1001 M:0 C:1 T:0
 		 * 74181 function F=A+B
 		 * T source is BUS
 		 */
 		case aluf_bus_plus_t:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(1,0,0,1, 0, 1));
-#else
 			alu = m_bus + m_t;
 			m_aluc0 = (alu >> 16) & 1;
-#endif
 			flags = ALUM2;
 			LOG((LOG_CPU,2,"	ALU← BUS + T (%#o := %#o + %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
 		 * 10: ALU ← BUS - T
-		 * PROM data for S3-0:0110 M:0 C:0
+		 * PROM data for S3-0:0110 M:0 C:0 T:0
 		 * 74181 function F=A-B
 		 * T source is BUS
 		 */
 		case aluf_bus_minus_t:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(0,1,1,0, 0, 0));
-#else
 			alu = m_bus + ~m_t + 1;
 			m_aluc0 = (~alu >> 16) & 1;
-#endif
 			flags = ALUM2;
 			LOG((LOG_CPU,2,"	ALU← BUS - T (%#o := %#o - %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
 		 * 11: ALU ← BUS - T - 1
-		 * PROM data for S3-0:0110 M:0 C:1
+		 * PROM data for S3-0:0110 M:0 C:1 T:0
 		 * 74181 function F=A-B-1
 		 * T source is BUS
 		 */
 		case aluf_bus_minus_t_minus_1:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(0,1,1,0, 0, 1));
-#else
 			alu = m_bus + ~m_t;
 			m_aluc0 = (~alu >> 16) & 1;
-#endif
 			flags = ALUM2;
 			LOG((LOG_CPU,2,"	ALU← BUS - T - 1 (%#o := %#o - %#o - 1)\n", alu, m_bus, m_t));
 			break;
 
 		/**
 		 * 12: ALU ← BUS + T + 1
-		 * PROM data for S3-0:1001 M:0 C:0
+		 * PROM data for S3-0:1001 M:0 C:0 T:1
 		 * 74181 function F=A+B+1
 		 * T source is ALU
 		 */
 		case aluf_bus_plus_t_plus_1__alut:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(1,0,0,1, 0, 0));
-#else
 			alu = m_bus + m_t + 1;
 			m_aluc0 = (alu >> 16) & 1;
-#endif
 			flags = ALUM2 | TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS + T + 1 (%#o := %#o + %#o + 1)\n", alu, m_bus, m_t));
 			break;
 
 		/**
 		 * 13: ALU ← BUS + SKIP
-		 * PROM data for S3-0:0000 M:0 C:SKIP
+		 * PROM data for S3-0:0000 M:0 C:SKIP T:1
 		 * 74181 function F=A (SKIP=1) or F=A+1 (SKIP=0)
 		 * T source is ALU
 		 */
 		case aluf_bus_plus_skip__alut:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(0,0,0,0, 0, m_emu.skip^1));
-#else
 			alu = m_bus + m_emu.skip;
 			m_aluc0 = (alu >> 16) & 1;
-#endif
 			flags = ALUM2 | TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS + SKIP (%#o := %#o + %#o)\n", alu, m_bus, m_emu.skip));
 			break;
 
 		/**
 		 * 14: ALU ← BUS,T
-		 * PROM data for S3-0:1011 M:1 C:0
+		 * PROM data for S3-0:1011 M:1 C:0 T:1
 		 * 74181 function F=A&B
 		 * T source is ALU
 		 */
 		case aluf_bus_and_t__alut:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(1,0,1,1, 1, 0));
-#else
 			alu = m_bus & m_t;
 			m_aluc0 = 1;
-#endif
 			flags = TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS,T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
 		 * 15: ALU ← BUS & ~T
-		 * PROM data for S3-0:0111 M:1 C:0
+		 * PROM data for S3-0:0111 M:1 C:0 T:0
 		 * 74181 function F=A&~B
 		 * T source is BUS
 		 */
 		case aluf_bus_and_not_t:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(0,1,1,1, 1, 0));
-#else
 			alu = m_bus & ~m_t;
 			m_aluc0 = 1;
-#endif
 			flags = 0;
 			LOG((LOG_CPU,2,"	ALU← BUS AND NOT T (%#o := %#o & ~%#o)\n", alu, m_bus, m_t));
 			break;
 
 		/**
-		 * 16: ALU ← ???
-		 * PROM data for S3-0:???? M:? C:?
+		 * 16: ALU ← BUS
+		 * PROM data for S3-0:1111 M:1 C:0 T:1
 		 * 74181 perhaps F=0 (0011/0/0)
 		 * T source is BUS
 		 */
 		case aluf_undef_16:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(0,0,1,1, 0, 0));
-#else
-			alu = 0;
+			alu = m_bus;
 			m_aluc0 = 1;
-#endif
-			flags = ALUM2;
+			flags = TSELECT;
 			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
 			break;
 
 		/**
-		 * 17: ALU ← ???
-		 * PROM data for S3-0:???? M:? C:?
+		 * 17: ALU ← BUS
+		 * PROM data for S3-0:1111 M:1 C:0 T:1
 		 * 74181 perhaps F=~0 (0011/0/1)
 		 * T source is BUS
 		 */
 		case aluf_undef_17:
 		default:
-#if	USE_ALU_74181
-			alu = alu_74181(SMC(0,0,1,1, 0, 1));
-#else
-			alu = 0177777;
+			alu = m_bus;
 			m_aluc0 = 1;
-#endif
-			flags = ALUM2;
+			flags = TSELECT;
 			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
 		}
+#endif
 		m_alu = static_cast<UINT16>(alu);
 
 		/* WRTRAM now, before L is changed */
