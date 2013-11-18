@@ -480,27 +480,6 @@ INLINE void SET_REG_YA(spc700i_cpu *cpustate, uint value)
 	((!FLAG_Z) << 1)        |   \
 	CFLAG_AS_1())
 
-/* Get Processor Status Register with B flag set (when executing BRK instruction) */
-#define GET_REG_P_BRK()         \
-	((FLAG_N & 0x80)        |   \
-	((FLAG_V & 0x80) >> 1)  |   \
-	(FLAG_P>>3)             |   \
-	FLAGPOS_B               |   \
-	(FLAG_H & HFLAG_SET)        |   \
-	FLAG_I                  |   \
-	((!FLAG_Z) << 1)        |   \
-	CFLAG_AS_1())
-
-/* Get Processor Status Register with B flag cleared (when servicing an interrupt) */
-#define GET_REG_P_INT()         \
-	((FLAG_N & 0x80)        |   \
-	((FLAG_V & 0x80) >> 1)  |   \
-	(FLAG_P>>3)             |   \
-	(FLAG_H & HFLAG_SET)        |   \
-	FLAG_I                  |   \
-	((!FLAG_Z) << 1)        |   \
-	CFLAG_AS_1())
-
 INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value);
 
 /* Set the Process Status Register */
@@ -700,7 +679,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 #define OP_BRK(BCLK)                                                        \
 			CLK(BCLK);                                                      \
 			PUSH_16(cpustate, REG_PC);                                              \
-			PUSH_8(cpustate, GET_REG_P_BRK());                                      \
+			PUSH_8(cpustate, GET_REG_P());                                      \
 			FLAG_B |= FLAGPOS_B;                                                \
 			FLAG_I = IFLAG_CLEAR;                                               \
 			JUMP(cpustate, read_16_VEC(VECTOR_BRK))
@@ -1328,7 +1307,7 @@ static void spc700_set_nmi_line(spc700i_cpu *cpustate,int state)
 		LINE_NMI = 1;
 		CLK(7);
 		PUSH_16(cpustate, REG_PC);
-		PUSH_8(cpustate, GET_REG_P_INT());
+		PUSH_8(cpustate, GET_REG_P());
 		JUMP(cpustate, read_16_VEC(VECTOR_NMI));
 	}
 #endif /* SPC700_OPTIMIZE_SNES */
