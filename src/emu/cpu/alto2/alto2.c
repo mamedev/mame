@@ -1250,9 +1250,14 @@ WRITE32_MEMBER( alto2_cpu_device::cram_w )
 	*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = data;
 }
 
-#define	RD_CROM(addr) crom_r(space(AS_0), addr, 0xffffffff)
-#define	RD_CRAM(addr) cram_r(space(AS_0), addr, 0xffffffff)
-#define	WR_CRAM(addr,data) cram_w(space(AS_0), addr, data)
+//! direct read access to the microcode CROM
+#define	RD_CROM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_crom + addr * 4))
+//! direct read access to the microcode CRAM
+#define	RD_CRAM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4))
+//! direct write access to the microcode CRAM
+#define	WR_CRAM(addr,data) do { \
+	*reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4) = data; \
+} while (0)
 
 //! read constants PROM
 READ16_MEMBER ( alto2_cpu_device::const_r )
@@ -2191,11 +2196,11 @@ void alto2_cpu_device::rdram()
 		LOG((LOG_CPU,0,"	rdram: ROM [%05o] ", addr));
 	} else {
 		/* read RAM 0,1,2 */
-		addr = ALTO2_UCODE_RAM_BASE + bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;
+		addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;
 		LOG((LOG_CPU,0,"	rdram: RAM%d [%04o] ", bank, wordaddr));
 	}
 
-	if (addr >= ALTO2_UCODE_SIZE) {
+	if (ALTO2_UCODE_RAM_BASE + addr >= ALTO2_UCODE_SIZE) {
 		val = 0177777;	/* ??? */
 		LOG((LOG_CPU,0,"invalid address (%06o)\n", val));
 		return;
@@ -2230,9 +2235,9 @@ void alto2_cpu_device::wrtram()
 	m_wrtram_flag = 0;
 
 	/* write RAM 0,1,2 */
-	addr = ALTO2_UCODE_RAM_BASE + bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;
+	addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;
 	LOG((LOG_CPU,0,"	wrtram: RAM%d [%04o] upper:%06o lower:%06o", bank, wordaddr, m_m, m_alu));
-	if (addr >= ALTO2_UCODE_SIZE) {
+	if (ALTO2_UCODE_RAM_BASE + addr >= ALTO2_UCODE_SIZE) {
 		LOG((LOG_CPU,0," invalid address\n"));
 		return;
 	}

@@ -358,7 +358,7 @@ UINT8 alto2_cpu_device::display_state_machine(UINT8 arg)
 
 	if (A66_VBLANK_HI(a66, HLC1024)) {
 		/* VBLANK: remember hlc */
-		m_dsp.vblank = m_dsp.hlc | 1;
+		m_dsp.vblank = m_dsp.hlc | HLC1024;
 
 		LOG((LOG_DISPL,1, " VBLANK"));
 
