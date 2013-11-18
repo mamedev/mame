@@ -1006,6 +1006,104 @@ ROM_START( cbombersj )
 ROM_END
 
 
+
+ROM_START( cbombersp )
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 2048K for 68020 code (CPU A)
+	ROM_LOAD32_BYTE( "hh.bin",  0x00000, 0x80000, CRC(8ee7b6c2) SHA1(033bc2c207b458113ff9f81cb90d22b7984f49de) )
+	ROM_LOAD32_BYTE( "hl.bin",  0x00001, 0x80000, CRC(63683ed8) SHA1(e6b57300f712fac3cf54f70ca255e514018a1c81) )
+	ROM_LOAD32_BYTE( "lh.bin",  0x00002, 0x80000, CRC(77ad9acb) SHA1(73bc156c377d42e7c752d71686ca5ad3dc506053) )
+	ROM_LOAD32_BYTE( "ll.bin",  0x00003, 0x80000, CRC(54c060a5) SHA1(7623eb418734d2adc4e913b5a99d4caeb857b3ac) )
+
+	ROM_REGION( 0x140000, "audiocpu", 0 )   // Sound cpu
+	ROM_LOAD16_BYTE( "ic47_eprg_h_up_c5c5.bin", 0x100000, 0x20000, CRC(cb0d11b1) SHA1(0ac192f31f531defe088ed899aadbaa0798df4d6) )
+	ROM_LOAD16_BYTE( "ic46_eprg_l_low_d5e.bin", 0x100001, 0x20000, CRC(567ae215) SHA1(32d40d1c24e014ffb52a81df4a0d5adb20f0048c) )
+
+	ROM_REGION( 0x40000, "sub", 0 ) // 256K for 68000 code (CPU B)
+	ROM_LOAD16_BYTE( "5-l.bin", 0x00001, 0x20000, CRC(aed4c3c0) SHA1(004f83ce0739cb2839022eb4d83f82e54776914f) )
+	ROM_LOAD16_BYTE( "5-h.bin", 0x00000, 0x20000, CRC(c6ec60e4) SHA1(554f19926e050ff2b8c56c30f174aca5a3fff845) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "scp0ll_ic7.bin",          0x000000, 0x80000, CRC(b1af439d) SHA1(a13fb4242808d1f3fc629988912c8186a99fb878) )
+	ROM_LOAD32_BYTE( "scp0hl_ic9.bin",          0x000001, 0x80000, CRC(5b6e413e) SHA1(7eaee158e985a20b5c228b476ee102f88311423a) )
+	ROM_LOAD32_BYTE( "scp0lh_ic22.bin",         0x000002, 0x80000, CRC(d5109bca) SHA1(c4c5b8dbc1139718d2aa73413b1b206f9df10fed) )
+	ROM_LOAD32_BYTE( "scp0aa_2b04_ic35.bin",    0x000003, 0x80000, CRC(b8ec56bd) SHA1(00191fd4b2e315a5a18f2e690a45b6f6a6ebb3d2) )
+	ROM_LOAD32_BYTE( "scp1ll_ic8.bin",          0x200000, 0x80000, CRC(eaa5839a) SHA1(80c7bb1151253a23934b65110db973641f7a073e) )
+	ROM_LOAD32_BYTE( "scp1hl_ic24.bin",         0x200001, 0x80000, CRC(46d198ba) SHA1(d9c9ddb23ad8f2abbd0ab2322d31d929085f0591) )
+	ROM_LOAD32_BYTE( "scp1lh_ic23.bin",         0x200002, 0x80000, CRC(7c9f0035) SHA1(a5632bd11426ba2cf0016847a3c08a2b90498271) )
+	ROM_LOAD32_BYTE( "scp1hh_ic36.bin",         0x200003, 0x80000, CRC(24f545d8) SHA1(c5ae0e714ed4765f3416cb58bc9cfccfbf78081c) )
+
+	ROM_REGION( 0x1800000, "gfx2", 0 )
+	// tiles 0x00000 - 0x07fff 
+	ROMX_LOAD( "obj0l_ic29.bin",   0x0000003, 0x80000, CRC(4b954950) SHA1(cafd9ba3128aa2e7dbde959a705aff8db6c311fa) , ROM_SKIP(7) ) // bp 1
+	ROMX_LOAD( "obj16l_ic20.bin",  0x0000002, 0x80000, CRC(b53932c0) SHA1(94ea6ccc29bd7b7e94d7494aaf0cc19b67c4ce72) , ROM_SKIP(7) ) // bp 2
+	ROMX_LOAD( "obj32l_ic51.bin",  0x0000001, 0x80000, CRC(f23f7253) SHA1(cbff5aee79d1b4990a35d5fc55e348aa81b2b5d3) , ROM_SKIP(7) ) // bp 3
+	ROMX_LOAD( "obj48l_ic53.bin",  0x0000000, 0x80000, CRC(85bb6b75) SHA1(ccff9c331b54e3c3618d205ffd4b999fcf861e09) , ROM_SKIP(7) ) // bp 4
+	ROMX_LOAD( "obj8l_ic4.bin",    0x0000007, 0x80000, CRC(d26140bb) SHA1(c882150c2914f23c5a27b43a228c62401cdb1a73) , ROM_SKIP(7) ) // bp 1
+	ROMX_LOAD( "obj24l_ic50.bin",  0x0000006, 0x80000, CRC(27c76f27) SHA1(c3e96015abc042420632e489e202684c358a5f42) , ROM_SKIP(7) ) // bp 2
+	ROMX_LOAD( "obj40l_ic52.bin",  0x0000005, 0x80000, CRC(09aaf6c5) SHA1(f2838fbf5ede241939562a65ecb908d882f267e2) , ROM_SKIP(7) ) // bp 3
+	ROMX_LOAD( "obj56l_ic54.bin",  0x0000004, 0x80000, CRC(8b6bacdf) SHA1(fe22f700147f641339ef754b3e5896279b5c2800) , ROM_SKIP(7) ) // bp 4
+	ROMX_LOAD( "obj64l_ic55.bin",  0x0c00000, 0x80000, CRC(18c976f1) SHA1(4fa53bbfaacd8ca9c7bec3aeff13481302aeefdc) , ROM_SKIP(7) ) // bp 5
+	ROMX_LOAD( "obj72l_ic56.bin",  0x0c00004, 0x80000, CRC(6a1b5ebc) SHA1(632d19d73c8cf75e3c428f1870e75c07b6846be5) , ROM_SKIP(7) ) // bp 5
+	// tiles 0x08000 - 0x0ffff
+	ROMX_LOAD( "obj0h_ic30.bin",   0x0400003, 0x80000, CRC(4c436ad2) SHA1(34fb6bb5aa7b131dda2d167a5dacc09090698dd1) , ROM_SKIP(7) ) // bp 1
+	ROMX_LOAD( "obj16h_ic21.bin",  0x0400002, 0x80000, CRC(5406b71e) SHA1(5e10db4d9052b903987629aa1df34bd4380ad29b) , ROM_SKIP(7) ) // bp 2
+	ROMX_LOAD( "ic65_4b57.bin",    0x0400001, 0x80000, CRC(6a1a8054) SHA1(20a001b1957fa67297959b86e20a0c2a417c2452) , ROM_SKIP(7) ) // bp 3
+	ROMX_LOAD( "ic67_0956.bin",    0x0400000, 0x80000, CRC(abe445dd) SHA1(22ad1ace2ee80a2297e4a004b6f5cd52c7c9b187) , ROM_SKIP(7) ) // bp 4
+	ROMX_LOAD( "obj8l_ic5.bin",    0x0400007, 0x80000, CRC(46b028eb) SHA1(02bb36108636695bc6db523991b34713599b2716) , ROM_SKIP(7) ) // bp 1
+	ROMX_LOAD( "ic64_5aba.bin",    0x0400006, 0x80000, CRC(0912b766) SHA1(62a8c0f2341b7e1f7b7ba0e194eda39f502209e6) , ROM_SKIP(7) ) // bp 2
+	ROMX_LOAD( "ic66_4ae9.bin",    0x0400005, 0x80000, CRC(77aafe1a) SHA1(35392526d5b6d974bff3bda316677fa0890b76a8) , ROM_SKIP(7) ) // bp 3
+	ROMX_LOAD( "ic68_1429.bin",    0x0400004, 0x80000, CRC(2e5857e5) SHA1(04bdd2e7cc89b14c7d7d72de45a7cce74cbcf7bd) , ROM_SKIP(7) ) // bp 4
+	ROMX_LOAD( "ic69_43b4.bin",    0x1000000, 0x80000, CRC(d08643be) SHA1(aacc324276c92b5786298b474ad6277fb802c470) , ROM_SKIP(7) ) // bp 5
+	ROMX_LOAD( "ic70_4504.bin",    0x1000004, 0x80000, CRC(3cf5d9d7) SHA1(35cc8b403550fb9928003308139de05ceb7bd5bb) , ROM_SKIP(7) ) // bp 5
+	// tiles 0x10000 - 0x17fff
+	ROMX_LOAD( "obj0l_ic31.bin",   0x0800003, 0x80000, CRC(9a20d601) SHA1(f3e561ed8687b65c6328c10d69c74615e693a83f) , ROM_SKIP(7) ) // bp 1
+	ROMX_LOAD( "obj16l_ic33.bin",  0x0800002, 0x80000, CRC(ea9df360) SHA1(4b0b50679ae4438f117b631b76b02a5170cc292a) , ROM_SKIP(7) ) // bp 2
+	ROMX_LOAD( "ic77_36ac.bin",    0x0800001, 0x80000, CRC(75628014) SHA1(62f8ba94be047e54c3577e6ecd68b3e613905a9f) , ROM_SKIP(7) ) // bp 3
+	ROMX_LOAD( "ic79_ef40.bin",    0x0800000, 0x80000, CRC(6af34bbf) SHA1(7bd021fc041465abe8dc6ac1ada634ae7314fec9) , ROM_SKIP(7) ) // bp 4
+	ROMX_LOAD( "obj8l_ic6.bin",    0x0800007, 0x80000, CRC(2037aad5) SHA1(0c837a39d92e99536bcd949c80fbdd4c37ad7e34) , ROM_SKIP(7) ) // bp 1
+	ROMX_LOAD( "ic76_443a.bin",    0x0800006, 0x80000, CRC(e5820610) SHA1(0eefb098766187983d88017863ce3a3418807428) , ROM_SKIP(7) ) // bp 2
+	ROMX_LOAD( "ic78_989c.bin",    0x0800005, 0x80000, CRC(23ec2896) SHA1(b5fcc88d2428ff9341690a0e0a1fc25e42684680) , ROM_SKIP(7) ) // bp 3
+	ROMX_LOAD( "ic80_d511.bin",    0x0800004, 0x80000, CRC(37da5baf) SHA1(a78ac413de08a1ff70ab14561b75df633a9e5be8) , ROM_SKIP(7) ) // bp 4
+	ROMX_LOAD( "ic81_e150.bin",    0x1400000, 0x80000, CRC(48dbc4fb) SHA1(acec207d05a8ea615f27216fbfd567cc630e5191) , ROM_SKIP(7) ) // bp 5
+	ROMX_LOAD( "ic82_3d3d.bin",    0x1400004, 0x80000, CRC(3e62970e) SHA1(82970accb4ce29034e7b97b74c831ec0314c5a8f) , ROM_SKIP(7) ) // bp 5
+	
+	ROM_REGION( 0x400000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "ic44_scc1.bin",  0x000001, 0x080000, CRC(868d0d3d) SHA1(29251d545548856296b5ae32a96f2eeef2418dc4) )
+	ROM_LOAD16_BYTE( "ic43_scc4.bin",  0x000000, 0x080000, CRC(2f170ee4) SHA1(2b8f07186c9f7589e1af131b8c377443a29bd149) )
+	ROM_LOAD       ( "ic45_5cc2.bin",  0x300000, 0x080000, CRC(7ae48d63) SHA1(2a8b291f0a683ed5b0c39d221737956b6fc72fa5) )
+	ROM_FILL       (                   0x200000, 0x080000, 0 )
+	ROM_LOAD16_BYTE( "ic58_f357.bin",  0x100001, 0x080000, CRC(16486967) SHA1(c2fd6c9f21232656b52ab589ac61f94aa728524e) )
+	ROM_LOAD16_BYTE( "ic57_1a62.bin",  0x100000, 0x080000, CRC(afd45e35) SHA1(6d7c0729c7d2b204473679b97923130e289f429d) )
+	ROM_LOAD       ( "ic59_7cce.bin",  0x380000, 0x080000, CRC(ee762199) SHA1(d56e96feeedba8b77f8f18cb380d2902ca3f1e50) )
+	ROM_FILL       (                   0x280000, 0x080000, 0 )
+
+	ROM_REGION16_LE( 0x80000, "user1", 0 )
+	ROM_LOAD16_BYTE( "st8_ic2.bin", 0x000001, 0x40000, CRC(d74254d8) SHA1(f4a4f9d95f70edf74d937be067d6a9f68a955ea7) )
+	ROM_LOAD16_BYTE( "st0_ic1.bin", 0x000000, 0x40000, CRC(c414c479) SHA1(e585502fcfa6ae2a36a66927ba2c49e49317f149) )
+
+	ROM_REGION( 0x40000, "user2", 0 )
+	ROM_LOAD( "st16_ic3.bin", 0x00000,  0x40000, CRC(c4ff6b2f) SHA1(65795bcb3749cce9c291204cd64fafa529317e14) )
+
+	ROM_REGION16_BE( 0x1000000, "ensoniq.0" , ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE("ic84_0816_wave0.bin", 0x000000, 0x080000, CRC(c30c71fd) SHA1(4240a23120b85f9daf6a462770185614fa758e4d) )
+	ROM_LOAD16_BYTE("ic85_8058_wave1.bin", 0x100000, 0x080000, CRC(fe37d544) SHA1(75c23b4e4e2efbbda1724a557f68c3bf1e5016c6) )
+	ROM_LOAD16_BYTE("ic86_9e88_wave2.bin", 0x200000, 0x080000, CRC(d6dcb45d) SHA1(ec69fb0a9fc6f7e72850775656e9fcd185889825) )
+	ROM_LOAD16_BYTE("ic87_42e7_wave3.bin", 0x300000, 0x080000, CRC(fe52856b) SHA1(fc68301d8b514a142cb38c3aa7a081674bdba6ca) )
+	ROM_LOAD16_BYTE("ic88_2704_wave4.bin", 0x400000, 0x080000, CRC(cba55d36) SHA1(944188bb3d9466ba246cabc57db6b965f2a902a0) )
+	// wave 5 not populated
+	// wave 6 not populated
+	// wave 7 not populated
+	// wave 8 not populated
+	// wave 9 not populated
+	// wave 10 not populated
+	// wave 11 not populated
+	// wave 12 not populated
+	// wave 13 not populated
+	ROM_LOAD16_BYTE("ic107_3a9c_wave14.bin", 0xe00000, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )    // -std-
+	ROM_LOAD16_BYTE("ic108_a148_wave15.bin", 0xf00000, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )    // -std-
+ROM_END
+
+
 DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 {
 	UINT32 offset,i;
@@ -1071,3 +1169,4 @@ GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, undrfire, R
 GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, undrfire, ROT0, "Taito Corporation",         "Under Fire (Japan)", 0 )
 GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)", GAME_IMPERFECT_GRAPHICS, layout_cbombers )
 GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (Japan)", GAME_IMPERFECT_GRAPHICS, layout_cbombers )
+GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, cbombers, ROT0, "Taito Corporation",         "Chase Bombers (prototype)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS, layout_cbombers )
