@@ -2681,13 +2681,13 @@ ROM_START( pepp0775 ) /* Normal board : Unknown Poker (PP0775) */
 	ROM_LOAD( "pp0775_a44-a73.u68",   0x00000, 0x10000, CRC(79a56642) SHA1(dfde6c12551e4f12a59e31c14fbfb9edb57e4fac) ) /* Game Version: A44, Library Version: A73 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2129.u72",   0x00000, 0x8000, CRC(f168f9ad) SHA1(acf98a155ccc892ac7c095bbd5538193c444ceb3) ) /* Most Likely WRONG!! But sort of works */
-	ROM_LOAD( "mgo-cg2129.u73",   0x08000, 0x8000, CRC(40b6df21) SHA1(7de6ff24db09facae040b889612222a6b1ce1b4e) ) /* use until the correct set is verified! */
-	ROM_LOAD( "mbo-cg2129.u74",   0x10000, 0x8000, CRC(508eab4b) SHA1(ba7920c3190302be924ef110b8a5e4c4c38ea535) ) /* CG2003 & CG954 give same results */
-	ROM_LOAD( "mxo-cg2129.u75",   0x18000, 0x8000, CRC(e98a0efd) SHA1(eed9229f904a38435cd34e06b2c22fd323d73e2d) ) /* Others are clearly wrong */
+	ROM_LOAD( "mro-cg2129.u72",   0x00000, 0x8000, CRC(f168f9ad) SHA1(acf98a155ccc892ac7c095bbd5538193c444ceb3) ) /* WRONG!! Use until the correct set is verified! */
+	ROM_LOAD( "mgo-cg2129.u73",   0x08000, 0x8000, CRC(40b6df21) SHA1(7de6ff24db09facae040b889612222a6b1ce1b4e) ) /* CG2003 & CG954 give same results, Others are clearly wrong */
+	ROM_LOAD( "mbo-cg2129.u74",   0x10000, 0x8000, CRC(508eab4b) SHA1(ba7920c3190302be924ef110b8a5e4c4c38ea535) ) /* Custom Arizona Charlie's Casino graphics */
+	ROM_LOAD( "mxo-cg2129.u75",   0x18000, 0x8000, CRC(e98a0efd) SHA1(eed9229f904a38435cd34e06b2c22fd323d73e2d) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "capx1321.u43", 0x0000, 0x0100, CRC(1e19c0ff) SHA1(e48ebc4a3c88e8b8c9740841dac919e9bb2c4b7f) )
+	ROM_LOAD( "cap2129.u50", 0x0000, 0x0100, CRC(b00d19e5) SHA1(4e8d88748c7591246ccd02c959d78b50227ddafb) ) /* BPROM type N82S135N verified */
 ROM_END
 
 ROM_START( pebe0014 ) /* Normal board : Blackjack (BE0014) */
@@ -4834,6 +4834,23 @@ ROM_START( pexm005p ) /* Superboard : Multi-Poker (XM00005P) - Bonus Poker, Dbl 
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0100, CRC(cbff3f26) SHA1(9e145676f2871c2369042a13cbeabb7efe2728e1) )
 ROM_END
 
+ROM_START( pexm007p ) /* Superboard : Multi-Poker (XM00007P) - Bonus Poker, Dbl Dbl Bonus Poker, Deuces Wild Poker, Dbl Bonus Poker & Jacks or Better */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) ) /*  07/25/96   @IGT L96-2041  - Linkable Progressive */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "xm00007p.u66",   0x00000, 0x10000, CRC(85a76416) SHA1(1bc3b9c2f687e68a085bfc5cf86d99fbd18cb9c7) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2233.u77",  0x00000, 0x8000, CRC(8758866a) SHA1(49146560a7e79593a2ac0378dc3b300b96ef1015) )
+	ROM_LOAD( "mgo-cg2233.u78",  0x08000, 0x8000, CRC(45ac6cfd) SHA1(25ff276320fe51c56aea0cff099be17e4ce8f404) )
+	ROM_LOAD( "mbo-cg2233.u79",  0x10000, 0x8000, CRC(9e9d702f) SHA1(75bb9adb49095b7cb87d2615bcf725e4a4774e25) )
+	ROM_LOAD( "mxo-cg2233.u80",  0x18000, 0x8000, CRC(2f05ebcb) SHA1(90d00ee4ce2dcbfbe33e221efe4db45a4e484baa) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "capx2174.u43", 0x0000, 0x0100, CRC(cbff3f26) SHA1(9e145676f2871c2369042a13cbeabb7efe2728e1) )
+ROM_END
+
 ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
 /*
 
@@ -5054,6 +5071,7 @@ GAMEL(1995, pexm002p,  pexm001p, peplus,  peplus_poker, peplus_state, peplussb, 
 GAMEL(1995, pexm003p,  pexm001p, peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XM00003P+XMP00024) Multi-Poker",         0,   layout_pe_poker )
 GAMEL(1995, pexm004p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XM00004P+XMP00002) Multi-Poker",         0,   layout_pe_poker )
 GAMEL(1995, pexm005p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XM00005P+XMP00004) Multi-Poker",         0,   layout_pe_poker )
+GAMEL(1995, pexm007p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XM00007P+XMP00006) Multi-Poker",         0,   layout_pe_poker )
 
 /* Superboard : multi-poker (wingboard) */
 GAMEL(1995, pexmp017, 0,      peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard",            0,   layout_pe_poker )
