@@ -158,6 +158,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_disp_a38(0),
 	m_disp_a63(0),
 	m_disp_a66(0),
+	m_displ_bitmap(0),
 	m_mem(),
 	m_emu(),
 	m_ether_a41(0),
@@ -2612,10 +2613,6 @@ void alto2_cpu_device::execute_run()
 	do {
 		int do_bs, flags;
 		UINT32 alu;
-		UINT8 aluf;
-		UINT8 bs;
-		UINT8 f1;
-		UINT8 f2;
 
 		/*
 		 * Subtract the microcycle time from the display time accu.
@@ -2663,10 +2660,10 @@ void alto2_cpu_device::execute_run()
 		m_rsel = MIR_RSEL(m_mir);
 		m_next = MIR_NEXT(m_mir) | m_next2;
 		m_next2 = A2_GET32(RD_CROM(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
-		aluf = MIR_ALUF(m_mir);
-		bs = MIR_BS(m_mir);
-		f1 = MIR_F1(m_mir);
-		f2 = MIR_F2(m_mir);
+		UINT8 aluf = MIR_ALUF(m_mir);
+		UINT8 bs = MIR_BS(m_mir);
+		UINT8 f1 = MIR_F1(m_mir);
+		UINT8 f2 = MIR_F2(m_mir);
 		LOG((LOG_CPU,2,"%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
 			task_name(m_task), m_mpc, m_mir, m_rsel, aluf, bs, f1, f2, MIR_T(m_mir), MIR_L(m_mir), m_next, m_next2));
 		debugger_instruction_hook(this, m_mpc);

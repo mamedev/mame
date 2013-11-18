@@ -13,16 +13,14 @@
 UINT32 alto2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
-	cpu->screen_update(bitmap, cliprect);
+	copybitmap(bitmap, cpu->display(), 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
-#if	0
 void alto2_state::screen_eof_alto2(screen_device &screen, bool state)
 {
 	// FIXME: what do we do here?
 }
-#endif
 
 /* Input Ports */
 
@@ -253,9 +251,11 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz, 768,   0, 606, 875,   0, 808)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz,
+						   ALTO2_DISPLAY_TOTAL_WIDTH,   0, ALTO2_DISPLAY_WIDTH,
+						   ALTO2_DISPLAY_TOTAL_HEIGHT,  0, ALTO2_DISPLAY_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(alto2_state, screen_update)
-//	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
+	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
 
 	MCFG_PALETTE_LENGTH(2)
 
@@ -270,24 +270,6 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
 	cpu->set_diablo(0, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_0)));
 	cpu->set_diablo(1, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_1)));
-
-#define	UNICODE_TESTING	0
-#if	UNICODE_TESTING
-	const char* filename = "docs/UnicodeData.txt";
-	int res = unicode_data_load(filename);
-	logerror("%s: unicode_data_load(\"%s\") result %d\n", filename, __FUNCTION__, res);
-	for (unicode_char uchar = 0; uchar < UNICODE_PLANESIZE; uchar++) {
-		if (UNICODE_NOT_DECIMAL != unicode_decimal(uchar))
-			logerror("%s: U+%04x (%s) is decimal %u\n", __FUNCTION__, uchar, unicode_name(uchar), unicode_decimal(uchar));
-		if (UNICODE_NOT_DIGIT != unicode_digit(uchar))
-			logerror("%s: U+%04x (%s) is digit %u\n", __FUNCTION__, uchar, unicode_name(uchar), unicode_digit(uchar));
-		if (UNICODE_NOT_NUMERIC != unicode_digit(uchar))
-			logerror("%s: U+%04x (%s) is numeric %u\n", __FUNCTION__, uchar, unicode_name(uchar), unicode_numeric(uchar));
-		if (uchar != unicode_lcase(uchar))
-			logerror("%s: U+%04x (%s) lower chase is U+%04x (%s)\n", __FUNCTION__, uchar, unicode_name(uchar), unicode_lcase(uchar), unicode_name(unicode_lcase(uchar)));
-	}
-	unicode_data_free();
-#endif
 }
 
 /* Game Drivers */

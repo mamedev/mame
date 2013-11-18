@@ -189,6 +189,31 @@ static const UINT16 double_bits[256] = {
 	0xffc0,0xffc3,0xffcc,0xffcf,0xfff0,0xfff3,0xfffc,0xffff
 };
 
+#define	BLACK	1
+#define	WHITE	0
+
+//! update the internal bitmap to the MAME bitmap.pix16
+void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
+{
+	UINT16* pix = &m_displ_bitmap->pix16(y) + x;
+	*pix++ = (word & 0100000) ? BLACK : WHITE;
+	*pix++ = (word & 0040000) ? BLACK : WHITE;
+	*pix++ = (word & 0020000) ? BLACK : WHITE;
+	*pix++ = (word & 0010000) ? BLACK : WHITE;
+	*pix++ = (word & 0004000) ? BLACK : WHITE;
+	*pix++ = (word & 0002000) ? BLACK : WHITE;
+	*pix++ = (word & 0001000) ? BLACK : WHITE;
+	*pix++ = (word & 0000400) ? BLACK : WHITE;
+	*pix++ = (word & 0000200) ? BLACK : WHITE;
+	*pix++ = (word & 0000100) ? BLACK : WHITE;
+	*pix++ = (word & 0000040) ? BLACK : WHITE;
+	*pix++ = (word & 0000020) ? BLACK : WHITE;
+	*pix++ = (word & 0000010) ? BLACK : WHITE;
+	*pix++ = (word & 0000004) ? BLACK : WHITE;
+	*pix++ = (word & 0000002) ? BLACK : WHITE;
+	*pix++ = (word & 0000001) ? BLACK : WHITE;
+}
+
 /**
  * @brief unload the next word from the display FIFO and shift it to the screen
  */
@@ -196,7 +221,6 @@ int alto2_cpu_device::unload_word(int x)
 {
 	int y = ((m_dsp.hlc - m_dsp.vblank) & ~(1024|1)) + HLC1024();
 	UINT16* scanline = m_dsp.scanline[y];
-	UINT8 dirty = m_dsp.scanline_dirty[y];
 
 	UINT32 word = m_dsp.inverse;
 	if (FIFO_MBEMPTY_0() == 0) {
@@ -210,8 +234,8 @@ int alto2_cpu_device::unload_word(int x)
 
 	if (y >= 0 && y < ALTO2_DISPLAY_HEIGHT && x < ALTO2_DISPLAY_VISIBLE_WORDS) {
 		if (m_dsp.halfclock) {
-			UINT32 word1 = double_bits[word / 256];
-			UINT32 word2 = double_bits[word % 256];
+			UINT16 word1 = double_bits[word / 256];
+			UINT16 word2 = double_bits[word % 256];
 			/* mixing with the cursor */
 			if (x == m_dsp.curword + 0)
 				word1 ^= m_dsp.curdata >> 16;
@@ -219,7 +243,7 @@ int alto2_cpu_device::unload_word(int x)
 				word1 ^= m_dsp.curdata & 0177777;
 			if (word1 != scanline[x]) {
 				scanline[x] = word1;
-				dirty = 1;
+				update_bitmap_word(16 * x, y, word1);
 			}
 			x++;
 			if (x < ALTO2_DISPLAY_VISIBLE_WORDS) {
@@ -230,7 +254,7 @@ int alto2_cpu_device::unload_word(int x)
 					word2 ^= m_dsp.curdata & 0177777;
 				if (word2 != scanline[x]) {
 					scanline[x] = word2;
-					dirty = 1;
+					update_bitmap_word(16 * x, y, word2);
 				}
 				x++;
 			}
@@ -242,12 +266,11 @@ int alto2_cpu_device::unload_word(int x)
 				word ^= m_dsp.curdata & 0177777;
 			if (word != scanline[x]) {
 				scanline[x] = word;
-				dirty = 1;
+				update_bitmap_word(16 * x, y, word);
 			}
 			x++;
 		}
 	}
-	m_dsp.scanline_dirty[y] = dirty;
 	if (x < ALTO2_DISPLAY_VISIBLE_WORDS) {
 		m_unload_time += ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
 		return x;
@@ -277,7 +300,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 
 	a63 = m_disp_a63[arg];
 
-	if (A2_HLCGATE_HI(a63)) {
+	if (A63_HLCGATE_HI(a63)) {
 		/* reset or count horizontal line counters */
 		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END)
 			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
@@ -301,15 +324,15 @@ int alto2_cpu_device::display_state_machine(int arg)
 	// next address from PROM a63, use A4 from HLC1
 	next = (16 * (HLC1() ^ 1)) | A63_NEXT(a63);
 
-	if (A2_VBLANK_HI(a66)) {
+	if (A66_VBLANK_HI(a66, HLC1024())) {
 		/* VBLANK: remember hlc */
 		m_dsp.vblank = m_dsp.hlc | 1;
 
 		LOG((LOG_DISPL,1, " VBLANK"));
 
 		/* VSYNC is always within VBLANK */
-		if (A2_VSYNC_HI(a66)) {
-			if (A2_VSYNC_LO(m_dsp.a66)) {
+		if (A66_VSYNC_HI(a66, HLC1024())) {
+			if (A66_VSYNC_LO(m_dsp.a66, HLC1024())) {
 				LOG((LOG_DISPL,1, " VSYNC/ (wake DVT)"));
 				/*
 				 * The display vertical task DVT is awakened once per field,
@@ -322,7 +345,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 			}
 		}
 	} else {
-		if (A2_VBLANK_HI(m_dsp.a66)) {
+		if (A66_VBLANK_HI(m_dsp.a66, HLC1024())) {
 			/**
 			 * VBLANKPULSE:
 			 * The display horizontal task DHT is awakened once at the
@@ -342,7 +365,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 			 */
 			m_dsp.curt_blocks = 0;
 		}
-		if (A2_HBLANK_LO(a63) && A2_HBLANK_HI(m_dsp.a63)) {
+		if (A63_HBLANK_LO(a63) && A63_HBLANK_HI(m_dsp.a63)) {
 			/* falling edge of a63 HBLANK starts unload */
 			LOG((LOG_DISPL,1, " HBLANK\\ UNLOAD"));
 			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
@@ -368,15 +391,15 @@ int alto2_cpu_device::display_state_machine(int arg)
 		}
 	}
 
-	if (A2_SCANEND_HI(a63)) {
+	if (A63_SCANEND_HI(a63)) {
 		LOG((LOG_DISPL,1, " SCANEND"));
 		m_task_wakeup &= ~(1 << task_dwt);
 	}
 
 	LOG((LOG_DISPL,1, "%s", (a63 & A63_HBLANK) ? " HBLANK": ""));
 
-	if (A2_HSYNC_HI(a63)) {
-		if (A2_HSYNC_LO(m_dsp.a63)) {
+	if (A63_HSYNC_HI(a63)) {
+		if (A63_HSYNC_LO(m_dsp.a63)) {
 			LOG((LOG_DISPL,1, " HSYNC/ (CLRBUF)"));
 			/*
 			 * The hardware sets the buffer empty and clears the DWT block
@@ -394,7 +417,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 		} else {
 			LOG((LOG_DISPL,1, " HSYNC"));
 		}
-	} else if (A2_HSYNC_HI(m_dsp.a63)) {
+	} else if (A63_HSYNC_HI(m_dsp.a63)) {
 		/*
 		 * CLRBUF' also resets the 2nd cursor task block flip flop,
 		 * which is built from two NAND gates a30c and a30d (74H00).
@@ -439,52 +462,22 @@ void alto2_cpu_device::f2_evenfield_1()
 void alto2_cpu_device::init_disp()
 {
 	memset(&m_dsp, 0, sizeof(m_dsp));
+	// allocate the 16bpp bitmap
+	m_displ_bitmap = auto_bitmap_ind16_alloc(machine(), ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT);
+	LOG((LOG_DISPL,0,"	m_bitmap=%p\n", m_displ_bitmap));
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 	m_dsp.raw_bitmap = auto_alloc_array(machine(), UINT16, ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
 	m_dsp.scanline = auto_alloc_array(machine(), UINT16*, ALTO2_DISPLAY_HEIGHT);
 	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++) {
-		m_dsp.scanline[y] = m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS;
-		memset(m_dsp.scanline[y], 0, sizeof(UINT16) * ALTO2_DISPLAY_VISIBLE_WORDS);
+		UINT16* scanline = m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS;
+		m_dsp.scanline[y] = scanline;
+		memset(m_dsp.scanline[y], y & 1 ? 0x55 : 0xaa, sizeof(UINT16) * ALTO2_DISPLAY_VISIBLE_WORDS);
+		for (int x = 0; x < ALTO2_DISPLAY_SCANLINE_WORDS; x++)
+			update_bitmap_word(x*16, y, scanline[x]);
 	}
-	m_dsp.scanline_dirty = auto_alloc_array(machine(), UINT8, ALTO2_DISPLAY_HEIGHT);
-	memset(m_dsp.scanline_dirty, 1, sizeof(UINT8) * ALTO2_DISPLAY_HEIGHT);
 }
 
 void alto2_cpu_device::exit_disp()
 {
 	// nothing to do yet
-}
-
-#define	BLACK	1
-#define	WHITE	0
-
-//! update the internal bitmap to the MAME bitmap.pix16
-void alto2_cpu_device::screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for (UINT32 y = 0; y < ALTO2_DISPLAY_HEIGHT; y++) {
-		if (0 == m_dsp.scanline_dirty[y])
-			continue;
-		m_dsp.scanline_dirty[y] = 0;
-		UINT16* src = m_dsp.scanline[y];
-		UINT16* pix = &bitmap.pix16(y);
-		for (UINT32 x = 0; x < ALTO2_DISPLAY_WIDTH; x += 16) {
-			UINT16 w = *src++;
-			*pix++ = (w & 0100000) ? BLACK : WHITE;
-			*pix++ = (w & 0040000) ? BLACK : WHITE;
-			*pix++ = (w & 0020000) ? BLACK : WHITE;
-			*pix++ = (w & 0010000) ? BLACK : WHITE;
-			*pix++ = (w & 0004000) ? BLACK : WHITE;
-			*pix++ = (w & 0002000) ? BLACK : WHITE;
-			*pix++ = (w & 0001000) ? BLACK : WHITE;
-			*pix++ = (w & 0000400) ? BLACK : WHITE;
-			*pix++ = (w & 0000200) ? BLACK : WHITE;
-			*pix++ = (w & 0000100) ? BLACK : WHITE;
-			*pix++ = (w & 0000040) ? BLACK : WHITE;
-			*pix++ = (w & 0000020) ? BLACK : WHITE;
-			*pix++ = (w & 0000010) ? BLACK : WHITE;
-			*pix++ = (w & 0000004) ? BLACK : WHITE;
-			*pix++ = (w & 0000002) ? BLACK : WHITE;
-			*pix++ = (w & 0000001) ? BLACK : WHITE;
-		}
-	}
 }

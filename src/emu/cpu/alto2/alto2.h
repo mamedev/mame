@@ -20,7 +20,7 @@
 #define	ALTO2_TAG "alto2"
 
 #ifndef	ALTO2_DEBUG
-#define	ALTO2_DEBUG             0   //!< define to 1 to enable logerror() output
+#define	ALTO2_DEBUG             1   //!< define to 1 to enable logerror() output
 #endif
 
 #define	USE_PRIO_F9318			0	//!< define to 1 to use the F9318 priority encoder code
@@ -144,7 +144,7 @@
 
 #define	ALTO2_DISPLAY_SCANLINE_WORDS (ALTO2_DISPLAY_TOTAL_WIDTH/16)		//!< words per scanline
 #define	ALTO2_DISPLAY_HEIGHT 808										//!< number of visible scanlines per frame; 808 really, but there are some empty lines?
-#define	ALTO2_DISPLAY_WIDTH 606											//!< visible width of the display
+#define	ALTO2_DISPLAY_WIDTH 606											//!< visible width of the display; 38 words - 2 pixels
 #define	ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)		//!< visible words per scanline
 #define	ALTO2_DISPLAY_BITCLOCK 20160000ll								//!< display bit clock in in Hertz (20.16MHz)
 #define	ALTO2_DISPLAY_BITTIME(n) ((n)*U64(1000000000)/ALTO2_DISPLAY_BITCLOCK)	//!< display bit time in in atto seconds (~= 49.6031ns)
@@ -220,11 +220,11 @@ public:
 	//! driver interface to set diablo_hd_device
 	void set_diablo(int unit, diablo_hd_device* ptr);
 
-	//! update the internal bitmap to the MAME bitmap.pix16
-	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	//! call in for the next sector callback
 	void next_sector(int unit);
+
+	//! return the display bitmap
+	bitmap_ind16& display() { return *m_displ_bitmap; }
 
 	DECLARE_ADDRESS_MAP( ucode_map, 32 );
 	DECLARE_ADDRESS_MAP( const_map, 16 );
@@ -1601,7 +1601,6 @@ private:
 		UINT32 curdata;						//!< helper: shifted cursor data (32-bit)
 		UINT16 *raw_bitmap;					//!< array of words of the raw bitmap that is displayed
 		UINT16 **scanline;					//!< array of pointers to the scanlines
-		UINT8 *scanline_dirty;				//!< array of flags indicating whenever the scanline contents changed
 	}	m_dsp;
 
 	//! horizontal line counter bit 0
@@ -1656,11 +1655,17 @@ private:
 	 */
 	UINT8* m_disp_a38;
 
+	//! output bits of PROM A38
+	enum {
+		A38_STOPWAKE	= (1 << 1),
+		A38_MBEMPTY		= (1 << 3)
+	};
+
 	//! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
-	inline int FIFO_STOPWAKE_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & 002; }
+	inline int FIFO_STOPWAKE_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & A38_STOPWAKE; }
 
 	//! PROM a38 bit O3 is MBEMPTY' (FIFO is empty if bit is zero)
-	inline int FIFO_MBEMPTY_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & 010; }
+	inline int FIFO_MBEMPTY_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & A38_MBEMPTY; }
 
 	/**
 	 * @brief emulation of PROM a63 in the display schematics page 8
@@ -1702,24 +1707,24 @@ private:
 		A63_HLCGATE	= (1 << 7)				//!< PROM a63 B7 HLCGATE signal, which enables counting the HLC
 	};
 	//!< helper to extract A3-A0 from a PROM a63 value
-	inline UINT8 A63_NEXT(UINT8 n) { return (n >> 2) & 017; }
+	static inline UINT8 A63_NEXT(UINT8 n) { return (n >> 2) & 017; }
 
 	//!< test the HBLANK (horizontal blanking) signal in PROM a63 being high
-	static inline bool A2_HBLANK_HI(UINT8 a) { return (a & A63_HBLANK) ? true : false; }
+	static inline bool A63_HBLANK_HI(UINT8 a) { return (a & A63_HBLANK) ? true : false; }
 	//!< test the HBLANK (horizontal blanking) signal in PROM a63 being low
-	static inline bool A2_HBLANK_LO(UINT8 a) { return !A2_HBLANK_HI(a); }
+	static inline bool A63_HBLANK_LO(UINT8 a) { return (a & A63_HBLANK) ? false : true; }
 	//!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being high
-	static inline bool A2_HSYNC_HI(UINT8 a) { return (a & A63_HSYNC) ? true : false; }
+	static inline bool A63_HSYNC_HI(UINT8 a) { return (a & A63_HSYNC) ? true : false; }
 	//!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being low
-	static inline bool A2_HSYNC_LO(UINT8 a) { return !A2_HSYNC_HI(a); }
+	static inline bool A63_HSYNC_LO(UINT8 a) { return (a & A63_HSYNC) ? false : true; }
 	//!< test the SCANEND (scanline end) signal in PROM a63 being high
-	static inline bool A2_SCANEND_HI(UINT8 a) { return (a & A63_SCANEND) ? true : false; }
+	static inline bool A63_SCANEND_HI(UINT8 a) { return (a & A63_SCANEND) ? true : false; }
 	//!< test the SCANEND (scanline end) signal in PROM a63 being low
-	static inline bool A2_SCANEND_LO(UINT8 a) { return !A2_SCANEND_HI(a); }
+	static inline bool A63_SCANEND_LO(UINT8 a) { return (a & A63_SCANEND) ? false : true; }
 	//!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being high
-	static inline bool A2_HLCGATE_HI(UINT8 a) { return (a & A63_HLCGATE) ? true : false; }
+	static inline bool A63_HLCGATE_HI(UINT8 a) { return (a & A63_HLCGATE) ? true : false; }
 	//!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being low
-	static inline bool A2_HLCGATE_LO(UINT8 a) { return !A2_HLCGATE_HI(a); }
+	static inline bool A63_HLCGATE_LO(UINT8 a) { return (a & A63_HLCGATE) ? false : true; }
 
 	/**
 	 * @brief vertical blank and synch PROM
@@ -1742,22 +1747,22 @@ private:
 		A66_VBLANK_EVEN	= (1 << 3)
 	};
 
-	//! test for the VSYNC signal (depends on "field", i.e. HLC1024)
-	inline bool A66_VSYNC(UINT8 a) { return a & (HLC1024() ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? true : false; }
-	//! test for the VBLANK signal (depends on "field", i.e. HLC1024)
-	inline bool A66_VBLANK(UINT8 a) { return a & (HLC1024() ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? true : false; }
 	//! test the VSYNC (vertical synchronisation) signal in PROM a66 being high
-	inline bool A2_VSYNC_HI(UINT8 a) { return A66_VSYNC(a); }
+	static inline bool A66_VSYNC_HI(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? true : false; }
 	//! test the VSYNC (vertical synchronisation) signal in PROM a66 being low
-	inline bool A2_VSYNC_LO(UINT8 a) { return !A66_VSYNC(a); }
+	static inline bool A66_VSYNC_LO(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? false : true; }
 	//! test the VBLANK (vertical blanking) signal in PROM a66 being high
-	inline bool A2_VBLANK_HI(UINT8 a) { return A66_VBLANK(a); }
+	static inline bool A66_VBLANK_HI(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? true : false; }
 	//! test the VBLANK (vertical blanking) signal in PROM a66 being low
-	inline bool A2_VBLANK_LO(UINT8 a) { return !A66_VBLANK(a); }
+	static inline bool A66_VBLANK_LO(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? false : true; }
 
-	/**
-	 * @brief unload the next word from the display FIFO and shift it to the screen
-	 */
+	//! screen bitmap
+	bitmap_ind16* m_displ_bitmap;
+
+	//! update a word in the screen bitmap
+	void update_bitmap_word(int x, int y, UINT16 word);
+
+	//! unload the next word from the display FIFO and shift it to the screen
 	int unload_word(int x);
 
 	/**

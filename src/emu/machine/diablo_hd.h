@@ -13,7 +13,7 @@
 #include "imagedev/diablo.h"
 
 #ifndef	DIABLO_DEBUG
-#define	DIABLO_DEBUG	1		//!< set to 1 to enable debug log output
+#define	DIABLO_DEBUG	0		//!< set to 1 to enable debug log output
 #endif
 
 #define DIABLO_HD_0 "diablo0"
