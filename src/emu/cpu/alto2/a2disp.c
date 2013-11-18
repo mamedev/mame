@@ -502,9 +502,6 @@ void alto2_cpu_device::init_disp()
 	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++) {
 		UINT16* scanline = m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS;
 		m_dsp.scanline[y] = scanline;
-		memset(m_dsp.scanline[y], y & 1 ? 0x55 : 0xaa, sizeof(UINT16) * ALTO2_DISPLAY_VISIBLE_WORDS);
-		for (int x = 0; x < ALTO2_DISPLAY_SCANLINE_WORDS; x++)
-			update_bitmap_word(x*16, y, scanline[x]);
 	}
 }
 

@@ -256,8 +256,9 @@ void alto2_state::palette_init()
 
 static MACHINE_CONFIG_START( alto2, alto2_state )
 	/* basic machine hardware */
-	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 8
-	MCFG_CPU_ADD("maincpu", ALTO2, XTAL_29_4912MHz/8)
+	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
+	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto
+	MCFG_CPU_ADD("maincpu", ALTO2, XTAL_29_4912MHz/5)
 	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
 	MCFG_CPU_DATA_MAP(alto2_const_map)
 	MCFG_CPU_IO_MAP(alto2_iomem_map)
