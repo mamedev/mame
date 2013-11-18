@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( xmen, xmen_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_K054539_ADD("k054539", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
@@ -390,11 +390,11 @@ static const k053247_interface xmen6p_k053246_intf =
 static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* ? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(6p_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000)   /* verified with M1, guessed but accurate */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -430,11 +430,11 @@ static MACHINE_CONFIG_START( xmen6p, xmen_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_K054539_ADD("k054539", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END

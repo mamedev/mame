@@ -1429,12 +1429,12 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
 	MCFG_SOUND_CONFIG(k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_2", XTAL_18_432MHz, k054539_config)
 	MCFG_SOUND_CONFIG(k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

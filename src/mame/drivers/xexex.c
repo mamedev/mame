@@ -515,7 +515,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_SOUND_ROUTE(1, "filter2l", 0.50)
 	MCFG_SOUND_ROUTE(1, "filter2r", 0.50)
 
-	MCFG_K054539_ADD("k054539", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539", XTAL_18_432MHz, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
