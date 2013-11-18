@@ -52,11 +52,11 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  80K 5 1/4 inch single density single sided
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 16, 40, 1, 128, {}, 1, {}, 27, 11, 0
+		4000, 16, 40, 1, 128, {}, 1, {}, 28, 11, 27
 	},
 
 	// track description
-	// 55x4e 12x00 3xf5 fe 2x00 2x01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 55x4e 12x00 3xf5 fe 2x00 01 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 2x00 02 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 2x00 03 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 2x00 04 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
@@ -76,11 +76,11 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  160K 5 1/4 inch double density single sided
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000, 16, 40, 1, 256, {}, 1, {}, 54, 22, 0
+		2000, 16, 40, 1, 256, {}, 1, {}, 55, 22, 54
 	},
 
 	// track description 
-	// 55x4e 12x00 3xf5 fe 2x00 2x01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 55x4e 12x00 3xf5 fe 2x00 01 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 2x00 02 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 2x00 03 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 2x00 04 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
@@ -100,11 +100,11 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  640K 5 1/4 inch quad density
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
-		2000, 16, 80, 2, 256, {}, 1, {}, 54, 22, 0
+		2000, 16, 80, 2, 256, {}, 1, {}, 55, 22, 54
 	},
 
 	// track description
-	// 55x4e 12x00 3xf5 fe 00 3x01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
+	// 55x4e 12x00 3xf5 fe 00 01 01 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 00 01 02 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 00 01 03 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 00 01 04 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
@@ -134,7 +134,7 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  1M 8 inch double density
 		floppy_image::FF_8, floppy_image::DSDD, floppy_image::MFM,
-		2000, 26, 77, 2, 256, {}, 1, {}, 54, 22, 0
+		2000, 26, 77, 2, 256, {}, 1, {}, 55, 22, 54
 	},
 
 	{}
