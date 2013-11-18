@@ -13,7 +13,9 @@
     TODO:
 
     - Xerox 820
-        - floppy (wd1772.c FM support)
+        - floppy format has 3xcd at the end of track data
+	        :u109: write track 0
+			:u109: track description 16xff ... 109xff 3xcd
     - Xerox 820-II
         - floppy (read/write to FDC triggers Z80 WAIT)
         - Winchester
