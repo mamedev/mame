@@ -24,7 +24,7 @@
 #endif
 
 #define	USE_PRIO_F9318			0	//!< define to 1 to use the F9318 priority encoder code
-#define	USE_ALU_74181			0	//!< define to 1 to use the SN74181 ALU code
+#define	USE_ALU_74181			1	//!< define to 1 to use the SN74181 ALU code
 #define	DEBUG_DISPLAY_TIMING	0	//!< define to 1 to debug the display timing
 #define	USE_BITCLK_TIMER		0	//!< define to 1 to use a very high rate timer for the disk bit clock
 #define	ALTO2_HAMMING_CHECK		0	//!< define to 1 to incorporate the Hamming code and Parity check
@@ -1111,7 +1111,7 @@ private:
 	void f2_load_md_1();							//!< f2_load_md late: load memory data
 
 	UINT8* m_alu_a10;								//!< ALU function to 74181 operation lookup PROM
-	UINT32 alu_74181(UINT32 smc);
+	UINT32 alu_74181(UINT32 a, UINT32 b, UINT8 smc);
 
 	void rdram();									//!< read the microcode ROM/RAM halfword
 	void wrtram();									//!< write the microcode RAM from M register and ALU

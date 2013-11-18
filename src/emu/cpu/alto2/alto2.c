@@ -2346,28 +2346,48 @@ void alto2_cpu_device::wrtram()
  * </PRE>
  */
 
+enum {
+    A10_UNUSED  = (1 << 0),
+    A10_TSELECT = (1 << 1),
+    A10_ALUCI   = (1 << 2),
+    A10_ALUM    = (1 << 3),
+    A10_ALUS0   = (1 << 4),
+    A10_ALUS1   = (1 << 5),
+    A10_ALUS2   = (1 << 6),
+    A10_ALUS3   = (1 << 7),
+    A10_ALUIN   = (A10_ALUM|A10_ALUCI|A10_ALUS0|A10_ALUS1|A10_ALUS2|A10_ALUS3)
+};
+
 //! S function, M flag and C carry in
-#define	SMC(s3,s2,s1,s0,m,c) (((s3)<<7)|((s2)<<6)|((s1)<<5)|((s0)<<4)|((m)<<3)|((c)<<2))
+#define	SMC(s3,s2,s1,s0,m,ci) (s3*A10_ALUS3 + s2*A10_ALUS2 + s1*A10_ALUS1 + s0*A10_ALUS0 + m*A10_ALUM + ci*A10_ALUCI)
 
 /**
- * @brief Compute the 74181 ALU operation smc
+ * @brief Compute the 74181 ALU operation smc for inputs a and b
+ *
+ * The function, arithmetic / logic flag and carry in define the
+ * ALU operation. The carry in is irrelevant for the logic operations.
+ * The result is 17 bit, where bit #16 is the carry out.
+ *
  * @param smc S function [0-15], M arithmetic/logic flag, C carry
  * @return resulting ALU output
  */
-UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
+UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 {
-	register UINT32 a = m_bus;
-	register UINT32 b = m_t;
-	register UINT32 s = 0;
-	register UINT32 f = 0;
+	register UINT32 f;
+	register const UINT32 cout = 1 << 16;
 
-	switch (smc & SMC(1,1,1,1, 1, 1)) {
+	switch (smc & A10_ALUIN) {
 	case SMC(0,0,0,0, 0, 0): // 0000: A + 1
 		f = a + 1;
 		break;
 
 	case SMC(0,0,0,0, 0, 1): // 0000: A
 		f = a;
+		break;
+
+	case SMC(0,0,0,0, 1, 0): // 0000: A'
+	case SMC(0,0,0,0, 1, 1):
+		f = (~a) | cout;
 		break;
 
 	case SMC(0,0,0,1, 0, 0): // 0001: (A | B) + 1
@@ -2378,6 +2398,11 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		f = a | b;
 		break;
 
+	case SMC(0,0,0,1, 1, 0): // 0001: A' | B'
+	case SMC(0,0,0,1, 1, 1):
+		f = (~a | ~b) | cout;
+		break;
+
 	case SMC(0,0,1,0, 0, 0): // 0010: (A | B') + 1
 		f = (a | ~b) + 1;
 		break;
@@ -2386,14 +2411,22 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		f = a | ~b;
 		break;
 
+	case SMC(0,0,1,0, 1, 0): // 0010: A' & B
+	case SMC(0,0,1,0, 1, 1):
+		f = (~a & b) | cout;
+		break;
+
 	case SMC(0,0,1,1, 0, 0): // 0011: -1 + 1
-		s = 1;
-		f = -1 + 1;
+		f = (-1 + 1) | cout;
 		break;
 
 	case SMC(0,0,1,1, 0, 1): // 0011: -1
-		s = 1;
-		f = -1;
+		f = (-1) | cout;
+		break;
+
+	case SMC(0,0,1,1, 1, 0): // 0011: logic 0
+	case SMC(0,0,1,1, 1, 1):
+		f = cout;
 		break;
 
 	case SMC(0,1,0,0, 0, 0): // 0100: A + (A & B') + 1
@@ -2404,6 +2437,11 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		f = a + (a & ~b);
 		break;
 
+	case SMC(0,1,0,0, 1, 0): // 0100: (A & B)'
+	case SMC(0,1,0,0, 1, 1):
+		f = ~(a & b) | cout;
+		break;
+
 	case SMC(0,1,0,1, 0, 0): // 0101: (A | B) + (A & B') + 1
 		f = (a | b) + (a & ~b) + 1;
 		break;
@@ -2412,24 +2450,35 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		f = (a | b) + (a & ~b);
 		break;
 
+	case SMC(0,1,0,1, 1, 0): // 0101: B'
+	case SMC(0,1,0,1, 1, 1):
+		f = (~b) | cout;
+		break;
+
 	case SMC(0,1,1,0, 0, 0): // 0110: A - B - 1 + 1
-		s = 1;
-		f = a - b - 1 + 1;
+		f = (a - b - 1 + 1)  ^ cout;
 		break;
 
 	case SMC(0,1,1,0, 0, 1): // 0110: A - B - 1
-		s = 1;
-		f = a - b - 1;
+		f = (a - b - 1) ^ cout;
+		break;
+
+	case SMC(0,1,1,0, 1, 0): // 0110: A ^ B
+	case SMC(0,1,1,0, 1, 1):
+		f = (a ^ b) | cout;
 		break;
 
 	case SMC(0,1,1,1, 0, 0): // 0111: (A & B) - 1 + 1
-		s = 1;
-		f = (a & b) - 1 + 1;
+		f = ((a & b) - 1 + 1) ^ cout;
 		break;
 
 	case SMC(0,1,1,1, 0, 1): // 0111: (A & B) - 1
-		s = 1;
-		f = (a & b) - 1;
+		f = ((a & b) - 1) ^ cout;
+		break;
+
+	case SMC(0,1,1,1, 1, 0): // 0111: A & B'
+	case SMC(0,1,1,1, 1, 1):
+		f = (a & ~b) | cout;
 		break;
 
 	case SMC(1,0,0,0, 0, 0): // 1000: A + (A & B) + 1
@@ -2440,12 +2489,22 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		f = a + (a & b);
 		break;
 
+	case SMC(1,0,0,0, 1, 0): // 1000: A' | B
+	case SMC(1,0,0,0, 1, 1):
+		f = (~a | b) | cout;
+		break;
+
 	case SMC(1,0,0,1, 0, 0): // 1001: A + B + 1
 		f = a + b + 1;
 		break;
 
 	case SMC(1,0,0,1, 0, 1): // 1001: A + B
 		f = a + b;
+		break;
+
+	case SMC(1,0,0,1, 1, 0): // 1001: A' ^ B'
+	case SMC(1,0,0,1, 1, 1):
+		f = (~a ^ ~b) | cout;
 		break;
 
 	case SMC(1,0,1,0, 0, 0): // 1010: (A | B') + (A & B) + 1
@@ -2456,14 +2515,22 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		f = (a | ~b) + (a & b);
 		break;
 
+	case SMC(1,0,1,0, 1, 0): // 1010: B
+	case SMC(1,0,1,0, 1, 1):
+		f = (b) | cout;
+		break;
+
 	case SMC(1,0,1,1, 0, 0): // 1011: (A & B) - 1 + 1
-		s = 1;
-		f = (a & b) - 1 + 1;
+		f = ((a & b) - 1 + 1) ^ cout;
 		break;
 
 	case SMC(1,0,1,1, 0, 1): // 1011: (A & B) - 1
-		s = 1;
-		f = (a & b) - 1;
+		f = ((a & b) - 1)  ^ cout;
+		break;
+
+	case SMC(1,0,1,1, 1, 0): // 1011: A & B
+	case SMC(1,0,1,1, 1, 1):
+		f = (a & b) | cout;
 		break;
 
 	case SMC(1,1,0,0, 0, 0): // 1100: A + A + 1
@@ -2474,12 +2541,22 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		f = a + a;
 		break;
 
+	case SMC(1,1,0,0, 1, 0): // 1100: logic 1
+	case SMC(1,1,0,0, 1, 1):
+		f = (~0) | cout;
+		break;
+
 	case SMC(1,1,0,1, 0, 0): // 1101: (A | B) + A + 1
 		f = (a | b) + a + 1;
 		break;
 
 	case SMC(1,1,0,1, 0, 1): // 1101: (A | B) + A
 		f = (a | b) + a;
+		break;
+
+	case SMC(1,1,0,1, 1, 0): // 1101: A | B'
+	case SMC(1,1,0,1, 1, 1):
+		f = (a | ~b) | cout;
 		break;
 
 	case SMC(1,1,1,0, 0, 0): // 1110: (A | B') + A + 1
@@ -2490,110 +2567,33 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 smc)
 		f = (a | ~b) + a;
 		break;
 
+	case SMC(1,1,1,0, 1, 0): // 1110: A | B
+	case SMC(1,1,1,0, 1, 1):
+		f = (a | b) | cout;
+		break;
+
 	case SMC(1,1,1,1, 0, 0): // 1111: A - 1 + 1
-		s = 1;
-		f = a - 1 + 1;
+		f = (a - 1 + 1) ^ cout;
 		break;
 
 	case SMC(1,1,1,1, 0, 1): // 1111: A - 1
-		s = 1;
-		f = a - 1;
-		break;
-
-	case SMC(0,0,0,0, 1, 0): // 0000: A'
-	case SMC(0,0,0,0, 1, 1):
-		f = ~a;
-		break;
-
-	case SMC(0,0,0,1, 1, 0): // 0001: A' | B'
-	case SMC(0,0,0,1, 1, 1):
-		f = ~a | ~b;
-		break;
-
-	case SMC(0,0,1,0, 1, 0): // 0010: A' & B
-	case SMC(0,0,1,0, 1, 1):
-		f = ~a & b;
-		break;
-
-	case SMC(0,0,1,1, 1, 0): // 0011: logic 0
-	case SMC(0,0,1,1, 1, 1):
-		f = 0;
-		break;
-
-	case SMC(0,1,0,0, 1, 0): // 0100: (A & B)'
-	case SMC(0,1,0,0, 1, 1):
-		f = ~(a & b);
-		break;
-
-	case SMC(0,1,0,1, 1, 0): // 0101: B'
-	case SMC(0,1,0,1, 1, 1):
-		f = ~b;
-		break;
-
-	case SMC(0,1,1,0, 1, 0): // 0110: A ^ B
-	case SMC(0,1,1,0, 1, 1):
-		f = a ^ b;
-		break;
-
-	case SMC(0,1,1,1, 1, 0): // 0111: A & B'
-	case SMC(0,1,1,1, 1, 1):
-		f = a & ~b;
-		break;
-
-	case SMC(1,0,0,0, 1, 0): // 1000: A' | B
-	case SMC(1,0,0,0, 1, 1):
-		f = ~a | b;
-		break;
-
-	case SMC(1,0,0,1, 1, 0): // 1001: A' ^ B'
-	case SMC(1,0,0,1, 1, 1):
-		f = ~a ^ ~b;
-		break;
-
-	case SMC(1,0,1,0, 1, 0): // 1010: B
-	case SMC(1,0,1,0, 1, 1):
-		f = b;
-		break;
-
-	case SMC(1,0,1,1, 1, 0): // 1011: A & B
-	case SMC(1,0,1,1, 1, 1):
-		f = a & b;
-		break;
-
-	case SMC(1,1,0,0, 1, 0): // 1100: logic 1
-	case SMC(1,1,0,0, 1, 1):
-		f = ~0;
-		break;
-
-	case SMC(1,1,0,1, 1, 0): // 1101: A | B'
-	case SMC(1,1,0,1, 1, 1):
-		f = a | ~b;
-		break;
-
-	case SMC(1,1,1,0, 1, 0): // 1110: A | B
-	case SMC(1,1,1,0, 1, 1):
-		f = a | b;
+		f = (a - 1) ^ cout;
 		break;
 
 	case SMC(1,1,1,1, 1, 0): // 1111: A
 	case SMC(1,1,1,1, 1, 1):
-		f = a;
+		f = (a) | cout;
 		break;
-	}
-	if (smc & 2) {
-		m_aluc0 = ((f >> 16) ^ s) & 1;
-	} else {
-		m_aluc0 = 1;
 	}
 	return f;
 }
 #endif
 
 /** @brief flag that tells whether to load the T register from BUS or ALU */
-#define	TSELECT	(1 << 1)
+#define	TSELECT	A10_TSELECT
 
 /** @brief flag that tells wheter operation was 0: logic (M=1) or 1: arithmetic (M=0) */
-#define	ALUM2	(1 << 3)
+#define	ALUM2	A10_ALUM
 
 /** @brief execute the CPU for at most nsecs nano seconds */
 void alto2_cpu_device::execute_run()
@@ -2603,7 +2603,6 @@ void alto2_cpu_device::execute_run()
 
 	do {
 		int do_bs, flags;
-		UINT32 alu;
 
 		/*
 		 * Subtract the microcycle time from the display time accu.
@@ -2734,9 +2733,12 @@ void alto2_cpu_device::execute_run()
 		// B4: ALUS0'   B5: ALUS1'   B6: ALUS2'   B7: ALUS3'
 		// B3-B7 are inverted on loading the PROM
 		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | aluf];
-		alu = alu_74181(a10);
+		UINT32 alu = alu_74181(m_bus, m_t, a10);
+		m_aluc0 = (alu >> 16) & 1;
 		flags = (a10 ^ ALUM2) & (TSELECT | ALUM2);
+		m_alu = static_cast<UINT16>(alu);
 #else
+		UINT32 alu;
 		/* compute the ALU function */
 		switch (aluf) {
 		/**
@@ -2924,8 +2926,8 @@ void alto2_cpu_device::execute_run()
 		/**
 		 * 16: ALU ← BUS
 		 * PROM data for S3-0:1111 M:1 C:0 T:1
-		 * 74181 perhaps F=0 (0011/0/0)
-		 * T source is BUS
+		 * 74181 function F=A
+		 * T source is ALU
 		 */
 		case aluf_undef_16:
 			alu = m_bus;
@@ -2937,8 +2939,8 @@ void alto2_cpu_device::execute_run()
 		/**
 		 * 17: ALU ← BUS
 		 * PROM data for S3-0:1111 M:1 C:0 T:1
-		 * 74181 perhaps F=~0 (0011/0/1)
-		 * T source is BUS
+		 * 74181 function F=A
+		 * T source is ALU
 		 */
 		case aluf_undef_17:
 		default:
@@ -2947,8 +2949,8 @@ void alto2_cpu_device::execute_run()
 			flags = TSELECT;
 			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
 		}
-#endif
 		m_alu = static_cast<UINT16>(alu);
+#endif
 
 		/* WRTRAM now, before L is changed */
 		if (m_wrtram_flag)
