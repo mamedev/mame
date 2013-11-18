@@ -13,7 +13,7 @@
 #include "imagedev/diablo.h"
 
 #ifndef	DIABLO_DEBUG
-#define	DIABLO_DEBUG	0		//!< set to 1 to enable debug log output
+#define	DIABLO_DEBUG	1		//!< set to 1 to enable debug log output
 #endif
 
 #define DIABLO_HD_0 "diablo0"
@@ -31,12 +31,12 @@ public:
 	static const int DIABLO_CYLINDERS = 203;		//!< number of cylinders per drive
 	static const int DIABLO_CYLINDER_MASK = 0777;	//!< bit maks for cylinder number (9 bits)
 	static const int DIABLO_SPT = 12;				//!< number of sectors per track
-	static const int DIABLO_SECTOR_MASK = 017;		//!< bit maks for cylinder number (4 bits)
+	static const int DIABLO_SECTOR_MASK = 017;		//!< bit maks for sector number (4 bits)
 	static const int DIABLO_HEADS = 2;				//!< number of heads per drive
-	static const int DIABLO_HEAD_MASK = 1;			//!< bit maks for cylinder number (4 bits)
+	static const int DIABLO_HEAD_MASK = 1;			//!< bit maks for head number (1 bit)
 	static const int DIABLO_PAGES = 203*2*12;		//!< number of pages per drive
 	//! convert a cylinder/head/sector to a logical block address (page)
-	static inline int DRIVE_PAGE(int c,int h,int s)	{ return (c * DIABLO_HEADS + h) * DIABLO_SPT + s; }
+	static inline int DIABLO_PAGE(int c, int h, int s) { return (c * DIABLO_HEADS + h) * DIABLO_SPT + s; }
 
 	void set_sector_callback(void* cookie, void(*callback)(void*, int));
 
@@ -102,7 +102,7 @@ private:
 	int m_cylinder;							//!< current cylinder number
 	int m_head;								//!< current head (track) number on cylinder
 	int m_sector;							//!< current sector number in track
-	int m_page;								//!< current page
+	int m_page;								//!< current page (derived from cylinder, head and sector)
 	int m_pages;							//!< total number of pages
 	UINT8** m_cache;						//!< pages raw bytes
 	UINT32** m_bits;						//!< pages expanded to bits
