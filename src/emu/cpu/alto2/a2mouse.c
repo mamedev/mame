@@ -95,18 +95,18 @@ enum {
  * Advance the mouse x and y coordinates to the dx and dy
  * coordinates by either toggling MX2 or MX1 first for a
  * y movement, or MY2 or MY1 for x movement.
+ * There are four read phases counted by m_mouse.phase
  *
- * @result lookup value from madr_a32
+ * @return lookup value from madr_a32
  */
 UINT16 alto2_cpu_device::mouse_read()
 {
-	static int arg;
 	UINT16 data;
 
 	m_mouse.latch = (m_mouse.latch << 1) & MLATCH;
 	data = m_madr_a32[m_mouse.latch];
 
-	switch (arg & 3) {
+	switch (m_mouse.phase) {
 	case 0:
 		m_mouse.latch |= MOVEX(m_mouse.dx - m_mouse.x);
 		m_mouse.latch |= MOVEY(m_mouse.dy - m_mouse.y);
@@ -137,7 +137,7 @@ UINT16 alto2_cpu_device::mouse_read()
 		if (m_mouse.y > m_mouse.dy)
 			m_mouse.y--;
 	}
-	arg++;
+	m_mouse.phase = (m_mouse.phase + 1) % 4;
 	return data;
 }
 
@@ -151,7 +151,7 @@ UINT16 alto2_cpu_device::mouse_read()
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 {
 	// set new destination (absolute) mouse x coordinate
-	m_mouse.dx += newval - oldval;
+	m_mouse.dx = newval;
 #if	MOUSE_DIRTY_HACK
 	/* XXX: dirty, dirty, hack */
 #if	ALTO2_HAMMING_CHECK
@@ -172,7 +172,7 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
 {
 	// set new destination (absolute) mouse y coordinate
-	m_mouse.dy += newval - oldval;
+	m_mouse.dy = newval;
 #if	MOUSE_DIRTY_HACK
 	/* XXX: dirty, dirty, hack */
 #if	ALTO2_HAMMING_CHECK

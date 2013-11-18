@@ -1387,11 +1387,12 @@ private:
 
 	//! mouse context
 	struct {
-		int x;
-		int y;
-		int dx;
-		int dy;
-		UINT8 latch;
+		int x;										//!< current X coordinate
+		int y;										//!< current Y coordinate
+		int dx;										//!< destination X coordinate (real mouse X)
+		int dy;										//!< destination Y coordinate (real mouse Y)
+		UINT8 latch;								//!< current latch value
+		UINT8 phase;								//!< current read latch phase
 	}	m_mouse;
 
 	UINT16 mouse_read();							//!< return the mouse motion flags

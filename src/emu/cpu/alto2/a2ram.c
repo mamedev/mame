@@ -234,7 +234,7 @@ void alto2_cpu_device::f1_swmode_1()
  */
 void alto2_cpu_device::f1_wrtram_1()
 {
-	m_wrtram_flag = 1;
+	m_wrtram_flag = true;
 	LOG((LOG_RAM,2,"	WRTRAM\n"));
 }
 
@@ -243,7 +243,7 @@ void alto2_cpu_device::f1_wrtram_1()
  */
 void alto2_cpu_device::f1_rdram_1()
 {
-	m_rdram_flag = 1;
+	m_rdram_flag = true;
 	LOG((LOG_RAM,2,"	RDRAM\n"));
 }
 

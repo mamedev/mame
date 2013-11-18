@@ -2195,7 +2195,7 @@ void alto2_cpu_device::rdram()
 	UINT32 bank = GET_CRAM_BANKSEL(m_cram_addr) % ALTO2_UCODE_RAM_PAGES;
 	UINT32 wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
 
-	m_rdram_flag = 0;
+	m_rdram_flag = false;
 	if (GET_CRAM_RAMROM(m_cram_addr)) {
 		/* read ROM 0 at current mpc */
 		addr = m_mpc & 01777;
@@ -2238,7 +2238,7 @@ void alto2_cpu_device::wrtram()
 	UINT32 bank = GET_CRAM_BANKSEL(m_cram_addr) % ALTO2_UCODE_RAM_PAGES;
 	UINT32 wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
 
-	m_wrtram_flag = 0;
+	m_wrtram_flag = false;
 
 	/* write RAM 0,1,2 */
 	addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;
@@ -2731,7 +2731,7 @@ void alto2_cpu_device::execute_run()
 		// The PROM output lines are
 		// B0: unused   B1: TSELECT  B2: ALUCI'   B3: ALUM'
 		// B4: ALUS0'   B5: ALUS1'   B6: ALUS2'   B7: ALUS3'
-		// B3-B7 are inverted on loading the PROM
+		// B1 and B3-B7 are inverted on loading the PROM
 		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | aluf];
 		UINT32 alu = alu_74181(m_bus, m_t, a10);
 		m_aluc0 = (alu >> 16) & 1;
