@@ -83,7 +83,7 @@
  *
  * Decoded states of this PROM:
  *
- *      STATE  PROM   binary   HBLANK  HSYNC NEXT SCANEND HLCGATE
+ *  STATE  PROM   binary   HBLANK  HSYNC NEXT SCANEND HLCGATE
  *	----------------------------------------------------------
  *	  000  0007  00000111     1      1    001    0       0
  *	  001  0013  00001011     1      1    002    0       0
@@ -214,12 +214,47 @@ void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 	*pix++ = (word & 0000001) ? BLACK : WHITE;
 }
 
+#define	HLC1	((m_dsp.hlc >>  0) & 1)		//!< horizontal line counter bit 0
+#define	HLC2	((m_dsp.hlc >>  1) & 1)		//!< horizontal line counter bit 1
+#define	HLC4	((m_dsp.hlc >>  2) & 1)		//!< horizontal line counter bit 2
+#define	HLC8	((m_dsp.hlc >>  3) & 1)		//!< horizontal line counter bit 3
+#define	HLC16	((m_dsp.hlc >>  4) & 1)		//!< horizontal line counter bit 4
+#define	HLC32	((m_dsp.hlc >>  5) & 1)		//!< horizontal line counter bit 5
+#define	HLC64	((m_dsp.hlc >>  6) & 1)		//!< horizontal line counter bit 6
+#define	HLC128	((m_dsp.hlc >>  7) & 1)		//!< horizontal line counter bit 7
+#define	HLC256	((m_dsp.hlc >>  8) & 1)		//!< horizontal line counter bit 8
+#define	HLC512	((m_dsp.hlc >>  9) & 1)		//!< horizontal line counter bit 9
+#define	HLC1024 ((m_dsp.hlc >> 10) & 1)		//!< horizontal line counter bit 10
+
+#define GET_SETMODE_SPEEDY(mode) A2_GET16(mode,16,0,0)  //!< get the pixel clock speed from a SETMODE<- bus value
+#define GET_SETMODE_INVERSE(mode) A2_GET16(mode,16,1,1) //!< get the inverse video flag from a SETMODE<- bus value
+
+//!< helper to extract A3-A0 from a PROM a63 value
+#define A63_NEXT(n) ((n >> 2) & 017)
+
+//!< test the HBLANK (horizontal blanking) signal in PROM a63 being high
+#define A63_HBLANK_HI(a) ((a & A63_HBLANK) ? true : false)
+//!< test the HBLANK (horizontal blanking) signal in PROM a63 being low
+#define A63_HBLANK_LO(a) ((a & A63_HBLANK) ? false : true)
+//!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being high
+#define A63_HSYNC_HI(a) ((a & A63_HSYNC) ? true : false)
+//!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being low
+#define A63_HSYNC_LO(a) ((a & A63_HSYNC) ? false : true)
+//!< test the SCANEND (scanline end) signal in PROM a63 being high
+#define A63_SCANEND_HI(a) ((a & A63_SCANEND) ? true : false)
+//!< test the SCANEND (scanline end) signal in PROM a63 being low
+#define A63_SCANEND_LO(a) ((a & A63_SCANEND) ? false : true)
+//!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being high
+#define A63_HLCGATE_HI(a) ((a & A63_HLCGATE) ? true : false)
+//!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being low
+#define A63_HLCGATE_LO(a) ((a & A63_HLCGATE) ? false : true)
+
 /**
  * @brief unload the next word from the display FIFO and shift it to the screen
  */
 int alto2_cpu_device::unload_word(int x)
 {
-	int y = ((m_dsp.hlc - m_dsp.vblank) & ~(1024|1)) + HLC1024();
+	int y = ((m_dsp.hlc - m_dsp.vblank) & ~(1024|1)) + HLC1024;
 	UINT16* scanline = m_dsp.scanline[y];
 
 	UINT32 word = m_dsp.inverse;
@@ -289,17 +324,14 @@ int alto2_cpu_device::unload_word(int x)
  * @param arg the current displ_a63 PROM address
  * @result returns the next state of the display state machine
  */
-int alto2_cpu_device::display_state_machine(int arg)
+UINT8 alto2_cpu_device::display_state_machine(UINT8 arg)
 {
-	int next, a63, a66;
-
 	LOG((LOG_DISPL,5,"DSP%03o:", arg));
 	if (020 == arg) {
 		LOG((LOG_DISPL,2," HLC=%d", m_dsp.hlc));
 	}
 
-	a63 = m_disp_a63[arg];
-
+	UINT8 a63 = m_disp_a63[arg];
 	if (A63_HLCGATE_HI(a63)) {
 		/* reset or count horizontal line counters */
 		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END)
@@ -313,26 +345,26 @@ int alto2_cpu_device::display_state_machine(int arg)
 			m_task_wakeup |= 1 << task_ether;
 		}
 	}
-	if (HLC256() || HLC512()) {
+	UINT8 a66 = 017;
+	if (HLC256 || HLC512) {
 		// PROM a66 is disabled, if any of HLC256 or HLC512 are high
-		a66 = 017;
 	} else {
 		// PROM a66 address lines are connected the HLC1 to HLC128 signals
 		a66 = m_disp_a66[m_dsp.hlc & 0377];
 	}
 
 	// next address from PROM a63, use A4 from HLC1
-	next = (16 * (HLC1() ^ 1)) | A63_NEXT(a63);
+	UINT8 next = ((HLC1 ^ 1) << 4) | A63_NEXT(a63);
 
-	if (A66_VBLANK_HI(a66, HLC1024())) {
+	if (A66_VBLANK_HI(a66, HLC1024)) {
 		/* VBLANK: remember hlc */
 		m_dsp.vblank = m_dsp.hlc | 1;
 
 		LOG((LOG_DISPL,1, " VBLANK"));
 
 		/* VSYNC is always within VBLANK */
-		if (A66_VSYNC_HI(a66, HLC1024())) {
-			if (A66_VSYNC_LO(m_dsp.a66, HLC1024())) {
+		if (A66_VSYNC_HI(a66, HLC1024)) {
+			if (A66_VSYNC_LO(m_dsp.a66, HLC1024)) {
 				LOG((LOG_DISPL,1, " VSYNC/ (wake DVT)"));
 				/*
 				 * The display vertical task DVT is awakened once per field,
@@ -345,7 +377,7 @@ int alto2_cpu_device::display_state_machine(int arg)
 			}
 		}
 	} else {
-		if (A66_VBLANK_HI(m_dsp.a66, HLC1024())) {
+		if (A66_VBLANK_HI(m_dsp.a66, HLC1024)) {
 			/**
 			 * VBLANKPULSE:
 			 * The display horizontal task DHT is awakened once at the
@@ -431,7 +463,6 @@ int alto2_cpu_device::display_state_machine(int arg)
 		m_task_wakeup |= 1 << task_curt;
 	}
 
-
 	LOG((LOG_DISPL,1, " NEXT:%03o\n", next));
 
 	m_dsp.a63 = a63;
@@ -447,7 +478,7 @@ int alto2_cpu_device::display_state_machine(int arg)
  */
 void alto2_cpu_device::f2_evenfield_1()
 {
-	UINT16 r = HLC1024() ^ 1;
+	UINT16 r = HLC1024 ^ 1;
 	LOG((LOG_DISPL,2,"	evenfield branch on HLC1024 (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 }

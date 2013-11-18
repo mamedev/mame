@@ -30,7 +30,7 @@ void alto2_cpu_device::f1_dht_block_0()
  */
 void alto2_cpu_device::f2_dht_setmode_1()
 {
-	UINT16 r = A2_GET32(m_bus,16,0,0);
+	UINT16 r = A2_GET16(m_bus,16,0,0);
 	m_dsp.setmode = m_bus;
 	LOG((LOG_DHT,2,"	SETMODE← BUS (%#o), branch on BUS[0] (%#o | %#o)\n", m_bus, m_next2, r));
 	m_next2 |= r;

@@ -125,7 +125,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_wrtram_flag(false),
 	m_s_reg_bank(),
 	m_bank_reg(),
-	m_ether_enable(true),
+	m_ether_enable(false),
 	m_ewfct(false),
 	m_dsp_time(0),
 	m_dsp_state(0),
@@ -2090,7 +2090,7 @@ void alto2_cpu_device::f2_shifter_eq_zero_1()
  */
 void alto2_cpu_device::f2_bus_1()
 {
-	UINT16 r = A2_GET32(m_bus,16,6,15);
+	UINT16 r = A2_GET16(m_bus,16,6,15);
 	LOG((LOG_CPU,2, "	BUS; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }

@@ -308,15 +308,19 @@ void diablo_hd_device::read_sector()
 		return;
 	}
 
-	/* allocate a buffer for this page */
-	m_cache[m_page] = auto_alloc_array(machine(), UINT8, sizeof(diablo_sector_t));
-	/* and read the page from the hard_disk image */
-	if (hard_disk_read(m_disk, m_page, m_cache[m_page])) {
-		LOG_DRIVE((2,"[DHD%u]	C/H/S:%d/%d/%d => page:%d loaded\n", m_unit, m_cylinder, m_head, m_sector, m_page));
+	if (m_disk) {
+		/* allocate a buffer for this page */
+		m_cache[m_page] = auto_alloc_array(machine(), UINT8, sizeof(diablo_sector_t));
+		/* and read the page from the hard_disk image */
+		if (hard_disk_read(m_disk, m_page, m_cache[m_page])) {
+			LOG_DRIVE((2,"[DHD%u]	C/H/S:%d/%d/%d => page:%d loaded\n", m_unit, m_cylinder, m_head, m_sector, m_page));
+		} else {
+			LOG_DRIVE((0,"[DHD%u]	C/H/S:%d/%d/%d => page:%d read failed\n", m_unit, m_cylinder, m_head, m_sector, m_page));
+			auto_free(machine(), m_cache[m_page]);
+			m_cache[m_page] = 0;
+		}
 	} else {
-		LOG_DRIVE((0,"[DHD%u]	C/H/S:%d/%d/%d => page:%d read failed\n", m_unit, m_cylinder, m_head, m_sector, m_page));
-		auto_free(machine(), m_cache[m_page]);
-		m_cache[m_page] = 0;
+		LOG_DRIVE((2,"[DHD%u]	no disk\n", m_unit));
 	}
 }
 
@@ -677,7 +681,7 @@ void diablo_hd_device::squeeze_sector()
 
 	if (m_rdfirst >= 0) {
 		LOG_DRIVE((0, "[DHD%u]	RD CHS:%03d/%d/%02d bit#%-5d ... bit#%-5d\n",
-			m_unit, m_cylinder, m_head, m_sector, m_rdfirst, m_rdlast));
+				   m_unit, m_cylinder, m_head, m_sector, m_rdfirst, m_rdlast));
 	}
 	m_rdfirst = -1;
 	m_rdlast = -1;
@@ -773,8 +777,12 @@ void diablo_hd_device::squeeze_sector()
 	auto_free(machine(), m_bits[m_page]);
 	m_bits[m_page] = 0;
 
-	if (!hard_disk_write(m_disk, m_page, m_cache[m_page])) {
-		LOG_DRIVE((0,"[DHD%u]	write failed for page #%d\n", m_unit, m_page));
+	if (m_disk) {
+		if (!hard_disk_write(m_disk, m_page, m_cache[m_page])) {
+			LOG_DRIVE((0,"[DHD%u]	write failed for page #%d\n", m_unit, m_page));
+		}
+	} else {
+		LOG_DRIVE((2,"[DHD%u]	no disk\n", m_unit));
 	}
 }
 

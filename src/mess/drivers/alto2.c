@@ -13,7 +13,9 @@
 UINT32 alto2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
-	copybitmap(bitmap, cpu->display(), 0, 0, 0, 0, cliprect);
+	bitmap_ind16& src = cpu->display();
+	if (src.valid())
+		copybitmap(bitmap, src, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

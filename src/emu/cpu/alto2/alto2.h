@@ -20,7 +20,7 @@
 #define	ALTO2_TAG "alto2"
 
 #ifndef	ALTO2_DEBUG
-#define	ALTO2_DEBUG             1   //!< define to 1 to enable logerror() output
+#define	ALTO2_DEBUG             0   //!< define to 1 to enable logerror() output
 #endif
 
 #define	USE_PRIO_F9318			0	//!< define to 1 to use the F9318 priority encoder code
@@ -35,7 +35,7 @@
 #define	ALTO2_BUSSRC	8			//!< 8 bus sources
 #define	ALTO2_F1MAX		16			//!< 16 F1 functions
 #define	ALTO2_F2MAX		16			//!< 16 F2 functions
-#define	ALTO2_UCYCLE	271			//!< time in nano seconds for a CPU micro cycle: 29.4912MHz/8 -> 3.6864MHz ~= 271ns/clock
+#define	ALTO2_UCYCLE	170			//!< time in nano seconds for a CPU micro cycle: 29.4912MHz/8 -> 3.6864MHz ~= 271ns/clock
 
 #define	ALTO2_ETHER_FIFO_SIZE	16
 
@@ -819,7 +819,7 @@ private:
 	bool m_ether_enable;							//!< set to true, if the ethernet should be simulated
 	bool m_ewfct;									//!< set by Ether task when it want's a wakeup at switch to task_mrt
 	int m_dsp_time;									//!< display_state_machine() time accu
-	int m_dsp_state;								//!< display_state_machine() previous state
+	UINT8 m_dsp_state;								//!< display_state_machine() previous state
 	int m_unload_time;								//!< unload word time accu
 	int m_unload_word;								//!< unload word number
 	int	m_bitclk_time;								//!< bitclk call time accu
@@ -1603,34 +1603,6 @@ private:
 		UINT16 **scanline;					//!< array of pointers to the scanlines
 	}	m_dsp;
 
-	//! horizontal line counter bit 0
-	inline int HLC1() { return A2_BIT16(m_dsp.hlc,11,10); }
-	//! horizontal line counter bit 1
-	inline int HLC2() { return A2_BIT16(m_dsp.hlc,11,9); }
-	//! horizontal line counter bit 2
-	inline int HLC4() { return A2_BIT16(m_dsp.hlc,11,8); }
-	//! horizontal line counter bit 3
-	inline int HLC8() { return A2_BIT16(m_dsp.hlc,11,7); }
-	//! horizontal line counter bit 4
-	inline int HLC16() { return A2_BIT16(m_dsp.hlc,11,6); }
-	//! horizontal line counter bit 5
-	inline int HLC32() { return A2_BIT16(m_dsp.hlc,11,5); }
-	//! horizontal line counter bit 6
-	inline int HLC64() { return A2_BIT16(m_dsp.hlc,11,4); }
-	//! horizontal line counter bit 7
-	inline int HLC128() { return A2_BIT16(m_dsp.hlc,11,3); }
-	//! horizontal line counter bit 8
-	inline int HLC256() { return A2_BIT16(m_dsp.hlc,11,2); }
-	//! horizontal line counter bit 9
-	inline int HLC512() { return A2_BIT16(m_dsp.hlc,11,1); }
-	//! horizontal line counter bit 10
-	inline int HLC1024() { return A2_BIT16(m_dsp.hlc,11,0); }
-
-	//! get the pixel clock speed from a SETMODE<- bus value
-	static inline UINT16 GET_SETMODE_SPEEDY(UINT16 mode) { return A2_GET16(mode,16,0,0); }
-	//! get the inverse video flag from a SETMODE<- bus value
-	static inline UINT16 GET_SETMODE_INVERSE(UINT16 mode) { return A2_GET16(mode,16,1,1); }
-
 	/**
 	 * @brief PROM a38 contains the STOPWAKE' and MBEMBPTY' signals for the FIFO
 	 * <PRE>
@@ -1662,10 +1634,10 @@ private:
 	};
 
 	//! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
-	inline int FIFO_STOPWAKE_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & A38_STOPWAKE; }
+	inline UINT8 FIFO_STOPWAKE_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & A38_STOPWAKE; }
 
 	//! PROM a38 bit O3 is MBEMPTY' (FIFO is empty if bit is zero)
-	inline int FIFO_MBEMPTY_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & A38_MBEMPTY; }
+	inline UINT8 FIFO_MBEMPTY_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & A38_MBEMPTY; }
 
 	/**
 	 * @brief emulation of PROM a63 in the display schematics page 8
@@ -1706,25 +1678,6 @@ private:
 		A63_SCANEND	= (1 << 6),				//!< PROM a63 B6 SCANEND signal, which resets the FIFO counters
 		A63_HLCGATE	= (1 << 7)				//!< PROM a63 B7 HLCGATE signal, which enables counting the HLC
 	};
-	//!< helper to extract A3-A0 from a PROM a63 value
-	static inline UINT8 A63_NEXT(UINT8 n) { return (n >> 2) & 017; }
-
-	//!< test the HBLANK (horizontal blanking) signal in PROM a63 being high
-	static inline bool A63_HBLANK_HI(UINT8 a) { return (a & A63_HBLANK) ? true : false; }
-	//!< test the HBLANK (horizontal blanking) signal in PROM a63 being low
-	static inline bool A63_HBLANK_LO(UINT8 a) { return (a & A63_HBLANK) ? false : true; }
-	//!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being high
-	static inline bool A63_HSYNC_HI(UINT8 a) { return (a & A63_HSYNC) ? true : false; }
-	//!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being low
-	static inline bool A63_HSYNC_LO(UINT8 a) { return (a & A63_HSYNC) ? false : true; }
-	//!< test the SCANEND (scanline end) signal in PROM a63 being high
-	static inline bool A63_SCANEND_HI(UINT8 a) { return (a & A63_SCANEND) ? true : false; }
-	//!< test the SCANEND (scanline end) signal in PROM a63 being low
-	static inline bool A63_SCANEND_LO(UINT8 a) { return (a & A63_SCANEND) ? false : true; }
-	//!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being high
-	static inline bool A63_HLCGATE_HI(UINT8 a) { return (a & A63_HLCGATE) ? true : false; }
-	//!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being low
-	static inline bool A63_HLCGATE_LO(UINT8 a) { return (a & A63_HLCGATE) ? false : true; }
 
 	/**
 	 * @brief vertical blank and synch PROM
@@ -1748,13 +1701,13 @@ private:
 	};
 
 	//! test the VSYNC (vertical synchronisation) signal in PROM a66 being high
-	static inline bool A66_VSYNC_HI(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? true : false; }
+	static inline bool A66_VSYNC_HI(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? false : true; }
 	//! test the VSYNC (vertical synchronisation) signal in PROM a66 being low
-	static inline bool A66_VSYNC_LO(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? false : true; }
+	static inline bool A66_VSYNC_LO(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? true : false; }
 	//! test the VBLANK (vertical blanking) signal in PROM a66 being high
-	static inline bool A66_VBLANK_HI(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? true : false; }
+	static inline bool A66_VBLANK_HI(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? false : true; }
 	//! test the VBLANK (vertical blanking) signal in PROM a66 being low
-	static inline bool A66_VBLANK_LO(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? false : true; }
+	static inline bool A66_VBLANK_LO(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? true : false; }
 
 	//! screen bitmap
 	bitmap_ind16* m_displ_bitmap;
@@ -1773,7 +1726,7 @@ private:
 	 * @param arg the current m_disp_a63 PROM address
 	 * @return next state of the display state machine
 	 */
-	int display_state_machine(int arg);
+	UINT8 display_state_machine(UINT8 arg);
 
 	//! branch on the evenfield flip-flop
 	void f2_evenfield_1(void);

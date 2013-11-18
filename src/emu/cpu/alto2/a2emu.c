@@ -312,7 +312,7 @@ void alto2_cpu_device::f1_emu_load_rmr_1()
 void alto2_cpu_device::f1_emu_load_esrb_1()
 {
 	LOG((LOG_EMU,2,"	ESRB←; BUS[12-14] (%#o)\n", m_bus));
-	m_s_reg_bank[m_task] = A2_GET32(m_bus,16,12,14);
+	m_s_reg_bank[m_task] = A2_GET16(m_bus,16,12,14);
 }
 
 /**
@@ -558,7 +558,7 @@ void alto2_cpu_device::bitblt_info()
  */
 void alto2_cpu_device::f2_load_ir_1()
 {
-	UINT16 r = (A2_BIT32(m_bus,16,0) << 3) | A2_GET32(m_bus,16,5,7);
+	UINT16 r = (A2_BIT16(m_bus,16,0) << 3) | A2_GET16(m_bus,16,5,7);
 
 	/* special logging of some opcodes */
 	switch (m_bus) {
@@ -630,7 +630,7 @@ void alto2_cpu_device::f2_idisp_1()
 		r = IR_SH(m_emu.ir) ^ 3;			/* complement of SH */
 		LOG((LOG_EMU,2,"	IDISP←; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
-		int addr = CTL2K_U3(f2_emu_idisp) + A2_GET32(m_emu.ir,16,1,7);
+		int addr = CTL2K_U3(f2_emu_idisp) + A2_GET16(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
 		LOG((LOG_EMU,2,"	IDISP←; IR (%#o) branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", m_emu.ir, addr, m_next2, r));
@@ -664,7 +664,7 @@ void alto2_cpu_device::f2_acsource_1()
 		r = IR_SH(m_emu.ir) ^ 3;			/* complement of SH */
 		LOG((LOG_EMU,2,"	←ACSOURCE; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
-		int addr = CTL2K_U3(f2_emu_acsource) + A2_GET32(m_emu.ir,16,1,7);
+		int addr = CTL2K_U3(f2_emu_acsource) + A2_GET16(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
 		LOG((LOG_EMU,2,"	←ACSOURCE; branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", addr, m_next2, r));
