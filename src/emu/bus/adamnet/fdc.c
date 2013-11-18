@@ -9,6 +9,16 @@
 
 **********************************************************************/
 
+/*
+	
+	TODO:
+
+	- 320KB DSDD 5.25"
+	- 720KB DSDD 3.5"
+	- 1.44MB DSHD 3.5"
+
+*/
+
 #include "fdc.h"
 
 
@@ -113,7 +123,7 @@ FLOPPY_FORMATS_MEMBER( adam_fdc_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( adam_fdc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
 SLOT_INTERFACE_END
 
 
@@ -128,7 +138,7 @@ static MACHINE_CONFIG_FRAGMENT( adam_fdc )
 
 	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_4MHz/4)
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525dd", adam_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -348,3 +358,12 @@ WRITE8_MEMBER( adam_fdc_device::p2_w )
 
 	m_bus->txd_w(this, BIT(data, 4));
 }
+
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( drive2 )
+//-------------------------------------------------
+
+DEVICE_INPUT_DEFAULTS_START( drive2 )
+	DEVICE_INPUT_DEFAULTS("SW3", 0x01, 0x01)
+DEVICE_INPUT_DEFAULTS_END

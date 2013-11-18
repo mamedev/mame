@@ -30,12 +30,23 @@ const char *adam_format::extensions() const
 	return "dsk";
 }
 
-// Unverified gap sizes
 const adam_format::format adam_format::formats[] = {
+	// track description
+	// 100x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 100x4e 12x00 3xf5 fe 2x00 02 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 100x4e 12x00 3xf5 fe 2x00 03 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 100x4e 12x00 3xf5 fe 2x00 04 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 100x4e 12x00 3xf5 fe 2x00 05 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 100x4e 12x00 3xf5 fe 2x00 06 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 100x4e 12x00 3xf5 fe 2x00 07 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 100x4e 12x00 3xf5 fe 2x00 08 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 859x4e
 	{   /*  160K 5 1/4 inch double density single sided */
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000,  8, 40, 1, 512, {}, 1, {}, 100, 22, 84
+		2000,  8, 40, 1, 512, {}, 1, {}, 100, 22, 100
 	},
+	
+	// Unverified gap sizes -->
 	{   /*  320K 5 1/4 inch double density */
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000,  8, 40, 2, 512, {}, 1, {}, 100, 22, 84

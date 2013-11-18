@@ -2,6 +2,42 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="adam_flop" description="Coleco Adam diskettes">
 
+	<software name="diskdoc">
+		<description>Disk Doctor v1.4</description>
+		<year>1987</year>
+		<publisher>AJM Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="52231">
+				<rom name="diskdoc.imd" size="52231" crc="33bf7050" sha1="413e091fb915c713f56004cbedc2be9dca9e12d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diskman">
+		<description>Disk Manager</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="162897">
+				<rom name="diskman1.imd" size="162897" crc="160d75a1" sha1="cb43a4c16abc24de4692038c94f7836c25fa495a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diskmana" cloneof="diskman">
+		<description>Disk Manager (Alt)</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163410">
+				<rom name="diskman2.imd" size="163410" crc="4db60438" sha1="9c1b815833726457d54c9bfc8848434cdbd2145e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bestbc">
 		<description>Best of B.C. Featuring B.C's Quest For Tires and B.C. II: Grog's Revenge</description>
 		<year>1985</year>
