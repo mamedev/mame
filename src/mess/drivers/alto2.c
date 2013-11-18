@@ -21,7 +21,7 @@ UINT32 alto2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void alto2_state::screen_eof_alto2(screen_device &screen, bool state)
 {
-	// FIXME: what do we do here?
+	// TODO: anything?
 }
 
 /* Input Ports */
@@ -205,7 +205,18 @@ static INPUT_PORTS_START( alto2 )
 	PORT_BIT(A2_KEY_FL4,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FL4") PORT_CODE(KEYCODE_F4)									//!< ADL left function key 4
 	PORT_BIT(A2_KEY_FR5,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR5") PORT_CODE(KEYCODE_F9)									//!< ADL right function key 5
 
-	PORT_START("CONFIG")    /* config diode on main board */
+	PORT_START("mouseb")	// Mouse buttons
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse RED (left)")      PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_buttons, 0 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse BLUE (right)")    PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_buttons, 0 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse YELLOW (middel)") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_buttons, 0 )
+
+	PORT_START("mousex")	// Mouse - X AXIS
+	PORT_BIT( 0xffff, 0x0000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, 0 )
+
+	PORT_START("mousey")	// Mouse - Y AXIS
+	PORT_BIT( 0xffff, 0x0000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
+
+PORT_START("CONFIG")    /* config diode on main board */
 	PORT_CONFNAME( 0x40, 0x40, "TV system")
 	PORT_CONFSETTING(    0x00, "NTSC")
 	PORT_CONFSETTING(    0x40, "PAL")

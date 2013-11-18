@@ -1,5 +1,7 @@
 #include "alto2.h"
 
+#define	MOUSE_DIRTY_HACK	0
+
 enum {
 	MX1		= (1<<0),		//!< MX1 signal is bit 0 (latch bit 1)
 	LMX1	= (1<<1),
@@ -140,22 +142,43 @@ UINT16 alto2_cpu_device::mouse_read()
 }
 
 /**
- * @brief register a mouse motion
- *
- * @param x new mouse x coordinate
- * @param y new mouse y coordinate
+ * @brief register a mouse motion in x direction
+ * @param ioport_field reference to the field
+ * @param param pointer passed in PORT_CHANGED_MEMBER last parameter
+ * @param oldval the old ioport_value
+ * @param newval the new ioport_value
  */
-void alto2_cpu_device::mouse_motion(int x, int y)
+INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 {
-	/* set new destination (absolute) mouse x and y coordinates */
-	m_mouse.dx = x;
-	m_mouse.dy = y;
-#if	1
+	// set new destination (absolute) mouse x coordinate
+	m_mouse.dx += newval - oldval;
+#if	MOUSE_DIRTY_HACK
 	/* XXX: dirty, dirty, hack */
 #if	ALTO2_HAMMING_CHECK
-	m_mem.ram[0424/2] = hamming_code(1, 0424 / 2, (x << 16) | y);
+	m_mem.ram[0424/2] = hamming_code(1, 0424 / 2, (m_mouse.dx << 16) | m_mouse.dy);
 #else
-	m_mem.ram[0424/2] = (x << 16) | y;
+	m_mem.ram[0424/2] = (m_mouse.dx << 16) | m_mouse.dy;
+#endif
+#endif
+}
+
+/**
+ * @brief register a mouse motion in y direction
+ * @param ioport_field reference to the field
+ * @param param pointer passed in PORT_CHANGED_MEMBER last parameter
+ * @param oldval the old ioport_value
+ * @param newval the new ioport_value
+ */
+INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
+{
+	// set new destination (absolute) mouse y coordinate
+	m_mouse.dy += newval - oldval;
+#if	MOUSE_DIRTY_HACK
+	/* XXX: dirty, dirty, hack */
+#if	ALTO2_HAMMING_CHECK
+	m_mem.ram[0424/2] = hamming_code(1, 0424 / 2, (m_mouse.dx << 16) | m_mouse.dy);
+#else
+	m_mem.ram[0424/2] = (m_mouse.dx << 16) | m_mouse.dy;
 #endif
 #endif
 }
@@ -165,16 +188,25 @@ void alto2_cpu_device::mouse_motion(int x, int y)
  *
  * convert button bits to UTILIN[13-15]
  *
- * @param b mouse buttons (bit 0:left 1:right 2:middle)
+ * @param ioport_field reference to the field
+ * @param param pointer passed in PORT_CHANGED_MEMBER last parameter
+ * @param oldval the old ioport_value
+ * @param newval the new ioport_value
  */
-void alto2_cpu_device::mouse_button(int b)
+INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_buttons )
 {
-	/* UTILIN[13] TOP or LEFT button (RED) */
-	PUT_MOUSE_RED   (m_hw.utilin, (b & (1 << 0)) ? 0 : 1);
-	/* UTILIN[14] BOTTOM or RIGHT button (BLUE) */
-	PUT_MOUSE_BLUE  (m_hw.utilin, (b & (1 << 1)) ? 0 : 1);
-	/* UTILIN[15] MIDDLE button (YELLOW) */
-	PUT_MOUSE_YELLOW(m_hw.utilin, (b & (1 << 2)) ? 0 : 1);
+	if (0x01 == (oldval ^ newval)) {
+		/* UTILIN[13] TOP or LEFT button (RED) */
+		PUT_MOUSE_RED   (m_hw.utilin, newval ? 0 : 1);
+	}
+	if (0x02 == (oldval ^ newval)) {
+		/* UTILIN[14] BOTTOM or RIGHT button (BLUE) */
+		PUT_MOUSE_BLUE  (m_hw.utilin, newval ? 0 : 1);
+	}
+	if (0x04 == (oldval ^ newval)) {
+		/* UTILIN[15] MIDDLE button (YELLOW) */
+		PUT_MOUSE_YELLOW(m_hw.utilin, newval ? 0 : 1);
+	}
 }
 
 

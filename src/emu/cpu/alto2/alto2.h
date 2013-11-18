@@ -230,6 +230,13 @@ public:
 	DECLARE_ADDRESS_MAP( const_map, 16 );
 	DECLARE_ADDRESS_MAP( iomem_map, 16 );
 
+	//! register a mouse motion in x direction
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_motion_x );
+	//! register a mouse motion in y direction
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_motion_y );
+	//! register a mouse button change
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_buttons );
+
 protected:
 	//! device-level override for start
 	virtual void device_start();
@@ -1388,8 +1395,6 @@ private:
 	}	m_mouse;
 
 	UINT16 mouse_read();							//!< return the mouse motion flags
-	void mouse_motion(int x, int y);				//!< register a mouse motion
-	void mouse_button(int b);						//!< register a mouse button change
 	void init_mouse();								//!< initialize the mouse context to useful values
 	void exit_mouse();								//!< deinitialize the mouse
 
