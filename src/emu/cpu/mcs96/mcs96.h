@@ -42,6 +42,10 @@
 
 class mcs96_device : public cpu_device {
 public:
+	enum {
+		EXINT_LINE = 1
+	};
+
 	mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int data_width, const char *shortname, const char *source);
 
 	UINT64 get_cycle();
@@ -69,29 +73,30 @@ protected:
 	};
 
 	enum {
-		DASM_none,          /* No parameters */
-		DASM_nop_2,         /* One ignored parameter byte */
-		DASM_rel8,          /* Relative, 8 bits */
-		DASM_rel11,         /* Relative, 11 bits */
-		DASM_rel16,         /* Relative, 16 bits */
-		DASM_rrel8,         /* Register + relative, 8 bits */
-		DASM_brrel8,        /* Bit test + register + relative, 8 bits */
-		DASM_direct_1,      /* Register-direct references, 1 operator */
-		DASM_direct_2,      /* Register-direct references, 2 operators */
-		DASM_direct_3,      /* Register-direct references, 3 operators */
-		DASM_immed_1b,      /* Immediate references to byte, 1 operator */
-		DASM_immed_2b,      /* Immediate references to byte, 2 operators */
-		DASM_immed_3b,      /* Immediate references to byte, 3 operators */
-		DASM_immed_1w,      /* Immediate references to word, 1 operator */
-		DASM_immed_2w,      /* Immediate references to word, 2 operators */
-		DASM_immed_3w,      /* Immediate references to word, 3 operators */
-		DASM_indirect_1n,   /* Indirect normal, 1 operator */
-		DASM_indirect_1,    /* Indirect, normal or auto-incrementing, 1 operator */
-		DASM_indirect_2,    /* Indirect, normal or auto-incrementing, 2 operators */
-		DASM_indirect_3,    /* Indirect, normal or auto-incrementing, 3 operators */
-		DASM_indexed_1,     /* Indexed, short or long, 1 operator */
-		DASM_indexed_2,     /* Indexed, short or long, 2 operators */
-		DASM_indexed_3,     /* Indexed, short or long, 3 operators */
+		DASM_none,              /* No parameters */
+		DASM_nop_2,             /* One ignored parameter byte */
+		DASM_rel8,              /* Relative, 8 bits */
+		DASM_rel11,             /* Relative, 11 bits */
+		DASM_rel16,             /* Relative, 16 bits */
+		DASM_rrel8,             /* Register + relative, 8 bits */
+		DASM_brrel8,            /* Bit test + register + relative, 8 bits */
+		DASM_direct_1,          /* Register-direct references, 1 operator */
+		DASM_direct_2,          /* Register-direct references, 2 operators */
+		DASM_direct_3,          /* Register-direct references, 3 operators */
+		DASM_immed_1b,          /* Immediate references to byte, 1 operator */
+		DASM_immed_2b,          /* Immediate references to byte, 2 operators */
+		DASM_immed_or_reg_2b,   /* Immediate references to byte or register, 2 operators */
+		DASM_immed_3b,          /* Immediate references to byte, 3 operators */
+		DASM_immed_1w,          /* Immediate references to word, 1 operator */
+		DASM_immed_2w,          /* Immediate references to word, 2 operators */
+		DASM_immed_3w,          /* Immediate references to word, 3 operators */
+		DASM_indirect_1n,       /* Indirect normal, 1 operator */
+		DASM_indirect_1,        /* Indirect, normal or auto-incrementing, 1 operator */
+		DASM_indirect_2,        /* Indirect, normal or auto-incrementing, 2 operators */
+		DASM_indirect_3,        /* Indirect, normal or auto-incrementing, 3 operators */
+		DASM_indexed_1,         /* Indexed, short or long, 1 operator */
+		DASM_indexed_2,         /* Indexed, short or long, 2 operators */
+		DASM_indexed_3,         /* Indexed, short or long, 3 operators */
 	};
 
 	// device-level overrides
@@ -245,15 +250,15 @@ protected:
 	O(rst_none);
 	O(scall_rel11);
 	O(setc_none);
-	O(shl_immed_2b);
-	O(shlb_immed_2b);
-	O(shll_immed_2b);
-	O(shr_immed_2b);
-	O(shra_immed_2b);
-	O(shrab_immed_2b);
-	O(shral_immed_2b);
-	O(shrb_immed_2b);
-	O(shrl_immed_2b);
+	O(shl_immed_or_reg_2b);
+	O(shlb_immed_or_reg_2b);
+	O(shll_immed_or_reg_2b);
+	O(shr_immed_or_reg_2b);
+	O(shra_immed_or_reg_2b);
+	O(shrab_immed_or_reg_2b);
+	O(shral_immed_or_reg_2b);
+	O(shrb_immed_or_reg_2b);
+	O(shrl_immed_or_reg_2b);
 	O(sjmp_rel11);
 	O(skip_immed_1b);
 	O(st_direct_2); O(st_indexed_2); O(st_indirect_2);

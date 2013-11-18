@@ -2,7 +2,8 @@ fetch
 	if(irq_requested) {
 		int level;
 		for(level = 7; level >= 0 && !(PSW & pending_irq & (1<<level)); level--);
-		pending_irq &= ~(1<<level);
+		if(level != 7)
+			pending_irq &= ~(1<<level);
 		OP1 = level;
 		TMP = reg_r16(0x18);
 		TMP -= 2;
@@ -70,6 +71,10 @@ eadr  immed_1b
 	OP1 = read_pc();
 
 eadr  immed_2b
+	OP1 = read_pc();
+	OP2 = read_pc();
+
+eadr  immed_or_reg_2b
 	OP1 = read_pc();
 	OP2 = read_pc();
 
@@ -199,8 +204,10 @@ macro post_indexed $cycles1 $cycles2
 	reg_w16(OP1, do_add(TMP, 1));
 	next(4);
 
-08    shr   immed_2b
-	OP1 &= 0x1f;
+08    shr   immed_or_reg_2b
+	if(OP1 >= 0x10) {
+		OP1 = reg_r8(OP1) & 0x1f;
+	}
 	TMP = reg_r16(OP2);
 	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
 	if(OP1 >= 2 && (TMP & (0xffff >> (OP1 <= 16 ? 17-OP1 : 0))))
@@ -215,8 +222,10 @@ macro post_indexed $cycles1 $cycles2
 	reg_w16(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
-09    shl   immed_2b
-	OP1 &= 0x1f;
+09    shl   immed_or_reg_2b
+	if(OP1 >= 0x10) {
+		OP1 = reg_r8(OP1) & 0x1f;
+	}
 	TMP = reg_r16(OP2);
 	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
 	if(OP1 >= 2 && (TMP & (0xffff << (OP1 <= 16 ? 17-OP1 : 0))))
@@ -231,8 +240,10 @@ macro post_indexed $cycles1 $cycles2
 	reg_w16(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
-0a    shra  immed_2b
-	OP1 &= 0x1f;
+0a    shra  immed_or_reg_2b
+	if(OP1 >= 0x10) {
+		OP1 = reg_r8(OP1) & 0x1f;
+	}
 	TMP = reg_r16(OP2);
 	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
 	if(OP1 >= 2 && (TMP & (0xffff >> (OP1 <= 16 ? 17-OP1 : 0))))
@@ -247,8 +258,10 @@ macro post_indexed $cycles1 $cycles2
 	reg_w16(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
-0c    shrl  immed_2b
-	OP1 &= 0x1f;
+0c    shrl  immed_or_reg_2b
+	if(OP1 >= 0x10) {
+		OP1 = reg_r8(OP1) & 0x1f;
+	}
 	OP2 &= 0xfc;
 	TMP = reg_r16(OP2);
 	TMP |= reg_r16(OP2+2) << 16;
@@ -266,8 +279,10 @@ macro post_indexed $cycles1 $cycles2
 	reg_w16(OP2+2, TMP >> 16);
 	next(OP1 ? 7+OP1 : 8);
 
-0d    shll  immed_2b
-	OP1 &= 0x1f;
+0d    shll  immed_or_reg_2b
+	if(OP1 >= 0x10) {
+		OP1 = reg_r8(OP1) & 0x1f;
+	}
 	OP2 &= 0xfc;
 	TMP = reg_r16(OP2);
 	TMP |= reg_r16(OP2+2) << 16;
@@ -285,8 +300,10 @@ macro post_indexed $cycles1 $cycles2
 	reg_w16(OP2+2, TMP >> 16);
 	next(OP1 ? 7+OP1 : 8);
 
-0e    shral immed_2b
-	OP1 &= 0x1f;
+0e    shral immed_or_reg_2b
+	if(OP1 >= 0x10) {
+		OP1 = reg_r8(OP1) & 0x1f;
+	}
 	OP2 &= 0xfc;
 	TMP = reg_r16(OP2);
 	TMP |= reg_r16(OP2+2) << 16;
@@ -351,8 +368,10 @@ macro post_indexed $cycles1 $cycles2
 	reg_w8(OP1, do_addb(TMP, 1));
 	next(4);
 
-18    shrb  immed_2b
-	OP1 &= 0x1f;
+18    shrb  immed_or_reg_2b
+	if(OP1 >= 0x10) {
+		OP1 = reg_r8(OP1) & 0x1f;
+	}
 	TMP = reg_r8(OP2);
 	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
 	if(OP1 >= 2 && (TMP & (0xff >> (OP1 <= 8 ? 9-OP1 : 0))))
@@ -367,8 +386,10 @@ macro post_indexed $cycles1 $cycles2
 	reg_w8(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
-19    shlb  immed_2b
-	OP1 &= 0x1f;
+19    shlb  immed_or_reg_2b
+	if(OP1 >= 0x10) {
+		OP1 = reg_r8(OP1) & 0x1f;
+	}
 	TMP = reg_r8(OP2);
 	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
 	if(OP1 >= 2 && (TMP & (0xff << (OP1 <= 8 ? 9-OP1 : 0))))
@@ -383,8 +404,10 @@ macro post_indexed $cycles1 $cycles2
 	reg_w8(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
-1a    shrab immed_2b
-	OP1 &= 0x1f;
+1a    shrab immed_or_reg_2b
+	if(OP1 >= 0x10) {
+		OP1 = reg_r8(OP1) & 0x1f;
+	}
 	TMP = reg_r8(OP2);
 	PSW &= ~(F_Z|F_N|F_C|F_V|F_ST);
 	if(OP1 >= 2 && (TMP & (0xff >> (OP1 <= 8 ? 9-OP1 : 0))))
@@ -1603,7 +1626,7 @@ d0    jnst  rel8
 	}
 
 d1    jnh   rel8
-	if((PSW & (F_Z|F_N)) != F_C) {
+	if((PSW & (F_C|F_N)) != F_C) {
 		PC += OP1;
 		next(8);
 	} else {
@@ -1669,7 +1692,7 @@ d8    jst   rel8
 	}
 
 d9    jh    rel8
-	if((PSW & (F_Z|F_N)) == F_C) {
+	if((PSW & (F_C|F_N)) == F_C) {
 		PC += OP1;
 		next(8);
 	} else {

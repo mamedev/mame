@@ -141,6 +141,13 @@ void mcs96_device::execute_run()
 void mcs96_device::execute_set_input(int inputnum, int state)
 {
 	switch(inputnum) {
+	case EXINT_LINE:
+		if(state)
+			pending_irq |= 0x80;
+		else
+			pending_irq &= 0x7f;
+		check_irq();
+		break;
 	}
 }
 
@@ -293,6 +300,14 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 		flags |= 3;
 		break;
 
+	case DASM_immed_or_reg_2b:
+		if(oprom[1] >= 0x10)
+			sprintf(buffer, " %s, %s", regname(oprom[2]).cstr(), regname(oprom[1]).cstr());
+		else
+			sprintf(buffer, " %s, #%02x", regname(oprom[2]).cstr(), oprom[1]);
+		flags |= 3;
+		break;
+
 	case DASM_immed_3b:
 		sprintf(buffer, " %s, %s, #%02x", regname(oprom[3]).cstr(), regname(oprom[2]).cstr(), oprom[1]);
 		flags |= 4;
@@ -366,9 +381,9 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 					sprintf(buffer, " %02x", delta);
 			} else {
 				if(delta < 0)
-					sprintf(buffer, " -%02x[%s]", -delta, regname(oprom[1]-1).cstr());
+					sprintf(buffer, " -%02x[%s]", -delta, regname(oprom[1]).cstr());
 				else
-					sprintf(buffer, " %02x[%s]", delta, regname(oprom[1]-1).cstr());
+					sprintf(buffer, " %02x[%s]", delta, regname(oprom[1]).cstr());
 			}
 			flags |= 3;
 		}
@@ -392,9 +407,9 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 					sprintf(buffer, " %s, %02x", regname(oprom[3]).cstr(), delta);
 			} else {
 				if(delta < 0)
-					sprintf(buffer, " %s, -%02x[%s]", regname(oprom[3]).cstr(), -delta, regname(oprom[1]-1).cstr());
+					sprintf(buffer, " %s, -%02x[%s]", regname(oprom[3]).cstr(), -delta, regname(oprom[1]).cstr());
 				else
-					sprintf(buffer, " %s, %02x[%s]", regname(oprom[3]).cstr(), delta, regname(oprom[1]-1).cstr());
+					sprintf(buffer, " %s, %02x[%s]", regname(oprom[3]).cstr(), delta, regname(oprom[1]).cstr());
 			}
 			flags |= 4;
 		}
@@ -418,9 +433,9 @@ offs_t mcs96_device::disasm_generic(char *buffer, offs_t pc, const UINT8 *oprom,
 					sprintf(buffer, " %s, %s, %02x", regname(oprom[4]).cstr(), regname(oprom[3]).cstr(), delta);
 			} else {
 				if(delta < 0)
-					sprintf(buffer, " %s, %s, -%02x[%s]", regname(oprom[4]).cstr(), regname(oprom[3]).cstr(), -delta, regname(oprom[1]-1).cstr());
+					sprintf(buffer, " %s, %s, -%02x[%s]", regname(oprom[4]).cstr(), regname(oprom[3]).cstr(), -delta, regname(oprom[1]).cstr());
 				else
-					sprintf(buffer, " %s, %s, %02x[%s]", regname(oprom[4]).cstr(), regname(oprom[3]).cstr(), delta, regname(oprom[1]-1).cstr());
+					sprintf(buffer, " %s, %s, %02x[%s]", regname(oprom[4]).cstr(), regname(oprom[3]).cstr(), delta, regname(oprom[1]).cstr());
 			}
 			flags |= 5;
 		}
