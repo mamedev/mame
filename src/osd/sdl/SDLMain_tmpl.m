@@ -12,7 +12,7 @@
 #import <sys/param.h> /* for MAXPATHLEN */
 #import <unistd.h>
 
-/* For some reaon, Apple removed setAppleMenu from the headers in 10.4,
+/* For some reason, Apple removed setAppleMenu from the headers in 10.4,
  but the method still is there and works. To avoid warnings, we declare
  it ourselves here. */
 @interface NSApplication(SDL_Missing_Methods)

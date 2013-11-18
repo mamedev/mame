@@ -278,7 +278,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	UINT8 pen = 0;
 	UINT8 cur_layer;
 
-	cur_layer = 0;//(m_mode & 0x3) << 16;
+	cur_layer = (m_mode & 0x3);
 
 	switch(m_mode >> 2)
 	{
@@ -295,7 +295,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						dot = m_cpu->space(AS_PROGRAM).read_byte(((offset + (bits >> 3)) & 0x1fff) + 0x4000) >> (4-(bits & 7));
 						dot&= 0xf;
 
-						//if(dot != 0xf)
+						//if(dot != 0xf || m_mode & 2)
 							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, dot);
 					}
 					bits += 4;
@@ -317,8 +317,8 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						dot&= 1;
 
 						pen = dot ? (m_color1 >> 4) : (m_color1 & 0xf);
-						//if(pen != 0xf)
-							write_byte(dstx|dsty<<8|cur_layer|m_vbank<<18, pen);
+						//if(pen != 0xf || m_mode & 2)
+							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, pen);
 					}
 					bits++;
 				}
@@ -353,8 +353,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 						}
 
 						//if(pen != 0xf)
-							write_byte(dstx|dsty<<8|cur_layer|m_vbank<<18, pen);
-
+							write_byte(dstx|dsty<<8|cur_layer<<16|m_vbank<<18, pen);
 					}
 
 					bits+=2;
@@ -494,6 +493,15 @@ UINT32 mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	int x,y;
 	UINT8 dot;
+	static UINT8 test;
+
+	if(machine().input().code_pressed_once(KEYCODE_Z))
+		test++;
+
+	if(machine().input().code_pressed_once(KEYCODE_X))
+		test--;
+
+	popmessage("%02x",test);
 
 	bitmap.fill(0x100,cliprect);
 
@@ -501,7 +509,7 @@ UINT32 mb_vcu_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		for(x=0;x<256;x++)
 		{
-			dot = read_byte((x >> 0)|(y<<8)|0<<16|(m_vbank ^ 1)<<18);
+			dot = read_byte((x >> 0)|(y<<8)|test<<16|(m_vbank ^ 1)<<18);
 			//if(dot != 0xf)
 			{
 				dot|= m_vregs[1] << 4;
