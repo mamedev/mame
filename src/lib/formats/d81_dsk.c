@@ -95,12 +95,24 @@ const char *d81_format::extensions() const
 	return "d81";
 }
 
-// Unverified gap sizes
 const d81_format::format d81_format::formats[] = {
+	// track description
+	// 32x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 35x4e 12x00 3xf5 fe 2x00 02 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 35x4e 12x00 3xf5 fe 2x00 03 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 35x4e 12x00 3xf5 fe 2x00 04 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 35x4e 12x00 3xf5 fe 2x00 05 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 35x4e 12x00 3xf5 fe 2x00 06 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 35x4e 12x00 3xf5 fe 2x00 07 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 35x4e 12x00 3xf5 fe 2x00 08 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 35x4e 12x00 3xf5 fe 2x00 09 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 35x4e 12x00 3xf5 fe 2x00 0a 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 164x4e
 	{
-	floppy_image::FF_35, floppy_image::DSDD, floppy_image::MFM,
-	2000, 10, 80, 2, 512, {}, 1, {}, 32, 22, 35
+		floppy_image::FF_35, floppy_image::DSDD, floppy_image::MFM,
+		2000, 10, 80, 2, 512, {}, 1, {}, 32, 22, 35
 	},
+
 	{}
 };
 
