@@ -610,7 +610,6 @@ ROM_START( cobra )
 	ROM_LOAD( "au0a",   0x0000, 0x2000, CRC(6aaedcf3) SHA1(52dc913eecf8a159784d500217cffd7a6d8eb45c) )
 	ROM_LOAD( "au0b",   0x4000, 0x2000, CRC(92247877) SHA1(f9bb0c20212ab13caabfb5beb9b6afc807bc9555) )
 	ROM_LOAD( "au0c",   0x8000, 0x2000, CRC(d00a2762) SHA1(84d4329b39b9fd30682b7efa5cb2744934c5ee5c) )
-
 	ROM_LOAD( "au07",   0x2000, 0x2000, CRC(d4bf12a5) SHA1(e172f69ae02ac2670b70af0cfcf3887dd99c2761) )
 	ROM_LOAD( "au08",   0x6000, 0x2000, CRC(63158274) SHA1(c728e8ba0a11ea67cf508877ad74a3aab9ef26fc) )
 	ROM_LOAD( "au09",   0xa000, 0x2000, CRC(74e93394) SHA1(7a1470cf2008b1bef8d950939b758707297b3655) )
@@ -619,8 +618,41 @@ ROM_START( cobra )
 	DISK_IMAGE_READONLY( "cobra", 0, SHA1(8390498294aca97a5d1769032e7b115d1a42f5d3) )
 ROM_END
 
+ROM_START( cobraa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bd03-a4.bin",      0x8000, 0x2000, CRC(f1b9df77) SHA1(7fcc613463441f69e4336c12252a616508c296d1) )
+	ROM_LOAD( "bd02-a3.bin",      0xa000, 0x2000, CRC(3d802707) SHA1(89033b2f9b295b74b6b5034c837509377f5aba62) )
+	ROM_LOAD( "bd01-a2.bin",      0xc000, 0x2000, CRC(1b4db507) SHA1(c58021cb7dcbcb159d9bb24d231755b3d07aa74a) )
+	ROM_LOAD( "bd000-1-a1.bin",   0xe000, 0x2000, CRC(8d9ad777) SHA1(10914251350988a82c0cfa1dc6e22587b885cc71) )
+	ROM_COPY( "maincpu",          0x8000, 0x4000, 0x4000 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "bd07-b11.bin",   0xe000, 0x2000, CRC(584d714a) SHA1(e3df3c42367d879c5f12db78d2797049ba18e6f8) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_LOAD( "bd04-.a10",     0x0000, 0x2000, CRC(33013cc2) SHA1(380ca35a891805e2aa1d35000a3770483aaedbfc) )
+	ROM_LOAD( "bd06-a8.bin",   0x4000, 0x2000, CRC(b1340125) SHA1(eef325c56d3a441432c7d31ea1dadfaa0c871c10) )
+	ROM_LOAD( "bd05-a9.bin",   0x8000, 0x2000, CRC(98412178) SHA1(20e93f377a0d572a6752d7435aa4d0a3feec0e92) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "cobra", 0, SHA1(8390498294aca97a5d1769032e7b115d1a42f5d3) ) // might be wrong for this set
+
+	ROM_REGION( 0x40000, "misc", 0 )
+	ROM_LOAD( "lp4-1.pal16l8cn.bin",        0x0000, 0x40000, CRC(4aeb2c7e) SHA1(3c962656cffc8d927047c64a15afccab767d776f) ) // dumped with cgfm's tool
+	ROM_LOAD( "lp4-1.pal16l8cn.pld",        0x0000, 0x00f71, CRC(ac1f1177) SHA1(ab721a840207354916c96e0ae83220fed12c6352) )
+//	ROM_LOAD( "lp4-2-pal10l8.d6.jed",       0x0000, 0x00249, CRC(309b3ce5) SHA1(04f185911d33730004c7cd44a693dd1b69b82032) )
+	ROM_LOAD( "lp4-2-pal10l8.d6.bin",       0x0000, 0x0002c, CRC(e594fd13) SHA1(4bb8a9b7cf8f8eaa3c9f290b6e5085a10c927e20) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "vd0-c.h15",        0x0000, 0x00020, CRC(02c27aa0) SHA1(e7b814aabbfbcd992f78254b29b6ab6fa8115429) )
+	ROM_LOAD( "vd0-t.f6",         0x0000, 0x00020, CRC(78449942) SHA1(584e25f7bffccd943c4db1edf05552f7989e08a4) )
+ROM_END
+
+
+
 GAME( 1983, begas,  0,       rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", GAME_NOT_WORKING )
 GAME( 1983, begas1, begas,   rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", GAME_NOT_WORKING )
-GAME( 1984, cobra,  0,       rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD)", GAME_NOT_WORKING )
+GAME( 1984, cobra,  0,       rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", GAME_NOT_WORKING )
+GAME( 1984, cobraa, cobra,   rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", GAME_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
 GAME( 1985, rblaster,  0,    rblaster,  rblaster, driver_device,  0, ROT0, "Data East", "Road Blaster (Data East LD)", GAME_NOT_WORKING )
