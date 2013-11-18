@@ -979,7 +979,7 @@ void diablo_hd_device::select(int unit, int head)
 		LOG_DRIVE((0,"[DHD%u]	select unit:%d head:%d\n", m_unit, unit, head));
 	}
 
-	if (m_image) {
+	if (m_disk) {
 		m_ready_0 = 0;					// it is ready
 		m_s_r_w_0 = 0;					// and can take seek/read/write commands
 		m_addx_acknowledge_0 = 0;		// assert address acknowledge (?)
