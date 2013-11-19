@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 //! f1_mrt_block early: block the display word task
 void alto2_cpu_device::f1_mrt_block_0()

@@ -19,11 +19,6 @@ UINT32 alto2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-void alto2_state::screen_eof_alto2(screen_device &screen, bool state)
-{
-	// TODO: anything?
-}
-
 /* Input Ports */
 
 /** @brief make an Alto key int from 1 << bit */
@@ -211,10 +206,10 @@ static INPUT_PORTS_START( alto2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse YELLOW (middel)") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_buttons, 0 )
 
 	PORT_START("mousex")	// Mouse - X AXIS
-	PORT_BIT( 0xffff, 0x0000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, 0 )
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(2) PORT_PLAYER(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, 0 )
 
 	PORT_START("mousey")	// Mouse - Y AXIS
-	PORT_BIT( 0xffff, 0x0000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(2) PORT_PLAYER(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
 
 PORT_START("CONFIG")    /* config diode on main board */
 	PORT_CONFNAME( 0x40, 0x40, "TV system")
@@ -224,9 +219,9 @@ INPUT_PORTS_END
 
 /* ROM */
 ROM_START( alto2 )
-	// dummy region for the maincpu
-	ROM_REGION( 1, "maincpu", 0 )
-	ROM_FILL(0, 1, ALTO2_UCODE_INVERTED)
+	// dummy region for the maincpu - this is not used in any way
+	ROM_REGION( 0400, "maincpu", 0 )
+	ROM_FILL(0, 0400, ALTO2_UCODE_INVERTED)
 ROM_END
 
 //**************************************************************************
@@ -269,7 +264,7 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 						   ALTO2_DISPLAY_TOTAL_WIDTH,   0, ALTO2_DISPLAY_WIDTH,
 						   ALTO2_DISPLAY_TOTAL_HEIGHT,  0, ALTO2_DISPLAY_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(alto2_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
+//	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
 
 	MCFG_PALETTE_LENGTH(2)
 
@@ -289,4 +284,4 @@ DRIVER_INIT_MEMBER( alto2_state, alto2 )
 /* Game Drivers */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME   FLAGS
-COMP( 1974, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1974, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", GAME_NO_SOUND )

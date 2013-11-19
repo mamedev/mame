@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 /**
  * @brief f1_dvt_block early: disable the display word task

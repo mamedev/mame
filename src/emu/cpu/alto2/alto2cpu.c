@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 #include "a2roms.h"
 
 #define	DEBUG_UCODE_CONST_DATA	0	//!< define to 1 to dump decoded micro code and constants
@@ -98,7 +98,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_icount(0),
 	m_task_mpc(),
 	m_task_next2(),
-	m_ntime(),
+	m_pico_time(),
 	m_task(0),
 	m_next_task(0),
 	m_next2_task(0),
@@ -1006,7 +1006,7 @@ void alto2_cpu_device::device_start()
 #endif
 	save_item(NAME(m_task_mpc));
 	save_item(NAME(m_task_next2));
-	save_item(NAME(m_ntime));
+	save_item(NAME(m_pico_time));
 	save_item(NAME(m_task));
 	save_item(NAME(m_next_task));
 	save_item(NAME(m_next2_task));
@@ -2612,7 +2612,7 @@ void alto2_cpu_device::execute_run()
 		 */
 		m_dsp_time -= ALTO2_UCYCLE;
 		if (m_dsp_time < 0) {
-			m_dsp_state = display_state_machine(m_dsp_state);
+			display_state_machine();
 			m_dsp_time += ALTO2_DISPLAY_BITTIME(24);
 		}
 		if (m_unload_time >= 0) {
@@ -2623,9 +2623,8 @@ void alto2_cpu_device::execute_run()
 			 * the unloading by leaving m_unload_time at -1.
 			 */
 			m_unload_time -= ALTO2_UCYCLE;
-			if (m_unload_time < 0) {
-				m_unload_word = unload_word(m_unload_word);
-			}
+			if (m_unload_time < 0)
+				unload_word();
 		}
 #if	(USE_BITCLK_TIMER == 0)
 		if (m_bitclk_time >= 0) {
@@ -2642,7 +2641,7 @@ void alto2_cpu_device::execute_run()
 
 		m_cycle++;
 		/* nano seconds per cycle */
-		m_ntime[m_task] += ALTO2_UCYCLE;
+		m_pico_time[m_task] += ALTO2_UCYCLE;
 
 		/* next instruction's mpc */
 		m_mpc = m_next;

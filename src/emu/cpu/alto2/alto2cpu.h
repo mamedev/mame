@@ -35,7 +35,7 @@
 #define	ALTO2_BUSSRC	8			//!< 8 bus sources
 #define	ALTO2_F1MAX		16			//!< 16 F1 functions
 #define	ALTO2_F2MAX		16			//!< 16 F2 functions
-#define	ALTO2_UCYCLE	169			//!< time in nano seconds for a CPU micro cycle: 29.4912MHz/5 -> 5.898240Hz ~= 169.542ns/clock
+#define	ALTO2_UCYCLE	169542		//!< time in pico seconds for a CPU micro cycle: 29.4912MHz/5 -> 5.898240Hz ~= 169.542ns/clock
 
 #define	ALTO2_ETHER_FIFO_SIZE	16
 
@@ -142,17 +142,17 @@
 #define	ALTO2_DISPLAY_TOTAL_WIDTH 768
 
 
-#define	ALTO2_DISPLAY_SCANLINE_WORDS (ALTO2_DISPLAY_TOTAL_WIDTH/16)		//!< words per scanline
-#define	ALTO2_DISPLAY_HEIGHT 808										//!< number of visible scanlines per frame; 808 really, but there are some empty lines?
-#define	ALTO2_DISPLAY_WIDTH 606											//!< visible width of the display; 38 words - 2 pixels
-#define	ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)		//!< visible words per scanline
-#define	ALTO2_DISPLAY_BITCLOCK 20160000ll								//!< display bit clock in in Hertz (20.16MHz)
-#define	ALTO2_DISPLAY_BITTIME(n) ((n)*U64(1000000000)/ALTO2_DISPLAY_BITCLOCK)	//!< display bit time in in atto seconds (~= 49.6031ns)
-#define	ALTO2_DISPLAY_SCANLINE_TIME	ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)	//!< time for a scanline in nano seconds (768 * 49.6031ns)
-#define	ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)	//!< time of the visible part of a scanline (606 * 49.6031ns)
-#define	ALTO2_DISPLAY_WORD_TIME	ALTO2_DISPLAY_BITTIME(16)				//!< time for a word (16 pixels * 49.6031ns)
+#define	ALTO2_DISPLAY_FIFO 16														//!< the display fifo has 16 words
+#define	ALTO2_DISPLAY_SCANLINE_WORDS (ALTO2_DISPLAY_TOTAL_WIDTH/16)         		//!< words per scanline
+#define	ALTO2_DISPLAY_HEIGHT 808                                                    //!< number of visible scanlines per frame; 808 really, but there are some empty lines?
+#define	ALTO2_DISPLAY_WIDTH 606                                                     //!< visible width of the display; 38 words - 2 pixels
+#define	ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)                   //!< visible words per scanline
+#define	ALTO2_DISPLAY_BITCLOCK 20160000ll                                           //!< display bit clock in in Hertz (20.16MHz)
+#define	ALTO2_DISPLAY_BITTIME(n) (U64(1000000000000)*(n)/ALTO2_DISPLAY_BITCLOCK)	//!< display bit time in in pico seconds (~= 49.6031ns)
+#define	ALTO2_DISPLAY_SCANLINE_TIME	ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)//!< time for a scanline in pico seconds (768 * 49.6031ns)
+#define	ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)		//!< time of the visible part of a scanline in pico seconds (606 * 49.6031ns)
+#define	ALTO2_DISPLAY_WORD_TIME	ALTO2_DISPLAY_BITTIME(16)							//!< time for a word in pico seconds (16 pixels * 49.6031ns)
 #define	ALTO2_DISPLAY_VBLANK_TIME ((ALTO2_DISPLAY_TOTAL_HEIGHT-ALTO2_DISPLAY_HEIGHT)*HZ_TO_ATTOSECONDS(26250))
-#define	ALTO2_DISPLAY_FIFO 16											//!< the display fifo has 16 words
 
 enum {
 	// micro code task, micro program counter, next and next2
@@ -344,7 +344,7 @@ private:
 
 	int m_icount;
 
-	static const UINT8 m_ether_id = 0377;
+	static const UINT8 m_ether_id = 0241;
 
 	typedef void (alto2_cpu_device::*a2func)();
 	typedef void (alto2_cpu_device::*a2cb)(int unit);
@@ -786,7 +786,7 @@ private:
 
 	UINT16 m_task_mpc[ALTO2_TASKS];					//!< per task micro program counter
 	UINT16 m_task_next2[ALTO2_TASKS];				//!< per task address modifier
-	attoseconds_t m_ntime[ALTO2_TASKS];				//!< per task atto seconds executed
+	attoseconds_t m_pico_time[ALTO2_TASKS];				//!< per task atto seconds executed
 	UINT8 m_task;									//!< active task
 	UINT8 m_next_task;								//!< next micro instruction's task
 	UINT8 m_next2_task;								//!< next but one micro instruction's task
@@ -826,7 +826,7 @@ private:
 	bool m_ether_enable;							//!< set to true, if the ethernet should be simulated
 	bool m_ewfct;									//!< set by Ether task when it want's a wakeup at switch to task_mrt
 	int m_dsp_time;									//!< display_state_machine() time accu
-	UINT8 m_dsp_state;								//!< display_state_machine() previous state
+	int m_dsp_state;								//!< display_state_machine() previous state
 	int m_unload_time;								//!< unload word time accu
 	int m_unload_word;								//!< unload word number
 	int	m_bitclk_time;								//!< bitclk call time accu
@@ -1075,7 +1075,7 @@ private:
 	UINT64 m_cycle;									//!< number of cycles executed in the current slice
 
 	UINT64 cycle() { return m_cycle; }				//!< return the current CPU cycle
-	UINT64 ntime() { return m_cycle*ALTO2_UCYCLE; }	//!< return the current nano seconds
+	UINT64 ntime() { return m_cycle*ALTO2_UCYCLE/1000; }	//!< return the current nano seconds
 
 	void hard_reset();								//!< reset the various registers
 	int soft_reset();								//!< soft reset
@@ -1722,7 +1722,7 @@ private:
 	void update_bitmap_word(int x, int y, UINT16 word);
 
 	//! unload the next word from the display FIFO and shift it to the screen
-	int unload_word(int x);
+	void unload_word();
 
 	/**
 	 * @brief function called by the CPU to enter the next display state
@@ -1732,7 +1732,7 @@ private:
 	 * @param arg the current m_disp_a63 PROM address
 	 * @return next state of the display state machine
 	 */
-	UINT8 display_state_machine(UINT8 arg);
+	void display_state_machine();
 
 	//! branch on the evenfield flip-flop
 	void f2_evenfield_1(void);

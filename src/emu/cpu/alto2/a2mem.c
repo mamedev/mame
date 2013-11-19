@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 #define	PUT_EVEN(dword,word)			A2_PUT32(dword,32, 0,15,word)
 #define	GET_EVEN(dword)					A2_GET32(dword,32, 0,15)

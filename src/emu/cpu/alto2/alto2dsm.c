@@ -5,7 +5,7 @@
  *
  *   Licenses: MAME, GPLv2
  **********************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 #define	loc_DASTART		0000420	// display list header
 #define	loc_DVIBITS		0000421	// display vertical field interrupt bitword

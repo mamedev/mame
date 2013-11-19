@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 /** @brief the ethernet ID of this machine */
 UINT8 ether_id = 254;

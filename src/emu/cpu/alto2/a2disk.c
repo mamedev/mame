@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 
 #define	JKFF_FUNCTION	0	//!< define 1 to debug the JK flip-flops, 0 to use a lookup table
@@ -2264,8 +2264,10 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	}
 #else
 	if (++arg < dhd->bits_per_sector()) {
-		if (!m_dsk.bitclk_time)
-			m_dsk.bitclk_time = static_cast<int>(dhd->bit_time().as_double() * ATTOSECONDS_PER_NANOSECOND);
+		if (!m_dsk.bitclk_time) {
+			// get bit time in pico seconds
+			m_dsk.bitclk_time = static_cast<int>(dhd->bit_time().as_attoseconds() / 1000000);
+		}
 		m_bitclk_time += m_dsk.bitclk_time;
 		m_bitclk_index = arg;
 	} else {
@@ -2373,11 +2375,10 @@ void alto2_cpu_device::init_disk()
 	m_dsk.strobon_timer->reset();
 
 	m_dsk.seclate_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_seclate),this));
-//	m_dsk.seclate_timer->adjust(attotime::from_nsec(TW_SECLATE), 1);
 	m_dsk.seclate_timer->reset();
 
 	m_dsk.ok_to_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ok_to_run),this));
-	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(35 * ALTO2_UCYCLE), 1);
+	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(35 * ALTO2_UCYCLE / 1000), 1);
 
 	m_dsk.ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ready_mf31a),this));
 	m_dsk.ready_timer->reset();

@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 /** @brief CTL2K_U3 address line for F2 function */
 #define	CTL2K_U3(f2) (f2 == f2_emu_idisp ? 0x80 : 0x00)

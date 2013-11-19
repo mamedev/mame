@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 /**
  * @brief PROM a38 contains the STOPWAKE' and MBEMBPTY' signals for the FIFO
@@ -252,8 +252,9 @@ void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 /**
  * @brief unload the next word from the display FIFO and shift it to the screen
  */
-int alto2_cpu_device::unload_word(int x)
+void alto2_cpu_device::unload_word()
 {
+	int x = m_unload_word;
 	int y = ((m_dsp.hlc - m_dsp.vblank) & ~(1024|1)) + HLC1024;
 	UINT16* scanline = m_dsp.scanline[y];
 
@@ -308,11 +309,10 @@ int alto2_cpu_device::unload_word(int x)
 	}
 	if (x < ALTO2_DISPLAY_VISIBLE_WORDS) {
 		m_unload_time += ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
-		return x;
+		m_unload_word = x;
+	} else {
+		m_unload_time = -1;
 	}
-
-	m_unload_time = -1;
-	return -1;
 }
 
 
@@ -324,14 +324,14 @@ int alto2_cpu_device::unload_word(int x)
  * @param arg the current displ_a63 PROM address
  * @result returns the next state of the display state machine
  */
-UINT8 alto2_cpu_device::display_state_machine(UINT8 arg)
+void alto2_cpu_device::display_state_machine()
 {
-	LOG((LOG_DISPL,5,"DSP%03o:", arg));
-	if (020 == arg) {
+	LOG((LOG_DISPL,5,"DSP%03o:", m_dsp_state));
+	if (020 == m_dsp_state) {
 		LOG((LOG_DISPL,2," HLC=%d", m_dsp.hlc));
 	}
 
-	UINT8 a63 = m_disp_a63[arg];
+	UINT8 a63 = m_disp_a63[m_dsp_state];
 	if (A63_HLCGATE_HI(a63)) {
 		/* reset or count horizontal line counters */
 		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END)
@@ -467,8 +467,7 @@ UINT8 alto2_cpu_device::display_state_machine(UINT8 arg)
 
 	m_dsp.a63 = a63;
 	m_dsp.a66 = a66;
-
-	return next;
+	m_dsp_state = next;
 }
 
 /**

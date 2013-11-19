@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 //! called by the CPU when the parity task becomes active
 void alto2_cpu_device::activate_part()

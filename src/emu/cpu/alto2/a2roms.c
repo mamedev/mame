@@ -1,4 +1,13 @@
-#include "alto2.h"
+/*****************************************************************************
+ *
+ *   Portable Xerox AltoII PROM loading and decoding
+ *
+ *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *
+ *   Licenses: MAME, GPLv2
+ *
+ *****************************************************************************/
+#include "alto2cpu.h"
 #include "a2roms.h"
 
 #define	DEBUG_PROM_LOAD		0	//!< define to 1 to dump PROMs after loading

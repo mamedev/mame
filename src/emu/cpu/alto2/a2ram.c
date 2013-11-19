@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 /**
  * @brief bs_read_sreg early: drive bus by S register or M (MYL), if rsel is = 0

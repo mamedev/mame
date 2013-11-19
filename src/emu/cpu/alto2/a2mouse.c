@@ -1,4 +1,13 @@
-#include "alto2.h"
+/*****************************************************************************
+ *
+ *   Portable Xerox AltoII mouse interface
+ *
+ *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *
+ *   Licenses: MAME, GPLv2
+ *
+ *****************************************************************************/
+#include "alto2cpu.h"
 
 #define	MOUSE_DIRTY_HACK	0
 
@@ -151,7 +160,11 @@ UINT16 alto2_cpu_device::mouse_read()
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 {
 	// set new destination (absolute) mouse x coordinate
-	m_mouse.dx = newval;
+	m_mouse.dx += newval - oldval;
+	if (m_mouse.dx < 0)
+		m_mouse.dx = 0;
+	if (m_mouse.dx > 605)
+		m_mouse.dx = 605;
 #if	MOUSE_DIRTY_HACK
 	/* XXX: dirty, dirty, hack */
 #if	ALTO2_HAMMING_CHECK
@@ -172,7 +185,11 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
 {
 	// set new destination (absolute) mouse y coordinate
-	m_mouse.dy = newval;
+	m_mouse.dy += newval - oldval;
+	if (m_mouse.dy < 0)
+		m_mouse.dy = 0;
+	if (m_mouse.dy > 807)
+		m_mouse.dy = 807;
 #if	MOUSE_DIRTY_HACK
 	/* XXX: dirty, dirty, hack */
 #if	ALTO2_HAMMING_CHECK

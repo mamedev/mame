@@ -7,7 +7,7 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#include "alto2.h"
+#include "alto2cpu.h"
 
 //! f1_kwd_block early: block the disk word task
 void alto2_cpu_device::f1_kwd_block_0()
