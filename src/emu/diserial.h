@@ -7,6 +7,13 @@
 #ifndef __DISERIAL_H__
 #define __DISERIAL_H__
 
+// Windows headers are crap, let me count the ways
+#undef PARITY_NONE
+#undef PARITY_ODD
+#undef PARITY_EVEN
+#undef PARITY_MARK
+#undef PARITY_SPACE
+
 // ======================> device_serial_interface
 class device_serial_interface : public device_interface
 {
