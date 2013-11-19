@@ -216,22 +216,6 @@ WRITE_LINE_MEMBER(capbowl_state::firqhandler)
 
 /*************************************
  *
- *  NVRAM
- *
- *************************************/
-
-void capbowl_state::init_nvram(nvram_device &nvram, void *base, size_t size)
-{
-	/* invalidate nvram to make the game initialize it.
-	  A 0xff fill will cause the game to malfunction, so we use a
-	  0x01 fill which seems OK */
-	memset(base, 0x01, size);
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -243,7 +227,7 @@ static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w)    /* + watchdog */
+	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w) AM_READNOP   /* + watchdog */
 	AM_RANGE(0x7000, 0x7000) AM_READ(track_0_r)         /* + other inputs */
 	AM_RANGE(0x7800, 0x7800) AM_READ(track_1_r)         /* + other inputs */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -256,7 +240,7 @@ static ADDRESS_MAP_START( bowlrama_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w)    /* + watchdog */
+	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w) AM_READNOP    /* + watchdog */
 	AM_RANGE(0x7000, 0x7000) AM_READ(track_0_r)         /* + other inputs */
 	AM_RANGE(0x7800, 0x7800) AM_READ(track_1_r)         /* + other inputs */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -384,11 +368,12 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(capbowl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  capbowl_interrupt)
+	MCFG_WATCHDOG_VBLANK_INIT(8) // Unverified
 
 	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", capbowl_state, init_nvram)
+	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 

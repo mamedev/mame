@@ -22,8 +22,6 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_tms34061(*this, "tms34061") { }
 
-	void init_nvram(nvram_device &nvram, void *base, size_t size);
-
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_rowaddress;
 
