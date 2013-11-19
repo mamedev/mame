@@ -1642,7 +1642,7 @@ void alto2_cpu_device::disk_block(int task)
  *     BUS[13]    CHSEMERROR (FF 44b output Q' inverted)
  * </PRE>
  */
-void alto2_cpu_device::bs_read_kstat_0()
+void alto2_cpu_device::bs_early_read_kstat()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	UINT16 r;
@@ -1689,7 +1689,7 @@ void alto2_cpu_device::bs_read_kstat_0()
  * 15 bits, and the current read data bit is the least significant
  * bit. This is handled in kwd_timing.
  */
-void alto2_cpu_device::bs_read_kdata_0()
+void alto2_cpu_device::bs_early_read_kdata()
 {
 	UINT16 r;
 	/* get the current word from the drive */
@@ -1705,7 +1705,7 @@ void alto2_cpu_device::bs_read_kdata_0()
  * been loaded previously, and the SENDADR bit of the KCOM
  * register previously set to 1.
  */
-void alto2_cpu_device::f1_strobe_1()
+void alto2_cpu_device::f1_late_strobe()
 {
 	if (GET_KCOM_SENDADR(m_dsk.kcom)) {
 		LOG((LOG_DISK,1,"	STROBE (SENDADR:1)\n"));
@@ -1729,7 +1729,7 @@ void alto2_cpu_device::f1_strobe_1()
  *
  * NB: The 4 bits are just software, not changed by hardware
  */
-void alto2_cpu_device::f1_load_kstat_1()
+void alto2_cpu_device::f1_late_load_kstat()
 {
 	LOG((LOG_DISK,1,"	KSTAT←; BUS[12-15] %#o\n", m_bus));
 	LOG((LOG_DISK,2,"		IDLE       : %d\n", GET_KSTAT_IDLE(m_bus)));
@@ -1770,7 +1770,7 @@ void alto2_cpu_device::f1_load_kstat_1()
  *
  * KDATA is loaded from BUS.
  */
-void alto2_cpu_device::f1_load_kdata_1()
+void alto2_cpu_device::f1_late_load_kdata()
 {
 	m_dsk.dataout = m_bus;
 	if (GET_KCOM_SENDADR(m_dsk.kcom)) {
@@ -1843,7 +1843,7 @@ void alto2_cpu_device::f1_load_kdata_1()
  * [ 6th        1           1         (none) 1 = check ]
  * </PRE>
  */
-void alto2_cpu_device::f1_increcno_1()
+void alto2_cpu_device::f1_late_increcno()
 {
 	switch (m_dsk.krecno) {
 	case RECNO_HEADER:
@@ -1878,7 +1878,7 @@ void alto2_cpu_device::f1_increcno_1()
  *
  * NB: IDLE (KSTAT[12]) and COMPLETION (KSTAT[14-15]) are not cleared
  */
-void alto2_cpu_device::f1_clrstat_1()
+void alto2_cpu_device::f1_late_clrstat()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	UINT8 s0, s1;
@@ -1984,7 +1984,7 @@ void alto2_cpu_device::f1_clrstat_1()
  *      SENDADR = 0 inhibits such signalling.
  * </PRE>
  */
-void alto2_cpu_device::f1_load_kcom_1()
+void alto2_cpu_device::f1_late_load_kcom()
 {
 	m_dsk.kcom = m_bus;
 	LOG((LOG_DISK,2,"	KCOM←; BUS %06o\n", m_dsk.kcom));
@@ -2005,7 +2005,7 @@ void alto2_cpu_device::f1_load_kcom_1()
  *
  * NB: the record numer RECNO(0) and RECNO(1) is reset to 0
  */
-void alto2_cpu_device::f1_load_kadr_1()
+void alto2_cpu_device::f1_late_load_kadr()
 {
 	int unit, head;
 
@@ -2045,7 +2045,7 @@ void alto2_cpu_device::f1_load_kadr_1()
  *
  * NEXT ← NEXT OR (WDTASKACT && WDINIT ? 037 : 0)
  */
-void alto2_cpu_device::f2_init_1()
+void alto2_cpu_device::f2_late_init()
 {
 	// INIT = current task == KWD and WDINIT
 	UINT16 r = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
@@ -2076,7 +2076,7 @@ void alto2_cpu_device::f2_init_1()
  *  1  1  |  3
  * </PRE>
  */
-void alto2_cpu_device::f2_rwc_1()
+void alto2_cpu_device::f2_late_rwc()
 {
 	static UINT16 branch_map[4] = {0,2,3,3};
 	UINT16 r = branch_map[m_dsk.krwc];;
@@ -2119,7 +2119,7 @@ void alto2_cpu_device::f2_rwc_1()
  * </PRE>
  * NB: The map isn't needed, because m_dsk.krecno counts exactly this way.
  */
-void alto2_cpu_device::f2_recno_1()
+void alto2_cpu_device::f2_late_recno()
 {
 	UINT16 r = m_dsk.krecno;
 	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
@@ -2133,7 +2133,7 @@ void alto2_cpu_device::f2_recno_1()
  *
  * NEXT ← NEXT OR (if current command wants data transfer ? 1 : 0)
  */
-void alto2_cpu_device::f2_xfrdat_1()
+void alto2_cpu_device::f2_late_xfrdat()
 {
 	UINT16 r = GET_KADR_NOXFER(m_dsk.kadr) ? 0 : 1;
 	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
@@ -2147,7 +2147,7 @@ void alto2_cpu_device::f2_xfrdat_1()
  *
  * NEXT ← NEXT OR (if disk not ready to accept command ? 1 : 0)
  */
-void alto2_cpu_device::f2_swrnrdy_1()
+void alto2_cpu_device::f2_late_swrnrdy()
 {
 	diablo_hd_device* dhd = m_drive[m_dsk.drive];
 	UINT16 r = dhd->get_seek_read_write_0();
@@ -2163,7 +2163,7 @@ void alto2_cpu_device::f2_swrnrdy_1()
  *
  * NEXT ← NEXT OR (if fatal error in latches ? 0 : 1)
  */
-void alto2_cpu_device::f2_nfer_1()
+void alto2_cpu_device::f2_late_nfer()
 {
 	UINT16 r = m_dsk.kfer ? 0 : 1;
 	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
@@ -2192,7 +2192,7 @@ void alto2_cpu_device::f2_nfer_1()
  * Rt = 20k, Cext = 0.01µF (=10000pF) => 57960ns (~= 58µs)
  * </PRE>
  */
-void alto2_cpu_device::f2_strobon_1()
+void alto2_cpu_device::f2_late_strobon()
 {
 	UINT16 r = m_dsk.strobe;
 	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;

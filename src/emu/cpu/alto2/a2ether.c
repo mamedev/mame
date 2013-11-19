@@ -436,7 +436,7 @@ void alto2_cpu_device::eth_startf()
  * Gates the contents of the FIFO to BUS[0-15], and increments
  * the read pointer at the end of the cycle.
  */
-void alto2_cpu_device::bs_eidfct_0()
+void alto2_cpu_device::bs_early_eidfct()
 {
 	UINT16 r = m_eth.fifo[m_eth.fifo_rd];
 
@@ -451,7 +451,7 @@ void alto2_cpu_device::bs_eidfct_0()
 /**
  * @brief f1_eth_block early: block the Ether task
  */
-void alto2_cpu_device::f1_eth_block_0()
+void alto2_cpu_device::f1_early_eth_block()
 {
 	LOG((LOG_ETH,2,"	BLOCK %s\n", task_name(m_task)));
 	m_task_wakeup &= ~(1 << task_ether);
@@ -463,7 +463,7 @@ void alto2_cpu_device::f1_eth_block_0()
  * Gates the contents of the FIFO to BUS[0-15], but does not
  * increment the read pointer;
  */
-void alto2_cpu_device::f1_eilfct_0()
+void alto2_cpu_device::f1_early_eilfct()
 {
 	UINT16 r = m_eth.fifo[m_eth.fifo_rd];
 	LOG((LOG_ETH,3, "	←EILFCT; %06o at FIFO[%02o]\n", r, m_eth.fifo_rd));
@@ -483,7 +483,7 @@ void alto2_cpu_device::f1_eilfct_0()
  * ;(LOW TRUE) to Bus [10:15], reset interface.
  *
  */
-void alto2_cpu_device::f1_epfct_0()
+void alto2_cpu_device::f1_early_epfct()
 {
 	UINT16 r = ~A2_GET16(m_eth.status,16,10,15) & 0177777;
 
@@ -502,7 +502,7 @@ void alto2_cpu_device::f1_epfct_0()
  * This function must be issued in the instruction after a TASK.
  * The resulting wakeup is cleared when the Ether task next runs.
  */
-void alto2_cpu_device::f1_ewfct_1()
+void alto2_cpu_device::f1_late_ewfct()
 {
 	/*
 	 * Set a flag in the CPU to handle the next task switch
@@ -517,7 +517,7 @@ void alto2_cpu_device::f1_ewfct_1()
  * Loads the FIFO from BUS[0-15], then increments the write
  * pointer at the end of the cycle.
  */
-void alto2_cpu_device::f2_eodfct_1()
+void alto2_cpu_device::f2_late_eodfct()
 {
 	LOG((LOG_ETH,3, "	EODFCT←; push %06o into FIFO[%02o]\n", m_bus, m_eth.fifo_wr));
 
@@ -543,7 +543,7 @@ void alto2_cpu_device::f2_eodfct_1()
  * or EEFCT has been issued, the interface will wait for silence
  * on the Ether and begin transmitting.
  */
-void alto2_cpu_device::f2_eosfct_1()
+void alto2_cpu_device::f2_late_eosfct()
 {
 	LOG((LOG_ETH,3, "	EOSFCT\n"));
 	PUT_ETH_WLF(m_eth.status, 0);
@@ -561,7 +561,7 @@ void alto2_cpu_device::f2_eosfct_1()
  * causing the Ethernet task to wakeup, dispatch on them and then
  * reset them with EPFCT.
  */
-void alto2_cpu_device::f2_erbfct_1()
+void alto2_cpu_device::f2_late_erbfct()
 {
 	UINT16 r = 0;
 	A2_PUT16(r,10,6,6,GET_ETH_ICMD(m_eth.status));
@@ -578,7 +578,7 @@ void alto2_cpu_device::f2_erbfct_1()
  * has been transferred to the FIFO. EEFCT disables further data
  * wakeups.
  */
-void alto2_cpu_device::f2_eefct_1()
+void alto2_cpu_device::f2_late_eefct()
 {
 	/* start transmitting the packet */
 	PUT_ETH_OBUSY(m_eth.status, 1);
@@ -599,7 +599,7 @@ void alto2_cpu_device::f2_eefct_1()
  * with AC0[14-15] non-zero is issued, or if the transmitter or
  * receiver is gone. ORs a 1 into NEXT[6] if a collision is detected.
  */
-void alto2_cpu_device::f2_ebfct_1()
+void alto2_cpu_device::f2_late_ebfct()
 {
 	UINT16 r = 0;
 	A2_PUT16(r,10,6,6, GET_ETH_COLL(m_eth.status));
@@ -617,7 +617,7 @@ void alto2_cpu_device::f2_ebfct_1()
  *
  * ORs a one into NEXT[7] if the FIFO is not empty.
  */
-void alto2_cpu_device::f2_ecbfct_1()
+void alto2_cpu_device::f2_late_ecbfct()
 {
 	UINT16 r = 0;
 	/* TODO: the BE' (buffer empty) signal is output D0 of PROM a49 */
@@ -634,7 +634,7 @@ void alto2_cpu_device::f2_ecbfct_1()
  * by a transition. When the interface has collected two words,
  * it will begin generating data wakeups to the microcode.
  */
-void alto2_cpu_device::f2_eisfct_1()
+void alto2_cpu_device::f2_late_eisfct()
 {
 	LOG((LOG_ETH,3, "	EISFCT\n"));
 	PUT_ETH_IBUSY(m_eth.status, 0);
@@ -658,20 +658,20 @@ void alto2_cpu_device::init_ether(int task)
 	// intialize all ethernet variables
 	memset(&m_eth, 0, sizeof(m_eth));
 
-	set_bs(task, bs_ether_eidfct,	&alto2_cpu_device::bs_eidfct_0,	0);
+	set_bs(task, bs_ether_eidfct,	&alto2_cpu_device::bs_early_eidfct,	0);
 
-	set_f1(task, f1_block,			&alto2_cpu_device::f1_eth_block_0, 0);
-	set_f1(task, f1_ether_eilfct,	&alto2_cpu_device::f1_eilfct_0, 0);
-	set_f1(task, f1_ether_epfct,	&alto2_cpu_device::f1_epfct_0, 0);
-	set_f1(task, f1_ether_ewfct,	0, &alto2_cpu_device::f1_ewfct_1);
+	set_f1(task, f1_block,			&alto2_cpu_device::f1_early_eth_block, 0);
+	set_f1(task, f1_ether_eilfct,	&alto2_cpu_device::f1_early_eilfct, 0);
+	set_f1(task, f1_ether_epfct,	&alto2_cpu_device::f1_early_epfct, 0);
+	set_f1(task, f1_ether_ewfct,	0, &alto2_cpu_device::f1_late_ewfct);
 
-	set_f2(task, f2_ether_eodfct,	0, &alto2_cpu_device::f2_eodfct_1);
-	set_f2(task, f2_ether_eosfct,	0, &alto2_cpu_device::f2_eosfct_1);
-	set_f2(task, f2_ether_erbfct,	0, &alto2_cpu_device::f2_erbfct_1);
-	set_f2(task, f2_ether_eefct,	0, &alto2_cpu_device::f2_eefct_1);
-	set_f2(task, f2_ether_ebfct,	0, &alto2_cpu_device::f2_ebfct_1);
-	set_f2(task, f2_ether_ecbfct,	0, &alto2_cpu_device::f2_ecbfct_1);
-	set_f2(task, f2_ether_eisfct,	0, &alto2_cpu_device::f2_eisfct_1);
+	set_f2(task, f2_ether_eodfct,	0, &alto2_cpu_device::f2_late_eodfct);
+	set_f2(task, f2_ether_eosfct,	0, &alto2_cpu_device::f2_late_eosfct);
+	set_f2(task, f2_ether_erbfct,	0, &alto2_cpu_device::f2_late_erbfct);
+	set_f2(task, f2_ether_eefct,	0, &alto2_cpu_device::f2_late_eefct);
+	set_f2(task, f2_ether_ebfct,	0, &alto2_cpu_device::f2_late_ebfct);
+	set_f2(task, f2_ether_ecbfct,	0, &alto2_cpu_device::f2_late_ecbfct);
+	set_f2(task, f2_ether_eisfct,	0, &alto2_cpu_device::f2_late_eisfct);
 
 	m_active_callback[task] = &alto2_cpu_device::activate_eth;
 }

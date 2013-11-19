@@ -12,7 +12,7 @@
 /**
  * @brief f1_dht_block early: disable the display word task
  */
-void alto2_cpu_device::f1_dht_block_0()
+void alto2_cpu_device::f1_early_dht_block()
 {
 	m_dsp.dht_blocks = 1;
 	/* clear the wakeup for the display horizontal task */
@@ -28,7 +28,7 @@ void alto2_cpu_device::f1_dht_block_0()
  *
  * The current BUS[0] drives the NEXT[09] line, i.e. branches to 0 or 1
  */
-void alto2_cpu_device::f2_dht_setmode_1()
+void alto2_cpu_device::f2_late_dht_setmode()
 {
 	UINT16 r = A2_GET16(m_bus,16,0,0);
 	m_dsp.setmode = m_bus;
@@ -52,9 +52,9 @@ void alto2_cpu_device::activate_dht()
  */
 void alto2_cpu_device::init_dht(int task)
 {
-	set_f1(task, f1_block,			&alto2_cpu_device::f1_dht_block_0, 0);
-	set_f2(task, f2_dht_evenfield,	0, &alto2_cpu_device::f2_evenfield_1);
-	set_f2(task, f2_dht_setmode,	0, &alto2_cpu_device::f2_dht_setmode_1);
+	set_f1(task, f1_block,			&alto2_cpu_device::f1_early_dht_block, 0);
+	set_f2(task, f2_dht_evenfield,	0, &alto2_cpu_device::f2_late_evenfield);
+	set_f2(task, f2_dht_setmode,	0, &alto2_cpu_device::f2_late_dht_setmode);
 	m_active_callback[task] = &alto2_cpu_device::activate_dht;
 }
 

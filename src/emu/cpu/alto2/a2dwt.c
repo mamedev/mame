@@ -12,7 +12,7 @@
 /**
  * @brief f1_dwt_block early: block the display word task
  */
-void alto2_cpu_device::f1_dwt_block_0()
+void alto2_cpu_device::f1_early_dwt_block()
 {
 	m_dsp.dwt_blocks = 1;
 
@@ -42,7 +42,7 @@ void alto2_cpu_device::f2_dwt_load_ddr_1()
 
 void alto2_cpu_device::init_dwt(int task)
 {
-	set_f1(task, f1_block,			&alto2_cpu_device::f1_dwt_block_0, 0);
+	set_f1(task, f1_block,			&alto2_cpu_device::f1_early_dwt_block, 0);
 	set_f2(task, f2_dwt_load_ddr,	0, &alto2_cpu_device::f2_dwt_load_ddr_1);
 }
 

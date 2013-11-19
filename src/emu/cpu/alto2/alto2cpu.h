@@ -1095,42 +1095,46 @@ private:
 	DECLARE_READ16_MEMBER( bank_reg_r );			//!< read bank register in memory mapped I/O range
 	DECLARE_WRITE16_MEMBER( bank_reg_w );			//!< write bank register in memory mapped I/O range
 
-	void bs_read_r_0();								//!< bs_read_r early: drive bus by R register
-	void bs_load_r_0();								//!< bs_load_r early: load R places 0 on the BUS
-	void bs_load_r_1();								//!< bs_load_r late: load R from SHIFTER
-	void bs_read_md_0();							//!< bs_read_md early: drive BUS from read memory data
-	void bs_mouse_0();								//!< bs_mouse early: drive bus by mouse
-	void bs_disp_0();								//!< bs_disp early: drive bus by displacement (which?)
-	void f1_load_mar_1();							//!< f1_load_mar late: load memory address register
-	void f1_task_0();								//!< f1_task early: task switch
-	void f2_bus_eq_zero_1();						//!< f2_bus_eq_zero late: branch on bus equals zero
-	void f2_shifter_lt_zero_1();					//!< f2_shifter_lt_zero late: branch on shifter less than zero
-	void f2_shifter_eq_zero_1();					//!< f2_shifter_eq_zero late: branch on shifter equals zero
-	void f2_bus_1();								//!< f2_bus late: branch on bus bits BUS[6-15]
-	void f2_alucy_1();								//!< f2_alucy late: branch on latched ALU carry
-	void f2_load_md_1();							//!< f2_load_md late: load memory data
+	void bs_early_read_r();							//!< bus source: drive bus by R register
+	void bs_early_load_r();							//!< bus source: load R places 0 on the BUS
+	void bs_late_load_r();							//!< bus source: load R from SHIFTER
+	void bs_early_read_md();						//!< bus source: drive BUS from read memory data
+	void bs_early_mouse();							//!< bus source: drive bus by mouse
+	void bs_early_disp();							//!< bus source: drive bus by displacement (which?)
+	void f1_late_load_mar();						//!< F1 func: load memory address register
+	void f1_early_task();							//!< F1 func: task switch
+	void f1_late_l_lsh_1();							//!< F1 func: SHIFTER = left shift L once
+	void f1_late_l_rsh_1();							//!< F1 func: SHIFTER = right shift L once
+	void f1_late_l_lcy_8();							//!< F1 func: SHIFTER = byte swap L
+	void f2_late_bus_eq_zero();						//!< F2 func: branch on bus equals zero
+	void f2_late_shifter_lt_zero();					//!< F2 func: branch on shifter less than zero
+	void f2_late_shifter_eq_zero();					//!< F2 func: branch on shifter equals zero
+	void f2_late_bus();								//!< F2 func: branch on bus bits BUS[6-15]
+	void f2_late_alucy();							//!< F2 func: branch on latched ALU carry
+	void f2_late_load_md();							//!< F2 func: load memory data
 
 	UINT8* m_alu_a10;								//!< ALU function to 74181 operation lookup PROM
+#if	USE_ALU_74181
 	UINT32 alu_74181(UINT32 a, UINT32 b, UINT8 smc);
-
+#endif
 	void rdram();									//!< read the microcode ROM/RAM halfword
 	void wrtram();									//!< write the microcode RAM from M register and ALU
 
 	// ************************************************
 	// ram related stuff
 	// ************************************************
-	void bs_read_sreg_0();							//!< bs_read_sreg early: drive bus by S register or M (MYL), if rsel is = 0
-	void bs_load_sreg_0();							//!< bs_load_sreg early: load S register puts garbage on the bus
-	void bs_load_sreg_1();							//!< bs_load_sreg late: load S register from M
+	void bs_early_read_sreg();						//!< bus source: drive bus by S register or M (MYL), if rsel is = 0
+	void bs_early_load_sreg();						//!< bus source: load S register puts garbage on the bus
+	void bs_late_load_sreg();						//!< bus source: load S register from M
 	void branch_ROM(const char *from, int page);	//!< branch to ROM page
 	void branch_RAM(const char *from, int page);	//!< branch to RAM page
-	void f1_swmode_1();								//!< f1_swmode early: switch to micro program counter BUS[6-15] in other bank
-	void f1_wrtram_1();								//!< f1_wrtram late: start WRTRAM cycle
-	void f1_rdram_1();								//!< f1_rdram late: start RDRAM cycle
+	void f1_late_swmode();							//!< F1 func: switch to micro program counter BUS[6-15] in other bank
+	void f1_late_wrtram();							//!< F1 func: start WRTRAM cycle
+	void f1_late_rdram();							//!< F1 func: start RDRAM cycle
 #if	(ALTO2_UCODE_RAM_PAGES == 3)
-	void f1_load_rmr_1();							//!< f1_load_rmr late: load the reset mode register
+	void f1_late_load_rmr();						//!< F1 func: load the reset mode register
 #else	// ALTO2_UCODE_RAM_PAGES != 3
-	void f1_load_srb_1();							//!< f1_load_srb late: load the S register bank from BUS[12-14]
+	void f1_late_load_srb();						//!< F1 func: load the S register bank from BUS[12-14]
 #endif
 	void init_ram(int task);						//!< called by RAM related tasks
 	void exit_ram();
@@ -1363,24 +1367,6 @@ private:
 	 * sequence: 40 -> d0 -> b0 -> 20
 	 * A motion to the south will first toggle MY1, then MY2.
 	 * sequence: 10 -> 70 -> e0 -> 80
-	 *
-	 * This dump is from PROM madr.a32:
-	 * 0000: 017,007,013,017,013,017,017,007,007,017,017,013,017,013,007,017,
-	 * 0020: 003,015,005,003,005,003,003,015,015,003,003,005,003,005,015,003,
-	 * 0040: 011,001,016,011,016,011,011,001,001,011,011,016,011,016,001,011,
-	 * 0060: 017,007,013,017,013,017,017,007,007,017,017,013,017,013,007,017,
-	 * 0100: 011,001,016,011,016,011,011,001,001,011,011,016,011,016,001,011,
-	 * 0120: 017,007,013,017,013,017,017,007,007,017,017,013,017,013,007,017,
-	 * 0140: 017,007,013,017,013,017,017,007,007,017,017,013,017,013,007,017,
-	 * 0160: 003,015,005,003,005,003,003,015,015,003,003,005,003,005,015,003,
-	 * 0200: 003,015,005,003,005,003,003,015,015,003,003,005,003,005,015,003,
-	 * 0220: 017,007,013,017,013,017,017,007,007,017,017,013,017,013,007,017,
-	 * 0240: 017,007,013,017,013,017,017,007,007,017,017,013,017,013,007,017,
-	 * 0260: 011,001,016,011,016,011,011,001,001,011,011,016,011,016,001,011,
-	 * 0300: 017,007,013,017,013,017,017,007,007,017,017,013,017,013,007,017,
-	 * 0320: 011,001,016,011,016,011,011,001,001,011,011,016,011,016,001,011,
-	 * 0340: 003,015,005,003,005,003,003,015,015,003,003,005,003,005,015,003,
-	 * 0360: 017,007,013,017,013,017,017,007,007,017,017,013,017,013,007,017
 	 * </PRE>
 	 */
 	UINT8* m_madr_a32;
@@ -1477,22 +1463,22 @@ private:
 	void disk_bitclk(void *ptr, int arg);			//!< function to update the disk controller with a new bitclk
 #endif
 	void disk_block(int task);						//!< called if one of the disk tasks (task_kwd or task_ksec) blocks
-	void bs_read_kstat_0();							//!< bs_read_kstat early: bus driven by disk status register KSTAT
-	void bs_read_kdata_0();							//!< bs_read_kdata early: bus driven by disk data register KDATA input
-	void f1_strobe_1();								//!< f1_strobe late: initiates a disk seek
-	void f1_load_kstat_1();							//!< f1_load_kstat late: load disk status register
-	void f1_load_kdata_1();							//!< f1_load_kdata late: load data out register, or the disk address register
-	void f1_increcno_1();							//!< f1_increcno late: advances shift registers holding KADR
-	void f1_clrstat_1();							//!< f1_clrstat late: reset all error latches
-	void f1_load_kcom_1();							//!< f1_load_kcom late: load the KCOM register from bus
-	void f1_load_kadr_1();							//!< f1_load_kadr late: load the KADR register from bus
-	void f2_init_1();								//!< f2_init late: branch on disk word task active and init
-	void f2_rwc_1();								//!< f2_rwc late: branch on read/write/check state of the current record
-	void f2_recno_1();								//!< f2_recno late: branch on the current record number by a lookup table
-	void f2_xfrdat_1();								//!< f2_xfrdat late: branch on the data transfer state
-	void f2_swrnrdy_1();							//!< f2_swrnrdy late: branch on the disk ready signal
-	void f2_nfer_1();								//!< f2_nfer late: branch on the disk fatal error condition
-	void f2_strobon_1();							//!< f2_strobon late: branch on the seek busy status
+	void bs_early_read_kstat();						//!< bus source: bus driven by disk status register KSTAT
+	void bs_early_read_kdata();						//!< bus source: bus driven by disk data register KDATA input
+	void f1_late_strobe();							//!< F1 func: initiates a disk seek
+	void f1_late_load_kstat();						//!< F1 func: load disk status register
+	void f1_late_load_kdata();						//!< F1 func: load data out register, or the disk address register
+	void f1_late_increcno();						//!< F1 func: advances shift registers holding KADR
+	void f1_late_clrstat();							//!< F1 func: reset all error latches
+	void f1_late_load_kcom();						//!< F1 func: load the KCOM register from bus
+	void f1_late_load_kadr();						//!< F1 func: load the KADR register from bus
+	void f2_late_init();							//!< F2 func: branch on disk word task active and init
+	void f2_late_rwc();								//!< F2 func: branch on read/write/check state of the current record
+	void f2_late_recno();							//!< F2 func: branch on the current record number by a lookup table
+	void f2_late_xfrdat();							//!< F2 func: branch on the data transfer state
+	void f2_late_swrnrdy();							//!< F2 func: branch on the disk ready signal
+	void f2_late_nfer();							//!< f2_nfer late: branch on the disk fatal error condition
+	void f2_late_strobon();							//!< f2_strobon late: branch on the seek busy status
 	void init_disk();								//!< initialize the disk context
 	void exit_disk();								//!< deinitialize the disk context
 
@@ -1735,7 +1721,7 @@ private:
 	void display_state_machine();
 
 	//! branch on the evenfield flip-flop
-	void f2_evenfield_1(void);
+	void f2_late_evenfield(void);
 
 	//! initialize the display context
 	void init_disp();
@@ -1874,29 +1860,29 @@ private:
 		UINT8 skip;									//!< emulator skip
 		UINT8 cy;									//!< emulator carry
 	}	m_emu;
-	void bs_emu_disp_0();							//!< bs_emu_disp early: drive bus by IR[8-15], possibly sign extended
-	void f1_emu_block_0();							//!< f1_block early: block task
-	void f1_emu_load_rmr_1();						//!< f1_load_rmr late: load the reset mode register
-	void f1_emu_load_esrb_1();						//!< f1_load_esrb late: load the extended S register bank from BUS[12-14]
-	void f1_rsnf_0();								//!< f1_rsnf early: drive the bus from the Ethernet node ID
-	void f1_startf_0();								//!< f1_startf early: defines commands for for I/O hardware, including Ethernet
-	void f2_busodd_1();								//!< f2_busodd late: branch on odd bus
-	void f2_magic_1();								//!< f2_magic late: shift and use T
-	void f2_load_dns_0();							//!< f2_load_dns early: modify RESELECT with DstAC = (3 - IR[3-4])
-	void f2_load_dns_1();							//!< f2_load_dns late: do novel shifts
-	void f2_acdest_0();								//!< f2_acdest early: modify RSELECT with DstAC = (3 - IR[3-4])
+	void bs_early_emu_disp();						//!< bus source: drive bus by IR[8-15], possibly sign extended
+	void f1_early_emu_block();						//!< F1 func: block task
+	void f1_late_emu_load_rmr();					//!< F1 func: load the reset mode register
+	void f1_late_emu_load_esrb();					//!< F1 func: load the extended S register bank from BUS[12-14]
+	void f1_early_rsnf();							//!< F1 func: drive the bus from the Ethernet node ID
+	void f1_early_startf();							//!< F1 func: defines commands for for I/O hardware, including Ethernet
+	void f2_late_busodd();							//!< F2 func: branch on odd bus
+	void f2_late_magic();							//!< F2 func: shift and use T
+	void f2_early_load_dns();						//!< F2 func: modify RESELECT with DstAC = (3 - IR[3-4])
+	void f2_late_load_dns();						//!< F2 func: do novel shifts
+	void f2_early_acdest();							//!< F2 func: modify RSELECT with DstAC = (3 - IR[3-4])
 	void bitblt_info();								//!< debug bitblt opcode
-	void f2_load_ir_1();							//!< f2_load_ir late: load instruction register IR and branch on IR[0,5-7]
-	void f2_idisp_1();								//!< f2_idisp late: branch on: arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
-	void f2_acsource_0();							//!< f2_acsource early: modify RSELECT with SrcAC = (3 - IR[1-2])
-	void f2_acsource_1();							//!< f2_acsource late: branch on arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
+	void f2_late_load_ir();							//!< F2 func: load instruction register IR and branch on IR[0,5-7]
+	void f2_late_idisp();							//!< F2 func: branch on: arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
+	void f2_early_acsource();						//!< F2 func: modify RSELECT with SrcAC = (3 - IR[1-2])
+	void f2_late_acsource();						//!< F2 func: branch on arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
 	void init_emu(int task);						//!< 000 initialize emulator task
 	void exit_emu();								//!< deinitialize emulator task
 
 	// ************************************************
 	// ksec task
 	// ************************************************
-	void f1_ksec_block_0(void);
+	void f1_early_ksec_block(void);
 	void init_ksec(int task);						//!< 004 initialize disk sector task
 	void exit_ksec();
 
@@ -1966,24 +1952,6 @@ private:
 	 * D1 (11) BNE'   (buffer next empty ?)
 	 * D2 (10) BNNE'  (buffer next next empty ?)
 	 * D3  (9) BF'    (buffer full)
-	 *
-	 * Data from enet.a49 after address line reversal:
-	 * 000: 010 007 017 017 017 017 017 017 017 017 017 017 017 017 013 011
-	 * 020: 011 010 007 017 017 017 017 017 017 017 017 017 017 017 017 013
-	 * 040: 013 011 010 007 017 017 017 017 017 017 017 017 017 017 017 017
-	 * 060: 017 013 011 010 007 017 017 017 017 017 017 017 017 017 017 017
-	 * 100: 017 017 013 011 010 007 017 017 017 017 017 017 017 017 017 017
-	 * 120: 017 017 017 013 011 010 007 017 017 017 017 017 017 017 017 017
-	 * 140: 017 017 017 017 013 011 010 007 017 017 017 017 017 017 017 017
-	 * 160: 017 017 017 017 017 013 011 010 007 017 017 017 017 017 017 017
-	 * 200: 017 017 017 017 017 017 013 011 010 007 017 017 017 017 017 017
-	 * 220: 017 017 017 017 017 017 017 013 011 010 007 017 017 017 017 017
-	 * 240: 017 017 017 017 017 017 017 017 013 011 010 007 017 017 017 017
-	 * 260: 017 017 017 017 017 017 017 017 017 013 011 010 007 017 017 017
-	 * 300: 017 017 017 017 017 017 017 017 017 017 013 011 010 007 017 017
-	 * 320: 017 017 017 017 017 017 017 017 017 017 017 013 011 010 007 017
-	 * 340: 017 017 017 017 017 017 017 017 017 017 017 017 013 011 010 007
-	 * 360: 007 017 017 017 017 017 017 017 017 017 017 017 017 013 011 010
 	 */
 	UINT8* m_ether_a49;
 
@@ -2006,18 +1974,18 @@ private:
 	TIMER_CALLBACK_MEMBER( tx_packet );				//!< transmit data from the FIFO to <nirvana for now>
 	void eth_wakeup();								//!< check for the various reasons to wakeup the Ethernet task
 	void eth_startf();								//!< start input or output depending on m_bus
-	void bs_eidfct_0();								//!< bs_eidfct early: Ethernet input data function
-	void f1_eth_block_0();							//!< f1_eth_block early: block the Ether task
-	void f1_eilfct_0();								//!< f1_eilfct early: Ethernet input look function
-	void f1_epfct_0();								//!< f1_epfct early: Ethernet post function
-	void f1_ewfct_1();								//!< f1_ewfct late: Ethernet countdown wakeup function
-	void f2_eodfct_1();								//!< f2_eodfct late: Ethernet output data function
-	void f2_eosfct_1();								//!< f2_eosfct late: Ethernet output start function
-	void f2_erbfct_1();								//!< f2_erbfct late: Ethernet reset branch function
-	void f2_eefct_1();								//!< f2_eefct late: Ethernet end of transmission function
-	void f2_ebfct_1();								//!< f2_ebfct late: Ethernet branch function
-	void f2_ecbfct_1();								//!< f2_ecbfct late: Ethernet countdown branch function
-	void f2_eisfct_1();								//!< f2_eisfct late: Ethernet input start function
+	void bs_early_eidfct();							//!< bus source: Ethernet input data function
+	void f1_early_eth_block();						//!< F1 func: block the Ether task
+	void f1_early_eilfct();							//!< F1 func: Ethernet input look function
+	void f1_early_epfct();							//!< F1 func: Ethernet post function
+	void f1_late_ewfct();							//!< F1 func: Ethernet countdown wakeup function
+	void f2_late_eodfct();							//!< F2 func: Ethernet output data function
+	void f2_late_eosfct();							//!< F2 func: Ethernet output start function
+	void f2_late_erbfct();							//!< F2 func: Ethernet reset branch function
+	void f2_late_eefct();							//!< F2 func: Ethernet end of transmission function
+	void f2_late_ebfct();							//!< F2 func: Ethernet branch function
+	void f2_late_ecbfct();							//!< F2 func: Ethernet countdown branch function
+	void f2_late_eisfct();							//!< F2 func: Ethernet input start function
 	void activate_eth();							//!< called by the CPU when the Ethernet task becomes active
 	void init_ether(int task);						//!< 007 initialize ethernet task
 	void exit_ether();								//!< deinitialize ethernet task
@@ -2025,7 +1993,7 @@ private:
 	// ************************************************
 	// memory refresh task
 	// ************************************************
-	void f1_mrt_block_0();							//!< f1_mrt_block early: block the display word task
+	void f1_early_mrt_block();						//!< F1 func: block the display word task
 	void activate_mrt();							//!< called by the CPU when MRT becomes active
 	void init_mrt(int task);						//!< 010 initialize memory refresh task
 	void exit_mrt();								//!< deinitialize memory refresh task
@@ -2033,17 +2001,17 @@ private:
 	// ************************************************
 	// display word task
 	// ************************************************
-	void f1_dwt_block_0();							//!< f1_dwt_block early: block the display word task
-	void f2_dwt_load_ddr_1();						//!< f2_dwt_load_ddr late: load the display data register
+	void f1_early_dwt_block();						//!< F1 func: block the display word task
+	void f2_dwt_load_ddr_1();						//!< F2 func: load the display data register
 	void init_dwt(int task);						//!< 011 initialize display word task
 	void exit_dwt();								//!< deinitialize display word task
 
 	// ************************************************
 	// cursor task
 	// ************************************************
-	void f1_curt_block_0();							//!< f1_curt_block early: disable the cursor task and set the curt_blocks flag
-	void f2_load_xpreg_1();							//!< f2_load_xpreg late: load the x position register from BUS[6-15]
-	void f2_load_csr_1();							//!< f2_load_csr late: load the cursor shift register from BUS[0-15]
+	void f1_early_curt_block();						//!< f1_curt_block early: disable the cursor task and set the curt_blocks flag
+	void f2_late_load_xpreg();						//!< f2_load_xpreg late: load the x position register from BUS[6-15]
+	void f2_late_load_csr();						//!< f2_load_csr late: load the cursor shift register from BUS[0-15]
 	void activate_curt();							//!< curt_activate: called by the CPU when the cursor task becomes active
 	void init_curt(int task);					 	//!< 012 initialize cursor task
 	void exit_curt();								//!< deinitialize cursor task
@@ -2051,8 +2019,8 @@ private:
 	// ************************************************
 	// display horizontal task
 	// ************************************************
-	void f1_dht_block_0();							//!< f1_dht_block early: disable the display word task
-	void f2_dht_setmode_1();						//!< f2_dht_setmode late: set the next scanline's mode inverse and half clock and branch
+	void f1_early_dht_block();						//!< F1 func: disable the display word task
+	void f2_late_dht_setmode();						//!< F2 func: set the next scanline's mode inverse and half clock and branch
 	void activate_dht();							//!< called by the CPU when the display horizontal task becomes active
 	void init_dht(int task);						//!< 013 initialize display horizontal task
 	void exit_dht();								//!< deinitialize display horizontal task
@@ -2060,7 +2028,7 @@ private:
 	// ************************************************
 	// display vertical task
 	// ************************************************
-	void f1_dvt_block_0();							//!< f1_dvt_block early: disable the display word task
+	void f1_early_dvt_block();						//!< F1 func: disable the display word task
 	void activate_dvt();							//!< called by the CPU when the display vertical task becomes active
 	void init_dvt(int task);						//!< 014 initialize display vertical task
 	void exit_dvt();								//!< deinitialize display vertical task
@@ -2075,7 +2043,7 @@ private:
 	// ************************************************
 	// disk word task
 	// ************************************************
-	void f1_kwd_block_0(void);
+	void f1_early_kwd_block();						//!< F1 func: disable the disk word task
 	void init_kwd(int task);						//!< 016 initialize disk word task
 	void exit_kwd();								//!< deinitialize disk word task
 };

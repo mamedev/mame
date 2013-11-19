@@ -15,7 +15,7 @@
  * Note: RSEL == 0 can't be read, because it is decoded as
  * access to the M register (MYL latch access, LREF' in the schematics)
  */
-void alto2_cpu_device::bs_read_sreg_0()
+void alto2_cpu_device::bs_early_read_sreg()
 {
 	UINT8 reg = MIR_RSEL(m_mir);
 	UINT16 r;
@@ -34,7 +34,7 @@ void alto2_cpu_device::bs_read_sreg_0()
 /**
  * @brief bs_load_sreg early: load S register puts garbage on the bus
  */
-void alto2_cpu_device::bs_load_sreg_0()
+void alto2_cpu_device::bs_early_load_sreg()
 {
 	int r = 0;	/* ??? */
 	LOG((LOG_RAM,2,"	S%02o← BUS &= garbage (%#o)\n", MIR_RSEL(m_mir), r));
@@ -44,7 +44,7 @@ void alto2_cpu_device::bs_load_sreg_0()
 /**
  * @brief bs_load_sreg late: load S register from M
  */
-void alto2_cpu_device::bs_load_sreg_1()
+void alto2_cpu_device::bs_late_load_sreg()
 {
 	UINT8 reg = MIR_RSEL(m_mir);
 	UINT8 bank = m_s_reg_bank[m_task];
@@ -84,7 +84,7 @@ void alto2_cpu_device::branch_RAM(const char *from, int page)
  * NEXT[0-9] of uninitialized RAM is 0.
  *
  */
-void alto2_cpu_device::f1_swmode_1()
+void alto2_cpu_device::f1_late_swmode()
 {
 	/* currently executing in what page? */
 	UINT16 current = m_mpc / ALTO2_UCODE_PAGE_SIZE;
@@ -232,7 +232,7 @@ void alto2_cpu_device::f1_swmode_1()
 /**
  * @brief f1_wrtram late: start WRTRAM cycle
  */
-void alto2_cpu_device::f1_wrtram_1()
+void alto2_cpu_device::f1_late_wrtram()
 {
 	m_wrtram_flag = true;
 	LOG((LOG_RAM,2,"	WRTRAM\n"));
@@ -241,7 +241,7 @@ void alto2_cpu_device::f1_wrtram_1()
 /**
  * @brief f1_rdram late: start RDRAM cycle
  */
-void alto2_cpu_device::f1_rdram_1()
+void alto2_cpu_device::f1_late_rdram()
 {
 	m_rdram_flag = true;
 	LOG((LOG_RAM,2,"	RDRAM\n"));
@@ -256,7 +256,7 @@ void alto2_cpu_device::f1_rdram_1()
  * RAM option, F1=013 performs RMR← in all RAM-related tasks, including
  * the emulator.
  */
-void alto2_cpu_device::f1_load_rmr_1()
+void alto2_cpu_device::f1_late_load_rmr()
 {
 	LOG((LOG_RAM,2,"	RMR←; BUS (%#o)\n", m_bus));
 	m_reset_mode = m_bus;
@@ -265,7 +265,7 @@ void alto2_cpu_device::f1_load_rmr_1()
 /**
  * @brief f1_load_srb late: load the S register bank from BUS[12-14]
  */
-void alto2_cpu_device::f1_load_srb_1()
+void alto2_cpu_device::f1_late_load_srb()
 {
 	m_s_reg_bank[m_task] = A2_GET16(m_bus,16,12,14) % ALTO2_SREG_BANKS;
 	LOG((LOG_RAM,2,"	SRB←; srb[%d] := %#o\n", m_task, m_s_reg_bank[m_task]));
@@ -279,16 +279,16 @@ void alto2_cpu_device::init_ram(int task)
 {
 	m_ram_related[task] = true;
 
-	set_bs(task, bs_ram_read_slocation,	&alto2_cpu_device::bs_read_sreg_0, 0);
-	set_bs(task, bs_ram_load_slocation,	&alto2_cpu_device::bs_load_sreg_0, &alto2_cpu_device::bs_load_sreg_1);
+	set_bs(task, bs_ram_read_slocation,	&alto2_cpu_device::bs_early_read_sreg, 0);
+	set_bs(task, bs_ram_load_slocation,	&alto2_cpu_device::bs_early_load_sreg, &alto2_cpu_device::bs_late_load_sreg);
 
-	set_f1(task, f1_ram_swmode,			0, &alto2_cpu_device::f1_swmode_1);
-	set_f1(task, f1_ram_wrtram,			0, &alto2_cpu_device::f1_wrtram_1);
-	set_f1(task, f1_ram_rdram,			0, &alto2_cpu_device::f1_rdram_1);
+	set_f1(task, f1_ram_swmode,			0, &alto2_cpu_device::f1_late_swmode);
+	set_f1(task, f1_ram_wrtram,			0, &alto2_cpu_device::f1_late_wrtram);
+	set_f1(task, f1_ram_rdram,			0, &alto2_cpu_device::f1_late_rdram);
 #if	(ALTO2_UCODE_RAM_PAGES == 3)
 	set_f1(task, f1_ram_load_rmr,		0, &alto2_cpu_device::f1_load_rmr_1);
 #else	// ALTO2_UCODE_RAM_PAGES != 3
-	set_f1(task, f1_ram_load_srb,		0, &alto2_cpu_device::f1_load_srb_1);
+	set_f1(task, f1_ram_load_srb,		0, &alto2_cpu_device::f1_late_load_srb);
 #endif
 }
 

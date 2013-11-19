@@ -1679,7 +1679,7 @@ WRITE16_MEMBER( alto2_cpu_device::bank_reg_w )
 /**
  * @brief bs_read_r early: drive bus by R register
  */
-void alto2_cpu_device::bs_read_r_0()
+void alto2_cpu_device::bs_early_read_r()
 {
 	UINT16 r = m_r[m_rsel];
 	LOG((LOG_CPU,2,"	←R%02o; %s (%#o)\n", m_rsel, r_name(m_rsel), r));
@@ -1689,7 +1689,7 @@ void alto2_cpu_device::bs_read_r_0()
 /**
  * @brief bs_load_r early: load R places 0 on the BUS
  */
-void alto2_cpu_device::bs_load_r_0()
+void alto2_cpu_device::bs_early_load_r()
 {
 	UINT16 r = 0;
 	LOG((LOG_CPU,2,"	R%02o←; %s (BUS&=0)\n", m_rsel, r_name(m_rsel)));
@@ -1699,7 +1699,7 @@ void alto2_cpu_device::bs_load_r_0()
 /**
  * @brief bs_load_r late: load R from SHIFTER
  */
-void alto2_cpu_device::bs_load_r_1()
+void alto2_cpu_device::bs_late_load_r()
 {
 	if (MIR_F2(m_mir) != f2_emu_load_dns) {
 		m_r[m_rsel] = m_shifter;
@@ -1719,7 +1719,7 @@ void alto2_cpu_device::bs_load_r_1()
 /**
  * @brief bs_read_md early: drive BUS from read memory data
  */
-void alto2_cpu_device::bs_read_md_0()
+void alto2_cpu_device::bs_early_read_md()
 {
 #if	ALTO2_DEBUG
 	UINT32 mar = m_mem.mar;
@@ -1732,7 +1732,7 @@ void alto2_cpu_device::bs_read_md_0()
 /**
  * @brief bs_mouse early: drive bus by mouse
  */
-void alto2_cpu_device::bs_mouse_0()
+void alto2_cpu_device::bs_early_mouse()
 {
 	UINT16 r = mouse_read();
 	LOG((LOG_CPU,2,"	←MOUSE; BUS&=MOUSE (%#o)\n", r));
@@ -1742,7 +1742,7 @@ void alto2_cpu_device::bs_mouse_0()
 /**
  * @brief bs_disp early: drive bus by displacement (which?)
  */
-void alto2_cpu_device::bs_disp_0()
+void alto2_cpu_device::bs_early_disp()
 {
 	UINT16 r = 0177777;
 	LOG((LOG_CPU,0,"BS ←DISP not handled by task %s mpc:%04x\n", task_name(m_task), m_mpc));
@@ -1756,7 +1756,7 @@ void alto2_cpu_device::bs_disp_0()
  * Load memory address register from the ALU output;
  * start main memory reference (see section 2.3).
  */
-void alto2_cpu_device::f1_load_mar_1()
+void alto2_cpu_device::f1_late_load_mar()
 {
 	UINT8 bank = m_bank_reg[m_task];
 	UINT32 msb;
@@ -1966,7 +1966,7 @@ static __inline f9318_out_t f9318(f9318_in_t in)
  * 0 (GND)         10 I0   Q2:1 Q1:1 Q0:1 GS:0 EO:1  x    x    x    x
  * </PRE>
  */
-void alto2_cpu_device::f1_task_0()
+void alto2_cpu_device::f1_early_task()
 {
 #if	USE_PRIO_F9318
 	/* Doesn't work yet */
@@ -2035,10 +2035,8 @@ void alto2_cpu_device::f1_task_0()
 		LOG((LOG_CPU,2, "		no switch\n"));
 	}
 #else	/* USE_PRIO_F9318 */
-	int i;
-
 	LOG((LOG_CPU,2, "	TASK %02o:%s", m_task, task_name(m_task)));
-	for (i = 15; i >= 0; i--) {
+	for (int i = 15; i >= 0; i--) {
 		if (m_task_wakeup & (1 << i)) {
 			m_next2_task = i;
 			if (m_next2_task != m_next_task) {
@@ -2066,10 +2064,53 @@ void alto2_cpu_device::f1_block_0()
 }
 #endif
 
+void alto2_cpu_device::f1_late_l_lsh_1()
+{
+#if	0
+	if (m_task == task_emu) {
+		if (f2 == f2_emu_magic) {
+			m_shifter = ((m_l << 1) | (m_t >> 15)) & 0177777;
+			LOG((LOG_CPU,2,"	SHIFTER ←L MLSH 1 (%#o := %#o<<1|%#o)\n", m_shifter, m_l, m_t >> 15));
+		}
+		if (f2 == f2_emu_load_dns) {
+			/* shifter is done in F2 */
+			break;
+		}
+	}
+#endif
+	m_shifter = (m_l << 1) & 0177777;
+	LOG((LOG_CPU,2,"	SHIFTER ←L LSH 1 (%#o := %#o<<1)\n", m_shifter, m_l));
+}
+
+void alto2_cpu_device::f1_late_l_rsh_1()
+{
+#if	0
+	if (m_task == task_emu) {
+		if (f2 == f2_emu_magic) {
+			m_shifter = ((m_l >> 1) | (m_t << 15)) & 0177777;
+			LOG((LOG_CPU,2,"	SHIFTER ←L MRSH 1 (%#o := %#o>>1|%#o)\n", m_shifter, m_l, (m_t << 15) & 0100000));
+			break;
+		}
+		if (f2 == f2_emu_load_dns) {
+			/* shifter is done in F2 */
+			break;
+		}
+	}
+#endif
+	m_shifter = m_l >> 1;
+	LOG((LOG_CPU,2,"	SHIFTER ←L RSH 1 (%#o := %#o>>1)\n", m_shifter, m_l));
+}
+
+void alto2_cpu_device::f1_late_l_lcy_8()
+{
+	m_shifter = ((m_l >> 8) | (m_l << 8)) & 0177777;
+	LOG((LOG_CPU,2,"	SHIFTER ←L LCY 8 (%#o := bswap %#o)\n", m_shifter, m_l));
+}
+
 /**
  * @brief f2_bus_eq_zero late: branch on bus equals zero
  */
-void alto2_cpu_device::f2_bus_eq_zero_1()
+void alto2_cpu_device::f2_late_bus_eq_zero()
 {
 	UINT16 r = m_bus == 0 ? 1 : 0;
 	LOG((LOG_CPU,2, "	BUS=0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
@@ -2079,7 +2120,7 @@ void alto2_cpu_device::f2_bus_eq_zero_1()
 /**
  * @brief f2_shifter_lt_zero late: branch on shifter less than zero
  */
-void alto2_cpu_device::f2_shifter_lt_zero_1()
+void alto2_cpu_device::f2_late_shifter_lt_zero()
 {
 	UINT16 r = (m_shifter & 0100000) ? 1 : 0;
 	LOG((LOG_CPU,2, "	SH<0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
@@ -2089,7 +2130,7 @@ void alto2_cpu_device::f2_shifter_lt_zero_1()
 /**
  * @brief f2_shifter_eq_zero late: branch on shifter equals zero
  */
-void alto2_cpu_device::f2_shifter_eq_zero_1()
+void alto2_cpu_device::f2_late_shifter_eq_zero()
 {
 	UINT16 r = m_shifter == 0 ? 1 : 0;
 	LOG((LOG_CPU,2, "	SH=0; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
@@ -2099,7 +2140,7 @@ void alto2_cpu_device::f2_shifter_eq_zero_1()
 /**
  * @brief f2_bus late: branch on bus bits BUS[6-15]
  */
-void alto2_cpu_device::f2_bus_1()
+void alto2_cpu_device::f2_late_bus()
 {
 	UINT16 r = A2_GET16(m_bus,16,6,15);
 	LOG((LOG_CPU,2, "	BUS; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
@@ -2109,7 +2150,7 @@ void alto2_cpu_device::f2_bus_1()
 /**
  * @brief f2_alucy late: branch on latched ALU carry
  */
-void alto2_cpu_device::f2_alucy_1()
+void alto2_cpu_device::f2_late_alucy()
 {
 	UINT16 r = m_laluc0;
 	LOG((LOG_CPU,2, "	ALUCY; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
@@ -2121,7 +2162,7 @@ void alto2_cpu_device::f2_alucy_1()
  *
  * Deliver BUS data to memory.
  */
-void alto2_cpu_device::f2_load_md_1()
+void alto2_cpu_device::f2_late_load_md()
 {
 #if	ALTO2_DEBUG
 	UINT16 mar = m_mem.mar;
@@ -2694,14 +2735,10 @@ void alto2_cpu_device::execute_run()
 			rdram();
 
 		/*
-		 * The constant memory is gated to the bus by F1 = 7, F2 = 7, or BS >= 4
+		 * The constant memory is gated to the bus by F1 == f1_const, F2 == f2_const, or BS >= 4
 		 */
-		if (!do_bs || bs >= 4) {
+		if (!do_bs || bs >= bs_task_4) {
 			int addr = 8 * m_rsel + bs;
-			// There is something going wrong with using:
-			// m_const->read_word(m_const->address_to_byte(addr));
-			// because for addr=0160 it returns const[0161] instead of const[0160]
-			// For now fall back to reading the const data from the byte array
 			UINT16 data = m_const_data[2*addr+0] | (m_const_data[2*addr+1] << 8);
 			m_bus &= data;
 			LOG((LOG_CPU,2,"	%#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
@@ -2709,7 +2746,7 @@ void alto2_cpu_device::execute_run()
 
 		/*
 		 * early f2 has to be done before early bs, because the
-		 * emulator f2 acsource or acdest may change rsel
+		 * emulator f2 acsource or acdest may change m_rsel
 		 */
 		((*this).*m_f2[0][m_task][f2])();
 
@@ -2955,66 +2992,22 @@ void alto2_cpu_device::execute_run()
 		if (m_wrtram_flag)
 			wrtram();
 
-		switch (f1) {
-		case f1_l_lsh_1:
-			if (m_task == task_emu) {
-				if (f2 == f2_emu_magic) {
-					m_shifter = ((m_l << 1) | (m_t >> 15)) & 0177777;
-					LOG((LOG_CPU,2,"	SHIFTER ←L MLSH 1 (%#o := %#o<<1|%#o)\n", m_shifter, m_l, m_t >> 15));
-					break;
-				}
-				if (f2 == f2_emu_load_dns) {
-					/* shifter is done in F2 */
-					break;
-				}
-			}
-			m_shifter = (m_l << 1) & 0177777;
-			LOG((LOG_CPU,2,"	SHIFTER ←L LSH 1 (%#o := %#o<<1)\n", m_shifter, m_l));
-			break;
+		// shifter passes L, if F1 is not one of L LSH 1, L RSH 1 or L LCY 8
+		m_shifter = m_l;
 
-		case f1_l_rsh_1:
-			if (m_task == task_emu) {
-				if (f2 == f2_emu_magic) {
-					m_shifter = ((m_l >> 1) | (m_t << 15)) & 0177777;
-					LOG((LOG_CPU,2,"	SHIFTER ←L MRSH 1 (%#o := %#o>>1|%#o)\n", m_shifter, m_l, (m_t << 15) & 0100000));
-					break;
-				}
-				if (f2 == f2_emu_load_dns) {
-					/* shifter is done in F2 */
-					break;
-				}
-			}
-			m_shifter = m_l >> 1;
-			LOG((LOG_CPU,2,"	SHIFTER ←L RSH 1 (%#o := %#o>>1)\n", m_shifter, m_l));
-			break;
-
-		case f1_l_lcy_8:
-			m_shifter = ((m_l >> 8) | (m_l << 8)) & 0177777;
-			LOG((LOG_CPU,2,"	SHIFTER ←L LCY 8 (%#o := bswap %#o)\n", m_shifter, m_l));
-			break;
-
-		default:
-			/* shifter passes L, if F1 is not one of L LSH 1, L RSH 1 or L LCY 8 */
-			m_shifter = m_l;
-		}
-
-		/* late F1 is done now, if any */
+		/* late F1 is done now */
 		((*this).*m_f1[1][m_task][f1])();
 
-		/* late F2 is done now, if any */
+		/* late F2 is done now */
 		((*this).*m_f2[1][m_task][f2])();
 
 		/* late BS is done now, if no constant was put on the bus */
 		if (do_bs)
 			((*this).*m_bs[1][m_task][bs])();
 
-		/*
-		 * update L register and LALUC0, and also M register,
-		 * if a RAM related task is active
-		 */
+		// update L register and LALUC0, and also M register, if a RAM related task is active
 		if (MIR_L(m_mir)) {
-			/* load L from ALU */
-			m_l = m_alu;
+			m_l = m_alu;			// load L from ALU
 			if (flags & ALUM2) {
 				m_laluc0 = m_aluc0;
 				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← ALUC0 (%o)\n", m_alu, m_aluc0));
@@ -3023,23 +3016,21 @@ void alto2_cpu_device::execute_run()
 				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← %o\n", m_alu, 0));
 			}
 			if (m_ram_related[m_task]) {
-				/* load M from ALU, if 'GOODTASK' */
-				m_m = m_alu;
-				/* also writes to S[bank][0], which can't be read */
-				m_s[m_s_reg_bank[m_task]][0] = m_alu;
+				m_m = m_alu;		// load M from ALU, if 'GOODTASK'
+				m_s[m_s_reg_bank[m_task]][0] = m_alu;	// also writes to S[bank][0], which can't be read
 				LOG((LOG_CPU,2, "	M← ALU (%#o)\n", m_alu));
 			}
 		}
 
-		/* update T register, if LOADT is set */
+		// update T register, if LOADT is set
 		if (MIR_T(m_mir)) {
 			m_cram_addr = m_alu;
 			if (flags & TSELECT) {
+				m_t = m_alu;		// T source is ALU
 				LOG((LOG_CPU,2, "	T← ALU (%#o)\n", m_alu));
-				m_t = m_alu;
 			} else {
+				m_t = m_bus;		// T source is BUS
 				LOG((LOG_CPU,2, "	T← BUS (%#o)\n", m_bus));
-				m_t = m_bus;
 			}
 		}
 
@@ -3049,20 +3040,15 @@ void alto2_cpu_device::execute_run()
 				/* one more microinstruction */
 				m_next_task = m_next2_task;
 			} else {
-				/* save this task's mpc */
+				/* save this task's mpc and next2 */
 				m_task_mpc[m_task] = m_next;
 				m_task_next2[m_task] = m_next2;
 				m_task = m_next_task;
 				LOG((LOG_CPU,1, "task switch to %02o:%s (cycle %lld)\n", m_task, task_name(m_task), cycle()));
-				/* get new task's mpc */
-				m_next = m_task_mpc[m_task];
-				/* get address modifier after task switch (?) */
-				m_next2 = m_task_next2[m_task];
+				m_next = m_task_mpc[m_task];	// get new task's mpc
+				m_next2 = m_task_next2[m_task];	// get address modifier after task switch (needed?)
 
-				/*
-				 * let the task know it becomes active now
-				 * and (most probably) reset the wakeup
-				 */
+				// let the task know it becomes active now and (most probably) reset the wakeup
 				((*this).*m_active_callback[m_task])();
 			}
 		}
@@ -3090,22 +3076,22 @@ void alto2_cpu_device::hard_reset()
 		if (0 == (m_reset_mode & (1 << task)))
 			m_task_mpc[task] |= ALTO2_UCODE_RAM_BASE;
 
-		set_bs(task, bs_read_r,			&alto2_cpu_device::bs_read_r_0,	0);
-		set_bs(task, bs_load_r,			&alto2_cpu_device::bs_load_r_0,	&alto2_cpu_device::bs_load_r_1);
+		set_bs(task, bs_read_r,			&alto2_cpu_device::bs_early_read_r,	0);
+		set_bs(task, bs_load_r,			&alto2_cpu_device::bs_early_load_r,	&alto2_cpu_device::bs_late_load_r);
 		set_bs(task, bs_no_source,		0, 0);
 		set_bs(task, bs_task_3,			&alto2_cpu_device::fn_bs_bad_0,	&alto2_cpu_device::fn_bs_bad_1);	// task specific
 		set_bs(task, bs_task_4,			&alto2_cpu_device::fn_bs_bad_0,	&alto2_cpu_device::fn_bs_bad_1);	// task specific
-		set_bs(task, bs_read_md,		&alto2_cpu_device::bs_read_md_0, 0);
-		set_bs(task, bs_mouse,			&alto2_cpu_device::bs_mouse_0, 0);
-		set_bs(task, bs_disp,			&alto2_cpu_device::bs_disp_0, 0);
+		set_bs(task, bs_read_md,		&alto2_cpu_device::bs_early_read_md, 0);
+		set_bs(task, bs_mouse,			&alto2_cpu_device::bs_early_mouse, 0);
+		set_bs(task, bs_disp,			&alto2_cpu_device::bs_early_disp, 0);
 
 		set_f1(task, f1_nop,			0, 0);
-		set_f1(task, f1_load_mar,		0, &alto2_cpu_device::f1_load_mar_1);
-		set_f1(task, f1_task,			&alto2_cpu_device::f1_task_0, 0);
+		set_f1(task, f1_load_mar,		0, &alto2_cpu_device::f1_late_load_mar);
+		set_f1(task, f1_task,			&alto2_cpu_device::f1_early_task, 0);
 		set_f1(task, f1_block,			&alto2_cpu_device::fn_f1_bad_0, &alto2_cpu_device::fn_f1_bad_1);	// not all tasks have the f1_block
-		set_f1(task, f1_l_lsh_1,		0, 0);			// inlined in execute()
-		set_f1(task, f1_l_rsh_1,		0, 0);			// inlined in execute()
-		set_f1(task, f1_l_lcy_8,		0, 0);			// inlined in execute()
+		set_f1(task, f1_l_lsh_1,		0, &alto2_cpu_device::f1_late_l_lsh_1);
+		set_f1(task, f1_l_rsh_1,		0, &alto2_cpu_device::f1_late_l_rsh_1);
+		set_f1(task, f1_l_lcy_8,		0, &alto2_cpu_device::f1_late_l_lcy_8);
 		set_f1(task, f1_const,			0, 0);
 		set_f1(task, f1_task_10,		&alto2_cpu_device::fn_f1_bad_0,	&alto2_cpu_device::fn_f1_bad_1);	// f1_task_10 to f1_task_17 are task specific
 		set_f1(task, f1_task_11,		&alto2_cpu_device::fn_f1_bad_0,	&alto2_cpu_device::fn_f1_bad_1);	// f1_task_10 to f1_task_17 are task specific
@@ -3117,12 +3103,12 @@ void alto2_cpu_device::hard_reset()
 		set_f1(task, f1_task_17,		&alto2_cpu_device::fn_f1_bad_0,	&alto2_cpu_device::fn_f1_bad_1);	// f1_task_10 to f1_task_17 are task specific
 
 		set_f2(task, f2_nop,			0, 0);
-		set_f2(task, f2_bus_eq_zero,	0, &alto2_cpu_device::f2_bus_eq_zero_1);
-		set_f2(task, f2_shifter_lt_zero,0, &alto2_cpu_device::f2_shifter_lt_zero_1);
-		set_f2(task, f2_shifter_eq_zero,0, &alto2_cpu_device::f2_shifter_eq_zero_1);
-		set_f2(task, f2_bus,			0, &alto2_cpu_device::f2_bus_1);
-		set_f2(task, f2_alucy,			0, &alto2_cpu_device::f2_alucy_1);
-		set_f2(task, f2_load_md,		0, &alto2_cpu_device::f2_load_md_1);
+		set_f2(task, f2_bus_eq_zero,	0, &alto2_cpu_device::f2_late_bus_eq_zero);
+		set_f2(task, f2_shifter_lt_zero,0, &alto2_cpu_device::f2_late_shifter_lt_zero);
+		set_f2(task, f2_shifter_eq_zero,0, &alto2_cpu_device::f2_late_shifter_eq_zero);
+		set_f2(task, f2_bus,			0, &alto2_cpu_device::f2_late_bus);
+		set_f2(task, f2_alucy,			0, &alto2_cpu_device::f2_late_alucy);
+		set_f2(task, f2_load_md,		0, &alto2_cpu_device::f2_late_load_md);
 		set_f2(task, f2_const,			0, 0);
 		set_f2(task, f2_task_10,		&alto2_cpu_device::fn_f2_bad_0,	&alto2_cpu_device::fn_f2_bad_1);	// f2_task_10 to f2_task_17 are task specific
 		set_f2(task, f2_task_11,		&alto2_cpu_device::fn_f2_bad_0,	&alto2_cpu_device::fn_f2_bad_1);	// f2_task_10 to f2_task_17 are task specific

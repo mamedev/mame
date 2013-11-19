@@ -10,7 +10,7 @@
 #include "alto2cpu.h"
 
 //! f1_mrt_block early: block the display word task
-void alto2_cpu_device::f1_mrt_block_0()
+void alto2_cpu_device::f1_early_mrt_block()
 {
 	/* clear the wakeup for the memory refresh task */
 	m_task_wakeup &= ~(1 << m_task);
@@ -27,7 +27,7 @@ void alto2_cpu_device::activate_mrt()
  //! memory refresh task slots initialization
 void alto2_cpu_device::init_mrt(int task)
 {
-	set_f1(task, f1_block,		&alto2_cpu_device::f1_mrt_block_0, 0);
+	set_f1(task, f1_block,		&alto2_cpu_device::f1_early_mrt_block, 0);
 	/* auto block */
 	m_active_callback[task] = &alto2_cpu_device::activate_mrt;
 }
