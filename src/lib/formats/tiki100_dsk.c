@@ -30,68 +30,84 @@ const char *tiki100_format::extensions() const
 	return "dsk";
 }
 
-// Unverified gap sizes
-// double sided disks have t0s0,t0s1,t1s0,t1s1... format
 const tiki100_format::format tiki100_format::formats[] = {
+	// track description
+	// 20xff 6x00 fe 2x00 01 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 0a 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 06 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 0f 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 0b 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 02 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 10 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 07 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 03 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 0c 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 08 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 11 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 0d 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 04 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 12 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 09 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 05 00 f7 11xff 6x00 fb 128xe5 f7
+	// 7xff 6x00 fe 2x00 0e 00 f7 11xff 6x00 fb 128xe5 f7
+	// 89xff
 	{   //  90K 5 1/4 inch single density single sided
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 18, 40, 1, 128, {}, 1, {}, 16, 11, 8
+		4000, 18, 40, 1, 128, {}, -1, { 1,10,6,15,11,2,16,7,3,12,8,17,13,4,12,9,5,14 }, 20, 11, 7
 	},
+
+	// track description
+	// 20x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 06 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 02 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 07 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 03 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 08 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 04 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 09 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 05 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 0a 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 275x4e
 	{   //  200K 5 1/4 inch double density single sided
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000, 10, 40, 1, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 80, 22, 20
+		2000, 10, 40, 1, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
 	},
+
+	// track description
+	// 20x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 06 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 02 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 07 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 03 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 08 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 04 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 09 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 05 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 0a 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 275x4e
 	{   //  400K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
-		2000, 10, 40, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 80, 22, 20
+		2000, 10, 40, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
 	},
+
+	// track description
+	// 20x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 06 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 02 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 07 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 03 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 08 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 04 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 09 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 05 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 24x4e 12x00 3xf5 fe 2x00 0a 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+	// 275x4e
 	{   //  800K 5 1/4 inch quad density
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
-		2000, 10, 80, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 80, 22, 20
+		2000, 10, 80, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 20, 22, 24
 	},
+
 	{}
 };
-
-floppy_image_format_t::desc_e* tiki100_format::get_desc_fm(const format &f, int &current_size, int &end_gap_index)
-{
-	static floppy_image_format_t::desc_e desc[23] = {
-		/* 00 */ { FM, 0xff, f.gap_1 },
-		/* 01 */ { SECTOR_LOOP_START, 0, f.sector_count-1 },
-		/* 02 */ {   FM, 0x00, 4 }, // NOTE here is the difference to wd177x_format
-		/* 03 */ {   CRC_CCITT_FM_START, 1 },
-		/* 04 */ {     RAW, 0xf57e, 1 },
-		/* 05 */ {     TRACK_ID_FM },
-		/* 06 */ {     HEAD_ID_FM },
-		/* 07 */ {     SECTOR_ID_FM },
-		/* 08 */ {     SIZE_ID_FM },
-		/* 09 */ {   CRC_END, 1 },
-		/* 10 */ {   CRC, 1 },
-		/* 11 */ {   FM, 0xff, f.gap_2 },
-		/* 12 */ {   FM, 0x00, 6 },
-		/* 13 */ {   CRC_CCITT_FM_START, 2 },
-		/* 14 */ {     RAW, 0xf56f, 1 },
-		/* 15 */ {     SECTOR_DATA_FM, -1 },
-		/* 16 */ {   CRC_END, 2 },
-		/* 17 */ {   CRC, 2 },
-		/* 18 */ {   FM, 0xff, f.gap_3 },
-		/* 19 */ { SECTOR_LOOP_END },
-		/* 20 */ { FM, 0xff, 0 },
-		/* 21 */ { RAWBITS, 0xffff, 0 },
-		/* 22 */ { END }
-	};
-
-	current_size = f.gap_1*16;
-	if(f.sector_base_size)
-		current_size += f.sector_base_size * f.sector_count * 16;
-	else {
-		for(int j=0; j != f.sector_count; j++)
-			current_size += f.per_sector_size[j] * 16;
-	}
-	current_size += (4+1+4+2+f.gap_2+6+1+2+f.gap_3) * f.sector_count * 16;
-
-	end_gap_index = 20;
-
-	return desc;
-}
 
 const floppy_format_type FLOPPY_TIKI100_FORMAT = &floppy_image_format_creator<tiki100_format>;

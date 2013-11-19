@@ -14,13 +14,13 @@
 
     TODO:
 
-    - floppy broken
     - palette RAM should be written during HBLANK
     - DART clocks
     - winchester hard disk
     - analog/digital I/O
     - light pen
     - 8088 CPU card
+    - 360KB floppy format
 
 */
 
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
 	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE(AY8912_TAG, ay8910_device, data_r, data_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0x03) AM_WRITE(system_w)
-	AM_RANGE(0x20, 0x27) AM_NOP // winchester controller
+//	AM_RANGE(0x20, 0x27) AM_NOP // winchester controller
 //  AM_RANGE(0x60, 0x6f) analog I/O (SINTEF)
 //  AM_RANGE(0x60, 0x67) digital I/O (RVO)
 //  AM_RANGE(0x70, 0x77) analog/digital I/O
@@ -592,7 +592,7 @@ void tiki100_state::machine_start()
 
 static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/4)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(tiki100_mem)
 	MCFG_CPU_IO_MAP(tiki100_io)
 	MCFG_CPU_CONFIG(tiki100_daisy_chain)
@@ -614,8 +614,8 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/4, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(XTAL_8MHz/4))
 	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_8MHz/8) // FD1767PL-02 or FD1797-PL
-	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525ssdd", tiki100_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525ssdd", tiki100_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -657,5 +657,5 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME        FLAGS */
-COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, driver_device, 0,      "Kontiki Data A/S", "KONTIKI 100",  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, driver_device, 0,      "Tiki Data A/S",    "TIKI 100",     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, driver_device, 0,      "Kontiki Data A/S", "KONTIKI 100",  GAME_SUPPORTS_SAVE )
+COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, driver_device, 0,      "Tiki Data A/S",    "TIKI 100",     GAME_SUPPORTS_SAVE )

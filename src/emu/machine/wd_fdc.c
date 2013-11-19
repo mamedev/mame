@@ -1465,6 +1465,10 @@ void wd_fdc_t::live_run(attotime limit)
 			set_drq();
 
 			if(cur_live.bit_counter == 16*6) {
+				if(cur_live.crc) {
+					status |= S_CRC;
+				}
+
 				// Already synchronous
 				cur_live.state = IDLE;
 				return;
