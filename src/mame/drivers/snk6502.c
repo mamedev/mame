@@ -887,8 +887,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( vanguard, snk6502_state )
 
 	// basic machine hardware
-	//MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
-	MCFG_CPU_ADD("maincpu", M6502, 930000)      // adjusted
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // adjusted using common divisor
+
 	MCFG_CPU_PROGRAM_MAP(vanguard_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk6502_state, snk6502_interrupt)
 
