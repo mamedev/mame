@@ -34,19 +34,19 @@ void t10spc::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
-	case SCSI_CMD_TEST_UNIT_READY:
+	case T10SPC_CMD_TEST_UNIT_READY:
 		m_phase = SCSI_PHASE_STATUS;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
 		break;
 
-	case SCSI_CMD_RECALIBRATE:
+	case T10SPC_CMD_RECALIBRATE:
 		m_phase = SCSI_PHASE_STATUS;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
 		break;
 
-	case SCSI_CMD_REQUEST_SENSE:
+	case T10SPC_CMD_REQUEST_SENSE:
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		if (command[4] == 0)
@@ -63,7 +63,7 @@ void t10spc::ExecCommand()
 		}
 		break;
 
-	case SCSI_CMD_SEND_DIAGNOSTIC:
+	case T10SPC_CMD_SEND_DIAGNOSTIC:
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = SCSILengthFromUINT16(&command[3]);
@@ -81,7 +81,7 @@ void t10spc::ReadData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
-	case SCSI_CMD_REQUEST_SENSE:
+	case T10SPC_CMD_REQUEST_SENSE:
 		if (command[4] == 0)
 		{
 			data[0] = m_sense_asc & 0x7f;
@@ -124,7 +124,7 @@ void t10spc::WriteData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
-	case SCSI_CMD_SEND_DIAGNOSTIC:
+	case T10SPC_CMD_SEND_DIAGNOSTIC:
 		break;
 
 	default:

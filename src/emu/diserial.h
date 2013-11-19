@@ -149,7 +149,7 @@ private:
 	attotime m_tra_rate;
 	UINT8 m_rcv_line;
 
-	bool m_tra_clock_state, m_rcv_clock_state;
+	int m_tra_clock_state, m_rcv_clock_state;
 
 	device_serial_interface *m_other_connection;
 

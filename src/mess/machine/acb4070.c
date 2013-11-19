@@ -35,7 +35,7 @@ void acb4070_device::ExecCommand()
 		m_transfer_length = TRANSFERLENGTH_DATA_BUFFER;
 		break;
 
-	case SCSI_CMD_MODE_SELECT:
+	case T10SPC_CMD_MODE_SELECT_6:
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
@@ -51,7 +51,7 @@ void acb4070_device::WriteData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
-	case SCSI_CMD_MODE_SELECT:
+	case T10SPC_CMD_MODE_SELECT_6:
 		adaptec_sense_t *sense=(adaptec_sense_t *) data;
 		int tracks=(sense->cylinder_count[0]<<8)+sense->cylinder_count[1];
 		int capacity=(tracks * sense->head_count * 17);

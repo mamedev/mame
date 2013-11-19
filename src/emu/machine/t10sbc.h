@@ -25,10 +25,10 @@ protected:
 
 	harddisk_image_device *m_image;
 
-	UINT32 lba;
-	UINT32 blocks;
+	UINT32 m_lba;
+	UINT32 m_blocks;
 
-	hard_disk_file *disk;
+	hard_disk_file *m_disk;
 };
 
 #endif

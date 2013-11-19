@@ -203,7 +203,6 @@ s1410_device::s1410_device(const machine_config &mconfig, const char *tag, devic
 
 #define S1410_CMD_CHECK_TRACK_FORMAT ( 0x05 )
 #define S1410_CMD_FORMAT_TRACK ( 0x06 )
-#define S1410_CMD_SEEK ( 0x0b )
 #define S1410_CMD_INIT_DRIVE_PARAMS ( 0x0c )
 #define S1410_CMD_FORMAT_ALT_TRACK ( 0x0E )
 #define S1410_CMD_WRITE_SEC_BUFFER ( 0x0F )
@@ -222,7 +221,7 @@ void s1410_device::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
-	case SCSI_CMD_RECALIBRATE:
+	case T10SPC_CMD_RECALIBRATE:
 		if (command[1] >> 5)
 		{
 			m_phase = SCSI_PHASE_STATUS;
@@ -236,7 +235,7 @@ void s1410_device::ExecCommand()
 		}
 		break;
 
-	case SCSI_CMD_REQUEST_SENSE:
+	case T10SPC_CMD_REQUEST_SENSE:
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 4;
@@ -244,39 +243,42 @@ void s1410_device::ExecCommand()
 
 	case S1410_CMD_FORMAT_TRACK:
 		{
-		lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
+		m_lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
 
 		switch( m_sector_bytes )
 		{
 		case 256:
-			blocks = 32;
+			m_blocks = 32;
 			break;
 
 		case 512:
-			blocks = 17;
+			m_blocks = 17;
 			break;
 		}
 
-		logerror("S1410: FORMAT TRACK at LBA %x for %x blocks\n", lba, blocks);
+		logerror("S1410: FORMAT TRACK at LBA %x for %x blocks\n", m_lba, m_blocks);
 
-		int dataLength = blocks * m_sector_bytes;
-		UINT8 data[dataLength];
-		memset(data, 0xc6, dataLength);
+		if ((m_disk) && (m_blocks))
+		{
+			UINT8 *data = global_alloc_array(UINT8, m_sector_bytes);
+			memset(data, 0xc6, m_sector_bytes);
 
-		WriteData(data, dataLength);
+			while (m_blocks > 0)
+			{
+				if (!hard_disk_write(m_disk, m_lba, data))
+				{
+					logerror("S1410: HD write error!\n");
+				}
+				m_lba++;
+				m_blocks--;
+			}
+
+			global_free(data);
+		}
 
 		m_phase = SCSI_PHASE_STATUS;
 		m_transfer_length = 0;
 		}
-		break;
-
-	case S1410_CMD_SEEK:
-		lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
-		
-		logerror("S1410: SEEK to LBA %x\n", lba);
-		
-		m_phase = SCSI_PHASE_STATUS;
-		m_transfer_length = 0;
 		break;
 
 	case S1410_CMD_INIT_DRIVE_PARAMS:
@@ -322,23 +324,6 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
-	case S1410_CMD_FORMAT_TRACK:
-		if ((disk) && (blocks))
-		{
-			while (dataLength > 0)
-			{
-				if (!hard_disk_write(disk, lba, data))
-				{
-					logerror("S1410: HD write error!\n");
-				}
-				lba++;
-				blocks--;
-				dataLength -= m_sector_bytes;
-				data += m_sector_bytes;
-			}
-		}
-		break;
-
 	case S1410_CMD_INIT_DRIVE_PARAMS:
 		{
 			int sectorsPerTrack = 0;
@@ -372,7 +357,7 @@ void s1410_device::ReadData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
-	case SCSI_CMD_REQUEST_SENSE:
+	case T10SPC_CMD_REQUEST_SENSE:
 		data[0] = m_sense_asc & 0x7f;
 		data[1] = (m_sense_information >> 16) & 0x1f;
 		data[2] = (m_sense_information >> 8) & 0xff;

@@ -137,8 +137,8 @@ void gdrom_device::ExecCommand()
 			}
 			else
 			{
-				lba = (command[2]<<16 | command[3]<<8 | command[4]) - 150;
-				blocks = command[8]<<16 | command[9]<<8 | command[10];
+				m_lba = (command[2]<<16 | command[3]<<8 | command[4]) - 150;
+				m_blocks = command[8]<<16 | command[9]<<8 | command[10];
 
 				read_type = (command[1] >> 1) & 7;
 				data_select = (command[1]>>4) & 0xf;
@@ -153,16 +153,16 @@ void gdrom_device::ExecCommand()
 					fatalerror("GDROM: Unhandled data_select %d\n", data_select);
 				}
 
-				printf("GDROM: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n", lba, blocks, blocks * m_sector_bytes, read_type, data_select);
+				printf("GDROM: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n", m_lba, m_blocks, m_blocks * m_sector_bytes, read_type, data_select);
 
-				if (num_subblocks > 1)
+				if (m_num_subblocks > 1)
 				{
-					cur_subblock = lba % num_subblocks;
-					lba /= num_subblocks;
+					m_cur_subblock = m_lba % m_num_subblocks;
+					m_lba /= m_num_subblocks;
 				}
 				else
 				{
-					cur_subblock = 0;
+					m_cur_subblock = 0;
 				}
 
 				if (m_cdda != NULL)
@@ -172,7 +172,7 @@ void gdrom_device::ExecCommand()
 
 				m_phase = SCSI_PHASE_DATAIN;
 				m_status_code = SCSI_STATUS_CODE_GOOD;
-				m_transfer_length = blocks * m_sector_bytes;
+				m_transfer_length = m_blocks * m_sector_bytes;
 			}
 			break;
 
@@ -180,7 +180,7 @@ void gdrom_device::ExecCommand()
 		case 0x14:
 		{
 			int start_trk = command[2];// ok?
-			int end_trk = cdrom_get_last_track(cdrom);
+			int end_trk = cdrom_get_last_track(m_cdrom);
 			int length;
 			int allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
 
@@ -263,29 +263,29 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 
 		case 0x30: // CD_READ
 			logerror("GDROM: read %x dataLength, \n", dataLength);
-			if ((cdrom) && (blocks))
+			if ((m_cdrom) && (m_blocks))
 			{
 				while (dataLength > 0)
 				{
-					if (!cdrom_read_data(cdrom, lba, tmp_buffer, CD_TRACK_MODE1))
+					if (!cdrom_read_data(m_cdrom, m_lba, tmp_buffer, CD_TRACK_MODE1))
 					{
 						logerror("GDROM: CD read error!\n");
 					}
 
-					logerror("True LBA: %d, buffer half: %d\n", lba, cur_subblock * m_sector_bytes);
+					logerror("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
 
-					memcpy(data, &tmp_buffer[cur_subblock * m_sector_bytes], m_sector_bytes);
+					memcpy(data, &tmp_buffer[m_cur_subblock * m_sector_bytes], m_sector_bytes);
 
-					cur_subblock++;
-					if (cur_subblock >= num_subblocks)
+					m_cur_subblock++;
+					if (m_cur_subblock >= m_num_subblocks)
 					{
-						cur_subblock = 0;
+						m_cur_subblock = 0;
 
-						lba++;
-						blocks--;
+						m_lba++;
+						m_blocks--;
 					}
 
-					last_lba = lba;
+					m_last_lba = m_lba;
 					dataLength -= m_sector_bytes;
 					data += m_sector_bytes;
 				}
@@ -317,7 +317,7 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 							start_trk = 1;
 						}
 
-						end_trk = cdrom_get_last_track(cdrom);
+						end_trk = cdrom_get_last_track(m_cdrom);
 						len = (end_trk * 8) + 2;
 
 						// the returned TOC DATA LENGTH must be the full amount,
@@ -349,11 +349,11 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 							}
 
 							data[dptr++] = 0;
-							data[dptr++] = cdrom_get_adr_control(cdrom, cdrom_track);
+							data[dptr++] = cdrom_get_adr_control(m_cdrom, cdrom_track);
 							data[dptr++] = i;
 							data[dptr++] = 0;
 
-							tstart = cdrom_get_track_start(cdrom, cdrom_track);
+							tstart = cdrom_get_track_start(m_cdrom, cdrom_track);
 							if ((command[1]&2)>>1)
 								tstart = lba_to_msf(tstart);
 							data[dptr++] = (tstart>>24) & 0xff;
