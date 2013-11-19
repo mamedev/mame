@@ -1125,14 +1125,17 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 MACHINE_CONFIG_END
 
 /*
-    ROM loading
+    All ROM dumps except the speech ROM have a CRC16 checksum as the final two
+    bytes. ROM1 contains four 8K chunks of ROM contents with an own CRC at their
+    ends. All GROMs, ROM0, and the four ROM1 parts were successfully
+    validated.
 */
 ROM_START(ti99_8)
 	// Logical (CPU) memory space: ROM0
 	ROM_REGION(0x2000, ROM0_TAG, 0)
 	ROM_LOAD("u4_rom0.bin", 0x0000, 0x2000, CRC(901eb8d6) SHA1(13190c5e834baa9c0a70066b566cfcef438ed88a))
 
-	// Physical memory space: ROM1
+	// Physical memory space (mapped): ROM1
 	ROM_REGION(0x8000, ROM1_TAG, 0)
 	ROM_LOAD("u25_rom1.bin", 0x0000, 0x8000, CRC(b574461a) SHA1(42c6aed44802cfabdd26b565d6e5ddfcd689f11e))
 
@@ -1142,8 +1145,9 @@ ROM_START(ti99_8)
 	ROM_LOAD("cd2326a.vsm", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020))
 
 	// System GROMs. 3 chips @ f830
-	// The schematics do not enumerate the circuits but only show "circuits on board" (COB)
-	// so we name the roms as gID_port.bin
+	// The schematics do not enumerate the circuits but only talk about
+	// "circuits on board" (COB) so we name the GROMs as gM_N.bin where M is the
+	// ID (0-7) and N is the access port in the logical address space.
 	ROM_REGION(0x6000, region_sysgrom, 0)
 	ROM_LOAD("g0_f830.bin", 0x0000, 0x1800, CRC(1026db60) SHA1(7327095bf4f390476e69d9fd8424e98ea1f2325a))
 	ROM_LOAD("g1_f830.bin", 0x2000, 0x1800, CRC(93a43d65) SHA1(19be8a07d674bc7554c2bc9c7a5725d81e888e6e))
@@ -1162,7 +1166,7 @@ ROM_START(ti99_8)
 
 	// Pascal library. 8 chips @ f850
 	ROM_REGION(0x10000, region_gromlib2, 0)
-	ROM_LOAD("g0_f850.bin", 0x0000, 0x1800, CRC(ec59a428) SHA1(be6d47a3497130f22b771c28af50abe632744d70))
+	ROM_LOAD("g0_f850.bin", 0x0000, 0x1800, CRC(2d948672) SHA1(cf15912d6dae5a450e0cfd796aa36ea5e521dc56))
 	ROM_LOAD("g1_f850.bin", 0x2000, 0x1800, CRC(7d64a842) SHA1(d5884bb2af21c8027311478ee506beac6f46203d))
 	ROM_LOAD("g2_f850.bin", 0x4000, 0x1800, CRC(e5ed8900) SHA1(03826882ce10fb5a6b3a9ccc85d3d1fe51979d0b))
 	ROM_LOAD("g3_f850.bin", 0x6000, 0x1800, CRC(87aaf19e) SHA1(fdbe163773b8a30fa6b9508e679be6fa4f99bf7a))
@@ -1173,7 +1177,7 @@ ROM_START(ti99_8)
 
 	// Pascal library. 3 chips @ f860
 	ROM_REGION(0x6000, region_gromlib3, 0)
-	ROM_LOAD("g0_f860.bin", 0x0000, 0x1800, CRC(9b7ec501) SHA1(223cc0070429e4a8e3d9fe10f5f660f011fe8fa9))
+	ROM_LOAD("g0_f860.bin", 0x0000, 0x1800, CRC(0ceef210) SHA1(b89957fbff094b758746391a69dea6907c66b950))
 	ROM_LOAD("g1_f860.bin", 0x2000, 0x1800, CRC(fc87de25) SHA1(4695b7f979f59a01ec16c55e4587c3379482b658))
 	ROM_LOAD("g2_f860.bin", 0x4000, 0x1800, CRC(e833e350) SHA1(6ffe501981a1112be1af596a489d96e287fc6be5))
 
