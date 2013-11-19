@@ -295,10 +295,6 @@ UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitm
 	return 0;
 }
 
-void generic_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-}
-
 WRITE8_MEMBER( generic_terminal_device::kbd_put )
 {
 	if (data)
@@ -352,7 +348,6 @@ void generic_terminal_device::device_reset()
 {
 	clear();
 	m_framecnt = 0;
-	//m_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
 }
 
 /*
@@ -518,6 +513,11 @@ void serial_terminal_device::device_reset()
 		set_data_frame(8, 1, PARITY_EVEN, false);
 		break;
 	}
+}
+
+void serial_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void serial_terminal_device::send_key(UINT8 code)

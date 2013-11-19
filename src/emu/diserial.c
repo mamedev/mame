@@ -66,14 +66,14 @@ void device_serial_interface::interface_pre_start()
 
 void device_serial_interface::set_rcv_rate(attotime rate)
 {
-	m_rcv_rate = rate;
+	m_rcv_rate = rate/2;
 	receive_register_reset();
 	m_rcv_clock->adjust(attotime::never);
 }
 
 void device_serial_interface::set_tra_rate(attotime rate)
 {
-	m_tra_rate = rate;
+	m_tra_rate = rate/2;
 	transmit_register_reset();
 	m_tra_clock->adjust(attotime::never);
 }

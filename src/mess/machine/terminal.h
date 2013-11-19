@@ -66,7 +66,6 @@ protected:
 	virtual void term_write(UINT8 data);
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 	virtual void send_key(UINT8 code) { m_keyboard_func(0, code); }
 	UINT8 m_buffer[TERMINAL_WIDTH*50]; // make big enough for teleprinter
@@ -104,6 +103,7 @@ protected:
 	virtual void device_start();
 	virtual void device_config_complete();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void tra_callback();
 	virtual void tra_complete();
 	virtual void rcv_complete();

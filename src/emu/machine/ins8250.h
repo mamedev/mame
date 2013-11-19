@@ -44,6 +44,7 @@ protected:
 	virtual void rcv_complete();
 	virtual void tra_complete();
 	virtual void tra_callback();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	virtual void set_fcr(UINT8 data) {}
 	virtual void push_tx(UINT8 data) {}

@@ -539,6 +539,11 @@ void ins8250_uart_device::device_config_complete()
 	}
 }
 
+void ins8250_uart_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+		device_serial_interface::device_timer(timer, id, param, ptr);
+}
+
 void ns16550_device::device_start()
 {
 	m_timeout = timer_alloc();
