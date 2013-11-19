@@ -21,13 +21,22 @@
     20-pin devices:
         PAL10H8     = QP20 QF0320
         PAL12H6     = QP20 QF0320
-        PAL14H4     = QP20
-        PAL16H2     = QP20
-        PAL16C1     = QP20
+        PAL14H4     = QP20 QF0448
+        PAL16H2     = QP20 QF0512
+        PAL16C1     = QP20 QF0512
         PAL10L8     = QP20 QF0320
-        PAL12L6     = QP20
-        PAL14L4     = QP20
-        PAL16L2     = QP20
+        PAL12L6     = QP20 QF0320
+        PAL14L4     = QP20 QF0448
+        PAL16L2     = QP20 QF0512
+
+        PAL10P8     = QP20 QF0328
+        PAL12P6     = QP20 QF0390
+        PAL14P4     = QP20 QF0452
+        PAL16P2     = QP20 QF0514
+        PAL16P8     = QP20 QF2056
+        PAL16RP4    = QP20 QF2056
+        PAL16RP6    = QP20 QF2056
+        PAL16RP8    = QP20 QF2056
 
         15S8        = QP20 QF0448
 
@@ -37,10 +46,10 @@
 
         PAL16L8     = QP20 QF2048
 
-        PAL16R4     = QP20
-        PAL16R6     = QP20
-        PAL16R8     = QP20
-        PAL16RA8    = QP20 QF2056
+        PAL16R4     = QP20 QF2048
+        PAL16R6     = QP20 QF2048
+        PAL16R8     = QP20 QF2048
+        PAL16RA8    = QP20 QF2056?
 
         PAL16V8R    = QP20 QF2194
         PALCE16V8   = QP20 QF2194
@@ -48,18 +57,40 @@
 
         18CV8       = QP20 QF2696
 
+        EPL10P8     = QP20
+        EPL12P6     = QP20
+        EPL14P4     = QP20
+        EPL16P2     = QP20
+        EPL16P8     = QP20
+        EPL16RP8    = QP20
+        EPL16RP6    = QP20
+        EPL16RP4    = QP20
+
     24-pin devices:
-        PAL20L8     = QP24
-        PAL20L10    = QP24
-        PAL20R4     = QP24
-        PAL20R6     = QP24
-        PAL20R8     = QP24
+        PAL6L16     = QP24 QF0192
+        PAL8L14     = QP24 QF0224
+        PAL12H10    = QP24 QF0480
+        PAL12L10    = QP24 QF0480
+        PAL14H8     = QP24 QF0560
+        PAL14L8     = QP24 QF0560
+        PAL16H6     = QP24 QF0640
+        PAL16L6     = QP24 QF0640
+        PAL18H4     = QP24 QF0720
+        PAL18L4     = QP24 QF0720
+        PAL20C1     = QP24 QF0640
+        PAL20L2     = QP24 QF0640
 
-        PAL20X4     = QP24
-        PAL20X8     = QP24
-        PAL20X10    = QP24
+        PAL20L8     = QP24 QF2560
+        PAL20L10    = QP24 QF1600
+        PAL20R4     = QP24 QF2560
+        PAL20R6     = QP24 QF2560
+        PAL20R8     = QP24 QF2560
 
-        PAL22V10    = QP24
+        PAL20X4     = QP24 QF1600
+        PAL20X8     = QP24 QF1600
+        PAL20X10    = QP24 QF1600
+
+        PAL22V10    = QP24 QF5828?
 
         GAL20V8A    = QP24 QF2706
         GAL22V10    = QP24 QF5892
@@ -69,8 +100,8 @@
 
 ****************************************************************************
 
-    Thanks to Charles MacDonald for providing information on how to decode
-    the PLS153/82S153 and CK2605 fuse map.
+    Thanks to Charles MacDonald (http://cgfm2.emuviews.com/) for providing
+    information on how to decode the PLS153/82S153 and CK2605 fuse map.
 
 ***************************************************************************/
 
@@ -134,6 +165,26 @@
 #define LOWHIGH_FUSE_BLOWN 0x00000004
 #define NO_FUSE_BLOWN      0x00000008
 
+
+
+/* Symbols */
+#define AND_SYMBOL "&"
+#define OR_SYMBOL "+"
+#define XOR_SYMBOL ":+:"
+
+#define LOW_SYMBOL "/"
+
+#define INPUT_SYMBOL "i"
+#define OUTPUT_SYMBOL "o"
+#define REGISTERED_FEEDBACK_OUTPUT_SYMBOL "rfo"
+#define OUTPUT_FEEDBACK_SYMBOL "of"
+#define REGISTERED_FEEDBACK_SYMBOL "rf"
+
+#define COMBINATORIAL_ASSIGNMENT "="
+#define REGISTERED_ASSIGNMENT ":="
+
+
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -181,6 +232,7 @@ typedef UINT16 (*get_pin_fuse_state_func)(const pal_data* pal, const jed_data* j
 struct _pal_data
 {
 	const char *name;
+    UINT32 numfuses;
 	const pin_fuse_rows *pinfuserows;
 	UINT16 pinfuserowscount;
 	const pin_fuse_columns *pinfusecolumns;
@@ -233,6 +285,36 @@ static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed
 static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_data* jed);
 static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed);
+#if defined(ricoh_pals)
+static void print_epl10p8_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_epl12p6_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_epl14p4_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_epl16p2_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_epl16p8_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_epl16rp8_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_epl16rp6_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_epl16rp4_product_terms(const pal_data* pal, const jed_data* jed);
+#endif
+static void print_pal10p8_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal12p6_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal14p4_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal16p2_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal16p8_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal16rp4_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal16rp6_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal16rp8_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal6l16_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal8l14_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal12h10_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal12l10_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal14h8_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal14l8_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal16h6_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal16l6_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal18h4_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal18l4_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal20c1_product_terms(const pal_data* pal, const jed_data* jed);
+static void print_pal20l2_product_terms(const pal_data* pal, const jed_data* jed);
 
 
 
@@ -263,6 +345,36 @@ static void config_pal20x8_pins(const pal_data* pal, const jed_data* jed);
 static void config_pal20x10_pins(const pal_data* pal, const jed_data* jed);
 static void config_82s153_pls153_pins(const pal_data* pal, const jed_data* jed);
 static void config_ck2605_pins(const pal_data* pal, const jed_data* jed);
+#if defined(ricoh_pals)
+static void config_epl10p8_pins(const pal_data* pal, const jed_data* jed);
+static void config_epl12p6_pins(const pal_data* pal, const jed_data* jed);
+static void config_epl14p4_pins(const pal_data* pal, const jed_data* jed);
+static void config_epl16p2_pins(const pal_data* pal, const jed_data* jed);
+static void config_epl16p8_pins(const pal_data* pal, const jed_data* jed);
+static void config_epl16rp8_pins(const pal_data* pal, const jed_data* jed);
+static void config_epl16rp6_pins(const pal_data* pal, const jed_data* jed);
+static void config_epl16rp4_pins(const pal_data* pal, const jed_data* jed);
+#endif
+static void config_pal10p8_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal12p6_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal14p4_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal16p2_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal16p8_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal16rp4_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal16rp6_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal16rp8_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal6l16_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal8l14_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal12h10_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal12l10_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal14h8_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal14l8_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal16h6_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal16l6_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal18h4_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal18l4_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal20c1_pins(const pal_data* pal, const jed_data* jed);
+static void config_pal20l2_pins(const pal_data* pal, const jed_data* jed);
 
 
 
@@ -391,14 +503,14 @@ static pin_fuse_rows pal16r8pinfuserows[] = {
 	{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 224}};    /* Registered Output */
 
 static pin_fuse_rows palce16v8pinfuserows[] = {
-	{12, 1792, 1824, 2016},
-	{13, 1536, 1568, 1760},
-	{14, 1280, 1312, 1504},
-	{15, 1024, 1056, 1248},
-	{16, 768, 800, 992},
-	{17, 512, 544, 736},
-	{18, 256, 288, 480},
-	{19, 0, 32, 224}};
+	{12, 0, 0, 0},
+	{13, 0, 0, 0},
+	{14, 0, 0, 0},
+	{15, 0, 0, 0},
+	{16, 0, 0, 0},
+	{17, 0, 0, 0},
+	{18, 0, 0, 0},
+	{19, 0, 0, 0}};
 
 static pin_fuse_rows gal16v8pinfuserows[] = {
 	{12, 0, 0, 0},
@@ -543,6 +655,258 @@ static pin_fuse_rows ck2605pinfuserows[] = {
 	{17, 988,  0, 0},
 	{18, 1024, 0, 0},
 	{19, 1060, 0, 0}};
+
+#if defined(ricoh_pals)
+static pin_fuse_rows epl10p8pinfuserows[] = {
+	{12, NO_OUTPUT_ENABLE_FUSE_ROW, 560, 620},
+	{13, NO_OUTPUT_ENABLE_FUSE_ROW, 480, 540},
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 400, 460},
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 320, 380},
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 240, 300},
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 160, 220},
+	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 80, 140},
+	{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 60}};
+
+static pin_fuse_rows epl12p6pinfuserows[] = {
+	{13, NO_OUTPUT_ENABLE_FUSE_ROW, 576, 744},
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 480, 552},
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 384, 456},
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 288, 360},
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 192, 264},
+	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 168}};
+
+static pin_fuse_rows epl14p4pinfuserows[] = {
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 672, 868},
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 448, 644},
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 224, 420},
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 196}};
+
+static pin_fuse_rows epl16p2pinfuserows[] = {
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 992},
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 480}};
+
+static pin_fuse_rows epl16p8pinfuserows[] = {
+	{12, 1792, 1824, 2016},
+	{13, 1536, 1568, 1760},
+	{14, 1280, 1312, 1504},
+	{15, 1024, 1056, 1248},
+	{16, 768, 800, 992},
+	{17, 512, 544, 736},
+	{18, 256, 288, 480},
+	{19, 0, 32, 224}};
+
+static pin_fuse_rows epl16rp8pinfuserows[] = {
+	{12, NO_OUTPUT_ENABLE_FUSE_ROW, 1792, 2016}, /* Registered Output */
+	{13, NO_OUTPUT_ENABLE_FUSE_ROW, 1536, 1760}, /* Registered Output */
+    {14, NO_OUTPUT_ENABLE_FUSE_ROW, 1280, 1504}, /* Registered Output */
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 1024, 1248}, /* Registered Output */
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 768, 992},   /* Registered Output */
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},   /* Registered Output */
+	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 480},   /* Registered Output */
+	{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 224}};    /* Registered Output */
+
+static pin_fuse_rows epl16rp6pinfuserows[] = {
+	{12, 1792, 1824, 2016},
+	{13, NO_OUTPUT_ENABLE_FUSE_ROW, 1536, 1760}, /* Registered Output */
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 1280, 1504}, /* Registered Output */
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 1024, 1248}, /* Registered Output */
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 768, 992},   /* Registered Output */
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},   /* Registered Output */
+	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 480},   /* Registered Output */
+	{19, 0, 32, 224}};
+
+static pin_fuse_rows epl16rp4pinfuserows[] = {
+	{12, 1792, 1824, 2016},
+	{13, 1536, 1568, 1760},
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 1280, 1504}, /* Registered Output */
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 1024, 1248}, /* Registered Output */
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 768, 992},   /* Registered Output */
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},   /* Registered Output */
+	{18, 256, 288, 480},
+	{19, 0, 32, 224}};
+#endif
+
+static pin_fuse_rows pal10p8pinfuserows[] = {
+	{12, NO_OUTPUT_ENABLE_FUSE_ROW, 280, 300},
+	{13, NO_OUTPUT_ENABLE_FUSE_ROW, 240, 260},
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 200, 220},
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 160, 180},
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 120, 140},
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 80, 100},
+	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 40, 60},
+	{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 20}};
+
+static pin_fuse_rows pal12p6pinfuserows[] = {
+	{13, NO_OUTPUT_ENABLE_FUSE_ROW, 288, 360},
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 240, 264},
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 192, 216},
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 144, 168},
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 96, 120},
+	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 72}};
+
+static pin_fuse_rows pal14p4pinfuserows[] = {
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 336, 420},
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 224, 308},
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 112, 196},
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 84}};
+
+static pin_fuse_rows pal16p2pinfuserows[] = {
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 480},
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 224}};
+
+static pin_fuse_rows pal16p8pinfuserows[] = {
+	{12, 1792, 1824, 2016},
+	{13, 1536, 1568, 1760},
+	{14, 1280, 1312, 1504},
+	{15, 1024, 1056, 1248},
+	{16, 768, 800, 992},
+	{17, 512, 544, 736},
+	{18, 256, 288, 480},
+	{19, 0, 32, 224}};
+
+static pin_fuse_rows pal16rp4pinfuserows[] = {
+	{12, 1792, 1824, 2016},
+	{13, 1536, 1568, 1760},
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 1280, 1504}, /* Registered Output */
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 1024, 1248}, /* Registered Output */
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 768, 992},   /* Registered Output */
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},   /* Registered Output */
+	{18, 256, 288, 480},
+	{19, 0, 32, 224}};
+
+static pin_fuse_rows pal16rp6pinfuserows[] = {
+	{12, 1792, 1824, 2016},
+	{13, NO_OUTPUT_ENABLE_FUSE_ROW, 1536, 1760}, /* Registered Output */
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 1280, 1504}, /* Registered Output */
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 1024, 1248}, /* Registered Output */
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 768, 992},   /* Registered Output */
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},   /* Registered Output */
+	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 480},   /* Registered Output */
+	{19, 0, 32, 224}};
+
+static pin_fuse_rows pal16rp8pinfuserows[] = {
+	{12, NO_OUTPUT_ENABLE_FUSE_ROW, 1792, 2016}, /* Registered Output */
+	{13, NO_OUTPUT_ENABLE_FUSE_ROW, 1536, 1760}, /* Registered Output */
+	{14, NO_OUTPUT_ENABLE_FUSE_ROW, 1280, 1504}, /* Registered Output */
+	{15, NO_OUTPUT_ENABLE_FUSE_ROW, 1024, 1248}, /* Registered Output */
+	{16, NO_OUTPUT_ENABLE_FUSE_ROW, 768, 992},   /* Registered Output */
+	{17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},   /* Registered Output */
+	{18, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 480},   /* Registered Output */
+	{19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 224}};    /* Registered Output */
+
+static pin_fuse_rows pal6l16pinfuserows[] = {
+    {1, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+    {2, NO_OUTPUT_ENABLE_FUSE_ROW, 24, 24},
+    {3, NO_OUTPUT_ENABLE_FUSE_ROW, 36, 36},
+    {10, NO_OUTPUT_ENABLE_FUSE_ROW, 132, 132},
+    {11, NO_OUTPUT_ENABLE_FUSE_ROW, 168, 168},
+    {13, NO_OUTPUT_ENABLE_FUSE_ROW, 180, 180},
+    {14, NO_OUTPUT_ENABLE_FUSE_ROW, 156, 156},
+    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 144, 144},
+    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 120, 120},
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 108, 108},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 96, 96},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 84, 84},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 72, 72},
+    {21, NO_OUTPUT_ENABLE_FUSE_ROW, 60, 60},
+    {22, NO_OUTPUT_ENABLE_FUSE_ROW, 48, 48},
+    {23, NO_OUTPUT_ENABLE_FUSE_ROW, 12, 12}};
+
+static pin_fuse_rows pal8l14pinfuserows[] = {
+    {1, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 0},
+    {2, NO_OUTPUT_ENABLE_FUSE_ROW, 32, 32},
+    {11, NO_OUTPUT_ENABLE_FUSE_ROW, 192, 192},
+    {13, NO_OUTPUT_ENABLE_FUSE_ROW, 208, 208},
+    {14, NO_OUTPUT_ENABLE_FUSE_ROW, 176, 176},
+    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 160, 160},
+    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 144, 144},
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 128, 128},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 112, 112},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 96, 96},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 80, 80},
+    {21, NO_OUTPUT_ENABLE_FUSE_ROW, 64, 64},
+    {22, NO_OUTPUT_ENABLE_FUSE_ROW, 48, 48},
+    {23, NO_OUTPUT_ENABLE_FUSE_ROW, 16, 16}};
+
+static pin_fuse_rows pal12h10pinfuserows[] = {
+    {14, NO_OUTPUT_ENABLE_FUSE_ROW, 432, 456},
+    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 384, 408},
+    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 336, 360},
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 288, 312},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 240, 264},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 192, 216},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 144, 168},
+    {21, NO_OUTPUT_ENABLE_FUSE_ROW, 96, 120},
+    {22, NO_OUTPUT_ENABLE_FUSE_ROW, 48, 72},
+    {23, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 24}};
+
+static pin_fuse_rows pal12l10pinfuserows[] = {
+    {14, NO_OUTPUT_ENABLE_FUSE_ROW, 432, 456},
+    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 384, 408},
+    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 336, 360},
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 288, 312},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 240, 264},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 192, 216},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 144, 168},
+    {21, NO_OUTPUT_ENABLE_FUSE_ROW, 96, 120},
+    {22, NO_OUTPUT_ENABLE_FUSE_ROW, 48, 72},
+    {23, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 24}};
+
+static pin_fuse_rows pal14h8pinfuserows[] = {
+    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 448, 532},
+    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 392, 420},
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 336, 364},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 280, 308},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 224, 252},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 168, 196},
+    {21, NO_OUTPUT_ENABLE_FUSE_ROW, 112, 140},
+    {22, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 84}};
+
+static pin_fuse_rows pal14l8pinfuserows[] = {
+    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 448, 532},
+    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 392, 420},
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 336, 364},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 280, 308},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 224, 252},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 168, 196},
+    {21, NO_OUTPUT_ENABLE_FUSE_ROW, 112, 140},
+    {22, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 84}};
+
+static pin_fuse_rows pal16h6pinfuserows[] = {
+    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 608},
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 384, 480},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 320, 352},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 288},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 128, 224},
+    {21, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 96}};
+
+static pin_fuse_rows pal16l6pinfuserows[] = {
+    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 608},
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 384, 480},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 320, 352},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 288},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 128, 224},
+    {21, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 96}};
+
+static pin_fuse_rows pal18h4pinfuserows[] = {
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 504, 684},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 360, 468},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 216, 324},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 180}};
+
+static pin_fuse_rows pal18l4pinfuserows[] = {
+    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 504, 684},
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 360, 468},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 216, 324},
+    {20, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 180}};
+
+static pin_fuse_rows pal20c1pinfuserows[] = {
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 280},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 320, 600}};
+
+static pin_fuse_rows pal20l2pinfuserows[] = {
+    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 320, 600},
+    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 280}};
 
 static pin_fuse_columns pal10l8pinfusecolumns[] = {
 	{1, 3, 2},
@@ -1047,212 +1411,868 @@ static pin_fuse_columns ck2605pinfusecolumns[] = {
 	{18, 33, 32},
 	{19, 35, 34}};
 
+#if defined(ricoh_pals)
+static pin_fuse_columns epl10p8pinfusecolumns[] = {
+	{1,  3,  2},
+	{2,  1,  0},
+	{3,  5,  4},
+	{4,  7,  6},
+	{5,  9,  8},
+	{6,  11, 10},
+	{7,  13, 12},
+	{8,  15, 14},
+	{9,  17, 16},
+	{11, 19, 18}};
+
+static pin_fuse_columns epl12p6pinfusecolumns[] = {
+	{1,  3,  2},
+	{2,  1,  0},
+	{3,  5,  4},
+	{4,  9,  8},
+	{5,  11, 10},
+	{6,  13, 12},
+	{7,  15, 14},
+	{8,  17, 16},
+	{9,  19, 18},
+	{11, 21, 20},
+	{12, 19, 18},
+	{19, 7,  6}};
+
+static pin_fuse_columns epl14p4pinfusecolumns[] = {
+	{1,  3,  2},
+	{2,  1,  0},
+	{3,  5,  4},
+	{4,  9,  8},
+	{5,  13, 12},
+	{6,  15, 14},
+	{7,  17, 16},
+	{8,  21, 20},
+	{9,  25, 24},
+	{11, 27, 26},
+	{12, 23, 22},
+	{13, 19, 18},
+	{18, 11, 10},
+	{19, 7,  6}};
+
+static pin_fuse_columns epl16p2pinfusecolumns[] = {
+	{1,  3,  2},
+	{2,  1,  0},
+	{3,  5,  4},
+	{4,  9,  8},
+	{5,  13, 12},
+	{6,  17, 16},
+	{7,  21, 20},
+	{8,  25, 24},
+	{9,  29, 28},
+	{11, 31, 30},
+	{12, 27, 26},
+	{13, 23, 22},
+	{14, 19, 18},
+	{17, 15, 14},
+	{18, 11, 10},
+	{19, 7,  6}};
+
+static pin_fuse_columns epl16p8pinfusecolumns[] = {
+	{1,  3,  2},
+	{2,  1,  0},
+	{3,  5,  4},
+	{4,  9,  8},
+	{5,  13, 12},
+	{6,  17, 16},
+	{7,  21, 20},
+	{8,  25, 24},
+	{9,  29, 28},
+	{11, 31, 30},
+	{13, 27, 26},
+	{14, 23, 22},
+	{15, 19, 18},
+	{16, 15, 14},
+	{17, 11, 10},
+	{18, 7,  6}};
+
+static pin_fuse_columns epl16rp8pinfusecolumns[] = {
+	{2,  1,  0},
+	{3,  5,  4},
+	{4,  9,  8},
+	{5,  13, 12},
+	{6,  17, 16},
+	{7,  21, 20},
+	{8,  25, 24},
+	{9,  29, 28},
+	{12, 31, 30},
+	{13, 27, 26},
+    {14, 23, 22},
+    {15, 19, 18},
+    {16, 15, 14},
+    {17, 11, 10},
+	{18, 7,  6},
+	{19, 3,  2}};
+
+static pin_fuse_columns epl16rp6pinfusecolumns[] = {
+	{2,  1,  0},
+	{3,  5,  4},
+	{4,  9,  8},
+	{5,  13, 12},
+	{6,  17, 16},
+	{7,  21, 20},
+	{8,  25, 24},
+	{9,  29, 28},
+	{12, 31, 30},
+	{13, 27, 26},
+    {14, 23, 22},
+    {15, 19, 18},
+    {16, 15, 14},
+    {17, 11, 10},
+	{18, 7,  6},
+	{19, 3,  2}};
+
+static pin_fuse_columns epl16rp4pinfusecolumns[] = {
+	{2,  1,  0},
+	{3,  5,  4},
+	{4,  9,  8},
+	{5,  13, 12},
+	{6,  17, 16},
+	{7,  21, 20},
+	{8,  25, 24},
+	{9,  29, 28},
+	{12, 31, 30},
+	{13, 27, 26},
+	{18, 7,  6},
+	{19, 3,  2}};
+#endif
+
+static pin_fuse_columns pal10p8pinfusecolumns[] = {
+	{1, 3, 2},
+	{2, 1, 0},
+	{3, 5, 4},
+	{4, 7, 6},
+	{5, 9, 8},
+	{6, 11, 10},
+	{7, 13, 12},
+	{8, 15, 14},
+	{9, 17, 16},
+	{11, 19, 18}};
+
+static pin_fuse_columns pal12p6pinfusecolumns[] = {
+	{1, 3, 2},
+	{2, 1, 0},
+	{3, 5, 4},
+	{4, 9, 8},
+	{5, 11, 10},
+	{6, 13, 12},
+	{7, 15, 14},
+	{8, 17, 16},
+	{9, 21, 20},
+	{11, 23, 22},
+	{12, 19, 18},
+	{19, 7, 6}};
+
+static pin_fuse_columns pal14p4pinfusecolumns[] = {
+	{1, 3, 2},
+	{2, 1, 0},
+	{3, 5, 4},
+	{4, 9, 8},
+	{5, 13, 12},
+	{6, 15, 14},
+	{7, 17, 16},
+	{8, 21, 20},
+	{9, 25, 24},
+	{11, 27, 26},
+	{12, 23, 22},
+	{13, 19, 18},
+	{18, 11, 10},
+	{19, 7, 6}};
+
+static pin_fuse_columns pal16p2pinfusecolumns[] = {
+	{1, 3, 2},
+	{2, 1, 0},
+	{3, 5, 4},
+	{4, 9, 8},
+	{5, 13, 12},
+	{6, 17, 16},
+	{7, 21, 20},
+	{8, 25, 24},
+	{9, 29, 28},
+	{11, 31, 30},
+	{12, 27, 26},
+	{13, 23, 22},
+	{14, 19, 18},
+	{17, 15, 14},
+	{18, 11, 10},
+	{19, 7, 6}};
+
+static pin_fuse_columns pal16p8pinfusecolumns[] = {
+	{1, 3, 2},
+	{2, 1, 0},
+	{3, 5, 4},
+	{4, 9, 8},
+	{5, 13, 12},
+	{6, 17, 16},
+	{7, 21, 20},
+	{8, 25, 24},
+	{9, 29, 28},
+	{11, 31, 30},
+	{13, 27, 26},
+	{14, 23, 22},
+	{15, 19, 18},
+	{16, 15, 14},
+	{17, 11, 10},
+	{18, 7, 6}};
+
+static pin_fuse_columns pal16rp4pinfusecolumns[] = {
+	{2, 1, 0},
+	{3, 5, 4},
+	{4, 9, 8},
+	{5, 13, 12},
+	{6, 17, 16},
+	{7, 21, 20},
+	{8, 25, 24},
+	{9, 29, 28},
+	{12, 31, 30},
+	{13, 27, 26},
+	{14, 23, 22}, /* Registered Output */
+	{15, 19, 18}, /* Registered Output */
+	{16, 15, 14}, /* Registered Output */
+	{17, 11, 10}, /* Registered Output */
+	{18, 7, 6},
+	{19, 3, 2}};
+
+static pin_fuse_columns pal16rp6pinfusecolumns[] = {
+	{2, 1, 0},
+	{3, 5, 4},
+	{4, 9, 8},
+	{5, 13, 12},
+	{6, 17, 16},
+	{7, 21, 20},
+	{8, 25, 24},
+	{9, 29, 28},
+	{12, 31, 30},
+	{13, 27, 26}, /* Registered Output */
+	{14, 23, 22}, /* Registered Output */
+	{15, 19, 18}, /* Registered Output */
+	{16, 15, 14}, /* Registered Output */
+	{17, 11, 10}, /* Registered Output */
+	{18, 7, 6},   /* Registered Output */
+	{19, 3, 2}};
+
+static pin_fuse_columns pal16rp8pinfusecolumns[] = {
+	{2, 1, 0},
+	{3, 5, 4},
+	{4, 9, 8},
+	{5, 13, 12},
+	{6, 17, 16},
+	{7, 21, 20},
+	{8, 25, 24},
+	{9, 29, 28},
+	{12, 31, 30}, /* Registered Output */
+	{13, 27, 26}, /* Registered Output */
+	{14, 23, 22}, /* Registered Output */
+	{15, 19, 18}, /* Registered Output */
+	{16, 15, 14}, /* Registered Output */
+	{17, 11, 10}, /* Registered Output */
+	{18, 7, 6},   /* Registered Output */
+	{19, 3, 2}};  /* Registered Output */
+
+static pin_fuse_columns pal6l16pinfusecolumns[] = {
+    {4, 1, 0},
+    {5, 3, 2},
+    {6, 5, 4},
+    {7, 7, 6},
+    {8, 9, 8},
+    {9, 11, 10}};
+
+static pin_fuse_columns pal8l14pinfusecolumns[] = {
+    {3, 1, 0},
+    {4, 3, 2},
+    {5, 5, 4},
+    {6, 7, 6},
+    {7, 9, 8},
+    {8, 11, 10},
+    {9, 13, 12},
+    {10, 15, 14}};
+
+static pin_fuse_columns pal12h10pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 7, 6},
+    {5, 9, 8},
+    {6, 11, 10},
+    {7, 13, 12},
+    {8, 15, 14},
+    {9, 17, 16},
+    {10, 19, 18},
+    {11, 21, 20},
+    {13, 23, 22}};
+
+static pin_fuse_columns pal12l10pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 7, 6},
+    {5, 9, 8},
+    {6, 11, 10},
+    {7, 13, 12},
+    {8, 15, 14},
+    {9, 17, 16},
+    {10, 19, 18},
+    {11, 21, 20},
+    {13, 23, 22}};
+
+static pin_fuse_columns pal14h8pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 9, 8},
+    {5, 11, 10},
+    {6, 13, 12},
+    {7, 15, 14},
+    {8, 17, 16},
+    {9, 19, 18},
+    {10, 21, 20},
+    {11, 25, 24},
+    {13, 27, 26},
+    {14, 23, 22},
+    {23, 7, 6}};
+
+static pin_fuse_columns pal14l8pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 9, 8},
+    {5, 11, 10},
+    {6, 13, 12},
+    {7, 15, 14},
+    {8, 17, 16},
+    {9, 19, 18},
+    {10, 21, 20},
+    {11, 25, 24},
+    {13, 27, 26},
+    {14, 23, 22},
+    {23, 7, 6}};
+
+static pin_fuse_columns pal16h6pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 9, 8},
+    {5, 13, 12},
+    {6, 15, 14},
+    {7, 17, 16},
+    {8, 19, 18},
+    {9, 21, 20},
+    {10, 25, 24},
+    {11, 29, 28},
+    {13, 31, 30},
+    {14, 27, 26},
+    {15, 23, 22},
+    {22, 11, 10},
+    {23, 7, 6}};
+
+static pin_fuse_columns pal16l6pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 9, 8},
+    {5, 13, 12},
+    {6, 15, 14},
+    {7, 17, 16},
+    {8, 19, 18},
+    {9, 21, 20},
+    {10, 25, 24},
+    {11, 29, 28},
+    {13, 31, 30},
+    {14, 27, 26},
+    {15, 23, 22},
+    {22, 11, 10},
+    {23, 7, 6}};
+
+static pin_fuse_columns pal18h4pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 9, 8},
+    {5, 13, 12},
+    {6, 17, 16},
+    {7, 19, 18},
+    {8, 21, 20},
+    {9, 25, 24},
+    {10, 29, 28},
+    {11, 33, 32},
+    {13, 35, 34},
+    {14, 31, 30},
+    {15, 27, 26},
+    {16, 23, 22},
+    {21, 15, 14},
+    {22, 11, 10},
+    {23, 7, 6}};
+
+static pin_fuse_columns pal18l4pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 9, 8},
+    {5, 13, 12},
+    {6, 17, 16},
+    {7, 19, 18},
+    {8, 21, 20},
+    {9, 25, 24},
+    {10, 29, 28},
+    {11, 33, 32},
+    {13, 35, 34},
+    {14, 31, 30},
+    {15, 27, 26},
+    {16, 23, 22},
+    {21, 15, 14},
+    {22, 11, 10},
+    {23, 7, 6}};
+
+static pin_fuse_columns pal20c1pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 9, 8},
+    {5, 13, 12},
+    {6, 17, 16},
+    {7, 21, 20},
+    {8, 25, 24},
+    {9, 29, 28},
+    {10, 33, 32},
+    {11, 37, 36},
+    {13, 39, 38},
+    {14, 35, 34},
+    {15, 31, 30},
+    {16, 27, 26},
+    {17, 23, 22},
+    {20, 19, 18},
+    {21, 15, 14},
+    {22, 11, 10},
+    {23, 7, 6}};
+
+static pin_fuse_columns pal20l2pinfusecolumns[] = {
+    {1, 3, 2},
+    {2, 1, 0},
+    {3, 5, 4},
+    {4, 9, 8},
+    {5, 13, 12},
+    {6, 17, 16},
+    {7, 21, 20},
+    {8, 25, 24},
+    {9, 29, 28},
+    {10, 33, 32},
+    {11, 37, 36},
+    {13, 39, 38},
+    {14, 35, 34},
+    {15, 31, 30},
+    {16, 27, 26},
+    {17, 23, 22},
+    {20, 19, 18},
+    {21, 15, 14},
+    {22, 11, 10},
+    {23, 7, 6}};
+
 static pal_data paldata[] = {
-	{"PAL10L8",
+	{"PAL10L8", 320,
 		pal10l8pinfuserows, ARRAY_LEN(pal10l8pinfuserows),
 		pal10l8pinfusecolumns, ARRAY_LEN(pal10l8pinfusecolumns),
 		print_pal10l8_product_terms,
 		config_pal10l8_pins,
 		NULL,
 		NULL},
-	{"PAL10H8",
+	{"PAL10H8", 320,
 		pal10h8pinfuserows, ARRAY_LEN(pal10h8pinfuserows),
 		pal10h8pinfusecolumns, ARRAY_LEN(pal10h8pinfusecolumns),
 		print_pal10h8_product_terms,
 		config_pal10h8_pins,
 		NULL,
 		NULL},
-	{"PAL12H6",
+	{"PAL12H6", 384,
 		pal12h6pinfuserows, ARRAY_LEN(pal12h6pinfuserows),
 		pal12h6pinfusecolumns, ARRAY_LEN(pal12h6pinfusecolumns),
 		print_pal12h6_product_terms,
 		config_pal12h6_pins,
 		NULL,
 		NULL},
-	{"PAL14H4",
+	{"PAL14H4", 448,
 		pal14h4pinfuserows, ARRAY_LEN(pal14h4pinfuserows),
 		pal14h4pinfusecolumns, ARRAY_LEN(pal14h4pinfusecolumns),
 		print_pal14h4_product_terms,
 		config_pal14h4_pins,
 		NULL,
 		NULL},
-	{"PAL16H2",
+	{"PAL16H2", 512,
 		pal16h2pinfuserows, ARRAY_LEN(pal16h2pinfuserows),
 		pal16h2pinfusecolumns, ARRAY_LEN(pal16h2pinfusecolumns),
 		print_pal16h2_product_terms,
 		config_pal16h2_pins,
 		NULL,
 		NULL},
-	{"PAL16C1",
+	{"PAL16C1", 512,
 		pal16c1pinfuserows, ARRAY_LEN(pal16c1pinfuserows),
 		pal16c1pinfusecolumns, ARRAY_LEN(pal16c1pinfusecolumns),
 		print_pal16c1_product_terms,
 		config_pal16c1_pins,
 		NULL,
 		NULL},
-	{"PAL12L6",
+	{"PAL12L6", 384,
 		pal12l6pinfuserows, ARRAY_LEN(pal12l6pinfuserows),
 		pal12l6pinfusecolumns, ARRAY_LEN(pal12l6pinfusecolumns),
 		print_pal12l6_product_terms,
 		config_pal12l6_pins,
 		NULL,
 		NULL},
-	{"PAL14L4",
+	{"PAL14L4", 448,
 		pal14l4pinfuserows, ARRAY_LEN(pal14l4pinfuserows),
 		pal14l4pinfusecolumns, ARRAY_LEN(pal14l4pinfusecolumns),
 		print_pal14l4_product_terms,
 		config_pal14l4_pins,
 		NULL,
 		NULL},
-	{"PAL16L2",
+	{"PAL16L2", 512,
 		pal16l2pinfuserows, ARRAY_LEN(pal16l2pinfuserows),
 		pal16l2pinfusecolumns, ARRAY_LEN(pal16l2pinfusecolumns),
 		print_pal16l2_product_terms,
 		config_pal16l2_pins,
 		NULL,
 		NULL},
-	/*{"15S8", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
-	{"PAL16L8",
+	/*{"15S8", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
+	{"PAL16L8", 2048,
 		pal16l8pinfuserows, ARRAY_LEN(pal16l8pinfuserows),
 		pal16l8pinfusecolumns, ARRAY_LEN(pal16l8pinfusecolumns),
 		print_pal16l8_product_terms,
 		config_pal16l8_pins,
 		NULL,
 		NULL},
-	{"PAL16R4",
+	{"PAL16R4", 2048,
 		pal16r4pinfuserows, ARRAY_LEN(pal16r4pinfuserows),
 		pal16r4pinfusecolumns, ARRAY_LEN(pal16r4pinfusecolumns),
 		print_pal16r4_product_terms,
 		config_pal16r4_pins,
 		NULL,
 		NULL},
-	{"PAL16R6",
+	{"PAL16R6", 2048,
 		pal16r6pinfuserows, ARRAY_LEN(pal16r6pinfuserows),
 		pal16r6pinfusecolumns, ARRAY_LEN(pal16r6pinfusecolumns),
 		print_pal16r6_product_terms,
 		config_pal16r6_pins,
 		NULL,
 		NULL},
-	{"PAL16R8",
+	{"PAL16R8", 2048,
 		pal16r8pinfuserows, ARRAY_LEN(pal16r8pinfuserows),
 		pal16r8pinfusecolumns, ARRAY_LEN(pal16r8pinfusecolumns),
 		print_pal16r8_product_terms,
 		config_pal16r8_pins,
 		NULL,
 		NULL},
-	/*{"PAL16RA8", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"PAL16V8R", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
-	{"PALCE16V8",
+	/*{"PAL16RA8", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+	{"PAL16V8R", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
+	{"PALCE16V8", 2194,
 		palce16v8pinfuserows, ARRAY_LEN(palce16v8pinfuserows),
 		palce16v8pinfusecolumns, ARRAY_LEN(palce16v8pinfusecolumns),
 		print_palce16v8_product_terms,
 		config_palce16v8_pins,
 		NULL,
 		NULL},
-	{"GAL16V8",
+	{"GAL16V8", 2194,
 		gal16v8pinfuserows, ARRAY_LEN(gal16v8pinfuserows),
 		gal16v8pinfusecolumns, ARRAY_LEN(gal16v8pinfusecolumns),
 		print_gal16v8_product_terms,
 		config_gal16v8_pins,
 		is_gal16v8_product_term_enabled,
 		NULL},
-	{"18CV8",
+	{"18CV8", 2696,
 		peel18cv8pinfuserows, ARRAY_LEN(peel18cv8pinfuserows),
 		peel18cv8pinfusecolumns, ARRAY_LEN(peel18cv8pinfusecolumns),
 		print_peel18cv8_product_terms,
 		config_peel18cv8_pins,
 		NULL,
 		get_peel18cv8_pin_fuse_state},
-	{"GAL18V10",
+	{"GAL18V10", 3540,
 		gal18v10pinfuserows, ARRAY_LEN(gal18v10pinfuserows),
 		gal18v10pinfusecolumns, ARRAY_LEN(gal18v10pinfusecolumns),
 		print_gal18v10_product_terms,
 		config_gal18v10_pins,
 		NULL,
 		NULL},
-	{"PAL20L8",
+	{"PAL20L8", 2560,
 		pal20l8pinfuserows, ARRAY_LEN(pal20l8pinfuserows),
 		pal20l8pinfusecolumns, ARRAY_LEN(pal20l8pinfusecolumns),
 		print_pal20l8_product_terms,
 		config_pal20l8_pins,
 		NULL,
 		NULL},
-	{"PAL20L10",
+	{"PAL20L10", 1600,
 		pal20l10pinfuserows, ARRAY_LEN(pal20l10pinfuserows),
 		pal20l10pinfusecolumns, ARRAY_LEN(pal20l10pinfusecolumns),
 		print_pal20l10_product_terms,
 		config_pal20l10_pins,
 		NULL,
 		NULL},
-	{"PAL20R4",
+	{"PAL20R4", 2560,
 		pal20r4pinfuserows, ARRAY_LEN(pal20r4pinfuserows),
 		pal20r4pinfusecolumns, ARRAY_LEN(pal20r4pinfusecolumns),
 		print_pal20r4_product_terms,
 		config_pal20r4_pins,
 		NULL,
 		NULL},
-	{"PAL20R6",
+	{"PAL20R6", 2560,
 		pal20r6pinfuserows, ARRAY_LEN(pal20r6pinfuserows),
 		pal20r6pinfusecolumns, ARRAY_LEN(pal20r6pinfusecolumns),
 		print_pal20r6_product_terms,
 		config_pal20r6_pins,
 		NULL,
 		NULL},
-	{"PAL20R8",
+	{"PAL20R8", 2560,
 		pal20r8pinfuserows, ARRAY_LEN(pal20r8pinfuserows),
 		pal20r8pinfusecolumns, ARRAY_LEN(pal20r8pinfusecolumns),
 		print_pal20r8_product_terms,
 		config_pal20r8_pins,
 		NULL,
 		NULL},
-	{"PAL20X4",
+	{"PAL20X4", 1600,
 		pal20x4pinfuserows, ARRAY_LEN(pal20x4pinfuserows),
 		pal20x4pinfusecolumns, ARRAY_LEN(pal20x4pinfusecolumns),
 		print_pal20x4_product_terms,
 		config_pal20x4_pins,
 		NULL,
 		NULL},
-	{"PAL20X8",
+	{"PAL20X8", 1600,
 		pal20x8pinfuserows, ARRAY_LEN(pal20x8pinfuserows),
 		pal20x8pinfusecolumns, ARRAY_LEN(pal20x8pinfusecolumns),
 		print_pal20x8_product_terms,
 		config_pal20x8_pins,
 		NULL,
 		NULL},
-	{"PAL20X10",
+	{"PAL20X10", 1600,
 		pal20x10pinfuserows, ARRAY_LEN(pal20x10pinfuserows),
 		pal20x10pinfusecolumns, ARRAY_LEN(pal20x10pinfusecolumns),
 		print_pal20x10_product_terms,
 		config_pal20x10_pins,
 		NULL,
 		NULL},
-	/*{"PAL22V10", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"GAL20V8A", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"GAL22V10", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
-	{"PLS100", NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
-	{"82S153",
+	/*{"PAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+	{"GAL20V8A", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+	{"GAL22V10", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},
+	{"PLS100", 0, NULL, 0, NULL, 0, NULL, NULL, NULL, NULL},*/
+	{"82S153", 1842,
 		_82s153_pls153pinfuserows, ARRAY_LEN(_82s153_pls153pinfuserows),
 		_82s153_pls153pinfusecolumns, ARRAY_LEN(_82s153_pls153pinfusecolumns),
 		print_82s153_pls153_product_terms,
 		config_82s153_pls153_pins,
 		NULL,
 		NULL},
-	{"PLS153",
+	{"PLS153", 1842,
 		_82s153_pls153pinfuserows, ARRAY_LEN(_82s153_pls153pinfuserows),
 		_82s153_pls153pinfusecolumns, ARRAY_LEN(_82s153_pls153pinfusecolumns),
 		print_82s153_pls153_product_terms,
 		config_82s153_pls153_pins,
 		NULL,
 		NULL},
-	{"CK2605",
+	{"CK2605", 1106,
 		ck2605pinfuserows, ARRAY_LEN(ck2605pinfuserows),
 		ck2605pinfusecolumns, ARRAY_LEN(ck2605pinfusecolumns),
 		print_ck2605_product_terms,
 		config_ck2605_pins,
 		NULL,
-		NULL}};
-
-
+		NULL},
+#if defined(ricoh_pals)
+	{"EPL10P8", 664,
+		epl10p8pinfuserows, ARRAY_LEN(epl10p8pinfuserows),
+		epl10p8pinfusecolumns, ARRAY_LEN(epl10p8pinfusecolumns),
+		print_epl10p8_product_terms,
+		config_epl10p8_pins,
+		NULL,
+		NULL},
+	{"EPL12P6", 786,
+		epl12p6pinfuserows, ARRAY_LEN(epl12p6pinfuserows),
+		epl12p6pinfusecolumns, ARRAY_LEN(epl12p6pinfusecolumns),
+		print_epl12p6_product_terms,
+		config_epl12p6_pins,
+		NULL,
+		NULL},
+	{"EPL14P4", 908,
+		epl14p4pinfuserows, ARRAY_LEN(epl14p4pinfuserows),
+		epl14p4pinfusecolumns, ARRAY_LEN(epl14p4pinfusecolumns),
+		print_epl14p4_product_terms,
+		config_epl14p4_pins,
+		NULL,
+		NULL},
+	{"EPL16P2", 1030,
+		epl16p2pinfuserows, ARRAY_LEN(epl16p2pinfuserows),
+		epl16p2pinfusecolumns, ARRAY_LEN(epl16p2pinfusecolumns),
+		print_epl16p2_product_terms,
+		config_epl16p2_pins,
+		NULL,
+		NULL},
+	{"EPL16P8", 2072,
+		epl16p8pinfuserows, ARRAY_LEN(epl16p8pinfuserows),
+		epl16p8pinfusecolumns, ARRAY_LEN(epl16p8pinfusecolumns),
+		print_epl16p8_product_terms,
+		config_epl16p8_pins,
+		NULL,
+		NULL},
+	{"EPL16RP8", 2072,
+		epl16rp8pinfuserows, ARRAY_LEN(epl16rp8pinfuserows),
+		epl16rp8pinfusecolumns, ARRAY_LEN(epl16rp8pinfusecolumns),
+		print_epl16rp8_product_terms,
+		config_epl16rp8_pins,
+		NULL,
+		NULL},
+	{"EPL16RP6", 2072,
+		epl16rp6pinfuserows, ARRAY_LEN(epl16rp6pinfuserows),
+		epl16rp6pinfusecolumns, ARRAY_LEN(epl16rp6pinfusecolumns),
+		print_epl16rp6_product_terms,
+		config_epl16rp6_pins,
+		NULL,
+        NULL},
+	{"EPL16RP4", 2072,
+		epl16rp4pinfuserows, ARRAY_LEN(epl16rp4pinfuserows),
+		epl16rp4pinfusecolumns, ARRAY_LEN(epl16rp4pinfusecolumns),
+		print_epl16rp4_product_terms,
+		config_epl16rp4_pins,
+		NULL,
+        NULL},
+#endif
+	{"PAL10P8", 328,
+		pal10p8pinfuserows, ARRAY_LEN(pal10p8pinfuserows),
+		pal10p8pinfusecolumns, ARRAY_LEN(pal10p8pinfusecolumns),
+		print_pal10p8_product_terms,
+		config_pal10p8_pins,
+		NULL,
+        NULL},
+	{"PAL12P6", 390,
+		pal12p6pinfuserows, ARRAY_LEN(pal12p6pinfuserows),
+		pal12p6pinfusecolumns, ARRAY_LEN(pal12p6pinfusecolumns),
+		print_pal12p6_product_terms,
+		config_pal12p6_pins,
+		NULL,
+        NULL},
+	{"PAL14P4", 452,
+		pal14p4pinfuserows, ARRAY_LEN(pal14p4pinfuserows),
+		pal14p4pinfusecolumns, ARRAY_LEN(pal14p4pinfusecolumns),
+		print_pal14p4_product_terms,
+		config_pal14p4_pins,
+		NULL,
+        NULL},
+	{"PAL16P2", 514,
+		pal16p2pinfuserows, ARRAY_LEN(pal16p2pinfuserows),
+		pal16p2pinfusecolumns, ARRAY_LEN(pal16p2pinfusecolumns),
+		print_pal16p2_product_terms,
+		config_pal16p2_pins,
+		NULL,
+        NULL},
+	{"PAL16P8", 2056,
+		pal16p8pinfuserows, ARRAY_LEN(pal16p8pinfuserows),
+		pal16p8pinfusecolumns, ARRAY_LEN(pal16p8pinfusecolumns),
+		print_pal16p8_product_terms,
+        config_pal16p8_pins,
+        NULL,
+        NULL},
+	{"PAL16RP4", 2056,
+		pal16rp4pinfuserows, ARRAY_LEN(pal16rp4pinfuserows),
+		pal16rp4pinfusecolumns, ARRAY_LEN(pal16rp4pinfusecolumns),
+		print_pal16rp4_product_terms,
+        config_pal16rp4_pins,
+        NULL,
+        NULL},
+	{"PAL16RP6", 2056,
+		pal16rp6pinfuserows, ARRAY_LEN(pal16rp6pinfuserows),
+		pal16rp6pinfusecolumns, ARRAY_LEN(pal16rp6pinfusecolumns),
+		print_pal16rp6_product_terms,
+        config_pal16rp6_pins,
+        NULL,
+        NULL},
+	{"PAL16RP8", 2056,
+		pal16rp8pinfuserows, ARRAY_LEN(pal16rp8pinfuserows),
+		pal16rp8pinfusecolumns, ARRAY_LEN(pal16rp8pinfusecolumns),
+		print_pal16rp8_product_terms,
+        config_pal16rp8_pins,
+        NULL,
+        NULL},
+    {"PAL6L16", 192,
+        pal6l16pinfuserows, ARRAY_LEN(pal6l16pinfuserows),
+        pal6l16pinfusecolumns, ARRAY_LEN(pal6l16pinfusecolumns),
+        print_pal6l16_product_terms,
+        config_pal6l16_pins,
+        NULL,
+        NULL},
+    {"PAL8L14", 224,
+        pal8l14pinfuserows, ARRAY_LEN(pal8l14pinfuserows),
+        pal8l14pinfusecolumns, ARRAY_LEN(pal8l14pinfusecolumns),
+        print_pal8l14_product_terms,
+        config_pal8l14_pins,
+        NULL,
+        NULL},
+    {"PAL12H10", 480,
+        pal12h10pinfuserows, ARRAY_LEN(pal12h10pinfuserows),
+        pal12h10pinfusecolumns, ARRAY_LEN(pal12h10pinfusecolumns),
+        print_pal12h10_product_terms,
+        config_pal12h10_pins,
+        NULL,
+        NULL},
+    {"PAL12L10", 480,
+        pal12l10pinfuserows, ARRAY_LEN(pal12l10pinfuserows),
+        pal12l10pinfusecolumns, ARRAY_LEN(pal12l10pinfusecolumns),
+        print_pal12l10_product_terms,
+        config_pal12l10_pins,
+        NULL,
+        NULL},
+    {"PAL14H8", 560,
+        pal14h8pinfuserows, ARRAY_LEN(pal14h8pinfuserows),
+        pal14h8pinfusecolumns, ARRAY_LEN(pal14h8pinfusecolumns),
+        print_pal14h8_product_terms,
+        config_pal14h8_pins,
+        NULL,
+        NULL},
+    {"PAL14L8", 560,
+        pal14l8pinfuserows, ARRAY_LEN(pal14l8pinfuserows),
+        pal14l8pinfusecolumns, ARRAY_LEN(pal14l8pinfusecolumns),
+        print_pal14l8_product_terms,
+        config_pal14l8_pins,
+        NULL,
+        NULL},
+    {"PAL16H6", 640,
+        pal16h6pinfuserows, ARRAY_LEN(pal16h6pinfuserows),
+        pal16h6pinfusecolumns, ARRAY_LEN(pal16h6pinfusecolumns),
+        print_pal16h6_product_terms,
+        config_pal16h6_pins,
+        NULL,
+        NULL},
+    {"PAL16L6", 640,
+        pal16l6pinfuserows, ARRAY_LEN(pal16l6pinfuserows),
+        pal16l6pinfusecolumns, ARRAY_LEN(pal16l6pinfusecolumns),
+        print_pal16l6_product_terms,
+        config_pal16l6_pins,
+        NULL,
+        NULL},
+    {"PAL18H4", 720,
+        pal18h4pinfuserows, ARRAY_LEN(pal18h4pinfuserows),
+        pal18h4pinfusecolumns, ARRAY_LEN(pal18h4pinfusecolumns),
+        print_pal18h4_product_terms,
+        config_pal18h4_pins,
+        NULL,
+        NULL},
+    {"PAL18L4", 720,
+        pal18l4pinfuserows, ARRAY_LEN(pal18l4pinfuserows),
+        pal18l4pinfusecolumns, ARRAY_LEN(pal18l4pinfusecolumns),
+        print_pal18l4_product_terms,
+        config_pal18l4_pins,
+        NULL,
+        NULL},
+    {"PAL20C1", 640,
+        pal20c1pinfuserows, ARRAY_LEN(pal20c1pinfuserows),
+        pal20c1pinfusecolumns, ARRAY_LEN(pal20c1pinfusecolumns),
+        print_pal20c1_product_terms,
+        config_pal20c1_pins,
+        NULL,
+        NULL},
+    {"PAL20L2", 640,
+        pal20l2pinfuserows, ARRAY_LEN(pal20l2pinfuserows),
+        pal20l2pinfusecolumns, ARRAY_LEN(pal20l2pinfusecolumns),
+        print_pal20l2_product_terms,
+        config_pal20l2_pins,
+        NULL,
+        NULL}};
 
 /***************************************************************************
     CORE IMPLEMENTATION
@@ -1612,12 +2632,12 @@ static void generate_product_terms(const pal_data* pal, const jed_data* jed, UIN
 		{
 			if (haveterm)
 			{
-				strcat(buffer,  " & ");
+				strcat(buffer, " " AND_SYMBOL " ");
 			}
 
 			if (!is_output_pin(pin))
 			{
-				sprintf(tmpbuffer, "/i%d", pin);
+				sprintf(tmpbuffer, LOW_SYMBOL INPUT_SYMBOL "%d", pin);
 				strcat(buffer, tmpbuffer);
 			}
 			else
@@ -1628,11 +2648,11 @@ static void generate_product_terms(const pal_data* pal, const jed_data* jed, UIN
 				{
 					if (flags & OUTPUT_COMBINATORIAL)
 					{
-						sprintf(tmpbuffer, "/o%d", pin);
+						sprintf(tmpbuffer, LOW_SYMBOL OUTPUT_SYMBOL "%d", pin);
 					}
 					else if (flags & OUTPUT_REGISTERED)
 					{
-						sprintf(tmpbuffer, "/rfo%d", pin);
+						sprintf(tmpbuffer, LOW_SYMBOL REGISTERED_FEEDBACK_OUTPUT_SYMBOL "%d", pin);
 					}
 					else
 					{
@@ -1643,11 +2663,11 @@ static void generate_product_terms(const pal_data* pal, const jed_data* jed, UIN
 				}
 				else if (flags & OUTPUT_FEEDBACK_COMBINATORIAL)
 				{
-					sprintf(tmpbuffer, "/of%d", pin);
+					sprintf(tmpbuffer, LOW_SYMBOL OUTPUT_FEEDBACK_SYMBOL "%d", pin);
 				}
 				else if (flags & OUTPUT_FEEDBACK_REGISTERED)
 				{
-					sprintf(tmpbuffer, "/rf%d", pin);
+					sprintf(tmpbuffer, LOW_SYMBOL REGISTERED_FEEDBACK_SYMBOL "%d", pin);
 				}
 				else
 				{
@@ -1666,12 +2686,12 @@ static void generate_product_terms(const pal_data* pal, const jed_data* jed, UIN
 		{
 			if (haveterm)
 			{
-				strcat(buffer, " & ");
+				strcat(buffer, " " AND_SYMBOL " ");
 			}
 
 			if (!is_output_pin(pin))
 			{
-				sprintf(tmpbuffer, "i%d", pin);
+				sprintf(tmpbuffer, INPUT_SYMBOL "%d", pin);
 				strcat(buffer, tmpbuffer);
 			}
 			else
@@ -1682,11 +2702,11 @@ static void generate_product_terms(const pal_data* pal, const jed_data* jed, UIN
 				{
 					if (flags & OUTPUT_COMBINATORIAL)
 					{
-						sprintf(tmpbuffer, "o%d", pin);
+						sprintf(tmpbuffer, OUTPUT_SYMBOL "%d", pin);
 					}
 					else if (flags & OUTPUT_REGISTERED)
 					{
-						sprintf(tmpbuffer, "rfo%d", pin);
+						sprintf(tmpbuffer, REGISTERED_FEEDBACK_OUTPUT_SYMBOL "%d", pin);
 					}
 					else
 					{
@@ -1697,11 +2717,11 @@ static void generate_product_terms(const pal_data* pal, const jed_data* jed, UIN
 				}
 				else if (flags & OUTPUT_FEEDBACK_COMBINATORIAL)
 				{
-					sprintf(tmpbuffer, "of%d", pin);
+					sprintf(tmpbuffer, OUTPUT_FEEDBACK_SYMBOL "%d", pin);
 				}
 				else if (flags & OUTPUT_FEEDBACK_REGISTERED)
 				{
-					sprintf(tmpbuffer, "rf%d", pin);
+					sprintf(tmpbuffer, REGISTERED_FEEDBACK_SYMBOL "%d", pin);
 				}
 				else
 				{
@@ -1843,18 +2863,18 @@ static void print_product_terms(const pal_data* pal, const jed_data* jed)
 
 		if (flags & OUTPUT_ACTIVELOW)
 		{
-			printf("/");
+			printf(LOW_SYMBOL);
 
-			++indent;
+			indent += strlen(LOW_SYMBOL);
 		}
 
 		if (flags & OUTPUT_COMBINATORIAL)
 		{
-			sprintf(buffer, "o%d = ", outputpins[index].pin);
+			sprintf(buffer, OUTPUT_SYMBOL "%d " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
 		}
 		else if (flags & OUTPUT_REGISTERED)
 		{
-			sprintf(buffer, "rf%d := ", outputpins[index].pin);
+			sprintf(buffer, REGISTERED_FEEDBACK_SYMBOL "%d " REGISTERED_ASSIGNMENT " ", outputpins[index].pin);
 		}
 		else
 		{
@@ -1886,7 +2906,7 @@ static void print_product_terms(const pal_data* pal, const jed_data* jed)
 			{
 				if (haveterms)
 				{
-					printf(" +\n");
+					printf(" " OR_SYMBOL "\n");
 
 					for (indentindex = 0; indentindex < indent; ++indentindex)
 					{
@@ -1908,7 +2928,7 @@ static void print_product_terms(const pal_data* pal, const jed_data* jed)
 
 		if (flags & OUTPUT_COMBINATORIAL)
 		{
-			printf("o%d.oe = ", outputpins[index].pin);
+			printf(OUTPUT_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
 
 			if (fuse_rows->fuserowoutputenable == NO_OUTPUT_ENABLE_FUSE_ROW ||
 				all_fuses_in_row_blown(pal, jed, fuse_rows->fuserowoutputenable))
@@ -1924,7 +2944,7 @@ static void print_product_terms(const pal_data* pal, const jed_data* jed)
 		}
 		else if (flags & OUTPUT_REGISTERED)
 		{
-			printf("rf%d.oe = ", outputpins[index].pin);
+			printf(REGISTERED_FEEDBACK_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
 
 			if (fuse_rows->fuserowoutputenable == NO_OUTPUT_ENABLE_FUSE_ROW)
 			{
@@ -1943,6 +2963,232 @@ static void print_product_terms(const pal_data* pal, const jed_data* jed)
 		}
 
 		printf("\n");
+	}
+}
+
+
+
+/*-------------------------------------------------
+    config_palce16v8_pin_as_7_product_terms_and_oe_term - configures
+    the fuse rows of a PALCE16V8 pin with seven
+    product terms and one output enable product term.
+-------------------------------------------------*/
+
+static void config_palce16v8_pin_as_7_product_terms_and_oe_term(UINT16 pin)
+{
+    static pin_fuse_rows pinfuserows[] = {
+	    {12, 1792, 1824, 2016},
+	    {13, 1536, 1568, 1760},
+	    {14, 1280, 1312, 1504},
+	    {15, 1024, 1056, 1248},
+	    {16, 768, 800, 992},
+	    {17, 512, 544, 736},
+	    {18, 256, 288, 480},
+	    {19, 0, 32, 224}};
+    UINT16 index;
+
+    for (index = 0; index < ARRAY_LEN(pinfuserows); ++index)
+    {
+        if (pinfuserows[index].pin == pin)
+        {
+            palce16v8pinfuserows[index].fuserowoutputenable = pinfuserows[index].fuserowoutputenable;
+            palce16v8pinfuserows[index].fuserowtermstart = pinfuserows[index].fuserowtermstart;
+	        palce16v8pinfuserows[index].fuserowtermend = pinfuserows[index].fuserowtermend;
+
+            break;
+        }
+    }
+}
+
+
+
+/*-------------------------------------------------
+    config_palce16v8_pin_as_8_product_terms - configures
+    the fuse rows of a PALCE16V8 pin with eight
+    product terms and no output enable product term.
+-------------------------------------------------*/
+
+static void config_palce16v8_pin_as_8_product_terms(UINT16 pin)
+{
+    static pin_fuse_rows pinfuserows[] = {
+	    {12, NO_OUTPUT_ENABLE_FUSE_ROW, 1792, 2016},
+	    {13, NO_OUTPUT_ENABLE_FUSE_ROW, 1536, 1760},
+	    {14, NO_OUTPUT_ENABLE_FUSE_ROW, 1280, 1504},
+	    {15, NO_OUTPUT_ENABLE_FUSE_ROW, 1024, 1248},
+	    {16, NO_OUTPUT_ENABLE_FUSE_ROW, 768, 992},
+	    {17, NO_OUTPUT_ENABLE_FUSE_ROW, 512, 736},
+	    {18, NO_OUTPUT_ENABLE_FUSE_ROW, 256, 480},
+	    {19, NO_OUTPUT_ENABLE_FUSE_ROW, 0, 224}};
+    UINT16 index;
+
+    for (index = 0; index < ARRAY_LEN(pinfuserows); ++index)
+    {
+        if (pinfuserows[index].pin == pin)
+        {
+            palce16v8pinfuserows[index].fuserowoutputenable = pinfuserows[index].fuserowoutputenable;
+            palce16v8pinfuserows[index].fuserowtermstart = pinfuserows[index].fuserowtermstart;
+	        palce16v8pinfuserows[index].fuserowtermend = pinfuserows[index].fuserowtermend;
+
+            break;
+        }
+    }
+}
+
+
+
+/*-------------------------------------------------
+    print_pal20xxx_product_terms - prints the product
+    terms for a PAL20X4, PAL20X8 and PAL20X10
+-------------------------------------------------*/
+
+static void print_pal20xxx_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	UINT16 index, columncount, flags, row, haveterms, tmpindex;
+	char buffer[200];
+	int indent, indentindex, rowhasterms[4];
+	const pin_fuse_rows* fuse_rows;
+
+	columncount = calc_fuse_column_count(pal);
+
+	print_input_pins();
+	print_output_pins();
+
+	printf("Equations:\n\n");
+
+	for (index = 0; index < outputpinscount; ++index)
+	{
+		flags = outputpins[index].flags;
+
+		indent = 0;
+
+        if (flags & OUTPUT_COMBINATORIAL)
+        {
+		    sprintf(buffer, LOW_SYMBOL OUTPUT_SYMBOL "%d " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
+
+		    printf("%s", buffer);
+
+		    haveterms = 0;
+		    indent += strlen(buffer);
+
+		    fuse_rows = find_fuse_rows(pal, outputpins[index].pin);
+
+       		for (row = fuse_rows->fuserowtermstart; row <= fuse_rows->fuserowtermend;
+				 row += columncount)
+            {
+				generate_product_terms(pal, jed, row, buffer);
+
+				if (strlen(buffer) > 0)
+				{
+					if (haveterms)
+					{
+						printf(" ");
+                        printf(OR_SYMBOL);
+                        printf("\n");
+
+						for (indentindex = 0; indentindex < indent; ++indentindex)
+						{
+							printf(" ");
+						}
+					}
+					else
+					{
+						haveterms = 1;
+					}
+
+					printf("%s", buffer);
+				}
+            }
+
+		    printf("\n");
+
+		    /* output enable equation */
+
+		    printf(OUTPUT_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
+
+		    if (all_fuses_in_row_blown(pal, jed, fuse_rows->fuserowoutputenable))
+		    {
+			    printf("vcc\n");
+		    }
+		    else
+		    {
+			    generate_product_terms(pal, jed, fuse_rows->fuserowoutputenable, buffer);
+
+			    printf("%s\n", buffer);
+		    }
+        }
+        else if (flags & OUTPUT_REGISTERED)
+        {
+		    sprintf(buffer, LOW_SYMBOL REGISTERED_FEEDBACK_SYMBOL "%d " REGISTERED_ASSIGNMENT " ", outputpins[index].pin);
+
+		    printf("%s", buffer);
+
+		    haveterms = 0;
+		    indent += strlen(buffer);
+
+		    fuse_rows = find_fuse_rows(pal, outputpins[index].pin);
+		    tmpindex = 0;
+
+            memset(rowhasterms, 0, sizeof(rowhasterms));
+
+       		for (row = fuse_rows->fuserowtermstart; row <= fuse_rows->fuserowtermend;
+				 row += columncount)
+            {
+				generate_product_terms(pal, jed, row, buffer);
+
+				if (strlen(buffer) > 0)
+                {
+                    rowhasterms[tmpindex] = 1;
+
+					if (haveterms)
+					{
+                        if (tmpindex == 1)
+                        {
+                            printf(" " OR_SYMBOL "\n");
+                        }
+                        else if (tmpindex == 2)
+                        {
+                            printf(" " XOR_SYMBOL "\n");
+                        }
+                        else if (tmpindex == 3)
+                        {
+                            if (rowhasterms[2])
+                            {
+                                printf(" " OR_SYMBOL "\n");
+                            }
+                            else
+                            {
+                                printf(" " XOR_SYMBOL "\n");
+                            }
+                        }
+
+						for (indentindex = 0; indentindex < indent; ++indentindex)
+						{
+							printf(" ");
+						}
+					}
+					else
+					{
+						haveterms = 1;
+					}
+
+					printf("%s", buffer);
+                }
+
+                ++tmpindex;
+            }
+
+            printf("\n");
+
+		    /* output enable equation */
+
+		    printf(REGISTERED_FEEDBACK_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " OE\n", outputpins[index].pin);
+        }
+        else
+        {
+            fprintf(stderr, "Unknown output type for pin %d!\n", outputpins[index].pin);
+        }
+
+	    printf("\n");
 	}
 }
 
@@ -2111,9 +3357,7 @@ static void print_pal16r8_product_terms(const pal_data* pal, const jed_data* jed
 
 static void print_palce16v8_product_terms(const pal_data* pal, const jed_data* jed)
 {
-	fprintf(stderr, "Printing product terms for PALCE16V8 not supported!\n");
-
-	/*print_product_terms(pal, jed);*/
+	print_product_terms(pal, jed);
 }
 
 
@@ -2269,7 +3513,7 @@ static void print_pal20r8_product_terms(const pal_data* pal, const jed_data* jed
 
 static void print_pal20x4_product_terms(const pal_data* pal, const jed_data* jed)
 {
-	print_product_terms(pal, jed);
+	print_pal20xxx_product_terms(pal, jed);
 }
 
 
@@ -2281,7 +3525,7 @@ static void print_pal20x4_product_terms(const pal_data* pal, const jed_data* jed
 
 static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed)
 {
-	print_product_terms(pal, jed);
+	print_pal20xxx_product_terms(pal, jed);
 }
 
 
@@ -2293,7 +3537,7 @@ static void print_pal20x8_product_terms(const pal_data* pal, const jed_data* jed
 
 static void print_pal20x10_product_terms(const pal_data* pal, const jed_data* jed)
 {
-	print_product_terms(pal, jed);
+	print_pal20xxx_product_terms(pal, jed);
 }
 
 
@@ -2325,12 +3569,12 @@ static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_dat
 
 		if (flags & OUTPUT_ACTIVELOW)
 		{
-			printf("/");
+			printf(LOW_SYMBOL);
 
-			++indent;
+			indent += strlen(LOW_SYMBOL);
 		}
 
-		sprintf(buffer, "o%d = ", outputpins[index].pin);
+		sprintf(buffer, OUTPUT_SYMBOL "%d " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
 
 		printf("%s", buffer);
 
@@ -2359,7 +3603,7 @@ static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_dat
 				{
 					if (haveterms)
 					{
-						printf(" +\n");
+						printf(" " OR_SYMBOL "\n");
 
 						for (indentindex = 0; indentindex < indent; ++indentindex)
 						{
@@ -2382,7 +3626,7 @@ static void print_82s153_pls153_product_terms(const pal_data* pal, const jed_dat
 
 		/* output enable equations */
 
-		printf("o%d.oe = ", outputpins[index].pin);
+		printf(OUTPUT_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
 
 		if (all_fuses_in_row_blown(pal, jed, fuse_rows->fuserowoutputenable))
 		{
@@ -2428,12 +3672,12 @@ static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed)
 
 		if (flags & OUTPUT_ACTIVELOW)
 		{
-			printf("/");
+			printf(LOW_SYMBOL);
 
-			++indent;
+			indent += strlen(LOW_SYMBOL);
 		}
 
-		sprintf(buffer, "o%d = ", outputpins[index].pin);
+		sprintf(buffer, OUTPUT_SYMBOL "%d " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
 
 		printf("%s", buffer);
 
@@ -2462,7 +3706,7 @@ static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed)
 				{
 					if (haveterms)
 					{
-						printf(" +\n");
+                        printf(" " OR_SYMBOL "\n");
 
 						for (indentindex = 0; indentindex < indent; ++indentindex)
 						{
@@ -2485,7 +3729,7 @@ static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed)
 
 		/* output enable equations */
 
-		printf("o%d.oe = ", outputpins[index].pin);
+		printf(OUTPUT_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
 
 		if (all_fuses_in_row_blown(pal, jed, fuse_rows->fuserowoutputenable))
 		{
@@ -2500,6 +3744,486 @@ static void print_ck2605_product_terms(const pal_data* pal, const jed_data* jed)
 
 		printf("\n");
 	}
+}
+
+
+
+#if defined(ricoh_pals)
+/*-------------------------------------------------
+    print_epl10p8_product_terms - prints the product
+    terms for a EPL10P8
+-------------------------------------------------*/
+
+static void print_epl10p8_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _memory_cell memory_cell;
+	struct _memory_cell
+	{
+		UINT16 pin;
+		UINT16 or_fuse; /* 0 - intact? */
+        UINT16 xor_fuse; /* 0 - intact? */
+	};
+
+    static memory_cell memory_cells[] = {
+        {12, 661, 662},
+        {13, 658, 659},
+        {14, 655, 656},
+        {15, 652, 653},
+        {16, 649, 650},
+        {17, 646, 647},
+        {18, 643, 644},
+        {19, 640, 641}};
+	UINT16 index, columncount, flags, haveterms, fuserow;
+	char buffer[200];
+	int indent, row, indentindex;
+	const pin_fuse_rows* fuse_rows;
+
+    printf("Warning: This is experimental support!\n");
+
+	columncount = calc_fuse_column_count(pal);
+
+	print_input_pins();
+	print_output_pins();
+
+	printf("Equations:\n\n");
+   
+    for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+    {
+		flags = outputpins[index].flags;
+
+		indent = 0;
+
+		if (flags & OUTPUT_ACTIVELOW)
+		{
+			printf(LOW_SYMBOL);
+
+			indent += strlen(LOW_SYMBOL);
+		}
+
+		sprintf(buffer, OUTPUT_SYMBOL "%d " COMBINATORIAL_ASSIGNMENT " ", outputpins[index].pin);
+
+		printf("%s", buffer);
+
+		haveterms = 0;
+		indent += strlen(buffer);
+
+		fuse_rows = find_fuse_rows(pal, outputpins[index].pin);
+
+		if (!jed_get_fuse(jed, memory_cells[index].or_fuse) ||
+            !jed_get_fuse(jed, memory_cells[index].xor_fuse))
+        {
+            /* MMI PAL pin compatible configuration */
+
+            fuserow = fuse_rows->fuserowtermstart;
+
+            for (row = 0; row < 2; ++row)
+            {
+				generate_product_terms(pal, jed, fuserow, buffer);
+
+				if (strlen(buffer) > 0)
+				{
+					if (haveterms)
+					{
+                        printf(" " OR_SYMBOL "\n");
+
+						for (indentindex = 0; indentindex < indent; ++indentindex)
+						{
+							printf(" ");
+						}
+					}
+					else
+					{
+						haveterms = 1;
+					}
+
+					printf("%s", buffer);
+				}
+
+                fuserow += columncount;
+            }
+
+	        printf("\n");
+
+		    printf(OUTPUT_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " vcc\n", outputpins[index].pin);
+
+            printf("\n");
+        }
+		else if (!jed_get_fuse(jed, memory_cells[index].or_fuse) ||
+                 jed_get_fuse(jed, memory_cells[index].xor_fuse))
+        {
+            /* or configuration */
+
+            fuserow = fuse_rows->fuserowtermstart;
+
+            for (row = 0; row < 4; ++row)
+            {
+				generate_product_terms(pal, jed, fuserow, buffer);
+
+				if (strlen(buffer) > 0)
+				{
+					if (haveterms)
+					{
+                        printf(" " OR_SYMBOL "\n");
+
+						for (indentindex = 0; indentindex < indent; ++indentindex)
+						{
+							printf(" ");
+						}
+					}
+					else
+					{
+						haveterms = 1;
+					}
+
+					printf("%s", buffer);
+				}
+
+                fuse_rows += columncount;
+            }
+
+	        printf("\n");
+
+		    printf(OUTPUT_SYMBOL "%d.oe " COMBINATORIAL_ASSIGNMENT " vcc\n", outputpins[index].pin);
+
+            printf("\n");
+        }
+		else if (jed_get_fuse(jed, memory_cells[index].or_fuse) ||
+                 !jed_get_fuse(jed, memory_cells[index].xor_fuse))
+        {
+            /* xor configuration */
+        }
+        else
+        {
+            fprintf(stderr, "Unknown fuse configuration for pin %d!", memory_cells[index].pin);
+        }
+    }
+
+    printf("Warning: This is experimental support!\n");
+}
+
+
+
+/*-------------------------------------------------
+    print_epl12p6_product_terms - prints the product
+    terms for a EPL12P6
+-------------------------------------------------*/
+
+static void print_epl12p6_product_terms(const pal_data* pal, const jed_data* jed)
+{
+    fprintf(stderr, "Printing product terms not supported for this device!\n");
+}
+
+
+
+/*-------------------------------------------------
+    print_epl14p4_product_terms - prints the product
+    terms for a EPL14P4
+-------------------------------------------------*/
+
+static void print_epl14p4_product_terms(const pal_data* pal, const jed_data* jed)
+{
+    fprintf(stderr, "Printing product terms not supported for this device!\n");
+}
+
+
+
+/*-------------------------------------------------
+    print_epl16p2_product_terms - prints the product
+    terms for a EPL16P2
+-------------------------------------------------*/
+
+static void print_epl16p2_product_terms(const pal_data* pal, const jed_data* jed)
+{
+    fprintf(stderr, "Printing product terms not supported for this device!\n");
+}
+
+
+
+/*-------------------------------------------------
+    print_epl16p8_product_terms - prints the product
+    terms for a EPL16P8
+-------------------------------------------------*/
+
+static void print_epl16p8_product_terms(const pal_data* pal, const jed_data* jed)
+{
+    fprintf(stderr, "Printing product terms not supported for this device!\n");
+}
+
+
+
+/*-------------------------------------------------
+    print_epl16rp8_product_terms - prints the product
+    terms for a EPL16RP8
+-------------------------------------------------*/
+
+static void print_epl16rp8_product_terms(const pal_data* pal, const jed_data* jed)
+{
+    fprintf(stderr, "Printing product terms not supported for this device!\n");
+}
+
+
+
+/*-------------------------------------------------
+    print_epl16rp6_product_terms - prints the product
+    terms for a EPL16RP6
+-------------------------------------------------*/
+
+static void print_epl16rp6_product_terms(const pal_data* pal, const jed_data* jed)
+{
+    fprintf(stderr, "Printing product terms not supported for this device!\n");
+}
+
+
+
+/*-------------------------------------------------
+    print_epl16rp4_product_terms - prints the product
+    terms for a EPL16RP4
+-------------------------------------------------*/
+
+static void print_epl16rp4_product_terms(const pal_data* pal, const jed_data* jed)
+{
+    fprintf(stderr, "Printing product terms not supported for this device!\n");
+}
+#endif
+
+
+
+/*-------------------------------------------------
+    print_pal10p8_product_terms - prints the product
+    terms for a PAL10P8
+-------------------------------------------------*/
+
+static void print_pal10p8_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_epl12p6_product_terms - prints the product
+    terms for a PAL12P6
+-------------------------------------------------*/
+
+static void print_pal12p6_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_epl14p4_product_terms - prints the product
+    terms for a PAL14P4
+-------------------------------------------------*/
+
+static void print_pal14p4_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_epl16p2_product_terms - prints the product
+    terms for a PAL16P2
+-------------------------------------------------*/
+
+static void print_pal16p2_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal16p8_product_terms - prints the product
+    terms for a PAL16P8
+-------------------------------------------------*/
+
+static void print_pal16p8_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal16rp4_product_terms - prints the product
+    terms for a PAL16RP4
+-------------------------------------------------*/
+
+static void print_pal16rp4_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal16rp6_product_terms - prints the product
+    terms for a PAL16RP6
+-------------------------------------------------*/
+
+static void print_pal16rp6_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal16rp8_product_terms - prints the product
+    terms for a PAL16RP8
+-------------------------------------------------*/
+
+static void print_pal16rp8_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal6l16_product_terms - prints the product
+    terms for a PAL6L16
+-------------------------------------------------*/
+
+static void print_pal6l16_product_terms(const pal_data* pal, const jed_data* jed)
+{
+    print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal8l14_product_terms - prints the product
+    terms for a PAL8L14
+-------------------------------------------------*/
+
+static void print_pal8l14_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal12h10_product_terms - prints the product
+    terms for a PAL12H10
+-------------------------------------------------*/
+
+static void print_pal12h10_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal12l10_product_terms - prints the product
+    terms for a PAL12L10
+-------------------------------------------------*/
+
+static void print_pal12l10_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal14h8_product_terms - prints the product
+    terms for a PAL14H8
+-------------------------------------------------*/
+
+static void print_pal14h8_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal14l8_product_terms - prints the product
+    terms for a PAL14L8
+-------------------------------------------------*/
+
+static void print_pal14l8_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal16h6_product_terms - prints the product
+    terms for a PAL16H6
+-------------------------------------------------*/
+
+static void print_pal16h6_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal16l6_product_terms - prints the product
+    terms for a PAL16L6
+-------------------------------------------------*/
+
+static void print_pal16l6_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal18h4_product_terms - prints the product
+    terms for a PAL18H4
+-------------------------------------------------*/
+
+static void print_pal18h4_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal18l4_product_terms - prints the product
+    terms for a PAL18L4
+-------------------------------------------------*/
+
+static void print_pal18l4_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal20lc1_product_terms - prints the product
+    terms for a PAL20LC1
+-------------------------------------------------*/
+
+static void print_pal20c1_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
+}
+
+
+
+/*-------------------------------------------------
+    print_pal20l2_product_terms - prints the product
+    terms for a PAL20L2
+-------------------------------------------------*/
+
+static void print_pal20l2_product_terms(const pal_data* pal, const jed_data* jed)
+{
+	print_product_terms(pal, jed);
 }
 
 
@@ -2859,55 +4583,257 @@ static void config_palce16v8_pins(const pal_data* pal, const jed_data* jed)
 	struct _output_logic_macrocell
 	{
 		UINT16 pin;
-		UINT16 sl0_fuse; /* registers allowed */
-		UINT16 sl1_fuse; /* output polarity 0 - low, 1 - high */
+		UINT16 sl0_fuse; /* registers allowed (0 - registered, 1 - not registered) */
+		UINT16 sl1_fuse; /* output polarity (0 - low, 1 - high) */
+        UINT16 fuserowoutputenable;
 	};
 
 	static output_logic_macrocell macrocells[] = {
-		{12, 2127, 2055},
-		{13, 2126, 2054},
-		{14, 2125, 2053},
-		{15, 2124, 2052},
-		{16, 2123, 2051},
-		{17, 2122, 2050},
-		{18, 2121, 2049},
-		{19, 2120, 2048}};
-	UINT16 sg0 = 2192; /* guessing on fuse here */
-	UINT16 sg1 = 2193; /* guessing on fuse here */
-	UINT16 index;
+		{12, 2127, 2055, 1792},
+		{13, 2126, 2054, 1536},
+		{14, 2125, 2053, 1280},
+		{15, 2124, 2052, 1024},
+		{16, 2123, 2051, 768},
+		{17, 2122, 2050, 512},
+		{18, 2121, 2049, 256},
+		{19, 2120, 2048, 0}};
+	static pin_fuse_columns pinfusecolumns_i_or_o[] = {
+	    {1, 3, 2},
+	    {2, 1, 0},
+	    {3, 5, 4},
+	    {4, 9, 8},
+	    {5, 13, 12},
+	    {6, 17, 16},
+	    {7, 21, 20},
+	    {8, 25, 24},
+	    {9, 29, 28},
+	    {11, 31, 30},
+	    {12, 27, 26},
+	    {13, 23, 22},
+        {14, 19, 18},
+        {17, 15, 14},
+        {18, 11, 10},
+        {19, 7, 6}};
+	static pin_fuse_columns pinfusecolumns_io[] = {
+	    {1, 3, 2},
+	    {2, 1, 0},
+	    {3, 5, 4},
+	    {4, 9, 8},
+	    {5, 13, 12},
+	    {6, 17, 16},
+	    {7, 21, 20},
+	    {8, 25, 24},
+	    {9, 29, 28},
+	    {11, 31, 30},
+	    {13, 27, 26},
+	    {14, 23, 22},
+        {15, 19, 18},
+        {16, 15, 14},
+        {17, 11, 10},
+        {18, 7, 6}};
+	static pin_fuse_columns pinfusecolumns_regs[] = {
+	    {2, 1, 0},
+	    {3, 5, 4},
+	    {4, 9, 8},
+	    {5, 13, 12},
+	    {6, 17, 16},
+	    {7, 21, 20},
+	    {8, 25, 24},
+	    {9, 29, 28},
+	    {12, 31, 30},
+	    {13, 27, 26},
+	    {14, 23, 22},
+        {15, 19, 18},
+        {16, 15, 14},
+        {17, 11, 10},
+        {18, 7, 6},
+        {19, 3, 2}};
+    static UINT16 input_pins_i_or_o[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+    static UINT16 input_pins_io[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+    static UINT16 input_pins_regs[] = {2, 3, 4, 5, 6, 7, 8, 9};
+    static UINT16 sg0 = 2192;
+    static UINT16 sg1 = 2193;
+    UINT16 input_pins[18];
+    pin_output_config output_pins[ARRAY_LEN(macrocells)];
+    UINT16 index, input_pin_count, output_pin_count;
 
-	for (index = 0; index < ARRAY_LEN(macrocells); ++index)
-	{
-		if (jed_get_fuse(jed, sg0))
-		{
-			/* Device uses no registers */
+    input_pin_count = 0;
+	output_pin_count = 0;
 
-			if (jed_get_fuse(jed, sg1))
-			{
-				/* Combinatorial I/O */
-			}
-			else
-			{
-				/* Combinatorial Output or Input */
-			}
-		}
-		else
-		{
-			/* Device uses registers */
+    if (!jed_get_fuse(jed, sg0))
+    {
+        /* Device uses registers */
 
-			if (jed_get_fuse(jed, sg1))
-			{
-			}
-			else
-			{
-				fprintf(stderr, "Unknown configuration type!\n");
-			}
-		}
-	}
+        if (jed_get_fuse(jed, sg1))
+        {
+            memcpy(palce16v8pinfusecolumns, pinfusecolumns_regs, sizeof(pinfusecolumns_regs));
 
-	/* 2056 - 2119 are the 64 bit signature fuses */
+        	memcpy(input_pins, input_pins_regs, sizeof(input_pins_regs));
 
-	fprintf(stderr, "Configuring product terms for PALCE16V8 not supported!\n");
+            input_pin_count = ARRAY_LEN(input_pins_regs);
+
+            for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+            {
+                if (!jed_get_fuse(jed, macrocells[index].sl0_fuse))
+                {
+                    /* Registered output */
+
+                    config_palce16v8_pin_as_8_product_terms(macrocells[index].pin);
+
+                    output_pins[output_pin_count].pin = macrocells[index].pin;
+				    output_pins[output_pin_count].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+
+	                if (!jed_get_fuse(jed, macrocells[index].sl1_fuse))
+                    {
+					    output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+                    }
+                    else
+                    {
+					    output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+                    }
+
+            	    ++output_pin_count;
+
+                    input_pins[input_pin_count] = macrocells[index].pin;
+
+                    ++input_pin_count;
+                }
+                else
+                {
+                    /* Combinatorial I/O */
+
+                    if (does_output_enable_fuse_row_allow_output(pal, jed, macrocells[index].fuserowoutputenable))
+                    {
+                        config_palce16v8_pin_as_7_product_terms_and_oe_term(macrocells[index].pin);
+
+                        output_pins[output_pin_count].pin = macrocells[index].pin;
+				        output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+	                    if (!jed_get_fuse(jed, macrocells[index].sl1_fuse))
+                        {
+					        output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+                        }
+                        else
+                        {
+					        output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+                        }
+
+            	        ++output_pin_count;
+                    }
+
+                    input_pins[input_pin_count] = macrocells[index].pin;
+
+                    ++input_pin_count;
+                }
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Unknown configuration type!\n");
+        }
+    }
+    else
+    {
+        /* Device uses no registers */
+
+        if (jed_get_fuse(jed, sg1))
+        {
+            /* Combinatorial I/O (7 product terms and 1 output enable product term) */
+
+            memcpy(palce16v8pinfusecolumns, pinfusecolumns_io, sizeof(pinfusecolumns_io));
+
+        	memcpy(input_pins, input_pins_io, sizeof(input_pins_io));
+
+            input_pin_count = ARRAY_LEN(input_pins_io);
+
+            for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+            {
+                if (does_output_enable_fuse_row_allow_output(pal, jed, macrocells[index].fuserowoutputenable))
+                {
+                    config_palce16v8_pin_as_7_product_terms_and_oe_term(macrocells[index].pin);
+
+                    output_pins[output_pin_count].pin = macrocells[index].pin;
+				    output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+	                if (!jed_get_fuse(jed, macrocells[index].sl1_fuse))
+                    {
+					    output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+                    }
+                    else
+                    {
+					    output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+                    }
+
+            	    ++output_pin_count;
+                }
+
+                /* Pins 12 and 19 cannot be used as an input only an output. */
+
+                if (macrocells[index].pin != 12 && macrocells[index].pin != 19)
+                {
+                    input_pins[input_pin_count] = macrocells[index].pin;
+
+                    ++input_pin_count;
+                }
+            }
+        }
+        else
+        {
+            /* Combinatorial Output or Input */
+
+            memcpy(palce16v8pinfusecolumns, pinfusecolumns_i_or_o, sizeof(pinfusecolumns_i_or_o));
+
+        	memcpy(input_pins, input_pins_i_or_o, sizeof(input_pins_i_or_o));
+
+            input_pin_count = ARRAY_LEN(input_pins_i_or_o);
+
+            for (index = 0; index < ARRAY_LEN(macrocells); ++index)
+            {
+                if (!jed_get_fuse(jed, macrocells[index].sl0_fuse))
+                {
+                    /* pin configured as an output only */
+
+                    config_palce16v8_pin_as_8_product_terms(macrocells[index].pin);
+
+                    output_pins[output_pin_count].pin = macrocells[index].pin;
+				    output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+	                if (!jed_get_fuse(jed, macrocells[index].sl1_fuse))
+                    {
+					    output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+                    }
+                    else
+                    {
+					    output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+                    }
+
+            	    ++output_pin_count;
+                }
+                else
+                {
+                    /* pin configured as an input only */
+
+                    input_pins[input_pin_count] = macrocells[index].pin;
+
+                    ++input_pin_count;
+                }
+            }
+        }
+    }
+
+    set_input_pins(input_pins, input_pin_count);
+	set_output_pins(output_pins, output_pin_count);
+
+    /* 2056 - 2119 are the 64 bit signature fuses */
+
+    /* 2128 - 2135 product term 8? */
+    /* 2136 - 2143 product term 7? */
+    /* 2144 - 2151 product term 6? */
+    /* 2152 - 2159 product term 5? */
+    /* 2160 - 2167 product term 4? */
+    /* 2168 - 2175 product term 3? */
+    /* 2176 - 2183 product term 2? */
+    /* 2184 - 2191 product term 1? */
 }
 
 
@@ -3757,6 +5683,1075 @@ static void config_ck2605_pins(const pal_data* pal, const jed_data* jed)
 
 
 
+#if defined(ricoh_pals)
+/*-------------------------------------------------
+    config_epl10p8_pins - configures the pins for
+    a EPL10P8
+-------------------------------------------------*/
+
+static void config_epl10p8_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _memory_cell memory_cell;
+	struct _memory_cell
+	{
+		UINT16 pin;
+		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
+	};
+
+    static memory_cell memory_cells[] = {
+        {12, 663},
+        {13, 660},
+        {14, 657},
+        {15, 654},
+        {16, 651},
+        {17, 648},
+        {18, 645},
+        {19, 642}};
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	pin_output_config output_pins[8];
+	UINT16 index;
+   
+    for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+    {
+		output_pins[index].pin = memory_cells[index].pin;
+		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (!jed_get_fuse(jed, memory_cells[index].polarity_fuse))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_epl12p6_pins - configures the pins for
+    a EPL12P6
+-------------------------------------------------*/
+
+static void config_epl12p6_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _memory_cell memory_cell;
+	struct _memory_cell
+	{
+		UINT16 pin;
+		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
+		UINT16 or_fuse; /* 0 - intact? */
+        UINT16 xor_fuse; /* 0 - intact? */
+	};
+
+    static memory_cell memory_cells[] = {
+        {13, 785, 783, 784},
+        {14, 782, 780, 781},
+        {15, 779, 777, 778},
+        {16, 776, 774, 775},
+        {17, 773, 771, 772},
+        {18, 770, 768, 769}};
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
+	pin_output_config output_pins[8];
+	UINT16 index;
+   
+    for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+    {
+		output_pins[index].pin = memory_cells[index].pin;
+		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (!jed_get_fuse(jed, memory_cells[index].polarity_fuse))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_epl14p4_pins - configures the pins for
+    a EPL14P4
+-------------------------------------------------*/
+
+static void config_epl14p4_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _memory_cell memory_cell;
+	struct _memory_cell
+	{
+		UINT16 pin;
+		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
+		UINT16 or_fuse; /* 0 - intact? */
+        UINT16 xor_fuse; /* 0 - intact? */
+	};
+
+    static memory_cell memory_cells[] = {
+        {14, 907, 905, 906},
+        {15, 904, 902, 903},
+        {16, 901, 899, 900},
+        {17, 898, 896, 897}};
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
+	pin_output_config output_pins[8];
+	UINT16 index;
+   
+    for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+    {
+		output_pins[index].pin = memory_cells[index].pin;
+		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (!jed_get_fuse(jed, memory_cells[index].polarity_fuse))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_epl16p2_pins - configures the pins for
+    a EPL16P2
+-------------------------------------------------*/
+
+static void config_epl16p2_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _memory_cell memory_cell;
+	struct _memory_cell
+	{
+		UINT16 pin;
+		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
+		UINT16 or_fuse; /* 0 - intact? */
+        UINT16 xor_fuse; /* 0 - intact? */
+	};
+
+    static memory_cell memory_cells[] = {
+        {15, 1029, 1027, 1028},
+        {16, 1026, 1024, 1025}};
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
+	pin_output_config output_pins[8];
+	UINT16 index;
+   
+    for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+    {
+		output_pins[index].pin = memory_cells[index].pin;
+		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (!jed_get_fuse(jed, memory_cells[index].polarity_fuse))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_epl16p8_pins - configures the pins for
+    a EPL16P8
+-------------------------------------------------*/
+
+static void config_epl16p8_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _memory_cell memory_cell;
+	struct _memory_cell
+	{
+		UINT16 pin;
+		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
+		UINT16 or_fuse; /* 0 - intact? */
+        UINT16 xor_fuse; /* 0 - intact? */
+	};
+
+    static memory_cell memory_cells[] = {
+        {12, 2071, 2069, 2070},
+        {13, 2068, 2066, 2067},
+        {14, 2065, 2063, 2064},
+        {15, 2062, 2060, 2061},
+        {16, 2059, 2057, 2058},
+        {17, 2056, 2054, 2055},
+        {18, 2053, 2051, 2052},
+        {19, 2050, 2048, 2049}};
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	pin_output_config output_pins[8];
+	UINT16 index;
+   
+    for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+    {
+		output_pins[index].pin = memory_cells[index].pin;
+		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (!jed_get_fuse(jed, memory_cells[index].polarity_fuse))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_epl16rp8_pins - configures the pins for
+    a EPL16RP8
+-------------------------------------------------*/
+
+static void config_epl16rp8_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _memory_cell memory_cell;
+	struct _memory_cell
+	{
+		UINT16 pin;
+		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
+		UINT16 or_fuse; /* 0 - intact? */
+        UINT16 xor_fuse; /* 0 - intact? */
+	};
+
+    static memory_cell memory_cells[] = {
+        {12, 2071, 2069, 2070},
+        {13, 2068, 2066, 2067},
+        {14, 2065, 2063, 2064},
+        {15, 2062, 2060, 2061},
+        {16, 2059, 2057, 2058},
+        {17, 2056, 2054, 2055},
+        {18, 2053, 2051, 2052},
+        {19, 2050, 2048, 2049}};
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	pin_output_config output_pins[8];
+	UINT16 index;
+   
+    for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+    {
+		output_pins[index].pin = memory_cells[index].pin;
+    	output_pins[index].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+
+		if (!jed_get_fuse(jed, memory_cells[index].polarity_fuse))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_epl16rp6_pins - configures the pins for
+    a EPL16RP6
+-------------------------------------------------*/
+
+static void config_epl16rp6_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _memory_cell memory_cell;
+	struct _memory_cell
+	{
+		UINT16 pin;
+		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
+		UINT16 or_fuse; /* 0 - intact? */
+        UINT16 xor_fuse; /* 0 - intact? */
+	};
+
+    static memory_cell memory_cells[] = {
+        {12, 2071, 2069, 2070},
+        {13, 2068, 2066, 2067},
+        {14, 2065, 2063, 2064},
+        {15, 2062, 2060, 2061},
+        {16, 2059, 2057, 2058},
+        {17, 2056, 2054, 2055},
+        {18, 2053, 2051, 2052},
+        {19, 2050, 2048, 2049}};
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	pin_output_config output_pins[8];
+	UINT16 index;
+   
+    for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+    {
+		output_pins[index].pin = memory_cells[index].pin;
+
+        if (memory_cells[index].pin == 13 || memory_cells[index].pin == 14 ||
+            memory_cells[index].pin == 15 || memory_cells[index].pin == 16 ||
+            memory_cells[index].pin == 17 || memory_cells[index].pin == 18)
+        {
+    		output_pins[index].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+        }
+        else
+        {
+    		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+        }
+
+		if (!jed_get_fuse(jed, memory_cells[index].polarity_fuse))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_epl16rp4_pins - configures the pins for
+    a EPL16RP4
+-------------------------------------------------*/
+
+static void config_epl16rp4_pins(const pal_data* pal, const jed_data* jed)
+{
+	typedef struct _memory_cell memory_cell;
+	struct _memory_cell
+	{
+		UINT16 pin;
+		UINT16 polarity_fuse; /* 0 - active low?, 1 - active high? */
+		UINT16 or_fuse; /* 0 - intact? */
+        UINT16 xor_fuse; /* 0 - intact? */
+	};
+
+    static memory_cell memory_cells[] = {
+        {12, 2071, 2069, 2070},
+        {13, 2068, 2066, 2067},
+        {14, 2065, 2063, 2064},
+        {15, 2062, 2060, 2061},
+        {16, 2059, 2057, 2058},
+        {17, 2056, 2054, 2055},
+        {18, 2053, 2051, 2052},
+        {19, 2050, 2048, 2049}};
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	pin_output_config output_pins[8];
+	UINT16 index;
+   
+    for (index = 0; index < ARRAY_LEN(memory_cells); ++index)
+    {
+		output_pins[index].pin = memory_cells[index].pin;
+
+        if (memory_cells[index].pin == 14 || memory_cells[index].pin == 15 ||
+            memory_cells[index].pin == 16 || memory_cells[index].pin == 17)
+        {
+    		output_pins[index].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+        }
+        else
+        {
+    		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+        }
+
+		if (!jed_get_fuse(jed, memory_cells[index].polarity_fuse))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+#endif
+
+
+
+/*-------------------------------------------------
+    config_pal10p8_pins - configures the pins for
+    a PAL10P8
+-------------------------------------------------*/
+
+static void config_pal10p8_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+	pin_output_config output_pins[8];
+	UINT16 index;
+
+    for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+    {
+		output_pins[index].pin = index + 12;
+  		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (!jed_get_fuse(jed, 327 - index))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal12p6_pins - configures the pins for
+    a PAL12P6A
+-------------------------------------------------*/
+
+static void config_pal12p6_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 19};
+	pin_output_config output_pins[6];
+	UINT16 index;
+
+    for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+    {
+		output_pins[index].pin = index + 13;
+  		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (!jed_get_fuse(jed, 389 - index))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal14p4_pins - configures the pins for
+    a PAL14P4
+-------------------------------------------------*/
+
+static void config_pal14p4_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19};
+	pin_output_config output_pins[4];
+	UINT16 index;
+
+    for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+    {
+		output_pins[index].pin = index + 14;
+  		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (!jed_get_fuse(jed, 451 - index))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal16p2_pins - configures the pins for
+    a PAL16P2
+-------------------------------------------------*/
+
+static void config_pal16p2_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19};
+	pin_output_config output_pins[2];
+	UINT16 index;
+
+    for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+    {
+		output_pins[index].pin = index + 15;
+  		output_pins[index].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE;
+
+		if (!jed_get_fuse(jed, 513 - index))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal16p8_pins - configures the pins for
+    a PAL16P8
+-------------------------------------------------*/
+
+static void config_pal16p8_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 16, 17, 18};
+	pin_output_config output_pins[8];
+	UINT16 output_pin_count, index;
+
+	output_pin_count = 0;
+
+	for (index = 0; index < pal->pinfuserowscount; ++index)
+	{
+		if (does_output_enable_fuse_row_allow_output(pal, jed, pal->pinfuserows[index].fuserowoutputenable))
+		{
+			output_pins[output_pin_count].pin = pal->pinfuserows[index].pin;
+			output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+			if (!jed_get_fuse(jed, 2055 - index))
+			{
+				output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+			}
+			else
+			{
+				output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+			}
+
+			++output_pin_count;
+		}
+	}
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, output_pin_count);
+}
+
+
+
+/*-------------------------------------------------
+    config_pal16rp4_pins - configures the pins for
+    a PAL16RP4
+-------------------------------------------------*/
+
+static void config_pal16rp4_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	static UINT16 registered_pins[] = {14, 15, 16, 17};
+	pin_output_config output_pins[8];
+	UINT16 output_pin_count, index;
+
+	output_pin_count = 0;
+
+	if (does_output_enable_fuse_row_allow_output(pal, jed, 1792))
+	{
+		output_pins[output_pin_count].pin = 12;
+		output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+		if (!jed_get_fuse(jed, 2055))
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+		}
+
+		++output_pin_count;
+	}
+
+	if (does_output_enable_fuse_row_allow_output(pal, jed, 1536))
+	{
+		output_pins[output_pin_count].pin = 13;
+		output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+		if (!jed_get_fuse(jed, 2054))
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+		}
+
+		++output_pin_count;
+	}
+
+	for (index = 0; index < ARRAY_LEN(registered_pins); ++index)
+	{
+		output_pins[output_pin_count].pin = registered_pins[index];
+		output_pins[output_pin_count].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+
+        if (!jed_get_fuse(jed, 2053 - index))
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+		}
+
+		++output_pin_count;
+	}
+
+	if (does_output_enable_fuse_row_allow_output(pal, jed, 256))
+	{
+		output_pins[output_pin_count].pin = 18;
+		output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+		if (!jed_get_fuse(jed, 2049))
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+		}
+
+		++output_pin_count;
+	}
+
+	if (does_output_enable_fuse_row_allow_output(pal, jed, 0))
+	{
+		output_pins[output_pin_count].pin = 19;
+		output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+		if (!jed_get_fuse(jed, 2048))
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+		}
+
+		++output_pin_count;
+	}
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, output_pin_count);
+}
+
+
+
+/*-------------------------------------------------
+    config_pal16rp6_pins - configures the pins for
+    a PAL16RP6
+-------------------------------------------------*/
+
+static void config_pal16rp6_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	static UINT16 registered_pins[] = {13, 14, 15, 16, 17, 18};
+	pin_output_config output_pins[8];
+	UINT16 output_pin_count, index;
+
+	output_pin_count = 0;
+
+	if (does_output_enable_fuse_row_allow_output(pal, jed, 1792))
+	{
+		output_pins[output_pin_count].pin = 12;
+		output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+		if (!jed_get_fuse(jed, 2055))
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+		}
+
+		++output_pin_count;
+	}
+
+	for (index = 0; index < ARRAY_LEN(registered_pins); ++index)
+	{
+		output_pins[output_pin_count].pin = registered_pins[index];
+		output_pins[output_pin_count].flags = OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED;
+
+        if (!jed_get_fuse(jed, 2054 - index))
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+		}
+
+		++output_pin_count;
+	}
+
+	if (does_output_enable_fuse_row_allow_output(pal, jed, 0))
+	{
+		output_pins[output_pin_count].pin = 19;
+		output_pins[output_pin_count].flags = OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_OUTPUT;
+
+        if (!jed_get_fuse(jed, 2048))
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[output_pin_count].flags |= OUTPUT_ACTIVEHIGH;
+		}
+
+		++output_pin_count;
+	}
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, output_pin_count);
+}
+
+
+
+/*-------------------------------------------------
+    config_pal16rp8_pins - configures the pins for
+    a PAL16RP8
+-------------------------------------------------*/
+
+static void config_pal16rp8_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+	pin_output_config output_pins[] = {
+		{12, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+		{13, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+		{14, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+		{15, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+		{16, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+		{17, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+		{18, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED},
+		{19, OUTPUT_REGISTERED | OUTPUT_FEEDBACK_REGISTERED}};
+	UINT16 index;
+
+	for (index = 0; index < ARRAY_LEN(output_pins); ++index)
+	{
+        if (!jed_get_fuse(jed, 2055 - index))
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVELOW;
+		}
+		else
+		{
+			output_pins[index].flags |= OUTPUT_ACTIVEHIGH;
+		}
+    }
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal6l16_pins - configures the pins for
+    a PAL6L16
+-------------------------------------------------*/
+
+static void config_pal6l16_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {4, 5, 6, 7, 8, 9};
+	static pin_output_config output_pins[] = {
+		{1, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{2, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{3, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{10, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{11, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{13, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{14, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{21, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{22, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{23, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal8l14_pins - configures the pins for
+    a PAL8L14
+-------------------------------------------------*/
+
+static void config_pal8l14_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {3, 4, 5, 6, 7, 8, 9, 10};
+	static pin_output_config output_pins[] = {
+		{1, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{2, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{11, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{13, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{14, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{21, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{22, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{23, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal12h10_pins - configures the pins for
+    a PAL12H10
+-------------------------------------------------*/
+
+static void config_pal12h10_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13};
+	static pin_output_config output_pins[] = {
+		{14, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{15, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{17, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{21, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{22, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{23, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal12l10_pins - configures the pins for
+    a PAL12L10
+-------------------------------------------------*/
+
+static void config_pal12l10_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13};
+	static pin_output_config output_pins[] = {
+		{14, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{21, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{22, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{23, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal14h8_pins - configures the pins for
+    a PAL14H8
+-------------------------------------------------*/
+
+static void config_pal14h8_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 23};
+	static pin_output_config output_pins[] = {
+		{15, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{17, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{21, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{22, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal14l8_pins - configures the pins for
+    a PAL14L8
+-------------------------------------------------*/
+
+static void config_pal14l8_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 23};
+	static pin_output_config output_pins[] = {
+		{15, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{21, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{22, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal16h6_pins - configures the pins for
+    a PAL16H6
+-------------------------------------------------*/
+
+static void config_pal16h6_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 22, 23};
+	static pin_output_config output_pins[] = {
+		{16, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{17, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{21, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal16l6_pins - configures the pins for
+    a PAL16L6
+-------------------------------------------------*/
+
+static void config_pal16l6_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 22, 23};
+	static pin_output_config output_pins[] = {
+		{16, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{21, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal18h4_pins - configures the pins for
+    a PAL18H4
+-------------------------------------------------*/
+
+static void config_pal18h4_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 21, 22, 23};
+	static pin_output_config output_pins[] = {
+		{17, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal18l4_pins - configures the pins for
+    a PAL18L4
+-------------------------------------------------*/
+
+static void config_pal18l4_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 21, 22, 23};
+	static pin_output_config output_pins[] = {
+		{17, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{20, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal20c1_pins - configures the pins for
+    a PAL20C1
+-------------------------------------------------*/
+
+static void config_pal20c1_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 20, 21, 22, 23};
+	static pin_output_config output_pins[] = {
+		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVEHIGH | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
+/*-------------------------------------------------
+    config_pal20l2_pins - configures the pins for
+    a PAL20L2
+-------------------------------------------------*/
+
+static void config_pal20l2_pins(const pal_data* pal, const jed_data* jed)
+{
+	static UINT16 input_pins[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 20, 21, 22, 23};
+	static pin_output_config output_pins[] = {
+		{18, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE},
+		{19, OUTPUT_ACTIVELOW | OUTPUT_COMBINATORIAL | OUTPUT_FEEDBACK_NONE}};
+
+	set_input_pins(input_pins, ARRAY_LEN(input_pins));
+	set_output_pins(output_pins, ARRAY_LEN(output_pins));
+}
+
+
+
 /*-------------------------------------------------
     is_gal16v8_product_term_enabled - determines if
     a fuse row in a GAL16V8 is enabled
@@ -4047,9 +7042,9 @@ static int command_convert(int argc, char *argv[])
 
 		switch (err)
 		{
-			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid source file\n"); return 1;
-			case JEDERR_BAD_XMIT_SUM:   fprintf(stderr, "Fatal error: Bad transmission checksum\n"); return 1;
-			case JEDERR_BAD_FUSE_SUM:   fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); return 1;
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid source file\n"); free(srcbuf); return 1;
+			case JEDERR_BAD_XMIT_SUM:   fprintf(stderr, "Fatal error: Bad transmission checksum\n"); free(srcbuf); return 1;
+			case JEDERR_BAD_FUSE_SUM:   fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); free(srcbuf); return 1;
 		}
 
 		/* override the number of fuses */
@@ -4081,7 +7076,7 @@ static int command_convert(int argc, char *argv[])
 		err = jedbin_parse(srcbuf, srcbuflen, &jed);
 		switch (err)
 		{
-			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); return 1;
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); free(srcbuf); return 1;
 		}
 
 		/* print out data */
@@ -4119,6 +7114,7 @@ static int command_convert(int argc, char *argv[])
 
 static int command_view(int argc, char *argv[])
 {
+    int result = 0;
 	const char *srcfile, *palname;
 	int is_jed;
 	const pal_data* pal;
@@ -4149,8 +7145,8 @@ static int command_view(int argc, char *argv[])
 	err = read_source_file(srcfile);
 	if (err != 0)
 	{
-		free(srcbuf);
-		return 1;
+        result = 1;
+        goto end;
 	}
 
 	/* if the source is JED, convert to binary */
@@ -4160,9 +7156,9 @@ static int command_view(int argc, char *argv[])
 		err = jed_parse(srcbuf, srcbuflen, &jed);
 		switch (err)
 		{
-			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid .JED file\n"); return 1;
-			case JEDERR_BAD_XMIT_SUM:   fprintf(stderr, "Fatal error: Bad transmission checksum\n"); return 1;
-			case JEDERR_BAD_FUSE_SUM:   fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); return 1;
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid .JED file\n"); result = 1; goto end;
+			case JEDERR_BAD_XMIT_SUM:   fprintf(stderr, "Fatal error: Bad transmission checksum\n"); result = 1; goto end;
+			case JEDERR_BAD_FUSE_SUM:   fprintf(stderr, "Fatal error: Bad fusemap checksum\n"); result = 1; goto end;
 		}
 	}
 	else
@@ -4171,9 +7167,16 @@ static int command_view(int argc, char *argv[])
 		err = jedbin_parse(srcbuf, srcbuflen, &jed);
 		switch (err)
 		{
-			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); return 1;
+			case JEDERR_INVALID_DATA:   fprintf(stderr, "Fatal error: Invalid binary JEDEC file\n"); result = 1; goto end;
 		}
 	}
+
+    if (jed.numfuses != pal->numfuses)
+    {
+		fprintf(stderr, "Fuse count does not match this pal type.");
+        result = 1;
+        goto end;
+    }
 
 	/* generate equations from fuse map */
 
@@ -4186,12 +7189,12 @@ static int command_view(int argc, char *argv[])
 	else
 	{
 		fprintf(stderr, "Viewing product terms not supported for this pal type.");
-		free(srcbuf);
-		return 1;
+		result = 1;
 	}
 
+end:
 	free(srcbuf);
-	return 0;
+	return result;
 }
 
 

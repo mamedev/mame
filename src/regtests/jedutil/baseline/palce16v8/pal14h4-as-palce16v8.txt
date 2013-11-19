@@ -1,0 +1,53 @@
+Inputs:
+
+1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 18, 19
+
+Outputs:
+
+14 (Combinatorial, No output feedback, Active high)
+15 (Combinatorial, No output feedback, Active high)
+16 (Combinatorial, No output feedback, Active high)
+17 (Combinatorial, No output feedback, Active high)
+
+Equations:
+
+o14 = /i1 +
+      /i3 & /i9 +
+      i7 & i12 +
+      i5 & /i11 +
+      /i2 +
+      /i12 +
+      /i8 & i11 +
+      i4
+o14.oe = vcc
+
+o15 = i4 +
+      /i8 +
+      i2 & i9 +
+      /i3 & i13 +
+      /i3 +
+      i1 & i7 +
+      /i13 +
+      i5
+o15.oe = vcc
+
+o16 = /i5 & i7 & i8 +
+      /i2 & /i9 +
+      /i7 & /i8 +
+      /i18 +
+      /i1 +
+      i6 & i18 +
+      i3 & i11 +
+      i6
+o16.oe = vcc
+
+o17 = i6 & i9 +
+      /i1 & /i11 +
+      /i19 +
+      /i9 +
+      /i5 +
+      i3 & i4 +
+      i2 & i19 +
+      i7
+o17.oe = vcc
+

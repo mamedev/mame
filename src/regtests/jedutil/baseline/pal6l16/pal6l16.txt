@@ -1,0 +1,73 @@
+Inputs:
+
+4, 5, 6, 7, 8, 9
+
+Outputs:
+
+1 (Combinatorial, No output feedback, Active low)
+2 (Combinatorial, No output feedback, Active low)
+3 (Combinatorial, No output feedback, Active low)
+10 (Combinatorial, No output feedback, Active low)
+11 (Combinatorial, No output feedback, Active low)
+13 (Combinatorial, No output feedback, Active low)
+14 (Combinatorial, No output feedback, Active low)
+15 (Combinatorial, No output feedback, Active low)
+16 (Combinatorial, No output feedback, Active low)
+17 (Combinatorial, No output feedback, Active low)
+18 (Combinatorial, No output feedback, Active low)
+19 (Combinatorial, No output feedback, Active low)
+20 (Combinatorial, No output feedback, Active low)
+21 (Combinatorial, No output feedback, Active low)
+22 (Combinatorial, No output feedback, Active low)
+23 (Combinatorial, No output feedback, Active low)
+
+Equations:
+
+/o1 = i4
+o1.oe = vcc
+
+/o2 = i5
+o2.oe = vcc
+
+/o3 = i6
+o3.oe = vcc
+
+/o10 = i7
+o10.oe = vcc
+
+/o11 = i8
+o11.oe = vcc
+
+/o13 = i9
+o13.oe = vcc
+
+/o14 = i4 & i5
+o14.oe = vcc
+
+/o15 = /i9
+o15.oe = vcc
+
+/o16 = /i8
+o16.oe = vcc
+
+/o17 = /i7
+o17.oe = vcc
+
+/o18 = /i6
+o18.oe = vcc
+
+/o19 = /i5
+o19.oe = vcc
+
+/o20 = /i4
+o20.oe = vcc
+
+/o21 = /i4 & i5 & /i6 & i7 & /i8 & i9
+o21.oe = vcc
+
+/o22 = i4 & /i5 & i6 & /i7 & i8 & /i9
+o22.oe = vcc
+
+/o23 = i6 & i9
+o23.oe = vcc
+

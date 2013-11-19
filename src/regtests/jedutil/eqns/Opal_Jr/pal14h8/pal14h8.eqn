@@ -1,0 +1,42 @@
+chip pal14h8 PAL14H8
+
+i1=1 i2=2 i3=3 i4=4 i5=5 i6=6 i7=7 i8=8 i9=9 i10=10 i11=11 GND=12
+i13=13 i14=14 o15=15 o16=16 o17=17 o18=18 o19=19 o20=20 o21=21 o22=22 i23=23 VCC=24
+
+equations
+
+o15 = /i1 & /i2 +
+      /i3 +
+      /i4 +
+      /i5 & /i6
+o15.oe = vcc
+
+o16 = /i7 +
+      /i8
+o16.oe = vcc
+
+o17 = /i9 & /i10 +
+      /i13
+o17.oe = vcc
+
+o18 = i1 & i2 & i3 +
+      i4 & i5 & i6 & /i14
+o18.oe = vcc
+
+o19 = i7 +
+      i8
+o19.oe = vcc
+
+o20 = i9 & i10 & i14 +
+      i13
+o20.oe = vcc
+
+o21 = /i2 & i5 & i6 & /i7 +
+      i3 & i6 & i7 & i13 & i23
+o21.oe = vcc
+
+o22 = i5 & i6 +
+      /i7 & i11 +
+      /i23 +
+      /i1 & i3 & i6 & i7 & i10
+o22.oe = vcc

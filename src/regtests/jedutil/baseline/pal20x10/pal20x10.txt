@@ -18,61 +18,61 @@ Outputs:
 Equations:
 
 /rf14 := /i2 & rf15 +
-         i11 & /rf15 +
+         i11 & /rf15 :+:
          i3 & i4 +
          /i5 & i10
 rf14.oe = OE
 
 /rf15 := i2 & i6 & i7 +
-         i6 & rf16 +
+         i6 & rf16 :+:
          i3 & /rf16 +
          i7
 rf15.oe = OE
 
 /rf16 := /i3 & /rf17 +
-         /i4 +
+         /i4 :+:
          /i3 & i4 +
          /i7 & rf17
 rf16.oe = OE
 
 /rf17 := /i2 +
-         /rf18 +
+         /rf18 :+:
          i5 & i6 +
          rf18
 rf17.oe = OE
 
 /rf18 := /i2 & i5 & i6 & /i7 & /i11 +
-         i3 & rf19 +
+         i3 & rf19 :+:
          /i2 & /i7 +
          /i3 & /rf19
 rf18.oe = OE
 
 /rf19 := i5 & i6 & /i7 & i10 +
-         i3 & i6 & i7 +
+         i3 & i6 & i7 :+:
          i5 & rf20 +
          /i4 & /rf20 & rf23
 rf19.oe = OE
 
 /rf20 := /i10 & rf17 +
-         /i11 +
+         /i11 :+:
          i4 & /rf17 +
          i2 & /rf23
 rf20.oe = OE
 
 /rf21 := /i2 & rf17 +
-         /i10 & i11 +
+         /i10 & i11 :+:
          /rf14 & rf15 +
          i8 & i9 & /rf22
 rf21.oe = OE
 
 /rf22 := rf14 & /rf15 +
-         i3 & /rf21 +
+         i3 & /rf21 :+:
          /i8 & rf21 +
          rf16 & /rf20
 rf22.oe = OE
 
 /rf23 := /rf14 +
-         i6 & rf14 +
+         i6 & rf14 :+:
          i7 & rf22 +
          i2 & i4 & i6 & i8 & /rf15
 rf23.oe = OE

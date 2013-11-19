@@ -1,0 +1,51 @@
+TITLE     PAL8L14 Test 1
+PATTERN   A
+REVISION  1.0
+AUTHOR    MAMEDev
+COMPANY   MAMEDev
+DATE      11/11/2013
+
+CHIP PAL8L14Test1 PAL8L14
+
+;---------------------------------- PIN Declarations ---------------
+PIN  1          O1                   COMBINATORIAL               ;
+PIN  2          O2                   COMBINATORIAL               ;
+PIN  3          I3                   COMBINATORIAL               ;
+PIN  4          I4                   COMBINATORIAL               ;
+PIN  5          I5                   COMBINATORIAL               ;
+PIN  6          I6                   COMBINATORIAL               ;
+PIN  7          I7                   COMBINATORIAL               ;
+PIN  8          I8                   COMBINATORIAL               ;
+PIN  9          I9                   COMBINATORIAL               ;
+PIN  10         I10                  COMBINATORIAL               ;
+PIN  11         O11                  COMBINATORIAL               ;
+PIN  12         GND                                              ;
+PIN  13         O13                  COMBINATORIAL               ;
+PIN  14         O14                  COMBINATORIAL               ;
+PIN  15         O15                  COMBINATORIAL               ;
+PIN  16         O16                  COMBINATORIAL               ;
+PIN  17         O17                  COMBINATORIAL               ;
+PIN  18         O18                  COMBINATORIAL               ;
+PIN  19         O19                  COMBINATORIAL               ;
+PIN  20         O20                  COMBINATORIAL               ;
+PIN  21         O21                  COMBINATORIAL               ;
+PIN  22         O22                  COMBINATORIAL               ;
+PIN  23         O23                  COMBINATORIAL               ;
+PIN  24         VCC                                              ;
+
+EQUATIONS
+
+/O1 = I3
+/O2 = I4
+/O11 = I5
+/O13 = I6
+/O14 = I7
+/O15 = I8
+/O16 = I9
+/O17 = I10
+/O18 = /I3
+/O19 = /I4 * /I9
+/O20 = /I5
+/O21 = /I6 * /I10
+/O22 = /I7
+/O23 = /I8

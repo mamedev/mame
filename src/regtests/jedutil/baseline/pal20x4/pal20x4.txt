@@ -33,25 +33,25 @@ o15.oe = i6 & o16
 o16.oe = /i3 & i4
 
 /rf17 := /i2 +
-         /rf18 +
+         /rf18 :+:
          i5 & i6 +
          rf18
 rf17.oe = OE
 
 /rf18 := /i2 & i5 & i6 & /i7 & /i11 +
-         i3 & rf19 +
+         i3 & rf19 :+:
          /i2 & /i7 +
          /i3 & /rf19
 rf18.oe = OE
 
 /rf19 := i5 & i6 & /i7 & i10 +
-         i3 & i6 & i7 +
+         i3 & i6 & i7 :+:
          i5 & rf20 +
          /i4 & /rf20 & o23
 rf19.oe = OE
 
 /rf20 := /i10 & rf17 +
-         /i11 +
+         /i11 :+:
          i4 & /rf17 +
          i2 & /o23
 rf20.oe = OE
