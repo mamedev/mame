@@ -32,18 +32,18 @@
                (Each row appears vertically because the monitor is rotated)
 
     6000          Sound command
-    6800            Trackball Reset. Double duties as a watchdog.
-    7000          Input port 1    Bit 0-3 Trackball Vertical Position
+    6800          Trackball Reset. Double duties as a watchdog.
+    7000          Input port 1  Bit 0-3 Trackball Vertical Position
                                 Bit 4   Player 2 Hook Left
                                 Bit 5   Player 2 Hook Right
                                 Bit 6   Upright/Cocktail DIP Switch
-                               Bit 7   Coin 2
-    7800          Input port 2    Bit 0-3 Trackball Horizontal Positon
-                               Bit 4   Player 1 Hook Left
-                               Bit 5   Player 1 Hook Right
-                               Bit 6   Start
-                               Bit 7   Coin 1
-    8000-ffff       ROM
+                                Bit 7   Coin 2
+    7800          Input port 2  Bit 0-3 Trackball Horizontal Positon
+                                Bit 4   Player 1 Hook Left
+                                Bit 5   Player 1 Hook Right
+                                Bit 6   Start
+                                Bit 7   Coin 1
+    8000-ffff     ROM
 
 
     Sound Board:
@@ -52,10 +52,8 @@
     1000-1001       YM2203
                 Port A D7 Read  is ticket sensor
                 Port B D7 Write is ticket dispenser enable
-                Port B D6 looks like a diagnostics LED to indicate that
-                          the PCB is operating. It's pulsated by the
-                          sound CPU. It is kind of pointless to emulate it.
-    2000            Not hooked up according to the schematics
+                Port B D6 Write is Sound OK LED
+    2000            Sound watchdog clear
     6000            DAC write
     7000            Sound command read (0x34 is used to dispense a ticket)
     8000-ffff       ROM
@@ -94,7 +92,7 @@
 #include "sound/2203intf.h"
 #include "sound/dac.h"
 
-#define MASTER_CLOCK        8000000     /* 8MHz crystal */
+#define MASTER_CLOCK		XTAL_8MHz
 
 
 /*************************************
@@ -257,7 +255,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x2000, 0x2000) AM_WRITENOP                /* Not hooked up according to the schematics */
+	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -368,17 +366,17 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(capbowl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  capbowl_interrupt)
-	MCFG_WATCHDOG_VBLANK_INIT(8) // Unverified
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // ~0.3s
 
 	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
+//	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // TODO
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(360, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 244)
