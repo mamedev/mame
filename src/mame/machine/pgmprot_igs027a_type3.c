@@ -544,7 +544,7 @@ INPUT_PORTS_START( theglad )
 	PORT_INCLUDE ( pgm )
 
 	PORT_START("RegionHack")    /* Region - actually supplied by protection device */
-	PORT_CONFNAME( 0x00ff, 0x0006, DEF_STR( Region ) )
+	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
 	//PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) ) // it doesn't appear that carts of the Japanese version were released, the PCB has an extra sample ROM used in Japanese mode for the music
@@ -643,6 +643,10 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 	share16 = (UINT16 *)(m_svg_shareram[0]);
 	share16[0x158/2] = 0x0005;
 }
+
+//
+// int j = BITSWAP24(i, 23, 20, 17, 16, 19, 18, 15, 14, 13, 12, 11, 10, 9, 22, 21, 6, 7, 6, 5, 4, 3, 2, 1, 0);
+// buffer[i] = src[j]
 
 // todo, collapse these to an address swap
 void pgm_arm_type3_state::pgm_descramble_happy6(UINT8* src)
