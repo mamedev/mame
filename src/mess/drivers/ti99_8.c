@@ -1139,11 +1139,6 @@ ROM_START(ti99_8)
 	ROM_REGION(0x8000, ROM1_TAG, 0)
 	ROM_LOAD("u25_rom1.bin", 0x0000, 0x8000, CRC(b574461a) SHA1(42c6aed44802cfabdd26b565d6e5ddfcd689f11e))
 
-	// Speech ROMs
-	ROM_REGION(0x8000, SPEECH_TAG, 0)
-	ROM_LOAD("cd2325a.vsm", 0x0000, 0x4000, CRC(1f58b571) SHA1(0ef4f178716b575a1c0c970c56af8a8d97561ffe))
-	ROM_LOAD("cd2326a.vsm", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020))
-
 	// System GROMs. 3 chips @ f830
 	// The schematics do not enumerate the circuits but only talk about
 	// "circuits on board" (COB) so we name the GROMs as gM_N.bin where M is the
