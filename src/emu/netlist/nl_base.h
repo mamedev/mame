@@ -287,7 +287,8 @@ public:
         STATE_INP_ACTIVE = 1,
         STATE_INP_HL = 2,
         STATE_INP_LH = 4,
-        STATE_NONE = 128
+        STATE_OUT = 128,
+        STATE_NONEX = 256
     };
 
 	ATTR_COLD netlist_terminal_t(const type_t atype, const family_t afamily)
@@ -297,7 +298,7 @@ public:
     , m_update_list_next(NULL)
 	, m_netdev(NULL)
     , m_net(NULL)
-    , m_state(STATE_NONE)
+    , m_state(STATE_NONEX)
 	{}
 
     ATTR_COLD netlist_terminal_t()
@@ -306,10 +307,10 @@ public:
     , m_update_list_next(NULL)
     , m_netdev(NULL)
     , m_net(NULL)
-    , m_state(STATE_NONE)
+    , m_state(STATE_NONEX)
     {}
 
-	ATTR_COLD virtual void init_terminal(netlist_core_device_t &dev);
+	ATTR_COLD void init_terminal(netlist_core_device_t &dev, const state_e astate);
 
     ATTR_COLD void set_net(netlist_net_t &anet)   { m_net = &anet; }
     ATTR_COLD bool has_net() { return (m_net != NULL); }
@@ -319,7 +320,11 @@ public:
 
     ATTR_HOT inline const bool is_state(const state_e astate) const { return (m_state == astate); }
     ATTR_HOT inline const state_e state() const { return m_state; }
-    ATTR_HOT inline void set_state(const state_e astate) { m_state = astate; }
+    ATTR_HOT inline void set_state(const state_e astate)
+    {
+        assert(astate != STATE_NONEX);
+        m_state = astate;
+    }
 
     ATTR_HOT inline netlist_core_device_t & RESTRICT netdev() const { return *m_netdev; }
 
@@ -522,7 +527,7 @@ public:
 
 	netlist_output_t(const type_t atype, const family_t afamily);
 
-    ATTR_COLD virtual void init_terminal(netlist_core_device_t &dev);
+    ATTR_COLD void init_terminal(netlist_core_device_t &dev);
 
 	double m_low_V;
 	double m_high_V;
@@ -576,13 +581,13 @@ public:
 		: netlist_output_t(OUTPUT, ANALOG)
     {
 	    net().m_cur.Analog = 0.0;
-	    net().m_new.Analog = 0.0;
+	    net().m_new.Analog = 99.0;
     }
 
     ATTR_COLD void initial(const double val)
     {
         net().m_cur.Analog = val;
-        net().m_new.Analog = val;
+        net().m_new.Analog = 99.0;
     }
 
 	ATTR_HOT inline void set_Q(const double newQ, const netlist_time &delay)
@@ -830,7 +835,7 @@ public:
 protected:
 	void start()
 	{
-		m_I.init_terminal(*this);
+		m_I.init_terminal(*this, netlist_terminal_t::STATE_INP_ACTIVE);
 
 		m_Q.init_terminal(*this);
 		m_Q.initial(1);
@@ -842,6 +847,8 @@ protected:
 			OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
 		else if (m_I.Q_Analog() < m_I.m_low_thresh_V)
 			OUTLOGIC(m_Q, 0, NLTIME_FROM_NS(1));
+		else
+		    OUTLOGIC(m_Q, m_Q.net().last_Q(), NLTIME_FROM_NS(1));
 	}
 
 };
@@ -870,7 +877,7 @@ public:
 protected:
 	void start()
 	{
-		m_I.init_terminal(*this);
+		m_I.init_terminal(*this, netlist_terminal_t::STATE_INP_ACTIVE);
 		m_Q.init_terminal(*this);
 		m_Q.initial(0);
 	}

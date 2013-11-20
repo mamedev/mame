@@ -146,8 +146,11 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
                 astring temp = dev.name();
                 temp.cat(".");
                 temp.cat(name);
-                term.init_terminal(upd_dev);
-                term.set_state(state);
+                if (obj.isType(netlist_terminal_t::OUTPUT))
+                    dynamic_cast<netlist_output_t &>(term).init_terminal(upd_dev);
+                else
+                    term.init_terminal(upd_dev, state);
+
                 if (!(m_terminals.add(temp, &term, false)==TMERR_NONE))
                     fatalerror("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), temp.cstr());
                 NL_VERBOSE_OUT(("%s %s\n", objtype_as_astr(term).cstr(), name.cstr()));
@@ -278,11 +281,11 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
 {
     if (inp.isFamily(netlist_terminal_t::ANALOG))
     {
-        connect_terminals(term, inp);
+        connect_terminals(inp, term);
     }
     else if (inp.isFamily(netlist_terminal_t::LOGIC))
     {
-        //printf("here 1\n");
+        NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
         nld_a_to_d_proxy *proxy = new nld_a_to_d_proxy(inp);
         astring x = "";
         x.printf("proxy_da_%d", m_proxy_cnt++);
@@ -292,6 +295,7 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
         connect_terminals(term, proxy->m_I);
 
         if (inp.has_net())
+            //fatalerror("logic inputs can only belong to one net!\n");
             proxy->m_Q.net().merge_net(&inp.net());
         else
             proxy->m_Q.net().register_con(inp);
@@ -316,7 +320,7 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
     }
     else if (out.isFamily(netlist_terminal_t::LOGIC))
     {
-        //printf("here 1\n");
+        NL_VERBOSE_OUT(("connect_terminal_output: connecting proxy\n"));
         nld_d_to_a_proxy *proxy = new nld_d_to_a_proxy(out);
         astring x = "";
         x.printf("proxy_da_%d", m_proxy_cnt++);
@@ -336,32 +340,35 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
     }
 }
 
-void netlist_setup_t::connect_terminals(netlist_terminal_t &in, netlist_terminal_t &out)
+void netlist_setup_t::connect_terminals(netlist_terminal_t &t1, netlist_terminal_t &t2)
 {
-    assert(in.isType(netlist_terminal_t::TERMINAL));
-    assert(out.isType(netlist_terminal_t::TERMINAL));
+    //assert(in.isType(netlist_terminal_t::TERMINAL));
+    //assert(out.isType(netlist_terminal_t::TERMINAL));
 
-    if (in.has_net() && out.has_net())
+    if (t1.has_net() && t2.has_net())
     {
-        in.net().merge_net(&out.net());
+        NL_VERBOSE_OUT(("T2 and T1 have net\n"));
+        t1.net().merge_net(&t2.net());
     }
-    else if (out.has_net())
+    else if (t2.has_net())
     {
-        out.net().register_con(in);
+        NL_VERBOSE_OUT(("T2 has net\n"));
+        t2.net().register_con(t1);
     }
-    else if (in.has_net())
+    else if (t1.has_net())
     {
-        in.net().register_con(out);
+        NL_VERBOSE_OUT(("T1 has net\n"));
+        t1.net().register_con(t2);
     }
     else
     {
         NL_VERBOSE_OUT(("adding net ...\n"));
         netlist_net_t *anet =  new netlist_net_t(netlist_object_t::NET, netlist_object_t::ANALOG);
-        in.set_net(*anet);
+        t1.set_net(*anet);
         m_netlist.solver()->m_nets.add(anet);
-        in.net().init_object(netlist());
-        in.net().register_con(out);
-        in.net().register_con(in);
+        t1.net().init_object(netlist());
+        t1.net().register_con(t2);
+        t1.net().register_con(t1);
     }
 }
 
@@ -389,6 +396,8 @@ void netlist_setup_t::resolve_inputs(void)
         const astring t2s = entry->object()->e2;
         netlist_terminal_t &t1 = find_terminal(t1s);
         netlist_terminal_t &t2 = find_terminal(t2s);
+
+        NL_VERBOSE_OUT(("Connecting %s to %s\n", t1s.cstr(), t2s.cstr()));
 
         // FIXME: amend device design so that warnings can be turned into errors
         //        Only variable inputs have this issue

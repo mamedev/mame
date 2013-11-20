@@ -951,6 +951,7 @@ static const net_device_t_base_factory *netregistry[] =
 {
     ENTRY(R,                    NETDEV_R)
     ENTRY(C,                    NETDEV_C)
+    ENTRY(D,                    NETDEV_D)
 	ENTRY(ttl_const,            NETDEV_TTL_CONST)
 	ENTRY(analog_const,         NETDEV_ANALOG_CONST)
 	ENTRY(logic_input,          NETDEV_LOGIC_INPUT)

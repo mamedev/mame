@@ -16,6 +16,8 @@
 //  MACROS / inline netlist definitions
 //============================================================
 
+#define NET_STR(_x) # _x
+
 #define NET_ALIAS(_alias, _name)                                                    \
 	netlist.register_alias(# _alias, # _name);
 #define NET_NEW(_type , _name)  net_create_device_by_classname(NETLIB_NAME_STR(_type), netlist, # _name)
@@ -29,7 +31,7 @@
 #define NET_CONNECT(_name, _input, _output)                                         \
 		netlist.register_link(# _name "." # _input, # _output);
 #define NET_C(_input, _output)                                                      \
-        netlist.register_link(# _input , # _output);
+        netlist.register_link(NET_STR(_input) , NET_STR(_output));
 #define NETDEV_PARAM(_name, _val)                                                   \
 		netlist.find_param(# _name).initial(_val);
 #define NETDEV_PARAMI(_name, _param, _val)                                           \

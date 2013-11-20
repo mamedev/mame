@@ -34,6 +34,22 @@
         NET_REGISTER_DEV(solver, _name)
 
 // ----------------------------------------------------------------------------------------
+// 2 terminal devices
+// ----------------------------------------------------------------------------------------
+
+#define NETDEV_R(_name, _R)                                                         \
+        NET_REGISTER_DEV(R, _name)                                                  \
+        NETDEV_PARAMI(_name, R, _R)
+
+#define NETDEV_C(_name, _C)                                                         \
+        NET_REGISTER_DEV(C, _name)                                                  \
+        NETDEV_PARAMI(_name, C, _C)
+
+/* Generic Diode */
+#define NETDEV_D(_name)                                                             \
+        NET_REGISTER_DEV(D, _name)
+
+// ----------------------------------------------------------------------------------------
 // netdev_*_const
 // ----------------------------------------------------------------------------------------
 
@@ -81,8 +97,11 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
         netlist_ttl_input_t m_feedback;
         netlist_ttl_output_t m_Q;
 
+        netlist_param_t m_freq;
+
         netlist_time m_inc;
         netlist_time m_last_step;
+
         netlist_list_t<netlist_terminal_t *> m_terms;
         netlist_list_t<netlist_terminal_t *> m_inps;
 
@@ -153,6 +172,7 @@ protected:
 
     ATTR_HOT ATTR_ALIGN virtual void update_terminals()
     {
+        m_P.m_g = m_N.m_g = m_g;
         m_N.m_Idr = (m_P.net().Q_Analog() - m_V) * m_g + m_I;
         m_P.m_Idr = (m_N.net().Q_Analog() + m_V) * m_g - m_I;
         //printf("%f %f %f %f\n", m_N.m_Idr, m_P.m_Idr, m_N.net().Q_Analog(), m_P.net().Q_Analog());
@@ -192,8 +212,6 @@ protected:
     virtual void update_param()
     {
         m_g = 1.0 / m_R.Value();
-        m_P.m_g = m_g;
-        m_N.m_g = m_g;
     }
 
 private:
@@ -220,8 +238,7 @@ protected:
 
     virtual void update_param()
     {
-        // set to some very big step time for now
-        // ==> large resistance
+        // set to some very small step time for now
         step_time(1e-9);
     }
 
@@ -230,6 +247,62 @@ protected:
         m_g = m_P.m_g = m_N.m_g = m_C.Value() / st;
         m_I = -m_g * (m_P.net().Q_Analog()- m_N.net().Q_Analog());
     }
+private:
+};
+
+class nld_D : public nld_twoterm
+{
+public:
+    nld_D()
+    : nld_twoterm()
+    {
+    }
+
+    netlist_param_t m_Vt;
+    netlist_param_t m_Is;
+    netlist_param_t m_Rmin;
+
+    double m_VtInv;
+    double m_Vcrit;
+    double m_Vd;
+
+protected:
+    void start()
+    {
+        register_terminal("A", m_P);
+        register_terminal("K", m_N);
+
+        register_param("Vt", m_Vt, 0.0258);
+        register_param("Is", m_Is, 1e-15);
+        register_param("Rmin", m_Rmin, 1.4);
+        m_Vd = 0.7;
+    }
+
+    virtual void update_param()
+    {
+        m_Vcrit = m_Vt.Value() * log(m_Vt.Value() / m_Is.Value() / sqrt(2.0));
+        m_VtInv = 1.0 / m_Vt.Value();
+        NL_VERBOSE_OUT(("VCutoff: %f\n", m_Vcrit));
+    }
+
+    ATTR_HOT ATTR_ALIGN virtual void update_terminals()
+    {
+        const double nVd = m_P.net().Q_Analog()- m_N.net().Q_Analog();
+
+        //FIXME: Optimize cutoff case
+        m_Vd = (nVd > m_Vcrit) ? m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt.Value() : nVd;
+
+        const double eVDVt = exp(m_Vd * m_VtInv);
+        const double Id = m_Is.Value() * (eVDVt - 1.0);
+
+        m_g = m_Is.Value() * m_VtInv * eVDVt;
+
+        m_I = (Id - m_Vd * m_g);
+        //printf("Vd: %f %f %f %f\n", m_Vd, m_g, Id, m_I);
+
+        nld_twoterm::update_terminals();
+    }
+
 private:
 };
 

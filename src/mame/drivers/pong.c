@@ -467,8 +467,9 @@ static NETLIST_START(pong_schematics)
 
     NETDEV_SOLVER(Solver)
     NETDEV_ANALOG_CONST(V5, 5)
+    NETDEV_ANALOG_CONST(V1, 1)
     NETDEV_ANALOG_CONST(V0, 0)
-#if 1
+#if 0
     NETDEV_R(R1, 10)
     NETDEV_R(R2, 10)
     NETDEV_R(R3, 10)
@@ -477,7 +478,7 @@ static NETLIST_START(pong_schematics)
     NET_C(R2.2, R3.1)
     NET_C(R3.2, V0)
 #endif
-#if 1
+#if 0
     NETDEV_R(R4, 1000)
     NETDEV_C(C1, 1e-6)
     NET_C(V5,R4.1)
@@ -485,6 +486,46 @@ static NETLIST_START(pong_schematics)
     NET_C(C1.2, V0)
     //NETDEV_LOG(log1, C1.1)
 #endif
+
+
+#define tt(_n) \
+    NETDEV_R(R ## _n, 1000) \
+	NETDEV_D(D ## _n) \
+    NET_C(V5, R ## _n.1) \
+    NET_C(R ## _n.2, D ## _n.A) \
+    NET_C(D ## _n.K, V0)
+
+/*    tt(20)
+    tt(21)
+    tt(22)
+    tt(23)
+    tt(24)
+    tt(25)
+    tt(26)
+    tt(27)
+    tt(28)
+    tt(29)
+*/
+#if 0
+    NETDEV_R(R5, 1000)
+    NETDEV_D(D1)
+    NET_C(V5, R5.1)
+    NET_C(R5.2, D1.A)
+    NET_C(D1.K, V0)
+    //NETDEV_LOG(log1, D1.A)
+#endif
+
+    // astable NAND Multivibrator
+    NETDEV_R(R1, 1000)
+    NETDEV_C(C1, 1e-6)
+    TTL_7400_NAND(n1,R1.1,R1.1)
+    TTL_7400_NAND(n2,R1.2,R1.2)
+    NET_C(n1.Q, R1.2)
+    NET_C(n2.Q, C1.1)
+    NET_C(C1.2, R1.1)
+    //NETDEV_LOG(log2, C1.2)
+    //NETDEV_LOG(log2, n1.Q)
+    //NETDEV_LOG(log3, n2.Q)
 NETLIST_END
 
 static NETLIST_START(pong)
