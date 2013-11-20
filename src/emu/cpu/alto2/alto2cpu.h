@@ -19,6 +19,32 @@
 
 #define	ALTO2_TAG "alto2"
 
+/**
+ * \brief AltoII register names
+ */
+enum {
+	// micro code task, micro program counter, next and next2
+	A2_TASK, A2_MPC, A2_NEXT, A2_NEXT2,
+	// BUS, ALU, temp, latch, memory latch and carry flags
+	A2_BUS, A2_T, A2_ALU, A2_ALUC0,	A2_L, A2_SHIFTER, A2_LALUC0, A2_M,
+	A2_R,	// 32 R registers
+	A2_AC3 = A2_R, A2_AC2, A2_AC1, A2_AC0, A2_R04, A2_R05, A2_PC,  A2_R07,
+	A2_R10, A2_R11, A2_R12, A2_R13, A2_R14, A2_R15, A2_R16, A2_R17,
+	A2_R20, A2_R21, A2_R22, A2_R23, A2_R24, A2_R25, A2_R26, A2_R27,
+	A2_R30, A2_R31, A2_R32, A2_R33, A2_R34, A2_R35, A2_R36, A2_R37,
+	A2_S,	// 32 S registers
+	A2_S00 = A2_S, A2_S01, A2_S02, A2_S03, A2_S04, A2_S05, A2_S06, A2_S07,
+	A2_S10, A2_S11, A2_S12, A2_S13, A2_S14, A2_S15, A2_S16, A2_S17,
+	A2_S20, A2_S21, A2_S22, A2_S23, A2_S24, A2_S25, A2_S26, A2_S27,
+	A2_S30, A2_S31, A2_S32, A2_S33, A2_S34, A2_S35, A2_S36, A2_S37,
+	// DISK controller registers
+	A2_DRIVE, A2_KADDR, A2_KADR, A2_KSTAT, A2_KCOM, A2_KRECNO,
+	A2_SHIFTIN, A2_SHIFTOUT, A2_DATAIN, A2_DATAOUT, A2_KRWC,
+	A2_KFER, A2_WDTSKENA, A2_WDINIT0, A2_WDINIT, A2_STROBE,
+	A2_BITCLK, A2_DATIN, A2_BITCNT, A2_CARRY, A2_SECLATE,
+	A2_SEEKOK, A2_OKTORUN, A2_READY
+};
+
 #ifndef	ALTO2_DEBUG
 #define	ALTO2_DEBUG             0   //!< define to 1 to enable logerror() output
 #endif
@@ -79,6 +105,33 @@
 
 //! inverted bits in the micro instruction 32 bit word
 #define	ALTO2_UCODE_INVERTED	((1 << 10) | (1 << 15) | (1 << 19))
+
+/********************************************************************************
+ * Bit field primitives
+ * These are some macros to make it easier to access variable by the bit-
+ * reversed notation that the Xerox Alto documents use all over the place.
+ * Bit number 0 is the most significant there,
+ * and bit number (width - 1) is the least significant.
+ * The X_ is for Xerox and to avoid collisions with MAME generic macros.
+ ********************************************************************************/
+
+//! get the left shift required to access bit %to in a word of %width bits
+#define X_BITSHIFT(width,to) ((width) - 1 - (to))
+
+//! build a least significant bit mask for bits %from to %to (inclusive)
+#define X_BITMASK(from,to) ((1ul << ((to) + 1 - (from))) - 1)
+
+//! get a single bit number %bit value from %reg, a word of %width bits
+#define	X_BIT(reg,width,bit) (((reg) >> X_BITSHIFT(width,bit)) & 1)
+
+//! get a bit field from %reg, a word of %width bits, starting at bit %from until bit %to
+#define X_RDBITS(reg,width,from,to) (((reg) >> X_BITSHIFT(width,to)) & X_BITMASK(from,to))
+
+//! put a value %val into %reg, a word of %width bits, starting at bit %from until bit %to
+#define X_WRBITS(reg,width,from,to,val) do { \
+	UINT32 mask = X_BITMASK(from,to) << X_BITSHIFT(width,to); \
+	reg = ((reg) & ~mask) | (((val) << X_BITSHIFT(width,to)) & mask); \
+} while (0)
 
 /**
  * @brief start value for the horizontal line counter
@@ -145,37 +198,14 @@
 #define	ALTO2_DISPLAY_FIFO 16														//!< the display fifo has 16 words
 #define	ALTO2_DISPLAY_SCANLINE_WORDS (ALTO2_DISPLAY_TOTAL_WIDTH/16)         		//!< words per scanline
 #define	ALTO2_DISPLAY_HEIGHT 808                                                    //!< number of visible scanlines per frame; 808 really, but there are some empty lines?
-#define	ALTO2_DISPLAY_WIDTH 606                                                     //!< visible width of the display; 38 words - 2 pixels
+#define	ALTO2_DISPLAY_WIDTH 606                                                     //!< visible width of the display; 38 x 16 bit words - 2 pixels
 #define	ALTO2_DISPLAY_VISIBLE_WORDS ((ALTO2_DISPLAY_WIDTH+15)/16)                   //!< visible words per scanline
 #define	ALTO2_DISPLAY_BITCLOCK 20160000ll                                           //!< display bit clock in in Hertz (20.16MHz)
 #define	ALTO2_DISPLAY_BITTIME(n) (U64(1000000000000)*(n)/ALTO2_DISPLAY_BITCLOCK)	//!< display bit time in in pico seconds (~= 49.6031ns)
-#define	ALTO2_DISPLAY_SCANLINE_TIME	ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)//!< time for a scanline in pico seconds (768 * 49.6031ns)
-#define	ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)		//!< time of the visible part of a scanline in pico seconds (606 * 49.6031ns)
-#define	ALTO2_DISPLAY_WORD_TIME	ALTO2_DISPLAY_BITTIME(16)							//!< time for a word in pico seconds (16 pixels * 49.6031ns)
+#define	ALTO2_DISPLAY_SCANLINE_TIME	ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)//!< time for a scanline in pico seconds (768 * 49.6031ns ~= 38095.1808ns)
+#define	ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)		//!< time of the visible part of a scanline in pico seconds (606 * 49.6031ns ~= 30059.4786ns)
+#define	ALTO2_DISPLAY_WORD_TIME	ALTO2_DISPLAY_BITTIME(16)							//!< time for a word in pico seconds (16 pixels * 49.6031ns ~= 793.6496ns)
 #define	ALTO2_DISPLAY_VBLANK_TIME ((ALTO2_DISPLAY_TOTAL_HEIGHT-ALTO2_DISPLAY_HEIGHT)*HZ_TO_ATTOSECONDS(26250))
-
-enum {
-	// micro code task, micro program counter, next and next2
-	A2_TASK, A2_MPC, A2_NEXT, A2_NEXT2,
-	// BUS, ALU, temp, latch, memory latch and carry flags
-	A2_BUS, A2_T, A2_ALU, A2_ALUC0,	A2_L, A2_SHIFTER, A2_LALUC0, A2_M,
-	// DISK controller registers
-	A2_DRIVE, A2_KADDR, A2_KADR, A2_KSTAT, A2_KCOM, A2_KRECNO,
-	A2_SHIFTIN, A2_SHIFTOUT, A2_DATAIN, A2_DATAOUT, A2_KRWC,
-	A2_KFER, A2_WDTSKENA, A2_WDINIT0, A2_WDINIT, A2_STROBE,
-	A2_BITCLK, A2_DATIN, A2_BITCNT, A2_CARRY, A2_SECLATE,
-	A2_SEEKOK, A2_OKTORUN, A2_READY,
-	A2_R,	// 32 R registers
-	A2_AC3 = A2_R, A2_AC2, A2_AC1, A2_AC0, A2_R04, A2_R05, A2_PC,  A2_R07,
-	A2_R10, A2_R11, A2_R12, A2_R13, A2_R14, A2_R15, A2_R16, A2_R17,
-	A2_R20, A2_R21, A2_R22, A2_R23, A2_R24, A2_R25, A2_R26, A2_R27,
-	A2_R30, A2_R31, A2_R32, A2_R33, A2_R34, A2_R35, A2_R36, A2_R37,
-	A2_S,	// 32 S registers
-	A2_S00 = A2_S, A2_S01, A2_S02, A2_S03, A2_S04, A2_S05, A2_S06, A2_S07,
-	A2_S10, A2_S11, A2_S12, A2_S13, A2_S14, A2_S15, A2_S16, A2_S17,
-	A2_S20, A2_S21, A2_S22, A2_S23, A2_S24, A2_S25, A2_S26, A2_S27,
-	A2_S30, A2_S31, A2_S32, A2_S33, A2_S34, A2_S35, A2_S36, A2_S37
-};
 
 /**
  * @brief enumeration of the inputs and outputs of a JK flip-flop type 74109
@@ -347,9 +377,6 @@ private:
 	static const UINT8 m_ether_id = 0241;
 
 	typedef void (alto2_cpu_device::*a2func)();
-	typedef void (alto2_cpu_device::*a2cb)(int unit);
-	typedef void (alto2_cpu_device::*a2io_wr)(UINT32 addr, UINT16 data);
-	typedef UINT16 (alto2_cpu_device::*a2io_rd)(UINT32 addr);
 
 	//! task numbers
 	enum {
@@ -411,70 +438,70 @@ private:
 	enum {
 		/**
 		 * \brief 00: ALU <- BUS
-		 * PROM data for S3-0,M,C: 1111/1/0
+		 * PROM data for S3-0,M,C,T: 1111/1/0/0
 		 * function F=A
 		 * T source is ALU
 		 */
 		aluf_bus__alut,
 		/**
 		 * \brief 01: ALU <- T
-		 * PROM data for S3-0,M,C: 1010/1/0
+		 * PROM data for S3-0,M,C,T: 1010/1/0/0
 		 * function F=B
 		 * T source is BUS
 		 */
 		aluf_treg,
 		/**
 		 * \brief 02: ALU <- BUS | T
-		 * PROM data for S3-0,M,C: 1110/1/0
+		 * PROM data for S3-0,M,C,T: 1110/1/0/1
 		 * function F=A|B
 		 * T source is ALU
 		 */
 		aluf_bus_or_t__alut,
 		/**
 		 * \brief 03: ALU <- BUS & T
-		 * PROM data for S3-0,M,C: 1011/1/0
+		 * PROM data for S3-0,M,C,T: 1011/1/0/0
 		 * function F=A&B
 		 * T source is BUS
 		 */
 		aluf_bus_and_t,
 		/**
 		 * \brief 04: ALU <- BUS ^ T
-		 * PROM data for S3-0,M,C: 0110/1/0
+		 * PROM data for S3-0,M,C,T: 0110/1/0/0
 		 * function F=A^B
 		 * T source is BUS
 		 */
 		aluf_bus_xor_t,
 		/**
 		 * \brief 05: ALU <- BUS + 1
-		 * PROM data for S3-0,M,C: 0000/0/0
+		 * PROM data for S3-0,M,C,T: 0000/0/0/1
 		 * function F=A+1
 		 * T source is ALU
 		 */
 		aluf_bus_plus_1__alut,
 		/**
 		 * \brief 06: ALU <- BUS - 1
-		 * PROM data for S3-0,M,C: 1111/0/1
+		 * PROM data for S3-0,M,C,T: 1111/0/1/1
 		 * function F=A-1
 		 * T source is ALU
 		 */
 		aluf_bus_minus_1__alut,
 		/**
 		 * \brief 07: ALU <- BUS + T
-		 * PROM data for S3-0,M,C: 1001/0/1
+		 * PROM data for S3-0,M,C,T: 1001/0/1/0
 		 * function F=A+B
 		 * T source is BUS
 		 */
 		aluf_bus_plus_t,
 		/**
 		 * \brief 10: ALU <- BUS - T
-		 * PROM data for S3-0,M,C: 0110/0/0
+		 * PROM data for S3-0,M,C,T: 0110/0/0/0
 		 * function F=A-B
 		 * T source is BUS
 		 */
 		aluf_bus_minus_t,
 		/**
 		 * \brief 11: ALU <- BUS - T - 1
-		 * PROM data for S3-0,M,C: 0110/0/1
+		 * PROM data for S3-0,M,C,T: 0110/0/1/0
 		 * function F=A-B-1
 		 * T source is BUS
 		 */
@@ -488,37 +515,37 @@ private:
 		aluf_bus_plus_t_plus_1__alut,
 		/**
 		 * \brief 13: ALU <- BUS + SKIP
-		 * PROM data for S3-0,M,C: 0000/0/SKIP
+		 * PROM data for S3-0,M,C,T: 0000/0/SKIP/1
 		 * function F=A (SKIP=1) or F=A+1 (SKIP=0)
 		 * T source is ALU
 		 */
 		aluf_bus_plus_skip__alut,
 		/**
 		 * \brief 14: ALU <- BUS & T
-		 * PROM data for S3-0,M,C: 1011/1/0
+		 * PROM data for S3-0,M,C,T: 1011/1/0/1
 		 * function F=A&B
 		 * T source is ALU
 		 */
 		aluf_bus_and_t__alut,
 		/**
 		 * \brief 15: ALU <- BUS & ~T
-		 * PROM data for S3-0,M,C: 0111/1/0
+		 * PROM data for S3-0,M,C,T: 0111/1/0/0
 		 * function F=A&~B
 		 * T source is BUS
 		 */
 		aluf_bus_and_not_t,
 		/**
-		 * \brief 16: ALU <- ???
-		 * PROM data for S3-0,M,C: ????/?/?
-		 * perhaps F=0 (0011/0/0)
-		 * T source is BUS
+		 * \brief 16: ALU <- BUS
+		 * PROM data for S3-0,M,C,T: 1111/1/0/1
+		 * function F=A
+		 * T source is ALU
 		 */
 		aluf_undef_16,
 		/**
-		 * \brief 17: ALU <- ???
-		 * PROM data for S3-0,M,C: ????/?/?
-		 * perhaps F=0 (0011/0/0)
-		 * T source is BUS
+		 * \brief 17: ALU <- BUS
+		 * PROM data for S3-0,M,C,T: 1111/1/0/1
+		 * function F=A
+		 * T source is ALU
 		 */
 		aluf_undef_17
 	};
@@ -670,62 +697,6 @@ private:
 		f2_kwd_strobon		= f2_task_16,	//!< f2 (1110) kwd: branches NEXT[9] on STROBE
 	};
 
-	enum {
-		p_dynamic,			//!< dynamic functions (e.g. ALU and SHIFTER operations)
-		p_latches			//!< latching function (T, L, M, R, etc. register latch)
-	};
-
-
-	/**
-	 * Bit field primitives
-	 * These are some inline functions to make it easier to access variable by the
-	 * bit-reversed notation that the Xerox Alto documents use all over the place.
-	 * Bit number 0 is the most significant there, and bit number (width - 1)
-	 * is the least significant.
-	 */
-
-	//! get the left shift required to access bit %to in a word of %width bits
-	static inline UINT8 A2_BITSHIFT(UINT8 width, UINT8 to) { return width - 1 - to; }
-
-	//! build a least significant bit mask for bits %from to %to (inclusive)
-	static inline UINT32 A2_BITMASK(UINT8 from, UINT8 to) { return (1ul << (to + 1 - from)) - 1; }
-
-	//! get a single bit number %bit value from %reg, a word of %width bits
-	static inline UINT8 A2_BIT8(UINT8 reg, UINT8 width, UINT8 bit) { return (reg >> A2_BITSHIFT(width,bit)) & 1; }
-
-	//! get a bit field from %reg, a word of %width bits, starting at bit %from until bit %to
-	static inline UINT8 A2_GET8(UINT8 reg, UINT8 width, UINT8 from, UINT8 to) { return (reg >> A2_BITSHIFT(width,to)) & A2_BITMASK(from,to); }
-
-	//! put a value %val into %reg, a word of %width bits, starting at bit %from until bit %to
-	static inline void A2_PUT8(UINT8& reg, UINT8 width, UINT8 from, UINT8 to, UINT8 val) {
-		UINT8 mask = A2_BITMASK(from,to) << A2_BITSHIFT(width,to);
-		reg = (reg & ~mask) | ((val << A2_BITSHIFT(width,to)) & mask);
-	}
-
-	//! get a single bit number %bit value from %reg, a word of %width bits
-	static inline UINT16 A2_BIT16(UINT16 reg, UINT8 width, UINT8 bit) { return (reg >> A2_BITSHIFT(width,bit)) & 1; }
-
-	//! get a bit field from %reg, a word of %width bits, starting at bit %from until bit %to
-	static inline UINT16 A2_GET16(UINT16 reg, UINT8 width, UINT8 from, UINT8 to) { return (reg >> A2_BITSHIFT(width,to)) & A2_BITMASK(from,to); }
-
-	//! put a value %val into %reg, a word of %width bits, starting at bit %from until bit %to
-	static inline void A2_PUT16(UINT16& reg, UINT8 width, UINT8 from, UINT8 to, UINT16 val) {
-		UINT16 mask = A2_BITMASK(from,to) << A2_BITSHIFT(width,to);
-		reg = (reg & ~mask) | ((val << A2_BITSHIFT(width,to)) & mask);
-	}
-
-	//! get a single bit number %bit value from %reg, a word of %width bits
-	static inline UINT32 A2_BIT32(UINT32 reg, UINT8 width, UINT8 bit) { return (reg >> A2_BITSHIFT(width,bit)) & 1; }
-
-	//! get a bit field from %reg, a word of %width bits, starting at bit %from until bit %to
-	static inline UINT32 A2_GET32(UINT32 reg, UINT8 width, UINT8 from, UINT8 to) { return (reg >> A2_BITSHIFT(width,to)) & A2_BITMASK(from,to); }
-
-	//! put a value %val into %reg, a word of %width bits, starting at bit %from until bit %to
-	static inline void A2_PUT32(UINT32& reg, UINT8 width, UINT8 from, UINT8 to, UINT32 val) {
-		UINT32 mask = A2_BITMASK(from,to) << A2_BITSHIFT(width,to);
-		reg = (reg & ~mask) | ((val << A2_BITSHIFT(width,to)) & mask);
-	}
-
 	//! enumeration of the micro code word bits
 	//! Note: The Alto documents enumerate bits from left (MSB = 0) to right (LSB = 31)
 	enum {
@@ -734,55 +705,31 @@ private:
 		DBS0, DBS1, DBS2,
 		DF1_0, DF1_1, DF1_2, DF1_3,
 		DF2_0, DF2_1, DF2_2, DF2_3,
-		LOADT,
-		LOADL,
+		DLOADT,
+		DLOADL,
 		NEXT0, NEXT1, NEXT2, NEXT3, NEXT4, NEXT5, NEXT6, NEXT7, NEXT8, NEXT9
 	};
 
-	//! get the RSEL value from a micro instruction word
-	static inline UINT32 MIR_RSEL(UINT32 mir) { return A2_GET32(mir, 32, DRSEL0, DRSEL4); }
-
-	//! get the ALUF value from a micro instruction word
-	static inline UINT32 MIR_ALUF(UINT32 mir) { return A2_GET32(mir, 32, DALUF0, DALUF3); }
-
-	//! get the BS value from a micro instruction word
-	static inline UINT32 MIR_BS(UINT32 mir) { return A2_GET32(mir, 32, DBS0, DBS2); }
-
-	//! get the F1 value from a micro instruction word
-	static inline UINT32 MIR_F1(UINT32 mir) { return A2_GET32(mir, 32, DF1_0, DF1_3); }
-
-	//! get the F2 value from a micro instruction word
-	static inline UINT32 MIR_F2(UINT32 mir) { return A2_GET32(mir, 32, DF2_0, DF2_3); }
-
-	//! get the T value from a micro instruction word
-	static inline UINT32 MIR_T(UINT32 mir) { return A2_BIT32(mir, 32, LOADT); }
-
-	//! get the L value from a micro instruction word
-	static inline UINT32 MIR_L(UINT32 mir) { return A2_BIT32(mir, 32, LOADL); }
-
-	//! get the NEXT value from a micro instruction word
-	static inline UINT32 MIR_NEXT(UINT32 mir) { return A2_GET32(mir, 32, NEXT0, NEXT9); }
-
 	//! get the normally accessed bank number from a bank register
-	static inline UINT16 GET_BANK_NORMAL(UINT16 breg) { return A2_GET16(breg,16,12,13); }
+	static inline UINT16 GET_BANK_NORMAL(UINT16 breg) { return X_RDBITS(breg,16,12,13); }
 
 	//! get the extended bank number (accessed via XMAR) from a bank register
-	static inline UINT16 GET_BANK_EXTENDED(UINT16 breg) { return A2_GET16(breg,16,14,15); }
+	static inline UINT16 GET_BANK_EXTENDED(UINT16 breg) { return X_RDBITS(breg,16,14,15); }
 
 	//! get an ignored bit field from a control RAM address
-	static inline UINT16 GET_CRAM_IGNORE(UINT16 addr) { return A2_GET16(addr,16,0,1); }
+	static inline UINT16 GET_CRAM_IGNORE(UINT16 addr) { return X_RDBITS(addr,16,0,1); }
 
 	//! get the bank select bit field from a control RAM address
-	static inline UINT16 GET_CRAM_BANKSEL(UINT16 addr) { return A2_GET16(addr,16,2,3); }
+	static inline UINT16 GET_CRAM_BANKSEL(UINT16 addr) { return X_RDBITS(addr,16,2,3); }
 
 	//! get the ROM/RAM flag from a control RAM address
-	static inline UINT16 GET_CRAM_RAMROM(UINT16 addr) { return A2_GET16(addr,16,4,4); }
+	static inline UINT16 GET_CRAM_RAMROM(UINT16 addr) { return X_RDBITS(addr,16,4,4); }
 
 	//! get the half select flag from a control RAM address
-	static inline UINT16 GET_CRAM_HALFSEL(UINT16 addr) { return A2_GET16(addr,16,5,5); }
+	static inline UINT16 GET_CRAM_HALFSEL(UINT16 addr) { return X_RDBITS(addr,16,5,5); }
 
 	//! get the word address bit field from a control RAM address
-	static inline UINT16 GET_CRAM_WORDADDR(UINT16 addr)	{ return A2_GET16(addr,16,6,15); }
+	static inline UINT16 GET_CRAM_WORDADDR(UINT16 addr)	{ return X_RDBITS(addr,16,6,15); }
 
 	UINT16 m_task_mpc[ALTO2_TASKS];					//!< per task micro program counter
 	UINT16 m_task_next2[ALTO2_TASKS];				//!< per task address modifier
@@ -796,11 +743,17 @@ private:
 	/**
 	 * \brief current micro instruction's register selection
 	 * The emulator F2s ACSOURCE and ACDEST modify this.
-	 * Note: S registers are addressed by the original RSEL[0-4],
+	 * Note: The S registers are addressed by the original RSEL[0-4],
 	 * even when the the emulator modifies this.
 	 */
 	UINT8 m_rsel;
-
+	UINT8 m_d_rsel;									//!< decoded RSEL[0-4]
+	UINT8 m_d_aluf;									//!< decoded ALUF[0-3] function
+	UINT8 m_d_bs;									//!< decoded BS[0-2] bus source
+	UINT8 m_d_f1;									//!< decoded F1[0-3] function
+	UINT8 m_d_f2;									//!< decoded F2[0-3] function
+	UINT8 m_d_loadt;									//!< decoded LOADT flag
+	UINT8 m_d_loadl;									//!< decoded LOADL flag
 	UINT16 m_next;									//!< current micro instruction's next
 	UINT16 m_next2;									//!< next micro instruction's next
 	UINT16 m_r[ALTO2_REGS];							//!< R register file
@@ -1101,6 +1054,7 @@ private:
 	void bs_early_read_md();						//!< bus source: drive BUS from read memory data
 	void bs_early_mouse();							//!< bus source: drive bus by mouse
 	void bs_early_disp();							//!< bus source: drive bus by displacement (which?)
+	void f1_early_block();							//!< F1 func: block active task
 	void f1_late_load_mar();						//!< F1 func: load memory address register
 	void f1_early_task();							//!< F1 func: task switch
 	void f1_late_l_lsh_1();							//!< F1 func: SHIFTER = left shift L once
@@ -1139,181 +1093,7 @@ private:
 	void init_ram(int task);						//!< called by RAM related tasks
 	void exit_ram();
 
-	// ************************************************
-	// memory mapped i/o stuff
-	// ************************************************
-	/**
-	 * @brief get printer paper ready bit
-	 * Paper ready bit. 0 when the printer is ready for a paper scrolling operation.
-	 */
-	static inline UINT16 GET_PPRDY(UINT16 utilin) { return A2_GET16(utilin,16,0,0); }
-
-	/** @brief put printer paper ready bit */
-	static inline void PUT_PPRDY(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,0,0,val); }
-
-	/**
-	 * @brief get printer check bit
-	 * Printer check bit bit. Should the printer find itself in an abnormal state,
-	 * it sets this bit to 0
-	 */
-	static inline UINT16 GET_PCHECK(UINT16 utilin) { return A2_GET16(utilin,16,1,1); }
-
-	/** @brief put printer check bit */
-	static inline void PUT_PCHECK(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,1,1,val); }
-
-	/** @brief get unused bit 2 */
-	static inline UINT16 GET_UNUSED_2(UINT16 utilin) { return A2_GET16(utilin,16,2,2); }
-
-	/** @brief put unused bit 2 */
-	static inline void PUT_UNUSED_2(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,2,2,val); }
-
-	/**
-	 * @brief get printer daisy ready bit
-	 * Daisy ready bit. 0 when the printer is ready to print a character.
-	 */
-	static inline UINT16 GET_PCHRDY(UINT16 utilin) { return A2_GET16(utilin,16,3,3); }
-
-	/** @brief put printer daisy ready bit */
-	static inline void PUT_PCHRDY(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,3,3,val); }
-
-	/**
-	 * @brief get printer carriage ready bit
-	 * Carriage ready bit. 0 when the printer is ready for horizontal positioning.
-	 */
-	static inline UINT16 GET_PCARRDY(UINT16 utilin) { return A2_GET16(utilin,16,4,4); }
-
-	/** @brief put printer carriage ready bit */
-	static inline void PUT_PCARRDY(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,4,4,val); }
-
-	/**
-	 * @brief get printer ready bit
-	 * Ready bit. Both this bit and the appropriate other ready bit (carriage,
-	 * daisy, etc.) must be 0 before attempting any output operation.
-	 */
-	static inline UINT16 GET_PREADY(UINT16 utilin) { return A2_GET16(utilin,16,5,5); }
-
-	/** @brief put printer ready bit */
-	static inline void PUT_PREADY(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,5,5,val); }
-
-	/**
-	 * @brief memory configuration switch
-	 */
-	static inline UINT16 GET_MEMCONFIG(UINT16 utilin) { return A2_GET16(utilin,16,6,6); }
-
-	/** @brief put memory configuration switch */
-	static inline void PUT_MEMCONFIG(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,6,6,val); }
-
-	/** @brief get unused bit 7 */
-	static inline UINT16 GET_UNUSED_7(UINT16 utilin) { return A2_GET16(utilin,16,7,7); }
-	/** @brief put unused bit 7 */
-	static inline void PUT_UNUSED_7(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,7,7,val); }
-
-	/** @brief get key set key 0 */
-	static inline UINT16 GET_KEYSET_KEY0(UINT16 utilin) { return A2_GET16(utilin,16,8,8); }
-	/** @brief put key set key 0 */
-	static inline void PUT_KEYSET_KEY0(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,8,8,val); }
-
-	/** @brief get key set key 1 */
-	static inline UINT16 GET_KEYSET_KEY1(UINT16 utilin) { return A2_GET16(utilin,16,9,9); }
-	/** @brief put key set key 1 */
-	static inline void PUT_KEYSET_KEY1(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,9,9,val); }
-
-	/** @brief get key set key 2 */
-	static inline UINT16 GET_KEYSET_KEY2(UINT16 utilin) { return A2_GET16(utilin,16,10,10); }
-	/** @brief put key set key 2 */
-	static inline void PUT_KEYSET_KEY2(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,10,10,val); }
-
-	/** @brief get key set key 3 */
-	static inline UINT16 GET_KEYSET_KEY3(UINT16 utilin) { return A2_GET16(utilin,16,11,11); }
-	/** @brief put key set key 3 */
-	static inline void PUT_KEYSET_KEY3(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,11,11,val); }
-
-	/** @brief get key set key 4 */
-	static inline UINT16 GET_KEYSET_KEY4(UINT16 utilin) { return A2_GET16(utilin,16,12,12); }
-	/** @brief put key set key 4 */
-	static inline void PUT_KEYSET_KEY4(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,12,12,val); }
-
-	/** @brief get mouse red button bit */
-	static inline UINT16 GET_MOUSE_RED(UINT16 utilin) { return A2_GET16(utilin,16,13,13); }
-	/** @brief put mouse red button bit */
-	static inline void PUT_MOUSE_RED(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,13,13,val); }
-
-	/** @brief get mouse blue button bit */
-	static inline UINT16 GET_MOUSE_BLUE(UINT16 utilin) { return A2_GET16(utilin,16,14,14); }
-	/** @brief put mouse blue button bit */
-	static inline void PUT_MOUSE_BLUE(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,14,14,val); }
-
-	/** @brief get mouse yellow button bit */
-	static inline UINT16 GET_MOUSE_YELLOW(UINT16 utilin) { return A2_GET16(utilin,16,15,15); }
-	/** @brief put mouse yellow button bit */
-	static inline void PUT_MOUSE_YELLOW(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,15,15,val); }
-
-	/** @brief put mouse bits */
-	static inline void PUT_MOUSE(UINT16& utilin, UINT16 val) { A2_PUT16(utilin,16,13,15,val); }
-
-	/**
-	 * @brief printer paper strobe bit
-	 * Paper strobe bit. Toggling this bit causes a paper scrolling operation.
-	 */
-	static inline UINT16 GET_PPPSTR(UINT16 utilout) { return A2_GET16(utilout,16,0,0); }
-
-	/**
-	 * @brief printer retstore bit
-	 * Restore bit. Toggling this bit resets the printer (including clearing
-	 * the "check" condition if present) and moves the carriage to the
-	 * left margin.
-	 */
-	static inline UINT16 GET_PREST(UINT16 utilout) { return A2_GET16(utilout,16,1,1); }
-
-	/**
-	 * @brief printer ribbon bit
-	 * Ribbon bit. When this bit is 1 the ribbon is up (in printing
-	 * position); when 0, it is down.
-	 */
-	static inline UINT16 GET_PRIB(UINT16 utilout) { return A2_GET16(utilout,16,2,2); }
-
-	/**
-	 * @brief printer daisy strobe bit
-	 * Daisy strobe bit. Toggling this bit causes a character to be printed.
-	 */
-	static inline UINT16 GET_PCHSTR(UINT16 utilout) { return A2_GET16(utilout,16,3,3); }
-
-	/**
-	 * @brief printer carriage strobe bit
-	 * Carriage strobe bit. Toggling this bit causes a horizontal position operation.
-	 */
-	static inline UINT16 GET_PCARSTR(UINT16 utilout) { return A2_GET16(utilout,16,4,4); }
-
-	/**
-	 * @brief printer data
-	 * Argument to various output operations:
-	 * 1. Printing characters. When the daisy bit is toggled bits 9-15 of this field
-	 * are interpreted as an ASCII character code to be printed (it should be noted
-	 * that all codes less than 040 print as lower case "w").
-	 * 2. For paper and carriage operations the field is interpreted as a displacement
-	 * (-1024 to +1023), in units of 1/48 inch for paper and 1/60 inch for carriage.
-	 * Positive is down or to the right, negative up or to the left. The value is
-	 * represented as sign-magnitude (i.e., bit 5 is 1 for negative numbers, 0 for
-	 * positive; bits 6-15 are the absolute value of the number).
-	 */
-	static inline UINT16 GET_PDATA(UINT16 utilout) { return A2_GET16(utilout,16,5,15); }
-
-	/** @brief miscellaneous hardware registers in the memory mapped I/O range */
-	struct {
-		UINT16 eia;				//!< the EIA port at 0177001
-		UINT16 utilout;			//!< the UTILOUT port at 0177016 (active-low outputs) */
-		UINT16 xbus[4];			//!< the XBUS port at 0177020 to 0177023
-		UINT16 utilin;			//!< the UTILIN port at 0177030 to 0177033 (same value on all addresses)
-	}	m_hw;
-
-	DECLARE_READ16_MEMBER( utilin_r );			//!< read an UTILIN address
-	DECLARE_READ16_MEMBER( utilout_r );			//!< read the UTILOUT address
-	DECLARE_WRITE16_MEMBER( utilout_w );		//!< write the UTILOUT address
-	DECLARE_READ16_MEMBER( xbus_r );			//!< read an XBUS address
-	DECLARE_WRITE16_MEMBER( xbus_w );			//!< write an XBUS address (?)
-	void init_hw();								//!< initialize miscellaneous hardware
-	void exit_hw();								//!< deinitialize miscellaneous hardware
-
+#	include "a2hw.h"
 	// ************************************************
 	// keyboard stuff
 	// ************************************************

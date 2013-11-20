@@ -1128,6 +1128,72 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_eth.tx_count));
 	save_item(NAME(m_eth.duckbreath));
 
+	state_add( A2_AC3,     "AC(3)",   m_r[000]).formatstr("%06O");
+	state_add( A2_AC2,     "AC(2)",   m_r[001]).formatstr("%06O");
+	state_add( A2_AC1,     "AC(1)",   m_r[002]).formatstr("%06O");
+	state_add( A2_AC0,     "AC(0)",   m_r[003]).formatstr("%06O");
+	state_add( A2_R04,     "R04",     m_r[004]).formatstr("%06O");
+	state_add( A2_R05,     "R05",     m_r[005]).formatstr("%06O");
+	state_add( A2_PC,      "PC",      m_r[006]).formatstr("%06O");
+	state_add( A2_R07,     "R07",     m_r[007]).formatstr("%06O");
+	state_add( A2_R10,     "R10",     m_r[010]).formatstr("%06O");
+	state_add( A2_R11,     "R11",     m_r[011]).formatstr("%06O");
+	state_add( A2_R12,     "R12",     m_r[012]).formatstr("%06O");
+	state_add( A2_R13,     "R13",     m_r[013]).formatstr("%06O");
+	state_add( A2_R14,     "R14",     m_r[014]).formatstr("%06O");
+	state_add( A2_R15,     "R15",     m_r[015]).formatstr("%06O");
+	state_add( A2_R16,     "R16",     m_r[016]).formatstr("%06O");
+	state_add( A2_R17,     "R17",     m_r[017]).formatstr("%06O");
+	state_add( A2_R20,     "R20",     m_r[020]).formatstr("%06O");
+	state_add( A2_R21,     "R21",     m_r[021]).formatstr("%06O");
+	state_add( A2_R22,     "R22",     m_r[022]).formatstr("%06O");
+	state_add( A2_R23,     "R23",     m_r[023]).formatstr("%06O");
+	state_add( A2_R24,     "R24",     m_r[024]).formatstr("%06O");
+	state_add( A2_R25,     "R25",     m_r[025]).formatstr("%06O");
+	state_add( A2_R26,     "R26",     m_r[026]).formatstr("%06O");
+	state_add( A2_R27,     "R27",     m_r[027]).formatstr("%06O");
+	state_add( A2_R30,     "R30",     m_r[030]).formatstr("%06O");
+	state_add( A2_R31,     "R31",     m_r[031]).formatstr("%06O");
+	state_add( A2_R32,     "R32",     m_r[032]).formatstr("%06O");
+	state_add( A2_R33,     "R33",     m_r[033]).formatstr("%06O");
+	state_add( A2_R34,     "R34",     m_r[034]).formatstr("%06O");
+	state_add( A2_R35,     "R35",     m_r[035]).formatstr("%06O");
+	state_add( A2_R36,     "R36",     m_r[036]).formatstr("%06O");
+	state_add( A2_R37,     "R37",     m_r[037]).formatstr("%06O");
+	state_add_divider(-1);
+	state_add( A2_S00,     "R40",     m_s[0][000]).formatstr("%06O");
+	state_add( A2_S01,     "R41",     m_s[0][001]).formatstr("%06O");
+	state_add( A2_S02,     "R42",     m_s[0][002]).formatstr("%06O");
+	state_add( A2_S03,     "R43",     m_s[0][003]).formatstr("%06O");
+	state_add( A2_S04,     "R44",     m_s[0][004]).formatstr("%06O");
+	state_add( A2_S05,     "R45",     m_s[0][005]).formatstr("%06O");
+	state_add( A2_S06,     "R46",     m_s[0][006]).formatstr("%06O");
+	state_add( A2_S07,     "R47",     m_s[0][007]).formatstr("%06O");
+	state_add( A2_S10,     "R50",     m_s[0][010]).formatstr("%06O");
+	state_add( A2_S11,     "R51",     m_s[0][011]).formatstr("%06O");
+	state_add( A2_S12,     "R52",     m_s[0][012]).formatstr("%06O");
+	state_add( A2_S13,     "R53",     m_s[0][013]).formatstr("%06O");
+	state_add( A2_S14,     "R54",     m_s[0][014]).formatstr("%06O");
+	state_add( A2_S15,     "R55",     m_s[0][015]).formatstr("%06O");
+	state_add( A2_S16,     "R56",     m_s[0][016]).formatstr("%06O");
+	state_add( A2_S17,     "R57",     m_s[0][017]).formatstr("%06O");
+	state_add( A2_S20,     "R60",     m_s[0][020]).formatstr("%06O");
+	state_add( A2_S21,     "R61",     m_s[0][021]).formatstr("%06O");
+	state_add( A2_S22,     "R62",     m_s[0][022]).formatstr("%06O");
+	state_add( A2_S23,     "R63",     m_s[0][023]).formatstr("%06O");
+	state_add( A2_S24,     "R64",     m_s[0][024]).formatstr("%06O");
+	state_add( A2_S25,     "R65",     m_s[0][025]).formatstr("%06O");
+	state_add( A2_S26,     "R66",     m_s[0][026]).formatstr("%06O");
+	state_add( A2_S27,     "R67",     m_s[0][027]).formatstr("%06O");
+	state_add( A2_S30,     "R70",     m_s[0][030]).formatstr("%06O");
+	state_add( A2_S31,     "R71",     m_s[0][031]).formatstr("%06O");
+	state_add( A2_S32,     "R72",     m_s[0][032]).formatstr("%06O");
+	state_add( A2_S33,     "R73",     m_s[0][033]).formatstr("%06O");
+	state_add( A2_S34,     "R74",     m_s[0][034]).formatstr("%06O");
+	state_add( A2_S35,     "R75",     m_s[0][035]).formatstr("%06O");
+	state_add( A2_S36,     "R76",     m_s[0][036]).formatstr("%06O");
+	state_add( A2_S37,     "R77",     m_s[0][037]).formatstr("%06O");
+	state_add_divider(-1);
 	state_add( A2_DRIVE,   "DRIVE",   m_dsk.drive).formatstr("%1u");
 	state_add( A2_KADDR,   "KADDR",   m_dsk.kaddr).formatstr("%06O");
 	state_add( A2_KADR,    "KADR",    m_dsk.kadr).formatstr("%06O");
@@ -1165,72 +1231,6 @@ void alto2_cpu_device::device_start()
 	state_add( A2_SHIFTER, "SHIFTER", m_shifter).formatstr("%06O");
 	state_add( A2_LALUC0,  "LALUC0",  m_laluc0).formatstr("%1u");
 	state_add( A2_M,       "M",       m_m).formatstr("%06O");
-	state_add_divider(-1);
-	state_add( A2_AC3,     "AC(3)",   m_r[000]).formatstr("%06O");
-	state_add( A2_AC2,     "AC(2)",   m_r[001]).formatstr("%06O");
-	state_add( A2_AC1,     "AC(1)",   m_r[002]).formatstr("%06O");
-	state_add( A2_AC0,     "AC(0)",   m_r[003]).formatstr("%06O");
-	state_add( A2_R04,     "R04",     m_r[004]).formatstr("%06O");
-	state_add( A2_R05,     "R05",     m_r[005]).formatstr("%06O");
-	state_add( A2_PC,      "PC",      m_r[006]).formatstr("%06O");
-	state_add( A2_R07,     "R07",     m_r[007]).formatstr("%06O");
-	state_add( A2_R10,     "R10",     m_r[010]).formatstr("%06O");
-	state_add( A2_R11,     "R11",     m_r[011]).formatstr("%06O");
-	state_add( A2_R12,     "R12",     m_r[012]).formatstr("%06O");
-	state_add( A2_R13,     "R13",     m_r[013]).formatstr("%06O");
-	state_add( A2_R14,     "R14",     m_r[014]).formatstr("%06O");
-	state_add( A2_R15,     "R15",     m_r[015]).formatstr("%06O");
-	state_add( A2_R16,     "R16",     m_r[016]).formatstr("%06O");
-	state_add( A2_R17,     "R17",     m_r[017]).formatstr("%06O");
-	state_add( A2_R20,     "R20",     m_r[020]).formatstr("%06O");
-	state_add( A2_R21,     "R21",     m_r[021]).formatstr("%06O");
-	state_add( A2_R22,     "R22",     m_r[022]).formatstr("%06O");
-	state_add( A2_R23,     "R23",     m_r[023]).formatstr("%06O");
-	state_add( A2_R24,     "R24",     m_r[024]).formatstr("%06O");
-	state_add( A2_R25,     "R25",     m_r[025]).formatstr("%06O");
-	state_add( A2_R26,     "R26",     m_r[026]).formatstr("%06O");
-	state_add( A2_R27,     "R27",     m_r[027]).formatstr("%06O");
-	state_add( A2_R30,     "R30",     m_r[030]).formatstr("%06O");
-	state_add( A2_R31,     "R31",     m_r[031]).formatstr("%06O");
-	state_add( A2_R32,     "R32",     m_r[032]).formatstr("%06O");
-	state_add( A2_R33,     "R33",     m_r[033]).formatstr("%06O");
-	state_add( A2_R34,     "R34",     m_r[034]).formatstr("%06O");
-	state_add( A2_R35,     "R35",     m_r[035]).formatstr("%06O");
-	state_add( A2_R36,     "R36",     m_r[036]).formatstr("%06O");
-	state_add( A2_R37,     "R37",     m_r[037]).formatstr("%06O");
-	state_add_divider(-1);
-	state_add( A2_S00,     "S00",     m_s[0][000]).formatstr("%06O");
-	state_add( A2_S01,     "S01",     m_s[0][001]).formatstr("%06O");
-	state_add( A2_S02,     "S02",     m_s[0][002]).formatstr("%06O");
-	state_add( A2_S03,     "S03",     m_s[0][003]).formatstr("%06O");
-	state_add( A2_S04,     "S04",     m_s[0][004]).formatstr("%06O");
-	state_add( A2_S05,     "S05",     m_s[0][005]).formatstr("%06O");
-	state_add( A2_S06,     "S06",     m_s[0][006]).formatstr("%06O");
-	state_add( A2_S07,     "S07",     m_s[0][007]).formatstr("%06O");
-	state_add( A2_S10,     "S10",     m_s[0][010]).formatstr("%06O");
-	state_add( A2_S11,     "S11",     m_s[0][011]).formatstr("%06O");
-	state_add( A2_S12,     "S12",     m_s[0][012]).formatstr("%06O");
-	state_add( A2_S13,     "S13",     m_s[0][013]).formatstr("%06O");
-	state_add( A2_S14,     "S14",     m_s[0][014]).formatstr("%06O");
-	state_add( A2_S15,     "S15",     m_s[0][015]).formatstr("%06O");
-	state_add( A2_S16,     "S16",     m_s[0][016]).formatstr("%06O");
-	state_add( A2_S17,     "S17",     m_s[0][017]).formatstr("%06O");
-	state_add( A2_S20,     "S20",     m_s[0][020]).formatstr("%06O");
-	state_add( A2_S21,     "S21",     m_s[0][021]).formatstr("%06O");
-	state_add( A2_S22,     "S22",     m_s[0][022]).formatstr("%06O");
-	state_add( A2_S23,     "S23",     m_s[0][023]).formatstr("%06O");
-	state_add( A2_S24,     "S24",     m_s[0][024]).formatstr("%06O");
-	state_add( A2_S25,     "S25",     m_s[0][025]).formatstr("%06O");
-	state_add( A2_S26,     "S26",     m_s[0][026]).formatstr("%06O");
-	state_add( A2_S27,     "S27",     m_s[0][027]).formatstr("%06O");
-	state_add( A2_S30,     "S30",     m_s[0][030]).formatstr("%06O");
-	state_add( A2_S31,     "S31",     m_s[0][031]).formatstr("%06O");
-	state_add( A2_S32,     "S32",     m_s[0][032]).formatstr("%06O");
-	state_add( A2_S33,     "S33",     m_s[0][033]).formatstr("%06O");
-	state_add( A2_S34,     "S34",     m_s[0][034]).formatstr("%06O");
-	state_add( A2_S35,     "S35",     m_s[0][035]).formatstr("%06O");
-	state_add( A2_S36,     "S36",     m_s[0][036]).formatstr("%06O");
-	state_add( A2_S37,     "S37",     m_s[0][037]).formatstr("%06O");
 
 	state_add(STATE_GENPC, "curpc", m_mpc).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_aluc0).formatstr("%5s").noshow();
@@ -1273,10 +1273,10 @@ READ16_MEMBER ( alto2_cpu_device::const_r )
 	return *reinterpret_cast<UINT16 *>(m_const_data + offset * 2);
 }
 
-#define	PUT_EVEN(dword,word)			A2_PUT32(dword,32, 0,15,word)
-#define	GET_EVEN(dword)					A2_GET32(dword,32, 0,15)
-#define	PUT_ODD(dword,word)				A2_PUT32(dword,32,16,31,word)
-#define	GET_ODD(dword)					A2_GET32(dword,32,16,31)
+#define	PUT_EVEN(dword,word)			X_WRBITS(dword,32, 0,15,word)
+#define	GET_EVEN(dword)					X_RDBITS(dword,32, 0,15)
+#define	PUT_ODD(dword,word)				X_WRBITS(dword,32,16,31,word)
+#define	GET_ODD(dword)					X_RDBITS(dword,32,16,31)
 
 //! read i/o space RAM
 READ16_MEMBER ( alto2_cpu_device::ioram_r )
@@ -1531,42 +1531,42 @@ void alto2_cpu_device::watch_write(UINT32 addr, UINT32 data)
 void alto2_cpu_device::fn_bs_bad_0()
 {
 	fatal(9,"fatal: bad early bus source pointer for task %s, mpc:%05o bs:%s\n",
-		task_name(m_task), m_mpc, bs_name(MIR_BS(m_mir)));
+		task_name(m_task), m_mpc, bs_name(m_d_bs));
 }
 
 /** @brief fatal exit on unitialized latching phase BUS source */
 void alto2_cpu_device::fn_bs_bad_1()
 {
 	fatal(9,"fatal: bad late bus source pointer for task %s, mpc:%05o bs: %s\n",
-		task_name(m_task), m_mpc, bs_name(MIR_BS(m_mir)));
+		task_name(m_task), m_mpc, bs_name(m_d_bs));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F1 function */
 void alto2_cpu_device::fn_f1_bad_0()
 {
 	fatal(9,"fatal: bad early f1 function pointer for task %s, mpc:%05o f1: %s\n",
-		task_name(m_task), m_mpc, f1_name(MIR_F1(m_mir)));
+		task_name(m_task), m_mpc, f1_name(m_d_f1));
 }
 
 /** @brief fatal exit on unitialized latching phase F1 function */
 void alto2_cpu_device::fn_f1_bad_1()
 {
 	fatal(9,"fatal: bad late f1 function pointer for task %s, mpc:%05o f1: %s\n",
-		task_name(m_task), m_mpc, f1_name(MIR_F1(m_mir)));
+		task_name(m_task), m_mpc, f1_name(m_d_f1));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F2 function */
 void alto2_cpu_device::fn_f2_bad_0()
 {
 	fatal(9,"fatal: bad early f2 function pointer for task %s, mpc:%05o f2: %s\n",
-		task_name(m_task), m_mpc, f2_name(MIR_F2(m_mir)));
+		task_name(m_task), m_mpc, f2_name(m_d_f2));
 }
 
 /** @brief fatal exit on unitialized latching phase F2 function */
 void alto2_cpu_device::fn_f2_bad_1()
 {
 	fatal(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",
-		  task_name(m_task), m_mpc, f2_name(MIR_F2(m_mir)));
+		  task_name(m_task), m_mpc, f2_name(m_d_f2));
 }
 
 #if	ALTO2_DEBUG
@@ -1701,9 +1701,10 @@ void alto2_cpu_device::bs_early_load_r()
  */
 void alto2_cpu_device::bs_late_load_r()
 {
-	if (MIR_F2(m_mir) != f2_emu_load_dns) {
+	if (m_d_f2 != f2_emu_load_dns) {
 		m_r[m_rsel] = m_shifter;
 		LOG((LOG_CPU,2,"	R%02o←; %s = SHIFTER (%#o)\n", m_rsel, r_name(m_rsel), m_shifter));
+#if	1
 		/* HACK: programs writing r37 with xxx3 make the cursor
 		 * display go nuts. Until I found the real reason for this
 		 * obviously buggy display, I just clear the two
@@ -1713,6 +1714,7 @@ void alto2_cpu_device::bs_late_load_r()
 			printf("writing r37 = %#o\n", m_shifter);
 			m_r[037] &= ~3;
 		}
+#endif
 	}
 }
 
@@ -1760,7 +1762,7 @@ void alto2_cpu_device::f1_late_load_mar()
 {
 	UINT8 bank = m_bank_reg[m_task];
 	UINT32 msb;
-	if (MIR_F2(m_mir) == f2_load_md) {
+	if (m_d_f2 == f2_load_md) {
 		msb = GET_BANK_EXTENDED(bank) << 16;
 		LOG((LOG_CPU,7, "	XMAR %#o\n", msb | m_alu));
 	} else {
@@ -2051,59 +2053,32 @@ void alto2_cpu_device::f1_early_task()
 #endif	/* !USE_PRIO_F9318 */
 }
 
-#ifdef	f1_block0_unused
 /**
  * @brief f1_block early: block task
  *
  * The task request for the active task is cleared
  */
-void alto2_cpu_device::f1_block_0()
+void alto2_cpu_device::f1_early_block()
 {
-	CPU_CLR_TASK_WAKEUP(m_task);
+	m_task_wakeup &= ~(1 << m_task);
 	LOG((LOG_CPU,2, "	BLOCK %02o:%s\n", m_task, task_name(m_task)));
 }
-#endif
 
 void alto2_cpu_device::f1_late_l_lsh_1()
 {
-#if	0
-	if (m_task == task_emu) {
-		if (f2 == f2_emu_magic) {
-			m_shifter = ((m_l << 1) | (m_t >> 15)) & 0177777;
-			LOG((LOG_CPU,2,"	SHIFTER ←L MLSH 1 (%#o := %#o<<1|%#o)\n", m_shifter, m_l, m_t >> 15));
-		}
-		if (f2 == f2_emu_load_dns) {
-			/* shifter is done in F2 */
-			break;
-		}
-	}
-#endif
-	m_shifter = (m_l << 1) & 0177777;
+	m_shifter = m_l << 1;
 	LOG((LOG_CPU,2,"	SHIFTER ←L LSH 1 (%#o := %#o<<1)\n", m_shifter, m_l));
 }
 
 void alto2_cpu_device::f1_late_l_rsh_1()
 {
-#if	0
-	if (m_task == task_emu) {
-		if (f2 == f2_emu_magic) {
-			m_shifter = ((m_l >> 1) | (m_t << 15)) & 0177777;
-			LOG((LOG_CPU,2,"	SHIFTER ←L MRSH 1 (%#o := %#o>>1|%#o)\n", m_shifter, m_l, (m_t << 15) & 0100000));
-			break;
-		}
-		if (f2 == f2_emu_load_dns) {
-			/* shifter is done in F2 */
-			break;
-		}
-	}
-#endif
 	m_shifter = m_l >> 1;
 	LOG((LOG_CPU,2,"	SHIFTER ←L RSH 1 (%#o := %#o>>1)\n", m_shifter, m_l));
 }
 
 void alto2_cpu_device::f1_late_l_lcy_8()
 {
-	m_shifter = ((m_l >> 8) | (m_l << 8)) & 0177777;
+	m_shifter = (m_l >> 8) | (m_l << 8);
 	LOG((LOG_CPU,2,"	SHIFTER ←L LCY 8 (%#o := bswap %#o)\n", m_shifter, m_l));
 }
 
@@ -2142,7 +2117,7 @@ void alto2_cpu_device::f2_late_shifter_eq_zero()
  */
 void alto2_cpu_device::f2_late_bus()
 {
-	UINT16 r = A2_GET16(m_bus,16,6,15);
+	UINT16 r = X_RDBITS(m_bus,16,6,15);
 	LOG((LOG_CPU,2, "	BUS; %sbranch (%#o|%#o)\n", r ? "" : "no ", m_next2, r));
 	m_next2 |= r;
 }
@@ -2167,7 +2142,7 @@ void alto2_cpu_device::f2_late_load_md()
 #if	ALTO2_DEBUG
 	UINT16 mar = m_mem.mar;
 #endif
-	if (MIR_F1(m_mir) == f1_load_mar) {
+	if (m_d_f1 == f1_load_mar) {
 		/* part of an XMAR */
 		LOG((LOG_CPU,2, "	XMAR %#o (%#o)\n", mar, m_bus));
 	} else {
@@ -2256,9 +2231,11 @@ void alto2_cpu_device::rdram()
 	if (GET_CRAM_HALFSEL(m_cram_addr)) {
 		val = val >> 16;
 		LOG((LOG_CPU,0,"upper:%06o\n", val));
+		printf("RD RAM%d [%04o] upper:%06o\n", bank, wordaddr, val);
 	} else {
 		val = val & 0177777;
 		LOG((LOG_CPU,0,"lower:%06o\n", val));
+		printf("RD RAM%d [%04o] lower:%06o\n", bank, wordaddr, val);
 	}
 	m_bus &= val;
 }
@@ -2284,6 +2261,7 @@ void alto2_cpu_device::wrtram()
 	/* write RAM 0,1,2 */
 	addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;
 	LOG((LOG_CPU,0,"	wrtram: RAM%d [%04o] upper:%06o lower:%06o", bank, wordaddr, m_m, m_alu));
+	printf("WR RAM%d [%04o] upper:%06o lower:%06o\n", bank, wordaddr, m_m, m_alu);
 	if (ALTO2_UCODE_RAM_BASE + addr >= ALTO2_UCODE_SIZE) {
 		LOG((LOG_CPU,0," invalid address\n"));
 		return;
@@ -2687,15 +2665,18 @@ void alto2_cpu_device::execute_run()
 		/* next instruction's mpc */
 		m_mpc = m_next;
 		m_mir = RD_CROM(m_mpc);
-		m_rsel = MIR_RSEL(m_mir);
-		m_next = MIR_NEXT(m_mir) | m_next2;
-		m_next2 = A2_GET32(RD_CROM(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
-		UINT8 aluf = MIR_ALUF(m_mir);
-		UINT8 bs = MIR_BS(m_mir);
-		UINT8 f1 = MIR_F1(m_mir);
-		UINT8 f2 = MIR_F2(m_mir);
+
+		m_d_rsel = m_rsel = X_RDBITS(m_mir, 32, DRSEL0, DRSEL4);
+		m_d_aluf = X_RDBITS(m_mir, 32, DALUF0, DALUF3);
+		m_d_bs = X_RDBITS(m_mir, 32, DBS0, DBS2);
+		m_d_f1 = X_RDBITS(m_mir, 32, DF1_0, DF1_3);
+		m_d_f2 = X_RDBITS(m_mir, 32, DF2_0, DF2_3);
+		m_d_loadt = X_BIT(m_mir, 32, DLOADT);
+		m_d_loadl = X_BIT(m_mir, 32, DLOADL);
+		m_next = X_RDBITS(m_mir, 32, NEXT0, NEXT9) | m_next2;
+		m_next2 = X_RDBITS(RD_CROM(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
 		LOG((LOG_CPU,2,"%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
-			task_name(m_task), m_mpc, m_mir, m_rsel, aluf, bs, f1, f2, MIR_T(m_mir), MIR_L(m_mir), m_next, m_next2));
+			task_name(m_task), m_mpc, m_mir, m_rsel, m_d_aluf, m_d_bs, m_d_f1, m_d_f2, MIR_T(m_mir), MIR_L(m_mir), m_next, m_next2));
 		debugger_instruction_hook(this, m_mpc);
 
 		/*
@@ -2703,16 +2684,16 @@ void alto2_cpu_device::execute_run()
 		 * These functions use the BS field to provide part of the address
 		 * to the constant ROM
 		 */
-		do_bs = !(f1 == f1_const || f2 == f2_const);
+		do_bs = !(m_d_f1 == f1_const || m_d_f2 == f2_const);
 
-		if (f1 == f1_load_mar) {
+		if (m_d_f1 == f1_load_mar) {
 			if (check_mem_load_mar_stall(m_rsel)) {
 				LOG((LOG_CPU,3, "	MAR← stall\n"));
 				m_next2 = m_next;
 				m_next = m_mpc;
 				continue;
 			}
-		} else if (f2 == f2_load_md) {
+		} else if (m_d_f2 == f2_load_md) {
 			if (check_mem_write_stall()) {
 				LOG((LOG_CPU,3, "	MD← stall\n"));
 				m_next2 = m_next;
@@ -2720,7 +2701,7 @@ void alto2_cpu_device::execute_run()
 				continue;
 			}
 		}
-		if (do_bs && bs == bs_read_md) {
+		if (do_bs && m_d_bs == bs_read_md) {
 			if (check_mem_read_stall()) {
 				LOG((LOG_CPU,3, "	←MD stall\n"));
 				m_next2 = m_next;
@@ -2737,8 +2718,8 @@ void alto2_cpu_device::execute_run()
 		/*
 		 * The constant memory is gated to the bus by F1 == f1_const, F2 == f2_const, or BS >= 4
 		 */
-		if (!do_bs || bs >= bs_task_4) {
-			int addr = 8 * m_rsel + bs;
+		if (!do_bs || m_d_bs >= bs_task_4) {
+			int addr = 8 * m_rsel + m_d_bs;
 			UINT16 data = m_const_data[2*addr+0] | (m_const_data[2*addr+1] << 8);
 			m_bus &= data;
 			LOG((LOG_CPU,2,"	%#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
@@ -2748,18 +2729,18 @@ void alto2_cpu_device::execute_run()
 		 * early f2 has to be done before early bs, because the
 		 * emulator f2 acsource or acdest may change m_rsel
 		 */
-		((*this).*m_f2[0][m_task][f2])();
+		((*this).*m_f2[0][m_task][m_d_f2])();
 
 		/*
 		 * early bs can be done now
 		 */
 		if (do_bs)
-			((*this).*m_bs[0][m_task][bs])();
+			((*this).*m_bs[0][m_task][m_d_bs])();
 
 		/*
 		 * early f1
 		 */
-		((*this).*m_f1[0][m_task][f1])();
+		((*this).*m_f1[0][m_task][m_d_f1])();
 
 #if	USE_ALU_74181
 		// The ALU a10 PROM address lines are
@@ -2768,7 +2749,7 @@ void alto2_cpu_device::execute_run()
 		// B0: unused   B1: TSELECT  B2: ALUCI'   B3: ALUM'
 		// B4: ALUS0'   B5: ALUS1'   B6: ALUS2'   B7: ALUS3'
 		// B1 and B3-B7 are inverted on loading the PROM
-		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | aluf];
+		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | m_d_aluf];
 		UINT32 alu = alu_74181(m_bus, m_t, a10);
 		m_aluc0 = (alu >> 16) & 1;
 		flags = (a10 ^ ALUM2) & (TSELECT | ALUM2);
@@ -2996,17 +2977,17 @@ void alto2_cpu_device::execute_run()
 		m_shifter = m_l;
 
 		/* late F1 is done now */
-		((*this).*m_f1[1][m_task][f1])();
+		((*this).*m_f1[1][m_task][m_d_f1])();
 
 		/* late F2 is done now */
-		((*this).*m_f2[1][m_task][f2])();
+		((*this).*m_f2[1][m_task][m_d_f2])();
 
 		/* late BS is done now, if no constant was put on the bus */
 		if (do_bs)
-			((*this).*m_bs[1][m_task][bs])();
+			((*this).*m_bs[1][m_task][m_d_bs])();
 
 		// update L register and LALUC0, and also M register, if a RAM related task is active
-		if (MIR_L(m_mir)) {
+		if (m_d_loadl) {
 			m_l = m_alu;			// load L from ALU
 			if (flags & ALUM2) {
 				m_laluc0 = m_aluc0;
@@ -3023,8 +3004,8 @@ void alto2_cpu_device::execute_run()
 		}
 
 		// update T register, if LOADT is set
-		if (MIR_T(m_mir)) {
-			m_cram_addr = m_alu;
+		if (m_d_loadt) {
+			m_cram_addr = m_alu;	// latch CRAM address
 			if (flags & TSELECT) {
 				m_t = m_alu;		// T source is ALU
 				LOG((LOG_CPU,2, "	T← ALU (%#o)\n", m_alu));

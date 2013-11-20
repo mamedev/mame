@@ -10,6 +10,225 @@
 #include "alto2cpu.h"
 
 /**
+ * @brief read printer paper ready bit
+ * Paper ready bit. 0 when the printer is ready for a paper scrolling operation.
+ */
+READ16_MEMBER ( alto2_cpu_device::pprdy_r ) { return X_RDBITS(m_hw.utilin,16,0,0); }
+
+/**
+ * @brief read printer check bit
+ * Printer check bit bit.
+ * Should the printer find itself in an abnormal state, it sets this bit to 0
+ */
+READ16_MEMBER ( alto2_cpu_device::pcheck_r ) { return X_RDBITS(m_hw.utilin,16,1,1); }
+
+/**
+ * @brief read unused bit 2
+ */
+READ16_MEMBER ( alto2_cpu_device::unused2_r ) { return X_RDBITS(m_hw.utilin,16,2,2); }
+
+/**
+ * @brief read printer daisy ready bit
+ * Daisy ready bit. 0 when the printer is ready to print a character.
+ */
+READ16_MEMBER ( alto2_cpu_device::pchrdy_r ) { return X_RDBITS(m_hw.utilin,16,3,3); }
+
+/**
+ * @brief read printer carriage ready bit
+ * Carriage ready bit. 0 when the printer is ready for horizontal positioning.
+ */
+READ16_MEMBER ( alto2_cpu_device::parrdy_r ) { return X_RDBITS(m_hw.utilin,16,4,4); }
+
+/**
+ * @brief read printer ready bit
+ * Ready bit. Both this bit and the appropriate other ready bit (carriage,
+ * daisy, etc.) must be 0 before attempting any output operation.
+ */
+READ16_MEMBER ( alto2_cpu_device::pready_r ) { return X_RDBITS(m_hw.utilin,16,5,5); }
+
+/**
+ * @brief memory configuration switch
+ */
+READ16_MEMBER ( alto2_cpu_device::memconfig_r ) { return X_RDBITS(m_hw.utilin,16,6,6); }
+
+/**
+ * @brief get unused bit 7
+ */
+READ16_MEMBER ( alto2_cpu_device::unused7_r ) { return X_RDBITS(m_hw.utilin,16,7,7); }
+
+/**
+ * @brief get key set key 0
+ */
+READ16_MEMBER ( alto2_cpu_device::keyset_key0_r ) { return X_RDBITS(m_hw.utilin,16,8,8); }
+
+/**
+ * @brief get key set key 1
+ */
+READ16_MEMBER ( alto2_cpu_device::keyset_key1_r ) { return X_RDBITS(m_hw.utilin,16,9,9); }
+
+/**
+ * @brief get key set key 2
+ */
+READ16_MEMBER ( alto2_cpu_device::keyset_key2_r ) { return X_RDBITS(m_hw.utilin,16,10,10); }
+
+/**
+ * @brief get key set key 3
+ */
+READ16_MEMBER ( alto2_cpu_device::keyset_key3_r ) { return X_RDBITS(m_hw.utilin,16,11,11); }
+
+/**
+ * @brief get key set key 4
+ */
+READ16_MEMBER ( alto2_cpu_device::keyset_key4_r ) { return X_RDBITS(m_hw.utilin,16,12,12); }
+
+/**
+ * @brief get mouse red button bit
+ */
+READ16_MEMBER ( alto2_cpu_device::mouse_red_r ) { return X_RDBITS(m_hw.utilin,16,13,13); }
+
+/**
+ * @brief get mouse blue button bit
+ */
+READ16_MEMBER ( alto2_cpu_device::mouse_blue_r ) { return X_RDBITS(m_hw.utilin,16,14,14); }
+
+/**
+ * @brief get mouse yellow button bit
+ */
+READ16_MEMBER ( alto2_cpu_device::mouse_yellow_r ) { return X_RDBITS(m_hw.utilin,16,15,15); }
+
+/**
+ * @brief write printer paper ready bit
+ */
+WRITE16_MEMBER( alto2_cpu_device::pprdy_w ) { X_WRBITS(m_hw.utilin,16,0,0,data); }
+
+/**
+ * @brief write printer check bit
+ */
+WRITE16_MEMBER( alto2_cpu_device::pcheck_w ) { X_WRBITS(m_hw.utilin,16,1,1,data); }
+
+/**
+ * @brief read unused bit 2
+ */
+WRITE16_MEMBER( alto2_cpu_device::unused2_w ) { X_WRBITS(m_hw.utilin,16,2,2,data); }
+
+/**
+ * @brief write printer daisy ready bit
+ */
+WRITE16_MEMBER( alto2_cpu_device::pchrdy_w ) { X_WRBITS(m_hw.utilin,16,3,3,data); }
+
+/**
+ * @brief write printer carriage ready bit
+ */
+WRITE16_MEMBER( alto2_cpu_device::parrdy_w ) { X_WRBITS(m_hw.utilin,16,4,4,data); }
+
+/**
+ * @brief write printer ready bit
+ */
+WRITE16_MEMBER( alto2_cpu_device::pready_w ) { X_WRBITS(m_hw.utilin,16,5,5,data); }
+
+/**
+ * @brief write memory configuration switch
+ */
+WRITE16_MEMBER( alto2_cpu_device::memconfig_w ) { X_WRBITS(m_hw.utilin,16,6,6,data); }
+
+/**
+ * @brief write unused bit 7
+ */
+WRITE16_MEMBER( alto2_cpu_device::unused7_w ) { X_WRBITS(m_hw.utilin,16,7,7,data); }
+
+/**
+ * @brief write key set key 0
+ */
+WRITE16_MEMBER( alto2_cpu_device::keyset_key0_w ) { X_WRBITS(m_hw.utilin,16,8,8,data); }
+
+/**
+ * @brief write key set key 1
+ */
+WRITE16_MEMBER( alto2_cpu_device::keyset_key1_w ) { X_WRBITS(m_hw.utilin,16,9,9,data); }
+
+/**
+ * @brief write key set key 2
+ */
+WRITE16_MEMBER( alto2_cpu_device::keyset_key2_w ) { X_WRBITS(m_hw.utilin,16,10,10,data); }
+
+/**
+ * @brief write key set key 3
+ */
+WRITE16_MEMBER( alto2_cpu_device::keyset_key3_w ) { X_WRBITS(m_hw.utilin,16,11,11,data); }
+
+/**
+ * @brief write key set key 4
+ */
+WRITE16_MEMBER( alto2_cpu_device::keyset_key4_w ) { X_WRBITS(m_hw.utilin,16,12,12,data); }
+
+/**
+ * @brief write mouse red button bit
+ */
+WRITE16_MEMBER( alto2_cpu_device::mouse_red_w ) { X_WRBITS(m_hw.utilin,16,13,13,data); }
+
+/**
+ * @brief write mouse blue button bit
+ */
+WRITE16_MEMBER( alto2_cpu_device::mouse_blue_w ) { X_WRBITS(m_hw.utilin,16,14,14,data); }
+
+/**
+ * @brief write mouse yellow button bit
+ */
+WRITE16_MEMBER( alto2_cpu_device::mouse_yellow_w ) { X_WRBITS(m_hw.utilin,16,15,15,data); }
+
+/**
+ * @brief write mouse buttons bits
+ */
+WRITE16_MEMBER( alto2_cpu_device::mouse_buttons_w ) { X_WRBITS(m_hw.utilin,16,13,15,data); }
+
+/**
+ * @brief printer paper strobe bit
+ * Paper strobe bit. Toggling this bit causes a paper scrolling operation.
+ */
+static inline UINT16 GET_PPPSTR(UINT16 utilout) { return X_RDBITS(utilout,16,0,0); }
+
+/**
+ * @brief printer retstore bit
+ * Restore bit. Toggling this bit resets the printer (including clearing
+ * the "check" condition if present) and moves the carriage to the
+ * left margin.
+ */
+static inline UINT16 GET_PREST(UINT16 utilout) { return X_RDBITS(utilout,16,1,1); }
+
+/**
+ * @brief printer ribbon bit
+ * Ribbon bit. When this bit is 1 the ribbon is up (in printing
+ * position); when 0, it is down.
+ */
+static inline UINT16 GET_PRIB(UINT16 utilout) { return X_RDBITS(utilout,16,2,2); }
+
+/**
+ * @brief printer daisy strobe bit
+ * Daisy strobe bit. Toggling this bit causes a character to be printed.
+ */
+static inline UINT16 GET_PCHSTR(UINT16 utilout) { return X_RDBITS(utilout,16,3,3); }
+
+/**
+ * @brief printer carriage strobe bit
+ * Carriage strobe bit. Toggling this bit causes a horizontal position operation.
+ */
+static inline UINT16 GET_PCARSTR(UINT16 utilout) { return X_RDBITS(utilout,16,4,4); }
+
+/**
+ * @brief printer data
+ * Argument to various output operations:
+ * 1. Printing characters. When the daisy bit is toggled bits 9-15 of this field
+ * are interpreted as an ASCII character code to be printed (it should be noted
+ * that all codes less than 040 print as lower case "w").
+ * 2. For paper and carriage operations the field is interpreted as a displacement
+ * (-1024 to +1023), in units of 1/48 inch for paper and 1/60 inch for carriage.
+ * Positive is down or to the right, negative up or to the left. The value is
+ * represented as sign-magnitude (i.e., bit 5 is 1 for negative numbers, 0 for
+ * positive; bits 6-15 are the absolute value of the number).
+ */
+static inline UINT16 GET_PDATA(UINT16 utilout) { return X_RDBITS(utilout,16,5,15); }
+
+/**
  * @brief read the UTILIN port
  *
  * @param addr memory mapped I/O address to be read

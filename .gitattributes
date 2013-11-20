@@ -930,6 +930,7 @@ src/emu/cpu/alto2/a2dwt.c svneol=native#text/plain
 src/emu/cpu/alto2/a2emu.c svneol=native#text/plain
 src/emu/cpu/alto2/a2ether.c svneol=native#text/plain
 src/emu/cpu/alto2/a2hw.c svneol=native#text/plain
+src/emu/cpu/alto2/a2hw.h svneol=native#text/plain
 src/emu/cpu/alto2/a2kbd.c svneol=native#text/plain
 src/emu/cpu/alto2/a2ksec.c svneol=native#text/plain
 src/emu/cpu/alto2/a2kwd.c svneol=native#text/plain

@@ -12,59 +12,59 @@
 
 #define	JKFF_FUNCTION	0	//!< define 1 to debug the JK flip-flops, 0 to use a lookup table
 
-#define	GET_KADDR_SECTOR(kaddr)			A2_GET16(kaddr,16, 0, 3)			//!< get sector number from address register
-#define	PUT_KADDR_SECTOR(kaddr,val)		A2_PUT16(kaddr,16, 0, 3,val)		//!< put sector number into address register
-#define	GET_KADDR_CYLINDER(kaddr)		A2_GET16(kaddr,16, 4,12)			//!< get cylinder number from address register
-#define	PUT_KADDR_CYLINDER(kaddr,val)	A2_PUT16(kaddr,16, 4,12,val)		//!< put cylinder number int address register
-#define	GET_KADDR_HEAD(kaddr)			A2_GET16(kaddr,16,13,13)			//!< get head number from address register
-#define	PUT_KADDR_HEAD(kaddr,val)		A2_PUT16(kaddr,16,13,13,val)		//!< put head number into address register
-#define	GET_KADDR_DRIVE(kaddr)			A2_GET16(kaddr,16,14,14)			//!< get drive (unit) number from address register
-#define	PUT_KADDR_DRIVE(kaddr,val)		A2_PUT16(kaddr,16,14,14,val)		//!< put drive (unit) number into address register
-#define	GET_KADDR_RESTORE(kaddr)		A2_GET16(kaddr,16,15,15)			//!< get restore flag from address register
-#define	PUT_KADDR_RESTORE(kaddr,val)	A2_PUT16(kaddr,16,15,15,val)		//!< putt restore flag into address register
+#define	GET_KADDR_SECTOR(kaddr)			X_RDBITS(kaddr,16, 0, 3)			//!< get sector number from address register
+#define	PUT_KADDR_SECTOR(kaddr,val)		X_WRBITS(kaddr,16, 0, 3,val)		//!< put sector number into address register
+#define	GET_KADDR_CYLINDER(kaddr)		X_RDBITS(kaddr,16, 4,12)			//!< get cylinder number from address register
+#define	PUT_KADDR_CYLINDER(kaddr,val)	X_WRBITS(kaddr,16, 4,12,val)		//!< put cylinder number int address register
+#define	GET_KADDR_HEAD(kaddr)			X_RDBITS(kaddr,16,13,13)			//!< get head number from address register
+#define	PUT_KADDR_HEAD(kaddr,val)		X_WRBITS(kaddr,16,13,13,val)		//!< put head number into address register
+#define	GET_KADDR_DRIVE(kaddr)			X_RDBITS(kaddr,16,14,14)			//!< get drive (unit) number from address register
+#define	PUT_KADDR_DRIVE(kaddr,val)		X_WRBITS(kaddr,16,14,14,val)		//!< put drive (unit) number into address register
+#define	GET_KADDR_RESTORE(kaddr)		X_RDBITS(kaddr,16,15,15)			//!< get restore flag from address register
+#define	PUT_KADDR_RESTORE(kaddr,val)	X_WRBITS(kaddr,16,15,15,val)		//!< putt restore flag into address register
 
-#define	GET_KADR_SEAL(kadr)				A2_GET16(kadr,16, 0, 7)				//!< get command seal from command register
-#define	PUT_KADR_SEAL(kadr,val)			A2_PUT16(kadr,16, 0, 7,val)			//!< put command seal into command register
-#define	GET_KADR_HEADER(kadr)			A2_GET16(kadr,16, 8, 9)				//!< get r/w/c for header from command register
-#define	PUT_KADR_HEADER(kadr,val)		A2_PUT16(kadr,16, 8, 9,val)			//!< put r/w/c for header from command register
-#define	GET_KADR_LABEL(kadr)			A2_GET16(kadr,16,10,11)				//!< get r/w/c for label from command register
-#define	PUT_KADR_LABEL(kadr,val)		A2_PUT16(kadr,16,10,11,val)			//!< put r/w/c for label into command register
-#define	GET_KADR_DATA(kadr)				A2_GET16(kadr,16,12,13)				//!< get r/w/c for data from command register
-#define	PUT_KADR_DATA(kadr,val)			A2_PUT16(kadr,16,12,13,val)			//!< put r/w/c for data into command register
-#define	GET_KADR_NOXFER(kadr)			A2_GET16(kadr,16,14,14)				//!< get no transfer flag from command register
-#define	PUT_KADR_NOXFER(kadr,val)		A2_PUT16(kadr,16,14,14,val)			//!< put no transfer flag into command register
-#define	GET_KADR_UNUSED(kadr)			A2_GET16(kadr,16,15,15)				//!< get unused (drive?) flag from command register
-#define	PUT_KADR_UNUSED(kadr,val)		A2_PUT16(kadr,16,15,15,val)			//!< put unused (drive?) flag into command register
+#define	GET_KADR_SEAL(kadr)				X_RDBITS(kadr,16, 0, 7)				//!< get command seal from command register
+#define	PUT_KADR_SEAL(kadr,val)			X_WRBITS(kadr,16, 0, 7,val)			//!< put command seal into command register
+#define	GET_KADR_HEADER(kadr)			X_RDBITS(kadr,16, 8, 9)				//!< get r/w/c for header from command register
+#define	PUT_KADR_HEADER(kadr,val)		X_WRBITS(kadr,16, 8, 9,val)			//!< put r/w/c for header from command register
+#define	GET_KADR_LABEL(kadr)			X_RDBITS(kadr,16,10,11)				//!< get r/w/c for label from command register
+#define	PUT_KADR_LABEL(kadr,val)		X_WRBITS(kadr,16,10,11,val)			//!< put r/w/c for label into command register
+#define	GET_KADR_DATA(kadr)				X_RDBITS(kadr,16,12,13)				//!< get r/w/c for data from command register
+#define	PUT_KADR_DATA(kadr,val)			X_WRBITS(kadr,16,12,13,val)			//!< put r/w/c for data into command register
+#define	GET_KADR_NOXFER(kadr)			X_RDBITS(kadr,16,14,14)				//!< get no transfer flag from command register
+#define	PUT_KADR_NOXFER(kadr,val)		X_WRBITS(kadr,16,14,14,val)			//!< put no transfer flag into command register
+#define	GET_KADR_UNUSED(kadr)			X_RDBITS(kadr,16,15,15)				//!< get unused (drive?) flag from command register
+#define	PUT_KADR_UNUSED(kadr,val)		X_WRBITS(kadr,16,15,15,val)			//!< put unused (drive?) flag into command register
 
-#define	GET_KSTAT_SECTOR(kstat)			A2_GET16(kstat,16,0,3)				//!< get current sector number from status register
-#define	PUT_KSTAT_SECTOR(kstat,val)		A2_PUT16(kstat,16,0,3,val)			//!< put current sector number into status register
-#define	GET_KSTAT_DONE(kstat)			A2_GET16(kstat,16,4,7)				//!< get 'done' field from status register (017)
-#define	PUT_KSTAT_DONE(kstat,val)		A2_PUT16(kstat,16,4,7,val)			//!< put 'done' field int status register (017)
-#define	GET_KSTAT_SEEKFAIL(kstat)		A2_GET16(kstat,16,8,8)				//!< get seek fail flag from status register
-#define	PUT_KSTAT_SEEKFAIL(kstat,val)	A2_PUT16(kstat,16,8,8,val)			//!< put seek fail flag into status register
-#define	GET_KSTAT_SEEK(kstat)			A2_GET16(kstat,16,9,9)				//!< get seek busy flag (strobe) from status register
-#define	PUT_KSTAT_SEEK(kstat,val)		A2_PUT16(kstat,16,9,9,val)			//!< put seek busy flag (strobe) into status register
-#define	GET_KSTAT_NOTRDY(kstat)			A2_GET16(kstat,16,10,10)			//!< get drive not ready flag from status register
-#define	PUT_KSTAT_NOTRDY(kstat,val)		A2_PUT16(kstat,16,10,10,val)		//!< put drive not ready flag into status register
-#define	GET_KSTAT_DATALATE(kstat)		A2_GET16(kstat,16,11,11)			//!< get data late flag from status register
-#define	PUT_KSTAT_DATALATE(kstat,val)	A2_PUT16(kstat,16,11,11,val)		//!< put data late flag into status register
-#define	GET_KSTAT_IDLE(kstat)			A2_GET16(kstat,16,12,12)			//!< get idle flag from status register (idle is a software flag)
-#define	PUT_KSTAT_IDLE(kstat,val)		A2_PUT16(kstat,16,12,12,val)		//!< put idle flag into status register (idle is a software flag)
-#define	GET_KSTAT_CKSUM(kstat)			A2_GET16(kstat,16,13,13)			//!< get checksum flag from status register (checksum is a software flag; it is ORed when 0)
-#define	PUT_KSTAT_CKSUM(kstat,val)		A2_PUT16(kstat,16,13,13,val)		//!< put checksum flag into status register (checksum is a software flag; it is ORed when 0)
-#define	GET_KSTAT_COMPLETION(kstat)		A2_GET16(kstat,16,14,15)			//!< get completion code from status register (completion is a 2-bit software latch)
-#define	PUT_KSTAT_COMPLETION(kstat,val)	A2_PUT16(kstat,16,14,15,val)		//!< put completion code into status register (completion is a 2-bit software latch)
+#define	GET_KSTAT_SECTOR(kstat)			X_RDBITS(kstat,16,0,3)				//!< get current sector number from status register
+#define	PUT_KSTAT_SECTOR(kstat,val)		X_WRBITS(kstat,16,0,3,val)			//!< put current sector number into status register
+#define	GET_KSTAT_DONE(kstat)			X_RDBITS(kstat,16,4,7)				//!< get 'done' field from status register (017)
+#define	PUT_KSTAT_DONE(kstat,val)		X_WRBITS(kstat,16,4,7,val)			//!< put 'done' field int status register (017)
+#define	GET_KSTAT_SEEKFAIL(kstat)		X_RDBITS(kstat,16,8,8)				//!< get seek fail flag from status register
+#define	PUT_KSTAT_SEEKFAIL(kstat,val)	X_WRBITS(kstat,16,8,8,val)			//!< put seek fail flag into status register
+#define	GET_KSTAT_SEEK(kstat)			X_RDBITS(kstat,16,9,9)				//!< get seek busy flag (strobe) from status register
+#define	PUT_KSTAT_SEEK(kstat,val)		X_WRBITS(kstat,16,9,9,val)			//!< put seek busy flag (strobe) into status register
+#define	GET_KSTAT_NOTRDY(kstat)			X_RDBITS(kstat,16,10,10)			//!< get drive not ready flag from status register
+#define	PUT_KSTAT_NOTRDY(kstat,val)		X_WRBITS(kstat,16,10,10,val)		//!< put drive not ready flag into status register
+#define	GET_KSTAT_DATALATE(kstat)		X_RDBITS(kstat,16,11,11)			//!< get data late flag from status register
+#define	PUT_KSTAT_DATALATE(kstat,val)	X_WRBITS(kstat,16,11,11,val)		//!< put data late flag into status register
+#define	GET_KSTAT_IDLE(kstat)			X_RDBITS(kstat,16,12,12)			//!< get idle flag from status register (idle is a software flag)
+#define	PUT_KSTAT_IDLE(kstat,val)		X_WRBITS(kstat,16,12,12,val)		//!< put idle flag into status register (idle is a software flag)
+#define	GET_KSTAT_CKSUM(kstat)			X_RDBITS(kstat,16,13,13)			//!< get checksum flag from status register (checksum is a software flag; it is ORed when 0)
+#define	PUT_KSTAT_CKSUM(kstat,val)		X_WRBITS(kstat,16,13,13,val)		//!< put checksum flag into status register (checksum is a software flag; it is ORed when 0)
+#define	GET_KSTAT_COMPLETION(kstat)		X_RDBITS(kstat,16,14,15)			//!< get completion code from status register (completion is a 2-bit software latch)
+#define	PUT_KSTAT_COMPLETION(kstat,val)	X_WRBITS(kstat,16,14,15,val)		//!< put completion code into status register (completion is a 2-bit software latch)
 
-#define	GET_KCOM_XFEROFF(kcom)			A2_GET16(kcom,16,1,1)				//!< get transfer off flag from controller command (hardware command register)
-#define	PUT_KCOM_XFEROFF(kcom,val)		A2_PUT16(kcom,16,1,1,val)			//!< put transfer off flag into controller command (hardware command register)
-#define	GET_KCOM_WDINHIB(kcom)			A2_GET16(kcom,16,2,2)				//!< get word task inhibit flag from controller command (hardware command register)
-#define	PUT_KCOM_WDINHIB(kcom,val)		A2_PUT16(kcom,16,2,2,val)			//!< put word task inhibit flag into controller command (hardware command register)
-#define	GET_KCOM_BCLKSRC(kcom)			A2_GET16(kcom,16,3,3)				//!< get bit clock source flag from controller command (hardware command register)
-#define	PUT_KCOM_BCLKSRC(kcom,val)		A2_PUT16(kcom,16,3,3,val)			//!< put bit clock source flag into controller command (hardware command register)
-#define	GET_KCOM_WFFO(kcom)				A2_GET16(kcom,16,4,4)				//!< get write fixed frequency oscillator flag from controller command (hardware command register)
-#define	PUT_KCOM_WFFO(kcom,val)			A2_PUT16(kcom,16,4,4,val)			//!< put write fixed frequency oscillator flag into controller command (hardware command register)
-#define	GET_KCOM_SENDADR(kcom)			A2_GET16(kcom,16,5,5)				//!< get send address flag from controller command (hardware command register)
-#define	PUT_KCOM_SENDADR(kcom,val)		A2_PUT16(kcom,16,5,5,val)			//!< put send address flag into controller command (hardware command register)
+#define	GET_KCOM_XFEROFF(kcom)			X_RDBITS(kcom,16,1,1)				//!< get transfer off flag from controller command (hardware command register)
+#define	PUT_KCOM_XFEROFF(kcom,val)		X_WRBITS(kcom,16,1,1,val)			//!< put transfer off flag into controller command (hardware command register)
+#define	GET_KCOM_WDINHIB(kcom)			X_RDBITS(kcom,16,2,2)				//!< get word task inhibit flag from controller command (hardware command register)
+#define	PUT_KCOM_WDINHIB(kcom,val)		X_WRBITS(kcom,16,2,2,val)			//!< put word task inhibit flag into controller command (hardware command register)
+#define	GET_KCOM_BCLKSRC(kcom)			X_RDBITS(kcom,16,3,3)				//!< get bit clock source flag from controller command (hardware command register)
+#define	PUT_KCOM_BCLKSRC(kcom,val)		X_WRBITS(kcom,16,3,3,val)			//!< put bit clock source flag into controller command (hardware command register)
+#define	GET_KCOM_WFFO(kcom)				X_RDBITS(kcom,16,4,4)				//!< get write fixed frequency oscillator flag from controller command (hardware command register)
+#define	PUT_KCOM_WFFO(kcom,val)			X_WRBITS(kcom,16,4,4,val)			//!< put write fixed frequency oscillator flag into controller command (hardware command register)
+#define	GET_KCOM_SENDADR(kcom)			X_RDBITS(kcom,16,5,5)				//!< get send address flag from controller command (hardware command register)
+#define	PUT_KCOM_SENDADR(kcom,val)		X_WRBITS(kcom,16,5,5,val)			//!< put send address flag into controller command (hardware command register)
 
 /** @brief completion codes (only for documentation, since this is microcode defined) */
 enum {

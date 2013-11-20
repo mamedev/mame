@@ -13,52 +13,52 @@
 UINT8 ether_id = 254;
 
 /** @brief hardware status: write latch full/filled (? set by EODFCT) */
-#define	GET_ETH_WLF(st)			A2_BIT16(st,16,4)
-#define	PUT_ETH_WLF(st,val)		A2_PUT16(st,16,4,4,val)
+#define	GET_ETH_WLF(st)			X_BIT(st,16,4)
+#define	PUT_ETH_WLF(st,val)		X_WRBITS(st,16,4,4,val)
 
 /** @brief hardware status: output end of transmission (set by EEFCT) */
-#define	GET_ETH_OEOT(st)		A2_BIT16(st,16,5)
-#define	PUT_ETH_OEOT(st,val)	A2_PUT16(st,16,5,5,val)
+#define	GET_ETH_OEOT(st)		X_BIT(st,16,5)
+#define	PUT_ETH_OEOT(st,val)	X_WRBITS(st,16,5,5,val)
 
 /** @brief hardware status: input gone */
-#define	GET_ETH_IGONE(st)		A2_BIT16(st,16,6)
-#define	PUT_ETH_IGONE(st,val)	A2_PUT16(st,16,6,6,val)
+#define	GET_ETH_IGONE(st)		X_BIT(st,16,6)
+#define	PUT_ETH_IGONE(st,val)	X_WRBITS(st,16,6,6,val)
 
 /** @brief hardware status: input busy (set by EISFCT, bit isn't visible to microcode) */
-#define	GET_ETH_IBUSY(st)		A2_BIT16(st,16,7)
-#define	PUT_ETH_IBUSY(st,val)	A2_PUT16(st,16,7,7,val)
+#define	GET_ETH_IBUSY(st)		X_BIT(st,16,7)
+#define	PUT_ETH_IBUSY(st,val)	X_WRBITS(st,16,7,7,val)
 
 /** @brief hardware status: output gone */
-#define	GET_ETH_OGONE(st)		A2_BIT16(st,16,8)
-#define	PUT_ETH_OGONE(st,val)	A2_PUT16(st,16,8,8,val)
+#define	GET_ETH_OGONE(st)		X_BIT(st,16,8)
+#define	PUT_ETH_OGONE(st,val)	X_WRBITS(st,16,8,8,val)
 
 /** @brief hardware status: output busy (set by EOSFCT, bit isn't visible to microcode) */
-#define	GET_ETH_OBUSY(st)		A2_BIT16(st,16,9)
-#define	PUT_ETH_OBUSY(st,val)	A2_PUT16(st,16,9,9,val)
+#define	GET_ETH_OBUSY(st)		X_BIT(st,16,9)
+#define	PUT_ETH_OBUSY(st,val)	X_WRBITS(st,16,9,9,val)
 
 /** @brief hardware status: input data late */
-#define	GET_ETH_IDL(st)			A2_BIT16(st,16,10)
-#define	PUT_ETH_IDL(st,val)		A2_PUT16(st,16,10,10,val)
+#define	GET_ETH_IDL(st)			X_BIT(st,16,10)
+#define	PUT_ETH_IDL(st,val)		X_WRBITS(st,16,10,10,val)
 
 /** @brief hardware status: collision */
-#define	GET_ETH_COLL(st)		A2_BIT16(st,16,11)
-#define	PUT_ETH_COLL(st,val)	A2_PUT16(st,16,11,11,val)
+#define	GET_ETH_COLL(st)		X_BIT(st,16,11)
+#define	PUT_ETH_COLL(st,val)	X_WRBITS(st,16,11,11,val)
 
 /** @brief hardware status: CRC error */
-#define	GET_ETH_CRC(st)			A2_BIT16(st,16,12)
-#define	PUT_ETH_CRC(st,val)		A2_PUT16(st,16,12,12,val)
+#define	GET_ETH_CRC(st)			X_BIT(st,16,12)
+#define	PUT_ETH_CRC(st,val)		X_WRBITS(st,16,12,12,val)
 
 /** @brief hardware status: input command (set from BUS[14] on SIO, reset by EPFCT) */
-#define	GET_ETH_ICMD(st)		A2_BIT16(st,16,13)
-#define	PUT_ETH_ICMD(st,val)	A2_PUT16(st,16,13,13,val)
+#define	GET_ETH_ICMD(st)		X_BIT(st,16,13)
+#define	PUT_ETH_ICMD(st,val)	X_WRBITS(st,16,13,13,val)
 
 /** @brief hardware status: output command (set from BUS[15] on SIO, reset by EPFCT) */
-#define	GET_ETH_OCMD(st)		A2_BIT16(st,16,14)
-#define	PUT_ETH_OCMD(st,val)	A2_PUT16(st,16,14,14,val)
+#define	GET_ETH_OCMD(st)		X_BIT(st,16,14)
+#define	PUT_ETH_OCMD(st,val)	X_WRBITS(st,16,14,14,val)
 
 /** @brief hardware status: IT flip flop & ISRFULL' */
 #define	GET_ETH_IT(st)			ALTO2_GET(st,16,15,15)
-#define	PUT_ETH_IT(st,val)		A2_PUT16(st,16,15,15,val)
+#define	PUT_ETH_IT(st,val)		X_WRBITS(st,16,15,15,val)
 
 /** @brief missing PROM ether.u49; buffer empty (active low) */
 #define	ETHER_A49_BE	(m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd] & (1 << 0))
@@ -424,8 +424,8 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
 
 void alto2_cpu_device::eth_startf()
 {
-	PUT_ETH_ICMD(m_eth.status, A2_BIT16(m_bus,16,14));
-	PUT_ETH_OCMD(m_eth.status, A2_BIT16(m_bus,16,15));
+	PUT_ETH_ICMD(m_eth.status, X_BIT(m_bus,16,14));
+	PUT_ETH_OCMD(m_eth.status, X_BIT(m_bus,16,15));
 	if (GET_ETH_ICMD(m_eth.status) || GET_ETH_OCMD(m_eth.status))
 		m_task_wakeup |= 1 << task_ether;
 }
@@ -485,7 +485,7 @@ void alto2_cpu_device::f1_early_eilfct()
  */
 void alto2_cpu_device::f1_early_epfct()
 {
-	UINT16 r = ~A2_GET16(m_eth.status,16,10,15) & 0177777;
+	UINT16 r = ~X_RDBITS(m_eth.status,16,10,15) & 0177777;
 
 	LOG((LOG_ETH,3, "	←EPFCT; BUS[8-15] = STATUS (%#o)\n", r));
 	m_bus &= r;
@@ -564,8 +564,8 @@ void alto2_cpu_device::f2_late_eosfct()
 void alto2_cpu_device::f2_late_erbfct()
 {
 	UINT16 r = 0;
-	A2_PUT16(r,10,6,6,GET_ETH_ICMD(m_eth.status));
-	A2_PUT16(r,10,7,7,GET_ETH_OCMD(m_eth.status));
+	X_WRBITS(r,10,6,6,GET_ETH_ICMD(m_eth.status));
+	X_WRBITS(r,10,7,7,GET_ETH_OCMD(m_eth.status));
 	LOG((LOG_ETH,3, "	ERBFCT; NEXT[6-7] = ICMD,OCMD (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 	eth_wakeup();
@@ -602,8 +602,8 @@ void alto2_cpu_device::f2_late_eefct()
 void alto2_cpu_device::f2_late_ebfct()
 {
 	UINT16 r = 0;
-	A2_PUT16(r,10,6,6, GET_ETH_COLL(m_eth.status));
-	A2_PUT16(r,10,7,7, GET_ETH_IDL(m_eth.status) |
+	X_WRBITS(r,10,6,6, GET_ETH_COLL(m_eth.status));
+	X_WRBITS(r,10,7,7, GET_ETH_IDL(m_eth.status) |
 		GET_ETH_ICMD(m_eth.status) |
 		GET_ETH_OCMD(m_eth.status) |
 		GET_ETH_IGONE(m_eth.status) |
@@ -621,7 +621,7 @@ void alto2_cpu_device::f2_late_ecbfct()
 {
 	UINT16 r = 0;
 	/* TODO: the BE' (buffer empty) signal is output D0 of PROM a49 */
-	A2_PUT16(r,10,7,7,ETHER_A49_BE);
+	X_WRBITS(r,10,7,7,ETHER_A49_BE);
 	LOG((LOG_ETH,3, "	ECBFCT; NEXT[7] = FIFO %sempty (%#o | %#o)\n", r ? "not " : "is ", m_next2, r));
 	m_next2 |= r;
 }

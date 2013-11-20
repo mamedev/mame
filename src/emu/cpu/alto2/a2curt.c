@@ -24,7 +24,7 @@ void alto2_cpu_device::f1_early_curt_block()
  */
 void alto2_cpu_device::f2_late_load_xpreg()
 {
-	m_dsp.xpreg = A2_GET16(m_bus,16,6,15);
+	m_dsp.xpreg = X_RDBITS(m_bus,16,6,15);
 	LOG((LOG_CURT,2,"	XPREG← BUS[6-15] (%#o)\n", m_dsp.xpreg));
 }
 

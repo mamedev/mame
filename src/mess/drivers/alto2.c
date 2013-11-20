@@ -206,10 +206,10 @@ static INPUT_PORTS_START( alto2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse YELLOW (middel)") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_buttons, 0 )
 
 	PORT_START("mousex")	// Mouse - X AXIS
-	PORT_BIT( 0xffff, 0x00, IPT_LIGHTGUN_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(2) PORT_PLAYER(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, 0 )
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, 0 )
 
 	PORT_START("mousey")	// Mouse - Y AXIS
-	PORT_BIT( 0xffff, 0x00, IPT_LIGHTGUN_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(2) PORT_PLAYER(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
 
 PORT_START("CONFIG")    /* config diode on main board */
 	PORT_CONFNAME( 0x40, 0x40, "TV system")
@@ -264,7 +264,6 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 						   ALTO2_DISPLAY_TOTAL_WIDTH,   0, ALTO2_DISPLAY_WIDTH,
 						   ALTO2_DISPLAY_TOTAL_HEIGHT,  0, ALTO2_DISPLAY_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(alto2_state, screen_update)
-//	MCFG_SCREEN_VBLANK_DRIVER(alto2_state, screen_eof_alto2)
 
 	MCFG_PALETTE_LENGTH(2)
 

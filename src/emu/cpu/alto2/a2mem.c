@@ -9,36 +9,36 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
-#define	PUT_EVEN(dword,word)			A2_PUT32(dword,32, 0,15,word)
-#define	GET_EVEN(dword)					A2_GET32(dword,32, 0,15)
-#define	PUT_ODD(dword,word)				A2_PUT32(dword,32,16,31,word)
-#define	GET_ODD(dword)					A2_GET32(dword,32,16,31)
+#define	PUT_EVEN(dword,word)			X_WRBITS(dword,32, 0,15,word)
+#define	GET_EVEN(dword)					X_RDBITS(dword,32, 0,15)
+#define	PUT_ODD(dword,word)				X_WRBITS(dword,32,16,31,word)
+#define	GET_ODD(dword)					X_RDBITS(dword,32,16,31)
 
-#define	GET_MESR_HAMMING(mesr)			A2_GET16(mesr,16,0,5)
-#define	PUT_MESR_HAMMING(mesr,val)		A2_PUT16(mesr,16,0,5,val)
-#define	GET_MESR_PERR(mesr)				A2_GET16(mesr,16,6,6)
-#define	PUT_MESR_PERR(mesr,val)			A2_PUT16(mesr,16,6,6,val)
-#define	GET_MESR_PARITY(mesr)			A2_GET16(mesr,16,7,7)
-#define	PUT_MESR_PARITY(mesr,val)		A2_PUT16(mesr,16,7,7,val)
-#define	GET_MESR_SYNDROME(mesr)			A2_GET16(mesr,16,8,13)
-#define	PUT_MESR_SYNDROME(mesr,val)		A2_PUT16(mesr,16,8,13,val)
-#define	GET_MESR_BANK(mesr)				A2_GET16(mesr,16,14,15)
-#define	PUT_MESR_BANK(mesr,val)			A2_PUT16(mesr,16,14,15,val)
+#define	GET_MESR_HAMMING(mesr)			X_RDBITS(mesr,16,0,5)
+#define	PUT_MESR_HAMMING(mesr,val)		X_WRBITS(mesr,16,0,5,val)
+#define	GET_MESR_PERR(mesr)				X_RDBITS(mesr,16,6,6)
+#define	PUT_MESR_PERR(mesr,val)			X_WRBITS(mesr,16,6,6,val)
+#define	GET_MESR_PARITY(mesr)			X_RDBITS(mesr,16,7,7)
+#define	PUT_MESR_PARITY(mesr,val)		X_WRBITS(mesr,16,7,7,val)
+#define	GET_MESR_SYNDROME(mesr)			X_RDBITS(mesr,16,8,13)
+#define	PUT_MESR_SYNDROME(mesr,val)		X_WRBITS(mesr,16,8,13,val)
+#define	GET_MESR_BANK(mesr)				X_RDBITS(mesr,16,14,15)
+#define	PUT_MESR_BANK(mesr,val)			X_WRBITS(mesr,16,14,15,val)
 
-#define	GET_MECR_SPARE1(mecr,val)		A2_GET16(mecr,16,0,3)
-#define	PUT_MECR_SPARE1(mecr,val)		A2_PUT16(mecr,16,0,3,val)
-#define	GET_MECR_TEST_CODE(mecr)		A2_GET16(mecr,16,4,10)
-#define	PUT_MECR_TEST_CODE(mecr,val)	A2_PUT16(mecr,16,4,10,val)
-#define	GET_MECR_TEST_MODE(mecr)		A2_GET16(mecr,16,11,11)
-#define	PUT_MECR_TEST_MODE(mecr,val)	A2_PUT16(mecr,16,11,11,val)
-#define	GET_MECR_INT_SBERR(mecr)		A2_GET16(mecr,16,12,12)
-#define	PUT_MECR_INT_SBERR(mecr,val)	A2_PUT16(mecr,16,12,12,val)
-#define	GET_MECR_INT_DBERR(mecr)		A2_GET16(mecr,16,13,13)
-#define	PUT_MECR_INT_DBERR(mecr,val)	A2_PUT16(mecr,16,13,13,val)
-#define	GET_MECR_ERRCORR(mecr)			A2_GET16(mecr,16,14,14)
-#define	PUT_MECR_ERRCORR(mecr,val)		A2_PUT16(mecr,16,14,14,val)
-#define	GET_MECR_SPARE2(mecr)			A2_GET16(mecr,16,15,15)
-#define	PUT_MECR_SPARE2(mecr,val)		A2_PUT16(mecr,16,15,15,val)
+#define	GET_MECR_SPARE1(mecr,val)		X_RDBITS(mecr,16,0,3)
+#define	PUT_MECR_SPARE1(mecr,val)		X_WRBITS(mecr,16,0,3,val)
+#define	GET_MECR_TEST_CODE(mecr)		X_RDBITS(mecr,16,4,10)
+#define	PUT_MECR_TEST_CODE(mecr,val)	X_WRBITS(mecr,16,4,10,val)
+#define	GET_MECR_TEST_MODE(mecr)		X_RDBITS(mecr,16,11,11)
+#define	PUT_MECR_TEST_MODE(mecr,val)	X_WRBITS(mecr,16,11,11,val)
+#define	GET_MECR_INT_SBERR(mecr)		X_RDBITS(mecr,16,12,12)
+#define	PUT_MECR_INT_SBERR(mecr,val)	X_WRBITS(mecr,16,12,12,val)
+#define	GET_MECR_INT_DBERR(mecr)		X_RDBITS(mecr,16,13,13)
+#define	PUT_MECR_INT_DBERR(mecr,val)	X_WRBITS(mecr,16,13,13,val)
+#define	GET_MECR_ERRCORR(mecr)			X_RDBITS(mecr,16,14,14)
+#define	PUT_MECR_ERRCORR(mecr,val)		X_WRBITS(mecr,16,14,14,val)
+#define	GET_MECR_SPARE2(mecr)			X_RDBITS(mecr,16,15,15)
+#define	PUT_MECR_SPARE2(mecr,val)		X_WRBITS(mecr,16,15,15,val)
 
 /**
  * <PRE>
@@ -277,14 +277,14 @@
 /* a74: WD14   WD17   WD18   WD21   WD23   WD24   WD26   WD27   WD29 PCB     ---    */
 #define	A74 (WD(14)|WD(17)|WD(18)|WD(21)|WD(23)|WD(24)|WD(26)|WD(27)|WD(29))
 
-#define	H0(hpb) A2_GET8(hpb,8,0,0)	//!< get Hamming code bit 0 from hpb data (really bit 32)
-#define	H1(hpb) A2_GET8(hpb,8,1,1)	//!< get Hamming code bit 1 from hpb data (really bit 33)
-#define	H2(hpb) A2_GET8(hpb,8,2,2)	//!< get Hamming code bit 2 from hpb data (really bit 34)
-#define	H3(hpb) A2_GET8(hpb,8,3,3)	//!< get Hamming code bit 3 from hpb data (really bit 35)
-#define	H4(hpb) A2_GET8(hpb,8,4,4)	//!< get Hamming code bit 4 from hpb data (really bit 36)
-#define	H5(hpb) A2_GET8(hpb,8,5,5)	//!< get Hamming code bit 5 from hpb data (really bit 37)
-#define	RH(hpb) A2_GET8(hpb,8,0,5)	//!< get Hamming code from hpb data (bits 32 to 37)
-#define	RP(hpb) A2_BIT8(hpb,8,6)	//!< get parity bit from hpb data (really bit 38)
+#define	H0(hpb) X_RDBITS(hpb,8,0,0)	//!< get Hamming code bit 0 from hpb data (really bit 32)
+#define	H1(hpb) X_RDBITS(hpb,8,1,1)	//!< get Hamming code bit 1 from hpb data (really bit 33)
+#define	H2(hpb) X_RDBITS(hpb,8,2,2)	//!< get Hamming code bit 2 from hpb data (really bit 34)
+#define	H3(hpb) X_RDBITS(hpb,8,3,3)	//!< get Hamming code bit 3 from hpb data (really bit 35)
+#define	H4(hpb) X_RDBITS(hpb,8,4,4)	//!< get Hamming code bit 4 from hpb data (really bit 36)
+#define	H5(hpb) X_RDBITS(hpb,8,5,5)	//!< get Hamming code bit 5 from hpb data (really bit 37)
+#define	RH(hpb) X_RDBITS(hpb,8,0,5)	//!< get Hamming code from hpb data (bits 32 to 37)
+#define	RP(hpb) X_BIT(hpb,8,6)	//!< get parity bit from hpb data (really bit 38)
 
 /** @brief return even parity of a (masked) 32 bit value */
 static __inline UINT8 parity_even(UINT32 val)
@@ -396,7 +396,7 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 			   hcpa ^
 			   hcpb ^
 			   h_0_2 ^
-			   (A2_GET32(dw_data,32,0,0) ^ A2_GET32(dw_data,32,1,1)) ^
+			   (X_RDBITS(dw_data,32,0,0) ^ X_RDBITS(dw_data,32,1,1)) ^
 			   (dw_data & A54) ^
 			   RP(hpb) ^
 			   1);
@@ -568,8 +568,8 @@ WRITE16_MEMBER( alto2_cpu_device::mesr_w )
 WRITE16_MEMBER( alto2_cpu_device::mecr_w )
 {
 	m_mem.mecr = data ^ 0177777;
-	A2_PUT16(m_mem.mecr,16, 0, 3,0);
-	A2_PUT16(m_mem.mecr,16,15,15,0);
+	X_WRBITS(m_mem.mecr,16, 0, 3,0);
+	X_WRBITS(m_mem.mecr,16,15,15,0);
 	if (!space.debugger_access()) {
 		LOG((LOG_MEM,2,"	MECR write %07o\n", data));
 		LOG((LOG_MEM,6,"		Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));

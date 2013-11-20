@@ -184,8 +184,8 @@ void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 #define	HLC512	((m_dsp.hlc >>  9) & 1)		//!< horizontal line counter bit 9
 #define	HLC1024 ((m_dsp.hlc >> 10) & 1)		//!< horizontal line counter bit 10
 
-#define GET_SETMODE_SPEEDY(mode) A2_GET16(mode,16,0,0)  //!< get the pixel clock speed from a SETMODE<- bus value
-#define GET_SETMODE_INVERSE(mode) A2_GET16(mode,16,1,1) //!< get the inverse video flag from a SETMODE<- bus value
+#define GET_SETMODE_SPEEDY(mode) X_RDBITS(mode,16,0,0)  //!< get the pixel clock speed from a SETMODE<- bus value
+#define GET_SETMODE_INVERSE(mode) X_RDBITS(mode,16,1,1) //!< get the inverse video flag from a SETMODE<- bus value
 
 //!< helper to extract A3-A0 from a PROM a63 value
 #define A63_NEXT(n) ((n >> 2) & 017)
@@ -316,7 +316,7 @@ void alto2_cpu_device::display_state_machine()
 
 	if (A66_VBLANK_HI(a66, HLC1024)) {
 		/* VBLANK: remember hlc */
-		m_dsp.vblank = m_dsp.hlc & ~1;
+		m_dsp.vblank = m_dsp.hlc | 1;
 
 		LOG((LOG_DISPL,1, " VBLANK"));
 

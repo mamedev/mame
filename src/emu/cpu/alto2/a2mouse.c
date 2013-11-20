@@ -212,18 +212,7 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
  */
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_buttons )
 {
-	if (0x01 == (oldval ^ newval)) {
-		/* UTILIN[13] TOP or LEFT button (RED) */
-		PUT_MOUSE_RED   (m_hw.utilin, newval ? 0 : 1);
-	}
-	if (0x02 == (oldval ^ newval)) {
-		/* UTILIN[14] BOTTOM or RIGHT button (BLUE) */
-		PUT_MOUSE_BLUE  (m_hw.utilin, newval ? 0 : 1);
-	}
-	if (0x04 == (oldval ^ newval)) {
-		/* UTILIN[15] MIDDLE button (YELLOW) */
-		PUT_MOUSE_YELLOW(m_hw.utilin, newval ? 0 : 1);
-	}
+    mouse_buttons_w(space(AS_IO), 0, newval, 1);
 }
 
 

@@ -17,12 +17,11 @@
  */
 void alto2_cpu_device::bs_early_read_sreg()
 {
-	UINT8 reg = MIR_RSEL(m_mir);
 	UINT16 r;
 
-	if (reg) {
+	if (m_d_rsel) {
 		UINT8 bank = m_s_reg_bank[m_task];
-		r = m_s[bank][reg];
+		r = m_s[bank][m_d_rsel];
 		LOG((LOG_RAM,2,"	←S%02o; bus &= S[%o][%02o] (%#o)\n", reg, bank, reg, r));
 	} else {
 		r = m_m;
@@ -46,9 +45,8 @@ void alto2_cpu_device::bs_early_load_sreg()
  */
 void alto2_cpu_device::bs_late_load_sreg()
 {
-	UINT8 reg = MIR_RSEL(m_mir);
 	UINT8 bank = m_s_reg_bank[m_task];
-	m_s[bank][reg] = m_m;
+	m_s[bank][m_d_rsel] = m_m;
 	LOG((LOG_RAM,2,"	S%02o← S[%o][%02o] := %#o\n", reg, bank, reg, m_m));
 }
 
@@ -102,7 +100,7 @@ void alto2_cpu_device::f1_late_swmode()
 	}
 #endif
 #if (ALTO2_UCODE_ROM_PAGES == 2 && ALTO2_UCODE_RAM_PAGES == 1)
-	UINT16 next = A2_GET16(m_next2,10,1,1);
+	UINT16 next = X_RDBITS(m_next2,10,1,1);
 
 	switch (current) {
 	case 0: /* ROM0 to RAM0 or ROM1 */
@@ -146,7 +144,7 @@ void alto2_cpu_device::f1_late_swmode()
 	}
 #endif
 #if	(ALTO2_UCODE_ROM_PAGES == 1 && ALTO2_UCODE_RAM_PAGES == 3)
-	UINT16 next = A2_GET16(m_next2,10,1,2);
+	UINT16 next = X_RDBITS(m_next2,10,1,2);
 
 	switch (current) {
 	case 0: /* ROM0 to RAM0, RAM2, RAM1, RAM0 */
@@ -267,7 +265,7 @@ void alto2_cpu_device::f1_late_load_rmr()
  */
 void alto2_cpu_device::f1_late_load_srb()
 {
-	m_s_reg_bank[m_task] = A2_GET16(m_bus,16,12,14) % ALTO2_SREG_BANKS;
+	m_s_reg_bank[m_task] = X_RDBITS(m_bus,16,12,14) % ALTO2_SREG_BANKS;
 	LOG((LOG_RAM,2,"	SRB←; srb[%d] := %#o\n", m_task, m_s_reg_bank[m_task]));
 }
 #endif

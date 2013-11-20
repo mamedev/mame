@@ -58,21 +58,21 @@
  * - - - - - - - - - - - - - 1 1 0 SEZ skip if either result is zero
  * - - - - - - - - - - - - - 1 1 1 SBN skip if both results are non-zero
  */
-#define	IR_ARITH(ir)	A2_GET16(ir,16, 0, 0)
-#define	IR_SrcAC(ir)	A2_GET16(ir,16, 1, 2)
-#define	IR_DstAC(ir)	A2_GET16(ir,16, 3, 4)
-#define	IR_AFunc(ir)	A2_GET16(ir,16, 5, 7)
-#define	IR_SH(ir)		A2_GET16(ir,16, 8, 9)
-#define	IR_CY(ir)		A2_GET16(ir,16,10,11)
-#define	IR_NL(ir)		A2_GET16(ir,16,12,12)
-#define	IR_SK(ir)		A2_GET16(ir,16,13,15)
+#define	IR_ARITH(ir)	X_RDBITS(ir,16, 0, 0)
+#define	IR_SrcAC(ir)	X_RDBITS(ir,16, 1, 2)
+#define	IR_DstAC(ir)	X_RDBITS(ir,16, 3, 4)
+#define	IR_AFunc(ir)	X_RDBITS(ir,16, 5, 7)
+#define	IR_SH(ir)		X_RDBITS(ir,16, 8, 9)
+#define	IR_CY(ir)		X_RDBITS(ir,16,10,11)
+#define	IR_NL(ir)		X_RDBITS(ir,16,12,12)
+#define	IR_SK(ir)		X_RDBITS(ir,16,13,15)
 
-#define	IR_MFunc(ir)	A2_GET16(ir,16, 1, 2)
-#define	IR_JFunc(ir)	A2_GET16(ir,16, 3, 4)
-#define	IR_I(ir)		A2_GET16(ir,16, 5, 5)
-#define	IR_X(ir)		A2_GET16(ir,16, 6, 7)
-#define	IR_DISP(ir)		A2_GET16(ir,16, 8,15)
-#define	IR_AUGFUNC(ir)	A2_GET16(ir,16, 3, 7)
+#define	IR_MFunc(ir)	X_RDBITS(ir,16, 1, 2)
+#define	IR_JFunc(ir)	X_RDBITS(ir,16, 3, 4)
+#define	IR_I(ir)		X_RDBITS(ir,16, 5, 5)
+#define	IR_X(ir)		X_RDBITS(ir,16, 6, 7)
+#define	IR_DISP(ir)		X_RDBITS(ir,16, 8,15)
+#define	IR_AUGFUNC(ir)	X_RDBITS(ir,16, 3, 7)
 
 #define	op_MFUNC_MASK	0060000		//!< instruction register memory function mask
 #define	op_MFUNC_JUMP	0000000		//!< jump functions value
@@ -287,10 +287,8 @@ void alto2_cpu_device::f1_early_emu_block()
 		"%s-%04o: r:%02o af:%02o bs:%02o f1:%02o f2:%02o" \
 		" t:%o l:%o next:%05o next2:%05o cycle:%lld\n",
 		task_name(m_task), m_mpc,
-		m_rsel, MIR_ALUF, MIR_BS,
-		MIR_F1, MIR_F2,
-		MIR_T, MIR_L,
-		MIR_NEXT, m_next2,
+		m_rsel, m_daluf, m_dbs, m_df1, mdf2,
+		m_dloadt, m_dloatl, m_next, m_next2,
 		ntime() / CPU_MICROCYCLE_TIME);
 #else
 	/* just ignore (?) */
@@ -312,7 +310,7 @@ void alto2_cpu_device::f1_late_emu_load_rmr()
 void alto2_cpu_device::f1_late_emu_load_esrb()
 {
 	LOG((LOG_EMU,2,"	ESRB←; BUS[12-14] (%#o)\n", m_bus));
-	m_s_reg_bank[m_task] = A2_GET16(m_bus,16,12,14);
+	m_s_reg_bank[m_task] = X_RDBITS(m_bus,16,12,14);
 }
 
 /**
@@ -359,7 +357,7 @@ void alto2_cpu_device::f1_early_startf()
 {
 	LOG((LOG_EMU,2,"	STARTF (BUS is %06o)\n", m_bus));
 	/* TODO: what do we do here? reset the CPU on bit 0? */
-	if (A2_BIT32(m_bus,16,0)) {
+	if (X_BIT(m_bus,16,0)) {
 		LOG((LOG_EMU,2,"****	Software boot feature\n"));
 		soft_reset();
 	} else {
@@ -377,32 +375,31 @@ void alto2_cpu_device::f2_late_busodd()
 	m_next2 |= r;
 }
 
-#if	1
 /**
- * @brief f2_magic late: shift and use T
+ * @brief f2_magic late: shift and use T[0] or T[15]
  */
 void alto2_cpu_device::f2_late_magic()
 {
 	int XC;
-	switch (MIR_F1(m_mir)) {
+	switch (m_d_f1) {
 	case f1_l_lsh_1:	// ←L MLSH 1
 		XC = (m_t >> 15) & 1;
-		m_shifter = (m_l << 1) & 0177777;
-		m_shifter |= XC;
+		m_shifter = (m_l << 1) | XC;
 		LOG((LOG_EMU,2,"	←L MLSH 1 (shifer:%06o XC:%o)", m_shifter, XC));
 		break;
 	case f1_l_rsh_1:	// ←L MRSH 1
-		XC = m_t & 1;
-		m_shifter = m_l >> 1;
-		m_shifter |= XC << 15;
+		XC = (m_t & 1) << 15;
+		m_shifter = (m_l >> 1) | XC;
 		LOG((LOG_EMU,2,"	←L MRSH 1 (shifter:%06o XC:%o)", m_shifter, XC));
 		break;
 	case f1_l_lcy_8:	// ←L LCY 8
+		m_shifter = (m_l >> 8) | (m_l << 8);
+		break;
 	default:			// other
+		m_shifter = m_l;
 		break;
 	}
 }
-#endif
 
 /**
  * @brief dns early: modify RESELECT with DstAC = (3 - IR[3-4])
@@ -410,10 +407,10 @@ void alto2_cpu_device::f2_late_magic()
 void alto2_cpu_device::f2_early_load_dns()
 {
 #if	USE_SCHEMATICS_RSEL
-	A2_PUT8(m_rsel, 5, 3, 3, RA3(f2_emu_load_dns, m_emu.ir, m_rsel));
-	A2_PUT8(m_rsel, 5, 4, 4, RA4(f2_emu_load_dns, m_emu.ir, m_rsel));
+	X_WRBITS(m_rsel, 5, 3, 3, RA3(f2_emu_load_dns, m_emu.ir, m_rsel));
+	X_WRBITS(m_rsel, 5, 4, 4, RA4(f2_emu_load_dns, m_emu.ir, m_rsel));
 #else
-	A2_PUT8(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
+	X_WRBITS(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
 #endif
 	LOG((LOG_EMU,2,"	DNS←; rsel := DstAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
@@ -448,12 +445,12 @@ void alto2_cpu_device::f2_early_load_dns()
  */
 void alto2_cpu_device::f2_late_load_dns()
 {
-	UINT8 IR10 = A2_BIT16(m_emu.ir,16,10);
-	UINT8 IR11 = A2_BIT16(m_emu.ir,16,11);
-	UINT8 IR12 = A2_BIT16(m_emu.ir,16,12);
-	UINT8 IR13 = A2_BIT16(m_emu.ir,16,13);
-	UINT8 IR14 = A2_BIT16(m_emu.ir,16,14);
-	UINT8 IR15 = A2_BIT16(m_emu.ir,16,15);
+	UINT8 IR10 = X_BIT(m_emu.ir,16,10);
+	UINT8 IR11 = X_BIT(m_emu.ir,16,11);
+	UINT8 IR12 = X_BIT(m_emu.ir,16,12);
+	UINT8 IR13 = X_BIT(m_emu.ir,16,13);
+	UINT8 IR14 = X_BIT(m_emu.ir,16,14);
+	UINT8 IR15 = X_BIT(m_emu.ir,16,15);
 	UINT8 exorB = IR11 ^ IR10;
 	UINT8 CARRY = m_emu.cy ^ 1;
 	UINT8 ORA = (exorB | CARRY) ^ 1;
@@ -465,7 +462,7 @@ void alto2_cpu_device::f2_late_load_dns()
 	UINT8 DSKIP;
 	UINT8 SHZERO;
 
-	switch (MIR_F1(m_mir)) {
+	switch (m_d_f1) {
 	case f1_l_rsh_1:	// ←L RSH 1
 		NEWCARRY = m_l & 1;
 		m_shifter = ((m_l >> 1) | (XC << 15)) & 0177777;
@@ -477,8 +474,13 @@ void alto2_cpu_device::f2_late_load_dns()
 		LOG((LOG_EMU,2,"	DNS; ←L LSH 1 (shifter:%06o XC:%o NEWCARRY:%o)", m_shifter, XC, NEWCARRY));
 		break;
 	case f1_l_lcy_8:	// ←L LCY 8
-	default:		/* other */
 		NEWCARRY = XC;
+		m_shifter = (m_l >> 8) | (m_l << 8);
+		LOG((LOG_EMU,2,"	DNS; (shifter:%06o NEWCARRY:%o)", m_shifter, NEWCARRY));
+		break;
+	default:			// other
+		NEWCARRY = XC;
+		m_shifter = m_l;
 		LOG((LOG_EMU,2,"	DNS; (shifter:%06o NEWCARRY:%o)", m_shifter, NEWCARRY));
 		break;
 	}
@@ -504,7 +506,7 @@ void alto2_cpu_device::f2_early_acdest()
 	ALTO2_PUT(m_rsel, 5, 3, 3, RA3(f2_emu_acdest, m_emu.ir, m_rsel));
 	ALTO2_PUT(m_rsel, 5, 4, 4, RA4(f2_emu_acdest, m_emu.ir, m_rsel));
 #else
-	A2_PUT8(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
+	X_WRBITS(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
 #endif
 	LOG((LOG_EMU,2,"	ACDEST←; mux (rsel:%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
@@ -519,10 +521,10 @@ void alto2_cpu_device::bitblt_info()
 
 	LOG((LOG_EMU,3,"	BITBLT AC1:%06o AC2:%06o\n", m_r[rsel_ac1], m_r[rsel_ac2]));
 	LOG((LOG_EMU,3,"		function  : %06o\n", val));
-	LOG((LOG_EMU,3,"			src extRAM: %o\n", A2_BIT16(val,16,10)));
-	LOG((LOG_EMU,3,"			dst extRAM: %o\n", A2_BIT16(val,16,11)));
-	LOG((LOG_EMU,3,"			src type  : %o (%s)\n", A2_GET16(val,16,12,13), type_name[A2_GET16(val,16,12,13)]));
-	LOG((LOG_EMU,3,"			operation : %o (%s)\n", A2_GET16(val,16,14,15), oper_name[A2_GET16(val,16,14,15)]));
+	LOG((LOG_EMU,3,"			src extRAM: %o\n", X_BIT(val,16,10)));
+	LOG((LOG_EMU,3,"			dst extRAM: %o\n", X_BIT(val,16,11)));
+	LOG((LOG_EMU,3,"			src type  : %o (%s)\n", X_RDBITS(val,16,12,13), type_name[X_RDBITS(val,16,12,13)]));
+	LOG((LOG_EMU,3,"			operation : %o (%s)\n", X_RDBITS(val,16,14,15), oper_name[X_RDBITS(val,16,14,15)]));
 	val = debug_read_mem(bbt+1);
 	LOG((LOG_EMU,3,"		unused AC2: %06o (%d)\n", val, val));
 	val = debug_read_mem(bbt+2);
@@ -558,7 +560,7 @@ void alto2_cpu_device::bitblt_info()
  */
 void alto2_cpu_device::f2_late_load_ir()
 {
-	UINT16 r = (A2_BIT16(m_bus,16,0) << 3) | A2_GET16(m_bus,16,5,7);
+	UINT16 r = (X_BIT(m_bus,16,0) << 3) | X_RDBITS(m_bus,16,5,7);
 
 	/* special logging of some opcodes */
 	switch (m_bus) {
@@ -630,7 +632,7 @@ void alto2_cpu_device::f2_late_idisp()
 		r = IR_SH(m_emu.ir) ^ 3;			/* complement of SH */
 		LOG((LOG_EMU,2,"	IDISP←; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
-		int addr = CTL2K_U3(f2_emu_idisp) + A2_GET16(m_emu.ir,16,1,7);
+		int addr = CTL2K_U3(f2_emu_idisp) + X_RDBITS(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
 		LOG((LOG_EMU,2,"	IDISP←; IR (%#o) branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", m_emu.ir, addr, m_next2, r));
@@ -644,10 +646,10 @@ void alto2_cpu_device::f2_late_idisp()
 void alto2_cpu_device::f2_early_acsource()
 {
 #if	USE_SCHEMATICS_RSEL
-	A2_PUT8(m_rsel, 5, 3, 3, RA3(f2_emu_acsource, m_emu.ir, m_rsel));
-	A2_PUT8(m_rsel, 5, 4, 4, RA4(f2_emu_acsource, m_emu.ir, m_rsel));
+	X_WRBITS(m_rsel, 5, 3, 3, RA3(f2_emu_acsource, m_emu.ir, m_rsel));
+	X_WRBITS(m_rsel, 5, 4, 4, RA4(f2_emu_acsource, m_emu.ir, m_rsel));
 #else
-	A2_PUT8(m_rsel, 5, 3, 4, IR_SrcAC(m_emu.ir) ^ 3);
+	X_WRBITS(m_rsel, 5, 3, 4, IR_SrcAC(m_emu.ir) ^ 3);
 #endif
 	LOG((LOG_EMU,2,"	←ACSOURCE; rsel := SrcAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
@@ -664,7 +666,7 @@ void alto2_cpu_device::f2_late_acsource()
 		r = IR_SH(m_emu.ir) ^ 3;			/* complement of SH */
 		LOG((LOG_EMU,2,"	←ACSOURCE; branch on SH^3 (%#o|%#o)\n", m_next2, r));
 	} else {
-		int addr = CTL2K_U3(f2_emu_acsource) + A2_GET16(m_emu.ir,16,1,7);
+		int addr = CTL2K_U3(f2_emu_acsource) + X_RDBITS(m_emu.ir,16,1,7);
 		/* 0???????xxxxxxxx */
 		r = m_ctl2k_u3[addr];
 		LOG((LOG_EMU,2,"	←ACSOURCE; branch on PROM ctl2k_u3[%03o] (%#o|%#o)\n", addr, m_next2, r));
