@@ -185,6 +185,7 @@ private:
 	int m_pal_write_first, m_cmd_write_first;
 	UINT8 m_pal_write, m_cmd_write;
 	UINT8 m_pal_reg[32], m_stat_reg[10], m_cont_reg[48], m_read_ahead;
+	UINT8 m_v9958_sp_mode;
 
 	// memory
 	UINT16 m_address_latch;

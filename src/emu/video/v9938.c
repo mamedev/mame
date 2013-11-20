@@ -327,27 +327,6 @@ UINT32 v99x8_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-/*
-    so lookups for screen 12 will look like:
-
-    int ind;
-
-    ind = (*data & 7) << 11 | (*(data + 1) & 7) << 14 |
-    (*(data + 2) & 7) << 5 | (*(data + 3) & 7) << 8;
-
-    pixel0 = s_pal_indYJK[ind | (*data >> 3) & 31];
-    pixel1 = s_pal_indYJK[ind | (*(data + 1) >> 3) & 31];
-    pixel2 = s_pal_indYJK[ind | (*(data + 2) >> 3) & 31];
-    pixel3 = s_pal_indYJK[ind | (*(data + 3) >> 3) & 31];
-
-    and for screen 11:
-
-    pixel0 = (*data) & 8 ? pal_ind16[(*data) >> 4] : s_pal_indYJK[ind | (*data >> 3) & 30];
-    pixel1 = *(data+1) & 8 ? pal_ind16[*(data+1) >> 4] : s_pal_indYJK[ind | *(data+1) >> 3) & 30];
-    pixel2 = *(data+2) & 8 ? pal_ind16[*(data+2) >> 4] : s_pal_indYJK[ind | *(data+2) >> 3) & 30];
-    pixel3 = *(data+3) & 8 ? pal_ind16[*(data+3) >> 4] : s_pal_indYJK[ind | *(data+3) >> 3) & 30];
-*/
-
 READ8_MEMBER( v99x8_device::read )
 {
 	switch (offset & 3)
@@ -857,6 +836,11 @@ void v99x8_device::register_write (int reg, int data)
 		{
 			LOG(("v9938: Attempting to write %02xh to V9958 R#%d\n", data, reg));
 			data = 0;
+		}
+		else
+		{
+			if(reg == 25)
+				m_v9958_sp_mode = data & 0x18;
 		}
 		break;
 
@@ -1436,7 +1420,95 @@ void v99x8_device::mode_graphic7(const pen_t *pens, _PixelType *ln, int line)
 		xx = m_offset_x * 2;
 	while (xx--) *ln++ = pen_bg;
 
-	if (m_cont_reg[2] & 0x40)
+	if ((m_v9958_sp_mode & 0x18) == 0x08) // v9958 screen 12, puzzle star title screen
+	{
+		for (x=0;x<64;x++)
+		{
+			int colour[4];
+ 		   	int ind;
+
+			colour[0] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+			nametbl_addr++;
+			colour[1] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+			nametbl_addr++;
+			colour[2] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+			nametbl_addr++;
+			colour[3] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+
+ 		  	ind = (colour[0] & 7) << 11 | (colour[1] & 7) << 14 |
+		    (colour[2] & 7) << 5 | (colour[3] & 7) << 8;
+
+			*ln++ = s_pal_indYJK[ind | ((colour[0] >> 3) & 31)];
+			if (_Width > 512)
+				*ln++ = s_pal_indYJK[ind | ((colour[0] >> 3) & 31)];
+
+			*ln++ = s_pal_indYJK[ind | ((colour[1] >> 3) & 31)];
+
+			if (_Width > 512)
+				*ln++ = s_pal_indYJK[ind | ((colour[1] >> 3) & 31)];
+
+			*ln++ = s_pal_indYJK[ind | ((colour[2] >> 3) & 31)];
+
+			if (_Width > 512)
+				*ln++ = s_pal_indYJK[ind | ((colour[2] >> 3) & 31)];
+
+			*ln++ = s_pal_indYJK[ind | ((colour[3] >> 3) & 31)];
+
+			if (_Width > 512)
+				*ln++ = s_pal_indYJK[ind | ((colour[3] >> 3) & 31)];
+
+			nametbl_addr++;
+		}
+	}
+	else if ((m_v9958_sp_mode & 0x18) == 0x18) // v9958 screen 10/11, puzzle star & sexy boom gameplay
+	{
+		for (x=0;x<64;x++)
+		{
+			int colour[4];
+ 		   	int ind;
+
+/*
+    pixel0 = (*data) & 8 ? pal_ind16[(*data) >> 4] : s_pal_indYJK[ind | (*data >> 3) & 30];
+    pixel1 = *(data+1) & 8 ? pal_ind16[*(data+1) >> 4] : s_pal_indYJK[ind | *(data+1) >> 3) & 30];
+    pixel2 = *(data+2) & 8 ? pal_ind16[*(data+2) >> 4] : s_pal_indYJK[ind | *(data+2) >> 3) & 30];
+    pixel3 = *(data+3) & 8 ? pal_ind16[*(data+3) >> 4] : s_pal_indYJK[ind | *(data+3) >> 3) & 30];
+
+*/
+
+			colour[0] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+			nametbl_addr++;
+			colour[1] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+			nametbl_addr++;
+			colour[2] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+			nametbl_addr++;
+			colour[3] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
+
+ 		  	ind = (colour[0] & 7) << 11 | (colour[1] & 7) << 14 |
+		    (colour[2] & 7) << 5 | (colour[3] & 7) << 8;
+
+			*ln++ = colour[0] & 8 ? m_pal_ind16[colour[0] >> 4] : s_pal_indYJK[ind | ((colour[0] >> 3) & 30)];
+			if (_Width > 512)
+				*ln++ = colour[0] & 8 ? m_pal_ind16[colour[0] >> 4] : s_pal_indYJK[ind | ((colour[0] >> 3) & 30)];
+
+			*ln++ = colour[1] & 8 ? m_pal_ind16[colour[1] >> 4] : s_pal_indYJK[ind | ((colour[1] >> 3) & 30)];
+
+			if (_Width > 512)
+				*ln++ = colour[1] & 8 ? m_pal_ind16[colour[1] >> 4] : s_pal_indYJK[ind | ((colour[1] >> 3) & 30)];
+
+			*ln++ = colour[2] & 8 ? m_pal_ind16[colour[2] >> 4] : s_pal_indYJK[ind | ((colour[2] >> 3) & 30)];
+
+			if (_Width > 512)
+				*ln++ = colour[2] & 8 ? m_pal_ind16[colour[2] >> 4] : s_pal_indYJK[ind | ((colour[2] >> 3) & 30)];
+
+			*ln++ = colour[3] & 8 ? m_pal_ind16[colour[3] >> 4] : s_pal_indYJK[ind | ((colour[3] >> 3) & 30)];
+
+			if (_Width > 512)
+				*ln++ = colour[3] & 8 ? m_pal_ind16[colour[3] >> 4] : s_pal_indYJK[ind | ((colour[3] >> 3) & 30)];
+
+			nametbl_addr++;
+		}
+	}
+	else if (m_cont_reg[2] & 0x40)
 	{
 		for (x=0;x<32;x++)
 		{

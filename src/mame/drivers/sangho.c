@@ -37,8 +37,8 @@ is a YM2413 compatible chip.
 Sexy Boom's DSW setting verified via Z80 code by stephh
 
 TODO:
-- both games almost likely uses unemulated V9958 YJK mode(s)
-  http://www.msx-plaza.eu/home.php?page=mccm/mccm72/schermen_eng
+- sexyboom hangs at snippet 0x2ca0-0x2ca9, patching 0x2ca7 branch makes it to be fully playable;
+- v9958 screen modes 10/11/12 aren't 100% perfect (wrong pixels in some places);
 
 */
 
@@ -523,5 +523,5 @@ DRIVER_INIT_MEMBER(sangho_state,sangho)
 	m_ram = auto_alloc_array(machine(), UINT8, 0x20000);
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
-GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho_state, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
+GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho_state, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
