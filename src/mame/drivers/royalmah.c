@@ -127,7 +127,6 @@ public:
 	UINT8 m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(royalmah_palbank_w);
-	DECLARE_WRITE8_MEMBER(jansou_palbank_w);
 	DECLARE_WRITE8_MEMBER(mjderngr_coin_w);
 	DECLARE_WRITE8_MEMBER(mjderngr_palbank_w);
 	DECLARE_WRITE8_MEMBER(royalmah_rom_w);
@@ -777,13 +776,6 @@ WRITE8_MEMBER(royalmah_state::jansou_sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(royalmah_state::jansou_palbank_w)
-{
-	m_flip_screen = ((data & 4) >> 2) ^ 1;
-	coin_counter_w(machine(), 0,data & 2);  // in
-	coin_counter_w(machine(), 1,data & 1);  // out
-}
-
 static ADDRESS_MAP_START( jansou_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 
@@ -801,13 +793,6 @@ static ADDRESS_MAP_START( jansou_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( jansou_iomap, AS_IO, 8, royalmah_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(jansou_palbank_w)
-	AM_IMPORT_FROM( royalmah_iomap )
-ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( jansou_sub_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0xffff ) AM_ROM AM_WRITENOP // tries to write to the stack at irq generation
@@ -3282,7 +3267,7 @@ static MACHINE_CONFIG_DERIVED( jansou, royalmah )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jansou_map)
-	MCFG_CPU_IO_MAP(jansou_iomap)
+	MCFG_CPU_IO_MAP(royalmah_iomap)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(jansou_sub_map)
@@ -4802,8 +4787,8 @@ GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, driver_device, 0,        RO
 GAME( 1981,  janputer, 0,        royalmah, royalmah, driver_device, 0,        ROT0,   "bootleg (Public Software Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Janputer)", 0 ) // the original Janputer (Sanritsu) is not yet dumped
 GAME( 1984,  janoh,    0,        royalmah, royalmah, driver_device, 0,        ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        GAME_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoh,    royalmah, driver_device, 0,        ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        GAME_NOT_WORKING ) // this one is complete?
-GAME( 1985,  jansou,   0,        jansou,   jansou, driver_device,   0,        ROT180, "Dyna",                       "Jansou (set 1)",                        GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1985,  jansoua,  jansou,   jansou,   jansou, driver_device,   0,        ROT180, "Dyna",                       "Jansou (set 2)",                        0 )
+GAME( 1985,  jansou,   0,        jansou,   jansou, driver_device,   0,        ROT0,   "Dyna",                       "Jansou (set 1)",                        GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1985,  jansoua,  jansou,   jansou,   jansou, driver_device,   0,        ROT0,   "Dyna",                       "Jansou (set 2)",                        0 )
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, driver_device, 0,        ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu, royalmah_state,  ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume, driver_device,   0,        ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
