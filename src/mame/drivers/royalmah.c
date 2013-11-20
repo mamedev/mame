@@ -283,7 +283,7 @@ WRITE8_MEMBER(royalmah_state::mjderngr_coin_w)
 	/* bit 1 = coin counter */
 	coin_counter_w(machine(), 0,data & 2);
 
-	/* bit 2 always set? */
+	/* bit 2 = flip screen */
 	m_flip_screen = (data & 4) >> 2;
 }
 
