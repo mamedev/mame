@@ -158,7 +158,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_disp_a38(0),
 	m_disp_a63(0),
 	m_disp_a66(0),
-	m_bitmap(0),
 	m_mem(),
 	m_emu(),
 	m_ether_a41(0),
@@ -247,15 +246,6 @@ void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
 void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
 {
 	m_drive[unit] = ptr;
-}
-
-//-------------------------------------------------
-// driver interface to get the internal bitmap
-//-------------------------------------------------
-
-bitmap_ind16*alto2_cpu_device::bitmap()
-{
-	return m_bitmap;
 }
 
 //-------------------------------------------------

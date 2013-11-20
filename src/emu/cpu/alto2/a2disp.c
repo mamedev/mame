@@ -147,29 +147,28 @@ static const UINT16 double_bits[256] = {
 	0xffc0,0xffc3,0xffcc,0xffcf,0xfff0,0xfff3,0xfffc,0xffff
 };
 
-#define	BLACK	1
-#define	WHITE	0
-
-//! update the internal bitmap to the MAME bitmap.pix16
+//! update the internal bitmap to a byte array
 void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 {
-	UINT16* pix = &m_bitmap->pix16(y) + x;
-	*pix++ = (word & 0100000) ? BLACK : WHITE;
-	*pix++ = (word & 0040000) ? BLACK : WHITE;
-	*pix++ = (word & 0020000) ? BLACK : WHITE;
-	*pix++ = (word & 0010000) ? BLACK : WHITE;
-	*pix++ = (word & 0004000) ? BLACK : WHITE;
-	*pix++ = (word & 0002000) ? BLACK : WHITE;
-	*pix++ = (word & 0001000) ? BLACK : WHITE;
-	*pix++ = (word & 0000400) ? BLACK : WHITE;
-	*pix++ = (word & 0000200) ? BLACK : WHITE;
-	*pix++ = (word & 0000100) ? BLACK : WHITE;
-	*pix++ = (word & 0000040) ? BLACK : WHITE;
-	*pix++ = (word & 0000020) ? BLACK : WHITE;
-	*pix++ = (word & 0000010) ? BLACK : WHITE;
-	*pix++ = (word & 0000004) ? BLACK : WHITE;
-	*pix++ = (word & 0000002) ? BLACK : WHITE;
-	*pix++ = (word & 0000001) ? BLACK : WHITE;
+	const UINT8 white = 0;
+	const UINT8 black = 1;
+	UINT8* pix = m_dsp.scanline[y] + x;
+	*pix++ = (word & 0100000) ? black : white;
+	*pix++ = (word & 0040000) ? black : white;
+	*pix++ = (word & 0020000) ? black : white;
+	*pix++ = (word & 0010000) ? black : white;
+	*pix++ = (word & 0004000) ? black : white;
+	*pix++ = (word & 0002000) ? black : white;
+	*pix++ = (word & 0001000) ? black : white;
+	*pix++ = (word & 0000400) ? black : white;
+	*pix++ = (word & 0000200) ? black : white;
+	*pix++ = (word & 0000100) ? black : white;
+	*pix++ = (word & 0000040) ? black : white;
+	*pix++ = (word & 0000020) ? black : white;
+	*pix++ = (word & 0000010) ? black : white;
+	*pix++ = (word & 0000004) ? black : white;
+	*pix++ = (word & 0000002) ? black : white;
+	*pix++ = (word & 0000001) ? black : white;
 }
 
 #define	HLC1	((m_dsp.hlc >>  0) & 1)		//!< horizontal line counter bit 0
@@ -214,7 +213,7 @@ void alto2_cpu_device::unload_word()
 {
 	int x = m_unload_word;
 	int y = ((m_dsp.hlc - m_dsp.vblank) & ~(1024|1)) | HLC1024;
-	UINT16* scanline = m_dsp.scanline[y];
+	UINT16* scanline = m_dsp.raw_bitmap  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
 
 	UINT32 word = m_dsp.inverse;
 	if (FIFO_MBEMPTY_0() == 0) {
@@ -444,25 +443,44 @@ void alto2_cpu_device::f2_late_evenfield()
  * @brief initialize the display context to useful values
  *
  * Zap the display context to all 0s.
- * Allocate a raw_bitmap array to save blitting to the screen when
+ * Allocate a bitmap array to save blitting to the screen when
  * there is no change in the data words.
  */
 void alto2_cpu_device::init_disp()
 {
 	memset(&m_dsp, 0, sizeof(m_dsp));
-	// allocate the 16bpp bitmap
-	m_bitmap = auto_bitmap_ind16_alloc(machine(), ALTO2_DISPLAY_TOTAL_WIDTH, ALTO2_DISPLAY_TOTAL_HEIGHT);
-	LOG((LOG_DISPL,0,"	m_bitmap=%p\n", m_bitmap));
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
-	m_dsp.raw_bitmap = auto_alloc_array(machine(), UINT16, ALTO2_DISPLAY_TOTAL_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
-	m_dsp.scanline = auto_alloc_array(machine(), UINT16*, ALTO2_DISPLAY_TOTAL_HEIGHT);
-	for (int y = 0; y < ALTO2_DISPLAY_TOTAL_HEIGHT; y++) {
-		UINT16* scanline = m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS;
-		m_dsp.scanline[y] = scanline;
-	}
+
+	m_dsp.raw_bitmap = auto_alloc_array(machine(), UINT16, ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	m_dsp.scanline = auto_alloc_array(machine(), UINT8*, ALTO2_DISPLAY_HEIGHT);
+	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
+		m_dsp.scanline[y] = auto_alloc_array(machine(), UINT8, ALTO2_DISPLAY_TOTAL_WIDTH);
+
+	m_dsp.bitmap = auto_bitmap_ind16_alloc(machine(), ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT);
 }
 
 void alto2_cpu_device::exit_disp()
 {
 	// nothing to do yet
+}
+
+/* Video update */
+UINT32 alto2_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	pen_t palette_bw[2];
+	palette_bw[0] = get_white_pen(machine());
+	palette_bw[1] = get_black_pen(machine());
+	// copy even or odd field
+	for (int y = m_dsp.odd_frame ? 0 : 1; y < ALTO2_DISPLAY_HEIGHT; y += 2)
+		draw_scanline8(*m_dsp.bitmap, 0, y, ALTO2_DISPLAY_WIDTH, m_dsp.scanline[y], palette_bw);
+
+	// copy bitmap
+	copybitmap(bitmap, *m_dsp.bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+
+void alto2_cpu_device::screen_eof(screen_device &screen, bool state)
+{
+	if (state)
+		m_dsp.odd_frame = !m_dsp.odd_frame;
 }

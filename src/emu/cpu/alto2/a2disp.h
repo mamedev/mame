@@ -81,7 +81,7 @@
 #define	ALTO2_DISPLAY_SCANLINE_TIME	ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_TOTAL_WIDTH)//!< time for a scanline in pico seconds (768 * 49.6031ns ~= 38095.1808ns)
 #define	ALTO2_DISPLAY_VISIBLE_TIME ALTO2_DISPLAY_BITTIME(ALTO2_DISPLAY_WIDTH)		//!< time of the visible part of a scanline in pico seconds (606 * 49.6031ns ~= 30059.4786ns)
 #define	ALTO2_DISPLAY_WORD_TIME	ALTO2_DISPLAY_BITTIME(16)							//!< time for a word in pico seconds (16 pixels * 49.6031ns ~= 793.6496ns)
-#define	ALTO2_DISPLAY_VBLANK_TIME ((ALTO2_DISPLAY_TOTAL_HEIGHT-ALTO2_DISPLAY_HEIGHT)*HZ_TO_ATTOSECONDS(26250))
+#define	ALTO2_DISPLAY_VBLANK_TIME ((ALTO2_DISPLAY_TOTAL_HEIGHT-ALTO2_DISPLAY_HEIGHT)*HZ_TO_ATTOSECONDS(26250)/2)
 
 #else   // ALTO2_DEFINE_CONSTANTS
 /**
@@ -194,7 +194,9 @@ struct {
 	UINT32 curword;						//!< helper: first cursor word in current scanline
 	UINT32 curdata;						//!< helper: shifted cursor data (32-bit)
 	UINT16 *raw_bitmap;					//!< array of words of the raw bitmap that is displayed
-	UINT16 **scanline;					//!< array of pointers to the scanlines
+	UINT8 **scanline;					//!< array of scanlines with 1 byte per pixel
+	bitmap_ind16 *bitmap;				//!< MAME bitmap with 16 bit indices
+	bool odd_frame;						//!< true, if odd frame is drawn
 }	m_dsp;
 
 /**
@@ -303,8 +305,6 @@ static inline bool A66_VBLANK_HI(UINT8 a, int hlc1024) { return a & (hlc1024 ? A
 //! test the VBLANK (vertical blanking) signal in PROM a66 being low
 static inline bool A66_VBLANK_LO(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? true : false; }
 
-bitmap_ind16* m_bitmap;				//!< screen bitmap
-
 void update_bitmap_word(int x, int y, UINT16 word);	//!< update a word in the screen bitmap
 void unload_word();					//!< unload the next word from the display FIFO and shift it to the screen
 void display_state_machine();		//!< function called by the CPU to enter the next display state
@@ -313,5 +313,6 @@ void f2_late_evenfield(void);		//!< branch on the evenfield flip-flop
 
 void init_disp();					//!< initialize the display context
 void exit_disp();					//!< deinitialize the display context
+
 #endif	// _A2DISP_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

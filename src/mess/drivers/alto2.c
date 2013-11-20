@@ -8,17 +8,6 @@
 
 #include "includes/alto2.h"
 
-/* Video */
-
-UINT32 alto2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
-	bitmap_ind16* source = cpu->bitmap();
-	if (source && source->valid())
-		copybitmap(bitmap, *source, 0, 0, 0, 0, cliprect);
-	return 0;
-}
-
 /* Input Ports */
 
 static INPUT_PORTS_START( alto2 )
@@ -123,7 +112,7 @@ static INPUT_PORTS_START( alto2 )
 	PORT_START("mousey")	// Mouse - Y AXIS
 	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
 
-PORT_START("CONFIG")    /* Memory switch on AIM board */
+	PORT_START("CONFIG")    /* Memory switch on AIM board */
 	PORT_CONFNAME( 1<<9, 1<<9, "Memory switch")
 	PORT_CONFSETTING( 0,    "on")
 	PORT_CONFSETTING( 1<<9, "off")
@@ -175,7 +164,10 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz,
 						   ALTO2_DISPLAY_TOTAL_WIDTH,   0, ALTO2_DISPLAY_WIDTH,
 						   ALTO2_DISPLAY_TOTAL_HEIGHT,  0, ALTO2_DISPLAY_HEIGHT)
-	MCFG_SCREEN_UPDATE_DRIVER(alto2_state, screen_update)
+	MCFG_SCREEN_REFRESH_RATE(60)	// two interlaced fields
+	MCFG_SCREEN_VBLANK_TIME(ALTO2_DISPLAY_VBLANK_TIME)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)
+	MCFG_SCREEN_VBLANK_DEVICE("maincpu", alto2_cpu_device, screen_eof)
 
 	MCFG_PALETTE_LENGTH(2)
 

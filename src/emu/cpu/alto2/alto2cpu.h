@@ -164,8 +164,11 @@ public:
 	//! call in for the next sector callback
 	void next_sector(int unit);
 
-	//! return the display bitmap
-	bitmap_ind16* bitmap();
+	//! update the screen bitmap
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	//! screen VBLANK handler
+	void screen_eof(screen_device &screen, bool state);
 
 	DECLARE_ADDRESS_MAP( ucode_map, 32 );
 	DECLARE_ADDRESS_MAP( const_map, 16 );
