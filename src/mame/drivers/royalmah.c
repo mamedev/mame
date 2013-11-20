@@ -4790,7 +4790,7 @@ GAME( 1984,  janoha,   janoh,    janoh,    royalmah, driver_device, 0,        RO
 GAME( 1985,  jansou,   0,        jansou,   jansou, driver_device,   0,        ROT0,   "Dyna",                       "Jansou (set 1)",                        GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1985,  jansoua,  jansou,   jansou,   jansou, driver_device,   0,        ROT0,   "Dyna",                       "Jansou (set 2)",                        0 )
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, driver_device, 0,        ROT0,   "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
-GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu, royalmah_state,  ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
+GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu, royalmah_state, ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume, driver_device,   0,        ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
 GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, driver_device, 0,        ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                GAME_NOT_WORKING )
 GAME( 1986,  mjsenka,  0,        royalmah, royalmah, driver_device, 0,        ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 GAME_NOT_WORKING )
