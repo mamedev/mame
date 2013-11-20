@@ -43,6 +43,7 @@ public:
 	/* misc */
 	UINT8    m_rom_bank;
 	UINT8    m_mux_data;
+	UINT8    m_flip_screen;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -85,6 +86,7 @@ UINT32 jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind16 
 		for (x = 0; x < 256; x += 4)
 		{
 			int b;
+			int res_x,res_y;
 			UINT8 data1;
 			UINT8 data2;
 			UINT8 data3;
@@ -103,7 +105,9 @@ UINT32 jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind16 
 
 			for (b = 0; b < 4; ++b)
 			{
-				bitmap.pix16(255 - y, 255 - (x + b)) = ((data2 & 0x01)) + ((data2 & 0x10) >> 3) +
+				res_x = m_flip_screen ? 255 - (x + b) : (x + b);
+				res_y = m_flip_screen ? 255 - y : y;
+				bitmap.pix16(res_y, res_x) = ((data2 & 0x01)) + ((data2 & 0x10) >> 3) +
 															((data1 & 0x01) << 2) + ((data1 & 0x10) >> 1) +
 															((data3 & 0x01) << 4) + ((data3 & 0x10) << 1);
 				data1 >>= 1;
@@ -143,10 +147,13 @@ WRITE8_MEMBER(jongkyo_state::mux_w)
 
 WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
 {
+	/* bit 0 = hopper out? */
+
 	/* bit 1 = coin counter */
 	coin_counter_w(machine(), 0, data & 2);
 
 	/* bit 2 always set? */
+	m_flip_screen = (data & 4) >> 2;
 }
 
 READ8_MEMBER(jongkyo_state::input_1p_r)
@@ -244,6 +251,7 @@ static ADDRESS_MAP_START( jongkyo_portmap, AS_IO, 8, jongkyo_state )
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW") AM_WRITE(jongkyo_coin_counter_w)
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0") AM_WRITE(mux_w)
 	// W 11 select keyboard row (fe fd fb f7)
+	AM_RANGE(0x40, 0x40) AM_READNOP // unknown, if (A & 0xf) == 0x0a then a bit 0 write to 0x7520 doesn't occur
 	AM_RANGE(0x40, 0x45) AM_WRITE(bank_select_w)
 	AM_RANGE(0x46, 0x4f) AM_WRITE(unknown_w)
 ADDRESS_MAP_END
@@ -387,7 +395,7 @@ static INPUT_PORTS_START( jongkyo )
 	PORT_DIPNAME( 0x02, 0x00, "Memory Reset" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x00, "Analizer" )
+	PORT_DIPNAME( 0x04, 0x00, "Analyzer" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_SERVICE( 0x08, IP_ACTIVE_HIGH )
@@ -484,6 +492,7 @@ void jongkyo_state::machine_reset()
 {
 	m_rom_bank = 0;
 	m_mux_data = 0;
+	m_flip_screen = 1;
 }
 
 
