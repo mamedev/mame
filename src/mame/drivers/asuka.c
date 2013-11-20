@@ -1486,14 +1486,12 @@ ROM_START( earthjkr )
 	ROM_CONTINUE(         0x10000, 0x0c000 )    /* banked stuff */
 ROM_END
 
-ROM_START( earthjkrp )
+ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just be an early revision, not proto
 	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "3.bin",  0x00001, 0x20000, CRC(26c33225) SHA1(b039c47d0776c90813ab52c867e95989cab2c567) )
 	ROM_LOAD16_BYTE( "4.bin",  0x00000, 0x20000, CRC(e9b1ef0c) SHA1(5e104146d37922a8c7e93696c2c156223653025b) )
 	/* 0x40000 - 0x7ffff is intentionally empty */
 	ROM_LOAD16_WORD( "5.bin", 0x80000, 0x80000, CRC(bf760b2d) SHA1(4aff36623e5a31ab86c77461fa93e40e77f08edd) ) /* Fix ROM */
-
-	// no other roms present in set, but was production PCB with MASK rom
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "ej_chr.rom", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) */
@@ -1506,6 +1504,11 @@ ROM_START( earthjkrp )
 	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "ej_2.rom", 0x00000, 0x04000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) )
 	ROM_CONTINUE(         0x10000, 0x0c000 )    /* banked stuff */
+
+
+	ROM_REGION( 0x144, "pals", 0 )
+	ROM_LOAD( "b68-04.bin", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "b68-05.bin", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
 ROM_START( eto )
