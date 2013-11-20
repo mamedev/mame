@@ -1085,6 +1085,28 @@ const gfx_layout spyhuntpr_sprite_layout =
 };
 
 
+static const UINT32 spyhuntp_charlayout_xoffset[64] =
+{
+		0x0000*8,0x0000*8,   0x0000*8+1,0x0000*8+1,   0x0000*8+2,0x0000*8+2,   0x0000*8+3,0x0000*8+3,   0x0000*8+4,0x0000*8+4,   0x0000*8+5,0x0000*8+5,   0x0000*8+6,0x0000*8+6,   0x0000*8+7,0x0000*8+7,
+		0x1000*8,0x1000*8,   0x1000*8+1,0x1000*8+1,   0x1000*8+2,0x1000*8+2,   0x1000*8+3,0x1000*8+3,   0x1000*8+4,0x1000*8+4,   0x1000*8+5,0x1000*8+5,   0x1000*8+6,0x1000*8+6,   0x1000*8+7,0x1000*8+7,
+		0x2000*8,0x2000*8,   0x2000*8+1,0x2000*8+1,   0x2000*8+2,0x2000*8+2,   0x2000*8+3,0x2000*8+3,   0x2000*8+4,0x2000*8+4,   0x2000*8+5,0x2000*8+5,   0x2000*8+6,0x2000*8+6,   0x2000*8+7,0x2000*8+7,
+		0x3000*8,0x3000*8,   0x3000*8+1,0x3000*8+1,   0x3000*8+2,0x3000*8+2,   0x3000*8+3,0x3000*8+3,   0x3000*8+4,0x3000*8+4,   0x3000*8+5,0x3000*8+5,   0x3000*8+6,0x3000*8+6,   0x3000*8+7,0x3000*8+7,
+};
+
+
+static const gfx_layout spyhuntpr_charlayout =
+{
+	64,32,
+	RGN_FRAC(1,8),
+	4,
+	{ 0, 2*8, 0x4000*8 + 0, 0x4000*8 + 2*8},
+	EXTENDED_XOFFS,
+	{ 0*8,0*8,  4*8,4*8,  8*8,8*8,  12*8,12*8,    16*8,16*8,  20*8,20*8,  24*8,24*8,  28*8,28*8,     1*8,1*8,  5*8,5*8,  9*8,9*8,  13*8,13*8,     17*8,17*8,  21*8,21*8,  25*8,25*8,  29*8,29*8    },
+	32*8,
+	spyhuntp_charlayout_xoffset,
+	NULL
+};
+
 static GFXDECODE_START( mcr3 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )
@@ -1098,7 +1120,7 @@ static GFXDECODE_START( spyhunt )
 GFXDECODE_END
 
 static GFXDECODE_START( spyhuntpr )
-	GFXDECODE_ENTRY( "gfx1", 0, spyhunt_charlayout,  3*16, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, spyhuntpr_charlayout,  3*16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spyhuntpr_sprite_layout,   0*16, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhuntpr_alphalayout, 4*16, 1 )
 GFXDECODE_END
@@ -1493,10 +1515,70 @@ ROM_START( spyhuntpr )
 
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "6.bin",   0x00000, 0x2000, CRC(6b76f46a) SHA1(4b398084c42a60fcfa4a9bf14f844e36a3f42723) )
-	ROM_LOAD( "7.bin",   0x02000, 0x2000, CRC(085bd7a7) SHA1(c35c309b6c6485baec54d4434dea44abf4d48f41) )
-	ROM_LOAD( "8.bin",   0x04000, 0x2000, CRC(e699b329) SHA1(cb4b8c7b6fa1cb1144a18f1442dc3b267c408914) )
-	ROM_LOAD( "9.bin",   0x06000, 0x2000, CRC(6d462ec7) SHA1(0ff37f75b0eeceb86177a3f7c93834d5c0e24515) )
+	ROM_LOAD32_BYTE( "6.bin",   0x0000, 0x200, CRC(6b76f46a) SHA1(4b398084c42a60fcfa4a9bf14f844e36a3f42723) )
+	ROM_CONTINUE(0x0001, 0x200)
+	ROM_CONTINUE(0x0800, 0x200)
+	ROM_CONTINUE(0x0801, 0x200)
+	ROM_CONTINUE(0x1000, 0x200)
+	ROM_CONTINUE(0x1001, 0x200)
+	ROM_CONTINUE(0x1800, 0x200)
+	ROM_CONTINUE(0x1801, 0x200)
+	ROM_CONTINUE(0x2000, 0x200)
+	ROM_CONTINUE(0x2001, 0x200)
+	ROM_CONTINUE(0x2800, 0x200)
+	ROM_CONTINUE(0x2801, 0x200)
+	ROM_CONTINUE(0x3000, 0x200)
+	ROM_CONTINUE(0x3001, 0x200)
+	ROM_CONTINUE(0x3800, 0x200)
+	ROM_CONTINUE(0x3801, 0x200)
+	ROM_LOAD32_BYTE( "7.bin",   0x0002, 0x200, CRC(085bd7a7) SHA1(c35c309b6c6485baec54d4434dea44abf4d48f41) )
+	ROM_CONTINUE(0x0003, 0x200)
+	ROM_CONTINUE(0x0802, 0x200)
+	ROM_CONTINUE(0x0803, 0x200)
+	ROM_CONTINUE(0x1002, 0x200)
+	ROM_CONTINUE(0x1003, 0x200)
+	ROM_CONTINUE(0x1802, 0x200)
+	ROM_CONTINUE(0x1803, 0x200)
+	ROM_CONTINUE(0x2002, 0x200)
+	ROM_CONTINUE(0x2003, 0x200)
+	ROM_CONTINUE(0x2802, 0x200)
+	ROM_CONTINUE(0x2803, 0x200)
+	ROM_CONTINUE(0x3002, 0x200)
+	ROM_CONTINUE(0x3003, 0x200)
+	ROM_CONTINUE(0x3802, 0x200)
+	ROM_CONTINUE(0x3803, 0x200)	
+	ROM_LOAD32_BYTE( "8.bin",   0x4000, 0x200, CRC(e699b329) SHA1(cb4b8c7b6fa1cb1144a18f1442dc3b267c408914) )
+	ROM_CONTINUE(0x4001, 0x200)
+	ROM_CONTINUE(0x4800, 0x200)
+	ROM_CONTINUE(0x4801, 0x200)
+	ROM_CONTINUE(0x5000, 0x200)
+	ROM_CONTINUE(0x5001, 0x200)
+	ROM_CONTINUE(0x5800, 0x200)
+	ROM_CONTINUE(0x5801, 0x200)
+	ROM_CONTINUE(0x6000, 0x200)
+	ROM_CONTINUE(0x6001, 0x200)
+	ROM_CONTINUE(0x6800, 0x200)
+	ROM_CONTINUE(0x6801, 0x200)
+	ROM_CONTINUE(0x7000, 0x200)
+	ROM_CONTINUE(0x7001, 0x200)
+	ROM_CONTINUE(0x7800, 0x200)
+	ROM_CONTINUE(0x7801, 0x200)
+	ROM_LOAD32_BYTE( "9.bin",   0x4002, 0x200, CRC(6d462ec7) SHA1(0ff37f75b0eeceb86177a3f7c93834d5c0e24515) )
+	ROM_CONTINUE(0x4003, 0x200)
+	ROM_CONTINUE(0x4802, 0x200)
+	ROM_CONTINUE(0x4803, 0x200)
+	ROM_CONTINUE(0x5002, 0x200)
+	ROM_CONTINUE(0x5003, 0x200)
+	ROM_CONTINUE(0x5802, 0x200)
+	ROM_CONTINUE(0x5803, 0x200)
+	ROM_CONTINUE(0x6002, 0x200)
+	ROM_CONTINUE(0x6003, 0x200)
+	ROM_CONTINUE(0x6802, 0x200)
+	ROM_CONTINUE(0x6803, 0x200)
+	ROM_CONTINUE(0x7002, 0x200)
+	ROM_CONTINUE(0x7003, 0x200)
+	ROM_CONTINUE(0x7802, 0x200)
+	ROM_CONTINUE(0x7803, 0x200)	
 
 	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "10.bin",   0x00000, 0x4000, CRC(6f9fd416) SHA1(a51c86e5b22c91fc44673f53400b58af40b18065) )
@@ -1725,6 +1807,6 @@ GAME( 1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, stargrds, ROT0,
 /* MCR scrolling games */
 GAMEL(1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", GAME_SUPPORTS_SAVE, layout_spyhunt )
 GAMEL(1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", GAME_SUPPORTS_SAVE, layout_spyhunt )
-GAME (1983, spyhuntpr, spyhunt,  spyhuntpr,  spyhunt,  mcr3_state,  spyhuntpr,  ROT90, "Bally Midway", "Spy Hunter (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME (1983, spyhuntpr, spyhunt,  spyhuntpr,  spyhunt,  mcr3_state,  spyhuntpr,  ROT0, "Bally Midway", "Spy Hunter (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1984, crater,   0,        mcrscroll, crater,   mcr3_state, crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", GAME_SUPPORTS_SAVE )
 GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", GAME_SUPPORTS_SAVE, layout_turbotag )
