@@ -7,23 +7,30 @@
 
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "formats/tiki100_dsk.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "machine/serial.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 
-#define SCREEN_TAG      "screen"
 #define Z80_TAG         "z80"
 #define Z80DART_TAG     "z80dart"
 #define Z80PIO_TAG      "z80pio"
 #define Z80CTC_TAG      "z80ctc"
 #define FD1797_TAG      "fd1797"
 #define AY8912_TAG      "ay8912"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
+#define CASSETTE_TAG    "cassette"
+#define CENTRONICS_TAG  "centronics"
+#define SCREEN_TAG      "screen"
 
 #define TIKI100_VIDEORAM_SIZE   0x8000
 #define TIKI100_VIDEORAM_MASK   0x7fff
@@ -40,9 +47,13 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_ctc(*this, Z80CTC_TAG),
 			m_fdc(*this, FD1797_TAG),
+			m_pio(*this, Z80PIO_TAG),
+			m_dart(*this, Z80DART_TAG),
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, FD1797_TAG":0"),
 			m_floppy1(*this, FD1797_TAG":1"),
+			m_cassette(*this, CASSETTE_TAG),
+			m_centronics(*this, CENTRONICS_TAG),
 			m_rom(*this, Z80_TAG),
 			m_video_ram(*this, "video_ram"),
 			m_y1(*this, "Y1"),
@@ -62,9 +73,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<fd1797_t> m_fdc;
+	required_device<z80pio_device> m_pio;
+	required_device<z80dart_device> m_dart;
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_device<cassette_image_device> m_cassette;
+	required_device<centronics_device> m_centronics;
 	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_y1;
@@ -81,6 +96,7 @@ public:
 	required_ioport m_y12;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -91,8 +107,13 @@ public:
 	DECLARE_WRITE8_MEMBER( video_mode_w );
 	DECLARE_WRITE8_MEMBER( palette_w );
 	DECLARE_WRITE8_MEMBER( system_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 	DECLARE_WRITE8_MEMBER( video_scroll_w );
+
+	DECLARE_READ8_MEMBER( pio_pb_r );
+	DECLARE_WRITE8_MEMBER( pio_pb_w );
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void bankswitch();
@@ -107,9 +128,10 @@ public:
 	UINT8 m_palette;
 
 	/* keyboard state */
-	ioport_port* m_key_row[12];
 	int m_keylatch;
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+
+	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
+	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
 };
 
 #endif

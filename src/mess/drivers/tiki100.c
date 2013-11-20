@@ -14,6 +14,7 @@
 
     TODO:
 
+	- 3 expansion slots
     - palette RAM should be written during HBLANK
     - DART clocks
     - winchester hard disk
@@ -96,10 +97,25 @@ void tiki100_state::bankswitch()
 
 READ8_MEMBER( tiki100_state::keyboard_r )
 {
-	UINT8 data = m_key_row[m_keylatch]->read();
+	UINT8 data = 0xff;
+
+	switch (m_keylatch)
+	{
+	case 0: data = m_y1->read(); break;
+	case 1: data = m_y2->read(); break;
+	case 2: data = m_y3->read(); break;
+	case 3: data = m_y4->read(); break;
+	case 4: data = m_y5->read(); break;
+	case 5: data = m_y6->read(); break;
+	case 6: data = m_y7->read(); break;
+	case 7: data = m_y8->read(); break;
+	case 8: data = m_y9->read(); break;
+	case 9: data = m_y10->read(); break;
+	case 10: data = m_y11->read(); break;
+	case 11: data = m_y12->read(); break;
+	}
 
 	m_keylatch++;
-
 	if (m_keylatch == 12) m_keylatch = 0;
 
 	return data;
@@ -450,36 +466,90 @@ UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 static Z80DART_INTERFACE( dart_intf )
 {
-	0,
-	0,
-	0,
-	0,
+	0, 0, 0, 0,
+
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
+
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+
 	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
 };
 
 /* Z80-PIO Interface */
 
+READ8_MEMBER( tiki100_state::pio_pb_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       ACK
+	    5       BUSY
+	    6       NO PAPER
+	    7       UNIT SELECT, tape in
+	
+	*/
+
+	UINT8 data = 0;
+
+	// centronics
+	data |= m_centronics->ack_r() << 4;
+	data |= m_centronics->busy_r() << 5;
+	data |= m_centronics->pe_r() << 6;
+
+	// cassette
+	data |= (m_cassette->input() > 0.0) << 7;
+
+	return data;
+}
+
+WRITE8_MEMBER( tiki100_state::pio_pb_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       STRB
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       tape out
+	    7       
+	
+	*/
+
+	// centronics
+	m_centronics->strobe_w(BIT(data, 0));
+
+	// cassette
+	m_cassette->output(BIT(data, 6) ? -1 : 1);
+}
+
 static Z80PIO_INTERFACE( pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* callback when change interrupt status */
-	DEVCB_NULL,                     /* port A read callback */
-	DEVCB_NULL,                     /* port A write callback */
-	DEVCB_NULL,                     /* portA ready active callback */
-	DEVCB_NULL,                     /* port B read callback */
-	DEVCB_NULL,                     /* port B write callback */
-	DEVCB_NULL                      /* portB ready active callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, read),
+	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(tiki100_state, pio_pb_r),
+	DEVCB_DRIVER_MEMBER(tiki100_state, pio_pb_w),
+	DEVCB_NULL
 };
 
 /* Z80-CTC Interface */
@@ -493,16 +563,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(tiki100_state::ctc_tick)
 	m_ctc->trg1(0);
 }
 
-WRITE_LINE_MEMBER( tiki100_state::ctc_z1_w )
+WRITE_LINE_MEMBER( tiki100_state::ctc_z0_w )
 {
+	m_ctc->trg2(state);
+
+	m_dart->rxca_w(state);
+	m_dart->txca_w(state);
+}
+
+WRITE_LINE_MEMBER( tiki100_state::ctc_z2_w )
+{
+	m_ctc->trg3(state);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0), /* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg2), /* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z1_w),      /* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)  /* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z0_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, rxtxcb_w),
+	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z2_w),
 };
 
 /* FD1797 Interface */
@@ -544,6 +623,38 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 	{ NULL }
 };
 
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  cassette_interface cassette_intf
+//-------------------------------------------------
+
+TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
+{
+	m_pio->port_b_write((m_cassette->input() > 0.0) << 7);
+}
+
+static const cassette_interface cassette_intf =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
+	NULL
+};
+
 /* Machine Start */
 
 void tiki100_state::machine_start()
@@ -565,20 +676,6 @@ void tiki100_state::machine_start()
 
 	bankswitch();
 
-	// find keyboard rows
-	m_key_row[0] = m_y1;
-	m_key_row[1] = m_y2;
-	m_key_row[2] = m_y3;
-	m_key_row[3] = m_y4;
-	m_key_row[4] = m_y5;
-	m_key_row[5] = m_y6;
-	m_key_row[6] = m_y7;
-	m_key_row[7] = m_y8;
-	m_key_row[8] = m_y9;
-	m_key_row[9] = m_y10;
-	m_key_row[10] = m_y11;
-	m_key_row[11] = m_y12;
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));
@@ -586,6 +683,13 @@ void tiki100_state::machine_start()
 	save_item(NAME(m_mode));
 	save_item(NAME(m_palette));
 	save_item(NAME(m_keylatch));
+}
+
+void tiki100_state::machine_reset()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	system_w(space, 0, 0);
 }
 
 /* Machine Driver */
@@ -616,6 +720,11 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_8MHz/8) // FD1767PL-02 or FD1797-PL
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525qd", tiki100_state::floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", tiki100_state, tape_tick, attotime::from_hz(44100))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
