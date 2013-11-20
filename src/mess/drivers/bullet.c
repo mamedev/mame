@@ -50,9 +50,10 @@ Notes:
 
     TODO:
 
-    - floppy broken
+    - memory banking is broken
     - z80dart wait/ready
-    - Winchester hard disk
+    - IMI 7710 Winchester controller
+    	chdman createhd -o imi7710.chd -chs 350,3,10 -ss 1024
     - revision E model
 
 */
@@ -201,7 +202,7 @@ WRITE8_MEMBER( bullet_state::exdsk_w )
 
 	*/
 
-	if (BIT(data, 2))
+	if (BIT(data, 3))
 	{
 		m_exdsk_sw = true;
 	}
@@ -297,7 +298,7 @@ WRITE8_MEMBER( bullet_state::hdcon_w )
 	if (m_hdcon_sw)
 	{
 		// FDC clock
-		m_fdc->set_unscaled_clock(BIT(data, 2) ? XTAL_16MHz/8 : XTAL_16MHz/16);
+		m_fdc->set_unscaled_clock(BIT(data, 2) ? XTAL_16MHz/16 : XTAL_16MHz/8);
 
 		// density select
 		m_fdc->dden_w(BIT(data, 3));

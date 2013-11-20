@@ -178,7 +178,7 @@ int z80pio_device::z80daisy_irq_ack()
 		}
 	}
 
-	logerror("z80pio_irq_ack: failed to find an interrupt to ack!\n");
+	//logerror("z80pio_irq_ack: failed to find an interrupt to ack!\n");
 
 	return 0;
 }
@@ -207,7 +207,7 @@ void z80pio_device::z80daisy_irq_reti()
 		}
 	}
 
-	logerror("z80pio_irq_reti: failed to find an interrupt to clear IEO on!\n");
+	//logerror("z80pio_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
 
 
