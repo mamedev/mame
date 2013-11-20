@@ -1061,12 +1061,12 @@ static const gfx_layout spyhunt_alphalayout =
 
 static const gfx_layout spyhuntpr_alphalayout =
 {
-	16,16,
+	16,8,
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 4},
 	{ 0, 0, 1, 1, 2, 2, 3, 3, 8, 8, 9, 9, 10, 10, 11, 11 },
-	{ 0, 0, 2*8, 2*8, 4*8, 4*8, 6*8, 6*8, 8*8, 8*8, 10*8, 10*8, 12*8, 12*8, 14*8, 14*8 },
+	{ 0, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
 	16*8
 };
 
@@ -1074,12 +1074,12 @@ static const gfx_layout spyhuntpr_alphalayout =
 // not quite right
 const gfx_layout spyhuntpr_sprite_layout =
 {
-	32,32,
+	32,16,
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 6,7,  4,5,  2,3,  0,1,  14,15,  12,13,  10,11,  8,9,    22,23, 20,21,  18,19,  16,17,  30,31,  28,29,  26,27,  24,25 },
-	{ 0*32,0*32,1*32,1*32,2*32,2*32,3*32,3*32,4*32,4*32,5*32,5*32,6*32,6*32,7*32,7*32,8*32,8*32,9*32,9*32,10*32,10*32,11*32,11*32,12*32,12*32,13*32,13*32,14*32,14*32,15*32,15*32   },
+	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32   },
 
 	16*32
 };
@@ -1096,12 +1096,12 @@ static const UINT32 spyhuntp_charlayout_xoffset[64] =
 
 static const gfx_layout spyhuntpr_charlayout =
 {
-	64,32,
+	64,16,
 	RGN_FRAC(1,8),
 	4,
 	{ 0, 2*8, 0x4000*8 + 0, 0x4000*8 + 2*8},
 	EXTENDED_XOFFS,
-	{ 0*8,0*8,  4*8,4*8,  8*8,8*8,  12*8,12*8,    16*8,16*8,  20*8,20*8,  24*8,24*8,  28*8,28*8,     1*8,1*8,  5*8,5*8,  9*8,9*8,  13*8,13*8,     17*8,17*8,  21*8,21*8,  25*8,25*8,  29*8,29*8    },
+	{ 0*8,  4*8,  8*8,  12*8,    16*8,  20*8,  24*8,  28*8,     1*8,  5*8, 9*8, 13*8,    17*8,  21*8,  25*8,  29*8    },
 	32*8,
 	spyhuntp_charlayout_xoffset,
 	NULL
@@ -1228,12 +1228,50 @@ static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-/* Spy Hunter prototype */
-static MACHINE_CONFIG_DERIVED( spyhuntpr, mcrscroll )
+
+static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(spyhunt_map)
+	MCFG_CPU_IO_MAP(spyhunt_portmap)
+	MCFG_CPU_CONFIG(mcr_daisy_chain)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
+
+	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK/4 /* same as "maincpu" */, mcr_ctc_intf)
+
+	MCFG_WATCHDOG_VBLANK_INIT(16)
+	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
+	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+
+	/* basic machine hardware */
+	MCFG_MIDWAY_SSIO_ADD("ssio")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(30*16, 30*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*8-1)
 
 	MCFG_GFXDECODE(spyhuntpr)
+	MCFG_PALETTE_LENGTH(64+4)
 
+	MCFG_PALETTE_INIT_OVERRIDE(mcr3_state,spyhunt)
+	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhuntpr)
+	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhuntpr)
 MACHINE_CONFIG_END
+
+
 
 
 /*************************************
@@ -1807,6 +1845,6 @@ GAME( 1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, stargrds, ROT0,
 /* MCR scrolling games */
 GAMEL(1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", GAME_SUPPORTS_SAVE, layout_spyhunt )
 GAMEL(1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", GAME_SUPPORTS_SAVE, layout_spyhunt )
-GAME (1983, spyhuntpr, spyhunt,  spyhuntpr,  spyhunt,  mcr3_state,  spyhuntpr,  ROT0, "Bally Midway", "Spy Hunter (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME (1983, spyhuntpr, spyhunt,  spyhuntpr,  spyhunt,  mcr3_state,  spyhuntpr,  ROT90, "Bally Midway", "Spy Hunter (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // or bootleg??
 GAME( 1984, crater,   0,        mcrscroll, crater,   mcr3_state, crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", GAME_SUPPORTS_SAVE )
 GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", GAME_SUPPORTS_SAVE, layout_turbotag )
