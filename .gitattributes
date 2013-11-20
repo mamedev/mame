@@ -939,6 +939,7 @@ src/emu/cpu/alto2/a2ether.c svneol=native#text/plain
 src/emu/cpu/alto2/a2ether.h svneol=native#text/plain
 src/emu/cpu/alto2/a2hw.c svneol=native#text/plain
 src/emu/cpu/alto2/a2hw.h svneol=native#text/plain
+src/emu/cpu/alto2/a2jkff.c svneol=native#text/plain
 src/emu/cpu/alto2/a2jkff.h svneol=native#text/plain
 src/emu/cpu/alto2/a2kbd.c svneol=native#text/plain
 src/emu/cpu/alto2/a2kbd.h svneol=native#text/plain

@@ -2277,6 +2277,7 @@ $(CPUOBJ)/score/scoredsm.o: $(CPUSRC)/score/scoredsm.c \
 ifneq ($(filter ALTO2,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/alto2
 CPUOBJS += $(CPUOBJ)/alto2/alto2cpu.o \
+	$(CPUOBJ)/alto2/a2jkff.o \
 	$(CPUOBJ)/alto2/a2disk.o \
 	$(CPUOBJ)/alto2/a2disp.o \
 	$(CPUOBJ)/alto2/a2curt.o \
@@ -2300,6 +2301,10 @@ DASMOBJS += $(CPUOBJ)/alto2/alto2dsm.o
 endif
 
 $(CPUOBJ)/alto2/alto2cpu.o: $(CPUSRC)/alto2/alto2cpu.c \
+							$(CPUSRC)/alto2/alto2cpu.h
+
+$(CPUOBJ)/alto2/a2jkff.o:   $(CPUSRC)/alto2/a2jkff.c \
+							$(CPUSRC)/alto2/a2jkff.h \
 							$(CPUSRC)/alto2/alto2cpu.h
 
 $(CPUOBJ)/alto2/a2disk.o:   $(CPUSRC)/alto2/a2disk.c \

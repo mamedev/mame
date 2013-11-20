@@ -9,6 +9,142 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
+#define DEBUG_WRTRAM        0       //!< define to 1 to printf disassembled CRAM writes
+
+//! direct read access to the microcode CRAM
+#define	RD_CRAM(addr) (*reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4))
+
+//! direct write access to the microcode CRAM
+#define	WR_CRAM(addr,data) do { \
+    *reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4) = data; \
+} while (0)
+
+/**
+ * @brief read the microcode ROM/RAM halfword
+ *
+ * Note: HALFSEL is selecting the even (0) or odd (1) half of the
+ * microcode RAM 32-bit word. Here's how the demultiplexers (74298)
+ * u8, u18, u28 and u38 select the bits:
+ *
+ *           SN74298
+ *         +---+-+---+
+ *         |   +-+   |
+ *    B2  -|1      16|-  Vcc
+ *         |         |
+ *    A2  -|2      15|-  QA
+ *         |         |
+ *    A1  -|3      14|-  QB
+ *         |         |
+ *    B1  -|4      13|-  QC
+ *         |         |
+ *    C2  -|5      12|-  QD
+ *         |         |
+ *    D2  -|6      11|-  CLK
+ *         |         |
+ *    D1  -|7      10|-  SEL
+ *         |         |
+ *   GND  -|8       9|-  C1
+ *         |         |
+ *         +---------+
+ *
+ *	chip  out pin  BUS in   pin HSEL=0      in   pin HSEL=1
+ *	--------------------------------------------------------------
+ *  u8    QA  15   0   A1   3   DRSEL(0)'   A2   2   DF2(0)
+ *  u8    QB  14   1   B1   4   DRSEL(1)'   B2   1   DF2(1)'
+ *  u8    QC  13   2   C1   9   DRSEL(2)'   C2   5   DF2(2)'
+ *  u8    QD  12   3   D1   7   DRSEL(3)'   D2   6   DF2(3)'
+ *
+ *  u18   QA  15   4   A1   3   DRSEL(4)'   A2   2   LOADT'
+ *  u18   QB  14   5   B1   4   DALUF(0)'   B2   1   LOADL
+ *  u18   QC  13   6   C1   9   DALUF(1)'   C2   5   NEXT(00)'
+ *  u18   QD  12   7   D1   7   DALUF(2)'   D2   6   NEXT(01)'
+ *
+ *  u28   QA  15   8   A1   3   DALUF(3)'   A2   2   NEXT(02)'
+ *  u28   QB  14   9   B1   4   DBS(0)'     B2   1   NEXT(03)'
+ *  u28   QC  13   10  C1   9   DBS(1)'     C2   5   NEXT(04)'
+ *  u28   QD  12   11  D1   7   DBS(2)'     D2   6   NEXT(05)'
+ *
+ *  u38   QA  15   12  A1   3   DF1(0)      A2   2   NEXT(06)'
+ *  u38   QB  14   13  B1   4   DF1(1)'     B2   1   NEXT(07)'
+ *  u38   QC  13   14  C1   9   DF1(2)'     C2   5   NEXT(08)'
+ *  u38   QD  12   15  D1   7   DF1(3)'     D2   6   NEXT(09)'
+ *
+ * The HALFSEL signal to the demultiplexers is the inverted bit BUS(5):
+ * BUS(5)=1, HALFSEL=0, A1,B1,C1,D1 inputs, upper half of the 32-bit word
+ * BUS(5)=0, HALFSEL=1, A2,B2,C2,D2 inputs, lower half of the 32-bit word
+ */
+void alto2_cpu_device::rdram()
+{
+	UINT32 addr, value;
+	UINT32 bank = GET_CRAM_BANKSEL(m_cram_addr);
+	UINT32 wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
+
+	if (GET_CRAM_RAMROM(m_cram_addr)) {
+		/* read CROM 0 at current mpc */
+		addr = m_mpc & ALTO2_UCODE_PAGE_MASK;
+		LOG((LOG_CPU,0,"	rdram: ROM [%05o] ", addr));
+	} else {
+		/* read CRAM[bank] */
+		addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;
+		LOG((LOG_CPU,0,"	rdram: RAM%d [%04o] ", bank, wordaddr));
+	}
+
+	m_rdram_flag = false;
+	if (ALTO2_UCODE_RAM_BASE + addr >= ALTO2_UCODE_SIZE) {
+		value = 0177777;	/* ??? */
+		LOG((LOG_CPU,0,"invalid address (%06o)\n", addr));
+		return;
+	}
+	value = RD_CRAM(addr) ^ ALTO2_UCODE_INVERTED;
+	if (GET_CRAM_HALFSEL(m_cram_addr)) {
+		value = value >> 16;
+		LOG((LOG_CPU,0,"upper:%06o\n", value & 0177777));
+	} else {
+		LOG((LOG_CPU,0,"lower:%06o\n", value & 0177777));
+	}
+	m_bus &= value;
+}
+
+/**
+ * @brief write the microcode RAM from M register and ALU
+ *
+ * Note: M is a latch (MYL, i.e. memory L) on the CRAM board that latches
+ * the ALU whenever LOADL and GOODTASK are met. GOODTASK is the Emulator
+ * task and something I have not yet found out about: TASKA' and TASKB'.
+ *
+ * There's also an undumped PROM u21 which is addressed by GOODTASK and
+ * 7 other signals...
+ */
+void alto2_cpu_device::wrtram()
+{
+	UINT32 bank = GET_CRAM_BANKSEL(m_cram_addr);
+	UINT32 wordaddr = GET_CRAM_WORDADDR(m_cram_addr);
+	UINT32 value = ((m_m << 16) | m_alu) ^ ALTO2_UCODE_INVERTED;
+
+	UINT32 addr = bank * ALTO2_UCODE_PAGE_SIZE + wordaddr;	// write RAM 0,1,2
+	LOG((LOG_CPU,0,"	wrtram: RAM%d [%04o] upper:%06o lower:%06o", bank, wordaddr, m_m, m_alu));
+
+#if	DEBUG_WRTRAM
+	char buff[128];
+	UINT8 oprom[4];
+	oprom[0] = m_m / 256;
+	oprom[1] = m_m % 256;
+	oprom[2] = m_m / 256;
+	oprom[3] = m_m % 256;
+	disasm_disassemble(buff, addr, oprom, oprom, 0);
+	printf("WR CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o *** %s\n",
+		   GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_m, m_alu, buff);
+#endif
+
+	m_wrtram_flag = false;
+	if (ALTO2_UCODE_RAM_BASE + addr >= ALTO2_UCODE_SIZE) {
+		LOG((LOG_CPU,0," invalid address %06o\n", addr));
+		return;
+	}
+	LOG((LOG_CPU,0,"\n"));
+	WR_CRAM(addr, value);
+}
+
 /**
  * @brief bs_read_sreg early: drive bus by S register or M (MYL), if rsel is = 0
  *
@@ -284,7 +420,7 @@ void alto2_cpu_device::init_ram(int task)
 	set_f1(task, f1_ram_wrtram,			0, &alto2_cpu_device::f1_late_wrtram);
 	set_f1(task, f1_ram_rdram,			0, &alto2_cpu_device::f1_late_rdram);
 #if	(ALTO2_UCODE_RAM_PAGES == 3)
-	set_f1(task, f1_ram_load_rmr,		0, &alto2_cpu_device::f1_load_rmr_1);
+	set_f1(task, f1_ram_load_rmr,		0, &alto2_cpu_device::f1_late_load_rmr);
 #else	// ALTO2_UCODE_RAM_PAGES != 3
 	set_f1(task, f1_ram_load_srb,		0, &alto2_cpu_device::f1_late_load_srb);
 #endif

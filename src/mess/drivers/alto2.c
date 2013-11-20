@@ -113,9 +113,9 @@ static INPUT_PORTS_START( alto2 )
 	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
 
 	PORT_START("CONFIG")    /* Memory switch on AIM board */
-	PORT_CONFNAME( 1<<9, 1<<9, "Memory switch")
-	PORT_CONFSETTING( 0,    "on")
-	PORT_CONFSETTING( 1<<9, "off")
+	PORT_CONFNAME( 1, 1, "Memory switch")
+	PORT_CONFSETTING( 0, "on")
+	PORT_CONFSETTING( 1, "off")
 INPUT_PORTS_END
 
 /* ROM */

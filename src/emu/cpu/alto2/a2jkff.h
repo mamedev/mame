@@ -7,8 +7,9 @@
  *   Licenses: MAME, GPLv2
  *
  *****************************************************************************/
-#ifndef _A2JKFF_H_
-#define _A2JKFF_H_
+#ifdef  ALTO2_DEFINE_CONSTANTS
+
+#define	JKFF_FUNCTION	0	//!< define 1 to debug the JK flip-flops, 0 to use a lookup table
 
 /**
  * @brief enumeration of the inputs and outputs of a JK flip-flop type 74109
@@ -43,4 +44,21 @@ typedef enum {
 	JKFF_Q0		= (1 << 6)	//!< Q' output
 }	jkff_t;
 
-#endif // A2JKFF_H
+#if	ALTO2_DEBUG
+static const char* raise_lower[2] = {"↗","↘"};
+static const char* jkff_name;
+/** @brief macro to set the name of a FF in DEBUG=1 builds only */
+#define	DEBUG_NAME(x)	jkff_name = x
+#else
+#define	DEBUG_NAME(x)
+#endif
+
+#else	// ALTO2_DEFINE_CONSTANTS
+
+#ifndef _A2JKFF_H_
+#define _A2JKFF_H_
+
+static jkff_t update_jkff(UINT8 s0, UINT8 s1);	//!< simulate a 74109 J-K flip-flop with set and reset inputs
+
+#endif	// _A2JKFF_H_
+#endif	// ALTO2_DEFINE_CONSTANTS

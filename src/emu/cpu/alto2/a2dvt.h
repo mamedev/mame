@@ -20,7 +20,7 @@ enum {
 
 void f1_early_dvt_block();						//!< F1 func: disable the display word task
 void activate_dvt();							//!< called by the CPU when the display vertical task becomes active
-void init_dvt(int task);						//!< 014 initialize display vertical task
+void init_dvt(int task = task_dvt);				//!< initialize display vertical task
 void exit_dvt();								//!< deinitialize display vertical task
 #endif  // _A2DVT_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

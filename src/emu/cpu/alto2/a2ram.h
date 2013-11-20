@@ -9,6 +9,36 @@
  *****************************************************************************/
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
+#if	(ALTO2_CRAM_CONFIG==1)
+#define	ALTO2_UCODE_ROM_PAGES	1   		//!< number of microcode ROM pages
+#define	ALTO2_UCODE_RAM_PAGES	1   		//!< number of microcode RAM pages
+#elif (ALTO2_CRAM_CONFIG==2)
+#define	ALTO2_UCODE_ROM_PAGES	2   		//!< number of microcode ROM pages
+#define	ALTO2_UCODE_RAM_PAGES	1   		//!< number of microcode RAM pages
+#elif (ALTO2_CRAM_CONFIG==3)
+#define	ALTO2_UCODE_ROM_PAGES	1   		//!< number of microcode ROM pages
+#define	ALTO2_UCODE_RAM_PAGES	3   		//!< number of microcode RAM pages
+#else
+#error "Undefined CROM/CRAM configuration"
+#endif
+
+/**
+ * \brief number of S register banks
+ * This depends on the number of RAM pages
+ *   8 pages in 3K CRAM configuration
+ *   1 page in 1K CRAM configurations
+ */
+#if	(ALTO2_UCODE_RAM_PAGES == 3)
+#define	ALTO2_SREG_BANKS	8
+#else
+#define	ALTO2_SREG_BANKS	1
+#endif
+
+#define	ALTO2_UCODE_PAGE_SIZE	02000						//!< number of words of microcode
+#define	ALTO2_UCODE_PAGE_MASK	(ALTO2_UCODE_PAGE_SIZE-1)	//!< mask for microcode ROM/RAM address
+#define	ALTO2_UCODE_SIZE		((ALTO2_UCODE_ROM_PAGES + ALTO2_UCODE_RAM_PAGES) * ALTO2_UCODE_PAGE_SIZE)	//!< total number of words of microcode
+#define	ALTO2_UCODE_RAM_BASE	(ALTO2_UCODE_ROM_PAGES * ALTO2_UCODE_PAGE_SIZE)	//!< base offset for the RAM page(s)
+
 #else   // ALTO2_DEFINE_CONSTANTS
 #ifndef _A2RAM_H_
 #define _A2RAM_H_

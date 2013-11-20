@@ -136,7 +136,7 @@ void f2_late_ebfct();							//!< F2 func: Ethernet branch function
 void f2_late_ecbfct();							//!< F2 func: Ethernet countdown branch function
 void f2_late_eisfct();							//!< F2 func: Ethernet input start function
 void activate_eth();							//!< called by the CPU when the Ethernet task becomes active
-void init_ether(int task);						//!< 007 initialize ethernet task
+void init_ether(int task = task_ether);			//!< initialize ethernet task
 void exit_ether();								//!< deinitialize ethernet task
 #endif // _A2ETHER_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

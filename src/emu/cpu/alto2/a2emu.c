@@ -687,8 +687,7 @@ void alto2_cpu_device::init_emu(int task)
 	set_f1(task, f1_emu_wrtram,			0, &alto2_cpu_device::f1_late_wrtram);
 	set_f1(task, f1_emu_rdram,			0, &alto2_cpu_device::f1_late_rdram);
 	set_f1(task, f1_emu_load_rmr,		0, &alto2_cpu_device::f1_late_emu_load_rmr);
-	/* F1 014 is undefined (?) */
-	set_f1(task, f1_task_14,			0, &alto2_cpu_device::f1_late_load_srb);
+	set_f1(task, f1_task_14,			0, 0);										// F1 014 is undefined (?)
 	set_f1(task, f1_emu_load_esrb,		0, &alto2_cpu_device::f1_late_emu_load_esrb);
 	set_f1(task, f1_emu_rsnf,			&alto2_cpu_device::f1_early_rsnf, 0);
 	set_f1(task, f1_emu_startf,			&alto2_cpu_device::f1_early_startf,	0);

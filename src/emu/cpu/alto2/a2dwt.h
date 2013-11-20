@@ -20,7 +20,7 @@ enum {
 
 void f1_early_dwt_block();						//!< F1 func: block the display word task
 void f2_late_dwt_load_ddr();					//!< F2 func: load the display data register
-void init_dwt(int task);						//!< 011 initialize display word task
+void init_dwt(int task = task_dwt);				//!< initialize display word task
 void exit_dwt();								//!< deinitialize display word task
 #endif  // _A2DWT_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

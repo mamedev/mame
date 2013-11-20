@@ -46,6 +46,10 @@ enum {
 #define	ALTO2_DEBUG             0			//!< define to 1 to enable logerror() output
 #endif
 
+#ifndef	ALTO2_CRAM_CONFIG
+#define	ALTO2_CRAM_CONFIG      	2           //!< use default CROM/CRAM configuration 2
+#endif
+
 #define	USE_PRIO_F9318			0			//!< define to 1 to use the F9318 priority encoder code
 #define	USE_ALU_74181			0			//!< define to 1 to use the SN74181 ALU code
 #define	DEBUG_DISPLAY_TIMING	0			//!< define to 1 to debug the display timing
@@ -60,40 +64,7 @@ enum {
 #define	ALTO2_F2MAX				16			//!< 16 F2 functions
 #define	ALTO2_UCYCLE			169542		//!< time in pico seconds for a CPU micro cycle: 29.4912MHz/5 -> 5.898240Hz ~= 169.542ns/clock
 
-#ifndef	ALTO2_CRAM_CONFIG
-#define	ALTO2_CRAM_CONFIG	2               //!< use default configuration 2
-#endif
-
-#if	(ALTO2_CRAM_CONFIG==1)
-#define	ALTO2_UCODE_ROM_PAGES	1   		//!< number of microcode ROM pages
-#define	ALTO2_UCODE_RAM_PAGES	1   		//!< number of microcode RAM pages
-#elif (ALTO2_CRAM_CONFIG==2)
-#define	ALTO2_UCODE_ROM_PAGES	2   		//!< number of microcode ROM pages
-#define	ALTO2_UCODE_RAM_PAGES	1   		//!< number of microcode RAM pages
-#elif (ALTO2_CRAM_CONFIG==3)
-#define	ALTO2_UCODE_ROM_PAGES	1   		//!< number of microcode ROM pages
-#define	ALTO2_UCODE_RAM_PAGES	3   		//!< number of microcode RAM pages
-#else
-#error "Undefined CROM/CRAM configuration"
-#endif
-
-/**
- * \brief number of S register banks
- * This depends on the number of RAM pages
- *   8 pages in 3K CRAM configuration
- *   1 page in 1K CRAM configurations
- */
-#if	(ALTO2_UCODE_RAM_PAGES == 3)
-#define	ALTO2_SREG_BANKS	8
-#else
-#define	ALTO2_SREG_BANKS	1
-#endif
-
-#define	ALTO2_UCODE_PAGE_SIZE	1024						//!< number of words of microcode
-#define	ALTO2_UCODE_PAGE_MASK	(ALTO2_UCODE_PAGE_SIZE-1)	//!< mask for microcode ROM/RAM address
-#define	ALTO2_UCODE_SIZE		((ALTO2_UCODE_ROM_PAGES + ALTO2_UCODE_RAM_PAGES) * ALTO2_UCODE_PAGE_SIZE)	//!< total number of words of microcode
-#define	ALTO2_UCODE_RAM_BASE	(ALTO2_UCODE_ROM_PAGES * ALTO2_UCODE_PAGE_SIZE)	//!< base offset for the RAM page(s)
-#define	ALTO2_CONST_SIZE		256							//!< number words in the constant ROM
+#define	ALTO2_CONST_SIZE		256			//!< number words in the constant ROM
 
 //! inverted bits in the micro instruction 32 bit word
 #define	ALTO2_UCODE_INVERTED	((1 << 10) | (1 << 15) | (1 << 19))
@@ -129,6 +100,7 @@ enum {
 // define constants from the sub-devices
 //*******************************************
 #define	ALTO2_DEFINE_CONSTANTS 1
+#include "a2jkff.h"
 #include "a2ram.h"
 #include "a2hw.h"
 #include "a2kbd.h"
@@ -148,8 +120,6 @@ enum {
 #include "a2dwt.h"
 #include "a2kwd.h"
 #undef ALTO2_DEFINE_CONSTANTS
-
-#include "a2jkff.h"
 
 class alto2_cpu_device :  public cpu_device
 {
@@ -944,6 +914,10 @@ private:
 	void rdram();									//!< read the microcode ROM/RAM halfword
 	void wrtram();									//!< write the microcode RAM from M register and ALU
 
+//*******************************************
+// inline the sub-devices
+//*******************************************
+#include "a2jkff.h"
 #include "a2ram.h"
 #include "a2hw.h"
 #include "a2kbd.h"

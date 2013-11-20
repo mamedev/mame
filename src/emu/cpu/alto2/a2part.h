@@ -13,7 +13,7 @@
 #ifndef _A2PART_H_
 #define _A2PART_H_
 void activate_part();
-void init_part(int task);						//!< 015 initialize parity task
+void init_part(int task = task_part);			//!< initialize parity task
 void exit_part();								//!< deinitialize parity task
 #endif // _A2PART_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

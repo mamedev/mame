@@ -64,7 +64,7 @@ void f2_late_load_ir();							//!< F2 func: load instruction register IR and bra
 void f2_late_idisp();							//!< F2 func: branch on: arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
 void f2_early_acsource();						//!< F2 func: modify RSELECT with SrcAC = (3 - IR[1-2])
 void f2_late_acsource();						//!< F2 func: branch on arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
-void init_emu(int task);						//!< 000 initialize emulator task
+void init_emu(int task = task_emu);				//!< initialize emulator task
 void exit_emu();								//!< deinitialize emulator task
 #endif // _A2EMU_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

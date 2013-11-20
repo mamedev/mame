@@ -19,12 +19,13 @@
 //! memory access mode
 enum {
 	ALTO2_MEM_NONE,
-	ALTO2_MEM_ODD	= (1 << 0),
-	ALTO2_MEM_RAM	= (1 << 1),
+	ALTO2_MEM_ODD		= (1 << 0),
+	ALTO2_MEM_RAM		= (1 << 1),
 	ALTO2_MEM_NIRVANA	= (1 << 2)
 };
 
 struct {
+	UINT32 size;						//!< main memory size (64K or 128K)
 	UINT32* ram;						//!< main memory organized as double-words
 	UINT8* hpb;							//!< Hamming Code bits (6) and Parity bits (1) per double word
 	UINT32 mar;							//!< memory address register
@@ -44,7 +45,7 @@ struct {
 	 */
 	int access;
 	int error;							//!< non-zero after a memory error was detected
-	int mear;							//!< memory error address register
+	UINT32 mear;						//!< memory error address register
 	UINT16 mesr;						//!< memory error status register
 	UINT16 mecr;						//!< memory error control register
 }	m_mem;
@@ -103,20 +104,12 @@ inline bool check_mem_write_stall() {
     return cycle() < m_mem.cycle+2;
 }
 
-//! memory error address register read
-DECLARE_READ16_MEMBER( mear_r );
 
-//! memory error status register read
-DECLARE_READ16_MEMBER( mesr_r );
-
-//! memory error status register write (clear)
-DECLARE_WRITE16_MEMBER( mesr_w );
-
-//! memory error control register read
-DECLARE_READ16_MEMBER( mecr_r );
-
-//! memory error control register write
-DECLARE_WRITE16_MEMBER( mecr_w );
+DECLARE_READ16_MEMBER ( mear_r );       //!< memory error address register read
+DECLARE_READ16_MEMBER ( mesr_r );       //!< memory error status register read
+DECLARE_WRITE16_MEMBER( mesr_w );       //!< memory error status register write (clear)
+DECLARE_READ16_MEMBER ( mecr_r );       //!< memory error control register read
+DECLARE_WRITE16_MEMBER( mecr_w );       //!< memory error control register write
 
 //! read or write a memory double-word and caluclate its Hamming code
 UINT32 hamming_code(int write, UINT32 dw_addr, UINT32 dw_data);

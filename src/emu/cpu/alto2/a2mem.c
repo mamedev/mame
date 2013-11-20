@@ -612,16 +612,18 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 		 * currently we don't do anything special
 		 */
 		LOG((LOG_MEM,5, "	MAR←; refresh cycle @ %#o\n", addr));
-	} else if (addr < ALTO2_RAM_SIZE) {
+		return;
+	}
+
+	m_mem.mar = addr;
+	if (addr < m_mem.size) {
 		LOG((LOG_MEM,2, "	MAR←; mar = %#o\n", addr));
 		m_mem.access = ALTO2_MEM_RAM;
-		m_mem.mar = addr;
 		/* fetch memory double-word to read/write latches */
 		m_mem.rmdd = m_mem.wmdd = m_mem.ram[m_mem.mar/2];
 		m_mem.cycle = cycle();
 	} else {
 		m_mem.access = ALTO2_MEM_NIRVANA;
-		m_mem.mar = addr;
 		m_mem.rmdd = m_mem.wmdd = ~0;
 	}
 }
@@ -647,7 +649,7 @@ UINT16 alto2_cpu_device::read_mem()
 	}
 
 	base_addr = m_mem.mar & 0177777;
-	if (base_addr >= ALTO2_IO_PAGE_BASE) {
+	if (base_addr >= ALTO2_IO_PAGE_BASE && m_mem.mar < ALTO2_RAM_SIZE) {
 		m_mem.md = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
 		LOG((LOG_MEM,6,"	MD = MMIO[%#o] (%#o)\n", base_addr, m_mem.md));
 		m_mem.access = ALTO2_MEM_NONE;
@@ -701,7 +703,7 @@ void alto2_cpu_device::write_mem(UINT16 data)
 	}
 
 	base_addr = m_mem.mar & 0177777;
-	if (base_addr >= ALTO2_IO_PAGE_BASE) {
+	if (base_addr >= ALTO2_IO_PAGE_BASE && m_mem.mar < ALTO2_RAM_SIZE) {
 		m_iomem->write_word(m_iomem->address_to_byte(base_addr), m_mem.md);
 		LOG((LOG_MEM,6, "	MMIO[%#o] = MD (%#o)\n", base_addr, m_mem.md));
 		m_mem.access = ALTO2_MEM_NONE;
@@ -744,7 +746,7 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 {
 	int base_addr = addr & 0177777;
 	int data = 0177777;
-	if (base_addr >= ALTO2_IO_PAGE_BASE) {
+	if (base_addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
 		data = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
 	} else {
 		data = (addr & ALTO2_MEM_ODD) ? GET_ODD(m_mem.ram[addr/2]) : GET_EVEN(m_mem.ram[addr/2]);
@@ -761,7 +763,7 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
 {
 	int base_addr = addr & 0177777;
-	if (base_addr >= ALTO2_IO_PAGE_BASE) {
+	if (base_addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
 		m_iomem->write_word(m_iomem->address_to_byte(base_addr), data);
 	} else if (addr & ALTO2_MEM_ODD) {
 		PUT_ODD(m_mem.ram[addr/2], data);
@@ -780,13 +782,17 @@ void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
  */
 void alto2_cpu_device::init_memory()
 {
-	memset(&m_mem, 0, sizeof(m_mem));
+    memset(&m_mem, 0, sizeof(m_mem));
 
-	// allocate 128KB of main memory
-	m_mem.ram = auto_alloc_array(machine(), UINT32, sizeof(UINT16)*ALTO2_RAM_SIZE);
-	memset(m_mem.ram, 0, sizeof(UINT32)*sizeof(UINT16)*ALTO2_RAM_SIZE);
-	m_mem.hpb = auto_alloc_array(machine(), UINT8,  sizeof(UINT16)*ALTO2_RAM_SIZE);
-	memset(m_mem.hpb, 0, sizeof(UINT8)*sizeof(UINT16)*ALTO2_RAM_SIZE);
+#if	0	// can't read ioport() at this time
+	// allocate 64KB or 128KB of main memory
+	m_mem.size = ioport("CONFIG")->read() & 1 ? ALTO2_RAM_SIZE : 2 * ALTO2_RAM_SIZE;
+#else
+	m_mem.size = 2 * ALTO2_RAM_SIZE;
+#endif
+	printf("main memory %u KB\n", m_mem.size / 1024);
+	m_mem.ram = auto_alloc_array_clear(machine(), UINT32, sizeof(UINT16) * m_mem.size);
+	m_mem.hpb = auto_alloc_array_clear(machine(), UINT8,  sizeof(UINT16) * m_mem.size);
 
 	/**
 	 * <PRE>
@@ -845,5 +851,12 @@ void alto2_cpu_device::init_memory()
 
 void alto2_cpu_device::exit_memory()
 {
-	// nothing to do yet
+	if (m_mem.ram) {
+		auto_free(machine(), m_mem.ram);
+		m_mem.ram = 0;
+	}
+	if (m_mem.hpb) {
+		auto_free(machine(), m_mem.hpb);
+		m_mem.hpb = 0;
+	}
 }

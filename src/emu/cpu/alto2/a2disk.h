@@ -74,8 +74,6 @@ jkff_t m_sysclka0[4];				//!< simulate previous sysclka
 jkff_t m_sysclka1[4];				//!< simulate current sysclka
 jkff_t m_sysclkb0[4];				//!< simulate previous sysclkb
 jkff_t m_sysclkb1[4];				//!< simulate current sysclkb
-//! lookup JK flip-flop state change from s0 to s1
-inline jkff_t update_jkff(UINT8 s0, UINT8 s1);
 
 void kwd_timing(int bitclk, int datin, int block);	//!< disk word timing
 TIMER_CALLBACK_MEMBER( disk_seclate );			//!< timer callback to take away the SECLATE pulse (monoflop)
