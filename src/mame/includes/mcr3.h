@@ -56,6 +56,7 @@ public:
 	DECLARE_DRIVER_INIT(maxrpm);
 	DECLARE_DRIVER_INIT(rampage);
 	DECLARE_DRIVER_INIT(spyhunt);
+	DECLARE_DRIVER_INIT(spyhuntpr);
 	DECLARE_DRIVER_INIT(sarge);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(mcrmono_get_bg_tile_info);

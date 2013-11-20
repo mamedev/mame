@@ -1059,6 +1059,31 @@ static const gfx_layout spyhunt_alphalayout =
 	16*8
 };
 
+static const gfx_layout spyhuntpr_alphalayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4},
+	{ 0, 0, 1, 1, 2, 2, 3, 3, 8, 8, 9, 9, 10, 10, 11, 11 },
+	{ 0, 0, 2*8, 2*8, 4*8, 4*8, 6*8, 6*8, 8*8, 8*8, 10*8, 10*8, 12*8, 12*8, 14*8, 14*8 },
+	16*8
+};
+
+
+// not quite right
+const gfx_layout spyhuntpr_sprite_layout =
+{
+	32,32,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(0,4)+1, RGN_FRAC(2,4), RGN_FRAC(2,4)+1 },
+	{ 6,6,  4,4,  2,2,  0,0,  14,14,  12,12,  10,10,  8,8,    22,22, 20,20,  18,18,  16,16,  30,30,  28,28,  26,26,  24,24 },
+	{ 0*32+0, 0*32+RGN_FRAC(1,4), 1*32+0, 1*32+RGN_FRAC(1,4), 2*32+0, 2*32+RGN_FRAC(1,4), 3*32+0, 3*32+RGN_FRAC(1,4),4*32+0, 4*32+RGN_FRAC(1,4),5*32+0, 5*32+RGN_FRAC(1,4),6*32+0, 6*32+RGN_FRAC(1,4),7*32+0, 7*32+RGN_FRAC(1,4),8*32+0, 8*32+RGN_FRAC(1,4),9*32+0, 9*32+RGN_FRAC(1,4),10*32+0, 10*32+RGN_FRAC(1,4),11*32+0, 11*32+RGN_FRAC(1,4),12*32+0, 12*32+RGN_FRAC(1,4),13*32+0, 13*32+RGN_FRAC(1,4),14*32+0, 14*32+RGN_FRAC(1,4),15*32+0, 15*32+RGN_FRAC(1,4)   },
+
+	16*32
+};
+
 
 static GFXDECODE_START( mcr3 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 )
@@ -1072,7 +1097,11 @@ static GFXDECODE_START( spyhunt )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhunt_alphalayout, 4*16, 1 )
 GFXDECODE_END
 
-
+static GFXDECODE_START( spyhuntpr )
+	GFXDECODE_ENTRY( "gfx1", 0, spyhunt_charlayout,  3*16, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, spyhuntpr_sprite_layout,   0*16, 4 )
+	GFXDECODE_ENTRY( "gfx3", 0, spyhuntpr_alphalayout, 4*16, 1 )
+GFXDECODE_END
 
 /*************************************
  *
@@ -1177,6 +1206,12 @@ static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+/* Spy Hunter prototype */
+static MACHINE_CONFIG_DERIVED( spyhuntpr, mcrscroll )
+
+	MCFG_GFXDECODE(spyhuntpr)
+
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -1446,6 +1481,35 @@ ROM_START( spyhuntp )
 ROM_END
 
 
+ROM_START( spyhuntpr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",   0x0000, 0x4000, CRC(2a2f77cb) SHA1(e1b74c951efb2a49bef0507ab3268b274515f339) )
+	ROM_LOAD( "2.bin",   0x4000, 0x4000, CRC(00778aff) SHA1(7c0b24c393f841e8379d4bba57ba502e3d2512f9) )
+	ROM_LOAD( "3.bin",   0x8000, 0x4000, CRC(2183b4af) SHA1(2b958afc40b26c9bc8d5254b0600426649f4ebf0) )
+	ROM_LOAD( "4.bin",   0xc000, 0x2000, CRC(3ea6a65c) SHA1(1320ce17044307ed3c4f2459631a9aa1734f1f30) )
+
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
+	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(33fe2829) SHA1(e6950dbf681242bf23542ca6604e62eacb431101) )
+
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "6.bin",   0x00000, 0x2000, CRC(6b76f46a) SHA1(4b398084c42a60fcfa4a9bf14f844e36a3f42723) )
+	ROM_LOAD( "7.bin",   0x02000, 0x2000, CRC(085bd7a7) SHA1(c35c309b6c6485baec54d4434dea44abf4d48f41) )
+	ROM_LOAD( "8.bin",   0x04000, 0x2000, CRC(e699b329) SHA1(cb4b8c7b6fa1cb1144a18f1442dc3b267c408914) )
+	ROM_LOAD( "9.bin",   0x06000, 0x2000, CRC(6d462ec7) SHA1(0ff37f75b0eeceb86177a3f7c93834d5c0e24515) )
+
+	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "10.bin",   0x00000, 0x4000, CRC(6f9fd416) SHA1(a51c86e5b22c91fc44673f53400b58af40b18065) )
+	ROM_LOAD( "11.bin",   0x0c000, 0x4000, CRC(75526ffe) SHA1(ff1adf6f9b6595114d0bd06b72d9eb7bbf70144d) )
+	ROM_LOAD( "12.bin",   0x08000, 0x4000, CRC(82ee7a4d) SHA1(184720de76680275bf7c4a171f03a0ce771d91fc) )
+	ROM_LOAD( "13.bin",   0x04000, 0x4000, CRC(0cc592a3) SHA1(b3563bde83432cdbaedb88d4d222da30bf679b08) )
+
+
+	ROM_REGION( 0x01000, "gfx3", 0 )
+	ROM_LOAD( "14.bin",  0x00000, 0x1000, CRC(87a4c130) SHA1(7792afdc36b0f3bd51c387d04d38f60c85fd2e93) )
+ROM_END
+
+
 ROM_START( crater )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crcpu.6d",     0x0000, 0x2000, CRC(ad31f127) SHA1(d03506570cd08bcdb39d7c6b9de4f9628c7373e9) )
@@ -1604,6 +1668,16 @@ DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 	m_spyhunt_scroll_offset = 16;
 }
 
+DRIVER_INIT_MEMBER(mcr3_state,spyhuntpr)
+{
+	mcr_common_init();
+//	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+//	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
+//	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+
+	m_spyhunt_sprite_color_mask = 0x00;
+	m_spyhunt_scroll_offset = 16;
+}
 
 DRIVER_INIT_MEMBER(mcr3_state,crater)
 {
@@ -1651,5 +1725,6 @@ GAME( 1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, stargrds, ROT0,
 /* MCR scrolling games */
 GAMEL(1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", GAME_SUPPORTS_SAVE, layout_spyhunt )
 GAMEL(1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", GAME_SUPPORTS_SAVE, layout_spyhunt )
+GAME (1983, spyhuntpr, spyhunt,  spyhuntpr,  spyhunt,  mcr3_state,  spyhuntpr,  ROT90, "Bally Midway", "Spy Hunter (prototype)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1984, crater,   0,        mcrscroll, crater,   mcr3_state, crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", GAME_SUPPORTS_SAVE )
 GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", GAME_SUPPORTS_SAVE, layout_turbotag )
