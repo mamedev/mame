@@ -287,6 +287,7 @@ endif
 ifneq ($(filter ISBX,$(BUSES)),)
 BUSOBJS += $(BUSOBJ)/isbx/isbx.o
 BUSOBJS += $(BUSOBJ)/isbx/compis_fdc.o
+BUSOBJS += $(BUSOBJ)/isbx/isbc_218a.o
 endif
 
 

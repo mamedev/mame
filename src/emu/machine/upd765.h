@@ -119,6 +119,7 @@ public:
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);
 	void set_floppy(floppy_image_device *image);
+	void soft_reset();
 
 protected:
 	virtual void device_start();
@@ -336,7 +337,6 @@ protected:
 
 	void delay_cycles(emu_timer *tm, int cycles);
 	void check_irq();
-	void soft_reset();
 	void fifo_expect(int size, bool write);
 	void fifo_push(UINT8 data, bool internal);
 	UINT8 fifo_pop(bool internal);

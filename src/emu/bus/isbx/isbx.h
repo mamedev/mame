@@ -149,6 +149,7 @@ extern const device_type ISBX_SLOT;
 
 // slot devices
 #include "compis_fdc.h"
+#include "isbc_218a.h"
 
 SLOT_INTERFACE_EXTERN( isbx_cards );
 

@@ -34,6 +34,7 @@ public:
 	m_terminal(*this, "terminal"),
 	m_uart8251(*this, "uart8251"),
 	m_uart8274(*this, "uart8274"),
+	m_pic_0(*this, "pic_0"),
 	m_pic_1(*this, "pic_1"),
 	m_centronics(*this, "centronics")
 	{ }
@@ -42,6 +43,7 @@ public:
 	required_device<serial_terminal_device> m_terminal;
 	optional_device<i8251_device> m_uart8251;
 	optional_device<i8274_device> m_uart8274;
+	required_device<pic8259_device> m_pic_0;
 	optional_device<pic8259_device> m_pic_1;
 	optional_device<centronics_device> m_centronics;
 
@@ -51,6 +53,8 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_READ8_MEMBER(ppi_b_r);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
+	IRQ_CALLBACK_MEMBER( irq_callback ) { return m_pic_0->inta_r(); }
+	void driver_start() { m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(isbc_state::irq_callback),this)); }
 };
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
@@ -302,6 +306,7 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(rpc86_mem)
 	MCFG_CPU_IO_MAP(rpc86_io)
+	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
 
 	/* video hardware */
 	MCFG_SERIAL_TERMINAL_ADD("terminal", terminal_intf, 300)
@@ -320,7 +325,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, isbc_uart8274_interface)
 	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, NULL)
 
-	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, "fdc")
+	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, "fdc_218a")
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir3_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir4_w))
 	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, NULL)
