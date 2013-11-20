@@ -1086,7 +1086,7 @@ ROM_START( crossbow )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1153,7 +1153,7 @@ ROM_START( cheyenne )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1214,7 +1214,7 @@ ROM_START( combat )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1275,7 +1275,7 @@ ROM_START( catch22 )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1334,7 +1334,7 @@ ROM_START( cracksht )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1380,7 +1380,7 @@ ROM_START( claypign )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1446,7 +1446,7 @@ ROM_START( chiller )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1519,7 +1519,7 @@ ROM_START( topsecex )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1579,7 +1579,7 @@ ROM_START( hitnmiss )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1640,7 +1640,7 @@ ROM_START( hitnmiss2 )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1649,7 +1649,78 @@ ROM_START( hitnmiss2 )
 ROM_END
 
 
-ROM_START( whodunit )
+ROM_START( whodunit ) /* Version 9 */
+	ROM_REGION( 0x50000, "maincpu", 0 )     /* 64k for code for the first CPU, plus lots of banked ROMs */
+	ROM_LOAD( "wdl-9_1-a_2764.bin", 0x08000, 0x2000, CRC(903e45f6) SHA1(3c5d3f0ec851331febf7da493bfa3b33ac5aaff3) )
+	ROM_LOAD( "wdl8.3a",   0x0a000, 0x2000, CRC(5d1530f8) SHA1(258d19c14a757497e0ce95a3ab8332168d97e67c) ) // WDL-9_3-A_2764.bin
+	ROM_LOAD( "wdl-9_4-a_2764.bin", 0x0c000, 0x2000, CRC(96c6b81f) SHA1(c4775b7cdbd2c977131b0df99aef75834a68559f) )
+	ROM_LOAD( "wdl-9_6-a_2764.bin", 0x0e000, 0x2000, CRC(c9a864ec) SHA1(2f67b8b711101818888bb9624be8a33d98ddc811) )
+	ROM_LOAD( "wdl-9_4-e_2764.bin", 0x14000, 0x2000, CRC(246c836f) SHA1(1c39b61dbbde5df2a79a9c96ed2a85eaf870b46c) )
+	ROM_LOAD( "wdl-9_6-e_2764.bin", 0x16000, 0x2000, CRC(65d551c0) SHA1(7ad3c2567ad7f64b8c3b9fade01296bad1ffff89) )
+	ROM_LOAD( "wdl-9_7-e_2764.bin", 0x18000, 0x2000, CRC(aee7a237) SHA1(e12a5cc825944c95461b436041631bc64ae7f0c3) )
+	ROM_LOAD( "wdl-9_8-e_2764.bin", 0x1a000, 0x2000, CRC(a1c1e995) SHA1(7fdd54102ba3d1a4e1612d1e63ac435317184c03) )
+	ROM_LOAD( "wdl8.10e",  0x1c000, 0x2000, CRC(f24adde5) SHA1(e4b22da75341a70c75fa245e26e965f1f7cbf3a1) ) // WDL-9_10-E_2764.bin
+	ROM_LOAD( "wdl8.11e",  0x1e000, 0x2000, CRC(ad6fe69e) SHA1(039baebb3a232cbd2c497cfe8aba234469e16ada) ) // WDL-9_11-E_2764.bin
+	ROM_LOAD( "wdl6.1d",   0x20000, 0x2000, CRC(3572fb71) SHA1(dcc5b04c8a4c0db62eeffe8524f67574142f1a19) ) // WDL-9_1-D_2764.bin
+	ROM_LOAD( "wdl6.3d",   0x22000, 0x2000, CRC(158074f4) SHA1(d4520017973a4476ba9ed7b5ed7cbfc3f5302f3a) ) // WDL-9_3-D_2764.bin
+	ROM_LOAD( "wdl8.4d",   0x24000, 0x2000, CRC(601d8bd0) SHA1(118e5d7358034c98a1e4e87b1e523e574c8264bb) ) // WDL-9_4-D_2764.bin
+	ROM_LOAD( "wdl8.6d",   0x26000, 0x2000, CRC(b72e8f63) SHA1(bdb5b379d5c14123e59cd186499703ca2096027c) ) // WDL-9_6-D_2764.bin
+	ROM_LOAD( "wdl6.7d",   0x28000, 0x2000, CRC(e3f55a4b) SHA1(9d3e4fc68f9b8c7228ef407f039849fdcdb1d9ef) ) // WDL-9_7-D_2764.bin
+	ROM_LOAD( "wdl6.8d",   0x2a000, 0x2000, CRC(932689c8) SHA1(9b65db2c4ce544331290f3dd57fde3b6aab905ff) ) // WDL-9_8-D_2764.bin
+	ROM_LOAD( "wdl6.10d",  0x2c000, 0x2000, CRC(0c4348f2) SHA1(19a3919dccf198c2189e310545aa15b319990579) ) // WDL-9_10-D_2764.bin
+	ROM_LOAD( "wdl8.11d",  0x2e000, 0x2000, CRC(92391ffe) SHA1(1f4bb288ec80af3eb452ca8fe67cba862e23977b) ) // WDL-9_11-D_2764.bin
+	ROM_LOAD( "wdl8.1c",   0x30000, 0x2000, CRC(21c62c90) SHA1(98dbf416e9d88383bf3e0e17a71861671046aa20) ) // WDL-9_1-C_2764.bin
+	ROM_LOAD( "wdl-9_3-c_2764.bin", 0x32000, 0x2000, CRC(b221188e) SHA1(0f488e7a46489e38da322769189c2f992bb3e1e7) )
+	ROM_LOAD( "wdl6.4c",   0x34000, 0x2000, CRC(7b58dfac) SHA1(b52566a9bfcd30510accc7e32c3535b99bf3372c) ) // WDL-9_4-C_2764.bin
+	ROM_LOAD( "wdl-9_6-c_2764.bin", 0x36000, 0x2000, CRC(abe0ba57) SHA1(9dfcdf8f7b8f09d6d2e90e1bb1fda9064215fe14) )
+	ROM_LOAD( "wdl6.7c",   0x38000, 0x2000, CRC(3cb3faae) SHA1(de719bc4806aa54ff73a723e3dfffed8bb394da0) ) // WDL-9_7-C_2764.bin
+	ROM_LOAD( "wdl6.8c",   0x3a000, 0x2000, CRC(51e95d91) SHA1(091dca2360456988da9ed39e757918ec58118258) ) // WDL-9_8-C_2764.bin
+	ROM_LOAD( "wdl6.10c",  0x3c000, 0x2000, CRC(eab12084) SHA1(aa75dfdeece07baa6cf72cecfc006af958768acf) ) // WDL-9_10-C_2764.bin
+	ROM_LOAD( "wdl6.11c",  0x3e000, 0x2000, CRC(fe2c532f) SHA1(199334fdc4c92ecacf4d4337bbe7419a53b78067) ) // WDL-9_11-C_2764.bin
+	ROM_LOAD( "wdl6.1b",   0x40000, 0x2000, CRC(cdaa5ca0) SHA1(1232e54cd61293f1cb7a8c628bb811bfd527ba93) ) // WDL-9_1-B_2764.bin
+	ROM_LOAD( "wdl6.3b",   0x42000, 0x2000, CRC(9bbc8161) SHA1(a4849ff8c957904a87f53edf79961a035e9b7c6b) ) // WDL-9_3-B_2764.bin
+	ROM_LOAD( "wdl8.4b",   0x44000, 0x2000, CRC(eb7dc583) SHA1(fe61e1eb16be246493db40f90090317d60a21bbf) ) // WDL-9_4-B_2764.bin
+	ROM_LOAD( "wdl8.6b",   0x46000, 0x2000, CRC(91c049a5) SHA1(8c6ae1e80925526902f80a2c549c6739353cdb86) ) // WDL-9_6-B_2764.bin
+	ROM_LOAD( "wdl6.7b",   0x48000, 0x2000, CRC(fe0a2d00) SHA1(a8649a95567f6c1f6513461a19250455b8cfe3ed) ) // WDL-9_7-B_2764.bin
+	ROM_LOAD( "wdl8.8b",   0x4a000, 0x2000, CRC(33792758) SHA1(408da288288f54f7446b083b14dc74d43ef4ab9f) ) // WDL-9_8-B_2764.bin
+	ROM_LOAD( "wdl-9_10-b_2764.bin",0x4c000, 0x2000, CRC(c5ab5805) SHA1(fd7c47e50eb4005b81309a73afae2e04a823d00b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "wda-9_h-1_2764.bin", 0x0e000, 0x2000, CRC(dc4b36f0) SHA1(1ddd47dbd7f3e360aae830b67a13dd6a1d7a6497) )
+
+	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_LOAD( "wda6.k2",   0x00000, 0x2000, CRC(d4951375) SHA1(88616a7cb587748b366ece6126185a85e7375659) ) // WDL-9_2-K_2764.bin
+	ROM_LOAD( "wda6.l2",   0x02000, 0x2000, CRC(be8dcf07) SHA1(9a6e9b256da07be50feb81b27e53d86b3f016f4e) ) // WDL-9_2-L_2764.bin
+	ROM_LOAD( "wda6.m2",   0x04000, 0x2000, CRC(fb389e2d) SHA1(8ee1be233429d6b7cbb56a13586e2db49dffaca1) ) // WDL-9_2-M_2764.bin
+	ROM_LOAD( "wda6.n2",   0x06000, 0x2000, CRC(3849bc78) SHA1(2b5bffec6919c3f4dfd3618f715445b02905cc1d) ) // WDL-9_2-N_2764.bin
+	ROM_LOAD( "wda6.p2",   0x08000, 0x2000, CRC(d0dcea80) SHA1(ac3305eab146f1741d38678a6f473474bef05ade) ) // WDL-9_2-P_2764.bin
+	ROM_LOAD( "wda6.r2",   0x0a000, 0x2000, CRC(748b0930) SHA1(f7e06ca6bef86d2bc8fa4569bcfc8d2ec199e4bd) ) // WDL-9_2-R_2764.bin
+	ROM_LOAD( "wda6.s2",   0x0c000, 0x2000, CRC(23d5c5a9) SHA1(ab8997556b6a9c4a011c367a2035aeba3c752be1) ) // WDL-9_2-S_2764.bin
+	ROM_LOAD( "wda6.t2",   0x0e000, 0x2000, CRC(a807536d) SHA1(154564c189c7e6f755acda95178db503991ecbaa) ) // WDL-9_2-T_2764.bin
+	ROM_LOAD( "wda8.l1",   0x12000, 0x2000, CRC(27b856bd) SHA1(f66f6f898d2a7f044b7d331290a7bf32715b5587) ) // WDL-9_1-L_2764.bin
+	ROM_LOAD( "wda8.m1",   0x14000, 0x2000, CRC(8e15c601) SHA1(924b10523cf8ff802c0907dae96cbc9bae9fe4b0) ) // WDL-9_1-M_2764.bin	
+	ROM_LOAD( "xba1.1n",   0x16000, 0x2000, CRC(2e855698) SHA1(fa4c3ec03fdd1c569c0ca2418899ffa81b5259ec) ) // WDL-9_1-N_2764.bin
+	ROM_LOAD( "wda6.p1",   0x18000, 0x2000, CRC(3ffaaa22) SHA1(a0848c0f4d799c3b6e9fe8e8f89e7e36754174f6) ) // WDL-9_1-P_2764.bin
+	ROM_LOAD( "wda6.r1",   0x1a000, 0x2000, CRC(0579a3b8) SHA1(554bced664c12547a766ee6df1278b967714b5ae) ) // WDL-9_1-R_2764.bin
+	ROM_LOAD( "wda6.s1",   0x1c000, 0x2000, CRC(f55c3c6e) SHA1(54878fe1106986e9aa26c6141921429119703990) ) // WDL-9_1-S_2764.bin
+	ROM_LOAD( "wda6.t1",   0x1e000, 0x2000, CRC(38363b52) SHA1(4b1c3225a32882e35e5af742f1c6b1e665722fd4) ) // WDL-9_1-T_2764.bin
+
+	ROM_REGION( 0x00900, "user1", 0 )
+	/* vertical sync timing */
+	ROM_LOAD( "xbl.12h",    0x00000, 0x0100, CRC(375c8bfc) SHA1(2602dde6961cc6b63d1652e2f3e4cfae2d8a34d9) ) // XBL-12H_MMI_6301.bin
+	/* horizontal sync timing */
+	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) ) // XBL-9H_MMI_6301.bin
+	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) ) // XBL-2H_MMI_6301.bin
+	ROM_LOAD( "xbl-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
+	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) ) // XBL-4K_MMI_6301.bin
+	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) ) // XBL-5K_MMI_6301.bin
+	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) ) // XBL-6K_MMI_6301.bin
+	ROM_LOAD( "xbl.7k",     0x00700, 0x0100, CRC(eda360b8) SHA1(79d84207e28c1289210cebd96abad6cfe1b4c1d0) ) // XBL-7K_MMI_6301.bin
+	ROM_LOAD( "xbl.8k",     0x00800, 0x0100, CRC(9d434cb1) SHA1(c3390bc1c02fe74ff2067f7fccfd1ad2c30b54a9) ) // XBL-8K_MMI_6301.bin
+ROM_END
+
+
+ROM_START( whodunit8 ) /* Version 8 */
 	ROM_REGION( 0x50000, "maincpu", 0 )     /* 64k for code for the first CPU, plus lots of banked ROMs */
 	ROM_LOAD( "wdl8.1a",   0x08000, 0x2000, CRC(50658904) SHA1(5d1b44a0e20c4ec599c339235f42ca881f8a5bfc) )
 	ROM_LOAD( "wdl8.3a",   0x0a000, 0x2000, CRC(5d1530f8) SHA1(258d19c14a757497e0ce95a3ab8332168d97e67c) )
@@ -1711,7 +1782,7 @@ ROM_START( whodunit )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1778,7 +1849,7 @@ ROM_START( showdown )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1841,7 +1912,7 @@ ROM_START( yukon )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -1904,7 +1975,7 @@ ROM_START( yukon1 )
 	/* horizontal sync timing */
 	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
 	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
-	ROM_LOAD( "xbl.3k",     0x00300, 0x0100, CRC(016fe2f7) SHA1(909f815a61e759fdf998674ee383512ecd8fee65) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
 	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
 	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
@@ -2009,7 +2080,8 @@ GAME( 1986, chiller,  0,        exidy440, chiller, exidy440_state,  exidy440, RO
 GAME( 1986, topsecex, 0,        topsecex, topsecex, exidy440_state, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
 GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)", 0 )
 GAME( 1987, hitnmiss2,hitnmiss, exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)", 0 )
-GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)", 0 )
+GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)", 0 )
+GAME( 1988, whodunit8,whodunit, exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)", 0 )
 GAME( 1988, showdown, 0,        exidy440, showdown, exidy440_state, showdown, ROT0, "Exidy", "Showdown (version 5.0)", 0 )
 GAME( 1989, yukon,    0,        exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 2.0)", 0 )
 GAME( 1989, yukon1,   yukon,    exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 1.0)", 0 )
