@@ -41,6 +41,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_v9938(*this, "v9938"),
+		m_v9958(*this, "v9958"),
 		m_cassette(*this, "cassette"),
 		m_ay8910(*this, "ay8910"),
 		m_ym(*this, "ym2413"),
@@ -139,6 +140,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<v9938_device> m_v9938;
+	optional_device<v9958_device> m_v9958;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ay8910_device> m_ay8910;
 	required_device<ym2413_device> m_ym;
@@ -158,6 +160,7 @@ public:
 	DECLARE_MACHINE_RESET(msx2);
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(msx2_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(msx2p_interrupt);
 	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
 	DECLARE_WRITE8_MEMBER(msx_printer_strobe_w);
 	DECLARE_WRITE8_MEMBER(msx_printer_data_w);

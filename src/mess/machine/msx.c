@@ -529,6 +529,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(msx_state::msx2_interrupt)
 	m_v9938->interrupt();
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(msx_state::msx2p_interrupt)
+{
+	m_v9958->set_resolution(m_io_dsw->read() & 0x03);
+	m_v9958->interrupt();
+}
+
 INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 {
 	m_mouse[0] = m_io_mouse0->read();
