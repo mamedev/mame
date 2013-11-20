@@ -127,6 +127,7 @@ public:
 	UINT8 m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(royalmah_palbank_w);
+	DECLARE_WRITE8_MEMBER(jansou_palbank_w);
 	DECLARE_WRITE8_MEMBER(mjderngr_coin_w);
 	DECLARE_WRITE8_MEMBER(mjderngr_palbank_w);
 	DECLARE_WRITE8_MEMBER(royalmah_rom_w);
@@ -243,7 +244,6 @@ void royalmah_state::palette_init()
 		palette_set_color_rgb(machine(),i, r,g,b);
 	}
 }
-
 
 PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
 {
@@ -425,7 +425,7 @@ WRITE8_MEMBER(royalmah_state::mjapinky_bank_w)
 
 WRITE8_MEMBER(royalmah_state::mjapinky_palbank_w)
 {
-	flip_screen_set(~data & 4);
+	m_flip_screen = (data & 4) >> 2;
 	m_palette_base = (data >> 3) & 0x01;
 	coin_counter_w(machine(), 0,data & 2);  // in
 	coin_counter_w(machine(), 1,data & 1);  // out
@@ -777,7 +777,12 @@ WRITE8_MEMBER(royalmah_state::jansou_sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-
+WRITE8_MEMBER(royalmah_state::jansou_palbank_w)
+{
+	m_flip_screen = ((data & 4) >> 2) ^ 1;
+	coin_counter_w(machine(), 0,data & 2);  // in
+	coin_counter_w(machine(), 1,data & 1);  // out
+}
 
 static ADDRESS_MAP_START( jansou_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
@@ -797,8 +802,15 @@ static ADDRESS_MAP_START( jansou_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( jansou_iomap, AS_IO, 8, royalmah_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE(jansou_palbank_w)
+	AM_IMPORT_FROM( royalmah_iomap )
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( jansou_sub_map, AS_PROGRAM, 8, royalmah_state )
-	AM_RANGE( 0x0000, 0xffff ) AM_ROM
+	AM_RANGE( 0x0000, 0xffff ) AM_ROM AM_WRITENOP // tries to write to the stack at irq generation
 ADDRESS_MAP_END
 
 
@@ -861,7 +873,7 @@ READ8_MEMBER(royalmah_state::janptr96_unknown_r)
 
 WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
 {
-	flip_screen_set(~data & 4);
+	m_flip_screen = (data & 4) >> 2;
 	coin_counter_w(machine(), 0,data & 2);  // in
 	coin_counter_w(machine(), 1,data & 1);  // out
 }
@@ -888,7 +900,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(royalmah_state::mjifb_coin_counter_w)
 {
-	flip_screen_set(data & 4);
+	m_flip_screen = ((data & 4) >> 2) ^ 1;
 	coin_counter_w(machine(), 0,data & 2);  // in
 	coin_counter_w(machine(), 1,data & 1);  // out
 }
@@ -1036,7 +1048,7 @@ WRITE8_MEMBER(royalmah_state::mjdejavu_rom_io_w)
 		case 0x8802:    m_palette_base = data & 0x1f;                   return;
 		case 0x9002:    machine().device<ay8910_device>("aysnd")->data_w(space,0,data);      return;
 		case 0x9003:    machine().device<ay8910_device>("aysnd")->address_w(space,0,data);   return;
-		case 0x9010:    mjifb_coin_counter_w(space,0,data);     return;
+		case 0x9010:    janptr96_coin_counter_w(space,0,data);     return;
 		case 0x9011:    input_port_select_w(space,0,data);      return;
 		case 0x9013:
 //          if (data)   popmessage("%02x",data);
@@ -1230,7 +1242,7 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 
 WRITE8_MEMBER(royalmah_state::mjvegasa_coin_counter_w)
 {
-	flip_screen_set(data & 4);
+	m_flip_screen = (data & 4) >> 2;
 	coin_counter_w(machine(), 0,data & 2);  // in
 	coin_counter_w(machine(), 1,data & 1);  // out
 }
@@ -3270,6 +3282,7 @@ static MACHINE_CONFIG_DERIVED( jansou, royalmah )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jansou_map)
+	MCFG_CPU_IO_MAP(jansou_iomap)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(jansou_sub_map)
