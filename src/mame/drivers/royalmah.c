@@ -124,6 +124,7 @@ public:
 	UINT8 m_gfxdata1;
 	UINT8 m_jansou_colortable[16];
 	UINT8 m_mjifb_rom_enable;
+	UINT8 m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(royalmah_palbank_w);
 	DECLARE_WRITE8_MEMBER(mjderngr_coin_w);
@@ -269,7 +270,8 @@ WRITE8_MEMBER(royalmah_state::royalmah_palbank_w)
 	/* bit 1 = coin counter */
 	coin_counter_w(machine(), 0,data & 2);
 
-	/* bit 2 always set? */
+	/* bit 2 = flip screen */
+	m_flip_screen = (data & 4) >> 2;
 
 	/* bit 3 = palette bank */
 	m_palette_base = (data >> 3) & 0x01;
@@ -282,6 +284,7 @@ WRITE8_MEMBER(royalmah_state::mjderngr_coin_w)
 	coin_counter_w(machine(), 0,data & 2);
 
 	/* bit 2 always set? */
+	m_flip_screen = (data & 4) >> 2;
 }
 
 
@@ -304,8 +307,8 @@ UINT32 royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_ind1
 		UINT8 data1 = videoram[offs + 0x0000];
 		UINT8 data2 = videoram[offs + 0x4000];
 
-		UINT8 y = 255 - (offs >> 6);
-		UINT8 x = 255 - (offs << 2);
+		UINT8 y = (m_flip_screen) ? 255 - (offs >> 6) : (offs >> 6);
+		UINT8 x = (m_flip_screen) ? 255 - (offs << 2) : (offs << 2);
 
 		for (i = 0; i < 4; i++)
 		{
@@ -313,7 +316,7 @@ UINT32 royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_ind1
 
 			bitmap.pix16(y, x) = (m_palette_base << 4) | pen;
 
-			x = x - 1;
+			x = (m_flip_screen) ? x - 1 : x + 1;
 			data1 = data1 >> 1;
 			data2 = data2 >> 1;
 		}
@@ -654,8 +657,8 @@ static ADDRESS_MAP_START( mjderngr_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE(mjderngr_coin_w )   // palette bank is set separately
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE(input_port_select_w )
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(dynax_bank_w )
-	AM_RANGE( 0x40, 0x40 ) AM_READ_PORT("DSW3")
-	AM_RANGE( 0x4c, 0x4c ) AM_READ_PORT("DSW2")
+	AM_RANGE( 0x40, 0x40 ) AM_READ_PORT("DSW2")
+	AM_RANGE( 0x4c, 0x4c ) AM_READ_PORT("DSW1")
 	AM_RANGE( 0x60, 0x60 ) AM_WRITE(mjderngr_palbank_w )
 ADDRESS_MAP_END
 
@@ -2050,6 +2053,61 @@ static INPUT_PORTS_START( mjdiplob )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Full Tests" )            // seems to hang after the last animation
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mjderngr )
+	PORT_INCLUDE( mjctrl2 )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "ROM & Animation Test" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4747,7 +4805,7 @@ GAME( 1988,  majs101b, 0,        majs101b, majs101b, driver_device, 0,        RO
 GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, driver_device, 0,        ROT0,   "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
 GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     0 )
 GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   0 )
-GAME( 1989,  mjderngr, 0,        mjderngr, majs101b, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
+GAME( 1989,  mjderngr, 0,        mjderngr, mjderngr, driver_device, 0,        ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
 GAME( 1989,  daisyari, 0,        daisyari, daisyari, driver_device, 0,        ROT0,   "Best System",                "Daisyarin [BET] (Japan)",               0 )
 GAME( 1990,  mjifb,    0,        mjifb,    mjifb, driver_device,    0,        ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )
 GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb, driver_device,    0,        ROT0,   "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
