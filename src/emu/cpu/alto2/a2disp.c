@@ -283,12 +283,12 @@ void alto2_cpu_device::unload_word()
  */
 void alto2_cpu_device::display_state_machine()
 {
-	LOG((LOG_DISPL,5,"DSP%03o:", m_dsp_state));
-	if (020 == m_dsp_state) {
+	LOG((LOG_DISPL,5,"DSP%03o:", m_dsp.state));
+	if (020 == m_dsp.state) {
 		LOG((LOG_DISPL,2," HLC=%d", m_dsp.hlc));
 	}
 
-	UINT8 a63 = m_disp_a63[m_dsp_state];
+	UINT8 a63 = m_disp_a63[m_dsp.state];
 	if (A63_HLCGATE_HI(a63)) {
 		/* reset or count horizontal line counters */
 		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END)
@@ -406,7 +406,7 @@ void alto2_cpu_device::display_state_machine()
 		} else {
 			LOG((LOG_DISPL,1, " HSYNC"));
 		}
-	} else if (A63_HSYNC_HI(m_dsp.a63)) {
+	} else if (A63_SCANEND_HI(a63)) {
 		/*
 		 * CLRBUF' also resets the 2nd cursor task block flip flop,
 		 * which is built from two NAND gates a30c and a30d (74H00).
@@ -416,15 +416,15 @@ void alto2_cpu_device::display_state_machine()
 		m_dsp.curt_wakeup = 1;
 	}
 
-	if (!m_dsp.curt_blocks && m_dsp.curt_wakeup) {
-		m_task_wakeup |= 1 << task_curt;
-	}
 
 	LOG((LOG_DISPL,1, " NEXT:%03o\n", next));
 
+	if (!m_dsp.curt_blocks && m_dsp.curt_wakeup)
+		m_task_wakeup |= 1 << task_curt;
+
 	m_dsp.a63 = a63;
 	m_dsp.a66 = a66;
-	m_dsp_state = next;
+	m_dsp.state = next;
 }
 
 /**
@@ -457,6 +457,7 @@ void alto2_cpu_device::init_disp()
 		m_dsp.scanline[y] = auto_alloc_array(machine(), UINT8, ALTO2_DISPLAY_TOTAL_WIDTH);
 
 	m_dsp.bitmap = auto_bitmap_ind16_alloc(machine(), ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT);
+	m_dsp.state = 020;
 }
 
 void alto2_cpu_device::exit_disp()

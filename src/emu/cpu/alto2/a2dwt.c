@@ -10,7 +10,7 @@
 #include "alto2cpu.h"
 
 /**
- * @brief f1_dwt_block early: block the display word task
+ * @brief block the display word task
  */
 void alto2_cpu_device::f1_early_dwt_block()
 {
@@ -26,7 +26,7 @@ void alto2_cpu_device::f1_early_dwt_block()
 }
 
 /**
- * @brief f2_load_ddr late: load the display data register
+ * @brief load the display data register
  */
 void alto2_cpu_device::f2_late_dwt_load_ddr()
 {

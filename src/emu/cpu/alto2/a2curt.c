@@ -59,8 +59,8 @@ void alto2_cpu_device::f2_late_load_csr()
  */
 void alto2_cpu_device::activate_curt()
 {
-	m_task_wakeup &= ~(1 << m_task);
-	m_dsp.curt_wakeup = 0;
+    m_task_wakeup &= ~(1 << m_task);
+    m_dsp.curt_wakeup = 0;
 }
 
 /** @brief initialize the cursor task F1 and F2 functions */

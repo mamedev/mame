@@ -9,80 +9,66 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
-/** @brief the ethernet ID of this machine */
-UINT8 ether_id = 254;
+#define DEBUG_PACKETS   1
 
-/** @brief hardware status: write latch full/filled (? set by EODFCT) */
-#define	GET_ETH_WLF(st)			X_BIT(st,16,4)
+#define	GET_ETH_WLF(st)			X_BIT(st,16,4)              //!< hardware status: write latch full/filled (? set by EODFCT)
 #define	PUT_ETH_WLF(st,val)		X_WRBITS(st,16,4,4,val)
 
-/** @brief hardware status: output end of transmission (set by EEFCT) */
-#define	GET_ETH_OEOT(st)		X_BIT(st,16,5)
+#define	GET_ETH_OEOT(st)		X_BIT(st,16,5)              //!< hardware status: output end of transmission (set by EEFCT)
 #define	PUT_ETH_OEOT(st,val)	X_WRBITS(st,16,5,5,val)
 
-/** @brief hardware status: input gone */
-#define	GET_ETH_IGONE(st)		X_BIT(st,16,6)
+#define	GET_ETH_IGONE(st)		X_BIT(st,16,6)              //!< hardware status: input gone
 #define	PUT_ETH_IGONE(st,val)	X_WRBITS(st,16,6,6,val)
 
-/** @brief hardware status: input busy (set by EISFCT, bit isn't visible to microcode) */
-#define	GET_ETH_IBUSY(st)		X_BIT(st,16,7)
+#define	GET_ETH_IBUSY(st)		X_BIT(st,16,7)              //!< hardware status: input busy (set by EISFCT, bit isn't visible to microcode)
 #define	PUT_ETH_IBUSY(st,val)	X_WRBITS(st,16,7,7,val)
 
-/** @brief hardware status: output gone */
-#define	GET_ETH_OGONE(st)		X_BIT(st,16,8)
+#define	GET_ETH_OGONE(st)		X_BIT(st,16,8)              //!< hardware status: output gone
 #define	PUT_ETH_OGONE(st,val)	X_WRBITS(st,16,8,8,val)
 
-/** @brief hardware status: output busy (set by EOSFCT, bit isn't visible to microcode) */
-#define	GET_ETH_OBUSY(st)		X_BIT(st,16,9)
+#define	GET_ETH_OBUSY(st)		X_BIT(st,16,9)              //!< hardware status: output busy (set by EOSFCT, bit isn't visible to microcode)
 #define	PUT_ETH_OBUSY(st,val)	X_WRBITS(st,16,9,9,val)
 
-/** @brief hardware status: input data late */
-#define	GET_ETH_IDL(st)			X_BIT(st,16,10)
+#define	GET_ETH_IDL(st)			X_BIT(st,16,10)             //!< hardware status: input data late
 #define	PUT_ETH_IDL(st,val)		X_WRBITS(st,16,10,10,val)
 
-/** @brief hardware status: collision */
-#define	GET_ETH_COLL(st)		X_BIT(st,16,11)
+#define	GET_ETH_COLL(st)		X_BIT(st,16,11)             //!< hardware status: collision
 #define	PUT_ETH_COLL(st,val)	X_WRBITS(st,16,11,11,val)
 
-/** @brief hardware status: CRC error */
-#define	GET_ETH_CRC(st)			X_BIT(st,16,12)
+#define	GET_ETH_CRC(st)			X_BIT(st,16,12)             //!< hardware status: CRC error
 #define	PUT_ETH_CRC(st,val)		X_WRBITS(st,16,12,12,val)
 
-/** @brief hardware status: input command (set from BUS[14] on SIO, reset by EPFCT) */
-#define	GET_ETH_ICMD(st)		X_BIT(st,16,13)
+#define	GET_ETH_ICMD(st)		X_BIT(st,16,13)				//!< hardware status: input command (set from BUS[14] on SIO, reset by EPFCT)
 #define	PUT_ETH_ICMD(st,val)	X_WRBITS(st,16,13,13,val)
 
-/** @brief hardware status: output command (set from BUS[15] on SIO, reset by EPFCT) */
-#define	GET_ETH_OCMD(st)		X_BIT(st,16,14)
+#define	GET_ETH_OCMD(st)		X_BIT(st,16,14)				//!< hardware status: output command (set from BUS[15] on SIO, reset by EPFCT)
 #define	PUT_ETH_OCMD(st,val)	X_WRBITS(st,16,14,14,val)
 
-/** @brief hardware status: IT flip flop & ISRFULL' */
-#define	GET_ETH_IT(st)			ALTO2_GET(st,16,15,15)
+#define	GET_ETH_IT(st)			X_BIT(st,16,15)				//!< hardware status: IT flip flop & ISRFULL'
 #define	PUT_ETH_IT(st,val)		X_WRBITS(st,16,15,15,val)
 
-/** @brief missing PROM ether.u49; buffer empty (active low) */
+//! PROM ether.u49; buffer empty (active low)
 #define	ETHER_A49_BE	(m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd] & (1 << 0))
 
-/** @brief missing PROM ether.u49; buffer next(?) empty (active low) */
+//! PROM ether.u49; buffer next(?) empty (active low)
 #define	ETHER_A49_BNE	(m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd] & (1 << 1))
 
-/** @brief missing PROM ether.u49; buffer next next(?) empty (active low) */
+//! PROM ether.u49; buffer next next(?) empty (active low)
 #define	ETHER_A49_BNNE	(m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd] & (1 << 2))
 
-/** @brief missing PROM ether.u49; buffer full (active low) */
+//! PROM ether.u49; buffer full (active low)
 #define	ETHER_A49_BF	(m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd] & (1 << 3))
 
-
-#define	BREATHLEN	0400	/* ethernet packet length */
-#define	BREATHADDR	0177400	/* dest,,source */
-#define	BREATHTYPE	0000602	/* ethernet packet type */
+#define	BREATHLEN	ALTO2_ETHER_PACKET_SIZE	//!< ethernet packet length
+#define	BREATHADDR	0177400					//!< destination and source
+#define	BREATHTYPE	0000602					//!< ethernet packet type
 static const UINT16 duckbreath_data[BREATHLEN] =
 {
-	BREATHADDR,		/* 3MB dest,,source */
+	BREATHADDR,		/* 3MB destination and source */
 	BREATHTYPE,		/* ether packet type  */
 	/* the rest is the contents of a breath of life packet.
-	 * see <altosource>etherboot.dm (etherboot.asm) for alto
-	 * assembly code.
+	 * see <altosource>etherboot.dm (etherboot.asm) for the
+	 * Alto assembly code.
 	 */
 	0022574, 0100000, 0040437, 0102000, 0034431, 0164000,
 	0061005, 0102460, 0024567, 0034572, 0061006, 0024565, 0034570, 0061006,
@@ -118,19 +104,52 @@ static const UINT16 duckbreath_data[BREATHLEN] =
 	0014623, 0004644, 0020634, 0061004, 0002000, 0176764, 0001401, 0041002
 };
 
+#if	DEBUG_PACKETS
+static void dump_ascii(const UINT16 *src, size_t size)
+{
+	printf(" [");
+	for (size_t offs = 0; offs < size; offs++) {
+		char ch1 = src[offs] / 256;
+		char ch2 = src[offs] % 256;
+		printf("%c", ch1 < 32 || ch1 > 126 ? '.' : ch1);
+		printf("%c", ch2 < 32 || ch2 > 126 ? '.' : ch2);
+	}
+	printf("]\n");
+}
+
+size_t dump_packet(const UINT16 *src, size_t addr, size_t size)
+{
+	size_t offs;
+	for (offs = 0; offs < size; offs++) {
+		UINT16 word = src[offs];
+		if (offs % 8) {
+			printf(" %06o", word);
+		} else {
+			if (offs > 0)
+				dump_ascii(&src[offs-8], 8);
+			printf("\t%05o: %06o", static_cast<unsigned>(addr + offs), word);
+		}
+	}
+	if (offs % 8) {
+		dump_ascii(&src[offs - (offs % 8)], offs % 8);
+	} else if (offs > 0) {
+		dump_ascii(&src[offs - 8], 8);
+	}
+	return size;
+}
+#endif
+
 /**
- * @brief check for the various reasons to wakeup the Ethernet task
+ * @brief check for the various reasons to wakeup the ethernet task
  */
 void alto2_cpu_device::eth_wakeup()
 {
-	register int busy, idr, odr, etac;
-
-	etac = m_task == task_ether;
+	register int etac = m_task == task_ether;
 
 	LOG((LOG_ETH,0,"eth_wakeup: ibusy=%d obusy=%d ", GET_ETH_IBUSY(m_eth.status), GET_ETH_OBUSY(m_eth.status)));
-	busy = GET_ETH_IBUSY(m_eth.status) | GET_ETH_OBUSY(m_eth.status);
-	/* if not busy, reset the FIFO read and write counters */
-	if (busy == 0) {
+	register int busy = GET_ETH_IBUSY(m_eth.status) | GET_ETH_OBUSY(m_eth.status);
+	if (0 == busy) {
+		// if not busy, reset the FIFO read and write counters
 		m_eth.fifo_rd = 0;
 		m_eth.fifo_wr = 0;
 	}
@@ -178,7 +197,7 @@ void alto2_cpu_device::eth_wakeup()
 	 *
 	 * IDR' = (IBUSY & (BNNE & (BNE' & ETAC')')')'
 	 */
-	idr = GET_ETH_IBUSY(m_eth.status) && (ETHER_A49_BNNE || (ETHER_A49_BNE == 0 && etac));
+	register int idr = GET_ETH_IBUSY(m_eth.status) && (ETHER_A49_BNNE || (ETHER_A49_BNE == 0 && etac));
 	if (idr) {
 		m_task_wakeup |= 1 << task_ether;
 		LOG((LOG_ETH,0,"input data ready\n"));
@@ -194,7 +213,7 @@ void alto2_cpu_device::eth_wakeup()
 	 *
 	 * ODR'	= (OBUSY & OEOT' & (BF' & WLF')')'
 	 */
-	odr = GET_ETH_OBUSY(m_eth.status) && (GET_ETH_OEOT(m_eth.status) || (GET_ETH_WLF(m_eth.status) && ETHER_A49_BF == 0));
+	register int odr = GET_ETH_OBUSY(m_eth.status) && (GET_ETH_OEOT(m_eth.status) || (GET_ETH_WLF(m_eth.status) && ETHER_A49_BF == 0));
 	if (odr) {
 		m_task_wakeup |= 1 << task_ether;
 		LOG((LOG_ETH,0,"output data ready\n"));
@@ -204,8 +223,8 @@ void alto2_cpu_device::eth_wakeup()
 	/*
 	 * EWFCT (ether wake function) conditions to wakeup the Ether task:
 	 *	EWFCT	flip flop set by the F1 EWFCT
-	 * The task is activated by the display.c code together with the
-	 * next wakeup of the MRT (memory refresh task).
+	 * The task is activated by the display code together with the
+	 * next wakeup of the memory refresh task (MRT).
 	 */
 	if (m_ewfct) {
 		m_task_wakeup |= 1 << task_ether;
@@ -213,7 +232,7 @@ void alto2_cpu_device::eth_wakeup()
 		return;
 	}
 
-	/* otherwise no more wakeup for the Ether task */
+	// otherwise no more wakeups for the ether task
 	LOG((LOG_ETH,0,"-/-\n"));
 	m_task_wakeup &= ~(1 << task_ether);
 }
@@ -305,8 +324,8 @@ void alto2_cpu_device::eth_wakeup()
  * H  H  H	X^16+x^11+x^4+1                 CRC-CCITT reverse
  *
  * </PRE>
- * The Alto Ethernet interface seems to be using the last one of polynomials,
- * or perhaps something entirely different.
+ * The Alto ethernet interface seems to be using the last one of the polynomials,
+ * or perhaps something entirely different?
  *
  * TODO: verify polynomial generator; build a lookup table to make it faster.
  *
@@ -337,8 +356,9 @@ void alto2_cpu_device::rx_duckbreath(void* ptr, INT32 arg)
 	UINT32 data;
 
 	if (arg == 0) {
-		/* first word: set the IBUSY flip flop */
+		// first word: set the IBUSY flip flop
 		PUT_ETH_IBUSY(m_eth.status, 1);
+		m_eth.rx_count = 0;
 	}
 
 	data = duckbreath_data[arg++];
@@ -346,6 +366,10 @@ void alto2_cpu_device::rx_duckbreath(void* ptr, INT32 arg)
 
 	m_eth.fifo[m_eth.fifo_wr] = data;
 	m_eth.fifo_wr = (m_eth.fifo_wr + 1) % ALTO2_ETHER_FIFO_SIZE;
+
+	if (m_eth.rx_count < ALTO2_ETHER_PACKET_SIZE)
+		m_eth.rx_packet[m_eth.rx_count] = data;
+	m_eth.rx_count++;
 
 	PUT_ETH_WLF(m_eth.status, 1);
 	if (ETHER_A49_BF == 0) {
@@ -362,15 +386,17 @@ void alto2_cpu_device::rx_duckbreath(void* ptr, INT32 arg)
 		 * and set the CRC error flag if they differ.
 		 */
 		m_eth.rx_crc = 0;
-		/* set the IGONE flip flop */
+
+		// set the IGONE flip flop
 		PUT_ETH_IGONE(m_eth.status, 1);
-
-		m_eth.tx_timer->adjust(attotime::from_seconds(m_duckbreath_sec), 0);
+#if	DEBUG_PACKETS
+		dump_packet(m_eth.rx_packet, 0, m_eth.rx_count);
+#endif
+		m_eth.rx_timer->adjust(attotime::from_seconds(m_duckbreath_sec), 0);
 	} else {
-		/* 5.44us per word (?) */
-		m_eth.tx_timer->adjust(attotime::from_usec(5.44), arg);
+		// receive at a rate of 5.44us per word
+		m_eth.rx_timer->adjust(attotime::from_usec(5.44), arg);
 	}
-
 	eth_wakeup();
 }
 
@@ -384,12 +410,14 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
 {
 	UINT32 data;
 
-	/* last word is the CRC */
-	if (arg == -1) {
-		if (m_eth.tx_timer)
-			m_eth.tx_timer->enable(false);
-		/* TODO: send the CRC as final word of the packet */
+	// the last word sent is the CRC
+	if (-1 == arg) {
+		m_eth.tx_timer->reset();
 		LOG((LOG_ETH,0," CRC:%06o\n", m_eth.tx_crc));
+#if	DEBUG_PACKETS
+		dump_packet(m_eth.tx_packet, 0, m_eth.tx_count);
+#endif
+		// TODO: send the CRC as final word of the packet
 		m_eth.tx_crc = 0;
 		PUT_ETH_OGONE(m_eth.status, 1);		// set the OGONE flip flop
 		eth_wakeup();
@@ -398,30 +426,30 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
 
 	data = m_eth.fifo[m_eth.fifo_rd];
 	m_eth.tx_crc = f9401_7(m_eth.tx_crc, data);
-	if (m_eth.fifo_rd % 8)
-		LOG((LOG_ETH,0," %06o", data));
-	else
-		LOG((LOG_ETH,0,"\n%06o: %06o", m_eth.tx_count, data));
 	m_eth.fifo_rd = (m_eth.fifo_rd + 1) % ALTO2_ETHER_FIFO_SIZE;
+
+	if (m_eth.tx_count < ALTO2_ETHER_PACKET_SIZE)
+		m_eth.tx_packet[m_eth.tx_count] = data;
 	m_eth.tx_count++;
 
-	/* is the FIFO empty now? */
+	// is the FIFO empty now?
 	if (ETHER_A49_BE) {
 		/* clear the OBUSY and WLF flip flops */
 		PUT_ETH_OBUSY(m_eth.status, 0);
 		PUT_ETH_WLF(m_eth.status, 0);
-		// FIXME: Use MAME timer
-		// m_eth.tx_id = timer_insert(TIME_US(5.44), tx_packet, -1, "tx packet CRC");
+		m_eth.tx_timer->adjust(attotime::from_usec(5.44), -1);
 		eth_wakeup();
 		return;
 	}
 
-	/* next word */
-	// FIXME: Use MAME timer
-	// m_eth.tx_id = timer_insert(TIME_US(5.44), tx_packet, arg + 1, "tx packet");
+	/* transmit teh next word after 5.44µs */
+	m_eth.tx_timer->adjust(attotime::from_usec(5.44), arg + 1);
 	eth_wakeup();
 }
 
+/**
+ * @brief ethernet start function - called from the emulator task
+ */
 void alto2_cpu_device::eth_startf()
 {
 	PUT_ETH_ICMD(m_eth.status, X_BIT(m_bus,16,14));
@@ -431,7 +459,7 @@ void alto2_cpu_device::eth_startf()
 }
 
 /**
- * @brief bs_eidfct early: Ethernet input data function
+ * @brief ethernet input data function
  *
  * Gates the contents of the FIFO to BUS[0-15], and increments
  * the read pointer at the end of the cycle.
@@ -443,13 +471,11 @@ void alto2_cpu_device::bs_early_eidfct()
 	LOG((LOG_ETH,3, "	←EIDFCT; pull %06o from FIFO[%02o]\n", r, m_eth.fifo_rd));
 	m_eth.fifo_rd = (m_eth.fifo_rd + 1) % ALTO2_ETHER_FIFO_SIZE;
 	m_bus &= r;
-	m_eth.rx_count++;
-
 	eth_wakeup();
 }
 
 /**
- * @brief f1_eth_block early: block the Ether task
+ * @brief block the ethernet task
  */
 void alto2_cpu_device::f1_early_eth_block()
 {
@@ -458,7 +484,7 @@ void alto2_cpu_device::f1_early_eth_block()
 }
 
 /**
- * @brief f1_eilfct early: Ethernet input look function
+ * @brief ethernet input look function
  *
  * Gates the contents of the FIFO to BUS[0-15], but does not
  * increment the read pointer;
@@ -471,31 +497,40 @@ void alto2_cpu_device::f1_early_eilfct()
 }
 
 /**
- * @brief f1_epfct early: Ethernet post function
+ * @brief ethernet post function
  *
  * Gates the interface status to BUS[8-15]. Resets the interface
  * at the end of the function.
  *
  * The schematics suggest that just BUS[10-15] is modified.
  *
- * Also a comment from the microcode:
+ * Also a comment from the microcode suggests this:
+ *<PRE>
  * ;Ether Post Function - EPFCT.  Gate the hardware status
  * ;(LOW TRUE) to Bus [10:15], reset interface.
- *
+ *</PRE>
  */
 void alto2_cpu_device::f1_early_epfct()
 {
 	UINT16 r = ~X_RDBITS(m_eth.status,16,10,15) & 0177777;
 
 	LOG((LOG_ETH,3, "	←EPFCT; BUS[8-15] = STATUS (%#o)\n", r));
+	LOG((LOG_ETH,5, "		IDL     : %u\n", GET_ETH_IDL(m_eth.status)));
+	LOG((LOG_ETH,5, "		COLL    : %u\n", GET_ETH_COLL(m_eth.status)));
+	LOG((LOG_ETH,5, "		CRC     : %u\n", GET_ETH_CRC(m_eth.status)));
+	LOG((LOG_ETH,5, "		ICMD    : %u\n", GET_ETH_ICMD(m_eth.status)));
+	LOG((LOG_ETH,5, "		OCMD    : %u\n", GET_ETH_OCMD(m_eth.status)));
+	LOG((LOG_ETH,5, "		IT      : %u\n", GET_ETH_IT(m_eth.status)));
+
 	m_bus &= r;
 
 	m_eth.status = 0;
+	m_eth.tx_count = 0;
 	eth_wakeup();
 }
 
 /**
- * @brief f1_ewfct late: Ethernet countdown wakeup function
+ * @brief ethernet countdown wakeup function
  *
  * Sets a flip flop in the interface that will cause a wakeup to the
  * Ether task on the next tick of SWAKMRT (memory refresh task).
@@ -512,7 +547,7 @@ void alto2_cpu_device::f1_late_ewfct()
 }
 
 /**
- * @brief f2_eodfct late: Ethernet output data function
+ * @brief ethernet output data function
  *
  * Loads the FIFO from BUS[0-15], then increments the write
  * pointer at the end of the cycle.
@@ -526,17 +561,14 @@ void alto2_cpu_device::f2_late_eodfct()
 
 	PUT_ETH_WLF(m_eth.status, 1);
 	PUT_ETH_OBUSY(m_eth.status, 1);
-	/* if the FIFO is full */
-	if (ETHER_A49_BF == 0) {
-		if (!m_eth.tx_timer) {
-			m_eth.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::tx_packet),this));
-		}
-	}
+	// if the FIFO is full, kick off the timer
+	if (0 == ETHER_A49_BF)
+		m_eth.tx_timer->adjust(attotime::from_usec(5.44), 0);
 	eth_wakeup();
 }
 
 /**
- * @brief f2_eosfct late: Ethernet output start function
+ * @brief f2_eosfct late: ethernet output start function
  *
  * Sets the OBUSY flip flop in the interface, starting data
  * wakeups to fill the FIFO for output. When the FIFO is full,
@@ -552,13 +584,13 @@ void alto2_cpu_device::f2_late_eosfct()
 }
 
 /**
- * @brief f2_erbfct late: Ethernet reset branch function
+ * @brief f2_erbfct late: ethernet reset branch function
  *
  * This command dispatch function merges the ICMD and OCMD flip flops
  * into NEXT[6-7]. These flip flops are the means of communication
- * between the emulator task and the Ethernet task. The emulator
+ * between the emulator task and the ethernet task. The emulator
  * task sets them up from BUS[14-15] with the STARTF function,
- * causing the Ethernet task to wakeup, dispatch on them and then
+ * causing the ethernet task to wakeup, dispatch on them and then
  * reset them with EPFCT.
  */
 void alto2_cpu_device::f2_late_erbfct()
@@ -572,7 +604,7 @@ void alto2_cpu_device::f2_late_erbfct()
 }
 
 /**
- * @brief f2_eefct late: Ethernet end of transmission function
+ * @brief ethernet end of transmission function
  *
  * This function is issued when all of the main memory output buffer
  * has been transferred to the FIFO. EEFCT disables further data
@@ -580,24 +612,21 @@ void alto2_cpu_device::f2_late_erbfct()
  */
 void alto2_cpu_device::f2_late_eefct()
 {
-	/* start transmitting the packet */
 	PUT_ETH_OBUSY(m_eth.status, 1);
 	PUT_ETH_OEOT(m_eth.status, 1);
-	if (m_eth.tx_timer) {
-		m_eth.tx_timer->enable();
-	} else {
-		m_eth.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::tx_packet),this));
-		m_eth.tx_timer->adjust(attotime::from_usec(5.44), 0);
-	}
+	// end transmitting the packet
+	m_eth.tx_timer->adjust(attotime::from_usec(5.44), -1);
 	eth_wakeup();
 }
 
 /**
- * @brief f2_ebfct late: Ethernet branch function
+ * @brief ethernet branch function
  *
- * ORs a 1 into NEXT[7] if an input data late is detected, or an SIO
- * with AC0[14-15] non-zero is issued, or if the transmitter or
- * receiver is gone. ORs a 1 into NEXT[6] if a collision is detected.
+ * ORs a 1 into NEXT[6] if a collision is detected.
+ * ORs a 1 into NEXT[7] if an input data late is detected,
+ *     or a SIO with AC0[14-15] non-zero is issued,
+ *     or if the transmitter is gone
+ *     or if the receiver is gone.
  */
 void alto2_cpu_device::f2_late_ebfct()
 {
@@ -613,7 +642,7 @@ void alto2_cpu_device::f2_late_ebfct()
 }
 
 /**
- * @brief f2_ecbfct late: Ethernet countdown branch function
+ * @brief f2_ecbfct late: ethernet countdown branch function
  *
  * ORs a one into NEXT[7] if the FIFO is not empty.
  */
@@ -627,7 +656,7 @@ void alto2_cpu_device::f2_late_ecbfct()
 }
 
 /**
- * @brief f2_eisfct late: Ethernet input start function
+ * @brief f2_eisfct late: ethernet input start function
  *
  * Sets the IBUSY flip flop in the interface, causing it to hunt
  * for the beginning of a packet: silence on the Ether followed
@@ -641,7 +670,7 @@ void alto2_cpu_device::f2_late_eisfct()
 	eth_wakeup();
 }
 
-/** @brief called by the CPU when the Ethernet task becomes active
+/** @brief called by the CPU when the ethernet task becomes active
  *
  * Reset the Ether wake flip flop
  */
@@ -651,12 +680,14 @@ void alto2_cpu_device::activate_eth()
 }
 
 /**
- * @brief Ethernet task slot initialization
+ * @brief ethernet task slot initialization
  */
 void alto2_cpu_device::init_ether(int task)
 {
 	// intialize all ethernet variables
 	memset(&m_eth, 0, sizeof(m_eth));
+
+	// FIXME: read configuration for m_eth.duckbreath enable
 
 	set_bs(task, bs_ether_eidfct,	&alto2_cpu_device::bs_early_eidfct,	0);
 
@@ -674,6 +705,18 @@ void alto2_cpu_device::init_ether(int task)
 	set_f2(task, f2_ether_eisfct,	0, &alto2_cpu_device::f2_late_eisfct);
 
 	m_active_callback[task] = &alto2_cpu_device::activate_eth;
+
+	m_eth.rx_packet = auto_alloc_array(machine(), UINT16, sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
+	m_eth.tx_packet = auto_alloc_array(machine(), UINT16, sizeof(UINT16)*ALTO2_ETHER_PACKET_SIZE);
+
+	m_eth.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::tx_packet),this));
+	m_eth.tx_timer->reset();
+
+	m_eth.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::rx_duckbreath),this));
+	if (m_eth.duckbreath)
+		m_eth.rx_timer->adjust(attotime::from_seconds(m_duckbreath_sec), 0);
+	else
+		m_eth.rx_timer->reset();
 }
 
 void alto2_cpu_device::exit_ether()

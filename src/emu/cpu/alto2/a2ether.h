@@ -10,6 +10,7 @@
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
 #define ALTO2_ETHER_FIFO_SIZE	16              //!< number of words in the ethernet FIFO
+#define ALTO2_ETHER_PACKET_SIZE 0400            //!< size of a packet in words
 
 #else   // ALTO2_DEFINE_CONSTANTS
 #ifndef _A2ETHER_H_
@@ -115,6 +116,9 @@ struct {
 	UINT32 tx_crc;								//!< transmitter CRC
 	UINT32 rx_count;							//!< received words count
 	UINT32 tx_count;							//!< transmitted words count
+	UINT16* rx_packet;							//!< buffer to collect received words
+	UINT16* tx_packet;							//!< buffer to collect transmitted words
+	emu_timer* rx_timer;						//!< receiver timer
 	emu_timer* tx_timer;						//!< transmitter timer
 	int duckbreath;								//!< if non-zero, interval in seconds at which to broadcast the duckbreath
 }	m_eth;

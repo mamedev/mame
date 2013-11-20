@@ -570,11 +570,12 @@ private:
 	bool m_ether_enable;							//!< set to true, if the ethernet should be simulated
 	bool m_ewfct;									//!< set by Ether task when it want's a wakeup at switch to task_mrt
 	int m_dsp_time;									//!< display_state_machine() time accu
-	int m_dsp_state;								//!< display_state_machine() previous state
 	int m_unload_time;								//!< unload word time accu
 	int m_unload_word;								//!< unload word number
+#if	(USE_BITCLK_TIMER == 0)
 	int	m_bitclk_time;								//!< bitclk call time accu
 	int m_bitclk_index;								//!< bitclk index (bit number)
+#endif
 
 	static const char *task_name(int task);			//!< human readable task names
 	static const char *r_name(UINT8 reg);			//!< human readable register names

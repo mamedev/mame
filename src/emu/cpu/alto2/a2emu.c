@@ -361,6 +361,7 @@ void alto2_cpu_device::f1_early_startf()
 		LOG((LOG_EMU,2,"****	Software boot feature\n"));
 		soft_reset();
 	} else {
+		LOG((LOG_EMU,2,"****	Ethernet start frame\n"));
 		eth_startf();
 	}
 }

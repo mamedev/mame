@@ -10,96 +10,103 @@
 
 /* Input Ports */
 
+#define	PORT_KEY(_bit,_code,_char1,_char2,_name) \
+	PORT_BIT(_bit, IP_ACTIVE_LOW, IPT_KEYBOARD) \
+	PORT_CODE(_code) PORT_NAME(_name) \
+	PORT_CHAR(_char1) PORT_CHAR(_char2) \
+
+#define SPACING "     "
+
 static INPUT_PORTS_START( alto2 )
 	PORT_START("ROW0")
-	PORT_BIT(A2_KEY_5,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')	//!< normal: 5    shifted: %
-	PORT_BIT(A2_KEY_4,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')	//!< normal: 4    shifted: $
-	PORT_BIT(A2_KEY_6,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 ~") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('~')	//!< normal: 6    shifted: ~
-	PORT_BIT(A2_KEY_E,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e E") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')	//!< normal: e    shifted: E
-	PORT_BIT(A2_KEY_7,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')	//!< normal: 7    shifted: &
-	PORT_BIT(A2_KEY_D,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d D") PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')	//!< normal: d    shifted: D
-	PORT_BIT(A2_KEY_U,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u U") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')	//!< normal: u    shifted: U
-	PORT_BIT(A2_KEY_V,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v V") PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')	//!< normal: v    shifted: V
-	PORT_BIT(A2_KEY_0,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')	//!< normal: 0    shifted: )
-	PORT_BIT(A2_KEY_K,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k K") PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')	//!< normal: k    shifted: K
-	PORT_BIT(A2_KEY_MINUS,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')	//!< normal: -    shifted: _
-	PORT_BIT(A2_KEY_P,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p P") PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')	//!< normal: p    shifted: P
-	PORT_BIT(A2_KEY_SLASH,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')	//!< normal: /    shifted: ?
-	PORT_BIT(A2_KEY_BACKSLASH,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')	//!< normal: \    shifted: |
-	PORT_BIT(A2_KEY_LF,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_DOWN) PORT_CHAR('\012')				//!< normal: LF   shifted: ?
-	PORT_BIT(A2_KEY_BS,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('\010')			//!< normal: BS   shifted: ?
+	PORT_KEY(A2_KEY_5,          KEYCODE_5,          '5',    '%',  "5" SPACING "%")  //!< normal: 5    shifted: %
+	PORT_KEY(A2_KEY_4,          KEYCODE_4,          '4',    '$',  "4" SPACING "$")  //!< normal: 4    shifted: $
+	PORT_KEY(A2_KEY_6,          KEYCODE_6,          '6',    '~',  "6" SPACING "~")  //!< normal: 6    shifted: ~
+	PORT_KEY(A2_KEY_E,          KEYCODE_E,          'e',    'E',  "e" SPACING "E")  //!< normal: e    shifted: E
+	PORT_KEY(A2_KEY_7,          KEYCODE_7,          '7',    '&',  "7" SPACING "&")  //!< normal: 7    shifted: &
+	PORT_KEY(A2_KEY_D,          KEYCODE_D,          'd',    'D',  "d" SPACING "D")  //!< normal: d    shifted: D
+	PORT_KEY(A2_KEY_U,          KEYCODE_U,          'u',    'U',  "u" SPACING "U")  //!< normal: u    shifted: U
+	PORT_KEY(A2_KEY_V,          KEYCODE_V,          'v',    'V',  "v" SPACING "V")  //!< normal: v    shifted: V
+	PORT_KEY(A2_KEY_0,          KEYCODE_0,          '0',    ')',  "0" SPACING ")")  //!< normal: 0    shifted: )
+	PORT_KEY(A2_KEY_K,          KEYCODE_K,          'k',    'K',  "k" SPACING "K")  //!< normal: k    shifted: K
+	PORT_KEY(A2_KEY_MINUS,      KEYCODE_MINUS,      '-',    '_',  "-" SPACING "_")  //!< normal: -    shifted: _
+	PORT_KEY(A2_KEY_P,          KEYCODE_P,          'p',    'P',  "p" SPACING "P")  //!< normal: p    shifted: P
+	PORT_KEY(A2_KEY_SLASH,      KEYCODE_SLASH,      '/',    '?',  "/" SPACING "?")  //!< normal: /    shifted: ?
+	PORT_KEY(A2_KEY_BACKSLASH,  KEYCODE_BACKSLASH,  '\\',   '|', "\\" SPACING "|")  //!< normal: \    shifted: |
+	PORT_KEY(A2_KEY_LF,         KEYCODE_DOWN,       '\012', 0,    "LF"           )  //!< normal: LF   shifted: ?
+	PORT_KEY(A2_KEY_BS,         KEYCODE_BACKSPACE,  '\010', 0,    "BS"           )  //!< normal: BS   shifted: ?
 
 	PORT_START("ROW1")
-	PORT_BIT(A2_KEY_3,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')	//!< normal: 3    shifted: #
-	PORT_BIT(A2_KEY_2,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')	//!< normal: 2    shifted: @
-	PORT_BIT(A2_KEY_W,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w W") PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')	//!< normal: w    shifted: W
-	PORT_BIT(A2_KEY_Q,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')	//!< normal: q    shifted: Q
-	PORT_BIT(A2_KEY_S,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s S") PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')	//!< normal: s    shifted: S
-	PORT_BIT(A2_KEY_A,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')	//!< normal: a    shifted: A
-	PORT_BIT(A2_KEY_9,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')	//!< normal: 9    shifted: (
-	PORT_BIT(A2_KEY_I,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i I") PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')	//!< normal: i    shifted: I
-	PORT_BIT(A2_KEY_X,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')	//!< normal: x    shifted: X
-	PORT_BIT(A2_KEY_O,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o O") PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')	//!< normal: o    shifted: O
-	PORT_BIT(A2_KEY_L,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l L") PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')	//!< normal: l    shifted: L
-	PORT_BIT(A2_KEY_COMMA,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')	//!< normal: ,    shifted: <
-	PORT_BIT(A2_KEY_QUOTE,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("' \"") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\x27') PORT_CHAR('"')	//!< normal: '    shifted: "
-	PORT_BIT(A2_KEY_RBRACKET,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')	//!< normal: ]    shifted: }
-	PORT_BIT(A2_KEY_BLANK_MID,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M[ ]") PORT_CODE(KEYCODE_END)								//!< middle blank key
-	PORT_BIT(A2_KEY_BLANK_TOP,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T[ ]") PORT_CODE(KEYCODE_PGUP)								//!< top blank key
+	PORT_KEY(A2_KEY_3,          KEYCODE_3,          '3',    '#',  "3" SPACING "#")  //!< normal: 3    shifted: #
+	PORT_KEY(A2_KEY_2,          KEYCODE_2,          '2',    '@',  "2" SPACING "@")  //!< normal: 2    shifted: @
+	PORT_KEY(A2_KEY_W,          KEYCODE_W,          'w',    'W',  "w" SPACING "W")  //!< normal: w    shifted: W
+	PORT_KEY(A2_KEY_Q,          KEYCODE_Q,          'q',    'Q',  "q" SPACING "Q")  //!< normal: q    shifted: Q
+	PORT_KEY(A2_KEY_S,          KEYCODE_S,          's',    'S',  "s" SPACING "S")  //!< normal: s    shifted: S
+	PORT_KEY(A2_KEY_A,          KEYCODE_A,          'a',    'A',  "a" SPACING "A")  //!< normal: a    shifted: A
+	PORT_KEY(A2_KEY_9,          KEYCODE_9,          '9',    '(',  "9" SPACING "(")  //!< normal: 9    shifted: (
+	PORT_KEY(A2_KEY_I,          KEYCODE_I,          'i',    'I',  "i" SPACING "I")  //!< normal: i    shifted: I
+	PORT_KEY(A2_KEY_X,          KEYCODE_X,          'x',    'X',  "x" SPACING "X")  //!< normal: x    shifted: X
+	PORT_KEY(A2_KEY_O,          KEYCODE_O,          'o',    'O',  "o" SPACING "O")  //!< normal: o    shifted: O
+	PORT_KEY(A2_KEY_L,          KEYCODE_L,          'l',    'L',  "l" SPACING "L")  //!< normal: l    shifted: L
+	PORT_KEY(A2_KEY_COMMA,      KEYCODE_COMMA,      ',',    '<',  "," SPACING "<")  //!< normal: ,    shifted: <
+	PORT_KEY(A2_KEY_QUOTE,		KEYCODE_QUOTE,      '\x27', '"',  "'" SPACING "\"") //!< normal: '    shifted: "
+	PORT_KEY(A2_KEY_RBRACKET,   KEYCODE_CLOSEBRACE, ']',    '}',  "]" SPACING "}")  //!< normal: ]    shifted: }
+	PORT_KEY(A2_KEY_BLANK_MID,  KEYCODE_END,        0,      0,    "MID"          )  //!< middle blank key
+	PORT_KEY(A2_KEY_BLANK_TOP,  KEYCODE_PGUP,       0,      0,    "TOP"          )  //!< top blank key
 
 	PORT_START("ROW2")
-	PORT_BIT(A2_KEY_1,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')	//!< normal: 1    shifted: !
-	PORT_BIT(A2_KEY_ESCAPE,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR('\x1b')				//!< normal: ESC  shifted: ?
-	PORT_BIT(A2_KEY_TAB,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\011')				//!< normal: TAB  shifted: ?
-	PORT_BIT(A2_KEY_F,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f F") PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')	//!< normal: f    shifted: F
-	PORT_BIT(A2_KEY_CTRL,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)							//!< CTRL
-	PORT_BIT(A2_KEY_C,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c C") PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')	//!< normal: c    shifted: C
-	PORT_BIT(A2_KEY_J,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j J") PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')	//!< normal: j    shifted: J
-	PORT_BIT(A2_KEY_B,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b B") PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')	//!< normal: b    shifted: B
-	PORT_BIT(A2_KEY_Z,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')	//!< normal: z    shifted: Z
-	PORT_BIT(A2_KEY_LSHIFT,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LSHIFT") PORT_CODE(KEYCODE_LSHIFT)							//!< LSHIFT
-	PORT_BIT(A2_KEY_PERIOD,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')	//!< normal: .    shifted: >
-	PORT_BIT(A2_KEY_SEMICOLON,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')//!< normal: ;    shifted: :
-	PORT_BIT(A2_KEY_RETURN,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\013')			//!< RETURN
-	PORT_BIT(A2_KEY_LEFTARROW,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("← ↑") PORT_CODE(KEYCODE_LEFT)								//!< normal: left arrow   shifted: up arrow (caret)
-	PORT_BIT(A2_KEY_DEL,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)								//!< normal: DEL  shifted: ?
-	PORT_BIT(A2_KEY_MSW_2_17,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2/17") PORT_CODE(KEYCODE_MENU)								//!< unused on Microswitch KDB
+	PORT_KEY(A2_KEY_1,          KEYCODE_1,          '1',    '!',  "1" SPACING "!")  //!< normal: 1    shifted: !
+	PORT_KEY(A2_KEY_ESCAPE,     KEYCODE_ESC,        '\x1b', 0,    "ESC"          )  //!< normal: ESC  shifted: ?
+	PORT_KEY(A2_KEY_TAB,        KEYCODE_TAB,        '\011', 0,    "TAB"          )  //!< normal: TAB  shifted: ?
+	PORT_KEY(A2_KEY_F,          KEYCODE_F,          'f',    'F',  "f" SPACING "F")  //!< normal: f    shifted: F
+	PORT_KEY(A2_KEY_CTRL,       KEYCODE_LCONTROL,   0,      0,    "CTRL"         )  //!< CTRL
+	PORT_KEY(A2_KEY_C,          KEYCODE_C,          'c',    'C',  "c" SPACING "C")  //!< normal: c    shifted: C
+	PORT_KEY(A2_KEY_J,          KEYCODE_J,          'j',    'J',  "j" SPACING "J")  //!< normal: j    shifted: J
+	PORT_KEY(A2_KEY_B,          KEYCODE_B,          'b',    'B',  "b" SPACING "B")  //!< normal: b    shifted: B
+	PORT_KEY(A2_KEY_Z,          KEYCODE_Z,          'z',    'Z',  "z" SPACING "Z")  //!< normal: z    shifted: Z
+	PORT_KEY(A2_KEY_LSHIFT,     KEYCODE_LSHIFT,     0,      0,    "LSHIFT"       )  //!< LSHIFT
+	PORT_KEY(A2_KEY_PERIOD,     KEYCODE_STOP,       '.',    '>',  "." SPACING ">")  //!< normal: .    shifted: >
+	PORT_KEY(A2_KEY_SEMICOLON,  KEYCODE_COLON,      ';',    ':',  ";" SPACING ":")  //!< normal: ;    shifted: :
+	PORT_KEY(A2_KEY_RETURN,     KEYCODE_ENTER,      '\013', 0,    "RETURN"       )  //!< RETURN
+	PORT_KEY(A2_KEY_LEFTARROW,  KEYCODE_LEFT,       0,      0,    "←" SPACING "↑")  //!< normal: left arrow   shifted: up arrow (caret)
+	PORT_KEY(A2_KEY_DEL,        KEYCODE_DEL,        0,      0,    "DEL"          )  //!< normal: DEL  shifted: ?
+	PORT_KEY(A2_KEY_MSW_2_17,   KEYCODE_MENU,       0,      0,    "MSW2/17"      )  //!< unused on Microswitch KDB
 
 	PORT_START("ROW3")
-	PORT_BIT(A2_KEY_R,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r R") PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')	//!< normal: r    shifted: R
-	PORT_BIT(A2_KEY_T,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t T") PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')	//!< normal: t    shifted: T
-	PORT_BIT(A2_KEY_G,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g G") PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')	//!< normal: g    shifted: G
-	PORT_BIT(A2_KEY_Y,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')	//!< normal: y    shifted: Y
-	PORT_BIT(A2_KEY_H,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h H") PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')	//!< normal: h    shifted: H
-	PORT_BIT(A2_KEY_8,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 *") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')	//!< normal: 8    shifted: *
-	PORT_BIT(A2_KEY_N,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n N") PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')	//!< normal: n    shifted: N
-	PORT_BIT(A2_KEY_M,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m M") PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')	//!< normal: m    shifted: M
-	PORT_BIT(A2_KEY_LOCK,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LOCK") PORT_CODE(KEYCODE_SCRLOCK)							//!< LOCK
-	PORT_BIT(A2_KEY_SPACE,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')					//!< SPACE
-	PORT_BIT(A2_KEY_L,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')	//!< normal: [    shifted: {
-	PORT_BIT(A2_KEY_EQUALS,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')	//!< normal: =    shifted: +
-	PORT_BIT(A2_KEY_RSHIFT,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RSHIFT") PORT_CODE(KEYCODE_RSHIFT)							//!< RSHIFT
-	PORT_BIT(A2_KEY_BLANK_BOT,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B[ ]") PORT_CODE(KEYCODE_PGDN)								//!< bottom blank key
-	PORT_BIT(A2_KEY_MSW_3_16,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3/16") PORT_CODE(KEYCODE_HOME)								//!< unused on Microswitch KDB
-	PORT_BIT(A2_KEY_MSW_3_17,	IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3/17") PORT_CODE(KEYCODE_INSERT)							//!< unused on Microswitch KDB
+	PORT_KEY(A2_KEY_R,          KEYCODE_R,          'r',    'R',  "r" SPACING "R")  //!< normal: r    shifted: R
+	PORT_KEY(A2_KEY_T,          KEYCODE_T,          't',    'T',  "t" SPACING "T")  //!< normal: t    shifted: T
+	PORT_KEY(A2_KEY_G,          KEYCODE_G,          'g',    'G',  "g" SPACING "G")  //!< normal: g    shifted: G
+	PORT_KEY(A2_KEY_Y,          KEYCODE_Y,          'y',    'Y',  "y" SPACING "Y")  //!< normal: y    shifted: Y
+	PORT_KEY(A2_KEY_H,          KEYCODE_H,          'h',    'H',  "h" SPACING "H")  //!< normal: h    shifted: H
+	PORT_KEY(A2_KEY_8,          KEYCODE_8,          '8',    '*',  "8" SPACING "*")  //!< normal: 8    shifted: *
+	PORT_KEY(A2_KEY_N,          KEYCODE_N,          'n',    'N',  "n" SPACING "N")  //!< normal: n    shifted: N
+	PORT_KEY(A2_KEY_M,          KEYCODE_M,          'm',    'M',  "m" SPACING "M")  //!< normal: m    shifted: M
+	PORT_KEY(A2_KEY_LOCK,       KEYCODE_SCRLOCK,    0,      0,    "LOCK"         )  //!< LOCK
+	PORT_KEY(A2_KEY_SPACE,      KEYCODE_SPACE,      ' ',    0,    "SPACE"        )  //!< SPACE
+	PORT_KEY(A2_KEY_LBRACKET,   KEYCODE_OPENBRACE,  '[',    '{',  "[" SPACING "{")  //!< normal: [    shifted: {
+	PORT_KEY(A2_KEY_EQUALS,     KEYCODE_EQUALS,     '=',    '+',  "=" SPACING "+")  //!< normal: =    shifted: +
+	PORT_KEY(A2_KEY_RSHIFT,     KEYCODE_RSHIFT,     0,      0,    "RSHIFT"       )  //!< RSHIFT
+	PORT_KEY(A2_KEY_BLANK_BOT,  KEYCODE_PGDN,       0,      0,    "BOT"          )  //!< bottom blank key
+	PORT_KEY(A2_KEY_MSW_3_16,   KEYCODE_HOME,       0,      0,    "MSW3/16"      )  //!< unused on Microswitch KDB
+	PORT_KEY(A2_KEY_MSW_3_17,   KEYCODE_INSERT,     0,      0,    "MSW3/17"      )  //!< unused on Microswitch KDB
 
 	PORT_START("ROW4")
-	PORT_BIT(A2_KEY_FR2,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR2") PORT_CODE(KEYCODE_F6)									//!< ADL right function key 2
-	PORT_BIT(A2_KEY_FL2,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FL2") PORT_CODE(KEYCODE_F2)									//!< ADL left function key 2
+	PORT_KEY(A2_KEY_FR2,        KEYCODE_F6,         0,      0,    "FR2"          )  //!< ADL right function key 2
+	PORT_KEY(A2_KEY_FL2,        KEYCODE_F2,         0,      0,    "FL2"          )  //!< ADL left function key 2
 
 	PORT_START("ROW5")
-	PORT_BIT(A2_KEY_FR4,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR4") PORT_CODE(KEYCODE_F8)									//!< ADL right funtion key 4
-	PORT_BIT(A2_KEY_BW,			IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BW")  PORT_CODE(KEYCODE_F10)								//!< ADL BW (?)
+	PORT_KEY(A2_KEY_FR4,        KEYCODE_F8,         0,      0,    "FR4"          )  //!< ADL right funtion key 4
+	PORT_KEY(A2_KEY_BW,         KEYCODE_F10,        0,      0,    "BW"           )  //!< ADL BW (?)
 
 	PORT_START("ROW6")
-	PORT_BIT(A2_KEY_FR3,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR3") PORT_CODE(KEYCODE_F7)									//!< ADL right function key 3
-	PORT_BIT(A2_KEY_FL1,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FL1") PORT_CODE(KEYCODE_F1)									//!< ADL left function key 1
-	PORT_BIT(A2_KEY_FL3,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FL3") PORT_CODE(KEYCODE_F3)									//!< ADL left function key 3
+	PORT_KEY(A2_KEY_FR3,        KEYCODE_F7,         0,      0,    "FR3"          )  //!< ADL right function key 3
+	PORT_KEY(A2_KEY_FL1,        KEYCODE_F1,         0,      0,    "FL1"          )  //!< ADL left function key 1
+	PORT_KEY(A2_KEY_FL3,        KEYCODE_F3,         0,      0,    "FL3"          )  //!< ADL left function key 3
 
 	PORT_START("ROW7")
-	PORT_BIT(A2_KEY_FR1,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR1") PORT_CODE(KEYCODE_F5)									//!< ADL right function key 1
-	PORT_BIT(A2_KEY_FL4,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FL4") PORT_CODE(KEYCODE_F4)									//!< ADL left function key 4
-	PORT_BIT(A2_KEY_FR5,		IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FR5") PORT_CODE(KEYCODE_F9)									//!< ADL right function key 5
+	PORT_KEY(A2_KEY_FR1,        KEYCODE_F5,         0,      0,    "FR1"          )  //!< ADL right function key 1
+	PORT_KEY(A2_KEY_FL4,        KEYCODE_F4,         0,      0,    "FL4"          )  //!< ADL left function key 4
+	PORT_KEY(A2_KEY_FR5,        KEYCODE_F9,         0,      0,    "FR5"          )  //!< ADL right function key 5
 
 	PORT_START("mouseb")	// Mouse buttons
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse RED (left)")      PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_buttons, 0 )
@@ -113,9 +120,9 @@ static INPUT_PORTS_START( alto2 )
 	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
 
 	PORT_START("CONFIG")    /* Memory switch on AIM board */
-	PORT_CONFNAME( 1, 1, "Memory switch")
-	PORT_CONFSETTING( 0, "on")
-	PORT_CONFSETTING( 1, "off")
+	PORT_CONFNAME( 0x01, 0x01, "Memory switch")
+	PORT_CONFSETTING( 0x00, "on")
+	PORT_CONFSETTING( 0x01, "off")
 INPUT_PORTS_END
 
 /* ROM */

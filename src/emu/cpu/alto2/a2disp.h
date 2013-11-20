@@ -174,6 +174,7 @@
 #ifndef _A2DISP_H_
 #define _A2DISP_H_
 struct {
+	UINT8 state;						//!< current state of the display_state_machine()
 	UINT16 hlc;							//!< horizontal line counter
 	UINT8 a63;							//!< most recent value read from the PROM a63
 	UINT8 a66;							//!< most recent value read from the PROM a66

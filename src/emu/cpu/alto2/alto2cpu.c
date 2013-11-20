@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
-	m_log_types(LOG_DISPL),
+	m_log_types(LOG_ETH),
 	m_log_level(8),
 	m_log_newline(true),
 #endif
@@ -128,7 +128,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_ether_enable(false),
 	m_ewfct(false),
 	m_dsp_time(0),
-	m_dsp_state(0),
 	m_unload_time(0),
 	m_unload_word(0),
 	m_bitclk_time(0),
@@ -1034,7 +1033,7 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_ether_enable));
 	save_item(NAME(m_ewfct));
 	save_item(NAME(m_dsp_time));
-	save_item(NAME(m_dsp_state));
+	save_item(NAME(m_dsp.state));
 	save_item(NAME(m_unload_time));
 	save_item(NAME(m_unload_word));
 #if	(USE_BITCLK_TIMER == 0)
@@ -2985,8 +2984,6 @@ void alto2_cpu_device::hard_reset()
 	init_kwd();
 
 	m_dsp_time = 0;					// reset the display state timing
-	m_dsp_state = 020;				// initial state
-
 	m_task = task_emu;				// start with task 0 (emulator)
 	m_task_wakeup |= 1 << task_emu;	// set wakeup flag
 }
@@ -3005,7 +3002,8 @@ int alto2_cpu_device::soft_reset()
 	m_reset_mode = 0xffff;			// all tasks start in ROM0 again
 
 	m_dsp_time = 0;					// reset the display state timing
-	m_dsp_state = 020;				// initial state
+
+	// FIXME: all sub-devices need a reset_... method as well
 
 	return m_next_task;				// return next task (?)
 }
