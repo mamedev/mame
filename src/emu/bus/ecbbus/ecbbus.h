@@ -2,10 +2,46 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Conitec Datensysteme ECB Bus emulation
+    Kontron Europe Card Bus emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************
+
+                              A  B  C
+                +5 V    ---   *  1  *   --- +5V
+                D5      ---   *  2  *   --- D0
+                D6      ---   *  3  *   --- D7
+                D3      ---   *  4  *   --- D2
+                D4      ---   *  5  *   --- A0
+                A2      ---   *  6  *   --- A3
+                A4      ---   *  7  *   --- A1
+                A5      ---   *  8  *   --- A8
+                A6      ---   *  9  *   --- A7
+                WAIT*   ---   * 10  *   --- D8
+                BUSRQ*  ---   * 11  *   --- IEI
+                BAI1    ---   * 12  *   --- D9
+                +12 V   ---   * 13  *   --- D10
+                D11     ---   * 14  *   --- D1
+                -5 V    ---   * 15  *   --- -15 V
+                phi2    ---   * 16  *   --- IEO
+                BAO1    ---   * 17  *   --- A11
+                A14     ---   * 18  *   --- A10
+                +15 V   ---   * 19  *   --- D13
+                M1*     ---   * 20  *   --- NMI*
+                D14     ---   * 21  *   --- INT*
+                D15     ---   * 22  *   --- WR*
+                DPR*    ---   * 23  *   --- D12
+                +5VBAT  ---   * 24  *   --- RD*
+                phiN    ---   * 25  *   --- HALT*
+                WRITE EN---   * 26  *   --- PWRRCL*
+                IORQ*   ---   * 27  *   --- A12
+                RFSH*   ---   * 28  *   --- A15
+                A13     ---   * 29  *   --- PHI
+                A9      ---   * 30  *   --- MREQ*
+                BUSAK*  ---   * 31  *   --- RESET*
+                GND     ---   * 32  *   --- GND
 
 **********************************************************************/
 

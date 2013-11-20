@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Conitec Datensysteme ECB Bus emulation
+    Kontron Europe Card Bus emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
