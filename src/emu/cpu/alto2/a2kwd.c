@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *   Portable Xerox AltoII disk word task
+ *   Xerox AltoII disk word task
  *
- *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *   Copyright © Jürgen Buchmüller <pullmoll@t-online.de>
  *
  *   Licenses: MAME, GPLv2
  *

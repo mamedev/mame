@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *   Portable Xerox AltoII display word task
+ *   Xerox AltoII display word task
  *
- *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *   Copyright © Jürgen Buchmüller <pullmoll@t-online.de>
  *
  *   Licenses: MAME, GPLv2
  *
@@ -28,7 +28,7 @@ void alto2_cpu_device::f1_early_dwt_block()
 /**
  * @brief f2_load_ddr late: load the display data register
  */
-void alto2_cpu_device::f2_dwt_load_ddr_1()
+void alto2_cpu_device::f2_late_dwt_load_ddr()
 {
 	LOG((LOG_DWT,2,"	DDR← BUS (%#o)\n", m_bus));
 	m_dsp.fifo[m_dsp.fifo_wr] = m_bus;
@@ -43,7 +43,7 @@ void alto2_cpu_device::f2_dwt_load_ddr_1()
 void alto2_cpu_device::init_dwt(int task)
 {
 	set_f1(task, f1_block,			&alto2_cpu_device::f1_early_dwt_block, 0);
-	set_f2(task, f2_dwt_load_ddr,	0, &alto2_cpu_device::f2_dwt_load_ddr_1);
+	set_f2(task, f2_dwt_load_ddr,	0, &alto2_cpu_device::f2_late_dwt_load_ddr);
 }
 
 void alto2_cpu_device::exit_dwt()

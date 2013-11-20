@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *   Portable Xerox AltoII RAM related functions
+ *   Xerox AltoII RAM related functions
  *
- *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *   Copyright © Jürgen Buchmüller <pullmoll@t-online.de>
  *
  *   Licenses: MAME, GPLv2
  *

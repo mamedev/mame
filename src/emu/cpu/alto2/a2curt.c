@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *   Portable Xerox AltoII cursor task
+ *   Xerox AltoII cursor task
  *
- *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *   Copyright © Jürgen Buchmüller <pullmoll@t-online.de>
  *
  *   Licenses: MAME, GPLv2
  *

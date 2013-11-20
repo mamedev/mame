@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *   Portable Xerox AltoII display interface
+ *   Xerox AltoII display interface
  *
- *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *   Copyright © Jürgen Buchmüller <pullmoll@t-online.de>
  *
  *   Licenses: MAME, GPLv2
  *
@@ -153,7 +153,7 @@ static const UINT16 double_bits[256] = {
 //! update the internal bitmap to the MAME bitmap.pix16
 void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 {
-	UINT16* pix = &m_displ_bitmap->pix16(y) + x;
+	UINT16* pix = &m_bitmap->pix16(y) + x;
 	*pix++ = (word & 0100000) ? BLACK : WHITE;
 	*pix++ = (word & 0040000) ? BLACK : WHITE;
 	*pix++ = (word & 0020000) ? BLACK : WHITE;
@@ -213,7 +213,7 @@ void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 void alto2_cpu_device::unload_word()
 {
 	int x = m_unload_word;
-	int y = ((m_dsp.hlc - m_dsp.vblank) & ~(1024|1)) + HLC1024;
+	int y = ((m_dsp.hlc - m_dsp.vblank) & ~(1024|1)) | HLC1024;
 	UINT16* scanline = m_dsp.scanline[y];
 
 	UINT32 word = m_dsp.inverse;
@@ -451,12 +451,12 @@ void alto2_cpu_device::init_disp()
 {
 	memset(&m_dsp, 0, sizeof(m_dsp));
 	// allocate the 16bpp bitmap
-	m_displ_bitmap = auto_bitmap_ind16_alloc(machine(), ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT);
-	LOG((LOG_DISPL,0,"	m_bitmap=%p\n", m_displ_bitmap));
+	m_bitmap = auto_bitmap_ind16_alloc(machine(), ALTO2_DISPLAY_TOTAL_WIDTH, ALTO2_DISPLAY_TOTAL_HEIGHT);
+	LOG((LOG_DISPL,0,"	m_bitmap=%p\n", m_bitmap));
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
-	m_dsp.raw_bitmap = auto_alloc_array(machine(), UINT16, ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
-	m_dsp.scanline = auto_alloc_array(machine(), UINT16*, ALTO2_DISPLAY_HEIGHT);
-	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++) {
+	m_dsp.raw_bitmap = auto_alloc_array(machine(), UINT16, ALTO2_DISPLAY_TOTAL_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	m_dsp.scanline = auto_alloc_array(machine(), UINT16*, ALTO2_DISPLAY_TOTAL_HEIGHT);
+	for (int y = 0; y < ALTO2_DISPLAY_TOTAL_HEIGHT; y++) {
 		UINT16* scanline = m_dsp.raw_bitmap + y * ALTO2_DISPLAY_SCANLINE_WORDS;
 		m_dsp.scanline[y] = scanline;
 	}

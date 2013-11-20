@@ -1,7 +1,7 @@
 /**********************************************************
  *   DIABLO31 and DIABLO44 hard drive support
  *
- *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *   Copyright © Jürgen Buchmüller <pullmoll@t-online.de>
  *
  *   Licenses: MAME, GPLv2
  **********************************************************/
@@ -309,9 +309,9 @@ void diablo_hd_device::read_sector()
 	}
 
 	if (m_disk) {
-		/* allocate a buffer for this page */
+		// allocate a buffer for this page
 		m_cache[m_page] = auto_alloc_array(machine(), UINT8, sizeof(diablo_sector_t));
-		/* and read the page from the hard_disk image */
+		// and read the page from the hard_disk image
 		if (hard_disk_read(m_disk, m_page, m_cache[m_page])) {
 			LOG_DRIVE((2,"[DHD%u]	CHS:%03d/%d/%02d => page:%d loaded\n", m_unit, m_cylinder, m_head, m_sector, m_page));
 		} else {
@@ -443,7 +443,7 @@ UINT32* diablo_hd_device::expand_sector()
 	diablo_sector_t *s = reinterpret_cast<diablo_sector_t *>(m_cache[m_page]);
 
 	/* allocate a bits image */
-	UINT32 *bits = reinterpret_cast<UINT32 *>(auto_alloc_array(machine(), UINT32, 400));
+	UINT32 *bits = auto_alloc_array_clear(machine(), UINT32, 400);
 
 	if (m_diablo31) {
 		/* write sync bit after (MFROBL-MRPAL) words - 1 bit */
@@ -979,6 +979,7 @@ void diablo_hd_device::select(int unit, int head)
 		m_addx_acknowledge_0 = 0;		// assert address acknowledge (?)
 		m_log_addx_interlock_0 = 1;		// deassert log address interlock (?)
 		LOG_DRIVE((1,"[DHD%u]	select unit:%d ready\n", m_unit, unit));
+		read_sector();
 	} else {
 		m_ready_0 = 1;					// it is not ready (?)
 		m_s_r_w_0 = 1;					// can't take seek/read/write commands (?)
@@ -986,7 +987,6 @@ void diablo_hd_device::select(int unit, int head)
 		m_log_addx_interlock_0 = 1;		// deassert log address interlock (?)
 		LOG_DRIVE((1,"[DHD%u]	select unit:%d not ready (no image)\n", m_unit, unit));
 	}
-	read_sector();
 }
 
 /**
@@ -1256,16 +1256,27 @@ void diablo_hd_device::device_start()
 	m_packs = 1;		// FIXME: get from configuration?
 	m_unit = strstr(m_image->tag(), "diablo0") ? 0 : 1;
 
-	m_cache = auto_alloc_array(machine(), UINT8*, m_pages);
-	memset(m_cache, 0, sizeof(UINT8*) * m_pages);
-	m_bits = auto_alloc_array(machine(), UINT32*, m_pages);
-	memset(m_bits, 0, sizeof(UINT32*) * m_pages);
-
 	m_timer = timer_alloc(1, 0);
 }
 
 void diablo_hd_device::device_reset()
 {
+	// free previous page cache
+	if (m_cache) {
+		for (int page = 0; page < m_pages; page++)
+			if (m_cache[page])
+				auto_free(machine(), m_cache[page]);
+		auto_free(machine(), m_cache);
+		m_cache = 0;
+	}
+	// free previous bits cache
+	if (m_bits) {
+		for (int page = 0; page < m_pages; page++)
+			if (m_bits[page])
+				auto_free(machine(), m_bits[page]);
+		auto_free(machine(), m_bits);
+		m_bits = 0;
+	}
 	m_handle = m_image->get_chd_file();
 	m_diablo31 = true;	// FIXME: get from m_handle meta data?
 	m_disk = m_image->get_hard_disk_file();
@@ -1276,6 +1287,7 @@ void diablo_hd_device::device_reset()
 		m_sector_mark_0_time = DIABLO31_SECTOR_MARK_PULSE_PRE;
 		m_sector_mark_1_time = DIABLO31_SECTOR_MARK_PULSE_PRE;
 		m_bit_time = DIABLO31_BIT_TIME(1);
+		m_pages = DIABLO_PAGES;
 	} else {
 		snprintf(m_description, sizeof(m_description), "DIABLO44");
 		m_rotation_time = DIABLO44_ROTATION_TIME;
@@ -1283,6 +1295,7 @@ void diablo_hd_device::device_reset()
 		m_sector_mark_0_time = DIABLO44_SECTOR_MARK_PULSE_PRE;
 		m_sector_mark_1_time = DIABLO44_SECTOR_MARK_PULSE_PRE;
 		m_bit_time = DIABLO44_BIT_TIME(1);
+		m_pages = 2 * DIABLO_PAGES;
 	}
 	LOG_DRIVE((0,"[DHD%u]	rotation time       : %.0fns\n", m_unit, m_rotation_time.as_double() * ATTOSECONDS_PER_NANOSECOND));
 	LOG_DRIVE((0,"[DHD%u]	sector time         : %.0fns\n", m_unit, m_sector_time.as_double() * ATTOSECONDS_PER_NANOSECOND));
@@ -1317,6 +1330,8 @@ void diablo_hd_device::device_reset()
 	// for units with a CHD assigned to them start the timer
 	if (m_handle) {
 		timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
+		m_cache = auto_alloc_array_clear(machine(), UINT8*, m_pages);
+		m_bits = auto_alloc_array_clear(machine(), UINT32*, m_pages);
 		read_sector();
 	}
 }

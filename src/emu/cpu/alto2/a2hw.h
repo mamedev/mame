@@ -1,9 +1,25 @@
+/*****************************************************************************
+ *
+ *   Xerox AltoII memory mapped i/o stuff (HW)
+ *
+ *   Copyright © Jürgen Buchmüller <pullmoll@t-online.de>
+ *
+ *   Licenses: MAME, GPLv2
+ *
+ *****************************************************************************/
+#ifdef  ALTO2_DEFINE_CONSTANTS
+
+#else   // ALTO2_DEFINE_CONSTANTS
 #ifndef _A2HW_H_
 #define _A2HW_H_
+//! miscellaneous hardware registers in the memory mapped I/O range
+struct {
+	UINT16 eia;				//!< the EIA port at 0177001
+	UINT16 utilout;			//!< the UTILOUT port at 0177016 (active-low outputs)
+	UINT16 xbus[4];			//!< the XBUS port at 0177020 to 0177023
+	UINT16 utilin;			//!< the UTILIN port at 0177030 to 0177033 (same value on all addresses)
+}	m_hw;
 
-// ************************************************
-// hardware (memory mapped i/o stuff)
-// ************************************************
 DECLARE_READ16_MEMBER ( pprdy_r );			//!< read UTILIN[0] printer paper ready bit
 DECLARE_READ16_MEMBER ( pcheck_r );			//!< read UTILIN[1] printer check bit
 DECLARE_READ16_MEMBER ( unused2_r );		//!< read UTILIN[2] unused bit
@@ -39,20 +55,13 @@ DECLARE_WRITE16_MEMBER( mouse_blue_w );		//!< write UTILIN[14] mouse blue button
 DECLARE_WRITE16_MEMBER( mouse_yellow_w );	//!< write UTILIN[15] mouse yellow button bit
 DECLARE_WRITE16_MEMBER( mouse_buttons_w );	//!< write UTILIN[13-15] mouse buttons bits
 
-/** @brief miscellaneous hardware registers in the memory mapped I/O range */
-struct {
-	UINT16 eia;				//!< the EIA port at 0177001
-	UINT16 utilout;			//!< the UTILOUT port at 0177016 (active-low outputs) */
-	UINT16 xbus[4];			//!< the XBUS port at 0177020 to 0177023
-	UINT16 utilin;			//!< the UTILIN port at 0177030 to 0177033 (same value on all addresses)
-}	m_hw;
-
-DECLARE_READ16_MEMBER( utilin_r );			//!< read an UTILIN address
-DECLARE_READ16_MEMBER( utilout_r );			//!< read the UTILOUT address
+DECLARE_READ16_MEMBER ( utilin_r );			//!< read an UTILIN address
+DECLARE_READ16_MEMBER ( utilout_r );		//!< read the UTILOUT address
 DECLARE_WRITE16_MEMBER( utilout_w );		//!< write the UTILOUT address
-DECLARE_READ16_MEMBER( xbus_r );			//!< read an XBUS address
+DECLARE_READ16_MEMBER ( xbus_r );			//!< read an XBUS address
 DECLARE_WRITE16_MEMBER( xbus_w );			//!< write an XBUS address (?)
+
 void init_hw();								//!< initialize miscellaneous hardware
 void exit_hw();								//!< deinitialize miscellaneous hardware
-
-#endif // _A2HW_H_
+#endif	// _A2HW_H_
+#endif	// ALTO2_DEFINE_CONSTANTS

@@ -1,8 +1,8 @@
 /*****************************************************************************
  *
- *   Portable Xerox AltoII CPU core
+ *   Xerox AltoII CPU core
  *
- *   Copyright: Juergen Buchmueller <pullmoll@t-online.de>
+ *   Copyright © Jürgen Buchmüller <pullmoll@t-online.de>
  *
  *   Licenses: MAME, GPLv2
  *
@@ -158,7 +158,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_disp_a38(0),
 	m_disp_a63(0),
 	m_disp_a66(0),
-	m_displ_bitmap(0),
+	m_bitmap(0),
 	m_mem(),
 	m_emu(),
 	m_ether_a41(0),
@@ -247,6 +247,15 @@ void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
 void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
 {
 	m_drive[unit] = ptr;
+}
+
+//-------------------------------------------------
+// driver interface to get the internal bitmap
+//-------------------------------------------------
+
+bitmap_ind16*alto2_cpu_device::bitmap()
+{
+	return m_bitmap;
 }
 
 //-------------------------------------------------
@@ -2365,18 +2374,6 @@ void alto2_cpu_device::wrtram()
  * </PRE>
  */
 
-enum {
-    A10_UNUSED  = (1 << 0),
-    A10_TSELECT = (1 << 1),
-    A10_ALUCI   = (1 << 2),
-    A10_ALUM    = (1 << 3),
-    A10_ALUS0   = (1 << 4),
-    A10_ALUS1   = (1 << 5),
-    A10_ALUS2   = (1 << 6),
-    A10_ALUS3   = (1 << 7),
-    A10_ALUIN   = (A10_ALUM|A10_ALUCI|A10_ALUS0|A10_ALUS1|A10_ALUS2|A10_ALUS3)
-};
-
 //! S function, M flag and C carry in
 #define	SMC(s3,s2,s1,s0,m,ci) (s3*A10_ALUS3 + s2*A10_ALUS2 + s1*A10_ALUS1 + s0*A10_ALUS0 + m*A10_ALUM + ci*A10_ALUCI)
 
@@ -2757,7 +2754,7 @@ void alto2_cpu_device::execute_run()
 #else
 		UINT32 alu;
 		/* compute the ALU function */
-		switch (aluf) {
+		switch (m_d_aluf) {
 		/**
 		 * 00: ALU ← BUS
 		 * PROM data for S3-0:1111 M:1 C:0 T:0
@@ -3119,11 +3116,11 @@ void alto2_cpu_device::hard_reset()
 	init_part(task_part);
 	init_kwd(task_kwd);
 
-	m_dsp_time = 0;			// reset the display state machine values
-	m_dsp_state = 020;
+	m_dsp_time = 0;					// reset the display state timing
+	m_dsp_state = 020;				// initial state
 
-	m_task = 0;						// start with task 0
-	m_task_wakeup |= 1 << 0;		// set wakeup flag
+	m_task = task_emu;				// start with task 0 (emulator)
+	m_task_wakeup |= 1 << task_emu;	// set wakeup flag
 }
 
 /** @brief software initiated reset (STARTF) */
@@ -3136,11 +3133,11 @@ int alto2_cpu_device::soft_reset()
 		if (0 == (m_reset_mode & (1 << task)))
 			m_task_mpc[task] |= ALTO2_UCODE_RAM_BASE;
 	}
-	m_next2_task = 0;		// switch to task 0
-	m_reset_mode = 0xffff;	// all tasks start in ROM0 again
+	m_next2_task = task_emu;		// switch to task 0 (emulator)
+	m_reset_mode = 0xffff;			// all tasks start in ROM0 again
 
-	m_dsp_time = 0;			// reset the display state machine values
-	m_dsp_state = 020;
+	m_dsp_time = 0;					// reset the display state timing
+	m_dsp_state = 020;				// initial state
 
-	return m_next_task;		// return next task (?)
+	return m_next_task;				// return next task (?)
 }

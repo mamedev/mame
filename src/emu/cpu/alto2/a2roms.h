@@ -1,3 +1,12 @@
+/*****************************************************************************
+ *
+ *   Xerox AltoII RAM PROM loading and decoding
+ *
+ *   Copyright © Jürgen Buchmüller <pullmoll@t-online.de>
+ *
+ *   Licenses: MAME, GPLv2
+ *
+ *****************************************************************************/
 #ifndef _CPU_A2ROMS_H_
 #define _CPU_A2ROMS_H_
 
