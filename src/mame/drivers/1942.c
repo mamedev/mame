@@ -732,8 +732,8 @@ ROM_START( 1942p )
 	ROM_LOAD( "(__1942p)3.bin", 0x14000, 0x4000, CRC(108fda63) SHA1(6ffdf57a04bcfae9fdb2343f30cff50926188cbf) )//
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "(__1942p)snd.bin", 0x0000, 0x4000, BAD_DUMP CRC(43d6df9f) SHA1(c34579c73faa7e9552a6721ef8050b33ca158588) )// looks bad
-	ROM_LOAD( "sr-01.c11", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) ) // unlikely to be the same..
+	ROM_LOAD( "(__1942p)snd.bin", 0x0000, 0x4000, BAD_DUMP CRC(43d6df9f) SHA1(c34579c73faa7e9552a6721ef8050b33ca158588) ) // looks bad, window was smashed, likely dead.
+	ROM_LOAD( "sr-01.c11", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) ) // works but we can't be 100% sure it was the same.
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "(__1942p)8.bin", 0x0000, 0x2000, CRC(6ebca191) SHA1(0dbddadde54a0ab66994c4a8726be05c6ca88a0e) )   /* characters */ //
