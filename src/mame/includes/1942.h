@@ -12,6 +12,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
+		m_protopal(*this, "protopal"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu") { }
 
@@ -19,12 +20,17 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_bg_videoram;
+	optional_shared_ptr<UINT8> m_protopal;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	int m_palette_bank;
 	UINT8 m_scroll[2];
+	rgb_t palette[256];
+	void create_palette();
+	void palette_init_1942p();
+	DECLARE_WRITE8_MEMBER(c1942p_palette_w);
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -34,12 +40,14 @@ public:
 	DECLARE_WRITE8_MEMBER(c1942_palette_bank_w);
 	DECLARE_WRITE8_MEMBER(c1942_scroll_w);
 	DECLARE_WRITE8_MEMBER(c1942_c804_w);
+	DECLARE_WRITE8_MEMBER(c1942p_f600_w);
 	DECLARE_DRIVER_INIT(1942);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	void video_start_c1942p();
 	virtual void palette_init();
 	UINT32 screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
