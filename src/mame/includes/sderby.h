@@ -20,7 +20,7 @@ public:
 
 	UINT16 m_scroll[6];
 	DECLARE_READ16_MEMBER(sderby_input_r);
-	DECLARE_READ16_MEMBER(sderby2_input_r);
+	DECLARE_READ16_MEMBER(sderbya_input_r);
 	DECLARE_READ16_MEMBER(roulette_input_r);
 	DECLARE_READ16_MEMBER(rprot_r);
 	DECLARE_WRITE16_MEMBER(rprot_w);
