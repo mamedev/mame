@@ -49,6 +49,9 @@ void alto2_cpu_device::f2_late_load_csr()
 {
 	m_dsp.csr = m_bus;
 	LOG((LOG_CURT, m_dsp.csr ? 2 : 9,"	CSR← BUS (%#o)\n", m_dsp.csr));
+	int x = 01777 - m_dsp.xpreg;
+	m_dsp.curdata = m_dsp.csr << (16 - (x & 15));
+	m_dsp.curword = x / 16;
 }
 
 /**
@@ -58,9 +61,6 @@ void alto2_cpu_device::activate_curt()
 {
 	m_task_wakeup &= ~(1 << m_task);
 	m_dsp.curt_wakeup = false;
-	int x = 01777 - m_dsp.xpreg;
-	m_dsp.curdata = m_dsp.csr << (16 - (x & 15));
-	m_dsp.curword = x / 16;
 }
 
 /** @brief initialize the cursor task F1 and F2 functions */

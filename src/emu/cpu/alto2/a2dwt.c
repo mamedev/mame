@@ -9,6 +9,9 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
+//! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
+#define FIFO_STOPWAKE(a38) (0 == (a38 & disp_a38_STOPWAKE) ? true : false)
+
 /**
  * @brief block the display word task
  */
@@ -33,11 +36,12 @@ void alto2_cpu_device::f2_late_dwt_load_ddr()
 	LOG((LOG_DWT,2,"	DDR← BUS (%#o)\n", m_bus));
 	m_dsp.fifo[m_dsp.fifo_wr] = m_bus;
 	m_dsp.fifo_wr = (m_dsp.fifo_wr + 1) % ALTO2_DISPLAY_FIFO;
-	if (FIFO_STOPWAKE_0() == 0)
+	UINT8 a38 = m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr];
+	if (FIFO_STOPWAKE(a38))
 		m_task_wakeup &= ~(1 << task_dwt);
 	LOG((LOG_DWT,2, "	DWT push %04x into FIFO[%02o]%s\n",
 		m_bus, (m_dsp.fifo_wr - 1) & (ALTO2_DISPLAY_FIFO - 1),
-		FIFO_STOPWAKE_0() == 0 ? " STOPWAKE" : ""));
+		FIFO_STOPWAKE(a38) ? " STOPWAKE" : ""));
 }
 
 void alto2_cpu_device::init_dwt(int task)
