@@ -72,6 +72,7 @@ private:
 	void security_error();
 	void read_first_sector();
 	void soft_reset();
+	attotime seek_time();
 
 	UINT32          m_cur_lba;
 	UINT16          m_block_count;

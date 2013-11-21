@@ -14,10 +14,10 @@
 
 #define TIME_PER_SECTOR                     (attotime::from_usec(100))
 #define TIME_PER_ROTATION                   (attotime::from_hz(5400/60))
-#define TIME_MULTIPLE_SECTORS               (attotime::from_nsec(400))
+#define TIME_BETWEEN_SECTORS                (attotime::from_nsec(400))
 
-#define TIME_SEEK_MULTISECTOR               (attotime::from_usec(13000))
-#define TIME_NO_SEEK_MULTISECTOR            (attotime::from_usec(1300))
+#define TIME_FULL_STROKE_SEEK               (attotime::from_usec(13000))
+#define TIME_AVERAGE_ROTATIONAL_LATENCY     (attotime::from_usec(1300))
 
 ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
 	: ata_hle_device(mconfig, type, name, tag, owner, clock, shortname, source),
@@ -187,6 +187,7 @@ void ata_mass_storage_device::soft_reset()
 {
 	ata_hle_device::soft_reset();
 
+	m_cur_lba = 0;
 	m_status |= IDE_STATUS_DSC;
 
 	m_master_password_enable = (m_master_password != NULL);
@@ -338,6 +339,25 @@ void ata_mass_storage_device::security_error()
  *
  *************************************/
 
+attotime ata_mass_storage_device::seek_time()
+{
+	/* just set a timer */
+	int new_lba = lba_address();
+
+	int old_cylinder = m_cur_lba / (m_num_heads * m_num_sectors);
+	int new_cylinder = new_lba / (m_num_heads * m_num_sectors);
+	int diff = abs(old_cylinder - new_cylinder);
+
+	m_cur_lba = new_lba;
+
+	if (diff == 0)
+		return TIME_BETWEEN_SECTORS;
+
+	attotime seek_time = (TIME_FULL_STROKE_SEEK * diff) / m_num_cylinders;
+
+	return seek_time + TIME_AVERAGE_ROTATIONAL_LATENCY;
+}
+
 void ata_mass_storage_device::fill_buffer()
 {
 	switch (m_command)
@@ -354,7 +374,7 @@ void ata_mass_storage_device::fill_buffer()
 		{
 			set_dasp(ASSERT_LINE);
 
-			start_busy(TIME_MULTIPLE_SECTORS, PARAM_COMMAND);
+			start_busy(TIME_BETWEEN_SECTORS, PARAM_COMMAND);
 		}
 		break;
 	}
@@ -423,15 +443,7 @@ void ata_mass_storage_device::read_first_sector()
 	{
 		set_dasp(ASSERT_LINE);
 
-		/* just set a timer */
-		int new_lba = lba_address();
-		int diff = abs(m_cur_lba - new_lba);
-		int total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
-		attotime seek_time = TIME_NO_SEEK_MULTISECTOR + ((TIME_SEEK_MULTISECTOR * diff) / total_sectors);
-
-		start_busy(seek_time, PARAM_COMMAND);
-
-		m_cur_lba = new_lba;
+		start_busy(seek_time(), PARAM_COMMAND);
 	}
 }
 
