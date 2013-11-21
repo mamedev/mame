@@ -90,20 +90,9 @@ For now I'm writing this function with a command basis so I can work better with
 ****************************************************************************************/
 
 #include "emu.h"
-#include "stvprot.h"
 #include "includes/stv.h"
 
-// these should become member variables!
-UINT32 m_abus_protenable;
-UINT32 m_abus_prot_addr;
-UINT32 m_abus_protkey;
 
-static UINT32 a_bus[4];
-static UINT32 ctrl_index;
-static UINT32 internal_counter;
-static UINT8 char_offset; //helper to jump the decoding of the NULL chars.
-
-static UINT32 (*prot_readback)(address_space&,int,UINT32);
 
 /************************
 *
@@ -584,7 +573,7 @@ UINT32 ffreveng_prot_read_callback( address_space &space, int protaddr, UINT32 k
 *
 *************************************/
 
-static READ32_HANDLER( common_prot_r )
+READ32_MEMBER( stv_state::common_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
@@ -595,20 +584,20 @@ static READ32_HANDLER( common_prot_r )
 			#ifdef MAME_DEBUG
 			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),m_abus_protkey);
 			#endif
-			UINT32 realret = space.read_dword(0x2000000+ctrl_index);
-			UINT32 retdata = prot_readback(space, ctrl_index, m_abus_protkey);
+			UINT32 realret = space.read_dword(0x2000000+m_ctrl_index);
+			UINT32 retdata = m_prot_readback(space, m_ctrl_index, m_abus_protkey);
 
 			logerror("A-Bus control protection read at %06x with data = %08x Returning = %08x Would otherwise return = %08x\n",space.device().safe_pc(),m_abus_protkey, retdata, realret);
 
-			ctrl_index += 4;
+			m_ctrl_index += 4;
 			return retdata;
 
 		}
-		return a_bus[offset];
+		return m_a_bus[offset];
 	}
 	else
 	{
-		if(a_bus[offset] != 0) return a_bus[offset];
+		if(m_a_bus[offset] != 0) return m_a_bus[offset];
 		else return ROM[(0x02fffff0/4)+offset];
 	}
 }
@@ -616,9 +605,9 @@ static READ32_HANDLER( common_prot_r )
 
 
 
-static WRITE32_HANDLER ( common_prot_w )
+WRITE32_MEMBER ( stv_state::common_prot_w )
 {
-	COMBINE_DATA(&a_bus[offset]);
+	COMBINE_DATA(&m_a_bus[offset]);
 	//printf("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 
 	if (offset == 0)
@@ -648,58 +637,58 @@ static WRITE32_HANDLER ( common_prot_w )
 		// the game reads the number of bytes specified in the length via the protection device, writing them to RAM.  This suggests there
 		// is no compression going on, only some form of encryption.
 
-		ctrl_index = a_bus_vector;
+		m_ctrl_index = a_bus_vector;
 	}
 }
 
-void install_common_protection(running_machine &machine)
+void stv_state::install_common_protection()
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(common_prot_r), FUNC(common_prot_w));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4fffff0, 0x4ffffff, read32_delegate(FUNC(stv_state::common_prot_r), this), write32_delegate(FUNC(stv_state::common_prot_w), this));
 }
 
-void install_sss_protection(running_machine &machine)
+void stv_state::install_sss_protection()
 {
-	install_common_protection(machine);
-	prot_readback = sss_prot_read_callback;
+	install_common_protection();
+	m_prot_readback = sss_prot_read_callback;
 }
 
-void install_astrass_protection(running_machine &machine)
+void stv_state::install_astrass_protection()
 {
-	install_common_protection(machine);
-	prot_readback = astrass_prot_read_callback;
+	install_common_protection();
+	m_prot_readback = astrass_prot_read_callback;
 }
 
-void install_ffreveng_protection(running_machine &machine)
+void stv_state::install_ffreveng_protection()
 {
-	install_common_protection(machine);
-	prot_readback = ffreveng_prot_read_callback;
+	install_common_protection();
+	m_prot_readback = ffreveng_prot_read_callback;
 }
 
-void install_elandore_protection(running_machine &machine)
+void stv_state::install_elandore_protection()
 {
-	install_common_protection(machine);
-	prot_readback = elandore_prot_read_callback;
+	install_common_protection();
+	m_prot_readback = elandore_prot_read_callback;
 }
 
-void install_rsgun_protection(running_machine &machine)
+void stv_state::install_rsgun_protection()
 {
-	install_common_protection(machine);
-	prot_readback = rsgun_prot_read_callback;
+	install_common_protection();
+	m_prot_readback = rsgun_prot_read_callback;
 }
 
-void install_twcup98_protection(running_machine &machine)
+void stv_state::install_twcup98_protection()
 {
-	install_common_protection(machine);
-	prot_readback = twcup98_prot_read_callback;
+	install_common_protection();
+	m_prot_readback = twcup98_prot_read_callback;
 
 }
 
 
 
-void stv_register_protection_savestates(running_machine &machine)
+void stv_state::stv_register_protection_savestates()
 {
-	machine.save().save_item(NAME(a_bus));
-	machine.save().save_item(NAME(ctrl_index));
-	machine.save().save_item(NAME(internal_counter));
-	machine.save().save_item(NAME(char_offset));
+	save_item(NAME(m_a_bus));
+	save_item(NAME(m_ctrl_index));
+	save_item(NAME(m_internal_counter));
+	save_item(NAME(m_char_offset));
 }
