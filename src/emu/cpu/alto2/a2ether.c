@@ -331,15 +331,15 @@ void alto2_cpu_device::eth_wakeup()
  *
  * @param crc previous CRC value
  * @param data 16 bit data
- * @result new CRC value after 16 bits
+ * @return new CRC value after 16 bits
  */
 UINT32 f9401_7(UINT32 crc, UINT32 data)
 {
 	int i;
 	for (i = 0; i < 16; i++) {
 		crc <<= 1;
-		if (data & 0100000)
-			crc ^= (1<<15) | (1<<10) | (1<<3) | (1<<0);
+		if (data & (1 << 15))
+			crc ^= (1 << 10) | (1 << 3) | (1 << 0);
 		data <<= 1;
 	}
 	return crc & 0177777;
@@ -676,7 +676,7 @@ void alto2_cpu_device::f2_late_eisfct()
  */
 void alto2_cpu_device::activate_eth()
 {
-    m_ewfct = 0;
+	m_ewfct = 0;
 }
 
 /**

@@ -14,7 +14,7 @@
  */
 void alto2_cpu_device::f1_early_dwt_block()
 {
-	m_dsp.dwt_blocks = 1;
+	m_dsp.dwt_blocks = true;
 
 	/* clear the wakeup for the display word task */
 	m_task_wakeup &= ~(1 << m_task);

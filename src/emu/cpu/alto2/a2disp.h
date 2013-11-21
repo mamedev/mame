@@ -185,10 +185,10 @@ struct {
 	UINT16 fifo[ALTO2_DISPLAY_FIFO];	//!< display word fifo
 	UINT8 fifo_wr;						//!< fifo input pointer (4-bit)
 	UINT8 fifo_rd;						//!< fifo output pointer (4-bit)
-	UINT8 dht_blocks;					//!< set non-zero, if the DHT executed BLOCK
-	UINT8 dwt_blocks;					//!< set non-zero, if the DWT executed BLOCK
-	UINT8 curt_blocks;					//!< set non-zero, if the CURT executed BLOCK
-	UINT8 curt_wakeup;					//!< set non-zero, if CURT wakeups are generated
+	bool dht_blocks;					//!< set non-zero, if the DHT executed BLOCK
+	bool dwt_blocks;					//!< set non-zero, if the DWT executed BLOCK
+	bool curt_blocks;					//!< set non-zero, if the CURT executed BLOCK
+	bool curt_wakeup;					//!< set non-zero, if CURT wakeups are generated
 	UINT16 vblank;						//!< most recent HLC with VBLANK still high (11-bit)
 	UINT16 xpreg;						//!< cursor cursor x position register (10-bit)
 	UINT16 csr;							//!< cursor shift register (16-bit)
@@ -296,15 +296,6 @@ enum {
 	A66_VBLANK_ODD	= (1 << 2),
 	A66_VBLANK_EVEN	= (1 << 3)
 };
-
-//! test the VSYNC (vertical synchronisation) signal in PROM a66 being high
-static inline bool A66_VSYNC_HI(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? false : true; }
-//! test the VSYNC (vertical synchronisation) signal in PROM a66 being low
-static inline bool A66_VSYNC_LO(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? true : false; }
-//! test the VBLANK (vertical blanking) signal in PROM a66 being high
-static inline bool A66_VBLANK_HI(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? false : true; }
-//! test the VBLANK (vertical blanking) signal in PROM a66 being low
-static inline bool A66_VBLANK_LO(UINT8 a, int hlc1024) { return a & (hlc1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? true : false; }
 
 void update_bitmap_word(int x, int y, UINT16 word);	//!< update a word in the screen bitmap
 void unload_word();					//!< unload the next word from the display FIFO and shift it to the screen

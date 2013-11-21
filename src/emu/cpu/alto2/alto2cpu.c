@@ -606,7 +606,7 @@ static const prom_load_t pl_ucode[] = {
 /* dmap */	DMAP_DEFAULT,
 /* dand */	KEEP,
 /* type */	sizeof(UINT32)
-    }
+	}
 #endif	// (UCODE_ROM_PAGES > 1)
 };
 
@@ -1297,7 +1297,7 @@ WRITE16_MEMBER( alto2_cpu_device::ioram_w )
 // FIXME
 void alto2_cpu_device::device_reset()
 {
-    soft_reset();
+	soft_reset();
 }
 
 /**
@@ -1640,7 +1640,7 @@ READ16_MEMBER( alto2_cpu_device::noop_r )
  */
 WRITE16_MEMBER( alto2_cpu_device::noop_w )
 {
-    LOG((LOG_CPU,0,"	MMIO wr %s\n", memory_range_name(offset)));
+	LOG((LOG_CPU,0,"	MMIO wr %s\n", memory_range_name(offset)));
 }
 
 /**
@@ -2475,8 +2475,8 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 /** @brief flag that tells whether to load the T register from BUS or ALU */
 #define	TSELECT	A10_TSELECT
 
-/** @brief flag that tells wheter operation was 0: logic (M=1) or 1: arithmetic (M=0) */
-#define	ALUM2	A10_ALUM
+/** @brief flag that tells wheter operation was 0: arithmetic (M=0) or 1: logic (M=1) */
+#define	ALUM	A10_ALUM
 
 /** @brief execute the CPU for at most nsecs nano seconds */
 void alto2_cpu_device::execute_run()
@@ -2486,41 +2486,6 @@ void alto2_cpu_device::execute_run()
 
 	do {
 		int do_bs, flags;
-
-		/*
-		 * Subtract the microcycle time from the display time accu.
-		 * If it underflows, call the display state machine and add
-		 * the time for 24 pixel clocks to the accu.
-		 * This is very close to every seventh CPU cycle.
-		 */
-		m_dsp_time -= ALTO2_UCYCLE;
-		if (m_dsp_time < 0) {
-			display_state_machine();
-			m_dsp_time += ALTO2_DISPLAY_BITTIME(24);
-		}
-		if (m_unload_time >= 0) {
-			/*
-			 * Subtract the microcycle time from the unload time accu.
-			 * If it underflows, call the unload word function which adds
-			 * the time for 16 or 32 pixel clocks to the accu, or ends
-			 * the unloading by leaving m_unload_time at -1.
-			 */
-			m_unload_time -= ALTO2_UCYCLE;
-			if (m_unload_time < 0)
-				unload_word();
-		}
-#if	(USE_BITCLK_TIMER == 0)
-		if (m_bitclk_time >= 0) {
-			/*
-			 * Subtract the microcycle time from the bitclk time accu.
-			 * If it underflows, call the disk bitclk function which adds
-			 * the time for one bit as clocks to the accu, or ends
-			 * the bitclk sequence by leaving m_bitclk_time at -1.
-			 */
-			m_bitclk_time -= ALTO2_UCYCLE;
-			disk_bitclk(0, m_bitclk_index);
-		}
-#endif
 
 		m_cycle++;
 		/* nano seconds per cycle */
@@ -2616,7 +2581,7 @@ void alto2_cpu_device::execute_run()
 		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | m_d_aluf];
 		UINT32 alu = alu_74181(m_bus, m_t, a10);
 		m_aluc0 = (alu >> 16) & 1;
-		flags = (a10 ^ ALUM2) & (TSELECT | ALUM2);
+		flags = a10 & (TSELECT | ALUM);
 		m_alu = static_cast<UINT16>(alu);
 #else
 		UINT32 alu;
@@ -2631,7 +2596,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus__alut:
 			alu = m_bus;
 			m_aluc0 = 1;
-			flags = 0;
+			flags = ALUM;
 			LOG((LOG_CPU,2,"	ALU← BUS (%#o := %#o)\n", alu, m_bus));
 			break;
 
@@ -2644,7 +2609,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_treg:
 			alu = m_t;
 			m_aluc0 = 1;
-			flags = 0;
+			flags = ALUM;
 			LOG((LOG_CPU,2,"	ALU← T (%#o := %#o)\n", alu, m_t));
 			break;
 
@@ -2657,7 +2622,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_or_t__alut:
 			alu = m_bus | m_t;
 			m_aluc0 = 1;
-			flags = TSELECT;
+			flags = ALUM | TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS OR T (%#o := %#o | %#o)\n", alu, m_bus, m_t));
 			break;
 
@@ -2670,7 +2635,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_and_t:
 			alu = m_bus & m_t;
 			m_aluc0 = 1;
-			flags = 0;
+			flags = ALUM;
 			LOG((LOG_CPU,2,"	ALU← BUS AND T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
 			break;
 
@@ -2683,7 +2648,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_xor_t:
 			alu = m_bus ^ m_t;
 			m_aluc0 = 1;
-			flags = 0;
+			flags = ALUM;
 			LOG((LOG_CPU,2,"	ALU← BUS XOR T (%#o := %#o ^ %#o)\n", alu, m_bus, m_t));
 			break;
 
@@ -2696,7 +2661,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_plus_1__alut:
 			alu = m_bus + 1;
 			m_aluc0 = (alu >> 16) & 1;
-			flags = ALUM2 | TSELECT;
+			flags = TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS + 1 (%#o := %#o + 1)\n", alu, m_bus));
 			break;
 
@@ -2709,7 +2674,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_minus_1__alut:
 			alu = m_bus + 0177777;
 			m_aluc0 = (~alu >> 16) & 1;
-			flags = ALUM2 | TSELECT;
+			flags = TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS - 1 (%#o := %#o - 1)\n", alu, m_bus));
 			break;
 
@@ -2722,7 +2687,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_plus_t:
 			alu = m_bus + m_t;
 			m_aluc0 = (alu >> 16) & 1;
-			flags = ALUM2;
+			flags = 0;
 			LOG((LOG_CPU,2,"	ALU← BUS + T (%#o := %#o + %#o)\n", alu, m_bus, m_t));
 			break;
 
@@ -2735,7 +2700,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_minus_t:
 			alu = m_bus + ~m_t + 1;
 			m_aluc0 = (~alu >> 16) & 1;
-			flags = ALUM2;
+			flags = 0;
 			LOG((LOG_CPU,2,"	ALU← BUS - T (%#o := %#o - %#o)\n", alu, m_bus, m_t));
 			break;
 
@@ -2748,7 +2713,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_minus_t_minus_1:
 			alu = m_bus + ~m_t;
 			m_aluc0 = (~alu >> 16) & 1;
-			flags = ALUM2;
+			flags = 0;
 			LOG((LOG_CPU,2,"	ALU← BUS - T - 1 (%#o := %#o - %#o - 1)\n", alu, m_bus, m_t));
 			break;
 
@@ -2761,7 +2726,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_plus_t_plus_1__alut:
 			alu = m_bus + m_t + 1;
 			m_aluc0 = (alu >> 16) & 1;
-			flags = ALUM2 | TSELECT;
+			flags = TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS + T + 1 (%#o := %#o + %#o + 1)\n", alu, m_bus, m_t));
 			break;
 
@@ -2774,7 +2739,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_plus_skip__alut:
 			alu = m_bus + m_emu.skip;
 			m_aluc0 = (alu >> 16) & 1;
-			flags = ALUM2 | TSELECT;
+			flags = TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS + SKIP (%#o := %#o + %#o)\n", alu, m_bus, m_emu.skip));
 			break;
 
@@ -2787,7 +2752,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_and_t__alut:
 			alu = m_bus & m_t;
 			m_aluc0 = 1;
-			flags = TSELECT;
+			flags = ALUM | TSELECT;
 			LOG((LOG_CPU,2,"	ALU← BUS,T (%#o := %#o & %#o)\n", alu, m_bus, m_t));
 			break;
 
@@ -2800,7 +2765,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_bus_and_not_t:
 			alu = m_bus & ~m_t;
 			m_aluc0 = 1;
-			flags = 0;
+			flags = ALUM;
 			LOG((LOG_CPU,2,"	ALU← BUS AND NOT T (%#o := %#o & ~%#o)\n", alu, m_bus, m_t));
 			break;
 
@@ -2813,7 +2778,7 @@ void alto2_cpu_device::execute_run()
 		case aluf_undef_16:
 			alu = m_bus;
 			m_aluc0 = 1;
-			flags = TSELECT;
+			flags = ALUM | TSELECT;
 			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
 			break;
 
@@ -2827,7 +2792,7 @@ void alto2_cpu_device::execute_run()
 		default:
 			alu = m_bus;
 			m_aluc0 = 1;
-			flags = TSELECT;
+			flags = ALUM | TSELECT;
 			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
 		}
 		m_alu = static_cast<UINT16>(alu);
@@ -2853,29 +2818,17 @@ void alto2_cpu_device::execute_run()
 		// update L register and LALUC0, and also M register, if a RAM related task is active
 		if (m_d_loadl) {
 			m_l = m_alu;			// load L from ALU
-			if (flags & ALUM2) {
-				m_laluc0 = m_aluc0;
-				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← ALUC0 (%o)\n", m_alu, m_aluc0));
-			} else {
-				m_laluc0 = 0;
+			if (flags & ALUM) {
+				m_laluc0 = 0;		// logic operation - latch 0
 				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← %o\n", m_alu, 0));
+			} else {
+				m_laluc0 = m_aluc0;	// logic operation - latch carry
+				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← ALUC0 (%o)\n", m_alu, m_aluc0));
 			}
 			if (m_ram_related[m_task]) {
 				m_m = m_alu;		// load M from ALU, if 'GOODTASK'
 				m_s[m_s_reg_bank[m_task]][0] = m_alu;	// also writes to S[bank][0], which can't be read
 				LOG((LOG_CPU,2, "	M← ALU (%#o)\n", m_alu));
-			}
-		}
-
-		// update T register, if LOADT is set
-		if (m_d_loadt) {
-			m_cram_addr = m_alu;	// latch CRAM address
-			if (flags & TSELECT) {
-				m_t = m_alu;		// T source is ALU
-				LOG((LOG_CPU,2, "	T← ALU (%#o)\n", m_alu));
-			} else {
-				m_t = m_bus;		// T source is BUS
-				LOG((LOG_CPU,2, "	T← BUS (%#o)\n", m_bus));
 			}
 		}
 
@@ -2897,6 +2850,53 @@ void alto2_cpu_device::execute_run()
 				((*this).*m_active_callback[m_task])();
 			}
 		}
+
+		// update T register, if LOADT is set
+		if (m_d_loadt) {
+			m_cram_addr = m_alu;	// latch CRAM address
+			if (flags & TSELECT) {
+				m_t = m_alu;		// T source is ALU
+				LOG((LOG_CPU,2, "	T← ALU (%#o)\n", m_alu));
+			} else {
+				m_t = m_bus;		// T source is BUS
+				LOG((LOG_CPU,2, "	T← BUS (%#o)\n", m_bus));
+			}
+		}
+
+		/*
+		 * Subtract the microcycle time from the display time accu.
+		 * If it underflows, call the display state machine and add
+		 * the time for 24 pixel clocks to the accu.
+		 * This is very close to every seventh CPU cycle.
+		 */
+		m_dsp_time -= ALTO2_UCYCLE;
+		if (m_dsp_time < 0) {
+			display_state_machine();
+			m_dsp_time += ALTO2_DISPLAY_BITTIME(24);
+		}
+		if (m_unload_time >= 0) {
+			/*
+			 * Subtract the microcycle time from the unload time accu.
+			 * If it underflows, call the unload word function which adds
+			 * the time for 16 or 32 pixel clocks to the accu, or ends
+			 * the unloading by leaving m_unload_time at -1.
+			 */
+			m_unload_time -= ALTO2_UCYCLE;
+			if (m_unload_time < 0)
+				unload_word();
+		}
+#if	(USE_BITCLK_TIMER == 0)
+		if (m_bitclk_time >= 0) {
+			/*
+			 * Subtract the microcycle time from the bitclk time accu.
+			 * If it underflows, call the disk bitclk function which adds
+			 * the time for one bit as clocks to the accu, or ends
+			 * the bitclk sequence by leaving m_bitclk_time at -1.
+			 */
+			m_bitclk_time -= ALTO2_UCYCLE;
+			disk_bitclk(0, m_bitclk_index);
+		}
+#endif
 	} while (m_icount-- > 0);
 
 	/* save this task's mpc and address modifier */

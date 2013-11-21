@@ -14,7 +14,7 @@
  */
 void alto2_cpu_device::f1_early_dht_block()
 {
-	m_dsp.dht_blocks = 1;
+	m_dsp.dht_blocks = true;
 	/* clear the wakeup for the display horizontal task */
 	m_task_wakeup &= ~(1 << m_task);
 	LOG((LOG_DHT,2,"	BLOCK %s\n", task_name(m_task)));

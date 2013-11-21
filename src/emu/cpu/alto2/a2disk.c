@@ -927,7 +927,7 @@ void alto2_cpu_device::disk_ready_mf31a(void* ptr, INT32 arg)
  */
 void alto2_cpu_device::disk_block(int task)
 {
-    kwd_timing(m_dsk.bitclk, m_dsk.datin, task);
+	kwd_timing(m_dsk.bitclk, m_dsk.datin, task);
 }
 
 /**
@@ -1529,11 +1529,12 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	 * </PRE>
 	 */
 	if (m_dsk.krwc & RWC_WRITE) {
-		bit = (m_dsk.shiftout >> 15) & 1;
-		kwd_timing(clk, bit, 0);
 		if (GET_KCOM_XFEROFF(m_dsk.kcom)) {
 			/* do anything, if the transfer is off? */
+			kwd_timing(clk, 1, 0);
 		} else {
+			bit = (m_dsk.shiftout >> 15) & 1;
+			kwd_timing(clk, bit, 0);
 			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (write) @%lldns\n", arg, bit, ntime()));
 			if (clk)
 				dhd->wr_data(arg, bit);
@@ -1566,11 +1567,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	}
 #else
 	if (++arg < dhd->bits_per_sector()) {
-		if (!m_dsk.bitclk_time) {
-			// get bit time in pico seconds
-			m_dsk.bitclk_time = static_cast<int>(dhd->bit_time().as_attoseconds() / 1000000);
-		}
-		m_bitclk_time += m_dsk.bitclk_time;
+		m_bitclk_time += m_dsk.bitclk_time[m_dsk.drive];
 		m_bitclk_index = arg;
 	} else {
 		// stop the bitclock timer
@@ -1588,6 +1585,8 @@ void alto2_cpu_device::next_sector(int unit)
 {
 	diablo_hd_device* dhd = m_drive[unit];
 	LOG((LOG_DISK,0,"%s dhd=%p\n", __FUNCTION__, dhd));
+	// get bit time in pico seconds
+	m_dsk.bitclk_time[unit] = static_cast<int>(dhd->bit_time().as_attoseconds() / 1000000);
 #if	USE_BITCLK_TIMER
 	LOG((LOG_DISK,0,"	unit #%d stop bitclk\n", unit));
 	m_dsk.bitclk_timer->enable(false);
@@ -1684,6 +1683,9 @@ void alto2_cpu_device::init_disk()
 
 	m_dsk.ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::disk_ready_mf31a),this));
 	m_dsk.ready_timer->reset();
+
+	m_dsk.bitclk_time[0] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
+	m_dsk.bitclk_time[1] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
 }
 
 /**
@@ -1691,6 +1693,6 @@ void alto2_cpu_device::init_disk()
  */
 void alto2_cpu_device::exit_disk()
 {
-    // nothing to do yet
+	// nothing to do yet
 }
 

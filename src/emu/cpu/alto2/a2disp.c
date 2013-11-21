@@ -96,6 +96,18 @@
  * </PRE>
  */
 
+//!< test the HBLANK (horizontal blanking) signal in PROM a63 being high
+#define A63_HBLANK_HI(a) ((a & A63_HBLANK) ? true : false)
+
+//!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being high
+#define A63_HSYNC_HI(a) ((a & A63_HSYNC) ? true : false)
+
+//!< test the SCANEND (scanline end) signal in PROM a63 being high
+#define A63_SCANEND_HI(a) ((a & A63_SCANEND) ? true : false)
+
+//!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being high
+#define A63_HLCGATE_HI(a) ((a & A63_HLCGATE) ? true : false)
+
 /**
  * @brief PROM a66 is a 256x4 bit (type 3601)
  * <PRE>
@@ -108,6 +120,12 @@
  * Q4 is VBLANK for the even field (with H1024=1)
  * </PRE>
  */
+
+//! test the VSYNC (vertical synchronisation) signal in PROM a66 being high
+#define A66_VSYNC(a) (a & (HLC1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? false : true)
+
+//! test the VBLANK (vertical blanking) signal in PROM a66 being high
+#define A66_VBLANK(a) (a & (HLC1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? false : true)
 
 /**
  * @brief double the bits for a byte (left and right of display word) to a word
@@ -150,25 +168,23 @@ static const UINT16 double_bits[256] = {
 //! update the internal bitmap to a byte array
 void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 {
-	const UINT8 white = 0;
-	const UINT8 black = 1;
 	UINT8* pix = m_dsp.scanline[y] + x;
-	*pix++ = (word & 0100000) ? black : white;
-	*pix++ = (word & 0040000) ? black : white;
-	*pix++ = (word & 0020000) ? black : white;
-	*pix++ = (word & 0010000) ? black : white;
-	*pix++ = (word & 0004000) ? black : white;
-	*pix++ = (word & 0002000) ? black : white;
-	*pix++ = (word & 0001000) ? black : white;
-	*pix++ = (word & 0000400) ? black : white;
-	*pix++ = (word & 0000200) ? black : white;
-	*pix++ = (word & 0000100) ? black : white;
-	*pix++ = (word & 0000040) ? black : white;
-	*pix++ = (word & 0000020) ? black : white;
-	*pix++ = (word & 0000010) ? black : white;
-	*pix++ = (word & 0000004) ? black : white;
-	*pix++ = (word & 0000002) ? black : white;
-	*pix++ = (word & 0000001) ? black : white;
+	*pix++ = (word >> 15) & 1;
+	*pix++ = (word >> 14) & 1;
+	*pix++ = (word >> 13) & 1;
+	*pix++ = (word >> 12) & 1;
+	*pix++ = (word >> 11) & 1;
+	*pix++ = (word >> 10) & 1;
+	*pix++ = (word >>  9) & 1;
+	*pix++ = (word >>  8) & 1;
+	*pix++ = (word >>  7) & 1;
+	*pix++ = (word >>  6) & 1;
+	*pix++ = (word >>  5) & 1;
+	*pix++ = (word >>  4) & 1;
+	*pix++ = (word >>  3) & 1;
+	*pix++ = (word >>  2) & 1;
+	*pix++ = (word >>  1) & 1;
+	*pix++ = (word >>  0) & 1;
 }
 
 #define	HLC1	((m_dsp.hlc >>  0) & 1)		//!< horizontal line counter bit 0
@@ -188,23 +204,6 @@ void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 
 //!< helper to extract A3-A0 from a PROM a63 value
 #define A63_NEXT(n) ((n >> 2) & 017)
-
-//!< test the HBLANK (horizontal blanking) signal in PROM a63 being high
-#define A63_HBLANK_HI(a) ((a & A63_HBLANK) ? true : false)
-//!< test the HBLANK (horizontal blanking) signal in PROM a63 being low
-#define A63_HBLANK_LO(a) ((a & A63_HBLANK) ? false : true)
-//!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being high
-#define A63_HSYNC_HI(a) ((a & A63_HSYNC) ? true : false)
-//!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being low
-#define A63_HSYNC_LO(a) ((a & A63_HSYNC) ? false : true)
-//!< test the SCANEND (scanline end) signal in PROM a63 being high
-#define A63_SCANEND_HI(a) ((a & A63_SCANEND) ? true : false)
-//!< test the SCANEND (scanline end) signal in PROM a63 being low
-#define A63_SCANEND_LO(a) ((a & A63_SCANEND) ? false : true)
-//!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being high
-#define A63_HLCGATE_HI(a) ((a & A63_HLCGATE) ? true : false)
-//!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being low
-#define A63_HLCGATE_LO(a) ((a & A63_HLCGATE) ? false : true)
 
 /**
  * @brief unload the next word from the display FIFO and shift it to the screen
@@ -302,26 +301,21 @@ void alto2_cpu_device::display_state_machine()
 			m_task_wakeup |= 1 << task_ether;
 		}
 	}
-	UINT8 a66 = 017;
-	if (HLC256 || HLC512) {
-		// PROM a66 is disabled, if any of HLC256 or HLC512 are high
-	} else {
-		// PROM a66 address lines are connected the HLC1 to HLC128 signals
-		a66 = m_disp_a66[m_dsp.hlc & 0377];
-	}
+	// PROM a66 is disabled, if any of HLC256 or HLC512 are high
+	UINT8 a66 = (HLC256 || HLC512) ? 017 : m_disp_a66[m_dsp.hlc & 0377];
 
 	// next address from PROM a63, use A4 from HLC1
 	UINT8 next = ((HLC1 ^ 1) << 4) | A63_NEXT(a63);
 
-	if (A66_VBLANK_HI(a66, HLC1024)) {
+	if (A66_VBLANK(a66)) {
 		/* VBLANK: remember hlc */
-		m_dsp.vblank = m_dsp.hlc | 1;
+		m_dsp.vblank = m_dsp.hlc & ~02000;
 
 		LOG((LOG_DISPL,1, " VBLANK"));
 
 		/* VSYNC is always within VBLANK */
-		if (A66_VSYNC_HI(a66, HLC1024)) {
-			if (A66_VSYNC_LO(m_dsp.a66, HLC1024)) {
+		if (A66_VSYNC(a66)) {
+			if (!A66_VSYNC(m_dsp.a66)) {
 				LOG((LOG_DISPL,1, " VSYNC/ (wake DVT)"));
 				/*
 				 * The display vertical task DVT is awakened once per field,
@@ -334,7 +328,7 @@ void alto2_cpu_device::display_state_machine()
 			}
 		}
 	} else {
-		if (A66_VBLANK_HI(m_dsp.a66, HLC1024)) {
+		if (A66_VBLANK(m_dsp.a66)) {
 			/**
 			 * VBLANKPULSE:
 			 * The display horizontal task DHT is awakened once at the
@@ -345,16 +339,16 @@ void alto2_cpu_device::display_state_machine()
 			 * next field.
 			 */
 			LOG((LOG_DISPL,1, " VBLANKPULSE (wake DHT)"));
-			m_dsp.dht_blocks = 0;
-			m_dsp.dwt_blocks = 0;
+			m_dsp.dht_blocks = false;
+			m_dsp.dwt_blocks = false;
 			m_task_wakeup |= 1 << task_dht;
 			/*
 			 * VBLANKPULSE also resets the cursor task block flip flop,
 			 * which is built from two NAND gates a40c and a40d (74H01).
 			 */
-			m_dsp.curt_blocks = 0;
+			m_dsp.curt_blocks = false;
 		}
-		if (A63_HBLANK_LO(a63) && A63_HBLANK_HI(m_dsp.a63)) {
+		if (!A63_HBLANK_HI(a63) && A63_HBLANK_HI(m_dsp.a63)) {
 			/* falling edge of a63 HBLANK starts unload */
 			LOG((LOG_DISPL,1, " HBLANK\\ UNLOAD"));
 			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
@@ -374,10 +368,8 @@ void alto2_cpu_device::display_state_machine()
 	 * are generated.
 	 */
 	if (!m_dsp.dwt_blocks && !m_dsp.dht_blocks && FIFO_STOPWAKE_0() != 0) {
-		if (!(m_task_wakeup & (1 << task_dwt))) {
-			m_task_wakeup |= 1 << task_dwt;
-			LOG((LOG_DISPL,1, " (wake DWT)"));
-		}
+		m_task_wakeup |= 1 << task_dwt;
+		LOG((LOG_DISPL,1, " (wake DWT)"));
 	}
 
 	if (A63_SCANEND_HI(a63)) {
@@ -385,10 +377,10 @@ void alto2_cpu_device::display_state_machine()
 		m_task_wakeup &= ~(1 << task_dwt);
 	}
 
-	LOG((LOG_DISPL,1, "%s", (a63 & A63_HBLANK) ? " HBLANK": ""));
+	LOG((LOG_DISPL,1, "%s", A63_HBLANK_HI(a63) ? " HBLANK": ""));
 
 	if (A63_HSYNC_HI(a63)) {
-		if (A63_HSYNC_LO(m_dsp.a63)) {
+		if (!A63_HSYNC_HI(m_dsp.a63)) {
 			LOG((LOG_DISPL,1, " HSYNC/ (CLRBUF)"));
 			/*
 			 * The hardware sets the buffer empty and clears the DWT block
@@ -397,7 +389,7 @@ void alto2_cpu_device::display_state_machine()
 			 */
 			m_dsp.fifo_wr = 0;
 			m_dsp.fifo_rd = 0;
-			m_dsp.dwt_blocks = 0;
+			m_dsp.dwt_blocks = false;
 			/* now take the new values from the last setmode */
 			m_dsp.inverse = GET_SETMODE_INVERSE(m_dsp.setmode) ? 0xffff : 0x0000;
 			m_dsp.halfclock = GET_SETMODE_SPEEDY(m_dsp.setmode);
@@ -406,14 +398,16 @@ void alto2_cpu_device::display_state_machine()
 		} else {
 			LOG((LOG_DISPL,1, " HSYNC"));
 		}
-	} else if (A63_SCANEND_HI(a63)) {
-		/*
-		 * CLRBUF' also resets the 2nd cursor task block flip flop,
-		 * which is built from two NAND gates a30c and a30d (74H00).
-		 * If both flip flops are reset, the NOR gate a20d (74S02)
-		 * decodes this as WAKECURT signal.
-		 */
-		m_dsp.curt_wakeup = 1;
+	}
+	// FIXME: try at the end of HSYNC
+	if (A63_HSYNC_HI(m_dsp.a63) && !A63_HSYNC_HI(a63)) {
+			/*
+			 * CLRBUF' also resets the 2nd cursor task block flip flop,
+			 * which is built from two NAND gates a30c and a30d (74H00).
+			 * If both flip flops are reset, the NOR gate a20d (74S02)
+			 * decodes this as WAKECURT signal.
+			 */
+			m_dsp.curt_wakeup = true;
 	}
 
 

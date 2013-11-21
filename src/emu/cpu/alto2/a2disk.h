@@ -42,7 +42,7 @@ struct {
 #if	USE_BITCLK_TIMER
 	emu_timer* bitclk_timer;		//!< bit clock timer
 #else
-	int bitclk_time;				//!< time in clocks per bit
+	int bitclk_time[2];				//!< per drive time in clocks per bit
 #endif
 	UINT8 datin;					//!< current datin from the drive
 	UINT8 bitcount;					//!< bit counter

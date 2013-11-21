@@ -14,9 +14,9 @@
  */
 void alto2_cpu_device::f1_early_curt_block()
 {
+	m_dsp.curt_blocks = true;
 	m_task_wakeup &= ~(1 << m_task);
 	LOG((LOG_CURT,2,"	BLOCK %s\n", task_name(m_task)));
-	m_dsp.curt_blocks = 1;
 }
 
 /**
@@ -59,8 +59,8 @@ void alto2_cpu_device::f2_late_load_csr()
  */
 void alto2_cpu_device::activate_curt()
 {
-    m_task_wakeup &= ~(1 << m_task);
-    m_dsp.curt_wakeup = 0;
+	m_task_wakeup &= ~(1 << m_task);
+	m_dsp.curt_wakeup = false;
 }
 
 /** @brief initialize the cursor task F1 and F2 functions */
