@@ -5,6 +5,23 @@
 			<bounds left="0" top="0" right="400" bottom="300" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
+
+		<rect>
+			<bounds left="0" top="0" right="85" bottom="300" />
+			<color red="1.0" green="1.0" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds left="0" top="70" right="85" bottom="300" />
+			<color red="0.1" green="1.0" blue="0.7" />
+		</rect>
+		<rect>
+			<bounds left="0" top="150" right="85" bottom="300" />
+			<color red="1.0" green="0.15" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds left="0" top="245" right="85" bottom="300" />
+			<color red="0.15" green="0.7" blue="1.0" />
+		</rect>
 	</element>
 
 	<view name="Color Overlay">
