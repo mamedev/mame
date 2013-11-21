@@ -534,7 +534,14 @@ static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8, mcr3_state )
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( spyhuntpr_portmap, AS_IO, 8, mcr3_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -1229,12 +1236,31 @@ static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 MACHINE_CONFIG_END
 
 
+
+static ADDRESS_MAP_START( spyhuntpr_sound_map, AS_PROGRAM, 8, mcr3_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
+//	AM_RANGE(0xfe00, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spyhuntpr_sound_portmap, AS_IO, 8, mcr3_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+
+	AM_RANGE(0x12, 0x13) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x14, 0x15) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x18, 0x19) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
+
+ADDRESS_MAP_END
+
+
+
 static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(spyhunt_map)
-	MCFG_CPU_IO_MAP(spyhunt_portmap)
+	MCFG_CPU_IO_MAP(spyhuntpr_portmap)
 	MCFG_CPU_CONFIG(mcr_daisy_chain)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
 
@@ -1245,16 +1271,9 @@ static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
 	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
+	
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-
-	/* basic machine hardware */
-	MCFG_MIDWAY_SSIO_ADD("ssio")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1269,6 +1288,22 @@ static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
 	MCFG_PALETTE_INIT_OVERRIDE(mcr3_state,spyhunt)
 	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhuntpr)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhuntpr)
+
+
+	MCFG_CPU_ADD("audiocpu", Z80, 3000000 )
+	MCFG_CPU_PROGRAM_MAP(spyhuntpr_sound_map)
+	MCFG_CPU_IO_MAP(spyhuntpr_sound_portmap)
+//	MCFG_CPU_PERIODIC_INT_DRIVER(mcr3_state, irq0_line_hold, 4*60)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ay1", AY8910, 3000000/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, 3000000/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay3", AY8910, 3000000/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 MACHINE_CONFIG_END
 
 
@@ -1548,7 +1583,7 @@ ROM_START( spyhuntpr )
 	ROM_LOAD( "3.bin",   0x8000, 0x4000, CRC(2183b4af) SHA1(2b958afc40b26c9bc8d5254b0600426649f4ebf0) )
 	ROM_LOAD( "4.bin",   0xc000, 0x2000, CRC(3ea6a65c) SHA1(1320ce17044307ed3c4f2459631a9aa1734f1f30) )
 
-	ROM_REGION( 0x10000, "ssio:cpu", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(33fe2829) SHA1(e6950dbf681242bf23542ca6604e62eacb431101) )
 
 
