@@ -23,6 +23,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_alpha_tilemap;
 	DECLARE_WRITE8_MEMBER(mcr3_paletteram_w);
+	DECLARE_WRITE8_MEMBER(spyhuntpr_paletteram_w);
 	DECLARE_WRITE8_MEMBER(mcr3_videoram_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_videoram_w);
 	DECLARE_WRITE8_MEMBER(spyhunt_alpharam_w);

@@ -71,6 +71,13 @@ TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_alpha_tile_info)
 
 PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
 {
+	int i;
+
+	for (i = 0; i < machine().total_colors(); i++)
+	{
+		palette_set_color(machine(),i,RGB_BLACK); /* black */
+	}
+
 	/* alpha colors are hard-coded */
 	palette_set_color(machine(),4*16+0,MAKE_RGB(0x00,0x00,0x00));
 	palette_set_color(machine(),4*16+1,MAKE_RGB(0x00,0xff,0x00));
@@ -150,6 +157,17 @@ WRITE8_MEMBER(mcr3_state::mcr3_paletteram_w)
 	palette_set_color_rgb(machine(), offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
+WRITE8_MEMBER(mcr3_state::spyhuntpr_paletteram_w)
+{
+	m_generic_paletteram_8[offset] = data;
+	offset = (offset & 0x0f) | (offset & 0x60) >> 1;
+
+	int r = (data & 0x07) >> 0;
+	int g = (data & 0x38) >> 3;
+	int b = (data & 0xc0) >> 6;
+
+	palette_set_color(machine(), offset, MAKE_RGB(r<<5,g<<5,b<<6));
+}
 
 
 /*************************************
