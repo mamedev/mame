@@ -9,6 +9,11 @@
  *****************************************************************************/
 #include "alto2cpu.h"
 
+#if	ALTO2_DEBUG
+static const char* raise_lower[2] = {"↗","↘"};
+#endif
+const char* jkff_name;
+
 #if	JKFF_FUNCTION
 
 /**

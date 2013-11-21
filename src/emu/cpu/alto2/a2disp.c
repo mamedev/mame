@@ -313,23 +313,23 @@ void alto2_cpu_device::display_state_machine()
 
 		LOG((LOG_DISPL,1, " VBLANK"));
 
-		/* VSYNC is always within VBLANK */
+		// VSYNC is always within VBLANK, thus we handle it only here
 		if (A66_VSYNC(a66)) {
 			if (!A66_VSYNC(m_dsp.a66)) {
-				LOG((LOG_DISPL,1, " VSYNC/ (wake DVT)"));
+				LOG((LOG_DISPL,1, " VSYNC↗ (wake DVT)"));
 				/*
 				 * The display vertical task DVT is awakened once per field,
 				 * at the beginning of vertical retrace.
 				 */
 				m_task_wakeup |= 1 << task_dvt;
-				// sdl_update(HLC1024()); // FIXME: upade odd or even field
+				// TODO: upade odd or even field of the internal bitmap
 			} else {
 				LOG((LOG_DISPL,1, " VSYNC"));
 			}
 		}
 	} else {
 		if (A66_VBLANK(m_dsp.a66)) {
-			/**
+			/*
 			 * VBLANKPULSE:
 			 * The display horizontal task DHT is awakened once at the
 			 * beginning of each field, and thereafter whenever the
@@ -349,8 +349,8 @@ void alto2_cpu_device::display_state_machine()
 			m_dsp.curt_blocks = false;
 		}
 		if (!A63_HBLANK_HI(a63) && A63_HBLANK_HI(m_dsp.a63)) {
-			/* falling edge of a63 HBLANK starts unload */
-			LOG((LOG_DISPL,1, " HBLANK\\ UNLOAD"));
+			// falling edge of a63 HBLANK starts unloading of FIFO words
+			LOG((LOG_DISPL,1, " HBLANK↘ UNLOAD"));
 			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
 			m_unload_word = 0;
 #if	DEBUG_DISPLAY_TIMING
@@ -363,7 +363,7 @@ void alto2_cpu_device::display_state_machine()
 
 	/*
 	 * The wakeup request for the display word task (DWT) is controlled by
-	 * the state of the 16 word buffer. If DWT has not executed a BLOCK,
+	 * the state of the 16 word FIFO. If DWT has not executed a BLOCK,
 	 * if DHT is not blocked, and if the buffer is not full, DWT wakeups
 	 * are generated.
 	 */
@@ -372,6 +372,7 @@ void alto2_cpu_device::display_state_machine()
 		LOG((LOG_DISPL,1, " (wake DWT)"));
 	}
 
+	// Stop waking the display word task at SCANEND time
 	if (A63_SCANEND_HI(a63)) {
 		LOG((LOG_DISPL,1, " SCANEND"));
 		m_task_wakeup &= ~(1 << task_dwt);
@@ -381,7 +382,7 @@ void alto2_cpu_device::display_state_machine()
 
 	if (A63_HSYNC_HI(a63)) {
 		if (!A63_HSYNC_HI(m_dsp.a63)) {
-			LOG((LOG_DISPL,1, " HSYNC/ (CLRBUF)"));
+			LOG((LOG_DISPL,1, " HSYNC↗ (CLRBUF)"));
 			/*
 			 * The hardware sets the buffer empty and clears the DWT block
 			 * flip-flop at the beginning of horizontal retrace for
@@ -390,24 +391,24 @@ void alto2_cpu_device::display_state_machine()
 			m_dsp.fifo_wr = 0;
 			m_dsp.fifo_rd = 0;
 			m_dsp.dwt_blocks = false;
-			/* now take the new values from the last setmode */
+			// now take the new values from the last SETMODE←
 			m_dsp.inverse = GET_SETMODE_INVERSE(m_dsp.setmode) ? 0xffff : 0x0000;
 			m_dsp.halfclock = GET_SETMODE_SPEEDY(m_dsp.setmode);
-			/* stop the CPU from calling unload_word() */
+			// stop the CPU from calling unload_word()
 			m_unload_time = -1;
 		} else {
 			LOG((LOG_DISPL,1, " HSYNC"));
 		}
 	}
-	// FIXME: try at the end of HSYNC
+	// FIXME: jiggly cursor issue; try to wake up CURT at the end of HSYNC
 	if (A63_HSYNC_HI(m_dsp.a63) && !A63_HSYNC_HI(a63)) {
-			/*
-			 * CLRBUF' also resets the 2nd cursor task block flip flop,
-			 * which is built from two NAND gates a30c and a30d (74H00).
-			 * If both flip flops are reset, the NOR gate a20d (74S02)
-			 * decodes this as WAKECURT signal.
-			 */
-			m_dsp.curt_wakeup = true;
+		/*
+		 * CLRBUF' also resets the 2nd cursor task block flip flop,
+		 * which is built from two NAND gates a30c and a30d (74H00).
+		 * If both flip flops are reset, the NOR gate a20d (74S02)
+		 * decodes this as WAKECURT signal.
+		 */
+		m_dsp.curt_wakeup = true;
 	}
 
 

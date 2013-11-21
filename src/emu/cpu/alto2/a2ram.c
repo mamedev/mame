@@ -16,7 +16,7 @@
 
 //! direct write access to the microcode CRAM
 #define	WR_CRAM(addr,data) do { \
-    *reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4) = data; \
+	*reinterpret_cast<UINT32 *>(m_ucode_cram + addr * 4) = data; \
 } while (0)
 
 /**
@@ -158,10 +158,10 @@ void alto2_cpu_device::bs_early_read_sreg()
 	if (m_d_rsel) {
 		UINT8 bank = m_s_reg_bank[m_task];
 		r = m_s[bank][m_d_rsel];
-		LOG((LOG_RAM,2,"	←S%02o; bus &= S[%o][%02o] (%#o)\n", reg, bank, reg, r));
+		LOG((LOG_RAM,2,"	←S%02o; bus &= S[%o][%02o] (%#o)\n", m_d_rsel, bank, m_d_rsel, r));
 	} else {
 		r = m_m;
-		LOG((LOG_RAM,2,"	←S%02o; bus &= M (%#o)\n", reg, r));
+		LOG((LOG_RAM,2,"	←S%02o; bus &= M (%#o)\n", m_d_rsel, r));
 	}
 	m_bus &= r;
 }
@@ -172,7 +172,7 @@ void alto2_cpu_device::bs_early_read_sreg()
 void alto2_cpu_device::bs_early_load_sreg()
 {
 	int r = 0;	/* ??? */
-	LOG((LOG_RAM,2,"	S%02o← BUS &= garbage (%#o)\n", MIR_RSEL(m_mir), r));
+	LOG((LOG_RAM,2,"	S%02o← BUS &= garbage (%#o)\n", m_d_rsel, r));
 	m_bus &= r;
 }
 
@@ -183,7 +183,7 @@ void alto2_cpu_device::bs_late_load_sreg()
 {
 	UINT8 bank = m_s_reg_bank[m_task];
 	m_s[bank][m_d_rsel] = m_m;
-	LOG((LOG_RAM,2,"	S%02o← S[%o][%02o] := %#o\n", reg, bank, reg, m_m));
+	LOG((LOG_RAM,2,"	S%02o← S[%o][%02o] := %#o\n", m_d_rsel, bank, m_d_rsel, m_m));
 }
 
 /**

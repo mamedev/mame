@@ -45,9 +45,8 @@ typedef enum {
 }	jkff_t;
 
 #if	ALTO2_DEBUG
-static const char* raise_lower[2] = {"↗","↘"};
-static const char* jkff_name;
 /** @brief macro to set the name of a FF in DEBUG=1 builds only */
+extern const char* jkff_name;
 #define	DEBUG_NAME(x)	jkff_name = x
 #else
 #define	DEBUG_NAME(x)
@@ -58,7 +57,7 @@ static const char* jkff_name;
 #ifndef _A2JKFF_H_
 #define _A2JKFF_H_
 
-static jkff_t update_jkff(UINT8 s0, UINT8 s1);	//!< simulate a 74109 J-K flip-flop with set and reset inputs
+jkff_t update_jkff(UINT8 s0, UINT8 s1);	//!< simulate a 74109 J-K flip-flop with set and reset inputs
 
 #endif	// _A2JKFF_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

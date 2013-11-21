@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
-	m_log_types(LOG_ETH),
+	m_log_types(LOG_DISK),
 	m_log_level(8),
 	m_log_newline(true),
 #endif
@@ -2505,7 +2505,7 @@ void alto2_cpu_device::execute_run()
 		m_next = X_RDBITS(m_mir, 32, NEXT0, NEXT9) | m_next2;
 		m_next2 = X_RDBITS(RD_CROM(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
 		LOG((LOG_CPU,2,"%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
-			task_name(m_task), m_mpc, m_mir, m_rsel, m_d_aluf, m_d_bs, m_d_f1, m_d_f2, MIR_T(m_mir), MIR_L(m_mir), m_next, m_next2));
+			task_name(m_task), m_mpc, m_mir, m_rsel, m_d_aluf, m_d_bs, m_d_f1, m_d_f2, m_d_loadt, m_d_loadl, m_next, m_next2));
 		debugger_instruction_hook(this, m_mpc);
 
 		/*
@@ -2815,16 +2815,29 @@ void alto2_cpu_device::execute_run()
 		if (do_bs)
 			((*this).*m_bs[1][m_task][m_d_bs])();
 
-		// update L register and LALUC0, and also M register, if a RAM related task is active
+		// update T register, if LOADT is set
+		if (m_d_loadt) {
+			m_cram_addr = m_alu;	// latch CRAM address
+			if (flags & TSELECT) {
+				m_t = m_alu;		// T source is ALU
+				LOG((LOG_CPU,2, "	T← ALU (%#o)\n", m_alu));
+			} else {
+				m_t = m_bus;		// T source is BUS
+				LOG((LOG_CPU,2, "	T← BUS (%#o)\n", m_bus));
+			}
+		}
+
+		// update L register and LALUC0
 		if (m_d_loadl) {
 			m_l = m_alu;			// load L from ALU
 			if (flags & ALUM) {
 				m_laluc0 = 0;		// logic operation - latch 0
 				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← %o\n", m_alu, 0));
 			} else {
-				m_laluc0 = m_aluc0;	// logic operation - latch carry
+				m_laluc0 = m_aluc0;	// arithmethic operation - latch carry
 				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← ALUC0 (%o)\n", m_alu, m_aluc0));
 			}
+			// update M (MYL) register, if a RAM related task is active
 			if (m_ram_related[m_task]) {
 				m_m = m_alu;		// load M from ALU, if 'GOODTASK'
 				m_s[m_s_reg_bank[m_task]][0] = m_alu;	// also writes to S[bank][0], which can't be read
@@ -2832,6 +2845,7 @@ void alto2_cpu_device::execute_run()
 			}
 		}
 
+		// handle task switching
 		if (m_task != m_next2_task) {
 			/* switch now? */
 			if (m_task == m_next_task) {
@@ -2848,18 +2862,6 @@ void alto2_cpu_device::execute_run()
 
 				// let the task know it becomes active now and (most probably) reset the wakeup
 				((*this).*m_active_callback[m_task])();
-			}
-		}
-
-		// update T register, if LOADT is set
-		if (m_d_loadt) {
-			m_cram_addr = m_alu;	// latch CRAM address
-			if (flags & TSELECT) {
-				m_t = m_alu;		// T source is ALU
-				LOG((LOG_CPU,2, "	T← ALU (%#o)\n", m_alu));
-			} else {
-				m_t = m_bus;		// T source is BUS
-				LOG((LOG_CPU,2, "	T← BUS (%#o)\n", m_bus));
 			}
 		}
 
