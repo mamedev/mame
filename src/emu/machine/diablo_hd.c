@@ -5,7 +5,6 @@
  *
  *   Licenses: MAME, GPLv2
  **********************************************************/
-
 #include "diablo_hd.h"
 
 /**
@@ -83,11 +82,12 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_egate_0(1),
 	m_wrgate_0(1),
 	m_rdgate_0(1),
+	m_cylinders(DIABLO_CYLINDERS),
+	m_pages(DIABLO_PAGES),
 	m_cylinder(-1),
 	m_head(-1),
 	m_sector(-1),
 	m_page(-1),
-	m_pages(DIABLO_PAGES),
 	m_cache(0),
 	m_bits(0),
 	m_rdfirst(-1),
@@ -132,8 +132,8 @@ void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *
 	m_sector_callback = callback;
 }
 
-#define	DIABLO31_ROTATION_TIME attotime::from_usec(40000)		//!< DIABLO 31 rotation time is approx. 40ms
-#define	DIABLO31_SECTOR_TIME attotime::from_usec(40000/12)      //!< DIABLO 31 sector time
+#define	DIABLO31_ROTATION_TIME attotime::from_usec(39900)		//!< DIABLO 31 rotation time is approx. 40ms
+#define	DIABLO31_SECTOR_TIME attotime::from_usec(39900/12)      //!< DIABLO 31 sector time
 /**
  * @brief DIABLO 31 bit clock is 3330kHz ~= 300ns per bit
  * ~= 133333 bits/track (?)
@@ -141,8 +141,8 @@ void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *
  * ~= 347 words/sector
  */
 #define	DIABLO31_BIT_TIME(bits) attotime::from_nsec(300*(bits))
-#define DIABLO31_SECTOR_BITS  11111
-#define	DIABLO31_SECTOR_WORDS 347								//!< DIABLO 31 possible sector words
+#define DIABLO31_SECTOR_BITS	10432
+#define	DIABLO31_SECTOR_WORDS	347								//!< DIABLO 31 possible sector words
 #define	DIABLO31_SECTOR_MARK_PULSE_PRE DIABLO31_BIT_TIME(16)	//!< pulse width of sector mark before the next sector begins
 #define	DIABLO31_SECTOR_MARK_PULSE_POST DIABLO31_BIT_TIME(16)	//!< pulse width of sector mark after the next sector began
 
@@ -155,7 +155,7 @@ void diablo_hd_device::set_sector_callback(void *cookie, void (*callback)(void *
  * ~= 325 words/sector
  */
 #define	DIABLO44_BIT_TIME(bits) attotime::from_nsec(200*(bits))
-#define DIABLO44_SECTOR_BITS  10432
+#define DIABLO44_SECTOR_BITS	10432
 #define	DIABLO44_SECTOR_WORDS	325								//!< DIABLO 44 possible sector words
 #define	DIABLO44_SECTOR_MARK_PULSE_PRE DIABLO44_BIT_TIME(16)	//!< pulse width of sector mark before the next sector begins
 #define	DIABLO44_SECTOR_MARK_PULSE_POST DIABLO44_BIT_TIME(16)	//!< pulse width of sector mark after the next sector began
@@ -284,7 +284,7 @@ void diablo_hd_device::read_sector()
 		m_page = -1;
 		return;
 	}
-	if (m_cylinder < 0 || m_cylinder >= DIABLO_CYLINDERS) {
+	if (m_cylinder < 0 || m_cylinder >= m_cylinders) {
 		LOG_DRIVE((0,"[DHD%u]	CHS:%03d/%d/%02d => invalid cylinder\n", m_unit, m_cylinder, m_head, m_sector));
 		m_page = -1;
 		return;
@@ -304,7 +304,7 @@ void diablo_hd_device::read_sector()
 
 	// already have the sector image?
 	if (m_cache[m_page]) {
-		LOG_DRIVE((6,"[DHD%u]	CHS:%03d/%d/%02d => page:%d is cached\n", m_unit, m_cylinder, m_head, m_sector, m_page));
+		LOG_DRIVE((9,"[DHD%u]	CHS:%03d/%d/%02d => page:%d is cached\n", m_unit, m_cylinder, m_head, m_sector, m_page));
 		return;
 	}
 
@@ -735,6 +735,7 @@ void diablo_hd_device::squeeze_sector()
 	src = squeeze_sync(bits, src, 40);			// sync on header preamble
 	LOG_DRIVE((0,"[DHD%u]	header sync bit #%5d\n", m_unit, src));
 	src = squeeze_record(bits, src, s->header, sizeof(s->header));
+	LOG_DRIVE((0,"[DHD%u]	header CRC bit #%5d\n", m_unit, src));
 	src = squeeze_cksum(bits, src, &cksum_header);
 #if	DIABLO_DEBUG
 	dump_record(s->header, 0, sizeof(s->header), "header", 0);
@@ -744,6 +745,7 @@ void diablo_hd_device::squeeze_sector()
 	src = squeeze_sync(bits, src, 40);			// sync on label preamble
 	LOG_DRIVE((0,"[DHD%u]	label sync bit #%5d\n", m_unit, src));
 	src = squeeze_record(bits, src, s->label, sizeof(s->label));
+	LOG_DRIVE((0,"[DHD%u]	label CRC bit #%5d\n", m_unit, src));
 	src = squeeze_cksum(bits, src, &cksum_label);
 #if	DIABLO_DEBUG
 	dump_record(s->label, 0, sizeof(s->label), "label", 0);
@@ -753,10 +755,12 @@ void diablo_hd_device::squeeze_sector()
 	src = squeeze_sync(bits, src, 40);			// sync on data preamble
 	LOG_DRIVE((0,"[DHD%u]	data sync bit #%5d\n", m_unit, src));
 	src = squeeze_record(bits, src, s->data, sizeof(s->data));
+	LOG_DRIVE((0,"[DHD%u]	data CRC bit #%5d\n", m_unit, src));
 	src = squeeze_cksum(bits, src, &cksum_data);
 #if	DIABLO_DEBUG
 	dump_record(s->data, 0, sizeof(s->data), "data", 1);
 #endif
+	LOG_DRIVE((0,"[DHD%u]	postamble bit #%5d\n", m_unit, src));
 
 	/* The checksum start value always seems to be 0521 */
 	cksum_header ^= cksum(s->header, sizeof(s->header), 0521);
@@ -786,7 +790,7 @@ void diablo_hd_device::squeeze_sector()
  */
 int diablo_hd_device::bits_per_sector() const
 {
-    return m_diablo31 ? DIABLO31_SECTOR_BITS : DIABLO44_SECTOR_BITS;
+	return m_diablo31 ? DIABLO31_SECTOR_BITS : DIABLO44_SECTOR_BITS;
 }
 
 /**
@@ -795,7 +799,7 @@ int diablo_hd_device::bits_per_sector() const
  */
 const char* diablo_hd_device::description() const
 {
-    return m_description;
+	return m_description;
 }
 
 /**
@@ -804,7 +808,7 @@ const char* diablo_hd_device::description() const
  */
 int diablo_hd_device::unit() const
 {
-    return m_unit;
+	return m_unit;
 }
 
 /**
@@ -813,7 +817,7 @@ int diablo_hd_device::unit() const
  */
 attotime diablo_hd_device::rotation_time() const
 {
-    return m_rotation_time;
+	return m_rotation_time;
 }
 
 /**
@@ -822,7 +826,7 @@ attotime diablo_hd_device::rotation_time() const
  */
 attotime diablo_hd_device::sector_time() const
 {
-    return m_sector_time;
+	return m_sector_time;
 }
 
 /**
@@ -831,7 +835,7 @@ attotime diablo_hd_device::sector_time() const
  */
 attotime diablo_hd_device::bit_time() const
 {
-    return m_bit_time;
+	return m_bit_time;
 }
 
 /**
@@ -840,7 +844,7 @@ attotime diablo_hd_device::bit_time() const
  */
 int diablo_hd_device::get_seek_read_write_0() const
 {
-    return m_s_r_w_0;
+	return m_s_r_w_0;
 }
 
 /**
@@ -849,7 +853,7 @@ int diablo_hd_device::get_seek_read_write_0() const
  */
 int diablo_hd_device::get_ready_0() const
 {
-    return m_ready_0;
+	return m_ready_0;
 }
 
 /**
@@ -877,7 +881,7 @@ int diablo_hd_device::get_sector_mark_0() const
  */
 int diablo_hd_device::get_addx_acknowledge_0() const
 {
-    return m_addx_acknowledge_0;
+	return m_addx_acknowledge_0;
 }
 
 /**
@@ -886,7 +890,7 @@ int diablo_hd_device::get_addx_acknowledge_0() const
  */
 int diablo_hd_device::get_log_addx_interlock_0() const
 {
-    return m_log_addx_interlock_0;
+	return m_log_addx_interlock_0;
 }
 
 /**
@@ -895,7 +899,7 @@ int diablo_hd_device::get_log_addx_interlock_0() const
  */
 int diablo_hd_device::get_seek_incomplete_0() const
 {
-    return m_seek_incomplete_0;
+	return m_seek_incomplete_0;
 }
 
 /**
@@ -909,7 +913,7 @@ int diablo_hd_device::get_seek_incomplete_0() const
  */
 int diablo_hd_device::get_cylinder() const
 {
-    return m_cylinder;
+	return m_cylinder;
 }
 
 /**
@@ -923,7 +927,7 @@ int diablo_hd_device::get_cylinder() const
  */
 int diablo_hd_device::get_head() const
 {
-    return m_head;
+	return m_head;
 }
 
 /**
@@ -941,7 +945,7 @@ int diablo_hd_device::get_head() const
  */
 int diablo_hd_device::get_sector() const
 {
-    return m_sector;
+	return m_sector;
 }
 
 /**
@@ -955,7 +959,7 @@ int diablo_hd_device::get_sector() const
  */
 int diablo_hd_device::get_page() const
 {
-    return m_page;
+	return m_page;
 }
 
 /**
@@ -1021,34 +1025,33 @@ void diablo_hd_device::set_strobe(int cylinder, bool restore, int strobe)
 	// assert the seek-read-write signal
 	m_s_r_w_0 = 0;
 
+	bool complete = true;
 	if (seekto < m_cylinder) {
 		m_cylinder--;					// previous cylinder
 		if (m_cylinder < 0) {
 			m_cylinder = 0;
-			m_log_addx_interlock_0 = 1;	// deassert the log address interlock signal
-			m_seek_incomplete_0 = 1;	// deassert seek incomplete signal
-			m_addx_acknowledge_0 = 0;	// assert address acknowledge signal
-			LOG_DRIVE((1,"[DHD%u]	STROBE to cylinder %d incomplete\n", m_unit, seekto));
-			return;
+			complete = false;
 		}
 	}
 	if (seekto > m_cylinder) {
 		/* increment cylinder */
 		m_cylinder++;
-		if (m_cylinder >= DIABLO_CYLINDERS) {
-			m_cylinder = DIABLO_CYLINDERS - 1;
-			m_log_addx_interlock_0 = 1;	// deassert the log address interlock signal
-			m_seek_incomplete_0 = 1;	// deassert seek incomplete signal
-			m_addx_acknowledge_0 = 0;	// assert address acknowledge signal
-			LOG_DRIVE((1,"[DHD%u]	STROBE to cylinder %d incomplete\n", m_unit, seekto));
-			return;
+		if (m_cylinder >= m_cylinders) {
+			m_cylinder = m_cylinders - 1;
+			complete = false;
 		}
 	}
-	LOG_DRIVE((1,"[DHD%u]	STROBE to cylinder %d (now %d) - interlock\n", m_unit, seekto, m_cylinder));
-
-	m_addx_acknowledge_0 = 1;	// deassert address acknowledge signal
-	m_seek_incomplete_0 = 1;	// deassert seek incomplete signal
-	read_sector();
+	if (complete) {
+		LOG_DRIVE((1,"[DHD%u]	STROBE to cylinder %d (now %d) - interlock\n", m_unit, seekto, m_cylinder));
+		m_addx_acknowledge_0 = 1;	// deassert address acknowledge signal
+		m_seek_incomplete_0 = 1;	// deassert seek incomplete signal
+		read_sector();
+	} else {
+		m_log_addx_interlock_0 = 0;	// deassert the log address interlock signal
+		m_seek_incomplete_0 = 1;	// deassert seek incomplete signal
+		m_addx_acknowledge_0 = 0;	// assert address acknowledge signal
+		LOG_DRIVE((1,"[DHD%u]	STROBE to cylinder %d incomplete\n", m_unit, seekto));
+	}
 }
 
 /**
@@ -1057,7 +1060,7 @@ void diablo_hd_device::set_strobe(int cylinder, bool restore, int strobe)
  */
 void diablo_hd_device::set_egate(int gate)
 {
-    m_egate_0 = gate & 1;
+	m_egate_0 = gate & 1;
 }
 
 /**
@@ -1066,7 +1069,7 @@ void diablo_hd_device::set_egate(int gate)
  */
 void diablo_hd_device::set_wrgate(int gate)
 {
-    m_wrgate_0 = gate & 1;
+	m_wrgate_0 = gate & 1;
 }
 
 /**
@@ -1075,7 +1078,7 @@ void diablo_hd_device::set_wrgate(int gate)
  */
 void diablo_hd_device::set_rdgate(int gate)
 {
-    m_rdgate_0 = gate & 1;
+	m_rdgate_0 = gate & 1;
 }
 
 /**
@@ -1098,12 +1101,12 @@ void diablo_hd_device::set_rdgate(int gate)
 void diablo_hd_device::wr_data(int index, int wrdata)
 {
 	if (m_wrgate_0) {
-		LOG_DRIVE((0,"[DHD%u]	wrgate not asserted\n", m_unit));
+		LOG_DRIVE((0,"[DHD%u]	index=%d wrgate not asserted\n", m_unit, index));
 		return;	// write gate is not asserted (active 0)
 	}
 
 	if (index < 0 || index >= bits_per_sector()) {
-		LOG_DRIVE((0,"[DHD%u]	index out of range (%d)\n", m_unit, index));
+		LOG_DRIVE((0,"[DHD%u]	index=%d out of range\n", m_unit, index));
 		return;	// don't write before or beyond the sector
 	}
 
@@ -1140,12 +1143,12 @@ int diablo_hd_device::rd_data(int index)
 	int bit = 0;
 
 	if (m_rdgate_0) {
-		LOG_DRIVE((1,"[DHD%u]	rdgate not asserted\n", m_unit));
+		LOG_DRIVE((1,"[DHD%u]	index=%d rdgate not asserted\n", m_unit, index));
 		return 0;	// read gate is not asserted (active 0)
 	}
 
 	if (index < 0 || index >= bits_per_sector()) {
-		LOG_DRIVE((0,"[DHD%u]	index out of range (%d)\n", m_unit, index));
+		LOG_DRIVE((0,"[DHD%u]	index=%d out of range\n", m_unit, index));
 		return 1;	// don't read before or beyond the sector
 	}
 
@@ -1236,6 +1239,9 @@ void diablo_hd_device::sector_mark_0()
 {
 	LOG_DRIVE((9,"[DHD%u]	CHS:%03d/%d/%02d sector_mark_0=0\n", m_unit, m_cylinder, m_head, m_sector));
 
+	// HACK: deassert wrgate
+	m_wrgate_0 = 1;
+
 	squeeze_sector();		// squeeze previous sector bits, if it was written to
 	m_sector_mark_0 = 0;	// assert sector mark (set to 0)
 	// reset read and write bit locations
@@ -1287,6 +1293,7 @@ void diablo_hd_device::device_reset()
 		m_sector_mark_0_time = DIABLO31_SECTOR_MARK_PULSE_PRE;
 		m_sector_mark_1_time = DIABLO31_SECTOR_MARK_PULSE_PRE;
 		m_bit_time = DIABLO31_BIT_TIME(1);
+		m_cylinders = DIABLO_CYLINDERS;
 		m_pages = DIABLO_PAGES;
 	} else {
 		snprintf(m_description, sizeof(m_description), "DIABLO44");
@@ -1295,6 +1302,7 @@ void diablo_hd_device::device_reset()
 		m_sector_mark_0_time = DIABLO44_SECTOR_MARK_PULSE_PRE;
 		m_sector_mark_1_time = DIABLO44_SECTOR_MARK_PULSE_PRE;
 		m_bit_time = DIABLO44_BIT_TIME(1);
+		m_cylinders = 2 * DIABLO_CYLINDERS;
 		m_pages = 2 * DIABLO_PAGES;
 	}
 	LOG_DRIVE((0,"[DHD%u]	rotation time       : %.0fns\n", m_unit, m_rotation_time.as_double() * ATTOSECONDS_PER_NANOSECOND));
@@ -1349,7 +1357,7 @@ void diablo_hd_device::device_reset()
  */
 void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	LOG_DRIVE((6,"[DHD%u]	TIMER id=%d param=%d ptr=%p @%.0fns\n", m_unit, id, param, ptr, timer.elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND));
+	LOG_DRIVE((9,"[DHD%u]	TIMER id=%d param=%d ptr=%p @%.0fns\n", m_unit, id, param, ptr, timer.elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND));
 
 	switch (param) {
 	case 0:

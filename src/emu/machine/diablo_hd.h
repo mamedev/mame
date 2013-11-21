@@ -13,7 +13,7 @@
 #include "imagedev/diablo.h"
 
 #ifndef	DIABLO_DEBUG
-#define	DIABLO_DEBUG	0                   		//!< set to 1 to enable debug log output
+#define	DIABLO_DEBUG	1                   		//!< set to 1 to enable debug log output
 #endif
 
 #define DIABLO_HD_0 "diablo0"
@@ -99,11 +99,12 @@ private:
 	int m_egate_0;							//!< erase gate
 	int m_wrgate_0;							//!< write gate
 	int m_rdgate_0;							//!< read gate
+	int m_cylinders;						//!< total number of cylinders
+	int m_pages;							//!< total number of pages
 	int m_cylinder;							//!< current cylinder number
 	int m_head;								//!< current head (track) number on cylinder
 	int m_sector;							//!< current sector number in track
 	int m_page;								//!< current page (derived from cylinder, head and sector)
-	int m_pages;							//!< total number of pages
 	UINT8** m_cache;						//!< pages raw bytes
 	UINT32** m_bits;						//!< pages expanded to bits
 	int m_rdfirst;							//!< set to first bit of a sector that is read from
