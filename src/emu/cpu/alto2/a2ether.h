@@ -39,71 +39,9 @@ enum {
 												//!< f2 (1111): undefined
 };
 
-/**
- * @brief BPROMs P3601-1; 256x4; enet.a41 "PE1" and enet.a42 "PE2"
- *
- * Phase encoder
- *
- * a41: P3601-1; 256x4; "PE1"
- * a42: P3601-1; 256x4; "PE2"
- *
- * PE1/PE2 inputs
- * ----------------
- * A0  (5) OUTGO
- * A1  (6) XDATA
- * A2  (7) OSDATAG
- * A3  (4) XCLOCK
- * A4  (3) OCNTR0
- * A5  (2) OCNTR1
- * A6  (1) OCNTR2
- * A7 (15) OCNTR3
- *
- * PE1 outputs
- * ----------------
- * D0 (12) OCNTR0
- * D1 (11) OCNTR1
- * D2 (10) OCNTR2
- * D3  (9) OCNTR3
- *
- * PE2 outputs
- * ----------------
- * D0 (12) n.c.
- * D1 (11) to OSLOAD flip flop J and K'
- * D2 (10) XDATA
- * D3  (9) XCLOCK
- */
-UINT8* m_ether_a41;
-UINT8* m_ether_a42;
-
-/**
- * @brief BPROM; P3601-1; 265x4 enet.a49 "AFIFO"
- *
- * Perhaps try with the contents of the display FIFO, as it is
- * the same type and the display FIFO has the same size.
- *
- * FIFO control
- *
- * a49: P3601-1; 256x4; "AFIFO"
- *
- * inputs
- * ----------------
- * A0  (5) fifo_wr[0]
- * A1  (6) fifo_wr[1]
- * A2  (7) fifo_wr[2]
- * A3  (4) fifo_wr[3]
- * A4  (3) fifo_rd[0]
- * A5  (2) fifo_rd[1]
- * A6  (1) fifo_rd[2]
- * A7 (15) fifo_rd[3]
- *
- * outputs active low
- * ----------------------------
- * D0 (12) BE'    (buffer empty)
- * D1 (11) BNE'   (buffer next empty ?)
- * D2 (10) BNNE'  (buffer next next empty ?)
- * D3  (9) BF'    (buffer full)
- */
-UINT8* m_ether_a49;
+UINT8* m_ether_a41;								//!< BPROM; P3601-1; 256x4; enet.a41 "PE1"
+UINT8* m_ether_a42;								//!< BPROM; P3601-1; 256x4; enet.a42 "PE2"
+UINT8* m_ether_a49;								//!< BPROM; P3601-1; 265x4 enet.a49 "AFIFO"
 
 static const int m_duckbreath_sec = 15;			//!< send duckbreath every 15 seconds
 

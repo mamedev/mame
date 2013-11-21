@@ -8,8 +8,122 @@
  *
  *****************************************************************************/
 #include "alto2cpu.h"
+#include "a2roms.h"
 
 #define DEBUG_PACKETS   1
+
+
+/**
+ * @brief BPROMs P3601-1; 256x4; enet.a41 "PE1" and enet.a42 "PE2"
+ *
+ * Phase encoder
+ *
+ * a41: P3601-1; 256x4; "PE1"
+ * a42: P3601-1; 256x4; "PE2"
+ *
+ * PE1/PE2 inputs
+ * ----------------
+ * A0  (5) OUTGO
+ * A1  (6) XDATA
+ * A2  (7) OSDATAG
+ * A3  (4) XCLOCK
+ * A4  (3) OCNTR0
+ * A5  (2) OCNTR1
+ * A6  (1) OCNTR2
+ * A7 (15) OCNTR3
+ *
+ * PE1 outputs
+ * ----------------
+ * D0 (12) OCNTR0
+ * D1 (11) OCNTR1
+ * D2 (10) OCNTR2
+ * D3  (9) OCNTR3
+ *
+ * PE2 outputs
+ * ----------------
+ * D0 (12) n.c.
+ * D1 (11) to OSLOAD flip flop J and K'
+ * D2 (10) XDATA
+ * D3  (9) XCLOCK
+ */
+static const prom_load_t pl_enet_a41 =
+{	/* P3601 256x4 BPROM; Ethernet phase encoder 1 "PE1" */
+	"enet.a41",
+	0,
+	"d5de8d86",
+	"c134a4c898c73863124361a9b0218f7a7f00082a",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_enet_a42 =
+{	/* P3601 256x4 BPROM; Ethernet phase encoder 2 "PE2" */
+	"enet.a42",
+	0,
+	"9d5c81bd",
+	"ac7e63332a3dad0bef7cd0349b24e156a96a4bf0",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+/**
+ * @brief BPROM; P3601-1; 265x4 enet.a49 "AFIFO"
+ *
+ * Perhaps try with the contents of the display FIFO, as it is
+ * the same type and the display FIFO has the same size.
+ *
+ * FIFO control
+ *
+ * a49: P3601-1; 256x4; "AFIFO"
+ *
+ * inputs
+ * ----------------
+ * A0  (5) fifo_wr[0]
+ * A1  (6) fifo_wr[1]
+ * A2  (7) fifo_wr[2]
+ * A3  (4) fifo_wr[3]
+ * A4  (3) fifo_rd[0]
+ * A5  (2) fifo_rd[1]
+ * A6  (1) fifo_rd[2]
+ * A7 (15) fifo_rd[3]
+ *
+ * outputs active low
+ * ----------------------------
+ * D0 (12) BE'    (buffer empty)
+ * D1 (11) BNE'   (buffer next empty ?)
+ * D2 (10) BNNE'  (buffer next next empty ?)
+ * D3  (9) BF'    (buffer full)
+ */
+static const prom_load_t pl_enet_a49 =
+{	/* P3601 256x4 BPROM; Ethernet FIFO control "AFIFO" */
+	"enet.a49",
+	0,
+	"4d2dcdb2",
+	"583327a7d70cd02702c941c0e43c1e9408ff7fd0",
+	/* size */	0400,
+	/* amap */	AMAP_REVERSE_0_7,				// reverse address lines A0-A7
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
 
 #define	GET_ETH_WLF(st)			X_BIT(st,16,4)              //!< hardware status: write latch full/filled (? set by EODFCT)
 #define	PUT_ETH_WLF(st,val)		X_WRBITS(st,16,4,4,val)
@@ -687,7 +801,12 @@ void alto2_cpu_device::init_ether(int task)
 	// intialize all ethernet variables
 	memset(&m_eth, 0, sizeof(m_eth));
 
+	m_ether_a41 = prom_load(machine(), &pl_enet_a41, memregion("ether_a41")->base());
+	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
+	m_ether_a49 = prom_load(machine(), &pl_enet_a49, memregion("ether_a49")->base());
+
 	// FIXME: read configuration for m_eth.duckbreath enable
+	m_eth.duckbreath = m_duckbreath_sec;
 
 	set_bs(task, bs_ether_eidfct,	&alto2_cpu_device::bs_early_eidfct,	0);
 
@@ -714,7 +833,7 @@ void alto2_cpu_device::init_ether(int task)
 
 	m_eth.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::rx_duckbreath),this));
 	if (m_eth.duckbreath)
-		m_eth.rx_timer->adjust(attotime::from_seconds(m_duckbreath_sec), 0);
+		m_eth.rx_timer->adjust(attotime::from_seconds(m_eth.duckbreath), 0);
 	else
 		m_eth.rx_timer->reset();
 }

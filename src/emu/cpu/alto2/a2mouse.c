@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 #include "alto2cpu.h"
+#include "a2roms.h"
 
 #define	MOUSE_DIRTY_HACK	0
 
@@ -208,9 +209,25 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
  */
 INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_buttons )
 {
-    mouse_buttons_w(space(AS_IO), 0, newval, 1);
+	mouse_buttons_w(space(AS_IO), 0, newval, 1);
 }
 
+static const prom_load_t pl_madr_a32 =
+{
+	"madr.a32",
+	0,
+	"a0e3b4a7",
+	"24e50afdeb637a6a8588f8d3a3493c9188b8da2c",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	017,						// invert D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
 
 /**
  * @brief initialize the mouse context to useful values
@@ -237,10 +254,11 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_buttons )
  */
 void alto2_cpu_device::init_mouse()
 {
-    memset(&m_mouse, 0, sizeof(m_mouse));
+	memset(&m_mouse, 0, sizeof(m_mouse));
+	m_madr_a32 = prom_load(machine(), &pl_madr_a32, memregion("madr_a32")->base());
 }
 
 void alto2_cpu_device::exit_mouse()
 {
-    // nothing to do yet
+	// nothing to do yet
 }

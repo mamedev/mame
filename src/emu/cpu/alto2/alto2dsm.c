@@ -251,46 +251,46 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(T) ");
 		break;
 	case  2: // T?: BUS OR T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS OR T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS|T) ");
 		break;
 	case  3: //   : BUS AND T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS AND T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS&T) ");
 		break;
 	case  4: //   : BUS XOR T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS XOR T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS^T) ");
 		break;
 	case  5: // T?: BUS + 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS + 1) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS+1) ");
 		break;
 	case  6: // T?: BUS - 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS - 1) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS-1) ");
 		break;
 	case  7: //   : BUS + T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS + T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS+T) ");
 		break;
 	case  8: //   : BUS - T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS - T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS-T) ");
 		break;
 	case  9: //   : BUS - T - 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS - T - 1) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS-T-1) ");
 		break;
 	case 10: // T?: BUS + T + 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS + T + 1) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS+T+1) ");
 		break;
 	case 11: // T?: BUS + SKIP
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS + SKIP) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS+SKIP) ");
 		break;
 	case 12: // T?: BUS, T (AND)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS, T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS,T) ");
 		break;
 	case 13: //   : BUS AND NOT T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS AND NOT T) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS&~T) ");
 		break;
 	case 14: //   : undefined
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(14) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "*ALUF(BUS) ");
 		break;
 	case 15: //   : undefined
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(15) ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "*ALUF(BUS) ");
 		break;
 	}
 
@@ -329,10 +329,10 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "MAR←ALU ");
 		break;
 	case 2:	// switch tasks if higher priority wakeup is pending
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[TASK] ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "TASK ");
 		break;
 	case 3:	// disable the current task until re-enabled by a hardware-generated condition
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[BLOCK] ");
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "BLOCK ");
 		break;
 	case 4:	// SHIFTER output will be L shifted left one place
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "SHIFTER←L(LSH1) ");
@@ -356,27 +356,23 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 	case 0:	// no operation
 		break;
 	case 1:	// NEXT ← NEXT OR (BUS==0 ? 1 : 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[BUS==0 ? %s : %s] ",
-			addrname((prefetch | 1) & MCODE_MASK),
-			addrname(prefetch & MCODE_MASK));
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "[BUS==0 ? %s:%s] ",
+			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 2:	// NEXT ← NEXT OR (SHIFTER==0 ? 1 : 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH==0 ? %s : %s] ",
-			addrname((prefetch | 1) & MCODE_MASK),
-			addrname(prefetch & MCODE_MASK));
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH==0 ? %s:%s] ",
+			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 3:	// NEXT ← NEXT OR (SHIFTER<0 ? 1 : 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH<0 ? %s : %s] ",
-			addrname((prefetch | 1) & MCODE_MASK),
-			addrname(prefetch & MCODE_MASK));
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH<0 ? %s:%s] ",
+			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 4:	// NEXT ← NEXT OR BUS
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "NEXT←BUS ");
 		break;
 	case 5:	// NEXT ← NEXT OR ALUC0. ALUC0 is the carry produced by last L loading microinstruction.
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[ALUC0 ? %s : %s] ",
-			addrname((prefetch | 1) & MCODE_MASK),
-			addrname(prefetch & MCODE_MASK));
+		dst += snprintf(dst, len - (size_t)(dst - buffer), "[ALUC0 ? %s:%s] ",
+			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 6:	// deliver BUS data to memory
 		dst += snprintf(dst, len - (size_t)(dst - buffer), "MD←BUS ");

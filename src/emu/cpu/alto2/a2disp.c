@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 #include "alto2cpu.h"
+#include "a2roms.h"
 
 /**
  * @brief PROM a38 contains the STOPWAKE' and MBEMBPTY' signals for the FIFO
@@ -31,6 +32,24 @@
  * 	O3 (010) = MBEMPTY'
  * </PRE>
  */
+
+//! P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
+static const prom_load_t pl_displ_a38 =
+{
+	"displ.a38",
+	0,
+	"fd30beb7",
+	"65e4a19ba4ff748d525122128c514abedd55d866",
+	/* size */	0400,
+	/* amap */	AMAP_REVERSE_0_7,			// reverse address lines A0-A7
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
 
 //! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
 #define FIFO_STOPWAKE(a38) (0 == (a38 & disp_a38_STOPWAKE) ? true : false)
@@ -102,6 +121,24 @@
  * </PRE>
  */
 
+//! 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
+static const prom_load_t pl_displ_a63 =
+{
+	"displ.a63",
+	0,
+	"82a20d60",
+	"39d90703568be5419ada950e112d99227873fdea",
+	/* size */	0040,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	8,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
 //!< test the HBLANK (horizontal blanking) signal in PROM a63 being high
 #define A63_HBLANK(a) ((a & disp_a63_HBLANK) ? true : false)
 
@@ -126,6 +163,24 @@
  * Q4 is VBLANK for the even field (with H1024=1)
  * </PRE>
  */
+
+//! P3601 256x4 BPROM; display VSYNC and VBLANK
+static const prom_load_t pl_displ_a66 =
+{
+	"displ.a66",
+	0,
+	"9f91aad9",
+	"69b1d4c71f4e18103112e8601850c2654e9265cf",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	0,
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
 
 //! test the VSYNC (vertical synchronisation) signal in PROM a66 being high
 #define A66_VSYNC(a) (a & (HLC1024 ? disp_a66_VSYNC_ODD : disp_a66_VSYNC_EVEN) ? false : true)
@@ -452,6 +507,11 @@ void alto2_cpu_device::f2_late_evenfield()
 void alto2_cpu_device::init_disp()
 {
 	memset(&m_dsp, 0, sizeof(m_dsp));
+
+	m_disp_a38 = prom_load(machine(), &pl_displ_a38, memregion("displ_a38")->base());
+	m_disp_a63 = prom_load(machine(), &pl_displ_a63, memregion("displ_a63")->base());
+	m_disp_a66 = prom_load(machine(), &pl_displ_a66, memregion("displ_a66")->base());
+
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 
 	m_dsp.raw_bitmap = auto_alloc_array(machine(), UINT16, ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);

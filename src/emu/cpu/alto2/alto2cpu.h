@@ -43,7 +43,7 @@ enum {
 };
 
 #ifndef	ALTO2_DEBUG
-#define	ALTO2_DEBUG             0			//!< define to 1 to enable logerror() output
+#define	ALTO2_DEBUG             1			//!< define to 1 to enable logerror() output
 #endif
 
 #ifndef	ALTO2_CRAM_CONFIG
@@ -810,16 +810,16 @@ private:
 	 * KP0-KP3 are decoded using 7442 a78 to select
 	 * the keyboard row enable
 	 *
-	 * Enable   Keys
+	 * Enable   Key[0]  Key[1]  Key[2]  Key[3]  Key[4]  Key[5]  Key[6]  Key[7]
 	 * ------------------------------------------------------------------------
-	 * KE(0)    KB(R)   KB(1)   KB(3)   KB(5)   KB(T)   KB(ESC)   KB(2)   KB(4)
-	 * KE(1)    KB(G)   KB(TAB) KB(W)   KB(6)   KB(Y)   KB(F)     KB(0)   KB(E)
-	 * KE(2)    KB(H)   KB(CTL) KB(S)   KB(7)   KB(8)   KB(C)     KB(A)   KB(D)
-	 * KE(3)    KB(N)   KB(J)   KB(9)   KB(U)   KB(M)   KB(B)     KB(I)   KB(V)
-	 * KE(4)    KB(LCK) KB(Z)   KB(X)   KB(Q)   KB(SPC) KB(↑R)    KB(O)   KB(K)
-	 * KE(5)    KB([)   KB(.)   KB(L)   KB(-)   KB(+)   KB(;)     KB(,)   KB(P)
-	 * KE(6)    KB(↑L)  KB(RTN) KB(")   KB(/)   KB(S3)  KB(←)     KB(])   KB(\)
-	 * KE(7)    KB(S1)  KB(DEL) KB(S2)  KB(LF)  KB(S4)  KB(S5)    KB(BW)  KB(BS)
+	 * KE(0)    KB(R)   KB(1)   KB(3)   KB(5)   KB(T)   KB(ESC)  KB(2)  KB(4)
+	 * KE(1)    KB(G)   KB(TAB) KB(W)   KB(6)   KB(Y)   KB(F)    KB(0)  KB(E)
+	 * KE(2)    KB(H)   KB(CTL) KB(S)   KB(7)   KB(8)   KB(C)    KB(A)  KB(D)
+	 * KE(3)    KB(N)   KB(J)   KB(9)   KB(U)   KB(M)   KB(B)    KB(I)  KB(V)
+	 * KE(4)    KB(LCK) KB(Z)   KB(X)   KB(Q)   KB(SPC) KB(↑R)   KB(O)  KB(K)
+	 * KE(5)    KB([)   KB(.)   KB(L)   KB(-)   KB(+)   KB(;)    KB(,)  KB(P)
+	 * KE(6)    KB(↑L)  KB(RTN) KB(")   KB(/)   KB(S3)  KB(←)    KB(])  KB(\)
+	 * KE(7)    KB(S1)  KB(DEL) KB(S2)  KB(LF)  KB(S4)  KB(S5)   KB(BW) KB(BS)
 	 */
 	UINT8* m_madr_a91;
 

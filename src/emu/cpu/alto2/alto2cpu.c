@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
 #if	ALTO2_DEBUG
-	m_log_types(LOG_DISK),
+	m_log_types(LOG_ETH),
 	m_log_level(8),
 	m_log_newline(true),
 #endif
@@ -105,6 +105,13 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_mpc(0),
 	m_mir(0),
 	m_rsel(0),
+	m_d_rsel(0),
+	m_d_aluf(0),
+	m_d_bs(0),
+	m_d_f1(0),
+	m_d_f2(0),
+	m_d_loadt(0),
+	m_d_loadl(0),
 	m_next(0),
 	m_next2(0),
 	m_r(),
@@ -343,21 +350,6 @@ ROM_END
 const rom_entry *alto2_cpu_device::device_rom_region() const
 {
 	return ROM_NAME( alto2_cpu );
-}
-
-//-------------------------------------------------
-// device_memory_interface overrides
-//-------------------------------------------------
-
-const address_space_config*alto2_cpu_device::memory_space_config(address_spacenum spacenum) const
-{
-	if (AS_0 == spacenum)
-		return &m_ucode_config;
-	if (AS_1 == spacenum)
-		return &m_const_config;
-	if (AS_2 == spacenum)
-		return &m_iomem_config;
-	return NULL;
 }
 
 /**
@@ -676,60 +668,6 @@ static const prom_load_t pl_const[] = {
 	}
 };
 
-//! 82S23 32x8 BPROM; display HBLANK, HSYNC, SCANEND, HLCGATE ...
-static const prom_load_t pl_displ_a63 =
-{
-	"displ.a63",
-	0,
-	"82a20d60",
-	"39d90703568be5419ada950e112d99227873fdea",
-	/* size */	0040,
-	/* amap */	AMAP_DEFAULT,
-	/* axor */	0,
-	/* dxor */	0,
-	/* width */	8,
-	/* shift */	0,
-	/* dmap */	DMAP_DEFAULT,
-	/* dand */	ZERO,
-	/* type */	sizeof(UINT8)
-};
-
-//! P3601 256x4 BPROM; display FIFO control: STOPWAKE, MBEMPTY
-static const prom_load_t pl_displ_a38 =
-{
-	"displ.a38",
-	0,
-	"fd30beb7",
-	"65e4a19ba4ff748d525122128c514abedd55d866",
-	/* size */	0400,
-	/* amap */	AMAP_REVERSE_0_7,			// reverse address lines A0-A7
-	/* axor */	0,
-	/* dxor */	0,
-	/* width */	4,
-	/* shift */	0,
-	/* dmap */	DMAP_DEFAULT,
-	/* dand */	ZERO,
-	/* type */	sizeof(UINT8)
-};
-
-//! P3601 256x4 BPROM; display VSYNC and VBLANK
-static const prom_load_t pl_displ_a66 =
-{
-	"displ.a66",
-	0,
-	"9f91aad9",
-	"69b1d4c71f4e18103112e8601850c2654e9265cf",
-	/* size */	0400,
-	/* amap */	AMAP_DEFAULT,
-	/* axor */	0,
-	/* dxor */	0,
-	/* width */	4,
-	/* shift */	0,
-	/* dmap */	DMAP_DEFAULT,
-	/* dand */	ZERO,
-	/* type */	sizeof(UINT8)
-};
-
 //! 3601-1 256x4 BPROM; Emulator address modifier
 static const prom_load_t pl_2kctl_u3 =
 {
@@ -819,23 +757,6 @@ static const prom_load_t pl_3kcram_a37 =
 	/* type */	sizeof(UINT8)
 };
 
-static const prom_load_t pl_madr_a32 =
-{
-	"madr.a32",
-	0,
-	"a0e3b4a7",
-	"24e50afdeb637a6a8588f8d3a3493c9188b8da2c",
-	/* size */	0400,
-	/* amap */	AMAP_DEFAULT,
-	/* axor */	0,
-	/* dxor */	017,						// invert D0-D3
-	/* width */	4,
-	/* shift */	0,
-	/* dmap */	DMAP_REVERSE_0_3,			// reverse D0-D3 to D3-D0
-	/* dand */	ZERO,
-	/* type */	sizeof(UINT8)
-};
-
 static const prom_load_t pl_madr_a64 =
 {
 	"madr.a64",
@@ -904,56 +825,20 @@ static const prom_load_t pl_madr_a91 =
 	/* type */	sizeof(UINT8)
 };
 
-static const prom_load_t pl_enet_a41 =
-{	/* P3601 256x4 BPROM; Ethernet phase encoder 1 "PE1" */
-	"enet.a41",
-	0,
-	"d5de8d86",
-	"c134a4c898c73863124361a9b0218f7a7f00082a",
-	/* size */	0400,
-	/* amap */	AMAP_DEFAULT,
-	/* axor */	0,
-	/* dxor */	0,
-	/* width */	4,
-	/* shift */	0,
-	/* dmap */	DMAP_DEFAULT,
-	/* dand */	ZERO,
-	/* type */	sizeof(UINT8)
-};
+//-------------------------------------------------
+// device_memory_interface overrides
+//-------------------------------------------------
 
-static const prom_load_t pl_enet_a42 =
-{	/* P3601 256x4 BPROM; Ethernet phase encoder 2 "PE2" */
-	"enet.a42",
-	0,
-	"9d5c81bd",
-	"ac7e63332a3dad0bef7cd0349b24e156a96a4bf0",
-	/* size */	0400,
-	/* amap */	AMAP_DEFAULT,
-	/* axor */	0,
-	/* dxor */	0,
-	/* width */	4,
-	/* shift */	0,
-	/* dmap */	DMAP_DEFAULT,
-	/* dand */	ZERO,
-	/* type */	sizeof(UINT8)
-};
-
-static const prom_load_t pl_enet_a49 =
-{	/* P3601 256x4 BPROM; Ethernet FIFO control "AFIFO" */
-	"enet.a49",
-	0,
-	"4d2dcdb2",
-	"583327a7d70cd02702c941c0e43c1e9408ff7fd0",
-	/* size */	0400,
-	/* amap */	AMAP_REVERSE_0_7,				// reverse address lines A0-A7
-	/* axor */	0,
-	/* dxor */	0,
-	/* width */	4,
-	/* shift */	0,
-	/* dmap */	DMAP_DEFAULT,
-	/* dand */	ZERO,
-	/* type */	sizeof(UINT8)
-};
+const address_space_config*alto2_cpu_device::memory_space_config(address_spacenum spacenum) const
+{
+	if (AS_0 == spacenum)
+		return &m_ucode_config;
+	if (AS_1 == spacenum)
+		return &m_const_config;
+	if (AS_2 == spacenum)
+		return &m_iomem_config;
+	return NULL;
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -965,34 +850,27 @@ void alto2_cpu_device::device_start()
 	// get a pointer to the IO address space
 	m_iomem = &space(AS_2);
 
-	// decode micro code PROMs to CROM
+	// decode ALTO2_UCODE_PAGES = 1 or 2 pages of micro code PROMs to CROM
 	m_ucode_crom = prom_load(machine(), pl_ucode, memregion("ucode_proms")->base(), ALTO2_UCODE_ROM_PAGES, 8);
 
 	// allocate micro code CRAM
 	m_ucode_cram = auto_alloc_array(machine(), UINT8, sizeof(UINT32) * ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE);
-	// fill with inverted bits value
+	// fill with the micro code inverted bits value
 	for (offs_t offset = 0; offset < ALTO2_UCODE_RAM_PAGES * ALTO2_UCODE_PAGE_SIZE; offset++)
 		*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = ALTO2_UCODE_INVERTED;
 
-	// decode constant PROMs to const data
+	// decode constant PROMs to m_const_data
 	m_const_data = prom_load(machine(), pl_const, memregion("const_proms")->base(), 1, 4);
 
-	m_disp_a38 = prom_load(machine(), &pl_displ_a38, memregion("displ_a38")->base());
-	m_disp_a63 = prom_load(machine(), &pl_displ_a63, memregion("displ_a63")->base());
-	m_disp_a66 = prom_load(machine(), &pl_displ_a66, memregion("displ_a66")->base());
 	m_ctl2k_u3 = prom_load(machine(), &pl_2kctl_u3, memregion("2kctl_u3")->base());
 	m_ctl2k_u38 = prom_load(machine(), &pl_2kctl_u38, memregion("2kctl_u38")->base());
 	m_ctl2k_u76 = prom_load(machine(), &pl_2kctl_u76, memregion("2kctl_u76")->base());
 	m_alu_a10 = prom_load(machine(), &pl_alu_a10, memregion("alu_a10")->base());
 	m_cram3k_a37 = prom_load(machine(), &pl_3kcram_a37, memregion("3kcram_a37")->base());
-	m_madr_a32 = prom_load(machine(), &pl_madr_a32, memregion("madr_a32")->base());
 	m_madr_a64 = prom_load(machine(), &pl_madr_a64, memregion("madr_a64")->base());
 	m_madr_a65 = prom_load(machine(), &pl_madr_a65, memregion("madr_a65")->base());
 	m_madr_a90 = prom_load(machine(), &pl_madr_a90, memregion("madr_a90")->base());
 	m_madr_a91 = prom_load(machine(), &pl_madr_a91, memregion("madr_a91")->base());
-	m_ether_a41 = prom_load(machine(), &pl_enet_a41, memregion("ether_a41")->base());
-	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
-	m_ether_a49 = prom_load(machine(), &pl_enet_a49, memregion("ether_a49")->base());
 
 #if	0	// dump ALU a10 PROM after loading
 	for (UINT8 i = 0; i < 32; i++) {
@@ -1126,6 +1004,19 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_eth.tx_count));
 	save_item(NAME(m_eth.duckbreath));
 
+	state_add( A2_TASK,    "TASK",    m_task).callimport().formatstr("%6s");
+	state_add( A2_MPC,     "MPC",     m_mpc).formatstr("%06O");
+	state_add( A2_NEXT,    "NEXT",    m_next).formatstr("%06O");
+	state_add( A2_NEXT2,   "NEXT2",   m_next2).formatstr("%06O");
+	state_add( A2_BUS,     "BUS",     m_bus).formatstr("%06O");
+	state_add( A2_T,       "T",       m_t).formatstr("%06O");
+	state_add( A2_ALU,     "ALU",     m_alu).formatstr("%06O");
+	state_add( A2_ALUC0,   "ALUC0",   m_aluc0).mask(1);
+	state_add( A2_L,       "L",       m_l).formatstr("%06O");
+	state_add( A2_SHIFTER, "SHIFTER", m_shifter).formatstr("%06O");
+	state_add( A2_LALUC0,  "LALUC0",  m_laluc0).mask(1);
+	state_add( A2_M,       "M",       m_m).formatstr("%06O");
+	state_add_divider(-1);
 	state_add( A2_AC3,     "AC(3)",   m_r[000]).formatstr("%06O");
 	state_add( A2_AC2,     "AC(2)",   m_r[001]).formatstr("%06O");
 	state_add( A2_AC1,     "AC(1)",   m_r[002]).formatstr("%06O");
@@ -1216,19 +1107,6 @@ void alto2_cpu_device::device_start()
 	state_add( A2_SEEKOK,  "SEEKOK",  m_dsk.seekok).formatstr("%1u");
 	state_add( A2_OKTORUN, "OKTORUN", m_dsk.ok_to_run).formatstr("%1u");
 	state_add( A2_READY,   "READY",   m_dsk.kstat).formatstr("%1u");
-	state_add_divider(-1);
-	state_add( A2_TASK,    "TASK",    m_task).formatstr("%03O");
-	state_add( A2_MPC,     "MPC",     m_mpc).formatstr("%06O");
-	state_add( A2_NEXT,    "NEXT",    m_next).formatstr("%06O");
-	state_add( A2_NEXT2,   "NEXT2",   m_next2).formatstr("%06O");
-	state_add( A2_BUS,     "BUS",     m_bus).formatstr("%06O");
-	state_add( A2_T,       "T",       m_t).formatstr("%06O");
-	state_add( A2_ALU,     "ALU",     m_alu).formatstr("%06O");
-	state_add( A2_ALUC0,   "ALUC0",   m_aluc0).formatstr("%1u");
-	state_add( A2_L,       "L",       m_l).formatstr("%06O");
-	state_add( A2_SHIFTER, "SHIFTER", m_shifter).formatstr("%06O");
-	state_add( A2_LALUC0,  "LALUC0",  m_laluc0).formatstr("%1u");
-	state_add( A2_M,       "M",       m_m).formatstr("%06O");
 
 	state_add(STATE_GENPC, "curpc", m_mpc).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_aluc0).formatstr("%5s").noshow();
@@ -1236,6 +1114,28 @@ void alto2_cpu_device::device_start()
 	m_icountptr = &m_icount;
 
 	hard_reset();
+}
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
+
+void alto2_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+	case A2_TASK:
+		string.printf("%s", task_name(m_task));
+		break;
+	case STATE_GENFLAGS:
+		string.printf("%s%s%s%s",
+					  m_aluc0 ? "C":"-",
+					  m_laluc0 ? "c":"-",
+					  m_shifter == 0 ? "0":"-",
+					  static_cast<INT16>(m_shifter) < 0 ? "<":"-");
+		break;
+	}
 }
 
 //! read microcode CROM
@@ -1329,25 +1229,6 @@ void alto2_cpu_device::interface_post_reset()
 // FIXME
 void alto2_cpu_device::execute_set_input(int inputnum, int state)
 {
-}
-
-//-------------------------------------------------
-//  state_string_export - export state as a string
-//  for the debugger
-//-------------------------------------------------
-
-void alto2_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
-{
-	switch (entry.index())
-	{
-	case STATE_GENFLAGS:
-		string.printf("%s%s%s%s",
-					  m_aluc0 ? "C":"-",
-					  m_laluc0 ? "c":"-",
-					  m_shifter == 0 ? "0":"-",
-					  static_cast<INT16>(m_shifter) < 0 ? "<":"-");
-		break;
-	}
 }
 
 void alto2_cpu_device::fatal(int exitcode, const char *format, ...)
