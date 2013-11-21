@@ -2307,16 +2307,16 @@ ROM_START( machridra )
 	PALETTE_2C04_0001
 ROM_END
 
-ROM_START( vspinbal ) /* Set ID should be something like MDS-PN3-1 xx or MDS-PN4-1 xx */
+ROM_START( vspinbal ) /* E-1 Set; used Nintendo labels, e and 1 written in red marker */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "pb-6d",  0x8000, 0x2000, CRC(69fc575e) SHA1(d5165959c3569f5ebccd03d2cad4714f9240cc4c) )
-	ROM_LOAD( "pb-6c",  0xa000, 0x2000, CRC(fa9472d2) SHA1(d20ffb156bea1f474ad7d9776e217cb05048f00f) )
-	ROM_LOAD( "pb-6b",  0xc000, 0x2000, CRC(f57d89c5) SHA1(03f3a27d806c61fef13b0d8b2d8b9a15ee968e80) )
-	ROM_LOAD( "pb-6a",  0xe000, 0x2000, CRC(640c4741) SHA1(930bed577bfc75b03d064dc0ef523c45186fc3c4) )
+	ROM_LOAD( "mds-pn4_1__6d_e.6d",  0x8000, 0x2000, CRC(69fc575e) SHA1(d5165959c3569f5ebccd03d2cad4714f9240cc4c) )
+	ROM_LOAD( "mds-pn4_1__6c_e.6c",  0xa000, 0x2000, CRC(fa9472d2) SHA1(d20ffb156bea1f474ad7d9776e217cb05048f00f) )
+	ROM_LOAD( "mds-pn4_1__6b_e.6b",  0xc000, 0x2000, CRC(f57d89c5) SHA1(03f3a27d806c61fef13b0d8b2d8b9a15ee968e80) )
+	ROM_LOAD( "mds-pn4_1__6a_e.6a",  0xe000, 0x2000, CRC(640c4741) SHA1(930bed577bfc75b03d064dc0ef523c45186fc3c4) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "pb-8b",  0x0000, 0x2000, CRC(8822ee9e) SHA1(950113952e6d356e45e03479ba5dd5a8cb131609) )
-	ROM_LOAD( "pb-8a",  0x2000, 0x2000, CRC(cbe98a28) SHA1(c00c5f15a33611bfe3ad420b93b1cc2cae011c3e) )
+	ROM_LOAD( "mds-pn4_1__8b_e.8b",  0x0000, 0x2000, CRC(8822ee9e) SHA1(950113952e6d356e45e03479ba5dd5a8cb131609) )
+	ROM_LOAD( "mds-pn4_1__8a_e.8a",  0x2000, 0x2000, CRC(cbe98a28) SHA1(c00c5f15a33611bfe3ad420b93b1cc2cae011c3e) )
 
 	PALETTE_2C04_0001
 ROM_END
@@ -2801,7 +2801,7 @@ GAME( 1984, smgolfb,  smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, 
 GAME( 1984, smgolfj,  smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
 GAME( 1984, ladygolfe,smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)", 0 )
 GAME( 1984, ladygolf, smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)", 0 )
-GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Pinball (set ?)", 0 )
+GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Pinball (USA, set PN4 E-1)", 0 )
 GAME( 1984, vspinbalj,vspinbal, vsnes,   vspinblj, vsnes_state, vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)", 0 )
 GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnes_state, vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom", GAME_IMPERFECT_GRAPHICS )
 GAME( 1985, vssoccer, 0,        vsnes,   vssoccer, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
