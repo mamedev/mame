@@ -226,15 +226,9 @@ UINT8* m_disp_a38;
 
 //! output bits of PROM A38
 enum {
-	A38_STOPWAKE	= (1 << 1),
-	A38_MBEMPTY		= (1 << 3)
+	disp_a38_STOPWAKE	= (1 << 1),
+	disp_a38_MBEMPTY	= (1 << 3)
 };
-
-//! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
-inline UINT8 FIFO_STOPWAKE_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & A38_STOPWAKE; }
-
-//! PROM a38 bit O3 is MBEMPTY' (FIFO is empty if bit is zero)
-inline UINT8 FIFO_MBEMPTY_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr] & A38_MBEMPTY; }
 
 /**
  * @brief emulation of PROM a63 in the display schematics page 8
@@ -266,14 +260,14 @@ inline UINT8 FIFO_MBEMPTY_0() { return m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fif
 UINT8* m_disp_a63;
 
 enum {
-	A63_HBLANK	= (1 << 0),				//!< PROM a63 B0 is latched as HBLANK signal
-	A63_HSYNC	= (1 << 1),				//!< PROM a63 B1 is latched as HSYNC signal
-	A63_A0		= (1 << 2),				//!< PROM a63 B2 is the latched next address bit A0
-	A63_A1		= (1 << 3),				//!< PROM a63 B3 is the latched next address bit A1
-	A63_A2		= (1 << 4),				//!< PROM a63 B4 is the latched next address bit A2
-	A63_A3		= (1 << 5),				//!< PROM a63 B5 is the latched next address bit A3
-	A63_SCANEND	= (1 << 6),				//!< PROM a63 B6 SCANEND signal, which resets the FIFO counters
-	A63_HLCGATE	= (1 << 7)				//!< PROM a63 B7 HLCGATE signal, which enables counting the HLC
+	disp_a63_HBLANK		= (1 << 0),			//!< PROM a63 B0 is latched as HBLANK signal
+	disp_a63_HSYNC		= (1 << 1),			//!< PROM a63 B1 is latched as HSYNC signal
+	disp_a63_A0			= (1 << 2),			//!< PROM a63 B2 is the latched next address bit A0
+	disp_a63_A1			= (1 << 3),			//!< PROM a63 B3 is the latched next address bit A1
+	disp_a63_A2			= (1 << 4),			//!< PROM a63 B4 is the latched next address bit A2
+	disp_a63_A3			= (1 << 5),			//!< PROM a63 B5 is the latched next address bit A3
+	disp_a63_SCANEND	= (1 << 6),			//!< PROM a63 B6 SCANEND signal, which resets the FIFO counters
+	disp_a63_HLCGATE	= (1 << 7)			//!< PROM a63 B7 HLCGATE signal, which enables counting the HLC
 };
 
 /**
@@ -282,19 +276,14 @@ enum {
  * PROM a66 is a 256x4 bit (type 3601), containing the vertical blank + synch.
  * Address lines are driven by H[1] to H[128] of the the horz. line counters.
  * The PROM is enabled whenever H[256] and H[512] are both 0.
- *
- * Q1 (001) is VSYNC for the odd field (with H1024=1)
- * Q2 (002) is VSYNC for the even field (with H1024=0)
- * Q3 (004) is VBLANK for the odd field (with H1024=1)
- * Q4 (010) is VBLANK for the even field (with H1024=0)
  */
 UINT8* m_disp_a66;
 
 enum {
-	A66_VSYNC_ODD	= (1 << 0),
-	A66_VSYNC_EVEN	= (1 << 1),
-	A66_VBLANK_ODD	= (1 << 2),
-	A66_VBLANK_EVEN	= (1 << 3)
+	disp_a66_VSYNC_ODD		= (1 << 0),		//!< Q1 (001) is VSYNC for the odd field (with H1024=1)
+	disp_a66_VSYNC_EVEN		= (1 << 1),		//!< Q2 (002) is VSYNC for the even field (with H1024=0)
+	disp_a66_VBLANK_ODD		= (1 << 2),		//!< Q3 (004) is VBLANK for the odd field (with H1024=1)
+	disp_a66_VBLANK_EVEN	= (1 << 3)		//!< Q4 (010) is VBLANK for the even field (with H1024=0)
 };
 
 void update_bitmap_word(int x, int y, UINT16 word);	//!< update a word in the screen bitmap

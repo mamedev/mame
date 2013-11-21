@@ -32,6 +32,12 @@
  * </PRE>
  */
 
+//! PROM a38 bit O1 is STOPWAKE' (stop DWT if bit is zero)
+#define FIFO_STOPWAKE(a38) (0 == (a38 & disp_a38_STOPWAKE) ? true : false)
+
+//! PROM a38 bit O3 is MBEMPTY' (FIFO is empty if bit is zero)
+#define	FIFO_MBEMPTY(a38) (0 == (a38 & disp_a38_MBEMPTY) ? true : false)
+
 /**
  * @brief emulation of PROM a63 in the display schematics page 8
  * <PRE>
@@ -97,16 +103,16 @@
  */
 
 //!< test the HBLANK (horizontal blanking) signal in PROM a63 being high
-#define A63_HBLANK_HI(a) ((a & A63_HBLANK) ? true : false)
+#define A63_HBLANK(a) ((a & disp_a63_HBLANK) ? true : false)
 
 //!< test the HSYNC (horizontal synchonisation) signal in PROM a63 being high
-#define A63_HSYNC_HI(a) ((a & A63_HSYNC) ? true : false)
+#define A63_HSYNC(a) ((a & disp_a63_HSYNC) ? true : false)
 
 //!< test the SCANEND (scanline end) signal in PROM a63 being high
-#define A63_SCANEND_HI(a) ((a & A63_SCANEND) ? true : false)
+#define A63_SCANEND(a) ((a & disp_a63_SCANEND) ? true : false)
 
 //!< test the HLCGATE (horz. line counter gate) signal in PROM a63 being high
-#define A63_HLCGATE_HI(a) ((a & A63_HLCGATE) ? true : false)
+#define A63_HLCGATE(a) ((a & disp_a63_HLCGATE) ? true : false)
 
 /**
  * @brief PROM a66 is a 256x4 bit (type 3601)
@@ -122,10 +128,10 @@
  */
 
 //! test the VSYNC (vertical synchronisation) signal in PROM a66 being high
-#define A66_VSYNC(a) (a & (HLC1024 ? A66_VSYNC_ODD : A66_VSYNC_EVEN) ? false : true)
+#define A66_VSYNC(a) (a & (HLC1024 ? disp_a66_VSYNC_ODD : disp_a66_VSYNC_EVEN) ? false : true)
 
 //! test the VBLANK (vertical blanking) signal in PROM a66 being high
-#define A66_VBLANK(a) (a & (HLC1024 ? A66_VBLANK_ODD : A66_VBLANK_EVEN) ? false : true)
+#define A66_VBLANK(a) (a & (HLC1024 ? disp_a66_VBLANK_ODD : disp_a66_VBLANK_EVEN) ? false : true)
 
 /**
  * @brief double the bits for a byte (left and right of display word) to a word
@@ -215,7 +221,8 @@ void alto2_cpu_device::unload_word()
 	UINT16* scanline = m_dsp.raw_bitmap  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
 
 	UINT32 word = m_dsp.inverse;
-	if (FIFO_MBEMPTY_0() == 0) {
+	UINT8 a38 = m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr];
+	if (FIFO_MBEMPTY(a38)) {
 		LOG((LOG_DISPL,1, "	DSP FIFO underrun y:%d x:%d\n", y, x));
 	} else {
 		word ^= m_dsp.fifo[m_dsp.fifo_rd];
@@ -288,7 +295,7 @@ void alto2_cpu_device::display_state_machine()
 	}
 
 	UINT8 a63 = m_disp_a63[m_dsp.state];
-	if (A63_HLCGATE_HI(a63)) {
+	if (A63_HLCGATE(a63)) {
 		/* reset or count horizontal line counters */
 		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END)
 			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
@@ -348,7 +355,7 @@ void alto2_cpu_device::display_state_machine()
 			 */
 			m_dsp.curt_blocks = false;
 		}
-		if (!A63_HBLANK_HI(a63) && A63_HBLANK_HI(m_dsp.a63)) {
+		if (!A63_HBLANK(a63) && A63_HBLANK(m_dsp.a63)) {
 			// falling edge of a63 HBLANK starts unloading of FIFO words
 			LOG((LOG_DISPL,1, " HBLANK↘ UNLOAD"));
 			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
@@ -367,21 +374,22 @@ void alto2_cpu_device::display_state_machine()
 	 * if DHT is not blocked, and if the buffer is not full, DWT wakeups
 	 * are generated.
 	 */
-	if (!m_dsp.dwt_blocks && !m_dsp.dht_blocks && FIFO_STOPWAKE_0() != 0) {
+	UINT8 a38 = m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr];
+	if (!m_dsp.dwt_blocks && !m_dsp.dht_blocks && !FIFO_STOPWAKE(a38)) {
 		m_task_wakeup |= 1 << task_dwt;
 		LOG((LOG_DISPL,1, " (wake DWT)"));
 	}
 
 	// Stop waking the display word task at SCANEND time
-	if (A63_SCANEND_HI(a63)) {
+	if (A63_SCANEND(a63)) {
 		LOG((LOG_DISPL,1, " SCANEND"));
 		m_task_wakeup &= ~(1 << task_dwt);
 	}
 
-	LOG((LOG_DISPL,1, "%s", A63_HBLANK_HI(a63) ? " HBLANK": ""));
+	LOG((LOG_DISPL,1, "%s", A63_HBLANK(a63) ? " HBLANK": ""));
 
-	if (A63_HSYNC_HI(a63)) {
-		if (!A63_HSYNC_HI(m_dsp.a63)) {
+	if (A63_HSYNC(a63)) {
+		if (!A63_HSYNC(m_dsp.a63)) {
 			LOG((LOG_DISPL,1, " HSYNC↗ (CLRBUF)"));
 			/*
 			 * The hardware sets the buffer empty and clears the DWT block
@@ -401,7 +409,7 @@ void alto2_cpu_device::display_state_machine()
 		}
 	}
 	// FIXME: jiggly cursor issue; try to wake up CURT at the end of HSYNC
-	if (A63_HSYNC_HI(m_dsp.a63) && !A63_HSYNC_HI(a63)) {
+	if (A63_HSYNC(m_dsp.a63) && !A63_HSYNC(a63)) {
 		/*
 		 * CLRBUF' also resets the 2nd cursor task block flip flop,
 		 * which is built from two NAND gates a30c and a30d (74H00).
