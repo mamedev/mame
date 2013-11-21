@@ -45,7 +45,10 @@ public:
 		m_discrete(*this, "discrete"),
 		m_samples(*this, "samples"),
 		m_samples1(*this, "samples1"),
-		m_samples2(*this, "samples2")
+		m_samples2(*this, "samples2"),
+		m_sn1(*this, "sn1"),
+		m_sn2(*this, "sn2"),
+		m_sn(*this, "snsnd")
 	{ }
 
 	/* device/memory pointers */
@@ -83,9 +86,9 @@ public:
 	optional_device<samples_device> m_samples;
 	optional_device<samples_device> m_samples1;
 	optional_device<samples_device> m_samples2;
-	device_t *m_sn1;
-	device_t *m_sn2;
-	device_t *m_sn;
+	optional_device<sn76477_device> m_sn1;
+	optional_device<sn76477_device> m_sn2;
+	optional_device<sn76477_device> m_sn;
 
 	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
 	DECLARE_READ8_MEMBER(mw8080bw_reversable_shift_result_r);

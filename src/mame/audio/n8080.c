@@ -5,9 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs48/mcs48.h"
-#include "sound/sn76477.h"
-#include "sound/dac.h"
 #include "includes/n8080.h"
 
 static const double ATTACK_RATE = 10e-6 * 500;
@@ -69,162 +66,152 @@ static const sn76477_interface spacefev_sn76477_interface =
 };
 
 
-static void spacefev_update_SN76477_status( device_t *sn )
+void n8080_state::spacefev_update_SN76477_status()
 {
-	n8080_state *state = sn->machine().driver_data<n8080_state>();
 	double dblR0 = RES_M(1.0);
 	double dblR1 = RES_M(1.5);
 
-	if (!state->m_mono_flop[0])
+	if (!m_mono_flop[0])
 	{
 		dblR0 = 1 / (1 / RES_K(150) + 1 / dblR0); /* ? */
 	}
-	if (!state->m_mono_flop[1])
+	if (!m_mono_flop[1])
 	{
 		dblR1 = 1 / (1 / RES_K(620) + 1 / dblR1); /* ? */
 	}
 
-	sn76477_decay_res_w(sn, dblR0);
+	m_sn->decay_res_w(dblR0);
 
-	sn76477_vco_res_w(sn, dblR1);
+	m_sn->vco_res_w(dblR1);
 
-	sn76477_enable_w(sn,
-		!state->m_mono_flop[0] &&
-		!state->m_mono_flop[1] &&
-		!state->m_mono_flop[2]);
+	m_sn->enable_w(
+		!m_mono_flop[0] &&
+		!m_mono_flop[1] &&
+		!m_mono_flop[2]);
 
-	sn76477_vco_w(sn, state->m_mono_flop[1]);
+	m_sn->vco_w(m_mono_flop[1]);
 
-	sn76477_mixer_b_w(sn, state->m_mono_flop[0]);
+	m_sn->mixer_b_w(m_mono_flop[0]);
 }
 
 
-static void sheriff_update_SN76477_status( device_t *sn )
+void n8080_state::sheriff_update_SN76477_status()
 {
-	n8080_state *state = sn->machine().driver_data<n8080_state>();
-	if (state->m_mono_flop[1])
+	if (m_mono_flop[1])
 	{
-		sn76477_vco_voltage_w(sn, 5);
+		m_sn->vco_voltage_w(5);
 	}
 	else
 	{
-		sn76477_vco_voltage_w(sn, 0);
+		m_sn->vco_voltage_w(0);
 	}
 
-	sn76477_enable_w(sn,
-		!state->m_mono_flop[0] &&
-		!state->m_mono_flop[1]);
+	m_sn->enable_w(
+		!m_mono_flop[0] &&
+		!m_mono_flop[1]);
 
-	sn76477_vco_w(sn, state->m_mono_flop[0]);
+	m_sn->vco_w(m_mono_flop[0]);
 
-	sn76477_mixer_b_w(sn, !state->m_mono_flop[0]);
+	m_sn->mixer_b_w(!m_mono_flop[0]);
 }
 
 
-static void update_SN76477_status( device_t *device )
+void n8080_state::update_SN76477_status()
 {
-	n8080_state *state = device->machine().driver_data<n8080_state>();
-	if (state->m_n8080_hardware == 1)
+	if (m_n8080_hardware == 1)
 	{
-		spacefev_update_SN76477_status(device);
+		spacefev_update_SN76477_status();
 	}
-	if (state->m_n8080_hardware == 2)
+	if (m_n8080_hardware == 2)
 	{
-		sheriff_update_SN76477_status(device);
+		sheriff_update_SN76477_status();
 	}
 }
 
 
-static void start_mono_flop( device_t *sn, int n, attotime expire )
+void n8080_state::start_mono_flop( int n, attotime expire )
 {
-	n8080_state *state = sn->machine().driver_data<n8080_state>();
-	state->m_mono_flop[n] = 1;
+	m_mono_flop[n] = 1;
 
-	update_SN76477_status(sn);
+	update_SN76477_status();
 
-	state->m_sound_timer[n]->adjust(expire, n);
+	m_sound_timer[n]->adjust(expire, n);
 }
 
 
-static void stop_mono_flop( device_t *sn, int n )
+void n8080_state::stop_mono_flop( int n )
 {
-	n8080_state *state = sn->machine().driver_data<n8080_state>();
-	state->m_mono_flop[n] = 0;
+	m_mono_flop[n] = 0;
 
-	update_SN76477_status(sn);
+	update_SN76477_status();
 
-	state->m_sound_timer[n]->adjust(attotime::never, n);
+	m_sound_timer[n]->adjust(attotime::never, n);
 }
 
 
-static TIMER_CALLBACK( stop_mono_flop_callback )
+TIMER_CALLBACK_MEMBER( n8080_state::stop_mono_flop_callback )
 {
-	stop_mono_flop(machine.device("snsnd"), param);
+	stop_mono_flop(param);
 }
 
 
-static void spacefev_sound_pins_changed( running_machine &machine )
+void n8080_state::spacefev_sound_pins_changed()
 {
-	device_t *sn = machine.device("snsnd");
-	n8080_state *state = machine.driver_data<n8080_state>();
-	UINT16 changes = ~state->m_curr_sound_pins & state->m_prev_sound_pins;
+	UINT16 changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
 	if (changes & (1 << 0x3))
 	{
-		stop_mono_flop(sn, 1);
+		stop_mono_flop(1);
 	}
 	if (changes & ((1 << 0x3) | (1 << 0x6)))
 	{
-		stop_mono_flop(sn, 2);
+		stop_mono_flop(2);
 	}
 	if (changes & (1 << 0x3))
 	{
-		start_mono_flop(sn, 0, attotime::from_usec(550 * 36 * 100));
+		start_mono_flop(0, attotime::from_usec(550 * 36 * 100));
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(sn, 1, attotime::from_usec(550 * 22 * 33));
+		start_mono_flop(1, attotime::from_usec(550 * 22 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(sn, 2, attotime::from_usec(550 * 22 * 33));
+		start_mono_flop(2, attotime::from_usec(550 * 22 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(machine.device("audiocpu"), 0, 2);
+		generic_pulse_irq_line(m_audiocpu, 0, 2);
 	}
 }
 
 
-static void sheriff_sound_pins_changed( running_machine &machine )
+void n8080_state::sheriff_sound_pins_changed()
 {
-	device_t *sn = machine.device("snsnd");
-	n8080_state *state = machine.driver_data<n8080_state>();
-	UINT16 changes = ~state->m_curr_sound_pins & state->m_prev_sound_pins;
+	UINT16 changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
 	if (changes & (1 << 0x6))
 	{
-		stop_mono_flop(sn, 1);
+		stop_mono_flop(1);
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(sn, 0, attotime::from_usec(550 * 33 * 33));
+		start_mono_flop(0, attotime::from_usec(550 * 33 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(sn, 1, attotime::from_usec(550 * 33 * 33));
+		start_mono_flop(1, attotime::from_usec(550 * 33 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(machine.device("audiocpu"), 0, 2);
+		generic_pulse_irq_line(m_audiocpu, 0, 2);
 	}
 }
 
 
-static void helifire_sound_pins_changed( running_machine &machine )
+void n8080_state::helifire_sound_pins_changed()
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
-	UINT16 changes = ~state->m_curr_sound_pins & state->m_prev_sound_pins;
+	UINT16 changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
 	/* ((state->m_curr_sound_pins >> 0xa) & 1) not emulated */
 	/* ((state->m_curr_sound_pins >> 0xb) & 1) not emulated */
@@ -232,31 +219,27 @@ static void helifire_sound_pins_changed( running_machine &machine )
 
 	if (changes & (1 << 6))
 	{
-		generic_pulse_irq_line(machine.device("audiocpu"), 0, 2);
+		generic_pulse_irq_line(m_audiocpu, 0, 2);
 	}
 }
 
 
-static void sound_pins_changed( running_machine &machine )
+void n8080_state::sound_pins_changed()
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
+	if (m_n8080_hardware == 1)
+		spacefev_sound_pins_changed();
+	if (m_n8080_hardware == 2)
+		sheriff_sound_pins_changed();
+	if (m_n8080_hardware == 3)
+		helifire_sound_pins_changed();
 
-	if (state->m_n8080_hardware == 1)
-		spacefev_sound_pins_changed(machine);
-	if (state->m_n8080_hardware == 2)
-		sheriff_sound_pins_changed(machine);
-	if (state->m_n8080_hardware == 3)
-		helifire_sound_pins_changed(machine);
-
-	state->m_prev_sound_pins = state->m_curr_sound_pins;
+	m_prev_sound_pins = m_curr_sound_pins;
 }
 
 
-static void delayed_sound_1( running_machine &machine, int data )
+void n8080_state::delayed_sound_1( int data )
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
-
-	state->m_curr_sound_pins &= ~(
+	m_curr_sound_pins &= ~(
 		(1 << 0x7) |
 		(1 << 0x5) |
 		(1 << 0x6) |
@@ -264,40 +247,38 @@ static void delayed_sound_1( running_machine &machine, int data )
 		(1 << 0x4) |
 		(1 << 0x1));
 
-	if (~data & 0x01) state->m_curr_sound_pins |= 1 << 0x7;
-	if (~data & 0x02) state->m_curr_sound_pins |= 1 << 0x5; /* pulse */
-	if (~data & 0x04) state->m_curr_sound_pins |= 1 << 0x6; /* pulse */
-	if (~data & 0x08) state->m_curr_sound_pins |= 1 << 0x3; /* pulse (except in Helifire) */
-	if (~data & 0x10) state->m_curr_sound_pins |= 1 << 0x4; /* pulse (except in Helifire) */
-	if (~data & 0x20) state->m_curr_sound_pins |= 1 << 0x1;
+	if (~data & 0x01) m_curr_sound_pins |= 1 << 0x7;
+	if (~data & 0x02) m_curr_sound_pins |= 1 << 0x5; /* pulse */
+	if (~data & 0x04) m_curr_sound_pins |= 1 << 0x6; /* pulse */
+	if (~data & 0x08) m_curr_sound_pins |= 1 << 0x3; /* pulse (except in Helifire) */
+	if (~data & 0x10) m_curr_sound_pins |= 1 << 0x4; /* pulse (except in Helifire) */
+	if (~data & 0x20) m_curr_sound_pins |= 1 << 0x1;
 
-	if (state->m_n8080_hardware == 1)
+	if (m_n8080_hardware == 1)
 	{
-		if (data & ~state->m_prev_snd_data & 0x10)
+		if (data & ~m_prev_snd_data & 0x10)
 		{
-			state->spacefev_start_red_cannon();
+			spacefev_start_red_cannon();
 		}
 
-		state->m_spacefev_red_screen = data & 0x08;
+		m_spacefev_red_screen = data & 0x08;
 	}
 
-	sound_pins_changed(machine);
+	sound_pins_changed();
 
-	state->m_prev_snd_data = data;
+	m_prev_snd_data = data;
 }
 
 
-static TIMER_CALLBACK( delayed_sound_1_callback )
+TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_1_callback )
 {
-	delayed_sound_1(machine, param);
+	delayed_sound_1(param);
 }
 
 
-static void delayed_sound_2( running_machine &machine, int data )
+void n8080_state::delayed_sound_2( int data )
 {
-	n8080_state *state = machine.driver_data<n8080_state>();
-
-	state->m_curr_sound_pins &= ~(
+	m_curr_sound_pins &= ~(
 		(1 << 0x8) |
 		(1 << 0x9) |
 		(1 << 0xa) |
@@ -305,36 +286,36 @@ static void delayed_sound_2( running_machine &machine, int data )
 		(1 << 0x2) |
 		(1 << 0xc));
 
-	if (~data & 0x01) state->m_curr_sound_pins |= 1 << 0x8;
-	if (~data & 0x02) state->m_curr_sound_pins |= 1 << 0x9;
-	if (~data & 0x04) state->m_curr_sound_pins |= 1 << 0xa;
-	if (~data & 0x08) state->m_curr_sound_pins |= 1 << 0xb;
-	if (~data & 0x10) state->m_curr_sound_pins |= 1 << 0x2; /* pulse */
-	if (~data & 0x20) state->m_curr_sound_pins |= 1 << 0xc;
+	if (~data & 0x01) m_curr_sound_pins |= 1 << 0x8;
+	if (~data & 0x02) m_curr_sound_pins |= 1 << 0x9;
+	if (~data & 0x04) m_curr_sound_pins |= 1 << 0xa;
+	if (~data & 0x08) m_curr_sound_pins |= 1 << 0xb;
+	if (~data & 0x10) m_curr_sound_pins |= 1 << 0x2; /* pulse */
+	if (~data & 0x20) m_curr_sound_pins |= 1 << 0xc;
 
-	if (state->m_n8080_hardware == 1)
-		state->flip_screen_set_no_update(data & 0x20);
-	if (state->m_n8080_hardware == 3)
-		state->m_helifire_flash = data & 0x20;
+	if (m_n8080_hardware == 1)
+		flip_screen_set_no_update(data & 0x20);
+	if (m_n8080_hardware == 3)
+		m_helifire_flash = data & 0x20;
 
-	sound_pins_changed(machine);
+	sound_pins_changed();
 }
 
 
-static TIMER_CALLBACK( delayed_sound_2_callback )
+TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_2_callback )
 {
-	delayed_sound_2(machine, param);
+	delayed_sound_2(param);
 }
 
 
 WRITE8_MEMBER(n8080_state::n8080_sound_1_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_sound_1_callback), data); /* force CPUs to sync */
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_1_callback), this), data); /* force CPUs to sync */
 }
 
 WRITE8_MEMBER(n8080_state::n8080_sound_2_w)
 {
-	machine().scheduler().synchronize(FUNC(delayed_sound_2_callback), data); /* force CPUs to sync */
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_2_callback), this), data); /* force CPUs to sync */
 }
 
 
@@ -428,7 +409,6 @@ WRITE8_MEMBER(n8080_state::helifire_sound_ctrl_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::spacefev_vco_voltage_timer)
 {
-	device_t *sn = machine().device("snsnd");
 	double voltage = 0;
 
 	if (m_mono_flop[2])
@@ -436,7 +416,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::spacefev_vco_voltage_timer)
 		voltage = 5 * (1 - exp(- m_sound_timer[2]->elapsed().as_double() / 0.22));
 	}
 
-	sn76477_vco_voltage_w(sn, voltage);
+	m_sn->vco_voltage_w(voltage);
 }
 
 
@@ -457,9 +437,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
 
 SOUND_START_MEMBER(n8080_state,spacefev)
 {
-	m_sound_timer[0] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
-	m_sound_timer[1] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
-	m_sound_timer[2] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
+	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
+	m_sound_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
 
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
@@ -479,15 +459,15 @@ SOUND_RESET_MEMBER(n8080_state,spacefev)
 	m_prev_sound_pins = 0;
 	m_curr_sound_pins = 0;
 
-	delayed_sound_1(machine(), 0);
-	delayed_sound_2(machine(), 0);
+	delayed_sound_1(0);
+	delayed_sound_2(0);
 }
 
 
 SOUND_START_MEMBER(n8080_state,sheriff)
 {
-	m_sound_timer[0] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
-	m_sound_timer[1] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
+	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
+	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
 
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
@@ -506,8 +486,8 @@ SOUND_RESET_MEMBER(n8080_state,sheriff)
 	m_prev_sound_pins = 0;
 	m_curr_sound_pins = 0;
 
-	delayed_sound_1(machine(), 0);
-	delayed_sound_2(machine(), 0);
+	delayed_sound_1(0);
+	delayed_sound_2(0);
 }
 
 
@@ -533,8 +513,8 @@ SOUND_RESET_MEMBER(n8080_state,helifire)
 	m_prev_sound_pins = 0;
 	m_curr_sound_pins = 0;
 
-	delayed_sound_1(machine(), 0);
-	delayed_sound_2(machine(), 0);
+	delayed_sound_1(0);
+	delayed_sound_2(0);
 }
 
 

@@ -29,7 +29,12 @@ public:
 	toratora_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_sn1(*this, "sn1"),
+		m_sn2(*this, "sn2"),
+		m_pia_u1(*this, "pia_u1"),
+		m_pia_u2(*this, "pia_u2"),
+		m_pia_u3(*this, "pia_u3") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -41,9 +46,11 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	pia6821_device *m_pia_u1;
-	pia6821_device *m_pia_u2;
-	pia6821_device *m_pia_u3;
+	required_device<sn76477_device> m_sn1;
+	required_device<sn76477_device> m_sn2;
+	required_device<pia6821_device> m_pia_u1;
+	required_device<pia6821_device> m_pia_u2;
+	required_device<pia6821_device> m_pia_u3;
 	DECLARE_WRITE8_MEMBER(clear_tv_w);
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_WRITE8_MEMBER(clear_timer_w);
@@ -128,8 +135,7 @@ WRITE8_MEMBER(toratora_state::clear_tv_w)
 
 WRITE8_MEMBER(toratora_state::port_b_u1_w)
 {
-	pia6821_device *pia = machine().device<pia6821_device>("pia_u1");
-	if (pia->port_b_z_mask() & 0x20)
+	if (m_pia_u1->port_b_z_mask() & 0x20)
 		coin_counter_w(machine(), 0, 1);
 	else
 		coin_counter_w(machine(), 0, data & 0x20);
@@ -144,8 +150,7 @@ WRITE8_MEMBER(toratora_state::port_b_u1_w)
 
 WRITE_LINE_MEMBER(toratora_state::main_cpu_irq)
 {
-	pia6821_device *pia = machine().device<pia6821_device>("pia_u1");
-	int combined_state = pia->irq_a_state() | pia->irq_b_state();
+	int combined_state = m_pia_u1->irq_a_state() | m_pia_u1->irq_b_state();
 
 	logerror("GEN IRQ: %x\n", combined_state);
 	m_maincpu->set_input_line(0, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -218,15 +223,13 @@ static const sn76477_interface sn76477_intf =
 
 WRITE8_MEMBER(toratora_state::sn1_port_a_u2_u3_w)
 {
-	device_t *device = machine().device("sn1");
-	sn76477_vco_voltage_w(device, 2.35 * (data & 0x7f) / 128.0);
-	sn76477_enable_w(device, (data >> 7) & 0x01);
+	m_sn1->vco_voltage_w(2.35 * (data & 0x7f) / 128.0);
+	m_sn1->enable_w((data >> 7) & 0x01);
 }
 
 
 WRITE8_MEMBER(toratora_state::sn1_port_b_u2_u3_w)
 {
-	device_t *device = machine().device("sn1");
 	static const double resistances[] =
 	{
 		0,  /* N/C */
@@ -239,32 +242,29 @@ WRITE8_MEMBER(toratora_state::sn1_port_b_u2_u3_w)
 		RES_K(47)
 	};
 
-	sn76477_mixer_a_w      (device, (data >> 0) & 0x01);
-	sn76477_mixer_b_w      (device, (data >> 1) & 0x01);
-	sn76477_mixer_c_w      (device, (data >> 2) & 0x01);
-	sn76477_envelope_1_w   (device, (data >> 3) & 0x01);
-	sn76477_envelope_2_w   (device, (data >> 4) & 0x01);
-	sn76477_amplitude_res_w(device, resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
+	m_sn1->mixer_a_w      ((data >> 0) & 0x01);
+	m_sn1->mixer_b_w      ((data >> 1) & 0x01);
+	m_sn1->mixer_c_w      ((data >> 2) & 0x01);
+	m_sn1->envelope_1_w   ((data >> 3) & 0x01);
+	m_sn1->envelope_2_w   ((data >> 4) & 0x01);
+	m_sn1->amplitude_res_w(resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
 }
 
 
 WRITE_LINE_MEMBER(toratora_state::sn1_ca2_u2_u3_w)
 {
-	device_t *device = machine().device("sn1");
-	sn76477_vco_w(device, state);
+	m_sn1->vco_w(state);
 }
 
 WRITE8_MEMBER(toratora_state::sn2_port_a_u2_u3_w)
 {
-	device_t *device = machine().device("sn2");
-	sn76477_vco_voltage_w(device, 2.35 * (data & 0x7f) / 128.0);
-	sn76477_enable_w(device, (data >> 7) & 0x01);
+	m_sn2->vco_voltage_w(2.35 * (data & 0x7f) / 128.0);
+	m_sn2->enable_w((data >> 7) & 0x01);
 }
 
 
 WRITE8_MEMBER(toratora_state::sn2_port_b_u2_u3_w)
 {
-	device_t *device = machine().device("sn2");
 	static const double resistances[] =
 	{
 		0,  /* N/C */
@@ -277,19 +277,18 @@ WRITE8_MEMBER(toratora_state::sn2_port_b_u2_u3_w)
 		RES_K(47)
 	};
 
-	sn76477_mixer_a_w      (device, (data >> 0) & 0x01);
-	sn76477_mixer_b_w      (device, (data >> 1) & 0x01);
-	sn76477_mixer_c_w      (device, (data >> 2) & 0x01);
-	sn76477_envelope_1_w   (device, (data >> 3) & 0x01);
-	sn76477_envelope_2_w   (device, (data >> 4) & 0x01);
-	sn76477_amplitude_res_w(device, resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
+	m_sn2->mixer_a_w      ((data >> 0) & 0x01);
+	m_sn2->mixer_b_w      ((data >> 1) & 0x01);
+	m_sn2->mixer_c_w      ((data >> 2) & 0x01);
+	m_sn2->envelope_1_w   ((data >> 3) & 0x01);
+	m_sn2->envelope_2_w   ((data >> 4) & 0x01);
+	m_sn2->amplitude_res_w(resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
 }
 
 
 WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_u3_w)
 {
-	device_t *device = machine().device("sn2");
-	sn76477_vco_w(device, state);
+	m_sn2->vco_w(state);
 }
 
 /*************************************
@@ -426,10 +425,6 @@ INPUT_PORTS_END
 
 void toratora_state::machine_start()
 {
-	m_pia_u1 = machine().device<pia6821_device>("pia_u1");
-	m_pia_u2 = machine().device<pia6821_device>("pia_u2");
-	m_pia_u3 = machine().device<pia6821_device>("pia_u3");
-
 	save_item(NAME(m_timer));
 	save_item(NAME(m_last));
 	save_item(NAME(m_clear_tv));

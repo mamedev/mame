@@ -1,12 +1,16 @@
+#include "sound/sn76477.h"
+
 class route16_state : public driver_device
 {
 public:
 	route16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_sn(*this, "snsnd"),
 		m_sharedram(*this, "sharedram"),
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"){ }
 
+	optional_device<sn76477_device> m_sn;
 	required_shared_ptr<UINT8> m_sharedram;
 	UINT8 m_ttmahjng_port_select;
 	int m_speakres_vrx;

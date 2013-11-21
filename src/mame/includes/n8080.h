@@ -1,4 +1,6 @@
+#include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
+#include "sound/sn76477.h"
 
 class n8080_state : public driver_device
 {
@@ -8,7 +10,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_dac(*this, "dac"),
+		m_sn(*this, "snsnd") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -43,7 +47,9 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<dac_device> m_dac;
+	optional_device<sn76477_device> m_sn;
 	DECLARE_WRITE8_MEMBER(n8080_shift_bits_w);
 	DECLARE_WRITE8_MEMBER(n8080_shift_data_w);
 	DECLARE_READ8_MEMBER(n8080_shift_r);
@@ -90,6 +96,20 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(helifire_dac_volume_timer);
 	void spacefev_start_red_cannon(  );
 	void helifire_next_line(  );
+	void spacefev_update_SN76477_status();
+	void sheriff_update_SN76477_status();
+	void update_SN76477_status();
+	void start_mono_flop( int n, attotime expire );
+	void stop_mono_flop( int n );
+	TIMER_CALLBACK_MEMBER( stop_mono_flop_callback );
+	void spacefev_sound_pins_changed();
+	void sheriff_sound_pins_changed();
+	void helifire_sound_pins_changed();
+	void sound_pins_changed();
+	void delayed_sound_1( int data );
+	TIMER_CALLBACK_MEMBER( delayed_sound_1_callback );
+	void delayed_sound_2( int data );
+	TIMER_CALLBACK_MEMBER( delayed_sound_2_callback );
 };
 
 /*----------- defined in audio/n8080.c -----------*/

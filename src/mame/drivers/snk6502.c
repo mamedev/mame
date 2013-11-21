@@ -281,7 +281,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
-#include "sound/sn76477.h"
 #include "sound/samples.h"
 #include "includes/snk6502.h"
 

@@ -94,10 +94,6 @@ void mw8080bw_state::mw8080bw_start_interrupt_timer(  )
 MACHINE_START_MEMBER(mw8080bw_state,mw8080bw)
 {
 	mw8080bw_create_interrupt_timer();
-
-	m_sn = machine().device("snsnd");
-	m_sn1 = machine().device("sn1");
-	m_sn2 = machine().device("sn2");
 }
 
 

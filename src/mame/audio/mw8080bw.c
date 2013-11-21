@@ -5,9 +5,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/samples.h"
-#include "sound/sn76477.h"
-#include "sound/discrete.h"
 #include "includes/mw8080bw.h"
 
 
@@ -3283,7 +3280,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_3_w)
 
 	discrete_sound_w(m_discrete, space, SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
 
-	sn76477_enable_w(m_sn, (data >> 5) & 0x01); /* saucer sound */
+	m_sn->enable_w((data >> 5) & 0x01); /* saucer sound */
 
 	/* D6 and D7 are not connected */
 }
@@ -4174,7 +4171,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::invaders_audio_1_w)
 {
-	sn76477_enable_w(m_sn, (~data >> 0) & 0x01);    /* saucer sound */
+	m_sn->enable_w((~data >> 0) & 0x01);    /* saucer sound */
 
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
@@ -4803,7 +4800,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_1_w)
 {
-	sn76477_enable_w(m_sn1, (~data >> 0) & 0x01);   /* saucer sound */
+	m_sn1->enable_w((~data >> 0) & 0x01);   /* saucer sound */
 
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
@@ -4827,7 +4824,7 @@ WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_2_w)
 
 WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_3_w)
 {
-	sn76477_enable_w(m_sn2, (~data >> 0) & 0x01);   /* saucer sound */
+	m_sn2->enable_w((~data >> 0) & 0x01);   /* saucer sound */
 
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);

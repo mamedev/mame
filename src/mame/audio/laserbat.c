@@ -1,5 +1,4 @@
 #include "emu.h"
-#include "sound/sn76477.h"
 #include "sound/tms3615.h"
 #include "includes/laserbat.h"
 
@@ -52,11 +51,11 @@ WRITE8_MEMBER(laserbat_state::laserbat_csound2_w)
 			break;
 		}
 
-		sn76477_noise_filter_res_w(m_sn, noise_filter_res);
-		sn76477_vco_res_w(m_sn, vco_res);
+		m_sn->noise_filter_res_w(noise_filter_res);
+		m_sn->vco_res_w(vco_res);
 
-		sn76477_enable_w(m_sn, (m_csound1 & 0x08) ? 1 : 0); // AB SOUND
-		sn76477_mixer_b_w(m_sn, (m_csound1 & 0x10) ? 1 : 0); // _VCO/NOISE
+		m_sn->enable_w((m_csound1 & 0x08) ? 1 : 0); // AB SOUND
+		m_sn->mixer_b_w((m_csound1 & 0x10) ? 1 : 0); // _VCO/NOISE
 
 		m_degr = (m_csound1 & 0x20) ? 1 : 0;
 		m_filt = (m_csound1 & 0x40) ? 1 : 0;
@@ -64,21 +63,21 @@ WRITE8_MEMBER(laserbat_state::laserbat_csound2_w)
 		m_us = 0; // sn76477 pin 12
 	}
 
-	sn76477_vco_w(m_sn, (data & 0x40) ? 0 : 1);
+	m_sn->vco_w((data & 0x40) ? 0 : 1);
 
 	switch((data & 0x1c) >> 2)
 	{
 	case 0x00:
-		sn76477_slf_res_w(m_sn, RES_K(27));
+		m_sn->slf_res_w(RES_K(27));
 		break;
 	case 0x01:
-		sn76477_slf_res_w(m_sn, RES_K(22));
+		m_sn->slf_res_w(RES_K(22));
 		break;
 	case 0x02:
-		sn76477_slf_res_w(m_sn, RES_K(22));
+		m_sn->slf_res_w(RES_K(22));
 		break;
 	case 0x03:
-		sn76477_slf_res_w(m_sn, RES_K(12));
+		m_sn->slf_res_w(RES_K(12));
 		break;
 	case 0x04: // not connected
 		break;

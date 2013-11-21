@@ -55,7 +55,6 @@
 #include "formats/hect_tap.h"
 #include "imagedev/printer.h"
 #include "sound/wave.h"      /* for K7 sound*/
-#include "sound/sn76477.h"   /* for sn sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "machine/upd765.h" /* for floppy disc controller */
 

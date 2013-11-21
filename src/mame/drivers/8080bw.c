@@ -2488,7 +2488,6 @@ MACHINE_START_MEMBER(_8080bw_state,darthvdr)
 {
 	/* do nothing for now - different interrupt system */
 	m_fleet_step = 3;
-	m_sn = machine().device("snsnd");
 }
 
 

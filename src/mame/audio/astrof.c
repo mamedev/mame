@@ -5,8 +5,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/samples.h"
-#include "sound/sn76477.h"
 #include "includes/astrof.h"
 
 
@@ -192,7 +190,7 @@ WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
 	/* D4 - UFO */
 
 	/* D5 - UFO under water */
-	sn76477_enable_w(m_sn, (~data >> 5) & 0x01);
+	m_sn->enable_w((~data >> 5) & 0x01);
 
 	/* D6 - explosion */
 

@@ -155,8 +155,6 @@ READ8_MEMBER(crbaloon_state::pc3259_r)
 
 WRITE8_MEMBER(crbaloon_state::port_sound_w)
 {
-	device_t *sn = machine().device("snsnd");
-
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
 	m_irq_mask = data & 0x01;
 	crbaloon_set_clear_collision_address((data & 0x01) ? TRUE : FALSE);
@@ -168,13 +166,13 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
 	crbaloon_audio_set_music_enable(space, 0, (data & 0x04) ? TRUE : FALSE);
 
 	/* D3 - EXPLOSION */
-	crbaloon_audio_set_explosion_enable(sn, (data & 0x08) ? TRUE : FALSE);
+	crbaloon_audio_set_explosion_enable((data & 0x08) ? TRUE : FALSE);
 
 	/* D4 - BREATH */
-	crbaloon_audio_set_breath_enable(sn, (data & 0x10) ? TRUE : FALSE);
+	crbaloon_audio_set_breath_enable((data & 0x10) ? TRUE : FALSE);
 
 	/* D5 - APPEAR */
-	crbaloon_audio_set_appear_enable(sn, (data & 0x20) ? TRUE : FALSE);
+	crbaloon_audio_set_appear_enable((data & 0x20) ? TRUE : FALSE);
 
 	/* D6 - unlabeled - laugh enable */
 	crbaloon_audio_set_laugh_enable(space, 0, (data & 0x40) ? TRUE : FALSE);

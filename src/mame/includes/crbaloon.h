@@ -5,6 +5,7 @@ Crazy Ballooon
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "sound/sn76477.h"
 
 #define CRBALOON_MASTER_XTAL    (XTAL_9_987MHz)
 
@@ -18,13 +19,16 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_pc3092_data(*this, "pc3092_data"),
-		m_discrete(*this, "discrete"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_sn(*this, "snsnd"),
+		m_discrete(*this, "discrete") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_pc3092_data;
+	required_device<cpu_device> m_maincpu;
+	required_device<sn76477_device> m_sn;
 	required_device<discrete_device> m_discrete;
 	UINT16 m_collision_address;
 	UINT8 m_collision_address_clear;
@@ -51,13 +55,12 @@ public:
 	void pc3092_reset(void);
 	void pc3092_update();
 	void pc3259_update(void);
-	required_device<cpu_device> m_maincpu;
+	void crbaloon_audio_set_explosion_enable(int enabled);
+	void crbaloon_audio_set_breath_enable(int enabled);
+	void crbaloon_audio_set_appear_enable(int enabled);
 };
 
 
 /*----------- defined in audio/crbaloon.c -----------*/
 
-void crbaloon_audio_set_explosion_enable(device_t *sn, int enabled);
-void crbaloon_audio_set_breath_enable(device_t *sn, int enabled);
-void crbaloon_audio_set_appear_enable(device_t *sn, int enabled);
 MACHINE_CONFIG_EXTERN( crbaloon_audio );

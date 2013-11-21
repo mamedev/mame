@@ -148,12 +148,12 @@ WRITE8_MEMBER( spectra_state::portb_w )
 	if (BIT(data, 1)) vco -= 0.625;
 	if (BIT(data, 2)) vco -= 1.25;
 	if (BIT(data, 3)) vco -= 2.5;
-	sn76477_vco_voltage_w(m_snsnd, 5.4 - vco);
-	sn76477_enable_w(m_snsnd, !BIT(data, 4)); // strobe: toggles enable
-	sn76477_envelope_1_w(m_snsnd, !BIT(data, 5)); //decay: toggles envelope
-	sn76477_vco_w(m_snsnd, BIT(data, 6)); // "phaser" sound: VCO toggled
-	sn76477_mixer_b_w(m_snsnd, BIT(data, 7)); // "pulse" sound: pins 25 & 27 changed
-	sn76477_mixer_c_w(m_snsnd, BIT(data, 7)); // "pulse" sound: pins 25 & 27 changed
+	m_snsnd->vco_voltage_w(5.4 - vco);
+	m_snsnd->enable_w(!BIT(data, 4)); // strobe: toggles enable
+	m_snsnd->envelope_1_w(!BIT(data, 5)); //decay: toggles envelope
+	m_snsnd->vco_w(BIT(data, 6)); // "phaser" sound: VCO toggled
+	m_snsnd->mixer_b_w(BIT(data, 7)); // "pulse" sound: pins 25 & 27 changed
+	m_snsnd->mixer_c_w(BIT(data, 7)); // "pulse" sound: pins 25 & 27 changed
 }
 
 

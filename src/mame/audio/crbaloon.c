@@ -8,8 +8,6 @@
 
 #include "emu.h"
 #include "includes/crbaloon.h"
-#include "sound/sn76477.h"
-#include "sound/discrete.h"
 
 
 /* timing sources */
@@ -42,25 +40,25 @@ WRITE8_MEMBER(crbaloon_state::crbaloon_audio_set_music_enable)
 }
 
 
-void crbaloon_audio_set_explosion_enable(device_t *sn, int enabled)
+void crbaloon_state::crbaloon_audio_set_explosion_enable(int enabled)
 {
-	sn76477_enable_w(sn, enabled);
+	m_sn->enable_w(enabled);
 }
 
 
-void crbaloon_audio_set_breath_enable(device_t *sn, int enabled)
+void crbaloon_state::crbaloon_audio_set_breath_enable(int enabled)
 {
 	/* changes slf_res to 10k (middle of two 10k resistors)
 	   it also puts a tantal capacitor against GND on the output,
 	   but this section of the schematics is not readable. */
-	sn76477_slf_res_w(sn, enabled ? RES_K(10) : RES_K(20) );
+	m_sn->slf_res_w(enabled ? RES_K(10) : RES_K(20) );
 }
 
 
-void crbaloon_audio_set_appear_enable(device_t *sn, int enabled)
+void crbaloon_state::crbaloon_audio_set_appear_enable(int enabled)
 {
 	/* APPEAR is connected to MIXER B */
-	sn76477_mixer_b_w(sn, enabled);
+	m_sn->mixer_b_w(enabled);
 }
 
 

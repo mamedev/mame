@@ -20,7 +20,6 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/6821pia.h"
-#include "sound/sn76477.h"
 #include "sound/tms3615.h"
 #include "includes/laserbat.h"
 
@@ -675,7 +674,6 @@ static const s2636_interface s2636_3_config =
 void laserbat_state::machine_start()
 {
 	m_pia = machine().device<pia6821_device>("pia");
-	m_sn = machine().device("snsnd");
 	m_tms1 = machine().device<tms3615_device>("tms1");
 	m_tms2 = machine().device<tms3615_device>("tms2");
 

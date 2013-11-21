@@ -7,6 +7,7 @@
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
 #include "machine/s2636.h"
+#include "sound/sn76477.h"
 
 class laserbat_state : public driver_device
 {
@@ -20,7 +21,8 @@ public:
 		m_ay2(*this, "ay2"),
 		m_s2636_1(*this, "s2636_1"),
 		m_s2636_2(*this, "s2636_2"),
-		m_s2636_3(*this, "s2636_3")
+		m_s2636_3(*this, "s2636_3"),
+		m_sn(*this, "snsnd")
 	{
 	}
 
@@ -32,6 +34,7 @@ public:
 	required_device<s2636_device> m_s2636_1;
 	required_device<s2636_device> m_s2636_2;
 	required_device<s2636_device> m_s2636_3;
+	optional_device<sn76477_device> m_sn;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -64,7 +67,6 @@ public:
 
 	/* device */
 	pia6821_device *m_pia;
-	device_t *m_sn;
 	tms3615_device *m_tms1;
 	tms3615_device *m_tms2;
 

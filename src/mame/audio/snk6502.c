@@ -11,7 +11,6 @@
 
 
 #include "emu.h"
-#include "sound/sn76477.h"
 #include "sound/samples.h"
 #include "includes/snk6502.h"
 #include "sound/discrete.h"
@@ -771,7 +770,7 @@ WRITE8_MEMBER( snk6502_sound_device::vanguard_sound_w )
 		}
 
 		/* SHOT B */
-		sn76477_enable_w(space.machine().device("sn76477.2"), (data & 0x40) ? 0 : 1);
+		machine().device<sn76477_device>("sn76477.2")->enable_w((data & 0x40) ? 0 : 1);
 
 		m_LastPort1 = data;
 		break;

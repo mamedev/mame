@@ -32,7 +32,6 @@
 */
 
 #include "emu.h"
-#include "sound/sn76477.h"   // for sn sound
 
 #include "includes/hec2hrp.h"
 

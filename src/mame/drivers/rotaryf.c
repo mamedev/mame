@@ -111,7 +111,7 @@ WRITE8_MEMBER( rotaryf_state::port28_w )
 	if (BIT(rising_bits, 6)) m_samples->start (2, 2);   /* Hit */
 	if (BIT(rising_bits, 7)) m_samples->start (0, 0);   /* Shoot */
 
-	sn76477_enable_w(m_sn, (data & 3) ? 1 : 0);     /* Saucer Sound */
+	m_sn->enable_w((data & 3) ? 1 : 0);     /* Saucer Sound */
 
 	if (BIT(rising_bits, 4))
 	{

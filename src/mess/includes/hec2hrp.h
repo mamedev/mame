@@ -41,6 +41,7 @@
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
+#include "sound/sn76477.h"   /* for sn sound*/
 
 /* Enum status for high memory bank (c000 - ffff)*/
 enum
@@ -77,7 +78,8 @@ public:
 		m_hector_videoram(*this,"hector_videoram") ,
 		m_maincpu(*this, "maincpu"),
 		m_disc2cpu(*this, "disc2cpu"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_sn(*this, "sn76477") { }
 
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_hector_videoram;
@@ -148,6 +150,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_disc2cpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<sn76477_device> m_sn;
 	int isHectorWithDisc2();
 	int isHectorWithMiniDisc();
 	int isHectorHR();

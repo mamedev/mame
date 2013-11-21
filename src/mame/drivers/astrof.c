@@ -510,8 +510,6 @@ MACHINE_START_MEMBER(astrof_state,tomahawk)
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(0xff);
 
-	m_sn = machine().device("snsnd");
-
 	/* register for state saving */
 	save_item(NAME(m_red_on));
 	save_item(NAME(m_flipscreen));
