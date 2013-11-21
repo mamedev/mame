@@ -832,6 +832,13 @@ ROM_START( gl8008cx )
 	ROM_LOAD( "27-6296-0-0.u3", 0x000, 0x800, NO_DUMP )
 ROM_END
 
+ROM_START( itunlim )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "27-06124-002.u3", 0x000000, 0x200000, CRC(0c0753ce) SHA1(d22504d583ca8d6a9d2f56fbaa3e1d52c442a1e9) )
+
+	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME        PARENT          COMPAT MACHINE   INPUT        INIT                COMPANY             FULLNAME                  FLAGS */
@@ -839,3 +846,4 @@ COMP( 1997, iq128,      0,              0,    iq128,     geniusiq_de, driver_dev
 COMP( 1997, iq128_fr,   iq128,          0,    iq128,     geniusiq,    driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1998, iqtv512,    0,              0,    iqtv512,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ TV 512 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1999, gl8008cx,   0,              0,    gl8008cx,  gl8008cx,    driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", GAME_IS_SKELETON)
+COMP( 1998, itunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IT Unlimited (UK)", GAME_NO_SOUND)
