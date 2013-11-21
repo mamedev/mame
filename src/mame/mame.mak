@@ -2424,6 +2424,8 @@ $(DRIVERS)/goldnpkr.o:  $(LAYOUT)/goldnpkr.lh \
 			$(LAYOUT)/pmpoker.lh \
 			$(LAYOUT)/upndown.lh
 
+$(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh
+
 $(DRIVERS)/goldstar.o:  $(LAYOUT)/lucky8.lh \
 			$(LAYOUT)/bingowng.lh
 

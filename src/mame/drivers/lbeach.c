@@ -28,6 +28,8 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "machine/nvram.h"
 
+#include "lbeach.lh"
+
 
 class lbeach_state : public driver_device
 {
@@ -370,4 +372,4 @@ ROM_START( lbeach )
 ROM_END
 
 
-GAME( 1979, lbeach, 0, lbeach, lbeach, driver_device, 0, ROT0, "Olympia / Seletron", "Long Beach", GAME_WRONG_COLORS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL(1979, lbeach, 0, lbeach, lbeach, driver_device, 0, ROT0, "Olympia / Seletron", "Long Beach", GAME_WRONG_COLORS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_lbeach )
