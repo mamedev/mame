@@ -72,13 +72,14 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 
 	size_t viewDataOffset = 0;
 	const debug_view_xy& visibleCharDims = m_view->visible_size();
+	const debug_view_char* viewdata = m_view->viewdata();
 	for (int y = 0; y < visibleCharDims.y; y++)
 	{
 		for (int x = 0; x < visibleCharDims.x; x++)
 		{
-			const unsigned char textAttr = m_view->viewdata()[viewDataOffset].attrib;
+			const unsigned char textAttr = viewdata[viewDataOffset].attrib;
 
-			if (x == 0 || textAttr != m_view->viewdata()[viewDataOffset-1].attrib)
+			if (x == 0 || textAttr != viewdata[viewDataOffset-1].attrib)
 			{
 				// Text color handling
 				QColor fgColor(0,0,0);
@@ -125,17 +126,21 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 
 				bgBrush.setColor(bgColor);
 				painter.setBackground(bgBrush);
+				// Scan for the width of identical attributes
+				int width;
+				for (width = 0; x + width < visibleCharDims.x; width++)
+					if (textAttr != viewdata[viewDataOffset + width].attrib)
+						break;
+				// Fill the of width times fontWidth x fontHeight.
+				painter.fillRect(x*fontWidth, y*fontHeight, width*fontWidth, fontHeight, bgBrush);
 				painter.setPen(QPen(fgColor));
 			}
-
-			// Your character is not guaranteed to take up the entire fontWidth x fontHeight, so fill before.
-			painter.fillRect(x*fontWidth, y*fontHeight, fontWidth, fontHeight, bgBrush);
 
 			// There is a touchy interplay between font height, drawing difference, visible position, etc
 			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
 			painter.drawText(x*fontWidth,
 								(y*fontHeight + (fontHeight*0.80)),
-								QString(QChar(m_view->viewdata()[viewDataOffset].uchar)));
+								QString(QChar(viewdata[viewDataOffset].uchar)));
 			viewDataOffset++;
 		}
 	}
@@ -251,7 +256,11 @@ void DebuggerView::debuggerViewUpdate(debug_view& debugView, void* osdPrivate)
 {
 	// Get a handle to the DebuggerView being updated & redraw
 	DebuggerView* dView = (DebuggerView*)osdPrivate;
-	dView->verticalScrollBar()->setValue(dView->view()->visible_position().y);
+	int y = dView->view()->visible_position().y;
+	// Make the DVT_LOG view track the last visible line on updates
+	if (dView->view()->type() == DVT_LOG)
+		y += dView->view()->visible_size().y;
+	dView->verticalScrollBar()->setValue(y);
 	dView->viewport()->update();
 	dView->update();
 }
