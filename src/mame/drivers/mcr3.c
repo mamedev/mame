@@ -576,7 +576,7 @@ static ADDRESS_MAP_START( spyhuntpr_map, AS_PROGRAM, 8, mcr3_state )
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM //AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_RAM AM_WRITE(spyhuntpr_paletteram_w) AM_SHARE("paletteram")
 	
@@ -601,7 +601,7 @@ static ADDRESS_MAP_START( spyhuntpr_portmap, AS_IO, 8, mcr3_state )
 	AM_RANGE(0x04, 0x04) AM_WRITE(spyhuntpr_port04_w)
 	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
+//	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
@@ -1038,7 +1038,7 @@ static INPUT_PORTS_START( spyhuntpr )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "reset" )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
@@ -1061,7 +1061,7 @@ static INPUT_PORTS_START( spyhuntpr )
 	PORT_DIPNAME( 0x0001, 0x0001, "2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "start" ) // start
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
@@ -1070,13 +1070,13 @@ static INPUT_PORTS_START( spyhuntpr )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "handbrake?" )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "pedal inverse" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
@@ -1102,10 +1102,10 @@ static INPUT_PORTS_START( spyhuntpr )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "coin" ) // coin?
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "machineguns" ) // machine guns
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1413,15 +1413,18 @@ static ADDRESS_MAP_START( spyhuntpr_sound_portmap, AS_IO, 8, mcr3_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x12, 0x13) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x14, 0x15) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x18, 0x19) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
+	AM_RANGE(0x12, 0x13) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
+	AM_RANGE(0x14, 0x15) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
+	AM_RANGE(0x18, 0x19) AM_DEVWRITE("ay3", ay8912_device, address_data_w)
 
 ADDRESS_MAP_END
 
 
 
 static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
+
+// note: no ctc, no nvram
+// 2*z80, 3*ay8912
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1435,7 +1438,8 @@ static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
 	MCFG_WATCHDOG_VBLANK_INIT(16)
 	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+
+//	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	
 	/* video hardware */
@@ -1463,11 +1467,11 @@ static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 3000000/2)
+	MCFG_SOUND_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8910, 3000000/2)
+	MCFG_SOUND_ADD("ay2", AY8912, 3000000/2) // "
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay3", AY8910, 3000000/2)
+	MCFG_SOUND_ADD("ay3", AY8912, 3000000/2) // "
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
