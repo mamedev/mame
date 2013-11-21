@@ -166,7 +166,7 @@ WRITE8_MEMBER(mcr3_state::spyhuntpr_paletteram_w)
 	int g = (data & 0x38) >> 3;
 	int b = (data & 0xc0) >> 6;
 
-	palette_set_color(machine(), offset, MAKE_RGB(r<<5,g<<5,b<<6));
+	palette_set_color(machine(), offset^0xf, MAKE_RGB(r<<5,g<<5,b<<6));
 }
 
 

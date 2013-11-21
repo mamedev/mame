@@ -542,7 +542,7 @@ static ADDRESS_MAP_START( spyhuntpr_map, AS_PROGRAM, 8, mcr3_state )
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfb80, 0xfbff) AM_RAM AM_WRITE(spyhuntpr_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_RAM AM_WRITE(spyhuntpr_paletteram_w) AM_SHARE("paletteram")
 	
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("IN0")
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("IN1")
@@ -1206,13 +1206,12 @@ static const gfx_layout spyhuntpr_alphalayout =
 };
 
 
-// not quite right
 const gfx_layout spyhuntpr_sprite_layout =
 {
 	32,16,
 	RGN_FRAC(1,4),
 	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
 	{ 6,7,  4,5,  2,3,  0,1,  14,15,  12,13,  10,11,  8,9,    22,23, 20,21,  18,19,  16,17,  30,31,  28,29,  26,27,  24,25 },
 	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32   },
 
@@ -1715,7 +1714,7 @@ ROM_START( spyhuntpr )
 	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(33fe2829) SHA1(e6950dbf681242bf23542ca6604e62eacb431101) )
 
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "6.bin",   0x0000, 0x200, CRC(6b76f46a) SHA1(4b398084c42a60fcfa4a9bf14f844e36a3f42723) )
 	ROM_CONTINUE(0x0001, 0x200)
 	ROM_CONTINUE(0x0800, 0x200)
@@ -1783,9 +1782,9 @@ ROM_START( spyhuntpr )
 
 	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "10.bin",   0x00000, 0x4000, CRC(6f9fd416) SHA1(a51c86e5b22c91fc44673f53400b58af40b18065) )
-	ROM_LOAD( "11.bin",   0x0c000, 0x4000, CRC(75526ffe) SHA1(ff1adf6f9b6595114d0bd06b72d9eb7bbf70144d) )
+	ROM_LOAD( "11.bin",   0x04000, 0x4000, CRC(75526ffe) SHA1(ff1adf6f9b6595114d0bd06b72d9eb7bbf70144d) )
 	ROM_LOAD( "12.bin",   0x08000, 0x4000, CRC(82ee7a4d) SHA1(184720de76680275bf7c4a171f03a0ce771d91fc) )
-	ROM_LOAD( "13.bin",   0x04000, 0x4000, CRC(0cc592a3) SHA1(b3563bde83432cdbaedb88d4d222da30bf679b08) )
+	ROM_LOAD( "13.bin",   0x0c000, 0x4000, CRC(0cc592a3) SHA1(b3563bde83432cdbaedb88d4d222da30bf679b08) )
 
 
 	ROM_REGION( 0x01000, "gfx3", 0 )
