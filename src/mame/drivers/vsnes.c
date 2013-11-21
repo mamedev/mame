@@ -1923,8 +1923,8 @@ MACHINE_CONFIG_END
 
 /* Notes for Super Mario:
 
-mds-sm4-4 e.1c or 6c CRC32 0x5E3FB550 verified on 3 PCBs / dumped sets
-mds-sm4-4.1c or 6c   CRC32 0x0011FC5A differs by 2 bytes: 0x1634 = 0x0D (vs 0x11) & 0x163B = 0x11 (vs 0x14)
+mds-sm4-4__1cor6c_e.1c or 6c CRC32 0x5E3FB550 verified on 3 PCBs / dumped sets
+(__suprmrioa).1c or 6c       CRC32 0x0011FC5A differs by 2 bytes: 0x1634 = 0x0D (vs 0x11) & 0x163B = 0x11 (vs 0x14)
                      Each change is part of a LDA #$ statement IE: A9 0D  LDA #$0D (vs A9 11  LDA #$11)
                      It's unknown if it's an official alt version or hack.
 
@@ -2130,10 +2130,10 @@ ROM_END
 
 ROM_START( vsgradus )
 	ROM_REGION( 0x20000,"maincpu", 0  ) /* 6502 memory */
-	ROM_LOAD( "prg.u7",  0x10000, 0x10000, CRC(d99a2087) SHA1(b26efe78798453a903921723f3c9ac69f579b7d2) )
+	ROM_LOAD( "mds-gr__prg_e.u7",  0x10000, 0x10000, CRC(d99a2087) SHA1(b26efe78798453a903921723f3c9ac69f579b7d2) )
 
 	ROM_REGION( 0x10000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "chr.u4",  0x0000, 0x10000, CRC(23cf2fc3) SHA1(0a3f48aec529b92abc261952e632af7ff766b1ef) )
+	ROM_LOAD( "mds-gr__chr_e.u4",  0x0000, 0x10000, CRC(23cf2fc3) SHA1(0a3f48aec529b92abc261952e632af7ff766b1ef) )
 
 	PALETTE_2C04_0001
 ROM_END
@@ -2425,7 +2425,7 @@ ROM_END
 
 ROM_START( topgun )
 	ROM_REGION( 0x30000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "rc-003",  0x10000, 0x20000, CRC(8c0c2df5) SHA1(d9b1b87204e025a637821a0168475e1209ce0c8a) )
+	ROM_LOAD( "rc-003.u7",  0x10000, 0x20000, CRC(8c0c2df5) SHA1(d9b1b87204e025a637821a0168475e1209ce0c8a) )
 
 	/* No cart gfx - uses vram */
 
@@ -2801,12 +2801,12 @@ GAME( 1984, smgolfb,  smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, 
 GAME( 1984, smgolfj,  smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
 GAME( 1984, ladygolfe,smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)", 0 )
 GAME( 1984, ladygolf, smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)", 0 )
-GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Pinball (USA, set PN4 E-1)", 0 )
+GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)", 0 )
 GAME( 1984, vspinbalj,vspinbal, vsnes,   vspinblj, vsnes_state, vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)", 0 )
 GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnes_state, vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom", GAME_IMPERFECT_GRAPHICS )
 GAME( 1985, vssoccer, 0,        vsnes,   vssoccer, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
 GAME( 1985, vssoccera,vssoccer, vsnes,   vssoccer, vsnes_state, bnglngby, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)", 0 )
-GAME( 1986, vsgradus, 0,        vsnes,   vsgradus, vsnes_state, vskonami, ROT0, "Konami",                 "Vs. Gradius", 0 )
+GAME( 1986, vsgradus, 0,        vsnes,   vsgradus, vsnes_state, vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)", 0 )
 GAME( 1987, platoon,  0,        vsnes,   platoon, vsnes_state,  platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
 GAME( 1987, vstetris, 0,        vsnes,   vstetris, vsnes_state, vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" , 0 )
 GAME( 1986, mightybj, 0,        mightybj,mightybj, vsnes_state, vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
