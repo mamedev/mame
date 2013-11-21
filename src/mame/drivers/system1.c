@@ -4740,12 +4740,6 @@ DRIVER_INIT_MEMBER(system1_state,dakkochn)
 	m_videomode_custom = &system1_state::dakkochn_custom_w;
 
 	mc8123_decrypt_rom(machine(), "maincpu", "key", "bank1", 4);
-
-//  m_maincpu->space(AS_IO).install_legacy_read_handler(0x00, 0x00, FUNC(dakkochn_port_00_r));
-//  m_maincpu->space(AS_IO).install_legacy_read_handler(0x03, 0x03, FUNC(dakkochn_port_03_r));
-//  m_maincpu->space(AS_IO).install_legacy_read_handler(0x04, 0x04, FUNC(dakkochn_port_04_r));
-
-//  m_maincpu->space(AS_IO).install_legacy_write_handler(0x15, 0x15, FUNC(dakkochn_port_15_w));
 }
 
 

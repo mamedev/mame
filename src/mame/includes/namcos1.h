@@ -77,6 +77,9 @@ public:
 	DECLARE_WRITE8_MEMBER(namcos1_subcpu_bank_w);
 	DECLARE_WRITE8_MEMBER(namcos1_mcu_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(namcos1_mcu_patch_w);
+	DECLARE_READ8_MEMBER(quester_paddle_r);
+	DECLARE_READ8_MEMBER(berabohm_buttons_r);
+	DECLARE_READ8_MEMBER(faceoff_inputs_r);
 	DECLARE_DRIVER_INIT(pacmania);
 	DECLARE_DRIVER_INIT(ws);
 	DECLARE_DRIVER_INIT(wldcourt);
@@ -110,6 +113,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_namcos1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_namcos1(screen_device &screen, bool state);
+	
 
 private:
 	inline void bg_get_info(tile_data &tileinfo,int tile_index,UINT8 *info_vram);

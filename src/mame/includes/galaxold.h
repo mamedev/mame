@@ -101,14 +101,9 @@ public:
 	DECLARE_WRITE8_MEMBER(galaxold_coin_counter_1_w);
 	DECLARE_WRITE8_MEMBER(galaxold_coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(galaxold_leds_w);
-	DECLARE_WRITE8_MEMBER(zigzag_sillyprotection_w);
 	DECLARE_READ8_MEMBER(scramblb_protection_1_r);
 	DECLARE_READ8_MEMBER(scramblb_protection_2_r);
 	DECLARE_WRITE8_MEMBER(_4in1_bank_w);
-	DECLARE_READ8_MEMBER(checkmaj_protection_r);
-	DECLARE_READ8_MEMBER(dingo_3000_r);
-	DECLARE_READ8_MEMBER(dingo_3035_r);
-	DECLARE_READ8_MEMBER(dingoe_3001_r);
 	DECLARE_WRITE8_MEMBER(racknrol_tiles_bank_w);
 	DECLARE_WRITE8_MEMBER(galaxold_videoram_w);
 	DECLARE_READ8_MEMBER(galaxold_videoram_r);
@@ -244,7 +239,6 @@ public:
 	void bagmanmc_modify_charcode(UINT16 *code, UINT8 x);
 	void bagmanmc_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void machine_reset_common(int line);
-	UINT8 decode_mooncrst(UINT8 data,offs_t addr);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 };

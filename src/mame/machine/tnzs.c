@@ -536,7 +536,7 @@ DRIVER_INIT_MEMBER(tnzs_state,tnzs)
 {
 	m_mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0xef10, 0xef10, write8_delegate(FUNC(tnzs_state::tnzs_sync_kludge_w), this));
 }
 
 DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
@@ -544,7 +544,7 @@ DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
 	m_mcu_type = MCU_NONE_TNZSB;
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0xef10, 0xef10, write8_delegate(FUNC(tnzs_state::tnzs_sync_kludge_w), this));
 }
 
 DRIVER_INIT_MEMBER(tnzs_state,kabukiz)

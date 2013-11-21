@@ -491,7 +491,7 @@ DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
 
 #if ENABLE_ALL_JDREDD_LEVELS
 	/* how about the final levels? */
-	jdredd_hack = m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0xFFBA7FF0, 0xFFBA7FFf, FUNC(jdredd_hack_r));
+	jdredd_hack = m_maincpu->space(AS_PROGRAM).install_read_handler(0xFFBA7FF0, 0xFFBA7FFf, read16_delegate(FUNC(midtunit_state::jdredd_hack_r), this));
 #endif
 }
 

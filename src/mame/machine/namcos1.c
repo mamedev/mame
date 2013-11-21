@@ -82,9 +82,6 @@ static WRITE8_HANDLER( namcos1_3dcs_w )
 }
 
 
-// used by faceoff and tankforce 4 player (input multiplex)
-static DECLARE_READ8_HANDLER( faceoff_inputs_r );
-
 static READ8_HANDLER( no_key_r )
 {
 	popmessage("CPU %s PC %08x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
@@ -1217,7 +1214,7 @@ DRIVER_INIT_MEMBER(namcos1_state,tankfrc4)
 	};
 	namcos1_driver_init(machine(), &tankfrce_specific);
 
-	m_mcu->space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::faceoff_inputs_r), this));
 }
 
 /*******************************************************************************
@@ -1273,7 +1270,7 @@ DRIVER_INIT_MEMBER(namcos1_state,soukobdx)
 /*******************************************************************************
 *   Quester specific                                                           *
 *******************************************************************************/
-static READ8_HANDLER( quester_paddle_r )
+READ8_MEMBER( namcos1_state::quester_paddle_r )
 {
 	static int qnum=0, qstrobe=0;
 
@@ -1282,9 +1279,9 @@ static READ8_HANDLER( quester_paddle_r )
 		int ret;
 
 		if (!qnum)
-			ret = (space.machine().root_device().ioport("CONTROL0")->read()&0x90) | qstrobe | (space.machine().root_device().ioport("PADDLE0")->read()&0x0f);
+			ret = (ioport("CONTROL0")->read()&0x90) | qstrobe | (ioport("PADDLE0")->read()&0x0f);
 		else
-			ret = (space.machine().root_device().ioport("CONTROL0")->read()&0x90) | qstrobe | (space.machine().root_device().ioport("PADDLE1")->read()&0x0f);
+			ret = (ioport("CONTROL0")->read()&0x90) | qstrobe | (ioport("PADDLE1")->read()&0x0f);
 
 		qstrobe ^= 0x40;
 
@@ -1295,9 +1292,9 @@ static READ8_HANDLER( quester_paddle_r )
 		int ret;
 
 		if (!qnum)
-			ret = (space.machine().root_device().ioport("CONTROL1")->read()&0x90) | qnum | (space.machine().root_device().ioport("PADDLE0")->read()>>4);
+			ret = (ioport("CONTROL1")->read()&0x90) | qnum | (ioport("PADDLE0")->read()>>4);
 		else
-			ret = (space.machine().root_device().ioport("CONTROL1")->read()&0x90) | qnum | (space.machine().root_device().ioport("PADDLE1")->read()>>4);
+			ret = (ioport("CONTROL1")->read()&0x90) | qnum | (ioport("PADDLE1")->read()>>4);
 
 		if (!qstrobe) qnum ^= 0x20;
 
@@ -1308,7 +1305,7 @@ static READ8_HANDLER( quester_paddle_r )
 DRIVER_INIT_MEMBER(namcos1_state,quester)
 {
 	namcos1_driver_init(machine(), NULL);
-	m_mcu->space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(quester_paddle_r));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::quester_paddle_r), this));
 }
 
 
@@ -1317,7 +1314,7 @@ DRIVER_INIT_MEMBER(namcos1_state,quester)
 *   Beraboh Man specific                                                       *
 *******************************************************************************/
 
-static READ8_HANDLER( berabohm_buttons_r )
+READ8_MEMBER( namcos1_state::berabohm_buttons_r )
 {
 	int res;
 	static int input_count, strobe, strobe_count;
@@ -1327,7 +1324,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 	{
 		int inp = input_count;
 
-		if (inp == 4) res = space.machine().root_device().ioport("CONTROL0")->read();
+		if (inp == 4) res = ioport("CONTROL0")->read();
 		else
 		{
 			char portname[40];
@@ -1336,7 +1333,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 			static int counter[4];
 
 			sprintf(portname,"IN%d",inp);   /* IN0-IN3 */
-			res = space.machine().root_device().ioport(portname)->read();
+			res = ioport(portname)->read();
 			if (res & 0x80)
 			{
 				if (counter[inp] >= 0)
@@ -1360,7 +1357,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 				counter[inp] = -1;
 #else
 			sprintf(portname,"IN%d",inp);   /* IN0-IN3 */
-			res = space.machine().root_device().ioport(portname)->read();
+			res = ioport(portname)->read();
 			if (res & 1) res = 0x7f;        /* weak */
 			else if (res & 2) res = 0x48;   /* medium */
 			else if (res & 4) res = 0x40;   /* strong */
@@ -1371,7 +1368,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 	}
 	else
 	{
-		res = space.machine().root_device().ioport("CONTROL1")->read() & 0x8f;
+		res = ioport("CONTROL1")->read() & 0x8f;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
 		   much time reading the inputs and won't have enough cycles to play two
@@ -1397,7 +1394,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 DRIVER_INIT_MEMBER(namcos1_state,berabohm)
 {
 	namcos1_driver_init(machine(), NULL);
-	m_mcu->space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(berabohm_buttons_r));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::berabohm_buttons_r), this));
 }
 
 
@@ -1406,20 +1403,22 @@ DRIVER_INIT_MEMBER(namcos1_state,berabohm)
 *   Face Off specific                                                          *
 *******************************************************************************/
 
-static READ8_HANDLER( faceoff_inputs_r )
+// used by faceoff and tankforce 4 player (input multiplex)
+
+READ8_MEMBER( namcos1_state::faceoff_inputs_r )
 {
 	int res;
 	static int input_count, strobe_count, stored_input[2];
 
 	if (offset == 0)
 	{
-		res = (space.machine().root_device().ioport("CONTROL0")->read() & 0x80) | stored_input[0];
+		res = (ioport("CONTROL0")->read() & 0x80) | stored_input[0];
 
 		return res;
 	}
 	else
 	{
-		res = space.machine().root_device().ioport("CONTROL1")->read() & 0x80;
+		res = ioport("CONTROL1")->read() & 0x80;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
 		   much time reading the inputs and won't have enough cycles to play two
@@ -1434,17 +1433,17 @@ static READ8_HANDLER( faceoff_inputs_r )
 			switch (input_count)
 			{
 				case 0:
-					stored_input[0] = space.machine().root_device().ioport("IN0")->read() & 0x1f;
-					stored_input[1] = (space.machine().root_device().ioport("IN3")->read() & 0x07) << 3;
+					stored_input[0] = ioport("IN0")->read() & 0x1f;
+					stored_input[1] = (ioport("IN3")->read() & 0x07) << 3;
 					break;
 
 				case 3:
-					stored_input[0] = space.machine().root_device().ioport("IN2")->read() & 0x1f;
+					stored_input[0] = ioport("IN2")->read() & 0x1f;
 					break;
 
 				case 4:
-					stored_input[0] = space.machine().root_device().ioport("IN1")->read() & 0x1f;
-					stored_input[1] = space.machine().root_device().ioport("IN3")->read() & 0x18;
+					stored_input[0] = ioport("IN1")->read() & 0x1f;
+					stored_input[1] = ioport("IN3")->read() & 0x18;
 					break;
 
 				default:
@@ -1467,5 +1466,5 @@ static READ8_HANDLER( faceoff_inputs_r )
 DRIVER_INIT_MEMBER(namcos1_state,faceoff)
 {
 	namcos1_driver_init(machine(), NULL);
-	m_mcu->space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
+	m_mcu->space(AS_PROGRAM).install_read_handler(0x1400, 0x1401, read8_delegate(FUNC(namcos1_state::faceoff_inputs_r), this));
 }
