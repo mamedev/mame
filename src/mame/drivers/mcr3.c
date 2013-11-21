@@ -534,10 +534,46 @@ static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8, mcr3_state )
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(mcr3_state::spyhuntpr_a800_w)
+{
+
+}
+
+WRITE8_MEMBER(mcr3_state::spyhuntpr_a801_w)
+{
+
+}
+
+WRITE8_MEMBER(mcr3_state::spyhuntpr_a802_w)
+{
+
+}
+
+WRITE8_MEMBER(mcr3_state::spyhuntpr_a803_w)
+{
+
+}
+
+WRITE8_MEMBER(mcr3_state::spyhuntpr_a900_w)
+{
+
+}
+
+WRITE8_MEMBER(mcr3_state::spyhuntpr_fd00_w)
+{
+
+}
 
 static ADDRESS_MAP_START( spyhuntpr_map, AS_PROGRAM, 8, mcr3_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
+
+	AM_RANGE(0xa800, 0xa800) AM_WRITE( spyhuntpr_a800_w )
+	AM_RANGE(0xa801, 0xa801) AM_WRITE( spyhuntpr_a801_w )
+	AM_RANGE(0xa802, 0xa802) AM_WRITE( spyhuntpr_a802_w )
+	AM_RANGE(0xa803, 0xa803) AM_WRITE( spyhuntpr_a803_w )
+	AM_RANGE(0xa900, 0xa900) AM_WRITE( spyhuntpr_a900_w )
+
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
@@ -548,18 +584,21 @@ static ADDRESS_MAP_START( spyhuntpr_map, AS_PROGRAM, 8, mcr3_state )
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("IN1")
 	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("IN2")
 	AM_RANGE(0xfc03, 0xfc03) AM_READ_PORT("IN3")
-//	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("IN3")
 	
-//	AM_RANGE(0xfa80, 0xfdff) AM_RAM
-
-
+	AM_RANGE(0xfd00, 0xfd00) AM_WRITE( spyhuntpr_fd00_w )
 
 	AM_RANGE(0xfe00, 0xffff) AM_RAM // a modified copy of spriteram for this hw??
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(mcr3_state::spyhuntpr_port04_w)
+{
+
+}
+
 static ADDRESS_MAP_START( spyhuntpr_portmap, AS_IO, 8, mcr3_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x04, 0x04) AM_WRITE(spyhuntpr_port04_w)
 	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
