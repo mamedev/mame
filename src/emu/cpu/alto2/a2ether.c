@@ -83,9 +83,6 @@ static const prom_load_t pl_enet_a42 =
 /**
  * @brief BPROM; P3601-1; 265x4 enet.a49 "AFIFO"
  *
- * Perhaps try with the contents of the display FIFO, as it is
- * the same type and the display FIFO has the same size.
- *
  * FIFO control
  *
  * a49: P3601-1; 256x4; "AFIFO"
@@ -104,8 +101,8 @@ static const prom_load_t pl_enet_a42 =
  * outputs active low
  * ----------------------------
  * D0 (12) BE'    (buffer empty)
- * D1 (11) BNE'   (buffer next empty ?)
- * D2 (10) BNNE'  (buffer next next empty ?)
+ * D1 (11) BNE'   (buffer nearly empty)
+ * D2 (10) BNNE'  (buffer next nearly empty)
  * D3  (9) BF'    (buffer full)
  */
 static const prom_load_t pl_enet_a49 =
@@ -161,17 +158,10 @@ static const prom_load_t pl_enet_a49 =
 #define	GET_ETH_IT(st)			X_BIT(st,16,15)				//!< hardware status: IT flip flop & ISRFULL'
 #define	PUT_ETH_IT(st,val)		X_WRBITS(st,16,15,15,val)
 
-//! PROM ether.u49; buffer empty (active low)
-#define	ETHER_A49_BE	(m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd] & (1 << 0))
-
-//! PROM ether.u49; buffer next(?) empty (active low)
-#define	ETHER_A49_BNE	(m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd] & (1 << 1))
-
-//! PROM ether.u49; buffer next next(?) empty (active low)
-#define	ETHER_A49_BNNE	(m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd] & (1 << 2))
-
-//! PROM ether.u49; buffer full (active low)
-#define	ETHER_A49_BF	(m_ether_a49[16 * m_eth.fifo_wr + m_eth.fifo_rd] & (1 << 3))
+#define	BE(a49)   ((a49 & ether_a49_BE) ? 1 : 0)		//! buffer empty
+#define	BNE(a49)  ((a49 & ether_a49_BNE) ? 1 : 0)		//! buffer next empty
+#define	BNNE(a49) ((a49 & ether_a49_BNNE) ? 1 : 0)		//! buffer next next empty
+#define	BF(a49)   ((a49 & ether_a49_BF) ? 1 : 0)		//! buffer full
 
 #define	BREATHLEN	ALTO2_ETHER_PACKET_SIZE	//!< ethernet packet length
 #define	BREATHADDR	0177400					//!< destination and source
@@ -258,10 +248,9 @@ size_t dump_packet(const UINT16 *src, size_t addr, size_t size)
  */
 void alto2_cpu_device::eth_wakeup()
 {
-	register int etac = m_task == task_ether;
-
-	LOG((LOG_ETH,0,"eth_wakeup: ibusy=%d obusy=%d ", GET_ETH_IBUSY(m_eth.status), GET_ETH_OBUSY(m_eth.status)));
-	register int busy = GET_ETH_IBUSY(m_eth.status) | GET_ETH_OBUSY(m_eth.status);
+	register int st = m_eth.status;
+	LOG((LOG_ETH,0,"IBUSY=%d OBUSY=%d ", GET_ETH_IBUSY(st), GET_ETH_OBUSY(st)));
+	UINT8 busy = GET_ETH_IBUSY(st) | GET_ETH_OBUSY(st);
 	if (0 == busy) {
 		// if not busy, reset the FIFO read and write counters
 		m_eth.fifo_rd = 0;
@@ -276,28 +265,28 @@ void alto2_cpu_device::eth_wakeup()
 	 *	output gone
 	 *	input gone
 	 */
-	if (GET_ETH_IDL(m_eth.status)) {
-		LOG((LOG_ETH,0,"post (input data late)\n"));
+	if (GET_ETH_IDL(st)) {
+		LOG((LOG_ETH,0,"POST (input data late)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
-	if (GET_ETH_OCMD(m_eth.status)) {
-		LOG((LOG_ETH,0,"post (output command)\n"));
+	if (GET_ETH_OCMD(st)) {
+		LOG((LOG_ETH,0,"POST (output command)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
-	if (GET_ETH_ICMD(m_eth.status)) {
-		LOG((LOG_ETH,0,"post (input command)\n"));
+	if (GET_ETH_ICMD(st)) {
+		LOG((LOG_ETH,0,"POST (input command)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
-	if (GET_ETH_OGONE(m_eth.status)) {
-		LOG((LOG_ETH,0,"post (output gone)\n"));
+	if (GET_ETH_OGONE(st)) {
+		LOG((LOG_ETH,0,"POST (output gone)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
-	if (GET_ETH_IGONE(m_eth.status)) {
-		LOG((LOG_ETH,0,"post (input gone)\n"));
+	if (GET_ETH_IGONE(st)) {
+		LOG((LOG_ETH,0,"POST (input gone)\n"));
 		m_task_wakeup |= 1 << task_ether;
 		return;
 	}
@@ -305,13 +294,15 @@ void alto2_cpu_device::eth_wakeup()
 	/*
 	 * IDR (input data ready) conditions to wakeup the Ether task (AND):
 	 *	IBUSY   input busy
-	 *	BNNE    buffer next next empty
-	 *	BNE     buffer next empty
+	 *	BNNE    buffer next nearly empty
+	 *	BNE     buffer nearly empty
 	 *	ETAC    ether task active
 	 *
 	 * IDR' = (IBUSY & (BNNE & (BNE' & ETAC')')')'
 	 */
-	register int idr = GET_ETH_IBUSY(m_eth.status) && (ETHER_A49_BNNE || (ETHER_A49_BNE == 0 && etac));
+	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_rd + m_eth.fifo_wr];
+	UINT8 etac = m_task == task_ether ? 0 : 1;
+	UINT8 idr = GET_ETH_IBUSY(st) & ~(~BNNE(a49) & ~(BNE(a49) & etac));
 	if (idr) {
 		m_task_wakeup |= 1 << task_ether;
 		LOG((LOG_ETH,0,"input data ready\n"));
@@ -327,7 +318,7 @@ void alto2_cpu_device::eth_wakeup()
 	 *
 	 * ODR'	= (OBUSY & OEOT' & (BF' & WLF')')'
 	 */
-	register int odr = GET_ETH_OBUSY(m_eth.status) && (GET_ETH_OEOT(m_eth.status) || (GET_ETH_WLF(m_eth.status) && ETHER_A49_BF == 0));
+	UINT8 odr = GET_ETH_OBUSY(st) & ~(~GET_ETH_OEOT(st) & ~(BF(a49) & ~GET_ETH_WLF(st)));
 	if (odr) {
 		m_task_wakeup |= 1 << task_ether;
 		LOG((LOG_ETH,0,"output data ready\n"));
@@ -342,12 +333,12 @@ void alto2_cpu_device::eth_wakeup()
 	 */
 	if (m_ewfct) {
 		m_task_wakeup |= 1 << task_ether;
-		LOG((LOG_ETH,0,"ether wake function\n"));
+		LOG((LOG_ETH,0,"EWFCT (ether wake function)\n"));
 		return;
 	}
 
 	// otherwise no more wakeups for the ether task
-	LOG((LOG_ETH,0,"-/-\n"));
+	LOG((LOG_ETH,0,"stop wake\n"));
 	m_task_wakeup &= ~(1 << task_ether);
 }
 
@@ -449,13 +440,10 @@ void alto2_cpu_device::eth_wakeup()
  */
 UINT32 f9401_7(UINT32 crc, UINT32 data)
 {
-	int i;
-	for (i = 0; i < 16; i++) {
-		crc <<= 1;
-		if (data & (1 << 15))
-			crc ^= (1 << 10) | (1 << 3) | (1 << 0);
-		data <<= 1;
-	}
+	static const UINT32 XOR = (1 << 10) | (1 << 3) | (1 << 0);
+	crc ^= data;
+	for (int i = 0; i < 16; i++)
+		crc = (crc >> 1) ^ ((crc & 1) ? XOR : 0);
 	return crc & 0177777;
 }
 
@@ -470,42 +458,37 @@ void alto2_cpu_device::rx_duckbreath(void* ptr, INT32 arg)
 	UINT32 data;
 
 	if (arg == 0) {
-		// first word: set the IBUSY flip flop
+		// on the first word set the IBUSY flip flop
 		PUT_ETH_IBUSY(m_eth.status, 1);
 		m_eth.rx_count = 0;
 	}
 
-	data = duckbreath_data[arg++];
+	if (arg >= BREATHLEN) {
+		// CRC after the data
+		data = m_eth.rx_crc;
+		arg++;
+	} else {
+		// next data word
+		data = duckbreath_data[arg++];
+	}
 	m_eth.rx_crc = f9401_7(m_eth.rx_crc, data);
-
 	m_eth.fifo[m_eth.fifo_wr] = data;
 	m_eth.fifo_wr = (m_eth.fifo_wr + 1) % ALTO2_ETHER_FIFO_SIZE;
 
-	if (m_eth.rx_count < ALTO2_ETHER_PACKET_SIZE)
-		m_eth.rx_packet[m_eth.rx_count] = data;
-	m_eth.rx_count++;
+//	PUT_ETH_WLF(m_eth.status, 1);	// set WLF (write latch full)?
 
-	PUT_ETH_WLF(m_eth.status, 1);
-	if (ETHER_A49_BF == 0) {
-		/* fifo is overrun: set input data late flip flop */
-		PUT_ETH_IDL(m_eth.status, 1);
-	}
+	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_rd + m_eth.fifo_wr];
+	if (0 == BF(a49))
+		PUT_ETH_IDL(m_eth.status, 1);	// fifo is overrun: set input data late flip flop
 
-	if (arg == BREATHLEN) {
+	if (arg > BREATHLEN) {
 		/*
-		 * last word: reset the receiver CRC
-		 *
 		 * TODO: if data comes from some other source,
 		 * compare our CRC with the next word received
 		 * and set the CRC error flag if they differ.
 		 */
 		m_eth.rx_crc = 0;
-
-		// set the IGONE flip flop
-		PUT_ETH_IGONE(m_eth.status, 1);
-#if	DEBUG_PACKETS
-		dump_packet(m_eth.rx_packet, 0, m_eth.rx_count);
-#endif
+		PUT_ETH_IGONE(m_eth.status, 1);		// set the IGONE flip flop
 		m_eth.rx_timer->adjust(attotime::from_seconds(m_duckbreath_sec), 0);
 	} else {
 		// receive at a rate of 5.44us per word
@@ -517,7 +500,7 @@ void alto2_cpu_device::rx_duckbreath(void* ptr, INT32 arg)
 /**
  * @brief transmit data from the FIFO to <nirvana for now>
  *
- * @param id timer id
+ * @param ptr unused pointer
  * @param arg word count if >= 0, -1 if CRC is to be transmitted (last word)
  */
 void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
@@ -528,9 +511,6 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
 	if (-1 == arg) {
 		m_eth.tx_timer->reset();
 		LOG((LOG_ETH,0," CRC:%06o\n", m_eth.tx_crc));
-#if	DEBUG_PACKETS
-		dump_packet(m_eth.tx_packet, 0, m_eth.tx_count);
-#endif
 		// TODO: send the CRC as final word of the packet
 		m_eth.tx_crc = 0;
 		PUT_ETH_OGONE(m_eth.status, 1);		// set the OGONE flip flop
@@ -542,22 +522,16 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
 	m_eth.tx_crc = f9401_7(m_eth.tx_crc, data);
 	m_eth.fifo_rd = (m_eth.fifo_rd + 1) % ALTO2_ETHER_FIFO_SIZE;
 
-	if (m_eth.tx_count < ALTO2_ETHER_PACKET_SIZE)
-		m_eth.tx_packet[m_eth.tx_count] = data;
-	m_eth.tx_count++;
-
-	// is the FIFO empty now?
-	if (ETHER_A49_BE) {
-		/* clear the OBUSY and WLF flip flops */
+	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_rd + m_eth.fifo_wr];
+	if (0 == BE(a49)) {
+		// the FIFO is empty now: clear the OBUSY and WLF flip flops
 		PUT_ETH_OBUSY(m_eth.status, 0);
 		PUT_ETH_WLF(m_eth.status, 0);
 		m_eth.tx_timer->adjust(attotime::from_usec(5.44), -1);
-		eth_wakeup();
-		return;
+	} else {
+		// transmit teh next word after 5.44µs
+		m_eth.tx_timer->adjust(attotime::from_usec(5.44), arg + 1);
 	}
-
-	/* transmit teh next word after 5.44µs */
-	m_eth.tx_timer->adjust(attotime::from_usec(5.44), arg + 1);
 	eth_wakeup();
 }
 
@@ -568,8 +542,8 @@ void alto2_cpu_device::eth_startf()
 {
 	PUT_ETH_ICMD(m_eth.status, X_BIT(m_bus,16,14));
 	PUT_ETH_OCMD(m_eth.status, X_BIT(m_bus,16,15));
-	if (GET_ETH_ICMD(m_eth.status) || GET_ETH_OCMD(m_eth.status))
-		m_task_wakeup |= 1 << task_ether;
+	LOG((LOG_ETH,3, "	STARTF; ICMD=%u OCMD=%u\n", GET_ETH_ICMD(m_eth.status), GET_ETH_ICMD(m_eth.status)));
+	eth_wakeup();
 }
 
 /**
@@ -581,10 +555,19 @@ void alto2_cpu_device::eth_startf()
 void alto2_cpu_device::bs_early_eidfct()
 {
 	UINT16 r = m_eth.fifo[m_eth.fifo_rd];
-
 	LOG((LOG_ETH,3, "	←EIDFCT; pull %06o from FIFO[%02o]\n", r, m_eth.fifo_rd));
 	m_eth.fifo_rd = (m_eth.fifo_rd + 1) % ALTO2_ETHER_FIFO_SIZE;
 	m_bus &= r;
+
+#if	DEBUG_PACKETS
+	if (m_eth.rx_count < ALTO2_ETHER_PACKET_SIZE)
+		m_eth.rx_packet[m_eth.rx_count] = r;
+	m_eth.rx_count++;
+	if (ALTO2_ETHER_PACKET_SIZE == m_eth.rx_count) {
+		dump_packet(m_eth.rx_packet, 0, m_eth.rx_count);
+		m_eth.rx_count = 0;
+	}
+#endif
 	eth_wakeup();
 }
 
@@ -627,20 +610,19 @@ void alto2_cpu_device::f1_early_eilfct()
 void alto2_cpu_device::f1_early_epfct()
 {
 	UINT16 r = ~X_RDBITS(m_eth.status,16,10,15) & 0177777;
-
-	LOG((LOG_ETH,3, "	←EPFCT; BUS[8-15] = STATUS (%#o)\n", r));
-	LOG((LOG_ETH,5, "		IDL     : %u\n", GET_ETH_IDL(m_eth.status)));
-	LOG((LOG_ETH,5, "		COLL    : %u\n", GET_ETH_COLL(m_eth.status)));
-	LOG((LOG_ETH,5, "		CRC     : %u\n", GET_ETH_CRC(m_eth.status)));
-	LOG((LOG_ETH,5, "		ICMD    : %u\n", GET_ETH_ICMD(m_eth.status)));
-	LOG((LOG_ETH,5, "		OCMD    : %u\n", GET_ETH_OCMD(m_eth.status)));
-	LOG((LOG_ETH,5, "		IT      : %u\n", GET_ETH_IT(m_eth.status)));
-
-	m_bus &= r;
-
 	m_eth.status = 0;
 	m_eth.tx_count = 0;
 	eth_wakeup();
+
+	LOG((LOG_ETH,3, "	←EPFCT; BUS[8-15] = STATUS (%#o)\n", r));
+	LOG((LOG_ETH,5, "		IDL'    : %u\n", GET_ETH_IDL(r)));
+	LOG((LOG_ETH,5, "		COLL'   : %u\n", GET_ETH_COLL(r)));
+	LOG((LOG_ETH,5, "		CRC'    : %u\n", GET_ETH_CRC(r)));
+	LOG((LOG_ETH,5, "		ICMD'   : %u\n", GET_ETH_ICMD(r)));
+	LOG((LOG_ETH,5, "		OCMD'   : %u\n", GET_ETH_OCMD(r)));
+	LOG((LOG_ETH,5, "		IT'     : %u\n", GET_ETH_IT(r)));
+
+	m_bus &= r;
 }
 
 /**
@@ -665,20 +647,39 @@ void alto2_cpu_device::f1_late_ewfct()
  *
  * Loads the FIFO from BUS[0-15], then increments the write
  * pointer at the end of the cycle.
+ *
+ * Comment from the micro code:
+ *<PRE>
+ * Ether Output Data Function - EODFCT.  Copy the bus into the
+ * interface data buffer, increment the write pointer, clears wakeup
+ * request if the buffer is now nearly full (one slot available).
+ *</PRE>
  */
 void alto2_cpu_device::f2_late_eodfct()
 {
 	LOG((LOG_ETH,3, "	EODFCT←; push %06o into FIFO[%02o]\n", m_bus, m_eth.fifo_wr));
-
 	m_eth.fifo[m_eth.fifo_wr] = m_bus;
 	m_eth.fifo_wr = (m_eth.fifo_wr + 1) % ALTO2_ETHER_FIFO_SIZE;
 
-	PUT_ETH_WLF(m_eth.status, 1);
-	PUT_ETH_OBUSY(m_eth.status, 1);
-	// if the FIFO is full, kick off the timer
-	if (0 == ETHER_A49_BF)
-		m_eth.tx_timer->adjust(attotime::from_usec(5.44), 0);
+#if	DEBUG_PACKETS
+	if (m_eth.tx_count < ALTO2_ETHER_PACKET_SIZE)
+		m_eth.tx_packet[m_eth.tx_count] = m_bus;
+	m_eth.tx_count++;
+	if (ALTO2_ETHER_PACKET_SIZE == m_eth.tx_count) {
+		dump_packet(m_eth.tx_packet, 0, m_eth.tx_count);
+		m_eth.tx_count = 0;
+	}
+#endif
+
+	PUT_ETH_WLF(m_eth.status, 1);			// set WLF (write latch full)
+	PUT_ETH_OBUSY(m_eth.status, 1);			// set OBUSY (output busy)
 	eth_wakeup();
+	// if the FIFO is full, stop wakeup and kick off the timer
+	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_rd + m_eth.fifo_wr];
+	if (0 == BF(a49)) {
+		m_task_wakeup &= ~(1 << task_ether);
+		m_eth.tx_timer->adjust(attotime::from_usec(5.44), 0);
+	}
 }
 
 /**
@@ -692,8 +693,8 @@ void alto2_cpu_device::f2_late_eodfct()
 void alto2_cpu_device::f2_late_eosfct()
 {
 	LOG((LOG_ETH,3, "	EOSFCT\n"));
-	PUT_ETH_WLF(m_eth.status, 0);
-	PUT_ETH_OBUSY(m_eth.status, 0);
+	PUT_ETH_WLF(m_eth.status, 1);
+	PUT_ETH_OBUSY(m_eth.status, 1);
 	eth_wakeup();
 }
 
@@ -746,11 +747,12 @@ void alto2_cpu_device::f2_late_ebfct()
 {
 	UINT16 r = 0;
 	X_WRBITS(r,10,6,6, GET_ETH_COLL(m_eth.status));
-	X_WRBITS(r,10,7,7, GET_ETH_IDL(m_eth.status) |
-		GET_ETH_ICMD(m_eth.status) |
-		GET_ETH_OCMD(m_eth.status) |
-		GET_ETH_IGONE(m_eth.status) |
-		GET_ETH_OGONE(m_eth.status));
+	X_WRBITS(r,10,7,7,
+			 GET_ETH_IDL(m_eth.status) |
+			 GET_ETH_ICMD(m_eth.status) |
+			 GET_ETH_OCMD(m_eth.status) |
+			 GET_ETH_IGONE(m_eth.status) |
+			 GET_ETH_OGONE(m_eth.status));
 	LOG((LOG_ETH,3, "	EBFCT; NEXT ... (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 }
@@ -758,13 +760,14 @@ void alto2_cpu_device::f2_late_ebfct()
 /**
  * @brief f2_ecbfct late: ethernet countdown branch function
  *
+ * The BE' (buffer empty) signal is output D0 of PROM a49
  * ORs a one into NEXT[7] if the FIFO is not empty.
  */
 void alto2_cpu_device::f2_late_ecbfct()
 {
 	UINT16 r = 0;
-	/* TODO: the BE' (buffer empty) signal is output D0 of PROM a49 */
-	X_WRBITS(r,10,7,7,ETHER_A49_BE);
+	UINT8 a49 = m_ether_a49[16 * m_eth.fifo_rd + m_eth.fifo_wr];
+	X_WRBITS(r,10,7,7,~BE(a49));
 	LOG((LOG_ETH,3, "	ECBFCT; NEXT[7] = FIFO %sempty (%#o | %#o)\n", r ? "not " : "is ", m_next2, r));
 	m_next2 |= r;
 }
@@ -780,7 +783,7 @@ void alto2_cpu_device::f2_late_ecbfct()
 void alto2_cpu_device::f2_late_eisfct()
 {
 	LOG((LOG_ETH,3, "	EISFCT\n"));
-	PUT_ETH_IBUSY(m_eth.status, 0);
+	PUT_ETH_IBUSY(m_eth.status, 1);
 	eth_wakeup();
 }
 

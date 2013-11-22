@@ -42,6 +42,12 @@ enum {
 UINT8* m_ether_a41;								//!< BPROM; P3601-1; 256x4; enet.a41 "PE1"
 UINT8* m_ether_a42;								//!< BPROM; P3601-1; 256x4; enet.a42 "PE2"
 UINT8* m_ether_a49;								//!< BPROM; P3601-1; 265x4 enet.a49 "AFIFO"
+enum {
+	ether_a49_BE	= (1 << 0),					//!< buffer empty
+	ether_a49_BNE	= (1 << 1),					//!< buffer next empty
+	ether_a49_BNNE	= (1 << 2),					//!< buffer next next empty
+	ether_a49_BF	= (1 << 3)					//!< buffer full
+};
 
 static const int m_duckbreath_sec = 15;			//!< send duckbreath every 15 seconds
 
