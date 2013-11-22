@@ -107,6 +107,7 @@ public:
 	void stp_w(int state);
 	void dir_w(int state) { dir = state; }
 	void ss_w(int state) { ss = state; }
+	void inuse_w(int state) { }
 
 	void index_resync();
 	attotime time_next_index();
