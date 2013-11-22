@@ -201,6 +201,7 @@
 
 #include "cosmicm.lh"
 #include "galactic.lh"
+#include "gunchamp.lh"
 #include "shuttlei.lh"
 #include "spacecom.lh"
 
@@ -4681,7 +4682,7 @@ GAME( 1979, yosakdona,  yosakdon, yosakdon,  yosakdon,  driver_device, 0, ROT270
 GAMEL(1979, shuttlei,   0,        shuttlei,  shuttlei,  driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Shuttle Invader", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_shuttlei )
 GAMEL(1979, skylove,    0,        shuttlei,  skylove,   driver_device, 0, ROT270, "Omori Electric Co., Ltd.", "Sky Love", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_shuttlei )
 GAME (1978, claybust,   0,        claybust,  claybust,  driver_device, 0, ROT0,   "Model Racing", "Claybuster", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // no titlescreen, Claybuster according to flyers
-GAME (1980, gunchamp,   0,        claybust,  gunchamp,  driver_device, 0, ROT0,   "Model Racing", "Gun Champ", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // no titlescreen, Gun Champ according to original cab
+GAMEL(1980, gunchamp,   0,        claybust,  gunchamp,  driver_device, 0, ROT0,   "Model Racing", "Gun Champ", GAME_SUPPORTS_SAVE | GAME_NO_SOUND, gunchamp ) // no titlescreen, Gun Champ according to original cab
 GAME( 1980?,astropal,   0,        astropal,  astropal,  driver_device, 0, ROT0,   "Sidam?", "Astropal", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979?,attackfc,   0,        attackfc,  attackfc,  _8080bw_state, attackfc, ROT0, "Electronic Games Systems", "Attack Force", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 

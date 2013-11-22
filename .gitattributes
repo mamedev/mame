@@ -5450,6 +5450,7 @@ src/mame/layout/goldnpkr.lay svneol=native#text/plain
 src/mame/layout/gorf.lay svneol=native#text/plain
 src/mame/layout/grchamp.lay svneol=native#text/plain
 src/mame/layout/gridiron.lay svneol=native#text/plain
+src/mame/layout/gunchamp.lay svneol=native#text/plain
 src/mame/layout/gunfight.lay svneol=native#text/plain
 src/mame/layout/gypsyjug.lay svneol=native#text/plain
 src/mame/layout/icecold.lay svneol=native#text/plain

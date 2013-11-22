@@ -2267,6 +2267,7 @@ $(DRIVERS)/30test.o:    $(LAYOUT)/30test.lh
 
 $(DRIVERS)/8080bw.o:    $(LAYOUT)/cosmicm.lh \
 			$(LAYOUT)/galactic.lh \
+			$(LAYOUT)/gunchamp.lh \
 			$(LAYOUT)/shuttlei.lh \
 			$(LAYOUT)/spacecom.lh
 
@@ -2609,6 +2610,8 @@ $(DRIVERS)/speedbal.o:  $(LAYOUT)/speedbal.lh
 $(DRIVERS)/sspeedr.o:   $(LAYOUT)/sspeedr.lh
 
 $(DRIVERS)/stactics.o:  $(LAYOUT)/stactics.lh
+
+$(DRIVERS)/sshot.o:     $(LAYOUT)/gunchamp.lh
 
 $(DRIVERS)/sstrangr.o:  $(LAYOUT)/sstrangr.lh
 
