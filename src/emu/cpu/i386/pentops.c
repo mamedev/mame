@@ -1159,6 +1159,20 @@ static void PENTIUMOP(popcnt_r32_rm32)(i386_state *cpustate)    // Opcode f3 0f 
 	CYCLES(cpustate,1); // TODO: correct cycle count
 }
 
+static void PENTIUMOP(tzcnt_r16_rm16)(i386_state *cpustate)
+{
+	// for CPUs that don't support TZCNT, fall back to BSF
+	i386_bsf_r16_rm16(cpustate);
+	// TODO: actually implement TZCNT
+}
+
+static void PENTIUMOP(tzcnt_r32_rm32)(i386_state *cpustate)
+{
+	// for CPUs that don't support TZCNT, fall back to BSF
+	i386_bsf_r32_rm32(cpustate);
+	// TODO: actually implement TZCNT
+}
+
 INLINE INT8 SaturatedSignedWordToSignedByte(INT16 word)
 {
 	if (word > 127)

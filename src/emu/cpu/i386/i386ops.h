@@ -525,6 +525,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0x7E,     OP_3BYTEF3|OP_SSE,          SSEOP(movq_r128_r128m64),       SSEOP(movq_r128_r128m64),   },
 	{ 0x7F,     OP_3BYTEF3|OP_SSE,          SSEOP(movdqu_rm128_r128),       SSEOP(movdqu_rm128_r128),   },
 	{ 0xB8,     OP_3BYTEF3|OP_PENTIUM,      PENTIUMOP(popcnt_r16_rm16),     PENTIUMOP(popcnt_r32_rm32), },
+	{ 0xBC,     OP_3BYTEF3|OP_PENTIUM,      PENTIUMOP(tzcnt_r16_rm16),      PENTIUMOP(tzcnt_r32_rm32), },
 	{ 0xC2,     OP_3BYTEF3|OP_SSE,          SSEOP(cmpss_r128_r128m32_i8),   SSEOP(cmpss_r128_r128m32_i8),},
 	{ 0xD6,     OP_3BYTEF3|OP_SSE,          SSEOP(movq2dq_r128_r64),        SSEOP(movq2dq_r128_r64),    },
 	{ 0xE6,     OP_3BYTEF3|OP_SSE,          SSEOP(cvtdq2pd_r128_r128m64),   SSEOP(cvtdq2pd_r128_r128m64)}
