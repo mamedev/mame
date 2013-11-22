@@ -290,6 +290,7 @@ static void modrm_to_EA(i386_state *cpustate,UINT8 mod_rm, UINT32* out_ea, UINT8
 	if( mod_rm >= 0xc0 )
 		fatalerror("i386: Called modrm_to_EA with modrm value %02X!\n",mod_rm);
 
+
 	if( cpustate->address_size ) {
 		switch( rm )
 		{
@@ -4201,7 +4202,14 @@ static CPU_RESET( pentium_pro )
 	cpustate->cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	cpustate->feature_flags = 0x00000001;       // TODO: enable relevant flags here
+	// [ 2:2] I/O breakpoints
+	// [ 4:4] Time Stamp Counter
+	// [ 5:5] Pentium CPU style model specific registers
+	// [ 7:7] Machine Check Exception
+	// [ 8:8] CMPXCHG8B instruction
+	// [15:15] CMOV and FCMOV
+	// No MMX
+	cpustate->feature_flags = 0x000081bf;
 
 	CHANGE_PC(cpustate,cpustate->eip);
 }
@@ -4307,7 +4315,13 @@ static CPU_RESET( pentium_mmx )
 	cpustate->cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	cpustate->feature_flags = 0x00000001;       // TODO: enable relevant flags here
+	// [ 2:2] I/O breakpoints
+	// [ 4:4] Time Stamp Counter
+	// [ 5:5] Pentium CPU style model specific registers
+	// [ 7:7] Machine Check Exception
+	// [ 8:8] CMPXCHG8B instruction
+	// [23:23] MMX instructions
+	cpustate->feature_flags = 0x008001bf;
 
 	CHANGE_PC(cpustate,cpustate->eip);
 }
@@ -4413,7 +4427,7 @@ static CPU_RESET( pentium2 )
 	cpustate->cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	cpustate->feature_flags = 0x00000001;       // TODO: enable relevant flags here
+	cpustate->feature_flags = 0x008081bf;       // TODO: enable relevant flags here
 
 	CHANGE_PC(cpustate,cpustate->eip);
 }

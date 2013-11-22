@@ -204,17 +204,24 @@ static void PENTIUMOP(cmovo_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 40
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->OF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->OF == 1)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->OF == 1)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -223,17 +230,24 @@ static void PENTIUMOP(cmovo_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 40
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->OF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->OF == 1)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->OF == 1)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -242,17 +256,24 @@ static void PENTIUMOP(cmovno_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->OF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->OF == 0)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->OF == 0)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -261,17 +282,24 @@ static void PENTIUMOP(cmovno_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->OF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->OF == 0)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->OF == 0)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -280,17 +308,24 @@ static void PENTIUMOP(cmovb_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 42
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->CF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->CF == 1)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->CF == 1)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -299,17 +334,24 @@ static void PENTIUMOP(cmovb_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 42
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->CF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->CF == 1)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->CF == 1)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -318,17 +360,24 @@ static void PENTIUMOP(cmovae_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->CF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->CF == 0)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->CF == 0)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -337,17 +386,24 @@ static void PENTIUMOP(cmovae_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->CF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->CF == 0)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->CF == 0)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -356,17 +412,24 @@ static void PENTIUMOP(cmove_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 44
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->ZF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->ZF == 1)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->ZF == 1)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -375,17 +438,24 @@ static void PENTIUMOP(cmove_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 44
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->ZF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->ZF == 1)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->ZF == 1)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -394,17 +464,24 @@ static void PENTIUMOP(cmovne_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->ZF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->ZF == 0)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->ZF == 0)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -413,17 +490,24 @@ static void PENTIUMOP(cmovne_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->ZF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->ZF == 0)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->ZF == 0)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -432,17 +516,24 @@ static void PENTIUMOP(cmovbe_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if ((cpustate->CF == 1) || (cpustate->ZF == 1)) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if ((cpustate->CF == 1) || (cpustate->ZF == 1))
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if ((cpustate->CF == 1) || (cpustate->ZF == 1))
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -451,17 +542,24 @@ static void PENTIUMOP(cmovbe_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if ((cpustate->CF == 1) || (cpustate->ZF == 1)) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if ((cpustate->CF == 1) || (cpustate->ZF == 1))
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if ((cpustate->CF == 1) || (cpustate->ZF == 1))
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -470,17 +568,24 @@ static void PENTIUMOP(cmova_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 47
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if ((cpustate->CF == 0) && (cpustate->ZF == 0)) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if ((cpustate->CF == 0) && (cpustate->ZF == 0))
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if ((cpustate->CF == 0) && (cpustate->ZF == 0))
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -489,17 +594,24 @@ static void PENTIUMOP(cmova_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 47
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if ((cpustate->CF == 0) && (cpustate->ZF == 0)) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if ((cpustate->CF == 0) && (cpustate->ZF == 0))
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if ((cpustate->CF == 0) && (cpustate->ZF == 0))
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -508,17 +620,24 @@ static void PENTIUMOP(cmovs_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 48
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->SF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->SF == 1)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->SF == 1)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -527,17 +646,24 @@ static void PENTIUMOP(cmovs_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 48
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->SF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->SF == 1)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->SF == 1)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -546,17 +672,24 @@ static void PENTIUMOP(cmovns_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->SF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->SF == 0)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->SF == 0)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -565,17 +698,24 @@ static void PENTIUMOP(cmovns_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->SF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->SF == 0)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->SF == 0)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -584,17 +724,24 @@ static void PENTIUMOP(cmovp_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4a
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->PF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->PF == 1)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->PF == 1)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -603,17 +750,24 @@ static void PENTIUMOP(cmovp_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4a
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->PF == 1) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->PF == 1)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->PF == 1)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -622,17 +776,24 @@ static void PENTIUMOP(cmovnp_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->PF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->PF == 0)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->PF == 0)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -641,17 +802,24 @@ static void PENTIUMOP(cmovnp_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->PF == 0) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->PF == 0)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->PF == 0)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -660,17 +828,24 @@ static void PENTIUMOP(cmovl_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4c
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->SF != cpustate->OF) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->SF != cpustate->OF)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->SF != cpustate->OF)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -679,17 +854,24 @@ static void PENTIUMOP(cmovl_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4c
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->SF != cpustate->OF) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->SF != cpustate->OF)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->SF != cpustate->OF)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -698,17 +880,24 @@ static void PENTIUMOP(cmovge_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->SF == cpustate->OF) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->SF == cpustate->OF)
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->SF == cpustate->OF)
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -717,17 +906,24 @@ static void PENTIUMOP(cmovge_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if (cpustate->SF == cpustate->OF) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if (cpustate->SF == cpustate->OF)
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if (cpustate->SF == cpustate->OF)
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -736,17 +932,24 @@ static void PENTIUMOP(cmovle_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if ((cpustate->ZF == 1) || (cpustate->SF != cpustate->OF)) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if ((cpustate->ZF == 1) || (cpustate->SF != cpustate->OF))
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if ((cpustate->ZF == 1) || (cpustate->SF != cpustate->OF))
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -755,17 +958,24 @@ static void PENTIUMOP(cmovle_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if ((cpustate->ZF == 1) || (cpustate->SF != cpustate->OF)) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if ((cpustate->ZF == 1) || (cpustate->SF != cpustate->OF))
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if ((cpustate->ZF == 1) || (cpustate->SF != cpustate->OF))
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -774,17 +984,24 @@ static void PENTIUMOP(cmovg_r16_rm16)(i386_state *cpustate)    // Opcode 0x0f 4f
 	UINT16 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if ((cpustate->ZF == 0) && (cpustate->SF == cpustate->OF)) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if ((cpustate->ZF == 0) && (cpustate->SF == cpustate->OF))
+		{
 			src = LOAD_RM16(modrm);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if ((cpustate->ZF == 0) && (cpustate->SF == cpustate->OF))
+		{
 			src = READ16(cpustate,ea);
 			STORE_REG16(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
@@ -793,17 +1010,24 @@ static void PENTIUMOP(cmovg_r32_rm32)(i386_state *cpustate)    // Opcode 0x0f 4f
 	UINT32 src;
 	UINT8 modrm = FETCH(cpustate);
 
-	if ((cpustate->ZF == 0) && (cpustate->SF == cpustate->OF)) {
-		if( modrm >= 0xc0 ) {
+	if( modrm >= 0xc0 )
+	{
+		if ((cpustate->ZF == 0) && (cpustate->SF == cpustate->OF))
+		{
 			src = LOAD_RM32(modrm);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
-		} else {
-			UINT32 ea = GetEA(cpustate,modrm,0);
+		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
+	}
+	else
+	{
+		UINT32 ea = GetEA(cpustate,modrm,0);
+		if ((cpustate->ZF == 0) && (cpustate->SF == cpustate->OF))
+		{
 			src = READ32(cpustate,ea);
 			STORE_REG32(modrm, src);
-			CYCLES(cpustate,1); // TODO: correct cycle count
 		}
+		CYCLES(cpustate,1); // TODO: correct cycle count
 	}
 }
 
