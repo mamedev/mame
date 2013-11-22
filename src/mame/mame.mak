@@ -2611,7 +2611,7 @@ $(DRIVERS)/sspeedr.o:   $(LAYOUT)/sspeedr.lh
 
 $(DRIVERS)/stactics.o:  $(LAYOUT)/stactics.lh
 
-$(DRIVERS)/sshot.o:     $(LAYOUT)/gunchamp.lh
+$(DRIVERS)/sshot.o:     $(LAYOUT)/gunchamps.lh
 
 $(DRIVERS)/sstrangr.o:  $(LAYOUT)/sstrangr.lh
 

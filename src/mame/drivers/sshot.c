@@ -163,7 +163,7 @@ Given CS numbers this is released after the other GunChamp
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
 
-#include "gunchamp.lh"
+#include "gunchamps.lh"
 
 
 class supershot_state : public driver_device
@@ -399,4 +399,4 @@ ROM_END
 
 
 GAME( 1979, sshot,     0,        supershot, supershot, driver_device, 0, ROT0, "Model Racing", "Super Shot", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAMEL(1980, gunchamps, gunchamp, supershot, supershot, driver_device, 0, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING, layout_gunchamp )
+GAMEL(1980, gunchamps, gunchamp, supershot, supershot, driver_device, 0, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING, layout_gunchamps )
