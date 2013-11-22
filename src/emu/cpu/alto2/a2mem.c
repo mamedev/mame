@@ -808,7 +808,8 @@ void alto2_cpu_device::reset_memory()
 		m_mem.hpb = 0;
 	}
 	// allocate 64K or 128K words of main memory
-	ioport_port* config = ioport("CONFIG");
+	ioport_port* config = ioport(":CONFIG");
+	// config should be valid, unless the driver doesn't define it
 	if (config)
 		m_mem.size = config->read() & 1 ? ALTO2_RAM_SIZE : 2 * ALTO2_RAM_SIZE;
 	else

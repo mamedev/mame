@@ -859,9 +859,11 @@ void alto2_cpu_device::reset_ether()
 	m_eth.tx_count = 0;
 	m_eth.rx_timer->reset();
 	m_eth.tx_timer->reset();
-	ioport_port* config = ioport("CONFIG");
+	ioport_port* config = ioport(":CONFIG");
+	// config should be valid, unless the driver doesn't define it
 	if (config)
 		m_eth.duckbreath = duckbreath_sec[(config->read() >> 4) & 7];
 	else
 		m_eth.duckbreath = 0;
+	logerror("Ethernet duckbreath %d sec\n", m_eth.duckbreath);
 }

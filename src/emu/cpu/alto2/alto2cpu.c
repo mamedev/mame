@@ -1161,25 +1161,6 @@ WRITE16_MEMBER( alto2_cpu_device::ioram_w )
 void alto2_cpu_device::device_reset()
 {
 	soft_reset();
-
-	// call all sub-devices' reset_...
-	reset_memory();
-	reset_disk();
-	reset_disp();
-	reset_kbd();
-	reset_mouse();
-	reset_hw();
-
-	reset_emu();
-	reset_ksec();
-	reset_ether();
-	reset_mrt();
-	reset_dwt();
-	reset_curt();
-	reset_dht();
-	reset_dvt();
-	reset_part();
-	reset_kwd();
 }
 
 /**
@@ -2864,9 +2845,31 @@ void alto2_cpu_device::soft_reset()
 	}
 	m_next2_task = task_emu;		// switch to task 0 (emulator)
 	m_reset_mode = 0xffff;			// all tasks start in ROM0 again
+	m_task = task_emu;				// set current task to emulator
+	m_task_wakeup = 1 << task_emu;	// set only the emulator task wakeup flag
 
-	m_dsp_time = 0;					// reset the display state timing
+	m_dsp_time = 0;					// reset the display state machine timing accu
+	m_unload_time = 0;				// reset the word unload timing accu
+#if	(USE_BITCLK_TIMER == 0)
+	m_bitclk_time = 0;				// reset the bitclk timing accu
+#endif
 
-	m_task = task_emu;				// start with task 0 (emulator)
-	m_task_wakeup |= 1 << task_emu;	// set wakeup flag
+	// call all sub-devices' reset_...
+	reset_memory();
+	reset_disk();
+	reset_disp();
+	reset_kbd();
+	reset_mouse();
+	reset_hw();
+
+	reset_emu();
+	reset_ksec();
+	reset_ether();
+	reset_mrt();
+	reset_dwt();
+	reset_curt();
+	reset_dht();
+	reset_dvt();
+	reset_part();
+	reset_kwd();
 }
