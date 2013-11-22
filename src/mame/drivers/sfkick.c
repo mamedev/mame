@@ -115,7 +115,7 @@ READ8_MEMBER(sfkick_state::ppi_port_b_r)
 
 void sfkick_state::sfkick_remap_banks()
 {
-	/* 0000-3ffff */
+	/* 0000-3fff */
 	switch(m_bank_cfg&3)
 	{
 		case 0: /* bios */
@@ -151,7 +151,7 @@ void sfkick_state::sfkick_remap_banks()
 		break;
 	}
 
-	/* 4000-7ffff */
+	/* 4000-7fff */
 	switch((m_bank_cfg>>2)&3)
 	{
 		case 0: /* bios - upper part */
@@ -180,7 +180,7 @@ void sfkick_state::sfkick_remap_banks()
 		break;
 	}
 
-	/* 8000-bffff */
+	/* 8000-bfff */
 	switch((m_bank_cfg>>4)&3)
 	{
 		case 0: /* cartridge */
@@ -209,7 +209,7 @@ void sfkick_state::sfkick_remap_banks()
 		break;
 	}
 
-	/* c000-fffff */
+	/* c000-ffff */
 	switch((m_bank_cfg>>6)&3)
 	{
 		case 0: /* unknown */

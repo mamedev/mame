@@ -73,6 +73,9 @@ public:
 	void sexyboom_map_bank(int bank);
 	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
+	UINT8 m_sec_slot[4];
+	DECLARE_READ8_MEMBER(sec_slot_r);
+	DECLARE_WRITE8_MEMBER(sec_slot_w);
 };
 
 
@@ -168,6 +171,7 @@ void sangho_state::pzlestar_map_banks()
 			break;
 	}
 
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8_delegate(FUNC(sangho_state::sec_slot_r),this), write8_delegate(FUNC(sangho_state::sec_slot_w),this));
 }
 
 WRITE8_MEMBER(sangho_state::pzlestar_bank_w)
@@ -236,6 +240,18 @@ WRITE8_MEMBER(sangho_state::sexyboom_bank_w)
 	m_sexyboom_bank[offset] = data;
 	sexyboom_map_bank(offset>>1);
 }
+
+/* secondary slot R/Ws from current primary slot number (see also mess/machine/msx.c) */
+READ8_MEMBER(sangho_state::sec_slot_r)
+{
+	return m_sec_slot[m_pzlestar_mem_bank >> 6] ^ 0xff;
+}
+
+WRITE8_MEMBER(sangho_state::sec_slot_w)
+{
+	m_sec_slot[m_pzlestar_mem_bank >> 6] = data;
+}
+
 
 static ADDRESS_MAP_START( sangho_map, AS_PROGRAM, 8, sangho_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
