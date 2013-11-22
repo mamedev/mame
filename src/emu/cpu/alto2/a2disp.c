@@ -248,7 +248,7 @@ void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 	*pix++ = (word >>  0) & 1;
 }
 
-#define	HLC1	((m_dsp.hlc >>  0) & 1)		//!< horizontal line counter bit 0
+#define	HLC1	((m_dsp.hlc >>  0) & 1)		//!< horizontal line counter bit 0 (mid of the scanline)
 #define	HLC2	((m_dsp.hlc >>  1) & 1)		//!< horizontal line counter bit 1
 #define	HLC4	((m_dsp.hlc >>  2) & 1)		//!< horizontal line counter bit 2
 #define	HLC8	((m_dsp.hlc >>  3) & 1)		//!< horizontal line counter bit 3
@@ -258,7 +258,7 @@ void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 #define	HLC128	((m_dsp.hlc >>  7) & 1)		//!< horizontal line counter bit 7
 #define	HLC256	((m_dsp.hlc >>  8) & 1)		//!< horizontal line counter bit 8
 #define	HLC512	((m_dsp.hlc >>  9) & 1)		//!< horizontal line counter bit 9
-#define	HLC1024 ((m_dsp.hlc >> 10) & 1)		//!< horizontal line counter bit 10
+#define	HLC1024 ((m_dsp.hlc >> 10) & 1)		//!< horizontal line counter bit 10 (odd/even field)
 
 #define GET_SETMODE_SPEEDY(mode) X_RDBITS(mode,16,0,0)  //!< get the pixel clock speed from a SETMODE<- bus value
 #define GET_SETMODE_INVERSE(mode) X_RDBITS(mode,16,1,1) //!< get the inverse video flag from a SETMODE<- bus value
@@ -351,11 +351,10 @@ void alto2_cpu_device::display_state_machine()
 
 	UINT8 a63 = m_disp_a63[m_dsp.state];
 	if (A63_HLCGATE(a63)) {
-		/* reset or count horizontal line counters */
-		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END)
+		// reset or count horizontal line counters
+		m_dsp.hlc += 1;
+		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END + 1)
 			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
-		else
-			m_dsp.hlc++;
 		/* start the refresh task _twice_ on each scanline */
 		m_task_wakeup |= 1 << task_mrt;
 		if (m_ewfct) {

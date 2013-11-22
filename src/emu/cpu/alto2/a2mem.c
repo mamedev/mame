@@ -619,8 +619,9 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 	if (addr < m_mem.size) {
 		LOG((LOG_MEM,2, "	MAR←; mar = %#o\n", addr));
 		m_mem.access = ALTO2_MEM_RAM;
-		/* fetch memory double-word to read/write latches */
+		// fetch the memory double-word to the read/write latches
 		m_mem.rmdd = m_mem.wmdd = m_mem.ram[m_mem.mar/2];
+		// keep track of the current CPU cycle
 		m_mem.cycle = cycle();
 	} else {
 		m_mem.access = ALTO2_MEM_NIRVANA;
@@ -672,10 +673,13 @@ UINT16 alto2_cpu_device::read_mem()
 #endif
 
 	if (m_mem.access & ALTO2_MEM_ODD) {
+		// after reading the odd word, reset the access flag
 		m_mem.access = ALTO2_MEM_NONE;
 	} else {
+		// after reading the even word word, toggle access flag (and address) to the odd word
 		m_mem.mar ^= ALTO2_MEM_ODD;
 		m_mem.access ^= ALTO2_MEM_ODD;
+		// extend the read succeeds window by one cycle
 		m_mem.cycle++;
 	}
 	return m_mem.md;
@@ -730,9 +734,11 @@ void alto2_cpu_device::write_mem(UINT16 data)
 #if	ALTO2_DEBUG
 	watch_write(m_mem.mar, m_mem.md);
 #endif
-	/* don't reset mem.access to permit double word exchange */
+	// Toggle the odd/even word access flag
+	// NB: don't reset mem.access to permit double word exchange
 	m_mem.mar ^= ALTO2_MEM_ODD;
 	m_mem.access ^= ALTO2_MEM_ODD;
+	// extend the write succeeds window by one cycle
 	m_mem.cycle++;
 }
 
@@ -744,6 +750,7 @@ void alto2_cpu_device::write_mem(UINT16 data)
  */
 UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 {
+	space(AS_2).set_debugger_access(true);
 	int base_addr = addr & 0177777;
 	int data = 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
@@ -751,6 +758,7 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
 	} else {
 		data = (addr & ALTO2_MEM_ODD) ? GET_ODD(m_mem.ram[addr/2]) : GET_EVEN(m_mem.ram[addr/2]);
 	}
+	space(AS_2).set_debugger_access(false);
 	return data;
 }
 
@@ -762,6 +770,7 @@ UINT16 alto2_cpu_device::debug_read_mem(UINT32 addr)
  */
 void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
 {
+	space(AS_2).set_debugger_access(true);
 	int base_addr = addr & 0177777;
 	if (base_addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
 		m_iomem->write_word(m_iomem->address_to_byte(base_addr), data);
@@ -770,6 +779,7 @@ void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
 	} else {
 		PUT_EVEN(m_mem.ram[addr/2], data);
 	}
+	space(AS_2).set_debugger_access(false);
 }
 
 /**
