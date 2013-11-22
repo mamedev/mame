@@ -930,7 +930,6 @@ WRITE_LINE_MEMBER( ksys573_state::h8_clk_w )
 			{
 				m_h8_index++;
 			}
-			printf( "%d\n", m_h8_index );
 		}
 
 		m_h8_clk = state;
