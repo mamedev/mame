@@ -245,17 +245,24 @@ public:
     };
 
 	ATTR_COLD netlist_object_t(const type_t atype, const family_t afamily)
-		: m_objtype(atype)
+	    : m_name(NULL)
+		, m_objtype(atype)
         , m_family(afamily)
         , m_netlist(NULL)
         {}
 
-	virtual ~netlist_object_t() {}
+	virtual ~netlist_object_t()
+	{
+	    delete m_name;
+	}
 
-    ATTR_COLD void init_object(netlist_base_t &nl)
+    ATTR_COLD void init_object(netlist_base_t &nl, const astring &aname)
     {
         m_netlist = &nl;
+        m_name = new astring(aname);
     }
+
+    ATTR_COLD const astring &name() const { if (m_name == NULL) fatalerror("object not initialized"); return *m_name; }
 
 	ATTR_HOT inline const type_t type() const { return m_objtype; }
     ATTR_HOT inline const family_t family() const { return m_family; }
@@ -267,6 +274,7 @@ public:
     ATTR_HOT inline const netlist_base_t & RESTRICT netlist() const { return *m_netlist; }
 
 private:
+    astring *m_name;
 	const type_t m_objtype;
     const family_t m_family;
     netlist_base_t * RESTRICT m_netlist;
@@ -310,7 +318,7 @@ public:
     , m_state(STATE_NONEX)
     {}
 
-	ATTR_COLD void init_terminal(netlist_core_device_t &dev, const state_e astate);
+	ATTR_COLD void init_terminal(netlist_core_device_t &dev, const astring &aname, const state_e astate);
 
     ATTR_COLD void set_net(netlist_net_t &anet)   { m_net = &anet; }
     ATTR_COLD bool has_net() { return (m_net != NULL); }
@@ -527,7 +535,7 @@ public:
 
 	netlist_output_t(const type_t atype, const family_t afamily);
 
-    ATTR_COLD void init_terminal(netlist_core_device_t &dev);
+    ATTR_COLD void init_terminal(netlist_core_device_t &dev, const astring &aname);
 
 	double m_low_V;
 	double m_high_V;
@@ -615,7 +623,6 @@ public:
 
 	ATTR_COLD virtual void init(netlist_setup_t &setup, const astring &name);
 
-	ATTR_COLD const astring &name() const { return m_name; }
 
 	ATTR_HOT virtual void update_param() {}
 
@@ -683,7 +690,6 @@ protected:
 	ATTR_HOT virtual void start() { }
 
 private:
-	astring m_name;
 };
 
 
@@ -835,9 +841,9 @@ public:
 protected:
 	void start()
 	{
-		m_I.init_terminal(*this, netlist_terminal_t::STATE_INP_ACTIVE);
+		m_I.init_terminal(*this, "I", netlist_terminal_t::STATE_INP_ACTIVE);
 
-		m_Q.init_terminal(*this);
+		m_Q.init_terminal(*this, "Q");
 		m_Q.initial(1);
 	}
 
@@ -877,8 +883,8 @@ public:
 protected:
 	void start()
 	{
-		m_I.init_terminal(*this, netlist_terminal_t::STATE_INP_ACTIVE);
-		m_Q.init_terminal(*this);
+		m_I.init_terminal(*this, "I", netlist_terminal_t::STATE_INP_ACTIVE);
+		m_Q.init_terminal(*this, "Q");
 		m_Q.initial(0);
 	}
 

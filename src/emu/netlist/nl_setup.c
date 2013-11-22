@@ -143,16 +143,13 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
         case netlist_terminal_t::OUTPUT:
             {
                 netlist_terminal_t &term = dynamic_cast<netlist_terminal_t &>(obj);
-                astring temp = dev.name();
-                temp.cat(".");
-                temp.cat(name);
                 if (obj.isType(netlist_terminal_t::OUTPUT))
-                    dynamic_cast<netlist_output_t &>(term).init_terminal(upd_dev);
+                    dynamic_cast<netlist_output_t &>(term).init_terminal(upd_dev, dev.name() + "." + name);
                 else
-                    term.init_terminal(upd_dev, state);
+                    term.init_terminal(upd_dev, dev.name() + "." + name, state);
 
-                if (!(m_terminals.add(temp, &term, false)==TMERR_NONE))
-                    fatalerror("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), temp.cstr());
+                if (!(m_terminals.add(term.name(), &term, false)==TMERR_NONE))
+                    fatalerror("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), term.name().cstr());
                 NL_VERBOSE_OUT(("%s %s\n", objtype_as_astr(term).cstr(), name.cstr()));
             }
             break;
@@ -366,7 +363,8 @@ void netlist_setup_t::connect_terminals(netlist_terminal_t &t1, netlist_terminal
         netlist_net_t *anet =  new netlist_net_t(netlist_object_t::NET, netlist_object_t::ANALOG);
         t1.set_net(*anet);
         m_netlist.solver()->m_nets.add(anet);
-        t1.net().init_object(netlist());
+        // FIXME: Nets should have a unique name
+        t1.net().init_object(netlist(),"some net");
         t1.net().register_con(t2);
         t1.net().register_con(t1);
     }

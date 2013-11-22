@@ -194,7 +194,7 @@ NETLIB_START(nicNE555N_MSTABLE)
 	register_param("VS", m_VS, 5.0);
 	register_param("VL", m_VL, 0.0 *5.0);
 
-	m_THRESHOLD_OUT.init_terminal(*this);
+	m_THRESHOLD_OUT.init_terminal(*this, "THRESHOLD");
 	register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT, netlist_input_t::STATE_INP_ACTIVE);
 
 	m_Q.initial(5.0 * 0.4);
