@@ -37,8 +37,10 @@ is a YM2413 compatible chip.
 Sexy Boom's DSW setting verified via Z80 code by stephh
 
 TODO:
-- sexyboom hangs at snippet 0x2ca0-0x2ca9, patching 0x2ca7 branch makes it to be fully playable;
-- v9958 screen modes 10/11/12 aren't 100% perfect (wrong pixels in some places);
+- pzlestar hangs at snippet 0x2ca0-0x2ca9, patching 0x2ca7 branch makes it to be fully playable (patched for now);
+- pzlestar title screen uses sprites with screen 12, has wrong colors due of it;
+- sexyboom presumably uses v9958 horizontal scrolling on title screen;
+- sexyboom slows down dramatically, presumably bankswitch related;
 
 */
 
@@ -65,7 +67,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
 	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
 	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
-	DECLARE_DRIVER_INIT(sangho);
+	DECLARE_DRIVER_INIT(pzlestar);
+	virtual void machine_start();
 	DECLARE_MACHINE_RESET(pzlestar);
 	DECLARE_MACHINE_RESET(sexyboom);
 	TIMER_DEVICE_CALLBACK_MEMBER(sangho_interrupt);
@@ -78,7 +81,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sec_slot_w);
 };
 
-
+/*
+	slot 0 selects RAM
+	slot 1 selects ?
+	slot 2 selects code ROMs
+	slot 3 selects data ROMs
+*/
 void sangho_state::pzlestar_map_banks()
 {
 	int slot_select;
@@ -397,6 +405,10 @@ static INPUT_PORTS_START( pzlestar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )      /* Dipswitch 1:1 Not shown in manual */
 INPUT_PORTS_END
 
+void sangho_state::machine_start()
+{
+	m_ram = auto_alloc_array(machine(), UINT8, 0x20000); // TODO: define how much RAM these ones have (MSX2+ can potentially go up to 4MB)
+}
 
 MACHINE_RESET_MEMBER(sangho_state,pzlestar)
 {
@@ -534,10 +546,14 @@ ROM_START( sexyboom )
 	/* 15 empty */
 ROM_END
 
-DRIVER_INIT_MEMBER(sangho_state,sangho)
+DRIVER_INIT_MEMBER(sangho_state,pzlestar)
 {
-	m_ram = auto_alloc_array(machine(), UINT8, 0x20000);
+	UINT8 *ROM = memregion("user1")->base();
+
+	/* patch nasty looping check, related to sound? */
+	ROM[0x12ca7] = 0x00;
+	ROM[0x12ca8] = 0x00;
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS )
-GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho_state, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
+GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state,  pzlestar,   ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, driver_device, 0,          ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS )

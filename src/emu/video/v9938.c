@@ -281,8 +281,8 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 	for (y=0;y<32;y++) for (k=0;k<64;k++) for (j=0;j<64;j++)
 	{
 		// calculate the color
-		if (k >= 32) k0 = (k - 64); else k0 = k;
-		if (j >= 32) j0 = (j - 64); else j0 = j;
+		if (k >= 32) k0 = (64 - k); else k0 = k;
+		if (j >= 32) j0 = (64 - j); else j0 = j;
 		r = y + j0;
 		b = (y * 5 - 2 * j0 - k0) / 4;
 		g = y + k0;
