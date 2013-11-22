@@ -763,8 +763,23 @@ public:
 	void install_rsgun_protection();
 	void install_elandore_protection();
 	void install_ffreveng_protection();
-
+	
 	void stv_register_protection_savestates();	
+	
+	// Decathlete specific variables and functions (see machine/decathlt.c)
+	UINT32 m_decathlt_protregs[4];
+	UINT32 m_decathlt_lastcount;
+	UINT32 m_decathlt_part;
+	UINT32 m_decathlt_prot_uploadmode;
+	UINT32 m_decathlt_prot_uploadoffset;
+	UINT16 m_decathlt_prottable1[24];
+	UINT16 m_decathlt_prottable2[128];
+	
+	DECLARE_READ32_MEMBER( decathlt_prot_r );
+	DECLARE_WRITE32_MEMBER( decathlt_prot1_w );
+	DECLARE_WRITE32_MEMBER( decathlt_prot2_w );
+	void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which);
+	void install_decathlt_protection();
 };
 
 

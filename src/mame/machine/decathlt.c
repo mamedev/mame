@@ -4,7 +4,6 @@
   build the trees required for decompression */
 
 #include "emu.h"
-#include "stvprot.h"
 #include "includes/stv.h"
 
 /**************************
@@ -13,59 +12,50 @@
 *
 **************************/
 
-
-static UINT32 decathlt_protregs[4];
-static UINT32 decathlt_lastcount = 0;
-static UINT32 decathlt_part;
-static UINT32 decathlt_prot_uploadmode=0;
-static UINT32 decathlt_prot_uploadoffset=0;
-static UINT16 decathlt_prottable1[24];
-static UINT16 decathlt_prottable2[128];
-
-static READ32_HANDLER( decathlt_prot_r )
+READ32_MEMBER( stv_state::decathlt_prot_r )
 {
 	// the offsets written to the protection device definitely only refer to 2 of the roms
 	//  it's a fair assumption to say that only those 2 are connected to the protection device
-	UINT8 *ROM = (UINT8 *)space.machine().root_device().memregion("abus")->base()+0x1000000;
-	UINT32 *fake0 = (UINT32*)space.machine().root_device().memregion( "fake0" )->base();
+	UINT8 *ROM = (UINT8 *)memregion("abus")->base()+0x1000000;
+	UINT32 *fake0 = (UINT32*)memregion( "fake0" )->base();
 
 	if (offset==2)
 	{
 		UINT32 retvalue = 0xffff;
 
-		switch (decathlt_protregs[0])
+		switch (m_decathlt_protregs[0])
 		{
 			default:
-			retvalue = ROM[(decathlt_protregs[0]*2)-2];
+			retvalue = ROM[(m_decathlt_protregs[0]*2)-2];
 			retvalue <<= 8;
-			retvalue |= ROM[((decathlt_protregs[0]+1)*2)+1-2];
+			retvalue |= ROM[((m_decathlt_protregs[0]+1)*2)+1-2];
 			retvalue <<= 8;
-			retvalue |= ROM[((decathlt_protregs[0]+1)*2)-2];
+			retvalue |= ROM[((m_decathlt_protregs[0]+1)*2)-2];
 			retvalue <<= 8;
-			retvalue |= ROM[((decathlt_protregs[0]+2)*2)+1-2];
-			decathlt_lastcount++;
-			logerror("read addr %08x, blah_r %08x - read count count %08x\n", decathlt_protregs[0], retvalue, decathlt_lastcount*4);
-			decathlt_protregs[0]+=2;
+			retvalue |= ROM[((m_decathlt_protregs[0]+2)*2)+1-2];
+			m_decathlt_lastcount++;
+			logerror("read addr %08x, blah_r %08x - read count count %08x\n", m_decathlt_protregs[0], retvalue, m_decathlt_lastcount*4);
+			m_decathlt_protregs[0]+=2;
 			return retvalue;
 
 			case 0x03228e4:
-				if (fake0) retvalue = fake0[(((0x20080/4)+decathlt_lastcount))];
-				decathlt_lastcount++;
+				if (fake0) retvalue = fake0[(((0x20080/4)+m_decathlt_lastcount))];
+				m_decathlt_lastcount++;
 				return retvalue;
 
 			case 0x00a9f3a:
-				if (fake0) retvalue = fake0[(((0x00000/4)+decathlt_lastcount))];
-				decathlt_lastcount++;
+				if (fake0) retvalue = fake0[(((0x00000/4)+m_decathlt_lastcount))];
+				m_decathlt_lastcount++;
 				return retvalue;
 
 			case 0x0213ab4:
-				if (fake0) retvalue = fake0[(((0x40000/4)+decathlt_lastcount))];
-				decathlt_lastcount++;
+				if (fake0) retvalue = fake0[(((0x40000/4)+m_decathlt_lastcount))];
+				m_decathlt_lastcount++;
 				return retvalue;
 
 			case 0x01efaf0:
-				if (fake0) retvalue = fake0[(((0x60000/4)+decathlt_lastcount))];
-				decathlt_lastcount++;
+				if (fake0) retvalue = fake0[(((0x60000/4)+m_decathlt_lastcount))];
+				m_decathlt_lastcount++;
 				return retvalue;
 
 			case 0x033f16c:
@@ -103,25 +93,25 @@ static READ32_HANDLER( decathlt_prot_r )
 	}
 	else
 	{
-		logerror("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n",space.device().safe_pc(), offset, mem_mask, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
+		logerror("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n", safe_pc(), offset, mem_mask, m_decathlt_protregs[0], m_decathlt_protregs[1], m_decathlt_protregs[2], m_decathlt_protregs[3]);
 	}
 
-	return decathlt_protregs[offset];
+	return m_decathlt_protregs[offset];
 }
 
 
-void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
+void stv_state::write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 {
-	decathlt_protregs[offset] = (data&mem_mask)|(decathlt_protregs[offset]&~mem_mask);
-//  decathlt_protregs[0] = 0x0c00000/4;
+	m_decathlt_protregs[offset] = (data&mem_mask)|(m_decathlt_protregs[offset]&~mem_mask);
+//  m_decathlt_protregs[0] = 0x0c00000/4;
 
 	if (offset==0) // seems to set a (scrambled?) source address
 	{
-		decathlt_part ^=1;
+		m_decathlt_part ^=1;
 
-		//if (decathlt_part==0) logerror("%d, last read count was %06x\n",which, decathlt_lastcount*4);
-		decathlt_lastcount = 0;
-		if (decathlt_part==1) logerror("%d Decathlete prot W offset %04x data %08x, %08x, >>> regs %08x <<<<, %08x, %08x, %08x\n",which, offset, data, decathlt_protregs[0], decathlt_protregs[0]*4, decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
+		//if (m_decathlt_part==0) logerror("%d, last read count was %06x\n",which, m_decathlt_lastcount*4);
+		m_decathlt_lastcount = 0;
+		if (m_decathlt_part==1) logerror("%d Decathlete prot W offset %04x data %08x, %08x, >>> regs %08x <<<<, %08x, %08x, %08x\n",which, offset, data, m_decathlt_protregs[0], m_decathlt_protregs[0]*4, m_decathlt_protregs[1], m_decathlt_protregs[2], m_decathlt_protregs[3]);
 	}
 
 	if (offset==1) // uploads 2 tables...
@@ -131,37 +121,37 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 			if (data == 0x80000000)
 			{
 			//  logerror("changed to upload mode 1\n");
-				decathlt_prot_uploadmode = 1;
-				decathlt_prot_uploadoffset = 0;
+				m_decathlt_prot_uploadmode = 1;
+				m_decathlt_prot_uploadoffset = 0;
 			}
 			else if (data == 0x80800000)
 			{
 			//  logerror("changed to upload mode 2\n");
-				decathlt_prot_uploadmode = 2;
-				decathlt_prot_uploadoffset = 0;
+				m_decathlt_prot_uploadmode = 2;
+				m_decathlt_prot_uploadoffset = 0;
 			}
 			else
 			{
 			//  logerror("unknown upload mode\n");
-				decathlt_prot_uploadmode = 2;
-				decathlt_prot_uploadoffset = 0;
+				m_decathlt_prot_uploadmode = 2;
+				m_decathlt_prot_uploadoffset = 0;
 			}
 
 //          logerror("ARGH! %08x %08x\n",mem_mask,data);
 		}
 		else if (mem_mask==0x0000ffff)
 		{
-			if (decathlt_prot_uploadmode==1)
+			if (m_decathlt_prot_uploadmode==1)
 			{
-				if (decathlt_prot_uploadoffset>=24)
+				if (m_decathlt_prot_uploadoffset>=24)
 				{
 				//  logerror("upload mode 1 error, too big\n");
 					return;
 				}
 
-				//logerror("uploading table 1 %04x %04x\n",decathlt_prot_uploadoffset, data&0xffff);
-				decathlt_prottable1[decathlt_prot_uploadoffset]=data&0xffff;
-				decathlt_prot_uploadoffset++;
+				//logerror("uploading table 1 %04x %04x\n",m_decathlt_prot_uploadoffset, data&0xffff);
+				m_decathlt_prottable1[m_decathlt_prot_uploadoffset]=data&0xffff;
+				m_decathlt_prot_uploadoffset++;
 
 				{
 					/* 0x18 (24) values in this table, rom data is 0x1800000 long, maybe it has
@@ -176,24 +166,24 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 						else fp = fopen("table1","wb");
 
 						{
-							fwrite(&decathlt_prottable1,24,2,fp);
+							fwrite(&m_decathlt_prottable1,24,2,fp);
 						}
 						fclose(fp);
 					}
 				}
 
 			}
-			else if (decathlt_prot_uploadmode==2)
+			else if (m_decathlt_prot_uploadmode==2)
 			{
-				if (decathlt_prot_uploadoffset>=128)
+				if (m_decathlt_prot_uploadoffset>=128)
 				{
 					//logerror("upload mode 2 error, too big\n");
 					return;
 				}
 
-				//logerror("uploading table 2 %04x %04x\n",decathlt_prot_uploadoffset, data&0xffff);
-				decathlt_prottable2[decathlt_prot_uploadoffset]=data&0xffff;
-				decathlt_prot_uploadoffset++;
+				//logerror("uploading table 2 %04x %04x\n",m_decathlt_prot_uploadoffset, data&0xffff);
+				m_decathlt_prottable2[m_decathlt_prot_uploadoffset]=data&0xffff;
+				m_decathlt_prot_uploadoffset++;
 
 				{
 					/* the table uploaded here is a 256 byte table with 256 unique values, remaps something? */
@@ -204,7 +194,7 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 						else fp = fopen("table2","wb");
 
 						{
-							fwrite(&decathlt_prottable2,128,2,fp);
+							fwrite(&m_decathlt_prottable2,128,2,fp);
 						}
 						fclose(fp);
 					}
@@ -224,29 +214,29 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 
 }
 
-static WRITE32_HANDLER( decathlt_prot1_w )
+WRITE32_MEMBER( stv_state::decathlt_prot1_w )
 {
 	write_prot_data(data,mem_mask, offset, 0);
 
 }
 
-static WRITE32_HANDLER( decathlt_prot2_w )
+WRITE32_MEMBER( stv_state::decathlt_prot2_w )
 {
 	write_prot_data(data,mem_mask, offset, 1);
 
 
 }
 
-void install_decathlt_protection(running_machine &machine)
+void stv_state::install_decathlt_protection()
 {
 	/* It uploads 2 tables here, then performs what looks like a number of transfers, setting
 	   a source address of some kind (scrambled?) and then making many reads from a single address */
-	memset(decathlt_protregs, 0, sizeof(decathlt_protregs));
-	decathlt_lastcount = 0;
-	decathlt_prot_uploadmode = 0;
-	decathlt_prot_uploadoffset = 0;
-	decathlt_part = 1;
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x37FFFF0, 0x37FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot1_w));
+	memset(m_decathlt_protregs, 0, sizeof(m_decathlt_protregs));
+	m_decathlt_lastcount = 0;
+	m_decathlt_prot_uploadmode = 0;
+	m_decathlt_prot_uploadoffset = 0;
+	m_decathlt_part = 1;
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x37FFFF0, 0x37FFFFF, read32_delegate(FUNC(stv_state::decathlt_prot_r), this), write32_delegate(FUNC(stv_state::decathlt_prot1_w), this));
 	/* It accesses the device at this address too, with different tables, for the game textures, should it just act like a mirror, or a secondary device? */
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x27FFFF0, 0x27FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot2_w));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x27FFFF0, 0x27FFFFF, read32_delegate(FUNC(stv_state::decathlt_prot_r), this), write32_delegate(FUNC(stv_state::decathlt_prot2_w), this));
 }

@@ -46,7 +46,6 @@
 #include "sound/scsp.h"
 #include "sound/cdda.h"
 #include "sound/dmadac.h"
-#include "machine/stvprot.h"
 #include "machine/smpc.h"
 #include "includes/stv.h"
 #include "imagedev/chd_cd.h"
@@ -907,7 +906,10 @@ DRIVER_INIT_MEMBER(stv_state,ffreveng)
 
 DRIVER_INIT_MEMBER(stv_state,decathlt)
 {
-	install_decathlt_protection(machine());
+	m_decathlt_lastcount = 0;
+	m_decathlt_prot_uploadmode = 0;
+	m_decathlt_prot_uploadoffset = 0;
+	install_decathlt_protection();
 	DRIVER_INIT_CALL(stv);
 }
 
