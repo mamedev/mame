@@ -512,6 +512,7 @@ public:
 		m_pads(*this, "PADS" ),
 		m_psxirq(*this, ":maincpu:irq" ),
 		m_ata(*this, "ata" ),
+		m_h8_response(*this, "h8_response"),
 		m_maincpu(*this, "maincpu" ),
 		m_ram(*this, "maincpu:ram" ),
 		m_flashbank(*this, "flashbank" ),
@@ -549,6 +550,11 @@ public:
 	DECLARE_DRIVER_INIT( hyperbbc );
 	DECLARE_DRIVER_INIT( drmn );
 	DECLARE_MACHINE_RESET( konami573 );
+	WRITE_LINE_MEMBER( h8_clk_w );
+	DECLARE_READ_LINE_MEMBER( h8_d0_r );
+	DECLARE_READ_LINE_MEMBER( h8_d1_r );
+	DECLARE_READ_LINE_MEMBER( h8_d2_r );
+	DECLARE_READ_LINE_MEMBER( h8_d3_r );
 	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b7 );
 	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b6 );
 	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b5 );
@@ -612,6 +618,10 @@ private:
 
 	UINT32 m_control;
 	UINT16 m_n_security_control;
+
+	required_memory_region m_h8_response;
+	int m_h8_index;
+	int m_h8_clk;
 
 	UINT8 m_gx700pwbf_output_data[ 4 ];
 	void ( ksys573_state::*m_gx700pwfbf_output_callback )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data, ATTR_UNUSED UINT8 mem_mask );
@@ -859,6 +869,9 @@ void ksys573_state::driver_start()
 MACHINE_RESET_MEMBER( ksys573_state,konami573 )
 {
 	update_disc();
+
+	m_h8_index = 0;
+	m_h8_clk = 0;
 }
 
 void ksys573_state::sys573_vblank( screen_device &screen, bool vblank_state )
@@ -904,6 +917,46 @@ void ksys573_state::sys573_vblank( screen_device &screen, bool vblank_state )
 		}
 	}
 }
+
+// H8 check at startup (JVS related)
+
+WRITE_LINE_MEMBER( ksys573_state::h8_clk_w )
+{
+	if( m_h8_clk != state )
+	{
+		if( state )
+		{
+			if( m_h8_index < m_h8_response->bytes() - 1 )
+			{
+				m_h8_index++;
+			}
+			printf( "%d\n", m_h8_index );
+		}
+
+		m_h8_clk = state;
+	}
+}
+
+READ_LINE_MEMBER( ksys573_state::h8_d0_r )
+{
+	return ( m_h8_response->base()[ m_h8_index ] >> 0 ) & 1;
+}
+
+READ_LINE_MEMBER( ksys573_state::h8_d1_r )
+{
+	return ( m_h8_response->base()[ m_h8_index ] >> 1 ) & 1;
+}
+
+READ_LINE_MEMBER( ksys573_state::h8_d2_r )
+{
+	return ( m_h8_response->base()[ m_h8_index ] >> 2 ) & 1;
+}
+
+READ_LINE_MEMBER( ksys573_state::h8_d3_r )
+{
+	return ( m_h8_response->base()[ m_h8_index ] >> 3 ) & 1;
+}
+
 
 /*
 GE765-PWB(B)A
@@ -2510,6 +2563,7 @@ static INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "adc0834", adc083x_device, cs_write )
 	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "adc0834", adc083x_device, clk_write )
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "adc0834", adc083x_device, di_write )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_clk_w )
 
 	PORT_START( "IN1" )
 	PORT_DIPNAME( 0x00000001, 0x00000001, "Unused 1" ) PORT_DIPLOCATION( "DIP SW:1" )
@@ -2524,8 +2578,10 @@ static INPUT_PORTS_START( konami573 )
 	PORT_DIPNAME( 0x00000008, 0x00000000, "Start Up Device" ) PORT_DIPLOCATION( "DIP SW:4" )
 	PORT_DIPSETTING(          0x00000008, "CD-ROM Drive" )
 	PORT_DIPSETTING(          0x00000000, "Flash ROM" )
-	PORT_BIT( 0x00000030, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d0_r )
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d1_r )
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d2_r )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, h8_d3_r )
 	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_adc083x_do )
 	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, read_line_adc083x_sars )
 //  PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2568,7 +2624,7 @@ static INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER( "cassette", konami573_cassette_slot_device, write_line_zs01_sda )
 
 	PORT_START( "IN2" )
-	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER( 1 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER( 1 )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER( 1 )
@@ -2963,9 +3019,13 @@ INPUT_PORTS_END
 	ROM_SYSTEM_BIOS( 0, "std",        "Standard" ) \
 	ROMX_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS( 1, "gchgchmp",   "Found on Gachagachamp" ) \
-	ROMX_LOAD( "700_a01.22g",  0x000000,  0x080000, CRC(39ebb0ca) SHA1(9aab8c637dd2be84d79007e52f108abe92bf29dd), ROM_BIOS(2) ) \
+	ROMX_LOAD( "700a01(gchgchmp).22g",  0x000000,  0x080000, CRC(39ebb0ca) SHA1(9aab8c637dd2be84d79007e52f108abe92bf29dd), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 2, "dsem2",      "Found on Dancing Stage Euro Mix 2" ) \
-	ROMX_LOAD( "700b01.22g",   0x0000000, 0x080000, CRC(6cf852af) NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "700b01.22g",   0x0000000, 0x080000, CRC(6cf852af) SHA1(a2421d0a494892c0e71003c96995ce8f945064dd), ROM_BIOS(3) ) \
+	ROM_REGION( 0x40, "h8_response", 0 ) \
+	ROMX_LOAD( "h8a01.bin",    0x000000, 0x000040, CRC(131e0359) SHA1(967f66578ebc0cf6b044d71af09b59bce1f4a1d0), ROM_BIOS(1) ) \
+	ROMX_LOAD( "h8a01.bin",    0x000000, 0x000040, CRC(131e0359) SHA1(967f66578ebc0cf6b044d71af09b59bce1f4a1d0), ROM_BIOS(2) ) \
+	ROMX_LOAD( "h8b01.bin",    0x000000, 0x000040, CRC(508b057d) SHA1(779177e6312ef272483eeb64a5e84bbae6e301f2), ROM_BIOS(3) )
 
 // BIOS
 ROM_START( sys573 )
