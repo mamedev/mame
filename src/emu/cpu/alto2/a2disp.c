@@ -482,6 +482,7 @@ void alto2_cpu_device::display_state_machine()
 	m_dsp.a63 = a63;
 	m_dsp.a66 = a66;
 	m_dsp.state = next;
+	m_dsp_time += ALTO2_DISPLAY_BITTIME(32);
 }
 
 /**

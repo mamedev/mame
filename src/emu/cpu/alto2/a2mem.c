@@ -598,6 +598,23 @@ READ16_MEMBER( alto2_cpu_device::mecr_r )
 	return data;
 }
 
+//! read i/o space RAM
+READ16_MEMBER ( alto2_cpu_device::ioram_r )
+{
+	offs_t dword_addr = offset / 2;
+	return static_cast<UINT16>(offset & 1 ? GET_ODD(m_mem.ram[dword_addr]) : GET_EVEN(m_mem.ram[dword_addr]));
+}
+
+//! write i/o space RAM
+WRITE16_MEMBER( alto2_cpu_device::ioram_w )
+{
+	offs_t dword_addr = offset / 2;
+	if (offset & 1)
+		PUT_ODD(m_mem.ram[dword_addr], data);
+	else
+		PUT_EVEN(m_mem.ram[dword_addr], data);
+}
+
 /**
  * @brief load the memory address register with some value
  *

@@ -1120,39 +1120,16 @@ WRITE32_MEMBER( alto2_cpu_device::cram_w )
 	*reinterpret_cast<UINT32 *>(m_ucode_cram + offset * 4) = data;
 }
 
-//! direct read access to the microcode CROM
-#define	RD_CROM(addr) (addr < ALTO2_UCODE_RAM_BASE ? \
-	*reinterpret_cast<UINT32 *>(m_ucode_crom + addr * 4) : \
-	*reinterpret_cast<UINT32 *>(m_ucode_cram + (addr - ALTO2_UCODE_RAM_BASE) * 4))
-
-
 //! read constants PROM
 READ16_MEMBER ( alto2_cpu_device::const_r )
 {
 	return *reinterpret_cast<UINT16 *>(m_const_data + offset * 2);
 }
 
-#define	PUT_EVEN(dword,word)			X_WRBITS(dword,32, 0,15,word)
-#define	GET_EVEN(dword)					X_RDBITS(dword,32, 0,15)
-#define	PUT_ODD(dword,word)				X_WRBITS(dword,32,16,31,word)
-#define	GET_ODD(dword)					X_RDBITS(dword,32,16,31)
-
-//! read i/o space RAM
-READ16_MEMBER ( alto2_cpu_device::ioram_r )
-{
-	offs_t dword_addr = offset / 2;
-	return static_cast<UINT16>(offset & 1 ? GET_ODD(m_mem.ram[dword_addr]) : GET_EVEN(m_mem.ram[dword_addr]));
-}
-
-//! write i/o space RAM
-WRITE16_MEMBER( alto2_cpu_device::ioram_w )
-{
-	offs_t dword_addr = offset / 2;
-	if (offset & 1)
-		PUT_ODD(m_mem.ram[dword_addr], data);
-	else
-		PUT_EVEN(m_mem.ram[dword_addr], data);
-}
+//! direct read access to the microcode CROM or CRAM
+#define	RD_UCODE(addr) (addr < ALTO2_UCODE_RAM_BASE ? \
+	*reinterpret_cast<UINT32 *>(m_ucode_crom + addr * 4) : \
+	*reinterpret_cast<UINT32 *>(m_ucode_cram + (addr - ALTO2_UCODE_RAM_BASE) * 4))
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -1161,7 +1138,24 @@ WRITE16_MEMBER( alto2_cpu_device::ioram_w )
 void alto2_cpu_device::device_reset()
 {
 	soft_reset();
-}
+	// call all sub-devices' reset_...
+	reset_memory();
+	reset_disk();
+	reset_disp();
+	reset_kbd();
+	reset_mouse();
+	reset_hw();
+
+	reset_emu();
+	reset_ksec();
+	reset_ether();
+	reset_mrt();
+	reset_dwt();
+	reset_curt();
+	reset_dht();
+	reset_dvt();
+	reset_part();
+	reset_kwd();}
 
 /**
  * @brief callback is called by the drive timer whenever a new sector starts
@@ -2330,14 +2324,10 @@ void alto2_cpu_device::execute_run()
 	do {
 		int do_bs, flags;
 
-		m_cycle++;
-		/* nano seconds per cycle */
-		m_pico_time[m_task] += ALTO2_UCYCLE;
+		m_mpc = m_next;				// next instruction's micro program counter
+		m_mir = RD_UCODE(m_mpc);	// fetch the micro code
 
-		/* next instruction's mpc */
-		m_mpc = m_next;
-		m_mir = RD_CROM(m_mpc);
-
+		// extract the bit fields
 		m_d_rsel = m_rsel = X_RDBITS(m_mir, 32, DRSEL0, DRSEL4);
 		m_d_aluf = X_RDBITS(m_mir, 32, DALUF0, DALUF3);
 		m_d_bs = X_RDBITS(m_mir, 32, DBS0, DBS2);
@@ -2345,82 +2335,77 @@ void alto2_cpu_device::execute_run()
 		m_d_f2 = X_RDBITS(m_mir, 32, DF2_0, DF2_3);
 		m_d_loadt = X_BIT(m_mir, 32, DLOADT);
 		m_d_loadl = X_BIT(m_mir, 32, DLOADL);
-		m_next = X_RDBITS(m_mir, 32, NEXT0, NEXT9) | m_next2;
-		m_next2 = X_RDBITS(RD_CROM(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
-		LOG((LOG_CPU,2,"%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
-			task_name(m_task), m_mpc, m_mir, m_rsel, m_d_aluf, m_d_bs, m_d_f1, m_d_f2, m_d_loadt, m_d_loadl, m_next, m_next2));
+
 		debugger_instruction_hook(this, m_mpc);
 
+		m_cycle++;
+		m_pico_time[m_task] += ALTO2_UCYCLE;	// add per task pico seconds per cycle
+
 		/*
-		 * This bus source decoding is not performed if f1 = 7 or f2 = 7.
-		 * These functions use the BS field to provide part of the address
-		 * to the constant ROM
+		 * This bus source decoding is not performed if f1 == f1_const
+		 * or f2 == f2_const. These functions use the MIR BS field to
+		 * provide a part of the address to the constant ROM instead.
 		 */
 		do_bs = !(m_d_f1 == f1_const || m_d_f2 == f2_const);
 
-		if (m_d_f1 == f1_load_mar) {
-			if (check_mem_load_mar_stall(m_rsel)) {
-				LOG((LOG_CPU,3, "	MAR← stall\n"));
-				m_next2 = m_next;
-				m_next = m_mpc;
-				continue;
-			}
-		} else if (m_d_f2 == f2_load_md) {
-			if (check_mem_write_stall()) {
-				LOG((LOG_CPU,3, "	MD← stall\n"));
-				m_next2 = m_next;
-				m_next = m_mpc;
-				continue;
-			}
+		if (m_d_f1 == f1_load_mar && check_mem_load_mar_stall(m_rsel)) {
+			LOG((LOG_CPU,3, "	MAR← stall\n"));
+			continue;
 		}
-		if (do_bs && m_d_bs == bs_read_md) {
-			if (check_mem_read_stall()) {
-				LOG((LOG_CPU,3, "	←MD stall\n"));
-				m_next2 = m_next;
-				m_next = m_mpc;
-				continue;
-			}
+		if (m_d_f2 == f2_load_md && check_mem_write_stall()) {
+			LOG((LOG_CPU,3, "	MD← stall\n"));
+			continue;
 		}
+		if (do_bs && m_d_bs == bs_read_md && check_mem_read_stall()) {
+			LOG((LOG_CPU,3, "	←MD stall\n"));
+			continue;
+		}
+		// now read the next instruction field from the MIR and modify it
+		m_next = X_RDBITS(m_mir, 32, NEXT0, NEXT9) | m_next2;
+		// prefetch the next instruction's next field as next2
+		m_next2 = X_RDBITS(RD_UCODE(m_next), 32, NEXT0, NEXT9) | (m_next2 & ~ALTO2_UCODE_PAGE_MASK);
+		LOG((LOG_CPU,2,"%s-%04o: %011o r:%02o aluf:%02o bs:%02o f1:%02o f2:%02o t:%o l:%o next:%05o next2:%05o\n",
+			task_name(m_task), m_mpc, m_mir, m_rsel, m_d_aluf, m_d_bs, m_d_f1, m_d_f2, m_d_loadt, m_d_loadl, m_next, m_next2));
 
+		// BUS is all ones at the start of each cycle
 		m_bus = 0177777;
 
 		if (m_rdram_flag)
 			rdram();
 
-		/*
-		 * The constant memory is gated to the bus by F1 == f1_const, F2 == f2_const, or BS >= 4
-		 */
+		// The constant memory is gated to the bus by F1 == f1_const, F2 == f2_const, or BS >= 4
 		if (!do_bs || m_d_bs >= bs_task_4) {
-			int addr = 8 * m_rsel + m_d_bs;
-			UINT16 data = m_const_data[2*addr+0] | (m_const_data[2*addr+1] << 8);
+			UINT32 addr = 8 * m_rsel + m_d_bs;
+			// FIXME: is the format of m_const_data endian safe?
+			UINT16 data = m_const_data[2*addr] | (m_const_data[2*addr+1] << 8);
 			m_bus &= data;
 			LOG((LOG_CPU,2,"	%#o; BUS &= %#o CONST[%03o]\n", m_bus, data, addr));
 		}
 
 		/*
-		 * early f2 has to be done before early bs, because the
-		 * emulator f2 acsource or acdest may change m_rsel
+		 * early F2 function has to be called before early BS,
+		 * because the emulator task F2 acsource or acdest may
+		 * change the m_rsel
 		 */
 		((*this).*m_f2[0][m_task][m_d_f2])();
 
-		/*
-		 * early bs can be done now
-		 */
+		// early BS function can be done now
 		if (do_bs)
 			((*this).*m_bs[0][m_task][m_d_bs])();
 
-		/*
-		 * early f1
-		 */
+		// early F1 function
 		((*this).*m_f1[0][m_task][m_d_f1])();
 
 #if	USE_ALU_74181
-		// The ALU a10 PROM address lines are
-		// A4:SKIP      A3:ALUF0     A2:ALUF1     A1:ALUF2     A0:ALUF3
-		// The PROM output lines are
-		// B0: unused   B1: TSELECT  B2: ALUCI'   B3: ALUM'
-		// B4: ALUS0'   B5: ALUS1'   B6: ALUS2'   B7: ALUS3'
-		// B1 and B3-B7 are inverted on loading the PROM
+		/**
+		 * The ALU a10 PROM address lines are
+		 * A4:SKIP      A3:ALUF0     A2:ALUF1     A1:ALUF2     A0:ALUF3
+		 * The PROM output lines are
+		 * B0: unused   B1: TSELECT  B2: ALUCI'   B3: ALUM'
+		 * B4: ALUS0'   B5: ALUS1'   B6: ALUS2'   B7: ALUS3'
+		 *
+		 * B1 and B3-B7 are inverted on loading the PROM
+		 */
 		UINT8 a10 = m_alu_a10[(m_emu.skip << 4) | m_d_aluf];
 		UINT32 alu = alu_74181(m_bus, m_t, a10);
 		m_aluc0 = (alu >> 16) & 1;
@@ -2641,20 +2626,20 @@ void alto2_cpu_device::execute_run()
 		m_alu = static_cast<UINT16>(alu);
 #endif
 
-		/* WRTRAM now, before L is changed */
+		// WRTRAM must happen now before L is changed
 		if (m_wrtram_flag)
 			wrtram();
 
 		// shifter passes L, if F1 is not one of L LSH 1, L RSH 1 or L LCY 8
 		m_shifter = m_l;
 
-		/* late F1 is done now */
+		// late F1 function call now
 		((*this).*m_f1[1][m_task][m_d_f1])();
 
-		/* late F2 is done now */
+		// late F2 function call now
 		((*this).*m_f2[1][m_task][m_d_f2])();
 
-		/* late BS is done now, if no constant was put on the bus */
+		// late BS function call now, if no constant was put on the bus
 		if (do_bs)
 			((*this).*m_bs[1][m_task][m_d_bs])();
 
@@ -2670,14 +2655,14 @@ void alto2_cpu_device::execute_run()
 			}
 		}
 
-		// update L register and LALUC0
+		// update L register and LALUC0 if LOADL is set
 		if (m_d_loadl) {
 			m_l = m_alu;			// load L from ALU
 			if (flags & ALUM) {
-				m_laluc0 = 0;		// logic operation - latch 0
+				m_laluc0 = 0;		// logic operation - put 0 into latched carry
 				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← %o\n", m_alu, 0));
 			} else {
-				m_laluc0 = m_aluc0;	// arithmethic operation - latch carry
+				m_laluc0 = m_aluc0;	// arithmethic operation - put ALU carry into latched carry
 				LOG((LOG_CPU,2, "	L← ALU (%#o); LALUC0← ALUC0 (%o)\n", m_alu, m_aluc0));
 			}
 			// update M (MYL) register, if a RAM related task is active
@@ -2690,12 +2675,12 @@ void alto2_cpu_device::execute_run()
 
 		// handle task switching
 		if (m_task != m_next2_task) {
-			/* switch now? */
+			// switch now?
 			if (m_task == m_next_task) {
-				/* one more microinstruction */
+				// one more microinstruction
 				m_next_task = m_next2_task;
 			} else {
-				/* save this task's mpc and next2 */
+				// save this task's next and next2
 				m_task_mpc[m_task] = m_next;
 				m_task_next2[m_task] = m_next2;
 				m_task = m_next_task;
@@ -2708,19 +2693,19 @@ void alto2_cpu_device::execute_run()
 			}
 		}
 
-		/*
+		/**
 		 * Subtract the microcycle time from the display time accu.
 		 * If it underflows, call the display state machine and add
-		 * the time for 24 pixel clocks to the accu.
-		 * This is very close to every seventh CPU cycle.
+		 * the time for 32(!) pixel clocks to the accu.
+		 * This is very close to every seventh CPU cycle (really?)
 		 */
-		m_dsp_time -= ALTO2_UCYCLE;
-		if (m_dsp_time < 0) {
-			display_state_machine();
-			m_dsp_time += ALTO2_DISPLAY_BITTIME(24);
+		if (m_dsp_time >= 0) {
+			m_dsp_time -= ALTO2_UCYCLE;
+			if (m_dsp_time < 0)
+				display_state_machine();
 		}
 		if (m_unload_time >= 0) {
-			/*
+			/**
 			 * Subtract the microcycle time from the unload time accu.
 			 * If it underflows, call the unload word function which adds
 			 * the time for 16 or 32 pixel clocks to the accu, or ends
@@ -2853,23 +2838,4 @@ void alto2_cpu_device::soft_reset()
 #if	(USE_BITCLK_TIMER == 0)
 	m_bitclk_time = 0;				// reset the bitclk timing accu
 #endif
-
-	// call all sub-devices' reset_...
-	reset_memory();
-	reset_disk();
-	reset_disp();
-	reset_kbd();
-	reset_mouse();
-	reset_hw();
-
-	reset_emu();
-	reset_ksec();
-	reset_ether();
-	reset_mrt();
-	reset_dwt();
-	reset_curt();
-	reset_dht();
-	reset_dvt();
-	reset_part();
-	reset_kwd();
 }
