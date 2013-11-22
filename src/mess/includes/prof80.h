@@ -9,6 +9,7 @@
 #include "bus/ecbbus/ecbbus.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/prof80mmu.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
 #include "machine/serial.h"
@@ -16,6 +17,7 @@
 #include "machine/upd765.h"
 
 #define Z80_TAG         "z1"
+#define MMU_TAG			"mmu"
 #define UPD765_TAG      "z38"
 #define UPD1990A_TAG    "z43"
 #define RS232_A_TAG     "rs232a"
@@ -35,6 +37,7 @@ public:
 	prof80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
+			m_mmu(*this, MMU_TAG),
 			m_rtc(*this, UPD1990A_TAG),
 			m_fdc(*this, UPD765_TAG),
 			m_ram(*this, RAM_TAG),
@@ -49,6 +52,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<prof80_mmu_device> m_mmu;
 	required_device<upd1990a_device> m_rtc;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
@@ -64,7 +68,6 @@ public:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void machine_start();
 	virtual void machine_reset();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	enum
 	{
@@ -74,16 +77,9 @@ public:
 	DECLARE_WRITE8_MEMBER( flr_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_READ8_MEMBER( status2_r );
-	DECLARE_WRITE8_MEMBER( par_w );
-	DECLARE_WRITE_LINE_MEMBER( floppy_index_w );
 
-	void bankswitch();
 	void ls259_w(int fa, int sa, int fb, int sb);
-	void floppy_motor_off();
-
-	// memory state
-	UINT8 m_mmu[16];        // MMU block register
-	int m_init;             // MMU enable
+	void motor(int mon);
 
 	// RTC state
 	int m_c0;
@@ -91,8 +87,9 @@ public:
 	int m_c2;
 
 	// floppy state
-	int m_fdc_index;        // floppy index hole sensor
-	int m_motor;            // floppy motor
+	int m_motor;
+	int m_ready;
+	int m_select;
 
 	// timers
 	emu_timer   *m_floppy_motor_off_timer;

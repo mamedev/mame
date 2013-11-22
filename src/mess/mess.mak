@@ -1119,6 +1119,7 @@ $(MESSOBJ)/concept.a:           \
 
 $(MESSOBJ)/conitec.a:           \
 	$(MESS_DRIVERS)/prof80.o    \
+	$(MESS_MACHINE)/prof80mmu.o \
 	$(MESS_DRIVERS)/prof180x.o  \
 
 $(MESSOBJ)/cybiko.a:            \
