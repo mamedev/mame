@@ -17,10 +17,9 @@
   or to make room for future additions?
 
 TODO:
-- discrete sound?
-- correct colors
+- discrete sound
+- improve colors
 - unknown writes
-- video/nmi timing
 
 ***************************************************************************/
 
@@ -84,13 +83,9 @@ public:
 
 void lbeach_state::palette_init()
 {
-	// This is guesswork.
-	// The only hints are the gradient on the Seletron screen,
-	// and the highlighted blocks in testmode.
-	
 	// tiles
 	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 1, 0xff, 0xff, 0xff);
+	palette_set_color_rgb(machine(), 1, 0xc0, 0xc0, 0xc0);
 
 	// road
 	palette_set_color_rgb(machine(), 2, 0x00, 0x00, 0x00);
@@ -107,7 +102,7 @@ void lbeach_state::palette_init()
 
 	// player car
 	palette_set_color_rgb(machine(), 10, 0x00, 0x00, 0x00);
-	palette_set_color_rgb(machine(), 11, 0xc0, 0xc0, 0xc0);
+	palette_set_color_rgb(machine(), 11, 0xff, 0xff, 0xff);
 }
 
 
@@ -326,13 +321,13 @@ static MACHINE_CONFIG_START( lbeach, lbeach_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_16MHz / 32) // Motorola MC6800P, 500kHz
 	MCFG_CPU_PROGRAM_MAP(lbeach_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(lbeach_state, nmi_line_pulse, 50) // unknown freq, it affects game speed, glitchy if it's too fast
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", lbeach_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // ?
+	MCFG_SCREEN_REFRESH_RATE(60) // ~60Hz
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511-32, 0, 255-24)
 	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
@@ -372,4 +367,4 @@ ROM_START( lbeach )
 ROM_END
 
 
-GAMEL(1979, lbeach, 0, lbeach, lbeach, driver_device, 0, ROT0, "Olympia / Seletron", "Long Beach", GAME_WRONG_COLORS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_lbeach )
+GAMEL(1979, lbeach, 0, lbeach, lbeach, driver_device, 0, ROT0, "Olympia / Seletron", "Long Beach", GAME_IMPERFECT_COLORS | GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_lbeach )
