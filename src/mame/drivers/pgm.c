@@ -3713,6 +3713,8 @@ ROM_START( ket )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketsui_v100.u38", 0x000000, 0x200000, CRC(dfe62f3b) SHA1(baa58d1ce47a707f84f65779ac0689894793e9d9) )
+	// an alt version of this rom exists with 0xff fill in the unused area after 0x1443bc rather than random data like the one above, there are no code changes.
+	//ROM_LOAD16_WORD_SWAP( "ketsui_v100.u38", 0x000000, 0x200000, CRC(e140f8a4) SHA1(34fd25f8896935503d7537e89a4cd174e8995070) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
