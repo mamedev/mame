@@ -294,6 +294,7 @@ void f2_late_evenfield(void);		//!< branch on the evenfield flip-flop
 
 void init_disp();					//!< initialize the display context
 void exit_disp();					//!< deinitialize the display context
+void reset_disp();					//!< reset the display context
 
 #endif	// _A2DISP_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

@@ -15,7 +15,7 @@
 void alto2_cpu_device::f1_early_dht_block()
 {
 	m_dsp.dht_blocks = true;
-	/* clear the wakeup for the display horizontal task */
+	// clear the wakeup for the display horizontal task
 	m_task_wakeup &= ~(1 << m_task);
 	LOG((LOG_DHT,2,"	BLOCK %s\n", task_name(m_task)));
 }
@@ -41,7 +41,6 @@ void alto2_cpu_device::f2_late_dht_setmode()
  */
 void alto2_cpu_device::activate_dht()
 {
-	/* TODO: what do we do here? */
 	m_task_wakeup &= ~(1 << m_task);
 }
 
@@ -63,3 +62,8 @@ void alto2_cpu_device::exit_dht()
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_dht()
+{
+	m_dsp.dht_blocks = true;
+	m_dsp.setmode = 0;
+}

@@ -808,9 +808,6 @@ void alto2_cpu_device::init_ether(int task)
 	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
 	m_ether_a49 = prom_load(machine(), &pl_enet_a49, memregion("ether_a49")->base());
 
-	// FIXME: read configuration for m_eth.duckbreath enable
-	m_eth.duckbreath = m_duckbreath_sec;
-
 	set_bs(task, bs_ether_eidfct,	&alto2_cpu_device::bs_early_eidfct,	0);
 
 	set_f1(task, f1_block,			&alto2_cpu_device::f1_early_eth_block, 0);
@@ -846,3 +843,25 @@ void alto2_cpu_device::exit_ether()
 	// nothing to do yet
 }
 
+//! delay between two duckbreaths in seconds
+static const int duckbreath_sec[8] = {
+	0, 5, 10, 15, 30, 60, 90, 120
+};
+void alto2_cpu_device::reset_ether()
+{
+	memset(m_eth.fifo, 0, sizeof(m_eth.fifo));
+	m_eth.fifo_rd = 0;
+	m_eth.fifo_wr = 0;
+	m_eth.status = 0;
+	m_eth.rx_crc = 0;
+	m_eth.tx_crc = 0;
+	m_eth.rx_count = 0;
+	m_eth.tx_count = 0;
+	m_eth.rx_timer->reset();
+	m_eth.tx_timer->reset();
+	ioport_port* config = ioport("CONFIG");
+	if (config)
+		m_eth.duckbreath = duckbreath_sec[(config->read() >> 4) & 7];
+	else
+		m_eth.duckbreath = 0;
+}

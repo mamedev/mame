@@ -25,5 +25,6 @@ void f2_late_load_csr();						//!< f2_load_csr late: load the cursor shift regis
 void activate_curt();							//!< curt_activate: called by the CPU when the cursor task becomes active
 void init_curt(int task = task_curt);		 	//!< initialize cursor task
 void exit_curt();								//!< deinitialize cursor task
+void reset_curt();								//!< reset cursor task
 #endif // _A2CURT_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

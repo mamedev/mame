@@ -64,9 +64,9 @@ struct {
  * @return false, if memory address can be loaded
  */
 inline bool check_mem_load_mar_stall(UINT8 rsel) {
-    if (ALTO2_MEM_NONE == m_mem.access)
-        return false;
-    return cycle() < m_mem.cycle+5;
+	if (ALTO2_MEM_NONE == m_mem.access)
+		return false;
+	return cycle() < m_mem.cycle+5;
 }
 
 /**
@@ -82,9 +82,9 @@ inline bool check_mem_load_mar_stall(UINT8 rsel) {
  * @return false, if memory can be read without wait cycle
  */
 inline bool check_mem_read_stall() {
-    if (ALTO2_MEM_NONE == m_mem.access)
-        return false;
-    return cycle() < m_mem.cycle+4;
+	if (ALTO2_MEM_NONE == m_mem.access)
+		return false;
+	return cycle() < m_mem.cycle+4;
 }
 
 /**
@@ -99,9 +99,9 @@ inline bool check_mem_read_stall() {
  * @return false, if memory can be written without wait cycle
  */
 inline bool check_mem_write_stall() {
-    if (ALTO2_MEM_NONE == m_mem.access)
-        return false;
-    return cycle() < m_mem.cycle+2;
+	if (ALTO2_MEM_NONE == m_mem.access)
+		return false;
+	return cycle() < m_mem.cycle+2;
 }
 
 
@@ -136,5 +136,6 @@ void watch_read(UINT32 addr, UINT32 data);
 
 void init_memory();								//!< initialize the memory system
 void exit_memory();								//!< deinitialize the memory system
+void reset_memory();							//!< reset the memory system
 #endif // _A2MEM_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

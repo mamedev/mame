@@ -36,3 +36,8 @@ void alto2_cpu_device::exit_mrt()
 {
 	// nothing to do yet
 }
+
+void alto2_cpu_device::reset_mrt()
+{
+	// nothing to do yet
+}

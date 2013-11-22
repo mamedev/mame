@@ -12,7 +12,6 @@
 //! called by the CPU when the parity task becomes active
 void alto2_cpu_device::activate_part()
 {
-	/* TODO: what do we do here ? */
 	m_task_wakeup &= ~(1 << m_task);
 }
 
@@ -26,4 +25,10 @@ void alto2_cpu_device::exit_part()
 {
 	// nothing to do yet
 }
+
+void alto2_cpu_device::reset_part()
+{
+	// nothing to do yet
+}
+
 

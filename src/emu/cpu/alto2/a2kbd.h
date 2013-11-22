@@ -106,5 +106,6 @@ DECLARE_READ16_MEMBER( kbd_ad_r );			//!< read the keyboard matrix
 
 void init_kbd(UINT16 bootkey = 0177777);	//!< initialize the keyboard hardware, optinally set the boot key
 void exit_kbd();							//!< deinitialize the keyboard hardware
+void reset_kbd();							//!< reset the keyboard hardware
 #endif // _A2KBD_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

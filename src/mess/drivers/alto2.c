@@ -123,6 +123,15 @@ static INPUT_PORTS_START( alto2 )
 	PORT_CONFNAME( 0x01, 0x01, "Memory switch")
 	PORT_CONFSETTING( 0x00, "on")
 	PORT_CONFSETTING( 0x01, "off")
+	PORT_CONFNAME( 0x70, 0x00, "Ethernet 'duckbreath' fake")
+	PORT_CONFSETTING( 0x00, "off")
+	PORT_CONFSETTING( 0x10, "5 seconds")
+	PORT_CONFSETTING( 0x20, "10 seconds")
+	PORT_CONFSETTING( 0x30, "15 seconds")
+	PORT_CONFSETTING( 0x40, "30 seconds")
+	PORT_CONFSETTING( 0x50, "60 seconds")
+	PORT_CONFSETTING( 0x60, "90 seconds")
+	PORT_CONFSETTING( 0x70, "120 seconds")
 INPUT_PORTS_END
 
 /* ROM */

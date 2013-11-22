@@ -77,3 +77,11 @@ void alto2_cpu_device::exit_curt()
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_curt()
+{
+	m_dsp.curt_blocks = false;
+	m_dsp.xpreg = 0;
+	m_dsp.csr = 0;
+	m_dsp.curdata = 0;
+	m_dsp.curword = 0;
+}

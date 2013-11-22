@@ -66,7 +66,8 @@ struct {
 }	m_mouse;
 
 UINT16 mouse_read();							//!< return the mouse motion flags
-void init_mouse();								//!< initialize the mouse context to useful values
-void exit_mouse();								//!< deinitialize the mouse
+void init_mouse();								//!< initialize the mouse context
+void exit_mouse();								//!< deinitialize the mouse context
+void reset_mouse();								//!< reset the mouse context
 #endif	// _A2MOUSE_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

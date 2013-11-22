@@ -528,6 +528,33 @@ void alto2_cpu_device::exit_disp()
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_disp()
+{
+	m_dsp.state = 020;
+	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
+	m_dsp.a63 = 0;
+	m_dsp.a66 = 0;
+	m_dsp.setmode = 0;
+	m_dsp.inverse = 0;
+	m_dsp.halfclock = 0;
+	m_dsp.clr = 0;
+	m_dsp.fifo_wr = 0;
+	m_dsp.fifo_rd = 0;
+	m_dsp.dht_blocks = false;
+	m_dsp.dwt_blocks = false;
+	m_dsp.curt_blocks = false;
+	m_dsp.curt_wakeup = false;
+	m_dsp.vblank = 0;
+	m_dsp.xpreg = 0;
+	m_dsp.csr = 0;
+	m_dsp.curword = 0;
+	m_dsp.curdata = 0;
+	memset(m_dsp.raw_bitmap, 0, sizeof(UINT16) * ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
+	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
+		memset(m_dsp.scanline[y], 0, sizeof(UINT8) * ALTO2_DISPLAY_TOTAL_WIDTH);
+	m_dsp.odd_frame = false;
+}
+
 /* Video update */
 UINT32 alto2_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

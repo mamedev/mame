@@ -102,7 +102,8 @@ void f2_late_xfrdat();							//!< F2 func: branch on the data transfer state
 void f2_late_swrnrdy();							//!< F2 func: branch on the disk ready signal
 void f2_late_nfer();							//!< f2_nfer late: branch on the disk fatal error condition
 void f2_late_strobon();							//!< f2_strobon late: branch on the seek busy status
-void init_disk();								//!< initialize the disk context
-void exit_disk();								//!< deinitialize the disk context
+void init_disk();								//!< initialize the disk controller
+void exit_disk();								//!< deinitialize the disk controller
+void reset_disk();								//!< reset the disk controller
 #endif	// _A2DISK_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

@@ -431,3 +431,12 @@ void alto2_cpu_device::exit_ram()
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_ram()
+{
+	m_rdram_flag = false;
+	m_wrtram_flag = false;
+	m_m = 0;
+	memset(m_s, 0, sizeof(m_s));
+}
+
+

@@ -24,5 +24,6 @@ void f2_late_dht_setmode();						//!< F2 func: set the next scanline's mode inve
 void activate_dht();							//!< called by the CPU when the display horizontal task becomes active
 void init_dht(int task = task_dht);				//!< initialize display horizontal task
 void exit_dht();								//!< deinitialize display horizontal task
+void reset_dht();								//!< reset the display horizontal task
 #endif // _A2DHT_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

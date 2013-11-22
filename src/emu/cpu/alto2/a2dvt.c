@@ -42,3 +42,7 @@ void alto2_cpu_device::exit_dvt()
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_dvt()
+{
+	// nothing to do yet
+}

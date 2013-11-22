@@ -54,3 +54,11 @@ void alto2_cpu_device::exit_dwt()
 {
 	// nothing to do yet
 }
+
+void alto2_cpu_device::reset_dwt()
+{
+	m_dsp.dwt_blocks = false;
+	memset(m_dsp.fifo, 0, sizeof(m_dsp.fifo));
+	m_dsp.fifo_wr = 0;
+	m_dsp.fifo_rd = 0;
+}

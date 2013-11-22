@@ -707,3 +707,9 @@ void alto2_cpu_device::exit_emu()
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_emu()
+{
+	m_emu.ir = 0;
+	m_emu.skip = 0;
+	m_emu.cy = 0;
+}

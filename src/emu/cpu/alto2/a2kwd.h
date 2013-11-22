@@ -44,7 +44,8 @@ enum {
 };
 
 void f1_early_kwd_block();						//!< F1 func: disable the disk word task
-void init_kwd(int task = task_kwd);				//!< initialize disk word task
-void exit_kwd();								//!< deinitialize disk word task
+void init_kwd(int task = task_kwd);				//!< initialize the disk word task
+void exit_kwd();								//!< deinitialize the disk word task
+void reset_kwd();								//!< reset the disk word task
 #endif // _A2KWD_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

@@ -50,3 +50,7 @@ void alto2_cpu_device::exit_ksec()
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_ksec()
+{
+	// nothing to do yet
+}

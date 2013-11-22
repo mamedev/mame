@@ -63,5 +63,6 @@ DECLARE_WRITE16_MEMBER( xbus_w );			//!< write an XBUS address (?)
 
 void init_hw();								//!< initialize miscellaneous hardware
 void exit_hw();								//!< deinitialize miscellaneous hardware
+void reset_hw();							//!< reset miscellaneous hardware
 #endif	// _A2HW_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

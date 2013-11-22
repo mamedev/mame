@@ -50,13 +50,13 @@ enum {
 
 //!< F1 functions for RAM related tasks
 enum {
-    f1_ram_swmode		= f1_task_10,       	//!< f1 10: switch mode to CROM/CRAM in same page
-    f1_ram_wrtram		= f1_task_11,       	//!< f1 11: start WRTRAM cycle
-    f1_ram_rdram		= f1_task_12,       	//!< f1 12: start RDRAM cycle
+	f1_ram_swmode		= f1_task_10,       	//!< f1 10: switch mode to CROM/CRAM in same page
+	f1_ram_wrtram		= f1_task_11,       	//!< f1 11: start WRTRAM cycle
+	f1_ram_rdram		= f1_task_12,       	//!< f1 12: start RDRAM cycle
 #if	(ALTO2_UCODE_RAM_PAGES == 3)
-    f1_ram_load_rmr		= f1_task_13,       	//!< f1 13: load the reset mode register
+	f1_ram_load_rmr		= f1_task_13,       	//!< f1 13: load the reset mode register
 #else	// ALTO2_UCODE_RAM_PAGES != 3
-    f1_ram_load_srb		= f1_task_13        	//!< f1 14: load the S register bank from BUS[12-14]
+	f1_ram_load_srb		= f1_task_13        	//!< f1 14: load the S register bank from BUS[12-14]
 #endif
 };
 
@@ -74,6 +74,7 @@ void f1_late_load_rmr();						//!< F1 func: load the reset mode register
 void f1_late_load_srb();						//!< F1 func: load the S register bank from BUS[12-14]
 #endif
 void init_ram(int task);						//!< called by RAM related tasks
-void exit_ram();
+void exit_ram();								//!< deinitialize the RAM related tasks
+void reset_ram();								//!< reset the RAM related tasks
 #endif // A2RAM_H
 #endif	// ALTO2_DEFINE_CONSTANTS

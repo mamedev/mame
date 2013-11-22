@@ -873,7 +873,7 @@ private:
 	UINT64 ntime() { return m_cycle*ALTO2_UCYCLE/1000; }	//!< return the current nano seconds
 
 	void hard_reset();								//!< reset the various registers
-	int soft_reset();								//!< soft reset
+	void soft_reset();								//!< soft reset
 
 	void fn_bs_bad_0();								//! bs dummy early function
 	void fn_bs_bad_1();								//! bs dummy late function

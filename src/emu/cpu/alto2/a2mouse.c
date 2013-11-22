@@ -262,3 +262,13 @@ void alto2_cpu_device::exit_mouse()
 {
 	// nothing to do yet
 }
+
+void alto2_cpu_device::reset_mouse()
+{
+	m_mouse.x = 0;
+	m_mouse.y = 0;
+	m_mouse.dx = 0;
+	m_mouse.dy = 0;
+	m_mouse.latch = 0;
+	m_mouse.phase = 0;
+}

@@ -1690,10 +1690,66 @@ void alto2_cpu_device::init_disk()
 }
 
 /**
- * @brief exit disk controller - free all timers
+ * @brief exit disk controller - free all timers?
  */
 void alto2_cpu_device::exit_disk()
 {
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_disk()
+{
+	m_dsk.drive = 0;
+	m_dsk.kaddr = 0;
+	m_dsk.kadr = 0;
+	m_dsk.kstat = 0;
+	m_dsk.kcom = 0;
+	m_dsk.krecno = 0;
+	m_dsk.egate = 1;
+	m_dsk.wrgate = 1;
+	m_dsk.rdgate = 1;
+	m_dsk.shiftin = 0;
+	m_dsk.shiftout = 0;
+	m_dsk.datain = 0;
+	m_dsk.dataout = 0;
+	m_dsk.krwc = 0;
+	m_dsk.kfer = 0;
+	m_dsk.wdtskena = 1;
+	m_dsk.wddone = 0;
+	m_dsk.wdinit0 = 0;
+	m_dsk.wdinit = 0;
+	m_dsk.strobe = 0;
+	m_dsk.strobon_timer->reset();
+	m_dsk.bitclk = 0;
+#if	USE_BITCLK_TIMER
+	m_dsk.bitclk_timer->reset();
+#else
+   m_dsk.bitclk_time[0] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
+   m_dsk.bitclk_time[1] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
+#endif
+	m_dsk.datin = 0;
+	m_dsk.bitcount = 0;
+	m_dsk.carry = 0;
+	m_dsk.seclate = 0;
+	m_dsk.seclate_timer->reset();
+	m_dsk.seekok = 0;
+	m_dsk.ok_to_run = 0;
+	m_dsk.ok_to_run_timer->adjust(attotime::from_nsec(35 * ALTO2_UCYCLE / 1000), 1);
+	m_dsk.ready_mf31a = 0;
+	m_dsk.ready_timer->reset();
+	m_dsk.seclate_mf31b = 0;
+	m_dsk.ff_21a = JKFF_0;
+	m_dsk.ff_21a_old = JKFF_0;
+	m_dsk.ff_21b = JKFF_0;
+	m_dsk.ff_22a = JKFF_0;
+	m_dsk.ff_22b = JKFF_0;
+	m_dsk.ff_43b = JKFF_0;
+	m_dsk.ff_53a = JKFF_0;
+	m_dsk.ff_43a = JKFF_0;
+	m_dsk.ff_53b = JKFF_0;
+	m_dsk.ff_44a = JKFF_0;
+	m_dsk.ff_44b = JKFF_0;
+	m_dsk.ff_45a = JKFF_0;
+	m_dsk.ff_45b = JKFF_0;
+
+}

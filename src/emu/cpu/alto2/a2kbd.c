@@ -49,10 +49,6 @@ READ16_MEMBER( alto2_cpu_device::kbd_ad_r )
 void alto2_cpu_device::init_kbd(UINT16 bootkey)
 {
 	m_kbd.bootkey = bootkey;
-	m_kbd.matrix[0] = 0177777;
-	m_kbd.matrix[1] = 0177777;
-	m_kbd.matrix[2] = 0177777;
-	m_kbd.matrix[3] = 0177777;
 }
 
 void alto2_cpu_device::exit_kbd()
@@ -60,3 +56,10 @@ void alto2_cpu_device::exit_kbd()
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_kbd()
+{
+	m_kbd.matrix[0] = 0177777;
+	m_kbd.matrix[1] = 0177777;
+	m_kbd.matrix[2] = 0177777;
+	m_kbd.matrix[3] = 0177777;
+}

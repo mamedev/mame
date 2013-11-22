@@ -43,7 +43,8 @@ enum {
 };
 
 void f1_early_ksec_block(void);                 //!< block ksec task
-void init_ksec(int task = task_ksec);			//!< initialize disk sector task
-void exit_ksec();								//!< deinitialize disk sector task
+void init_ksec(int task = task_ksec);			//!< initialize the disk sector task
+void exit_ksec();								//!< deinitialize the disk sector task
+void reset_ksec();								//!< reset the disk sector task
 #endif // _A2KSEC_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

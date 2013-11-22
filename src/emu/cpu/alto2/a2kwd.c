@@ -48,4 +48,7 @@ void alto2_cpu_device::exit_kwd()
 	// nothing to do yet
 }
 
-
+void alto2_cpu_device::reset_kwd()
+{
+	// nothing to do yet
+}

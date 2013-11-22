@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 #include "alto2cpu.h"
+#include "a2roms.h"
 
 /**
  * @brief read printer paper ready bit
@@ -315,20 +316,93 @@ WRITE16_MEMBER( alto2_cpu_device::utilout_w )
 }
 
 /**
+ * <PRE>
+ * TODO: use madr.a65 and madr.a64 to determine the actual I/O address ranges
+ *
+ * madr.a65
+ *	address	line	connected to
+ *	-------------------------------
+ *	A0		MAR[11]
+ *	A1		KEYSEL
+ *	A2		MAR[7-10] == 0
+ *	A3		MAR[12]
+ *	A4		MAR[13]
+ *	A5		MAR[14]
+ *	A6		MAR[15]
+ *	A7		IOREF (MAR[0-6] == 1)
+ *
+ *	output data	connected to
+ *	-------------------------------
+ *	D0		IOSEL0
+ *	D1		IOSEL1
+ *	D2		IOSEL2
+ *	D3		INTIO
+ *
+ * madr.a64
+ *	address	line	connected to
+ *	-------------------------------
+ *	A0		STORE
+ *	A1		MAR[11]
+ *	A2		MAR[7-10] == 0
+ *	A3		MAR[12]
+ *	A4		MAR[13]
+ *	A5		MAR[14]
+ *	A6		MAR[15]
+ *	A7		IOREF (MAR[0-6] == 1)
+ *
+ *	output data	connected to
+ *	-------------------------------
+ *	D0		& MISYSCLK -> SELP
+ *	D1		^ INTIO -> INTIOX
+ *	"		^ 1 -> NERRSEL
+ *	"		& WRTCLK -> NRSTE
+ *	D2		XREG'
+ *	D3		& MISYSCLK -> LOADERC
+ * </PRE>
+ */
+
+static const prom_load_t pl_madr_a64 =
+{
+	"madr.a64",
+	0,
+	"a66b0eda",
+	"4d9088f592caa3299e90966b17765be74e523144",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	017,						// invert D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+static const prom_load_t pl_madr_a65 =
+{
+	"madr.a65",
+	0,
+	"ba37febd",
+	"82e9db1cb65f451755295f0d179e6f8fe3349d4d",
+	/* size */	0400,
+	/* amap */	AMAP_DEFAULT,
+	/* axor */	0,
+	/* dxor */	017,						// invert D0-D3
+	/* width */	4,
+	/* shift */	0,
+	/* dmap */	DMAP_DEFAULT,
+	/* dand */	ZERO,
+	/* type */	sizeof(UINT8)
+};
+
+/**
  * @brief clear all keys and install the mmio handler for KBDAD to KBDAD+3
  */
 void alto2_cpu_device::init_hw()
 {
 	memset(&m_hw, 0, sizeof(m_hw));
-
-	// open inputs on UTILIN
-	m_hw.utilin = 0177777;
-
-	// open inputs on the XBUS (?)
-	m_hw.xbus[0] = 0177777;
-	m_hw.xbus[1] = 0177777;
-	m_hw.xbus[2] = 0177777;
-	m_hw.xbus[3] = 0177777;
+	m_madr_a64 = prom_load(machine(), &pl_madr_a64, memregion("madr_a64")->base());
+	m_madr_a65 = prom_load(machine(), &pl_madr_a65, memregion("madr_a65")->base());
 }
 
 void alto2_cpu_device::exit_hw()
@@ -336,3 +410,15 @@ void alto2_cpu_device::exit_hw()
 	// nothing to do yet
 }
 
+void alto2_cpu_device::reset_hw()
+{
+	m_hw.eia = 0;
+	m_hw.utilout = 0;
+	// open inputs on the XBUS (?)
+	m_hw.xbus[0] = 0177777;
+	m_hw.xbus[1] = 0177777;
+	m_hw.xbus[2] = 0177777;
+	m_hw.xbus[3] = 0177777;
+	// open inputs on UTILIN
+	m_hw.utilin = 0177777;
+}

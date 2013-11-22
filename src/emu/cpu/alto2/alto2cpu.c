@@ -757,40 +757,6 @@ static const prom_load_t pl_3kcram_a37 =
 	/* type */	sizeof(UINT8)
 };
 
-static const prom_load_t pl_madr_a64 =
-{
-	"madr.a64",
-	0,
-	"a66b0eda",
-	"4d9088f592caa3299e90966b17765be74e523144",
-	/* size */	0400,
-	/* amap */	AMAP_DEFAULT,
-	/* axor */	0,
-	/* dxor */	017,						// invert D0-D3
-	/* width */	4,
-	/* shift */	0,
-	/* dmap */	DMAP_DEFAULT,
-	/* dand */	ZERO,
-	/* type */	sizeof(UINT8)
-};
-
-static const prom_load_t pl_madr_a65 =
-{
-	"madr.a65",
-	0,
-	"ba37febd",
-	"82e9db1cb65f451755295f0d179e6f8fe3349d4d",
-	/* size */	0400,
-	/* amap */	AMAP_DEFAULT,
-	/* axor */	0,
-	/* dxor */	017,						// invert D0-D3
-	/* width */	4,
-	/* shift */	0,
-	/* dmap */	DMAP_DEFAULT,
-	/* dand */	ZERO,
-	/* type */	sizeof(UINT8)
-};
-
 static const prom_load_t pl_madr_a90 =
 {
 	"madr.a90",
@@ -867,8 +833,6 @@ void alto2_cpu_device::device_start()
 	m_ctl2k_u76 = prom_load(machine(), &pl_2kctl_u76, memregion("2kctl_u76")->base());
 	m_alu_a10 = prom_load(machine(), &pl_alu_a10, memregion("alu_a10")->base());
 	m_cram3k_a37 = prom_load(machine(), &pl_3kcram_a37, memregion("3kcram_a37")->base());
-	m_madr_a64 = prom_load(machine(), &pl_madr_a64, memregion("madr_a64")->base());
-	m_madr_a65 = prom_load(machine(), &pl_madr_a65, memregion("madr_a65")->base());
 	m_madr_a90 = prom_load(machine(), &pl_madr_a90, memregion("madr_a90")->base());
 	m_madr_a91 = prom_load(machine(), &pl_madr_a91, memregion("madr_a91")->base());
 
@@ -1194,10 +1158,28 @@ WRITE16_MEMBER( alto2_cpu_device::ioram_w )
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-// FIXME
 void alto2_cpu_device::device_reset()
 {
 	soft_reset();
+
+	// call all sub-devices' reset_...
+	reset_memory();
+	reset_disk();
+	reset_disp();
+	reset_kbd();
+	reset_mouse();
+	reset_hw();
+
+	reset_emu();
+	reset_ksec();
+	reset_ether();
+	reset_mrt();
+	reset_dwt();
+	reset_curt();
+	reset_dht();
+	reset_dvt();
+	reset_part();
+	reset_kwd();
 }
 
 /**
@@ -1213,7 +1195,6 @@ static void disk_sector_start(void* cookie, int unit)
 
 void alto2_cpu_device::interface_post_reset()
 {
-
 	// set the disk unit sector callbacks
 	for (int unit = 0; unit < diablo_hd_device::DIABLO_UNIT_MAX; unit++) {
 		diablo_hd_device* dhd = m_drive[unit];
@@ -2872,7 +2853,7 @@ void alto2_cpu_device::hard_reset()
 }
 
 /** @brief software initiated reset (STARTF) */
-int alto2_cpu_device::soft_reset()
+void alto2_cpu_device::soft_reset()
 {
 
 	for (int task = 0; task < ALTO2_TASKS; task++) {
@@ -2886,7 +2867,6 @@ int alto2_cpu_device::soft_reset()
 
 	m_dsp_time = 0;					// reset the display state timing
 
-	// FIXME: all sub-devices need a reset_... method as well
-
-	return m_next_task;				// return next task (?)
+	m_task = task_emu;				// start with task 0 (emulator)
+	m_task_wakeup |= 1 << task_emu;	// set wakeup flag
 }

@@ -782,71 +782,7 @@ void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
  */
 void alto2_cpu_device::init_memory()
 {
-    memset(&m_mem, 0, sizeof(m_mem));
-
-#if	0	// can't read ioport() at this time
-	// allocate 64KB or 128KB of main memory
-	m_mem.size = ioport("CONFIG")->read() & 1 ? ALTO2_RAM_SIZE : 2 * ALTO2_RAM_SIZE;
-#else
-	m_mem.size = 2 * ALTO2_RAM_SIZE;
-#endif
-	printf("main memory %u KB\n", m_mem.size / 1024);
-	m_mem.ram = auto_alloc_array_clear(machine(), UINT32, sizeof(UINT16) * m_mem.size);
-	m_mem.hpb = auto_alloc_array_clear(machine(), UINT8,  sizeof(UINT16) * m_mem.size);
-
-	/**
-	 * <PRE>
-	 * TODO: use madr.a65 and madr.a64 to determine the actual I/O address ranges
-	 *
-	 * madr.a65
-	 *	address	line	connected to
-	 *	-------------------------------
-	 *	A0		MAR[11]
-	 *	A1		KEYSEL
-	 *	A2		MAR[7-10] == 0
-	 *	A3		MAR[12]
-	 *	A4		MAR[13]
-	 *	A5		MAR[14]
-	 *	A6		MAR[15]
-	 *	A7		IOREF (MAR[0-6] == 1)
-	 *
-	 *	output data	connected to
-	 *	-------------------------------
-	 *	D0		IOSEL0
-	 *	D1		IOSEL1
-	 *	D2		IOSEL2
-	 *	D3		INTIO
-	 *
-	 * madr.a64
-	 *	address	line	connected to
-	 *	-------------------------------
-	 *	A0		STORE
-	 *	A1		MAR[11]
-	 *	A2		MAR[7-10] == 0
-	 *	A3		MAR[12]
-	 *	A4		MAR[13]
-	 *	A5		MAR[14]
-	 *	A6		MAR[15]
-	 *	A7		IOREF (MAR[0-6] == 1)
-	 *
-	 *	output data	connected to
-	 *	-------------------------------
-	 *	D0		& MISYSCLK -> SELP
-	 *	D1		^ INTIO -> INTIOX
-	 *	"		^ 1 -> NERRSEL
-	 *	"		& WRTCLK -> NRSTE
-	 *	D2		XREG'
-	 *	D3		& MISYSCLK -> LOADERC
-	 * </PRE>
-	 */
-
-#if	ALTO2_HAMMING_CHECK
-	// Initialize the hamming codes and parity bit
-	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_BASE; addr++) {
-		hamming_code(1, addr, 0);
-		hamming_code(1, 0200000 + addr, 0);
-	}
-#endif
+	memset(&m_mem, 0, sizeof(m_mem));
 }
 
 void alto2_cpu_device::exit_memory()
@@ -859,4 +795,44 @@ void alto2_cpu_device::exit_memory()
 		auto_free(machine(), m_mem.hpb);
 		m_mem.hpb = 0;
 	}
+}
+
+void alto2_cpu_device::reset_memory()
+{
+	if (m_mem.ram) {
+		auto_free(machine(), m_mem.ram);
+		m_mem.ram = 0;
+	}
+	if (m_mem.hpb) {
+		auto_free(machine(), m_mem.hpb);
+		m_mem.hpb = 0;
+	}
+	// allocate 64K or 128K words of main memory
+	ioport_port* config = ioport("CONFIG");
+	if (config)
+		m_mem.size = config->read() & 1 ? ALTO2_RAM_SIZE : 2 * ALTO2_RAM_SIZE;
+	else
+		m_mem.size = ALTO2_RAM_SIZE;
+	logerror("Main memory %u KiB\n", static_cast<UINT32>(sizeof(UINT16) * m_mem.size / 1024));
+
+	m_mem.ram = auto_alloc_array_clear(machine(), UINT32, sizeof(UINT16) * m_mem.size);
+	m_mem.hpb = auto_alloc_array_clear(machine(), UINT8,  sizeof(UINT16) * m_mem.size);
+
+#if	ALTO2_HAMMING_CHECK
+	// Initialize the hamming codes and parity bit
+	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_BASE; addr++) {
+		hamming_code(1, addr, 0);
+		hamming_code(1, 0200000 + addr, 0);
+	}
+#endif
+	m_mem.mar = 0;
+	m_mem.rmdd = 0;
+	m_mem.wmdd = 0;
+	m_mem.md = 0;
+	m_mem.cycle = 0;
+	m_mem.access = 0;
+	m_mem.error = 0;
+	m_mem.mear = 0;
+	m_mem.mesr = 0;
+	m_mem.mecr = 0;
 }
