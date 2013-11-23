@@ -160,7 +160,7 @@ void debug_view_state::recompute()
 	for (state_item *item = m_state_list; item != NULL; item = item->m_next)
 	{
 		count++;
-		maxtaglen = MAX(maxtaglen, item->m_symbol.len());
+		maxtaglen = MAX(maxtaglen, item->m_symbol_w);
 		maxvallen = MAX(maxvallen, item->m_vallen);
 	}
 
@@ -221,7 +221,7 @@ void debug_view_state::view_update()
 		if (curitem != NULL)
 		{
 			UINT32 effcol = m_topleft.x;
-			UINT8 attrib = DCA_NORMAL;
+			UINT32 attrib = DCA_NORMAL;
 			UINT32 len = 0;
 			astring valstr;
 
@@ -236,6 +236,7 @@ void debug_view_state::view_update()
 						curitem->m_symbol.reset();
 						for (int i = 0; i < m_total.x; i++)
 							curitem->m_symbol.cat("-");
+						curitem->m_symbol_w = utf8_width(curitem->m_symbol.cstr());
 						break;
 
 					case REG_CYCLES:
@@ -283,24 +284,17 @@ void debug_view_state::view_update()
 			if (curitem->m_lastval != curitem->m_currval)
 				attrib = DCA_CHANGED;
 
-			// build up a string
-			char temp[256];
-			if (curitem->m_symbol.len() < m_divider - 1)
-			{
-				memset(&temp[len], ' ', m_divider - 1 - curitem->m_symbol.len());
-				len += m_divider - 1 - curitem->m_symbol.len();
-			}
-
-			memcpy(&temp[len], curitem->m_symbol.cstr(), curitem->m_symbol.len());
-			len += curitem->m_symbol.len();
-
-			temp[len++] = ' ';
-			temp[len++] = ' ';
-
-			memcpy(&temp[len], valstr.cstr(), curitem->m_vallen);
-			len += curitem->m_vallen;
-
-			temp[len++] = ' ';
+			// build up a unciode_char string
+			unicode_char temp[256];
+			for (int i = 0; i < ARRAY_LENGTH(temp); i++)
+				temp[i] = ' ';
+			len = curitem->m_symbol_w > m_divider - 1 ? 0 : m_divider - 1 - curitem->m_symbol_w;
+			// decode symbol UTF-8 to unicode values
+			len += ustring_from_utf8(&temp[len], ARRAY_LENGTH(temp) - len, curitem->m_symbol.cstr());
+			len += 2;
+			// decode value UTF-8 to unicode values
+			len += ustring_from_utf8(&temp[len], ARRAY_LENGTH(temp) - len, valstr.cstr());
+			len += 1;
 			temp[len] = 0;
 
 			// copy data
@@ -341,6 +335,7 @@ debug_view_state::state_item::state_item(int index, const char *name, UINT8 valu
 		m_currval(0),
 		m_index(index),
 		m_vallen(valuechars),
-		m_symbol(name)
+		m_symbol(name),
+		m_symbol_w(utf8_width(name))
 {
 }

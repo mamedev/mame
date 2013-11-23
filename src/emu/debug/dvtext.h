@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvtext.h
+	dvtext.h
 
-    Debugger simple text-based views.
+	Debugger simple text-based views.
 
 ***************************************************************************/
 
@@ -36,7 +36,7 @@ protected:
 
 private:
 	// internal state
-	text_buffer &       m_textbuf;              /* pointer to the text buffer */
+	text_buffer &       m_textbuf;                  /* reference to the text buffer */
 	bool                m_at_bottom;                /* are we tracking new stuff being added? */
 	UINT32              m_topseq;                   /* sequence number of the top line */
 };

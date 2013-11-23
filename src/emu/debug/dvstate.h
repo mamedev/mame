@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    dvstate.h
+	dvstate.h
 
-    State debugger view.
+	State debugger view.
 
 ***************************************************************************/
 
@@ -64,6 +64,7 @@ private:
 		int                 m_index;            // index
 		UINT8               m_vallen;           // number of value chars
 		astring             m_symbol;           // symbol
+		size_t              m_symbol_w;     // width of the symbol in unicode glyphs
 	};
 
 	// internal helpers

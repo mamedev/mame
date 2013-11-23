@@ -21,7 +21,7 @@
  */
 int uchar_isvalid(unicode_char uchar)
 {
-    return (uchar < 0x110000) && !((uchar >= 0xd800) && (uchar <= 0xdfff));
+	return (uchar < 0x110000) && !((uchar >= 0xd800) && (uchar <= 0xdfff));
 }
 
 
@@ -324,7 +324,7 @@ int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar)
  * @param plen optional pointer to a size_t variable to receive the source string length
  * @return number of unicode_char values decoded from the UTF-8 string
  */
-size_t utf8_ucharlen(const char* utf8src, size_t * plen)
+size_t utf8_width(const char* utf8src, size_t * plen)
 {
 	size_t len = 0;
 	size_t total = 0;
@@ -393,7 +393,7 @@ size_t utf8_ucharlen(const char* utf8src, size_t * plen)
  * @param plen optional pointer to a size_t variable to receive the source string length
  * @return number of unicode_char values decoded from the UTF-8 string
  */
-size_t utf16_ucharlen(const utf16_char* utf16src, size_t * plen)
+size_t utf16_width(const utf16_char* utf16src, size_t * plen)
 {
 	size_t len = 0;
 	size_t total = 0;
@@ -534,49 +534,55 @@ void uchar_table_free(unicode_char* table)
 }
 
 /**
- * @brief return an unicode_char array allocated while converted from UTF-8
+ * @brief fill an unicode_char array with values decoded from UTF-8
+ * @param ustr destination unicode_char string
+ * @param size maximum size ucharstr array in unicode_char
  * @param utf8char source string encoded in UTF-8
- * @return newly allocated unicode_char string
+ * @return number of unicode_char decoded excluding the final 0, or -1 on error
  */
-unicode_char* uchar_strfrom_utf8(const char *utf8src)
+size_t ustring_from_utf8(unicode_char* ustr, size_t size, const char *utf8src)
 {
-	size_t available;
-	size_t size = utf8_ucharlen(utf8src, &available);
-	if (-1 == size)
-		return NULL;
-	unicode_char* result = (unicode_char *)calloc(sizeof(unicode_char), size + 1);
-	unicode_char* dst = result;
-	while (*utf8src) {
-		unicode_char uchar = 0;
-		int len = uchar_from_utf8(&uchar, utf8src, available);
+	size_t avail;
+	size_t width = utf8_width(utf8src, &avail);
+	if (-1 == width)
+		return width;
+	size_t length;
+	for (length = 0; *utf8src && length < size - 1; length++)
+	{
+		int len = uchar_from_utf8(&ustr[length], utf8src, avail);
+		if (len < 0)
+			break;
 		utf8src += len;
-		available -= len;
-		*dst++ = uchar;
+		avail -= len;
 	}
-	return result;
+	ustr[length] = 0;
+	return length;
 }
 
 /**
  * @brief return an unicode_char array allocated while converted from UTF-16
- * @param utf16src source string encoded in UTF-16
- * @return newly allocated unicode_char string
+ * @param ustr destination unicode_char string
+ * @param size maximum size ucharstr array in unicode_char
+ * @param utf16char source string encoded in UTF-16
+ * @return number of unicode_char decoded excluding the final 0, or -1 on error
  */
-unicode_char* uchar_strfrom_utf16(const utf16_char *utf16src)
+size_t ustring_from_utf16(unicode_char* ustr, size_t size, const utf16_char *utf16src)
 {
-	size_t available;
-	size_t size = utf16_ucharlen(utf16src, &available);
-	if (-1 == size)
-		return NULL;
-	unicode_char* result = (unicode_char *)calloc(sizeof(unicode_char), size + 1);
-	unicode_char* dst = result;
-	while (*utf16src) {
-		unicode_char uchar = 0;
-		int len = uchar_from_utf16(&uchar, utf16src, available);
+	size_t avail;
+	size_t width = utf16_width(utf16src, &avail);
+	if (-1 == width)
+		return width;
+	size_t length;
+	for (length = 0; *utf16src && length < size - 1; length++)
+	{
+		int len = uchar_from_utf16(&ustr[length], utf16src, avail);
+		if (len < 0)
+			break;
 		utf16src += len;
-		available -= len;
-		*dst++ = uchar;
+		avail -= len;
 	}
-	return result;
+	ustr[length] = 0;
+	return length;
 }
 
 /**
@@ -636,7 +642,7 @@ int uchar_strncmp(const unicode_char* dst, const unicode_char* src, size_t len)
  * @param format format string followed by optional parameters
  * @return number of unicode_char stored in dst
  */
-int uchar_sprintf(unicode_char* dst, const char* format, ...)
+int uchar_sprintf(unicode_char* ustr, const char* format, ...)
 {
 	va_list ap;
 	char buff[256];
@@ -644,8 +650,30 @@ int uchar_sprintf(unicode_char* dst, const char* format, ...)
 	int len = vsnprintf(buff, sizeof(buff), format, ap);
 	va_end(ap);
 	for (int i = 0; i < len; i++)
-		*dst++ = buff[i];
-	*dst = 0;
+		*ustr++ = buff[i];
+	*ustr = 0;
+	return len;
+}
+
+/**
+ * @brief print a formatted string of ASCII characters to an unicode_char array
+ * @param dst pointer to the array
+ * @param format format string followed by optional parameters
+ * @param size maximum number of unicode_char to write to dst
+ * @return number of unicode_char stored in dst
+ */
+int uchar_snprintf(unicode_char* ustr, size_t size, const char* format, ...)
+{
+	va_list ap;
+	char buff[256];
+	va_start(ap, format);
+	int len = vsnprintf(buff, sizeof(buff), format, ap);
+	va_end(ap);
+	if (len < 0)
+		return len;
+	for (int i = 0; i < len; i++)
+		*ustr++ = buff[i];
+	*ustr = 0;
 	return len;
 }
 

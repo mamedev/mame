@@ -145,11 +145,11 @@ int utf16_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
 //! convert an unicode character into a UTF-16 sequence with flipped endianness
 int utf16f_from_uchar(utf16_char *utf16string, size_t count, unicode_char uchar);
 
-//! return the number of decoded Unicode values in UTF-8 encoded string
-size_t utf8_ucharlen(const char* utf8src, size_t * plen = 0);
+//! return the width of an UTF-8 encoded string (number of decoded Unicode glyphs)
+size_t utf8_width(const char* utf8src, size_t * plen = 0);
 
-//! return the number of decoded Unicode values in UTF-16 encoded string
-size_t utf16_ucharlen(const utf16_char* utf16src, size_t * plen = 0);
+//! return the width of an UTF-16 encoded string (number of decoded Unicode glyphs)
+size_t utf16_width(const utf16_char* utf16src, size_t * plen = 0);
 
 /* misc UTF-8 helpers */
 //! return a pointer to the previous character in a string
@@ -168,11 +168,11 @@ UINT8 uchar_table_index(unicode_char* table, unicode_char uchar);
 //! free a unicode table
 void uchar_table_free(unicode_char* table);
 
-//! return an unicode_char array allocated while converted from UTF-8
-unicode_char* ustring_from_utf8(const char *utf8char);
+//! fill an unicode_char array with values decoded from UTF-8
+size_t ustring_from_utf8(unicode_char* ucharstr, size_t max, const char *utf8char);
 
-//! return an unicode_char array allocated while converted from UTF-16
-unicode_char* ustring_from_utf16(const utf16_char *utf16char);
+//! fill an unicode_char array with values decoded from UTF-16
+size_t ustring_from_utf16(unicode_char* ucharstr, size_t max, const utf16_char *utf16char);
 
 /* unicode_char array functions - string.h like */
 //! return the unicode_char array length
@@ -185,10 +185,10 @@ int uchar_strcmp(const unicode_char* dst, const unicode_char* src);
 int uchar_strncmp(const unicode_char* dst, const unicode_char* src, size_t len);
 
 //! print a formatted string of ASCII characters to an unicode_char array (max 256 characters)
-int uchar_sprintf(unicode_char* dst, const char* format, ...);
+int uchar_sprintf(unicode_char* ustr, const char* format, ...);
 
 //! print a formatted string of ASCII characters to an unicode_char array (max size characters)
-int uchar_snprintf(unicode_char* dst, size_t size, const char* format, ...);
+int uchar_snprintf(unicode_char* ustr, size_t size, const char* format, ...);
 
 //! copy an array of unicode_char from source to destination
 unicode_char* uchar_strcpy(unicode_char* dst, const unicode_char* src);

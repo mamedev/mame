@@ -46,15 +46,16 @@ enum debug_view_notification
 
 
 // attribute bits for debug_view_char.attrib
-const UINT8 DCA_NORMAL      = 0x00;     //!< black on white
-const UINT8 DCA_CHANGED     = 0x01;     //!< red foreground
-const UINT8 DCA_SELECTED    = 0x02;     //!< light red background
-const UINT8 DCA_INVALID     = 0x04;     //!< dark blue foreground
-const UINT8 DCA_DISABLED    = 0x08;     //!< darker foreground
-const UINT8 DCA_ANCILLARY   = 0x10;     //!< grey background
-const UINT8 DCA_CURRENT     = 0x20;     //!< yellow background
-const UINT8 DCA_COMMENT     = 0x40;     //!< green foreground
-const UINT8 DCA_VISITED     = 0x80;     //!< light blue background
+const UINT32 DCA_NORMAL      = 0;             //!< black on white
+const UINT32 DCA_CHANGED     = (1 <<  0);     //!< red foreground
+const UINT32 DCA_SELECTED    = (1 <<  1);     //!< light red background
+const UINT32 DCA_INVALID     = (1 <<  2);     //!< dark blue foreground
+const UINT32 DCA_DISABLED    = (1 <<  3);     //!< darker foreground
+const UINT32 DCA_ANCILLARY   = (1 <<  4);     //!< grey background
+const UINT32 DCA_CURRENT     = (1 <<  5);     //!< yellow background
+const UINT32 DCA_COMMENT     = (1 <<  6);     //!< green foreground
+const UINT32 DCA_VISITED     = (1 <<  7);     //!< light blue background
+const UINT32 DCA_WIDTH_MASK  = (3 << 30);     //!< width of the glyph in cells
 
 
 // special characters that can be passed to process_char()
@@ -90,11 +91,11 @@ class debug_view;
 typedef void (*debug_view_osd_update_func)(debug_view &view, void *osdprivate);
 
 
-//! a single "character" in the debug view has an Unicode value and an attribute byte
+//! a single "character" in the debug view has an Unicode value and an attribute flags
 struct debug_view_char
 {
 	unicode_char        uchar;
-	UINT8               attrib;
+	UINT32              attrib;
 };
 
 

@@ -81,7 +81,7 @@ INLINE INT32 buffer_space(text_buffer *text)
 	text_buffer_alloc - allocate a new text buffer
 -------------------------------------------------*/
 
-text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
+text_buffer *text_buffer_alloc(UINT32 columns, UINT32 lines)
 {
 	text_buffer *text;
 
@@ -91,7 +91,7 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 		return NULL;
 
 	/* allocate memory for the buffer itself */
-	text->buffer = (unicode_char *)osd_malloc_array(sizeof(unicode_char) * bytes);
+	text->buffer = (unicode_char *)osd_malloc_array(sizeof(unicode_char) * columns);
 	if (!text->buffer)
 	{
 		osd_free(text);
@@ -108,7 +108,7 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	}
 
 	/* initialize the buffer description */
-	text->bufsize = bytes;
+	text->bufsize = columns;
 	text->linesize = lines;
 	text_buffer_clear(text);
 
@@ -183,7 +183,7 @@ void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
 	INT32 needed_space;
 
 	/* we need to ensure there is enough space for this string plus enough for the max line length */
-	needed_space = utf8_ucharlen(data) + MAX_LINE_LENGTH;
+	needed_space = utf8_width(data) + MAX_LINE_LENGTH;
 
 	/* make space in the buffer if we need to */
 	while (buffer_space(text) < needed_space && text->linestart != text->lineend)
@@ -194,26 +194,29 @@ void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
 		text->bufstart = text->lineoffs[text->linestart];
 	}
 
+	size_t avail = strlen(data);
 	/* now add the data */
 	while (*data)
 	{
-		unicode_char ch;
+		unicode_char uchar;
 		int linelen;
-		int utf8len = uchar_from_utf8(&ch, data, strlen(data));
-		if (utf8len > 0)
-			data += utf8len;
+		int utf8len = uchar_from_utf8(&uchar, data, avail);
+		if (utf8len < 0)
+			break;
+		data += utf8len;
+		avail -= utf8len;
 
 		/* a CR resets our position */
-		if (ch == '\r')
+		if (uchar == '\r')
 			text->bufend = text->lineoffs[text->lineend];
 
 		/* non-CR data is just characters */
-		else if (ch != '\n')
-			text->buffer[text->bufend++] = ch;
+		else if (uchar != '\n')
+			text->buffer[text->bufend++] = uchar;
 
 		/* an explicit newline or line-too-long condition inserts a newline */
 		linelen = text->bufend - text->lineoffs[text->lineend];
-		if (ch == '\n' || linelen >= stopcol)
+		if (uchar == '\n' || linelen >= stopcol)
 		{
 			int overflow = 0;
 

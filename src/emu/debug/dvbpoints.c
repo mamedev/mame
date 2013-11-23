@@ -345,42 +345,45 @@ void debug_view_breakpoints::view_update()
 
 	// Draw
 	debug_view_char *dest = m_viewdata;
+	size_t width = 256;
+	unicode_char buffer[256+1];
 	for (int row = 0; row < m_visible.y; row++)
 	{
 		UINT32 effrow = m_topleft.y + row;
+		for (size_t i = 0; i < width; i++)
+			buffer[i] = ' ';
 
 		// Header
 		if (row == 0)
 		{
-			astring header;
-			header.printf("ID");
-			if (m_sortType == SORT_INDEX_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_INDEX_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[0]);
-			header.catprintf("En");
-			if (m_sortType == SORT_ENABLED_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_ENABLED_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[1]);
-			header.catprintf("CPU");
-			if (m_sortType == SORT_CPU_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_CPU_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[2]);
-			header.catprintf("Address");
-			if (m_sortType == SORT_ADDRESS_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_ADDRESS_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[3]);
-			header.catprintf("Condition");
-			if (m_sortType == SORT_CONDITION_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_CONDITION_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[4]);
-			header.catprintf("Action");
-			if (m_sortType == SORT_ACTION_ASCENDING) header.catprintf("\\");
-			else if (m_sortType == SORT_ACTION_DESCENDING) header.catprintf("/");
-			pad_astring_to_length(header, tableBreaks[5]);
+			const unicode_char up_arrow = 0x25b2;	// BLACK UP-POINTING TRIANGLE "▲"
+			const unicode_char down_arrow = 0x25bc;	// BLACK DOWN-POINTING TRIANGLE "▼"
+			int col = uchar_snprintf(buffer, width, "ID");
+			if (m_sortType == SORT_INDEX_ASCENDING) buffer[col++] = down_arrow;
+			else if (m_sortType == SORT_INDEX_DESCENDING) buffer[col++] = up_arrow;
+			col = tableBreaks[0];
+			col += uchar_snprintf(&buffer[col], width - col, "En");
+			if (m_sortType == SORT_ENABLED_ASCENDING) buffer[col] = down_arrow;
+			else if (m_sortType == SORT_ENABLED_DESCENDING) buffer[col] = up_arrow;
+			col = tableBreaks[1];
+			col += uchar_snprintf(&buffer[col], width - col, "CPU");
+			if (m_sortType == SORT_CPU_ASCENDING) buffer[col] = down_arrow;
+			else if (m_sortType == SORT_CPU_DESCENDING) buffer[col] = up_arrow;
+			col = tableBreaks[2];
+			col += uchar_snprintf(&buffer[col], width - col, "Address");
+			if (m_sortType == SORT_ADDRESS_ASCENDING) buffer[col] = down_arrow;
+			else if (m_sortType == SORT_ADDRESS_DESCENDING) buffer[col] = up_arrow;
+			col = tableBreaks[3];
+			col += uchar_snprintf(&buffer[col], width - col, "Condition");
+			if (m_sortType == SORT_CONDITION_ASCENDING) buffer[col] = down_arrow;
+			else if (m_sortType == SORT_CONDITION_DESCENDING) buffer[col] = up_arrow;
+			col = tableBreaks[4];
+			col += uchar_snprintf(&buffer[col], width - col, "Action");
+			if (m_sortType == SORT_ACTION_ASCENDING) buffer[col] = down_arrow;
+			else if (m_sortType == SORT_ACTION_DESCENDING) buffer[col] = up_arrow;
 
-			for (int i = 0; i < m_visible.x; i++)
-			{
-				dest->uchar = (i < header.len()) ? header[i] : ' ';
+			for (size_t i = 0; i < m_visible.x && i < width; i++) {
+				dest->uchar = buffer[i];
 				dest->attrib = DCA_ANCILLARY;
 				dest++;
 			}
@@ -391,37 +394,29 @@ void debug_view_breakpoints::view_update()
 		int bpi = effrow-1;
 		if (bpi < numBPs && bpi >= 0)
 		{
+			const unicode_char checked = 0x25a3;		// WHITE SQUARE CONTAINING BLACK SMALL SQUARE "▣"
+			const unicode_char unchecked = 0x25a1;		// WHITE SQUARE "□"
 			device_debug::breakpoint* bp = bpList[bpi];
-
-			astring buffer;
-			buffer.printf("%x", bp->index());
-			pad_astring_to_length(buffer, tableBreaks[0]);
-			buffer.catprintf("%c", bp->enabled() ? 'X' : 'O');
-			pad_astring_to_length(buffer, tableBreaks[1]);
-			buffer.catprintf("%s", bp->debugInterface()->device().tag());
-			pad_astring_to_length(buffer, tableBreaks[2]);
-			buffer.catprintf("%s", core_i64_hex_format(bp->address(), bp->debugInterface()->logaddrchars()));
-			pad_astring_to_length(buffer, tableBreaks[3]);
+			uchar_snprintf(buffer, width, "%x", bp->index());
+			int col = tableBreaks[0];
+			buffer[col] = bp->enabled() ? checked : unchecked;
+			col = tableBreaks[1];
+			uchar_snprintf(&buffer[col], width - col, "%s", bp->debugInterface()->device().tag());
+			col = tableBreaks[2];
+			uchar_snprintf(&buffer[col], width - col, "%s", core_i64_hex_format(bp->address(), bp->debugInterface()->logaddrchars()));
+			col = tableBreaks[3];
 			if (astring(bp->condition()) != astring("1"))
-			{
-				buffer.catprintf("%s", bp->condition());
-				pad_astring_to_length(buffer, tableBreaks[4]);
-			}
+				uchar_snprintf(&buffer[col], width - col, "%s", bp->condition());
+			col = tableBreaks[4];
 			if (astring(bp->action()) != astring(""))
-			{
-				buffer.catprintf("%s", bp->action());
-				pad_astring_to_length(buffer, tableBreaks[5]);
-			}
+				uchar_snprintf(&buffer[col], width - col, "%s", bp->action());
 
-			for (int i = 0; i < m_visible.x; i++)
-			{
-				dest->uchar = (i < buffer.len()) ? buffer[i] : ' ';
+			for (size_t i = 0; i < m_visible.x && i < width; i++) {
+				dest->uchar = buffer[i];
 				dest->attrib = DCA_NORMAL;
-
 				// Color disabled breakpoints red
-				if (i == 5 && dest->uchar == 'O')
+				if (i == tableBreaks[0] && !bp->enabled())
 					dest->attrib = DCA_CHANGED;
-
 				dest++;
 			}
 			continue;
