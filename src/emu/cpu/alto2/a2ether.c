@@ -856,13 +856,12 @@ void alto2_cpu_device::reset_ether()
 	m_eth.tx_crc = 0;
 	m_eth.rx_count = 0;
 	m_eth.tx_count = 0;
+	m_eth.breath_of_life = 0;
 	m_eth.rx_timer->reset();
 	m_eth.tx_timer->reset();
 	ioport_port* config = ioport(":CONFIG");
 	// config should be valid, unless the driver doesn't define it
 	if (config)
 		m_eth.breath_of_life = breath_of_life_sec[(config->read() >> 4) & 7];
-	else
-		m_eth.breath_of_life = 0;
 	logerror("Ethernet breath_of_life %d sec\n", m_eth.breath_of_life);
 }

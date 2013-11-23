@@ -152,6 +152,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_f2(),
 	m_ram_related(),
 	m_cycle(0),
+	m_ether_id(0),
 	m_hw(),
 	m_mouse(),
 	m_drive(),
@@ -1138,6 +1139,10 @@ READ16_MEMBER ( alto2_cpu_device::const_r )
 void alto2_cpu_device::device_reset()
 {
 	soft_reset();
+	// get the configured ethernet id
+	ioport_port* etherid = ioport(":ETHERID");
+	if (etherid)
+		m_ether_id = etherid->read() & 0377;
 	// call all sub-devices' reset_...
 	reset_memory();
 	reset_disk();

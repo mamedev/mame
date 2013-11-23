@@ -258,8 +258,6 @@ private:
 
 	int m_icount;
 
-	static const UINT8 m_ether_id = 0241;
-
 	typedef void (alto2_cpu_device::*a2func)();
 
 	//! task numbers
@@ -914,6 +912,8 @@ private:
 #endif
 	void rdram();									//!< read the microcode ROM/RAM halfword
 	void wrtram();									//!< write the microcode RAM from M register and ALU
+
+	UINT8 m_ether_id;								//!< configured Ethernet ID for this machine
 
 //*******************************************
 // inline the sub-devices
