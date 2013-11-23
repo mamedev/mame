@@ -164,9 +164,9 @@ static const prom_load_t pl_enet_a49 =
 #define	BF(a49)   ((a49 & ether_a49_BF) ? 1 : 0)		//! buffer full
 
 #define	BREATHLEN	ALTO2_ETHER_PACKET_SIZE	//!< ethernet packet length
-#define	BREATHADDR	0177400					//!< destination and source
-#define	BREATHTYPE	0000602					//!< ethernet packet type
-static const UINT16 duckbreath_data[BREATHLEN] =
+#define	BREATHADDR	(0377<<8)				//!< destination (0377) and source (0000)
+#define	BREATHTYPE	0602					//!< ethernet packet type
+static const UINT16 breath_of_life_data[BREATHLEN] =
 {
 	BREATHADDR,		/* 3MB destination and source */
 	BREATHTYPE,		/* ether packet type  */
@@ -211,27 +211,27 @@ static const UINT16 duckbreath_data[BREATHLEN] =
 #if	DEBUG_PACKETS
 static void dump_ascii(const UINT16 *src, size_t size)
 {
-	printf(" [");
+	logerror(" [");
 	for (size_t offs = 0; offs < size; offs++) {
 		char ch1 = src[offs] / 256;
 		char ch2 = src[offs] % 256;
-		printf("%c", ch1 < 32 || ch1 > 126 ? '.' : ch1);
-		printf("%c", ch2 < 32 || ch2 > 126 ? '.' : ch2);
+		logerror("%c", ch1 < 32 || ch1 > 126 ? '.' : ch1);
+		logerror("%c", ch2 < 32 || ch2 > 126 ? '.' : ch2);
 	}
-	printf("]\n");
+	logerror("]\n");
 }
 
-size_t dump_packet(const UINT16 *src, size_t addr, size_t size)
+static void dump_packet(const char* name, const UINT16 *src, size_t addr, size_t size)
 {
 	size_t offs;
 	for (offs = 0; offs < size; offs++) {
 		UINT16 word = src[offs];
 		if (offs % 8) {
-			printf(" %06o", word);
+			logerror(" %06o", word);
 		} else {
 			if (offs > 0)
 				dump_ascii(&src[offs-8], 8);
-			printf("\t%05o: %06o", static_cast<unsigned>(addr + offs), word);
+			logerror("%s\t%05o: %06o", name, static_cast<unsigned>(addr + offs), word);
 		}
 	}
 	if (offs % 8) {
@@ -239,7 +239,6 @@ size_t dump_packet(const UINT16 *src, size_t addr, size_t size)
 	} else if (offs > 0) {
 		dump_ascii(&src[offs - 8], 8);
 	}
-	return size;
 }
 #endif
 
@@ -448,12 +447,12 @@ UINT32 f9401_7(UINT32 crc, UINT32 data)
 }
 
 /**
- * @brief HACK: pull the next word from the duckbreath_data in the fifo
+ * @brief HACK: pull the next word from the breath_of_life_data in the fifo
  *
  * This is probably lacking the updates to one or more of
  * the status flip flops.
  */
-void alto2_cpu_device::rx_duckbreath(void* ptr, INT32 arg)
+void alto2_cpu_device::rx_breath_of_life(void* ptr, INT32 arg)
 {
 	UINT32 data;
 
@@ -469,7 +468,7 @@ void alto2_cpu_device::rx_duckbreath(void* ptr, INT32 arg)
 		arg++;
 	} else {
 		// next data word
-		data = duckbreath_data[arg++];
+		data = breath_of_life_data[arg++];
 	}
 	m_eth.rx_crc = f9401_7(m_eth.rx_crc, data);
 	m_eth.fifo[m_eth.fifo_wr] = data;
@@ -489,7 +488,7 @@ void alto2_cpu_device::rx_duckbreath(void* ptr, INT32 arg)
 		 */
 		m_eth.rx_crc = 0;
 		PUT_ETH_IGONE(m_eth.status, 1);		// set the IGONE flip flop
-		m_eth.rx_timer->adjust(attotime::from_seconds(m_duckbreath_sec), 0);
+		m_eth.rx_timer->adjust(attotime::from_seconds(m_eth.breath_of_life), 0);
 	} else {
 		// receive at a rate of 5.44us per word
 		m_eth.rx_timer->adjust(attotime::from_usec(5.44), arg);
@@ -564,7 +563,7 @@ void alto2_cpu_device::bs_early_eidfct()
 		m_eth.rx_packet[m_eth.rx_count] = r;
 	m_eth.rx_count++;
 	if (ALTO2_ETHER_PACKET_SIZE == m_eth.rx_count) {
-		dump_packet(m_eth.rx_packet, 0, m_eth.rx_count);
+		dump_packet("RX", m_eth.rx_packet, 0, m_eth.rx_count);
 		m_eth.rx_count = 0;
 	}
 #endif
@@ -666,7 +665,7 @@ void alto2_cpu_device::f2_late_eodfct()
 		m_eth.tx_packet[m_eth.tx_count] = m_bus;
 	m_eth.tx_count++;
 	if (ALTO2_ETHER_PACKET_SIZE == m_eth.tx_count) {
-		dump_packet(m_eth.tx_packet, 0, m_eth.tx_count);
+		dump_packet("TX", m_eth.tx_packet, 0, m_eth.tx_count);
 		m_eth.tx_count = 0;
 	}
 #endif
@@ -831,9 +830,9 @@ void alto2_cpu_device::init_ether(int task)
 	m_eth.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::tx_packet),this));
 	m_eth.tx_timer->reset();
 
-	m_eth.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::rx_duckbreath),this));
-	if (m_eth.duckbreath)
-		m_eth.rx_timer->adjust(attotime::from_seconds(m_eth.duckbreath), 0);
+	m_eth.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::rx_breath_of_life),this));
+	if (m_eth.breath_of_life)
+		m_eth.rx_timer->adjust(attotime::from_seconds(m_eth.breath_of_life), 0);
 	else
 		m_eth.rx_timer->reset();
 }
@@ -843,8 +842,8 @@ void alto2_cpu_device::exit_ether()
 	// nothing to do yet
 }
 
-//! delay between two duckbreaths in seconds
-static const int duckbreath_sec[8] = {
+//! delay between two breath_of_lifes in seconds
+static const int breath_of_life_sec[8] = {
 	0, 5, 10, 15, 30, 60, 90, 120
 };
 void alto2_cpu_device::reset_ether()
@@ -862,8 +861,8 @@ void alto2_cpu_device::reset_ether()
 	ioport_port* config = ioport(":CONFIG");
 	// config should be valid, unless the driver doesn't define it
 	if (config)
-		m_eth.duckbreath = duckbreath_sec[(config->read() >> 4) & 7];
+		m_eth.breath_of_life = breath_of_life_sec[(config->read() >> 4) & 7];
 	else
-		m_eth.duckbreath = 0;
-	logerror("Ethernet duckbreath %d sec\n", m_eth.duckbreath);
+		m_eth.breath_of_life = 0;
+	logerror("Ethernet breath_of_life %d sec\n", m_eth.breath_of_life);
 }

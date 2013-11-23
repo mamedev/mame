@@ -49,8 +49,6 @@ enum {
 	ether_a49_BF	= (1 << 3)					//!< buffer full
 };
 
-static const int m_duckbreath_sec = 15;			//!< send duckbreath every 15 seconds
-
 struct {
 	UINT16 fifo[ALTO2_ETHER_FIFO_SIZE];			//!< FIFO buffer
 	UINT16 fifo_rd;								//!< FIFO input pointer
@@ -64,10 +62,10 @@ struct {
 	UINT16* tx_packet;							//!< buffer to collect transmitted words
 	emu_timer* rx_timer;						//!< receiver timer
 	emu_timer* tx_timer;						//!< transmitter timer
-	int duckbreath;								//!< if non-zero, interval in seconds at which to broadcast the duckbreath
+	int breath_of_life;							//!< if non-zero, interval in seconds at which to broadcast the breath-of-life
 }	m_eth;
 
-TIMER_CALLBACK_MEMBER( rx_duckbreath );			//!< HACK: pull the next word from the duckbreath in the fifo
+TIMER_CALLBACK_MEMBER( rx_breath_of_life );		//!< HACK: pull the next word from the breath-of-life in the fifo
 TIMER_CALLBACK_MEMBER( tx_packet );				//!< transmit data from the FIFO to <nirvana for now>
 void eth_wakeup();								//!< check for the various reasons to wakeup the Ethernet task
 void eth_startf();								//!< start input or output depending on m_bus

@@ -966,7 +966,7 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_eth.tx_crc));
 	save_item(NAME(m_eth.rx_count));
 	save_item(NAME(m_eth.tx_count));
-	save_item(NAME(m_eth.duckbreath));
+	save_item(NAME(m_eth.breath_of_life));
 
 	state_add( A2_TASK,    "TASK",    m_task).callimport().formatstr("%6s");
 	state_add( A2_MPC,     "MPC",     m_mpc).formatstr("%06O");
