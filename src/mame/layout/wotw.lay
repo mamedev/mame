@@ -6,34 +6,34 @@
 <!-- backdrop -->
 
 		<rect>
-			<color red="1.0" green="0.16" blue="0.16" />
+			<color red="1.0" green="0.15" blue="0.15" />
 			<bounds x="0" y="0" width="500" height="300" />
 		</rect>
 
 <!-- gradient -->
 
 		<disk>
-			<color red="1.0" green="0.30" blue="0.16" />
+			<color red="1.0" green="0.29" blue="0.15" />
 			<bounds x="0" y="66" width="500" height="170" />
 		</disk>
 		<disk>
-			<color red="1.0" green="0.44" blue="0.16" />
+			<color red="1.0" green="0.43" blue="0.15" />
 			<bounds x="0" y="68" width="500" height="170" />
 		</disk>
 		<disk>
-			<color red="1.0" green="0.58" blue="0.16" />
+			<color red="1.0" green="0.57" blue="0.15" />
 			<bounds x="0" y="70" width="500" height="170" />
 		</disk>
 		<disk>
-			<color red="1.0" green="0.72" blue="0.16" />
+			<color red="1.0" green="0.71" blue="0.15" />
 			<bounds x="0" y="72" width="500" height="170" />
 		</disk>
 		<disk>
-			<color red="1.0" green="0.86" blue="0.16" />
+			<color red="1.0" green="0.85" blue="0.15" />
 			<bounds x="0" y="74" width="500" height="170" />
 		</disk>
 		<disk>
-			<color red="1.0" green="1.0" blue="0.16" />
+			<color red="1.0" green="1.0" blue="0.15" />
 			<bounds x="0" y="76" width="500" height="170" />
 		</disk>
 
@@ -43,7 +43,7 @@
 <!-- you'd need external artwork for that -->
 
 		<rect>
-			<color red="1.0" green="1.0" blue="0.16" />
+			<color red="1.0" green="1.0" blue="0.15" />
 			<bounds left="0" top="166" right="500" bottom="300" />
 		</rect>
 		<rect>

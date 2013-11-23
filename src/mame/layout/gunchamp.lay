@@ -1,10 +1,65 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
+
 	<element name="overlay">
+
+<!-- same as gunchamps, except for y-offset -->
+
 		<rect>
 			<bounds left="0" top="0" right="400" bottom="300" />
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="1.0" green="0.15" blue="0.15" />
 		</rect>
+
+		<rect>
+			<bounds left="0" top="36" right="400" bottom="300" />
+			<color red="1.0" green="0.29" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds left="0" top="38" right="400" bottom="300" />
+			<color red="1.0" green="0.43" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds left="0" top="40" right="400" bottom="300" />
+			<color red="1.0" green="0.57" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds left="0" top="42" right="400" bottom="300" />
+			<color red="1.0" green="0.71" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds left="0" top="44" right="400" bottom="300" />
+			<color red="1.0" green="0.85" blue="0.15" />
+		</rect>
+		<rect>
+			<bounds left="0" top="46" right="400" bottom="300" />
+			<color red="1.0" green="1.0" blue="0.15" />
+		</rect>
+
+		<rect>
+			<bounds left="0" top="165" right="400" bottom="300" />
+			<color red="0.85" green="0.85" blue="0.29" />
+		</rect>
+		<rect>
+			<bounds left="0" top="167" right="400" bottom="300" />
+			<color red="0.71" green="0.71" blue="0.43" />
+		</rect>
+		<rect>
+			<bounds left="0" top="169" right="400" bottom="300" />
+			<color red="0.57" green="0.57" blue="0.57" />
+		</rect>
+		<rect>
+			<bounds left="0" top="171" right="400" bottom="300" />
+			<color red="0.43" green="0.43" blue="0.71" />
+		</rect>
+		<rect>
+			<bounds left="0" top="173" right="400" bottom="300" />
+			<color red="0.29" green="0.29" blue="0.85" />
+		</rect>
+		<rect>
+			<bounds left="0" top="175" right="400" bottom="300" />
+			<color red="0.15" green="0.15" blue="1.0" />
+		</rect>
+
 	</element>
 
 	<view name="Color Overlay">
