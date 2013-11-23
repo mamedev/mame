@@ -84,6 +84,8 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_rdgate_0(1),
 	m_cylinders(DIABLO_CYLINDERS),
 	m_pages(DIABLO_PAGES),
+	m_seekto(0),
+	m_restore(0),
 	m_cylinder(-1),
 	m_head(-1),
 	m_sector(-1),
@@ -905,6 +907,9 @@ int diablo_hd_device::get_seek_incomplete_0() const
 /**
  * @brief return the current cylinder of a drive unit
  *
+ * This is a convenience function.
+ * There is no such signal on the BUS.
+ *
  * Note: The bus lines are active low
  * The value on the BUS needs an XOR with DIABLO_CYLINDER_MASK
  * to resemble the physical line levels.
@@ -918,6 +923,9 @@ int diablo_hd_device::get_cylinder() const
 
 /**
  * @brief return the current head of a drive unit
+ *
+ * This is a convenience function.
+ * There is no such signal on the BUS.
  *
  * Note: The bus lines are active low
  * The value on the BUS needs an XOR with DIABLO_HEAD_MASK
@@ -951,9 +959,11 @@ int diablo_hd_device::get_sector() const
 /**
  * @brief return the current page of a drive unit
  *
- * The current page number is derived from the cylinder, head, and sector numbers.
  * This is a convenience function.
  * There is no such signal on the BUS.
+ *
+ * The current page number is derived from the cylinder,
+ * head, and sector numbers.
  *
  * @return the current page for the drive
  */
@@ -963,19 +973,15 @@ int diablo_hd_device::get_page() const
 }
 
 /**
- * @brief select a drive unit and head
+ * @brief select a drive unit
+ *
+ * Selecting a drive unit updates the ready status
  *
  * @param unit unit number
- * @param head head number
  */
-void diablo_hd_device::select(int unit, int head)
+void diablo_hd_device::select(int unit)
 {
-	assert(unit == m_unit);
-	/* this drive is selected */
-	if ((head & DIABLO_HEAD_MASK) != m_head) {
-		m_head = head & DIABLO_HEAD_MASK;
-		LOG_DRIVE((0,"[DHD%u]	select unit:%d head:%d\n", m_unit, unit, head));
-	}
+	assert(unit == m_unit);	// this drive is selected
 
 	if (m_disk) {
 		m_ready_0 = 0;					// it is ready
@@ -994,18 +1000,61 @@ void diablo_hd_device::select(int unit, int head)
 }
 
 /**
+ * @brief set the selected head
+ * @param head head number
+ */
+void diablo_hd_device::set_head(int head)
+{
+	if ((head & DIABLO_HEAD_MASK) != m_head) {
+		m_head = head & DIABLO_HEAD_MASK;
+		LOG_DRIVE((0,"[DHD%u]	select head:%d\n", m_unit, m_head));
+	}
+}
+
+/**
+ * @brief set the cylinder number to seek to
+ *
+ * This defines the cylinder to seek when the
+ * STROBE line is pulsed.
+ *
+ * @param cylinder cylinder number (bus lines CYL[0-9])
+ */
+void diablo_hd_device::set_cylinder(int cylinder)
+{
+	if ((cylinder & DIABLO_CYLINDER_MASK) != m_seekto) {
+		m_seekto = cylinder & DIABLO_CYLINDER_MASK;
+		LOG_DRIVE((0,"[DHD%u]	seek to cylinder:%d\n", m_unit, m_seekto));
+	}
+}
+
+/**
+ * @brief set the restore line
+ *
+ * If the restore line is asserted when the
+ * STROBE line is pulsed, the drive seeks
+ * towards cylinder 0.
+ *
+ * @param restore state of the restore line
+ */
+void diablo_hd_device::set_restore(int restore)
+{
+	if ((restore & 1) != m_restore) {
+		m_restore = restore & 1;
+		LOG_DRIVE((0,"[DHD%u]	restore:%d\n", m_unit, m_restore));
+	}
+}
+
+/**
  * @brief strobe a seek operation
  *
- * Seek to the cylinder %cylinder, or restore to cylinder 0.
+ * Seek to the specified cylinder m_seekto,
+ * or restore to cylinder 0, if m_restore is set.
  *
- * @param unit unit number
- * @param cylinder cylinder number to seek to
- * @param restore true, if the drive should restore to cylinder 0
  * @param strobe current level of the strobe signal (for edge detection)
  */
-void diablo_hd_device::set_strobe(int cylinder, bool restore, int strobe)
+void diablo_hd_device::set_strobe(int strobe)
 {
-	int seekto = restore ? 0 : cylinder;
+	int seekto = m_restore ? 0 : m_seekto;
 	if (strobe) {
 		LOG_DRIVE((1,"[DHD%u]	STROBE end of interlock\n", m_unit));
 		// deassert the log address interlock
@@ -1318,6 +1367,9 @@ void diablo_hd_device::device_reset()
 	m_log_addx_interlock_0 = 1;		// deassert drive log address interlock
 	m_seek_incomplete_0 = 1;		// deassert drive seek incomplete
 
+	// reset the disk drive's strobe info
+	m_seekto = 0;
+	m_restore = 0;
 	// reset the disk drive's address
 	m_cylinder = 0;
 	m_head = 0;

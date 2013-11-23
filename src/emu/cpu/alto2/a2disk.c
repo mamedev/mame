@@ -844,23 +844,22 @@ void alto2_cpu_device::disk_ok_to_run(void* ptr, INT32 arg)
 void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 {
 	(void)ptr;
-	UINT8 unit = arg % 2;
-	UINT8 restore = (arg / 2) % 2;
-	INT32 cylinder = arg / 4;
-	int seekok;
-	int lai;
-	int strobe;
+	int unit = arg % 2;
+	int restore = (arg / 2) % 2;
+	int cylinder = arg / 4;
 
 	diablo_hd_device* dhd = m_drive[unit];
 	LOG((LOG_DISK,2,"	STROBE #%d restore:%d cylinder:%d dhd:%p\n", unit, restore, cylinder, dhd));
 
-	/* This is really monoflop 52a generating a very short 0 pulse */
-	for (strobe = 0; strobe < 2; strobe++) {
+	//
+	dhd->set_cylinder(cylinder);
+	dhd->set_restore(restore);
+	// This is really monoflop 52a generating a very short 0 pulse
+	for (int strobe = 0; strobe < 2; strobe++) {
 		UINT8 s0, s1;
-		/* pulse the strobe signal to the unit */
-		dhd->set_strobe(cylinder, restore, strobe);
+		dhd->set_strobe(strobe);	// pulse the strobe signal to the unit
 
-		lai = dhd->get_log_addx_interlock_0();
+		int lai = dhd->get_log_addx_interlock_0();
 		LOG((LOG_DISK,6,"		LAI':%d\n", lai));
 		/**
 		 * JK flip-flop 44a (LAI' clocked)
@@ -895,7 +894,7 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 		/* clear the monoflop 52b, i.e. no timer restart */
 		LOG((LOG_DISK,2,"		STROBON:%d\n", m_dsk.strobe));
 		/* update the seekok status: SKINC' && LAI' && Q' of FF 44a */
-		seekok = dhd->get_seek_incomplete_0();
+		int seekok = dhd->get_seek_incomplete_0();
 		if (seekok != m_dsk.seekok) {
 			m_dsk.seekok = seekok;
 			LOG((LOG_DISK,2,"		SEEKOK:%d\n", m_dsk.seekok));
@@ -1310,8 +1309,6 @@ void alto2_cpu_device::f1_late_load_kcom()
  */
 void alto2_cpu_device::f1_late_load_kadr()
 {
-	int unit, head;
-
 	/* store into the separate fields of KADR */
 	PUT_KADR_SEAL(m_dsk.kadr, GET_KADR_SEAL(m_bus));
 	PUT_KADR_HEADER(m_dsk.kadr, GET_KADR_HEADER(m_bus));
@@ -1320,17 +1317,19 @@ void alto2_cpu_device::f1_late_load_kadr()
 	PUT_KADR_NOXFER(m_dsk.kadr, GET_KADR_NOXFER(m_bus));
 	PUT_KADR_UNUSED(m_dsk.kadr, GET_KADR_UNUSED(m_bus));
 
-	unit = GET_KADDR_DRIVE(m_dsk.kaddr);	// get selected drive from DATA[14] output (FF 67a really)
-	head = GET_KADDR_HEAD(m_dsk.dataout);	// latch head from DATA[13]
-	PUT_KADDR_HEAD(m_dsk.kaddr, head);		// store in KADDR
+	int unit = GET_KADDR_DRIVE(m_dsk.kaddr);	// get selected drive from DATA[14] output (FF 67a really)
+	int head = GET_KADDR_HEAD(m_dsk.dataout);	// latch head from DATA[13]
+	PUT_KADDR_HEAD(m_dsk.kaddr, head);			// store in KADDR
 
-	/* take the selected head and select drive unit and head in the DIABLO HD */
+	// select drive unit
 	diablo_hd_device* dhd = m_drive[unit];
-	dhd->select(unit, head);
+	dhd->select(unit);
+	// set selected head
+	dhd->set_head(head);
 
-	/* On KDAR← load bit 0 of parts #36 and #37 is reset to 0, i.e. recno = 0 */
+	// On KDAR← load bit 0 of parts #36 and #37 is reset to 0, i.e. recno = 0
 	m_dsk.krecno = 0;
-	/* current read/write/check is that for the header */
+	// current read/write/check is that for the header
 	m_dsk.krwc = GET_KADR_HEADER(m_dsk.kadr);
 
 	LOG((LOG_DISK,1,"	KADR←; BUS[8-14] #%o\n", m_dsk.kadr));

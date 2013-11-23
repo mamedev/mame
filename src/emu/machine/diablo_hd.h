@@ -57,8 +57,11 @@ public:
 	int get_head() const;
 	int get_sector() const;
 	int get_page() const;
-	void select(int unit, int head);
-	void set_strobe(int cylinder, bool restore, int strobe);
+	void select(int unit);
+	void set_head(int head);
+	void set_cylinder(int cylinder);
+	void set_restore(int restore);
+	void set_strobe(int strobe);
 	void set_egate(int gate);
 	void set_wrgate(int gate);
 	void set_rdgate(int gate);
@@ -101,6 +104,8 @@ private:
 	int m_rdgate_0;							//!< read gate
 	int m_cylinders;						//!< total number of cylinders
 	int m_pages;							//!< total number of pages
+	int m_seekto;							//!< seek to cylinder number
+	int m_restore;							//!< restore to cylinder 0 flag
 	int m_cylinder;							//!< current cylinder number
 	int m_head;								//!< current head (track) number on cylinder
 	int m_sector;							//!< current sector number in track
