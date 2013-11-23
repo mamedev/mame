@@ -10,7 +10,7 @@
 #include "cpu/m6809/m6809.h"
 #include "video/awpvid.h"       //Fruit Machines Only
 #include "machine/6821pia.h"
-#include "machine/68681.h"
+#include "machine/n68681.h"
 #include "machine/meters.h"
 #include "machine/roc10937.h"   // vfd
 #include "machine/steppers.h"   // stepper motor
@@ -41,12 +41,18 @@ class maygay1b_state : public driver_device
 public:
 	maygay1b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_vfd(*this, "vfd"),
 		m_maincpu(*this, "maincpu"),
-		m_msm6376(*this, "msm6376") {
+		m_vfd(*this, "vfd"),
+		m_msm6376(*this, "msm6376"),
+		m_duart68681(*this, "duart68681") {
 		m_NMIENABLE = 0;
 	}
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<roc10937_t> m_vfd;
+	optional_device<okim6376_device> m_msm6376;
+	required_device<duartn68681_device> m_duart68681;
+	
 	UINT8 m_lamppos;
 	int m_alpha_clock;
 	int m_RAMEN;
@@ -59,8 +65,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_nmitimer_callback );
 	UINT8 m_Lamps[256];
 	int m_optic_pattern;
-	optional_device<roc10937_t> m_vfd;
-	device_t *m_duart68681;
 	i8279_state m_i8279[2];
 	DECLARE_READ8_MEMBER(m1_8279_r);
 	DECLARE_WRITE8_MEMBER(m1_8279_w);
@@ -80,11 +84,11 @@ public:
 	DECLARE_WRITE8_MEMBER(m1_meter_w);
 	DECLARE_READ8_MEMBER(m1_meter_r);
 	DECLARE_READ8_MEMBER(m1_firq_trg_r);
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	DECLARE_READ8_MEMBER(m1_duart_r);
 	DECLARE_DRIVER_INIT(m1);
 	virtual void machine_start();
 	virtual void machine_reset();
 	void update_outputs(i8279_state *chip, UINT16 which);
 	void m1_stepper_reset();
-	required_device<cpu_device> m_maincpu;
-	optional_device<okim6376_device> m_msm6376;
 };

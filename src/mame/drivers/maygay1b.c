@@ -472,17 +472,15 @@ void maygay1b_state::m1_stepper_reset()
 void maygay1b_state::machine_reset()
 {
 	m_vfd->reset(); // reset display1
-	m_duart68681 = machine().device( "duart68681" );
 	m1_stepper_reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 // IRQ from Duart (hopper?)
-static void duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(maygay1b_state::duart_irq_handler)
 {
-	maygay1b_state *drvstate = device->machine().driver_data<maygay1b_state>();
-	drvstate->m_maincpu->set_input_line(M6809_IRQ_LINE,  state?ASSERT_LINE:CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE,  state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 irq%d \n",state));
 }
 
@@ -730,10 +728,9 @@ WRITE8_MEMBER(maygay1b_state::reel56_w)
 	awp_draw_reel(5);
 }
 
-static UINT8 m1_duart_r (device_t *device)
+READ8_MEMBER(maygay1b_state::m1_duart_r)
 {
-	maygay1b_state *state = device->machine().driver_data<maygay1b_state>();
-	return ~(state->m_optic_pattern);
+	return ~(m_optic_pattern);
 }
 
 WRITE8_MEMBER(maygay1b_state::m1_meter_w)
@@ -821,7 +818,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2040, 0x2041) AM_READWRITE(m1_8279_2_r,m1_8279_2_w)
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 
-	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE_LEGACY("duart68681", duart68681_r, duart68681_w )
+	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE("duart68681", duartn68681_device, read, write )
 
 	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x20B0, 0x20B0) AM_READ(m1_meter_r)
@@ -852,12 +849,13 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 };
 
-static const duart68681_config maygaym1_duart68681_config =
+static const duartn68681_config maygaym1_duart68681_config =
 {
-	duart_irq_handler,
-	NULL,
-	m1_duart_r,
-	NULL
+	DEVCB_DRIVER_LINE_MEMBER(maygay1b_state, duart_irq_handler),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(maygay1b_state, m1_duart_r),
+	DEVCB_NULL
 };
 
 // machine driver for maygay m1 board /////////////////////////////////
@@ -869,7 +867,7 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 
-	MCFG_DUART68681_ADD("duart68681", M1_DUART_CLOCK, maygaym1_duart68681_config)
+	MCFG_DUARTN68681_ADD("duart68681", M1_DUART_CLOCK, maygaym1_duart68681_config)
 	MCFG_PIA6821_ADD("pia", m1_pia_intf)
 	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
