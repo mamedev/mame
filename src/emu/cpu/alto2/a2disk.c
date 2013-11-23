@@ -439,7 +439,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 * Q	to 53a J
 	 * </PRE>
 	 */
-	DEBUG_NAME("\t\t43b KWD   ");
 	s0 = m_dsk.ff_43b;
 	s1 = wddone ? JKFF_CLK : JKFF_0;
 	s1 |= JKFF_J;
@@ -448,17 +447,19 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		s1 |= JKFF_S;
 	if (!(m_dsk.ff_43a & JKFF_Q))
 		s1 |= JKFF_C;
-	m_dsk.ff_43b = update_jkff(s0, s1);
+	m_dsk.ff_43b = update_jkff(s0, s1, "43b KWD   ");
 
 	// loop over the 4 stages of sysclka and sysclkb transitions
 	for (i = 0; i < 4; i++) {
 
+#if	ALTO2_DEBUG
 		if (m_sysclka0[i] != m_sysclka1[i]) {
 			LOG((LOG_DISK,9,"	SYSCLKA' %s\n", raise_lower[m_sysclka1[i]]));
 		}
 		if (m_sysclkb0[i] != m_sysclkb1[i]) {
 			LOG((LOG_DISK,9,"	SYSCLKB' %s\n", raise_lower[m_sysclkb1[i]]));
 		}
+#endif
 
 		/**
 		 * JK flip-flop 53b (word task)
@@ -471,7 +472,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	WDINIT
 		 * </PRE>
 		 */
-		DEBUG_NAME("\t\t53b KWD   ");
 		s0 = m_dsk.ff_53b;
 		s1 = m_sysclkb1[i];
 		if (block != task_kwd)
@@ -479,7 +479,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		if (WDALLOW)
 			s1 |= JKFF_S;
 		s1 |= JKFF_C;
-		m_dsk.ff_53b = update_jkff(s0, s1);
+		m_dsk.ff_53b = update_jkff(s0, s1, "53b KWD   ");
 
 		/**
 		 * JK flip-flop 53a (word task)
@@ -492,7 +492,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	to 43a J and K'
 		 * </PRE>
 		 */
-		DEBUG_NAME("\t\t53a KWD   ");
 		s0 = m_dsk.ff_53a;
 		s1 = m_sysclkb1[i];
 		if (m_dsk.ff_43b & JKFF_Q)
@@ -502,7 +501,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		s1 |= JKFF_S;
 		if (WDALLOW)
 			s1 |= JKFF_C;
-		m_dsk.ff_53a = update_jkff(s0, s1);
+		m_dsk.ff_53a = update_jkff(s0, s1, "53a KWD   ");
 
 		/**
 		 * JK flip-flop 43a (word task)
@@ -515,7 +514,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	WDTSKENA', Q' WDTSKENA
 		 * </PRE>
 		 */
-		DEBUG_NAME("\t\t43a KWD   ");
 		s0 = m_dsk.ff_43a;
 		s1 = m_sysclka1[i];
 		if (m_dsk.ff_53a & JKFF_Q)
@@ -525,7 +523,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		s1 |= JKFF_S;
 		if (WDALLOW)
 			s1 |= JKFF_C;
-		m_dsk.ff_43a = update_jkff(s0, s1);
+		m_dsk.ff_43a = update_jkff(s0, s1, "43a KWD   ");
 
 		/**
 		 * JK flip-flop 45a (ready latch)
@@ -538,7 +536,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	RDYLAT'
 		 * </PRE>
 		 */
-		DEBUG_NAME("\t\t45a RDYLAT");
 		s0 = m_dsk.ff_45a;
 		s1 = m_sysclka1[i];
 		if (dhd->get_ready_0())
@@ -546,7 +543,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
 		s1 |= JKFF_C;		// FIXME: CLRSTAT' ?
-		m_dsk.ff_45a = update_jkff(s0, s1);
+		m_dsk.ff_45a = update_jkff(s0, s1, "45a RDYLAT");
 
 		/**
 		 * sets the seqerr flip-flop 45b (Q' is SEQERR)
@@ -560,7 +557,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	to KSTAT[11] DATALATE
 		 * </PRE>
 		 */
-		DEBUG_NAME("\t\t45b SEQERR");
 		s0 = m_dsk.ff_45b;
 		s1 = m_sysclka1[i];
 		s1 |= JKFF_J;
@@ -568,7 +564,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			s1 |= JKFF_K;
 		s1 |= JKFF_S;		// FIXME: CLRSTAT' ?
 		s1 |= JKFF_C;
-		m_dsk.ff_45b = update_jkff(s0, s1);
+		m_dsk.ff_45b = update_jkff(s0, s1, "45b SEQERR");
 
 		/**
 		 * JK flip-flop 22b (sector task)
@@ -581,7 +577,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	STSKENA; Q' WAKEKST'
 		 * </PRE>
 		 */
-		DEBUG_NAME("\t\t22b KSEC  ");
 		s0 = m_dsk.ff_22b;
 		s1 = m_sysclkb1[i];
 		if (m_dsk.ff_22a & JKFF_Q)
@@ -590,7 +585,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 			s1 |= JKFF_K;
 		s1 |= JKFF_S;	// FIXME: RESET' ?
 		s1 |= JKFF_C;
-		m_dsk.ff_22b = update_jkff(s0, s1);
+		m_dsk.ff_22b = update_jkff(s0, s1, "22b KSEC  ");
 
 		/**
 		 * JK flip-flop 22a (sector task)
@@ -603,7 +598,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	to 22b J
 		 * </PRE>
 		 */
-		DEBUG_NAME("\t\t22a KSEC  ");
 		s0 = m_dsk.ff_22a;
 		s1 = m_sysclkb1[i];
 		if (m_dsk.ff_21b & JKFF_Q)
@@ -612,7 +606,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		s1 |= JKFF_S;
 		if (!(m_dsk.ff_22b & JKFF_Q))
 			s1 |= JKFF_C;
-		m_dsk.ff_22a = update_jkff(s0, s1);
+		m_dsk.ff_22a = update_jkff(s0, s1, "22a KSEC  ");
 
 		/**
 		 * JK flip-flop 21b (sector task)
@@ -625,7 +619,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		 * Q	to 22a J
 		 * </PRE>
 		 */
-		DEBUG_NAME("\t\t21b KSEC  ");
 		s0 = m_dsk.ff_21b;
 		s1 = m_sysclkb1[i];
 		if (m_dsk.ff_21a & JKFF_Q)
@@ -634,7 +627,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		s1 |= JKFF_S;
 		if (!(m_dsk.ff_22b & JKFF_Q))
 			s1 |= JKFF_C;
-		m_dsk.ff_21b = update_jkff(s0, s1);
+		m_dsk.ff_21b = update_jkff(s0, s1, "21b KSEC  ");
 	}
 
 	// The 53b FF Q output is the WDINIT signal.
@@ -716,7 +709,6 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	 * Q	to seclate monoflop
 	 * </PRE>
 	 */
-	DEBUG_NAME("\t\t21a KSEC  ");
 	s0 = m_dsk.ff_21a;
 	s1 = dhd->get_sector_mark_0() ? JKFF_CLK : JKFF_0;
 	if (!(m_dsk.ff_22b & JKFF_Q))
@@ -726,7 +718,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		s1 |= JKFF_S;
 	if (!(m_dsk.ff_22b & JKFF_Q))
 		s1 |= JKFF_C;
-	m_dsk.ff_21a = update_jkff(s0, s1);
+	m_dsk.ff_21a = update_jkff(s0, s1, "21a KSEC  ");
 
 	// If the KSEC FF 21a Q goes 1, pulse the SECLATE signal for some time.
 	if (!(m_dsk.ff_21a_old & JKFF_Q) && (m_dsk.ff_21a & JKFF_Q)) {
@@ -872,14 +864,13 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 		 * Q	to seekok
 		 * </PRE>
 		 */
-		DEBUG_NAME("\t\t44a LAI   ");
 		s0 = m_dsk.ff_44a;
 		s1 = lai ? JKFF_CLK : JKFF_0;
 		s1 |= JKFF_J;
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
 		s1 |= JKFF_C;
-		m_dsk.ff_44a = update_jkff(s0, s1);
+		m_dsk.ff_44a = update_jkff(s0, s1, "44a LAI   ");
 		if (dhd->get_addx_acknowledge_0() == 0 && (m_dsk.ff_44a & JKFF_Q)) {
 			/* if address is acknowledged, and Q' of FF 44a, clear the strobe */
 			m_dsk.strobe = 0;
@@ -1055,7 +1046,6 @@ void alto2_cpu_device::f1_late_load_kstat()
 	 */
 	for (int i = 0; i < 2; i++) {
 		UINT8 s0, s1;
-		DEBUG_NAME("\t\t44b CKSUM ");
 		s0 = m_dsk.ff_44b;
 		s1 = i ? JKFF_CLK : JKFF_0;
 		if (!GET_KSTAT_CKSUM(m_bus))
@@ -1063,7 +1053,7 @@ void alto2_cpu_device::f1_late_load_kstat()
 		s1 |= JKFF_K;
 		s1 |= JKFF_S;
 		s1 |= JKFF_C;
-		m_dsk.ff_44b = update_jkff(s0, s1);
+		m_dsk.ff_44b = update_jkff(s0, s1, "44b CKSUM ");
 	}
 }
 
@@ -1194,14 +1184,13 @@ void alto2_cpu_device::f1_late_clrstat()
 	 * C'	CLRSTAT'
 	 * Q	to seekok
 	 */
-	DEBUG_NAME("\t\t44a LAI   ");
 	s0 = m_dsk.ff_44a;
 	s1 = m_dsk.ff_44a & JKFF_CLK;
 	s1 |= JKFF_J;
 	s1 |= JKFF_K;
 	s1 |= JKFF_S;
 	s1 &= ~JKFF_C;
-	m_dsk.ff_44a = update_jkff(s0, s1);
+	m_dsk.ff_44a = update_jkff(s0, s1, "44a LAI   ");
 
 	/* clears the CKSUM flip-flop 44b
 	 * JK flip-flop 44b (KSTAT← clocked)
@@ -1212,14 +1201,13 @@ void alto2_cpu_device::f1_late_clrstat()
 	 * C'	CLRSTAT'
 	 * Q	to seekok
 	 */
-	DEBUG_NAME("\t\t44b CKSUM ");
 	s0 = m_dsk.ff_44b;
 	s1 = m_dsk.ff_44b & JKFF_CLK;
 	s1 |= m_dsk.ff_44b & JKFF_J;
 	s1 |= JKFF_K;
 	s1 |= JKFF_S;
 	s1 &= ~JKFF_C;
-	m_dsk.ff_44b = update_jkff(s0, s1);
+	m_dsk.ff_44b = update_jkff(s0, s1, "44b CKSUM ");
 
 	/* clears the rdylat flip-flop 45a
 	 * JK flip-flop 45a (ready latch)
@@ -1230,7 +1218,6 @@ void alto2_cpu_device::f1_late_clrstat()
 	 * C'	CLRSTAT'
 	 * Q	RDYLAT'
 	 */
-	DEBUG_NAME("\t\t45a RDYLAT");
 	s0 = m_dsk.ff_45a;
 	s1 = m_dsk.ff_45a & JKFF_CLK;
 	if (dhd->get_ready_0())
@@ -1238,7 +1225,7 @@ void alto2_cpu_device::f1_late_clrstat()
 	s1 |= JKFF_K;
 	s1 |= JKFF_S;
 	s1 &= ~JKFF_C;
-	m_dsk.ff_45a = update_jkff(s0, s1);
+	m_dsk.ff_45a = update_jkff(s0, s1, "45a RDYLAT");
 
 	/* sets the seqerr flip-flop 45b (Q' is SEQERR)
 	 * JK flip-flop 45b (seqerr latch)
@@ -1249,7 +1236,6 @@ void alto2_cpu_device::f1_late_clrstat()
 	 * C'	1
 	 * Q	to KSTAT[11] DATALATE
 	 */
-	DEBUG_NAME("\t\t45b SEQERR");
 	s0 = m_dsk.ff_45b;
 	s1 = m_dsk.ff_45b & JKFF_CLK;
 	s1 |= JKFF_J;
@@ -1257,7 +1243,7 @@ void alto2_cpu_device::f1_late_clrstat()
 		s1 |= JKFF_K;
 	s1 &= ~JKFF_S;
 	s1 |= JKFF_C;
-	m_dsk.ff_45b = update_jkff(s0, s1);
+	m_dsk.ff_45b = update_jkff(s0, s1, "45b SEQERR");
 
 	/* set or reset monoflop 31a, depending on drive READY' */
 	m_dsk.ready_mf31a = dhd->get_ready_0();

@@ -840,6 +840,16 @@ void alto2_cpu_device::activate_eth()
  */
 void alto2_cpu_device::init_ether(int task)
 {
+	save_item(NAME(m_eth.fifo));
+	save_item(NAME(m_eth.fifo_rd));
+	save_item(NAME(m_eth.fifo_wr));
+	save_item(NAME(m_eth.status));
+	save_item(NAME(m_eth.rx_crc));
+	save_item(NAME(m_eth.tx_crc));
+	save_item(NAME(m_eth.rx_count));
+	save_item(NAME(m_eth.tx_count));
+	save_item(NAME(m_eth.breath_of_life));
+
 	// intialize all ethernet variables
 	memset(&m_eth, 0, sizeof(m_eth));
 

@@ -826,6 +826,16 @@ void alto2_cpu_device::exit_memory()
 
 void alto2_cpu_device::reset_memory()
 {
+	save_item(NAME(m_mem.mar));
+	save_item(NAME(m_mem.rmdd));
+	save_item(NAME(m_mem.wmdd));
+	save_item(NAME(m_mem.md));
+	save_item(NAME(m_mem.cycle));
+	save_item(NAME(m_mem.access));
+	save_item(NAME(m_mem.error));
+	save_item(NAME(m_mem.mear));
+	save_item(NAME(m_mem.mecr));
+
 	if (m_mem.ram) {
 		auto_free(machine(), m_mem.ram);
 		m_mem.ram = 0;

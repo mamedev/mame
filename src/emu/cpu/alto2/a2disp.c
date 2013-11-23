@@ -530,6 +530,26 @@ void alto2_cpu_device::exit_disp()
 
 void alto2_cpu_device::reset_disp()
 {
+	save_item(NAME(m_dsp.hlc));
+	save_item(NAME(m_dsp.a63));
+	save_item(NAME(m_dsp.a66));
+	save_item(NAME(m_dsp.setmode));
+	save_item(NAME(m_dsp.inverse));
+	save_item(NAME(m_dsp.halfclock));
+	save_item(NAME(m_dsp.clr));
+	save_item(NAME(m_dsp.fifo));
+	save_item(NAME(m_dsp.fifo_wr));
+	save_item(NAME(m_dsp.fifo_rd));
+	save_item(NAME(m_dsp.dht_blocks));
+	save_item(NAME(m_dsp.dwt_blocks));
+	save_item(NAME(m_dsp.curt_blocks));
+	save_item(NAME(m_dsp.curt_wakeup));
+	save_item(NAME(m_dsp.vblank));
+	save_item(NAME(m_dsp.xpreg));
+	save_item(NAME(m_dsp.csr));
+	save_item(NAME(m_dsp.curword));
+	save_item(NAME(m_dsp.curdata));
+
 	m_dsp.state = 020;
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 	m_dsp.a63 = 0;

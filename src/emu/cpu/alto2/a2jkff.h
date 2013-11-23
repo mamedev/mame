@@ -9,7 +9,7 @@
  *****************************************************************************/
 #ifdef  ALTO2_DEFINE_CONSTANTS
 
-#define	JKFF_FUNCTION	0	//!< define 1 to debug the JK flip-flops, 0 to use a lookup table
+#define	JKFF_DEBUG		0	//!< define 1 to debug the transitions
 
 /**
  * @brief enumeration of the inputs and outputs of a JK flip-flop type 74109
@@ -44,20 +44,151 @@ typedef enum {
 	JKFF_Q0		= (1 << 6)	//!< Q' output
 }	jkff_t;
 
-#if	ALTO2_DEBUG
-/** @brief macro to set the name of a FF in DEBUG=1 builds only */
-extern const char* jkff_name;
-#define	DEBUG_NAME(x)	jkff_name = x
-#else
-#define	DEBUG_NAME(x)
-#endif
-
 #else	// ALTO2_DEFINE_CONSTANTS
 
 #ifndef _A2JKFF_H_
 #define _A2JKFF_H_
 
-jkff_t update_jkff(UINT8 s0, UINT8 s1);	//!< simulate a 74109 J-K flip-flop with set and reset inputs
+#if	JKFF_DEBUG
+/**
+ * @brief simulate a 74109 J-K flip-flop with set and reset inputs
+ *
+ * @param s0 is the previous state of the FF's in- and outputs
+ * @param s1 is the next state
+ * @return returns the next state and probably modified Q output
+ */
+static inline jkff_t update_jkff(UINT8 s0, UINT8 s1, const char* jkff_name)
+{
+	switch (s1 & (JKFF_C | JKFF_S))
+	{
+	case JKFF_C | JKFF_S:	/* C' is 1, and S' is 1 */
+		if (((s0 ^ s1) & s1) & JKFF_CLK) {
+			/* rising edge of the clock */
+			switch (s1 & (JKFF_J | JKFF_K))
+			{
+			case 0:
+				/* both J and K' are 0: set Q to 0, Q' to 1 */
+				s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
+				if (s0 & JKFF_Q) {
+					LOG((LOG_DISK,9,"\t\t%s J:0 K':0 → Q:0\n", jkff_name));
+				}
+				break;
+			case JKFF_J:
+				/* J is 1, and K' is 0: toggle Q */
+				if (s0 & JKFF_Q)
+					s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
+				else
+					s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
+				LOG((LOG_DISK,9,"\t\t%s J:0 K':1 flip-flop Q:%d\n", jkff_name, (s1 & JKFF_Q) ? 1 : 0));
+				break;
+			case JKFF_K:
+				if ((s0 ^ s1) & JKFF_Q) {
+					LOG((LOG_DISK,9,"\t\t%s J:0 K':1 keep Q:%d\n", jkff_name, (s1 & JKFF_Q) ? 1 : 0));
+				}
+				/* J is 0, and K' is 1: keep Q as is */
+				if (s0 & JKFF_Q)
+					s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
+				else
+					s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
+				break;
+			case JKFF_J | JKFF_K:
+				/* both J and K' are 1: set Q to 1 */
+				s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
+				if (!(s0 & JKFF_Q)) {
+					LOG((LOG_DISK,9,"\t\t%s J:1 K':1 → Q:1\n", jkff_name));
+				}
+				break;
+			}
+		} else {
+			/* keep Q */
+			s1 = (s1 & ~JKFF_Q) | (s0 & JKFF_Q);
+		}
+		break;
+	case JKFF_S:
+		/* S' is 1, C' is 0: set Q to 0, Q' to 1 */
+		s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
+		if (s0 & JKFF_Q) {
+			LOG((LOG_DISK,9,"\t\t%s C':0 → Q:0\n", jkff_name));
+		}
+		break;
+	case JKFF_C:
+		/* S' is 0, C' is 1: set Q to 1, Q' to 0 */
+		s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
+		if (!(s0 & JKFF_Q)) {
+			LOG((LOG_DISK,9,"\t\t%s S':0 → Q:1\n", jkff_name));
+		}
+		break;
+	case 0:
+	default:
+		/* unstable state (what to do?) */
+		s1 = s1 | JKFF_Q | JKFF_Q0;
+		LOG((LOG_DISK,9,"\t\t%s C':0 S':0 → Q:1 and Q':1 <unstable>\n", jkff_name));
+		break;
+	}
+	return static_cast<jkff_t>(s1);
+}
+#else	// JKFF_DEBUG
+/**
+ * @brief simulate a 74109 J-K flip-flop with set and reset inputs
+ *
+ * @param s0 is the previous state of the FF's in- and outputs
+ * @param s1 is the next state
+ * @return returns the next state and probably modified Q output
+ */
+static inline jkff_t update_jkff(UINT8 s0, UINT8 s1, const char*)
+{
+	switch (s1 & (JKFF_C | JKFF_S))
+	{
+	case JKFF_C | JKFF_S:	/* C' is 1, and S' is 1 */
+		if (((s0 ^ s1) & s1) & JKFF_CLK) {
+			/* rising edge of the clock */
+			switch (s1 & (JKFF_J | JKFF_K))
+			{
+			case 0:
+				/* both J and K' are 0: set Q to 0, Q' to 1 */
+				s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
+				break;
+			case JKFF_J:
+				/* J is 1, and K' is 0: toggle Q */
+				if (s0 & JKFF_Q)
+					s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
+				else
+					s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
+				break;
+			case JKFF_K:
+				/* J is 0, and K' is 1: keep Q as is */
+				if (s0 & JKFF_Q)
+					s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
+				else
+					s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
+				break;
+			case JKFF_J | JKFF_K:
+				/* both J and K' are 1: set Q to 1 */
+				s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
+				break;
+			}
+		} else {
+			/* keep Q */
+			s1 = (s1 & ~JKFF_Q) | (s0 & JKFF_Q);
+		}
+		break;
+	case JKFF_S:
+		/* S' is 1, C' is 0: set Q to 0, Q' to 1 */
+		s1 = (s1 & ~JKFF_Q) | JKFF_Q0;
+		break;
+	case JKFF_C:
+		/* S' is 0, C' is 1: set Q to 1, Q' to 0 */
+		s1 = (s1 | JKFF_Q) & ~JKFF_Q0;
+		break;
+	case 0:
+	default:
+		/* unstable state (what to do?) */
+		s1 = s1 | JKFF_Q | JKFF_Q0;
+		break;
+	}
+	return static_cast<jkff_t>(s1);
+}
+#endif	// JKFF_DEBUG
 
 #endif	// _A2JKFF_H_
 #endif	// ALTO2_DEFINE_CONSTANTS

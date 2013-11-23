@@ -17,6 +17,62 @@
 //**************************************************************************
 
 const device_type ALTO2 = &device_creator<alto2_cpu_device>;
+
+//**************************************************************************
+//  LOGGING AND DEBUGGING
+//**************************************************************************
+#if	ALTO2_DEBUG
+int g_log_types = LOG_ETH;
+int g_log_level = 8;
+bool g_log_newline = true;
+
+void logprintf(int type, int level, const char* format, ...)
+{
+	static const char* type_name[] = {
+		"[CPU]",
+		"[EMU]",
+		"[T01]",
+		"[T02]",
+		"[T03]",
+		"[KSEC]",
+		"[T05]",
+		"[T06]",
+		"[ETH]",
+		"[MRT]",
+		"[DWT]",
+		"[CURT]",
+		"[DHT]",
+		"[DVT]",
+		"[PART]",
+		"[KWD]",
+		"[T17]",
+		"[MEM]",
+		"[RAM]",
+		"[DRIVE]",
+		"[DISK]",
+		"[DISPL]",
+		"[MOUSE]",
+		"[HW]",
+		"[KBD]"
+	};
+	if (!(g_log_types & type))
+		return;
+	if (level > g_log_level)
+		return;
+	if (g_log_newline) {
+		// last line had a \n - print type name
+		for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
+			if (type & (1 << i))
+				logerror("%-7s ", type_name[i]);
+	}
+	va_list ap;
+	va_start(ap, format);
+	vlogerror(format, ap);
+	va_end(ap);
+	g_log_newline = format[strlen(format) - 1] == '\n';
+}
+#endif
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -85,11 +141,6 @@ ADDRESS_MAP_END
 
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
 	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2", __FILE__),
-#if	ALTO2_DEBUG
-	m_log_types(LOG_ETH),
-	m_log_level(8),
-	m_log_newline(true),
-#endif
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
 	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
@@ -195,56 +246,6 @@ alto2_cpu_device::~alto2_cpu_device()
 	exit_disk();
 	exit_memory();
 }
-
-#if	ALTO2_DEBUG
-// FIXME: define types (sections) and print the section like [emu] [kwd] ...
-// FIXME: use the level to suppress messages if logging is less verbose than level
-void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
-{
-	static const char* type_name[] = {
-		"[CPU]",
-		"[EMU]",
-		"[T01]",
-		"[T02]",
-		"[T03]",
-		"[KSEC]",
-		"[T05]",
-		"[T06]",
-		"[ETH]",
-		"[MRT]",
-		"[DWT]",
-		"[CURT]",
-		"[DHT]",
-		"[DVT]",
-		"[PART]",
-		"[KWD]",
-		"[T17]",
-		"[MEM]",
-		"[RAM]",
-		"[DRIVE]",
-		"[DISK]",
-		"[DISPL]",
-		"[MOUSE]",
-		"[HW]",
-		"[KBD]"
-	};
-	if (!(m_log_types & type))
-		return;
-	if (level > m_log_level)
-		return;
-	if (m_log_newline) {
-		// last line had a \n - print type name
-		for (int i = 0; i < sizeof(type_name)/sizeof(type_name[0]); i++)
-			if (type & (1 << i))
-				logerror("%-7s %11lld ", type_name[i], cycle());
-	}
-	va_list ap;
-	va_start(ap, format);
-	vlogerror(format, ap);
-	va_end(ap);
-	m_log_newline = format[strlen(format) - 1] == '\n';
-}
-#endif
 
 //-------------------------------------------------
 // driver interface to set diablo_hd_device
@@ -812,7 +813,6 @@ const address_space_config*alto2_cpu_device::memory_space_config(address_spacenu
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-// FIXME
 void alto2_cpu_device::device_start()
 {
 	// get a pointer to the IO address space
@@ -929,46 +929,6 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_dsk.ff_45a));
 	save_item(NAME(m_dsk.ff_45b));
 #endif
-	save_item(NAME(m_dsp.hlc));
-	save_item(NAME(m_dsp.a63));
-	save_item(NAME(m_dsp.a66));
-	save_item(NAME(m_dsp.setmode));
-	save_item(NAME(m_dsp.inverse));
-	save_item(NAME(m_dsp.halfclock));
-	save_item(NAME(m_dsp.clr));
-	save_item(NAME(m_dsp.fifo));
-	save_item(NAME(m_dsp.fifo_wr));
-	save_item(NAME(m_dsp.fifo_rd));
-	save_item(NAME(m_dsp.dht_blocks));
-	save_item(NAME(m_dsp.dwt_blocks));
-	save_item(NAME(m_dsp.curt_blocks));
-	save_item(NAME(m_dsp.curt_wakeup));
-	save_item(NAME(m_dsp.vblank));
-	save_item(NAME(m_dsp.xpreg));
-	save_item(NAME(m_dsp.csr));
-	save_item(NAME(m_dsp.curword));
-	save_item(NAME(m_dsp.curdata));
-	save_item(NAME(m_mem.mar));
-	save_item(NAME(m_mem.rmdd));
-	save_item(NAME(m_mem.wmdd));
-	save_item(NAME(m_mem.md));
-	save_item(NAME(m_mem.cycle));
-	save_item(NAME(m_mem.access));
-	save_item(NAME(m_mem.error));
-	save_item(NAME(m_mem.mear));
-	save_item(NAME(m_mem.mecr));
-	save_item(NAME(m_emu.ir));
-	save_item(NAME(m_emu.skip));
-	save_item(NAME(m_emu.cy));
-	save_item(NAME(m_eth.fifo));
-	save_item(NAME(m_eth.fifo_rd));
-	save_item(NAME(m_eth.fifo_wr));
-	save_item(NAME(m_eth.status));
-	save_item(NAME(m_eth.rx_crc));
-	save_item(NAME(m_eth.tx_crc));
-	save_item(NAME(m_eth.rx_count));
-	save_item(NAME(m_eth.tx_count));
-	save_item(NAME(m_eth.breath_of_life));
 
 	state_add( A2_TASK,    "TASK",    m_task).callimport().formatstr("%6s");
 	state_add( A2_MPC,     "MPC",     m_mpc).formatstr("%06O");
