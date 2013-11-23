@@ -1090,6 +1090,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::gmgalax_port_r)
 
 WRITE8_MEMBER(galaxian_state::zigzag_bankswap_w)
 {
+	/* Zig Zag can swap ROMs 2 and 3 as a form of copy protection */
 	membank("bank1")->set_entry(data & 1);
 	membank("bank2")->set_entry(~data & 1);
 }
