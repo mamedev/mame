@@ -2,6 +2,7 @@
 #define __DEBUG_QT_VIEW_H__
 
 #include <QtGui/QtGui>
+#include <QPainter>
 
 #include "debug/debugvw.h"
 

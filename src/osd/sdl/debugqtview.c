@@ -70,13 +70,21 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 	bgBrush.setStyle(Qt::SolidPattern);
 	painter.setPen(QPen(QColor(0,0,0)));
 
+	QTextOption opt(Qt::AlignLeft);
+	QStaticText stext;
+	stext.prepare();
+	stext.setTextFormat(Qt::PlainText);
+	stext.setTextOption(opt);
+
 	size_t viewDataOffset = 0;
 	const debug_view_xy& visibleCharDims = m_view->visible_size();
 	const debug_view_char* viewdata = m_view->viewdata();
 	for (int y = 0; y < visibleCharDims.y; y++)
 	{
-		for (int x = 0; x < visibleCharDims.x; x++)
+		for (int x = 0; x < visibleCharDims.x; /* */)
 		{
+			int width = 0;
+			QString text;
 			const unsigned char textAttr = viewdata[viewDataOffset].attrib;
 
 			if (x == 0 || textAttr != viewdata[viewDataOffset-1].attrib)
@@ -127,21 +135,22 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 				bgBrush.setColor(bgColor);
 				painter.setBackground(bgBrush);
 				// Scan for the width of identical attributes
-				int width;
-				for (width = 0; x + width < visibleCharDims.x; width++)
+				text.clear();
+				for (width = 0; x + width < visibleCharDims.x; width++) {
 					if (textAttr != viewdata[viewDataOffset + width].attrib)
 						break;
-				// Fill the of width times fontWidth x fontHeight.
+					text.append(QChar(viewdata[viewDataOffset + width].uchar));
+				}
+				// Fill width times fontWidth x fontHeight.
 				painter.fillRect(x*fontWidth, y*fontHeight, width*fontWidth, fontHeight, bgBrush);
 				painter.setPen(QPen(fgColor));
 			}
-
-			// There is a touchy interplay between font height, drawing difference, visible position, etc
-			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
-			painter.drawText(x*fontWidth,
-								(y*fontHeight + (fontHeight*0.80)),
-								QString(QChar(viewdata[viewDataOffset].uchar)));
-			viewDataOffset++;
+			// Use QPainter::drawStaticText() for the string of characters
+			// sharing the same attributes
+			stext.setText(text);
+			painter.drawStaticText(QPoint(x*fontWidth,y*fontHeight), stext);
+			viewDataOffset += width;
+			x += width;
 		}
 	}
 }
