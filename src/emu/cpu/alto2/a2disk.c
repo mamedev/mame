@@ -1702,7 +1702,7 @@ void alto2_cpu_device::reset_disk()
 	m_dsk.kaddr = 0;
 	m_dsk.kadr = 0;
 	m_dsk.kstat = 0;
-	m_dsk.kcom = 0;
+	m_dsk.kcom = 066000;
 	m_dsk.krecno = 0;
 	m_dsk.egate = 1;
 	m_dsk.wrgate = 1;
@@ -1723,8 +1723,8 @@ void alto2_cpu_device::reset_disk()
 #if	USE_BITCLK_TIMER
 	m_dsk.bitclk_timer->reset();
 #else
-   m_dsk.bitclk_time[0] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
-   m_dsk.bitclk_time[1] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
+	m_dsk.bitclk_time[0] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
+	m_dsk.bitclk_time[1] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
 #endif
 	m_dsk.datin = 0;
 	m_dsk.bitcount = 0;

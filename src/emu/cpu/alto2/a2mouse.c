@@ -98,6 +98,7 @@ enum {
 
 #define	MOVEX(x) ((((x) < 0) ? MY2 : ((x) > 0) ? MY1 : 0))
 #define	MOVEY(y) ((((y) < 0) ? MX2 : ((y) > 0) ? MX1 : 0))
+#define	SIGN(a) ((a) < 0 ? -1 : (a) > 0 ? 1 : 0)
 
 /**
  * @brief return the mouse motion flags
@@ -123,14 +124,8 @@ UINT16 alto2_cpu_device::mouse_read()
 		break;
 	case 1:
 		m_mouse.latch |= MACTIVE;
-		if (m_mouse.x < m_mouse.dx)
-			m_mouse.x++;
-		if (m_mouse.x > m_mouse.dx)
-			m_mouse.x--;
-		if (m_mouse.y < m_mouse.dy)
-			m_mouse.y++;
-		if (m_mouse.y > m_mouse.dy)
-			m_mouse.y--;
+		m_mouse.x -= SIGN(m_mouse.x - m_mouse.dx);
+		m_mouse.y -= SIGN(m_mouse.y - m_mouse.dy);
 		break;
 	case 2:
 		m_mouse.latch ^= MOVEX(m_mouse.dx - m_mouse.x);
@@ -138,14 +133,8 @@ UINT16 alto2_cpu_device::mouse_read()
 		break;
 	default:
 		m_mouse.latch &= ~MACTIVE;
-		if (m_mouse.x < m_mouse.dx)
-			m_mouse.x++;
-		if (m_mouse.x > m_mouse.dx)
-			m_mouse.x--;
-		if (m_mouse.y < m_mouse.dy)
-			m_mouse.y++;
-		if (m_mouse.y > m_mouse.dy)
-			m_mouse.y--;
+		m_mouse.x -= SIGN(m_mouse.x - m_mouse.dx);
+		m_mouse.y -= SIGN(m_mouse.y - m_mouse.dy);
 	}
 	m_mouse.phase = (m_mouse.phase + 1) % 4;
 	return data;

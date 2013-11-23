@@ -433,6 +433,8 @@ UINT32* diablo_hd_device::expand_sector()
 {
 	size_t dst;
 
+	if (!m_bits)
+		return NULL;
 	/* already expanded this sector? */
 	if (m_bits[m_page])
 		return m_bits[m_page];
@@ -1165,6 +1167,11 @@ void diablo_hd_device::wr_data(int index, int wrdata)
 	}
 
 	UINT32 *bits = expand_sector();
+	if (!bits) {
+		LOG_DRIVE((0,"[DHD%u]	no bits\n", m_unit));
+		return;	// invalid unit
+	}
+
 	if (-1 == m_wrfirst)
 		m_wrfirst = index;
 
@@ -1208,10 +1215,15 @@ int diablo_hd_device::rd_data(int index)
 
 	if (-1 == m_page) {
 		LOG_DRIVE((0,"[DHD%u]	invalid page\n", m_unit));
-		return 1;	// invalid page
+		return 1;	// invalid unit
 	}
 
 	UINT32 *bits = expand_sector();
+	if (!bits) {
+		LOG_DRIVE((0,"[DHD%u]	no bits\n", m_unit));
+		return 1;	// invalid page
+	}
+
 	if (-1 == m_rdfirst)
 		m_rdfirst = index;
 
@@ -1250,6 +1262,11 @@ int diablo_hd_device::rd_clock(int index)
 	}
 
 	UINT32 *bits = expand_sector();
+	if (!bits) {
+		LOG_DRIVE((0,"[DHD%u]	no bits\n", m_unit));
+		return 1;	// invalid unit
+	}
+
 	if (-1 == m_rdfirst)
 		m_rdfirst = index;
 
@@ -1354,6 +1371,8 @@ void diablo_hd_device::device_reset()
 		m_cylinders = 2 * DIABLO_CYLINDERS;
 		m_pages = 2 * DIABLO_PAGES;
 	}
+	LOG_DRIVE((0,"[DHD%u]	m_handle            : %p\n", m_unit, m_handle));
+	LOG_DRIVE((0,"[DHD%u]	m_disk              : %p\n", m_unit, m_disk));
 	LOG_DRIVE((0,"[DHD%u]	rotation time       : %.0fns\n", m_unit, m_rotation_time.as_double() * ATTOSECONDS_PER_NANOSECOND));
 	LOG_DRIVE((0,"[DHD%u]	sector time         : %.0fns\n", m_unit, m_sector_time.as_double() * ATTOSECONDS_PER_NANOSECOND));
 	LOG_DRIVE((0,"[DHD%u]	sector mark 0 time  : %.0fns\n", m_unit, m_sector_mark_0_time.as_double() * ATTOSECONDS_PER_NANOSECOND));
@@ -1387,13 +1406,13 @@ void diablo_hd_device::device_reset()
 	m_rdfirst = -1;
 	m_rdlast = -1;
 
+	if (!m_handle)
+		return;
 	// for units with a CHD assigned to them start the timer
-	if (m_handle) {
-		timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
-		m_cache = auto_alloc_array_clear(machine(), UINT8*, m_pages);
-		m_bits = auto_alloc_array_clear(machine(), UINT32*, m_pages);
-		read_sector();
-	}
+	m_cache = auto_alloc_array_clear(machine(), UINT8*, m_pages);
+	m_bits = auto_alloc_array_clear(machine(), UINT32*, m_pages);
+	timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
+	read_sector();
 }
 
 /**

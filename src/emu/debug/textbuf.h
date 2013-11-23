@@ -27,7 +27,7 @@ struct text_buffer;
 ***************************************************************************/
 
 /* allocate a new text buffer */
-text_buffer *text_buffer_alloc(UINT32 columns, UINT32 lines);
+text_buffer *text_buffer_alloc(UINT32 length, UINT32 lines);
 
 /* free a text buffer */
 void text_buffer_free(text_buffer *text);

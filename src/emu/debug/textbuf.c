@@ -46,8 +46,8 @@ struct text_buffer
 ***************************************************************************/
 
 /*-------------------------------------------------
-	buffer_used - return the number of bytes
-	currently held in the buffer
+	buffer_used - return the number of
+	unicode_chars currently held in the buffer
 -------------------------------------------------*/
 
 INLINE INT32 buffer_used(text_buffer *text)
@@ -60,8 +60,8 @@ INLINE INT32 buffer_used(text_buffer *text)
 
 
 /*-------------------------------------------------
-	buffer_space - return the number of bytes
-	available in the buffer
+	buffer_space - return the number of
+	unicode_chars available in the buffer
 -------------------------------------------------*/
 
 INLINE INT32 buffer_space(text_buffer *text)
@@ -81,7 +81,7 @@ INLINE INT32 buffer_space(text_buffer *text)
 	text_buffer_alloc - allocate a new text buffer
 -------------------------------------------------*/
 
-text_buffer *text_buffer_alloc(UINT32 columns, UINT32 lines)
+text_buffer *text_buffer_alloc(UINT32 length, UINT32 lines)
 {
 	text_buffer *text;
 
@@ -91,7 +91,7 @@ text_buffer *text_buffer_alloc(UINT32 columns, UINT32 lines)
 		return NULL;
 
 	/* allocate memory for the buffer itself */
-	text->buffer = (unicode_char *)osd_malloc_array(sizeof(unicode_char) * columns);
+	text->buffer = (unicode_char *)osd_malloc_array((length + 1) * sizeof(unicode_char));
 	if (!text->buffer)
 	{
 		osd_free(text);
@@ -108,7 +108,7 @@ text_buffer *text_buffer_alloc(UINT32 columns, UINT32 lines)
 	}
 
 	/* initialize the buffer description */
-	text->bufsize = columns;
+	text->bufsize = length;
 	text->linesize = lines;
 	text_buffer_clear(text);
 

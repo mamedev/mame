@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    debugvw.c
+	debugvw.c
 
-    Debugger view engine.
+	Debugger view engine.
 
 ***************************************************************************/
 

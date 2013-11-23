@@ -252,6 +252,7 @@ void alto2_cpu_device::logprintf(int type, int level, const char* format, ...)
 
 void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
 {
+	logerror("%s: unit=%d diablo_hd_device=%p\n", __FUNCTION__, unit, ptr);
 	m_drive[unit] = ptr;
 }
 

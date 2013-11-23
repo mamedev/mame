@@ -353,7 +353,7 @@ void alto2_cpu_device::display_state_machine()
 	if (A63_HLCGATE(a63)) {
 		// reset or count horizontal line counters
 		m_dsp.hlc += 1;
-		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END + 1)
+		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END - 1)
 			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 		/* start the refresh task _twice_ on each scanline */
 		m_task_wakeup |= 1 << task_mrt;
