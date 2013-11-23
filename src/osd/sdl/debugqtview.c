@@ -87,64 +87,62 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 			QString text;
 			const unsigned char textAttr = viewdata[viewDataOffset].attrib;
 
-			if (x == 0 || textAttr != viewdata[viewDataOffset-1].attrib)
+			// Text color handling
+			QColor fgColor(0,0,0);
+			QColor bgColor(255,255,255);
+
+			if(textAttr & DCA_VISITED)
 			{
-				// Text color handling
-				QColor fgColor(0,0,0);
-				QColor bgColor(255,255,255);
-
-				if(textAttr & DCA_VISITED)
-				{
-					bgColor.setRgb(0xc6, 0xe2, 0xff);
-				}
-				if(textAttr & DCA_ANCILLARY)
-				{
-					bgColor.setRgb(0xe0, 0xe0, 0xe0);
-				}
-				if(textAttr & DCA_SELECTED)
-				{
-					bgColor.setRgb(0xff, 0x80, 0x80);
-				}
-				if(textAttr & DCA_CURRENT)
-				{
-					bgColor.setRgb(0xff, 0xff, 0x00);
-				}
-				if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
-				{
-					bgColor.setRgb(0xff,0xc0,0x80);
-				}
-				if(textAttr & DCA_CHANGED)
-				{
-					fgColor.setRgb(0xff, 0x00, 0x00);
-				}
-				if(textAttr & DCA_INVALID)
-				{
-					fgColor.setRgb(0x00, 0x00, 0xff);
-				}
-				if(textAttr & DCA_DISABLED)
-				{
-					fgColor.setRgb((fgColor.red()   + bgColor.red())   >> 1,
-									(fgColor.green() + bgColor.green()) >> 1,
-									(fgColor.blue()  + bgColor.blue())  >> 1);
-				}
-				if(textAttr & DCA_COMMENT)
-				{
-					fgColor.setRgb(0x00, 0x80, 0x00);
-				}
-
-				bgBrush.setColor(bgColor);
-				painter.setBackground(bgBrush);
-				// Scan for the width of identical attributes
-				text.clear();
-				for (width = 0; x + width < visibleCharDims.x; width++) {
-					if (textAttr != viewdata[viewDataOffset + width].attrib)
-						break;
-					text.append(QChar(viewdata[viewDataOffset + width].uchar));
-				}
-				// Fill width times fontWidth x fontHeight.
-				painter.fillRect(x*fontWidth, y*fontHeight, width*fontWidth, fontHeight, bgBrush);
-				painter.setPen(QPen(fgColor));
+				bgColor.setRgb(0xc6, 0xe2, 0xff);
 			}
+			if(textAttr & DCA_ANCILLARY)
+			{
+				bgColor.setRgb(0xe0, 0xe0, 0xe0);
+			}
+			if(textAttr & DCA_SELECTED)
+			{
+				bgColor.setRgb(0xff, 0x80, 0x80);
+			}
+			if(textAttr & DCA_CURRENT)
+			{
+				bgColor.setRgb(0xff, 0xff, 0x00);
+			}
+			if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
+			{
+				bgColor.setRgb(0xff,0xc0,0x80);
+			}
+			if(textAttr & DCA_CHANGED)
+			{
+				fgColor.setRgb(0xff, 0x00, 0x00);
+			}
+			if(textAttr & DCA_INVALID)
+			{
+				fgColor.setRgb(0x00, 0x00, 0xff);
+			}
+			if(textAttr & DCA_DISABLED)
+			{
+				fgColor.setRgb((fgColor.red()   + bgColor.red())   >> 1,
+								(fgColor.green() + bgColor.green()) >> 1,
+								(fgColor.blue()  + bgColor.blue())  >> 1);
+			}
+			if(textAttr & DCA_COMMENT)
+			{
+				fgColor.setRgb(0x00, 0x80, 0x00);
+			}
+
+			bgBrush.setColor(bgColor);
+			painter.setBackground(bgBrush);
+			// Scan for the width of identical attributes
+			text.clear();
+			for (width = 0; x + width < visibleCharDims.x; width++) {
+				if (textAttr != viewdata[viewDataOffset + width].attrib)
+					break;
+				text.append(QChar(viewdata[viewDataOffset + width].uchar));
+			}
+			// Fill width times fontWidth x fontHeight.
+			painter.fillRect(x*fontWidth, y*fontHeight, width*fontWidth, fontHeight, bgBrush);
+			painter.setPen(QPen(fgColor));
+
 			// Use QPainter::drawStaticText() for the string of characters
 			// sharing the same attributes
 			stext.setText(text);
