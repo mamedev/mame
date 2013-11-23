@@ -1717,7 +1717,7 @@ ROM_START( whodunit ) /* Version 9 */
 	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) ) // XBL-6K_MMI_6301.bin
 	ROM_LOAD( "xbl.7k",     0x00700, 0x0100, CRC(eda360b8) SHA1(79d84207e28c1289210cebd96abad6cfe1b4c1d0) ) // XBL-7K_MMI_6301.bin
 	ROM_LOAD( "xbl.8k",     0x00800, 0x0100, CRC(9d434cb1) SHA1(c3390bc1c02fe74ff2067f7fccfd1ad2c30b54a9) ) // XBL-8K_MMI_6301.bin
-	ROM_LOAD( "11b_xicor_2804a.bin", 0x0900, 0x0200, CRC(ec4a70e2) SHA1(2602dde6961cc6b63d1652e2f3e4cfae2d8a34d9) ) // Unknown Use - Dumped from Version 9 PCB
+	ROM_LOAD( "11b_xicor_2804a.bin", 0x0900, 0x0200, CRC(ec4a70e2) SHA1(2dc271571d320660fb6484dbc1bd6daa73be05ae) ) // Unknown Use - Dumped from Version 9 PCB
 ROM_END
 
 
