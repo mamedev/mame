@@ -1,5 +1,6 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
+#include "machine/n68681.h"
 
 class taito_en_device : public device_t
 
@@ -16,6 +17,8 @@ public:
 	//todo: hook up cpu/es5510
 	DECLARE_READ16_MEMBER( es5510_dsp_r );
 	DECLARE_WRITE16_MEMBER( es5510_dsp_w );
+	
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 
 protected:
 	// device-level overrides
@@ -37,6 +40,8 @@ private:
 	UINT8    m_es5510_ram_sel;
 
 	UINT32   *m_snd_shared_ram;
+	
+	duartn68681_device *m_duart68681;
 
 };
 
