@@ -43,7 +43,7 @@ enum {
 };
 
 #ifndef	ALTO2_DEBUG
-#define	ALTO2_DEBUG             0			//!< define to 1 to enable logerror() output
+#define	ALTO2_DEBUG             1			//!< define to 1 to enable logerror() output
 #endif
 
 #ifndef	ALTO2_CRAM_CONFIG

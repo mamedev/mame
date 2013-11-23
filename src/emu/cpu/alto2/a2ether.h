@@ -54,8 +54,8 @@ struct {
 	UINT16 fifo_rd;								//!< FIFO input pointer
 	UINT16 fifo_wr;								//!< FIFO output pointer
 	UINT16 status;								//!< status word
-	UINT32 rx_crc;								//!< receiver CRC
-	UINT32 tx_crc;								//!< transmitter CRC
+	UINT16 rx_crc;								//!< receiver CRC
+	UINT16 tx_crc;								//!< transmitter CRC
 	UINT32 rx_count;							//!< received words count
 	UINT32 tx_count;							//!< transmitted words count
 	UINT16* rx_packet;							//!< buffer to collect received words
