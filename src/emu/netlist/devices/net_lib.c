@@ -194,7 +194,7 @@ NETLIB_START(nicNE555N_MSTABLE)
 	register_param("VS", m_VS, 5.0);
 	register_param("VL", m_VL, 0.0 *5.0);
 
-	m_THRESHOLD_OUT.init_terminal(*this, "THRESHOLD");
+	m_THRESHOLD_OUT.init_object(*this, "THRESHOLD");
 	register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT, netlist_input_t::STATE_INP_ACTIVE);
 
 	m_Q.initial(5.0 * 0.4);
@@ -987,7 +987,7 @@ static const net_device_t_base_factory *netregistry[] =
 	NULL
 };
 
-netlist_device_t *net_create_device_by_classname(const astring &classname, netlist_setup_t &setup, const astring &icname)
+netlist_device_t *net_create_device_by_classname(const astring &classname, netlist_setup_t &setup)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
 	while (*p != NULL)
@@ -995,16 +995,15 @@ netlist_device_t *net_create_device_by_classname(const astring &classname, netli
 		if (strcmp((*p)->classname(), classname) == 0)
 		{
 			netlist_device_t *ret = (*p)->Create();
-			ret->init(setup, icname);
 			return ret;
 		}
 		p++;
 	}
-	fatalerror("Class %s required for IC %s not found!\n", classname.cstr(), icname.cstr());
+	fatalerror("Class %s not found!\n", classname.cstr());
 	return NULL; // appease code analysis
 }
 
-netlist_device_t *net_create_device_by_name(const astring &name, netlist_setup_t &setup, const astring &icname)
+netlist_device_t *net_create_device_by_name(const astring &name, netlist_setup_t &setup)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
 	while (*p != NULL)
@@ -1012,11 +1011,11 @@ netlist_device_t *net_create_device_by_name(const astring &name, netlist_setup_t
 		if (strcmp((*p)->name(), name) == 0)
 		{
 			netlist_device_t *ret = (*p)->Create();
-			ret->init(setup, icname);
+			//ret->init(setup, icname);
 			return ret;
 		}
 		p++;
 	}
-	fatalerror("Class %s required for IC %s not found!\n", name.cstr(), icname.cstr());
+	fatalerror("Class %s not found!\n", name.cstr());
 	return NULL; // appease code analysis
 }

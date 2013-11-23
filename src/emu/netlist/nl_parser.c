@@ -53,7 +53,8 @@ void netlist_parser::netdev_param()
 	skipws();
 	val = eval_param();
 	NL_VERBOSE_OUT(("Parser: Param: %s %f\n", param.cstr(), val));
-	m_setup.find_param(param).initial(val);
+	m_setup.register_param(param, val);
+	//m_setup.find_param(param).initial(val);
 	check_char(')');
 }
 
@@ -66,15 +67,16 @@ void netlist_parser::netdev_const(const astring &dev_name)
 
 	skipws();
 	name = getname(',');
-	dev = net_create_device_by_name(dev_name, m_setup, name);
-	m_setup.register_dev(dev);
+	dev = net_create_device_by_name(dev_name, m_setup);
+	m_setup.register_dev(dev, name);
 	skipws();
 	val = eval_param();
 	check_char(')');
 	paramfq = name;
 	paramfq.cat(".CONST");
 	NL_VERBOSE_OUT(("Parser: Const: %s %f\n", name.cstr(), val));
-	m_setup.find_param(paramfq).initial(val);
+	//m_setup.find_param(paramfq).initial(val);
+	m_setup.register_param(paramfq, val);
 }
 
 void netlist_parser::netdev_device(const astring &dev_type)
@@ -85,8 +87,8 @@ void netlist_parser::netdev_device(const astring &dev_type)
 
 	skipws();
 	devname = getname2(',', ')');
-	dev = net_create_device_by_name(dev_type, m_setup, devname);
-	m_setup.register_dev(dev);
+	dev = net_create_device_by_name(dev_type, m_setup);
+	m_setup.register_dev(dev, devname);
 	skipws();
 	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
 	cnt = 0;
@@ -96,16 +98,20 @@ void netlist_parser::netdev_device(const astring &dev_type)
 		skipws();
 		astring output_name = getname2(',', ')');
 		NL_VERBOSE_OUT(("Parser: ID: %s %s\n", output_name.cstr(), dev->m_terminals.item(cnt)->cstr()));
-		m_setup.register_link(devname + "." + *dev->m_terminals.item(cnt), output_name);
+		astring temp;
+		temp.printf("%s.[%d]", devname.cstr(), cnt);
+		m_setup.register_link(temp, output_name);
 		skipws();
 		cnt++;
 	}
-	if (cnt != dev->m_terminals.count() && !dev->variable_input_count())
+/*
+    if (cnt != dev->m_terminals.count() && !dev->variable_input_count())
 		fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), dev->m_terminals.count(), cnt);
 	if (dev->variable_input_count())
 	{
 		NL_VERBOSE_OUT(("variable inputs %s: %d\n", dev->name().cstr(), cnt));
 	}
+	*/
 	check_char(')');
 }
 

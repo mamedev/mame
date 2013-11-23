@@ -20,10 +20,10 @@
 
 #define NET_ALIAS(_alias, _name)                                                    \
 	netlist.register_alias(# _alias, # _name);
-#define NET_NEW(_type , _name)  net_create_device_by_classname(NETLIB_NAME_STR(_type), netlist, # _name)
+#define NET_NEW(_type)  net_create_device_by_classname(NETLIB_NAME_STR(_type), netlist)
 
 #define NET_REGISTER_DEV(_type, _name)                                              \
-		netlist.register_dev(NET_NEW(_type, _name));
+		netlist.register_dev(NET_NEW(_type), # _name);
 #define NET_REMOVE_DEV(_name)                                                       \
 		netlist.remove_dev(# _name);
 #define NET_REGISTER_SIGNAL(_type, _name)                                           \
@@ -32,11 +32,12 @@
 		netlist.register_link(# _name "." # _input, # _output);
 #define NET_C(_input, _output)                                                      \
         netlist.register_link(NET_STR(_input) , NET_STR(_output));
-#define NETDEV_PARAM(_name, _val)                                                   \
-		netlist.find_param(# _name).initial(_val);
-#define NETDEV_PARAMI(_name, _param, _val)                                           \
-        netlist.find_param(# _name "." # _param).initial(_val);
 
+#define NETDEV_PARAM(_name, _val)                                                   \
+		netlist.register_param(# _name, _val);
+
+#define NETDEV_PARAMI(_name, _param, _val)                                           \
+        netlist.register_param(# _name "." # _param, _val);
 
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
@@ -87,12 +88,13 @@ public:
 
 	netlist_base_t &netlist() { return m_netlist; }
 
-	netlist_device_t *register_dev(netlist_device_t *dev);
+	netlist_device_t *register_dev(netlist_device_t *dev, const astring &name);
 	void remove_dev(const astring &name);
 
     void register_alias(const astring &alias, const astring &out);
-
     void register_link(const astring &sin, const astring &sout);
+    void register_param(const astring &param, const astring &value);
+    void register_param(const astring &param, const double value);
 
     void register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, netlist_object_t &obj, netlist_input_t::state_e state);
 
@@ -105,6 +107,7 @@ public:
 
 	void parse(char *buf);
 
+    void start_devices(void);
 	void resolve_inputs(void);
 	void step_devices_once(void);
 
@@ -123,6 +126,7 @@ private:
 	tagmap_astring_t m_alias;
 	tagmap_param_t  m_params;
 	tagmap_link_t  m_links;
+    tagmap_astring_t m_params_temp;
 
 	int m_proxy_cnt;
 
@@ -134,7 +138,7 @@ private:
     // helpers
     astring objtype_as_astr(netlist_object_t &in);
 
-	const astring &resolve_alias(const astring &name) const;
+	const astring resolve_alias(const astring &name) const;
 };
 
 #endif /* NLSETUP_H_ */

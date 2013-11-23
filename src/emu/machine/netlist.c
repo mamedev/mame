@@ -88,6 +88,8 @@ void netlist_mame_device::device_start()
 
 	m_setup_func(*m_setup);
 
+	m_setup->start_devices();
+
 	bool allok = true;
 	for (on_device_start **ods = m_device_start_list.first(); ods <= m_device_start_list.last(); ods++)
 		allok &= (*ods)->OnDeviceStart();

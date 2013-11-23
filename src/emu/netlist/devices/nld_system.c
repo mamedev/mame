@@ -143,6 +143,7 @@ NETLIB_UPDATE(solver)
 
     if (delta >= m_inc)
     {
+        NL_VERBOSE_OUT(("Step!\n"));
         /* update all terminals for new time step */
         m_last_step = now;
         for (netlist_terminal_t **p = m_terms.first(); p != NULL; p = m_terms.next(p))

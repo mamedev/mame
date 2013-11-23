@@ -243,7 +243,7 @@ public:
 	virtual bool OnDeviceStart()
 	{
 		this->m_target = &m_netlist->setup().find_param(m_output);
-		return this->report_missing(this->m_target != NULL, "output", true);
+		return this->report_missing(this->m_target != NULL, "parameter", true);
 	}
 };
 

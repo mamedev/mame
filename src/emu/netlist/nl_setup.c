@@ -47,10 +47,10 @@ netlist_setup_t::~netlist_setup_t()
 	m_terminals.reset();
 }
 
-netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev)
+netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const astring &name)
 {
-	if (!(m_devices.add(dev->name(), dev, false)==TMERR_NONE))
-		fatalerror("Error adding %s to device list\n", dev->name().cstr());
+	if (!(m_devices.add(name, dev, false)==TMERR_NONE))
+		fatalerror("Error adding %s to device list\n", name.cstr());
 	return dev;
 }
 
@@ -144,9 +144,9 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
             {
                 netlist_terminal_t &term = dynamic_cast<netlist_terminal_t &>(obj);
                 if (obj.isType(netlist_terminal_t::OUTPUT))
-                    dynamic_cast<netlist_output_t &>(term).init_terminal(upd_dev, dev.name() + "." + name);
+                    dynamic_cast<netlist_output_t &>(term).init_object(upd_dev, dev.name() + "." + name);
                 else
-                    term.init_terminal(upd_dev, dev.name() + "." + name, state);
+                    term.init_object(upd_dev, dev.name() + "." + name, state);
 
                 if (!(m_terminals.add(term.name(), &term, false)==TMERR_NONE))
                     fatalerror("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), term.name().cstr());
@@ -161,6 +161,15 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
                 astring temp = param.netdev().name();
                 temp.cat(".");
                 temp.cat(name);
+                const astring *val = m_params_temp.find(temp);
+                if (val != NULL)
+                {
+                    //printf("Found parameter ... %s : %s\n", temp.cstr(), val->cstr());
+                    double vald = 0;
+                    if (sscanf(val->cstr(), "%lf", &vald) != 1)
+                        fatalerror("Invalid number conversion %s : %s\n", temp.cstr(), val->cstr());
+                    param.initial(vald);
+                }
                 if (!(m_params.add(temp, &param, false)==TMERR_NONE))
                     fatalerror("Error adding parameter %s to parameter list\n", name.cstr());
             }
@@ -178,12 +187,39 @@ void netlist_setup_t::register_link(const astring &sin, const astring &sout)
 		fatalerror("Error adding link %s<==%s to link list\n", sin.cstr(), sout.cstr());
 }
 
-const astring &netlist_setup_t::resolve_alias(const astring &name) const
+void netlist_setup_t::register_param(const astring &param, const double value)
 {
-	const astring *ret = m_alias.find(name);
-	if (ret != NULL)
-		return *ret;
-	return name;
+    // FIXME: there should be a better way
+    astring temp;
+    temp.printf("%.9e", value);
+    register_param(param, temp);
+}
+
+void netlist_setup_t::register_param(const astring &param, const astring &value)
+{
+    if (!(m_params_temp.add(param, new astring(value), false)==TMERR_NONE))
+        fatalerror("Error adding parameter %s to parameter list\n", param.cstr());
+}
+
+const astring netlist_setup_t::resolve_alias(const astring &name) const
+{
+	const astring *temp = m_alias.find(name);
+	astring ret = name;
+	if (temp != NULL)
+		ret = *temp;
+	int p = ret.find(".[");
+	if (p > 0)
+	{
+	    astring dname = ret;
+	    netlist_device_t *dev = m_devices.find(dname.substr(0,p));
+	    if (dev == NULL)
+	        fatalerror("Device for %s not found\n", name.cstr());
+	    ret.substr(p+2,ret.len()-p-3);
+	    int c = atoi(ret);
+	    ret = dev->name() + "." + *(dev->m_terminals.item(c));
+	}
+
+	return ret;
 }
 
 netlist_terminal_t &netlist_setup_t::find_terminal(const astring &terminal_in)
@@ -250,7 +286,7 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
         x.printf("proxy_ad_%d", m_proxy_cnt++);
 
         proxy->init(*this, x.cstr());
-        register_dev(proxy);
+        register_dev(proxy, x);
 
         proxy->m_Q.net().register_con(in);
         out.net().register_con(proxy->m_I);
@@ -263,7 +299,7 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
         astring x = "";
         x.printf("proxy_da_%d", m_proxy_cnt++);
         proxy->init(*this, x.cstr());
-        register_dev(proxy);
+        register_dev(proxy, x);
 
         proxy->m_Q.net().register_con(in);
         out.net().register_con(proxy->m_I);
@@ -287,7 +323,7 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
         astring x = "";
         x.printf("proxy_da_%d", m_proxy_cnt++);
         proxy->init(*this, x.cstr());
-        register_dev(proxy);
+        register_dev(proxy, x);
 
         connect_terminals(term, proxy->m_I);
 
@@ -322,7 +358,7 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
         astring x = "";
         x.printf("proxy_da_%d", m_proxy_cnt++);
         proxy->init(*this, x.cstr());
-        register_dev(proxy);
+        register_dev(proxy, x);
 
         out.net().register_con(proxy->m_I);
 
@@ -449,6 +485,15 @@ void netlist_setup_t::resolve_inputs(void)
 
 }
 
+void netlist_setup_t::start_devices(void)
+{
+    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+    {
+        netlist_device_t *dev = entry->object();
+        dev->init(*this, entry->tag());
+    }
+}
+
 void netlist_setup_t::step_devices_once(void)
 {
 	/* make sure params are set now .. */
@@ -480,9 +525,9 @@ void netlist_setup_t::print_stats()
 			//entry->object()->s
 			printf("Device %20s : %12d %15ld\n", entry->object()->name().cstr(), entry->object()->stat_count, (long int) entry->object()->total_time / (entry->object()->stat_count + 1));
 		}
-		printf("Queue Start %15d\n", m_netlist.m_queue.m_prof_start);
-		printf("Queue End   %15d\n", m_netlist.m_queue.m_prof_end);
-		printf("Queue Sort  %15d\n", m_netlist.m_queue.m_prof_sort);
-		printf("Queue Move  %15d\n", m_netlist.m_queue.m_prof_sortmove);
+		printf("Queue Start %15d\n", m_netlist.queue().m_prof_start);
+		printf("Queue End   %15d\n", m_netlist.queue().m_prof_end);
+		printf("Queue Sort  %15d\n", m_netlist.queue().m_prof_sort);
+		printf("Queue Move  %15d\n", m_netlist.queue().m_prof_sortmove);
 	}
 }

@@ -80,7 +80,7 @@ private:
 // ----------------------------------------------------------------------------------------
 
 template <class _Element, class _Time, int _Size>
-class netlist_timed_queue1
+class netlist_timed_queue
 {
 public:
 
@@ -97,7 +97,7 @@ public:
 		_Element *m_object;
 	};
 
-	netlist_timed_queue1()
+	netlist_timed_queue()
 	{
 		//m_list = global_alloc_array(entry_t, SIZE);
 		clear();

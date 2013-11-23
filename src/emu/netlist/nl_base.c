@@ -6,6 +6,52 @@
 #include "nl_base.h"
 #include "devices/nld_system.h"
 
+// ----------------------------------------------------------------------------------------
+// netlist_object_t
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD netlist_object_t::netlist_object_t(const type_t atype, const family_t afamily)
+: m_objtype(atype)
+, m_family(afamily)
+, m_netlist(NULL)
+, m_name(NULL)
+{}
+
+ATTR_COLD netlist_object_t::~netlist_object_t()
+{
+    delete m_name;
+}
+
+ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const astring &aname)
+{
+    m_netlist = &nl;
+    m_name = new astring(aname);
+}
+
+ATTR_COLD const astring &netlist_object_t::name() const
+{
+    if (m_name == NULL)
+        fatalerror("object not initialized");
+    return *m_name;
+}
+
+// ----------------------------------------------------------------------------------------
+// netlist_owned_object_t
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD netlist_owned_object_t::netlist_owned_object_t(const type_t atype,
+        const family_t afamily)
+: netlist_object_t(atype, afamily)
+, m_netdev(NULL)
+{
+}
+
+ATTR_COLD void netlist_owned_object_t::init_object(netlist_core_device_t &dev,
+        const astring &aname)
+{
+    netlist_object_t::init_object(dev.netlist(), aname);
+    m_netdev = &dev;
+}
 
 // ----------------------------------------------------------------------------------------
 // netlist_base_t
@@ -244,10 +290,10 @@ ATTR_COLD void netlist_device_t::register_input(const astring &name, netlist_inp
 // FIXME: Revise internal links ...
 ATTR_COLD void netlist_device_t::register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState)
 {
-    in.init_terminal(dev, "internal input", aState);
+    in.init_object(dev, "internal input", aState);
     // ensure we are not yet initialized ...
     if (!out.net().isRailNet())
-        out.init_terminal(dev, "internal output");
+        out.init_object(dev, "internal output");
 	//if (in.state() != net_input_t::INP_STATE_PASSIVE)
 		out.net().register_con(in);
 }
@@ -286,6 +332,12 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
     m_new.Q = 0;
     m_last.Q = 0;
 };
+
+ATTR_COLD void netlist_net_t::register_railterminal(netlist_terminal_t &mr)
+{
+    assert(m_railterminal == NULL);
+    m_railterminal = &mr;
+}
 
 ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
 {
@@ -377,11 +429,37 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 // netlist_terminal_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void netlist_terminal_t::init_terminal(netlist_core_device_t &dev, const astring &aname, const state_e astate)
+ATTR_COLD netlist_terminal_t::netlist_terminal_t(const type_t atype, const family_t afamily)
+: netlist_owned_object_t(atype, afamily)
+, m_Idr(0.0)
+, m_g(NETLIST_GMIN)
+, m_update_list_next(NULL)
+, m_net(NULL)
+, m_state(STATE_NONEX)
 {
-	m_netdev = &dev;
+
+}
+
+ATTR_COLD netlist_terminal_t::netlist_terminal_t()
+: netlist_owned_object_t(TERMINAL, ANALOG)
+, m_Idr(0.0)
+, m_g(NETLIST_GMIN)
+, m_update_list_next(NULL)
+, m_net(NULL)
+, m_state(STATE_NONEX)
+{
+
+}
+
+ATTR_COLD void netlist_terminal_t::init_object(netlist_core_device_t &dev, const astring &aname, const state_e astate)
+{
 	set_state(astate);
-	init_object(dev.netlist(), aname);
+	netlist_owned_object_t::init_object(dev, aname);
+}
+
+ATTR_COLD void netlist_terminal_t::set_net(netlist_net_t &anet)
+{
+    m_net = &anet;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -402,9 +480,9 @@ netlist_output_t::netlist_output_t(const type_t atype, const family_t afamily)
     this->set_net(m_my_net);
 }
 
-ATTR_COLD void netlist_output_t::init_terminal(netlist_core_device_t &dev, const astring &aname)
+ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const astring &aname)
 {
-    netlist_terminal_t::init_terminal(dev, aname, STATE_OUT);
+    netlist_terminal_t::init_object(dev, aname, STATE_OUT);
     net().init_object(dev.netlist(), aname);
     net().register_railterminal(*this);
 }
