@@ -147,8 +147,7 @@ void tms9980a_device::execute_set_input(int irqline, int state)
 	{
 		if (m_irq_level == LOAD_INT)
 		{
-			// Clearing m_reset is a hack to prevent an initial RESET.
-			// Should fix that in tms99xx
+			// Some boards start up with LOAD interrupt, so we clear the reset flag
 			m_reset = false;
 			m_load_state = true;
 		}
