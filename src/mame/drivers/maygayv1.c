@@ -129,7 +129,7 @@ Find lamps/reels after UPD changes.
 #include "video/awpvid.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/6821pia.h"
-#include "machine/68681.h"
+#include "machine/n68681.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
 #include "machine/nvram.h"
@@ -220,13 +220,18 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_upd7759(*this, "upd") { }
+		m_upd7759(*this, "upd"),
+		m_duart68681(*this, "duart68681") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<i8052_device> m_soundcpu;
+	required_device<upd7759_device> m_upd7759;
+	required_device<duartn68681_device> m_duart68681;
+	
 	int m_vsync_latch_preset;
 	UINT8 m_p1;
 	UINT8 m_p3;
 	int m_d68681_val;
-	device_t *m_duart68681;
 	i82716_t m_i82716;
 	i8279_t m_i8279;
 	DECLARE_WRITE16_MEMBER(i82716_w);
@@ -249,9 +254,8 @@ public:
 	INTERRUPT_GEN_MEMBER(vsync_interrupt);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	DECLARE_READ8_MEMBER(data_to_i8031);
-	required_device<cpu_device> m_maincpu;
-	required_device<i8052_device> m_soundcpu;
-	required_device<upd7759_device> m_upd7759;
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(duart_txa);
 };
 
 
@@ -697,7 +701,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, maygayv1_state )
 	AM_RANGE(0x860000, 0x86000d) AM_READWRITE(read_odd, write_odd)
 	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
 	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
-	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff)
+	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff)
 	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREADWRITE8("pia", pia6821_device, read, write, 0xff)
 ADDRESS_MAP_END
 
@@ -940,31 +944,26 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)
 {
-	maygayv1_state *drvstate = device->machine().driver_data<maygayv1_state>();
-	drvstate->m_maincpu->set_input_line_and_vector(5, state, vector);
-//  drvstate->m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line_and_vector(5, state, m_duart68681->get_irq_vector());
+//  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 };
 
 
-static void duart_tx(device_t *device, int channel, UINT8 data)
+WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
 {
-	maygayv1_state *state = device->machine().driver_data<maygayv1_state>();
-	if (channel == 0)
-	{
-		state->m_d68681_val = data;
-		state->m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
-	}
-
+	m_d68681_val = state;
+	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
 };
 
-static const duart68681_config maygayv1_duart68681_config =
+static const duartn68681_config maygayv1_duart68681_config =
 {
-	duart_irq_handler,
-	duart_tx,
-	NULL,
-	NULL
+	DEVCB_DRIVER_LINE_MEMBER(maygayv1_state, duart_irq_handler),
+	DEVCB_DRIVER_LINE_MEMBER(maygayv1_state, duart_txa),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -975,7 +974,7 @@ READ8_MEMBER(maygayv1_state::data_to_i8031)
 
 WRITE8_MEMBER(maygayv1_state::data_from_i8031)
 {
-	duart68681_rx_data(m_duart68681, 0, data);
+	m_duart68681->rx_a_w(data);
 }
 
 READ8_MEMBER(maygayv1_state::b_read)
@@ -1016,8 +1015,6 @@ void maygayv1_state::machine_start()
 
 	save_pointer(NAME(i82716.dram), 0x40000);
 
-//  duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
-
 	m_soundcpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(maygayv1_state::data_from_i8031),this));
 	m_soundcpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(maygayv1_state::data_to_i8031),this));
 }
@@ -1026,7 +1023,6 @@ void maygayv1_state::machine_reset()
 {
 	i82716_t &i82716 = m_i82716;
 	// ?
-	m_duart68681 = machine().device( "duart68681" );
 	memset(i82716.dram, 0, 0x40000);
 	i82716.r[RWBA] = 0x0200;
 }
@@ -1065,7 +1061,7 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_DUART68681_ADD("duart68681", DUART_CLOCK, maygayv1_duart68681_config)
+	MCFG_DUARTN68681_ADD("duart68681", DUART_CLOCK, maygayv1_duart68681_config)
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
