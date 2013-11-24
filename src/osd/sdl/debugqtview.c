@@ -72,71 +72,73 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 
 	size_t viewDataOffset = 0;
 	const debug_view_xy& visibleCharDims = m_view->visible_size();
+	const debug_view_char* viewdata = m_view->viewdata();
 	for (int y = 0; y < visibleCharDims.y; y++)
 	{
-		for (int x = 0; x < visibleCharDims.x; x++)
+		int width = 1;
+		for (int x = 0; x < visibleCharDims.x; viewDataOffset += width, x += width)
 		{
-			const unsigned char textAttr = m_view->viewdata()[viewDataOffset].attrib;
+			const unsigned char textAttr = viewdata[viewDataOffset].attrib;
 
-			if (x == 0 || textAttr != m_view->viewdata()[viewDataOffset-1].attrib)
+			// Text color handling
+			QColor fgColor(0,0,0);
+			QColor bgColor(255,255,255);
+
+			if(textAttr & DCA_VISITED)
 			{
-				// Text color handling
-				QColor fgColor(0,0,0);
-				QColor bgColor(255,255,255);
-
-				if(textAttr & DCA_VISITED)
-				{
-					bgColor.setRgb(0xc6, 0xe2, 0xff);
-				}
-				if(textAttr & DCA_ANCILLARY)
-				{
-					bgColor.setRgb(0xe0, 0xe0, 0xe0);
-				}
-				if(textAttr & DCA_SELECTED)
-				{
-					bgColor.setRgb(0xff, 0x80, 0x80);
-				}
-				if(textAttr & DCA_CURRENT)
-				{
-					bgColor.setRgb(0xff, 0xff, 0x00);
-				}
-				if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
-				{
-					bgColor.setRgb(0xff,0xc0,0x80);
-				}
-				if(textAttr & DCA_CHANGED)
-				{
-					fgColor.setRgb(0xff, 0x00, 0x00);
-				}
-				if(textAttr & DCA_INVALID)
-				{
-					fgColor.setRgb(0x00, 0x00, 0xff);
-				}
-				if(textAttr & DCA_DISABLED)
-				{
-					fgColor.setRgb((fgColor.red()   + bgColor.red())   >> 1,
-									(fgColor.green() + bgColor.green()) >> 1,
-									(fgColor.blue()  + bgColor.blue())  >> 1);
-				}
-				if(textAttr & DCA_COMMENT)
-				{
-					fgColor.setRgb(0x00, 0x80, 0x00);
-				}
-
-				bgBrush.setColor(bgColor);
-				painter.setBackground(bgBrush);
-				painter.setPen(QPen(fgColor));
+				bgColor.setRgb(0xc6, 0xe2, 0xff);
+			}
+			if(textAttr & DCA_ANCILLARY)
+			{
+				bgColor.setRgb(0xe0, 0xe0, 0xe0);
+			}
+			if(textAttr & DCA_SELECTED)
+			{
+				bgColor.setRgb(0xff, 0x80, 0x80);
+			}
+			if(textAttr & DCA_CURRENT)
+			{
+				bgColor.setRgb(0xff, 0xff, 0x00);
+			}
+			if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
+			{
+				bgColor.setRgb(0xff,0xc0,0x80);
+			}
+			if(textAttr & DCA_CHANGED)
+			{
+				fgColor.setRgb(0xff, 0x00, 0x00);
+			}
+			if(textAttr & DCA_INVALID)
+			{
+				fgColor.setRgb(0x00, 0x00, 0xff);
+			}
+			if(textAttr & DCA_DISABLED)
+			{
+				fgColor.setRgb((fgColor.red()   + bgColor.red())   >> 1,
+								(fgColor.green() + bgColor.green()) >> 1,
+								(fgColor.blue()  + bgColor.blue())  >> 1);
+			}
+			if(textAttr & DCA_COMMENT)
+			{
+				fgColor.setRgb(0x00, 0x80, 0x00);
 			}
 
-			// Your character is not guaranteed to take up the entire fontWidth x fontHeight, so fill before.
-			painter.fillRect(x*fontWidth, y*fontHeight, fontWidth, fontHeight, bgBrush);
+			bgBrush.setColor(bgColor);
+			painter.setBackground(bgBrush);
+			painter.setPen(QPen(fgColor));
 
-			// There is a touchy interplay between font height, drawing difference, visible position, etc
-			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
-			painter.drawText(x*fontWidth,
-								(y*fontHeight + (fontHeight*0.80)),
-								QString(m_view->viewdata()[viewDataOffset].byte));
-			viewDataOffset++;
+			QString text(QChar(viewdata[viewDataOffset].byte));
+			for (width = 1; x + width < visibleCharDims.x; width++)
+			{
+				if (textAttr != viewdata[viewDataOffset + width].attrib)
+					break;
+				text.append(QChar(viewdata[viewDataOffset + width].byte));
+			}
+			// Your characters are not guaranteed to take up the entire length x fontWidth x fontHeight, so fill before.
+			painter.fillRect(x*fontWidth, y*fontHeight, width*fontWidth, fontHeight, bgBrush);
+			// Static text object
+			QStaticText staticText(text);
+			painter.drawStaticText(x*fontWidth, y*fontHeight, staticText);
 		}
 	}
 }
