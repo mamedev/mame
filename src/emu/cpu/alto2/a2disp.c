@@ -272,65 +272,78 @@ void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 void alto2_cpu_device::unload_word()
 {
 	int x = m_unload_word;
-	int y = ((m_dsp.hlc - m_dsp.vblank) & ~(1024|1)) | HLC1024;
-	UINT16* scanline = m_dsp.raw_bitmap  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
+	int y = ((m_dsp.hlc - m_dsp.vblank) & ~02001) ^ HLC1024;
 
+	if (y < 0 || y >= ALTO2_DISPLAY_HEIGHT || x >= ALTO2_DISPLAY_VISIBLE_WORDS)
+	{
+		m_unload_time = -1;
+		return;
+	}
+	UINT16* scanline = m_dsp.raw_bitmap  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
 	UINT32 word = m_dsp.inverse;
 	UINT8 a38 = m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr];
-	if (FIFO_MBEMPTY(a38)) {
+	if (FIFO_MBEMPTY(a38))
+	{
 		LOG((LOG_DISPL,1, "	DSP FIFO underrun y:%d x:%d\n", y, x));
-	} else {
+	}
+	else
+	{
 		word ^= m_dsp.fifo[m_dsp.fifo_rd];
 		m_dsp.fifo_rd = (m_dsp.fifo_rd + 1) % ALTO2_DISPLAY_FIFO;
 		LOG((LOG_DISPL,3, "	DSP pull %04x from FIFO[%02o] y:%d x:%d\n",
-			word, (m_dsp.fifo_rd - 1) & (ALTO2_DISPLAY_FIFO - 1), y, x));
+			 word, (m_dsp.fifo_rd - 1) & (ALTO2_DISPLAY_FIFO - 1), y, x));
 	}
 
-	if (y >= 0 && y < ALTO2_DISPLAY_HEIGHT && x < ALTO2_DISPLAY_VISIBLE_WORDS) {
-		if (m_dsp.halfclock) {
-			UINT16 word1 = double_bits[word / 256];
-			UINT16 word2 = double_bits[word % 256];
+	if (m_dsp.halfclock)
+	{
+		UINT16 word1 = double_bits[word / 256];
+		UINT16 word2 = double_bits[word % 256];
+		/* mixing with the cursor */
+		if (x == m_dsp.curword + 0)
+			word1 ^= m_dsp.curdata >> 16;
+		if (x == m_dsp.curword + 1)
+			word1 ^= m_dsp.curdata & 0177777;
+		if (word1 != scanline[x])
+		{
+			scanline[x] = word1;
+			update_bitmap_word(16 * x, y, word1);
+		}
+		x++;
+		if (x < ALTO2_DISPLAY_VISIBLE_WORDS)
+		{
 			/* mixing with the cursor */
 			if (x == m_dsp.curword + 0)
-				word1 ^= m_dsp.curdata >> 16;
+				word2 ^= m_dsp.curdata >> 16;
 			if (x == m_dsp.curword + 1)
-				word1 ^= m_dsp.curdata & 0177777;
-			if (word1 != scanline[x]) {
-				scanline[x] = word1;
-				update_bitmap_word(16 * x, y, word1);
-			}
-			x++;
-			if (x < ALTO2_DISPLAY_VISIBLE_WORDS) {
-				/* mixing with the cursor */
-				if (x == m_dsp.curword + 0)
-					word2 ^= m_dsp.curdata >> 16;
-				if (x == m_dsp.curword + 1)
-					word2 ^= m_dsp.curdata & 0177777;
-				if (word2 != scanline[x]) {
-					scanline[x] = word2;
-					update_bitmap_word(16 * x, y, word2);
-				}
-				x++;
-			}
-		} else {
-			/* mixing with the cursor */
-			if (x == m_dsp.curword + 0)
-				word ^= m_dsp.curdata >> 16;
-			if (x == m_dsp.curword + 1)
-				word ^= m_dsp.curdata & 0177777;
-			if (word != scanline[x]) {
-				scanline[x] = word;
-				update_bitmap_word(16 * x, y, word);
+				word2 ^= m_dsp.curdata & 0177777;
+			if (word2 != scanline[x])
+			{
+				scanline[x] = word2;
+				update_bitmap_word(16 * x, y, word2);
 			}
 			x++;
 		}
+		m_unload_time += ALTO2_DISPLAY_BITTIME(32);
 	}
-	if (x < ALTO2_DISPLAY_VISIBLE_WORDS) {
-		m_unload_time += ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
+	else
+	{
+		/* mixing with the cursor */
+		if (x == m_dsp.curword + 0)
+			word ^= m_dsp.curdata >> 16;
+		if (x == m_dsp.curword + 1)
+			word ^= m_dsp.curdata & 0177777;
+		if (word != scanline[x])
+		{
+			scanline[x] = word;
+			update_bitmap_word(16 * x, y, word);
+		}
+		x++;
+		m_unload_time += ALTO2_DISPLAY_BITTIME(16);
+	}
+	if (x < ALTO2_DISPLAY_VISIBLE_WORDS)
 		m_unload_word = x;
-	} else {
+	else
 		m_unload_time = -1;
-	}
 }
 
 
@@ -345,22 +358,20 @@ void alto2_cpu_device::unload_word()
 void alto2_cpu_device::display_state_machine()
 {
 	LOG((LOG_DISPL,5,"DSP%03o:", m_dsp.state));
-	if (020 == m_dsp.state) {
+	if (020 == m_dsp.state)
+	{
 		LOG((LOG_DISPL,2," HLC=%d", m_dsp.hlc));
 	}
 
 	UINT8 a63 = m_disp_a63[m_dsp.state];
-	if (A63_HLCGATE(a63)) {
-		// reset or count horizontal line counters
+	if (A63_HLCGATE(a63))
+	{
+		// count horizontal line counters and wrap
 		m_dsp.hlc += 1;
 		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END + 1)
 			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
-		/* start the refresh task _twice_ on each scanline */
+		// wake up the memory refresh task _twice_ on each scanline
 		m_task_wakeup |= 1 << task_mrt;
-		if (m_ewfct) {
-			/* The Ether task wants a wakeup, too */
-			m_task_wakeup |= 1 << task_ether;
-		}
 	}
 	// PROM a66 is disabled, if any of HLC256 or HLC512 are high
 	UINT8 a66 = (HLC256 || HLC512) ? 017 : m_disp_a66[m_dsp.hlc & 0377];
@@ -368,35 +379,45 @@ void alto2_cpu_device::display_state_machine()
 	// next address from PROM a63, use A4 from HLC1
 	UINT8 next = ((HLC1 ^ 1) << 4) | A63_NEXT(a63);
 
-	if (A66_VBLANK(a66)) {
-		/* VBLANK: remember hlc */
+	if (A66_VBLANK(a66))
+	{
+		// Rising edge of VBLANK: remember HLC[1-10] where the VBLANK starts
 		m_dsp.vblank = m_dsp.hlc & ~02000;
 
 		LOG((LOG_DISPL,1, " VBLANK"));
 
 		// VSYNC is always within VBLANK, thus we handle it only here
-		if (A66_VSYNC(a66)) {
-			if (!A66_VSYNC(m_dsp.a66)) {
+		if (A66_VSYNC(a66))
+		{
+			if (!A66_VSYNC(m_dsp.a66))
+			{
 				LOG((LOG_DISPL,1, " VSYNC↗ (wake DVT)"));
 				/*
-				 * The display vertical task DVT is awakened once per field,
+				 * The display vertical task DVT is woken once per field
 				 * at the beginning of vertical retrace.
 				 */
 				m_task_wakeup |= 1 << task_dvt;
-				// TODO: upade odd or even field of the internal bitmap
-			} else {
+				// TODO: upade odd or even field of the internal bitmap now?
+			}
+			else
+			{
 				LOG((LOG_DISPL,1, " VSYNC"));
 			}
 		}
-	} else {
-		if (A66_VBLANK(m_dsp.a66)) {
+	}
+	else
+	{
+		// Falling edge of VBLANK?
+		if (A66_VBLANK(m_dsp.a66))
+		{
 			/*
 			 * VBLANKPULSE:
-			 * The display horizontal task DHT is awakened once at the
+			 * The display horizontal task DHT is woken once at the
 			 * beginning of each field, and thereafter whenever the
 			 * display word task blocks.
+			 *
 			 * The DHT can block itself, in which case neither it nor
-			 * the word task can be awakened until the start of the
+			 * the word task can be woken until the start of the
 			 * next field.
 			 */
 			LOG((LOG_DISPL,1, " VBLANKPULSE (wake DHT)"));
@@ -409,16 +430,12 @@ void alto2_cpu_device::display_state_machine()
 			 */
 			m_dsp.curt_blocks = false;
 		}
-		if (!A63_HBLANK(a63) && A63_HBLANK(m_dsp.a63)) {
-			// falling edge of a63 HBLANK starts unloading of FIFO words
+		if (!A63_HBLANK(a63) && A63_HBLANK(m_dsp.a63))
+		{
+			// Falling edge of a63 HBLANK starts unloading of FIFO words
 			LOG((LOG_DISPL,1, " HBLANK↘ UNLOAD"));
 			m_unload_time = ALTO2_DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16);
 			m_unload_word = 0;
-#if	DEBUG_DISPLAY_TIMING
-			printf("@%lld: first unload_word @%lldns hlc:+%d (id:%d)\n",
-				ntime(), ntime() + DISPLAY_BITTIME(m_dsp.halfclock ? 32 : 16),
-				m_dsp.hlc - DISPLAY_HLC_START, m_dsp.unload_id);
-#endif
 		}
 	}
 
@@ -429,21 +446,27 @@ void alto2_cpu_device::display_state_machine()
 	 * are generated.
 	 */
 	UINT8 a38 = m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr];
-	if (!m_dsp.dwt_blocks && !m_dsp.dht_blocks && !FIFO_STOPWAKE(a38)) {
+	if (!m_dsp.dwt_blocks && !m_dsp.dht_blocks && !FIFO_STOPWAKE(a38))
+	{
 		m_task_wakeup |= 1 << task_dwt;
 		LOG((LOG_DISPL,1, " (wake DWT)"));
 	}
 
-	// Stop waking the display word task at SCANEND time
-	if (A63_SCANEND(a63)) {
-		LOG((LOG_DISPL,1, " SCANEND"));
+	// Stop waking up the DWT when SCANEND is active
+	if (A63_SCANEND(a63))
+	{
 		m_task_wakeup &= ~(1 << task_dwt);
+		LOG((LOG_DISPL,1, " SCANEND"));
 	}
 
 	LOG((LOG_DISPL,1, "%s", A63_HBLANK(a63) ? " HBLANK": ""));
 
-	if (A63_HSYNC(a63)) {
-		if (!A63_HSYNC(m_dsp.a63)) {
+	if (A63_HSYNC(a63))
+	{
+		// Active HSYNC
+		if (!A63_HSYNC(m_dsp.a63))
+		{
+			// Rising edge of HSYNC => CLRBUF
 			LOG((LOG_DISPL,1, " HSYNC↗ (CLRBUF)"));
 			/*
 			 * The hardware sets the buffer empty and clears the DWT block
@@ -456,14 +479,18 @@ void alto2_cpu_device::display_state_machine()
 			// now take the new values from the last SETMODE←
 			m_dsp.inverse = GET_SETMODE_INVERSE(m_dsp.setmode) ? 0xffff : 0x0000;
 			m_dsp.halfclock = GET_SETMODE_SPEEDY(m_dsp.setmode);
-			// stop the CPU from calling unload_word()
+			// stop the CPU execution loop from calling unload_word()
 			m_unload_time = -1;
-		} else {
+		}
+		else
+		{
 			LOG((LOG_DISPL,1, " HSYNC"));
 		}
 	}
-	// FIXME: jiggly cursor issue; try to wake up CURT at the end of HSYNC
-	if (A63_HSYNC(m_dsp.a63) && !A63_HSYNC(a63)) {
+	else
+	// Falling edge of HSYNC?
+	if (A63_HSYNC(m_dsp.a63))
+	{
 		/*
 		 * CLRBUF' also resets the 2nd cursor task block flip flop,
 		 * which is built from two NAND gates a30c and a30d (74H00).
@@ -471,13 +498,11 @@ void alto2_cpu_device::display_state_machine()
 		 * decodes this as WAKECURT signal.
 		 */
 		m_dsp.curt_wakeup = true;
+		if (!m_dsp.curt_blocks)
+			m_task_wakeup |= 1 << task_curt;
 	}
 
-
 	LOG((LOG_DISPL,1, " NEXT:%03o\n", next));
-
-	if (!m_dsp.curt_blocks && m_dsp.curt_wakeup)
-		m_task_wakeup |= 1 << task_curt;
 
 	m_dsp.a63 = a63;
 	m_dsp.a66 = a66;
@@ -849,7 +874,8 @@ void alto2_cpu_device::fake_status_putch(int x, UINT8 ch)
 	int dx = 6 * x;
 	if (dx >= ALTO2_DISPLAY_WIDTH)
 		return;
-	for (int dy = 0; dy < 10; dy++) {
+	for (int dy = 0; dy < 10; dy++)
+	{
 		UINT8* pix = m_dsp.scanline[ALTO2_DISPLAY_HEIGHT + 1 + dy] + dx;
 		UINT8 bits = ~pf->bits[dy];
 		pix[0] = (bits >> 7) & 1;
