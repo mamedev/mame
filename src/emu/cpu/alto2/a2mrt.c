@@ -20,8 +20,12 @@ void alto2_cpu_device::f1_early_mrt_block()
 //! called by the CPU when MRT becomes active
 void alto2_cpu_device::activate_mrt()
 {
-	/* TODO: what do we do here? */
 	m_task_wakeup &= ~(1 << m_task);
+	if (m_ewfct)
+	{
+		// The Ether task wants a wakeup, too
+		m_task_wakeup |= 1 << task_ether;
+	}
 }
 
  //! memory refresh task slots initialization
