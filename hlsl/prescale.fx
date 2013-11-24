@@ -7,9 +7,9 @@ texture Diffuse;
 sampler DiffuseSampler = sampler_state
 {
 	Texture   = <Diffuse>;
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
+	MipFilter = NONE;
+	MinFilter = NONE;
+	MagFilter = NONE;
 	AddressU = CLAMP;
 	AddressV = CLAMP;
 	AddressW = CLAMP;
