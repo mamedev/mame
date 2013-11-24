@@ -50,6 +50,7 @@ enum {
 };
 
 struct {
+	UINT32 serin;								//!< serial input shift registers 74164 #37 and #33
 	UINT16 fifo[ALTO2_ETHER_FIFO_SIZE];			//!< FIFO buffer
 	UINT16 fifo_rd;								//!< FIFO input pointer
 	UINT16 fifo_wr;								//!< FIFO output pointer
@@ -107,7 +108,9 @@ void f2_late_ebfct();							//!< F2 func: Ethernet branch function
 void f2_late_ecbfct();							//!< F2 func: Ethernet countdown branch function
 void f2_late_eisfct();							//!< F2 func: Ethernet input start function
 void activate_eth();							//!< called by the CPU when the Ethernet task becomes active
-void update_ether();							//!< update all JK flip-flops for this cycle
+void update_sysclk(int sysclk);					//!< update all JK flip-flops for one cycle of SYSCLK
+void update_rclk(int rclk);						//!< update all JK flip-flops for one cycle of RCLK
+void update_tclk(int tclk);						//!< update all JK flip-flops for one cycle of TCLK
 void init_ether(int task = task_ether);			//!< initialize the ethernet task
 void exit_ether();								//!< deinitialize the ethernet task
 void reset_ether();								//!< reset the ethernet task

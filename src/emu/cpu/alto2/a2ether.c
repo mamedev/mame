@@ -572,48 +572,7 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
 void alto2_cpu_device::eth_startf()
 {
 	for (int sysclk = 0; sysclk < 2; sysclk++)
-	{
-		UINT8 s0, s1;
-		/*
-		 * JK flip-flop 35a (SIO' and SYSCLK clocked)
-		 * (Sheet 7)
-		 *
-		 * CLK	(SIO & SYSCLK)'
-		 * J	BUS[15]
-		 * K'	1
-		 * S'	1
-		 * C'	ERESET'
-		 * Q	OCMD
-		 * Q'   OCMD'
-		 */
-		s0 = m_eth.ff_35a;
-		s1 = sysclk ? JKFF_CLK : JKFF_0;
-		if (X_BIT(m_bus,16,15))
-			s1 |= JKFF_J;
-		s1 |= JKFF_K;
-		s1 |= JKFF_C;		// ERESET not now
-		m_eth.ff_35a = update_jkff(s0, s1, "35a OCMD   ");
-
-		/*
-		 * JK flip-flop 35b (SIO' and SYSCLK clocked)
-		 * (Sheet 7)
-		 *
-		 * CLK	(SIO & SYSCLK)'
-		 * J	BUS[14]
-		 * K'	1
-		 * S'	1
-		 * C'	ERESET'
-		 * Q	ICMD
-		 * Q'   ICMD'
-		 */
-		s0 = m_eth.ff_35b;
-		s1 = sysclk ? JKFF_CLK : JKFF_0;
-		if (X_BIT(m_bus,16,14))
-			s1 |= JKFF_J;
-		s1 |= JKFF_K;
-		s1 |= JKFF_C;		// ERESET not now
-		m_eth.ff_35b = update_jkff(s0, s1, "35b ICMD   ");
-	}
+		update_sysclk(sysclk);
 	PUT_ETH_OCMD(m_eth.status, m_eth.ff_35a & JKFF_Q ? 1 : 0);
 	PUT_ETH_ICMD(m_eth.status, m_eth.ff_35b & JKFF_Q ? 1 : 0);
 	LOG((LOG_ETH,3, "	STARTF; ICMD=%u OCMD=%u\n", GET_ETH_ICMD(m_eth.status), GET_ETH_ICMD(m_eth.status)));
@@ -878,9 +837,174 @@ void alto2_cpu_device::activate_eth()
 	m_ewfct = 0;
 }
 
-void alto2_cpu_device::update_ether()
+/**
+ * @brief update the ethernet circuit JK flip-flops that depend on SYSCLK
+ * @param sysclk current SYSCLK level 0 or 1
+ */
+void alto2_cpu_device::update_sysclk(int sysclk)
 {
 	UINT8 s0, s1;
+
+	/*
+	 * JK flip-flop 35a (SIO' and SYSCLK clocked)
+	 * (Sheet 7)
+	 *
+	 * Note: SIO is the emulator F1 STARTF
+	 *
+	 * CLK	(SIO & SYSCLK)'
+	 * J	BUS[15]
+	 * K'	1
+	 * S'	1
+	 * C'	ERESET'
+	 * Q	OCMD
+	 * Q'   OCMD'
+	 */
+	s0 = m_eth.ff_35a;
+	s1 = (m_d_f1 == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
+	if (X_BIT(m_bus,16,15))
+		s1 |= JKFF_J;
+	s1 |= JKFF_K;
+	s1 |= JKFF_C;		// ERESET' not now
+	m_eth.ff_35a = update_jkff(s0, s1, "35a OCMD   ");
+
+	/*
+	 * JK flip-flop 35b (SIO' and SYSCLK clocked)
+	 * (Sheet 7)
+	 *
+	 * Note: SIO is the emulator F1 STARTF
+	 *
+	 * CLK	(SIO & SYSCLK)'
+	 * J	BUS[14]
+	 * K'	1
+	 * S'	1
+	 * C'	ERESET'
+	 * Q	ICMD
+	 * Q'   ICMD'
+	 */
+	s0 = m_eth.ff_35b;
+	s1 = (m_d_f1 == f1_emu_startf && sysclk) ? JKFF_CLK : JKFF_0;
+	if (X_BIT(m_bus,16,14))
+		s1 |= JKFF_J;
+	s1 |= JKFF_K;
+	s1 |= JKFF_C;		// ERESET' not now
+	m_eth.ff_35b = update_jkff(s0, s1, "35b ICMD   ");
+
+	/*
+	 * JK flip-flop 10a IBUSY (Sheet 13)
+	 *
+	 * CLK	SYSCLK'
+	 * J	0
+	 * K'	EISFCT'
+	 * S'	ERESET'
+	 * C'	1
+	 * Q	IBUSY'
+	 * Q'   IBUSY
+	 */
+	s0 = m_eth.ff_10a;
+	s1 = sysclk ? JKFF_CLK : JKFF_0;
+	if (m_d_f2 != f2_ether_eisfct)
+		s1 |= JKFF_K;
+	s1 |= JKFF_C;
+	m_eth.ff_10a = update_jkff(s0, s1, "10a IBUSY    ");
+
+	/*
+	 * DEMUX 74S157 76
+	 * 1A   (SYSCLK & EODFCT)'
+	 * 2A   OSLOAD'
+	 * 3A   OSLOAD
+	 * 4A   (SYSCLK & EODFCT)'
+	 * 1B   ISRFULL
+	 * 2B   (SYSCLK & EIDFCT)'
+	 * 3B   EILDFCTA = (EIDFCT' & EILFCT')'
+	 * 4B   WLF'
+	 * SEL  IBUSY
+	 * 1Y   WLLOAD
+	 * 2Y   RDCNT'
+	 * 3Y   RR
+	 * 4Y   WLL'
+	 */
+	UINT8 WLLOAD;
+	UINT8 RDCNT0;
+	UINT8 RR;
+	UINT8 WLL0;
+	if (m_eth.ff_10a & JKFF_Q) {
+		WLLOAD = ~(sysclk & (m_d_f2 == f2_ether_eodfct)) & 1;
+		RDCNT0 = m_eth.ff_52b & JKFF_Q ? 1 : 0;
+		RR     = m_eth.ff_52b & JKFF_Q0 ? 1 : 0;
+		WLL0   = ~(sysclk & (m_d_f2 == f2_ether_eodfct)) & 1;
+	} else {
+		// ISRFULL
+		WLLOAD = (m_eth.serin >> 1) & 1;
+		RDCNT0 = ~(sysclk & (m_d_bs == bs_ether_eidfct)) & 1;
+		RR     = m_d_bs == bs_ether_eidfct || m_d_f1 == f1_ether_eilfct;
+		WLL0   = m_eth.ff_77b & JKFF_Q0 ? 1 : 0;
+	}
+	// TODO: use the signals
+	(void)RDCNT0;
+	(void)RR;
+	(void)WLL0;
+
+	/*
+	 * JK flip-flop 10b OBUSY (Sheet 13)
+	 *
+	 * CLK	SYSCLK'
+	 * J	0
+	 * K'	EOSFCT'
+	 * S'	ERESET'
+	 * C'	1
+	 * Q	OBUSY'
+	 * Q'   OBUSY
+	 */
+	s0 = m_eth.ff_10b;
+	s1 = sysclk ? JKFF_CLK : JKFF_0;
+	if (m_d_f2 != f2_ether_eosfct)
+		s1 |= JKFF_K;
+	m_eth.ff_10b = update_jkff(s0, s1, "10b OBUSY    ");
+
+	/*
+	 * JK flip-flop 51a EWFCT latch (Sheet 19)
+	 *
+	 * CLK	SYSCLK'
+	 * J	OCDW
+	 * K'	EWFCT'
+	 * S'	ERESET'
+	 * C'	1
+	 * Q	EWFCT latch(?)
+	 * Q'   ---
+	 */
+	s0 = m_eth.ff_51a;
+	s1 = sysclk ? JKFF_CLK : JKFF_0;
+	m_eth.ff_51a = update_jkff(s0, s1, "51a EWFCT_L  ");
+
+	/*
+	 * JK flip-flop 31b OEOT (Sheet 19)
+	 *
+	 * CLK	SYSCLK'
+	 * J	0
+	 * K'	EEFCT'
+	 * S'	ERESET'
+	 * C'	1
+	 * Q	OEOT'
+	 * Q'   ---
+	 */
+	s0 = m_eth.ff_31b;
+	s1 = sysclk ? JKFF_CLK : JKFF_0;
+	m_eth.ff_31b = update_jkff(s0, s1, "31b OEOT     ");
+
+	/*
+	 * JK flip-flop 69a IT (Sheet 14)
+	 *
+	 * CLK	ARC'
+	 * J	(BNE & ILOC & IMID & WR')
+	 * K'	1
+	 * S'	1
+	 * C'	ERESET'
+	 * Q	INGONE
+	 * Q'   INGONE'
+	 */
+	s0 = m_eth.ff_69a;
+	s1 = JKFF_CLK;
+	m_eth.ff_69a = update_jkff(s0, s1, "69a IT       ");
 
 	/*
 	 * JK flip-flop 65a IDL (Sheet 10)
@@ -913,6 +1037,21 @@ void alto2_cpu_device::update_ether()
 	m_eth.ff_65b = update_jkff(s0, s1, "65b IO       ");
 
 	/*
+	 * JK flip-flop 77b WLF (Sheet 10)
+	 *
+	 * CLK	WLLOAD
+	 * J	1
+	 * K'	1
+	 * S'	1
+	 * C'	(BUSY | WE')
+	 * Q	WLF
+	 * Q'   WLF'
+	 */
+	s0 = m_eth.ff_77b;
+	s1 = WLLOAD ? JKFF_CLK : JKFF_0;
+	m_eth.ff_77b = update_jkff(s0, s1, "77b WLF      ");
+
+	/*
 	 * JK flip-flop 77a WR (Sheet 10)
 	 *
 	 * CLK	ARC'
@@ -925,67 +1064,8 @@ void alto2_cpu_device::update_ether()
 	 */
 	s0 = m_eth.ff_77a;
 	s1 = JKFF_CLK;
+	if (m_eth.ff_77b)
 	m_eth.ff_77a = update_jkff(s0, s1, "77a WR       ");
-
-	/*
-	 * JK flip-flop 77b WLF (Sheet 10)
-	 *
-	 * CLK	WLLOAD
-	 * J	1
-	 * K'	1
-	 * S'	1
-	 * C'	(BUSY | WE')
-	 * Q	WLF
-	 * Q'   WLF'
-	 */
-	s0 = m_eth.ff_77b;
-	s1 = JKFF_CLK;
-	m_eth.ff_77b = update_jkff(s0, s1, "77b WLF      ");
-
-	/*
-	 * JK flip-flop 10a IBUSY (Sheet 13)
-	 *
-	 * CLK	SYSCLK'
-	 * J	0
-	 * K'	EISFCT'
-	 * S'	ERESET'
-	 * C'	1
-	 * Q	IBUSY'
-	 * Q'   IBUSY
-	 */
-	s0 = m_eth.ff_10a;
-	s1 = JKFF_CLK;
-	m_eth.ff_10a = update_jkff(s0, s1, "10a IBUSY    ");
-
-	/*
-	 * JK flip-flop 10b OBUSY (Sheet 13)
-	 *
-	 * CLK	SYSCLK'
-	 * J	0
-	 * K'	EOSFCT'
-	 * S'	ERESET'
-	 * C'	1
-	 * Q	OBUSY'
-	 * Q'   OBUSY
-	 */
-	s0 = m_eth.ff_10b;
-	s1 = JKFF_CLK;
-	m_eth.ff_10b = update_jkff(s0, s1, "10b OBUSY    ");
-
-	/*
-	 * JK flip-flop 69a IT (Sheet 14)
-	 *
-	 * CLK	ARC'
-	 * J	(BNE & ILOC & IMID & WR')
-	 * K'	1
-	 * S'	1
-	 * C'	ERESET'
-	 * Q	INGONE
-	 * Q'   INGONE'
-	 */
-	s0 = m_eth.ff_69a;
-	s1 = JKFF_CLK;
-	m_eth.ff_69a = update_jkff(s0, s1, "69a IT       ");
 
 	/*
 	 * JK flip-flop 69b INON (Sheet 14)
@@ -1003,21 +1083,6 @@ void alto2_cpu_device::update_ether()
 	m_eth.ff_69b = update_jkff(s0, s1, "69b INON     ");
 
 	/*
-	 * JK flip-flop 70a IMID (Sheet 14)
-	 *
-	 * CLK	RCLK
-	 * J	ISR00
-	 * K'	1
-	 * S'	1
-	 * C'	INON
-	 * Q	IMID
-	 * Q'   IMID'
-	 */
-	s0 = m_eth.ff_70a;
-	s1 = JKFF_CLK;
-	m_eth.ff_70a = update_jkff(s0, s1, "70a IMID     ");
-
-	/*
 	 * JK flip-flop 70b ILOC (Sheet 14)
 	 *
 	 * CLK	CARRIER'
@@ -1031,66 +1096,6 @@ void alto2_cpu_device::update_ether()
 	s0 = m_eth.ff_70b;
 	s1 = JKFF_CLK;
 	m_eth.ff_70b = update_jkff(s0, s1, "70b ILOC     ");
-
-	/*
-	 * JK flip-flop 47a OUTON (Sheet 15)
-	 *
-	 * CLK	RCLK
-	 * J	(ISR15 | ISRFULL)'
-	 * K'	 dito
-	 * S'	INON
-	 * C'	1
-	 * Q	---
-	 * Q'   ISR14
-	 */
-	s0 = m_eth.ff_47a;
-	s1 = JKFF_CLK;
-	m_eth.ff_47a = update_jkff(s0, s1, "47a ISR14    ");
-
-	/*
-	 * JK flip-flop 47b COLL (Sheet 15)
-	 *
-	 * CLK	RCLK
-	 * J	RDATA
-	 * K'	 dito
-	 * S'	1
-	 * C'	INON
-	 * Q	ISR15
-	 * Q'   ---
-	 */
-	s0 = m_eth.ff_47b;
-	s1 = JKFF_CLK;
-	m_eth.ff_47b = update_jkff(s0, s1, "47b ISR15    ");
-
-	/*
-	 * JK flip-flop 52b OSLOAD (Sheet 17)
-	 *
-	 * CLK	TCLK'
-	 * J	PROM a42 O2
-	 * K'	 dito
-	 * S'	1
-	 * C'	1
-	 * Q	OSLOAD'
-	 * Q'   OSLOAD
-	 */
-	s0 = m_eth.ff_52b;
-	s1 = JKFF_CLK;
-	m_eth.ff_52b = update_jkff(s0, s1, "52b OSLOAD   ");
-
-	/*
-	 * JK flip-flop 51a EWFCT latch (Sheet 19)
-	 *
-	 * CLK	SYSCLK'
-	 * J	OCDW
-	 * K'	EWFCT'
-	 * S'	ERSET'
-	 * C'	1
-	 * Q	EWFCT latch(?)
-	 * Q'   ---
-	 */
-	s0 = m_eth.ff_51a;
-	s1 = JKFF_CLK;
-	m_eth.ff_51a = update_jkff(s0, s1, "51a EWFCT_L  ");
 
 	/*
 	 * JK flip-flop 51b OCDW (Sheet 19)
@@ -1151,21 +1156,84 @@ void alto2_cpu_device::update_ether()
 	s0 = m_eth.ff_31a;
 	s1 = JKFF_CLK;
 	m_eth.ff_31a = update_jkff(s0, s1, "31a OUTGONE  ");
+}
+
+/**
+ * @brief update the ethernet circuit JK flip-flops that depend on RCLK
+ * @param rclk current RCLK level 0 or 1
+ */
+void alto2_cpu_device::update_rclk(int rclk)
+{
+	UINT8 s0, s1;
 
 	/*
-	 * JK flip-flop 31b OEOT (Sheet 19)
+	 * JK flip-flop 70a IMID (Sheet 14)
 	 *
-	 * CLK	SYSCLK'
-	 * J	0
-	 * K'	EEFCT'
-	 * S'	ERESET'
+	 * CLK	RCLK
+	 * J	ISR00
+	 * K'	1
+	 * S'	1
+	 * C'	INON
+	 * Q	IMID
+	 * Q'   IMID'
+	 */
+	s0 = m_eth.ff_70a;
+	s1 = rclk ? JKFF_CLK : JKFF_0;
+	m_eth.ff_70a = update_jkff(s0, s1, "70a IMID     ");
+
+	/*
+	 * JK flip-flop 47a OUTON (Sheet 15)
+	 *
+	 * CLK	RCLK
+	 * J	(ISR15 | ISRFULL)'
+	 * K'	 dito
+	 * S'	INON
 	 * C'	1
-	 * Q	OEOT'
+	 * Q	---
+	 * Q'   ISR14
+	 */
+	s0 = m_eth.ff_47a;
+	s1 = rclk ? JKFF_CLK : JKFF_0;
+	m_eth.ff_47a = update_jkff(s0, s1, "47a ISR14    ");
+
+	/*
+	 * JK flip-flop 47b COLL (Sheet 15)
+	 *
+	 * CLK	RCLK
+	 * J	RDATA
+	 * K'	 dito
+	 * S'	1
+	 * C'	INON
+	 * Q	ISR15
 	 * Q'   ---
 	 */
-	s0 = m_eth.ff_31b;
-	s1 = JKFF_CLK;
-	m_eth.ff_31b = update_jkff(s0, s1, "31b OEOT     ");
+	s0 = m_eth.ff_47b;
+	s1 = rclk ? JKFF_CLK : JKFF_0;
+	m_eth.ff_47b = update_jkff(s0, s1, "47b ISR15    ");
+}
+
+/**
+ * @brief update the ethernet circuit JK flip-flops that depend on TCLK
+ * @param tclk current TCLK level 0 or 1
+ */
+void alto2_cpu_device::update_tclk(int tclk)
+{
+	UINT8 s0, s1;
+
+	/*
+	 * JK flip-flop 52b OSLOAD (Sheet 17)
+	 *
+	 * CLK	TCLK'
+	 * J	PROM a42 O2
+	 * K'	 dito
+	 * S'	1
+	 * C'	1
+	 * Q	OSLOAD'
+	 * Q'   OSLOAD
+	 */
+	s0 = m_eth.ff_52b;
+	s1 = tclk ? JKFF_0 : JKFF_CLK;
+	m_eth.ff_52b = update_jkff(s0, s1, "52b OSLOAD   ");
 
 	/*
 	 * JK flip-flop 61a CRCGO (Sheet 21)
@@ -1179,7 +1247,7 @@ void alto2_cpu_device::update_ether()
 	 * Q'   CRCGO'
 	 */
 	s0 = m_eth.ff_61a;
-	s1 = JKFF_CLK;
+	s1 = tclk ? JKFF_0 : JKFF_CLK;
 	m_eth.ff_61a = update_jkff(s0, s1, "61a CRCGO    ");
 
 	/*
@@ -1194,7 +1262,7 @@ void alto2_cpu_device::update_ether()
 	 * Q'   ---
 	 */
 	s0 = m_eth.ff_61b;
-	s1 = JKFF_CLK;
+	s1 = tclk ? JKFF_0 : JKFF_CLK;
 	m_eth.ff_61b = update_jkff(s0, s1, "61b OUTRGO   ");
 
 	/*
@@ -1209,7 +1277,7 @@ void alto2_cpu_device::update_ether()
 	 * Q'   ---
 	 */
 	s0 = m_eth.ff_62a;
-	s1 = JKFF_CLK;
+	s1 = tclk ? JKFF_0 : JKFF_CLK;
 	m_eth.ff_62a = update_jkff(s0, s1, "62a OUTGO    ");
 
 	/*
@@ -1224,9 +1292,10 @@ void alto2_cpu_device::update_ether()
 	 * Q'   OUTON'
 	 */
 	s0 = m_eth.ff_62b;
-	s1 = JKFF_CLK;
+	s1 = tclk ? JKFF_0 : JKFF_CLK;
 	m_eth.ff_62b = update_jkff(s0, s1, "62b OUTON    ");
 }
+
 
 /**
  * @brief ethernet task slot initialization
