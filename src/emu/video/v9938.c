@@ -281,8 +281,8 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 	for (y=0;y<32;y++) for (k=0;k<64;k++) for (j=0;j<64;j++)
 	{
 		// calculate the color
-		if (k >= 32) k0 = (64 - k); else k0 = k;
-		if (j >= 32) j0 = (64 - j); else j0 = j;
+		if (k >= 32) k0 = (k - 64); else k0 = k;
+		if (j >= 32) j0 = (j - 64); else j0 = j;
 		r = y + j0;
 		b = (y * 5 - 2 * j0 - k0) / 4;
 		g = y + k0;
@@ -290,9 +290,9 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 		if (g < 0) g = 0; else if (g > 31) g = 31;
 		if (b < 0) b = 0; else if (b > 31) b = 31;
 
-		r = (r << 3) | (r >> 2);
-		b = (b << 3) | (b >> 2);
-		g = (g << 3) | (g >> 2);
+		//r = (r << 3) | (r >> 2);
+		//b = (b << 3) | (b >> 2);
+		//g = (g << 3) | (g >> 2);
 		// have we seen this one before?
 		n = 0;
 		while (n < i)
@@ -311,7 +311,7 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 			pal[i*3+0] = r;
 			pal[i*3+1] = g;
 			pal[i*3+2] = b;
-			palette_set_color(machine(), i+512, MAKE_RGB(r, g, b));
+			palette_set_color(machine(), i+512, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
 			v99x8_device::s_pal_indYJK[y | j << 5 | k << (5 + 6)] = i + 512;
 			i++;
 		}
