@@ -39,7 +39,6 @@ Sexy Boom's DSW setting verified via Z80 code by stephh
 TODO:
 - pzlestar hangs at snippet 0x2ca0-0x2ca9, patching 0x2ca7 branch makes it to be fully playable (patched for now);
 - pzlestar title screen uses sprites with screen 12, has wrong colors due of it;
-- sexyboom presumably uses v9958 horizontal scrolling on title screen;
 - sexyboom slows down dramatically, presumably bankswitch related;
 
 */
@@ -555,5 +554,5 @@ DRIVER_INIT_MEMBER(sangho_state,pzlestar)
 	ROM[0x12ca8] = 0x00;
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state,  pzlestar,   ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, driver_device, 0,          ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state,  pzlestar,   ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, driver_device, 0,          ROT270, "Sang Ho Soft", "Sexy Boom", 0 )
