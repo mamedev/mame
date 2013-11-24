@@ -340,6 +340,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 	bool changed = false;
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 	int char_num =  source.is_octal() ? 3 : 2;
+	UINT32 need_dasm_width = m_dasm_width;
 
 	// determine how many characters we need for an address and set the divider
 	m_divider1 = 1 + (source.m_space.logaddrchars()/2*char_num) + 1;
@@ -420,15 +421,21 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 		// append the UTF-8 decoded disassembly to the buffer
 		const char* src = buffer;
+		size_t avail = strlen(buffer);
 		for (UINT32 offs = 0; offs < m_dasm_width + 2; offs++)
 		{
 			destbuf[m_divider1 + 1 + offs] = ' ';
 			if (!*src)
 				continue;
-			int len = uchar_from_utf8(&destbuf[m_divider1 + 1 + offs], src, strlen(src));
-			if (len > 0)
+			int len = uchar_from_utf8(&destbuf[m_divider1 + 1 + offs], src, avail);
+			if (len > 0) {
 				src += len;
+				avail -= len;
+			}
 		}
+		// do we need to increase m_dasm_width?
+		if (*src)
+			need_dasm_width = utf8_width(buffer);
 
 		// output the right column
 		if (m_right_column == DASM_RIGHTCOL_RAW || m_right_column == DASM_RIGHTCOL_ENCRYPTED)
@@ -459,6 +466,9 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 
 	// now longer need to recompute
 	m_recompute = false;
+	// except we need more columns for the disassembler's output
+	if (need_dasm_width > m_dasm_width)
+		set_disasm_width(need_dasm_width);
 	return changed;
 }
 
