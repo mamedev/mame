@@ -70,6 +70,8 @@ struct {
 	jkff_t ff_31b;								//!< JK flip-flop 31b OEOT (Sheet 19)
 	jkff_t ff_35a;								//!< JK flip-flop 35a OCMD (Sheet 7)
 	jkff_t ff_35b;								//!< JK flip-flop 35b ICMD (Sheet 7)
+	jkff_t ff_47a;								//!< JK flip-flop 47a ISR14 (Sheet 15)
+	jkff_t ff_47b;								//!< JK flip-flop 47b ISR15 (Sheet 15)
 	jkff_t ff_51a;								//!< JK flip-flop 51a EWFCT latch (Sheet 19)
 	jkff_t ff_51b;								//!< JK flip-flop 51b OCDW (Sheet 19)
 	jkff_t ff_52b;								//!< JK flip-flop 52b OSLOAD (Sheet 17)
@@ -105,6 +107,7 @@ void f2_late_ebfct();							//!< F2 func: Ethernet branch function
 void f2_late_ecbfct();							//!< F2 func: Ethernet countdown branch function
 void f2_late_eisfct();							//!< F2 func: Ethernet input start function
 void activate_eth();							//!< called by the CPU when the Ethernet task becomes active
+void update_ether();							//!< update all JK flip-flops for this cycle
 void init_ether(int task = task_ether);			//!< initialize the ethernet task
 void exit_ether();								//!< deinitialize the ethernet task
 void reset_ether();								//!< reset the ethernet task
