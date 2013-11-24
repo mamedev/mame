@@ -27,7 +27,7 @@ WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 
 	if (mem_mask &0xff00)
 	{
-		duart68681_w(m_duart,space,offset,(data>>8)&0x00ff);
+		m_duart->write(space,offset,(data>>8)&0x00ff);
 	}
 	else
 	{
@@ -193,37 +193,35 @@ WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_ym_irqhandler)
 
 
 
-void bfm_sc5_duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_irq_handler)
 {
 	printf("bfm_sc5_duart_irq_handler\n");
-};
+}
 
-void bfm_sc5_duart_tx(device_t *device, int channel, UINT8 data)
+WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_txa)
 {
 	logerror("bfm_sc5_duart_tx\n");
-};
+}
 
-
-
-UINT8 bfm_sc5_duart_input_r(device_t *device)
+READ8_MEMBER(bfm_sc5_state::bfm_sc5_duart_input_r)
 {
-	//bfm_sc5_state *state = device->machine().driver_data<bfm_sc5_state>();
 	printf("bfm_sc5_duart_input_r\n");
 	return 0xff;
 }
 
-void bfm_sc5_duart_output_w(device_t *device, UINT8 data)
+WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 {
 	logerror("bfm_sc5_duart_output_w\n");
 }
 
 
-static const duart68681_config bfm_sc5_duart68681_config =
+static const duartn68681_config bfm_sc5_duart68681_config =
 {
-	bfm_sc5_duart_irq_handler,
-	bfm_sc5_duart_tx,
-	bfm_sc5_duart_input_r,
-	bfm_sc5_duart_output_w,
+	DEVCB_DRIVER_LINE_MEMBER(bfm_sc5_state, bfm_sc5_duart_irq_handler),
+	DEVCB_DRIVER_LINE_MEMBER(bfm_sc5_state, bfm_sc5_duart_txa),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(bfm_sc5_state, bfm_sc5_duart_input_r),
+	DEVCB_DRIVER_MEMBER(bfm_sc5_state, bfm_sc5_duart_output_w),
 	// TODO: What are the actual frequencies?
 	16000000/2/8,     /* IP2/RxCB clock */
 	16000000/2/16,    /* IP3/TxCA clock */
@@ -240,7 +238,7 @@ MACHINE_CONFIG_START( bfm_sc5, bfm_sc5_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DUART68681_ADD("duart68681", 16000000/4, bfm_sc5_duart68681_config) // ?? Mhz
+	MCFG_DUARTN68681_ADD("duart68681", 16000000/4, bfm_sc5_duart68681_config) // ?? Mhz
 
 
 	MCFG_BFMBDA_ADD("vfd0",0)

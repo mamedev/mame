@@ -7,7 +7,7 @@
 #include "machine/bfm_bda.h"
 
 #include "sound/ymz280b.h"
-#include "machine/68681.h"
+#include "machine/n68681.h"
 #include "machine/nvram.h"
 #include "machine/68307.h"
 #include "machine/68340.h"
@@ -28,7 +28,7 @@ public:
 
 public:
 
-	required_device<duart68681_device> m_duart;
+	required_device<duartn68681_device> m_duart;
 	optional_device<bfm_bda_t> m_vfd0;
 	optional_device<bfmdm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
@@ -103,6 +103,17 @@ public:
 	DECLARE_WRITE16_MEMBER(sc4_mem_w);
 
 	DECLARE_READ16_MEMBER(sc4_cs1_r);
+	
+	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
+	DECLARE_READ8_MEMBER(bfm_sc4_duart_input_r);
+	DECLARE_WRITE8_MEMBER(bfm_sc4_duart_output_w);
+	
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
+	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb);
+	DECLARE_READ8_MEMBER(m68307_duart_input_r);
+	DECLARE_WRITE8_MEMBER(m68307_duart_output_w);
 
 	DECLARE_DRIVER_INIT(sc4);
 	DECLARE_DRIVER_INIT(sc4mbus);

@@ -213,7 +213,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				return duart68681_r(m_duart,space,offset);
+				return m_duart->read(space,offset);
 			}
 			else
 			{
@@ -364,7 +364,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				duart68681_w(m_duart,space,offset,data&0x00ff);
+				m_duart->write(space,offset,data&0x00ff);
 			}
 			else
 			{
@@ -610,7 +610,7 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 		bfm_sc4_68307_porta_w,
 		bfm_sc4_68307_portb_r,
 		bfm_sc4_68307_portb_w );
-	m68307_set_duart68681(m_maincpu,machine().device("m68307_68681"));
+	m68307_set_duart68681(m_maincpu,machine().device<duartn68681_device>("m68307_68681"));
 
 
 
@@ -631,58 +631,55 @@ WRITE_LINE_MEMBER(sc4_state::bfm_sc4_irqhandler)
 
 
 
-void bfm_sc4_duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(sc4_state::bfm_sc4_duart_irq_handler)
 {
-	sc4_state *drvstate = device->machine().driver_data<sc4_state>();
 	// triggers after reel tests on luckb, at the start on dnd...
 	// not sure this is right, causes some games to crash
 	logerror("bfm_sc4_duart_irq_handler\n");
 	if (state == ASSERT_LINE)
 	{
-		m68307_licr2_interrupt(drvstate->m_maincpu);
+		m68307_licr2_interrupt(m_maincpu);
 	}
-};
-
-void bfm_sc4_duart_tx(device_t *device, int channel, UINT8 data)
-{
-	logerror("bfm_sc4_duart_tx\n");
-};
-
-
-
-UINT8 bfm_sc4_duart_input_r(device_t *device)
-{
-	sc4_state *state = device->machine().driver_data<sc4_state>();
-//  printf("bfm_sc4_duart_input_r\n");
-	return state->m_optic_pattern;
 }
 
-void bfm_sc4_duart_output_w(device_t *device, UINT8 data)
+WRITE_LINE_MEMBER(sc4_state::bfm_sc4_duart_txa)
+{
+	logerror("bfm_sc4_duart_tx\n");
+}
+
+
+
+READ8_MEMBER(sc4_state::bfm_sc4_duart_input_r)
+{
+	//  printf("bfm_sc4_duart_input_r\n");
+	return m_optic_pattern;
+}
+
+WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 {
 //  logerror("bfm_sc4_duart_output_w\n");
-	sc4_state *state = device->machine().driver_data<sc4_state>();
+	m_reel56_latch = data;
 
-	state->m_reel56_latch = data;
+	if ( stepper_update(4, data&0x0f   ) ) m_reel_changed |= 0x10;
+	if ( stepper_update(5, (data>>4)&0x0f) ) m_reel_changed |= 0x20;
 
-	if ( stepper_update(4, data&0x0f   ) ) state->m_reel_changed |= 0x10;
-	if ( stepper_update(5, (data>>4)&0x0f) ) state->m_reel_changed |= 0x20;
-
-	if ( stepper_optic_state(4) ) state->m_optic_pattern |=  0x10;
-	else                          state->m_optic_pattern &= ~0x10;
-	if ( stepper_optic_state(5) ) state->m_optic_pattern |=  0x20;
-	else                          state->m_optic_pattern &= ~0x20;
+	if ( stepper_optic_state(4) ) m_optic_pattern |=  0x10;
+	else                          m_optic_pattern &= ~0x10;
+	if ( stepper_optic_state(5) ) m_optic_pattern |=  0x20;
+	else                          m_optic_pattern &= ~0x20;
 
 	awp_draw_reel(4);
 	awp_draw_reel(5);
 }
 
 
-static const duart68681_config bfm_sc4_duart68681_config =
+static const duartn68681_config bfm_sc4_duart68681_config =
 {
-	bfm_sc4_duart_irq_handler,
-	bfm_sc4_duart_tx,
-	bfm_sc4_duart_input_r,
-	bfm_sc4_duart_output_w,
+	DEVCB_DRIVER_LINE_MEMBER(sc4_state, bfm_sc4_duart_irq_handler),
+	DEVCB_DRIVER_LINE_MEMBER(sc4_state, bfm_sc4_duart_txa),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(sc4_state, bfm_sc4_duart_input_r),
+	DEVCB_DRIVER_MEMBER(sc4_state, bfm_sc4_duart_output_w),
 	// TODO: What are the actual frequencies?
 	XTAL_16MHz/2/8,     /* IP2/RxCB clock */
 	XTAL_16MHz/2/16,    /* IP3/TxCA clock */
@@ -692,47 +689,45 @@ static const duart68681_config bfm_sc4_duart68681_config =
 
 
 
-void m68307_duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(sc4_state::m68307_duart_irq_handler)
 {
-	sc4_state *drvstate = device->machine().driver_data<sc4_state>();
 	logerror("m68307_duart_irq_handler\n");
 	if (state == ASSERT_LINE)
 	{
-		m68307_serial_interrupt(drvstate->m_maincpu, vector);
+		m68307_serial_interrupt(m_maincpu, machine().device<duartn68681_device>("m68307_68681")->get_irq_vector());
 	}
-};
+}
 
-void m68307_duart_tx(device_t *device, int channel, UINT8 data)
+WRITE_LINE_MEMBER(sc4_state::m68307_duart_txa)
 {
-	if (channel==0)
-	{
-		logerror("m68307_duart_tx %02x\n",data);
-	}
-	else
-	{
-		printf("(illegal channel 1) m68307_duart_tx %02x\n",data);
-	}
-};
+	logerror("m68307_duart_tx %02x\n", state);
+}
 
-UINT8 m68307_duart_input_r(device_t *device)
+WRITE_LINE_MEMBER(sc4_state::m68307_duart_txb)
+{
+	printf("(illegal channel 1) m68307_duart_tx %02x\n", state);
+}
+
+READ8_MEMBER(sc4_state::m68307_duart_input_r)
 {
 	logerror("m68307_duart_input_r\n");
 	return 0x00;
 }
 
-void m68307_duart_output_w(device_t *device, UINT8 data)
+WRITE8_MEMBER(sc4_state::m68307_duart_output_w)
 {
 	logerror("m68307_duart_output_w %02x\n", data);
 }
 
 
 
-static const duart68681_config m68307_duart68681_config =
+static const duartn68681_config m68307_duart68681_config =
 {
-	m68307_duart_irq_handler,
-	m68307_duart_tx,
-	m68307_duart_input_r,
-	m68307_duart_output_w
+	DEVCB_DRIVER_LINE_MEMBER(sc4_state, m68307_duart_irq_handler),
+	DEVCB_DRIVER_LINE_MEMBER(sc4_state, m68307_duart_txa),
+	DEVCB_DRIVER_LINE_MEMBER(sc4_state, m68307_duart_txb),
+	DEVCB_DRIVER_MEMBER(sc4_state, m68307_duart_input_r),
+	DEVCB_DRIVER_MEMBER(sc4_state, m68307_duart_output_w)
 };
 
 /* default dmd */
@@ -753,7 +748,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
 
 	// internal duart of the 68307... paired in machine start
-	MCFG_DUART68681_ADD("m68307_68681", 16000000/4, m68307_duart68681_config) // ?? Mhz
+	MCFG_DUARTN68681_ADD("m68307_68681", 16000000/4, m68307_duart68681_config) // ?? Mhz
 
 	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
 	MCFG_MACHINE_RESET_OVERRIDE(sc4_state, sc4 )
@@ -763,7 +758,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_DUART68681_ADD("duart68681", 16000000/4, bfm_sc4_duart68681_config) // ?? Mhz
+	MCFG_DUARTN68681_ADD("duart68681", 16000000/4, bfm_sc4_duart68681_config) // ?? Mhz
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 
