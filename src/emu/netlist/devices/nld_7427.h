@@ -29,11 +29,10 @@
  *
  */
 
-
-#include "nld_signal.h"
-
 #ifndef NLD_7427_H_
 #define NLD_7427_H_
+
+#include "nld_signal.h"
 
 #define TTL_7427_NOR(_name, _I1, _I2, _I3)                                          \
         NET_REGISTER_DEV(7427, _name)                                               \

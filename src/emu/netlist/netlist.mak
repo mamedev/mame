@@ -24,4 +24,5 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/nl_parser.o \
 	$(NETLISTOBJ)/devices/nld_system.o \
 	$(NETLISTOBJ)/devices/net_lib.o \
+	$(NETLISTOBJ)/devices/nld_7486.o \
 

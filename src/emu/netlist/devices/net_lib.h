@@ -60,6 +60,8 @@
 #include "nld_7420.h"
 #include "nld_7425.h"
 #include "nld_7427.h"
+#include "nld_7430.h"
+#include "nld_7486.h"
 
 // this is a bad hack
 #define USE_OLD7493 (0)
@@ -97,24 +99,9 @@
 // TTL Logic chips
 // ----------------------------------------------------------------------------------------
 
-
-
 #define TTL_7404_INVERT(_name, _I1)                                                 \
 		NET_REGISTER_DEV(nic7404, _name)                                            \
 		NET_CONNECT(_name, I1, _I1)
-
-
-
-#define TTL_7430_NAND(_name, _I1, _I2, _I3, _I4, _I5, _I6, _I7, _I8)                \
-		NET_REGISTER_DEV(nic7430, _name)                                            \
-		NET_CONNECT(_name, A, _I1)                                                  \
-		NET_CONNECT(_name, B, _I2)                                                  \
-		NET_CONNECT(_name, C, _I3)                                                  \
-		NET_CONNECT(_name, D, _I4)                                                  \
-		NET_CONNECT(_name, E, _I5)                                                  \
-		NET_CONNECT(_name, F, _I6)                                                  \
-		NET_CONNECT(_name, G, _I7)                                                  \
-		NET_CONNECT(_name, H, _I8)
 
 #define TTL_7450_ANDORINVERT(_name, _I1, _I2, _I3, _I4)                             \
 		NET_REGISTER_DEV(nic7450, _name)                                            \
@@ -122,11 +109,6 @@
 		NET_CONNECT(_name, I2, _I2)                                                 \
 		NET_CONNECT(_name, I3, _I3)                                                 \
 		NET_CONNECT(_name, I4, _I4)
-
-#define TTL_7486_XOR(_name, _I1, _I2)                                               \
-		NET_REGISTER_DEV(nic7486, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)                                                 \
-		NET_CONNECT(_name, I2, _I2)
 
 #define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)                      \
 		NET_REGISTER_DEV(nic7448, _name)                                            \
@@ -297,7 +279,7 @@ NETLIB_DEVICE_WITH_PARAMS(nicNE555N_MSTABLE,
 
 );
 
-NETLIB_SIGNAL(nic7430, 8, 0, 0);
+
 
 NETLIB_DEVICE(nic7404,
 	netlist_ttl_input_t m_I;
@@ -328,12 +310,6 @@ NETLIB_DEVICE(nic7474,
 	netlist_ttl_input_t m_D;
 	netlist_ttl_input_t m_clrQ;
 	netlist_ttl_input_t m_preQ;
-);
-
-NETLIB_DEVICE(nic7486,
-		netlist_ttl_input_t m_I0;
-		netlist_ttl_input_t m_I1;
-		netlist_ttl_output_t m_Q;
 );
 
 /* 74107 does latch data during high !

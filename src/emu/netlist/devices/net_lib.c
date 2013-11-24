@@ -280,20 +280,6 @@ NETLIB_UPDATE(nic7404)
 	OUTLOGIC(m_Q, t, delay[t]);
 }
 
-NETLIB_START(nic7486)
-{
-	register_input("I1", m_I0);
-	register_input("I2", m_I1);
-	register_output("Q", m_Q);
-}
-
-NETLIB_UPDATE(nic7486)
-{
-	static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
-	UINT8 t = INPLOGIC(m_I0) ^ INPLOGIC(m_I1);
-	OUTLOGIC(m_Q, t, delay[t]);
-}
-
 NETLIB_START(nic7448)
 {
 	register_sub(sub, "sub");

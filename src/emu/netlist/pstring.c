@@ -107,112 +107,109 @@ pstring pstring::sprintf(const char *format, ...)
 
 char *pstring::alloc_str(int n)
 {
-#if (IMMEDIATE_MODE)
-    return (char *) malloc(n);
-#else
-#if (DEBUG_MODE)
-    int min_alloc = MAX(0, n+sizeof(memblock));
-#else
-    int min_alloc = MAX(8192, n+sizeof(memblock));
-#endif
-    char *ret = NULL;
-
-    //std::printf("m_first %p\n", m_first);
-    for (memblock *p = m_first; p != NULL && ret == NULL; p = p->next)
+    if (IMMEDIATE_MODE)
+        return (char *) malloc(n);
+    else
     {
-        if (p->remaining > n)
+        int min_alloc = MAX((DEBUG_MODE) ? 0 : 8192, n+sizeof(memblock));
+        char *ret = NULL;
+
+        //std::printf("m_first %p\n", m_first);
+        for (memblock *p = m_first; p != NULL && ret == NULL; p = p->next)
         {
+            if (p->remaining > n)
+            {
+                ret = p->cur;
+                p->cur += n;
+                p->allocated += 1;
+                p->remaining -= n;
+            }
+        }
+
+        if (ret == NULL)
+        {
+            // need to allocate a new block
+            memblock *p = (memblock *) malloc(min_alloc); //new char[min_alloc];
+            p->allocated = 0;
+            p->cur = &p->data[0];
+            p->size = p->remaining = min_alloc - sizeof(memblock);
+            p->next = m_first;
+            //std::printf("allocated block size %d\n", p->size);
+
             ret = p->cur;
             p->cur += n;
             p->allocated += 1;
             p->remaining -= n;
+
+            m_first = p;
         }
+
+        return ret;
     }
-
-    if (ret == NULL)
-    {
-        // need to allocate a new block
-        memblock *p = (memblock *) malloc(min_alloc); //new char[min_alloc];
-        p->allocated = 0;
-        p->cur = &p->data[0];
-        p->size = p->remaining = min_alloc - sizeof(memblock);
-        p->next = m_first;
-        //std::printf("allocated block size %d\n", p->size);
-
-        ret = p->cur;
-        p->cur += n;
-        p->allocated += 1;
-        p->remaining -= n;
-
-        m_first = p;
-    }
-
-    return ret;
-#endif
 }
 
 void pstring::dealloc_str(void *ptr)
 {
-#if (IMMEDIATE_MODE)
-    free(ptr);
-#else
-    for (memblock *p = m_first; p != NULL; p = p->next)
+    if (IMMEDIATE_MODE)
+        free(ptr);
+    else
     {
-        if (ptr >= &p->data[0] && ptr < &p->data[p->size])
+        for (memblock *p = m_first; p != NULL; p = p->next)
         {
-            p->allocated -= 1;
-            if (p->allocated < 0)
-                fatalerror("nstring: memory corruption\n");
-            if (p->allocated == 0)
+            if (ptr >= &p->data[0] && ptr < &p->data[p->size])
             {
-                //std::printf("Block entirely freed\n");
-                p->remaining = p->size;
-                p->cur = &p->data[0];
+                p->allocated -= 1;
+                if (p->allocated < 0)
+                    fatalerror("nstring: memory corruption\n");
+                if (p->allocated == 0)
+                {
+                    //std::printf("Block entirely freed\n");
+                    p->remaining = p->size;
+                    p->cur = &p->data[0];
+                }
+                // shutting down ?
+                if (m_zero == NULL)
+                    resetmem(); // try to free blocks
+                return;
             }
-            // shutting down ?
-            if (m_zero == NULL)
-                resetmem(); // try to free blocks
-            return;
         }
+        fatalerror("nstring: string <%p> not found\n", ptr);
     }
-    fatalerror("nstring: string <%p> not found\n", ptr);
-#endif
 }
 
 void pstring::resetmem()
 {
-#if (IMMEDIATE_MODE)
-#else
-    memblock **p = &m_first;
-    int totalblocks = 0;
-    int freedblocks = 0;
-
-    // Release the 0 string
-    if (m_zero != NULL) sfree(m_zero);
-    m_zero = NULL;
-
-    while (*p != NULL)
+    if (!IMMEDIATE_MODE)
     {
-        totalblocks++;
-        memblock **next = &((*p)->next);
-        if ((*p)->allocated == 0)
+        memblock **p = &m_first;
+        int totalblocks = 0;
+        int freedblocks = 0;
+
+        // Release the 0 string
+        if (m_zero != NULL) sfree(m_zero);
+        m_zero = NULL;
+
+        while (*p != NULL)
         {
-            //std::printf("freeing block %p\n", *p);
-            memblock *freeme = *p;
-            *p = *next;
-            free(freeme); //delete[] *p;
-            freedblocks++;
+            totalblocks++;
+            memblock **next = &((*p)->next);
+            if ((*p)->allocated == 0)
+            {
+                //std::printf("freeing block %p\n", *p);
+                memblock *freeme = *p;
+                *p = *next;
+                free(freeme); //delete[] *p;
+                freedblocks++;
+            }
+            else
+            {
+                if (DEBUG_MODE)
+                    std::printf("Allocated: <%s>\n", ((str_t *)(&(*p)->data[0]))->str());
+
+                p = next;
+            }
         }
-        else
-        {
-#if (DEBUG_MODE)
-            std::printf("Allocated: <%s>\n", ((str_t *)(&(*p)->data[0]))->str());
-#endif
-            p = next;
-        }
+        if (DEBUG_MODE)
+            std::printf("Freed %d out of total %d blocks\n", freedblocks, totalblocks);
     }
-#if (DEBUG_MODE)
-    std::printf("Freed %d out of total %d blocks\n", freedblocks, totalblocks);
-#endif
-#endif
 }

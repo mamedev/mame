@@ -29,10 +29,10 @@
  *
  */
 
-#include "nld_signal.h"
-
 #ifndef NLD_7400_H_
 #define NLD_7400_H_
+
+#include "nld_signal.h"
 
 #define TTL_7400_NAND(_name, _A, _B)                                                \
 		NET_REGISTER_DEV(7400, _name)                                               \
