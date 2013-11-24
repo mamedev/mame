@@ -62,6 +62,29 @@ struct {
 	UINT16* tx_packet;							//!< buffer to collect transmitted words
 	emu_timer* rx_timer;						//!< receiver timer
 	emu_timer* tx_timer;						//!< transmitter timer
+	jkff_t ff_10a;								//!< JK flip-flop 10a IBUSY (Sheet 13)
+	jkff_t ff_10b;								//!< JK flip-flop 10b OBUSY (Sheet 13)
+	jkff_t ff_21a;								//!< JK flip-flop 21a OUTON (Sheet 19)
+	jkff_t ff_21b;								//!< JK flip-flop 21b COLL (Sheet 19)
+	jkff_t ff_31a;								//!< JK flip-flop 31a OUTGONE (Sheet 19)
+	jkff_t ff_31b;								//!< JK flip-flop 31b OEOT (Sheet 19)
+	jkff_t ff_35a;								//!< JK flip-flop 35a OCMD (Sheet 7)
+	jkff_t ff_35b;								//!< JK flip-flop 35b ICMD (Sheet 7)
+	jkff_t ff_51a;								//!< JK flip-flop 51a EWFCT latch (Sheet 19)
+	jkff_t ff_51b;								//!< JK flip-flop 51b OCDW (Sheet 19)
+	jkff_t ff_52b;								//!< JK flip-flop 52b OSLOAD (Sheet 17)
+	jkff_t ff_61a;								//!< JK flip-flop 61a CRCGO (Sheet 21)
+	jkff_t ff_61b;								//!< JK flip-flop 61b OUTRGO (Sheet 21)
+	jkff_t ff_62a;								//!< JK flip-flop 62a OUTON (Sheet 21)
+	jkff_t ff_62b;								//!< JK flip-flop 62b OUTGO (Sheet 21)
+	jkff_t ff_65a;								//!< JK flip-flop 65a IDL (Sheet 10)
+	jkff_t ff_65b;								//!< JK flip-flop 65b IO (Sheet 10)
+	jkff_t ff_69a;								//!< JK flip-flop 69a IT (Sheet 14)
+	jkff_t ff_69b;								//!< JK flip-flop 69b INON (Sheet 14)
+	jkff_t ff_70a;								//!< JK flip-flop 70a IMID (Sheet 14)
+	jkff_t ff_70b;								//!< JK flip-flop 70b ILOC (Sheet 14)
+	jkff_t ff_77a;								//!< JK flip-flop 77a WR (Sheet 10)
+	jkff_t ff_77b;								//!< JK flip-flop 77b WLF (Sheet 10)
 	int breath_of_life;							//!< if non-zero, interval in seconds at which to broadcast the breath-of-life
 }	m_eth;
 
