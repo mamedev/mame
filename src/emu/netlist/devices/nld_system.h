@@ -96,6 +96,9 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 // ----------------------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(solver,
+        typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
+        typedef netlist_list_t<netlist_net_t *>      net_list_t;
+
         netlist_ttl_input_t m_feedback;
         netlist_ttl_output_t m_Q;
 
@@ -104,11 +107,14 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
         netlist_time m_inc;
         netlist_time m_last_step;
 
-        netlist_list_t<netlist_terminal_t *> m_terms;
-        netlist_list_t<netlist_terminal_t *> m_inps;
+        terminal_list_t m_terms;
+        terminal_list_t m_inps;
 
 public:
-        netlist_list_t<netlist_net_t *> m_nets;
+
+        ~NETLIB_NAME(solver)();
+
+        net_list_t m_nets;
 
         ATTR_HOT inline void schedule();
 

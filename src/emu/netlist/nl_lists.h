@@ -15,14 +15,23 @@
 // ----------------------------------------------------------------------------------------
 
 
-template <class _ListClass>
+template <class _ListClass, int _NumElem = 128>
 struct netlist_list_t
 {
 public:
-	ATTR_COLD netlist_list_t(int numElements = 100)
+
+    struct entry_t {
+
+        // keep compatibility with tagmap
+        _ListClass object() { return m_obj; }
+
+        _ListClass m_obj;
+    };
+
+	ATTR_COLD netlist_list_t(int numElements = _NumElem)
 	{
 		m_num_elements = numElements;
-		m_list = new _ListClass[m_num_elements];
+		m_list = new entry_t[m_num_elements];
 		m_ptr = m_list;
 		m_ptr--;
 	}
@@ -32,24 +41,29 @@ public:
 	}
 	ATTR_HOT inline void add(const _ListClass elem)
 	{
-		assert(m_ptr-m_list <= m_num_elements - 1);
+		if (m_ptr-m_list >= m_num_elements - 1)
+		    resize(m_num_elements * 2);
 
-		*(++m_ptr) = elem;
+		(++m_ptr)->m_obj = elem;
 	}
 	ATTR_HOT inline void resize(const int new_size)
 	{
 	    int cnt = count();
-	    _ListClass *m_new = new _ListClass[new_size];
-	    memcpy(m_new, m_list, new_size * sizeof(_ListClass));
+	    entry_t *m_new = new entry_t[new_size];
+	    entry_t *pd = m_new;
+
+	    for (entry_t *ps = m_list; ps <= m_ptr; ps++, pd++)
+	        *pd = *ps;
 	    delete[] m_list;
 	    m_list = m_new;
 	    m_ptr = m_list + cnt - 1;
+	    m_num_elements = new_size;
 	}
-    ATTR_HOT inline void del(const _ListClass elem)
+    ATTR_HOT inline void remove(const _ListClass elem)
     {
-        for (_ListClass * i=m_list; i<=m_ptr; i++)
+        for (entry_t *i = m_list; i <= m_ptr; i++)
         {
-            if (*i == elem)
+            if (i->object() == elem)
             {
                 while (i <= m_ptr)
                 {
@@ -61,16 +75,16 @@ public:
             }
         }
     }
-	ATTR_HOT inline _ListClass *first() { return (m_ptr >= m_list ? &m_list[0] : NULL ); }
-    ATTR_HOT inline _ListClass *next(_ListClass *lc) { return (lc < last() ? lc + 1 : NULL ); }
-	ATTR_HOT inline _ListClass *last()  { return m_ptr; }
-	ATTR_HOT inline _ListClass *item(int i) { return &m_list[i]; }
+	ATTR_HOT inline entry_t *first() { return (m_ptr >= m_list ? &m_list[0] : NULL ); }
+    ATTR_HOT inline entry_t *next(entry_t *lc) { return (lc < last() ? lc + 1 : NULL ); }
+	ATTR_HOT inline entry_t *last()  { return m_ptr; }
+	ATTR_HOT inline entry_t *item(int i) { return &m_list[i]; }
 	ATTR_HOT inline int count() const { return m_ptr - m_list + 1; }
 	ATTR_HOT inline bool empty() { return (m_ptr < m_list); }
-	ATTR_HOT inline void clear() { m_ptr = m_list - 1; }
+	ATTR_HOT inline void reset() { m_ptr = m_list - 1; }
 private:
-	_ListClass * m_ptr;
-	_ListClass * m_list;
+	entry_t * m_ptr;
+	entry_t * m_list;
 	int m_num_elements;
 	//_ListClass m_list[_NumElements];
 };
@@ -111,7 +125,7 @@ public:
 		if (is_empty() || (e.time() <= (m_end - 1)->time()))
 		{
 			*m_end++ = e;
-			//inc_stat(m_prof_end);
+			inc_stat(m_prof_end);
 		}
 		else
 		{
@@ -120,20 +134,20 @@ public:
 			{
 				i--;
 				*(i+1) = *i;
-				//inc_stat(m_prof_sortmove);
+				inc_stat(m_prof_sortmove);
 			}
 			*i = e;
-			//inc_stat(m_prof_sort);
+			inc_stat(m_prof_sort);
 		}
 		assert(m_end - m_list < _Size);
 	}
 
-	ATTR_HOT inline const entry_t pop()
+	ATTR_HOT inline const entry_t &pop()
 	{
 		return *--m_end;
 	}
 
-	ATTR_HOT inline const entry_t peek() const
+	ATTR_HOT inline const entry_t &peek() const
 	{
 		return *(m_end-1);
 	}
@@ -142,12 +156,15 @@ public:
 	{
 		m_end = &m_list[0];
 	}
-	// profiling
 
+#if (NL_KEEP_STATISTICS)
+	// profiling
 	INT32   m_prof_start;
 	INT32   m_prof_end;
 	INT32   m_prof_sortmove;
 	INT32   m_prof_sort;
+#endif
+
 private:
 
 	entry_t * RESTRICT m_end;

@@ -987,7 +987,7 @@ static const net_device_t_base_factory *netregistry[] =
 	NULL
 };
 
-netlist_device_t *net_create_device_by_classname(const astring &classname, netlist_setup_t &setup)
+netlist_device_t *net_create_device_by_classname(const pstring &classname, netlist_setup_t &setup)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
 	while (*p != NULL)
@@ -1003,7 +1003,7 @@ netlist_device_t *net_create_device_by_classname(const astring &classname, netli
 	return NULL; // appease code analysis
 }
 
-netlist_device_t *net_create_device_by_name(const astring &name, netlist_setup_t &setup)
+netlist_device_t *net_create_device_by_name(const pstring &name, netlist_setup_t &setup)
 {
 	const net_device_t_base_factory **p = &netregistry[0];
 	while (*p != NULL)

@@ -68,42 +68,53 @@ public:
 
     struct link_t
     {
-        link_t(const astring &ae1, const astring &ae2)
+        link_t() { }
+        // Copy constructor
+        link_t(const link_t &from)
+        {
+            e1 = from.e1;
+            e2 = from.e2;
+        }
+
+        link_t(const pstring &ae1, const pstring &ae2)
         {
             e1 = ae1;
             e2 = ae2;
         }
-        astring e1;
-        astring e2;
+        pstring e1;
+        pstring e2;
+
+        bool operator==(const link_t &rhs) const { return (e1 == rhs.e1) && (e2 == rhs.e2); }
+        link_t &operator=(const link_t &rhs) { e1 = rhs.e1; e2 = rhs.e2; return *this; }
     };
 
 	typedef tagmap_t<netlist_device_t *, 393> tagmap_devices_t;
-    typedef tagmap_t<link_t *, 393> tagmap_link_t;
-	typedef tagmap_t<const astring *, 393> tagmap_astring_t;
+	typedef tagmap_t<pstring, 393> tagmap_nstring_t;
 	typedef tagmap_t<netlist_param_t *, 393> tagmap_param_t;
 	typedef tagmap_t<netlist_terminal_t *, 393> tagmap_terminal_t;
+	typedef netlist_list_t<link_t> tagmap_link_t;
 
 	netlist_setup_t(netlist_base_t &netlist);
 	~netlist_setup_t();
 
 	netlist_base_t &netlist() { return m_netlist; }
 
-	netlist_device_t *register_dev(netlist_device_t *dev, const astring &name);
-	void remove_dev(const astring &name);
+	netlist_device_t *register_dev(netlist_device_t *dev, const pstring &name);
+	void remove_dev(const pstring &name);
 
-    void register_alias(const astring &alias, const astring &out);
-    void register_link(const astring &sin, const astring &sout);
-    void register_param(const astring &param, const astring &value);
-    void register_param(const astring &param, const double value);
+    void register_alias(const pstring &alias, const pstring &out);
+    void register_link(const pstring &sin, const pstring &sout);
+    void register_param(const pstring &param, const pstring &value);
+    void register_param(const pstring &param, const double value);
 
-    void register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const astring &name, netlist_object_t &obj, netlist_input_t::state_e state);
+    void register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const pstring &name, netlist_object_t &obj, netlist_input_t::state_e state);
 
-    netlist_terminal_t &find_terminal(const astring &outname_in);
-    netlist_terminal_t &find_terminal(const astring &outname_in, netlist_object_t::type_t atype);
+    netlist_terminal_t &find_terminal(const pstring &outname_in);
+    netlist_terminal_t &find_terminal(const pstring &outname_in, netlist_object_t::type_t atype);
 
-    netlist_param_t &find_param(const astring &param_in);
+    netlist_param_t &find_param(const pstring &param_in);
 
-	void register_callback(const astring &devname, netlist_output_delegate delegate);
+	void register_callback(const pstring &devname, netlist_output_delegate delegate);
 
 	void parse(char *buf);
 
@@ -123,10 +134,10 @@ private:
 	netlist_base_t &m_netlist;
 
 	tagmap_devices_t m_devices;
-	tagmap_astring_t m_alias;
+	tagmap_nstring_t m_alias;
 	tagmap_param_t  m_params;
-	tagmap_link_t  m_links;
-    tagmap_astring_t m_params_temp;
+	tagmap_link_t   m_links;
+    tagmap_nstring_t m_params_temp;
 
 	int m_proxy_cnt;
 
@@ -136,9 +147,9 @@ private:
     void connect_terminal_input(netlist_terminal_t &term, netlist_input_t &inp);
 
     // helpers
-    astring objtype_as_astr(netlist_object_t &in);
+    pstring objtype_as_astr(netlist_object_t &in);
 
-	const astring resolve_alias(const astring &name) const;
+	const pstring resolve_alias(const pstring &name) const;
 };
 
 #endif /* NLSETUP_H_ */

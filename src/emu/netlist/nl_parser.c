@@ -16,7 +16,7 @@ void netlist_parser::parse(char *buf)
 	m_p = buf;
 	while (*m_p)
 	{
-		astring n;
+		pstring n;
 		skipws();
 		if (!*m_p) break;
 		n = getname('(');
@@ -34,8 +34,8 @@ void netlist_parser::parse(char *buf)
 
 void netlist_parser::net_alias()
 {
-	astring alias;
-	astring out;
+	pstring alias;
+	pstring out;
 	skipws();
 	alias = getname(',');
 	skipws();
@@ -46,7 +46,7 @@ void netlist_parser::net_alias()
 
 void netlist_parser::netdev_param()
 {
-	astring param;
+	pstring param;
 	double val;
 	skipws();
 	param = getname(',');
@@ -58,11 +58,11 @@ void netlist_parser::netdev_param()
 	check_char(')');
 }
 
-void netlist_parser::netdev_const(const astring &dev_name)
+void netlist_parser::netdev_const(const pstring &dev_name)
 {
-	astring name;
+	pstring name;
 	netlist_device_t *dev;
-	astring paramfq;
+	pstring paramfq;
 	double val;
 
 	skipws();
@@ -72,16 +72,15 @@ void netlist_parser::netdev_const(const astring &dev_name)
 	skipws();
 	val = eval_param();
 	check_char(')');
-	paramfq = name;
-	paramfq.cat(".CONST");
+	paramfq = name + ".CONST";
 	NL_VERBOSE_OUT(("Parser: Const: %s %f\n", name.cstr(), val));
 	//m_setup.find_param(paramfq).initial(val);
 	m_setup.register_param(paramfq, val);
 }
 
-void netlist_parser::netdev_device(const astring &dev_type)
+void netlist_parser::netdev_device(const pstring &dev_type)
 {
-	astring devname;
+	pstring devname;
 	netlist_device_t *dev;
 	int cnt;
 
@@ -96,11 +95,9 @@ void netlist_parser::netdev_device(const astring &dev_type)
 	{
 		m_p++;
 		skipws();
-		astring output_name = getname2(',', ')');
+		pstring output_name = getname2(',', ')');
 		NL_VERBOSE_OUT(("Parser: ID: %s %s\n", output_name.cstr(), dev->m_terminals.item(cnt)->cstr()));
-		astring temp;
-		temp.printf("%s.[%d]", devname.cstr(), cnt);
-		m_setup.register_link(temp, output_name);
+		m_setup.register_link(pstring::sprintf("%s.[%d]", devname.cstr(), cnt), output_name);
 		skipws();
 		cnt++;
 	}
@@ -156,7 +153,7 @@ void netlist_parser::skipws()
 	}
 }
 
-astring netlist_parser::getname(char sep)
+pstring netlist_parser::getname(char sep)
 {
 	char buf[300];
 	char *p1 = buf;
@@ -165,10 +162,10 @@ astring netlist_parser::getname(char sep)
 		*p1++ = *m_p++;
 	*p1 = 0;
 	m_p++;
-	return astring(buf);
+	return pstring(buf);
 }
 
-astring netlist_parser::getname2(char sep1, char sep2)
+pstring netlist_parser::getname2(char sep1, char sep2)
 {
 	char buf[300];
 	char *p1 = buf;
@@ -176,7 +173,7 @@ astring netlist_parser::getname2(char sep1, char sep2)
 	while ((*m_p != sep1) && (*m_p != sep2))
 		*p1++ = *m_p++;
 	*p1 = 0;
-	return astring(buf);
+	return pstring(buf);
 }
 
 void netlist_parser::check_char(char ctocheck)

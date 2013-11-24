@@ -49,8 +49,6 @@
 #include "netlist/nl_setup.h"
 #include "netlist/devices/net_lib.h"
 
-const netlist_time netlist_time::zero = netlist_time::from_raw(0);
-
 // ----------------------------------------------------------------------------------------
 // netlist_mame_device
 // ----------------------------------------------------------------------------------------
@@ -91,8 +89,8 @@ void netlist_mame_device::device_start()
 	m_setup->start_devices();
 
 	bool allok = true;
-	for (on_device_start **ods = m_device_start_list.first(); ods <= m_device_start_list.last(); ods++)
-		allok &= (*ods)->OnDeviceStart();
+	for (device_start_list_t::entry_t *ods = m_device_start_list.first(); ods != NULL; ods = m_device_start_list.next(ods))
+		allok &= ods->object()->OnDeviceStart();
 
 	if (!allok)
 		fatalerror("required elements not found\n");

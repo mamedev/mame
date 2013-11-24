@@ -5,6 +5,9 @@
 
 #include "nl_base.h"
 #include "devices/nld_system.h"
+#include "pstring.h"
+
+const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
 // ----------------------------------------------------------------------------------------
 // netlist_object_t
@@ -14,25 +17,24 @@ ATTR_COLD netlist_object_t::netlist_object_t(const type_t atype, const family_t 
 : m_objtype(atype)
 , m_family(afamily)
 , m_netlist(NULL)
-, m_name(NULL)
 {}
 
 ATTR_COLD netlist_object_t::~netlist_object_t()
 {
-    delete m_name;
+    //delete m_name;
 }
 
-ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const astring &aname)
+ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const pstring &aname)
 {
     m_netlist = &nl;
-    m_name = new astring(aname);
+    m_name = aname;
 }
 
-ATTR_COLD const astring &netlist_object_t::name() const
+ATTR_COLD const pstring &netlist_object_t::name() const
 {
-    if (m_name == NULL)
+    if (m_name == "")
         fatalerror("object not initialized");
-    return *m_name;
+    return m_name;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -47,7 +49,7 @@ ATTR_COLD netlist_owned_object_t::netlist_owned_object_t(const type_t atype,
 }
 
 ATTR_COLD void netlist_owned_object_t::init_object(netlist_core_device_t &dev,
-        const astring &aname)
+        const pstring &aname)
 {
     netlist_object_t::init_object(dev.netlist(), aname);
     m_netdev = &dev;
@@ -58,15 +60,17 @@ ATTR_COLD void netlist_owned_object_t::init_object(netlist_core_device_t &dev,
 // ----------------------------------------------------------------------------------------
 
 netlist_base_t::netlist_base_t()
-	: m_mainclock(NULL),
-		m_time_ps(netlist_time::zero),
+	: 	m_time_ps(netlist_time::zero),
 		m_rem(0),
-		m_div(NETLIST_DIV)
+		m_div(NETLIST_DIV),
+		m_mainclock(NULL),
+		m_solver(NULL)
 {
 }
 
 netlist_base_t::~netlist_base_t()
 {
+    pstring::resetmem();
 }
 
 ATTR_COLD void netlist_base_t::set_mainclock_dev(NETLIB_NAME(mainclock) *dev)
@@ -81,11 +85,12 @@ ATTR_COLD void netlist_base_t::set_solver_dev(NETLIB_NAME(solver) *dev)
 
 ATTR_COLD void netlist_base_t::reset()
 {
-		m_time_ps = netlist_time::zero;
-		m_rem = 0;
-		m_queue.clear();
-		if (m_mainclock != NULL)
-			m_mainclock->m_Q.net().set_time(netlist_time::zero);
+    m_time_ps = netlist_time::zero;
+    m_rem = 0;
+    m_queue.clear();
+    if (m_mainclock != NULL)
+        m_mainclock->m_Q.net().set_time(netlist_time::zero);
+
 }
 
 
@@ -121,7 +126,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(INT32 &atime)
 	{
 		while ( (atime > 0) && (m_queue.is_not_empty()))
 		{
-			const queue_t::entry_t e = m_queue.pop();
+			const queue_t::entry_t &e = m_queue.pop();
 			update_time(e.time(), atime);
 
 			//if (FATAL_ERROR_AFTER_NS)
@@ -156,7 +161,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(INT32 &atime)
 					NETLIB_NAME(mainclock)::mc_update(mcQ, time() + inc);
 
 				}
-				const queue_t::entry_t e = m_queue.pop();
+				const queue_t::entry_t &e = m_queue.pop();
 
 				update_time(e.time(), atime);
 
@@ -197,7 +202,7 @@ netlist_core_device_t::netlist_core_device_t()
 {
 }
 
-ATTR_COLD void netlist_core_device_t::init(netlist_setup_t &setup, const astring &name)
+ATTR_COLD void netlist_core_device_t::init(netlist_setup_t &setup, const pstring &name)
 {
     init_object(setup.netlist(), name);
 
@@ -248,7 +253,7 @@ netlist_device_t::~netlist_device_t()
 	//NL_VERBOSE_OUT(("~net_device_t\n");
 }
 
-ATTR_COLD void netlist_device_t::init(netlist_setup_t &setup, const astring &name)
+ATTR_COLD void netlist_device_t::init(netlist_setup_t &setup, const pstring &name)
 {
 	netlist_core_device_t::init(setup, name);
 	m_setup = &setup;
@@ -256,33 +261,33 @@ ATTR_COLD void netlist_device_t::init(netlist_setup_t &setup, const astring &nam
 }
 
 
-ATTR_COLD void netlist_device_t::register_sub(netlist_core_device_t &dev, const astring &name)
+ATTR_COLD void netlist_device_t::register_sub(netlist_core_device_t &dev, const pstring &name)
 {
 	dev.init(*m_setup, this->name() + "." + name);
 }
 
-ATTR_COLD void netlist_device_t::register_output(netlist_core_device_t &dev, const astring &name, netlist_output_t &port)
+ATTR_COLD void netlist_device_t::register_output(netlist_core_device_t &dev, const pstring &name, netlist_output_t &port)
 {
 	m_setup->register_object(*this, dev, name, port, netlist_terminal_t::STATE_OUT);
 }
 
-ATTR_COLD void netlist_device_t::register_terminal(const astring &name, netlist_terminal_t &port)
+ATTR_COLD void netlist_device_t::register_terminal(const pstring &name, netlist_terminal_t &port)
 {
     m_setup->register_object(*this,*this,name, port, netlist_terminal_t::STATE_INP_ACTIVE);
 }
 
-ATTR_COLD void netlist_device_t::register_output(const astring &name, netlist_output_t &port)
+ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_output_t &port)
 {
 	m_setup->register_object(*this,*this,name, port, netlist_terminal_t::STATE_OUT);
 }
 
-ATTR_COLD void netlist_device_t::register_input(netlist_core_device_t &dev, const astring &name, netlist_input_t &inp, netlist_input_t::state_e type)
+ATTR_COLD void netlist_device_t::register_input(netlist_core_device_t &dev, const pstring &name, netlist_input_t &inp, netlist_input_t::state_e type)
 {
     m_terminals.add(name);
 	m_setup->register_object(*this, dev, name, inp, type);
 }
 
-ATTR_COLD void netlist_device_t::register_input(const astring &name, netlist_input_t &inp, netlist_input_t::state_e type)
+ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp, netlist_input_t::state_e type)
 {
 	register_input(*this, name, inp, type);
 }
@@ -303,14 +308,14 @@ ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, net
 	register_link_internal(*this, in, out, aState);
 }
 
-ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const astring &name, netlist_param_t &param, double initialVal)
+ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &name, netlist_param_t &param, double initialVal)
 {
 	param.set_netdev(dev);
 	param.initial(initialVal);
 	m_setup->register_object(*this, *this, name, param, netlist_terminal_t::STATE_NONEX);
 }
 
-ATTR_COLD void netlist_device_t::register_param(const astring &name, netlist_param_t &param, double initialVal)
+ATTR_COLD void netlist_device_t::register_param(const pstring &name, netlist_param_t &param, double initialVal)
 {
 	register_param(*this,name, param, initialVal);
 }
@@ -451,7 +456,7 @@ ATTR_COLD netlist_terminal_t::netlist_terminal_t()
 
 }
 
-ATTR_COLD void netlist_terminal_t::init_object(netlist_core_device_t &dev, const astring &aname, const state_e astate)
+ATTR_COLD void netlist_terminal_t::init_object(netlist_core_device_t &dev, const pstring &aname, const state_e astate)
 {
 	set_state(astate);
 	netlist_owned_object_t::init_object(dev, aname);
@@ -480,7 +485,7 @@ netlist_output_t::netlist_output_t(const type_t atype, const family_t afamily)
     this->set_net(m_my_net);
 }
 
-ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const astring &aname)
+ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const pstring &aname)
 {
     netlist_terminal_t::init_object(dev, aname, STATE_OUT);
     net().init_object(dev.netlist(), aname);

@@ -19,15 +19,15 @@ public:
 	void parse(char *buf);
 	void net_alias();
 	void netdev_param();
-	void netdev_const(const astring &dev_name);
-	void netdev_device(const astring &dev_type);
+	void netdev_const(const pstring &dev_name);
+	void netdev_device(const pstring &dev_type);
 
 private:
 
 	void skipeol();
 	void skipws();
-	astring getname(char sep);
-	astring getname2(char sep1, char sep2);
+	pstring getname(char sep);
+	pstring getname2(char sep1, char sep2);
 	void check_char(char ctocheck);
 	double eval_param();
 

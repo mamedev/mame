@@ -18,8 +18,9 @@ NETLISTOBJ = $(EMUOBJ)/netlist
 #-------------------------------------------------
 
 NETLISTOBJS+= \
-	$(NETLISTOBJ)/nl_setup.o \
 	$(NETLISTOBJ)/nl_base.o \
+	$(NETLISTOBJ)/pstring.o \
+	$(NETLISTOBJ)/nl_setup.o \
 	$(NETLISTOBJ)/nl_parser.o \
 	$(NETLISTOBJ)/devices/nld_system.o \
 	$(NETLISTOBJ)/devices/net_lib.o \

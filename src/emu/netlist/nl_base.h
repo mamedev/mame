@@ -138,6 +138,7 @@
 #include "nl_config.h"
 #include "nl_lists.h"
 #include "nl_time.h"
+#include "pstring.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -248,9 +249,9 @@ public:
 
 	virtual ~netlist_object_t();
 
-	ATTR_COLD void init_object(netlist_base_t &nl, const astring &aname);
+	ATTR_COLD void init_object(netlist_base_t &nl, const pstring &aname);
 
-    ATTR_COLD const astring &name() const;
+    ATTR_COLD const pstring &name() const;
 
 	ATTR_HOT inline const type_t type() const { return m_objtype; }
     ATTR_HOT inline const family_t family() const { return m_family; }
@@ -262,10 +263,10 @@ public:
     ATTR_HOT inline const netlist_base_t & RESTRICT netlist() const { return *m_netlist; }
 
 private:
+    pstring m_name;
 	const type_t m_objtype;
     const family_t m_family;
     netlist_base_t * RESTRICT m_netlist;
-    astring *m_name;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -277,7 +278,7 @@ class netlist_owned_object_t : public netlist_object_t
 public:
     ATTR_COLD netlist_owned_object_t(const type_t atype, const family_t afamily);
 
-    ATTR_COLD void init_object(netlist_core_device_t &dev, const astring &aname);
+    ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
 
     ATTR_HOT inline netlist_core_device_t & RESTRICT netdev() const { return *m_netdev; }
 private:
@@ -306,7 +307,7 @@ public:
 	ATTR_COLD netlist_terminal_t(const type_t atype, const family_t afamily);
     ATTR_COLD netlist_terminal_t();
 
-	ATTR_COLD void init_object(netlist_core_device_t &dev, const astring &aname, const state_e astate);
+	ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname, const state_e astate);
 
     ATTR_COLD void set_net(netlist_net_t &anet);
     ATTR_COLD inline bool has_net() { return (m_net != NULL); }
@@ -515,7 +516,7 @@ public:
 
 	ATTR_COLD netlist_output_t(const type_t atype, const family_t afamily);
 
-    ATTR_COLD void init_object(netlist_core_device_t &dev, const astring &aname);
+    ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
 
 	double m_low_V;
 	double m_high_V;
@@ -601,7 +602,7 @@ public:
 
     ATTR_COLD virtual ~netlist_core_device_t();
 
-	ATTR_COLD virtual void init(netlist_setup_t &setup, const astring &name);
+	ATTR_COLD virtual void init(netlist_setup_t &setup, const pstring &name);
 
 
 	ATTR_HOT virtual void update_param() {}
@@ -656,9 +657,11 @@ public:
 	ATTR_HOT virtual void step_time(const double st) { }
     ATTR_HOT virtual void update_terminals() { }
 
-	/* stats */
+#if (NL_KEEP_STATISTICS)
+    /* stats */
 	osd_ticks_t total_time;
 	INT32 stat_count;
+#endif
 
 #if USE_DELEGATES
 	net_update_delegate static_update;
@@ -681,21 +684,21 @@ public:
 
 	ATTR_COLD virtual ~netlist_device_t();
 
-	ATTR_COLD virtual void init(netlist_setup_t &setup, const astring &name);
+	ATTR_COLD virtual void init(netlist_setup_t &setup, const pstring &name);
 
 	ATTR_COLD const netlist_setup_t *setup() const { return m_setup; }
 
 	ATTR_COLD bool variable_input_count() { return m_variable_input_count; }
 
-	ATTR_COLD void register_sub(netlist_core_device_t &dev, const astring &name);
+	ATTR_COLD void register_sub(netlist_core_device_t &dev, const pstring &name);
 
-    ATTR_COLD void register_terminal(const astring &name, netlist_terminal_t &port);
+    ATTR_COLD void register_terminal(const pstring &name, netlist_terminal_t &port);
 
-	ATTR_COLD void register_output(const astring &name, netlist_output_t &out);
-	ATTR_COLD void register_output(netlist_core_device_t &dev, const astring &name, netlist_output_t &out);
+	ATTR_COLD void register_output(const pstring &name, netlist_output_t &out);
+	ATTR_COLD void register_output(netlist_core_device_t &dev, const pstring &name, netlist_output_t &out);
 
-	ATTR_COLD void register_input(const astring &name, netlist_input_t &in, netlist_input_t::state_e state = netlist_input_t::STATE_INP_ACTIVE);
-	ATTR_COLD void register_input(netlist_core_device_t &dev, const astring &name, netlist_input_t &in, netlist_input_t::state_e state = netlist_input_t::STATE_INP_ACTIVE);
+	ATTR_COLD void register_input(const pstring &name, netlist_input_t &in, netlist_input_t::state_e state = netlist_input_t::STATE_INP_ACTIVE);
+	ATTR_COLD void register_input(netlist_core_device_t &dev, const pstring &name, netlist_input_t &in, netlist_input_t::state_e state = netlist_input_t::STATE_INP_ACTIVE);
 
 	ATTR_COLD void register_link_internal(netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState);
 	ATTR_COLD void register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState);
@@ -703,15 +706,15 @@ public:
     ATTR_HOT virtual void update_terminals() { }
 
     /* driving logic outputs don't count in here */
-	netlist_list_t<astring> m_terminals;
+	netlist_list_t<pstring, 20> m_terminals;
 
 protected:
 
 	virtual void update() { }
 	virtual void start() { }
 
-	ATTR_COLD void register_param(const astring &sname, netlist_param_t &param, const double initialVal = 0.0);
-	ATTR_COLD void register_param(netlist_core_device_t &dev, const astring &sname, netlist_param_t &param, const double initialVal = 0.0);
+	ATTR_COLD void register_param(const pstring &sname, netlist_param_t &param, const double initialVal = 0.0);
+	ATTR_COLD void register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_t &param, const double initialVal = 0.0);
 
 	netlist_setup_t *m_setup;
 	bool m_variable_input_count;
@@ -780,18 +783,21 @@ public:
 	ATTR_COLD void reset();
 
 protected:
+#if (NL_KEEP_STATISTICS)
 	// performance
 	int m_perf_out_processed;
 	int m_perf_inp_processed;
 	int m_perf_inp_active;
+#endif
 
 private:
+    netlist_time                m_time_ps;
     queue_t                     m_queue;
-	NETLIB_NAME(mainclock) *    m_mainclock;
-    NETLIB_NAME(solver) *       m_solver;
-	netlist_time                m_time_ps;
 	UINT32                      m_rem;
 	UINT32                      m_div;
+
+	NETLIB_NAME(mainclock) *    m_mainclock;
+    NETLIB_NAME(solver) *       m_solver;
 
 	ATTR_HOT void update_time(const netlist_time t, INT32 &atime);
 
@@ -994,7 +1000,7 @@ ATTR_HOT inline const bool netlist_analog_input_t::is_highz() const
 class net_device_t_base_factory
 {
 public:
-	net_device_t_base_factory(const astring &name, const astring &classname)
+	net_device_t_base_factory(const pstring &name, const pstring &classname)
 	: m_name(name), m_classname(classname)
 	{}
 
@@ -1002,18 +1008,18 @@ public:
 
 	virtual netlist_device_t *Create() const = 0;
 
-	const astring &name() const { return m_name; }
-	const astring &classname() const { return m_classname; }
+	const pstring &name() const { return m_name; }
+	const pstring &classname() const { return m_classname; }
 protected:
-	astring m_name;                             /* device name */
-	astring m_classname;                        /* device class name */
+	pstring m_name;                             /* device name */
+	pstring m_classname;                        /* device class name */
 };
 
 template <class C>
 class net_device_t_factory : public net_device_t_base_factory
 {
 public:
-	net_device_t_factory(const astring &name, const astring &classname)
+	net_device_t_factory(const pstring &name, const pstring &classname)
 	: net_device_t_base_factory(name, classname) { }
 
 	netlist_device_t *Create() const
@@ -1024,8 +1030,8 @@ public:
 	}
 };
 
-netlist_device_t *net_create_device_by_classname(const astring &classname, netlist_setup_t &setup);
-netlist_device_t *net_create_device_by_name(const astring &name, netlist_setup_t &setup);
+netlist_device_t *net_create_device_by_classname(const pstring &classname, netlist_setup_t &setup);
+netlist_device_t *net_create_device_by_name(const pstring &name, netlist_setup_t &setup);
 
 
 #endif /* NLBASE_H_ */

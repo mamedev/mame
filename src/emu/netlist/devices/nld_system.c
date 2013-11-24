@@ -98,13 +98,24 @@ NETLIB_UPDATE_PARAM(solver)
     m_inc = netlist_time::from_hz(m_freq.Value());
 }
 
+NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
+{
+    net_list_t::entry_t *p = m_nets.first();
+    while (p != NULL)
+    {
+        net_list_t::entry_t *pn = m_nets.next(pn);
+        delete pn->object();
+        p = pn;
+    }
+}
+
 NETLIB_FUNC_VOID(solver, post_start, ())
 {
     NL_VERBOSE_OUT(("post start solver ...\n"));
-    for (netlist_net_t **pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+    for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
     {
         NL_VERBOSE_OUT(("setting up net\n"));
-        for (netlist_terminal_t *p = (*pn)->m_head; p != NULL; p = p->m_update_list_next)
+        for (netlist_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
         {
             switch (p->type())
             {
@@ -121,11 +132,11 @@ NETLIB_FUNC_VOID(solver, post_start, ())
                     break;
             }
         }
-        if ((*pn)->m_head == NULL)
+        if (pn->object()->m_head == NULL)
         {
             NL_VERBOSE_OUT(("Deleting net ...\n"));
-            netlist_net_t *to_delete = *pn;
-            m_nets.del(to_delete);
+            netlist_net_t *to_delete = pn->object();
+            m_nets.remove(to_delete);
             delete to_delete;
             pn--;
         }
@@ -146,15 +157,15 @@ NETLIB_UPDATE(solver)
         NL_VERBOSE_OUT(("Step!\n"));
         /* update all terminals for new time step */
         m_last_step = now;
-        for (netlist_terminal_t **p = m_terms.first(); p != NULL; p = m_terms.next(p))
-            (*p)->netdev().step_time(delta.as_double());
+        for (terminal_list_t::entry_t *p = m_terms.first(); p != NULL; p = m_terms.next(p))
+            p->object()->netdev().step_time(delta.as_double());
     }
-    for (netlist_net_t **pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+    for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
     {
         double gtot = 0;
         double iIdr = 0;
 
-        for (netlist_terminal_t *p = (*pn)->m_head; p != NULL; p = p->m_update_list_next)
+        for (netlist_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
         {
             if (p->isType(netlist_terminal_t::TERMINAL))
             {
@@ -165,9 +176,9 @@ NETLIB_UPDATE(solver)
         }
 
         double new_val = iIdr / gtot;
-        if (fabs(new_val - (*pn)->m_cur.Analog) > 1e-4)
+        if (fabs(new_val - pn->object()->m_cur.Analog) > 1e-4)
             resched = true;
-        (*pn)->m_cur.Analog = (*pn)->m_new.Analog = new_val;
+        pn->object()->m_cur.Analog = pn->object()->m_new.Analog = new_val;
 
         NL_VERBOSE_OUT(("Info: %d\n", (*pn)->m_num_cons));
         NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
@@ -179,8 +190,8 @@ NETLIB_UPDATE(solver)
     else
     {
         /* update all inputs connected */
-        for (netlist_terminal_t **p = m_inps.first(); p != NULL; p = m_inps.next(p))
-            (*p)->netdev().update_dev();
+        for (terminal_list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+            p->object()->netdev().update_dev();
         /* step circuit */
         if (!m_Q.net().is_queued())
         {

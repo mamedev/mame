@@ -118,7 +118,9 @@ public:
 	netlist_setup_t &setup() { return *m_setup; }
 	netlist_t &netlist() { return *m_netlist; }
 
-	netlist_list_t<on_device_start *> m_device_start_list;
+	typedef netlist_list_t<on_device_start *> device_start_list_t;
+
+	device_start_list_t m_device_start_list;
 
 protected:
 	// device-level overrides
