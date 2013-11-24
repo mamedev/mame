@@ -930,6 +930,8 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_dsk.ff_45b));
 #endif
 
+	hard_reset();
+
 	state_add( A2_TASK,    "TASK",    m_task).callimport().formatstr("%6s");
 	state_add( A2_MPC,     "MPC",     m_mpc).formatstr("%06O");
 	state_add( A2_NEXT,    "NEXT",    m_next).formatstr("%06O");
@@ -1038,8 +1040,6 @@ void alto2_cpu_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_aluc0).formatstr("%5s").noshow();
 
 	m_icountptr = &m_icount;
-
-	hard_reset();
 }
 
 //-------------------------------------------------

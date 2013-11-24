@@ -810,6 +810,15 @@ void alto2_cpu_device::debug_write_mem(UINT32 addr, UINT16 data)
 void alto2_cpu_device::init_memory()
 {
 	memset(&m_mem, 0, sizeof(m_mem));
+	save_item(NAME(m_mem.mar));
+	save_item(NAME(m_mem.rmdd));
+	save_item(NAME(m_mem.wmdd));
+	save_item(NAME(m_mem.md));
+	save_item(NAME(m_mem.cycle));
+	save_item(NAME(m_mem.access));
+	save_item(NAME(m_mem.error));
+	save_item(NAME(m_mem.mear));
+	save_item(NAME(m_mem.mecr));
 }
 
 void alto2_cpu_device::exit_memory()
@@ -826,16 +835,6 @@ void alto2_cpu_device::exit_memory()
 
 void alto2_cpu_device::reset_memory()
 {
-	save_item(NAME(m_mem.mar));
-	save_item(NAME(m_mem.rmdd));
-	save_item(NAME(m_mem.wmdd));
-	save_item(NAME(m_mem.md));
-	save_item(NAME(m_mem.cycle));
-	save_item(NAME(m_mem.access));
-	save_item(NAME(m_mem.error));
-	save_item(NAME(m_mem.mear));
-	save_item(NAME(m_mem.mecr));
-
 	if (m_mem.ram) {
 		auto_free(machine(), m_mem.ram);
 		m_mem.ram = 0;

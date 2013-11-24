@@ -677,6 +677,7 @@ void alto2_cpu_device::f2_late_acsource()
 
 void alto2_cpu_device::init_emu(int task)
 {
+	memset(&m_emu, 0, sizeof(m_emu));
 	save_item(NAME(m_emu.ir));
 	save_item(NAME(m_emu.skip));
 	save_item(NAME(m_emu.cy));

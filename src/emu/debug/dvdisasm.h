@@ -110,7 +110,7 @@ private:
 
 	// constants
 	static const int DEFAULT_DASM_LINES = 1000;
-	static const int DEFAULT_DASM_WIDTH = 50;
+	static const int DEFAULT_DASM_WIDTH = 24;
 	static const int DASM_MAX_BYTES = 16;
 };
 

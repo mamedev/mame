@@ -63,13 +63,21 @@
 #define	GET_KCOM_SENDADR(kcom)			X_RDBITS(kcom,16,5,5)				//!< get send address flag from controller command (hardware command register)
 #define	PUT_KCOM_SENDADR(kcom,val)		X_WRBITS(kcom,16,5,5,val)			//!< put send address flag into controller command (hardware command register)
 
-#define	STATUS_DP0	50
-#define	STATUS_DP1	80
-#define	STATUS_KWRC	0, "%c"
-#define	STATUS_CYL	2, "C%3d"
-#define	STATUS_HEAD	7, "H%d"
-#define	STATUS_SECT	10, "S%2d"
-#define	STATUS_PAGE	14, "[%4d]"
+#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
+#define	STATUS_DP0	48
+#define	STATUS_DP1	78
+#define	STATUS_RGATE	0, "%c"
+#define	STATUS_WGATE	1, "%c"
+#define	STATUS_KWRC		2, "%c"
+#define	STATUS_CYL		4, "C%-3d"
+#define	STATUS_HEAD		9, "H%d"
+#define	STATUS_SECT		12, "S%-2d"
+#define	STATUS_PAGE		16, "[%-4d]"
+#define	FAKE_STATUS(_unit,_which,...) do { \
+	int x = (_unit) ? STATUS_DP1 : STATUS_DP0; \
+	fake_status_printf(x + _which, __VA_ARGS__); \
+} while (0)
+#endif
 
 /** @brief completion codes (only for documentation, since this is microcode defined) */
 enum {
@@ -759,6 +767,8 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 		dhd->set_egate(m_dsk.egate = 1);
 		dhd->set_wrgate(m_dsk.wrgate = 1);
 		dhd->set_rdgate(m_dsk.rdgate = 1);
+		FAKE_STATUS(m_dsk.drive, STATUS_WGATE, '-');
+		FAKE_STATUS(m_dsk.drive, STATUS_RGATE, '-');
 	} else {
 		if (m_dsk.krwc & RWC_WRITE) {
 			if (m_dsk.ok_to_run) {
@@ -777,6 +787,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 				// assert erase and write gates
 				dhd->set_egate(m_dsk.egate = 0);
 				dhd->set_wrgate(m_dsk.wrgate = 0);
+				FAKE_STATUS(m_dsk.drive, STATUS_WGATE, 'W');
 			}
 		} else {
 #if	ALTO2_DEBUG
@@ -786,6 +797,7 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 #endif
 			// assert read gate
 			dhd->set_rdgate(m_dsk.rdgate = 0);
+			FAKE_STATUS(m_dsk.drive, STATUS_RGATE, 'R');
 		}
 	}
 
@@ -907,11 +919,8 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 	} else {
 		m_dsk.strobon_timer->reset();
 	}
-#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
-	int x = unit ? STATUS_DP1 : STATUS_DP0;
-	fake_status_printf(x + STATUS_CYL, dhd->get_cylinder());
-	fake_status_printf(x + STATUS_HEAD, dhd->get_head());
-#endif
+	FAKE_STATUS(unit, STATUS_CYL, dhd->get_cylinder());
+	FAKE_STATUS(unit, STATUS_HEAD, dhd->get_head());
 }
 
 /** @brief timer callback to change the READY monoflop 31a */
@@ -1172,10 +1181,7 @@ void alto2_cpu_device::f1_late_increcno()
 		break;
 	}
 	// TODO: show disk indicator
-#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
-	int x = m_dsk.drive ? STATUS_DP1 : STATUS_DP0;
-	fake_status_printf(x + STATUS_KWRC, "HPLD"[m_dsk.krecno]);
-#endif
+	FAKE_STATUS(m_dsk.drive, STATUS_KWRC, "HPLD"[m_dsk.krecno]);
 }
 
 /**
@@ -1627,9 +1633,8 @@ void alto2_cpu_device::next_sector(int unit)
 #if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
 	if (debug_read_mem(0521) && unit == GET_KADDR_DRIVE(debug_read_mem(0523)))
 	{
-		int x = unit ? STATUS_DP1 : STATUS_DP0;
-		fake_status_printf(x + STATUS_SECT, dhd->get_sector());
-		fake_status_printf(x + STATUS_PAGE, dhd->get_page());
+		FAKE_STATUS(unit, STATUS_SECT, dhd->get_sector());
+		FAKE_STATUS(unit, STATUS_PAGE, dhd->get_page());
 	}
 #endif
 }
@@ -1761,14 +1766,14 @@ void alto2_cpu_device::reset_disk()
 	m_dsk.ff_45b = JKFF_0;
 
 #if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
-	int x = STATUS_DP0;
-	for (int i = 0; i < 2; i++) {
-		fake_status_printf(x + STATUS_KWRC, '-');
-		fake_status_printf(x + STATUS_CYL, 0);
-		fake_status_printf(x + STATUS_HEAD, 0);
-		fake_status_printf(x + STATUS_SECT, 0);
-		fake_status_printf(x + STATUS_PAGE, 0);
-		x = STATUS_DP1;
+	for (int unit = 0; unit < 2; unit++) {
+		FAKE_STATUS(unit, STATUS_RGATE, '-');
+		FAKE_STATUS(unit, STATUS_WGATE, '-');
+		FAKE_STATUS(unit, STATUS_KWRC, '-');
+		FAKE_STATUS(unit, STATUS_CYL, 0);
+		FAKE_STATUS(unit, STATUS_HEAD, 0);
+		FAKE_STATUS(unit, STATUS_SECT, 0);
+		FAKE_STATUS(unit, STATUS_PAGE, 0);
 	}
 #endif
 }

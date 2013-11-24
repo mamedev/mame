@@ -571,10 +571,15 @@ void alto2_cpu_device::tx_packet(void* ptr, INT32 arg)
  */
 void alto2_cpu_device::eth_startf()
 {
+#if	0	// FIXME: does not yet work
 	for (int sysclk = 0; sysclk < 2; sysclk++)
 		update_sysclk(sysclk);
 	PUT_ETH_OCMD(m_eth.status, m_eth.ff_35a & JKFF_Q ? 1 : 0);
 	PUT_ETH_ICMD(m_eth.status, m_eth.ff_35b & JKFF_Q ? 1 : 0);
+#else
+	PUT_ETH_ICMD(m_eth.status, X_BIT(m_bus,16,14));
+	PUT_ETH_OCMD(m_eth.status, X_BIT(m_bus,16,15));
+#endif
 	LOG((LOG_ETH,3, "	STARTF; ICMD=%u OCMD=%u\n", GET_ETH_ICMD(m_eth.status), GET_ETH_ICMD(m_eth.status)));
 	eth_wakeup();
 }
@@ -1302,6 +1307,8 @@ void alto2_cpu_device::update_tclk(int tclk)
  */
 void alto2_cpu_device::init_ether(int task)
 {
+	// intialize all ethernet variables
+	memset(&m_eth, 0, sizeof(m_eth));
 	save_item(NAME(m_eth.fifo));
 	save_item(NAME(m_eth.fifo_rd));
 	save_item(NAME(m_eth.fifo_wr));
@@ -1311,9 +1318,6 @@ void alto2_cpu_device::init_ether(int task)
 	save_item(NAME(m_eth.rx_count));
 	save_item(NAME(m_eth.tx_count));
 	save_item(NAME(m_eth.breath_of_life));
-
-	// intialize all ethernet variables
-	memset(&m_eth, 0, sizeof(m_eth));
 
 	m_ether_a41 = prom_load(machine(), &pl_enet_a41, memregion("ether_a41")->base());
 	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
