@@ -1106,11 +1106,11 @@ void alto2_cpu_device::device_reset()
 		m_ether_id = etherid->read() & 0377;
 	// call all sub-devices' reset_...
 	reset_memory();
-	reset_disk();
 	reset_disp();
+	reset_disk();
+	reset_hw();
 	reset_kbd();
 	reset_mouse();
-	reset_hw();
 
 	reset_emu();
 	reset_ksec();

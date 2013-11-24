@@ -108,10 +108,12 @@ static INPUT_PORTS_START( alto2 )
 	PORT_KEY(A2_KEY_FL4,        KEYCODE_F4,         0,              0,            "FL4"          )  //!< ADL left function key 4
 	PORT_KEY(A2_KEY_FR5,        KEYCODE_F9,         0,              0,            "FR5"          )  //!< ADL right function key 5
 
-	PORT_START("mouseb")	// Mouse buttons
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse RED (left)")      PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_buttons, 0 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse BLUE (right)")    PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_buttons, 0 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse YELLOW (middel)") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_buttons, 0 )
+	PORT_START("mouseb0")	// Mouse button 0
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse RED (left)")      PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_0, 0 )
+	PORT_START("mouseb1")	// Mouse button 1
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse BLUE (right)")    PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_1, 0 )
+	PORT_START("mouseb2")	// Mouse button 2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse YELLOW (middle)") PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_2, 0 )
 
 	PORT_START("mousex")	// Mouse - X AXIS
 	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, 0 )
@@ -246,7 +248,7 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz,
 						   ALTO2_DISPLAY_TOTAL_WIDTH,   0, ALTO2_DISPLAY_WIDTH,
-						   ALTO2_DISPLAY_TOTAL_HEIGHT,  0, ALTO2_DISPLAY_HEIGHT)
+						   ALTO2_DISPLAY_TOTAL_HEIGHT,  0, ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H)
 	MCFG_SCREEN_REFRESH_RATE(60)	// two interlaced fields
 	MCFG_SCREEN_VBLANK_TIME(ALTO2_DISPLAY_VBLANK_TIME)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)

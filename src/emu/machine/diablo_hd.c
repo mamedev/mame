@@ -1327,7 +1327,6 @@ void diablo_hd_device::device_start()
 
 	m_packs = 1;		// FIXME: get from configuration?
 	m_unit = strstr(m_image->tag(), "diablo0") ? 0 : 1;
-
 	m_timer = timer_alloc(1, 0);
 }
 
@@ -1429,6 +1428,8 @@ void diablo_hd_device::device_reset()
 void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	LOG_DRIVE((9,"[DHD%u]	TIMER id=%d param=%d ptr=%p @%.0fns\n", m_unit, id, param, ptr, timer.elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND));
+	if (!m_disk)
+		return;
 
 	switch (param) {
 	case 0:

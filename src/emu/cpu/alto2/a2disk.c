@@ -63,6 +63,14 @@
 #define	GET_KCOM_SENDADR(kcom)			X_RDBITS(kcom,16,5,5)				//!< get send address flag from controller command (hardware command register)
 #define	PUT_KCOM_SENDADR(kcom,val)		X_WRBITS(kcom,16,5,5,val)			//!< put send address flag into controller command (hardware command register)
 
+#define	STATUS_DP0	50
+#define	STATUS_DP1	80
+#define	STATUS_KWRC	0, "%c"
+#define	STATUS_CYL	2, "C%3d"
+#define	STATUS_HEAD	7, "H%d"
+#define	STATUS_SECT	10, "S%2d"
+#define	STATUS_PAGE	14, "[%4d]"
+
 /** @brief completion codes (only for documentation, since this is microcode defined) */
 enum {
 	STATUS_COMPLETION_GOOD,
@@ -843,7 +851,6 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 	diablo_hd_device* dhd = m_drive[unit];
 	LOG((LOG_DISK,2,"	STROBE #%d restore:%d cylinder:%d dhd:%p\n", unit, restore, cylinder, dhd));
 
-	//
 	dhd->set_cylinder(cylinder);
 	dhd->set_restore(restore);
 	// This is really monoflop 52a generating a very short 0 pulse
@@ -900,6 +907,11 @@ void alto2_cpu_device::disk_strobon(void* ptr, INT32 arg)
 	} else {
 		m_dsk.strobon_timer->reset();
 	}
+#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
+	int x = unit ? STATUS_DP1 : STATUS_DP0;
+	fake_status_printf(x + STATUS_CYL, dhd->get_cylinder());
+	fake_status_printf(x + STATUS_HEAD, dhd->get_head());
+#endif
 }
 
 /** @brief timer callback to change the READY monoflop 31a */
@@ -1160,6 +1172,10 @@ void alto2_cpu_device::f1_late_increcno()
 		break;
 	}
 	// TODO: show disk indicator
+#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
+	int x = m_dsk.drive ? STATUS_DP1 : STATUS_DP0;
+	fake_status_printf(x + STATUS_KWRC, "HPLD"[m_dsk.krecno]);
+#endif
 }
 
 /**
@@ -1593,7 +1609,6 @@ void alto2_cpu_device::next_sector(int unit)
 
 	LOG((LOG_DISK,1,"	unit #%d sector %d start\n", unit, GET_KSTAT_SECTOR(m_dsk.kstat)));
 
-
 #if	USE_BITCLK_TIMER
 	// HACK: no command, no bit clock
 	if (debug_read_mem(0521))
@@ -1607,6 +1622,14 @@ void alto2_cpu_device::next_sector(int unit)
 		// Make the CPU execution loop call disk_bitclk
 		m_bitclk_time = 0;
 		m_bitclk_index = 0;
+	}
+#endif
+#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
+	if (debug_read_mem(0521) && unit == GET_KADDR_DRIVE(debug_read_mem(0523)))
+	{
+		int x = unit ? STATUS_DP1 : STATUS_DP0;
+		fake_status_printf(x + STATUS_SECT, dhd->get_sector());
+		fake_status_printf(x + STATUS_PAGE, dhd->get_page());
 	}
 #endif
 }
@@ -1737,4 +1760,15 @@ void alto2_cpu_device::reset_disk()
 	m_dsk.ff_45a = JKFF_0;
 	m_dsk.ff_45b = JKFF_0;
 
+#if defined(ALTO2_FAKE_STATUS_H) && (ALTO2_FAKE_STATUS_H > 0)
+	int x = STATUS_DP0;
+	for (int i = 0; i < 2; i++) {
+		fake_status_printf(x + STATUS_KWRC, '-');
+		fake_status_printf(x + STATUS_CYL, 0);
+		fake_status_printf(x + STATUS_HEAD, 0);
+		fake_status_printf(x + STATUS_SECT, 0);
+		fake_status_printf(x + STATUS_PAGE, 0);
+		x = STATUS_DP1;
+	}
+#endif
 }

@@ -189,16 +189,26 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
 /**
  * @brief register a mouse button change
  *
- * convert button bits to UTILIN[13-15]
+ * convert button bit to UTILIN[13-15]
  *
  * @param ioport_field reference to the field
  * @param param pointer passed in PORT_CHANGED_MEMBER last parameter
  * @param oldval the old ioport_value
  * @param newval the new ioport_value
  */
-INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_buttons )
+INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_button_0 )
 {
-	mouse_buttons_w(space(AS_IO), 0, newval, 1);
+	X_WRBITS(m_hw.utilin,16,13,13,newval);
+}
+
+INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_button_1 )
+{
+	X_WRBITS(m_hw.utilin,16,14,14,newval);
+}
+
+INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_button_2 )
+{
+	X_WRBITS(m_hw.utilin,16,15,15,newval);
 }
 
 static const prom_load_t pl_madr_a32 =
