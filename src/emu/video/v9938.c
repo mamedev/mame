@@ -272,6 +272,9 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 	// init v9938 512-color palette
 	PALETTE_INIT_CALL_MEMBER(v9938);
 
+	if(machine().total_colors() != 19780)
+		fatalerror("V9958: not enough palette, must be 19780");
+
 	if (v99x8_device::s_pal_indYJK == NULL)
 		v99x8_device::s_pal_indYJK = auto_alloc_array(machine(),UINT16, 0x20000);
 
