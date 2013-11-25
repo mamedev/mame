@@ -167,13 +167,13 @@ ADDRESS_MAP_END
 
 /*realbrk specific memory map*/
 static ADDRESS_MAP_START( realbrk_mem, AS_PROGRAM, 16, realbrk_state )
-	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff) //
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")                            // P1 & P2 (Inputs)
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                            // Coins
 	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ(realbrk_dsw_r) AM_SHARE("dsw_select")  // DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM                                         // RAM
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(realbrk_flipscreen_w              )   // Hack! Parallel port data register
+	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
 /*pkgnsh specific memory map*/

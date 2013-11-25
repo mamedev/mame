@@ -17,6 +17,13 @@ public:
 	void external_interrupt_1();
 	void external_interrupt_2();
 
+	DECLARE_READ16_MEMBER(imr_r);
+	DECLARE_WRITE16_MEMBER(imr_w);
+	DECLARE_READ16_MEMBER(iisr_r);
+	DECLARE_WRITE16_MEMBER(iisr_w);
+	DECLARE_READ16_MEMBER(scr_r);
+	DECLARE_WRITE16_MEMBER(scr_w);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -37,6 +44,10 @@ private:
 	void update_timer( int i );
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq_state();
+
+	UINT16 m_imr;
+	UINT16 m_iisr;
+	UINT16 m_scr;
 
 	inline UINT16 read_word(offs_t address);
 	inline void write_word(offs_t address, UINT16 data);

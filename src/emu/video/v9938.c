@@ -1645,22 +1645,20 @@ void v99x8_device::graphic7_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8
 	else
 		ln += m_offset_x;
 
+	for (i=0;i<256;i++)
 	{
-		for (i=0;i<256;i++)
+		if (col[i] & 0x80)
 		{
-			if (col[i] & 0x80)
-			{
+			*ln++ = pens[g7_ind16[col[i]&0x0f]];
+			if (_Width > 512)
 				*ln++ = pens[g7_ind16[col[i]&0x0f]];
-				if (_Width > 512)
-					*ln++ = pens[g7_ind16[col[i]&0x0f]];
-			}
+		}
+		else
+		{
+			if (_Width > 512)
+				ln += 2;
 			else
-			{
-				if (_Width > 512)
-					ln += 2;
-				else
-					ln++;
-			}
+				ln++;
 		}
 	}
 }
