@@ -1,7 +1,8 @@
 #ifndef TMP68301_H
 #define TMP68301_H
 
-class tmp68301_device : public device_t
+class tmp68301_device : public device_t,
+						public device_memory_interface
 {
 public:
 	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -21,6 +22,7 @@ protected:
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 private:
 	// internal state
@@ -29,12 +31,16 @@ private:
 	UINT8 m_IE[3];        // 3 External Interrupt Lines
 	emu_timer *m_tmp68301_timer[3];        // 3 Timers
 
-	int m_irq_vector[8];
+	UINT16 m_irq_vector[8];
 
 	TIMER_CALLBACK_MEMBER( timer_callback );
 	void update_timer( int i );
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_irq_state();
+
+	inline UINT16 read_word(offs_t address);
+	inline void write_word(offs_t address, UINT16 data);
+	const address_space_config      m_space_config;
 };
 
 extern const device_type TMP68301;

@@ -13,8 +13,15 @@
 
 const device_type TMP68301 = &device_creator<tmp68301_device>;
 
+static ADDRESS_MAP_START( tmp68301_regs, AS_0, 16, tmp68301_device )
+//	AM_RANGE(0x000,0x3ff) AM_RAM
+
+ADDRESS_MAP_END
+
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__)
+	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__),
+		device_memory_interface(mconfig, *this),
+		m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, NULL, *ADDRESS_MAP_NAME(tmp68301_regs))
 {
 }
 
@@ -53,6 +60,37 @@ void tmp68301_device::device_reset()
 	machine().firstcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(tmp68301_device::irq_callback),this));
 }
 
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *tmp68301_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_0) ? &m_space_config : NULL;
+}
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  read_byte - read a byte at the given address
+//-------------------------------------------------
+
+inline UINT16 tmp68301_device::read_word(offs_t address)
+{
+	return space(AS_0).read_word(address << 1);
+}
+
+//-------------------------------------------------
+//  write_byte - write a byte at the given address
+//-------------------------------------------------
+
+inline void tmp68301_device::write_word(offs_t address, UINT16 data)
+{
+	space(AS_0).write_word(address << 1, data);
+}
 
 IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
 {
@@ -180,6 +218,8 @@ READ16_MEMBER( tmp68301_device::regs_r )
 WRITE16_MEMBER( tmp68301_device::regs_w )
 {
 	COMBINE_DATA(&m_regs[offset]);
+
+	write_word(offset,m_regs[offset]);
 
 	if (!ACCESSING_BITS_0_7)    return;
 

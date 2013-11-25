@@ -217,7 +217,7 @@ Palette functions
 /*
 About the colour burst registers:
 
-The color burst registers will only have effect on the composite video outputfrom
+The color burst registers will only have effect on the composite video output from
 the V9938. but the output is only NTSC (Never The Same Color ,so the
 effects are already present) . this system is not used in europe
 the european machines use a separate PAL  (Phase Alternating Line) encoder
@@ -1470,14 +1470,6 @@ void v99x8_device::mode_graphic7(const pen_t *pens, _PixelType *ln, int line)
 			int colour[4];
  		   	int ind;
 
-/*
-    pixel0 = (*data) & 8 ? pal_ind16[(*data) >> 4] : s_pal_indYJK[ind | (*data >> 3) & 30];
-    pixel1 = *(data+1) & 8 ? pal_ind16[*(data+1) >> 4] : s_pal_indYJK[ind | *(data+1) >> 3) & 30];
-    pixel2 = *(data+2) & 8 ? pal_ind16[*(data+2) >> 4] : s_pal_indYJK[ind | *(data+2) >> 3) & 30];
-    pixel3 = *(data+3) & 8 ? pal_ind16[*(data+3) >> 4] : s_pal_indYJK[ind | *(data+3) >> 3) & 30];
-
-*/
-
 			colour[0] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
 			nametbl_addr++;
 			colour[1] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
@@ -1653,20 +1645,22 @@ void v99x8_device::graphic7_draw_sprite(const pen_t *pens, _PixelType *ln, UINT8
 	else
 		ln += m_offset_x;
 
-	for (i=0;i<256;i++)
 	{
-		if (col[i] & 0x80)
+		for (i=0;i<256;i++)
 		{
-			*ln++ = pens[g7_ind16[col[i]&0x0f]];
-			if (_Width > 512)
+			if (col[i] & 0x80)
+			{
 				*ln++ = pens[g7_ind16[col[i]&0x0f]];
-		}
-		else
-		{
-			if (_Width > 512)
-				ln += 2;
+				if (_Width > 512)
+					*ln++ = pens[g7_ind16[col[i]&0x0f]];
+			}
 			else
-				ln++;
+			{
+				if (_Width > 512)
+					ln += 2;
+				else
+					ln++;
+			}
 		}
 	}
 }

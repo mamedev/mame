@@ -146,9 +146,9 @@ static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
 
-	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
-
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
+
+	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
 ADDRESS_MAP_END
 
 #if USE_H8
@@ -611,7 +611,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
 	int scanline = param;
 
 	if(scanline == 212*2)
-		m_maincpu->set_input_line_and_vector(1, HOLD_LINE,0x100/4);
+		m_tmp68301->external_interrupt_0();
 
 	if((scanline % 2) == 0)
 	{
