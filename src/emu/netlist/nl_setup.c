@@ -410,6 +410,48 @@ void netlist_setup_t::connect_terminals(netlist_terminal_t &t1, netlist_terminal
     }
 }
 
+void netlist_setup_t::connect(netlist_terminal_t &t1, netlist_terminal_t &t2)
+{
+    NL_VERBOSE_OUT(("Connecting %s to %s\n", t1.name().cstr(), t2s.name().cstr()));
+
+    // FIXME: amend device design so that warnings can be turned into errors
+    //        Only variable inputs have this issue
+    if (t1.isType(netlist_terminal_t::OUTPUT) && t2.isType(netlist_terminal_t::INPUT))
+    {
+        if (t2.has_net())
+            mame_printf_warning("Input %s already connected\n", t2.name().cstr());
+        connect_input_output(dynamic_cast<netlist_input_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
+    }
+    else if (t1.isType(netlist_terminal_t::INPUT) && t2.isType(netlist_terminal_t::OUTPUT))
+    {
+        if (t1.has_net())
+            mame_printf_warning("Input %s already connected\n", t1.name().cstr());
+        connect_input_output(dynamic_cast<netlist_input_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
+    }
+    else if (t1.isType(netlist_terminal_t::OUTPUT) && t2.isType(netlist_terminal_t::TERMINAL))
+    {
+        connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
+    }
+    else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::OUTPUT))
+    {
+        connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
+    }
+    else if (t1.isType(netlist_terminal_t::INPUT) && t2.isType(netlist_terminal_t::TERMINAL))
+    {
+        connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t2), dynamic_cast<netlist_input_t &>(t1));
+    }
+    else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::INPUT))
+    {
+        connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_input_t &>(t2));
+    }
+    else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::TERMINAL))
+    {
+        connect_terminals(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_terminal_t &>(t2));
+    }
+    else
+        fatalerror("Connecting %s to %s not supported!\n", t1.name().cstr(), t2.name().cstr());
+}
+
 void netlist_setup_t::resolve_inputs(void)
 {
     NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
@@ -435,44 +477,7 @@ void netlist_setup_t::resolve_inputs(void)
         netlist_terminal_t &t1 = find_terminal(t1s);
         netlist_terminal_t &t2 = find_terminal(t2s);
 
-        NL_VERBOSE_OUT(("Connecting %s to %s\n", t1s.cstr(), t2s.cstr()));
-
-        // FIXME: amend device design so that warnings can be turned into errors
-        //        Only variable inputs have this issue
-        if (t1.isType(netlist_terminal_t::OUTPUT) && t2.isType(netlist_terminal_t::INPUT))
-        {
-            if (t2.has_net())
-                mame_printf_warning("Input %s already connected\n", t2s.cstr());
-            connect_input_output(dynamic_cast<netlist_input_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
-        }
-        else if (t1.isType(netlist_terminal_t::INPUT) && t2.isType(netlist_terminal_t::OUTPUT))
-        {
-            if (t1.has_net())
-                mame_printf_warning("Input %s already connected\n", t1s.cstr());
-            connect_input_output(dynamic_cast<netlist_input_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
-        }
-        else if (t1.isType(netlist_terminal_t::OUTPUT) && t2.isType(netlist_terminal_t::TERMINAL))
-        {
-            connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
-        }
-        else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::OUTPUT))
-        {
-            connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
-        }
-        else if (t1.isType(netlist_terminal_t::INPUT) && t2.isType(netlist_terminal_t::TERMINAL))
-        {
-            connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t2), dynamic_cast<netlist_input_t &>(t1));
-        }
-        else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::INPUT))
-        {
-            connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_input_t &>(t2));
-        }
-        else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::TERMINAL))
-        {
-            connect_terminals(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_terminal_t &>(t2));
-        }
-        else
-            fatalerror("Connecting %s to %s not supported!\n", t1s.cstr(), t2s.cstr());
+        connect(t1, t2);
     }
 
     /* print all outputs */

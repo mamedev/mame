@@ -103,8 +103,8 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
     net_list_t::entry_t *p = m_nets.first();
     while (p != NULL)
     {
-        net_list_t::entry_t *pn = m_nets.next(pn);
-        delete pn->object();
+        net_list_t::entry_t *pn = m_nets.next(p);
+        delete p->object();
         p = pn;
     }
 }

@@ -108,6 +108,7 @@ public:
     void register_param(const pstring &param, const double value);
 
     void register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const pstring &name, netlist_object_t &obj, netlist_input_t::state_e state);
+    void connect(netlist_terminal_t &t1, netlist_terminal_t &t2);
 
     netlist_terminal_t &find_terminal(const pstring &outname_in);
     netlist_terminal_t &find_terminal(const pstring &outname_in, netlist_object_t::type_t atype);

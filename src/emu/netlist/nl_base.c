@@ -292,15 +292,33 @@ ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_inp
 	register_input(*this, name, inp, type);
 }
 
+static void init_term(netlist_core_device_t &dev, netlist_terminal_t &term, netlist_input_t::state_e aState)
+{
+    if (!term.isInitalized())
+    {
+        switch (term.type())
+        {
+            case netlist_terminal_t::OUTPUT:
+                dynamic_cast<netlist_output_t &>(term).init_object(dev, "internal output");
+                break;
+            case netlist_terminal_t::INPUT:
+                dynamic_cast<netlist_input_t &>(term).init_object(dev, "internal input", aState);
+                break;
+            case netlist_terminal_t::TERMINAL:
+                dynamic_cast<netlist_terminal_t &>(term).init_object(dev, "internal terminal", aState);
+                break;
+            default:
+                fatalerror("Unknown terminal type");
+        }
+    }
+}
+
 // FIXME: Revise internal links ...
 ATTR_COLD void netlist_device_t::register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState)
 {
-    in.init_object(dev, "internal input", aState);
-    // ensure we are not yet initialized ...
-    if (!out.net().isRailNet())
-        out.init_object(dev, "internal output");
-	//if (in.state() != net_input_t::INP_STATE_PASSIVE)
-		out.net().register_con(in);
+    init_term(dev, in, aState);
+    init_term(dev, out, aState);
+    m_setup->connect(in, out);
 }
 
 ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState)

@@ -250,6 +250,7 @@ public:
 	virtual ~netlist_object_t();
 
 	ATTR_COLD void init_object(netlist_base_t &nl, const pstring &aname);
+    ATTR_COLD bool isInitalized() { return (m_netlist != NULL); }
 
     ATTR_COLD const pstring &name() const;
 

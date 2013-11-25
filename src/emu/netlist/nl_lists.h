@@ -65,7 +65,7 @@ public:
         {
             if (i->object() == elem)
             {
-                while (i <= m_ptr)
+                while (i < m_ptr)
                 {
                     *i = *(i+1);
                     i++;
