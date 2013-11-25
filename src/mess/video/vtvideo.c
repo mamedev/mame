@@ -683,7 +683,7 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			}
 
 			//  LINE ATTRIBUTE - valid for all chars on next line  ** DO NOT SHUFFLE **
-			attr_addr = ( 0x1000 | (addr + xpos + 1) & 0x0fff );
+			attr_addr = ( 0x1000 | ((addr + xpos + 1) & 0x0fff) );
 
 			// MOVE TO NEW DATA
 			temp = m_in_ram_func(addr + xpos + 2) * 256 + m_in_ram_func(addr + xpos + 1);
