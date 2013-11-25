@@ -28,7 +28,6 @@ public:
 	void _IRQHandler(int irq);
 	void _timer_handler(int c,int count,int clock);
 	void _ym2610_update_request();
-	void set_pcmbufs(const UINT8 *buf, size_t size, UINT8* bufdt, size_t sizedt);
 
 protected:
 	// device-level overrides

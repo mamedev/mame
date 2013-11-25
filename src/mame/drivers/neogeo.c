@@ -386,69 +386,11 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 }
 #endif
 
-void neogeo_state::select_slot(UINT16 data, UINT16 mem_mask)
-{
-	if (mem_mask & 0x00ff)
-	{
-		int newslot = data & 0x7;
-
-		if (newslot < 6)
-		{
-		//	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x000080, 0x0fffff); // unmap the cart (but not the vectors)
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x200000, 0x2fffff); // unmap the bank region
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, "cartridge");
-			install_bankswitch();
-
-
-
-			if (neogeo_cart_table[newslot].regions.maincpu_region != 0)
-			{
-				current_slot = newslot;
-
-				current_maincpu_region = neogeo_cart_table[current_slot].regions.maincpu_region;
-				current_maincpu_region_size = neogeo_cart_table[current_slot].regions.maincpu_region_size;
-				current_audiocpu_region = neogeo_cart_table[current_slot].regions.audiocpu_region;
-				current_audiocpu_region_size = neogeo_cart_table[current_slot].regions.audiocpu_region_size;
-				current_fixed_region = neogeo_cart_table[current_slot].regions.fixed_region;
-				current_fixed_region_size = neogeo_cart_table[current_slot].regions.fixed_region_size;
-				current_ymsnd_region = neogeo_cart_table[current_slot].regions.ymsnd_region;
-				current_ymsnd_region_size = neogeo_cart_table[current_slot].regions.ymsnd_region_size;
-				current_ymdelta_region = neogeo_cart_table[current_slot].regions.ymdelta_region;
-				current_ymdelta_region_size = neogeo_cart_table[current_slot].regions.ymdelta_region_size;
-				current_audiocrypt_region = neogeo_cart_table[current_slot].regions.audiocrypt_region;
-				current_audiocrypt_region_size = neogeo_cart_table[current_slot].regions.audiocrypt_region_size;
-				current_sprites_region = neogeo_cart_table[current_slot].regions.sprites_region;
-				current_sprites_region_size = neogeo_cart_table[current_slot].regions.sprites_region_size;
-
-
-				// setup cartridge ROM area
-				m_maincpu->space(AS_PROGRAM).install_read_bank(0x000080, 0x0fffff, "cart_rom");
-				membank("cart_rom")->set_base(current_maincpu_region + 0x80);
-				neogeo_main_cpu_banking_init();
-				ym2610_device* ym = (ym2610_device*)machine().device("ymsnd");
-				ym->reset();
-				ym->set_pcmbufs(current_ymsnd_region, current_ymsnd_region_size, current_ymdelta_region, current_ymdelta_region_size);
-				neogeo_audio_cpu_banking_init(0);
-
-				// install any protection handlers etc. for the slot we just enabled
-				neogeo_cart_table[current_slot].slot_enable((void*)this);
-
-			}
-
-		}
-
-
-	}
-
-
-}
-
 WRITE16_MEMBER(neogeo_state::io_control_w)
 {
 	switch (offset)
 	{
 	case 0x00: select_controller(data & 0x00ff); break;
-	case 0x10: if (m_type == NEOGEO_MVS) select_slot(data, mem_mask); break;
 	case 0x18: if (m_type == NEOGEO_MVS) set_output_latch(data & 0x00ff); break;
 	case 0x20: if (m_type == NEOGEO_MVS) set_output_data(data & 0x00ff); break;
 	case 0x28: if (m_type == NEOGEO_MVS) m_upd4990a->control_16_w(space, 0, data, mem_mask); break;
@@ -640,7 +582,7 @@ void neogeo_state::_set_main_cpu_bank_address()
 {
 	if (m_type == NEOGEO_CD) return;
 
-	m_bank_cartridge->set_base(current_maincpu_region + m_main_cpu_bank_address);
+	m_bank_cartridge->set_base(m_region_maincpu->base() + m_main_cpu_bank_address);
 }
 
 
@@ -657,7 +599,7 @@ void neogeo_state::neogeo_set_main_cpu_bank_address( UINT32 bank_address )
 WRITE16_MEMBER(neogeo_state::main_cpu_bank_select_w)
 {
 	UINT32 bank_address;
-	UINT32 len = current_maincpu_region_size;
+	UINT32 len = m_region_maincpu->bytes();
 
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", space.device().safe_pc(), data);
@@ -679,14 +621,14 @@ WRITE16_MEMBER(neogeo_state::main_cpu_bank_select_w)
 void neogeo_state::neogeo_main_cpu_banking_init()
 {
 	/* create vector banks */
-	m_bank_vectors->configure_entry(1, current_maincpu_region);
+	m_bank_vectors->configure_entry(1, m_region_maincpu->base());
 	m_bank_vectors->configure_entry(0, memregion("mainbios")->base());
 	m_bank_vectors->set_entry(0);
 
 	if (m_type != NEOGEO_CD)
 	{
 		/* set initial main CPU bank */
-		if (current_maincpu_region_size > 0x100000)
+		if (m_region_maincpu->bytes() > 0x100000)
 			neogeo_set_main_cpu_bank_address(0x100000);
 		else
 			neogeo_set_main_cpu_bank_address(0x000000);
@@ -708,7 +650,7 @@ READ8_MEMBER(neogeo_state::audio_cpu_bank_select_r)
 }
 
 
-void neogeo_state::neogeo_audio_cpu_banking_init(int set_entry)
+void neogeo_state::neogeo_audio_cpu_banking_init()
 {
 	if (m_type == NEOGEO_CD) return;
 
@@ -718,12 +660,12 @@ void neogeo_state::neogeo_audio_cpu_banking_init(int set_entry)
 	UINT32 address_mask;
 
 	/* audio bios/cartridge selection */
-	m_bank_audio_main->configure_entry(1, current_audiocpu_region);
+	m_bank_audio_main->configure_entry(1, memregion("audiocpu")->base());
 	if (memregion("audiobios"))
 		m_bank_audio_main->configure_entry(0, memregion("audiobios")->base());
 	else /* on hardware with no SM1 ROM, the cart ROM is always enabled */
-		m_bank_audio_main->configure_entry(0, current_audiocpu_region);
-	if (set_entry) m_bank_audio_main->set_entry(0); // if this is allowed when the game slot changes garou, zupapa etc. have no proper sounds, check.
+		m_bank_audio_main->configure_entry(0, memregion("audiocpu")->base());
+	m_bank_audio_main->set_entry(0);
 
 	/* audio banking */
 	m_bank_audio_cart[0] = membank("audio_f000");
@@ -731,8 +673,8 @@ void neogeo_state::neogeo_audio_cpu_banking_init(int set_entry)
 	m_bank_audio_cart[2] = membank("audio_c000");
 	m_bank_audio_cart[3] = membank("audio_8000");
 
-	address_mask = (current_audiocpu_region_size - 0x10000 - 1) & 0x3ffff;
-	rgn = current_audiocpu_region;
+	address_mask = (memregion("audiocpu")->bytes() - 0x10000 - 1) & 0x3ffff;
+	rgn = memregion("audiocpu")->base();
 
 	for (region = 0; region < 4; region++)
 	{
@@ -922,7 +864,7 @@ void neogeo_state::machine_start()
 	neogeo_main_cpu_banking_init();
 
 	/* set the initial audio CPU ROM banks */
-	neogeo_audio_cpu_banking_init(1);
+	neogeo_audio_cpu_banking_init();
 
 	create_interrupt_timers();
 
@@ -965,7 +907,6 @@ void neogeo_state::machine_start()
 
 void neogeo_state::machine_reset()
 {
-
 	offs_t offs;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1064,7 +1005,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( neogeo )
+static INPUT_PORTS_START( neogeo )
 	PORT_START("P1/DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, "Setting Mode" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -1131,7 +1072,7 @@ INPUT_PORTS_START( neogeo )
 
 	PORT_START("TEST")
 	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? If ACTIVE_LOW, MVS-6 slot detected, when ACTIVE_HIGH MVS-1 slot (AES) detected */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* what is this? If ACTIVE_LOW, MVS-6 slot detected, when ACTIVE_HIGH MVS-1 slot (AES) detected */
 	PORT_SERVICE_NO_TOGGLE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1139,145 +1080,48 @@ INPUT_PORTS_END
 
 
 
-struct neogeo_cart_region neogeo_cart_table[] =
-{
-	{ ":cart1", 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0  }, neogeo_state::slot_enable_default,  0 },
-	{ ":cart2", 1, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0  }, neogeo_state::slot_enable_default,  0 },
-	{ ":cart3", 2, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0  }, neogeo_state::slot_enable_default,  0 },
-	{ ":cart4", 3, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0  }, neogeo_state::slot_enable_default,  0 },
-	{ ":cart5", 4, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0  }, neogeo_state::slot_enable_default,  0 },
-	{ ":cart6", 5, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0  }, neogeo_state::slot_enable_default,  0 },
-	{ 0 }
-};
-
 
 
 DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 {
-	struct neogeo_cart_region *mt_cart = &neogeo_cart_table[0], *this_cart;
-
-	/* First, determine where this cart has to be loaded */
-	while (mt_cart->tag)
-	{
-		if (strcmp(mt_cart->tag, image.device().tag()) == 0)
-			break;
-
-		mt_cart++;
-	}
-
-	this_cart = mt_cart;
-
-	int slot = this_cart->slot;
-
-
-
 	UINT32 size;
 	device_t* ym = machine().device("ymsnd");
 
 	// first check software list
 	if(image.software_entry() != NULL)
 	{
-		// create memory regions		
+		// create memory regions
 		size = image.get_software_region_length("maincpu");
-
-		if (slot == 0)
-		{
-
-			machine().memory().region_free(":maincpu");
-			machine().memory().region_alloc(":maincpu", size, 2, ENDIANNESS_BIG);
-			
-			current_maincpu_region = memregion("maincpu")->base();
-			current_maincpu_region_size = memregion("maincpu")->bytes();
-
-
-			// Reset the reference to the region
-			//m_region_maincpu.findit();
+		machine().memory().region_free(":maincpu");
+		machine().memory().region_alloc(":maincpu",size, 2, ENDIANNESS_BIG);
+		// Reset the reference to the region
+		m_region_maincpu.findit();
 
 #ifdef LSB_FIRST
-			// software list ROM loading currently does not fix up endianness for us, so we need to do it by hand
-			UINT16 *src = (UINT16 *)image.get_software_region("maincpu");
-			UINT16 *dst = (UINT16 *)current_maincpu_region;
-			for (int i = 0; i < size / 2; i++)
-			{
-				dst[i] = FLIPENDIAN_INT16(src[i]);
-			}
-#else
-			memcpy(current_maincpu_region, image.get_software_region("maincpu"), size);
-#endif
-		}
-		else
+		// software list ROM loading currently does not fix up endianness for us, so we need to do it by hand
+		UINT16 *src = (UINT16 *)image.get_software_region("maincpu");
+		UINT16 *dst = (UINT16 *)memregion("maincpu")->base();
+		for (int i=0; i<size/2; i++)
 		{
-			// NEW...
-			this_cart->regions.maincpu_region = auto_alloc_array(machine(), UINT8, size);
-#ifdef LSB_FIRST
-			// software list ROM loading currently does not fix up endianness for us, so we need to do it by hand
-			UINT16 *src = (UINT16 *)image.get_software_region("maincpu");
-			UINT16 *dst = (UINT16 *)this_cart->regions.maincpu_region;
-			for (int i = 0; i < size / 2; i++)
-			{
-				dst[i] = FLIPENDIAN_INT16(src[i]);
-			}
-#else
-			memcpy(this_cart->regions.maincpu_region, image.get_software_region("maincpu"), size);
-#endif
-
-			current_maincpu_region = this_cart->regions.maincpu_region;
-			current_maincpu_region_size = size;
-
+			dst[i] = FLIPENDIAN_INT16(src[i]);
 		}
+#else
+		memcpy(memregion("maincpu")->base(),image.get_software_region("maincpu"),size);
+#endif
 
 		size = image.get_software_region_length("fixed");
-	
-		if (slot == 0)
-		{
-			machine().memory().region_free(":fixed");
-			machine().memory().region_alloc(":fixed", size, 1, ENDIANNESS_LITTLE);
-	
-			current_fixed_region = memregion("fixed")->base();
-			current_fixed_region_size = memregion("fixed")->bytes();
-	
-			memcpy(current_fixed_region, image.get_software_region("fixed"), size);
-			//m_region_fixed.findit();
-		}
-		else
-		{
-			// NEW...
-			this_cart->regions.fixed_region = auto_alloc_array(machine(), UINT8, size);
-			memcpy(this_cart->regions.fixed_region, image.get_software_region("fixed"), size);
+		machine().memory().region_free(":fixed");
+		machine().memory().region_alloc(":fixed",size,1, ENDIANNESS_LITTLE);
+		memcpy(memregion("fixed")->base(),image.get_software_region("fixed"),size);
+		m_region_fixed.findit();
 
-			current_fixed_region = this_cart->regions.fixed_region;
-			current_fixed_region_size = size;
-
-		}
-
-		if (image.get_software_region("audiocpu") != NULL)
+		if(image.get_software_region("audiocpu") != NULL)
 		{
 			size = image.get_software_region_length("audiocpu");
-
-			if (slot == 0)
-			{
-				machine().memory().region_free(":audiocpu");
-				machine().memory().region_alloc(":audiocpu", size + 0x10000, 1, ENDIANNESS_LITTLE);
-	
-				current_audiocpu_region = memregion("audiocpu")->base();
-				current_audiocpu_region_size = memregion("audiocpu")->bytes();
-				
-				memcpy(current_audiocpu_region, image.get_software_region("audiocpu"), size);
-				memcpy(current_audiocpu_region + 0x10000, image.get_software_region("audiocpu"), size); // avoid reloading in XML, should just improve banking instead tho?
-			}
-			else
-			{
-				// NEW...
-				this_cart->regions.audiocpu_region = auto_alloc_array(machine(), UINT8, size + 0x10000);
-				memcpy(this_cart->regions.audiocpu_region + 0x00000, image.get_software_region("audiocpu"), size);
-				memcpy(this_cart->regions.audiocpu_region + 0x10000, image.get_software_region("audiocpu"), size); // avoid reloading in XML, should just improve banking instead tho?
-
-
-				current_audiocpu_region = this_cart->regions.audiocpu_region;
-				current_audiocpu_region_size = size + 0x10000;;
-
-			}
-
+			machine().memory().region_free(":audiocpu");
+			machine().memory().region_alloc(":audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
+			memcpy(memregion("audiocpu")->base(),image.get_software_region("audiocpu"),size);
+			memcpy(memregion("audiocpu")->base()+0x10000,image.get_software_region("audiocpu"),size); // avoid reloading in XML, should just improve banking instead tho?
 		}
 
 
@@ -1286,169 +1130,43 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 		    Thus we preemptively reset it here while the old pointers are still valid so it's up to date and
 		    doesn't generate samples below when we reset it for the new pointers.
 		*/
-
-
 		ym->reset();
 		size = image.get_software_region_length("ymsnd");
-	
-		if (slot == 0)
-		{
-			machine().memory().region_free(":ymsnd");
-			machine().memory().region_alloc(":ymsnd", size, 1, ENDIANNESS_LITTLE);
-
-			current_ymsnd_region = memregion("ymsnd")->base();
-			current_ymsnd_region_size = memregion("ymsnd")->bytes();
-
-			memcpy(current_ymsnd_region, image.get_software_region("ymsnd"), size);
-		}
-		else
-		{
-			// NEW...
-			this_cart->regions.ymsnd_region = auto_alloc_array(machine(), UINT8, size);
-			memcpy(this_cart->regions.ymsnd_region, image.get_software_region("ymsnd"), size);
-
-			current_ymsnd_region = this_cart->regions.ymsnd_region;
-			current_ymsnd_region_size = size;
-
-
-		}
-
-
+		machine().memory().region_free(":ymsnd");
+		machine().memory().region_alloc(":ymsnd",size,1, ENDIANNESS_LITTLE);
+		memcpy(memregion("ymsnd")->base(),image.get_software_region("ymsnd"),size);
 		if(image.get_software_region("ymsnd.deltat") != NULL)
 		{
 			size = image.get_software_region_length("ymsnd.deltat");
-	
-			if (slot == 0)
-			{
-				machine().memory().region_free(":ymsnd.deltat");
-				machine().memory().region_alloc(":ymsnd.deltat", size, 1, ENDIANNESS_LITTLE);
-	
-				current_ymdelta_region = memregion("ymsnd.deltat")->base();
-				current_ymdelta_region_size = memregion("ymsnd.deltat")->bytes();
-				
-				memcpy(current_ymdelta_region, image.get_software_region("ymsnd.deltat"), size);
-			}
-			else
-			{
-				// NEW...
-				this_cart->regions.ymdelta_region = auto_alloc_array(machine(), UINT8, size);
-				memcpy(this_cart->regions.ymdelta_region, image.get_software_region("ymsnd.deltat"), size);
-				current_ymdelta_region = this_cart->regions.ymdelta_region;
-				current_ymdelta_region_size = size;
-
-			}
-
+			machine().memory().region_free(":ymsnd.deltat");
+			machine().memory().region_alloc(":ymsnd.deltat",size,1, ENDIANNESS_LITTLE);
+			memcpy(memregion("ymsnd.deltat")->base(),image.get_software_region("ymsnd.deltat"),size);
 		}
 		else
-		{
-			if (slot == 0)
-			{
-				machine().memory().region_free(":ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
-			}
-			else
-			{
-				// NEW
-				this_cart->regions.ymdelta_region = 0;
-				current_ymdelta_region = 0;
-				current_ymdelta_region_size = 0;
-
-			}
-
-		}
+			machine().memory().region_free(":ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
 		ym->reset();    // and this makes the new pointers take effect
-
 		size = image.get_software_region_length("sprites");
-
-		if (slot == 0)
-		{
-			machine().memory().region_free(":sprites");
-			machine().memory().region_alloc(":sprites", size, 1, ENDIANNESS_LITTLE);
-
-			current_sprites_region = memregion("sprites")->base();
-			current_sprites_region_size = memregion("sprites")->bytes();
-
-
-			memcpy(current_sprites_region, image.get_software_region("sprites"), size);
-			// Reset the reference to the region
-			//m_region_sprites.findit();
-		}
-		else
-		{
-			// NEW...
-			this_cart->regions.sprites_region = auto_alloc_array(machine(), UINT8, size);
-			memcpy(this_cart->regions.sprites_region, image.get_software_region("sprites"), size);
-			current_sprites_region = this_cart->regions.sprites_region;
-			current_sprites_region_size = size;
-		}
-			
+		machine().memory().region_free(":sprites");
+		machine().memory().region_alloc(":sprites",size,1, ENDIANNESS_LITTLE);
+		memcpy(memregion("sprites")->base(),image.get_software_region("sprites"),size);
+		// Reset the reference to the region
+		m_region_sprites.findit();
 		if(image.get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
 		{
 			size = image.get_software_region_length("audiocrypt");
-	
-			if (slot == 0)
-			{
-				machine().memory().region_alloc(":audiocrypt", size, 1, ENDIANNESS_LITTLE);
-
-				current_audiocrypt_region = memregion("audiocrypt")->base();
-				current_audiocrypt_region_size = memregion("audiocrypt")->bytes();
-
-				memcpy(current_audiocrypt_region, image.get_software_region("audiocrypt"), size);
-				// allocate the audiocpu region to decrypt data into
-				machine().memory().region_free(":audiocpu");
-				machine().memory().region_alloc(":audiocpu", size + 0x10000, 1, ENDIANNESS_LITTLE);
-			
-				current_audiocpu_region = memregion("audiocpu")->base();
-				current_audiocpu_region_size = memregion("audiocpu")->bytes();
-	
-			}
-			else
-			{
-				// NEW...
-				this_cart->regions.audiocrypt_region = auto_alloc_array(machine(), UINT8, size);
-				current_audiocrypt_region = this_cart->regions.audiocrypt_region;
-				current_audiocrypt_region_size = size;
-	
-				
-				memcpy(this_cart->regions.audiocrypt_region, image.get_software_region("audiocrypt"), size);
-				this_cart->regions.audiocpu_region = auto_alloc_array(machine(), UINT8, size + 0x10000);
-				current_audiocpu_region = this_cart->regions.audiocpu_region;
-				current_audiocpu_region_size = size + 0x10000;
-			}
-
+			machine().memory().region_alloc(":audiocrypt",size,1, ENDIANNESS_LITTLE);
+			memcpy(memregion("audiocrypt")->base(),image.get_software_region("audiocrypt"),size);
+			// allocate the audiocpu region to decrypt data into
+			machine().memory().region_free(":audiocpu");
+			machine().memory().region_alloc(":audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
 		}
 
-		neogeo_cart_table[slot].regions.maincpu_region = current_maincpu_region;
-		neogeo_cart_table[slot].regions.maincpu_region_size = current_maincpu_region_size;
-		neogeo_cart_table[slot].regions.audiocpu_region = current_audiocpu_region;
-		neogeo_cart_table[slot].regions.audiocpu_region_size = current_audiocpu_region_size;
-		neogeo_cart_table[slot].regions.fixed_region = current_fixed_region;
-		neogeo_cart_table[slot].regions.fixed_region_size = current_fixed_region_size;
-		neogeo_cart_table[slot].regions.ymsnd_region = current_ymsnd_region;
-		neogeo_cart_table[slot].regions.ymsnd_region_size = current_ymsnd_region_size;
-		neogeo_cart_table[slot].regions.ymdelta_region = current_ymdelta_region;
-		neogeo_cart_table[slot].regions.ymdelta_region_size = current_ymdelta_region_size;
-		neogeo_cart_table[slot].regions.audiocrypt_region = current_audiocrypt_region;
-		neogeo_cart_table[slot].regions.audiocrypt_region_size = current_audiocrypt_region_size;
-		neogeo_cart_table[slot].regions.sprites_region = current_sprites_region;
-		neogeo_cart_table[slot].regions.sprites_region_size = current_sprites_region_size;
-
-		if (slot == 0)
-		{
-			// setup cartridge ROM area
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x000080, 0x0fffff, "cart_rom");
-			membank("cart_rom")->set_base(current_maincpu_region + 0x80);
-
-
-		}
-
-
-
-
+		// setup cartridge ROM area
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x000080,0x0fffff,"cart_rom");
+		membank("cart_rom")->set_base(m_region_maincpu->base() + 0x80);
 
 		// handle possible protection
-		mvs_install_protection(image, slot);
-		
-		optimize_sprite_data(); // this takes a long time on big carts, so best use more memory and do it now rather than every time the active cart changes at runtime
+		mvs_install_protection(image);
 
 		return IMAGE_INIT_PASS;
 	}
@@ -1490,7 +1208,7 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
+static MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(128762))
 
 	/* NEC uPD4990A RTC */
@@ -1500,21 +1218,10 @@ MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
 	MCFG_MEMCARD_HANDLER(neogeo)
 MACHINE_CONFIG_END
 
-
-#define MCFG_NEOGEO_CARTSLOT_ADD(_tag) \
-	MCFG_CARTSLOT_ADD(_tag) \
-	MCFG_CARTSLOT_INTERFACE("neo_cart") \
+static MACHINE_CONFIG_DERIVED( mvs, neogeo )
+	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_LOAD(neogeo_state,neo_cartridge)
-
-MACHINE_CONFIG_DERIVED( mvs, neogeo )
-	MCFG_NEOGEO_CARTSLOT_ADD("cart1")
-	MCFG_NEOGEO_CARTSLOT_ADD("cart2")
-	MCFG_NEOGEO_CARTSLOT_ADD("cart3")
-	MCFG_NEOGEO_CARTSLOT_ADD("cart4")
-	MCFG_NEOGEO_CARTSLOT_ADD("cart5")
-	MCFG_NEOGEO_CARTSLOT_ADD("cart6")
-	
-	
+	MCFG_CARTSLOT_INTERFACE("neo_cart")
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
 MACHINE_CONFIG_END
@@ -1528,32 +1235,8 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(neogeo_state,neogeo)
 {
-	// make sure legacy MAME style loading still works
-	if (current_slot == 0)
-	{
-		current_maincpu_region = memregion("maincpu")->base();
-		current_maincpu_region_size = memregion("maincpu")->bytes();
-		current_ymsnd_region = memregion("ymsnd")->base();
-		current_ymsnd_region_size = memregion("ymsnd")->bytes();
-		current_sprites_region = memregion("sprites")->base();
-		current_sprites_region_size = memregion("sprites")->bytes();
-		current_fixed_region = memregion("fixed")->base();
-		current_fixed_region_size = memregion("fixed")->bytes();
-		current_audiocpu_region = memregion("audiocpu")->base();
-		current_audiocpu_region_size = memregion("audiocpu")->bytes();
-		current_audiocrypt_region = memregion("audiocrypt")->base();
-		current_audiocrypt_region_size = memregion("audiocrypt")->bytes();
-		current_ymdelta_region = memregion("ymsnd.deltat")->base();
-		current_ymdelta_region_size = memregion("ymsnd.deltat")->bytes();
-	}
-
-	neogeo_cart_table[current_slot].slot_enable = slot_enable_default;
-
 	m_fixed_layer_bank_type = 0;
 }
 
-DRIVER_INIT_MEMBER(neogeo_state, neogeo_postinit)
-{
-	neogeo_cart_table[current_slot].slot_enable((void*)this);
-}
 
+#include "neogeo.inc"

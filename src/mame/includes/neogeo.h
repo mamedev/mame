@@ -20,38 +20,7 @@
 #define NEOGEO_VSSTART                          (0x000)
 #define NEOGEO_VBLANK_RELOAD_HPOS               (0x11f)
 
-struct neogeo_regionptrs
-{
-	UINT8*		maincpu_region;
-	size_t		maincpu_region_size;
-	UINT8*		audiocpu_region;
-	size_t		audiocpu_region_size;
-	UINT8*		fixed_region;
-	size_t		fixed_region_size;
-	UINT8*		ymsnd_region;
-	size_t		ymsnd_region_size;
-	UINT8*		ymdelta_region;
-	size_t		ymdelta_region_size;
-	UINT8*		audiocrypt_region;
-	size_t		audiocrypt_region_size;
-	UINT8*		sprites_region;
-	size_t		sprites_region_size;
-};
 
-typedef void (*neogeo_slot_enable_callback)(void *state);
-
-struct neogeo_cart_region
-{
-	const char *tag;
-	int        slot;
-	neogeo_regionptrs regions;
-	neogeo_slot_enable_callback slot_enable;
-	UINT32     m_sprite_gfx_address_mask;
-	dynamic_array<UINT8> m_sprite_gfx;
-
-};
-
-extern struct neogeo_cart_region neogeo_cart_table[];
 
 class neogeo_state : public driver_device
 {
@@ -61,18 +30,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 
+		m_region_maincpu(*this, "maincpu"),
+		m_region_sprites(*this, "sprites"),
+		m_region_fixed(*this, "fixed"),
 		m_region_fixedbios(*this, "fixedbios"),
 		m_bank_vectors(*this, "vectors"),
 		m_bank_cartridge(*this, "cartridge"),
 		m_bank_audio_main(*this, "audio_main"),
 		m_upd4990a(*this, "upd4990a"),
-		m_save_ram(*this, "saveram")
-	{ 
-		current_slot = 0;
-
-
-
-	}
+		m_save_ram(*this, "saveram") { }
 
 	DECLARE_WRITE16_MEMBER(io_control_w);
 	DECLARE_READ16_MEMBER(memcard_r);
@@ -156,35 +122,7 @@ public:
 	DECLARE_DRIVER_INIT(lans2004);
 	DECLARE_DRIVER_INIT(sbp);
 	DECLARE_DRIVER_INIT(mvs);
-	void mvs_install_protection(device_image_interface& image, int slot);
-	void install_bankswitch();
-
-	// these get called when a cartridge is enabled, they're used to install
-	// cartridge specific handlers
-	static void slot_enable_default(void *state);
-	static void slot_enable_cmc_bank1(void *state);
-	static void slot_enable_cmc_bank2(void *state);
-	static void slot_enable_garou(void *state);
-	static void slot_enable_garouh(void *state);
-	static void slot_enable_kof2000(void *state);
-	static void slot_enable_mslug3(void *state);
-	static void slot_enable_kof99(void *state);
-	static void slot_enable_pvc_cmc2(void *state);
-	static void slot_enable_pvc_cmc1(void *state);
-	static void slot_enable_pvc_boot(void *state);
-	static void slot_enable_fatfury2(void *state);
-	static void slot_enable_kof98(void *state);
-	static void slot_enable_mslugx(void *state);
-	static void slot_enable_kof10th(void *state);
-	static void slot_enable_ms5plus(void *state);
-	static void slot_enable_kf2k3bl(void *state);
-	static void slot_enable_kf2k3pl(void *state);
-	static void slot_enable_jockeygp(void *state);
-	static void slot_enable_vliner(void *state);
-	static void slot_enable_kog(void *state);
-	static void slot_enable_sbp(void *state);
-
-	DECLARE_DRIVER_INIT(neogeo_postinit);
+	void mvs_install_protection(device_image_interface& image);
 
 	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
@@ -208,25 +146,6 @@ public:
 	// this has to be public for the legacy MEMCARD_HANDLER
 	UINT8      *m_memcard_data;
 
-	int	current_slot;
-
-
-	UINT8* current_maincpu_region;
-	size_t current_maincpu_region_size;
-	UINT8* current_ymsnd_region;
-	size_t current_ymsnd_region_size;
-	UINT8* current_sprites_region;
-	size_t current_sprites_region_size;
-	UINT8* current_fixed_region;
-	size_t current_fixed_region_size;
-	UINT8* current_audiocpu_region;
-	size_t current_audiocpu_region_size;
-	UINT8* current_audiocrypt_region;
-	size_t current_audiocrypt_region_size;
-	UINT8* current_ymdelta_region;
-	size_t current_ymdelta_region_size;
-
-
 protected:
 	void neogeo_postload();
 	void update_interrupts();
@@ -236,7 +155,7 @@ protected:
 	void neogeo_set_main_cpu_bank_address( UINT32 bank_address );
 	void _set_main_cpu_bank_address();
 	void neogeo_main_cpu_banking_init();
-	void neogeo_audio_cpu_banking_init(int set_entry);
+	void neogeo_audio_cpu_banking_init();
 	void adjust_display_position_interrupt_timer();
 	void neogeo_set_display_position_interrupt_control(UINT16 data);
 	void neogeo_set_display_counter_msb(UINT16 data);
@@ -275,7 +194,6 @@ protected:
 	void set_output_latch( UINT8 data );
 	void set_output_data( UINT8 data );
 	void install_banked_bios();
-	void select_slot(UINT16 data, UINT16 mem_mask);
 
 	// protections implementation
 	DECLARE_READ16_MEMBER( sbp_lowerrom_r );
@@ -283,15 +201,11 @@ protected:
 	DECLARE_READ16_MEMBER( fatfury2_protection_16_r );
 	DECLARE_WRITE16_MEMBER( fatfury2_protection_16_w );
 	void fatfury2_install_protection();
-	void fatfury2_init_protection();
-
 	DECLARE_WRITE16_MEMBER ( kof98_prot_w );
 	void install_kof98_protection();
 	DECLARE_WRITE16_MEMBER( mslugx_protection_16_w );
 	DECLARE_READ16_MEMBER( mslugx_protection_16_r );
 	void mslugx_install_protection();
-	void mslugx_init_protection();
-
 	DECLARE_WRITE16_MEMBER( kof99_bankswitch_w );
 	DECLARE_WRITE16_MEMBER( garou_bankswitch_w );
 	DECLARE_WRITE16_MEMBER( garouh_bankswitch_w );
@@ -301,7 +215,6 @@ protected:
 	DECLARE_READ16_MEMBER( sma_random_r );
 	void reset_sma_rng();
 	void sma_install_random_read_handler( int addr1, int addr2 );
-	void init_sma(void);
 	void kof99_install_protection();
 	void garou_install_protection();
 	void garouh_install_protection();
@@ -313,7 +226,6 @@ protected:
 	DECLARE_READ16_MEMBER( pvc_prot_r );
 	DECLARE_WRITE16_MEMBER( pvc_prot_w );
 	void install_pvc_protection();
-	void init_pvc_protection();
 	void neogeo_bootleg_cx_decrypt();
 	void neogeo_bootleg_sx_decrypt(int value );
 	void kog_px_decrypt();
@@ -408,6 +320,9 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 
 	// memory
+	required_memory_region m_region_maincpu;
+	required_memory_region m_region_sprites;
+	required_memory_region m_region_fixed;
 	optional_memory_region m_region_fixedbios;
 	required_memory_bank   m_bank_vectors;
 	optional_memory_bank   m_bank_cartridge;  // optional because of neocd
@@ -459,6 +374,8 @@ protected:
 
 	const UINT8 *m_region_zoomy;
 
+	dynamic_array<UINT8> m_sprite_gfx;
+	UINT32     m_sprite_gfx_address_mask;
 
 	UINT8      m_auto_animation_speed;
 	UINT8      m_auto_animation_disabled;
@@ -503,7 +420,4 @@ protected:
 /*----------- defined in drivers/neogeo.c -----------*/
 
 MACHINE_CONFIG_EXTERN( neogeo_base );
-MACHINE_CONFIG_EXTERN( neogeo );
-MACHINE_CONFIG_EXTERN( mvs );
 MEMCARD_HANDLER( neogeo );
-INPUT_PORTS_EXTERN( neogeo );

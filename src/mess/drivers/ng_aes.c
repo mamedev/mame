@@ -191,7 +191,6 @@ public:
 	DECLARE_DRIVER_INIT(neocdzj);
 
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
-	void common_aes_init();
 
 protected:
 	required_ioport m_io_in2;
@@ -993,7 +992,7 @@ void ng_aes_state::common_machine_start()
 	neogeo_main_cpu_banking_init();
 
 	/* set the initial audio CPU ROM banks */
-	neogeo_audio_cpu_banking_init(1);
+	neogeo_audio_cpu_banking_init();
 
 	create_interrupt_timers();
 
@@ -1587,27 +1586,8 @@ ROM_END
 
 #define rom_neocdzj    rom_neocdz
 
-void ng_aes_state::common_aes_init()
-{
-	current_maincpu_region = memregion("maincpu")->base();
-	current_maincpu_region_size = memregion("maincpu")->bytes();
-	current_ymsnd_region = memregion("ymsnd")->base();
-	current_ymsnd_region_size = memregion("ymsnd")->bytes();
-	current_sprites_region = memregion("sprites")->base();
-	current_sprites_region_size = memregion("sprites")->bytes();
-	current_fixed_region = memregion("fixed")->base();
-	current_fixed_region_size = memregion("fixed")->bytes();
-	current_audiocpu_region = memregion("audiocpu")->base();
-	current_audiocpu_region_size = memregion("audiocpu")->bytes();
-	current_audiocrypt_region = memregion("audiocrypt")->base();
-	current_audiocrypt_region_size = memregion("audiocrypt")->bytes();
-	current_ymdelta_region = memregion("ymsnd.deltat")->base();
-	current_ymdelta_region_size = memregion("ymsnd.deltat")->bytes();
-}
-
 DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
 {
-	common_aes_init();
 }
 
 
@@ -1616,13 +1596,11 @@ CONS( 1990, aes,    0,      0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", 
 
 DRIVER_INIT_MEMBER(ng_aes_state,neocdz)
 {
-	common_aes_init();
 	NeoSystem = NEOCD_REGION_US;
 }
 
 DRIVER_INIT_MEMBER(ng_aes_state,neocdzj)
 {
-	common_aes_init();
 	NeoSystem = NEOCD_REGION_JAPAN;
 }
 

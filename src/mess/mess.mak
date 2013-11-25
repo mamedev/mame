@@ -1832,7 +1832,6 @@ $(MESSOBJ)/snk.a:               \
 	$(MAME_MACHINE)/neoprot.o   \
 	$(MAME_MACHINE)/neoboot.o   \
 	$(MAME_DRIVERS)/neogeo.o    \
-	$(MAME_DRIVERS)/neogeomvs.o  \
 	$(MESS_DRIVERS)/ngp.o       \
 	$(MESS_VIDEO)/k1ge.o        \
 

@@ -3665,22 +3665,6 @@ void ym2610_shutdown(void *chip)
 	auto_free(F2610->OPN.ST.device->machine(), F2610);
 }
 
-void ym2610_set_pcmbufs(void *chip, const UINT8 *buf, size_t size, UINT8* bufdt, size_t sizedt)
-{
-	YM2610 *F2610 = (YM2610 *)chip;
-
-	F2610->pcmbuf = buf;
-	F2610->pcm_size = size;
-	F2610->deltaT.memory = bufdt;
-	if(F2610->deltaT.memory == NULL)
-	{
-		F2610->deltaT.memory = (UINT8*)F2610->pcmbuf;
-		F2610->deltaT.memory_size = F2610->pcm_size;
-	}
-	else
-		F2610->deltaT.memory_size = sizedt;
-}
-
 /* reset one of chip */
 void ym2610_reset_chip(void *chip)
 {
@@ -3690,23 +3674,21 @@ void ym2610_reset_chip(void *chip)
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 
 	astring name;
-	astring name2;
 	device_t* dev = F2610->OPN.ST.device;
 
 	/* setup PCM buffers again */
 	name.printf("%s",dev->tag());
-	name2.printf("%s.deltat",dev->tag());
-
-	ym2610_set_pcmbufs(chip,
-						(const UINT8 *)dev->machine().root_device().memregion(name)->base(),
-						
-						dev->machine().root_device().memregion(name)->bytes(),
-		               
-						(UINT8 *)dev->machine().root_device().memregion(name2)->base(),
-					 
-					   dev->machine().root_device().memregion(name2)->bytes()
-					   
-					   );
+	F2610->pcmbuf   = (const UINT8 *)dev->machine().root_device().memregion(name)->base();
+	F2610->pcm_size = dev->machine().root_device().memregion(name)->bytes();
+	name.printf("%s.deltat",dev->tag());
+	F2610->deltaT.memory = (UINT8 *)dev->machine().root_device().memregion(name)->base();
+	if(F2610->deltaT.memory == NULL)
+	{
+		F2610->deltaT.memory = (UINT8*)F2610->pcmbuf;
+		F2610->deltaT.memory_size = F2610->pcm_size;
+	}
+	else
+		F2610->deltaT.memory_size = dev->machine().root_device().memregion(name)->bytes();
 
 	/* Reset Prescaler */
 	OPNSetPres( OPN, 6*24, 6*24, 4*2); /* OPN 1/6 , SSG 1/4 */
