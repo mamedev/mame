@@ -13,6 +13,7 @@
     - keyboard not working
     - foreground is black, according to the construction article it should be white.
     - it is supposed to reset itself at boot, but that isn't working. You must press R.
+    - Pressing F3 causes it to jump into the weeds.
 
 */
 
