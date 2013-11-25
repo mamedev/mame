@@ -1,25 +1,28 @@
-/**********************************************************************
+	/**********************************************************************
 
     DEC VT Terminal video emulation
     [ DC012 and DC011 emulation ]
 
     01/05/2009 Initial implementation [Miodrag Milanovic]
-    Sept. 2013 portions by Karl-Ludwig Deisenhofer.
+    --/--/2013 portions by Karl-Ludwig Deisenhofer.
 
-    STATE OF DEC-100 VIDEO AS OF SEPTEMBER 2013
-    -------------------------------------------
-    - FURTHER TESTING: do line and character attributes match real hardware?  Does soft scrolling work?
-    - LIKELY INCORRECT : implementation of double size attribute in 132 columns mode (additional case)
+    DEC VIDEO : STATE AS OF NOVEMBER 2013
+    -------------------------------------
+    - NOT WORKING : scrolling requires implementation of 'scrolling region'. Multiple regions could be present.
+					Split & a full screen modes exist. Scroll should be synced with beam or DMA. 
+					See 4.7.4 and up in VT manual.
 
-    - MISSING: undocumented features of DC011 / DC012 - see public domain SQUEEZE.COM pokes:
-        0f00 => PORT 0C;
-        0b00 => PORT 0C;
-        1000 => PORT 04
-        (SQUEEZE compresses the display in X and Y direction on a real DEC-100 B)
+	- TESTS REQUIRED : do line and character attributes (plus combinations) match real hardware?  
+
+	- UNDOCUMENTED FEATURES of DC011 / DC012 (CLUES WANTED)
+       A. (VT 100): DEC VT terminals are said to have a feature that doubles the number of lines 
+					(50 real lines or just interlaced mode with 500 instead of 250 scanlines?)
+
+	   B. (DEC-100-B) fun PD program SQUEEZE.COM _compresses_ display to X/2 and Y/2 
+ 	      - so picture takes a quarter of the original screen. How does it accomplish this?				           
 
     - IMPROVEMENTS:
-        - find a more realistic approach for intensity control (bold attribute)
-        - correct phosphor colors (green, white and amber monitors were common)
+        - exact colors for different VR201 monitors ('paper white', green and amber)
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -140,12 +143,13 @@ void vt100_video_device::device_reset()
 }
 
 // ****** RAINBOW ******
-// 3 color palette, 24 and 48 line modes.
+// 4 color (= monochrome intensities) palette, 24 and 48 line modes.
 void rainbow_video_device::device_reset()
 {
+	DEC_MHFU = true; // SET ON COLD BOOT 
+
 	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
-	palette_set_color_rgb(machine(), 1, 213, 146, 82);      // AMBER (not exact)
-	palette_set_color_rgb(machine(), 2, 255, 193, 129);     // AMBER (brighter)
+	// (rest of the palette is set in the main program)
 
 	m_height = 24;  // <---- DEC-100
 	m_height_MAX = 48;
@@ -193,11 +197,36 @@ READ8_MEMBER( vt100_video_device::lba7_r )
 	return m_lba7;
 }
 
+
 // Also used by Rainbow-100 ************
 WRITE8_MEMBER( vt100_video_device::dc012_w )
 {
+	if (data == 0) 
+	{
+		if (DEC_MHFU == true)
+			DEC_MHFU = false; // MHFU is disabled by writing 00 to port 010C.
+	} else 
+	{
+		if (DEC_MHFU == false)
+			DEC_MHFU = true; // TODO: MHFU ENABLE should also reset the MHFU timer.
+	}
+
 	if (!(data & 0x08))
 	{
+		// The scroll offset put in 'm_scroll_latch' is a decimal offset controlling 10 scan lines.
+		// The BIOS first writes the least significant bits, then the 2 most significant bits.
+
+		// If scrolling up (incrementing the scroll latch), the additional line is linked in at the bottom.
+		// When the scroll latch is incremented back to 0, the top line of the scrolling region must be unlinked. 
+
+		// When scrolling down (decrementing the scroll latch), new lines must be linked in at the top of the scroll region
+		// and unlinked down at the bottom. 
+
+		// Note that the scroll latch value will be used during the next frame rather than the current frame.
+		// All line linking/unlinking should be done during the vertical blanking interval (< 550ms).
+
+		// More on scrolling regions: Rainbow 100 B technical documentation (QV069-GZ) April 1985 page 22
+		// Also see VT100 Technical Manual: 4.7.4 Address Shuffling to 4.7.9 Split Screen Smooth Scrolling.
 		if (!(data & 0x04))
 		{
 			// set lower part scroll
@@ -229,17 +258,20 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 				// set reverse field off
 				m_reverse_field = 0;
 				break;
-			case 0x0c:
-				// set basic attribute to underline
-				m_basic_attribute = 0;
-				m_blink_flip_flop = 0;
-				break;
-			case 0x0d:
-				// set basic attribute to reverse video / blink flip-flop off
-				m_basic_attribute = 1;
-				m_blink_flip_flop = 0;
 
-				if (m_height_MAX == 25) break; // VT 100.
+			//	Writing a 11XX bit combination clears the blink-flip flop (valid for 0x0C - 0x0F):
+			case 0x0c:
+				// set basic attribute to underline / blink flip-flop off
+				m_blink_flip_flop = 0;
+				m_basic_attribute = 0; // (VT-100 without AVO): reverse video is interpreted as underline (basic_attribute 0)
+				break;
+
+			case 0x0d:
+				// (DEC Rainbow 100 DEFAULT) : reverse video with 24 lines / blink flip-flop off
+				m_blink_flip_flop = 0;
+				m_basic_attribute = 1; // (VT-100 without AVO): reverse video is interpreted as reverse (basic_attribute 1)
+
+				if (m_height_MAX == 25) break; //  Abort on VT-100 for now.
 
 				if (m_height != 24)
 				{
@@ -249,14 +281,17 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 				break;
 
 			case 0x0e:
-				break;                  // (DC12) : 'not supported'
+				m_blink_flip_flop = 0;  // 'unsupported' DC012 command. Turn blink flip-flop off.
+				break;                 
 
-			case 0x0f:
-				// (DEC Rainbow 100) : set basic attribute to reverse video / blink flip-flop off
-				m_basic_attribute = 1;
+			case 0x0f: 
+				// (DEC Rainbow 100): reverse video with 48 lines / blink flip-flop off 
 				m_blink_flip_flop = 0;
+				m_basic_attribute = 1;
 
-				if (m_height_MAX == 25) break; // VT 100.
+				// 0x0f = 'reserved' on VT 100 
+				//  Abort on VT-100 for now.
+				if (m_height_MAX == 25) break; 
 
 				if (m_height != 48)
 				{
@@ -435,102 +470,180 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 }
 
 // ****** RAINBOW ******
-// 5 possible character states (normal, reverse, bold, blink, underline) are encoded into display_type.
+// 5 possible CHARACTER STATES (normal, reverse, bold, blink, underline) are encoded into display_type.
+
+// From the VT-180 specs, chapter 6-43 (where multiple attributes are described):
+//  1) reverse characters [ XOR of reverse video and reverse screen (A) ] normally have dim backgrounds with black characters (B)
+//  2) bold and reverse together give a background of normal intensity
+
+//  3) blink controls intensity: normal chars vary between A) normal and dim  (B) bold chars vary between bright and normal
+//  4) blink applied to a 
+//       A) reverse character causes it to alternate between normal and reverse video representation
+//       B) non-rev. "        : alternate between usual intensity and the next lower intensity
+//  5) underline causes the 9.th scan to be forced to 
+//       A) white of the same intensity as the characters (for nonreversed characters),
+//       b) to black (for reverse characters)
+
+// LINE ATTRIBUTE 'double_height' always is interpreted as 'double width + double height'
 void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type)
 {
-	UINT8 xsize, d_xsize;
+	UINT16 y_preset;
+	UINT16 x_preset, d_x_preset;
 	if (m_columns == 132)
-	{     xsize = 9;
-			d_xsize = 18;
+	{     x_preset   = x * 9;
+		  d_x_preset = x * 18;
 	} else
 	{
-			xsize = 10;
-			d_xsize = 20;
+		  x_preset   = x * 10;
+		  d_x_preset = x * 20;
 	}
 
 	UINT8 line = 0;
-	int bit = 0, j=0, invert, bold, blink, underline;
+	int bit = 0, j = 0;
+	int fg_intensity;
+	int back_intensity, back_default_intensity;
 
-	invert = display_type &  8;        // BIT 3 indicates REVERSE
-	bold   = (display_type & 16) >> 4; // BIT 4 indicates BOLD
-	blink  = display_type &  32;       // BIT 5 indicates BLINK
-	underline = display_type & 64;     // BIT 6 indicates UNDERLINE
+	int invert = (display_type &  8) >> 3; // BIT 3 indicates REVERSE
+	int bold = (display_type & 16) >> 4;   // BIT 4 indicates BOLD 
+	int blink  = display_type &  32;       // BIT 5 indicates BLINK
+	int underline = display_type & 64;     // BIT 6 indicates UNDERLINE
+	bool blank = (display_type & 0x80) ? true : false; // BIT 7 indicates BLANK
+
 	display_type = display_type & 3;
 
-	int double_width = (display_type == 1) ? 1 : 0;
+	// CASE 1 A) 
+	// SCREEN ATTRIBUTES (see VT-180 manual 6-30):
+	// 'reverse field' = reverse video over entire screen (identical on Rainbow-100)
+
+    // What does 'base attribute' do on Rainbow-100 ?
+	// VT-100 interpretation ('without AVO, eigth char.bit defines base attribute') most likely not correct!
+	// OR 'base attribute' = reverse or underline (depending on the selection of the cursor at SETUP) ??
+	// VT-100 manual 4-75 / 4-98 says: reverse = (reverse field H) XOR (reverse video H = base attribute input)
+
+	// For reference: a complete truth table can be taken from TABLE 4-6-4 / VT100 technical manual.
+    // Following simple IF statements implement it in full. Code should not be shuffled!
+	invert = invert ^ m_reverse_field ^ m_basic_attribute;
+
+	fg_intensity = bold + 2;   // FOREGROUND (FG):  normal (2) or bright (3)
+
+	back_intensity = 0; // DO NOT SHUFFLE CODE AROUND !!
+	if ( (blink != 0) && ( m_blink_flip_flop != 0 ) )
+		fg_intensity -= 1; // normal => dim    bright => normal (when bold)
+
+	// INVERSION: background gets foreground intensity (reduced by 1).
+	// _RELIES ON_ on_ previous evaluation of the BLINK signal (fg_intensity).
+	if (invert != 0)				
+	{	
+		back_intensity = fg_intensity - 1; // BG: normal => dim;  dim => OFF;   bright => normal
+
+		if (back_intensity != 0)           //  FG: avoid 'black on black'
+			fg_intensity = 0;			       
+		else
+			fg_intensity = fg_intensity + 1; // FG: dim => normal; normal => bright 
+	}
+
+	// BG: DEFAULT for entire character (underline overrides this for 1 line) -
+	back_default_intensity = back_intensity;
+
+	bool double_width  = (display_type != 3) ? true  : false; // all except normal: double width
+ 	bool double_height = (display_type &  1) ? false : true;  // 0,2 = double height
 
 	for (int i = 0; i < 10; i++)
 	{
+		y_preset = y * 10 + i;
+
 		switch (display_type)
 		{
-			case 0 : // bottom half, double height
-						j = (i >> 1) + 5; break;
-			case 2 : // top half, double height
-						j = (i >> 1); break;
+			case 0 :  // bottom half of 'double height, double width' char.
+						j = (i >> 1) + 5; 
+						break;
 
-			default : j = i; break; // 1: double width  /  3: normal
+			case 2 :  // top half of 'double height, double width' char.
+						j = (i >> 1); 	  
+						break;
+
+			default : // 1: double width  
+					  // 3: normal
+						j = i;           
+						break; 
 		}
+
 		// modify line since that is how it is stored in rom
 		if (j == 0) j = 15; else j = j - 1;
 
 		line = m_gfx[code * 16 + j];
 
-		if ( i == 8 )
+		// UNDERLINED CHARACTERS (CASE 5 - different in 1 line):
+		back_intensity = back_default_intensity; // 0, 1, 2 
+		if ( underline != 0 )
 		{
-			if ( underline != 0  ) line = 0xff;
-		}
-
-		//  Code to handle basic attribute from VT-100
-		if ( m_basic_attribute == 1 )
-		{
-			if ((code & 0x80) == 0x80)
-				invert = 1;
-			else
-				invert = 0;
-			}
-
-			if (m_blink_flip_flop > 0)
-		{
-			if ( blink != 0 )
+			if ( i == 8 ) 
 			{
-				line = line ^ 0xff;
-			}
-		}
-		if (invert != 0)
-				line = line ^ 0xff;
+				 if (invert == 0) 
+					 line = 0xff; // CASE 5 A)
+				 else
+				 {	 line = 0x00; // CASE 5 B)
+				     back_intensity = 0; // OVERRIDE: BLACK BACKGROUND
+				 }
+           	}
+ 		}
 
-		for (int b = 0; b < 8; b++)
+		for (int b = 0; b < 8; b++) // 0..7
 		{
-			bit = BIT((line << b), 7) << bold;
+			if (blank)
+			{	    bit = m_reverse_field ^ m_basic_attribute;
+			} 
+			else
+			{
+					bit = BIT((line << b), 7);
+
+					if (bit > 0)
+						bit = fg_intensity;
+					else
+						bit = back_intensity;
+			}
+
+			// Double, 'double_height + double_width', then normal.
 			if (double_width)
 			{
-				bitmap.pix16(y * 10 + i, x * d_xsize + b * 2)     = bit;
-				bitmap.pix16(y * 10 + i, x * d_xsize + b * 2 + 1) = bit;
+  		        bitmap.pix16( y_preset, d_x_preset + b * 2 + 1) = bit;
+				bitmap.pix16( y_preset, d_x_preset + b * 2)     = bit;
+
+				if (double_height)
+				{
+					  bitmap.pix16( 1 + y_preset, d_x_preset + b * 2 + 1) = bit;
+					  bitmap.pix16( 1 + y_preset, d_x_preset + b * 2)     = bit;
+				}
 			}
 			else
 			{
-				bitmap.pix16(y * 10 + i, x * xsize + b) = bit;
+				bitmap.pix16(y_preset, x_preset + b) = bit;
+			}
+		} // for (8 bit)
+
+		
+		// char interleave (X) is filled with last bit
+		if (double_width)
+		{   
+			// double chars: 18 or 20 bits
+			bitmap.pix16(y_preset, d_x_preset + 16) = bit;
+			bitmap.pix16(y_preset, d_x_preset + 17) = bit;
+
+			if (m_columns == 80) 
+			{	bitmap.pix16(y_preset, d_x_preset + 18) = bit;
+			    bitmap.pix16(y_preset, d_x_preset + 19) = bit;
 			}
 		}
-
-
-		// char interleave is filled with last bit
-		if (double_width)
-		{
-			bitmap.pix16(y * 10 + i, x * d_xsize + 16) = bit;
-			bitmap.pix16(y * 10 + i, x * d_xsize + 17) = bit;
-			bitmap.pix16(y * 10 + i, x * d_xsize + 18) = bit;
-			bitmap.pix16(y * 10 + i, x * d_xsize + 19) = bit;
-		}
 		else
-		{
-			bitmap.pix16(y * 10 + i, x * xsize + 8) = bit;
-			if (m_columns == 80)
-				bitmap.pix16(y * 10 + i, x * xsize + 9) = bit;
+		{   // normal chars: 9 or 10 bits
+			bitmap.pix16(y_preset, x_preset + 8) = bit;
+
+			if (m_columns == 80) 
+				bitmap.pix16(y_preset, x_preset + 9) = bit;
 		}
 
+	} // for
 
-	}
 }
 
 // ****** RAINBOW ******
@@ -543,42 +656,42 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 	int ypos = 0;
 	UINT8 code;
 	int x = 0;
-	UINT8 scroll_region = 1; // binary 1
+	UINT8 scroll_region = 1;  // DEFAULT TO 1 = PART OF scroll_region
 	UINT8 display_type = 3;  // binary 11
 	UINT16 temp = 0;
 
 	while (line < (m_height + m_skip_lines))
 	{
 		code = m_in_ram_func(addr + xpos);
-		if (code == 0xff)
+ 
+	    if ( code == 0x00 )        // TODO: investigate side effect on regular zero character!
+			 display_type |= 0x80; // DEFAULT: filler chars (till end of line) and empty lines (00) will be blanked 
+		else
+			 display_type &= 0x7f; // else activate display.
+
+		if ( code == 0xff )
 		{
 			// end of line, fill empty till end of line
 			if (line >= m_skip_lines)
 			{
-				// NOTE: display_type is already SHIFTED by 1  ( 1 = DOUBLE WIDTH 40 / 66 )
-				for (x = xpos; x < ((display_type == 1) ? (m_columns / 2) : m_columns); x++)
+				// NOTE: display_type is already shifted! All except 3 is DOUBLE WIDTH 40 or 66 chars per line
+				for (x = xpos; x < ( (display_type != 3) ? (m_columns / 2) : m_columns );  x++)
 				{
-					display_char(bitmap, code, x, ypos, scroll_region, display_type);
+					display_char(bitmap, code, x, ypos, scroll_region, display_type | 0x80);
 				}
+
 			}
-			// move to new data
+
+			//  LINE ATTRIBUTE - valid for all chars on next line  ** DO NOT SHUFFLE **
+			attr_addr = ( 0x1000 | (addr + xpos + 1) & 0x0fff );
+
+			// MOVE TO NEW DATA
 			temp = m_in_ram_func(addr + xpos + 2) * 256 + m_in_ram_func(addr + xpos + 1);
-
 			addr = (temp) & 0x0fff;
-			attr_addr = ((temp) & 0x1fff) - 2;
 
-			//  No AVO here.
-			attr_addr |= 0x1000;
-			if (attr_addr > 0x2000) // Ignore attributes beyond 8192 byte limit (SRAM).
-			{
-				scroll_region = 1; // binary 1   <- SET DEFAULTS
-				display_type = 3;  // binary 111
-			} else
-			{
-				temp = m_in_ram_func(attr_addr);
-				scroll_region = (temp) & 1;
-				display_type  = (temp >> 1) & 3;
-			}
+			temp = m_in_ram_func(attr_addr);
+			scroll_region = (temp) & 1;
+			display_type  = (temp >> 1) & 3;
 
 			if (line >= m_skip_lines)
 			{
@@ -588,33 +701,76 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			line++;
 		}
 		else
-		{
+		{  
 			// display regular char
 			if (line >= m_skip_lines)
 			{
 				attr_addr = 0x1000 | ( (addr + xpos) & 0x0fff );
 				temp = m_in_ram_func(attr_addr); // get character attribute
 
-				// TODO: check if reverse bit is treated the same way on real hardware
+				// CONFIRMED: Reverse active on 1.  No attributes = 0x0E
 				// 1 = display char. in REVERSE   (encoded as 8)
 				// 0 = display char. in BOLD      (encoded as 16)
 				// 0 = display char. w. BLINK     (encoded as 32)
 				// 0 = display char. w. UNDERLINE (encoded as 64).
-					display_char(bitmap, code, xpos, ypos, scroll_region, display_type | ( (  (temp & 1)) << 3 )
-																					| ( (2-(temp & 2)) << 3 )
-																					| ( (4-(temp & 4)) << 3 )
-																					| ( (8-(temp & 8)) << 3 )
+				display_char(bitmap, code, xpos, ypos, scroll_region, display_type | (   (    (temp & 1)) << 3 )
+																					   | ( (2-(temp & 2)) << 3 )
+																					   | ( (4-(temp & 4)) << 3 )
+																					   | ( (8-(temp & 8)) << 3 )
 																					);
-			}
-			xpos++;
-			if (xpos > m_columns)
-			{
-				line++;
-				xpos = 0;
-			}
-		}
-	}
 
+			} 
+			xpos++;
+
+			if (xpos > m_columns )
+			{
+				xpos = 0;
+				line++;
+			}
+		} // (else) valid char
+
+	} // while
+   
+
+}
+
+	
+void rainbow_video_device::palette_select ( int choice )
+{
+	switch(choice)
+	{
+ 			default:
+			case 0x01:  
+						palette_set_color_rgb(machine(), 1, 0xff-100, 0xff-100, 0xff-100);  // WHITE (dim)
+						palette_set_color_rgb(machine(), 2, 0xff-50, 0xff-50, 0xff-50);     // WHITE NORMAL
+						palette_set_color_rgb(machine(), 3, 0xff, 0xff, 0xff);			    // WHITE (brighter)
+						break;
+
+			case 0x02:
+						palette_set_color_rgb(machine(), 1, 0 , 200 -50, 0);        // GREEN (dim)
+						palette_set_color_rgb(machine(), 2, 0 , 200,     0);		// GREEN (NORMAL)
+						palette_set_color_rgb(machine(), 3, 0,  200 +50, 0);        // GREEN (brighter)
+						break;
+
+			case 0x03: 
+						palette_set_color_rgb(machine(), 1, 213 - 47, 146 - 47, 82 - 47);      // AMBER (dim)
+						palette_set_color_rgb(machine(), 2, 213,      146,      82);      // AMBER (normal - not exact)
+						palette_set_color_rgb(machine(), 3, 255, 193, 129);     // AMBER (brighter)
+						break;
+	}
+}
+
+// ****** RAINBOW ******
+void rainbow_video_device::video_blanking(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// 'In reverse screen mode, termination forces the beam to the screen background intensity'
+	// Background intensity means 'dim' (1) according to one source. Most certainly not pitch black.
+ 	bitmap.fill( ((m_reverse_field ^ m_basic_attribute) ? 1 : 0) , cliprect); 
+}
+
+int rainbow_video_device::dc012_MHFU()
+{
+	return DEC_MHFU;
 }
 
 TIMER_CALLBACK_MEMBER( vt100_video_device::lba7_change )

@@ -6,31 +6,47 @@
 
     STATE AS OF NOVEMBER 2013
     --------------------------
-    - FATAL: keyboard emulation needs love (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
-    - NOT WORKING: serial (ERROR 60)
-    - NOT WORKING: printer interface (ERROR 40).
+    - FATAL: keyboard emulation incomplete (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
+    - NOT WORKING: serial (ERROR 60). 
+    - NOT WORKING: printer interface (ERROR 40). Like error 60 not mission-critical.
 
-    - NON-CRITICAL: no code for W18 (DSR) jumper. W90 jumper probably not relevant for emulation (VBIAS pin 2 => to unknown register).
-    - NON-CRITICAL: watchdog logic not implemented. MHFLU - ERROR 16 indicated hardware problems or (most often) software crashes on real hardware.
+    - NON-CRITICAL: watchdog logic (triggered after 108 ms without interrupts) still not exactly by the book. 
+
+					Timer is reset by TWO sources: the VERT INT L from the DC012, or the MHFU ENB L from the enable flip-flop.
+					The MHFU gets active if the 8088 has not acknowledged a video processor interrupt within approx. 108 milliseconds.
+	
+					BIOS assumes a power-up reset if MHFU detection is disabled - and assumes a MHFU reset if MHFU detection is ENABLED.
+					Therefore a 'warm boot' within MESS (F3) causes ERROR 16.
 
     - SHOULD BE IMPLEMENTED AS SLOT DEVICES (for now, DIP settings affect 'system_parameter_r' only and are disabled):
             * Color graphics option (uses NEC upd7220 GDC)
             * Extended communication option (same as BUNDLE_OPTION ?)
 
     - OTHER UPGRADES (NEC_V20 should be easy, the TURBOW is harder to come by)
-			* Suitable Solutions TURBOW286 (12 Mhz, 68-pin, low power AMD N80L286-12 and WAYLAND/EDSUN EL286-88-10-B ( 80286 to 8088 Processor Signal Converter )
-			  / replacement for main cpu with on-board DC 7174 or DT 7174 (?) RTC and changed BOOT ROM labeled 'TBSS1.3 - 3ED4').
+			* Suitable Solutions TURBOW286: 12 Mhz, 68-pin, low power AMD N80L286-12 and WAYLAND/EDSUN EL286-88-10-B ( 80286 to 8088 Processor Signal Converter )
+			  plus DC 7174 or DT 7174 (barely readable). Add-on card, replaces main 8088 cpu (via ribbon cable). Changed BOOT ROM labeled 'TBSS1.3 - 3ED4'.
 
 			* NEC_V20 (requires modded BOOT ROM because of - at least 2 - hard coded timing loops): 
                  100A:         100B/100+:						100B+ ALTERNATE RECOMMENDATION (fixes RAM size auto-detection problems when V20 is in place.
-				                                                                                Tested on a 30+ year old live machine. Your mileage may vary)
+	                                                            Tested on a 30+ year old live machine. Your mileage may vary)
+
                  Location Data	Location Data                   Loc.|Data								
-																00C6 46 [ increases 'wait for Z80' from approx. 27,5 ms (old value 40) to 30,5 ms ]
-																0303 00 [ disable CHECKSUM ]
+	             ....     ..    ....     ..  ------------------ 00C6 46 [ increases 'wait for Z80' from approx. 27,5 ms (old value 40) to 30,5 ms ]
+	             ....     ..    ....     ..  ------------------ 0303 00 [ disable CHECKSUM ]
                  043F     64    072F     64	<----------------->	072F 73 [ increases minimum cycle time from 2600 (64) to 3000 ms (73) ]
-                 067D	  20	0B36     20	<-----------------> 0B36 20 [ use a value of 20 for NEC_V20 - as in the initial patch. Changes cause VFR - ERROR 10. ]
+                 067D	  20	0B36     20	<-----------------> 0B36 20 [ USE A VALUE OF 20 FOR THE NEC - as in the initial patch! CHANGES CAUSE VFR-ERROR 10 ]
                  1FFE     2B	3FFE     1B  (BIOS CHECKSUM)    
                  1FFF     70	3FFF     88  (BIOS CHECKSUM)    
+
+			 => the 'leaked' DOS 3.10 Beta -for Rainbow- 'should not be used' on rigs with NEC V20. It possibly wasn't tested, but boots and runs well.
+			 => on the NEC, auto detection (of option RAM) fails with the original V20 patch (above, left)
+			    Expect RAM related system crashes after swapping CPUs and altering physical RAM _afterwards_.
+				Hard coded CPU loops are to blame. Try values from the alternate patch (right). 
+			 => AAD/AAM - Intel 8088 honors the second byte (operand), NEC V20 ignores it and always uses base 0Ah (10). 
+			 => UNDOCUMENTED: NEC V20 does not have "POP CS" (opcode 0F). There are more differences (opcode D6; the 2 byte POP: 8F Cx; FF Fx instructions)
+			    Commercial programs had to be patched back then (as was the case with Loderunner for PC).
+			 => NEW OPCODES: REPC, REPNC, CHKIND, PREPARE, DISPOSE; BCD string operations (ADD4S, CMP4S, SUB4S), bit-ops (NOT, SET, TEST, ROL4, ROR4)
+			    WARNING: undoc'd opcodes, INS, EXT and 8080 behaviour are unemulated yet! MESS' CPU source has up-to-date info. 
 
     Meaning of Diagnostics LEDs (from PC100ESV1.PDF found, e.g.,
     on ftp://ftp.update.uu.se/pub/rainbow/doc/rainbow-docs/
@@ -95,9 +111,9 @@ PCB # 5416206 / 5016205-01C1:
         7-6-5-4 |3-2-1
         DIAGNOSTIC-LEDs |J3   | |J2     | |J1    |
 |------|----8088|Z80-|--|VIDEO|-|PRINTER|-|SERIAL|---|
-|  2 x 64 K             |/KBD.|                      |
-|  R  A  M             NEC D7201C            |P|[W90]|
-|                                            |O|     |
+|  2 x 64 K             |/KBD.|                 !!!!!|
+|  R  A  M             NEC D7201C            |P|!W90!|
+|                                            |O|!!!!!|
 |   [W6]   ROM 1       INTEL 8088            |W|     |
 |          (23-020e5-00)                     |E|     |
 |                                            |R|     |
@@ -119,17 +135,34 @@ NOTES
 W5 + W6 are out when 16K x 8 EPROMS are used  
 / W5 + W6 installed => 32 K x 8 EPROMs (pin 27 = A14)
 
-W13, W14, W15, W18, W90 = for manufacturing tests.
+W13, W14, W15, W18 = for manufacturing tests.
 => W13 - W15 affect diagnostic read register (port $0a)
 => W18 pulls DSR to ground and affects 8251A - port $11 (bit 7)
-   NOTE: THERE IS NO CODE TO PULL DSR YET.
-=> W90 connects pin 2 (Voltage Bias on PWR connector J8) with the communications control register 
-(SH1 - IOWR4 L line according to page 21 of the DEC-100-B field manual)
 
-SEEN ON SCHEMATICS - NOT PRESENT ON THIS PCB:
-W16 pulls J2 printer port pin 1 to GND when set (otherwise pin unconnected)
-W17 pulls J1 serial  port pin 1 to GND when set (otherwise pin unconnected)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! DO NOT SHORT JUMPER / CONNECTOR [W90] ON LIVE HARDWARE  !! 
+!!                                                         !!   
+!! WARNING:  CIRCUIT DAMAGE could occur if this jumper is  !!
+!! set by end users.        See PDF document AA-V523A-TV.  !! 
+!!                                                         !!   
+!! W90 connects to pin 2 (Voltage Bias on PWR connector J8)!! 
+!! and is designed FOR ===> FACTORY TESTS OF THE PSU <===  !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+WIRE CONNECTORS - SEEN ON SCHEMATICS - NOT PRESENT ON DEC-100 B (-A only?):
+W16 pulls J2 printer port pin 1 to GND when set (chassis to logical GND).
+W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 ****************************************************************************/
+
+/*
+HARD DISC SIZES AND LIMITS
+  HARDWARE: the Rainbow winchester controller has a built-in limit of 8 heads and 1024 cylinders (67 MB). Standard geometry is 4 surfaces.
+
+  SOFTWARE: the original DEC boot loader (and FDISK from DOS 3.10) initially allowed a maximum hard disc size of 20 MB. 
+  - DOS 3 has a 1024 cylinder limit (32 MB). 
+  - the custom boot loader that comes with 'WUTIL 3.2' stretches limits to 117 MB and 8 surfaces.
+*/
+
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -144,8 +177,6 @@ W17 pulls J1 serial  port pin 1 to GND when set (otherwise pin unconnected)
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-21
 
-#define DEC_B_NVMEM_SIZE (256)
-
 class rainbow_state : public driver_device
 {
 public:
@@ -159,6 +190,7 @@ public:
 			m_inp6(*this, "FLOPPY CONTROLLER"),
 			m_inp7(*this, "GRAPHICS OPTION"),
 			m_inp8(*this, "MEMORY PRESENT"),
+			m_inp9(*this, "MONITOR TYPE"),
 
 		m_beep(*this, "beeper"),
 		m_crtc(*this, "vt100_video"),
@@ -183,6 +215,7 @@ public:
 	required_ioport m_inp6;
 	required_ioport m_inp7;
 	required_ioport m_inp8;
+	required_ioport m_inp9;
 
 	required_device<beep_device> m_beep;
 
@@ -231,13 +264,14 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_diskcontrol_write_w);
 	DECLARE_READ8_MEMBER(system_parameter_r);
 
+	DECLARE_READ_LINE_MEMBER(dsr_r);
+
 	DECLARE_READ_LINE_MEMBER(kbd_rx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
 
 	bool m_SCREEN_BLANK;
-	bool m_COLDBOOT;
 
 	bool m_zflip;                   // Z80 alternate memory map with A15 inverted
 	bool m_z80_halted;
@@ -246,12 +280,15 @@ public:
 	int m_KBD;
 	int m_beep_counter;
 
+	int MHFU_counter;
+
 private:
 	UINT8 m_z80_private[0x800];     // Z80 private 2K
 	UINT8 m_z80_mailbox, m_8088_mailbox;
 
 	void update_kbd_irq();
 	virtual void machine_reset();
+	void MHFU_reset();
 public:
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -262,7 +299,6 @@ public:
 void rainbow_state::machine_start()
 {  
 	m_SCREEN_BLANK = false;
-	m_COLDBOOT = true;
 
 	save_item(NAME(m_z80_private));
 	save_item(NAME(m_z80_mailbox));
@@ -315,11 +351,11 @@ static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	//  - PC-100 A might have had a smaller (NV-)RAM (*)
 	//  - ED000 - ED0FF is the area the _DEC-100-B BIOS_ accesses - and checks.
 
-	//  - Specs claim that the CPU has direct access to volatile RAM only.
+	//  - Specs say that the CPU has direct access to volatile RAM only.
 	//    So NVRAM is hidden now and loads & saves are triggered within the 
-	//    'diagnostic_w' handler (like on real hardware).
+	//    'diagnostic_w' handler (similar to real hardware).
 
-	//  - Address bits 8-12 are ignored (-> AM_MIRROR). Remove for debugging.
+	//  - Address bits 8-12 are ignored (-> AM_MIRROR). 
 	AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00) 
 	AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram") 
 
@@ -341,8 +377,9 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	AM_RANGE (0x08, 0x08) AM_READ(system_parameter_r)
 
 	AM_RANGE (0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
-	// 0x0C Video processor DC012
-	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
+
+	// 0x0C Video processor DC012 
+	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w) 
 
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("kbdser", i8251_device, data_r, data_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w)
@@ -371,12 +408,28 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( rainbow )
+		PORT_START("MONITOR TYPE")
+		PORT_DIPNAME( 0x03, 0x03, "MONOCHROME MONITOR") 
+		PORT_DIPSETTING(    0x01, "PAPER WHITE" )
+		PORT_DIPSETTING(    0x02, "GREEN" )
+		PORT_DIPSETTING(    0x03, "AMBER" )
+
 		PORT_START("FLOPPY CONTROLLER")
 		PORT_DIPNAME( 0x02, 0x02, "FLOPPY CONTROLLER") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 
-	PORT_START("MEMORY PRESENT")
+		PORT_START("GRAPHICS OPTION")
+		PORT_DIPNAME( 0x00, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+
+		PORT_START("BUNDLE OPTION")
+		PORT_DIPNAME( 0x00, 0x00, "BUNDLE OPTION") PORT_TOGGLE
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+
+		PORT_START("MEMORY PRESENT")
 		PORT_DIPNAME( 0xF000, 0x2000, "MEMORY PRESENT")
 		PORT_DIPSETTING(    0x2000, "128 K (BOARD DEFAULT)" ) // NOTE: 0x2000 hard coded in 'system_parameter_r'
 		PORT_DIPSETTING(    0x3000, "192 K (MEMORY OPTION)" )
@@ -392,36 +445,35 @@ static INPUT_PORTS_START( rainbow )
 		PORT_DIPSETTING(    0xD000, "832 K (MEMORY OPTION)" )
 		PORT_DIPSETTING(    0xE000, "896 K (MEMORY OPTION)" )
 
-		PORT_START("GRAPHICS OPTION")
-		PORT_DIPNAME( 0x00, 0x00, "GRAPHICS OPTION") PORT_TOGGLE
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-		PORT_START("BUNDLE OPTION")
-		PORT_DIPNAME( 0x00, 0x00, "BUNDLE OPTION") PORT_TOGGLE
-		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-
 	PORT_START("W13")
-		PORT_DIPNAME( 0x02, 0x02, "W13") PORT_TOGGLE
+		PORT_DIPNAME( 0x02, 0x02, "W13 (FACTORY TEST A, LEAVE OFF)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("W14")
-		PORT_DIPNAME( 0x04, 0x04, "W14") PORT_TOGGLE
+		PORT_DIPNAME( 0x04, 0x04, "W14 (FACTORY TEST B, LEAVE OFF)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("W15")
-		PORT_DIPNAME( 0x08, 0x08, "W15") PORT_TOGGLE
+		PORT_DIPNAME( 0x08, 0x08, "W15 (FACTORY TEST C, LEAVE OFF)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    // DSR = 1 when switch is OFF - see i8251.c (status_r) 
 	PORT_START("W18")
-		PORT_DIPNAME( 0x00, 0x04, "W18") PORT_TOGGLE
-		PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+		PORT_DIPNAME( 0x01, 0x00, "W18 (FACTORY TEST D, LEAVE OFF) (8251A: DSR)") PORT_TOGGLE 
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
+void rainbow_state::MHFU_reset()
+{
+	MHFU_counter = 530; // 528 = 110ms 
+}
+
 void rainbow_state::machine_reset()
 {
+	MHFU_reset();
+
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	m_zflip = true;
@@ -454,15 +506,24 @@ void rainbow_state::machine_reset()
 
 UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_SCREEN_BLANK)
-		bitmap.fill(get_black_pen(machine()), cliprect);
- 	else 
-		m_crtc->video_update(bitmap, cliprect);
+	m_crtc->palette_select( m_inp9->read() );
+
+	if ( m_SCREEN_BLANK )
+		 m_crtc->video_blanking(bitmap, cliprect);
+	else 
+		 m_crtc->video_update(bitmap, cliprect);
 	return 0;
 }
 
-// Simulate floating bus for initial RAM detection in low ROM.
-// WANTED: is a cleaner, more compatible way feasible?
+// It is no longer possible to key in the RAM size on the 100-B.
+// The DEC-100-B boot ROM probes until a 'flaky' area is found (around F400:xxxx).
+
+// Unexpected low RAM sizes are an indication of option RAM (at worst: 128 K on board) failure.
+// While motherboard errors often render the system unbootable, bad option RAM (> 128 K)
+// can be narrowed down with a diagnostic disk and codes from the 'Pocket Service Guide' 
+// EK-PC100-PS-002 (APPENDIX B.2.2); pc100ps2.pdf
+
+// Simulate floating bus for initial RAM detection:
 READ8_MEMBER(rainbow_state::floating_bus_r)
 {
 	if ( m_maincpu->state_int(I8086_CS) != 0xF400)
@@ -555,17 +616,15 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 }
 
 READ8_MEMBER(rainbow_state::comm_control_r)
-{
-	// Our simple COLDBOOT flag is adequate for the initial MHFU test (at BIOS location 00A8).
-
-	// TODO: on real hardware, MHFU detection is disabled BY WRITING TO 0x10c (=> BIOS assumes power-up reset)
-	//       MHFU is enabled by writing to 0x0c.
-	if (m_COLDBOOT)
-	{    m_COLDBOOT = 0;
-		return ( 0x20 );  // bit 5 = watchdog detect.
-	} else {
-		return ( 0x00 );  // ERROR 16 is displayed = watchdog triggered
-	}
+{ 
+/*
+--> What the specs says on how MHFU detection is disabled:
+	//  1.  by first disabling interrupts with CLI
+	//  2.  by writing 0x00 to port 0x10C (handled by 'dc012_w' in vtvideo) 
+	// (3.) MHFU is re-enabled by writing to 0x0c (or automatically after STI - when under BIOS control ?)
+*/
+		return (  ( m_crtc->dc012_MHFU() << 5)  // shift status of DC012 - MHFU flag to bit pos.5
+			   );  
 }
 
 WRITE8_MEMBER(rainbow_state::comm_control_w)
@@ -713,6 +772,8 @@ READ8_MEMBER( rainbow_state::read_video_ram_r )
 INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 {
 	device.execute().set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x20);
+
+	MHFU_reset();
 }
 
 WRITE8_MEMBER( rainbow_state::clear_video_interrupt )
@@ -766,6 +827,11 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 }
 
 
+READ_LINE_MEMBER(rainbow_state::dsr_r)
+{
+	return m_inp4->read(); // W18 (1/0)
+}
+
 // KEYBOARD
 void rainbow_state::update_kbd_irq()
 {
@@ -809,6 +875,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 {
 	m_kbd8251->transmit_clock();
 	m_kbd8251->receive_clock();
+
+	if ( m_crtc->dc012_MHFU() ) // MHFU ENABLED?
+    {	
+				if (MHFU_counter) 
+					MHFU_counter--;
+
+			    if (MHFU_counter == 1) // resets ONCE.
+				{
+						printf("*** CPU RESET: MASSIVE HARDWARE FAILURE DETECTED (MHFU LOGIC ~108 ms)\n");
+						m_i8088->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				} 
+	}
 
 	if (m_beep_counter > 1)
 			m_beep_counter--;
@@ -870,7 +948,7 @@ static const i8251_interface i8251_intf =
 {
 	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_rx),         // rxd in
 	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_tx),         // txd out
-	DEVCB_NULL,         // dsr
+	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, dsr_r),       // dsr
 	DEVCB_NULL,         // dtr
 	DEVCB_NULL,         // rts
 	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_rxready_w),
@@ -897,11 +975,11 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(132*10, 49*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*10-1, 0, 25*10-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 80 * 10-1, 0, 24 * 10-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 	MCFG_GFXDECODE(rainbow)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_amber)
+	MCFG_PALETTE_LENGTH(4)
+
 	MCFG_RAINBOW_VIDEO_ADD("vt100_video", video_interface)
 
 		/* sound hardware */
