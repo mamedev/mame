@@ -50,8 +50,10 @@ void alto2_cpu_device::f2_late_load_csr()
 	m_dsp.csr = m_bus;
 	LOG((LOG_CURT, m_dsp.csr ? 2 : 9,"	CSR← BUS (%#o)\n", m_dsp.csr));
 	int x = 01777 - m_dsp.xpreg;
-	m_dsp.curdata = m_dsp.csr << (16 - (x & 15));
-	m_dsp.curword = x / 16;
+	UINT32 bits = m_bus;
+	m_dsp.cursor0 = static_cast<UINT16>((bits << (16 - (x & 15))) >> 16);
+	m_dsp.cursor1 = static_cast<UINT16>(bits << (16 - (x & 15)));
+	m_dsp.curxpos = x / 16;
 }
 
 /**
@@ -82,6 +84,6 @@ void alto2_cpu_device::reset_curt()
 	m_dsp.curt_blocks = false;
 	m_dsp.xpreg = 0;
 	m_dsp.csr = 0;
-	m_dsp.curdata = 0;
-	m_dsp.curword = 0;
+	m_dsp.curxpos = 0;
+	m_dsp.cursor0 = m_dsp.cursor1 = 0;
 }

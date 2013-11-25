@@ -174,17 +174,16 @@
 #ifndef _A2DISP_H_
 #define _A2DISP_H_
 struct {
-	UINT8 state;						//!< current state of the display_state_machine()
+	UINT16 state;						//!< current state of the display_state_machine()
 	UINT16 hlc;							//!< horizontal line counter
-	UINT8 a63;							//!< most recent value read from the PROM a63
-	UINT8 a66;							//!< most recent value read from the PROM a66
 	UINT16 setmode;						//!< value written by last SETMODE<-
 	UINT16 inverse;						//!< set to 0xffff if line is inverse, 0x0000 otherwise
-	UINT8 halfclock;					//!< set 0 for normal pixel clock, 1 for half pixel clock
-	UINT8 clr;							//!< set non-zero if any of VBLANK or HBLANK is active (a39a 74S08)
+	bool halfclock;						//!< set 0 for normal pixel clock, 1 for half pixel clock
 	UINT16 fifo[ALTO2_DISPLAY_FIFO];	//!< display word fifo
-	UINT8 fifo_wr;						//!< fifo input pointer (4-bit)
-	UINT8 fifo_rd;						//!< fifo output pointer (4-bit)
+	UINT8 wa;							//!< fifo input pointer (write address; 4-bit)
+	UINT8 ra;							//!< fifo output pointer (read address; 4-bit)
+	UINT8 a63;							//!< most recent value read from the PROM a63
+	UINT8 a66;							//!< most recent value read from the PROM a66
 	bool dht_blocks;					//!< set non-zero, if the DHT executed BLOCK
 	bool dwt_blocks;					//!< set non-zero, if the DWT executed BLOCK
 	bool curt_blocks;					//!< set non-zero, if the CURT executed BLOCK
@@ -192,8 +191,9 @@ struct {
 	UINT16 vblank;						//!< most recent HLC with VBLANK still high (11-bit)
 	UINT16 xpreg;						//!< cursor cursor x position register (10-bit)
 	UINT16 csr;							//!< cursor shift register (16-bit)
-	UINT32 curword;						//!< helper: first cursor word in current scanline
-	UINT32 curdata;						//!< helper: shifted cursor data (32-bit)
+	UINT32 curxpos;						//!< helper: first cursor word in scanline
+	UINT16 cursor0;						//!< helper: shifted cursor data for left word
+	UINT16 cursor1;						//!< helper: shifted cursor data for right word
 	UINT16 *raw_bitmap;					//!< array of words of the raw bitmap that is displayed
 	UINT8 **scanline;					//!< array of scanlines with 1 byte per pixel
 	bitmap_ind16 *bitmap;				//!< MAME bitmap with 16 bit indices
@@ -286,7 +286,7 @@ enum {
 	disp_a66_VBLANK_EVEN	= (1 << 3)		//!< Q4 (010) is VBLANK for the even field (with H1024=0)
 };
 
-void update_bitmap_word(int x, int y, UINT16 word);	//!< update a word in the screen bitmap
+void update_bitmap_word(UINT16* bitmap, int x, int y, UINT16 word);	//!< update a word in the screen bitmap
 void unload_word();					//!< unload the next word from the display FIFO and shift it to the screen
 void display_state_machine();		//!< function called by the CPU to enter the next display state
 

@@ -226,28 +226,6 @@ static const UINT16 double_bits[256] = {
 	0xffc0,0xffc3,0xffcc,0xffcf,0xfff0,0xfff3,0xfffc,0xffff
 };
 
-//! update the internal bitmap to a byte array
-void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
-{
-	UINT8* pix = m_dsp.scanline[y] + x;
-	*pix++ = (word >> 15) & 1;
-	*pix++ = (word >> 14) & 1;
-	*pix++ = (word >> 13) & 1;
-	*pix++ = (word >> 12) & 1;
-	*pix++ = (word >> 11) & 1;
-	*pix++ = (word >> 10) & 1;
-	*pix++ = (word >>  9) & 1;
-	*pix++ = (word >>  8) & 1;
-	*pix++ = (word >>  7) & 1;
-	*pix++ = (word >>  6) & 1;
-	*pix++ = (word >>  5) & 1;
-	*pix++ = (word >>  4) & 1;
-	*pix++ = (word >>  3) & 1;
-	*pix++ = (word >>  2) & 1;
-	*pix++ = (word >>  1) & 1;
-	*pix++ = (word >>  0) & 1;
-}
-
 #define	HLC1	((m_dsp.hlc >>  0) & 1)		//!< horizontal line counter bit 0 (mid of the scanline)
 #define	HLC2	((m_dsp.hlc >>  1) & 1)		//!< horizontal line counter bit 1
 #define	HLC4	((m_dsp.hlc >>  2) & 1)		//!< horizontal line counter bit 2
@@ -266,6 +244,36 @@ void alto2_cpu_device::update_bitmap_word(int x, int y, UINT16 word)
 //!< helper to extract A3-A0 from a PROM a63 value
 #define A63_NEXT(n) ((n >> 2) & 017)
 
+//! update the internal bitmap to a byte array
+void alto2_cpu_device::update_bitmap_word(UINT16* bitmap, int x, int y, UINT16 word)
+{
+	/* mixing with the cursor */
+	if (x == m_dsp.curxpos + 0)
+		word ^= m_dsp.cursor0;
+	if (x == m_dsp.curxpos + 1)
+		word ^= m_dsp.cursor1;
+	if (word == bitmap[x])
+		return;
+	bitmap[x] = word;
+	UINT8* pix = m_dsp.scanline[y] + x * 16;
+	*pix++ = (word >> 15) & 1;
+	*pix++ = (word >> 14) & 1;
+	*pix++ = (word >> 13) & 1;
+	*pix++ = (word >> 12) & 1;
+	*pix++ = (word >> 11) & 1;
+	*pix++ = (word >> 10) & 1;
+	*pix++ = (word >>  9) & 1;
+	*pix++ = (word >>  8) & 1;
+	*pix++ = (word >>  7) & 1;
+	*pix++ = (word >>  6) & 1;
+	*pix++ = (word >>  5) & 1;
+	*pix++ = (word >>  4) & 1;
+	*pix++ = (word >>  3) & 1;
+	*pix++ = (word >>  2) & 1;
+	*pix++ = (word >>  1) & 1;
+	*pix++ = (word >>  0) & 1;
+}
+
 /**
  * @brief unload the next word from the display FIFO and shift it to the screen
  */
@@ -279,64 +287,37 @@ void alto2_cpu_device::unload_word()
 		m_unload_time = -1;
 		return;
 	}
-	UINT16* scanline = m_dsp.raw_bitmap  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
-	UINT32 word = m_dsp.inverse;
-	UINT8 a38 = m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr];
+	UINT16* bitmap = m_dsp.raw_bitmap  + y * ALTO2_DISPLAY_SCANLINE_WORDS;
+	UINT16 word = m_dsp.inverse;
+	UINT8 a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
 	if (FIFO_MBEMPTY(a38))
 	{
 		LOG((LOG_DISPL,1, "	DSP FIFO underrun y:%d x:%d\n", y, x));
 	}
 	else
 	{
-		word ^= m_dsp.fifo[m_dsp.fifo_rd];
-		m_dsp.fifo_rd = (m_dsp.fifo_rd + 1) % ALTO2_DISPLAY_FIFO;
+		word ^= m_dsp.fifo[m_dsp.ra];
+		m_dsp.ra = (m_dsp.ra + 1) % ALTO2_DISPLAY_FIFO;
 		LOG((LOG_DISPL,3, "	DSP pull %04x from FIFO[%02o] y:%d x:%d\n",
-			 word, (m_dsp.fifo_rd - 1) & (ALTO2_DISPLAY_FIFO - 1), y, x));
+			 word, (m_dsp.ra - 1) & (ALTO2_DISPLAY_FIFO - 1), y, x));
 	}
 
 	if (m_dsp.halfclock)
 	{
 		UINT16 word1 = double_bits[word / 256];
 		UINT16 word2 = double_bits[word % 256];
-		/* mixing with the cursor */
-		if (x == m_dsp.curword + 0)
-			word1 ^= m_dsp.curdata >> 16;
-		if (x == m_dsp.curword + 1)
-			word1 ^= m_dsp.curdata & 0177777;
-		if (word1 != scanline[x])
-		{
-			scanline[x] = word1;
-			update_bitmap_word(16 * x, y, word1);
-		}
+		update_bitmap_word(bitmap, x, y, word1);
 		x++;
 		if (x < ALTO2_DISPLAY_VISIBLE_WORDS)
 		{
-			/* mixing with the cursor */
-			if (x == m_dsp.curword + 0)
-				word2 ^= m_dsp.curdata >> 16;
-			if (x == m_dsp.curword + 1)
-				word2 ^= m_dsp.curdata & 0177777;
-			if (word2 != scanline[x])
-			{
-				scanline[x] = word2;
-				update_bitmap_word(16 * x, y, word2);
-			}
+			update_bitmap_word(bitmap, x, y, word2);
 			x++;
 		}
 		m_unload_time += ALTO2_DISPLAY_BITTIME(32);
 	}
 	else
 	{
-		/* mixing with the cursor */
-		if (x == m_dsp.curword + 0)
-			word ^= m_dsp.curdata >> 16;
-		if (x == m_dsp.curword + 1)
-			word ^= m_dsp.curdata & 0177777;
-		if (word != scanline[x])
-		{
-			scanline[x] = word;
-			update_bitmap_word(16 * x, y, word);
-		}
+		update_bitmap_word(bitmap, x, y, word);
 		x++;
 		m_unload_time += ALTO2_DISPLAY_BITTIME(16);
 	}
@@ -445,7 +426,7 @@ void alto2_cpu_device::display_state_machine()
 	 * if DHT is not blocked, and if the buffer is not full, DWT wakeups
 	 * are generated.
 	 */
-	UINT8 a38 = m_disp_a38[m_dsp.fifo_rd * 16 + m_dsp.fifo_wr];
+	UINT8 a38 = m_disp_a38[m_dsp.ra * 16 + m_dsp.wa];
 	if (!m_dsp.dwt_blocks && !m_dsp.dht_blocks && !FIFO_STOPWAKE(a38))
 	{
 		m_task_wakeup |= 1 << task_dwt;
@@ -473,12 +454,12 @@ void alto2_cpu_device::display_state_machine()
 			 * flip-flop at the beginning of horizontal retrace for
 			 * every scanline.
 			 */
-			m_dsp.fifo_wr = 0;
-			m_dsp.fifo_rd = 0;
+			m_dsp.wa = 0;
+			m_dsp.ra = 0;
 			m_dsp.dwt_blocks = false;
 			// now take the new values from the last SETMODE←
 			m_dsp.inverse = GET_SETMODE_INVERSE(m_dsp.setmode) ? 0xffff : 0x0000;
-			m_dsp.halfclock = GET_SETMODE_SPEEDY(m_dsp.setmode);
+			m_dsp.halfclock = GET_SETMODE_SPEEDY(m_dsp.setmode) ? true : false;
 			// stop the CPU execution loop from calling unload_word()
 			m_unload_time = -1;
 		}
@@ -532,16 +513,16 @@ void alto2_cpu_device::f2_late_evenfield()
 void alto2_cpu_device::init_disp()
 {
 	memset(&m_dsp, 0, sizeof(m_dsp));
+	save_item(NAME(m_dsp.state));
 	save_item(NAME(m_dsp.hlc));
-	save_item(NAME(m_dsp.a63));
-	save_item(NAME(m_dsp.a66));
 	save_item(NAME(m_dsp.setmode));
 	save_item(NAME(m_dsp.inverse));
 	save_item(NAME(m_dsp.halfclock));
-	save_item(NAME(m_dsp.clr));
 	save_item(NAME(m_dsp.fifo));
-	save_item(NAME(m_dsp.fifo_wr));
-	save_item(NAME(m_dsp.fifo_rd));
+	save_item(NAME(m_dsp.wa));
+	save_item(NAME(m_dsp.ra));
+	save_item(NAME(m_dsp.a63));
+	save_item(NAME(m_dsp.a66));
 	save_item(NAME(m_dsp.dht_blocks));
 	save_item(NAME(m_dsp.dwt_blocks));
 	save_item(NAME(m_dsp.curt_blocks));
@@ -549,8 +530,9 @@ void alto2_cpu_device::init_disp()
 	save_item(NAME(m_dsp.vblank));
 	save_item(NAME(m_dsp.xpreg));
 	save_item(NAME(m_dsp.csr));
-	save_item(NAME(m_dsp.curword));
-	save_item(NAME(m_dsp.curdata));
+	save_item(NAME(m_dsp.curxpos));
+	save_item(NAME(m_dsp.cursor0));
+	save_item(NAME(m_dsp.cursor1));
 
 	m_disp_a38 = prom_load(machine(), &pl_displ_a38, memregion("displ_a38")->base());
 	m_disp_a63 = prom_load(machine(), &pl_displ_a63, memregion("displ_a63")->base());
@@ -580,10 +562,9 @@ void alto2_cpu_device::reset_disp()
 	m_dsp.a66 = 0;
 	m_dsp.setmode = 0;
 	m_dsp.inverse = 0;
-	m_dsp.halfclock = 0;
-	m_dsp.clr = 0;
-	m_dsp.fifo_wr = 0;
-	m_dsp.fifo_rd = 0;
+	m_dsp.halfclock = false;
+	m_dsp.wa = 0;
+	m_dsp.ra = 0;
 	m_dsp.dht_blocks = false;
 	m_dsp.dwt_blocks = false;
 	m_dsp.curt_blocks = false;
@@ -591,8 +572,9 @@ void alto2_cpu_device::reset_disp()
 	m_dsp.vblank = 0;
 	m_dsp.xpreg = 0;
 	m_dsp.csr = 0;
-	m_dsp.curword = 0;
-	m_dsp.curdata = 0;
+	m_dsp.curxpos = 0;
+	m_dsp.cursor0 = 0;
+	m_dsp.cursor1 = 0;
 	memset(m_dsp.raw_bitmap, 0, sizeof(UINT16) * ALTO2_DISPLAY_HEIGHT * ALTO2_DISPLAY_SCANLINE_WORDS);
 	for (int y = 0; y < ALTO2_DISPLAY_HEIGHT; y++)
 		memset(m_dsp.scanline[y], 0, sizeof(UINT8) * ALTO2_DISPLAY_TOTAL_WIDTH);

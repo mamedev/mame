@@ -877,7 +877,6 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_ether_enable));
 	save_item(NAME(m_ewfct));
 	save_item(NAME(m_dsp_time));
-	save_item(NAME(m_dsp.state));
 	save_item(NAME(m_unload_time));
 	save_item(NAME(m_unload_word));
 #if	(USE_BITCLK_TIMER == 0)
