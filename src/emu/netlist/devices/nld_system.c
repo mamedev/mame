@@ -12,7 +12,7 @@
 NETLIB_START(ttl_const)
 {
     register_output("Q", m_Q);
-    register_param("CONST", m_const, 0.0);
+    register_param("CONST", m_const, 0);
 }
 
 NETLIB_UPDATE(ttl_const)
@@ -21,7 +21,7 @@ NETLIB_UPDATE(ttl_const)
 
 NETLIB_UPDATE_PARAM(ttl_const)
 {
-    OUTLOGIC(m_Q, m_const.ValueInt(), NLTIME_IMMEDIATE);
+    OUTLOGIC(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
 }
 
 NETLIB_START(analog_const)
@@ -59,7 +59,7 @@ NETLIB_START(clock)
     register_output("Q", m_Q);
     //register_input("FB", m_feedback);
 
-    register_param("FREQ", m_freq, 7159000.0 * 5);
+    register_param("FREQ", m_freq, 7159000.0 * 5.0);
     m_inc = netlist_time::from_hz(m_freq.Value()*2);
 
     register_link_internal(m_feedback, m_Q, netlist_input_t::STATE_INP_ACTIVE);
@@ -85,7 +85,7 @@ NETLIB_START(solver)
     register_output("Q", m_Q);
     //register_input("FB", m_feedback);
 
-    register_param("FREQ", m_freq, 50000);
+    register_param("FREQ", m_freq, 50000.0);
     m_inc = netlist_time::from_hz(m_freq.Value());
 
     register_link_internal(m_feedback, m_Q, netlist_input_t::STATE_INP_ACTIVE);

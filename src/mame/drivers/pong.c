@@ -465,12 +465,12 @@ static NETLIST_START(pong_schematics)
 	NETDEV_PARAM(videomix.R2, RES_K(1.2))
 	NETDEV_PARAM(videomix.R3, RES_K(22))
 
-#if 0
     NETDEV_SOLVER(Solver)
     NETDEV_ANALOG_CONST(V5, 5)
     NETDEV_ANALOG_CONST(V1, 1)
     NETDEV_ANALOG_CONST(V0, 0)
 
+#if 0
     NETDEV_R(R1, 10)
     NETDEV_R(R2, 10)
     NETDEV_R(R3, 10)
@@ -516,7 +516,7 @@ static NETLIST_START(pong_schematics)
     //NETDEV_LOG(log1, D1.A)
 #endif
 
-#if 0
+#if 1
     // astable NAND Multivibrator
     NETDEV_R(R1, 1000)
     NETDEV_C(C1, 1e-6)
@@ -583,10 +583,10 @@ public:
 	netlist_mame_device::required_output<netlist_logic_output_t> m_srst;
 	netlist_mame_device::required_output<netlist_analog_output_t> m_p_V0;
 	netlist_mame_device::required_output<netlist_analog_output_t> m_p_V1;
-	netlist_mame_device::required_param m_sw1a;
-	netlist_mame_device::required_param m_sw1b;
-	netlist_mame_device::required_param m_p_R0;
-	netlist_mame_device::required_param m_p_R1;
+	netlist_mame_device::required_param<netlist_param_int_t> m_sw1a;
+	netlist_mame_device::required_param<netlist_param_int_t> m_sw1b;
+	netlist_mame_device::required_param<netlist_param_double_t> m_p_R0;
+	netlist_mame_device::required_param<netlist_param_double_t> m_p_R1;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

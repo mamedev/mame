@@ -167,11 +167,30 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
                 const pstring val = m_params_temp.find(temp);
                 if (val != "")
                 {
-                    //printf("Found parameter ... %s : %s\n", temp.cstr(), val->cstr());
-                    double vald = 0;
-                    if (sscanf(val.cstr(), "%lf", &vald) != 1)
-                        fatalerror("Invalid number conversion %s : %s\n", temp.cstr(), val.cstr());
-                    param.initial(vald);
+                    switch (param.param_type())
+                    {
+                        case netlist_param_t::DOUBLE:
+                        {
+                            //printf("Found parameter ... %s : %s\n", temp.cstr(), val->cstr());
+                            double vald = 0;
+                            if (sscanf(val.cstr(), "%lf", &vald) != 1)
+                                fatalerror("Invalid number conversion %s : %s\n", temp.cstr(), val.cstr());
+                            dynamic_cast<netlist_param_double_t &>(param).initial(vald);
+                        }
+                        break;
+                        case netlist_param_t::INTEGER:
+                        case netlist_param_t::LOGIC:
+                        {
+                            //printf("Found parameter ... %s : %s\n", temp.cstr(), val->cstr());
+                            int vald = 0;
+                            if (sscanf(val.cstr(), "%d", &vald) != 1)
+                                fatalerror("Invalid number conversion %s : %s\n", temp.cstr(), val.cstr());
+                            dynamic_cast<netlist_param_int_t &>(param).initial(vald);
+                        }
+                        break;
+                        default:
+                            fatalerror("Parameter is not supported %s : %s\n", temp.cstr(), val.cstr());
+                    }
                 }
                 if (!(m_params.add(temp, &param, false)==TMERR_NONE))
                     fatalerror("Error adding parameter %s to parameter list\n", name.cstr());

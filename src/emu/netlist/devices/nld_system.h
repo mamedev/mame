@@ -57,12 +57,12 @@
 
 NETLIB_DEVICE_WITH_PARAMS(ttl_const,
 	netlist_ttl_output_t m_Q;
-	netlist_param_t m_const;
+	netlist_param_logic_t m_const;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(analog_const,
 	netlist_analog_output_t m_Q;
-	netlist_param_t m_const;
+	netlist_param_double_t m_const;
 );
 
 // ----------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ NETLIB_DEVICE_WITH_PARAMS(mainclock,
 public:
     netlist_ttl_output_t m_Q;
 
-	netlist_param_t m_freq;
+	netlist_param_double_t m_freq;
 	netlist_time m_inc;
 
 	ATTR_HOT inline static void mc_update(netlist_net_t &net, const netlist_time curtime);
@@ -87,7 +87,7 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
     netlist_ttl_input_t m_feedback;
     netlist_ttl_output_t m_Q;
 
-    netlist_param_t m_freq;
+    netlist_param_double_t m_freq;
     netlist_time m_inc;
 );
 
@@ -102,7 +102,7 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
         netlist_ttl_input_t m_feedback;
         netlist_ttl_output_t m_Q;
 
-        netlist_param_t m_freq;
+        netlist_param_double_t m_freq;
 
         netlist_time m_inc;
         netlist_time m_last_step;
@@ -206,7 +206,7 @@ public:
     {
     }
 
-    netlist_param_t m_R;
+    netlist_param_double_t m_R;
 
 protected:
     void start()
@@ -233,7 +233,7 @@ public:
     {
     }
 
-    netlist_param_t m_C;
+    netlist_param_double_t m_C;
 
 protected:
     void start()
@@ -266,9 +266,9 @@ public:
     {
     }
 
-    netlist_param_t m_Vt;
-    netlist_param_t m_Is;
-    netlist_param_t m_Rmin;
+    netlist_param_double_t m_Vt;
+    netlist_param_double_t m_Is;
+    netlist_param_double_t m_Rmin;
 
     double m_VtInv;
     double m_Vcrit;

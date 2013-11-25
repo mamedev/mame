@@ -93,7 +93,7 @@ NETLIB_START(nicMultiSwitch)
 		m_low.net().register_con(m_I[i]);
 		//m_I[i].set_net(m_low.m_net);
 	}
-	register_param("POS", m_POS);
+	register_param("POS", m_POS, 0);
 	register_output("Q", m_Q);
 
 	m_variable_input_count = true;
@@ -107,7 +107,7 @@ NETLIB_UPDATE(nicMultiSwitch)
 
 NETLIB_UPDATE_PARAM(nicMultiSwitch)
 {
-	m_position = m_POS.ValueInt();
+	m_position = m_POS.Value();
 	//update();
 }
 
@@ -189,8 +189,8 @@ NETLIB_START(nicNE555N_MSTABLE)
 	register_input("CV", m_CV);
 
 	register_output("Q", m_Q);
-	register_param("R", m_R);
-	register_param("C", m_C);
+	register_param("R", m_R, 0.0);
+	register_param("C", m_C, 0.0);
 	register_param("VS", m_VS, 5.0);
 	register_param("VL", m_VL, 0.0 *5.0);
 

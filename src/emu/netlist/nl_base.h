@@ -714,8 +714,14 @@ protected:
 	virtual void update() { }
 	virtual void start() { }
 
-	ATTR_COLD void register_param(const pstring &sname, netlist_param_t &param, const double initialVal = 0.0);
-	ATTR_COLD void register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_t &param, const double initialVal = 0.0);
+    template <class C, class T>
+	ATTR_COLD void register_param(const pstring &sname, C &param, const T initialVal)
+	{
+	    register_param(*this, sname, param, initialVal);
+	}
+
+	template <class C, class T>
+    ATTR_COLD void register_param(netlist_core_device_t &dev, const pstring &sname, C &param, const T initialVal);
 
 	netlist_setup_t *m_setup;
 	bool m_variable_input_count;
@@ -726,29 +732,70 @@ private:
 class netlist_param_t : public netlist_object_t
 {
 public:
-	netlist_param_t()
+
+    enum param_type_t {
+        STRING,
+        DOUBLE,
+        INTEGER,
+        LOGIC
+    };
+
+	netlist_param_t(const param_type_t atype)
 	: netlist_object_t(PARAM, ANALOG)
-    , m_param(0.0)
+    , m_param_type(atype)
 	, m_netdev(NULL)
 	{  }
 
-	ATTR_HOT inline void setTo(const double param) { m_param = param; m_netdev->update_param(); }
-	ATTR_HOT inline void setTo(const int param) { m_param = param; m_netdev->update_param(); }
-	ATTR_COLD inline void initial(const double val) { m_param = val; }
-	ATTR_COLD inline void initial(const int val) { m_param = val; }
 
-	ATTR_HOT inline const double Value() const        { return m_param;   }
-	ATTR_HOT inline const int    ValueInt() const     { return (int) m_param;     }
-
+    ATTR_HOT inline const param_type_t param_type() const { return m_param_type; }
 	ATTR_HOT inline netlist_core_device_t &netdev() const { return *m_netdev; }
 	ATTR_COLD void set_netdev(netlist_core_device_t &dev) { m_netdev = &dev; }
 
 private:
-
-	double m_param;
+    const param_type_t m_param_type;
 	netlist_core_device_t *m_netdev;
 };
 
+class netlist_param_double_t : public netlist_param_t
+{
+public:
+    netlist_param_double_t()
+    : netlist_param_t(DOUBLE)
+    , m_param(0.0)
+    {  }
+
+    ATTR_HOT inline void setTo(const double param) { m_param = param; netdev().update_param(); }
+    ATTR_COLD inline void initial(const double val) { m_param = val; }
+    ATTR_HOT inline const double Value() const        { return m_param;   }
+
+private:
+    double m_param;
+};
+
+class netlist_param_int_t : public netlist_param_t
+{
+public:
+    netlist_param_int_t()
+    : netlist_param_t(INTEGER)
+    , m_param(0)
+    {  }
+
+    ATTR_HOT inline void setTo(const int param) { m_param = param; netdev().update_param(); }
+    ATTR_COLD inline void initial(const int val) { m_param = val; }
+
+    ATTR_HOT inline const int Value() const     { return m_param;     }
+
+private:
+    int m_param;
+};
+
+class netlist_param_logic_t : public netlist_param_int_t
+{
+public:
+    netlist_param_logic_t()
+    : netlist_param_int_t()
+    {  }
+};
 
 // ----------------------------------------------------------------------------------------
 // netlist_base_t

@@ -326,17 +326,18 @@ ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, net
 	register_link_internal(*this, in, out, aState);
 }
 
-ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &name, netlist_param_t &param, double initialVal)
+template <class C, class T>
+ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, C &param, const T initialVal)
 {
-	param.set_netdev(dev);
-	param.initial(initialVal);
-	m_setup->register_object(*this, *this, name, param, netlist_terminal_t::STATE_NONEX);
+    param.set_netdev(dev);
+    param.initial(initialVal);
+    m_setup->register_object(*this, *this, sname, param, netlist_terminal_t::STATE_NONEX);
 }
 
-ATTR_COLD void netlist_device_t::register_param(const pstring &name, netlist_param_t &param, double initialVal)
-{
-	register_param(*this,name, param, initialVal);
-}
+template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_double_t &param, const double initialVal);
+template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_int_t &param, const int initialVal);
+template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_logic_t &param, const int initialVal);
+
 
 // ----------------------------------------------------------------------------------------
 // net_net_t

@@ -218,7 +218,7 @@ NETLIB_DEVICE_WITH_PARAMS(nicMultiSwitch,
 	netlist_analog_output_t m_Q;
 	netlist_analog_output_t m_low;
 
-	netlist_param_t m_POS;
+	netlist_param_int_t m_POS;
 
 	int m_position;
 );
@@ -237,7 +237,7 @@ NETLIB_DEVICE_WITH_PARAMS(nicMixer8,
 	netlist_analog_output_t m_Q;
 	netlist_analog_output_t m_low;
 
-	netlist_param_t m_R[8];
+	netlist_param_double_t m_R[8];
 
 	double m_w[8];
 );
@@ -260,10 +260,10 @@ NETLIB_DEVICE_WITH_PARAMS(nicNE555N_MSTABLE,
 	netlist_analog_output_t m_THRESHOLD_OUT; /* internal */
 
 	//netlist_base_timer_t *m_timer;
-	netlist_param_t m_R;
-	netlist_param_t m_C;
-	netlist_param_t m_VS;
-	netlist_param_t m_VL;
+	netlist_param_double_t m_R;
+	netlist_param_double_t m_C;
+	netlist_param_double_t m_VS;
+	netlist_param_double_t m_VL;
 
 	double nicNE555N_cv();
 	double nicNE555N_clamp(const double v, const double a, const double b);

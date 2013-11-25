@@ -102,10 +102,13 @@ public:
 
 	template<bool _Required, class _NETClass>
 	class output_finder;
+    template<class C>
 	class optional_output;
 	template<class C>
 	class required_output;
+    template<class C>
 	class optional_param;
+    template<class C>
 	class required_param;
 	class on_device_start;
 
@@ -190,16 +193,17 @@ protected:
 };
 
 // optional device finder
-class netlist_mame_device::optional_output : public netlist_mame_device::output_finder<false, netlist_output_t>
+template<class C>
+class netlist_mame_device::optional_output : public netlist_mame_device::output_finder<false, C>
 {
 public:
-	optional_output(device_t &base, const char *tag, const char *output) : output_finder<false, netlist_output_t>(base, tag, output) { }
+	optional_output(device_t &base, const char *tag, const char *output) : output_finder<false, C>(base, tag, output) { }
 
 	virtual ~optional_output() {};
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = dynamic_cast<netlist_output_t *>(&m_netlist->setup().find_terminal(m_output, netlist_object_t::OUTPUT));
+		this->m_target = dynamic_cast<C *>(&this->m_netlist->setup().find_terminal(this->m_output, netlist_object_t::OUTPUT));
 		return this->report_missing(this->m_target != NULL, "output", false);
 	}
 
@@ -216,35 +220,37 @@ public:
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = (C *) &(this->m_netlist->setup().find_terminal(this->m_output, netlist_object_t::OUTPUT));
+		this->m_target = dynamic_cast<C *>(&this->m_netlist->setup().find_terminal(this->m_output, netlist_object_t::OUTPUT));
 		return this->report_missing(this->m_target != NULL, "output", true);
 	}
 
 };
 
 // optional device finder
-class netlist_mame_device::optional_param : public netlist_mame_device::output_finder<false, netlist_param_t>
+template<class C>
+class netlist_mame_device::optional_param : public netlist_mame_device::output_finder<false, C>
 {
 public:
-	optional_param(device_t &base, const char *tag, const char *output) : output_finder<false, netlist_param_t>(base, tag, output) { }
+	optional_param(device_t &base, const char *tag, const char *output) : output_finder<false, C>(base, tag, output) { }
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = &m_netlist->setup().find_param(m_output);
+		this->m_target = dynamic_cast<C *>(&this->m_netlist->setup().find_param(this->m_output));
 		return this->report_missing(this->m_target != NULL, "parameter", false);
 	}
 
 };
 
 // required devices are similar but throw an error if they are not found
-class netlist_mame_device::required_param : public netlist_mame_device::output_finder<true, netlist_param_t>
+template<class C>
+class netlist_mame_device::required_param : public netlist_mame_device::output_finder<true, C>
 {
 public:
-	required_param(device_t &base, const char *tag, const char *output) : output_finder<true, netlist_param_t>(base, tag, output) { }
+	required_param(device_t &base, const char *tag, const char *output) : output_finder<true, C>(base, tag, output) { }
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = &m_netlist->setup().find_param(m_output);
+		this->m_target = dynamic_cast<C *>( &this->m_netlist->setup().find_param(this->m_output));
 		return this->report_missing(this->m_target != NULL, "parameter", true);
 	}
 };
