@@ -56,11 +56,13 @@
 
 #include "nld_7400.h"
 #include "nld_7402.h"
+#include "nld_7404.h"
 #include "nld_7410.h"
 #include "nld_7420.h"
 #include "nld_7425.h"
 #include "nld_7427.h"
 #include "nld_7430.h"
+#include "nld_7474.h"
 #include "nld_7486.h"
 
 // this is a bad hack
@@ -99,10 +101,6 @@
 // TTL Logic chips
 // ----------------------------------------------------------------------------------------
 
-#define TTL_7404_INVERT(_name, _I1)                                                 \
-		NET_REGISTER_DEV(nic7404, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)
-
 #define TTL_7450_ANDORINVERT(_name, _I1, _I2, _I3, _I4)                             \
 		NET_REGISTER_DEV(nic7450, _name)                                            \
 		NET_CONNECT(_name, I1, _I1)                                                 \
@@ -119,13 +117,6 @@
 		NET_CONNECT(_name, LTQ, _LTQ)                                               \
 		NET_CONNECT(_name, BIQ, _BIQ)                                               \
 		NET_CONNECT(_name, RBIQ, _RBIQ)
-
-#define TTL_7474(_name, _CLK, _D, _CLRQ, _PREQ)                                     \
-		NET_REGISTER_DEV(nic7474, _name)                                            \
-		NET_CONNECT(_name, CLK, _CLK)                                               \
-		NET_CONNECT(_name, D,  _D)                                                  \
-		NET_CONNECT(_name, CLRQ,  _CLRQ)                                            \
-		NET_CONNECT(_name, PREQ,  _PREQ)
 
 #define TTL_7483(_name, _A1, _A2, _A3, _A4, _B1, _B2, _B3, _B4, _CI)                \
 		NET_REGISTER_DEV(nic7483, _name)                                            \
@@ -281,10 +272,7 @@ NETLIB_DEVICE_WITH_PARAMS(nicNE555N_MSTABLE,
 
 
 
-NETLIB_DEVICE(nic7404,
-	netlist_ttl_input_t m_I;
-	netlist_ttl_output_t m_Q;
-);
+
 
 NETLIB_DEVICE(nic7450,
 	netlist_ttl_input_t m_I0;
@@ -292,24 +280,6 @@ NETLIB_DEVICE(nic7450,
 	netlist_ttl_input_t m_I2;
 	netlist_ttl_input_t m_I3;
 	netlist_ttl_output_t m_Q;
-);
-
-NETLIB_SUBDEVICE(nic7474sub,
-	netlist_ttl_input_t m_clk;
-
-	UINT8 m_nextD;
-	netlist_ttl_output_t m_Q;
-	netlist_ttl_output_t m_QQ;
-
-	ATTR_HOT inline void newstate(const UINT8 state);
-);
-
-NETLIB_DEVICE(nic7474,
-	NETLIB_NAME(nic7474sub) sub;
-
-	netlist_ttl_input_t m_D;
-	netlist_ttl_input_t m_clrQ;
-	netlist_ttl_input_t m_preQ;
 );
 
 /* 74107 does latch data during high !
