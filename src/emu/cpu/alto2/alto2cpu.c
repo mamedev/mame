@@ -22,7 +22,7 @@ const device_type ALTO2 = &device_creator<alto2_cpu_device>;
 //  LOGGING AND DEBUGGING
 //**************************************************************************
 #if	ALTO2_DEBUG
-int g_log_types = LOG_ETH;
+int g_log_types = LOG_DISK | LOG_ETH;
 int g_log_level = 8;
 bool g_log_newline = true;
 

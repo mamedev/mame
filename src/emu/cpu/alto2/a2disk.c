@@ -90,7 +90,7 @@ enum {
 /** @brief record numbers per sector in INCRECNO order */
 enum {
 	RECNO_HEADER,
-	RECNO_PAGENO,
+	RECNO_NOTHING,
 	RECNO_LABEL,
 	RECNO_DATA
 };
@@ -1164,10 +1164,10 @@ void alto2_cpu_device::f1_late_increcno()
 		m_dsk.krwc = GET_KADR_LABEL(m_dsk.kadr);
 		LOG((LOG_DISK,2,"	INCRECNO; HEADER → LABEL (%o, rwc:%o)\n", m_dsk.krecno, m_dsk.krwc));
 		break;
-	case RECNO_PAGENO:
+	case RECNO_NOTHING:
 		m_dsk.krecno = RECNO_HEADER;
 		m_dsk.krwc = GET_KADR_HEADER(m_dsk.kadr);
-		LOG((LOG_DISK,2,"	INCRECNO; PAGENO → HEADER (%o, rwc:%o)\n", m_dsk.krecno, m_dsk.krwc));
+		LOG((LOG_DISK,2,"	INCRECNO; NOTHING → HEADER (%o, rwc:%o)\n", m_dsk.krecno, m_dsk.krwc));
 		break;
 	case RECNO_LABEL:
 		m_dsk.krecno = RECNO_DATA;
@@ -1175,9 +1175,9 @@ void alto2_cpu_device::f1_late_increcno()
 		LOG((LOG_DISK,2,"	INCRECNO; LABEL → DATA (%o, rwc:%o)\n", m_dsk.krecno, m_dsk.krwc));
 		break;
 	case RECNO_DATA:
-		m_dsk.krecno = RECNO_PAGENO;
+		m_dsk.krecno = RECNO_NOTHING;
 		m_dsk.krwc = 0;	/* read (?) */
-		LOG((LOG_DISK,2,"	INCRECNO; DATA → PAGENO (%o, rwc:%o)\n", m_dsk.krecno, m_dsk.krwc));
+		LOG((LOG_DISK,2,"	INCRECNO; DATA → NOTHING (%o, rwc:%o)\n", m_dsk.krecno, m_dsk.krwc));
 		break;
 	}
 	// TODO: show disk indicator
@@ -1296,6 +1296,7 @@ void alto2_cpu_device::f1_late_clrstat()
  */
 void alto2_cpu_device::f1_late_load_kcom()
 {
+	UINT16 change = m_dsk.kcom ^ m_bus;
 	m_dsk.kcom = m_bus;
 	LOG((LOG_DISK,2,"	KCOM←; BUS %06o\n", m_dsk.kcom));
 	LOG((LOG_DISK,2,"		XFEROFF    : %d\n", GET_KCOM_XFEROFF(m_dsk.kcom)));
@@ -1303,6 +1304,76 @@ void alto2_cpu_device::f1_late_load_kcom()
 	LOG((LOG_DISK,2,"		BCLKSRC    : %d\n", GET_KCOM_BCLKSRC(m_dsk.kcom)));
 	LOG((LOG_DISK,2,"		WFFO       : %d\n", GET_KCOM_WFFO(m_dsk.kcom)));
 	LOG((LOG_DISK,2,"		SENDADR    : %d\n", GET_KCOM_SENDADR(m_dsk.kcom)));
+	if (GET_KCOM_WDINHIB(change)) {
+		// WDALLOW going 0: should asynchronously reset 43a and 53a and set 53b
+		if (m_task == task_kwd) {
+			UINT8 s0, s1;
+			/**
+			 * JK flip-flop 53b (word task)
+			 * <PRE>
+			 * CLK	SYSCLKB'
+			 * J	0
+			 * K'	(BLOCK & WDTSKACT)'
+			 * S'	WDALLOW
+			 * C'	1
+			 * Q	WDINIT
+			 * </PRE>
+			 */
+			s0 = m_dsk.ff_53b;
+			s1 = JKFF_0;
+			if (WDALLOW)
+				s1 |= JKFF_S;
+			s1 |= JKFF_C;
+			m_dsk.ff_53b = update_jkff(s0, s1, "53b KWD   ");
+
+			/**
+			 * JK flip-flop 53a (word task)
+			 * <PRE>
+			 * CLK	SYSCLKB'
+			 * J	from 43b Q
+			 * K'	(BLOCK & WDTSKACT)'
+			 * S'	1
+			 * C'	WDALLOW
+			 * Q	to 43a J and K'
+			 * </PRE>
+			 */
+			s0 = m_dsk.ff_53a;
+			s1 = JKFF_0;
+			if (m_dsk.ff_43b & JKFF_Q)
+				s1 |= JKFF_J;
+			s1 |= JKFF_S;
+			if (WDALLOW)
+				s1 |= JKFF_C;
+			m_dsk.ff_53a = update_jkff(s0, s1, "53a KWD   ");
+
+			/**
+			 * JK flip-flop 43a (word task)
+			 * <PRE>
+			 * CLK	SYSCLKA'
+			 * J	from 53a Q
+			 * K'	from 53a Q
+			 * S'	1
+			 * C'	WDALLOW
+			 * Q	WDTSKENA', Q' WDTSKENA
+			 * </PRE>
+			 */
+			s0 = m_dsk.ff_43a;
+			s1 = JKFF_0;
+			if (m_dsk.ff_53a & JKFF_Q)
+				s1 |= JKFF_J;
+			if (m_dsk.ff_53a & JKFF_Q)
+				s1 |= JKFF_K;
+			s1 |= JKFF_S;
+			if (WDALLOW)
+				s1 |= JKFF_C;
+			m_dsk.ff_43a = update_jkff(s0, s1, "43a KWD   ");
+
+			if (m_dsk.ff_43a & JKFF_Q) {
+				m_dsk.wdtskena = 1;
+				m_task_wakeup &= ~(1 << task_kwd);
+			}
+		}
+	}
 	// TODO: show disk indicator in the GUI?
 }
 
@@ -1388,9 +1459,19 @@ void alto2_cpu_device::f2_late_init()
  */
 void alto2_cpu_device::f2_late_rwc()
 {
-	static UINT16 branch_map[4] = {0,2,3,3};
-	UINT16 r = branch_map[m_dsk.krwc];;
+	UINT16 r;
 	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
+
+	switch (m_dsk.krwc & 3) {
+	case 0:
+		r = 0;
+		break;
+	case 1:
+		r = 2;
+		break;
+	default:
+		r = 3;
+	}
 
 	switch (m_dsk.krecno) {
 	case RECNO_HEADER:
@@ -1398,7 +1479,7 @@ void alto2_cpu_device::f2_late_rwc()
 			(r | init) ? "" : "no ", m_dsk.krecno,
 			rwc_name[m_dsk.krwc], m_next2, r, init));
 		break;
-	case RECNO_PAGENO:
+	case RECNO_NOTHING:
 		LOG((LOG_DISK,1,"	RWC; %sbranch pageno(%d):%s (%#o|%#o|%#o)\n",
 			(r | init) ? "" : "no ", m_dsk.krecno,
 			rwc_name[m_dsk.krwc], m_next2, r, init));

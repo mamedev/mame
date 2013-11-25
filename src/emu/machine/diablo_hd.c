@@ -1306,7 +1306,7 @@ void diablo_hd_device::sector_mark_0()
 	LOG_DRIVE((9,"[DHD%u]	CHS:%03d/%d/%02d sector_mark_0=0\n", m_unit, m_cylinder, m_head, m_sector));
 
 	// HACK: deassert wrgate
-	m_wrgate_0 = 1;
+	//	m_wrgate_0 = 1;
 
 	squeeze_sector();		// squeeze previous sector bits, if it was written to
 	m_sector_mark_0 = 0;	// assert sector mark (set to 0)
