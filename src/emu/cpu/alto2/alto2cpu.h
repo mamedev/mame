@@ -53,9 +53,9 @@ enum {
 #define	ALTO2_FAKE_STATUS_H		12			//!< number of extra scanlines to display some status info
 
 #define	USE_PRIO_F9318			0			//!< define to 1 to use the F9318 priority encoder code
-#define	USE_ALU_74181			1			//!< define to 1 to use the SN74181 ALU code
+#define	USE_ALU_74181			0			//!< define to 1 to use the SN74181 ALU code
 #define	USE_BITCLK_TIMER		0			//!< define to 1 to use a very high rate timer for the disk bit clock
-#define	ALTO2_HAMMING_CHECK		0			//!< define to 1 to incorporate the Hamming code and Parity check
+#define	USE_HAMMING_CHECK		1			//!< define to 1 to use the Hamming code and Parity check in a2mem
 
 #define	ALTO2_TASKS				16			//!< 16 task slots
 #define	ALTO2_REGS				32			//!< 32 16-bit words in the R register file
@@ -445,7 +445,7 @@ private:
 		bs_task_4,							//!< BUS source is task specific
 		bs_read_md,							//!< BUS source is memory data
 		bs_mouse,							//!< BUS source is mouse data
-		bs_disp,							//!< BUS source displacement
+		bs_disp								//!< BUS source displacement (emulator task)
 	};
 
 	//! Function 1 numbers
@@ -453,7 +453,7 @@ private:
 		f1_nop,								//!< f1 00 no operation
 		f1_load_mar,						//!< f1 01 load memory address register
 		f1_task,							//!< f1 02 task switch
-		f1_block,							//!< f1 03 block task
+		f1_block,							//!< f1 03 task block
 		f1_l_lsh_1,							//!< f1 04 left shift L once
 		f1_l_rsh_1,							//!< f1 05 right shift L once
 		f1_l_lcy_8,							//!< f1 06 cycle L 8 times
@@ -466,7 +466,7 @@ private:
 		f1_task_14,							//!< f1 14 task specific
 		f1_task_15,							//!< f1 15 task specific
 		f1_task_16,							//!< f1 16 task specific
-		f1_task_17,							//!< f1 17 task specific
+		f1_task_17							//!< f1 17 task specific
 	};
 
 	//! Function 2 numbers
@@ -487,7 +487,7 @@ private:
 		f2_task_14,							//!< f2 14 task specific
 		f2_task_15,							//!< f2 15 task specific
 		f2_task_16,							//!< f2 16 task specific
-		f2_task_17,							//!< f2 17 task specific
+		f2_task_17							//!< f2 17 task specific
 	};
 
 	//! enumeration of the micro code word bits
@@ -526,7 +526,6 @@ private:
 
 	UINT16 m_task_mpc[ALTO2_TASKS];					//!< per task micro program counter
 	UINT16 m_task_next2[ALTO2_TASKS];				//!< per task address modifier
-	attoseconds_t m_pico_time[ALTO2_TASKS];				//!< per task atto seconds executed
 	UINT8 m_task;									//!< active task
 	UINT8 m_next_task;								//!< next micro instruction's task
 	UINT8 m_next2_task;								//!< next but one micro instruction's task

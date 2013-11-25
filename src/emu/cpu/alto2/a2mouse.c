@@ -155,7 +155,7 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
 	m_mouse.dx = x;
 #if	MOUSE_DIRTY_HACK
 	/* XXX: dirty, dirty, hack */
-#if	ALTO2_HAMMING_CHECK
+#if	USE_HAMMING_CHECK
 	m_mem.ram[0424/2] = hamming_code(1, 0424 / 2, (m_mouse.dx << 16) | m_mouse.dy);
 #else
 	m_mem.ram[0424/2] = (m_mouse.dx << 16) | m_mouse.dy;
@@ -178,7 +178,7 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
 	m_mouse.dy = y;
 #if	MOUSE_DIRTY_HACK
 	/* XXX: dirty, dirty, hack */
-#if	ALTO2_HAMMING_CHECK
+#if	USE_HAMMING_CHECK
 	m_mem.ram[0424/2] = hamming_code(1, 0424 / 2, (m_mouse.dx << 16) | m_mouse.dy);
 #else
 	m_mem.ram[0424/2] = (m_mouse.dx << 16) | m_mouse.dy;

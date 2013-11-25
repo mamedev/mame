@@ -346,7 +346,7 @@ static const char* raise_lower[2] = {"↗","↘"};
 #define	WDALLOW	(!GET_KCOM_WDINHIB(m_dsk.kcom))
 #define	WDINIT	((m_dsk.ff_53b & JKFF_Q) ? 1 : 0)
 #define	RDYLAT	((m_dsk.ff_45a & JKFF_Q) ? 1 : 0)
-#define	SEQERR	((m_task == task_ksec && m_dsk.seclate == 0) || (m_task == task_kwd && m_dsk.carry == 1))
+#define	SEQERR	((m_task == task_ksec && m_dsk.seclate == 0) || (m_task == task_kwd && m_dsk.bitcount == 15))
 #define	ERRWAKE	(RDYLAT | m_dsk.ready_mf31a)
 #define	SEEKOK	(m_dsk.seekok)
 
@@ -366,61 +366,66 @@ void alto2_cpu_device::kwd_timing(int bitclk, int datin, int block)
 	int i;
 	UINT8 s0, s1;
 
-	LOG((LOG_DISK,8,"	*** KWD timing bitclk:%d datin:%d block:%d\n", bitclk, datin, block));
-	if (0 == m_dsk.seclate) {
+	LOG((LOG_DISK,9,"	*** KWD timing bitclk:%d datin:%d block:%d\n", bitclk, datin, block));
+	if (0 == m_dsk.seclate)
+	{
 		// if SECLATE is 0, WDDONE' never goes low (counter's clear has precedence).
-		if (m_dsk.bitcount || m_dsk.carry) {
+		if (m_dsk.bitcount) {
 			LOG((LOG_DISK,7,"	SECLATE:0 clears bitcount:0\n"));
 			m_dsk.bitcount = 0;
-			m_dsk.carry = 0;
 		}
-	} else if (m_dsk.bitclk && !bitclk) {
-		// if SECLATE is 1, the counter will count or be loaded
-		if ((m_dsk.shiftin & (1 << 16)) && !GET_KCOM_WFFO(m_dsk.kcom)) {
+	}
+	else
+	{
+		// SECLATE is 1
+		if (m_dsk.bitclk && !bitclk)
+		{
+			// on the falling edge of bitclk the counter will count or be loaded
+			if ((m_dsk.shiftin & (1 << 16)) && !GET_KCOM_WFFO(m_dsk.kcom)) {
+				/*
+				 * If HIORDBIT is 1 at the falling edge of BITCLK, it sets the
+				 * JK-FF 67b, and thus takes away the LOAD' assertion from the
+				 * counter. It has been loaded with 15, so it counts to 16 on
+				 * the next rising edge and makes WDDONE' go to 0.
+				 */
+				LOG((LOG_DISK,7,"	HIORDBIT:1 sets WFFO:1\n"));
+				PUT_KCOM_WFFO(m_dsk.kcom, 1);
+				// TODO: show disk indicators
+			}
 			/*
-			 * If HIORDBIT is 1 at the falling edge of BITCLK, it sets the
-			 * JK-FF 67b, and thus takes away the LOAD' assertion from the
-			 * counter. It has been loaded with 15, so it counts to 16 on
-			 * the next rising edge and makes WDDONE' go to 0.
+			 * Falling edge of BITCLK, counting continues as it was preset
+			 * with BUS[4] (WFFO) at the last KCOM← load, or as set by a
+			 * 1 bit being read in HIORDBIT.
 			 */
-			LOG((LOG_DISK,7,"	HIORDBIT:1 sets WFFO:1\n"));
-			PUT_KCOM_WFFO(m_dsk.kcom, 1);
-			// TODO: show disk indicators
+			if (GET_KCOM_WFFO(m_dsk.kcom)) {
+				/*
+				 * If BUS[4] (WFFO) was 1, both J and K' of the FF (74109) will
+				 * be 1 at the rising edge of LDCOM' (at the end of KCOM←)
+				 * and Q will be 1. LOAD' is deassterted: count on clock.
+				 */
+				m_dsk.bitcount = (m_dsk.bitcount + 1) % 16;
+				LOG((LOG_DISK,6,"	WFFO:1 count bitcount:%2d\n", m_dsk.bitcount));
+			} else {
+				/*
+				 * If BUS[4] (WFFO) was 0, both J and K' will be 0, and Q
+				 * will be 0. LOAD' is asserted and will load on rising bitclock (now)
+				 */
+				m_dsk.bitcount = 15;
+				LOG((LOG_DISK,6,"	WFFO:0 load bitcount:%2d\n", m_dsk.bitcount));
+			}
 		}
-		/*
-		 * Falling edge of BITCLK, counting continues as it was preset
-		 * with BUS[4] (WFFO) at the last KCOM← load, or as set by a
-		 * 1 bit being read in HIORDBIT.
-		 */
-		if (GET_KCOM_WFFO(m_dsk.kcom)) {
-			/*
-			 * If BUS[4] (WFFO) was 1, both J and K' of the FF (74109) will
-			 * be 1 at the rising edge of LDCOM' (at the end of KCOM←)
-			 * and Q will be 1. LOAD' is deassterted: count on clock.
-			 */
-			m_dsk.bitcount = (m_dsk.bitcount + 1) % 16;
-			m_dsk.carry = m_dsk.bitcount == 15;
-			LOG((LOG_DISK,6,"	WFFO:1 count bitcount:%2d\n", m_dsk.bitcount));
-		} else {
-			/*
-			 * If BUS[4] (WFFO) was 0, both J and K' will be 0, and Q
-			 * will be 0. LOAD' is asserted and will load on rising bitclock (now)
-			 */
-			m_dsk.bitcount = 15;
-			m_dsk.carry = 1;
-			LOG((LOG_DISK,6,"	WFFO:0 load bitcount:%2d\n", m_dsk.bitcount));
+		if (!m_dsk.bitclk && bitclk) {
+			// rising edge of bitclk
+			m_dsk.shiftin = (m_dsk.shiftin << 1) | datin;		// clock the input shift register
+			m_dsk.shiftout = m_dsk.shiftout << 1;				// and the output shift register too
 		}
-	} else if (!m_dsk.bitclk && bitclk) {
-		// rising edge of bitclk
-		m_dsk.shiftin = (m_dsk.shiftin << 1) | datin;		// clock the input shift register
-		m_dsk.shiftout = m_dsk.shiftout << 1;				// and the output shift register too
 	}
 
 	if (m_dsk.wddone != wddone) {
 		LOG((LOG_DISK,8,"	WDDONE':%d→%d\n", m_dsk.wddone, wddone));
 	}
 
-	if (m_dsk.carry) {
+	if (15 == m_dsk.bitcount) {
 		/* CARRY = 1 -> WDDONE' = 0 */
 		wddone = 0;
 		if (m_dsk.wddone == 0) {
@@ -1368,10 +1373,8 @@ void alto2_cpu_device::f1_late_load_kcom()
 				s1 |= JKFF_C;
 			m_dsk.ff_43a = update_jkff(s0, s1, "43a KWD   ");
 
-			if (m_dsk.ff_43a & JKFF_Q) {
-				m_dsk.wdtskena = 1;
-				m_task_wakeup &= ~(1 << task_kwd);
-			}
+			m_dsk.wdtskena = 1;
+			m_task_wakeup &= ~(1 << task_kwd);
 		}
 	}
 	// TODO: show disk indicator in the GUI?
@@ -1422,7 +1425,7 @@ void alto2_cpu_device::f1_late_load_kadr()
 }
 
 /**
- * @brief f2_init late: branch on disk word task active and init
+ * @brief branch on disk word task active and init
  *
  * NEXT ← NEXT OR (WDTASKACT && WDINIT ? 037 : 0)
  */
@@ -1436,7 +1439,7 @@ void alto2_cpu_device::f2_late_init()
 }
 
 /**
- * @brief f2_rwc late: branch on read/write/check state of the current record
+ * @brief branch on read/write/check state of the current record
  * <PRE>
  * NEXT ← NEXT OR (current record to be written ? 3 : current record to be checked ? 2 : 0);
  *
@@ -1463,13 +1466,13 @@ void alto2_cpu_device::f2_late_rwc()
 	UINT16 init = (m_task == task_kwd && m_dsk.wdinit0) ? 037 : 0;
 
 	switch (m_dsk.krwc & 3) {
-	case 0:
+	case 0:		// read
 		r = 0;
 		break;
-	case 1:
+	case 1:		// check
 		r = 2;
 		break;
-	default:
+	default:	// write
 		r = 3;
 	}
 
@@ -1520,7 +1523,7 @@ void alto2_cpu_device::f2_late_recno()
 }
 
 /**
- * @brief f2_xfrdat late: branch on the data transfer state
+ * @brief branch on the data transfer state
  *
  * NEXT ← NEXT OR (if current command wants data transfer ? 1 : 0)
  */
@@ -1534,7 +1537,7 @@ void alto2_cpu_device::f2_late_xfrdat()
 }
 
 /**
- * @brief f2_swrnrdy late: branch on the disk ready signal
+ * @brief branch on the disk ready signal
  *
  * NEXT ← NEXT OR (if disk not ready to accept command ? 1 : 0)
  */
@@ -1550,7 +1553,7 @@ void alto2_cpu_device::f2_late_swrnrdy()
 }
 
 /**
- * @brief f2_nfer late: branch on the disk fatal error condition
+ * @brief branch on the disk fatal error condition
  *
  * NEXT ← NEXT OR (if fatal error in latches ? 0 : 1)
  */
@@ -1624,7 +1627,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		} else {
 			bit = (m_dsk.shiftout >> 15) & 1;
 			kwd_timing(clk, bit, 0);
-			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (write) @%lldns\n", arg, bit, ntime()));
+			LOG((LOG_DISK,8,"	BITCLK#%d bit:%d (write) @%lldns\n", arg, bit, ntime()));
 			if (clk)
 				dhd->wr_data(arg, bit);
 			else
@@ -1633,7 +1636,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 	} else if (GET_KCOM_BCLKSRC(m_dsk.kcom)) {
 		/* always select the crystal clock */
 		bit = dhd->rd_data(arg);
-		LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (read, crystal) @%lldns\n", arg, bit, ntime()));
+		LOG((LOG_DISK,8,"	BITCLK#%d bit:%d (read, crystal) @%lldns\n", arg, bit, ntime()));
 		kwd_timing(clk, bit, 0);
 	} else {
 		/* if XFEROFF is set, keep the bit at 1 (RDGATE' is high) */
@@ -1642,7 +1645,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, INT32 arg)
 		} else {
 			clk = dhd->rd_clock(arg);
 			bit = dhd->rd_data(arg);
-			LOG((LOG_DISK,7,"	BITCLK#%d bit:%d (read, driveclk) @%lldns\n", arg, bit, ntime()));
+			LOG((LOG_DISK,8,"	BITCLK#%d bit:%d (read, driveclk) @%lldns\n", arg, bit, ntime()));
 		}
 		kwd_timing(clk, bit, 0);
 	}
@@ -1728,6 +1731,46 @@ void alto2_cpu_device::next_sector(int unit)
 void alto2_cpu_device::init_disk()
 {
 	memset(&m_dsk, 0, sizeof(m_dsk));
+	save_item(NAME(m_dsk.drive));
+	save_item(NAME(m_dsk.kaddr));
+	save_item(NAME(m_dsk.kadr));
+	save_item(NAME(m_dsk.kstat));
+	save_item(NAME(m_dsk.kcom));
+	save_item(NAME(m_dsk.krecno));
+	save_item(NAME(m_dsk.shiftin));
+	save_item(NAME(m_dsk.shiftout));
+	save_item(NAME(m_dsk.datain));
+	save_item(NAME(m_dsk.dataout));
+	save_item(NAME(m_dsk.krwc));
+	save_item(NAME(m_dsk.kfer));
+	save_item(NAME(m_dsk.wdtskena));
+	save_item(NAME(m_dsk.wdinit0));
+	save_item(NAME(m_dsk.wdinit));
+	save_item(NAME(m_dsk.strobe));
+	save_item(NAME(m_dsk.bitclk));
+	save_item(NAME(m_dsk.datin));
+	save_item(NAME(m_dsk.bitcount));
+	save_item(NAME(m_dsk.carry));
+	save_item(NAME(m_dsk.seclate));
+	save_item(NAME(m_dsk.seekok));
+	save_item(NAME(m_dsk.ok_to_run));
+	save_item(NAME(m_dsk.ready_mf31a));
+	save_item(NAME(m_dsk.seclate_mf31b));
+#if	0
+	save_item(NAME(m_dsk.ff_21a));
+	save_item(NAME(m_dsk.ff_21a_old));
+	save_item(NAME(m_dsk.ff_21b));
+	save_item(NAME(m_dsk.ff_22a));
+	save_item(NAME(m_dsk.ff_22b));
+	save_item(NAME(m_dsk.ff_43b));
+	save_item(NAME(m_dsk.ff_53a));
+	save_item(NAME(m_dsk.ff_43a));
+	save_item(NAME(m_dsk.ff_53b));
+	save_item(NAME(m_dsk.ff_44a));
+	save_item(NAME(m_dsk.ff_44b));
+	save_item(NAME(m_dsk.ff_45a));
+	save_item(NAME(m_dsk.ff_45b));
+#endif
 
 	/** @brief simulate previous sysclka */
 	m_sysclka0[0] = JKFF_CLK;
@@ -1823,7 +1866,6 @@ void alto2_cpu_device::reset_disk()
 #endif
 	m_dsk.datin = 0;
 	m_dsk.bitcount = 0;
-	m_dsk.carry = 0;
 	m_dsk.seclate = 0;
 	m_dsk.seclate_timer->reset();
 	m_dsk.seekok = 0;

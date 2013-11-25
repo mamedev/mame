@@ -237,7 +237,7 @@
  * Whoa ;-)
  * </PRE>
  */
-#if	ALTO2_HAMMING_CHECK
+#if	USE_HAMMING_CHECK
 
 #define	WD(x) (1ul<<(31-x))
 
@@ -277,14 +277,14 @@
 /* a74: WD14   WD17   WD18   WD21   WD23   WD24   WD26   WD27   WD29 PCB     ---    */
 #define	A74 (WD(14)|WD(17)|WD(18)|WD(21)|WD(23)|WD(24)|WD(26)|WD(27)|WD(29))
 
-#define	H0(hpb) X_RDBITS(hpb,8,0,0)	//!< get Hamming code bit 0 from hpb data (really bit 32)
-#define	H1(hpb) X_RDBITS(hpb,8,1,1)	//!< get Hamming code bit 1 from hpb data (really bit 33)
-#define	H2(hpb) X_RDBITS(hpb,8,2,2)	//!< get Hamming code bit 2 from hpb data (really bit 34)
-#define	H3(hpb) X_RDBITS(hpb,8,3,3)	//!< get Hamming code bit 3 from hpb data (really bit 35)
-#define	H4(hpb) X_RDBITS(hpb,8,4,4)	//!< get Hamming code bit 4 from hpb data (really bit 36)
-#define	H5(hpb) X_RDBITS(hpb,8,5,5)	//!< get Hamming code bit 5 from hpb data (really bit 37)
+#define	H0(hpb) X_BIT(hpb,8,0)		//!< get Hamming code bit 0 from hpb data (really bit 32)
+#define	H1(hpb) X_BIT(hpb,8,1)		//!< get Hamming code bit 1 from hpb data (really bit 33)
+#define	H2(hpb) X_BIT(hpb,8,2)		//!< get Hamming code bit 2 from hpb data (really bit 34)
+#define	H3(hpb) X_BIT(hpb,8,3)		//!< get Hamming code bit 3 from hpb data (really bit 35)
+#define	H4(hpb) X_BIT(hpb,8,4)		//!< get Hamming code bit 4 from hpb data (really bit 36)
+#define	H5(hpb) X_BIT(hpb,8,5)		//!< get Hamming code bit 5 from hpb data (really bit 37)
 #define	RH(hpb) X_RDBITS(hpb,8,0,5)	//!< get Hamming code from hpb data (bits 32 to 37)
-#define	RP(hpb) X_BIT(hpb,8,6)	//!< get parity bit from hpb data (really bit 38)
+#define	RP(hpb) X_BIT(hpb,8,6)		//!< get parity bit from hpb data (really bit 38)
 
 /** @brief return even parity of a (masked) 32 bit value */
 static __inline UINT8 parity_even(UINT32 val)
@@ -440,7 +440,7 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 	if (perr || syndrome) {
 		/* latch data on the first error */
 		if (!m_mem.error) {
-			m_mem.error = 1;
+			m_mem.error = true;
 			PUT_MESR_HAMMING(m_mem.mesr, RH(hpb));
 			PUT_MESR_PERR(m_mem.mesr, perr);
 			PUT_MESR_PARITY(m_mem.mesr, RP(hpb));
@@ -480,7 +480,7 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
 	}
 	return dw_data;
 }
-#endif	/* ALTO2_HAMMING_CHECK */
+#endif	/* USE_HAMMING_CHECK */
 
 /**
  * @brief memory error address register read
@@ -524,7 +524,7 @@ READ16_MEMBER( alto2_cpu_device::mesr_r )
 		LOG((LOG_MEM,6,"		Hamming code read    : %#o\n", GET_MESR_HAMMING(data)));
 		LOG((LOG_MEM,6,"		Parity error         : %o\n", GET_MESR_PERR(data)));
 		LOG((LOG_MEM,6,"		Memory parity bit    : %o\n", GET_MESR_PARITY(data)));
-#if	ALTO2_HAMMING_CHECK
+#if	USE_HAMMING_CHECK
 		LOG((LOG_MEM,6,"		Hamming syndrome     : %#o (bit #%d)\n", GET_MESR_SYNDROME(data), hamming_lut[GET_MESR_SYNDROME(data)]));
 #else
 		LOG((LOG_MEM,6,"		Hamming syndrome     : %#o\n", GET_MESR_SYNDROME(data)));
@@ -641,7 +641,7 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 		// keep track of the current CPU cycle
 		m_mem.cycle = cycle();
 	} else {
-		m_mem.access = ALTO2_MEM_NIRVANA;
+		m_mem.access = ALTO2_MEM_INVALID;
 		m_mem.rmdd = m_mem.wmdd = ~0;
 	}
 }
@@ -677,7 +677,7 @@ UINT16 alto2_cpu_device::read_mem()
 		return m_mem.md;
 	}
 
-#if	ALTO2_HAMMING_CHECK
+#if	USE_HAMMING_CHECK
 	/* check for errors on the first access */
 	if (!(m_mem.access & ALTO2_MEM_ODD))
 		m_mem.rmdd = hamming_code(0, m_mem.mar/2, m_mem.rmdd);
@@ -740,7 +740,7 @@ void alto2_cpu_device::write_mem(UINT16 data)
 	else
 		PUT_EVEN(m_mem.wmdd, m_mem.md);
 
-#if	ALTO2_HAMMING_CHECK
+#if	USE_HAMMING_CHECK
 	if (m_mem.access & ALTO2_MEM_RAM)
 		m_mem.ram[m_mem.mar/2] = hamming_code(1, m_mem.mar/2, m_mem.wmdd);
 #else
@@ -855,7 +855,7 @@ void alto2_cpu_device::reset_memory()
 	m_mem.ram = auto_alloc_array_clear(machine(), UINT32, sizeof(UINT16) * m_mem.size);
 	m_mem.hpb = auto_alloc_array_clear(machine(), UINT8,  sizeof(UINT16) * m_mem.size);
 
-#if	ALTO2_HAMMING_CHECK
+#if	USE_HAMMING_CHECK
 	// Initialize the hamming codes and parity bit
 	for (UINT32 addr = 0; addr < ALTO2_IO_PAGE_BASE; addr++) {
 		hamming_code(1, addr, 0);
@@ -868,7 +868,7 @@ void alto2_cpu_device::reset_memory()
 	m_mem.md = 0;
 	m_mem.cycle = 0;
 	m_mem.access = 0;
-	m_mem.error = 0;
+	m_mem.error = false;
 	m_mem.mear = 0;
 	m_mem.mesr = 0;
 	m_mem.mecr = 0;

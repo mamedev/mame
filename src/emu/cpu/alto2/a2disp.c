@@ -332,9 +332,6 @@ void alto2_cpu_device::unload_word()
  * @brief function called by the CPU to enter the next display state
  *
  * There are 32 states per scanline and 875 scanlines per frame.
- *
- * @param arg the current displ_a63 PROM address
- * @result returns the next state of the display state machine
  */
 void alto2_cpu_device::display_state_machine()
 {
@@ -349,7 +346,7 @@ void alto2_cpu_device::display_state_machine()
 	{
 		// count horizontal line counters and wrap
 		m_dsp.hlc += 1;
-		if (m_dsp.hlc == ALTO2_DISPLAY_HLC_END + 1)
+		if (m_dsp.hlc > ALTO2_DISPLAY_HLC_END)
 			m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 		// wake up the memory refresh task _twice_ on each scanline
 		m_task_wakeup |= 1 << task_mrt;
@@ -379,10 +376,6 @@ void alto2_cpu_device::display_state_machine()
 				 */
 				m_task_wakeup |= 1 << task_dvt;
 				// TODO: upade odd or even field of the internal bitmap now?
-			}
-			else
-			{
-				LOG((LOG_DISPL,1, " VSYNC"));
 			}
 		}
 	}

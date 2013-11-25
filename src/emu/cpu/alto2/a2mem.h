@@ -21,7 +21,7 @@ enum {
 	ALTO2_MEM_NONE,
 	ALTO2_MEM_ODD		= (1 << 0),
 	ALTO2_MEM_RAM		= (1 << 1),
-	ALTO2_MEM_NIRVANA	= (1 << 2)
+	ALTO2_MEM_INVALID	= (1 << 2)
 };
 
 struct {
@@ -40,11 +40,9 @@ struct {
 	 * 1: invalid
 	 * 2: memory access even word (MEM_RAM)
 	 * 3: memory access odd word (MEM_RAM | MEM_ODD)
-	 * 4: refresh even word (MEM_REFRESH)
-	 * 5: refresh odd word (MEM_REFRESH | MEM_ODD)
 	 */
 	int access;
-	int error;							//!< non-zero after a memory error was detected
+	bool error;							//!< non-zero after a memory error was detected
 	UINT32 mear;						//!< memory error address register
 	UINT16 mesr;						//!< memory error status register
 	UINT16 mecr;						//!< memory error control register

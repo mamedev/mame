@@ -149,7 +149,6 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_icount(0),
 	m_task_mpc(),
 	m_task_next2(),
-	m_pico_time(),
 	m_task(0),
 	m_next_task(0),
 	m_next2_task(0),
@@ -848,7 +847,6 @@ void alto2_cpu_device::device_start()
 #endif
 	save_item(NAME(m_task_mpc));
 	save_item(NAME(m_task_next2));
-	save_item(NAME(m_pico_time));
 	save_item(NAME(m_task));
 	save_item(NAME(m_next_task));
 	save_item(NAME(m_next2_task));
@@ -888,46 +886,6 @@ void alto2_cpu_device::device_start()
 	save_item(NAME(m_mouse.dx));
 	save_item(NAME(m_mouse.dy));
 	save_item(NAME(m_mouse.latch));
-	save_item(NAME(m_dsk.drive));
-	save_item(NAME(m_dsk.kaddr));
-	save_item(NAME(m_dsk.kadr));
-	save_item(NAME(m_dsk.kstat));
-	save_item(NAME(m_dsk.kcom));
-	save_item(NAME(m_dsk.krecno));
-	save_item(NAME(m_dsk.shiftin));
-	save_item(NAME(m_dsk.shiftout));
-	save_item(NAME(m_dsk.datain));
-	save_item(NAME(m_dsk.dataout));
-	save_item(NAME(m_dsk.krwc));
-	save_item(NAME(m_dsk.kfer));
-	save_item(NAME(m_dsk.wdtskena));
-	save_item(NAME(m_dsk.wdinit0));
-	save_item(NAME(m_dsk.wdinit));
-	save_item(NAME(m_dsk.strobe));
-	save_item(NAME(m_dsk.bitclk));
-	save_item(NAME(m_dsk.datin));
-	save_item(NAME(m_dsk.bitcount));
-	save_item(NAME(m_dsk.carry));
-	save_item(NAME(m_dsk.seclate));
-	save_item(NAME(m_dsk.seekok));
-	save_item(NAME(m_dsk.ok_to_run));
-	save_item(NAME(m_dsk.ready_mf31a));
-	save_item(NAME(m_dsk.seclate_mf31b));
-#if	0
-	save_item(NAME(m_dsk.ff_21a));
-	save_item(NAME(m_dsk.ff_21a_old));
-	save_item(NAME(m_dsk.ff_21b));
-	save_item(NAME(m_dsk.ff_22a));
-	save_item(NAME(m_dsk.ff_22b));
-	save_item(NAME(m_dsk.ff_43b));
-	save_item(NAME(m_dsk.ff_53a));
-	save_item(NAME(m_dsk.ff_43a));
-	save_item(NAME(m_dsk.ff_53b));
-	save_item(NAME(m_dsk.ff_44a));
-	save_item(NAME(m_dsk.ff_44b));
-	save_item(NAME(m_dsk.ff_45a));
-	save_item(NAME(m_dsk.ff_45b));
-#endif
 
 	hard_reset();
 
@@ -1501,7 +1459,7 @@ void alto2_cpu_device::bs_late_load_r()
 	if (m_d_f2 != f2_emu_load_dns) {
 		m_r[m_rsel] = m_shifter;
 		LOG((LOG_CPU,2,"	R%02o←; %s = SHIFTER (%#o)\n", m_rsel, r_name(m_rsel), m_shifter));
-#if	1
+#if	0
 		/* HACK: programs writing r37 with xxx3 make the cursor
 		 * display go nuts. Until I found the real reason for this
 		 * obviously buggy display, I just clear the two
@@ -1851,9 +1809,9 @@ void alto2_cpu_device::f1_early_task()
 }
 
 /**
- * @brief f1_block early: block task
+ * @brief block task
  *
- * The task request for the active task is cleared
+ * The task wakeup for the active task is cleared
  */
 void alto2_cpu_device::f1_early_block()
 {
@@ -1861,18 +1819,27 @@ void alto2_cpu_device::f1_early_block()
 	LOG((LOG_CPU,2, "	BLOCK %02o:%s\n", m_task, task_name(m_task)));
 }
 
+/**
+ * @brief SHIFTER = L shifted left once
+ */
 void alto2_cpu_device::f1_late_l_lsh_1()
 {
 	m_shifter = m_l << 1;
 	LOG((LOG_CPU,2,"	SHIFTER ←L LSH 1 (%#o := %#o<<1)\n", m_shifter, m_l));
 }
 
+/**
+ * @brief SHIFTER = L shifted right once
+ */
 void alto2_cpu_device::f1_late_l_rsh_1()
 {
 	m_shifter = m_l >> 1;
 	LOG((LOG_CPU,2,"	SHIFTER ←L RSH 1 (%#o := %#o>>1)\n", m_shifter, m_l));
 }
 
+/**
+ * @brief SHIFTER = L cycled 8 times (byte swap)
+ */
 void alto2_cpu_device::f1_late_l_lcy_8()
 {
 	m_shifter = (m_l >> 8) | (m_l << 8);
@@ -1890,7 +1857,7 @@ void alto2_cpu_device::f2_late_bus_eq_zero()
 }
 
 /**
- * @brief f2_shifter_lt_zero late: branch on shifter less than zero
+ * @brief branch on shifter less than zero
  */
 void alto2_cpu_device::f2_late_shifter_lt_zero()
 {
@@ -1900,7 +1867,7 @@ void alto2_cpu_device::f2_late_shifter_lt_zero()
 }
 
 /**
- * @brief f2_shifter_eq_zero late: branch on shifter equals zero
+ * @brief branch on shifter equals zero
  */
 void alto2_cpu_device::f2_late_shifter_eq_zero()
 {
@@ -2302,16 +2269,8 @@ void alto2_cpu_device::execute_run()
 		m_d_loadl = X_BIT(m_mir, 32, DLOADL);
 
 		debugger_instruction_hook(this, m_mpc);
-
 		m_cycle++;
-		m_pico_time[m_task] += ALTO2_UCYCLE;	// add per task pico seconds per cycle
 
-		/*
-		 * This bus source decoding is not performed if f1 == f1_const
-		 * or f2 == f2_const. These functions use the MIR BS field to
-		 * provide a part of the address to the constant ROM instead.
-		 */
-		do_bs = !(m_d_f1 == f1_const || m_d_f2 == f2_const);
 
 		if (m_d_f1 == f1_load_mar && check_mem_load_mar_stall(m_rsel)) {
 			LOG((LOG_CPU,3, "	MAR← stall\n"));
@@ -2321,6 +2280,12 @@ void alto2_cpu_device::execute_run()
 			LOG((LOG_CPU,3, "	MD← stall\n"));
 			continue;
 		}
+		/*
+		 * Bus source decoding is not performed if f1 == f1_const
+		 * or f2 == f2_const. These functions use the MIR BS field to
+		 * provide a part of the address to the constant ROM instead.
+		 */
+		do_bs = !(m_d_f1 == f1_const || m_d_f2 == f2_const);
 		if (do_bs && m_d_bs == bs_read_md && check_mem_read_stall()) {
 			LOG((LOG_CPU,3, "	←MD stall\n"));
 			continue;
@@ -2572,7 +2537,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus;
 			m_aluc0 = 1;
 			flags = ALUM | TSELECT;
-			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
+			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, m_d_aluf));
 			break;
 
 		/**
@@ -2586,7 +2551,7 @@ void alto2_cpu_device::execute_run()
 			alu = m_bus;
 			m_aluc0 = 1;
 			flags = ALUM | TSELECT;
-			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, aluf));
+			LOG((LOG_CPU,0,"	ALU← 0 (illegal aluf in task %s, mpc:%05o aluf:%02o)\n", task_name(m_task), m_mpc, m_d_aluf));
 		}
 		m_alu = static_cast<UINT16>(alu);
 #endif
