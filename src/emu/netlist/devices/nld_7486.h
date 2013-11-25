@@ -3,7 +3,7 @@
 /*
  * nld_7486.h
  *
- *  DM7486: Quad 2-Input NAND Gates
+ *  DM7486: Quad 2-Input Quad 2-Input Exclusive-OR Gates
  *
  *          +--------------+
  *       A1 |1     ++    14| VCC
