@@ -1,54 +1,66 @@
 /***************************************************************************
 
-        Hawthorne Technologies TinyGiant HT68k
+        Hawthorne Technology TinyGiant HT68k
 
         29/11/2009 Skeleton driver.
 
-Monitor commands (most do unknown things) (must be in Uppercase)
-B boot
-C compare memory blocks
-D dump memory to screen
-E Edit memory (. to escape)
-F
-G
-K
-L
-M
-P
-R
-S
-T
-W
-X (. to escape)
+Monitor commands (from ht68k manual) (must be in Uppercase)
+B Load binary file from disk.
+C Compare memory.
+D Display memory in Hex and ASCII.
+E Examine and/or change memory (2 bytes). (. to escape)
+F Fill a block of memory with a value.
+G Go to an address and execute program.
+K Peek.
+L Load program from serial port.
+M Move memory.
+P Poke.
+R Read binary file from disk.
+S System boot.
+T Test printer.
+W Write binary file to disk.
+X Examine long and/or change memory (4 bytes). (. to escape)
+
+
+Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/68681.h"
+#include "machine/n68681.h"
 #include "machine/wd_fdc.h"
-#include "machine/terminal.h"
+#include "machine/serial.h"
 
 
 class ht68k_state : public driver_device
 {
 public:
 	ht68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG),
 	m_duart(*this, "duart68681"),
-	m_fdc(*this, "wd1770")
-	,
-		m_p_ram(*this, "p_ram"){ }
+	m_fdc(*this, "wd1770"),
+	m_floppy0(*this, "wd1770:0"),
+	m_floppy1(*this, "wd1770:1"),
+	m_floppy2(*this, "wd1770:2"),
+	m_floppy3(*this, "wd1770:3"),
+	m_floppy(NULL),
+	m_p_ram(*this, "p_ram"){ }
 
 
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	required_device<duart68681_device> m_duart;
+	required_device<duartn68681_device> m_duart;
 	required_device<wd1770_t> m_fdc;
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE_LINE_MEMBER(ht68k_fdc_intrq_w);
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	floppy_image_device *m_floppy;
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(duart_txb);
+	DECLARE_READ8_MEMBER(duart_input);
+	DECLARE_WRITE8_MEMBER(duart_output);
 	required_shared_ptr<UINT16> m_p_ram;
 	virtual void machine_reset();
 };
@@ -60,14 +72,13 @@ static ADDRESS_MAP_START(ht68k_mem, AS_PROGRAM, 16, ht68k_state)
 	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
 	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
 	AM_RANGE(0x00e00000, 0x00e00007) AM_MIRROR(0xfff8) AM_DEVREADWRITE8("wd1770", wd1770_t, read, write, 0x00ff) // FDC WD1770
-	AM_RANGE(0x00e80000, 0x00e800ff) AM_MIRROR(0xff00) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE(0x00e80000, 0x00e800ff) AM_MIRROR(0xff00) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff )
 	AM_RANGE(0x00f00000, 0x00f07fff) AM_ROM AM_MIRROR(0xf8000) AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( ht68k )
 INPUT_PORTS_END
-
 
 void ht68k_state::machine_reset()
 {
@@ -76,59 +87,56 @@ void ht68k_state::machine_reset()
 	memcpy((UINT8*)m_p_ram.target(),user1,0x8000);
 
 	m_maincpu->reset();
+	
+	m_fdc->reset();
+	m_fdc->set_floppy(NULL);
 }
 
-static void duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(ht68k_state::duart_irq_handler)
 {
-	ht68k_state *drvstate = device->machine().driver_data<ht68k_state>();
-	drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR);
 }
 
-static void duart_tx(device_t *device, int channel, UINT8 data)
+WRITE_LINE_MEMBER(ht68k_state::duart_txb)
 {
-	ht68k_state *state = device->machine().driver_data<ht68k_state>();
-	state->m_terminal->write(device->machine().driver_data()->generic_space(), 0, data);
+	//This is the second serial channel named AUX, for modem or other serial devices.
 }
 
-static UINT8 duart_input(device_t *device)
+READ8_MEMBER(ht68k_state::duart_input)
 {
 	return 0;
 }
 
-static void duart_output(device_t *device, UINT8 data)
+WRITE8_MEMBER(ht68k_state::duart_output)
 {
-	ht68k_state *state = device->machine().driver_data<ht68k_state>();
+	m_floppy = NULL;
 
-	static const char *names[] = { "wd1770:0", "wd1770:1", "wd1770:2", "wd1770:3" };
-	floppy_image_device *floppy = 0;
-	for(int i=0; i<4; i++) {
-		if(BIT(data, 7-i)==0) {
-			floppy_connector *con = device->machine().device<floppy_connector>(names[i]);
-			if(con)
-				floppy = con->get_device();
-			break;
-		}
-	}
-	if (floppy) floppy->ss_w(BIT(data,3) ? 0 : 1);
-	state->m_fdc->set_floppy(floppy);
+	if ((BIT(data, 7)) == 0) { m_floppy = m_floppy0->get_device(); }
+	if ((BIT(data, 6)) == 0) { m_floppy = m_floppy1->get_device(); }
+	if ((BIT(data, 5)) == 0) { m_floppy = m_floppy2->get_device(); }
+	if ((BIT(data, 4)) == 0) { m_floppy = m_floppy3->get_device(); }
+
+	m_fdc->set_floppy(m_floppy);
+
+	if (m_floppy) {m_floppy->ss_w(BIT(data,3) ? 0 : 1);}
 }
 
-WRITE8_MEMBER( ht68k_state::kbd_put )
+static const rs232_port_interface rs232_intf =
 {
-	duart68681_rx_data(m_duart, 0, data);
-}
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(ht68k_state, kbd_put)
+	DEVCB_DEVICE_LINE_MEMBER("duart68681", duartn68681_device, rx_a_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-static const duart68681_config ht68k_duart68681_config =
+static const duartn68681_config ht68k_duart68681_config =
 {
-	duart_irq_handler,
-	duart_tx,
-	duart_input,
-	duart_output
+	DEVCB_DRIVER_LINE_MEMBER(ht68k_state, duart_irq_handler),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx), //serial channel CON (console, for terminal, 9600 baud)
+	DEVCB_DRIVER_LINE_MEMBER(ht68k_state, duart_txb), // serial channel AUX (auxiliary, for modem or other serial device, 1200 baud)
+	DEVCB_DRIVER_MEMBER(ht68k_state, duart_input),
+	DEVCB_DRIVER_MEMBER(ht68k_state, duart_output)
 };
 
 static SLOT_INTERFACE_START( ht68k_floppies )
@@ -140,12 +148,10 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
-
+	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-
-	MCFG_DUART68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )
+	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )
 
 	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )
 
@@ -165,4 +171,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                     FULLNAME                    FLAGS */
-COMP( 1987, ht68k,  0,       0,      ht68k,     ht68k, driver_device,   0,   "Hawthorne Technologies", "TinyGiant HT68k", GAME_NO_SOUND)
+COMP( 1987, ht68k,  0,       0,      ht68k,     ht68k, driver_device,   0,   "Hawthorne Technology", "TinyGiant HT68k", GAME_NO_SOUND)
