@@ -215,6 +215,11 @@ WRITE8_MEMBER( ym2610_device::write )
 	ym2610_write(m_chip, offset & 3, data);
 }
 
+void ym2610_device::set_pcmbufs(const UINT8 *buf, size_t size, UINT8* bufdt, size_t sizedt)
+{
+	ym2610_set_pcmbufs(m_chip, buf, size, bufdt, sizedt);
+}
+
 
 const device_type YM2610 = &device_creator<ym2610_device>;
 

@@ -1372,6 +1372,7 @@ $(MAMEOBJ)/nasco.a: \
 
 $(MAMEOBJ)/neogeo.a: \
 	$(DRIVERS)/neogeo.o $(VIDEO)/neogeo.o \
+	$(DRIVERS)/neogeomvs.o \
 	$(MACHINE)/neoboot.o \
 	$(MACHINE)/neocrypt.o \
 	$(MACHINE)/neoprot.o \
@@ -2699,7 +2700,6 @@ $(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 # misc dependencies
 #-------------------------------------------------
 
-$(DRIVERS)/neogeo.o:    $(MAMESRC)/drivers/neogeo.inc
 $(VIDEO)/jaguar.o:  $(MAMESRC)/video/jagobj.inc \
 			$(MAMESRC)/video/jagblit.inc
 $(DRIVERS)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h

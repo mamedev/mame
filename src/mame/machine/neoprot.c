@@ -91,6 +91,13 @@ WRITE16_MEMBER( neogeo_state::fatfury2_protection_16_w )
 	}
 }
 
+void neogeo_state::fatfury2_init_protection()
+{
+	// hack, if using multiple slots this ends up being called multiple times
+	// it should be part of the cartridge, not global.  For now only regster
+	// it for slot 0 to keep legacy MAME use happy.
+	if (current_slot == 0) save_item(NAME(m_fatfury2_prot_data));
+}
 
 void neogeo_state::fatfury2_install_protection()
 {
@@ -100,7 +107,7 @@ void neogeo_state::fatfury2_install_protection()
 
 	m_fatfury2_prot_data = 0;
 
-	save_item(NAME(m_fatfury2_prot_data));
+	
 }
 
 
@@ -114,7 +121,7 @@ void neogeo_state::fatfury2_install_protection()
 WRITE16_MEMBER( neogeo_state::kof98_prot_w )
 {
 	/* info from razoola */
-	UINT16* mem16 = (UINT16*)memregion("maincpu")->base();
+	UINT16* mem16 = (UINT16*)current_maincpu_region;
 
 	switch (data)
 	{
@@ -205,13 +212,23 @@ READ16_MEMBER( neogeo_state::mslugx_protection_16_r )
 	return res;
 }
 
+void neogeo_state::mslugx_init_protection()
+{	// hack, if using multiple slots this ends up being called multiple times
+	// it should be part of the cartridge, not global.  For now only regster
+	// it for slot 0 to keep legacy MAME use happy.
+	if (current_slot == 0)
+	{
+		save_item(NAME(m_mslugx_command));
+		save_item(NAME(m_mslugx_counter));
+	}
+}
 
 void neogeo_state::mslugx_install_protection()
 {
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fffe0, 0x2fffef, read16_delegate(FUNC(neogeo_state::mslugx_protection_16_r),this), write16_delegate(FUNC(neogeo_state::mslugx_protection_16_w),this));
 
-	save_item(NAME(m_mslugx_command));
-	save_item(NAME(m_mslugx_counter));
+
+
 }
 
 
@@ -428,9 +445,17 @@ void neogeo_state::reset_sma_rng()
 }
 
 
+void neogeo_state::init_sma(void)
+{
+	// hack, if using multiple slots this ends up being called multiple times
+	// it should be part of the cartridge, not global.  For now only regster
+	// it for slot 0 to keep legacy MAME use happy.
+	if (current_slot == 0) save_item(NAME(m_sma_rng));
+}
+
 void neogeo_state::sma_install_random_read_handler(int addr1, int addr2 )
 {
-	save_item(NAME(m_sma_rng));
+
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(addr1, addr1 + 1, read16_delegate(FUNC(neogeo_state::sma_random_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(addr2, addr2 + 1, read16_delegate(FUNC(neogeo_state::sma_random_r),this));
@@ -544,10 +569,15 @@ WRITE16_MEMBER( neogeo_state::pvc_prot_w )
 		pvc_write_bankswitch(space);
 }
 
+void neogeo_state::init_pvc_protection()
+{
+	// hack, if using multiple slots this ends up being called multiple times
+	// it should be part of the cartridge, not global.  For now only regster
+	// it for slot 0 to keep legacy MAME use happy.
+	if (current_slot == 0) save_item(NAME(m_cartridge_ram));
+}
 
 void neogeo_state::install_pvc_protection()
 {
-	save_item(NAME(m_cartridge_ram));
-
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::pvc_prot_r),this), write16_delegate(FUNC(neogeo_state::pvc_prot_w),this));
 }

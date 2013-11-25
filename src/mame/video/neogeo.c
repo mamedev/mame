@@ -250,8 +250,8 @@ void neogeo_state::draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline )
 {
 	int x;
 
-	UINT8* gfx_base = m_fixed_layer_source ? m_region_fixed->base() : m_region_fixedbios->base();
-	UINT32 addr_mask = ( m_fixed_layer_source ? m_region_fixed->bytes() : m_region_fixedbios->bytes() ) - 1;
+	UINT8* gfx_base = m_fixed_layer_source ? current_fixed_region : m_region_fixedbios->base();
+	UINT32 addr_mask = ( m_fixed_layer_source ? current_fixed_region_size : m_region_fixedbios->bytes() ) - 1;
 	UINT16 *video_data = &m_videoram[0x7000 | (scanline >> 3)];
 	UINT32 *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
 
@@ -498,7 +498,7 @@ void neogeo_state::draw_sprites( bitmap_rgb32 &bitmap, int scanline )
 			zoom_x_table = zoom_x_tables[zoom_x];
 
 			/* compute offset in gfx ROM and mask it to the number of bits available */
-			gfx = &m_sprite_gfx[((code << 8) | (sprite_y << 4)) & m_sprite_gfx_address_mask];
+			gfx = &neogeo_cart_table[current_slot].m_sprite_gfx[((code << 8) | (sprite_y << 4)) & neogeo_cart_table[current_slot].m_sprite_gfx_address_mask];
 
 			line_pens = &m_pens[attr >> 8 << 4];
 
@@ -661,7 +661,7 @@ void neogeo_state::optimize_sprite_data()
 	   power of 2 */
 	mask = 0xffffffff;
 
-	len = m_region_sprites->bytes();
+	len = current_sprites_region_size;
 
 	for (bit = 0x80000000; bit != 0; bit >>= 1)
 	{
@@ -671,11 +671,11 @@ void neogeo_state::optimize_sprite_data()
 		mask >>= 1;
 	}
 
-	m_sprite_gfx.resize(mask + 1);
-	m_sprite_gfx_address_mask = mask;
+	neogeo_cart_table[current_slot].m_sprite_gfx.resize(mask + 1);
+	neogeo_cart_table[current_slot].m_sprite_gfx_address_mask = mask;
 
-	src = m_region_sprites->base();
-	dest = m_sprite_gfx;
+	src = current_sprites_region;
+	dest = neogeo_cart_table[current_slot].m_sprite_gfx;
 
 	for (unsigned i = 0; i < len; i += 0x80, src += 0x80)
 	{
@@ -832,7 +832,6 @@ void neogeo_state::video_start()
 	create_sprite_line_timer();
 	create_auto_animation_timer();
 
-	m_sprite_gfx_address_mask = 0;
 	optimize_sprite_data();
 
 	/* initialize values that are not modified on a reset */

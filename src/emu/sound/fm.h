@@ -190,6 +190,8 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length);
 void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length);
 #endif /* BUILD_YM2610B */
 
+void ym2610_set_pcmbufs(void *chip, const UINT8 *buf, size_t size, UINT8* bufdt, size_t sizedt);
+
 int ym2610_write(void *chip, int a,unsigned char v);
 unsigned char ym2610_read(void *chip,int a);
 int ym2610_timer_over(void *chip, int c );
