@@ -1,17 +1,54 @@
 /***************************************************************************
 
-        Microsystems International Limited MOD-8
+Microsystems International Limited MOD-8
 
-        M.I.L. was formed in 1968 from a joint venture between the Canadian
-        Government and Northern Telecom. It produced a variety of computer
-        chips, eproms, etc, plus parts for the telephone company. It folded
-        in 1975.
-        (Info from http://www.cse.yorku.ca/museum/v_tour/artifacts/artifacts.htm)
+M.I.L. was formed in 1968 from a joint venture between the Canadian
+Government and Northern Telecom. It produced a variety of computer
+chips, eproms, etc, plus parts for the telephone company. It folded
+in 1975.
+(Info from http://www.cse.yorku.ca/museum/v_tour/artifacts/artifacts.htm)
 
 
-        14/06/2011 Modernised & above notes added.
-        02/12/2009 Working driver [Miodrag Milanovic]
-        18/11/2009 Skeleton driver.
+    2009-11-18 Skeleton driver.
+    2009-12-02 Working driver [Miodrag Milanovic]
+    2011-06-14 Modernised & above notes added.
+
+Commands:
+All commands consist of 3 uppercase letters. If further info is required
+then a * prompt is printed on a new line, where you will enter the data.
+All numbers are OCTAL (3/6 digits with leading zeros). Since a teletypewriter
+is being used, there is no cursor. Do NOT press Enter except after these
+commands, otherwise things get confusing.
+
+LOC - set current location pointer (the CLP)
+DLP - display CLP
+DPS - dump symbolic
+LDO - load octal
+DPO - dump octal
+LBF - load BNPF format
+DBF - dump BNPF format
+EDT - enter Edit Mode
+XQT - initiate program execution
+CPY - copy routine
+TRN - translate routine
+SBP - set breakpoint
+CBP - clear breakpoint
+PRG - program PROM
+
+Pressing Ctrl-A will escape back to the monitor. You will see 8 dashes.
+
+Commands in the Edit Mode:
+When you enter the Edit Mode it displays the CLP followed by a slash.
+
+nnn - enter a new value into this memory location and increment the CLP
+` (tic) - decrement CLP
+@ - same as XQT
+R - return to monitor
+*nnnnnn - change CLP to this value
+space - display current contents of memory
+
+While in 'space' mode, press a letter to increment CLP, or shift-delete
+(underscore character) followed by a new byte for this location.
 
 ****************************************************************************/
 
@@ -23,21 +60,22 @@ class mod8_state : public driver_device
 {
 public:
 	mod8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_teleprinter(*this, TELEPRINTER_TAG)
-	,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_teleprinter(*this, TELEPRINTER_TAG)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	required_device<teleprinter_device> m_teleprinter;
 	DECLARE_WRITE8_MEMBER(out_w);
 	DECLARE_WRITE8_MEMBER(tty_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(tty_r);
+	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
+private:
 	UINT16 m_tty_data;
 	UINT8 m_tty_key_data;
 	int m_tty_cnt;
 	virtual void machine_reset();
-	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
+	required_device<teleprinter_device> m_teleprinter;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -112,7 +150,6 @@ static MACHINE_CONFIG_START( mod8, mod8_state )
 	MCFG_CPU_PROGRAM_MAP(mod8_mem)
 	MCFG_CPU_IO_MAP(mod8_io)
 
-
 	/* video hardware */
 	MCFG_GENERIC_TELEPRINTER_ADD(TELEPRINTER_TAG, teleprinter_intf)
 MACHINE_CONFIG_END
@@ -132,5 +169,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY                      FULLNAME       FLAGS */
-COMP( 1974, mod8,   0,       0,      mod8,      mod8, driver_device,    0, "Microsystems International Ltd", "MOD-8", GAME_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS           INIT   COMPANY                       FULLNAME       FLAGS */
+COMP( 1974, mod8,   0,       0,      mod8,      mod8,   driver_device,   0, "Microsystems International Ltd", "MOD-8", GAME_NO_SOUND_HW)
