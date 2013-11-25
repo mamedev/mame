@@ -1,19 +1,27 @@
 // license:MAME
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/***********************************************************************************************************
 
     'High Rate DVD' HW (c) 1998 Nichibutsu
 
     preliminary driver by Angelo Salese
 
     TODO:
-    - rewrite v9938/v9958 video chip;
     - fix h8 CPU core bugs, it trips various unhandled opcodes
     - Implement DVD routing and YUV decoding;
     - game timings seem busted, could be due of missing DVD hook-up
     - csplayh1: inputs doesn't work at all, slower than the others too
+	- h8 type is almost likely to be wrong;
 
-***************************************************************************/
+	DVD Notes:
+	- TMP68301 communicates with h8 via their respective internal serial comms
+	- First command is a "?P<CR>", which, according to the Pioneer V5000 protocol manual
+	  is an Active Mode request. Manual is at:
+	  http://www.pioneerelectronics.com/ephox/StaticFiles/Manuals/Business/Pio%20V5000-RS232%20-%20CPM.pdf
+      After returning a correct status code, tmp68301 sends "FSDVD04.MPG00001<CR>" to serial, probably tries
+      to playback the file ...
+
+***********************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -94,7 +102,7 @@ public:
 
 
 
-#define USE_H8 0
+#define USE_H8 1
 
 // from MSX2 driver, may be not accurate for this HW
 #define MSX2_XBORDER_PIXELS     16
