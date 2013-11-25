@@ -10,6 +10,10 @@
     - quickload
     - color on
 
+    - keyboard not working
+    - foreground is black, according to the construction article it should be white.
+    - it is supposed to reset itself at boot, but that isn't working. You must press R.
+
 */
 
 #include "includes/eti660.h"
@@ -42,9 +46,9 @@ WRITE8_MEMBER( eti660_state::colorram_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( eti660_map, AS_PROGRAM, 8, eti660_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x0fff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eti660_io_map, AS_IO, 8, eti660_state )
@@ -184,7 +188,7 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 	if (!BIT(m_keylatch, 2)) data &= m_pa2->read();
 	if (!BIT(m_keylatch, 3)) data &= m_pa3->read();
 
-	return data;
+	return data | m_keylatch;
 }
 
 WRITE8_MEMBER( eti660_state::pia_pa_w )
