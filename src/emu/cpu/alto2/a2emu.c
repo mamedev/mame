@@ -12,9 +12,6 @@
 /** @brief CTL2K_U3 address line for F2 function */
 #define	CTL2K_U3(f2) (f2 == f2_emu_idisp ? 0x80 : 0x00)
 
-/** @brief set non-zero to use expressions after the schematics for RSEL[3-4] */
-#define	USE_SCHEMATICS_RSEL	0
-
 /**
  * width,from,to of the 16 bit instruction register
  *                     1 1 1 1 1 1
@@ -237,18 +234,6 @@
  * </PRE>
  */
 
-#if	USE_SCHEMATICS_RSEL
-#define	RA3(f2,ir,rs)	(\
-	(((ALTO2_GET(f2,4,0,2)==5 && ALTO2_GET(ir,16,3,3)==0) ? 0 : 1) && \
-	((ALTO2_GET(f2,4,0,2)==7 && ALTO2_GET(ir,16,1,1)==0) ? 0 : 1) && \
-	(ALTO2_GET(rs,5,3,3)==0)) ? 0 : 1)
-
-#define	RA4(f2,ir,rs)	(\
-	(((ALTO2_GET(f2,4,0,2)==5 && ALTO2_GET(ir,16,4,4)==0) ? 0 : 1) && \
-	((ALTO2_GET(f2,4,0,2)==7 && ALTO2_GET(ir,16,2,2)==0) ? 0 : 1) && \
-	(ALTO2_GET(rs,5,4,4)==0)) ? 0 : 1)
-#endif	/* USE_SCHEMATICS_RSEL */
-
 /**
  * @brief bs_disp early: drive bus by IR[8-15], possibly sign extended
  *
@@ -367,7 +352,7 @@ void alto2_cpu_device::f1_early_startf()
 }
 
 /**
- * @brief f2_busodd late: branch on odd bus
+ * @brief branch on odd bus
  */
 void alto2_cpu_device::f2_late_busodd()
 {
@@ -377,7 +362,7 @@ void alto2_cpu_device::f2_late_busodd()
 }
 
 /**
- * @brief f2_magic late: shift and use T[0] or T[15]
+ * @brief f2_magic late: shift and use T[0] or T[15] for bit 15 or 0
  */
 void alto2_cpu_device::f2_late_magic()
 {
@@ -403,21 +388,16 @@ void alto2_cpu_device::f2_late_magic()
 }
 
 /**
- * @brief dns early: modify RESELECT with DstAC = (3 - IR[3-4])
+ * @brief do novel shifts: modify RESELECT with DstAC = (3 - IR[3-4])
  */
 void alto2_cpu_device::f2_early_load_dns()
 {
-#if	USE_SCHEMATICS_RSEL
-	X_WRBITS(m_rsel, 5, 3, 3, RA3(f2_emu_load_dns, m_emu.ir, m_rsel));
-	X_WRBITS(m_rsel, 5, 4, 4, RA4(f2_emu_load_dns, m_emu.ir, m_rsel));
-#else
 	X_WRBITS(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
-#endif
 	LOG((LOG_EMU,2,"	DNS←; rsel := DstAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 /**
- * @brief f2_load_dns late: do novel shifts
+ * @brief do novel shifts
  *
  * <PRE>
  * New emulator carry is selected by instruction register
@@ -499,16 +479,11 @@ void alto2_cpu_device::f2_late_load_dns()
 }
 
 /**
- * @brief f2_acdest early: modify RSELECT with DstAC = (3 - IR[3-4])
+ * @brief destiantion accu: modify RSELECT with DstAC = (3 - IR[3-4])
  */
 void alto2_cpu_device::f2_early_acdest()
 {
-#if	USE_SCHEMATICS_RSEL
-	ALTO2_PUT(m_rsel, 5, 3, 3, RA3(f2_emu_acdest, m_emu.ir, m_rsel));
-	ALTO2_PUT(m_rsel, 5, 4, 4, RA4(f2_emu_acdest, m_emu.ir, m_rsel));
-#else
 	X_WRBITS(m_rsel, 5, 3, 4, IR_DstAC(m_emu.ir) ^ 3);
-#endif
 	LOG((LOG_EMU,2,"	ACDEST←; mux (rsel:%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
@@ -555,7 +530,7 @@ void alto2_cpu_device::bitblt_info()
 #endif	/* DEBUG */
 
 /**
- * @brief f2_load_ir late: load instruction register IR and branch on IR[0,5-7]
+ * @brief load instruction register IR and branch on IR[0,5-7]
  *
  * Loading the IR clears the skip latch.
  */
@@ -563,6 +538,7 @@ void alto2_cpu_device::f2_late_load_ir()
 {
 	UINT16 r = (X_BIT(m_bus,16,0) << 3) | X_RDBITS(m_bus,16,5,7);
 
+#if	ALTO2_DEBUG
 	/* special logging of some opcodes */
 	switch (m_bus) {
 	case op_CYCLE:
@@ -595,9 +571,7 @@ void alto2_cpu_device::f2_late_load_ir()
 			m_r[rsel_ac2], m_r[rsel_ac3]));
 		break;
 	case op_BITBLT:
-#if	ALTO2_DEBUG
 		bitblt_info();
-#endif
 		break;
 	case op_RDRAM:
 		LOG((LOG_EMU,3,"	RDRAM addr:%#o\n", m_r[rsel_ac1]));
@@ -615,6 +589,7 @@ void alto2_cpu_device::f2_late_load_ir()
 		LOG((LOG_EMU,3,"	XMSTA [bank:%o AC1:#o] = AC0 (%#o)\n", m_bank_reg[m_task] & 3, m_r[rsel_ac1], m_r[rsel_ac0]));
 		break;
 	}
+#endif
 	m_emu.ir = m_bus;
 	m_emu.skip = 0;
 	m_next2 |= r;
@@ -622,7 +597,7 @@ void alto2_cpu_device::f2_late_load_ir()
 
 
 /**
- * @brief f2_idisp late: branch on: arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
+ * @brief branch on: arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
  */
 void alto2_cpu_device::f2_late_idisp()
 {
@@ -642,21 +617,16 @@ void alto2_cpu_device::f2_late_idisp()
 }
 
 /**
- * @brief f2_acsource early: modify RSELECT with SrcAC = (3 - IR[1-2])
+ * @brief source accu: modify RSELECT with SrcAC = (3 - IR[1-2])
  */
 void alto2_cpu_device::f2_early_acsource()
 {
-#if	USE_SCHEMATICS_RSEL
-	X_WRBITS(m_rsel, 5, 3, 3, RA3(f2_emu_acsource, m_emu.ir, m_rsel));
-	X_WRBITS(m_rsel, 5, 4, 4, RA4(f2_emu_acsource, m_emu.ir, m_rsel));
-#else
 	X_WRBITS(m_rsel, 5, 3, 4, IR_SrcAC(m_emu.ir) ^ 3);
-#endif
 	LOG((LOG_EMU,2,"	←ACSOURCE; rsel := SrcAC (%#o %s)\n", m_rsel, r_name(m_rsel)));
 }
 
 /**
- * @brief f2_acsource late: branch on: arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
+ * @brief branch on: arithmetic IR_SH, others PROM ctl2k_u3[IR[1-7]]
  */
 void alto2_cpu_device::f2_late_acsource()
 {
