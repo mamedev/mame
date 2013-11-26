@@ -102,7 +102,7 @@ public:
 
 
 
-#define USE_H8 1
+#define USE_H8 0
 
 // from MSX2 driver, may be not accurate for this HW
 #define MSX2_XBORDER_PIXELS     16

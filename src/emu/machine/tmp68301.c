@@ -6,6 +6,12 @@
     3 timers, address decoder, wait generator, interrupt controller,
     all integrated in a single chip.
 
+	TODO:
+	- Interrupt generation: handle pending / in-service mechanisms
+	- Parallel port: handle timing latency
+	- Serial port: not done at all
+	- (and many other things)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -19,6 +25,7 @@ static ADDRESS_MAP_START( tmp68301_regs, AS_0, 16, tmp68301_device )
 	AM_RANGE(0x098,0x099) AM_READWRITE(iisr_r,iisr_w)
 
 	/* Parallel Port */
+	AM_RANGE(0x100,0x101) AM_READWRITE(pdir_r,pdir_w)
 	AM_RANGE(0x10a,0x10b) AM_READWRITE(pdr_r,pdr_w)
 
 	/* Serial Port */
@@ -65,15 +72,25 @@ WRITE16_MEMBER(tmp68301_device::scr_w)
 	m_scr &= 0xa1;
 }
 
-/* TODO: bit direction */
+/* Parallel direction: 1 = output, 0 = input */
+READ16_MEMBER(tmp68301_device::pdir_r)
+{
+	return m_pdir;
+}
+
+WRITE16_MEMBER(tmp68301_device::pdir_w)
+{
+	m_pdir = data;
+}
+
 READ16_MEMBER(tmp68301_device::pdr_r)
 {
-	return m_in_parallel_func(0);
+	return m_in_parallel_func(0) & ~m_pdir;
 }
 
 WRITE16_MEMBER(tmp68301_device::pdr_w)
 {
-	m_out_parallel_func(0,data);
+	m_out_parallel_func(0,data & m_pdir);
 }
 
 

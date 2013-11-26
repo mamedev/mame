@@ -57,6 +57,8 @@ public:
 	DECLARE_WRITE16_MEMBER(scr_w);
 	DECLARE_READ16_MEMBER(pdr_r);
 	DECLARE_WRITE16_MEMBER(pdr_w);
+	DECLARE_READ16_MEMBER(pdir_r);
+	DECLARE_WRITE16_MEMBER(pdir_w);
 
 protected:
 	// device-level overrides
@@ -84,6 +86,7 @@ private:
 	UINT16 m_imr;
 	UINT16 m_iisr;
 	UINT16 m_scr;
+	UINT16 m_pdir;
 
 	inline UINT16 read_word(offs_t address);
 	inline void write_word(offs_t address, UINT16 data);
