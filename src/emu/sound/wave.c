@@ -16,13 +16,57 @@
 #include "emu.h"
 #include "imagedev/cassette.h"
 #include "wave.h"
-#include "devlegcy.h"
 
 #define ALWAYS_PLAY_SOUND   0
 
-static STREAM_UPDATE( wave_sound_update )
+
+
+void wave_device::static_set_cassette_tag(device_t &device, const char *cassette_tag)
 {
-	cassette_image_device *cass = (cassette_image_device *)param;
+	wave_device &wave = downcast<wave_device &>(device);
+	wave.m_cassette_tag = cassette_tag;
+}
+
+const device_type WAVE = &device_creator<wave_device>;
+
+wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, WAVE, "Wave", tag, owner, clock, "wawe", __FILE__),
+		device_sound_interface(mconfig, *this)
+{
+	m_cassette_tag = 0;
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void wave_device::device_config_complete()
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void wave_device::device_start()
+{
+	speaker_device_iterator spkiter(machine().root_device());
+	int speakers = spkiter.count();
+	if (speakers > 1)
+		machine().sound().stream_alloc(*this, 0, 2, machine().sample_rate(), this);
+	else
+		machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate(), this);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	cassette_image_device *cass = machine().device<cassette_image_device>(m_cassette_tag);
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
@@ -63,59 +107,4 @@ static STREAM_UPDATE( wave_sound_update )
 		if (speakers > 1)
 			memset(right_buffer, 0, sizeof(*right_buffer) * samples);
 	}
-}
-
-
-
-static DEVICE_START( wave )
-{
-	cassette_image_device *image = NULL;
-
-	assert( device != NULL );
-	assert( device->static_config() != NULL );
-	speaker_device_iterator spkiter(device->machine().root_device());
-	int speakers = spkiter.count();
-	image = dynamic_cast<cassette_image_device *>(device->machine().device( (const char *)device->static_config()));
-	if (speakers > 1)
-		device->machine().sound().stream_alloc(*device, 0, 2, device->machine().sample_rate(), (void *)image, wave_sound_update);
-	else
-		device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), (void *)image, wave_sound_update);
-}
-
-
-const device_type WAVE = &device_creator<wave_device>;
-
-wave_device::wave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WAVE, "Wave", tag, owner, clock, "wawe", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void wave_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void wave_device::device_start()
-{
-	DEVICE_START_NAME( wave )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void wave_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
