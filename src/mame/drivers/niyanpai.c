@@ -23,8 +23,6 @@
 /******************************************************************************
 Memo:
 
-- TMP68301 emulation is not implemented (machine/m68kfmly.c, .h does nothing).
-
 - niyanpai's 2p start does not mean 2p simultaneous or exchanging play.
   Simply uses controls for 2p side.
 
@@ -38,7 +36,7 @@ Memo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/m68kfmly.h"
+#include "machine/tmp68301.h"
 #include "machine/z80ctc.h"
 #include "includes/nb1413m3.h"
 #include "sound/dac.h"
@@ -306,15 +304,22 @@ READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
 	return (portdata);
 }
 
-CUSTOM_INPUT_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
+WRITE16_MEMBER(niyanpai_state::tmp68301_parallel_port_w)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
 	//  bit 2   motor on
 	//  bit 3   coin lock
+	//  bit 8-9 video page select?
 
-	if (tmp68301_parallel_interface_r(space, 0x0005, 0x00ff) & 0x0004) m_musobana_outcoin_flag ^= 1;
+	m_motor_on = data & 4;
+	coin_counter_w(machine(),0,data & 1);
+	coin_lockout_w(machine(), 0,data & 0x08);
+}
+
+CUSTOM_INPUT_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
+{
+	if (m_motor_on) m_musobana_outcoin_flag ^= 1;
 	else m_musobana_outcoin_flag = 1;
 
 	return m_musobana_outcoin_flag & 0x01;
@@ -324,14 +329,6 @@ WRITE16_MEMBER(niyanpai_state::musobana_inputport_w)
 {
 	m_musobana_inputport = data;
 }
-
-static ADDRESS_MAP_START( tmp68301_regs, AS_PROGRAM, 16, niyanpai_state )
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE_LEGACY(tmp68301_address_decoder_r,tmp68301_address_decoder_w)
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE_LEGACY(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w)
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE_LEGACY(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w)
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_READWRITE_LEGACY(tmp68301_serial_interface_r,tmp68301_serial_interface_w)
-	AM_RANGE(0xfffe00, 0xfffe4f) AM_READWRITE_LEGACY(tmp68301_timer_r,tmp68301_timer_w)
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -365,7 +362,7 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
 	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
 
-	AM_IMPORT_FROM( tmp68301_regs )
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
@@ -403,7 +400,7 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
-	AM_IMPORT_FROM( tmp68301_regs )
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
@@ -443,7 +440,7 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
-	AM_IMPORT_FROM( tmp68301_regs )
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
@@ -482,7 +479,7 @@ static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
-	AM_IMPORT_FROM( tmp68301_regs )
+	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -928,7 +925,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(niyanpai_state::niyanpai_interrupt)
 {
-	device.execute().set_input_line_and_vector(1, HOLD_LINE,0x100/4);
+	m_tmp68301->external_interrupt_0();
 }
 
 static const z80_daisy_config daisy_chain_sound[] =
@@ -937,6 +934,11 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ NULL }
 };
 
+static TMP68301_INTERFACE( tmp68301_interface )
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER16(niyanpai_state,tmp68301_parallel_port_w)
+};
 
 static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 
@@ -944,6 +946,8 @@ static MACHINE_CONFIG_START( niyanpai, niyanpai_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */
 	MCFG_CPU_PROGRAM_MAP(niyanpai_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", niyanpai_state,  niyanpai_interrupt)
+
+	MCFG_TMP68301_ADD("tmp68301",tmp68301_interface)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)                  /* TMPZ84C011, 8.00 MHz */
 	MCFG_CPU_CONFIG(daisy_chain_sound)

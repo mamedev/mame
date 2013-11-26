@@ -210,7 +210,6 @@ static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM                             // cleared
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")  // Video Registers
 	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)       // Samples Banks
-	AM_RANGE(0xfffd0a, 0xfffd0b) AM_READWRITE(gundamex_eeprom_r,gundamex_eeprom_w)  // parallel data register
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -442,7 +441,6 @@ static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")    // Palette
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")              // Video Registers
-	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(reelquak_leds_w )     // parallel data register (leds)
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -502,7 +500,6 @@ static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
 
 	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 
-	AM_RANGE( 0xfffd0a, 0xfffd0b ) AM_READ_PORT("DSW2")             // parallel data register (DSW 2)
 	AM_RANGE( 0xfffc00, 0xffffff ) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)    // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -1990,13 +1987,37 @@ static const x1_010_interface x1_010_sound_intf =
 	0x0000,     /* address */
 };
 
+static TMP68301_INTERFACE( tmp68301_default_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+static TMP68301_INTERFACE( tmp68301_gundamex_intf )
+{
+	DEVCB_DRIVER_MEMBER16(seta2_state,gundamex_eeprom_r),
+	DEVCB_DRIVER_MEMBER16(seta2_state,gundamex_eeprom_w)
+};
+
+static TMP68301_INTERFACE( tmp68301_reelquak_intf )
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER16(seta2_state,reelquak_leds_w)
+};
+
+static TMP68301_INTERFACE( tmp68301_samshoot_intf )
+{
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)   // !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 
-	MCFG_TMP68301_ADD("tmp68301")
-
+	MCFG_TMP68301_ADD("tmp68301", tmp68301_default_intf)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2035,6 +2056,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gundamex, seta2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gundamex_map)
+
+	MCFG_TMP68301_MODIFY("tmp68301",tmp68301_gundamex_intf)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2102,6 +2125,8 @@ static MACHINE_CONFIG_DERIVED( reelquak, seta2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(reelquak_map)
 
+	MCFG_TMP68301_MODIFY("tmp68301",tmp68301_reelquak_intf)
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -2117,6 +2142,8 @@ static MACHINE_CONFIG_DERIVED( samshoot, seta2 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(samshoot_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
+
+	MCFG_TMP68301_MODIFY("tmp68301",tmp68301_samshoot_intf)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2240,7 +2267,7 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_CPU_PROGRAM_MAP(namcostr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 
-	MCFG_TMP68301_ADD("tmp68301")
+	MCFG_TMP68301_ADD("tmp68301",tmp68301_reelquak_intf)
 
 
 	// video hardware

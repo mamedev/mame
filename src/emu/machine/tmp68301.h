@@ -1,8 +1,40 @@
 #ifndef TMP68301_H
 #define TMP68301_H
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+/* TODO: frequency & hook it up with m68k */
+#define MCFG_TMP68301_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, TMP68301, 0) \
+	MCFG_DEVICE_CONFIG(_config)
+
+#define MCFG_TMP68301_MODIFY(_tag, _config) \
+	MCFG_DEVICE_MODIFY(_tag) \
+	MCFG_DEVICE_CONFIG(_config)
+
+
+#define TMP68301_INTERFACE(name) \
+	const tmp68301_interface (name) =
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> mb_vcu_interface
+
+struct tmp68301_interface
+{
+	devcb_read16         m_in_parallel_cb;
+	devcb_write16        m_out_parallel_cb;
+// 	TODO: serial ports
+};
+
 class tmp68301_device : public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+						public tmp68301_interface
 {
 public:
 	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -23,6 +55,8 @@ public:
 	DECLARE_WRITE16_MEMBER(iisr_w);
 	DECLARE_READ16_MEMBER(scr_r);
 	DECLARE_WRITE16_MEMBER(scr_w);
+	DECLARE_READ16_MEMBER(pdr_r);
+	DECLARE_WRITE16_MEMBER(pdr_w);
 
 protected:
 	// device-level overrides
@@ -31,6 +65,8 @@ protected:
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
+	devcb_resolved_read16         m_in_parallel_func;
+	devcb_resolved_write16        m_out_parallel_func;
 private:
 	// internal state
 	UINT16 m_regs[0x400];
@@ -55,8 +91,5 @@ private:
 };
 
 extern const device_type TMP68301;
-
-#define MCFG_TMP68301_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TMP68301, 0)
 
 #endif

@@ -172,7 +172,6 @@ static ADDRESS_MAP_START( realbrk_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                            // Coins
 	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ(realbrk_dsw_r) AM_SHARE("dsw_select")  // DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM                                         // RAM
-	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(realbrk_flipscreen_w              )   // Hack! Parallel port data register
 	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
@@ -751,6 +750,12 @@ INTERRUPT_GEN_MEMBER(realbrk_state::realbrk_interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
+static TMP68301_INTERFACE( tmp68301_interface )
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER16(realbrk_state,realbrk_flipscreen_w)
+};
+
 static MACHINE_CONFIG_START( realbrk, realbrk_state )
 
 	/* basic machine hardware */
@@ -758,7 +763,7 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_CPU_PROGRAM_MAP(realbrk_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", realbrk_state,  realbrk_interrupt)
 
-	MCFG_TMP68301_ADD("tmp68301")
+	MCFG_TMP68301_ADD("tmp68301", tmp68301_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

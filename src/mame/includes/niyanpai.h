@@ -1,4 +1,5 @@
 #include "sound/dac.h"
+#include "machine/tmp68301.h"
 #define VRAM_MAX    3
 
 class niyanpai_state : public driver_device
@@ -12,6 +13,7 @@ public:
 	niyanpai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
+		m_tmp68301(*this, "tmp68301"),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2") { }
 
@@ -86,6 +88,8 @@ public:
 	DECLARE_WRITE16_MEMBER(niyanpai_clutsel_2_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
 	DECLARE_DRIVER_INIT(niyanpai);
+	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
+	UINT8 m_motor_on;
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_niyanpai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -99,6 +103,7 @@ public:
 	void niyanpai_gfxdraw(int vram);
 	void niyanpai_soundbank_w(int data);
 	required_device<cpu_device> m_maincpu;
+	required_device<tmp68301_device> m_tmp68301;
 	required_device<dac_device> m_dac1;
 	required_device<dac_device> m_dac2;
 

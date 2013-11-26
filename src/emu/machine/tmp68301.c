@@ -18,7 +18,10 @@ static ADDRESS_MAP_START( tmp68301_regs, AS_0, 16, tmp68301_device )
 	AM_RANGE(0x094,0x095) AM_READWRITE(imr_r,imr_w)
 	AM_RANGE(0x098,0x099) AM_READWRITE(iisr_r,iisr_w)
 
-	/* Serial */
+	/* Parallel Port */
+	AM_RANGE(0x10a,0x10b) AM_READWRITE(pdr_r,pdr_w)
+
+	/* Serial Port */
 	AM_RANGE(0x18e,0x18f) AM_READWRITE(scr_r,scr_w)
 ADDRESS_MAP_END
 
@@ -62,6 +65,17 @@ WRITE16_MEMBER(tmp68301_device::scr_w)
 	m_scr &= 0xa1;
 }
 
+/* TODO: bit direction */
+READ16_MEMBER(tmp68301_device::pdr_r)
+{
+	return m_in_parallel_func(0);
+}
+
+WRITE16_MEMBER(tmp68301_device::pdr_w)
+{
+	m_out_parallel_func(0,data);
+}
+
 
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMP68301, "TMP68301", tag, owner, clock, "tmp68301", __FILE__),
@@ -78,6 +92,18 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 
 void tmp68301_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const tmp68301_interface *intf = reinterpret_cast<const tmp68301_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<tmp68301_interface *>(this) = *intf;
+
+	// or defaults to 0 if none provided
+	else
+	{
+		memset(&m_in_parallel_cb, 0, sizeof(m_in_parallel_cb));
+		memset(&m_out_parallel_cb, 0, sizeof(m_out_parallel_cb));
+
+	}
 }
 
 //-------------------------------------------------
@@ -89,6 +115,9 @@ void tmp68301_device::device_start()
 	int i;
 	for (i = 0; i < 3; i++)
 		m_tmp68301_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmp68301_device::timer_callback), this));
+
+	m_in_parallel_func.resolve(m_in_parallel_cb, *this);
+	m_out_parallel_func.resolve(m_out_parallel_cb, *this);
 }
 
 //-------------------------------------------------
