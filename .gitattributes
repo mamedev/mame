@@ -7313,6 +7313,7 @@ src/mess/drivers/x07.c svneol=native#text/plain
 src/mess/drivers/x1.c svneol=native#text/plain
 src/mess/drivers/x1twin.c svneol=native#text/plain
 src/mess/drivers/x68k.c svneol=native#text/plain
+src/mess/drivers/xavix.c svneol=native#text/plain
 src/mess/drivers/xerox820.c svneol=native#text/plain
 src/mess/drivers/xor100.c svneol=native#text/plain
 src/mess/drivers/ymmu100.c svneol=native#text/plain
