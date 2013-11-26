@@ -188,6 +188,11 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
                             dynamic_cast<netlist_param_int_t &>(param).initial(vald);
                         }
                         break;
+                        case netlist_param_t::STRING:
+                        {
+                            dynamic_cast<netlist_param_str_t &>(param).initial(val);
+                        }
+                        break;
                         default:
                             fatalerror("Parameter is not supported %s : %s\n", temp.cstr(), val.cstr());
                     }

@@ -465,10 +465,6 @@ static NETLIST_START(pong_schematics)
 	NETDEV_PARAM(videomix.R2, RES_K(1.2))
 	NETDEV_PARAM(videomix.R3, RES_K(22))
 
-    NETDEV_SOLVER(Solver)
-    NETDEV_ANALOG_CONST(V5, 5)
-    NETDEV_ANALOG_CONST(V1, 1)
-    NETDEV_ANALOG_CONST(V0, 0)
 
 #if 0
     NETDEV_R(R1, 10)
@@ -507,16 +503,25 @@ static NETLIST_START(pong_schematics)
     tt(28)
     tt(29)
 */
-#if 0
+#if 1
+    NETDEV_SOLVER(Solver)
+    NETDEV_ANALOG_CONST(V5, 5)
+    NETDEV_ANALOG_CONST(V1, 1)
+    NETDEV_ANALOG_CONST(V0, 0)
+
     NETDEV_R(R5, 1000)
-    NETDEV_D(D1)
+    NETDEV_1N914(D1)
     NET_C(V5, R5.1)
     NET_C(R5.2, D1.A)
     NET_C(D1.K, V0)
     //NETDEV_LOG(log1, D1.A)
 #endif
 
-#if 1
+#if 0
+    NETDEV_SOLVER(Solver)
+    NETDEV_ANALOG_CONST(V5, 5)
+    NETDEV_ANALOG_CONST(V1, 1)
+    NETDEV_ANALOG_CONST(V0, 0)
     // astable NAND Multivibrator
     NETDEV_R(R1, 1000)
     NETDEV_C(C1, 1e-6)

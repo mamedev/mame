@@ -27,7 +27,7 @@ public:
     ~pstring();
 
     // construction with copy
-    pstring(const char *string) {init(); if (string != NULL) pcopy(string); }
+    pstring(const char *string) {init(); if (string != NULL && *string != 0) pcopy(string); }
     pstring(const pstring &string) {init(); pcopy(string); }
 
     // assignment operators
@@ -62,7 +62,10 @@ public:
     inline const int len() const { return m_ptr->len(); }
 
     inline bool equals(const pstring &string) { return (pcmp(string.cstr(), m_ptr->str()) == 0); }
+    inline bool iequals(const pstring &string) { return (pcmpi(string.cstr(), m_ptr->str()) == 0); }
+
     int cmp(pstring &string) { return pcmp(string.cstr()); }
+    int cmpi(pstring &string) { return pcmpi(cstr(), string.cstr()); }
 
     int find(const char *search, int start = 0) const
     {
@@ -122,6 +125,8 @@ private:
         else
             return strncmp(left, right, count);
     }
+
+    int pcmpi(const char *lhs, const char *rhs, int count = -1) const;
 
     void pcopy(const char *from, int size);
 

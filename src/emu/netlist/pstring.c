@@ -66,6 +66,26 @@ pstring pstring::substr(unsigned int start, int count) const
     return ret;
 }
 
+//-------------------------------------------------
+//  pcmpi - compare a character array to an nstring
+//-------------------------------------------------
+
+int pstring::pcmpi(const char *lhs, const char *rhs, int count) const
+{
+    // loop while equal until we hit the end of strings
+    int index;
+    for (index = 0; index < count; index++)
+        if (lhs[index] == 0 || tolower(lhs[index]) != tolower(rhs[index]))
+            break;
+
+    // determine the final result
+    if (index < count)
+        return tolower(lhs[index]) - tolower(rhs[index]);
+    if (lhs[index] == 0)
+        return 0;
+    return 1;
+}
+
 pstring pstring::vprintf(va_list args) const
 {
     // sprintf into the temporary buffer

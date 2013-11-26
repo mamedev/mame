@@ -592,6 +592,104 @@ public:
 };
 
 // ----------------------------------------------------------------------------------------
+// net_param_t
+// ----------------------------------------------------------------------------------------
+
+class netlist_param_t : public netlist_owned_object_t
+{
+public:
+
+    enum param_type_t {
+        STRING,
+        DOUBLE,
+        INTEGER,
+        LOGIC
+    };
+
+    netlist_param_t(const param_type_t atype)
+    : netlist_owned_object_t(PARAM, ANALOG)
+    , m_param_type(atype)
+    {  }
+
+
+    ATTR_HOT inline const param_type_t param_type() const { return m_param_type; }
+
+private:
+    const param_type_t m_param_type;
+};
+
+class netlist_param_double_t : public netlist_param_t
+{
+public:
+    netlist_param_double_t()
+    : netlist_param_t(DOUBLE)
+    , m_param(0.0)
+    {  }
+
+    ATTR_HOT inline void setTo(const double param);
+    ATTR_COLD inline void initial(const double val) { m_param = val; }
+    ATTR_HOT inline const double Value() const        { return m_param;   }
+
+private:
+    double m_param;
+};
+
+class netlist_param_int_t : public netlist_param_t
+{
+public:
+    netlist_param_int_t()
+    : netlist_param_t(INTEGER)
+    , m_param(0)
+    {  }
+
+    ATTR_HOT inline void setTo(const int param);
+    ATTR_COLD inline void initial(const int val) { m_param = val; }
+
+    ATTR_HOT inline const int Value() const     { return m_param;     }
+
+private:
+    int m_param;
+};
+
+class netlist_param_logic_t : public netlist_param_int_t
+{
+public:
+    netlist_param_logic_t()
+    : netlist_param_int_t()
+    {  }
+};
+
+class netlist_param_str_t : public netlist_param_t
+{
+public:
+    netlist_param_str_t()
+    : netlist_param_t(STRING)
+    , m_param("")
+    {  }
+
+    ATTR_HOT inline void setTo(const pstring &param);
+    ATTR_COLD inline void initial(const pstring &val) { m_param = val; }
+
+    ATTR_HOT inline const pstring &Value() const     { return m_param;     }
+
+private:
+   pstring m_param;
+};
+
+class netlist_param_multi_t : public netlist_param_str_t
+{
+public:
+    netlist_param_multi_t()
+    : netlist_param_str_t()
+    {  }
+
+    /* these should be cached! */
+    ATTR_COLD double dValue(const pstring &entity, const double defval = 0.0) const;
+
+private:
+};
+
+// ----------------------------------------------------------------------------------------
 // net_device_t
 // ----------------------------------------------------------------------------------------
 
@@ -729,73 +827,6 @@ protected:
 private:
 };
 
-class netlist_param_t : public netlist_object_t
-{
-public:
-
-    enum param_type_t {
-        STRING,
-        DOUBLE,
-        INTEGER,
-        LOGIC
-    };
-
-	netlist_param_t(const param_type_t atype)
-	: netlist_object_t(PARAM, ANALOG)
-    , m_param_type(atype)
-	, m_netdev(NULL)
-	{  }
-
-
-    ATTR_HOT inline const param_type_t param_type() const { return m_param_type; }
-	ATTR_HOT inline netlist_core_device_t &netdev() const { return *m_netdev; }
-	ATTR_COLD void set_netdev(netlist_core_device_t &dev) { m_netdev = &dev; }
-
-private:
-    const param_type_t m_param_type;
-	netlist_core_device_t *m_netdev;
-};
-
-class netlist_param_double_t : public netlist_param_t
-{
-public:
-    netlist_param_double_t()
-    : netlist_param_t(DOUBLE)
-    , m_param(0.0)
-    {  }
-
-    ATTR_HOT inline void setTo(const double param) { m_param = param; netdev().update_param(); }
-    ATTR_COLD inline void initial(const double val) { m_param = val; }
-    ATTR_HOT inline const double Value() const        { return m_param;   }
-
-private:
-    double m_param;
-};
-
-class netlist_param_int_t : public netlist_param_t
-{
-public:
-    netlist_param_int_t()
-    : netlist_param_t(INTEGER)
-    , m_param(0)
-    {  }
-
-    ATTR_HOT inline void setTo(const int param) { m_param = param; netdev().update_param(); }
-    ATTR_COLD inline void initial(const int val) { m_param = val; }
-
-    ATTR_HOT inline const int Value() const     { return m_param;     }
-
-private:
-    int m_param;
-};
-
-class netlist_param_logic_t : public netlist_param_int_t
-{
-public:
-    netlist_param_logic_t()
-    : netlist_param_int_t()
-    {  }
-};
 
 // ----------------------------------------------------------------------------------------
 // netlist_base_t
@@ -935,6 +966,25 @@ private:
 // ----------------------------------------------------------------------------------------
 // Inline implementations
 // ----------------------------------------------------------------------------------------
+
+ATTR_HOT inline void netlist_param_str_t::setTo(const pstring &param)
+{
+    m_param = param;
+    netdev().update_param();
+}
+
+ATTR_HOT inline void netlist_param_int_t::setTo(const int param)
+{
+    m_param = param;
+    netdev().update_param();
+}
+
+ATTR_HOT inline void netlist_param_double_t::setTo(const double param)
+{
+    m_param = param;
+    netdev().update_param();
+}
+
 
 ATTR_HOT inline void netlist_input_t::inactivate()
 {

@@ -329,7 +329,7 @@ ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, net
 template <class C, class T>
 ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, C &param, const T initialVal)
 {
-    param.set_netdev(dev);
+    param.init_object(dev, sname);
     param.initial(initialVal);
     m_setup->register_object(*this, *this, sname, param, netlist_terminal_t::STATE_NONEX);
 }
@@ -337,6 +337,9 @@ ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, cons
 template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_double_t &param, const double initialVal);
 template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_int_t &param, const int initialVal);
 template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_logic_t &param, const int initialVal);
+template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_str_t &param, const char * initialVal);
+template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_str_t &param, const pstring &initialVal);
+template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_multi_t &param, const char * initialVal);
 
 
 // ----------------------------------------------------------------------------------------
@@ -530,6 +533,43 @@ ATTR_COLD void netlist_logic_output_t::set_levels(const double low, const double
 {
     m_low_V = low;
     m_high_V = high;
+}
+
+// ----------------------------------------------------------------------------------------
+// netlist_param_t & friends
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD double netlist_param_multi_t::dValue(const pstring &entity, const double defval) const
+{
+    pstring tmp = this->Value();
+    // .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
+    int p = tmp.find(entity);
+    if (p>=0)
+    {
+        int pblank = tmp.find(" ", p);
+        if (pblank < 0) pblank = tmp.len() + 1;
+        tmp = tmp.substr(p, pblank - p);
+        int pequal = tmp.find("=", 0);
+        if (pequal < 0)
+           fatalerror("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
+        tmp = tmp.substr(pequal+1);
+        double factor = 1.0;
+        switch (*(tmp.right(1).cstr()))
+        {
+            case 'm': factor = 1e-3; break;
+            case 'u': factor = 1e-6; break;
+            case 'n': factor = 1e-9; break;
+            case 'p': factor = 1e-12; break;
+            case 'f': factor = 1e-15; break;
+            case 'a': factor = 1e-18; break;
+
+        }
+        if (factor != 1.0)
+            tmp = tmp.left(tmp.len() - 1);
+        return atof(tmp.cstr()) * factor;
+    }
+    else
+        return defval;
 }
 
 

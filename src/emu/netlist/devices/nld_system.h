@@ -46,8 +46,11 @@
         NETDEV_PARAMI(_name, C, _C)
 
 /* Generic Diode */
-#define NETDEV_D(_name)                                                             \
-        NET_REGISTER_DEV(D, _name)
+#define NETDEV_D(_name,  _model)                                                    \
+        NET_REGISTER_DEV(D, _name)                                                  \
+        NETDEV_PARAMI(_name, model, _model)
+
+#define NETDEV_1N914(_name) NETDEV_D(_name, "Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon")
 
 // .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
 
@@ -266,9 +269,11 @@ public:
     {
     }
 
-    netlist_param_double_t m_Vt;
-    netlist_param_double_t m_Is;
-    netlist_param_double_t m_Rmin;
+    netlist_param_multi_t m_model;
+
+    double m_Vt;
+    double m_Is;
+    double m_n;
 
     double m_VtInv;
     double m_Vcrit;
@@ -279,17 +284,20 @@ protected:
     {
         register_terminal("A", m_P);
         register_terminal("K", m_N);
+        register_param("model", m_model, "");
 
-        register_param("Vt", m_Vt, 0.0258);
-        register_param("Is", m_Is, 1e-15);
-        register_param("Rmin", m_Rmin, 1.4);
         m_Vd = 0.7;
     }
 
     virtual void update_param()
     {
-        m_Vcrit = m_Vt.Value() * log(m_Vt.Value() / m_Is.Value() / sqrt(2.0));
-        m_VtInv = 1.0 / m_Vt.Value();
+        m_Is = m_model.dValue("Is", 1e-15);
+        m_n = m_model.dValue("N", 1);
+
+        m_Vt = 0.0258 * m_n;
+
+        m_Vcrit = m_Vt * log(m_Vt / m_Is / sqrt(2.0));
+        m_VtInv = 1.0 / m_Vt;
         NL_VERBOSE_OUT(("VCutoff: %f\n", m_Vcrit));
     }
 
@@ -298,12 +306,12 @@ protected:
         const double nVd = m_P.net().Q_Analog()- m_N.net().Q_Analog();
 
         //FIXME: Optimize cutoff case
-        m_Vd = (nVd > m_Vcrit) ? m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt.Value() : nVd;
+        m_Vd = (nVd > m_Vcrit) ? m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt : nVd;
 
         const double eVDVt = exp(m_Vd * m_VtInv);
-        const double Id = m_Is.Value() * (eVDVt - 1.0);
+        const double Id = m_Is * (eVDVt - 1.0);
 
-        m_g = m_Is.Value() * m_VtInv * eVDVt;
+        m_g = m_Is * m_VtInv * eVDVt;
 
         m_I = (Id - m_Vd * m_g);
         //printf("Vd: %f %f %f %f\n", m_Vd, m_g, Id, m_I);
