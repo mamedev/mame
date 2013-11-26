@@ -1,8 +1,14 @@
-// license: ?
-// copyright-holders: Angelo Salese
+// license: MAME
+// copyright-holders: ?
 /***************************************************************************
 
-Template for skeleton drivers
+	Skeleton driver for XaviX TV PNP console and childs (Let's! Play TV Classic)
+
+	CPU is M6502 derivative, almost likely to be a G65816
+
+	TODO:
+	- understand how to map ROM at 0x800000-0x9fffff / 0xc00000 / 0xdfffff
+	  banks (granted that we have the ROM for that, of course)
 
 ***************************************************************************/
 
@@ -47,9 +53,9 @@ UINT32 xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
-	AM_RANGE(0x00f000, 0x00ffff) AM_ROM AM_REGION("bios", 0xf000)
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("bios", 0)
-
+	AM_RANGE(0x000000, 0x0001ff) AM_RAM
+	AM_RANGE(0x00f000, 0x00ffff) AM_ROM AM_REGION("bios", 0x00f000)
+	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("bios", 0x000000) // wrong
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xavix )
@@ -108,6 +114,7 @@ static INPUT_PORTS_START( xavix )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+/* correct, 4bpp gfxs */
 static const gfx_layout charlayout =
 {
 	8,8,
