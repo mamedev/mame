@@ -215,7 +215,7 @@ READ8_MEMBER( p2000t_state::videoram_r )
 static SAA5050_INTERFACE( p2000t_saa5050_intf )
 {
 	DEVCB_DRIVER_MEMBER(p2000t_state, videoram_r),
-	40, 24 - 1, 80  /* x, y, size */
+	40, 24, 80  /* x, y, size */
 };
 
 /* Machine definition */
