@@ -7201,6 +7201,7 @@ src/mess/drivers/selz80.c svneol=native#text/plain
 src/mess/drivers/sg1000.c svneol=native#text/plain
 src/mess/drivers/sgi_ip2.c svneol=native#text/plain
 src/mess/drivers/sgi_ip6.c svneol=native#text/plain
+src/mess/drivers/sh4robot.c svneol=native#text/plain
 src/mess/drivers/sitcom.c svneol=native#text/plain
 src/mess/drivers/slc1.c svneol=native#text/plain
 src/mess/drivers/sm1800.c svneol=native#text/plain

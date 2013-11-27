@@ -2204,6 +2204,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/sage2.o     \
 	$(MESS_DRIVERS)/sbrain.o    \
 	$(MESS_DRIVERS)/seattle.o   \
+	$(MESS_DRIVERS)/sh4robot.o  \
 	$(MESS_DRIVERS)/softbox.o   \
 	$(MESS_DRIVERS)/swtpc.o     \
 	$(MESS_DRIVERS)/sys2900.o   \
