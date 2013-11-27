@@ -33,11 +33,8 @@
     values 24.7 thru 27.7 degrees in 0.5 degree increments.  Enabled 
     Phase Shift 26.2 degrees as default.
 
-    NOTE: Atari system's (2600, 5200, 8bit, 7800) palette appear different
-    on modern flat panel displays than their original target display 
-    device, CRT.  Most noticeable is Hue 1x which is Gold on a CRT, 
-    but appears Green-Yellow on flat panels.  Other hues may be distorted 
-    as well on flat panel displays.
+    2013-11-23 Robert Tuccitto:
+	Added palette notes
 
 ******************************************************************************/
 
@@ -756,8 +753,76 @@ static INPUT_PORTS_START( a5200 )
 	PORT_BIT(0xff, 0x72, IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0x00,0xe4) PORT_PLAYER(4)
 
 INPUT_PORTS_END
+/***************************************************************
+Atari 5200 Palette Notes: 
 
+Palette on a modern flat panel display (LCD, LED, Plasma, etc.) 
+appears different from a traditional CRT. The most outstanding 
+difference is Hue 1x, the hue begin point. Hue 1x looks very 
+'green' (~-60 to -45 degrees - depending on how poor or well it 
+handles the signal conversion and its calibration) on a modern 
+flat panel display, as opposed to 'gold' (~-33 degrees) on a 
+CRT.  The official technical document, "GTIA C014805 NTSC" 
+stipulates Hue 1x as gold.
 
+The "Atari 5200 Field Service Manual" provides two different 
+sets of instructions in harmony with utilizing the "PAM 
+Diagnostic SALT Cartridge v1.1".  In one account it states the 
+color just below and above the reference bar to be within one 
+shade of each other.  
+
+Under the same reference document, directions are given for it 
+to be the same color.  Phase Shift 25.7 degrees matches Hue 1x, 
+15x and the color below the reference bar.
+
+However, if the system is adjusted within the first several 
+minutes of running, the warm up, consistent system run time, 
+causes Hue 15x (F$) to become stronger/darker gold (More brown 
+then ultimately red-brown); as well as leans Hue 14x (E$) more 
+brown than green.  Once achieving a phase shift of 27.7, 
+Hue 14x (E$) and Hue 15x (F$) near-exact match Hue 1x and 2x 
+respectively. 
+
+Accounting for system 'warm-up', phase shifting, as well as the 
+instructions for it to be within one shade of each other, would 
+make Phase Shift 26.2 degrees or 26.7 degrees a realistic 
+logical choice.
+
+It also collaborates with the official "GTIA C014805 NTSC" 
+document for color order: Hue 1x = Gold, Hue 2x = Orange, 
+Hue 15x (F$) = Light-Orange; Phase Shift 26.2 places 
+Hue 15x (F$) between Hue 1x, Gold and Hue 2x, Orange; 
+a Light Orange in color.  Color descriptions are best measured 
+in the middle of the brightness scale. 
+
+It should be mentioned that Green-Yellow is referenced at 
+Hue 13x (D$), nowhere near Hue 1x.  A Green-Yellow Hue 1x is 
+how the palette is manipulated and modified (in part) under 
+a modern flat panel display.
+
+Note though, even a properly calibrated console, at power on, 
+the phase shift appears as low as ~23 degrees and after a 
+considerable consistent runtime, can be as high as ~28 degrees.  
+In general, the low end of ~23 degrees lasts for maybe several 
+seconds, whereas higher values such as ~25-27 degrees is the 
+most dominant during system run time. 
+
+Additionally, the blue to red (And consequently blue to green) 
+ratio proportions may appear different on a modern flat panel 
+display than a CRT in some instances for the Atari 5200 system.  
+Furthermore, you may have some variation of proportions even 
+within the same display type.
+ 
+One side effect of this on the console's palette is that some 
+values of red may appear too pinkish - Too much blue to red.  
+This is not the same as a traditional tint-hue control 
+adjustment; rather, can be demonstrated by changing the blue 
+ratio values via MESS HLSL settings.
+
+Lastly, the Atari 2600 & 7800 NTSC color palettes hold the same 
+hue structure order and have similar appearance differences 
+dependent upon display type.
+***************************************************************/
 /**************************************************************
  *
  * Palette - Phase Shift 26.2

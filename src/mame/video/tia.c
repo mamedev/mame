@@ -48,7 +48,82 @@ static void extend_palette(running_machine &machine) {
 PALETTE_INIT_MEMBER(tia_ntsc_video_device, tia_ntsc)
 {
 	int i, j;
-/********************************
+/********************************************************************
+Atari 2600 NTSC Palette Notes:
+
+Palette on a modern flat panel display (LCD, LED, Plasma, etc.) 
+appears different from a traditional CRT. The most outstanding 
+difference is Hue 1x, the hue begin point. Hue 1x looks very 
+'green' (~-60 to -45 degrees - depending on how poor or well it 
+handles the signal conversion and its calibration) on a modern 
+flat panel display, as opposed to 'gold' (~-33 degrees) on a CRT.
+
+The official technical documents: "Television Interface Adaptor 
+[TIA] (Model 1A)", "Atari VCS POP Field Service Manual", and 
+"Stella Programmer's Guide" stipulate Hue 1x to be gold.
+
+The system's pot adjustment manually manipulates the degree of 
+phase shift, while the system 'warming-up' will automatically 
+push whatever degrees has been manually set, higher.  According 
+to the Atari VCS POP Field Service Manual and system diagnostic 
+and test (color) cart, instructions are provide to set the pot 
+adjustment having Hue 1x and Hue 15x (F$) match or within one 
+shade of each other, both a 'goldenrod'.
+
+At power on, the system's phase shift appears as low as ~23 
+degrees and after a considerable consistent runtime, can be as 
+high as ~28 degrees. 
+ 
+In general, the low end of ~23 degrees lasts for several seconds, 
+whereas higher values such as ~25-27 degrees are the most 
+dominant during system run time.  180 degrees colorburst takes 
+place at ~25.7 degrees (A near exact match of Hue 1x and 15x - 
+To the naked eye they appear to be the same).  
+ 
+However, if the system is adjusted within the first several 
+minutes of running, the warm up, consistent system run time, 
+causes Hue 15x (F$) to become stronger/darker gold (More brown 
+then ultimately red-brown); as well as leans Hue 14x (E$) more 
+brown than green.  Once achieving a phase shift of 27.7 degrees, 
+Hue 14x (E$) and Hue 15x (F$) near-exact match Hue 1x and 2x 
+respectively. 
+ 
+Therefore, an ideal phase shift while accounting for properly 
+calibrating a system's color palette within the first several 
+minutes of it running via the pot adjustment, the reality of 
+shifting while warming up, as well as maintaining differences 
+between Hues 1x, 2x and 14x, 15x, would likely fall between 25.7 
+and 27.7 degrees.  Phase shifts 26.2 and 26.7 places Hue 15x/F$ 
+between Hue 1x and Hue 2x, having 26.2 degrees leaning closer to 
+Hue 1x and 26.7 degrees leaning closer to Hue 2x.
+ 
+The above notion would also harmonize with what has been 
+documented within "Stella Programmer's Guide" for the colors of 
+1x, 2x, 14x, 15x on the 2600 and 7800.  1x = Gold, 2x = Orange, 
+14x (E$) = Orange-Green. 15x (F$) = Light Orange.  Color 
+descriptions are best measured in the middle of the brightness 
+scale.  It should be mentioned that Green-Yellow is referenced 
+at Hue 13x (D$), nowhere near Hue 1x.  A Green-Yellow Hue 1x is 
+how the palette is manipulated and modified (in part) under a 
+modern flat panel display.
+
+Additionally, the blue to red (And consequently blue to green) 
+ratio proportions may appear different on a modern flat panel 
+display than a CRT in some instances for the Atari 2600 system.  
+Furthermore, you may have some variation of proportions even 
+within the same display type.
+ 
+One side effect of this on the console's palette is that some 
+values of red may appear too pinkish - Too much blue to red.  
+This is not the same as a traditional tint-hue control adjustment; 
+rather, can be demonstrated by changing the blue ratio values 
+via MESS HLSL settings.
+
+Lastly, the Atari 5200 & 7800 NTSC color palettes hold the same 
+hue structure order and have similar appearance differences that 
+are dependent upon display type.
+********************************************************************/
+/*********************************
 Phase Shift 24.7
         {  0.000,  0.000 },
         {  0.192, -0.127 },
@@ -156,7 +231,7 @@ Phase Shift 27.7
         {  0.099, -0.182 },
         {  0.194, -0.126 },
         {  0.244, -0.042 }
-**********************************/
+*********************************/
 
 	static const double color[16][2] =
 /*********************************

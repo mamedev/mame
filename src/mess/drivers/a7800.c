@@ -68,7 +68,9 @@
 
     2013/10/27 Robert Tuccitto  Modernized screen parameters for NTSC & PAL.
 
-    2013/11/03 Fixed correctly typo under 26.7 7$.
+    2013/11/03 Robert Tuccitto Fixed correctly typo under 26.7 7$.
+
+	2014/11/23 Robert Tuccitto Added NTSC Palette Notes
 ***************************************************************************/
 
 #include "emu.h"
@@ -98,15 +100,15 @@ static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x0460, 0x046f) /* XBOARD POKEY2 */
 	AM_RANGE(0x0470, 0x047f) /* XBOARD CTRL */
 	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_RAM    /* RIOT RAM */
-		AM_RANGE(0x1000, 0x17ff) AM_RAM /* hs SRAM */
+	AM_RANGE(0x1000, 0x17ff) AM_RAM /* hs SRAM */
 	AM_RANGE(0x1800, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK("bank7")    /* MAINRAM */
 	AM_RANGE(0x3000, 0x37ff) AM_RAMBANK("bank7")    /* MAINRAM */
 	AM_RANGE(0x3800, 0x3fff) AM_RAMBANK("bank7")    /* MAINRAM */
-		AM_RANGE(0x3000, 0x3fff) AM_ROM  /* hs ROM space */
+	AM_RANGE(0x3000, 0x3fff) AM_ROM  /* hs ROM space */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* f18 hornet */
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(a7800_cart_w) /* XBOARD SRAM */
-		AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")                        /* sc */
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")                        /* sc */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")                        /* sc + ac */
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")                        /* ac */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -154,7 +156,65 @@ static INPUT_PORTS_START( a7800 )
 	PORT_DIPSETTING(0x00, "B" )
 INPUT_PORTS_END
 
+/***************************************************************************
+Atari 7800 NTSC Palette Notes:
 
+Palette on a modern flat panel display (LCD, LED, Plasma, etc.) appears 
+different from a traditional CRT. The most outstanding difference is Hue 1x, 
+the hue begin point. Hue 1x looks very 'green' (~-60 to -45 degrees - 
+depending on how poor or well it handles the signal conversion and its 
+calibration) on a modern flat panel display, as opposed to 'gold' (~-33 
+degrees) on a CRT.  
+
+The system's pot adjustment manually manipulates the ratio of blue to 
+green/blue to red, while the system 'warming-up' causes the palette phase 
+shift to go higher in degrees.
+
+At power on, the system's phase shift appears as low as ~23 degrees and 
+after a considerable consistent runtime, can be as high as ~28 degrees. 
+ 
+In general, the low end of ~23 degrees lasts for maybe several seconds, 
+whereas higher values such as ~25-27 degrees is the most dominant during 
+system run time.  180 degrees colorburst takes place at ~25.7 degrees (A 
+near exact match of Hue 1x and 15x - To the naked eye they appear to be 
+the same).  
+ 
+However, if the system is adjusted within the first several minutes of 
+running, the warm up, consistent system run time, causes Hue 15x (F$) to 
+become stronger/darker gold (More brown then ultimately red-brown); as well 
+as leans Hue 14x (E$) more brown than green.  Once achieving a phase shift 
+of 27.7, Hue 14x (E$) and Hue 15x (F$) near-exact match Hue 1x and 2x 
+respectively. 
+ 
+Therefore, an ideal phase shift while accounting for the reality of 
+shifting while warming up, as well as maintaining differences between 1x, 
+2x and 14x, 15x, would likely fall between a 25.7 and 27.7. Phase shifts 
+26.2 degrees and 26.7 degrees places Hue 15x (F$) between Hue 1x and 
+Hue 2x, having 26.2 degrees leaning closer to Hue 1x and 26.7 degrees 
+leaning closer to Hue 2x.
+
+The above notion would also harmonize with what has been documented for 
+the colors of 1x, 2x, 14x, 15x on the 7800.  1x = Gold, 2x = Orange, 
+14x (E$) = Orange-Green. 15x (F$) = Light Orange.  Color descriptions are 
+best measured in the middle of the brightness scale.  It should be 
+mentioned that Green-Yellow is referenced at Hue 13x (D$), nowhere near
+Hue 1x.  A Green-Yellow Hue 1x is how the palette is manipulated and 
+modified (in part) under a modern flat panel display.
+
+Additionally, the blue to red (And consequently blue to green) ratio 
+proportions may appear different on a modern flat panel display than a CRT 
+in some instances for the Atari 7800 system.  Furthermore, you may have 
+some variation of proportions even within the same display type.
+ 
+One side effect of this on the console's palette is that some values of 
+red may appear too pinkish - Too much blue to red.  This is not the same 
+as a traditional tint-hue control adjustment; rather, can be demonstrated 
+by changing the blue ratio values via MESS HLSL settings.
+
+Lastly, the Atari 2600 & 5200 NTSC color palettes hold the same hue 
+structure order and have similar appearance differences that are dependent 
+upon display type.
+***************************************************************************/
 /***************************************************************************
     PALETTE - 26.2 PHASE SHIFT
 ***************************************************************************/
