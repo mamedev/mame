@@ -270,23 +270,21 @@ NETLIB_START(nic7448)
 {
 	register_sub(sub, "sub");
 
-	sub.m_state = 0;
-
-	register_input(sub, "A0", sub.m_A0);
-	register_input(sub, "A1", sub.m_A1);
-	register_input(sub, "A2", sub.m_A2);
-	register_input(sub, "A3", sub.m_A3);
+	register_subalias("A0", sub.m_A0);
+	register_subalias("A1", sub.m_A1);
+	register_subalias("A2", sub.m_A2);
+	register_subalias("A3", sub.m_A3);
 	register_input("LTQ", m_LTQ);
 	register_input("BIQ", m_BIQ);
-	register_input(sub, "RBIQ",sub.m_RBIQ);
+	register_subalias("RBIQ",sub.m_RBIQ);
 
-	register_output(sub, "a", sub.m_a);
-	register_output(sub, "b", sub.m_b);
-	register_output(sub, "c", sub.m_c);
-	register_output(sub, "d", sub.m_d);
-	register_output(sub, "e", sub.m_e);
-	register_output(sub, "f", sub.m_f);
-	register_output(sub, "g", sub.m_g);
+	register_subalias("a", sub.m_a);
+	register_subalias("b", sub.m_b);
+	register_subalias("c", sub.m_c);
+	register_subalias("d", sub.m_d);
+	register_subalias("e", sub.m_e);
+	register_subalias("f", sub.m_f);
+	register_subalias("g", sub.m_g);
 }
 
 NETLIB_UPDATE(nic7448)
@@ -316,6 +314,25 @@ NETLIB_UPDATE(nic7448)
 		sub.update();
 	}
 
+}
+
+NETLIB_START(nic7448_sub)
+{
+    m_state = 0;
+
+    register_input("A0", m_A0);
+    register_input("A1", m_A1);
+    register_input("A2", m_A2);
+    register_input("A3", m_A3);
+    register_input("RBIQ", m_RBIQ);
+
+    register_output("a", m_a);
+    register_output("b", m_b);
+    register_output("c", m_c);
+    register_output("d", m_d);
+    register_output("e", m_e);
+    register_output("f", m_f);
+    register_output("g", m_g);
 }
 
 NETLIB_UPDATE(nic7448_sub)
@@ -511,19 +528,24 @@ NETLIB_START(nic7493)
 	register_sub(C, "C");
 	register_sub(D, "D");
 
-	register_input(A, "CLKA", A.m_I, netlist_input_t::STATE_INP_HL);
-	register_input(B, "CLKB", B.m_I, netlist_input_t::STATE_INP_HL);
+	register_subalias("CLKA", A.m_I);
+	register_subalias("CLKB", B.m_I);
 	register_input("R1",  m_R1);
 	register_input("R2",  m_R2);
 
-	register_output(A, "QA", A.m_Q);
-	register_output(B, "QB", B.m_Q);
-	register_output(C, "QC", C.m_Q);
-	register_output(D, "QD", D.m_Q);
+	register_subalias("QA", A.m_Q);
+	register_subalias("QB", B.m_Q);
+	register_subalias("QC", C.m_Q);
+	register_subalias("QD", D.m_Q);
 
 	register_link_internal(C, C.m_I, B.m_Q, netlist_input_t::STATE_INP_HL);
 	register_link_internal(D, D.m_I, C.m_Q, netlist_input_t::STATE_INP_HL);
+}
 
+NETLIB_START(nic7493ff)
+{
+    register_input("CLK", m_I, netlist_input_t::STATE_INP_HL);
+    register_output("Q", m_Q);
 }
 
 NETLIB_UPDATE(nic7493ff)
@@ -637,16 +659,26 @@ NETLIB_FUNC_VOID(nic7493, update_outputs, (void))
 }
 #endif
 
+NETLIB_START(nic74107Asub)
+{
+    register_input("CLK", m_clk, netlist_input_t::STATE_INP_HL);
+    register_output("Q", m_Q);
+    register_output("QQ", m_QQ);
+
+    m_Q.initial(0);
+    m_QQ.initial(1);
+}
+
 NETLIB_START(nic74107A)
 {
 	register_sub(sub, "sub");
 
-	register_input(sub, "CLK", sub.m_clk, netlist_input_t::STATE_INP_HL);
+	register_subalias("CLK", sub.m_clk);
 	register_input("J", m_J);
 	register_input("K", m_K);
 	register_input("CLRQ", m_clrQ);
-	register_output(sub, "Q", sub.m_Q);
-	register_output(sub, "QQ", sub.m_QQ);
+	register_subalias("Q", sub.m_Q);
+	register_subalias("QQ", sub.m_QQ);
 
 	sub.m_Q.initial(0);
 	sub.m_QQ.initial(1);
@@ -747,27 +779,44 @@ NETLIB_START(nic9316)
 {
 	register_sub(sub, "sub");
 
-	sub.m_cnt = 0;
-	sub.m_loadq = 1;
-	sub.m_ent = 1;
-
-	register_input(sub, "CLK", sub.m_clk, netlist_input_t::STATE_INP_LH);
+	register_subalias("CLK", sub.m_clk);
 
 	register_input("ENP", m_ENP);
 	register_input("ENT", m_ENT);
 	register_input("CLRQ", m_CLRQ);
 	register_input("LOADQ", m_LOADQ);
 
-	register_input(sub, "A", sub.m_A, netlist_input_t::STATE_INP_PASSIVE);
-	register_input(sub, "B", sub.m_B, netlist_input_t::STATE_INP_PASSIVE);
-	register_input(sub, "C", sub.m_C, netlist_input_t::STATE_INP_PASSIVE);
-	register_input(sub, "D", sub.m_D, netlist_input_t::STATE_INP_PASSIVE);
+	register_subalias("A", sub.m_A);
+	register_subalias("B", sub.m_B);
+	register_subalias("C", sub.m_C);
+	register_subalias("D", sub.m_D);
 
-	register_output(sub, "QA", sub.m_QA);
-	register_output(sub, "QB", sub.m_QB);
-	register_output(sub, "QC", sub.m_QC);
-	register_output(sub, "QD", sub.m_QD);
-	register_output(sub, "RC", sub.m_RC);
+	register_subalias("QA", sub.m_QA);
+	register_subalias("QB", sub.m_QB);
+	register_subalias("QC", sub.m_QC);
+	register_subalias("QD", sub.m_QD);
+	register_subalias("RC", sub.m_RC);
+
+}
+
+NETLIB_START(nic9316_sub)
+{
+    m_cnt = 0;
+    m_loadq = 1;
+    m_ent = 1;
+
+    register_input("CLK", m_clk, netlist_input_t::STATE_INP_LH);
+
+    register_input("A", m_A, netlist_input_t::STATE_INP_PASSIVE);
+    register_input("B", m_B, netlist_input_t::STATE_INP_PASSIVE);
+    register_input("C", m_C, netlist_input_t::STATE_INP_PASSIVE);
+    register_input("D", m_D, netlist_input_t::STATE_INP_PASSIVE);
+
+    register_output("QA", m_QA);
+    register_output("QB", m_QB);
+    register_output("QC", m_QC);
+    register_output("QD", m_QD);
+    register_output("RC", m_RC);
 
 }
 

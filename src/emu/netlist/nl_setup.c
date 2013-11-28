@@ -230,11 +230,16 @@ void netlist_setup_t::register_param(const pstring &param, const pstring &value)
 
 const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 {
-	const pstring temp = m_alias.find(name);
-	pstring ret = name;
-	if (temp != "")
-		ret = temp;
-	int p = ret.find(".[");
+    pstring temp = name;
+    pstring ret;
+
+    /* FIXME: Detect endless loop */
+    do {
+        ret = temp;
+        temp = m_alias.find(ret);
+    } while (temp != "");
+
+    int p = ret.find(".[");
 	if (p > 0)
 	{
 	    pstring dname = ret;
@@ -242,7 +247,12 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 	    if (dev == NULL)
 	        fatalerror("Device for %s not found\n", name.cstr());
 	    int c = atoi(ret.substr(p+2,ret.len()-p-3));
-	    ret = dev->name() + "." + dev->m_terminals.item(c)->object();
+	    temp = dev->name() + "." + dev->m_terminals.item(c)->object();
+	    // reresolve ....
+	    do {
+	        ret = temp;
+	        temp = m_alias.find(ret);
+	    } while (temp != "");
 	}
 
     //printf("%s==>%s\n", name.cstr(), ret.cstr());

@@ -190,17 +190,19 @@ typedef delegate<void ()> net_update_delegate;
 #define NETLIB_DEVICE(_name, _priv)                                                 \
 		NETLIB_DEVICE_BASE(NETLIB_NAME(_name), netlist_device_t, , _priv)
 
-#define NETLIB_SUBDEVICE(_name, _priv)                                              \
-	class NETLIB_NAME(_name) : public netlist_core_device_t                         \
-	{                                                                               \
-	public:                                                                         \
-		NETLIB_NAME(_name) ()                                                       \
-		: netlist_core_device_t()                                                   \
-			{ }                                                                     \
-	/*protected:*/                                                                  \
-		ATTR_HOT void update();                                                     \
-		_priv                                                                       \
-	}
+#define NETLIB_SUBDEVICE(_name, _priv)                                             \
+    class NETLIB_NAME(_name) : public netlist_device_t                              \
+    {                                                                               \
+    public:                                                                         \
+        NETLIB_NAME(_name) ()                                                       \
+        : netlist_device_t()                                                        \
+            { }                                                                     \
+    /*protected:*/                                                                  \
+        ATTR_HOT void update();                                                     \
+        ATTR_HOT void start();                                                      \
+    public:                                                                         \
+        _priv                                                                       \
+    }
 
 #define NETLIB_DEVICE_WITH_PARAMS(_name, _priv)                                     \
         NETLIB_DEVICE_BASE(NETLIB_NAME(_name), netlist_device_t,                    \
@@ -789,15 +791,14 @@ public:
 
 	ATTR_COLD bool variable_input_count() { return m_variable_input_count; }
 
-	ATTR_COLD void register_sub(netlist_core_device_t &dev, const pstring &name);
+	ATTR_COLD void register_sub(netlist_device_t &dev, const pstring &name);
+    ATTR_COLD void register_subalias(const pstring &name, netlist_terminal_t &term);
 
     ATTR_COLD void register_terminal(const pstring &name, netlist_terminal_t &port);
 
 	ATTR_COLD void register_output(const pstring &name, netlist_output_t &out);
-	ATTR_COLD void register_output(netlist_core_device_t &dev, const pstring &name, netlist_output_t &out);
 
 	ATTR_COLD void register_input(const pstring &name, netlist_input_t &in, netlist_input_t::state_e state = netlist_input_t::STATE_INP_ACTIVE);
-	ATTR_COLD void register_input(netlist_core_device_t &dev, const pstring &name, netlist_input_t &in, netlist_input_t::state_e state = netlist_input_t::STATE_INP_ACTIVE);
 
 	ATTR_COLD void register_link_internal(netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState);
 	ATTR_COLD void register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState);

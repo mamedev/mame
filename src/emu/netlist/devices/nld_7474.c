@@ -47,14 +47,24 @@ NETLIB_UPDATE(nic7474)
 NETLIB_START(nic7474)
 {
     register_sub(sub, "sub");
-    register_input(sub, "CLK",  sub.m_clk, netlist_input_t::STATE_INP_LH);
+
+    register_subalias("CLK",  sub.m_clk);
     register_input("D",    m_D);
     register_input("CLRQ", m_clrQ);
     register_input("PREQ", m_preQ);
 
-    register_output(sub, "Q",   sub.m_Q);
-    register_output(sub, "QQ",  sub.m_QQ);
+    register_subalias("Q",   sub.m_Q);
+    register_subalias("QQ",  sub.m_QQ);
 
-    sub.m_Q.initial(1);
-    sub.m_QQ.initial(0);
+}
+
+NETLIB_START(nic7474sub)
+{
+    register_input("CLK",  m_clk, netlist_input_t::STATE_INP_LH);
+
+    register_output("Q",   m_Q);
+    register_output("QQ",  m_QQ);
+
+    m_Q.initial(1);
+    m_QQ.initial(0);
 }

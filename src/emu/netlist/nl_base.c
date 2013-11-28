@@ -261,14 +261,21 @@ ATTR_COLD void netlist_device_t::init(netlist_setup_t &setup, const pstring &nam
 }
 
 
-ATTR_COLD void netlist_device_t::register_sub(netlist_core_device_t &dev, const pstring &name)
+ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstring &name)
 {
 	dev.init(*m_setup, this->name() + "." + name);
 }
 
-ATTR_COLD void netlist_device_t::register_output(netlist_core_device_t &dev, const pstring &name, netlist_output_t &port)
+ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, netlist_terminal_t &term)
 {
-	m_setup->register_object(*this, dev, name, port, netlist_terminal_t::STATE_OUT);
+    pstring alias = this->name() + "." + name;
+
+    //printf("alias: %s\n", alias.cstr());
+
+    m_setup->register_alias(alias, term.name());
+
+    if (term.isType(netlist_terminal_t::INPUT))
+        m_terminals.add(name);
 }
 
 ATTR_COLD void netlist_device_t::register_terminal(const pstring &name, netlist_terminal_t &port)
@@ -281,15 +288,10 @@ ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_ou
 	m_setup->register_object(*this,*this,name, port, netlist_terminal_t::STATE_OUT);
 }
 
-ATTR_COLD void netlist_device_t::register_input(netlist_core_device_t &dev, const pstring &name, netlist_input_t &inp, netlist_input_t::state_e type)
-{
-    m_terminals.add(name);
-	m_setup->register_object(*this, dev, name, inp, type);
-}
-
 ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp, netlist_input_t::state_e type)
 {
-	register_input(*this, name, inp, type);
+    m_terminals.add(name);
+    m_setup->register_object(*this, *this, name, inp, type);
 }
 
 static void init_term(netlist_core_device_t &dev, netlist_terminal_t &term, netlist_input_t::state_e aState)
