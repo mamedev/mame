@@ -22,6 +22,9 @@
 ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
 	: ata_hle_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_can_identify_device(0),
+	m_num_cylinders(0),
+	m_num_sectors(0),
+	m_num_heads(0),
 	m_master_password(NULL),
 	m_user_password(NULL)
 {
@@ -341,11 +344,14 @@ void ata_mass_storage_device::security_error()
 
 attotime ata_mass_storage_device::seek_time()
 {
-	/* just set a timer */
-	int new_lba = lba_address();
+	int sectors_per_cylinder =  m_num_heads * m_num_sectors;
 
-	int old_cylinder = m_cur_lba / (m_num_heads * m_num_sectors);
-	int new_cylinder = new_lba / (m_num_heads * m_num_sectors);
+	if (sectors_per_cylinder == 0 || m_num_cylinders == 0)
+		return attotime::zero;
+
+	int new_lba = lba_address();
+	int old_cylinder = m_cur_lba / sectors_per_cylinder;
+	int new_cylinder = new_lba / sectors_per_cylinder;
 	int diff = abs(old_cylinder - new_cylinder);
 
 	m_cur_lba = new_lba;
