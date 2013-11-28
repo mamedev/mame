@@ -3046,10 +3046,10 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2291.u72",  0x00000, 0x8000, CRC(db4e491c) SHA1(e371e7b236962a0f30640c683d3a0a302c51aee9) ) /* Custom The Orleans graphics */
-	ROM_LOAD( "mgo-cg2291.u73",  0x08000, 0x8000, CRC(17bb35f8) SHA1(ba9e8aa3ff42b17c7be6ee46c70db22d8e60e52c) ) /* Compatible with most "standard" game sets */
-	ROM_LOAD( "mbo-cg2291.u74",  0x10000, 0x8000, CRC(de1036e4) SHA1(774bbcda301754dc4a606974248847a2264c3827) )
-	ROM_LOAD( "mxo-cg2291.u75",  0x18000, 0x8000, CRC(7049403c) SHA1(3a29a00fb8dfdb30dba757c1536151827ea09068) )
+	ROM_LOAD( "mro-cg2291.u77",  0x00000, 0x8000, CRC(db4e491c) SHA1(e371e7b236962a0f30640c683d3a0a302c51aee9) ) /* Custom The Orleans graphics */
+	ROM_LOAD( "mgo-cg2291.u78",  0x08000, 0x8000, CRC(17bb35f8) SHA1(ba9e8aa3ff42b17c7be6ee46c70db22d8e60e52c) ) /* Compatible with most "standard" game sets */
+	ROM_LOAD( "mbo-cg2291.u79",  0x10000, 0x8000, CRC(de1036e4) SHA1(774bbcda301754dc4a606974248847a2264c3827) )
+	ROM_LOAD( "mxo-cg2291.u80",  0x18000, 0x8000, CRC(7049403c) SHA1(3a29a00fb8dfdb30dba757c1536151827ea09068) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "capx2291.u43", 0x0000, 0x0100, CRC(4ae03cdc) SHA1(cdb083a232b0a5fe437610e13812f93bc253d108) )
