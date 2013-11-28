@@ -529,10 +529,10 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/bus/a2bus/nubus.h,BUSES += NUBUS
+#@src/emu/bus/nubus/nubus.h,BUSES += NUBUS
 #-------------------------------------------------
 
-ifneq ($(filter A2BUS,$(BUSES)),)
+ifneq ($(filter NUBUS,$(BUSES)),)
 BUSOBJS += $(BUSOBJ)/nubus/nubus.o
 BUSOBJS += $(BUSOBJ)/nubus/nubus_48gc.o
 BUSOBJS += $(BUSOBJ)/nubus/nubus_cb264.o
