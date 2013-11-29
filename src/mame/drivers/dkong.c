@@ -2229,6 +2229,71 @@ ROM_START( dkongjnrj )
 	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
 ROM_END
 
+ROM_START( dkongjre )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "djr1-c.5b",    0x0000, 0x1000, CRC(ffe9e1a5) SHA1(715dc79d85169b4c1faf43458592e69b434afefd) )
+	ROM_CONTINUE(             0x3000, 0x1000 )
+	ROM_LOAD( "djr1-c.5c",    0x2000, 0x0800, CRC(982e30e8) SHA1(4d93d79e6ab1cad678af509cb3be4166b239bfa6) )
+	ROM_CONTINUE(             0x4800, 0x0800 )
+	ROM_CONTINUE(             0x1000, 0x0800 )
+	ROM_CONTINUE(             0x5800, 0x0800 )
+	ROM_LOAD( "djr1-c.5e",    0x4000, 0x0800, CRC(24c3d325) SHA1(98b0354cddf2cb5e21a3aa8387b86e8606e51d55) )
+	ROM_CONTINUE(             0x2800, 0x0800 )
+	ROM_CONTINUE(             0x5000, 0x0800 )
+	ROM_CONTINUE(             0x1800, 0x0800 )
+	ROM_LOAD( "djr1-c.5a",    0x8000, 0x1000, CRC(bb5f5180) SHA1(1ef6236b7204432cfd17c689760943ab603c6fb7) )
+
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "dkj.3n",       0x0000, 0x1000, CRC(8d51aca9) SHA1(64887564b079d98e98aafa53835e398f34fe4e3f) )
+	ROM_LOAD( "dkj.3p",       0x1000, 0x1000, CRC(4ef64ba5) SHA1(41a7a4005087951f57f62c9751d62a8c495e6bb3) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "v_7c.bin",     0x0000, 0x0800, CRC(dc7f4164) SHA1(07a6242e95b5c3b8dfdcd4b4950f463dba16dd77) )
+	ROM_LOAD( "v_7d.bin",     0x0800, 0x0800, CRC(0ce7dcf6) SHA1(0654b77526c49f0dfa077ac4f1f69cf5cb2e2f64) )
+	ROM_LOAD( "v_7e.bin",     0x1000, 0x0800, CRC(24d1ff17) SHA1(696854bf3dc5447d33b4815db357e6ce3834d867) )
+	ROM_LOAD( "v_7f.bin",     0x1800, 0x0800, CRC(0f8c083f) SHA1(0b688ae9da296b2447fffa5e135fd6a56ec3e790) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "c-2e.bpr",  0x0000, 0x0100, CRC(463dc7ad) SHA1(b2c9f22facc8885be2d953b056eb8dcddd4f34cb) )   /* palette low 4 bits (inverted) */
+	ROM_LOAD( "c-2f.bpr",  0x0100, 0x0100, CRC(47ba0042) SHA1(dbec3f4b8013628c5b8f83162e5f8b1f82f6ee5f) )   /* palette high 4 bits (inverted) */
+	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
+ROM_END
+
+ROM_START( dkongjrp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dkjr1-c.5b-p", 0x0000, 0x1000, BAD_DUMP CRC(8d99b3e0) SHA1(311a9f353e62d9d07c678e45baa2efec575a8f3b) ) // does not match SUM16 of bulletin (see notes), howcome?? - marked bad for now until reason is known
+	ROM_CONTINUE(             0x3000, 0x1000 )
+	ROM_LOAD( "dkjr1-c.5c-p", 0x2000, 0x0800, BAD_DUMP CRC(b92d258c) SHA1(793483e249d08cbbbefe06d3ddc4c2eda5428ee8) ) // "
+	ROM_CONTINUE(             0x4800, 0x0800 )
+	ROM_CONTINUE(             0x1000, 0x0800 )
+	ROM_CONTINUE(             0x5800, 0x0800 )
+	ROM_LOAD( "dkjr1-c.5e",   0x4000, 0x0800, CRC(d042b6a8) SHA1(57ac237d273496b44220b4437118115ef11dbd9f) )
+	ROM_CONTINUE(             0x2800, 0x0800 )
+	ROM_CONTINUE(             0x5000, 0x0800 )
+	ROM_CONTINUE(             0x1800, 0x0800 )
+
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "dkj.3n",       0x0000, 0x1000, CRC(8d51aca9) SHA1(64887564b079d98e98aafa53835e398f34fe4e3f) )
+	ROM_LOAD( "dkj.3p",       0x1000, 0x1000, CRC(4ef64ba5) SHA1(41a7a4005087951f57f62c9751d62a8c495e6bb3) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "v_7c.bin",     0x0000, 0x0800, CRC(dc7f4164) SHA1(07a6242e95b5c3b8dfdcd4b4950f463dba16dd77) )
+	ROM_LOAD( "v_7d.bin",     0x0800, 0x0800, CRC(0ce7dcf6) SHA1(0654b77526c49f0dfa077ac4f1f69cf5cb2e2f64) )
+	ROM_LOAD( "v_7e.bin",     0x1000, 0x0800, CRC(24d1ff17) SHA1(696854bf3dc5447d33b4815db357e6ce3834d867) )
+	ROM_LOAD( "v_7f.bin",     0x1800, 0x0800, CRC(0f8c083f) SHA1(0b688ae9da296b2447fffa5e135fd6a56ec3e790) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "c-2e.bpr",  0x0000, 0x0100, CRC(463dc7ad) SHA1(b2c9f22facc8885be2d953b056eb8dcddd4f34cb) )   /* palette low 4 bits (inverted) */
+	ROM_LOAD( "c-2f.bpr",  0x0100, 0x0100, CRC(47ba0042) SHA1(dbec3f4b8013628c5b8f83162e5f8b1f82f6ee5f) )   /* palette high 4 bits (inverted) */
+	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
+ROM_END
+
 ROM_START( dkongjrb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dkjr1",        0x0000, 0x1000, CRC(ec7e097f) SHA1(c10885d8724434030094a106c5b6de7fa6976d0f) )
@@ -2364,39 +2429,6 @@ ROM_START( dkingjr )
 	ROM_LOAD( "mb7052.9l",  0x0100, 0x0100, CRC(487513ab) SHA1(e686021bbd41ea8c9d1fd3a277333173ba50afdd) )   /* palette high 4 bits */
 	ROM_LOAD( "mb7052.6b",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
 	ROM_LOAD( "mb7051.8j",  0x0300, 0x0020, CRC(a5a6f2ca) SHA1(5507fb6f5c8845c4421c2996e9f76c818d987623) )   /* unknown */
-ROM_END
-
-ROM_START( dkongjre )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "djr1-c.5b",    0x0000, 0x1000, CRC(ffe9e1a5) SHA1(715dc79d85169b4c1faf43458592e69b434afefd) )
-	ROM_CONTINUE(             0x3000, 0x1000 )
-	ROM_LOAD( "djr1-c.5c",    0x2000, 0x0800, CRC(982e30e8) SHA1(4d93d79e6ab1cad678af509cb3be4166b239bfa6) )
-	ROM_CONTINUE(             0x4800, 0x0800 )
-	ROM_CONTINUE(             0x1000, 0x0800 )
-	ROM_CONTINUE(             0x5800, 0x0800 )
-	ROM_LOAD( "djr1-c.5e",    0x4000, 0x0800, CRC(24c3d325) SHA1(98b0354cddf2cb5e21a3aa8387b86e8606e51d55) )
-	ROM_CONTINUE(             0x2800, 0x0800 )
-	ROM_CONTINUE(             0x5000, 0x0800 )
-	ROM_CONTINUE(             0x1800, 0x0800 )
-	ROM_LOAD( "djr1-c.5a",    0x8000, 0x1000, CRC(bb5f5180) SHA1(1ef6236b7204432cfd17c689760943ab603c6fb7) )
-
-	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
-	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "dkj.3n",       0x0000, 0x1000, CRC(8d51aca9) SHA1(64887564b079d98e98aafa53835e398f34fe4e3f) )
-	ROM_LOAD( "dkj.3p",       0x1000, 0x1000, CRC(4ef64ba5) SHA1(41a7a4005087951f57f62c9751d62a8c495e6bb3) )
-
-	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "v_7c.bin",     0x0000, 0x0800, CRC(dc7f4164) SHA1(07a6242e95b5c3b8dfdcd4b4950f463dba16dd77) )
-	ROM_LOAD( "v_7d.bin",     0x0800, 0x0800, CRC(0ce7dcf6) SHA1(0654b77526c49f0dfa077ac4f1f69cf5cb2e2f64) )
-	ROM_LOAD( "v_7e.bin",     0x1000, 0x0800, CRC(24d1ff17) SHA1(696854bf3dc5447d33b4815db357e6ce3834d867) )
-	ROM_LOAD( "v_7f.bin",     0x1800, 0x0800, CRC(0f8c083f) SHA1(0b688ae9da296b2447fffa5e135fd6a56ec3e790) )
-
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "c-2e.bpr",  0x0000, 0x0100, CRC(463dc7ad) SHA1(b2c9f22facc8885be2d953b056eb8dcddd4f34cb) )   /* palette low 4 bits (inverted) */
-	ROM_LOAD( "c-2f.bpr",  0x0100, 0x0100, CRC(47ba0042) SHA1(dbec3f4b8013628c5b8f83162e5f8b1f82f6ee5f) )   /* palette high 4 bits (inverted) */
-	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
 ROM_END
 
 ROM_START( pestplce )
@@ -3178,7 +3210,8 @@ GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr, driver_device,        0,  ROT
 GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjnrj,dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo", "Donkey Kong Junior (Japan?)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrb, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjre, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (Easy)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjre, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (E kit)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjrp, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (P kit)", GAME_SUPPORTS_SAVE )
 GAME( 1982, jrking,   dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "bootleg", "Junior King (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkingjr,  dkongjr,  dkongjr,  dkongjr, dkong_state,  dkingjr,  ROT90, "bootleg", "Donkey King Jr. (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
 
