@@ -20,21 +20,21 @@ The following games are known to exist on this hardware (there may be more)
                                                                   Video CD     Security
 Game Title                       Year            Program CD     6/7/8 use DVD  Dongle      HDD label
 -----------------------------------------------------------------------------------------------------
-beatmania IIDX (English)       - Konami 1999     GQ863 A01        GQ863 A04    863 A02     Possibly same as Japan version?
-beatmania IIDX (Japanese)      - Konami 1999     GQ863-JA B01     GQ863 A04     "   "      C44 JA A03*
+beatmania IIDX (English)       - Konami 1999     GQ863 A01        GQ863 A04    863 A02     ?
+beatmania IIDX (Japanese)      - Konami 1999     GQ863-JA B01     GQ863 A04     "   "      ?
 beatmania IIDX + DDR Club Kit  - Konami 1999     896 JA ABM       ?            ?           ?
 beatmania IIDX Substream       - Konami 1999     ?                GC983 A04    ?           Dumped#
 beatmania IIDX Club Version 2  - Konami 1999     GE984 A01(BM)    ?            984 A02     ?
                                                + GE984 A01(DDR)
-beatmania IIDX 2nd Style       - Konami 1999     GC985 A01        GC985 A04    ?           ?
-beatmania IIDX 3rd Style       - Konami 2000     GC992-JA A01     GC992-JA A04 ?           ?
+beatmania IIDX 2nd Style       - Konami 1999     GC985 A01        GC985 A04    ?           985 HDD A01
+beatmania IIDX 3rd Style       - Konami 2000     GC992-JA A01     GC992-JA A04 ?           992 HDD A01
 beatmania IIDX 3rd Style(newer)- Konami 2000     GC992-JA C01     GC992-JA A04 ?           ?
 beatmania IIDX 4th Style       - Konami 2000     A03 JA A01       A03 JA A02   A03         A03 JA A03
-beatmania IIDX 5th Style       - Konami 2001     A17 JA A01       A17 JA A02   ?           ?
+beatmania IIDX 5th Style       - Konami 2001     A17 JA A01       A17 JA A02   ?           A17 JA A03
 beatmania IIDX 6th Style       - Konami 2001     B4U JA A01       B4U JA A02   ?           B4U JA A03
 beatmania IIDX 6th Style(newer)- Konami 2001     B4U JA B01       B4U JA A02   ?           B4U JA A03
-beatmania IIDX 7th Style       - Konami 2002     B44 JA A01       B44 JA A02   ?           ?
-beatmania IIDX 8th Style       - Konami 2002     C44 JA A01       ?            C44         ?
+beatmania IIDX 7th Style       - Konami 2002     B44 JA A01       B44 JA A02   ?           B44 JA A03
+beatmania IIDX 8th Style       - Konami 2002     C44 JA A01       ?            C44         C44 JA A03
 
 ? = Undumped pieces.
 # = Dumped but code unknown.
@@ -934,13 +934,13 @@ ROM_START( bmiidx )
 	TWINKLE_BIOS
 
 	DISK_REGION( "scsi:cdrom" ) // program
-	DISK_IMAGE_READONLY("863jaa01", 0, BAD_DUMP SHA1(aee12de1dc5dd44e5bf7b62133ed695b80999390) )
+	DISK_IMAGE_READONLY( "gq863a01", 0, BAD_DUMP SHA1(aee12de1dc5dd44e5bf7b62133ed695b80999390) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY("863jaa04", 0, BAD_DUMP SHA1(8f6a0d2e191153032c9388b5298d8ee531b22a41) )
+	DISK_IMAGE_READONLY( "gq863a04", 0, BAD_DUMP SHA1(8f6a0d2e191153032c9388b5298d8ee531b22a41) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY("c44jaa03", 0, SHA1(53e9bd25d1674a04aeec81c0224b4e4e44af802a) ) // was part of a 1st mix machine, but "c44" indicates 8th mix?
+	DISK_IMAGE_READONLY( "863hdda01", 0, SHA1(0b8dbf1c9caf4abf965dbc6e1a8e6329d48b1c90) )
 ROM_END
 
 ROM_START( bmiidx2 )
@@ -950,13 +950,13 @@ ROM_START( bmiidx2 )
 	ROM_LOAD( "985j.pd",      0x000000, 0x000100, BAD_DUMP CRC(a35143a9) SHA1(1c0feeab60d9dc50dc4b9a2f3dac73ca619e74b0) )
 
 	DISK_REGION( "scsi:cdrom" )
-	DISK_IMAGE_READONLY( "985jaa01", 0, BAD_DUMP SHA1(0b783f11317f64552ebf3323459139529e7f315f) )
+	DISK_IMAGE_READONLY( "gc985a01", 0, SHA1(0b783f11317f64552ebf3323459139529e7f315f) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY( "985jaa02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "gc985a04", 0, SHA1(4306417f61eb1ea92894d288cdb7c385eb4610f2) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "985jaahd", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "985hdda01", 0, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidx3 )
@@ -969,10 +969,10 @@ ROM_START( bmiidx3 )
 	DISK_IMAGE_READONLY( "992jaa01", 0, BAD_DUMP SHA1(7e5389735dff379bb286ba3744edf59b7dfcc74b) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY( "992jaa02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "992jaa04", 0, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "992jaahd", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "992hdda01", 0, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidx4 )
@@ -985,10 +985,26 @@ ROM_START( bmiidx4 )
 	DISK_IMAGE_READONLY( "a03jaa01", 0, BAD_DUMP SHA1(2a587b5524bac6f03d26b55247a0acd22aad6c3a) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY( "a03jaa02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "a03jaa02", 0, SHA1(d6f01d666e8de285a02215f7ef987073e2b25019) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "a03jaahd", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "a03jaa03", 0, SHA1(a9814c60d2ed98b8c4f6e11ea762518a1712e7b5) )
+ROM_END
+
+ROM_START( bmiidx5 )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "security", 0 )
+	ROM_LOAD( "a17j.pd",      0x000000, 0x000100, CRC(9428afb0) SHA1(ba907d3361256b022583d6a42fe223e90590e3c6) )
+
+	DISK_REGION( "scsi:cdrom" )
+	DISK_IMAGE_READONLY( "a17jaa01", 0, BAD_DUMP SHA1(9f552eaa0acbdbddf93cabe99f8f829afbf29e02) )
+
+	DISK_REGION( "cdrom1" ) // video CD
+	DISK_IMAGE_READONLY( "a17jaa02", 0, BAD_DUMP SHA1(767554dcc879bfc87df0d86384d8c850bafefad2) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE_READONLY( "a17jaa03", 0, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidx6 )
@@ -1001,10 +1017,10 @@ ROM_START( bmiidx6 )
 	DISK_IMAGE_READONLY( "b4ujaa01", 0, BAD_DUMP SHA1(d8f5d56b8728bea761dc4cdbc04851094d276bd6) )
 
 	DISK_REGION( "cdrom1" ) // DVD
-	DISK_IMAGE_READONLY( "b4ujaa02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "b4ujaa02", 0, SHA1(70c85f6df6f21b96c02e4eefc224593edcaf9e63) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "b4ujaahd", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "b4ujaa03", 0, SHA1(cfcbdfab157a864cbd4ac83247be5d62218f5b72) )
 ROM_END
 
 ROM_START( bmiidx7 )
@@ -1017,10 +1033,10 @@ ROM_START( bmiidx7 )
 	DISK_IMAGE_READONLY( "b44jaa01", 0, BAD_DUMP SHA1(a21610f3dc090e39e125d063442ed877fa056146) )
 
 	DISK_REGION( "cdrom1" ) // DVD
-	DISK_IMAGE_READONLY( "b44jaa02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "b44jaa02", 0, SHA1(a45726d99025f4d824ec143ef92957c76c08a13a) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "b44jaahd", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "b44jaa03", 0, SHA1(1adb8e4874e26e8ccd9822e6f9dd12f6e6f8af05) )
 ROM_END
 
 ROM_START( bmiidx8 )
@@ -1033,10 +1049,10 @@ ROM_START( bmiidx8 )
 	DISK_IMAGE_READONLY( "c44jaa01", 0, BAD_DUMP SHA1(8b544c81bc56b19e4aa1649e68824811d6d51ce5) )
 
 	DISK_REGION( "cdrom1" ) // DVD
-	DISK_IMAGE_READONLY( "c44jaa02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "c44jaa02", 0, SHA1(f4c454a6360c507a122888d5bc3311eed5ce083b) )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "c44jaahd", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "c44jaa03", 0, SHA1(14df5039a4f5a648f1a2d12a35c16f56d0f9cd28) )
 ROM_END
 
 ROM_START( bmiidxc )
@@ -1046,13 +1062,13 @@ ROM_START( bmiidxc )
 	ROM_LOAD( "896j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1e5caf37) SHA1(75b378662b651cb322e41564d3bae68cc9edadc5) )
 
 	DISK_REGION( "scsi:cdrom" )
-	DISK_IMAGE_READONLY( "896jaabm", 0, BAD_DUMP SHA1(af008e5bcf18da4e9aea752a712c843e37a74be5) )
+	DISK_IMAGE_READONLY( "896jabbm", 0, BAD_DUMP SHA1(117ae4c876207bbaf9e8fe0fdf5bb161155c1bdb) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY( "abmjaa02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "896jaa02", 0, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "abmjaahd", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "896hdda01", 0, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidxc2 )
@@ -1065,10 +1081,10 @@ ROM_START( bmiidxc2 )
 	DISK_IMAGE_READONLY( "984a01bm", 0, BAD_DUMP SHA1(d9b7d74a72a76e4e9cf7725e0fb8dafcc1c87187) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY( "abmjaa02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "984a04", 0, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "abmjaahd", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "984hdda01", 0, NO_DUMP )
 ROM_END
 
 ROM_START( bmiidxca )
@@ -1078,13 +1094,29 @@ ROM_START( bmiidxca )
 	ROM_LOAD( "896j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1e5caf37) SHA1(75b378662b651cb322e41564d3bae68cc9edadc5) )
 
 	DISK_REGION( "scsi:cdrom" )
-	DISK_IMAGE_READONLY( "896jabbm", 0, BAD_DUMP SHA1(117ae4c876207bbaf9e8fe0fdf5bb161155c1bdb) )
+	DISK_IMAGE_READONLY( "896jaabm", 0, SHA1(ea7205f86543d9273efcc226666ab530c32b23c1) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY( "abmjaa02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "896jaa02", 0, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE_READONLY( "abmjaahd", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "896hdda01", 0, NO_DUMP )
+ROM_END
+
+ROM_START( bmiidxs )
+	TWINKLE_BIOS
+
+	ROM_REGION( 0x100, "security", 0 )
+	ROM_LOAD( "983j.pd",      0x000000, 0x000100, NO_DUMP )
+
+	DISK_REGION( "scsi:cdrom" )
+	DISK_IMAGE_READONLY( "gc983a01", 0, NO_DUMP )
+
+	DISK_REGION( "cdrom1" ) // video CD
+	DISK_IMAGE_READONLY( "gc983a04", 0, BAD_DUMP SHA1(5cc5a22c1ec3f3cd5f37c0aa7a90d7e8712f2431) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
 
 GAME( 1999, gq863,    0,       twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "Twinkle System", GAME_IS_BIOS_ROOT )
@@ -1094,14 +1126,14 @@ GAME( 1999, bmiidx,   gq863,   twinkle, twinkle, twinkle_state, twinkle, ROT0, "
 /* find out what these use for security */
 GAME( 1999, bmiidxc,  gq863,   twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 1999, bmiidxca, bmiidxc, twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-/* 1999 - beatmania IIDX substream */
+GAME( 1999, bmiidxs,  gq863,   twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "beatmania IIDX Substream (983 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 1999, bmiidxc2, gq863,   twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "beatmania IIDX Substream 2 with DDR 2nd Club Version (984 A01 BM)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 
 /* these use i2c for security */
 GAME( 1999, bmiidx2,  gq863,   twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "beatmania IIDX 2nd style (GC985 JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 2000, bmiidx3,  gq863,   twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 2000, bmiidx4,  gq863,   twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "beatmania IIDX 4th style (GCA03 JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-/* 2001 - beatmania IIDX 5th style */
+GAME( 2001, bmiidx5,  gq863,   twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "beatmania IIDX 5th style (GCA17 JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 
 /* DVD */
 GAME( 2001, bmiidx6,  gq863,   twinkle, twinkle, twinkle_state, twinkle, ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
