@@ -82,13 +82,18 @@ NETLIB_UPDATE(clock)
 
 NETLIB_START(solver)
 {
-    register_output("Q", m_Q);
+    register_output("Q_sync", m_Q_sync);
+    register_output("Q_step", m_Q_step);
     //register_input("FB", m_feedback);
+
+    register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(10).as_double());
+    m_nt_sync_delay = m_sync_delay.Value();
 
     register_param("FREQ", m_freq, 50000.0);
     m_inc = netlist_time::from_hz(m_freq.Value());
 
-    register_link_internal(m_feedback, m_Q, netlist_input_t::STATE_INP_ACTIVE);
+    register_link_internal(m_fb_sync, m_Q_sync, netlist_input_t::STATE_INP_ACTIVE);
+    register_link_internal(m_fb_step, m_Q_step, netlist_input_t::STATE_INP_ACTIVE);
     m_last_step = netlist_time::zero;
 
 }
@@ -190,13 +195,26 @@ NETLIB_UPDATE(solver)
     else
     {
         /* update all inputs connected */
+#if 0
+        for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+        {
+            if (pn->object()->m_cur.Analog != pn->object()->m_last.Analog)
+            {
+                for (netlist_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
+                {
+                    if (p->isType(netlist_terminal_t::INPUT))
+                        p->netdev().update_dev();
+                }
+            }
+            pn->object()->m_last.Analog = pn->object()->m_cur.Analog;
+        }
+#else
         for (terminal_list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
             p->object()->netdev().update_dev();
+#endif
         /* step circuit */
-        if (!m_Q.net().is_queued())
-        {
-            m_Q.net().push_to_queue(m_inc);
-        }
+        if (!m_Q_step.net().is_queued())
+            m_Q_step.net().push_to_queue(m_inc);
     }
 
         /* only inputs and terminals connected

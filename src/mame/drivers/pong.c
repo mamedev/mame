@@ -63,7 +63,7 @@ fixedfreq_interface fixedfreq_mode_pong = {
 	H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL,
 	V_TOTAL-22,V_TOTAL-19,V_TOTAL-16,V_TOTAL,
 	1,  /* interlaced */
-	0.3
+	0.32
 };
 
 fixedfreq_interface fixedfreq_mode_pongX2 = {
@@ -71,7 +71,7 @@ fixedfreq_interface fixedfreq_mode_pongX2 = {
 	(H_TOTAL-67) * 2, (H_TOTAL-40) * 2, (H_TOTAL-8) * 2, (H_TOTAL) * 2,
 	V_TOTAL-22,V_TOTAL-19,V_TOTAL-16,V_TOTAL,
 	1,  /* interlaced */
-	0.3
+	0.32
 };
 
 enum input_changed_enum
@@ -460,12 +460,29 @@ static NETLIST_START(pong_schematics)
 	TTL_7486_XOR(ic_a4d, hsyncQ, vsyncQ)
 	TTL_7404_INVERT(ic_e4f, ic_a4d.Q)
 
+#if 0
 	NETDEV_MIXER3(videomix, video, score, ic_e4f.Q)
 	NETDEV_PARAM(videomix.R1, RES_K(1))
 	NETDEV_PARAM(videomix.R2, RES_K(1.2))
 	NETDEV_PARAM(videomix.R3, RES_K(22))
+#else
+	NETDEV_R(RV1, RES_K(1))
+    NETDEV_R(RV2, RES_K(1.2))
+    NETDEV_R(RV3, RES_K(22))
+    NET_C(video, RV1.1)
+    NET_C(score, RV2.1)
+    NET_C(ic_e4f.Q, RV3.1)
+    NET_C(RV1.2, RV2.2)
+    NET_C(RV2.2, RV3.2)
 
+    NET_ALIAS(videomix, RV3.2)
 
+    NETDEV_SOLVER(Solver)
+    NETDEV_ANALOG_CONST(V5, 5)
+    NETDEV_ANALOG_CONST(V1, 1)
+    NETDEV_ANALOG_CONST(V0, 0)
+
+#endif
 #if 0
     NETDEV_R(R1, 10)
     NETDEV_R(R2, 10)
@@ -503,12 +520,8 @@ static NETLIST_START(pong_schematics)
     tt(28)
     tt(29)
 */
-#if 1
-    NETDEV_SOLVER(Solver)
-    NETDEV_ANALOG_CONST(V5, 5)
-    NETDEV_ANALOG_CONST(V1, 1)
-    NETDEV_ANALOG_CONST(V0, 0)
 
+#if 0
     NETDEV_R(R5, 1000)
     NETDEV_1N914(D1)
     NET_C(V5, R5.1)
@@ -518,10 +531,7 @@ static NETLIST_START(pong_schematics)
 #endif
 
 #if 0
-    NETDEV_SOLVER(Solver)
-    NETDEV_ANALOG_CONST(V5, 5)
-    NETDEV_ANALOG_CONST(V1, 1)
-    NETDEV_ANALOG_CONST(V0, 0)
+
     // astable NAND Multivibrator
     NETDEV_R(R1, 1000)
     NETDEV_C(C1, 1e-6)
@@ -607,6 +617,7 @@ public:
 	void video_cb(double newval)
 	{
 		m_video->update_vid(newval, m_maincpu->local_time());
+		//printf("%20.15f\n", newval);
 	}
 
 protected:

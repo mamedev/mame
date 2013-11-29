@@ -102,13 +102,18 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
         typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
         typedef netlist_list_t<netlist_net_t *>      net_list_t;
 
-        netlist_ttl_input_t m_feedback;
-        netlist_ttl_output_t m_Q;
+        netlist_ttl_input_t m_fb_sync;
+        netlist_ttl_output_t m_Q_sync;
+
+        netlist_ttl_input_t m_fb_step;
+        netlist_ttl_output_t m_Q_step;
 
         netlist_param_double_t m_freq;
+        netlist_param_double_t m_sync_delay;
 
         netlist_time m_inc;
         netlist_time m_last_step;
+        netlist_time m_nt_sync_delay;
 
         terminal_list_t m_terms;
         terminal_list_t m_inps;
@@ -127,9 +132,8 @@ public:
 inline void NETLIB_NAME(solver)::schedule()
 {
     // FIXME: time should be parameter;
-    if (!m_Q.net().is_queued()) {
-        m_Q.net().push_to_queue(NLTIME_FROM_NS(10));
-    }
+    if (!m_Q_sync.net().is_queued())
+        m_Q_sync.net().push_to_queue(m_nt_sync_delay);
 }
 
 // ----------------------------------------------------------------------------------------

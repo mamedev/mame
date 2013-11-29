@@ -42,6 +42,9 @@ public:
     ATTR_HOT friend inline bool operator<=(const netlist_time &left, const netlist_time &right);
 
     ATTR_HOT inline const netlist_time &operator=(const netlist_time &right) { m_time = right.m_time; return *this; }
+    ATTR_HOT inline const netlist_time &operator=(const double &right) { m_time = (INTERNALTYPE) ( right * (double) RESOLUTION); return *this; }
+    ATTR_HOT inline operator double() const { return as_double(); }
+
     ATTR_HOT inline const netlist_time &operator+=(const netlist_time &right) { m_time += right.m_time; return *this; }
 
     ATTR_HOT inline const INTERNALTYPE as_raw() const { return m_time; }
@@ -51,6 +54,7 @@ public:
     ATTR_HOT static inline const netlist_time from_usec(const int us) { return netlist_time((UINT64) us * (RESOLUTION / U64(1000000))); }
     ATTR_HOT static inline const netlist_time from_msec(const int ms) { return netlist_time((UINT64) ms * (RESOLUTION / U64(1000))); }
     ATTR_HOT static inline const netlist_time from_hz(const UINT64 hz) { return netlist_time(RESOLUTION / hz); }
+    ATTR_HOT static inline const netlist_time from_double(const double t) { return netlist_time((INTERNALTYPE) ( t * (double) RESOLUTION)); }
     ATTR_HOT static inline const netlist_time from_raw(const INTERNALTYPE raw) { return netlist_time(raw); }
 
     static const netlist_time zero;
