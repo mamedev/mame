@@ -20,7 +20,13 @@ const device_type YMZ770 = &device_creator<ymz770_device>;
 
 ymz770_device::ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMZ770, "Yamaha YMZ770", tag, owner, clock, "ymz770", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_cur_reg(0),
+		m_mute(0),
+		m_doen(0),
+		m_vlma(0),
+		m_bsl(0),
+		m_cpl(0)
 {
 }
 
@@ -45,6 +51,12 @@ void ymz770_device::device_start()
 
 	// register for save states
 	save_item(NAME(m_cur_reg));
+	save_item(NAME(m_mute));
+	save_item(NAME(m_doen));
+	save_item(NAME(m_vlma));
+	save_item(NAME(m_bsl));
+	save_item(NAME(m_cpl));
+
 	for (int i = 0; i < 8; i++)
 	{
 		save_item(NAME(m_channels[i].phrase), i);
@@ -94,18 +106,15 @@ void ymz770_device::device_reset()
 void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *outL, *outR;
-	int i, ch;
 
 	outL = outputs[0];
 	outR = outputs[1];
 
-	for (i = 0; i < samples; i++)
+	for (int i = 0; i < samples; i++)
 	{
-		INT32 mix;
+		INT32 mix = 0;
 
-		mix = 0;
-
-		for (ch = 0; ch < 8; ch++)
+		for (int ch = 0; ch < 8; ch++)
 		{
 			if (m_channels[ch].is_seq_playing)
 			{
@@ -212,7 +221,33 @@ WRITE8_MEMBER( ymz770_device::write )
 
 void ymz770_device::internal_reg_write(UINT8 reg, UINT8 data)
 {
-	if (reg >= 0x40 && reg <= 0x5f)
+	// global registers
+	if (reg < 0x40)
+	{
+		switch (reg)
+		{
+			case 0x00:
+				m_mute = data & 1;
+				m_doen = data >> 1 & 1;
+				break;
+			
+			case 0x01:
+				m_vlma = data;
+				break;
+			
+			case 0x02:
+				m_bsl = data & 7;
+				m_cpl = data >> 4 & 7;
+				break;
+
+			// unused
+			default:
+				break;
+		}
+	}
+
+	// playback registers
+	else if (reg < 0x60)
 	{
 		int voice = reg >> 2 & 0x07;
 
@@ -250,7 +285,9 @@ void ymz770_device::internal_reg_write(UINT8 reg, UINT8 data)
 				break;
 		}
 	}
-	else if (reg >= 0x80)
+	
+	// sequencer registers
+	else
 	{
 		int voice = reg >> 4 & 0x07;
 

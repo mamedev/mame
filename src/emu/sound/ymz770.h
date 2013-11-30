@@ -78,6 +78,11 @@ protected:
 
 	// data
 	UINT8 m_cur_reg;
+	UINT8 m_mute;         // mute chip
+	UINT8 m_doen;         // digital output enable
+	UINT8 m_vlma;         // overall AAM volume
+	UINT8 m_bsl;          // boost level
+	UINT8 m_cpl;          // clip limiter
 	UINT8 *m_rom_base;
 	int m_rom_size;
 
