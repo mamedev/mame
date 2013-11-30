@@ -8,6 +8,7 @@
 #define _INCLUDES_ALTO2_H_
 
 #include "emu.h"
+#include "rendlay.h"
 #include "cpu/alto2/alto2cpu.h"
 #include "machine/diablo_hd.h"
 

@@ -1372,9 +1372,6 @@ void alto2_cpu_device::f1_late_load_kcom()
 			if (WDALLOW)
 				s1 |= JKFF_C;
 			m_dsk.ff_43a = update_jkff(s0, s1, "43a KWD   ");
-
-			m_dsk.wdtskena = 1;
-			m_task_wakeup &= ~(1 << task_kwd);
 		}
 	}
 	// TODO: show disk indicator in the GUI?

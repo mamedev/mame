@@ -539,7 +539,7 @@ void alto2_cpu_device::init_disp()
 		m_dsp.scanline[y] = auto_alloc_array(machine(), UINT8, ALTO2_DISPLAY_TOTAL_WIDTH);
 
 	m_dsp.bitmap = auto_bitmap_ind16_alloc(machine(), ALTO2_DISPLAY_WIDTH, ALTO2_DISPLAY_HEIGHT + ALTO2_FAKE_STATUS_H);
-	m_dsp.state = 020;
+	m_dsp.state = 0;
 }
 
 void alto2_cpu_device::exit_disp()
@@ -549,7 +549,7 @@ void alto2_cpu_device::exit_disp()
 
 void alto2_cpu_device::reset_disp()
 {
-	m_dsp.state = 020;
+	m_dsp.state = 0;
 	m_dsp.hlc = ALTO2_DISPLAY_HLC_START;
 	m_dsp.a63 = 0;
 	m_dsp.a66 = 0;

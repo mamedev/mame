@@ -253,6 +253,7 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_SCREEN_VBLANK_TIME(ALTO2_DISPLAY_VBLANK_TIME)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)
 	MCFG_SCREEN_VBLANK_DEVICE("maincpu", alto2_cpu_device, screen_eof)
+	MCFG_DEFAULT_LAYOUT( layout_vertical )
 
 	MCFG_PALETTE_LENGTH(2)
 
