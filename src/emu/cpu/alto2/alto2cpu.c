@@ -2023,6 +2023,7 @@ void alto2_cpu_device::f2_late_load_md()
  * @param smc S function [0-15], M arithmetic/logic flag, C carry
  * @return resulting ALU output
  */
+#if	1
 UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 {
 	register UINT32 f;
@@ -2239,6 +2240,50 @@ UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
 	}
 	return f;
 }
+#else
+
+#define	DO_74181(ci,mp,s0,s1,s2,s3,a,b,_b0,_b1,_b2,_b3,f,co) do { \
+	int a0 = BIT(a,_b0), a1 = BIT(a,_b1), a2 = BIT(a,_b2), a3 = BIT(a,_b3); \
+	int b0 = BIT(b,_b0), b1 = BIT(b,_b1), b2 = BIT(b,_b2), b3 = BIT(b,_b3); \
+	int ap0 = !(a0 | (b0 & s0) | (s1 & !b0)); \
+	int bp0 = !(((!b0) & s2 & a0) | (a0 & b0 & s3)); \
+	int ap1 = !(a1 | (b1 & s0) | (s1 & !b1)); \
+	int bp1 = !(((!b1) & s2 & a1) | (a1 & b1 & s3)); \
+	int ap2 = !(a2 | (b2 & s0) | (s1 & !b2)); \
+	int bp2 = !(((!b2) & s2 & a2) | (a2 & b2 & s3)); \
+	int ap3 = !(a3 | (b3 & s0) | (s1 & !b3)); \
+	int bp3 = !(((!b3) & s2 & a3) | (a3 & b3 & s3)); \
+	int fp0 = !(ci & mp) ^ ((!ap0) & bp0); \
+	int fp1 = (!((mp & ap0) | (mp & bp0 & ci))) ^ ((!ap1) & bp1); \
+	int fp2 = (!((mp & ap1) | (mp & ap0 & bp1) | (mp & ci & bp0 & bp1))) ^ ((!ap2) & bp2); \
+	int fp3 = (!((mp & ap2) | (mp & ap1 & bp2) | (mp & ap0 & bp1 & bp2) | (mp & ci & bp0 & bp1 & bp2))) ^ ((!ap3) & bp3); \
+	f |= (fp0 << _b0) | (fp1 << _b1) | (fp2 << _b2) | (fp3 << _b3); \
+	int g = !((ap0 & bp1 & bp2 & bp3) | (ap1 & bp2 & bp3) | (ap2 & bp3) | ap3); \
+	co = (!(ci & bp0 & bp1 & bp2 & bp3)) | g; \
+} while (0)
+
+
+UINT32 alto2_cpu_device::alu_74181(UINT32 a, UINT32 b, UINT8 smc)
+{
+	// inputs
+	int ci = !BIT(smc, 2);
+	int mp = !BIT(smc, 3);
+	int s0 = !BIT(smc, 4), s1 = !BIT(smc, 5), s2 = !BIT(smc, 6), s3 = !BIT(smc, 7);
+
+	// outputs
+	UINT32 f = 0;
+	int cn_x;
+	DO_74181(ci,  mp,s0,s1,s2,s3,a,b, 0, 1, 2, 3,f,cn_x);	// 74181 #1
+	int cn_y;
+	DO_74181(cn_x,mp,s0,s1,s2,s3,a,b, 4, 5, 6, 7,f,cn_y);	// 74181 #2
+	int cn_z;
+	DO_74181(cn_y,mp,s0,s1,s2,s3,a,b, 8, 9,10,11,f,cn_z);	// 74181 #3
+	int co;
+	DO_74181(cn_z,mp,s0,s1,s2,s3,a,b,12,13,14,15,f,co);		// 74181 #4
+	f |= co << 16;
+	return f;
+}
+#endif	// 0
 #endif
 
 /** @brief flag that tells whether to load the T register from BUS or ALU */

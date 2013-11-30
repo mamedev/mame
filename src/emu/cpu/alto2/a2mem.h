@@ -21,7 +21,8 @@ enum {
 	ALTO2_MEM_NONE,
 	ALTO2_MEM_ODD		= (1 << 0),
 	ALTO2_MEM_RAM		= (1 << 1),
-	ALTO2_MEM_INVALID	= (1 << 2)
+	ALTO2_MEM_REFRESH	= (1 << 2),
+	ALTO2_MEM_INVALID	= (1 << 3)
 };
 
 struct {

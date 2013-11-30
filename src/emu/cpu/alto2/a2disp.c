@@ -247,11 +247,12 @@ static const UINT16 double_bits[256] = {
 //! update the internal bitmap to a byte array
 void alto2_cpu_device::update_bitmap_word(UINT16* bitmap, int x, int y, UINT16 word)
 {
-	/* mixing with the cursor */
+	// mixing with the cursor
 	if (x == m_dsp.curxpos + 0)
 		word ^= m_dsp.cursor0;
 	if (x == m_dsp.curxpos + 1)
 		word ^= m_dsp.cursor1;
+	// no change?
 	if (word == bitmap[x])
 		return;
 	bitmap[x] = word;
@@ -485,14 +486,14 @@ void alto2_cpu_device::display_state_machine()
 }
 
 /**
- * @brief f2_evenfield late: branch on evenfield
+ * @brief branch on evenfield
  *
  * NEXT(09) = even field ? 1 : 0
  */
 void alto2_cpu_device::f2_late_evenfield()
 {
 	UINT16 r = HLC1024 ^ 1;
-	LOG((LOG_DISPL,2,"	evenfield branch on HLC1024 (%#o | %#o)\n", m_next2, r));
+	LOG((LOG_DISPL,2,"	EVENFIELD branch (%#o | %#o)\n", m_next2, r));
 	m_next2 |= r;
 }
 

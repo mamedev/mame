@@ -629,6 +629,9 @@ void alto2_cpu_device::load_mar(UINT8 rsel, UINT32 addr)
 		 * currently we don't do anything special
 		 */
 		LOG((LOG_MEM,5, "	MAR←; refresh cycle @ %#o\n", addr));
+		m_mem.mar = addr;
+		m_mem.access = ALTO2_MEM_REFRESH;
+		m_mem.cycle = cycle();
 		return;
 	}
 
