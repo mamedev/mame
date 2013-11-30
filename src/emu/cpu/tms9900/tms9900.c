@@ -703,10 +703,12 @@ MICROPROGRAM(shift_mp)
 {
 	ALU_SHIFT,
 	MEMORY_READ,
-	ALU_SHIFT,
-	MEMORY_READ,
+	ALU_SHIFT,              // 2 cycles if count != 0, else 4
+	MEMORY_READ,            // skipped if count != 0
+	ALU_SHIFT,              // skipped if count != 0  (4 cycles)
 	ALU_SHIFT,
 	MEMORY_WRITE,
+	ALU_NOP,
 	END
 };
 
@@ -2455,6 +2457,7 @@ void tms99xx_device::alu_shift()
 	{
 	case 0:
 		m_address = WP + ((IR & 0x000f)<<1);
+		pulse_clock(2);
 		break;
 	case 1:
 		// we have the value of the register in m_current_value
@@ -2466,15 +2469,23 @@ void tms99xx_device::alu_shift()
 
 		if (m_current_value != 0)
 		{
-			// skip the next read operation
-			MPC++;
+			// skip the next read and ALU operation
+			MPC = MPC+2;
+			m_state++;
 		}
 		else
 		{
 			if (TRACE_ALU) logerror("tms99xx: Shift operation gets count from R0\n");
+			pulse_clock(2);
 		}
+		pulse_clock(2);
 		break;
 	case 2:
+		// after READ
+		pulse_clock(2);
+		pulse_clock(2);
+		break;
+	case 3:
 		count = m_current_value & 0x000f; // from the instruction or from R0
 		if (count==0) count = 16;
 
@@ -2517,7 +2528,6 @@ void tms99xx_device::alu_shift()
 		break;
 	}
 	m_state++;
-	pulse_clock(2);
 }
 
 void tms99xx_device::alu_ai_ori()
