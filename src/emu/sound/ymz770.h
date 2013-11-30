@@ -62,7 +62,6 @@ public:
 	// construction/destruction
 	ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
 	sound_stream *m_stream;
@@ -79,10 +78,10 @@ protected:
 
 	// data
 	UINT8 m_cur_reg;
-	UINT8 *rom_base;
-	int rom_size;
+	UINT8 *m_rom_base;
+	int m_rom_size;
 
-	ymz_channel channels[8];
+	ymz_channel m_channels[8];
 };
 
 
