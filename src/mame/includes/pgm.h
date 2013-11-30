@@ -106,7 +106,7 @@ public:
 };
 
 
-/* for machine/pgmprot.c type games */
+/* for machine/pgmprot_orlegend.c type games */
 class pgm_asic3_state : public pgm_state
 {
 public:
@@ -118,16 +118,11 @@ public:
 	UINT8         m_asic3_reg;
 	UINT8         m_asic3_latch[3];
 	UINT8         m_asic3_x;
-	UINT8         m_asic3_y;
-	UINT8         m_asic3_z;
-	UINT16        m_asic3_h1;
-	UINT16        m_asic3_h2;
+	UINT16        m_asic3_hilo;
 	UINT16        m_asic3_hold;
 
-
-
 	DECLARE_DRIVER_INIT(orlegend);
-	void asic3_compute_hold();
+	void asic3_compute_hold(int,int);
 	DECLARE_READ16_MEMBER( pgm_asic3_r );
 	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
 	DECLARE_WRITE16_MEMBER( pgm_asic3_reg_w );

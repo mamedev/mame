@@ -66,6 +66,7 @@ UINT32 igs028_device::olds_prot_addr(UINT16 addr)
 		case 0x6: return 0x4030a4;
 		case 0x7: return 0x403000;
 		case 0x9: return 0x40306e;
+		case 0xb: return 0x403044;
 	}
 
 	return 0;

@@ -743,7 +743,7 @@ void pgm_svgpcb_decrypt(running_machine &machine)
 		IGS27_CRYPT2_ALT3
 		IGS27_CRYPT3
 		IGS27_CRYPT4 // ok?
-		IGS27_CRYPT5_ALT  //
+		IGS27_CRYPT5  // ok?
 		IGS27_CRYPT6_ALT // ok?
 		IGS27_CRYPT7
 		IGS27_CRYPT8_ALT
