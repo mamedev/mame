@@ -41,8 +41,8 @@ void ymz770_device::device_start()
 		channels[i].decoder = new mpeg_audio(rom_base, mpeg_audio::AMM, false, 0);
 	}
 
-
-	save_item(NAME(cur_reg));
+	// register for save states
+	save_item(NAME(m_cur_reg));
 	for (int i = 0; i < 8; i++)
 	{
 		save_item(NAME(channels[i].phrase), i);
@@ -132,8 +132,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 							channels[ch].seqdelay = 32 - 1;
 							break;
 						default:
-							cur_reg = reg;
-							internal_reg_write(1, data);
+							internal_reg_write(reg, data);
 							break;
 					}
 				}
@@ -147,17 +146,17 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 				else
 				{
-				retry:
+retry:
 					if (channels[ch].last_block)
 					{
 						if (channels[ch].control & 1)
 						{
-								UINT8 phrase = channels[ch].phrase;
-								channels[ch].pptr = 8*(rom_base[(4*phrase)+1]<<16 | rom_base[(4*phrase)+2]<<8 | rom_base[(4*phrase)+3]);
+							UINT8 phrase = channels[ch].phrase;
+							channels[ch].pptr = 8*(rom_base[(4*phrase)+1]<<16 | rom_base[(4*phrase)+2]<<8 | rom_base[(4*phrase)+3]);
 						}
 						else
 						{
-								channels[ch].is_playing = false;
+							channels[ch].is_playing = false;
 						}
 					}
 
@@ -190,7 +189,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 }
 
 //-------------------------------------------------
-//  read - read from the chip's registers and internal RAM
+//  read - read from the chip's registers
 //-------------------------------------------------
 
 READ8_MEMBER( ymz770_device::read )
@@ -198,22 +197,13 @@ READ8_MEMBER( ymz770_device::read )
 	return 0;
 }
 
-void ymz770_device::internal_reg_write(int offset, UINT8 data)
+void ymz770_device::internal_reg_write(UINT8 reg, UINT8 data)
 {
-	if (!offset)
+	if (reg >= 0x40 && reg <= 0x5f)
 	{
-		cur_reg = data;
-		return;
-	}
+		int voice = reg >> 2 & 0x07;
 
-	if (cur_reg >= 0x40 && cur_reg <= 0x5f)
-	{
-		cur_reg -= 0x40;
-
-		int voice = cur_reg / 4;
-		int reg = cur_reg % 4;
-
-		switch (reg)
+		switch (reg & 0x03)
 		{
 			case 0:
 				channels[voice].phrase = data;
@@ -247,11 +237,11 @@ void ymz770_device::internal_reg_write(int offset, UINT8 data)
 				break;
 		}
 	}
-	else if (cur_reg >= 0x80)
+	else if (reg >= 0x80)
 	{
-		int voice = (cur_reg & 0x70)>>4;
-		int reg = cur_reg & 0x0f;
-		switch (reg)
+		int voice = reg >> 4 & 0x07;
+
+		switch (reg & 0x0f)
 		{
 			case 0:
 				channels[voice].sequence = data;
@@ -267,20 +257,31 @@ void ymz770_device::internal_reg_write(int offset, UINT8 data)
 				}
 				else
 				{
-						channels[voice].is_seq_playing = false;
+					channels[voice].is_seq_playing = false;
 				}
+
 				channels[voice].seqcontrol = data;
+				break;
+
+			default:
 				break;
 		}
 	}
 }
 
 //-------------------------------------------------
-//  write - write to the chip's registers and internal RAM
+//  write - write to the chip's registers
 //-------------------------------------------------
 
 WRITE8_MEMBER( ymz770_device::write )
 {
-	m_stream->update();
-	internal_reg_write(offset, data);
+	if (offset & 1)
+	{
+		m_stream->update();
+		internal_reg_write(m_cur_reg, data);
+	}
+	else
+	{
+		m_cur_reg = data;
+	}
 }
