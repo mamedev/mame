@@ -2449,7 +2449,7 @@ MACHINE_CONFIG_END
 READ8_MEMBER(zn_state::cbaj_sound_main_status_r)
 {
 	// d1: fifo empty flag, other bits: unused(?)
-	return ~(m_cbaj_fifo2->ef_r() << 1);
+	return m_cbaj_fifo2->ef_r() << 1;
 }
 
 static ADDRESS_MAP_START(coh1002msnd_map, AS_PROGRAM, 32, zn_state)
@@ -2463,7 +2463,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(zn_state::cbaj_sound_z80_status_r)
 {
 	// d1: fifo empty flag, other bits: unused
-	return ~(m_cbaj_fifo1->ef_r() << 1);
+	return m_cbaj_fifo1->ef_r() << 1;
 }
 
 static ADDRESS_MAP_START( cbaj_z80_map, AS_PROGRAM, 8, zn_state )

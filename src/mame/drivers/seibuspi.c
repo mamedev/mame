@@ -876,8 +876,8 @@ READ8_MEMBER(seibuspi_state::sound_fifo_status_r)
 	// d0: fifo full flag (z80)
 	// d1: fifo empty flag (main)
 	// other bits: unused?
-	int d1 = (m_soundfifo2 != NULL) ? ~m_soundfifo2->ef_r() << 1 & 0x02 : 0;
-	return d1 | (~m_soundfifo1->ff_r() & 0x01);
+	int d1 = (m_soundfifo2 != NULL) ? m_soundfifo2->ef_r() << 1 : 0;
+	return d1 | m_soundfifo1->ff_r();
 }
 
 READ8_MEMBER(seibuspi_state::spi_status_r)
@@ -1058,8 +1058,8 @@ READ8_MEMBER(seibuspi_state::z80_soundfifo_status_r)
 	// d0: fifo full flag (main)
 	// d1: fifo empty flag (z80)
 	// other bits: unused?
-	int d0 = (m_soundfifo2 != NULL) ? ~m_soundfifo2->ff_r() & 0x01 : 0;
-	return d0 | (~m_soundfifo1->ef_r() << 1 & 0x02);
+	int d0 = (m_soundfifo2 != NULL) ? m_soundfifo2->ff_r() : 0;
+	return d0 | m_soundfifo1->ef_r() << 1;
 }
 
 WRITE8_MEMBER(seibuspi_state::z80_bank_w)

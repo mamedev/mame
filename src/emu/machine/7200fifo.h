@@ -92,9 +92,9 @@ public:
 	template<class _Object> static devcb2_base &set_hf_handler(device_t &device, _Object object) { return downcast<fifo7200_device &>(device).m_hf_handler.set_callback(object); }
 	static void set_ram_size(device_t &device, int size) { downcast<fifo7200_device &>(device).m_ram_size = size; }
 
-	DECLARE_READ_LINE_MEMBER( ef_r ) { return m_ef; }
-	DECLARE_READ_LINE_MEMBER( ff_r ) { return m_ff; }
-	DECLARE_READ_LINE_MEMBER( hf_r ) { return m_hf; }
+	DECLARE_READ_LINE_MEMBER( ef_r ) { return !m_ef; } // _EF
+	DECLARE_READ_LINE_MEMBER( ff_r ) { return !m_ff; } // _FF
+	DECLARE_READ_LINE_MEMBER( hf_r ) { return !m_hf; } // _HF
 
 	// normal configuration
 	DECLARE_WRITE16_MEMBER( data_word_w ) { fifo_write(data); }

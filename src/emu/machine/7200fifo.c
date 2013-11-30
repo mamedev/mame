@@ -67,9 +67,9 @@ void fifo7200_device::device_reset()
 	m_ff = 0;
 	m_hf = 0;
 
-	if (!m_ef_handler.isnull()) m_ef_handler(m_ef);
-	if (!m_ff_handler.isnull()) m_ff_handler(m_ff);
-	if (!m_hf_handler.isnull()) m_hf_handler(m_hf);
+	if (!m_ef_handler.isnull()) m_ef_handler(!m_ef);
+	if (!m_ff_handler.isnull()) m_ff_handler(!m_ff);
+	if (!m_hf_handler.isnull()) m_hf_handler(!m_hf);
 }
 
 
@@ -89,19 +89,19 @@ void fifo7200_device::fifo_write(UINT16 data)
 	if (m_ef)
 	{
 		m_ef = 0;
-		if (!m_ef_handler.isnull()) m_ef_handler(m_ef);
+		if (!m_ef_handler.isnull()) m_ef_handler(!m_ef);
 	}
 
 	else if (m_read_ptr == m_write_ptr)
 	{
 		m_ff = 1;
-		if (!m_ff_handler.isnull()) m_ff_handler(m_ff);
+		if (!m_ff_handler.isnull()) m_ff_handler(!m_ff);
 	}
 
 	else if (((m_read_ptr + 1 + m_ram_size / 2) % m_ram_size) == m_write_ptr)
 	{
 		m_hf = 1;
-		if (!m_hf_handler.isnull()) m_hf_handler(m_hf);
+		if (!m_hf_handler.isnull()) m_hf_handler(!m_hf);
 	}
 }
 
@@ -120,19 +120,19 @@ UINT16 fifo7200_device::fifo_read()
 	if (m_ff)
 	{
 		m_ff = 0;
-		if (!m_ff_handler.isnull()) m_ff_handler(m_ff);
+		if (!m_ff_handler.isnull()) m_ff_handler(!m_ff);
 	}
 
 	else if (m_read_ptr == m_write_ptr)
 	{
 		m_ef = 1;
-		if (!m_ef_handler.isnull()) m_ef_handler(m_ef);
+		if (!m_ef_handler.isnull()) m_ef_handler(!m_ef);
 	}
 
 	else if (((m_read_ptr + m_ram_size / 2) % m_ram_size) == m_write_ptr)
 	{
 		m_hf = 0;
-		if (!m_hf_handler.isnull()) m_hf_handler(m_hf);
+		if (!m_hf_handler.isnull()) m_hf_handler(!m_hf);
 	}
 
 	return ret;
