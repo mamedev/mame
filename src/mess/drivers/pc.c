@@ -761,7 +761,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tandy1t )
 	PORT_START("IN0") /* IN0 */
 	PORT_BIT ( 0xf0, 0xf0,   IPT_UNUSED )
-	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_t1000:screen")
 	PORT_BIT ( 0x07, 0x07,   IPT_UNUSED )
 
 	PORT_START("DSW0") /* IN1 */
@@ -802,6 +802,8 @@ static INPUT_PORTS_START( ibmpcjr )
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_MODIFY("pc_keyboard_4")
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK)
+	PORT_MODIFY("IN0")
+	PORT_BIT ( 0x08, 0x08,   IPT_CUSTOM ) PORT_VBLANK("pcvideo_pcjr:screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mc1502 )          /* fix */
@@ -1198,8 +1200,11 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	/* basic machine hardware */
-	MCFG_CPU_PC(tandy1000, tandy1000, I8088, 8000000, pc_frame_interrupt)
-
+	MCFG_CPU_ADD("maincpu", I8088, 8000000)                \
+	MCFG_CPU_PROGRAM_MAP(tandy1000_map) \
+	MCFG_CPU_IO_MAP(tandy1000_io)  \
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pc_frame_interrupt, "pcvideo_t1000:screen", 0, 1) //with this line commented out, it boots further though keyboard doesn't work, obviously
+	
 	MCFG_MACHINE_START_OVERRIDE(tandy_pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
@@ -1217,7 +1222,7 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
+	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
 	MCFG_GFXDECODE(t1000)
 
 	/* sound hardware */
@@ -1252,8 +1257,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	/* basic machine hardware */
-	MCFG_CPU_PC(tandy1000_16, tandy1000_16, I8086, XTAL_28_63636MHz / 3, pc_frame_interrupt)
-
+	MCFG_CPU_ADD("maincpu", I8086, XTAL_28_63636MHz / 3)                \
+	MCFG_CPU_PROGRAM_MAP(tandy1000_16_map) \
+	MCFG_CPU_IO_MAP(tandy1000_16_io)  \
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pc_frame_interrupt, "pcvideo_t1000:screen", 0, 1)
+	
+	
 	MCFG_MACHINE_START_OVERRIDE(tandy_pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(tandy_pc_state,tandy1000rl)
 
@@ -1271,7 +1280,7 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
+	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
 	MCFG_GFXDECODE(t1000)
 
 	/* sound hardware */
@@ -1307,8 +1316,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	/* basic machine hardware */
-	MCFG_CPU_PC(tandy1000_286, tandy1000_286, I80286, XTAL_28_63636MHz / 2, pc_frame_interrupt)
-
+	MCFG_CPU_ADD("maincpu", I80286, XTAL_28_63636MHz / 2)                \
+	MCFG_CPU_PROGRAM_MAP(tandy1000_286_map) \
+	MCFG_CPU_IO_MAP(tandy1000_286_io)  \
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pc_frame_interrupt, "pcvideo_t1000:screen", 0, 1)
+	
+	
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
@@ -1326,7 +1339,7 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_t1000 )
+	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
 	MCFG_GFXDECODE(t1000)
 
 	/* sound hardware */
@@ -1383,8 +1396,11 @@ static const serial_image_interface mc1502_serial =
 
 static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 	/* basic machine hardware */
-	MCFG_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt) /* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
-
+	MCFG_CPU_ADD("maincpu", I8088, 4900000)   \
+	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map) \
+	MCFG_CPU_IO_MAP(ibmpcjr_io)  \
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pcjr_frame_interrupt, "pcvideo_pcjr:screen", 0, 1) //with this line commented out, it boots further though keyboard doesn't work, obviously
+	
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pcjr)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pcjr)
 
@@ -1400,7 +1416,7 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_pcjr )
+	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
 	MCFG_GFXDECODE(ibmpcjr)
 
 	/* sound hardware */

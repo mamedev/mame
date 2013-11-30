@@ -38,7 +38,6 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "video/pc_vga.h"
 #include "video/pc_cga.h"
 #include "video/pc_aga.h"
-#include "video/pc_t1t.h"
 
 #include "machine/pc_fdc.h"
 #include "machine/pc_joy.h"
