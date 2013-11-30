@@ -402,7 +402,7 @@ struct i386_state
 	UINT32 cpu_version;
 	UINT32 feature_flags;
 	UINT64 tsc;
-
+	UINT64 perfctr[2];
 
 	// FPU
 	floatx80 x87_reg[8];
@@ -1376,19 +1376,161 @@ INLINE void WRITEPORT32(i386_state *cpustate, offs_t port, UINT32 value)
     MSR ACCESS
 ***********************************************************************************/
 
+// Pentium MSR handling
+UINT64 pentium_msr_read(i386_state *cpustate, UINT32 offset,UINT8 *valid_msr)
+{
+	switch(offset)
+	{
+	// Machine Check Exception (TODO)
+	case 0x00:
+		*valid_msr = 1;
+		popmessage("RDMSR: Reading P5_MC_ADDR");
+		return 0;
+	case 0x01:
+		*valid_msr = 1;
+		popmessage("RDMSR: Reading P5_MC_TYPE");
+		return 0;
+	// Time Stamp Counter
+	case 0x10:
+		*valid_msr = 1;
+		popmessage("RDMSR: Reading TSC");
+		return cpustate->tsc;
+	// Event Counters (TODO)
+	case 0x11:  // CESR
+		*valid_msr = 1;
+		popmessage("WRMSR: Reading CESR");
+		return 0;
+	case 0x12:  // CTR0
+		*valid_msr = 1;
+		return cpustate->perfctr[0];
+	case 0x13:  // CTR1
+		*valid_msr = 1;
+		return cpustate->perfctr[1];
+	default:
+		logerror("RDMSR: invalid P5 MSR read %08x at %08x\n",offset,cpustate->pc-2);
+		*valid_msr = 0;
+		return 0;
+	}
+	return -1;
+}
+
+void pentium_msr_write(i386_state *cpustate, UINT32 offset, UINT64 data, UINT8 *valid_msr)
+{
+	switch(offset)
+	{
+	// Machine Check Exception (TODO)
+	case 0x00:
+		popmessage("WRMSR: Writing P5_MC_ADDR");
+		*valid_msr = 1;
+		break;
+	case 0x01:
+		popmessage("WRMSR: Writing P5_MC_TYPE");
+		*valid_msr = 1;
+		break;
+	// Time Stamp Counter
+	case 0x10:
+		cpustate->tsc = data;
+		popmessage("WRMSR: Writing to TSC");
+		*valid_msr = 1;
+		break;
+	// Event Counters (TODO)
+	case 0x11:  // CESR
+		popmessage("WRMSR: Writing to CESR");
+		*valid_msr = 1;
+		break;
+	case 0x12:  // CTR0
+		cpustate->perfctr[0] = data;
+		*valid_msr = 1;
+		break;
+	case 0x13:  // CTR1
+		cpustate->perfctr[1] = data;
+		*valid_msr = 1;
+		break;
+	default:
+		logerror("WRMSR: invalid MSR write %08x (%08x%08x) at %08x\n",offset,(UINT32)(data >> 32),(UINT32)data,cpustate->pc-2);
+		*valid_msr = 0;
+		break;
+	}
+}
+
+// P6 (Pentium Pro, Pentium II, Pentium III) MSR handling
+UINT64 p6_msr_read(i386_state *cpustate, UINT32 offset,UINT8 *valid_msr)
+{
+	switch(offset)
+	{
+	// Machine Check Exception (TODO)
+	case 0x00:
+		*valid_msr = 1;
+		popmessage("RDMSR: Reading P5_MC_ADDR");
+		return 0;
+	case 0x01:
+		*valid_msr = 1;
+		popmessage("RDMSR: Reading P5_MC_TYPE");
+		return 0;
+	// Time Stamp Counter
+	case 0x10:
+		*valid_msr = 1;
+		popmessage("RDMSR: Reading TSC");
+		return cpustate->tsc;
+	// Performance Counters (TODO)
+	case 0xc1:  // PerfCtr0
+		*valid_msr = 1;
+		return cpustate->perfctr[0];
+	case 0xc2:  // PerfCtr1
+		*valid_msr = 1;
+		return cpustate->perfctr[1];
+	default:
+		logerror("RDMSR: unimplemented register called %08x at %08x\n",offset,cpustate->pc-2);
+		*valid_msr = 1;
+		return 0;
+	}
+	return -1;
+}
+
+void p6_msr_write(i386_state *cpustate, UINT32 offset, UINT64 data, UINT8 *valid_msr)
+{
+	switch(offset)
+	{
+	// Time Stamp Counter
+	case 0x10:
+		cpustate->tsc = data;
+		popmessage("WRMSR: Writing to TSC");
+		*valid_msr = 1;
+		break;
+	// Performance Counters (TODO)
+	case 0xc1:  // PerfCtr0
+		cpustate->perfctr[0] = data;
+		*valid_msr = 1;
+		break;
+	case 0xc2:  // PerfCtr1
+		cpustate->perfctr[1] = data;
+		*valid_msr = 1;
+		break;
+	default:
+		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n",offset,(UINT32)(data >> 32),(UINT32)data,cpustate->pc-2);
+		*valid_msr = 1;
+		break;
+	}
+}
+
 INLINE UINT64 MSR_READ(i386_state *cpustate, UINT32 offset,UINT8 *valid_msr)
 {
 	UINT64 res;
+	UINT8 cpu_type = (cpustate->cpu_version >> 8) & 0x0f;
 
 	*valid_msr = 0;
 
-	switch(offset)
+	switch(cpu_type)
 	{
-		default:
-			logerror("RDMSR: unimplemented register called %08x at %08x\n",offset,cpustate->pc-2);
-			res = -1;
-			*valid_msr = 1;
-			break;
+	case 5:  // Pentium
+		res = pentium_msr_read(cpustate,offset,valid_msr);
+		break;
+	case 6:  // Pentium Pro, Pentium II, Pentium III
+		res = p6_msr_read(cpustate,offset,valid_msr);
+		break;
+	default:
+		res = 0;
+		break;
 	}
 
 	return res;
@@ -1397,13 +1539,16 @@ INLINE UINT64 MSR_READ(i386_state *cpustate, UINT32 offset,UINT8 *valid_msr)
 INLINE void MSR_WRITE(i386_state *cpustate, UINT32 offset, UINT64 data, UINT8 *valid_msr)
 {
 	*valid_msr = 0;
+	UINT8 cpu_type = (cpustate->cpu_version >> 8) & 0x0f;
 
-	switch(offset)
+	switch(cpu_type)
 	{
-		default:
-			logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n",offset,(UINT32)(data >> 32),(UINT32)data,cpustate->pc-2);
-			*valid_msr = 1;
-			break;
+	case 5:  // Pentium
+		pentium_msr_write(cpustate,offset,data,valid_msr);
+		break;
+	case 6:  // Pentium Pro, Pentium II, Pentium III
+		p6_msr_write(cpustate,offset,data,valid_msr);
+		break;
 	}
 }
 
