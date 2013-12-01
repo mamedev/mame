@@ -939,11 +939,11 @@ static const net_device_t_base_factory *netregistry[] =
 	ENTRY(7420,                 TTL_7420_NAND)
 	ENTRY(7425,                 TTL_7425_NOR)
 	ENTRY(7427,                 TTL_7427_NOR)
-	ENTRY(nic7430,              TTL_7430_NAND)
+	ENTRY(7430,                 TTL_7430_NAND)
 	ENTRY(nic7450,              TTL_7450_ANDORINVERT)
-	ENTRY(nic7486,              TTL_7486_XOR)
+	ENTRY(7486,                 TTL_7486_XOR)
 	ENTRY(nic7448,              TTL_7448)
-	ENTRY(nic7474,              TTL_7474)
+	ENTRY(7474,                 TTL_7474)
 	ENTRY(nic7483,              TTL_7483)
 	ENTRY(nic7490,              TTL_7490)
 	ENTRY(nic7493,              TTL_7493)
@@ -951,7 +951,8 @@ static const net_device_t_base_factory *netregistry[] =
 	ENTRY(nic74107A,            TTL_74107A)
 	ENTRY(nic74153,             TTL_74153)
 	ENTRY(nic9316,              TTL_9316)
-	ENTRY(nicNE555N_MSTABLE,    NE555N_MSTABLE)
+	ENTRY(NE555,                NETDEV_NE555)
+    ENTRY(nicNE555N_MSTABLE,    NE555N_MSTABLE)
 	NULL
 };
 

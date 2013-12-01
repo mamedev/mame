@@ -54,12 +54,12 @@ typedef delegate<void (const double)> netlist_output_delegate;
 //  DEBUGGING
 //============================================================
 
-#define NL_VERBOSE                 (0)
-#define NL_KEEP_STATISTICS         (0)
-#define FATAL_ERROR_AFTER_NS     (0) //(1000)
+#define NL_VERBOSE                  (0)
+#define NL_KEEP_STATISTICS          (0)
+#define FATAL_ERROR_AFTER_NS        (0) //(1000)
 
 #if (NL_VERBOSE)
-	#define NL_VERBOSE_OUT(x)      printf x
+	#define NL_VERBOSE_OUT(x)       printf x
 #else
 	#define NL_VERBOSE_OUT(x)
 #endif

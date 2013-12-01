@@ -146,7 +146,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
         case netlist_terminal_t::INPUT:
         case netlist_terminal_t::OUTPUT:
             {
-                netlist_terminal_t &term = dynamic_cast<netlist_terminal_t &>(obj);
+                netlist_core_terminal_t &term = dynamic_cast<netlist_core_terminal_t &>(obj);
                 if (obj.isType(netlist_terminal_t::OUTPUT))
                     dynamic_cast<netlist_output_t &>(term).init_object(upd_dev, dev.name() + "." + name);
                 else
@@ -259,18 +259,18 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 	return ret;
 }
 
-netlist_terminal_t &netlist_setup_t::find_terminal(const pstring &terminal_in)
+netlist_core_terminal_t &netlist_setup_t::find_terminal(const pstring &terminal_in)
 {
     const pstring &tname = resolve_alias(terminal_in);
-    netlist_terminal_t *ret;
+    netlist_core_terminal_t *ret;
 
-    ret = dynamic_cast<netlist_terminal_t *>(m_terminals.find(tname));
+    ret = m_terminals.find(tname);
     /* look for default */
     if (ret == NULL)
     {
         /* look for ".Q" std output */
         pstring s = tname + ".Q";
-        ret = dynamic_cast<netlist_terminal_t *>(m_terminals.find(s));
+        ret = m_terminals.find(s);
     }
     if (ret == NULL)
         fatalerror("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
@@ -278,18 +278,18 @@ netlist_terminal_t &netlist_setup_t::find_terminal(const pstring &terminal_in)
     return *ret;
 }
 
-netlist_terminal_t &netlist_setup_t::find_terminal(const pstring &terminal_in, netlist_object_t::type_t atype)
+netlist_core_terminal_t &netlist_setup_t::find_terminal(const pstring &terminal_in, netlist_object_t::type_t atype)
 {
 	const pstring &tname = resolve_alias(terminal_in);
-	netlist_terminal_t *ret;
+	netlist_core_terminal_t *ret;
 
-	ret = dynamic_cast<netlist_terminal_t *>(m_terminals.find(tname));
+	ret = m_terminals.find(tname);
 	/* look for default */
 	if (ret == NULL && atype == netlist_object_t::OUTPUT)
 	{
 		/* look for ".Q" std output */
 		pstring s = tname + ".Q";
-		ret = dynamic_cast<netlist_terminal_t *>(m_terminals.find(s));
+		ret = m_terminals.find(s);
 	}
 	if (ret == NULL)
 		fatalerror("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
@@ -411,7 +411,7 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
     }
 }
 
-void netlist_setup_t::connect_terminals(netlist_terminal_t &t1, netlist_terminal_t &t2)
+void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2)
 {
     //assert(in.isType(netlist_terminal_t::TERMINAL));
     //assert(out.isType(netlist_terminal_t::TERMINAL));
@@ -444,41 +444,40 @@ void netlist_setup_t::connect_terminals(netlist_terminal_t &t1, netlist_terminal
     }
 }
 
-void netlist_setup_t::connect(netlist_terminal_t &t1, netlist_terminal_t &t2)
+void netlist_setup_t::connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2)
 {
-    NL_VERBOSE_OUT(("Connecting %s to %s\n", t1.name().cstr(), t2s.name().cstr()));
-
+    NL_VERBOSE_OUT(("Connecting %s to %s\n", t1.name().cstr(), t2.name().cstr()));
     // FIXME: amend device design so that warnings can be turned into errors
     //        Only variable inputs have this issue
-    if (t1.isType(netlist_terminal_t::OUTPUT) && t2.isType(netlist_terminal_t::INPUT))
+    if (t1.isType(netlist_core_terminal_t::OUTPUT) && t2.isType(netlist_core_terminal_t::INPUT))
     {
         if (t2.has_net())
             mame_printf_warning("Input %s already connected\n", t2.name().cstr());
         connect_input_output(dynamic_cast<netlist_input_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
     }
-    else if (t1.isType(netlist_terminal_t::INPUT) && t2.isType(netlist_terminal_t::OUTPUT))
+    else if (t1.isType(netlist_core_terminal_t::INPUT) && t2.isType(netlist_core_terminal_t::OUTPUT))
     {
         if (t1.has_net())
             mame_printf_warning("Input %s already connected\n", t1.name().cstr());
         connect_input_output(dynamic_cast<netlist_input_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
     }
-    else if (t1.isType(netlist_terminal_t::OUTPUT) && t2.isType(netlist_terminal_t::TERMINAL))
+    else if (t1.isType(netlist_core_terminal_t::OUTPUT) && t2.isType(netlist_core_terminal_t::TERMINAL))
     {
         connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t2), dynamic_cast<netlist_output_t &>(t1));
     }
-    else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::OUTPUT))
+    else if (t1.isType(netlist_core_terminal_t::TERMINAL) && t2.isType(netlist_core_terminal_t::OUTPUT))
     {
         connect_terminal_output(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_output_t &>(t2));
     }
-    else if (t1.isType(netlist_terminal_t::INPUT) && t2.isType(netlist_terminal_t::TERMINAL))
+    else if (t1.isType(netlist_core_terminal_t::INPUT) && t2.isType(netlist_core_terminal_t::TERMINAL))
     {
         connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t2), dynamic_cast<netlist_input_t &>(t1));
     }
-    else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::INPUT))
+    else if (t1.isType(netlist_core_terminal_t::TERMINAL) && t2.isType(netlist_core_terminal_t::INPUT))
     {
         connect_terminal_input(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_input_t &>(t2));
     }
-    else if (t1.isType(netlist_terminal_t::TERMINAL) && t2.isType(netlist_terminal_t::TERMINAL))
+    else if (t1.isType(netlist_core_terminal_t::TERMINAL) && t2.isType(netlist_core_terminal_t::TERMINAL))
     {
         connect_terminals(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_terminal_t &>(t2));
     }
@@ -488,28 +487,14 @@ void netlist_setup_t::connect(netlist_terminal_t &t1, netlist_terminal_t &t2)
 
 void netlist_setup_t::resolve_inputs(void)
 {
-    NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
-    /* find the main clock ... */
-    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-    {
-        netlist_device_t *dev = entry->object();
-        if (dynamic_cast<NETLIB_NAME(mainclock)*>(dev) != NULL)
-        {
-            m_netlist.set_mainclock_dev(dynamic_cast<NETLIB_NAME(mainclock)*>(dev));
-        }
-        if (dynamic_cast<NETLIB_NAME(solver)*>(dev) != NULL)
-        {
-            m_netlist.set_solver_dev(dynamic_cast<NETLIB_NAME(solver)*>(dev));
-        }
-    }
 
     NL_VERBOSE_OUT(("Resolving ...\n"));
     for (tagmap_link_t::entry_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
     {
         const pstring t1s = entry->object().e1;
         const pstring t2s = entry->object().e2;
-        netlist_terminal_t &t1 = find_terminal(t1s);
-        netlist_terminal_t &t2 = find_terminal(t2s);
+        netlist_core_terminal_t &t1 = find_terminal(t1s);
+        netlist_core_terminal_t &t2 = find_terminal(t2s);
 
         connect(t1, t2);
     }
@@ -530,6 +515,23 @@ void netlist_setup_t::resolve_inputs(void)
 
 void netlist_setup_t::start_devices(void)
 {
+
+    NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
+    /* find the main clock ... */
+    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+    {
+        netlist_device_t *dev = entry->object();
+        if (dynamic_cast<NETLIB_NAME(mainclock)*>(dev) != NULL)
+        {
+            m_netlist.set_mainclock_dev(dynamic_cast<NETLIB_NAME(mainclock)*>(dev));
+        }
+        if (dynamic_cast<NETLIB_NAME(solver)*>(dev) != NULL)
+        {
+            m_netlist.set_solver_dev(dynamic_cast<NETLIB_NAME(solver)*>(dev));
+        }
+    }
+
+    NL_VERBOSE_OUT(("Initializing devices ...\n"));
     for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
     {
         netlist_device_t *dev = entry->object();

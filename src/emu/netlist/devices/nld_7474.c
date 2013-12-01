@@ -5,7 +5,7 @@
 
 #include "nld_7474.h"
 
-ATTR_HOT inline void NETLIB_NAME(nic7474sub)::newstate(const UINT8 state)
+ATTR_HOT inline void NETLIB_NAME(7474sub)::newstate(const UINT8 state)
 {
     static const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
     //printf("%s %d %d %d\n", "7474", state, Q.Q(), QQ.Q());
@@ -13,7 +13,7 @@ ATTR_HOT inline void NETLIB_NAME(nic7474sub)::newstate(const UINT8 state)
     OUTLOGIC(m_QQ, !state, delay[!state]);
 }
 
-NETLIB_UPDATE(nic7474sub)
+NETLIB_UPDATE(7474sub)
 {
     //if (!INP_LAST(m_clk) & INP(m_clk))
     {
@@ -22,7 +22,7 @@ NETLIB_UPDATE(nic7474sub)
     }
 }
 
-NETLIB_UPDATE(nic7474)
+NETLIB_UPDATE(7474)
 {
     if (!INPLOGIC(m_preQ))
     {
@@ -44,7 +44,7 @@ NETLIB_UPDATE(nic7474)
     }
 }
 
-NETLIB_START(nic7474)
+NETLIB_START(7474)
 {
     register_sub(sub, "sub");
 
@@ -58,7 +58,7 @@ NETLIB_START(nic7474)
 
 }
 
-NETLIB_START(nic7474sub)
+NETLIB_START(7474sub)
 {
     register_input("CLK",  m_clk, netlist_input_t::STATE_INP_LH);
 

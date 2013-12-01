@@ -266,7 +266,7 @@ ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstri
 	dev.init(*m_setup, this->name() + "." + name);
 }
 
-ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, netlist_terminal_t &term)
+ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, netlist_core_terminal_t &term)
 {
     pstring alias = this->name() + "." + name;
 
@@ -294,7 +294,7 @@ ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_inp
     m_setup->register_object(*this, *this, name, inp, type);
 }
 
-static void init_term(netlist_core_device_t &dev, netlist_terminal_t &term, netlist_input_t::state_e aState)
+static void init_term(netlist_core_device_t &dev, netlist_core_terminal_t &term, netlist_input_t::state_e aState)
 {
     if (!term.isInitalized())
     {
@@ -362,7 +362,7 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
     m_last.Q = 0;
 };
 
-ATTR_COLD void netlist_net_t::register_railterminal(netlist_terminal_t &mr)
+ATTR_COLD void netlist_net_t::register_railterminal(netlist_output_t &mr)
 {
     assert(m_railterminal == NULL);
     m_railterminal = &mr;
@@ -384,10 +384,10 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
     }
     else
     {
-        netlist_terminal_t *p = othernet->m_head;
+        netlist_core_terminal_t *p = othernet->m_head;
         while (p != NULL)
         {
-            netlist_terminal_t *pn = p->m_update_list_next;
+            netlist_core_terminal_t *pn = p->m_update_list_next;
             register_con(*p);
             p = pn;
         }
@@ -396,7 +396,7 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
     }
 }
 
-ATTR_COLD void netlist_net_t::register_con(netlist_terminal_t &terminal)
+ATTR_COLD void netlist_net_t::register_con(netlist_core_terminal_t &terminal)
 {
     terminal.set_net(*this);
 
@@ -408,7 +408,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_terminal_t &terminal)
         m_active++;
 }
 
-ATTR_HOT inline void netlist_net_t::update_dev(const netlist_terminal_t *inp, const UINT32 mask)
+ATTR_HOT inline void netlist_net_t::update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
 {
 	if ((inp->state() & mask) != 0)
 	{
@@ -433,7 +433,7 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 
 	    const UINT32 mask = masks[ (m_last.Q  << 1) | m_cur.Q ];
 
-	    netlist_terminal_t *p = m_head;
+	    netlist_core_terminal_t *p = m_head;
 	    switch (m_num_cons)
 	    {
 	    case 2:
@@ -458,10 +458,8 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 // netlist_terminal_t
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD netlist_terminal_t::netlist_terminal_t(const type_t atype, const family_t afamily)
+ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, const family_t afamily)
 : netlist_owned_object_t(atype, afamily)
-, m_Idr(0.0)
-, m_g(NETLIST_GMIN)
 , m_update_list_next(NULL)
 , m_net(NULL)
 , m_state(STATE_NONEX)
@@ -470,23 +468,20 @@ ATTR_COLD netlist_terminal_t::netlist_terminal_t(const type_t atype, const famil
 }
 
 ATTR_COLD netlist_terminal_t::netlist_terminal_t()
-: netlist_owned_object_t(TERMINAL, ANALOG)
+: netlist_core_terminal_t(TERMINAL, ANALOG)
 , m_Idr(0.0)
 , m_g(NETLIST_GMIN)
-, m_update_list_next(NULL)
-, m_net(NULL)
-, m_state(STATE_NONEX)
 {
 
 }
 
-ATTR_COLD void netlist_terminal_t::init_object(netlist_core_device_t &dev, const pstring &aname, const state_e astate)
+ATTR_COLD void netlist_core_terminal_t::init_object(netlist_core_device_t &dev, const pstring &aname, const state_e astate)
 {
 	set_state(astate);
 	netlist_owned_object_t::init_object(dev, aname);
 }
 
-ATTR_COLD void netlist_terminal_t::set_net(netlist_net_t &anet)
+ATTR_COLD void netlist_core_terminal_t::set_net(netlist_net_t &anet)
 {
     m_net = &anet;
 }
@@ -500,7 +495,7 @@ ATTR_COLD void netlist_terminal_t::set_net(netlist_net_t &anet)
 // ----------------------------------------------------------------------------------------
 
 netlist_output_t::netlist_output_t(const type_t atype, const family_t afamily)
-	: netlist_terminal_t(atype, afamily)
+	: netlist_core_terminal_t(atype, afamily)
 	, m_low_V(0.0)
 	, m_high_V(0.0)
     , m_my_net(NET, afamily)
@@ -511,7 +506,7 @@ netlist_output_t::netlist_output_t(const type_t atype, const family_t afamily)
 
 ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const pstring &aname)
 {
-    netlist_terminal_t::init_object(dev, aname, STATE_OUT);
+    netlist_core_terminal_t::init_object(dev, aname, STATE_OUT);
     net().init_object(dev.netlist(), aname);
     net().register_railterminal(*this);
 }

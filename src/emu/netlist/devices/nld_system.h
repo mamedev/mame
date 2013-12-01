@@ -80,7 +80,7 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 // ----------------------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(solver,
-        typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
+        typedef netlist_list_t<netlist_core_terminal_t *> terminal_list_t;
         typedef netlist_list_t<netlist_net_t *>      net_list_t;
 
         netlist_ttl_input_t m_fb_sync;

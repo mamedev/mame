@@ -120,7 +120,7 @@ NETLIB_FUNC_VOID(solver, post_start, ())
     for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
     {
         NL_VERBOSE_OUT(("setting up net\n"));
-        for (netlist_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
+        for (netlist_core_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
         {
             switch (p->type())
             {
@@ -170,13 +170,14 @@ NETLIB_UPDATE(solver)
         double gtot = 0;
         double iIdr = 0;
 
-        for (netlist_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
+        for (netlist_core_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
         {
-            if (p->isType(netlist_terminal_t::TERMINAL))
+            if (p->isType(netlist_core_terminal_t::TERMINAL))
             {
-                p->netdev().update_terminals();
-                gtot += p->m_g;
-                iIdr += p->m_Idr;
+                netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
+                pt->netdev().update_terminals();
+                gtot += pt->m_g;
+                iIdr += pt->m_Idr;
             }
         }
 
@@ -185,7 +186,7 @@ NETLIB_UPDATE(solver)
             resched = true;
         pn->object()->m_cur.Analog = pn->object()->m_new.Analog = new_val;
 
-        NL_VERBOSE_OUT(("Info: %d\n", (*pn)->m_num_cons));
+        NL_VERBOSE_OUT(("Info: %d\n", pn->object()->m_num_cons));
         NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
     }
     if (resched)

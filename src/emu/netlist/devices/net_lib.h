@@ -66,6 +66,8 @@
 #include "nld_7474.h"
 #include "nld_7486.h"
 
+#include "nld_NE555.h"
+
 // this is a bad hack
 #define USE_OLD7493 (0)
 

@@ -531,7 +531,6 @@ static NETLIST_START(pong_schematics)
 #endif
 
 #if 0
-
     // astable NAND Multivibrator
     NETDEV_R(R1, 1000)
     NETDEV_C(C1, 1e-6)
@@ -544,6 +543,31 @@ static NETLIST_START(pong_schematics)
     //NETDEV_LOG(log2, n1.Q)
     //NETDEV_LOG(log3, n2.Q)
 #endif
+
+#if 0
+    // astable NE555, 1.13 ms period
+    NETDEV_R(RA, 5000)
+    NETDEV_R(RB, 3000)
+    NETDEV_C(C, 0.15e-6)
+    NETDEV_NE555(555)
+
+    NET_C(V0, 555.GND)
+    NET_C(V5, 555.VCC)
+
+    NET_C(RA.1, 555.VCC)
+    NET_C(RA.2, 555.DISCH)
+
+    NET_C(RB.1, 555.DISCH)
+    NET_C(RB.2, 555.TRIG)
+
+    NET_C(RB.2, 555.THRESH)
+
+    NET_C(555.TRIG, C.1)
+    NET_C(C.2, V0)
+    //NETDEV_LOG(log2, C.1)
+#endif
+
+
 NETLIST_END
 
 static NETLIST_START(pong)

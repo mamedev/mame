@@ -291,10 +291,10 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
-// net_terminal_t
+// netlist_core_terminal_t
 // ----------------------------------------------------------------------------------------
 
-class netlist_terminal_t : public netlist_owned_object_t
+class netlist_core_terminal_t : public netlist_owned_object_t
 {
 public:
 
@@ -309,8 +309,7 @@ public:
         STATE_NONEX = 256
     };
 
-	ATTR_COLD netlist_terminal_t(const type_t atype, const family_t afamily);
-    ATTR_COLD netlist_terminal_t();
+	ATTR_COLD netlist_core_terminal_t(const type_t atype, const family_t afamily);
 
 	ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname, const state_e astate);
 
@@ -327,14 +326,21 @@ public:
         m_state = astate;
     }
 
-    double m_Idr; // drive current
-    double m_g; // conductance
-
-    netlist_terminal_t *m_update_list_next;
+    netlist_core_terminal_t *m_update_list_next;
 
 private:
     netlist_net_t * RESTRICT m_net;
     state_e m_state;
+};
+
+class netlist_terminal_t : public netlist_core_terminal_t
+{
+public:
+    ATTR_COLD netlist_terminal_t();
+
+    double m_Idr; // drive current
+    double m_g; // conductance
+
 };
 
 
@@ -342,13 +348,13 @@ private:
 // netlist_input_t
 // ----------------------------------------------------------------------------------------
 
-class netlist_input_t : public netlist_terminal_t
+class netlist_input_t : public netlist_core_terminal_t
 {
 public:
 
 
 	ATTR_COLD netlist_input_t(const type_t atype, const family_t afamily)
-		: netlist_terminal_t(atype, afamily)
+		: netlist_core_terminal_t(atype, afamily)
         , m_low_thresh_V(0)
         , m_high_thresh_V(0)
 	{
@@ -444,9 +450,9 @@ public:
 
     ATTR_COLD netlist_net_t(const type_t atype, const family_t afamily);
 
-    ATTR_COLD void register_con(netlist_terminal_t &terminal);
+    ATTR_COLD void register_con(netlist_core_terminal_t &terminal);
     ATTR_COLD void merge_net(netlist_net_t *othernet);
-    ATTR_COLD void register_railterminal(netlist_terminal_t &mr);
+    ATTR_COLD void register_railterminal(netlist_output_t &mr);
 
     /* inline not always works out */
     ATTR_HOT inline void update_devs();
@@ -455,8 +461,8 @@ public:
     ATTR_HOT inline void set_time(const netlist_time ntime) { m_time = ntime; }
 
     ATTR_HOT inline bool isRailNet() { return !(m_railterminal == NULL); }
-    ATTR_HOT inline const netlist_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }
-    ATTR_HOT inline const netlist_terminal_t & RESTRICT railterminal() { return *m_railterminal; }
+    ATTR_HOT inline const netlist_core_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }
+    ATTR_HOT inline const netlist_core_terminal_t & RESTRICT railterminal() { return *m_railterminal; }
 
     /* Everything below is used by the logic subsystem */
 
@@ -494,17 +500,17 @@ protected:
     hybrid_t m_cur;
     hybrid_t m_new;
 
-    netlist_terminal_t *m_head;
+    netlist_core_terminal_t *m_head;
     UINT32 m_num_cons;
 
 private:
-    ATTR_HOT void update_dev(const netlist_terminal_t *inp, const UINT32 mask);
+    ATTR_HOT void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask);
 
     netlist_time m_time;
     INT32        m_active;
     UINT32       m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
 
-    netlist_terminal_t * RESTRICT m_railterminal;
+    netlist_core_terminal_t * RESTRICT m_railterminal;
 };
 
 
@@ -515,7 +521,7 @@ private:
 class NETLIB_NAME(mainclock);
 class NETLIB_NAME(solver);
 
-class netlist_output_t : public netlist_terminal_t
+class netlist_output_t : public netlist_core_terminal_t
 {
 public:
 
@@ -748,6 +754,8 @@ public:
 
 	ATTR_HOT inline const double INPANALOG(const netlist_analog_input_t &inp) const { return inp.Q_Analog(); }
 
+	ATTR_HOT inline const double TERMANALOG(const netlist_terminal_t &term) const { return term.net().Q_Analog(); }
+
 	ATTR_HOT inline void OUTANALOG(netlist_analog_output_t &out, const double val, const netlist_time &delay)
 	{
 		out.set_Q(val, delay);
@@ -794,7 +802,7 @@ public:
 	ATTR_COLD bool variable_input_count() { return m_variable_input_count; }
 
 	ATTR_COLD void register_sub(netlist_device_t &dev, const pstring &name);
-    ATTR_COLD void register_subalias(const pstring &name, netlist_terminal_t &term);
+    ATTR_COLD void register_subalias(const pstring &name, netlist_core_terminal_t &term);
 
     ATTR_COLD void register_terminal(const pstring &name, netlist_terminal_t &port);
 

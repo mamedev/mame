@@ -91,7 +91,7 @@ public:
 	typedef tagmap_t<netlist_device_t *, 393> tagmap_devices_t;
 	typedef tagmap_t<pstring, 393> tagmap_nstring_t;
 	typedef tagmap_t<netlist_param_t *, 393> tagmap_param_t;
-	typedef tagmap_t<netlist_terminal_t *, 393> tagmap_terminal_t;
+	typedef tagmap_t<netlist_core_terminal_t *, 393> tagmap_terminal_t;
 	typedef netlist_list_t<link_t> tagmap_link_t;
 
 	netlist_setup_t(netlist_base_t &netlist);
@@ -108,10 +108,10 @@ public:
     void register_param(const pstring &param, const double value);
 
     void register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const pstring &name, netlist_object_t &obj, netlist_input_t::state_e state);
-    void connect(netlist_terminal_t &t1, netlist_terminal_t &t2);
+    void connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
 
-    netlist_terminal_t &find_terminal(const pstring &outname_in);
-    netlist_terminal_t &find_terminal(const pstring &outname_in, netlist_object_t::type_t atype);
+    netlist_core_terminal_t &find_terminal(const pstring &outname_in);
+    netlist_core_terminal_t &find_terminal(const pstring &outname_in, netlist_object_t::type_t atype);
 
     netlist_param_t &find_param(const pstring &param_in);
 
@@ -142,7 +142,7 @@ private:
 
 	int m_proxy_cnt;
 
-	void connect_terminals(netlist_terminal_t &in, netlist_terminal_t &out);
+	void connect_terminals(netlist_core_terminal_t &in, netlist_core_terminal_t &out);
 	void connect_input_output(netlist_input_t &in, netlist_output_t &out);
     void connect_terminal_output(netlist_terminal_t &in, netlist_output_t &out);
     void connect_terminal_input(netlist_terminal_t &term, netlist_input_t &inp);

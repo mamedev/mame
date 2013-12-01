@@ -45,13 +45,13 @@
 #include "nld_signal.h"
 
 #define TTL_7474(_name, _CLK, _D, _CLRQ, _PREQ)                                     \
-        NET_REGISTER_DEV(nic7474, _name)                                            \
+        NET_REGISTER_DEV(7474, _name)                                               \
         NET_CONNECT(_name, CLK, _CLK)                                               \
         NET_CONNECT(_name, D,  _D)                                                  \
         NET_CONNECT(_name, CLRQ,  _CLRQ)                                            \
         NET_CONNECT(_name, PREQ,  _PREQ)
 
-NETLIB_SUBDEVICE(nic7474sub,
+NETLIB_SUBDEVICE(7474sub,
     netlist_ttl_input_t m_clk;
 
     UINT8 m_nextD;
@@ -61,16 +61,13 @@ NETLIB_SUBDEVICE(nic7474sub,
     ATTR_HOT inline void newstate(const UINT8 state);
 );
 
-NETLIB_DEVICE(nic7474,
-    NETLIB_NAME(nic7474sub) sub;
+NETLIB_DEVICE(7474,
+    NETLIB_NAME(7474sub) sub;
 
     netlist_ttl_input_t m_D;
     netlist_ttl_input_t m_clrQ;
     netlist_ttl_input_t m_preQ;
 );
 
-
-
-NETLIB_SIGNAL(7474, 4, 0, 0);
 
 #endif /* NLD_7474_H_ */

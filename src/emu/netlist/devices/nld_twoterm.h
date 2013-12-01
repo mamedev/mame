@@ -99,6 +99,9 @@ NETLIB_DEVICE_WITH_PARAMS_DERIVED(R, twoterm,
 
     NETLIB_UPDATE_TERMINALS() { NETLIB_NAME(twoterm)::update_terminals(); }
 
+public:
+    inline void set_R(double R) { m_g = 1.0 / R; }
+
 );
 
 // ----------------------------------------------------------------------------------------
