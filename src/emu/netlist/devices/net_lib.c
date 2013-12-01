@@ -68,17 +68,6 @@ NETLIB_UPDATE(analog_input)
 {
 }
 
-NETLIB_START(log)
-{
-	register_input("I", m_I);
-}
-
-NETLIB_UPDATE(log)
-{
-	printf("%s: %f %f\n", name().cstr(), netlist().time().as_double(), INPANALOG(m_I));
-}
-
-
 NETLIB_START(nicMultiSwitch)
 {
 	static const char *sIN[8] = { "i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8" };

@@ -68,6 +68,8 @@
 
 #include "nld_NE555.h"
 
+#include "nld_log.h"
+
 // this is a bad hack
 #define USE_OLD7493 (0)
 
@@ -87,7 +89,7 @@
 		NET_CONNECT(_name, i1, _i1)                                                 \
 		NET_CONNECT(_name, i2, _i2)
 #define NETDEV_DELAY_RISE(_name, _CLK, _D)                                          \
-		NET_REGISTER_DEV(delay_lh, _name)                                    \
+		NET_REGISTER_DEV(delay_lh, _name)                                           \
 		NET_CONNECT(_name, CLK, _CLK)                                               \
 		NET_CONNECT(_name, D, _D)
 #define NETDEV_RSFF(_name, _S, _R)                                                  \
@@ -95,9 +97,6 @@
 		NET_CONNECT(_name, S, _S)                                                   \
 		NET_CONNECT(_name, R, _R)
 
-#define NETDEV_LOG(_name, _I)                                                       \
-		NET_REGISTER_DEV(log, _name)                                         \
-		NET_CONNECT(_name, I, _I)
 
 
 // ----------------------------------------------------------------------------------------
@@ -202,11 +201,6 @@ NETLIB_DEVICE(logic_input,
 NETLIB_DEVICE(analog_input,
 	netlist_analog_output_t m_Q;
 );
-
-NETLIB_DEVICE(log,
-	netlist_analog_input_t m_I;
-);
-
 
 // ----------------------------------------------------------------------------------------
 // Special devices ...
