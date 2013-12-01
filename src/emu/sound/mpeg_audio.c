@@ -92,7 +92,8 @@ bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
 		abort();
 	case 4:
 		try {
-			read_header_amm(variant == 2);
+			if (!read_header_amm(variant == 2))
+				return false;
 			read_data_mpeg2();
 			decode_mpeg2(output, output_samples);
 		} catch(limit_hit) {
@@ -110,7 +111,7 @@ bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
 	return true;
 }
 
-void mpeg_audio::read_header_amm(bool layer25)
+bool mpeg_audio::read_header_amm(bool layer25)
 {
 	gb(1); // unused
 	int full_packets_count = gb(4); // max 12
@@ -122,6 +123,9 @@ void mpeg_audio::read_header_amm(bool layer25)
 	int stereo_mode_ext = gb(2);
 	param_index = gb(3);
 	gb(1); // must be zero
+	
+	if (last_frame_number == 0)
+		return false;
 
 	channel_count = stereo_mode != 3 ? 2 : 1;
 
@@ -131,6 +135,8 @@ void mpeg_audio::read_header_amm(bool layer25)
 		joint_bands = joint_band_counts[stereo_mode_ext];
 	if(joint_bands > total_bands )
 		joint_bands = total_bands;
+	
+	return true;
 }
 
 void mpeg_audio::read_header_mpeg2(bool layer25)

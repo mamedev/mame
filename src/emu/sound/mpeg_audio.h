@@ -93,7 +93,7 @@ private:
 
 	int current_pos, current_limit;
 
-	void read_header_amm(bool layer25);
+	bool read_header_amm(bool layer25);
 	void read_header_mpeg2(bool layer25);
 	void read_data_mpeg2();
 	void decode_mpeg2(short *output, int &output_samples);
