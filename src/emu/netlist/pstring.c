@@ -7,8 +7,12 @@
 #include <cstdio>
 
 
-pblockpool *pstring::m_pool = new pblockpool;
-pstring::str_t *pstring::m_zero = new(*pstring::m_pool, 0) pstring::str_t(0);
+//pblockpool *pstring::m_pool = new pblockpool;
+//pstring::str_t *pstring::m_zero = new(pstring::m_pool, 0) pstring::str_t(0);
+
+pblockpool pstring::m_pool;
+
+pstring::str_t *pstring::m_zero = NULL;
 
 #define IMMEDIATE_MODE  (1)
 #define DEBUG_MODE      (0)
@@ -90,12 +94,12 @@ void pstring::sfree(str_t *s)
 {
     s->m_ref_count--;
     if (s->m_ref_count == 0)
-        m_pool->dealloc(s);
+        m_pool.dealloc(s);
 }
 
 pstring::str_t *pstring::salloc(int n)
 {
-    str_t *ret = new(*m_pool, n) str_t(n);
+    str_t *ret = new(m_pool, n) str_t(n);
     return ret;
 }
 
@@ -115,8 +119,8 @@ void pstring::resetmem()
     if (m_zero != NULL)
         sfree(m_zero);
     m_zero = NULL;
-    m_pool->m_shutdown = true;
-    m_pool->resetmem();
+    m_pool.m_shutdown = true;
+    m_pool.resetmem();
 }
 
 // ----------------------------------------------------------------------------------------

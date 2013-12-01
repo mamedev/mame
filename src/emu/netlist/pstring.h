@@ -45,6 +45,16 @@ struct pblockpool {
     int m_align;
 };
 
+/* objects must be destroyed using destroy above */
+
+inline void *operator new(std::size_t size, pblockpool &pool, int extra = 0) throw (std::bad_alloc)
+{
+    void *result = pool.alloc(size + extra);
+    if (result == NULL)
+        throw std::bad_alloc();
+    return result;
+}
+
 // ----------------------------------------------------------------------------------------
 // nstring: immutable strings ...
 //
@@ -148,11 +158,13 @@ protected:
 
     str_t *m_ptr;
 
-    static pblockpool *m_pool;
+    static pblockpool m_pool;
 
 private:
     inline void init()
     {
+        if (m_zero == NULL)
+            m_zero = new(pstring::m_pool, 0) pstring::str_t(0);
         m_ptr = m_zero;
         m_ptr->m_ref_count++;
     }
@@ -194,15 +206,6 @@ private:
     static str_t *m_zero;
 };
 
-/* objects must be destroyed using destroy above */
-
-inline void *operator new(std::size_t size, pblockpool &pool, int extra = 0) throw (std::bad_alloc)
-{
-    void *result = pool.alloc(size + extra);
-    if (result == NULL)
-        throw std::bad_alloc();
-    return result;
-}
 
 
 #endif /* _PSTRING_H_ */
