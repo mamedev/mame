@@ -10,7 +10,7 @@
 pblockpool *pstring::m_pool = new pblockpool;
 pstring::str_t *pstring::m_zero = new(*pstring::m_pool, 0) pstring::str_t(0);
 
-#define IMMEDIATE_MODE  (0)
+#define IMMEDIATE_MODE  (1)
 #define DEBUG_MODE      (0)
 
 pstring::~pstring()
