@@ -17,30 +17,30 @@ Konami Twinkle Hardware Overview
 Konami 1999-2002
 
 The following games are known to exist on this hardware (there may be more)
-                                                                  Video CD     Security
-Game Title                       Year            Program CD     6/7/8 use DVD  Dongle      HDD label
+                                                                  Video CD      Security
+Game Title                            Year     Program CD       6/7/8 use DVD   Dongle      HDD label
 -----------------------------------------------------------------------------------------------------
-beatmania IIDX (English)       - Konami 1999     GQ863 A01        GQ863 A04    863 A02     ?
-beatmania IIDX (Japanese)      - Konami 1999     GQ863-JA B01     GQ863 A04     "   "      ?
-beatmania IIDX + DDR Club Kit  - Konami 1999     896 JA ABM       ?            ?           ?
-beatmania IIDX Substream       - Konami 1999     ?                GC983 A04    ?           Dumped#
-beatmania IIDX Club Version 2  - Konami 1999     GE984 A01(BM)    ?            984 A02     ?
-                                               + GE984 A01(DDR)
-beatmania IIDX 2nd Style       - Konami 1999     GC985 A01        GC985 A04    ?           985 HDD A01
-beatmania IIDX 3rd Style       - Konami 2000     GC992-JA A01     GC992-JA A04 ?           992 HDD A01
-beatmania IIDX 3rd Style(newer)- Konami 2000     GC992-JA C01     GC992-JA A04 ?           ?
-beatmania IIDX 4th Style       - Konami 2000     A03 JA A01       A03 JA A02   A03         A03 JA A03
-beatmania IIDX 5th Style       - Konami 2001     A17 JA A01       A17 JA A02   ?           A17 JA A03
-beatmania IIDX 6th Style       - Konami 2001     B4U JA A01       B4U JA A02   ?           B4U JA A03
-beatmania IIDX 6th Style(newer)- Konami 2001     B4U JA B01       B4U JA A02   ?           B4U JA A03
-beatmania IIDX 7th Style       - Konami 2002     B44 JA A01       B44 JA A02   ?           B44 JA A03
-beatmania IIDX 8th Style       - Konami 2002     C44 JA A01       ?            C44         C44 JA A03
+beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      *863 A02     ?
+beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      *863 A02     ?
+beatmania IIDX + DDR Club Kit         1999     896 JA ABM       *?             *?           *?
+beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       *?             *?           *?
+beatmania IIDX Substream              1999     *?               GC983 A04      *?           ?
+beatmania IIDX Club Version 2         1999     GE984 A01(BM)    *?             *984 A02     *?
+                                             + GE984 A01(DDR)
+beatmania IIDX 2nd Style              1999     GC985 A01        GC985 A04      *           *985 HDD A01
+beatmania IIDX 3rd Style              2000     GC992-JA A01     *GC992-JA A04  *           *992 HDD A01
+beatmania IIDX 3rd Style(newer)       2000     *GC992-JA C01    *GC992-JA A04  *           *992 HDD A01
+beatmania IIDX 4th Style              2000     A03 JA A01       A03 JA A02     *A03        A03 JA A03
+beatmania IIDX 5th Style              2001     A17 JA A01       A17 JA A02     *           *A17 JA A03
+beatmania IIDX 6th Style              2001     B4U JA A01       B4U JA A02     *           B4U JA A03
+beatmania IIDX 6th Style(newer)       2001     *B4U JA B01      B4U JA A02     *           B4U JA A03
+beatmania IIDX 7th Style              2002     B44 JA A01       B44 JA A02     *           B44 JA A03
+beatmania IIDX 8th Style              2002     C44 JA A01       C44 JA A02     *C44        C44 JA A03
 
-? = Undumped pieces.
-# = Dumped but code unknown.
-* = Came with beatmania IIDX main board but might be for 8th Style (i.e. game C44)?
-If you can help, please contact us at http://members.iinet.net.au/~lantra9jp1/gurudumps/ or http://mamedev.org/contact.html
+* = Not dumped.
+? = Code unknown.
 
+Where there are multiple revisions of the program cd, it has been assumed that the video and hdd are the same.
 
 The Konami Twinkle hardware basically consists of the following parts....
 3 PCBs sandwiched together in a metal box

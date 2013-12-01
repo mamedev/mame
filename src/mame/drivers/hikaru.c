@@ -18,8 +18,7 @@ Planet Harriers             (C) Sega, 2001
 !Star Wars Racer Arcade      (C) Sega, 2000
 
 ! - denotes secured but not fully dumped yet
-* - denotes not dumped yet. If you can help with the remaining undumped games,
-    please contact http://members.iinet.net.au/~lantra9jp1/gurudumps/ or http://mamedev.org/
+* - denotes not dumped yet.
 
 The Sega Hikaru system comprises the following PCBs.....
 Main board     - 2 known versions exists. They're mostly the same. It contains many thin BGAs,

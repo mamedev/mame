@@ -131,9 +131,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
   Note:
        Not all games listed above are confirmed to run on System 573.
-       * - denotes not dumped yet. If you can help with the remaining undumped System 573 games,
-       please contact http://members.iinet.net.au/~lantra9jp1/gurudumps/
-
+       * - denotes not dumped yet.
 
   Main PCB Layout
   ---------------

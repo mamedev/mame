@@ -368,9 +368,6 @@ PUCKPOKE.U8 27C4001---/
 
 ROM sockets U63 & U64 empty
 
-Hi-res PCB scan available on request.
-Screenshots available on my site at http://members.iinet.net.au/~lantra9jp1/gurudumps/oldnews2001.html (under PCB Shop Raid #2)
-
 
 ****************************************************************************/
 

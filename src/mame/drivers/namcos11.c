@@ -49,8 +49,6 @@ Tekken Ver.C                          (C) Namco, 1995
 Tekken II Ver.C                       (C) Namco, 1995
 Kosodate Quiz My Angel 3 (KQT1/VER.B) (C) Namco, 1998
 
-If you can help with the remaining undumped S11 games, please contact http://members.iinet.net.au/~lantra9jp1/gurudumps/
-
 
 The Namco System 11 system comprises 3 PCB's....
 MOTHER PCB- This is the main PCB. It holds all sound circuitry, sound ROMs, program ROMs, shared RAM, bank-switching logic,

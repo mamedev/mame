@@ -44,8 +44,7 @@ Star Trigon (STT1 Ver.A)                         (C) Namco, 2002
 *Tsukkomi Yousei Gips Nice Tsukkomi              (C) Namco/Metro, 2002
 Uchuu Daisakusen : Chocovader Contactee (CVC1 Ver.A) (C) Namco, 2002
 
-* - denotes not dumped yet. If you can help with the remaining undumped S10 games,
-    please contact me at http://members.iinet.net.au/~lantra9jp1/gurudumps/
+* - denotes not dumped yet.
 
 The Namco System 10 system comprises 2 PCB's....
 MAIN PCB - This is the mother board PCB. It holds the main CPU/GPU & SPU and all sound circuitry, program & video RAM,

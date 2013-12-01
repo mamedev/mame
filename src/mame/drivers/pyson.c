@@ -35,9 +35,7 @@ World Soccer Winning Eleven Arcade Game Style          C18JAA03    DIN5 dongle G
 World Soccer Winning Eleven Arcade Game Style 2003     C27JAA03    not used               KN00002
 ---------------------------------------------------------------------------------------------------------
 
-* denotes not dumped. If you can help with the remaining undumped games
-please contact us via http://mamedev.org or http://members.iinet.net.au/~lantra9jp1/gurudumps/
-
+* denotes not dumped.
 
 Konami PCB Layout
 -----------------

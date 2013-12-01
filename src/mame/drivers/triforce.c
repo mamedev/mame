@@ -46,8 +46,6 @@ Games on this system include....
 | | 2007 | Mario Kart Arcade GP 2                                   | Namco / Nintendo | ROM Cart        | ?            |
 +-+------+----------------------------------------------------------+------------------+-----------------+--------------+
 * denotes these games are archived.
-If you can help with the undumped games or know of missing Triforce games, please contact...
-http://members.iinet.net.au/~lantra9jp1/gurudumps/
 
 
 PCB Layouts
