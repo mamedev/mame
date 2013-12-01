@@ -586,7 +586,7 @@ ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_net_t &net, const
 	net.update_devs();
 }
 
-ATTR_COLD NETLIB_START(mainclock)
+NETLIB_START(mainclock)
 {
 	register_output("Q", m_Q);
 
@@ -595,12 +595,12 @@ ATTR_COLD NETLIB_START(mainclock)
 
 }
 
-ATTR_HOT NETLIB_UPDATE_PARAM(mainclock)
+NETLIB_UPDATE_PARAM(mainclock)
 {
 	m_inc = netlist_time::from_hz(m_freq.Value()*2);
 }
 
-ATTR_HOT NETLIB_UPDATE(mainclock)
+NETLIB_UPDATE(mainclock)
 {
     netlist_net_t &net = m_Q.net();
 	// this is only called during setup ...

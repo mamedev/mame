@@ -10,6 +10,42 @@
 #include "nl_config.h"
 
 // ----------------------------------------------------------------------------------------
+// pblockbool: allocate small memory more efficiently at the expense of some overhead
+// ----------------------------------------------------------------------------------------
+
+struct pblockpool {
+
+    struct memblock
+    {
+        memblock *next;
+        int size;
+        int allocated;
+        int remaining;
+        char *cur;
+        char data[];
+    };
+
+    pblockpool();
+
+    void resetmem();
+
+    void *alloc(std::size_t n);
+    void dealloc(void *ptr);
+
+    template<class T>
+    void destroy(T* object)
+    {
+        object->~T();
+        dealloc(object);
+    }
+
+    bool m_shutdown;
+    memblock *m_first;
+    int m_blocksize;
+    int m_align;
+};
+
+// ----------------------------------------------------------------------------------------
 // nstring: immutable strings ...
 //
 // nstrings are just a pointer to a "pascal-style" string representation.
@@ -59,13 +95,13 @@ public:
     bool operator>=(const pstring &string) const { return (pcmp(string.cstr()) >= 0); }
 
     //
-    inline const int len() const { return m_ptr->len(); }
+    inline int len() const { return m_ptr->len(); }
 
     inline bool equals(const pstring &string) { return (pcmp(string.cstr(), m_ptr->str()) == 0); }
     inline bool iequals(const pstring &string) { return (pcmpi(string.cstr(), m_ptr->str()) == 0); }
 
-    int cmp(pstring &string) { return pcmp(string.cstr()); }
-    int cmpi(pstring &string) { return pcmpi(cstr(), string.cstr()); }
+    int cmp(const pstring &string) const { return pcmp(string.cstr()); }
+    int cmpi(const pstring &string) const { return pcmpi(cstr(), string.cstr()); }
 
     int find(const char *search, int start = 0) const
     {
@@ -76,8 +112,8 @@ public:
 
     // various
 
-    bool startsWith(pstring &arg) { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
-    bool startsWith(const char *arg) { return (pcmp(cstr(), arg, strlen(arg)) == 0); }
+    bool startsWith(const pstring &arg) const { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
+    bool startsWith(const char *arg) const { return (pcmp(cstr(), arg, strlen(arg)) == 0); }
 
     // these return nstring ...
     pstring cat(const pstring &s) const { return *this + s; }
@@ -100,18 +136,26 @@ protected:
 
     struct str_t
     {
-        int reference_count;
+        str_t(int alen) : m_ref_count(1), m_len(alen) { m_str[0] = 0; }
+
         char *str() { return &m_str[0]; }
         int len() { return m_len; }
     //private:
+        int m_ref_count;
         int m_len;
-        char m_str[];
+        char m_str[1];
     };
 
     str_t *m_ptr;
 
+    static pblockpool *m_pool;
+
 private:
-    void init();
+    inline void init()
+    {
+        m_ptr = m_zero;
+        m_ptr->m_ref_count++;
+    }
 
     inline int pcmp(const char *right) const
     {
@@ -139,30 +183,26 @@ private:
     {
         sfree(m_ptr);
         m_ptr = from.m_ptr;
-        m_ptr->reference_count++;
+        m_ptr->m_ref_count++;
     }
 
     void pcat(const char *s);
 
-    static str_t *m_zero;
-
     static str_t *salloc(int n);
     static void sfree(str_t *s);
 
-    struct memblock
-    {
-        memblock *next;
-        int size;
-        int allocated;
-        int remaining;
-        char *cur;
-        char data[];
-    };
-
-    static memblock *m_first;
-    static char *alloc_str(int n);
-    static void dealloc_str(void *ptr);
+    static str_t *m_zero;
 };
+
+/* objects must be destroyed using destroy above */
+
+inline void *operator new(std::size_t size, pblockpool &pool, int extra = 0) throw (std::bad_alloc)
+{
+    void *result = pool.alloc(size + extra);
+    if (result == NULL)
+        throw std::bad_alloc();
+    return result;
+}
 
 
 #endif /* _PSTRING_H_ */

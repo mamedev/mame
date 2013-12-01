@@ -168,8 +168,10 @@ typedef delegate<void ()> net_update_delegate;
 //#define NETLIB_CONSTRUCTOR(_chip) ATTR_COLD _chip :: _chip (netlist_setup_t &setup, const char *name)
 //          : net_device_t(setup, name)
 
-#define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
+#define NETLIB_UPDATE_PARAM(_chip) ATTR_COLD ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: _name _params
+
+#define NETLIB_UPDATE_TERMINALS() ATTR_HOT ATTR_ALIGN inline void update_terminals(void)
 
 #define NETLIB_DEVICE_BASE(_name, _pclass, _extra, _priv)                           \
     class _name : public _pclass                                                    \

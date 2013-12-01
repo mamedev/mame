@@ -53,6 +53,7 @@
 #include "../nl_base.h"
 #include "nld_signal.h"
 #include "nld_system.h"
+#include "nld_twoterm.h"
 
 #include "nld_7400.h"
 #include "nld_7402.h"

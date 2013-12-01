@@ -6,29 +6,16 @@
 #include "pstring.h"
 #include <cstdio>
 
-//nstring::str_t *nstring::m_zero = NULL;
-pstring::str_t *pstring::m_zero = pstring::salloc(0);
-pstring::memblock *pstring::m_first = NULL;
 
-#define IMMEDIATE_MODE  (1)
+pblockpool *pstring::m_pool = new pblockpool;
+pstring::str_t *pstring::m_zero = new(*pstring::m_pool, 0) pstring::str_t(0);
+
+#define IMMEDIATE_MODE  (0)
 #define DEBUG_MODE      (0)
 
 pstring::~pstring()
 {
    sfree(m_ptr);
-}
-
-void pstring::init()
-{
-    if (m_zero == NULL)
-    {
-        m_zero = (str_t *) alloc_str(sizeof(str_t) + 1);
-        m_zero->reference_count = 1;
-        m_zero->m_len = 0;
-        m_zero->m_str[0] = 0;
-    }
-    m_ptr = m_zero;
-    m_ptr->reference_count++;
 }
 
 void pstring::pcat(const char *s)
@@ -101,19 +88,15 @@ pstring pstring::vprintf(va_list args) const
 
 void pstring::sfree(str_t *s)
 {
-    s->reference_count--;
-    if (s->reference_count == 0)
-        dealloc_str(s);
+    s->m_ref_count--;
+    if (s->m_ref_count == 0)
+        m_pool->dealloc(s);
 }
 
 pstring::str_t *pstring::salloc(int n)
 {
-    str_t *ret = (str_t *) alloc_str(sizeof(str_t) + n + 1);
-    ret->reference_count = 1;
-    ret->m_len = n;
-    ret->m_str[0] = 0;
+    str_t *ret = new(*m_pool, n) str_t(n);
     return ret;
-    //std::printf("old string %d <%s> %p %p\n", n, old, old, m_ptr);
 }
 
 pstring pstring::sprintf(const char *format, ...)
@@ -125,24 +108,49 @@ pstring pstring::sprintf(const char *format, ...)
     return ret;
 }
 
-char *pstring::alloc_str(int n)
+
+void pstring::resetmem()
+{
+    // Release the 0 string
+    if (m_zero != NULL)
+        sfree(m_zero);
+    m_zero = NULL;
+    m_pool->m_shutdown = true;
+    m_pool->resetmem();
+}
+
+// ----------------------------------------------------------------------------------------
+// block allocation pool
+// ----------------------------------------------------------------------------------------
+
+
+pblockpool::pblockpool()
+    : m_shutdown(false)
+    , m_first(NULL)
+    , m_blocksize((DEBUG_MODE) ? 0 : 16384)
+    , m_align(8)
+{
+}
+
+
+void *pblockpool::alloc(const std::size_t n)
 {
     if (IMMEDIATE_MODE)
         return (char *) malloc(n);
     else
     {
-        int min_alloc = MAX((DEBUG_MODE) ? 0 : 8192, n+sizeof(memblock));
+        int min_alloc = MAX(m_blocksize, n+sizeof(memblock));
         char *ret = NULL;
-
+        int memsize = ((n + m_align - 1) / m_align) * m_align;
         //std::printf("m_first %p\n", m_first);
         for (memblock *p = m_first; p != NULL && ret == NULL; p = p->next)
         {
-            if (p->remaining > n)
+            if (p->remaining > memsize)
             {
                 ret = p->cur;
-                p->cur += n;
+                p->cur += memsize;
                 p->allocated += 1;
-                p->remaining -= n;
+                p->remaining -= memsize;
             }
         }
 
@@ -157,9 +165,9 @@ char *pstring::alloc_str(int n)
             //std::printf("allocated block size %d\n", p->size);
 
             ret = p->cur;
-            p->cur += n;
+            p->cur += memsize;
             p->allocated += 1;
-            p->remaining -= n;
+            p->remaining -= memsize;
 
             m_first = p;
         }
@@ -168,7 +176,7 @@ char *pstring::alloc_str(int n)
     }
 }
 
-void pstring::dealloc_str(void *ptr)
+void pblockpool::dealloc(void *ptr)
 {
     if (IMMEDIATE_MODE)
         free(ptr);
@@ -188,7 +196,7 @@ void pstring::dealloc_str(void *ptr)
                     p->cur = &p->data[0];
                 }
                 // shutting down ?
-                if (m_zero == NULL)
+                if (m_shutdown)
                     resetmem(); // try to free blocks
                 return;
             }
@@ -197,17 +205,13 @@ void pstring::dealloc_str(void *ptr)
     }
 }
 
-void pstring::resetmem()
+void pblockpool::resetmem()
 {
     if (!IMMEDIATE_MODE)
     {
         memblock **p = &m_first;
         int totalblocks = 0;
         int freedblocks = 0;
-
-        // Release the 0 string
-        if (m_zero != NULL) sfree(m_zero);
-        m_zero = NULL;
 
         while (*p != NULL)
         {
@@ -223,8 +227,8 @@ void pstring::resetmem()
             }
             else
             {
-                if (DEBUG_MODE)
-                    std::printf("Allocated: <%s>\n", ((str_t *)(&(*p)->data[0]))->str());
+                //if (DEBUG_MODE)
+                //    std::printf("Allocated: <%s>\n", ((str_t *)(&(*p)->data[0]))->str());
 
                 p = next;
             }
