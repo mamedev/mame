@@ -2175,7 +2175,7 @@ ROM_START( pepp0428 ) /* Normal board : Joker Poker (No Double-up) (PP0428) */
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
   P17A      1    1   2   3    4   5  20  40 100 200 500    800
-  % Range: 91.5-92.5%  Optimum: 995.5%  Hit Frequency: 44.7%
+  % Range: 91.5-92.5%  Optimum: 95.5%  Hit Frequency: 44.7%
      Programs Available: PP0459, X000459P & PP0428 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3251,13 +3251,13 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2129.u77",   0x00000, 0x8000, CRC(f168f9ad) SHA1(acf98a155ccc892ac7c095bbd5538193c444ceb3) ) /* Custom Arizona Charlie's Casino graphics */
-	ROM_LOAD( "mgo-cg2129.u78",   0x08000, 0x8000, CRC(40b6df21) SHA1(7de6ff24db09facae040b889612222a6b1ce1b4e) )
-	ROM_LOAD( "mbo-cg2129.u79",   0x10000, 0x8000, CRC(508eab4b) SHA1(ba7920c3190302be924ef110b8a5e4c4c38ea535) )
-	ROM_LOAD( "mxo-cg2129.u80",   0x18000, 0x8000, CRC(e98a0efd) SHA1(eed9229f904a38435cd34e06b2c22fd323d73e2d) )
+	ROM_LOAD( "mro-cg2185.u77",  0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) ) /*  07/10/95   @ IGT  L95-1506  */
+	ROM_LOAD( "mgo-cg2185.u78",  0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
+	ROM_LOAD( "mbo-cg2185.u79",  0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
+	ROM_LOAD( "mxo-cg2185.u80",  0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "capx2129.u43", 0x0000, 0x0100, CRC(b00d19e5) SHA1(4e8d88748c7591246ccd02c959d78b50227ddafb) ) /* BPROM type N82S135N verified */
+	ROM_LOAD( "capx1321.u43", 0x0000, 0x0100, CRC(1e19c0ff) SHA1(e48ebc4a3c88e8b8c9740841dac919e9bb2c4b7f) )
 ROM_END
 
 ROM_START( pex0055pc ) /* Superboard : Deuces Wild Poker (X000055P+XP000028) */
@@ -3580,11 +3580,6 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "mgo-cg2324.u78",  0x08000, 0x8000, CRC(26d0acbe) SHA1(09a9127deb88185cd5b748bac657461eadb2f48f) )
 	ROM_LOAD( "mbo-cg2324.u79",  0x10000, 0x8000, CRC(47baee32) SHA1(d8af09022ccb5fc06aa3aa4c200a734b66cbee00) )
 	ROM_LOAD( "mxo-cg2324.u80",  0x18000, 0x8000, CRC(60449fc0) SHA1(251d1e04786b70c1d2bc7b02f3b69cd58ac76398) )
-
-	ROM_LOAD( "mro-cg2245.u77",  0x00000, 0x8000, CRC(60461758) SHA1(856aa5a2ec2d3dece8a94cd6c58ff0e2941d61b3) )
-	ROM_LOAD( "mgo-cg2245.u78",  0x08000, 0x8000, CRC(d4939806) SHA1(2852ec153da620868330d0d51b73c779ee6cfc49) )
-	ROM_LOAD( "mbo-cg2245.u79",  0x10000, 0x8000, CRC(86b2977b) SHA1(a086c05afeb6b2658975f06c33aa768efef92688) )
-	ROM_LOAD( "mxo-cg2245.u80",  0x18000, 0x8000, CRC(fd95acea) SHA1(be8feb17e22915951ff9b68150674e369ea95758) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0100, CRC(1e19c0ff) SHA1(e48ebc4a3c88e8b8c9740841dac919e9bb2c4b7f) )
