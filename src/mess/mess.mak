@@ -2170,6 +2170,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/lola8a.o    \
 	$(MESS_DRIVERS)/m79152pc.o  \
 	$(MESS_DRIVERS)/mbc200.o    \
+	$(MESS_DRIVERS)/mcb216.o    \
 	$(MESS_DRIVERS)/mccpm.o     \
 	$(MESS_DRIVERS)/mes.o       \
 	$(MESS_DRIVERS)/mice.o      \

@@ -7026,6 +7026,7 @@ src/mess/drivers/mbee.c svneol=native#text/plain
 src/mess/drivers/mc10.c svneol=native#text/plain
 src/mess/drivers/mc1000.c svneol=native#text/plain
 src/mess/drivers/mc80.c svneol=native#text/plain
+src/mess/drivers/mcb216.c svneol=native#text/plain
 src/mess/drivers/mccpm.c svneol=native#text/plain
 src/mess/drivers/megadriv.c svneol=native#text/plain
 src/mess/drivers/mekd2.c svneol=native#text/plain
