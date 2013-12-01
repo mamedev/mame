@@ -346,13 +346,13 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_data_w )
 WRITE_LINE_MEMBER(ghosteo_state::s3c2410_i2c_scl_w )
 {
 //  logerror( "s3c2410_i2c_scl_w %d\n", state ? 1 : 0);
-	i2cmem_scl_write( m_i2cmem, state);
+	m_i2cmem->write_scl(state);
 }
 
 READ_LINE_MEMBER(ghosteo_state::s3c2410_i2c_sda_r )
 {
 	int state;
-	state = i2cmem_sda_read( m_i2cmem );
+	state = m_i2cmem->read_sda();
 //  logerror( "s3c2410_i2c_sda_r %d\n", state ? 1 : 0);
 	return state;
 }
@@ -360,7 +360,7 @@ READ_LINE_MEMBER(ghosteo_state::s3c2410_i2c_sda_r )
 WRITE_LINE_MEMBER(ghosteo_state::s3c2410_i2c_sda_w )
 {
 //  logerror( "s3c2410_i2c_sda_w %d\n", state ? 1 : 0);
-	i2cmem_sda_write( m_i2cmem, state);
+	m_i2cmem->write_sda(state);
 }
 
 WRITE32_MEMBER(ghosteo_state::sound_w)
@@ -556,16 +556,6 @@ static const s3c2410_interface bballoon_s3c2410_intf =
 	{ DEVCB_DRIVER_MEMBER(ghosteo_state,s3c2410_nand_command_w), DEVCB_DRIVER_MEMBER(ghosteo_state,s3c2410_nand_address_w), DEVCB_DRIVER_MEMBER(ghosteo_state,s3c2410_nand_data_r), DEVCB_DRIVER_MEMBER(ghosteo_state,s3c2410_nand_data_w) }
 };
 
-static const i2cmem_interface bballoon_i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 0, 256
-};
-
-static const i2cmem_interface touryuu_i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 0, 1024
-};
-
 
 
 READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
@@ -630,13 +620,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bballoon, ghosteo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballoon_map)
-	MCFG_I2CMEM_ADD("i2cmem", bballoon_i2cmem_interface)
+	MCFG_I2CMEM_ADD("i2cmem")
+	MCFG_I2CMEM_DATA_SIZE(256)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( touryuu, ghosteo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(touryuu_map)
-	MCFG_I2CMEM_ADD("i2cmem", touryuu_i2cmem_interface)
+	MCFG_I2CMEM_ADD("i2cmem")
+	MCFG_I2CMEM_DATA_SIZE(1024)
 MACHINE_CONFIG_END
 
 

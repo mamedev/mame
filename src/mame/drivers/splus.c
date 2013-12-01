@@ -38,7 +38,9 @@ public:
 		m_program_ram(*this, "program_ram"),
 		m_reel_ram(*this, "reel_ram"),
 		m_io_port(*this, "io_port"),
-		m_maincpu(*this, "maincpu") {
+		m_maincpu(*this, "maincpu"),
+		m_i2cmem(*this, "i2cmem")
+	{
 		m_sda_dir = 0;
 		m_coin_state = 0;
 		m_last_cycles = 0;
@@ -103,6 +105,7 @@ public:
 	DECLARE_READ8_MEMBER(splus_reel_optics_r);
 	DECLARE_DRIVER_INIT(splus);
 	required_device<cpu_device> m_maincpu;
+	required_device<i2cmem_device> m_i2cmem;
 };
 
 /* Static Variables */
@@ -126,14 +129,6 @@ static const UINT8 optics[200] = {
 #define CPU_CLOCK           ((MASTER_CLOCK)/2)      /* divided by 2 - 7474 */
 #define SOUND_CLOCK         ((MASTER_CLOCK)/12)
 
-/* Static Variables */
-#define EEPROM_NVRAM_SIZE   0x200 // 4k Bit
-
-/* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-static const i2cmem_interface i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE
-};
 
 /*****************
 * Write Handlers *
@@ -357,10 +352,9 @@ WRITE8_MEMBER(splus_state::splus_duart_w)
 
 WRITE8_MEMBER(splus_state::i2c_nvram_w)
 {
-	device_t *device = machine().device("i2cmem");
-	i2cmem_scl_write(device,BIT(data, 2));
+	m_i2cmem->write_scl(BIT(data, 2));
 	m_sda_dir = BIT(data, 1);
-	i2cmem_sda_write(device,BIT(data, 0));
+	m_i2cmem->write_sda(BIT(data, 0));
 }
 
 /****************
@@ -539,8 +533,6 @@ READ8_MEMBER(splus_state::splus_registers_r)
 
 READ8_MEMBER(splus_state::splus_reel_optics_r)
 {
-	device_t *device = machine().device("i2cmem");
-
 /*
         Bit 0 = REEL #1
         Bit 1 = REEL #2
@@ -559,7 +551,7 @@ READ8_MEMBER(splus_state::splus_reel_optics_r)
 
 	if(!m_sda_dir)
 	{
-		sda = i2cmem_sda_read(device);
+		sda = m_i2cmem->read_sda();
 	}
 
 	reel_optics = reel_optics | 0x40 | (sda<<7);
@@ -694,7 +686,7 @@ static MACHINE_CONFIG_START( splus, splus_state )   // basic machine hardware
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 
-	MCFG_I2CMEM_ADD("i2cmem", i2cmem_interface)
+	MCFG_X2404P_ADD("i2cmem")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

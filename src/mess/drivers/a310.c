@@ -270,11 +270,6 @@ static const wd17xx_interface a310_wd17xx_interface =
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-static const i2cmem_interface i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 0, 0x100
-};
-
 WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
 {
 	if(state)
@@ -303,7 +298,8 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_CPU_PROGRAM_MAP(a310_mem)
 
 	MCFG_AAKART_ADD("kart", 8000000/128, kart_interface) // TODO: frequency
-	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
+	MCFG_I2CMEM_ADD("i2cmem")
+	MCFG_I2CMEM_DATA_SIZE(0x100)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

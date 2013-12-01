@@ -624,52 +624,52 @@ WRITE32_MEMBER( cxhumax_state::cx_i2c0_w )
 	COMBINE_DATA(&m_i2c0_regs[offset]);
 }
 
-static UINT8 i2cmem_read_byte( device_t *machine, int last)
+UINT8 cxhumax_state::i2cmem_read_byte(int last)
 {
 	UINT8 data = 0;
 	int i;
-	i2cmem_sda_write(machine, 1);
+	m_i2cmem->write_sda(1);
 	for (i = 0; i < 8; i++)
 	{
-		i2cmem_scl_write(machine, 1);
-		data = (data << 1) + (i2cmem_sda_read( machine ) ? 1 : 0);
-		i2cmem_scl_write(machine, 0);
+		m_i2cmem->write_scl(1);
+		data = (data << 1) + (m_i2cmem->read_sda() ? 1 : 0);
+		m_i2cmem->write_scl(0);
 	}
-	i2cmem_sda_write(machine, last);
-	i2cmem_scl_write(machine, 1);
-	i2cmem_scl_write(machine, 0);
+	m_i2cmem->write_sda(last);
+	m_i2cmem->write_scl(1);
+	m_i2cmem->write_scl(0);
 	return data;
 }
 
-static void i2cmem_write_byte( device_t *machine, UINT8 data)
+void cxhumax_state::i2cmem_write_byte(UINT8 data)
 {
 	int i;
 	for (i = 0; i < 8; i++)
 	{
-		i2cmem_sda_write(machine, (data & 0x80) ? 1 : 0);
+		m_i2cmem->write_sda((data & 0x80) ? 1 : 0);
 		data = data << 1;
-		i2cmem_scl_write(machine, 1);
-		i2cmem_scl_write(machine, 0);
+		m_i2cmem->write_scl(1);
+		m_i2cmem->write_scl(0);
 	}
-	i2cmem_sda_write(machine, 1); // ack bit
-	i2cmem_scl_write(machine, 1);
-	i2cmem_scl_write(machine, 0);
+	m_i2cmem->write_sda(1); // ack bit
+	m_i2cmem->write_scl(1);
+	m_i2cmem->write_scl(0);
 }
 
-static void i2cmem_start( device_t *machine )
+void cxhumax_state::i2cmem_start()
 {
-	i2cmem_sda_write(machine, 1);
-	i2cmem_scl_write(machine, 1);
-	i2cmem_sda_write(machine, 0);
-	i2cmem_scl_write(machine, 0);
+	m_i2cmem->write_sda(1);
+	m_i2cmem->write_scl(1);
+	m_i2cmem->write_sda(0);
+	m_i2cmem->write_scl(0);
 }
 
-static void i2cmem_stop( device_t *machine )
+void cxhumax_state::i2cmem_stop()
 {
-	i2cmem_sda_write(machine, 0);
-	i2cmem_scl_write(machine, 1);
-	i2cmem_sda_write(machine, 1);
-	i2cmem_scl_write(machine, 0);
+	m_i2cmem->write_sda(0);
+	m_i2cmem->write_scl(1);
+	m_i2cmem->write_sda(1);
+	m_i2cmem->write_scl(0);
 }
 
 READ32_MEMBER( cxhumax_state::cx_i2c1_r )
@@ -677,7 +677,7 @@ READ32_MEMBER( cxhumax_state::cx_i2c1_r )
 	UINT32 data=0;
 	switch(offset) {
 		case I2C_STAT_REG:
-			data |= i2cmem_sda_read(machine().device("eeprom"))<<3;
+			data |= m_i2cmem->read_sda()<<3;
 			// fall
 		default:
 			data |= m_i2c1_regs[offset]; break;
@@ -692,36 +692,36 @@ WRITE32_MEMBER( cxhumax_state::cx_i2c1_w )
 	switch(offset) {
 		case I2C_CTRL_REG:
 			if(data&0x10) {// START
-				i2cmem_start(machine().device("eeprom"));
+				i2cmem_start();
 			}
 			if((data&0x4) || ((data&3)==3)) // I2C READ
 			{
 				m_i2c1_regs[I2C_RDATA_REG] = 0;
-				if(data&0x10) i2cmem_write_byte(machine().device("eeprom"),(data>>24)&0xFF);
+				if(data&0x10) i2cmem_write_byte((data>>24)&0xFF);
 				if(m_i2c1_regs[I2C_MODE_REG]&(1<<5)) // BYTE_ORDER
 				{
 					for(int i=0; i<(data&3); i++) {
-						m_i2c1_regs[I2C_RDATA_REG] |= i2cmem_read_byte(machine().device("eeprom"),0) << (i*8);
+						m_i2c1_regs[I2C_RDATA_REG] |= i2cmem_read_byte(0) << (i*8);
 					}
-					m_i2c1_regs[I2C_RDATA_REG] |= i2cmem_read_byte(machine().device("eeprom"),(data&0x20)?1:0) << ((data&3)*8);
+					m_i2c1_regs[I2C_RDATA_REG] |= i2cmem_read_byte((data&0x20)?1:0) << ((data&3)*8);
 				}
 				else
 				{
 					for(int i=0; i<(data&3); i++) {
-						m_i2c1_regs[I2C_RDATA_REG] |= i2cmem_read_byte(machine().device("eeprom"),0);
+						m_i2c1_regs[I2C_RDATA_REG] |= i2cmem_read_byte(0);
 						m_i2c1_regs[I2C_RDATA_REG] <<= 8;
 					}
-					m_i2c1_regs[I2C_RDATA_REG] |= i2cmem_read_byte(machine().device("eeprom"),(data&0x20)?1:0);
+					m_i2c1_regs[I2C_RDATA_REG] |= i2cmem_read_byte((data&0x20)?1:0);
 				}
 			}
 			else
 			{
 				for(int i=0; i<=(data&3); i++) {
-					i2cmem_write_byte(machine().device("eeprom"),(data>>(24-(i*8))&0xFF));
+					i2cmem_write_byte((data>>(24-(i*8))&0xFF));
 				}
 			}
 			if(data&0x20) {// STOP
-				i2cmem_stop(machine().device("eeprom"));
+				i2cmem_stop();
 			}
 
 			/* The interrupt status bit is set at the end of an I2C read or write operation. */
@@ -978,7 +978,6 @@ INPUT_PORTS_END
 
 void cxhumax_state::machine_start()
 {
-	m_i2cmem = machine().device("eeprom");
 	int index = 0;
 	for(index = 0; index < MAX_CX_TIMERS; index++)
 	{
@@ -1054,18 +1053,14 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_NULL
 };
 
-static const i2cmem_interface i2cmem_interface =
-{
-		I2CMEM_SLAVE_ADDRESS, 0, 0x2000
-};
-
 static MACHINE_CONFIG_START( cxhumax, cxhumax_state )
 	MCFG_CPU_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
 	MCFG_CPU_PROGRAM_MAP(cxhumax_map)
 
 
 	MCFG_INTEL_28F320J3D_ADD("flash")
-	MCFG_I2CMEM_ADD("eeprom",i2cmem_interface)
+	MCFG_I2CMEM_ADD("eeprom")
+	MCFG_I2CMEM_DATA_SIZE(0x2000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -32,7 +32,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_flash(*this, "flash"),
 		m_ram(*this, "ram"),
-		m_terminal(*this, TERMINAL_TAG) { }
+		m_terminal(*this, TERMINAL_TAG),
+		m_i2cmem(*this, "eeprom")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<intel_28f320j3d_device> m_flash;
@@ -135,8 +138,13 @@ public:
 
 	UINT32 m_i2c0_regs[0x20/4];
 	UINT32 m_i2c1_regs[0x20/4];
-	device_t *m_i2cmem;
+	required_device<i2cmem_device> m_i2cmem;
 	UINT32 m_i2c2_regs[0x20/4];
+
+	void i2cmem_start();
+	void i2cmem_stop();
+	UINT8 i2cmem_read_byte(int last);
+	void i2cmem_write_byte(UINT8 data);
 
 	UINT32 m_mccfg_regs[0x0C/4];
 

@@ -10,6 +10,7 @@ CuboCD32 definitions
 #include "includes/amiga.h"
 #include "machine/microtch.h"
 #include "sound/cdda.h"
+#include "machine/i2cmem.h"
 
 class cd32_state : public amiga_state
 {
@@ -105,7 +106,7 @@ private:
 	UINT8 * m_cdrom_toc;
 	emu_timer *m_dma_timer;
 	emu_timer *m_frame_timer;
-	device_t *m_i2cmem;
+	i2cmem_device *m_i2cmem;
 
 	int m_cdrom_is_device;
 

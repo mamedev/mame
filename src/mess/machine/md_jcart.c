@@ -75,24 +75,14 @@ md_seprom_mm96_device::md_seprom_mm96_device(const machine_config &mconfig, cons
 //  SERIAL I2C DEVICE
 //-------------------------------------------------
 
-static const i2cmem_interface md_24c08_i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 0, 0x400
-};
-
-static const i2cmem_interface md_24c16a_i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 0, 0x800
-};
-
 // MD_SEPROM_CODEMAST
 MACHINE_CONFIG_FRAGMENT( md_i2c_24c08 )
-	MCFG_I2CMEM_ADD("i2cmem", md_24c08_i2cmem_interface)
+	MCFG_24C08_ADD("i2cmem")
 MACHINE_CONFIG_END
 
 // MD_SEPROM_MM96
 MACHINE_CONFIG_FRAGMENT( md_i2c_24c16a )
-	MCFG_I2CMEM_ADD("i2cmem", md_24c16a_i2cmem_interface)
+	MCFG_24C16A_ADD("i2cmem")
 MACHINE_CONFIG_END
 
 
@@ -219,7 +209,7 @@ READ16_MEMBER(md_seprom_codemast_device::read)
 {
 	if (offset == 0x380000/2)
 	{
-		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+		m_i2c_mem = m_i2cmem->read_sda();
 		return (m_i2c_mem & 1) << 7;
 	}
 	if (offset == 0x38fffe/2)
@@ -251,8 +241,8 @@ WRITE16_MEMBER(md_seprom_codemast_device::write)
 	{
 		m_i2c_clk = BIT(data, 9);
 		m_i2c_mem = BIT(data, 8);
-		i2cmem_scl_write(m_i2cmem, m_i2c_clk);
-		i2cmem_sda_write(m_i2cmem, m_i2c_mem);
+		m_i2cmem->write_scl(m_i2c_clk);
+		m_i2cmem->write_sda(m_i2c_mem);
 	}
 	if (offset == 0x38fffe/2)
 	{

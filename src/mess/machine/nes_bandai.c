@@ -408,8 +408,8 @@ WRITE8_MEMBER(nes_lz93d50_24c01_device::write_h)
 		case 0x0d:
 			m_i2c_clk = BIT(data, 5);
 			m_i2c_mem = BIT(data, 6);
-			i2cmem_scl_write(m_i2cmem, m_i2c_clk);
-			i2cmem_sda_write(m_i2cmem, m_i2c_mem);
+			m_i2cmem->write_scl(m_i2c_clk);
+			m_i2cmem->write_sda(m_i2c_mem);
 			break;
 		default:
 			lz93d50_write(space, offset & 0x0f, data, mem_mask);
@@ -420,20 +420,15 @@ WRITE8_MEMBER(nes_lz93d50_24c01_device::write_h)
 READ8_MEMBER(nes_lz93d50_24c01_device::read_m)
 {
 	LOG_MMC(("lz93d50 EEPROM read, offset: %04x\n", offset));
-	return (i2cmem_sda_read(m_i2cmem) & 1) << 4;
+	return (m_i2cmem->read_sda() & 1) << 4;
 }
 
 //-------------------------------------------------
 //  SERIAL I2C DEVICE
 //-------------------------------------------------
 
-static const i2cmem_interface bandai_24c01_i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 4, 0x80
-};
-
 MACHINE_CONFIG_FRAGMENT( bandai_i2c_24c01 )
-	MCFG_I2CMEM_ADD("i2cmem", bandai_24c01_i2cmem_interface)
+	MCFG_24C01_ADD("i2cmem")
 MACHINE_CONFIG_END
 
 machine_config_constructor nes_lz93d50_24c01_device::device_mconfig_additions() const
@@ -443,14 +438,8 @@ machine_config_constructor nes_lz93d50_24c01_device::device_mconfig_additions() 
 
 
 
-static const i2cmem_interface bandai_24c02_i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 4, 0x100
-};
-
-
 MACHINE_CONFIG_FRAGMENT( bandai_i2c_24c02 )
-	MCFG_I2CMEM_ADD("i2cmem", bandai_24c02_i2cmem_interface)
+	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
 
 machine_config_constructor nes_lz93d50_24c02_device::device_mconfig_additions() const

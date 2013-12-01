@@ -1316,10 +1316,10 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 7   R/W IR received bit (mirror, if device not selected: 0)
             */
 		if ( m_pm_reg[0x60] & 0x04 )
-			m_i2cmem->set_sda_line( ( data & 0x04 ) ? 1 : 0 );
+			m_i2cmem->write_sda( ( data & 0x04 ) ? 1 : 0 );
 
 		if ( m_pm_reg[0x60] & 0x08 )
-			m_i2cmem->set_scl_line( ( data & 0x08 ) ? 1 : 0 );
+			m_i2cmem->write_scl( ( data & 0x08 ) ? 1 : 0 );
 		break;
 	case 0x70:  /* Sound related */
 		m_pm_reg[0x70] = data;
@@ -1480,7 +1480,7 @@ READ8_MEMBER(pokemini_state::pokemini_hwreg_r)
 	case 0x61:
 		if ( ! ( m_pm_reg[0x60] & 0x04 ) )
 		{
-			data = ( data & ~ 0x04 ) | ( m_i2cmem->read_sda_line() ? 0x04 : 0x00 );
+			data = ( data & ~ 0x04 ) | ( m_i2cmem->read_sda() ? 0x04 : 0x00 );
 		}
 
 		if ( ! ( m_pm_reg[0x60] & 0x08 ) )
@@ -1758,12 +1758,6 @@ static const speaker_interface pokemini_speaker_interface =
 };
 
 
-static const i2cmem_interface i2cmem_interface =
-{
-		I2CMEM_SLAVE_ADDRESS, 0, 0x2000
-};
-
-
 void pokemini_state::video_start()
 {
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
@@ -1784,7 +1778,8 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
+	MCFG_I2CMEM_ADD("i2cmem")
+	MCFG_I2CMEM_DATA_SIZE(0x2000)
 
 	/* This still needs to be improved to actually match the hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

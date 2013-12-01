@@ -221,18 +221,15 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 #define NVRAM_SIZE 256
 #define NVRAM_PAGE_SIZE 0   /* max size of one write request */
 
-static const i2cmem_interface i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
-};
-
 static MACHINE_CONFIG_START( ertictac, ertictac_state )
 
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	MCFG_CPU_PROGRAM_MAP(ertictac_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ertictac_state, ertictac_podule_irq, 60) // FIXME: timing of this
 
-	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
+	MCFG_I2CMEM_ADD("i2cmem")
+	MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
+	MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
 //  MCFG_AAKART_ADD("kart", XTAL_24MHz/3) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -31,7 +31,6 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/cdda.h"
 #include "machine/6526cia.h"
-#include "machine/i2cmem.h"
 #include "includes/cd32.h"
 #include "imagedev/chd_cd.h"
 #include "machine/amigafdc.h"
@@ -764,11 +763,6 @@ static const legacy_mos6526_interface cia_1_intf =
 #define NVRAM_SIZE 1024
 #define NVRAM_PAGE_SIZE 16  /* max size of one write request */
 
-static const i2cmem_interface i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
-};
-
 static MACHINE_CONFIG_START( cd32base, cd32_state )
 
 	/* basic machine hardware */
@@ -779,7 +773,9 @@ static MACHINE_CONFIG_START( cd32base, cd32_state )
 	MCFG_MACHINE_START_OVERRIDE(amiga_state, amiga )
 	MCFG_MACHINE_RESET_OVERRIDE(amiga_state,amiga)
 
-	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
+	MCFG_I2CMEM_ADD("i2cmem")
+	MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
+	MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

@@ -412,11 +412,6 @@ void aristmk5_state::machine_reset()
 #if 0
 #define NVRAM_SIZE 256
 #define NVRAM_PAGE_SIZE 0   /* max size of one write request */
-
-static const i2cmem_interface i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
-};
 #endif
 
 /* TODO: this isn't supposed to access a keyboard ... */
@@ -431,7 +426,9 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_CPU_PROGRAM_MAP(aristmk5_drame_map)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
 
-//  MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
+//  MCFG_I2CMEM_ADD("i2cmem")
+//  MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
+//  MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
 	MCFG_AAKART_ADD("kart", 12000000/128, kart_interface) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -475,7 +472,9 @@ static MACHINE_CONFIG_START( aristmk5_usa, aristmk5_state )
 	MCFG_CPU_PROGRAM_MAP(aristmk5_map)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
 
-//  MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
+//  MCFG_I2CMEM_ADD("i2cmem")
+//  MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
+//  MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
 	MCFG_AAKART_ADD("kart", 12000000/128, kart_interface) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)

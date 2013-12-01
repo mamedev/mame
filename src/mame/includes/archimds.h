@@ -88,7 +88,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_i2cmem;
+	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<device_t> m_wd1772;
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_vram;

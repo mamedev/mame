@@ -2,7 +2,6 @@
 #include "cdrom.h"
 #include "coreutil.h"
 #include "sound/cdda.h"
-#include "machine/i2cmem.h"
 #include "imagedev/chd_cd.h"
 #include "includes/cd32.h"
 
@@ -213,8 +212,8 @@ void akiko_device::nvram_write(UINT32 data)
 	m_i2c_scl_dir = BIT(data,15);
 	m_i2c_sda_dir = BIT(data,14);
 
-	i2cmem_scl_write( m_i2cmem, m_i2c_scl_out );
-	i2cmem_sda_write( m_i2cmem, m_i2c_sda_out );
+	m_i2cmem->write_scl( m_i2c_scl_out );
+	m_i2cmem->write_sda( m_i2c_sda_out );
 }
 
 UINT32 akiko_device::nvram_read()
@@ -236,7 +235,7 @@ UINT32 akiko_device::nvram_read()
 	}
 	else
 	{
-		v |= i2cmem_sda_read( m_i2cmem ) << 30;
+		v |= m_i2cmem->read_sda() << 30;
 	}
 
 	v |= m_i2c_scl_dir << 15;

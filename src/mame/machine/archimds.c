@@ -469,7 +469,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 
 			if ( m_i2cmem )
 			{
-				i2c_data = (i2cmem_sda_read(m_i2cmem) & 1);
+				i2c_data = (m_i2cmem->read_sda() & 1);
 			}
 
 			return (flyback) | (m_ioc_regs[CONTROL] & 0x7c) | (m_i2c_clk<<1) | i2c_data;
@@ -537,8 +537,8 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
 			if ( m_i2cmem )
 			{
-				i2cmem_sda_write(m_i2cmem, data & 0x01);
-				i2cmem_scl_write(m_i2cmem, (data & 0x02) >> 1);
+				m_i2cmem->write_sda(data & 0x01);
+				m_i2cmem->write_scl((data & 0x02) >> 1);
 			}
 			m_i2c_clk = (data & 2) >> 1;
 			break;

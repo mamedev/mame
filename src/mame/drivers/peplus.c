@@ -197,7 +197,10 @@ public:
 		m_sd000_ram(*this, "sd000_ram"),
 		m_sf000_ram(*this, "sf000_ram"),
 		m_io_port(*this, "io_port"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_i2cmem(*this, "i2cmem")
+	{
+	}
 
 	required_shared_ptr<UINT8> m_cmos_ram;
 	required_shared_ptr<UINT8> m_program_ram;
@@ -277,6 +280,7 @@ public:
 	void peplus_load_superdata(const char *bank_name);
 	void peplus_init();
 	required_device<cpu_device> m_maincpu;
+	required_device<i2cmem_device> m_i2cmem;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -290,14 +294,6 @@ static const UINT16 id_023[8] = { 0x4a6c, 0x4a7b, 0x4a4b, 0x4a5a, 0x4a2b, 0x4a0a
 #define MC6845_CLOCK        ((MASTER_CLOCK)/8/3)
 #define SOUND_CLOCK         ((MASTER_CLOCK)/12)
 
-
-#define eeprom_NVRAM_SIZE   0x200 // 4k Bit
-
-/* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-static const i2cmem_interface i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 8, eeprom_NVRAM_SIZE
-};
 
 /* prototypes */
 
@@ -529,10 +525,9 @@ WRITE8_MEMBER(peplus_state::peplus_output_bank_c_w)
 
 WRITE8_MEMBER(peplus_state::i2c_nvram_w)
 {
-	device_t *device = machine().device("i2cmem");
-	i2cmem_scl_write(device,BIT(data, 2));
+	m_i2cmem->write_scl(BIT(data, 2));
 	m_sda_dir = BIT(data, 1);
-	i2cmem_sda_write(device,BIT(data, 0));
+	m_i2cmem->write_sda(BIT(data, 0));
 }
 
 
@@ -855,7 +850,6 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
 
 READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 {
-	device_t *device = machine().device("i2cmem");
 /*
         Bit 0 = COIN DETECTOR A
         Bit 1 = COIN DETECTOR B
@@ -875,7 +869,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 	UINT8 sda = 0;
 	if(!m_sda_dir)
 	{
-		sda = i2cmem_sda_read(device);
+		sda = m_i2cmem->read_sda();
 	}
 
 	if ((ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && m_coin_state == 0) {
@@ -1346,7 +1340,7 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MCFG_PALETTE_LENGTH(16*16*2)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", MC6845_CLOCK, mc6845_intf)
-	MCFG_I2CMEM_ADD("i2cmem", i2cmem_interface)
+	MCFG_X2404P_ADD("i2cmem")
 
 
 	// sound hardware

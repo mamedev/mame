@@ -1154,11 +1154,6 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
 
-static const i2cmem_interface i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 0, 0x200
-};
-
 static MACHINE_CONFIG_START( batman, vii_state )
 
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
@@ -1166,7 +1161,8 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
 
 
-	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
+	MCFG_I2CMEM_ADD("i2cmem")
+	MCFG_I2CMEM_DATA_SIZE(0x200)
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE(60)

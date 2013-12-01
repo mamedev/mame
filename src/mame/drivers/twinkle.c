@@ -273,7 +273,6 @@ public:
 	DECLARE_READ16_MEMBER(shared_68k_r);
 	DECLARE_WRITE16_MEMBER(shared_68k_w);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_DRIVER_INIT(twinklei);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 
@@ -854,20 +853,6 @@ static void scsi_dma_write( twinkle_state *state, UINT32 *p_n_psxram, UINT32 n_a
 	}
 }
 
-DRIVER_INIT_MEMBER(twinkle_state,twinklei)
-{
-	device_t *i2cmem = machine().device("security");
-	i2cmem_e0_write( i2cmem, 0 );
-	i2cmem_e1_write( i2cmem, 0 );
-	i2cmem_e2_write( i2cmem, 0 );
-	i2cmem_wc_write( i2cmem, 0 );
-}
-
-static const i2cmem_interface i2cmem_interface =
-{
-	I2CMEM_SLAVE_ADDRESS, 0, 0x100
-};
-
 static const rtc65271_interface twinkle_rtc =
 {
 	DEVCB_NULL
@@ -919,7 +904,8 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( twinklei, twinkle )
-	MCFG_I2CMEM_ADD("security",i2cmem_interface)
+	MCFG_I2CMEM_ADD("security")
+	MCFG_I2CMEM_DATA_SIZE(0x100)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( twinkle )
@@ -976,11 +962,11 @@ static INPUT_PORTS_START( twinklei )
 	PORT_INCLUDE( twinkle )
 
 	PORT_MODIFY("OUTSEC")
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("security", i2cmem_scl_write)
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("security", i2cmem_sda_write)
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", i2cmem_device, write_scl)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("security", i2cmem_device, write_sda)
 
 	PORT_MODIFY("INSEC")
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE("security", i2cmem_sda_read)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("security", i2cmem_device, read_sda)
 INPUT_PORTS_END
 
 #define TWINKLE_BIOS    \
@@ -1244,12 +1230,12 @@ GAME( 1999, bmiidxc,  gq863,   twinkle,  twinkle,  driver_device, 0,        ROT0
 GAME( 1999, bmiidxca, bmiidxc, twinkle,  twinkle,  driver_device, 0,        ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 1999, bmiidxs,  gq863,   twinkle,  twinkle,  driver_device, 0,        ROT0, "Konami", "beatmania IIDX Substream (983 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
 GAME( 1999, bmiidxc2, gq863,   twinkle,  twinkle,  driver_device, 0,        ROT0, "Konami", "Beatmania IIDX Substream with DDR 2nd Club Version 2 (984 A01 BM)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 1999, bmiidx2,  gq863,   twinklei, twinklei, twinkle_state, twinklei, ROT0, "Konami", "beatmania IIDX 2nd style (GC985 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 2000, bmiidx3,  gq863,   twinklei, twinklei, twinkle_state, twinklei, ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAC)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 2000, bmiidx3a, bmiidx3, twinklei, twinklei, twinkle_state, twinklei, ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 2000, bmiidx4,  gq863,   twinklei, twinklei, twinkle_state, twinklei, ROT0, "Konami", "beatmania IIDX 4th style (GCA03 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 2001, bmiidx5,  gq863,   twinklei, twinklei, twinkle_state, twinklei, ROT0, "Konami", "beatmania IIDX 5th style (GCA17 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 2001, bmiidx6,  gq863,   twinklei, twinklei, twinkle_state, twinklei, ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 2001, bmiidx6a, bmiidx6, twinklei, twinklei, twinkle_state, twinklei, ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 2002, bmiidx7,  gq863,   twinklei, twinklei, twinkle_state, twinklei, ROT0, "Konami", "beatmania IIDX 7th style (GCB44 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
-GAME( 2002, bmiidx8,  gq863,   twinklei, twinklei, twinkle_state, twinklei, ROT0, "Konami", "beatmania IIDX 8th style (GCC44 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 1999, bmiidx2,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 2nd style (GC985 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 2000, bmiidx3,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAC)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 2000, bmiidx3a, bmiidx3, twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 2000, bmiidx4,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 4th style (GCA03 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 2001, bmiidx5,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 5th style (GCA17 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 2001, bmiidx6,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 2001, bmiidx6a, bmiidx6, twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 6th style (GCB4U JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 2002, bmiidx7,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 7th style (GCB44 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )
+GAME( 2002, bmiidx8,  gq863,   twinklei, twinklei, driver_device, 0,        ROT0, "Konami", "beatmania IIDX 8th style (GCC44 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING  )

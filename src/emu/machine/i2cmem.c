@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /***************************************************************************
 
 I2C Memory
@@ -76,6 +78,9 @@ i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, de
 	: device_t(mconfig, I2CMEM, "I2CMEM", tag, owner, clock, "i2cmem", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+	m_slave_address( I2CMEM_SLAVE_ADDRESS ),
+	m_page_size( 0 ),
+	m_data_size( 0 ),
 	m_scl( 0 ),
 	m_sdaw( 0 ),
 	m_e0( 0 ),
@@ -96,29 +101,16 @@ i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, de
 
 void i2cmem_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const i2cmem_interface *intf = reinterpret_cast<const i2cmem_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<i2cmem_interface *>(this) = *intf;
-	}
-	else
-	{
-		m_slave_address = 0;
-		m_page_size = 0;
-		m_data_size = 0;
-	}
-
-	m_address_bits = 0;
+	int address_bits = 0;
 
 	int i = m_data_size - 1;
 	while( i > 0 )
 	{
-		m_address_bits++;
+		address_bits++;
 		i >>= 1;
 	}
 
-	m_space_config = address_space_config( "i2cmem", ENDIANNESS_BIG, 8,  m_address_bits, 0, *ADDRESS_MAP_NAME( i2cmem_map8 ) );
+	m_space_config = address_space_config( "i2cmem", ENDIANNESS_BIG, 8,  address_bits, 0, *ADDRESS_MAP_NAME( i2cmem_map8 ) );
 }
 
 
@@ -251,12 +243,7 @@ void i2cmem_device::nvram_write( emu_file &file )
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_DEVICE_HANDLER( i2cmem_e0_write )
-{
-	downcast<i2cmem_device *>( device )->set_e0_line( state );
-}
-
-void i2cmem_device::set_e0_line( int state )
+WRITE_LINE_MEMBER( i2cmem_device::write_e0 )
 {
 	state &= 1;
 	if( m_e0 != state )
@@ -267,12 +254,7 @@ void i2cmem_device::set_e0_line( int state )
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( i2cmem_e1_write )
-{
-	downcast<i2cmem_device *>( device )->set_e1_line( state );
-}
-
-void i2cmem_device::set_e1_line( int state )
+WRITE_LINE_MEMBER( i2cmem_device::write_e1 )
 {
 	state &= 1;
 	if( m_e1 != state )
@@ -283,12 +265,7 @@ void i2cmem_device::set_e1_line( int state )
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( i2cmem_e2_write )
-{
-	downcast<i2cmem_device *>( device )->set_e2_line( state );
-}
-
-void i2cmem_device::set_e2_line( int state )
+WRITE_LINE_MEMBER( i2cmem_device::write_e2 )
 {
 	state &= 1;
 	if( m_e2 != state )
@@ -299,12 +276,7 @@ void i2cmem_device::set_e2_line( int state )
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( i2cmem_sda_write )
-{
-	downcast<i2cmem_device *>( device )->set_sda_line( state );
-}
-
-void i2cmem_device::set_sda_line( int state )
+WRITE_LINE_MEMBER( i2cmem_device::write_sda )
 {
 	state &= 1;
 	if( m_sdaw != state )
@@ -331,12 +303,7 @@ void i2cmem_device::set_sda_line( int state )
 	}
 }
 
-WRITE_LINE_DEVICE_HANDLER( i2cmem_scl_write )
-{
-	downcast<i2cmem_device *>( device )->set_scl_line( state );
-}
-
-void i2cmem_device::set_scl_line( int state )
+WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 {
 	if( m_scl != state )
 	{
@@ -497,12 +464,7 @@ void i2cmem_device::set_scl_line( int state )
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( i2cmem_wc_write )
-{
-	downcast<i2cmem_device *>( device )->set_wc_line( state );
-}
-
-void i2cmem_device::set_wc_line( int state )
+WRITE_LINE_MEMBER( i2cmem_device::write_wc )
 {
 	state &= 1;
 	if( m_wc != state )
@@ -513,12 +475,7 @@ void i2cmem_device::set_wc_line( int state )
 }
 
 
-READ_LINE_DEVICE_HANDLER( i2cmem_sda_read )
-{
-	return downcast<i2cmem_device *>( device )->read_sda_line();
-}
-
-int i2cmem_device::read_sda_line()
+READ_LINE_MEMBER( i2cmem_device::read_sda )
 {
 	int res = m_sdar & 1;
 
