@@ -48,6 +48,7 @@ class ymz770_device : public device_t, public device_sound_interface
 		INT16 output_data[1152];
 		int output_remaining;
 		int output_ptr;
+		int atbl;
 		int pptr;
 
 		UINT8 sequence;
@@ -84,7 +85,7 @@ protected:
 	UINT8 m_bsl;          // boost level
 	UINT8 m_cpl;          // clip limiter
 	UINT8 *m_rom_base;
-	int m_rom_size;
+	int m_rom_limit;
 
 	ymz_channel m_channels[8];
 };
