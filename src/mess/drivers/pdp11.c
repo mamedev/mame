@@ -81,6 +81,9 @@
         0xffce: R7 / PC
         0xfffe: PSW
 
+        SMS-1000:
+        Claims to be 100% compatible with DEC PDP-11. Added as a skeleton.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -425,9 +428,42 @@ ROM_START( pdp11qb )
 	ROM_LOAD16_BYTE( "m7195fa.1", 0xc000, 0x2000, CRC(0fa58752) SHA1(4bcd006790a60f2998ee8377ac5e2c18ef330930))
 	ROM_LOAD16_BYTE( "m7195fa.2", 0xc001, 0x2000, CRC(15b6f60c) SHA1(80dd4f8ca3c27babb5e75111b04241596a07c53a))
 ROM_END
+
+ROM_START( sms1000 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD( "21251000u",    0x00000, 0x008000, CRC(68db0afc) SHA1(577124bc64f6ddc9771e11b483120a175bfcf8c5) )
+	ROM_LOAD( "21251001u",    0x00000, 0x010000, CRC(eec3ccbb) SHA1(69eedb2c3bffe0a2988b1c066df1fea195618087) )
+	ROM_LOAD( "21251002u",    0x00000, 0x000800, CRC(66ca0eaf) SHA1(8141f64f81d9954169bcff6c79fd9f85e91f98e0) )
+	ROM_LOAD( "2123001",      0x00000, 0x000800, CRC(7eb10e9b) SHA1(521ce8b8a79075c30ad92d810141c725d26fc50e) )
+	ROM_LOAD( "2115001.jed",  0x00000, 0x000b19, CRC(02170f78) SHA1(afe50d165b39bff1cadae4290344341376729fda) )
+	// no idea how large these undumped proms are
+	ROM_LOAD( "2096001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2097002",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "20982000f",    0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "20982001f",    0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2099002b",     0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2108001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2109001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2110001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2111001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2116001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2117001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2118001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2119001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2120001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2121001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2122001",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2124008",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2124009",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2124010",      0x1f000, 0x000100, NO_DUMP )
+	ROM_LOAD( "2127001b",     0x1f000, 0x000100, NO_DUMP ) // has 3 of these
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( ????, pdp11ub,  0,       0,   pdp11,    pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9301-YA)",       GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( ????, pdp11ub2, pdp11ub, 0,   pdp11ub2, pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9312)",      GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( ????, pdp11qb,  pdp11ub, 0,   pdp11qb,  pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Q-BUS] (M7195 - MXV11)",      GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, sms1000,  pdp11ub, 0,   pdp11qb,  pdp11, driver_device,  0,   "Scientific Micro Systems",   "SMS-1000",      GAME_IS_SKELETON )
