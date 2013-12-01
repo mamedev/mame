@@ -2,7 +2,9 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    2013-12-01 Driver for Cromemco MCB-216 SCC (Single Card Computer)
+    2013-12-01 Driver for Cromemco MCB-216 SCC (Single Card Computer),
+    and also the earlier CB-308.
+
     The driver is working, just missing some hardware info (see ToDo).
 
     TODO:
@@ -15,12 +17,17 @@
     - 2000 to 23FF - standard ram
     - 2400 to FFFF - optional whatever the user wants (expect ram)
 
-    When started, you must press Enter twice, then you will be in BASIC.
-    To go to the monitor, use the QUIT command, and to return use the B
-    command.
+    MCB-216:
+    Press Enter twice. You will see the Basic OK prompt. To get into the
+    monitor, use the QUIT command, and to return use the B command.
 
     The mcb216 can use an optional floppy-disk-drive unit. The only other
     storage is paper-tape, which is expected to be attached to the terminal.
+
+    CB-308:
+    Press Enter twice. You will see the Monitor logo. To get into the
+    BASIC (if it was fitted), enter GE400. All monitor commands must be
+    in uppercase. The only storage is paper-tape.
 
 ****************************************************************************/
 
@@ -67,13 +74,6 @@ static ADDRESS_MAP_START(cb308_mem, AS_PROGRAM, 8, mcb216_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
-
-// io unknown, assumed to be the same as mcb216
-static ADDRESS_MAP_START(cb308_io, AS_IO, 8, mcb216_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(status_r)
-	AM_RANGE(0x01, 0x01) AM_READ(keyin_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 ADDRESS_MAP_END
 
 
@@ -132,7 +132,7 @@ static MACHINE_CONFIG_START( cb308, mcb216_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(cb308_mem)
-	MCFG_CPU_IO_MAP(cb308_io)
+	MCFG_CPU_IO_MAP(mcb216_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mcb216_state, cb308)
 
 	/* video hardware */
@@ -148,8 +148,11 @@ ROM_END
 
 ROM_START( cb308 )
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "cb308r0", 0x0000, 0x0800, NO_DUMP )
-	ROM_LOAD( "cb308r1", 0x0800, 0x0800, NO_DUMP )
+	ROM_LOAD( "cb308r0",  0x0000, 0x0400, CRC(62f50531) SHA1(3071e2ab7fc6b2ca889e4fb5cf7cc9ee8fbe53d3) )
+	// undumped BASIC
+	ROM_LOAD( "cb308r1",  0x0400, 0x0400, NO_DUMP )
+	ROM_LOAD( "cb308r2",  0x0800, 0x0400, NO_DUMP )
+	ROM_LOAD( "cb308r3",  0x0c00, 0x0400, NO_DUMP )
 ROM_END
 
 /* Driver */
