@@ -10643,7 +10643,9 @@ comg905d        // (c) 198? Cal Omega Inc.
 // IGT Player's Edge Plus
 peset001        // (c) 1987 IGT - International Gaming Technology
 peset038        // (c) 1987 IGT - International Gaming Technology
+pepp0002        // (c) 1987 IGT - International Gaming Technology
 pepp0043        // (c) 1987 IGT - International Gaming Technology
+pepp0045        // (c) 1987 IGT - International Gaming Technology
 pepp0055        // (c) 1987 IGT - International Gaming Technology
 pepp0055a       // (c) 1987 IGT - International Gaming Technology
 pepp0065        // (c) 1987 IGT - International Gaming Technology
@@ -10685,6 +10687,8 @@ pepp0447a       // (c) 1987 IGT - International Gaming Technology
 pepp0449        // (c) 1987 IGT - International Gaming Technology
 pepp0452        // (c) 1987 IGT - International Gaming Technology
 pepp0454        // (c) 1987 IGT - International Gaming Technology
+pepp0455        // (c) 1987 IGT - International Gaming Technology
+pepp0458        // (c) 1987 IGT - International Gaming Technology
 pepp0488        // (c) 1987 IGT - International Gaming Technology
 pepp0508        // (c) 1987 IGT - International Gaming Technology
 pepp0509        // (c) 1987 IGT - International Gaming Technology
@@ -10694,16 +10698,19 @@ pepp0515        // (c) 1987 IGT - International Gaming Technology
 pepp0515a       // (c) 1987 IGT - International Gaming Technology
 pepp0516        // (c) 1987 IGT - International Gaming Technology
 pepp0516a       // (c) 1987 IGT - International Gaming Technology
+pepp0536        // (c) 1987 IGT - International Gaming Technology
 pepp0538        // (c) 1987 IGT - International Gaming Technology
 pepp0540        // (c) 1987 IGT - International Gaming Technology
 pepp0542        // (c) 1987 IGT - International Gaming Technology
 pepp0568        // (c) 1987 IGT - International Gaming Technology
 pepp0585        // (c) 1987 IGT - International Gaming Technology
 pepp0725        // (c) 1987 IGT - International Gaming Technology
+pepp0726        // (c) 1987 IGT - International Gaming Technology
 pepp0728        // (c) 1987 IGT - International Gaming Technology
 pepp0760        // (c) 1987 IGT - International Gaming Technology
 pepp0763        // (c) 1987 IGT - International Gaming Technology
 pepp0775        // (c) 1987 IGT - International Gaming Technology
+peip0074        // (c) 1987 IGT - International Gaming Technology
 pebe0014        // (c) 1994 IGT - International Gaming Technology
 peke1012        // (c) 1994 IGT - International Gaming Technology
 peke1013        // (c) 1994 IGT - International Gaming Technology
@@ -10724,6 +10731,7 @@ peps0581        // (c) 1996 IGT - International Gaming Technology
 peps0615        // (c) 1996 IGT - International Gaming Technology
 peps0631        // (c) 1996 IGT - International Gaming Technology
 peps0716        // (c) 1996 IGT - International Gaming Technology
+pex0045p        // (c) 1995 IGT - International Gaming Technology
 pex0054p        // (c) 1995 IGT - International Gaming Technology
 pex0055p        // (c) 1995 IGT - International Gaming Technology
 pex0055pa       // (c) 1995 IGT - International Gaming Technology
@@ -10801,6 +10809,7 @@ pexm004p        // (c) 1997 IGT - International Gaming Technology
 pexm005p        // (c) 1997 IGT - International Gaming Technology
 pexm007p        // (c) 1997 IGT - International Gaming Technology
 pexmp017        // (c) 1997 IGT - International Gaming Technology
+pexmp017a       // (c) 1997 IGT - International Gaming Technology
 
 elgrande        // (c) 1982 Tuni Electro Service / E.T. Marketing
 jjpoker         // (c) 1983 Enter-Tech
