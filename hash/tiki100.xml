@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="tiki100" description="TIKI-100 Disk Images">
 
@@ -519,7 +519,7 @@
 		</part>
 	</software>
 
-	<software name="matematik">
+	<software name="matemati">
 		<description>Matematikk (Nor)</description>
 		<year>198?</year>
 		<publisher>Rogalandsdata Programvare</publisher>
