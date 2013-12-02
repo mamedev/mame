@@ -79,6 +79,9 @@ public:
 	// construction/destruction
 	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( videoram_r );
+	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
 
 protected:
@@ -87,10 +90,6 @@ protected:
 	
 private:
 	UINT8 *m_t1_displayram;
-	
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( videoram_r );
-	DECLARE_WRITE8_MEMBER( videoram_w );
 	void mode_switch( void );
 	void vga_data_w(int data);
 	void bank_w(int data);
@@ -108,6 +107,7 @@ public:
 	// construction/destruction
 	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
 	
 	UINT8   *m_jxkanji;
@@ -117,7 +117,6 @@ protected:
 	virtual void device_start();
 
 private:
-	DECLARE_WRITE8_MEMBER( write );
 	void pc_pcjr_mode_switch();
 	void pc_pcjr_vga_data_w(int data);
 	void pc_pcjr_bank_w(int data);

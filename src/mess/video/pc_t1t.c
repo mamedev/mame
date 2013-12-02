@@ -53,41 +53,16 @@ pcvideo_pcjr_device::pcvideo_pcjr_device(const machine_config &mconfig, const ch
 
 void pcvideo_t1000_device::device_start()
 {
-	int buswidth;
-	address_space &space = machine().firstcpu->space(AS_PROGRAM);
-	address_space &spaceio = machine().firstcpu->space(AS_IO);
-
 	m_chr_gen = machine().root_device().memregion("gfx1")->base();
 	m_update_row = NULL;
 	m_bank = 0;
 	m_chr_size = 1;
 	m_ra_offset = 256;
-
-	buswidth = machine().firstcpu->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			space.install_readwrite_handler(0xb8000, 0xbffff, read8_delegate(FUNC(pcvideo_t1000_device::videoram_r), this), write8_delegate(FUNC(pcvideo_t1000_device::videoram_w), this));
-			spaceio.install_readwrite_handler(0x3d0, 0x3df, read8_delegate(FUNC(pc_t1t_device::read), this), write8_delegate(FUNC(pcvideo_t1000_device::write), this));
-			break;
-
-		case 16:
-			space.install_readwrite_handler(0xb8000, 0xbffff, read8_delegate(FUNC(pcvideo_t1000_device::videoram_r), this), write8_delegate(FUNC(pcvideo_t1000_device::videoram_w), this), 0xffff );
-			spaceio.install_readwrite_handler(0x3d0, 0x3df, read8_delegate(FUNC(pc_t1t_device::read), this), write8_delegate(FUNC(pcvideo_t1000_device::write), this), 0xffff );
-			break;
-
-		default:
-			fatalerror("T1T: Bus width %d not supported\n", buswidth);
-			break;
-	}
 }
 
 
 void pcvideo_pcjr_device::device_start()
 {
-	int buswidth;
-	address_space &spaceio = machine().firstcpu->space(AS_IO);
-
 	m_chr_gen = machine().root_device().memregion("gfx1")->base();
 	m_update_row = NULL;
 	m_bank = 0;
@@ -98,18 +73,6 @@ void pcvideo_pcjr_device::device_start()
 		m_jxkanji = machine().root_device().memregion("kanji")->base();
 	else
 		m_jxkanji = NULL;
-
-	buswidth = machine().firstcpu->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 8:
-			spaceio.install_readwrite_handler(0x3d0, 0x3df, read8_delegate(FUNC(pc_t1t_device::read), this), write8_delegate(FUNC(pcvideo_pcjr_device::write), this));
-			break;
-
-		default:
-			fatalerror("PCJR: Bus width %d not supported\n", buswidth);
-			break;
-	}
 }
 
 

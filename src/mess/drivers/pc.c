@@ -374,6 +374,7 @@ static ADDRESS_MAP_START(tandy1000_map, AS_PROGRAM, 8, tandy_pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
+	AM_RANGE(0xb8000, 0xbffff) AM_DEVREADWRITE("pcvideo_t1000", pcvideo_t1000_device, videoram_r, videoram_w);
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
@@ -394,6 +395,7 @@ static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, tandy_pc_state )
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,         pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE("pcvideo_t1000", pcvideo_t1000_device, read, write)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE("fdc", pc_fdc_interface, map)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
@@ -404,6 +406,7 @@ static ADDRESS_MAP_START(tandy1000_16_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
+	AM_RANGE(0xb8000, 0xbffff) AM_DEVREADWRITE8("pcvideo_t1000", pcvideo_t1000_device, videoram_r, videoram_w, 0xffff)
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
@@ -423,6 +426,7 @@ static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, tandy_pc_state )
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,            pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0xffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("pcvideo_t1000", pcvideo_t1000_device, read, write, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
@@ -435,6 +439,7 @@ static ADDRESS_MAP_START(tandy1000_286_map, AS_PROGRAM, 16, tandy_pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
+	AM_RANGE(0xb8000, 0xbffff) AM_DEVREADWRITE8("pcvideo_t1000", pcvideo_t1000_device, videoram_r, videoram_w, 0xffff)
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
 	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
 	AM_RANGE(0xca000, 0xcffff) AM_NOP
@@ -455,6 +460,7 @@ static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16, tandy_pc_state )
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,           pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_device, read, write, 0xffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("pcvideo_t1000", pcvideo_t1000_device, read, write, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
@@ -487,6 +493,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, tandy_pc_state )
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,         pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE("pcvideo_pcjr", pcvideo_pcjr_device, read, write)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
 
