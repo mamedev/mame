@@ -5,6 +5,15 @@
     Emulation by R. Belmont
     AMM decode by Olivier Galibert
 
+-----
+TODO:
+- A lot of unimplemented features, even simple ones like panning,
+  these should be added once we find out any software that uses it.
+- Sequencer is very preliminary
+- What does channel ATBL mean?
+- Is YMZ774(and other variants) the same family as this chip?
+  What are the differences?
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -39,8 +48,8 @@ void ymz770_device::device_start()
 {
 	// create the stream
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, 16000, this);
-	m_rom_base = device().machine().root_device().memregion(":ymz770")->base();
-	m_rom_limit = device().machine().root_device().memregion(":ymz770")->bytes() * 8;
+	m_rom_base = *region();
+	m_rom_limit = region()->bytes() * 8;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -119,7 +128,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 		{
 			if (m_channels[ch].is_seq_playing)
 			{
-				if (m_channels[ch].seqdelay != 0)
+				if (m_channels[ch].seqdelay > 0)
 				{
 					m_channels[ch].seqdelay--;
 				}
@@ -155,7 +164,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			{
 				if (m_channels[ch].output_remaining > 0)
 				{
-					mix += (m_channels[ch].output_data[m_channels[ch].output_ptr++]*2*m_channels[ch].volume);
+					mix += (m_channels[ch].output_data[m_channels[ch].output_ptr++]*m_channels[ch].volume);
 					m_channels[ch].output_remaining--;
 				}
 				else
@@ -179,12 +188,7 @@ retry:
 					if (m_channels[ch].is_playing)
 					{
 						int sample_rate, channel_count;
-						if (!m_channels[ch].decoder->decode_buffer(m_channels[ch].pptr,
-																m_rom_limit,
-																m_channels[ch].output_data,
-																m_channels[ch].output_remaining,
-																sample_rate,
-																channel_count))
+						if (!m_channels[ch].decoder->decode_buffer(m_channels[ch].pptr, m_rom_limit, m_channels[ch].output_data, m_channels[ch].output_remaining, sample_rate, channel_count) || m_channels[ch].output_remaining == 0)
 						{
 							m_channels[ch].is_playing = !m_channels[ch].last_block; // detect infinite retry loop
 							m_channels[ch].last_block = true;
@@ -195,7 +199,7 @@ retry:
 						m_channels[ch].output_remaining--;
 						m_channels[ch].output_ptr = 1;
 
-						mix += (m_channels[ch].output_data[0]*2*m_channels[ch].volume);
+						mix += (m_channels[ch].output_data[0]*m_channels[ch].volume);
 					}
 				}
 			}
