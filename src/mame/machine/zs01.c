@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /*
  * zs01.c
  *
@@ -7,125 +9,114 @@
  *
  */
 
-#include "emu.h"
 #include "machine/zs01.h"
 
-#define VERBOSE_LEVEL 0
+#define VERBOSE_LEVEL ( 0 )
 
-inline void ATTR_PRINTF(3,4) zs01_device::verboselog(int n_level, const char *s_fmt, ...)
+inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char *s_fmt, ... )
 {
-	if(VERBOSE_LEVEL >= n_level)
+	if( VERBOSE_LEVEL >= n_level )
 	{
 		va_list v;
-		char buf[32768];
-		va_start(v, s_fmt);
-		vsprintf(buf, s_fmt, v);
-		va_end(v);
-		logerror("zs01 %s %s: %s", tag(), machine().describe_context(), buf);
+		char buf[ 32768 ];
+		va_start( v, s_fmt );
+		vsprintf( buf, s_fmt, v );
+		va_end( v );
+		logerror( "%s: zs01(%s) %s", machine().describe_context(), tag(), buf );
 	}
 }
 
 // device type definition
 const device_type ZS01 = &device_creator<zs01_device>;
 
-void zs01_device::static_set_ds2401_tag(device_t &device, const char *ds2401_tag)
-{
-	zs01_device &zs01 = downcast<zs01_device &>(device);
-	zs01.ds2401_tag = ds2401_tag;
-}
-
-zs01_device::zs01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_secure_serial_flash(mconfig, ZS01, "ZS01", tag, owner, clock, "zs01", __FILE__)
+zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: device_t( mconfig, ZS01, "ZS01", tag, owner, clock, "zs01", __FILE__ ),
+	device_nvram_interface(mconfig, *this),
+	m_cs( 0 ),
+	m_rst( 0 ),
+	m_scl( 0 ),
+	m_sdaw( 0 ),
+	m_sdar( 0 ),
+	m_state( STATE_STOP ),
+	m_shift( 0 ),
+	m_bit( 0 ),
+	m_byte( 0 )
 {
 }
 
 void zs01_device::device_start()
 {
-	device_secure_serial_flash::device_start();
-	save_item(NAME(state));
-	save_item(NAME(shift));
-	save_item(NAME(bit));
-	save_item(NAME(byte));
-	save_item(NAME(write_buffer));
-	save_item(NAME(read_buffer));
-	save_item(NAME(response_key));
-	save_item(NAME(response_to_reset));
-	save_item(NAME(command_key));
-	save_item(NAME(data_key));
-
-	m_ds2401 = siblingdevice<ds2401_device>(ds2401_tag);
+	m_ds2401 = siblingdevice<ds2401_device>(m_ds2401_tag);
 	if( m_ds2401 == NULL )
 	{
-		logerror( "ds2401 '%s' not found\n", ds2401_tag );
+		logerror( "ds2401 '%s' not found\n", m_ds2401_tag );
 	}
+
+	memset( m_write_buffer, 0, sizeof( m_write_buffer ) );
+	memset( m_read_buffer, 0, sizeof( m_read_buffer ) );
+	memset( m_response_key, 0, sizeof( m_response_key ) );
+
+	save_item( NAME( m_cs ) );
+	save_item( NAME( m_rst ) );
+	save_item( NAME( m_scl ) );
+	save_item( NAME( m_sdaw ) );
+	save_item( NAME( m_sdar ) );
+	save_item( NAME( m_state ) );
+	save_item( NAME( m_shift ) );
+	save_item( NAME( m_bit ) );
+	save_item( NAME( m_byte ) );
+	save_item( NAME( m_write_buffer ) );
+	save_item( NAME( m_read_buffer ) );
+	save_item( NAME( m_response_key ) );
+	save_item( NAME( m_response_to_reset ) );
+	save_item( NAME( m_command_key ) );
+	save_item( NAME( m_data_key ) );
+	save_item( NAME( m_data ) );
 }
 
-void zs01_device::device_reset()
+WRITE_LINE_MEMBER( zs01_device::write_rst )
 {
-	device_secure_serial_flash::device_reset();
-	state = STATE_STOP;
-	shift = 0;
-	bit = 0;
-	byte = 0;
-	memset(write_buffer, 0, SIZE_WRITE_BUFFER);
-	memset(read_buffer, 0, SIZE_READ_BUFFER);
-	memset(response_key, 0, SIZE_KEY);
-}
-
-void zs01_device::nvram_default()
-{
-	// region always wins
-	if(m_region)
+	if( m_rst != state )
 	{
-		// Ensure the size is correct though
-		if(m_region->bytes() != SIZE_RESPONSE_TO_RESET+SIZE_KEY+SIZE_KEY+SIZE_DATA)
-			logerror("zs01 %s: Wrong region length for initialization data, expected 0x%x, got 0x%x\n",
-						tag(),
-						SIZE_RESPONSE_TO_RESET+SIZE_KEY+SIZE_KEY+SIZE_DATA,
-						m_region->bytes());
-		else {
-			UINT8 *rb = m_region->base();
-			int offset = 0;
-			memcpy(response_to_reset, rb + offset, SIZE_RESPONSE_TO_RESET); offset += SIZE_RESPONSE_TO_RESET;
-			memcpy(command_key,       rb + offset, SIZE_KEY); offset += SIZE_KEY;
-			memcpy(data_key,          rb + offset, SIZE_KEY); offset += SIZE_KEY;
-			memcpy(data,              rb + offset, SIZE_DATA); offset += SIZE_DATA;
-			return;
-		}
+		verboselog( 2, "rst=%d\n", state );
 	}
 
-	// That chip isn't really usable without the passwords, so bitch
-	// if there's no region
-	logerror("zs01 %s: Warning, no default data provided, chip is unusable.\n", tag());
-	memset(response_to_reset, 0, SIZE_RESPONSE_TO_RESET);
-	memset(command_key,       0, SIZE_KEY);
-	memset(data_key,          0, SIZE_KEY);
-	memset(data,              0, SIZE_DATA);
-}
-
-void zs01_device::cs_0()
-{
-}
-
-void zs01_device::cs_1()
-{
-}
-
-void zs01_device::rst_0()
-{
-}
-
-void zs01_device::rst_1()
-{
-	if(!cs) {
-		verboselog(1, "goto response to reset\n");
-		state = STATE_RESPONSE_TO_RESET;
-		bit = 0;
-		byte = 0;
+	if( m_rst == 0 && state != 0 && m_cs == 0 )
+	{
+		verboselog( 1, "goto response to reset\n" );
+		m_state = STATE_RESPONSE_TO_RESET;
+		m_bit = 0;
+		m_byte = 0;
 	}
+
+	m_rst = state;
 }
 
-void zs01_device::decrypt(UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte)
+WRITE_LINE_MEMBER( zs01_device::write_cs )
+{
+	if( m_cs != state )
+	{
+		verboselog( 2, "cs=%d\n", state );
+	}
+
+//  if( m_cs != 0 && state == 0 )
+//  {
+//      /* enable chip */
+//      m_state = STATE_STOP;
+//  }
+
+//  if( m_cs == 0 && state != 0 )
+//  {
+//      /* disable chip */
+//      m_state = STATE_STOP;
+//      /* high impendence? */
+//      m_sdar = 0;
+//  }
+
+	m_cs = state;
+}
+
+void zs01_device::decrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte )
 {
 	UINT32 a0;
 	UINT32 v1;
@@ -172,7 +163,7 @@ void zs01_device::decrypt(UINT8 *destination, UINT8 *source, int length, UINT8 *
 	}
 }
 
-void zs01_device::decrypt2(UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte)
+void zs01_device::decrypt2( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte )
 {
 	UINT32 a0;
 	UINT32 v1;
@@ -220,7 +211,7 @@ void zs01_device::decrypt2(UINT8 *destination, UINT8 *source, int length, UINT8 
 	}
 }
 
-void zs01_device::encrypt(UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT32 previous_byte)
+void zs01_device::encrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT32 previous_byte )
 {
 	UINT32 t0;
 	UINT32 v0;
@@ -268,7 +259,7 @@ void zs01_device::encrypt(UINT8 *destination, UINT8 *source, int length, UINT8 *
 	}
 }
 
-UINT16 zs01_device::do_crc(UINT8 *buffer, UINT32 length)
+UINT16 zs01_device::calc_crc( UINT8 *buffer, UINT32 length )
 {
 	UINT32 v1;
 	UINT32 a3;
@@ -318,221 +309,309 @@ UINT16 zs01_device::do_crc(UINT8 *buffer, UINT32 length)
 
 int zs01_device::data_offset()
 {
-	int block = ( (write_buffer[0] & 2 ) << 7 ) | write_buffer[1];
+	int block = ( ( m_write_buffer[ 0 ] & 2 ) << 7 ) | m_write_buffer[ 1 ];
 
 	return block * SIZE_DATA_BUFFER;
 }
 
-void zs01_device::scl_0()
+WRITE_LINE_MEMBER( zs01_device::write_scl )
 {
-	if(!cs) {
-		switch(state) {
-		case STATE_STOP:
-			break;
-
-		case STATE_RESPONSE_TO_RESET:
-			if(!bit) {
-				shift = response_to_reset[byte];
-				verboselog(1, "<- response_to_reset[%d]: %02x\n", byte, shift);
-			}
-
-			sdar = (shift >> 7) & 1;
-			shift <<= 1;
-			bit++;
-
-			if( bit == 8 ) {
-				bit = 0;
-				byte++;
-				if( byte == 4 ) {
-					sdar = true;
-					verboselog(1, "goto stop\n");
-					state = STATE_STOP;
-				}
-			}
-			break;
-
-		case STATE_LOAD_COMMAND:
-			break;
-
-		case STATE_READ_DATA:
-			break;
-		}
+	if( m_scl != state )
+	{
+		verboselog( 2, "scl=%d\n", state );
 	}
-}
 
-void zs01_device::scl_1()
-{
-	if(!cs) {
-		switch(state) {
+	if( m_cs == 0 )
+	{
+		switch( m_state )
+		{
 		case STATE_STOP:
 			break;
 
 		case STATE_RESPONSE_TO_RESET:
-			break;
-
-		case STATE_LOAD_COMMAND:
-			if(bit < 8) {
-				shift <<= 1;
-				if(sdaw)
-					shift |= 1;
-				bit++;
-				verboselog(2, "clock %d %02x\n", bit, shift);
-			} else {
-				sdar = false;
-
-				switch(state) {
-				case STATE_LOAD_COMMAND:
-					write_buffer[byte] = shift;
-					verboselog(2, "-> write_buffer[%d]: %02x\n", byte, write_buffer[byte]);
-					byte++;
-					if(byte == SIZE_WRITE_BUFFER) {
-						UINT16 crc;
-
-						decrypt(write_buffer, write_buffer, SIZE_WRITE_BUFFER, command_key, 0xff);
-
-						if(write_buffer[0] & 4)
-							decrypt2(&write_buffer[2], &write_buffer[2], SIZE_DATA_BUFFER, data_key, 0x00);
-
-						crc = do_crc(write_buffer, 10);
-
-						if(crc == ((write_buffer[10] << 8) | write_buffer[11])) {
-							verboselog(1, "-> command: %02x\n", write_buffer[0]);
-							verboselog(1, "-> address: %02x\n", write_buffer[1]);
-							verboselog(1, "-> data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
-										write_buffer[2], write_buffer[3], write_buffer[4], write_buffer[5],
-										write_buffer[6], write_buffer[7], write_buffer[8], write_buffer[9]);
-							verboselog(1, "-> crc: %02x%02x\n", write_buffer[10], write_buffer[11]);
-							switch(write_buffer[0] & 1) {
-							case COMMAND_WRITE:
-								memcpy(&data[data_offset()], &write_buffer[2], SIZE_DATA_BUFFER);
-
-								/* todo: find out what should be returned. */
-								memset(&read_buffer[0] , 0, SIZE_WRITE_BUFFER);
-								break;
-
-							case COMMAND_READ:
-								/* todo: find out what should be returned. */
-								memset(&read_buffer[0], 0, 2);
-
-								switch(write_buffer[1]) {
-								case 0xfd: {
-									/* TODO: use read/write to talk to the ds2401, which will require a timer. */
-									if( m_ds2401 != NULL )
-										for(int i = 0; i < SIZE_DATA_BUFFER; i++)
-											read_buffer[2+i] = m_ds2401->direct_read(SIZE_DATA_BUFFER-i-1);
-									break;
-								}
-								default:
-									memcpy(&read_buffer[2], &data[data_offset()], SIZE_DATA_BUFFER);
-									break;
-								}
-
-								memcpy(response_key, &write_buffer[2], SIZE_KEY);
-								break;
-							}
-						} else {
-							verboselog(0, "bad crc\n");
-							/* todo: find out what should be returned. */
-							memset(&read_buffer[0], 0xff, 2 );
-						}
-
-						verboselog(1, "<- status: %02x%02x\n",
-									read_buffer[0], read_buffer[1]);
-
-						verboselog(1, "<- data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
-									read_buffer[2], read_buffer[3], read_buffer[4], read_buffer[5],
-									read_buffer[6], read_buffer[7], read_buffer[8], read_buffer[9]);
-
-						crc = do_crc(read_buffer, 10);
-						read_buffer[10] = crc >> 8;
-						read_buffer[11] = crc & 255;
-
-						encrypt(read_buffer, read_buffer, SIZE_READ_BUFFER, response_key, 0xff);
-
-						byte = 0;
-						state = STATE_READ_DATA;
-					}
-					break;
+			if( m_scl != 0 && state == 0 )
+			{
+				if( m_bit == 0 )
+				{
+					m_shift = m_response_to_reset[ m_byte ];
+					verboselog( 1, "<- response_to_reset[ %d ]: %02x\n", m_byte, m_shift );
 				}
 
-				bit = 0;
-				shift = 0;
+				m_sdar = ( m_shift >> 7 ) & 1;
+				m_shift <<= 1;
+				m_bit++;
+
+				if( m_bit == 8 )
+				{
+					m_bit = 0;
+					m_byte++;
+
+					if( m_byte == sizeof( m_response_to_reset ) )
+					{
+						m_sdar = 1;
+						verboselog( 1, "goto stop\n" );
+						m_state = STATE_STOP;
+					}
+				}
 			}
 			break;
 
-		case STATE_READ_DATA:
-			if(bit < 8) {
-				if(bit == 0) {
-					switch(state) {
-					case STATE_READ_DATA:
-						shift = read_buffer[byte];
-						verboselog(2, "<- read_buffer[%d]: %02x\n", byte, shift);
+		case STATE_LOAD_COMMAND:
+			if( m_scl == 0 && state != 0 )
+			{
+				if( m_bit < 8 )
+				{
+					verboselog( 2, "clock\n" );
+					m_shift <<= 1;
+
+					if( m_sdaw != 0 )
+					{
+						m_shift |= 1;
+					}
+
+					m_bit++;
+				}
+				else
+				{
+					m_sdar = 0;
+
+					switch( m_state )
+					{
+					case STATE_LOAD_COMMAND:
+						m_write_buffer[ m_byte ] = m_shift;
+						verboselog( 2, "-> write_buffer[ %d ]: %02x\n", m_byte, m_write_buffer[ m_byte ] );
+
+						m_byte++;
+						if( m_byte == sizeof( m_write_buffer ) )
+						{
+							decrypt( m_write_buffer, m_write_buffer, sizeof( m_write_buffer ), m_command_key, 0xff );
+
+							if( ( m_write_buffer[ 0 ] & 4 ) != 0 )
+							{
+								decrypt2( &m_write_buffer[ 2 ], &m_write_buffer[ 2 ], SIZE_DATA_BUFFER, m_data_key, 0x00 );
+							}
+
+							UINT16 crc = calc_crc( m_write_buffer, 10 );
+
+							if( crc == ( ( m_write_buffer[ 10 ] << 8 ) | m_write_buffer[ 11 ] ) )
+							{
+								verboselog( 1, "-> command: %02x\n", m_write_buffer[ 0 ] );
+								verboselog( 1, "-> address: %02x\n", m_write_buffer[ 1 ] );
+								verboselog( 1, "-> data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
+									m_write_buffer[ 2 ], m_write_buffer[ 3 ], m_write_buffer[ 4 ], m_write_buffer[ 5 ],
+									m_write_buffer[ 6 ], m_write_buffer[ 7 ], m_write_buffer[ 8 ], m_write_buffer[ 9 ] );
+								verboselog( 1, "-> crc: %02x%02x\n", m_write_buffer[ 10 ], m_write_buffer[ 11 ] );
+
+								switch( m_write_buffer[ 0 ] & 1 )
+								{
+								case COMMAND_WRITE:
+									memcpy( &m_data[ data_offset() ], &m_write_buffer[ 2 ], SIZE_DATA_BUFFER );
+
+									/* todo: find out what should be returned. */
+									memset( &m_read_buffer[ 0 ], 0, sizeof( m_write_buffer ) );
+									break;
+
+								case COMMAND_READ:
+									/* todo: find out what should be returned. */
+									memset( &m_read_buffer[ 0 ], 0, 2 );
+
+									switch( m_write_buffer[ 1 ] )
+									{
+									case 0xfd:
+										{
+											/* TODO: use read/write to talk to the ds2401, which will require a timer. */
+											for( int i = 0; i < SIZE_DATA_BUFFER; i++ )
+											{
+												m_read_buffer[ 2 + i ] = m_ds2401->direct_read( SIZE_DATA_BUFFER - i - 1 );
+											}
+										}
+										break;
+
+									default:
+										memcpy( &m_read_buffer[ 2 ], &m_data[ data_offset() ], SIZE_DATA_BUFFER );
+										break;
+									}
+
+									memcpy( m_response_key, &m_write_buffer[ 2 ], sizeof( m_response_key ) );
+									break;
+								}
+							}
+							else
+							{
+								verboselog( 0, "bad crc\n" );
+
+								/* todo: find out what should be returned. */
+								memset( &m_read_buffer[ 0 ], 0xff, 2 );
+							}
+
+							verboselog( 1, "<- status: %02x%02x\n",
+								m_read_buffer[ 0 ], m_read_buffer[ 1 ] );
+
+							verboselog( 1, "<- data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
+								m_read_buffer[ 2 ], m_read_buffer[ 3 ], m_read_buffer[ 4 ], m_read_buffer[ 5 ],
+								m_read_buffer[ 6 ], m_read_buffer[ 7 ], m_read_buffer[ 8 ], m_read_buffer[ 9 ] );
+
+							crc = calc_crc( m_read_buffer, 10 );
+							m_read_buffer[ 10 ] = crc >> 8;
+							m_read_buffer[ 11 ] = crc & 255;
+
+							encrypt( m_read_buffer, m_read_buffer, sizeof( m_read_buffer ), m_response_key, 0xff );
+
+							m_byte = 0;
+							m_state = STATE_READ_DATA;
+						}
 						break;
 					}
+
+					m_bit = 0;
+					m_shift = 0;
 				}
-				sdar = (shift >> 7) & 1;
-				shift <<= 1;
-				bit++;
-			} else {
-				bit = 0;
-				sdar = false;
-				if(!sdaw) {
-					verboselog(2, "ack <-\n");
-					byte++;
-					if(byte == SIZE_READ_BUFFER) {
-						byte = 0;
-						sdar = true;
-						state = STATE_LOAD_COMMAND;
+			}
+			break;
+
+		case STATE_READ_DATA:
+			if( m_scl == 0 && state != 0 )
+			{
+				if( m_bit < 8 )
+				{
+					if( m_bit == 0 )
+					{
+						switch( m_state )
+						{
+						case STATE_READ_DATA:
+							m_shift = m_read_buffer[ m_byte ];
+							verboselog( 2, "<- read_buffer[ %d ]: %02x\n", m_byte, m_shift );
+							break;
+						}
 					}
-				} else {
-					verboselog(2, "nak <-\n");
+
+					m_sdar = ( m_shift >> 7 ) & 1;
+					m_shift <<= 1;
+					m_bit++;
+				}
+				else
+				{
+					m_bit = 0;
+					m_sdar = 0;
+
+					if( m_sdaw == 0 )
+					{
+						verboselog( 2, "ack <-\n" );
+						m_byte++;
+
+						if( m_byte == sizeof( m_read_buffer ) )
+						{
+							m_byte = 0;
+							m_sdar = 1;
+							m_state = STATE_LOAD_COMMAND;
+						}
+					}
+					else
+					{
+						verboselog( 2, "nak <-\n" );
+					}
 				}
 			}
 			break;
 		}
 	}
+
+	m_scl = state;
 }
 
-void zs01_device::sda_1()
+WRITE_LINE_MEMBER( zs01_device::write_sda )
 {
-	if(!cs && scl){
-//      state = STATE_STOP;
-//      sdar = false;
+	if( m_sdaw != state )
+	{
+		verboselog( 2, "sdaw=%d\n", state );
 	}
-}
 
-void zs01_device::sda_0()
-{
-	if(!cs && scl) {
-		switch(state) {
-		case STATE_STOP:
-			verboselog(1, "goto start\n");
-			state = STATE_LOAD_COMMAND;
-			break;
-			//  default:
-			//      verboselog(1, "skipped start (default)\n");
-			//      break;
+	if( m_cs == 0 && m_scl != 0 )
+	{
+//      if( m_sdaw == 0 && state != 0 )
+//      {
+//          verboselog( 1, "goto stop\n" );
+//          m_state = STATE_STOP;
+//          m_sdar = 0;
+//      }
+
+		if( m_sdaw != 0 && state == 0 )
+		{
+			switch( m_state )
+			{
+			case STATE_STOP:
+				verboselog( 1, "goto start\n" );
+				m_state = STATE_LOAD_COMMAND;
+				break;
+
+//          default:
+//              verboselog( 1, "skipped start (default)\n" );
+//              break;
+			}
+
+			m_bit = 0;
+			m_byte = 0;
+			m_shift = 0;
+			m_sdar = 0;
 		}
+	}
 
-		bit = 0;
-		byte = 0;
-		shift = 0;
-		sdar = false;
+	m_sdaw = state;
+}
+
+READ_LINE_MEMBER( zs01_device::read_sda )
+{
+	if( m_cs != 0 )
+	{
+		verboselog( 2, "not selected\n" );
+		return 1;
+	}
+
+	verboselog( 2, "sdar=%d\n", m_sdar );
+
+	return m_sdar;
+}
+
+void zs01_device::nvram_default()
+{
+	memset( m_response_to_reset, 0, sizeof( m_response_to_reset ) );
+	memset( m_command_key, 0, sizeof( m_command_key ) );
+	memset( m_data_key, 0, sizeof( m_data_key ) );
+	memset( m_data, 0, sizeof( m_data ) );
+
+	int expected_bytes = sizeof( m_response_to_reset ) + sizeof( m_command_key ) + sizeof( m_data_key ) + sizeof( m_data );
+
+	if( !m_region )
+	{
+		logerror( "zs01(%s) region not found\n", tag() );
+	}
+	else if( m_region->bytes() != expected_bytes )
+	{
+		logerror( "zs01(%s) region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), expected_bytes );
+	}
+	else
+	{
+		UINT8 *region = m_region->base();
+
+		memcpy( m_response_to_reset, region, sizeof( m_response_to_reset ) ); region += sizeof( m_response_to_reset );
+		memcpy( m_command_key, region, sizeof( m_command_key ) ); region += sizeof( m_command_key );
+		memcpy( m_data_key, region, sizeof( m_data_key ) ); region += sizeof( m_data_key );
+		memcpy( m_data, region, sizeof( m_data ) ); region += sizeof( m_data );
 	}
 }
 
-void zs01_device::nvram_read(emu_file &file)
+void zs01_device::nvram_read( emu_file &file )
 {
-	file.read(response_to_reset, SIZE_RESPONSE_TO_RESET);
-	file.read(command_key,       SIZE_KEY);
-	file.read(data_key,          SIZE_KEY);
-	file.read(data,              SIZE_DATA);
+	file.read( m_response_to_reset, sizeof( m_response_to_reset ) );
+	file.read( m_command_key, sizeof( m_command_key ) );
+	file.read( m_data_key, sizeof( m_data_key ) );
+	file.read( m_data, sizeof( m_data ) );
 }
 
-void zs01_device::nvram_write(emu_file &file)
+void zs01_device::nvram_write( emu_file &file )
 {
-	file.write(response_to_reset, SIZE_RESPONSE_TO_RESET);
-	file.write(command_key,       SIZE_KEY);
-	file.write(data_key,          SIZE_KEY);
-	file.write(data,              SIZE_DATA);
+	file.write( m_response_to_reset, sizeof( m_response_to_reset ) );
+	file.write( m_command_key, sizeof( m_command_key ) );
+	file.write( m_data_key, sizeof( m_data_key ) );
+	file.write( m_data, sizeof( m_data ) );
 }

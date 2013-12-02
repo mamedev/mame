@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /*
  * x76f100.c
  *
@@ -12,133 +14,122 @@
 #include "emu.h"
 #include "machine/x76f100.h"
 
-#define VERBOSE_LEVEL 0
+#define VERBOSE_LEVEL ( 0 )
 
-inline void ATTR_PRINTF(3,4) x76f100_device::verboselog(int n_level, const char *s_fmt, ...)
+inline void ATTR_PRINTF( 3, 4 ) x76f100_device::verboselog( int n_level, const char *s_fmt, ... )
 {
-	if(VERBOSE_LEVEL >= n_level)
+	if( VERBOSE_LEVEL >= n_level )
 	{
 		va_list v;
-		char buf[32768];
-		va_start(v, s_fmt);
-		vsprintf(buf, s_fmt, v);
-		va_end(v);
-		logerror("x76f100 %s %s: %s", tag(), machine().describe_context(), buf);
+		char buf[ 32768 ];
+		va_start( v, s_fmt );
+		vsprintf( buf, s_fmt, v );
+		va_end( v );
+		logerror( "%s: x76f100(%s) %s", machine().describe_context(), tag(), buf );
 	}
 }
 
 // device type definition
 const device_type X76F100 = &device_creator<x76f100_device>;
 
-x76f100_device::x76f100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_secure_serial_flash(mconfig, X76F100, "X76F100", tag, owner, clock, "x76f100", __FILE__)
+x76f100_device::x76f100_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: device_t( mconfig, X76F100, "X76F100", tag, owner, clock, "x76f100", __FILE__ ),
+	device_nvram_interface(mconfig, *this),
+	m_cs( 0 ),
+	m_rst( 0 ),
+	m_scl( 0 ),
+	m_sdaw( 0 ),
+	m_sdar( 0 ),
+	m_state( STATE_STOP ),
+	m_shift( 0 ),
+	m_bit( 0 ),
+	m_byte( 0 ),
+	m_command( 0 )
 {
 }
 
 void x76f100_device::device_start()
 {
-	device_secure_serial_flash::device_start();
-	save_item(NAME(state));
-	save_item(NAME(shift));
-	save_item(NAME(bit));
-	save_item(NAME(byte));
-	save_item(NAME(command));
-	save_item(NAME(write_buffer));
-	save_item(NAME(response_to_reset));
-	save_item(NAME(write_password));
-	save_item(NAME(read_password));
-	save_item(NAME(data));
+	memset( m_write_buffer, 0, sizeof( m_write_buffer ) );
+
+	save_item( NAME( m_cs ) );
+	save_item( NAME( m_rst ) );
+	save_item( NAME( m_scl ) );
+	save_item( NAME( m_sdaw ) );
+	save_item( NAME( m_sdar ) );
+	save_item( NAME( m_state ) );
+	save_item( NAME( m_shift ) );
+	save_item( NAME( m_bit ) );
+	save_item( NAME( m_byte ) );
+	save_item( NAME( m_command ) );
+	save_item( NAME( m_write_buffer ) );
+	save_item( NAME( m_response_to_reset ) );
+	save_item( NAME( m_write_password ) );
+	save_item( NAME( m_read_password ) );
+	save_item( NAME( m_data ) );
 }
 
-void x76f100_device::device_reset()
+WRITE_LINE_MEMBER( x76f100_device::write_cs )
 {
-	device_secure_serial_flash::device_reset();
-	state = STATE_STOP;
-	shift = 0;
-	bit = 0;
-	byte = 0;
-	command = 0;
-	memset(write_buffer, 0, SIZE_WRITE_BUFFER);
-}
-
-void x76f100_device::nvram_default()
-{
-	// region always wins
-	if(m_region)
+	if( m_cs != state )
 	{
-		// Ensure the size is correct though
-		if(m_region->bytes() != SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+SIZE_READ_PASSWORD+SIZE_DATA)
-			logerror("x76f100 %s: Wrong region length for initialization data, expected 0x%x, got 0x%x\n",
-						tag(),
-						SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+SIZE_READ_PASSWORD+SIZE_DATA,
-						m_region->bytes());
-		else {
-			UINT8 *rb = m_region->base();
-			int offset = 0;
-			memcpy(response_to_reset, rb + offset, SIZE_RESPONSE_TO_RESET); offset += SIZE_RESPONSE_TO_RESET;
-			memcpy(write_password,    rb + offset, SIZE_WRITE_PASSWORD); offset += SIZE_WRITE_PASSWORD;
-			memcpy(read_password,     rb + offset, SIZE_READ_PASSWORD); offset += SIZE_READ_PASSWORD;
-			memcpy(data,              rb + offset, SIZE_DATA); offset += SIZE_DATA;
-			return;
-		}
+		verboselog( 2, "cs=%d\n", state );
 	}
 
-	// That chip isn't really usable without the passwords, so bitch
-	// if there's no region
-	logerror("x76f100 %s: Warning, no default data provided, chip is unusable.\n", tag());
-	memset(response_to_reset, 0, SIZE_RESPONSE_TO_RESET);
-	memset(write_password,    0, SIZE_WRITE_PASSWORD);
-	memset(read_password,     0, SIZE_READ_PASSWORD);
-	memset(data,              0, SIZE_DATA);
-}
-
-void x76f100_device::cs_0()
-{
-	/* enable chip */
-	state = STATE_STOP;
-}
-
-void x76f100_device::cs_1()
-{
-	/* disable chip */
-	state = STATE_STOP;
-	/* high impendence? */
-	sdar = 0;
-}
-
-void x76f100_device::rst_0()
-{
-}
-
-void x76f100_device::rst_1()
-{
-	if(!cs) {
-		verboselog(1, "goto response to reset\n");
-		state = STATE_RESPONSE_TO_RESET;
-		bit = 0;
-		byte = 0;
+	if( m_cs != 0 && state == 0 )
+	{
+		/* enable chip */
+		m_state = STATE_STOP;
 	}
+
+	if( m_cs == 0 && state != 0 )
+	{
+		/* disable chip */
+		m_state = STATE_STOP;
+		/* high impendence? */
+		m_sdar = 0;
+	}
+
+	m_cs = state;
+}
+
+WRITE_LINE_MEMBER( x76f100_device::write_rst )
+{
+	if( m_rst != state )
+	{
+		verboselog( 2, "rst=%d\n", state );
+	}
+
+	if( m_rst == 0 && state != 0 && m_cs == 0 )
+	{
+		verboselog( 1, "goto response to reset\n" );
+		m_state = STATE_RESPONSE_TO_RESET;
+		m_bit = 0;
+		m_byte = 0;
+	}
+
+	m_rst = state;
 }
 
 UINT8 *x76f100_device::password()
 {
-	if((command & 0xe1) == COMMAND_READ)
+	if( ( m_command & 0xe1 ) == COMMAND_READ )
 	{
-		return read_password;
+		return m_read_password;
 	}
 
-	return write_password;
+	return m_write_password;
 }
 
 void x76f100_device::password_ok()
 {
-	if((command & 0xe1) == COMMAND_READ)
+	if( ( m_command & 0xe1 ) == COMMAND_READ )
 	{
-		state = STATE_READ_DATA;
+		m_state = STATE_READ_DATA;
 	}
-	else if((command & 0xe1) == COMMAND_WRITE)
+	else if( ( m_command & 0xe1 ) == COMMAND_WRITE )
 	{
-		state = STATE_WRITE_DATA;
+		m_state = STATE_WRITE_DATA;
 	}
 	else
 	{
@@ -148,181 +139,289 @@ void x76f100_device::password_ok()
 
 int x76f100_device::data_offset()
 {
-	int block_offset = (command >> 1) & 0x0f;
+	int block_offset = ( m_command >> 1 ) & 0x0f;
 
-	return block_offset * SIZE_WRITE_BUFFER + byte;
+	return ( block_offset * sizeof( m_write_buffer ) ) + m_byte;
 }
 
-void x76f100_device::scl_0()
+WRITE_LINE_MEMBER( x76f100_device::write_scl )
 {
-	if(cs)
-		return;
-
-	switch(state) {
-	case STATE_RESPONSE_TO_RESET:
-		if(bit == 0) {
-			shift = response_to_reset[byte];
-			verboselog(1, "<- response_to_reset[%d]: %02x\n", byte, shift);
-		}
-
-		sdar = shift & 1;
-		shift >>= 1;
-		bit++;
-
-		if(bit == 8) {
-			bit = 0;
-			byte++;
-			if(byte == 4)
-				byte = 0;
-		}
-		break;
+	if( m_scl != state )
+	{
+		verboselog( 2, "scl=%d\n", state );
 	}
+
+	if( m_cs == 0 )
+	{
+		switch( m_state )
+		{
+		case STATE_STOP:
+			break;
+
+		case STATE_RESPONSE_TO_RESET:
+			if( m_scl != 0 && state == 0 )
+			{
+				if( m_bit == 0 )
+				{
+					m_shift = m_response_to_reset[ m_byte ];
+					verboselog( 1, "<- response_to_reset[%d]: %02x\n", m_byte, m_shift );
+				}
+
+				m_sdar = m_shift & 1;
+				m_shift >>= 1;
+				m_bit++;
+
+				if( m_bit == 8 )
+				{
+					m_bit = 0;
+					m_byte++;
+
+					if( m_byte == sizeof( m_response_to_reset ) )
+					{
+						m_byte = 0;
+					}
+				}
+			}
+			break;
+
+		case STATE_LOAD_COMMAND:
+		case STATE_LOAD_PASSWORD:
+		case STATE_VERIFY_PASSWORD:
+		case STATE_WRITE_DATA:
+			if( m_scl == 0 && state != 0 )
+			{
+				if( m_bit < 8 )
+				{
+					verboselog( 2, "clock\n" );
+					m_shift <<= 1;
+
+					if( m_sdaw != 0 )
+					{
+						m_shift |= 1;
+					}
+
+					m_bit++;
+				}
+				else
+				{
+					m_sdar = 0;
+
+					switch( m_state )
+					{
+					case STATE_LOAD_COMMAND:
+						m_command = m_shift;
+						verboselog( 1, "-> command: %02x\n", m_command );
+						/* todo: verify command is valid? */
+						m_state = STATE_LOAD_PASSWORD;
+						break;
+
+					case STATE_LOAD_PASSWORD:
+						verboselog( 1, "-> password: %02x\n", m_shift );
+						m_write_buffer[ m_byte++ ] = m_shift;
+
+						if( m_byte == sizeof( m_write_buffer ) )
+						{
+							m_state = STATE_VERIFY_PASSWORD;
+						}
+						break;
+
+					case STATE_VERIFY_PASSWORD:
+						verboselog( 1, "-> verify password: %02x\n", m_shift );
+
+						/* todo: this should probably be handled as a command */
+						if( m_shift == COMMAND_ACK_PASSWORD )
+						{
+							/* todo: this should take 10ms before it returns ok. */
+							if( memcmp( password(), m_write_buffer, sizeof( m_write_buffer ) ) == 0 )
+							{
+								password_ok();
+							}
+							else
+							{
+								m_sdar = 1;
+							}
+						}
+						break;
+
+					case STATE_WRITE_DATA:
+						verboselog( 2, "-> data: %02x\n", m_shift );
+						m_write_buffer[ m_byte++ ] = m_shift;
+
+						if( m_byte == sizeof( m_write_buffer ) )
+						{
+							for( m_byte = 0; m_byte < sizeof( m_write_buffer ); m_byte++ )
+							{
+								int offset = data_offset();
+								verboselog( 1, "-> data[ %03x ]: %02x\n", offset, m_write_buffer[ m_byte ] );
+								m_data[ offset ] = m_write_buffer[ m_byte ];
+							}
+
+							m_byte = 0;
+
+							verboselog( 1, "data flushed\n" );
+						}
+						break;
+					}
+
+					m_bit = 0;
+					m_shift = 0;
+				}
+			}
+			break;
+
+		case STATE_READ_DATA:
+			if( m_scl == 0 && state != 0 )
+			{
+				if( m_bit < 8 )
+				{
+					if( m_bit == 0 )
+					{
+						int offset;
+
+						switch( m_state )
+						{
+						case STATE_READ_DATA:
+							offset = data_offset();
+							m_shift = m_data[ offset ];
+							verboselog( 1, "<- data[ %02x ]: %02x\n", offset, m_shift );
+							break;
+						}
+					}
+
+					m_sdar = ( m_shift >> 7 ) & 1;
+					m_shift <<= 1;
+					m_bit++;
+				}
+				else
+				{
+					m_bit = 0;
+					m_sdar = 0;
+
+					if( m_sdaw == 0 )
+					{
+						verboselog( 2, "ack <-\n" );
+						m_byte++;
+					}
+					else
+					{
+						verboselog( 2, "nak <-\n" );
+					}
+				}
+			}
+			break;
+		}
+	}
+
+	m_scl = state;
 }
 
-void x76f100_device::scl_1()
+WRITE_LINE_MEMBER( x76f100_device::write_sda )
 {
-	if(cs)
-		return;
+	if( m_sdaw != state )
+	{
+		verboselog( 2, "sdaw=%d\n", state );
+	}
 
-	switch(state) {
-	case STATE_RESPONSE_TO_RESET:
-		break;
+	if( m_cs == 0 && m_scl != 0 )
+	{
+		if( m_sdaw == 0 && state != 0 )
+		{
+			verboselog( 1, "goto stop\n" );
+			m_state = STATE_STOP;
+			m_sdar = 0;
+		}
 
-	case STATE_LOAD_COMMAND:
-	case STATE_LOAD_PASSWORD:
-	case STATE_VERIFY_PASSWORD:
-	case STATE_WRITE_DATA:
-		if(bit < 8) {
-			verboselog(2, "clock\n");
-			shift <<= 1;
-			if(sdaw)
-				shift |= 1;
-			bit++;
-		} else {
-			switch(state) {
-			case STATE_LOAD_COMMAND:
-				verboselog(1, "-> command: %02x\n", command);
-				sdar = false;
-				command = shift;
-				/* todo: verify command is valid? */
-				state = STATE_LOAD_PASSWORD;
-				bit = 0;
-				shift = 0;
+		if( m_sdaw != 0 && state == 0 )
+		{
+			switch( m_state )
+			{
+			case STATE_STOP:
+				verboselog( 1, "goto start\n" );
+				m_state = STATE_LOAD_COMMAND;
 				break;
 
 			case STATE_LOAD_PASSWORD:
-				verboselog(1, "-> password: %02x\n", shift);
-				sdar = false;
-				write_buffer[byte++] = shift;
-				if(byte == SIZE_WRITE_BUFFER)
-					state = STATE_VERIFY_PASSWORD;
-				bit = 0;
-				shift = 0;
+				/* todo: this will be the 0xc0 command, but it's not handled as a command yet. */
+				verboselog( 1, "goto start\n" );
 				break;
 
-			case STATE_VERIFY_PASSWORD:
-				verboselog(1, "-> verify password: %02x\n", shift);
-				sdar = false;
-				/* todo: this should probably be handled as a command */
-				if(shift == COMMAND_ACK_PASSWORD) {
-					/* todo: this should take 10ms before it returns ok. */
-					if(!memcmp(password(), write_buffer, SIZE_WRITE_BUFFER))
-						password_ok();
-					else
-						sdar = true;
-				}
-				bit = 0;
-				shift = 0;
+			case STATE_READ_DATA:
+				verboselog( 1, "continue reading??\n" );
+//              verboselog( 1, "goto load address\n" );
+//              m_state = STATE_LOAD_ADDRESS;
 				break;
 
-			case STATE_WRITE_DATA:
-				verboselog(1, "-> data: %02x\n", shift );
-				sdar = false;
-				write_buffer[byte++] = shift;
-				if(byte == SIZE_WRITE_BUFFER) {
-					for(byte = 0; byte < SIZE_WRITE_BUFFER; byte++)
-						data[data_offset()] = write_buffer[byte];
-					byte = 0;
-				}
-				bit = 0;
-				shift = 0;
+			default:
+				verboselog( 1, "skipped start (default)\n" );
 				break;
 			}
+
+			m_bit = 0;
+			m_byte = 0;
+			m_shift = 0;
+			m_sdar = 0;
 		}
-		break;
+	}
 
-	case STATE_READ_DATA:
-		if(bit < 8) {
-			if(bit == 0) {
-				shift = data[data_offset()];
-				verboselog(1, "<- data: %02x\n", shift );
-			}
-			sdar = (shift >> 7) & 1;
-			shift <<= 1;
-			bit++;
-		} else {
-			bit = 0;
-			sdar = false;
-			if(!sdaw) {
-				verboselog(2, "ack <-\n");
-				byte++;
-			} else {
-				verboselog(2, "nak <-\n");
-			}
-		}
-		break;
+	m_sdaw = state;
+}
+
+READ_LINE_MEMBER( x76f100_device::read_sda )
+{
+	if( m_cs != 0 )
+	{
+		verboselog( 2, "not selected\n" );
+		return 1;
+	}
+
+	verboselog( 2, "sdar=%d\n", m_sdar );
+	return m_sdar;
+}
+
+void x76f100_device::nvram_default()
+{
+	m_response_to_reset[ 0 ] = 0x19;
+	m_response_to_reset[ 1 ] = 0x00;
+	m_response_to_reset[ 2 ] = 0xaa;
+	m_response_to_reset[ 3 ] = 0x55,
+
+	memset( m_write_password, 0, sizeof( m_write_password ) );
+	memset( m_read_password, 0, sizeof( m_read_password ) );
+	memset( m_data, 0, sizeof( m_data ) );
+
+	int expected_size = sizeof( m_response_to_reset ) + sizeof( m_write_password ) + sizeof( m_read_password ) + sizeof( m_data );
+
+	if( !m_region )
+	{
+		logerror( "x76f100(%s) region not found\n", tag() );
+	}
+	else if( m_region->bytes() != expected_size )
+	{
+		logerror("x76f100(%s) region length 0x%x expected 0x%x\n", tag(), m_region->bytes(), expected_size );
+	}
+	else
+	{
+		UINT8 *region = m_region->base();
+
+		memcpy( m_response_to_reset, region, sizeof( m_response_to_reset )); region += sizeof( m_response_to_reset );
+		memcpy( m_write_password, region, sizeof( m_write_password )); region += sizeof( m_write_password );
+		memcpy( m_read_password, region, sizeof( m_read_password )); region += sizeof( m_read_password );
+		memcpy( m_data, region, sizeof( m_data )); region += sizeof( m_data );
 	}
 }
 
-void x76f100_device::sda_0()
+void x76f100_device::nvram_read( emu_file &file )
 {
-	if(cs || !scl)
-		return;
-
-	switch(state) {
-	case STATE_STOP:
-		state = STATE_LOAD_COMMAND;
-		break;
-
-	case STATE_LOAD_PASSWORD:
-		/* todo: this will be the 0xc0 command, but it's not handled as a command yet. */
-		break;
-
-	case STATE_READ_DATA:
-		//              c->state = STATE_LOAD_ADDRESS;
-		break;
-
-	default:
-		break;
-	}
-
-	bit = 0;
-	byte = 0;
-	shift = 0;
-	sdar = false;
+	file.read( m_response_to_reset, sizeof( m_response_to_reset ) );
+	file.read( m_write_password, sizeof( m_write_password ) );
+	file.read( m_read_password, sizeof( m_read_password ) );
+	file.read( m_data, sizeof( m_data ) );
 }
 
-void x76f100_device::sda_1()
+void x76f100_device::nvram_write( emu_file &file )
 {
-	if(cs || !scl)
-		return;
-
-	state = STATE_STOP;
-	sdar = false;
-}
-
-void x76f100_device::nvram_read(emu_file &file)
-{
-	file.read(response_to_reset, SIZE_RESPONSE_TO_RESET);
-	file.read(write_password,    SIZE_WRITE_PASSWORD);
-	file.read(read_password,     SIZE_READ_PASSWORD);
-	file.read(data,              SIZE_DATA);
-}
-
-void x76f100_device::nvram_write(emu_file &file)
-{
-	file.write(response_to_reset, SIZE_RESPONSE_TO_RESET);
-	file.write(write_password,    SIZE_WRITE_PASSWORD);
-	file.write(read_password,     SIZE_READ_PASSWORD);
-	file.write(data,              SIZE_DATA);
+	file.write( m_response_to_reset, sizeof( m_response_to_reset ) );
+	file.write( m_write_password, sizeof( m_write_password ) );
+	file.write( m_read_password, sizeof( m_read_password ) );
+	file.write( m_data, sizeof( m_data ) );
 }

@@ -1472,7 +1472,6 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter X76F041,$(MACHINES)),)
-MACHINES += SECFLASH
 MACHINEOBJS += $(MACHINEOBJ)/x76f041.o
 endif
 
@@ -1482,7 +1481,6 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter X76F100,$(MACHINES)),)
-MACHINES += SECFLASH
 MACHINEOBJS += $(MACHINEOBJ)/x76f100.o
 endif
 
@@ -1547,15 +1545,6 @@ endif
 
 ifneq ($(filter Z8536,$(MACHINES)),)
 MACHINEOBJS += $(MACHINEOBJ)/z8536.o
-endif
-
-#-------------------------------------------------
-#
-#@src/emu/machine/secflash.h,MACHINES += SECFLASH
-#-------------------------------------------------
-
-ifneq ($(filter SECFLASH,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/secflash.o
 endif
 
 #-------------------------------------------------

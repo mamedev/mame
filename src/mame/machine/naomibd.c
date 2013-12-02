@@ -188,15 +188,15 @@ WRITE16_MEMBER(naomi_board::dma_count_w)
 
 WRITE16_MEMBER(naomi_board::boardid_w)
 {
-	eeprom->cs_w((data >> 2) & 1);
-	eeprom->rst_w((data >> 3) & 1);
-	eeprom->scl_w((data >> 1) & 1);
-	eeprom->sda_w((data >> 0) & 1);
+	eeprom->write_cs((data >> 2) & 1);
+	eeprom->write_rst((data >> 3) & 1);
+	eeprom->write_scl((data >> 1) & 1);
+	eeprom->write_sda((data >> 0) & 1);
 }
 
 READ16_MEMBER(naomi_board::boardid_r)
 {
-	return eeprom->sda_r() << 15;
+	return eeprom->read_sda() << 15;
 }
 
 READ16_MEMBER(naomi_board::default_r)

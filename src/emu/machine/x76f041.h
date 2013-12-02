@@ -1,3 +1,5 @@
+// license:MAME
+// copyright-holders:smf
 /*
  * x76f041.h
  *
@@ -5,67 +7,73 @@
  *
  */
 
+#pragma once
+
 #ifndef __X76F041_H__
 #define __X76F041_H__
 
-#define MCFG_X76F041_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, X76F041, 0)
+#include "emu.h"
 
-#include "machine/secflash.h"
+#define MCFG_X76F041_ADD( _tag ) \
+	MCFG_DEVICE_ADD( _tag, X76F041, 0 )
 
-class x76f041_device : public device_secure_serial_flash
+class x76f041_device : public device_t,
+	public device_nvram_interface
 {
 public:
 	// construction/destruction
-	x76f041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+
+	DECLARE_WRITE_LINE_MEMBER( write_cs );
+	DECLARE_WRITE_LINE_MEMBER( write_rst );
+	DECLARE_WRITE_LINE_MEMBER( write_scl );
+	DECLARE_WRITE_LINE_MEMBER( write_sda );
+	DECLARE_READ_LINE_MEMBER( read_sda );
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
+	virtual void nvram_read( emu_file &file );
+	virtual void nvram_write( emu_file &file );
 
-	// device_secure_serial_flash implementations
-	virtual void cs_0();
-	virtual void cs_1();
-	virtual void rst_0();
-	virtual void rst_1();
-	virtual void scl_0();
-	virtual void scl_1();
-	virtual void sda_0();
-	virtual void sda_1();
+private:
+	inline void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, const char *s_fmt, ... );
+	UINT8 *password();
+	void password_ok();
+	void load_address();
+	int data_offset();
 
-	// internal state
-	enum {
-		SIZE_WRITE_BUFFER = 8,
-		SIZE_RESPONSE_TO_RESET = 4,
-		SIZE_WRITE_PASSWORD = 8,
-		SIZE_READ_PASSWORD = 8,
-		SIZE_CONFIGURATION_PASSWORD = 8,
-		SIZE_CONFIGURATION_REGISTERS = 8,
-		SIZE_DATA = 512,
-
+	enum configuration_register_t
+	{
 		CONFIG_BCR1 = 0,
 		CONFIG_BCR2 = 1,
 		CONFIG_CR = 2,
 		CONFIG_RR = 3,
 		CONFIG_RC = 4,
+	};
 
+	enum bcr_t
+	{
 		BCR_X = 8,
 		BCR_Y = 4,
 		BCR_Z = 2,
-		BCR_T = 1,
+		BCR_T = 1
+	};
 
+	enum command_t
+	{
 		COMMAND_WRITE = 0x00,
 		COMMAND_READ = 0x20,
 		COMMAND_WRITE_USE_CONFIGURATION_PASSWORD = 0x40,
 		COMMAND_READ_USE_CONFIGURATION_PASSWORD = 0x60,
-		COMMAND_CONFIGURATION = 0x80,
+		COMMAND_CONFIGURATION = 0x80
+	};
 
+	enum configuration_t
+	{
 		CONFIGURATION_PROGRAM_WRITE_PASSWORD = 0x00,
 		CONFIGURATION_PROGRAM_READ_PASSWORD = 0x10,
 		CONFIGURATION_PROGRAM_CONFIGURATION_PASSWORD = 0x20,
@@ -77,7 +85,8 @@ protected:
 		CONFIGURATION_MASS_ERASE = 0x80
 	};
 
-	enum {
+	enum state_t
+	{
 		STATE_STOP,
 		STATE_RESPONSE_TO_RESET,
 		STATE_LOAD_COMMAND,
@@ -90,23 +99,25 @@ protected:
 		STATE_WRITE_CONFIGURATION_REGISTERS
 	};
 
-	int state, bit, byte, address;
-	UINT8 command, shift;
-	UINT8 write_buffer[SIZE_WRITE_BUFFER];
-	UINT8 response_to_reset[SIZE_RESPONSE_TO_RESET];
-	UINT8 write_password[SIZE_WRITE_PASSWORD];
-	UINT8 read_password[SIZE_READ_PASSWORD];
-	UINT8 configuration_password[SIZE_CONFIGURATION_PASSWORD];
-	UINT8 configuration_registers[SIZE_CONFIGURATION_REGISTERS];
-	UINT8 data[SIZE_DATA];
-
-	UINT8 *password();
-	void password_ok();
-	void load_address();
-	int data_offset();
-
-private:
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ...);
+	// internal state
+	int m_cs;
+	int m_rst;
+	int m_scl;
+	int m_sdaw;
+	int m_sdar;
+	int m_state;
+	int m_shift;
+	int m_bit;
+	int m_byte;
+	int m_command;
+	int m_address;
+	UINT8 m_write_buffer[ 8 ];
+	UINT8 m_response_to_reset[ 4 ];
+	UINT8 m_write_password[ 8 ];
+	UINT8 m_read_password[ 8 ];
+	UINT8 m_configuration_password[ 8 ];
+	UINT8 m_configuration_registers[ 8 ];
+	UINT8 m_data[ 512 ];
 };
 
 
