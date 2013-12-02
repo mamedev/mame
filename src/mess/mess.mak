@@ -2185,6 +2185,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/ms9540.o    \
 	$(MESS_DRIVERS)/mstation.o  \
 	$(MESS_DRIVERS)/mycom.o     \
+	$(MESS_DRIVERS)/myvision.o  \
 	$(MESS_DRIVERS)/octopus.o   \
 	$(MESS_DRIVERS)/onyx.o      \
 	$(MESS_DRIVERS)/okean240.o  \

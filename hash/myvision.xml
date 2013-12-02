@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="myvision" description="Nichibutsu My Vision cartridges">
+
+	<software name="gomoku">
+		<description>Gomoku Narabe Renju</description>
+		<year>1983</year>
+		<publisher>Nihonbussan</publisher>
+		<info name="label" value="CORTRIDGE LT-0319953" />
+		<info name="pcb" value="KH-1001-A" />
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="rj1" size="8192" crc="fa3df109" sha1="a3b5640fa465de3004a05e59c1362d440842355f" offset="000000" />
+				<rom name="rj1" size="8192" crc="eae282e3" sha1="829a34a2d0685b68280d8251a641cadd12e3b3c4" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hanafuda">
+		<description>Hanafuda</description>
+		<year>1983</year>
+		<publisher>Logitec Corp.</publisher>
+		<info name="label" value="CORTRIDGE LT-0730853" />
+		<info name="pcb" value="KH-1001-A" />
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="f1" size="8192" crc="31f662c8" sha1="608c9fbcbcb134d3dfcecd9c3ea81d2f075b3fb9" offset="000000" />
+				<rom name="f2" size="8192" crc="0e9fb68b" sha1="1730dededd220dd0a0c6fee41460981471283018" offset="0x2000" />
+				<rom name="f3" size="8192" crc="057cc785" sha1="90d84df698a0166ed19e3c3f8d2da57b72cfde97" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjong">
+		<description>Mahjong Nichibutsu</description>
+		<year>1983</year>
+		<publisher>Nihonbussan</publisher>
+		<info name="label" value="CORTRIDGE LT-0334653" />
+		<info name="pcb" value="KH-1001-A" />
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="mj1" size="8192" crc="f7dff3c3" sha1="07d7916ebf1bf29d4da12ca11f29271da520023a" offset="000000" />
+				<rom name="mj2" size="8192" crc="0b75671c" sha1="e69a6606d21cd487f3481afa51076320278eb543" offset="0x2000" />
+				<rom name="mj3" size="8192" crc="b476c2c1" sha1="44d0c5738321cd4aa37b8ad25a4a4e77b144b6db" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsumesho">
+		<description>Tsumeshougi</description>
+		<year>1983</year>
+		<publisher>Logitec Corp.</publisher>
+		<info name="label" value="CORTRIDGE LT-0594253" />
+		<info name="pcb" value="KH-1001-A" />
+		<part name="cart" interface="myvision_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="s1" size="8192" crc="bc4ae5b2" sha1="758ac3ab00d9b97026e67a9bad6b34d9e4a19e1c" offset="000000" />
+				<rom name="s2" size="8192" crc="348b0074" sha1="d9373b04664c419cf2a2f0120a12ee2810313fb5" offset="0x2000" />
+				<rom name="s3" size="8192" crc="d927a49d" sha1="2b8ded33cda425229d0fd5bbe236102afdcaf6cf" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
