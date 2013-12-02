@@ -2262,11 +2262,11 @@ ROM_START( dkongjre )
 	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( dkongjrp )
+ROM_START( dkongjrpb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dkjr1-c.5b-p", 0x0000, 0x1000, BAD_DUMP CRC(8d99b3e0) SHA1(311a9f353e62d9d07c678e45baa2efec575a8f3b) ) // does not match SUM16 of bulletin (see notes), howcome?? - marked bad for now until reason is known
+	ROM_LOAD( "dkjr1-c.5b-p", 0x0000, 0x1000, CRC(8d99b3e0) SHA1(311a9f353e62d9d07c678e45baa2efec575a8f3b) ) // does not match SUM16 of bulletin (see notes), definitely not from Nintendo
 	ROM_CONTINUE(             0x3000, 0x1000 )
-	ROM_LOAD( "dkjr1-c.5c-p", 0x2000, 0x0800, BAD_DUMP CRC(b92d258c) SHA1(793483e249d08cbbbefe06d3ddc4c2eda5428ee8) ) // "
+	ROM_LOAD( "dkjr1-c.5c-p", 0x2000, 0x0800, CRC(b92d258c) SHA1(793483e249d08cbbbefe06d3ddc4c2eda5428ee8) ) // "
 	ROM_CONTINUE(             0x4800, 0x0800 )
 	ROM_CONTINUE(             0x1000, 0x0800 )
 	ROM_CONTINUE(             0x5800, 0x0800 )
@@ -3211,7 +3211,7 @@ GAME( 1982, dkongjrj,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        R
 GAME( 1982, dkongjnrj, dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong Junior (Japan?)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrb,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjre,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (E kit)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjrp,  dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (P kit)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjrpb, dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "bootleg", "Donkey Kong Junior (P kit, bootleg)", GAME_SUPPORTS_SAVE ) // definitely not issued by Nintendo
 GAME( 1982, jrking,    dkongjr,  dkongjr,   dkongjr,  driver_device, 0,        ROT90,  "bootleg", "Junior King (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkingjr,   dkongjr,  dkongjr,   dkongjr,  dkong_state,   dkingjr,  ROT90,  "bootleg", "Donkey King Jr. (bootleg of Donkey Kong Jr.)", GAME_SUPPORTS_SAVE )
 
