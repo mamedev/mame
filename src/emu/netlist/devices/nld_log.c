@@ -4,6 +4,7 @@
  */
 
 #include "nld_log.h"
+#include "sound/wavwrite.h"
 
 NETLIB_START(log)
 {
@@ -22,3 +23,25 @@ NETLIB_NAME(log)::~NETLIB_NAME(log)()
 {
     fclose(m_file);
 }
+
+// FIXME: Implement wav later, this must be clock triggered device where the input to be written
+//        is on a subdevice ...
+#if 0
+NETLIB_START(wav)
+{
+    register_input("I", m_I);
+
+    pstring filename = "netlist_" + name() + ".wav";
+    m_file = wav_open(filename, sample_rate(), active_inputs()/2)
+}
+
+NETLIB_UPDATE(wav)
+{
+    fprintf(m_file, "%e %e\n", netlist().time().as_double(), INPANALOG(m_I));
+}
+
+NETLIB_NAME(log)::~NETLIB_NAME(wav)()
+{
+    fclose(m_file);
+}
+#endif

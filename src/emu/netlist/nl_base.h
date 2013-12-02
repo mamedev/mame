@@ -1139,8 +1139,21 @@ public:
 	}
 };
 
-netlist_device_t *net_create_device_by_classname(const pstring &classname, netlist_setup_t &setup);
-netlist_device_t *net_create_device_by_name(const pstring &name, netlist_setup_t &setup);
+class netlist_factory
+{
+public:
+
+    void initialize();
+
+    netlist_device_t *new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const;
+    netlist_device_t *new_device_by_name(const pstring &name, netlist_setup_t &setup) const;
+
+private:
+    typedef netlist_list_t<net_device_t_base_factory *> list_t;
+    list_t m_list;
+
+};
+
 
 
 #endif /* NLBASE_H_ */

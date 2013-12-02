@@ -16,8 +16,6 @@
 //  SETUP
 //============================================================
 
-//#define astring breakme()
-
 #define USE_DELEGATES           (0)
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc

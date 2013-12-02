@@ -89,7 +89,7 @@ NETLIB_START(solver)
     register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(10).as_double());
     m_nt_sync_delay = m_sync_delay.Value();
 
-    register_param("FREQ", m_freq, 50000.0);
+    register_param("FREQ", m_freq, 48000.0);
     m_inc = netlist_time::from_hz(m_freq.Value());
 
     register_link_internal(m_fb_sync, m_Q_sync, netlist_input_t::STATE_INP_ACTIVE);

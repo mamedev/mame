@@ -7,6 +7,8 @@
 #include <cstdio>
 
 
+// The following will work on linux, however not on Windows ....
+
 //pblockpool *pstring::m_pool = new pblockpool;
 //pstring::str_t *pstring::m_zero = new(pstring::m_pool, 0) pstring::str_t(0);
 

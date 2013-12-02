@@ -67,7 +67,7 @@ void netlist_parser::netdev_const(const pstring &dev_name)
 
 	skipws();
 	name = getname(',');
-	dev = net_create_device_by_name(dev_name, m_setup);
+	dev = m_setup.factory().new_device_by_name(dev_name, m_setup);
 	m_setup.register_dev(dev, name);
 	skipws();
 	val = eval_param();
@@ -86,7 +86,7 @@ void netlist_parser::netdev_device(const pstring &dev_type)
 
 	skipws();
 	devname = getname2(',', ')');
-	dev = net_create_device_by_name(dev_type, m_setup);
+	dev = m_setup.factory().new_device_by_name(dev_type, m_setup);
 	m_setup.register_dev(dev, devname);
 	skipws();
 	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));

@@ -20,7 +20,7 @@
 
 #define NET_ALIAS(_alias, _name)                                                    \
 	netlist.register_alias(# _alias, # _name);
-#define NET_NEW(_type)  net_create_device_by_classname(NETLIB_NAME_STR(_type), netlist)
+#define NET_NEW(_type)  netlist.factory().new_device_by_classname(NETLIB_NAME_STR(_type), netlist)
 
 #define NET_REGISTER_DEV(_type, _name)                                              \
 		netlist.register_dev(NET_NEW(_type), # _name);
@@ -98,6 +98,7 @@ public:
 	~netlist_setup_t();
 
 	netlist_base_t &netlist() { return m_netlist; }
+	netlist_factory &factory() { return m_factory; }
 
 	netlist_device_t *register_dev(netlist_device_t *dev, const pstring &name);
 	void remove_dev(const pstring &name);
@@ -139,6 +140,8 @@ private:
 	tagmap_param_t  m_params;
 	tagmap_link_t   m_links;
     tagmap_nstring_t m_params_temp;
+
+    netlist_factory m_factory;
 
 	int m_proxy_cnt;
 

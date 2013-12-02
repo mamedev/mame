@@ -25,6 +25,7 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 	: m_netlist(netlist)
     , m_proxy_cnt(0)
 {
+    m_factory.initialize();
 	NETLIST_NAME(base)(*this);
 }
 

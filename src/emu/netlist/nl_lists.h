@@ -75,12 +75,12 @@ public:
             }
         }
     }
-	ATTR_HOT inline entry_t *first() { return (m_ptr >= m_list ? &m_list[0] : NULL ); }
-    ATTR_HOT inline entry_t *next(entry_t *lc) { return (lc < last() ? lc + 1 : NULL ); }
-	ATTR_HOT inline entry_t *last()  { return m_ptr; }
-	ATTR_HOT inline entry_t *item(int i) { return &m_list[i]; }
+	ATTR_HOT inline entry_t *first() const { return (m_ptr >= m_list ? &m_list[0] : NULL ); }
+    ATTR_HOT inline entry_t *next(entry_t *lc) const { return (lc < last() ? lc + 1 : NULL ); }
+	ATTR_HOT inline entry_t *last() const { return m_ptr; }
+	ATTR_HOT inline entry_t *item(int i) const { return &m_list[i]; }
 	ATTR_HOT inline int count() const { return m_ptr - m_list + 1; }
-	ATTR_HOT inline bool empty() { return (m_ptr < m_list); }
+	ATTR_HOT inline bool empty() const { return (m_ptr < m_list); }
 	ATTR_HOT inline void reset() { m_ptr = m_list - 1; }
 private:
 	entry_t * m_ptr;

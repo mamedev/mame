@@ -31,4 +31,14 @@ private:
     FILE *m_file;
 );
 
+#if 0
+NETLIB_DEVICE(wav,
+    ~NETLIB_NAME(wav)();
+    netlist_analog_input_t m_I;
+private:
+    // FIXME: rewrite sound/wavwrite.h to be an object ...
+    void *m_file;
+);
+#endif
+
 #endif /* NLD_LOG_H_ */

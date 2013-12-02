@@ -901,79 +901,78 @@ NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
 }
 
 #define xstr(s) # s
-#define ENTRY1(_nic, _name) new net_device_t_factory< _nic >( # _name, xstr(_nic) ),
+#define ENTRY1(_nic, _name) m_list.add(new net_device_t_factory< _nic >( # _name, xstr(_nic) ));
 #define ENTRY(_nic, _name) ENTRY1(NETLIB_NAME(_nic), _name)
 
-static const net_device_t_base_factory *netregistry[] =
+void netlist_factory::initialize()
 {
     ENTRY(R,                    NETDEV_R)
     ENTRY(C,                    NETDEV_C)
     ENTRY(D,                    NETDEV_D)
-	ENTRY(ttl_const,            NETDEV_TTL_CONST)
-	ENTRY(analog_const,         NETDEV_ANALOG_CONST)
-	ENTRY(logic_input,          NETDEV_LOGIC_INPUT)
-	ENTRY(analog_input,         NETDEV_ANALOG_INPUT)
-	ENTRY(log,                  NETDEV_LOG)
-	ENTRY(clock,                NETDEV_CLOCK)
-	ENTRY(mainclock,            NETDEV_MAINCLOCK)
+    ENTRY(ttl_const,            NETDEV_TTL_CONST)
+    ENTRY(analog_const,         NETDEV_ANALOG_CONST)
+    ENTRY(logic_input,          NETDEV_LOGIC_INPUT)
+    ENTRY(analog_input,         NETDEV_ANALOG_INPUT)
+    ENTRY(log,                  NETDEV_LOG)
+    ENTRY(clock,                NETDEV_CLOCK)
+    ENTRY(mainclock,            NETDEV_MAINCLOCK)
     ENTRY(solver,               NETDEV_SOLVER)
-	ENTRY(analog_callback,      NETDEV_CALLBACK)
-	ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
-	ENTRY(nicRSFF,              NETDEV_RSFF)
-	ENTRY(nicMixer8,            NETDEV_MIXER)
-	ENTRY(7400,                 TTL_7400_NAND)
-	ENTRY(7402,                 TTL_7402_NOR)
-	ENTRY(nic7404,              TTL_7404_INVERT)
-	ENTRY(7410,                 TTL_7410_NAND)
-	ENTRY(7420,                 TTL_7420_NAND)
-	ENTRY(7425,                 TTL_7425_NOR)
-	ENTRY(7427,                 TTL_7427_NOR)
-	ENTRY(7430,                 TTL_7430_NAND)
-	ENTRY(nic7450,              TTL_7450_ANDORINVERT)
-	ENTRY(7486,                 TTL_7486_XOR)
-	ENTRY(nic7448,              TTL_7448)
-	ENTRY(7474,                 TTL_7474)
-	ENTRY(nic7483,              TTL_7483)
-	ENTRY(nic7490,              TTL_7490)
-	ENTRY(nic7493,              TTL_7493)
-	ENTRY(nic74107,             TTL_74107)
-	ENTRY(nic74107A,            TTL_74107A)
-	ENTRY(nic74153,             TTL_74153)
-	ENTRY(nic9316,              TTL_9316)
-	ENTRY(NE555,                NETDEV_NE555)
+    ENTRY(analog_callback,      NETDEV_CALLBACK)
+    ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
+    ENTRY(nicRSFF,              NETDEV_RSFF)
+    ENTRY(nicMixer8,            NETDEV_MIXER)
+    ENTRY(7400,                 TTL_7400_NAND)
+    ENTRY(7402,                 TTL_7402_NOR)
+    ENTRY(nic7404,              TTL_7404_INVERT)
+    ENTRY(7410,                 TTL_7410_NAND)
+    ENTRY(7420,                 TTL_7420_NAND)
+    ENTRY(7425,                 TTL_7425_NOR)
+    ENTRY(7427,                 TTL_7427_NOR)
+    ENTRY(7430,                 TTL_7430_NAND)
+    ENTRY(nic7450,              TTL_7450_ANDORINVERT)
+    ENTRY(7486,                 TTL_7486_XOR)
+    ENTRY(nic7448,              TTL_7448)
+    ENTRY(7474,                 TTL_7474)
+    ENTRY(nic7483,              TTL_7483)
+    ENTRY(nic7490,              TTL_7490)
+    ENTRY(nic7493,              TTL_7493)
+    ENTRY(nic74107,             TTL_74107)
+    ENTRY(nic74107A,            TTL_74107A)
+    ENTRY(nic74153,             TTL_74153)
+    ENTRY(nic9316,              TTL_9316)
+    ENTRY(NE555,                NETDEV_NE555)
     ENTRY(nicNE555N_MSTABLE,    NE555N_MSTABLE)
-	NULL
-};
-
-netlist_device_t *net_create_device_by_classname(const pstring &classname, netlist_setup_t &setup)
-{
-	const net_device_t_base_factory **p = &netregistry[0];
-	while (*p != NULL)
-	{
-		if (strcmp((*p)->classname(), classname) == 0)
-		{
-			netlist_device_t *ret = (*p)->Create();
-			return ret;
-		}
-		p++;
-	}
-	fatalerror("Class %s not found!\n", classname.cstr());
-	return NULL; // appease code analysis
 }
 
-netlist_device_t *net_create_device_by_name(const pstring &name, netlist_setup_t &setup)
+netlist_device_t *netlist_factory::new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const
 {
-	const net_device_t_base_factory **p = &netregistry[0];
-	while (*p != NULL)
-	{
-		if (strcmp((*p)->name(), name) == 0)
-		{
-			netlist_device_t *ret = (*p)->Create();
-			//ret->init(setup, icname);
-			return ret;
-		}
-		p++;
-	}
-	fatalerror("Class %s not found!\n", name.cstr());
-	return NULL; // appease code analysis
+    for (list_t::entry_t *e = m_list.first(); e != NULL; e = m_list.next(e))
+    {
+        net_device_t_base_factory *p = e->object();
+        if (strcmp(p->classname(), classname) == 0)
+        {
+            netlist_device_t *ret = p->Create();
+            return ret;
+        }
+        p++;
+    }
+    fatalerror("Class %s not found!\n", classname.cstr());
+    return NULL; // appease code analysis
 }
+
+netlist_device_t *netlist_factory::new_device_by_name(const pstring &name, netlist_setup_t &setup) const
+{
+    for (list_t::entry_t *e = m_list.first(); e != NULL; e = m_list.next(e))
+    {
+        net_device_t_base_factory *p = e->object();
+        if (strcmp(p->name(), name) == 0)
+        {
+            netlist_device_t *ret = p->Create();
+            return ret;
+        }
+        p++;
+    }
+    fatalerror("Class %s not found!\n", name.cstr());
+    return NULL; // appease code analysis
+}
+
