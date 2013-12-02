@@ -314,12 +314,32 @@ static NETLIST_START(pong_schematics)
 	// sound logic
 	TTL_7474(ic_c2a, vpos256, high, hitQ, high)
 	TTL_74107(ic_f3_topbot, vblank, vvid, vvidQ, ServeQ)
+
+	// monoflop with NE555 determines duration of score sound
+#if 0
 	NE555N_MSTABLE(ic_g4_sc, MissQ, NC)
 	NET_ALIAS(SC, ic_g4_sc.Q)       // monoflop with NE555 determines score sound
 	NETDEV_PARAM(ic_g4_sc.R, RES_K(220))
 	NETDEV_PARAM(ic_g4_sc.C, CAP_U(1))
+#else
+    NETDEV_R(ic_g4_R, RES_K(220))
+    NETDEV_C(ic_g4_C, CAP_U(1))
+    NETDEV_NE555(ic_g4_sc)
+    NET_ALIAS(SC, ic_g4_sc.OUT)
 
-	NET_ALIAS(hit_sound_en, ic_c2a.QQ)
+    NET_C(ic_g4_sc.VCC, V5)
+    NET_C(ic_g4_sc.GND, GND)
+    NET_C(ic_g4_sc.RESET, V5)
+    NET_C(ic_g4_R.1, V5)
+    NET_C(ic_g4_R.2, ic_g4_sc.THRESH)
+    NET_C(ic_g4_R.2, ic_g4_sc.DISCH)
+    NET_C(MissQ, ic_g4_sc.TRIG)
+    NET_C(ic_g4_R.2, ic_g4_C.1)
+    NET_C(GND, ic_g4_C.2)
+    //NETDEV_LOG(C, ic_g4_C.1)
+#endif
+
+    NET_ALIAS(hit_sound_en, ic_c2a.QQ)
 	TTL_7400_NAND(hit_sound, hit_sound_en, vpos16)
 	TTL_7400_NAND(score_sound, SC, vpos32)
 	TTL_7400_NAND(topbothitsound, ic_f3_topbot.Q, vpos32)
@@ -480,7 +500,7 @@ static NETLIST_START(pong_schematics)
     NETDEV_SOLVER(Solver)
     NETDEV_ANALOG_CONST(V5, 5)
     NETDEV_ANALOG_CONST(V1, 1)
-    NETDEV_ANALOG_CONST(V0, 0)
+    NETDEV_ANALOG_CONST(GND, 0)
 
 #endif
 #if 0
@@ -490,14 +510,14 @@ static NETLIST_START(pong_schematics)
     NET_C(V5,R1.1)
     NET_C(R1.2, R2.1)
     NET_C(R2.2, R3.1)
-    NET_C(R3.2, V0)
+    NET_C(R3.2, GND)
 #endif
 #if 0
     NETDEV_R(R4, 1000)
     NETDEV_C(C1, 1e-6)
     NET_C(V5,R4.1)
     NET_C(R4.2, C1.1)
-    NET_C(C1.2, V0)
+    NET_C(C1.2, GND)
     //NETDEV_LOG(log1, C1.1)
 #endif
 
@@ -507,7 +527,7 @@ static NETLIST_START(pong_schematics)
 	NETDEV_D(D ## _n) \
     NET_C(V5, R ## _n.1) \
     NET_C(R ## _n.2, D ## _n.A) \
-    NET_C(D ## _n.K, V0)
+    NET_C(D ## _n.K, GND)
 
 /*    tt(20)
     tt(21)
@@ -526,7 +546,7 @@ static NETLIST_START(pong_schematics)
     NETDEV_1N914(D1)
     NET_C(V5, R5.1)
     NET_C(R5.2, D1.A)
-    NET_C(D1.K, V0)
+    NET_C(D1.K, GND)
     //NETDEV_LOG(log1, D1.A)
 #endif
 
@@ -551,7 +571,7 @@ static NETLIST_START(pong_schematics)
     NETDEV_C(C, 0.15e-6)
     NETDEV_NE555(555)
 
-    NET_C(V0, 555.GND)
+    NET_C(GND, 555.GND)
     NET_C(V5, 555.VCC)
 
     NET_C(RA.1, 555.VCC)
@@ -563,8 +583,9 @@ static NETLIST_START(pong_schematics)
     NET_C(RB.2, 555.THRESH)
 
     NET_C(555.TRIG, C.1)
-    NET_C(C.2, V0)
+    NET_C(C.2, GND)
     //NETDEV_LOG(log2, C.1)
+    //NETDEV_LOG(log3, 555.OUT)
 #endif
 
 
