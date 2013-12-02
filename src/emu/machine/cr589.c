@@ -45,28 +45,36 @@ void matsushita_cr589_device::ExecCommand()
 {
 	switch( command[ 0 ] )
 	{
-		case 0x3b: // WRITE BUFFER
-			bufferOffset = ( command[ 3 ] << 16 ) | ( command[ 4 ] << 8 ) | command[ 5 ];
-			m_phase = SCSI_PHASE_DATAOUT;
-			m_status_code = SCSI_STATUS_CODE_GOOD;
-			m_transfer_length = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
-			break;
+	case T10SPC_CMD_INQUIRY:
+		logerror("T10MMC: INQUIRY\n");
+		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+		break;
 
-		case 0x3c: // READ BUFFER
-			bufferOffset = ( command[ 3 ] << 16 ) | ( command[ 4 ] << 8 ) | command[ 5 ];
-			m_phase = SCSI_PHASE_DATAIN;
-			m_status_code = SCSI_STATUS_CODE_GOOD;
-			m_transfer_length = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
-			break;
+	case 0x3b: // WRITE BUFFER
+		bufferOffset = ( command[ 3 ] << 16 ) | ( command[ 4 ] << 8 ) | command[ 5 ];
+		m_phase = SCSI_PHASE_DATAOUT;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
+		break;
 
-		case 0xcc: // FIRMWARE DOWNLOAD ENABLE
-			m_phase = SCSI_PHASE_DATAOUT;
-			m_status_code = SCSI_STATUS_CODE_GOOD;
-			m_transfer_length = SCSILengthFromUINT16( &command[7] );
-			break;
+	case 0x3c: // READ BUFFER
+		bufferOffset = ( command[ 3 ] << 16 ) | ( command[ 4 ] << 8 ) | command[ 5 ];
+		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = ( command[ 6 ] << 16 ) | ( command[ 7 ] << 8 ) | command[ 8 ];
+		break;
 
-		default:
-			t10mmc::ExecCommand();
+	case 0xcc: // FIRMWARE DOWNLOAD ENABLE
+		m_phase = SCSI_PHASE_DATAOUT;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = SCSILengthFromUINT16( &command[7] );
+		break;
+
+	default:
+		t10mmc::ExecCommand();
+		break;
 	}
 }
 
@@ -74,27 +82,29 @@ void matsushita_cr589_device::ReadData( UINT8 *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
-		case 0x12: // INQUIRY
-			t10mmc::ReadData( data, dataLength );
+	case T10SPC_CMD_INQUIRY:
+		memset(data, 0, dataLength);
 
-			if( download )
-			{
-				memcpy( &data[ 8 ], download_identity, 28 );
-			}
-			else
-			{
-				memcpy( &data[ 8 ], &buffer[ identity_offset ], 28 );
-			}
-			break;
+		t10mmc::ReadData( data, dataLength );
 
-		case 0x3c: // READ BUFFER
-			memcpy( data, &buffer[ bufferOffset ], dataLength );
-			bufferOffset += dataLength;
-			break;
+		if( download )
+		{
+			memcpy( &data[ 8 ], download_identity, 28 );
+		}
+		else
+		{
+			memcpy( &data[ 8 ], &buffer[ identity_offset ], 28 );
+		}
+		break;
 
-		default:
-			t10mmc::ReadData( data, dataLength );
-			break;
+	case 0x3c: // READ BUFFER
+		memcpy( data, &buffer[ bufferOffset ], dataLength );
+		bufferOffset += dataLength;
+		break;
+
+	default:
+		t10mmc::ReadData( data, dataLength );
+		break;
 	}
 }
 
