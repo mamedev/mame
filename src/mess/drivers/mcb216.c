@@ -25,9 +25,10 @@
     storage is paper-tape, which is expected to be attached to the terminal.
 
     CB-308:
-    Press Enter twice. You will see the Monitor logo. To get into the
-    BASIC (if it was fitted), enter GE400. All monitor commands must be
-    in uppercase. The only storage is paper-tape.
+    Press Enter twice. You will see the Monitor logo. To get into the BASIC,
+    enter GE400. To return to the monitor, use the QUIT command followed by
+    pressing Enter twice. All monitor commands must be in uppercase. The
+    only storage is paper-tape.
 
 ****************************************************************************/
 
@@ -149,10 +150,9 @@ ROM_END
 ROM_START( cb308 )
 	ROM_REGION(0x1000, "roms", 0)
 	ROM_LOAD( "cb308r0",  0x0000, 0x0400, CRC(62f50531) SHA1(3071e2ab7fc6b2ca889e4fb5cf7cc9ee8fbe53d3) )
-	// undumped BASIC
-	ROM_LOAD( "cb308r1",  0x0400, 0x0400, NO_DUMP )
-	ROM_LOAD( "cb308r2",  0x0800, 0x0400, NO_DUMP )
-	ROM_LOAD( "cb308r3",  0x0c00, 0x0400, NO_DUMP )
+	ROM_LOAD( "cb308r1",  0x0400, 0x0400, CRC(03191ac1) SHA1(84665dfc797c9f51bb659291b18399986ed846fb) )
+	ROM_LOAD( "cb308r2",  0x0800, 0x0400, CRC(695ea521) SHA1(efe36a712e2a038ee804e556c5ebe05443cf798e) )
+	ROM_LOAD( "cb308r3",  0x0c00, 0x0400, CRC(e3e4a778) SHA1(a7c14458f8636d860ae25b10387fa6f7f2ef6ef9) )
 ROM_END
 
 /* Driver */
