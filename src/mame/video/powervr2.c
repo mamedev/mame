@@ -1550,12 +1550,21 @@ void powervr2_device::update_screen_format()
 	attoseconds_t refresh = HZ_TO_ATTOSECONDS(pclk) * spg_hsize * spg_vsize;
 
 	rectangle visarea = m_screen->visible_area();
-	/* FIXME: fix if spg_*bend > spg_*bstart */
+
 	visarea.min_x = spg_hbend;
 	visarea.max_x = spg_hbstart - 1;
 	visarea.min_y = spg_vbend;
 	visarea.max_y = spg_vbstart - 1;
-	//printf("%d %d %d\n",spg_vbstart,spg_vbend,vo_vert_start_pos_f1);
+
+	// Sanitize
+	if(visarea.max_x >= spg_hsize)
+		visarea.max_x = spg_hsize-1;
+	if(visarea.max_y >= spg_vsize)
+		visarea.max_y = spg_vsize-1;
+	if(visarea.min_x > visarea.max_x)
+		visarea.min_x = visarea.max_x;
+	if(visarea.min_y > visarea.max_y)
+		visarea.min_y = visarea.max_y;
 
 	m_screen->configure(spg_hsize, spg_vsize, visarea, refresh );
 }
