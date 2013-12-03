@@ -20,7 +20,7 @@ const struct pit8253_interface at_pit8254_config =
 		}, {
 			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
-			DEVCB_NULL
+			DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, at_pit8254_out1_changed)
 		}, {
 			4772720/4,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
@@ -286,6 +286,11 @@ WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out0_changed )
 		m_pic8259_master->ir0_w(state);
 }
 
+WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out1_changed )
+{
+	if(state)
+		m_refresh = !m_refresh;
+}
 
 WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out2_changed )
 {
@@ -455,7 +460,7 @@ READ8_MEMBER( southbridge_device::at_portb_r )
 	data &= ~0xd0; /* AT BIOS don't likes this being set */
 
 	/* 0x10 is the dram refresh line bit on the 5170, just a timer here, 15.085us. */
-	data |= (machine().time().as_ticks(110000) & 1) ? 0x10 : 0;
+	data |= m_refresh ? 0x10 : 0;
 
 	if (m_pit8254->get_output(2))
 		data |= 0x20;

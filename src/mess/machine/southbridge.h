@@ -70,6 +70,7 @@ public:
 		DECLARE_WRITE8_MEMBER(at_portb_w);
 		DECLARE_READ8_MEMBER(get_slave_ack);
 		DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
+		DECLARE_WRITE_LINE_MEMBER(at_pit8254_out1_changed);
 		DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
 		DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
 		DECLARE_READ8_MEMBER(pc_dma8237_0_dack_r);
@@ -117,6 +118,7 @@ protected:
 		UINT8 m_at_pages[0x10];
 		UINT16 m_dma_high_byte;
 		UINT8 m_at_speaker;
+		bool m_refresh;
 		void at_speaker_set_spkrdata(UINT8 data);
 		void at_speaker_set_input(UINT8 data);
 

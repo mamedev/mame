@@ -1398,7 +1398,7 @@ UINT64 pentium_msr_read(i386_state *cpustate, UINT32 offset,UINT8 *valid_msr)
 	// Event Counters (TODO)
 	case 0x11:  // CESR
 		*valid_msr = 1;
-		popmessage("WRMSR: Reading CESR");
+		popmessage("RDMSR: Reading CESR");
 		return 0;
 	case 0x12:  // CTR0
 		*valid_msr = 1;
@@ -1407,6 +1407,12 @@ UINT64 pentium_msr_read(i386_state *cpustate, UINT32 offset,UINT8 *valid_msr)
 		*valid_msr = 1;
 		return cpustate->perfctr[1];
 	default:
+		if(!(offset & ~0xf)) // 2-f are test registers
+		{
+			*valid_msr = 1;
+			logerror("RDMSR: Reading test MSR %x", offset);
+			return 0;
+		}
 		logerror("RDMSR: invalid P5 MSR read %08x at %08x\n",offset,cpustate->pc-2);
 		*valid_msr = 0;
 		return 0;
@@ -1447,6 +1453,12 @@ void pentium_msr_write(i386_state *cpustate, UINT32 offset, UINT64 data, UINT8 *
 		*valid_msr = 1;
 		break;
 	default:
+		if(!(offset & ~0xf)) // 2-f are test registers
+		{
+			*valid_msr = 1;
+			logerror("WRMSR: Writing test MSR %x", offset);
+			break;
+		}
 		logerror("WRMSR: invalid MSR write %08x (%08x%08x) at %08x\n",offset,(UINT32)(data >> 32),(UINT32)data,cpustate->pc-2);
 		*valid_msr = 0;
 		break;
