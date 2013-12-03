@@ -26,7 +26,6 @@ public:
 
 	UINT16 m_CPUA_register;
 	UINT16 m_CPUB_register;
-	UINT16 m_sound_command;
 	int m_cuebrickj_nvram_bank;
 	UINT16 m_cuebrickj_nvram[0x400*0x20];
 	UINT16 m_custom_video;
@@ -40,12 +39,8 @@ public:
 	UINT16 m_scrolly[3];
 	UINT16 m_video_register;
 	tilemap_t *m_text_tilemap;
-	DECLARE_READ16_MEMBER(videoram16_r);
-	DECLARE_WRITE16_MEMBER(videoram16_w);
-	DECLARE_READ16_MEMBER(extra_rom_r);
 	DECLARE_READ16_MEMBER(twin16_gfx_rom1_r);
 	DECLARE_READ16_MEMBER(twin16_gfx_rom2_r);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(twin16_CPUA_register_w);
 	DECLARE_WRITE16_MEMBER(twin16_CPUB_register_w);
 	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
