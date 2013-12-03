@@ -8,22 +8,21 @@
 Known Dumps
 -----------
 
-Game       Description                        Mother Board   Code       Version       Date   Time
+Game       Description                                              Mother Board   Code       Version       Date   Time
 
-powyak96   Jikkyou Powerful Pro Yakyuu '96    GV999          GV017   JAPAN 1.03   96.05.27  18:00
-hyperath   Hyper Athlete                      ZV610          GV021   JAPAN 1.00   96.06.09  19:00
-lacrazyc   Let's Attack Crazy Cross           ZV610          GV027   ASIA  1.10   96.01.18  12:00
-susume     Susume! Taisen Puzzle-Dama         ZV610          GV027   JAPAN 1.20   96.03.04  12:00
-btchamp    Beat the Champ                     GV999          GV053   UAA01        ?
-kdeadeye   Dead Eye                           GV999          GV054   UAA01        ?
-weddingr   Wedding Rhapsody                   ?              GX624   JAA          97.05.29   9:12
-tokimosh   Tokimeki Memorial Oshiete          ?              GE755   JAA          97.08.06  11:52
-           Your Heart
-tokimosp   Tokimeki Memorial Oshiete          ?              GE756   JAB          97.09.27   9:10
-           Your Heart Seal version PLUS
-nagano98   Winter Olypmics in Nagano 98       GV999          GX720   EAA01 1.03   98.01.08  10:45
-naganoj    Hyper Olympic in Nagano            GV999          GX720   JAA01 1.02   98.01.07  01:10
-simpbowl   Simpsons Bowling                   GV999          GQ829   UAA          ?
+powyak96   Jikkyou Powerful Pro Yakyuu '96                          GV999          GV017   JAPAN 1.03   96.05.27  18:00
+hyperath   Hyper Athlete                                            ZV610          GV021   JAPAN 1.00   96.06.09  19:00
+lacrazyc   Let's Attack Crazy Cross                                 ZV610          GV027   ASIA  1.10   96.01.18  12:00
+susume     Susume! Taisen Puzzle-Dama                               ZV610          GV027   JAPAN 1.20   96.03.04  12:00
+btchamp    Beat the Champ                                           GV999          GV053   UAA01        ?
+kdeadeye   Dead Eye                                                 GV999          GV054   UAA01        ?
+weddingr   Wedding Rhapsody                                         ?              GX624   JAA          97.05.29   9:12
+tokimfwy   Tokimeki Memorial ? (TITLE2.TIM from "Forever With You") ?              GQ673   JAA
+tokimosh   Tokimeki Memorial Oshiete Your Heart                     ?              GE755   JAA          97.08.06  11:52
+tokimosp   Tokimeki Memorial Oshiete Your Heart Seal version PLUS   ?              GE756   JAB          97.09.27   9:10
+nagano98   Winter Olypmics in Nagano 98                             GV999          GX720   EAA01 1.03   98.01.08  10:45
+naganoj    Hyper Olympic in Nagano                                  GV999          GX720   JAA01 1.02   98.01.07  01:10
+simpbowl   Simpsons Bowling                                         GV999          GQ829   UAA          ?
 
 PCB Layouts
 -----------
@@ -810,7 +809,7 @@ GAME( 1996, susume,   lacrazyc, konamigv, konamigv, driver_device,  0,        RO
 GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  driver_device,  0,        ROT0, "Konami", "Beat the Champ (GV053 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, driver_device,  0,        ROT0, "Konami", "Dead Eye (GV054 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, weddingr, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, tokimfwy, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial: Forever With You (GQ673 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1997, tokimfwy, konamigv, tokimosh, konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial: Forever With You (GQ673 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1997, tokimosh, konamigv, tokimosh, konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GE755 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1997, tokimosp, konamigv, tokimosh, konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal version PLUS (GE756 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1998, nagano98, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
