@@ -65,13 +65,13 @@
 #include "nld_7430.h"
 #include "nld_7474.h"
 #include "nld_7486.h"
+#include "nld_7493.h"
 
 #include "nld_NE555.h"
 
 #include "nld_log.h"
 
 // this is a bad hack
-#define USE_OLD7493 (0)
 
 // ----------------------------------------------------------------------------------------
 // Special chips
@@ -139,13 +139,6 @@
 		NET_CONNECT(_name, R2,  _R2)                                                \
 		NET_CONNECT(_name, R91, _R91)                                               \
 		NET_CONNECT(_name, R92, _R92)
-
-#define TTL_7493(_name, _CLKA, _CLKB, _R1, _R2)                                     \
-		NET_REGISTER_DEV(nic7493, _name)                                            \
-		NET_CONNECT(_name, CLKA, _CLKA)                                             \
-		NET_CONNECT(_name, CLKB, _CLKB)                                             \
-		NET_CONNECT(_name, R1,  _R1)                                                \
-		NET_CONNECT(_name, R2,  _R2)
 
 #define TTL_74107A(_name, _CLK, _J, _K, _CLRQ)                                      \
 		NET_REGISTER_DEV(nic74107A, _name)                                          \
@@ -314,41 +307,6 @@ public:
 
 };
 
-
-NETLIB_SUBDEVICE(nic7493ff,
-	netlist_ttl_input_t m_I;
-	netlist_ttl_output_t m_Q;
-
-	UINT8 m_reset;
-);
-
-#if !USE_OLD7493
-NETLIB_DEVICE(nic7493,
-	netlist_ttl_input_t m_R1;
-	netlist_ttl_input_t m_R2;
-
-	NETLIB_NAME(nic7493ff) A;
-	NETLIB_NAME(nic7493ff) B;
-	NETLIB_NAME(nic7493ff) C;
-	NETLIB_NAME(nic7493ff) D;
-);
-
-#else
-NETLIB_DEVICE(nic7493,
-	netlist_ttl_input_t m_CLK;
-	netlist_ttl_input_t m_CLKB; /* dummy ! */
-	netlist_ttl_input_t m_R1;
-	netlist_ttl_input_t m_R2;
-
-	netlist_ttl_output_t m_QA;
-	netlist_ttl_output_t m_QB;
-	netlist_ttl_output_t m_QC;
-	netlist_ttl_output_t m_QD;
-
-	UINT8 m_cnt;
-	ATTR_HOT void update_outputs();
-);
-#endif
 
 NETLIB_DEVICE(nic7490,
 	ATTR_HOT void update_outputs();

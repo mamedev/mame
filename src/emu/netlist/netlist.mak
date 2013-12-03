@@ -28,6 +28,7 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/devices/nld_7404.o \
 	$(NETLISTOBJ)/devices/nld_7474.o \
 	$(NETLISTOBJ)/devices/nld_7486.o \
+	$(NETLISTOBJ)/devices/nld_7493.o \
 	$(NETLISTOBJ)/devices/nld_NE555.o \
 	$(NETLISTOBJ)/devices/nld_log.o \
 
