@@ -904,6 +904,21 @@ NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
 #define ENTRY1(_nic, _name) m_list.add(new net_device_t_factory< _nic >( # _name, xstr(_nic) ));
 #define ENTRY(_nic, _name) ENTRY1(NETLIB_NAME(_nic), _name)
 
+netlist_factory::netlist_factory()
+{
+
+}
+
+netlist_factory::~netlist_factory()
+{
+    for (list_t::entry_t *e = m_list.first(); e != NULL; e = m_list.next(e))
+    {
+        net_device_t_base_factory *p = e->object();
+        delete p;
+    }
+    m_list.reset();
+}
+
 void netlist_factory::initialize()
 {
     ENTRY(R,                    NETDEV_R)

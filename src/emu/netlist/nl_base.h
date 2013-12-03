@@ -1143,6 +1143,9 @@ class netlist_factory
 {
 public:
 
+    netlist_factory();
+    ~netlist_factory();
+
     void initialize();
 
     netlist_device_t *new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const;
