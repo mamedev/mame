@@ -1299,10 +1299,10 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightu1",    CPS_B_04,     mapper_S224B },
 	{"ffightua",    CPS_B_01,     mapper_S224B },
 	{"ffightub",    CPS_B_05,     mapper_S224B },
-	{"ffightj",     CPS_B_04,     mapper_S224B },   // wrong, this set uses S222B, still not dumped
-	{"ffightj1",    CPS_B_01,     mapper_S224B },   // wrong, this set uses S222B, still not dumped
-	{"ffightj2",    CPS_B_02,     mapper_S224B },   // wrong, this set uses S222B, still not dumped
-	{"ffightj3",    CPS_B_05,     mapper_S224B },   // wrong, this set uses S222B, still not dumped
+	{"ffightj",     CPS_B_04,     mapper_S224B },   // wrong, this set uses S222B
+	{"ffightj1",    CPS_B_01,     mapper_S224B },   // wrong, this set uses S222B
+	{"ffightj2",    CPS_B_02,     mapper_S224B },   // wrong, this set uses S222B
+	{"ffightj3",    CPS_B_05,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightjh",    CPS_B_01,     mapper_S224B },   // wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
 	{"1941",        CPS_B_05,     mapper_YI24B },
 	{"1941r1",      CPS_B_05,     mapper_YI24B },
