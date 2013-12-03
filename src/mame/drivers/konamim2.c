@@ -1204,8 +1204,8 @@ ROM_START( polystar )
 	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.7k",  0x000000, 0x000080, CRC(66d02984) SHA1(d07c57d198c611b6ff67a783c20a3d038ba34cd1) )
 
-	DISK_REGION( "cdrom" ) // TODO: Add correct CHD
-	DISK_IMAGE( "623jaa02", 0, BAD_DUMP SHA1(cd542931cdac95d05344d34421e223dd6e371bb5) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE( "623jaa02", 0, SHA1(e7d9e628a3e0e085e084e4e3630fa5e3a7345547) )
 ROM_END
 
 ROM_START( btltryst )
@@ -1213,7 +1213,7 @@ ROM_START( btltryst )
 	ROM_LOAD16_WORD( "636a01.8q", 0x000000, 0x200000, CRC(7b1dc738) SHA1(32ae8e7ddd38fcc70b4410275a2cc5e9a0d7d33b) )
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "btltryst", 0, BAD_DUMP SHA1(c76326b0a0fcfe696a2ca019170d3abde40e773e) )
+	DISK_IMAGE( "636jac02", 0, SHA1(d36556a3a4b91058100924a9e9f1a58983399c6e) )
 ROM_END
 
 ROM_START( heatof11 )
@@ -1241,7 +1241,7 @@ ROM_START( evilngt )
 	ROM_LOAD( "93c46.7k",    0x000000, 0x000080, CRC(d7ba2e5e) SHA1(d729557555c6fc1cd433b14017952cc63ec73573) )
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE( "810uba02", 0, BAD_DUMP SHA1(ca3b957e3e33435391fbf630f9ed89aa08a70c8f) )
+	DISK_IMAGE( "810uba02", 0, SHA1(e570470c1cbfe187d5bba8125616412f386264ba) )
 ROM_END
 
 ROM_START( evilngte )
@@ -1267,8 +1267,8 @@ ROM_START( hellngt )
 	ROM_REGION( 0x400000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "810a03.16h",  0x000000, 0x400000, CRC(4cd79d98) SHA1(12fea41cfc5c1b883ffbeda7e428dd1d1bf54d7f) )
 
-	DISK_REGION( "cdrom" ) // TODO: Add correct CHD
-	DISK_IMAGE( "810eaa02", 0, BAD_DUMP SHA1(c407bad498cb87788ce332dbef5e8c6e19c1fd16) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE( "810eaa02", 0, SHA1(d701b900eddc7674015823b2cb33e887bf107fa8) )
 ROM_END
 
 ROM_START( totlvice )
@@ -1280,6 +1280,17 @@ ROM_START( totlvice )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "639uac01", 0, BAD_DUMP SHA1(88431b8a0ce83c156c8b19efbba1af901b859404) )
+ROM_END
+
+ROM_START( totlvica )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
+
+	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE( "639aab01", 0, SHA1(bb99db2eeaecabfda8f20b7b06f714605bbd5b7c) )
 ROM_END
 
 ROM_START( totlvicj )
@@ -1309,11 +1320,11 @@ DRIVER_INIT_MEMBER(konamim2_state,m2)
 GAME( 1997, polystar, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1997, totlvice, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver UAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1997, totlvicj, totlvice, m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver JAD)", GAME_NOT_WORKING | GAME_NO_SOUND )
-//GAME( 1997, totlvica, totlvice, m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver AAB)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, totlvica, totlvice, m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver AAB)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, btltryst, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, heatof11, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, evilngt, 0,         m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver UBA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, evilngte,  evilngt,       m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver UBA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Hell Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 CONS( 199?, 3do_m2,     0,      0,    m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    GAME_NOT_WORKING | GAME_NO_SOUND )
