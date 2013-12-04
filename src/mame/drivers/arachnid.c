@@ -256,8 +256,7 @@ static TMS9928A_INTERFACE( vdp_intf )
 
 WRITE8_MEMBER(arachnid_state::ptm_o1_callback)
 {
-//	Commented line below to compile:  TODO
-//	speaker_level_w(m_speaker, data);
+	m_speaker->level_w(data);
 }
 
 static const ptm6840_interface ptm_intf =
