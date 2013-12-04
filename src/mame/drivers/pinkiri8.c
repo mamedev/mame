@@ -1,8 +1,14 @@
 /***************************************************************************
 
-Pinkiri 8 skeleton driver
+Janshi / Pinkiri 8 / Ron Jan
+ - Wing / Eagle Mahjong board using HD647180X0P6 with internal ROM
 
-- current blocker is the video emulation i/o ports, it looks somewhat exotic.
+
+ Todo:
+ - background tilemap is not fully understood, we lack evidence to support
+   it properly, all the games here just do a solid fill of one tile!
+
+ - sprite heights?!
 
 ============================================================================
 Janshi
@@ -79,12 +85,14 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+
+	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
 /* VDP device to give us our own memory map */
-
 class janshi_vdp_device : public device_t,
 							public device_memory_interface
 {
@@ -97,9 +105,6 @@ protected:
 	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	address_space_config        m_space_config;
-
-
-
 };
 
 
@@ -122,8 +127,6 @@ ADDRESS_MAP_END
 
 const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
 
-
-
 janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, JANSHIVDP, "JANSHIVDP", tag, owner, clock, "janshi_vdp", __FILE__),
 		device_memory_interface(mconfig, *this),
@@ -131,82 +134,193 @@ janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *
 {
 }
 
-
-
-
-
-void janshi_vdp_device::device_config_complete()
-{
-//  int address_bits = 24;
-
-//  m_space_config = address_space_config("janshi_vdp", ENDIANNESS_BIG, 8,  address_bits, 0, *ADDRESS_MAP_NAME(janshi_vdp_map8));
-}
-
-void janshi_vdp_device::device_validity_check(validity_checker &valid) const
-{
-}
-
-void janshi_vdp_device::device_start()
-{
-}
-
-void janshi_vdp_device::device_reset()
-{
-}
+void janshi_vdp_device::device_config_complete(){}
+void janshi_vdp_device::device_validity_check(validity_checker &valid) const {}
+void janshi_vdp_device::device_start() {}
+void janshi_vdp_device::device_reset() {}
 
 const address_space_config *janshi_vdp_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
-
-/* end VDP device to give us our own memory map */
-
+void pinkiri8_state::video_start() {}
 
 
-
-
-void pinkiri8_state::video_start()
+void pinkiri8_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	gfx_element *gfx = machine().gfx[0];
+
+	/* FIXME: color is a bit of a mystery */
+	{
+		int x, y, col, tile, count, attr;
+
+		count = 0;
+
+		for (y = 0; y < 64; y++)
+		{
+			for (x = 0; x < 32; x++)
+			{
+				tile = m_janshi_back_vram[count + 1] << 8 | m_janshi_back_vram[count + 0];
+				attr = m_janshi_back_vram[count + 2] ^ 0xf0;
+				col = (attr >> 4) | 0x10;
+
+				drawgfx_transpen(bitmap, cliprect, gfx, tile, col, 0, 0, x * 16, y * 8, 0);
+
+				count += 4;
+			}
+		}
+	}
 }
 
-/*
+void pinkiri8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int game_type_hack = 0;
+	int col_bank;
+	gfx_element *gfx = machine().gfx[0];
 
-ronjan
-00, 7d, 00, 40, 00, 42, 00, 44, 00, 46, 00, 48, 00, 4a, 00, 0c, 00, 4e, 00, 10, 00, 12, 00, 14, 00, 16, 00, 18, 00, 1a, 00, 1c,
-00, 7d, 00, 40, 00, 42, 00, 44, 00, 46, 00, 48, 00, 4a, 00, 4c, 00, 4e, 00, 50, 00, 52, 00, 54, 00, 56, 00, 58, 00, 5a, 00, 5c,
-00, 7d, 00, 40, 00, 42, 00, 44, 00, 46, 00, 48, 00, 4a, 00, 4c, 00, 4e, 00, 50, 00, 52, 00, 54, 00, 56, 00, 58, 00, 5a, 00, 5c,
+	if (!strcmp(machine().system().name,"janshi")) game_type_hack = 1;
 
-00, 1e, 00, 20, 00, 22, 00, 24, 00, 26, 00, 68, 00, 6a, 00, 6c, 00, 6e, 00, 70, 00, 72, 00, 74, 00, 76, 00, 38, 00, 3a, 00, c0,
-00, 5e, 00, 60, 00, 62, 00, 64, 00, 66, 00, 68, 00, 6a, 00, 6c, 00, 6e, 00, 70, 00, 72, 00, 74, 00, 76, 00, 78, 00, 7a, 00, c0,
-00, 5e, 00, 60, 00, 62, 00, 64, 00, 66, 00, 68, 00, 6a, 00, 6c, 00, 6e, 00, 70, 00, 72, 00, 74, 00, 76, 00, 78, 00, 7a, 00, c0,
-
-
-00, c2, 00, c4, 00, c6, 00, c8, 00, ca, 00, cc, 00, ce, 00, d0, 00, d2, 00, d4, 00, d6, 00, d8, 00, da, 00, dc, 00, de, 00, e0,
-00, c2, 00, c4, 00, c6, 00, c8, 00, ca, 00, cc, 00, ce, 00, d0, 00, d2, 00, d4, 00, d6, 00, d8, 00, da, 00, dc, 00, de, 00, e0,
-00, c2, 00, c4, 00, c6, 00, c8, 00, ca, 00, cc, 00, ce, 00, d0, 00, d2, 00, d4, 00, d6, 00, d8, 00, da, 00, dc, 00, de, 00, e0,
-
-00, e3, 00, e5, 00, e7, 00, e9, 00, eb, 00, ed, 00, ef, 00, f1, 00, f3, 00, f5, 00, f7, 00, f9, 00, fb, 00, fd, 00, ff, 00, 7e,
-00, e3, 00, e5, 00, e7, 00, e9, 00, eb, 00, ed, 00, ef, 00, f1, 00, f3, 00, f5, 00, f7, 00, f9, 00, fb, 00, fd, 00, ff, 00, 7e,
-00, e3, 00, e5, 00, e7, 00, e9, 00, eb, 00, ed, 00, ef, 00, f1, 00, f3, 00, f5, 00, f7, 00, f9, 00, fb, 00, fd, 00, ff, 00, 7e,
-
-00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 01, 00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01,
-00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01,
-00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01,
+	//popmessage("%02x",m_janshi_crtc_regs[0x0a]);
+	col_bank = (m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
 
 
-00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 01, 00, 00, 00, 00,
-00, 01, 00, 01, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
-00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 00, 00, 00,
+	int x,y; //,unk2;
+	int col;
+
+	int spr_offs,i;
+
+	int width, height;
 
 
 
-*/
+	for(i=(0x1000/4)-4;i>=0;i--)
+	{
+	/*  "vram1" (video map 0xfc2000)
+
+		tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
+
+		"vram2" (video map 0xfc3800)
+
+		yyyy yyyy | ???? ???? |
+
+
+		widths come from "widthflags" (0xfc3780)
+		"unk1" (0xfc3700) and "unk2" (0xfc37c0) are a mystery
+
+		*/
+
+		spr_offs = ((m_janshi_vram1[(i*4)+0] & 0xff) | (m_janshi_vram1[(i*4)+1]<<8)) & 0xffff;
+		col = (m_janshi_vram1[(i*4)+2] & 0xf8) >> 3;
+		x =   m_janshi_vram1[(i*4)+3] * 2;
+
+//          unk2 = m_janshi_vram2[(i*2)+1];
+		y = (m_janshi_vram2[(i*2)+0]);
+
+		y = 0x100-y;
+
+		col|= col_bank<<5;
+
+	//  width = 0; height = 0;
+
+		width = 2;
+		height = 2;
+
+
+		// this bit determines the sprite width, one bit is used in each word, each bit is used for a range of sprites
+		int bit = m_janshi_widthflags[(i/0x20)*2 + 1];
+
+		if (bit)
+		{
+			//col = machine().rand();
+			width = 2;
+		}
+		else
+		{
+			width = 1;
+			height = 2;
+		}
+
+		// hacks!
+		if (game_type_hack==1) // janshi
+		{
+			if (spr_offs<0x400)
+			{
+				height = 4;
+			}
+			else if (spr_offs<0x580)
+			{
+			//  height = 2;
+			}
+			else if (spr_offs<0x880)
+			{
+				height = 4;
+			}
+			else if (spr_offs<0x1000)
+			{
+			//  height = 2;
+			}
+			else if (spr_offs<0x1080)
+			{
+			//  height = 2;
+			}
+			else if (spr_offs<0x1700)
+			{
+				height = 4;
+			}
+			else if (spr_offs<0x1730)
+			{
+			//  height = 2;
+			}
+			else if (spr_offs<0x1930)
+			{
+				height = 4;
+			}
+			else if (spr_offs<0x19c0)
+			{
+				height = 1;
+			}
+			else
+			{
+				height = 4;
+			}
+
+
+		}
+
+
+
+
+
+
+		if (height==1)
+			y+=16;
+
+
+		// hmm...
+		if (height==2)
+			y+=16;
+
+
+
+		{
+			int count = 0;
+
+
+			for (int yy=0;yy<height;yy++)
+			{
+				for (int xx=0;xx<width;xx++)
+				{
+					drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+count,col,0,0,(x+xx*16) -7 ,(y+yy*8)-33,0);
+					count++;
+				}
+			}
+		}
+	}
+}
 
 UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int col_bank;
-	gfx_element *gfx = machine().gfx[0];
 
 	/* update palette */
 	for (int pen = 0; pen < 0x800 ; pen++)
@@ -218,10 +332,9 @@ UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind1
 		palette_set_color_rgb(machine(), pen, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 
-	int game_type_hack = 0;
 
-	if (!strcmp(machine().system().name,"janshi")) game_type_hack = 1;
 
+#if 0
 	if ( machine().input().code_pressed_once(KEYCODE_W) )
 	{
 		int i;
@@ -239,177 +352,16 @@ UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind1
 				printf("\n");
 				count2 = 0;
 			}
-
-
 		}
-
-
 	}
+#endif
 
-
-
-	//popmessage("%02x",m_janshi_crtc_regs[0x0a]);
-	col_bank = (m_janshi_crtc_regs[0x0a] & 0x40) >> 6;
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	/* FIXME: color is a bit of a mystery */
-	{
-		int x,y,col,tile,count,attr;
+	draw_background(bitmap, cliprect);
 
-		count = 0;
-
-		for(y=0;y<64;y++)
-		{
-			for(x=0;x<32;x++)
-			{
-				tile = m_janshi_back_vram[count+1]<<8 | m_janshi_back_vram[count+0];
-				attr = m_janshi_back_vram[count+2] ^ 0xf0;
-				col = (attr >> 4) | 0x10;
-
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,col,0,0,x*16,y*8,0);
-
-				count+=4;
-			}
-		}
-	}
-
-	{
-		int x,y; //,unk2;
-		int col;
-
-		int spr_offs,i;
-
-		int width, height;
-
-
-
-		for(i=(0x1000/4)-4;i>=0;i--)
-		{
-		/* vram 1 (video map 0xfc2000)
-
-		  tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
-
-		  vram 2 (video map 0xfc3800)
-
-		  yyyy yyyy | ???? ???? |
-
-		there is also some data at 13000 - 137ff
-		and a table at 20000..
-
-		  */
-
-			spr_offs = ((m_janshi_vram1[(i*4)+0] & 0xff) | (m_janshi_vram1[(i*4)+1]<<8)) & 0xffff;
-			col = (m_janshi_vram1[(i*4)+2] & 0xf8) >> 3;
-			x =   m_janshi_vram1[(i*4)+3];
-
-			x &= 0xff;
-			x *= 2;
-
-//          unk2 = m_janshi_vram2[(i*2)+1];
-			y = (m_janshi_vram2[(i*2)+0]);
-
-			y = 0x100-y;
-
-			col|= col_bank<<5;
-
-		//  width = 0; height = 0;
-
-			width = 2;
-			height = 2;
-
-
-			// these bits seem to somehow determine the sprite height / widths for the sprite ram region?
-			int bit = m_janshi_widthflags[(i/0x20)*2 + 1];
-
-			if (bit)
-			{
-				//col = machine().rand();
-				width = 2;
-			}
-			else
-			{
-				width = 1;
-				height = 2;
-			}
-
-			// hacks!
-			if (game_type_hack==1) // janshi
-			{
-				if (spr_offs<0x400)
-				{
-					height = 4;
-				}
-				else if (spr_offs<0x580)
-				{
-				//  height = 2;
-				}
-				else if (spr_offs<0x880)
-				{
-					height = 4;
-				}
-				else if (spr_offs<0x1000)
-				{
-				//  height = 2;
-				}
-				else if (spr_offs<0x1080)
-				{
-				//  height = 2;
-				}
-				else if (spr_offs<0x1700)
-				{
-					height = 4;
-				}
-				else if (spr_offs<0x1730)
-				{
-				//  height = 2;
-				}
-				else if (spr_offs<0x1930)
-				{
-					height = 4;
-				}
-				else if (spr_offs<0x19c0)
-				{
-					height = 1;
-				}
-				else
-				{
-					height = 4;
-				}
-
-
-			}
-
-
-
-
-
-
-			if (height==1)
-				y+=16;
-
-
-			// hmm...
-			if (height==2)
-				y+=16;
-
-
-
-			{
-				int count = 0;
-
-
-				for (int yy=0;yy<height;yy++)
-				{
-					for (int xx=0;xx<width;xx++)
-					{
-						drawgfx_transpen(bitmap,cliprect,gfx,spr_offs+count,col,0,0,x+xx*16,y+yy*8,0);
-						count++;
-					}
-				}
-			}
-		}
-	}
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
@@ -1138,7 +1090,7 @@ static MACHINE_CONFIG_START( pinkiri8, pinkiri8_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pinkiri8_state, screen_update_pinkiri8)
 
 	MCFG_GFXDECODE(pinkiri8)
