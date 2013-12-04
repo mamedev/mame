@@ -362,6 +362,8 @@ WRITE16_MEMBER(dec0_state::dec0_priority_w)
 
 VIDEO_START_MEMBER(dec0_state,dec0_nodma)
 {
+	save_item(NAME(m_pri));
+
 	m_buffered_spriteram = m_spriteram;
 }
 
