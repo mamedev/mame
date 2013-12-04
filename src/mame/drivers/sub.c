@@ -499,4 +499,4 @@ ROM_START( sub )
 	ROM_LOAD( "prom pos c8 n82s129",      0x0600, 0x100, CRC(351e1ef8) SHA1(530c9012ff5abda1c4ba9787ca999ca1ae1a893d) )
 ROM_END
 
-GAME( 1985, sub,  0,    sub, sub, driver_device,  0, ROT270, "Sigma Enterprises Inc.", "Submarine", GAME_NO_COCKTAIL )
+GAME( 1985, sub,  0,    sub, sub, driver_device,  0, ROT270, "Sigma Enterprises Inc.", "Submarine (Sigma)", GAME_NO_COCKTAIL )
