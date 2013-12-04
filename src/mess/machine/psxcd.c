@@ -113,6 +113,7 @@ void psxcd_device::device_start()
 	m_sysclock = sysclk;
 
 	res_queue = NULL;
+	rdp = 0;
 	status=status_shellopen;
 	mode=0;
 
