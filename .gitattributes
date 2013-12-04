@@ -3433,6 +3433,7 @@ src/mame/drivers/angelkds.c svneol=native#text/plain
 src/mame/drivers/appoooh.c svneol=native#text/plain
 src/mame/drivers/aquarium.c svneol=native#text/plain
 src/mame/drivers/arabian.c svneol=native#text/plain
+src/mame/drivers/arachnid.c svneol=native#text/plain
 src/mame/drivers/arcadecl.c svneol=native#text/plain
 src/mame/drivers/arcadia.c svneol=native#text/plain
 src/mame/drivers/argus.c svneol=native#text/plain
