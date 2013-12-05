@@ -52,9 +52,10 @@ Additional notes
     runs and you set the options and put the 'pepp0516' chip back in.
 
     The only way to simulate this is to fire up the 'pepp0516' game and set it up. Then exit the
-    game and copy the pepp0516.nv file to peset038.nv, and then run the 'peset038' program.
-    This is because they have to have the same eeprom and cmos data in memory to work. When you
-    are done with the 'peset038' program, you copy the peset038.nv file back over the pepp0516.nv .
+    game and copy the cmos & i2cmem files from your 'pepp0516' directory (in NVRAM) to the peset038
+    directory in NVRAM, and then run the 'peset038' program. This is because they have to have the
+    same eeprom and cmos data in memory to work. When you are done with the 'peset038' program,
+    you copy the cmos & i2cmem files back into the pepp0516 directory and restart the pepp0516 game.
     'peset038' is just a utility program with one screen and 3 tested inputs.
 
 
@@ -3347,7 +3348,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
      Programs Available: PP0055, X000055P, PP0723
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xp000022.u67",   0x00000, 0x10000, CRC(7930741b) SHA1(d3b83fd08a458cc794301ef612f8c7b13d4b2050) )
+	ROM_LOAD( "xp000022.u67",   0x00000, 0x10000, CRC(7930741b) SHA1(d3b83fd08a458cc794301ef612f8c7b13d4b2050) ) /*  09/28/95   @IGT  L95-2028  */
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x010000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
@@ -4256,7 +4257,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
-ROM_START( pex0459pa ) /* Superboard : Joker Poker (X000459P+XP000155) */
+ROM_START( pex0459pa ) /* Superboard : Joker Poker (X000459P+XP000155) - Use SET038 to set Denomination for this game */
 /*
                                             w/J     w/oJ
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
