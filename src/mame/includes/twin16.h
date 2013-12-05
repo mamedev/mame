@@ -73,7 +73,6 @@ public:
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap );
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, int opaque );
 	int twin16_spriteram_process_enable(  );
-	void gfx_untangle(  );
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

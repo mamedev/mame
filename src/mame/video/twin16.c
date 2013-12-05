@@ -62,14 +62,14 @@ WRITE16_MEMBER(twin16_state::fround_gfx_bank_w)
 
 WRITE16_MEMBER(twin16_state::twin16_video_register_w)
 {
+	int text_flip;
 	switch (offset)
 	{
 		case 0:
 			COMBINE_DATA( &m_video_register );
-
-			flip_screen_x_set(m_video_register & TWIN16_SCREEN_FLIPX);
-			flip_screen_y_set(m_video_register & TWIN16_SCREEN_FLIPY);
-
+			text_flip  = (m_video_register&TWIN16_SCREEN_FLIPX) ? TILEMAP_FLIPX : 0;
+			text_flip |= (m_video_register&TWIN16_SCREEN_FLIPY) ? TILEMAP_FLIPY : 0;
+			m_text_tilemap->set_flip(text_flip);
 			break;
 
 		case 1: COMBINE_DATA( &m_scrollx[0] ); break;
@@ -488,8 +488,12 @@ TILE_GET_INFO_MEMBER(twin16_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(twin16_state,twin16)
 {
+	m_gfx_rom = (UINT16 *)memregion("gfx2")->base();
+
 	m_text_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(twin16_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_text_tilemap->set_transparent_pen(0);
+	m_text_tilemap->set_scrolldx(0, m_screen->width() - 320);
+	m_text_tilemap->set_scrolldy(0, m_screen->height() - 256);
 
 	palette_set_shadow_factor(machine(),0.4); // screenshots estimate
 
@@ -511,16 +515,11 @@ VIDEO_START_MEMBER(twin16_state,twin16)
 
 UINT32 twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int text_flip=0;
-	if (m_video_register&TWIN16_SCREEN_FLIPX) text_flip|=TILEMAP_FLIPX;
-	if (m_video_register&TWIN16_SCREEN_FLIPY) text_flip|=TILEMAP_FLIPY;
-
 	screen.priority().fill(0, cliprect);
 	draw_layer( screen, bitmap, 1 );
 	draw_layer( screen, bitmap, 0 );
 	draw_sprites( screen, bitmap );
 
-	if (text_flip) m_text_tilemap->set_flip(text_flip);
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
