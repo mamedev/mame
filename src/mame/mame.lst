@@ -1523,12 +1523,14 @@ invmultis3a     // hack
 invmultis2a     // hack
 invmultis1a     // hack
 invmultip       // hack
-18w             // 653 (c) 1979 Midway
-18w2            // 653 (c) 1979 Midway
-sspeedr         // 1979 Midway
 
 // Similar but with a M6800 instead of an 8080
 sflush          // (c)1979 Taito
+
+// Midway Z80 games
+18w             // 653 (c) 1979 Midway
+18w2            // 653 (c) 1979 Midway
+sspeedr         // 1979 Midway
 
 // Meadows S2650 games
 lazercmd        // [1976?]

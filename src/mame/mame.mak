@@ -1286,10 +1286,8 @@ $(MAMEOBJ)/midcoin.a: \
 $(MAMEOBJ)/midw8080.a: \
 	$(DRIVERS)/8080bw.o $(AUDIO)/8080bw.o $(VIDEO)/8080bw.o \
 	$(DRIVERS)/m79amb.o $(AUDIO)/m79amb.o \
-	$(DRIVERS)/mw18w.o \
 	$(DRIVERS)/mw8080bw.o $(MACHINE)/mw8080bw.o $(AUDIO)/mw8080bw.o $(VIDEO)/mw8080bw.o \
 	$(DRIVERS)/rotaryf.o \
-	$(DRIVERS)/sspeedr.o $(VIDEO)/sspeedr.o \
 
 $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/astrocde.o $(VIDEO)/astrocde.o \
@@ -1306,9 +1304,11 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/midxunit.o $(MACHINE)/midxunit.o \
 	$(DRIVERS)/midyunit.o $(MACHINE)/midyunit.o $(VIDEO)/midyunit.o \
 	$(DRIVERS)/midzeus.o $(VIDEO)/midzeus.o $(VIDEO)/midzeus2.o \
+	$(DRIVERS)/mw18w.o \
 	$(DRIVERS)/omegrace.o \
 	$(DRIVERS)/pinball2k.o \
 	$(DRIVERS)/seattle.o \
+	$(DRIVERS)/sspeedr.o $(VIDEO)/sspeedr.o \
 	$(DRIVERS)/tmaster.o \
 	$(DRIVERS)/vegas.o $(DRIVERS)/wmg.o \
 	$(DRIVERS)/williams.o $(MACHINE)/williams.o $(AUDIO)/williams.o $(VIDEO)/williams.o \

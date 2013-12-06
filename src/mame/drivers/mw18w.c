@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/* Midway's 18 Wheeler hardware, game number 653
+/* Midway 18 Wheeler hardware, game number 653
 
 driver todo:
 - discrete sound
@@ -28,13 +28,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	required_device<cpu_device> m_maincpu;
+
 	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
 	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
 	DECLARE_WRITE8_MEMBER(mw18w_lamps_w);
 	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
 	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -79,8 +80,6 @@ CUSTOM_INPUT_MEMBER(mw18w_state::mw18w_sensors_r)
 }
 
 
-
-
 static ADDRESS_MAP_START( mw18w_map, AS_PROGRAM, 8, mw18w_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
@@ -97,6 +96,7 @@ static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8, mw18w_state )
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(mw18w_irq0_clear_w)
 ADDRESS_MAP_END
+
 
 static const ioport_value mw18w_controller_table[] =
 {
@@ -176,36 +176,35 @@ static INPUT_PORTS_START( mw18w )
 INPUT_PORTS_END
 
 
-
-
 static MACHINE_CONFIG_START( mw18w, mw18w_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mw18w_state, irq0_line_assert, 960.516)    // 555 IC
+	MCFG_CPU_PERIODIC_INT_DRIVER(mw18w_state, irq0_line_assert, 960.516) // 555 IC
 	MCFG_CPU_PROGRAM_MAP(mw18w_map)
 	MCFG_CPU_IO_MAP(mw18w_portmap)
 
 	/* no video! */
 
 	/* sound hardware */
-	// MCFG_SPEAKER_STANDARD_MONO("mono")
+	//...
 MACHINE_CONFIG_END
 
 
-ROM_START(18w)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "18w_b1.rom1", 0x0000, 0x0800, CRC(200c5beb) SHA1(994d67a89f18df9716c5dd4dd60f6e7eeb880f1b))
-	ROM_LOAD( "18w_a2.rom2", 0x0800, 0x0800, CRC(efbadee8) SHA1(834eaf8ca50544123de7529b90b828cf46b1c001))
-	ROM_LOAD( "18w_b3.rom3", 0x1000, 0x0800, CRC(214606f6) SHA1(9a9dc20259b4462661c6be410d98d2be54657a0e))
-	ROM_LOAD( "18w_a4.rom4", 0x1800, 0x0800, CRC(e88ad6a9) SHA1(ac010aa7e0288197ff9342801522623b64dd2a47))
+ROM_START( 18w )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "18w_b1.rom1", 0x0000, 0x0800, CRC(200c5beb) SHA1(994d67a89f18df9716c5dd4dd60f6e7eeb880f1b) )
+	ROM_LOAD( "18w_a2.rom2", 0x0800, 0x0800, CRC(efbadee8) SHA1(834eaf8ca50544123de7529b90b828cf46b1c001) )
+	ROM_LOAD( "18w_b3.rom3", 0x1000, 0x0800, CRC(214606f6) SHA1(9a9dc20259b4462661c6be410d98d2be54657a0e) )
+	ROM_LOAD( "18w_a4.rom4", 0x1800, 0x0800, CRC(e88ad6a9) SHA1(ac010aa7e0288197ff9342801522623b64dd2a47) )
 ROM_END
 
-ROM_START(18w2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "18w_b1(__18w2).rom1",0x0000, 0x0800, CRC(cbc0fb2c) SHA1(66b14f0d76baebbd64e8ed107e536ad811d55273))
-	ROM_LOAD( "18w_b2.rom2", 0x0800, 0x0800, CRC(efbadee8) SHA1(834eaf8ca50544123de7529b90b828cf46b1c001))
-	ROM_LOAD( "18w_b3.rom3", 0x1000, 0x0800, CRC(214606f6) SHA1(9a9dc20259b4462661c6be410d98d2be54657a0e))
-	ROM_LOAD( "18w_b4.rom4", 0x1800, 0x0800, CRC(e88ad6a9) SHA1(ac010aa7e0288197ff9342801522623b64dd2a47))
+ROM_START( 18w2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "18w_b1(__18w2).rom1",0x0000, 0x0800, CRC(cbc0fb2c) SHA1(66b14f0d76baebbd64e8ed107e536ad811d55273) )
+	ROM_LOAD( "18w_b2.rom2", 0x0800, 0x0800, CRC(efbadee8) SHA1(834eaf8ca50544123de7529b90b828cf46b1c001) )
+	ROM_LOAD( "18w_b3.rom3", 0x1000, 0x0800, CRC(214606f6) SHA1(9a9dc20259b4462661c6be410d98d2be54657a0e) )
+	ROM_LOAD( "18w_b4.rom4", 0x1800, 0x0800, CRC(e88ad6a9) SHA1(ac010aa7e0288197ff9342801522623b64dd2a47) )
 ROM_END
 
 
