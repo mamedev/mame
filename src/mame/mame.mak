@@ -1306,6 +1306,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/midyunit.o $(MACHINE)/midyunit.o $(VIDEO)/midyunit.o \
 	$(DRIVERS)/midzeus.o $(VIDEO)/midzeus.o $(VIDEO)/midzeus2.o \
 	$(DRIVERS)/mw18w.o \
+	$(DRIVERS)/mwsub.o \
 	$(DRIVERS)/omegrace.o \
 	$(DRIVERS)/pinball2k.o \
 	$(DRIVERS)/seattle.o \
@@ -2508,6 +2509,8 @@ $(DRIVERS)/mw8080bw.o:  $(LAYOUT)/280zzzap.lh \
 			$(LAYOUT)/seawolf.lh \
 			$(LAYOUT)/spacwalk.lh \
 			$(LAYOUT)/spcenctr.lh
+
+$(DRIVERS)/mwsub.o:     $(LAYOUT)/submar.lh
 
 $(DRIVERS)/meadows.o:   $(LAYOUT)/deadeye.lh \
 			$(LAYOUT)/gypsyjug.lh \

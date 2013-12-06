@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/* Midway 18 Wheeler hardware, game number 653
+/* Midway's 18 Wheeler hardware, game number 653
 
 driver todo:
 - discrete sound
