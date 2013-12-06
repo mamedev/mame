@@ -318,7 +318,7 @@ WRITE8_MEMBER(itt3030_state::bankh_w)
 
 UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	for(int y = 0; y < 24; y++ )
 	{
