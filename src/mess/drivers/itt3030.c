@@ -193,6 +193,7 @@ Beeper Circuit, all ICs shown:
 #include "cpu/z80/z80.h"
 #include "machine/wd_fdc.h"
 #include "machine/bankdev.h"
+#include "machine/ram.h"
 #include "formats/itt3030_dsk.h"
 #include "video/tms9927.h"			//Display hardware
 #include "sound/beep.h"
@@ -207,20 +208,28 @@ public:
 	itt3030_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "mainram")
 		, m_crtc(*this, "crt5027")
+		, m_48kbank(*this, "lowerbank")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_beep(*this, "beeper")
+		, m_vram(*this, "vram")
 	{ }
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_device<crt5027_device> m_crtc;
+	required_device<address_map_bank_device> m_48kbank;
 	required_device<fd1791_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<beep_device> m_beep;
+
+	// shared pointers
+	required_shared_ptr<UINT8> m_vram;
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -236,11 +245,16 @@ public:
 	DECLARE_READ8_MEMBER(vsync_r);
 	DECLARE_READ8_MEMBER(unk2_r);
 	DECLARE_WRITE8_MEMBER( beep_w );
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_READ8_MEMBER(bankl_r);
+	DECLARE_WRITE8_MEMBER(bankl_w);
+	DECLARE_READ8_MEMBER(bankh_r);
+	DECLARE_WRITE8_MEMBER(bankh_w);
 	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
 private:
 	UINT8 m_unk;
+	UINT8 m_bank;
 	floppy_image_device *m_floppy;
-	
 };
 
 void itt3030_state::video_start()
@@ -263,6 +277,45 @@ WRITE8_MEMBER( itt3030_state::beep_w )
 	m_beep->set_state(data&0x32);
 }
 
+WRITE8_MEMBER(itt3030_state::bank_w)
+{
+	int bank;
+	m_bank = data>>4;
+
+	if (data & 1)	// bank 8
+	{
+		bank = 8;
+	}
+	else
+	{
+		bank = m_bank >> 1; 
+	}
+
+//	printf("bank_w: new value %02x, m_bank %x, bank %x\n", data, m_bank, bank);
+
+	m_48kbank->set_bank(bank);
+}
+
+READ8_MEMBER(itt3030_state::bankl_r)
+{
+	return m_ram->read(offset);
+}
+
+WRITE8_MEMBER(itt3030_state::bankl_w)
+{
+	m_ram->write(offset, data);
+}
+
+READ8_MEMBER(itt3030_state::bankh_r)
+{
+	return m_ram->read(((m_bank>>1)*0x10000) + offset + 0xc000);
+}
+
+WRITE8_MEMBER(itt3030_state::bankh_w)
+{
+	m_ram->write(((m_bank>>1)*0x10000) + offset + 0xc000, data);
+}
+
 UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -271,7 +324,7 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 	{
 		for(int x = 0; x < 80; x++ )
 		{
-			UINT8 code = space.read_byte(0x3000 + x + y*128);
+			UINT8 code = m_vram[0x3000 + x + y*128];
 			drawgfx_opaque(bitmap, cliprect, machine().gfx[0],  code , 0, 0,0, x*8,y*16);
 		}
 	}
@@ -279,12 +332,24 @@ UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
+
+// The lower 48K is switchable among the first 48K of each of 8 64K banks numbered 0-7 or "bank 8" which is the internal ROM and VRAM
+// The upper 16K is always the top 16K of the selected bank 0-7, which allows bank/bank copies and such
+// Port F6 bits 7-5 select banks 0-7, bit 4 enables bank 8
+
 static ADDRESS_MAP_START( itt3030_map, AS_PROGRAM, 8, itt3030_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x0800, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x1000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xbfff) AM_DEVICE("lowerbank", address_map_bank_device, amap8)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(bankh_r, bankh_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( lower48_map, AS_PROGRAM, 8, itt3030_state )
+	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(bankl_r, bankl_w)	// pages 0-7
+//  AM_RANGE(0x00000, 0x7ffff) AM_DEVREADWRITE("mainram", ram_device, read, write)	// should work in theory, but compiler blows up spectacularly?
+	AM_RANGE(0x80000, 0x807ff) AM_ROM AM_REGION("maincpu", 0)   // begin "page 8"
+	AM_RANGE(0x80800, 0x80fff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x81000, 0x810ff) AM_RAM AM_MIRROR(0x100)	// only 256 bytes, but ROM also clears 11xx?
+	AM_RANGE(0x83000, 0x83fff) AM_RAM AM_SHARE("vram")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -293,7 +358,7 @@ static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	AM_RANGE(0x32, 0x32) AM_WRITE(beep_w)
 	AM_RANGE(0x35, 0x35) AM_READ(vsync_r)
 	AM_RANGE(0x50, 0x55) AM_DEVREADWRITE("fdc", fd1791_t, read, write)
-	
+	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( itt3030 )
@@ -322,6 +387,8 @@ void itt3030_state::machine_start()
 
 void itt3030_state::machine_reset()
 {
+	m_bank = 1;
+	m_48kbank->set_bank(8);
 }
 
 FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
@@ -356,6 +423,11 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*16-1)
 	
 	/* devices */
+	MCFG_DEVICE_ADD("lowerbank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(lower48_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 	MCFG_DEVICE_ADD("crt5027", CRT5027, XTAL_6MHz)
 	MCFG_DEVICE_CONFIG(crtc_intf)
 	MCFG_FD1791x_ADD("fdc", XTAL_20MHz / 20)
@@ -367,6 +439,10 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+
+	/* internal ram */
+	MCFG_RAM_ADD("mainram")
+	MCFG_RAM_DEFAULT_SIZE("512K")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
