@@ -204,6 +204,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/z80ne_dsk.o   \
 	$(LIBOBJ)/formats/zx81_p.o      \
 	$(LIBOBJ)/formats/hxcmfm_dsk.o  \
+	$(LIBOBJ)/formats/itt3030_dsk.o \
 
 $(OBJ)/libformats.a: $(FORMATSOBJS)
 
