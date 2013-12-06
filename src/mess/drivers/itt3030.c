@@ -279,10 +279,10 @@ WRITE8_MEMBER( itt3030_state::beep_w )
 
 WRITE8_MEMBER(itt3030_state::bank_w)
 {
-	int bank;
+	int bank = 0;
 	m_bank = data>>4;
 
-	if (data & 1)	// bank 8
+	if (m_bank & 1)	// bank 8
 	{
 		bank = 8;
 	}
