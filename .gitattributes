@@ -7660,6 +7660,7 @@ src/mess/layout/votrpss.lay svneol=native#text/plain
 src/mess/layout/votrtnt.lay svneol=native#text/plain
 src/mess/layout/vsc.lay svneol=native#text/plain
 src/mess/layout/vt100.lay svneol=native#text/plain
+src/mess/layout/wicat.lay svneol=native#text/plain
 src/mess/layout/wswan.lay svneol=native#text/plain
 src/mess/layout/x68000.lay svneol=native#text/plain
 src/mess/layout/z80dev.lay svneol=native#text/plain

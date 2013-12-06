@@ -11,22 +11,28 @@ Wicat - various systems.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
+#include "wicat.lh"
 
 class wicat_state : public driver_device
 {
 public:
 	wicat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_p_base(*this, "rambase")
+//		, m_p_base(*this, "rambase")
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_READ16_MEMBER(invalid_r);
+	DECLARE_WRITE16_MEMBER(invalid_w);
+	DECLARE_WRITE16_MEMBER(serial_w);
+	DECLARE_WRITE16_MEMBER(parallel_led_w);
 private:
 	UINT8 m_term_data;
+	virtual void machine_start();
 	virtual void machine_reset();
-	required_shared_ptr<UINT16> m_p_base;
+//	required_shared_ptr<UINT16> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -35,9 +41,14 @@ private:
 static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x04cfff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x04d000, 0x04ffff) AM_ROM AM_REGION("c1", 0)
-	AM_RANGE(0x018000, 0x018fff) AM_RAM
+//	AM_RANGE(0x000000, 0x01efff) AM_RAM AM_SHARE("rambase")
+	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_REGION("c2", 0x0000)
+	AM_RANGE(0x020000, 0x1fffff) AM_RAM
+	AM_RANGE(0x200000, 0x3fffff) AM_RAM
+	AM_RANGE(0x400000, 0xdfffff) AM_READWRITE(invalid_r,invalid_w)
+	AM_RANGE(0xeff800, 0xefffff) AM_RAM  // memory mapping SRAM, used during boot sequence for the stack (TODO)
+	AM_RANGE(0xf00000, 0xf0002f) AM_WRITE(serial_w)  // UARTs
+	AM_RANGE(0xf000d0, 0xf000d1) AM_WRITE(parallel_led_w)
 ADDRESS_MAP_END
 
 
@@ -46,16 +57,59 @@ static INPUT_PORTS_START( wicat )
 INPUT_PORTS_END
 
 
+void wicat_state::machine_start()
+{
+}
+
 void wicat_state::machine_reset()
 {
-	UINT8* ROM = memregion("c1")->base();
-	memcpy(m_p_base, ROM, 8);
-	m_maincpu->reset();
 }
 
 WRITE8_MEMBER( wicat_state::kbd_put )
 {
 	m_term_data = data;
+}
+
+WRITE16_MEMBER( wicat_state::serial_w )
+{
+	if(ACCESSING_BITS_8_15)  // even addresses
+	{
+		switch(offset)
+		{
+		case 0x00:
+		case 0x02:
+		case 0x04:
+		case 0x06:
+			m_terminal->write(space,0,data);
+		default:
+			logerror("Serial: Unused serial port write %02x to offset %02x\n",data,offset);
+		}
+	}
+}
+
+WRITE16_MEMBER( wicat_state::parallel_led_w )
+{
+	// bit 0 - parallel port A direction (0 = input)
+	// bit 1 - parallel port B direction (0 = input)
+	output_set_value("led1",(~data) & 0x0400);
+	output_set_value("led2",(~data) & 0x0800);
+	output_set_value("led3",(~data) & 0x1000);
+	output_set_value("led4",(~data) & 0x2000);
+	output_set_value("led5",(~data) & 0x4000);
+	output_set_value("led6",(~data) & 0x8000);
+}
+
+READ16_MEMBER( wicat_state::invalid_r )
+{
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	return 0xff;
+}
+
+WRITE16_MEMBER( wicat_state::invalid_w )
+{
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
@@ -70,11 +124,13 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+
+	MCFG_DEFAULT_LAYOUT(layout_wicat)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( wicat )
-	ROM_REGION16_BE(0x3000, "c1", 0)
+	ROM_REGION16_BE(0x4000, "c1", 0)
 	ROM_LOAD16_BYTE("wiboot.e",   0x00000, 0x0800, CRC(6f0f73c6) SHA1(be635bf3ffa1301f844a3d5560e278de46740d19) )
 	ROM_LOAD16_BYTE("wiboot.o",   0x00001, 0x0800, CRC(b9763bbd) SHA1(68f497be56ff69534e17b41a40737cd6f708d65e) )
 	ROM_LOAD16_BYTE("tpcnif.e",   0x01000, 0x0800, CRC(fd1127ec) SHA1(7c6b436c0cea41dbb23cb6bd9b9a5c21fa61d232) )
@@ -87,10 +143,10 @@ ROM_START( wicat )
 	ROM_LOAD       ("cpu.15c",    0x00040, 0x0020, CRC(ba2dd77d) SHA1(eb693d6d30aa6a9dba61c6c41a75614ed4e9e69a) )
 
 	ROM_REGION16_BE(0x2000, "c2", 0)
-	ROM_LOAD16_BYTE("wd3_15.b5",  0x00000, 0x0800, CRC(a765899b) SHA1(8427c564029914b7dbc29768ce451604180e390f) )
-	ROM_LOAD16_BYTE("wd3_15.b7",  0x00001, 0x0800, CRC(9d986585) SHA1(1ac7579c692f827b121c56dac0a77b15400caba1) )
-	ROM_LOAD16_BYTE("boot156.a5", 0x01000, 0x0800, CRC(58510a52) SHA1(d2135b056a04ba830b0ae1cef539e4a9a1b58f82) )
-	ROM_LOAD16_BYTE("boot156.a7", 0x01001, 0x0800, CRC(e53999f1) SHA1(9c6c6a3a56b5c16a35e1fe824f37c8ae739ebcb9) )
+	ROM_LOAD16_BYTE("boot156.a5", 0x00000, 0x0800, CRC(58510a52) SHA1(d2135b056a04ba830b0ae1cef539e4a9a1b58f82) )
+	ROM_LOAD16_BYTE("boot156.a7", 0x00001, 0x0800, CRC(e53999f1) SHA1(9c6c6a3a56b5c16a35e1fe824f37c8ae739ebcb9) )
+	ROM_LOAD16_BYTE("wd3_15.b5",  0x01000, 0x0800, CRC(a765899b) SHA1(8427c564029914b7dbc29768ce451604180e390f) )
+	ROM_LOAD16_BYTE("wd3_15.b7",  0x01001, 0x0800, CRC(9d986585) SHA1(1ac7579c692f827b121c56dac0a77b15400caba1) )
 
 	ROM_REGION16_BE(0x8000, "g1", 0)
 	ROM_LOAD16_BYTE("1term0.e",   0x00000, 0x0800, CRC(a9aade37) SHA1(644e9362d5a9523be5c6f39a650b574735dbd4a2) )
