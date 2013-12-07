@@ -11,6 +11,9 @@ Wicat - various systems.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
+#include "machine/6522via.h"
+#include "machine/mm58274c.h"
+#include "machine/mc2661.h"
 #include "wicat.lh"
 
 class wicat_state : public driver_device
@@ -21,20 +24,43 @@ public:
 //		, m_p_base(*this, "rambase")
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, TERMINAL_TAG)
+		, m_rtc(*this, "rtc")
+		, m_uart0(*this,"uart0")
+		, m_uart1(*this,"uart1")
+		, m_uart2(*this,"uart2")
+		, m_uart3(*this,"uart3")
+		, m_uart4(*this,"uart4")
+		, m_uart5(*this,"uart5")
+		, m_uart6(*this,"uart6")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	//DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ16_MEMBER(invalid_r);
 	DECLARE_WRITE16_MEMBER(invalid_w);
 	DECLARE_WRITE16_MEMBER(serial_w);
 	DECLARE_WRITE16_MEMBER(parallel_led_w);
+	DECLARE_READ8_MEMBER(via_a_r);
+	DECLARE_READ8_MEMBER(via_b_r);
+	DECLARE_WRITE8_MEMBER(via_a_w);
+	DECLARE_WRITE8_MEMBER(via_b_w);
 private:
 	UINT8 m_term_data;
 	virtual void machine_start();
 	virtual void machine_reset();
 //	required_shared_ptr<UINT16> m_p_base;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<serial_terminal_device> m_terminal;
+	required_device<mm58274c_device> m_rtc;
+	required_device<mc2661_device> m_uart0;
+	required_device<mc2661_device> m_uart1;
+	required_device<mc2661_device> m_uart2;
+	required_device<mc2661_device> m_uart3;
+	required_device<mc2661_device> m_uart4;
+	required_device<mc2661_device> m_uart5;
+	required_device<mc2661_device> m_uart6;
+
+	UINT8 m_portA;
+	UINT8 m_portB;
 };
 
 
@@ -44,11 +70,20 @@ static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 //	AM_RANGE(0x000000, 0x01efff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_REGION("c2", 0x0000)
 	AM_RANGE(0x020000, 0x1fffff) AM_RAM
-	AM_RANGE(0x200000, 0x3fffff) AM_RAM
-	AM_RANGE(0x400000, 0xdfffff) AM_READWRITE(invalid_r,invalid_w)
-	AM_RANGE(0xeff800, 0xefffff) AM_RAM  // memory mapping SRAM, used during boot sequence for the stack (TODO)
-	AM_RANGE(0xf00000, 0xf0002f) AM_WRITE(serial_w)  // UARTs
+	AM_RANGE(0x200000, 0x2fffff) AM_RAM
+	AM_RANGE(0x300000, 0xdfffff) AM_READWRITE(invalid_r,invalid_w)
+	AM_RANGE(0xeff800, 0xeffbff) AM_RAM  // memory mapping SRAM, used during boot sequence for the stack (TODO)
+	AM_RANGE(0xf00000, 0xf00007) AM_DEVREADWRITE8("uart0",mc2661_device,read,write,0xff00)  // UARTs
+	AM_RANGE(0xf00008, 0xf0000f) AM_DEVREADWRITE8("uart1",mc2661_device,read,write,0xff00)
+	AM_RANGE(0xf00010, 0xf00017) AM_DEVREADWRITE8("uart2",mc2661_device,read,write,0xff00)
+	AM_RANGE(0xf00018, 0xf0001f) AM_DEVREADWRITE8("uart3",mc2661_device,read,write,0xff00)
+	AM_RANGE(0xf00020, 0xf00027) AM_DEVREADWRITE8("uart4",mc2661_device,read,write,0xff00)
+	AM_RANGE(0xf00028, 0xf0002f) AM_DEVREADWRITE8("uart5",mc2661_device,read,write,0xff00)
+	AM_RANGE(0xf00030, 0xf00037) AM_DEVREADWRITE8("uart6",mc2661_device,read,write,0xff00)
+	AM_RANGE(0xf00040, 0xf0005f) AM_DEVREADWRITE8("via",via6522_device,read,write,0xff00)
+	AM_RANGE(0xf00060, 0xf0007f) AM_DEVREADWRITE8("rtc",mm58274c_device,read,write,0xff00)
 	AM_RANGE(0xf000d0, 0xf000d1) AM_WRITE(parallel_led_w)
+	AM_RANGE(0xf00f00, 0xf00fff) AM_READWRITE(invalid_r,invalid_w)
 ADDRESS_MAP_END
 
 
@@ -65,10 +100,10 @@ void wicat_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER( wicat_state::kbd_put )
-{
-	m_term_data = data;
-}
+//WRITE8_MEMBER( wicat_state::kbd_put )
+//{
+//	m_term_data = data;
+//}
 
 WRITE16_MEMBER( wicat_state::serial_w )
 {
@@ -76,11 +111,11 @@ WRITE16_MEMBER( wicat_state::serial_w )
 	{
 		switch(offset)
 		{
-		case 0x00:
-		case 0x02:
-		case 0x04:
-		case 0x06:
-			m_terminal->write(space,0,data);
+		//case 0x00:
+		//case 0x01:
+		//case 0x02:
+		//case 0x03:
+			//m_terminal->write(space,0,data >> 8);
 		default:
 			logerror("Serial: Unused serial port write %02x to offset %02x\n",data,offset);
 		}
@@ -99,6 +134,28 @@ WRITE16_MEMBER( wicat_state::parallel_led_w )
 	output_set_value("led6",(~data) & 0x8000);
 }
 
+READ8_MEMBER( wicat_state::via_a_r )
+{
+	return m_portA;
+}
+
+READ8_MEMBER( wicat_state::via_b_r )
+{
+	return m_portB;
+}
+
+WRITE8_MEMBER( wicat_state::via_a_w )
+{
+	m_portA = data;
+	logerror("VIA: write %02x to port A\n",data);
+}
+
+WRITE8_MEMBER( wicat_state::via_b_w )
+{
+	m_portB = data;
+	logerror("VIA: write %02x to port B\n",data);
+}
+
 READ16_MEMBER( wicat_state::invalid_r )
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -112,18 +169,83 @@ WRITE16_MEMBER( wicat_state::invalid_w )
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static serial_terminal_interface terminal_intf =
 {
-	DEVCB_DRIVER_MEMBER(wicat_state, kbd_put)
+	DEVCB_NULL
+};
+
+static mc2661_interface wicat_uart0_intf =
+{
+	0,  // RXC
+	0,  // TXC
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),  // RXD in
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),  // RXD out
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
+	DEVCB_NULL,  // TXRDY out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),  // RTS out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),  // DTR out
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
+	DEVCB_NULL,  // BKDET out
+	DEVCB_NULL   // XSYNC out
+};
+
+static mc2661_interface wicat_unused_intf =
+{
+	0,
+	0,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static via6522_interface wicat_via_intf =
+{
+	DEVCB_DRIVER_MEMBER(wicat_state,via_a_r),  // Port A in
+	DEVCB_DRIVER_MEMBER(wicat_state,via_b_r),  // Port B in
+	DEVCB_NULL,  // CA1 in
+	DEVCB_NULL,  // CB1 in
+	DEVCB_NULL,  // CA2 in
+	DEVCB_NULL,  // CB2 in
+	DEVCB_DRIVER_MEMBER(wicat_state,via_a_w),  // Port A out
+	DEVCB_DRIVER_MEMBER(wicat_state,via_b_w),  // Port B out
+	DEVCB_NULL,  // CA1 out
+	DEVCB_NULL,  // CB1 out
+	DEVCB_NULL,  // CA2 out
+	DEVCB_NULL,  // CB2 out
+	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_1)  // IRQ
+};
+
+static mm58274c_interface wicat_rtc_intf =
+{
+	0,  // 12 hour
+	1   // first day
 };
 
 static MACHINE_CONFIG_START( wicat, wicat_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // unknown clock
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(wicat_mem)
 
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, XTAL_5_0688MHz)
+
+	MCFG_VIA6522_ADD("via",XTAL_4MHz,wicat_via_intf)
+
+	MCFG_MM58274C_ADD("rtc",wicat_rtc_intf)  // actually an MM58174AN, but should be compatible
+
+	MCFG_MC2661_ADD("uart0", XTAL_5_0688MHz, wicat_uart0_intf)  // connected to terminal board (TODO)
+	MCFG_MC2661_ADD("uart1", XTAL_5_0688MHz, wicat_unused_intf)
+	MCFG_MC2661_ADD("uart2", XTAL_5_0688MHz, wicat_unused_intf)
+	MCFG_MC2661_ADD("uart3", XTAL_5_0688MHz, wicat_unused_intf)
+	MCFG_MC2661_ADD("uart4", XTAL_5_0688MHz, wicat_unused_intf)
+	MCFG_MC2661_ADD("uart5", XTAL_5_0688MHz, wicat_unused_intf)
+	MCFG_MC2661_ADD("uart6", XTAL_5_0688MHz, wicat_unused_intf)  // connected to modem port
 
 	MCFG_DEFAULT_LAYOUT(layout_wicat)
 MACHINE_CONFIG_END
@@ -142,12 +264,14 @@ ROM_START( wicat )
 	ROM_LOAD       ("cpu.8c",     0x00020, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) )
 	ROM_LOAD       ("cpu.15c",    0x00040, 0x0020, CRC(ba2dd77d) SHA1(eb693d6d30aa6a9dba61c6c41a75614ed4e9e69a) )
 
+	// System 150 CPU/MU board
 	ROM_REGION16_BE(0x2000, "c2", 0)
 	ROM_LOAD16_BYTE("boot156.a5", 0x00000, 0x0800, CRC(58510a52) SHA1(d2135b056a04ba830b0ae1cef539e4a9a1b58f82) )
 	ROM_LOAD16_BYTE("boot156.a7", 0x00001, 0x0800, CRC(e53999f1) SHA1(9c6c6a3a56b5c16a35e1fe824f37c8ae739ebcb9) )
 	ROM_LOAD16_BYTE("wd3_15.b5",  0x01000, 0x0800, CRC(a765899b) SHA1(8427c564029914b7dbc29768ce451604180e390f) )
 	ROM_LOAD16_BYTE("wd3_15.b7",  0x01001, 0x0800, CRC(9d986585) SHA1(1ac7579c692f827b121c56dac0a77b15400caba1) )
 
+	// Terminal CPU board (Graphical)
 	ROM_REGION16_BE(0x8000, "g1", 0)
 	ROM_LOAD16_BYTE("1term0.e",   0x00000, 0x0800, CRC(a9aade37) SHA1(644e9362d5a9523be5c6f39a650b574735dbd4a2) )
 	ROM_LOAD16_BYTE("1term0.o",   0x00001, 0x0800, CRC(8026b5b7) SHA1(cb93e0595b321889694cbb87f497d244e6a2d648) )
@@ -184,6 +308,7 @@ ROM_START( wicat )
 	ROM_LOAD16_BYTE("2term7.e",   0x07000, 0x0800, CRC(033ea830) SHA1(27c33eea2df812a1a96e2f47ba7993e2ca3675ad) )
 	ROM_LOAD16_BYTE("2term7.o",   0x07001, 0x0800, CRC(e157c5d2) SHA1(3cd1ea0fb9df1358e8a358468a4df5e4eaaa86a2) )
 
+	// Terminal Video board
 	ROM_REGION(0x1000, "g2char", 0)
 	ROM_LOAD       ("ascii.chr",  0x00000, 0x0800, CRC(43e26e37) SHA1(f3d5d16040c66f0e827f72a35d4694ca62950949) )
 	ROM_LOAD       ("apl.chr",    0x00800, 0x0800, CRC(8c6d698e) SHA1(147dd9296fe2efc6140fa148a6edf673c33f9371) )
