@@ -238,15 +238,20 @@ public:
         TERMINAL = 0,
 		INPUT    = 1,
 		OUTPUT   = 2,
-		DEVICE   = 3,
-		PARAM    = 4,
-		NET      = 5
+		PARAM    = 3,
+		NET      = 4,
+        DEVICE   = 5,
 	};
     enum family_t {
-        LOGIC    = 1,
-        ANALOG   = 2,
-        CURRENT  = 3,
-        ALL      = 4   // <== devices usually fall into this category
+        // Terminal families
+        LOGIC     = 1,
+        ANALOG    = 2,
+        // Device families
+        GENERIC   = 3,   // <== devices usually fall into this category
+        RESISTOR  = 4,   // Resistor
+        CAPACITOR = 5,   // Capacitor
+        DIODE     = 6,   // Diode
+        BJT_SWITCH_NPN = 7,  // BJT(Switch)
     };
 
 	ATTR_COLD netlist_object_t(const type_t atype, const family_t afamily);
@@ -708,6 +713,7 @@ class netlist_core_device_t : public netlist_object_t
 public:
 
     ATTR_COLD netlist_core_device_t();
+    ATTR_COLD netlist_core_device_t(const family_t afamily);
 
     ATTR_COLD virtual ~netlist_core_device_t();
 
@@ -792,6 +798,7 @@ class netlist_device_t : public netlist_core_device_t
 public:
 
 	ATTR_COLD netlist_device_t();
+    ATTR_COLD netlist_device_t(const family_t afamily);
 
 	ATTR_COLD virtual ~netlist_device_t();
 

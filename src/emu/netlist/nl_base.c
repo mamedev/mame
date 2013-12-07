@@ -197,8 +197,13 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(INT32 &atime)
 // net_core_device_t
 // ----------------------------------------------------------------------------------------
 
-netlist_core_device_t::netlist_core_device_t()
-: netlist_object_t(DEVICE, ALL)
+ATTR_COLD netlist_core_device_t::netlist_core_device_t()
+: netlist_object_t(DEVICE, GENERIC)
+{
+}
+
+ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
+: netlist_object_t(DEVICE, afamily)
 {
 }
 
@@ -218,13 +223,35 @@ ATTR_COLD void netlist_core_device_t::init(netlist_setup_t &setup, const pstring
 
 }
 
-netlist_core_device_t::~netlist_core_device_t()
+ATTR_COLD netlist_core_device_t::~netlist_core_device_t()
 {
 }
 
 // ----------------------------------------------------------------------------------------
 // net_device_t
 // ----------------------------------------------------------------------------------------
+
+netlist_device_t::netlist_device_t()
+    : netlist_core_device_t(),
+        m_terminals(20),
+        m_setup(NULL),
+        m_variable_input_count(false)
+{
+}
+
+netlist_device_t::netlist_device_t(const family_t afamily)
+    : netlist_core_device_t(afamily),
+        m_terminals(20),
+        m_setup(NULL),
+        m_variable_input_count(false)
+{
+}
+
+netlist_device_t::~netlist_device_t()
+{
+    //NL_VERBOSE_OUT(("~net_device_t\n");
+}
+
 
 ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
 {
@@ -238,19 +265,6 @@ ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(
 	else
 		return inp.Q();
 
-}
-
-netlist_device_t::netlist_device_t()
-	: netlist_core_device_t(),
-		m_terminals(20),
-		m_setup(NULL),
-		m_variable_input_count(false)
-{
-}
-
-netlist_device_t::~netlist_device_t()
-{
-	//NL_VERBOSE_OUT(("~net_device_t\n");
 }
 
 ATTR_COLD void netlist_device_t::init(netlist_setup_t &setup, const pstring &name)
@@ -538,9 +552,9 @@ ATTR_COLD void netlist_logic_output_t::set_levels(const double low, const double
 
 ATTR_COLD double netlist_param_multi_t::dValue(const pstring &entity, const double defval) const
 {
-    pstring tmp = this->Value();
+    pstring tmp = this->Value().ucase();
     // .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
-    int p = tmp.find(entity);
+    int p = tmp.find(entity.ucase() + "=");
     if (p>=0)
     {
         int pblank = tmp.find(" ", p);

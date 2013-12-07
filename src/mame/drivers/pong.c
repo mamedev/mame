@@ -588,6 +588,21 @@ static NETLIST_START(pong_schematics)
     //NETDEV_LOG(log3, 555.OUT)
 #endif
 
+#if 0
+    NETDEV_BC238B(Q)
+    NETDEV_R(RB, 1000)
+    NETDEV_R(RC, 1000)
+
+    NET_C(RC.1, V5)
+    NET_C(RC.2, Q.C)
+    NET_C(RB.1, 128H)
+    NET_C(RB.2, Q.B)
+    NET_C(Q.E, GND)
+    //NETDEV_LOG(logB, Q.B)
+    //NETDEV_LOG(logC, Q.C)
+#endif
+
+
 
 NETLIST_END
 

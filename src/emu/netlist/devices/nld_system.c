@@ -4,6 +4,7 @@
  */
 
 #include "nld_system.h"
+#include "nld_twoterm.h"
 
 // ----------------------------------------------------------------------------------------
 // netdev_const
@@ -92,6 +93,8 @@ NETLIB_START(solver)
     register_param("FREQ", m_freq, 48000.0);
     m_inc = netlist_time::from_hz(m_freq.Value());
 
+    register_param("ACCURACY", m_accuracy, 1e-3);
+
     register_link_internal(m_fb_sync, m_Q_sync, netlist_input_t::STATE_INP_ACTIVE);
     register_link_internal(m_fb_step, m_Q_step, netlist_input_t::STATE_INP_ACTIVE);
     m_last_step = netlist_time::zero;
@@ -116,6 +119,7 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 
 NETLIB_FUNC_VOID(solver, post_start, ())
 {
+
     NL_VERBOSE_OUT(("post start solver ...\n"));
     for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
     {
@@ -127,6 +131,9 @@ NETLIB_FUNC_VOID(solver, post_start, ())
                 case netlist_terminal_t::TERMINAL:
                     m_terms.add(p);
                     NL_VERBOSE_OUT(("Added terminal\n"));
+                    if (p->netdev().isFamily(CAPACITOR))
+                        if (!m_steps.contains(&p->netdev()))
+                            m_steps.add(&p->netdev());
                     break;
                 case netlist_terminal_t::INPUT:
                     m_inps.add(p);
@@ -154,6 +161,7 @@ NETLIB_UPDATE(solver)
     //OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
 
     bool resched = false;
+    int  resched_cnt = 0;
     netlist_time now = netlist().time();
     netlist_time delta = now - m_last_step;
 
@@ -162,38 +170,73 @@ NETLIB_UPDATE(solver)
         NL_VERBOSE_OUT(("Step!\n"));
         /* update all terminals for new time step */
         m_last_step = now;
-        for (terminal_list_t::entry_t *p = m_terms.first(); p != NULL; p = m_terms.next(p))
-            p->object()->netdev().step_time(delta.as_double());
+        for (dev_list_t::entry_t *p = m_steps.first(); p != NULL; p = m_steps.next(p))
+            p->object()->step_time(delta.as_double());
     }
-    for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
-    {
-        double gtot = 0;
-        double iIdr = 0;
+    do {
+        resched = false;
 
-        for (netlist_core_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
+        for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
         {
-            if (p->isType(netlist_core_terminal_t::TERMINAL))
+            netlist_net_t *net = pn->object();
+
+            double gtot = 0;
+            double iIdr = 0;
+
+            for (netlist_core_terminal_t *p = net->m_head; p != NULL; p = p->m_update_list_next)
             {
-                netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
-                pt->netdev().update_terminals();
-                gtot += pt->m_g;
-                iIdr += pt->m_Idr;
+                if (p->isType(netlist_core_terminal_t::TERMINAL))
+                {
+                    netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
+                    netlist_core_device_t &dev = pt->netdev();
+#if 0
+                    switch (pt->family())
+                    {
+                        case RESISTOR:
+                            static_cast<NETLIB_NAME(R) &>(dev).update_terminals();
+                            break;
+                        case CAPACITOR:
+                            static_cast<NETLIB_NAME(C) &>(dev).update_terminals();
+                            break;
+#if 1
+                        case DIODE:
+                            static_cast<NETLIB_NAME(D) &>(dev).update_terminals();
+                            break;
+                        case BJT_SWITCH_NPN:
+                            static_cast<NETLIB_NAME(QNPN_switch) &>(dev).update_terminals();
+                            break;
+#endif
+                        default:
+                            dev.update_terminals();
+                            break;
+                    }
+#else
+                    dev.update_terminals();
+#endif
+                    gtot += pt->m_g;
+                    iIdr += pt->m_Idr;
+                }
             }
+
+            double new_val = iIdr / gtot;
+            if (fabs(new_val - net->m_cur.Analog) > m_accuracy.Value())
+                resched = true;
+            resched_cnt++;
+            net->m_cur.Analog = net->m_new.Analog = new_val;
+
+            NL_VERBOSE_OUT(("Info: %d\n", pn->object()->m_num_cons));
+            NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
         }
-
-        double new_val = iIdr / gtot;
-        if (fabs(new_val - pn->object()->m_cur.Analog) > 1e-4)
-            resched = true;
-        pn->object()->m_cur.Analog = pn->object()->m_new.Analog = new_val;
-
-        NL_VERBOSE_OUT(("Info: %d\n", pn->object()->m_num_cons));
-        NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
-    }
+    } while (resched && (resched_cnt < 1));
+    //if (resched_cnt >= 5)
+    //    printf("rescheduled\n");
     if (resched)
     {
         schedule();
     }
+#if 1
     else
+#endif
     {
         /* update all inputs connected */
 #if 0
@@ -201,7 +244,7 @@ NETLIB_UPDATE(solver)
         {
             if (pn->object()->m_cur.Analog != pn->object()->m_last.Analog)
             {
-                for (netlist_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
+                for (netlist_core_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
                 {
                     if (p->isType(netlist_terminal_t::INPUT))
                         p->netdev().update_dev();

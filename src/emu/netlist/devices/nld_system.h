@@ -82,6 +82,7 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 NETLIB_DEVICE_WITH_PARAMS(solver,
         typedef netlist_list_t<netlist_core_terminal_t *> terminal_list_t;
         typedef netlist_list_t<netlist_net_t *>      net_list_t;
+        typedef netlist_list_t<netlist_core_device_t *>      dev_list_t;
 
         netlist_ttl_input_t m_fb_sync;
         netlist_ttl_output_t m_Q_sync;
@@ -91,6 +92,7 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 
         netlist_param_double_t m_freq;
         netlist_param_double_t m_sync_delay;
+        netlist_param_double_t m_accuracy;
 
         netlist_time m_inc;
         netlist_time m_last_step;
@@ -98,6 +100,7 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 
         terminal_list_t m_terms;
         terminal_list_t m_inps;
+        dev_list_t m_steps;
 
 public:
 

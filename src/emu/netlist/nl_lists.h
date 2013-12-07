@@ -75,6 +75,15 @@ public:
             }
         }
     }
+    ATTR_HOT inline bool contains(const _ListClass elem) const
+    {
+        for (entry_t *i = m_list; i <= m_ptr; i++)
+        {
+            if (i->object() == elem)
+                return true;
+        }
+        return false;
+    }
 	ATTR_HOT inline entry_t *first() const { return (m_ptr >= m_list ? &m_list[0] : NULL ); }
     ATTR_HOT inline entry_t *next(entry_t *lc) const { return (lc < last() ? lc + 1 : NULL ); }
 	ATTR_HOT inline entry_t *last() const { return m_ptr; }

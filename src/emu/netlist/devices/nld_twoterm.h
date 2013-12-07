@@ -62,17 +62,14 @@
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
 
-class nld_twoterm : public netlist_device_t
+class NETLIB_NAME(twoterm) : public netlist_device_t
 {
 public:
-    nld_twoterm()
-    : netlist_device_t(), m_g(0.0), m_V(0.0), m_I(0.0) { }
+    ATTR_COLD NETLIB_NAME(twoterm)(const family_t afamily)
+    : netlist_device_t(afamily), m_g(0.0), m_V(0.0), m_I(0.0) { }
 
     netlist_terminal_t m_P;
     netlist_terminal_t m_N;
-
-protected:
-    virtual void start();
 
     virtual NETLIB_UPDATE_TERMINALS()
     {
@@ -81,7 +78,8 @@ protected:
         m_P.m_Idr = (m_N.net().Q_Analog() + m_V) * m_g - m_I;
         //printf("%f %f %f %f\n", m_N.m_Idr, m_P.m_Idr, m_N.net().Q_Analog(), m_P.net().Q_Analog());
     }
-
+protected:
+    ATTR_COLD virtual void start();
     ATTR_HOT ATTR_ALIGN void update();
 
     double m_g; // conductance
@@ -94,23 +92,30 @@ private:
 // nld_R
 // ----------------------------------------------------------------------------------------
 
-NETLIB_DEVICE_WITH_PARAMS_DERIVED(R, twoterm,
-        netlist_param_double_t m_R;
-
-    NETLIB_UPDATE_TERMINALS() { NETLIB_NAME(twoterm)::update_terminals(); }
-
+class NETLIB_NAME(R) : public NETLIB_NAME(twoterm)
+{
 public:
-    inline void set_R(double R) { m_g = 1.0 / R; }
+    ATTR_COLD NETLIB_NAME(R)() : NETLIB_NAME(twoterm)(RESISTOR) { }
 
-);
+    inline void set_R(const double R) { m_g = 1.0 / R; }
+
+protected:
+    ATTR_COLD virtual void start();
+    ATTR_COLD virtual void update_param();
+    ATTR_HOT ATTR_ALIGN void update();
+
+    netlist_param_double_t m_R;
+
+};
 
 // ----------------------------------------------------------------------------------------
 // nld_C
 // ----------------------------------------------------------------------------------------
 
-NETLIB_DEVICE_WITH_PARAMS_DERIVED(C, twoterm,
-
-    netlist_param_double_t m_C;
+class NETLIB_NAME(C) : public NETLIB_NAME(twoterm)
+{
+public:
+    ATTR_COLD NETLIB_NAME(C)() : NETLIB_NAME(twoterm)(CAPACITOR) { }
 
     ATTR_HOT void step_time(const double st)
     {
@@ -118,23 +123,23 @@ NETLIB_DEVICE_WITH_PARAMS_DERIVED(C, twoterm,
         m_I = -m_g * (m_P.net().Q_Analog()- m_N.net().Q_Analog());
     }
 
-);
+protected:
+    ATTR_COLD virtual void start();
+    ATTR_COLD virtual void update_param();
+    ATTR_HOT ATTR_ALIGN void update();
+
+    netlist_param_double_t m_C;
+
+};
 
 // ----------------------------------------------------------------------------------------
 // nld_D
 // ----------------------------------------------------------------------------------------
 
-NETLIB_DEVICE_WITH_PARAMS_DERIVED(D, twoterm,
-
-    netlist_param_multi_t m_model;
-
-    double m_Vt;
-    double m_Is;
-    double m_n;
-
-    double m_VtInv;
-    double m_Vcrit;
-    double m_Vd;
+class NETLIB_NAME(D) : public NETLIB_NAME(twoterm)
+{
+public:
+    ATTR_COLD NETLIB_NAME(D)() : NETLIB_NAME(twoterm)(DIODE) { }
 
     NETLIB_UPDATE_TERMINALS()
     {
@@ -151,11 +156,134 @@ NETLIB_DEVICE_WITH_PARAMS_DERIVED(D, twoterm,
         m_I = (Id - m_Vd * m_g);
         //printf("Vd: %f %f %f %f\n", m_Vd, m_g, Id, m_I);
 
-        nld_twoterm::update_terminals();
+        NETLIB_NAME(twoterm)::update_terminals();
     }
 
-private:
-);
+protected:
+    ATTR_COLD virtual void start();
+    ATTR_COLD virtual void update_param();
+    ATTR_HOT ATTR_ALIGN void update();
 
+    netlist_param_multi_t m_model;
+
+    double m_Vt;
+    double m_Is;
+    double m_n;
+
+    double m_VtInv;
+    double m_Vcrit;
+    double m_Vd;
+
+};
+
+/*
+ *         + -              C
+ *   B ----VVV----+         |
+ *                |         |
+ *                Rb        Rc
+ *                Rb        Rc
+ *                Rb        Rc
+ *                |         |
+ *                +----+----+
+ *                     |
+ *                     E
+ */
+
+#define NETDEV_QPNP(_name, _model)                                                 \
+        NET_REGISTER_DEV(QPNP_switch, _name)                                       \
+        NETDEV_PARAMI(_name,  model, _model)
+
+#define NETDEV_QNPN(_name, _model)                                                 \
+        NET_REGISTER_DEV(QNPN_switch, _name)                                       \
+        NETDEV_PARAMI(_name,  model, _model)
+
+#define NETDEV_BC238B(_name) NETDEV_QNPN(_name, "IS=1.8E-14 ISE=5.0E-14 ISC=1.72E-13 XTI=3 BF=400 BR=35.5 IKF=0.14 IKR=0.03 XTB=1.5 VAF=80 VAR=12.5 VJE=0.58 VJC=0.54 RE=0.6 RC=0.25 RB=0.56 CJE=13E-12 CJC=4E-12 XCJC=0.75 FC=0.5 NF=0.9955 NR=1.005 NE=1.46 NC=1.27 MJE=0.33 MJC=0.33 TF=0.64E-9 TR=50.72E-9 EG=1.11 KF=0 AF=1 VCEO=45V ICRATING=100M MFG=ZETEX")
+
+// Have a common start for transistors
+
+class NETLIB_NAME(Q) : public netlist_device_t
+{
+public:
+    enum q_type {
+        BJT_NPN,
+        BJT_PNP
+    };
+
+    ATTR_COLD NETLIB_NAME(Q)(const q_type atype, const family_t afamily)
+    : netlist_device_t(afamily)
+    , m_qtype(atype) { }
+
+    inline q_type qtype() const { return m_qtype; }
+    inline bool is_qtype(q_type atype) const { return m_qtype == atype; }
+protected:
+    ATTR_COLD virtual void start();
+    ATTR_HOT ATTR_ALIGN void update();
+
+    netlist_param_multi_t m_model;
+private:
+    q_type m_qtype;
+};
+
+class NETLIB_NAME(QBJT) : public NETLIB_NAME(Q)
+{
+public:
+
+    ATTR_COLD NETLIB_NAME(QBJT)(const q_type atype, const family_t afamily)
+    : NETLIB_NAME(Q)(atype, afamily) { }
+
+    netlist_terminal_t m_B;
+    netlist_terminal_t m_C;
+    netlist_terminal_t m_E;
+
+protected:
+    ATTR_COLD virtual void start();
+
+private:
+};
+
+//NETLIB_NAME(Q) nld_Q::q_type
+template <NETLIB_NAME(Q)::q_type _type>
+class NETLIB_NAME(QBJT_switch) : public NETLIB_NAME(QBJT)
+{
+public:
+    ATTR_COLD NETLIB_NAME(QBJT_switch)()
+    : NETLIB_NAME(QBJT)(_type, BJT_SWITCH_NPN), m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0) { }
+
+    NETLIB_UPDATE_TERMINALS()
+    {
+        double gb = m_gB;
+        double gc = m_gC;
+        double v  = m_V;
+        double vE = m_E.net().Q_Analog();
+        double vB = m_B.net().Q_Analog();
+
+        if (vB - vE < m_V )
+        {
+            // not conducting
+            gb = NETLIST_GMIN;
+            v = 0;
+            gc = NETLIST_GMIN;
+        }
+
+        m_B.m_g = m_E.m_g = gb;
+        m_C.m_g = gc;
+
+        m_B.m_Idr = (vE + v) * gb;
+        m_C.m_Idr = (vE) * gc;
+        m_E.m_Idr = (vB - v) * gb + m_C.net().Q_Analog() * gc;
+    }
+
+protected:
+
+    ATTR_COLD void update_param();
+
+    double m_gB; // conductance
+    double m_gC; // conductance
+    double m_V; // internal voltage source
+private:
+};
+
+typedef NETLIB_NAME(QBJT_switch)<NETLIB_NAME(Q)::BJT_PNP> NETLIB_NAME(QPNP_switch);
+typedef NETLIB_NAME(QBJT_switch)<NETLIB_NAME(Q)::BJT_NPN> NETLIB_NAME(QNPN_switch);
 
 #endif /* NLD_TWOTERM_H_ */
