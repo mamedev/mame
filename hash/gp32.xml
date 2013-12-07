@@ -416,7 +416,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
-				<rom name="dinball dreams.smc" size="17302528" crc="f9a48ef2" sha1="19eefbfd765913067a5a622ae6c40222118e6e5d" offset="0" />
+				<rom name="pinball dreams.smc" size="17302528" crc="f9a48ef2" sha1="19eefbfd765913067a5a622ae6c40222118e6e5d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
