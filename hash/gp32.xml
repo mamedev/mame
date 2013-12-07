@@ -4,19 +4,13 @@
 <!--
 Undumped games (from http://ko.wikipedia.org/wiki/GP32 )
 
-* 핀볼즈드림 ~ Pinball Dreams
-* 겨울은... ~ Winter Is...
-* Story of Bug Eyed Monster
-* 달려라 하니 시리즈 ~ Ride Do Series
 * Tears: Contact
 
 
 Questionable?
 
 * 강행돌파 [same as herknite?!?]
-* Funny Soccer [Euro version of doolysoc?!?]
-* 슈퍼 플라샤 ~ Super Plusha [homebrew?]
-* Gloop Deluxe [homebrew?]
+
 
 -->
 
@@ -377,4 +371,112 @@ Questionable?
 		</part>
 	</software>
 
+	<software name="funnysoc">
+		<description>Funny Soccer 2002 (Kor)</description>
+		<year>2002</year>
+		<publisher>Gamepark</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="34604032">
+				<rom name="Funny Soccer 2002.smc" size="34604032" crc="a5152676" sha1="70b12322b3e5245132e167b0d1633556a048b257" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gloopdx">
+		<description>GlooP Deluxe (Eur)</description>
+		<year>2003</year>
+		<publisher>Aeon Flame</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="17302528">
+				<rom name="GlooP Deluxe.smc" size="17302528" crc="4d992443" sha1="a2440b563e6ad36f9718a5a9db17ed6d219e0e9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holbatra">
+		<description>Holeman Battle Race 2002 (Kor)</description>
+		<year>2002</year>
+		<publisher>MoongKle</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="17302528">
+				<rom name="Holeman Battle Race 2002.smc" size="17302528" crc="e91b207b" sha1="8e7c3a36d230afbdf465ba62fb3785f1376c9373" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="pinbdrea">
+		<description>Pinball Dreams (Eur)</description>
+		<year>2002</year>
+		<publisher>Gamepark</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="17302528">
+				<rom name="Pinball Dreams.smc" size="17302528" crc="f9a48ef2" sha1="19eefbfd765913067a5a622ae6c40222118e6e5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="sobemons">
+		<description>Story of Bug eyed Monster (Kor)</description>
+		<year>2003</year>
+		<publisher>Gamepark</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="69207040">
+				<rom name="Story of Bug eyed Monster.smc" size="69207040" crc="5534905b" sha1="3e70e746f9a1819e629ffc4b9082ac4a8d1d022e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winteris">
+		<description>Winter Is (Kor)</description>
+		<year>2003</year>
+		<publisher>Gamepark</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="69207040">
+				<rom name="Winter Is.smc" size="69207040" crc="62c4a3fb" sha1="cf072fae0825164ff8c7393ab513058b78c46061" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="suplusha">
+		<description>Super Plusha (Eur)</description>
+		<year>2002</year>
+		<publisher>Gamepark</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="17302528">
+				<rom name="Super Plusha.smc" size="17302528" crc="65da87fc" sha1="1e2e984014f184759a35df93160f0fb4d11c7742" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="talowila">
+		<description>Tales of Windy Land (Kor)</description>
+		<year>2003</year>
+		<publisher>AIM Technology</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="17302528">
+				<rom name="Tales of Windy Land.smc" size="17302528" crc="83b9c315" sha1="51679a8197f721fc601ea0cd8c91a3bbabed9585" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="totogogo">
+		<description>Topy Topy Gogo (Eur)</description>
+		<year>2003</year>
+		<publisher>Gamepark</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="17302528">
+				<rom name="Topy Topy Gogo.smc" size="17302528" crc="9a5faa26" sha1="46e1f08ec260a633e8e4c44b3b46b5135e6c76a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
 </softwarelist>
