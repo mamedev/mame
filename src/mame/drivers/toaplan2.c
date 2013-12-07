@@ -1197,6 +1197,26 @@ static ADDRESS_MAP_START( batsugun_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( pwrkick_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+
+//	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYS")
+//	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("JMPR")
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r) // check me
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSWB")
+	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
+	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("IN2")
+	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("IN3")
+	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("IN4")
+	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYS")
+	AM_RANGE(0x700030, 0x700031) AM_WRITE(oki_bankswitch_w)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( snowbro2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -2231,6 +2251,7 @@ static INPUT_PORTS_START( vfive )
 INPUT_PORTS_END
 
 
+
 static INPUT_PORTS_START( batsugun )
 	PORT_INCLUDE( toaplan2_3b )
 
@@ -2280,6 +2301,71 @@ static INPUT_PORTS_START( batsugun )
 	PORT_CONFSETTING(       0x0000, "Korea (Unite Trading)" )
 INPUT_PORTS_END
 
+/* TODO: placeholder, needs heavy modifications for sure */
+static INPUT_PORTS_START( pwrkick )
+	PORT_INCLUDE( toaplan2_2b )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4) PORT_8WAY
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START4 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x0001,   0x0000, DEF_STR( Continue_Price ) ) PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(        0x0000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(        0x0001, "Discount" )
+	// Various features on bit mask 0x000e - see above
+	TOAPLAN_COINAGE_DUAL_LOC( JMPR, 0x1c00, 0x0800, SW1 )
+
+	PORT_MODIFY("DSWB")
+	// Difficulty on bit mask 0x0003 - see above
+	PORT_DIPNAME( 0x000c,   0x0000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!3,!4")
+	PORT_DIPSETTING(        0x000c, DEF_STR( None ) )
+	PORT_DIPSETTING(        0x0008, "200k only" )
+	PORT_DIPSETTING(        0x0000, "100k only" )
+	PORT_DIPSETTING(        0x0004, "100k and every 500k" )
+	PORT_DIPNAME( 0x0030,   0x0000, DEF_STR( Lives ) )      PORT_DIPLOCATION("SW2:!5,!6")
+	PORT_DIPSETTING(        0x0030, "1" )
+	PORT_DIPSETTING(        0x0020, "2" )
+	PORT_DIPSETTING(        0x0000, "3" )
+	PORT_DIPSETTING(        0x0010, "4" )
+	PORT_DIPNAME( 0x0040,   0x0000, "Invulnerability (Cheat)" )     PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPSETTING(        0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080,   0x0000, "Maximum Players" )     PORT_DIPLOCATION("SW2:!8")
+	PORT_DIPSETTING(        0x0080, "2" )
+	PORT_DIPSETTING(        0x0000, "4" )
+
+	PORT_START("JMPR")
+	PORT_CONFNAME( 0x2000,  0x0000, "Show All Rights Reserved" )    //PORT_CONFLOCATION("JP:!1")
+	PORT_CONFSETTING(       0x0000, DEF_STR( No ) )
+	PORT_CONFSETTING(       0x2000, DEF_STR( Yes ) )
+	PORT_CONFNAME( 0x1c00,  0x0800, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!4,!3,!2")
+	PORT_CONFSETTING(       0x0800, DEF_STR( Europe ) )
+	PORT_CONFSETTING(       0x0400, DEF_STR( USA ) )
+	PORT_CONFSETTING(       0x0000, DEF_STR( Japan ) )
+	PORT_CONFSETTING(       0x0c00, DEF_STR( Korea ) )
+	PORT_CONFSETTING(       0x1000, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(       0x1400, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(       0x1800, DEF_STR( Southeast_Asia ) )
+//  PORT_CONFSETTING(        0x1c00, DEF_STR( Unused ) )
+	PORT_BIT( 0xc3ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( snowbro2 )
 	PORT_INCLUDE( toaplan2_2b )
@@ -3456,6 +3542,45 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)           /* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(pwrkick_68k_mem)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
+
+//	MCFG_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)         /* NEC V25 type Toaplan marked CPU ??? */
+//	MCFG_CPU_PROGRAM_MAP(v25_mem)
+//	MCFG_CPU_IO_MAP(v25_port)
+
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+
+	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
+	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
+
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+
+	MCFG_DEVICE_ADD_VDP0
+
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_YM2151_ADD("ymsnd", XTAL_27MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/8, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 
@@ -4274,6 +4399,19 @@ ROM_START( batsugunsp )
 ROM_END
 
 
+ROM_START( pwrkick )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "1.u61",        0x000000, 0x080000, CRC(118b5899) SHA1(7a1637a63eb17e3892d79aede5730013a1dc00f9) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "2.u26",        0x000000, 0x080000, CRC(a190eaea) SHA1(2c7b8c8026873e0f591fbcbc2e72b196ef84e162) )
+	ROM_LOAD( "3.u27",        0x080000, 0x080000, CRC(0b81e038) SHA1(8376617ae519a8ef604f20b26e941aa5b8066602) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "4.u33",        0x000000, 0x080000, CRC(3ab742f1) SHA1(ce8ca02ca57fd77872e421ce601afd017d3518a0) )
+ROM_END
+
+
 ROM_START( snowbro2 )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "pro-4", 0x000000, 0x080000, CRC(4c7ee341) SHA1(ad46c605a38565d0148daac301be4e4b72302fe7) )
@@ -4981,6 +5119,8 @@ GAME( 1993, batsugun,   0,        batsugun, batsugun, toaplan2_state,   dogyuun,
 GAME( 1993, batsuguna,  batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )
 GAME( 1993, batsugunsp, batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun - Special Version", GAME_SUPPORTS_SAVE )
 
+GAME( 1994, pwrkick,  0,   pwrkick,  pwrkick, driver_device,  0,       ROT0,            "Sunwise",  "Power Kick", GAME_NOT_WORKING )
+
 GAME( 1994, snowbro2,   0,        snowbro2, snowbro2, driver_device,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, sstriker,   0,        mahoudai, sstriker, driver_device,   0,       ROT270, "Raizing", "Sorcer Striker (set 1)" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
@@ -5014,3 +5154,4 @@ GAME( 1999, bbakraid,   0,        bbakraid, bbakraid, toaplan2_state,  bbakraid,
 GAME( 1999, bbakraidj,  bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code
 GAME( 1999, bbakraidja, bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
+
