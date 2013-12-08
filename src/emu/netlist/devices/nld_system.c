@@ -129,14 +129,26 @@ NETLIB_FUNC_VOID(solver, post_start, ())
             switch (p->type())
             {
                 case netlist_terminal_t::TERMINAL:
-                    m_terms.add(p);
+                    switch (p->netdev().family())
+                    {
+                        case CAPACITOR:
+                            if (!m_steps.contains(&p->netdev()))
+                                m_steps.add(&p->netdev());
+                            break;
+                        case DIODE:
+                        case BJT_SWITCH:
+                            if (!m_dynamic.contains(&p->netdev()))
+                                m_dynamic.add(&p->netdev());
+                            break;
+                        default:
+                            break;
+                    }
+                    pn->object()->m_terms.add(static_cast<netlist_terminal_t *>(p));
                     NL_VERBOSE_OUT(("Added terminal\n"));
-                    if (p->netdev().isFamily(CAPACITOR))
-                        if (!m_steps.contains(&p->netdev()))
-                            m_steps.add(&p->netdev());
                     break;
                 case netlist_terminal_t::INPUT:
-                    m_inps.add(p);
+                    if (!m_inps.contains(&p->netdev()))
+                        m_inps.add(&p->netdev());
                     NL_VERBOSE_OUT(("Added input\n"));
                     break;
                 default:
@@ -174,6 +186,10 @@ NETLIB_UPDATE(solver)
             p->object()->step_time(delta.as_double());
     }
     do {
+        /* update all non-linear devices  */
+        for (dev_list_t::entry_t *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
+            p->object()->update_terminals();
+
         resched = false;
 
         for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
@@ -183,39 +199,11 @@ NETLIB_UPDATE(solver)
             double gtot = 0;
             double iIdr = 0;
 
-            for (netlist_core_terminal_t *p = net->m_head; p != NULL; p = p->m_update_list_next)
+            for (netlist_net_t::terminal_list_t::entry_t *e = net->m_terms.first(); e != NULL; e = net->m_terms.next(e))
             {
-                if (p->isType(netlist_core_terminal_t::TERMINAL))
-                {
-                    netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
-                    netlist_core_device_t &dev = pt->netdev();
-#if 0
-                    switch (pt->family())
-                    {
-                        case RESISTOR:
-                            static_cast<NETLIB_NAME(R) &>(dev).update_terminals();
-                            break;
-                        case CAPACITOR:
-                            static_cast<NETLIB_NAME(C) &>(dev).update_terminals();
-                            break;
-#if 1
-                        case DIODE:
-                            static_cast<NETLIB_NAME(D) &>(dev).update_terminals();
-                            break;
-                        case BJT_SWITCH_NPN:
-                            static_cast<NETLIB_NAME(QNPN_switch) &>(dev).update_terminals();
-                            break;
-#endif
-                        default:
-                            dev.update_terminals();
-                            break;
-                    }
-#else
-                    dev.update_terminals();
-#endif
-                    gtot += pt->m_g;
-                    iIdr += pt->m_Idr;
-                }
+                netlist_terminal_t *pt = e->object();
+                gtot += pt->m_g;
+                iIdr += pt->m_Idr + pt->m_g * pt->m_otherterm->net().Q_Analog();
             }
 
             double new_val = iIdr / gtot;
@@ -227,35 +215,19 @@ NETLIB_UPDATE(solver)
             NL_VERBOSE_OUT(("Info: %d\n", pn->object()->m_num_cons));
             NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
         }
-    } while (resched && (resched_cnt < 1));
+    } while (resched && (resched_cnt < 5));
     //if (resched_cnt >= 5)
     //    printf("rescheduled\n");
     if (resched)
     {
         schedule();
     }
-#if 1
     else
-#endif
     {
         /* update all inputs connected */
-#if 0
-        for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
-        {
-            if (pn->object()->m_cur.Analog != pn->object()->m_last.Analog)
-            {
-                for (netlist_core_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
-                {
-                    if (p->isType(netlist_terminal_t::INPUT))
-                        p->netdev().update_dev();
-                }
-            }
-            pn->object()->m_last.Analog = pn->object()->m_cur.Analog;
-        }
-#else
-        for (terminal_list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
-            p->object()->netdev().update_dev();
-#endif
+        for (dev_list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+            p->object()->update_dev();
+
         /* step circuit */
         if (!m_Q_step.net().is_queued())
             m_Q_step.net().push_to_queue(m_inc);

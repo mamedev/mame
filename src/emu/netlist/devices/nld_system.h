@@ -80,7 +80,6 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 // ----------------------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(solver,
-        typedef netlist_list_t<netlist_core_terminal_t *> terminal_list_t;
         typedef netlist_list_t<netlist_net_t *>      net_list_t;
         typedef netlist_list_t<netlist_core_device_t *>      dev_list_t;
 
@@ -98,8 +97,8 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
         netlist_time m_last_step;
         netlist_time m_nt_sync_delay;
 
-        terminal_list_t m_terms;
-        terminal_list_t m_inps;
+        dev_list_t m_dynamic;
+        dev_list_t m_inps;
         dev_list_t m_steps;
 
 public:

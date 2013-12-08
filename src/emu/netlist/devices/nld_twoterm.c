@@ -10,6 +10,13 @@
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
 
+ATTR_COLD NETLIB_NAME(twoterm)::NETLIB_NAME(twoterm)(const family_t afamily) :
+        netlist_device_t(afamily)
+{
+    m_P.m_otherterm = &m_N;
+    m_N.m_otherterm = &m_P;
+}
+
 NETLIB_START(twoterm)
 {
 }
@@ -34,7 +41,7 @@ NETLIB_START(R)
 
 NETLIB_UPDATE_PARAM(R)
 {
-    m_g = 1.0 / m_R.Value();
+    set_R(m_R.Value());
 }
 
 NETLIB_UPDATE(R)
@@ -138,7 +145,14 @@ NETLIB_START(QBJT)
     register_terminal("B", m_B);
     register_terminal("C", m_C);
     register_terminal("E", m_E);
+    register_terminal("EB", m_EB);
 
+    m_setup->connect(m_E, m_EB);
+
+    m_B.m_otherterm = &m_EB;
+    m_EB.m_otherterm = &m_B;
+    m_C.m_otherterm = &m_E;
+    m_E.m_otherterm = &m_C;
 }
 
 NETLIB_UPDATE(Q)

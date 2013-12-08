@@ -65,26 +65,25 @@
 class NETLIB_NAME(twoterm) : public netlist_device_t
 {
 public:
-    ATTR_COLD NETLIB_NAME(twoterm)(const family_t afamily)
-    : netlist_device_t(afamily), m_g(0.0), m_V(0.0), m_I(0.0) { }
+    ATTR_COLD NETLIB_NAME(twoterm)(const family_t afamily);
 
     netlist_terminal_t m_P;
     netlist_terminal_t m_N;
 
     virtual NETLIB_UPDATE_TERMINALS()
     {
-        m_P.m_g = m_N.m_g = m_g;
-        m_N.m_Idr = (m_P.net().Q_Analog() - m_V) * m_g + m_I;
-        m_P.m_Idr = (m_N.net().Q_Analog() + m_V) * m_g - m_I;
-        //printf("%f %f %f %f\n", m_N.m_Idr, m_P.m_Idr, m_N.net().Q_Analog(), m_P.net().Q_Analog());
+    }
+
+    ATTR_HOT inline void set(const double G, const double V, const double I)
+    {
+        m_P.m_g = m_N.m_g = G;
+        m_N.m_Idr = ( -V) * G + I;
+        m_P.m_Idr = (  V) * G - I;
     }
 protected:
     ATTR_COLD virtual void start();
     ATTR_HOT ATTR_ALIGN void update();
 
-    double m_g; // conductance
-    double m_V; // internal voltage source
-    double m_I; // internal current source
 private:
 };
 
@@ -97,7 +96,7 @@ class NETLIB_NAME(R) : public NETLIB_NAME(twoterm)
 public:
     ATTR_COLD NETLIB_NAME(R)() : NETLIB_NAME(twoterm)(RESISTOR) { }
 
-    inline void set_R(const double R) { m_g = 1.0 / R; }
+    inline void set_R(const double R) { set(1.0 / R, 0.0, 0.0); }
 
 protected:
     ATTR_COLD virtual void start();
@@ -119,8 +118,9 @@ public:
 
     ATTR_HOT void step_time(const double st)
     {
-        m_g = m_P.m_g = m_N.m_g = m_C.Value() / st;
-        m_I = -m_g * (m_P.net().Q_Analog()- m_N.net().Q_Analog());
+        double G = m_C.Value() / st;
+        double I = -G * (m_P.net().Q_Analog()- m_N.net().Q_Analog());
+        set(G, 0.0, I);
     }
 
 protected:
@@ -151,12 +151,11 @@ public:
         const double eVDVt = exp(m_Vd * m_VtInv);
         const double Id = m_Is * (eVDVt - 1.0);
 
-        m_g = m_Is * m_VtInv * eVDVt;
+        double G = m_Is * m_VtInv * eVDVt;
 
-        m_I = (Id - m_Vd * m_g);
-        //printf("Vd: %f %f %f %f\n", m_Vd, m_g, Id, m_I);
+        double I = (Id - m_Vd * G);
 
-        NETLIB_NAME(twoterm)::update_terminals();
+        set(G, 0.0, I);
     }
 
 protected:
@@ -235,6 +234,8 @@ public:
     netlist_terminal_t m_C;
     netlist_terminal_t m_E;
 
+    netlist_terminal_t m_EB;
+
 protected:
     ATTR_COLD virtual void start();
 
@@ -247,7 +248,7 @@ class NETLIB_NAME(QBJT_switch) : public NETLIB_NAME(QBJT)
 {
 public:
     ATTR_COLD NETLIB_NAME(QBJT_switch)()
-    : NETLIB_NAME(QBJT)(_type, BJT_SWITCH_NPN), m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0) { }
+    : NETLIB_NAME(QBJT)(_type, BJT_SWITCH), m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0) { }
 
     NETLIB_UPDATE_TERMINALS()
     {
@@ -257,6 +258,7 @@ public:
         double vE = m_E.net().Q_Analog();
         double vB = m_B.net().Q_Analog();
 
+        //printf("diff %f = %f - %f\n", vB - vE, vB, vE);
         if (vB - vE < m_V )
         {
             // not conducting
@@ -265,21 +267,23 @@ public:
             gc = NETLIST_GMIN;
         }
 
-        m_B.m_g = m_E.m_g = gb;
-        m_C.m_g = gc;
+        m_B.m_g = m_EB.m_g = gb;
+        m_C.m_g = m_E.m_g = gc;
 
-        m_B.m_Idr = (vE + v) * gb;
-        m_C.m_Idr = (vE) * gc;
-        m_E.m_Idr = (vB - v) * gb + m_C.net().Q_Analog() * gc;
+        m_B.m_Idr  = (  v) * gb;
+        m_EB.m_Idr = ( -v) * gb;
+        m_C.m_Idr  = 0.0;
+        m_E.m_Idr =  0.0;
     }
 
 protected:
 
     ATTR_COLD void update_param();
 
-    double m_gB; // conductance
-    double m_gC; // conductance
+    double m_gB; // base conductance / switch on
+    double m_gC; // collector conductance / switch on
     double m_V; // internal voltage source
+
 private:
 };
 

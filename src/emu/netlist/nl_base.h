@@ -251,7 +251,7 @@ public:
         RESISTOR  = 4,   // Resistor
         CAPACITOR = 5,   // Capacitor
         DIODE     = 6,   // Diode
-        BJT_SWITCH_NPN = 7,  // BJT(Switch)
+        BJT_SWITCH = 7,  // BJT(Switch)
     };
 
 	ATTR_COLD netlist_object_t(const type_t atype, const family_t afamily);
@@ -346,6 +346,7 @@ public:
     double m_Idr; // drive current
     double m_g; // conductance
 
+    netlist_terminal_t *m_otherterm;
 };
 
 
@@ -488,6 +489,10 @@ public:
 
     ATTR_HOT inline void push_to_queue(const netlist_time &delay);
     ATTR_HOT bool is_queued() { return m_in_queue == 1; }
+
+    // m_terms is only used by analog subsystem
+    typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
+    terminal_list_t m_terms;
 
 protected:
 
