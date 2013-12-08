@@ -159,6 +159,8 @@ public:
 	UINT8 m_pwrkick_hopper;
 	DECLARE_CUSTOM_INPUT_MEMBER(pwrkick_hopper_status_r);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
+	DECLARE_READ8_MEMBER(upd4992_calendar_r);
+	DECLARE_WRITE8_MEMBER(upd4992_calendar_w);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

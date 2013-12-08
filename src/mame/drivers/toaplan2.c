@@ -4,6 +4,7 @@
         Raizing/8ing game hardware from 1993 onwards
         -------------------------------------------------
         Driver by: Quench and Yochizo
+        Original othldrby.c by Nicola Salmoria
 
    Raizing games and Truxton 2 are heavily dependent on the Raine source -
    many thanks to Richard Bush and the Raine team. [Yochizo]
@@ -35,7 +36,6 @@ Supported games:
     batsugun    TP-030        Toaplan       Batsugun
     batsuguna   TP-030        Toaplan       Batsugun (older)
     batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
-    pwrkick     ??????        Sunwise       Power Kick
     snowbro2    ??????        Hanafram      Snow Bros. 2 - With New Elves
 
     * This version of Whoopee!! is on a board labeled TP-020
@@ -343,7 +343,7 @@ To Do / Unknowns:
     - Need to sort out the video status register.
     - Find out how exactly how sound CPU communication really works in bgaregga/batrider/bbakraid
         current emulation seems to work (plays all sounds), but there are still some unknown reads/writes
-
+    - Write a RTC core for uPD4992, needed by Othello Derby and Power Kick
 
 *****************************************************************************/
 
@@ -1205,14 +1205,48 @@ static ADDRESS_MAP_START( batsugun_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
+/* TODO: write in a proper core */
+WRITE8_MEMBER(toaplan2_state::upd4992_calendar_w)
+{
+}
+
+READ8_MEMBER(toaplan2_state::upd4992_calendar_r)
+{
+	system_time systime;
+
+	machine().base_datetime(systime);
+
+	switch (offset)
+	{
+		case 0:
+			return ((systime.local_time.second/10)<<4) + (systime.local_time.second%10);
+		case 1:
+			return ((systime.local_time.minute/10)<<4) + (systime.local_time.minute%10);
+		case 2:
+			return ((systime.local_time.hour/10)<<4) + (systime.local_time.hour%10);
+		case 3:
+			return systime.local_time.weekday;
+		case 4:
+			return ((systime.local_time.mday/10)<<4) + (systime.local_time.mday%10);
+		case 5:
+			return (systime.local_time.month + 1);
+		case 6:
+			return (((systime.local_time.year%100)/10)<<4) + (systime.local_time.year%10);
+		case 7:
+		default:
+			return 0;   /* status? the other registers are read only when bit 0 is clear */
+	}
+}
+
 static ADDRESS_MAP_START( pwrkick_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20000f) AM_RAM // uPD4992 RTC
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(upd4992_calendar_r,upd4992_calendar_w,0x00ff)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r) // check me
+
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSWB")
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
@@ -1223,6 +1257,25 @@ static ADDRESS_MAP_START( pwrkick_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x700034, 0x700035) AM_WRITE8(pwrkick_coin_w,0x00ff)
 	AM_RANGE(0x700038, 0x700039) AM_WRITENOP // lamps?
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( othldrby_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(upd4992_calendar_r,upd4992_calendar_w,0x00ff)
+	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSWB")
+	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
+	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("IN2")
+	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYS")
+	AM_RANGE(0x700030, 0x700031) AM_WRITE(oki_bankswitch_w)
+	AM_RANGE(0x700034, 0x700035) AM_WRITE(toaplan2_coin_word_w)
+ADDRESS_MAP_END
+
 
 
 static ADDRESS_MAP_START( snowbro2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
@@ -2444,6 +2497,61 @@ static INPUT_PORTS_START( pwrkick )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( othldrby )
+	PORT_INCLUDE( toaplan2_3b )
+
+	PORT_MODIFY("SYS")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( snowbro2 )
 	PORT_INCLUDE( toaplan2_2b )
 
@@ -3619,10 +3727,11 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
+/* TODO: clocks */
 static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)           /* 16MHz , 16MHz Oscillator */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(pwrkick_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
@@ -3647,11 +3756,40 @@ static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_YM2151_ADD("ymsnd", XTAL_27MHz/8)
+	/* empty YM2151 socket*/
+	MCFG_OKIM6295_ADD("oki", XTAL_27MHz/8, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW)
+static MACHINE_CONFIG_START( othldrby, toaplan2_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(othldrby_68k_mem)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
+
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+
+	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
+	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
+
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+
+	MCFG_DEVICE_ADD_VDP0
+
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_27MHz/8, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -4484,6 +4622,17 @@ ROM_START( pwrkick )
 	ROM_LOAD( "4.u33",        0x000000, 0x080000, CRC(3ab742f1) SHA1(ce8ca02ca57fd77872e421ce601afd017d3518a0) )
 ROM_END
 
+ROM_START( othldrby )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "db0.1",        0x00000, 0x80000, CRC(6b4008d3) SHA1(4cf838c47563ba482be8364b2e115569a4a06c83) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD( "db0-r2",       0x000000, 0x200000, CRC(4efff265) SHA1(4cd239ff42f532495946cb52bd1fee412f84e192) )
+	ROM_LOAD( "db0-r3",       0x200000, 0x200000, CRC(5c142b38) SHA1(5466a8b061a0f2545493de0f96fd4387beea276a) )
+
+	ROM_REGION( 0x080000, "oki", 0 )    /* OKIM6295 samples */
+	ROM_LOAD( "db0.4",        0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
+ROM_END
 
 ROM_START( snowbro2 )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
@@ -5193,6 +5342,7 @@ GAME( 1993, batsuguna,  batsugun, batsugun, batsugun, toaplan2_state,   dogyuun,
 GAME( 1993, batsugunsp, batsugun, batsugun, batsugun, toaplan2_state,   dogyuun, ROT270, "Toaplan", "Batsugun - Special Version", GAME_SUPPORTS_SAVE )
 
 GAME( 1994, pwrkick,    0,        pwrkick,  pwrkick, driver_device,    0,       ROT0,   "Sunwise",  "Power Kick (Japan)", 0 )
+GAME( 1995, othldrby,   0,        othldrby, othldrby,driver_device,    0,       ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
 
 GAME( 1994, snowbro2,   0,        snowbro2, snowbro2, driver_device,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
 
