@@ -35,6 +35,7 @@ Supported games:
     batsugun    TP-030        Toaplan       Batsugun
     batsuguna   TP-030        Toaplan       Batsugun (older)
     batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
+    pwrkick     ??????        Sunwise       Power Kick
     snowbro2    ??????        Hanafram      Snow Bros. 2 - With New Elves
 
     * This version of Whoopee!! is on a board labeled TP-020
@@ -1211,7 +1212,6 @@ static ADDRESS_MAP_START( pwrkick_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r) // check me
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSWB")
@@ -3622,13 +3622,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)           /* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)           /* 16MHz , 16MHz Oscillator */
 	MCFG_CPU_PROGRAM_MAP(pwrkick_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
-
-//	MCFG_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)         /* NEC V25 type Toaplan marked CPU ??? */
-//	MCFG_CPU_PROGRAM_MAP(v25_mem)
-//	MCFG_CPU_IO_MAP(v25_port)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3655,7 +3651,7 @@ static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
 	MCFG_YM2151_ADD("ymsnd", XTAL_27MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/8, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
