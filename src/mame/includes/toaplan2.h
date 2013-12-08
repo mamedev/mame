@@ -35,7 +35,8 @@ public:
 		m_nmk112(*this, "nmk112"),
 		m_oki(*this, "oki"),
 		m_oki1(*this, "oki1"),
-		m_eeprom(*this, "eeprom") {
+		m_eeprom(*this, "eeprom"),
+		m_rtc(*this, "rtc") {
 		m_vdp0 = NULL;
 		m_vdp1 = NULL;
 	}
@@ -155,12 +156,11 @@ public:
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<upd4992_device> m_rtc;
 
 	UINT8 m_pwrkick_hopper;
 	DECLARE_CUSTOM_INPUT_MEMBER(pwrkick_hopper_status_r);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
-	DECLARE_READ8_MEMBER(upd4992_calendar_r);
-	DECLARE_WRITE8_MEMBER(upd4992_calendar_w);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

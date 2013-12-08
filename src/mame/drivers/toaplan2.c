@@ -356,6 +356,7 @@ To Do / Unknowns:
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
 #include "machine/eepromser.h"
+#include "machine/upd4992.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
@@ -1207,43 +1208,11 @@ static ADDRESS_MAP_START( batsugun_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
-/* TODO: write in a proper core */
-WRITE8_MEMBER(toaplan2_state::upd4992_calendar_w)
-{
-}
-
-READ8_MEMBER(toaplan2_state::upd4992_calendar_r)
-{
-	system_time systime;
-
-	machine().base_datetime(systime);
-
-	switch (offset)
-	{
-		case 0:
-			return ((systime.local_time.second/10)<<4) + (systime.local_time.second%10);
-		case 1:
-			return ((systime.local_time.minute/10)<<4) + (systime.local_time.minute%10);
-		case 2:
-			return ((systime.local_time.hour/10)<<4) + (systime.local_time.hour%10);
-		case 3:
-			return systime.local_time.weekday;
-		case 4:
-			return ((systime.local_time.mday/10)<<4) + (systime.local_time.mday%10);
-		case 5:
-			return (systime.local_time.month + 1);
-		case 6:
-			return (((systime.local_time.year%100)/10)<<4) + (systime.local_time.year%10);
-		case 7:
-		default:
-			return 0;   /* status? the other registers are read only when bit 0 is clear */
-	}
-}
-
 static ADDRESS_MAP_START( pwrkick_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(upd4992_calendar_r,upd4992_calendar_w,0x00ff)
+
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("rtc", upd4992_device, read, write, 0x00ff )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -1263,7 +1232,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( othldrby_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(upd4992_calendar_r,upd4992_calendar_w,0x00ff)
+
+	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("rtc", upd4992_device, read, write, 0x00ff )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -3737,6 +3707,7 @@ static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_UPD4992_ADD("rtc")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3767,6 +3738,7 @@ static MACHINE_CONFIG_START( othldrby, toaplan2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_UPD4992_ADD("rtc")
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
