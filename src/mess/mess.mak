@@ -2212,6 +2212,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/swtpc.o     \
 	$(MESS_DRIVERS)/sys2900.o   \
 	$(MESS_DRIVERS)/systec.o    \
+	$(MESS_DRIVERS)/tavernie.o  \
 	$(MESS_DRIVERS)/terak.o     \
 	$(MESS_DRIVERS)/tim011.o    \
 	$(MESS_DRIVERS)/tim100.o    \
@@ -2229,7 +2230,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/vta2000.o   \
 	$(MESS_DRIVERS)/wicat.o     \
 	$(MESS_DRIVERS)/xor100.o    \
-	$(MESS_DRIVERS)/xavix.o    \
+	$(MESS_DRIVERS)/xavix.o     \
 	$(MESS_DRIVERS)/z100.o      \
 	$(MESS_DRIVERS)/zorba.o     \
 

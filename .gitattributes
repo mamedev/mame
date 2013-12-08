@@ -7254,6 +7254,7 @@ src/mess/drivers/sym1.c svneol=native#text/plain
 src/mess/drivers/sys2900.c svneol=native#text/plain
 src/mess/drivers/systec.c svneol=native#text/plain
 src/mess/drivers/tandy2k.c svneol=native#text/plain
+src/mess/drivers/tavernie.c svneol=native#text/plain
 src/mess/drivers/tdv2324.c svneol=native#text/plain
 src/mess/drivers/tec1.c svneol=native#text/plain
 src/mess/drivers/tek405x.c svneol=native#text/plain
