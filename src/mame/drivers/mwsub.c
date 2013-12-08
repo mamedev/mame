@@ -76,8 +76,8 @@ WRITE8_MEMBER(submar_state::submar_lamp_w)
 	// d1: target ship on water
 	// d2: target ship under water
 	// d3: explosion
-	// d4: game over
-	// d5: extended play
+	// d4: extended play
+	// d5: game over
 	// d6: front ship hit
 	// d7: scenery
 	for (int i = 0; i < 8; i++)

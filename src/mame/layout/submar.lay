@@ -1,45 +1,160 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
+
+<!-- NOTE: this only shows the info panel, -->
+<!-- movable parts are omitted -->
+
+
+<!-- define statics -->
+
+	<element name="static_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="static_grey">
+		<rect>
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+	</element>
+
+
+<!-- define digits -->
+
 	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="1.0" green="0.3" blue="0.0" />
+			<color red="1.0" green="0.3" blue="0.2" />
 		</led7seg>
 	</element>
-
 	<element name="digit0" defstate="63">
 		<led7seg>
-			<color red="1.0" green="0.3" blue="0.0" />
+			<color red="1.0" green="0.3" blue="0.2" />
 		</led7seg>
 	</element>
 
 
-	<view name="Simple LEDs">
-		<bounds left="0" right="256" top="0" bottom="256" />
+<!-- define text-lamps -->
 
-		<!-- SCORE -->
+	<element name="text_extended" defstate="0">
+		<text string="EXTENDED" state="1">
+			<color red="1.0" green="0.3" blue="0.2" />
+		</text>
+		<text string="EXTENDED" state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="text_play" defstate="0">
+		<text string="PLAY" state="1">
+			<color red="1.0" green="0.3" blue="0.2" />
+		</text>
+		<text string="PLAY" state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="text_game" defstate="0">
+		<text string="GAME" state="1">
+			<color red="1.0" green="0.3" blue="0.2" />
+		</text>
+		<text string="GAME" state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</text>
+	</element>
+	<element name="text_over" defstate="0">
+		<text string="OVER" state="1">
+			<color red="1.0" green="0.3" blue="0.2" />
+		</text>
+		<text string="OVER" state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+
+
+
+	<view name="Internal Layout">
+		<bounds left="0" right="244" top="0" bottom="47" />
+		<bezel element="static_black">
+			<bounds left="0" right="244" top="0" bottom="47" />
+		</bezel>
+
+<!-- extended play -->
+<!-- NOTE: ext. score is shown in the left of this box, msd modified manually -->
+
+		<bezel element="static_grey">
+			<bounds x="10" y="10" width="52" height="27" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="11" y="11" width="50" height="25" />
+		</bezel>
+
+		<bezel name="lamp4" element="text_extended">
+			<bounds x="30" y="16" width="30" height="7" />
+		</bezel>
+		<bezel name="lamp4" element="text_play">
+			<bounds x="30" y="24" width="30" height="7" />
+		</bezel>
+
+
+<!-- score -->
+
+		<bezel element="static_grey">
+			<bounds x="68" y="10" width="62" height="27" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="69" y="11" width="60" height="25" />
+		</bezel>
+
 		<!-- x1000, x100 -->
 		<bezel name="digit2" element="digit">
-			<bounds x="0" y="0" width="10" height="15" />
+			<bounds x="71" y="13" width="14" height="21" />
 		</bezel>
 		<bezel name="digit3" element="digit">
-			<bounds x="10" y="0" width="10" height="15" />
+			<bounds x="85" y="13" width="14" height="21" />
 		</bezel>
 
 		<!-- x10, x1: stuck to 0 -->
 		<bezel name="dummy_digita" element="digit0">
-			<bounds x="20" y="0" width="10" height="15" />
+			<bounds x="99" y="13" width="14" height="21" />
 		</bezel>
 		<bezel name="dummy_digitb" element="digit0">
-			<bounds x="30" y="0" width="10" height="15" />
+			<bounds x="113" y="13" width="14" height="21" />
 		</bezel>
 
-		<!-- TIME -->
+
+<!-- time -->
+
+		<bezel element="static_grey">
+			<bounds x="170" y="10" width="34" height="27" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="171" y="11" width="32" height="25" />
+		</bezel>
+
 		<bezel name="digit0" element="digit">
-			<bounds x="50" y="0" width="10" height="15" />
+			<bounds x="177" y="16" width="10" height="15" />
 		</bezel>
 		<bezel name="digit1" element="digit">
-			<bounds x="60" y="0" width="10" height="15" />
+			<bounds x="187" y="16" width="10" height="15" />
 		</bezel>
+
+
+<!-- game over -->
+
+		<bezel element="static_grey">
+			<bounds x="210" y="10" width="24" height="27" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="211" y="11" width="22" height="25" />
+		</bezel>
+
+		<bezel name="lamp5" element="text_game">
+			<bounds x="211" y="16" width="22" height="7" />
+		</bezel>
+		<bezel name="lamp5" element="text_over">
+			<bounds x="211" y="24" width="22" height="7" />
+		</bezel>
+
 
 	</view>
 </mamelayout>
