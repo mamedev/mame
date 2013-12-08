@@ -1448,6 +1448,7 @@ $(MESSOBJ)/motorola.a:          \
 	$(MESS_DRIVERS)/mekd2.o     \
 
 $(MESSOBJ)/multitch.a:          \
+	$(MESS_DRIVERS)/mkit09.o    \
 	$(MESS_DRIVERS)/mpf1.o      \
 
 $(MESSOBJ)/nakajima.a:          \
@@ -2353,6 +2354,7 @@ $(MESS_DRIVERS)/mirage.o:   $(MESS_LAYOUT)/mirage.lh
 $(MESS_DRIVERS)/mk1.o:      $(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk14.o:     $(MESS_LAYOUT)/mk14.lh
 $(MESS_DRIVERS)/mk2.o:      $(MESS_LAYOUT)/mk2.lh
+$(MESS_DRIVERS)/mkit09.o:   $(MESS_LAYOUT)/mkit09.lh
 $(MESS_DRIVERS)/mmd1.o:     $(MESS_LAYOUT)/mmd1.lh \
 							$(MESS_LAYOUT)/mmd2.lh
 $(MESS_DRIVERS)/mpf1.o:     $(MESS_LAYOUT)/mpf1.lh \
