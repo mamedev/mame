@@ -610,7 +610,7 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 		bfm_sc4_68307_porta_w,
 		bfm_sc4_68307_portb_r,
 		bfm_sc4_68307_portb_w );
-	m68307_set_duart68681(m_maincpu,machine().device<duartn68681_device>("m68307_68681"));
+	m68307_set_duart68681(m_maincpu,machine().device("m68307_68681"));
 
 
 
@@ -689,45 +689,45 @@ static const duartn68681_config bfm_sc4_duart68681_config =
 
 
 
-WRITE_LINE_MEMBER(sc4_state::m68307_duart_irq_handler)
+void m68307_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
+	sc4_state *drvstate = device->machine().driver_data<sc4_state>();
 	logerror("m68307_duart_irq_handler\n");
 	if (state == ASSERT_LINE)
 	{
-		m68307_serial_interrupt(m_maincpu, machine().device<duartn68681_device>("m68307_68681")->get_irq_vector());
+		m68307_serial_interrupt(drvstate->m_maincpu, vector);
 	}
 }
 
-WRITE_LINE_MEMBER(sc4_state::m68307_duart_txa)
+void m68307_duart_tx(device_t *device, int channel, UINT8 data)
 {
-	logerror("m68307_duart_tx %02x\n", state);
+	if (channel==0)
+ 	{
+		logerror("m68307_duart_tx %02x\n",data);
+	}
+	else
+	{
+		printf("(illegal channel 1) m68307_duart_tx %02x\n",data);
+	}
 }
 
-WRITE_LINE_MEMBER(sc4_state::m68307_duart_txb)
-{
-	printf("(illegal channel 1) m68307_duart_tx %02x\n", state);
-}
-
-READ8_MEMBER(sc4_state::m68307_duart_input_r)
+UINT8 m68307_duart_input_r(device_t *device)
 {
 	logerror("m68307_duart_input_r\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(sc4_state::m68307_duart_output_w)
+void m68307_duart_output_w(device_t *device, UINT8 data)
 {
 	logerror("m68307_duart_output_w %02x\n", data);
 }
 
-
-
-static const duartn68681_config m68307_duart68681_config =
+static const duart68681_config m68307_duart68681_config =
 {
-	DEVCB_DRIVER_LINE_MEMBER(sc4_state, m68307_duart_irq_handler),
-	DEVCB_DRIVER_LINE_MEMBER(sc4_state, m68307_duart_txa),
-	DEVCB_DRIVER_LINE_MEMBER(sc4_state, m68307_duart_txb),
-	DEVCB_DRIVER_MEMBER(sc4_state, m68307_duart_input_r),
-	DEVCB_DRIVER_MEMBER(sc4_state, m68307_duart_output_w)
+	m68307_duart_irq_handler,
+	m68307_duart_tx,
+	m68307_duart_input_r,
+	m68307_duart_output_w
 };
 
 /* default dmd */
@@ -748,7 +748,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
 
 	// internal duart of the 68307... paired in machine start
-	MCFG_DUARTN68681_ADD("m68307_68681", 16000000/4, m68307_duart68681_config) // ?? Mhz
+	MCFG_DUART68681_ADD("m68307_68681", 16000000/4, m68307_duart68681_config) // ?? Mhz
 
 	MCFG_MACHINE_START_OVERRIDE(sc4_state, sc4 )
 	MCFG_MACHINE_RESET_OVERRIDE(sc4_state, sc4 )
