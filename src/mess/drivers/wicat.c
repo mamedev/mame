@@ -10,10 +10,14 @@ Wicat - various systems.
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/terminal.h"
+#include "cpu/z8000/z8000.h"
+#include "machine/serial.h"
 #include "machine/6522via.h"
 #include "machine/mm58274c.h"
 #include "machine/mc2661.h"
+#include "machine/im6402.h"
+#include "video/i8275x.h"
+#include "machine/am9517a.h"
 #include "wicat.lh"
 
 class wicat_state : public driver_device
@@ -21,9 +25,8 @@ class wicat_state : public driver_device
 public:
 	wicat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//		, m_p_base(*this, "rambase")
+		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
 		, m_rtc(*this, "rtc")
 		, m_uart0(*this,"uart0")
 		, m_uart1(*this,"uart1")
@@ -32,6 +35,9 @@ public:
 		, m_uart4(*this,"uart4")
 		, m_uart5(*this,"uart5")
 		, m_uart6(*this,"uart6")
+		, m_videocpu(*this,"videocpu")
+		, m_videoctrl(*this,"video")
+		, m_videodma(*this,"videodma")
 	{ }
 
 	//DECLARE_WRITE8_MEMBER(kbd_put);
@@ -43,13 +49,16 @@ public:
 	DECLARE_READ8_MEMBER(via_b_r);
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
+	DECLARE_READ8_MEMBER(video_r);
+	DECLARE_WRITE8_MEMBER(video_w);
+
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 private:
 	UINT8 m_term_data;
 	virtual void machine_start();
 	virtual void machine_reset();
-//	required_shared_ptr<UINT16> m_p_base;
+	required_shared_ptr<UINT8> m_vram;
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_terminal_device> m_terminal;
 	required_device<mm58274c_device> m_rtc;
 	required_device<mc2661_device> m_uart0;
 	required_device<mc2661_device> m_uart1;
@@ -58,6 +67,9 @@ private:
 	required_device<mc2661_device> m_uart4;
 	required_device<mc2661_device> m_uart5;
 	required_device<mc2661_device> m_uart6;
+	required_device<cpu_device> m_videocpu;
+	required_device<i8275x_device> m_videoctrl;
+	required_device<am9517a_device> m_videodma;
 
 	UINT8 m_portA;
 	UINT8 m_portB;
@@ -67,7 +79,6 @@ private:
 static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-//	AM_RANGE(0x000000, 0x01efff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_REGION("c2", 0x0000)
 	AM_RANGE(0x020000, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x2fffff) AM_RAM
@@ -84,6 +95,23 @@ static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 	AM_RANGE(0xf00060, 0xf0007f) AM_DEVREADWRITE8("rtc",mm58274c_device,read,write,0xff00)
 	AM_RANGE(0xf000d0, 0xf000d1) AM_WRITE(parallel_led_w)
 	AM_RANGE(0xf00f00, 0xf00fff) AM_READWRITE(invalid_r,invalid_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(wicat_video_mem, AS_PROGRAM, 16, wicat_state)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("g2", 0x0000)
+	AM_RANGE(0x8000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(wicat_video_io, AS_PROGRAM, 8, wicat_state)
+	// yet to figure out...
+	// 0x0100 - INS2651 USART #1 ?
+	// 0x0200 - INS2651 USART #2 ?
+	AM_RANGE(0x0700,0x0700) AM_DEVREADWRITE("videouart",im6402_device,read,write)  // UART?
+	AM_RANGE(0x0800,0x080f) AM_DEVREADWRITE("videodma",am9517a_device,read,write)  // DMA?
+	AM_RANGE(0x0b00,0x0b03) AM_READWRITE(video_r,video_w)
+	AM_RANGE(0x4000,0x5fff) AM_RAM AM_SHARE("vram") // video RAM?
+	AM_RANGE(0x8000,0x8fff) AM_ROM AM_REGION("g2char",0x0000)
+	AM_RANGE(0x9000,0x9fff) AM_ROM AM_REGION("g2char",0x0000)
 ADDRESS_MAP_END
 
 
@@ -169,12 +197,133 @@ WRITE16_MEMBER( wicat_state::invalid_w )
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
-static serial_terminal_interface terminal_intf =
+READ8_MEMBER(wicat_state::video_r)
 {
+	switch(offset)
+	{
+	case 0x00:
+		return m_videoctrl->read(space,0);
+	case 0x02:
+		return m_videoctrl->read(space,1);
+	default:
+		return 0xff;
+	}
+}
+
+WRITE8_MEMBER(wicat_state::video_w)
+{
+	switch(offset)
+	{
+	case 0x00:
+		m_videoctrl->write(space,0,data);
+		break;
+	case 0x02:
+		m_videoctrl->write(space,1,data);
+		break;
+	}
+}
+
+I8275_DISPLAY_PIXELS(wicat_display_pixels)
+{
+	//wicat_state *state = device->machine().driver_data<wicat_state>();
+
+	// TODO
+}
+
+// internal terminal
+static mc2661_interface wicat_uart0_intf =
+{
+	0,  // RXC
+	0,  // TXC
+	DEVCB_NULL,  // RXD in
+	DEVCB_NULL,  // RXD out
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
+	DEVCB_NULL,  // TXRDY out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),  // RTS out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),  // DTR out
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
+	DEVCB_NULL,  // BKDET out
+	DEVCB_NULL   // XSYNC out
+};
+
+// RS232C ports (x5)
+static mc2661_interface wicat_uart1_intf =
+{
+	0,
+	0,
+	DEVCB_DEVICE_LINE_MEMBER("serial1", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("serial1", serial_port_device, tx),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("serial1", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial1", rs232_port_device, dtr_w),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
-static mc2661_interface wicat_uart0_intf =
+static mc2661_interface wicat_uart2_intf =
+{
+	0,
+	0,
+	DEVCB_DEVICE_LINE_MEMBER("serial2", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("serial2", serial_port_device, tx),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("serial2", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial2", rs232_port_device, dtr_w),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static mc2661_interface wicat_uart3_intf =
+{
+	0,
+	0,
+	DEVCB_DEVICE_LINE_MEMBER("serial3", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("serial3", serial_port_device, tx),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("serial3", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial3", rs232_port_device, dtr_w),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static mc2661_interface wicat_uart4_intf =
+{
+	0,
+	0,
+	DEVCB_DEVICE_LINE_MEMBER("serial4", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("serial4", serial_port_device, tx),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("serial4", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial4", rs232_port_device, dtr_w),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static mc2661_interface wicat_uart5_intf =
+{
+	0,
+	0,
+	DEVCB_DEVICE_LINE_MEMBER("serial5", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("serial5", serial_port_device, tx),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("serial5", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("serial5", rs232_port_device, dtr_w),
+	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // TXEMT out
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+// modem
+static mc2661_interface wicat_uart6_intf =
 {
 	0,  // RXC
 	0,  // TXC
@@ -189,19 +338,16 @@ static mc2661_interface wicat_uart0_intf =
 	DEVCB_NULL   // XSYNC out
 };
 
-static mc2661_interface wicat_unused_intf =
+struct im6402_interface wicat_video_uart_intf =
 {
-	0,
-	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	0,  // RRC
+	0,  // TRC
+
+	DEVCB_NULL, //m_in_rri_cb;
+	DEVCB_NULL, //m_out_tro_cb;
+	DEVCB_NULL, //m_out_dr_cb;
+	DEVCB_NULL, //m_out_tbre_cb;
+	DEVCB_NULL, //m_out_tre_cb;
 };
 
 static via6522_interface wicat_via_intf =
@@ -227,27 +373,70 @@ static mm58274c_interface wicat_rtc_intf =
 	1   // first day
 };
 
+struct rs232_port_interface wicat_serial_intf =
+{
+	DEVCB_NULL,  // RX out
+	DEVCB_NULL,  // DCD out
+	DEVCB_NULL,  // DSR out
+	DEVCB_NULL,  // RI out
+	DEVCB_NULL   // CTS out
+};
+
+AM9517A_INTERFACE( wicat_videodma_intf )
+{
+	DEVCB_NULL, // m_out_hreq_cb;
+	DEVCB_NULL, // m_out_eop_cb;
+
+	DEVCB_NULL, // m_in_memr_cb;
+	DEVCB_NULL, // m_out_memw_cb;
+
+	{ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }, // m_in_ior_cb[4];
+	{ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }, // m_out_iow_cb[4];
+	{ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }  // m_out_dack_cb[4];
+};
+
 static MACHINE_CONFIG_START( wicat, wicat_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(wicat_mem)
-
-	/* video hardware */
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, XTAL_5_0688MHz)
 
 	MCFG_VIA6522_ADD("via",XTAL_4MHz,wicat_via_intf)
 
 	MCFG_MM58274C_ADD("rtc",wicat_rtc_intf)  // actually an MM58174AN, but should be compatible
 
 	MCFG_MC2661_ADD("uart0", XTAL_5_0688MHz, wicat_uart0_intf)  // connected to terminal board (TODO)
-	MCFG_MC2661_ADD("uart1", XTAL_5_0688MHz, wicat_unused_intf)
-	MCFG_MC2661_ADD("uart2", XTAL_5_0688MHz, wicat_unused_intf)
-	MCFG_MC2661_ADD("uart3", XTAL_5_0688MHz, wicat_unused_intf)
-	MCFG_MC2661_ADD("uart4", XTAL_5_0688MHz, wicat_unused_intf)
-	MCFG_MC2661_ADD("uart5", XTAL_5_0688MHz, wicat_unused_intf)
-	MCFG_MC2661_ADD("uart6", XTAL_5_0688MHz, wicat_unused_intf)  // connected to modem port
+	MCFG_MC2661_ADD("uart1", XTAL_5_0688MHz, wicat_uart1_intf)
+	MCFG_MC2661_ADD("uart2", XTAL_5_0688MHz, wicat_uart2_intf)
+	MCFG_MC2661_ADD("uart3", XTAL_5_0688MHz, wicat_uart3_intf)
+	MCFG_MC2661_ADD("uart4", XTAL_5_0688MHz, wicat_uart4_intf)
+	MCFG_MC2661_ADD("uart5", XTAL_5_0688MHz, wicat_uart5_intf)
+	MCFG_MC2661_ADD("uart6", XTAL_5_0688MHz, wicat_uart6_intf)  // connected to modem port
+
+	MCFG_RS232_PORT_ADD("serial1",wicat_serial_intf,default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial2",wicat_serial_intf,default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial3",wicat_serial_intf,default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial4",wicat_serial_intf,default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial5",wicat_serial_intf,default_rs232_devices,NULL)
+
+	/* video hardware */
+	MCFG_CPU_ADD("videocpu",Z8002,XTAL_8MHz)  // AMD AMZ8002DC
+	MCFG_CPU_PROGRAM_MAP(wicat_video_mem)
+	MCFG_CPU_IO_MAP(wicat_video_io)
+
+	MCFG_AM9517A_ADD("videodma", XTAL_8MHz, wicat_videodma_intf)  // clock is a bit of guess
+	MCFG_IM6402_ADD("videouart", wicat_video_uart_intf)
+	// Also 2x INS2651 USARTs, not yet emulated
+
+	MCFG_SCREEN_ADD("screen",RASTER)
+	MCFG_SCREEN_SIZE(400,300)
+	MCFG_SCREEN_VISIBLE_AREA(0,400-1,0,300-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE_DEVICE("video",i8275x_device,screen_update)
+
+	MCFG_I8275_ADD("video",XTAL_19_6608MHz/8,9,wicat_display_pixels,DEVWRITELINE("videodma",am9517a_device, dreq0_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_wicat)
+
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -313,6 +502,7 @@ ROM_START( wicat )
 	ROM_LOAD       ("ascii.chr",  0x00000, 0x0800, CRC(43e26e37) SHA1(f3d5d16040c66f0e827f72a35d4694ca62950949) )
 	ROM_LOAD       ("apl.chr",    0x00800, 0x0800, CRC(8c6d698e) SHA1(147dd9296fe2efc6140fa148a6edf673c33f9371) )
 
+	// Winchester Floppy Controller  (Signetics N8X300I + FD1795)
 	ROM_REGION(0x1800, "wd3", 0)
 	ROM_LOAD       ("wd3.u95",    0x00000, 0x0800, CRC(80bb0617) SHA1(ac0f3194fcbef77532571baa3fec78b3010528bf) )
 	ROM_LOAD       ("wd3.u96",    0x00800, 0x0800, CRC(52736e61) SHA1(71c7c9170c733c483393969cb1cb3798b3eb980c) )
