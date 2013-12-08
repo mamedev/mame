@@ -262,7 +262,6 @@ WRITE_LINE_MEMBER( ds1204_device::write_clk )
 				}
 				else
 				{
-					verboselog( 0, "compare register does not match\n" );
 					new_state( STATE_OUTPUT_GARBLED_DATA );
 				}
 			}
@@ -316,7 +315,7 @@ WRITE_LINE_MEMBER( ds1204_device::write_clk )
 
 			if( m_bit == 64 )
 			{
-				verboselog( 1, "<- security match %02x %02x %02x %02x %02x %02x %02x %02x\n",
+				verboselog( 1, ">- security match %02x %02x %02x %02x %02x %02x %02x %02x\n",
 					m_security_match[ 0 ], m_security_match[ 1 ], m_security_match[ 2 ], m_security_match[ 3 ],
 					m_security_match[ 4 ], m_security_match[ 5 ], m_security_match[ 6 ], m_security_match[ 7 ] );
 
@@ -337,6 +336,15 @@ WRITE_LINE_MEMBER( ds1204_device::write_clk )
 
 			if( m_bit == 64 )
 			{
+				if( m_command[ 0 ] == COMMAND_READ )
+				{
+					verboselog( 1, "<- random\n" );
+				}
+				else
+				{
+					verboselog( 1, "-> ignore\n" );
+				}
+
 				new_state( STATE_STOP );
 			}
 			break;
