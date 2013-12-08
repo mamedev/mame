@@ -156,6 +156,10 @@ public:
 	optional_device<okim6295_device> m_oki1;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
+	UINT8 m_pwrkick_hopper;
+	DECLARE_CUSTOM_INPUT_MEMBER(pwrkick_hopper_status_r);
+	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
