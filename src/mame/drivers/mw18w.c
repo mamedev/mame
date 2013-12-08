@@ -226,7 +226,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mw18w_state::mw18w_update_lamps)
 	{
 		for (int row = 0; row < 5; row++)
 		{
-			if (m_lamps_on[row][col]) m_lamps_on[row][col]--;
+			if (m_lamps_on[col][row]) m_lamps_on[col][row]--;
 			output_set_lamp_value(col * 10 + row, m_lamps_on[col][row] != 0);
 		}
 	}
@@ -291,7 +291,7 @@ void mw18w_state::machine_start()
 	// init lamp matrix
 	for (int row = 0; row < 5; row++)
 		for (int col = 0; col < 8; col++)
-			m_lamps_on[row][col] = 0;
+			m_lamps_on[col][row] = 0;
 	
 	save_item(NAME(m_lamps_on));
 }
