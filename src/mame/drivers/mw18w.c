@@ -4,10 +4,10 @@
 
   Midway's 18 Wheeler, game number 653
 
-driver todo:
+TODO:
+- needs extensive interactive artwork
 - discrete sound
-- hook up lamps (and sensors)
-- lots of external artwork
+- identify lamps
 
 To diagnose game, turn on service mode and:
 - test RAM/ROM, leds, lamps:    reset with shifter in neutral
@@ -28,9 +28,14 @@ class mw18w_state : public driver_device
 public:
 	mw18w_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_lamp_timer(*this, "lamp_timer")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<timer_device> m_lamp_timer;
+	
+	int m_lamps_on[5][8];
 
 	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
 	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
@@ -38,6 +43,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
 	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(mw18w_update_lamps);
+
+	virtual void machine_start();
 };
 
 
@@ -50,7 +58,7 @@ public:
 WRITE8_MEMBER(mw18w_state::mw18w_sound0_w)
 {
 	// sound write (airhorn, brake, crash) plus motor speed for backdrop, and coin counter
-	coin_counter_w(machine(), 0, data&1);
+	coin_counter_w(machine(), 0, data & 1);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
@@ -61,7 +69,15 @@ WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
 
 WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 {
-	;
+	// d0-3, d7: selected rows
+	int rows = (data & 0xf) | ( data >> 3 & 0x10);
+	
+	// d4-d6: column
+	int col = data >> 4 & 7;
+	
+	// refresh lamp status
+	for (int i = 0; i < 5; i++)
+		if (rows >> i & 1) m_lamps_on[i][col] = 100;
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
@@ -72,7 +88,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
 
 	// d4-7: 7442 (BCD to decimal) -> pick digit panel
 	if ((data&0xf0)>0x90) return;
-	output_set_digit_value(data>>4, ls48_map[data&0xf]);
+	output_set_digit_value(data >> 4, ls48_map[data & 0xf]);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_irq0_clear_w)
@@ -131,20 +147,20 @@ static INPUT_PORTS_START( mw18w )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // left/right sw.
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // left/right sw.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw18w_state,mw18w_sensors_r, NULL)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw18w_state, mw18w_sensors_r, NULL)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_REMAP_TABLE(mw18w_controller_table + 0x20) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)    // accelerate
+	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_REMAP_TABLE(mw18w_controller_table + 0x20) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("Gas Pedal")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shifter 1st Gear")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Shifter 3rd Gear")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Shifter 2nd Gear")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x3f, 0x1f, IPT_PADDLE ) PORT_REMAP_TABLE(mw18w_controller_table) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)          // steering wheel
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    // brake
+	PORT_BIT( 0x3f, 0x1f, IPT_PADDLE ) PORT_REMAP_TABLE(mw18w_controller_table) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake Pedal")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Shifter Reverse")
 
 	PORT_START("DSW")
@@ -181,11 +197,9 @@ static INPUT_PORTS_START( mw18w )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW:8" )
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )     // n/c
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     // n/c
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )      // for both coin chutes
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // for both coin chutes
+	PORT_BIT( 0xf3, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -196,6 +210,27 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+TIMER_DEVICE_CALLBACK_MEMBER(mw18w_state::mw18w_update_lamps)
+{
+	// arbitrary timer to update and output lamp matrix
+	for (int row = 0; row < 5; row++)
+		for (int col = 0; col < 8; col++)
+		{
+			if (m_lamps_on[row][col]) m_lamps_on[row][col]--;
+			output_set_lamp_value(row * 10 + col, m_lamps_on[row][col] != 0);
+		}
+}
+
+void mw18w_state::machine_start()
+{
+	// init lamp matrix
+	for (int row = 0; row < 5; row++)
+		for (int col = 0; col < 8; col++)
+			m_lamps_on[row][col] = 0;
+	
+	save_item(NAME(m_lamps_on));
+}
+
 static MACHINE_CONFIG_START( mw18w, mw18w_state )
 
 	/* basic machine hardware */
@@ -203,6 +238,8 @@ static MACHINE_CONFIG_START( mw18w, mw18w_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(mw18w_state, irq0_line_assert, 960.516) // 555 IC
 	MCFG_CPU_PROGRAM_MAP(mw18w_map)
 	MCFG_CPU_IO_MAP(mw18w_portmap)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("lamp_timer", mw18w_state, mw18w_update_lamps, attotime::from_hz(500)) // capacitors, frequency is a simple guess (/100)
 
 	/* no video! */
 
