@@ -8,6 +8,7 @@
 #define _PSTRING_H_
 
 #include "nl_config.h"
+#include <cstdio>
 
 // ----------------------------------------------------------------------------------------
 // pblockbool: allocate small memory more efficiently at the expense of some overhead
@@ -50,6 +51,7 @@ struct pblockpool {
 inline void *operator new(std::size_t size, pblockpool &pool, int extra = 0) throw (std::bad_alloc)
 {
     void *result = pool.alloc(size + extra);
+    //std::printf("allocating %ld + %d\n", size, extra);
     if (result == NULL)
         throw std::bad_alloc();
     return result;
@@ -133,6 +135,7 @@ public:
 
     pstring left(unsigned int count) const { return substr(0, count); }
     pstring right(unsigned int count) const  { return substr(len() - count, count); }
+    pstring ucase() const;
 
     // printf using string as format ...
 
@@ -164,7 +167,9 @@ private:
     inline void init()
     {
         if (m_zero == NULL)
+        {
             m_zero = new(pstring::m_pool, 0) pstring::str_t(0);
+        }
         m_ptr = m_zero;
         m_ptr->m_ref_count++;
     }

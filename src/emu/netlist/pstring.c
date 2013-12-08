@@ -59,6 +59,15 @@ pstring pstring::substr(unsigned int start, int count) const
     return ret;
 }
 
+pstring pstring::ucase() const
+{
+    pstring ret = *this;
+    ret.pcopy(cstr(), len());
+    for (int i=0; i<ret.len(); i++)
+        ret.m_ptr->m_str[i] = toupper((unsigned) ret.m_ptr->m_str[i]);
+    return ret;
+}
+
 //-------------------------------------------------
 //  pcmpi - compare a character array to an nstring
 //-------------------------------------------------
@@ -101,7 +110,7 @@ void pstring::sfree(str_t *s)
 
 pstring::str_t *pstring::salloc(int n)
 {
-    str_t *ret = new(m_pool, n) str_t(n);
+    str_t *ret = new(m_pool, n+1) str_t(n);
     return ret;
 }
 
