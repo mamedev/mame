@@ -208,6 +208,7 @@ public:
 	itt3030_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_kbdmcu(*this, "kbdmcu")
 		, m_ram(*this, "mainram")
 		, m_crtc(*this, "crt5027")
 		, m_48kbank(*this, "lowerbank")
@@ -220,6 +221,7 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<i8041_device> m_kbdmcu;
 	required_device<ram_device> m_ram;
 	required_device<crt5027_device> m_crtc;
 	required_device<address_map_bank_device> m_48kbank;
@@ -250,10 +252,14 @@ public:
 	DECLARE_WRITE8_MEMBER(bankl_w);
 	DECLARE_READ8_MEMBER(bankh_r);
 	DECLARE_WRITE8_MEMBER(bankh_w);
+	DECLARE_READ8_MEMBER(kbd_fifo_r);
+	DECLARE_READ8_MEMBER(kbd_matrix_r);
+	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
 	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
 private:
 	UINT8 m_unk;
 	UINT8 m_bank;
+	UINT8 m_kbdrow, m_kbdcol, m_kbdclk;
 	floppy_image_device *m_floppy;
 };
 
@@ -357,8 +363,36 @@ static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	AM_RANGE(0x31, 0x31) AM_READ(unk2_r)
 	AM_RANGE(0x32, 0x32) AM_WRITE(beep_w)
 	AM_RANGE(0x35, 0x35) AM_READ(vsync_r)
+	AM_RANGE(0x40, 0x40) AM_READ(kbd_fifo_r)
 	AM_RANGE(0x50, 0x55) AM_DEVREADWRITE("fdc", fd1791_t, read, write)
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
+ADDRESS_MAP_END
+
+READ8_MEMBER(itt3030_state::kbd_fifo_r)
+{
+	return m_kbdmcu->upi41_master_r(space, 0);	// offset 0 is data, 1 is status
+}
+
+READ8_MEMBER(itt3030_state::kbd_matrix_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
+{
+	m_kbdrow = data & 0xf;
+	m_kbdcol = (data >> 4) & 0x7;
+	m_kbdclk = (data & 0x80) ? 1 : 0;
+}
+
+// Schematics say:
+// Port 1 goes to the keyboard matrix.  
+// bits 0-3 select matrix rows, bits 4-6 choose column to read, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
+// T0 is the key matrix return
+// Port 2 bit 2 is IRQ (in or out?)
+static ADDRESS_MAP_START( kbdmcu_io, AS_IO, 8, itt3030_state )
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(kbd_matrix_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kbd_matrix_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( itt3030 )
@@ -414,6 +448,9 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_CPU_PROGRAM_MAP(itt3030_map)
 	MCFG_CPU_IO_MAP(itt3030_io)
 
+	MCFG_CPU_ADD("kbdmcu", I8041, XTAL_6MHz)
+	MCFG_CPU_IO_MAP(kbdmcu_io)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -463,8 +500,9 @@ ROM_START( itt3030 )
 	ROM_LOAD( "bootv1.2.bin", 0x0000, 0x0800, CRC(90279d45) SHA1(a39a3f31f4f98980b1ef50805870837fbf72261d))
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "gb136-0.bin", 0x0000, 0x0800, CRC(6a3895a8) SHA1(f3b977ffa2f54c346521c9ef034830de8f404621))
-	ROM_REGION( 0x0400, "gfxcpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0400, "kbdmcu", ROMREGION_ERASE00 )
 	ROM_LOAD( "8741ad.bin", 0x0000, 0x0400, CRC(cabf4394) SHA1(e5d1416b568efa32b578ca295a29b7b5d20c0def))
 ROM_END
 
 GAME( 1982, itt3030,  0,   itt3030,  itt3030,  driver_device, 0,      ROT0, "ITT RFA",      "ITT3030", GAME_NOT_WORKING | GAME_NO_SOUND )
+
