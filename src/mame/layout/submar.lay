@@ -6,8 +6,40 @@
 		</led7seg>
 	</element>
 
+	<element name="digit0" defstate="63">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.0" />
+		</led7seg>
+	</element>
+
+
 	<view name="Simple LEDs">
 		<bounds left="0" right="256" top="0" bottom="256" />
+
+		<!-- SCORE -->
+		<!-- x1000, x100 -->
+		<bezel name="digit2" element="digit">
+			<bounds x="0" y="0" width="10" height="15" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="10" y="0" width="10" height="15" />
+		</bezel>
+
+		<!-- x10, x1: stuck to 0 -->
+		<bezel name="dummy_digita" element="digit0">
+			<bounds x="20" y="0" width="10" height="15" />
+		</bezel>
+		<bezel name="dummy_digitb" element="digit0">
+			<bounds x="30" y="0" width="10" height="15" />
+		</bezel>
+
+		<!-- TIME -->
+		<bezel name="digit0" element="digit">
+			<bounds x="50" y="0" width="10" height="15" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="60" y="0" width="10" height="15" />
+		</bezel>
 
 	</view>
 </mamelayout>

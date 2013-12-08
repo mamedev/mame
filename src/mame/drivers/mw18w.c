@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/* Midway's 18 Wheeler hardware, game number 653
+/***************************************************************************
+
+  Midway's 18 Wheeler, game number 653
 
 driver todo:
 - discrete sound
@@ -13,7 +15,7 @@ To diagnose game, turn on service mode and:
 - test accelerator:             reset with shifter in 1st gear
 - test steering wheel:          reset with shifter in 2nd gear
 
-*/
+***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -38,6 +40,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
 };
 
+
+/***************************************************************************
+
+  I/O, Memorymap
+
+***************************************************************************/
 
 WRITE8_MEMBER(mw18w_state::mw18w_sound0_w)
 {
@@ -98,6 +106,13 @@ static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8, mw18w_state )
 ADDRESS_MAP_END
 
 
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
+
 static const ioport_value mw18w_controller_table[] =
 {
 	// same encoder as sspeedr
@@ -138,12 +153,6 @@ static INPUT_PORTS_START( mw18w )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW:5,6")
-	PORT_DIPSETTING(    0x00, "60 seconds" )
-	PORT_DIPSETTING(    0x10, "70 seconds" )
-	PORT_DIPSETTING(    0x20, "80 seconds" )
-	PORT_DIPSETTING(    0x30, "90 seconds" )
-
 	PORT_DIPNAME( 0x0c, 0x00, "Extended Time" ) PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x00, "20 seconds at 4000" )  PORT_CONDITION("DSW", 0x30, EQUALS, 0x00) // @ 60 seconds
 	PORT_DIPSETTING(    0x04, "30 seconds at 8000" )  PORT_CONDITION("DSW", 0x30, EQUALS, 0x00)
@@ -161,7 +170,11 @@ static INPUT_PORTS_START( mw18w )
 	PORT_DIPSETTING(    0x04, "30 seconds at 15000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x30)
 	PORT_DIPSETTING(    0x08, "20 seconds at 15000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x30)
 	PORT_DIPSETTING(    0x0c, "30 seconds at 20000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x30)
-
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPSETTING(    0x00, "60 seconds" )
+	PORT_DIPSETTING(    0x10, "70 seconds" )
+	PORT_DIPSETTING(    0x20, "80 seconds" )
+	PORT_DIPSETTING(    0x30, "90 seconds" )
 	PORT_DIPNAME( 0x40, 0x40, "I/O Test" ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -175,6 +188,13 @@ static INPUT_PORTS_START( mw18w )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
 
 static MACHINE_CONFIG_START( mw18w, mw18w_state )
 
@@ -190,6 +210,13 @@ static MACHINE_CONFIG_START( mw18w, mw18w_state )
 	//...
 MACHINE_CONFIG_END
 
+
+
+/***************************************************************************
+
+  Game drivers
+
+***************************************************************************/
 
 ROM_START( 18w )
 	ROM_REGION( 0x10000, "maincpu", 0 )
