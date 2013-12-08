@@ -36,6 +36,8 @@ Supported games:
     batsugun    TP-030        Toaplan       Batsugun
     batsuguna   TP-030        Toaplan       Batsugun (older)
     batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
+    pwrkick     ??????        Sunwise       Power Kick
+	othldrby    ??????        Sunwise       Othello Derby
     snowbro2    ??????        Hanafram      Snow Bros. 2 - With New Elves
 
     * This version of Whoopee!! is on a board labeled TP-020
