@@ -350,6 +350,7 @@ public:
 	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );
 	DECLARE_READ32_MEMBER( killbldp_speedup_r );
 	DECLARE_READ32_MEMBER( theglad_speedup_r );
+	DECLARE_READ32_MEMBER( svg_speedup_r );
 	DECLARE_MACHINE_RESET(pgm_arm_type3_reset);
 };
 

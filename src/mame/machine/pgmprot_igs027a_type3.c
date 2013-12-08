@@ -251,6 +251,14 @@ READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
 	return m_arm_ram2[0x00c/4];
 }
 
+READ32_MEMBER(pgm_arm_type3_state::svg_speedup_r )
+{
+	int pc = space.device().safe_pc();
+	if (pc == 0x7d8) space.device().execute().eat_cycles(500);
+	//else printf("killbldp_speedup_r %08x\n", pc);
+	return m_arm_ram2[0x00c/4];
+}
+
 
 void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(void)
 {
@@ -477,6 +485,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
 }
 
+
 void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base)
 {
 	// we don't have the correct internal ROM for this version, so insead we use the one we have and patch the jump table in the external ROM
@@ -560,7 +569,8 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
 	svg_basic_init();
 	pgm_svg_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region(0x4000);
+	pgm_create_dummy_internal_arm_region_theglad();
+
 }
 
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
@@ -568,7 +578,10 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
 	svg_basic_init();
 	pgm_svgpcb_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region(0x4000);
+	pgm_create_dummy_internal_arm_region_theglad();
+
+//	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
+
 }
 
 
