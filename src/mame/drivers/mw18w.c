@@ -35,7 +35,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<timer_device> m_lamp_timer;
 	
-	int m_lamps_on[5][8];
+	int m_lamps_on[8][5];
 
 	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
 	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
@@ -57,14 +57,23 @@ public:
 
 WRITE8_MEMBER(mw18w_state::mw18w_sound0_w)
 {
-	// sound write (airhorn, brake, crash) plus motor speed for backdrop, and coin counter
+	// d0: coin counter
+	// d1: "summer"
+	// d2-d3: backdrop motor speed
+	// d4: air horn sound
+	// d5: crash sound
+	// d6-d7: brake sound
+
 	coin_counter_w(machine(), 0, data & 1);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
 {
-	// sound write (bell, engine) plus lamp dim control for backdrop lamp
-	;
+	// d0-d5: engine sound
+	// d6: bell sound
+	// d7: backdrop lamp dim control
+	
+	output_set_lamp_value(80, data >> 7 & 1);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
@@ -77,7 +86,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 	
 	// refresh lamp status
 	for (int i = 0; i < 5; i++)
-		if (rows >> i & 1) m_lamps_on[i][col] = 100;
+		if (rows >> i & 1) m_lamps_on[col][i] = 100;
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
@@ -213,12 +222,68 @@ INPUT_PORTS_END
 TIMER_DEVICE_CALLBACK_MEMBER(mw18w_state::mw18w_update_lamps)
 {
 	// arbitrary timer to update and output lamp matrix
-	for (int row = 0; row < 5; row++)
-		for (int col = 0; col < 8; col++)
+	for (int col = 0; col < 8; col++)
+	{
+		for (int row = 0; row < 5; row++)
 		{
 			if (m_lamps_on[row][col]) m_lamps_on[row][col]--;
-			output_set_lamp_value(row * 10 + col, m_lamps_on[row][col] != 0);
+			output_set_lamp_value(col * 10 + row, m_lamps_on[col][row] != 0);
 		}
+	}
+	
+	/* lamps info:
+	
+	00: upper right load zone
+	01: lower right load zone
+	02: lost cargo
+	03: hi score
+	04: right crash
+
+	10: 2 pos. load lost sequence
+	11: 3 pos. load lost sequence
+	12: 4 pos. load lost sequence
+	13: 5 pos. load lost sequence
+	14: 6 pos. load lost sequence
+
+	20: down shift
+	21: pick up cargo
+	22: ahead
+	23: 1 pos. load lost sequence
+	24: go
+
+	30: right man arm body
+	31: right man arm down
+	32: right man arm up
+	33: not used
+	34: not used
+
+	40: left man arm up
+	41: left man body
+	42: left man arm down
+	43: left crash
+	44: not used
+
+	50: 1 cargo
+	51: 3 cargo
+	52: 5 cargo
+	53: 7 cargo
+	54: not used
+
+	60: 2 cargo
+	61: 4 cargo
+	62: 6 cargo
+	63: 8 cargo
+	64: not used
+
+	70: upper left load zone
+	71: lower left load zone
+	72: extended play
+	73: credit
+	74: game over
+	
+	(80: backdrop dim)
+	
+	*/
 }
 
 void mw18w_state::machine_start()
@@ -265,7 +330,7 @@ ROM_END
 
 ROM_START( 18w2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "18w_b1(__18w2).rom1",0x0000, 0x0800, CRC(cbc0fb2c) SHA1(66b14f0d76baebbd64e8ed107e536ad811d55273) )
+	ROM_LOAD( "18w_b1(__18w2).rom1", 0x0000, 0x0800, CRC(cbc0fb2c) SHA1(66b14f0d76baebbd64e8ed107e536ad811d55273) )
 	ROM_LOAD( "18w_b2.rom2", 0x0800, 0x0800, CRC(efbadee8) SHA1(834eaf8ca50544123de7529b90b828cf46b1c001) )
 	ROM_LOAD( "18w_b3.rom3", 0x1000, 0x0800, CRC(214606f6) SHA1(9a9dc20259b4462661c6be410d98d2be54657a0e) )
 	ROM_LOAD( "18w_b4.rom4", 0x1800, 0x0800, CRC(e88ad6a9) SHA1(ac010aa7e0288197ff9342801522623b64dd2a47) )

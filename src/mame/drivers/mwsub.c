@@ -95,7 +95,7 @@ WRITE8_MEMBER(submar_state::submar_solenoid_w)
 WRITE8_MEMBER(submar_state::submar_sound_w)
 {
 	// d0: torpedo
-	// d1: summer
+	// d1: "summer"
 	// d2: ship hit
 	// d3: target ship hit
 	// d4: sonar circuit
