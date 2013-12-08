@@ -78,8 +78,135 @@ NETLIB_UPDATE(clock)
 }
 
 // ----------------------------------------------------------------------------------------
+// netlist_matrix_solver
+// ----------------------------------------------------------------------------------------
+
+
+ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets)
+{
+    for (netlist_net_t::list_t::entry_t *pn = nets.first(); pn != NULL; pn = nets.next(pn))
+    {
+        NL_VERBOSE_OUT(("setting up net\n"));
+
+        m_nets.add(pn->object());
+        pn->object()->m_solver = this;
+
+        for (netlist_core_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
+        {
+            switch (p->type())
+            {
+                case netlist_terminal_t::TERMINAL:
+                    switch (p->netdev().family())
+                    {
+                        case netlist_device_t::CAPACITOR:
+                            if (!m_steps.contains(&p->netdev()))
+                                m_steps.add(&p->netdev());
+                            break;
+                        case netlist_device_t::DIODE:
+                        case netlist_device_t::BJT_SWITCH:
+                            if (!m_dynamic.contains(&p->netdev()))
+                                m_dynamic.add(&p->netdev());
+                            break;
+                        default:
+                            break;
+                    }
+                    pn->object()->m_terms.add(static_cast<netlist_terminal_t *>(p));
+                    NL_VERBOSE_OUT(("Added terminal\n"));
+                    break;
+                case netlist_terminal_t::INPUT:
+                    if (!m_inps.contains(&p->netdev()))
+                        m_inps.add(&p->netdev());
+                    NL_VERBOSE_OUT(("Added input\n"));
+                    break;
+                default:
+                    fatalerror("unhandled element found\n");
+                    break;
+            }
+        }
+    }
+}
+
+ATTR_HOT inline void netlist_matrix_solver_t::step(const netlist_time delta)
+{
+    const double dd = delta.as_double();
+    for (dev_list_t::entry_t *p = m_steps.first(); p != NULL; p = m_steps.next(p))
+        p->object()->step_time(dd);
+}
+
+ATTR_HOT inline void netlist_matrix_solver_t::update_inputs()
+{
+    for (dev_list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+        p->object()->update_dev();
+}
+
+
+ATTR_HOT inline bool netlist_matrix_solver_t::solve()
+{
+    bool resched = false;
+
+    /* update all non-linear devices  */
+    for (dev_list_t::entry_t *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
+        p->object()->update_terminals();
+
+    for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+    {
+        netlist_net_t *net = pn->object();
+
+        double gtot = 0;
+        double iIdr = 0;
+
+        for (netlist_net_t::terminal_list_t::entry_t *e = net->m_terms.first(); e != NULL; e = net->m_terms.next(e))
+        {
+            netlist_terminal_t *pt = e->object();
+            gtot += pt->m_g;
+            iIdr += pt->m_Idr + pt->m_g * pt->m_otherterm->net().Q_Analog();
+        }
+
+        double new_val = iIdr / gtot;
+        if (fabs(new_val - net->m_cur.Analog) > m_accuracy)
+            resched = true;
+        net->m_cur.Analog = net->m_new.Analog = new_val;
+
+        NL_VERBOSE_OUT(("Info: %d\n", pn->object()->m_num_cons));
+        NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
+    }
+    return resched;
+}
+
+// ----------------------------------------------------------------------------------------
 // solver
 // ----------------------------------------------------------------------------------------
+
+typedef netlist_net_t::list_t  *net_groups_t;
+
+static bool already_processed(net_groups_t groups, int &cur_group, netlist_net_t *net)
+{
+    if (net->isRailNet())
+        return true;
+    for (int i = 0; i <= cur_group; i++)
+    {
+        if (groups[i].contains(net))
+            return true;
+    }
+    return false;
+}
+
+static void process_net(net_groups_t groups, int &cur_group, netlist_net_t *net)
+{
+    /* add the net */
+    groups[cur_group].add(net);
+    for (netlist_core_terminal_t *p = net->m_head; p != NULL; p = p->m_update_list_next)
+    {
+        if (p->isType(netlist_terminal_t::TERMINAL))
+        {
+            netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
+            netlist_net_t *nnet = &pt->m_otherterm->net();
+            if (!already_processed(groups, cur_group, nnet))
+                process_net(groups, cur_group, nnet);
+        }
+    }
+}
+
 
 NETLIB_START(solver)
 {
@@ -108,10 +235,18 @@ NETLIB_UPDATE_PARAM(solver)
 
 NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 {
-    net_list_t::entry_t *p = m_nets.first();
+    netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first();
+    while (e != NULL)
+    {
+        netlist_matrix_solver_t::list_t::entry_t *en = m_mat_solvers.next(e);
+        delete e->object();
+        e = en;
+    }
+
+    netlist_net_t::list_t::entry_t *p = m_nets.first();
     while (p != NULL)
     {
-        net_list_t::entry_t *pn = m_nets.next(p);
+        netlist_net_t::list_t::entry_t *pn = m_nets.next(p);
         delete p->object();
         p = pn;
     }
@@ -119,43 +254,14 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 
 NETLIB_FUNC_VOID(solver, post_start, ())
 {
+    netlist_net_t::list_t groups[100];
+    int cur_group = -1;
 
     NL_VERBOSE_OUT(("post start solver ...\n"));
-    for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+
+    // delete empty nets ...
+    for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
     {
-        NL_VERBOSE_OUT(("setting up net\n"));
-        for (netlist_core_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
-        {
-            switch (p->type())
-            {
-                case netlist_terminal_t::TERMINAL:
-                    switch (p->netdev().family())
-                    {
-                        case CAPACITOR:
-                            if (!m_steps.contains(&p->netdev()))
-                                m_steps.add(&p->netdev());
-                            break;
-                        case DIODE:
-                        case BJT_SWITCH:
-                            if (!m_dynamic.contains(&p->netdev()))
-                                m_dynamic.add(&p->netdev());
-                            break;
-                        default:
-                            break;
-                    }
-                    pn->object()->m_terms.add(static_cast<netlist_terminal_t *>(p));
-                    NL_VERBOSE_OUT(("Added terminal\n"));
-                    break;
-                case netlist_terminal_t::INPUT:
-                    if (!m_inps.contains(&p->netdev()))
-                        m_inps.add(&p->netdev());
-                    NL_VERBOSE_OUT(("Added input\n"));
-                    break;
-                default:
-                    fatalerror("unhandled element found\n");
-                    break;
-            }
-        }
         if (pn->object()->m_head == NULL)
         {
             NL_VERBOSE_OUT(("Deleting net ...\n"));
@@ -165,6 +271,33 @@ NETLIB_FUNC_VOID(solver, post_start, ())
             pn--;
         }
     }
+
+    printf("Scanning net groups ...\n");
+    // determine net groups
+    for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+    {
+        if (!already_processed(groups, cur_group, pn->object()))
+        {
+            cur_group++;
+            process_net(groups, cur_group, pn->object());
+        }
+    }
+    printf("Found %d net groups in %d nets\n", cur_group + 1, m_nets.count());
+    for (int i = 0; i <= cur_group; i++)
+    {
+        printf("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr());
+    }
+
+
+    // setup the solvers
+    for (int i = 0; i <= cur_group; i++)
+    {
+        netlist_matrix_solver_t *ms = new netlist_matrix_solver_t;
+        ms->m_accuracy = m_accuracy.Value();
+        ms->setup(groups[i]);
+        m_mat_solvers.add(ms);
+    }
+
 }
 
 NETLIB_UPDATE(solver)
@@ -182,65 +315,38 @@ NETLIB_UPDATE(solver)
         NL_VERBOSE_OUT(("Step!\n"));
         /* update all terminals for new time step */
         m_last_step = now;
-        for (dev_list_t::entry_t *p = m_steps.first(); p != NULL; p = m_steps.next(p))
-            p->object()->step_time(delta.as_double());
-    }
-    do {
-        /* update all non-linear devices  */
-        for (dev_list_t::entry_t *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
-            p->object()->update_terminals();
-
-        resched = false;
-
-        for (net_list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+        for (netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
         {
-            netlist_net_t *net = pn->object();
-
-            double gtot = 0;
-            double iIdr = 0;
-
-            for (netlist_net_t::terminal_list_t::entry_t *e = net->m_terms.first(); e != NULL; e = net->m_terms.next(e))
-            {
-                netlist_terminal_t *pt = e->object();
-                gtot += pt->m_g;
-                iIdr += pt->m_Idr + pt->m_g * pt->m_otherterm->net().Q_Analog();
-            }
-
-            double new_val = iIdr / gtot;
-            if (fabs(new_val - net->m_cur.Analog) > m_accuracy.Value())
-                resched = true;
-            resched_cnt++;
-            net->m_cur.Analog = net->m_new.Analog = new_val;
-
-            NL_VERBOSE_OUT(("Info: %d\n", pn->object()->m_num_cons));
-            NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
+            e->object()->step(delta);
         }
-    } while (resched && (resched_cnt < 5));
-    //if (resched_cnt >= 5)
-    //    printf("rescheduled\n");
-    if (resched)
+    }
+    bool global_resched = false;
+    for (netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
+    {
+        resched_cnt = 0;
+        do {
+            resched = e->object()->solve();
+            resched_cnt++;
+        } while (resched && (resched_cnt < 5));
+        global_resched = global_resched || resched;
+    }
+    if (global_resched)
+        printf("rescheduled\n");
+    if (global_resched)
     {
         schedule();
     }
     else
     {
         /* update all inputs connected */
-        for (dev_list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
-            p->object()->update_dev();
+        for (netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
+        {
+            e->object()->update_inputs();
+        }
 
         /* step circuit */
         if (!m_Q_step.net().is_queued())
             m_Q_step.net().push_to_queue(m_inc);
     }
-
-        /* only inputs and terminals connected
-         * approach:
-         *
-         * a) Update voltage on this net
-         * b) Update devices
-         * c) If difference old - new > trigger schedule immediate update
-         *    of number of updates < max_update_count
-         *    else clear number of updates
-         */
 
 }

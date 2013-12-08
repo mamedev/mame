@@ -79,9 +79,28 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 // solver
 // ----------------------------------------------------------------------------------------
 
+struct netlist_matrix_solver_t
+{
+    typedef netlist_list_t<netlist_matrix_solver_t *> list_t;
+    typedef netlist_core_device_t::list_t dev_list_t;
+    ATTR_COLD void setup(netlist_net_t::list_t &nets);
+
+    // return true if a reschedule is needed ...
+    ATTR_HOT bool solve();
+    ATTR_HOT void step(const netlist_time delta);
+    ATTR_HOT void update_inputs();
+
+    double m_accuracy;
+
+private:
+    netlist_net_t::list_t m_nets;
+    dev_list_t m_dynamic;
+    dev_list_t m_inps;
+    dev_list_t m_steps;
+};
+
 NETLIB_DEVICE_WITH_PARAMS(solver,
-        typedef netlist_list_t<netlist_net_t *>      net_list_t;
-        typedef netlist_list_t<netlist_core_device_t *>      dev_list_t;
+        typedef netlist_core_device_t::list_t dev_list_t;
 
         netlist_ttl_input_t m_fb_sync;
         netlist_ttl_output_t m_Q_sync;
@@ -97,15 +116,12 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
         netlist_time m_last_step;
         netlist_time m_nt_sync_delay;
 
-        dev_list_t m_dynamic;
-        dev_list_t m_inps;
-        dev_list_t m_steps;
-
+        netlist_matrix_solver_t::list_t m_mat_solvers;
 public:
 
         ~NETLIB_NAME(solver)();
 
-        net_list_t m_nets;
+        netlist_net_t::list_t m_nets;
 
         ATTR_HOT inline void schedule();
 

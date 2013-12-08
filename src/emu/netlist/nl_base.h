@@ -117,8 +117,24 @@
  *
  *  These equations represent a linear Matrix equation (with more math).
  *
- *  In the context of this exercise, in a first step, we will not solve it. Instead,
- *  we calculate the net voltage V(l) by using a mirror of the above device on each terminal.
+ *  In the end the solution of the analog subsystem boils down to
+ *
+ *  (G - D) * V = I
+ *
+ *  with G being the conductance matrix, D a diagonal matrix with the total conductance
+ *  on the diagonal elements, V the net voltage vector and I the current vector.
+ *
+ *  By using solely two terminal devices, we can simplify the whole calculation
+ *  significantly. A BJT now is a four terminal device with two terminals being
+ *  connected internally.
+ *
+ *  The system is solved using an iterative approach:
+ *
+ *  G * V - D * V = I
+ *
+ *  assuming V=Vn=Vo
+ *
+ *  Vn = D-1 * (I - G * Vo)
  *
  *  Each terminal thus has three properties:
  *
@@ -126,7 +142,7 @@
  *  b) Voltage source
  *  c) Current source/sink
  *
- *  Going forward, approach can be extended to use a linear equation solver.
+ *  Going forward, the approach can be extended e.g. to use a linear equation solver
  *
  *  The formal representation of the circuit will stay the same, thus scales.
  *
@@ -225,6 +241,7 @@ class netlist_output_t;
 class netlist_param_t;
 class netlist_setup_t;
 class netlist_base_t;
+class netlist_matrix_solver_t;
 
 
 // ----------------------------------------------------------------------------------------
@@ -438,8 +455,11 @@ class netlist_net_t : public netlist_object_t
 {
 public:
 
+    typedef netlist_list_t<netlist_net_t *> list_t;
+
     friend class NETLIB_NAME(mainclock);
     friend class NETLIB_NAME(solver);
+    friend class netlist_matrix_solver_t;
     friend class netlist_output_t;
     friend class netlist_input_t;
     friend class netlist_logic_output_t;
@@ -493,6 +513,9 @@ public:
     // m_terms is only used by analog subsystem
     typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
     terminal_list_t m_terms;
+    netlist_matrix_solver_t *m_solver;
+
+    netlist_core_terminal_t *m_head;
 
 protected:
 
@@ -510,7 +533,6 @@ protected:
     hybrid_t m_cur;
     hybrid_t m_new;
 
-    netlist_core_terminal_t *m_head;
     UINT32 m_num_cons;
 
 private:
@@ -716,6 +738,8 @@ private:
 class netlist_core_device_t : public netlist_object_t
 {
 public:
+
+    typedef netlist_list_t<netlist_core_device_t *> list_t;
 
     ATTR_COLD netlist_core_device_t();
     ATTR_COLD netlist_core_device_t(const family_t afamily);
