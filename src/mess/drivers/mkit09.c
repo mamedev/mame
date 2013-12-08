@@ -6,11 +6,23 @@
 
     2013-12-08 Mostly working driver.
 
+    The only documentation is in French, so the operation of the system
+    is a bit of a mystery.
+
 ToDo:
-    - NMI & RST keys
     - Test if Cassette works
-    - Test if Paste works
     - Need software to test with
+
+Pasting:
+    0-F : as is
+    (inc) : ^
+    (dec) : V
+    M (memory) : -
+    G (Go) : X
+
+Test Paste:
+    -0000 00^11^22^33^44^55^66^77^88^99^--0000
+    Now press up-arrow to confirm the data has been entered.
 
 ****************************************************************************/
 
@@ -36,6 +48,8 @@ public:
 	DECLARE_READ8_MEMBER(pb_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 private:
 	UINT8 m_keydata;
 	virtual void machine_reset();
@@ -69,7 +83,7 @@ static INPUT_PORTS_START( mkit09 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Dec") PORT_CODE(KEYCODE_DOWN) PORT_CHAR('V')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
@@ -99,9 +113,19 @@ static INPUT_PORTS_START( mkit09 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
-	//PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_reset, 0)
-	//PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_reset, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_nmi, 0)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER( mkit09_state::trigger_reset )
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+INPUT_CHANGED_MEMBER( mkit09_state::trigger_nmi )
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
 
 
 void mkit09_state::machine_reset()
@@ -193,5 +217,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT    COMPANY         FULLNAME       FLAGS */
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE     INPUT   CLASS          INIT    COMPANY         FULLNAME   FLAGS */
 COMP( 1983, mkit09,  0,      0,       mkit09,     mkit09, driver_device,   0,   "Multitech",  "Microkit09", 0 )
