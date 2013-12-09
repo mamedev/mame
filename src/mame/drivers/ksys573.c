@@ -19,9 +19,6 @@
 
   Note 4: Some games require you to press f2 to skip the rtc cleared note.
 
-  TODO:
-  * emulate memory card board GE885-PWB(A)A ( contains Toshiba tmpr3904af, ram, rom, tranceiver and glue ).
-
   -----------------------------------------------------------------------------------------
 
   System 573 Hardware Overview
@@ -354,7 +351,9 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "machine/linflash.h"
 #include "machine/k573cass.h"
 #include "machine/k573dio.h"
+#include "machine/k573mcr.h"
 #include "machine/k573msu.h"
+#include "machine/k573npu.h"
 #include "machine/mb89371.h"
 #include "machine/timekpr.h"
 #include "machine/upd4701.h"
@@ -2217,6 +2216,8 @@ static MACHINE_CONFIG_DERIVED( ddr, k573a )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddr2ml, k573a )
+	MCFG_DEVICE_ADD( "k573mcr", KONAMI_573_MEMORY_CARD_READER, 0 )
+
 	MCFG_FRAGMENT_ADD( pccard1_16mb )
 	MCFG_FRAGMENT_ADD( cassx )
 MACHINE_CONFIG_END
@@ -2349,6 +2350,10 @@ static MACHINE_CONFIG_DERIVED( gtrfrk7m, k573d )
 	MCFG_FRAGMENT_ADD( pccard1_32mb )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( gtfrk10mb, gtrfrk7m )
+	MCFG_DEVICE_ADD( "k573npu", KONAMI_573_NETWORK_PCB_UNIT, 0 )
+MACHINE_CONFIG_END
+
 // Miscellaneous
 
 static MACHINE_CONFIG_DERIVED( konami573x, konami573 )
@@ -2424,6 +2429,10 @@ static MACHINE_CONFIG_DERIVED( mamboagg, k573d )
 	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, mamboagg_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( casszi )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( mamboagga, mamboagg )
+	MCFG_DEVICE_ADD( "k573npu", KONAMI_573_NETWORK_PCB_UNIT, 0 )
 MACHINE_CONFIG_END
 
 
@@ -3091,9 +3100,6 @@ ROM_END
 ROM_START( ddr2ml )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x080000, "cpu2", 0 ) /* memory card reader */
-	ROM_LOAD( "885a01.bin",   0x000000, 0x080000, CRC(e22d093f) SHA1(927f62f63b5caa7899392decacd12fea0e6fdbea) )
-
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "ge885jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
 
@@ -3106,9 +3112,6 @@ ROM_END
 
 ROM_START( ddr2mla )
 	SYS573_BIOS_A
-
-	ROM_REGION( 0x080000, "cpu2", 0 ) /* memory card reader */
-	ROM_LOAD( "885a01.bin",   0x000000, 0x080000, CRC(e22d093f) SHA1(927f62f63b5caa7899392decacd12fea0e6fdbea) )
 
 	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
 	ROM_LOAD( "ge885jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
@@ -4774,7 +4777,7 @@ GAME( 2001, gtrfrk5m,  sys573,   gtrfrk5m,   gtrfrks,   driver_device, 0,       
 GAME( 2001, ddr5m,     sys573,   ddr5m,      ddr,       driver_device, 0,        ROT0, "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, dmx2majp,  sys573,   dmx,        dmx,       driver_device, 0,        ROT0, "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, mamboagg,  sys573,   mamboagg,   mamboagg,  driver_device, 0,        ROT0, "Konami", "Mambo A Go-Go (GQA40 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2001, mamboagga, mamboagg, mamboagg,   mamboagg,  driver_device, 0,        ROT0, "Konami", "Mambo A Go-Go e-Amusement (GQA40 VER. JRB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2001, mamboagga, mamboagg, mamboagga,  mamboagg,  driver_device, 0,        ROT0, "Konami", "Mambo A Go-Go e-Amusement (GQA40 VER. JRB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, drmn5m,    sys573,   drmn4m,     drmn,      driver_device, 0,        ROT0, "Konami", "DrumMania 5th Mix (G*B05 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, gtrfrk6m,  sys573,   gtrfrk5m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 6th Mix (G*B06 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, drmn6m,    sys573,   drmn4m,     drmn,      driver_device, 0,        ROT0, "Konami", "DrumMania 6th Mix (G*B16 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
@@ -4793,6 +4796,6 @@ GAME( 2003, gtrfrk9m,  sys573,   gtrfrk7m,   gtrfrks,   driver_device, 0,       
 GAME( 2003, drmn9m,    sys573,   drmn4m,     drmn,      driver_device, 0,        ROT0, "Konami", "DrumMania 9th Mix (G*D09 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtfrk10m,  sys573,   gtrfrk7m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2003, gtfrk10ma, gtfrk10m, gtrfrk7m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 10th Mix (G*D10 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2003, gtfrk10mb, gtfrk10m, gtrfrk7m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 10th Mix eAmusement (G*D10 VER. JBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2003, gtfrk10mb, gtfrk10m, gtfrk10mb,  gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 10th Mix eAmusement (G*D10 VER. JBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2004, gtfrk11m,  sys573,   gtrfrk7m,   gtrfrks,   driver_device, 0,        ROT0, "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2004, drmn10m,   sys573,   drmn4m,     drmn,      driver_device, 0,        ROT0, "Konami", "DrumMania 10th Mix (G*D40 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
