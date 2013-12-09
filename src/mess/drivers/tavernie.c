@@ -1,26 +1,27 @@
 // license:MAME
-// copyright-holders: I'm not claiming this!
+// copyright-holders: Robbbert
 /***************************************************************************
 
-    Tavernier
+    Tavernier CPU09 and IVG09 (Realisez votre ordinateur individuel)
 
     2013-12-08 Skeleton driver.
 
-    This is a French computer. Nothing else is known.
+    This system was described in a French computer magazine.
+
+    CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
+    IVG09 includes 6845, WD1795, another 6821
 
 ToDo:
     - Almost everything
     - Scrolling can cause the screen to go blank (use Z command to fix)
     - There's supposed to be a device at 2000-2003
-    - Get rid of the bodgy timer. It won't boot up without it.
-    - There's a bootstrap rom for this, but it's a bad dump
     - Character rom is not dumped
 
 List of commands (must be in UPPERCASE):
 A -
 B -
 C -
-D -
+D - Dump memory
 G -
 I -
 L -
@@ -44,8 +45,12 @@ Z - more scan lines per row (cursor is bigger)
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
+#include "machine/6840ptm.h"
+#include "machine/6850acia.h"
 #include "video/mc6845.h"
 #include "machine/keyboard.h"
+#include "machine/serial.h"
 
 
 class tavernie_state : public driver_device
@@ -57,6 +62,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	DECLARE_READ8_MEMBER(pa_r);
+	DECLARE_WRITE8_MEMBER(pa_w);
+	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	const UINT8 *m_p_chargen;
@@ -64,20 +72,22 @@ public:
 private:
 	UINT8 m_term_data;
 	virtual void machine_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	required_device<cpu_device> m_maincpu;
 };
 
 
 static ADDRESS_MAP_START(tavernie_mem, AS_PROGRAM, 8, tavernie_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("videoram")
-	//AM_RANGE(0x2000, 0x2003) some device
+	//AM_RANGE(0x2000, 0x2003) 6821 on ivg09
 	AM_RANGE(0x2002, 0x2003) AM_READ(keyin_r)
-	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
+	//AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	//AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
+	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
+	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
+	AM_RANGE(0xec00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
@@ -87,15 +97,28 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( tavernie )
+	PORT_START("DSW")
+	PORT_BIT( 0x9C, 0x9C, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x00, "IRQ PTM") PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "IRQ ACIA") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x60, 0x40, "Terminal") PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, "110 baud" )
+	PORT_DIPSETTING(    0x20, "300 baud" )
+	PORT_DIPSETTING(    0x40, "1200 baud" )
+	PORT_DIPSETTING(    0x60, "IVG09 (mc6845)" )
 INPUT_PORTS_END
 
 void tavernie_state::machine_reset()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_term_data = 0;
-	timer_set(attotime::from_msec(400), 0); //bodge
 }
 
+#if 0
 static MC6845_UPDATE_ROW( update_row )
 {
 	tavernie_state *state = device->machine().driver_data<tavernie_state>();
@@ -142,12 +165,78 @@ static MC6845_INTERFACE( mc6845_intf )
 	DEVCB_NULL,         /* VSYNC callback */
 	NULL                /* update address callback */
 };
+#endif
 
-void tavernie_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+READ8_MEMBER( tavernie_state::pa_r )
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.write_byte(0xef7a, 0xff);
+	return ioport("DSW")->read();
 }
+
+
+/*
+d0: A16
+d1: A17 (for 256kb expansion)
+d2, d3, d4: to 40-pin port
+d5: S3
+d6: S4
+d7: cassout
+*/
+WRITE8_MEMBER( tavernie_state::pa_w )
+{
+	//m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
+}
+
+// centronics
+WRITE8_MEMBER( tavernie_state::pb_w )
+{
+}
+
+static const pia6821_interface mc6821_intf =
+{
+	DEVCB_DRIVER_MEMBER(tavernie_state, pa_r),     /* port A input */
+	DEVCB_NULL,     /* port B input */
+	DEVCB_NULL,     /* CA1 input - cassin */
+	DEVCB_NULL,     /* CB1 input */
+	DEVCB_NULL,     /* CA2 input */
+	DEVCB_NULL,     /* CB2 input */
+	DEVCB_DRIVER_MEMBER(tavernie_state, pa_w),     /* port A output */
+	DEVCB_DRIVER_MEMBER(tavernie_state, pb_w),     /* port B output */
+	DEVCB_NULL,     /* CA2 output */
+	DEVCB_NULL,     /* CB2 output */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)     /* IRQB output */
+};
+
+static const ptm6840_interface mc6840_intf =
+{
+	XTAL_12MHz / 3, // unknown clock
+	{ 0, 0, 0 },
+	{ DEVCB_NULL,
+		DEVCB_DEVICE_LINE_MEMBER("ptm", ptm6840_device, set_c1),
+		DEVCB_NULL }, //DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w) },
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
+};
+
+static ACIA6850_INTERFACE( mc6850_intf )
+{
+	153600,
+	153600,
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, cts_r),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 READ8_MEMBER( tavernie_state::keyin_r )
 {
@@ -176,18 +265,22 @@ static MACHINE_CONFIG_START( tavernie, tavernie_state )
 	MCFG_CPU_IO_MAP(tavernie_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(80*8, 25*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	//MCFG_SCREEN_ADD("screen", RASTER)
+	//MCFG_SCREEN_REFRESH_RATE(50)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	//MCFG_SCREEN_SIZE(80*8, 25*10)
+	//MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
+	//MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	//MCFG_PALETTE_LENGTH(2)
+	//MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf)
+	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_PIA6821_ADD("pia", mc6821_intf)
+	MCFG_PTM6840_ADD("ptm", mc6840_intf)
+	//MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // unknown clock
+	MCFG_ACIA6850_ADD("acia", mc6850_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -203,4 +296,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE     INPUT     CLASS          INIT    COMPANY        FULLNAME   FLAGS */
-COMP( 19??, tavernie,  0,      0,       tavernie,   tavernie, driver_device,   0,   "<unknown>",  "Tavernier", GAME_IS_SKELETON )
+COMP( 1982, tavernie,  0,      0,       tavernie,   tavernie, driver_device,   0,   "C. Tavernier",  "CPU09", GAME_IS_SKELETON )
