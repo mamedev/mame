@@ -38,12 +38,13 @@ public:
 		, m_videocpu(*this,"videocpu")
 		, m_videoctrl(*this,"video")
 		, m_videodma(*this,"videodma")
+		, m_videouart0(*this,"videouart0")
+		, m_videouart1(*this,"videouart1")
+		, m_videouart(*this,"videouart")
 	{ }
 
-	//DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ16_MEMBER(invalid_r);
 	DECLARE_WRITE16_MEMBER(invalid_w);
-	DECLARE_WRITE16_MEMBER(serial_w);
 	DECLARE_WRITE16_MEMBER(parallel_led_w);
 	DECLARE_READ8_MEMBER(via_a_r);
 	DECLARE_READ8_MEMBER(via_b_r);
@@ -51,10 +52,13 @@ public:
 	DECLARE_WRITE8_MEMBER(via_b_w);
 	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_WRITE8_MEMBER(video_w);
+	DECLARE_READ8_MEMBER(video_uart0_r);
+	DECLARE_WRITE8_MEMBER(video_uart0_w);
+	DECLARE_READ8_MEMBER(video_uart1_r);
+	DECLARE_WRITE8_MEMBER(video_uart1_w);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 private:
-	UINT8 m_term_data;
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_shared_ptr<UINT8> m_vram;
@@ -70,6 +74,9 @@ private:
 	required_device<cpu_device> m_videocpu;
 	required_device<i8275x_device> m_videoctrl;
 	required_device<am9517a_device> m_videodma;
+	required_device<mc2661_device> m_videouart0;
+	required_device<mc2661_device> m_videouart1;
+	required_device<im6402_device> m_videouart;
 
 	UINT8 m_portA;
 	UINT8 m_portB;
@@ -104,8 +111,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(wicat_video_io, AS_PROGRAM, 8, wicat_state)
 	// yet to figure out...
-	// 0x0100 - INS2651 USART #1 ?
-	// 0x0200 - INS2651 USART #2 ?
+	AM_RANGE(0x0100,0x0107) AM_READWRITE(video_uart0_r,video_uart0_w)
+	AM_RANGE(0x0200,0x0207) AM_READWRITE(video_uart1_r,video_uart1_w)
 	AM_RANGE(0x0700,0x0700) AM_DEVREADWRITE("videouart",im6402_device,read,write)  // UART?
 	AM_RANGE(0x0800,0x080f) AM_DEVREADWRITE("videodma",am9517a_device,read,write)  // DMA?
 	AM_RANGE(0x0b00,0x0b03) AM_READWRITE(video_r,video_w)
@@ -126,28 +133,6 @@ void wicat_state::machine_start()
 
 void wicat_state::machine_reset()
 {
-}
-
-//WRITE8_MEMBER( wicat_state::kbd_put )
-//{
-//	m_term_data = data;
-//}
-
-WRITE16_MEMBER( wicat_state::serial_w )
-{
-	if(ACCESSING_BITS_8_15)  // even addresses
-	{
-		switch(offset)
-		{
-		//case 0x00:
-		//case 0x01:
-		//case 0x02:
-		//case 0x03:
-			//m_terminal->write(space,0,data >> 8);
-		default:
-			logerror("Serial: Unused serial port write %02x to offset %02x\n",data,offset);
-		}
-	}
 }
 
 WRITE16_MEMBER( wicat_state::parallel_led_w )
@@ -221,6 +206,30 @@ WRITE8_MEMBER(wicat_state::video_w)
 		m_videoctrl->write(space,1,data);
 		break;
 	}
+}
+
+READ8_HANDLER(wicat_state::video_uart0_r)
+{
+	UINT16 noff = offset >> 1;
+	return m_videouart0->read(space,noff);
+}
+
+WRITE8_HANDLER(wicat_state::video_uart0_w)
+{
+	UINT16 noff = offset >> 1;
+	m_videouart0->write(space,noff,data);
+}
+
+READ8_HANDLER(wicat_state::video_uart1_r)
+{
+	UINT16 noff = offset >> 1;
+	return m_videouart1->read(space,noff);
+}
+
+WRITE8_HANDLER(wicat_state::video_uart1_w)
+{
+	UINT16 noff = offset >> 1;
+	m_videouart1->write(space,noff,data);
 }
 
 I8275_DISPLAY_PIXELS(wicat_display_pixels)
@@ -338,6 +347,37 @@ static mc2661_interface wicat_uart6_intf =
 	DEVCB_NULL   // XSYNC out
 };
 
+// terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
+static mc2661_interface wicat_video_uart0_intf =
+{
+	0,  // RXC
+	0,  // TXC
+	DEVCB_NULL,  // RXD in
+	DEVCB_NULL,  // RXD out
+	DEVCB_CPU_INPUT_LINE("videocpu",INPUT_LINE_IRQ0),  // RXRDY out
+	DEVCB_NULL,  // TXRDY out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),  // RTS out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),  // DTR out
+	DEVCB_CPU_INPUT_LINE("videocpu",INPUT_LINE_IRQ0),  // TXEMT out
+	DEVCB_NULL,  // BKDET out
+	DEVCB_NULL   // XSYNC out
+};
+
+static mc2661_interface wicat_video_uart1_intf =
+{
+	0,  // RXC
+	0,  // TXC
+	DEVCB_NULL,  // RXD in
+	DEVCB_NULL,  // RXD out
+	DEVCB_CPU_INPUT_LINE("videocpu",INPUT_LINE_IRQ0),  // RXRDY out
+	DEVCB_NULL,  // TXRDY out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),  // RTS out
+	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),  // DTR out
+	DEVCB_CPU_INPUT_LINE("videocpu",INPUT_LINE_IRQ0),  // TXEMT out
+	DEVCB_NULL,  // BKDET out
+	DEVCB_NULL   // XSYNC out
+};
+
 struct im6402_interface wicat_video_uart_intf =
 {
 	0,  // RRC
@@ -425,7 +465,8 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 
 	MCFG_AM9517A_ADD("videodma", XTAL_8MHz, wicat_videodma_intf)  // clock is a bit of guess
 	MCFG_IM6402_ADD("videouart", wicat_video_uart_intf)
-	// Also 2x INS2651 USARTs, not yet emulated
+	MCFG_MC2661_ADD("videouart0", XTAL_5_0688MHz, wicat_video_uart0_intf)  // the INS2651 looks similar enough to the MC2661...
+	MCFG_MC2661_ADD("videouart1", XTAL_5_0688MHz, wicat_video_uart1_intf)
 
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_SIZE(400,300)
