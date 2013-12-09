@@ -330,9 +330,8 @@ int main( int argc, char *argv[] )
 	return 0;
 }
 
-void *malloc_file_line(size_t size, const char *file, int line)
+void *osd_malloc_array(size_t size)
 {
-	// allocate the memory and fail if we can't
 	return osd_malloc(size);
 }
 
