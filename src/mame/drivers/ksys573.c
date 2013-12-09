@@ -290,139 +290,6 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
         (CN4, CN3, CN2 is printed pattern only, no actual connector)
 
 
-
-  Digital I/O PCB
-  ---------------
-
-  GX894-PWB(B)A (C)1999 KONAMI CO. LTD.
-
-             |-------------|
-             |        CN12 |
-             |             |
-             | PC847 PC847 |
-             |             |
-             |        CN11 |
-             |             |
-             | PC847 PC847 |
-             |             |
-             | DS2401 CN10 |
-             |             |
-             | PC847 PC847 |
-             |             |
-             |  CN14  CN13 |
-  |----------|             |----------|
-  |                  PC847            |
-  | ADM232 CN17              XC9536   |
-  |                                   |
-  |                    19.6608MHz     |-----------|
-  | ADM232 CN15  CY7C109                          |
-  |                       HY51V65164A HY51V65164A |
-  |                            HY51V65164A        |
-  |      CN16    XCS40XL                          |
-  |                                               |
-  | AK4309B   CN18         29.450MHz  MAS3507D    |
-  |                                               |
-  |                           CN3                 |
-  | HYC24855  RCA-L/R                             |
-  |-----------------------------------------------|
-
-  Notes:
-
-  PC847       - High Density Mounting Type Photocoupler
-  CN12        - 13 pin connector with 8 wires to external connectors
-  CN11        - 12 pin connector with 8 wires to external connectors
-  DS2401      - DS2401 911C2  Silicon serial number
-  CN10        - 10 pin connector with 8 wires to external connectors
-  CN14        - 7 pin connector
-  CN13        - 5 pin connector with 2 wires to external connectors
-  ADM232      - ADM232AARN 9933 H48475  High Speed, 5 V, 0.1 uF CMOS RS-232 Drivers/Receivers
-  CN17        - 3 pin connector
-  XC9536      - XILINX XC9536 PC44AEM9933 F1096429A 15C
-  CN15        - 8 pin connector
-  CY7C109     - CY7C109-25VC 931 H 04 404825  128k x 8 Static RAM
-  HY51V65164A - 64M bit dynamic EDO RAM
-  CN16        - 4 pin connector joining this PCB to the CD-DA IN on the MAIN PCB.
-  XCS40XL     - XILINX XCS40XL PQ208AKP9929 A2033251A 4C
-  AK4309B     - AKM AK4309B 3N932N  16bit SCF DAC
-  CN18        - 6 pin connector
-  MAS3507D    - IM MAS3507D D8 9173 51 HM U 072953.000 ES  MPEG 1/2 Layer 2/3 Audio Decoder
-  CN3         - Connector joining this PCB to the MAIN PCB
-  HYC24855    - ?
-  RCA-L/R     - RCA connectors for left/right audio output
-
-  Drummania 10th Mix Multisession
-  -------------------------------
-
-  This box is used with multi-session System 573 games.
-
-  Main board is standard GX700 PCB with CDROM (Drummania 10th Mix Multisession)
-  and Digital I/O Board GX894-PWB(B)A
-  BIOS is on a small plug-in daughterboard.
-  Daughterboard contains one EPROM, one PAL22V10, 2 logic chips and a PIC16F84.
-  The dumps provided are the EPROM dumped separately and a dump of the 'board'
-  with it plugged in (reading may be affected by the PIC)
-
-
-  PCB Layout of External Multisession Box
-  ---------------------------------------
-
-  GXA25-PWB(A)(C)2000 KONAMI
-  |--------------------------------------------------------------------------|
-  |CN9  ADM232  LS273        PC16552          PC16552         XC9536(1)  CN13|
-  |DSW(8)  LS245   LS273            18.432MHz                        DS2401  |
-  |         |-------|      |-------|       |-------|      |-------|          |
-  | MB3793  |TOSHIBA|      |TOSHIBA|       |TOSHIBA|      |TOSHIBA|M48T58Y.6T|
-  |         |TC9446F|      |TC9446F|       |TC9446F|      |TC9446F|          |
-  |         |-016   |      |-016   |       |-016   |      |-016   |      CN12|
-  |         |-------|      |-------|       |-------|      |-------|          |
-  |       LV14                    XC9572XL                                   |
-  | CN16                 CN17                 CN18             CN19 XC9536(2)|
-  |PQ30RV21        LCX245   LCX245                                       CN11|
-  |                                  33.8688MHz              PQ30RV21        |
-  |    8.25MHz   HY57V641620                                                 |
-  |  |------------|     HY57V641620   XC2S200                                |
-  |  |TOSHIBA     |                                          FLASH.20T       |
-  |  |TMPR3927AF  |                                                      CN10|
-  |  |            |                                                          |
-  |  |            |                                     LS245   F245  F245   |
-  |  |            |HY57V641620  LCX245     DIP40                             |
-  |  |------------|     HY57V641620  LCX245                   ATAPI44        |
-  |                             LCX245              LED(HDD)  ATAPI40        |
-  |    CN7                      LCX245      CN14    LED(CD)           CN5    |
-  |--------------------------------------------------------------------------|
-  Notes: (all IC's shown)
-          TMPR3927     - Toshiba TMPR3927AF Risc Microprocessor (QFP240)
-          FLASH.20T    - Fujitsu 29F400TC Flash ROM (TSOP48)
-          ATAPI44      - IDE44 44-pin laptop type HDD connector (not used)
-          ATAPI40      - IDE40 40-pin flat cable HDD connector used for connection of CDROM drive
-          XC9572XL     - XILINX XC9572XL In-system Programmable CPLD stamped 'XA25A1' (TQFP100)
-          XC9536(1)    - XILINX CPLD stamped 'XA25A3' (PLCC44)
-          XC9536(2)    - XILINX CPLD stamped 'XA25A2' (PLCC44)
-          XC2S200      - XILINX XC2S200 SPARTAN FPGA (QFP208)
-          DS2401       - MAXIM Dallas DS2401 Silicon Serial Number (SOIC6)
-          M48T58Y      - ST M48T58Y Timekeeper NVRAM 8k bytes x8-bit (DIP28). Chip appears empty (0x04 fill) or unused
-          MB3793       - Fujitsu MB3793 Power-Voltage Monitoring IC with Watchdog Timer (SOIC8)
-          DIP40        - Empty DIP40 socket
-          HY57V641620  - Hyundai/Hynix HY57V641620 4 Banks x 1M x 16Bit Synchronous DRAM
-          PC16552D     - National PC16552D Dual Universal Asynchronous Receiver/Transmitter with FIFO's
-          TC9446F      - Toshiba TC9446F-016 Audio Digital Processor for Decode of Dolby Digital (AC-3) MPEG2 Audio
-          CN16-CN19    - Connector for sub board (3 of them are present). One board connects via a thin cable from
-                         CN1 to the main board to a connector on the security board labelled 'AMP BOX'.
-
-  Sub Board Layout
-  ----------------
-
-  GXA25-PWB(B) (C) 2000 KONAMI
-  |---------------------------------|
-  | TLP2630  LV14          ADM232   |
-  |CN2                           CN1|
-  |A2430         AK5330             |
-  |                                 |
-  |                          RCA L/R|
-  |ZUS1R50505        6379A          |
-  |                          LM358  |
-  |---------------------------------|
-
   PCMCIA Flash Card
   -----------------
 
@@ -486,8 +353,9 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "machine/ds2401.h"
 #include "machine/linflash.h"
 #include "machine/k573cass.h"
+#include "machine/k573dio.h"
+#include "machine/k573msu.h"
 #include "machine/mb89371.h"
-#include "machine/mpeg573.h"
 #include "machine/timekpr.h"
 #include "machine/upd4701.h"
 #include "sound/spu.h"
@@ -712,7 +580,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( konami573d_map, AS_PROGRAM, 32, ksys573_state )
 	AM_IMPORT_FROM( konami573_map )
-	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_DEVICE16( "mpeg573", mpeg573_device, amap, 0xffffffff )
+	AM_RANGE( 0x1f640000, 0x1f6400ff ) AM_DEVICE16( "k573dio", k573dio_device, amap, 0xffffffff )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( konami573a_map, AS_PROGRAM, 32, ksys573_state )
@@ -2225,7 +2093,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( k573d, konami573 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( konami573d_map )
-	MCFG_MPEG573_ADD( "mpeg573", XTAL_19_6608MHz, NOOP )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_ADD( "k573dio", XTAL_19_6608MHz )
 MACHINE_CONFIG_END
 
 // Variants with additional analogue i/o board
@@ -2354,31 +2222,31 @@ static MACHINE_CONFIG_DERIVED( ddr2ml, k573a )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddr3m, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( pccard2_32mb )
 	MCFG_FRAGMENT_ADD( cassyyi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddr3mp, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( pccard2_32mb )
 	MCFG_FRAGMENT_ADD( cassxzi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddrusa, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( casszi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddr5m, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( pccard2_32mb )
 	MCFG_FRAGMENT_ADD( casszi )
@@ -2396,15 +2264,15 @@ static MACHINE_CONFIG_DERIVED( dsftkd, k573a )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dsfdr, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( cassxzi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dsem, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddr_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( cassxi )
 MACHINE_CONFIG_END
@@ -2412,22 +2280,22 @@ MACHINE_CONFIG_END
 // Dance Dance Revolution Solo
 
 static MACHINE_CONFIG_DERIVED( ddrsolo, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( cassyi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddrs2k, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( cassyyi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddr4ms, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, ddrsolo_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( pccard2_32mb )
 	MCFG_FRAGMENT_ADD( cassxzi )
@@ -2440,17 +2308,19 @@ static MACHINE_CONFIG_DERIVED( drmn, k573a )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( drmn2m, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, drmn_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, drmn_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( cassxzi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( drmn4m, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, drmn_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, drmn_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( casszi )
+
+	MCFG_DEVICE_ADD( "k573msu", KONAMI_573_MULTI_SESSION_UNIT, 0 )
 MACHINE_CONFIG_END
 
 // Guitar Freaks
@@ -2543,15 +2413,15 @@ static MACHINE_CONFIG_DERIVED( gunmania, konami573 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dmx, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, dmx_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, dmx_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( casszi )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mamboagg, k573d )
-	MCFG_DEVICE_MODIFY( "mpeg573" )
-	MCFG_MPEG573_OUTPUT_CALLBACK( WRITE8( ksys573_state, mamboagg_output_callback ) )
+	MCFG_DEVICE_MODIFY( "k573dio" )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( WRITE8( ksys573_state, mamboagg_output_callback ) )
 
 	MCFG_FRAGMENT_ADD( casszi )
 MACHINE_CONFIG_END

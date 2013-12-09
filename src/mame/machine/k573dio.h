@@ -1,20 +1,21 @@
-#ifndef _MPEG573_H_
-#define _MPEG573_H_
+#pragma once
+
+#ifndef _K573DIO_H_
+#define _K573DIO_H_
 
 #include "sound/mas3507d.h"
 #include "machine/ds2401.h"
 
-#define MCFG_MPEG573_ADD(_tag, _clock, _output_cb ) \
-	MCFG_DEVICE_ADD(_tag, MPEG573, _clock) \
-	downcast<mpeg573_device *>(device)->set_output_cb(DEVCB2_##_output_cb);
+#define MCFG_KONAMI_573_DIGITAL_IO_BOARD_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, KONAMI_573_DIGITAL_IO_BOARD, _clock)
 
-#define MCFG_MPEG573_OUTPUT_CALLBACK( _output_cb )  \
-	downcast<mpeg573_device *>(device)->set_output_cb(DEVCB2_##_output_cb);
+#define MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( _output_cb )  \
+	downcast<k573dio_device *>(device)->set_output_cb(DEVCB2_##_output_cb);
 
-class mpeg573_device : public device_t
+class k573dio_device : public device_t
 {
 public:
-	mpeg573_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _write> void set_output_cb(_write _output_cb)
 	{
@@ -77,6 +78,6 @@ private:
 	void output(int offset, UINT16 data);
 };
 
-extern const device_type MPEG573;
+extern const device_type KONAMI_573_DIGITAL_IO_BOARD;
 
 #endif
