@@ -82,10 +82,7 @@ void k573npu_device::device_start()
 
 ROM_START( k573npu )
 	ROM_REGION( 0x080000, "tmpr3927", 0 )
-	ROM_LOAD( "flash.20t",    0x000000, 0x080000, CRC(b70c65b0) SHA1(d3b2bf9d3f8b1caf70755a0d7fa50ef8bbd758b8) ) // from "GXA25-PWB(A)(C)2000 KONAMI"
-
-	ROM_REGION( 0x002000, "m48t58y", 0 )
-	ROM_LOAD( "m48t58y.6t",   0x000000, 0x002000, CRC(609ef020) SHA1(71b87c8b25b9613b4d4511c53d0a3a3aacf1499d) )
+	ROM_LOAD( "29f400.24e",   0x000000, 0x080000, CRC(8dcf294b) SHA1(efac79e18db22c30886463ec1bc448187da7a95a) ) 
 ROM_END
 
 const rom_entry *k573npu_device::device_rom_region() const
