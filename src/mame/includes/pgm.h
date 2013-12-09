@@ -318,6 +318,8 @@ public:
 	required_shared_ptr<UINT32> m_arm_ram;
 	required_shared_ptr<UINT32> m_arm_ram2;
 
+	UINT32* m_armrom;
+
 	optional_device<cpu_device> m_prot;
 
 	DECLARE_DRIVER_INIT(theglad);
@@ -502,6 +504,7 @@ INPUT_PORTS_EXTERN( dw2001 );
 MACHINE_CONFIG_EXTERN( pgm_arm_type3 );
 INPUT_PORTS_EXTERN(theglad);
 INPUT_PORTS_EXTERN(happy6);
+INPUT_PORTS_EXTERN(svg);
 
 /*----------- defined in machine/pgmprot4.c -----------*/
 

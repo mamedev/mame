@@ -8,19 +8,21 @@
 
  Demon Front (dmnfrnt) *1
  The Gladiator (theglad) *2
- Spectral vs. Generation (svg)
- Happy 6-in-1 (happy6)
- The Killing Blade Plus (killbldp) *2
+ Spectral vs. Generation (svg) *2
+ Happy 6-in-1 (happy6) *4
+ The Killing Blade Plus (killbldp) *3
 
- None of these work at all, with the following exception.
 
  *1 - We bypass the internal ROM entirely! Game doesn't jump back
  *2 - Partial dump of internal ROM is used (currently only dumped from a Japan PCB, patched for other types) The missing code from the EO area is replaced with our own fake code with the same function
- *2 - Complete dump of IGS027A ROM sourced from a bootleg, looks to be legitimate.
+ *3 - Complete dump of IGS027A ROM sourced from a bootleg, looks to be legitimate.
+ *4 - not yet working
 
  ----
 
- These games use a large amount of shared RAM which is banked between CPUs
+ These games use a larger amount of shared RAM which is banked between CPUs compared to previous protection CPUs
+
+ In most cases the games run almost entirely on the ARM with the 68k just parsing the display lists / feeding inputs to the ARM
 
  ----
 
@@ -152,7 +154,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 {
-	// this is the location of the region in the internal rom, for some reaosn Japan doesn't play attract music (original game feature? bad code flow?)
+	// internal roms aren't fully dumped
 	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
 	int base = -1;
 
@@ -160,12 +162,14 @@ MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 	if (!strcmp(machine().system().name, "theglad100")) base = 0x3316;
 	if (!strcmp(machine().system().name, "theglad101")) base = 0x3316;
 	if (!strcmp(machine().system().name, "happy6")) base = 0x3316;
+	if (!strcmp(machine().system().name, "svgpcb")) base = 0x3a8e;
 
 	if (base != -1)
 	{
 		int regionhack = ioport("RegionHack")->read();
 		if (regionhack != 0xff)
 		{
+//			printf("%04x\n", temp16[(base) / 2]);
 			temp16[(base) / 2] = regionhack; base += 2;
 		}
 	}
@@ -190,7 +194,7 @@ MACHINE_CONFIG_START( pgm_arm_type3, pgm_arm_type3_state )
 	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 33333333)    // 55857G
+	MCFG_CPU_ADD("prot", ARM7, XTAL_33MHz)    // 55857G - 33Mhz Xtal, at least on SVG
 	MCFG_CPU_PROGRAM_MAP(55857G_arm7_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3_reset)
@@ -251,19 +255,19 @@ READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
 	return m_arm_ram2[0x00c/4];
 }
 
+// installed over rom
 READ32_MEMBER(pgm_arm_type3_state::svg_speedup_r )
 {
 	int pc = space.device().safe_pc();
-	if (pc == 0x7d8) space.device().execute().eat_cycles(500);
-	//else printf("killbldp_speedup_r %08x\n", pc);
-	return m_arm_ram2[0x00c/4];
+	if (pc == 0x9e0) space.device().execute().eat_cycles(500);
+//	else printf("killbldp_speedup_r %08x\n", pc);
+	return m_armrom[0x9e0/4];
 }
 
 
 void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(void)
 {
 	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
-
 	int i;
 	for (i=0;i<0x188/2;i+=2)
 	{
@@ -564,6 +568,21 @@ INPUT_PORTS_START( theglad )
 	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
 INPUT_PORTS_END
 
+INPUT_PORTS_START( svg )
+	PORT_INCLUDE ( pgm )
+
+	PORT_START("RegionHack")    /* Region - actually supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
+	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x0005, "Spanish Territories" )
+	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
+INPUT_PORTS_END
+
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
 {
 	svg_basic_init();
@@ -579,8 +598,8 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
 	pgm_svgpcb_decrypt(machine());
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad();
-
-//	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
+	m_armrom = (UINT32 *)memregion("prot")->base();
+	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
 
 }
 

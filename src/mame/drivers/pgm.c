@@ -3199,8 +3199,8 @@ ROM_START( theglad )
 	ROM_LOAD16_WORD_SWAP( "v101.u6",      0x100000, 0x080000, CRC(f799e866) SHA1(dccc3c903357c40c3cf85ac0ae8fc12fb0f853a6) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "thegladpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
-	ROM_LOAD( "thegladpcb_igs027a_v100_overseas.bin", 0x0188, 0x3e78, CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) )
+	ROM_LOAD( "theglad_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
+	ROM_LOAD( "theglad_igs027a_v100_overseas.bin", 0x0188, 0x3e78, CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v107.u26", 0x000000, 0x200000,  CRC(f7c61357) SHA1(52d31c464dfc83c5371b078cb6b73c0d0e0d57e3) )
@@ -3229,8 +3229,8 @@ ROM_START( theglad100 ) // is this actually a pre-v100 proto?
 	ROM_LOAD16_WORD_SWAP( "u6.rom",       0x100000, 0x080000, CRC(14c85212) SHA1(8d2489708e176a2c460498a13173be01f645b79e) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "thegladpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
-	ROM_LOAD( "thegladpcb_igs027a_older.bin", 0x0188, 0x3e78, BAD_DUMP CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) ) // this is wrong for this set, we patch it to work
+	ROM_LOAD( "theglad_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
+	ROM_LOAD( "theglad_igs027a_older.bin", 0x0188, 0x3e78, BAD_DUMP CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) ) // this is wrong for this set, we patch it to work
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "u2.rom", 0x000000, 0x200000,  CRC(c7bcf2ae) SHA1(10bc012c83987f594d5375a51bc4be2e17568a81) )
@@ -3260,8 +3260,8 @@ ROM_START( theglad101 )
 	ROM_LOAD16_WORD_SWAP( "v100.u6",       0x100000, 0x080000, CRC(bcf3b172) SHA1(df7e2808c0341be0a59eefa852c857a3a919223e) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "thegladpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
-	ROM_LOAD( "thegladpcb_igs027a_v100_overseas.bin", 0x0188, 0x3e78, CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) )
+	ROM_LOAD( "theglad_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
+	ROM_LOAD( "theglad_igs027a_v100_overseas.bin", 0x0188, 0x3e78, CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v101.u26", 0x000000, 0x200000, CRC(23faec02) SHA1(9065d55c2a14e6889e735a452bbc32530056645a) )
@@ -3614,7 +3614,7 @@ ROM_START( svg )
 	ROM_LOAD16_WORD_SWAP( "u30.bin",      0x100000, 0x080000, CRC(34c18f3f) SHA1(42d1edd0dcfaa5e44861c6a1d4cb24f51ba23de8) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "svg_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "svg_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // different from PCB version..
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "u26.bin", 0x000000, 0x400000, CRC(46826ec8) SHA1(ad1daf6f615fb8d748ce7f98f19dd3bf22f79fba) )
@@ -3646,128 +3646,9 @@ ROM_START( svgpcb )
 	ROM_LOAD16_WORD_SWAP( "svg_bios.u49",    0x000000, 0x020000, CRC(3346401f) SHA1(28bd730b6026c1e521c95072d33c7bdcd19c1460) )
 	ROM_LOAD16_WORD_SWAP( "svg_v100jp.u50",  0x100000, 0x080000, CRC(8d0405e4) SHA1(b6175c9ffeaac531d28e7845cb34c673476e286a) )
 
-
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-#if 0
-	/* temp, remove me once combined */
-	ROM_LOAD16_WORD_SWAP( "page00", 0x00 * 0x9c, 0x9c, CRC(7a7d92b9)   )
-	ROM_LOAD16_WORD_SWAP( "page01", 0x01 * 0x9c, 0x9c, CRC(7a7d92b9)   )
-	ROM_LOAD16_WORD_SWAP( "page02", 0x02 * 0x9c, 0x9c, CRC(2e9d4165)   )
-	ROM_LOAD16_WORD_SWAP( "page03", 0x03 * 0x9c, 0x9c, CRC(b51e0f9c)   )
-	ROM_LOAD16_WORD_SWAP( "page04", 0x04 * 0x9c, 0x9c, CRC(5ee59414)   )
-	ROM_LOAD16_WORD_SWAP( "page05", 0x05 * 0x9c, 0x9c, CRC(c0d1ea02)   )
-	ROM_LOAD16_WORD_SWAP( "page06", 0x06 * 0x9c, 0x9c, CRC(bebe0afa)   )
-	ROM_LOAD16_WORD_SWAP( "page07", 0x07 * 0x9c, 0x9c, CRC(84e17cdb)   )
-	ROM_LOAD16_WORD_SWAP( "page08", 0x08 * 0x9c, 0x9c, CRC(6fffa4e8)   )
-	ROM_LOAD16_WORD_SWAP( "page09", 0x09 * 0x9c, 0x9c, CRC(3800e317)   )
-	ROM_LOAD16_WORD_SWAP( "page0a", 0x0a * 0x9c, 0x9c, CRC(abd76978)   )
-	ROM_LOAD16_WORD_SWAP( "page0b", 0x0b * 0x9c, 0x9c, CRC(e6d83c06)   )
-	ROM_LOAD16_WORD_SWAP( "page0c", 0x0c * 0x9c, 0x9c, CRC(3468e50c)   )
-	ROM_LOAD16_WORD_SWAP( "page0d", 0x0d * 0x9c, 0x9c, CRC(cebbd3e9)   )
-	ROM_LOAD16_WORD_SWAP( "page0e", 0x0e * 0x9c, 0x9c, CRC(bdcf150d)   )
-	ROM_LOAD16_WORD_SWAP( "page0f", 0x0f * 0x9c, 0x9c, CRC(bd4dcbe9)   )
-
-	ROM_LOAD16_WORD_SWAP( "page10", 0x10 * 0x9c, 0x9c, CRC(522e4166)   )
-	ROM_LOAD16_WORD_SWAP( "page11", 0x11 * 0x9c, 0x9c, CRC(04ef2819)   )
-	ROM_LOAD16_WORD_SWAP( "page12", 0x12 * 0x9c, 0x9c, CRC(2ebbe3b8)   )
-	ROM_LOAD16_WORD_SWAP( "page13", 0x13 * 0x9c, 0x9c, CRC(084ad6e7)   )
-	ROM_LOAD16_WORD_SWAP( "page14", 0x14 * 0x9c, 0x9c, CRC(344e4f98)   )
-	ROM_LOAD16_WORD_SWAP( "page15", 0x15 * 0x9c, 0x9c, CRC(96bfb689)   )
-	ROM_LOAD16_WORD_SWAP( "page16", 0x16 * 0x9c, 0x9c, CRC(778fd10f)   )
-	ROM_LOAD16_WORD_SWAP( "page17", 0x17 * 0x9c, 0x9c, CRC(b51062b5)   )
-	ROM_LOAD16_WORD_SWAP( "page18", 0x18 * 0x9c, 0x9c, CRC(828d598f)   )
-	ROM_LOAD16_WORD_SWAP( "page19", 0x19 * 0x9c, 0x9c, CRC(93ecea91)   )
-	ROM_LOAD16_WORD_SWAP( "page1a", 0x1a * 0x9c, 0x9c, CRC(06c3e100)   )
-	ROM_LOAD16_WORD_SWAP( "page1b", 0x1b * 0x9c, 0x9c, CRC(608dbd52)   )
-	ROM_LOAD16_WORD_SWAP( "page1c", 0x1c * 0x9c, 0x9c, CRC(c9e0813a)   )
-	ROM_LOAD16_WORD_SWAP( "page1d", 0x1d * 0x9c, 0x9c, CRC(fff7aa20)   )
-	ROM_LOAD16_WORD_SWAP( "page1e", 0x1e * 0x9c, 0x9c, CRC(3938c90d)   )
-	ROM_LOAD16_WORD_SWAP( "page1f", 0x1f * 0x9c, 0x9c, CRC(9341f980)   )
-
-	ROM_LOAD16_WORD_SWAP( "page20", 0x20 * 0x9c, 0x9c, CRC(581d1a13)   )
-	ROM_LOAD16_WORD_SWAP( "page21", 0x21 * 0x9c, 0x9c, CRC(78583484)   )
-	ROM_LOAD16_WORD_SWAP( "page22", 0x22 * 0x9c, 0x9c, CRC(036ae38e)   )
-	ROM_LOAD16_WORD_SWAP( "page23", 0x23 * 0x9c, 0x9c, CRC(4f82e8a3)   )
-	ROM_LOAD16_WORD_SWAP( "page24", 0x24 * 0x9c, 0x9c, CRC(8373fbcb)   )
-	ROM_LOAD16_WORD_SWAP( "page25", 0x25 * 0x9c, 0x9c, CRC(5ac73b85)   )
-	ROM_LOAD16_WORD_SWAP( "page26", 0x26 * 0x9c, 0x9c, CRC(5b0aa40e)   )
-	ROM_LOAD16_WORD_SWAP( "page27", 0x27 * 0x9c, 0x9c, CRC(b27464ea)   )
-	ROM_LOAD16_WORD_SWAP( "page28", 0x28 * 0x9c, 0x9c, CRC(0e187e08)   )
-	ROM_LOAD16_WORD_SWAP( "page29", 0x29 * 0x9c, 0x9c, CRC(1f62b715)   )
-	ROM_LOAD16_WORD_SWAP( "page2a", 0x2a * 0x9c, 0x9c, CRC(aaa49bf9)   )
-	ROM_LOAD16_WORD_SWAP( "page2b", 0x2b * 0x9c, 0x9c, CRC(231ecd40)   )
-	ROM_LOAD16_WORD_SWAP( "page2c", 0x2c * 0x9c, 0x9c, CRC(9e4a4677)   )
-	ROM_LOAD16_WORD_SWAP( "page2d", 0x2d * 0x9c, 0x9c, CRC(f124b6cf)   )
-	ROM_LOAD16_WORD_SWAP( "page2e", 0x2e * 0x9c, 0x9c, CRC(dbea8517)   )
-	ROM_LOAD16_WORD_SWAP( "page2f", 0x2f * 0x9c, 0x9c, CRC(df2223ca)   )
-
-	ROM_LOAD16_WORD_SWAP( "page30", 0x30 * 0x9c, 0x9c, CRC(da861aab)   )
-	ROM_LOAD16_WORD_SWAP( "page31", 0x31 * 0x9c, 0x9c, CRC(ac9d70c4)   )
-	ROM_LOAD16_WORD_SWAP( "page32", 0x32 * 0x9c, 0x9c, CRC(5d2631fa)   )
-	ROM_LOAD16_WORD_SWAP( "page33", 0x33 * 0x9c, 0x9c, CRC(c3793fd4)   )
-	ROM_LOAD16_WORD_SWAP( "page34", 0x34 * 0x9c, 0x9c, CRC(ce6df10e)   )
-	ROM_LOAD16_WORD_SWAP( "page35", 0x35 * 0x9c, 0x9c, CRC(2a0df1c0)   )
-	ROM_LOAD16_WORD_SWAP( "page36", 0x36 * 0x9c, 0x9c, CRC(13877e3f)   )
-	ROM_LOAD16_WORD_SWAP( "page37", 0x37 * 0x9c, 0x9c, CRC(d41b8b56)   )
-	ROM_LOAD16_WORD_SWAP( "page38", 0x38 * 0x9c, 0x9c, CRC(ba3faebb)   )
-	ROM_LOAD16_WORD_SWAP( "page39", 0x39 * 0x9c, 0x9c, CRC(63f76afb)   )
-	ROM_LOAD16_WORD_SWAP( "page3a", 0x3a * 0x9c, 0x9c, CRC(669351e3)   )
-	ROM_LOAD16_WORD_SWAP( "page3b", 0x3b * 0x9c, 0x9c, CRC(0c456d7c)   )
-	ROM_LOAD16_WORD_SWAP( "page3c", 0x3c * 0x9c, 0x9c, CRC(51312e64)   )
-	ROM_LOAD16_WORD_SWAP( "page3d", 0x3d * 0x9c, 0x9c, CRC(7d60ca31)   )
-	ROM_LOAD16_WORD_SWAP( "page3e", 0x3e * 0x9c, 0x9c, CRC(40201a66)   )
-	ROM_LOAD16_WORD_SWAP( "page3f", 0x3f * 0x9c, 0x9c, CRC(eb1b2ec6)   )
-
-	ROM_LOAD16_WORD_SWAP( "page40", 0x40 * 0x9c, 0x9c, CRC(bb3dfff2)   )
-	ROM_LOAD16_WORD_SWAP( "page41", 0x41 * 0x9c, 0x9c, CRC(c66a4986)   )
-	ROM_LOAD16_WORD_SWAP( "page42", 0x42 * 0x9c, 0x9c, CRC(19d19cc4)   )
-	ROM_LOAD16_WORD_SWAP( "page43", 0x43 * 0x9c, 0x9c, CRC(83c788f9)   )
-	ROM_LOAD16_WORD_SWAP( "page44", 0x44 * 0x9c, 0x9c, CRC(237dfc25)   )
-	ROM_LOAD16_WORD_SWAP( "page45", 0x45 * 0x9c, 0x9c, CRC(a0d63251)   )
-	ROM_LOAD16_WORD_SWAP( "page46", 0x46 * 0x9c, 0x9c, CRC(f7ba4453)   )
-	ROM_LOAD16_WORD_SWAP( "page47", 0x47 * 0x9c, 0x9c, CRC(76f296d2)   )
-	ROM_LOAD16_WORD_SWAP( "page48", 0x48 * 0x9c, 0x9c, CRC(768f8882)   )
-	ROM_LOAD16_WORD_SWAP( "page49", 0x49 * 0x9c, 0x9c, CRC(e3cc7b53)   )
-	ROM_LOAD16_WORD_SWAP( "page4a", 0x4a * 0x9c, 0x9c, CRC(cd422fa9)   )
-	ROM_LOAD16_WORD_SWAP( "page4b", 0x4b * 0x9c, 0x9c, CRC(4cdc65f8)   )
-	ROM_LOAD16_WORD_SWAP( "page4c", 0x4c * 0x9c, 0x9c, CRC(3e8073f5)   )
-	ROM_LOAD16_WORD_SWAP( "page4d", 0x4d * 0x9c, 0x9c, CRC(37e5a5df)   )
-	ROM_LOAD16_WORD_SWAP( "page4e", 0x4e * 0x9c, 0x9c, CRC(e0d1bca7)   )
-	ROM_LOAD16_WORD_SWAP( "page4f", 0x4f * 0x9c, 0x9c, CRC(66a2884a)   )
-
-	ROM_LOAD16_WORD_SWAP( "page50", 0x50 * 0x9c, 0x9c, CRC(01c4e7dd)   )
-	ROM_LOAD16_WORD_SWAP( "page51", 0x51 * 0x9c, 0x9c, CRC(d359036c)   )
-	ROM_LOAD16_WORD_SWAP( "page52", 0x52 * 0x9c, 0x9c, CRC(30ff2cff)   )
-	ROM_LOAD16_WORD_SWAP( "page53", 0x53 * 0x9c, 0x9c, CRC(9ce7bafe)   )
-	ROM_LOAD16_WORD_SWAP( "page54", 0x54 * 0x9c, 0x9c, CRC(179d750b)   )
-	ROM_LOAD16_WORD_SWAP( "page55", 0x55 * 0x9c, 0x9c, CRC(e9c10e9f)   )
-	ROM_LOAD16_WORD_SWAP( "page56", 0x56 * 0x9c, 0x9c, CRC(6afc9cf1)   )
-	ROM_LOAD16_WORD_SWAP( "page57", 0x57 * 0x9c, 0x9c, CRC(b2b39a30)   )
-	ROM_LOAD16_WORD_SWAP( "page58", 0x58 * 0x9c, 0x9c, CRC(41f0cc93)   )
-	ROM_LOAD16_WORD_SWAP( "page59", 0x59 * 0x9c, 0x9c, CRC(2e917d23)   )
-	ROM_LOAD16_WORD_SWAP( "page5a", 0x5a * 0x9c, 0x9c, CRC(c1efa6f2)   )
-	ROM_LOAD16_WORD_SWAP( "page5b", 0x5b * 0x9c, 0x9c, CRC(c2989e24)   )
-	ROM_LOAD16_WORD_SWAP( "page5c", 0x5c * 0x9c, 0x9c, CRC(fc903fab)   )
-	ROM_LOAD16_WORD_SWAP( "page5d", 0x5d * 0x9c, 0x9c, CRC(afb51ff4)   )
-	ROM_LOAD16_WORD_SWAP( "page5e", 0x5e * 0x9c, 0x9c, CRC(85b707d5)   )
-	ROM_LOAD16_WORD_SWAP( "page5f", 0x5f * 0x9c, 0x9c, CRC(f9dc6148)   )
-
-	ROM_LOAD16_WORD_SWAP( "page60", 0x60 * 0x9c, 0x9c, CRC(5db0990b)   )
-	ROM_LOAD16_WORD_SWAP( "page61", 0x61 * 0x9c, 0x9c, CRC(a02b5fda)   )
-	ROM_LOAD16_WORD_SWAP( "page62", 0x62 * 0x9c, 0x9c, CRC(3932b150)   )
-	ROM_LOAD16_WORD_SWAP( "page63", 0x63 * 0x9c, 0x9c, CRC(3932b150)   )
-	ROM_LOAD16_WORD_SWAP( "page64", 0x64 * 0x9c, 0x9c, CRC(3932b150)   )
-	ROM_LOAD16_WORD_SWAP( "page65", 0x65 * 0x9c, 0x9c, CRC(3932b150)   )
-	ROM_LOAD16_WORD_SWAP( "page66", 0x66 * 0x9c, 0x9c, CRC(3932b150)   )
-	ROM_LOAD16_WORD_SWAP( "page67", 0x67 * 0x9c, 0x9c, CRC(3932b150)   )
-	ROM_LOAD16_WORD_SWAP( "page68", 0x68 * 0x9c, 0x9c, CRC(3932b150)   )
-	ROM_LOAD16_WORD_SWAP( "page69", 0x69 * 0x9c, 0x9c, CRC(5aa51eb9)   )
-	/* temp, remove me once cut off EO area */
-	ROM_LOAD16_WORD_SWAP( "prot_svgpcb", 0x0000, 0x4000, CRC(1e487985) SHA1(a8f4c946f23d9d8dc7269680d04dfb0582b0b8f2)  )
-#endif
-	ROM_LOAD( "svg_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
+	ROM_LOAD( "svgpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "svgcpb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(7a59da5d) SHA1(d67ba465db40ca716b4b901b1c8e762716fb954e) )
-
 
 	
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -4285,7 +4166,7 @@ GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    pgm, pgm_arm_type1_s
 GAME( 1999, puzzli2,      pgm,       pgm_arm_type1_sim,  puzzli2, pgm_arm_type1_state,    puzzli2,    ROT0,   "IGS", "Puzzli 2 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // ROM label is V100 ( V0001, 11/22/99 09:27:58 in program ROM )
 GAME( 2001, puzzli2s,     puzzli2,   pgm_arm_type1_sim,  puzzli2, pgm_arm_type1_state,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )  // ( V200, 12/28/01 12:53:34 in program ROM )
 
-GAME( 2005, killbldp,     pgm,       pgm_arm_type3,     pgm, pgm_arm_type3_state,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (ver. 300)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* using internal rom from bootleg */
+GAME( 2005, killbldp,     pgm,       pgm_arm_type3,     pgm, pgm_arm_type3_state,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (China, ver. 300)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* using internal rom from bootleg */
 
 // we're using a partial dump of the internal rom (sans the execute only area) with handcrafted startup code..
 // all 3 68k roms still have V100 strings, but are clearly different builds, there don't appear to be build string dates in them.  Two of the external ARM roms are marked V100 but are different builds, the single PCB v100 appears to be a later revision than the cart V100 as it shares the internal ROM with the V107 cart version, the v100 cart has a different internal ROM
@@ -4294,8 +4175,9 @@ GAME( 2003, theglad101,   theglad,   pgm_arm_type3,     theglad, pgm_arm_type3_s
 // the v100 68k ROM on this is older than the v101 set, this set also uses a different internal ROM to everything else, must be a very early release, maybe pre v100 proto with v100 strings?
 GAME( 2003, theglad100,   theglad,   pgm_arm_type3,     theglad, pgm_arm_type3_state,    theglada,   ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* need correct internal rom of IGS027A - we currently patch the one we have */ // ARM time: 10:39:25 
 // newer than ARM V100 Cart, older than ARM V101 Cart, same 68k rom as V101 Cart.
-GAME( 2003, thegladpcb,   theglad,   pgm_arm_type3,     pgm,    pgm_arm_type3_state,    theglad,    ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 02/25/03 SHEN JIAN) (Japan, JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )// ARM time: 16:32:21
+GAME( 2003, thegladpcb,   theglad,   pgm_arm_type3,     pgm,    pgm_arm_type3_state,    theglad,    ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 02/25/03 SHEN JIAN) (Japan, JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )// ARM time: 16:32:21 // PCB version only released in Japan?
 
+GAME( 2005, svgpcb,       svg,       pgm_arm_type3,     svg, pgm_arm_type3_state,    svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V100JP) (ARM label V100JP ROM 05/12/05  S.V.G V100) (Japan, JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )// ARM time: 15:31:35 // PCB version only released in Japan?
 
 /* -----------------------------------------------------------------------------------------------------------------------
    Partially Working, playable, but some imperfections
@@ -4355,5 +4237,4 @@ GAME( 2004, kovlsjba,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_sta
 
 GAME( 2004, happy6,       pgm,       pgm_arm_type3,     happy6, pgm_arm_type3_state,    happy6,     ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2005, svg,          pgm,       pgm_arm_type3,     pgm, pgm_arm_type3_state,    svg,        ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // label was 200, but it's code rev 201? // ARM time: 10:07:20
-GAME( 2005, svgpcb,       svg,       pgm_arm_type3,     pgm, pgm_arm_type3_state,    svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V100JP) (ARM label V100JP ROM 05/12/05  S.V.G V100) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 15:31:35
+GAME( 2005, svg,          pgm,       pgm_arm_type3,     svg, pgm_arm_type3_state,    svg,        ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // label was 200, but it's code rev 201? // ARM time: 10:07:20
