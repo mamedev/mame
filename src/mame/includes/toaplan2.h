@@ -1,6 +1,3 @@
-#include "machine/eepromser.h"
-#include "machine/nmk112.h"
-
 /**************** Machine stuff ******************/
 //#define USE_HD64x180          /* Define if CPU support is available */
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
@@ -8,11 +5,13 @@
 // We encode priority with colour in the tilemaps, so need a larger palette
 #define T2PALETTE_LENGTH 0x10000
 
-// VDP related
+#include "cpu/m68000/m68000.h"
+#include "machine/eepromser.h"
+#include "machine/nmk112.h"
+#include "machine/upd4992.h"
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
-#include "cpu/m68000/m68000.h"
-// Cache the CPUs and VDPs for faster access
+
 class toaplan2_state : public driver_device
 {
 public:
@@ -32,20 +31,31 @@ public:
 		m_mainram16(*this, "mainram16"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_vdp0(*this, "gp9001vdp0"),
+		m_vdp1(*this, "gp9001vdp1"),
 		m_nmk112(*this, "nmk112"),
 		m_oki(*this, "oki"),
 		m_oki1(*this, "oki1"),
 		m_eeprom(*this, "eeprom"),
-		m_rtc(*this, "rtc") {
-		m_vdp0 = NULL;
-		m_vdp1 = NULL;
-	}
-
-	gp9001vdp_device* m_vdp0;
-	gp9001vdp_device* m_vdp1;
+		m_rtc(*this, "rtc") { }
 
 	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
+	optional_shared_ptr<UINT16> m_txvideoram16;
+	optional_shared_ptr<UINT16> m_txvideoram16_offs;
+	optional_shared_ptr<UINT16> m_txscrollram16;
+	optional_shared_ptr<UINT16> m_tx_gfxram16;
+	optional_shared_ptr<UINT16> m_mainram16;
+
+	required_device<m68000_base_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	required_device<gp9001vdp_device> m_vdp0;
+	optional_device<gp9001vdp_device> m_vdp1;
+	optional_device<nmk112_device> m_nmk112;
+	optional_device<okim6295_device> m_oki;
+	optional_device<okim6295_device> m_oki1;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<upd4992_device> m_rtc;
 
 	UINT16 m_mcu_data;
 	UINT16 m_video_status;
@@ -54,13 +64,6 @@ public:
 	UINT8 m_v25_reset_line; /* 0x20 for dogyuun/batsugun, 0x10 for vfive, 0x08 for fixeight */
 	UINT8 m_sndirq_line;        /* IRQ4 for batrider, IRQ2 for bbakraid */
 	UINT8 m_z80_busreq;
-
-	optional_shared_ptr<UINT16> m_txvideoram16;
-	optional_shared_ptr<UINT16> m_txvideoram16_offs;
-	optional_shared_ptr<UINT16> m_txscrollram16;
-	optional_shared_ptr<UINT16> m_tx_gfxram16;
-	optional_shared_ptr<UINT16> m_mainram16;
-
 
 	bitmap_ind8 m_custom_priority_bitmap;
 	bitmap_ind16 m_secondary_render_bitmap;
@@ -150,13 +153,6 @@ public:
 	void toaplan2_vblank_irq(int irq_line);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(bbakraid_irqhandler);
-	required_device<m68000_base_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<nmk112_device> m_nmk112;
-	optional_device<okim6295_device> m_oki;
-	optional_device<okim6295_device> m_oki1;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device<upd4992_device> m_rtc;
 
 	UINT8 m_pwrkick_hopper;
 	DECLARE_CUSTOM_INPUT_MEMBER(pwrkick_hopper_status_r);

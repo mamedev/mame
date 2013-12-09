@@ -351,15 +351,11 @@ To Do / Unknowns:
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
-#include "machine/eepromser.h"
-#include "machine/upd4992.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
-#include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "includes/toaplan2.h"
 #include "includes/toaplipt.h"

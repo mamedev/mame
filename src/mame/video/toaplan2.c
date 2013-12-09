@@ -76,10 +76,6 @@ void toaplan2_state::truxton2_postload()
 
 VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 {
-	/* cache the VDP device */
-	m_vdp0 = machine().device<gp9001vdp_device>("gp9001vdp0");
-	m_vdp1 = machine().device<gp9001vdp_device>("gp9001vdp1");
-
 	/* our current VDP implementation needs this bitmap to work with */
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 
