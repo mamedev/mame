@@ -7,7 +7,6 @@
 TODO:
 - needs extensive interactive artwork
 - discrete sound
-- identify lamps
 
 To diagnose game, turn on service mode and:
 - test RAM/ROM, leds, lamps:    reset with shifter in neutral
@@ -28,24 +27,16 @@ class mw18w_state : public driver_device
 public:
 	mw18w_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_lamp_timer(*this, "lamp_timer")
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_lamp_timer;
-	
-	int m_lamps_on[8][5];
-
 	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
 	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
 	DECLARE_WRITE8_MEMBER(mw18w_lamps_w);
 	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
 	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
-	TIMER_DEVICE_CALLBACK_MEMBER(mw18w_update_lamps);
-
-	virtual void machine_start();
 };
 
 
@@ -86,7 +77,61 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 	
 	// refresh lamp status
 	for (int i = 0; i < 5; i++)
-		if (rows >> i & 1) m_lamps_on[col][i] = 100;
+		output_set_lamp_value(col * 10 + i, rows >> i & 1);
+
+	/* lamps info:
+	
+	00: upper right load zone
+	01: lower right load zone
+	02: lost cargo
+	03: hi score
+	04: right crash
+
+	10: 2 pos. load lost sequence
+	11: 3 pos. load lost sequence
+	12: 4 pos. load lost sequence
+	13: 5 pos. load lost sequence
+	14: 6 pos. load lost sequence
+
+	20: down shift
+	21: pick up cargo
+	22: ahead
+	23: 1 pos. load lost sequence
+	24: go
+
+	30: right man arm body
+	31: right man arm down
+	32: right man arm up
+	33: not used
+	34: not used
+
+	40: left man arm up
+	41: left man body
+	42: left man arm down
+	43: left crash
+	44: not used
+
+	50: 1 cargo
+	51: 3 cargo
+	52: 5 cargo
+	53: 7 cargo
+	54: not used
+
+	60: 2 cargo
+	61: 4 cargo
+	62: 6 cargo
+	63: 8 cargo
+	64: not used
+
+	70: upper left load zone
+	71: lower left load zone
+	72: extended play
+	73: credit
+	74: game over
+	
+	(80: backdrop dim)
+	
+	*/
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
@@ -219,83 +264,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(mw18w_state::mw18w_update_lamps)
-{
-	// arbitrary timer to update and output lamp matrix
-	for (int col = 0; col < 8; col++)
-	{
-		for (int row = 0; row < 5; row++)
-		{
-			if (m_lamps_on[col][row]) m_lamps_on[col][row]--;
-			output_set_lamp_value(col * 10 + row, m_lamps_on[col][row] != 0);
-		}
-	}
-	
-	/* lamps info:
-	
-	00: upper right load zone
-	01: lower right load zone
-	02: lost cargo
-	03: hi score
-	04: right crash
-
-	10: 2 pos. load lost sequence
-	11: 3 pos. load lost sequence
-	12: 4 pos. load lost sequence
-	13: 5 pos. load lost sequence
-	14: 6 pos. load lost sequence
-
-	20: down shift
-	21: pick up cargo
-	22: ahead
-	23: 1 pos. load lost sequence
-	24: go
-
-	30: right man arm body
-	31: right man arm down
-	32: right man arm up
-	33: not used
-	34: not used
-
-	40: left man arm up
-	41: left man body
-	42: left man arm down
-	43: left crash
-	44: not used
-
-	50: 1 cargo
-	51: 3 cargo
-	52: 5 cargo
-	53: 7 cargo
-	54: not used
-
-	60: 2 cargo
-	61: 4 cargo
-	62: 6 cargo
-	63: 8 cargo
-	64: not used
-
-	70: upper left load zone
-	71: lower left load zone
-	72: extended play
-	73: credit
-	74: game over
-	
-	(80: backdrop dim)
-	
-	*/
-}
-
-void mw18w_state::machine_start()
-{
-	// init lamp matrix
-	for (int row = 0; row < 5; row++)
-		for (int col = 0; col < 8; col++)
-			m_lamps_on[col][row] = 0;
-	
-	save_item(NAME(m_lamps_on));
-}
-
 static MACHINE_CONFIG_START( mw18w, mw18w_state )
 
 	/* basic machine hardware */
@@ -303,8 +271,6 @@ static MACHINE_CONFIG_START( mw18w, mw18w_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(mw18w_state, irq0_line_assert, 960.516) // 555 IC
 	MCFG_CPU_PROGRAM_MAP(mw18w_map)
 	MCFG_CPU_IO_MAP(mw18w_portmap)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("lamp_timer", mw18w_state, mw18w_update_lamps, attotime::from_hz(500)) // capacitors, frequency is a simple guess (/100)
 
 	/* no video! */
 
