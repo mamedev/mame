@@ -230,14 +230,7 @@ public:
     ATTR_COLD NETLIB_NAME(QBJT)(const q_type atype, const family_t afamily)
     : NETLIB_NAME(Q)(atype, afamily) { }
 
-    netlist_terminal_t m_B;
-    netlist_terminal_t m_C;
-    netlist_terminal_t m_E;
-
-    netlist_terminal_t m_EB;
-
 protected:
-    ATTR_COLD virtual void start();
 
 private:
 };
@@ -248,41 +241,53 @@ class NETLIB_NAME(QBJT_switch) : public NETLIB_NAME(QBJT)
 {
 public:
     ATTR_COLD NETLIB_NAME(QBJT_switch)()
-    : NETLIB_NAME(QBJT)(_type, BJT_SWITCH), m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0) { }
+    : NETLIB_NAME(QBJT)(_type, BJT_SWITCH), m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0), m_state_on(0) { }
 
-    NETLIB_UPDATE_TERMINALS()
+#if 1
+    NETLIB_UPDATEI()
     {
-        double gb = m_gB;
-        double gc = m_gC;
-        double v  = m_V;
-        double vE = m_E.net().Q_Analog();
-        double vB = m_B.net().Q_Analog();
+        double vE = INPANALOG(m_EV);
+        double vB = INPANALOG(m_BV);
 
-        //printf("diff %f = %f - %f\n", vB - vE, vB, vE);
-        if (vB - vE < m_V )
+        //printf("diff %f %f = %f - %f\n", vB - vE, vB, vE, m_RB.m_N.m_g);
+        int new_state = (vB - vE > m_V ) ? 1 : 0;
+        if (m_state_on ^ new_state)
         {
-            // not conducting
-            gb = NETLIST_GMIN;
-            v = 0;
-            gc = NETLIST_GMIN;
+            double gb = m_gB;
+            double gc = m_gC;
+            double v  = m_V;
+            if (!new_state )
+            {
+                // not conducting
+                gb = NETLIST_GMIN;
+                v = 0;
+                gc = NETLIST_GMIN;
+            }
+            m_RB.set(gb, v,   0.0);
+            m_RC.set(gc, 0.0, 0.0);
+            m_state_on = new_state;
+            m_RB.update_dev();
+            m_RC.update_dev();
         }
 
-        m_B.m_g = m_EB.m_g = gb;
-        m_C.m_g = m_E.m_g = gc;
-
-        m_B.m_Idr  = (  v) * gb;
-        m_EB.m_Idr = ( -v) * gb;
-        m_C.m_Idr  = 0.0;
-        m_E.m_Idr =  0.0;
     }
+#endif
+
+    NETLIB_NAME(R) m_RB;
+    NETLIB_NAME(R) m_RC;
+
+    netlist_analog_input_t m_BV;
+    netlist_analog_input_t m_EV;
 
 protected:
 
+    ATTR_COLD virtual void start();
     ATTR_COLD void update_param();
 
     double m_gB; // base conductance / switch on
     double m_gC; // collector conductance / switch on
     double m_V; // internal voltage source
+    int m_state_on;
 
 private:
 };

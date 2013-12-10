@@ -36,7 +36,7 @@ NETLIB_START(R)
     register_terminal("1", m_P);
     register_terminal("2", m_N);
 
-    register_param("R", m_R, NETLIST_GMIN);
+    register_param("R", m_R, 1.0 / NETLIST_GMIN);
 }
 
 NETLIB_UPDATE_PARAM(R)
@@ -58,7 +58,7 @@ NETLIB_START(C)
     register_terminal("1", m_P);
     register_terminal("2", m_N);
 
-    register_param("C", m_C, NETLIST_GMIN);
+    register_param("C", m_C, 1e-6);
 }
 
 NETLIB_UPDATE_PARAM(C)
@@ -95,6 +95,7 @@ NETLIB_UPDATE_PARAM(D)
     m_Vcrit = m_Vt * log(m_Vt / m_Is / sqrt(2.0));
     m_VtInv = 1.0 / m_Vt;
     NL_VERBOSE_OUT(("VCutoff: %f\n", m_Vcrit));
+    printf("VCutoff: %f %f\n", m_Vcrit, m_Is);
 }
 
 NETLIB_UPDATE(D)
@@ -138,21 +139,23 @@ NETLIB_START(Q)
     register_param("model", m_model, "");
 }
 
-NETLIB_START(QBJT)
+template <NETLIB_NAME(Q)::q_type _type>
+NETLIB_START(QBJT_switch<_type>)
 {
     NETLIB_NAME(Q)::start();
 
-    register_terminal("B", m_B);
-    register_terminal("C", m_C);
-    register_terminal("E", m_E);
-    register_terminal("EB", m_EB);
+    register_sub(m_RB, "RB");
+    register_sub(m_RC, "RC");
+    register_input("BV", m_BV);
+    register_input("EV", m_EV);
 
-    m_setup->connect(m_E, m_EB);
+    register_subalias("B", m_RB.m_P);
+    register_subalias("E", m_RB.m_N);
+    register_subalias("C", m_RC.m_P);
 
-    m_B.m_otherterm = &m_EB;
-    m_EB.m_otherterm = &m_B;
-    m_C.m_otherterm = &m_E;
-    m_E.m_otherterm = &m_C;
+    m_setup->connect(m_RB.m_N, m_RC.m_N);
+    m_setup->connect(m_RB.m_P, m_BV);
+    m_setup->connect(m_RB.m_N, m_EV);
 }
 
 NETLIB_UPDATE(Q)
@@ -184,7 +187,11 @@ NETLIB_UPDATE_PARAM(QBJT_switch<_type>)
         m_gB = NETLIST_GMIN;
     m_gC = BF * m_gB; // very rough estimate
     printf("%f %f \n", m_V, m_gB);
+    m_RB.set(NETLIST_GMIN, 0.0, 0.0);
+    m_RC.set(NETLIST_GMIN, 0.0, 0.0);
 }
 
+template NETLIB_START(QBJT_switch<NETLIB_NAME(Q)::BJT_NPN>);
+template NETLIB_START(QBJT_switch<NETLIB_NAME(Q)::BJT_PNP>);
 template NETLIB_UPDATE_PARAM(QBJT_switch<NETLIB_NAME(Q)::BJT_NPN>);
 template NETLIB_UPDATE_PARAM(QBJT_switch<NETLIB_NAME(Q)::BJT_PNP>);

@@ -552,9 +552,9 @@ ATTR_COLD void netlist_logic_output_t::set_levels(const double low, const double
 
 ATTR_COLD double netlist_param_multi_t::dValue(const pstring &entity, const double defval) const
 {
-    pstring tmp = this->Value().ucase();
+    pstring tmp = this->Value();
     // .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
-    int p = tmp.find(entity.ucase() + "=");
+    int p = tmp.ucase().find(entity.ucase() + "=");
     if (p>=0)
     {
         int pblank = tmp.find(" ", p);

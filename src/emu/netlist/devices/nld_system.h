@@ -79,8 +79,9 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 // solver
 // ----------------------------------------------------------------------------------------
 
-struct netlist_matrix_solver_t
+class netlist_matrix_solver_t
 {
+public:
     typedef netlist_list_t<netlist_matrix_solver_t *> list_t;
     typedef netlist_core_device_t::list_t dev_list_t;
     ATTR_COLD void setup(netlist_net_t::list_t &nets);
@@ -89,6 +90,8 @@ struct netlist_matrix_solver_t
     ATTR_HOT bool solve();
     ATTR_HOT void step(const netlist_time delta);
     ATTR_HOT void update_inputs();
+
+    ATTR_HOT inline bool is_dynamic() { return m_dynamic.count() > 0; }
 
     double m_accuracy;
 

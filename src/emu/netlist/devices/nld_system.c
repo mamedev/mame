@@ -103,7 +103,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets)
                                 m_steps.add(&p->netdev());
                             break;
                         case netlist_device_t::DIODE:
-                        case netlist_device_t::BJT_SWITCH:
+                        //case netlist_device_t::BJT_SWITCH:
                             if (!m_dynamic.contains(&p->netdev()))
                                 m_dynamic.add(&p->netdev());
                             break;
@@ -154,14 +154,54 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
 
         double gtot = 0;
         double iIdr = 0;
-
-        for (netlist_net_t::terminal_list_t::entry_t *e = net->m_terms.first(); e != NULL; e = net->m_terms.next(e))
+        const netlist_net_t::terminal_list_t &terms = net->m_terms;
+#if 1
+        switch (terms.count())
+        {
+            case 1:
+                {
+                    const netlist_terminal_t *pt = terms.first()->object();
+                    gtot = pt->m_g;
+                    iIdr = pt->m_Idr + pt->m_g * pt->m_otherterm->net().Q_Analog();
+                }
+                break;
+            case 2:
+                {
+                    const netlist_terminal_t *pt1 = terms.first()->object();
+                    const netlist_terminal_t *pt2 = terms.item(1)->object();
+                    gtot = pt1->m_g + pt2->m_g;
+                    iIdr = pt1->m_Idr + pt1->m_g * pt1->m_otherterm->net().Q_Analog()
+                         + pt2->m_Idr + pt2->m_g * pt2->m_otherterm->net().Q_Analog();
+                }
+                break;
+            case 3:
+                {
+                    const netlist_terminal_t *pt1 = terms.first()->object();
+                    const netlist_terminal_t *pt2 = terms.item(1)->object();
+                    const netlist_terminal_t *pt3 = terms.item(2)->object();
+                    gtot = pt1->m_g + pt2->m_g + pt3->m_g;
+                    iIdr = pt1->m_Idr + pt1->m_g * pt1->m_otherterm->net().Q_Analog()
+                         + pt2->m_Idr + pt2->m_g * pt2->m_otherterm->net().Q_Analog()
+                         + pt3->m_Idr + pt3->m_g * pt3->m_otherterm->net().Q_Analog();
+                }
+                break;
+            default:
+                for (netlist_net_t::terminal_list_t::entry_t *e = terms.first(); e != NULL; e = terms.next(e))
+                {
+                    netlist_terminal_t *pt = e->object();
+                    gtot += pt->m_g;
+                    iIdr += pt->m_Idr + pt->m_g * pt->m_otherterm->net().Q_Analog();
+                }
+                break;
+        }
+#else
+        for (netlist_net_t::terminal_list_t::entry_t *e = terms.first(); e != NULL; e = terms.next(e))
         {
             netlist_terminal_t *pt = e->object();
             gtot += pt->m_g;
             iIdr += pt->m_Idr + pt->m_g * pt->m_otherterm->net().Q_Analog();
         }
-
+#endif
         double new_val = iIdr / gtot;
         if (fabs(new_val - net->m_cur.Analog) > m_accuracy)
             resched = true;
@@ -282,20 +322,17 @@ NETLIB_FUNC_VOID(solver, post_start, ())
             process_net(groups, cur_group, pn->object());
         }
     }
-    printf("Found %d net groups in %d nets\n", cur_group + 1, m_nets.count());
-    for (int i = 0; i <= cur_group; i++)
-    {
-        printf("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr());
-    }
-
 
     // setup the solvers
+    printf("Found %d net groups in %d nets\n", cur_group + 1, m_nets.count());
     for (int i = 0; i <= cur_group; i++)
     {
         netlist_matrix_solver_t *ms = new netlist_matrix_solver_t;
         ms->m_accuracy = m_accuracy.Value();
         ms->setup(groups[i]);
         m_mat_solvers.add(ms);
+        printf("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr());
+        printf("  has %s elements\n", ms->is_dynamic() ? "dynamic" : "no dynamic");
     }
 
 }
@@ -323,11 +360,11 @@ NETLIB_UPDATE(solver)
     bool global_resched = false;
     for (netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
     {
-        resched_cnt = 0;
+        resched_cnt = (e->object()->is_dynamic() ? 0 : 1);
         do {
             resched = e->object()->solve();
             resched_cnt++;
-        } while (resched && (resched_cnt < 5));
+        } while ((resched && (resched_cnt < 5)) || (resched_cnt <= 1));
         global_resched = global_resched || resched;
     }
     if (global_resched)
