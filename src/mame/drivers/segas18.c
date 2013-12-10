@@ -767,22 +767,26 @@ static INPUT_PORTS_START( bloxeed )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x03, 0x03, "Price Type" ) PORT_DIPLOCATION("SW2:1,2") // Normal game | VS Mode
-	PORT_DIPSETTING(    0x03, "A" )     // 1 Start / 1 Continue | 2 Start / 1 Continue
-	PORT_DIPSETTING(    0x02, "B" )     // 1 Start / 1 Continue | 1 Start / 1 Continue
-	PORT_DIPSETTING(    0x01, "C" )     // 2 Start / 1 Continue | 4 Start / 2 Continue
-	PORT_DIPSETTING(    0x00, "D" )     // 2 Start / 1 Continue | 2 Start / 2 Continue
-	//"SW2:3" unused
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x01, "Allow VS Mode" )         PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0c, 0x0c, "Lines Per Level" )       PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	//"SW2:7" unused
-	PORT_DIPNAME( 0x80, 0x00, "High Speed Mode" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "High Speed Mode" )       PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
