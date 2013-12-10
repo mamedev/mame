@@ -11,7 +11,7 @@
 		<part name="cart" interface="myvision_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="rj1" size="8192" crc="fa3df109" sha1="a3b5640fa465de3004a05e59c1362d440842355f" offset="000000" />
-				<rom name="rj1" size="8192" crc="eae282e3" sha1="829a34a2d0685b68280d8251a641cadd12e3b3c4" offset="0x2000" />
+				<rom name="rj2" size="8192" crc="eae282e3" sha1="829a34a2d0685b68280d8251a641cadd12e3b3c4" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
