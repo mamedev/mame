@@ -265,7 +265,7 @@ READ32_MEMBER(pgm_arm_type3_state::svg_speedup_r )
 }
 
 
-void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(void)
+void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_svg)
 {
 	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
 	int i;
@@ -283,11 +283,21 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(void)
 	int base = 0x1c;
 	temp16[(base) /2] = 0xf000; base += 2;
 	temp16[(base) /2] = 0xe59f; base += 2;
-	temp16[(base) /2] = 0x0010; base += 2;
-	temp16[(base) /2] = 0x0800; base += 2;
-	temp16[(base) /2] = 0x0010; base += 2;
-	temp16[(base) /2] = 0x0800; base += 2;
-	 
+
+	if (is_svg == 0)
+	{
+		temp16[(base) / 2] = 0x0010; base += 2;
+		temp16[(base) / 2] = 0x0800; base += 2;
+		temp16[(base) / 2] = 0x0010; base += 2;
+		temp16[(base) / 2] = 0x0800; base += 2;
+	}
+	else
+	{
+		temp16[(base) / 2] = 0x0038; base += 2;
+		temp16[(base) / 2] = 0x0800; base += 2;
+		temp16[(base) / 2] = 0x0038; base += 2;
+		temp16[(base) / 2] = 0x0800; base += 2;
+	}
 
 	// some startup code to set up the stacks etc. we're assuming
 	// behavior is basically the same as killing blade plus here, this code
@@ -387,10 +397,37 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(void)
 	temp16[(base) /2] = 0xE121; base += 2;
 
 
+	if (is_svg == 0)
+	{
+		temp16[(base) / 2] = 0x0028; base += 2; // jump to 0x184
+		temp16[(base) / 2] = 0xEA00; base += 2;
+	}
+	else
+	{
+		temp16[(base) / 2] = 0x001c; base += 2; // jump to 0x154
+		temp16[(base) / 2] = 0xEA00; base += 2;
 
-	temp16[(base) /2] = 0x0028; base += 2; // jump to 0x184
-	temp16[(base) /2] = 0xEA00; base += 2;
+		base = 0x154;
 
+		// this actually makes matters worse here
+//		temp16[(base) / 2] = 0x1010; base += 2;
+//		temp16[(base) / 2] = 0xe59f; base += 2;
+//		temp16[(base) / 2] = 0x0001; base += 2;
+//		temp16[(base) / 2] = 0xe3a0; base += 2;
+//		temp16[(base) / 2] = 0x0000; base += 2;
+//		temp16[(base) / 2] = 0xe581; base += 2;
+
+		temp16[(base) / 2] = 0xf000; base += 2;
+		temp16[(base) / 2] = 0xe59f; base += 2;
+		temp16[(base) / 2] = 0x0028; base += 2;
+		temp16[(base) / 2] = 0x0800; base += 2;
+		temp16[(base) / 2] = 0x0028; base += 2;
+		temp16[(base) / 2] = 0x0800; base += 2;
+
+//		temp16[(base) / 2] = 0x003c; base += 2;
+//		temp16[(base) / 2] = 0x1000; base += 2;
+
+	}
 
 	
 	base = 0;
@@ -468,9 +505,8 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(void)
 	temp16[(base) /2] = 0xff1e; base += 2;
 	temp16[(base) /2] = 0xe12f; base += 2;
 
-	// the non-EO area starts in the middle of a function that seems similar to those  at 000037E4 / 000037D4 in killbldp.. by setting this up we allow the intro to run, but can no longer can get in game..
+	// the non-EO area starts in the middle of a function that seems similar to those  at 000037E4 / 000037D4 in killbldp.. by setting this up we allow the intro to run
 	// it sets '0x10000038' to a value ot 1
-	// maybe this flag needs to be flipped on interrupts or similar??
 	base = 0x184;
 	temp16[(base) /2] = 0x105c; base += 2;
 	temp16[(base) /2] = 0xE59F; base += 2;
@@ -483,12 +519,45 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	svg_latch_init();
 //	pgm_create_dummy_internal_arm_region(0x188);
 
-	pgm_create_dummy_internal_arm_region_theglad();
+	pgm_create_dummy_internal_arm_region_theglad(0);
 	
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
 }
 
+void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_svg(int base)
+{
+	// we don't have the correct internal ROM for this version, so insead we use the one we have and patch the jump table in the external ROM
+	int subroutine_addresses[] =
+	{
+		0,0,0,0,0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
+		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0
+	};
+	UINT16 *extprot = (UINT16 *)memregion("user1")->base();
+
+	for (int i = 0; i < 135; i++)
+	{
+		UINT32 addr = extprot[(base/2)] | (extprot[(base/2) + 1] << 16);
+		extprot[(base / 2)] = addr - subroutine_addresses[i];
+
+		base += 4;
+	}
+}
 
 void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base)
 {
@@ -588,7 +657,10 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
 	svg_basic_init();
 	pgm_svg_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region_theglad();
+	pgm_create_dummy_internal_arm_region_theglad(1);
+	pgm_patch_external_arm_rom_jumptable_svg(0x53f10);
+	m_armrom = (UINT32 *)memregion("prot")->base();
+	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
 
 }
 
@@ -597,7 +669,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
 	svg_basic_init();
 	pgm_svgpcb_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region_theglad();
+	pgm_create_dummy_internal_arm_region_theglad(0);
 	m_armrom = (UINT32 *)memregion("prot")->base();
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
 
@@ -759,7 +831,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
 	svg_basic_init();
 	pgm_happy6_decrypt(machine());
 	svg_latch_init();
-	pgm_create_dummy_internal_arm_region_theglad();
+	pgm_create_dummy_internal_arm_region_theglad(0);
 	pgm_patch_external_arm_rom_jumptable_theglada(0x5f1c0);
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
