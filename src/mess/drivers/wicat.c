@@ -413,13 +413,49 @@ static mm58274c_interface wicat_rtc_intf =
 	1   // first day
 };
 
-struct rs232_port_interface wicat_serial_intf =
+struct rs232_port_interface wicat_serial1_intf =
 {
 	DEVCB_NULL,  // RX out
-	DEVCB_NULL,  // DCD out
-	DEVCB_NULL,  // DSR out
+	DEVCB_DEVICE_LINE_MEMBER("uart1",mc2661_device,dcd_w),  // DCD out
+	DEVCB_DEVICE_LINE_MEMBER("uart1",mc2661_device,dsr_w),  // DSR out
 	DEVCB_NULL,  // RI out
-	DEVCB_NULL   // CTS out
+	DEVCB_DEVICE_LINE_MEMBER("uart1",mc2661_device,cts_w)   // CTS out
+};
+
+struct rs232_port_interface wicat_serial2_intf =
+{
+	DEVCB_NULL,  // RX out
+	DEVCB_DEVICE_LINE_MEMBER("uart2",mc2661_device,dcd_w),  // DCD out
+	DEVCB_DEVICE_LINE_MEMBER("uart2",mc2661_device,dsr_w),  // DSR out
+	DEVCB_NULL,  // RI out
+	DEVCB_DEVICE_LINE_MEMBER("uart2",mc2661_device,cts_w)   // CTS out
+};
+
+struct rs232_port_interface wicat_serial3_intf =
+{
+	DEVCB_NULL,  // RX out
+	DEVCB_DEVICE_LINE_MEMBER("uart3",mc2661_device,dcd_w),  // DCD out
+	DEVCB_DEVICE_LINE_MEMBER("uart3",mc2661_device,dsr_w),  // DSR out
+	DEVCB_NULL,  // RI out
+	DEVCB_DEVICE_LINE_MEMBER("uart3",mc2661_device,cts_w)   // CTS out
+};
+
+struct rs232_port_interface wicat_serial4_intf =
+{
+	DEVCB_NULL,  // RX out
+	DEVCB_DEVICE_LINE_MEMBER("uart4",mc2661_device,dcd_w),  // DCD out
+	DEVCB_DEVICE_LINE_MEMBER("uart4",mc2661_device,dsr_w),  // DSR out
+	DEVCB_NULL,  // RI out
+	DEVCB_DEVICE_LINE_MEMBER("uart4",mc2661_device,cts_w)   // CTS out
+};
+
+struct rs232_port_interface wicat_serial5_intf =
+{
+	DEVCB_NULL,  // RX out
+	DEVCB_DEVICE_LINE_MEMBER("uart5",mc2661_device,dcd_w),  // DCD out
+	DEVCB_DEVICE_LINE_MEMBER("uart5",mc2661_device,dsr_w),  // DSR out
+	DEVCB_NULL,  // RI out
+	DEVCB_DEVICE_LINE_MEMBER("uart5",mc2661_device,cts_w)   // CTS out
 };
 
 AM9517A_INTERFACE( wicat_videodma_intf )
@@ -452,11 +488,11 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_MC2661_ADD("uart5", XTAL_5_0688MHz, wicat_uart5_intf)
 	MCFG_MC2661_ADD("uart6", XTAL_5_0688MHz, wicat_uart6_intf)  // connected to modem port
 
-	MCFG_RS232_PORT_ADD("serial1",wicat_serial_intf,default_rs232_devices,NULL)
-	MCFG_RS232_PORT_ADD("serial2",wicat_serial_intf,default_rs232_devices,NULL)
-	MCFG_RS232_PORT_ADD("serial3",wicat_serial_intf,default_rs232_devices,NULL)
-	MCFG_RS232_PORT_ADD("serial4",wicat_serial_intf,default_rs232_devices,NULL)
-	MCFG_RS232_PORT_ADD("serial5",wicat_serial_intf,default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial1",wicat_serial1_intf,default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial2",wicat_serial2_intf,default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial3",wicat_serial3_intf,default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial4",wicat_serial4_intf,default_rs232_devices,NULL)
+	MCFG_RS232_PORT_ADD("serial5",wicat_serial5_intf,default_rs232_devices,NULL)
 
 	/* video hardware */
 	MCFG_CPU_ADD("videocpu",Z8002,XTAL_8MHz)  // AMD AMZ8002DC
