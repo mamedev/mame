@@ -487,25 +487,28 @@ WRITE32_MEMBER(hng64_state::hng64_com_w)
 	COMBINE_DATA(&m_com_ram[offset]);
 }
 
-WRITE32_MEMBER(hng64_state::hng64_com_share_w)
+/* TODO: fully understand this */
+WRITE8_MEMBER(hng64_state::hng64_com_share_mips_w)
 {
-	logerror("commw  (PC=%08x): %08x %08x %08x\n", space.device().safe_pc(), data, (offset*4)+0xc0001000, mem_mask);
-
-	if (offset == 0x0) COMBINE_DATA(&m_com_shared_a);
-	if (offset == 0x1) COMBINE_DATA(&m_com_shared_b);
+	m_com_shared[offset ^ 3] = data;
 }
 
-READ32_MEMBER(hng64_state::hng64_com_share_r)
+READ8_MEMBER(hng64_state::hng64_com_share_mips_r)
 {
-	logerror("commr  (PC=%08x): %08x %08x\n", space.device().safe_pc(), (offset*4)+0xc0001000, mem_mask);
+	return m_com_shared[offset];
+}
 
-	//if(offset == 0x0) return m_com_shared_a;
-	//if(offset == 0x1) return m_com_shared_b;
+WRITE8_MEMBER(hng64_state::hng64_com_share_w)
+{
+	m_com_shared[offset] = data;
+}
 
-	if(offset==0x0) return 0x0000aaaa;
-	if(offset==0x1) return 0x00030000;      // fatfurwa : at bfc06624 it wants a 01 : at bfc06650 it wants a 02
+READ8_MEMBER(hng64_state::hng64_com_share_r)
+{
+	if(offset == 4)
+		return m_com_shared[offset] | 1; // some busy flag?
 
-	return 0x00;
+	return m_com_shared[offset];
 }
 
 WRITE32_MEMBER(hng64_state::hng64_pal_w)
@@ -859,21 +862,38 @@ READ32_MEMBER(hng64_state::dl_r)
 }
 #endif
 
-// Some kind of buffering of the display lists, or 'render current buffer' write?
-WRITE32_MEMBER(hng64_state::dl_control_w)
+WRITE32_MEMBER(hng64_state::dl_upload_w)
 {
-//  printf("\n");   // Debug - ajg
-	// TODO: put this back in.
-	/*
-	if (activeBuffer==0 || activeBuffer==1)
-	    memcpy(&hng64_dls[activeBuffer][0],&hng64_dl[0],0x200);
+	// this handles 3d to fb upload
+#if 0
+	UINT16 packet3d[16];
 
-	// Only if it's VALID (hack)
-	if (data & 1)
-	    activeBuffer = 0;
-	if (data & 2)
-	    activeBuffer = 1;
-	*/
+	for(int packetStart=0;packetStart<0x200/4;packetStart+=8)
+	{
+		// Create a 3d packet
+		//UINT16 packetStart = offset - 0x08;
+		//if (offset == 0x7f) packetStart += 1;
+
+		for (int i = 0; i < 0x08; i++)
+		{
+			packet3d[i*2+0] = (m_dl[packetStart+i] & 0xffff0000) >> 16;
+			packet3d[i*2+1] = (m_dl[packetStart+i] & 0x0000ffff);
+		}
+
+		// Send it off to the 3d subsystem.
+		hng64_command3d(machine(), packet3d);
+	}
+#endif
+}
+
+WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
+{
+	if(data & 2) // clear current buffer
+		clear3d();
+
+//	if(data & 1) // swap buffers
+
+//  if(data & 4) // reset buffer count
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1141,7 +1161,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_SHARE("dl")  // 3d Display List
-//  AM_RANGE(0x20300200, 0x20300213) AM_RAM_WRITE(xxxx) AM_SHARE("xxxxxxxx")  // 3d Display List Upload?
+	AM_RANGE(0x20300200, 0x20300213) AM_WRITE(dl_upload_w)  // 3d Display List Upload
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
@@ -1162,7 +1182,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 
 	// Communications
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_SHARE("com_ram")
-	AM_RANGE(0xc0001000, 0xc0001007) AM_READWRITE(hng64_com_share_r, hng64_com_share_w)
+	AM_RANGE(0xc0001000, 0xc0001007) AM_READWRITE8(hng64_com_share_mips_r, hng64_com_share_mips_w,0xffffffff)
 
 	/* 6e000000-6fffffff */
 	/* 80000000-81ffffff */
@@ -1172,165 +1192,109 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	/* a0000000-a3ffffff */
 ADDRESS_MAP_END
 
-/**************/
-/** COMM CPU **/
-/**************/
-#define KL5C_MMU_A(xxx) ( (xxx == 0) ? 0x0000 : (state->m_com_mmu_mem[((xxx-1)*2)+1] << 2) | ((state->m_com_mmu_mem[(xxx-1)*2] & 0xc0) >> 6) )
-#define KL5C_MMU_B(xxx) ( (xxx == 0) ? 0x0000 : (state->m_com_mmu_mem[(xxx-1)*2] & 0x3f) )
+/*
+0x6010: tests RAM at [3]8000
 
-DIRECT_UPDATE_MEMBER(hng64_state::KL5C80_direct_handler)
+*/
+
+UINT8 hng64_state::read_comm_data(UINT32 offset)
 {
-	direct.explicit_configure(0x0000, 0xffff, 0xffff, m_com_op_base);
-	return ~0;
+	if((offset & 0x10000) == 0)
+		return m_comm_rom[offset & 0xffff];
+
+	if(offset & 0x10000)
+		return m_comm_ram[(offset & 0xffff)];
+
+	printf("%08x\n",offset);
+	return 0xff;
 }
 
-static UINT32 KL5C80_translate_address(hng64_state *state, UINT16 vAddr)
+void hng64_state::write_comm_data(UINT32 offset,UINT8 data)
 {
-	int i;
-	UINT8 bNum = 4;
-
-	/* Determine what B the vAddr is in */
-	for (i = 1; i < 5; i++)
+	if((offset & 0x10000) == 0)
 	{
-		if ( ((KL5C_MMU_B(i)+1)*0x400) > vAddr)
-		{
-			bNum = i-1;
-			break;
-		}
+		//m_comm_rom[offset];
+		return;
+	}
+	if(offset & 0x10000)
+	{
+		m_comm_ram[offset & 0xffff] = data;
+		return;
 	}
 
-	/* Calculate the full address and return */
-	if (bNum == 0)
-	{
-		return vAddr;
-	}
-	else
-	{   /* the offset to the base physical address plus the vAddr's offset from the virtual base */
-		return ((KL5C_MMU_A(bNum) + (KL5C_MMU_B(bNum)+1)) * 0x400) + (vAddr - ((KL5C_MMU_B(bNum)+1) * 0x400));
-	}
+
+	printf("%08x %02x\n",offset,data);
+
 }
 
-static void KL5C80_virtual_mem_sync(hng64_state *state)
+READ8_MEMBER(hng64_state::hng64_comm_space_r)
 {
-	/* The KL5C80 maps each progressive chunk from the beginning of the
-	   virtual region until the beginning of the next virtual region.
-	   This is implemented here in a lame way to simplify the code.  */
+	if((offset & 0xfc00) == 0) // B0 is fixed at 0-0x3ff
+		return m_comm_rom[offset];
 
-	int i,region;
-
-	for (region = 0; region < 5; region++)
+	for(int i=0;i<5;i++)
 	{
-		int logical_offset  = (KL5C_MMU_B(region)+1) * 0x400;
-		int physical_offset = (KL5C_MMU_A(region) + (KL5C_MMU_B(region)+1)) * 0x400;
+		if(offset >= m_mmub[i] && offset <= m_mmub[i+1]-1)
+			return read_comm_data(m_mmua[i]|offset);
+	}
 
-		/* The first MMU region is a special case */
-		if (region == 0)
-		{
-			logical_offset  = 0x0000;
-			physical_offset = 0x00000;
-		}
+	return 0xff;
+}
 
-		logerror("Now copying 0x%x to 0x%x\n", physical_offset, logical_offset);
-		for (i = logical_offset; i <= 0xffff; i++)
+WRITE8_MEMBER(hng64_state::hng64_comm_space_w)
+{
+	if((offset & 0xfc00) == 0) // B0 is fixed at 0-0x3ff
+		return;// m_comm_rom[offset];
+
+	for(int i=0;i<5;i++)
+	{
+		if(offset >= m_mmub[i] && offset <= m_mmub[i+1]-1)
 		{
-			if (physical_offset+i <= 0xfffff)
-				state->m_com_op_base[i] = state->m_com_virtual_mem[physical_offset+i];
+			write_comm_data(m_mmua[i]|offset,data);
+			return;
 		}
 	}
 }
 
-static void KL5C80_init(hng64_state *state)
+READ8_MEMBER(hng64_state::hng64_comm_mmu_r)
 {
-	UINT8 *hng64_com_mmu_mem = state->m_com_mmu_mem;
-
-	/* init the MMU */
-	hng64_com_mmu_mem[0] =
-	hng64_com_mmu_mem[2] =
-	hng64_com_mmu_mem[4] =
-	hng64_com_mmu_mem[6] = 0x3f;
-
-	hng64_com_mmu_mem[1] =
-	hng64_com_mmu_mem[3] =
-	hng64_com_mmu_mem[5] = 0x00;
-	hng64_com_mmu_mem[7] = 0xf0;
+	return m_mmu_regs[offset];
 }
 
-READ8_MEMBER(hng64_state::hng64_comm_memory_r)
-{
-	hng64_state *state = machine().driver_data<hng64_state>();
-	UINT32 physical_address = KL5C80_translate_address(state, offset);
-	logerror("READING 0x%02x from 0x%04x (0x%05x)\n", m_com_virtual_mem[physical_address], offset, physical_address);
+#define MMUA (m_mmu_regs[(offset&~1)+0]>>6)|(m_mmu_regs[(offset&~1)+1]<<2)
+#define MMUB (m_mmu_regs[(offset&~1)+0]&0x3f)
 
-	/* Custom "virtual" memory map */
-	if (physical_address >= 0x26000 && physical_address <= 0x28000)
+WRITE8_MEMBER(hng64_state::hng64_comm_mmu_w)
+{
+	m_mmu_regs[offset] = data;
+
+	/* cheap: avoid to overwrite read only params*/
+	if((offset & 6) == 6)
 	{
-		/* May very well be shared memory - it reads 16 bits from it at 0x309 */
+		m_mmu_regs[6] = m_mmu_regs[6] & 0x3f;
+		m_mmu_regs[7] = 0xf0;
+
 	}
 
-
-	return m_com_virtual_mem[physical_address];
+	{
+		m_mmua[offset/2+1] = (m_mmu_regs[(offset&~1)+0]>>6)|(m_mmu_regs[(offset&~1)+1]<<2);
+		m_mmua[offset/2+1]*= 0x400;
+		m_mmub[offset/2+1] = (m_mmu_regs[(offset&~1)+0]&0x3f);
+		m_mmub[offset/2+1]++;
+		m_mmub[offset/2+1]*= 0x400;
+		//printf("%d A %08x B %04x\n",offset/2,m_mmua[offset/2],m_mmub[offset/2]);
+		//printf("A %04x B %02x\n",MMUA,MMUB);
+	}
 }
-
-WRITE8_MEMBER(hng64_state::hng64_comm_memory_w)
-{
-	// Write to both virtual and physical memory
-//  UINT32 physical_address = KL5C80_translate_address(offset);
-//  logerror("WRITING 0x%02x to 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address);
-}
-
-/* KL5C80 I/O handlers */
-WRITE8_MEMBER(hng64_state::hng64_comm_io_mmu)
-{
-	m_com_mmu_mem[offset] = data;
-
-	/* Debugging - you can't change A4 - the hardware doesn't let you */
-	if (m_com_mmu_mem[7] != 0xf0 || ((m_com_mmu_mem[6] & 0xc0) != 0x00))
-		logerror("KL5C MMU error !!! Code is trying to change A4!\n");
-
-	hng64_state *state = machine().driver_data<hng64_state>();
-	logerror("COMM CPU MMU WRITE : ");
-	logerror("B : %02x %02x %02x %02x  A : %03x %03x %03x %03x\n", KL5C_MMU_B(1), KL5C_MMU_B(2), KL5C_MMU_B(3), KL5C_MMU_B(4),
-																	KL5C_MMU_A(1), KL5C_MMU_A(2), KL5C_MMU_A(3), KL5C_MMU_A(4));
-	KL5C80_virtual_mem_sync(state);
-}
-
-#ifdef UNUSED_FUNCTION
-READ8_MEMBER(hng64_state::hng64_comm_shared_r)
-{
-	// I'm thinking 0x54 comes from an interrupt on the MIPS CPU?  Or maybe the Toshiba one?
-	// Nothing from CPU0 seems to ping the COM CPU as often as it reads 0x54.
-	// Sometimes it wants 0x54 to be a 0x01 and sometimes it wants a 0x02.
-
-	// It's not an interrupt on the KL5C80 because they aren't enabled before 0x54 is ping'ed
-	// There is a special onboard interrupt handler for the KL5C80 though...
-
-	if (offset==0x00) logerror("COM CPU reading from 0x50.\n");
-	if (offset==0x01) logerror("COM CPU reading from 0x51.\n");
-	if (offset==0x02) logerror("COM CPU reading from 0x52.\n");
-	if (offset==0x03) logerror("COM CPU reading from 0x53.\n");
-	if (offset==0x04) (hng64_com_shared_b & 0x000000ff) ? return 0xff : return 0x00;
-}
-
-WRITE8_MEMBER(hng64_state::hng64_comm_shared_w)
-{
-	if (offset==0x00) hng64_com_shared_a = (hng64_com_shared_a & 0x00ffffff) | (data << 24);
-	if (offset==0x01) hng64_com_shared_a = (hng64_com_shared_a & 0xff00ffff) | (data << 16);
-	if (offset==0x02) hng64_com_shared_a = (hng64_com_shared_a & 0xffff00ff) | (data <<  8);
-	if (offset==0x03) hng64_com_shared_a = (hng64_com_shared_a & 0xffffff00) | (data <<  0);
-	if (offset==0x04) logerror("COM CPU writing to 0x54.\n");
-
-	logerror("COM CPU wrote to com_shared_a : %08x\n", hng64_com_shared_a);
-}
-#endif
 
 static ADDRESS_MAP_START( hng_comm_map, AS_PROGRAM, 8, hng64_state )
-	AM_RANGE(0x0000,0xffff) AM_READWRITE(hng64_comm_memory_r, hng64_comm_memory_w )
+	AM_RANGE(0x0000,0xffff) AM_READWRITE(hng64_comm_space_r, hng64_comm_space_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hng_comm_io_map, AS_IO, 8, hng64_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* Reserved for the KL5C80 internal hardware */
-	AM_RANGE(0x00, 0x07) AM_WRITE(hng64_comm_io_mmu ) AM_SHARE("com_mmu_mem")
+	AM_RANGE(0x00, 0x07) AM_READWRITE(hng64_comm_mmu_r,hng64_comm_mmu_w )
 //  AM_RANGE(0x08,0x1f) AM_NOP              /* Reserved */
 //  AM_RANGE(0x20,0x25) AM_READWRITE        /* Timer/Counter B */           /* hng64 writes here */
 //  AM_RANGE(0x27,0x27) AM_NOP              /* Reserved */
@@ -1343,7 +1307,7 @@ static ADDRESS_MAP_START( hng_comm_io_map, AS_IO, 8, hng64_state )
 //  AM_RANGE(0x3c,0x3f) AM_NOP              /* Reserved */
 
 	/* General IO */
-	AM_RANGE(0x50,0x54) AM_NOP // AM_WRITE(hng64_comm_shared_r, hng64_comm_shared_w)
+	AM_RANGE(0x50,0x57) AM_READWRITE(hng64_com_share_r, hng64_com_share_w)
 //  AM_RANGE(0x72,0x72) AM_WRITE            /* dunno yet */
 ADDRESS_MAP_END
 
@@ -1748,7 +1712,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 		case 224*2: m_set_irq(0x0001);  break; // lv 0 vblank irq
 		//case 0*2:   m_set_irq(0x0002);  break; // lv 1
 		//case 64*2:  m_set_irq(0x0004);  break; // lv 2
-		case 128*2: m_set_irq(0x0800);  break; // lv 11 network irq?
+		case 128*2:	m_set_irq(0x0800);  break; // lv 11 network irq?
 	}
 }
 
@@ -1762,14 +1726,14 @@ void hng64_state::machine_start()
 	mips3drc_add_fastram(m_maincpu, 0x00000000, 0x00ffffff, FALSE, m_mainram);
 	mips3drc_add_fastram(m_maincpu, 0x04000000, 0x05ffffff, TRUE,  m_cart);
 	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+
+	m_comm_rom = memregion("user2")->base();
+	m_comm_ram = auto_alloc_array(machine(),UINT8,0x10000);
 }
 
 
 void hng64_state::machine_reset()
 {
-	int i;
-	const UINT8 *rom = memregion("user2")->base();
-
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)m_soundram;
 	membank("bank1")->set_base(&RAM[0x1f0000]); // allows us to boot
@@ -1777,27 +1741,18 @@ void hng64_state::machine_reset()
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	/* Comm CPU */
-	KL5C80_init(this);
-
-	/* Fill up virtual memory with ROM */
-	for (i = 0x0; i < 0x100000; i++)
-		m_com_virtual_mem[i] = rom[i];
-
-	KL5C80_virtual_mem_sync(this);
-
-	address_space &space = m_comm->space(AS_PROGRAM);
-	space.set_direct_update_handler(direct_update_delegate(FUNC(hng64_state::KL5C80_direct_handler), this));
-
-	m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//	m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
 //  m_comm->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 	// "Display List" init - ugly
-	m_activeBuffer = 0;
+//	m_activeBuffer = 0;
 
 	/* For simulate MCU stepping */
 	m_mcu_fake_time = 0;
 	m_mcu_en = 0;
+
+	m_mmub[0] = 0;
+	m_mmub[5] = 0; // rolls back to 0xffff
 }
 
 
