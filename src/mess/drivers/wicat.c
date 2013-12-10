@@ -475,6 +475,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_SCREEN_UPDATE_DEVICE("video",i8275x_device,screen_update)
 
 	MCFG_I8275_ADD("video",XTAL_19_6608MHz/8,9,wicat_display_pixels,DEVWRITELINE("videodma",am9517a_device, dreq0_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEFAULT_LAYOUT(layout_wicat)
 
