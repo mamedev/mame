@@ -9,26 +9,28 @@
     This system was described in a French computer magazine.
 
     CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
-    IVG09 includes 6845, WD1795, another 6821
+    IVG09 includes 6845, WD1795, another 6821, beeper
 
 ToDo:
     - Almost everything
     - Scrolling can cause the screen to go blank (use Z command to fix)
     - There's supposed to be a device at 2000-2003
     - Character rom is not dumped
+    - Fix cassette
+    - Need software
 
 List of commands (must be in UPPERCASE):
 A -
 B -
 C -
-D - Dump memory
+D - Dump memory (^X to break)
 G -
 I -
-L -
+L - Load cassette
 M -
 N -
 O -
-P -
+P - Save cassette
 Q -
 R - Display/Alter Registers
 S -
@@ -51,6 +53,8 @@ Z - more scan lines per row (cursor is bigger)
 #include "video/mc6845.h"
 #include "machine/keyboard.h"
 #include "machine/serial.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 
 
 class tavernie_state : public driver_device
@@ -59,9 +63,11 @@ public:
 	tavernie_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
+		, m_cass(*this, "cassette")
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	DECLARE_READ_LINE_MEMBER(ca1_r);
 	DECLARE_READ8_MEMBER(pa_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
@@ -71,7 +77,9 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 private:
 	UINT8 m_term_data;
+	UINT8 m_pa;
 	virtual void machine_reset();
+	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -87,7 +95,7 @@ static ADDRESS_MAP_START(tavernie_mem, AS_PROGRAM, 8, tavernie_state)
 	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
 	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
 	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
-	AM_RANGE(0xec00, 0xefff) AM_RAM
+	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
@@ -98,7 +106,6 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( tavernie )
 	PORT_START("DSW")
-	PORT_BIT( 0x9C, 0x9C, IPT_UNUSED )
 	PORT_DIPNAME( 0x01, 0x00, "IRQ PTM") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
@@ -169,7 +176,7 @@ static MC6845_INTERFACE( mc6845_intf )
 
 READ8_MEMBER( tavernie_state::pa_r )
 {
-	return ioport("DSW")->read();
+	return ioport("DSW")->read() | m_pa;
 }
 
 
@@ -183,7 +190,8 @@ d7: cassout
 */
 WRITE8_MEMBER( tavernie_state::pa_w )
 {
-	//m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
+	m_pa = data & 0x9f;
+	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 // centronics
@@ -191,11 +199,17 @@ WRITE8_MEMBER( tavernie_state::pb_w )
 {
 }
 
+// cass in
+READ_LINE_MEMBER( tavernie_state::ca1_r )
+{
+	return (m_cass->input() > +0.01);
+}
+
 static const pia6821_interface mc6821_intf =
 {
 	DEVCB_DRIVER_MEMBER(tavernie_state, pa_r),     /* port A input */
 	DEVCB_NULL,     /* port B input */
-	DEVCB_NULL,     /* CA1 input - cassin */
+	DEVCB_DRIVER_LINE_MEMBER(tavernie_state, ca1_r),     /* CA1 input - cassin */
 	DEVCB_NULL,     /* CB1 input */
 	DEVCB_NULL,     /* CA2 input */
 	DEVCB_NULL,     /* CB2 input */
@@ -203,17 +217,18 @@ static const pia6821_interface mc6821_intf =
 	DEVCB_DRIVER_MEMBER(tavernie_state, pb_w),     /* port B output */
 	DEVCB_NULL,     /* CA2 output */
 	DEVCB_NULL,     /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)     /* IRQB output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
 };
 
+// all i/o lines connect to the 40-pin expansion connector
 static const ptm6840_interface mc6840_intf =
 {
-	XTAL_12MHz / 3, // unknown clock
+	XTAL_4MHz / 4,
 	{ 0, 0, 0 },
 	{ DEVCB_NULL,
-		DEVCB_DEVICE_LINE_MEMBER("ptm", ptm6840_device, set_c1),
-		DEVCB_NULL }, //DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w) },
+		DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),
+		DEVCB_NULL },
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
@@ -260,7 +275,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 static MACHINE_CONFIG_START( tavernie, tavernie_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(tavernie_mem)
 	MCFG_CPU_IO_MAP(tavernie_io)
 
@@ -274,8 +289,14 @@ static MACHINE_CONFIG_START( tavernie, tavernie_state )
 	//MCFG_PALETTE_LENGTH(2)
 	//MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 	MCFG_PIA6821_ADD("pia", mc6821_intf)
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)

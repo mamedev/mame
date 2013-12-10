@@ -10,7 +10,7 @@
     is a bit of a mystery.
 
 ToDo:
-    - Test if Cassette works
+    - Fix Cassette
     - Need software to test with
 
 Pasting:
@@ -192,7 +192,7 @@ static const pia6821_interface mc6821_intf =
 
 static MACHINE_CONFIG_START( mkit09, mkit09_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
 	MCFG_CPU_IO_MAP(mkit09_io)
 
