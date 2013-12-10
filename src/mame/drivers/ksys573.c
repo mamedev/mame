@@ -635,7 +635,7 @@ TIMER_CALLBACK_MEMBER( ksys573_state::atapi_xfer_end )
 	/// HACK: konami80s only works if you dma more data than requested
 	if( ( m_ata->read_cs1( space, (UINT32) 6, (UINT32) 0xffff ) & 8 ) != 0 )
 	{
-		m_atapi_timer->adjust( m_maincpu->cycles_to_attotime( ( ATAPI_CYCLES_PER_SECTOR * ( m_atapi_xfersize / 256 ) ) ) );
+		m_atapi_timer->adjust( m_maincpu->cycles_to_attotime( ( ATAPI_CYCLES_PER_SECTOR * ( m_atapi_xfersize / 64 ) ) ) );
 	}
 }
 
@@ -4563,7 +4563,7 @@ ROM_START( mamboagg )
 	ROM_LOAD( "gqa40jab.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a40jab02", 0, SHA1(a914842442b2f63465e16f979f06da0b78a5f13e) )
+	DISK_IMAGE_READONLY( "a40jab02", 0, SHA1(2e4ed217a7e9f7c79abc9a1798556cc3649db30e) )
 ROM_END
 
 ROM_START( mamboagga )
@@ -4576,7 +4576,7 @@ ROM_START( mamboagga )
 	ROM_LOAD( "gqa40jrb.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a40jab02", 0, SHA1(a914842442b2f63465e16f979f06da0b78a5f13e) )
+	DISK_IMAGE_READONLY( "a40jab02", 0, SHA1(2e4ed217a7e9f7c79abc9a1798556cc3649db30e) )
 ROM_END
 
 ROM_START( mrtlbeat )
