@@ -352,7 +352,7 @@ void peribox_device::ready_join(int slot, int state)
 	else
 		m_ready_flag &= ~(1 << slot);
 
-	m_console_ready((m_ready_flag != 0)? CLEAR_LINE : ASSERT_LINE);
+	m_datamux_ready((m_ready_flag != 0)? CLEAR_LINE : ASSERT_LINE);
 }
 
 void peribox_device::set_slot_loaded(int slot, peribox_slot_device* slotdev)
@@ -382,7 +382,7 @@ void peribox_device::device_config_complete()
 	assert (intf != NULL);
 	m_console_inta.resolve(intf->inta, *this);
 	m_console_intb.resolve(intf->intb, *this);
-	m_console_ready.resolve(intf->ready, *this);
+	m_datamux_ready.resolve(intf->ready, *this);
 
 	m_inta_flag = 0;
 	m_intb_flag = 0;
@@ -446,9 +446,25 @@ machine_config_constructor peribox_device::device_mconfig_additions() const
 *****************************************************************************/
 
 peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: peribox_device(mconfig, PERIBOX_GEN, "Peripheral expansion box Generic", tag, owner, clock, "peribox_gen", __FILE__)
+: peribox_device(mconfig, PERIBOX_GEN, "Peripheral expansion box Geneve", tag, owner, clock, "peribox_gen", __FILE__)
 {
 };
+
+// The BwG controller will not run with the Geneve due to its wait state
+// logic; it assumes that before reading 5FF6 (data register), address 5FF7
+// is also read (by means of the datamux). Unlike the 9900, the 9995 can read
+// single bytes, so it will never trigger a read operation on 5FF7.
+
+SLOT_INTERFACE_START( peribox_slot7nobwg )
+	SLOT_INTERFACE("ide", TI99_IDE)
+	SLOT_INTERFACE("usbsm", TI99_USBSM)
+	SLOT_INTERFACE("hfdc", TI99_HFDC)
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START( peribox_slot8nobwg )
+	SLOT_INTERFACE("tifdc", TI99_FDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC)
+SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_slotg )
 	SLOT_INTERFACE("memex", TI99_MEMEX)
@@ -466,8 +482,8 @@ MACHINE_CONFIG_FRAGMENT( peribox_gen_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotg )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotg )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot6 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7nobwg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8nobwg )
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
 	MCFG_MFMHD_3_DRIVES_ADD()
@@ -476,6 +492,47 @@ MACHINE_CONFIG_END
 machine_config_constructor peribox_gen_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( peribox_gen_device );
+}
+
+/****************************************************************************
+    A variant of the box used for the TI-99/8
+*****************************************************************************/
+
+peribox_998_device::peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: peribox_device(mconfig, PERIBOX_998, "Peripheral expansion box 99/8", tag, owner, clock, "peribox_998", __FILE__)
+{
+};
+
+// The BwG controller will not run with the TI-99/8 for the same reason why
+// it won't work with the Geneve.
+// We don't have many options here. The P-Box is not the prefered device for
+// the 99/8; it was intended to use the Hexbus interface. None of the memory
+// expansions are really supposed to work here.
+SLOT_INTERFACE_START( peribox_slot998 )
+	SLOT_INTERFACE("myarcmem", TI99_MYARCMEM)
+	SLOT_INTERFACE("samsmem", TI99_SAMSMEM)
+	SLOT_INTERFACE("horizon", TI99_HORIZON)
+	SLOT_INTERFACE("ide", TI99_IDE)
+	SLOT_INTERFACE("usbsm", TI99_USBSM)
+	SLOT_INTERFACE("tirs232", TI99_RS232)
+SLOT_INTERFACE_END
+
+MACHINE_CONFIG_FRAGMENT( peribox_998_device )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT2, peribox_slot998 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slot998 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slot998 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slot998 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot998 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot998 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8nobwg )
+
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_interface)
+	MCFG_MFMHD_3_DRIVES_ADD()
+MACHINE_CONFIG_END
+
+machine_config_constructor peribox_998_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( peribox_998_device );
 }
 
 /****************************************************************************
@@ -681,3 +738,4 @@ const device_type PERIBOX_SLOT = &device_creator<peribox_slot_device>;
 const device_type PERIBOX_EV = &device_creator<peribox_ev_device>;
 const device_type PERIBOX_SG = &device_creator<peribox_sg_device>;
 const device_type PERIBOX_GEN = &device_creator<peribox_gen_device>;
+const device_type PERIBOX_998 = &device_creator<peribox_998_device>;

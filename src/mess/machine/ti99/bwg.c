@@ -27,17 +27,53 @@
 
     Michael Zapf, September 2010
     January 2012: rewritten as class (MZ)
+
+    Known issues (Dec 2013):
+
+  1. The BwG controller may fail to read files from single density disks. This
+     is because the DSR tries to read the disk as double density first, which
+     usually fails for a single density disk image - unless we are in track 0.
+     The fix would be to enhance disk images in a way to tell the controller
+     whether they are single or double density and to refuse delivering data
+     when accessed wrongly.
+
+  2. The BwG controller cannot run with the Geneve or other non-9900 computers.
+     The reason for that is the wait state logic. It assumes that when
+     executing MOVB @>5FF6,*R2, first a value from 5FF7 is attempted to be read,
+     just as the TI console does. In that case, wait states are inserted if
+     necessary. The Geneve, however, will try to read a single byte from 5FF6
+     only and therefore circumvent the wait state generation. This is in fact
+     not an emulation glitch but the behavior of the real expansion card.
+
 *******************************************************************************/
 
 #include "emu.h"
 #include "peribox.h"
 #include "bwg.h"
-#include "machine/wd17xx.h"
 #include "formats/ti99_dsk.h"
 #include "imagedev/flopdrv.h"
 
-#define LOG logerror
-#define VERBOSE 1
+// ----------------------------------
+// Flags for debugging
+
+// Show read and write accesses
+#define TRACE_RW 0
+
+// Show CRU bit accesses
+#define TRACE_CRU 0
+
+// Show ready line activity
+#define TRACE_READY 0
+
+// Show detailed signal activity
+#define TRACE_SIGNALS 0
+
+// Show sector data
+#define TRACE_DATA 0
+
+// Show address bus operations
+#define TRACE_ADDRESS 0
+// ----------------------------------
 
 #define MOTOR_TIMER 1
 #define FDC_TAG "wd1773"
@@ -47,9 +83,8 @@
 
 snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 			: ti_expansion_card_device(mconfig, TI99_BWG, "SNUG BwG Floppy Controller", tag, owner, clock, "ti99_bwg", __FILE__),
-				m_clock(*this, CLOCK_TAG)
-{
-}
+				m_wd1773(*this, FDC_TAG),
+				m_clock(*this, CLOCK_TAG) { }
 
 /*
     Callback called at the end of DVENA pulse
@@ -57,30 +92,26 @@ snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag,
 void snug_bwg_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_DVENA = CLEAR_LINE;
-	handle_hold();
+	set_ready_line();
 }
 
+
 /*
-    Call this when the state of DSKhold or DRQ/IRQ or DVENA change
-    Also see ti_fdc.
-
-    Emulation is faulty because the CPU is actually stopped in the midst of
-    instruction, at the end of the memory access
-
-    TODO: This has to be replaced by the proper READY handling that is already
-    prepared here. (Requires READY handling by the CPU.)
+    Operate the wait state logic.
 */
-void snug_bwg_device::handle_hold()
+void snug_bwg_device::set_ready_line()
 {
-	line_state state;
+	// This is the wait state logic
+	if (TRACE_SIGNALS) logerror("bwg: address=%04x, DRQ=%d, INTRQ=%d, MOTOR=%d\n", m_address & 0xffff, m_DRQ, m_IRQ, m_DVENA);
+	line_state nready = (m_dataregLB &&         // Are we accessing 5ff7
+			m_WAITena &&                        // and the wait state generation is active (SBO 2)
+			(m_DRQ==CLEAR_LINE) &&              // and we are waiting for a byte
+			(m_IRQ==CLEAR_LINE) &&              // and there is no interrupt yet
+			(m_DVENA==ASSERT_LINE)              // and the motor is turning?
+			)? ASSERT_LINE : CLEAR_LINE;        // In that case, clear READY and thus trigger wait states
 
-	if (m_hold && !m_DRQ && !m_IRQ && (m_DVENA==ASSERT_LINE))
-		state = ASSERT_LINE;
-	else
-		state = CLEAR_LINE;
-
-	m_slot->set_ready((state==CLEAR_LINE)? ASSERT_LINE : CLEAR_LINE);
-//  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state);
+	if (TRACE_READY) if (nready==ASSERT_LINE) logerror("bwg: READY line = %d\n", (nready==CLEAR_LINE)? 1:0);
+	m_slot->set_ready((nready==CLEAR_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -88,78 +119,125 @@ void snug_bwg_device::handle_hold()
 */
 WRITE_LINE_MEMBER( snug_bwg_device::intrq_w )
 {
-	if (VERBOSE>8) LOG("bwg: set irq = %02x\n", state);
-	m_IRQ = (state==ASSERT_LINE);
+	if (TRACE_SIGNALS) logerror("bwg: set intrq = %d\n", state);
+	m_IRQ = (line_state)state;
 
 	// Note that INTB is actually not used in the TI-99 family. But the
 	// controller asserts the line nevertheless, probably intended for
 	// use in another planned TI system
-	m_slot->set_intb(state);
+	m_slot->set_intb(state==ASSERT_LINE);
 
-	handle_hold();
+	// We need to explicitly set the READY line to release the datamux
+	set_ready_line();
 }
 
 WRITE_LINE_MEMBER( snug_bwg_device::drq_w )
 {
-	if (VERBOSE>8) LOG("bwg: set drq = %02x\n", state);
-	m_DRQ = (state==ASSERT_LINE);
-	handle_hold();
+	if (TRACE_SIGNALS) logerror("bwg: set drq = %d\n", state);
+	m_DRQ = (line_state)state;
+
+	// We need to explicitly set the READY line to release the datamux
+	set_ready_line();
+}
+
+SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
+{
+	// Selection login in the PAL and some circuits on the board
+
+	// Is the card being selected?
+	m_address = offset;
+	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+
+	if (!m_inDsrArea) return;
+
+	if (TRACE_ADDRESS) logerror("bwg: set address = %04x\n", offset & 0xffff);
+
+	// Is the WD chip on the card being selected?
+	// We need the even and odd addresses for the wait state generation,
+	// but only the even addresses when we access it
+	m_WDsel0 = m_inDsrArea && !m_rtc_enabled
+			&& ((state==ASSERT_LINE && ((m_address & 0x1ff8)==0x1ff0))    // read
+				|| (state==CLEAR_LINE && ((m_address & 0x1ff8)==0x1ff8)));  // write
+
+	m_WDsel = m_WDsel0 && ((m_address & 1)==0);
+
+	// Is the RTC selected on the card? (even addr)
+	m_RTCsel = m_inDsrArea && m_rtc_enabled && ((m_address & 0x1fe1)==0x1fe0);
+
+	// RTC disabled:
+	// 5c00 - 5fef: RAM
+	// 5ff0 - 5fff: Controller (f0 = status, f2 = track, f4 = sector, f6 = data)
+
+	// RTC enabled:
+	// 5c00 - 5fdf: RAM
+	// 5fe0 - 5fff: Clock (even addr)
+
+	// Is RAM selected? We just check for the last 1K and let the RTC or WD
+	// just take control before
+	m_lastK = m_inDsrArea && ((m_address & 0x1c00)==0x1c00);
+
+	// Is the data register port of the WD being selected?
+	// In fact, the address to read the data from is 5FF6, but the TI-99 datamux
+	// fetches both bytes from 5FF7 and 5FF6, the odd one first. The BwG uses
+	// the odd address to operate the READY line
+	m_dataregLB = m_WDsel0 && ((m_address & 0x07)==0x07);
+
+	// Clear or assert the outgoing READY line
+	set_ready_line();
 }
 
 /*
-    Read a byte
-    4000 - 5bff: ROM (4 banks)
-
-    rtc disabled:
-    5c00 - 5fef: RAM
-    5ff0 - 5fff: Controller (f0 = status, f2 = track, f4 = sector, f6 = data)
-
-    rtc enabled:
-    5c00 - 5fdf: RAM
-    5fe0 - 5fff: Clock (even addr)
+    Read a byte from ROM, RAM, FDC, or RTC. See setaddress_dbin for selection
+    logic.
 */
 READ8Z_MEMBER(snug_bwg_device::readz)
 {
-	if (m_selected)
+	if (m_inDsrArea && m_selected)
 	{
-		if ((offset & m_select_mask)==m_select_value)
+		// 010x xxxx xxxx xxxx
+		if (m_lastK)
 		{
-			// 010x xxxx xxxx xxxx
-			if ((offset & 0x1c00)==0x1c00)
+			// ...1 11xx xxxx xxxx
+			if (m_rtc_enabled)
 			{
-				// ...1 11xx xxxx xxxx
-				if (m_rtc_enabled)
+				if (m_RTCsel)
 				{
-					if ((offset & 0x03e1)==0x03e0)
-					{
-						// .... ..11 111x xxx0
-						if (!space.debugger_access()) *value = m_clock->read(space, (offset & 0x001e) >> 1);
-					}
-					else
-					{
-						*value = m_buffer_ram[(m_ram_page<<10) | (offset & 0x03ff)];
-					}
+					// .... ..11 111x xxx0
+					if (!space.debugger_access()) *value = m_clock->read(space, (m_address & 0x001e) >> 1);
+					if (TRACE_RW) logerror("bwg: read RTC: %04x -> %02x\n", m_address & 0xffff, *value);
 				}
 				else
 				{
-					if ((offset & 0x03f9)==0x03f0)
-					{
-						// .... ..11 1111 0xx0
-						// Note that the value is inverted again on the board,
-						// so we can drop the inversion
-						if (!space.debugger_access()) *value = wd17xx_r(m_controller, space, (offset >> 1)&0x03);
-					}
-					else
-					{
-						*value = m_buffer_ram[(m_ram_page<<10) | (offset & 0x03ff)];
-					}
+					*value = m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)];
+					if (TRACE_RW) logerror("bwg: read ram: %04x (page %d)-> %02x\n", m_address & 0xffff, m_ram_page, *value);
 				}
 			}
 			else
 			{
-				*value = m_dsrrom[(m_rom_page<<13) | (offset & 0x1fff)];
-				if (VERBOSE>7) LOG("bwg read dsr: %04x -> %02x\n", offset, *value);
+				if (m_WDsel)
+				{
+					// .... ..11 1111 0xx0
+					// Note that the value is inverted again on the board,
+					// so we can drop the inversion
+					if (!space.debugger_access()) *value = wd17xx_r(m_wd1773, space, (m_address >> 1)&0x03);
+					if (TRACE_RW) logerror("bwg: read FDC: %04x -> %02x\n", m_address & 0xffff, *value);
+					if (TRACE_DATA)
+					{
+						if ((m_address & 0xffff)==0x5ff6) logerror("%02x ", *value);
+						else logerror("\n%04x: %02x", m_address&0xffff, *value);
+					}
+				}
+				else
+				{
+					*value = m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)];
+					if (TRACE_RW) logerror("bwg: read ram: %04x (page %d)-> %02x\n", m_address & 0xffff, m_ram_page, *value);
+				}
 			}
+		}
+		else
+		{
+			*value = m_dsrrom[(m_rom_page<<13) | (m_address & 0x1fff)];
+			if (TRACE_RW) logerror("bwg: read dsr: %04x (page %d)-> %02x\n", m_address & 0xffff, m_rom_page, *value);
 		}
 	}
 }
@@ -199,39 +277,38 @@ void snug_bwg_device::set_all_geometries(floppy_type_t type)
 */
 WRITE8_MEMBER(snug_bwg_device::write)
 {
-	if (m_selected)
+	if (m_inDsrArea && m_selected)
 	{
-		if ((offset & m_select_mask)==m_select_value)
+		if (m_lastK)
 		{
-			// 010x xxxx xxxx xxxx
-			if ((offset & 0x1c00)==0x1c00)
+			if (m_rtc_enabled)
 			{
-				// ...1 11xx xxxx xxxx
-				if (m_rtc_enabled)
+				if (m_RTCsel)
 				{
-					if ((offset & 0x03e1)==0x03e0)
-					{
-						// .... ..11 111x xxx0
-						if (!space.debugger_access()) m_clock->write(space, (offset & 0x001e) >> 1, data);
-					}
-					else
-					{
-						m_buffer_ram[(m_ram_page<<10) | (offset & 0x03ff)] = data;
-					}
+					// .... ..11 111x xxx0
+					if (TRACE_RW) logerror("bwg: write RTC: %04x <- %02x\n", m_address & 0xffff, data);
+					if (!space.debugger_access()) m_clock->write(space, (m_address & 0x001e) >> 1, data);
 				}
 				else
 				{
-					if ((offset & 0x03f9)==0x03f8)
-					{
-						// .... ..11 1111 1xx0
-						// Note that the value is inverted again on the board,
-						// so we can drop the inversion
-						if (!space.debugger_access()) wd17xx_w(m_controller, space, (offset >> 1)&0x03, data);
-					}
-					else
-					{
-						m_buffer_ram[(m_ram_page<<10) | (offset & 0x03ff)] = data;
-					}
+					if (TRACE_RW) logerror("bwg: write ram: %04x (page %d) <- %02x\n", m_address & 0xffff, m_ram_page, data);
+					m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
+				}
+			}
+			else
+			{
+				if (m_WDsel)
+				{
+					// .... ..11 1111 1xx0
+					// Note that the value is inverted again on the board,
+					// so we can drop the inversion
+					if (TRACE_RW) logerror("bwg: write FDC: %04x <- %02x\n", m_address & 0xffff, data);
+					if (!space.debugger_access()) wd17xx_w(m_wd1773, space, (m_address >> 1)&0x03, data);
+				}
+				else
+				{
+					if (TRACE_RW) logerror("bwg: write ram: %04x (page %d) <- %02x\n", m_address & 0xffff, m_ram_page, data);
+					m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
 				}
 			}
 		}
@@ -272,6 +349,7 @@ READ8Z_MEMBER(snug_bwg_device::crureadz)
 		}
 		else
 			*value = 0;
+		if (TRACE_CRU) logerror("bwg: Read CRU = %02x\n", *value);
 	}
 }
 
@@ -287,15 +365,15 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 		case 0:
 			/* (De)select the card. Indicated by a LED on the board. */
 			m_selected = (data != 0);
-			if (VERBOSE>4) LOG("bwg: Map DSR = %d\n", m_selected);
+			if (TRACE_CRU) logerror("bwg: Map DSR (bit 0) = %d\n", m_selected);
 			break;
 
 		case 1:
 			/* Activate motor */
 			if (data && !m_strobe_motor)
 			{   /* on rising edge, set motor_running for 4.23s */
+				if (TRACE_CRU) logerror("bwg: trigger motor (bit 1)\n");
 				m_DVENA = ASSERT_LINE;
-				handle_hold();
 				m_motor_on_timer->adjust(attotime::from_msec(4230));
 			}
 			m_strobe_motor = (data != 0);
@@ -307,9 +385,8 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 			// 1: TMS9900 is stopped until IRQ or DRQ are set
 			// OR the motor stops rotating - rotates for 4.23s after write
 			// to CRU bit 1
-			// This is not emulated and could cause the TI99 to lock up
-			m_hold = (data != 0);
-			handle_hold();
+			if (TRACE_CRU) logerror("bwg: arm wait state logic (bit 2) = %d\n", data);
+			m_WAITena = (data != 0);
 			break;
 
 		case 4:
@@ -319,6 +396,7 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 			/* Select drive 0-2 (DSK1-DSK3) (bits 4-6) */
 			/* Select drive 3 (DSK4) (bit 8) */
 			drive = (bit == 8) ? 3 : (bit - 4);     /* drive # (0-3) */
+			if (TRACE_CRU) logerror("bwg: set drive (bit %d) = %d\n", bit, data);
 			drivebit = 1<<drive;
 
 			if (data != 0)
@@ -328,7 +406,7 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 					if (m_DSEL != 0)
 						logerror("bwg: Multiple drives selected, %02x\n", m_DSEL);
 					m_DSEL |= drivebit;
-					wd17xx_set_drive(m_controller, drive);
+					wd17xx_set_drive(m_wd1773, drive);
 				}
 			}
 			else
@@ -338,12 +416,14 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 		case 7:
 			/* Select side of disk (bit 7) */
 			m_SIDE = data;
-			wd17xx_set_side(m_controller, m_SIDE);
+			if (TRACE_CRU) logerror("bwg: set side (bit 7) = %d\n", data);
+			wd17xx_set_side(m_wd1773, m_SIDE);
 			break;
 
 		case 10:
 			/* double density enable (active low) */
-			wd17xx_dden_w(m_controller, (data != 0) ? ASSERT_LINE : CLEAR_LINE);
+			if (TRACE_CRU) logerror("bwg: set double density (bit 10) = %d\n", data);
+			wd17xx_dden_w(m_wd1773, (data != 0) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 11:
@@ -352,15 +432,18 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 				m_rom_page |= 1;
 			else
 				m_rom_page &= 0xfe;  // 11111110
+			if (TRACE_CRU) logerror("bwg: set ROM page (bit 11) = %d, page = %d\n", bit, m_rom_page);
 			break;
 
 		case 13:
 			/* RAM A10 */
 			m_ram_page = data;
+			if (TRACE_CRU) logerror("bwg: set RAM page (bit 13) = %d, page = %d\n", bit, m_ram_page);
 			break;
 
 		case 14:
 			/* Override FDC with RTC (active high) */
+			if (TRACE_CRU) logerror("bwg: turn on RTC (bit 14) = %d\n", data);
 			m_rtc_enabled = (data != 0);
 			break;
 
@@ -370,12 +453,16 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 				m_rom_page |= 2;
 			else
 				m_rom_page &= 0xfd; // 11111101
+			if (TRACE_CRU) logerror("bwg: set ROM page (bit 15) = %d, page = %d\n", bit, m_rom_page);
 			break;
 
 		case 3:
+			if (TRACE_CRU) logerror("bwg: set head load (bit 3) = %d\n", data);
+			break;
 		case 9:
 		case 12:
 			/* Unused (bit 3, 9 & 12) */
+			if (TRACE_CRU) logerror("bwg: set unknown bit %d = %d\n", bit, data);
 			break;
 		}
 	}
@@ -383,17 +470,16 @@ WRITE8_MEMBER(snug_bwg_device::cruwrite)
 
 void snug_bwg_device::device_start(void)
 {
-	if (VERBOSE>5) LOG("bwg: BWG start\n");
+	logerror("bwg: BWG start\n");
 	m_dsrrom = memregion(DSRROM)->base();
 	m_buffer_ram = memregion(BUFFER)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
-	m_controller = subdevice(FDC_TAG);
 	m_cru_base = 0x1100;
 }
 
 void snug_bwg_device::device_reset()
 {
-	if (VERBOSE>5) LOG("bwg: BWG reset\n");
+	logerror("bwg: BWG reset\n");
 
 	if (m_genmod)
 	{
@@ -408,12 +494,14 @@ void snug_bwg_device::device_reset()
 
 	m_strobe_motor = false;
 	m_DVENA = CLEAR_LINE;
+	m_DSEL = 0;
+	m_SIDE = 0;
 	ti99_set_80_track_drives(FALSE);
 	floppy_type_t type = FLOPPY_STANDARD_5_25_DSDD_40;
 	set_all_geometries(type);
-	m_DRQ = false;
-	m_IRQ = false;
-	m_hold = false;
+	m_DRQ = CLEAR_LINE;
+	m_IRQ = CLEAR_LINE;
+	m_WAITena = false;
 	m_rtc_enabled = false;
 	m_selected = false;
 

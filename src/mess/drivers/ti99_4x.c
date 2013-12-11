@@ -381,7 +381,7 @@ static PERIBOX_CONFIG( peribox_conf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, extint),            // INTA
 	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, notconnected),  // INTB
-	DEVCB_DRIVER_LINE_MEMBER(ti99_4x_state, console_ready_pbox), // READY
+	DEVCB_DEVICE_LINE_MEMBER(DATAMUX_TAG, ti99_datamux_device, ready_line), // READY
 	0x70000                                             // Address bus prefix (AMA/AMB/AMC)
 };
 

@@ -52,7 +52,7 @@
     +---+                      +-+     |      | |                   :
       ^                     LS244|     |      | |
       |                          |     +--+---+-++
-      |                          +--------| DMUX |
+      |                          +--------| DMUX |---------------<--: READY
       +--- READY -------------------------+------+
 
          Databus width
@@ -79,8 +79,11 @@ ti99_datamux_device::ti99_datamux_device(const machine_config &mconfig, const ch
 {
 }
 
-#define VERBOSE 1
-#define LOG logerror
+#define TRACE_READY 0
+#define TRACE_ACCESS 0
+#define TRACE_ADDRESS 0
+#define TRACE_WAITCOUNT 0
+#define TRACE_SETUP 0
 
 /***************************************************************************
     DEVICE ACCESSOR FUNCTIONS
@@ -216,7 +219,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 		// Reading the even address now (addr)
 		UINT8 hbyte = 0;
 		read_all(space, m_addr_buf, &hbyte);
-		if (VERBOSE>3) LOG("datamux: read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
+		if (TRACE_ACCESS) logerror("datamux: read even byte from address %04x -> %02x\n",  m_addr_buf, hbyte);
 
 		return ((hbyte<<8) | m_latch) & mem_mask;
 	}
@@ -250,7 +253,7 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 		m_latch = (data >> 8) & 0xff;
 
 		// write odd byte
-		if (VERBOSE>3) LOG("datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
+		if (TRACE_ACCESS) logerror("datamux: write odd byte to address %04x <- %02x\n",  m_addr_buf+1, data & 0xff);
 		write_all(space, m_addr_buf+1, data & 0xff);
 	}
 }
@@ -261,7 +264,7 @@ WRITE16_MEMBER( ti99_datamux_device::write )
 */
 SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
 {
-	if (VERBOSE>6) LOG("datamux: set address %04x\n", offset << 1);
+	if (TRACE_ADDRESS) logerror("datamux: set address %04x\n", offset << 1);
 	// Initialize counter
 	// 1 cycle for loading into the datamux
 	// 2 subsequent wait states (LSB)
@@ -284,7 +287,8 @@ SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
 		// propagate the setaddress operation
 		// First the odd address
 		setaddress_all(space, m_addr_buf+1);
-		m_ready(CLEAR_LINE);
+		m_muxready = CLEAR_LINE;
+		ready_join();
 	}
 	else m_waitcount = 0;
 }
@@ -298,19 +302,28 @@ WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
 	{
-		if (VERBOSE>6) LOG("datamux: wait count %d\n", m_waitcount);
+		if (TRACE_WAITCOUNT) logerror("datamux: wait count %d\n", m_waitcount);
+		if (m_sysready==CLEAR_LINE)
+		{
+			if (TRACE_READY) logerror("datamux: stalled due to external READY=0\n");
+			return;
+		}
 		if (m_read_mode)
 		{
 			// Reading
 			if (state==ASSERT_LINE)
 			{   // raising edge
 				m_waitcount--;
-				if (m_waitcount==0) m_ready(ASSERT_LINE);
+				if (m_waitcount==0)
+				{
+					m_muxready = ASSERT_LINE;
+					ready_join();
+				}
 				if (m_waitcount==2)
 				{
 					// read odd byte
 					read_all(*m_spacep, m_addr_buf+1, &m_latch);
-					if (VERBOSE>3) LOG("datamux: read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
+					if (TRACE_ACCESS) logerror("datamux: read odd byte from address %04x -> %02x\n",  m_addr_buf+1, m_latch);
 					// do the setaddress for the even address
 					setaddress_all(*m_spacep, m_addr_buf);
 				}
@@ -321,7 +334,11 @@ WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
 			if (state==ASSERT_LINE)
 			{   // raising edge
 				m_waitcount--;
-				if (m_waitcount==0) m_ready(ASSERT_LINE);
+				if (m_waitcount==0)
+				{
+					m_muxready = ASSERT_LINE;
+					ready_join();
+				}
 			}
 			else
 			{   // falling edge
@@ -330,7 +347,7 @@ WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
 					// do the setaddress for the even address
 					setaddress_all(*m_spacep, m_addr_buf);
 					// write even byte
-					if (VERBOSE>3) LOG("datamux: write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
+					if (TRACE_ACCESS) logerror("datamux: write even byte to address %04x <- %02x\n",  m_addr_buf, m_latch);
 					write_all(*m_spacep, m_addr_buf, m_latch);
 				}
 			}
@@ -338,10 +355,29 @@ WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
 	}
 }
 
+/*
+    Combine the external (sysready) and the own (muxready) READY states.
+*/
+void ti99_datamux_device::ready_join()
+{
+	m_ready((m_sysready==CLEAR_LINE || m_muxready==CLEAR_LINE)? CLEAR_LINE : ASSERT_LINE);
+}
+
 WRITE_LINE_MEMBER( ti99_datamux_device::dbin_in )
 {
 	m_read_mode = (state==ASSERT_LINE);
-	if (VERBOSE>7) LOG("datamux: data bus in = %d\n", m_read_mode? 1:0 );
+	if (TRACE_ADDRESS) logerror("datamux: data bus in = %d\n", m_read_mode? 1:0 );
+}
+
+WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
+{
+	if (TRACE_READY)
+	{
+		if (state != m_sysready) logerror("datamux: READY line from PBox = %d\n", state);
+	}
+	m_sysready = (line_state)state;
+	// Also propagate to CPU via driver
+	ready_join();
 }
 
 /***************************************************************************
@@ -407,22 +443,25 @@ void ti99_datamux_device::device_reset(void)
 					{
 						attached_device *ad = new attached_device(dev, list[i]);
 						m_devices.append(*ad);
-						if (VERBOSE>8) LOG("datamux: Device %s mounted at index %d.\n", list[i].name, i);
+						if (TRACE_SETUP) logerror("datamux: Device %s mounted at index %d.\n", list[i].name, i);
 					}
 					else
 					{
-						if (VERBOSE>8) LOG("datamux: Device %s not found.\n", list[i].name);
+						if (TRACE_SETUP) logerror("datamux: Device %s not found.\n", list[i].name);
 					}
 				}
 				else
 				{
-					if (VERBOSE>8) LOG("datamux: Device %s not mounted due to configuration setting %s.\n", list[i].name, list[i].setting);
+					if (TRACE_SETUP) logerror("datamux: Device %s not mounted due to configuration setting %s.\n", list[i].name, list[i].setting);
 				}
 			}
 		}
 	}
-	if (VERBOSE>8) LOG("datamux: Device count = %d\n", m_devices.count());
-	m_ready(ASSERT_LINE);
+	if (TRACE_SETUP) logerror("datamux: Device count = %d\n", m_devices.count());
+
+	m_sysready = ASSERT_LINE;
+	m_muxready = ASSERT_LINE;
+	ready_join();
 
 	m_waitcount = 0;
 	m_latch = 0;

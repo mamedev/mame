@@ -22,6 +22,7 @@ extern const device_type PERIBOX_SLOT;
 extern const device_type PERIBOX_EV;
 extern const device_type PERIBOX_SG;
 extern const device_type PERIBOX_GEN;
+extern const device_type PERIBOX_998;
 
 #define DSRROM "dsrrom"
 
@@ -77,7 +78,7 @@ protected:
 	// Next three methods call back the console
 	devcb_resolved_write_line m_console_inta;   // INTA line (Box to console)
 	devcb_resolved_write_line m_console_intb;   // INTB line
-	devcb_resolved_write_line m_console_ready;  // READY line
+	devcb_resolved_write_line m_datamux_ready;  // READY line (to the datamux)
 
 	void set_slot_loaded(int slot, peribox_slot_device* slotdev);
 	peribox_slot_device *m_slot[9];     // for the sake of simplicity we donate the first two positions (0,1)
@@ -130,6 +131,18 @@ class peribox_gen_device : public peribox_device
 {
 public:
 	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+/*
+    Variation for TI-99/8
+*/
+class peribox_998_device : public peribox_device
+{
+public:
+	peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -234,6 +247,10 @@ protected:
 
 #define MCFG_PERIBOX_GEN_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, PERIBOX_GEN, 0) \
+	MCFG_DEVICE_CONFIG( _config )
+
+#define MCFG_PERIBOX_998_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, PERIBOX_998, 0) \
 	MCFG_DEVICE_CONFIG( _config )
 
 #define MCFG_PERIBOX_SLOT_ADD(_tag, _slot_intf) \

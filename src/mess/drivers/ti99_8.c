@@ -1051,7 +1051,7 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_998_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* Sound hardware */
 	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )
@@ -1096,7 +1096,7 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 	MCFG_TI99_GROMPORT_ADD( GROMPORT_TAG, console_cartslot )
 
 	/* Peripheral expansion box */
-	MCFG_PERIBOX_ADD( PERIBOX_TAG, peribox_conf )
+	MCFG_PERIBOX_998_ADD( PERIBOX_TAG, peribox_conf )
 
 	/* Sound hardware */
 	MCFG_TI_SOUND_76496_ADD( TISOUND_TAG, sound_conf )

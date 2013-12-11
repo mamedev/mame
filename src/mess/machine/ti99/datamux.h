@@ -76,6 +76,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
+	DECLARE_WRITE_LINE_MEMBER( ready_line );
 
 protected:
 	/* Constructor */
@@ -101,8 +102,17 @@ private:
 	UINT16 debugger_read(address_space& space, UINT16 addr);
 	void debugger_write(address_space& space, UINT16 addr, UINT16 data);
 
+	// Join own READY and external READY
+	void ready_join();
+
 	// Ready line to the CPU
 	devcb_resolved_write_line m_ready;
+
+	// Own ready state.
+	line_state  m_muxready;
+
+	// Ready state. Needed to control wait state generation via inbound READY
+	line_state  m_sysready;
 
 	/* Address latch (emu). In reality, the address bus remains constant. */
 	UINT16 m_addr_buf;

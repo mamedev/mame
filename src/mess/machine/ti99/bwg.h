@@ -17,6 +17,7 @@
 #include "ti99defs.h"
 #include "imagedev/flopdrv.h"
 #include "machine/mm58274c.h"
+#include "machine/wd17xx.h"
 
 extern const device_type TI99_BWG;
 
@@ -26,6 +27,7 @@ public:
 	snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
 
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
@@ -41,13 +43,13 @@ protected:
 	virtual ioport_constructor device_input_ports() const;
 
 private:
-	void handle_hold(void);
+	void set_ready_line();
 	void set_all_geometries(floppy_type_t type);
 	void set_geometry(device_t *drive, floppy_type_t type);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// Holds the status of the DRQ and IRQ lines.
-	bool            m_DRQ, m_IRQ;
+	line_state      m_DRQ, m_IRQ;
 
 	// DIP switch state
 	int             m_dip1, m_dip2, m_dip34;
@@ -56,8 +58,24 @@ private:
 	int             m_ram_page;  // 0-1
 	int             m_rom_page;  // 0-3
 
-	// When TRUE the CPU is halted while DRQ/IRQ are true.
-	bool            m_hold;
+	// When true, the READY line will be cleared (create wait states) when
+	// waiting for data from the controller.
+	bool            m_WAITena;
+
+	// Address in card area
+	bool            m_inDsrArea;
+
+	// WD selected
+	bool            m_WDsel, m_WDsel0;
+
+	// RTC selected
+	bool            m_RTCsel;
+
+	// last 1K area selected
+	bool            m_lastK;
+
+	// Data register +1 selected
+	bool            m_dataregLB;
 
 	/* Indicates whether the clock is mapped into the address space. */
 	bool            m_rtc_enabled;
@@ -67,6 +85,9 @@ private:
 
 	// Signal DVENA. When TRUE, makes some drive turning.
 	line_state      m_DVENA;
+
+	// Recent address
+	int             m_address;
 
 	/* Indicates which drive has been selected. Values are 0, 1, 2, and 4. */
 	// 000 = no drive
@@ -78,8 +99,8 @@ private:
 	/* Signal SIDSEL. 0 or 1, indicates the selected head. */
 	int             m_SIDE;
 
-	// Link to the FDC1771 controller on the board.
-	device_t*       m_controller;
+	// Link to the WD1773 controller on the board.
+	required_device<wd1773_device>   m_wd1773;
 
 	// Link to the real-time clock on the board.
 	required_device<mm58274c_device> m_clock;
