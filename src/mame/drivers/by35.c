@@ -1353,7 +1353,7 @@ GAME( 1988, uboat65,  0,        by35, by35, by35_state, by35, ROT0, "Nuova Bell 
 
 GAME( 1988, bbbowlin,  0,       by35, by35, by35_state, by35, ROT0, "United","Big Ball Bowling (Bowler)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, monrobwl,  0,       by35, by35, by35_state, by35, ROT0, "Monroe Bowling Co.","Stars & Strikes (Bowler)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1988, mdntmrdr,  0,       by35, by35, by35_state, by35, ROT0, "Bally Midway","Midnight Marauders (Gun game)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1984, mdntmrdr,  0,       by35, by35, by35_state, by35, ROT0, "Bally Midway","Midnight Marauders (Gun game)", GAME_IS_SKELETON_MECHANICAL)
 GAME( 1988, blbeauty,  0,       by35, by35, by35_state, by35, ROT0, "Stern","Black Beauty (Shuffle)", GAME_IS_SKELETON_MECHANICAL)
 
 GAME( 1984, suprbowl,  xsandos, by35, by35, by35_state, by35, ROT0, "Bell Games","Super Bowl", GAME_IS_SKELETON_MECHANICAL)
