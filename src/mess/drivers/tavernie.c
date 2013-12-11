@@ -9,15 +9,17 @@
     This system was described in a French computer magazine.
 
     CPU09 includes 6809, 6821, 6840, 6850, cassette, rs232
-    IVG09 includes 6845, WD1795, another 6821, beeper
+    IVG09 includes 6845, another 6821, beeper
+    IFD09 includes WD1795
 
 ToDo:
-    - FDC
     - Attributes ram
     - Graphics
     - Character rom is not dumped
     - Graphics rom is not dumped
+    - 3x 7611 proms not dumped
     - Fix cassette
+    - Test FDC
     - Need software
 
 List of commands (must be in UPPERCASE):
@@ -55,6 +57,7 @@ Z - more scan lines per row (cursor is bigger)
 #include "machine/keyboard.h"
 #include "machine/serial.h"
 #include "imagedev/cassette.h"
+#include "machine/wd_fdc.h"
 #include "sound/wave.h"
 #include "sound/beep.h"
 #include "tavernie.lh"
@@ -68,6 +71,8 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_cass(*this, "cassette")
 		, m_pia_ivg(*this, "pia_ivg")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
 		, m_beep(*this, "beeper")
 		, m_maincpu(*this, "maincpu")
 	{ }
@@ -79,6 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pa_ivg_w);
 	DECLARE_READ8_MEMBER(pb_ivg_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_WRITE8_MEMBER(ds_w);
 	DECLARE_MACHINE_RESET(cpu09);
 	DECLARE_MACHINE_RESET(ivg09);
 	const UINT8 *m_p_chargen;
@@ -88,6 +94,8 @@ private:
 	UINT8 m_pa;
 	required_device<cassette_image_device> m_cass;
 	optional_device<pia6821_device> m_pia_ivg;
+	optional_device<fd1795_t> m_fdc;
+	optional_device<floppy_connector> m_floppy0;
 	optional_device<beep_device> m_beep;
 	required_device<cpu_device> m_maincpu;
 };
@@ -110,6 +118,8 @@ static ADDRESS_MAP_START(ivg09_mem, AS_PROGRAM, 8, tavernie_state)
 	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia_ivg", pia6821_device, read, write)
 	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("fdc", fd1795_t, read, write)
+	AM_RANGE(0xe080, 0xe080) AM_WRITE(ds_w)
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
 	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
@@ -162,6 +172,27 @@ MACHINE_RESET_MEMBER( tavernie_state, ivg09)
 	m_beep->set_state(1);
 	m_term_data = 0;
 	m_pia_ivg->cb1_w(1);
+}
+
+static SLOT_INTERFACE_START( ifd09_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
+// can support 3 drives
+WRITE8_MEMBER( tavernie_state::ds_w )
+{
+	floppy_image_device *floppy = NULL;
+	if ((data & 3) == 1) floppy = m_floppy0->get_device();
+	//if ((data & 3) == 2) floppy = m_floppy1->get_device();
+	//if ((data & 3) == 3) floppy = m_floppy2->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		floppy->mon_w(0);
+		m_fdc->dden_w(!BIT(data, 2));
+	}
 }
 
 
@@ -376,6 +407,8 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // unknown clock
 	MCFG_PIA6821_ADD("pia_ivg", pia_ivg_intf)
+	MCFG_FD1795x_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -385,16 +418,19 @@ ROM_START( cpu09 )
 ROM_END
 
 ROM_START( ivg09 )
-	ROM_REGION( 0x1000, "roms", 0 )
+	ROM_REGION( 0x19f0, "roms", 0 )
 	ROM_LOAD( "tavbug.bin",   0x0000, 0x1000, CRC(77945cae) SHA1(d89b577bc0b4e15e9a49a849998681bdc6cf5fbe) )
+	// these 2 are not used. Boottav is copied to ram at c100
+	ROM_LOAD_OPTIONAL( "promon.bin",   0x1000, 0x0800, CRC(43256bf2) SHA1(e81acb5b659d50d7b019b97ad5d2a8f129da39f6) )
+	ROM_LOAD_OPTIONAL( "boottav.bin",  0x1800, 0x01f0, CRC(ae1a858d) SHA1(ab2144a00afd5b75c6dcb15c2c3f9d6910a159ae) )
 
 	// charrom is missing, using one from 'c10' for now
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT    COMPANY        FULLNAME   FLAGS */
 COMP( 1982, cpu09,  0,      0,       cpu09,   cpu09,   driver_device,   0,   "C. Tavernier",  "CPU09", GAME_NOT_WORKING )
-COMP( 1983, ivg09,  cpu09,  0,       ivg09,   ivg09,   driver_device,   0,   "C. Tavernier",  "CPU09 with IVG09", GAME_NOT_WORKING )
+COMP( 1983, ivg09,  cpu09,  0,       ivg09,   ivg09,   driver_device,   0,   "C. Tavernier",  "CPU09 with IVG09 and IFD09", GAME_NOT_WORKING )
