@@ -637,9 +637,17 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 /* Fatal Fury Wild Ambition / Buriki One */
 READ32_MEMBER(hng64_state::fight_io_r)
 {
+	/*
+	TODO: reads to i/o but coins doesn't work? Let's put a cheap hack for now
+	*/
+	if(ioport("SYSTEM")->read() & 0x00030000 && m_mcu_type == BURIKI_MCU)
+	{
+		space.write_byte(0xf3ce4, 1);
+	}
+
 	switch (offset*4)
 	{
-		case 0x000: return 0x00000400;
+		case 0x000:	return 0x00000400;
 		case 0x004: return ioport("SYSTEM")->read();
 		case 0x008: return ioport("P1_P2")->read();
 		case 0x600: return m_no_machine_error_code;
@@ -765,7 +773,8 @@ READ32_MEMBER(hng64_state::hng64_dualport_r)
 
 	switch (m_mcu_type)
 	{
-		case FIGHT_MCU:  return fight_io_r(space, offset,0xffffffff);
+		case FIGHT_MCU:
+		case BURIKI_MCU: return fight_io_r(space, offset,0xffffffff);
 		case SHOOT_MCU:  return shoot_io_r(space, offset,0xffffffff);
 		case RACING_MCU: return racing_io_r(space, offset,0xffffffff);
 		case SAMSHO_MCU: return samsho_io_r(space, offset,0xffffffff);
@@ -802,12 +811,10 @@ READ32_MEMBER(hng64_state::hng64_3d_1_r)
 	return m_3d_1[offset];
 }
 
-#ifdef UNUSED_FUNCTION
 WRITE32_MEMBER(hng64_state::hng64_3d_1_w)
 {
-	fatalerror("WRITE32_HANDLER( hng64_3d_1_w )\n");
+	COMBINE_DATA (&m_3d_1[offset]);
 }
-#endif
 
 READ32_MEMBER(hng64_state::hng64_3d_2_r)
 {
@@ -816,7 +823,6 @@ READ32_MEMBER(hng64_state::hng64_3d_2_r)
 
 WRITE32_MEMBER(hng64_state::hng64_3d_2_w)
 {
-	COMBINE_DATA (&m_3d_1[offset]);
 	COMBINE_DATA (&m_3d_2[offset]);
 }
 
@@ -889,7 +895,9 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
 {
 	if(data & 2) // clear current buffer
+	{
 		clear3d();
+	}
 
 //	if(data & 1) // swap buffers
 
@@ -944,7 +952,10 @@ READ32_MEMBER(hng64_state::tcram_r)
 }
 
 /* Some games (namely sams64 after the title screen) tests bit 15 of this to be high,
-   unknown purpose (vblank? related to the display list?). */
+   unknown purpose (vblank? related to the display list?).
+
+   bit 1 needs to be off, otherwise Fatal Fury WA locks up (FIFO full?)
+   */
 READ32_MEMBER(hng64_state::unk_vreg_r)
 {
 	return ++m_unk_vreg_toggle;
@@ -1161,13 +1172,13 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_SHARE("dl")  // 3d Display List
-	AM_RANGE(0x20300200, 0x20300213) AM_WRITE(dl_upload_w)  // 3d Display List Upload
+	AM_RANGE(0x20300200, 0x20300203) AM_WRITE(dl_upload_w)  // 3d Display List Upload
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
 	// 3d?
 	AM_RANGE(0x30000000, 0x3000002f) AM_RAM AM_SHARE("3dregs")
-	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r, hng64_3d_2_w) AM_SHARE("3d_1")  // 3D Display Buffer A
+	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r, hng64_3d_1_w) AM_SHARE("3d_1")  // 3D Display Buffer A
 	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r, hng64_3d_2_w) AM_SHARE("3d_2")  // 3D Display Buffer B
 
 	// Sound
@@ -1629,6 +1640,12 @@ DRIVER_INIT_MEMBER(hng64_state,fatfurwa)
 	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
 	DRIVER_INIT_CALL(hng64_fght);
 	m_mcu_type = FIGHT_MCU;
+}
+
+DRIVER_INIT_MEMBER(hng64_state,buriki)
+{
+	DRIVER_INIT_CALL(hng64_fght);
+	m_mcu_type = BURIKI_MCU;
 }
 
 DRIVER_INIT_MEMBER(hng64_state,ss64)
@@ -2263,4 +2280,4 @@ GAME( 1998, xrally,   hng64,  hng64, hng64, hng64_state,  hng64_race,  ROT0, "SN
 GAME( 1998, bbust2,   hng64,  hng64, bbust2, hng64_state, hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare",            GAME_NOT_WORKING|GAME_NO_SOUND )  /* 004 */
 GAME( 1998, sams64_2, hng64,  hng64, hng64, hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 005 */
 GAME( 1998, fatfurwa, hng64,  hng64, hng64, hng64_state,  fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)",          GAME_NOT_WORKING|GAME_NO_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64, hng64_state,  fatfurwa,    ROT0, "SNK", "Buriki One (rev.B)",                     GAME_NOT_WORKING|GAME_NO_SOUND )  /* 007 */
+GAME( 1999, buriki,   hng64,  hng64, hng64, hng64_state,  buriki,      ROT0, "SNK", "Buriki One (rev.B)",                     GAME_NOT_WORKING|GAME_NO_SOUND )  /* 007 */

@@ -1,9 +1,15 @@
 #include "machine/msm6242.h"
 
-#define FIGHT_MCU  1
-#define SHOOT_MCU  2
-#define RACING_MCU 3
-#define SAMSHO_MCU 4
+enum
+{
+	FIGHT_MCU = 1,
+	SHOOT_MCU,
+	RACING_MCU,
+	SAMSHO_MCU,
+	BURIKI_MCU
+};
+
+
 
 class hng64_state : public driver_device
 {
@@ -140,6 +146,7 @@ public:
 	DECLARE_WRITE32_MEMBER(hng64_dualport_w);
 	DECLARE_READ32_MEMBER(hng64_3d_1_r);
 	DECLARE_READ32_MEMBER(hng64_3d_2_r);
+	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
 	DECLARE_WRITE32_MEMBER(hng64_3d_2_w);
 	DECLARE_WRITE32_MEMBER(dl_w);
 	DECLARE_READ32_MEMBER(dl_r);
@@ -160,7 +167,6 @@ public:
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_even_w);
 	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_odd_w);
 	DECLARE_WRITE32_MEMBER(trap_write);
-	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
 	DECLARE_WRITE32_MEMBER(activate_3d_buffer);
 	DECLARE_READ8_MEMBER(hng64_comm_shared_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_shared_w);
@@ -171,6 +177,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hng64_comm_mmu_w);
 	DECLARE_DRIVER_INIT(hng64_race);
 	DECLARE_DRIVER_INIT(fatfurwa);
+	DECLARE_DRIVER_INIT(buriki);
 	DECLARE_DRIVER_INIT(hng64);
 	DECLARE_DRIVER_INIT(hng64_shoot);
 	DECLARE_DRIVER_INIT(ss64);
