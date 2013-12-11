@@ -209,8 +209,12 @@ public:
 	void screen_eof_hng64(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
 
-	void clear3d();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
+	void clear3d();
 };
 
 /*----------- defined in video/hng64.c -----------*/

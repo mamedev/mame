@@ -748,7 +748,18 @@ READ32_MEMBER(hng64_state::racing_io_r)
 				return 0x000;
 		}
 		case 0x004: return ioport("SYSTEM")->read();
-		case 0x008: return ioport("P1_P2")->read();
+		case 0x008: return ioport("IN0")->read();
+		case 0x014: return ioport("VIEW")->read();
+		case 0x018:
+		{
+			UINT8 handle, acc, brake;
+			handle = ioport("HANDLE")->read() & 0xff;
+			acc = ioport("ACCELERATOR")->read() & 0xff;
+			brake = ioport("BRAKE")->read() & 0xff;
+
+			return (handle<<24) | (acc<<16) | (brake<<8) | (0xff<<0);
+		}
+
 		case 0x600: return m_no_machine_error_code;
 	}
 
@@ -1325,6 +1336,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16, hng64_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("bank2")
+	AM_RANGE(0x10000, 0x1ffff) AM_RAM // tmp, roadedge
 	AM_RANGE(0xf0000, 0xfffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -1407,6 +1419,142 @@ static INPUT_PORTS_START( hng64 )
 	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+
+CUSTOM_INPUT_MEMBER(hng64_state::left_handle_r)
+{
+	return (ioport("HANDLE")->read() == 0);
+}
+
+CUSTOM_INPUT_MEMBER(hng64_state::right_handle_r)
+{
+	return (ioport("HANDLE")->read() == 0xff);
+}
+
+CUSTOM_INPUT_MEMBER(hng64_state::acc_down_r)
+{
+	return (ioport("ACCELERATOR")->read() == 0);
+}
+
+CUSTOM_INPUT_MEMBER(hng64_state::brake_down_r)
+{
+	return (ioport("BRAKE")->read() == 0);
+}
+
+static INPUT_PORTS_START( roadedge )
+	PORT_START("VBLANK")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, left_handle_r, NULL)
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, right_handle_r, NULL)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, acc_down_r, NULL)
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, brake_down_r, NULL)
+
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x010000, 0x000000, "SYSA" )
+	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x010000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x020000, 0x000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x020000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x040000, 0x000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x040000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x080000, 0x000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x080000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x100000, 0x000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x100000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x200000, 0x000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x200000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x400000, 0x000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x400000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x800000, 0x000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x800000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01000000, 0x00000000, "SYSA" )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02000000, 0x00000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04000000, 0x00000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08000000, 0x00000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10000000, 0x00000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20000000, 0x00000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40000000, 0x00000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80000000, 0x00000000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80000000, DEF_STR( On ) )
+
+
+	PORT_START("IN0")
+
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("BGM 1")
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("BGM 2")
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("BGM 3")
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("BGM 4")
+	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_START1 )
+
+	PORT_START("VIEW")
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("View 1")
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("View 2")
+
+	PORT_START("HANDLE")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("Handle")
+
+	PORT_START("ACCELERATOR")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("Accelerator")
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("Brake")
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( bbust2 )
 	PORT_START("VBLANK")
@@ -2274,9 +2422,9 @@ ROM_END
 GAME( 1997, hng64,    0,      hng64, hng64, hng64_state,  hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_state,  hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",        GAME_NOT_WORKING|GAME_NO_SOUND )  /* 001 */
+GAME( 1997, roadedge, hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",        GAME_NOT_WORKING|GAME_NO_SOUND )  /* 001 */
 GAME( 1998, sams64,   hng64,  hng64, hng64, hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64,  hng64, hng64, hng64_state,  hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",         GAME_NOT_WORKING|GAME_NO_SOUND )  /* 003 */
+GAME( 1998, xrally,   hng64,  hng64, roadedge, hng64_state,  hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",         GAME_NOT_WORKING|GAME_NO_SOUND )  /* 003 */
 GAME( 1998, bbust2,   hng64,  hng64, bbust2, hng64_state, hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare",            GAME_NOT_WORKING|GAME_NO_SOUND )  /* 004 */
 GAME( 1998, sams64_2, hng64,  hng64, hng64, hng64_state,  ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 005 */
 GAME( 1998, fatfurwa, hng64,  hng64, hng64, hng64_state,  fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)",          GAME_NOT_WORKING|GAME_NO_SOUND )  /* 006 */

@@ -1521,6 +1521,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	hng64_drawtilemap(screen,bitmap,cliprect, 0);
 
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites.
+	if(!(m_3dregs[0] & 0x1000000))
 	{
 		int x, y;
 
@@ -2633,7 +2634,7 @@ void hng64_state::clear3d()
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *      0 | ---- --x- ---- ---- ---- ---- ---- ---- | Reads in Fatal Fury WA, if on then there isn't a 3d refresh (busy flag?).
- *      0 | ---- ---x ---- ---- ---- ---- ---- ---- | set at POST, probably 3d disable
+ *      0 | ---- ---x ---- ---- ---- ---- ---- ---- | set at POST/service modes, almost likely fb disable
  *      0 | ???? ???? ???? ???? ccc? ???? ???? ???? | framebuffer color base, 0x311800 in Fatal Fury WA, 0x313800 in Buriki One
  *      1 |                                         |
  *      2 | ???? ???? ???? ???? ???? ???? ???? ???? | camera / framebuffer global x/y? Actively used by Samurai Shodown 64 2
