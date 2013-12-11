@@ -316,17 +316,7 @@ extern const mc6845_interface amstrad_plus_mc6845_intf;
 
 
 
-SLOT_INTERFACE_START(cpc_exp_cards)
-	SLOT_INTERFACE("ssa1", CPC_SSA1)
-	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
-	SLOT_INTERFACE("rom", CPC_ROM)
-	SLOT_INTERFACE("multiface2", CPC_MFACE2)
-SLOT_INTERFACE_END
-
-SLOT_INTERFACE_START(cpcplus_exp_cards)
-	SLOT_INTERFACE("ssa1", CPC_SSA1)
-	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
-	SLOT_INTERFACE("rom", CPC_ROM)
-SLOT_INTERFACE_END
+SLOT_INTERFACE_EXTERN(cpc_exp_cards);
+SLOT_INTERFACE_EXTERN(cpcplus_exp_cards);
 
 #endif /* AMSTRAD_H_ */

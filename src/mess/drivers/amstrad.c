@@ -832,6 +832,19 @@ static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gx4000")
 MACHINE_CONFIG_END
 
+SLOT_INTERFACE_START(cpc_exp_cards)
+	SLOT_INTERFACE("ssa1", CPC_SSA1)
+	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
+	SLOT_INTERFACE("rom", CPC_ROM)
+	SLOT_INTERFACE("multiface2", CPC_MFACE2)
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START(cpcplus_exp_cards)
+	SLOT_INTERFACE("ssa1", CPC_SSA1)
+	SLOT_INTERFACE("dkspeech", CPC_DKSPEECH)
+	SLOT_INTERFACE("rom", CPC_ROM)
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	/* Machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
