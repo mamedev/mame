@@ -94,6 +94,7 @@ public:
     ATTR_HOT inline bool is_dynamic() { return m_dynamic.count() > 0; }
 
     double m_accuracy;
+    double m_convergence_factor;
 
 private:
     netlist_net_t::list_t m_nets;
@@ -114,6 +115,7 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
         netlist_param_double_t m_freq;
         netlist_param_double_t m_sync_delay;
         netlist_param_double_t m_accuracy;
+        netlist_param_double_t m_convergence;
 
         netlist_time m_inc;
         netlist_time m_last_step;

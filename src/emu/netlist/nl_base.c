@@ -484,7 +484,8 @@ ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, c
 ATTR_COLD netlist_terminal_t::netlist_terminal_t()
 : netlist_core_terminal_t(TERMINAL, ANALOG)
 , m_Idr(0.0)
-, m_g(NETLIST_GMIN)
+, m_go(NETLIST_GMIN)
+, m_gt(NETLIST_GMIN)
 {
 
 }

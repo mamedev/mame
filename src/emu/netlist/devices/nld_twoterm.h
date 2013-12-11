@@ -76,7 +76,7 @@ public:
 
     ATTR_HOT inline void set(const double G, const double V, const double I)
     {
-        m_P.m_g = m_N.m_g = G;
+        m_P.m_go = m_N.m_go = m_P.m_gt = m_N.m_gt = G;
         m_N.m_Idr = ( -V) * G + I;
         m_P.m_Idr = (  V) * G - I;
     }
@@ -243,7 +243,6 @@ public:
     ATTR_COLD NETLIB_NAME(QBJT_switch)()
     : NETLIB_NAME(QBJT)(_type, BJT_SWITCH), m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0), m_state_on(0) { }
 
-#if 1
     NETLIB_UPDATEI()
     {
         double vE = INPANALOG(m_EV);
@@ -271,7 +270,6 @@ public:
         }
 
     }
-#endif
 
     NETLIB_NAME(R) m_RB;
     NETLIB_NAME(R) m_RC;
@@ -294,5 +292,111 @@ private:
 
 typedef NETLIB_NAME(QBJT_switch)<NETLIB_NAME(Q)::BJT_PNP> NETLIB_NAME(QPNP_switch);
 typedef NETLIB_NAME(QBJT_switch)<NETLIB_NAME(Q)::BJT_NPN> NETLIB_NAME(QNPN_switch);
+
+// ----------------------------------------------------------------------------------------
+// nld_VCCS
+// ----------------------------------------------------------------------------------------
+
+/*
+ *   Voltage controlled current source
+ *
+ *   IP ---+           +------> OP
+ *         |           |
+ *         RI          I
+ *         RI => G =>  I    IOut = (V(IP)-V(IN)) * G
+ *         RI          I
+ *         |           |
+ *   IN ---+           +------< ON
+ *
+ *   G=1 ==> 1V ==> 1A
+ *
+ *   RI = 1 / NETLIST_GMIN
+ *
+ */
+
+#define NETDEV_VCCS(_name)                                                         \
+        NET_REGISTER_DEV(VCCS, _name)                                              \
+
+//NETDEV_PARAMI(_name, model, _model)
+
+class NETLIB_NAME(VCCS) : public netlist_device_t
+{
+public:
+    ATTR_COLD NETLIB_NAME(VCCS)()
+    : netlist_device_t(VCCS) {  }
+    ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily)
+    : netlist_device_t(afamily) {  }
+
+protected:
+    ATTR_COLD virtual void start();
+    ATTR_COLD virtual void update_param();
+    ATTR_HOT ATTR_ALIGN void update();
+
+    ATTR_COLD void configure(const double Gfac, const double GI);
+
+    netlist_terminal_t m_OP;
+    netlist_terminal_t m_ON;
+
+    netlist_terminal_t m_IP;
+    netlist_terminal_t m_IN;
+
+    netlist_terminal_t m_OP1;
+    netlist_terminal_t m_ON1;
+
+    netlist_param_double_t m_G;
+};
+
+// ----------------------------------------------------------------------------------------
+// nld_VCVS
+// ----------------------------------------------------------------------------------------
+
+/*
+ *   Voltage controlled voltage source
+ *
+ *   Parameters:
+ *     G        Default: 1
+ *     RO       Default: 1  (would be typically 50 for an op-amp
+ *
+ *   IP ---+           +--+---- OP
+ *         |           |  |
+ *         RI          I  RO
+ *         RI => G =>  I  RO              V(OP) - V(ON) = (V(IP)-V(IN)) * G
+ *         RI          I  RO
+ *         |           |  |
+ *   IN ---+           +--+---- ON
+ *
+ *   G=1 ==> 1V ==> 1V
+ *
+ *   RI = 1 / NETLIST_GMIN
+ *
+ *   Internal GI = G / RO
+ *
+ */
+
+#define NETDEV_VCVS(_name)                                                         \
+        NET_REGISTER_DEV(VCVS, _name)                                              \
+
+//NETDEV_PARAMI(_name, model, _model)
+
+
+class NETLIB_NAME(VCVS) : public NETLIB_NAME(VCCS)
+{
+public:
+    ATTR_COLD NETLIB_NAME(VCVS)()
+    : NETLIB_NAME(VCCS)(VCVS) { }
+
+protected:
+    ATTR_COLD virtual void start();
+    ATTR_COLD virtual void update_param();
+    //ATTR_HOT ATTR_ALIGN void update();
+
+    netlist_terminal_t m_OP2;
+    netlist_terminal_t m_ON2;
+
+    double m_mult;
+
+    netlist_param_double_t m_RO;
+};
+
 
 #endif /* NLD_TWOTERM_H_ */

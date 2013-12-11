@@ -103,6 +103,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets)
                                 m_steps.add(&p->netdev());
                             break;
                         case netlist_device_t::DIODE:
+                        //case netlist_device_t::VCVS:
                         //case netlist_device_t::BJT_SWITCH:
                             if (!m_dynamic.contains(&p->netdev()))
                                 m_dynamic.add(&p->netdev());
@@ -153,6 +154,7 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
         netlist_net_t *net = pn->object();
 
         double gtot = 0;
+        double gabs = 0;
         double iIdr = 0;
         const netlist_net_t::terminal_list_t &terms = net->m_terms;
 #if 1
@@ -161,17 +163,19 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
             case 1:
                 {
                     const netlist_terminal_t *pt = terms.first()->object();
-                    gtot = pt->m_g;
-                    iIdr = pt->m_Idr + pt->m_g * pt->m_otherterm->net().Q_Analog();
+                    gtot = pt->m_gt;
+                    gabs = fabs(pt->m_go);
+                    iIdr = pt->m_Idr + pt->m_go * pt->m_otherterm->net().Q_Analog();
                 }
                 break;
             case 2:
                 {
                     const netlist_terminal_t *pt1 = terms.first()->object();
                     const netlist_terminal_t *pt2 = terms.item(1)->object();
-                    gtot = pt1->m_g + pt2->m_g;
-                    iIdr = pt1->m_Idr + pt1->m_g * pt1->m_otherterm->net().Q_Analog()
-                         + pt2->m_Idr + pt2->m_g * pt2->m_otherterm->net().Q_Analog();
+                    gtot = pt1->m_gt + pt2->m_gt;
+                    gabs = fabs(pt1->m_go) + fabs(pt2->m_go);
+                    iIdr = pt1->m_Idr + pt1->m_go * pt1->m_otherterm->net().Q_Analog()
+                         + pt2->m_Idr + pt2->m_go * pt2->m_otherterm->net().Q_Analog();
                 }
                 break;
             case 3:
@@ -179,18 +183,20 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
                     const netlist_terminal_t *pt1 = terms.first()->object();
                     const netlist_terminal_t *pt2 = terms.item(1)->object();
                     const netlist_terminal_t *pt3 = terms.item(2)->object();
-                    gtot = pt1->m_g + pt2->m_g + pt3->m_g;
-                    iIdr = pt1->m_Idr + pt1->m_g * pt1->m_otherterm->net().Q_Analog()
-                         + pt2->m_Idr + pt2->m_g * pt2->m_otherterm->net().Q_Analog()
-                         + pt3->m_Idr + pt3->m_g * pt3->m_otherterm->net().Q_Analog();
+                    gtot = pt1->m_gt + pt2->m_gt + pt3->m_gt;
+                    gabs = fabs(pt1->m_go) + fabs(pt2->m_go) + fabs(pt3->m_go);
+                    iIdr = pt1->m_Idr + pt1->m_go * pt1->m_otherterm->net().Q_Analog()
+                         + pt2->m_Idr + pt2->m_go * pt2->m_otherterm->net().Q_Analog()
+                         + pt3->m_Idr + pt3->m_go * pt3->m_otherterm->net().Q_Analog();
                 }
                 break;
             default:
                 for (netlist_net_t::terminal_list_t::entry_t *e = terms.first(); e != NULL; e = terms.next(e))
                 {
                     netlist_terminal_t *pt = e->object();
-                    gtot += pt->m_g;
-                    iIdr += pt->m_Idr + pt->m_g * pt->m_otherterm->net().Q_Analog();
+                    gtot += pt->m_gt;
+                    gabs += fabs(pt->m_go);
+                    iIdr += pt->m_Idr + pt->m_go * pt->m_otherterm->net().Q_Analog();
                 }
                 break;
         }
@@ -198,11 +204,18 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
         for (netlist_net_t::terminal_list_t::entry_t *e = terms.first(); e != NULL; e = terms.next(e))
         {
             netlist_terminal_t *pt = e->object();
-            gtot += pt->m_g;
-            iIdr += pt->m_Idr + pt->m_g * pt->m_otherterm->net().Q_Analog();
+            gtot += pt->m_gt;
+            gabs += fabs(pt->m_go);
+            iIdr += pt->m_Idr + pt->m_go * pt->m_otherterm->net().Q_Analog();
         }
 #endif
-        double new_val = iIdr / gtot;
+        double new_val;
+        gabs *= m_convergence_factor;
+        if (gabs > gtot)
+            new_val = (net->m_cur.Analog * gabs + iIdr) / (gtot + gabs);
+        else
+            new_val = iIdr / gtot;
+
         if (fabs(new_val - net->m_cur.Analog) > m_accuracy)
             resched = true;
         net->m_cur.Analog = net->m_new.Analog = new_val;
@@ -261,6 +274,7 @@ NETLIB_START(solver)
     m_inc = netlist_time::from_hz(m_freq.Value());
 
     register_param("ACCURACY", m_accuracy, 1e-3);
+    register_param("CONVERG", m_convergence, 0.3);
 
     register_link_internal(m_fb_sync, m_Q_sync, netlist_input_t::STATE_INP_ACTIVE);
     register_link_internal(m_fb_step, m_Q_step, netlist_input_t::STATE_INP_ACTIVE);
@@ -329,6 +343,7 @@ NETLIB_FUNC_VOID(solver, post_start, ())
     {
         netlist_matrix_solver_t *ms = new netlist_matrix_solver_t;
         ms->m_accuracy = m_accuracy.Value();
+        ms->m_convergence_factor = m_convergence.Value();
         ms->setup(groups[i]);
         m_mat_solvers.add(ms);
         printf("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr());
@@ -367,8 +382,8 @@ NETLIB_UPDATE(solver)
         } while ((resched && (resched_cnt < 5)) || (resched_cnt <= 1));
         global_resched = global_resched || resched;
     }
-    if (global_resched)
-        printf("rescheduled\n");
+    //if (global_resched)
+    //    printf("rescheduled\n");
     if (global_resched)
     {
         schedule();

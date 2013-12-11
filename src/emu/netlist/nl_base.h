@@ -270,6 +270,8 @@ public:
         CAPACITOR = 5,   // Capacitor
         DIODE     = 6,   // Diode
         BJT_SWITCH = 7,  // BJT(Switch)
+        VCVS       = 8,  // Voltage controlled voltage source
+        VCCS       = 9,  // Voltage controlled voltage source
     };
 
 	ATTR_COLD netlist_object_t(const type_t atype, const family_t afamily);
@@ -362,7 +364,29 @@ public:
     ATTR_COLD netlist_terminal_t();
 
     double m_Idr; // drive current
-    double m_g; // conductance
+    double m_go;  // conductance for Voltage from other term
+    double m_gt;  // conductance for total conductance
+
+    ATTR_HOT inline void set(const double G)
+    {
+        m_Idr = 0;
+        m_go = m_gt = G;
+    }
+
+    ATTR_HOT inline void set(const double GO, const double GT)
+    {
+        m_Idr = 0;
+        m_go = GO;
+        m_gt = GT;
+    }
+
+    ATTR_HOT inline void set(const double GO, const double GT, const double I)
+    {
+        m_Idr = I;
+        m_go = GO;
+        m_gt = GT;
+    }
+
 
     netlist_terminal_t *m_otherterm;
 };
@@ -834,7 +858,7 @@ public:
 
 	ATTR_COLD virtual void init(netlist_setup_t &setup, const pstring &name);
 
-	ATTR_COLD const netlist_setup_t *setup() const { return m_setup; }
+	ATTR_COLD netlist_setup_t *setup() const { return m_setup; }
 
 	ATTR_COLD bool variable_input_count() { return m_variable_input_count; }
 

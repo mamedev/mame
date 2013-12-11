@@ -521,7 +521,6 @@ static NETLIST_START(pong_schematics)
     //NETDEV_LOG(log1, C1.1)
 #endif
 
-
 #define tt(_n) \
     NETDEV_R(R ## _n, 1000) \
 	NETDEV_D(D ## _n) \
@@ -602,7 +601,122 @@ static NETLIST_START(pong_schematics)
     //NETDEV_LOG(logC, Q.C)
 #endif
 
+#if 0
+    NETDEV_VCVS(VV)
+    NETDEV_R(R1, 1000)
+    NETDEV_R(R2, 10000)
 
+    NET_C(V5, R1.1)
+    NET_C(R1.2, VV.IN)
+    NET_C(R2.1, VV.OP)
+    NET_C(R2.2, VV.IN)
+    NET_C(VV.ON, GND)
+    NET_C(VV.IP, GND)
+    NETDEV_LOG(logX, VV.OP)
+
+#endif
+
+#if 0
+    NETDEV_VCCS(VV)
+    NETDEV_PARAM(VV.G, 100000)  // typical OP-AMP amplification
+    NETDEV_R(R1, 1000)
+    NETDEV_R(R2, 1)
+    NETDEV_R(R3, 10000)
+
+    NET_C(4V, R1.1)
+    NET_C(R1.2, VV.IN)
+    NET_C(R2.1, VV.OP)
+    NET_C(R3.1, VV.IN)
+    NET_C(R3.2, VV.OP)
+    NET_C(R2.2, GND)
+    NET_C(VV.ON, GND)
+    NET_C(VV.IP, GND)
+    //NETDEV_LOG(logX, VV.OP)
+    //NETDEV_LOG(logY, 4V)
+
+#endif
+
+#if 0
+    NETDEV_VCVS(VV)
+    NETDEV_PARAM(VV.G, 100000)  // typical OP-AMP amplification
+    NETDEV_PARAM(VV.RO, 50)  // typical OP-AMP amplification
+    NETDEV_R(R1, 1000)
+    NETDEV_R(R3, 10000) // ==> 10x amplification (inverting)
+
+    NET_C(4V, R1.1)
+    NET_C(R1.2, VV.IN)
+    NET_C(R3.1, VV.IN)
+    NET_C(R3.2, VV.OP)
+    NET_C(VV.ON, GND)
+    NET_C(VV.IP, GND)
+    NETDEV_LOG(logX, VV.OP)
+    NETDEV_LOG(logY, 4V)
+
+#endif
+
+#if 0
+    // Impedance converter with resistor
+    NETDEV_VCVS(VV)
+    NETDEV_PARAM(VV.G, 100000)  // typical OP-AMP amplification
+    NETDEV_PARAM(VV.RO, 50)  // typical OP-AMP amplification
+    NETDEV_R(R3, 10000)
+
+    NET_C(4V, VV.IP)
+    NET_C(R3.1, VV.IN)
+    NET_C(R3.2, VV.OP)
+    NET_C(VV.ON, GND)
+    NETDEV_LOG(logX, VV.OP)
+    NETDEV_LOG(logY, 4V)
+
+#endif
+
+#if 0
+    // Impedance converter without resistor
+    NETDEV_VCVS(VV)
+    NETDEV_PARAM(VV.G, 100000)  // typical OP-AMP amplification
+    NETDEV_PARAM(VV.RO, 50)  // typical OP-AMP amplification
+
+    NET_C(4V, VV.IP)
+    NET_C(VV.IN, VV.OP)
+    NET_C(VV.ON, GND)
+    NETDEV_LOG(logX, VV.OP)
+    NETDEV_LOG(logY, 4V)
+
+#endif
+
+#if 0
+    /* Impedance converter current source opamp model from
+     *
+     * http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
+     *
+     * Bandwidth 10Mhz
+     *
+     */
+    NETDEV_VCCS(G1)
+    NETDEV_PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
+    NETDEV_R(RP1, 1000)
+    NETDEV_C(CP1, 1.59e-6)   // <== change to 1.59e-3 for 10Khz bandwidth
+    NETDEV_VCVS(EBUF)
+    NETDEV_PARAM(EBUF.RO, 50)
+    NETDEV_PARAM(EBUF.G, 1)
+
+    NET_C(G1.IP, 4V)
+    NET_C(G1.IN, EBUF.OP)
+    NET_C(EBUF.ON, GND)
+
+    NET_C(G1.ON, GND)
+    NET_C(RP1.2, GND)
+    NET_C(CP1.2, GND)
+    NET_C(EBUF.IN, GND)
+
+    NET_C(RP1.1, G1.OP)
+    NET_C(CP1.1, RP1.1)
+    NET_C(EBUF.IP, RP1.1)
+
+    NETDEV_LOG(logX, EBUF.OP)
+    NETDEV_LOG(logY, 4V)
+
+#endif
 
 NETLIST_END
 
