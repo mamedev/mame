@@ -12,10 +12,11 @@
     IVG09 includes 6845, WD1795, another 6821, beeper
 
 ToDo:
-    - Almost everything
-    - Scrolling can cause the screen to go blank (use Z command to fix)
-    - There's supposed to be a device at 2000-2003
+    - FDC
+    - Attributes ram
+    - Graphics
     - Character rom is not dumped
+    - Graphics rom is not dumped
     - Fix cassette
     - Need software
 
@@ -55,6 +56,7 @@ Z - more scan lines per row (cursor is bigger)
 #include "machine/serial.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "sound/beep.h"
 #include "tavernie.lh"
 
 
@@ -65,6 +67,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_cass(*this, "cassette")
+		, m_pia_ivg(*this, "pia_ivg")
+		, m_beep(*this, "beeper")
 		, m_maincpu(*this, "maincpu")
 	{ }
 
@@ -72,15 +76,19 @@ public:
 	DECLARE_READ8_MEMBER(pa_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_READ8_MEMBER(keyin_r);
+	DECLARE_WRITE8_MEMBER(pa_ivg_w);
+	DECLARE_READ8_MEMBER(pb_ivg_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_MACHINE_RESET(cpu09);
+	DECLARE_MACHINE_RESET(ivg09);
 	const UINT8 *m_p_chargen;
 	optional_shared_ptr<UINT8> m_p_videoram;
 private:
 	UINT8 m_term_data;
 	UINT8 m_pa;
-	virtual void machine_reset();
 	required_device<cassette_image_device> m_cass;
+	optional_device<pia6821_device> m_pia_ivg;
+	optional_device<beep_device> m_beep;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -99,8 +107,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(ivg09_mem, AS_PROGRAM, 8, tavernie_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("videoram")
-	//AM_RANGE(0x2000, 0x2003) 6821 on ivg09
-	AM_RANGE(0x2002, 0x2003) AM_READ(keyin_r)
+	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia_ivg", pia6821_device, read, write)
 	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -143,10 +150,18 @@ static INPUT_PORTS_START( ivg09 )
 	PORT_DIPSETTING(    0x60, "IVG09 (mc6845)" )
 INPUT_PORTS_END
 
-void tavernie_state::machine_reset()
+MACHINE_RESET_MEMBER( tavernie_state, cpu09)
+{
+	m_term_data = 0;
+}
+
+MACHINE_RESET_MEMBER( tavernie_state, ivg09)
 {
 	m_p_chargen = memregion("chargen")->base();
+	m_beep->set_frequency(950);    /* guess */
+	m_beep->set_state(1);
 	m_term_data = 0;
+	m_pia_ivg->cb1_w(1);
 }
 
 
@@ -162,7 +177,7 @@ static MC6845_UPDATE_ROW( update_row )
 	{
 		UINT8 inv=0;
 		if (x == cursor_x) inv=0xff;
-		mem = (ma + x) & 0x7ff;
+		mem = (ma + x) & 0xfff;
 		if (ra > 7)
 			gfx = inv;  // some blank spacing lines
 		else
@@ -233,7 +248,7 @@ static const pia6821_interface mc6821_intf =
 {
 	DEVCB_DRIVER_MEMBER(tavernie_state, pa_r),     /* port A input */
 	DEVCB_NULL,     /* port B input */
-	DEVCB_DRIVER_LINE_MEMBER(tavernie_state, ca1_r),     /* CA1 input - cassin */
+	DEVCB_DRIVER_LINE_MEMBER(tavernie_state, ca1_r),     /* CA1 input */
 	DEVCB_NULL,     /* CB1 input */
 	DEVCB_NULL,     /* CA2 input */
 	DEVCB_NULL,     /* CB2 input */
@@ -243,6 +258,34 @@ static const pia6821_interface mc6821_intf =
 	DEVCB_NULL,     /* CB2 output */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
+};
+
+READ8_MEMBER( tavernie_state::pb_ivg_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
+WRITE8_MEMBER( tavernie_state::pa_ivg_w )
+{
+// bits 0-3 are attribute bits
+}
+
+static const pia6821_interface pia_ivg_intf =
+{
+	DEVCB_NULL,     /* port A input */
+	DEVCB_DRIVER_MEMBER(tavernie_state, pb_ivg_r),     /* port B input */
+	DEVCB_NULL,     /* CA1 input */
+	DEVCB_NULL,     /* CB1 input */
+	DEVCB_NULL,     /* CA2 input */
+	DEVCB_NULL,     /* CB2 input */
+	DEVCB_DRIVER_MEMBER(tavernie_state, pa_ivg_w),     /* port A output */
+	DEVCB_NULL,     /* port B output */
+	DEVCB_NULL,     /* CA2 output */
+	DEVCB_DEVICE_LINE_MEMBER("beeper", beep_device, set_state),     /* CB2 output */
+	DEVCB_NULL,    /* IRQA output */
+	DEVCB_NULL     /* IRQB output */
 };
 
 // all i/o lines connect to the 40-pin expansion connector
@@ -277,19 +320,11 @@ static const rs232_port_interface rs232_intf =
 	DEVCB_NULL
 };
 
-READ8_MEMBER( tavernie_state::keyin_r )
-{
-	if (offset)
-		return (m_term_data) ? 0x80 : 0;
-
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
 WRITE8_MEMBER( tavernie_state::kbd_put )
 {
 	m_term_data = data;
+	m_pia_ivg->cb1_w(0);
+	m_pia_ivg->cb1_w(1);
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
@@ -301,6 +336,7 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(cpu09_mem)
+	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -319,6 +355,7 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ivg09_mem)
+	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, ivg09)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -331,9 +368,14 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 	MCFG_DEFAULT_LAYOUT(layout_tavernie)
 
+	/* sound hardware */
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
 	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // unknown clock
+	MCFG_PIA6821_ADD("pia_ivg", pia_ivg_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
