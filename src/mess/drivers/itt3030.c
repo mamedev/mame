@@ -5,9 +5,8 @@
 	
 	ToDo:
 	- Check Beeper
-	- hook up keyboard
+	- finish hooking up keyboard
 	- According to the manual, the keyboard is based on a 8278 ... it's nowhere to be found. The keyboard / video card has a 8741 instead of which a ROM dump exists
-	- memory map
 	- serial port
 	- daisy chain
 	- ...
@@ -216,6 +215,22 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_beep(*this, "beeper")
+		, m_keyrow1(*this, "ROW1")
+		, m_keyrow2(*this, "ROW2")
+		, m_keyrow3(*this, "ROW3")
+		, m_keyrow4(*this, "ROW4")
+		, m_keyrow5(*this, "ROW5")
+		, m_keyrow6(*this, "ROW6")
+		, m_keyrow7(*this, "ROW7")
+		, m_keyrow8(*this, "ROW8")
+		, m_keyrow9(*this, "ROW9")
+		, m_keyrow10(*this, "ROW10")
+		, m_keyrow11(*this, "ROW11")
+		, m_keyrow12(*this, "ROW12")
+		, m_keyrow13(*this, "ROW13")
+		, m_keyrow14(*this, "ROW14")
+		, m_keyrow15(*this, "ROW15")
+		, m_keyrow16(*this, "ROW16")
 		, m_vram(*this, "vram")
 	{ }
 
@@ -229,6 +244,9 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<beep_device> m_beep;
+
+	required_ioport m_keyrow1, m_keyrow2, m_keyrow3, m_keyrow4, m_keyrow5, m_keyrow6, m_keyrow7, m_keyrow8, m_keyrow9;
+	required_ioport m_keyrow10, m_keyrow11, m_keyrow12, m_keyrow13, m_keyrow14, m_keyrow15, m_keyrow16;
 
 	// shared pointers
 	required_shared_ptr<UINT8> m_vram;
@@ -259,7 +277,7 @@ public:
 private:
 	UINT8 m_unk;
 	UINT8 m_bank;
-	UINT8 m_kbdrow, m_kbdcol, m_kbdclk;
+	UINT8 m_kbdrow, m_kbdcol, m_kbdclk, m_kbdread;
 };
 
 void itt3030_state::video_start()
@@ -323,13 +341,11 @@ WRITE8_MEMBER(itt3030_state::bankh_w)
 
 UINT32 itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	for(int y = 0; y < 24; y++ )
 	{
 		for(int x = 0; x < 80; x++ )
 		{
-			UINT8 code = m_vram[0x3000 + x + y*128];
+			UINT8 code = m_vram[x + y*128];
 			drawgfx_opaque(bitmap, cliprect, machine().gfx[0],  code , 0, 0,0, x*8,y*16);
 		}
 	}
@@ -349,7 +365,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lower48_map, AS_PROGRAM, 8, itt3030_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(bankl_r, bankl_w)	// pages 0-7
-//  AM_RANGE(0x00000, 0x7ffff) AM_DEVREADWRITE("mainram", ram_device, read, write)	// should work in theory, but compiler blows up spectacularly?
 	AM_RANGE(0x80000, 0x807ff) AM_ROM AM_REGION("maincpu", 0)   // begin "page 8"
 	AM_RANGE(0x80800, 0x80fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x81000, 0x810ff) AM_RAM AM_MIRROR(0x100)	// only 256 bytes, but ROM also clears 11xx?
@@ -374,13 +389,25 @@ READ8_MEMBER(itt3030_state::kbd_fifo_r)
 
 READ8_MEMBER(itt3030_state::kbd_matrix_r)
 {
-	return 0;
+	return m_kbdread;
 }
 
 WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 {
+	ioport_port *ports[16] = { m_keyrow1, m_keyrow2, m_keyrow3, m_keyrow4, m_keyrow5, m_keyrow6, m_keyrow7, m_keyrow8, m_keyrow9,
+							   m_keyrow10, m_keyrow11, m_keyrow12, m_keyrow13, m_keyrow14, m_keyrow15, m_keyrow16 };
+	int col_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
+	int tmp_read;
+
 	m_kbdrow = data & 0xf;
 	m_kbdcol = (data >> 4) & 0x7;
+
+	if ((data & 0x80) && (!m_kbdclk))
+	{
+		tmp_read = ports[m_kbdrow]->read() & col_masks[m_kbdcol];
+		m_kbdread = (tmp_read != 0) ? 1 : 0;
+	}
+
 	m_kbdclk = (data & 0x80) ? 1 : 0;
 }
 
@@ -388,26 +415,114 @@ WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 // Port 1 goes to the keyboard matrix.  
 // bits 0-3 select matrix rows, bits 4-6 choose column to read, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 // T0 is the key matrix return
-// Port 2 bit 2 is IRQ (in or out?)
+// Port 2 bit 2 is shown as "IRQ" on the schematics, and the code does a lot with it as well (debug?)
 static ADDRESS_MAP_START( kbdmcu_io, AS_IO, 8, itt3030_state )
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(kbd_matrix_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(kbd_matrix_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_NOP AM_WRITENOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( itt3030 )
-	PORT_START("COL0")
+	PORT_START("ROW1")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
-	PORT_START("COL1")
+	PORT_START("ROW2")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
+
+	PORT_START("ROW3")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')	// actually UK pound symbol
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
+
+	PORT_START("ROW4")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+
+	PORT_START("ROW5")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
+
+	PORT_START("ROW6")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+
+	PORT_START("ROW7")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+
+	PORT_START("ROW8")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7) PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+
+	PORT_START("ROW9")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
+
+	PORT_START("ROW10")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_F9) 
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
+
+	PORT_START("ROW11")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_F10) 
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('@') PORT_CHAR('?')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('<') PORT_CHAR('>')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR('[') PORT_CHAR('{')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('`')
+
+	PORT_START("ROW12")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_F11) PORT_CHAR(27)                                    
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('/') PORT_CHAR('\\')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
+
+	PORT_START("ROW13")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(R)") PORT_CODE(KEYCODE_F12) PORT_CHAR('=')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('~')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_CHAR('^')	// PC doesn't have 3 keys to the right of L, so we sub DEL for the 3rd one
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+
+	PORT_START("ROW14")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(CL)") PORT_CODE(KEYCODE_F13) PORT_CHAR(4)	// produces control-D always
+	PORT_BIT(0x001e, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("ROW15")
+	PORT_BIT(0x001f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("ROW16")
+	PORT_BIT(0x001f, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -429,12 +544,23 @@ GFXDECODE_END
 
 void itt3030_state::machine_start()
 {
+	save_item(NAME(m_unk));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_kbdrow));
+	save_item(NAME(m_kbdcol));
+	save_item(NAME(m_kbdclk));
+	save_item(NAME(m_kbdread));
+
+	m_kbdclk = 0;	// must be initialized here b/c mcs48_reset() causes write of 0xff to all ports
 }
 
 void itt3030_state::machine_reset()
 {
 	m_bank = 1;
 	m_48kbank->set_bank(8);
+	m_kbdread = 1;
+	m_kbdrow = m_kbdcol = 0;
+	m_kbdclk = 1;
 }
 
 FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
