@@ -981,6 +981,7 @@ static const mapper8_list_entry mapper_devices[] =
 	// Physical (need to pack this in here as well to keep config simple)
 	// but these lines will be put into a separate list
 	{ DRAMNAME,         PHYSIC, STOP, 0x000000, 0xff0000, 0x000000  },  // 000000-00ffff 64 KiB DRAM
+	{ PCODENAME,        PHYSIC, STOP, 0xf00000, 0xffc000, 0x000000  },  // f00000-f03fff P-Code ROM
 	{ MAINBOARD8_TAG,   PHYSIC, CONT, 0xff4000, 0xffe000, 0x000000  },  // ff4000-ff5fff Internal DSR
 	{ GROMPORT_TAG,     PHYSIC, STOP, 0xff6000, 0xffe000, 0x000000  },  // ff6000-ff7fff Cartridge ROM space
 	{ GROMPORT_TAG,     PHYSIC, STOP, 0xff8000, 0xffe000, 0x000000  },  // ff8000-ff9fff Cartridge ROM space
@@ -1138,6 +1139,16 @@ ROM_START(ti99_8)
 	// Physical memory space (mapped): ROM1
 	ROM_REGION(0x8000, ROM1_TAG, 0)
 	ROM_LOAD("u25_rom1.bin", 0x0000, 0x8000, CRC(b574461a) SHA1(42c6aed44802cfabdd26b565d6e5ddfcd689f11e))
+
+	// Physical memory space (mapped): P-Code ROM
+	// This circuit is only available in later versions of the console and seems
+	// to be picky-backed on ROM1.
+	// To make things worse, the decoding logic of the custom chips do not show
+	// the required select line for this ROM on the available schematics, so
+	// they seem to be from the earlier version. The location in the address
+	// space was determined by ROM disassembly.
+	ROM_REGION(0x8000, PCODEROM_TAG, 0)
+	ROM_LOAD("u25a_pas.bin", 0x0000, 0x4000, CRC(d7ed6dd6) SHA1(32212ce6426ceccbff73d342d4a3ef699c0ae1e4))
 
 	// System GROMs. 3 chips @ f830
 	// The schematics do not enumerate the circuits but only talk about

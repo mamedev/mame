@@ -14,6 +14,10 @@
 
     Note: The TI-99/8's internal codename was "Armadillo"
 
+==============================
+    Mapper (codename "Amigo")
+==============================
+
     Initial setting of mapper (as defined in the power-up routine, TI-99/4A mode)
 
     0   00ff0000 -> Unmapped; logical address 0000...0fff = ROM0
@@ -33,93 +37,159 @@
     E   00006800 -> DRAM; e000 = 006800, efff = 0077ff
     F   00007800 -> DRAM; f000 = 007800, ffff = 0087ff
 
-    Informations taken from
-    [1] ARMADILLO PRODUCT SPECIFICATIONS
-    [2] TI-99/8 Graphics Programming Language interpreter
-
     Format of map table entry (not emulated)
 
-    * bit 0: WTPROT: page is write protected if 1
-    * bit 1: XPROT: page is execute protected if 1
-    * bit 2: RDPROT: page is read protected if 1
-    * bit 3: reserved, value is ignored
-    * bits 4-7: reserved, always forced to 0
-    * bits 8-23: page base address in 24-bit virtual address space
+    +------+------+------+------+---+---+---+---------+----------+---------+
+    | WProt| XProt| RProt|  *   | 0 | 0 | 0 |  Upper  |   High   |   Low   |
+    +------+------+------+------+---+---+---+---------+----------+---------+
 
-    Format of mapper control register:
-    * bit 0-4: unused???
-    * bit 5-6: map file to load/save (0 for file 0, 1 for file 1, etc.)
-    * bit 7: 0 -> load map file from RAM, 1 -> save map file to RAM
+    WProt: Write protection if set to 1
+    XProt: Execute protection if set to 1
+    RProt: Read protection if set to 1
 
-    Format of mapper status register (cleared by read):
-    * bit 0: WPE - Write-Protect Error
-    * bit 1: XCE - eXeCute Error
-    * bit 2: RPE - Read-Protect Error
-    * bits 3-7: unused???
+    When a protection violation occurs, the tms9901 INT1* pin is pulled low
+    (active).  The pin remains low until the mapper status register is read.
 
-    Memory error interrupts are enabled by setting WTPROT/XPROT/RDPROT.  When
-    an error occurs, the tms9901 INT1* pin is pulled low (active).  The pin
-    remains low until the mapper status register is read.
+    Address handling
+    ----------------
+    Physical address is (Upper * 2^16) + (High * 2^8) + Low
 
-24-bit address map:
-    * >000000->00ffff: console RAM
-    * >010000->feffff: expansion?
-    * >ff0000->ff0fff: empty???
-    * >ff1000->ff3fff: unused???
-    * >ff4000->ff5fff: DSR space
-    * >ff6000->ff7fff: cartridge space
-    * >ff8000->ff9fff(???): >4000 ROM (normally enabled with a write to CRU >2700)
-    * >ffa000->ffbfff(?): >2000 ROM
-    * >ffc000->ffdfff(?): >6000 ROM
+    The mapper calculates the actual physical address by looking up the
+    table entry from the first four bits of the logical address and then
+    *adding* the remaining 12 bits of the logical address on the map value.
+
+    The value 0xff0000 is used to indicate a non-mapped area.
+
+    Mapper control register
+    -----------------------
+    The mapper control register is used to initiate a map load/save operation.
+
+    +---+---+---+---+---+---+---+---+
+    | 0 | 0 | 0 | 0 | Map File  | RW|
+    +---+---+---+---+---+---+---+---+
+
+    The map file is a number from 0-7 indicating the set of map values for the
+    operation, which means the location in SRAM where the next 64 values are
+    loaded from or stored into.
+
+    RW = 1: load from SRAM into mapper
+    RW = 0: store from mapper into SRAM
+
+    When read, the mapper register returns the violation flags:
+    +------+------+------+---+---+---+---+---+
+    | WProt| XProt| RProt| 0 | 0 | 0 | 0 | 0 |
+    +------+------+------+---+---+---+---+---+
+
+    Logical address space (LAS)
+    ===========================
+    The LAS is the address space as seen by the TMS 9995 CPU. It is 64 KiB large.
+    The LAS can be configured in two ways:
+    - the native (99/8) mode
+    - and the compatibility mode (99/4A)
+
+    Both modes are selected by CRU bit 20 on base 0000 (named "CRUS").
+
+    The console starts up in compatibility mode.
+
+    The compatibility mode organizes the LAS in a similar way as the TI-99/4A.
+    This means that machine language programs should run with no or only minor
+    changes. In particular, game cartridges work without problems.
+
+    The native mode rearranges the address space and puts memory-mapped devices
+    to other positions.
+
+    TI-99/4A compatibility mode (CRUS=1)
+    ------------------------------------
+    0000-1fff: 2 KiB ROM0
+    2000-7fff: Free area
+    8000-87ff: 2 KiB SRAM
+      8000-81ff: mapper files (8 files with 16*4 bytes each)
+      8200-82ff: Free RAM
+      8300-83ff: Scratch-pad RAM as in the 99/4A
+      8400-840f: Sound chip
+    8800-880f: VDP read port (data, status)
+    8810-881f: Mapper access port
+    8820-8bff: Free area
+    8c00-8c0f: VDP write port (data, address)
+    8c10-8fff: Free area
+    9000-900f: Speech synthesizer read (on-board)
+    9010-93ff: Free area
+    9400-940f: Speech synthesizer write (on-board)
+    9410-97ff: Free area
+    9800-980f: System GROM read (data, address)
+    9810-9bff: Free area
+    9c00-9c0f: System GROM write (data, address)
+    9c10-fffb: Free area
+    fffc-ffff: NMI vector
+
+    TI-99/8 native mode (CRUS=0)
+    ----------------------------
+    0000-efff: Free area
+    f000-f7ff: 2 KiB SRAM
+      f000-f1ff: mapper files (8 files with 16*4 bytes each)
+      f200-f7ff: Free RAM
+    f800-f80f: Sound chip
+    f810-f81f: VDP read (data, status) and write (data, address)
+    f820-f82f: Speech synthesizer read/write
+    f830-f83f: System GROM read/write
+    f840-f86f: Free area
+    f870-f87f: Mapper access port
+    f880-fffb: Free area
+    fffc-ffff: NMI vector
+
+    Note that ROM0 is not visible in the native mode.
+
+    If CRU bit 21 (PTGEN*) is set to 0, Pascal GROMs appear in the LAS in either
+    mode. It is highly recommended to use native mode when turning on these
+    GROMs, because the area where they appear may be occupied by a program in
+    99/4A mode.
+
+    Pascal and Text-to-speech GROM enabled (PTGEN*=0)
+    -------------------------------------------------
+    f840-f84f: Text-to-speech GROM read/write
+    f850-f85f: P-Code library #1 GROM read/write
+    f860-f86f: P-Code library #2 GROM read/write
+
+    Physical address space (PAS)
+    ============================
+    The PAS is 24 bits wide and accessed via the custom mapper chip nicknamed
+    "Amigo". The mapper exchanges map definitions with SRAM (see LAS). That
+    means, a map can be prepared in SRAM, and for activating it, the mapper
+    is accessed on its port, telling it to load or save a map.
+
+    000000-00ffff: 64 KiB console DRAM
+    010000-efffff: undefined
+    f00000-f03fff: P-Code ROM (not mentioned in [1])
+    f04000-feffff: undefined
+    ff0000       : unmapped (code for mapper)
+    ff0001-ff3fff: undefined
+    ff4000-ff5fff: DSR ROM in Peripheral Box, Hexbus DSR (CRU 1700) or additional ROM (CRU 2700)
+    ff6000-ff9fff: Cartridge ROM space
+    ffa000-ffdfff: 16 KiB ROM1
+    ffe000-ffe00f: Interrupt level sense
+    ffe010-ffffff: undefined
 
 
-CRU map:
-    Since the tms9995 supports full 15-bit CRU addresses, the >1000->17ff
-    (>2000->2fff) range was assigned to support up to 16 extra expansion slot.
-    The good thing with using >1000->17ff is the fact that older expansion
-    cards that only decode 12 address bits will think that addresses
-    >1000->17ff refer to internal TI99 peripherals (>000->7ff range), which
-    suppresses any risk of bus contention.
-    * >0000->001f (>0000->003e): tms9901
-      - P4: 1 -> MMD (Memory Mapped Devices?) at >8000, ROM enabled
-      - P5: 1 -> no P-CODE GROMs
-    * >0800->17ff (>1000->2ffe): Peripheral CRU space
-    * >1380->13ff (>2700->27fe): Internal DSR, with two output bits:
-      - >2700: Internal DSR select (parts of Basic and various utilities)
-      - >2702: SBO -> hardware reset
+    CRU map (I/O address space)
+    ===========================
+    0000-003e: TMS9901 system interface (see ti99_8.c)
+    1700-17fe: Hexbus
+    2000-26fe: Future external devices
+    2700-27fe: Additional ROM ("internal DSR")
+    2702: System reset (when set to 1)
+    2800-3ffe: Future external devices
+    4000-fffe: Future external devices
 
-
-Memory map (TMS9901 P4 == 1):
-    When TMS9901 P4 output is set, locations >8000->9fff are ignored by mapper.
-    * >8000->83ff: SRAM (>8000->80ff is used by the mapper DMA controller
-      to hold four map files) (r/w)
-    * >8400: sound port (w)
-    * >8410->87ff: SRAM (r/w)
-    * >8800: VDP data read port (r)
-    * >8802: VDP status read port (r)
-    * >8810: memory mapper status and control registers (r/w)
-    * >8c00: VDP data write port (w)
-    * >8c02: VDP address and register write port (w)
-    * >9000: speech synthesizer read port (r)
-    * >9400: speech synthesizer write port (w)
-    * >9800 GPL data read port (r)
-    * >9802 GPL address read port (r)
-    * >9c00 GPL data write port -- unused (w)
-    * >9c02 GPL address write port (w)
-
-
-Memory map (TMS9901 P5 == 0):
-    When TMS9901 P5 output is cleared, locations >f840->f8ff(?) are ignored by
-    mapper.
-    * >f840: data port for P-code grom library 0 (r?)
-    * >f850: data port for P-code grom library 1 (r?)
-    * >f860: data port for P-code grom library 2 (r?)
-    * >f842: address port for P-code grom library 0 (r/w?)
-    * >f852: address port for P-code grom library 1 (r/w?)
-    * >f862: address port for P-code grom library 2 (r/w?)
+    The TMS9995 offers the full 15-bit CRU address space. Devices designed for
+    the TI-99/4A should only be accessed in the area 1000-1ffe. They will (by
+    design) incompletely decode the CRU address and be mirrored in the higher areas.
 
     Michael Zapf, October 2010
     February 2012: Rewritten as class
+
+    Informations taken from
+    [1] ARMADILLO PRODUCT SPECIFICATIONS
+    [2] TI-99/8 Graphics Programming Language interpreter
 
 ***************************************************************************/
 
@@ -524,6 +594,10 @@ void mainboard8_device::access_physical_r( address_space& space, offs_t pas_addr
 				*value = m_rom1[0x2000 | (pas_address & 0x1fff)];
 				if (TRACE_MEM) LOG("mainboard_998: (ROM)  %06x -> %02x\n", pas_address, *value);
 				break;
+			case MAP8_PCODE:
+				*value = m_pcode[pas_address & 0x3fff];
+				if (TRACE_MEM) LOG("mainboard_998: (PCDOE) %06x -> %02x\n", pas_address, *value);
+				break;
 			case MAP8_INTS:
 				// Interrupt sense
 				LOG("mainboard_998: ILSENSE not implemented.\n");
@@ -561,6 +635,9 @@ void mainboard8_device::access_physical_w( address_space& space, offs_t pas_addr
 			case MAP8_ROM1A0:
 			case MAP8_ROM1C0:
 				if (TRACE_MEM) LOG("mainboard_998: (ROM1)  %06x <- %02x (ignored)\n", pas_address, data);
+				break;
+			case MAP8_PCODE:
+				if (TRACE_MEM) LOG("mainboard_998: (PCODE)  %06x <- %02x (ignored)\n", pas_address, data);
 				break;
 			case MAP8_INTS:
 				// Interrupt sense
@@ -609,7 +686,7 @@ void mainboard8_device::device_start()
 	LOG("ti99_8: Starting mapper\n");
 
 	// String values of the pseudo constants, used in the configuration.
-	const char *const pseudodev[6] = { SRAMNAME, ROM0NAME, ROM1A0NAME, ROM1C0NAME, DRAMNAME, INTSNAME };
+	const char *const pseudodev[7] = { SRAMNAME, ROM0NAME, ROM1A0NAME, ROM1C0NAME, DRAMNAME, PCODENAME, INTSNAME };
 
 	const mapper8_config *conf = reinterpret_cast<const mapper8_config *>(static_config());
 
@@ -620,6 +697,7 @@ void mainboard8_device::device_start()
 	m_dram = machine().root_device().memregion(DRAM_TAG)->base();
 	m_rom0  = machine().root_device().memregion(ROM0_TAG)->base();
 	m_rom1  = machine().root_device().memregion(ROM1_TAG)->base();
+	m_pcode  = machine().root_device().memregion(PCODEROM_TAG)->base();
 
 	// Clear the lists
 	m_logcomp.reset();
@@ -641,7 +719,7 @@ void mainboard8_device::device_start()
 				device_t *dev = NULL;
 				mapper8_device_kind kind = MAP8_UNDEF;
 
-				for (int j=1; (j < 7) && (kind == MAP8_UNDEF); j++)
+				for (int j=1; (j < 8) && (kind == MAP8_UNDEF); j++)
 				{
 					// Pseudo devices are enumerated as 1 ... 6 (see MAP8_SRAM etc.)
 					if (strcmp(entry[i].name, pseudodev[j-1])==0) kind = (mapper8_device_kind)j;

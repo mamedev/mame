@@ -42,6 +42,7 @@
 #define SPEECH_TAG      "speech"
 #define ROM0_TAG        "rom0"
 #define ROM1_TAG        "rom1"
+#define PCODEROM_TAG    "pcode"
 
 // Geneve
 #define GKEYBOARD_TAG   "gkeyboard"

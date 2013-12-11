@@ -37,6 +37,7 @@ extern const device_type OSO;
 #define ROM1C0NAME "ROM1C"
 #define INTSNAME "INTS"
 #define DRAMNAME "DRAM"
+#define PCODENAME "PCODE"
 
 #define SRAM_SIZE 2048
 #define DRAM_SIZE 65536
@@ -50,6 +51,7 @@ enum mapper8_device_kind
 	MAP8_ROM1A0,
 	MAP8_ROM1C0,
 	MAP8_DRAM,
+	MAP8_PCODE,
 	MAP8_INTS,
 	MAP8_DEV        // device by name
 };
@@ -205,6 +207,9 @@ private:
 
 	// ROM area of the system. Directly connected to the physical address decoder.
 	UINT8   *m_rom1;
+
+	// P-Code ROM area of the system. Directly connected to the physical address decoder.
+	UINT8   *m_pcode;
 
 	// Custom chips
 	required_device<ti998_oso_device> m_oso;
