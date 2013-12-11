@@ -16,6 +16,7 @@
 #define __TIFDC__
 
 #include "ti99defs.h"
+#include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 
 extern const device_type TI99_FDC;
@@ -26,6 +27,7 @@ public:
 	ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
 
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
@@ -41,22 +43,30 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	void handle_hold(void);
+	void set_ready_line();
 	void set_all_geometries(floppy_type_t type);
 	void set_geometry(device_t *drive, floppy_type_t type);
 
+	// Recent address
+	int             m_address;
 
 	// Holds the status of the DRQ and IRQ lines.
-	bool        m_DRQ, m_IRQ;
+	line_state  m_DRQ, m_IRQ;
 
-	// When TRUE, keeps DVENA high.
-	bool        m_strobe_motor;
+	// Needed for triggering the motor monoflop
+	UINT8       m_lastval;
 
 	// Signal DVENA. When TRUE, makes some drive turning.
 	line_state  m_DVENA;
 
 	// When TRUE the CPU is halted while DRQ/IRQ are true.
-	bool        m_hold;
+	bool        m_WAITena;
+
+	// WD chip selected
+	bool        m_WDsel;
+
+	// Set when address is in card area
+	bool        m_inDsrArea;
 
 	// Indicates which drive has been selected. Values are 0, 1, 2, and 4.
 	// 000 = no drive
@@ -72,7 +82,7 @@ private:
 	emu_timer*  m_motor_on_timer;
 
 	// Link to the FDC1771 controller on the board.
-	device_t*   m_controller;
+	required_device<fd1771_device>   m_fd1771;
 
 	// DSR ROM
 	UINT8*      m_dsrrom;

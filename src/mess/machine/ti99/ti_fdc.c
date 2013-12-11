@@ -15,14 +15,33 @@
 #include "emu.h"
 #include "peribox.h"
 #include "ti_fdc.h"
-#include "machine/wd17xx.h"
 #include "formats/ti99_dsk.h"
 
-#define LOG logerror
-#define VERBOSE 1
+// ----------------------------------
+// Flags for debugging
 
-#define fdc_IRQ 1
-#define fdc_DRQ 2
+// Show read and write accesses
+#define TRACE_RW 0
+
+// Show CRU bit accesses
+#define TRACE_CRU 0
+
+// Show ready line activity
+#define TRACE_READY 0
+
+// Show detailed signal activity
+#define TRACE_SIGNALS 0
+
+// Show sector data
+#define TRACE_DATA 0
+
+// Show address bus operations
+#define TRACE_ADDRESS 0
+
+// Show address bus operations
+#define TRACE_MOTOR 0
+
+// ----------------------------------
 
 #define TI_FDC_TAG "ti_dssd_controller"
 
@@ -39,9 +58,8 @@ const wd17xx_interface ti_wd17xx_interface =
 };
 
 ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__)
-{
-}
+			: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__),
+			m_fd1771(*this, FDC_TAG) { }
 
 /*
     callback called at the end of DVENA pulse
@@ -49,48 +67,85 @@ ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, dev
 void ti_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_DVENA = CLEAR_LINE;
-	handle_hold();
+	if (TRACE_MOTOR) logerror("tifdc: Motor off\n");
+	set_ready_line();
+}
+
+/*
+    Operate the wait state logic.
+*/
+void ti_fdc_device::set_ready_line()
+{
+	// This is the wait state logic
+	if (TRACE_SIGNALS) logerror("tifdc: address=%04x, DRQ=%d, INTRQ=%d, MOTOR=%d\n", m_address & 0xffff, m_DRQ, m_IRQ, m_DVENA);
+	line_state nready = (m_WDsel &&             // Are we accessing 5ffx?
+			m_WAITena &&                        // and the wait state generation is active (SBO 2)
+			(m_DRQ==CLEAR_LINE) &&              // and we are waiting for a byte
+			(m_IRQ==CLEAR_LINE) &&              // and there is no interrupt yet
+			(m_DVENA==ASSERT_LINE)              // and the motor is turning?
+			)? ASSERT_LINE : CLEAR_LINE;        // In that case, clear READY and thus trigger wait states
+
+	if (TRACE_READY) if (nready==ASSERT_LINE) logerror("tifdc: READY line = %d\n", (nready==CLEAR_LINE)? 1:0);
+	m_slot->set_ready((nready==CLEAR_LINE)? ASSERT_LINE : CLEAR_LINE);
+}
+
+SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
+{
+	// Selection login in the PAL and some circuits on the board
+
+	// Is the card being selected?
+	m_address = offset;
+	m_inDsrArea = ((m_address & m_select_mask)==m_select_value);
+
+	if (!m_inDsrArea) return;
+
+	if (TRACE_ADDRESS) logerror("tifdc: set address = %04x\n", offset & 0xffff);
+
+	// Is the WD chip on the card being selected?
+	m_WDsel = m_inDsrArea && ((m_address & 0x1ff0)==0x1ff0);
+
+	// Clear or assert the outgoing READY line
+	set_ready_line();
 }
 
 READ8Z_MEMBER(ti_fdc_device::readz)
 {
-	if (m_selected)
+	if (m_inDsrArea && m_selected)
 	{
-		if ((offset & m_select_mask)==m_select_value)
-		{
-			// only use the even addresses from 1ff0 to 1ff6.
-			// Note that data is inverted.
-			// 0101 1111 1111 0xx0
-			UINT8 reply = 0;
+		// only use the even addresses from 1ff0 to 1ff6.
+		// Note that data is inverted.
+		// 0101 1111 1111 0xx0
+		UINT8 reply = 0;
 
-			if ((offset & 0x1ff9)==0x1ff0)
+		if (m_WDsel && ((m_address & 1)==0))
+		{
+			if (!space.debugger_access()) reply = wd17xx_r(m_fd1771, space, (offset >> 1)&0x03);
+			if (TRACE_DATA)
 			{
-				if (!space.debugger_access()) reply = wd17xx_r(m_controller, space, (offset >> 1)&0x03);
+				if ((m_address & 0xffff)==0x5ff6) logerror("%02x ", ~reply & 0xff);
+				else logerror("\n%04x: %02x", m_address&0xffff, ~reply & 0xff);
 			}
-			else
-			{
-				reply = m_dsrrom[offset & 0x1fff];
-			}
-			*value = reply;
-			if (VERBOSE>5) LOG("ti_fdc: %04x -> %02x\n", offset & 0xffff, *value);
 		}
+		else
+		{
+			reply = m_dsrrom[m_address & 0x1fff];
+		}
+		*value = reply;
+		if (TRACE_RW) logerror("ti_fdc: %04x -> %02x\n", offset & 0xffff, *value);
 	}
 }
 
 WRITE8_MEMBER(ti_fdc_device::write)
 {
-	if (m_selected)
+	if (m_inDsrArea && m_selected)
 	{
-		if ((offset & m_select_mask)==m_select_value)
+		if (TRACE_RW) logerror("ti_fdc: %04x <- %02x\n", offset & 0xffff, ~data & 0xff);
+		// only use the even addresses from 1ff8 to 1ffe.
+		// Note that data is inverted.
+		// 0101 1111 1111 1xx0
+		if (m_WDsel && ((m_address & 9)==8))
 		{
-			if (VERBOSE>5) LOG("ti_fdc: %04x <- %02x\n", offset & 0xffff, data);
-			// only use the even addresses from 1ff8 to 1ffe.
-			// Note that data is inverted.
-			// 0101 1111 1111 1xx0
-			if ((offset & 0x1ff9)==0x1ff8)
-			{
-				if (!space.debugger_access()) wd17xx_w(m_controller, space, (offset >> 1)&0x03, data);
-			}
+			if (!space.debugger_access()) wd17xx_w(m_fd1771, space, (offset >> 1)&0x03, data);
 		}
 	}
 }
@@ -121,6 +176,7 @@ READ8Z_MEMBER(ti_fdc_device::crureadz)
 			if (m_SIDSEL) reply |= 0x80;
 		}
 		*value = reply;
+		if (TRACE_CRU) logerror("tifdc: Read CRU = %02x\n", *value);
 	}
 }
 
@@ -136,17 +192,19 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 		case 0:
 			/* (De)select the card. Indicated by a LED on the board. */
 			m_selected = (data!=0);
-			if (VERBOSE>4) LOG("ti_fdc: Map DSR = %d\n", m_selected);
+			if (TRACE_CRU) logerror("tifdc: Map DSR (bit 0) = %d\n", m_selected);
 			break;
 		case 1:
 			/* Activate motor */
-			if (data && !m_strobe_motor)
+			if (data==1 && m_lastval==0)
 			{   /* on rising edge, set motor_running for 4.23s */
+				if (TRACE_CRU) logerror("tifdc: trigger motor (bit 1)\n");
 				m_DVENA = ASSERT_LINE;
-				handle_hold();
+				if (TRACE_MOTOR) logerror("tifdc: motor on\n");
+				set_ready_line();
 				m_motor_on_timer->adjust(attotime::from_msec(4230));
 			}
-			m_strobe_motor = (data!=0);
+			m_lastval = data;
 			break;
 
 		case 2:
@@ -155,13 +213,13 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 			// 1: TMS9900 is stopped until IRQ or DRQ are set
 			// OR the motor stops rotating - rotates for 4.23s after write
 			// to CRU bit 1
-			// This is not emulated and could cause the TI99 to lock up
-			m_hold = (data != 0);
-			handle_hold();
+			m_WAITena = (data != 0);
+			if (TRACE_CRU) logerror("tifdc: arm wait state logic (bit 2) = %d\n", data);
 			break;
 
 		case 3:
 			/* Load disk heads (HLT pin) (bit 3). Not implemented. */
+			if (TRACE_CRU) logerror("tifdc: set head load (bit 3) = %d\n", data);
 			break;
 
 		case 4:
@@ -169,17 +227,17 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 		case 6:
 			/* Select drive X (bits 4-6) */
 			drive = bit-4;                  /* drive # (0-2) */
+			if (TRACE_CRU) logerror("tifdc: set drive (bit %d) = %d\n", bit, data);
 			drivebit = 1<<drive;
 
-			if (data)
+			if (data != 0)
 			{
-				if ((m_DSEL & drivebit)!=0)         /* select drive */
+				if ((m_DSEL & drivebit) == 0)         /* select drive */
 				{
 					if (m_DSEL != 0)
-						LOG("ti_fdc: Multiple drives selected, %02x\n", m_DSEL);
+						logerror("tifdc: Multiple drives selected, %02x\n", m_DSEL);
 					m_DSEL |= drivebit;
-					wd17xx_set_drive(m_controller, drive);
-					/*wd17xx_set_side(DSKside);*/
+					wd17xx_set_drive(m_fd1771, drive);
 				}
 			}
 			else
@@ -189,32 +247,11 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 		case 7:
 			/* Select side of disk (bit 7) */
 			m_SIDSEL = data;
-			wd17xx_set_side(m_controller, data);
+			if (TRACE_CRU) logerror("tifdc: set side (bit 7) = %d\n", data);
+			wd17xx_set_side(m_fd1771, data);
 			break;
 		}
 	}
-}
-
-/*
-    Call this when the state of DSKhold or DRQ/IRQ or DVENA change
-
-    Emulation is faulty because the CPU is actually stopped in the midst of
-    instruction, at the end of the memory access
-
-    TODO: This has to be replaced by the proper READY handling that is already
-    prepared here. (Requires READY handling by the CPU.)
-*/
-void ti_fdc_device::handle_hold()
-{
-	line_state state;
-
-	if (m_hold && !m_DRQ && !m_IRQ && (m_DVENA==ASSERT_LINE))
-		state = ASSERT_LINE;
-	else
-		state = CLEAR_LINE;
-
-	m_slot->set_ready((state==CLEAR_LINE)? ASSERT_LINE : CLEAR_LINE);
-//  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state);
 }
 
 /*
@@ -243,40 +280,37 @@ void ti_fdc_device::set_all_geometries(floppy_type_t type)
 */
 WRITE_LINE_MEMBER( ti_fdc_device::intrq_w )
 {
-	if (VERBOSE>8) LOG("ti_fdc: set irq = %02x\n", state);
-	m_IRQ = (state==ASSERT_LINE);
+	if (TRACE_SIGNALS) logerror("ti_fdc: set irq = %d\n", state);
+	m_IRQ = (line_state)state;
 	// Note that INTB is actually not used in the TI-99 family. But the
 	// controller asserts the line nevertheless, probably intended for
 	// use in another planned TI system
 	m_slot->set_intb(state);
-
-	handle_hold();
+	set_ready_line();
 }
 
 WRITE_LINE_MEMBER( ti_fdc_device::drq_w )
 {
-	if (VERBOSE>8) LOG("ti_fdc: set drq = %02x\n", state);
-	m_DRQ = (state == ASSERT_LINE);
-	handle_hold();
+	if (TRACE_SIGNALS) logerror("ti_fdc: set drq = %d\n", state);
+	m_DRQ = (line_state)state;
+	set_ready_line();
 }
 
 void ti_fdc_device::device_start(void)
 {
-	if (VERBOSE>5) LOG("ti_fdc: TI FDC start\n");
+	logerror("ti_fdc: TI FDC start\n");
 	m_dsrrom = memregion(DSRROM)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
-	m_controller = subdevice(FDC_TAG);
-
 	m_cru_base = 0x1100;
 }
 
 void ti_fdc_device::device_reset(void)
 {
-	if (VERBOSE>5) LOG("ti_fdc: TI FDC reset\n");
+	logerror("ti_fdc: TI FDC reset\n");
 	m_DSEL = 0;
 	m_SIDSEL = 0;
 	m_DVENA = CLEAR_LINE;
-	m_strobe_motor = false;
+	m_lastval = 0;
 	if (m_genmod)
 	{
 		m_select_mask = 0x1fe000;
@@ -287,9 +321,9 @@ void ti_fdc_device::device_reset(void)
 		m_select_mask = 0x7e000;
 		m_select_value = 0x74000;
 	}
-	m_DRQ = false;
-	m_IRQ = false;
-	m_hold = false;
+	m_DRQ = CLEAR_LINE;
+	m_IRQ = CLEAR_LINE;
+	m_WAITena = false;
 	m_selected = false;
 
 	ti99_set_80_track_drives(FALSE);
