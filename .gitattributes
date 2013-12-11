@@ -7658,6 +7658,7 @@ src/mess/layout/supercon.lay svneol=native#text/plain
 src/mess/layout/svision.lay svneol=native#text/plain
 src/mess/layout/svmu.lay svneol=native#text/plain
 src/mess/layout/sym1.lay svneol=native#text/plain
+src/mess/layout/tavernie.lay svneol=native#text/plain
 src/mess/layout/tec1.lay svneol=native#text/plain
 src/mess/layout/tk80.lay svneol=native#text/plain
 src/mess/layout/tm990189.lay svneol=native#text/plain

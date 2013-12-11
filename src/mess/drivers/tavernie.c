@@ -55,6 +55,7 @@ Z - more scan lines per row (cursor is bigger)
 #include "machine/serial.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "tavernie.lh"
 
 
 class tavernie_state : public driver_device
@@ -74,7 +75,7 @@ public:
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	const UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
+	optional_shared_ptr<UINT8> m_p_videoram;
 private:
 	UINT8 m_term_data;
 	UINT8 m_pa;
@@ -84,13 +85,9 @@ private:
 };
 
 
-static ADDRESS_MAP_START(tavernie_mem, AS_PROGRAM, 8, tavernie_state)
+static ADDRESS_MAP_START(cpu09_mem, AS_PROGRAM, 8, tavernie_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("videoram")
-	//AM_RANGE(0x2000, 0x2003) 6821 on ivg09
-	AM_RANGE(0x2002, 0x2003) AM_READ(keyin_r)
-	//AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	//AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x1000, 0x1fff) AM_NOP
 	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
 	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
@@ -99,12 +96,24 @@ static ADDRESS_MAP_START(tavernie_mem, AS_PROGRAM, 8, tavernie_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tavernie_io, AS_IO, 8, tavernie_state)
+static ADDRESS_MAP_START(ivg09_mem, AS_PROGRAM, 8, tavernie_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("videoram")
+	//AM_RANGE(0x2000, 0x2003) 6821 on ivg09
+	AM_RANGE(0x2002, 0x2003) AM_READ(keyin_r)
+	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0xeb00, 0xeb03) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0xeb04, 0xeb04) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
+	AM_RANGE(0xeb05, 0xeb05) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
+	AM_RANGE(0xeb08, 0xeb0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
+	AM_RANGE(0xec00, 0xefff) AM_RAM // 1Kx8 RAM MK4118
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
+
 /* Input ports */
-static INPUT_PORTS_START( tavernie )
+static INPUT_PORTS_START( cpu09 )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "IRQ PTM") PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR(Off))
@@ -119,13 +128,28 @@ static INPUT_PORTS_START( tavernie )
 	PORT_DIPSETTING(    0x60, "IVG09 (mc6845)" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ivg09 )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "IRQ PTM") PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "IRQ ACIA") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x60, 0x60, "Terminal") PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, "110 baud" )
+	PORT_DIPSETTING(    0x20, "300 baud" )
+	PORT_DIPSETTING(    0x40, "1200 baud" )
+	PORT_DIPSETTING(    0x60, "IVG09 (mc6845)" )
+INPUT_PORTS_END
+
 void tavernie_state::machine_reset()
 {
 	m_p_chargen = memregion("chargen")->base();
 	m_term_data = 0;
 }
 
-#if 0
+
 static MC6845_UPDATE_ROW( update_row )
 {
 	tavernie_state *state = device->machine().driver_data<tavernie_state>();
@@ -172,7 +196,7 @@ static MC6845_INTERFACE( mc6845_intf )
 	DEVCB_NULL,         /* VSYNC callback */
 	NULL                /* update address callback */
 };
-#endif
+
 
 READ8_MEMBER( tavernie_state::pa_r )
 {
@@ -273,21 +297,10 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 	DEVCB_DRIVER_MEMBER(tavernie_state, kbd_put)
 };
 
-static MACHINE_CONFIG_START( tavernie, tavernie_state )
+static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(tavernie_mem)
-	MCFG_CPU_IO_MAP(tavernie_io)
-
-	/* video hardware */
-	//MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_REFRESH_RATE(50)
-	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	//MCFG_SCREEN_SIZE(80*8, 25*10)
-	//MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
-	//MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	//MCFG_PALETTE_LENGTH(2)
-	//MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_CPU_PROGRAM_MAP(cpu09_mem)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -295,17 +308,41 @@ static MACHINE_CONFIG_START( tavernie, tavernie_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
 	MCFG_PIA6821_ADD("pia", mc6821_intf)
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)
-	//MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // unknown clock
 	MCFG_ACIA6850_ADD("acia", mc6850_intf)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ivg09_mem)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(80*8, 25*10)
+	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_DEFAULT_LAYOUT(layout_tavernie)
+
+	/* Devices */
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // unknown clock
+MACHINE_CONFIG_END
+
 /* ROM definition */
-ROM_START( tavernie )
+ROM_START( cpu09 )
+	ROM_REGION( 0x1000, "roms", 0 )
+	ROM_LOAD( "tavbug.bin",   0x0000, 0x1000, CRC(77945cae) SHA1(d89b577bc0b4e15e9a49a849998681bdc6cf5fbe) )
+ROM_END
+
+ROM_START( ivg09 )
 	ROM_REGION( 0x1000, "roms", 0 )
 	ROM_LOAD( "tavbug.bin",   0x0000, 0x1000, CRC(77945cae) SHA1(d89b577bc0b4e15e9a49a849998681bdc6cf5fbe) )
 
@@ -316,5 +353,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT   MACHINE     INPUT     CLASS          INIT    COMPANY        FULLNAME   FLAGS */
-COMP( 1982, tavernie,  0,      0,       tavernie,   tavernie, driver_device,   0,   "C. Tavernier",  "CPU09", GAME_IS_SKELETON )
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT    COMPANY        FULLNAME   FLAGS */
+COMP( 1982, cpu09,  0,      0,       cpu09,   cpu09,   driver_device,   0,   "C. Tavernier",  "CPU09", GAME_NOT_WORKING )
+COMP( 1983, ivg09,  cpu09,  0,       ivg09,   ivg09,   driver_device,   0,   "C. Tavernier",  "CPU09 with IVG09", GAME_NOT_WORKING )
