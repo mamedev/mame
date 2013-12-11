@@ -80,10 +80,11 @@ public:
 
 protected:
 	/* Constructor */
-	virtual void device_start(void);
-	virtual void device_stop(void);
-	virtual void device_reset(void);
-	virtual ioport_constructor device_input_ports() const;
+	void device_start();
+	void device_stop();
+	void device_reset();
+	void device_config_complete();
+	ioport_constructor device_input_ports() const;
 
 private:
 	// Keeps the address space pointer

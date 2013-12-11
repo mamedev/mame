@@ -394,12 +394,19 @@ void ti99_datamux_device::device_stop(void)
 	if (m_ram16b) free(m_ram16b);
 }
 
+void ti99_datamux_device::device_config_complete()
+{
+	const datamux_config *conf = reinterpret_cast<const datamux_config *>(static_config());
+	// Must do this here, or ready may be called too early
+	// The device is built below because we need the dip switches.
+	m_ready.resolve(conf->ready, *this);
+}
+
 void ti99_datamux_device::device_reset(void)
 {
 	const datamux_config *conf = reinterpret_cast<const datamux_config *>(static_config());
 
 	const dmux_device_list_entry *list = conf->devlist;
-	m_ready.resolve(conf->ready, *this);
 
 	m_cpu = machine().device("maincpu");
 	// m_space = &m_cpu->memory().space(AS_PROGRAM);
