@@ -287,7 +287,19 @@ void itt3030_state::video_start()
 
 READ8_MEMBER(itt3030_state::vsync_r)
 {
-	return machine().primary_screen->vblank() ? 0x80 : 0;
+	UINT8 ret = 0;
+
+	if (machine().primary_screen->vblank())
+	{
+		ret |= 0xc0;	// set both bits 6 and 7 if vblank
+	}
+
+	if (machine().primary_screen->hblank())
+	{
+		ret |= 0x80;	// set only bit 7 if hblank
+	}
+
+	return ret;
 }
 
 READ8_MEMBER(itt3030_state::unk2_r)
