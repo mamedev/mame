@@ -78,14 +78,14 @@ void ti_fdc_device::set_ready_line()
 {
 	// This is the wait state logic
 	if (TRACE_SIGNALS) logerror("tifdc: address=%04x, DRQ=%d, INTRQ=%d, MOTOR=%d\n", m_address & 0xffff, m_DRQ, m_IRQ, m_DVENA);
-	line_state nready = (m_WDsel &&             // Are we accessing 5ffx?
+	line_state nready = (m_WDsel &&             // Are we accessing 5ffx (even addr)?
 			m_WAITena &&                        // and the wait state generation is active (SBO 2)
 			(m_DRQ==CLEAR_LINE) &&              // and we are waiting for a byte
 			(m_IRQ==CLEAR_LINE) &&              // and there is no interrupt yet
 			(m_DVENA==ASSERT_LINE)              // and the motor is turning?
 			)? ASSERT_LINE : CLEAR_LINE;        // In that case, clear READY and thus trigger wait states
 
-	if (TRACE_READY) if (nready==ASSERT_LINE) logerror("tifdc: READY line = %d\n", (nready==CLEAR_LINE)? 1:0);
+	if (TRACE_READY) logerror("tifdc: READY line = %d\n", (nready==CLEAR_LINE)? 1:0);
 	m_slot->set_ready((nready==CLEAR_LINE)? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -102,7 +102,7 @@ SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
 	if (TRACE_ADDRESS) logerror("tifdc: set address = %04x\n", offset & 0xffff);
 
 	// Is the WD chip on the card being selected?
-	m_WDsel = m_inDsrArea && ((m_address & 0x1ff0)==0x1ff0);
+	m_WDsel = m_inDsrArea && ((m_address & 0x1ff1)==0x1ff0);
 
 	// Clear or assert the outgoing READY line
 	set_ready_line();
