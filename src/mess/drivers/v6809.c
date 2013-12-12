@@ -34,24 +34,23 @@ ToDo:
 - Colours (a photo shows colours but the schematic doesn't
            have any ram for colours).
 
-- Connect the devices (RTC, FDC, PIAs, ACIAs, timer).
+- Connect the devices (RTC, FDC).
 
 - Find the missing character generator rom.
 
-- Add mirrors to the address map.
-
 - Add sound. Pressing BEL character issues commands to the timer chip.
 
-- Replace terminal keyboard with proper plug-in unit (no info).
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/6821pia.h"
+#include "machine/6840ptm.h"
 #include "video/mc6845.h"
-//#include "machine/6821pia.h"
-//#include "machine/6850acia.h"
+#include "machine/6850acia.h"
 #include "machine/keyboard.h"
+#include "sound/speaker.h"
 
 
 
@@ -59,28 +58,29 @@ class v6809_state : public driver_device
 {
 public:
 	v6809_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "crtc"),
-	m_video_address(0)
+		: driver_device(mconfig, type, tag)
+		, m_video_address(0)
+		, m_pia0(*this, "pia0")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_READ8_MEMBER(pb_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(v6809_address_w);
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_MACHINE_RESET(v6809);
 	UINT8 *m_p_videoram;
 	const UINT8 *m_p_chargen;
 	UINT16 m_video_address;
+private:
 	UINT8 m_video_index;
 	UINT8 m_term_data;
 	UINT8 m_vidbyte;
-	virtual void machine_reset();
-	virtual void video_start();
+	required_device<pia6821_device> m_pia0;
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
 };
 
 
@@ -90,18 +90,16 @@ static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(v6809_address_w)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(v6809_register_w)
 	AM_RANGE(0xf200, 0xf200) AM_MIRROR(0xff) AM_WRITE(videoram_w)
-	//AM_RANGE(0xf505, 0xf506) acia-1 (modem)
-	//AM_RANGE(0xf50c, 0xf50d) acia-2 (printer)
+	AM_RANGE(0xf504, 0xf504) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, status_read, control_write) // modem
+	AM_RANGE(0xf505, 0xf505) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, data_read, data_write)
+	AM_RANGE(0xf50c, 0xf50c) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, status_read, control_write) // printer
+	AM_RANGE(0xf50d, 0xf50d) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, data_read, data_write)
 	//AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x3c) disk controller
 	//AM_RANGE(0xf640, 0xf64f) AM_MIRROR(0x30) real time clock
-	//AM_RANGE(0xf680, 0xf683) AM_MIRROR(0x3c) pia-1 (disk & keyboard)
-	//AM_RANGE(0xf6c8, 0xf6cf) timer
-	//AM_RANGE(0xf6d0, 0xf6d3) pia-2
+	AM_RANGE(0xf680, 0xf683) AM_MIRROR(0x3c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0xf6c8, 0xf6cf) AM_MIRROR(0x08) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
+	AM_RANGE(0xf6d0, 0xf6d3) AM_MIRROR(0x0c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
-
-	//temp
-	AM_RANGE(0xf682, 0xf682) AM_READ(key_r)
-	AM_RANGE(0xf683, 0xf683) AM_READ(status_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(v6809_io, AS_PROGRAM, 8, v6809_state)
@@ -112,6 +110,14 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( v6809 )
 INPUT_PORTS_END
+
+MACHINE_RESET_MEMBER( v6809_state, v6809)
+{
+	m_p_chargen = memregion("chargen")->base();
+	m_p_videoram = memregion("videoram")->base();
+	m_term_data = 0;
+	m_pia0->cb1_w(1);
+}
 
 // **** Video ****
 
@@ -169,13 +175,6 @@ MC6845_ON_UPDATE_ADDR_CHANGED( v6809_update_addr )
 	state->m_video_address = address & 0x7ff;
 }
 
-void v6809_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("videoram")->base();
-}
-
-
 static MC6845_INTERFACE( v6809_crtc )
 {
 	false,
@@ -221,21 +220,11 @@ WRITE8_MEMBER( v6809_state::v6809_register_w )
 
 // **** Keyboard ****
 
-READ8_MEMBER( v6809_state::key_r )
-{
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( v6809_state::status_r )
-{
-	return (m_term_data) ? 0x80 : 0;
-}
-
 WRITE8_MEMBER( v6809_state::kbd_put )
 {
 	m_term_data = data;
+	m_pia0->cb1_w(0);
+	m_pia0->cb1_w(1);
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
@@ -243,18 +232,77 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 	DEVCB_DRIVER_MEMBER(v6809_state, kbd_put)
 };
 
-// *** Machine ****
-
-void v6809_state::machine_reset()
+READ8_MEMBER( v6809_state::pb_r )
 {
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
 }
+
+// port A = drive select and 2 control lines ; port B = keyboard
+static const pia6821_interface pia0_intf =
+{
+	DEVCB_NULL,     /* port A input */
+	DEVCB_DRIVER_MEMBER(v6809_state, pb_r),     /* port B input */
+	DEVCB_NULL,     /* CA1 input */
+	DEVCB_NULL,     /* CB1 input */
+	DEVCB_NULL,     /* CA2 input */
+	DEVCB_NULL,     /* CB2 input */
+	DEVCB_NULL,     /* port A output */
+	DEVCB_NULL,     /* port B output */
+	DEVCB_NULL,     /* CA2 output */
+	DEVCB_NULL,     /* CB2 output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
+};
+
+// no idea what this does
+static const pia6821_interface pia1_intf =
+{
+	DEVCB_NULL,     /* port A input */
+	DEVCB_NULL,     /* port B input */
+	DEVCB_NULL,     /* CA1 input */
+	DEVCB_NULL,     /* CB1 input */
+	DEVCB_NULL,     /* CA2 input */
+	DEVCB_NULL,     /* CB2 input */
+	DEVCB_NULL,     /* port A output */
+	DEVCB_NULL,     /* port B output */
+	DEVCB_NULL,     /* CA2 output */
+	DEVCB_NULL,     /* CB2 output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
+};
+
+static const ptm6840_interface mc6840_intf =
+{
+	XTAL_16MHz / 4,
+	{ 0, 0, 0 },
+	{ DEVCB_NULL,
+		DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w),
+		DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w) },
+	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
+};
+
+static ACIA6850_INTERFACE( mc6850_intf )
+{
+	10,
+	10,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+// *** Machine ****
 
 static MACHINE_CONFIG_START( v6809, v6809_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(v6809_mem)
 	MCFG_CPU_IO_MAP(v6809_io)
-
+	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -267,9 +315,19 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 	MCFG_GFXDECODE(v6809)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_16MHz / 8, v6809_crtc)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_PIA6821_ADD("pia0", pia0_intf)
+	MCFG_PIA6821_ADD("pia1", pia1_intf)
+	MCFG_PTM6840_ADD("ptm", mc6840_intf)
+	MCFG_ACIA6850_ADD("acia0", mc6850_intf)
+	MCFG_ACIA6850_ADD("acia1", mc6850_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -287,5 +345,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY      FULLNAME       FLAGS */
-COMP( 1982, v6809,  0,      0,       v6809,     v6809, driver_device,   0,      "Microkit", "Vegas 6809", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT     COMPANY      FULLNAME       FLAGS */
+COMP( 1982, v6809,  0,      0,       v6809,     v6809, driver_device,   0,     "Microkit", "Vegas 6809", GAME_NOT_WORKING )
