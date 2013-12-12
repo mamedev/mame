@@ -5,12 +5,13 @@
 Undumped games (from http://ko.wikipedia.org/wiki/GP32 )
 
 * 달려라 하니 시리즈 ~ Ride Do Series
-* Tears: Contact
-
+* Tears: Contact (not sure this game title exist for the GP32)
 
 Questionable?
 
 * 강행돌파 [same as herknite?!?]
+
+* Tears - Another Story added (not 100% verified whether it is a final version or not) 
 
 It is recommended to use the firmware 1.6.6 as default BIOS!
 
@@ -480,5 +481,17 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 			</dataarea>
 		</part>
 	</software>	
+	
+		<software name="tearsast">
+		<description>Tears - Another Story (Kor)</description>
+		<year>2003</year>
+		<publisher>Team D.T.R.</publisher>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="17302528">
+				<rom name="tears - another story.smc" size="17302528" crc="7c46d80a" sha1="682f123d3f827544cc876e624ccacd61cd8283a3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 	
 </softwarelist>
