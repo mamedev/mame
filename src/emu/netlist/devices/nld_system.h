@@ -30,10 +30,15 @@
 #define NETDEV_CLOCK(_name)                                                         \
         NET_REGISTER_DEV(clock, _name)
 
-#define NETDEV_SOLVER(_name)                                                        \
-        NET_REGISTER_DEV(solver, _name)
+#define NETDEV_LOGIC_INPUT(_name)                                                   \
+        NET_REGISTER_DEV(logic_input, _name)
 
-// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
+#define NETDEV_ANALOG_INPUT(_name)                                                  \
+        NET_REGISTER_DEV(analog_input, _name)
+
+#define NETDEV_CALLBACK(_name, _IN)                                                 \
+        NET_REGISTER_DEV(analog_callback, _name)                                    \
+        NET_CONNECT(_name, IN, _IN)
 
 // ----------------------------------------------------------------------------------------
 // netdev_*_const
@@ -75,70 +80,6 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
     netlist_time m_inc;
 );
 
-// ----------------------------------------------------------------------------------------
-// solver
-// ----------------------------------------------------------------------------------------
-
-class netlist_matrix_solver_t
-{
-public:
-    typedef netlist_list_t<netlist_matrix_solver_t *> list_t;
-    typedef netlist_core_device_t::list_t dev_list_t;
-    ATTR_COLD void setup(netlist_net_t::list_t &nets);
-
-    // return true if a reschedule is needed ...
-    ATTR_HOT bool solve();
-    ATTR_HOT void step(const netlist_time delta);
-    ATTR_HOT void update_inputs();
-
-    ATTR_HOT inline bool is_dynamic() { return m_dynamic.count() > 0; }
-
-    double m_accuracy;
-    double m_convergence_factor;
-
-private:
-    netlist_net_t::list_t m_nets;
-    dev_list_t m_dynamic;
-    dev_list_t m_inps;
-    dev_list_t m_steps;
-};
-
-NETLIB_DEVICE_WITH_PARAMS(solver,
-        typedef netlist_core_device_t::list_t dev_list_t;
-
-        netlist_ttl_input_t m_fb_sync;
-        netlist_ttl_output_t m_Q_sync;
-
-        netlist_ttl_input_t m_fb_step;
-        netlist_ttl_output_t m_Q_step;
-
-        netlist_param_double_t m_freq;
-        netlist_param_double_t m_sync_delay;
-        netlist_param_double_t m_accuracy;
-        netlist_param_double_t m_convergence;
-
-        netlist_time m_inc;
-        netlist_time m_last_step;
-        netlist_time m_nt_sync_delay;
-
-        netlist_matrix_solver_t::list_t m_mat_solvers;
-public:
-
-        ~NETLIB_NAME(solver)();
-
-        netlist_net_t::list_t m_nets;
-
-        ATTR_HOT inline void schedule();
-
-        ATTR_COLD void post_start();
-);
-
-inline void NETLIB_NAME(solver)::schedule()
-{
-    // FIXME: time should be parameter;
-    if (!m_Q_sync.net().is_queued())
-        m_Q_sync.net().push_to_queue(m_nt_sync_delay);
-}
 
 // ----------------------------------------------------------------------------------------
 // netdev_callback
@@ -167,6 +108,18 @@ private:
 	netlist_analog_input_t m_in;
 	netlist_output_delegate m_callback;
 };
+
+// ----------------------------------------------------------------------------------------
+// Special support devices ...
+// ----------------------------------------------------------------------------------------
+
+NETLIB_DEVICE(logic_input,
+    netlist_ttl_output_t m_Q;
+);
+
+NETLIB_DEVICE(analog_input,
+    netlist_analog_output_t m_Q;
+);
 
 
 

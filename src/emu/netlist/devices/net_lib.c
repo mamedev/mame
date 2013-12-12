@@ -50,159 +50,141 @@
 #include "net_lib.h"
 #include "nld_system.h"
 
-NETLIB_START(logic_input)
-{
-	register_output("Q", m_Q);
-}
-
-NETLIB_UPDATE(logic_input)
-{
-}
-
-NETLIB_START(analog_input)
-{
-	register_output("Q", m_Q);
-}
-
-NETLIB_UPDATE(analog_input)
-{
-}
-
 NETLIB_START(nicMultiSwitch)
 {
-	static const char *sIN[8] = { "i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8" };
-	int i;
+    static const char *sIN[8] = { "i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8" };
+    int i;
 
-	m_position = 0;
-	m_low.initial(0);
+    m_position = 0;
+    m_low.initial(0);
 
-	for (i=0; i<8; i++)
-	{
-		register_input(sIN[i], m_I[i]);
-		m_low.net().register_con(m_I[i]);
-		//m_I[i].set_net(m_low.m_net);
-	}
-	register_param("POS", m_POS, 0);
-	register_output("Q", m_Q);
+    for (i=0; i<8; i++)
+    {
+        register_input(sIN[i], m_I[i]);
+        m_low.net().register_con(m_I[i]);
+        //m_I[i].set_net(m_low.m_net);
+    }
+    register_param("POS", m_POS, 0);
+    register_output("Q", m_Q);
 
-	m_variable_input_count = true;
+    m_variable_input_count = true;
 }
 
 NETLIB_UPDATE(nicMultiSwitch)
 {
-	assert(m_position<8);
-	OUTANALOG(m_Q, INPANALOG(m_I[m_position]), NLTIME_FROM_NS(1));
+    assert(m_position<8);
+    OUTANALOG(m_Q, INPANALOG(m_I[m_position]), NLTIME_FROM_NS(1));
 }
 
 NETLIB_UPDATE_PARAM(nicMultiSwitch)
 {
-	m_position = m_POS.Value();
-	//update();
+    m_position = m_POS.Value();
+    //update();
 }
 
 NETLIB_START(nicMixer8)
 {
-	static const char *sI[8] = { "I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8" };
-	static const char *sR[8] = { "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8" };
-	int i;
+    static const char *sI[8] = { "I1", "I2", "I3", "I4", "I5", "I6", "I7", "I8" };
+    static const char *sR[8] = { "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8" };
+    int i;
 
-	m_low.initial(0);
+    m_low.initial(0);
 
-	for (i=0; i<8; i++)
-	{
-		register_input(sI[i], m_I[i]);
-		m_low.net().register_con(m_I[i]);
-		//m_I[i].set_output(m_low);
-		register_param(sR[i], m_R[i], 1e12);
-	}
-	register_output("Q", m_Q);
+    for (i=0; i<8; i++)
+    {
+        register_input(sI[i], m_I[i]);
+        m_low.net().register_con(m_I[i]);
+        //m_I[i].set_output(m_low);
+        register_param(sR[i], m_R[i], 1e12);
+    }
+    register_output("Q", m_Q);
 
-	m_variable_input_count = true;
+    m_variable_input_count = true;
 }
 
 NETLIB_UPDATE(nicMixer8)
 {
-	int i;
-	double r = 0;
+    int i;
+    double r = 0;
 
-	for (i=0; i<8; i++)
-	{
-		r += m_w[i] * INPANALOG(m_I[i]);
-	}
-	OUTANALOG(m_Q, r, NLTIME_IMMEDIATE);
+    for (i=0; i<8; i++)
+    {
+        r += m_w[i] * INPANALOG(m_I[i]);
+    }
+    OUTANALOG(m_Q, r, NLTIME_IMMEDIATE);
 }
 
 NETLIB_UPDATE_PARAM(nicMixer8)
 {
-	double t = 0;
-	int i;
+    double t = 0;
+    int i;
 
-	for (i=0; i<8; i++)
-		t += 1.0 / m_R[i].Value();
-	t = 1.0 / t;
+    for (i=0; i<8; i++)
+        t += 1.0 / m_R[i].Value();
+    t = 1.0 / t;
 
-	for (i=0; i<8; i++)
-		m_w[i] = t / m_R[i].Value();
+    for (i=0; i<8; i++)
+        m_w[i] = t / m_R[i].Value();
 }
 
 
 
 NETLIB_START(nicRSFF)
 {
-	register_input("S", m_S);
-	register_input("R", m_R);
-	register_output("Q", m_Q);
-	register_output("QQ", m_QQ);
-	m_Q.initial(0);
-	m_QQ.initial(1);
+    register_input("S", m_S);
+    register_input("R", m_R);
+    register_output("Q", m_Q);
+    register_output("QQ", m_QQ);
+    m_Q.initial(0);
+    m_QQ.initial(1);
 }
 
 NETLIB_UPDATE(nicRSFF)
 {
-	if (INPLOGIC(m_S))
-	{
-		OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(10));
-		OUTLOGIC(m_QQ, 0, NLTIME_FROM_NS(10));
-	}
-	else if (INPLOGIC(m_R))
-	{
-		OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(10));
-		OUTLOGIC(m_QQ, 1, NLTIME_FROM_NS(10));
-	}
+    if (INPLOGIC(m_S))
+    {
+        OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(10));
+        OUTLOGIC(m_QQ, 0, NLTIME_FROM_NS(10));
+    }
+    else if (INPLOGIC(m_R))
+    {
+        OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(10));
+        OUTLOGIC(m_QQ, 1, NLTIME_FROM_NS(10));
+    }
 }
 
 
 NETLIB_START(nicNE555N_MSTABLE)
 {
-	register_input("TRIG", m_trigger);
-	register_input("CV", m_CV);
+    register_input("TRIG", m_trigger);
+    register_input("CV", m_CV);
 
-	register_output("Q", m_Q);
-	register_param("R", m_R, 0.0);
-	register_param("C", m_C, 0.0);
-	register_param("VS", m_VS, 5.0);
-	register_param("VL", m_VL, 0.0 *5.0);
+    register_output("Q", m_Q);
+    register_param("R", m_R, 0.0);
+    register_param("C", m_C, 0.0);
+    register_param("VS", m_VS, 5.0);
+    register_param("VL", m_VL, 0.0 *5.0);
 
-	m_THRESHOLD_OUT.init_object(*this, "THRESHOLD");
-	register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT, netlist_input_t::STATE_INP_ACTIVE);
+    m_THRESHOLD_OUT.init_object(*this, "THRESHOLD");
+    register_link_internal(m_THRESHOLD, m_THRESHOLD_OUT, netlist_input_t::STATE_INP_ACTIVE);
 
-	m_Q.initial(5.0 * 0.4);
-	m_last = false;
+    m_Q.initial(5.0 * 0.4);
+    m_last = false;
 }
 
 inline double NETLIB_NAME(nicNE555N_MSTABLE)::nicNE555N_cv()
 {
-	return (m_CV.is_highz() ? 0.67 * m_VS.Value() : INPANALOG(m_CV));
+    return (m_CV.is_highz() ? 0.67 * m_VS.Value() : INPANALOG(m_CV));
 }
 
 inline double NETLIB_NAME(nicNE555N_MSTABLE)::nicNE555N_clamp(const double v, const double a, const double b)
 {
-	double ret = v;
-	if (ret >  m_VS.Value() - a)
-		ret = m_VS.Value() - a;
-	if (ret < b)
-		ret = b;
-	return ret;
+    double ret = v;
+    if (ret >  m_VS.Value() - a)
+        ret = m_VS.Value() - a;
+    if (ret < b)
+        ret = b;
+    return ret;
 }
 
 NETLIB_UPDATE_PARAM(nicNE555N_MSTABLE)
@@ -211,97 +193,97 @@ NETLIB_UPDATE_PARAM(nicNE555N_MSTABLE)
 
 NETLIB_UPDATE(nicNE555N_MSTABLE)
 {
-	update_param(); // FIXME : m_CV should be on a sub device ...
+    update_param(); // FIXME : m_CV should be on a sub device ...
 
-	double vt = nicNE555N_clamp(nicNE555N_cv(), 0.7, 1.4);
-	bool bthresh = (INPANALOG(m_THRESHOLD) > vt);
-	bool btrig = (INPANALOG(m_trigger) > nicNE555N_clamp(nicNE555N_cv() * 0.5, 0.7, 1.4));
-	bool out = m_last;
+    double vt = nicNE555N_clamp(nicNE555N_cv(), 0.7, 1.4);
+    bool bthresh = (INPANALOG(m_THRESHOLD) > vt);
+    bool btrig = (INPANALOG(m_trigger) > nicNE555N_clamp(nicNE555N_cv() * 0.5, 0.7, 1.4));
+    bool out = m_last;
 
-	if (!btrig)
-	{
-		out = true;
-	}
-	else if (bthresh)
-	{
-		out = false;
-	}
+    if (!btrig)
+    {
+        out = true;
+    }
+    else if (bthresh)
+    {
+        out = false;
+    }
 
-	if (!m_last && out)
-	{
-		double vl = m_VL.Value();
-		double time;
+    if (!m_last && out)
+    {
+        double vl = m_VL.Value();
+        double time;
 
-		// FIXME : m_CV should be on a sub device ...
+        // FIXME : m_CV should be on a sub device ...
 
-		// TI datasheet states minimum pulse of 10 us
-		if (vt<vl)
-			time = 10;
-		else
-		{
-			time = - log((m_VS.Value()-vt)/(m_VS.Value()-vl)) * m_R.Value() * m_C.Value() * 1.0e6; // in us
-			if (time < 10.0)
-				time = 10.0;
-		}
+        // TI datasheet states minimum pulse of 10 us
+        if (vt<vl)
+            time = 10;
+        else
+        {
+            time = - log((m_VS.Value()-vt)/(m_VS.Value()-vl)) * m_R.Value() * m_C.Value() * 1.0e6; // in us
+            if (time < 10.0)
+                time = 10.0;
+        }
 
-		OUTANALOG(m_Q, m_VS.Value() * 0.7, NLTIME_FROM_NS(100));
-		OUTANALOG(m_THRESHOLD_OUT, m_VS.Value(), NLTIME_FROM_US(time ));
-	}
-	else if (m_last && !out)
-	{
-		OUTANALOG(m_Q, 0.25, NLTIME_FROM_NS(100));
-		OUTANALOG(m_THRESHOLD_OUT, 0.0, NLTIME_FROM_NS(1));
-	}
-	m_last = out;
+        OUTANALOG(m_Q, m_VS.Value() * 0.7, NLTIME_FROM_NS(100));
+        OUTANALOG(m_THRESHOLD_OUT, m_VS.Value(), NLTIME_FROM_US(time ));
+    }
+    else if (m_last && !out)
+    {
+        OUTANALOG(m_Q, 0.25, NLTIME_FROM_NS(100));
+        OUTANALOG(m_THRESHOLD_OUT, 0.0, NLTIME_FROM_NS(1));
+    }
+    m_last = out;
 }
 
 NETLIB_START(nic7448)
 {
-	register_sub(sub, "sub");
+    register_sub(sub, "sub");
 
-	register_subalias("A0", sub.m_A0);
-	register_subalias("A1", sub.m_A1);
-	register_subalias("A2", sub.m_A2);
-	register_subalias("A3", sub.m_A3);
-	register_input("LTQ", m_LTQ);
-	register_input("BIQ", m_BIQ);
-	register_subalias("RBIQ",sub.m_RBIQ);
+    register_subalias("A0", sub.m_A0);
+    register_subalias("A1", sub.m_A1);
+    register_subalias("A2", sub.m_A2);
+    register_subalias("A3", sub.m_A3);
+    register_input("LTQ", m_LTQ);
+    register_input("BIQ", m_BIQ);
+    register_subalias("RBIQ",sub.m_RBIQ);
 
-	register_subalias("a", sub.m_a);
-	register_subalias("b", sub.m_b);
-	register_subalias("c", sub.m_c);
-	register_subalias("d", sub.m_d);
-	register_subalias("e", sub.m_e);
-	register_subalias("f", sub.m_f);
-	register_subalias("g", sub.m_g);
+    register_subalias("a", sub.m_a);
+    register_subalias("b", sub.m_b);
+    register_subalias("c", sub.m_c);
+    register_subalias("d", sub.m_d);
+    register_subalias("e", sub.m_e);
+    register_subalias("f", sub.m_f);
+    register_subalias("g", sub.m_g);
 }
 
 NETLIB_UPDATE(nic7448)
 {
-	if (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ))
-	{
-		sub.update_outputs(8);
-	}
-	else if (!INPLOGIC(m_BIQ))
-	{
-		sub.update_outputs(15);
-	}
+    if (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ))
+    {
+        sub.update_outputs(8);
+    }
+    else if (!INPLOGIC(m_BIQ))
+    {
+        sub.update_outputs(15);
+    }
 
-	if (!INPLOGIC(m_BIQ) || (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ)))
-	{
-		sub.m_A0.inactivate();
-		sub.m_A1.inactivate();
-		sub.m_A2.inactivate();
-		sub.m_A3.inactivate();
-		sub.m_RBIQ.inactivate();
-	} else {
-		sub.m_RBIQ.activate();
-		sub.m_A3.activate();
-		sub.m_A2.activate();
-		sub.m_A1.activate();
-		sub.m_A0.activate();
-		sub.update();
-	}
+    if (!INPLOGIC(m_BIQ) || (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ)))
+    {
+        sub.m_A0.inactivate();
+        sub.m_A1.inactivate();
+        sub.m_A2.inactivate();
+        sub.m_A3.inactivate();
+        sub.m_RBIQ.inactivate();
+    } else {
+        sub.m_RBIQ.activate();
+        sub.m_A3.activate();
+        sub.m_A2.activate();
+        sub.m_A1.activate();
+        sub.m_A0.activate();
+        sub.update();
+    }
 
 }
 
@@ -326,189 +308,100 @@ NETLIB_START(nic7448_sub)
 
 NETLIB_UPDATE(nic7448_sub)
 {
-	UINT8 v;
+    UINT8 v;
 
-	v = (INPLOGIC(m_A0) << 0) | (INPLOGIC(m_A1) << 1) | (INPLOGIC(m_A2) << 2) | (INPLOGIC(m_A3) << 3);
-	if ((!INPLOGIC(m_RBIQ) && (v==0)))
-			v = 15;
-	update_outputs(v);
+    v = (INPLOGIC(m_A0) << 0) | (INPLOGIC(m_A1) << 1) | (INPLOGIC(m_A2) << 2) | (INPLOGIC(m_A3) << 3);
+    if ((!INPLOGIC(m_RBIQ) && (v==0)))
+            v = 15;
+    update_outputs(v);
 }
 
 NETLIB_FUNC_VOID(nic7448_sub, update_outputs, (UINT8 v))
 {
-	assert(v<16);
-	if (v != m_state)
-	{
-		OUTLOGIC(m_a, tab7448[v][0], NLTIME_FROM_NS(100));
-		OUTLOGIC(m_b, tab7448[v][1], NLTIME_FROM_NS(100));
-		OUTLOGIC(m_c, tab7448[v][2], NLTIME_FROM_NS(100));
-		OUTLOGIC(m_d, tab7448[v][3], NLTIME_FROM_NS(100));
-		OUTLOGIC(m_e, tab7448[v][4], NLTIME_FROM_NS(100));
-		OUTLOGIC(m_f, tab7448[v][5], NLTIME_FROM_NS(100));
-		OUTLOGIC(m_g, tab7448[v][6], NLTIME_FROM_NS(100));
-		m_state = v;
-	}
+    assert(v<16);
+    if (v != m_state)
+    {
+        OUTLOGIC(m_a, tab7448[v][0], NLTIME_FROM_NS(100));
+        OUTLOGIC(m_b, tab7448[v][1], NLTIME_FROM_NS(100));
+        OUTLOGIC(m_c, tab7448[v][2], NLTIME_FROM_NS(100));
+        OUTLOGIC(m_d, tab7448[v][3], NLTIME_FROM_NS(100));
+        OUTLOGIC(m_e, tab7448[v][4], NLTIME_FROM_NS(100));
+        OUTLOGIC(m_f, tab7448[v][5], NLTIME_FROM_NS(100));
+        OUTLOGIC(m_g, tab7448[v][6], NLTIME_FROM_NS(100));
+        m_state = v;
+    }
 }
 
 const UINT8 NETLIB_NAME(nic7448_sub)::tab7448[16][7] =
 {
-		{   1, 1, 1, 1, 1, 1, 0 },  /* 00 - not blanked ! */
-		{   0, 1, 1, 0, 0, 0, 0 },  /* 01 */
-		{   1, 1, 0, 1, 1, 0, 1 },  /* 02 */
-		{   1, 1, 1, 1, 0, 0, 1 },  /* 03 */
-		{   0, 1, 1, 0, 0, 1, 1 },  /* 04 */
-		{   1, 0, 1, 1, 0, 1, 1 },  /* 05 */
-		{   0, 0, 1, 1, 1, 1, 1 },  /* 06 */
-		{   1, 1, 1, 0, 0, 0, 0 },  /* 07 */
-		{   1, 1, 1, 1, 1, 1, 1 },  /* 08 */
-		{   1, 1, 1, 0, 0, 1, 1 },  /* 09 */
-		{   0, 0, 0, 1, 1, 0, 1 },  /* 10 */
-		{   0, 0, 1, 1, 0, 0, 1 },  /* 11 */
-		{   0, 1, 0, 0, 0, 1, 1 },  /* 12 */
-		{   1, 0, 0, 1, 0, 1, 1 },  /* 13 */
-		{   0, 0, 0, 1, 1, 1, 1 },  /* 14 */
-		{   0, 0, 0, 0, 0, 0, 0 },  /* 15 */
+        {   1, 1, 1, 1, 1, 1, 0 },  /* 00 - not blanked ! */
+        {   0, 1, 1, 0, 0, 0, 0 },  /* 01 */
+        {   1, 1, 0, 1, 1, 0, 1 },  /* 02 */
+        {   1, 1, 1, 1, 0, 0, 1 },  /* 03 */
+        {   0, 1, 1, 0, 0, 1, 1 },  /* 04 */
+        {   1, 0, 1, 1, 0, 1, 1 },  /* 05 */
+        {   0, 0, 1, 1, 1, 1, 1 },  /* 06 */
+        {   1, 1, 1, 0, 0, 0, 0 },  /* 07 */
+        {   1, 1, 1, 1, 1, 1, 1 },  /* 08 */
+        {   1, 1, 1, 0, 0, 1, 1 },  /* 09 */
+        {   0, 0, 0, 1, 1, 0, 1 },  /* 10 */
+        {   0, 0, 1, 1, 0, 0, 1 },  /* 11 */
+        {   0, 1, 0, 0, 0, 1, 1 },  /* 12 */
+        {   1, 0, 0, 1, 0, 1, 1 },  /* 13 */
+        {   0, 0, 0, 1, 1, 1, 1 },  /* 14 */
+        {   0, 0, 0, 0, 0, 0, 0 },  /* 15 */
 };
 
 NETLIB_START(nic7450)
 {
-	register_input("I1", m_I0);
-	register_input("I2", m_I1);
-	register_input("I3", m_I2);
-	register_input("I4", m_I3);
-	register_output("Q", m_Q);
+    register_input("I1", m_I0);
+    register_input("I2", m_I1);
+    register_input("I3", m_I2);
+    register_input("I4", m_I3);
+    register_output("Q", m_Q);
 }
 
 NETLIB_UPDATE(nic7450)
 {
-	m_I0.activate();
-	m_I1.activate();
-	m_I2.activate();
-	m_I3.activate();
-	UINT8 t1 = INPLOGIC(m_I0) & INPLOGIC(m_I1);
-	UINT8 t2 = INPLOGIC(m_I2) & INPLOGIC(m_I3);
+    m_I0.activate();
+    m_I1.activate();
+    m_I2.activate();
+    m_I3.activate();
+    UINT8 t1 = INPLOGIC(m_I0) & INPLOGIC(m_I1);
+    UINT8 t2 = INPLOGIC(m_I2) & INPLOGIC(m_I3);
 #if 0
-	UINT8 t =  (t1 | t2) ^ 1;
-	OUTLOGIC(m_Q, t, t ? NLTIME_FROM_NS(22) : NLTIME_FROM_NS(15));
+    UINT8 t =  (t1 | t2) ^ 1;
+    OUTLOGIC(m_Q, t, t ? NLTIME_FROM_NS(22) : NLTIME_FROM_NS(15));
 #else
-	const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
+    const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
-	UINT8 res = 0;
-	if (t1 ^ 1)
-	{
-		if (t2 ^ 1)
-		{
-			res = 1;
-		}
-		else
-		{
-			m_I0.inactivate();
-			m_I1.inactivate();
-		}
-	} else {
-		if (t2 ^ 1)
-		{
-			m_I2.inactivate();
-			m_I3.inactivate();
-		}
-	}
-	OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
+    UINT8 res = 0;
+    if (t1 ^ 1)
+    {
+        if (t2 ^ 1)
+        {
+            res = 1;
+        }
+        else
+        {
+            m_I0.inactivate();
+            m_I1.inactivate();
+        }
+    } else {
+        if (t2 ^ 1)
+        {
+            m_I2.inactivate();
+            m_I3.inactivate();
+        }
+    }
+    OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
 
 #endif
 }
 
 
-NETLIB_START(nic7483)
-{
-	m_lastr = 0;
 
-	register_input("A1", m_A1);
-	register_input("A2", m_A2);
-	register_input("A3", m_A3);
-	register_input("A4", m_A4);
-	register_input("B1", m_B1);
-	register_input("B2", m_B2);
-	register_input("B3", m_B3);
-	register_input("B4", m_B4);
-	register_input("CI", m_CI);
 
-	register_output("SA", m_SA);
-	register_output("SB", m_SB);
-	register_output("SC", m_SC);
-	register_output("SD", m_SD);
-	register_output("CO", m_CO);
-}
-
-NETLIB_UPDATE(nic7483)
-{
-	UINT8 a = (INPLOGIC(m_A1) << 0) | (INPLOGIC(m_A2) << 1) | (INPLOGIC(m_A3) << 2) | (INPLOGIC(m_A4) << 3);
-	UINT8 b = (INPLOGIC(m_B1) << 0) | (INPLOGIC(m_B2) << 1) | (INPLOGIC(m_B3) << 2) | (INPLOGIC(m_B4) << 3);
-
-	UINT8 r = a + b + INPLOGIC(m_CI);
-
-	if (r != m_lastr)
-	{
-		m_lastr = r;
-		OUTLOGIC(m_SA, (r >> 0) & 1, NLTIME_FROM_NS(23));
-		OUTLOGIC(m_SB, (r >> 1) & 1, NLTIME_FROM_NS(23));
-		OUTLOGIC(m_SC, (r >> 2) & 1, NLTIME_FROM_NS(23));
-		OUTLOGIC(m_SD, (r >> 3) & 1, NLTIME_FROM_NS(23));
-		OUTLOGIC(m_CO, (r >> 4) & 1, NLTIME_FROM_NS(23));
-	}
-}
-
-NETLIB_START(nic7490)
-{
-	m_cnt = 0;
-
-	register_input("CLK", m_clk);
-	register_input("R1",  m_R1);
-	register_input("R2",  m_R2);
-	register_input("R91", m_R91);
-	register_input("R92", m_R92);
-
-	register_output("QA", m_Q[0]);
-	register_output("QB", m_Q[1]);
-	register_output("QC", m_Q[2]);
-	register_output("QD", m_Q[3]);
-}
-
-NETLIB_UPDATE(nic7490)
-{
-	if (INPLOGIC(m_R91) & INPLOGIC(m_R92))
-	{
-		m_cnt = 9;
-		update_outputs();
-	}
-	else if (INPLOGIC(m_R1) & INPLOGIC(m_R2))
-	{
-		m_cnt = 0;
-		update_outputs();
-	}
-	else if (INP_HL(m_clk))
-	{
-		m_cnt++;
-		if (m_cnt >= 10)
-			m_cnt = 0;
-		update_outputs();
-	}
-}
-#if 0
-NETLIB_FUNC_VOID(nic7490, update_outputs)
-{
-	OUTLOGIC(m_QA, (m_cnt >> 0) & 1, NLTIME_FROM_NS(18));
-	OUTLOGIC(m_QB, (m_cnt >> 1) & 1, NLTIME_FROM_NS(36));
-	OUTLOGIC(m_QC, (m_cnt >> 2) & 1, NLTIME_FROM_NS(54));
-	OUTLOGIC(m_QD, (m_cnt >> 3) & 1, NLTIME_FROM_NS(72));
-}
-#else
-NETLIB_FUNC_VOID(nic7490, update_outputs, (void))
-{
-	const netlist_time delay[4] = { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54), NLTIME_FROM_NS(72) };
-	for (int i=0; i<4; i++)
-		OUTLOGIC(m_Q[i], (m_cnt >> i) & 1, delay[i]);
-}
-#endif
 
 NETLIB_START(nic74107Asub)
 {
@@ -522,245 +415,110 @@ NETLIB_START(nic74107Asub)
 
 NETLIB_START(nic74107A)
 {
-	register_sub(sub, "sub");
+    register_sub(sub, "sub");
 
-	register_subalias("CLK", sub.m_clk);
-	register_input("J", m_J);
-	register_input("K", m_K);
-	register_input("CLRQ", m_clrQ);
-	register_subalias("Q", sub.m_Q);
-	register_subalias("QQ", sub.m_QQ);
+    register_subalias("CLK", sub.m_clk);
+    register_input("J", m_J);
+    register_input("K", m_K);
+    register_input("CLRQ", m_clrQ);
+    register_subalias("Q", sub.m_Q);
+    register_subalias("QQ", sub.m_QQ);
 
-	sub.m_Q.initial(0);
-	sub.m_QQ.initial(1);
+    sub.m_Q.initial(0);
+    sub.m_QQ.initial(1);
 }
 
 ATTR_HOT inline void NETLIB_NAME(nic74107Asub)::newstate(const netlist_sig_t state)
 {
-	const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+    const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 #if 1
-	OUTLOGIC(m_Q, state, delay[state ^ 1]);
-	OUTLOGIC(m_QQ, state ^ 1, delay[state]);
+    OUTLOGIC(m_Q, state, delay[state ^ 1]);
+    OUTLOGIC(m_QQ, state ^ 1, delay[state]);
 #else
-	if (state != Q.new_Q())
-	{
-		Q.setToNoCheck(state, delay[1-state]);
-		QQ.setToNoCheck(1-state, delay[state]);
-	}
+    if (state != Q.new_Q())
+    {
+        Q.setToNoCheck(state, delay[1-state]);
+        QQ.setToNoCheck(1-state, delay[state]);
+    }
 #endif
 }
 
 NETLIB_UPDATE(nic74107Asub)
 {
-	{
-		const netlist_sig_t t = m_Q.net().new_Q();
-		newstate((!t & m_Q1) | (t & m_Q2) | m_F);
-		if (!m_Q1)
-			m_clk.inactivate();
-	}
+    {
+        const netlist_sig_t t = m_Q.net().new_Q();
+        newstate((!t & m_Q1) | (t & m_Q2) | m_F);
+        if (!m_Q1)
+            m_clk.inactivate();
+    }
 }
 
 NETLIB_UPDATE(nic74107A)
 {
-	if (INPLOGIC(m_J) & INPLOGIC(m_K))
-	{
-		sub.m_Q1 = 1;
-		sub.m_Q2 = 0;
-		sub.m_F  = 0;
-	}
-	else if (!INPLOGIC(m_J) & INPLOGIC(m_K))
-	{
-		sub.m_Q1 = 0;
-		sub.m_Q2 = 0;
-		sub.m_F  = 0;
-	}
-	else if (INPLOGIC(m_J) & !INPLOGIC(m_K))
-	{
-		sub.m_Q1 = 0;
-		sub.m_Q2 = 0;
-		sub.m_F  = 1;
-	}
-	else
-	{
-		sub.m_Q1 = 0;
-		sub.m_Q2 = 1;
-		sub.m_F  = 0;
-		sub.m_clk.inactivate();
-	}
-	if (!INPLOGIC(m_clrQ))
-	{
-		sub.m_clk.inactivate();
-		sub.newstate(0);
-	}
-	else if (!sub.m_Q2)
-		sub.m_clk.activate_hl();
-	//if (!sub.m_Q2 & INPLOGIC(m_clrQ))
-	//  sub.m_clk.activate_hl();
+    if (INPLOGIC(m_J) & INPLOGIC(m_K))
+    {
+        sub.m_Q1 = 1;
+        sub.m_Q2 = 0;
+        sub.m_F  = 0;
+    }
+    else if (!INPLOGIC(m_J) & INPLOGIC(m_K))
+    {
+        sub.m_Q1 = 0;
+        sub.m_Q2 = 0;
+        sub.m_F  = 0;
+    }
+    else if (INPLOGIC(m_J) & !INPLOGIC(m_K))
+    {
+        sub.m_Q1 = 0;
+        sub.m_Q2 = 0;
+        sub.m_F  = 1;
+    }
+    else
+    {
+        sub.m_Q1 = 0;
+        sub.m_Q2 = 1;
+        sub.m_F  = 0;
+        sub.m_clk.inactivate();
+    }
+    if (!INPLOGIC(m_clrQ))
+    {
+        sub.m_clk.inactivate();
+        sub.newstate(0);
+    }
+    else if (!sub.m_Q2)
+        sub.m_clk.activate_hl();
+    //if (!sub.m_Q2 & INPLOGIC(m_clrQ))
+    //  sub.m_clk.activate_hl();
 }
 
 NETLIB_START(nic74153)
 {
-	register_input("A1", m_I[0]);
-	register_input("A2", m_I[1]);
-	register_input("A3", m_I[2]);
-	register_input("A4", m_I[3]);
-	register_input("A", m_A);
-	register_input("B", m_B);
-	register_input("GA", m_GA);
+    register_input("A1", m_I[0]);
+    register_input("A2", m_I[1]);
+    register_input("A3", m_I[2]);
+    register_input("A4", m_I[3]);
+    register_input("A", m_A);
+    register_input("B", m_B);
+    register_input("GA", m_GA);
 
-	register_output("AY", m_AY);
+    register_output("AY", m_AY);
 }
 
 NETLIB_UPDATE(nic74153)
 {
-	const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
-	if (!INPLOGIC(m_GA))
-	{
-		UINT8 chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
-		UINT8 t = INPLOGIC(m_I[chan]);
-		OUTLOGIC(m_AY, t, delay[t] ); /* data to y only, FIXME */
-	}
-	else
-	{
-		OUTLOGIC(m_AY, 0, delay[0]);
-	}
+    const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
+    if (!INPLOGIC(m_GA))
+    {
+        UINT8 chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
+        UINT8 t = INPLOGIC(m_I[chan]);
+        OUTLOGIC(m_AY, t, delay[t] ); /* data to y only, FIXME */
+    }
+    else
+    {
+        OUTLOGIC(m_AY, 0, delay[0]);
+    }
 }
 
-NETLIB_START(nic9316)
-{
-	register_sub(sub, "sub");
-
-	register_subalias("CLK", sub.m_clk);
-
-	register_input("ENP", m_ENP);
-	register_input("ENT", m_ENT);
-	register_input("CLRQ", m_CLRQ);
-	register_input("LOADQ", m_LOADQ);
-
-	register_subalias("A", sub.m_A);
-	register_subalias("B", sub.m_B);
-	register_subalias("C", sub.m_C);
-	register_subalias("D", sub.m_D);
-
-	register_subalias("QA", sub.m_QA);
-	register_subalias("QB", sub.m_QB);
-	register_subalias("QC", sub.m_QC);
-	register_subalias("QD", sub.m_QD);
-	register_subalias("RC", sub.m_RC);
-
-}
-
-NETLIB_START(nic9316_sub)
-{
-    m_cnt = 0;
-    m_loadq = 1;
-    m_ent = 1;
-
-    register_input("CLK", m_clk, netlist_input_t::STATE_INP_LH);
-
-    register_input("A", m_A, netlist_input_t::STATE_INP_PASSIVE);
-    register_input("B", m_B, netlist_input_t::STATE_INP_PASSIVE);
-    register_input("C", m_C, netlist_input_t::STATE_INP_PASSIVE);
-    register_input("D", m_D, netlist_input_t::STATE_INP_PASSIVE);
-
-    register_output("QA", m_QA);
-    register_output("QB", m_QB);
-    register_output("QC", m_QC);
-    register_output("QD", m_QD);
-    register_output("RC", m_RC);
-
-}
-
-NETLIB_UPDATE(nic9316_sub)
-{
-	if (m_loadq)
-	{
-		m_cnt = ( m_cnt + 1) & 0x0f;
-		update_outputs();
-	}
-	else
-	{
-		m_cnt = (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
-		update_outputs_all();
-	}
-	OUTLOGIC(m_RC, m_ent & (m_cnt == 0x0f), NLTIME_FROM_NS(20));
-}
-
-NETLIB_UPDATE(nic9316)
-{
-	sub.m_loadq = INPLOGIC(m_LOADQ);
-	sub.m_ent = INPLOGIC(m_ENT);
-	const netlist_sig_t clrq = INPLOGIC(m_CLRQ);
-
-	if ((!sub.m_loadq || (sub.m_ent & INPLOGIC(m_ENP))) & clrq)
-	{
-		sub.m_clk.activate_lh();
-	}
-	else
-	{
-		sub.m_clk.inactivate();
-		if (!clrq & (sub.m_cnt>0))
-		{
-			sub.m_cnt = 0;
-			sub.update_outputs();
-			OUTLOGIC(sub.m_RC, 0, NLTIME_FROM_NS(20));
-			return;
-		}
-	}
-	OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
-}
-
-NETLIB_FUNC_VOID(nic9316_sub, update_outputs_all, (void))
-{
-	const netlist_time out_delay = NLTIME_FROM_NS(20);
-	OUTLOGIC(m_QA, (m_cnt >> 0) & 1, out_delay);
-	OUTLOGIC(m_QB, (m_cnt >> 1) & 1, out_delay);
-	OUTLOGIC(m_QC, (m_cnt >> 2) & 1, out_delay);
-	OUTLOGIC(m_QD, (m_cnt >> 3) & 1, out_delay);
-}
-
-NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
-{
-	const netlist_time out_delay = NLTIME_FROM_NS(20);
-#if 0
-	OUTLOGIC(m_QA, (m_cnt >> 0) & 1, out_delay);
-	OUTLOGIC(m_QB, (m_cnt >> 1) & 1, out_delay);
-	OUTLOGIC(m_QC, (m_cnt >> 2) & 1, out_delay);
-	OUTLOGIC(m_QD, (m_cnt >> 3) & 1, out_delay);
-#else
-	if ((m_cnt & 1) == 1)
-		OUTLOGIC(m_QA, 1, out_delay);
-	else
-	{
-		OUTLOGIC(m_QA, 0, out_delay);
-		switch (m_cnt)
-		{
-		case 0x00:
-			OUTLOGIC(m_QB, 0, out_delay);
-			OUTLOGIC(m_QC, 0, out_delay);
-			OUTLOGIC(m_QD, 0, out_delay);
-			break;
-		case 0x02:
-		case 0x06:
-		case 0x0A:
-		case 0x0E:
-			OUTLOGIC(m_QB, 1, out_delay);
-			break;
-		case 0x04:
-		case 0x0C:
-			OUTLOGIC(m_QB, 0, out_delay);
-			OUTLOGIC(m_QC, 1, out_delay);
-			break;
-		case 0x08:
-			OUTLOGIC(m_QB, 0, out_delay);
-			OUTLOGIC(m_QC, 0, out_delay);
-			OUTLOGIC(m_QD, 1, out_delay);
-			break;
-		}
-
-	}
-#endif
-}
 
 #define xstr(s) # s
 #define ENTRY1(_nic, _name) m_list.add(new net_device_t_factory< _nic >( # _name, xstr(_nic) ));
@@ -795,6 +553,7 @@ void netlist_factory::initialize()
     ENTRY(logic_input,          NETDEV_LOGIC_INPUT)
     ENTRY(analog_input,         NETDEV_ANALOG_INPUT)
     ENTRY(log,                  NETDEV_LOG)
+    ENTRY(logD,                 NETDEV_LOGD)
     ENTRY(clock,                NETDEV_CLOCK)
     ENTRY(mainclock,            NETDEV_MAINCLOCK)
     ENTRY(solver,               NETDEV_SOLVER)

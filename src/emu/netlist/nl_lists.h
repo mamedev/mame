@@ -35,6 +35,28 @@ public:
 		m_ptr = m_list;
 		m_ptr--;
 	}
+
+    ATTR_COLD netlist_list_t(const netlist_list_t &rhs)
+    {
+        m_list = new entry_t[m_num_elements];
+        m_ptr = m_list;
+        m_ptr--;
+        for (int i=0; i<rhs.count(); i++)
+        {
+            this->add(rhs[i]);
+        }
+    }
+
+    ATTR_COLD netlist_list_t &operator=(const netlist_list_t &rhs)
+    {
+        for (int i=0; i<rhs.count(); i++)
+        {
+            this->add(rhs[i]);
+        }
+        return *this;
+    }
+
+
 	ATTR_COLD ~netlist_list_t()
 	{
 		delete[] m_list;
@@ -87,10 +109,14 @@ public:
 	ATTR_HOT inline entry_t *first() const { return (m_ptr >= m_list ? &m_list[0] : NULL ); }
     ATTR_HOT inline entry_t *next(entry_t *lc) const { return (lc < last() ? lc + 1 : NULL ); }
 	ATTR_HOT inline entry_t *last() const { return m_ptr; }
-	ATTR_HOT inline entry_t *item(int i) const { return &m_list[i]; }
 	ATTR_HOT inline int count() const { return m_ptr - m_list + 1; }
 	ATTR_HOT inline bool empty() const { return (m_ptr < m_list); }
 	ATTR_HOT inline void reset() { m_ptr = m_list - 1; }
+
+    //ATTR_HOT inline entry_t *item(int i) const { return &m_list[i]; }
+	ATTR_HOT inline _ListClass& operator[](const int & index) { return m_list[index].m_obj; }
+    ATTR_HOT inline const _ListClass& operator[](const int & index) const { return m_list[index].m_obj; }
+
 private:
 	entry_t * m_ptr;
 	entry_t * m_list;

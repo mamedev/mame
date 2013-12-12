@@ -64,12 +64,17 @@
 #include "nld_7427.h"
 #include "nld_7430.h"
 #include "nld_7474.h"
+#include "nld_7483.h"
 #include "nld_7486.h"
+#include "nld_7490.h"
 #include "nld_7493.h"
+#include "nld_9316.h"
 
 #include "nld_NE555.h"
 
 #include "nld_log.h"
+
+#include "nld_solver.h"
 
 // this is a bad hack
 
@@ -77,13 +82,6 @@
 // Special chips
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_LOGIC_INPUT(_name)                                                   \
-		NET_REGISTER_DEV(logic_input, _name)
-#define NETDEV_ANALOG_INPUT(_name)                                                  \
-		NET_REGISTER_DEV(analog_input, _name)
-#define NETDEV_CALLBACK(_name, _IN)                                                 \
-		NET_REGISTER_DEV(analog_callback, _name)                                    \
-		NET_CONNECT(_name, IN, _IN)
 #define NETDEV_SWITCH2(_name, _i1, _i2)                                             \
 		NET_REGISTER_DEV(nicMultiSwitch, _name)                                     \
 		NET_CONNECT(_name, i1, _i1)                                                 \
@@ -120,26 +118,6 @@
 		NET_CONNECT(_name, BIQ, _BIQ)                                               \
 		NET_CONNECT(_name, RBIQ, _RBIQ)
 
-#define TTL_7483(_name, _A1, _A2, _A3, _A4, _B1, _B2, _B3, _B4, _CI)                \
-		NET_REGISTER_DEV(nic7483, _name)                                            \
-		NET_CONNECT(_name, A1, _A1)                                                 \
-		NET_CONNECT(_name, A2, _A2)                                                 \
-		NET_CONNECT(_name, A3, _A3)                                                 \
-		NET_CONNECT(_name, A4, _A4)                                                 \
-		NET_CONNECT(_name, B1, _B1)                                                 \
-		NET_CONNECT(_name, B2, _B2)                                                 \
-		NET_CONNECT(_name, B3, _B3)                                                 \
-		NET_CONNECT(_name, B4, _B4)                                                 \
-		NET_CONNECT(_name, CI, _CI)
-
-#define TTL_7490(_name, _CLK, _R1, _R2, _R91, _R92)                                 \
-		NET_REGISTER_DEV(nic7490, _name)                                            \
-		NET_CONNECT(_name, CLK, _CLK)                                               \
-		NET_CONNECT(_name, R1,  _R1)                                                \
-		NET_CONNECT(_name, R2,  _R2)                                                \
-		NET_CONNECT(_name, R91, _R91)                                               \
-		NET_CONNECT(_name, R92, _R92)
-
 #define TTL_74107A(_name, _CLK, _J, _K, _CLRQ)                                      \
 		NET_REGISTER_DEV(nic74107A, _name)                                          \
 		NET_CONNECT(_name, CLK, _CLK)                                               \
@@ -160,18 +138,6 @@
 		NET_CONNECT(_name, B, _B)                                                   \
 		NET_CONNECT(_name, GA, _GA)
 
-#define TTL_9316(_name, _CLK, _ENP, _ENT, _CLRQ, _LOADQ, _A, _B, _C, _D)            \
-		NET_REGISTER_DEV(nic9316, _name)                                            \
-		NET_CONNECT(_name, CLK, _CLK)                                               \
-		NET_CONNECT(_name, ENP,  _ENP)                                              \
-		NET_CONNECT(_name, ENT,  _ENT)                                              \
-		NET_CONNECT(_name, CLRQ, _CLRQ)                                             \
-		NET_CONNECT(_name, LOADQ,_LOADQ)                                            \
-		NET_CONNECT(_name, A,    _A)                                                \
-		NET_CONNECT(_name, B,    _B)                                                \
-		NET_CONNECT(_name, C,    _C)                                                \
-		NET_CONNECT(_name, D,    _D)
-
 #define NE555N_MSTABLE(_name, _TRIG, _CV)                                           \
 		NET_REGISTER_DEV(nicNE555N_MSTABLE, _name)                                  \
 		NET_CONNECT(_name, TRIG, _TRIG)                                             \
@@ -182,18 +148,6 @@
 		NET_CONNECT(_name, I1, _I1)                                                 \
 		NET_CONNECT(_name, I2, _I2)                                                 \
 		NET_CONNECT(_name, I3, _I3)
-
-// ----------------------------------------------------------------------------------------
-// Special support devices ...
-// ----------------------------------------------------------------------------------------
-
-NETLIB_DEVICE(logic_input,
-	netlist_ttl_output_t m_Q;
-);
-
-NETLIB_DEVICE(analog_input,
-	netlist_analog_output_t m_Q;
-);
 
 // ----------------------------------------------------------------------------------------
 // Special devices ...
@@ -308,73 +262,9 @@ public:
 };
 
 
-NETLIB_DEVICE(nic7490,
-	ATTR_HOT void update_outputs();
-
-	netlist_ttl_input_t m_R1;
-	netlist_ttl_input_t m_R2;
-	netlist_ttl_input_t m_R91;
-	netlist_ttl_input_t m_R92;
-	netlist_ttl_input_t m_clk;
-
-	UINT8 m_cnt;
-
-	netlist_ttl_output_t m_Q[4];
-);
-
 /* ripple-carry counter on low-high clock transition */
 
-NETLIB_SUBDEVICE(nic9316_sub,
-	ATTR_HOT void update_outputs_all();
-	ATTR_HOT void update_outputs();
 
-	netlist_ttl_input_t m_clk;
-
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_C;
-	netlist_ttl_input_t m_D;
-
-	UINT8 m_cnt;
-	netlist_sig_t m_loadq;
-	netlist_sig_t m_ent;
-
-	netlist_ttl_output_t m_QA;
-	netlist_ttl_output_t m_QB;
-	netlist_ttl_output_t m_QC;
-	netlist_ttl_output_t m_QD;
-	netlist_ttl_output_t m_RC;
-);
-
-NETLIB_DEVICE(nic9316,
-	NETLIB_NAME(nic9316_sub) sub;
-	netlist_ttl_input_t m_ENP;
-	netlist_ttl_input_t m_ENT;
-	netlist_ttl_input_t m_CLRQ;
-	netlist_ttl_input_t m_LOADQ;
-);
-
-NETLIB_DEVICE(nic7483,
-	netlist_ttl_input_t m_CI;
-	netlist_ttl_input_t m_A1;
-	netlist_ttl_input_t m_A2;
-	netlist_ttl_input_t m_A3;
-	netlist_ttl_input_t m_A4;
-	netlist_ttl_input_t m_B1;
-	netlist_ttl_input_t m_B2;
-	netlist_ttl_input_t m_B3;
-	netlist_ttl_input_t m_B4;
-	netlist_ttl_input_t m_clk;
-
-	UINT8 m_lastr;
-
-	netlist_ttl_output_t m_SA;
-	netlist_ttl_output_t m_SB;
-	netlist_ttl_output_t m_SC;
-	netlist_ttl_output_t m_SD;
-	netlist_ttl_output_t m_CO;
-
-);
 
 /* one half of a nic74153 */
 

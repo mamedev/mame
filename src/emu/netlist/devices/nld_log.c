@@ -24,6 +24,17 @@ NETLIB_NAME(log)::~NETLIB_NAME(log)()
     fclose(m_file);
 }
 
+NETLIB_START(logD)
+{
+    NETLIB_NAME(log)::start();
+    register_input("I2", m_I2);
+}
+
+NETLIB_UPDATE(logD)
+{
+    fprintf(m_file, "%e %e\n", netlist().time().as_double(), INPANALOG(m_I) - INPANALOG(m_I2));
+}
+
 // FIXME: Implement wav later, this must be clock triggered device where the input to be written
 //        is on a subdevice ...
 #if 0

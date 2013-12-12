@@ -66,6 +66,12 @@ typedef delegate<void (const double)> netlist_output_delegate;
 //  MACROS
 //============================================================
 
+// prevent implicit copying
+#define NETLIST_PREVENT_COPYING(_name)          \
+    private:                                    \
+        _name(const _name &);                   \
+        _name &operator=(const _name &);        \
+
 #if NL_KEEP_STATISTICS
 #define add_to_stat(v,x)        do { v += (x); } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)

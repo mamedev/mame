@@ -6,6 +6,7 @@
 #include "nl_base.h"
 #include "devices/nld_system.h"
 #include "pstring.h"
+#include "nl_util.h"
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
@@ -280,7 +281,7 @@ ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstri
 	dev.init(*m_setup, this->name() + "." + name);
 }
 
-ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, netlist_core_terminal_t &term)
+ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, const netlist_core_terminal_t &term)
 {
     pstring alias = this->name() + "." + name;
 
@@ -330,14 +331,14 @@ static void init_term(netlist_core_device_t &dev, netlist_core_terminal_t &term,
 }
 
 // FIXME: Revise internal links ...
-ATTR_COLD void netlist_device_t::register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState)
+ATTR_COLD void netlist_device_t::register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, const netlist_input_t::state_e aState)
 {
     init_term(dev, in, aState);
     init_term(dev, out, aState);
     m_setup->connect(in, out);
 }
 
-ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, netlist_output_t &out, netlist_input_t::state_e aState)
+ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, netlist_output_t &out, const netlist_input_t::state_e aState)
 {
 	register_link_internal(*this, in, out, aState);
 }
@@ -422,7 +423,7 @@ ATTR_COLD void netlist_net_t::register_con(netlist_core_terminal_t &terminal)
         m_active++;
 }
 
-ATTR_HOT inline void netlist_net_t::update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
+ATTR_HOT inline void netlist_net_t::update_dev(const netlist_core_terminal_t *inp, const UINT32 mask) const
 {
 	if ((inp->state() & mask) != 0)
 	{
@@ -602,7 +603,6 @@ NETLIB_START(mainclock)
 
 	register_param("FREQ", m_freq, 7159000.0 * 5);
 	m_inc = netlist_time::from_hz(m_freq.Value()*2);
-
 }
 
 NETLIB_UPDATE_PARAM(mainclock)

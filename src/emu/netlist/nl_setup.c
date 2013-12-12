@@ -8,7 +8,9 @@
 #include "nl_base.h"
 #include "nl_setup.h"
 #include "nl_parser.h"
+#include "nl_util.h"
 #include "devices/nld_system.h"
+#include "devices/nld_solver.h"
 
 static NETLIST_START(base)
 	NETDEV_TTL_CONST(ttlhigh, 1)
@@ -139,7 +141,7 @@ pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in)
     fatalerror("Unknown object type %d\n", in.type());
 }
 
-void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const pstring &name, netlist_object_t &obj, netlist_input_t::state_e state)
+void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const pstring &name, netlist_object_t &obj, const netlist_input_t::state_e state)
 {
     switch (obj.type())
     {
@@ -248,7 +250,7 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 	    if (dev == NULL)
 	        fatalerror("Device for %s not found\n", name.cstr());
 	    int c = atoi(ret.substr(p+2,ret.len()-p-3));
-	    temp = dev->name() + "." + dev->m_terminals.item(c)->object();
+	    temp = dev->name() + "." + dev->m_terminals[c];
 	    // reresolve ....
 	    do {
 	        ret = temp;
@@ -516,6 +518,21 @@ void netlist_setup_t::resolve_inputs(void)
 
 void netlist_setup_t::start_devices(void)
 {
+
+    if (getenv("NL_LOGS"))
+    {
+        NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
+        nl_util::pstring_list ll = nl_util::split(getenv("NL_LOGS"), ":");
+        for (int i=0; i < ll.count(); i++)
+        {
+            printf("%d: <%s>\n",i, ll[i].cstr());
+            netlist_device_t *nc = factory().new_device_by_classname("nld_log", *this);
+            pstring name = "log" + ll[i];
+            register_dev(nc, name);
+            register_link(name + ".I", ll[i]);
+        }
+    }
+
 
     NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
     /* find the main clock ... */

@@ -3,7 +3,7 @@
 /*
  * nld_7493.h
  *
- *  DM7493: Quad 2-Input NAND Gates
+ *  DM7493: Binary Counters
  *
  *          +--------------+
  *        B |1     ++    14| A
@@ -38,10 +38,12 @@
  *          |   15  ||  1 |  1 |  1 |  1 |
  *          +-------++----+----+----+----+
  *
+ *          Note C Output QA is connected to input B
+ *
  *          Reset Count Function table
  *
  *          +-----+-----++----+----+----+----+
- *          | R01 | R01 || QD | QC | QB | QA |
+ *          | R01 | R02 || QD | QC | QB | QA |
  *          +=====+=====++====+====+====+====+
  *          |  1  |  1  ||  0 |  0 |  0 |  0 |
  *          |  0  |  X  ||       COUNT       |
