@@ -84,7 +84,7 @@ TODO (game-specific):
     - The House of the Dead 2: game uses an earlier PVR so it has extra gfx issues;
     - The Typing of the Dead: missing keyboard inputs, doesn't enter into attract/test mode anymore (JVS issue);
     - Virtua Tennis: dies when accessing the gameplay or the attract mode (PVR or SH-4 bug, most likely);
-    - World Kicks: MAME crashes even before showing Naomi logo;
+    - World Kicks (both sets): "NAOMIM2: unhandled board write a0800600, 0000" after Naomi logo
     (more will come up soon ...)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -5619,6 +5619,29 @@ ROM_START( wldkicks )
 	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(c1e3000b) SHA1(36c2546833effe9452e2b3f7d31335fc5e349f49) )
 ROM_END
 
+ROM_START( wldkicksa )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "wk3vera_fl1.2d", 0x0400000, 0x800000, CRC(cfdd5c5d) SHA1(ffc5d38edb600462574d4ed8ce5ada8625d59c74) ) 
+	ROM_LOAD( "wk3vera_fl2.2c", 0x0c00000, 0x800000, CRC(ad2577d5) SHA1(f7b6bab001c5f5cf0b33a70cd0dfdca8f7d25921) ) 
+	ROM_LOAD( "wk1ma2.4m",   0x1000000, 0x1000000, CRC(650590ec) SHA1(bb9d5d5df2321df24ee0fb9e8bf2757d5277f8ea) )
+	ROM_RELOAD( 0x800000, 0x400000)
+	ROM_LOAD( "wk1ma3.4l",   0x2000000, 0x1000000, CRC(3b340dc0) SHA1(2412e41d5bd74d1233fb91f8ce2276a318bfc53d) )
+	ROM_LOAD( "wk1ma4.4k",   0x3000000, 0x1000000, CRC(263fbb16) SHA1(b5d3a3d085f9623d70030ca3c49afb84e25549e3) )
+	ROM_LOAD( "wk1ma5.4j",   0x4000000, 0x1000000, CRC(9697db68) SHA1(7926e2acff0519403afcba9bdb5f68de28b06c79) )
+	ROM_LOAD( "wk1ma6.4h",   0x5000000, 0x1000000, CRC(65017db3) SHA1(a66cd73cdfc9355df63da781a46aa832889f583a) )
+	ROM_LOAD( "wk1ma7.4f",   0x6000000, 0x1000000, CRC(902eea85) SHA1(aa7964eb85b468d4fe112f9f0faaf2fa3f1aa96b) )
+	ROM_LOAD( "wk1ma8.4e",   0x7000000, 0x1000000, CRC(90e917ed) SHA1(53d32ce0ae2b05fa55a95b8697927045d07f4e8a) )
+	ROM_LOAD( "wk1ma9.4d",   0x8000000, 0x1000000, CRC(1d227a05) SHA1(9f816bcdf0279785e0b37ab2f3c5eb5912114dd5) )
+	ROM_LOAD( "wk1ma10.4c",  0x9000000, 0x1000000, CRC(29635a54) SHA1(a3109d0f8f271e2183316846df2a6a819f6a9b20) )
+	ROM_LOAD( "wk1ma11.4b",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
+
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(c1e3000b) SHA1(36c2546833effe9452e2b3f7d31335fc5e349f49) )
+ROM_END
+
 ROM_START( toukon4 )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8206,6 +8229,7 @@ ROM_END
 
 /* Cart games on Namco custom ROM board */
 /* 25209801 */ GAME( 2000, wldkicks, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "World Kicks (WK2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 25209801 */ GAME( 2000, wldkicksa,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "World Kicks (WK3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25349801 */ GAME( 2000, toukon4,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 // 25469801 Ninja Assault (NJA1 Ver. A)
 // 25469801 Ninja Assault (NJA2 Ver. A)
