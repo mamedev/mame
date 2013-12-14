@@ -25,8 +25,13 @@ const device_type MC2661 = &device_creator<mc2661_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG 1
 
+
+UINT32 baud_rates[16] =
+{
+	50, 75, 110, 135 /*134.5*/, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19200
+};
 
 enum
 {
@@ -193,6 +198,7 @@ void mc2661_device::device_reset()
 
 	m_mode_index = 0;
 	m_sync_index = 0;
+	m_signal = 0;
 
 	m_out_txd_func(1);
 	m_out_rxrdy_func(CLEAR_LINE);
@@ -225,6 +231,8 @@ void mc2661_device::tra_callback()
 void mc2661_device::tra_complete()
 {
 	// TODO
+	m_sr |= STATUS_TXRDY;
+	m_out_txrdy_func(ASSERT_LINE);
 }
 
 
@@ -235,7 +243,7 @@ void mc2661_device::tra_complete()
 void mc2661_device::rcv_callback()
 {
 	if (m_in_rxd_func.isnull())
-		receive_register_update_bit(get_in_data_bit());
+		receive_register_update_bit(m_signal);
 	else
 		receive_register_update_bit(m_in_rxd_func());
 }
@@ -248,6 +256,10 @@ void mc2661_device::rcv_callback()
 void mc2661_device::rcv_complete()
 {
 	// TODO
+	receive_register_extract();
+	m_rhr = get_received_char();
+	m_sr |= STATUS_RXRDY;
+	m_out_rxrdy_func(ASSERT_LINE);
 }
 
 
@@ -273,6 +285,8 @@ READ8_MEMBER( mc2661_device::read )
 	{
 	case REGISTER_HOLDING:
 		data = m_rhr;
+		m_sr &= ~STATUS_RXRDY;
+		m_out_rxrdy_func(CLEAR_LINE);
 		break;
 
 	case REGISTER_STATUS:
@@ -284,6 +298,7 @@ READ8_MEMBER( mc2661_device::read )
 
 		m_mode_index++;
 		m_mode_index &= 0x01;
+
 		break;
 
 	case REGISTER_COMMAND:
@@ -310,6 +325,15 @@ WRITE8_MEMBER( mc2661_device::write )
 		if (LOG) logerror("MC2661 '%s' Transmit Holding Register: %02x\n", tag(), data);
 
 		m_thr = data;
+		if(COMMAND_TXEN)
+		{
+			if(COMMAND_MODE != 0x02)
+				transmit_register_setup(m_thr);
+			m_sr &= ~STATUS_TXRDY;
+			m_out_txrdy_func(CLEAR_LINE);
+		}
+		if(COMMAND_MODE == 0x02)  // loopback - the Wicat will set this after enabling the transmitter
+			m_rhr = data;
 		break;
 
 	case REGISTER_SYNC:
@@ -345,6 +369,54 @@ WRITE8_MEMBER( mc2661_device::write )
 
 			set_data_frame(word_length, stop_bits, parity_code, false);
 		}
+		if(m_mode_index == 1)
+		{
+			UINT32 rx_baud = baud_rates[data & 0x0f];
+			UINT32 tx_baud = baud_rates[data & 0x0f];
+			if(data & 0x10)  // internal receiver clock
+			{
+//				if((m_mr[0] & 0x03) != 0)
+//					rx_baud *= 16;
+			}
+			else  // external receiver clock
+			{
+				switch(m_mr[0] & 0x03)
+				{
+				case 0x02:
+					rx_baud *= 16;
+					break;
+				case 0x03:
+					rx_baud *= 64;
+					break;
+				default:
+					// x1
+					break;
+				}
+			}
+			if(data & 0x20)  // internal transmitter clock
+			{
+//				if((m_mr[0] & 0x03) != 0)
+//					tx_baud *= 16;
+			}
+			else  // external transmitter clock
+			{
+				switch(m_mr[0] & 0x03)
+				{
+				case 0x02:
+					tx_baud *= 16;
+					break;
+				case 0x03:
+					tx_baud *= 64;
+					break;
+				default:
+					// x1
+					break;
+				}
+			}
+
+			set_rcv_rate(rx_baud);
+			set_tra_rate(tx_baud);
+		}
 
 		m_mode_index++;
 		m_mode_index &= 0x01;
@@ -355,13 +427,40 @@ WRITE8_MEMBER( mc2661_device::write )
 
 		m_cr = data & 0xef;
 
+		m_out_dtr_func(!COMMAND_DTR);
+		m_out_rts_func(!COMMAND_RTS);
+
+		if (COMMAND_MODE == 0x02)  // local loopback
+		{
+			if(COMMAND_DTR && COMMAND_RTS)  // CR1 and CR5 must be set to 1 to use local loopback
+			{
+				// probably much more to it that this, but this is enough for the Wicat to be happy
+				m_rhr = m_thr;
+				m_sr |= STATUS_RXRDY;
+				m_out_rxrdy_func(ASSERT_LINE);
+				return;
+			}
+		}
+
+		if (COMMAND_TXEN)
+		{
+			m_sr |= STATUS_TXRDY;
+			m_out_txrdy_func(ASSERT_LINE);
+		}
+		else
+		{
+			m_sr &= ~STATUS_TXRDY;
+			m_out_txrdy_func(CLEAR_LINE);
+		}
+		if (!COMMAND_RXEN)
+		{
+			m_sr &= ~STATUS_RXRDY;
+			m_out_rxrdy_func(CLEAR_LINE);
+		}
 		if (COMMAND_RESET)
 		{
 			m_sr &= ~(STATUS_FE | STATUS_OVERRUN | STATUS_PE);
 		}
-
-		m_out_dtr_func(!COMMAND_DTR);
-		m_out_rts_func(!COMMAND_RTS);
 		break;
 	}
 }

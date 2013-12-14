@@ -93,6 +93,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( rxrdy_r );
 	DECLARE_READ_LINE_MEMBER( txemt_r );
 
+	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_signal = state; device_serial_interface::rx_w(state); }
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -125,6 +127,7 @@ private:
 	UINT8 m_sr;
 	UINT8 m_mr[2];
 	UINT8 m_sync[3];
+	UINT8 m_signal;
 
 	int m_mode_index;
 	int m_sync_index;
