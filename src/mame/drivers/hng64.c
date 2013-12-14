@@ -983,6 +983,8 @@ READ32_MEMBER(hng64_state::tcram_r)
    */
 READ32_MEMBER(hng64_state::unk_vreg_r)
 {
+//	m_unk_vreg_toggle^=0x8000;
+
 	return 0;
 
 //	return ++m_unk_vreg_toggle;
@@ -1856,8 +1858,8 @@ void hng64_state::m_set_irq(UINT32 irq_vector)
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 3 3d fifo processed irq
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 9
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 10
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 17
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 11 network irq? needed by xrally and roadedge
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 17 MCU related irq
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 11 network irq, needed by xrally and roadedge
 
 	    samsho64 / samsho64_2 does this during running:
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000000. (PC=800008fc) just checking?
