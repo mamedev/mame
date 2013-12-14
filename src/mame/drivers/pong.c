@@ -8,9 +8,6 @@ Notes:
 
 TODO:
 
-============================================================================
-
-
 ***************************************************************************/
 
 
@@ -110,7 +107,6 @@ static NETLIST_START(pong_schematics)
 #endif
 
 	NETDEV_LOGIC_INPUT(SRST)
-	NETDEV_ANALOG_INPUT(P1)
 	NETDEV_ANALOG_INPUT(P2)
 
 	TTL_7404_INVERT(hitQ, hit)
@@ -150,7 +146,9 @@ static NETLIST_START(pong_schematics)
 	TTL_7427_NOR(ic_g2a, ic_g3c.Q, 256HQ, vpad2Q)
 	NET_ALIAS(pad2, ic_g2a.Q)
 
+	// ----------------------------------------------------------------------------------------
 	// horizontal counter
+    // ----------------------------------------------------------------------------------------
 	TTL_7493(ic_f8, clk, ic_f8.QA, ic_e7b.QQ, ic_e7b.QQ)    // f8, f9, f6b
 	TTL_7493(ic_f9, ic_f8.QD, ic_f9.QA, ic_e7b.QQ, ic_e7b.QQ)   // f8, f9, f6b
 	TTL_74107(ic_f6b, ic_f9.QD, high, high, ic_e7b.Q)
@@ -168,7 +166,9 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(256H, ic_f6b.Q)
 	NET_ALIAS(256HQ, ic_f6b.QQ)
 
+    // ----------------------------------------------------------------------------------------
 	// vertical counter
+    // ----------------------------------------------------------------------------------------
 	TTL_7493(ic_e8, hreset, ic_e8.QA, ic_e7a.QQ, ic_e7a.QQ) // e8, e9, d9b
 	TTL_7493(ic_e9, ic_e8.QD,ic_e9.QA,  ic_e7a.QQ, ic_e7a.QQ)   // e8, e9, d9b
 	TTL_74107(ic_d9b, ic_e9.QD, high, high, ic_e7a.Q)
@@ -186,7 +186,9 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(256VQ, ic_d9b.QQ)
 
 
+    // ----------------------------------------------------------------------------------------
 	// hblank flip flop
+    // ----------------------------------------------------------------------------------------
 
 	TTL_7400_NAND(ic_g5b, 16H, 64H)
 
@@ -198,7 +200,9 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(hblankQ,  ic_h5b.Q)
 	TTL_7400_NAND(hsyncQ, hblank, 32H)
 
+    // ----------------------------------------------------------------------------------------
 	// vblank flip flop
+    // ----------------------------------------------------------------------------------------
 	TTL_7402_NOR(ic_f5c, ic_f5d.Q, vreset)
 	TTL_7402_NOR(ic_f5d, ic_f5c.Q, 16V)
 
@@ -209,14 +213,13 @@ static NETLIST_START(pong_schematics)
 	TTL_7410_NAND(ic_g5a, vblank, 4V, ic_h5a.Q)
 	NET_ALIAS(vsyncQ, ic_g5a.Q)
 
+    // ----------------------------------------------------------------------------------------
 	// move logic
+    // ----------------------------------------------------------------------------------------
 
 	TTL_7400_NAND(ic_e1d, hit_sound, ic_e1c.Q)
 	TTL_7400_NAND(ic_e1c, ic_f1.QC, ic_f1.QD)
 	TTL_7493(ic_f1, ic_e1d.Q, ic_f1.QA, rstspeed, rstspeed)
-
-	//NETDEV_LOG(LOG2, ic_f1.QC)
-	//NETDEV_LOG(LOG3, ic_f1.QD)
 
 	TTL_7402_NOR(ic_g1d, ic_f1.QC, ic_f1.QD)
 	TTL_7400_NAND(ic_h1a, ic_g1d.Q, ic_g1d.Q)
@@ -229,10 +232,6 @@ static NETLIST_START(pong_schematics)
 	TTL_74107(ic_h2a, ic_g1c.Q, ic_h2b.Q, low, ic_h1b.Q)
 	TTL_74107(ic_h2b, ic_g1c.Q, high, move, ic_h1c.Q)
 
-	//NETDEV_LOG(LOG2, ic_h2a)
-	//NETDEV_LOG(LOG3, ic_h2b)
-
-
 	TTL_7400_NAND(ic_h4a, ic_h2b.Q, ic_h2a.Q)
 	NET_ALIAS(move, ic_h4a.Q)
 
@@ -240,15 +239,15 @@ static NETLIST_START(pong_schematics)
 	TTL_7404_INVERT(ic_d1a, ic_c1d.Q)
 	TTL_7474(ic_h3b, ic_d1a.Q, ic_h3b.QQ, hit1Q, hit2Q)
 
-	//NETDEV_LOG(LOG1, move)
-
 	TTL_7400_NAND(ic_h4d, ic_h3b.Q, move)
 	TTL_7400_NAND(ic_h4b, ic_h3b.QQ, move)
 	TTL_7400_NAND(ic_h4c, ic_h4d.Q, ic_h4b.Q)
 	NET_ALIAS(Aa, ic_h4c.Q)
 	NET_ALIAS(Ba, ic_h4b.Q)
 
+    // ----------------------------------------------------------------------------------------
 	// hvid circuit
+    // ----------------------------------------------------------------------------------------
 
 	TTL_7400_NAND(hball_resetQ, Serve, attractQ)
 
@@ -259,7 +258,9 @@ static NETLIST_START(pong_schematics)
 	TTL_7420_NAND(ic_h6b, ic_g6b.Q, ic_h7.RC, ic_g7.QC, ic_g7.QD)
 	NET_ALIAS(hvidQ, ic_h6b.Q)
 
+    // ----------------------------------------------------------------------------------------
 	// vvid circuit
+    // ----------------------------------------------------------------------------------------
 
 	TTL_9316(ic_b3, hsyncQ, high, vblankQ, high, ic_b2b.Q, a6, b6, c6, d6)
 	TTL_9316(ic_a3, hsyncQ, ic_b3.RC, high, high, ic_b2b.Q, low, low, low, low)
@@ -271,7 +272,9 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(vpos32, ic_a3.QB)
 	NET_ALIAS(vpos16, ic_a3.QA)
 
+    // ----------------------------------------------------------------------------------------
 	// vball ctrl circuit
+    // ----------------------------------------------------------------------------------------
 
 	TTL_7450_ANDORINVERT(ic_a6a, b1, 256HQ, b2, 256H)
 	TTL_7450_ANDORINVERT(ic_a6b, c1, 256HQ, c2, 256H)
@@ -295,34 +298,49 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(c6, ic_b4.SC)
 	NET_ALIAS(d6, ic_b4.SD)
 
+    // ----------------------------------------------------------------------------------------
 	// serve monoflop
-	TTL_7404_INVERT(f4_trig, rstspeed)
-	NE555N_MSTABLE(ic_f4_serve, f4_trig, NC)
-	NETDEV_PARAM(ic_f4_serve.R, RES_K(330))
-	NETDEV_PARAM(ic_f4_serve.C, CAP_U(4.7))
+    // ----------------------------------------------------------------------------------------
 
-	TTL_7427_NOR(ic_e5a, ic_f4_serve.Q, StopG, runQ)
+	TTL_7404_INVERT(f4_trig, rstspeed)
+
+	NETDEV_R(ic_f4_serve_R, RES_K(330))
+    NETDEV_C(ic_f4_serve_C, CAP_U(4.7))
+    NETDEV_NE555(ic_f4_serve)
+
+    NET_C(ic_f4_serve.VCC, V5)
+    NET_C(ic_f4_serve.GND, GND)
+    NET_C(ic_f4_serve.RESET, V5)
+    NET_C(ic_f4_serve_R.1, V5)
+    NET_C(ic_f4_serve_R.2, ic_f4_serve.THRESH)
+    NET_C(ic_f4_serve_R.2, ic_f4_serve.DISCH)
+    NET_C(f4_trig, ic_f4_serve.TRIG)
+    NET_C(ic_f4_serve_R.2, ic_f4_serve_C.1)
+    NET_C(GND, ic_f4_serve_C.2)
+
+    TTL_7427_NOR(ic_e5a, ic_f4_serve.OUT, StopG, runQ)
 	TTL_7474(ic_b5b_serve, pad1, ic_e5a, ic_e5a, high)
 
 	NET_ALIAS(Serve, ic_b5b_serve.QQ)
 	NET_ALIAS(ServeQ, ic_b5b_serve.Q)
 
+    // ----------------------------------------------------------------------------------------
 	// score logic
+    // ----------------------------------------------------------------------------------------
 
 	TTL_7474(ic_h3a, 4H, 128H, high, attractQ)
 
+    // ----------------------------------------------------------------------------------------
 	// sound logic
+    // ----------------------------------------------------------------------------------------
 	TTL_7474(ic_c2a, vpos256, high, hitQ, high)
 	TTL_74107(ic_f3_topbot, vblank, vvid, vvidQ, ServeQ)
 
+    // ----------------------------------------------------------------------------------------
 	// monoflop with NE555 determines duration of score sound
-#if 0
-	NE555N_MSTABLE(ic_g4_sc, MissQ, NC)
-	NET_ALIAS(SC, ic_g4_sc.Q)       // monoflop with NE555 determines score sound
-	NETDEV_PARAM(ic_g4_sc.R, RES_K(220))
-	NETDEV_PARAM(ic_g4_sc.C, CAP_U(1))
-#else
-    NETDEV_R(ic_g4_R, RES_K(220))
+    // ----------------------------------------------------------------------------------------
+
+	NETDEV_R(ic_g4_R, RES_K(220))
     NETDEV_C(ic_g4_C, CAP_U(1))
     NETDEV_NE555(ic_g4_sc)
     NET_ALIAS(SC, ic_g4_sc.OUT)
@@ -336,8 +354,6 @@ static NETLIST_START(pong_schematics)
     NET_C(MissQ, ic_g4_sc.TRIG)
     NET_C(ic_g4_R.2, ic_g4_C.1)
     NET_C(GND, ic_g4_C.2)
-    //NETDEV_LOG(C, ic_g4_C.1)
-#endif
 
     NET_ALIAS(hit_sound_en, ic_c2a.QQ)
 	TTL_7400_NAND(hit_sound, hit_sound_en, vpos16)
@@ -349,15 +365,37 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(sound, ic_c1b.Q)
 
 
+    // ----------------------------------------------------------------------------------------
 	// paddle1 logic 1
+    // ----------------------------------------------------------------------------------------
 
-	NE555N_MSTABLE(ic_b9, 256VQ, P1)
-	NETDEV_PARAM(ic_b9.R, RES_K(90))
-	NETDEV_PARAM(ic_b9.C, CAP_U(.1))
-	NETDEV_PARAM(ic_b9.VL, 0.5)         // 1N914
-	TTL_7404_INVERT(ic_c9b, ic_b9.Q)
+    NETDEV_POT(ic_b9_POT, RES_K(1))     // This is a guess!!
+    NETDEV_R(ic_b9_RPRE, 470)
+
+    NET_C(ic_b9_POT.1, V5)
+    NET_C(ic_b9_POT.3, GND)
+    NET_C(ic_b9_POT.2, ic_b9_RPRE.1)
+    NET_C(ic_b9_RPRE.2, ic_b9.CONT)
+
+    NETDEV_R(ic_b9_R, RES_K(71))
+    NETDEV_C(ic_b9_C, CAP_U(.1))
+    NETDEV_1N914(ic_b9_D)
+    NETDEV_NE555(ic_b9)
+
+    NET_C(ic_b9.VCC, V5)
+    NET_C(ic_b9.GND, GND)
+    NET_C(ic_b9.RESET, V5)
+    NET_C(ic_b9_R.1, V5)
+    NET_C(ic_b9_R.2, ic_b9.THRESH)
+    NET_C(ic_b9_R.2, ic_b9_D.A)
+    NET_C(ic_b9_D.K, ic_b9.DISCH)
+    NET_C(256VQ, ic_b9.TRIG)
+    NET_C(ic_b9_R.2, ic_b9_C.1)
+    NET_C(GND, ic_b9_C.2)
+
+	TTL_7404_INVERT(ic_c9b, ic_b9.OUT)
 	TTL_7400_NAND(ic_b7b, ic_a7b.Q, hsyncQ)
-	TTL_7493(ic_b8, ic_b7b.Q, ic_b8.QA, ic_b9.Q, ic_b9.Q)
+	TTL_7493(ic_b8, ic_b7b.Q, ic_b8.QA, ic_b9.OUT, ic_b9.OUT)
 	TTL_7400_NAND(ic_b7a, ic_c9b.Q, ic_a7b.Q)
 	TTL_7420_NAND(ic_a7b, ic_b8.QA, ic_b8.QB, ic_b8.QC, ic_b8.QD)
 	NET_ALIAS(vpad1Q, ic_b7a.Q)
@@ -366,15 +404,37 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(c1, ic_b8.QC)
 	NET_ALIAS(d1, ic_b8.QD)
 
+    // ----------------------------------------------------------------------------------------
 	// paddle1 logic 2
+    // ----------------------------------------------------------------------------------------
 
-	NE555N_MSTABLE(ic_a9, 256VQ, P2)
-	NETDEV_PARAM(ic_a9.R, RES_K(90))
-	NETDEV_PARAM(ic_a9.C, CAP_U(.1))
-	NETDEV_PARAM(ic_a9.VL, 0.5)         // 1N914
-	TTL_7404_INVERT(ic_c9a, ic_a9.Q)
+	NETDEV_POT(ic_a9_POT, RES_K(1))     // This is a guess!!
+    NETDEV_R(ic_a9_RPRE, 470)
+
+    NET_C(ic_a9_POT.1, V5)
+    NET_C(ic_a9_POT.3, GND)
+    NET_C(ic_a9_POT.2, ic_a9_RPRE.1)
+    NET_C(ic_a9_RPRE.2, ic_a9.CONT)
+
+    NETDEV_R(ic_a9_R, RES_K(71))
+    NETDEV_C(ic_a9_C, CAP_U(.1))
+    NETDEV_1N914(ic_a9_D)
+    NETDEV_NE555(ic_a9)
+
+    NET_C(ic_a9.VCC, V5)
+    NET_C(ic_a9.GND, GND)
+    NET_C(ic_a9.RESET, V5)
+    NET_C(ic_a9_R.1, V5)
+    NET_C(ic_a9_R.2, ic_a9.THRESH)
+    NET_C(ic_a9_R.2, ic_a9_D.A)
+    NET_C(ic_a9_D.K, ic_a9.DISCH)
+    NET_C(256VQ, ic_a9.TRIG)
+    NET_C(ic_a9_R.2, ic_a9_C.1)
+    NET_C(GND, ic_a9_C.2)
+
+	TTL_7404_INVERT(ic_c9a, ic_a9.OUT)
 	TTL_7400_NAND(ic_b7c, ic_a7a.Q, hsyncQ)
-	TTL_7493(ic_a8, ic_b7c.Q, ic_a8.QA, ic_a9.Q, ic_a9.Q)
+	TTL_7493(ic_a8, ic_b7c.Q, ic_a8.QA, ic_a9.OUT, ic_a9.OUT)
 	TTL_7400_NAND(ic_b7d, ic_c9a.Q, ic_a7a.Q)
 	TTL_7420_NAND(ic_a7a, ic_a8.QA, ic_a8.QB, ic_a8.QC, ic_a8.QD)
 	NET_ALIAS(vpad2Q, ic_b7d.Q)
@@ -383,7 +443,9 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(c2, ic_a8.QC)
 	NET_ALIAS(d2, ic_a8.QD)
 
+    // ----------------------------------------------------------------------------------------
 	// C5-EN Logic
+    // ----------------------------------------------------------------------------------------
 
 	TTL_7404_INVERT(ic_e3a, 128H)
 	TTL_7427_NOR( ic_e3b, 256H, 64H, ic_e3a.Q)
@@ -394,7 +456,9 @@ static NETLIST_START(pong_schematics)
 	TTL_7425_NOR(ic_f2a, ic_g1a.Q, 64V, 128V, ic_d2c.Q)
 	NET_ALIAS(c5-en, ic_f2a.Q)
 
+    // ----------------------------------------------------------------------------------------
 	// Score logic ...
+    // ----------------------------------------------------------------------------------------
 
 	TTL_7402_NOR(ic_f5b, L, Missed)
 	TTL_7490(ic_c7, ic_f5b, SRST, SRST, low, low)
@@ -426,7 +490,9 @@ static NETLIST_START(pong_schematics)
 	NET_ALIAS(score2_10, ic_c8b.Q)
 	NET_ALIAS(score2_10Q, ic_c8b.QQ)
 
+    // ----------------------------------------------------------------------------------------
 	// Score display
+    // ----------------------------------------------------------------------------------------
 
 	TTL_74153(ic_d6a, score1_10Q, score1_4, score2_10Q, score2_4, 32H, 64H, low)
 	TTL_74153(ic_d6b, score1_10Q, score1_8, score2_10Q, score2_8, 32H, 64H, low)
@@ -471,7 +537,10 @@ static NETLIST_START(pong_schematics)
 	TTL_7427_NOR(ic_g2b, ic_g3b.Q, vblank, 4V)
 	NET_ALIAS(net, ic_g2b.Q)
 
+    // ----------------------------------------------------------------------------------------
 	// video
+    // ----------------------------------------------------------------------------------------
+
 	TTL_7402_NOR(ic_g1b, hvidQ, vvidQ)
 	TTL_7425_NOR(ic_f2b, ic_g1b.Q, pad1, pad2, net)
 	TTL_7404_INVERT(ic_e4e, ic_f2b.Q)
@@ -480,12 +549,6 @@ static NETLIST_START(pong_schematics)
 	TTL_7486_XOR(ic_a4d, hsyncQ, vsyncQ)
 	TTL_7404_INVERT(ic_e4f, ic_a4d.Q)
 
-#if 0
-	NETDEV_MIXER3(videomix, video, score, ic_e4f.Q)
-	NETDEV_PARAM(videomix.R1, RES_K(1))
-	NETDEV_PARAM(videomix.R2, RES_K(1.2))
-	NETDEV_PARAM(videomix.R3, RES_K(22))
-#else
 	NETDEV_R(RV1, RES_K(1))
     NETDEV_R(RV2, RES_K(1.2))
     NETDEV_R(RV3, RES_K(22))
@@ -498,11 +561,11 @@ static NETLIST_START(pong_schematics)
     NET_ALIAS(videomix, RV3.2)
 
     NETDEV_SOLVER(Solver)
+    NETDEV_PARAM(Solver.FREQ, 48000)
     NETDEV_ANALOG_CONST(V5, 5)
     NETDEV_ANALOG_CONST(V1, 1)
     NETDEV_ANALOG_CONST(GND, 0)
 
-#endif
 #if 0
     NETDEV_R(R1, 10)
     NETDEV_R(R2, 10)
@@ -713,8 +776,8 @@ static NETLIST_START(pong_schematics)
     NET_C(CP1.1, RP1.1)
     NET_C(EBUF.IP, RP1.1)
 
-    NETDEV_LOG(logX, EBUF.OP)
-    NETDEV_LOG(logY, 4V)
+    //NETDEV_LOG(logX, EBUF.OP)
+    //NETDEV_LOG(logY, 4V)
 
 #endif
 
@@ -732,12 +795,6 @@ NETLIST_END
 static NETLIST_START(pong_fast)
 
 	NETLIST_INCLUDE(pong_schematics)
-	/* the signal above is delayed on pong due to counter at gate delays.
-	 * This is approximated by the following circuit ...
-	 */
-	//NET_REMOVE_DEV(ic_h5b)
-	//NETDEV_DELAY_RISE(ic_g5b_D, clk, ic_g5b.Q)
-	//TTL_7400_NAND(ic_h5b, ic_h5c.Q, ic_g5b_D.Q)
 
 	NETDEV_CALLBACK(sound_cb, sound)
 	NETDEV_CALLBACK(video_cb, videomix)
@@ -754,12 +811,17 @@ public:
 
 			m_dac(*this, "dac"),                /* just to have a sound device */
 			m_srst(*this, "maincpu", "SRST"),
-			m_p_V0(*this, "maincpu", "P1"),
-			m_p_V1(*this, "maincpu", "P2"),
+			m_p_P0(*this, "maincpu", "ic_b9_POT.DIAL"),
+            m_p_P1(*this, "maincpu", "ic_a9_POT.DIAL"),
+			m_p_V0(*this, "maincpu", "P1"),  // pong - legacy
+			m_p_V1(*this, "maincpu", "P2"),  // pong - legacy
 			m_sw1a(*this, "maincpu", "sw1a.POS"),
 			m_sw1b(*this, "maincpu", "sw1b.POS"),
-			m_p_R0(*this, "maincpu", "ic_a9.R"),
-			m_p_R1(*this, "maincpu", "ic_b9.R")
+			m_p_R0(*this, "maincpu", "ic_a9_R.R"),
+			m_p_R1(*this, "maincpu", "ic_b9_R.R"),
+			m_p_R0x(*this, "maincpu", "ic_a9.R"),  // pong - legacy
+			m_p_R1x(*this, "maincpu", "ic_b9.R"),  // pong - legacy
+			isRomPong(false)
 	{
 	}
 
@@ -770,12 +832,18 @@ public:
 
 	// sub devices
 	netlist_mame_device::required_output<netlist_logic_output_t> m_srst;
-	netlist_mame_device::required_output<netlist_analog_output_t> m_p_V0;
-	netlist_mame_device::required_output<netlist_analog_output_t> m_p_V1;
+    netlist_mame_device::optional_param<netlist_param_double_t> m_p_P0;
+    netlist_mame_device::optional_param<netlist_param_double_t> m_p_P1;
+	netlist_mame_device::optional_output<netlist_analog_output_t> m_p_V0;
+	netlist_mame_device::optional_output<netlist_analog_output_t> m_p_V1;
 	netlist_mame_device::required_param<netlist_param_int_t> m_sw1a;
 	netlist_mame_device::required_param<netlist_param_int_t> m_sw1b;
-	netlist_mame_device::required_param<netlist_param_double_t> m_p_R0;
-	netlist_mame_device::required_param<netlist_param_double_t> m_p_R1;
+	netlist_mame_device::optional_param<netlist_param_double_t> m_p_R0;
+	netlist_mame_device::optional_param<netlist_param_double_t> m_p_R1;
+    netlist_mame_device::optional_param<netlist_param_double_t> m_p_R0x;
+    netlist_mame_device::optional_param<netlist_param_double_t> m_p_R1x;
+
+	bool isRomPong;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -808,6 +876,10 @@ private:
 
 void pong_state::machine_start()
 {
+    if (strcmp(this->shortname(),"pong")==0)
+    {
+        isRomPong = true;
+    }
 }
 
 void pong_state::machine_reset()
@@ -846,10 +918,21 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		double vB = 5.0 * 2 * NE555_R / (2 * NE555_R + NE555_R);
 		double Req = RES_2_PARALLEL(R1, R3) + RES_2_PARALLEL(NE555_R, 2.0 * NE555_R);
 		double pad = vA + (vB - vA)*PRE_R / (Req + PRE_R);
-		switch (numpad)
+		if (!isRomPong)
 		{
-		case IC_PADDLE1:    m_p_V0->set_Q(pad, NLTIME_FROM_NS(0)); break;
-		case IC_PADDLE2:    m_p_V1->set_Q(pad, NLTIME_FROM_NS(0)); break;
+	        switch (numpad)
+	        {
+	        case IC_PADDLE1:    m_p_P0->setTo(fac); break;
+	        case IC_PADDLE2:    m_p_P1->setTo(fac); break;
+	        }
+		}
+		else
+		{
+	        switch (numpad)
+	        {
+	        case IC_PADDLE1:    m_p_V0->set_Q(pad, NLTIME_FROM_NS(0)); break;
+	        case IC_PADDLE2:    m_p_V1->set_Q(pad, NLTIME_FROM_NS(0)); break;
+	        }
 		}
 		//printf("%d %f\n", newval, (float) pad);
 		break;
@@ -864,11 +947,22 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 	case IC_VR1:
 	case IC_VR2:
 		pad = (double) newval / (double) 100 * RES_K(50) + RES_K(56);
-		switch (numpad)
-		{
-		case IC_VR1:    m_p_R0->setTo(pad); break;
-		case IC_VR2:    m_p_R1->setTo(pad); break;
-		}
+        if (!isRomPong)
+        {
+            switch (numpad)
+            {
+            case IC_VR1:    m_p_R0->setTo(pad); break;
+            case IC_VR2:    m_p_R1->setTo(pad); break;
+            }
+        }
+        else
+        {
+            switch (numpad)
+            {
+            case IC_VR1:    m_p_R0x->setTo(pad); break;
+            case IC_VR2:    m_p_R1x->setTo(pad); break;
+            }
+        }
 		break;
 	}
 

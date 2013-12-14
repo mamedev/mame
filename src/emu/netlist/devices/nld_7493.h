@@ -60,27 +60,27 @@
 #include "../nl_base.h"
 
 #define TTL_7493(_name, _CLKA, _CLKB, _R1, _R2)                                     \
-        NET_REGISTER_DEV(nic7493, _name)                                            \
+        NET_REGISTER_DEV(7493, _name)                                               \
         NET_CONNECT(_name, CLKA, _CLKA)                                             \
         NET_CONNECT(_name, CLKB, _CLKB)                                             \
         NET_CONNECT(_name, R1,  _R1)                                                \
         NET_CONNECT(_name, R2,  _R2)
 
-NETLIB_SUBDEVICE(nic7493ff,
+NETLIB_SUBDEVICE(7493ff,
     netlist_ttl_input_t m_I;
     netlist_ttl_output_t m_Q;
 
     UINT8 m_reset;
 );
 
-NETLIB_DEVICE(nic7493,
+NETLIB_DEVICE(7493,
     netlist_ttl_input_t m_R1;
     netlist_ttl_input_t m_R2;
 
-    NETLIB_NAME(nic7493ff) A;
-    NETLIB_NAME(nic7493ff) B;
-    NETLIB_NAME(nic7493ff) C;
-    NETLIB_NAME(nic7493ff) D;
+    NETLIB_NAME(7493ff) A;
+    NETLIB_NAME(7493ff) B;
+    NETLIB_NAME(7493ff) C;
+    NETLIB_NAME(7493ff) D;
 );
 
 #endif /* NLD_7493_H_ */

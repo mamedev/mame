@@ -5,7 +5,7 @@
 
 #include "nld_9316.h"
 
-NETLIB_START(nic9316)
+NETLIB_START(9316)
 {
     register_sub(sub, "sub");
 
@@ -29,7 +29,7 @@ NETLIB_START(nic9316)
 
 }
 
-NETLIB_START(nic9316_sub)
+NETLIB_START(9316_sub)
 {
     m_cnt = 0;
     m_loadq = 1;
@@ -50,7 +50,7 @@ NETLIB_START(nic9316_sub)
 
 }
 
-NETLIB_UPDATE(nic9316_sub)
+NETLIB_UPDATE(9316_sub)
 {
     if (m_loadq)
     {
@@ -65,7 +65,7 @@ NETLIB_UPDATE(nic9316_sub)
     OUTLOGIC(m_RC, m_ent & (m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
-NETLIB_UPDATE(nic9316)
+NETLIB_UPDATE(9316)
 {
     sub.m_loadq = INPLOGIC(m_LOADQ);
     sub.m_ent = INPLOGIC(m_ENT);
@@ -89,7 +89,7 @@ NETLIB_UPDATE(nic9316)
     OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
-NETLIB_FUNC_VOID(nic9316_sub, update_outputs_all, (void))
+NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (void))
 {
     const netlist_time out_delay = NLTIME_FROM_NS(20);
     OUTLOGIC(m_QA, (m_cnt >> 0) & 1, out_delay);
@@ -98,7 +98,7 @@ NETLIB_FUNC_VOID(nic9316_sub, update_outputs_all, (void))
     OUTLOGIC(m_QD, (m_cnt >> 3) & 1, out_delay);
 }
 
-NETLIB_FUNC_VOID(nic9316_sub, update_outputs, (void))
+NETLIB_FUNC_VOID(9316_sub, update_outputs, (void))
 {
     const netlist_time out_delay = NLTIME_FROM_NS(20);
 #if 0

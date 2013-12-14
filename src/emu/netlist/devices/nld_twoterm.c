@@ -32,17 +32,21 @@ NETLIB_UPDATE(twoterm)
 // nld_R
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(R)
+NETLIB_START(R_base)
 {
     register_terminal("1", m_P);
     register_terminal("2", m_N);
-
-    register_param("R", m_R, 1.0 / NETLIST_GMIN);
 }
 
-NETLIB_UPDATE_PARAM(R)
+NETLIB_UPDATE(R_base)
 {
-    set_R(m_R.Value());
+    NETLIB_NAME(twoterm)::update();
+}
+
+NETLIB_START(R)
+{
+    NETLIB_NAME(R_base)::start();
+    register_param("R", m_R, 1.0 / NETLIST_GMIN);
 }
 
 NETLIB_UPDATE(R)
@@ -50,6 +54,41 @@ NETLIB_UPDATE(R)
     NETLIB_NAME(twoterm)::update();
 }
 
+NETLIB_UPDATE_PARAM(R)
+{
+    set_R(m_R.Value());
+}
+
+// ----------------------------------------------------------------------------------------
+// nld_POT
+// ----------------------------------------------------------------------------------------
+
+NETLIB_START(POT)
+{
+    register_sub(m_R1, "R1");
+    register_sub(m_R2, "R2");
+
+    register_subalias("1", m_R1.m_P);
+    register_subalias("2", m_R1.m_N);
+    register_subalias("3", m_R2.m_N);
+
+    setup()->connect(m_R2.m_P, m_R1.m_N);
+
+    register_param("R", m_R, 1.0 / NETLIST_GMIN);
+    register_param("DIAL", m_Dial, 0.5);
+}
+
+NETLIB_UPDATE(POT)
+{
+    m_R1.update_dev();
+    m_R2.update_dev();
+}
+
+NETLIB_UPDATE_PARAM(POT)
+{
+    m_R1.set_R(MAX(m_R.Value() * m_Dial.Value(), NETLIST_GMIN));
+    m_R2.set_R(MAX(m_R.Value() * (1.0 - m_Dial.Value()), NETLIST_GMIN));
+}
 // ----------------------------------------------------------------------------------------
 // nld_C
 // ----------------------------------------------------------------------------------------

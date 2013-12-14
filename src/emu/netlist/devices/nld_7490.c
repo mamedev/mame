@@ -5,7 +5,7 @@
 
 #include "nld_7490.h"
 
-NETLIB_START(nic7490)
+NETLIB_START(7490)
 {
     m_cnt = 0;
 
@@ -21,7 +21,7 @@ NETLIB_START(nic7490)
     register_output("QD", m_Q[3]);
 }
 
-NETLIB_UPDATE(nic7490)
+NETLIB_UPDATE(7490)
 {
     if (INPLOGIC(m_R91) & INPLOGIC(m_R92))
     {
@@ -42,7 +42,7 @@ NETLIB_UPDATE(nic7490)
     }
 }
 #if 0
-NETLIB_FUNC_VOID(nic7490, update_outputs)
+NETLIB_FUNC_VOID(7490, update_outputs)
 {
     OUTLOGIC(m_QA, (m_cnt >> 0) & 1, NLTIME_FROM_NS(18));
     OUTLOGIC(m_QB, (m_cnt >> 1) & 1, NLTIME_FROM_NS(36));
@@ -50,7 +50,7 @@ NETLIB_FUNC_VOID(nic7490, update_outputs)
     OUTLOGIC(m_QD, (m_cnt >> 3) & 1, NLTIME_FROM_NS(72));
 }
 #else
-NETLIB_FUNC_VOID(nic7490, update_outputs, (void))
+NETLIB_FUNC_VOID(7490, update_outputs, (void))
 {
     const netlist_time delay[4] = { NLTIME_FROM_NS(18), NLTIME_FROM_NS(36), NLTIME_FROM_NS(54), NLTIME_FROM_NS(72) };
     for (int i=0; i<4; i++)

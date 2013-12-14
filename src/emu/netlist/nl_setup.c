@@ -262,7 +262,7 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 	return ret;
 }
 
-netlist_core_terminal_t &netlist_setup_t::find_terminal(const pstring &terminal_in)
+netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_in, bool required)
 {
     const pstring &tname = resolve_alias(terminal_in);
     netlist_core_terminal_t *ret;
@@ -275,13 +275,14 @@ netlist_core_terminal_t &netlist_setup_t::find_terminal(const pstring &terminal_
         pstring s = tname + ".Q";
         ret = m_terminals.find(s);
     }
-    if (ret == NULL)
+    if (ret == NULL && required)
         fatalerror("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
-    NL_VERBOSE_OUT(("Found input %s\n", tname.cstr()));
-    return *ret;
+    if (ret != NULL)
+        NL_VERBOSE_OUT(("Found input %s\n", tname.cstr()));
+    return ret;
 }
 
-netlist_core_terminal_t &netlist_setup_t::find_terminal(const pstring &terminal_in, netlist_object_t::type_t atype)
+netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_in, netlist_object_t::type_t atype, bool required)
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	netlist_core_terminal_t *ret;
@@ -294,24 +295,31 @@ netlist_core_terminal_t &netlist_setup_t::find_terminal(const pstring &terminal_
 		pstring s = tname + ".Q";
 		ret = m_terminals.find(s);
 	}
-	if (ret == NULL)
+	if (ret == NULL && required)
 		fatalerror("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
-    if (ret->type() != atype)
-        fatalerror("object %s(%s) found but wrong type\n", terminal_in.cstr(), tname.cstr());
-	NL_VERBOSE_OUT(("Found input %s\n", tname.cstr()));
-	return *ret;
+    if (ret != NULL && ret->type() != atype)
+    {
+        if (required)
+            fatalerror("object %s(%s) found but wrong type\n", terminal_in.cstr(), tname.cstr());
+        else
+            ret = NULL;
+    }
+    if (ret != NULL)
+        NL_VERBOSE_OUT(("Found input %s\n", tname.cstr()));
+	return ret;
 }
 
-netlist_param_t &netlist_setup_t::find_param(const pstring &param_in)
+netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool required)
 {
 	const pstring &outname = resolve_alias(param_in);
 	netlist_param_t *ret;
 
 	ret = m_params.find(outname);
-	if (ret == NULL)
+	if (ret == NULL && required)
 		fatalerror("parameter %s(%s) not found!\n", param_in.cstr(), outname.cstr());
-	NL_VERBOSE_OUT(("Found parameter %s\n", outname.cstr()));
-	return *ret;
+	if (ret != NULL)
+	    NL_VERBOSE_OUT(("Found parameter %s\n", outname.cstr()));
+	return ret;
 }
 
 
@@ -496,10 +504,10 @@ void netlist_setup_t::resolve_inputs(void)
     {
         const pstring t1s = entry->object().e1;
         const pstring t2s = entry->object().e2;
-        netlist_core_terminal_t &t1 = find_terminal(t1s);
-        netlist_core_terminal_t &t2 = find_terminal(t2s);
+        netlist_core_terminal_t *t1 = find_terminal(t1s);
+        netlist_core_terminal_t *t2 = find_terminal(t2s);
 
-        connect(t1, t2);
+        connect(*t1, *t2);
     }
 
     /* print all outputs */

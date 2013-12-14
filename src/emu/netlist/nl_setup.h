@@ -111,10 +111,10 @@ public:
     void register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const pstring &name, netlist_object_t &obj, netlist_input_t::state_e state);
     void connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
 
-    netlist_core_terminal_t &find_terminal(const pstring &outname_in);
-    netlist_core_terminal_t &find_terminal(const pstring &outname_in, netlist_object_t::type_t atype);
+    netlist_core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
+    netlist_core_terminal_t *find_terminal(const pstring &outname_in, netlist_object_t::type_t atype, bool required = true);
 
-    netlist_param_t &find_param(const pstring &param_in);
+    netlist_param_t *find_param(const pstring &param_in, bool required = true);
 
 	void register_callback(const pstring &devname, netlist_output_delegate delegate);
 

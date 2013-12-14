@@ -19,13 +19,9 @@ NETLISTOBJ = $(EMUOBJ)/netlist
 
 NETLISTOBJS+= \
 	$(NETLISTOBJ)/nl_base.o \
-	$(NETLISTOBJ)/pstring.o \
-	$(NETLISTOBJ)/nl_setup.o \
 	$(NETLISTOBJ)/nl_parser.o \
-	$(NETLISTOBJ)/devices/nld_system.o \
-	$(NETLISTOBJ)/devices/nld_twoterm.o \
-	$(NETLISTOBJ)/devices/nld_solver.o \
-	$(NETLISTOBJ)/devices/net_lib.o \
+	$(NETLISTOBJ)/nl_setup.o \
+	$(NETLISTOBJ)/pstring.o \
 	$(NETLISTOBJ)/devices/nld_7404.o \
 	$(NETLISTOBJ)/devices/nld_7474.o \
 	$(NETLISTOBJ)/devices/nld_7483.o \
@@ -34,5 +30,10 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/devices/nld_7493.o \
 	$(NETLISTOBJ)/devices/nld_9316.o \
 	$(NETLISTOBJ)/devices/nld_NE555.o \
+	$(NETLISTOBJ)/devices/nld_legacy.o \
+	$(NETLISTOBJ)/devices/net_lib.o \
 	$(NETLISTOBJ)/devices/nld_log.o \
+	$(NETLISTOBJ)/devices/nld_solver.o \
+	$(NETLISTOBJ)/devices/nld_system.o \
+	$(NETLISTOBJ)/devices/nld_twoterm.o \
 

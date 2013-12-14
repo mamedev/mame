@@ -58,7 +58,7 @@
 #include "../nl_base.h"
 
 #define TTL_7490(_name, _CLK, _R1, _R2, _R91, _R92)                                 \
-        NET_REGISTER_DEV(nic7490, _name)                                            \
+        NET_REGISTER_DEV(7490, _name)                                               \
         NET_CONNECT(_name, CLK, _CLK)                                               \
         NET_CONNECT(_name, R1,  _R1)                                                \
         NET_CONNECT(_name, R2,  _R2)                                                \
@@ -66,7 +66,7 @@
         NET_CONNECT(_name, R92, _R92)
 
 
-NETLIB_DEVICE(nic7490,
+NETLIB_DEVICE(7490,
     ATTR_HOT void update_outputs();
 
     netlist_ttl_input_t m_R1;

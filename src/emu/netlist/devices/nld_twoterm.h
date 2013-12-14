@@ -43,6 +43,11 @@
         NET_REGISTER_DEV(R, _name)                                                  \
         NETDEV_PARAMI(_name, R, _R)
 
+#define NETDEV_POT(_name, _R)                                                       \
+        NET_REGISTER_DEV(POT, _name)                                                \
+        NETDEV_PARAMI(_name, R, _R)
+
+
 #define NETDEV_C(_name, _C)                                                         \
         NET_REGISTER_DEV(C, _name)                                                  \
         NETDEV_PARAMI(_name, C, _C)
@@ -91,21 +96,34 @@ private:
 // nld_R
 // ----------------------------------------------------------------------------------------
 
-class NETLIB_NAME(R) : public NETLIB_NAME(twoterm)
+class NETLIB_NAME(R_base) : public NETLIB_NAME(twoterm)
 {
 public:
-    ATTR_COLD NETLIB_NAME(R)() : NETLIB_NAME(twoterm)(RESISTOR) { }
+    ATTR_COLD NETLIB_NAME(R_base)() : NETLIB_NAME(twoterm)(RESISTOR) { }
 
     inline void set_R(const double R) { set(1.0 / R, 0.0, 0.0); }
 
 protected:
     ATTR_COLD virtual void start();
-    ATTR_COLD virtual void update_param();
     ATTR_HOT ATTR_ALIGN void update();
+};
+
+NETLIB_DEVICE_WITH_PARAMS_DERIVED(R, R_base,
+    netlist_param_double_t m_R;
+);
+
+// ----------------------------------------------------------------------------------------
+// nld_POT
+// ----------------------------------------------------------------------------------------
+
+NETLIB_DEVICE_WITH_PARAMS(POT,
+    NETLIB_NAME(R_base) m_R1;
+    NETLIB_NAME(R_base) m_R2;
 
     netlist_param_double_t m_R;
+    netlist_param_double_t m_Dial;
+);
 
-};
 
 // ----------------------------------------------------------------------------------------
 // nld_C

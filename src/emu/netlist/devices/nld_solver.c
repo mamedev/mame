@@ -4,6 +4,7 @@
  */
 
 #include "nld_solver.h"
+#include "nld_twoterm.h"
 
 // ----------------------------------------------------------------------------------------
 // netlist_matrix_solver
@@ -75,7 +76,15 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
 
     /* update all non-linear devices  */
     for (dev_list_t::entry_t *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
-        p->object()->update_terminals();
+        switch (p->object()->family())
+        {
+            case netlist_device_t::DIODE:
+                static_cast<NETLIB_NAME(D) *>(p->object())->update_terminals();
+                break;
+            default:
+                p->object()->update_terminals();
+                break;
+        }
 
     for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
     {

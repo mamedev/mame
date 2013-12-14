@@ -52,7 +52,7 @@
 #include "../nl_base.h"
 
 #define TTL_9316(_name, _CLK, _ENP, _ENT, _CLRQ, _LOADQ, _A, _B, _C, _D)            \
-        NET_REGISTER_DEV(nic9316, _name)                                            \
+        NET_REGISTER_DEV(9316, _name)                                               \
         NET_CONNECT(_name, CLK, _CLK)                                               \
         NET_CONNECT(_name, ENP,  _ENP)                                              \
         NET_CONNECT(_name, ENT,  _ENT)                                              \
@@ -63,7 +63,7 @@
         NET_CONNECT(_name, C,    _C)                                                \
         NET_CONNECT(_name, D,    _D)
 
-NETLIB_SUBDEVICE(nic9316_sub,
+NETLIB_SUBDEVICE(9316_sub,
     ATTR_HOT void update_outputs_all();
     ATTR_HOT void update_outputs();
 
@@ -85,8 +85,8 @@ NETLIB_SUBDEVICE(nic9316_sub,
     netlist_ttl_output_t m_RC;
 );
 
-NETLIB_DEVICE(nic9316,
-    NETLIB_NAME(nic9316_sub) sub;
+NETLIB_DEVICE(9316,
+    NETLIB_NAME(9316_sub) sub;
     netlist_ttl_input_t m_ENP;
     netlist_ttl_input_t m_ENT;
     netlist_ttl_input_t m_CLRQ;

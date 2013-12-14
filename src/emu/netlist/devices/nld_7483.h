@@ -30,7 +30,7 @@
 #include "../nl_base.h"
 
 #define TTL_7483(_name, _A1, _A2, _A3, _A4, _B1, _B2, _B3, _B4, _CI)                \
-        NET_REGISTER_DEV(nic7483, _name)                                            \
+        NET_REGISTER_DEV(7483, _name)                                               \
         NET_CONNECT(_name, A1, _A1)                                                 \
         NET_CONNECT(_name, A2, _A2)                                                 \
         NET_CONNECT(_name, A3, _A3)                                                 \
@@ -41,7 +41,7 @@
         NET_CONNECT(_name, B4, _B4)                                                 \
         NET_CONNECT(_name, C0, _CI)
 
-NETLIB_DEVICE(nic7483,
+NETLIB_DEVICE(7483,
     netlist_ttl_input_t m_C0;
     netlist_ttl_input_t m_A1;
     netlist_ttl_input_t m_A2;

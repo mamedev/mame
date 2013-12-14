@@ -5,7 +5,7 @@
 
 #include "nld_7493.h"
 
-NETLIB_START(nic7493)
+NETLIB_START(7493)
 {
     register_sub(A, "A");
     register_sub(B, "B");
@@ -26,19 +26,19 @@ NETLIB_START(nic7493)
     register_link_internal(D, D.m_I, C.m_Q, netlist_input_t::STATE_INP_HL);
 }
 
-NETLIB_START(nic7493ff)
+NETLIB_START(7493ff)
 {
     register_input("CLK", m_I, netlist_input_t::STATE_INP_HL);
     register_output("Q", m_Q);
 }
 
-NETLIB_UPDATE(nic7493ff)
+NETLIB_UPDATE(7493ff)
 {
     if (m_reset == 0)
         OUTLOGIC(m_Q, !m_Q.net().new_Q(), NLTIME_FROM_NS(18));
 }
 
-NETLIB_UPDATE(nic7493)
+NETLIB_UPDATE(7493)
 {
     netlist_sig_t r = INPLOGIC(m_R1) & INPLOGIC(m_R2);
 
