@@ -62,6 +62,8 @@ public:
 	DECLARE_WRITE8_MEMBER(video_uart1_w);
 	DECLARE_READ8_MEMBER(videosram_r);
 	DECLARE_WRITE8_MEMBER(videosram_w);
+	DECLARE_READ8_MEMBER(video_timer_r);
+	DECLARE_WRITE8_MEMBER(video_timer_w);
 
 	required_shared_ptr<UINT8> m_vram;
 	required_device<cpu_device> m_maincpu;
@@ -82,12 +84,20 @@ public:
 	required_device<x2212_device> m_videosram;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+
 private:
 	virtual void machine_start();
 	virtual void machine_reset();
+	virtual void driver_start();
+
+	emu_timer* m_video_timer;
+	static const device_timer_id VIDEO_TIMER = 0;
 
 	UINT8 m_portA;
 	UINT8 m_portB;
+	bool m_video_timer_irq;
 };
 
 
@@ -118,10 +128,11 @@ static ADDRESS_MAP_START(wicat_video_mem, AS_PROGRAM, 16, wicat_state)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(wicat_video_io, AS_PROGRAM, 8, wicat_state)
+static ADDRESS_MAP_START(wicat_video_io, AS_IO, 8, wicat_state)
 	// these are largely wild guesses...
-	AM_RANGE(0x0100,0x0107) AM_READWRITE(video_uart0_r,video_uart0_w)
-	AM_RANGE(0x0200,0x0207) AM_READWRITE(video_uart1_r,video_uart1_w)
+	AM_RANGE(0x0000,0x0003) AM_READWRITE(video_timer_r,video_timer_w)  // some sort of timer?
+	AM_RANGE(0x0100,0x0107) AM_READWRITE(video_uart0_r,video_uart0_w)  // INS2651 UART #1
+	AM_RANGE(0x0200,0x0207) AM_READWRITE(video_uart1_r,video_uart1_w)  // INS2651 UART #2
 	AM_RANGE(0x0400,0x047f) AM_READWRITE(videosram_r,videosram_w)  // XD2210  4-bit NOVRAM
 	AM_RANGE(0x0700,0x0700) AM_DEVREADWRITE("videouart",im6402_device,read,write)  // UART?
 	AM_RANGE(0x0800,0x080f) AM_DEVREADWRITE("videodma",am9517a_device,read,write)  // DMA?
@@ -136,6 +147,10 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( wicat )
 INPUT_PORTS_END
 
+void wicat_state::driver_start()
+{
+	m_video_timer = timer_alloc(VIDEO_TIMER);
+}
 
 void wicat_state::machine_start()
 {
@@ -147,8 +162,20 @@ void wicat_state::machine_reset()
 	m_videouart0->dcd_w(0);
 	m_videouart1->dcd_w(0);
 	m_uart0->dcd_w(0);
+	m_video_timer_irq = false;
+	m_video_timer->adjust(attotime::zero,0,attotime::from_hz(60));
 }
 
+void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case VIDEO_TIMER:
+		m_video_timer_irq = true;
+		m_videocpu->set_input_line(INPUT_LINE_IRQ0,ASSERT_LINE);
+		break;
+	}
+}
 WRITE16_MEMBER( wicat_state::parallel_led_w )
 {
 	// bit 0 - parallel port A direction (0 = input)
@@ -276,6 +303,27 @@ WRITE8_MEMBER(wicat_state::videosram_w)
 {
 	if(!(offset & 0x01))
 		m_videosram->write(space,offset/2,data);
+}
+
+READ8_MEMBER(wicat_state::video_timer_r)
+{
+	UINT8 ret = 0x00;
+
+	if(offset == 0x00)
+	{
+		if(m_video_timer_irq)
+		{
+			ret |= 0x08;
+			m_video_timer_irq = false;
+			m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
+		}
+	}
+	return ret;
+}
+
+WRITE8_MEMBER(wicat_state::video_timer_w)
+{
+	logerror("I/O port 0x%04x write %02x\n",offset,data);
 }
 
 I8275_DISPLAY_PIXELS(wicat_display_pixels)
