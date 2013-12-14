@@ -45,7 +45,7 @@ class ymz770_device : public device_t, public device_sound_interface
 
 		mpeg_audio *decoder;
 
-		INT16 output_data[1152];
+		INT16 output_data[0x1000];
 		int output_remaining;
 		int output_ptr;
 		int atbl;

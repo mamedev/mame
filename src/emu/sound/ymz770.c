@@ -9,11 +9,11 @@
 TODO:
 - A lot of unimplemented features, even simple ones like panning,
   these should be added once we find out any software that uses it.
+- Is channel volume linear(current implementation) or logarithmic?
 - Sequencer is very preliminary
 - What does channel ATBL mean?
 - Is YMZ774(and other variants) the same family as this chip?
   What are the differences?
-- channel volume is linear or logarithmic?
 
 ***************************************************************************/
 
@@ -67,23 +67,23 @@ void ymz770_device::device_start()
 	save_item(NAME(m_bsl));
 	save_item(NAME(m_cpl));
 
-	for (int i = 0; i < 8; i++)
+	for (int ch = 0; ch < 8; ch++)
 	{
-		save_item(NAME(m_channels[i].phrase), i);
-		save_item(NAME(m_channels[i].pan), i);
-		save_item(NAME(m_channels[i].volume), i);
-		save_item(NAME(m_channels[i].control), i);
-		save_item(NAME(m_channels[i].is_playing), i);
-		save_item(NAME(m_channels[i].last_block), i);
-		save_item(NAME(m_channels[i].output_remaining), i);
-		save_item(NAME(m_channels[i].output_ptr), i);
-		save_item(NAME(m_channels[i].atbl), i);
-		save_item(NAME(m_channels[i].pptr), i);
-		save_item(NAME(m_channels[i].sequence), i);
-		save_item(NAME(m_channels[i].seqcontrol), i);
-		save_item(NAME(m_channels[i].seqdelay), i);
-		save_item(NAME(m_channels[i].is_seq_playing), i);
-		save_item(NAME(m_channels[i].output_data), i);
+		save_item(NAME(m_channels[ch].phrase), ch);
+		save_item(NAME(m_channels[ch].pan), ch);
+		save_item(NAME(m_channels[ch].volume), ch);
+		save_item(NAME(m_channels[ch].control), ch);
+		save_item(NAME(m_channels[ch].is_playing), ch);
+		save_item(NAME(m_channels[ch].last_block), ch);
+		save_item(NAME(m_channels[ch].output_remaining), ch);
+		save_item(NAME(m_channels[ch].output_ptr), ch);
+		save_item(NAME(m_channels[ch].atbl), ch);
+		save_item(NAME(m_channels[ch].pptr), ch);
+		save_item(NAME(m_channels[ch].sequence), ch);
+		save_item(NAME(m_channels[ch].seqcontrol), ch);
+		save_item(NAME(m_channels[ch].seqdelay), ch);
+		save_item(NAME(m_channels[ch].is_seq_playing), ch);
+		save_item(NAME(m_channels[ch].output_data), ch);
 	}
 }
 
@@ -94,17 +94,19 @@ void ymz770_device::device_start()
 
 void ymz770_device::device_reset()
 {
-	for (int i = 0; i < 8; i++)
+	for (int ch = 0; ch < 8; ch++)
 	{
-		m_channels[i].phrase = 0;
-		m_channels[i].pan = 8;
-		m_channels[i].volume = 0;
-		m_channels[i].control = 0;
-		m_channels[i].sequence = 0;
-		m_channels[i].seqcontrol = 0;
-		m_channels[i].seqdelay = 0;
-		m_channels[i].is_playing = false;
-		m_channels[i].is_seq_playing = false;
+		m_channels[ch].phrase = 0;
+		m_channels[ch].pan = 8;
+		m_channels[ch].volume = 0;
+		m_channels[ch].control = 0;
+		m_channels[ch].sequence = 0;
+		m_channels[ch].seqcontrol = 0;
+		m_channels[ch].seqdelay = 0;
+		m_channels[ch].is_playing = false;
+		m_channels[ch].is_seq_playing = false;
+		m_channels[ch].output_remaining = 0;
+		//m_channels[ch].decoder->clear();
 	}
 }
 
@@ -167,48 +169,52 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 		for (int ch = 0; ch < 8; ch++)
 		{
-			if (m_channels[ch].is_playing)
+			if (m_channels[ch].output_remaining > 0)
 			{
-				if (m_channels[ch].output_remaining > 0)
-				{
-					mix += (m_channels[ch].output_data[m_channels[ch].output_ptr++]*m_channels[ch].volume);
-					m_channels[ch].output_remaining--;
-				}
-				else
-				{
+				// force finish current block
+				mix += (m_channels[ch].output_data[m_channels[ch].output_ptr++]*m_channels[ch].volume);
+				m_channels[ch].output_remaining--;
+				
+				//if (m_channels[ch].output_remaining == 0 && !m_channels[ch].is_playing)
+					//m_channels[ch].decoder->clear();
+			}
+			
+			else if (m_channels[ch].is_playing)
+			{
 retry:
-					if (m_channels[ch].last_block)
+				if (m_channels[ch].last_block)
+				{
+					if (m_channels[ch].control & 1)
 					{
-						if (m_channels[ch].control & 1)
-						{
-							// loop sample
-							UINT8 phrase = m_channels[ch].phrase;
-							m_channels[ch].atbl = m_rom_base[(4*phrase)+0] >> 4 & 7;
-							m_channels[ch].pptr = 8*(m_rom_base[(4*phrase)+1]<<16 | m_rom_base[(4*phrase)+2]<<8 | m_rom_base[(4*phrase)+3]);
-						}
-						else
-						{
-							m_channels[ch].is_playing = false;
-							//m_channels[ch].decoder->stop();
-						}
+						// loop sample
+						UINT8 phrase = m_channels[ch].phrase;
+						m_channels[ch].atbl = m_rom_base[(4*phrase)+0] >> 4 & 7;
+						m_channels[ch].pptr = 8*(m_rom_base[(4*phrase)+1]<<16 | m_rom_base[(4*phrase)+2]<<8 | m_rom_base[(4*phrase)+3]);
+					}
+					else
+					{
+						m_channels[ch].is_playing = false;
+						m_channels[ch].output_remaining = 0;
+						//m_channels[ch].decoder->clear();
+					}
+				}
+
+				if (m_channels[ch].is_playing)
+				{
+					// next block
+					int sample_rate, channel_count;
+					if (!m_channels[ch].decoder->decode_buffer(m_channels[ch].pptr, m_rom_limit, m_channels[ch].output_data, m_channels[ch].output_remaining, sample_rate, channel_count) || m_channels[ch].output_remaining == 0)
+					{
+						m_channels[ch].is_playing = !m_channels[ch].last_block; // detect infinite retry loop
+						m_channels[ch].last_block = true;
+						goto retry;
 					}
 
-					if (m_channels[ch].is_playing)
-					{
-						int sample_rate, channel_count;
-						if (!m_channels[ch].decoder->decode_buffer(m_channels[ch].pptr, m_rom_limit, m_channels[ch].output_data, m_channels[ch].output_remaining, sample_rate, channel_count) || m_channels[ch].output_remaining == 0)
-						{
-							m_channels[ch].is_playing = !m_channels[ch].last_block; // detect infinite retry loop
-							m_channels[ch].last_block = true;
-							goto retry;
-						}
+					m_channels[ch].last_block = m_channels[ch].output_remaining < 1152;
+					m_channels[ch].output_remaining--;
+					m_channels[ch].output_ptr = 1;
 
-						m_channels[ch].last_block = m_channels[ch].output_remaining < 1152;
-						m_channels[ch].output_remaining--;
-						m_channels[ch].output_ptr = 1;
-
-						mix += (m_channels[ch].output_data[0]*m_channels[ch].volume);
-					}
+					mix += (m_channels[ch].output_data[0]*m_channels[ch].volume);
 				}
 			}
 		}
@@ -266,41 +272,38 @@ void ymz770_device::internal_reg_write(UINT8 reg, UINT8 data)
 	// playback registers
 	else if (reg < 0x60)
 	{
-		int voice = reg >> 2 & 0x07;
+		int ch = reg >> 2 & 0x07;
 
 		switch (reg & 0x03)
 		{
 			case 0:
-				m_channels[voice].phrase = data;
+				m_channels[ch].phrase = data;
 				break;
 
 			case 1:
-				m_channels[voice].volume = data;
+				m_channels[ch].volume = data;
 				break;
 
 			case 2:
-				m_channels[voice].pan = data;
+				m_channels[ch].pan = data;
 				break;
 
 			case 3:
 				if (data & 6)
 				{
-					UINT8 phrase = m_channels[voice].phrase;
-					m_channels[voice].atbl = m_rom_base[(4*phrase)+0] >> 4 & 7;
-					m_channels[voice].pptr = 8*(m_rom_base[(4*phrase)+1]<<16 | m_rom_base[(4*phrase)+2]<<8 | m_rom_base[(4*phrase)+3]);
-					m_channels[voice].output_remaining = 0;
-					m_channels[voice].output_ptr = 0;
-					m_channels[voice].last_block = false;
+					UINT8 phrase = m_channels[ch].phrase;
+					m_channels[ch].atbl = m_rom_base[(4*phrase)+0] >> 4 & 7;
+					m_channels[ch].pptr = 8*(m_rom_base[(4*phrase)+1]<<16 | m_rom_base[(4*phrase)+2]<<8 | m_rom_base[(4*phrase)+3]);
+					m_channels[ch].last_block = false;
 
-					m_channels[voice].is_playing = true;
+					m_channels[ch].is_playing = true;
 				}
 				else
 				{
-					m_channels[voice].is_playing = false;
-					//m_channels[voice].decoder->stop();
+					m_channels[ch].is_playing = false;
 				}
 
-				m_channels[voice].control = data;
+				m_channels[ch].control = data;
 				break;
 		}
 	}
@@ -308,28 +311,28 @@ void ymz770_device::internal_reg_write(UINT8 reg, UINT8 data)
 	// sequencer registers
 	else
 	{
-		int voice = reg >> 4 & 0x07;
+		int ch = reg >> 4 & 0x07;
 
 		switch (reg & 0x0f)
 		{
 			case 0:
-				m_channels[voice].sequence = data;
+				m_channels[ch].sequence = data;
 				break;
 			case 1:
 				if (data & 6)
 				{
-					UINT8 sqn = m_channels[voice].sequence;
+					UINT8 sqn = m_channels[ch].sequence;
 					UINT32 pptr = m_rom_base[(4*sqn)+1+0x400]<<16 | m_rom_base[(4*sqn)+2+0x400]<<8 | m_rom_base[(4*sqn)+3+0x400];
-					m_channels[voice].seqdata = &m_rom_base[pptr];
-					m_channels[voice].seqdelay = 0;
-					m_channels[voice].is_seq_playing = true;
+					m_channels[ch].seqdata = &m_rom_base[pptr];
+					m_channels[ch].seqdelay = 0;
+					m_channels[ch].is_seq_playing = true;
 				}
 				else
 				{
-					m_channels[voice].is_seq_playing = false;
+					m_channels[ch].is_seq_playing = false;
 				}
 
-				m_channels[voice].seqcontrol = data;
+				m_channels[ch].seqcontrol = data;
 				break;
 
 			default:
