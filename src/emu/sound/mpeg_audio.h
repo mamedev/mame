@@ -49,6 +49,9 @@ public:
 						int &output_samples, int &sample_rate, int &channels);
 
 
+	// Clear audio buffer
+	void clear();
+
 	// Change the base pointer
 	void set_base(const void *base);
 

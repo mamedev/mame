@@ -106,7 +106,7 @@ void ymz770_device::device_reset()
 		m_channels[ch].is_playing = false;
 		m_channels[ch].is_seq_playing = false;
 		m_channels[ch].output_remaining = 0;
-		//m_channels[ch].decoder->clear();
+		m_channels[ch].decoder->clear();
 	}
 }
 
@@ -175,8 +175,8 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				mix += (m_channels[ch].output_data[m_channels[ch].output_ptr++]*m_channels[ch].volume);
 				m_channels[ch].output_remaining--;
 				
-				//if (m_channels[ch].output_remaining == 0 && !m_channels[ch].is_playing)
-					//m_channels[ch].decoder->clear();
+				if (m_channels[ch].output_remaining == 0 && !m_channels[ch].is_playing)
+					m_channels[ch].decoder->clear();
 			}
 			
 			else if (m_channels[ch].is_playing)
@@ -195,7 +195,7 @@ retry:
 					{
 						m_channels[ch].is_playing = false;
 						m_channels[ch].output_remaining = 0;
-						//m_channels[ch].decoder->clear();
+						m_channels[ch].decoder->clear();
 					}
 				}
 

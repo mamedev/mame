@@ -14,11 +14,15 @@ mpeg_audio::mpeg_audio(const void *_base, unsigned int _accepted, bool lsb_first
 	do_gb = lsb_first ? do_gb_lsb : do_gb_msb;
 	position_align = _position_align ? _position_align - 1 : 0;
 
+	clear();
+}
+
+void mpeg_audio::clear()
+{
 	memset(audio_buffer, 0, sizeof(audio_buffer));
 	audio_buffer_pos[0] = 16*32;
 	audio_buffer_pos[1] = 16*32;
 }
-
 
 bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
 								int &output_samples, int &sample_rate, int &channels)
