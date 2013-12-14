@@ -99,7 +99,8 @@ bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
 			if (!read_header_amm(variant == 2))
 				return false;
 			read_data_mpeg2();
-			decode_mpeg2(output, output_samples);
+			if(last_frame_number)
+				decode_mpeg2(output, output_samples);
 		} catch(limit_hit) {
 			return false;
 		}
@@ -128,9 +129,6 @@ bool mpeg_audio::read_header_amm(bool layer25)
 	param_index = gb(3);
 	gb(1); // must be zero
 	
-	if (last_frame_number == 0)
-		return false;
-
 	channel_count = stereo_mode != 3 ? 2 : 1;
 
 	total_bands = total_band_counts[param_index];
