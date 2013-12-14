@@ -207,6 +207,7 @@ retry:
 					{
 						m_channels[ch].is_playing = !m_channels[ch].last_block; // detect infinite retry loop
 						m_channels[ch].last_block = true;
+						m_channels[ch].output_remaining = 0;
 						goto retry;
 					}
 
