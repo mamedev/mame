@@ -13,6 +13,7 @@ TODO:
 - What does channel ATBL mean?
 - Is YMZ774(and other variants) the same family as this chip?
   What are the differences?
+- channel volume is linear or logarithmic?
 
 ***************************************************************************/
 
@@ -122,8 +123,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 	for (int i = 0; i < samples; i++)
 	{
-		INT32 mix = 0;
-
+		// run sequencers (should probably be in separate timer callbacks)
 		for (int ch = 0; ch < 8; ch++)
 		{
 			if (m_channels[ch].is_seq_playing)
@@ -160,6 +160,13 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 					}
 				}
 			}
+		}
+		
+		// process channels
+		INT32 mix = 0;
+
+		for (int ch = 0; ch < 8; ch++)
+		{
 			if (m_channels[ch].is_playing)
 			{
 				if (m_channels[ch].output_remaining > 0)
@@ -182,6 +189,7 @@ retry:
 						else
 						{
 							m_channels[ch].is_playing = false;
+							//m_channels[ch].decoder->stop();
 						}
 					}
 
@@ -289,6 +297,7 @@ void ymz770_device::internal_reg_write(UINT8 reg, UINT8 data)
 				else
 				{
 					m_channels[voice].is_playing = false;
+					//m_channels[voice].decoder->stop();
 				}
 
 				m_channels[voice].control = data;
