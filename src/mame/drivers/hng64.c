@@ -30,6 +30,9 @@ Notes:
 
   * The Japanese text on the Roads Edge network screen says : "waiting to connect network... please wait without touching machine"
 
+  * Xrally and Roads Edge have a symbols table at respectively 0xb2f30 and 0xe10c0
+    Also, to enter into service mode you need to change value of 0xa2363  / 0xcfb53 to 1 during gameplay (of course, if you put into free play mode games are playable)
+
 ToDo:
   * Buriki One / Xrally and Roads Edge doesn't coin it up, irq issue?
   * Sprite garbage in Beast Busters 2nd Nightmare, another irq issue?
@@ -477,13 +480,13 @@ READ32_MEMBER(hng64_state::hng64_random_read)
 
 READ32_MEMBER(hng64_state::hng64_com_r)
 {
-	logerror("com read  (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
+	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
 	return m_com_ram[offset];
 }
 
 WRITE32_MEMBER(hng64_state::hng64_com_w)
 {
-	logerror("com write (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, data);
+	//logerror("com write (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_com_ram[offset]);
 }
 
@@ -841,11 +844,11 @@ WRITE32_MEMBER(hng64_state::hng64_3d_2_w)
 WRITE32_MEMBER(hng64_state::dl_w)
 {
 	UINT32 *hng64_dl = m_dl;
-	int i;
-	UINT16 packet3d[16];
+	//UINT16 packet3d[16];
 
 	COMBINE_DATA(&hng64_dl[offset]);
 
+#if 0
 	if (offset == 0x08 || offset == 0x7f || // Special buggers.
 		offset == 0x10 || offset == 0x18 ||
 		offset == 0x20 || offset == 0x28 ||
@@ -868,6 +871,7 @@ WRITE32_MEMBER(hng64_state::dl_w)
 		// Send it off to the 3d subsystem.
 		hng64_command3d(machine(), packet3d);
 	}
+#endif
 }
 
 #if 0
@@ -879,10 +883,16 @@ READ32_MEMBER(hng64_state::dl_r)
 }
 #endif
 
+TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed )
+{
+// ...
+	m_set_irq(0x0008);
+}
+
+/* TODO: different param for both Samurai games, less FIFO to process? */
 WRITE32_MEMBER(hng64_state::dl_upload_w)
 {
 	// this handles 3d to fb upload
-#if 0
 	UINT16 packet3d[16];
 
 	for(int packetStart=0;packetStart<0x200/4;packetStart+=8)
@@ -900,7 +910,8 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 		// Send it off to the 3d subsystem.
 		hng64_command3d(machine(), packet3d);
 	}
-#endif
+
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
 }
 
 WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
@@ -910,7 +921,9 @@ WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
 		clear3d();
 	}
 
-//	if(data & 1) // swap buffers
+//	printf("%02x\n",data);
+
+//	if(data & 1) // swap buffers?
 
 //  if(data & 4) // reset buffer count
 }
@@ -966,10 +979,13 @@ READ32_MEMBER(hng64_state::tcram_r)
    unknown purpose (vblank? related to the display list?).
 
    bit 1 needs to be off, otherwise Fatal Fury WA locks up (FIFO full?)
+   bit 0 is likely to be fifo empty (active low)
    */
 READ32_MEMBER(hng64_state::unk_vreg_r)
 {
-	return ++m_unk_vreg_toggle;
+	return 0;
+
+//	return ++m_unk_vreg_toggle;
 }
 
 /***** I don't think there is a soundram2, having it NOT hooked up causes xrally to copy the sound program to the expected location, see memory map note *****/
@@ -1835,9 +1851,9 @@ void hng64_state::m_set_irq(UINT32 irq_vector)
 
 	    This is written with irqs DISABLED
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0 vblank irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 1
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 2
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 3 (actually this is cleared even if it isn't fired?)
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 1 <empty>
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 2 <empty>
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 3 3d fifo processed irq
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 9
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 10
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 17
@@ -1874,9 +1890,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 
 	switch(scanline)
 	{
-		case 224*2: m_set_irq(0x0001);  break; // lv 0 vblank irq
-		//case 0*2:   m_set_irq(0x0002);  break; // lv 1
-		//case 64*2:  m_set_irq(0x0004);  break; // lv 2
+		case 224*2:	m_set_irq(0x0001);  break; // lv 0 vblank irq
+//		case 0*2:   m_set_irq(0x0002);  break; // lv 1
+//		case 32*2:  m_set_irq(0x0008);  break; // lv 2
+//		case 64*2:  m_set_irq(0x0008);  break; // lv 2
 		case 128*2:	m_set_irq(0x0800);  break; // lv 11 network irq?
 	}
 }

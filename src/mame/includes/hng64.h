@@ -215,6 +215,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
 	void clear3d();
+	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
 };
 
 /*----------- defined in video/hng64.c -----------*/
