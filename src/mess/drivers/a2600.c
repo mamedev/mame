@@ -55,7 +55,8 @@ public:
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG) ,
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_modeFE_trigger_on_next_access(false) { }
 
 	dpc_t m_dpc;
 	memory_region* m_extra_RAM;
@@ -77,13 +78,9 @@ public:
 	UINT16 m_modeSS_last_address;
 	unsigned m_FVlocked;
 	UINT16 m_current_screen_height;
-	int m_FETimer;
-
-	direct_update_delegate m_FE_old_opbase_handler;
 
 	DECLARE_DIRECT_UPDATE_MEMBER(modeF6_opbase);
 	DECLARE_DIRECT_UPDATE_MEMBER(modeDPC_opbase_handler);
-	DECLARE_DIRECT_UPDATE_MEMBER(modeFE_opbase_handler);
 	DECLARE_READ8_MEMBER(modeF8_switch_r);
 	DECLARE_READ8_MEMBER(modeFA_switch_r);
 	DECLARE_READ8_MEMBER(modeF6_switch_r);
@@ -115,6 +112,7 @@ public:
 	DECLARE_WRITE8_MEMBER(modeDPC_w);
 	DECLARE_READ8_MEMBER(modeFE_switch_r);
 	DECLARE_WRITE8_MEMBER(modeFE_switch_w);
+	DECLARE_READ8_MEMBER(modeFE_rom_r);
 	DECLARE_READ8_MEMBER(current_bank_r);
 	DECLARE_READ16_MEMBER(a2600_read_input_port);
 	DECLARE_READ8_MEMBER(a2600_get_databus_contents);
@@ -150,7 +148,6 @@ protected:
 	void mode3E_RAM_switch(UINT16 offset, UINT8 data);
 	void modeFV_switch(UINT16 offset, UINT8 data);
 	void modeJVP_switch(UINT16 offset, UINT8 data);
-	void modeFE_switch(UINT16 offset, UINT8 data);
 	void install_banks(int count, unsigned init);
 
 	UINT8   *m_cart;
@@ -169,8 +166,9 @@ protected:
 	int detect_32K_mode3F();
 	int detect_super_chip();
 	unsigned long detect_2600controllers();
-	required_device<cpu_device> m_maincpu;
+	required_device<m6502_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	bool m_modeFE_trigger_on_next_access;
 };
 
 
@@ -1205,44 +1203,58 @@ depending on last byte & 0x20 -> 0x00 -> switch to bank #1
  */
 
 
-DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
-{
-	/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
-	   cpu should be the last byte that was on the data bus and so should determine the bank
-	   we should switch in. */
-	m_bank_base[1] = memregion("user1")->base() + 0x1000 * ( ( m_maincpu->pc() & 0x2000 ) ? 0 : 1 );
-	membank("bank1")->set_base(m_bank_base[1] );
-	/* and restore old opbase handler */
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(m_FE_old_opbase_handler);
-	return address;
-}
-
-void a2600_state::modeFE_switch(UINT16 offset, UINT8 data)
-{
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	/* Retrieve last byte read by the cpu (for this mapping scheme this
-	   should be the last byte that was on the data bus
-	*/
-	m_FE_old_opbase_handler = space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeFE_opbase_handler), this));
-}
-
 READ8_MEMBER(a2600_state::modeFE_switch_r)
 {
+	UINT8 data = space.read_byte(0xFE + offset );
+
 	if ( ! space.debugger_access() )
 	{
-		modeFE_switch(offset, 0 );
+		switch ( offset & 1 )
+		{
+			case 0:
+				/* The next byte on the data bus determines which bank to switch to */
+				m_modeFE_trigger_on_next_access = true;
+				break;
+
+			case 1:
+				if ( m_modeFE_trigger_on_next_access ) {
+					m_bank_base[1] = m_cart + 0x1000 * ( ( data & 0x20 ) ? 0 : 1 );
+					m_modeFE_trigger_on_next_access = false;
+				}
+				break;
+		}
 	}
-	return space.read_byte(0xFE);
+	return data;
 }
+
 
 WRITE8_MEMBER(a2600_state::modeFE_switch_w)
 {
 	space.write_byte(0xFE, data );
 	if ( ! space.debugger_access() )
 	{
-		modeFE_switch(offset, 0 );
+		/* The next byte on the data bus determines which bank to switch to */
+		m_modeFE_trigger_on_next_access = true;
 	}
 }
+
+
+READ8_MEMBER(a2600_state::modeFE_rom_r)
+{
+	UINT8 data = m_bank_base[1][offset];;
+
+	if ( ! space.debugger_access() )
+	{
+		if ( m_modeFE_trigger_on_next_access )
+		{
+			m_bank_base[1] = m_cart + 0x1000 * ( ( data & 0x20 ) ? 0 : 1 );
+			m_modeFE_trigger_on_next_access = false;
+		}
+	}
+
+	return data;
+}
+
 
 READ8_MEMBER(a2600_state::current_bank_r)
 {
@@ -1799,7 +1811,9 @@ void a2600_state::machine_reset()
 
 	case modeFE:
 		space.install_write_handler(0x01fe, 0x01fe, write8_delegate(FUNC(a2600_state::modeFE_switch_w),this));
-		space.install_read_handler(0x01fe, 0x01fe, read8_delegate(FUNC(a2600_state::modeFE_switch_r),this));
+		space.install_read_handler(0x01fe, 0x01ff, read8_delegate(FUNC(a2600_state::modeFE_switch_r),this));
+		space.install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(a2600_state::modeFE_rom_r),this));
+		m_modeFE_trigger_on_next_access = false;
 		break;
 
 	case mode3E:
