@@ -7,7 +7,7 @@
     --- Technical Notes ---
 
     Name:    S+
-    Company: IGT - International Gaming Technology
+    Company: IGT - International Game Technology
     Year:    1994
 
     Hardware:
@@ -712,4 +712,4 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME        PARENT  MACHINE  INPUT   INIT     ROT    COMPANY                                  FULLNAME                       FLAGS             LAYOUT  */
-GAMEL( 1994, spss4240,   0,      splus,   splus, splus_state,  splus,   ROT0,  "IGT - International Gaming Technology", "S-Plus (SS4240) Coral Reef",  GAME_NOT_WORKING, layout_splus )
+GAMEL( 1994, spss4240,   0,      splus,   splus, splus_state,  splus,   ROT0,  "IGT - International Game Technology", "S-Plus (SS4240) Coral Reef",  GAME_NOT_WORKING, layout_splus )
