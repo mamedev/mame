@@ -48,7 +48,6 @@
  result in some graphics also being cut off slightly, but that is correct.
 
  Undumped Semicom games on similar hardware:
-   Wivern Wings - Semicom's orginal release with alt spelling of title
    Red Wyvern - A semi-sequel or update?
  Same time era, but unknown hardware:
    Gaia The last Choice of the Earth (c) 1998 (might be Byron Future Assault type hardware)
@@ -124,9 +123,9 @@ public:
 	DECLARE_READ16_MEMBER(luplup29_speedup_r);
 	DECLARE_READ16_MEMBER(puzlbang_speedup_r);
 	DECLARE_READ16_MEMBER(puzlbanga_speedup_r);
+	DECLARE_READ32_MEMBER(wivernwg_speedup_r);
 	DECLARE_READ32_MEMBER(wyvernwg_speedup_r);
 	DECLARE_READ32_MEMBER(wyvernwga_speedup_r);
-	DECLARE_READ32_MEMBER(wivernwga_speedup_r);
 	DECLARE_READ32_MEMBER(finalgdr_speedup_r);
 	DECLARE_READ32_MEMBER(mrkicker_speedup_r);
 	DECLARE_READ16_MEMBER(dquizgo2_speedup_r);
@@ -1757,7 +1756,7 @@ ROM_END
 
 /*
 
-Wyvern Wings (c) 2001 SemiCom, Game Vision License
+Wivern Wings (c) 2001 SemiCom / Wyvern Wings (c) 2001 SemiCom, Game Vision License
 
    CPU: Hyperstone E1-32T
  Video: 2 QuickLogic QL12x16B-XPL84 FPGA
@@ -1813,17 +1812,17 @@ ROM1 & ROM2 are both ST 27c4000D
 
 ROM_START( wivernwg )
 	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "rom1", 0x000000, 0x080000, CRC(83eb9a36) SHA1(d9c3b2facf42c137abc2923bbaeae300964ca4a0) )
+	ROM_LOAD( "rom1", 0x000000, 0x080000, CRC(83eb9a36) SHA1(d9c3b2facf42c137abc2923bbaeae300964ca4a0) ) /* ST 27C4000D with no labels */
 	ROM_LOAD( "rom2", 0x080000, 0x080000, CRC(5d657055) SHA1(21baa81b80f28aec4a6be9eaf69709958bf2a129) )
 
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "u7",  0x00000, 0x20000, CRC(00a3f705) SHA1(f0a6bafd16bea53d4c05c8cc108983cbd41e5757) )
+	ROM_LOAD( "u7",  0x00000, 0x20000, CRC(00a3f705) SHA1(f0a6bafd16bea53d4c05c8cc108983cbd41e5757) ) /* ST 27C1001 with no labels */
 	ROM_RELOAD(      0x20000, 0x20000 )
 	ROM_RELOAD(      0x40000, 0x20000 )
 	ROM_RELOAD(      0x60000, 0x20000 )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )  /* gfx data */
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) )
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) ) /* MX 29F1610MC-16 flash roms with no labels */
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(516aca48) SHA1(42cf5678eb4c0ee7da2ab0bd66e4e34b2735c75a) )
 	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1c764f95) SHA1(ba6ac1376e837b491bc0269f2a1d10577a3d40cb) )
 	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fee42c63) SHA1(a27b5cbca0defa9be85fee91dde1273f445d3372) )
@@ -1833,23 +1832,23 @@ ROM_START( wivernwg )
 	ROM_LOAD32_WORD( "h03",    0xc00002, 0x200000, CRC(ade8af9f) SHA1(05cdc1b38dec9d8a86302f2de794391fd3e376a5) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* Music data / QDSP samples (SFX) */
-	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) )
+	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) ) /* MX 29F1610MC-16 flash rom with no label */
 	ROM_LOAD( "qs1001a",     0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
 ROM_START( wyvernwg )
 	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "rom1.bin", 0x000000, 0x080000, CRC(66bf3a5c) SHA1(037d5e7a6ef6f5b4ac08a9c811498c668a9d2522) )
+	ROM_LOAD( "rom1.bin", 0x000000, 0x080000, CRC(66bf3a5c) SHA1(037d5e7a6ef6f5b4ac08a9c811498c668a9d2522) ) /* ST 27c4000D with no labels */
 	ROM_LOAD( "rom2.bin", 0x080000, 0x080000, CRC(fd9b5911) SHA1(a01e8c6e5a9009024af385268ba3ba90e1ebec50) )
 
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "u7",  0x00000, 0x20000, CRC(00a3f705) SHA1(f0a6bafd16bea53d4c05c8cc108983cbd41e5757) )
+	ROM_LOAD( "u7",  0x00000, 0x20000, CRC(00a3f705) SHA1(f0a6bafd16bea53d4c05c8cc108983cbd41e5757) ) /* ST 27C1001 with no labels */
 	ROM_RELOAD(      0x20000, 0x20000 )
 	ROM_RELOAD(      0x40000, 0x20000 )
 	ROM_RELOAD(      0x60000, 0x20000 )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )  /* gfx data */
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) )
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) ) /* MX 29F1610MC-16 flash roms with no labels */
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(516aca48) SHA1(42cf5678eb4c0ee7da2ab0bd66e4e34b2735c75a) )
 	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1c764f95) SHA1(ba6ac1376e837b491bc0269f2a1d10577a3d40cb) )
 	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fee42c63) SHA1(a27b5cbca0defa9be85fee91dde1273f445d3372) )
@@ -1859,20 +1858,23 @@ ROM_START( wyvernwg )
 	ROM_LOAD32_WORD( "romh03", 0xc00002, 0x200000, CRC(e01c2a92) SHA1(f53c2db92d62f595d473b1835c46d426f0dbe6b3) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* Music data / QDSP samples (SFX) */
-	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) )
+	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) ) /* MX 29F1610MC-16 flash rom with no label */
 	ROM_LOAD( "qs1001a",     0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
 ROM_START( wyvernwga )
 	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "rom1(__alt).rom", 0x000000, 0x080000, CRC(586881fd) SHA1(d335bbd91def8fa4935eb2375c9b00471a1f40eb) )
-	ROM_LOAD( "rom2(__alt).rom", 0x080000, 0x080000, CRC(938049ec) SHA1(cc10944c99ceb388dd4aafc93377c40540861d14) )
+	ROM_LOAD( "rom1.rom", 0x000000, 0x080000, CRC(586881fd) SHA1(d335bbd91def8fa4935eb2375c9b00471a1f40eb) ) /* ST 27c4000D with no labels */
+	ROM_LOAD( "rom2.rom", 0x080000, 0x080000, CRC(938049ec) SHA1(cc10944c99ceb388dd4aafc93377c40540861d14) )
 
-	ROM_REGION( 0x020000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
-	ROM_LOAD( "u7", 0x0000, 0x20000, CRC(00a3f705) SHA1(f0a6bafd16bea53d4c05c8cc108983cbd41e5757) )
+	ROM_REGION( 0x080000, "qs1000:cpu", 0 ) /* QDSP (8052) Code */
+	ROM_LOAD( "u7",  0x00000, 0x20000, CRC(00a3f705) SHA1(f0a6bafd16bea53d4c05c8cc108983cbd41e5757) ) /* ST 27C1001 with no labels */
+	ROM_RELOAD(      0x20000, 0x20000 )
+	ROM_RELOAD(      0x40000, 0x20000 )
+	ROM_RELOAD(      0x60000, 0x20000 )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )  /* gfx data */
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) )
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) ) /* MX 29F1610MC-16 flash roms with no labels */
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(516aca48) SHA1(42cf5678eb4c0ee7da2ab0bd66e4e34b2735c75a) )
 	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1c764f95) SHA1(ba6ac1376e837b491bc0269f2a1d10577a3d40cb) )
 	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fee42c63) SHA1(a27b5cbca0defa9be85fee91dde1273f445d3372) )
@@ -1882,7 +1884,7 @@ ROM_START( wyvernwga )
 	ROM_LOAD32_WORD( "romh03", 0xc00002, 0x200000, CRC(e01c2a92) SHA1(f53c2db92d62f595d473b1835c46d426f0dbe6b3) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 ) /* Music data / QDSP samples (SFX) */
-	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) )
+	ROM_LOAD( "romsnd.u15a", 0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) ) /* MX 29F1610MC-16 flash rom with no label */
 	ROM_LOAD( "qs1001a",     0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
@@ -2414,6 +2416,19 @@ READ16_MEMBER(vamphalf_state::puzlbanga_speedup_r)
 	return m_wram[(0x113ecc/2)+offset];
 }
 
+READ32_MEMBER(vamphalf_state::wivernwg_speedup_r)
+{
+	if(space.device().safe_pc() == 0x10758 )
+	{
+		if(irq_active(space))
+			space.device().execute().spin_until_interrupt();
+		else
+			space.device().execute().eat_cycles(50);
+	}
+
+	return m_wram32[0x00b4ccc/4];
+}
+
 READ32_MEMBER(vamphalf_state::wyvernwg_speedup_r)
 {
 	if(space.device().safe_pc() == 0x10758 )
@@ -2438,19 +2453,6 @@ READ32_MEMBER(vamphalf_state::wyvernwga_speedup_r)
 	}
 
 	return m_wram32[0x00b74f8/4];
-}
-
-READ32_MEMBER(vamphalf_state::wivernwga_speedup_r)
-{
-	if(space.device().safe_pc() == 0x10758 )
-	{
-		if(irq_active(space))
-			space.device().execute().spin_until_interrupt();
-		else
-			space.device().execute().eat_cycles(50);
-	}
-
-	return m_wram32[0x00b4ccc/4];
 }
 
 READ32_MEMBER(vamphalf_state::finalgdr_speedup_r)
@@ -2635,10 +2637,9 @@ DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
 
 DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 {
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b4ccc, 0x00b4ccf, read32_delegate(FUNC(vamphalf_state::wivernwg_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b56fc, 0x00b56ff, read32_delegate(FUNC(vamphalf_state::wyvernwg_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b74f8, 0x00b74fb, read32_delegate(FUNC(vamphalf_state::wyvernwga_speedup_r), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b4ccc, 0x00b4ccf, read32_delegate(FUNC(vamphalf_state::wivernwga_speedup_r), this));
-
 	m_palshift = 0;
 	m_flip_bit = 1;
 
