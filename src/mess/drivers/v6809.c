@@ -37,7 +37,7 @@ ToDo:
 
    - Find the missing character generator rom.
 
-   - Add sound. Pressing BEL character issues commands to the timer chip.
+   - Enable sound, when what seems to be a 6840 bug is fixed.
 
    - Schematic is almost useless, riddled with omissions and errors.
      All documents are in French, so no help there. The parts list
@@ -72,8 +72,11 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
+		, m_speaker(*this, "speaker")
 	{ }
 
+	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(pb_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -85,6 +88,7 @@ public:
 	const UINT8 *m_p_chargen;
 	UINT16 m_video_address;
 private:
+	bool m_speaker_en;
 	UINT8 m_video_index;
 	UINT8 m_term_data;
 	UINT8 m_vidbyte;
@@ -93,6 +97,7 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<mb8876_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
+	required_device<speaker_sound_device> m_speaker;
 };
 
 
@@ -163,10 +168,7 @@ MC6845_UPDATE_ROW( v6809_update_row )
 	{
 		mem = (ma + x) & 0x7ff;
 		chr = state->m_p_videoram[mem];
-		if (x == cursor_x)
-			gfx = 0xff;
-		else
-			gfx = state->m_p_chargen[(chr<<4) | ra];
+		gfx = state->m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
 
 		/* Display a scanline of a character (8 pixels) */
 		*p++ = palette[BIT(gfx, 7)];
@@ -306,13 +308,26 @@ static const pia6821_interface pia1_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
 };
 
+// this should output 1 to enable sound, then output 0 after a short time
+// however it continuously outputs 1
+WRITE_LINE_MEMBER( v6809_state::speaker_en_w )
+{
+	m_speaker_en = state;
+}
+
+WRITE_LINE_MEMBER( v6809_state::speaker_w )
+{
+//	if (m_speaker_en)
+//		m_speaker->level_w(state);
+}
+
 static const ptm6840_interface mc6840_intf =
 {
 	XTAL_16MHz / 4,
-	{ 0, 0, 0 },
+	{ 4000000/14, 4000000/14, 4000000/14/8 },
 	{ DEVCB_NULL,
-		DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w),
-		DEVCB_DEVICE_LINE_MEMBER("speaker", speaker_sound_device, level_w) },
+		DEVCB_DRIVER_LINE_MEMBER(v6809_state, speaker_w),
+		DEVCB_DRIVER_LINE_MEMBER(v6809_state, speaker_en_w) },
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
