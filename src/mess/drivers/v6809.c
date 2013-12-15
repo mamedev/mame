@@ -31,10 +31,9 @@ M modify memory (. to exit)
 
 ToDo:
 
-   - Colours (a photo shows colours but the schematic doesn't
-           have any ram for colours).
+   - Colours (Looks like characters 0xc0-0xff produce coloured lores gfx).
 
-   - Connect the RTC.
+   - Connect the RTC interrupt pin (not supported currently)
 
    - Find the missing character generator rom.
 
@@ -55,6 +54,7 @@ ToDo:
 #include "machine/6840ptm.h"
 #include "video/mc6845.h"
 #include "machine/6850acia.h"
+#include "machine/mm58274c.h"
 #include "machine/keyboard.h"
 #include "sound/speaker.h"
 #include "machine/wd_fdc.h"
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
 	AM_RANGE(0xf50c, 0xf50c) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, status_read, control_write) // printer
 	AM_RANGE(0xf50d, 0xf50d) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, data_read, data_write)
 	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x3c) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
-	//AM_RANGE(0xf640, 0xf64f) AM_MIRROR(0x30) real time clock
+	AM_RANGE(0xf640, 0xf64f) AM_MIRROR(0x30) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
 	AM_RANGE(0xf680, 0xf683) AM_MIRROR(0x3c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0xf6c8, 0xf6cf) AM_MIRROR(0x08) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xf6d0, 0xf6d3) AM_MIRROR(0x0c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -272,6 +272,7 @@ WRITE8_MEMBER( v6809_state::pa_w )
 }
 
 // port A = drive select and 2 control lines ; port B = keyboard
+// CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
 static const pia6821_interface pia0_intf =
 {
 	DEVCB_NULL,     /* port A input */
@@ -331,6 +332,18 @@ static SLOT_INTERFACE_START( v6809_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
+//-------------------------------------------------
+//  mm58274c_interface rtc_intf
+//-------------------------------------------------
+
+// this is all guess
+static const mm58274c_interface rtc_intf =
+{
+	0,  /*  mode 24*/
+	1   /*  first day of week */
+};
+
+
 // *** Machine ****
 
 static MACHINE_CONFIG_START( v6809, v6809_state )
@@ -364,6 +377,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)
 	MCFG_ACIA6850_ADD("acia0", mc6850_intf)
 	MCFG_ACIA6850_ADD("acia1", mc6850_intf)
+	MCFG_MM58274C_ADD("rtc", rtc_intf)
 	MCFG_MB8876x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
