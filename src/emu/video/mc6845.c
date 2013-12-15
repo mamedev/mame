@@ -516,7 +516,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			rectangle visarea;
 
 			attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_clock) * (m_horiz_char_total + 1) * vert_pix_total;
-printf("%d:%d ",m_vert_disp, video_char_height);
+
 			if(m_show_border_area)
 				visarea.set(0, horiz_pix_total+1, 0, vert_pix_total+1);
 			else
