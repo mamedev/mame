@@ -26,8 +26,6 @@ public:
 
 	UINT16 m_CPUA_register;
 	UINT16 m_CPUB_register;
-	int m_cuebrickj_nvram_bank;
-	UINT16 m_cuebrickj_nvram[0x400*0x20];
 	UINT16 m_custom_video;
 	UINT16 *m_gfx_rom;
 	UINT16 m_sprite_buffer[0x800];
@@ -44,10 +42,6 @@ public:
 	DECLARE_WRITE16_MEMBER(twin16_CPUA_register_w);
 	DECLARE_WRITE16_MEMBER(twin16_CPUB_register_w);
 	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
-	DECLARE_READ16_MEMBER(twin16_input_r);
-	DECLARE_READ16_MEMBER(cuebrickj_nvram_r);
-	DECLARE_WRITE16_MEMBER(cuebrickj_nvram_w);
-	DECLARE_WRITE16_MEMBER(cuebrickj_nvram_bank_w);
 	DECLARE_WRITE16_MEMBER(twin16_text_ram_w);
 	DECLARE_WRITE16_MEMBER(twin16_paletteram_word_w);
 	DECLARE_WRITE16_MEMBER(fround_gfx_bank_w);
@@ -56,9 +50,8 @@ public:
 	DECLARE_READ8_MEMBER(twin16_upd_busy_r);
 	DECLARE_WRITE8_MEMBER(twin16_upd_reset_w);
 	DECLARE_WRITE8_MEMBER(twin16_upd_start_w);
-	DECLARE_DRIVER_INIT(fround);
 	DECLARE_DRIVER_INIT(twin16);
-	DECLARE_DRIVER_INIT(cuebrickj);
+	DECLARE_DRIVER_INIT(fround);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	DECLARE_MACHINE_START(twin16);
 	DECLARE_MACHINE_RESET(twin16);
@@ -79,4 +72,18 @@ public:
 	optional_device<cpu_device> m_subcpu;
 	required_device<k007232_device> m_k007232;
 	required_device<upd7759_device> m_upd7759;
+};
+
+class cuebrickj_state : public twin16_state
+{
+public:
+	cuebrickj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: twin16_state(mconfig, type, tag)
+	{}
+
+	DECLARE_WRITE8_MEMBER(nvram_bank_w);
+	DECLARE_DRIVER_INIT(cuebrickj);
+
+private:
+	UINT16 m_nvram[0x400 * 0x20 / 2];
 };

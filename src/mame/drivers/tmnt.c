@@ -142,30 +142,25 @@ WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
 		m_k053245->k053244_w(space, offset + 1, data & 0xff);
 }
 
-INTERRUPT_GEN_MEMBER(tmnt_state::cuebrick_interrupt)
+/* cuebrick, mia, tmnt */
+INTERRUPT_GEN_MEMBER(tmnt_state::tmnt_interrupt)
 {
 	if (m_irq5_mask)
 		device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
+/* punkshot, blswhstl, tmnt2, ssriders, thndrx2 */
 INTERRUPT_GEN_MEMBER(tmnt_state::punkshot_interrupt)
 {
 	if (m_k052109->is_irq_enabled())
-		irq4_line_hold(device);
+		device.execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
 }
 
+/* lgtnfght, glfgreat, prmrsocr */
 INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 {
 	if (m_k052109->is_irq_enabled())
-		irq5_line_hold(device);
-}
-
-
-
-WRITE16_MEMBER(tmnt_state::tmnt_sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-		soundlatch_byte_w(space, 0, data & 0xff);
+		device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 READ8_MEMBER(tmnt_state::punkshot_sound_r)
@@ -183,22 +178,6 @@ WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-READ16_MEMBER(tmnt_state::prmrsocr_sound_r)
-{
-	return soundlatch3_byte_r(space, 0);
-}
-
-WRITE16_MEMBER(tmnt_state::prmrsocr_sound_cmd_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		data &= 0xff;
-		if (offset == 0)
-			soundlatch_byte_w(space, 0, data);
-		else
-			soundlatch2_byte_w(space, 0, data);
-	}
-}
 
 WRITE16_MEMBER(tmnt_state::prmrsocr_sound_irq_w)
 {
@@ -490,19 +469,9 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_eeprom_w)
 	}
 }
 
-READ16_MEMBER(tmnt_state::cuebrick_nv_r)
+WRITE8_MEMBER(tmnt_state::cuebrick_nvbank_w)
 {
-	return m_cuebrick_nvram[offset + (m_cuebrick_nvram_bank * 0x400 / 2)];
-}
-
-WRITE16_MEMBER(tmnt_state::cuebrick_nv_w)
-{
-	COMBINE_DATA(&m_cuebrick_nvram[offset + (m_cuebrick_nvram_bank * 0x400 / 2)]);
-}
-
-WRITE16_MEMBER(tmnt_state::cuebrick_nvbank_w)
-{
-	m_cuebrick_nvram_bank = data >> 8;
+	membank("nvrambank")->set_entry(data);
 }
 
 static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
@@ -513,12 +482,11 @@ static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrick_nv_r, cuebrick_nv_w) AM_SHARE("nvram")
-	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrick_nvbank_w)
+	AM_RANGE(0x0b0000, 0x0b03ff) AM_RAMBANK("nvrambank")
+	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE8(cuebrick_nvbank_w, 0xff00)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0xff00)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051960_device, k051937_word_r, k051937_word_w)
@@ -534,7 +502,7 @@ static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
+	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
@@ -556,7 +524,7 @@ static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P3")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
+	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0014, 0x0a0015) AM_READ_PORT("P4")
@@ -696,8 +664,9 @@ static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/COINS")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P2/EEPROM")
-	AM_RANGE(0x12100c, 0x12100f) AM_WRITE(prmrsocr_sound_cmd_w)
-	AM_RANGE(0x121014, 0x121015) AM_READ(prmrsocr_sound_r)
+	AM_RANGE(0x12100c, 0x12100d) AM_WRITE8(soundlatch_byte_w, 0x00ff)
+	AM_RANGE(0x12100e, 0x12100f) AM_WRITE8(soundlatch2_byte_w, 0x00ff)
+	AM_RANGE(0x121014, 0x121015) AM_READ8(soundlatch3_byte_r, 0x00ff)
 	AM_RANGE(0x122000, 0x122001) AM_WRITE(prmrsocr_eeprom_w)    /* EEPROM + video control */
 	AM_RANGE(0x123000, 0x123001) AM_WRITE(prmrsocr_sound_irq_w)
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
@@ -1144,11 +1113,11 @@ static INPUT_PORTS_START( cuebrick )
 	PORT_START("P2")
 	KONAMI16_LSB( 2, IPT_BUTTON3, IPT_UNUSED )
 
-	PORT_START("DSW2")
+	PORT_START("DSW1")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
 	/* "Invalid" = both coin slots disabled */
 
-	PORT_START("DSW1")
+	PORT_START("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" ) // manual says "not used"
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW2:2" ) // manual says "not used"
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")
@@ -2139,8 +2108,6 @@ MACHINE_START_MEMBER(tmnt_state,common)
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_last));
 	save_item(NAME(m_tmnt_soundlatch));
-	save_item(NAME(m_cuebrick_snd_irqlatch));
-	save_item(NAME(m_cuebrick_nvram_bank));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
@@ -2152,15 +2119,6 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 	m_toggle = 0;
 	m_last = 0;
 	m_tmnt_soundlatch = 0;
-	m_cuebrick_snd_irqlatch = 0;
-	m_cuebrick_nvram_bank = 0;
-}
-
-/* cuebrick, mia and tmnt */
-INTERRUPT_GEN_MEMBER(tmnt_state::tmnt_vblank_irq)
-{
-	if(m_irq5_mask)
-		device.execute().set_input_line(5, HOLD_LINE);
 }
 
 
@@ -2169,7 +2127,7 @@ static MACHINE_CONFIG_START( cuebrick, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(cuebrick_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, cuebrick_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
@@ -2207,7 +2165,7 @@ static MACHINE_CONFIG_START( mia, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mia_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  tmnt_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(mia_audio_map)
@@ -2258,7 +2216,7 @@ static MACHINE_CONFIG_START( tmnt, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(tmnt_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  tmnt_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(tmnt_audio_map)
@@ -2310,7 +2268,7 @@ static MACHINE_CONFIG_START( punkshot, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(punkshot_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(punkshot_audio_map)
@@ -2352,7 +2310,7 @@ static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
 	MCFG_CPU_PROGRAM_MAP(lgtnfght_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  lgtnfght_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(lgtnfght_audio_map)
@@ -2396,7 +2354,7 @@ static MACHINE_CONFIG_START( blswhstl, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(blswhstl_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
@@ -2462,7 +2420,7 @@ static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(glfgreat_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  lgtnfght_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(glfgreat_audio_map)
@@ -2518,7 +2476,7 @@ static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
 	MCFG_CPU_PROGRAM_MAP(prmrsocr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  lgtnfght_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(prmrsocr_audio_map)
@@ -2564,7 +2522,7 @@ static MACHINE_CONFIG_START( tmnt2, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(tmnt2_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM */
 						/* access. Access speed of ROM/RAM used on the machine is 150ns, */
@@ -2615,7 +2573,7 @@ static MACHINE_CONFIG_START( ssriders, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ssriders_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ssriders_audio_map)
@@ -2698,7 +2656,7 @@ static MACHINE_CONFIG_START( thndrx2, tmnt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(thndrx2_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state,  punkshot_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(thndrx2_audio_map)
@@ -4222,7 +4180,11 @@ DRIVER_INIT_MEMBER(tmnt_state,tmnt)
 
 DRIVER_INIT_MEMBER(tmnt_state,cuebrick)
 {
+	membank("nvrambank")->configure_entries(0, 0x20, m_cuebrick_nvram, 0x400);
+
 	machine().device<nvram_device>("nvram")->set_base(m_cuebrick_nvram, sizeof(m_cuebrick_nvram));
+
+	save_item(NAME(m_cuebrick_nvram));
 }
 
 //    YEAR, NAME,        PARENT,   MACHINE,  INPUT,     INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS

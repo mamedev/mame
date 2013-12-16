@@ -143,22 +143,6 @@ WRITE16_MEMBER(twin16_state::fround_CPU_register_w)
 	}
 }
 
-READ16_MEMBER(twin16_state::twin16_input_r)
-{
-	switch( offset )
-	{
-		case 0x00: return ioport("SYSTEM")->read();
-		case 0x01: return ioport("P1")->read();
-		case 0x02: return ioport("P2")->read();
-		case 0x03: return ioport("P3")->read();
-		case 0x08: return ioport("DSW2")->read();
-		case 0x09: return ioport("DSW1")->read();
-		case 0x0c: return ioport("DSW3")->read();
-		default: break;
-	}
-	return 0;
-}
-
 READ8_MEMBER(twin16_state::twin16_upd_busy_r)
 {
 	return m_upd7759->busy_r();
@@ -172,21 +156,6 @@ WRITE8_MEMBER(twin16_state::twin16_upd_reset_w)
 WRITE8_MEMBER(twin16_state::twin16_upd_start_w)
 {
 	m_upd7759->start_w(data & 1);
-}
-
-READ16_MEMBER(twin16_state::cuebrickj_nvram_r)
-{
-	return m_cuebrickj_nvram[offset + (m_cuebrickj_nvram_bank * 0x400 / 2)];
-}
-
-WRITE16_MEMBER(twin16_state::cuebrickj_nvram_w)
-{
-	COMBINE_DATA(&m_cuebrickj_nvram[offset + (m_cuebrickj_nvram_bank * 0x400 / 2)]);
-}
-
-WRITE16_MEMBER(twin16_state::cuebrickj_nvram_bank_w)
-{
-	m_cuebrickj_nvram_bank = (data >> 8);
 }
 
 /* Memory Maps */
@@ -210,12 +179,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
-	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(twin16_CPUA_register_w)
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrickj_nvram_r, cuebrickj_nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrickj_nvram_bank_w)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(twin16_CPUA_register_w)
+	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
+	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
+	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P3")
+	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE8(soundlatch_byte_w, 0x00ff)
+	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(twin16_video_register_w)
 	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_SHARE("text_ram")
@@ -244,10 +215,13 @@ static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(fround_CPU_register_w)
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(fround_CPU_register_w)
+	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
+	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
+	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE8(soundlatch_byte_w, 0x00ff)
+	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(twin16_video_register_w)
 	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(fround_gfx_bank_w)
@@ -676,9 +650,6 @@ MACHINE_START_MEMBER(twin16_state,twin16)
 	/* register for savestates */
 	save_item(NAME(m_CPUA_register));
 	save_item(NAME(m_CPUB_register));
-
-	save_item(NAME(m_cuebrickj_nvram_bank));
-	save_item(NAME(m_cuebrickj_nvram));
 }
 
 static MACHINE_CONFIG_START( twin16, twin16_state )
@@ -691,7 +662,7 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state,  CPUB_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -716,11 +687,11 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 7159160/2)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12) // estimated with gradius2 OST
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
@@ -738,11 +709,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( fround, twin16_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fround_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state,  CPUA_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -767,11 +738,11 @@ static MACHINE_CONFIG_START( fround, twin16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 7159160/2)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
@@ -788,7 +759,7 @@ static MACHINE_CONFIG_DERIVED( miaj, twin16 )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cuebrickj, twin16 )
+static MACHINE_CONFIG_DERIVED_CLASS( cuebrickj, twin16, cuebrickj_state )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1264,10 +1235,25 @@ DRIVER_INIT_MEMBER(twin16_state,fround)
 	m_custom_video = 1;
 }
 
-DRIVER_INIT_MEMBER(twin16_state,cuebrickj)
+WRITE8_MEMBER(cuebrickj_state::nvram_bank_w)
 {
+	membank("nvrambank")->set_entry(data);
+}
+
+DRIVER_INIT_MEMBER(cuebrickj_state,cuebrickj)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	space.install_readwrite_bank(0x0b0000, 0x0b03ff, "nvrambank");
+	space.install_write_handler( 0x0b0400, 0x0b0401, WRITE8_DELEGATE(cuebrickj_state, nvram_bank_w), 0xff00);
+
+	membank("nvrambank")->configure_entries(0, 0x20, m_nvram, 0x400);
+
+	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
+
+	save_item(NAME(m_nvram));
+
 	m_custom_video = 0;
-	machine().device<nvram_device>("nvram")->set_base(m_cuebrickj_nvram, 0x400*0x20);
 }
 
 /* Game Drivers */
@@ -1286,5 +1272,5 @@ GAME( 1988, gradius2b, vulcan,   twin16,    vulcan, twin16_state,    twin16,    
 GAME( 1988, fround,    0,        fround,    fround, twin16_state,    fround,    ROT0,   "Konami", "The Final Round (version M)", GAME_SUPPORTS_SAVE )
 GAME( 1988, froundl,   fround,   fround,    fround, twin16_state,    fround,    ROT0,   "Konami", "The Final Round (version L)", GAME_SUPPORTS_SAVE )
 GAME( 1988, hpuncher,  fround,   twin16,    fround, twin16_state,    twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, miaj,      mia,      miaj,      miaj, twin16_state,      twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, twin16_state, cuebrickj, ROT0,   "Konami", "Cue Brick (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, miaj,      mia,      miaj,      miaj,   twin16_state,    twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj_state, cuebrickj, ROT0, "Konami", "Cue Brick (Japan)", GAME_SUPPORTS_SAVE )

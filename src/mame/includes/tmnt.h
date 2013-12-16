@@ -45,8 +45,6 @@ public:
 	optional_shared_ptr<UINT16> m_sunset_104000;
 	optional_shared_ptr<UINT16> m_tmnt2_1c0800;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
-//  UINT8 *     m_nvram;    // currently cuebrick uses generic nvram handling
-//  UINT8 *     m_cuebrick_nvram;
 
 	/* video-related */
 	int        m_layer_colorbase[3];
@@ -69,11 +67,9 @@ public:
 
 	/* misc */
 	int        m_tmnt_soundlatch;
-	int        m_cuebrick_snd_irqlatch;
-	int        m_cuebrick_nvram_bank;
 	int        m_toggle;
 	int        m_last;
-	UINT16     m_cuebrick_nvram[0x400 * 0x20];  // 32k paged in a 1k window
+	UINT16     m_cuebrick_nvram[0x400 * 0x20 / 2];  // 32k paged in a 1k window
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -102,9 +98,6 @@ public:
 	DECLARE_WRITE16_MEMBER(k053245_scattered_word_w);
 	DECLARE_READ16_MEMBER(k053244_word_noA1_r);
 	DECLARE_WRITE16_MEMBER(k053244_word_noA1_w);
-	DECLARE_WRITE16_MEMBER(tmnt_sound_command_w);
-	DECLARE_READ16_MEMBER(prmrsocr_sound_r);
-	DECLARE_WRITE16_MEMBER(prmrsocr_sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(prmrsocr_sound_irq_w);
 	DECLARE_WRITE8_MEMBER(prmrsocr_audio_bankswitch_w);
 	DECLARE_READ8_MEMBER(tmnt_sres_r);
@@ -120,9 +113,7 @@ public:
 	DECLARE_READ16_MEMBER(thndrx2_eeprom_r);
 	DECLARE_WRITE16_MEMBER(thndrx2_eeprom_w);
 	DECLARE_WRITE16_MEMBER(prmrsocr_eeprom_w);
-	DECLARE_READ16_MEMBER(cuebrick_nv_r);
-	DECLARE_WRITE16_MEMBER(cuebrick_nv_w);
-	DECLARE_WRITE16_MEMBER(cuebrick_nvbank_w);
+	DECLARE_WRITE8_MEMBER(cuebrick_nvbank_w);
 	DECLARE_WRITE16_MEMBER(ssriders_soundkludge_w);
 	DECLARE_WRITE16_MEMBER(k053251_glfgreat_w);
 	DECLARE_WRITE16_MEMBER(tmnt2_1c0800_w);
@@ -169,10 +160,9 @@ public:
 	UINT32 screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_blswhstl(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(cuebrick_interrupt);
+	INTERRUPT_GEN_MEMBER(tmnt_interrupt);
 	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
-	INTERRUPT_GEN_MEMBER(tmnt_vblank_irq);
 	void sound_nmi_callback( int param );
 	inline UINT32 tmnt2_get_word( UINT32 addr );
 	void tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data );

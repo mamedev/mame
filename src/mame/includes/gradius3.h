@@ -50,7 +50,6 @@ public:
 	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
 	DECLARE_WRITE16_MEMBER(cpuB_irqenable_w);
 	DECLARE_WRITE16_MEMBER(cpuB_irqtrigger_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(gradius3_gfxrom_r);
 	DECLARE_WRITE16_MEMBER(gradius3_gfxram_w);

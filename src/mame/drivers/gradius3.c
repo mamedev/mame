@@ -123,12 +123,6 @@ WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 		logerror("%04x MISSED cpu B irq 4 %02x\n",space.device().safe_pc(),data);
 }
 
-WRITE16_MEMBER(gradius3_state::sound_command_w)
-{
-	if (ACCESSING_BITS_8_15)
-		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
-}
-
 WRITE16_MEMBER(gradius3_state::sound_irq_w)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
@@ -159,7 +153,7 @@ static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x0d0002, 0x0d0003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0d8000, 0x0d8001) AM_WRITE(cpuB_irqtrigger_w)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE(sound_command_w)
+	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE8(soundlatch_byte_w, 0xff00)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x14c000, 0x153fff) AM_READWRITE(k052109_halfword_r, k052109_halfword_w)
