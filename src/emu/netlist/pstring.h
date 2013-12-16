@@ -19,11 +19,10 @@ struct pblockpool {
     struct memblock
     {
         memblock *next;
-        int size;
         int allocated;
         int remaining;
         char *cur;
-        char data[];
+        char data[16384];
     };
 
     pblockpool();
@@ -42,7 +41,6 @@ struct pblockpool {
 
     bool m_shutdown;
     memblock *m_first;
-    int m_blocksize;
     int m_align;
 };
 
@@ -55,6 +53,10 @@ inline void *operator new(std::size_t size, pblockpool &pool, int extra = 0) thr
     if (result == NULL)
         throw std::bad_alloc();
     return result;
+}
+
+inline void operator delete(void *pMem, pblockpool &pool, int extra)
+{
 }
 
 // ----------------------------------------------------------------------------------------

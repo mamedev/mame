@@ -142,7 +142,6 @@ void pstring::resetmem()
 pblockpool::pblockpool()
     : m_shutdown(false)
     , m_first(NULL)
-    , m_blocksize((DEBUG_MODE) ? 0 : 16384)
     , m_align(8)
 {
 }
@@ -154,7 +153,6 @@ void *pblockpool::alloc(const std::size_t n)
         return (char *) malloc(n);
     else
     {
-        int min_alloc = MAX(m_blocksize, n+sizeof(memblock));
         char *ret = NULL;
         int memsize = ((n + m_align - 1) / m_align) * m_align;
         //std::printf("m_first %p\n", m_first);
@@ -172,12 +170,12 @@ void *pblockpool::alloc(const std::size_t n)
         if (ret == NULL)
         {
             // need to allocate a new block
-            memblock *p = (memblock *) malloc(min_alloc); //new char[min_alloc];
+            memblock *p = (memblock *) malloc(sizeof(memblock)); //new char[sizeof(memblock)];
             p->allocated = 0;
             p->cur = &p->data[0];
-            p->size = p->remaining = min_alloc - sizeof(memblock);
+            p->remaining = sizeof(p->data);
             p->next = m_first;
-            //std::printf("allocated block size %d\n", p->size);
+            //std::printf("allocated block size %d\n", sizeof(p->data));
 
             ret = p->cur;
             p->cur += memsize;
@@ -199,7 +197,7 @@ void pblockpool::dealloc(void *ptr)
     {
         for (memblock *p = m_first; p != NULL; p = p->next)
         {
-            if (ptr >= &p->data[0] && ptr < &p->data[p->size])
+            if (ptr >= &p->data[0] && ptr < &p->data[sizeof(p->data)])
             {
                 p->allocated -= 1;
                 if (p->allocated < 0)
@@ -207,7 +205,7 @@ void pblockpool::dealloc(void *ptr)
                 if (p->allocated == 0)
                 {
                     //std::printf("Block entirely freed\n");
-                    p->remaining = p->size;
+                    p->remaining = sizeof(p->data);
                     p->cur = &p->data[0];
                 }
                 // shutting down ?
