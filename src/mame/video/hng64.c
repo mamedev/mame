@@ -1118,6 +1118,9 @@ static void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const
 			   The code below could also be wrong, and rowscroll simply acts the same in all
 			   modes, this is hard to know because ss64_2 barely uses it.
 
+
+			   buriki line data is at 20146000 (physical)
+
 			*/
 
 			popmessage("Unhandled rowscroll %02x", tileregs>>12);
