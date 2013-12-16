@@ -4,16 +4,47 @@
 
     Acorn 6809
 
-    12/05/2009 Skeleton driver.
+    2009-05-12 Skeleton driver.
+    2013-12-16 Fixed video [Robbbert]
 
     Acorn System 3 update?
     http://acorn.chriswhy.co.uk/8bit_Upgrades/Acorn_6809_CPU.html
 
+    This is a few boards emulated together:
+    - 6809 main board
+    - 80x25 video board
+    - FDC board (to come)
+
+The video board has a mc6845, and the characters do not go to a character
+generator, instead they go to a SAA5050, which has its own CG inbuilt, plus
+many other features.
+
 ToDo:
     - FDC (address A00)
-    - Cursor
-    - Scrolling
     - Centronics Printer (VIA port A)
+
+Commands:
+C - Echo to printer ( C '+' turns it on)
+D - boot from disk
+G - Go
+L - Load tape
+P - Run from  pc reg
+R - Display regs
+S - Save tape
+T - Trace
+V - Set breakpoint
+
+M - Modify memory
+MV - Modify memory at breakpoint address
+MG - Modify memory from Go address
+MP - Modify memory from pc-reg address
+MR - Modify regs
+
+While modifying memory:
+,  show next address
+-  show previous address
+enter  show next address
+;  exit
 
 
 ****************************************************************************/
@@ -32,27 +63,35 @@ class a6809_state : public driver_device
 {
 public:
 	a6809_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_via(*this, "via"),
-		m_videoram(*this, "videoram"),
-		m_cass(*this, "cassette"),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_via(*this, "via")
+		, m_cass(*this, "cassette")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "mc6845")
+	{ }
 
-	DECLARE_READ8_MEMBER(via_pb_r);
-	DECLARE_WRITE8_MEMBER(kb_w);
+	DECLARE_READ8_MEMBER(pb_r);
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(videoram_r);
+	DECLARE_WRITE8_MEMBER(a6809_address_w);
+	DECLARE_WRITE8_MEMBER(a6809_register_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	DECLARE_MACHINE_RESET(a6809);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_p);
+	required_shared_ptr<UINT8> m_p_videoram;
+	UINT16 m_start_address;
+	UINT16 m_cursor_address;
 private:
 	UINT8 m_cass_data[4];
 	bool m_cass_state;
-	UINT8 m_keydata;
-	virtual void machine_reset();
+	UINT8 m_term_data;
+	UINT8 m_video_index;
 	required_device<via6522_device> m_via;
-	required_shared_ptr<UINT8> m_videoram;
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
 };
 
 
@@ -60,8 +99,8 @@ static ADDRESS_MAP_START(a6809_mem, AS_PROGRAM, 8, a6809_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000,0x03ff) AM_RAM
 	AM_RANGE(0x0400,0x07ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0800,0x0800) AM_DEVWRITE("mc6845", mc6845_device, address_w)
-	AM_RANGE(0x0801,0x0801) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0800,0x0800) AM_DEVREAD("mc6845", mc6845_device, status_r) AM_WRITE(a6809_address_w)
+	AM_RANGE(0x0801,0x0801) AM_DEVREAD("mc6845", mc6845_device, register_r) AM_WRITE(a6809_register_w)
 	AM_RANGE(0x0900,0x090f) AM_MIRROR(0xf0) AM_DEVREADWRITE("via", via6522_device, read, write)
 	AM_RANGE(0xf000,0xf7ff) // optional ROM
 	AM_RANGE(0xf800,0xffff) AM_ROM AM_REGION("maincpu", 0)
@@ -76,19 +115,19 @@ static INPUT_PORTS_START( a6809 )
 INPUT_PORTS_END
 
 
-void a6809_state::machine_reset()
+MACHINE_RESET_MEMBER( a6809_state, a6809)
 {
+	m_term_data = 0;
 }
 
 static MC6845_UPDATE_ROW( a6809_update_row )
 {
 }
 
-
 static MC6845_INTERFACE( a6809_crtc6845_interface )
 {
 	false,
-	12 /*?*/,
+	12,
 	NULL,
 	a6809_update_row,
 	NULL,
@@ -101,18 +140,57 @@ static MC6845_INTERFACE( a6809_crtc6845_interface )
 
 READ8_MEMBER( a6809_state::videoram_r )
 {
-	return m_videoram[offset];
+	offset += m_start_address;
+
+	if (m_cursor_address == offset)
+		return 0x7f; // cheap cursor
+	else
+		return m_p_videoram[offset&0x3ff];
 }
 
 static SAA5050_INTERFACE( a6809_saa5050_intf )
 {
 	DEVCB_DRIVER_MEMBER(a6809_state, videoram_r),
-	40, 24, 40  /* x, y, size */
+	40, 25, 40  /* x, y, size */
 };
 
-READ8_MEMBER( a6809_state::via_pb_r )
+WRITE8_MEMBER( a6809_state::a6809_address_w )
 {
-	return m_keydata | m_cass_data[2];
+	m_crtc->address_w( space, 0, data );
+
+	m_video_index = data & 0x1f;
+}
+
+WRITE8_MEMBER( a6809_state::a6809_register_w )
+{
+	UINT16 temp = m_start_address;
+	UINT16 temq = m_cursor_address;
+
+	// data is 18, but we need 19, to give the 20 rows needed by the SAA5050
+	if (m_video_index == 9)
+		data++;
+
+	m_crtc->register_w( space, 0, data );
+
+	// Get start address
+	if (m_video_index == 12)
+		m_start_address = ((data & 7) << 8 ) | (temp & 0xff);
+	else
+	if (m_video_index == 13)
+		m_start_address = data | (temp & 0x3f00);
+
+	else
+	// Get cursor address
+	if (m_video_index == 14)
+		m_cursor_address = ((data & 7) << 8 ) | (temq & 0xff);
+	else
+	if (m_video_index == 15)
+		m_cursor_address = data | (temq & 0x3f00);
+}
+
+READ8_MEMBER( a6809_state::pb_r )
+{
+	return m_term_data | m_cass_data[2];
 }
 
 WRITE_LINE_MEMBER( a6809_state::cass_w )
@@ -123,7 +201,7 @@ WRITE_LINE_MEMBER( a6809_state::cass_w )
 static const via6522_interface via_intf =
 {
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(a6809_state, via_pb_r),
+	DEVCB_DRIVER_MEMBER(a6809_state, pb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -161,9 +239,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_p)
 	}
 }
 
-WRITE8_MEMBER( a6809_state::kb_w )
+WRITE8_MEMBER( a6809_state::kbd_put )
 {
-	m_keydata = data & 0x7f;
+	m_term_data = data & 0x7f;
+	if (data == 8) m_term_data = 0x7f; // allow backspace to work
 
 	m_via->write_cb1(1);
 	m_via->write_cb1(0);
@@ -171,7 +250,7 @@ WRITE8_MEMBER( a6809_state::kb_w )
 
 static ASCII_KEYBOARD_INTERFACE( kb_intf )
 {
-	DEVCB_DRIVER_MEMBER(a6809_state, kb_w)
+	DEVCB_DRIVER_MEMBER(a6809_state, kbd_put)
 };
 
 static MACHINE_CONFIG_START( a6809, a6809_state )
@@ -179,25 +258,26 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(a6809_mem)
 	MCFG_CPU_IO_MAP(a6809_io)
+	MCFG_MACHINE_RESET_OVERRIDE(a6809_state, a6809)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(40 * 12, 24 * 20)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 24 * 20 - 1)
+	MCFG_SCREEN_SIZE(40 * 12, 25 * 20)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 12 - 1, 0, 25 * 20 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
-
+	MCFG_PALETTE_LENGTH(8)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SAA5050_ADD("saa5050", 6000000, a6809_saa5050_intf)
 
 	/* Devices */
 	MCFG_VIA6522_ADD("via", XTAL_4MHz / 4, via_intf)
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_4MHz / 2, a6809_crtc6845_interface)
+	MCFG_SAA5050_ADD("saa5050", 6000000, a6809_saa5050_intf)
 	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("a6809_c", a6809_state, a6809_c, attotime::from_hz(4800))
@@ -215,5 +295,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR   NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, a6809,  0,      0,       a6809,     a6809, driver_device,   0,      "Acorn",  "System 3 (6809 CPU)", GAME_NOT_WORKING )
+/*    YEAR   NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1980, a6809,  0,      0,       a6809,     a6809, driver_device,   0,     "Acorn",  "System 3 (6809 CPU)", 0 )
