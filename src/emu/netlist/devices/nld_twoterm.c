@@ -76,6 +76,7 @@ NETLIB_START(POT)
 
     register_param("R", m_R, 1.0 / NETLIST_GMIN);
     register_param("DIAL", m_Dial, 0.5);
+
 }
 
 NETLIB_UPDATE(POT)
@@ -125,6 +126,7 @@ NETLIB_START(D)
     m_Vd = 0.7;
 }
 
+
 NETLIB_UPDATE_PARAM(D)
 {
     m_Is = m_model.dValue("Is", 1e-15);
@@ -135,7 +137,6 @@ NETLIB_UPDATE_PARAM(D)
     m_Vcrit = m_Vt * log(m_Vt / m_Is / sqrt(2.0));
     m_VtInv = 1.0 / m_Vt;
     NL_VERBOSE_OUT(("VCutoff: %f\n", m_Vcrit));
-    printf("VCutoff: %f %f\n", m_Vcrit, m_Is);
 }
 
 NETLIB_UPDATE(D)

@@ -36,17 +36,12 @@
 #define NETLIST_MASK                (NETLIST_DIV-1)
 #define NETLIST_CLOCK               (NETLIST_INTERNAL_RES / NETLIST_DIV)
 
+//FIXME: LEGACY
 #define NETLIST_HIGHIMP_V   (1.23456e20)        /* some voltage we should never see */
 
 #define NETLIST_GMIN    (1e-9)
 
 typedef UINT8 netlist_sig_t;
-
-/* FIXME: We need a different solution to output delegates !
- * More something like a callback object
- */
-
-typedef delegate<void (const double)> netlist_output_delegate;
 
 //============================================================
 //  DEBUGGING

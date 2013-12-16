@@ -18,18 +18,26 @@
 
 #define NET_STR(_x) # _x
 
+#define NET_MODEL(_model)                                                           \
+    netlist.register_model(_model);
+
 #define NET_ALIAS(_alias, _name)                                                    \
 	netlist.register_alias(# _alias, # _name);
+
 #define NET_NEW(_type)  netlist.factory().new_device_by_classname(NETLIB_NAME_STR(_type), netlist)
 
 #define NET_REGISTER_DEV(_type, _name)                                              \
 		netlist.register_dev(NET_NEW(_type), # _name);
+
 #define NET_REMOVE_DEV(_name)                                                       \
 		netlist.remove_dev(# _name);
+
 #define NET_REGISTER_SIGNAL(_type, _name)                                           \
 		NET_REGISTER_DEV(_type ## _ ## sig, _name)
+
 #define NET_CONNECT(_name, _input, _output)                                         \
 		netlist.register_link(# _name "." # _input, # _output);
+
 #define NET_C(_input, _output)                                                      \
         netlist.register_link(NET_STR(_input) , NET_STR(_output));
 
@@ -48,9 +56,6 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 
 #define NETLIST_INCLUDE(_name)                                                      \
 		NETLIST_NAME(_name)(netlist);
-
-#define NETLIST_MEMREGION(_name)                                                    \
-		netlist.parse((char *)downcast<netlist_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());
 
 // ----------------------------------------------------------------------------------------
 // FIXME: Clean this up
@@ -103,6 +108,7 @@ public:
 	netlist_device_t *register_dev(netlist_device_t *dev, const pstring &name);
 	void remove_dev(const pstring &name);
 
+    void register_model(const pstring &model);
     void register_alias(const pstring &alias, const pstring &out);
     void register_link(const pstring &sin, const pstring &sout);
     void register_param(const pstring &param, const pstring &value);
@@ -115,9 +121,9 @@ public:
     netlist_core_terminal_t *find_terminal(const pstring &outname_in, netlist_object_t::type_t atype, bool required = true);
 
     netlist_param_t *find_param(const pstring &param_in, bool required = true);
-
+#if 0
 	void register_callback(const pstring &devname, netlist_output_delegate delegate);
-
+#endif
 	void parse(char *buf);
 
     void start_devices(void);
@@ -142,6 +148,8 @@ private:
     tagmap_nstring_t m_params_temp;
 
     netlist_factory m_factory;
+
+    netlist_list_t<pstring> m_models;
 
 	int m_proxy_cnt;
 

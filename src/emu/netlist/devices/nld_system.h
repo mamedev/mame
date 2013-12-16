@@ -36,10 +36,6 @@
 #define NETDEV_ANALOG_INPUT(_name)                                                  \
         NET_REGISTER_DEV(analog_input, _name)
 
-#define NETDEV_CALLBACK(_name, _IN)                                                 \
-        NET_REGISTER_DEV(analog_callback, _name)                                    \
-        NET_CONNECT(_name, IN, _IN)
-
 // ----------------------------------------------------------------------------------------
 // netdev_*_const
 // ----------------------------------------------------------------------------------------
@@ -80,34 +76,6 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
     netlist_time m_inc;
 );
 
-
-// ----------------------------------------------------------------------------------------
-// netdev_callback
-// ----------------------------------------------------------------------------------------
-
-class NETLIB_NAME(analog_callback) : public netlist_device_t
-{
-public:
-	NETLIB_NAME(analog_callback)()
-		: netlist_device_t() { }
-
-	ATTR_COLD void start()
-	{
-		register_input("IN", m_in);
-	}
-
-	ATTR_COLD void register_callback(netlist_output_delegate callback)
-	{
-		m_callback = callback;
-	}
-
-	ATTR_HOT void update();
-
-
-private:
-	netlist_analog_input_t m_in;
-	netlist_output_delegate m_callback;
-};
 
 // ----------------------------------------------------------------------------------------
 // Special support devices ...

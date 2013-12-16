@@ -44,6 +44,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "netlist.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
@@ -78,11 +79,14 @@ void netlist_mame_device::device_config_complete()
 
 void netlist_mame_device::device_start()
 {
-	//double dt = clocks_to_attotime(1).as_double();
-	m_netlist = global_alloc_clear(netlist_t(*this));
+	m_netlist = global_alloc_clear(netlist_mame_t(*this));
 	m_netlist->set_clock_freq(this->clock());
 
 	m_setup = global_alloc_clear(netlist_setup_t(*m_netlist));
+
+	// register additional devices
+
+	m_setup->factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback");
 
 	m_setup_func(*m_setup);
 

@@ -55,9 +55,15 @@
 /* Generic Diode */
 #define NETDEV_D(_name,  _model)                                                    \
         NET_REGISTER_DEV(D, _name)                                                  \
-        NETDEV_PARAMI(_name, model, _model)
+        NETDEV_PARAMI(_name, model, # _model)
 
-#define NETDEV_1N914(_name) NETDEV_D(_name, "Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon")
+#define NETDEV_QPNP(_name, _model)                                                 \
+        NET_REGISTER_DEV(QPNP_switch, _name)                                       \
+        NETDEV_PARAMI(_name,  model, # _model)
+
+#define NETDEV_QNPN(_name, _model)                                                 \
+        NET_REGISTER_DEV(QNPN_switch, _name)                                       \
+        NETDEV_PARAMI(_name,  model, # _model)
 
 // ----------------------------------------------------------------------------------------
 // Implementation
@@ -154,6 +160,33 @@ protected:
 // nld_D
 // ----------------------------------------------------------------------------------------
 
+
+// this one has an accuracy of better than 5%. That's enough for our purpose
+// add c3 and it'll be better than 1%
+
+inline double fastexp_h(const double x)
+{
+    static const double ln2r = 1.442695040888963387;
+    static const double ln2  = 0.693147180559945286;
+    //static const double c3   = 0.166666666666666667;
+
+    const double y = x * ln2r;
+    const unsigned int t = y;
+    const double z = (x - ln2 * (double) t);
+    const double zz = z * z;
+    //const double zzz = zz * z;
+
+    return (double)(1 << t)*(1.0 + z + 0.5 * zz); // + c3*zzz;
+}
+
+inline double fastexp(const double x)
+{
+    if (x<0)
+        return 1.0 / fastexp_h(-x);
+    else
+        return fastexp_h(x);
+}
+
 class NETLIB_NAME(D) : public NETLIB_NAME(twoterm)
 {
 public:
@@ -164,15 +197,36 @@ public:
         const double nVd = m_P.net().Q_Analog()- m_N.net().Q_Analog();
 
         //FIXME: Optimize cutoff case
-        m_Vd = (nVd > m_Vcrit) ? m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt : nVd;
 
-        const double eVDVt = exp(m_Vd * m_VtInv);
-        const double Id = m_Is * (eVDVt - 1.0);
+        double Id;
+        double G;
 
-        double G = m_Is * m_VtInv * eVDVt;
+        if (nVd < -5.0 * m_Vt)
+        {
+            m_Vd = nVd;
+            G = NETLIST_GMIN;
+            Id = - m_Is;
+        }
+        else if (nVd < m_Vcrit)
+        {
+            m_Vd = nVd;
+
+            const double eVDVt = fastexp(m_Vd * m_VtInv);
+            Id = m_Is * (eVDVt - 1.0);
+            G = m_Is * m_VtInv * eVDVt;
+        }
+        else
+        {
+            //m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
+            m_Vd = m_Vd + log1p((nVd - m_Vd) * m_VtInv) * m_Vt;
+
+            const double eVDVt = fastexp(m_Vd * m_VtInv);
+            Id = m_Is * (eVDVt - 1.0);
+
+            G = m_Is * m_VtInv * eVDVt;
+        }
 
         double I = (Id - m_Vd * G);
-
         set(G, 0.0, I);
     }
 
@@ -181,7 +235,7 @@ protected:
     ATTR_COLD virtual void update_param();
     ATTR_HOT ATTR_ALIGN void update();
 
-    netlist_param_multi_t m_model;
+    netlist_param_model_t m_model;
 
     double m_Vt;
     double m_Is;
@@ -206,16 +260,6 @@ protected:
  *                     E
  */
 
-#define NETDEV_QPNP(_name, _model)                                                 \
-        NET_REGISTER_DEV(QPNP_switch, _name)                                       \
-        NETDEV_PARAMI(_name,  model, _model)
-
-#define NETDEV_QNPN(_name, _model)                                                 \
-        NET_REGISTER_DEV(QNPN_switch, _name)                                       \
-        NETDEV_PARAMI(_name,  model, _model)
-
-#define NETDEV_BC238B(_name) NETDEV_QNPN(_name, "IS=1.8E-14 ISE=5.0E-14 ISC=1.72E-13 XTI=3 BF=400 BR=35.5 IKF=0.14 IKR=0.03 XTB=1.5 VAF=80 VAR=12.5 VJE=0.58 VJC=0.54 RE=0.6 RC=0.25 RB=0.56 CJE=13E-12 CJC=4E-12 XCJC=0.75 FC=0.5 NF=0.9955 NR=1.005 NE=1.46 NC=1.27 MJE=0.33 MJC=0.33 TF=0.64E-9 TR=50.72E-9 EG=1.11 KF=0 AF=1 VCEO=45V ICRATING=100M MFG=ZETEX")
-
 // Have a common start for transistors
 
 class NETLIB_NAME(Q) : public netlist_device_t
@@ -236,7 +280,7 @@ protected:
     ATTR_COLD virtual void start();
     ATTR_HOT ATTR_ALIGN void update();
 
-    netlist_param_multi_t m_model;
+    netlist_param_model_t m_model;
 private:
     q_type m_qtype;
 };

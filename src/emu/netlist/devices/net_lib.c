@@ -335,7 +335,7 @@ NETLIB_UPDATE(nic74153)
 
 
 #define xstr(s) # s
-#define ENTRY1(_nic, _name) m_list.add(new net_device_t_factory< _nic >( # _name, xstr(_nic) ));
+#define ENTRY1(_nic, _name) register_device<_nic>( # _name, xstr(_nic) );
 #define ENTRY(_nic, _name) ENTRY1(NETLIB_NAME(_nic), _name)
 
 netlist_factory::netlist_factory()
@@ -372,7 +372,6 @@ void netlist_factory::initialize()
     ENTRY(clock,                NETDEV_CLOCK)
     ENTRY(mainclock,            NETDEV_MAINCLOCK)
     ENTRY(solver,               NETDEV_SOLVER)
-    ENTRY(analog_callback,      NETDEV_CALLBACK)
     ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
     ENTRY(nicRSFF,              NETDEV_RSFF)
     ENTRY(nicMixer8,            NETDEV_MIXER)

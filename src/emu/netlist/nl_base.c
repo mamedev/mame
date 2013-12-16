@@ -355,9 +355,9 @@ ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, cons
 template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_double_t &param, const double initialVal);
 template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_int_t &param, const int initialVal);
 template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_logic_t &param, const int initialVal);
-template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_str_t &param, const char * initialVal);
+template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_str_t &param, const char * const initialVal);
 template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_str_t &param, const pstring &initialVal);
-template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_multi_t &param, const char * const initialVal);
+template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_model_t &param, const char * const initialVal);
 
 
 // ----------------------------------------------------------------------------------------
@@ -553,7 +553,7 @@ ATTR_COLD void netlist_logic_output_t::set_levels(const double low, const double
 // netlist_param_t & friends
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD double netlist_param_multi_t::dValue(const pstring &entity, const double defval) const
+ATTR_COLD double netlist_param_model_t::dValue(const pstring &entity, const double defval) const
 {
     pstring tmp = this->Value();
     // .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)

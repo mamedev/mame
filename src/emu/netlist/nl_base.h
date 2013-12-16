@@ -665,6 +665,7 @@ class netlist_param_t : public netlist_owned_object_t
 public:
 
     enum param_type_t {
+        MODEL,
         STRING,
         DOUBLE,
         INTEGER,
@@ -741,17 +742,23 @@ private:
    pstring m_param;
 };
 
-class netlist_param_multi_t : public netlist_param_str_t
+class netlist_param_model_t : public netlist_param_t
 {
 public:
-    netlist_param_multi_t()
-    : netlist_param_str_t()
+    netlist_param_model_t()
+    : netlist_param_t(MODEL)
+    , m_param("")
     {  }
+
+    ATTR_COLD inline void initial(const pstring &val) { m_param = val; }
+
+    ATTR_HOT inline const pstring &Value() const     { return m_param;     }
 
     /* these should be cached! */
     ATTR_COLD double dValue(const pstring &entity, const double defval = 0.0) const;
 
 private:
+    pstring m_param;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -1208,6 +1215,12 @@ public:
     ~netlist_factory();
 
     void initialize();
+
+    template<class _C>
+    void register_device(const pstring &name, const pstring &classname)
+    {
+        m_list.add(new net_device_t_factory< _C >(name, classname) );
+    }
 
     netlist_device_t *new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const;
     netlist_device_t *new_device_by_name(const pstring &name, netlist_setup_t &setup) const;

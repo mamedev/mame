@@ -379,7 +379,7 @@ static NETLIST_START(pong_schematics)
 
     NETDEV_R(ic_b9_R, RES_K(71))
     NETDEV_C(ic_b9_C, CAP_U(.1))
-    NETDEV_1N914(ic_b9_D)
+    NETDEV_D(ic_b9_D, 1N914)
     NETDEV_NE555(ic_b9)
 
     NET_C(ic_b9.VCC, V5)
@@ -418,7 +418,7 @@ static NETLIST_START(pong_schematics)
 
     NETDEV_R(ic_a9_R, RES_K(71))
     NETDEV_C(ic_a9_C, CAP_U(.1))
-    NETDEV_1N914(ic_a9_D)
+    NETDEV_D(ic_a9_D, 1N914)
     NETDEV_NE555(ic_a9)
 
     NET_C(ic_a9.VCC, V5)
@@ -783,24 +783,6 @@ static NETLIST_START(pong_schematics)
 
 NETLIST_END
 
-static NETLIST_START(pong)
-
-	//NETLIST_INCLUDE(pong_schematics)
-	NETLIST_MEMREGION("maincpu")
-	NETDEV_CALLBACK(sound_cb, sound)
-	NETDEV_CALLBACK(video_cb, videomix)
-
-NETLIST_END
-
-static NETLIST_START(pong_fast)
-
-	NETLIST_INCLUDE(pong_schematics)
-
-	NETDEV_CALLBACK(sound_cb, sound)
-	NETDEV_CALLBACK(video_cb, videomix)
-
-NETLIST_END
-
 class pong_state : public driver_device
 {
 public:
@@ -849,16 +831,16 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
-	void sound_cb(double newval)
+	NETDEV_ANALOG_CALLBACK_MEMBER(sound_cb)
 	{
 		//printf("snd %f\n", newval);
 		//dac_w(m_dac, 0, newval*64);
-		m_dac->write_unsigned8(64*newval);
+		m_dac->write_unsigned8(64*data);
 	}
 
-	void video_cb(double newval)
+	NETDEV_ANALOG_CALLBACK_MEMBER(video_cb)
 	{
-		m_video->update_vid(newval, m_maincpu->local_time());
+		m_video->update_vid(data, time);
 		//printf("%20.15f\n", newval);
 	}
 
@@ -873,6 +855,24 @@ protected:
 private:
 
 };
+
+static NETLIST_START(pong)
+
+    //NETLIST_INCLUDE(pong_schematics)
+    NETLIST_MEMREGION("maincpu")
+
+    NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
+    NETDEV_ANALOG_CALLBACK(video_cb, videomix, pong_state, video_cb, "")
+NETLIST_END
+
+static NETLIST_START(pong_fast)
+
+    NETLIST_INCLUDE(pong_schematics)
+
+    NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
+    NETDEV_ANALOG_CALLBACK(video_cb, videomix, pong_state, video_cb, "")
+
+NETLIST_END
 
 void pong_state::machine_start()
 {
@@ -889,8 +889,6 @@ void pong_state::machine_reset()
 
 void pong_state::video_start()
 {
-	m_maincpu->setup().register_callback("sound_cb", netlist_output_delegate(&pong_state::sound_cb, "pong_state::sound_cb", this));
-	m_maincpu->setup().register_callback("video_cb", netlist_output_delegate(&pong_state::video_cb, "pong_state::video_cb", this));
 }
 
 

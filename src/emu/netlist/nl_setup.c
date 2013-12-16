@@ -16,6 +16,11 @@ static NETLIST_START(base)
 	NETDEV_TTL_CONST(ttlhigh, 1)
 	NETDEV_TTL_CONST(ttllow, 0)
 	NETDEV_ANALOG_CONST(NC, NETLIST_HIGHIMP_V)
+
+    NET_MODEL(".model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
+    NET_MODEL(".model 1N4148 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
+    NET_MODEL(".MODEL BC237B NPN(IS=1.8E-14 ISE=5.0E-14 ISC=1.72E-13 XTI=3 BF=400 BR=35.5 IKF=0.14 IKR=0.03 XTB=1.5 VAF=80 VAR=12.5 VJE=0.58 VJC=0.54 RE=0.6 RC=0.25 RB=0.56 CJE=13E-12 CJC=4E-12 XCJC=0.75 FC=0.5 NF=0.9955 NR=1.005 NE=1.46 NC=1.27 MJE=0.33 MJC=0.33 TF=0.64E-9 TR=50.72E-9 EG=1.11 KF=0 AF=1 VCEO=45V ICRATING=100M MFG=ZETEX)")
+
 NETLIST_END
 
 
@@ -28,7 +33,7 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
     , m_proxy_cnt(0)
 {
     m_factory.initialize();
-	NETLIST_NAME(base)(*this);
+    NETLIST_NAME(base)(*this);
 }
 
 template <class T>
@@ -100,12 +105,19 @@ void netlist_setup_t::remove_dev(const pstring &name)
 	m_devices.remove(name);
 }
 
+#if 0
 void netlist_setup_t::register_callback(const pstring &devname, netlist_output_delegate delegate)
 {
 	NETLIB_NAME(analog_callback) *dev = (NETLIB_NAME(analog_callback) *) m_devices.find(devname);
 	if (dev == NULL)
 		fatalerror("did not find device %s\n", devname.cstr());
 	dev->register_callback(delegate);
+}
+#endif
+
+void netlist_setup_t::register_model(const pstring &model)
+{
+    m_models.add(model);
 }
 
 void netlist_setup_t::register_alias(const pstring &alias, const pstring &out)
@@ -194,6 +206,25 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
                         case netlist_param_t::STRING:
                         {
                             dynamic_cast<netlist_param_str_t &>(param).initial(val);
+                        }
+                        break;
+                        case netlist_param_t::MODEL:
+                        {
+                            pstring search = (".model " + val + " ").ucase();
+                            bool found = false;
+                            for (int i=0; i < m_models.count(); i++)
+                            {
+                                if (m_models[i].ucase().startsWith(search))
+                                {
+                                    int pl=m_models[i].find("(");
+                                    int pr=m_models[i].find("(");
+                                    dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i].substr(pl+1,pr-pl-1));
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found)
+                                fatalerror("Model %s not found\n", val.cstr());
                         }
                         break;
                         default:
