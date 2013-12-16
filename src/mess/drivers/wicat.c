@@ -43,6 +43,7 @@ public:
 		, m_videouart1(*this,"videouart1")
 		, m_videouart(*this,"videouart")
 		, m_videosram(*this,"videosram")
+		, m_chargen(*this,"g2char")
 	{ }
 
 	DECLARE_READ16_MEMBER(invalid_r);
@@ -56,6 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(via_b_w);
 	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_WRITE8_MEMBER(video_w);
+	DECLARE_READ8_MEMBER(video_dma_r);
+	DECLARE_WRITE8_MEMBER(video_dma_w);
 	DECLARE_READ8_MEMBER(video_uart0_r);
 	DECLARE_WRITE8_MEMBER(video_uart0_w);
 	DECLARE_READ8_MEMBER(video_uart1_r);
@@ -64,6 +67,14 @@ public:
 	DECLARE_WRITE8_MEMBER(videosram_w);
 	DECLARE_READ8_MEMBER(video_timer_r);
 	DECLARE_WRITE8_MEMBER(video_timer_w);
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(video_ctrl_r);
+	DECLARE_WRITE8_MEMBER(video_ctrl_w);
+	DECLARE_READ8_MEMBER(video_status_r);
+	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
+	DECLARE_WRITE_LINE_MEMBER(dma_nmi_cb);
+	DECLARE_WRITE_LINE_MEMBER(crtc_cb);
 
 	required_shared_ptr<UINT8> m_vram;
 	required_device<cpu_device> m_maincpu;
@@ -82,6 +93,7 @@ public:
 	required_device<mc2661_device> m_videouart1;
 	required_device<im6402_device> m_videouart;
 	required_device<x2212_device> m_videosram;
+	required_memory_region m_chargen;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -98,6 +110,8 @@ private:
 	UINT8 m_portA;
 	UINT8 m_portB;
 	bool m_video_timer_irq;
+	UINT8 m_nmi_enable;
+	UINT8 m_crtc_irq;
 };
 
 
@@ -133,10 +147,13 @@ static ADDRESS_MAP_START(wicat_video_io, AS_IO, 8, wicat_state)
 	AM_RANGE(0x0000,0x0003) AM_READWRITE(video_timer_r,video_timer_w)  // some sort of timer?
 	AM_RANGE(0x0100,0x0107) AM_READWRITE(video_uart0_r,video_uart0_w)  // INS2651 UART #1
 	AM_RANGE(0x0200,0x0207) AM_READWRITE(video_uart1_r,video_uart1_w)  // INS2651 UART #2
+	AM_RANGE(0x0304,0x0304) AM_READ(video_status_r)
 	AM_RANGE(0x0400,0x047f) AM_READWRITE(videosram_r,videosram_w)  // XD2210  4-bit NOVRAM
 	AM_RANGE(0x0700,0x0700) AM_DEVREADWRITE("videouart",im6402_device,read,write)  // UART?
-	AM_RANGE(0x0800,0x080f) AM_DEVREADWRITE("videodma",am9517a_device,read,write)  // DMA?
-	AM_RANGE(0x0b00,0x0b03) AM_READWRITE(video_r,video_w)
+	AM_RANGE(0x0800,0x080f) AM_READWRITE(video_ctrl_r,video_ctrl_w)
+	AM_RANGE(0x0a00,0x0a1f) AM_READWRITE(video_dma_r,video_dma_w) // DMA
+	AM_RANGE(0x0b00,0x0b03) AM_READWRITE(video_r,video_w)  // i8275 CRTC
+	AM_RANGE(0x0e00,0x0eff) AM_RAM
 	AM_RANGE(0x4000,0x5fff) AM_RAM AM_SHARE("vram") // video RAM?
 	AM_RANGE(0x8000,0x8fff) AM_ROM AM_REGION("g2char",0x0000)
 	AM_RANGE(0x9000,0x9fff) AM_ROM AM_REGION("g2char",0x0000)
@@ -164,6 +181,8 @@ void wicat_state::machine_reset()
 	m_uart0->dcd_w(0);
 	m_video_timer_irq = false;
 	m_video_timer->adjust(attotime::zero,0,attotime::from_hz(60));
+	m_nmi_enable = 0;
+	m_crtc_irq = CLEAR_LINE;
 }
 
 void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -261,6 +280,27 @@ WRITE8_MEMBER(wicat_state::video_w)
 	}
 }
 
+READ8_MEMBER( wicat_state::vram_r )
+{
+	return m_videocpu->space(AS_IO).read_byte(offset*2);
+}
+
+WRITE8_MEMBER( wicat_state::vram_w )
+{
+	m_videocpu->space(AS_IO).write_byte(offset*2,data);
+}
+
+READ8_MEMBER(wicat_state::video_dma_r)
+{
+	return m_videodma->read(space,offset/2);
+}
+
+WRITE8_MEMBER(wicat_state::video_dma_w)
+{
+	if(!(offset & 0x01))
+		m_videodma->write(space,offset/2,data);
+}
+
 READ8_HANDLER(wicat_state::video_uart0_r)
 {
 	UINT16 noff = offset >> 1;
@@ -326,11 +366,63 @@ WRITE8_MEMBER(wicat_state::video_timer_w)
 	logerror("I/O port 0x%04x write %02x\n",offset,data);
 }
 
+READ8_MEMBER(wicat_state::video_ctrl_r)
+{
+	return 0x00;  // TODO
+}
+
+WRITE8_MEMBER(wicat_state::video_ctrl_w)
+{
+	if(offset == 0x07)
+		m_nmi_enable = data;
+}
+
+READ8_MEMBER(wicat_state::video_status_r)
+{
+	// this port is read in the NVI IRQ routine, which if bit 2 is set, will unmask DMA channel 0.  But no idea what triggers it...
+	if(m_crtc_irq == ASSERT_LINE)
+		return 0x04;
+	else
+		return 0x00;
+}
+
+WRITE_LINE_MEMBER(wicat_state::dma_hrq_w)
+{
+	m_videocpu->set_input_line(INPUT_LINE_HALT,state ? ASSERT_LINE : CLEAR_LINE);
+	m_videodma->hack_w(state);
+}
+
+WRITE_LINE_MEMBER(wicat_state::dma_nmi_cb)
+{
+	if(state)
+	{
+		if(m_nmi_enable != 0)
+			m_videocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER(wicat_state::crtc_cb)
+{
+	m_crtc_irq = state ? ASSERT_LINE : CLEAR_LINE;
+	m_videocpu->set_input_line(INPUT_LINE_IRQ0,m_crtc_irq);
+}
+
 I8275_DISPLAY_PIXELS(wicat_display_pixels)
 {
-	//wicat_state *state = device->machine().driver_data<wicat_state>();
+	wicat_state *state = device->machine().driver_data<wicat_state>();
 
-	// TODO
+	UINT8 romdata = state->m_chargen->base()[((charcode << 4) | linecount) + 1];
+	int i;
+
+	for (i = 0; i < 8; i++)
+	{
+		int color = (romdata >> (7-i)) & 0x01;
+
+		if(linecount > 9)
+			color = 0;
+
+		bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color];
+	}
 }
 
 // internal terminal
@@ -554,20 +646,20 @@ struct rs232_port_interface wicat_serial5_intf =
 
 AM9517A_INTERFACE( wicat_videodma_intf )
 {
-	DEVCB_NULL, // m_out_hreq_cb;
-	DEVCB_NULL, // m_out_eop_cb;
+	DEVCB_DRIVER_LINE_MEMBER(wicat_state,dma_hrq_w), // m_out_hreq_cb;
+	DEVCB_DRIVER_LINE_MEMBER(wicat_state,dma_nmi_cb), // m_out_eop_cb;
 
-	DEVCB_NULL, // m_in_memr_cb;
-	DEVCB_NULL, // m_out_memw_cb;
+	DEVCB_DRIVER_MEMBER(wicat_state,vram_r), // m_in_memr_cb;
+	DEVCB_DRIVER_MEMBER(wicat_state,vram_w), // m_out_memw_cb;
 
 	{ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }, // m_in_ior_cb[4];
-	{ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }, // m_out_iow_cb[4];
+	{ DEVCB_DEVICE_MEMBER("video", i8275x_device, dack_w),DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }, // m_out_iow_cb[4];
 	{ DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL }  // m_out_dack_cb[4];
 };
 
 static MACHINE_CONFIG_START( wicat, wicat_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) // unknown clock
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_mem)
 
 	MCFG_VIA6522_ADD("via",XTAL_4MHz,wicat_via_intf)
@@ -589,7 +681,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_RS232_PORT_ADD("serial5",wicat_serial5_intf,default_rs232_devices,NULL)
 
 	/* video hardware */
-	MCFG_CPU_ADD("videocpu",Z8002,XTAL_8MHz)  // AMD AMZ8002DC
+	MCFG_CPU_ADD("videocpu",Z8002,XTAL_8MHz/2)  // AMD AMZ8002DC
 	MCFG_CPU_PROGRAM_MAP(wicat_video_mem)
 	MCFG_CPU_IO_MAP(wicat_video_io)
 
@@ -606,6 +698,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_SCREEN_UPDATE_DEVICE("video",i8275x_device,screen_update)
 
 	MCFG_I8275_ADD("video",XTAL_19_6608MHz/8,9,wicat_display_pixels,DEVWRITELINE("videodma",am9517a_device, dreq0_w))
+	MCFG_I8275_IRQ_CALLBACK(WRITELINE(wicat_state,crtc_cb))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEFAULT_LAYOUT(layout_wicat)
