@@ -45,6 +45,7 @@ public:
 
 	// window handle and info
 	HWND                hwnd;
+	HWND                focus_hwnd;
 	char                title[256];
 	RECT                non_fullscreen_bounds;
 	int                 startmaximized;

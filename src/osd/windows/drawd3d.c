@@ -903,7 +903,7 @@ try_again:
 													D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	// create the D3D device
-	result = (*d3dintf->d3d.create_device)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_window->hwnd,
+	result = (*d3dintf->d3d.create_device)(d3dintf, m_adapter, D3DDEVTYPE_HAL, m_window->focus_hwnd,
 					D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);
 	if (result != D3D_OK)
 	{

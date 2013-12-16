@@ -1178,6 +1178,9 @@ static int complete_create(win_window_info *window)
 	if (window->hwnd == NULL)
 		return 1;
 
+	// set window #0 as the focus window for all windows, required for D3D & multimonitor
+	window->focus_hwnd = win_window_list->hwnd;
+
 	// set a pointer back to us
 	SetWindowLongPtr(window->hwnd, GWLP_USERDATA, (LONG_PTR)window);
 
