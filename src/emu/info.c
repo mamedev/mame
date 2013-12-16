@@ -398,12 +398,11 @@ void info_xml_creator::output_devices()
 		slot_interface_iterator iter(m_drivlist.config().root_device());
 		for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 		{
-			const slot_interface* intf = slot->get_slot_interfaces();
-			for (int i = 0; intf && intf[i].name != NULL; i++)
+			for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
 			{
 				astring temptag("_");
-				temptag.cat(intf[i].name);
-				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), intf[i].devtype, 0);
+				temptag.cat(option->name());
+				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), option->devtype(), 0);
 
 				// notify this device and all its subdevices that they are now configured
 				device_iterator subiter(*dev);
@@ -1281,19 +1280,18 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 			 fprintf(m_output, " interface=\"%s\"", xml_normalize_string(slot->slot_interface()));
 			 */
 
-			const slot_interface* intf = slot->get_slot_interfaces();
-			for (int i = 0; intf && intf[i].name != NULL && !intf[i].internal; i++)
+			for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
 			{
-				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", intf[i].devtype, 0);
+				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), "dummy", option->devtype(), 0);
 				if (!dev->configured())
 					dev->config_complete();
 
 				fprintf(m_output, "\t\t\t<slotoption");
-				fprintf(m_output, " name=\"%s\"", xml_normalize_string(intf[i].name));
+				fprintf(m_output, " name=\"%s\"", xml_normalize_string(option->name()));
 				fprintf(m_output, " devname=\"%s\"", xml_normalize_string(dev->shortname()));
-				if (slot->get_default_card())
+				if (slot->default_option())
 				{
-					if (strcmp(slot->get_default_card(),intf[i].name)==0)
+					if (strcmp(slot->default_option(),option->name())==0)
 						fprintf(m_output, " default=\"yes\"");
 				}
 				fprintf(m_output, "/>\n");

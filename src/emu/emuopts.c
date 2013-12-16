@@ -233,10 +233,11 @@ bool emu_options::add_slot_options(bool isfirst)
 			entry[0].name = slot->device().tag() + 1;
 			entry[0].description = NULL;
 			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
-			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card() : NULL;
+			entry[0].defvalue = slot->default_option();
 			if ( entry[0].defvalue )
 			{
-				if ( slot->is_internal_option( entry[0].defvalue ) )
+				const device_slot_option *option = slot->option(entry[0].defvalue);
+				if (option && !option->selectable())
 				{
 					entry[0].flags |= OPTION_FLAG_INTERNAL;
 				}
@@ -269,12 +270,13 @@ void emu_options::update_slot_options()
 	{
 		// retrieve info about the device instance
 		if (exists(slot->device().tag()+1)) {
-			if (slot->get_slot_interfaces() != NULL) {
+			if (slot->first_option() != NULL) {
 				const char *def = slot->get_default_card_software(config,*this);
 				if (def)
 				{
 					set_default_value(slot->device().tag()+1,def);
-					set_flag(slot->device().tag()+1, ~OPTION_FLAG_INTERNAL, slot->is_internal_option(def) ? OPTION_FLAG_INTERNAL : 0 );
+					const device_slot_option *option = slot->option( def );
+					set_flag(slot->device().tag()+1, ~OPTION_FLAG_INTERNAL, option && !option->selectable() ? OPTION_FLAG_INTERNAL : 0 );
 				}
 			}
 		}

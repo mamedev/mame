@@ -49,7 +49,7 @@
 // define machine_config_constructor here due to circular dependency
 // between devices and the machine config
 class machine_config;
-typedef device_t * (*machine_config_constructor)(machine_config &config, device_t *owner);
+typedef device_t * (*machine_config_constructor)(machine_config &config, device_t *owner, device_t *device);
 
 // I/O
 #include "input.h"

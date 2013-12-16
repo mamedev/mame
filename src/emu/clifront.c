@@ -664,23 +664,26 @@ void cli_frontend::listslots(const char *gamename)
 			// output the line, up to the list of extensions
 			printf("%-13s%-10s   ", first ? drivlist.driver().name : "", slot->device().tag()+1);
 
+			bool first_option = true;
+
 			// get the options and print them
-			const slot_interface* intf = slot->get_slot_interfaces();
-			for (int i = 0; intf && intf[i].name != NULL; i++)
+			for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
 			{
-				if (!intf[i].internal)
+				if (option->selectable())
 				{
-					device_t *dev = (*intf[i].devtype)(drivlist.config(), "dummy", &drivlist.config().root_device(), 0);
+					device_t *dev = (*option->devtype())(drivlist.config(), "dummy", &drivlist.config().root_device(), 0);
 					dev->config_complete();
-					if (i==0) {
-						printf("%-15s %s\n", intf[i].name,dev->name());
+					if (first_option) {
+						printf("%-15s %s\n", option->name(),dev->name());
 					} else {
-						printf("%-23s   %-15s %s\n", "",intf[i].name,dev->name());
+						printf("%-23s   %-15s %s\n", "",option->name(),dev->name());
 					}
 					global_free(dev);
+
+					first_option = false;
 				}
 			}
-			if (intf==NULL || (intf!=NULL && intf[0].name == NULL))
+			if (first_option)
 				printf("%-15s %s\n", "[none]","No options available");
 			// end the line
 			printf("\n");
@@ -884,12 +887,11 @@ void cli_frontend::verifyroms(const char *gamename)
 			slot_interface_iterator slotiter(config.root_device());
 			for (const device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
 			{
-				const slot_interface* intf = slot->get_slot_interfaces();
-				for (int i = 0; intf && intf[i].name != NULL; i++)
+				for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
 				{
 					astring temptag("_");
-					temptag.cat(intf[i].name);
-					device_t *dev = const_cast<machine_config &>(config).device_add(&config.root_device(), temptag.cstr(), intf[i].devtype, 0);
+					temptag.cat(option->name());
+					device_t *dev = const_cast<machine_config &>(config).device_add(&config.root_device(), temptag.cstr(), option->devtype(), 0);
 
 					// notify this device and all its subdevices that they are now configured
 					device_iterator subiter(*dev);

@@ -366,18 +366,45 @@ void ui_menu_keyboard_mode::handle()
 
 
 /*-------------------------------------------------
+    ui_slot_get_current_option - returns
+-------------------------------------------------*/
+device_slot_option *ui_menu_slot_devices::slot_get_current_option(device_slot_interface *slot)
+{
+	const char *current;
+	if (slot->fixed())
+	{
+		current = slot->default_option();
+	}
+	else
+	{
+		astring temp;
+		current = machine().options().main_value(temp,slot->device().tag()+1);
+	}
+
+	return slot->option(current);
+}
+
+/*-------------------------------------------------
     ui_slot_get_current_index - returns
 -------------------------------------------------*/
 int ui_menu_slot_devices::slot_get_current_index(device_slot_interface *slot)
 {
-	astring temp;
-	const char *current = machine().options().main_value(temp,slot->device().tag()+1);
-	const slot_interface* intf = slot->get_slot_interfaces();
-	int val = -1;
-	for (int i = 0; intf[i].name != NULL; i++) {
-		if (strcmp(current, intf[i].name) == 0) val = i;
+	const device_slot_option *current = slot_get_current_option(slot);
+
+	if (current != NULL)
+	{
+		int val = 0;
+		for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
+		{
+			if (option == current)
+				return val;
+
+			if (option->selectable())
+				val++;
+		}
 	}
-	return val;
+
+	return -1;
 }
 
 /*-------------------------------------------------
@@ -385,9 +412,13 @@ int ui_menu_slot_devices::slot_get_current_index(device_slot_interface *slot)
 -------------------------------------------------*/
 int ui_menu_slot_devices::slot_get_length(device_slot_interface *slot)
 {
-	const slot_interface* intf = slot->get_slot_interfaces();
+	const device_slot_option *current = slot_get_current_option(slot);
+
 	int val = 0;
-	for (int i = 0; intf[i].name != NULL; i++) val++;
+	for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
+		if (option == current || option->selectable())
+			val++;
+
 	return val;
 }
 
@@ -396,13 +427,16 @@ int ui_menu_slot_devices::slot_get_length(device_slot_interface *slot)
 -------------------------------------------------*/
 const char *ui_menu_slot_devices::slot_get_next(device_slot_interface *slot)
 {
-	int idx = slot_get_current_index(slot) + 1;
-	do {
-		if (idx==slot_get_length(slot)) return "";
-		if (slot->get_slot_interfaces()[idx].internal) idx++;
-	} while (slot->get_slot_interfaces()[idx].internal);
-	if (idx==slot_get_length(slot)) return "";
-	return slot->get_slot_interfaces()[idx].name;
+	int idx = slot_get_current_index(slot);
+	if (idx < 0)
+		idx = 0;
+	else
+		idx++;
+
+	if (idx >= slot_get_length(slot))
+		return "";
+
+	return slot_get_option(slot, idx);
 }
 
 /*-------------------------------------------------
@@ -410,26 +444,39 @@ const char *ui_menu_slot_devices::slot_get_next(device_slot_interface *slot)
 -------------------------------------------------*/
 const char *ui_menu_slot_devices::slot_get_prev(device_slot_interface *slot)
 {
-	int idx = slot_get_current_index(slot) - 1;
-	do {
-		if (idx==-1) return "";
-		if (idx==-2) idx = slot_get_length(slot) -1;
-		if (idx==-1) return "";
-		if (slot->get_slot_interfaces()[idx].internal) idx--;
-	} while (slot->get_slot_interfaces()[idx].internal);
-	return slot->get_slot_interfaces()[idx].name;
+	int idx = slot_get_current_index(slot);
+	if (idx < 0)
+		idx = slot_get_length(slot) - 1;
+	else
+		idx--;
+
+	if (idx < 0)
+		return "";
+
+	return slot_get_option(slot, idx);
 }
 
 /*-------------------------------------------------
-    ui_get_slot_device - returns
+    ui_slot_get_option - returns
 -------------------------------------------------*/
-const char *ui_menu_slot_devices::get_slot_device(device_slot_interface *slot)
+const char *ui_menu_slot_devices::slot_get_option(device_slot_interface *slot, int index)
 {
-	int idx = slot_get_current_index(slot);
-	if (idx == -1)
-		return "";
-	else
-		return slot->get_slot_interfaces()[idx].name;
+	const device_slot_option *current = slot_get_current_option(slot);
+
+	if (index >= 0 )
+	{
+		int val = 0;
+		for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
+		{
+			if (val == index)
+				return option->name();
+
+			if (option == current || option->selectable())
+				val++;
+		}
+	}
+
+	return "";
 }
 
 
@@ -461,11 +508,9 @@ void ui_menu_slot_devices::populate()
 	for (device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
 		/* record the menu item */
-		const char *title = get_slot_device(slot);
-		// do no display fixed slots
-		if (slot->fixed()) title = slot->get_default_card();
-		if (title==NULL) title = "";
-		item_append(slot->device().tag()+1, strcmp(title,"")==0 ? "------" : title, (slot->fixed() || slot->all_internal()) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
+		const device_slot_option *option = slot_get_current_option(slot);
+
+		item_append(slot->device().tag()+1, option == NULL ? "------" : option->name(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
 	}
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Reset",  NULL, 0, NULL);

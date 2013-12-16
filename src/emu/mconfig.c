@@ -36,62 +36,46 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		m_root_device(NULL)
 {
 	// construct the config
-	(*gamedrv.machine_config)(*this, NULL);
+	(*gamedrv.machine_config)(*this, NULL, NULL);
 
 	bool is_selected_driver = mame_stricmp(gamedrv.name,options.system_name())==0;
 	// intialize slot devices - make sure that any required devices have been allocated
 	slot_interface_iterator slotiter(root_device());
 	for (device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
 	{
-		const slot_interface *intf = slot->get_slot_interfaces();
-		if (intf != NULL)
+		device_t &owner = slot->device();
+		astring temp;
+		const char *selval = options.main_value(temp, owner.tag()+1);
+		bool isdefault = (options.priority(owner.tag()+1)==OPTION_PRIORITY_DEFAULT);
+		if (!is_selected_driver || !options.exists(owner.tag()+1))
+			selval = slot->default_option();
+
+		if (selval != NULL && *selval != 0)
 		{
-			device_t &owner = slot->device();
-			astring temp;
-			const char *selval = options.main_value(temp, owner.tag()+1);
-			bool isdefault = (options.priority(owner.tag()+1)==OPTION_PRIORITY_DEFAULT);
-			if (!is_selected_driver || !options.exists(owner.tag()+1))
-				selval = slot->get_default_card();
+			const device_slot_option *option = slot->option(selval);
 
-			if (selval != NULL && *selval != 0)
+			if (option && (isdefault || option->selectable()))
 			{
-				bool found = false;
-				for (int i = 0; intf[i].name != NULL; i++)
-				{
-					if (mame_stricmp(selval, intf[i].name) == 0)
-					{
-						if ((!intf[i].internal) || (isdefault && intf[i].internal))
-						{
-							device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, slot->card_clock(selval));
-							found = true;
+				device_t *new_dev = device_add(&owner, option->name(), option->devtype(), option->clock());
 
-							const char *default_bios = slot->card_default_bios(selval);
-							if (default_bios != NULL)
-							{
-								device_t::static_set_default_bios_tag(*new_dev, default_bios);
-							}
+				const char *default_bios = option->default_bios();
+				if (default_bios != NULL)
+					device_t::static_set_default_bios_tag(*new_dev, default_bios);
 
-							machine_config_constructor additions = slot->card_machine_config(selval);
-							if (additions != NULL)
-								(*additions)(const_cast<machine_config &>(*this), new_dev);
+				machine_config_constructor additions = option->machine_config();
+				if (additions != NULL)
+					(*additions)(const_cast<machine_config &>(*this), new_dev, NULL);
 
-							const input_device_default *input_device_defaults = slot->card_input_device_defaults(selval);
-							if (input_device_defaults)
-							{
-								device_t::static_set_input_default(*new_dev, input_device_defaults);
-							}
+				const input_device_default *input_device_defaults = option->input_device_defaults();
+				if (input_device_defaults)
+					device_t::static_set_input_default(*new_dev, input_device_defaults);
 
-							const void *config = slot->card_config(selval);
-							if (config)
-							{
-								device_t::static_set_static_config(*new_dev, config);
-							}
-						}
-					}
-				}
-				if (!found)
-					throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);
+				const void *config = option->static_config();
+				if (config)
+					device_t::static_set_static_config(*new_dev, config);
 			}
+			else
+				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);
 		}
 	}
 
@@ -173,7 +157,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	// apply any machine configuration owned by the device now
 	machine_config_constructor additions = m_root_device->machine_config_additions();
 	if (additions != NULL)
-		(*additions)(*this, m_root_device);
+		(*additions)(*this, m_root_device, NULL);
 	return m_root_device;
 }
 

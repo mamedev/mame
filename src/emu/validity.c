@@ -1103,12 +1103,11 @@ void validity_checker::validate_devices()
 	slot_interface_iterator slotiter(m_current_config->root_device());
 	for (const device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
 	{
-		const slot_interface* intf = slot->get_slot_interfaces();
-		for (int i = 0; intf && intf[i].name != NULL; i++)
+		for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
 		{
 			astring temptag("_");
-			temptag.cat(intf[i].name);
-			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.cstr(), intf[i].devtype, 0);
+			temptag.cat(option->name());
+			device_t *dev = const_cast<machine_config &>(*m_current_config).device_add(&m_current_config->root_device(), temptag.cstr(), option->devtype(), 0);
 
 			// notify this device and all its subdevices that they are now configured
 			device_iterator subiter(*dev);

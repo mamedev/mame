@@ -144,51 +144,43 @@ private:
 #define MACHINE_CONFIG_NAME(_name) construct_machine_config_##_name
 
 #define MACHINE_CONFIG_START(_name, _class) \
-ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
+ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
-	device_t *device = NULL; \
-	(void)device; \
 	devcb2_base *devcb = NULL; \
 	(void)devcb; \
 	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_creator<_class>, 0);
 #define MACHINE_CONFIG_FRAGMENT(_name) \
-ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
+ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
-	device_t *device = NULL; \
-	(void)device; \
 	devcb2_base *devcb = NULL; \
 	(void)devcb; \
 	assert(owner != NULL);
 #define MACHINE_CONFIG_DERIVED(_name, _base) \
-ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
+ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
-	device_t *device = NULL; \
-	(void)device; \
 	devcb2_base *devcb = NULL; \
 	(void)devcb; \
-	owner = MACHINE_CONFIG_NAME(_base)(config, owner); \
+	owner = MACHINE_CONFIG_NAME(_base)(config, owner, device); \
 	assert(owner != NULL);
 #define MACHINE_CONFIG_DERIVED_CLASS(_name, _base, _class) \
-ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
+ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device) \
 { \
-	device_t *device = NULL; \
-	(void)device; \
 	devcb2_base *devcb = NULL; \
 	(void)devcb; \
 	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_creator<_class>, 0); \
-	owner = MACHINE_CONFIG_NAME(_base)(config, owner);
+	owner = MACHINE_CONFIG_NAME(_base)(config, owner, device);
 #define MACHINE_CONFIG_END \
 	return owner; \
 }
 
 // use this to declare external references to a machine driver
 #define MACHINE_CONFIG_EXTERN(_name) \
-	extern device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner)
+	extern device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner, device_t *device)
 
 
 // importing data from other machine drivers
 #define MCFG_FRAGMENT_ADD(_name) \
-	MACHINE_CONFIG_NAME(_name)(config, owner);
+	MACHINE_CONFIG_NAME(_name)(config, owner, device);
 
 
 // scheduling parameters
