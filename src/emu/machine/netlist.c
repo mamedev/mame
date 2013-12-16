@@ -97,7 +97,7 @@ void netlist_mame_device::device_start()
 		allok &= ods->object()->OnDeviceStart();
 
 	if (!allok)
-		fatalerror("required elements not found\n");
+	    m_netlist->xfatalerror("required elements not found\n");
 
 	m_setup->resolve_inputs();
 

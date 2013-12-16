@@ -154,9 +154,9 @@ void *pblockpool::alloc(const std::size_t n)
         return (char *) malloc(n);
     else
     {
-        int min_alloc = MAX(m_blocksize, n+sizeof(memblock)-8);
-        char *ret = NULL;
         int memsize = ((n + m_align - 1) / m_align) * m_align;
+        int min_alloc = MAX(m_blocksize, memsize+sizeof(memblock)-MINDATASIZE);
+        char *ret = NULL;
         //std::printf("m_first %p\n", m_first);
         for (memblock *p = m_first; p != NULL && ret == NULL; p = p->next)
         {
@@ -175,7 +175,7 @@ void *pblockpool::alloc(const std::size_t n)
             memblock *p = (memblock *) malloc(min_alloc); //new char[min_alloc];
             p->allocated = 0;
             p->cur = &p->data[0];
-            p->size = p->remaining = min_alloc - sizeof(memblock);
+            p->size = p->remaining = min_alloc - (sizeof(memblock)-MINDATASIZE);
             p->next = m_first;
             //std::printf("allocated block size %d\n", sizeof(p->data));
 
@@ -203,7 +203,7 @@ void pblockpool::dealloc(void *ptr)
             {
                 p->allocated -= 1;
                 if (p->allocated < 0)
-                    fatalerror("nstring: memory corruption\n");
+                    std::fprintf(stderr, "nstring: memory corruption - crash likely\n");
                 if (p->allocated == 0)
                 {
                     //std::printf("Block entirely freed\n");
@@ -216,7 +216,7 @@ void pblockpool::dealloc(void *ptr)
                 return;
             }
         }
-        fatalerror("nstring: string <%p> not found\n", ptr);
+        std::fprintf(stderr, "nstring: string <%p> not found on free\n", ptr);
     }
 }
 

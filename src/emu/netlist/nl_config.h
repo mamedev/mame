@@ -47,6 +47,8 @@ typedef UINT8 netlist_sig_t;
 //  DEBUGGING
 //============================================================
 
+#define fatalerror xxbreakme
+
 #define NL_VERBOSE                  (0)
 #define NL_KEEP_STATISTICS          (0)
 #define FATAL_ERROR_AFTER_NS        (0) //(1000)

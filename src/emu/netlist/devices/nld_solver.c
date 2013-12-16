@@ -11,8 +11,9 @@
 // ----------------------------------------------------------------------------------------
 
 
-ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets)
+ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
 {
+    m_owner = &aowner;
     for (netlist_net_t::list_t::entry_t *pn = nets.first(); pn != NULL; pn = nets.next(pn))
     {
         NL_VERBOSE_OUT(("setting up net\n"));
@@ -49,7 +50,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets)
                     NL_VERBOSE_OUT(("Added input\n"));
                     break;
                 default:
-                    fatalerror("unhandled element found\n");
+                    owner().netlist().xfatalerror("unhandled element found\n");
                     break;
             }
         }
@@ -158,7 +159,7 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
         net->m_cur.Analog = net->m_new.Analog = new_val;
 
         NL_VERBOSE_OUT(("Info: %d\n", pn->object()->m_num_cons));
-        NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
+        //NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
     }
     return resched;
 }
@@ -278,10 +279,10 @@ NETLIB_FUNC_VOID(solver, post_start, ())
     printf("Found %d net groups in %d nets\n", cur_group + 1, m_nets.count());
     for (int i = 0; i <= cur_group; i++)
     {
-        netlist_matrix_solver_t *ms = new netlist_matrix_solver_t;
+        netlist_matrix_solver_t *ms = new netlist_matrix_solver_t();
         ms->m_accuracy = m_accuracy.Value();
         ms->m_convergence_factor = m_convergence.Value();
-        ms->setup(groups[i]);
+        ms->setup(groups[i], *this);
         m_mat_solvers.add(ms);
         printf("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr());
         printf("  has %s elements\n", ms->is_dynamic() ? "dynamic" : "no dynamic");

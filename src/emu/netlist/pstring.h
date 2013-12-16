@@ -16,6 +16,8 @@
 
 struct pblockpool {
 
+    static const int MINDATASIZE = 8;
+
     struct memblock
     {
         memblock *next;
@@ -23,7 +25,7 @@ struct pblockpool {
         int allocated;
         int remaining;
         char *cur;
-        char data[8];
+        char data[MINDATASIZE];
     };
 
     pblockpool();

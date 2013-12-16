@@ -103,6 +103,7 @@ public:
 	~netlist_setup_t();
 
 	netlist_base_t &netlist() { return m_netlist; }
+    const netlist_base_t &netlist() const { return m_netlist; }
 	netlist_factory &factory() { return m_factory; }
 
 	netlist_device_t *register_dev(netlist_device_t *dev, const pstring &name);

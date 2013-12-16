@@ -795,15 +795,10 @@ public:
 			m_srst(*this, "maincpu", "SRST"),
 			m_p_P0(*this, "maincpu", "ic_b9_POT.DIAL"),
             m_p_P1(*this, "maincpu", "ic_a9_POT.DIAL"),
-			m_p_V0(*this, "maincpu", "P1"),  // pong - legacy
-			m_p_V1(*this, "maincpu", "P2"),  // pong - legacy
 			m_sw1a(*this, "maincpu", "sw1a.POS"),
 			m_sw1b(*this, "maincpu", "sw1b.POS"),
 			m_p_R0(*this, "maincpu", "ic_a9_R.R"),
-			m_p_R1(*this, "maincpu", "ic_b9_R.R"),
-			m_p_R0x(*this, "maincpu", "ic_a9.R"),  // pong - legacy
-			m_p_R1x(*this, "maincpu", "ic_b9.R"),  // pong - legacy
-			isRomPong(false)
+			m_p_R1(*this, "maincpu", "ic_b9_R.R")
 	{
 	}
 
@@ -814,18 +809,12 @@ public:
 
 	// sub devices
 	netlist_mame_device::required_output<netlist_logic_output_t> m_srst;
-    netlist_mame_device::optional_param<netlist_param_double_t> m_p_P0;
-    netlist_mame_device::optional_param<netlist_param_double_t> m_p_P1;
-	netlist_mame_device::optional_output<netlist_analog_output_t> m_p_V0;
-	netlist_mame_device::optional_output<netlist_analog_output_t> m_p_V1;
+    netlist_mame_device::required_param<netlist_param_double_t> m_p_P0;
+    netlist_mame_device::required_param<netlist_param_double_t> m_p_P1;
 	netlist_mame_device::required_param<netlist_param_int_t> m_sw1a;
 	netlist_mame_device::required_param<netlist_param_int_t> m_sw1b;
-	netlist_mame_device::optional_param<netlist_param_double_t> m_p_R0;
-	netlist_mame_device::optional_param<netlist_param_double_t> m_p_R1;
-    netlist_mame_device::optional_param<netlist_param_double_t> m_p_R0x;
-    netlist_mame_device::optional_param<netlist_param_double_t> m_p_R1x;
-
-	bool isRomPong;
+	netlist_mame_device::required_param<netlist_param_double_t> m_p_R0;
+	netlist_mame_device::required_param<netlist_param_double_t> m_p_R1;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -876,10 +865,6 @@ NETLIST_END
 
 void pong_state::machine_start()
 {
-    if (strcmp(this->shortname(),"pong")==0)
-    {
-        isRomPong = true;
-    }
 }
 
 void pong_state::machine_reset()
@@ -894,10 +879,6 @@ void pong_state::video_start()
 
 INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
-	static const double NE555_R = RES_K(5);
-	static const double PRE_R = RES_R(470);
-	static const double POT_R = RES_K(1);
-
 	double pad;
 	int numpad = (FPTR) (param);
 
@@ -910,29 +891,11 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 
 		double fac = (double) newval / (double) 256;
 		fac = (exp(fac) - 1.0) / (exp(1.0) -1.0) ;
-		double R1 = fac * POT_R;
-		double R3 = (1.0 - fac) * POT_R;
-		double vA = 5.0 * R3 / (R3 + R1);
-		double vB = 5.0 * 2 * NE555_R / (2 * NE555_R + NE555_R);
-		double Req = RES_2_PARALLEL(R1, R3) + RES_2_PARALLEL(NE555_R, 2.0 * NE555_R);
-		double pad = vA + (vB - vA)*PRE_R / (Req + PRE_R);
-		if (!isRomPong)
-		{
-	        switch (numpad)
-	        {
-	        case IC_PADDLE1:    m_p_P0->setTo(fac); break;
-	        case IC_PADDLE2:    m_p_P1->setTo(fac); break;
-	        }
-		}
-		else
-		{
-	        switch (numpad)
-	        {
-	        case IC_PADDLE1:    m_p_V0->set_Q(pad, NLTIME_FROM_NS(0)); break;
-	        case IC_PADDLE2:    m_p_V1->set_Q(pad, NLTIME_FROM_NS(0)); break;
-	        }
-		}
-		//printf("%d %f\n", newval, (float) pad);
+        switch (numpad)
+        {
+        case IC_PADDLE1:    m_p_P0->setTo(fac); break;
+        case IC_PADDLE2:    m_p_P1->setTo(fac); break;
+        }
 		break;
 	}
 	case IC_SWITCH:
@@ -945,21 +908,10 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 	case IC_VR1:
 	case IC_VR2:
 		pad = (double) newval / (double) 100 * RES_K(50) + RES_K(56);
-        if (!isRomPong)
+        switch (numpad)
         {
-            switch (numpad)
-            {
-            case IC_VR1:    m_p_R0->setTo(pad); break;
-            case IC_VR2:    m_p_R1->setTo(pad); break;
-            }
-        }
-        else
-        {
-            switch (numpad)
-            {
-            case IC_VR1:    m_p_R0x->setTo(pad); break;
-            case IC_VR2:    m_p_R1x->setTo(pad); break;
-            }
+        case IC_VR1:    m_p_R0->setTo(pad); break;
+        case IC_VR2:    m_p_R1->setTo(pad); break;
         }
 		break;
 	}
@@ -1022,7 +974,7 @@ MACHINE_CONFIG_END
 
 ROM_START( pong ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* enough for netlist */
-	ROM_LOAD( "pong.netlist", 0x000000, 0x0029e4, CRC(e9c409a1) SHA1(1dc99437f49261c3cb3f46153c6258043bc720a0) )
+	ROM_LOAD( "pong.netlist", 0x000000, 0x003f24, CRC(cc99883b) SHA1(87ea6ec8772db7bf4047695d4c3513fa1a52b6b8) )
 ROM_END
 
 ROM_START( pongf ) /* dummy to satisfy game entry*/

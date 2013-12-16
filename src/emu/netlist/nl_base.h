@@ -489,11 +489,12 @@ public:
     friend class netlist_analog_output_t;
 
     // FIXME: union does not work
-    typedef struct
+    struct hybrid_t
     {
+        inline hybrid_t() : Q(0), Analog(0.0) {}
         netlist_sig_t Q;
         double        Analog;
-    } hybrid_t;
+    };
 
     ATTR_COLD netlist_net_t(const type_t atype, const family_t afamily);
 
@@ -939,7 +940,12 @@ public:
 
 	ATTR_COLD void reset();
 
+	ATTR_COLD void xfatalerror(const char *format, ...) const;
+
 protected:
+
+	// any derived netlist must override this ...
+	virtual void vfatalerror(const char *format, va_list ap) const = 0;
 #if (NL_KEEP_STATISTICS)
 	// performance
 	int m_perf_out_processed;

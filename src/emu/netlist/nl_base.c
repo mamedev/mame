@@ -34,7 +34,7 @@ ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const pstring &
 ATTR_COLD const pstring &netlist_object_t::name() const
 {
     if (m_name == "")
-        fatalerror("object not initialized");
+        netlist().xfatalerror("object not initialized");
     return m_name;
 }
 
@@ -139,7 +139,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(INT32 &atime)
 
             if (FATAL_ERROR_AFTER_NS)
                 if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
-                    fatalerror("Stopped");
+                    xfatalerror("Stopped");
         }
 
         if (atime > 0)
@@ -175,7 +175,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(INT32 &atime)
             }
             if (FATAL_ERROR_AFTER_NS)
                 if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
-                    fatalerror("Stopped");
+                    xfatalerror("Stopped");
 
             add_to_stat(m_perf_out_processed, 1);
         }
@@ -187,6 +187,17 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(INT32 &atime)
         }
     }
 }
+
+ATTR_COLD void netlist_base_t::xfatalerror(const char *format, ...) const
+{
+    va_list ap;
+    va_start(ap, format);
+    //emu_fatalerror error(format, ap);
+    vfatalerror(format, ap);
+    va_end(ap);
+    //throw error;
+}
+
 
 // ----------------------------------------------------------------------------------------
 // Default netlist elements ...
@@ -325,7 +336,7 @@ static void init_term(netlist_core_device_t &dev, netlist_core_terminal_t &term,
                 dynamic_cast<netlist_terminal_t &>(term).init_object(dev, "internal terminal", aState);
                 break;
             default:
-                fatalerror("Unknown terminal type");
+                dev.netlist().xfatalerror("Unknown terminal type");
                 break;
         }
     }
@@ -373,9 +384,6 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
     , m_in_queue(2)
     , m_railterminal(NULL)
 {
-    m_cur.Q = 0;
-    m_new.Q = 0;
-    m_last.Q = 0;
 };
 
 ATTR_COLD void netlist_net_t::register_railterminal(netlist_output_t &mr)
@@ -391,7 +399,7 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
         return; // Nothing to do
 
     if (this->isRailNet() && othernet->isRailNet())
-        fatalerror("Trying to merge to rail nets\n");
+        netlist().xfatalerror("Trying to merge to rail nets\n");
 
     if (othernet->isRailNet())
     {
@@ -565,7 +573,7 @@ ATTR_COLD double netlist_param_model_t::dValue(const pstring &entity, const doub
         tmp = tmp.substr(p, pblank - p);
         int pequal = tmp.find("=", 0);
         if (pequal < 0)
-           fatalerror("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
+            netlist().xfatalerror("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
         tmp = tmp.substr(pequal+1);
         double factor = 1.0;
         switch (*(tmp.right(1).cstr()))

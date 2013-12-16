@@ -23,8 +23,18 @@ void netlist_parser::parse(char *buf)
 		NL_VERBOSE_OUT(("Parser: Device: %s\n", n.cstr()));
 		if (n == "NET_ALIAS")
 			net_alias();
+        else if (n == "NET_C")
+            net_c();
 		else if (n == "NETDEV_PARAM")
 			netdev_param();
+        else if (n == "NETDEV_R")
+            netdev_device(n, "R");
+        else if (n == "NETDEV_C")
+            netdev_device(n, "C");
+        else if (n == "NETDEV_POT")
+            netdev_device(n, "R");
+        else if (n == "NETDEV_D")
+            netdev_device(n, "model", true);
 		else if ((n == "NETDEV_TTL_CONST") || (n == "NETDEV_ANALOG_CONST"))
 			netdev_const(n);
 		else
@@ -42,6 +52,18 @@ void netlist_parser::net_alias()
 	out = getname(')');
 	NL_VERBOSE_OUT(("Parser: Alias: %s %s\n", alias.cstr(), out.cstr()));
 	m_setup.register_alias(alias, out);
+}
+
+void netlist_parser::net_c()
+{
+    pstring t1;
+    pstring t2;
+    skipws();
+    t1 = getname(',');
+    skipws();
+    t2 = getname(')');
+    NL_VERBOSE_OUT(("Parser: Connect: %s %s\n", t1.cstr(), t2.cstr()));
+    m_setup.register_link(t1 , t2);
 }
 
 void netlist_parser::netdev_param()
@@ -113,6 +135,39 @@ void netlist_parser::netdev_device(const pstring &dev_type)
 	check_char(')');
 }
 
+void netlist_parser::netdev_device(const pstring &dev_type, const pstring &default_param, bool isString)
+{
+    netlist_device_t *dev;
+
+    skipws();
+    pstring devname = getname2(',', ')');
+    pstring defparam = devname + "." + default_param;
+    dev = m_setup.factory().new_device_by_name(dev_type, m_setup);
+    m_setup.register_dev(dev, devname);
+    skipws();
+    NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
+    if (*m_p != ')')
+    {
+        // have a default param
+        m_p++;
+        skipws();
+        if (isString)
+        {
+            pstring val = getname(')');
+            m_p--;
+            NL_VERBOSE_OUT(("Parser: Default param: %s %s\n", defparam.cstr(), val.cstr()));
+            m_setup.register_param(defparam, val);
+        }
+        else
+        {
+            double val = eval_param();
+            NL_VERBOSE_OUT(("Parser: Default param: %s %f\n", defparam.cstr(), val));
+            m_setup.register_param(defparam, val);
+        }
+    }
+    check_char(')');
+}
+
 // ----------------------------------------------------------------------------------------
 // private
 // ----------------------------------------------------------------------------------------
@@ -146,7 +201,17 @@ void netlist_parser::skipws()
 			break;
 		case '/':
 			if (*(m_p+1) == '/')
-				skipeol();
+			{
+                skipeol();
+			}
+			else if (*(m_p+1) == '*')
+			{
+			    m_p+=2;
+			    while (*m_p && !(*m_p == '*' && *(m_p + 1) == '/' ))
+			        m_p++;
+			    if (*m_p)
+			        m_p += 2;
+			}
 			break;
 		default:
 			return;
@@ -185,7 +250,7 @@ void netlist_parser::check_char(char ctocheck)
 		m_p++;
 		return;
 	}
-	fatalerror("Parser: expected '%c' found '%c'\n", ctocheck, *m_p);
+	m_setup.netlist().xfatalerror("Parser: expected '%c' found '%c'\n", ctocheck, *m_p);
 }
 
 double netlist_parser::eval_param()
@@ -203,7 +268,7 @@ double netlist_parser::eval_param()
 			f = i;
 	ret = strtod(s+strlen(macs[f]), &e);
 	if ((f>0) && (*e != ')'))
-		fatalerror("Parser: Error with parameter ...\n");
+	    m_setup.netlist().xfatalerror("Parser: Error with parameter ...\n");
 	if (f>0)
 		e++;
 	m_p = e;

@@ -99,6 +99,14 @@ public:
 
     netlist_mame_device &parent() { return m_parent; }
 
+protected:
+
+    void vfatalerror(const char *format, va_list ap) const
+    {
+        emu_fatalerror error(format, ap);
+        throw error;
+    }
+
 private:
     netlist_mame_device &m_parent;
 };

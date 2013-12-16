@@ -19,8 +19,10 @@ public:
 	void parse(char *buf);
 	void net_alias();
 	void netdev_param();
+    void net_c();
 	void netdev_const(const pstring &dev_name);
 	void netdev_device(const pstring &dev_type);
+    void netdev_device(const pstring &dev_type, const pstring &default_param, bool isString = false);
 
 private:
 
