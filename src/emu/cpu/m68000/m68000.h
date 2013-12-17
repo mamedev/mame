@@ -789,5 +789,6 @@ extern UINT16 m68k_get_fc(m68000_base_device *device);
 extern void m68k_set_encrypted_opcode_range(m68000_base_device *device, offs_t start, offs_t end);
 extern void m68k_set_hmmu_enable(m68000_base_device *device, int enable);
 extern void m68k_set_instruction_hook(m68000_base_device *device, instruction_hook_t ihook);
+extern void m68k_set_buserror_details(m68000_base_device *device, UINT32 fault_addr, UINT8 rw, UINT8 fc);
 
 #endif /* __M68000_H__ */

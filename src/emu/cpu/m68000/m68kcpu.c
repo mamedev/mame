@@ -1612,6 +1612,16 @@ void m68k_set_reset_callback(m68000_base_device *device, m68k_reset_func callbac
 	device->reset_instr_callback = callback;
 }
 
+// fault_addr = address to indicate fault at
+// rw = 0 for read, 1 for write
+// fc = 3-bit function code of access (usually you'd just put what m68k_get_fc() returns here)
+void m68k_set_buserror_details(m68000_base_device *device, UINT32 fault_addr, UINT8 rw, UINT8 fc)
+{
+	device->aerr_address = fault_addr;
+	device->aerr_write_mode = rw;
+	device->aerr_fc = fc;
+}
+
 void m68k_set_cmpild_callback(m68000_base_device *device, m68k_cmpild_func callback)
 {
 	device->cmpild_instr_callback = callback;
@@ -1631,9 +1641,6 @@ UINT16 m68k_get_fc(m68000_base_device *device)
 {
 	return device->mmu_tmp_fc;
 }
-
-
-
 
 /****************************************************************************
  * State definition
