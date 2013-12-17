@@ -77,7 +77,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_cb);
 
 	required_shared_ptr<UINT8> m_vram;
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<mm58274c_device> m_rtc;
 	required_device<mc2661_device> m_uart0;
 	required_device<mc2661_device> m_uart1;
@@ -231,6 +231,7 @@ WRITE8_MEMBER( wicat_state::via_b_w )
 
 READ16_MEMBER( wicat_state::invalid_r )
 {
+	m68k_set_buserror_details(m_maincpu,0x300000+offset*2-2,0,m68k_get_fc(m_maincpu));
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	return 0xff;
@@ -238,6 +239,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 
 WRITE16_MEMBER( wicat_state::invalid_w )
 {
+	m68k_set_buserror_details(m_maincpu,0x300000+offset*2-2,1,m68k_get_fc(m_maincpu));
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
