@@ -34,7 +34,11 @@ private:
 	void check_char(char ctocheck);
 	double eval_param();
 
-	char * m_p;
+	unsigned char getc();
+	void ungetc();
+	bool eof() { return *m_px == 0; }
+
+	char * m_px;
 	netlist_setup_t &m_setup;
 };
 
