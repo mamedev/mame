@@ -1806,8 +1806,8 @@ static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cojagr3k_rom, cojagr3k )
-	MCFG_DEVICE_REMOVE("ide:0")
-	MCFG_ATA_SLOT_ADD("ide:0", ata_devices, NULL, true)
+	MCFG_DEVICE_MODIFY("ide:0")
+	MCFG_SLOT_DEFAULT_OPTION(NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )

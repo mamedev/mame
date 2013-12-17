@@ -22,10 +22,12 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_IDE_CONTROLLER_ADD(_tag, _slotintf, _master, _slave, _fixed) \
+#define MCFG_IDE_CONTROLLER_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
 	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
-	MCFG_ATA_SLOT_ADD(_tag ":0", _slotintf, _master, _fixed) \
-	MCFG_ATA_SLOT_ADD(_tag ":1", _slotintf, _slave, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":0") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":1") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 class ide_controller_device : public ata_interface_device
@@ -43,10 +45,12 @@ public:
 extern const device_type IDE_CONTROLLER;
 
 
-#define MCFG_IDE_CONTROLLER_32_ADD(_tag, _slotintf, _master, _slave, _fixed) \
+#define MCFG_IDE_CONTROLLER_32_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
 	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER_32, 0) \
-	MCFG_ATA_SLOT_ADD(_tag ":0", _slotintf, _master, _fixed) \
-	MCFG_ATA_SLOT_ADD(_tag ":1", _slotintf, _slave, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":0") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":1") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 class ide_controller_32_device : public ide_controller_device
@@ -70,10 +74,12 @@ private:
 extern const device_type IDE_CONTROLLER_32;
 
 
-#define MCFG_BUS_MASTER_IDE_CONTROLLER_ADD(_tag, _slotintf, _master, _slave, _fixed) \
+#define MCFG_BUS_MASTER_IDE_CONTROLLER_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
 	MCFG_DEVICE_ADD(_tag, BUS_MASTER_IDE_CONTROLLER, 0) \
-	MCFG_ATA_SLOT_ADD(_tag ":0", _slotintf, _master, _fixed) \
-	MCFG_ATA_SLOT_ADD(_tag ":1", _slotintf, _slave, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":0") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":1") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(bmcpu, bmspace) \

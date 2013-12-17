@@ -2010,10 +2010,6 @@ static double analogue_inputs_callback( device_t *device, UINT8 input )
 	return 0;
 }
 
-SLOT_INTERFACE_START( ksys573_ata_devices )
-	SLOT_INTERFACE( "cr589", CR589 )
-SLOT_INTERFACE_END
-
 static MACHINE_CONFIG_FRAGMENT( cr589_config )
 	MCFG_DEVICE_MODIFY( "cdda" )
 	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
@@ -2035,11 +2031,13 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 
 	MCFG_DEVICE_ADD( "mb89371", MB89371, 0 )
 
-	MCFG_ATA_INTERFACE_ADD( "ata", ksys573_ata_devices, "cr589", NULL, true )
+	MCFG_DEVICE_ADD( "ata", ATA_INTERFACE, 0 )
 	MCFG_ATA_INTERFACE_IRQ_HANDLER( WRITELINE( ksys573_state, ata_interrupt ) )
 
 	MCFG_DEVICE_MODIFY( "ata:0" )
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "cr589", cr589_config )
+	MCFG_SLOT_OPTION_ADD( "cr589", CR589 )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cr589", cr589_config )
+	MCFG_SLOT_DEFAULT_OPTION( "cr589" )
 
 	MCFG_DEVICE_ADD( "maincpu:sio1:cassette", KONAMI573_CASSETTE_SLOT_SERIAL, 0 )
 

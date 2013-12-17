@@ -606,10 +606,6 @@ static const aica_interface dc_aica_interface =
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
-SLOT_INTERFACE_START(dccons_ata_devices)
-	SLOT_INTERFACE("gdrom", GDROM)
-SLOT_INTERFACE_END
-
 static MACHINE_CONFIG_FRAGMENT( gdrom_config )
 	MCFG_DEVICE_MODIFY("cdda")
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
@@ -650,13 +646,15 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
-	MCFG_AICARTC_ADD("aicartc", XTAL_32_768kHz )
+	MCFG_AICARTC_ADD("aicartc", XTAL_32_768kHz)
 
-	MCFG_ATA_INTERFACE_ADD("ata", dccons_ata_devices, "gdrom", NULL, true)
+	MCFG_DEVICE_ADD("ata", ATA_INTERFACE, 0)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(dc_cons_state, ata_interrupt))
 
 	MCFG_DEVICE_MODIFY("ata:0")
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "gdrom", gdrom_config )
+	MCFG_SLOT_OPTION_ADD("gdrom", GDROM)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("gdrom", gdrom_config)
+	MCFG_SLOT_DEFAULT_OPTION("gdrom")
 MACHINE_CONFIG_END
 
 /*

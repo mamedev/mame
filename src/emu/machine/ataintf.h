@@ -36,6 +36,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
+
 private:
 	ata_device_interface *m_dev;
 };
@@ -62,15 +63,13 @@ SLOT_INTERFACE_EXTERN(ata_devices);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_ATA_INTERFACE_ADD(_tag, _slotintf, _master, _slave, _fixed) \
+#define MCFG_ATA_INTERFACE_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ATA_INTERFACE, 0) \
-	MCFG_ATA_SLOT_ADD(_tag ":0", _slotintf, _master, _fixed) \
-	MCFG_ATA_SLOT_ADD(_tag ":1", _slotintf, _slave, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":0") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":1") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
 	MCFG_DEVICE_MODIFY(_tag)
-
-#define MCFG_ATA_SLOT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, ATA_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -100,6 +99,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	virtual void set_irq(int state);
 	virtual void set_dmarq(int state);

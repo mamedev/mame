@@ -22,10 +22,12 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_VT83C461_ADD(_tag, _slotintf, _master, _slave, _fixed) \
+#define MCFG_VT83C461_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
 	MCFG_DEVICE_ADD(_tag, VT83C461, 0) \
-	MCFG_ATA_SLOT_ADD(_tag ":0", _slotintf, _master, _fixed) \
-	MCFG_ATA_SLOT_ADD(_tag ":1", _slotintf, _slave, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":0") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
+	MCFG_DEVICE_MODIFY(_tag ":1") \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define IDE_CONFIG_REGISTERS                0x10
