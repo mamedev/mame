@@ -4205,7 +4205,7 @@ typedef dynamic_array_t<discrete_task *> task_list_t;
 struct discrete_block
 {
 	int             node;                           /* Output node number */
-	discrete_node_base_factory  *factory;
+	discrete_base_node *(*factory)(discrete_device * pdev, const discrete_block *block);
 	int             type;                           /* see defines below */
 	int             active_inputs;                  /* Number of active inputs on this node type */
 	int             input_node[DISCRETE_MAX_INPUTS];/* input/control nodes */
@@ -4500,6 +4500,7 @@ public:
 template <class C>
 class discrete_node_factory : public discrete_node_base_factory
 {
+public:
 	discrete_base_node *Create(discrete_device * pdev, const discrete_block *block);
 };
 
@@ -4527,9 +4528,16 @@ discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, co
  *
  *************************************/
 
+template <class C>
+discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_block *block)
+{
+    return discrete_node_factory< C >().Create(pdev, block);
+}
+
 #define DISCRETE_SOUND_EXTERN(name) extern const discrete_block name##_discrete_interface[]
 #define DISCRETE_SOUND_START(name) const discrete_block name##_discrete_interface[] = {
-#define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  new discrete_node_factory< DISCRETE_CLASS_NAME(_class) >, _dss, _num, _iact, _iinit, _custom, _name, # _class }
+//#define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  new discrete_node_factory< DISCRETE_CLASS_NAME(_class) >, _dss, _num, _iact, _iinit, _custom, _name, # _class }
+#define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  &discrete_create_node< DISCRETE_CLASS_NAME(_class) >, _dss, _num, _iact, _iinit, _custom, _name, # _class }
 
 
 #define DISCRETE_SOUND_END                                              DSC_SND_ENTRY( NODE_00, special, DSS_NULL     , 0, DSE( NODE_NC ), DSE( 0 ) ,NULL  ,"DISCRETE_SOUND_END" )  };
