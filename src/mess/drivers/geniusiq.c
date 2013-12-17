@@ -839,6 +839,27 @@ ROM_START( itunlim )
 	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
 ROM_END
 
+ROM_START( iqunlim )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) )
+
+	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START( gl3000s ) // looks like Z80 code
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "27-5713-00.bin", 0x000000, 0x040000, CRC(18b113e0) SHA1(27a12893c38068efa35a99fa97a260dbfbd497e3) )
+
+	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START( glmmc )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "27-5889-00.bin", 0x000000, 0x080000, CRC(5e2c6359) SHA1(cc01c7bd5c87224b63dd1044db5a36a5cb7824f1) )
+
+	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME        PARENT          COMPAT MACHINE   INPUT        INIT                COMPANY             FULLNAME                  FLAGS */
@@ -847,3 +868,6 @@ COMP( 1997, iq128_fr,   iq128,          0,    iq128,     geniusiq,    driver_dev
 COMP( 1998, iqtv512,    0,              0,    iqtv512,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ TV 512 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1999, gl8008cx,   0,              0,    gl8008cx,  gl8008cx,    driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", GAME_IS_SKELETON)
 COMP( 1998, itunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IT Unlimited (UK)", GAME_NO_SOUND)
+COMP( 19??, iqunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IQ Unlimited (Germany)", GAME_IS_SKELETON)
+COMP( 19??, gl3000s,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader 3000S (Germany)", GAME_IS_SKELETON)
+COMP( 19??, glmmc,      0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader Master Mega Color (Germany)", GAME_IS_SKELETON)
