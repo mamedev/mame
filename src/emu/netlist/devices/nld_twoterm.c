@@ -72,7 +72,7 @@ NETLIB_START(POT)
     register_subalias("2", m_R1.m_N);
     register_subalias("3", m_R2.m_N);
 
-    setup()->connect(m_R2.m_P, m_R1.m_N);
+    setup().connect(m_R2.m_P, m_R1.m_N);
 
     register_param("R", m_R, 1.0 / NETLIST_GMIN);
     register_param("DIAL", m_Dial, 0.5);
@@ -194,9 +194,9 @@ NETLIB_START(QBJT_switch<_type>)
     register_subalias("E", m_RB.m_N);
     register_subalias("C", m_RC.m_P);
 
-    m_setup->connect(m_RB.m_N, m_RC.m_N);
-    m_setup->connect(m_RB.m_P, m_BV);
-    m_setup->connect(m_RB.m_N, m_EV);
+    setup().connect(m_RB.m_N, m_RC.m_N);
+    setup().connect(m_RB.m_P, m_BV);
+    setup().connect(m_RB.m_N, m_EV);
 }
 
 NETLIB_UPDATE(Q)
@@ -275,8 +275,8 @@ ATTR_COLD void NETLIB_NAME(VCCS)::configure(const double Gfac, const double GI)
     m_ON1.set(m_mult, 0.0);
     m_ON1.m_otherterm = &m_IN;
 
-    m_setup->connect(m_OP, m_OP1);
-    m_setup->connect(m_ON, m_ON1);
+    setup().connect(m_OP, m_OP1);
+    setup().connect(m_ON, m_ON1);
 }
 
 NETLIB_UPDATE_PARAM(VCCS)
@@ -309,8 +309,8 @@ NETLIB_START(VCVS)
     m_OP2.m_otherterm = &m_ON2;
     m_ON2.m_otherterm = &m_OP2;
 
-    setup()->connect(m_OP2, m_OP1);
-    setup()->connect(m_ON2, m_ON1);
+    setup().connect(m_OP2, m_OP1);
+    setup().connect(m_ON2, m_ON1);
 }
 
 NETLIB_UPDATE_PARAM(VCVS)

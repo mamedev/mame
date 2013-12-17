@@ -18,13 +18,6 @@
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------
-#if 0
-
-#define NETDEV_DELAY_RISE(_name, _CLK, _D)                                          \
-        NET_REGISTER_DEV(delay_lh, _name)                                           \
-        NET_CONNECT(_name, CLK, _CLK)                                               \
-        NET_CONNECT(_name, D, _D)
-#endif
 
 #define NETDEV_RSFF(_name, _S, _R)                                                  \
         NET_REGISTER_DEV(nicRSFF, _name)                                            \

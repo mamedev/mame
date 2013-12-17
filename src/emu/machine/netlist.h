@@ -219,6 +219,50 @@ private:
     netlist_analog_output_delegate m_callback;
 };
 
+class NETLIB_NAME(sound) : public netlist_device_t
+{
+public:
+    NETLIB_NAME(sound)()
+        : netlist_device_t() { }
+
+    static const int BUFSIZE = 2048;
+
+    ATTR_COLD void start()
+    {
+        register_input("IN", m_in);
+        m_cur = 0;
+        m_last_pos = 0;
+        m_last_buffer = netlist_time::zero;
+        m_sample = netlist_time::zero;  // FIXME: divide by zero
+     }
+
+    ATTR_HOT void sound_update()
+    {
+        netlist_time current = netlist().time();
+        int pos = (current - m_last_buffer) / m_sample;
+        if (pos >= BUFSIZE)
+            netlist().xfatalerror("sound %s: exceeded BUFSIZE\n", name().cstr());
+        while (m_last_pos < pos )
+        {
+            m_buffer[m_last_pos++] = m_cur;
+        }
+    }
+
+    ATTR_HOT void update()
+    {
+        double val = INPANALOG(m_in);
+        sound_update();
+        m_cur = val;
+    }
+
+private:
+    netlist_analog_input_t m_in;
+    netlist_time m_sample;
+    double m_cur;
+    int m_last_pos;
+    netlist_time m_last_buffer;
+    stream_sample_t m_buffer[BUFSIZE];
+};
 
 
 // ======================> netlist_output_finder

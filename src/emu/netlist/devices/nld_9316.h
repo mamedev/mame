@@ -64,8 +64,8 @@
         NET_CONNECT(_name, D,    _D)
 
 NETLIB_SUBDEVICE(9316_sub,
-    ATTR_HOT void update_outputs_all();
-    ATTR_HOT void update_outputs();
+    ATTR_HOT void update_outputs_all(const UINT8 cnt);
+    ATTR_HOT void update_outputs(const UINT8 cnt);
 
     netlist_ttl_input_t m_clk;
 

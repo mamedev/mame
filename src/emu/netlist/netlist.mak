@@ -29,7 +29,7 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/devices/nld_7490.o \
 	$(NETLISTOBJ)/devices/nld_7493.o \
 	$(NETLISTOBJ)/devices/nld_9316.o \
-	$(NETLISTOBJ)/devices/nld_NE555.o \
+	$(NETLISTOBJ)/devices/nld_ne555.o \
 	$(NETLISTOBJ)/devices/nld_legacy.o \
 	$(NETLISTOBJ)/devices/net_lib.o \
 	$(NETLISTOBJ)/devices/nld_log.o \

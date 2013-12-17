@@ -69,6 +69,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 
 class netlist_setup_t
 {
+    NETLIST_PREVENT_COPYING(netlist_setup_t)
 public:
 
     struct link_t
@@ -122,10 +123,8 @@ public:
     netlist_core_terminal_t *find_terminal(const pstring &outname_in, netlist_object_t::type_t atype, bool required = true);
 
     netlist_param_t *find_param(const pstring &param_in, bool required = true);
-#if 0
-	void register_callback(const pstring &devname, netlist_output_delegate delegate);
-#endif
-	void parse(char *buf);
+
+    void parse(char *buf);
 
     void start_devices(void);
 	void resolve_inputs(void);

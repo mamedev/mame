@@ -15,20 +15,12 @@
 // ----------------------------------------------------------------------------------------
 
 struct pblockpool {
-
+    NETLIST_PREVENT_COPYING(pblockpool)
+public:
     static const int MINDATASIZE = 8;
 
-    struct memblock
-    {
-        memblock *next;
-        int size;
-        int allocated;
-        int remaining;
-        char *cur;
-        char data[MINDATASIZE];
-    };
-
     pblockpool();
+    ~pblockpool();
 
     void resetmem();
 
@@ -41,8 +33,19 @@ struct pblockpool {
         object->~T();
         dealloc(object);
     }
-
     bool m_shutdown;
+
+private:
+    struct memblock
+    {
+        memblock *next;
+        int size;
+        int allocated;
+        int remaining;
+        char *cur;
+        char data[MINDATASIZE];
+    };
+
     memblock *m_first;
     int m_blocksize;
     int m_align;

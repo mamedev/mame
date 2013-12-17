@@ -252,6 +252,7 @@ class NETLIB_NAME(mainclock);
 
 class netlist_object_t
 {
+    NETLIST_PREVENT_COPYING(netlist_object_t)
 public:
 	enum type_t {
         TERMINAL = 0,
@@ -306,6 +307,7 @@ private:
 
 class netlist_owned_object_t : public netlist_object_t
 {
+    NETLIST_PREVENT_COPYING(netlist_owned_object_t)
 public:
     ATTR_COLD netlist_owned_object_t(const type_t atype, const family_t afamily);
 
@@ -322,6 +324,7 @@ private:
 
 class netlist_core_terminal_t : public netlist_owned_object_t
 {
+    NETLIST_PREVENT_COPYING(netlist_core_terminal_t)
 public:
 
     /* needed here ... */
@@ -361,6 +364,7 @@ private:
 
 class netlist_terminal_t : public netlist_core_terminal_t
 {
+    NETLIST_PREVENT_COPYING(netlist_terminal_t)
 public:
     ATTR_COLD netlist_terminal_t();
 
@@ -479,6 +483,7 @@ public:
 
 class netlist_net_t : public netlist_object_t
 {
+    NETLIST_PREVENT_COPYING(netlist_net_t)
 public:
 
     typedef netlist_list_t<netlist_net_t *> list_t;
@@ -548,6 +553,7 @@ public:
 
     // m_terms is only used by analog subsystem
     typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
+
     terminal_list_t m_terms;
     netlist_matrix_solver_t *m_solver;
 
@@ -579,6 +585,7 @@ private:
 
 class netlist_output_t : public netlist_core_terminal_t
 {
+    NETLIST_PREVENT_COPYING(netlist_output_t)
 public:
 
 	ATTR_COLD netlist_output_t(const type_t atype, const family_t afamily);
@@ -597,6 +604,7 @@ private:
 
 class netlist_logic_output_t : public netlist_output_t
 {
+    NETLIST_PREVENT_COPYING(netlist_logic_output_t)
 public:
 
 	ATTR_COLD netlist_logic_output_t();
@@ -621,32 +629,20 @@ class netlist_ttl_output_t : public netlist_logic_output_t
 {
 public:
 
-	netlist_ttl_output_t()
-		: netlist_logic_output_t()
-	{
-	    set_levels(0.3, 3.4);
-	}
+	ATTR_COLD netlist_ttl_output_t();
 
 };
 
 class netlist_analog_output_t : public netlist_output_t
 {
+    NETLIST_PREVENT_COPYING(netlist_analog_output_t)
 public:
 
-	ATTR_COLD netlist_analog_output_t()
-		: netlist_output_t(OUTPUT, ANALOG)
-    {
-	    net().m_cur.Analog = 0.0;
-	    net().m_new.Analog = 99.0;
-    }
+	ATTR_COLD netlist_analog_output_t();
 
-    ATTR_COLD void initial(const double val)
-    {
-        net().m_cur.Analog = val;
-        net().m_new.Analog = 99.0;
-    }
+    ATTR_COLD void initial(const double val);
 
-	ATTR_HOT inline void set_Q(const double newQ, const netlist_time &delay)
+    ATTR_HOT inline void set_Q(const double newQ, const netlist_time &delay)
 	{
 		if (newQ != net().m_new.Analog)
 		{
@@ -663,6 +659,7 @@ public:
 
 class netlist_param_t : public netlist_owned_object_t
 {
+    NETLIST_PREVENT_COPYING(netlist_param_t)
 public:
 
     enum param_type_t {
@@ -673,11 +670,7 @@ public:
         LOGIC
     };
 
-    netlist_param_t(const param_type_t atype)
-    : netlist_owned_object_t(PARAM, ANALOG)
-    , m_param_type(atype)
-    {  }
-
+    ATTR_COLD netlist_param_t(const param_type_t atype);
 
     ATTR_HOT inline const param_type_t param_type() const { return m_param_type; }
 
@@ -687,11 +680,9 @@ private:
 
 class netlist_param_double_t : public netlist_param_t
 {
+    NETLIST_PREVENT_COPYING(netlist_param_double_t)
 public:
-    netlist_param_double_t()
-    : netlist_param_t(DOUBLE)
-    , m_param(0.0)
-    {  }
+    ATTR_COLD netlist_param_double_t();
 
     ATTR_HOT inline void setTo(const double param);
     ATTR_COLD inline void initial(const double val) { m_param = val; }
@@ -703,11 +694,9 @@ private:
 
 class netlist_param_int_t : public netlist_param_t
 {
+    NETLIST_PREVENT_COPYING(netlist_param_int_t)
 public:
-    netlist_param_int_t()
-    : netlist_param_t(INTEGER)
-    , m_param(0)
-    {  }
+    ATTR_COLD netlist_param_int_t();
 
     ATTR_HOT inline void setTo(const int param);
     ATTR_COLD inline void initial(const int val) { m_param = val; }
@@ -720,19 +709,16 @@ private:
 
 class netlist_param_logic_t : public netlist_param_int_t
 {
+    NETLIST_PREVENT_COPYING(netlist_param_logic_t)
 public:
-    netlist_param_logic_t()
-    : netlist_param_int_t()
-    {  }
+    ATTR_COLD netlist_param_logic_t();
 };
 
 class netlist_param_str_t : public netlist_param_t
 {
+    NETLIST_PREVENT_COPYING(netlist_param_str_t)
 public:
-    netlist_param_str_t()
-    : netlist_param_t(STRING)
-    , m_param("")
-    {  }
+    ATTR_COLD netlist_param_str_t();
 
     ATTR_HOT inline void setTo(const pstring &param);
     ATTR_COLD inline void initial(const pstring &val) { m_param = val; }
@@ -745,11 +731,9 @@ private:
 
 class netlist_param_model_t : public netlist_param_t
 {
+    NETLIST_PREVENT_COPYING(netlist_param_model_t)
 public:
-    netlist_param_model_t()
-    : netlist_param_t(MODEL)
-    , m_param("")
-    {  }
+    ATTR_COLD netlist_param_model_t();
 
     ATTR_COLD inline void initial(const pstring &val) { m_param = val; }
 
@@ -768,6 +752,7 @@ private:
 
 class netlist_core_device_t : public netlist_object_t
 {
+    NETLIST_PREVENT_COPYING(netlist_core_device_t)
 public:
 
     typedef netlist_list_t<netlist_core_device_t *> list_t;
@@ -777,7 +762,7 @@ public:
 
     ATTR_COLD virtual ~netlist_core_device_t();
 
-	ATTR_COLD virtual void init(netlist_setup_t &setup, const pstring &name);
+	ATTR_COLD virtual void init(netlist_base_t &anetlist, const pstring &name);
 
 
 	ATTR_HOT virtual void update_param() {}
@@ -855,6 +840,7 @@ private:
 
 class netlist_device_t : public netlist_core_device_t
 {
+    NETLIST_PREVENT_COPYING(netlist_device_t)
 public:
 
 	ATTR_COLD netlist_device_t();
@@ -862,12 +848,9 @@ public:
 
 	ATTR_COLD virtual ~netlist_device_t();
 
-	ATTR_COLD virtual void init(netlist_setup_t &setup, const pstring &name);
+	ATTR_COLD virtual void init(netlist_base_t &anetlist, const pstring &name);
 
-	ATTR_COLD netlist_setup_t *setup() const { return m_setup; }
-
-	// FIXME: Legacy ... this needs to disappear
-	ATTR_COLD bool variable_input_count() const { return m_variable_input_count; }
+	ATTR_COLD netlist_setup_t &setup();
 
 	ATTR_COLD void register_sub(netlist_device_t &dev, const pstring &name);
     ATTR_COLD void register_subalias(const pstring &name, const netlist_core_terminal_t &term);
@@ -899,9 +882,6 @@ protected:
 	template <class C, class T>
     ATTR_COLD void register_param(netlist_core_device_t &dev, const pstring &sname, C &param, const T initialVal);
 
-	netlist_setup_t *m_setup;
-	bool m_variable_input_count;
-
 private:
 };
 
@@ -912,14 +892,13 @@ private:
 
 class netlist_base_t
 {
+    NETLIST_PREVENT_COPYING(netlist_base_t)
 public:
 
 	typedef netlist_timed_queue<netlist_net_t, netlist_time, 512> queue_t;
 
 	netlist_base_t();
 	virtual ~netlist_base_t();
-
-	ATTR_COLD void set_clock_freq(UINT64 clockfreq);
 
     ATTR_HOT inline const queue_t &queue() const { return m_queue; }
     ATTR_HOT inline queue_t &queue() { return m_queue; }
@@ -938,6 +917,14 @@ public:
 	ATTR_COLD void set_mainclock_dev(NETLIB_NAME(mainclock) *dev);
     ATTR_COLD void set_solver_dev(NETLIB_NAME(solver) *dev);
 
+    ATTR_COLD void set_clock_freq(UINT64 clockfreq);
+
+    ATTR_COLD netlist_setup_t &setup() { return *m_setup; }
+    ATTR_COLD void set_setup(netlist_setup_t *asetup)
+    {
+        m_setup = asetup;
+    }
+
 	ATTR_COLD void reset();
 
 	ATTR_COLD void xfatalerror(const char *format, ...) const;
@@ -954,6 +941,8 @@ protected:
 #endif
 
 private:
+    ATTR_HOT void update_time(const netlist_time t, INT32 &atime);
+
     netlist_time                m_time_ps;
     queue_t                     m_queue;
 	UINT32                      m_rem;
@@ -962,8 +951,7 @@ private:
 	NETLIB_NAME(mainclock) *    m_mainclock;
     NETLIB_NAME(solver) *       m_solver;
 
-	ATTR_HOT void update_time(const netlist_time t, INT32 &atime);
-
+    netlist_setup_t *m_setup;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -1182,6 +1170,7 @@ ATTR_HOT inline const bool netlist_analog_input_t::is_highz() const
 
 class net_device_t_base_factory
 {
+    NETLIST_PREVENT_COPYING(net_device_t_base_factory)
 public:
 	net_device_t_base_factory(const pstring &name, const pstring &classname)
 	: m_name(name), m_classname(classname)
@@ -1201,6 +1190,7 @@ protected:
 template <class C>
 class net_device_t_factory : public net_device_t_base_factory
 {
+    NETLIST_PREVENT_COPYING(net_device_t_factory)
 public:
 	net_device_t_factory(const pstring &name, const pstring &classname)
 	: net_device_t_base_factory(name, classname) { }

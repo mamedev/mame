@@ -164,6 +164,7 @@ protected:
 // this one has an accuracy of better than 5%. That's enough for our purpose
 // add c3 and it'll be better than 1%
 
+#if 0
 inline double fastexp_h(const double x)
 {
     static const double ln2r = 1.442695040888963387;
@@ -186,6 +187,7 @@ inline double fastexp(const double x)
     else
         return fastexp_h(x);
 }
+#endif
 
 class NETLIB_NAME(D) : public NETLIB_NAME(twoterm)
 {
@@ -211,7 +213,7 @@ public:
         {
             m_Vd = nVd;
 
-            const double eVDVt = fastexp(m_Vd * m_VtInv);
+            const double eVDVt = exp(m_Vd * m_VtInv);
             Id = m_Is * (eVDVt - 1.0);
             G = m_Is * m_VtInv * eVDVt;
         }
@@ -220,7 +222,7 @@ public:
             //m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
             m_Vd = m_Vd + log1p((nVd - m_Vd) * m_VtInv) * m_Vt;
 
-            const double eVDVt = fastexp(m_Vd * m_VtInv);
+            const double eVDVt = exp(m_Vd * m_VtInv);
             Id = m_Is * (eVDVt - 1.0);
 
             G = m_Is * m_VtInv * eVDVt;

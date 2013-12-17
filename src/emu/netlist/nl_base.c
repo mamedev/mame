@@ -219,9 +219,9 @@ ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
 {
 }
 
-ATTR_COLD void netlist_core_device_t::init(netlist_setup_t &setup, const pstring &name)
+ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstring &name)
 {
-    init_object(setup.netlist(), name);
+    init_object(anetlist, name);
 
 #if USE_DELEGATES
 #if USE_PMFDELEGATES
@@ -239,32 +239,6 @@ ATTR_COLD netlist_core_device_t::~netlist_core_device_t()
 {
 }
 
-// ----------------------------------------------------------------------------------------
-// net_device_t
-// ----------------------------------------------------------------------------------------
-
-netlist_device_t::netlist_device_t()
-    : netlist_core_device_t(),
-        m_terminals(20),
-        m_setup(NULL),
-        m_variable_input_count(false)
-{
-}
-
-netlist_device_t::netlist_device_t(const family_t afamily)
-    : netlist_core_device_t(afamily),
-        m_terminals(20),
-        m_setup(NULL),
-        m_variable_input_count(false)
-{
-}
-
-netlist_device_t::~netlist_device_t()
-{
-    //NL_VERBOSE_OUT(("~net_device_t\n");
-}
-
-
 ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
 {
     if (inp.state() == netlist_input_t::STATE_INP_PASSIVE)
@@ -279,17 +253,41 @@ ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(
 
 }
 
-ATTR_COLD void netlist_device_t::init(netlist_setup_t &setup, const pstring &name)
+// ----------------------------------------------------------------------------------------
+// net_device_t
+// ----------------------------------------------------------------------------------------
+
+netlist_device_t::netlist_device_t()
+    : netlist_core_device_t(),
+        m_terminals(20)
 {
-    netlist_core_device_t::init(setup, name);
-    m_setup = &setup;
+}
+
+netlist_device_t::netlist_device_t(const family_t afamily)
+    : netlist_core_device_t(afamily),
+        m_terminals(20){
+}
+
+netlist_device_t::~netlist_device_t()
+{
+    //NL_VERBOSE_OUT(("~net_device_t\n");
+}
+
+ATTR_COLD netlist_setup_t &netlist_device_t::setup()
+{
+    return netlist().setup();
+}
+
+ATTR_COLD void netlist_device_t::init(netlist_base_t &anetlist, const pstring &name)
+{
+    netlist_core_device_t::init(anetlist, name);
     start();
 }
 
 
 ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstring &name)
 {
-    dev.init(*m_setup, this->name() + "." + name);
+    dev.init(netlist(), this->name() + "." + name);
 }
 
 ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, const netlist_core_terminal_t &term)
@@ -298,7 +296,7 @@ ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, const ne
 
     //printf("alias: %s\n", alias.cstr());
 
-    m_setup->register_alias(alias, term.name());
+    setup().register_alias(alias, term.name());
 
     if (term.isType(netlist_terminal_t::INPUT))
         m_terminals.add(name);
@@ -306,18 +304,18 @@ ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, const ne
 
 ATTR_COLD void netlist_device_t::register_terminal(const pstring &name, netlist_terminal_t &port)
 {
-    m_setup->register_object(*this,*this,name, port, netlist_terminal_t::STATE_INP_ACTIVE);
+    setup().register_object(*this,*this,name, port, netlist_terminal_t::STATE_INP_ACTIVE);
 }
 
 ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_output_t &port)
 {
-    m_setup->register_object(*this,*this,name, port, netlist_terminal_t::STATE_OUT);
+    setup().register_object(*this,*this,name, port, netlist_terminal_t::STATE_OUT);
 }
 
 ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp, netlist_input_t::state_e type)
 {
     m_terminals.add(name);
-    m_setup->register_object(*this, *this, name, inp, type);
+    setup().register_object(*this, *this, name, inp, type);
 }
 
 static void init_term(netlist_core_device_t &dev, netlist_core_terminal_t &term, netlist_input_t::state_e aState)
@@ -347,7 +345,7 @@ ATTR_COLD void netlist_device_t::register_link_internal(netlist_core_device_t &d
 {
     init_term(dev, in, aState);
     init_term(dev, out, aState);
-    m_setup->connect(in, out);
+    setup().connect(in, out);
 }
 
 ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, netlist_output_t &out, const netlist_input_t::state_e aState)
@@ -360,7 +358,7 @@ ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, cons
 {
     param.init_object(dev, sname);
     param.initial(initialVal);
-    m_setup->register_object(*this, *this, sname, param, netlist_terminal_t::STATE_NONEX);
+    setup().register_object(*this, *this, sname, param, netlist_terminal_t::STATE_NONEX);
 }
 
 template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_double_t &param, const double initialVal);
@@ -558,8 +556,70 @@ ATTR_COLD void netlist_logic_output_t::set_levels(const double low, const double
 }
 
 // ----------------------------------------------------------------------------------------
+// netlist_ttl_output_t
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD netlist_ttl_output_t::netlist_ttl_output_t()
+    : netlist_logic_output_t()
+{
+    set_levels(0.3, 3.4);
+}
+
+// ----------------------------------------------------------------------------------------
+// netlist_analog_output_t
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
+    : netlist_output_t(OUTPUT, ANALOG)
+{
+    net().m_cur.Analog = 0.0;
+    net().m_new.Analog = 99.0;
+}
+
+ATTR_COLD void netlist_analog_output_t::initial(const double val)
+{
+    net().m_cur.Analog = val;
+    net().m_new.Analog = 99.0;
+}
+
+// ----------------------------------------------------------------------------------------
 // netlist_param_t & friends
 // ----------------------------------------------------------------------------------------
+
+ATTR_COLD netlist_param_t::netlist_param_t(const param_type_t atype)
+    : netlist_owned_object_t(PARAM, ANALOG)
+    , m_param_type(atype)
+{
+}
+
+ATTR_COLD netlist_param_double_t::netlist_param_double_t()
+    : netlist_param_t(DOUBLE)
+    , m_param(0.0)
+{
+}
+
+ATTR_COLD netlist_param_int_t::netlist_param_int_t()
+    : netlist_param_t(INTEGER)
+    , m_param(0)
+{
+}
+
+ATTR_COLD netlist_param_logic_t::netlist_param_logic_t()
+    : netlist_param_int_t()
+{
+}
+
+ATTR_COLD netlist_param_str_t::netlist_param_str_t()
+    : netlist_param_t(STRING)
+    , m_param("")
+{
+}
+
+ATTR_COLD netlist_param_model_t::netlist_param_model_t()
+    : netlist_param_t(MODEL)
+    , m_param("")
+{
+}
 
 ATTR_COLD double netlist_param_model_t::dValue(const pstring &entity, const double defval) const
 {

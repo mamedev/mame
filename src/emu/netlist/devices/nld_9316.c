@@ -52,17 +52,23 @@ NETLIB_START(9316_sub)
 
 NETLIB_UPDATE(9316_sub)
 {
+    UINT8 cnt = m_cnt;
     if (m_loadq)
     {
-        m_cnt = ( m_cnt + 1) & 0x0f;
-        update_outputs();
+        cnt = ( cnt + 1) & 0x0f;
+        update_outputs(cnt);
+        if (cnt == 0x0f)
+            OUTLOGIC(m_RC, m_ent, NLTIME_FROM_NS(20));
+        else if (cnt == 0)
+            OUTLOGIC(m_RC, 0, NLTIME_FROM_NS(20));
     }
     else
     {
-        m_cnt = (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
-        update_outputs_all();
+        cnt = (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
+        update_outputs_all(cnt);
+        OUTLOGIC(m_RC, m_ent & (cnt == 0x0f), NLTIME_FROM_NS(20));
     }
-    OUTLOGIC(m_RC, m_ent & (m_cnt == 0x0f), NLTIME_FROM_NS(20));
+    m_cnt = cnt;
 }
 
 NETLIB_UPDATE(9316)
@@ -81,7 +87,7 @@ NETLIB_UPDATE(9316)
         if (!clrq & (sub.m_cnt>0))
         {
             sub.m_cnt = 0;
-            sub.update_outputs();
+            sub.update_outputs(sub.m_cnt);
             OUTLOGIC(sub.m_RC, 0, NLTIME_FROM_NS(20));
             return;
         }
@@ -89,30 +95,32 @@ NETLIB_UPDATE(9316)
     OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
-NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (void))
+inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))
 {
     const netlist_time out_delay = NLTIME_FROM_NS(20);
-    OUTLOGIC(m_QA, (m_cnt >> 0) & 1, out_delay);
-    OUTLOGIC(m_QB, (m_cnt >> 1) & 1, out_delay);
-    OUTLOGIC(m_QC, (m_cnt >> 2) & 1, out_delay);
-    OUTLOGIC(m_QD, (m_cnt >> 3) & 1, out_delay);
+    OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
+    OUTLOGIC(m_QB, (cnt >> 1) & 1, out_delay);
+    OUTLOGIC(m_QC, (cnt >> 2) & 1, out_delay);
+    OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
 }
 
-NETLIB_FUNC_VOID(9316_sub, update_outputs, (void))
+inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
 {
     const netlist_time out_delay = NLTIME_FROM_NS(20);
 #if 0
-    OUTLOGIC(m_QA, (m_cnt >> 0) & 1, out_delay);
-    OUTLOGIC(m_QB, (m_cnt >> 1) & 1, out_delay);
-    OUTLOGIC(m_QC, (m_cnt >> 2) & 1, out_delay);
-    OUTLOGIC(m_QD, (m_cnt >> 3) & 1, out_delay);
+//    for (int i=0; i<4; i++)
+//        OUTLOGIC(m_Q[i], (cnt >> i) & 1, delay[i]);
+    OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
+    OUTLOGIC(m_QB, (cnt >> 1) & 1, out_delay);
+    OUTLOGIC(m_QC, (cnt >> 2) & 1, out_delay);
+    OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
 #else
-    if ((m_cnt & 1) == 1)
+    if ((cnt & 1) == 1)
         OUTLOGIC(m_QA, 1, out_delay);
     else
     {
         OUTLOGIC(m_QA, 0, out_delay);
-        switch (m_cnt)
+        switch (cnt)
         {
         case 0x00:
             OUTLOGIC(m_QB, 0, out_delay);

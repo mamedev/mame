@@ -32,6 +32,7 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
 	: m_netlist(netlist)
     , m_proxy_cnt(0)
 {
+    netlist.set_setup(this);
     m_factory.initialize();
     NETLIST_NAME(base)(*this);
 }
@@ -56,6 +57,9 @@ netlist_setup_t::~netlist_setup_t()
 	m_params.reset();
 	m_terminals.reset();
 	m_params_temp.reset();
+
+	netlist().set_setup(NULL);
+
 	pstring::resetmem();
 }
 
@@ -104,16 +108,6 @@ void netlist_setup_t::remove_dev(const pstring &name)
 	}
 	m_devices.remove(name);
 }
-
-#if 0
-void netlist_setup_t::register_callback(const pstring &devname, netlist_output_delegate delegate)
-{
-	NETLIB_NAME(analog_callback) *dev = (NETLIB_NAME(analog_callback) *) m_devices.find(devname);
-	if (dev == NULL)
-		fatalerror("did not find device %s\n", devname.cstr());
-	dev->register_callback(delegate);
-}
-#endif
 
 void netlist_setup_t::register_model(const pstring &model)
 {
@@ -364,7 +358,7 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
         pstring x = pstring::sprintf("proxy_ad_%d", m_proxy_cnt);
         m_proxy_cnt++;
 
-        proxy->init(*this, x);
+        proxy->init(netlist(), x);
         register_dev(proxy, x);
 
         proxy->m_Q.net().register_con(in);
@@ -378,7 +372,7 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
         pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
         m_proxy_cnt++;
 
-        proxy->init(*this, x);
+        proxy->init(netlist(), x);
         register_dev(proxy, x);
 
         proxy->m_Q.net().register_con(in);
@@ -403,7 +397,7 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
         pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
         m_proxy_cnt++;
 
-        proxy->init(*this, x);
+        proxy->init(netlist(), x);
         register_dev(proxy, x);
 
         connect_terminals(term, proxy->m_I);
@@ -439,7 +433,7 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
         pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
         m_proxy_cnt++;
 
-        proxy->init(*this, x);
+        proxy->init(netlist(), x);
         register_dev(proxy, x);
 
         out.net().register_con(proxy->m_I);
@@ -594,7 +588,7 @@ void netlist_setup_t::start_devices(void)
     for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
     {
         netlist_device_t *dev = entry->object();
-        dev->init(*this, entry->tag().cstr());
+        dev->init(netlist(), entry->tag().cstr());
     }
 }
 

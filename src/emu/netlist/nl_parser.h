@@ -12,6 +12,7 @@
 
 class netlist_parser
 {
+    NETLIST_PREVENT_COPYING(netlist_parser)
 public:
 	netlist_parser(netlist_setup_t &setup)
 	: m_setup(setup) {}

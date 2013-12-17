@@ -70,7 +70,7 @@
 #include "nld_7493.h"
 #include "nld_9316.h"
 
-#include "nld_NE555.h"
+#include "nld_ne555.h"
 
 #include "nld_log.h"
 

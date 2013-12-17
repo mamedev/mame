@@ -16,8 +16,28 @@ pblockpool pstring::m_pool;
 
 pstring::str_t *pstring::m_zero = NULL;
 
-#define IMMEDIATE_MODE  (1)
-#define DEBUG_MODE      (0)
+/*
+ * Uncomment the following to override defaults
+ */
+
+//#define IMMEDIATE_MODE  (1)
+//#define DEBUG_MODE      (0)
+
+#ifdef MAME_DEBUG
+    #ifndef IMMEDIATE_MODE
+        #define IMMEDIATE_MODE  (0)
+    #endif
+    #ifndef DEBUG_MODE
+        #define DEBUG_MODE      (1)
+    #endif
+#else
+    #ifndef IMMEDIATE_MODE
+        #define IMMEDIATE_MODE  (1)
+    #endif
+    #ifndef DEBUG_MODE
+        #define DEBUG_MODE      (0)
+    #endif
+#endif
 
 pstring::~pstring()
 {
@@ -142,8 +162,12 @@ void pstring::resetmem()
 pblockpool::pblockpool()
     : m_shutdown(false)
     , m_first(NULL)
-    , m_blocksize((DEBUG_MODE) ? 0 : 16384)
+    , m_blocksize((DEBUG_MODE) ? 16384 : 16384)
     , m_align(8)
+{
+}
+
+pblockpool::~pblockpool()
 {
 }
 

@@ -21,8 +21,6 @@ NETLIB_START(nicMultiSwitch)
     }
     register_param("POS", m_POS, 0);
     register_output("Q", m_Q);
-
-    m_variable_input_count = true;
 }
 
 NETLIB_UPDATE(nicMultiSwitch)
@@ -53,8 +51,6 @@ NETLIB_START(nicMixer8)
         register_param(sR[i], m_R[i], 1e12);
     }
     register_output("Q", m_Q);
-
-    m_variable_input_count = true;
 }
 
 NETLIB_UPDATE(nicMixer8)

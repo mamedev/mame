@@ -131,6 +131,7 @@ private:
 template <class _Element, class _Time, int _Size>
 class netlist_timed_queue
 {
+    NETLIST_PREVENT_COPYING(netlist_timed_queue)
 public:
 
 	struct entry_t
