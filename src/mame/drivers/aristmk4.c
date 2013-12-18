@@ -87,12 +87,6 @@
     The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
     The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
 
-	11/12/13 - Lord-Data
-	Added 3 DIP switch settings to configure behaviour:
-		Option to raise outputs for physical meters to be used
-		Option to disable making sound effects for emulated meters
-		Option to disable virtual emulation of hopper/coin release system
-
     27/04/10 - FrasheR
     2 x Sound Chips connected to the 6522 VIA.
 
@@ -175,6 +169,9 @@
     Caribbean Gold II - copied cgold graphics ROMs u8+u11 (aka u20+u45) to cgold2, game now playable. Tiles 0x64 and 0x65 are used to show the game's denomination (credit value), however cgold does not use these tiles (there are seemingly unused line/bet/number tiles in this location), this causes a minor glitch on the $/c sign. Tiles 0x277-0x288 also differ but are unused.
     Promoted Fortune Hunter and clone to working status, as they were in fact working for quite a while.
     Fixed ROM names for kgbird/kgbirda; 5c and 10c variants were mixed up.
+
+	11/12/13 - Lord-Data
+	Added hopper and meter outputs.
 
     ****************************************************************************
 
@@ -620,11 +617,10 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 	{
 		if(emet[i])
 		{
-		//logerror("Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
-		if ((ioport("OPMDIP")->read() & 0x01) == 1)  
+			//logerror("Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
+			// Output Physical Meters
+			switch(i+1)
 			{
-				switch(i+1)
-				{
 				case 4:
 					output_set_value("creditspendmeter", emet[i]);
 					break;
@@ -634,19 +630,15 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 				default:
 					printf("Unhandled Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
 					break;
-				}
-							
 			}
-		if ((ioport("MeterSNDDIP")->read() & 0x01) == 1)  
+			
+			m_samples->start(i,0); // pulse sound for mechanical meters
+		}
+		else
+		{
+			// if there is not a value set, this meter is not active, reset output to 0 
+			switch(i+1)
 			{
-				m_samples->start(i,0); // pulse sound for mechanical meters
-			}
-		} else {
-			if ((ioport("OPMDIP")->read() & 0x01) == 1)  
-			{
-				//if there is not a value set, this meter is not active, reset output to 0 
-				switch(i+1)
-				{
 				case 4:
 					output_set_value("creditspendmeter", 0);
 					break;
@@ -655,7 +647,6 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 					break;
 				default:
 					break;
-				}
 			}
 		}
 	} 
@@ -689,10 +680,8 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::coin_input_reset)
 
 TIMER_CALLBACK_MEMBER(aristmk4_state::hopper_reset)
 {
-	m_hopper_motor=0x01;
-	if ((ioport("HopperDIP")->read() & 0x01) != 1)  {
-		output_set_value("hopper_motor", m_hopper_motor);
-	}
+	m_hopper_motor = 0x01;
+	output_set_value("hopper_motor", m_hopper_motor);
 }
 
 // Port A read (SW1)
@@ -749,22 +738,15 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 	switch(m_hopper_motor)
 	{
 	case 0x00:
+		ret=ret^0x40;
+		machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
 		m_hopper_motor=0x02;
-		if ((ioport("HopperDIP")->read() & 0x01) == 1)  
-		{
-			ret=ret^0x40;
-			machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
-		} else {
-			output_set_value("hopper_motor", m_hopper_motor);
-		}
+		output_set_value("hopper_motor", m_hopper_motor);
 		break;
 	case 0x01:
 		break; //default
 	case 0x02:
-		if ((ioport("HopperDIP")->read() & 0x01) == 1)  
-		{
-			ret=ret^0x40;
-		}
+		ret=ret^0x40;
 		break;
 	default:
 		break;
@@ -884,9 +866,7 @@ WRITE8_MEMBER(aristmk4_state::via_cb2_w)
 	else if (m_hopper_motor<0x02)
 		m_hopper_motor=data; 
 
-	if ((ioport("HopperDIP")->read() & 0x01) != 1) {
-		output_set_value("hopper_motor", m_hopper_motor); //stop motor
-	}
+	output_set_value("hopper_motor", m_hopper_motor); // stop motor
 }
 
 // Lamp output
@@ -1231,21 +1211,6 @@ static INPUT_PORTS_START(aristmk4)
 
 	PORT_START("powerfail")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power Fail / Shutdown") PORT_CODE(KEYCODE_COMMA)
-
-	PORT_START("OPMDIP")
-	PORT_DIPNAME( 0x01, 0x00, "Output Physical Meters")
-	PORT_DIPSETTING(    0X00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-
-	PORT_START("MeterSNDDIP")
-	PORT_DIPNAME( 0x01, 0x01, "Play Meter Sounds")
-	PORT_DIPSETTING(    0X00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-
-	PORT_START("HopperDIP")
-	PORT_DIPNAME( 0x01, 0x01, "Emulate Hopper")
-	PORT_DIPSETTING(    0X00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
 	/************************************** LINKS ***************************************************************/
 
