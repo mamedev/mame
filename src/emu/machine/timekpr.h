@@ -46,14 +46,6 @@
 //**************************************************************************
 
 
-// ======================> timekeeper_config
-
-struct timekeeper_config
-{
-	const UINT8 *m_data;
-};
-
-
 // ======================> timekeeper_device
 
 class timekeeper_device :   public device_t,
