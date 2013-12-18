@@ -87,6 +87,12 @@
     The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
     The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
 
+	11/12/13 - Lord-Data
+	Added 3 DIP switch settings to configure behaviour:
+		Option to raise outputs for physical meters to be used
+		Option to disable making sound effects for emulated meters
+		Option to disable virtual emulation of hopper/coin release system
+
     27/04/10 - FrasheR
     2 x Sound Chips connected to the 6522 VIA.
 
@@ -615,9 +621,44 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 		if(emet[i])
 		{
 		//logerror("Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
-		m_samples->start(i,0); // pulse sound for mechanical meters
+		if ((ioport("OPMDIP")->read() & 0x01) == 1)  
+			{
+				switch(i+1)
+				{
+				case 4:
+					output_set_value("creditspendmeter", emet[i]);
+					break;
+				case 5:
+					output_set_value("creditoutmeter", emet[i]);
+					break;
+				default:
+					printf("Unhandled Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
+					break;
+				}
+							
+			}
+		if ((ioport("MeterSNDDIP")->read() & 0x01) == 1)  
+			{
+				m_samples->start(i,0); // pulse sound for mechanical meters
+			}
+		} else {
+			if ((ioport("OPMDIP")->read() & 0x01) == 1)  
+			{
+				//if there is not a value set, this meter is not active, reset output to 0 
+				switch(i+1)
+				{
+				case 4:
+					output_set_value("creditspendmeter", 0);
+					break;
+				case 5:
+					output_set_value("creditoutmeter", 0);
+					break;
+				default:
+					break;
+				}
+			}
 		}
-	}
+	} 
 }
 
 /* sound interface for playing mechanical meter sound */
@@ -649,6 +690,9 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::coin_input_reset)
 TIMER_CALLBACK_MEMBER(aristmk4_state::hopper_reset)
 {
 	m_hopper_motor=0x01;
+	if ((ioport("HopperDIP")->read() & 0x01) != 1)  {
+		output_set_value("hopper_motor", m_hopper_motor);
+	}
 }
 
 // Port A read (SW1)
@@ -682,7 +726,7 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 //   CBOPT1 - Bit7 - Cash box optics
 /* Coin input... CBOPT2 goes LOW, then the optic detectors OPTA1 / OPTB1 detect the coin passing */
 /* The timer causes one credit, per 150ms or so... */
-
+	
 	switch(m_inscrd)
 	{
 	case 0x00:
@@ -705,14 +749,22 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 	switch(m_hopper_motor)
 	{
 	case 0x00:
-		ret=ret^0x40;
-		machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
 		m_hopper_motor=0x02;
+		if ((ioport("HopperDIP")->read() & 0x01) == 1)  
+		{
+			ret=ret^0x40;
+			machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
+		} else {
+			output_set_value("hopper_motor", m_hopper_motor);
+		}
 		break;
 	case 0x01:
 		break; //default
 	case 0x02:
-		ret=ret^0x40;
+		if ((ioport("HopperDIP")->read() & 0x01) == 1)  
+		{
+			ret=ret^0x40;
+		}
 		break;
 	default:
 		break;
@@ -830,7 +882,11 @@ WRITE8_MEMBER(aristmk4_state::via_cb2_w)
 	if (data==0x01)
 		m_hopper_motor=data;
 	else if (m_hopper_motor<0x02)
-		m_hopper_motor=data;
+		m_hopper_motor=data; 
+
+	if ((ioport("HopperDIP")->read() & 0x01) != 1) {
+		output_set_value("hopper_motor", m_hopper_motor); //stop motor
+	}
 }
 
 // Lamp output
@@ -980,14 +1036,14 @@ INPUT PORTS
 static INPUT_PORTS_START(aristmk4)
 
 	PORT_START("via_port_b")
-	PORT_DIPNAME( 0x10, 0x00, "1" )
+	PORT_DIPNAME( 0x10, 0x00, "1" )																							// "COIN FAULT"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) ) PORT_DIPLOCATION("AY:1")
-	PORT_DIPNAME( 0x20, 0x00, "2" )
+	PORT_DIPNAME( 0x20, 0x00, "2" )																							// "COIN FAULT"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) ) PORT_DIPLOCATION("AY:2")
-	PORT_DIPNAME( 0x40, 0x40, "HOPCO1" )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) ) PORT_DIPLOCATION("AY:3")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hopper Coin Release") PORT_CODE(KEYCODE_BACKSLASH)				// "ILLEGAL COIN PAID"
+	
 	PORT_DIPNAME( 0x80, 0x00, "CBOPT1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("AY:4")
@@ -1001,8 +1057,9 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x04, 0x00, "HOPHI2") // hopper 2 full
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DOPTI")  // photo optic door
+	PORT_DIPNAME( 0x08, 0x00, "DOPTI")  // photo optic door																			DOOR OPEN SENSE SWITCH
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Audit Key") PORT_TOGGLE PORT_CODE(KEYCODE_K) // AUDTSW
 	PORT_DIPNAME( 0x20, 0x00, "HOPLO1") // hopper 1 low
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:6")
@@ -1174,6 +1231,21 @@ static INPUT_PORTS_START(aristmk4)
 
 	PORT_START("powerfail")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power Fail / Shutdown") PORT_CODE(KEYCODE_COMMA)
+
+	PORT_START("OPMDIP")
+	PORT_DIPNAME( 0x01, 0x00, "Output Physical Meters")
+	PORT_DIPSETTING(    0X00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("MeterSNDDIP")
+	PORT_DIPNAME( 0x01, 0x01, "Play Meter Sounds")
+	PORT_DIPSETTING(    0X00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("HopperDIP")
+	PORT_DIPNAME( 0x01, 0x01, "Emulate Hopper")
+	PORT_DIPSETTING(    0X00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
 	/************************************** LINKS ***************************************************************/
 
