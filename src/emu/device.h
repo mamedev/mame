@@ -35,8 +35,6 @@
 // configure devices
 #define MCFG_DEVICE_CONFIG(_config) \
 	device_t::static_set_static_config(*device, &(_config));
-#define MCFG_DEVICE_CONFIG_CLEAR() \
-	device_t::static_set_static_config(*device, NULL);
 #define MCFG_DEVICE_CLOCK(_clock) \
 	device_t::static_set_clock(*device, _clock);
 #define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
