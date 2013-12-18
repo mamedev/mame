@@ -145,7 +145,7 @@ void fixedfreq_device::recompute_parameters(bool postload)
 	/* sync separator */
 
 	m_int_trig = (exp(- 3.0/(3.0+3.0))) - exp(-1.0);
-	m_mult = (double) (m_monitor_clock) / m_htotal; // / (3.0 + 3.0);
+	m_mult = (double) (m_monitor_clock) / (double) m_htotal * 1.0; // / (3.0 + 3.0);
 	VERBOSE_OUT(("trigger %f with len %f\n", m_int_trig, 1e6 / m_mult));
 
 	m_bitmap[0] = auto_bitmap_rgb32_alloc(machine(),m_htotal, m_vtotal);
@@ -183,8 +183,8 @@ int fixedfreq_device::sync_separator(attotime time, double newval)
 	int last_comp = m_sig_composite;
 	int ret = 0;
 
-	m_vint += ((double) m_sig_composite - m_vint) * (1.0 - exp(-time.as_double() * m_mult));
-	m_sig_composite = (newval < m_sync_threshold) ? 1 : 0 ;
+	m_vint += ((double) last_comp - m_vint) * (1.0 - exp(-time.as_double() * m_mult));
+    m_sig_composite = (newval < m_sync_threshold) ? 1 : 0 ;
 
 	m_sig_vsync = (m_vint > m_int_trig) ? 1 : 0;
 
@@ -234,6 +234,7 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 	if (m_last_y < bm->height())
 	{
 		rgb_t col;
+
 		if (m_vid < m_sync_threshold)
 			col = MAKE_RGB(255, 0, 0);
 		else
@@ -241,8 +242,6 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 			int colv = (int) ((m_vid - m_sync_threshold) / 3.2 * 255.0);
 			col = MAKE_RGB(colv, colv, colv);
 		}
-
-		if (m_vid < m_sync_threshold)
 
 		while (0 && pixels >= m_htotal)
 		{
@@ -265,7 +264,6 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 	{
 		VERBOSE_OUT(("HSYNC down %f %d %f\n", time.as_double()* 1e6, pixels, m_vid));
 	}
-	//VERBOSE_OUT(("%d\n", m_last_x);
 
 	if (sync & 1)
 	{
@@ -276,7 +274,7 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 		m_last_vsync_time = cur_time;
 	}
 
-	if (sync & 2)
+	if ((sync & 2) && !m_sig_vsync)
 	{
 		m_last_y += m_fieldcount;
 		m_last_x = 0;
