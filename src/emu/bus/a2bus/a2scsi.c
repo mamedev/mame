@@ -50,7 +50,6 @@ const device_type A2BUS_SCSI = &device_creator<a2bus_scsi_device>;
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
 
 static MACHINE_CONFIG_FRAGMENT( ncr5380 )
-	MCFG_DEVICE_MODIFY(DEVICE_SELF)
 	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE("^^", a2bus_scsi_device, drq_w))
 MACHINE_CONFIG_END

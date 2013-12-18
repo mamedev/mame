@@ -64,7 +64,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 				machine_config_constructor additions = option->machine_config();
 				if (additions != NULL)
-					(*additions)(const_cast<machine_config &>(*this), new_dev, NULL);
+					(*additions)(const_cast<machine_config &>(*this), new_dev, new_dev);
 
 				const input_device_default *input_device_defaults = option->input_device_defaults();
 				if (input_device_defaults)
