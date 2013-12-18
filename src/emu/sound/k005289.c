@@ -28,8 +28,9 @@
 #include "emu.h"
 #include "k005289.h"
 
-#define FREQBASEBITS    16
-
+// is this an actual hardware limit? or just an arbitrary divider
+// to bring the output frequency down to a reasonable value for MAME?
+#define CLOCK_DIVIDER 32
 
 // device type definition
 const device_type K005289 = &device_creator<k005289_device>;
@@ -48,19 +49,10 @@ k005289_device::k005289_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 	m_sound_prom(NULL),
 	m_stream(NULL),
-	m_mclock(0),
 	m_rate(0),
 	m_mixer_table(NULL),
 	m_mixer_lookup(NULL),
-	m_mixer_buffer(NULL),
-	m_k005289_A_frequency(0),
-	m_k005289_B_frequency(0),
-	m_k005289_A_volume(0),
-	m_k005289_B_volume(0),
-	m_k005289_A_waveform(0),
-	m_k005289_B_waveform(0),
-	m_k005289_A_latch(0),
-	m_k005289_B_latch(0)
+	m_mixer_buffer(NULL)
 {
 }
 
@@ -71,14 +63,9 @@ k005289_device::k005289_device(const machine_config &mconfig, const char *tag, d
 
 void k005289_device::device_start()
 {
-	k005289_sound_channel *voice;
-
-	voice = m_channel_list;
-
 	/* get stream channels */
-	m_rate = clock()/16;
+	m_rate = clock() / CLOCK_DIVIDER;
 	m_stream = stream_alloc(0, 1, m_rate);
-	m_mclock = clock();
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer = auto_alloc_array(machine(), short, 2 * m_rate);
@@ -89,14 +76,20 @@ void k005289_device::device_start()
 	m_sound_prom = m_region->base();
 
 	/* reset all the voices */
-	voice[0].frequency = 0;
-	voice[0].volume = 0;
-	voice[0].wave = &m_sound_prom[0];
-	voice[0].counter = 0;
-	voice[1].frequency = 0;
-	voice[1].volume = 0;
-	voice[1].wave = &m_sound_prom[0x100];
-	voice[1].counter = 0;
+	for (int i = 0; i < 2; i++)
+	{
+		m_counter[i] = 0;
+		m_frequency[i] = 0;
+		m_freq_latch[i] = 0;
+		m_waveform[i] = i * 0x100;
+		m_volume[i] = 0;
+	}
+
+	save_item(NAME(m_counter));
+	save_item(NAME(m_frequency));
+	save_item(NAME(m_freq_latch));
+	save_item(NAME(m_waveform));
+	save_item(NAME(m_volume));
 }
 
 
@@ -106,7 +99,6 @@ void k005289_device::device_start()
 
 void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	k005289_sound_channel *voice=m_channel_list;
 	stream_sample_t *buffer = outputs[0];
 	short *mix;
 	int i,v,f;
@@ -114,12 +106,12 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	/* zap the contents of the mixer buffer */
 	memset(m_mixer_buffer, 0, samples * sizeof(INT16));
 
-	v=voice[0].volume;
-	f=voice[0].frequency;
+	v=m_volume[0];
+	f=m_frequency[0];
 	if (v && f)
 	{
-		const unsigned char *w = voice[0].wave;
-		int c = voice[0].counter;
+		const unsigned char *w = m_sound_prom + m_waveform[0];
+		int c = m_counter[0];
 
 		mix = m_mixer_buffer;
 
@@ -128,21 +120,21 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		{
 			int offs;
 
-			c+=(long)((((float)m_mclock / (float)(f * 16))*(float)(1<<FREQBASEBITS)) / (float)(m_rate / 32));
-			offs = (c >> 16) & 0x1f;
+			c += CLOCK_DIVIDER;
+			offs = (c / f) & 0x1f;
 			*mix++ += ((w[offs] & 0x0f) - 8) * v;
 		}
 
 		/* update the counter for this voice */
-		voice[0].counter = c;
+		m_counter[0] = c % (f * 0x20);
 	}
 
-	v=voice[1].volume;
-	f=voice[1].frequency;
+	v=m_volume[1];
+	f=m_frequency[1];
 	if (v && f)
 	{
-		const unsigned char *w = voice[1].wave;
-		int c = voice[1].counter;
+		const unsigned char *w = m_sound_prom + m_waveform[1];
+		int c = m_counter[1];
 
 		mix = m_mixer_buffer;
 
@@ -151,13 +143,13 @@ void k005289_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		{
 			int offs;
 
-			c+=(long)((((float)m_mclock / (float)(f * 16))*(float)(1<<FREQBASEBITS)) / (float)(m_rate / 32));
-			offs = (c >> 16) & 0x1f;
+			c += CLOCK_DIVIDER;
+			offs = (c / f) & 0x1f;
 			*mix++ += ((w[offs] & 0x0f) - 8) * v;
 		}
 
 		/* update the counter for this voice */
-		voice[1].counter = c;
+		m_counter[1] = c % (f * 0x20);
 	}
 
 	/* mix it down */
@@ -195,58 +187,47 @@ void k005289_device::make_mixer_table(int voices)
 }
 
 
-void k005289_device::k005289_recompute()
-{
-	k005289_sound_channel *voice = m_channel_list;
-
-	m_stream->update(); /* update the streams */
-
-	voice[0].frequency = m_k005289_A_frequency;
-	voice[1].frequency = m_k005289_B_frequency;
-	voice[0].volume = m_k005289_A_volume;
-	voice[1].volume = m_k005289_B_volume;
-	voice[0].wave = &m_sound_prom[32 * m_k005289_A_waveform];
-	voice[1].wave = &m_sound_prom[32 * m_k005289_B_waveform + 0x100];
-}
-
-
 WRITE8_MEMBER( k005289_device::k005289_control_A_w )
 {
-	m_k005289_A_volume=data&0xf;
-	m_k005289_A_waveform=data>>5;
-	k005289_recompute();
+	m_stream->update();
+
+	m_volume[0] = data & 0xf;
+	m_waveform[0] = data & 0xe0;
 }
 
 
 WRITE8_MEMBER( k005289_device::k005289_control_B_w )
 {
-	m_k005289_B_volume=data&0xf;
-	m_k005289_B_waveform=data>>5;
-	k005289_recompute();
+	m_stream->update();
+
+	m_volume[1] = data & 0xf;
+	m_waveform[1] = (data & 0xe0) + 0x100;
 }
 
 
 WRITE8_MEMBER( k005289_device::k005289_pitch_A_w )
 {
-	m_k005289_A_latch = 0x1000 - offset;
+	m_freq_latch[0] = 0x1000 - offset;
 }
 
 
 WRITE8_MEMBER( k005289_device::k005289_pitch_B_w )
 {
-	m_k005289_B_latch = 0x1000 - offset;
+	m_freq_latch[1] = 0x1000 - offset;
 }
 
 
 WRITE8_MEMBER( k005289_device::k005289_keylatch_A_w )
 {
-	m_k005289_A_frequency = m_k005289_A_latch;
-	k005289_recompute();
+	m_stream->update();
+
+	m_frequency[0] = m_freq_latch[0];
 }
 
 
 WRITE8_MEMBER( k005289_device::k005289_keylatch_B_w )
 {
-	m_k005289_B_frequency = m_k005289_B_latch;
-	k005289_recompute();
+	m_stream->update();
+
+	m_frequency[1] = m_freq_latch[1];
 }

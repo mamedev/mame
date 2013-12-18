@@ -74,7 +74,6 @@ public:
 	DECLARE_READ16_MEMBER(konamigt_input_word_r);
 	DECLARE_WRITE16_MEMBER(selected_ip_word_w);
 	DECLARE_READ16_MEMBER(selected_ip_word_r);
-	DECLARE_WRITE16_MEMBER(nemesis_soundlatch_word_w);
 	DECLARE_READ8_MEMBER(wd_r);
 	DECLARE_WRITE16_MEMBER(nemesis_gfx_flipx_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_gfx_flipy_word_w);

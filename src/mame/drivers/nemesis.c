@@ -206,12 +206,6 @@ READ16_MEMBER(nemesis_state::selected_ip_word_r)
 }
 
 
-WRITE16_MEMBER(nemesis_state::nemesis_soundlatch_word_w)
-{
-	if (ACCESSING_BITS_0_7)
-		soundlatch_byte_w(space, offset, data & 0xff);
-}
-
 WRITE8_MEMBER(nemesis_state::gx400_speech_start_w)
 {
 	/* the voice data is not in a rom but in sound RAM at $8000 */
@@ -266,7 +260,7 @@ static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
 	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE(nemesis_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
+	AM_RANGE(0x05c000, 0x05c001) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x05c400, 0x05c401) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)   /* probably */
@@ -300,7 +294,7 @@ static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x057000, 0x057fff) AM_RAM             /* needed for twinbee */
 	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE(nemesis_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
+	AM_RANGE(0x05c000, 0x05c001) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c404, 0x05c405) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c406, 0x05c407) AM_READ_PORT("TEST")
@@ -332,7 +326,7 @@ static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
 	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE(nemesis_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
+	AM_RANGE(0x05c000, 0x05c001) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x05c400, 0x05c401) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c800, 0x05c801) AM_WRITE(watchdog_reset16_w)   /* probably */
@@ -366,7 +360,7 @@ static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_SHARE("colorram2")
 	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE(nemesis_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
+	AM_RANGE(0x05c000, 0x05c001) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c404, 0x05c405) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c406, 0x05c407) AM_READ_PORT("TEST")
@@ -427,7 +421,7 @@ static ADDRESS_MAP_START( salamand_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE(salamander_palette_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_WRITE(watchdog_reset16_w)   /* probably */
 	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
@@ -452,7 +446,7 @@ static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x080000, 0x081fff) AM_RAM_WRITE(salamander_palette_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x090000, 0x097fff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a0001) AM_RAM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_WRITE(watchdog_reset16_w)   /* probably */
 	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
@@ -481,7 +475,7 @@ static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x0f0004, 0x0f0005) AM_READ_PORT("IN1")
 	AM_RANGE(0x0f0006, 0x0f0007) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0f0010, 0x0f0011) AM_WRITE(nemesis_soundlatch_word_w)
+	AM_RANGE(0x0f0010, 0x0f0011) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE(watchdog_reset16_w)   /* probably */
 	AM_RANGE(0x0f0020, 0x0f0021) AM_READ(selected_ip_word_r) AM_WRITENOP    /* WEC Le Mans 24 control? */
 	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
@@ -509,7 +503,7 @@ static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x070004, 0x070005) AM_READ_PORT("IN1")
 	AM_RANGE(0x070006, 0x070007) AM_READ_PORT("IN0")    /* Coins, start buttons, test mode */
 	AM_RANGE(0x070008, 0x070009) AM_READ_PORT("DSW0")
-	AM_RANGE(0x070010, 0x070011) AM_WRITE(nemesis_soundlatch_word_w)
+	AM_RANGE(0x070010, 0x070011) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x070018, 0x070019) AM_WRITE(watchdog_reset16_w)   /* probably */
 	AM_RANGE(0x078000, 0x078001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
@@ -573,7 +567,7 @@ static ADDRESS_MAP_START( hcrash_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE(salamander_palette_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("TEST")
@@ -1562,7 +1556,7 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 	MCFG_SOUND_CONFIG(ay8910_interface_2)   /* fixed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* verified with OST */
 
-	MCFG_K005289_ADD("k005289", 3579545/2)
+	MCFG_K005289_ADD("k005289", 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35) /* verified with OST */
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
@@ -1605,7 +1599,7 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* verified with OST */
 
-	MCFG_K005289_ADD("k005289", 3579545/2)
+	MCFG_K005289_ADD("k005289", 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35) /* verified with OST */
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
@@ -1647,7 +1641,7 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_K005289_ADD("k005289", 3579545/2)
+	MCFG_K005289_ADD("k005289", 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -1687,7 +1681,7 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_K005289_ADD("k005289", 3579545/2)
+	MCFG_K005289_ADD("k005289", 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
@@ -2433,7 +2427,7 @@ Notes:
       VLM5030 - clock 1.7897725MHz [3.579545/2]
       AY3-8910 - clock 3.579545MHz
       400A1.2B / 400A2.1B - Texas Instruments TBP24S10 Bipolar PROMs
-                            Connected to 0005289, maybe MCU code?
+                            Connected to 0005289 (wavetable data)
       400B03.8G - 2764 EPROM
       2128 - 2kx8 SRAM
       6264 - 8kx8 SRAM
@@ -2441,10 +2435,7 @@ Notes:
       VSync - 60Hz
       HSync - 15.52kHz
 
-      Custom Chips - 0005289 (DIP42, possibly MCU?), 0005297 (SDIP64)
-      NOTE! Removing the 0005289 results in the music at start-up having missing notes,
-      as if only one of the AY3-8910's is being used. The game otherwise boots fine and
-      appears to play perfectly without any noticeable errors or missing graphics or sounds.
+      Custom Chips - 0005289 (DIP42, wavetable sound chip), 0005297 (SDIP64)
 
 
 Bottom PCB
@@ -2656,7 +2647,7 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* verified with OST */
 
-	MCFG_SOUND_ADD("k005289", K005289, 3579545/2)
+	MCFG_K005289_ADD("k005289", 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35) /* verified with OST */
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
