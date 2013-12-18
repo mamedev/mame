@@ -51,6 +51,9 @@
 # uncomment next line to enable a build using Microsoft tools
 # MSVC_BUILD = 1
 
+# uncomment next line to use ICL with MSVC
+# USE_ICL = 1
+
 # uncomment next line to enable code analysis using Microsoft tools
 # MSVC_ANALYSIS = 1
 
@@ -113,13 +116,23 @@ OSPREBUILD = $(VCONV_TARGET)
 
 # append a 'v' prefix if nothing specified
 ifndef PREFIX
+ifdef USE_ICL
+PREFIX = vi
+else
 PREFIX = v
+endif
 endif
 
 # replace the various compilers with vconv.exe prefixes
+ifdef USE_ICL
+CC = @$(VCONV) gcc -icl -I.
+LD = @$(VCONV) ld -icl /profile
+AR = @$(VCONV) ar -icl
+else
 CC = @$(VCONV) gcc -I.
 LD = @$(VCONV) ld /profile
 AR = @$(VCONV) ar
+endif
 RC = @$(VCONV) windres
 
 # make sure we use the multithreaded runtime

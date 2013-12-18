@@ -12,8 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -70,7 +68,7 @@ static const translation_info gcc_translate[] =
 	{ 0,        "-fomit-frame-pointer",     "" },
 	{ 0,        "-Werror",                  "/WX" },
 	//{ VS7,        "-Wall",                    "/Wall /W3 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
-	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826 /wd4820 /wd4514 /wd4668 /wd4127 /wd4625 /wd4626 /wd4512 /wd4100 /wd4310 /wd4571 /wd4061 /wd4131 /wd4255 /wd4510 /wd4610 /wd4505 /wd4324 /wd4611 /wd4201 /wd4189 /wd4296 /wd4986 /wd4347 /wd4987 /wd4250 /wd4435" },
+	{ VS7,      "-Wall",                    "/Wall /W4 /wd4003 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826 /wd4820 /wd4514 /wd4668 /wd4127 /wd4625 /wd4626 /wd4512 /wd4100 /wd4310 /wd4571 /wd4061 /wd4131 /wd4255 /wd4510 /wd4610 /wd4505 /wd4324 /wd4611 /wd4201 /wd4189 /wd4296 /wd4986 /wd4347 /wd4987" },
 	{ 0,        "-Wall",                    "/W0" },
 	{ VS7,      "-Wno-unused",              "/wd4100 /wd4101 /wd4102 /wd4505" },
 	{ 0,        "-Wno-sign-compare",        "/wd4365 /wd4389 /wd4245" },
@@ -231,22 +229,70 @@ static void build_command_line(int argc, char *argv[])
 	const char *outstring = "";
 	char *dst = command_line;
 	int output_is_first = 0;
+	int icl_compile = 0;
+	int parampos = 2;
 	int param;
-	DWORD exe_version;
+	DWORD exe_version = 0;
 
 	// if no parameters, show usage
 	if (argc < 2)
 	{
-		fprintf(stderr, "Usage:\n  vconv {gcc|ar|ld} [param [...]]\n");
+		fprintf(stderr, "Usage:\n  vconv {gcc|ar|ld} [-icl] [param [...]]\n");
 		exit(0);
+	}
+
+	if (!strcmp(argv[2], "-icl"))
+	{
+		icl_compile = 1;
+		parampos = 3;
 	}
 
 	// first parameter determines the type
 	if (!strcmp(argv[1], "gcc"))
 	{
 		transtable = gcc_translate;
-		executable = "cl.exe";
-		dst += sprintf(dst, "cl /nologo ");
+
+		if (!icl_compile)
+		{
+			executable = "cl.exe";
+			dst += sprintf(dst, "cl /nologo ");
+		}
+		else
+		{
+			executable = "icl.exe";
+			dst += sprintf(dst, "icl /nologo");
+
+			/* ICL 14.0 generates more warnings than MSVC, for now turn them off */
+
+			dst += sprintf(dst, " /Qwd9 ");    /* remark #9: nested comment is not allowed */
+			dst += sprintf(dst, " /Qwd82 ");   /* remark #82: storage class is not first */
+			dst += sprintf(dst, " /Qwd111 ");  /* remark #111: statement is unreachable */
+			dst += sprintf(dst, " /Qwd128 ");  /* remark #128: loop is not reachable */
+			dst += sprintf(dst, " /Qwd177 ");  /* remark #177: function "xxx" was declared but never referenced */
+			dst += sprintf(dst, " /Qwd181 ");  /* remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int" */
+			dst += sprintf(dst, " /Qwd185 ");  /* remark #185: dynamic initialization in unreachable code */
+			dst += sprintf(dst, " /Qwd280 ");  /* remark #280: selector expression is constant */
+			dst += sprintf(dst, " /Qwd344 ");  /* remark #344: typedef name has already been declared (with same type) */
+			dst += sprintf(dst, " /Qwd411 ");  /* remark #411: class "xxx" defines no constructor to initialize the following */
+			dst += sprintf(dst, " /Qwd869 ");  /* remark #869: parameter "xxx" was never referenced */
+			dst += sprintf(dst, " /Qwd2545 "); /* remark #2545: empty dependent statement in "else" clause of if - statement */
+			dst += sprintf(dst, " /Qwd2553 "); /* remark #2553: nonstandard second parameter "TCHAR={WCHAR = { __wchar_t } } **" of "main", expected "char *[]" or "char **" extern "C" int _tmain(int argc, TCHAR **argv) */
+			dst += sprintf(dst, " /Qwd2557 "); /* remark #2557: comparison between signed and unsigned operands */
+			dst += sprintf(dst, " /Qwd3280 "); /* remark #3280: declaration hides member "attotime::seconds" (declared at line 126) static attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); } */
+
+			dst += sprintf(dst, " /Qwd170 ");  /* error #170: pointer points outside of underlying object */
+			dst += sprintf(dst, " /Qwd188 ");  /* error #188: enumerated type mixed with another type */
+
+			dst += sprintf(dst, " /Qwd63 ");   /* warning #63: shift count is too large */
+			dst += sprintf(dst, " /Qwd177 ");  /* warning #177: label "xxx" was declared but never referenced */
+			dst += sprintf(dst, " /Qwd186 ");  /* warning #186: pointless comparison of unsigned integer with zero */
+			dst += sprintf(dst, " /Qwd488 ");  /* warning #488: template parameter "_FunctionClass" is not used in declaring the parameter types of function template "device_delegate<_Signature>::device_delegate<_FunctionClass>(delegate<_Signature>: */
+			dst += sprintf(dst, " /Qwd1478 "); /* warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated */
+			dst += sprintf(dst, " /Qwd1879 "); /* warning #1879: unimplemented pragma ignored */
+			dst += sprintf(dst, " /Qwd3291 "); /* warning #3291: invalid narrowing conversion from "double" to "int" */
+
+			// icl: command line warning #10120: overriding '/O2' with '/Od'
+		}
 	}
 	else if (!strcmp(argv[1], "windres"))
 	{
@@ -257,16 +303,36 @@ static void build_command_line(int argc, char *argv[])
 	else if (!strcmp(argv[1], "ld"))
 	{
 		transtable = ld_translate;
-		executable = "link.exe";
-		dst += sprintf(dst, "link /nologo /debug ");
+
+		if (!icl_compile)
+		{
+			executable = "link.exe";
+			dst += sprintf(dst, "link /nologo /debug ");
+		}
+		else
+		{
+			executable = "xilink.exe";
+			dst += sprintf(dst, "xilink /nologo /debug ");
+		}
 	}
 	else if (!strcmp(argv[1], "ar"))
 	{
 		transtable = ar_translate;
-		executable = "link.exe";
-		dst += sprintf(dst, "link /lib /nologo ");
-		outstring = "/out:";
-		output_is_first = 1;
+		
+		if (!icl_compile)
+		{
+			executable = "link.exe";
+			dst += sprintf(dst, "link /lib /nologo ");
+			outstring = "/out:";
+			output_is_first = 1;
+		}
+		else
+		{
+			executable = "xilink.exe";
+			dst += sprintf(dst, "xilink /lib /nologo ");
+			outstring = "/out:";
+			output_is_first = 1;
+		}
 	}
 	else
 	{
@@ -275,14 +341,15 @@ static void build_command_line(int argc, char *argv[])
 	}
 
 	// identify the version number of the EXE
-	exe_version = get_exe_version(executable);
+	if (!icl_compile) exe_version = get_exe_version(executable);
+	else exe_version = 0x00110000; // assume this for ICL
 
 	// special case
 	if (!strcmp(executable, "cl.exe") && (exe_version >= 0x00070000))
 		dst += sprintf(dst, "/wd4025 ");
 
 	// iterate over parameters
-	for (param = 2; param < argc; param++)
+	for (param = parampos; param < argc; param++)
 	{
 		const char *src = argv[param];
 		int firstchar = src[0];
