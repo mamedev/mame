@@ -3948,6 +3948,27 @@ ROM_START( gram2000 )
 	ROM_LOAD( "gram2000-key.bin", 0, 4, CRC(179314d9) SHA1(3dbbc04e9ff62800d08c4a239af3a83252a28dc0) )
 ROM_END
 
+ROM_START( tduno )
+	NAOMI_BIOS
+
+	ROM_REGION16_BE( 0x80, "main_eeprom", 0 )
+	ROM_LOAD16_WORD("main_eeprom.bin", 0x0000, 0x0080, CRC(fea29cbb) SHA1(4099f1747aafa07db34f6e072cd9bfaa83bae10e) )
+
+	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-22073.ic22", 0x0000000, 0x200000, CRC(dbeee93c) SHA1(95a761aa07b231f36e1656f46d3a711a4eea0210) ) 
+	ROM_LOAD( "mpr-22074.ic1",  0x0800000, 0x800000, CRC(fd6070a4) SHA1(8fb01c39e5deb002401b971aa415f7d7e220134d) ) 
+	ROM_LOAD( "mpr-22075.ic2",  0x1000000, 0x800000, CRC(4c11d298) SHA1(d4edfd2a2c81dd45356ee53de27a86e04a13011b) ) 
+	ROM_LOAD( "mpr-22076.ic3",  0x1800000, 0x800000, CRC(e4c98898) SHA1(c13c842874a9266a7bd5856f298687e0f8c07fc1) ) 
+	ROM_LOAD( "mpr-22077.ic4",  0x2000000, 0x400000, CRC(f33d7620) SHA1(82c3e2bb6feed68670798efa3e17c9f6d6d0070a) ) 
+
+	// on-cart X76F100 eeprom contents
+	ROM_REGION( 0x84, "naomibd_eeprom", 0 )
+	ROM_LOAD( "x76f100.ic37", 0x000000, 0x000084, CRC(c79251d5) SHA1(3e70bbbb6d28bade7eec7e27d716463045656f98) ) 
+
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "tduno.key",    0x000000, 0x000004, CRC(217ce9d0) SHA1(39d71a84b2769cd0c1521ddf1c617c18f577020c) ) 
+ROM_END
+
 ROM_START( tduno2 )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8132,7 +8153,7 @@ ROM_END
 /* 0004 */ GAME( 1999, ringout,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Ring Out 4x4", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0005 */ GAME( 1999, alpilota, naomi,    naomim2, alpilota,naomi_state, naomi,   ROT0, "Sega", "Airline Pilots (Rev A)", GAME_FLAGS ) /* specific BIOS "airlbios" needed */
 /* 0007 */ GAME( 1999, ggram2,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Giant Gram: All Japan Pro Wrestling 2 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-// 0008 Touch de Uno!
+/* 0008 */ GAME( 1999, tduno,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch de Uno!", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0010 */ GAME( 1999, vs2_2k,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0011 */ GAME( 1999, toyfight, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Toy Fighter", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0012 */ GAME( 1999, smlg99,   naomi,    naomim2, dybbnao, naomi_state, naomi,   ROT0, "Sega", "Super Major League '99", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
