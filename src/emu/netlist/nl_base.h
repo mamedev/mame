@@ -814,7 +814,7 @@ public:
 
 	ATTR_HOT virtual void inc_active() {  }
 
-	ATTR_HOT virtual void dec_active() { /*printf("DeActivate %s\n", m_name);*/ }
+	ATTR_HOT virtual void dec_active() {  }
 
 	ATTR_HOT virtual void step_time(const double st) { }
     ATTR_HOT virtual void update_terminals() { }
@@ -890,6 +890,8 @@ private:
 // netlist_base_t
 // ----------------------------------------------------------------------------------------
 
+typedef tagmap_t<netlist_device_t *, 393> tagmap_devices_t;
+
 class netlist_base_t
 {
     NETLIST_PREVENT_COPYING(netlist_base_t)
@@ -914,20 +916,18 @@ public:
 
 	ATTR_HOT inline const netlist_time &time() const { return m_time_ps; }
 
-	ATTR_COLD void set_mainclock_dev(NETLIB_NAME(mainclock) *dev);
+    ATTR_COLD void set_mainclock_dev(NETLIB_NAME(mainclock) *dev);
     ATTR_COLD void set_solver_dev(NETLIB_NAME(solver) *dev);
+    ATTR_COLD void set_setup(netlist_setup_t *asetup) { m_setup = asetup;  }
 
     ATTR_COLD void set_clock_freq(UINT64 clockfreq);
 
     ATTR_COLD netlist_setup_t &setup() { return *m_setup; }
-    ATTR_COLD void set_setup(netlist_setup_t *asetup)
-    {
-        m_setup = asetup;
-    }
-
 	ATTR_COLD void reset();
 
 	ATTR_COLD void xfatalerror(const char *format, ...) const;
+
+    tagmap_devices_t m_devices;
 
 protected:
 

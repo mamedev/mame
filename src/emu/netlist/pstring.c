@@ -108,6 +108,37 @@ int pstring::pcmpi(const char *lhs, const char *rhs, int count) const
     return 1;
 }
 
+double pstring::as_double(bool *error) const
+{
+    double ret;
+    char *e = NULL;
+
+    if (error != NULL)
+        *error = false;
+    ret = strtod(cstr(), &e);
+    if (*e != 0)
+        if (error != NULL)
+            *error = true;
+    return ret;
+}
+
+long pstring::as_long(bool *error) const
+{
+    double ret;
+    char *e = NULL;
+
+    if (error != NULL)
+        *error = false;
+    if (startsWith("0x"))
+        ret = strtol(&(cstr()[2]), &e, 16);
+    else
+        ret = strtol(cstr(), &e, 10);
+    if (*e != 0)
+        if (error != NULL)
+            *error = true;
+    return ret;
+}
+
 pstring pstring::vprintf(va_list args) const
 {
     // sprintf into the temporary buffer

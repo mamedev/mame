@@ -222,6 +222,7 @@ UINT32 fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 void fixedfreq_device::update_vid(double newval, attotime cur_time)
 {
 	bitmap_rgb32 *bm = m_bitmap[m_cur_bm];
+	const int has_fields = (m_fieldcount > 1) ? 1: 0;
 
 	int pixels = round((cur_time - m_line_time).as_double() / m_clock_period.as_double());
 	attotime time = (cur_time - m_last_time);
@@ -245,11 +246,11 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 
 		while (0 && pixels >= m_htotal)
 		{
-			bm->plot_box(m_last_x, m_last_y + m_sig_field, m_htotal - 1 - m_last_x, 1, col);
+			bm->plot_box(m_last_x, m_last_y + m_sig_field * has_fields, m_htotal - 1 - m_last_x, 1, col);
 			pixels -= m_htotal;
 			m_last_x = 0;
 		}
-		bm->plot_box(m_last_x, m_last_y + m_sig_field, pixels - m_last_x, 1, col);
+		bm->plot_box(m_last_x, m_last_y + m_sig_field * has_fields, pixels - m_last_x, 1, col);
 		m_last_x = pixels;
 	}
 	if (sync & 1)
@@ -267,7 +268,7 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 
 	if (sync & 1)
 	{
-		m_last_y = 0;
+		m_last_y = m_vbackporch - m_vsync; // 6; // FIXME: needed for pong - need to be able to adjust screen parameters
 		// toggle bitmap
 		m_cur_bm ^= 1;
 		update_screen_parameters(cur_time - m_last_vsync_time);

@@ -50,6 +50,8 @@
 #include "netlist/nl_setup.h"
 #include "netlist/devices/net_lib.h"
 
+#define LOG_DEV_CALLS(x)   do { } while (0);
+
 // ----------------------------------------------------------------------------------------
 // netlist_mame_device
 // ----------------------------------------------------------------------------------------
@@ -71,14 +73,18 @@ void netlist_mame_device::static_set_constructor(device_t &device, void (*setup_
 {
 	netlist_mame_device &netlist = downcast<netlist_mame_device &>(device);
 	netlist.m_setup_func = setup_func;
+	LOG_DEV_CALLS(("static_set_constructor\n"));
 }
 
 void netlist_mame_device::device_config_complete()
 {
+    LOG_DEV_CALLS(("device_config_complete\n"));
 }
 
 void netlist_mame_device::device_start()
 {
+    LOG_DEV_CALLS(("device_start\n"));
+
 	m_netlist = global_alloc_clear(netlist_mame_t(*this));
 	m_netlist->set_clock_freq(this->clock());
 
@@ -91,15 +97,14 @@ void netlist_mame_device::device_start()
 	m_setup_func(*m_setup);
 
 	m_setup->start_devices();
-
-	bool allok = true;
-	for (device_start_list_t::entry_t *ods = m_device_start_list.first(); ods != NULL; ods = m_device_start_list.next(ods))
-		allok &= ods->object()->OnDeviceStart();
-
-	if (!allok)
-	    m_netlist->xfatalerror("required elements not found\n");
-
 	m_setup->resolve_inputs();
+
+    bool allok = true;
+    for (device_start_list_t::entry_t *ods = m_device_start_list.first(); ods != NULL; ods = m_device_start_list.next(ods))
+        allok &= ods->object()->OnDeviceStart();
+
+    if (!allok)
+        m_netlist->xfatalerror("required elements not found\n");
 
 	save_state();
 	/* TODO: we have to save the round robin queue as well */
@@ -110,12 +115,13 @@ void netlist_mame_device::device_start()
 
 void netlist_mame_device::device_reset()
 {
+    LOG_DEV_CALLS(("device_reset\n"));
 	m_netlist->reset();
-	m_setup->step_devices_once();
 }
 
 void netlist_mame_device::device_stop()
 {
+    LOG_DEV_CALLS(("device_stop\n"));
 	m_setup->print_stats();
 
 	global_free(m_setup);

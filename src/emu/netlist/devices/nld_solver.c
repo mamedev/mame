@@ -10,6 +10,8 @@
 // netlist_matrix_solver
 // ----------------------------------------------------------------------------------------
 
+#define SOLVER_VERBOSE_OUT(x) do {} while (0)
+//#define SOLVER_VERBOSE_OUT(x) printf x
 
 ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
 {
@@ -264,7 +266,7 @@ NETLIB_FUNC_VOID(solver, post_start, ())
         }
     }
 
-    printf("Scanning net groups ...\n");
+    SOLVER_VERBOSE_OUT(("Scanning net groups ...\n"));
     // determine net groups
     for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
     {
@@ -276,7 +278,7 @@ NETLIB_FUNC_VOID(solver, post_start, ())
     }
 
     // setup the solvers
-    printf("Found %d net groups in %d nets\n", cur_group + 1, m_nets.count());
+    SOLVER_VERBOSE_OUT(("Found %d net groups in %d nets\n", cur_group + 1, m_nets.count()));
     for (int i = 0; i <= cur_group; i++)
     {
         netlist_matrix_solver_t *ms = new netlist_matrix_solver_t();
@@ -284,8 +286,8 @@ NETLIB_FUNC_VOID(solver, post_start, ())
         ms->m_convergence_factor = m_convergence.Value();
         ms->setup(groups[i], *this);
         m_mat_solvers.add(ms);
-        printf("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr());
-        printf("  has %s elements\n", ms->is_dynamic() ? "dynamic" : "no dynamic");
+        SOLVER_VERBOSE_OUT(("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr()));
+        SOLVER_VERBOSE_OUT(("  has %s elements\n", ms->is_dynamic() ? "dynamic" : "no dynamic"));
     }
 
 }

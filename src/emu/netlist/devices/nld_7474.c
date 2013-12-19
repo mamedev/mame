@@ -8,7 +8,6 @@
 ATTR_HOT inline void NETLIB_NAME(7474sub)::newstate(const UINT8 state)
 {
     static const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
-    //printf("%s %d %d %d\n", "7474", state, Q.Q(), QQ.Q());
     OUTLOGIC(m_Q, state, delay[state]);
     OUTLOGIC(m_QQ, !state, delay[!state]);
 }

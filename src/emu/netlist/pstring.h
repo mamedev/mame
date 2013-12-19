@@ -122,10 +122,10 @@ public:
     inline bool equals(const pstring &string) { return (pcmp(string.cstr(), m_ptr->str()) == 0); }
     inline bool iequals(const pstring &string) { return (pcmpi(string.cstr(), m_ptr->str()) == 0); }
 
-    int cmp(const pstring &string) const { return pcmp(string.cstr()); }
-    int cmpi(const pstring &string) const { return pcmpi(cstr(), string.cstr()); }
+    inline int cmp(const pstring &string) const { return pcmp(string.cstr()); }
+    inline int cmpi(const pstring &string) const { return pcmpi(cstr(), string.cstr()); }
 
-    int find(const char *search, int start = 0) const
+    inline int find(const char *search, int start = 0) const
     {
         int alen = len();
         const char *result = strstr(cstr() + MIN(start, alen), search);
@@ -134,18 +134,25 @@ public:
 
     // various
 
-    bool startsWith(const pstring &arg) const { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
-    bool startsWith(const char *arg) const { return (pcmp(cstr(), arg, strlen(arg)) == 0); }
+    inline bool startsWith(const pstring &arg) const { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
+    inline bool startsWith(const char *arg) const { return (pcmp(cstr(), arg, strlen(arg)) == 0); }
 
     // these return nstring ...
-    pstring cat(const pstring &s) const { return *this + s; }
-    pstring cat(const char *s) const { return *this + s; }
+    inline pstring cat(const pstring &s) const { return *this + s; }
+    inline pstring cat(const char *s) const { return *this + s; }
 
     pstring substr(unsigned int start, int count = -1) const ;
 
-    pstring left(unsigned int count) const { return substr(0, count); }
-    pstring right(unsigned int count) const  { return substr(len() - count, count); }
+    inline pstring left(unsigned int count) const { return substr(0, count); }
+    inline pstring right(unsigned int count) const  { return substr(len() - count, count); }
+
     pstring ucase() const;
+
+    // conversions
+
+    double as_double(bool *error = NULL) const;
+
+    long as_long(bool *error = NULL) const;
 
     // printf using string as format ...
 

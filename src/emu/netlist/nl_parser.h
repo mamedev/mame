@@ -17,7 +17,7 @@ public:
 	netlist_parser(netlist_setup_t &setup)
 	: m_setup(setup) {}
 
-	void parse(char *buf);
+	void parse(const char *buf);
 	void net_alias();
 	void netdev_param();
     void net_c();
@@ -38,7 +38,7 @@ private:
 	void ungetc();
 	bool eof() { return *m_px == 0; }
 
-	char * m_px;
+	const char * m_px;
 	netlist_setup_t &m_setup;
 };
 

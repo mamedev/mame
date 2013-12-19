@@ -58,8 +58,8 @@ TODO:
 fixedfreq_interface fixedfreq_mode_pong = {
 	MASTER_CLOCK,
 	H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL,
-	V_TOTAL-22,V_TOTAL-19,V_TOTAL-16,V_TOTAL,
-	1,  /* interlaced */
+	V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL,
+	1,  /* non-interlaced */
 	0.32
 };
 
@@ -67,7 +67,7 @@ fixedfreq_interface fixedfreq_mode_pongX2 = {
 	MASTER_CLOCK * 2,
 	(H_TOTAL-67) * 2, (H_TOTAL-40) * 2, (H_TOTAL-8) * 2, (H_TOTAL) * 2,
 	V_TOTAL-22,V_TOTAL-19,V_TOTAL-16,V_TOTAL,
-	1,  /* interlaced */
+	1,  /* non-interlaced */
 	0.32
 };
 
@@ -933,9 +933,9 @@ static INPUT_PORTS_START( pong )
 	PORT_DIPSETTING(    0x06, "15" )
 
 	PORT_START("VR1")
-	PORT_ADJUSTER( 63, "VR1 - 50k, Paddle 1 adjustment" )   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR1)
+	PORT_ADJUSTER( 50, "VR1 - 50k, Paddle 1 adjustment" )   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR1)
 	PORT_START("VR2")
-	PORT_ADJUSTER( 63, "VR2 - 50k, Paddle 2 adjustment" )   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR2)
+	PORT_ADJUSTER( 50, "VR2 - 50k, Paddle 2 adjustment" )   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR2)
 	//PORT_START("GATESPEED")
 	//PORT_ADJUSTER( 100, "Logic Gate Delay" ) PORT_MINMAX(10, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_GATEDELAY)
 

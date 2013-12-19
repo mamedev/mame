@@ -7,20 +7,18 @@
 
 #include "nl_parser.h"
 
-#undef NL_VERBOSE_OUT
-#define NL_VERBOSE_OUT(x) printf x
+//#undef NL_VERBOSE_OUT
+//#define NL_VERBOSE_OUT(x) printf x
 
 // ----------------------------------------------------------------------------------------
 // A netlist parser
 // ----------------------------------------------------------------------------------------
 
-void netlist_parser::parse(char *buf)
+void netlist_parser::parse(const char *buf)
 {
-    char c;
 	m_px = buf;
-	c = getc();
 
-	while (c)
+	while (!eof())
 	{
 		pstring n;
 		skipws();
@@ -45,7 +43,6 @@ void netlist_parser::parse(char *buf)
 			netdev_const(n);
 		else
 			netdev_device(n);
-		c = getc();
 	}
 }
 
@@ -83,7 +80,6 @@ void netlist_parser::netdev_param()
 	val = eval_param();
 	NL_VERBOSE_OUT(("Parser: Param: %s %f\n", param.cstr(), val));
 	m_setup.register_param(param, val);
-	//m_setup.find_param(param).initial(val);
 	check_char(')');
 }
 
@@ -103,7 +99,6 @@ void netlist_parser::netdev_const(const pstring &dev_name)
 	paramfq = name + ".CONST";
 	NL_VERBOSE_OUT(("Parser: Const: %s %f\n", name.cstr(), val));
     check_char(')');
-	//m_setup.find_param(paramfq).initial(val);
 	m_setup.register_param(paramfq, val);
 }
 
@@ -273,31 +268,28 @@ double netlist_parser::eval_param()
 	static double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	int i;
 	int f=0;
-	char *e;
+	bool e;
 	double ret;
 
 	pstring s = getname2(')',',');
 
-	printf("Got %s\n", s.cstr());
 	for (i=1; i<6;i++)
 		if (strncmp(s.cstr(), macs[i], strlen(macs[i])) == 0)
 			f = i;
-	ret = strtod(s.substr(strlen(macs[f])).cstr(), &e);
-	if ((f>0) && (*e != 0))
+	ret = s.substr(strlen(macs[f])).as_double(&e);
+	if ((f>0) && e)
 	    m_setup.netlist().xfatalerror("Parser: Error with parameter ...\n");
     if (f>0)
         check_char(')');
-	//if (f == 0)
-	//    ungetc();
-	//if (f>0)
-	//	e++;
-	//m_p = e;
 	return ret * facs[f];
 }
 
 unsigned char netlist_parser::getc()
 {
-    return *(m_px++);
+    if (*m_px)
+        return *(m_px++);
+    else
+        return *m_px;
 }
 
 void netlist_parser::ungetc()

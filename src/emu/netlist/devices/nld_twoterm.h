@@ -312,7 +312,6 @@ public:
         double vE = INPANALOG(m_EV);
         double vB = INPANALOG(m_BV);
 
-        //printf("diff %f %f = %f - %f\n", vB - vE, vB, vE, m_RB.m_N.m_g);
         int new_state = (vB - vE > m_V ) ? 1 : 0;
         if (m_state_on ^ new_state)
         {

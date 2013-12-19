@@ -227,7 +227,7 @@ NETLIB_UPDATE_PARAM(QBJT_switch<_type>)
     if (m_gB < NETLIST_GMIN)
         m_gB = NETLIST_GMIN;
     m_gC = BF * m_gB; // very rough estimate
-    printf("%f %f \n", m_V, m_gB);
+    //printf("%f %f \n", m_V, m_gB);
     m_RB.set(NETLIST_GMIN, 0.0, 0.0);
     m_RC.set(NETLIST_GMIN, 0.0, 0.0);
 }

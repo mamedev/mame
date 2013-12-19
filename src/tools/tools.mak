@@ -62,6 +62,7 @@ TOOLS += \
 	src2html$(EXE) \
 	split$(EXE) \
 	pngcmp$(EXE) \
+	nltool$(EXE) \
 
 
 
@@ -207,3 +208,14 @@ pngcmp$(EXE): $(PNGCMPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
+#-------------------------------------------------
+# nltool
+#-------------------------------------------------
+
+NLTOOLOBJS = \
+	$(TOOLSOBJ)/nltool.o \
+	$(NETLISTOBJS) \
+
+nltool$(EXE): $(NLTOOLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

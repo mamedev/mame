@@ -69,8 +69,19 @@ netlist_base_t::netlist_base_t()
 {
 }
 
+template <class T>
+static void tagmap_free_entries(T &tm)
+{
+    for (typename T::entry_t *entry = tm.first(); entry != NULL; entry = tm.next(entry))
+    {
+        delete entry->object();
+    }
+    tm.reset();
+}
+
 netlist_base_t::~netlist_base_t()
 {
+    tagmap_free_entries<tagmap_devices_t>(m_devices);
     pstring::resetmem();
 }
 
@@ -92,8 +103,20 @@ ATTR_COLD void netlist_base_t::reset()
     if (m_mainclock != NULL)
         m_mainclock->m_Q.net().set_time(netlist_time::zero);
 
-}
+    // FIXME: some const devices rely on this
+    /* make sure params are set now .. */
+    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+    {
+        entry->object()->update_param();
+    }
 
+    // Step all devices once !
+    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+    {
+        netlist_device_t *dev = entry->object();
+        dev->update_dev();
+    }
+}
 
 void netlist_base_t::set_clock_freq(UINT64 clockfreq)
 {
@@ -293,8 +316,6 @@ ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstri
 ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, const netlist_core_terminal_t &term)
 {
     pstring alias = this->name() + "." + name;
-
-    //printf("alias: %s\n", alias.cstr());
 
     setup().register_alias(alias, term.name());
 

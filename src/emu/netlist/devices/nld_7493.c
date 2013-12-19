@@ -44,7 +44,6 @@ NETLIB_UPDATE(7493)
 
     if (r)
     {
-        //printf("%s reset\n", name());
         A.m_reset = B.m_reset = C.m_reset = D.m_reset = 1;
         A.m_I.inactivate();
         B.m_I.inactivate();
@@ -58,6 +57,5 @@ NETLIB_UPDATE(7493)
         A.m_reset = B.m_reset = C.m_reset = D.m_reset = 0;
         A.m_I.activate_hl();
         B.m_I.activate_hl();
-        //printf("%s enable\n", name());
     }
 }
