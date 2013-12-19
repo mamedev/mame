@@ -198,7 +198,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 				state->m_trom->tr6_w(1);
 				state->m_trom->tr6_w(0);
 
-				int col=state->m_trom->get_rgb();
+				int col=state->m_trom->get_rgb() ^ ((x_pos==cursor_x) ? 7 : 0);
 
 				int r = BIT(col, 0) * 0xff;
 				int g = BIT(col, 1) * 0xff;
@@ -230,7 +230,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 
 				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
 				{
-					int col=state->m_videoULA_pallet_lookup[state->m_pixel_bits[i]];
+					int col=state->m_videoULA_pallet_lookup[state->m_pixel_bits[i]] ^ ((x_pos==cursor_x) ? 7 : 0);
 					bitmap.pix32(y, (x_pos*state->m_pixels_per_byte)+pixelno)=palette[col];
 					i=(i<<1)|1;
 				}
