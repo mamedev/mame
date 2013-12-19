@@ -197,4 +197,6 @@ int main(int argc, char *argv[])
     }
     double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
     printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
+    
+    return 0;
 }
