@@ -137,11 +137,10 @@ static SLOT_INTERFACE_START( bebox_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-const struct mpc105_interface mpc105_config =
-{
-	"ppc1",
-	0
-};
+static MACHINE_CONFIG_FRAGMENT( mpc105_config )
+	MCFG_MPC105_CPU( "ppc1" )
+	MCFG_MPC105_BANK_BASE_DEFAULT( 0 )
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -224,7 +223,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	/* pci */
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "mpc105", true)
-	MCFG_DEVICE_CARD_CONFIG("mpc105", &mpc105_config)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("mpc105", mpc105_config)
 
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "cirrus", true)
 

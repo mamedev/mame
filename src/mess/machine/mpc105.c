@@ -30,7 +30,8 @@ const device_type MPC105 = &device_creator<mpc105_device>;
 mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MPC105, "MPC105", tag, owner, clock, "mpc105", __FILE__),
 	pci_device_interface( mconfig, *this ),
-	m_maincpu(NULL)
+	m_cpu_tag(NULL),
+	m_bank_base_default(0)
 {
 }
 
@@ -40,7 +41,7 @@ mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, dev
 
 void mpc105_device::device_start()
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
+	m_maincpu = machine().device<cpu_device>(m_cpu_tag);
 }
 
 //-------------------------------------------------
@@ -52,30 +53,6 @@ void mpc105_device::device_reset()
 	m_bank_base = m_bank_base_default;
 	m_bank_enable = 0;
 	memset(m_bank_registers,0,sizeof(m_bank_registers));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mpc105_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mpc105_interface *intf = reinterpret_cast<const mpc105_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<mpc105_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_cputag, 0, sizeof(m_cputag));
-		m_bank_base_default = 0;
-
-	}
 }
 
 //-------------------------------------------------

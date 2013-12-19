@@ -23,7 +23,6 @@
 #define MCFG_DEVICE_CARD_DEFAULT_BIOS(_option, _default_bios) MCFG_SLOT_OPTION_DEFAULT_BIOS(_option, _default_bios)
 #define MCFG_DEVICE_CARD_MACHINE_CONFIG(_option, _machine_config_name) MCFG_SLOT_OPTION_MACHINE_CONFIG(_option, _machine_config_name)
 #define MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS(_option, _dev_inp_def) MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS(_option, _dev_inp_def)
-#define MCFG_DEVICE_CARD_CONFIG(_option, _config) MCFG_SLOT_OPTION_CONFIG(_option, _config)
 #define MCFG_DEVICE_CARD_CLOCK(_option, _clock) MCFG_SLOT_OPTION_CLOCK(_option, _clock)
 
 
@@ -55,9 +54,6 @@
 #define MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS(_option, _dev_inp_def) \
 	device_slot_interface::static_set_option_device_input_defaults(*device, _option, DEVICE_INPUT_DEFAULTS_NAME(_dev_inp_def));
 
-#define MCFG_SLOT_OPTION_CONFIG(_option, _config) \
-	device_slot_interface::static_set_option_config(*device, _option, _config);
-
 #define MCFG_SLOT_OPTION_CLOCK(_option, _clock) \
 	device_slot_interface::static_set_option_clock(*device, _option, _clock);
 
@@ -83,7 +79,6 @@ public:
 	const char *default_bios() const { return m_default_bios; }
 	machine_config_constructor machine_config() const { return m_machine_config; }
 	const input_device_default *input_device_defaults() const { return m_input_device_defaults; }
-	const void *static_config() const { return m_config; }
 	UINT32 clock() const { return m_clock; }
 
 private:
@@ -95,7 +90,6 @@ private:
 	const char *m_default_bios;
 	machine_config_constructor m_machine_config;
 	const input_device_default *m_input_device_defaults;
-	const void *m_config;
 	UINT32 m_clock;
 };
 
@@ -117,7 +111,6 @@ public:
 	static void static_set_option_default_bios(device_t &device, const char *option, const char *default_bios) { static_option(device, option)->m_default_bios = default_bios; }
 	static void static_set_option_machine_config(device_t &device, const char *option, const machine_config_constructor machine_config) { static_option(device, option)->m_machine_config = machine_config; }
 	static void static_set_option_device_input_defaults(device_t &device, const char *option, const input_device_default *default_input) { static_option(device, option)->m_input_device_defaults = default_input; }
-	static void static_set_option_config(device_t &device, const char *option, const void *config) { static_option(device, option)->m_config = config; }
 	static void static_set_option_clock(device_t &device, const char *option, UINT32 default_clock) { static_option(device, option)->m_clock = default_clock; }
 	const bool fixed() const { return m_fixed; }
 	const char *default_option() const { return m_default_option; }

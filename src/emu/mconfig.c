@@ -69,10 +69,6 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 				const input_device_default *input_device_defaults = option->input_device_defaults();
 				if (input_device_defaults)
 					device_t::static_set_input_default(*new_dev, input_device_defaults);
-
-				const void *config = option->static_config();
-				if (config)
-					device_t::static_set_static_config(*new_dev, config);
 			}
 			else
 				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);

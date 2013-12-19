@@ -27,7 +27,6 @@ device_slot_option::device_slot_option(const char *name, const device_type &devt
 	m_default_bios(NULL),
 	m_machine_config(NULL),
 	m_input_device_defaults(NULL),
-	m_config(NULL),
 	m_clock(0)
 {
 }

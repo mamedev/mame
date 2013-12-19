@@ -601,11 +601,10 @@ static MACHINE_CONFIG_START( k286i, at_state )
 MACHINE_CONFIG_END
 
 
-const struct i82439tx_interface tx_config =
-{
-	"maincpu",
-	"isa"
-};
+static MACHINE_CONFIG_FRAGMENT( tx_config )
+	MCFG_I82439TX_CPU( "maincpu" )
+	MCFG_I82439TX_REGION( "isa" )
+MACHINE_CONFIG_END
 
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("i82439tx", I82439TX)
@@ -625,7 +624,7 @@ static MACHINE_CONFIG_START( at586, at586_state )
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", true)
-	MCFG_DEVICE_CARD_CONFIG("i82439tx", &tx_config)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82439tx", tx_config)
 
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", true)
 
@@ -648,7 +647,7 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", true)
-	MCFG_DEVICE_CARD_CONFIG("i82439tx", &tx_config)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82439tx", tx_config)
 
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", true)
 

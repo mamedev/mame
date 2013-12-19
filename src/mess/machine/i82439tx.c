@@ -15,8 +15,10 @@ const device_type I82439TX = &device_creator<i82439tx_device>;
 
 
 i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock, "i82439tx", __FILE__),
-		pci_device_interface( mconfig, *this )
+	: northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock, "i82439tx", __FILE__),
+	pci_device_interface( mconfig, *this ),
+	m_cpu_tag( NULL ),
+	m_region_tag( NULL )
 {
 }
 
@@ -251,30 +253,6 @@ void i82439tx_device::pci_write(pci_bus_device *pcibus, int function, int offset
 	}
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i82439tx_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i82439tx_interface *intf = reinterpret_cast<const i82439tx_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<i82439tx_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_cputag, 0, sizeof(m_cputag));
-		memset(&m_rom_region, 0, sizeof(m_rom_region));
-	}
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -283,13 +261,13 @@ void i82439tx_device::device_start()
 {
 	northbridge_device::device_start();
 	/* get address space we are working on */
-	device_t *cpu = machine().device(m_cputag);
+	device_t *cpu = machine().device(m_cpu_tag);
 	assert(cpu != NULL);
 
 	m_space = &cpu->memory().space(AS_PROGRAM);
 
 	/* get rom region */
-	m_rom = machine().root_device().memregion(m_rom_region)->base();
+	m_rom = machine().root_device().memregion(m_region_tag)->base();
 
 	/* setup save states */
 	save_item(NAME(m_regs));
