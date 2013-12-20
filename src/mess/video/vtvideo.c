@@ -1,16 +1,16 @@
-	/**********************************************************************
+/**********************************************************************
 
     DEC VT Terminal video emulation
     [ DC012 and DC011 emulation ]
 
     01/05/2009 Initial implementation [Miodrag Milanovic]
-    --/--/2013 portions by Karl-Ludwig Deisenhofer.
+    xx/xx/2013 portions by Karl-Ludwig Deisenhofer.
 
     DEC VIDEO : STATE AS OF NOVEMBER 2013
     -------------------------------------
-    - NOT WORKING : scrolling requires implementation of 'scrolling region'. Multiple regions could be present.
-					Split & a full screen modes exist. Scroll should be synced with beam or DMA. 
-					See 4.7.4 and up in VT manual.
+    - NOT FULLY WORKING : scrolling requires implementation of 'scrolling region'. Multiple regions could be present.
+                          Split & full screen modes exist. Scroll should be synced with beam or DMA.
+                          See 4.7.4 and up in VT manual.
 
 	- TESTS REQUIRED : do line and character attributes (plus combinations) match real hardware?  
 
@@ -103,7 +103,6 @@ void vt100_video_device::device_start()
 	// LBA7 is scan line frequency update
 	machine().scheduler().timer_pulse(attotime::from_nsec(31778), timer_expired_delegate(FUNC(vt100_video_device::lba7_change),this));
 
-
 	save_item(NAME(m_lba7));
 	save_item(NAME(m_scroll_latch));
 	save_item(NAME(m_blink_flip_flop));
@@ -146,10 +145,11 @@ void vt100_video_device::device_reset()
 // 4 color (= monochrome intensities) palette, 24 and 48 line modes.
 void rainbow_video_device::device_reset()
 {
-	DEC_MHFU = true; // SET ON COLD BOOT 
+	MHFU_FLAG = false;
+	MHFU_counter = 0; // **** MHFU: OFF ON COLD BOOT ! ****
 
-	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
 	// (rest of the palette is set in the main program)
+	palette_set_color_rgb(machine(), 0, 0x00, 0x00, 0x00); // black
 
 	m_height = 24;  // <---- DEC-100
 	m_height_MAX = 48;
@@ -201,14 +201,21 @@ READ8_MEMBER( vt100_video_device::lba7_r )
 // Also used by Rainbow-100 ************
 WRITE8_MEMBER( vt100_video_device::dc012_w )
 {
-	if (data == 0) 
-	{
-		if (DEC_MHFU == true)
-			DEC_MHFU = false; // MHFU is disabled by writing 00 to port 010C.
-	} else 
-	{
-		if (DEC_MHFU == false)
-			DEC_MHFU = true; // TODO: MHFU ENABLE should also reset the MHFU timer.
+   	// TODO: writes to 10C/0C should be treated differently (emulation disables the watchdog too often).
+	if (data == 0) // MHFU is disabled by writing 00 to port 010C.
+	{	
+				//if (MHFU_FLAG == true)
+				//	printf("MHFU  *** DISABLED *** \n");
+				MHFU_FLAG = false;
+				MHFU_counter = 0;
+	}
+	else 
+	{	        // RESET
+			    //if (MHFU_FLAG == false)
+				//	printf("MHFU  ___ENABLED___ \n");
+				MHFU_FLAG = true;
+
+				MHFU_counter = 0;
 	}
 
 	if (!(data & 0x08))
@@ -223,7 +230,7 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 		// and unlinked down at the bottom. 
 
 		// Note that the scroll latch value will be used during the next frame rather than the current frame.
-		// All line linking/unlinking should be done during the vertical blanking interval (< 550ms).
+		// All line linking/unlinking is done during the vertical blanking interval (< 550ms).
 
 		// More on scrolling regions: Rainbow 100 B technical documentation (QV069-GZ) April 1985 page 22
 		// Also see VT100 Technical Manual: 4.7.4 Address Shuffling to 4.7.9 Split Screen Smooth Scrolling.
@@ -249,6 +256,7 @@ WRITE8_MEMBER( vt100_video_device::dc012_w )
 			case 0x09:
 				// clear vertical frequency interrupt;
 				m_clear_video_interrupt(0, 0);
+
 				break;
 			case 0x0a:
 				// set reverse field on
@@ -571,7 +579,7 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 		// modify line since that is how it is stored in rom
 		if (j == 0) j = 15; else j = j - 1;
 
-		line = m_gfx[code * 16 + j];
+		line = m_gfx[ (code << 4) + j]; // code * 16
 
 		// UNDERLINED CHARACTERS (CASE 5 - different in 1 line):
 		back_intensity = back_default_intensity; // 0, 1, 2 
@@ -606,13 +614,13 @@ void rainbow_video_device::display_char(bitmap_ind16 &bitmap, UINT8 code, int x,
 			// Double, 'double_height + double_width', then normal.
 			if (double_width)
 			{
-  		        bitmap.pix16( y_preset, d_x_preset + b * 2 + 1) = bit;
-				bitmap.pix16( y_preset, d_x_preset + b * 2)     = bit;
+  		        bitmap.pix16( y_preset, d_x_preset + (b << 1) + 1) = bit;
+				bitmap.pix16( y_preset, d_x_preset + (b << 1)    ) = bit;
 
 				if (double_height)
 				{
-					  bitmap.pix16( 1 + y_preset, d_x_preset + b * 2 + 1) = bit;
-					  bitmap.pix16( 1 + y_preset, d_x_preset + b * 2)     = bit;
+					  bitmap.pix16( 1 + y_preset, d_x_preset + (b << 1) + 1) = bit;
+					  bitmap.pix16( 1 + y_preset, d_x_preset + (b << 1)    ) = bit;
 				}
 			}
 			else
@@ -683,7 +691,7 @@ void rainbow_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &c
 			}
 
 			//  LINE ATTRIBUTE - valid for all chars on next line  ** DO NOT SHUFFLE **
-			attr_addr = ( 0x1000 | ((addr + xpos + 1) & 0x0fff) );
+			attr_addr = 0x1000 | ( (addr + xpos + 1) & 0x0fff );
 
 			// MOVE TO NEW DATA
 			temp = m_in_ram_func(addr + xpos + 2) * 256 + m_in_ram_func(addr + xpos + 1);
@@ -747,15 +755,15 @@ void rainbow_video_device::palette_select ( int choice )
 						break;
 
 			case 0x02:
-						palette_set_color_rgb(machine(), 1, 0 , 200 -50, 0);        // GREEN (dim)
-						palette_set_color_rgb(machine(), 2, 0 , 200,     0);		// GREEN (NORMAL)
-						palette_set_color_rgb(machine(), 3, 0,  200 +50, 0);        // GREEN (brighter)
+						palette_set_color_rgb(machine(), 1, 0 , 205 -50, 100 - 50);        // GREEN (dim)
+						palette_set_color_rgb(machine(), 2, 0 , 205,     100     );		   // GREEN (NORMAL)
+						palette_set_color_rgb(machine(), 3, 0,  205 +50, 100 + 50);        // GREEN (brighter)
 						break;
 
 			case 0x03: 
-						palette_set_color_rgb(machine(), 1, 213 - 47, 146 - 47, 82 - 47);      // AMBER (dim)
-						palette_set_color_rgb(machine(), 2, 213,      146,      82);      // AMBER (normal - not exact)
-						palette_set_color_rgb(machine(), 3, 255, 193, 129);     // AMBER (brighter)
+						palette_set_color_rgb(machine(), 1, 213 - 47, 146 - 47, 82 - 47); // AMBER (dim)
+						palette_set_color_rgb(machine(), 2, 213,      146,      82     ); // AMBER (NORMAL)
+						palette_set_color_rgb(machine(), 3, 255,      193,      129    ); // AMBER (brighter)
 						break;
 	}
 }
@@ -764,13 +772,38 @@ void rainbow_video_device::palette_select ( int choice )
 void rainbow_video_device::video_blanking(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// 'In reverse screen mode, termination forces the beam to the screen background intensity'
-	// Background intensity means 'dim' (1) according to one source. Most certainly not pitch black.
+	// Background intensity means 'dim' (1) according to one source. 
  	bitmap.fill( ((m_reverse_field ^ m_basic_attribute) ? 1 : 0) , cliprect); 
 }
 
-int rainbow_video_device::dc012_MHFU()
+
+
+int rainbow_video_device::MHFU(int ASK)
 {
-	return DEC_MHFU;
+	switch (ASK)
+	{		
+			case 1:			// "true": RETURN BOOLEAN (MHFU disabled or enabled?)
+				return MHFU_FLAG;
+
+			case -1:		// -1: increment, return counter value (=> Rainbow.c)
+				 if (MHFU_FLAG == true) 
+					MHFU_counter++; 
+				return MHFU_counter;
+
+			case -100:			// -100 : RESET and ENABLE MHFU counter
+			    //printf("-100 MHFU  * reset and ENABLE * \n");
+				MHFU_counter = 0;
+
+			    //if (MHFU_FLAG == false)
+				//	printf("-100 MHFU  ___ENABLED___\n");
+				MHFU_FLAG = true;
+
+				return -100;
+
+			default:
+				assert(1);
+				return -255;
+	} // switch
 }
 
 TIMER_CALLBACK_MEMBER( vt100_video_device::lba7_change )

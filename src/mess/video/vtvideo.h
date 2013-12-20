@@ -40,7 +40,6 @@ public:
 	DECLARE_WRITE8_MEMBER(brightness_w);
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -58,7 +57,10 @@ protected:
 	UINT8 *m_gfx;     /* content of char rom */
 
 	int m_lba7;
-	bool DEC_MHFU;
+
+	bool MHFU_FLAG;
+	int MHFU_counter;
+
 
 	// dc012 attributes
 	UINT8 m_scroll_latch;
@@ -84,7 +86,7 @@ public:
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void video_blanking(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	int dc012_MHFU();
+	int MHFU(int);
 	void palette_select(int choice);
 protected:
 	virtual void display_char(bitmap_ind16 &bitmap, UINT8 code, int x, int y, UINT8 scroll_region, UINT8 display_type);

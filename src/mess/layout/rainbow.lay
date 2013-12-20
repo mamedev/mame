@@ -1,13 +1,30 @@
 <mamelayout version="2">
-	<element name="led" defstate="0">
-		<disk state="0">
+	<element name="driveled" defstate="0">
+		<disk state="1">
 			<color red="0.75" green="0.0" blue="0.0" />
 		</disk>
-		<disk state="1">
+		<disk state="0">
 			<color red="0.20" green="0.0" blue="0.0" />
 		</disk>
 	</element>
 
+	<element name="sysled" defstate="0">
+		<disk state="0">
+			<color red="0.55" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="greenkbd" defstate="0">
+		<disk state="0">
+			<color red="0.0" green="0.75" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.0" green="0.20" blue="0.0" />
+		</disk>
+	</element>
 
 	<element name="DRIVE0">
 		<text string="A">
@@ -20,42 +37,55 @@
 		</text>
 	</element>
 
-	<element name="l1">
+	<element name="DRIVE2">
+		<text string="C">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+	<element name="DRIVE3">
+		<text string="D">
+			<color red="0.70" green="0.70" blue="0.70" />
+		</text>
+	</element>
+
+
+	<element name="l1sysled0">
 		<text string="1">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.70" green="0.70" blue="0.70" />
 		</text>
 	</element>
 	<element name="l2">
 		<text string="2">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.70" green="0.70" blue="0.70" />
 		</text>
 	</element>
 	<element name="l3">
 		<text string="3">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.70" green="0.70" blue="0.70" />
 		</text>
 	</element>
 	<element name="l4">
 		<text string="4">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.70" green="0.70" blue="0.70" />
 		</text>
 	</element>
 	<element name="l5">
 		<text string="5">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.70" green="0.70" blue="0.70" />
 		</text>
 	</element>
 	<element name="l6">
 		<text string="6">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.70" green="0.70" blue="0.70" />
 		</text>
 	</element>
 	<element name="l7">
 		<text string="7">
-			<color red="1.0" green="1.0" blue="1.0" />
+			<color red="0.70" green="0.70" blue="0.70" />
 		</text>
 	</element>
-	<element name="l8">
+	
+	<element name="l8wait">
 		<text string="WAIT">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
@@ -81,45 +111,51 @@
 			<bounds x="30" y="0" width="640" height="480" />
 		</screen>
 
-		<bezel name="led20" element="led">
+		<bezel name="driveled0" element="driveled">
 			<bounds x="15" y="3" width="10" height="10" />
 		</bezel>
-		<bezel name="led21" element="led">
+		<bezel name="driveled1" element="driveled">
 			<bounds x="15" y="18" width="10" height="10" />
 		</bezel>
+		<bezel name="driveled2" element="driveled">
+			<bounds x="15" y="33" width="10" height="10" />
+		</bezel>
+		<bezel name="driveled3" element="driveled">
+			<bounds x="15" y="46" width="10" height="10" />
+		</bezel>
 
-		<bezel name="led1" element="led">
-			<bounds x="15" y="43" width="10" height="10" />
+		<bezel name="led1" element="sysled">
+			<bounds x="15" y="76" width="10" height="10" />
 		</bezel>
-		<bezel name="led2" element="led">
-			<bounds x="15" y="63" width="10" height="10" />
+		<bezel name="led2" element="sysled">
+			<bounds x="15" y="96" width="10" height="10" />
 		</bezel>
-		<bezel name="led3" element="led">
-			<bounds x="15" y="83" width="10" height="10" />
+		<bezel name="led3" element="sysled">
+			<bounds x="15" y="116" width="10" height="10" />
 		</bezel>
-		<bezel name="led4" element="led">
-			<bounds x="15" y="103" width="10" height="10" />
+		<bezel name="led4" element="sysled">
+			<bounds x="15" y="136" width="10" height="10" />
 		</bezel>
-		<bezel name="led5" element="led">
-			<bounds x="15" y="123" width="10" height="10" />
+		<bezel name="led5" element="sysled">
+			<bounds x="15" y="156" width="10" height="10" />
 		</bezel>
-		<bezel name="led6" element="led">
-			<bounds x="15" y="143" width="10" height="10" />
+		<bezel name="led6" element="sysled">
+			<bounds x="15" y="176" width="10" height="10" />
 		</bezel>
-		<bezel name="led7" element="led">
-			<bounds x="15" y="163" width="10" height="10" />
+		<bezel name="led7" element="sysled">
+			<bounds x="15" y="196" width="10" height="10" />
 		</bezel>
-		<bezel name="led8" element="led">
-			<bounds x="15" y="193" width="10" height="10" />
+		<bezel name="led8" element="greenkbd">
+			<bounds x="15" y="226" width="10" height="10" />
 		</bezel>
-		<bezel name="led9" element="led">
-			<bounds x="15" y="213" width="10" height="10" />
+		<bezel name="led9" element="greenkbd">
+			<bounds x="15" y="246" width="10" height="10" />
 		</bezel>
-		<bezel name="led10" element="led">
-			<bounds x="15" y="232" width="10" height="10" />
+		<bezel name="led10" element="greenkbd">
+			<bounds x="15" y="265" width="10" height="10" />
 		</bezel>
-		<bezel name="led11" element="led">
-			<bounds x="15" y="252" width="10" height="10" />
+		<bezel name="led11" element="greenkbd">
+			<bounds x="15" y="285" width="10" height="10" />
 		</bezel>
 
 		<bezel name="label20" element="DRIVE0">
@@ -128,38 +164,45 @@
 		<bezel name="label21" element="DRIVE1">
 			<bounds x="0" y="14" width="15" height="16" />
 		</bezel>
-		<bezel name="label1" element="l1">
-			<bounds x="0" y="40" width="15" height="16" />
+		<bezel name="label22" element="DRIVE2">
+			<bounds x="0" y="29" width="15" height="16" />
+		</bezel>
+		<bezel name="label23" element="DRIVE3">
+			<bounds x="0" y="43" width="15" height="16" />
+		</bezel>
+
+		<bezel name="label1" element="l1sysled0">
+			<bounds x="0" y="73" width="15" height="16" />
 		</bezel>
 		<bezel name="label2" element="l2">
-			<bounds x="0" y="60" width="15" height="16" />
+			<bounds x="0" y="93" width="15" height="16" />
 		</bezel>
 		<bezel name="label3" element="l3">
-			<bounds x="0" y="80" width="15" height="16" />
+			<bounds x="0" y="113" width="15" height="16" />
 		</bezel>
 		<bezel name="label4" element="l4">
-			<bounds x="0" y="100" width="15" height="16" />
+			<bounds x="0" y="133" width="15" height="16" />
 		</bezel>
 		<bezel name="label5" element="l5">
-			<bounds x="0" y="120" width="15" height="16" />
+			<bounds x="0" y="153" width="15" height="16" />
 		</bezel>
 		<bezel name="label6" element="l6">
-			<bounds x="0" y="140" width="15" height="16" />
+			<bounds x="0" y="173" width="15" height="16" />
 		</bezel>
 		<bezel name="label7" element="l7">
-			<bounds x="0" y="160" width="15" height="16" />
+			<bounds x="0" y="193" width="15" height="16" />
 		</bezel>
-		<bezel name="label8" element="l8">
-			<bounds x="0" y="189" width="15" height="16" />
+		<bezel name="label8" element="l8wait">
+			<bounds x="0" y="222" width="15" height="16" />
 		</bezel>
 		<bezel name="label9" element="l9">
-			<bounds x="0" y="209" width="15" height="16" />
+			<bounds x="0" y="242" width="15" height="16" />
 		</bezel>
 		<bezel name="label10" element="l10">
-			<bounds x="0" y="229" width="15" height="16" />
+			<bounds x="0" y="262" width="15" height="16" />
 		</bezel>
 		<bezel name="label11" element="l11">
-			<bounds x="0" y="249" width="15" height="16" />
+			<bounds x="0" y="282" width="15" height="16" />
 		</bezel>
 	</view>
 

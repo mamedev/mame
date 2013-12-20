@@ -11,6 +11,20 @@
 
 #define LK201_TAG   "lk201"
 
+#define LK_CMD_LEDS_ON          0x13    /* light LEDs - 1st param: led bitmask */
+#define LK_CMD_LEDS_OFF         0x11    /* turn off LEDs */
+
+#define LK_CMD_DIS_KEYCLK       0x99    /* disable the keyclick */
+#define LK_CMD_ENB_KEYCLK       0x1b    /* enable the keyclick - 1st param: volume */
+//#define LK_CMD_DIS_CTLCLK       0xb9    /* disable the Ctrl keyclick */
+//#define LK_CMD_ENB_CTLCLK       0xbb    /* enable the Ctrl keyclick */
+#define LK_CMD_SOUND_CLK        0x9f    /* emit a keyclick  - 1st param: volume */
+#define LK_CMD_DIS_BELL         0xa1    /* disable the bell */
+#define LK_CMD_ENB_BELL         0x23    /* enable the bell - 1st param: volume */
+#define LK_CMD_BELL             0xa7    /* emit a bell - 1st param: volume */
+
+#define LK_CMD_POWER_UP         0xfd    /* init power-up sequence */
+
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
