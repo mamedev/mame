@@ -258,6 +258,7 @@ public:
 
 	// getter for explicit fetching
 	UINT32 bytes() const { return m_bytes; }
+	UINT32 mask() const { return m_bytes - 1; }
 
 	// setter for setting the object
 	void set_target(_PointerType *target, size_t bytes) { this->m_target = target; m_bytes = bytes; }

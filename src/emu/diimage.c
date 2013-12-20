@@ -434,6 +434,25 @@ const char *device_image_interface::get_feature(const char *feature_name)
 	return NULL;
 }
 
+
+//-------------------------------------------------
+//  load_software_region -
+//-------------------------------------------------
+
+bool device_image_interface::load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr)
+{
+	size_t size = get_software_region_length(tag);
+	
+	if (size)
+	{
+		ptr.allocate(size);
+
+		memcpy(ptr, get_software_region(tag), size);
+	}
+
+	return size > 0;
+}
+
 /****************************************************************************
   Hash info loading
 

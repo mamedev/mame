@@ -176,6 +176,8 @@ public:
 	bool has_been_created() { return m_created; }
 	void make_readonly() { m_readonly = true; }
 	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return core_fread(m_file, buffer, length); }
+	UINT32 fread(optional_shared_ptr<UINT8> &ptr, UINT32 length) { ptr.allocate(length); return fread(ptr, length); }
+	UINT32 fread(optional_shared_ptr<UINT8> &ptr, UINT32 length, offs_t offset) { ptr.allocate(length); return fread(ptr + offset, length - offset); }
 	UINT32 fwrite(const void *buffer, UINT32 length) { check_for_file(); return core_fwrite(m_file, buffer, length); }
 	int fseek(INT64 offset, int whence) { check_for_file(); return core_fseek(m_file, offset, whence); }
 	UINT64 ftell() { check_for_file(); return core_ftell(m_file); }
@@ -201,6 +203,7 @@ public:
 	UINT8 *get_software_region(const char *tag);
 	UINT32 get_software_region_length(const char *tag);
 	const char *get_feature(const char *feature_name);
+	bool load_software_region(const char *tag, optional_shared_ptr<UINT8> &ptr);
 
 	UINT32 crc();
 	hash_collection& hash() { return m_hash; }
