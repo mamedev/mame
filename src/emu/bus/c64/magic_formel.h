@@ -57,6 +57,7 @@ protected:
 
 private:
 	required_device<pia6821_device> m_pia;
+	optional_shared_ptr<UINT8> m_ram;
 
 	UINT8 m_rom_bank;
 	UINT8 m_ram_bank;

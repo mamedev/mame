@@ -182,6 +182,7 @@ c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machi
 	device_t(mconfig, C64_MAGIC_FORMEL, "C64 Magic Formel cartridge", tag, owner, clock, "c64_magic_formel", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_pia(*this, MC6821_TAG),
+	m_ram(*this, "ram"),
 	m_rom_bank(0),
 	m_ram_bank(0),
 	m_pb7_ff(0),
@@ -199,6 +200,9 @@ c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machi
 
 void c64_magic_formel_cartridge_device::device_start()
 {
+	// allocate memory
+	m_ram.allocate(0x2000);
+
 	// state saving
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_ram_bank));

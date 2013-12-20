@@ -152,36 +152,22 @@ public:
 	device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_plus4_expansion_card_interface();
 
-	// initialization
-	virtual UINT8* plus4_c1l_pointer(running_machine &machine, size_t size);
-	virtual UINT8* plus4_c1h_pointer(running_machine &machine, size_t size);
-	virtual UINT8* plus4_c2l_pointer(running_machine &machine, size_t size);
-	virtual UINT8* plus4_c2h_pointer(running_machine &machine, size_t size);
-	virtual UINT8* plus4_ram_pointer(running_machine &machine, size_t size);
-	virtual UINT8* plus4_nvram_pointer(running_machine &machine, size_t size);
-
 	// runtime
 	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return data; };
 	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { };
 
 protected:
-	plus4_expansion_slot_device *m_slot;
-
-	UINT8 *m_c1l;
-	UINT8 *m_c1h;
-	UINT8 *m_c2l;
-	UINT8 *m_c2h;
-	UINT8 *m_ram;
-	UINT8 *m_nvram;
-
-	size_t m_nvram_size;
+	optional_shared_ptr<UINT8> m_c1l;
+	optional_shared_ptr<UINT8> m_c1h;
+	optional_shared_ptr<UINT8> m_c2l;
+	optional_shared_ptr<UINT8> m_c2h;
 
 	size_t m_c1l_mask;
 	size_t m_c1h_mask;
 	size_t m_c2l_mask;
 	size_t m_c2h_mask;
-	size_t m_ram_mask;
-	size_t m_nvram_mask;
+
+	plus4_expansion_slot_device *m_slot;
 };
 
 

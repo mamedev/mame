@@ -144,31 +144,17 @@ public:
 	device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic20_expansion_card_interface();
 
-protected:
-	// initialization
-	virtual UINT8* vic20_blk1_pointer(running_machine &machine, size_t size);
-	virtual UINT8* vic20_blk2_pointer(running_machine &machine, size_t size);
-	virtual UINT8* vic20_blk3_pointer(running_machine &machine, size_t size);
-	virtual UINT8* vic20_blk5_pointer(running_machine &machine, size_t size);
-	virtual UINT8* vic20_ram_pointer(running_machine &machine, size_t size);
-	virtual UINT8* vic20_nvram_pointer(running_machine &machine, size_t size);
-
-	// runtime
 	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return data; };
 	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { };
 
+protected:
+	optional_shared_ptr<UINT8> m_blk1;
+	optional_shared_ptr<UINT8> m_blk2;
+	optional_shared_ptr<UINT8> m_blk3;
+	optional_shared_ptr<UINT8> m_blk5;
+	optional_shared_ptr<UINT8> m_nvram;
+
 	vic20_expansion_slot_device *m_slot;
-
-	UINT8 *m_blk1;
-	UINT8 *m_blk2;
-	UINT8 *m_blk3;
-	UINT8 *m_blk5;
-	UINT8 *m_ram;
-	UINT8 *m_nvram;
-
-	size_t m_nvram_size;
-
-	size_t m_nvram_mask;
 };
 
 

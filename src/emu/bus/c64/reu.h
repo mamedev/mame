@@ -56,6 +56,8 @@ protected:
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 
 	required_device<mos8726_device> m_dmac;
+	required_memory_region m_rom;
+	optional_shared_ptr<UINT8> m_ram;
 
 	int m_variant;
 	int m_jp1;

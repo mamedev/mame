@@ -39,16 +39,9 @@ const device_type CBM2_EXPANSION_SLOT = &device_creator<cbm2_expansion_slot_devi
 
 device_cbm2_expansion_card_interface::device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_bank1(NULL),
-		m_bank2(NULL),
-		m_bank3(NULL),
-		m_ram(NULL),
-		m_nvram(NULL),
-		m_nvram_size(0),
-		m_bank1_mask(0),
-		m_bank2_mask(0),
-		m_bank3_mask(0),
-		m_ram_mask(0)
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3")
 {
 	m_slot = dynamic_cast<cbm2_expansion_slot_device *>(device.owner());
 }
@@ -60,92 +53,6 @@ device_cbm2_expansion_card_interface::device_cbm2_expansion_card_interface(const
 
 device_cbm2_expansion_card_interface::~device_cbm2_expansion_card_interface()
 {
-}
-
-
-//-------------------------------------------------
-//  cbm2_bank1_pointer - get bank 1 pointer
-//-------------------------------------------------
-
-UINT8* device_cbm2_expansion_card_interface::cbm2_bank1_pointer(running_machine &machine, size_t size)
-{
-	if (m_bank1 == NULL)
-	{
-		m_bank1 = auto_alloc_array(machine, UINT8, size);
-
-		m_bank1_mask = size - 1;
-	}
-
-	return m_bank1;
-}
-
-
-//-------------------------------------------------
-//  cbm2_bank2_pointer - get bank 2 pointer
-//-------------------------------------------------
-
-UINT8* device_cbm2_expansion_card_interface::cbm2_bank2_pointer(running_machine &machine, size_t size)
-{
-	if (m_bank2 == NULL)
-	{
-		m_bank2 = auto_alloc_array(machine, UINT8, size);
-
-		m_bank2_mask = size - 1;
-	}
-
-	return m_bank2;
-}
-
-
-//-------------------------------------------------
-//  cbm2_bank3_pointer - get bank 3 pointer
-//-------------------------------------------------
-
-UINT8* device_cbm2_expansion_card_interface::cbm2_bank3_pointer(running_machine &machine, size_t size)
-{
-	if (m_bank3 == NULL)
-	{
-		m_bank3 = auto_alloc_array(machine, UINT8, size);
-
-		m_bank3_mask = size - 1;
-	}
-
-	return m_bank3;
-}
-
-
-//-------------------------------------------------
-//  cbm2_ram_pointer - get RAM pointer
-//-------------------------------------------------
-
-UINT8* device_cbm2_expansion_card_interface::cbm2_ram_pointer(running_machine &machine, size_t size)
-{
-	if (m_ram == NULL)
-	{
-		m_ram = auto_alloc_array(machine, UINT8, size);
-
-		m_ram_mask = size - 1;
-	}
-
-	return m_ram;
-}
-
-
-//-------------------------------------------------
-//  cbm2_ram_pointer - get NVRAM pointer
-//-------------------------------------------------
-
-UINT8* device_cbm2_expansion_card_interface::cbm2_nvram_pointer(running_machine &machine, size_t size)
-{
-	if (m_nvram == NULL)
-	{
-		m_nvram = auto_alloc_array(machine, UINT8, size);
-
-		m_nvram_mask = size - 1;
-		m_nvram_size = size;
-	}
-
-	return m_nvram;
 }
 
 
@@ -209,33 +116,25 @@ bool cbm2_expansion_slot_device::call_load()
 
 			if (!mame_stricmp(filetype(), "20"))
 			{
-				fread(m_card->cbm2_bank1_pointer(machine(), size), size);
+				m_card->m_bank1.allocate(size);
+				fread(m_card->m_bank1, size);
 			}
 			else if (!mame_stricmp(filetype(), "40"))
 			{
-				fread(m_card->cbm2_bank2_pointer(machine(), size), size);
+				m_card->m_bank2.allocate(size);
+				fread(m_card->m_bank2, size);
 			}
 			else if (!mame_stricmp(filetype(), "60"))
 			{
-				fread(m_card->cbm2_bank3_pointer(machine(), size), size);
+				m_card->m_bank3.allocate(size);
+				fread(m_card->m_bank3, size);
 			}
 		}
 		else
 		{
-			size = get_software_region_length("bank1");
-			if (size) memcpy(m_card->cbm2_bank1_pointer(machine(), size), get_software_region("bank1"), size);
-
-			size = get_software_region_length("bank2");
-			if (size) memcpy(m_card->cbm2_bank2_pointer(machine(), size), get_software_region("bank2"), size);
-
-			size = get_software_region_length("bank3");
-			if (size) memcpy(m_card->cbm2_bank3_pointer(machine(), size), get_software_region("bank3"), size);
-
-			size = get_software_region_length("ram");
-			if (size) memset(m_card->cbm2_ram_pointer(machine(), size), 0, size);
-
-			size = get_software_region_length("nvram");
-			if (size) memset(m_card->cbm2_nvram_pointer(machine(), size), 0, size);
+			load_software_region("bank1", m_card->m_bank1);
+			load_software_region("bank2", m_card->m_bank2);
+			load_software_region("bank3", m_card->m_bank3);
 		}
 	}
 

@@ -21,10 +21,10 @@ const device_type VIC20_MEGACART = &device_creator<vic20_megacart_device>;
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( vic1112 )
+//  MACHINE_DRIVER( vic20_megacart )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( vic1112 )
+static MACHINE_CONFIG_FRAGMENT( vic20_megacart )
 
 MACHINE_CONFIG_END
 
@@ -36,7 +36,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor vic20_megacart_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( vic1112 );
+	return MACHINE_CONFIG_NAME( vic20_megacart );
 }
 
 
@@ -64,6 +64,8 @@ vic20_megacart_device::vic20_megacart_device(const machine_config &mconfig, cons
 
 void vic20_megacart_device::device_start()
 {
+	m_nvram.allocate(0x2000);
+
 	// state saving
 	save_item(NAME(m_nvram_en));
 }

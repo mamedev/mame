@@ -48,6 +48,8 @@ protected:
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw);
 
 private:
+	optional_shared_ptr<UINT8> m_ram;
+
 	int m_a0;
 	int m_a6;
 	int m_nmi;

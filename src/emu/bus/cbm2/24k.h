@@ -39,6 +39,8 @@ protected:
 	// device_cbm2_expansion_card_interface overrides
 	virtual UINT8 cbm2_bd_r(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3);
 	virtual void cbm2_bd_w(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3);
+
+	optional_shared_ptr<UINT8> m_ram;
 };
 
 

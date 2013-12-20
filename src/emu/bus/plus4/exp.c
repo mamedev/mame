@@ -39,18 +39,14 @@ const device_type PLUS4_EXPANSION_SLOT = &device_creator<plus4_expansion_slot_de
 
 device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_c1l(NULL),
-		m_c1h(NULL),
-		m_c2l(NULL),
-		m_c2h(NULL),
-		m_ram(NULL),
-		m_nvram(NULL),
-		m_nvram_size(0),
+		m_c1l(*this, "c1l"),
+		m_c1h(*this, "c1h"),
+		m_c2l(*this, "c2l"),
+		m_c2h(*this, "c2h"),
 		m_c1l_mask(0),
 		m_c1h_mask(0),
 		m_c2l_mask(0),
-		m_c2h_mask(0),
-		m_ram_mask(0)
+		m_c2h_mask(0)
 {
 	m_slot = dynamic_cast<plus4_expansion_slot_device *>(device.owner());
 }
@@ -62,109 +58,6 @@ device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(con
 
 device_plus4_expansion_card_interface::~device_plus4_expansion_card_interface()
 {
-}
-
-
-//-------------------------------------------------
-//  plus4_c1l_pointer - get low ROM 1 pointer
-//-------------------------------------------------
-
-UINT8* device_plus4_expansion_card_interface::plus4_c1l_pointer(running_machine &machine, size_t size)
-{
-	if (m_c1l == NULL)
-	{
-		m_c1l = auto_alloc_array(machine, UINT8, size);
-
-		m_c1l_mask = size - 1;
-	}
-
-	return m_c1l;
-}
-
-
-//-------------------------------------------------
-//  plus4_c1h_pointer - get low ROM 1 pointer
-//-------------------------------------------------
-
-UINT8* device_plus4_expansion_card_interface::plus4_c1h_pointer(running_machine &machine, size_t size)
-{
-	if (m_c1h == NULL)
-	{
-		m_c1h = auto_alloc_array(machine, UINT8, size);
-
-		m_c1h_mask = size - 1;
-	}
-
-	return m_c1h;
-}
-
-
-//-------------------------------------------------
-//  plus4_c2l_pointer - get low ROM 1 pointer
-//-------------------------------------------------
-
-UINT8* device_plus4_expansion_card_interface::plus4_c2l_pointer(running_machine &machine, size_t size)
-{
-	if (m_c2l == NULL)
-	{
-		m_c2l = auto_alloc_array(machine, UINT8, size);
-
-		m_c2l_mask = size - 1;
-	}
-
-	return m_c2l;
-}
-
-
-//-------------------------------------------------
-//  plus4_c2h_pointer - get low ROM 1 pointer
-//-------------------------------------------------
-
-UINT8* device_plus4_expansion_card_interface::plus4_c2h_pointer(running_machine &machine, size_t size)
-{
-	if (m_c2h == NULL)
-	{
-		m_c2h = auto_alloc_array(machine, UINT8, size);
-
-		m_c2h_mask = size - 1;
-	}
-
-	return m_c2h;
-}
-
-
-//-------------------------------------------------
-//  plus4_ram_pointer - get RAM pointer
-//-------------------------------------------------
-
-UINT8* device_plus4_expansion_card_interface::plus4_ram_pointer(running_machine &machine, size_t size)
-{
-	if (m_ram == NULL)
-	{
-		m_ram = auto_alloc_array(machine, UINT8, size);
-
-		m_ram_mask = size - 1;
-	}
-
-	return m_ram;
-}
-
-
-//-------------------------------------------------
-//  plus4_ram_pointer - get NVRAM pointer
-//-------------------------------------------------
-
-UINT8* device_plus4_expansion_card_interface::plus4_nvram_pointer(running_machine &machine, size_t size)
-{
-	if (m_nvram == NULL)
-	{
-		m_nvram = auto_alloc_array(machine, UINT8, size);
-
-		m_nvram_mask = size - 1;
-		m_nvram_size = size;
-	}
-
-	return m_nvram;
 }
 
 
@@ -234,31 +127,16 @@ bool plus4_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size = 0;
-
 		if (software_entry() == NULL)
 		{
 			// TODO
 		}
 		else
 		{
-			size = get_software_region_length("c1l");
-			if (size) memcpy(m_card->plus4_c1l_pointer(machine(), size), get_software_region("c1l"), size);
-
-			size = get_software_region_length("c1h");
-			if (size) memcpy(m_card->plus4_c1h_pointer(machine(), size), get_software_region("c1h"), size);
-
-			size = get_software_region_length("c2l");
-			if (size) memcpy(m_card->plus4_c2l_pointer(machine(), size), get_software_region("c2l"), size);
-
-			size = get_software_region_length("c2h");
-			if (size) memcpy(m_card->plus4_c2h_pointer(machine(), size), get_software_region("c2h"), size);
-
-			size = get_software_region_length("ram");
-			if (size) memset(m_card->plus4_ram_pointer(machine(), size), 0, size);
-
-			size = get_software_region_length("nvram");
-			if (size) memset(m_card->plus4_nvram_pointer(machine(), size), 0, size);
+			load_software_region("c1l", m_card->m_c1l);
+			load_software_region("c1h", m_card->m_c1h);
+			load_software_region("c2l", m_card->m_c2l);
+			load_software_region("c2h", m_card->m_c2h);
 		}
 	}
 

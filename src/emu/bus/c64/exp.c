@@ -31,14 +31,9 @@ const device_type C64_EXPANSION_SLOT = &device_creator<c64_expansion_slot_device
 
 device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_roml(NULL),
-		m_romh(NULL),
-		m_ram(NULL),
-		m_nvram(NULL),
-		m_nvram_size(0),
-		m_roml_mask(0),
-		m_romh_mask(0),
-		m_ram_mask(0),
+		m_roml(*this, "roml"),
+		m_romh(*this, "romh"),
+		m_nvram(*this, "nvram"),
 		m_game(1),
 		m_exrom(1)
 {
@@ -52,75 +47,6 @@ device_c64_expansion_card_interface::device_c64_expansion_card_interface(const m
 
 device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 {
-}
-
-
-//-------------------------------------------------
-//  c64_roml_pointer - get low ROM pointer
-//-------------------------------------------------
-
-UINT8* device_c64_expansion_card_interface::c64_roml_pointer(running_machine &machine, size_t size)
-{
-	if (m_roml == NULL)
-	{
-		m_roml = auto_alloc_array(machine, UINT8, size);
-
-		m_roml_mask = size - 1;
-	}
-
-	return m_roml;
-}
-
-
-//-------------------------------------------------
-//  c64_romh_pointer - get high ROM pointer
-//-------------------------------------------------
-
-UINT8* device_c64_expansion_card_interface::c64_romh_pointer(running_machine &machine, size_t size)
-{
-	if (m_romh == NULL)
-	{
-		m_romh = auto_alloc_array(machine, UINT8, size);
-
-		m_romh_mask = size - 1;
-	}
-
-	return m_romh;
-}
-
-
-//-------------------------------------------------
-//  c64_ram_pointer - get RAM pointer
-//-------------------------------------------------
-
-UINT8* device_c64_expansion_card_interface::c64_ram_pointer(running_machine &machine, size_t size)
-{
-	if (m_ram == NULL)
-	{
-		m_ram = auto_alloc_array(machine, UINT8, size);
-
-		m_ram_mask = size - 1;
-	}
-
-	return m_ram;
-}
-
-
-//-------------------------------------------------
-//  c64_ram_pointer - get NVRAM pointer
-//-------------------------------------------------
-
-UINT8* device_c64_expansion_card_interface::c64_nvram_pointer(running_machine &machine, size_t size)
-{
-	if (m_nvram == NULL)
-	{
-		m_nvram = auto_alloc_array(machine, UINT8, size);
-
-		m_nvram_mask = size - 1;
-		m_nvram_size = size;
-	}
-
-	return m_nvram;
 }
 
 
@@ -202,7 +128,7 @@ bool c64_expansion_slot_device::call_load()
 
 			if (!mame_stricmp(filetype(), "80"))
 			{
-				fread(m_card->c64_roml_pointer(machine(), size), size);
+				fread(m_card->m_roml, size);
 				m_card->m_exrom = (0);
 
 				if (size == 0x4000)
@@ -212,14 +138,14 @@ bool c64_expansion_slot_device::call_load()
 			}
 			else if (!mame_stricmp(filetype(), "a0"))
 			{
-				fread(m_card->c64_romh_pointer(machine(), 0x2000), 0x2000);
+				fread(m_card->m_romh, 0x2000);
 
 				m_card->m_exrom = 0;
 				m_card->m_game = 0;
 			}
 			else if (!mame_stricmp(filetype(), "e0"))
 			{
-				fread(m_card->c64_romh_pointer(machine(), 0x2000), 0x2000);
+				fread(m_card->m_romh, 0x2000);
 
 				m_card->m_game = 0;
 			}
@@ -235,8 +161,11 @@ bool c64_expansion_slot_device::call_load()
 					UINT8 *roml = NULL;
 					UINT8 *romh = NULL;
 
-					if (roml_size) roml = m_card->c64_roml_pointer(machine(), roml_size);
-					if (romh_size) romh = m_card->c64_romh_pointer(machine(), romh_size);
+					m_card->m_roml.allocate(roml_size);
+					m_card->m_romh.allocate(romh_size);
+
+					if (roml_size) roml = m_card->m_roml;
+					if (romh_size) romh = m_card->m_roml;
 
 					cbm_crt_read_data(m_file, roml, romh);
 				}
@@ -252,10 +181,8 @@ bool c64_expansion_slot_device::call_load()
 			if (size)
 			{
 				// Ultimax (VIC-10) cartridge
-				memcpy(m_card->c64_romh_pointer(machine(), size), get_software_region("uprom"), size);
-
-				size = get_software_region_length("lorom");
-				if (size) memcpy(m_card->c64_roml_pointer(machine(), size), get_software_region("lorom"), size);
+				load_software_region("lorom", m_card->m_roml);
+				load_software_region("uprom", m_card->m_romh);
 
 				m_card->m_exrom = 1;
 				m_card->m_game = 0;
@@ -263,17 +190,9 @@ bool c64_expansion_slot_device::call_load()
 			else
 			{
 				// Commodore 64/128 cartridge
-				size = get_software_region_length("roml");
-				if (size) memcpy(m_card->c64_roml_pointer(machine(), size), get_software_region("roml"), size);
-
-				size = get_software_region_length("romh");
-				if (size) memcpy(m_card->c64_romh_pointer(machine(), size), get_software_region("romh"), size);
-
-				size = get_software_region_length("ram");
-				if (size) memset(m_card->c64_ram_pointer(machine(), size), 0, size);
-
-				size = get_software_region_length("nvram");
-				if (size) memset(m_card->c64_nvram_pointer(machine(), size), 0, size);
+				load_software_region("roml", m_card->m_roml);
+				load_software_region("romh", m_card->m_romh);
+				load_software_region("nvram", m_card->m_nvram);
 
 				if (get_feature("exrom") != NULL) m_card->m_exrom = atol(get_feature("exrom"));
 				if (get_feature("game") != NULL) m_card->m_game = atol(get_feature("game"));

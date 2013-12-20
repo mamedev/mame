@@ -43,8 +43,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() { }
-	virtual void nvram_read(emu_file &file) { if (m_nvram != NULL) { file.read(m_nvram, m_nvram_size); } }
-	virtual void nvram_write(emu_file &file) { if (m_nvram != NULL) { file.write(m_nvram, m_nvram_size); } }
+	virtual void nvram_read(emu_file &file) { file.read(m_nvram, m_nvram.bytes()); }
+	virtual void nvram_write(emu_file &file) { file.write(m_nvram, m_nvram.bytes()); }
 
 	// device_vic20_expansion_card_interface overrides
 	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);

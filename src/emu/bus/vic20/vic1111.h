@@ -39,6 +39,9 @@ protected:
 	// device_vic20_expansion_card_interface overrides
 	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
 	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
+
+private:
+	optional_shared_ptr<UINT8> m_ram;
 };
 
 

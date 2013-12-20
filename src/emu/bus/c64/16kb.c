@@ -102,7 +102,9 @@ ioport_constructor c64_16kb_cartridge_device::device_input_ports() const
 c64_16kb_cartridge_device::c64_16kb_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_16KB, "C64 16KB EPROM cartridge", tag, owner, clock, "c64_16kb", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_sw1(*this, "SW1")
+	m_sw1(*this, "SW1"),
+	m_rom_low(*this, "roml"),
+	m_rom_high(*this, "romh")
 {
 }
 
@@ -113,8 +115,6 @@ c64_16kb_cartridge_device::c64_16kb_cartridge_device(const machine_config &mconf
 
 void c64_16kb_cartridge_device::device_start()
 {
-	m_roml = memregion("roml")->base();
-	m_romh = memregion("romh")->base();
 }
 
 
@@ -139,11 +139,11 @@ UINT8 c64_16kb_cartridge_device::c64_cd_r(address_space &space, offs_t offset, U
 {
 	if (!roml)
 	{
-		data = m_roml[offset & 0x1fff];
+		data = m_rom_low->base()[offset & 0x1fff];
 	}
 	else if (!romh)
 	{
-		data = m_romh[offset & 0x1fff];
+		data = m_rom_high->base()[offset & 0x1fff];
 	}
 
 	return data;

@@ -32,7 +32,8 @@ const device_type VIC1210 = &device_creator<vic1210_device>;
 
 vic1210_device::vic1210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIC1210, "VIC1210", tag, owner, clock, "vic1210", __FILE__),
-		device_vic20_expansion_card_interface(mconfig, *this)
+		device_vic20_expansion_card_interface(mconfig, *this),
+		m_ram(*this, "ram")
 {
 }
 
@@ -44,7 +45,7 @@ vic1210_device::vic1210_device(const machine_config &mconfig, const char *tag, d
 void vic1210_device::device_start()
 {
 	// allocate memory
-	m_ram = auto_alloc_array(machine(), UINT8, 0xc00);
+	m_ram.allocate(0xc00);
 }
 
 

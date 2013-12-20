@@ -82,6 +82,7 @@ ioport_constructor c64_partner_cartridge_device::device_input_ports() const
 c64_partner_cartridge_device::c64_partner_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_PARTNER, "C64 PARTNER 64 cartridge", tag, owner, clock, "c64_partner", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
+	m_ram(*this, "ram"),
 	m_a0(1),
 	m_a6(1),
 	m_nmi(0)
@@ -96,7 +97,7 @@ c64_partner_cartridge_device::c64_partner_cartridge_device(const machine_config 
 void c64_partner_cartridge_device::device_start()
 {
 	// allocate memory
-	c64_ram_pointer(machine(), 0x2000);
+	m_ram.allocate(0x2000);
 }
 
 

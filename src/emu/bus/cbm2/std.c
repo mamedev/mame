@@ -51,17 +51,17 @@ void cbm2_standard_cartridge_device::device_start()
 
 UINT8 cbm2_standard_cartridge_device::cbm2_bd_r(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
 {
-	if (!csbank1 && m_bank1_mask)
+	if (!csbank1 && m_bank1.bytes())
 	{
-		data = m_bank1[offset & m_bank1_mask];
+		data = m_bank1[offset & m_bank1.mask()];
 	}
-	else if (!csbank2 && m_bank2_mask)
+	else if (!csbank2 && m_bank2.bytes())
 	{
-		data = m_bank2[offset & m_bank2_mask];
+		data = m_bank2[offset & m_bank2.mask()];
 	}
-	else if (!csbank3 && m_bank3_mask)
+	else if (!csbank3 && m_bank3.bytes())
 	{
-		data = m_bank3[offset & m_bank3_mask];
+		data = m_bank3[offset & m_bank3.mask()];
 	}
 
 	return data;

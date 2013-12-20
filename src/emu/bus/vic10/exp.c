@@ -33,9 +33,9 @@ const device_type VIC10_EXPANSION_SLOT = &device_creator<vic10_expansion_slot_de
 
 device_vic10_expansion_card_interface::device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig,device),
-		m_exram(NULL),
-		m_lorom(NULL),
-		m_uprom(NULL)
+		m_lorom(*this, "lorom"),
+		m_exram(*this, "exram"),
+		m_uprom(*this, "uprom")
 {
 	m_slot = dynamic_cast<vic10_expansion_slot_device *>(device.owner());
 }
@@ -47,52 +47,6 @@ device_vic10_expansion_card_interface::device_vic10_expansion_card_interface(con
 
 device_vic10_expansion_card_interface::~device_vic10_expansion_card_interface()
 {
-}
-
-
-
-//-------------------------------------------------
-//  vic10_lorom_pointer - get lower ROM pointer
-//-------------------------------------------------
-
-UINT8* device_vic10_expansion_card_interface::vic10_lorom_pointer(running_machine &machine, size_t size)
-{
-	if (m_lorom == NULL)
-	{
-		m_lorom = auto_alloc_array(machine, UINT8, size);
-	}
-
-	return m_lorom;
-}
-
-
-//-------------------------------------------------
-//  vic10_uprom_pointer - get upper ROM pointer
-//-------------------------------------------------
-
-UINT8* device_vic10_expansion_card_interface::vic10_uprom_pointer(running_machine &machine, size_t size)
-{
-	if (m_uprom == NULL)
-	{
-		m_uprom = auto_alloc_array(machine, UINT8, size);
-	}
-
-	return m_uprom;
-}
-
-
-//-------------------------------------------------
-//  vic10_exram_pointer - get expanded RAM pointer
-//-------------------------------------------------
-
-UINT8* device_vic10_expansion_card_interface::vic10_exram_pointer(running_machine &machine, size_t size)
-{
-	if (m_exram == NULL)
-	{
-		m_exram = auto_alloc_array(machine, UINT8, size);
-	}
-
-	return m_exram;
 }
 
 
@@ -170,14 +124,17 @@ bool vic10_expansion_slot_device::call_load()
 
 			if (!mame_stricmp(filetype(), "80"))
 			{
-				fread(m_card->vic10_lorom_pointer(machine(), 0x2000), 0x2000);
+				fread(m_card->m_lorom, 0x2000);
 
 				if (size == 0x4000)
 				{
-					fread(m_card->vic10_uprom_pointer(machine(), 0x2000), 0x2000);
+					fread(m_card->m_uprom, 0x2000);
 				}
 			}
-			else if (!mame_stricmp(filetype(), "e0")) fread(m_card->vic10_uprom_pointer(machine(), size), size);
+			else if (!mame_stricmp(filetype(), "e0"))
+			{
+				fread(m_card->m_uprom, size);
+			}
 			else if (!mame_stricmp(filetype(), "crt"))
 			{
 				size_t roml_size = 0;
@@ -190,8 +147,11 @@ bool vic10_expansion_slot_device::call_load()
 					UINT8 *roml = NULL;
 					UINT8 *romh = NULL;
 
-					if (roml_size) roml = m_card->vic10_lorom_pointer(machine(), roml_size);
-					if (romh_size) romh = m_card->vic10_uprom_pointer(machine(), romh_size);
+					m_card->m_lorom.allocate(roml_size);
+					m_card->m_uprom.allocate(romh_size);
+
+					if (roml_size) roml = m_card->m_lorom;
+					if (romh_size) romh = m_card->m_lorom;
 
 					cbm_crt_read_data(m_file, roml, romh);
 				}
@@ -199,14 +159,9 @@ bool vic10_expansion_slot_device::call_load()
 		}
 		else
 		{
-			size = get_software_region_length("lorom");
-			if (size) memcpy(m_card->vic10_lorom_pointer(machine(), size), get_software_region("lorom"), size);
-
-			size = get_software_region_length("uprom");
-			if (size) memcpy(m_card->vic10_uprom_pointer(machine(), size), get_software_region("uprom"), size);
-
-			size = get_software_region_length("exram");
-			if (size) m_card->vic10_exram_pointer(machine(), size);
+			load_software_region("lorom", m_card->m_lorom);
+			load_software_region("exram", m_card->m_exram);
+			load_software_region("uprom", m_card->m_uprom);
 		}
 	}
 

@@ -178,7 +178,8 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, C64_XL80, "XL 80", tag, owner, clock, "c64_xl80", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, HD46505SP_TAG),
-	m_char_rom(*this, HD46505SP_TAG)
+	m_char_rom(*this, HD46505SP_TAG),
+	m_ram(*this, "ram")
 {
 }
 
@@ -190,10 +191,7 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 void c64_xl80_device::device_start()
 {
 	// allocate memory
-	c64_ram_pointer(machine(), RAM_SIZE);
-
-	// state saving
-	save_pointer(NAME(m_ram), RAM_SIZE);
+	m_ram.allocate(RAM_SIZE);
 }
 
 

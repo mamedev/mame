@@ -51,21 +51,21 @@ void plus4_standard_cartridge_device::device_start()
 
 UINT8 plus4_standard_cartridge_device::plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	if (!c1l && m_c1l_mask)
+	if (!c1l && m_c1l.bytes())
 	{
-		data = m_c1l[offset & m_c1l_mask];
+		data = m_c1l[offset & m_c1l.mask()];
 	}
-	else if (!c1h && m_c1h_mask)
+	else if (!c1h && m_c1h.bytes())
 	{
-		data = m_c1h[offset & m_c1h_mask];
+		data = m_c1h[offset & m_c1h.mask()];
 	}
-	else if (!c2l && m_c2l_mask)
+	else if (!c2l && m_c2l.bytes())
 	{
-		data = m_c2l[offset & m_c2l_mask];
+		data = m_c2l[offset & m_c2l.mask()];
 	}
-	else if (!c2h && m_c2h_mask)
+	else if (!c2h && m_c2h.bytes())
 	{
-		data = m_c2h[offset & m_c2h_mask];
+		data = m_c2h[offset & m_c2h.mask()];
 	}
 
 	return data;

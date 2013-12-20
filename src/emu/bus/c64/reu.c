@@ -86,6 +86,8 @@ c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_dmac(*this, MOS8726R1_TAG),
+	m_rom(*this, "rom"),
+	m_ram(*this, "ram"),
 	m_variant(variant),
 	m_jp1(jp1),
 	m_ram_size(ram_size)
@@ -108,11 +110,8 @@ c64_reu1764_cartridge_device::c64_reu1764_cartridge_device(const machine_config 
 
 void c64_reu_cartridge_device::device_start()
 {
-	// find memory region
-	m_roml = memregion("roml")->base();
-
 	// allocate memory
-	c64_ram_pointer(machine(), m_ram_size);
+	m_ram.allocate(m_ram_size);
 
 	// setup DMA controller
 	m_dmac->set_unscaled_clock(m_slot->phi2());

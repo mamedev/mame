@@ -116,33 +116,15 @@ public:
 	device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cbm2_expansion_card_interface();
 
-protected:
-	// initialization
-	virtual UINT8* cbm2_bank1_pointer(running_machine &machine, size_t size);
-	virtual UINT8* cbm2_bank2_pointer(running_machine &machine, size_t size);
-	virtual UINT8* cbm2_bank3_pointer(running_machine &machine, size_t size);
-	virtual UINT8* cbm2_ram_pointer(running_machine &machine, size_t size);
-	virtual UINT8* cbm2_nvram_pointer(running_machine &machine, size_t size);
-
-	// runtime
 	virtual UINT8 cbm2_bd_r(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3) { return data; };
 	virtual void cbm2_bd_w(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3) { };
 
+protected:
+	optional_shared_ptr<UINT8> m_bank1;
+	optional_shared_ptr<UINT8> m_bank2;
+	optional_shared_ptr<UINT8> m_bank3;
+
 	cbm2_expansion_slot_device *m_slot;
-
-	UINT8 *m_bank1;
-	UINT8 *m_bank2;
-	UINT8 *m_bank3;
-	UINT8 *m_ram;
-	UINT8 *m_nvram;
-
-	size_t m_nvram_size;
-
-	size_t m_bank1_mask;
-	size_t m_bank2_mask;
-	size_t m_bank3_mask;
-	size_t m_ram_mask;
-	size_t m_nvram_mask;
 };
 
 

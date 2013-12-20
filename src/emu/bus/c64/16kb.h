@@ -49,6 +49,8 @@ protected:
 
 private:
 	required_ioport m_sw1;
+	required_memory_region m_rom_low;
+	required_memory_region m_rom_high;
 };
 
 

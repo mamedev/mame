@@ -33,108 +33,13 @@ const device_type VIC20_EXPANSION_SLOT = &device_creator<vic20_expansion_slot_de
 
 device_vic20_expansion_card_interface::device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device),
-		m_blk1(NULL),
-		m_blk2(NULL),
-		m_blk3(NULL),
-		m_blk5(NULL),
-		m_ram(NULL),
-		m_nvram(NULL),
-		m_nvram_size(0)
+		m_blk1(*this, "blk1"),
+		m_blk2(*this, "blk2"),
+		m_blk3(*this, "blk3"),
+		m_blk5(*this, "blk5"),
+		m_nvram(*this, "nvram")
 {
 	m_slot = dynamic_cast<vic20_expansion_slot_device *>(device.owner());
-}
-
-
-//-------------------------------------------------
-//  vic20_blk1_pointer - get block 1 pointer
-//-------------------------------------------------
-
-UINT8* device_vic20_expansion_card_interface::vic20_blk1_pointer(running_machine &machine, size_t size)
-{
-	if (m_blk1 == NULL)
-	{
-		m_blk1 = auto_alloc_array(machine, UINT8, size);
-	}
-
-	return m_blk1;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk2_pointer - get block 2 pointer
-//-------------------------------------------------
-
-UINT8* device_vic20_expansion_card_interface::vic20_blk2_pointer(running_machine &machine, size_t size)
-{
-	if (m_blk2 == NULL)
-	{
-		m_blk2 = auto_alloc_array(machine, UINT8, size);
-	}
-
-	return m_blk2;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk3_pointer - get block 3 pointer
-//-------------------------------------------------
-
-UINT8* device_vic20_expansion_card_interface::vic20_blk3_pointer(running_machine &machine, size_t size)
-{
-	if (m_blk3 == NULL)
-	{
-		m_blk3 = auto_alloc_array(machine, UINT8, size);
-	}
-
-	return m_blk3;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk5_pointer - get block 5 pointer
-//-------------------------------------------------
-
-UINT8* device_vic20_expansion_card_interface::vic20_blk5_pointer(running_machine &machine, size_t size)
-{
-	if (m_blk5 == NULL)
-	{
-		m_blk5 = auto_alloc_array(machine, UINT8, size);
-	}
-
-	return m_blk5;
-}
-
-
-//-------------------------------------------------
-//  vic20_ram_pointer - get RAM pointer
-//-------------------------------------------------
-
-UINT8* device_vic20_expansion_card_interface::vic20_ram_pointer(running_machine &machine, size_t size)
-{
-	if (m_ram == NULL)
-	{
-		m_ram = auto_alloc_array(machine, UINT8, size);
-	}
-
-	return m_ram;
-}
-
-
-//-------------------------------------------------
-//  vic20_nvram_pointer - get NVRAM pointer
-//-------------------------------------------------
-
-UINT8* device_vic20_expansion_card_interface::vic20_nvram_pointer(running_machine &machine, size_t size)
-{
-	if (m_nvram == NULL)
-	{
-		m_nvram = auto_alloc_array(machine, UINT8, size);
-
-		m_nvram_mask = size - 1;
-		m_nvram_size = size;
-	}
-
-	return m_nvram;
 }
 
 
@@ -211,16 +116,14 @@ bool vic20_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size = 0;
-
 		if (software_entry() == NULL)
 		{
-			if (!mame_stricmp(filetype(), "20")) fread(m_card->vic20_blk1_pointer(machine(), 0x2000), 0x2000);
-			else if (!mame_stricmp(filetype(), "40")) fread(m_card->vic20_blk2_pointer(machine(), 0x2000), 0x2000);
-			else if (!mame_stricmp(filetype(), "60")) fread(m_card->vic20_blk3_pointer(machine(), 0x2000), 0x2000);
-			else if (!mame_stricmp(filetype(), "70")) fread(m_card->vic20_blk3_pointer(machine(), 0x2000) + 0x1000, 0x1000);
-			else if (!mame_stricmp(filetype(), "a0")) fread(m_card->vic20_blk5_pointer(machine(), 0x2000), 0x2000);
-			else if (!mame_stricmp(filetype(), "b0")) fread(m_card->vic20_blk5_pointer(machine(), 0x2000) + 0x1000, 0x1000);
+			if (!mame_stricmp(filetype(), "20")) fread(m_card->m_blk1, 0x2000);
+			else if (!mame_stricmp(filetype(), "40")) fread(m_card->m_blk2, 0x2000);
+			else if (!mame_stricmp(filetype(), "60")) fread(m_card->m_blk3, 0x2000);
+			else if (!mame_stricmp(filetype(), "70")) fread(m_card->m_blk3, 0x2000, 0x1000);
+			else if (!mame_stricmp(filetype(), "a0")) fread(m_card->m_blk5, 0x2000);
+			else if (!mame_stricmp(filetype(), "b0")) fread(m_card->m_blk5, 0x2000, 0x1000);
 			else if (!mame_stricmp(filetype(), "crt"))
 			{
 				// read the header
@@ -230,36 +133,22 @@ bool vic20_expansion_slot_device::call_load()
 
 				switch (address)
 				{
-				case 0x2000: fread(m_card->vic20_blk1_pointer(machine(), 0x2000), 0x2000); break;
-				case 0x4000: fread(m_card->vic20_blk2_pointer(machine(), 0x2000), 0x2000); break;
-				case 0x6000: fread(m_card->vic20_blk3_pointer(machine(), 0x2000), 0x2000); break;
-				case 0x7000: fread(m_card->vic20_blk3_pointer(machine(), 0x2000) + 0x1000, 0x1000); break;
-				case 0xa000: fread(m_card->vic20_blk5_pointer(machine(), 0x2000), 0x2000); break;
-				case 0xb000: fread(m_card->vic20_blk5_pointer(machine(), 0x2000) + 0x1000, 0x1000); break;
+				case 0x2000: fread(m_card->m_blk1, 0x2000); break;
+				case 0x4000: fread(m_card->m_blk2, 0x2000); break;
+				case 0x6000: fread(m_card->m_blk3, 0x2000); break;
+				case 0x7000: fread(m_card->m_blk3, 0x2000, 0x1000); break;
+				case 0xa000: fread(m_card->m_blk5, 0x2000); break;
+				case 0xb000: fread(m_card->m_blk5, 0x2000, 0x1000); break;
 				default: return IMAGE_INIT_FAIL;
 				}
 			}
 		}
 		else
 		{
-			size = get_software_region_length("blk1");
-			if (size) memcpy(m_card->vic20_blk1_pointer(machine(), size), get_software_region("blk1"), size);
-
-			size = get_software_region_length("blk2");
-			if (size) memcpy(m_card->vic20_blk2_pointer(machine(), size), get_software_region("blk2"), size);
-
-			size = get_software_region_length("blk3");
-			if (size) memcpy(m_card->vic20_blk3_pointer(machine(), size), get_software_region("blk3"), size);
-
-			size = get_software_region_length("blk5");
-			if (size) memcpy(m_card->vic20_blk5_pointer(machine(), size), get_software_region("blk5"), size);
-
-			size = get_software_region_length("ram");
-			if (size) memcpy(m_card->vic20_ram_pointer(machine(), size), get_software_region("ram"), size);
-
-			size = get_software_region_length("nvram");
-			if (size) memcpy(m_card->vic20_nvram_pointer(machine(), size), get_software_region("nvram"), size);
-
+			load_software_region("blk1", m_card->m_blk1);
+			load_software_region("blk2", m_card->m_blk2);
+			load_software_region("blk3", m_card->m_blk3);
+			load_software_region("blk5", m_card->m_blk5);
 		}
 	}
 

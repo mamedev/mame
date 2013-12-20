@@ -31,7 +31,8 @@ const device_type C64_GEORAM = &device_creator<c64_georam_cartridge_device>;
 
 c64_georam_cartridge_device::c64_georam_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_GEORAM, "C64 GeoRAM cartridge", tag, owner, clock, "c64_georam", __FILE__),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_ram(*this, "ram")
 {
 }
 
@@ -43,7 +44,7 @@ c64_georam_cartridge_device::c64_georam_cartridge_device(const machine_config &m
 void c64_georam_cartridge_device::device_start()
 {
 	// allocate memory
-	c64_ram_pointer(machine(), 0x80000);
+	m_ram.allocate(0x80000);
 
 	// state saving
 	save_item(NAME(m_bank));

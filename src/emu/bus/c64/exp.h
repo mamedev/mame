@@ -167,35 +167,20 @@ public:
 	device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_c64_expansion_card_interface();
 
-protected:
-	// initialization
-	virtual UINT8* c64_roml_pointer(running_machine &machine, size_t size);
-	virtual UINT8* c64_romh_pointer(running_machine &machine, size_t size);
-	virtual UINT8* c64_ram_pointer(running_machine &machine, size_t size);
-	virtual UINT8* c64_nvram_pointer(running_machine &machine, size_t size);
-
-	// runtime
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) { return m_game; }
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) { return m_exrom; }
 
-	c64_expansion_slot_device *m_slot;
-
-	UINT8 *m_roml;
-	UINT8 *m_romh;
-	UINT8 *m_ram;
-	UINT8 *m_nvram;
-
-	size_t m_nvram_size;
-
-	size_t m_roml_mask;
-	size_t m_romh_mask;
-	size_t m_ram_mask;
-	size_t m_nvram_mask;
+protected:
+	optional_shared_ptr<UINT8> m_roml;
+	optional_shared_ptr<UINT8> m_romh;
+	optional_shared_ptr<UINT8> m_nvram;
 
 	int m_game;
 	int m_exrom;
+
+	c64_expansion_slot_device *m_slot;
 };
 
 

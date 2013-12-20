@@ -63,17 +63,17 @@ UINT8 c64_westermann_cartridge_device::c64_cd_r(address_space &space, offs_t off
 {
 	if (!roml)
 	{
-		data = m_roml[offset & 0x1fff];
+		data = m_roml[offset & m_roml.mask()];
 	}
 	else if (!romh)
 	{
-		if (m_romh_mask)
+		if (m_romh.bytes())
 		{
-			data = m_romh[offset & 0x1fff];
+			data = m_romh[offset & m_romh.mask()];
 		}
 		else
 		{
-			data = m_roml[offset & 0x3fff];
+			data = m_roml[offset & m_roml.mask()];
 		}
 	}
 	else if (!io2)

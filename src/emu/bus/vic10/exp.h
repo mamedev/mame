@@ -152,13 +152,6 @@ public:
 	device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic10_expansion_card_interface();
 
-protected:
-	// initialization
-	virtual UINT8* vic10_exram_pointer(running_machine &machine, size_t size);
-	virtual UINT8* vic10_lorom_pointer(running_machine &machine, size_t size);
-	virtual UINT8* vic10_uprom_pointer(running_machine &machine, size_t size);
-
-	// runtime
 	virtual UINT8 vic10_cd_r(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram) { return data; };
 	virtual void vic10_cd_w(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram) { };
 	virtual int vic10_p0_r() { return 0; };
@@ -166,11 +159,12 @@ protected:
 	virtual void vic10_sp_w(int state) { };
 	virtual void vic10_cnt_w(int state) { };
 
-	vic10_expansion_slot_device *m_slot;
+protected:
+	optional_shared_ptr<UINT8> m_lorom;
+	optional_shared_ptr<UINT8> m_exram;
+	optional_shared_ptr<UINT8> m_uprom;
 
-	UINT8 *m_exram;
-	UINT8 *m_lorom;
-	UINT8 *m_uprom;
+	vic10_expansion_slot_device *m_slot;
 };
 
 

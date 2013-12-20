@@ -57,6 +57,7 @@ private:
 	required_device<ds1302_device> m_rtc;
 	required_device<ata_interface_device> m_ata;
 	required_ioport m_jp1;
+	optional_shared_ptr<UINT8> m_ram;
 
 	UINT8 m_bank;
 	UINT16 m_ata_data;
