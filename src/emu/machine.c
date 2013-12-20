@@ -433,7 +433,7 @@ int running_machine::run(bool firstrun)
 	}
 	catch (emu_fatalerror &fatal)
 	{
-		mame_printf_error("%s\n", fatal.string());
+		mame_printf_error("FATALERROR: %s\n", fatal.string());
 		error = MAMERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();
