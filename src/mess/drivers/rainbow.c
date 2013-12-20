@@ -716,7 +716,7 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 	return 0x0f - m_inp5->read() 
 	            - 0                 // floppy is hard coded in emulator.
 				- m_inp7->read() 
-				- (m_inp8->read() > 0x2000) ? 8 : 0;
+				- ((m_inp8->read() > 0x2000) ? 8 : 0);
 }
 
 READ8_MEMBER(rainbow_state::comm_control_r)
