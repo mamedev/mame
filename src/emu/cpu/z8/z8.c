@@ -144,72 +144,82 @@ enum
     MACROS
 ***************************************************************************/
 
-#define P01M        cpustate->r[Z8_REGISTER_P01M]
-#define P2M         cpustate->r[Z8_REGISTER_P2M]
-#define P3M         cpustate->r[Z8_REGISTER_P3M]
-#define T0          cpustate->r[Z8_REGISTER_T0]
-#define T1          cpustate->r[Z8_REGISTER_T1]
-#define PRE0        cpustate->r[Z8_REGISTER_PRE0]
-#define PRE1        cpustate->r[Z8_REGISTER_PRE1]
+#define P01M        m_r[Z8_REGISTER_P01M]
+#define P2M         m_r[Z8_REGISTER_P2M]
+#define P3M         m_r[Z8_REGISTER_P3M]
+#define T0          m_r[Z8_REGISTER_T0]
+#define T1          m_r[Z8_REGISTER_T1]
+#define PRE0        m_r[Z8_REGISTER_PRE0]
+#define PRE1        m_r[Z8_REGISTER_PRE1]
+
+
+const device_type Z8601 = &device_creator<z8601_device>;
+const device_type UB8830D = &device_creator<ub8830d_device>;
+const device_type Z8611 = &device_creator<z8611_device>;
+
 
 /***************************************************************************
-    TYPE DEFINITIONS
+    ADDRESS MAPS
 ***************************************************************************/
 
-struct z8_state
+static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, z8_device )
+    AM_RANGE(0x0000, 0x07ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8, z8_device )
+    AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, ( size == 4 ) ? ADDRESS_MAP_NAME(program_4kb) : ADDRESS_MAP_NAME(program_2kb))
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 2, 0)
 {
-	address_space *program;
-	direct_read_data *direct;
-	address_space *data;
-	address_space *io;
+}
 
-	/* registers */
-	UINT16 pc;              /* program counter */
-	UINT8 r[256];           /* register file */
-	UINT8 input[4];         /* port input latches */
-	UINT8 output[4];        /* port output latches */
-	UINT8 t0;               /* timer 0 current count */
-	UINT8 t1;               /* timer 1 current count */
 
-	/* fake registers */
-	UINT16 fake_sp;         /* fake stack pointer */
-	UINT8 fake_r[16];       /* fake working registers */
+z8601_device::z8601_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock)
+	: z8_device(mconfig, Z8601, "Z8601", _tag, _owner, _clock, "z8601", __FILE__, 2)
+{
+}
 
-	/* interrupts */
-	int irq[6];             /* interrupts */
 
-	/* execution logic */
-	int clock;              /* clock */
-	int icount;             /* instruction counter */
+ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock)
+	: z8_device(mconfig, UB8830D, "UB8830D", _tag, _owner, _clock, "ub8830d", __FILE__, 2)
+{
+}
 
-	/* timers */
-	emu_timer *t0_timer;
-	emu_timer *t1_timer;
-};
+
+z8611_device::z8611_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock)
+	: z8_device(mconfig, Z8611, "Z8611", _tag, _owner, _clock, "z8611", __FILE__, 4)
+{
+}
+
+
+offs_t z8_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( z8 );
+	return CPU_DISASSEMBLE_NAME(z8)(this, buffer, pc, oprom, opram, options);
+}
+
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE z8_state *get_safe_token(device_t *device)
+UINT8 z8_device::fetch()
 {
-	assert(device != NULL);
-	assert((device->type() == Z8601) ||
-		(device->type() == UB8830D) ||
-		(device->type() == Z8611));
-	return (z8_state *)downcast<legacy_cpu_device *>(device)->token();
-}
+	UINT8 data = m_direct->read_decrypted_byte(m_pc);
 
-INLINE UINT8 fetch(z8_state *cpustate)
-{
-	UINT8 data = cpustate->direct->read_decrypted_byte(cpustate->pc);
-
-	cpustate->pc++;
+	m_pc++;
 
 	return data;
 }
 
-INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
+
+UINT8 z8_device::register_read(UINT8 offset)
 {
 	UINT8 data = 0xff;
 	UINT8 mask = 0;
@@ -219,51 +229,51 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 	case Z8_REGISTER_P0:
 		switch (P01M & Z8_P01M_P0L_MODE_MASK)
 		{
-		case Z8_P01M_P0L_MODE_OUTPUT:   data = cpustate->output[offset] & 0x0f;     break;
+		case Z8_P01M_P0L_MODE_OUTPUT:   data = m_output[offset] & 0x0f;     break;
 		case Z8_P01M_P0L_MODE_INPUT:    mask = 0x0f;                                break;
 		default: /* A8...A11 */         data = 0x0f;                                break;
 		}
 
 		switch (P01M & Z8_P01M_P0H_MODE_MASK)
 		{
-		case Z8_P01M_P0H_MODE_OUTPUT:   data |= cpustate->output[offset] & 0xf0;    break;
+		case Z8_P01M_P0H_MODE_OUTPUT:   data |= m_output[offset] & 0xf0;    break;
 		case Z8_P01M_P0H_MODE_INPUT:    mask |= 0xf0;                               break;
 		default: /* A12...A15 */        data |= 0xf0;                               break;
 		}
 
 		if (!(P3M & Z8_P3M_P0_STROBED))
 		{
-			if (mask) cpustate->input[offset] = cpustate->io->read_byte(offset);
+			if (mask) m_input[offset] = m_io->read_byte(offset);
 		}
 
-		data |= cpustate->input[offset] & mask;
+		data |= m_input[offset] & mask;
 		break;
 
 	case Z8_REGISTER_P1:
 		switch (P01M & Z8_P01M_P1_MODE_MASK)
 		{
-		case Z8_P01M_P1_MODE_OUTPUT:    data = cpustate->output[offset];            break;
+		case Z8_P01M_P1_MODE_OUTPUT:    data = m_output[offset];            break;
 		case Z8_P01M_P1_MODE_INPUT:     mask = 0xff;                                break;
 		default: /* AD0..AD7 */         data = 0xff;                                break;
 		}
 
 		if ((P3M & Z8_P3M_P33_P34_MASK) != Z8_P3M_P33_P34_DAV1_RDY1)
 		{
-			if (mask) cpustate->input[offset] = cpustate->io->read_byte(offset);
+			if (mask) m_input[offset] = m_io->read_byte(offset);
 		}
 
-		data |= cpustate->input[offset] & mask;
+		data |= m_input[offset] & mask;
 		break;
 
 	case Z8_REGISTER_P2:
-		mask = cpustate->r[Z8_REGISTER_P2M];
+		mask = m_r[Z8_REGISTER_P2M];
 
 		if (!(P3M & Z8_P3M_P2_STROBED))
 		{
-			if (mask) cpustate->input[offset] = cpustate->io->read_byte(offset);
+			if (mask) m_input[offset] = m_io->read_byte(offset);
 		}
 
-		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
+		data = (m_input[offset] & mask) | (m_output[offset] & ~mask);
 		break;
 
 	case Z8_REGISTER_P3:
@@ -273,17 +283,17 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 			mask = 0x0f;
 		}
 
-		if (mask) cpustate->input[offset] = cpustate->io->read_byte(offset);
+		if (mask) m_input[offset] = m_io->read_byte(offset);
 
-		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
+		data = (m_input[offset] & mask) | (m_output[offset] & ~mask);
 		break;
 
 	case Z8_REGISTER_T0:
-		data = cpustate->t0;
+		data = m_t0;
 		break;
 
 	case Z8_REGISTER_T1:
-		data = cpustate->t1;
+		data = m_t1;
 		break;
 
 	case Z8_REGISTER_PRE1:
@@ -296,45 +306,45 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 		break;
 
 	default:
-		data = cpustate->r[offset];
+		data = m_r[offset];
 		break;
 	}
 
 	return data;
 }
 
-INLINE UINT16 register_pair_read(z8_state *cpustate, UINT8 offset)
+UINT16 z8_device::register_pair_read(UINT8 offset)
 {
-	return (register_read(cpustate, offset) << 8) | register_read(cpustate, offset + 1);
+	return (register_read(offset) << 8) | register_read(offset + 1);
 }
 
-INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
+void z8_device::register_write(UINT8 offset, UINT8 data)
 {
 	UINT8 mask = 0;
 
 	switch (offset)
 	{
 	case Z8_REGISTER_P0:
-		cpustate->output[offset] = data;
+		m_output[offset] = data;
 		if ((P01M & Z8_P01M_P0L_MODE_MASK) == Z8_P01M_P0L_MODE_OUTPUT) mask |= 0x0f;
 		if ((P01M & Z8_P01M_P0H_MODE_MASK) == Z8_P01M_P0H_MODE_OUTPUT) mask |= 0xf0;
-		if (mask) cpustate->io->write_byte(offset, data & mask);
+		if (mask) m_io->write_byte(offset, data & mask);
 		break;
 
 	case Z8_REGISTER_P1:
-		cpustate->output[offset] = data;
+		m_output[offset] = data;
 		if ((P01M & Z8_P01M_P1_MODE_MASK) == Z8_P01M_P1_MODE_OUTPUT) mask = 0xff;
-		if (mask) cpustate->io->write_byte(offset, data & mask);
+		if (mask) m_io->write_byte(offset, data & mask);
 		break;
 
 	case Z8_REGISTER_P2:
-		cpustate->output[offset] = data;
-		mask = cpustate->r[Z8_REGISTER_P2M] ^ 0xff;
-		if (mask) cpustate->io->write_byte(offset, data & mask);
+		m_output[offset] = data;
+		mask = m_r[Z8_REGISTER_P2M] ^ 0xff;
+		if (mask) m_io->write_byte(offset, data & mask);
 		break;
 
 	case Z8_REGISTER_P3:
-		cpustate->output[offset] = data;
+		m_output[offset] = data;
 
 		// TODO: special port 3 modes
 		if (!(P3M & 0x7c))
@@ -342,7 +352,7 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 			mask = 0xf0;
 		}
 
-		if (mask) cpustate->io->write_byte(offset, data & mask);
+		if (mask) m_io->write_byte(offset, data & mask);
 		break;
 
 	case Z8_REGISTER_SIO:
@@ -351,19 +361,19 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 	case Z8_REGISTER_TMR:
 		if (data & Z8_TMR_LOAD_T0)
 		{
-			cpustate->t0 = T0;
-			cpustate->t0_timer->adjust(attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE0 >> 2) + 1)));
+			m_t0 = T0;
+			m_t0_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock / 2 / 4 / ((PRE0 >> 2) + 1)));
 		}
 
-		cpustate->t0_timer->enable(data & Z8_TMR_ENABLE_T0);
+		m_t0_timer->enable(data & Z8_TMR_ENABLE_T0);
 
 		if (data & Z8_TMR_LOAD_T1)
 		{
-			cpustate->t1 = T1;
-			cpustate->t1_timer->adjust(attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE1 >> 2) + 1)));
+			m_t1 = T1;
+			m_t1_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock / 2 / 4 / ((PRE1 >> 2) + 1)));
 		}
 
-		cpustate->t1_timer->enable(data & Z8_TMR_ENABLE_T1);
+		m_t1_timer->enable(data & Z8_TMR_ENABLE_T1);
 		break;
 
 	case Z8_REGISTER_P2M:
@@ -391,145 +401,145 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 		break;
 	}
 
-	cpustate->r[offset] = data;
+	m_r[offset] = data;
 }
 
-INLINE void register_pair_write(z8_state *cpustate, UINT8 offset, UINT16 data)
+void z8_device::register_pair_write(UINT8 offset, UINT16 data)
 {
-	register_write(cpustate, offset, data >> 8);
-	register_write(cpustate, offset + 1, data & 0xff);
+	register_write(offset, data >> 8);
+	register_write(offset + 1, data & 0xff);
 }
 
-INLINE UINT8 get_working_register(z8_state *cpustate, int offset)
+UINT8 z8_device::get_working_register(int offset)
 {
-	return (cpustate->r[Z8_REGISTER_RP] & 0xf0) | (offset & 0x0f);
+	return (m_r[Z8_REGISTER_RP] & 0xf0) | (offset & 0x0f);
 }
 
-INLINE UINT8 get_register(z8_state *cpustate, UINT8 offset)
+UINT8 z8_device::get_register(UINT8 offset)
 {
 	if ((offset & 0xf0) == 0xe0)
-		return get_working_register(cpustate, offset & 0x0f);
+		return get_working_register(offset & 0x0f);
 	else
 		return offset;
 }
 
-INLINE UINT8 get_intermediate_register(z8_state *cpustate, int offset)
+UINT8 z8_device::get_intermediate_register(int offset)
 {
-	return register_read(cpustate, get_register(cpustate, offset));
+	return register_read(get_register(offset));
 }
 
-INLINE void stack_push_byte(z8_state *cpustate, UINT8 src)
+void z8_device::stack_push_byte(UINT8 src)
 {
-	if (register_read(cpustate, Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
 		/* SP <- SP - 1 */
-		UINT8 sp = register_read(cpustate, Z8_REGISTER_SPL) - 1;
-		register_write(cpustate, Z8_REGISTER_SPL, sp);
+		UINT8 sp = register_read(Z8_REGISTER_SPL) - 1;
+		register_write(Z8_REGISTER_SPL, sp);
 
 		/* @SP <- src */
-		register_write(cpustate, sp, src);
+		register_write(sp, src);
 	}
 	else
 	{
 		/* SP <- SP - 1 */
-		UINT16 sp = register_pair_read(cpustate, Z8_REGISTER_SPH) - 1;
-		register_pair_write(cpustate, Z8_REGISTER_SPH, sp);
+		UINT16 sp = register_pair_read(Z8_REGISTER_SPH) - 1;
+		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
-		cpustate->data->write_byte(sp, src);
+		m_data->write_byte(sp, src);
 	}
 }
 
-INLINE void stack_push_word(z8_state *cpustate, UINT16 src)
+void z8_device::stack_push_word(UINT16 src)
 {
-	if (register_read(cpustate, Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
 		/* SP <- SP - 2 */
-		UINT8 sp = register_read(cpustate, Z8_REGISTER_SPL) - 2;
-		register_write(cpustate, Z8_REGISTER_SPL, sp);
+		UINT8 sp = register_read(Z8_REGISTER_SPL) - 2;
+		register_write(Z8_REGISTER_SPL, sp);
 
 		/* @SP <- src */
-		register_pair_write(cpustate, sp, src);
+		register_pair_write(sp, src);
 	}
 	else
 	{
 		/* SP <- SP - 2 */
-		UINT16 sp = register_pair_read(cpustate, Z8_REGISTER_SPH) - 2;
-		register_pair_write(cpustate, Z8_REGISTER_SPH, sp);
+		UINT16 sp = register_pair_read(Z8_REGISTER_SPH) - 2;
+		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
-		cpustate->data->write_word(sp, src);
+		m_data->write_word(sp, src);
 	}
 }
 
-INLINE UINT8 stack_pop_byte(z8_state *cpustate)
+UINT8 z8_device::stack_pop_byte()
 {
-	if (register_read(cpustate, Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
 		/* SP <- SP + 1 */
-		UINT8 sp = register_read(cpustate, Z8_REGISTER_SPL) + 1;
-		register_write(cpustate, Z8_REGISTER_SPL, sp);
+		UINT8 sp = register_read(Z8_REGISTER_SPL) + 1;
+		register_write(Z8_REGISTER_SPL, sp);
 
 		/* @SP <- src */
-		return register_read(cpustate, sp);
+		return register_read(sp);
 	}
 	else
 	{
 		/* SP <- SP + 1 */
-		UINT16 sp = register_pair_read(cpustate, Z8_REGISTER_SPH) + 1;
-		register_pair_write(cpustate, Z8_REGISTER_SPH, sp);
+		UINT16 sp = register_pair_read(Z8_REGISTER_SPH) + 1;
+		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
-		return cpustate->data->read_byte(sp);
+		return m_data->read_byte(sp);
 	}
 }
 
-INLINE UINT16 stack_pop_word(z8_state *cpustate)
+UINT16 z8_device::stack_pop_word()
 {
-	if (register_read(cpustate, Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
+	if (register_read(Z8_REGISTER_P01M) & Z8_P01M_INTERNAL_STACK)
 	{
 		/* SP <- SP + 2 */
-		UINT8 sp = register_read(cpustate, Z8_REGISTER_SPL) + 2;
-		register_write(cpustate, Z8_REGISTER_SPL, sp);
+		UINT8 sp = register_read(Z8_REGISTER_SPL) + 2;
+		register_write(Z8_REGISTER_SPL, sp);
 
 		/* @SP <- src */
-		return register_read(cpustate, sp);
+		return register_read(sp);
 	}
 	else
 	{
 		/* SP <- SP + 2 */
-		UINT16 sp = register_pair_read(cpustate, Z8_REGISTER_SPH) + 2;
-		register_pair_write(cpustate, Z8_REGISTER_SPH, sp);
+		UINT16 sp = register_pair_read(Z8_REGISTER_SPH) + 2;
+		register_pair_write(Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
-		return cpustate->data->read_word(sp);
+		return m_data->read_word(sp);
 	}
 }
 
-INLINE void set_flag(z8_state *cpustate, UINT8 flag, int state)
+void z8_device::set_flag(UINT8 flag, int state)
 {
 	if (state)
-		cpustate->r[Z8_REGISTER_FLAGS] |= flag;
+		m_r[Z8_REGISTER_FLAGS] |= flag;
 	else
-		cpustate->r[Z8_REGISTER_FLAGS] &= ~flag;
+		m_r[Z8_REGISTER_FLAGS] &= ~flag;
 }
 
-#define set_flag_h(state)   set_flag(cpustate, Z8_FLAGS_H, state);
-#define set_flag_d(state)   set_flag(cpustate, Z8_FLAGS_D, state);
-#define set_flag_v(state)   set_flag(cpustate, Z8_FLAGS_V, state);
-#define set_flag_s(state)   set_flag(cpustate, Z8_FLAGS_S, state);
-#define set_flag_z(state)   set_flag(cpustate, Z8_FLAGS_Z, state);
-#define set_flag_c(state)   set_flag(cpustate, Z8_FLAGS_C, state);
+#define set_flag_h(state)   set_flag(Z8_FLAGS_H, state);
+#define set_flag_d(state)   set_flag(Z8_FLAGS_D, state);
+#define set_flag_v(state)   set_flag(Z8_FLAGS_V, state);
+#define set_flag_s(state)   set_flag(Z8_FLAGS_S, state);
+#define set_flag_z(state)   set_flag(Z8_FLAGS_Z, state);
+#define set_flag_c(state)   set_flag(Z8_FLAGS_C, state);
 
 /***************************************************************************
     OPCODE HANDLERS
 ***************************************************************************/
 
-#define INSTRUCTION(mnemonic) INLINE void (mnemonic)(z8_state *cpustate, UINT8 opcode, int *cycles)
+#define INSTRUCTION(mnemonic) void z8_device::mnemonic(UINT8 opcode, int *cycles)
 
 INSTRUCTION( illegal )
 {
-	logerror("Z8: PC = %04x, Illegal opcode = %02x\n", cpustate->pc - 1, opcode);
+	logerror("Z8: PC = %04x, Illegal opcode = %02x\n", m_pc - 1, opcode);
 }
 
 #include "z8ops.c"
@@ -538,97 +548,116 @@ INSTRUCTION( illegal )
     OPCODE TABLES
 ***************************************************************************/
 
-typedef void (*z8_opcode_func) (z8_state *cpustate, UINT8 opcode, int *cycles);
-
-struct z8_opcode_map
+const z8_device::z8_opcode_map z8_device::Z8601_OPCODE_MAP[256] =
 {
-	z8_opcode_func  function;
-	int             execution_cycles;
-	int             pipeline_cycles;
-};
+	{ &z8_device::dec_R1, 6, 5 },   { &z8_device::dec_IR1, 6, 5 },  { &z8_device::add_r1_r2, 10, 5 },   { &z8_device::add_r1_Ir2, 10, 5 },
+	{ &z8_device::add_R2_R1, 10, 5 },   { &z8_device::add_IR2_R1, 10, 5 },  { &z8_device::add_R1_IM, 10, 5 },   { &z8_device::add_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::illegal, 0, 0 },
 
-static const z8_opcode_map Z8601_OPCODE_MAP[] =
-{
-	{ dec_R1, 6, 5 },   { dec_IR1, 6, 5 },  { add_r1_r2, 10, 5 },   { add_r1_Ir2, 10, 5 },  { add_R2_R1, 10, 5 },   { add_IR2_R1, 10, 5 },  { add_R1_IM, 10, 5 },   { add_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
+	{ &z8_device::rlc_R1, 6, 5 },   { &z8_device::rlc_IR1, 6, 5 },  { &z8_device::adc_r1_r2, 6, 5 },    { &z8_device::adc_r1_Ir2, 6, 5 },
+	{ &z8_device::adc_R2_R1, 10, 5 },   { &z8_device::adc_IR2_R1, 10, 5 },  { &z8_device::adc_R1_IM, 10, 5 },   { &z8_device::adc_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::illegal, 0, 0 },
 
-	{ rlc_R1, 6, 5 },   { rlc_IR1, 6, 5 },  { adc_r1_r2, 6, 5 },    { adc_r1_Ir2, 6, 5 },   { adc_R2_R1, 10, 5 },   { adc_IR2_R1, 10, 5 },  { adc_R1_IM, 10, 5 },   { adc_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
+	{ &z8_device::inc_R1, 6, 5 },   { &z8_device::inc_IR1, 6, 5 },  { &z8_device::sub_r1_r2, 6, 5 },    { &z8_device::sub_r1_Ir2, 6, 5 },
+	{ &z8_device::sub_R2_R1, 10, 5 },   { &z8_device::sub_IR2_R1, 10, 5 },  { &z8_device::sub_R1_IM, 10, 5 },   { &z8_device::sub_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::illegal, 0, 0 },
 
-	{ inc_R1, 6, 5 },   { inc_IR1, 6, 5 },  { sub_r1_r2, 6, 5 },    { sub_r1_Ir2, 6, 5 },   { sub_R2_R1, 10, 5 },   { sub_IR2_R1, 10, 5 },  { sub_R1_IM, 10, 5 },   { sub_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
+	{ &z8_device::jp_IRR1, 8, 0 },  { &z8_device::srp_IM, 6, 1 },   { &z8_device::sbc_r1_r2, 6, 5 },    { &z8_device::sbc_r1_Ir2, 6, 5 },
+	{ &z8_device::sbc_R2_R1, 10, 5 },   { &z8_device::sbc_IR2_R1, 10, 5 },  { &z8_device::sbc_R1_IM, 10, 5 },   { &z8_device::sbc_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::illegal, 0, 0 },
 
-	{ jp_IRR1, 8, 0 },  { srp_IM, 6, 1 },   { sbc_r1_r2, 6, 5 },    { sbc_r1_Ir2, 6, 5 },   { sbc_R2_R1, 10, 5 },   { sbc_IR2_R1, 10, 5 },  { sbc_R1_IM, 10, 5 },   { sbc_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
+	{ &z8_device::da_R1, 8, 5 },    { &z8_device::da_IR1, 8, 5 },   { &z8_device::or_r1_r2, 6, 5 },     { &z8_device::or_r1_Ir2, 6, 5 },
+	{ &z8_device::or_R2_R1, 10, 5 },    { &z8_device::or_IR2_R1, 10, 5 },   { &z8_device::or_R1_IM, 10, 5 },    { &z8_device::or_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::illegal, 0, 0 },
 
-	{ da_R1, 8, 5 },    { da_IR1, 8, 5 },   { or_r1_r2, 6, 5 },     { or_r1_Ir2, 6, 5 },    { or_R2_R1, 10, 5 },    { or_IR2_R1, 10, 5 },   { or_R1_IM, 10, 5 },    { or_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
+	{ &z8_device::pop_R1, 10, 5 },  { &z8_device::pop_IR1, 10, 5 }, { &z8_device::and_r1_r2, 6, 5 },    { &z8_device::and_r1_Ir2, 6, 5 },
+	{ &z8_device::and_R2_R1, 10, 5 },   { &z8_device::and_IR2_R1, 10, 5 },  { &z8_device::and_R1_IM, 10, 5 },   { &z8_device::and_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::illegal, 0, 0 },
 
-	{ pop_R1, 10, 5 },  { pop_IR1, 10, 5 }, { and_r1_r2, 6, 5 },    { and_r1_Ir2, 6, 5 },   { and_R2_R1, 10, 5 },   { and_IR2_R1, 10, 5 },  { and_R1_IM, 10, 5 },   { and_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
+	{ &z8_device::com_R1, 6, 5 },   { &z8_device::com_IR1, 6, 5 },  { &z8_device::tcm_r1_r2, 6, 5 },    { &z8_device::tcm_r1_Ir2, 6, 5 },
+	{ &z8_device::tcm_R2_R1, 10, 5 },   { &z8_device::tcm_IR2_R1, 10, 5 },  { &z8_device::tcm_R1_IM, 10, 5 },   { &z8_device::tcm_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::illegal, 0, 0 },
 
-	{ com_R1, 6, 5 },   { com_IR1, 6, 5 },  { tcm_r1_r2, 6, 5 },    { tcm_r1_Ir2, 6, 5 },   { tcm_R2_R1, 10, 5 },   { tcm_IR2_R1, 10, 5 },  { tcm_R1_IM, 10, 5 },   { tcm_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
+	{ &z8_device::push_R2, 10, 1 }, { &z8_device::push_IR2, 12, 1 },{ &z8_device::tm_r1_r2, 6, 5 },     { &z8_device::tm_r1_Ir2, 6, 5 },
+	{ &z8_device::tm_R2_R1, 10, 5 },    { &z8_device::tm_IR2_R1, 10, 5 },   { &z8_device::tm_R1_IM, 10, 5 },    { &z8_device::tm_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::illegal, 0, 0 },
 
-	{ push_R2, 10, 1 }, { push_IR2, 12, 1 },{ tm_r1_r2, 6, 5 },     { tm_r1_Ir2, 6, 5 },    { tm_R2_R1, 10, 5 },    { tm_IR2_R1, 10, 5 },   { tm_R1_IM, 10, 5 },    { tm_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { illegal, 0, 0 },
+	{ &z8_device::decw_RR1, 10, 5 },{ &z8_device::decw_IR1, 10, 5 },{ &z8_device::lde_r1_Irr2, 12, 0 }, { &z8_device::ldei_Ir1_Irr2, 18, 0 },
+	{ &z8_device::illegal, 0, 0 },     { &z8_device::illegal, 0, 0 },      { &z8_device::illegal, 0, 0 },      { &z8_device::illegal, 0, 0 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::di, 6, 1 },
 
-	{ decw_RR1, 10, 5 },{ decw_IR1, 10, 5 },{ lde_r1_Irr2, 12, 0 }, { ldei_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },     { illegal, 0, 0 },      { illegal, 0, 0 },      { illegal, 0, 0 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { di, 6, 1 },
+	{ &z8_device::rl_R1, 6, 5 },    { &z8_device::rl_IR1, 6, 5 },   { &z8_device::lde_r2_Irr1, 12, 0 }, { &z8_device::ldei_Ir2_Irr1, 18, 0 },
+	{ &z8_device::illegal, 0, 0 },     { &z8_device::illegal, 0, 0 },      { &z8_device::illegal, 0, 0 },      { &z8_device::illegal, 0, 0 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::ei, 6, 1 },
 
-	{ rl_R1, 6, 5 },    { rl_IR1, 6, 5 },   { lde_r2_Irr1, 12, 0 }, { ldei_Ir2_Irr1, 18, 0 },{ illegal, 0, 0 },     { illegal, 0, 0 },      { illegal, 0, 0 },      { illegal, 0, 0 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { ei, 6, 1 },
+	{ &z8_device::incw_RR1, 10, 5 },{ &z8_device::incw_IR1, 10, 5 },{ &z8_device::cp_r1_r2, 6, 5 },     { &z8_device::cp_r1_Ir2, 6, 5 },
+	{ &z8_device::cp_R2_R1, 10, 5 },    { &z8_device::cp_IR2_R1, 10, 5 },   { &z8_device::cp_R1_IM, 10, 5 },    { &z8_device::cp_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::ret, 14, 0 },
 
-	{ incw_RR1, 10, 5 },{ incw_IR1, 10, 5 },{ cp_r1_r2, 6, 5 },     { cp_r1_Ir2, 6, 5 },    { cp_R2_R1, 10, 5 },    { cp_IR2_R1, 10, 5 },   { cp_R1_IM, 10, 5 },    { cp_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { ret, 14, 0 },
+	{ &z8_device::clr_R1, 6, 5 },   { &z8_device::clr_IR1, 6, 5 },  { &z8_device::xor_r1_r2, 6, 5 },    { &z8_device::xor_r1_Ir2, 6, 5 },
+	{ &z8_device::xor_R2_R1, 10, 5 },   { &z8_device::xor_IR2_R1, 10, 5 },  { &z8_device::xor_R1_IM, 10, 5 },   { &z8_device::xor_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::iret, 16, 0 },
 
-	{ clr_R1, 6, 5 },   { clr_IR1, 6, 5 },  { xor_r1_r2, 6, 5 },    { xor_r1_Ir2, 6, 5 },   { xor_R2_R1, 10, 5 },   { xor_IR2_R1, 10, 5 },  { xor_R1_IM, 10, 5 },   { xor_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { iret, 16, 0 },
+	{ &z8_device::rrc_R1, 6, 5 },   { &z8_device::rrc_IR1, 6, 5 },  { &z8_device::ldc_r1_Irr2, 12, 0 }, { &z8_device::ldci_Ir1_Irr2, 18, 0 },
+	{ &z8_device::illegal, 0, 0 },     { &z8_device::illegal, 0, 0 },      { &z8_device::illegal, 0, 0 },      { &z8_device::ld_r1_x_R2, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::rcf, 6, 5 },
 
-	{ rrc_R1, 6, 5 },   { rrc_IR1, 6, 5 },  { ldc_r1_Irr2, 12, 0 }, { ldci_Ir1_Irr2, 18, 0 },{ illegal, 0, 0 },     { illegal, 0, 0 },      { illegal, 0, 0 },      { ld_r1_x_R2, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { rcf, 6, 5 },
+	{ &z8_device::sra_R1, 6, 5 },   { &z8_device::sra_IR1, 6, 5 },  { &z8_device::ldc_r2_Irr1, 12, 0 }, { &z8_device::ldci_Ir2_Irr1, 18, 0 },
+	{ &z8_device::call_IRR1, 20, 0 },  { &z8_device::illegal, 0, 0 },      { &z8_device::call_DA, 20, 0 },     { &z8_device::ld_r2_x_R1, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::scf, 6, 5 },
 
-	{ sra_R1, 6, 5 },   { sra_IR1, 6, 5 },  { ldc_r2_Irr1, 12, 0 }, { ldci_Ir2_Irr1, 18, 0 },{ call_IRR1, 20, 0 },  { illegal, 0, 0 },      { call_DA, 20, 0 },     { ld_r2_x_R1, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { scf, 6, 5 },
+	{ &z8_device::rr_R1, 6, 5 },    { &z8_device::rr_IR1, 6, 5 },   { &z8_device::illegal, 0, 0 },      { &z8_device::ld_r1_Ir2, 6, 5 },
+	{ &z8_device::ld_R2_R1, 10, 5 },    { &z8_device::ld_IR2_R1, 10, 5 },   { &z8_device::ld_R1_IM, 10, 5 },    { &z8_device::ld_IR1_IM, 10, 5 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::ccf, 6, 5 },
 
-	{ rr_R1, 6, 5 },    { rr_IR1, 6, 5 },   { illegal, 0, 0 },      { ld_r1_Ir2, 6, 5 },    { ld_R2_R1, 10, 5 },    { ld_IR2_R1, 10, 5 },   { ld_R1_IM, 10, 5 },    { ld_IR1_IM, 10, 5 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { ccf, 6, 5 },
-
-	{ swap_R1, 8, 5 },  { swap_IR1, 8, 5 }, { illegal, 0, 0 },      { ld_Ir1_r2, 6, 5 },    { illegal, 0, 0 },      { ld_R2_IR1, 10, 5 },   { illegal, 0, 0 },      { illegal, 0, 0 },
-	{ ld_r1_R2, 6, 5 }, { ld_r2_R1, 6, 5 }, { djnz_r1_RA, 10, 5 },  { jr_cc_RA, 10, 0 },    { ld_r1_IM, 6, 5 },     { jp_cc_DA, 10, 0 },    { inc_r1, 6, 5 },       { nop, 6, 0 },
+	{ &z8_device::swap_R1, 8, 5 },  { &z8_device::swap_IR1, 8, 5 }, { &z8_device::illegal, 0, 0 },      { &z8_device::ld_Ir1_r2, 6, 5 },
+	{ &z8_device::illegal, 0, 0 },      { &z8_device::ld_R2_IR1, 10, 5 },   { &z8_device::illegal, 0, 0 },      { &z8_device::illegal, 0, 0 },
+	{ &z8_device::ld_r1_R2, 6, 5 }, { &z8_device::ld_r2_R1, 6, 5 }, { &z8_device::djnz_r1_RA, 10, 5 },  { &z8_device::jr_cc_RA, 10, 0 },
+	{ &z8_device::ld_r1_IM, 6, 5 },     { &z8_device::jp_cc_DA, 10, 0 },    { &z8_device::inc_r1, 6, 5 },       { &z8_device::nop, 6, 0 }
 };
 
 /***************************************************************************
     TIMER CALLBACKS
 ***************************************************************************/
 
-static TIMER_CALLBACK( t0_tick )
+TIMER_CALLBACK_MEMBER( z8_device::t0_tick )
 {
-	z8_state *cpustate = (z8_state *)ptr;
+	m_t0--;
 
-	cpustate->t0--;
-
-	if (cpustate->t0 == 0)
+	if (m_t0 == 0)
 	{
-		cpustate->t0 = T0;
-		cpustate->t0_timer->adjust(attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE0 >> 2) + 1)));
-		cpustate->t0_timer->enable(PRE0 & Z8_PRE0_COUNT_MODULO_N);
-		cpustate->irq[4] = ASSERT_LINE;
+		m_t0 = T0;
+		m_t0_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock / 2 / 4 / ((PRE0 >> 2) + 1)));
+		m_t0_timer->enable(PRE0 & Z8_PRE0_COUNT_MODULO_N);
+		m_irq[4] = ASSERT_LINE;
 	}
 }
 
-static TIMER_CALLBACK( t1_tick )
+TIMER_CALLBACK_MEMBER( z8_device::t1_tick )
 {
-	z8_state *cpustate = (z8_state *)ptr;
+	m_t1--;
 
-	cpustate->t1--;
-
-	if (cpustate->t1 == 0)
+	if (m_t1 == 0)
 	{
-		cpustate->t1 = T1;
-		cpustate->t1_timer->adjust(attotime::zero, 0, attotime::from_hz(cpustate->clock / 2 / 4 / ((PRE1 >> 2) + 1)));
-		cpustate->t1_timer->enable(PRE1 & Z8_PRE0_COUNT_MODULO_N);
-		cpustate->irq[5] = ASSERT_LINE;
+		m_t1 = T1;
+		m_t1_timer->adjust(attotime::zero, 0, attotime::from_hz(m_clock / 2 / 4 / ((PRE1 >> 2) + 1)));
+		m_t1_timer->enable(PRE1 & Z8_PRE0_COUNT_MODULO_N);
+		m_irq[5] = ASSERT_LINE;
 	}
 }
 
@@ -636,128 +665,123 @@ static TIMER_CALLBACK( t1_tick )
     INITIALIZATION
 ***************************************************************************/
 
-static CPU_INIT( z8 )
+void z8_device::device_start()
 {
-	z8_state *cpustate = get_safe_token(device);
-
 	/* set up the state table */
 	{
-		device_state_interface *state;
-		device->interface(state);
-		state->state_add(Z8_PC,         "PC",        cpustate->pc);
-		state->state_add(STATE_GENPC,   "GENPC",     cpustate->pc).noshow();
-		state->state_add(Z8_SP,         "SP",        cpustate->fake_sp).callimport().callexport();
-		state->state_add(STATE_GENSP,   "GENSP",     cpustate->fake_sp).callimport().callexport().noshow();
-		state->state_add(Z8_RP,         "RP",        cpustate->r[Z8_REGISTER_RP]);
-		state->state_add(Z8_T0,         "T0",        cpustate->t0);
-		state->state_add(Z8_T1,         "T1",        cpustate->t1);
-		state->state_add(STATE_GENFLAGS, "GENFLAGS", cpustate->r[Z8_REGISTER_FLAGS]).noshow().formatstr("%6s");
+		state_add(Z8_PC,         "PC",        m_pc);
+		state_add(STATE_GENPC,   "GENPC",     m_pc).noshow();
+		state_add(Z8_SP,         "SP",        m_fake_sp).callimport().callexport();
+		state_add(STATE_GENSP,   "GENSP",     m_fake_sp).callimport().callexport().noshow();
+		state_add(Z8_RP,         "RP",        m_r[Z8_REGISTER_RP]);
+		state_add(Z8_T0,         "T0",        m_t0);
+		state_add(Z8_T1,         "T1",        m_t1);
+		state_add(STATE_GENFLAGS, "GENFLAGS", m_r[Z8_REGISTER_FLAGS]).noshow().formatstr("%6s");
 
 		astring tempstr;
 		for (int regnum = 0; regnum < 16; regnum++)
-			state->state_add(Z8_R0 + regnum, tempstr.format("R%d", regnum), cpustate->fake_r[regnum]).callimport().callexport();
+			state_add(Z8_R0 + regnum, tempstr.format("R%d", regnum), m_fake_r[regnum]).callimport().callexport();
 	}
 
-	cpustate->clock = device->clock();
-
 	/* find address spaces */
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->data = &device->space(AS_DATA);
-	cpustate->io = &device->space(AS_IO);
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_data = &space(AS_DATA);
+	m_io = &space(AS_IO);
 
 	/* allocate timers */
-	cpustate->t0_timer = device->machine().scheduler().timer_alloc(FUNC(t0_tick), cpustate);
-	cpustate->t1_timer = device->machine().scheduler().timer_alloc(FUNC(t1_tick), cpustate);
+	m_t0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::t0_tick), this));
+	m_t1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::t1_tick), this));
+
+	/* Clear state */
+	for ( int i = 0; i < 6; i++ )
+		m_irq[i] = 0;
+	for ( int i = 0; i < 256; i++ )
+		m_r[i] = 0;
+	for ( int i = 0; i < 4; i++ )
+	{
+		m_input[i] = 0;
+		m_output[i] = 0;
+	}
+	for ( int i = 0; i < 16; i++ )
+		m_fake_r[i] = 0;
+	m_fake_sp = 0;
+	m_t0 = 0;
+	m_t1 = 0;
 
 	/* register for state saving */
-	device->save_item(NAME(cpustate->pc));
-	device->save_item(NAME(cpustate->r));
-	device->save_item(NAME(cpustate->input));
-	device->save_item(NAME(cpustate->output));
-	device->save_item(NAME(cpustate->irq));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_r));
+	save_item(NAME(m_input));
+	save_item(NAME(m_output));
+	save_item(NAME(m_irq));
+
+	m_icountptr = &m_icount;
 }
 
 /***************************************************************************
     EXECUTION
 ***************************************************************************/
 
-static CPU_EXECUTE( z8 )
+void z8_device::execute_run()
 {
-	z8_state *cpustate = get_safe_token(device);
-
 	do
 	{
 		UINT8 opcode;
 		int cycles;
 
-		debugger_instruction_hook(device, cpustate->pc);
+		debugger_instruction_hook(this, m_pc);
 
 		/* TODO: sample interrupts */
-		cpustate->input[3] = cpustate->io->read_byte(3);
+		m_input[3] = m_io->read_byte(3);
 
 		/* fetch opcode */
-		opcode = fetch(cpustate);
+		opcode = fetch();
 		cycles = Z8601_OPCODE_MAP[opcode].execution_cycles;
 
 		/* execute instruction */
-		(*(Z8601_OPCODE_MAP[opcode].function))(cpustate, opcode, &cycles);
+		(this->*(Z8601_OPCODE_MAP[opcode].function))(opcode, &cycles);
 
-		cpustate->icount -= cycles;
+		m_icount -= cycles;
 	}
-	while (cpustate->icount > 0);
+	while (m_icount > 0);
 }
 
 /***************************************************************************
     RESET
 ***************************************************************************/
 
-static CPU_RESET( z8 )
+void z8_device::device_reset()
 {
-	z8_state *cpustate = get_safe_token(device);
+	m_pc = 0x000c;
 
-	cpustate->pc = 0x000c;
-
-	register_write(cpustate, Z8_REGISTER_TMR, 0x00);
-	register_write(cpustate, Z8_REGISTER_PRE1, register_read(cpustate, Z8_REGISTER_PRE1) & 0xfc);
-	register_write(cpustate, Z8_REGISTER_PRE0, register_read(cpustate, Z8_REGISTER_PRE0) & 0xfe);
-	register_write(cpustate, Z8_REGISTER_P2M, 0xff);
-	register_write(cpustate, Z8_REGISTER_P3M, 0x00);
-	register_write(cpustate, Z8_REGISTER_P01M, 0x4d);
-	register_write(cpustate, Z8_REGISTER_IRQ, 0x00);
-	register_write(cpustate, Z8_REGISTER_RP, 0x00);
+	register_write(Z8_REGISTER_TMR, 0x00);
+	register_write(Z8_REGISTER_PRE1, register_read(Z8_REGISTER_PRE1) & 0xfc);
+	register_write(Z8_REGISTER_PRE0, register_read(Z8_REGISTER_PRE0) & 0xfe);
+	register_write(Z8_REGISTER_P2M, 0xff);
+	register_write(Z8_REGISTER_P3M, 0x00);
+	register_write(Z8_REGISTER_P01M, 0x4d);
+	register_write(Z8_REGISTER_IRQ, 0x00);
+	register_write(Z8_REGISTER_RP, 0x00);
 }
 
-/***************************************************************************
-    ADDRESS MAPS
-***************************************************************************/
-
-static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, legacy_cpu_device )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8, legacy_cpu_device )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
 
 /**************************************************************************
  * STATE IMPORT/EXPORT
  **************************************************************************/
 
-static CPU_IMPORT_STATE( z8 )
+void z8_device::state_import(const device_state_entry &entry)
 {
-	z8_state *cpustate = get_safe_token(device);
-
 	switch (entry.index())
 	{
 		case Z8_SP:
 		case Z8_GENSP:
-			cpustate->r[Z8_REGISTER_SPH] = cpustate->fake_sp >> 8;
-			cpustate->r[Z8_REGISTER_SPL] = cpustate->fake_sp & 0xff;
+			m_r[Z8_REGISTER_SPH] = m_fake_sp >> 8;
+			m_r[Z8_REGISTER_SPL] = m_fake_sp & 0xff;
 			break;
 
 		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
-			cpustate->r[cpustate->r[Z8_REGISTER_RP] + (entry.index() - Z8_R0)] = cpustate->fake_r[entry.index() - Z8_R0];
+			m_r[m_r[Z8_REGISTER_RP] + (entry.index() - Z8_R0)] = m_fake_r[entry.index() - Z8_R0];
 			break;
 
 		default:
@@ -766,19 +790,17 @@ static CPU_IMPORT_STATE( z8 )
 	}
 }
 
-static CPU_EXPORT_STATE( z8 )
+void z8_device::state_export(const device_state_entry &entry)
 {
-	z8_state *cpustate = get_safe_token(device);
-
 	switch (entry.index())
 	{
 		case Z8_SP:
 		case Z8_GENSP:
-			cpustate->fake_sp = (cpustate->r[Z8_REGISTER_SPH] << 8) | cpustate->r[Z8_REGISTER_SPL];
+			m_fake_sp = (m_r[Z8_REGISTER_SPH] << 8) | m_r[Z8_REGISTER_SPL];
 			break;
 
 		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
-			cpustate->fake_r[entry.index() - Z8_R0] = cpustate->r[cpustate->r[Z8_REGISTER_RP] + (entry.index() - Z8_R0)];
+			m_fake_r[entry.index() - Z8_R0] = m_r[m_r[Z8_REGISTER_RP] + (entry.index() - Z8_R0)];
 			break;
 
 		default:
@@ -787,139 +809,41 @@ static CPU_EXPORT_STATE( z8 )
 	}
 }
 
-static CPU_EXPORT_STRING( z8 )
+void z8_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	z8_state *cpustate = get_safe_token(device);
-
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS: string.printf("%c%c%c%c%c%c",
-										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_C ? 'C' : '.',
-										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_Z ? 'Z' : '.',
-										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_S ? 'S' : '.',
-										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_V ? 'V' : '.',
-										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_D ? 'D' : '.',
-										cpustate->r[Z8_REGISTER_FLAGS] & Z8_FLAGS_H ? 'H' : '.');   break;
+										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_C ? 'C' : '.',
+										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_Z ? 'Z' : '.',
+										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_S ? 'S' : '.',
+										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_V ? 'V' : '.',
+										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_D ? 'D' : '.',
+										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_H ? 'H' : '.');   break;
 	}
 }
 
-/***************************************************************************
-    GENERAL CONTEXT ACCESS
-***************************************************************************/
 
-static CPU_SET_INFO( z8 )
+void z8_device::execute_set_input(int inputnum, int state)
 {
-	z8_state *cpustate = get_safe_token(device);
-
-	switch (state)
+	switch ( inputnum )
 	{
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0: cpustate->irq[0] = info->i;             break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ1: cpustate->irq[1] = info->i;             break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ2: cpustate->irq[2] = info->i;             break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ3: cpustate->irq[3] = info->i;             break;
+		case INPUT_LINE_IRQ0:
+			m_irq[0] = state;
+			break;
+
+		case INPUT_LINE_IRQ1:
+			m_irq[1] = state;
+			break;
+
+		case INPUT_LINE_IRQ2:
+			m_irq[2] = state;
+			break;
+
+		case INPUT_LINE_IRQ3:
+			m_irq[3] = state;
+			break;
+
 	}
 }
 
-static CPU_GET_INFO( z8 )
-{
-	z8_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(z8_state);             break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 4;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 2;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 3;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 6;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 20;                           break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:            info->i = 16;                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:            info->i = 0;                            break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:           info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:           info->i = 16;                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:           info->i = 0;                            break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 2;                            break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                            break;
-
-		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(z8);          break;
-		case CPUINFO_FCT_INIT:                  info->init = CPU_INIT_NAME(z8);                 break;
-		case CPUINFO_FCT_RESET:                 info->reset = CPU_RESET_NAME(z8);               break;
-		case CPUINFO_FCT_EXECUTE:               info->execute = CPU_EXECUTE_NAME(z8);           break;
-		case CPUINFO_FCT_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(z8);   break;
-		case CPUINFO_FCT_IMPORT_STATE:          info->import_state = CPU_IMPORT_STATE_NAME(z8); break;
-		case CPUINFO_FCT_EXPORT_STATE:          info->export_state = CPU_EXPORT_STATE_NAME(z8); break;
-		case CPUINFO_FCT_EXPORT_STRING:         info->export_string = CPU_EXPORT_STRING_NAME(z8);   break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &cpustate->icount;               break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8");                  break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z8");                  break;
-		case CPUINFO_STR_FAMILY:                        strcpy(info->s, "Zilog Z8");            break;
-		case CPUINFO_STR_VERSION:                       strcpy(info->s, "1.0");                 break;
-		case CPUINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                       strcpy(info->s, "Copyright MESS Team"); break;
-	}
-}
-
-/***************************************************************************
-    CPU-SPECIFIC CONTEXT ACCESS
-***************************************************************************/
-
-CPU_GET_INFO( z8601 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);    break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8601");                               break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z8601");                               break;
-
-		default:                                        CPU_GET_INFO_CALL(z8);                                  break;
-	}
-}
-
-CPU_GET_INFO( ub8830d )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);    break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "UB8830D");                             break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "ub8830d");                             break;
-
-		default:                                        CPU_GET_INFO_CALL(z8);                                  break;
-	}
-}
-
-CPU_GET_INFO( z8611 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:  info->internal_map8 = ADDRESS_MAP_NAME(program_4kb);    break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z8611");                               break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z8611");                               break;
-
-		default:                                        CPU_GET_INFO_CALL(z8);                                  break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(Z8601, z8601);
-DEFINE_LEGACY_CPU_DEVICE(UB8830D, ub8830d);
-DEFINE_LEGACY_CPU_DEVICE(Z8611, z8611);
