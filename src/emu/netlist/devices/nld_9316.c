@@ -48,6 +48,9 @@ NETLIB_START(9316_sub)
     register_output("QD", m_QD);
     register_output("RC", m_RC);
 
+    save(NAME(m_cnt));
+    save(NAME(m_loadq));
+    save(NAME(m_ent));
 }
 
 NETLIB_UPDATE(9316_sub)

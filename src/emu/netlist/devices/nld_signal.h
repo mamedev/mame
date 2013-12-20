@@ -43,6 +43,7 @@ public:
 			register_input(sIN[i], m_i[i], netlist_input_t::STATE_INP_ACTIVE);
 		}
 		m_Q.initial(1);
+		save(NAME(m_active));
 	}
 
 #if (USE_DEACTIVE_DEVICE)
@@ -69,7 +70,7 @@ public:
 public:
 	netlist_ttl_input_t m_i[_numdev];
 	netlist_ttl_output_t m_Q;
-	INT8 m_active;
+	INT32 m_active;
 };
 
 
@@ -92,6 +93,7 @@ public:
 		{
 			register_input(sIN[i], m_i[i]);
 		}
+        save(NAME(m_active));
 	}
 
 	#if (USE_DEACTIVE_DEVICE)
@@ -142,7 +144,7 @@ public:
 public:
 	netlist_ttl_input_t m_i[_numdev];
 	netlist_ttl_output_t m_Q;
-	INT8 m_active;
+	INT32 m_active;
 };
 
 #if 1
@@ -165,6 +167,7 @@ public:
 		{
 			register_input(sIN[i], m_i[i], netlist_input_t::STATE_INP_ACTIVE);
 		}
+        save(NAME(m_active));
 	}
 
 	#if (USE_DEACTIVE_DEVICE)
@@ -214,7 +217,7 @@ public:
 public:
 	netlist_ttl_input_t m_i[2];
 	netlist_ttl_output_t m_Q;
-	INT8 m_active;
+	INT32 m_active;
 
 };
 #endif

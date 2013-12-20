@@ -29,6 +29,7 @@ ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const pstring &
 {
     m_netlist = &nl;
     m_name = aname;
+    save_register();
 }
 
 ATTR_COLD const pstring &netlist_object_t::name() const
@@ -36,6 +37,23 @@ ATTR_COLD const pstring &netlist_object_t::name() const
     if (m_name == "")
         netlist().xfatalerror("object not initialized");
     return m_name;
+}
+
+ATTR_COLD void netlist_object_t::save_state_ptr(const pstring &stname, const netlist_data_type_e dt, const int size, void *ptr)
+{
+    pstring fullname = name() + "." + stname;
+    // do nothing for now;
+    ATTR_UNUSED  pstring ts[] = {
+            "NOT_SUPPORTED",
+            "DT_DOUBLE",
+            "DT_INT64",
+            "DT_INT8",
+            "DT_INT",
+            "DT_BOOLEAN"
+    };
+
+    NL_VERBOSE_OUT(("SAVE: <%s> %s(%d) %p\n", fullname.cstr(), ts[dt].cstr(), size, ptr));
+    netlist().setup().save_state_ptr(fullname, dt, size, ptr);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -61,7 +79,8 @@ ATTR_COLD void netlist_owned_object_t::init_object(netlist_core_device_t &dev,
 // ----------------------------------------------------------------------------------------
 
 netlist_base_t::netlist_base_t()
-    :   m_time_ps(netlist_time::zero),
+    :   netlist_object_t(NETLIST, GENERIC),
+        m_time_ps(netlist_time::zero),
         m_rem(0),
         m_div(NETLIST_DIV),
         m_mainclock(NULL),
@@ -82,7 +101,28 @@ static void tagmap_free_entries(T &tm)
 netlist_base_t::~netlist_base_t()
 {
     tagmap_free_entries<tagmap_devices_t>(m_devices);
+
+    netlist_net_t::list_t::entry_t *p = m_nets.first();
+    while (p != NULL)
+    {
+        netlist_net_t::list_t::entry_t *pn = m_nets.next(p);
+        if (!p->object()->isRailNet())
+            delete p->object();
+        p = pn;
+    }
+
+    m_nets.reset();
     pstring::resetmem();
+}
+
+ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
+{
+    for (netlist_net_t::list_t::entry_t *p = m_nets.first(); p != NULL; p = m_nets.next(p))
+    {
+        if (p->object()->name() == name)
+            return p->object();
+    }
+    return NULL;
 }
 
 ATTR_COLD void netlist_base_t::set_mainclock_dev(NETLIB_NAME(mainclock) *dev)
@@ -339,6 +379,7 @@ ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_inp
     setup().register_object(*this, *this, name, inp, type);
 }
 
+//FIXME: Get rid of this
 static void init_term(netlist_core_device_t &dev, netlist_core_terminal_t &term, netlist_input_t::state_e aState)
 {
     if (!term.isInitalized())
@@ -346,13 +387,13 @@ static void init_term(netlist_core_device_t &dev, netlist_core_terminal_t &term,
         switch (term.type())
         {
             case netlist_terminal_t::OUTPUT:
-                dynamic_cast<netlist_output_t &>(term).init_object(dev, "internal output");
+                dynamic_cast<netlist_output_t &>(term).init_object(dev, dev.name() + ".INTOUT");
                 break;
             case netlist_terminal_t::INPUT:
-                dynamic_cast<netlist_input_t &>(term).init_object(dev, "internal input", aState);
+                dynamic_cast<netlist_input_t &>(term).init_object(dev, dev.name() + ".INTINP", aState);
                 break;
             case netlist_terminal_t::TERMINAL:
-                dynamic_cast<netlist_terminal_t &>(term).init_object(dev, "internal terminal", aState);
+                dynamic_cast<netlist_terminal_t &>(term).init_object(dev, dev.name() + ".INTTERM", aState);
                 break;
             default:
                 dev.netlist().xfatalerror("Unknown terminal type");
@@ -362,6 +403,7 @@ static void init_term(netlist_core_device_t &dev, netlist_core_terminal_t &term,
 }
 
 // FIXME: Revise internal links ...
+//FIXME: Get rid of this
 ATTR_COLD void netlist_device_t::register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, const netlist_input_t::state_e aState)
 {
     init_term(dev, in, aState);
@@ -377,9 +419,11 @@ ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, net
 template <class C, class T>
 ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, C &param, const T initialVal)
 {
-    param.init_object(dev, sname);
+    pstring fullname = dev.name() + "." + sname;
+    param.init_object(dev, fullname);
     param.initial(initialVal);
-    setup().register_object(*this, *this, sname, param, netlist_terminal_t::STATE_NONEX);
+    //FIXME: pass fullname from above
+    setup().register_object(*this, *this, fullname, param, netlist_terminal_t::STATE_NONEX);
 }
 
 template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_double_t &param, const double initialVal);
@@ -404,6 +448,12 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
     , m_railterminal(NULL)
 {
 };
+
+ATTR_COLD void netlist_net_t::init_object(netlist_base_t &nl, const pstring &aname)
+{
+    netlist_object_t::init_object(nl, aname);
+    nl.m_nets.add(this);
+}
 
 ATTR_COLD void netlist_net_t::register_railterminal(netlist_output_t &mr)
 {
@@ -551,7 +601,7 @@ netlist_output_t::netlist_output_t(const type_t atype, const family_t afamily)
 ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const pstring &aname)
 {
     netlist_core_terminal_t::init_object(dev, aname, STATE_OUT);
-    net().init_object(dev.netlist(), aname);
+    net().init_object(dev.netlist(), aname + ".net");
     net().register_railterminal(*this);
 }
 

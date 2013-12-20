@@ -24,6 +24,8 @@ NETLIB_START(7483)
     register_output("SC", m_SC);
     register_output("SD", m_SD);
     register_output("C4", m_C4);
+
+    save(NAME(m_lastr));
 }
 
 NETLIB_UPDATE(7483)

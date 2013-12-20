@@ -187,6 +187,8 @@ static bool already_processed(net_groups_t groups, int &cur_group, netlist_net_t
 static void process_net(net_groups_t groups, int &cur_group, netlist_net_t *net)
 {
     /* add the net */
+    if (net->m_head == NULL)
+        return;
     groups[cur_group].add(net);
     for (netlist_core_terminal_t *p = net->m_head; p != NULL; p = p->m_update_list_next)
     {
@@ -216,9 +218,17 @@ NETLIB_START(solver)
     register_param("ACCURACY", m_accuracy, 1e-3);
     register_param("CONVERG", m_convergence, 0.3);
 
-    register_link_internal(m_fb_sync, m_Q_sync, netlist_input_t::STATE_INP_ACTIVE);
-    register_link_internal(m_fb_step, m_Q_step, netlist_input_t::STATE_INP_ACTIVE);
+    // internal staff
+
+    register_input("FB_sync", m_fb_sync, netlist_input_t::STATE_INP_ACTIVE);
+    register_input("FB_step", m_fb_step, netlist_input_t::STATE_INP_ACTIVE);
+
+    setup().connect(m_fb_sync, m_Q_sync);
+    setup().connect(m_fb_step, m_Q_step);
+
     m_last_step = netlist_time::zero;
+
+    save(NAME(m_last_step));
 
 }
 
@@ -237,13 +247,6 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
         e = en;
     }
 
-    netlist_net_t::list_t::entry_t *p = m_nets.first();
-    while (p != NULL)
-    {
-        netlist_net_t::list_t::entry_t *pn = m_nets.next(p);
-        delete p->object();
-        p = pn;
-    }
 }
 
 NETLIB_FUNC_VOID(solver, post_start, ())
@@ -251,24 +254,9 @@ NETLIB_FUNC_VOID(solver, post_start, ())
     netlist_net_t::list_t groups[100];
     int cur_group = -1;
 
-    NL_VERBOSE_OUT(("post start solver ...\n"));
-
-    // delete empty nets ...
-    for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
-    {
-        if (pn->object()->m_head == NULL)
-        {
-            NL_VERBOSE_OUT(("Deleting net ...\n"));
-            netlist_net_t *to_delete = pn->object();
-            m_nets.remove(to_delete);
-            delete to_delete;
-            pn--;
-        }
-    }
-
     SOLVER_VERBOSE_OUT(("Scanning net groups ...\n"));
     // determine net groups
-    for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+    for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
     {
         if (!already_processed(groups, cur_group, pn->object()))
         {

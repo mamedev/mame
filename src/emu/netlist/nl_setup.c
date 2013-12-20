@@ -33,6 +33,10 @@ netlist_setup_t::netlist_setup_t(netlist_base_t &netlist)
     , m_proxy_cnt(0)
 {
     netlist.set_setup(this);
+}
+
+void netlist_setup_t::init()
+{
     m_factory.initialize();
     NETLIST_NAME(base)(*this);
 }
@@ -45,6 +49,7 @@ netlist_setup_t::~netlist_setup_t()
 	m_params.reset();
 	m_terminals.reset();
 	m_params_temp.reset();
+	m_save.reset_and_free();
 
 	netlist().set_setup(NULL);
 
@@ -132,6 +137,9 @@ pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in)
         case netlist_terminal_t::DEVICE:
             return "DEVICE";
             break;
+        case netlist_terminal_t::NETLIST:
+            return "NETLIST";
+            break;
     }
     // FIXME: noreturn
     netlist().xfatalerror("Unknown object type %d\n", in.type());
@@ -161,10 +169,8 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
             break;
         case netlist_terminal_t::PARAM:
             {
-
                 netlist_param_t &param = dynamic_cast<netlist_param_t &>(obj);
-                pstring temp = param.netdev().name() + "." + name;
-                const pstring val = m_params_temp.find(temp);
+                const pstring val = m_params_temp.find(name);
                 if (val != "")
                 {
                     switch (param.param_type())
@@ -174,17 +180,17 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
                             NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", temp.cstr(), val->cstr()));
                             double vald = 0;
                             if (sscanf(val.cstr(), "%lf", &vald) != 1)
-                                netlist().xfatalerror("Invalid number conversion %s : %s\n", temp.cstr(), val.cstr());
+                                netlist().xfatalerror("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
                             dynamic_cast<netlist_param_double_t &>(param).initial(vald);
                         }
                         break;
                         case netlist_param_t::INTEGER:
                         case netlist_param_t::LOGIC:
                         {
-                            NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", temp.cstr(), val->cstr()));
+                            NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val->cstr()));
                             int vald = 0;
                             if (sscanf(val.cstr(), "%d", &vald) != 1)
-                                netlist().xfatalerror("Invalid number conversion %s : %s\n", temp.cstr(), val.cstr());
+                                netlist().xfatalerror("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
                             dynamic_cast<netlist_param_int_t &>(param).initial(vald);
                         }
                         break;
@@ -213,14 +219,18 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
                         }
                         break;
                         default:
-                            netlist().xfatalerror("Parameter is not supported %s : %s\n", temp.cstr(), val.cstr());
+                            netlist().xfatalerror("Parameter is not supported %s : %s\n", name.cstr(), val.cstr());
                     }
                 }
-                if (!(m_params.add(temp, &param, false)==TMERR_NONE))
+                if (!(m_params.add(name, &param, false)==TMERR_NONE))
                     netlist().xfatalerror("Error adding parameter %s to parameter list\n", name.cstr());
             }
             break;
         case netlist_terminal_t::DEVICE:
+            netlist().xfatalerror("Device registration not yet supported - \n", name.cstr());
+            break;
+        case netlist_terminal_t::NETLIST:
+            netlist().xfatalerror("Netlist registration not yet supported - \n", name.cstr());
             break;
     }
 }
@@ -462,9 +472,9 @@ void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_cor
         NL_VERBOSE_OUT(("adding net ...\n"));
         netlist_net_t *anet =  new netlist_net_t(netlist_object_t::NET, netlist_object_t::ANALOG);
         t1.set_net(*anet);
-        m_netlist.solver()->m_nets.add(anet);
+        //m_netlist.solver()->m_nets.add(anet);
         // FIXME: Nets should have a unique name
-        t1.net().init_object(netlist(),"some net");
+        t1.net().init_object(netlist(),"net." + t1.name() );
         t1.net().register_con(t2);
         t1.net().register_con(t1);
     }
@@ -533,6 +543,23 @@ void netlist_setup_t::resolve_inputs()
             //VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
     }
 
+#if 0
+    NL_VERBOSE_OUT(("deleting empty nets ...\n"));
+
+    // delete empty nets ...
+    for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+    {
+        if (pn->object()->m_head == NULL)
+        {
+            NL_VERBOSE_OUT(("Deleting net ...\n"));
+            netlist_net_t *to_delete = pn->object();
+            netlist().m_nets.remove(to_delete);
+            if (!to_delete->isRailNet())
+                delete to_delete;
+            pn--;
+        }
+    }
+#endif
     if (m_netlist.solver() != NULL)
         m_netlist.solver()->post_start();
 
@@ -578,6 +605,7 @@ void netlist_setup_t::start_devices()
         netlist_device_t *dev = entry->object();
         dev->init(netlist(), entry->tag().cstr());
     }
+
 }
 
 void netlist_setup_t::parse(const char *buf)

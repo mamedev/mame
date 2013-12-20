@@ -118,6 +118,8 @@ NETLIB_START(nic7448_sub)
     register_output("e", m_e);
     register_output("f", m_f);
     register_output("g", m_g);
+
+    save(NAME(m_state));
 }
 
 NETLIB_UPDATE(nic7448_sub)
@@ -225,6 +227,10 @@ NETLIB_START(nic74107Asub)
 
     m_Q.initial(0);
     m_QQ.initial(1);
+
+    save(NAME(m_Q1));
+    save(NAME(m_Q2));
+    save(NAME(m_F));
 }
 
 NETLIB_START(nic74107A)

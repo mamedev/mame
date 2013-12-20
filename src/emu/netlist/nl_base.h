@@ -247,6 +247,33 @@ class NETLIB_NAME(solver);
 class NETLIB_NAME(mainclock);
 
 // ----------------------------------------------------------------------------------------
+// state saving ...
+// ----------------------------------------------------------------------------------------
+
+enum netlist_data_type_e {
+    NOT_SUPPORTED,
+    DT_DOUBLE,
+    DT_INT64,
+    DT_INT8,
+    DT_INT,
+    DT_BOOLEAN
+};
+
+template<typename _ItemType> struct nl_datatype { static const netlist_data_type_e type = netlist_data_type_e(NOT_SUPPORTED); };
+//template<typename _ItemType> struct type_checker<_ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
+
+#define NETLIST_SAVE_TYPE(TYPE, TYPEDESC) template<> struct nl_datatype<TYPE>{ static const netlist_data_type_e type = netlist_data_type_e(TYPEDESC); }
+
+NETLIST_SAVE_TYPE(double, DT_DOUBLE);
+NETLIST_SAVE_TYPE(INT8, DT_INT8);
+NETLIST_SAVE_TYPE(UINT8, DT_INT8);
+NETLIST_SAVE_TYPE(INT64, DT_INT64);
+NETLIST_SAVE_TYPE(UINT64, DT_INT64);
+NETLIST_SAVE_TYPE(bool, DT_BOOLEAN);
+NETLIST_SAVE_TYPE(UINT32, DT_INT);
+NETLIST_SAVE_TYPE(INT32, DT_INT);
+
+// ----------------------------------------------------------------------------------------
 // netlist_object_t
 // ----------------------------------------------------------------------------------------
 
@@ -261,6 +288,7 @@ public:
 		PARAM    = 3,
 		NET      = 4,
         DEVICE   = 5,
+        NETLIST   = 6,
 	};
     enum family_t {
         // Terminal families
@@ -285,6 +313,12 @@ public:
 
     ATTR_COLD const pstring &name() const;
 
+    ATTR_COLD void save_state_ptr(const pstring &stname, const netlist_data_type_e, const int size, void *ptr);
+    template<class C> ATTR_COLD void save(C &state, const pstring &stname)
+    {
+        save_state_ptr(stname, nl_datatype<C>::type, sizeof(C), &state);
+    }
+
 	ATTR_HOT inline const type_t type() const { return m_objtype; }
     ATTR_HOT inline const family_t family() const { return m_family; }
 
@@ -294,12 +328,22 @@ public:
     ATTR_HOT inline netlist_base_t & RESTRICT netlist() { return *m_netlist; }
     ATTR_HOT inline const netlist_base_t & RESTRICT netlist() const { return *m_netlist; }
 
+protected:
+
+    // must call parent save_register !
+    ATTR_COLD virtual void save_register() { };
+
 private:
     pstring m_name;
 	const type_t m_objtype;
     const family_t m_family;
     netlist_base_t * RESTRICT m_netlist;
 };
+
+template<> ATTR_COLD inline void netlist_object_t::save(netlist_time &state, const pstring &stname)
+{
+    save_state_ptr(stname, DT_INT64, sizeof(netlist_time::INTERNALTYPE), state.get_internaltype_ptr());
+}
 
 // ----------------------------------------------------------------------------------------
 // netlist_owned_object_t
@@ -338,6 +382,7 @@ public:
         STATE_NONEX = 256
     };
 
+
 	ATTR_COLD netlist_core_terminal_t(const type_t atype, const family_t afamily);
 
 	ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname, const state_e astate);
@@ -357,10 +402,16 @@ public:
 
     netlist_core_terminal_t *m_update_list_next;
 
+protected:
+    ATTR_COLD virtual void save_register() { save(NAME(m_state)); netlist_owned_object_t::save_register(); }
+
 private:
     netlist_net_t * RESTRICT m_net;
     state_e m_state;
 };
+
+NETLIST_SAVE_TYPE(netlist_core_terminal_t::state_e, DT_INT);
+
 
 class netlist_terminal_t : public netlist_core_terminal_t
 {
@@ -394,6 +445,16 @@ public:
 
 
     netlist_terminal_t *m_otherterm;
+
+protected:
+    ATTR_COLD virtual void save_register()
+    {
+        save(NAME(m_Idr));
+        save(NAME(m_go));
+        save(NAME(m_gt));
+        netlist_core_terminal_t::save_register();
+    }
+
 };
 
 
@@ -502,6 +563,7 @@ public:
     };
 
     ATTR_COLD netlist_net_t(const type_t atype, const family_t afamily);
+    ATTR_COLD void init_object(netlist_base_t &nl, const pstring &aname);
 
     ATTR_COLD void register_con(netlist_core_terminal_t &terminal);
     ATTR_COLD void merge_net(netlist_net_t *othernet);
@@ -567,6 +629,21 @@ protected:
     hybrid_t m_new;
 
     UINT32 m_num_cons;
+
+protected:
+    ATTR_COLD virtual void save_register()
+    {
+        save(NAME(m_last.Analog));
+        save(NAME(m_cur.Analog));
+        save(NAME(m_new.Analog));
+        save(NAME(m_last.Q));
+        save(NAME(m_cur.Q));
+        save(NAME(m_new.Q));
+        save(NAME(m_time));
+        save(NAME(m_active));
+        save(NAME(m_in_queue));
+        netlist_object_t::save_register();
+    }
 
 private:
     ATTR_HOT void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask) const;
@@ -688,6 +765,13 @@ public:
     ATTR_COLD inline void initial(const double val) { m_param = val; }
     ATTR_HOT inline const double Value() const        { return m_param;   }
 
+protected:
+    ATTR_COLD virtual void save_register()
+    {
+        save(NAME(m_param));
+        netlist_param_t::save_register();
+    }
+
 private:
     double m_param;
 };
@@ -702,6 +786,13 @@ public:
     ATTR_COLD inline void initial(const int val) { m_param = val; }
 
     ATTR_HOT inline const int Value() const     { return m_param;     }
+
+protected:
+    ATTR_COLD virtual void save_register()
+    {
+        save(NAME(m_param));
+        netlist_param_t::save_register();
+    }
 
 private:
     int m_param;
@@ -832,7 +923,7 @@ public:
 protected:
 
 	ATTR_HOT virtual void update() { }
-	ATTR_HOT virtual void start() { }
+	ATTR_COLD virtual void start() { }
 
 private:
 };
@@ -892,7 +983,7 @@ private:
 
 typedef tagmap_t<netlist_device_t *, 393> tagmap_devices_t;
 
-class netlist_base_t
+class netlist_base_t : public netlist_object_t
 {
     NETLIST_PREVENT_COPYING(netlist_base_t)
 public:
@@ -920,6 +1011,8 @@ public:
     ATTR_COLD void set_solver_dev(NETLIB_NAME(solver) *dev);
     ATTR_COLD void set_setup(netlist_setup_t *asetup) { m_setup = asetup;  }
 
+    ATTR_COLD netlist_net_t *find_net(const pstring &name);
+
     ATTR_COLD void set_clock_freq(UINT64 clockfreq);
 
     ATTR_COLD netlist_setup_t &setup() { return *m_setup; }
@@ -928,11 +1021,23 @@ public:
 	ATTR_COLD void xfatalerror(const char *format, ...) const;
 
     tagmap_devices_t m_devices;
+    netlist_net_t::list_t m_nets;
 
 protected:
 
 	// any derived netlist must override this ...
 	virtual void vfatalerror(const char *format, va_list ap) const = 0;
+
+protected:
+    ATTR_COLD virtual void save_register()
+    {
+        //queue_t                     m_queue;
+        save(NAME(m_time_ps));
+        save(NAME(m_rem));
+        save(NAME(m_div));
+        netlist_object_t::save_register();
+    }
+
 #if (NL_KEEP_STATISTICS)
 	// performance
 	int m_perf_out_processed;
@@ -978,9 +1083,8 @@ public:
 protected:
 	ATTR_COLD void start()
 	{
-		m_I.init_object(*this, "I", netlist_terminal_t::STATE_INP_ACTIVE);
-
-		m_Q.init_object(*this, "Q");
+	    register_input("I", m_I, netlist_terminal_t::STATE_INP_ACTIVE);
+	    register_output("Q", m_Q);
 		m_Q.initial(1);
 	}
 
@@ -1020,8 +1124,8 @@ public:
 protected:
 	ATTR_COLD void start()
 	{
-		m_I.init_object(*this, "I", netlist_terminal_t::STATE_INP_ACTIVE);
-		m_Q.init_object(*this, "Q");
+        register_input("I", m_I, netlist_terminal_t::STATE_INP_ACTIVE);
+        register_output("Q", m_Q);
 		m_Q.initial(0);
 	}
 

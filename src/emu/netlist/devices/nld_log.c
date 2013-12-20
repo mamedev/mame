@@ -6,6 +6,8 @@
 #include "nld_log.h"
 #include "sound/wavwrite.h"
 
+//FIXME: what to do with save states?
+
 NETLIB_START(log)
 {
     register_input("I", m_I);

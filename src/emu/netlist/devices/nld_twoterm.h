@@ -219,9 +219,11 @@ public:
         }
         else
         {
-            //m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
+#if defined(_MSC_VER) && _MSC_VER < 1200
+            m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
+#else
             m_Vd = m_Vd + log1p((nVd - m_Vd) * m_VtInv) * m_Vt;
-
+#endif
             const double eVDVt = exp(m_Vd * m_VtInv);
             Id = m_Is * (eVDVt - 1.0);
 
@@ -348,7 +350,7 @@ protected:
     double m_gB; // base conductance / switch on
     double m_gC; // collector conductance / switch on
     double m_V; // internal voltage source
-    int m_state_on;
+    UINT8 m_state_on;
 
 private:
 };

@@ -113,6 +113,15 @@ public:
 	ATTR_HOT inline bool empty() const { return (m_ptr < m_list); }
 	ATTR_HOT inline void reset() { m_ptr = m_list - 1; }
 
+	ATTR_COLD void reset_and_free()
+	{
+        for (entry_t *i = m_list; i <= m_ptr; i++)
+        {
+            delete i->object();
+        }
+        reset();
+	}
+
     //ATTR_HOT inline entry_t *item(int i) const { return &m_list[i]; }
 	ATTR_HOT inline _ListClass& operator[](const int & index) { return m_list[index].m_obj; }
     ATTR_HOT inline const _ListClass& operator[](const int & index) const { return m_list[index].m_obj; }
@@ -142,6 +151,9 @@ public:
 		inline entry_t(const _Time atime, _Element &elem) : m_time(atime), m_object(&elem) {}
 		ATTR_HOT inline const _Time &time() const { return m_time; }
 		ATTR_HOT inline _Element & object() const { return *m_object; }
+
+		ATTR_HOT inline const _Time *time_ptr() const { return &m_time; }
+        ATTR_HOT inline _Element *object_ptr() const { return m_object; }
 	private:
 		_Time m_time;
 		_Element *m_object;
@@ -153,6 +165,7 @@ public:
 		clear();
 	}
 
+    ATTR_HOT inline int capacity() const { return _Size; }
 	ATTR_HOT inline bool is_empty() const { return (m_end == &m_list[0]); }
 	ATTR_HOT inline bool is_not_empty() const { return (m_end > &m_list[0]); }
 
@@ -192,6 +205,11 @@ public:
 	{
 		m_end = &m_list[0];
 	}
+
+	// save state support
+
+	ATTR_COLD entry_t *listptr() { return &m_list[0]; }
+	ATTR_COLD int count() const { return m_end - m_list; }
 
 #if (NL_KEEP_STATISTICS)
 	// profiling

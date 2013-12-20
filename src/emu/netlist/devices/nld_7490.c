@@ -19,6 +19,9 @@ NETLIB_START(7490)
     register_output("QB", m_Q[1]);
     register_output("QC", m_Q[2]);
     register_output("QD", m_Q[3]);
+
+    save(NAME(m_cnt));
+
 }
 
 NETLIB_UPDATE(7490)

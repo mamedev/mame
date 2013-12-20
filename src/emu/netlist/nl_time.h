@@ -50,6 +50,9 @@ public:
     ATTR_HOT inline const INTERNALTYPE as_raw() const { return m_time; }
     ATTR_HOT inline const double as_double() const { return (double) m_time / (double) RESOLUTION; }
 
+    // for save states ....
+    ATTR_HOT inline INTERNALTYPE *get_internaltype_ptr() { return &m_time; }
+
     ATTR_HOT static inline const netlist_time from_nsec(const int ns) { return netlist_time((UINT64) ns * (RESOLUTION / U64(1000000000))); }
     ATTR_HOT static inline const netlist_time from_usec(const int us) { return netlist_time((UINT64) us * (RESOLUTION / U64(1000000))); }
     ATTR_HOT static inline const netlist_time from_msec(const int ms) { return netlist_time((UINT64) ms * (RESOLUTION / U64(1000))); }

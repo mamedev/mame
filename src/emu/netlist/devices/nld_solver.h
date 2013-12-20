@@ -74,8 +74,6 @@ public:
 
         ~NETLIB_NAME(solver)();
 
-        netlist_net_t::list_t m_nets;
-
         ATTR_HOT inline void schedule();
 
         ATTR_COLD void post_start();

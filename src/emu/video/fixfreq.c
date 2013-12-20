@@ -113,6 +113,31 @@ void fixedfreq_device::device_start()
 	m_bitmap[1] = NULL;
 	//m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 	recompute_parameters(false);
+
+    save_item(NAME(m_vid));
+    save_item(NAME(m_last_x));
+    save_item(NAME(m_last_y));
+    save_item(NAME(m_last_time));
+    save_item(NAME(m_line_time));
+    save_item(NAME(m_last_hsync_time));
+    save_item(NAME(m_last_vsync_time));
+    save_item(NAME(m_refresh));
+    save_item(NAME(m_clock_period));
+    //save_item(NAME(m_bitmap[0]));
+    //save_item(NAME(m_bitmap[1]));
+    save_item(NAME(m_cur_bm));
+
+    /* sync separator */
+    save_item(NAME(m_vint));
+    save_item(NAME(m_int_trig));
+    save_item(NAME(m_mult));
+
+    save_item(NAME(m_sig_vsync));
+    save_item(NAME(m_sig_composite));
+    save_item(NAME(m_sig_field));
+
+
+
 }
 
 void fixedfreq_device::device_reset()
@@ -122,6 +147,7 @@ void fixedfreq_device::device_reset()
 	m_last_hsync_time = attotime::zero;
 	m_last_vsync_time = attotime::zero;
 	m_vint = 0;
+
 }
 
 

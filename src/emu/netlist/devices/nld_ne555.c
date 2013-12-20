@@ -48,6 +48,8 @@ NETLIB_START(NE555)
     setup().connect(m_RDIS.m_N, m_R3.m_N);
 
     m_last_out = false;
+
+    save(NAME(m_last_out));
 }
 
 NETLIB_UPDATE(NE555)

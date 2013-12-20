@@ -124,6 +124,9 @@ NETLIB_START(D)
     register_param("model", m_model, "");
 
     m_Vd = 0.7;
+
+    save(NAME(m_Vd));
+
 }
 
 
@@ -197,6 +200,8 @@ NETLIB_START(QBJT_switch<_type>)
     setup().connect(m_RB.m_N, m_RC.m_N);
     setup().connect(m_RB.m_P, m_BV);
     setup().connect(m_RB.m_N, m_EV);
+
+    save(NAME(m_state_on));
 }
 
 NETLIB_UPDATE(Q)
@@ -256,8 +261,8 @@ ATTR_COLD void NETLIB_NAME(VCCS)::configure(const double Gfac, const double GI)
     register_terminal("OP", m_OP);
     register_terminal("ON", m_ON);
 
-    m_OP1.init_object(*this, "OP1", netlist_core_terminal_t::STATE_INP_ACTIVE);
-    m_ON1.init_object(*this, "ON1", netlist_core_terminal_t::STATE_INP_ACTIVE);
+    m_OP1.init_object(*this, name() + ".OP1", netlist_core_terminal_t::STATE_INP_ACTIVE);
+    m_ON1.init_object(*this, name() + ".ON1", netlist_core_terminal_t::STATE_INP_ACTIVE);
 
     const double m_mult = m_G.Value() * Gfac; // 1.0 ==> 1V ==> 1A
     m_IP.set(GI);

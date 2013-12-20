@@ -122,6 +122,7 @@ private:
 
 class netlist_mame_device : public device_t,
 						    public device_execute_interface
+		                    //public device_state_interface
 						    //, public device_memory_interface
 {
 public:
@@ -158,6 +159,7 @@ protected:
 	virtual void device_stop();
 	virtual void device_reset();
 	virtual void device_post_load();
+    virtual void device_pre_save();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
 	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
@@ -167,6 +169,16 @@ protected:
 	netlist_mame_t *m_netlist;
 
 	netlist_setup_t *m_setup;
+
+// more save state ... needs to go somewhere else
+
+	struct qentry {
+        netlist_time m_time;
+	    char m_name[64];
+	};
+
+	qentry qtemp[1024];
+	int qsize;
 
 private:
 

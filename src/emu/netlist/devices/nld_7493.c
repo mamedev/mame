@@ -28,8 +28,12 @@ NETLIB_START(7493)
 
 NETLIB_START(7493ff)
 {
+    m_reset = 0;
+
     register_input("CLK", m_I, netlist_input_t::STATE_INP_HL);
     register_output("Q", m_Q);
+
+    save(NAME(m_reset));
 }
 
 NETLIB_UPDATE(7493ff)
