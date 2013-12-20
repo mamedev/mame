@@ -7448,7 +7448,6 @@ src/mess/includes/hp48.h svneol=native#text/plain
 src/mess/includes/huebler.h svneol=native#text/plain
 src/mess/includes/hx20.h svneol=native#text/plain
 src/mess/includes/intv.h svneol=native#text/plain
-src/mess/includes/jtc.h svneol=native#text/plain
 src/mess/includes/jupiter.h svneol=native#text/plain
 src/mess/includes/kaypro.h svneol=native#text/plain
 src/mess/includes/kc.h svneol=native#text/plain
