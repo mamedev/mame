@@ -105,51 +105,10 @@ static ins8250_interface ace3_intf =
 };
 
 
-//-------------------------------------------------
-//  rs232_port_interface rs232a_intf
-//-------------------------------------------------
-
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x0d ) // 110
 	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x20 ) // 8N2
 DEVICE_INPUT_DEFAULTS_END
-
-static const rs232_port_interface rs232a_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, rx_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, dcd_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, dsr_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, ri_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_1_TAG, ins8250_uart_device, cts_w)
-};
-
-
-//-------------------------------------------------
-//  rs232_port_interface rs232b_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232b_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, rx_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, dcd_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, dsr_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, ri_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_2_TAG, ins8250_uart_device, cts_w)
-};
-
-
-//-------------------------------------------------
-//  rs232_port_interface rs232c_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232c_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, rx_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, dcd_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, dsr_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, ri_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_3_TAG, ins8250_uart_device, cts_w)
-};
 
 
 //-------------------------------------------------
@@ -175,10 +134,29 @@ static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
 	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf, XTAL_18_432MHz/10)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, "serial_terminal")
+
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(INS8250_1_TAG, ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(INS8250_1_TAG, ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(INS8250_1_TAG, ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(INS8250_1_TAG, ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(INS8250_1_TAG, ins8250_uart_device, cts_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
-	MCFG_RS232_PORT_ADD(RS232_C_TAG, rs232c_intf, default_rs232_devices, NULL)
+
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(INS8250_2_TAG, ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD(RS232_C_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, cts_w))
+
 	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, NULL, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, rtc_tp_w))
 MACHINE_CONFIG_END
 

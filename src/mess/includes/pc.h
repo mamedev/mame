@@ -203,7 +203,6 @@ extern const struct pit8253_interface ibm5150_pit8253_config;
 extern const struct pit8253_interface pcjr_pit8253_config;
 extern const struct pit8253_interface mc1502_pit8253_config;
 extern const ins8250_interface ibm5150_com_interface[4];
-extern const rs232_port_interface ibm5150_serport_config[4];
 extern const i8255_interface ibm5160_ppi8255_interface;
 extern const i8255_interface pc_ppi8255_interface;
 extern const i8255_interface pcjr_ppi8255_interface;

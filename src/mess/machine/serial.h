@@ -3,20 +3,16 @@
 
 #include "emu.h"
 
-#define MCFG_SERIAL_PORT_ADD(_tag, _intf, _slot_intf, _def_slot) \
+#define MCFG_SERIAL_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, SERIAL_PORT, 0) \
-	MCFG_DEVICE_CONFIG(_intf) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#define MCFG_RS232_PORT_ADD(_tag, _intf, _slot_intf, _def_slot) \
+#define MCFG_RS232_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, RS232_PORT, 0) \
-	MCFG_DEVICE_CONFIG(_intf) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-struct serial_port_interface
-{
-	devcb_write_line    m_out_rx_cb;
-};
+#define MCFG_SERIAL_OUT_RX_HANDLER(_devcb) \
+	devcb = &serial_port_device::set_out_rx_handler(*device, DEVCB2_##_devcb);
 
 class device_serial_port_interface : public device_slot_card_interface
 {
@@ -32,36 +28,32 @@ protected:
 };
 
 class serial_port_device : public device_t,
-							public serial_port_interface,
-							public device_slot_interface
+	public device_slot_interface
 {
 public:
 	serial_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	serial_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~serial_port_device();
 
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_out_rx_handler(device_t &device, _Object object) { return downcast<serial_port_device &>(device).m_out_rx_handler.set_callback(object); }
+
 	DECLARE_WRITE_LINE_MEMBER( tx ) { if(m_dev) m_dev->tx(state); }
 	DECLARE_READ_LINE_MEMBER( rx )  { return (m_dev) ? m_dev->rx() : 1; }
 
-	void out_rx(UINT8 param)  { m_out_rx_func(param); }
+	void out_rx(UINT8 param)  { m_out_rx_handler(param); }
+
 protected:
 	virtual void device_start();
 	virtual void device_config_complete();
 	device_serial_port_interface *m_dev;
+
 private:
-	devcb_resolved_write_line m_out_rx_func;
+	devcb2_write_line m_out_rx_handler;
 };
 
 extern const device_type SERIAL_PORT;
 
-struct rs232_port_interface
-{
-	devcb_write_line    m_out_rx_cb;
-	devcb_write_line    m_out_dcd_cb;
-	devcb_write_line    m_out_dsr_cb;
-	devcb_write_line    m_out_ri_cb;
-	devcb_write_line    m_out_cts_cb;
-};
 
 class device_rs232_port_interface : public device_serial_port_interface
 {
@@ -76,6 +68,7 @@ public:
 	virtual UINT8 dsr_r() { return m_dsr; }
 	virtual UINT8 ri_r()  { return m_ri; }
 	virtual UINT8 cts_r() { return m_cts; }
+
 protected:
 	UINT8 m_dtr;
 	UINT8 m_rts;
@@ -85,12 +78,31 @@ protected:
 	UINT8 m_cts;
 };
 
-class rs232_port_device : public serial_port_device,
-							public rs232_port_interface
+
+#define MCFG_RS232_OUT_DCD_HANDLER(_devcb) \
+	devcb = &rs232_port_device::set_out_dcd_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_RS232_OUT_DSR_HANDLER(_devcb) \
+	devcb = &rs232_port_device::set_out_dsr_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_RS232_OUT_RI_HANDLER(_devcb) \
+	devcb = &rs232_port_device::set_out_ri_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_RS232_OUT_CTS_HANDLER(_devcb) \
+	devcb = &rs232_port_device::set_out_cts_handler(*device, DEVCB2_##_devcb);
+
+
+class rs232_port_device : public serial_port_device
 {
 public:
 	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~rs232_port_device();
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_out_dcd_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_out_dcd_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_dsr_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_out_dsr_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_ri_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_out_ri_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_cts_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_out_cts_handler.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( dtr_w );
 	DECLARE_WRITE_LINE_MEMBER( rts_w );
@@ -100,20 +112,21 @@ public:
 	DECLARE_READ_LINE_MEMBER( ri_r )  { return (m_dev) ? m_dev->ri_r() : 0; }
 	DECLARE_READ_LINE_MEMBER( cts_r ) { return (m_dev) ? m_dev->cts_r() : looprts; }
 
-	void out_dcd(UINT8 param) { m_out_dcd_func(param); }
-	void out_dsr(UINT8 param) { m_out_dsr_func(param); }
-	void out_ri(UINT8 param)  { m_out_ri_func(param); }
-	void out_cts(UINT8 param) { m_out_cts_func(param); }
+	void out_dcd(UINT8 param) { m_out_dcd_handler(param); }
+	void out_dsr(UINT8 param) { m_out_dsr_handler(param); }
+	void out_ri(UINT8 param)  { m_out_ri_handler(param); }
+	void out_cts(UINT8 param) { m_out_cts_handler(param); }
 
 protected:
 	virtual void device_start();
 	virtual void device_config_complete();
-	device_rs232_port_interface *m_dev;
+
 private:
-	devcb_resolved_write_line m_out_dcd_func;
-	devcb_resolved_write_line m_out_dsr_func;
-	devcb_resolved_write_line m_out_ri_func;
-	devcb_resolved_write_line m_out_cts_func;
+	device_rs232_port_interface *m_dev;
+	devcb2_write_line  m_out_dcd_handler;
+	devcb2_write_line  m_out_dsr_handler;
+	devcb2_write_line  m_out_ri_handler;
+	devcb2_write_line  m_out_cts_handler;
 	UINT8 loopdtr;
 	UINT8 looprts;
 };

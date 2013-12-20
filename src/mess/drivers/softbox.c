@@ -336,23 +336,10 @@ static I8255A_INTERFACE( ppi1_intf )
 };
 
 
-//-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
 	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x10 ) // 7E1
 DEVICE_INPUT_DEFAULTS_END
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 
@@ -431,7 +418,7 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_HARDDISK_ADD("harddisk2")
 	MCFG_HARDDISK_ADD("harddisk3")
 	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "serial_terminal")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 	MCFG_IMI5000H_ADD("corvus1")
 

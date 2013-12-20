@@ -212,17 +212,6 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 	DEVCB_NULL
 };
 
-// note: missing a receive clock callback to support external clock mode
-// (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, dcda_w),
-	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, synca_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("ic15", z80dart_device, ctsa_w)
-};
-
 // note: fault output should be connected to syncb input of the sio
 static const centronics_interface apricot_centronics_intf =
 {
@@ -416,7 +405,12 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_Z80SIO0_ADD("ic15", XTAL_15MHz / 6, apricot_z80sio_intf)
 
 	// rs232 port
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+// note: missing a receive clock callback to support external clock mode
+// (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ic15", z80dart_device, dcda_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ic15", z80dart_device, synca_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsa_w))
 
 	// centronics printer
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", apricot_centronics_intf)

@@ -1133,20 +1133,6 @@ static SLOT_INTERFACE_START( pc1512_floppies )
 SLOT_INTERFACE_END
 
 
-//-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, rx_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, dcd_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, dsr_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, ri_w),
-	DEVCB_DEVICE_LINE_MEMBER(INS8250_TAG, ins8250_uart_device, cts_w)
-};
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -1311,7 +1297,12 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, NULL,    pc1512_state::floppy_formats)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, cts_w))
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, ":" I8086_TAG, isabus_intf)
@@ -1375,7 +1366,12 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, NULL,    pc1512_state::floppy_formats)
 	MCFG_INS8250_ADD(INS8250_TAG, uart_intf, XTAL_1_8432MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(INS8250_TAG, ins8250_uart_device, cts_w))
 
 	// ISA8 bus
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, ":" I8086_TAG, isabus_intf)

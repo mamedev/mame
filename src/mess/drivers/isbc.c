@@ -256,15 +256,6 @@ static const i8251_interface isbc_uart8251_interface =
 	DEVCB_NULL
 };
 
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("uart8274", z80dart_device, dcda_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("uart8274", z80dart_device, ctsa_w)
-};
-
 READ8_MEMBER( isbc_state::get_slave_ack )
 {
 	if (offset == 7)
@@ -323,7 +314,10 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_I8255A_ADD("ppi", isbc286_ppi_interface)
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", isbc_centronics)
 	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, isbc_uart8274_interface)
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, NULL)
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcda_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsa_w))
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, "fdc_218a")
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir3_w))

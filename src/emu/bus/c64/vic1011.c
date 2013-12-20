@@ -29,25 +29,12 @@ const device_type C64_VIC1011 = &device_creator<c64_vic1011_device>;
 
 
 //-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_vic1011_device, rxd_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( vic1011 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vic1011 )
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, c64_vic1011_device, rxd_w))
 MACHINE_CONFIG_END
 
 

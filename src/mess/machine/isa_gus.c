@@ -1219,19 +1219,9 @@ static SLOT_INTERFACE_START(midiin_slot)
 	SLOT_INTERFACE("midiin", MIDIIN_PORT)
 SLOT_INTERFACE_END
 
-static const serial_port_interface midiin_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, midi_rx_w)
-};
-
 static SLOT_INTERFACE_START(midiout_slot)
 	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
 SLOT_INTERFACE_END
-
-static const serial_port_interface midiout_intf =
-{
-	DEVCB_NULL  // midi out ports don't transmit inward
-};
 
 static const gf1_interface gus_gf1_config =
 {
@@ -1253,8 +1243,10 @@ static MACHINE_CONFIG_FRAGMENT( gus_config )
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
 	MCFG_SOUND_ROUTE(1,"rspeaker",0.50)
 	MCFG_ACIA6850_ADD("midi",gus_midi_interface)
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin")
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, isa16_gus_device, midi_rx_w))
+
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( gus_joy )

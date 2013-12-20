@@ -74,22 +74,13 @@ static ACIA6850_INTERFACE( acia_intf )
 	DEVCB_NULL
 };
 
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( c68ksbc, c68ksbc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
 	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)
 
 	MCFG_ACIA6850_ADD("acia", acia_intf)
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
 MACHINE_CONFIG_END
 
 /* ROM definition */

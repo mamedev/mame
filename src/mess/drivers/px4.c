@@ -1242,15 +1242,6 @@ PALETTE_INIT_MEMBER(px4_state, px4p)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const cassette_interface px4_cassette_interface =
 {
 	cassette_default_formats,
@@ -1299,7 +1290,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_EPSON_SIO_ADD("sio", NULL)
 
 	// rs232 port
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
 
 	// rom capsules
 	MCFG_CARTSLOT_ADD("capsule1")

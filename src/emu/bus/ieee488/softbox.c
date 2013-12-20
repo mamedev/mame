@@ -258,20 +258,6 @@ static I8255A_INTERFACE( ppi1_intf )
 
 
 //-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( softbox )
 //-------------------------------------------------
 
@@ -290,7 +276,7 @@ static MACHINE_CONFIG_FRAGMENT( softbox )
 	MCFG_HARDDISK_ADD("harddisk2")
 	MCFG_HARDDISK_ADD("harddisk3")
 	MCFG_HARDDISK_ADD("harddisk4")
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 MACHINE_CONFIG_END
 
 

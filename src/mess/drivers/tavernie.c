@@ -342,15 +342,6 @@ static ACIA6850_INTERFACE( mc6850_intf )
 	DEVCB_NULL
 };
 
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 WRITE8_MEMBER( tavernie_state::kbd_put )
 {
 	m_term_data = data;
@@ -376,7 +367,7 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
 	MCFG_PIA6821_ADD("pia", mc6821_intf)
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)
 	MCFG_ACIA6850_ADD("acia", mc6850_intf)

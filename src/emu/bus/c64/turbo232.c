@@ -36,20 +36,6 @@ const device_type C64_TURBO232 = &device_creator<c64_turbo232_cartridge_device>;
 
 
 //-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(MOS6551_TAG, mos6551_device, rxd_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6551_TAG, mos6551_device, dcd_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6551_TAG, mos6551_device, dsr_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(MOS6551_TAG, mos6551_device, cts_w)
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
 //-------------------------------------------------
 
@@ -57,7 +43,11 @@ static MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
 	MCFG_MOS6551_ADD(MOS6551_TAG, XTAL_3_6864MHz, WRITELINE(c64_turbo232_cartridge_device, acia_irq_w))
 	MCFG_MOS6551_RXD_TXD_CALLBACKS(NULL, DEVWRITELINE(RS232_TAG, rs232_port_device, tx))
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, rxd_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, dsr_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MOS6551_TAG, mos6551_device, cts_w))
 MACHINE_CONFIG_END
 
 

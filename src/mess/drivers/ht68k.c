@@ -121,15 +121,6 @@ WRITE8_MEMBER(ht68k_state::duart_output)
 	if (m_floppy) {m_floppy->ss_w(BIT(data,3) ? 0 : 1);}
 }
 
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("duart68681", duartn68681_device, rx_a_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const duartn68681_config ht68k_duart68681_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(ht68k_state, duart_irq_handler),
@@ -148,7 +139,8 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart68681", duartn68681_device, rx_a_w))
 
 	/* video hardware */
 	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )

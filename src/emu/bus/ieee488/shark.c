@@ -74,20 +74,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( mshark )
 //-------------------------------------------------
 
@@ -99,7 +85,7 @@ static MACHINE_CONFIG_FRAGMENT( mshark )
 
 	// devices
 	MCFG_HARDDISK_ADD("harddisk1")
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 MACHINE_CONFIG_END
 
 

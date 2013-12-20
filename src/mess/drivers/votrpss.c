@@ -209,15 +209,6 @@ static const i8251_interface uart_intf =
 	DEVCB_NULL
 };
 
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static const struct pit8253_interface pit_intf =
 {
 	{
@@ -350,7 +341,7 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 
 	/* Serial components - comment out if not needed */
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("serial", votrpss_state, serial_tick, attotime::from_hz(153600))
-	//MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
 MACHINE_CONFIG_END
 
 

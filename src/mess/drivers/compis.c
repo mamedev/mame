@@ -673,34 +673,6 @@ static const mm58274c_interface rtc_intf =
 
 
 //-------------------------------------------------
-//  rs232_port_interface rs232a_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232a_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(I8274_TAG, z80dart_device, dcda_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(I8274_TAG, z80dart_device, ctsa_w)
-};
-
-
-//-------------------------------------------------
-//  rs232_port_interface rs232b_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232b_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(I8274_TAG, z80dart_device, dcdb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(I8274_TAG, z80dart_device, ctsb_w)
-};
-
-
-//-------------------------------------------------
 //  cassette_interface compis_cassette_interface
 //-------------------------------------------------
 
@@ -790,8 +762,15 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_I8274_ADD(I8274_TAG, XTAL_16MHz/4, mpsc_intf)
 	MCFG_MM58274C_ADD(MM58174A_TAG, rtc_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, compis_cassette_interface)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
+
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, dcda_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, dcdb_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(I8274_TAG, z80dart_device, ctsb_w))
+
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", compis_state, tape_tick, attotime::from_hz(44100))
 	MCFG_ISBX_SLOT_ADD(ISBX_0_TAG, 0, isbx_cards, "fdc")

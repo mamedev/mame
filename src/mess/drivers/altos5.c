@@ -427,15 +427,6 @@ static Z80SIO_INTERFACE( sio_intf )
 	DEVCB_NULL
 };
 
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, dcdb_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, rib_w),
-	DEVCB_DEVICE_LINE_MEMBER("z80sio", z80dart_device, ctsb_w)
-};
-
 static SLOT_INTERFACE_START( altos5_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -508,7 +499,12 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_Z80CTC_ADD( "z80ctc",   XTAL_8MHz / 2, ctc_intf )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_8MHz / 2, dart_intf )
 	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("z80sio", z80dart_device, dcdb_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("z80sio", z80dart_device, rib_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("z80sio", z80dart_device, ctsb_w))
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", altos5_state, ctc_tick, attotime::from_hz(XTAL_8MHz / 4))
 	MCFG_FD1797x_ADD("fdc", XTAL_8MHz / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525dd", floppy_image_device::default_floppy_formats)

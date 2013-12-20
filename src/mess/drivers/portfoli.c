@@ -772,20 +772,6 @@ static const centronics_interface centronics_intf =
 };
 
 
-//-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, rx_w),
-	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, dcd_w),
-	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, dsr_w),
-	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, ri_w),
-	DEVCB_DEVICE_LINE_MEMBER(M82C50A_TAG, ins8250_uart_device, cts_w)
-};
-
-
 
 //**************************************************************************
 //  IMAGE LOADING
@@ -913,7 +899,13 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_INS8250_ADD(M82C50A_TAG, i8250_intf, XTAL_1_8432MHz) // should be MCFG_INS8250A_ADD
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(M82C50A_TAG, ins8250_uart_device, cts_w))
 
 	/* fake keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", portfolio_state, keyboard_tick, attotime::from_usec(2500))

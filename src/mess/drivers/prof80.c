@@ -451,20 +451,6 @@ static ECBBUS_INTERFACE( ecb_intf )
 };
 
 
-//-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -549,8 +535,8 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", ecbbus_cards, NULL)
 
 	// V24
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232_intf, default_rs232_devices, NULL)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

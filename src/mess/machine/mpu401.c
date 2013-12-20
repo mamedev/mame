@@ -70,19 +70,9 @@ static SLOT_INTERFACE_START(midiin_slot)
 	SLOT_INTERFACE("midiin", MIDIIN_PORT)
 SLOT_INTERFACE_END
 
-static const serial_port_interface midiin_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, mpu401_device, midi_rx_w)
-};
-
 static SLOT_INTERFACE_START(midiout_slot)
 	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
 SLOT_INTERFACE_END
-
-static const serial_port_interface midiout_intf =
-{
-	DEVCB_NULL  // midi out ports don't transmit inward
-};
 
 MACHINE_CONFIG_FRAGMENT( mpu401 )
 	MCFG_CPU_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
@@ -90,8 +80,10 @@ MACHINE_CONFIG_FRAGMENT( mpu401 )
 	MCFG_CPU_IO_MAP(mpu401_io_map)
 	MCFG_M6801_SER_TX(WRITELINE(mpu401_device, mpu401_midi_tx))
 
-	MCFG_SERIAL_PORT_ADD(MIDIIN_TAG, midiin_intf, midiin_slot, "midiin")
-	MCFG_SERIAL_PORT_ADD(MIDIOUT_TAG, midiout_intf, midiout_slot, "midiout")
+	MCFG_SERIAL_PORT_ADD(MIDIIN_TAG, midiin_slot, "midiin")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, mpu401_device, midi_rx_w))
+
+	MCFG_SERIAL_PORT_ADD(MIDIOUT_TAG, midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
 ROM_START( mpu401 )

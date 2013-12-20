@@ -16,15 +16,17 @@ device_serial_port_interface::~device_serial_port_interface()
 
 serial_port_device::serial_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SERIAL_PORT, "Serial Port", tag, owner, clock, "serial_port", __FILE__),
-		device_slot_interface(mconfig, *this),
-		m_dev(NULL)
+	device_slot_interface(mconfig, *this),
+	m_dev(NULL),
+	m_out_rx_handler(*this)
 {
 }
 
 serial_port_device::serial_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this),
-		m_dev(NULL)
+	device_slot_interface(mconfig, *this),
+	m_dev(NULL),
+	m_out_rx_handler(*this)
 {
 }
 
@@ -34,21 +36,12 @@ serial_port_device::~serial_port_device()
 
 void serial_port_device::device_config_complete()
 {
-	const serial_port_interface *intf = reinterpret_cast<const serial_port_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<serial_port_interface *>(this) = *intf;
-	}
-	else
-	{
-		memset(&m_out_rx_cb, 0, sizeof(m_out_rx_cb));
-	}
 	m_dev = dynamic_cast<device_serial_port_interface *>(get_card_device());
 }
 
 void serial_port_device::device_start()
 {
-	m_out_rx_func.resolve(m_out_rx_cb, *this);
+	m_out_rx_handler.resolve_safe();
 }
 
 const device_type RS232_PORT = &device_creator<rs232_port_device>;
@@ -69,7 +62,11 @@ device_rs232_port_interface::~device_rs232_port_interface()
 }
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: serial_port_device(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock, "rs232", __FILE__)
+	: serial_port_device(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock, "rs232", __FILE__),
+	m_out_dcd_handler(*this),
+	m_out_dsr_handler(*this),
+	m_out_ri_handler(*this),
+	m_out_cts_handler(*this)
 {
 }
 
@@ -79,22 +76,8 @@ rs232_port_device::~rs232_port_device()
 
 void rs232_port_device::device_config_complete()
 {
-	const rs232_port_interface *intf = reinterpret_cast<const rs232_port_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<rs232_port_interface *>(this) = *intf;
-		memcpy(&(serial_port_interface::m_out_rx_cb), &(rs232_port_interface::m_out_rx_cb), sizeof(rs232_port_interface::m_out_rx_cb));
-	}
-	else
-	{
-		memset(&(serial_port_interface::m_out_rx_cb), 0, sizeof(serial_port_interface::m_out_rx_cb));
-		memset(&m_out_dcd_cb, 0, sizeof(m_out_dcd_cb));
-		memset(&m_out_dsr_cb, 0, sizeof(m_out_dsr_cb));
-		memset(&m_out_ri_cb, 0, sizeof(m_out_ri_cb));
-		memset(&m_out_cts_cb, 0, sizeof(m_out_cts_cb));
-	}
+	serial_port_device::device_config_complete();
 	m_dev = dynamic_cast<device_rs232_port_interface *>(get_card_device());
-	serial_port_device::m_dev = dynamic_cast<device_serial_port_interface *>(get_card_device());
 	loopdtr = 0;
 	looprts = 0;
 }
@@ -102,10 +85,10 @@ void rs232_port_device::device_config_complete()
 void rs232_port_device::device_start()
 {
 	serial_port_device::device_start();
-	m_out_dcd_func.resolve(m_out_dcd_cb, *this);
-	m_out_dsr_func.resolve(m_out_dsr_cb, *this);
-	m_out_ri_func.resolve(m_out_ri_cb, *this);
-	m_out_cts_func.resolve(m_out_cts_cb, *this);
+	m_out_dcd_handler.resolve_safe();
+	m_out_dsr_handler.resolve_safe();
+	m_out_ri_handler.resolve_safe();
+	m_out_cts_handler.resolve_safe();
 }
 
 // XXX:make loopback handshaking optional if needed

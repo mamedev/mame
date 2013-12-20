@@ -582,19 +582,6 @@ static const i8251_interface uart_intf =
 	DEVCB_NULL
 };
 
-//-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
@@ -610,7 +597,7 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(pc8401a_video)
@@ -644,7 +631,7 @@ static MACHINE_CONFIG_START( pc8500, pc8500_state )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(pc8500_video)

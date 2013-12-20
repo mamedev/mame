@@ -452,20 +452,6 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 };
 
 
-//-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -574,7 +560,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_ABC80_KEYBOARD_ADD(WRITELINE(abc80_state, keydown_w))
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "slow")
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("slow", abc830_slow)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	// internal ram

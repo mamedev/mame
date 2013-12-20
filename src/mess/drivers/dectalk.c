@@ -399,15 +399,6 @@ static const duartn68681_config dectalk_duart_config =
 	DEVCB_DRIVER_MEMBER(dectalk_state, dectalk_duart_output),           /* output port */
 };
 
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER("duartn68681", duartn68681_device, rx_b_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 /* FIFO and TMS32010 stuff */
 #define SPC_INITIALIZE state->m_m68k_spcflags_latch&0x1 // speech initialize flag
@@ -921,7 +912,8 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duartn68681", duartn68681_device, rx_b_w))
 MACHINE_CONFIG_END
 
 

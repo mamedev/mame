@@ -101,15 +101,6 @@ static ACIA6850_INTERFACE( acia_intf )
 	DEVCB_NULL
 };
 
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static struct votrax_sc01_interface votrtnt_votrax_interface =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
@@ -129,7 +120,7 @@ static MACHINE_CONFIG_START( votrtnt, votrtnt_state )
 
 	/* serial hardware */
 	MCFG_ACIA6850_ADD("acia", acia_intf)
-	MCFG_RS232_PORT_ADD("rs232", rs232_intf, default_rs232_devices, "serial_terminal")
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -1174,35 +1174,6 @@ static SLOT_INTERFACE_START( victor9k_floppies )
 SLOT_INTERFACE_END
 
 
-//-------------------------------------------------
-//  rs232_port_interface rs232a_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232a_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, dcda_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, ria_w),
-	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, ctsa_w)
-};
-
-
-//-------------------------------------------------
-//  rs232_port_interface rs232b_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232b_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, dcdb_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, rib_w),
-	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, z80dart_device, ctsb_w)
-};
-
-
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -1281,8 +1252,17 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_ADD(M6522_6_TAG, XTAL_30MHz/30, via6_intf)
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":0", victor9k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL)
+
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, dcda_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ria_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsa_w))
+
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, dcdb_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rib_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))
+
 	MCFG_VICTOR9K_KEYBOARD_ADD(WRITELINE(victor9k_state, kbrdy_w))
 
 	// internal ram

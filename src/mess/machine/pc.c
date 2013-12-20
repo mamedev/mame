@@ -520,38 +520,6 @@ const ins8250_interface ibm5150_com_interface[4]=
 	}
 };
 
-const rs232_port_interface ibm5150_serport_config[4] =
-{
-	{
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, rx_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, dcd_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, dsr_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, ri_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_0", ins8250_uart_device, cts_w)
-	},
-	{
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, rx_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, dcd_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, dsr_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, ri_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_1", ins8250_uart_device, cts_w)
-	},
-	{
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, rx_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, dcd_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, dsr_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, ri_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_2", ins8250_uart_device, cts_w)
-	},
-	{
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, rx_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, dcd_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, dsr_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, ri_w),
-		DEVCB_DEVICE_LINE_MEMBER("ins8250_3", ins8250_uart_device, cts_w)
-	}
-};
-
 /**********************************************************
  *
  * NMI handling

@@ -1047,10 +1047,34 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1155,10 +1179,35 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
+
 	MCFG_PC_JOY_ADD("pc_joy")
 
 	/* video hardware */
@@ -1225,8 +1274,20 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
@@ -1283,8 +1344,20 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
@@ -1342,8 +1415,20 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")
@@ -1419,8 +1504,20 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 
 	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
@@ -1606,10 +1703,34 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1682,10 +1803,34 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 //  MCFG_FRAGMENT_ADD( pcvideo_ega ) // Put this back after ISA are added to this driver
@@ -1737,10 +1882,34 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_poisk2 )
@@ -1792,10 +1961,34 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1847,10 +2040,34 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1902,10 +2119,34 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_2", ibm5150_com_interface[2], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
-	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_2", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_3", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )

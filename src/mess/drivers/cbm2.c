@@ -1925,20 +1925,6 @@ static CBM2_USER_PORT_INTERFACE( p500_user_intf )
 };
 
 
-//-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(MOS6551A_TAG, mos6551_device, rxd_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6551A_TAG, mos6551_device, dcd_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6551A_TAG, mos6551_device, dsr_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(MOS6551A_TAG, mos6551_device, cts_w)
-};
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -2196,7 +2182,13 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6567_CLOCK, cbm2_expansion_cards, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, rxd_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, dsr_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, cts_w))
+
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
@@ -2253,7 +2245,13 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6569_CLOCK, cbm2_expansion_cards, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, rxd_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, dsr_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, cts_w))
+
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
@@ -2316,7 +2314,13 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/9, cbm2_expansion_cards, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, rxd_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, dsr_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MOS6551A_TAG, mos6551_device, cts_w))
+
 	MCFG_QUICKLOAD_ADD("quickload", cbm2_state, cbmb, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list

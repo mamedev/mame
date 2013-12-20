@@ -234,15 +234,6 @@ static const ins8250_interface avigo_com_interface =
 	DEVCB_NULL
 };
 
-static const rs232_port_interface avigo_serport_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, rx_w),
-	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, dcd_w),
-	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, dsr_w),
-	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, ri_w),
-	DEVCB_DEVICE_LINE_MEMBER("ns16550", ins8250_uart_device, cts_w)
-};
-
 void avigo_state::machine_reset()
 {
 	/* if is a cold start initialize flash contents */
@@ -893,7 +884,13 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_NS16550_ADD( "ns16550", avigo_com_interface, XTAL_1_8432MHz )
-	MCFG_RS232_PORT_ADD( "serport", avigo_serport_config, avigo_com, NULL )
+
+	MCFG_RS232_PORT_ADD( "serport", avigo_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ns16550", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

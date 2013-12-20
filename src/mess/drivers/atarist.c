@@ -2143,20 +2143,6 @@ static const centronics_interface centronics_intf =
 
 
 //-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  SLOT_INTERFACE( midiin_slot )
 //-------------------------------------------------
 
@@ -2174,11 +2160,6 @@ WRITE_LINE_MEMBER( st_state::midi_rx_w )
 	}
 }
 
-static const serial_port_interface midiin_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(st_state, midi_rx_w)
-};
-
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( midiout_slot )
@@ -2187,11 +2168,6 @@ static const serial_port_interface midiin_intf =
 static SLOT_INTERFACE_START( midiout_slot )
 	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
 SLOT_INTERFACE_END
-
-static const serial_port_interface midiout_intf =
-{
-	DEVCB_NULL  // midi out ports don't transmit inward
-};
 
 
 
@@ -2438,9 +2414,12 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin")
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
+
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
@@ -2493,9 +2472,12 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin")
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
+
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
 	MCFG_RP5C15_ADD(RP5C15_TAG, XTAL_32_768kHz, rtc_intf)
 
 	// cartridge
@@ -2557,9 +2539,12 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin")
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout")
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
+	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
+
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
@@ -2631,9 +2616,12 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL, NULL)
+
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
+
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout", NULL)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

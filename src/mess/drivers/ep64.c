@@ -461,19 +461,6 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  rs232_port_interface rs232_intf
-//-------------------------------------------------
-
-static const rs232_port_interface rs232_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DAVE_TAG, dave_device, int2_w)
-};
-
 
 //-------------------------------------------------
 //  cassette_interface cass_intf
@@ -542,7 +529,10 @@ static MACHINE_CONFIG_START( ep64, ep64_state )
 	MCFG_EP64_EXPANSION_BUS_SLOT_ADD(EP64_EXPANSION_BUS_TAG, DAVE_TAG, NULL)
 	MCFG_EP64_EXPANSION_BUS_CALLBACKS(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0), INPUTLINE(Z80_TAG, INPUT_LINE_NMI), INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL)
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(DAVE_TAG, dave_device, int2_w))
+
 	MCFG_CASSETTE_ADD(CASSETTE1_TAG, cass_intf)
 	MCFG_CASSETTE_ADD(CASSETTE2_TAG, cass_intf)
 
