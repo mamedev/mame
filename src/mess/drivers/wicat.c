@@ -11,6 +11,7 @@ Wicat - various systems.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
+#include "cpu/8x300/8x300.h"
 #include "machine/serial.h"
 #include "machine/6522via.h"
 #include "machine/mm58274c.h"
@@ -19,6 +20,7 @@ Wicat - various systems.
 #include "video/i8275x.h"
 #include "machine/am9517a.h"
 #include "machine/x2212.h"
+#include "machine/wd17xx.h"
 #include "wicat.lh"
 
 class wicat_state : public driver_device
@@ -157,6 +159,16 @@ static ADDRESS_MAP_START(wicat_video_io, AS_IO, 8, wicat_state)
 	AM_RANGE(0x4000,0x5fff) AM_RAM AM_SHARE("vram") // video RAM?
 	AM_RANGE(0x8000,0x8fff) AM_ROM AM_REGION("g2char",0x0000)
 	AM_RANGE(0x9000,0x9fff) AM_ROM AM_REGION("g2char",0x0000)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(wicat_flop_mem, AS_PROGRAM, 16, wicat_state)
+	AM_RANGE(0x0000, 0x17ff) AM_ROM AM_REGION("wd3", 0x0000)
+	AM_RANGE(0x1800, 0x1fff) AM_NOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(wicat_flop_io, AS_IO, 8, wicat_state)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM  // left bank
+	AM_RANGE(0x0100, 0x01ff) AM_RAM  // right bank  -- one of these probably is RAM...
 ADDRESS_MAP_END
 
 
@@ -673,8 +685,8 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_X2212_ADD("videosram")  // XD2210
 
 	MCFG_SCREEN_ADD("screen",RASTER)
-	MCFG_SCREEN_SIZE(400,300)
-	MCFG_SCREEN_VISIBLE_AREA(0,400-1,0,300-1)
+	MCFG_SCREEN_SIZE(720,300)
+	MCFG_SCREEN_VISIBLE_AREA(0,720-1,0,300-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DEVICE("video",i8275x_device,screen_update)
 
@@ -683,6 +695,12 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEFAULT_LAYOUT(layout_wicat)
+
+	/* Winchester Floppy Controller */
+	MCFG_CPU_ADD("floppycpu",N8X300,XTAL_8MHz)
+	MCFG_CPU_PROGRAM_MAP(wicat_flop_mem)
+	MCFG_CPU_IO_MAP(wicat_flop_io)
+//	MCFG_FD1795_ADD("fdc")
 
 MACHINE_CONFIG_END
 
@@ -750,14 +768,14 @@ ROM_START( wicat )
 	ROM_LOAD       ("apl.chr",    0x00800, 0x0800, CRC(8c6d698e) SHA1(147dd9296fe2efc6140fa148a6edf673c33f9371) )
 
 	// Winchester Floppy Controller  (Signetics N8X300I + FD1795)
-	ROM_REGION(0x1800, "wd3", 0)
-	ROM_LOAD       ("wd3.u95",    0x00000, 0x0800, CRC(80bb0617) SHA1(ac0f3194fcbef77532571baa3fec78b3010528bf) )
-	ROM_LOAD       ("wd3.u96",    0x00800, 0x0800, CRC(52736e61) SHA1(71c7c9170c733c483393969cb1cb3798b3eb980c) )
-	ROM_LOAD       ("wd3.u97",    0x01000, 0x0800, CRC(a66619ec) SHA1(5d091ac7c88f2f45b4a05e78bfc7a16c206b31ff) )
+	ROM_REGION16_BE(0x1800, "wd3", 0)
+	ROM_LOAD16_BYTE("wd3.u96",    0x00000, 0x0800, CRC(52736e61) SHA1(71c7c9170c733c483393969cb1cb3798b3eb980c) )
+	ROM_LOAD16_BYTE("wd3.u97",    0x00001, 0x0800, CRC(a66619ec) SHA1(5d091ac7c88f2f45b4a05e78bfc7a16c206b31ff) )
+	ROM_LOAD       ("wd3.u95",    0x01000, 0x0800, CRC(80bb0617) SHA1(ac0f3194fcbef77532571baa3fec78b3010528bf) )
 ROM_END
 
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 198?, wicat, 0,       0,     wicat, wicat, driver_device, 0, "Millennium Systems", "Wicat", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1982, wicat, 0,       0,     wicat, wicat, driver_device, 0, "Millennium Systems", "Wicat System 150", GAME_NOT_WORKING | GAME_NO_SOUND_HW )

@@ -67,6 +67,20 @@ $(DRCOBJ): $(DRCDEPS)
 
 
 #-------------------------------------------------
+# Signetics 8X300 / Scientific Micro Systems SMS300
+#@src/emu/cpu/8x300/8x300.h,CPUS += 8X300
+#-------------------------------------------------
+
+ifneq ($(filter 8X300,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/8x300
+CPUOBJS += $(CPUOBJ)/8x300/8x300.o
+DASMOBJS += $(CPUOBJ)/8x300/8x300dasm.o
+endif
+
+$(CPUOBJ)/8x300/8x300.o:	$(CPUSRC)/8x300/8x300.c \
+							$(CPUSRC)/8x300/8x300.h
+
+#-------------------------------------------------
 # Acorn ARM series
 #
 #@src/emu/cpu/arm/arm.h,CPUS += ARM

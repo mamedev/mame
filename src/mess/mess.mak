@@ -129,6 +129,7 @@ CPUS += SCORE
 CPUS += ES5510
 CPUS += SCUDSP
 CPUS += IE15
+CPUS += 8X300
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
