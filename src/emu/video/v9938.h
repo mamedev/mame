@@ -238,7 +238,7 @@ private:
 	static const v99x8_mode s_modes[];
 
 protected:
-	static UINT16 *s_pal_indYJK;
+	static UINT16 s_pal_indYJK[0x20000];
 };
 
 

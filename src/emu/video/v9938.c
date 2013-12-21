@@ -262,7 +262,7 @@ to emulate this. Also it keeps the palette a reasonable size. :)
 
 */
 
-UINT16 *v99x8_device::s_pal_indYJK;
+UINT16 v99x8_device::s_pal_indYJK[0x20000];
 
 PALETTE_INIT_MEMBER(v9958_device, v9958)
 {
@@ -274,9 +274,6 @@ PALETTE_INIT_MEMBER(v9958_device, v9958)
 
 	if(machine().total_colors() != 19780)
 		fatalerror("V9958: not enough palette, must be 19780");
-
-	if (v99x8_device::s_pal_indYJK == NULL)
-		v99x8_device::s_pal_indYJK = auto_alloc_array(machine(),UINT16, 0x20000);
 
 	// set up YJK table
 	LOG(("Building YJK table for V9958 screens, may take a while ... \n"));
