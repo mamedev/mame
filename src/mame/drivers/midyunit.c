@@ -361,6 +361,104 @@ static INPUT_PORTS_START( trog )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hiimpact )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Action") PORT_PLAYER(1)
+	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Action") PORT_PLAYER(2)
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
+	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Video Freeze") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(3)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(4)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P3 Action") PORT_PLAYER(3)
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P4 Action") PORT_PLAYER(4)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW")
+	PORT_DIPUNUSED_DIPLOC ( 0x0001, 0x0001, "SW1:8" )
+	PORT_DIPUNUSED_DIPLOC ( 0x0002, 0x0002, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC ( 0x0004, 0x0004, "SW1:6" )
+	PORT_DIPNAME( 0x0078, 0x0078, DEF_STR( Coinage )) PORT_DIPLOCATION("SW1:5,4,3,2")
+	PORT_DIPSETTING(      0x0078, DEF_STR( 1C_1C ))        PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000) /* Generic coinage (no denomination); 2 identical chutes */
+	PORT_DIPSETTING(      0x0058, DEF_STR( 2C_1C ))        PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
+	PORT_DIPSETTING(      0x0068, "2 Coins/1 Credit 4/3" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
+	PORT_DIPSETTING(      0x0048, "2 Coins/1 Credit 4/4" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
+	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000) /* 25 cents; 4 chutes - dollar/quarter/dime/nickel */ 
+	PORT_DIPSETTING(      0x0078, "1DM/1 Credit 6/5" )     PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000) /* German coinage; these 4 have 2 chutes (1DM/5DM) */
+	PORT_DIPSETTING(      0x0058, "1DM/1 Credit 7/5" )     PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
+	PORT_DIPSETTING(      0x0068, "1DM/1 Credit 8/5" )     PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
+	PORT_DIPSETTING(      0x0048, "1DM/1 Credit" )         PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
+	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000) /* 1/1DM 6/5DM; 3 chutes (5DM/2DM/1DM) */ 
+	PORT_DIPSETTING(      0x0078, "5F/2 Credits 10/5" )    PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000) /* French coinage; 2 chutes (5F/10F) */
+	PORT_DIPSETTING(      0x0058, "5F/2 Credits" )         PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
+	PORT_DIPSETTING(      0x0068, "5F/1 Credit 10/3" )     PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
+	PORT_DIPSETTING(      0x0048, "5F/1 Credit" )          PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
+	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000) /* 1/3F 2/5F 5/10F; 3 chutes (1F/5F/10F) */ 
+	PORT_DIPSETTING(      0x0040, DEF_STR( Free_Play ))
+	PORT_DIPSETTING(      0x0038, "Other (See Service Menu)" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Players )) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0080, "4" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPNAME( 0x0100, 0x0100, "Test Switch" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPUNUSED_DIPLOC (0x0200, 0x0200, "SW2:7")
+	PORT_DIPUNUSED_DIPLOC (0x0400, 0x0400, "SW2:6")
+	PORT_DIPUNUSED_DIPLOC (0x0800, 0x0800, "SW2:5")
+	PORT_DIPNAME( 0x1000, 0x1000, "Coin Counters" ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x1000, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPNAME( 0x2000, 0x2000, "Power-Up Test" ) PORT_DIPLOCATION("SW2:3") /* Manual says "unused", service menu says "eat time" */
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off )) /* "Eat Time" */
+	PORT_DIPSETTING(      0x2000, DEF_STR( On ))  /* "Don't Eat Time" */
+	PORT_DIPNAME( 0xc000, 0xc000, "Country" ) PORT_DIPLOCATION("SW2:2,1") /* Affects currency used. Language remains in English */
+	PORT_DIPSETTING(      0xc000, DEF_STR( USA ))
+	PORT_DIPSETTING(      0x4000, DEF_STR( German ))
+	PORT_DIPSETTING(      0x8000, DEF_STR( French ))
+
+	PORT_START("UNK0")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("UNK1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( shimpact )
+	PORT_INCLUDE( hiimpact )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0001, 0x0000, "Card Dispenser" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( smashtv )
 	PORT_START("IN0")
@@ -2723,17 +2821,17 @@ GAME( 1990, smashtv5, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state, 
 GAME( 1990, smashtv4, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", GAME_SUPPORTS_SAVE )
 GAME( 1990, smashtv3, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 3.01)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,  trog, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,  trog, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,  trog, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,  trog, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA2 12/26/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,  trog, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", GAME_SUPPORTS_SAVE )
-GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,  trog, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA2 12/26/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,  trog, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,  trog, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,  trog, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,  trog, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", GAME_SUPPORTS_SAVE ) /* See notes about factory restore above */
+GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", GAME_SUPPORTS_SAVE ) /* See notes about factory restore above */
 
 GAME( 1991, strkforc, 0,        yunit_cvsd_4bit_fast,  strkforc, midyunit_state, strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", GAME_SUPPORTS_SAVE )
 
