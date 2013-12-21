@@ -219,7 +219,7 @@ public:
         }
         else
         {
-#if defined(_MSC_VER) && _MSC_VER < 1200
+#if defined(_MSC_VER) && _MSC_VER < 1800
             m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
 #else
             m_Vd = m_Vd + log1p((nVd - m_Vd) * m_VtInv) * m_Vt;
