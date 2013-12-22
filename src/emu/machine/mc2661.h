@@ -60,7 +60,6 @@ struct mc2661_interface
 	int m_rxc;
 	int m_txc;
 
-	devcb_read_line     m_in_rxd_cb;
 	devcb_write_line    m_out_txd_cb;
 
 	devcb_write_line    m_out_rxrdy_cb;

@@ -129,7 +129,6 @@ void mc2661_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_in_rxd_cb, 0, sizeof(m_in_rxd_cb));
 		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
 		memset(&m_out_rxrdy_cb, 0, sizeof(m_out_rxrdy_cb));
 		memset(&m_out_txrdy_cb, 0, sizeof(m_out_txrdy_cb));
@@ -149,7 +148,6 @@ void mc2661_device::device_config_complete()
 void mc2661_device::device_start()
 {
 	// resolve callbacks
-	m_in_rxd_func.resolve(m_in_rxd_cb, *this);
 	m_out_txd_func.resolve(m_out_txd_cb, *this);
 	m_out_rxrdy_func.resolve(m_out_rxrdy_cb, *this);
 	m_out_txrdy_func.resolve(m_out_txrdy_cb, *this);
@@ -242,10 +240,7 @@ void mc2661_device::tra_complete()
 
 void mc2661_device::rcv_callback()
 {
-	if (m_in_rxd_func.isnull())
-		receive_register_update_bit(m_signal);
-	else
-		receive_register_update_bit(m_in_rxd_func());
+	receive_register_update_bit(m_signal);
 }
 
 

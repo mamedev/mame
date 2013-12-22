@@ -444,7 +444,6 @@ static mc2661_interface wicat_uart0_intf =
 {
 	19200,  // RXC
 	19200,  // TXC
-	DEVCB_NULL,  // RXD in
 	DEVCB_DEVICE_LINE_MEMBER("videouart0",mc2661_device, rx_w),  // TXD out
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,  // TXRDY out
@@ -460,7 +459,6 @@ static mc2661_interface wicat_uart1_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial1", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("serial1", serial_port_device, tx),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
@@ -475,7 +473,6 @@ static mc2661_interface wicat_uart2_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial2", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("serial2", serial_port_device, tx),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
@@ -490,7 +487,6 @@ static mc2661_interface wicat_uart3_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial3", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("serial3", serial_port_device, tx),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
@@ -505,7 +501,6 @@ static mc2661_interface wicat_uart4_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial4", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("serial4", serial_port_device, tx),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
@@ -520,7 +515,6 @@ static mc2661_interface wicat_uart5_intf =
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER("serial5", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("serial5", serial_port_device, tx),
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,
@@ -536,7 +530,6 @@ static mc2661_interface wicat_uart6_intf =
 {
 	0,  // RXC
 	0,  // TXC
-	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),  // RXD in
 	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),  // RXD out
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,  // TXRDY out
@@ -552,7 +545,6 @@ static mc2661_interface wicat_video_uart0_intf =
 {
 	19200,  // RXC
 	19200,  // TXC
-	DEVCB_NULL,  // RXD in
 	DEVCB_DEVICE_LINE_MEMBER("uart0",mc2661_device, rx_w),  // RXD out
 	DEVCB_CPU_INPUT_LINE("videocpu",INPUT_LINE_IRQ0),  // RXRDY out
 	DEVCB_NULL,  // TXRDY out
@@ -567,7 +559,6 @@ static mc2661_interface wicat_video_uart1_intf =
 {
 	19200,  // RXC
 	19200,  // TXC
-	DEVCB_NULL,  // RXD in
 	DEVCB_NULL,  // RXD out
 	DEVCB_CPU_INPUT_LINE("videocpu",INPUT_LINE_IRQ0),  // RXRDY out
 	DEVCB_NULL,  // TXRDY out

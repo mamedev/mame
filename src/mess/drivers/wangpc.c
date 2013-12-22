@@ -963,7 +963,6 @@ static MC2661_INTERFACE( epci_intf )
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, epci_irq_w),
 	DEVCB_NULL,
@@ -1192,7 +1191,10 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(SCN2661_TAG,mc2661_device,rx_w))
+
 	MCFG_WANGPC_KEYBOARD_ADD()
 
 	// bus
