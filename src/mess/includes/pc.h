@@ -8,7 +8,6 @@
 #define PC_H_
 
 #include "machine/ins8250.h"
-#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/am9517a.h"
 #include "machine/serial.h"
@@ -51,8 +50,6 @@ public:
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
 	UINT8   m_u73_q2;
 	UINT8   m_out1;
-	UINT8   m_memboard[4];      /* used only by ec1840 and ec1841 */
-	int m_memboards;
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	int m_cur_eop;
@@ -90,10 +87,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_EXP_w);
 	DECLARE_READ8_MEMBER(pc_EXP_r);
 	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(ec1841_memboard_r);
-	DECLARE_WRITE8_MEMBER(ec1841_memboard_w);
-	DECLARE_DRIVER_INIT(ec1841);
-	DECLARE_DRIVER_INIT(mc1502);
 	DECLARE_DRIVER_INIT(bondwell);
 	DECLARE_DRIVER_INIT(pcjr);
 	DECLARE_DRIVER_INIT(pccga);
@@ -103,11 +96,9 @@ public:
 	DECLARE_MACHINE_RESET(pc);
 	DECLARE_MACHINE_START(pcjr);
 	DECLARE_MACHINE_RESET(pcjr);
-	DECLARE_MACHINE_START(mc1502);
 	TIMER_CALLBACK_MEMBER(pcjr_delayed_pic8259_irq);
 	TIMER_CALLBACK_MEMBER(pcjr_keyb_signal_callback);
 	TIMER_CALLBACK_MEMBER(pcjr_fdc_watchdog);
-	TIMER_CALLBACK_MEMBER(mc1502_keyb_signal_callback);
 	TIMER_CALLBACK_MEMBER(pc_rtc_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc_frame_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc_vga_frame_interrupt);
@@ -126,8 +117,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pcjr_pic8259_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(ibm5150_pit8253_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1);
 	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2);
 	DECLARE_READ8_MEMBER(ibm5160_ppi_porta_r);
@@ -135,20 +124,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ibm5160_ppi_portb_w);
 	DECLARE_READ8_MEMBER(pc_ppi_porta_r);
 	DECLARE_WRITE8_MEMBER(pc_ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(mc1502_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(mc1502_ppi_portb_w);
-	DECLARE_READ8_MEMBER(mc1502_ppi_portc_r);
-	DECLARE_READ8_MEMBER(mc1502_kppi_porta_r);
-	DECLARE_READ8_MEMBER(mc1502_kppi_portc_r);
-	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
-	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
 	DECLARE_WRITE8_MEMBER(pcjr_ppi_portb_w);
 	DECLARE_READ8_MEMBER(pcjr_ppi_porta_r);
 	DECLARE_READ8_MEMBER(pcjr_ppi_portc_r);
-	DECLARE_READ8_MEMBER(mc1502_wd17xx_aux_r);
-	DECLARE_WRITE8_MEMBER(mc1502_wd17xx_aux_w);
-	DECLARE_READ8_MEMBER(mc1502_wd17xx_drq_r);
-	DECLARE_READ8_MEMBER(mc1502_wd17xx_motor_r);
 	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
 	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
 	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
@@ -159,7 +137,6 @@ public:
 	void fdc_dma_drq(bool state);
 	void pc_select_dma_channel(int channel, bool state);
 	void pc_eop_w(int channel, bool state);
-	void mc1502_fdc_irq_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_FLOPPY_FORMATS( asst128_formats );
 	IRQ_CALLBACK_MEMBER(pc_irq_callback);
@@ -201,13 +178,9 @@ void pc_set_keyb_int(running_machine &machine, int state);
 extern const struct am9517a_interface ibm5150_dma8237_config;
 extern const struct pit8253_interface ibm5150_pit8253_config;
 extern const struct pit8253_interface pcjr_pit8253_config;
-extern const struct pit8253_interface mc1502_pit8253_config;
 extern const ins8250_interface ibm5150_com_interface[4];
 extern const i8255_interface ibm5160_ppi8255_interface;
 extern const i8255_interface pc_ppi8255_interface;
 extern const i8255_interface pcjr_ppi8255_interface;
-extern const i8251_interface mc1502_i8251_interface;
-extern const i8255_interface mc1502_ppi8255_interface;
-extern const i8255_interface mc1502_ppi8255_interface_2;
 
 #endif /* PC_H_ */

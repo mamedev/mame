@@ -762,33 +762,6 @@ void isa8_cga_device::device_reset()
 ***************************************************************************/
 
 
-const device_type ISA8_CGA_MC1502 = &device_creator<isa8_cga_mc1502_device>;
-
-//-------------------------------------------------
-//  isa8_cga_mc1502_device - constructor
-//-------------------------------------------------
-
-isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_MC1502, "ISA8_CGA_MC1502", tag, owner, clock, "cga_mc1502", __FILE__)
-{
-	m_vram_size = 0x8000;
-}
-
-
-ROM_START( mc1502 )
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))
-ROM_END
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *isa8_cga_mc1502_device::device_rom_region() const
-{
-	return ROM_NAME( mc1502 );
-}
-
 UINT32 isa8_cga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(CGA_MC6845_NAME);
@@ -812,34 +785,6 @@ UINT32 isa8_cga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		break;
 	}
 	return 0;
-}
-
-
-const device_type ISA8_CGA_POISK1 = &device_creator<isa8_cga_poisk1_device>;
-
-//-------------------------------------------------
-//  isa8_cga_poisk1_device - constructor
-//-------------------------------------------------
-
-isa8_cga_poisk1_device::isa8_cga_poisk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_POISK1, "ISA8_CGA_POISK1", tag, owner, clock, "cga_poisk1", __FILE__)
-{
-	m_chr_gen_offset[0] = 0x0000;
-	m_font_selection_mask = 0;
-}
-
-ROM_START( cga_poisk1 )
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD( "poisk.cga", 0x0000, 0x0800, CRC(f6eb39f0) SHA1(0b788d8d7a8e92cc612d044abcb2523ad964c200))
-ROM_END
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *isa8_cga_poisk1_device::device_rom_region() const
-{
-	return ROM_NAME( cga_poisk1 );
 }
 
 
@@ -1533,21 +1478,6 @@ void isa8_cga_device::plantronics_w(UINT8 data)
  *
  *************************************************************************/
 
-WRITE8_MEMBER( isa8_cga_device::char_ram_write )
-{
-	logerror("write char ram %04x %02x\n",offset,data);
-	m_chr_gen_base[offset + 0x0000] = data;
-	m_chr_gen_base[offset + 0x0800] = data;
-	m_chr_gen_base[offset + 0x1000] = data;
-	m_chr_gen_base[offset + 0x1800] = data;
-}
-
-
-READ8_MEMBER( isa8_cga_device::char_ram_read )
-{
-	return m_chr_gen_base[offset];
-}
-
 
 READ8_MEMBER( isa8_cga_device::io_read )
 {
@@ -1564,9 +1494,6 @@ READ8_MEMBER( isa8_cga_device::io_read )
 			break;
 		case 10:
 			data = m_vsync | ( ( data & 0x40 ) >> 4 ) | m_hsync;
-			break;
-		case 0x0f:
-			data = m_p3df;
 			break;
 	}
 	return data;
@@ -1595,20 +1522,6 @@ WRITE8_MEMBER( isa8_cga_device::io_write )
 	case 0x0d:
 		plantronics_w(data);
 		break;
-	case 0x0f:
-		// Not sure if some all CGA cards have ability to upload char definition
-		// The original CGA card had a char rom
-		// TODO: This should be moved to card implementations that actually had this feature
-		m_p3df = data;
-		if (data & 1) {
-			address_space &space_prg = machine().firstcpu->space(AS_PROGRAM);
-
-			space_prg.install_readwrite_handler(0xb8000, 0xb87ff, read8_delegate( FUNC(isa8_cga_device::char_ram_read), this), write8_delegate(FUNC(isa8_cga_device::char_ram_write), this) );
-		} else {
-			m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", m_vram);
-		}
-		break;
-
 	}
 }
 
@@ -2194,4 +2107,95 @@ UINT32 isa8_wyse700_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 		return isa8_cga_device::screen_update(screen, bitmap, cliprect);
 	}
 	return 0;
+}
+
+
+const device_type ISA8_EC1841_0002 = &device_creator<isa8_ec1841_0002_device>;
+
+//-------------------------------------------------
+//  isa8_ec1841_0002_device - constructor
+//-------------------------------------------------
+
+isa8_ec1841_0002_device::isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_cga_device( mconfig, ISA8_EC1841_0002, "EC 1841.0002 (CGA)", tag, owner, clock, "ec1841_0002", __FILE__)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void isa8_ec1841_0002_device::device_start()
+{
+	isa8_cga_device::device_start();
+
+	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_ec1841_0002_device::io_read), this ), write8_delegate( FUNC(isa8_ec1841_0002_device::io_write), this ) );
+}
+
+void isa8_ec1841_0002_device::device_reset()
+{
+	isa8_cga_device::device_reset();
+	m_p3df = 0;
+}
+
+ROM_START( iskr1031 )
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD( "iskra-1031_font.bin", 0x0000, 0x2000, CRC(f4d62e80) SHA1(ad7e81a0c9abc224671422bbcf6f6262da92b510))
+ROM_END
+
+const rom_entry *isa8_ec1841_0002_device::device_rom_region() const
+{
+	return ROM_NAME( iskr1031 );
+}
+
+WRITE8_MEMBER( isa8_ec1841_0002_device::char_ram_write )
+{
+	offset ^= BIT(offset, 12);
+//	logerror("write char ram %04x %02x\n",offset,data);
+	m_chr_gen_base[offset + 0x0000] = data;
+	m_chr_gen_base[offset + 0x0800] = data;
+	m_chr_gen_base[offset + 0x1000] = data;
+	m_chr_gen_base[offset + 0x1800] = data;
+}
+
+READ8_MEMBER( isa8_ec1841_0002_device::char_ram_read )
+{
+	offset ^= BIT(offset, 12);
+	return m_chr_gen_base[offset];
+}
+
+WRITE8_MEMBER( isa8_ec1841_0002_device::io_write )
+{
+	switch (offset)
+	{
+	case 0x0f:
+		m_p3df = data;
+		if (data & 1) {
+			m_isa->install_memory(0xb8000, 0xb9fff, 0, m_vram_size & 0x4000,
+				read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
+				write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
+		} else {
+			m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", m_vram);
+		}
+		break;
+	default:
+		isa8_cga_device::io_write(space, offset, data);
+		break;
+	}
+}
+
+READ8_MEMBER( isa8_ec1841_0002_device::io_read )
+{
+	UINT8 data;
+
+	switch (offset)
+	{
+	case 0x0f:
+		data = m_p3df;
+		break;
+	default:
+		data = isa8_cga_device::io_read(space, offset);
+		break;
+	}
+	return data;
 }

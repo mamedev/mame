@@ -879,3 +879,130 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
 	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 }
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type EC1841_MOTHERBOARD = &device_creator<ec1841_mb_device>;
+
+static MACHINE_CONFIG_FRAGMENT( ec1841_mb_config )
+	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
+
+	MCFG_DEVICE_REMOVE("pc_kbdc")
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf_5150)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor ec1841_mb_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( ec1841_mb_config );
+}
+
+static INPUT_PORTS_START( ec1841_mb )
+	PORT_START("DSW0") /* SA1 */
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
+	PORT_DIPNAME( 0x30, 0x20, "Graphics adapter")
+	PORT_DIPSETTING(    0x00, "Reserved" )
+	PORT_DIPSETTING(    0x10, "Color 40x25" )
+	PORT_DIPSETTING(    0x20, "Color 80x25" )
+	PORT_DIPSETTING(    0x30, "Monochrome" )
+	PORT_BIT(     0x08, 0x08, IPT_UNUSED )
+	/* BIOS does not support booting from QD floppies */
+	PORT_DIPNAME( 0x04, 0x04, "Floppy type")
+	PORT_DIPSETTING(    0x00, "80 tracks" )
+	PORT_DIPSETTING(    0x04, "40 tracks" )
+	PORT_DIPNAME( 0x02, 0x00, "8087 installed")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x02, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
+	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+
+	PORT_START("SA2")
+	PORT_DIPNAME( 0x04, 0x04, "Speech synthesizer")
+	PORT_DIPSETTING(    0x00, "Installed" )
+	PORT_DIPSETTING(    0x04, "Not installed" )
+INPUT_PORTS_END
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor ec1841_mb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ec1841_mb );
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  ec1841_mb_device - constructor
+//-------------------------------------------------
+
+ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: ibm5160_mb_device(mconfig, tag, owner, clock)
+{
+}
+
+void ec1841_mb_device::device_start()
+{
+	ibm5160_mb_device::device_start();
+}
+void ec1841_mb_device::device_reset()
+{
+	ibm5160_mb_device::device_reset();
+}
+
+// kbd interface is 5150-like but PB2 controls access to second bank of DIP switches (SA2).
+WRITE8_MEMBER( ec1841_mb_device::pc_ppi_portb_w )
+{
+	/* KB controller port B */
+	m_ppi_portb = data;
+	m_ppi_portc_switch_high = data & 0x04;
+	m_ppi_keyboard_clear = data & 0x80;
+	m_ppi_keyb_clock = data & 0x40;
+	m_pit8253->gate2_w(BIT(data, 0));
+	pc_speaker_set_spkrdata( data & 0x02 );
+
+	/* If PB7 is set clear the shift register and reset the IRQ line */
+	if ( m_ppi_keyboard_clear )
+	{
+		m_ppi_shift_register = 0;
+		m_ppi_shift_enable = 0;
+		m_pic8259->ir1_w(m_ppi_shift_enable);
+	}
+
+	m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
+	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
+	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
+}
+
+READ8_MEMBER ( ec1841_mb_device::pc_ppi_portc_r )
+{
+	int timer2_output = m_pit8253->get_output(2);
+	int data=0xff;
+
+	data&=~0x80; // no parity error
+	data&=~0x40; // no error on expansion board
+
+	if (m_ppi_portc_switch_high)
+	{
+		data = (data & 0xf0) | (ioport("SA2")->read() & 0x0f);
+	}
+
+	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
+
+	return data;
+}

@@ -1,20 +1,15 @@
 /**********************************************************************
 
-    EC-1841 92-key keyboard emulation
-
-    Sends 9 non-standard scan codes (54..5C) and reassigns 3 standard
-    ones (2A, 36, 3A).  EC-1841 BIOS converts scan codes into Cyrillic
-    by default; 'Lat' key (mapped to F11) switches it to Latin mode.
-    'Rus' (F12) switches back.
+    Iskra-1030 and -1031 XX-key keyboard emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
-#include "ec1841.h"
+#include "iskr1030.h"
 
-#define VERBOSE_DBG 0       /* general debug messages */
+#define VERBOSE_DBG 1       /* general debug messages */
 
 #define DBG_LOG(N,M,A) \
 	do { \
@@ -39,17 +34,17 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type PC_KBD_EC_1841 = &device_creator<ec_1841_keyboard_device>;
+const device_type PC_KBD_ISKR_1030 = &device_creator<iskr_1030_keyboard_device>;
 
 
 //-------------------------------------------------
-//  ROM( ec_1841_keyboard )
+//  ROM( iskr_1030_keyboard )
 //-------------------------------------------------
 
-ROM_START( ec_1841_keyboard )
-	ROM_REGION( 0x400, I8048_TAG, 0 )
+ROM_START( iskr_1030_keyboard )
+	ROM_REGION( 0x800, I8048_TAG, 0 )
 	// XXX add P/N etc
-	ROM_LOAD( "1816be48.bin", 0x000, 0x400, CRC(e9abfe44) SHA1(1db430c72c2d007ea0b8ae2514ff15c96baba308) )
+	ROM_LOAD( "i1030.bin", 0x000, 0x800, CRC(7cac9c4b) SHA1(03959d3350e012ebfe61cee9c062b6c1fdd8766e) )
 ROM_END
 
 
@@ -57,9 +52,9 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *ec_1841_keyboard_device::device_rom_region() const
+const rom_entry *iskr_1030_keyboard_device::device_rom_region() const
 {
-	return ROM_NAME( ec_1841_keyboard );
+	return ROM_NAME( iskr_1030_keyboard );
 }
 
 
@@ -67,22 +62,23 @@ const rom_entry *ec_1841_keyboard_device::device_rom_region() const
 //  ADDRESS_MAP( kb_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ec_1841_keyboard_io, AS_IO, 8, ec_1841_keyboard_device )
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_WRITE(bus_w)
+static ADDRESS_MAP_START( iskr_1030_keyboard_io, AS_IO, 8, iskr_1030_keyboard_device )
+	AM_RANGE(0x00, 0xFF) AM_RAM
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
+//	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
 ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( ec_1841_keyboard )
+//  MACHINE_DRIVER( iskr_1030_keyboard )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( ec_1841_keyboard )
+static MACHINE_CONFIG_FRAGMENT( iskr_1030_keyboard )
 	// XXX check
 	MCFG_CPU_ADD(I8048_TAG, I8048, MCS48_LC_CLOCK(IND_U(47), CAP_P(20.7)))
-	MCFG_CPU_IO_MAP(ec_1841_keyboard_io)
+	MCFG_CPU_IO_MAP(iskr_1030_keyboard_io)
 MACHINE_CONFIG_END
 
 
@@ -91,23 +87,23 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor ec_1841_keyboard_device::device_mconfig_additions() const
+machine_config_constructor iskr_1030_keyboard_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( ec_1841_keyboard );
+	return MACHINE_CONFIG_NAME( iskr_1030_keyboard );
 }
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( ec_1841_keyboard )
+//  INPUT_PORTS( iskr_1030_keyboard )
 //-------------------------------------------------
 
-INPUT_PORTS_START( ec_1841_keyboard )
+INPUT_PORTS_START( iskr_1030_keyboard )
 	PORT_START("MD00")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(TAB))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Inf") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 0x59
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("?59?") // 0x59 = Inf
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -268,9 +264,9 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor ec_1841_keyboard_device::device_input_ports() const
+ioport_constructor iskr_1030_keyboard_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( ec_1841_keyboard );
+	return INPUT_PORTS_NAME( iskr_1030_keyboard );
 }
 
 
@@ -280,11 +276,11 @@ ioport_constructor ec_1841_keyboard_device::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  ec_1841_keyboard_device - constructor
+//  iskr_1030_keyboard_device - constructor
 //-------------------------------------------------
 
-ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC_KBD_EC_1841, "EC-1841 Keyboard", tag, owner, clock, "kb_ec1841", __FILE__),
+iskr_1030_keyboard_device::iskr_1030_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC_KBD_ISKR_1030, "Iskra-1030 Keyboard", tag, owner, clock, "kb_iskr1030", __FILE__),
 		device_pc_kbd_interface(mconfig, *this),
 		m_maincpu(*this, I8048_TAG),
 		m_md00(*this, "MD00"),
@@ -303,10 +299,9 @@ ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, 
 		m_md13(*this, "MD13"),
 		m_md14(*this, "MD14"),
 		m_md15(*this, "MD15"),
-		m_bus(0xff),
-		m_p1(0xff),
-		m_p2(0xff),
-		m_q(1)
+		m_p1(0),
+		m_p2(0),
+		m_q(0)
 {
 }
 
@@ -315,12 +310,11 @@ ec_1841_keyboard_device::ec_1841_keyboard_device(const machine_config &mconfig, 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ec_1841_keyboard_device::device_start()
+void iskr_1030_keyboard_device::device_start()
 {
 	set_pc_kbdc_device();
 
 	// state saving
-	save_item(NAME(m_bus));
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
 	save_item(NAME(m_q));
@@ -331,7 +325,7 @@ void ec_1841_keyboard_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void ec_1841_keyboard_device::device_reset()
+void iskr_1030_keyboard_device::device_reset()
 {
 }
 
@@ -340,9 +334,10 @@ void ec_1841_keyboard_device::device_reset()
 //  clock_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
+WRITE_LINE_MEMBER( iskr_1030_keyboard_device::clock_write )
 {
 	DBG_LOG(1,0,( "%s: clock write %d\n", tag(), state));
+	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -350,21 +345,34 @@ WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
 //  data_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ec_1841_keyboard_device::data_write )
+WRITE_LINE_MEMBER( iskr_1030_keyboard_device::data_write )
 {
 	DBG_LOG(1,0,( "%s: data write %d\n", tag(), state));
 }
 
 
 //-------------------------------------------------
-//  bus_w -
+//  t0_r - XXX ENT0 CLK
 //-------------------------------------------------
 
-WRITE8_MEMBER( ec_1841_keyboard_device::bus_w )
+READ8_MEMBER( iskr_1030_keyboard_device::t0_r )
 {
-	DBG_LOG(2,0,( "%s: bus_w %02x\n", tag(), data));
+	return 0;
+//	return clock_signal();
+}
 
-	m_bus = data;
+
+//-------------------------------------------------
+//  t1_r - OK
+//-------------------------------------------------
+
+READ8_MEMBER( iskr_1030_keyboard_device::t1_r )
+{
+	UINT8 data = data_signal();
+
+	DBG_LOG(2,0,( "%s: t1_r %d\n", tag(), data));
+
+	return data;
 }
 
 
@@ -372,7 +380,7 @@ WRITE8_MEMBER( ec_1841_keyboard_device::bus_w )
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ec_1841_keyboard_device::p1_r )
+READ8_MEMBER( iskr_1030_keyboard_device::p1_r )
 {
 	/*
 
@@ -391,9 +399,6 @@ READ8_MEMBER( ec_1841_keyboard_device::p1_r )
 
 	UINT8 data = 0;
 
-	data |= clock_signal();
-	data |= data_signal() << 1;
-
 	DBG_LOG(1,0,( "%s: p1_r %02x\n", tag(), data));
 
 	return data;
@@ -401,10 +406,10 @@ READ8_MEMBER( ec_1841_keyboard_device::p1_r )
 
 
 //-------------------------------------------------
-//  p1_w -
+//  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ec_1841_keyboard_device::p1_w )
+WRITE8_MEMBER( iskr_1030_keyboard_device::p2_w )
 {
 	/*
 	    bit     description
@@ -418,72 +423,32 @@ WRITE8_MEMBER( ec_1841_keyboard_device::p1_w )
 	    6       LED XXX
 	    7       LED XXX
 	*/
-	DBG_LOG(1,0,( "%s: p1_w %02x\n", tag(), data));
+	DBG_LOG(1,0,( "%s: p2_w %02x\n", tag(), data));
 
 	m_p1 = data;
 }
 
 
 //-------------------------------------------------
-//  p2_w -
+//  p1_w - OK
 //-------------------------------------------------
 
-WRITE8_MEMBER( ec_1841_keyboard_device::p2_w )
+WRITE8_MEMBER( iskr_1030_keyboard_device::p1_w )
 {
 	/*
 	    bit     description
 
-	    0       -STROBE (to matrix mux)
-	    1       XXX CLOCK out 1
-	    2       XXX DATA out 1
-	    3
-	    4
-	    5       XXX DATA out 2?
-	    6       XXX CLOCK out 2?
+	    0       XXX
+	    1       XXX
+	    2       XXX
+	    3       XXX
+	    4       CLOCK out
+	    5       DATA out (inverted!)
+	    6       XXX
 	    7       XXX
 	*/
-	DBG_LOG(1,0,( "%s: p2_w %02x\n", tag(), data));
+	DBG_LOG(1,0,( "%s: p1_w %02x (clk %d data %d)\n", tag(), data, BIT(data, 4), BIT(data, 5)));
 
-	m_pc_kbdc->data_write_from_kb(BIT(data, 2));
-	m_pc_kbdc->clock_write_from_kb(BIT(data, 1));
-
-	m_p2 = data;
-}
-
-
-//-------------------------------------------------
-//  t1_r -
-//-------------------------------------------------
-
-READ8_MEMBER( ec_1841_keyboard_device::t1_r )
-{
-	if (BIT(m_p2,0)) {
-		m_q = 1;
-	} else {
-		UINT8 sense = 0xff;
-
-		switch(m_bus & 15) {
-			case 0: sense &= m_md00->read(); break;
-			case 1: sense &= m_md01->read(); break;
-			case 2: sense &= m_md02->read(); break;
-			case 3: sense &= m_md03->read(); break;
-			case 4: sense &= m_md04->read(); break;
-			case 5: sense &= m_md05->read(); break;
-			case 6: sense &= m_md06->read(); break;
-			case 7: sense &= m_md07->read(); break;
-			case 8: sense &= m_md08->read(); break;
-			case 9: sense &= m_md09->read(); break;
-			case 10: sense &= m_md10->read(); break;
-			case 11: sense &= m_md11->read(); break;
-			case 12: sense &= m_md12->read(); break;
-			case 13: sense &= m_md13->read(); break;
-			case 14: sense &= m_md14->read(); break;
-			case 15: sense &= m_md15->read(); break;
-		}
-		m_q = BIT(sense, (m_bus >> 4) & 7);
-	}
-
-	DBG_LOG(1,0,( "%s: bus %02X t1_r %d\n", tag(), m_bus, m_q));
-
-	return m_q;
+	m_pc_kbdc->data_write_from_kb(BIT(data, 5));
+	m_pc_kbdc->clock_write_from_kb(BIT(data, 4));
 }

@@ -689,6 +689,7 @@ DRVLIBS += \
 	$(MESSOBJ)/wang.a \
 	$(MESSOBJ)/wavemate.a \
 	$(MESSOBJ)/xerox.a \
+	$(MESSOBJ)/xussrpc.a \
 	$(MESSOBJ)/yamaha.a \
 	$(MESSOBJ)/zpa.a \
 	$(MESSOBJ)/zvt.a \
@@ -1341,6 +1342,7 @@ $(MESSOBJ)/hec2hrp.a:           \
 $(MESSOBJ)/intel.a:             \
 	$(MESS_DRIVERS)/basic52.o   \
 	$(MESS_DRIVERS)/isbc.o      \
+	$(MESS_MACHINE)/isbc_215g.o \
 	$(MESS_DRIVERS)/ipc.o       \
 	$(MESS_DRIVERS)/ipds.o      \
 	$(MESS_DRIVERS)/imds.o      \
@@ -2103,6 +2105,19 @@ $(MESSOBJ)/wavemate.a:          \
 $(MESSOBJ)/xerox.a:             \
 	$(MESS_DRIVERS)/xerox820.o  \
 	$(MESS_DRIVERS)/bigbord2.o  \
+
+$(MESSOBJ)/xussrpc.a:            \
+	$(MESS_DRIVERS)/ec184x.o    \
+	$(MESS_DRIVERS)/iskr103x.o  \
+	$(MESS_DRIVERS)/poisk1.o    \
+	$(MESS_MACHINE)/p1_fdc.o    \
+	$(MESS_MACHINE)/p1_hdc.o    \
+	$(MESS_MACHINE)/p1_rom.o    \
+	$(MESS_VIDEO)/poisk1.o      \
+	$(MESS_DRIVERS)/mc1502.o    \
+	$(MESS_MACHINE)/mc1502_fdc.o\
+	$(MESS_MACHINE)/mc1502_rom.o\
+	$(MESS_MACHINE)/xsu_cards.o \
 
 $(MESSOBJ)/yamaha.a:            \
 	$(MESS_DRIVERS)/ymmu100.o   \

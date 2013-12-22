@@ -17,7 +17,6 @@
 
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
-#include "machine/i8251.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
 
@@ -65,87 +64,6 @@
 			logerror A; \
 		} \
 	} while (0)
-
-/*
- * EC-1841 memory controller.  The machine can hold four memory boards;
- * each board has a control register, its address is set by a DIP switch
- * on the board itself.
- *
- * Only one board should be enabled for read, and one for write.
- * Normally, this is the same board.
- *
- * Each board is divided into 4 banks, internally numbererd 0..3.
- * POST tests each board on startup, and an error (indicated by
- * I/O CH CK bus signal) causes it to disable failing bank(s) by writing
- * 'reconfiguration code' (inverted number of failing memory bank) to
- * the register.
-
- * bit 1-0  'reconfiguration code'
- * bit 2    enable read access
- * bit 3    enable write access
- */
-
-READ8_MEMBER(pc_state::ec1841_memboard_r)
-{
-	pc_state *st = space.machine().driver_data<pc_state>();
-	UINT8 data;
-
-	data = offset % 4;
-	if (data > m_memboards)
-		data = 0xff;
-	else
-		data = st->m_memboard[data];
-	DBG_LOG(1,"ec1841_memboard",("R (%d of %d) == %02X\n", offset, m_memboards, data ));
-
-	return data;
-}
-
-WRITE8_MEMBER(pc_state::ec1841_memboard_w)
-{
-	pc_state *st = space.machine().driver_data<pc_state>();
-	address_space &program = st->m_maincpu->space(AS_PROGRAM);
-	UINT8 current;
-
-	current = st->m_memboard[offset];
-
-	DBG_LOG(1,"ec1841_memboard",("W (%d of %d) <- %02X (%02X)\n", offset, m_memboards, data, current));
-
-	if (offset > m_memboards) {
-		return;
-	}
-
-	if (BIT(current, 2) && !BIT(data, 2)) {
-		// disable read access
-		program.unmap_read(0, 0x7ffff);
-		DBG_LOG(1,"ec1841_memboard_w",("unmap_read(%d)\n", offset));
-	}
-
-	if (BIT(current, 3) && !BIT(data, 3)) {
-		// disable write access
-		program.unmap_write(0, 0x7ffff);
-		DBG_LOG(1,"ec1841_memboard_w",("unmap_write(%d)\n", offset));
-	}
-
-	if (!BIT(current, 2) && BIT(data, 2)) {
-		for(int i=0; i<4; i++)
-			st->m_memboard[i] &= 0xfb;
-		// enable read access
-		membank("bank10")->set_base(m_ram->pointer() + offset*0x80000);
-		program.install_read_bank(0, 0x7ffff, "bank10");
-		DBG_LOG(1,"ec1841_memboard_w",("map_read(%d)\n", offset));
-	}
-
-	if (!BIT(current, 3) && BIT(data, 3)) {
-		for(int i=0; i<4; i++)
-			st->m_memboard[i] &= 0xf7;
-		// enable write access
-		membank("bank20")->set_base(m_ram->pointer() + offset*0x80000);
-		program.install_write_bank(0, 0x7ffff, "bank20");
-		DBG_LOG(1,"ec1841_memboard_w",("map_write(%d)\n", offset));
-	}
-
-	st->m_memboard[offset] = data;
-}
 
 /*************************************************************************
  *
@@ -417,51 +335,6 @@ const struct pit8253_interface pcjr_pit8253_config =
 			XTAL_14_31818MHz/12,              /* pio port c pin 4, and speaker polling enough */
 			DEVCB_NULL,
 			DEVCB_DRIVER_LINE_MEMBER(pc_state,ibm5150_pit8253_out2_changed)
-		}
-	}
-};
-
-/* MC1502 uses single XTAL for everything -- incl. CGA? check */
-
-const i8251_interface mc1502_i8251_interface =
-{
-	/* XXX RxD data are accessible via PPI port C, bit 7 */
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w), /* default handler does nothing */
-	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
-	DEVCB_NULL,
-	DEVCB_NULL  /* XXX SYNDET triggers NMI */
-};
-
-WRITE_LINE_MEMBER(pc_state::mc1502_pit8253_out1_changed)
-{
-	machine().device<i8251_device>("upd8251")->txc_w(state);
-	machine().device<i8251_device>("upd8251")->rxc_w(state);
-}
-
-WRITE_LINE_MEMBER(pc_state::mc1502_pit8253_out2_changed)
-{
-	pc_speaker_set_input( state );
-	m_cassette->output(state ? 1 : -1);
-}
-
-const struct pit8253_interface mc1502_pit8253_config =
-{
-	{
-		{
-			XTAL_16MHz/12,              /* heartbeat IRQ */
-			DEVCB_NULL,
-			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
-		}, {
-			XTAL_16MHz/12,              /* serial port */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pc_state,mc1502_pit8253_out1_changed)
-		}, {
-			XTAL_16MHz/12,              /* pio port c pin 4, and speaker polling enough */
-			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(pc_state,mc1502_pit8253_out2_changed)
 		}
 	}
 };
@@ -890,138 +763,6 @@ I8255_INTERFACE( pc_ppi8255_interface )
 };
 
 
-static struct {
-	UINT8       pulsing;
-	UINT16      mask;       /* input lines */
-	emu_timer   *keyb_signal_timer;
-} mc1502_keyb;
-
-
-/* check if any keys are pressed, raise IRQ1 if so */
-
-TIMER_CALLBACK_MEMBER(pc_state::mc1502_keyb_signal_callback)
-{
-	UINT8 key = 0;
-
-	key |= ioport("Y1")->read();
-	key |= ioport("Y2")->read();
-	key |= ioport("Y3")->read();
-	key |= ioport("Y4")->read();
-	key |= ioport("Y5")->read();
-	key |= ioport("Y6")->read();
-	key |= ioport("Y7")->read();
-	key |= ioport("Y8")->read();
-	key |= ioport("Y9")->read();
-	key |= ioport("Y10")->read();
-	key |= ioport("Y11")->read();
-	key |= ioport("Y12")->read();
-//  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, mc1502_keyb.pulsing,
-//      (key || mc1502_keyb.pulsing) ? " will IRQ" : ""));
-
-	/*
-	   If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
-	   keep pulsing while any key is pressed, and pulse one time after all keys
-	   are released.
-	 */
-	if (key) {
-		if (mc1502_keyb.pulsing < 2) {
-			mc1502_keyb.pulsing += 2;
-		}
-	}
-
-	if (mc1502_keyb.pulsing) {
-		m_pic8259->ir1_w(mc1502_keyb.pulsing & 1);
-		mc1502_keyb.pulsing--;
-	}
-}
-
-WRITE8_MEMBER(pc_state::mc1502_ppi_porta_w)
-{
-	m_centronics->write(space, 0, data);
-}
-
-WRITE8_MEMBER(pc_state::mc1502_ppi_portb_w)
-{
-//  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
-	m_ppi_portb = data;
-	machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
-	pc_speaker_set_spkrdata(BIT(data, 1));
-	m_centronics->strobe_w(BIT(data, 2));
-	m_centronics->autofeed_w(BIT(data, 3));
-	m_centronics->init_prime_w(BIT(data, 4));
-}
-
-READ8_MEMBER(pc_state::mc1502_kppi_portc_r)
-{
-	UINT8 data = 0;
-
-	data |= m_centronics->fault_r() << 4;
-	data |= m_centronics->pe_r() << 5;
-	data |= m_centronics->ack_r() << 6;
-	data |= m_centronics->busy_r() << 7;
-
-	return data;
-}
-
-READ8_MEMBER(pc_state::mc1502_ppi_portc_r)
-{
-	int timer2_output = machine().device<pit8253_device>("pit8253")->get_output(2);
-	int data = 0xff;
-	double tap_val = m_cassette->input();
-
-//  0x80 -- serial RxD
-//  0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
-	data = ( data & ~0x40 ) | ( tap_val < 0 ? 0x40 : 0x00 ) | ( (BIT(m_ppi_portb, 7) && timer2_output) ? 0x40 : 0x00 );
-//  0x20 -- T2OUT
-	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
-//  0x10 -- SNDOUT
-	data = ( data & ~0x10 ) | ( (BIT(m_ppi_portb, 1) && timer2_output) ? 0x10 : 0x00 );
-
-//  DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
-//      data, tap_val, timer2_output, machine().describe_context()));
-	return data;
-}
-
-READ8_MEMBER(pc_state::mc1502_kppi_porta_r)
-{
-	UINT8 key = 0;
-
-	if (mc1502_keyb.mask & 0x0001) { key |= ioport("Y1")->read(); }
-	if (mc1502_keyb.mask & 0x0002) { key |= ioport("Y2")->read(); }
-	if (mc1502_keyb.mask & 0x0004) { key |= ioport("Y3")->read(); }
-	if (mc1502_keyb.mask & 0x0008) { key |= ioport("Y4")->read(); }
-	if (mc1502_keyb.mask & 0x0010) { key |= ioport("Y5")->read(); }
-	if (mc1502_keyb.mask & 0x0020) { key |= ioport("Y6")->read(); }
-	if (mc1502_keyb.mask & 0x0040) { key |= ioport("Y7")->read(); }
-	if (mc1502_keyb.mask & 0x0080) { key |= ioport("Y8")->read(); }
-	if (mc1502_keyb.mask & 0x0100) { key |= ioport("Y9")->read(); }
-	if (mc1502_keyb.mask & 0x0200) { key |= ioport("Y10")->read(); }
-	if (mc1502_keyb.mask & 0x0400) { key |= ioport("Y11")->read(); }
-	if (mc1502_keyb.mask & 0x0800) { key |= ioport("Y12")->read(); }
-	key ^= 0xff;
-//  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
-	return key;
-}
-
-WRITE8_MEMBER(pc_state::mc1502_kppi_portb_w)
-{
-	mc1502_keyb.mask &= ~255;
-	mc1502_keyb.mask |= data ^ 255;
-	if (!BIT(data, 0))
-		mc1502_keyb.mask |= 1 << 11;
-	else
-		mc1502_keyb.mask &= ~(1 << 11);
-//  DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
-}
-
-WRITE8_MEMBER(pc_state::mc1502_kppi_portc_w)
-{
-	mc1502_keyb.mask &= ~(7 << 8);
-	mc1502_keyb.mask |= ((data ^ 7) & 7) << 8;
-//  DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, mc1502_keyb.mask));
-}
-
-
 WRITE8_MEMBER(pc_state::pcjr_ppi_portb_w)
 {
 	/* KB controller port B */
@@ -1103,26 +844,6 @@ I8255_INTERFACE( pcjr_ppi8255_interface )
 	DEVCB_DRIVER_MEMBER(pc_state,pcjr_ppi_portb_w),
 	DEVCB_DRIVER_MEMBER(pc_state,pcjr_ppi_portc_r),
 	DEVCB_NULL
-};
-
-I8255_INTERFACE( mc1502_ppi8255_interface )
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_porta_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_portb_w),
-	DEVCB_DRIVER_MEMBER(pc_state,mc1502_ppi_portc_r),
-	DEVCB_NULL
-};
-
-I8255_INTERFACE( mc1502_ppi8255_interface_2 )
-{
-	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_porta_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_portb_w),
-	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_portc_r),
-	DEVCB_DRIVER_MEMBER(pc_state,mc1502_kppi_portc_w)
 };
 
 
@@ -1245,71 +966,6 @@ READ8_MEMBER(pc_state::pcjx_port_1ff_r)
 
 	m_pcjx_1ff_count = 0;
 	return 0x60; // expansion?
-}
-
-/*
- * MC1502 uses a FD1793 clone instead of uPD765
- */
-
-READ8_MEMBER(pc_state::mc1502_wd17xx_aux_r)
-{
-	UINT8 data;
-
-	data = 0;
-
-	return data;
-}
-
-WRITE8_MEMBER(pc_state::mc1502_wd17xx_aux_w)
-{
-	fd1793_t *fdc = machine().device<fd1793_t>("vg93");
-	floppy_image_device *floppy0 = machine().device<floppy_connector>("fd0")->get_device();
-	floppy_image_device *floppy1 = machine().device<floppy_connector>("fd1")->get_device();
-	floppy_image_device *floppy = ((data & 0x10)?floppy1:floppy0);
-	fdc->set_floppy(floppy);
-
-	// master reset
-	if((data & 1) == 0)
-		fdc->reset();
-
-	// SIDE ONE
-	floppy->ss_w((data & 2)?1:0);
-
-	// bits 2, 3 -- motor on (drive 0, 1)
-	floppy0->mon_w(!(data & 4));
-	floppy1->mon_w(!(data & 8));
-}
-
-/*
- * Accesses to this port block (halt the CPU until DRQ, INTRQ or MOTOR ON)
- */
-READ8_MEMBER(pc_state::mc1502_wd17xx_drq_r)
-{
-	fd1793_t *fdc = machine().device<fd1793_t>("vg93");
-
-	if (!fdc->drq_r() && !fdc->intrq_r()) {
-		/* fake cpu wait by resetting PC one insn back */
-		m_maincpu->set_state_int(I8086_IP, m_maincpu->state_int(I8086_IP) - 1);
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	}
-
-	return fdc->drq_r();
-}
-
-void pc_state::mc1502_fdc_irq_drq(bool state)
-{
-	if(state)
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-}
-
-READ8_MEMBER(pc_state::mc1502_wd17xx_motor_r)
-{
-	UINT8 data;
-
-	/* fake motor being always on */
-	data = 1;
-
-	return data;
 }
 
 WRITE8_MEMBER(pc_state::asst128_fdc_dor_w)
@@ -1445,23 +1101,6 @@ DRIVER_INIT_MEMBER(pc_state,pcjr)
 	mess_init_pc_common(pcjr_set_keyb_int);
 }
 
-DRIVER_INIT_MEMBER(pc_state,mc1502)
-{
-	mess_init_pc_common(NULL);
-}
-
-DRIVER_INIT_MEMBER(pc_state,ec1841)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	program.install_read_bank(0, 0x7ffff, "bank10");
-	program.install_write_bank(0, 0x7ffff, "bank20");
-	membank( "bank10" )->set_base( m_ram->pointer() );
-	membank( "bank20" )->set_base( m_ram->pointer() );
-
-	pc_rtc_init();
-}
-
 
 IRQ_CALLBACK_MEMBER(pc_state::pc_irq_callback)
 {
@@ -1499,35 +1138,6 @@ MACHINE_RESET_MEMBER(pc_state,pc)
 	m_ppi_shift_enable = 0;
 
 	m_speaker->level_w(0);
-
-	// ec1841-specific code
-	m_memboards = m_ram->size()/(512*1024) - 1;
-	if (m_memboards > 3)
-		m_memboards = 3;
-	memset(m_memboard,0,sizeof(m_memboard));
-	// mark 1st board enabled
-	m_memboard[0]=0xc;
-}
-
-
-MACHINE_START_MEMBER(pc_state,mc1502)
-{
-	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
-
-	/*
-	       Keyboard polling circuit holds IRQ1 high until a key is
-	       pressed, then it starts a timer that pulses IRQ1 low each
-	       40ms (check) for 20ms (check) until all keys are released.
-	       Last pulse causes BIOS to write a 'break' scancode into port 60h.
-	 */
-	m_pic8259->ir1_w(1);
-	memset(&mc1502_keyb, 0, sizeof(mc1502_keyb));
-	mc1502_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::mc1502_keyb_signal_callback),this));
-	mc1502_keyb.keyb_signal_timer->adjust( attotime::from_msec(20), 0, attotime::from_msec(20) );
-
-	fd1793_t *fdc = machine().device<fd1793_t>("vg93");
-	fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(pc_state::mc1502_fdc_irq_drq), this));
-	fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(pc_state::mc1502_fdc_irq_drq), this));
 }
 
 

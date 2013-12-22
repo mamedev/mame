@@ -64,8 +64,19 @@
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
+			<dataarea name="flop" size="327680">
 				<rom name="ec1841-demo.ima" size="327680" sha1="692fc2c01ba1dbceb5626cd3c593ebf8c79d62c3" crc="c273098d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="m86v32">
+		<description>Demo disk</description>
+		<year>1988</year>
+		<publisher>MPO VT</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="ec1841-m86-3.2.ima" size="327680" sha1="a51bf73114f9178348d0eda0db936fc1f3bd5aa0" crc="69ce32e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -24,6 +24,7 @@ isbc86 commands: BYTE WORD REAL EREAL ROMTEST. ROMTEST works, the others hang.
 #include "machine/serial.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/isbx/isbx.h"
+#include "machine/isbc_215g.h"
 
 class isbc_state : public driver_device
 {
@@ -100,6 +101,7 @@ static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
 	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 	AM_RANGE(0x00d8, 0x00df) AM_DEVREADWRITE8("uart8274", i8274_device, cd_ba_r, cd_ba_w, 0x00ff)
+	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc286_mem, AS_PROGRAM, 16, isbc_state)
@@ -324,6 +326,9 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir5_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir6_w))
 
+	MCFG_ISBC_215_ADD("isbc_215g", 0x100, "maincpu")
+	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
+
 	/* video hardware */
 	MCFG_SERIAL_TERMINAL_ADD("terminal", terminal_intf, 9600)
 	MCFG_DEVICE_INPUT_DEFAULTS(isbc286_terminal)
@@ -347,9 +352,9 @@ ROM_START( isbc286 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "u79.bin", 0x00001, 0x10000, CRC(144182ea) SHA1(4620ca205a6ac98fe2636183eaead7c4bfaf7a72))
 	ROM_LOAD16_BYTE( "u36.bin", 0x00000, 0x10000, CRC(22db075f) SHA1(fd29ea77f5fc0697c8f8b66aca549aad5b9db3ea))
-	ROM_REGION( 0x4000, "isbc215", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "174581.001.bin", 0x0000, 0x2000, CRC(ccdbc7ab) SHA1(5c2ebdde1b0252124177221ba9cacdb6d925a24d))
-	ROM_LOAD16_BYTE( "174581.002.bin", 0x0001, 0x2000, CRC(6190fa67) SHA1(295dd4e75f699aaf93227cc4876cee8accae383a))
+//	ROM_REGION( 0x4000, "isbc215", ROMREGION_ERASEFF )
+//	ROM_LOAD16_BYTE( "174581.001.bin", 0x0000, 0x2000, CRC(ccdbc7ab) SHA1(5c2ebdde1b0252124177221ba9cacdb6d925a24d))
+//	ROM_LOAD16_BYTE( "174581.002.bin", 0x0001, 0x2000, CRC(6190fa67) SHA1(295dd4e75f699aaf93227cc4876cee8accae383a))
 ROM_END
 
 ROM_START( isbc2861 )

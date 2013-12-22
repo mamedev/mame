@@ -2,6 +2,7 @@
 #include "emu.h"
 #include "keyboards.h"
 #include "ec1841.h"
+#include "iskr1030.h"
 #include "keytro.h"
 #include "msnat.h"
 #include "pc83.h"
@@ -13,6 +14,7 @@ SLOT_INTERFACE_START(pc_xt_keyboards)
 	SLOT_INTERFACE(STR_KBD_IBM_PC_83, PC_KBD_IBM_PC_83)
 	SLOT_INTERFACE(STR_KBD_IBM_PC_XT_83, PC_KBD_IBM_PC_XT_83)
 	SLOT_INTERFACE(STR_KBD_EC_1841, PC_KBD_EC_1841)
+	SLOT_INTERFACE(STR_KBD_ISKR_1030, PC_KBD_ISKR_1030)
 SLOT_INTERFACE_END
 
 

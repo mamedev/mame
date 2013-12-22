@@ -85,7 +85,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 6; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 7; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	// device_state_interface overrides
@@ -99,10 +99,10 @@ private:
 	bool remotebus_width() { return BIT(m_soc, 0); }
 	bool request_grant() { return BIT(m_soc, 1); }
 
-	UINT8 read_byte(offs_t address);
-	UINT16 read_word(offs_t address);
-	void write_byte(offs_t address, UINT8 data);
-	void write_word(offs_t address, UINT16 data);
+	UINT8 read_byte(bool space, offs_t address);
+	UINT16 read_word(bool space, offs_t address);
+	void write_byte(bool space, offs_t address, UINT8 data);
+	void write_word(bool space, offs_t address, UINT16 data);
 
 	required_device<i8089_channel> m_ch1;
 	required_device<i8089_channel> m_ch2;

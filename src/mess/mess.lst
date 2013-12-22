@@ -764,22 +764,26 @@ pc3086
 pc2386
 
 xtvga    // 198? PC-XT (VGA, MF2 Keyboard)
-iskr1031
-iskr1030m
-iskr3104
-asst128
-ec1840
-ec1841
-ec1845
-mk88
-poisk1
-poisk2
-mc1702
-mc1502
 zdsupers
 m24
 m240
 olivm15
+
+// Various PC and XT clones produced in ex-USSR and Soviet bloc
+asst128
+ec1840
+ec1841
+ec1845
+ec1847
+iskr1030m
+iskr1031
+iskr3104
+mc1502
+mc1702
+mk88
+pk88
+poisk1
+poisk2
 
 // AT
 ibm5170   // 1984 IBM PC/AT 5170, original 6 MHz model

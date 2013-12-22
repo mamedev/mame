@@ -104,9 +104,20 @@ void i8089_channel::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-void i8089_channel::set_reg(int reg, int value, int tag)
+void i8089_channel::set_reg(int reg, UINT32 value, int tag)
 {
-	m_r[reg].w = value;
+	if((reg == BC) || (reg == IX) || (reg == CC) || (reg == MC))
+	{
+		m_r[reg].w = value & 0xffff;
+		return;
+	}
+	m_r[reg].w = value & 0xfffff;
+
+	if(reg == PP)
+	{
+		m_r[PP].t = 0;
+		return;
+	}
 
 	if (tag != -1)
 		m_r[reg].t = tag;
@@ -122,47 +133,57 @@ bool i8089_channel::priority()     { return BIT(m_r[PSW].w, 7); }
 bool i8089_channel::chained()      { return CC_CHAIN; }
 bool i8089_channel::lock()         { return CC_LOCK; }
 
-UINT16 i8089_channel::displacement(int wb)
+INT16 i8089_channel::displacement(int wb)
 {
-	UINT16 displacement = 0;
+	INT16 displacement = 0;
 
 	if (wb == 1)
 	{
-		displacement = m_iop->read_byte(m_r[TP].w);
+		displacement = (INT16)((INT8)m_iop->read_byte(m_r[TP].t, m_r[TP].w));
 		set_reg(TP, m_r[TP].w + 1);
 	}
 	else if (wb == 2)
 	{
-		displacement = m_iop->read_word(m_r[TP].w);
+		displacement = (INT16)m_iop->read_word(m_r[TP].t, m_r[TP].w);
 		set_reg(TP, m_r[TP].w + 2);
 	}
 
 	return displacement;
 }
 
-UINT8 i8089_channel::offset(int aa)
+UINT32 i8089_channel::offset(int aa, int mm, int w)
 {
-	UINT8 offset = 0;
-
-	if (aa == 1)
+	UINT32 offset = 0;
+	switch(aa)
 	{
-		offset = m_iop->read_byte(m_r[TP].w);
-		set_reg(TP, m_r[TP].w + 1);
+		case 0:
+			offset = m_r[mm].w;
+			break;
+		case 1:
+			offset = m_r[mm].w + m_iop->read_byte(m_r[TP].t, m_r[TP].w);
+			set_reg(TP, m_r[TP].w + 1);
+			break;
+		case 2:
+			offset = m_r[mm].w + m_r[IX].w;
+			break;
+		case 3:
+			offset = m_r[mm].w + m_r[IX].w;
+			set_reg(IX, m_r[IX].w + (w ? 2 : 1));
+			break;
 	}
-
-	return offset;
+	return offset & 0xfffff;
 }
 
-UINT8 i8089_channel::imm8()
+INT8 i8089_channel::imm8()
 {
-	UINT8 imm8 = m_iop->read_byte(m_r[TP].w);
+	INT8 imm8 = (INT8)m_iop->read_byte(m_r[TP].t, m_r[TP].w);
 	set_reg(TP, m_r[TP].w + 1);
 	return imm8;
 }
 
-UINT16 i8089_channel::imm16()
+INT16 i8089_channel::imm16()
 {
-	UINT16 imm16 = m_iop->read_word(m_r[TP].w);
+	INT16 imm16 = (INT16)m_iop->read_word(m_r[TP].t, m_r[TP].w);
 	set_reg(TP, m_r[TP].w + 2);
 	return imm16;
 }
@@ -201,10 +222,6 @@ int i8089_channel::execute_run()
 			}
 		}
 
-		// todo: port transfers
-		if (CC_FUNC != 0x03)
-			fatalerror("%s('%s'): port transfer\n", shortname(), tag());
-
 		switch (m_dma_state)
 		{
 		case DMA_IDLE:
@@ -229,29 +246,33 @@ int i8089_channel::execute_run()
 			// source is 16-bit?
 			if (BIT(m_r[PSW].w, 1))
 			{
-				m_dma_value = m_iop->read_word(m_r[GA + CC_SOURCE].w);
-				m_r[GA + CC_SOURCE].w += 2;
+				m_dma_value = m_iop->read_word(m_r[GA + CC_SOURCE].t, m_r[GA + CC_SOURCE].w);
+				if(CC_FUNC & 1)
+					m_r[GA + CC_SOURCE].w += 2;
 				m_r[BC].w -= 2;
 			}
 			// destination is 16-bit, byte count is even
 			else if (BIT(m_r[PSW].w, 0) && !(m_r[BC].w & 1))
 			{
-				m_dma_value = m_iop->read_byte(m_r[GA + CC_SOURCE].w);
-				m_r[GA + CC_SOURCE].w++;
+				m_dma_value = m_iop->read_byte(m_r[GA + CC_SOURCE].t, m_r[GA + CC_SOURCE].w);
+				if(CC_FUNC & 1)
+					m_r[GA + CC_SOURCE].w++;
 				m_r[BC].w--;
 			}
 			// destination is 16-bit, byte count is odd
 			else if (BIT(m_r[PSW].w, 0) && (m_r[BC].w & 1))
 			{
-				m_dma_value |= m_iop->read_byte(m_r[GA + CC_SOURCE].w) << 8;
-				m_r[GA + CC_SOURCE].w++;
+				m_dma_value |= m_iop->read_byte(m_r[GA + CC_SOURCE].t, m_r[GA + CC_SOURCE].w) << 8;
+				if(CC_FUNC & 1)
+					m_r[GA + CC_SOURCE].w++;
 				m_r[BC].w--;
 			}
 			// 8-bit transfer
 			else
 			{
-				m_dma_value = m_iop->read_byte(m_r[GA + CC_SOURCE].w);
-				m_r[GA + CC_SOURCE].w++;
+				m_dma_value = m_iop->read_byte(m_r[GA + CC_SOURCE].t, m_r[GA + CC_SOURCE].w);
+				if(CC_FUNC & 1)
+					m_r[GA + CC_SOURCE].w++;
 				m_r[BC].w--;
 			}
 
@@ -284,8 +305,9 @@ int i8089_channel::execute_run()
 			// destination is 16-bit?
 			if (BIT(m_r[PSW].w, 0))
 			{
-				m_iop->write_word(m_r[GB - CC_SOURCE].w, m_dma_value);
-				m_r[GB - CC_SOURCE].w += 2;
+				m_iop->write_word(m_r[GB - CC_SOURCE].t, m_r[GB - CC_SOURCE].w, m_dma_value);
+				if(CC_FUNC & 2)
+					m_r[GB - CC_SOURCE].w += 2;
 
 				if (VERBOSE_DMA)
 					logerror("[ %04x ]\n", m_dma_value);
@@ -293,8 +315,9 @@ int i8089_channel::execute_run()
 			// destination is 8-bit
 			else
 			{
-				m_iop->write_byte(m_r[GB - CC_SOURCE].w, m_dma_value & 0xff);
-				m_r[GB - CC_SOURCE].w++;
+				m_iop->write_byte(m_r[GB - CC_SOURCE].t, m_r[GB - CC_SOURCE].w, m_dma_value & 0xff);
+				if(CC_FUNC & 2)
+					m_r[GB - CC_SOURCE].w++;
 
 				if (VERBOSE_DMA)
 					logerror("[ %02x ]\n", m_dma_value & 0xff);
@@ -323,10 +346,6 @@ int i8089_channel::execute_run()
 			else if (CC_TBC && m_r[BC].w == 0)
 				terminate_dma((CC_TBC - 1) * 4);
 
-			// terminate on external signal
-			else if (CC_TX)
-				fatalerror("%s('%s'): terminate on external signal not supported\n", shortname(), tag());
-
 			// terminate on single transfer
 			else if (CC_TS)
 				fatalerror("%s('%s'): terminate on single transfer not supported\n", shortname(), tag());
@@ -350,7 +369,7 @@ int i8089_channel::execute_run()
 			if (VERBOSE_DMA)
 				logerror("%s('%s'): entering state: DMA_STORE_BYTE_HIGH[ %02x ]\n", shortname(), tag(), (m_dma_value >> 8) & 0xff);
 
-			m_iop->write_byte(m_r[GB - CC_SOURCE].w, (m_dma_value >> 8) & 0xff);
+			m_iop->write_byte(m_r[GA - CC_SOURCE].t, m_r[GB - CC_SOURCE].w, (m_dma_value >> 8) & 0xff);
 			m_r[GB - CC_SOURCE].w++;
 			m_dma_state = DMA_TERMINATE;
 
@@ -371,7 +390,7 @@ int i8089_channel::execute_run()
 			m_r[PSW].w |= 1 << 6;
 
 		// fetch first two instruction bytes
-		UINT16 op = m_iop->read_word(m_r[TP].w);
+		UINT16 op = m_iop->read_word(m_r[TP].t, m_r[TP].w);
 		set_reg(TP, m_r[TP].w + 2);
 
 		// extract parameters
@@ -388,7 +407,7 @@ int i8089_channel::execute_run()
 		// fix-up so we can use our register array
 		if (mm == BC) mm = PP;
 
-		UINT8 o;
+		UINT32 o;
 		UINT16 off, seg;
 
 		switch (opc)
@@ -405,8 +424,8 @@ int i8089_channel::execute_run()
 			break;
 
 		case 0x02: // lpdi
-			off = imm16();
-			seg = imm16();
+			off = (UINT16)imm16();
+			seg = (UINT16)imm16();
 			lpdi(brp, seg, off);
 			break;
 
@@ -415,9 +434,18 @@ int i8089_channel::execute_run()
 			else   addbi_ri(brp, imm8());
 			break;
 
+		case 0x09: // or(b)i r, i
+			if (w) ori_ri(brp, imm16());
+			else   orbi_ri(brp, imm8());
+			break;
+
 		case 0x0a: // and(b)i r, i
 			if (w) andi_ri(brp, imm16());
 			else   andbi_ri(brp, imm8());
+			break;
+
+		case 0x0b: // not r
+			not_r(brp);
 			break;
 
 		case 0x0c: // mov(b)i r, i
@@ -425,8 +453,20 @@ int i8089_channel::execute_run()
 			else   movbi_ri(brp, imm8());
 			break;
 
+		case 0x0e: // inc r
+			inc_r(brp);
+			break;
+
 		case 0x0f: // dec r
 			dec_r(brp);
+			break;
+
+		case 0x10: // jnz r
+			jnz_r(brp, displacement(wb));
+			break;
+
+		case 0x11: // jz r
+			jz_r(brp, displacement(wb));
 			break;
 
 		case 0x12: // hlt
@@ -434,55 +474,166 @@ int i8089_channel::execute_run()
 			else             invalid(opc);
 			break;
 
+		case 0x13: // mov(b)i m, i
+			o = offset(aa, mm, w);
+			if (w) movi_mi(mm, imm16(), o);
+			else   movbi_mi(mm, imm8(), o);
+			break;
+
+		case 0x20: // mov(b) r, m
+			if (w) mov_rm(brp, mm, offset(aa, mm, w));
+			else   movb_rm(brp, mm, offset(aa, mm, w));
+			break;
+
+		case 0x21: // mov(b) m, r
+			if (w) mov_mr(mm, brp, offset(aa, mm, w));
+			else   movb_mr(mm, brp, offset(aa, mm, w));
+			break;
+
 		case 0x22: // lpd
-			o = offset(aa);
+			o = offset(aa, mm, w);
 			lpd(brp, mm, o);
 			break;
 
-		case 0x28: // add(b) r, m
-			if (w) add_rm(brp, mm, offset(aa));
-			else   addb_rm(brp, mm, offset(aa));
+		case 0x23: // movp p, m
+			movp_pm(brp, mm, offset(aa, mm, w));
 			break;
 
-		case 0x2a: // and(b) r, m
-			if (w) and_rm(brp, mm, offset(aa));
-			else   andb_rm(brp, mm, offset(aa));
+		case 0x24: // mov(b) m, m
+		{
+			o = offset(aa, mm, w);
+			UINT16 op2 = m_iop->read_word(m_r[TP].t, m_r[TP].w);
+			set_reg(TP, m_r[TP].w + 2);
+			int mm2 = (op2 >> 8) & 0x03;
+
+			if (w) mov_mm(mm, mm2, o, offset((op2 >> 1) & 0x03, mm2, w));
+			else   movb_mm(mm, mm2, o, offset((op2 >> 1) & 0x03, mm2, w));
+			break;
+		}
+
+		case 0x25: // tsl m, i, d
+		{
+			o = offset(aa, mm, w);
+			INT8 i = imm8();
+			tsl(mm, i, imm8(), o);
+			break;
+		}
+
+		case 0x26: // movp m, p
+			movp_mp(mm, brp, offset(aa, mm, w));
 			break;
 
 		case 0x27: // call
-			o = offset(aa);
+			o = offset(aa, mm, w);
 			call(mm, displacement(wb), o);
 			break;
 
+		case 0x28: // add(b) r, m
+			if (w) add_rm(brp, mm, offset(aa, mm, w));
+			else   addb_rm(brp, mm, offset(aa, mm, w));
+			break;
+
+		case 0x29: // or(b) r, m
+			if (w) or_rm(brp, mm, offset(aa, mm, w));
+			else   orb_rm(brp, mm, offset(aa, mm, w));
+			break;
+
+		case 0x2a: // and(b) r, m
+			if (w) and_rm(brp, mm, offset(aa, mm, w));
+			else   andb_rm(brp, mm, offset(aa, mm, w));
+			break;
+
+		case 0x2b: // not(b) r, m
+			if (w) not_rm(brp, mm, offset(aa, mm, w));
+			else   notb_rm(brp, mm, offset(aa, mm, w));
+			break;
+
+		case 0x2c: // jmce m, d
+			o = offset(aa, mm, w);
+			jmce(mm, displacement(wb), o);
+			break;
+
+		case 0x2d: // jmcne m, d
+			o = offset(aa, mm, w);
+			jmcne(mm, displacement(wb), o);
+			break;
+
+		case 0x2e: // jnbt m, b, d
+			o = offset(aa, mm, w);
+			jnbt(mm, brp, displacement(wb), o);
+			break;
+
+		case 0x2f: // jbt m, b, d
+			o = offset(aa, mm, w);
+			jbt(mm, brp, displacement(wb), o);
+			break;
+
 		case 0x30: // add(b)i m, i
-			o = offset(aa);
+			o = offset(aa, mm, w);
 			if (w) addi_mi(mm, imm16(), o);
 			else   addbi_mi(mm, imm8(), o);
 			break;
 
+		case 0x31: // or(b)i m, i
+			o = offset(aa, mm, w);
+			if (w) ori_mi(mm, imm16(), o);
+			else   orbi_mi(mm, imm8(), o);
+			break;
+
 		case 0x32: // and(b)i m, i
-			o = offset(aa);
+			o = offset(aa, mm, w);
 			if (w) andi_mi(mm, imm16(), o);
 			else   andbi_mi(mm, imm8(), o);
 			break;
 
 		case 0x34: // add(b) m, r
-			if (w) add_mr(mm, brp, offset(aa));
-			else   addb_mr(mm, brp, offset(aa));
+			if (w) add_mr(mm, brp, offset(aa, mm, w));
+			else   addb_mr(mm, brp, offset(aa, mm, w));
+			break;
+
+		case 0x35: // or(b) m, r
+			if (w) or_mr(mm, brp, offset(aa, mm, w));
+			else   orb_mr(mm, brp, offset(aa, mm, w));
 			break;
 
 		case 0x36: // and(b) m, r
-			if (w) and_mr(mm, brp, offset(aa));
-			else   andb_mr(mm, brp, offset(aa));
+			if (w) and_mr(mm, brp, offset(aa, mm, w));
+			else   andb_mr(mm, brp, offset(aa, mm, w));
+			break;
+
+		case 0x37: // not(b) m
+			if (w) not_m(mm, offset(aa, mm, w));
+			else   notb_m(mm, offset(aa, mm, w));
+			break;
+
+		case 0x38: // jnz m
+			o = offset(aa, mm, w);
+			if(w) jnz_m(mm, displacement(wb), o);
+			else jnzb(mm, displacement(wb), o);
+			break;
+
+		case 0x39: // jz m
+			o = offset(aa, mm, w);
+			if(w) jz_m(mm, displacement(wb), o);
+			else jzb(mm, displacement(wb), o);
+			break;
+
+		case 0x3a: // inc(b) m
+			if (w) inc_m(mm, offset(aa, mm, w));
+			else   incb(mm, offset(aa, mm, w));
 			break;
 
 		case 0x3b: // dec(b) m
-			if (w) dec_m(mm, offset(aa));
-			else   decb(mm, offset(aa));
+			if (w) dec_m(mm, offset(aa, mm, w));
+			else   decb(mm, offset(aa, mm, w));
+			break;
+
+		case 0x3d: // setb
+			setb(mm, brp, offset(aa, mm, w));
 			break;
 
 		case 0x3e: // clr
-			clr(mm, brp, offset(aa));
+			clr(mm, brp, offset(aa, mm, w));
 			break;
 
 		default:
@@ -526,7 +677,7 @@ void i8089_channel::examine_ccw(UINT8 ccw)
 void i8089_channel::attention()
 {
 	// examine control byte
-	UINT8 ccw = m_iop->read_byte(m_r[CP].w);
+	UINT8 ccw = m_iop->read_byte(m_r[CP].t, m_r[CP].w);
 
 	switch (ccw & 0x07)
 	{
@@ -545,11 +696,19 @@ void i8089_channel::attention()
 
 		examine_ccw(ccw);
 
-		lpd(PP, CP, 2);
-		movp_pm(TP, PP);
+		lpd(PP, CP, m_r[CP].w + 2);
+		movp_pm(TP, PP, m_r[PP].w);
 		movbi_mi(CP, 0xff, 1);
+		m_r[TP].t = 1;
 
 		m_r[PSW].w |= 1 << 2;
+
+		if (VERBOSE)
+		{
+			logerror("%s('%s'): ---- starting channel ----\n", shortname(), tag());
+			logerror("%s('%s'): parameter block address: %06x\n", shortname(), tag(), m_r[PP].w);
+			logerror("%s('%s'): task pointer: %04x\n", shortname(), tag(), m_r[TP].w);
+		}
 
 		break;
 
@@ -567,8 +726,8 @@ void i8089_channel::attention()
 
 		examine_ccw(ccw);
 
-		lpd(PP, CP, 2);
-		lpd(TP, PP);
+		lpd(PP, CP, m_r[CP].w + 2);
+		lpd(TP, PP, m_r[PP].w);
 		movbi_mi(CP, 0xff, 1);
 
 		m_r[PSW].w |= 1 << 2;
@@ -594,9 +753,9 @@ void i8089_channel::attention()
 			logerror("%s('%s'): command received: continue channel processing\n", shortname(), tag());
 
 		// restore task pointer and parameter block
-		movp_pm(TP, PP);
-		movb_rm(PSW, PP, 3);
-		movbi_mi(CP, 0xff, 1);
+		movp_pm(TP, PP, m_r[PP].w);
+		movb_rm(PSW, PP, m_r[PP].w + 3);
+		movbi_mi(CP, 0xff, m_r[CP].w + 1);
 
 		m_r[PSW].w |= 1 << 2;
 
@@ -614,8 +773,8 @@ void i8089_channel::attention()
 			logerror("%s('%s'): command received: halt channel and save tp\n", shortname(), tag());
 
 		// save task pointer and psw to parameter block
-		movp_mp(PP, TP);
-		movb_mr(PP, PSW, 3);
+		movp_mp(PP, TP, m_r[TP].w);
+		movb_mr(PP, PSW, m_r[PP].w + 3);
 		hlt();
 
 		break;
@@ -635,6 +794,8 @@ WRITE_LINE_MEMBER( i8089_channel::ext_w )
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ext_w: %d\n", shortname(), tag(), state);
+	if(transferring())
+		terminate_dma((CC_TX - 1) * 4);
 }
 
 WRITE_LINE_MEMBER( i8089_channel::drq_w )

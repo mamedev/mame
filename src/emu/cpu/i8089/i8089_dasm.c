@@ -20,7 +20,7 @@ INT16 displacement(offs_t &pc, int wb, const UINT8 *oprom, bool aa1)
 	switch (wb)
 	{
 	case 1:
-		result = oprom[2 + aa1];
+		result = (INT16)(INT8)oprom[2 + aa1];
 		pc += 1;
 		break;
 	case 2:
@@ -104,6 +104,12 @@ CPU_DISASSEMBLE( i8089 )
 		sprintf(buffer, "lpdi %s, %4x %4x", BRP, off, seg);
 		break;
 	case 0x08:
+		if(brp == 4)
+		{
+			INT16 offset = (w ? IMM16 : (INT8)IMM8);
+			sprintf(buffer, "jmp %06x", pc + offset);
+			break;
+		}
 		if (w) sprintf(buffer, "addi %s, %04x", BRP, IMM16);
 		else   sprintf(buffer, "addbi %s, %02x", BRP, IMM8);
 		break;
@@ -169,6 +175,13 @@ CPU_DISASSEMBLE( i8089 )
 		else sprintf(buffer, "movb %s, %s", buf, o);
 		break;
 	}
+	case 0x25:
+	{
+		OFFSET(o);
+		UINT16 i = IMM16;
+		sprintf(buffer, "tsl %s, %02x, %06x", o, i & 0xff, pc + (i >> 8));
+		break;
+	}
 	case 0x26:
 		OFFSET(o);
 		sprintf(buffer, "movp %s, %s", o, BRP);
@@ -222,7 +235,7 @@ CPU_DISASSEMBLE( i8089 )
 	case 0x31:
 		OFFSET(o);
 		if (w) sprintf(buffer, "ori %s, %04x", o, IMM16);
-		else   sprintf(buffer, "ori %s, %02x", o, IMM8);
+		else   sprintf(buffer, "orib %s, %02x", o, IMM8);
 		break;
 	case 0x32:
 		OFFSET(o);
@@ -275,7 +288,7 @@ CPU_DISASSEMBLE( i8089 )
 		break;
 	case 0x3d:
 		OFFSET(o);
-		sprintf(buffer, "set %s, %d", o, brp);
+		sprintf(buffer, "setb %s, %d", o, brp);
 		break;
 	case 0x3e:
 		OFFSET(o);

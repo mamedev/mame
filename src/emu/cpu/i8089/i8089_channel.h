@@ -45,7 +45,7 @@ public:
 	template<class _sintr> void set_sintr_callback(_sintr sintr) { m_write_sintr.set_callback(sintr); }
 
 	// set register
-	void set_reg(int reg, int value, int tag = -1);
+	void set_reg(int reg, UINT32 value, int tag = -1);
 
 	int execute_run();
 	void attention();
@@ -82,8 +82,8 @@ public:
 
 	struct
 	{
-		int w; // 20-bit address
-		int t; // tag-bit
+		UINT32 w; // 20-bit address
+		bool t; // tag-bit
 	}
 	m_r[11];
 
@@ -95,94 +95,81 @@ protected:
 private:
 
 	// opcodes
-	void add_rm(int r, int m, int o = 0);
-	void add_mr(int m, int r, int o = 0);
-	void addb_rm(int r, int m, int o = 0);
-	void addb_mr(int m, int r, int o = 0);
-	void addbi_ri(int r, int i);
-	void addbi_mi(int m, int i, int o = 0);
-	void addi_ri(int r, int i);
-	void addi_mi(int m, int i, int o = 0);
-	void and_rm(int r, int m, int o = 0);
-	void and_mr(int m, int r, int o = 0);
-	void andb_rm(int r, int m, int o = 0);
-	void andb_mr(int m, int r, int o = 0);
-	void andbi_ri(int r, int i);
-	void andbi_mi(int m, int i, int o = 0);
-	void andi_ri(int r, int i);
-	void andi_mi(int m, int i, int o = 0);
-	void call(int m, int d, int o = 0);
-	void clr(int m, int b, int o = 0);
+	void add_rm(int r, int m, int o);
+	void add_mr(int m, int r, int o);
+	void addb_rm(int r, int m, int o);
+	void addb_mr(int m, int r, int o);
+	void addbi_ri(int r, INT8 i);
+	void addbi_mi(int m, INT8 i, int o);
+	void addi_ri(int r, INT16 i);
+	void addi_mi(int m, INT16 i, int o);
+	void and_rm(int r, int m, int o);
+	void and_mr(int m, int r, int o);
+	void andb_rm(int r, int m, int o);
+	void andb_mr(int m, int r, int o);
+	void andbi_ri(int r, INT8 i);
+	void andbi_mi(int m, INT8 i, int o);
+	void andi_ri(int r, INT16 i);
+	void andi_mi(int m, INT16 i, int o);
+	void call(int m, INT16 d, int o);
+	void clr(int m, int b, int o);
 	void dec_r(int r);
-	void dec_m(int m, int o = 0);
-	void decb(int m, int o = 0);
+	void dec_m(int m, int o);
+	void decb(int m, int o);
 	void hlt();
 	void inc_r(int r);
-	void inc_m(int m, int o = 0);
-	void incb(int m, int o = 0);
-	void jbt(int m, int b, int d, int o = 0);
-	void jmce(int m, int d, int o = 0);
-	void jmcne(int m, int d, int o = 0);
-	void jmp(int d);
-	void jnbt(int m, int b, int d, int o = 0);
-	void jnz_r(int r, int d);
-	void jnz_m(int m, int d, int o = 0);
-	void jnzb(int m, int d, int o = 0);
-	void jz_r(int r, int d);
-	void jz_m(int m, int d, int o = 0);
-	void jzb(int m, int d, int o = 0);
-	void lcall(int m, int d, int o = 0);
-	void ljbt(int m, int b, int d, int o = 0);
-	void ljmce(int m, int d, int o = 0);
-	void ljmcne(int m, int d, int o = 0);
-	void ljmp(int d);
-	void ljnbt(int m, int b, int d, int o = 0);
-	void ljnz_r(int r, int d);
-	void ljnz_m(int m, int d, int o = 0);
-	void ljnzb(int m, int d, int o = 0);
-	void ljz_r(int r, int d);
-	void ljz_m(int m, int d, int o = 0);
-	void ljzb(int m, int d, int o = 0);
-	void lpd(int p, int m, int o = 0);
-	void lpdi(int p, int i, int o = 0);
-	void mov_mr(int m, int r, int o = 0);
-	void mov_rm(int r, int m, int o = 0);
-	void mov_mm(int m1, int m2, int o1 = 0, int o2 = 0);
-	void movb_mr(int m, int r, int o = 0);
-	void movb_rm(int r, int m, int o = 0);
-	void movb_mm(int m1, int m2, int o1 = 0, int o2 = 0);
-	void movbi_ri(int r, int i);
-	void movbi_mi(int m, int i, int o = 0);
-	void movi_ri(int r, int i);
-	void movi_mi(int m, int i, int o = 0);
-	void movp_mp(int m, int p, int o = 0);
-	void movp_pm(int p, int m, int o = 0);
+	void inc_m(int m, int o);
+	void incb(int m, int o);
+	void jbt(int m, int b, INT16 d, int o);
+	void jmce(int m, INT16 d, int o);
+	void jmcne(int m, INT16 d, int o);
+	void jnbt(int m, int b, INT16 d, int o);
+	void jnz_r(int r, INT16 d);
+	void jnz_m(int m, INT16 d, int o);
+	void jnzb(int m, INT16 d, int o);
+	void jz_r(int r, INT16 d);
+	void jz_m(int m, INT16 d, int o);
+	void jzb(int m, INT16 d, int o);
+	void lpd(int p, int m, int o);
+	void lpdi(int p, int s, int o);
+	void mov_mr(int m, int r, int o);
+	void mov_rm(int r, int m, int o);
+	void mov_mm(int m1, int m2, int o1, int o2);
+	void movb_mr(int m, int r, int o);
+	void movb_rm(int r, int m, int o);
+	void movb_mm(int m1, int m2, int o1, int o2);
+	void movbi_ri(int r, INT8 i);
+	void movbi_mi(int m, INT8 i, int o);
+	void movi_ri(int r, INT16 i);
+	void movi_mi(int m, INT16 i, int o);
+	void movp_mp(int m, int p, int o);
+	void movp_pm(int p, int m, int o);
 	void nop();
 	void not_r(int r);
-	void not_m(int m, int o = 0);
-	void not_rm(int r, int m, int o = 0);
-	void notb_m(int m, int o = 0);
-	void notb_rm(int r, int m, int o = 0);
-	void or_rm(int r, int m, int o = 0);
-	void or_mr(int m, int r, int o = 0);
-	void orb_rm(int r, int m, int o = 0);
-	void orb_mr(int m, int r, int o = 0);
-	void orbi_ri(int r, int i);
-	void orbi_mi(int m, int i, int o = 0);
-	void ori_ri(int r, int i);
-	void ori_mi(int m, int i, int o = 0);
-	void setb(int m, int b, int o = 0);
+	void not_m(int m, int o);
+	void not_rm(int r, int m, int o);
+	void notb_m(int m, int o);
+	void notb_rm(int r, int m, int o);
+	void or_rm(int r, int m, int o);
+	void or_mr(int m, int r, int o);
+	void orb_rm(int r, int m, int o);
+	void orb_mr(int m, int r, int o);
+	void orbi_ri(int r, INT8 i);
+	void orbi_mi(int m, INT8 i, int o);
+	void ori_ri(int r, INT16 i);
+	void ori_mi(int m, INT16 i, int o);
+	void setb(int m, int b, int o);
 	void sintr();
-	void tsl(int m, int i, int d, int o = 0);
+	void tsl(int m, INT8 i, INT8 d, int o);
 	void wid(int s, int d);
 	void xfer();
 	void invalid(int opc);
 
 	// instruction fetch
-	UINT16 displacement(int wb);
-	UINT8 offset(int aa);
-	UINT8 imm8();
-	UINT16 imm16();
+	INT16 displacement(int wb);
+	UINT32 offset(int aa, int mm, int w);
+	INT8 imm8();
+	INT16 imm16();
 
 	void examine_ccw(UINT8 ccw);
 

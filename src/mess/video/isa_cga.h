@@ -18,8 +18,7 @@ class isa8_cga_device :
 		public device_isa8_card_interface
 {
 	friend class isa8_cga_superimpose_device;
-	friend class isa8_cga_mc1502_device;
-	friend class isa8_cga_poisk1_device;
+//	friend class isa8_ec1841_0002_device;
 	friend class isa8_cga_poisk2_device;
 	friend class isa8_cga_pc1512_device;
 
@@ -45,8 +44,6 @@ public:
 	void plantronics_w(UINT8 data);
 	virtual DECLARE_READ8_MEMBER( io_read );
 	virtual DECLARE_WRITE8_MEMBER( io_write );
-	DECLARE_READ8_MEMBER( char_ram_read );
-	DECLARE_WRITE8_MEMBER( char_ram_write );
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -69,7 +66,6 @@ public:
 	size_t  m_vram_size;
 	UINT8   *m_vram;
 	bool    m_superimpose;
-	UINT8   m_p3df; /* This should be moved into the appropriate subclass */
 	UINT8   m_plantronics; /* This should be moved into the appropriate subclass */
 	offs_t  m_start_offset;
 };
@@ -90,38 +86,6 @@ public:
 
 // device type definition
 extern const device_type ISA8_CGA_SUPERIMPOSE;
-
-
-// ======================> isa8_cga_mc1502_device
-
-class isa8_cga_mc1502_device :
-		public isa8_cga_device
-{
-public:
-	// construction/destruction
-	isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-};
-
-// device type definition
-extern const device_type ISA8_CGA_MC1502;
-
-
-// ======================> isa8_poisk1_device
-
-class isa8_cga_poisk1_device :
-		public isa8_cga_device
-{
-public:
-	// construction/destruction
-	isa8_cga_poisk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-};
-
-// device type definition
-extern const device_type ISA8_CGA_POISK1;
 
 
 // ======================> isa8_poisk2_device
@@ -208,5 +172,34 @@ public:
 
 // device type definition
 extern const device_type ISA8_WYSE700;
+
+// ======================> isa8_ec1841_0002_device
+
+class isa8_ec1841_0002_device :
+		public isa8_cga_device
+{
+public:
+	// construction/destruction
+	isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+public:
+	virtual DECLARE_READ8_MEMBER( io_read );
+	virtual DECLARE_WRITE8_MEMBER( io_write );
+
+	UINT8   m_p3df;
+	DECLARE_READ8_MEMBER( char_ram_read );
+	DECLARE_WRITE8_MEMBER( char_ram_write );
+};
+
+// device type definition
+extern const device_type ISA8_EC1841_0002;
+
 
 #endif  /* __ISA_CGA_H__ */

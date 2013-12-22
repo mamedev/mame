@@ -13,6 +13,7 @@
 #define STR_KBD_IBM_PC_83           "pc"
 #define STR_KBD_IBM_PC_XT_83        "pcxt"
 #define STR_KBD_EC_1841             "ec1841"
+#define STR_KBD_ISKR_1030           "iskr1030"
 
 SLOT_INTERFACE_EXTERN(pc_xt_keyboards);
 

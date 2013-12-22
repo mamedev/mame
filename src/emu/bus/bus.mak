@@ -313,6 +313,7 @@ ifneq ($(filter PC_KBD,$(BUSES)),)
 BUSOBJS += $(BUSOBJ)/pc_kbd/pc_kbdc.o
 BUSOBJS += $(BUSOBJ)/pc_kbd/keyboards.o
 BUSOBJS += $(BUSOBJ)/pc_kbd/ec1841.o
+BUSOBJS += $(BUSOBJ)/pc_kbd/iskr1030.o
 BUSOBJS += $(BUSOBJ)/pc_kbd/keytro.o
 BUSOBJS += $(BUSOBJ)/pc_kbd/msnat.o
 BUSOBJS += $(BUSOBJ)/pc_kbd/pc83.o

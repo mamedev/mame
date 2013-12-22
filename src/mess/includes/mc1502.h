@@ -1,0 +1,89 @@
+/*****************************************************************************
+ *
+ * includes/mc1502.h
+ *
+ ****************************************************************************/
+
+#ifndef MC1502_H_
+#define MC1502_H_
+
+#include "imagedev/cassette.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/isa.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/serial.h"
+#include "machine/xsu_cards.h"
+#include "sound/speaker.h"
+
+class mc1502_state : public driver_device
+{
+public:
+	mc1502_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pic8259(*this, "pic8259"),
+		m_pit8253(*this, "pit8253"),
+		m_ppi8255n1(*this, "ppi8255n1"),
+		m_ppi8255n2(*this, "ppi8255n2"),
+		m_isabus(*this, "isa"),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette"),
+		m_centronics(*this, "centronics"),
+		m_ram(*this, RAM_TAG) { }
+
+	required_device<cpu_device>  m_maincpu;
+	required_device<pic8259_device>  m_pic8259;
+	required_device<pit8253_device>  m_pit8253;
+	required_device<i8255_device>  m_ppi8255n1;
+	required_device<i8255_device>  m_ppi8255n2;
+	required_device<isa8_device>  m_isabus;
+	required_device<speaker_sound_device>  m_speaker;
+	required_device<cassette_image_device>  m_cassette;
+	required_device<centronics_device> m_centronics;
+	required_device<ram_device> m_ram;
+
+	DECLARE_DRIVER_INIT(mc1502);
+	DECLARE_MACHINE_START(mc1502);
+	DECLARE_MACHINE_RESET(mc1502);
+
+	IRQ_CALLBACK_MEMBER(mc1502_irq_callback);
+	TIMER_CALLBACK_MEMBER(keyb_signal_callback);
+
+	struct {
+		UINT8       pulsing;
+		UINT16      mask;       /* input lines */
+		emu_timer   *keyb_signal_timer;
+	} m_kbd;
+
+	UINT8                   m_ppi_portb;
+	UINT8                   m_ppi_portc;
+	UINT8 m_mc1502_spkrdata;
+	UINT8 m_mc1502_input;
+
+	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out1_changed);
+	DECLARE_WRITE_LINE_MEMBER(mc1502_pit8253_out2_changed);
+	DECLARE_WRITE_LINE_MEMBER(mc1502_speaker_set_spkrdata);
+	DECLARE_WRITE_LINE_MEMBER(mc1502_i8251_syndet);
+
+	DECLARE_WRITE8_MEMBER(mc1502_ppi_porta_w);
+	DECLARE_WRITE8_MEMBER(mc1502_ppi_portb_w);
+	DECLARE_WRITE8_MEMBER(mc1502_ppi_portc_w);
+	DECLARE_READ8_MEMBER(mc1502_ppi_portc_r);
+	DECLARE_READ8_MEMBER(mc1502_kppi_porta_r);
+	DECLARE_READ8_MEMBER(mc1502_kppi_portc_r);
+	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
+	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
+/*
+	TIMER_CALLBACK_MEMBER(fdc_motor_callback);
+	static struct {
+		int         fdc_motor_on;
+		emu_timer   *fdc_motor_timer;
+	} m_motor;
+*/
+	const char *m_cputag;
+};
+
+#endif /* MC1502_H_ */

@@ -144,7 +144,7 @@ INPUT_PORTS_START( pcvideo_mc1502 )
 	PORT_BIT ( 0x03, 0x01, IPT_UNUSED ) /* via poisk2 */
 	PORT_CONFNAME( 0x1C, 0x00, "CGA monitor type")
 	PORT_CONFSETTING(0x00, "Colour RGB")
-	PORT_CONFSETTING(0x04, "Mono RGB")
+	PORT_CONFSETTING(0x08, "Colour composite")
 	PORT_BIT ( 0xE0, 0x00, IPT_UNUSED ) /* Chipset is always IBM */
 INPUT_PORTS_END
 
