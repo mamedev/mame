@@ -135,28 +135,6 @@ public:
 
 	void print_stats();
 
-	/* save state */
-
-	struct save_entry_t
-	{
-	    save_entry_t(const pstring &stname, const netlist_data_type_e dt, const int size, void *ptr) :
-	        m_name(stname), m_dt(dt), m_size(size), m_ptr(ptr) { }
-	    pstring m_name;
-	    netlist_data_type_e m_dt;
-	    int m_size;
-	    void *m_ptr;
-	};
-
-	typedef netlist_list_t<save_entry_t *> save_entry_list_t;
-
-	void save_state_ptr(const pstring &stname, const netlist_data_type_e dt, const int size, void *ptr)
-	{
-	    save_entry_t *p = new save_entry_t(stname, dt, size, ptr);
-	    m_save.add(p);
-	}
-
-	save_entry_list_t m_save;
-
 protected:
 
 private:

@@ -155,6 +155,7 @@
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "pstring.h"
+#include "pstate.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -247,33 +248,6 @@ class NETLIB_NAME(solver);
 class NETLIB_NAME(mainclock);
 
 // ----------------------------------------------------------------------------------------
-// state saving ...
-// ----------------------------------------------------------------------------------------
-
-enum netlist_data_type_e {
-    NOT_SUPPORTED,
-    DT_DOUBLE,
-    DT_INT64,
-    DT_INT8,
-    DT_INT,
-    DT_BOOLEAN
-};
-
-template<typename _ItemType> struct nl_datatype { static const netlist_data_type_e type = netlist_data_type_e(NOT_SUPPORTED); };
-//template<typename _ItemType> struct type_checker<_ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
-
-#define NETLIST_SAVE_TYPE(TYPE, TYPEDESC) template<> struct nl_datatype<TYPE>{ static const netlist_data_type_e type = netlist_data_type_e(TYPEDESC); }
-
-NETLIST_SAVE_TYPE(double, DT_DOUBLE);
-NETLIST_SAVE_TYPE(INT8, DT_INT8);
-NETLIST_SAVE_TYPE(UINT8, DT_INT8);
-NETLIST_SAVE_TYPE(INT64, DT_INT64);
-NETLIST_SAVE_TYPE(UINT64, DT_INT64);
-NETLIST_SAVE_TYPE(bool, DT_BOOLEAN);
-NETLIST_SAVE_TYPE(UINT32, DT_INT);
-NETLIST_SAVE_TYPE(INT32, DT_INT);
-
-// ----------------------------------------------------------------------------------------
 // netlist_object_t
 // ----------------------------------------------------------------------------------------
 
@@ -313,11 +287,14 @@ public:
 
     ATTR_COLD const pstring &name() const;
 
-    ATTR_COLD void save_state_ptr(const pstring &stname, const netlist_data_type_e, const int size, void *ptr);
+    PSTATE_INTERFACE(*m_netlist, name())
+
+#if 0
     template<class C> ATTR_COLD void save(C &state, const pstring &stname)
     {
         save_state_ptr(stname, nl_datatype<C>::type, sizeof(C), &state);
     }
+#endif
 
 	ATTR_HOT inline const type_t type() const { return m_objtype; }
     ATTR_HOT inline const family_t family() const { return m_family; }
@@ -330,6 +307,11 @@ public:
 
 protected:
 
+#if 0
+    // pstate_interface virtual
+    ATTR_COLD virtual void save_state_ptr(const pstring &stname, const netlist_data_type_e, const int size, const int count, void *ptr);
+#endif
+
     // must call parent save_register !
     ATTR_COLD virtual void save_register() { };
 
@@ -339,11 +321,6 @@ private:
     const family_t m_family;
     netlist_base_t * RESTRICT m_netlist;
 };
-
-template<> ATTR_COLD inline void netlist_object_t::save(netlist_time &state, const pstring &stname)
-{
-    save_state_ptr(stname, DT_INT64, sizeof(netlist_time::INTERNALTYPE), state.get_internaltype_ptr());
-}
 
 // ----------------------------------------------------------------------------------------
 // netlist_owned_object_t
@@ -983,7 +960,7 @@ private:
 
 typedef tagmap_t<netlist_device_t *, 393> tagmap_devices_t;
 
-class netlist_base_t : public netlist_object_t
+class netlist_base_t : public netlist_object_t, public pstate_manager_t
 {
     NETLIST_PREVENT_COPYING(netlist_base_t)
 public:

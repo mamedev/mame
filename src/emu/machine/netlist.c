@@ -49,6 +49,7 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 #include "netlist/devices/net_lib.h"
+#include "debugger.h"
 
 //#define LOG_DEV_CALLS(x)   printf x
 #define LOG_DEV_CALLS(x)   do { } while (0)
@@ -178,37 +179,27 @@ void netlist_mame_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 ATTR_COLD void netlist_mame_device::save_state()
 {
-    for (netlist_setup_t::save_entry_list_t::entry_t *p = setup().m_save.first(); p != NULL; p = setup().m_save.next(p))
+    for (pstate_entry_t::list_t::entry_t *p = m_netlist->save_list().first(); p != NULL; p = m_netlist->save_list().next(p))
     {
-        netlist_setup_t::save_entry_t *s = p->object();
+        pstate_entry_t *s = p->object();
         NL_VERBOSE_OUT(("saving state for %s\n", s->m_name.cstr()));
         switch (s->m_dt)
         {
             case DT_DOUBLE:
-                save_pointer((double *) s->m_ptr, s->m_name, 1);
+                save_pointer((double *) s->m_ptr, s->m_name, s->m_count);
                 break;
             case DT_INT64:
-                save_pointer((INT64 *) s->m_ptr, s->m_name, 1);
+                save_pointer((INT64 *) s->m_ptr, s->m_name, s->m_count);
                 break;
             case DT_INT8:
-                save_pointer((INT8 *) s->m_ptr, s->m_name, 1);
+                save_pointer((INT8 *) s->m_ptr, s->m_name, s->m_count);
                 break;
             case DT_INT:
-                save_pointer((int *) s->m_ptr, s->m_name, 1);
+                save_pointer((int *) s->m_ptr, s->m_name, s->m_count);
                 break;
             case DT_BOOLEAN:
-                save_pointer((bool *) s->m_ptr, s->m_name, 1);
+                save_pointer((bool *) s->m_ptr, s->m_name, s->m_count);
                 break;
-#if 0
-            case DT_NLTIME:
-                {
-                    netlist_time *nlt = (netlist_time *) s->m_ptr;
-                    //save_pointer((netlist_time::INTERNALTYPE *) s->m_ptr, s->m_name, 1);
-                    //save_pointer(nlt->get_internaltype_ptr(), s->m_name, 1);
-                    save_item(*nlt->get_internaltype_ptr(), s->m_name.cstr());
-                }
-                break;
-#endif
             case NOT_SUPPORTED:
             default:
                 m_netlist->xfatalerror("found unsupported save element %s\n", s->m_name.cstr());
@@ -225,13 +216,6 @@ ATTR_COLD void netlist_mame_device::save_state()
         save_pointer(qtemp[i].m_name, "queue_name", sizeof(qtemp[i].m_name), i);
 
     }
-#if 0
-
-    netlist_time *nlt = (netlist_time *) ;
-    netlist_base_t::queue_t::entry_t *p = m_netlist->queue().listptr()[i];
-    netlist_time *nlt = (netlist_time *) p->time_ptr();
-    save_pointer(nlt->get_internaltype_ptr(), "queue", 1, i);
-#endif
 }
 
 ATTR_COLD UINT64 netlist_mame_device::execute_clocks_to_cycles(UINT64 clocks) const
@@ -246,12 +230,12 @@ ATTR_COLD UINT64 netlist_mame_device::execute_cycles_to_clocks(UINT64 cycles) co
 
 ATTR_HOT void netlist_mame_device::execute_run()
 {
-	//bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	// debugging
 	//m_ppc = m_pc; // copy PC to previous PC
-	//if (check_debugger)
-	//  debugger_instruction_hook(this, 0); //m_pc);
+	if (check_debugger)
+	    debugger_instruction_hook(this, 0); //m_pc);
 
 	m_netlist->process_queue(m_icount);
 }

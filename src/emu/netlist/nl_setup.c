@@ -49,7 +49,6 @@ netlist_setup_t::~netlist_setup_t()
 	m_params.reset();
 	m_terminals.reset();
 	m_params_temp.reset();
-	m_save.reset_and_free();
 
 	netlist().set_setup(NULL);
 

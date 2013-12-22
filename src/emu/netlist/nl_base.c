@@ -39,23 +39,6 @@ ATTR_COLD const pstring &netlist_object_t::name() const
     return m_name;
 }
 
-ATTR_COLD void netlist_object_t::save_state_ptr(const pstring &stname, const netlist_data_type_e dt, const int size, void *ptr)
-{
-    pstring fullname = name() + "." + stname;
-    // do nothing for now;
-    ATTR_UNUSED  pstring ts[] = {
-            "NOT_SUPPORTED",
-            "DT_DOUBLE",
-            "DT_INT64",
-            "DT_INT8",
-            "DT_INT",
-            "DT_BOOLEAN"
-    };
-
-    NL_VERBOSE_OUT(("SAVE: <%s> %s(%d) %p\n", fullname.cstr(), ts[dt].cstr(), size, ptr));
-    netlist().setup().save_state_ptr(fullname, dt, size, ptr);
-}
-
 // ----------------------------------------------------------------------------------------
 // netlist_owned_object_t
 // ----------------------------------------------------------------------------------------
