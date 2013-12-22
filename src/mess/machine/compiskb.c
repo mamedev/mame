@@ -18,6 +18,7 @@
 //**************************************************************************
 
 #define I8748_TAG       "i8748"
+#define SPEAKER_TAG     "speaker"
 
 
 
@@ -239,7 +240,6 @@ ioport_constructor compis_keyboard_device::device_input_ports() const
 
 compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, COMPIS_KEYBOARD, "Compis Keyboard", tag, owner, clock, "compiskb", __FILE__),
-		m_write_irq(*this),
 		m_maincpu(*this, I8748_TAG),
 		m_speaker(*this, SPEAKER_TAG),
 		m_y1(*this, "Y1"),
@@ -252,7 +252,7 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 		m_y8(*this, "Y8"),
 		m_y9(*this, "Y9"),
 		m_special(*this, "SPECIAL"),
-		m_so(1),
+		m_out_tx_handler(*this),
 		m_bus(0xff),
 		m_keylatch(0)
 {
@@ -266,17 +266,8 @@ compis_keyboard_device::compis_keyboard_device(const machine_config &mconfig, co
 void compis_keyboard_device::device_start()
 {
 	// resolve callbacks
-	m_write_irq.resolve_safe();
-}
-
-
-//-------------------------------------------------
-//  so_r - serial output read
-//-------------------------------------------------
-
-READ_LINE_MEMBER( compis_keyboard_device::so_r )
-{
-	return m_so;
+	m_out_tx_handler.resolve_safe();
+	m_out_tx_handler(1);
 }
 
 
@@ -334,7 +325,7 @@ WRITE8_MEMBER( compis_keyboard_device::bus_w )
 	output_set_led_value(LED_CAPS, BIT(data, 6));
 
 	// serial data out
-	m_so = BIT(data, 7);
+	m_out_tx_handler(BIT(data, 7));
 }
 
 

@@ -255,8 +255,6 @@ const i8251_interface poly88_usart_interface=
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(poly88_state,poly88_usart_rxready),
 	DEVCB_NULL,
 	DEVCB_NULL,

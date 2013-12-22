@@ -734,8 +734,6 @@ static const i8251_interface i8251_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 

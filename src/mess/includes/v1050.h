@@ -46,6 +46,7 @@
 #define TIMER_RST_TAG           "timer_rst"
 #define SASIBUS_TAG             "sasi"
 #define RS232_TAG               "rs232"
+#define V1050_KEYBOARD_TAG      "v1050kb"
 
 #define V1050_VIDEORAM_SIZE     0x8000
 #define V1050_VIDEORAM_MASK     0x7fff

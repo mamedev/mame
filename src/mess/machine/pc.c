@@ -425,8 +425,7 @@ const struct pit8253_interface pcjr_pit8253_config =
 
 const i8251_interface mc1502_i8251_interface =
 {
-	DEVCB_NULL, /* XXX RxD data are accessible via PPI port C, bit 7 */
-	DEVCB_NULL,
+	/* XXX RxD data are accessible via PPI port C, bit 7 */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

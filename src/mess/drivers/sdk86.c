@@ -138,9 +138,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sdk86_state::serial_tick )
 
 static const i8251_interface usart_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
 	DEVCB_NULL, // connected to CTS
 	DEVCB_NULL,
@@ -177,7 +175,11 @@ static MACHINE_CONFIG_START( sdk86, sdk86_state )
 	/* Devices */
 	MCFG_I8251_ADD(I8251_TAG, usart_intf)
 	MCFG_I8279_ADD("i8279", 2500000, sdk86_intf) // based on divider
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("serial", sdk86_state, serial_tick, attotime::from_hz(307200))
 MACHINE_CONFIG_END

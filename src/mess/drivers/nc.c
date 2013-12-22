@@ -817,8 +817,6 @@ static const i8251_interface nc100_uart_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_rxrdy_callback),
 	DEVCB_DRIVER_LINE_MEMBER(nc_state,nc100_txrdy_callback),
 	DEVCB_NULL,
@@ -1161,8 +1159,6 @@ WRITE_LINE_MEMBER(nc_state::nc200_rxrdy_callback)
 
 static const i8251_interface nc200_uart_interface=
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

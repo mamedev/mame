@@ -447,9 +447,7 @@ public:
 	DECLARE_READ8_MEMBER(upd765_tc_r);
 	DECLARE_WRITE8_MEMBER(fdc_irq_vector_w);
 	DECLARE_WRITE8_MEMBER(fdc_drive_mode_w);
-	DECLARE_READ_LINE_MEMBER(rxdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_READ_LINE_MEMBER(dsr_r);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
 	DECLARE_READ8_MEMBER(pc8801_sound_board_r);
 	DECLARE_WRITE8_MEMBER(pc8801_sound_board_w);
@@ -2606,16 +2604,6 @@ static const ay8910_interface single_ay8910_config =
 };
 
 /* Cassette Configuration */
-READ_LINE_MEMBER( pc8801_state::rxdata_callback )
-{
-	return 0;
-	//return (m_cass->input() > -0.1) ? 1 : 0;
-}
-
-READ_LINE_MEMBER( pc8801_state::dsr_r )
-{
-	return 0; // bit 7 status
-}
 
 WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
 {
@@ -2629,9 +2617,7 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 
 static const i8251_interface uart_intf =
 {
-	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,rxdata_callback), //rxd_cb
 	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,txdata_callback), //txd_cb
-	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,dsr_r),
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,rxrdy_w),
 	DEVCB_NULL,

@@ -22,7 +22,7 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const i8251_interface default_i8251_interface = { DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL };
+const i8251_interface default_i8251_interface = { DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL };
 
 
 /***************************************************************************
@@ -80,9 +80,7 @@ void i8251_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_in_rxd_cb, 0, sizeof(m_in_rxd_cb));
 		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
-		memset(&m_in_dsr_cb, 0, sizeof(m_in_dsr_cb));
 		memset(&m_out_dtr_cb, 0, sizeof(m_out_dtr_cb));
 		memset(&m_out_rts_cb, 0, sizeof(m_out_rts_cb));
 		memset(&m_out_rxrdy_cb, 0, sizeof(m_out_rxrdy_cb));
@@ -99,9 +97,7 @@ void i8251_device::device_config_complete()
 void i8251_device::device_start()
 {
 	// resolve callbacks
-	m_in_rxd_func.resolve(m_in_rxd_cb,*this);
 	m_out_txd_func.resolve(m_out_txd_cb,*this);
-	m_in_dsr_func.resolve(m_in_dsr_cb,*this);
 	m_out_rxrdy_func.resolve(m_out_rxrdy_cb, *this);
 	m_out_txrdy_func.resolve(m_out_txrdy_cb, *this);
 	m_out_txempty_func.resolve(m_out_txempty_cb, *this);
@@ -151,10 +147,7 @@ void i8251_device::receive_clock()
 	{
 		//logerror("I8251\n");
 		/* get bit received from other side and update receive register */
-		if(m_in_rxd_func.isnull())
-			receive_register_update_bit(get_in_data_bit());
-		else
-			receive_register_update_bit(m_in_rxd_func());
+		receive_register_update_bit(get_in_data_bit());
 
 		if (is_receive_register_full())
 		{
@@ -674,7 +667,7 @@ WRITE8_MEMBER(i8251_device::control_w)
 
 READ8_MEMBER(i8251_device::status_r)
 {
-	UINT8 dsr = !(m_in_dsr_func.isnull() ? 0 : m_in_dsr_func() != 0);
+	UINT8 dsr = !((m_input_state & DSR) != 0);
 	UINT8 status = (dsr << 7) | m_status;
 
 	LOG(("status: %02x\n", status));
@@ -746,4 +739,29 @@ READ8_MEMBER(i8251_device::data_r)
 void i8251_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	device_serial_interface::device_timer(timer, id, param, ptr);
+}
+
+
+WRITE_LINE_MEMBER(i8251_device::write_rx)
+{
+	if (state)
+	{
+		input_callback(m_input_state | RX);
+	}
+	else
+	{
+		input_callback(m_input_state & ~RX);
+	}
+}
+
+WRITE_LINE_MEMBER(i8251_device::write_dsr)
+{
+	if (state)
+	{
+		input_callback(m_input_state | DSR);
+	}
+	else
+	{
+		input_callback(m_input_state & ~DSR);
+	}
 }

@@ -97,9 +97,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
 
-	DECLARE_READ8_MEMBER(i8251_in_rxd_cb);
-
-
 	DECLARE_DRIVER_INIT(ecoinfrbr);
 	DECLARE_DRIVER_INIT(ecoinfr);
 	DECLARE_DRIVER_INIT(ecoinfrmab);
@@ -775,16 +772,9 @@ MACHINE_START_MEMBER(ecoinfr_state,ecoinfr)
 	}
 }
 
-READ8_MEMBER(ecoinfr_state::i8251_in_rxd_cb)
-{
-	return 0x06;
-}
-
 static const i8251_interface i8251_intf =
 {
-	DEVCB_DRIVER_MEMBER(ecoinfr_state,i8251_in_rxd_cb), // in_rxd_cb
 	DEVCB_NULL, // out_txd_cb
-	DEVCB_NULL, // in_dsr_cb
 	DEVCB_NULL, // out_dtr_cb
 	DEVCB_NULL, // out_rts_cb
 	DEVCB_NULL, // out_rxrdy_cb

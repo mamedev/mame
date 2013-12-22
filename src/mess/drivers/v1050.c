@@ -932,9 +932,7 @@ WRITE_LINE_MEMBER( v1050_state::kb_rxrdy_w )
 
 static const i8251_interface kb_8251_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(V1050_KEYBOARD_TAG, v1050_keyboard_device, so_r),
 	DEVCB_DEVICE_LINE_MEMBER(V1050_KEYBOARD_TAG, v1050_keyboard_device, si_w),
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(v1050_state, kb_rxrdy_w),
@@ -967,9 +965,7 @@ WRITE_LINE_MEMBER( v1050_state::sio_txrdy_w )
 
 static const i8251_interface sio_8251_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(v1050_state, sio_rxrdy_w),
@@ -1137,7 +1133,10 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_KB_TAG, v1050_state, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
 	MCFG_TIMER_DRIVER_ADD(TIMER_SIO_TAG, v1050_state, sio_8251_tick)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_rx))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
 
 	// SASI bus
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
@@ -1149,7 +1148,8 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_TIMER_DRIVER_ADD(TIMER_RST_TAG, v1050_state, sasi_rst_tick)
 
 	// keyboard
-	MCFG_V1050_KEYBOARD_ADD()
+	MCFG_DEVICE_ADD(V1050_KEYBOARD_TAG, V1050_KEYBOARD, 0)
+	MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE(I8251A_KB_TAG, i8251_device, write_rx))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "v1050_flop")

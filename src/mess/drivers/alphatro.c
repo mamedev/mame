@@ -67,7 +67,6 @@ public:
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
-	DECLARE_READ_LINE_MEMBER(rxdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(alphatro_p);
@@ -138,11 +137,6 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	default:
 		assert_always(FALSE, "Unknown id in alphatro_state::device_timer");
 	}
-}
-
-READ_LINE_MEMBER( alphatro_state::rxdata_callback )
-{
-	return (bool)m_cass_data[2];
 }
 
 WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
@@ -379,7 +373,7 @@ void alphatro_state::machine_reset()
 	m_cass_state = 1;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
-	m_cass_data[2] = 0;
+	m_usart->write_rx(0);
 	m_cass_data[3] = 0;
 	m_beep->set_state(0);
 	m_beep->set_frequency(950);    /* piezo-device needs to be measured */
@@ -417,10 +411,7 @@ static MC6845_INTERFACE( alphatro_crtc6845_interface )
 
 static const i8251_interface alphatro_usart_interface =
 {
-	DEVCB_DRIVER_LINE_MEMBER(alphatro_state,rxdata_callback), //rxd_cb
 	DEVCB_DRIVER_LINE_MEMBER(alphatro_state,txdata_callback), //txd_cb
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -447,7 +438,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::alphatro_p)
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_cass_data[2] = ((m_cass_data[1] < 12) ? 1 : 0);
+		m_usart->write_rx((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
 }

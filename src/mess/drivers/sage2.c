@@ -427,9 +427,7 @@ static const struct pit8253_interface pit1_intf =
 
 static const i8251_interface usart0_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dsr_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_5),
@@ -445,9 +443,7 @@ static const i8251_interface usart0_intf =
 
 static const i8251_interface usart1_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dsr_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir1_w),
@@ -555,9 +551,15 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD()
+
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_rx))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_dsr))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
+
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_rx))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251_1_TAG, i8251_device, write_dsr))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

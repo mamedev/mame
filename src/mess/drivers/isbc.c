@@ -132,7 +132,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 static const serial_terminal_interface terminal_intf =
 {
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER("uart8251", i8251_device, write_rx)
 };
 
 static const struct pit8253_interface isbc86_pit_config =
@@ -245,9 +245,7 @@ static I8274_INTERFACE(isbc_uart8274_interface)
 
 static const i8251_interface isbc_uart8251_interface =
 {
-	DEVCB_DEVICE_LINE_MEMBER("terminal", serial_terminal_device, tx_r),
 	DEVCB_DEVICE_LINE_MEMBER("terminal", serial_terminal_device, rx_w),
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir6_w),

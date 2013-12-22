@@ -3418,8 +3418,6 @@ static const i8251_interface pc9801_uart_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 

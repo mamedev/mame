@@ -670,9 +670,7 @@ WRITE_LINE_MEMBER( vixen_state::txrdy_w )
 
 static const i8251_interface usart_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(vixen_state, rxrdy_w),
@@ -818,7 +816,10 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_IEEE488_BUS_ADD()
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(vixen_state, srq_w))
 	MCFG_IEEE488_ATN_CALLBACK(WRITELINE(vixen_state, atn_w))
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_rx))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(P8251A_TAG, i8251_device, write_dsr))
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")

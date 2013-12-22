@@ -272,9 +272,6 @@ public:
 
 	DECLARE_READ8_MEMBER(system_parameter_r);
 
-	DECLARE_READ_LINE_MEMBER(dsr_r);
-
-	DECLARE_READ_LINE_MEMBER(kbd_rx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
@@ -510,6 +507,7 @@ static INPUT_PORTS_START( rainbow100b_in )
 		PORT_DIPNAME( 0x02, 0x02, "W13 (FACTORY TEST A, LEAVE OFF)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("W14")
 		PORT_DIPNAME( 0x04, 0x04, "W14 (FACTORY TEST B, LEAVE OFF)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
@@ -523,6 +521,7 @@ static INPUT_PORTS_START( rainbow100b_in )
 		PORT_DIPNAME( 0x01, 0x00, "W18 (FACTORY TEST D, LEAVE OFF) (8251A: DSR)") PORT_TOGGLE 
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+		PORT_WRITE_LINE_DEVICE_MEMBER("kbdser", i8251_device, write_dsr)
 
     // J17 jumper on FDC controller board shifts drive select (experimental) -
 	PORT_START("FLOPPY CONTROLLER") 
@@ -1119,11 +1118,6 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 }
 
 
-READ_LINE_MEMBER(rainbow_state::dsr_r)
-{
-	return m_inp4->read(); // W18 (1/0)
-}
-
 // KEYBOARD
 void rainbow_state::update_kbd_irq()
 {
@@ -1137,12 +1131,6 @@ void rainbow_state::update_kbd_irq()
 	}
 }
 
-
-READ_LINE_MEMBER(rainbow_state::kbd_rx)
-{
-//    printf("read keyboard\n");
-	return 0x00;
-}
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
 {
@@ -1246,9 +1234,7 @@ static const floppy_interface floppy_intf =
 
 static const i8251_interface i8251_intf =
 {
-	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_rx),         // rxd in
 	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_tx),         // txd out
-	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, dsr_r),       // dsr
 	DEVCB_NULL,         // dtr
 	DEVCB_NULL,         // rts
 	DEVCB_DRIVER_LINE_MEMBER(rainbow_state, kbd_rxready_w),

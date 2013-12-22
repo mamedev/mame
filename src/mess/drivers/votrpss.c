@@ -193,13 +193,9 @@ IRQ_CALLBACK_MEMBER( votrpss_state::irq_ack )
 
 static const i8251_interface uart_intf =
 {
-	//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
 	//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dsr_r),
 	//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
 	//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -342,6 +338,8 @@ static MACHINE_CONFIG_START( votrpss, votrpss_state )
 	/* Serial components - comment out if not needed */
 	//MCFG_TIMER_DRIVER_ADD_PERIODIC("serial", votrpss_state, serial_tick, attotime::from_hz(153600))
 	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	//MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart", i8251_device, write_rx))
+	//MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 MACHINE_CONFIG_END
 
 

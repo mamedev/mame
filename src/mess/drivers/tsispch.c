@@ -164,11 +164,10 @@ WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
 	machine().device<pic8259_device>("pic8259")->ir3_w(state);
 }
 
+// (todo: proper hookup, currently using hack w/i8251_receive_character())
 const i8251_interface i8251_config =
 {
-	DEVCB_NULL, // in rxd, serial (todo: proper hookup, currently using hack w/i8251_receive_character())
 	DEVCB_NULL, // out txd, serial
-	DEVCB_NULL, // in dsr
 	DEVCB_NULL, // out dtr
 	DEVCB_NULL, // out rts
 	DEVCB_DRIVER_LINE_MEMBER(tsispch_state,i8251_rxrdy_int), // out rxrdy

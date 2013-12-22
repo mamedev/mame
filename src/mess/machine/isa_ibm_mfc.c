@@ -295,11 +295,6 @@ static const struct pit8253_interface d8253_intf =
 //  uPD71051 USART
 //-------------------------------------------------
 
-READ_LINE_MEMBER( isa8_ibm_mfc_device::d70151_dsr_r )
-{
-	return (m_tcr & TCR_EXT8) ? 1 : 0;
-}
-
 void isa8_ibm_mfc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	m_d71051->transmit_clock();
@@ -309,8 +304,6 @@ void isa8_ibm_mfc_device::device_timer(emu_timer &timer, device_timer_id id, int
 static const i8251_interface d71051_intf =
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_ibm_mfc_device, d70151_dsr_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -426,6 +419,8 @@ WRITE8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_w )
 			if (~m_tcr & TCR_TBC)
 				set_pc_interrupt(PC_IRQ_TIMERB, 0);
 
+			m_d71051->write_dsr((m_tcr & TCR_EXT8) ? 1 : 0);
+
 			break;
 		}
 
@@ -526,6 +521,7 @@ void isa8_ibm_mfc_device::device_start()
 void isa8_ibm_mfc_device::device_reset()
 {
 	m_tcr = 0;
+	m_d71051->write_dsr(0);
 	m_pc_irq_state = 0;
 	m_z80_irq_state = 0;
 }

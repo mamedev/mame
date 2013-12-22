@@ -407,9 +407,7 @@ GFXDECODE_END
 
 static const i8251_interface i8251_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL, // out_rxrdy_cb
@@ -442,10 +440,12 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 
 	MCFG_VT100_VIDEO_ADD("vt100_video", vt100_video_interface)
 
-
-	/* i8251 uart */
 	MCFG_I8251_ADD("i8251", i8251_intf)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rx))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
+
 	MCFG_COM8116_ADD(COM5016T_TAG, XTAL_5_0688MHz, NULL, DEVWRITELINE("i8251", i8251_device, rxc_w), DEVWRITELINE("i8251", i8251_device, txc_w))
 
 

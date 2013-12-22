@@ -1926,8 +1926,6 @@ static const i8251_interface pc6001_usart_interface=
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 

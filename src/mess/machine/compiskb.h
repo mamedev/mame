@@ -21,21 +21,12 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define COMPIS_KEYBOARD_TAG "compiskb"
-#define SPEAKER_TAG         "speaker"
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_COMPIS_KEYBOARD_ADD(_irq) \
-	MCFG_DEVICE_ADD(COMPIS_KEYBOARD_TAG, COMPIS_KEYBOARD, 0) \
-	downcast<compis_keyboard_device *>(device)->set_irq_callback(DEVCB2_##_irq);
+#define MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(_devcb) \
+	devcb = &compis_keyboard_device::set_out_tx_handler(*device, DEVCB2_##_devcb);
+
 
 
 
@@ -51,14 +42,13 @@ public:
 	// construction/destruction
 	compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
+	template<class _Object> static devcb2_base &set_out_tx_handler(device_t &device, _Object object) { return downcast<compis_keyboard_device &>(device).m_out_tx_handler.set_callback(object); }
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_READ_LINE_MEMBER( so_r );
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 
 	DECLARE_READ8_MEMBER( bus_r );
@@ -76,8 +66,6 @@ private:
 		LED_CAPS
 	};
 
-	devcb2_write_line   m_write_irq;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport m_y1;
@@ -90,8 +78,7 @@ private:
 	required_ioport m_y8;
 	required_ioport m_y9;
 	required_ioport m_special;
-
-	int m_so;
+	devcb2_write_line   m_out_tx_handler;
 
 	UINT8 m_bus;
 	UINT8 m_keylatch;

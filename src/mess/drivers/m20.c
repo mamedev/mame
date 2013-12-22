@@ -87,7 +87,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
-	DECLARE_READ_LINE_MEMBER(kbd_rx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
@@ -148,12 +147,7 @@ UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-// these two i8251 callbacks will ask for/send 1 bit at a time.
-READ_LINE_MEMBER(m20_state::kbd_rx)
-{
-	/* TODO: correct hookup for keyboard, keyboard uses 8048 */
-	return 0x00;
-}
+/* TODO: correct hookup for keyboard, keyboard uses 8048 */
 
 WRITE_LINE_MEMBER(m20_state::kbd_tx)
 {
@@ -869,9 +863,7 @@ void m20_state::fdc_intrq_w(bool state)
 
 static const i8251_interface kbd_i8251_intf =
 {
-	DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_rx),
 	DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_tx),
-	DEVCB_NULL,         // dsr
 	DEVCB_NULL,         // dtr
 	DEVCB_NULL,         // rts
 	DEVCB_DRIVER_LINE_MEMBER(m20_state, kbd_rxrdy_int),  // rx ready
@@ -882,9 +874,7 @@ static const i8251_interface kbd_i8251_intf =
 
 static const i8251_interface tty_i8251_intf =
 {
-	DEVCB_NULL,         // rxd in
 	DEVCB_NULL,         // txd out
-	DEVCB_NULL,         // dsr
 	DEVCB_NULL,         // dtr
 	DEVCB_NULL,         // rts
 	DEVCB_NULL,         // rx ready

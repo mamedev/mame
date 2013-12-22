@@ -71,7 +71,6 @@ public:
 	DECLARE_WRITE8_MEMBER(portf1_w);
 	DECLARE_WRITE8_MEMBER(h8_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(h8_inte_callback);
-	DECLARE_READ_LINE_MEMBER(rxdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_irq_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
@@ -219,7 +218,7 @@ void h8_state::machine_reset()
 	m_cass_state = 1;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
-	m_cass_data[2] = 0;
+	m_uart->write_rx(0);
 	m_cass_data[3] = 0;
 	m_ff_b = 1;
 }
@@ -262,11 +261,6 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 	output_set_value("run_led", state);
 }
 
-READ_LINE_MEMBER( h8_state::rxdata_callback )
-{//printf("%X",m_cass_data[2]);
-	return (bool)m_cass_data[2];
-}
-
 WRITE_LINE_MEMBER( h8_state::txdata_callback )
 {
 	m_cass_state = state;
@@ -274,9 +268,7 @@ WRITE_LINE_MEMBER( h8_state::txdata_callback )
 
 static const i8251_interface uart_intf =
 {
-	DEVCB_DRIVER_LINE_MEMBER(h8_state,rxdata_callback), //rxd_cb
 	DEVCB_DRIVER_LINE_MEMBER(h8_state,txdata_callback), //txd_cb
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -306,7 +298,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_cass_data[2] = (m_cass_data[1] < 12) ? 1 : 0;
+		m_uart->write_rx((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
 }

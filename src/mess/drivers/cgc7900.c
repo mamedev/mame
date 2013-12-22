@@ -353,8 +353,6 @@ static const i8251_interface rs232_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -364,8 +362,6 @@ static const i8251_interface rs232_intf =
 
 static const i8251_interface rs449_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

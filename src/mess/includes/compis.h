@@ -46,6 +46,7 @@
 #define ISBX_0_TAG      "isbx0"
 #define ISBX_1_TAG      "isbx1"
 #define SCREEN_TAG      "screen"
+#define COMPIS_KEYBOARD_TAG "compiskb"
 
 class compis_state : public driver_device
 {
