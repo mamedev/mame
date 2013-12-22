@@ -40,7 +40,6 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	// abc_keyboard_interface overrides
-	virtual int rxd_r();
 	virtual void txd_w(int state);
 
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
@@ -83,6 +82,7 @@ private:
 	};
 
 	inline void serial_input();
+	inline void serial_output(int state);
 	inline void serial_clock();
 	inline void key_down(int state);
 	inline void scan_mouse();
@@ -108,6 +108,7 @@ private:
 	int m_t1_z5;
 	int m_led_en;
 	int m_reset;
+	int m_txd;
 };
 
 

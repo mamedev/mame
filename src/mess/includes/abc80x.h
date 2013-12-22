@@ -61,6 +61,7 @@
 #define DISCRETE_TAG        "discrete"
 #define RS232_A_TAG         "rs232a"
 #define RS232_B_TAG         "rs232b"
+#define ABC_KEYBOARD_PORT_TAG   "kb"
 
 
 //**************************************************************************
@@ -86,7 +87,6 @@ public:
 			m_char_ram(*this, "char_ram"),
 			m_io_sb(*this, "SB"),
 			m_ctc_z0(0),
-			m_sio_rxdb(1),
 			m_sio_txcb(0),
 			m_sio_txdb(1),
 			m_sio_rtsb(1),
@@ -123,7 +123,6 @@ public:
 	void clock_cassette(int state);
 
 	DECLARE_READ8_MEMBER( pling_r );
-	DECLARE_READ_LINE_MEMBER( keyboard_txd_r );
 	DECLARE_READ8_MEMBER( keyboard_col_r );
 	DECLARE_WRITE8_MEMBER( keyboard_row_w );
 	DECLARE_WRITE8_MEMBER( keyboard_ctrl_w );
@@ -133,7 +132,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	DECLARE_READ_LINE_MEMBER( sio_rxdb_r );
 	DECLARE_WRITE_LINE_MEMBER( sio_txdb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
@@ -151,8 +149,6 @@ public:
 	// serial state
 	UINT8 m_sb;
 	int m_ctc_z0;
-	int m_sio_rxdb;
-	int m_sio_rxcb;
 	int m_sio_txcb;
 	int m_sio_txdb;
 	int m_sio_rtsb;

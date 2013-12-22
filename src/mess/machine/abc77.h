@@ -42,7 +42,6 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	// abc_keyboard_interface overrides
-	virtual int rxd_r();
 	virtual void txd_w(int state);
 
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );

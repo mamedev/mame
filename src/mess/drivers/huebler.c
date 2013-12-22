@@ -284,9 +284,9 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 /* Z80-SIO Interface */
 
-READ_LINE_MEMBER(amu880_state::cassette_r)
+TIMER_DEVICE_CALLBACK_MEMBER( amu880_state::tape_tick )
 {
-	return m_cassette->input() < 0.0;
+	m_z80sio->rxa_w(m_cassette->input() < 0.0);
 }
 
 WRITE_LINE_MEMBER(amu880_state::cassette_w)
@@ -298,7 +298,6 @@ static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DRIVER_LINE_MEMBER(amu880_state, cassette_r),
 	DEVCB_DRIVER_LINE_MEMBER(amu880_state, cassette_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -310,9 +309,12 @@ static Z80SIO_INTERFACE( sio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Z80 Daisy Chain */
@@ -409,6 +411,7 @@ static MACHINE_CONFIG_START( amu880, amu880_state )
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_10MHz/4, sio_intf) // U856
 
 	MCFG_CASSETTE_ADD("cassette", amu880_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", amu880_state, tape_tick, attotime::from_hz(44100))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

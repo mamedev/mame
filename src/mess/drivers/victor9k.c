@@ -380,14 +380,12 @@ static UPD7201_INTERFACE( mpsc_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
@@ -1254,11 +1252,13 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ria_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsa_w))
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxb_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, dcdb_w))
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rib_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))

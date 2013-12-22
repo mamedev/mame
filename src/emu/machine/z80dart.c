@@ -166,13 +166,11 @@ void z80dart_device::device_config_complete()
 	{
 		m_rxca = m_txca = m_rxcb = m_txcb = 0;
 
-		memset(&m_in_rxda_cb, 0, sizeof(m_in_rxda_cb));
 		memset(&m_out_txda_cb, 0, sizeof(m_out_txda_cb));
 		memset(&m_out_dtra_cb, 0, sizeof(m_out_dtra_cb));
 		memset(&m_out_rtsa_cb, 0, sizeof(m_out_rtsa_cb));
 		memset(&m_out_wrdya_cb, 0, sizeof(m_out_wrdya_cb));
 		memset(&m_out_synca_cb, 0, sizeof(m_out_synca_cb));
-		memset(&m_in_rxdb_cb, 0, sizeof(m_in_rxdb_cb));
 		memset(&m_out_txdb_cb, 0, sizeof(m_out_txdb_cb));
 		memset(&m_out_dtrb_cb, 0, sizeof(m_out_dtrb_cb));
 		memset(&m_out_rtsb_cb, 0, sizeof(m_out_rtsb_cb));
@@ -200,7 +198,6 @@ void z80dart_device::device_start()
 	m_chanA->m_rxc = m_rxca;
 	m_chanA->m_txc = m_txca;
 
-	m_chanA->m_in_rxd_cb = m_in_rxda_cb;
 	m_chanA->m_out_txd_cb = m_out_txda_cb;
 	m_chanA->m_out_dtr_cb = m_out_dtra_cb;
 	m_chanA->m_out_rts_cb = m_out_rtsa_cb;
@@ -213,8 +210,6 @@ void z80dart_device::device_start()
 	m_chanB->m_rxc = m_rxcb;
 	m_chanB->m_txc = m_txcb;
 
-	m_chanB->m_in_rxd_cb = m_in_rxdb_cb;
-	m_chanB->m_in_rxd_cb = m_in_rxdb_cb;
 	m_chanB->m_out_txd_cb = m_out_txdb_cb;
 	m_chanB->m_out_dtr_cb = m_out_dtrb_cb;
 	m_chanB->m_out_rts_cb = m_out_rtsb_cb;
@@ -509,7 +504,6 @@ void z80dart_channel::device_start()
 	m_index = m_uart->get_channel_index(this);
 
 	// resolve callbacks
-	m_in_rxd_func.resolve(m_in_rxd_cb, *m_uart);
 	m_out_txd_func.resolve(m_out_txd_cb, *m_uart);
 	m_out_dtr_func.resolve(m_out_dtr_cb, *m_uart);
 	m_out_rts_func.resolve(m_out_rts_cb, *m_uart);
@@ -654,10 +648,7 @@ void z80dart_channel::rcv_callback()
 {
 	if (m_wr[3] & WR3_RX_ENABLE)
 	{
-		if (m_in_rxd_func.isnull())
-			receive_register_update_bit(get_in_data_bit());
-		else
-			receive_register_update_bit(m_in_rxd_func());
+		receive_register_update_bit(get_in_data_bit());
 	}
 }
 
@@ -1331,3 +1322,21 @@ void z80dart_channel::set_rts(int state)
 
 	serial_connection_out();
 }
+
+
+//-------------------------------------------------
+//  write_rx -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(z80dart_channel::write_rx)
+{
+	if (state)
+	{
+		input_callback(m_input_state | RX);
+	}
+	else
+	{
+		input_callback(m_input_state & ~RX);
+	}
+}
+

@@ -137,6 +137,11 @@ static const serial_terminal_interface terminal_intf =
 	DEVCB_DEVICE_LINE_MEMBER("uart8251", i8251_device, write_rx)
 };
 
+static const serial_terminal_interface isbc_terminal_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER("uart8274", z80dart_device, rxb_w)
+};
+
 static const struct pit8253_interface isbc86_pit_config =
 {
 	{
@@ -228,21 +233,23 @@ static I8274_INTERFACE(isbc_uart8274_interface)
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER("terminal", serial_terminal_device, tx_r),
 	DEVCB_DEVICE_LINE_MEMBER("terminal", serial_terminal_device, rx_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir6_w)
+	DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir6_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const i8251_interface isbc_uart8251_interface =
@@ -316,6 +323,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_I8274_ADD("uart8274", XTAL_16MHz/4, isbc_uart8274_interface)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("uart8274", z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsa_w))
 
@@ -330,7 +338,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic_0", pic8259_device, ir5_w))
 
 	/* video hardware */
-	MCFG_SERIAL_TERMINAL_ADD("terminal", terminal_intf, 9600)
+	MCFG_SERIAL_TERMINAL_ADD("terminal", isbc_terminal_intf, 9600)
 	MCFG_DEVICE_INPUT_DEFAULTS(isbc286_terminal)
 MACHINE_CONFIG_END
 

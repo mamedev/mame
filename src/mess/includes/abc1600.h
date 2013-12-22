@@ -45,6 +45,7 @@
 #define BUS2_TAG            "bus2"
 #define RS232_A_TAG         "rs232a"
 #define RS232_B_TAG         "rs232b"
+#define ABC_KEYBOARD_PORT_TAG   "kb"
 
 
 

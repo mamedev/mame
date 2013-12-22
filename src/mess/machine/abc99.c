@@ -431,6 +431,21 @@ inline void abc99_device::serial_input()
 
 
 //-------------------------------------------------
+//  serial_output -
+//-------------------------------------------------
+
+inline void abc99_device::serial_output(int state)
+{
+	if (m_txd != state)
+	{
+		m_txd = state;
+
+		m_slot->write_rx(m_txd);
+	}
+}
+
+
+//-------------------------------------------------
 //  serial_clock -
 //-------------------------------------------------
 
@@ -489,7 +504,8 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 		m_t1_z2(0),
 		m_t1_z5(0),
 		m_led_en(0),
-		m_reset(1)
+		m_reset(1),
+		m_txd(1)
 {
 }
 
@@ -516,6 +532,7 @@ void abc99_device::device_start()
 	save_item(NAME(m_t1_z5));
 	save_item(NAME(m_led_en));
 	save_item(NAME(m_reset));
+	save_item(NAME(m_txd));
 }
 
 
@@ -547,16 +564,6 @@ void abc99_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		scan_mouse();
 		break;
 	}
-}
-
-
-//-------------------------------------------------
-//  rxd_r -
-//-------------------------------------------------
-
-int abc99_device::rxd_r()
-{
-	return m_so_z2 && m_so_z5;
 }
 
 
@@ -616,6 +623,7 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 
 	// serial output
 	m_so_z2 = BIT(data, 0);
+	serial_output(m_so_z2 && m_so_z5);
 
 	// key down
 	key_down(!BIT(data, 1));
@@ -758,6 +766,7 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 
 	// serial output
 	m_so_z5 = BIT(data, 6);
+	serial_output(m_so_z2 && m_so_z5);
 
 	// keyboard CPU T1
 	m_t1_z2 = BIT(data, 7);

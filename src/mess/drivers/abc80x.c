@@ -700,11 +700,6 @@ void abc800_state::clock_cassette(int state)
 	m_ctc_z0 = state;
 }
 
-READ_LINE_MEMBER( abc800_state::sio_rxdb_r )
-{
-	return m_sio_rxdb;
-}
-
 WRITE_LINE_MEMBER( abc800_state::sio_txdb_w )
 {
 	m_sio_txdb = state;
@@ -742,21 +737,23 @@ static Z80SIO_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DRIVER_LINE_MEMBER(abc800_state, sio_rxdb_r),
 	DEVCB_DRIVER_LINE_MEMBER(abc800_state, sio_txdb_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc800_state, sio_dtrb_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc800_state, sio_rtsb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -768,21 +765,23 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, rxd_r),
 	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -806,21 +805,23 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, rxd_r),
 	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc802_state, lrs_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc802_state, mux80_40_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -839,21 +840,22 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, rxd_r),
 	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w),
 	DEVCB_DRIVER_LINE_MEMBER(abc806_state, keydtr_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -913,7 +915,7 @@ void abc800_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 			if (m_dfd_in && !dfd_in)
 			{
-				m_sio_rxdb = !(m_tape_ctr == 15);
+				m_sio->rxb_w(!(m_tape_ctr == 15));
 			}
 
 			if (!dfd_in && (m_tape_ctr == 15))
@@ -947,9 +949,6 @@ void abc800_state::machine_start()
 	save_item(NAME(m_pling));
 	save_item(NAME(m_sb));
 	save_item(NAME(m_ctc_z0));
-	save_item(NAME(m_sio_rxdb));
-	save_item(NAME(m_sio_rxcb));
-	save_item(NAME(m_sio_txcb));
 	save_item(NAME(m_sio_txdb));
 	save_item(NAME(m_sio_rtsb));
 	save_item(NAME(m_dfd_out));
@@ -996,9 +995,6 @@ void abc802_state::machine_start()
 	save_item(NAME(m_pling));
 	save_item(NAME(m_sb));
 	save_item(NAME(m_ctc_z0));
-	save_item(NAME(m_sio_rxdb));
-	save_item(NAME(m_sio_rxcb));
-	save_item(NAME(m_sio_txcb));
 	save_item(NAME(m_sio_txdb));
 	save_item(NAME(m_sio_rtsb));
 	save_item(NAME(m_dfd_out));
@@ -1068,9 +1064,6 @@ void abc806_state::machine_start()
 	save_item(NAME(m_fetch_charram));
 	save_item(NAME(m_map));
 	save_item(NAME(m_ctc_z0));
-	save_item(NAME(m_sio_rxdb));
-	save_item(NAME(m_sio_rxcb));
-	save_item(NAME(m_sio_txcb));
 	save_item(NAME(m_sio_txdb));
 	save_item(NAME(m_sio_rtsb));
 	save_item(NAME(m_dfd_out));
@@ -1149,14 +1142,19 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_CASSETTE_ADD("cassette", cass_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
 
-	MCFG_ABC_KEYBOARD_PORT_ADD("abc800", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
+	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, "abc800")
+	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "abc830")
@@ -1199,14 +1197,19 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_CASSETTE_ADD("cassette", cass_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
 
-	MCFG_ABC_KEYBOARD_PORT_ADD("abc800", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
+	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, "abc800")
+	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "abc830")
@@ -1249,14 +1252,19 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_CASSETTE_ADD("cassette", cass_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
 
-	MCFG_ABC_KEYBOARD_PORT_ADD("abc55", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
+	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, "abc55")
+	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "abc834")
@@ -1292,14 +1300,19 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80dart_device, ctsa_w))
 
-	MCFG_ABC_KEYBOARD_PORT_ADD("abc77", DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
+	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, "abc77")
+	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "abc832")

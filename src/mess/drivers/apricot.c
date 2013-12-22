@@ -190,7 +190,6 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 	XTAL_4MHz / 16, XTAL_4MHz / 16,
 
 	// channel a
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
@@ -198,7 +197,6 @@ static Z80SIO_INTERFACE( apricot_z80sio_intf )
 	DEVCB_NULL,
 
 	// channel b
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(apricot_state, data_selector_dtr_w),
 	DEVCB_DRIVER_LINE_MEMBER(apricot_state, data_selector_rts_w),
@@ -408,6 +406,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
 // note: missing a receive clock callback to support external clock mode
 // (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ic15", z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ic15", z80dart_device, dcda_w))
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ic15", z80dart_device, synca_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ic15", z80dart_device, ctsa_w))

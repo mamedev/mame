@@ -616,21 +616,23 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, rxd_r),
 	DEVCB_DEVICE_LINE_MEMBER(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_5) // shared with SCC
+	DEVCB_CPU_INPUT_LINE(MC68008P8_TAG, M68K_IRQ_5), // shared with SCC
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -952,9 +954,17 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":0", abc1600_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, NULL,    floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats)
+
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
+
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
-	MCFG_ABC_KEYBOARD_PORT_ADD("abc99", DEVWRITELINE(Z8470AB1_TAG, z80dart_device, rxtxcb_w), DEVWRITELINE(Z8470AB1_TAG, z80dart_device, dcdb_w))
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(Z8470AB1_TAG, z80dart_device, rxa_w))
+
+	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, "abc99")
+	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(DEVWRITELINE(Z8470AB1_TAG, z80dart_device, rxb_w))
+	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(DEVWRITELINE(Z8470AB1_TAG, z80dart_device, rxtxcb_w))
+	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(DEVWRITELINE(Z8470AB1_TAG, z80dart_device, dcdb_w))
+
 	MCFG_ABCBUS_SLOT_ADD("bus0i", abc1600bus_cards, NULL)
 	MCFG_ABCBUS_SLOT_IRQ_CALLBACK(DEVWRITELINE(Z8536B1_TAG, z8536_device, pa7_w))
 	MCFG_ABCBUS_SLOT_ADD("bus0x", abc1600bus_cards, NULL)

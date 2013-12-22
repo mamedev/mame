@@ -382,10 +382,8 @@ static Z80DART_INTERFACE( dart_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 
 	// printer
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -405,7 +403,6 @@ static Z80SIO_INTERFACE( sio_intf )
 	0, 0, 0, 0,
 
 	// console#2
-	DEVCB_NULL, // ChA in data
 	DEVCB_NULL, // out data
 	DEVCB_NULL, // DTR
 	DEVCB_NULL, // RTS
@@ -413,7 +410,6 @@ static Z80SIO_INTERFACE( sio_intf )
 	DEVCB_NULL, // SYNC
 
 	// console#1
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
@@ -501,6 +497,7 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_Z80SIO0_ADD("z80sio",   XTAL_8MHz / 2, sio_intf )
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("z80sio", z80dart_device, rxb_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("z80sio", z80dart_device, dcdb_w))
 	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("z80sio", z80dart_device, rib_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("z80sio", z80dart_device, ctsb_w))

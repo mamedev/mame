@@ -293,6 +293,8 @@ inline void abc800_keyboard_device::serial_output(int state)
 	if (m_txd != state)
 	{
 		m_txd = state;
+
+		m_slot->write_rx(m_txd);
 	}
 }
 
@@ -393,16 +395,6 @@ void abc800_keyboard_device::device_reset()
 void abc800_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	serial_clock();
-}
-
-
-//-------------------------------------------------
-//  rxd_r -
-//-------------------------------------------------
-
-int abc800_keyboard_device::rxd_r()
-{
-	return m_txd;
 }
 
 

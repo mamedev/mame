@@ -383,6 +383,8 @@ inline void abc77_device::serial_output(int state)
 	if (m_txd != state)
 	{
 		m_txd = state;
+
+		m_slot->write_rx(m_txd);
 	}
 }
 
@@ -523,16 +525,6 @@ void abc77_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		break;
 	}
-}
-
-
-//-------------------------------------------------
-//  rxd_r -
-//-------------------------------------------------
-
-int abc77_device::rxd_r()
-{
-	return m_txd;
 }
 
 

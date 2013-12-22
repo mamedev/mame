@@ -465,26 +465,28 @@ static UPD7201_INTERFACE(qx10_upd7201_interface)
 {
 	0, 0, 0, 0, // channel b clock set by pit2 channel 2
 
-	DEVCB_DEVICE_LINE_MEMBER("kbd", serial_keyboard_device, tx_r),
 	DEVCB_DEVICE_LINE_MEMBER("kbd", serial_keyboard_device, rx_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DRIVER_LINE_MEMBER(qx10_state, keyboard_irq)
+	DEVCB_DRIVER_LINE_MEMBER(qx10_state, keyboard_irq),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static struct serial_keyboard_interface qx10_keyboard_interface =
 {
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER("upd7201", z80dart_device, rxa_w)
 };
 
 WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
@@ -874,7 +876,10 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", floppy_image_device::default_floppy_formats)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("upd7201", upd7201_device, rxb_w))
+
 	MCFG_QX10_KEYBOARD_ADD("kbd", qx10_keyboard_interface)
 
 	/* internal ram */

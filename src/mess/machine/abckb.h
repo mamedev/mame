@@ -19,21 +19,21 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define ABC_KEYBOARD_PORT_TAG   "kb"
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_ABC_KEYBOARD_PORT_ADD(_def_slot, _trxc, _keydown) \
-	MCFG_DEVICE_ADD(ABC_KEYBOARD_PORT_TAG, ABC_KEYBOARD_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(abc_keyboard_devices, _def_slot, false) \
-	downcast<abc_keyboard_port_device *>(device)->set_callbacks(DEVCB2_##_trxc, DEVCB2_##_keydown);
+#define MCFG_ABC_KEYBOARD_PORT_ADD(_tag, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, ABC_KEYBOARD_PORT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(abc_keyboard_devices, _def_slot, false)
+
+#define MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(_devcb) \
+	devcb = &abc_keyboard_port_device::set_out_rx_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(_devcb) \
+	devcb = &abc_keyboard_port_device::set_out_trxc_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(_devcb) \
+	devcb = &abc_keyboard_port_device::set_out_keydown_handler(*device, DEVCB2_##_devcb);
 
 
 
@@ -50,16 +50,15 @@ public:
 	// construction/destruction
 	abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _trxc, class _keydown> void set_callbacks(_trxc trxc, _keydown keydown) {
-		m_write_trxc.set_callback(trxc);
-		m_write_keydown.set_callback(keydown);
-	}
+	template<class _Object> static devcb2_base &set_out_rx_handler(device_t &device, _Object object) { return downcast<abc_keyboard_port_device &>(device).m_out_rx_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_trxc_handler(device_t &device, _Object object) { return downcast<abc_keyboard_port_device &>(device).m_out_trxc_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_out_keydown_handler(device_t &device, _Object object) { return downcast<abc_keyboard_port_device &>(device).m_out_keydown_handler.set_callback(object); }
 
 	// computer interface
-	DECLARE_READ_LINE_MEMBER( rxd_r );
 	DECLARE_WRITE_LINE_MEMBER( txd_w );
 
 	// peripheral interface
+	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( trxc_w );
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
 
@@ -68,8 +67,9 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	devcb2_write_line m_write_trxc;
-	devcb2_write_line m_write_keydown;
+	devcb2_write_line m_out_rx_handler;
+	devcb2_write_line m_out_trxc_handler;
+	devcb2_write_line m_out_keydown_handler;
 
 	abc_keyboard_interface *m_card;
 };
@@ -81,7 +81,6 @@ public:
 	// construction/destruction
 	abc_keyboard_interface(const machine_config &mconfig, device_t &device);
 
-	virtual int rxd_r() { return 1; };
 	virtual void txd_w(int state) { };
 
 protected:

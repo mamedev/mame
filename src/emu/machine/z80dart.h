@@ -218,14 +218,12 @@ struct z80dart_interface
 	int m_rxcb;
 	int m_txcb;
 
-	devcb_read_line     m_in_rxda_cb;
 	devcb_write_line    m_out_txda_cb;
 	devcb_write_line    m_out_dtra_cb;
 	devcb_write_line    m_out_rtsa_cb;
 	devcb_write_line    m_out_wrdya_cb;
 	devcb_write_line    m_out_synca_cb;
 
-	devcb_read_line     m_in_rxdb_cb;
 	devcb_write_line    m_out_txdb_cb;
 	devcb_write_line    m_out_dtrb_cb;
 	devcb_write_line    m_out_rtsb_cb;
@@ -272,6 +270,7 @@ public:
 
 	void receive_data(UINT8 data);
 
+	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
 	DECLARE_WRITE_LINE_MEMBER( ri_w );
@@ -279,7 +278,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( txc_w );
 	DECLARE_WRITE_LINE_MEMBER( sync_w );
 
-	devcb_read_line    m_in_rxd_cb;
 	devcb_write_line   m_out_txd_cb;
 	devcb_write_line   m_out_dtr_cb;
 	devcb_write_line   m_out_rts_cb;
@@ -437,7 +435,6 @@ protected:
 	int get_rx_word_length();
 	int get_tx_word_length();
 
-	devcb_resolved_read_line    m_in_rxd_func;
 	devcb_resolved_write_line   m_out_txd_func;
 	devcb_resolved_write_line   m_out_dtr_func;
 	devcb_resolved_write_line   m_out_rts_func;
@@ -497,6 +494,8 @@ public:
 	// interrupt acknowledge
 	int m1_r();
 
+	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_chanA->write_rx(state); }
+	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { m_chanB->write_rx(state); }
 	DECLARE_WRITE_LINE_MEMBER( ctsa_w ) { m_chanA->cts_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_chanB->cts_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_chanA->dcd_w(state); }
