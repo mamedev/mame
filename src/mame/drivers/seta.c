@@ -5800,6 +5800,15 @@ static INPUT_PORTS_START( thunderl )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( thunderlbl )
+	PORT_INCLUDE(thunderl)
+	
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 /***************************************************************************
                                 Thundercade (US)
@@ -8748,6 +8757,8 @@ static MACHINE_CONFIG_DERIVED( thunderlbl, thunderl )
 	MCFG_CPU_IO_MAP(thunderlbl_sound_portmap)
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
+	MCFG_DEVICE_REMOVE("x1snd")
+	
 	MCFG_YM2151_ADD("ymsnd", 16000000/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -11031,7 +11042,7 @@ GAME( 198?, setaroul, 0,        setaroul, setaroul, driver_device, 0,        ROT
 GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, driver_device, 0,        ROT0,   "Seta",                   "Dragon Unit / Castle of Dragon", 0 )
 GAME( 1989, wits,     0,        wits,     wits, driver_device,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
 GAME( 1990, thunderl, 0,        thunderl, thunderl, driver_device, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl,thunderlbl,thunderl, driver_device,0,        ROT270, "bootleg",                "Thunder & Lightning (bootleg with Tetris sound)" , GAME_NO_SOUND) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl,thunderlbl,thunderlbl, driver_device,0,        ROT90, "bootleg",                "Thunder & Lightning (bootleg with Tetris sound)" , GAME_NO_SOUND | GAME_NO_COCKTAIL ) // Country/License: DSW
 GAME( 1994, wiggie,   0,        wiggie,   thunderl, seta_state, wiggie,   ROT270, "Promat",                 "Wiggie Waggie", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar, wiggie,   superbar, thunderl, seta_state, wiggie,   ROT270, "Promat",                 "Super Bar", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc, driver_device,  0,        ROT0,   "Seta (Visco license)",   "Jockey Club", 0 )
