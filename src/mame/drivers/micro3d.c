@@ -319,8 +319,9 @@ static MC68901_INTERFACE( mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_NULL,                                         /* TDO */
-	DEVCB_NULL,                                         /* serial input */
-	DEVCB_NULL                                          /* serial output */
+	DEVCB_NULL,                                         /* serial output */
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

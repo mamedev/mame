@@ -1946,7 +1946,6 @@ static MC68901_INTERFACE( mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx)
 };
 
@@ -2013,7 +2012,6 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx)
 };
 
@@ -2079,7 +2077,6 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(st_state, mfp_tdo_w),      /* TDO */
-	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx)
 };
 
@@ -2388,7 +2385,9 @@ static MACHINE_CONFIG_START( st, st_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
@@ -2446,7 +2445,9 @@ static MACHINE_CONFIG_START( megast, megast_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
@@ -2513,7 +2514,9 @@ static MACHINE_CONFIG_START( ste, ste_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
@@ -2590,7 +2593,9 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL, NULL)
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))

@@ -87,7 +87,6 @@ struct mc68901_interface
 	devcb_write_line        m_out_tco_cb;
 	devcb_write_line        m_out_tdo_cb;
 
-	devcb_read_line         m_in_si_cb;
 	devcb_write_line        m_out_so_cb;
 	devcb_write_line        m_out_rr_cb;
 	devcb_write_line        m_out_tr_cb;
@@ -122,6 +121,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tai_w );
 	DECLARE_WRITE_LINE_MEMBER( tbi_w );
 
+	DECLARE_WRITE_LINE_MEMBER( write_rx );
+	DECLARE_WRITE_LINE_MEMBER( write_dsr );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -140,15 +142,6 @@ protected:
 	void take_interrupt(UINT16 mask);
 	void rx_buffer_full();
 	void rx_error();
-	void tx_buffer_empty();
-	void tx_error();
-	int get_parity_bit(UINT8 b);
-	void serial_receive();
-	void tx_disabled();
-	void tx_starting();
-	void tx_break();
-	void tx_enabled();
-	void serial_transmit();
 	void timer_count(int index);
 	void timer_input(int index, int value);
 	void gpio_input(int bit, int state);
@@ -247,7 +240,6 @@ private:
 
 	devcb_resolved_read8        m_in_gpio_func;
 	devcb_resolved_write8       m_out_gpio_func;
-	devcb_resolved_read_line    m_in_si_func;
 	devcb_resolved_write_line   m_out_so_func;
 	devcb_resolved_write_line   m_out_tao_func;
 	devcb_resolved_write_line   m_out_tbo_func;

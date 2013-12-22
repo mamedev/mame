@@ -176,9 +176,6 @@ const int mc68901_device::GPIO_TIMER[] =
 const int mc68901_device::PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 
 
-#define TXD(_data) m_out_so_func(_data);
-
-
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
@@ -221,336 +218,6 @@ inline void mc68901_device::rx_error()
 		rx_buffer_full();
 	}
 }
-
-inline void mc68901_device::tx_buffer_empty()
-{
-	if (m_ier & IR_XMIT_BUFFER_EMPTY)
-	{
-		take_interrupt(IR_XMIT_BUFFER_EMPTY);
-	}
-}
-
-inline void mc68901_device::tx_error()
-{
-	if (m_ier & IR_XMIT_ERROR)
-	{
-		take_interrupt(IR_XMIT_ERROR);
-	}
-	else
-	{
-		tx_buffer_empty();
-	}
-}
-
-inline int mc68901_device::get_parity_bit(UINT8 b)
-{
-	b ^= b >> 4;
-	b ^= b >> 2;
-	b ^= b >> 1;
-	return b & 1;
-}
-
-inline void mc68901_device::serial_receive()
-{
-	int rxd;
-
-	if (!(m_rsr & RSR_RCV_ENABLE)) return;
-
-	rxd = m_in_si_func();
-
-	switch (m_rx_state)
-	{
-	case SERIAL_START:
-		if (!rxd)
-		{
-			m_rsr |= RSR_CHAR_IN_PROGRESS;
-			m_rx_bits = 0;
-			m_rx_buffer = 0;
-			m_rx_state = SERIAL_DATA;
-			m_next_rsr = RSR_BREAK;
-		}
-		break;
-
-	case SERIAL_DATA:
-		if ((m_next_rsr & RSR_BREAK) && (rxd == 1) && m_rsr_read)
-		{
-			m_next_rsr &= ~RSR_BREAK;
-		}
-
-		m_rx_buffer >>= 1;
-		m_rx_buffer |= (rxd << 7);
-		m_rx_bits++;
-
-		if (m_rx_bits == m_rxtx_word)
-		{
-			if (m_rxtx_word < 8)
-			{
-				m_rx_buffer >>= (8 - m_rxtx_word);
-			}
-
-			m_rsr &= ~RSR_CHAR_IN_PROGRESS;
-
-			if (m_ucr & UCR_PARITY_ENABLED)
-			{
-				m_rx_state = SERIAL_PARITY;
-			}
-			else
-			{
-				m_rx_state = SERIAL_STOP;
-			}
-		}
-		break;
-
-	case SERIAL_PARITY:
-		m_rx_parity = rxd;
-
-		if (m_rx_parity != (get_parity_bit(m_rx_buffer) ^ ((m_ucr & UCR_PARITY_EVEN) >> 1)))
-		{
-			m_next_rsr |= RSR_PARITY_ERROR;
-		}
-
-		m_rx_state = SERIAL_STOP;
-		break;
-
-	case SERIAL_STOP:
-		if (rxd == 1)
-		{
-			if (!((m_rsr & RSR_SYNC_STRIP_ENABLE) && (m_rx_buffer == m_scr)))
-			{
-				if (!(m_rsr & RSR_OVERRUN_ERROR))
-				{
-					if (m_rsr & RSR_BUFFER_FULL)
-					{
-						// incoming word received but last word in receive buffer has not been read
-						m_next_rsr |= RSR_OVERRUN_ERROR;
-					}
-					else
-					{
-						// incoming word received and receive buffer is empty
-						m_rsr |= RSR_BUFFER_FULL;
-						m_udr = m_rx_buffer;
-						rx_buffer_full();
-					}
-				}
-			}
-		}
-		else
-		{
-			if (m_rx_buffer)
-			{
-				// non-zero data word not followed by a stop bit
-				m_next_rsr |= RSR_FRAME_ERROR;
-			}
-		}
-
-		m_rx_state = SERIAL_START;
-		break;
-	}
-}
-
-
-inline void mc68901_device::tx_disabled()
-{
-	switch (m_tsr & TSR_OUTPUT_MASK)
-	{
-	case TSR_OUTPUT_HI_Z:
-		/* indeterminate state */
-	case TSR_OUTPUT_LOW:
-		TXD(0);
-		break;
-
-	case TSR_OUTPUT_HIGH:
-	case TSR_OUTPUT_LOOP:
-		TXD(1);
-		break;
-	}
-}
-
-
-inline void mc68901_device::tx_starting()
-{
-	if (m_tsr & TSR_XMIT_ENABLE)
-	{
-		/* enable transmitter */
-		TXD(1);
-		m_xmit_state = XMIT_ON;
-	}
-	else
-	{
-		/* disable transmitter */
-		m_tsr |= TSR_END_OF_XMIT;
-		m_xmit_state = XMIT_OFF;
-	}
-}
-
-
-inline void mc68901_device::tx_break()
-{
-	if (m_tsr & TSR_XMIT_ENABLE)
-	{
-		if (m_tsr & TSR_BREAK)
-		{
-			/* transmit break */
-			TXD(1);
-		}
-		else
-		{
-			/* enable transmitter */
-			m_xmit_state = XMIT_ON;
-		}
-	}
-	else
-	{
-		/* disable transmitter */
-		m_tsr |= TSR_END_OF_XMIT;
-		m_xmit_state = XMIT_OFF;
-	}
-}
-
-
-inline void mc68901_device::tx_enabled()
-{
-	switch (m_tx_state)
-	{
-	case SERIAL_START:
-		if (m_tsr & TSR_UNDERRUN_ERROR)
-		{
-			/* buffer underrun condition */
-			if (m_tsr & TSR_XMIT_ENABLE)
-			{
-				/* transmit break */
-				TXD(1);
-			}
-			else
-			{
-				/* transmitter disabled */
-				tx_disabled();
-			}
-		}
-		else
-		{
-			if (m_tsr & TSR_BUFFER_EMPTY)
-			{
-				/* transmit buffer is empty, signal underrun error */
-				m_tsr |= TSR_UNDERRUN_ERROR;
-
-				if (m_tsr & TSR_XMIT_ENABLE)
-				{
-					/* transmit break */
-					TXD(1);
-				}
-				else
-				{
-					/* transmitter disabled */
-					tx_disabled();
-				}
-			}
-			else
-			{
-				/* transmit start bit */
-				TXD(0);
-
-				/* load transmit buffer */
-				m_tx_buffer = m_udr;
-				m_tx_bits = 0;
-
-				/* signal transmit buffer empty */
-				m_tsr |= TSR_BUFFER_EMPTY;
-				tx_buffer_empty();
-
-				/* calculate parity */
-				m_tx_parity = get_parity_bit(m_tx_buffer);
-
-				/* next bit is data */
-				m_tx_state = SERIAL_DATA;
-			}
-		}
-		break;
-
-	case SERIAL_DATA:
-		/* transmit data bit */
-		TXD(m_tx_buffer & 0x01);
-
-		/* shift transmit buffer */
-		m_tx_buffer >>= 1;
-		m_tx_bits++;
-
-		if (m_tx_bits == m_rxtx_word)
-		{
-			/* all data bits transferred */
-			if (m_ucr & UCR_PARITY_ENABLED)
-			{
-				/* next bit is parity */
-				m_tx_state = SERIAL_PARITY;
-			}
-			else
-			{
-				/* next bit is stop */
-				m_tx_state = SERIAL_STOP;
-			}
-		}
-		break;
-
-	case SERIAL_PARITY:
-		if (m_rxtx_word < 8)
-		{
-			/* transmit user-defined parity bit from buffer */
-			TXD(m_tx_buffer & 0x01);
-		}
-		else
-		{
-			/* transmit calculated parity bit */
-			TXD(m_tx_parity ^ ((m_ucr & UCR_PARITY_EVEN) >> 1));
-		}
-
-		/* next bit is stop */
-		m_tx_state = SERIAL_STOP;
-		break;
-
-	case SERIAL_STOP:
-		/* transmit stop bit */
-		TXD(1);
-
-		if (m_tsr & TSR_XMIT_ENABLE)
-		{
-			/* next bit is start */
-			m_tx_state = SERIAL_START;
-		}
-		else
-		{
-			if (m_tsr & TSR_AUTO_TURNAROUND)
-			{
-				/* enable transmitter */
-				m_tsr |= TSR_XMIT_ENABLE;
-
-				/* next bit is start */
-				m_tx_state = SERIAL_START;
-			}
-			else
-			{
-				/* disable transmitter */
-				m_xmit_state = XMIT_OFF;
-				m_tsr |= TSR_END_OF_XMIT;
-
-				/* signal transmit error */
-				tx_error();
-			}
-		}
-		break;
-	}
-}
-
-inline void mc68901_device::serial_transmit()
-{
-	switch (m_xmit_state)
-	{
-	case XMIT_OFF:      tx_disabled();  break;
-	case XMIT_STARTING: tx_starting();  break;
-	case XMIT_BREAK:    tx_break();     break;
-	case XMIT_ON:       tx_enabled();   break;
-	}
-}
-
 
 inline void mc68901_device::timer_count(int index)
 {
@@ -691,7 +358,6 @@ void mc68901_device::device_start()
 	/* resolve callbacks */
 	m_in_gpio_func.resolve(m_in_gpio_cb, *this);
 	m_out_gpio_func.resolve(m_out_gpio_cb, *this);
-	m_in_si_func.resolve(m_in_si_cb, *this);
 	m_out_so_func.resolve(m_out_so_cb, *this);
 	m_out_tao_func.resolve(m_out_tao_cb, *this);
 	m_out_tbo_func.resolve(m_out_tbo_cb, *this);
@@ -835,10 +501,7 @@ void mc68901_device::tra_complete()
 
 void mc68901_device::rcv_callback()
 {
-	if (m_in_si_func.isnull())
-		receive_register_update_bit(get_in_data_bit());
-	else
-		receive_register_update_bit(m_in_si_func());
+	receive_register_update_bit(get_in_data_bit());
 }
 
 
@@ -1438,4 +1101,28 @@ WRITE_LINE_MEMBER( mc68901_device::tai_w )
 WRITE_LINE_MEMBER( mc68901_device::tbi_w )
 {
 	timer_input(TIMER_B, state);
+}
+
+WRITE_LINE_MEMBER(mc68901_device::write_rx)
+{
+	if (state)
+	{
+		input_callback(m_input_state | RX);
+	}
+	else
+	{
+		input_callback(m_input_state & ~RX);
+	}
+}
+
+WRITE_LINE_MEMBER(mc68901_device::write_dsr)
+{
+	if (state)
+	{
+		input_callback(m_input_state | DSR);
+	}
+	else
+	{
+		input_callback(m_input_state & ~DSR);
+	}
 }

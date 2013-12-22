@@ -2066,7 +2066,6 @@ static MC68901_INTERFACE( mfp_interface )
 	DEVCB_NULL,                                         /* TBO */
 	DEVCB_NULL,                                         /* TCO */
 	DEVCB_DRIVER_LINE_MEMBER(x68k_state, mfp_tdo_w),    /* TDO */
-	DEVCB_NULL,                                         /* serial input */
 	DEVCB_NULL,                                         /* serial output */
 	DEVCB_NULL,
 	DEVCB_NULL
