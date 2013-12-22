@@ -1297,6 +1297,7 @@ const uPD7002_interface bbc_uPD7002 =
 void bbc_state::MC6850_Receive_Clock(int new_clock)
 {
 	m_rxd_cass = new_clock;
+	update_acia_rxd();
 
 	//
 	// Somehow the "serial processor" generates 16 clock signals towards
@@ -1366,6 +1367,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 				logerror ("Cassette length %d\n",m_wav_len);
 				m_nr_high_tones = 0;
 				m_dcd_cass = 0;
+				update_acia_dcd();
 				m_len0=0;
 				m_len1=0;
 				m_len2=0;
@@ -1387,6 +1389,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 				logerror("Serial value 0\n");
 				m_nr_high_tones = 0;
 				m_dcd_cass = 0;
+				update_acia_dcd();
 				MC6850_Receive_Clock(0);
 				m_len0=0;
 				m_len1=0;
@@ -1402,6 +1405,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 				if ( m_nr_high_tones > 100 )
 				{
 					m_dcd_cass = 1;
+					update_acia_dcd();
 				}
 				MC6850_Receive_Clock(1);
 				m_len0=0;
@@ -1416,22 +1420,39 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 	}
 }
 
-
-READ_LINE_MEMBER( bbc_state::bbc_rxd_r )
+WRITE_LINE_MEMBER( bbc_state::write_rxd_serial )
 {
-	return ( m_serproc_data & 0x40 ) ? m_rs232->rx() : m_rxd_cass;
+	m_rxd_serial = state;
+	update_acia_rxd();
+}
+
+void bbc_state::update_acia_rxd()
+{
+	m_acia->write_rx(( m_serproc_data & 0x40 ) ? m_rxd_serial : m_rxd_cass);
 }
 
 
-READ_LINE_MEMBER( bbc_state::bbc_dcd_r )
+WRITE_LINE_MEMBER( bbc_state::write_dcd_serial )
 {
-	return ( m_serproc_data & 0x40 ) ? m_rs232->dcd_r() : m_dcd_cass;
+	m_dcd_serial = state;
+	update_acia_dcd();
+}
+
+void bbc_state::update_acia_dcd()
+{
+	m_acia->write_dcd(( m_serproc_data & 0x40 ) ? m_dcd_serial : m_dcd_cass);
 }
 
 
-READ_LINE_MEMBER( bbc_state::bbc_cts_r )
+WRITE_LINE_MEMBER( bbc_state::write_cts_serial )
 {
-	return ( m_serproc_data & 0x40 ) ? m_rs232->cts_r() : 0;
+	m_cts_serial = state;
+	update_acia_cts();
+}
+
+void bbc_state::update_acia_cts()
+{
+	m_acia->write_cts(( m_serproc_data & 0x40 ) ? m_cts_serial : 0);
 }
 
 
@@ -1516,6 +1537,9 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 	};
 
 	m_serproc_data = data;
+	update_acia_rxd();
+	update_acia_dcd();
+	update_acia_cts();
 	BBC_Cassette_motor(m_serproc_data & 0x80);
 
 	// Set transmit clock rate

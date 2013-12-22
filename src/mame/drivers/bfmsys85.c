@@ -90,7 +90,6 @@ public:
 	int m_mux_input;
 	UINT8 m_Inputs[64];
 	UINT8 m_codec_data[256];
-	UINT8 m_sys85_data_line_r;
 	UINT8 m_sys85_data_line_t;
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 	DECLARE_READ8_MEMBER(irqlatch_r);
@@ -124,11 +123,6 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 
 
-READ_LINE_MEMBER(bfmsys85_state::sys85_data_r)
-{
-	return m_sys85_data_line_r;
-}
-
 WRITE_LINE_MEMBER(bfmsys85_state::sys85_data_w)
 {
 	m_sys85_data_line_t = state;
@@ -138,8 +132,8 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 {
 	500000,
 	500000,
-	DEVCB_DRIVER_LINE_MEMBER(bfmsys85_state,sys85_data_r),
 	DEVCB_DRIVER_LINE_MEMBER(bfmsys85_state,sys85_data_w),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 

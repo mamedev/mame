@@ -255,8 +255,6 @@ public:
 		DECLARE_WRITE_LINE_MEMBER(drq2_w);
 		DECLARE_WRITE_LINE_MEMBER(nmi_w);
 		DECLARE_WRITE_LINE_MEMBER( midi_rx_w );
-		DECLARE_READ_LINE_MEMBER( rx_in );
-		DECLARE_WRITE_LINE_MEMBER( tx_out );
 
 		// DMA overrides
 		virtual UINT8 dack_r(int line);
@@ -274,11 +272,9 @@ protected:
 private:
 		gf1_device* m_gf1;
 		acia6850_device* m_midi;
-		serial_port_device* m_mdout;
 
 		UINT8 m_irq_status;
 		attotime m_joy_time;
-		int m_rx_state;
 };
 
 // device type definition

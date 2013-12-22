@@ -30,12 +30,14 @@ class sb2m600_state : public driver_device
 public:
 	enum
 	{
+		TIMER_CASSETTE,
 		TIMER_SETUP_BEEP
 	};
 
 	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, M6502_TAG),
+	m_acia_0(*this, "acia_0"),
 	m_cassette(*this, "cassette"),
 	m_discrete(*this, DISCRETE_TAG),
 	m_ram(*this, RAM_TAG),
@@ -60,7 +62,6 @@ public:
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( keyboard_w );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
-	DECLARE_READ_LINE_MEMBER( cassette_rx );
 	DECLARE_WRITE_LINE_MEMBER( cassette_tx );
 
 	/* keyboard state */
@@ -78,6 +79,7 @@ public:
 	DECLARE_PALETTE_INIT(osi630);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<acia6850_device> m_acia_0;
 	required_device<cassette_image_device> m_cassette;
 	optional_device<discrete_sound_device> m_discrete;
 	required_device<ram_device> m_ram;
@@ -94,6 +96,7 @@ public:
 	required_ioport m_io_sound;
 	required_ioport m_io_reset;
 	optional_device<beep_device> m_beeper;
+	emu_timer *m_cassette_timer;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

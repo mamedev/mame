@@ -2652,11 +2652,6 @@ static const pia6821_interface sys906_pia1_intf =
 *                 ACIA Interface                 *
 *************************************************/
 
-READ_LINE_MEMBER(calomega_state::acia_rx_r)
-{
-	return m_rx_line;
-}
-
 WRITE_LINE_MEMBER(calomega_state::acia_tx_w)
 {
 	m_tx_line = state;
@@ -2666,10 +2661,7 @@ static ACIA6850_INTERFACE( acia6850_intf )
 {
 	UART_CLOCK,
 	UART_CLOCK,
-	DEVCB_DRIVER_LINE_MEMBER(calomega_state,acia_rx_r), /*&rx_line,*/
 	DEVCB_DRIVER_LINE_MEMBER(calomega_state,acia_tx_w), /*&tx_line,*/
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(calomega_state,tx_rx_clk)
 };

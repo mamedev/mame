@@ -334,11 +334,8 @@ static ACIA6850_INTERFACE( mc6850_intf )
 {
 	153600,
 	153600,
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, cts_r),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -367,7 +364,11 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+
 	MCFG_PIA6821_ADD("pia", mc6821_intf)
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)
 	MCFG_ACIA6850_ADD("acia", mc6850_intf)

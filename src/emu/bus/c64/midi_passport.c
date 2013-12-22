@@ -60,24 +60,11 @@ WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::acia_irq_w )
 	m_slot->irq_w(m_ptm_irq || m_acia_irq);
 }
 
-READ_LINE_MEMBER( c64_passport_midi_cartridge_device::rx_in )
-{
-	return m_rx_state;
-}
-
-WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::tx_out )
-{
-	m_mdout->tx(state);
-}
-
 static ACIA6850_INTERFACE( acia_intf )
 {
 	500000,
 	0,          // rx clock (we manually clock rx)
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_passport_midi_cartridge_device, rx_in),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_passport_midi_cartridge_device, tx_out),
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("mdout", serial_port_device, tx),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_passport_midi_cartridge_device, acia_irq_w)
 };
@@ -93,7 +80,7 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::midi_rx_w )
 {
-	m_rx_state = state;
+	m_acia->write_rx(state);
 
 	for (int i = 0; i < 16; i++)    // divider is set to 16
 	{
@@ -151,10 +138,8 @@ c64_passport_midi_cartridge_device::c64_passport_midi_cartridge_device(const mac
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MC6850_TAG),
 	m_ptm(*this, MC6840_TAG),
-	m_mdout(*this, "mdout"),
 	m_ptm_irq(CLEAR_LINE),
-	m_acia_irq(CLEAR_LINE),
-	m_rx_state(0)
+	m_acia_irq(CLEAR_LINE)
 {
 }
 
@@ -168,7 +153,6 @@ void c64_passport_midi_cartridge_device::device_start()
 	// state saving
 	save_item(NAME(m_ptm_irq));
 	save_item(NAME(m_acia_irq));
-	save_item(NAME(m_rx_state));
 }
 
 
@@ -180,8 +164,6 @@ void c64_passport_midi_cartridge_device::device_reset()
 {
 	m_acia->reset();
 	m_ptm->reset();
-
-	m_rx_state = 0;
 }
 
 

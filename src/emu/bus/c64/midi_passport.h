@@ -43,8 +43,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ptm_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( midi_rx_w );
-	DECLARE_READ_LINE_MEMBER( rx_in );
-	DECLARE_WRITE_LINE_MEMBER( tx_out );
 
 protected:
 	// device-level overrides
@@ -58,11 +56,9 @@ protected:
 private:
 	required_device<acia6850_device> m_acia;
 	required_device<ptm6840_device> m_ptm;
-	required_device<serial_port_device> m_mdout;
 
 	int m_ptm_irq;
 	int m_acia_irq;
-	int m_rx_state;
 };
 
 

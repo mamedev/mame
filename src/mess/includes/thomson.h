@@ -137,7 +137,6 @@ public:
 	DECLARE_WRITE8_MEMBER( to7_io_portb_out );
 	DECLARE_WRITE8_MEMBER( to7_io_cb2_out );
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_cb );
-	DECLARE_READ_LINE_MEMBER( to7_modem_rx_r );
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_tx_w );
 	DECLARE_READ8_MEMBER( to7_modem_mea8000_r );
 	DECLARE_WRITE8_MEMBER( to7_modem_mea8000_w );
@@ -339,7 +338,6 @@ protected:
 	UINT8 m_thom_cart_bank;     /* current bank */
 	UINT8 m_to7_lightpen_step;
 	UINT8 m_to7_lightpen;
-	UINT8 m_to7_modem_rx;
 	UINT8 m_to7_modem_tx;
 	/* calls to7_game_update_cb periodically */
 	emu_timer* m_to7_game_timer;

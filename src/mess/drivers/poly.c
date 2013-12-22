@@ -161,11 +161,8 @@ static ACIA6850_INTERFACE( acia_intf )
 {
 	1,
 	1,
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
 	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, cts_r),
 	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 

@@ -1200,18 +1200,12 @@ void gf1_device::eop_w(int state)
 
 /* 16-bit ISA card device implementation */
 
-static const acia6850_interface gus_midi_interface =
+static ACIA6850_INTERFACE(gus_midi_interface)
 {
 	31250 * 16,
 	0,
-
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, rx_in),   // rx in
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, tx_out),  // tx out
-
+	DEVCB_DEVICE_LINE_MEMBER("mdout", serial_port_device, tx),
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,midi_irq)
 };
 
@@ -1290,7 +1284,6 @@ void isa16_gus_device::device_start()
 {
 	m_gf1 = subdevice<gf1_device>("gf1");
 	m_midi = subdevice<acia6850_device>("midi");
-	m_mdout = subdevice<serial_port_device>("mdout");
 	set_isa_device();
 	m_isa->install_device(0x0200, 0x0201, 0, 0, read8_delegate(FUNC(isa16_gus_device::joy_r),this), write8_delegate(FUNC(isa16_gus_device::joy_w),this) );
 	m_isa->install_device(0x0220, 0x022f, 0, 0, read8_delegate(FUNC(isa16_gus_device::board_r),this), write8_delegate(FUNC(isa16_gus_device::board_w),this) );
@@ -1712,21 +1705,11 @@ WRITE_LINE_MEMBER( isa16_gus_device::midi_irq )
 
 WRITE_LINE_MEMBER( isa16_gus_device::midi_rx_w )
 {
-	m_rx_state = state;
+	m_midi->write_rx(state);
 	for (int i = 0; i < 16; i++)    // divider is set to 16
 	{
 		m_midi->rx_clock_in();
 	}
-}
-
-READ_LINE_MEMBER( isa16_gus_device::rx_in )
-{
-	return m_rx_state;
-}
-
-WRITE_LINE_MEMBER( isa16_gus_device::tx_out )
-{
-	m_mdout->tx(state);
 }
 
 WRITE_LINE_MEMBER( isa16_gus_device::nmi_w)

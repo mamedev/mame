@@ -247,12 +247,6 @@ public:
 	//Video
 	UINT8 m_m6840_irq_state;
 	UINT8 m_m6850_irq_state;
-	UINT8 m_m68k_m6809_line;
-	UINT8 m_m6809_m68k_line;
-	UINT8 m_m68k_acia_cts;
-	UINT8 m_m6809_acia_cts;
-	UINT8 m_m6809_acia_rts;
-	UINT8 m_m6809_acia_dcd;
 	int m_gfx_index;
 	INT8 m_cur[2];
 
@@ -282,17 +276,7 @@ public:
 	DECLARE_VIDEO_START(mpu4_vid);
 	UINT32 screen_update_mpu4_vid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
-	DECLARE_READ_LINE_MEMBER(m6809_acia_rx_r);
-	DECLARE_WRITE_LINE_MEMBER(m6809_acia_tx_w);
-	DECLARE_READ_LINE_MEMBER(m6809_acia_cts_r);
-	DECLARE_WRITE_LINE_MEMBER(m6809_acia_rts_w);
-	DECLARE_READ_LINE_MEMBER(m6809_acia_dcd_r);
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
-	DECLARE_READ_LINE_MEMBER(m68k_acia_rx_r);
-	DECLARE_WRITE_LINE_MEMBER(m68k_acia_tx_w);
-	DECLARE_READ_LINE_MEMBER(m68k_acia_cts_r);
-	DECLARE_WRITE_LINE_MEMBER(m68k_acia_rts_w);
-	DECLARE_READ_LINE_MEMBER(m68k_acia_dcd_r);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(cpu1_ptm_irq);
 	DECLARE_WRITE8_MEMBER(vid_o1_callback);
@@ -343,34 +327,9 @@ WRITE_LINE_MEMBER(mpu4vid_state::update_mpu68_interrupts)
 
 /* Communications with 6809 board */
 
-READ_LINE_MEMBER(mpu4vid_state::m6809_acia_rx_r)
-{
-	return m_m68k_m6809_line;
-}
-
-WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_tx_w)
-{
-	m_m6809_m68k_line = state;
-}
-
-READ_LINE_MEMBER(mpu4vid_state::m6809_acia_cts_r)
-{
-	return m_m6809_acia_cts;
-}
-
-WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_rts_w)
-{
-	m_m6809_acia_rts = state;
-}
-
-READ_LINE_MEMBER(mpu4vid_state::m6809_acia_dcd_r)
-{
-	return m_m6809_acia_dcd;
-}
-
 WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_irq)
 {
-	m_m68k_acia_cts = state;
+	m_acia_1->write_cts(state);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
@@ -378,42 +337,14 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 {
 	0,
 	0,
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_rx_r),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_tx_w),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_cts_r),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_rts_w),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_dcd_r),
+	DEVCB_DEVICE_LINE_MEMBER("acia6850_1", acia6850_device, write_rx),
+	DEVCB_DEVICE_LINE_MEMBER("acia6850_1", acia6850_device, write_dcd),
 	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m6809_acia_irq)
 };
 
-READ_LINE_MEMBER(mpu4vid_state::m68k_acia_rx_r)
-{
-	return m_m6809_m68k_line;
-}
-
-WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_tx_w)
-{
-	m_m68k_m6809_line = state;
-}
-
-READ_LINE_MEMBER(mpu4vid_state::m68k_acia_cts_r)
-{
-	return m_m68k_acia_cts;
-}
-
-WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_rts_w)
-{
-	m_m6809_acia_dcd = state;
-}
-
-READ_LINE_MEMBER(mpu4vid_state::m68k_acia_dcd_r)
-{
-	return m_m6809_acia_rts;
-}
-
 WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
 {
-	m_m6809_acia_cts = state;
+	m_acia_0->write_cts(state);
 	m_m6850_irq_state = state;
 	update_mpu68_interrupts(1);
 }
@@ -422,11 +353,8 @@ static ACIA6850_INTERFACE( m68k_acia_if )
 {
 	0,
 	0,
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_rx_r),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_tx_w),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_cts_r),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_rts_w),
-	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_dcd_r),
+	DEVCB_DEVICE_LINE_MEMBER("acia6850_0", acia6850_device, write_rx),
+	DEVCB_DEVICE_LINE_MEMBER("acia6850_0", acia6850_device, write_dcd),
 	DEVCB_DRIVER_LINE_MEMBER(mpu4vid_state, m68k_acia_irq)
 };
 

@@ -175,6 +175,9 @@ public:
 	int m_len3;
 	int m_mc6850_clock;
 	UINT8 m_serproc_data;
+	int m_rxd_serial;
+	int m_dcd_serial;
+	int m_cts_serial;
 	int m_dcd_cass;
 	int m_rxd_cass;
 	int m_cass_out_enabled;
@@ -340,11 +343,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
-	DECLARE_READ_LINE_MEMBER(bbc_rxd_r);
-	DECLARE_READ_LINE_MEMBER(bbc_dcd_r);
-	DECLARE_READ_LINE_MEMBER(bbc_cts_r);
+	void update_acia_rxd();
+	void update_acia_dcd();
+	void update_acia_cts();
 	DECLARE_WRITE_LINE_MEMBER(bbc_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_txd_w);
+	DECLARE_WRITE_LINE_MEMBER(write_rxd_serial);
+	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
+	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcb_cart );

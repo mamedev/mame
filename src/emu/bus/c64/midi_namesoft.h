@@ -41,9 +41,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( midi_rx_w );
-	DECLARE_READ_LINE_MEMBER( rx_in );
-	DECLARE_WRITE_LINE_MEMBER( tx_out );
-
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -55,9 +52,6 @@ protected:
 
 private:
 	required_device<acia6850_device> m_acia;
-	required_device<serial_port_device> m_mdout;
-
-	int m_rx_state;
 };
 
 

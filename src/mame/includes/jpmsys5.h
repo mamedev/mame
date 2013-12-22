@@ -18,12 +18,14 @@ public:
 	jpmsys5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		acia6850_2(*this, "acia6850_2"),
 		m_upd7759(*this, "upd7759"),
 		m_tms34061(*this, "tms34061"),
 		m_vfd(*this, "vfd"),
 		m_direct_port(*this, "DIRECT") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<acia6850_device> acia6850_2;
 	required_device<upd7759_device> m_upd7759;
 	optional_device<tms34061_device> m_tms34061;
 	optional_device<roc10937_t> m_vfd;
@@ -42,15 +44,9 @@ public:
 	int m_muxram[255];
 	int m_alpha_clock;
 	int m_chop;
-	UINT8 m_a0_acia_dcd;
 	UINT8 m_a0_data_out;
-	UINT8 m_a0_data_in;
-	UINT8 m_a1_acia_dcd;
 	UINT8 m_a1_data_out;
-	UINT8 m_a1_data_in;
-	UINT8 m_a2_acia_dcd;
 	UINT8 m_a2_data_out;
-	UINT8 m_a2_data_in;
 	DECLARE_WRITE16_MEMBER(sys5_tms34061_w);
 	DECLARE_READ16_MEMBER(sys5_tms34061_r);
 	DECLARE_WRITE16_MEMBER(ramdac_w);
@@ -71,15 +67,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(u29_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u29_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(acia_irq);
-	DECLARE_READ_LINE_MEMBER(a0_rx_r);
 	DECLARE_WRITE_LINE_MEMBER(a0_tx_w);
-	DECLARE_READ_LINE_MEMBER(a0_dcd_r);
-	DECLARE_READ_LINE_MEMBER(a1_rx_r);
 	DECLARE_WRITE_LINE_MEMBER(a1_tx_w);
-	DECLARE_READ_LINE_MEMBER(a1_dcd_r);
-	DECLARE_READ_LINE_MEMBER(a2_rx_r);
 	DECLARE_WRITE_LINE_MEMBER(a2_tx_w);
-	DECLARE_READ_LINE_MEMBER(a2_dcd_r);
 	DECLARE_READ16_MEMBER(mux_awp_r);
 	DECLARE_READ16_MEMBER(coins_awp_r);
 	void sys5_draw_lamps();

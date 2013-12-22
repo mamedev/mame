@@ -66,11 +66,8 @@ static ACIA6850_INTERFACE( acia_intf )
 {
 	153600,
 	153600,
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, cts_r),
 	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -80,7 +77,10 @@ static MACHINE_CONFIG_START( c68ksbc, c68ksbc_state )
 	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)
 
 	MCFG_ACIA6850_ADD("acia", acia_intf)
+
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */

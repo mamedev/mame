@@ -8,7 +8,6 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_tx_line;
-	UINT8 m_rx_line;
 	int m_s903_mux_data;
 	int m_s905_mux_data;
 	required_shared_ptr<UINT8> m_videoram;
@@ -35,7 +34,6 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_903a_w);
 	DECLARE_WRITE8_MEMBER(lamps_903b_w);
 	DECLARE_WRITE8_MEMBER(lamps_905_w);
-	DECLARE_READ_LINE_MEMBER(acia_rx_r);
 	DECLARE_WRITE_LINE_MEMBER(acia_tx_w);
 	DECLARE_DRIVER_INIT(elgrande);
 	DECLARE_DRIVER_INIT(standard);

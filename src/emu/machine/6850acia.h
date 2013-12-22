@@ -54,13 +54,8 @@ struct acia6850_interface
 	int m_tx_clock;
 	int m_rx_clock;
 
-	devcb_read_line     m_in_rx_cb;
 	devcb_write_line    m_out_tx_cb;
-
-	devcb_read_line     m_in_cts_cb;
 	devcb_write_line    m_out_rts_cb;
-	devcb_read_line     m_in_dcd_cb;
-
 	devcb_write_line    m_out_irq_cb;
 };
 
@@ -82,6 +77,10 @@ public:
 	DECLARE_READ8_MEMBER( status_read );
 	DECLARE_WRITE8_MEMBER( data_write );
 	DECLARE_READ8_MEMBER( data_read );
+
+	DECLARE_WRITE_LINE_MEMBER( write_rx );
+	DECLARE_WRITE_LINE_MEMBER( write_dcd );
+	DECLARE_WRITE_LINE_MEMBER( write_cts );
 
 	void tx_clock_in();
 	void rx_clock_in();
@@ -131,11 +130,8 @@ private:
 		EVEN
 	};
 
-	devcb_resolved_read_line    m_in_rx_func;
 	devcb_resolved_write_line   m_out_tx_func;
-	devcb_resolved_read_line    m_in_cts_func;
 	devcb_resolved_write_line   m_out_rts_func;
-	devcb_resolved_read_line    m_in_dcd_func;
 	devcb_resolved_write_line   m_out_irq_func;
 
 	UINT8       m_ctrl;
@@ -174,6 +170,9 @@ private:
 	serial_state m_tx_state;
 	int         m_irq;
 	bool        m_dcd_triggered;
+	int         m_rxd;
+	int         m_dcd;
+	int         m_cts;
 
 	emu_timer   *m_rx_timer;
 	emu_timer   *m_tx_timer;

@@ -594,7 +594,7 @@ WRITE8_MEMBER( st_state::ikbd_port2_w )
 	m_ikbd_joy = BIT(data, 0);
 
 	// serial transmit
-	m_ikbd_rx = BIT(data, 4);
+	m_acia0->write_rx(BIT(data, 4));
 }
 
 
@@ -1822,11 +1822,6 @@ static const ay8910_interface stbook_psg_intf =
 //  ACIA6850_INTERFACE( acia_ikbd_intf )
 //-------------------------------------------------
 
-READ_LINE_MEMBER( st_state::ikbd_rx_r )
-{
-	return m_ikbd_rx;
-}
-
 WRITE_LINE_MEMBER( st_state::ikbd_tx_w )
 {
 	m_ikbd_tx = state;
@@ -1843,10 +1838,7 @@ static ACIA6850_INTERFACE( acia_ikbd_intf )
 {
 	Y2/64,
 	Y2/64,
-	DEVCB_DRIVER_LINE_MEMBER(st_state, ikbd_rx_r),
 	DEVCB_DRIVER_LINE_MEMBER(st_state, ikbd_tx_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(st_state, acia_ikbd_irq_w)
 };
@@ -1860,10 +1852,7 @@ static ACIA6850_INTERFACE( stbook_acia_ikbd_intf )
 {
 	U517/2/16, // 500kHz
 	U517/2/2, // 1MHZ
-	DEVCB_DRIVER_LINE_MEMBER(st_state, ikbd_rx_r),
 	DEVCB_DRIVER_LINE_MEMBER(st_state, ikbd_tx_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(st_state, acia_ikbd_irq_w)
 };
@@ -1872,16 +1861,6 @@ static ACIA6850_INTERFACE( stbook_acia_ikbd_intf )
 //-------------------------------------------------
 //  ACIA6850_INTERFACE( acia_midi_intf )
 //-------------------------------------------------
-
-READ_LINE_MEMBER( st_state::midi_rx_in )
-{
-	return m_midi_rx_state;
-}
-
-WRITE_LINE_MEMBER( st_state::midi_tx_out )
-{
-	m_mdout->tx(state);
-}
 
 WRITE_LINE_MEMBER( st_state::acia_midi_irq_w )
 {
@@ -1894,10 +1873,7 @@ static ACIA6850_INTERFACE( acia_midi_intf )
 {
 	Y2/64,
 	0,          // rx clock (we manually clock rx)
-	DEVCB_DRIVER_LINE_MEMBER(st_state, midi_rx_in),
-	DEVCB_DRIVER_LINE_MEMBER(st_state, midi_tx_out),
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("mdout", serial_port_device, tx),
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(st_state, acia_midi_irq_w)
 };
@@ -2152,7 +2128,7 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( st_state::midi_rx_w )
 {
-	m_midi_rx_state = state;
+	m_acia1->write_rx(state);
 
 	for (int i = 0; i < 64; i++)    // divider is set to 64
 	{
@@ -2239,10 +2215,8 @@ void st_state::state_save()
 	save_item(NAME(m_ikbd_mouse_px));
 	save_item(NAME(m_ikbd_mouse_py));
 	save_item(NAME(m_ikbd_mouse_pc));
-	save_item(NAME(m_ikbd_rx));
 	save_item(NAME(m_ikbd_tx));
 	save_item(NAME(m_ikbd_joy));
-	save_item(NAME(m_midi_rx));
 	save_item(NAME(m_midi_tx));
 	save_item(NAME(m_acia_ikbd_irq));
 	save_item(NAME(m_acia_midi_irq));
@@ -2618,10 +2592,10 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL, NULL)
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout", NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

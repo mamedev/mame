@@ -84,11 +84,8 @@ void acia6850_device::static_set_interface(device_t &device, const acia6850_inte
 void acia6850_device::device_start()
 {
 	// resolve callbacks
-	m_in_rx_func.resolve(m_in_rx_cb, *this);
 	m_out_tx_func.resolve(m_out_tx_cb, *this);
-	m_in_cts_func.resolve(m_in_cts_cb, *this);
 	m_out_rts_func.resolve(m_out_rts_cb, *this);
-	m_in_dcd_func.resolve(m_in_dcd_cb, *this);
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
 
 	m_tx_counter = 0;
@@ -124,6 +121,9 @@ void acia6850_device::device_start()
 	save_item(NAME(m_first_reset));
 	save_item(NAME(m_rts));
 	save_item(NAME(m_brk));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_dcd));
+	save_item(NAME(m_cts));
 	save_item(NAME(m_status_read));
 	save_item(NAME(m_dcd_triggered));
 }
@@ -135,10 +135,7 @@ void acia6850_device::device_start()
 
 void acia6850_device::device_reset()
 {
-	int cts = m_in_cts_func();
-	int dcd = m_in_dcd_func();
-
-	m_status = (cts << 3) | (dcd << 2) | ACIA6850_STATUS_TDRE;
+	m_status = (m_cts << 3) | (m_dcd << 2) | ACIA6850_STATUS_TDRE;
 	m_tdr = 0;
 	m_rdr = 0;
 	m_tx_shift = 0;
@@ -178,6 +175,20 @@ void acia6850_device::device_reset()
 	}
 }
 
+DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_rx )
+{
+	m_rts = state;
+}
+
+DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_dcd )
+{
+	m_dcd = state;
+}
+
+DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_cts )
+{
+	m_cts = state;
+}
 
 //-------------------------------------------------
 //  device_timer - handle timer callbacks
@@ -226,9 +237,7 @@ READ8_MEMBER( acia6850_device::status_read )
 
 void acia6850_device::check_dcd_input()
 {
-	int dcd = m_in_dcd_func();
-
-	if (dcd)
+	if (m_dcd)
 	{
 		// IRQ from DCD is edge triggered
 		if ( ! ( m_status & ACIA6850_STATUS_DCD ) )
@@ -438,9 +447,7 @@ void acia6850_device::tx_tick()
 			}
 			else
 			{
-				int _cts = m_in_cts_func();
-
-				if (_cts)
+				if (m_cts)
 				{
 					m_status |= ACIA6850_STATUS_CTS;
 				}
@@ -542,9 +549,7 @@ void acia6850_device::tx_tick()
 
 void acia6850_device::tx_clock_in()
 {
-	int _cts = m_in_cts_func();
-
-	if (_cts)
+	if (m_cts)
 	{
 		m_status |= ACIA6850_STATUS_CTS;
 	}
@@ -578,13 +583,11 @@ void acia6850_device::rx_tick()
 	}
 	else
 	{
-		int rxd = m_in_rx_func();
-
 		switch (m_rx_state)
 		{
 			case START:
 			{
-				if (rxd == 0)
+				if (m_rxd == 0)
 				{
 					if (LOG) logerror("MC6850 '%s': RX START BIT\n", tag());
 					m_rx_shift = 0;
@@ -596,9 +599,9 @@ void acia6850_device::rx_tick()
 			}
 			case DATA:
 			{
-				if (LOG) logerror("MC6850 '%s': RX DATA BIT %x\n", tag(), rxd);
-				m_rx_shift |= rxd ? 0x80 : 0;
-				m_rx_parity ^= rxd;
+				if (LOG) logerror("MC6850 '%s': RX DATA BIT %x\n", tag(), m_rxd);
+				m_rx_shift |= m_rxd ? 0x80 : 0;
+				m_rx_parity ^= m_rxd;
 
 				if (--m_rx_bits == 0)
 				{
@@ -618,8 +621,8 @@ void acia6850_device::rx_tick()
 			}
 			case PARITY:
 			{
-				if (LOG) logerror("MC6850 '%s': RX PARITY BIT %x\n", tag(), rxd);
-				m_rx_parity ^= rxd;
+				if (LOG) logerror("MC6850 '%s': RX PARITY BIT %x\n", tag(), m_rxd);
+				m_rx_parity ^= m_rxd;
 
 				if (m_parity == EVEN)
 				{
@@ -641,7 +644,7 @@ void acia6850_device::rx_tick()
 			}
 			case STOP:
 			{
-				if (rxd == 1)
+				if (m_rxd == 1)
 				{
 					if (LOG) logerror("MC6850 '%s': RX STOP BIT\n", tag());
 					if (m_stopbits == 1)
@@ -672,7 +675,7 @@ void acia6850_device::rx_tick()
 			}
 			case STOP2:
 			{
-				if (rxd == 1)
+				if (m_rxd == 1)
 				{
 					if (LOG) logerror("MC6850 '%s': RX STOP BIT\n", tag());
 					m_status &= ~ACIA6850_STATUS_FE;

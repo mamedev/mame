@@ -826,11 +826,6 @@ const pia6821_interface to7_pia6821_modem =
 	DEVCB_NULL
 };
 
-READ_LINE_MEMBER( thomson_state::to7_modem_rx_r )
-{
-	return m_to7_modem_rx;
-}
-
 WRITE_LINE_MEMBER( thomson_state::to7_modem_tx_w )
 {
 	m_to7_modem_tx = state;
@@ -840,10 +835,7 @@ ACIA6850_INTERFACE( to7_modem )
 {
 	1200,
 	1200, /* 1200 bauds, might be divided by 16 */
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, to7_modem_rx_r), /*&to7_modem_rx,*/
 	DEVCB_DRIVER_LINE_MEMBER(thomson_state, to7_modem_tx_w), /*&to7_modem_tx,*/
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(thomson_state, to7_modem_cb)
 };
@@ -853,7 +845,7 @@ ACIA6850_INTERFACE( to7_modem )
 void thomson_state::to7_modem_reset()
 {
 	LOG (( "to7_modem_reset called\n" ));
-	m_to7_modem_rx = 0;
+	m_acia->write_rx(0);
 	m_to7_modem_tx = 0;
 	/* pia_reset() is called in machine_reset */
 	/* acia_6850 has no reset (?) */
@@ -864,7 +856,6 @@ void thomson_state::to7_modem_reset()
 void thomson_state::to7_modem_init()
 {
 	LOG (( "to7_modem_init: MODEM not implemented!\n" ));
-	save_item(NAME(m_to7_modem_rx));
 	save_item(NAME(m_to7_modem_tx));
 }
 

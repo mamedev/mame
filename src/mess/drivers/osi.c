@@ -644,11 +644,6 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-READ_LINE_MEMBER( sb2m600_state::cassette_rx )
-{
-	return ((m_cassette)->input() > 0.0) ? 1 : 0;
-}
-
 WRITE_LINE_MEMBER( sb2m600_state::cassette_tx )
 {
 	m_cassette->output(state ? +1.0 : -1.0);
@@ -658,10 +653,7 @@ static ACIA6850_INTERFACE( osi600_acia_intf )
 {
 	X1/32,
 	X1/32,
-	DEVCB_DRIVER_LINE_MEMBER(sb2m600_state, cassette_rx),
 	DEVCB_DRIVER_LINE_MEMBER(sb2m600_state, cassette_tx),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -670,10 +662,7 @@ static ACIA6850_INTERFACE( uk101_acia_intf )
 {
 	500000, //
 	500000, //
-	DEVCB_DRIVER_LINE_MEMBER(sb2m600_state, cassette_rx),
 	DEVCB_DRIVER_LINE_MEMBER(sb2m600_state, cassette_tx),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -682,9 +671,6 @@ static ACIA6850_INTERFACE( osi470_acia_intf )
 {
 	0,              // clocked in from the floppy drive
 	XTAL_4MHz/8,    // 250 kHz
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -935,6 +921,9 @@ void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch (id)
 	{
+	case TIMER_CASSETTE:
+		m_acia_0->write_rx(((m_cassette)->input() > 0.0) ? 1 : 0);
+		break;
 	case TIMER_SETUP_BEEP:
 		m_beeper->set_state(0);
 		m_beeper->set_frequency(300);
@@ -947,6 +936,8 @@ void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param
 DRIVER_INIT_MEMBER(c1p_state,c1p)
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
+	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
+	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 }
 
 

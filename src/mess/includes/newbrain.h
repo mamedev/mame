@@ -164,7 +164,6 @@ public:
 	int m_bee;              // identity
 	UINT8 m_enrg1;          // enable register 1
 	UINT8 m_enrg2;          // enable register 2
-	int m_acia_rxd;         // ACIA receive
 	int m_acia_txd;         // ACIA transmit
 
 	// COP420 state
@@ -239,7 +238,6 @@ public:
 	DECLARE_READ8_MEMBER( usbs_r );
 	DECLARE_WRITE8_MEMBER( usbs_w );
 	DECLARE_WRITE8_MEMBER( paging_w );
-	DECLARE_READ_LINE_MEMBER( acia_rx );
 	DECLARE_WRITE_LINE_MEMBER( acia_tx );
 	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );

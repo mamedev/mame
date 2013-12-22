@@ -1153,11 +1153,6 @@ INPUT_PORTS_END
 
 /* Machine Initialization */
 
-READ_LINE_MEMBER( newbrain_eim_state::acia_rx )
-{
-	return m_acia_rxd;
-}
-
 WRITE_LINE_MEMBER( newbrain_eim_state::acia_tx )
 {
 	m_acia_txd = state;
@@ -1172,10 +1167,7 @@ static ACIA6850_INTERFACE( acia_intf )
 {
 	0,
 	0,
-	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, acia_rx),
 	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, acia_tx),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, acia_interrupt)
 };

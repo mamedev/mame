@@ -1308,9 +1308,7 @@ static const acia6850_interface swyft_acia_config =
 	3579545, // guess
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const via6522_interface swyft_via0_config =

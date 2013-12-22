@@ -37,24 +37,11 @@ WRITE_LINE_MEMBER( c64_siel_midi_cartridge_device::acia_irq_w )
 	m_slot->irq_w(state);
 }
 
-READ_LINE_MEMBER( c64_siel_midi_cartridge_device::rx_in )
-{
-	return m_rx_state;
-}
-
-WRITE_LINE_MEMBER( c64_siel_midi_cartridge_device::tx_out )
-{
-	m_mdout->tx(state);
-}
-
 static ACIA6850_INTERFACE( acia_intf )
 {
 	XTAL_2MHz,
 	0,          // rx clock (we manually clock rx)
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_siel_midi_cartridge_device, rx_in),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_siel_midi_cartridge_device, tx_out),
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("mdout", serial_port_device, tx),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_siel_midi_cartridge_device, acia_irq_w)
 };
@@ -70,7 +57,7 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( c64_siel_midi_cartridge_device::midi_rx_w )
 {
-	m_rx_state = state;
+	m_acia->write_rx(state);
 
 	for (int i = 0; i < 64; i++)    // divider is set to 64
 	{
@@ -125,9 +112,7 @@ machine_config_constructor c64_siel_midi_cartridge_device::device_mconfig_additi
 c64_siel_midi_cartridge_device::c64_siel_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_MIDI_SIEL, "C64 Siel MIDI", tag, owner, clock, "c64_midisiel", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_acia(*this, MC6850_TAG),
-	m_mdout(*this, "mdout"),
-	m_rx_state(0)
+	m_acia(*this, MC6850_TAG)
 {
 }
 
@@ -139,7 +124,6 @@ c64_siel_midi_cartridge_device::c64_siel_midi_cartridge_device(const machine_con
 void c64_siel_midi_cartridge_device::device_start()
 {
 	// state saving
-	save_item(NAME(m_rx_state));
 }
 
 
@@ -150,8 +134,6 @@ void c64_siel_midi_cartridge_device::device_start()
 void c64_siel_midi_cartridge_device::device_reset()
 {
 	m_acia->reset();
-
-	m_rx_state = 0;
 }
 
 

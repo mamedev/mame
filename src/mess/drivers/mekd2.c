@@ -106,7 +106,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mekd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mekd2_segment_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mekd2_cart);
-	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
@@ -327,11 +326,6 @@ static const pia6821_interface mekd2_u_mc6821_intf =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB output */
 };
 
-READ_LINE_MEMBER( mekd2_state::cass_r )
-{
-	return (bool)m_cass_data[2];
-}
-
 WRITE_LINE_MEMBER( mekd2_state::cass_w )
 {
 	m_cass_state = state;
@@ -341,11 +335,8 @@ static ACIA6850_INTERFACE( mekd2_acia_intf )
 {
 	XTAL_MEKD2 / 256, /* tx clock 4800Hz */
 	300,     /* rx clock line, toggled by cassette circuit */
-	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, cass_r), /* in rxd func */
 	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, cass_w), /* out txd func */
-	DEVCB_NULL, /* in cts func */
-	DEVCB_NULL, /* out rts func */
-	DEVCB_NULL, /* in dcd func */
+	DEVCB_NULL, // cts
 	DEVCB_NULL  /* out irq func NOT USED */
 };
 
@@ -393,7 +384,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_cass_data[2] = ((m_cass_data[1] < 12) ? 1 : 0);
+		m_acia->write_rx((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
 }

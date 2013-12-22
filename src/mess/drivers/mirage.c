@@ -284,11 +284,8 @@ static ACIA6850_INTERFACE( mirage_acia6850_interface )
 {
 	0,              // tx clock
 	0,              // rx clock
-	DEVCB_NULL,         // rx in
 	DEVCB_NULL,         // rx out
-	DEVCB_NULL,         // cts in
 	DEVCB_NULL,         // rts out
-	DEVCB_NULL,         // dcd in
 	DEVCB_DRIVER_LINE_MEMBER(mirage_state, acia_irq_w)
 };
 

@@ -215,11 +215,8 @@ static ACIA6850_INTERFACE( acia0_intf )
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, cts_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dcd_r),
 	DEVCB_NULL
 };
 
@@ -232,11 +229,8 @@ static ACIA6850_INTERFACE( acia1_intf )
 {
 	0,
 	0,
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, cts_r),
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dcd_r),
 	DEVCB_NULL,
 };
 
@@ -318,8 +312,16 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
 	MCFG_ACIA6850_ADD(MC6850_0_TAG, acia0_intf)
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia1_intf)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, NULL, WRITELINE(ob68k1a_state, rx_tx_0_w), WRITELINE(ob68k1a_state, rx_tx_1_w))
+
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_rx))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_dcd))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_cts))
+
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rx))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_dcd))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_cts))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

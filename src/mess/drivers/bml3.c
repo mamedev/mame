@@ -105,11 +105,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bml3bus_irq_w);
 	DECLARE_WRITE8_MEMBER(bml3bus_firq_w);
 
-	DECLARE_READ_LINE_MEMBER( bml3_acia_rx_r );
 	DECLARE_WRITE_LINE_MEMBER( bml3_acia_tx_w );
-	DECLARE_READ_LINE_MEMBER( bml3_acia_dts_r );
 	DECLARE_WRITE_LINE_MEMBER( bml3_acia_rts_w );
-	DECLARE_READ_LINE_MEMBER(bml3_acia_dcd_r);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
 
 	DECLARE_READ8_MEMBER(bml3_a000_r); DECLARE_WRITE8_MEMBER(bml3_a000_w);
@@ -925,33 +922,15 @@ static const pia6821_interface bml3_pia_config =
 };
 
 
-READ_LINE_MEMBER( bml3_state::bml3_acia_rx_r )
-{
-	logerror("TAPE R\n");
-	return 1;
-}
-
 WRITE_LINE_MEMBER( bml3_state::bml3_acia_tx_w )
 {
 	logerror("%02x TAPE\n",state);
 }
 
 
-READ_LINE_MEMBER( bml3_state::bml3_acia_dts_r )
-{
-	logerror("TAPE R DTS\n");
-	return 1;
-}
-
 WRITE_LINE_MEMBER( bml3_state::bml3_acia_rts_w )
 {
 	logerror("%02x TAPE RTS\n",state);
-}
-
-READ_LINE_MEMBER( bml3_state::bml3_acia_dcd_r )
-{
-	logerror("TAPE R DCD\n");
-	return 1;
 }
 
 WRITE_LINE_MEMBER( bml3_state::bml3_acia_irq_w )
@@ -964,11 +943,8 @@ static ACIA6850_INTERFACE( bml3_acia_if )
 {
 	600,
 	600,
-	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_rx_r),
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_tx_w),
-	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_dts_r),
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_rts_w),
-	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_dcd_r),
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_irq_w)
 };
 

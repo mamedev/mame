@@ -238,6 +238,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_acia6850_2(*this, "acia6850_2"),
 		m_upd7759(*this, "upd") { }
 
 	UINT8 m_bank_data[4];
@@ -248,8 +249,6 @@ public:
 	UINT8 m_flip_8;
 	UINT8 m_flip_22;
 	UINT8 m_videomode;
-	UINT8 m_z80_m6809_line;
-	UINT8 m_m6809_z80_line;
 	UINT8 m_data_r;
 	UINT8 m_data_t;
 	int m_irq_state;
@@ -286,13 +285,8 @@ public:
 	DECLARE_WRITE8_MEMBER(fd_ctrl_w);
 	DECLARE_READ8_MEMBER(upd_r);
 	DECLARE_WRITE8_MEMBER(upd_w);
-	DECLARE_READ_LINE_MEMBER(z80_acia_rx_r);
-	DECLARE_WRITE_LINE_MEMBER(z80_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
-	DECLARE_READ_LINE_MEMBER(m6809_acia_rx_r);
-	DECLARE_WRITE_LINE_MEMBER(m6809_acia_tx_w);
 	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
-	DECLARE_READ_LINE_MEMBER(data_acia_rx_r);
 	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
 	DECLARE_DRIVER_INIT(bfcobra);
 	virtual void machine_reset();
@@ -312,6 +306,7 @@ public:
 	UINT8 results_phase(void);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<acia6850_device> m_acia6850_2;
 	required_device<upd7759_device> m_upd7759;
 };
 
@@ -1618,16 +1613,6 @@ void bfcobra_state::init_ram()
     What are the correct ACIA clocks ?
 */
 
-READ_LINE_MEMBER(bfcobra_state::z80_acia_rx_r)
-{
-	return m_m6809_z80_line;
-}
-
-WRITE_LINE_MEMBER(bfcobra_state::z80_acia_tx_w)
-{
-	m_z80_m6809_line = state;
-}
-
 WRITE_LINE_MEMBER(bfcobra_state::z80_acia_irq)
 {
 	m_acia_irq = state;
@@ -1638,23 +1623,10 @@ static ACIA6850_INTERFACE( z80_acia_if )
 {
 	500000,
 	500000,
-	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,z80_acia_rx_r), /*&m6809_z80_line,*/
-	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,z80_acia_tx_w), /*&z80_m6809_line,*/
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("acia6850_1", acia6850_device, write_rx),
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,z80_acia_irq)
 };
-
-READ_LINE_MEMBER(bfcobra_state::m6809_acia_rx_r)
-{
-	return m_z80_m6809_line;
-}
-
-WRITE_LINE_MEMBER(bfcobra_state::m6809_acia_tx_w)
-{
-	m_m6809_z80_line = state;
-}
 
 WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
 {
@@ -1665,22 +1637,14 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 {
 	500000,
 	500000,
-	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,m6809_acia_rx_r),/*&z80_m6809_line,*/
-	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,m6809_acia_tx_w),/*&m6809_z80_line,*/
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("acia6850_0", acia6850_device, write_rx),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
-READ_LINE_MEMBER(bfcobra_state::data_acia_rx_r)
-{
-	return m_data_r;
-}
-
 WRITE_LINE_MEMBER(bfcobra_state::data_acia_tx_w)
 {
-		m_data_t = state;
+	m_data_t = state;
 }
 
 
@@ -1688,10 +1652,7 @@ static ACIA6850_INTERFACE( data_acia_if )
 {
 	500000,
 	500000,
-	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,data_acia_rx_r),/*data_r,*/
 	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,data_acia_tx_w),/*data_t,*/
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(bfcobra_state,m6809_data_irq)
 };
@@ -1744,11 +1705,9 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 	membank("bank4")->set_base(memregion("user1")->base());
 
 	/* TODO: Properly sort out the data ACIA */
-	m_data_r = 1;
+	m_acia6850_2->write_rx(1);
 
 	/* Finish this */
-	save_item(NAME(m_z80_m6809_line));
-	save_item(NAME(m_m6809_z80_line));
 	save_item(NAME(m_data_r));
 	save_item(NAME(m_data_t));
 	save_item(NAME(m_h_scroll));

@@ -352,13 +352,13 @@ TIMER_CALLBACK_MEMBER(jpmsys5_state::touch_cb)
 		case START:
 		{
 			m_touch_shift_cnt = 0;
-			m_a2_data_in = 0;
+			acia6850_2->write_rx(0);
 			m_touch_state = DATA;
 			break;
 		}
 		case DATA:
 		{
-			m_a2_data_in = (m_touch_data[m_touch_data_count] >> (m_touch_shift_cnt)) & 1;
+			acia6850_2->write_rx((m_touch_data[m_touch_data_count] >> (m_touch_shift_cnt)) & 1);
 
 			if (++m_touch_shift_cnt == 8)
 				m_touch_state = STOP1;
@@ -367,13 +367,13 @@ TIMER_CALLBACK_MEMBER(jpmsys5_state::touch_cb)
 		}
 		case STOP1:
 		{
-			m_a2_data_in = 1;
+			acia6850_2->write_rx(1);
 			m_touch_state = STOP2;
 			break;
 		}
 		case STOP2:
 		{
-			m_a2_data_in = 1;
+			acia6850_2->write_rx(1);
 
 			if (++m_touch_data_count == 3)
 			{
@@ -596,84 +596,45 @@ WRITE_LINE_MEMBER(jpmsys5_state::acia_irq)
 
 /* Clocks are incorrect */
 
-READ_LINE_MEMBER(jpmsys5_state::a0_rx_r)
-{
-	return m_a0_data_in;
-}
-
 WRITE_LINE_MEMBER(jpmsys5_state::a0_tx_w)
 {
 	m_a0_data_out = state;
-}
-
-READ_LINE_MEMBER(jpmsys5_state::a0_dcd_r)
-{
-	return m_a0_acia_dcd;
 }
 
 static ACIA6850_INTERFACE( acia0_if )
 {
 	10000,
 	10000,
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a0_rx_r), /*&a0_data_in,*/
 	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a0_tx_w), /*&a0_data_out,*/
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a0_dcd_r), /*&a0_acia_dcd,*/
 	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,acia_irq)
 };
-
-READ_LINE_MEMBER(jpmsys5_state::a1_rx_r)
-{
-	return m_a1_data_in;
-}
 
 WRITE_LINE_MEMBER(jpmsys5_state::a1_tx_w)
 {
 	m_a1_data_out = state;
 }
 
-READ_LINE_MEMBER(jpmsys5_state::a1_dcd_r)
-{
-	return m_a1_acia_dcd;
-}
-
 static ACIA6850_INTERFACE( acia1_if )
 {
 	10000,
 	10000,
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a1_rx_r), /*&state->m_a1_data_in,*/
 	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a1_tx_w), /*&state->m_a1_data_out,*/
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a1_dcd_r), /*&state->m_a1_acia_dcd,*/
 	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,acia_irq)
 };
-
-READ_LINE_MEMBER(jpmsys5_state::a2_rx_r)
-{
-	return m_a2_data_in;
-}
 
 WRITE_LINE_MEMBER(jpmsys5_state::a2_tx_w)
 {
 	m_a2_data_out = state;
 }
 
-READ_LINE_MEMBER(jpmsys5_state::a2_dcd_r)
-{
-	return m_a2_acia_dcd;
-}
-
 static ACIA6850_INTERFACE( acia2_if )
 {
 	10000,
 	10000,
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a2_rx_r), /*&state->m_a2_data_in,*/
 	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a2_tx_w), /*&state->m_a2_data_out,*/
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,a2_dcd_r), /*&state->m_a2_acia_dcd,*/
 	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,acia_irq)
 };
 
@@ -694,8 +655,8 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
 {
 	m_touch_timer->reset();
 	m_touch_state = IDLE;
-	m_a2_data_in = 1;
-	m_a2_acia_dcd = 0;
+	acia6850_2->write_rx(1);
+	acia6850_2->write_dcd(0);
 	m_vfd->reset();
 
 }
@@ -892,8 +853,8 @@ MACHINE_START_MEMBER(jpmsys5_state,jpmsys5)
 
 MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
 {
-	m_a2_data_in = 1;
-	m_a2_acia_dcd = 0;
+	acia6850_2->write_rx(1);
+	acia6850_2->write_dcd(0);
 	m_vfd->reset();
 }
 

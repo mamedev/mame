@@ -555,11 +555,8 @@ static ACIA6850_INTERFACE( bbc_acia6850_interface )
 {
 	0,
 	0,
-	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_rxd_r),
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_txd_w),
-	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_cts_r),
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_rts_w),
-	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_dcd_r),
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbcb_acia6850_irq_w)
 };
 
@@ -697,6 +694,9 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
+	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
+	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
 	/* devices */
 	MCFG_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
@@ -884,6 +884,9 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
+	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
+	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
 	/* devices */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
