@@ -30,7 +30,6 @@ class sb2m600_state : public driver_device
 public:
 	enum
 	{
-		TIMER_CASSETTE,
 		TIMER_SETUP_BEEP
 	};
 
@@ -63,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER( keyboard_w );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
 	DECLARE_WRITE_LINE_MEMBER( cassette_tx );
+	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
 
 	/* keyboard state */
 	UINT8 m_keylatch;
@@ -96,7 +96,6 @@ public:
 	required_ioport m_io_sound;
 	required_ioport m_io_reset;
 	optional_device<beep_device> m_beeper;
-	emu_timer *m_cassette_timer;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

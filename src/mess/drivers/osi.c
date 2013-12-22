@@ -644,6 +644,11 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
+TIMER_DEVICE_CALLBACK_MEMBER( sb2m600_state::tape_tick )
+{
+	m_acia_0->write_rx((m_cassette->input() > 0.0) ? 1 : 0);
+}
+
 WRITE_LINE_MEMBER( sb2m600_state::cassette_tx )
 {
 	m_cassette->output(state ? +1.0 : -1.0);
@@ -796,6 +801,7 @@ static MACHINE_CONFIG_START( osi600, sb2m600_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", sb2m600_state, tape_tick, attotime::from_hz(44100))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -817,6 +823,7 @@ static MACHINE_CONFIG_START( uk101, uk101_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", sb2m600_state, tape_tick, attotime::from_hz(44100))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -850,6 +857,7 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", sb2m600_state, tape_tick, attotime::from_hz(44100))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -921,9 +929,6 @@ void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch (id)
 	{
-	case TIMER_CASSETTE:
-		m_acia_0->write_rx(((m_cassette)->input() > 0.0) ? 1 : 0);
-		break;
 	case TIMER_SETUP_BEEP:
 		m_beeper->set_state(0);
 		m_beeper->set_frequency(300);
@@ -936,8 +941,6 @@ void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param
 DRIVER_INIT_MEMBER(c1p_state,c1p)
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
-	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
-	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 }
 
 
