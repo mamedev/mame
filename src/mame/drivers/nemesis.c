@@ -56,6 +56,8 @@ So this is the correct behavior of real hardware, not an emulation bug.
 #include "includes/nemesis.h"
 #include "includes/konamipt.h"
 
+#include "konamigt.lh"
+
 
 INTERRUPT_GEN_MEMBER(nemesis_state::nemesis_interrupt)
 {
@@ -2327,7 +2329,7 @@ ROM_END
 
 GAME( 1985, nemesis,   0,         nemesis,    nemesis, driver_device,   0,    ROT0,   "Konami", "Nemesis (ROM version)",  GAME_SUPPORTS_SAVE )
 GAME( 1985, nemesisuk, nemesis,   nemesis,    nemesuk, driver_device,   0,    ROT0,   "Konami", "Nemesis (World?, ROM version)",  GAME_SUPPORTS_SAVE )
-GAME( 1985, konamigt,  0,         konamigt,   konamigt, driver_device,  0,    ROT0,   "Konami", "Konami GT",  GAME_SUPPORTS_SAVE )
+GAMEL(1985, konamigt,  0,         konamigt,   konamigt, driver_device,  0,    ROT0,   "Konami", "Konami GT",  GAME_SUPPORTS_SAVE, layout_konamigt )
 GAME( 1985, rf2,       konamigt,  rf2_gx400,  rf2, driver_device,       0,    ROT0,   "Konami", "Konami RF2 - Red Fighter",  GAME_SUPPORTS_SAVE )
 GAME( 1985, twinbee,   0,         gx400,      twinbee, driver_device,   0,    ROT90,  "Konami", "TwinBee (ROM version)",  GAME_SUPPORTS_SAVE )
 GAME( 1985, gradius,   nemesis,   gx400,      gradius, driver_device,   0,    ROT0,   "Konami", "Gradius (Japan, ROM version)",  GAME_SUPPORTS_SAVE )

@@ -2534,6 +2534,8 @@ $(DRIVERS)/nbmj8688.o:  $(LAYOUT)/nbmj8688.lh
 
 $(DRIVERS)/namcos2.o:   $(LAYOUT)/finallap.lh
 
+$(DRIVERS)/nemesis.o:   $(LAYOUT)/konamigt.lh
+
 $(DRIVERS)/neogeo.o:    $(LAYOUT)/neogeo.lh
 
 $(DRIVERS)/norautp.o:   $(LAYOUT)/noraut11.lh \
