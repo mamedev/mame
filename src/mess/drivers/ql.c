@@ -783,10 +783,7 @@ static ZX8302_INTERFACE( ql_zx8302_intf )
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, ql_comdata_w),
 	DEVCB_NULL, // TXD1
 	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
-	DEVCB_NULL, // DTR1
-	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, cts_r),
 	DEVCB_NULL, // NETOUT
-	DEVCB_NULL, // NETIN
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdselck_w),
 	DEVCB_DEVICE_LINE_MEMBER(MDV_1, microdrive_image_device, comms_in_w),
 	DEVCB_DRIVER_LINE_MEMBER(ql_state, zx8302_mdrdw_w),
@@ -1008,6 +1005,7 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_MICRODRIVE_ADD(MDV_2, mdv2_config)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL) // wired as DCE
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL) // wired as DTE
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")

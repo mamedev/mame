@@ -77,10 +77,7 @@ struct zx8302_interface
 	devcb_write_line    out_comdata_cb;
 	devcb_write_line    out_txd1_cb;
 	devcb_write_line    out_txd2_cb;
-	devcb_read_line     in_dtr1_cb;
-	devcb_read_line     in_cts2_cb;
 	devcb_write_line    out_netout_cb;
-	devcb_read_line     in_netin_cb;
 
 	// microdrive
 	devcb_write_line    out_mdselck_cb;
@@ -117,6 +114,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( comctl_w );
 	DECLARE_WRITE_LINE_MEMBER( comdata_w );
 	DECLARE_WRITE_LINE_MEMBER( extint_w );
+
+	DECLARE_WRITE_LINE_MEMBER( write_netin );
+	DECLARE_WRITE_LINE_MEMBER( write_dtr1 );
+	DECLARE_WRITE_LINE_MEMBER( write_cts2 );
 
 protected:
 	// device-level overrides
@@ -194,10 +195,7 @@ private:
 	devcb_resolved_write_line   m_out_comdata_func;
 	devcb_resolved_write_line   m_out_txd1_func;
 	devcb_resolved_write_line   m_out_txd2_func;
-	devcb_resolved_read_line    m_in_dtr1_func;
-	devcb_resolved_read_line    m_in_cts2_func;
 	devcb_resolved_write_line   m_out_netout_func;
-	devcb_resolved_read_line    m_in_netin_func;
 
 	devcb_resolved_write_line   m_out_mdselck_func;
 	devcb_resolved_write_line   m_out_mdseld_func;
@@ -207,6 +205,9 @@ private:
 	devcb_resolved_read_line    m_in_raw1_func;
 	devcb_resolved_write_line   m_out_raw2_func;
 	devcb_resolved_read_line    m_in_raw2_func;
+
+	int m_dtr1;
+	int m_cts2;
 
 	// registers
 	UINT8 m_idr;                    // IPC data register

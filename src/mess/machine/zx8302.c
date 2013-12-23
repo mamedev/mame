@@ -67,10 +67,7 @@ void zx8302_device::device_config_complete()
 		memset(&out_comdata_cb, 0, sizeof(out_comdata_cb));
 		memset(&out_txd1_cb, 0, sizeof(out_txd1_cb));
 		memset(&out_txd2_cb, 0, sizeof(out_txd2_cb));
-		memset(&in_dtr1_cb, 0, sizeof(in_dtr1_cb));
-		memset(&in_cts2_cb, 0, sizeof(in_cts2_cb));
 		memset(&out_netout_cb, 0, sizeof(out_netout_cb));
-		memset(&in_netin_cb, 0, sizeof(in_netin_cb));
 		memset(&out_mdselck_cb, 0, sizeof(out_mdselck_cb));
 		memset(&out_mdseld_cb, 0, sizeof(out_mdseld_cb));
 		memset(&out_mdrdw_cb, 0, sizeof(out_mdrdw_cb));
@@ -175,6 +172,8 @@ inline void zx8302_device::transmit_ipc_data()
 zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ZX8302, "Sinclair ZX8302", tag, owner, clock, "zx8302", __FILE__),
 		device_serial_interface(mconfig, *this),
+		m_dtr1(0),
+		m_cts2(0),
 		m_idr(1),
 		m_irq(0),
 		m_ctr(time(NULL) + RTC_BASE_ADJUST),
@@ -202,10 +201,7 @@ void zx8302_device::device_start()
 	m_out_comdata_func.resolve(out_comdata_cb, *this);
 	m_out_txd1_func.resolve(out_txd1_cb, *this);
 	m_out_txd2_func.resolve(out_txd2_cb, *this);
-	m_in_dtr1_func.resolve(in_dtr1_cb, *this);
-	m_in_cts2_func.resolve(in_cts2_cb, *this);
 	m_out_netout_func.resolve(out_netout_cb, *this);
-	m_in_netin_func.resolve(in_netin_cb, *this);
 	m_out_mdselck_func.resolve(out_mdselck_cb, *this);
 	m_out_mdseld_func.resolve(out_mdseld_cb, *this);
 	m_out_mdrdw_func.resolve(out_mdrdw_cb, *this);
@@ -225,6 +221,8 @@ void zx8302_device::device_start()
 	m_gap_timer->adjust(attotime::zero, 0, attotime::from_msec(31));
 
 	// register for state saving
+	save_item(NAME(m_dtr1));
+	save_item(NAME(m_cts2));
 	save_item(NAME(m_idr));
 	save_item(NAME(m_tcr));
 	save_item(NAME(m_tdr));
@@ -326,7 +324,7 @@ void zx8302_device::rcv_callback()
 	switch (m_tcr & MODE_MASK)
 	{
 	case MODE_NET:
-		receive_register_update_bit(m_in_netin_func());
+		receive_register_update_bit(get_in_data_bit());
 		break;
 	}
 }
@@ -457,10 +455,10 @@ READ8_MEMBER( zx8302_device::status_r )
 	// TODO microdrive GAP
 
 	// data terminal ready
-	data |= m_in_dtr1_func() << 4;
+	data |= m_dtr1 << 4;
 
 	// clear to send
-	data |= m_in_cts2_func() << 5;
+	data |= m_cts2 << 5;
 
 	// IPC busy
 	data |= m_ipc_busy << 6;
@@ -633,4 +631,26 @@ WRITE_LINE_MEMBER( zx8302_device::extint_w )
 	{
 		trigger_interrupt(INT_EXTERNAL);
 	}
+}
+
+WRITE_LINE_MEMBER( zx8302_device::write_netin )
+{
+	if (state)
+	{
+		input_callback(m_input_state | RX);
+	}
+	else
+	{
+		input_callback(m_input_state & ~RX);
+	}
+}
+
+WRITE_LINE_MEMBER( zx8302_device::write_dtr1 )
+{
+	m_dtr1 = state;
+}
+
+WRITE_LINE_MEMBER( zx8302_device::write_cts2 )
+{
+	m_cts2 = state;
 }
