@@ -995,6 +995,7 @@ UINT32 peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 &b
 void peplus_state::palette_init()
 {
 	const UINT8 *color_prom = memregion("proms")->base();
+	UINT32 proms_size = memregion("proms")->bytes();
 /*  prom bits
     7654 3210
     ---- -xxx   red component.
@@ -1008,20 +1009,20 @@ void peplus_state::palette_init()
 		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
-		bit0 = (~color_prom[i] >> 0) & 0x01;
-		bit1 = (~color_prom[i] >> 1) & 0x01;
-		bit2 = (~color_prom[i] >> 2) & 0x01;
+		bit0 = (~color_prom[i % proms_size] >> 0) & 0x01;
+		bit1 = (~color_prom[i % proms_size] >> 1) & 0x01;
+		bit2 = (~color_prom[i % proms_size] >> 2) & 0x01;
 		r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* green component */
-		bit0 = (~color_prom[i] >> 3) & 0x01;
-		bit1 = (~color_prom[i] >> 4) & 0x01;
-		bit2 = (~color_prom[i] >> 5) & 0x01;
+		bit0 = (~color_prom[i % proms_size] >> 3) & 0x01;
+		bit1 = (~color_prom[i % proms_size] >> 4) & 0x01;
+		bit2 = (~color_prom[i % proms_size] >> 5) & 0x01;
 		g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* blue component */
-		bit0 = (~color_prom[i] >> 6) & 0x01;
-		bit1 = (~color_prom[i] >> 7) & 0x01;
+		bit0 = (~color_prom[i % proms_size] >> 6) & 0x01;
+		bit1 = (~color_prom[i % proms_size] >> 7) & 0x01;
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
