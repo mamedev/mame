@@ -598,7 +598,6 @@ static SAA5050_INTERFACE( trom_intf )
 static const mc6854_interface adlc_intf =
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_r),
 	DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_w),
 	NULL,
 	DEVCB_NULL,
@@ -623,7 +622,7 @@ WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 static ECONET_INTERFACE( econet_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state, econet_clk_w),
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER("mc6854", mc6854_device, set_rx)
 };
 
 static MACHINE_CONFIG_FRAGMENT( bbc_cartslot )

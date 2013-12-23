@@ -214,7 +214,6 @@ void mc6854_device::device_config_complete()
 	else
 	{
 		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_in_rxd_cb, 0, sizeof(m_in_rxd_cb));
 		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
 		memset(&m_out_rts_cb, 0, sizeof(m_out_rts_cb));
 		memset(&m_out_dtr_cb, 0, sizeof(m_out_dtr_cb));
@@ -228,7 +227,6 @@ void mc6854_device::device_config_complete()
 void mc6854_device::device_start()
 {
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_in_rxd_func.resolve(m_in_rxd_cb, *this);
 	m_out_txd_func.resolve(m_out_txd_cb, *this);
 	m_out_rts_func.resolve(m_out_rts_cb, *this);
 	m_out_dtr_func.resolve(m_out_dtr_cb, *this);

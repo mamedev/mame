@@ -72,10 +72,6 @@ public:
 
 	void add_device(device_t *target, int address);
 
-	// reads for both host and peripherals
-	DECLARE_READ_LINE_MEMBER( clk_r );
-	DECLARE_READ_LINE_MEMBER( data_r );
-
 	// writes for host (driver_device)
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
@@ -159,9 +155,8 @@ public:
 	device_econet_interface *next() const { return m_next; }
 	device_econet_interface *m_next;
 
-	// optional operation overrides
 	virtual void econet_clk(int state) = 0;
-	virtual void econet_data(int state) { };
+	virtual void econet_data(int state) = 0;
 
 	econet_device  *m_econet;
 	UINT8 m_address;
@@ -172,9 +167,6 @@ public:
 extern const device_type ECONET;
 extern const device_type ECONET_SLOT;
 
-
-// slot devices
-#include "e01.h"
 
 SLOT_INTERFACE_EXTERN( econet_devices );
 

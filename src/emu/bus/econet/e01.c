@@ -154,11 +154,6 @@ WRITE_LINE_MEMBER( e01_device::adlc_irq_w )
 	update_interrupts();
 }
 
-READ_LINE_MEMBER( e01_device::econet_data_r )
-{
-	return m_econet->data_r();
-}
-
 WRITE_LINE_MEMBER( e01_device::econet_data_w )
 {
 	m_econet->data_w(this, state);
@@ -167,7 +162,6 @@ WRITE_LINE_MEMBER( e01_device::econet_data_w )
 static const mc6854_interface adlc_intf =
 {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, adlc_irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, econet_data_r),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, econet_data_w),
 	NULL,
 	DEVCB_NULL,
@@ -760,6 +754,16 @@ READ8_MEMBER( e01_device::rtc_data_r )
 WRITE8_MEMBER( e01_device::rtc_data_w )
 {
 	m_rtc->write(space, 1, data);
+}
+
+
+//-------------------------------------------------
+//  econet_clk_w -
+//-------------------------------------------------
+
+void e01_device::econet_data(int state)
+{
+	m_adlc->set_rx(state);
 }
 
 

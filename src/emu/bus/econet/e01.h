@@ -58,7 +58,6 @@ public:
 	DECLARE_WRITE8_MEMBER( rtc_data_w );
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( adlc_irq_w );
-	DECLARE_READ_LINE_MEMBER( econet_data_r );
 	DECLARE_WRITE_LINE_MEMBER( econet_data_w );
 	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_en_w );
@@ -81,6 +80,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const;
 
 	// device_econet_interface overrides
+	virtual void econet_data(int state);
 	virtual void econet_clk(int state);
 
 	required_device<m65c02_device> m_maincpu;

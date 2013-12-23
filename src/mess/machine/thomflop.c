@@ -1680,7 +1680,6 @@ const mc6854_interface to7_network_iface =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	to7_network_got_frame,
 	DEVCB_NULL,
 	DEVCB_NULL

@@ -24,7 +24,6 @@ struct mc6854_interface
 	devcb_write_line  m_out_irq_cb; /* interrupt request */
 
 	/* low-level, bit-based interface */
-	devcb_read_line   m_in_rxd_cb; /* receive bit */
 	devcb_write_line  m_out_txd_cb; /* transmit bit */
 
 	/* high-level, frame-based interface */
@@ -70,7 +69,6 @@ protected:
 private:
 	// internal state
 	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_read_line    m_in_rxd_func;
 	devcb_resolved_write_line   m_out_txd_func;
 	devcb_resolved_write_line   m_out_rts_func;
 	devcb_resolved_write_line   m_out_dtr_func;

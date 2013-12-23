@@ -298,26 +298,6 @@ econet_device::daisy_entry::daisy_entry(device_t *device)
 
 
 //-------------------------------------------------
-//  clk_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( econet_device::clk_r )
-{
-	return get_signal(CLK);
-}
-
-
-//-------------------------------------------------
-//  data_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( econet_device::data_r )
-{
-	return get_signal(DATA);
-}
-
-
-//-------------------------------------------------
 //  clk_w -
 //-------------------------------------------------
 
@@ -360,6 +340,9 @@ void econet_device::data_w(device_t *device, int state)
 //-------------------------------------------------
 //  SLOT_INTERFACE( econet_devices )
 //-------------------------------------------------
+
+// slot devices
+#include "e01.h"
 
 SLOT_INTERFACE_START( econet_devices )
 	SLOT_INTERFACE("e01", E01)
