@@ -242,10 +242,7 @@ void z80sti_device::tra_complete()
 
 void z80sti_device::rcv_callback()
 {
-	if (m_in_si_func.isnull())
-		receive_register_update_bit(get_in_data_bit());
-	else
-		receive_register_update_bit(m_in_si_func());
+	receive_register_update_bit(get_in_data_bit());
 }
 
 

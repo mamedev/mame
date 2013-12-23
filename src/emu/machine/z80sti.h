@@ -207,7 +207,6 @@ private:
 	// device callbacks
 	devcb_resolved_read8                m_in_gpio_func;
 	devcb_resolved_write8               m_out_gpio_func;
-	devcb_resolved_read_line            m_in_si_func;
 	devcb_resolved_write_line           m_out_so_func;
 	devcb_resolved_write_line           m_out_timer_func[4];
 	devcb_resolved_write_line           m_out_int_func;
