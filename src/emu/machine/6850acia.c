@@ -177,7 +177,7 @@ void acia6850_device::device_reset()
 
 DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_rx )
 {
-	m_rts = state;
+	m_rxd = state;
 }
 
 DECLARE_WRITE_LINE_MEMBER( acia6850_device::write_dcd )
