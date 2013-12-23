@@ -3,6 +3,73 @@
     G.I. Joe  (c) 1992 Konami
 
 
+G.I. Joe
+Konami 1992
+
+PCB Layout
+----------
+GX069 PWB352065B
+|--------------------------------------------------------|
+|LA4705           069A04.1E      069A05.1H               |
+|          84256                 069A06.2H               |
+| 056747           |------|      069A07.4H               |
+|          Z80E    |054539|      069A08.6H               |
+|CN6               |      |                              |
+|          8416    |      |            |------| |------| |
+| 051550           |------|            |053246| |053247A |
+|          069A01.7C                   |      | |      | |
+|                     32MHz            |      | |      | |
+|J          ER5911.7D 18.432MHz        |      | |      | |
+|A 052535       |------------|         |------| |------| |
+|M              |   68000    |                           |
+|M 052535       |            |         5168              |
+|A              |------------|         5168              |
+|  052535        84256                                   |
+|                                                        |
+|                069A12.13E            |------| |------| |
+|          8416                        |054157| |054156| |
+|                069UAB03.14E |------| |      | |      | |
+|          8416               |053251| |      | |      | |
+|  TEST_SW       84256        |      | |      | |      | |
+|                             |------| |------| |------| |
+|005273(X10)     069A11.16E                              |
+|                                                   5168 |
+|  CN9           069UAB02.18E           069A09.16J  5168 |
+|  CN8   DSW(4)               24MHz     069A10.18J  5168 |
+|--------------------------------------------------------|
+Notes:
+      68000   - Clock 16.000MHz [32/2]
+      Z80E    - Clock 8.000MHz [32/4]
+      8416    - Fujitsu MB8416 2kx8 SRAM (DIP24)
+      84256   - Fujitsu MB84256 32kx8 SRAM (DIP28)
+      5168    - Sharp LH5168 8kx8 SRAM (DIP28)
+      ER5911  - EEPROM (128 bytes)
+      CN6     - 4 pin connector for stereo sound output
+      CN8/CN9 - 15 pin connectors for player 3 & player 4 controls
+      069*    - EPROM/mask ROM
+      LA4705  - Power AMP IC
+
+      Custom Chips
+      ------------
+      053251  - Priority encoder
+      054157  \
+      054156  / Tilemap generators
+      053246  \
+      053247A / Sprite generators
+      054539  - 8-Channel ADPCM sound generator. Clock input 18.432MHz. Clock outputs 18.432/4 & 18.432/8
+      052535  - Video DAC (one for each R,G,B video signal)
+      051550  - EMI filter for credit/coin counter
+      005273  - Resistor array for player 3 & player 4 controls
+      056747  - Audio DAC/filter
+
+      Sync Measurements
+      -----------------
+      HSync - 15.2036kHz
+      VSync - 59.6374Hz
+
+
+****************************************************************************
+
 Change Log
 ----------
 

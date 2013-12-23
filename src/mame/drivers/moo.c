@@ -9,6 +9,80 @@
  These are the final Xexex hardware games before the pre-GX/Mystic Warriors
  hardware took over.
 
+
+Wild West C.O.W. Boys Of Moo Mesa
+Konami 1992
+
+PCB Layout
+----------
+GX151 PWB353126
+|--------------------------------------------------------|
+|LA4705                             151A11.A8  151A11.A10|
+|                        151A08.B6  151A10.B8  151A12.B10|
+| 054986    |------|     62256                  |------| |
+|           |054539|     62256                  |053246A |
+|S_OUT      |      |          054744   5168     |      | |
+|           |      |                   5168     |      | |
+|           |------|                            |      | |
+| YM2151  Z80E  151A07.F5                       |------| |
+|                                                        |
+|J   051550                                     |------| |
+|A                                              |053247A |
+|M 054573   |------| 2018                       |      | |
+|M 054753   |054338| 2018                       |      | |
+|A 054753   |      | 2018                       |      | |
+|  054754   |      |                  |------|  |------| |
+|           |------|  053252          |053251|   5168    |
+|                    |------|         |      |   5168    |
+| 18.432MHz |-----|  |053990|         |------|   5168    |
+| 32MHz     |68000|  |      |          |------|          |
+|           |     |  |------|          |054157| |------| |
+|  ER5911.N2|-----|  055373            |      | |054156| |
+|                                      |      | |      | |
+|005273(X10)   151B01.Q5  151AAB02.Q6  |      | |      | |
+|TEST_SW       62256      62256        |------| |      | |
+|              151A03.T5  151A04.T6             |------| |
+|PL3 PL4 DSW(4)                      151A05.T8 151A06.T10|
+|--------------------------------------------------------|
+Notes:
+      68000   - Clock 16.000MHz [32/2]
+      Z80E    - Clock 8.000MHz [32/4]
+      YM2151  - Clock 4.000MHz [32/8]
+      62256   - KM62256 32kx8 SRAM (DIP28)
+      5168    - Sharp LH5168 8kx8 SRAM (DIP28)
+      ER5911  - EEPROM (128 bytes)
+      S_OUT   - 4 pin connector for stereo sound output
+      PL3/PL4 - 15 pin connectors for player 3 & player 4 controls
+      151*    - EPROM/mask ROM
+      LA4705  - Power AMP IC
+
+      Custom Chips
+      ------------
+      053990  - ? (Connected to 68000, main program ROMs and 2018 RAM)
+      053251  - Priority encoder
+      053252  - Timing/Interrupt controller. Clock input 32MHz
+      054157  \
+      054156  / Tilemap generators
+      053246A \
+      053247A / Sprite generators
+      054539  - 8-Channel ADPCM sound generator. Clock input 18.432MHz. Clock outputs 18.432/4 & 18.432/8
+      054573  - Video DAC (one for each R,G,B video signal)
+      054574  - Possibly RGB mixer/DAC/filter? (connected to 054573)
+      054338  - Color mixer for special effects/alpha blending etc (connected to 054573 & 054574 and 2018 RAM)
+      051550  - EMI filter for credit/coin counter
+      005273  - Resistor array for player 3 & player 4 controls
+      054986  - Audio DAC/filter
+      054744  - PAL16L8
+      055373  - PAL20L10
+
+      Sync Measurements
+      -----------------
+      HSync - 15.2036kHz
+      VSync - 59.1858Hz
+
+
+****************************************************************************
+
 Bug Fixes and Outstanding Issues
 --------------------------------
 Moo:

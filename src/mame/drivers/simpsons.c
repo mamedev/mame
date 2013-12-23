@@ -6,63 +6,91 @@ Preliminary driver by:
 Ernesto Corvi
 someone@secureshell.com
 
+
+****************************************************************************
+
+The Simpsons
+Konami 1991
+
 PCB Layout
 ----------
 
-GX072  PWB352346B
-|-----------------------------------------------------|
-| MB3722   072D04.1D  072D05.1F        8464           |
-|  VOL VOL     YM2151                        072B08.3N|
-|           YM3012     053260       053246            |
-|CN3                 3.579545MHz                      |
-|              Z80     072E03.6G                      |
-|J 052535                 8416      053247            |
-|A 052535                 2018               072B09.8N|
-|M 052535 053994          2018      053251            |
-|M 051550 053995                                      |
-|A                   8464                             |
-|    ER5911               052109    051962  072B10.12N|
-|TEST  072M13.13C                                     |
-|      072L12.15C                                     |
-|CN6   072G02.16C  053248  8464  072B06.16H 072B11.16L|
-|CN7   072G01.17C    24MHz 8464  072B07.18H           |
-|-----------------------------------------------------|
+GX072 PWB352346B
+|--------------------------------------------------------|
+| MB3722   072D04.1D  072D05.1F           8464           |
+|VOL VOL   YM2151   |------|            |------|072B08.3N|
+|          YM3012   |053260| 3.579545MHz|053246|         |
+|CN3                |      |            |      |         |
+|                   |------|            |      |         |
+|                   Z80     072E03.6G   |      |         |
+|                                       |------|         |
+|                           8416                         |
+|                           2018        |------|         |
+|  052535                   2018        |053247|072B09.8N|
+|  052535                               |      |         |
+|J 052535                               |      |         |
+|A                                      |      |         |
+|M 051550                               |------|         |
+|M                                      |------|         |
+|A     053994  053995   8464            |053251|         |
+|                                       |      |072B10.12N
+|   ER5911.12C                          |------|         |
+|      072M13.13C             |------|  |------|         |
+|005273(X10)      |------|    |052109|  |051962|         |
+|      072L12.15C |053248|    |      |  |      |         |
+|TEST_SW          |      |    |      |  |      |         |
+|      072G02.16C |------|    |------|  |------|072B11.16L
+|CN6                         8464 072B06.16H             |
+|CN7   072G01.17C      24MHz 8464 072B07.18H             |
+|--------------------------------------------------------|
 Notes:
-       CN3 - 4 pin connector for sound output for right speaker (left speaker
-             is via the JAMMA connector)
-   CN6/CN7 - 15 pin connector for player 3 and player 4 controls
-    ER5911 - EEPROM (128bx8 == 93C46)
-      8464 - 8kx8 SRAM
-      8416 - 2kx8 SRAM
-      2018 - 2kx8 SRAM
-    MB3722 - Audio Power AMP
-       Z80 - clock 3.579545MHz
-    YM2151 - clock 3.579545MHz
-    YM3012 - clock 1.7897725MHz [3.579545/2]
-Custom ICs - 053260        - sound chip (QFP80)
-             053246/053247 - sprite generators (QFP120)
-             053251        - priority encoder (QFP100)
-             052535        - RGB DAC (ceramic encased SIP9)
-             051550        - I/O DAC (ceramic encased SIP23)
-             053994/053995 - PALs (MMI PAL16L8, DIP20)
-             052109/051962 - Tilemap Generators (QFP120)
-             053248        - CPU (QFP80), clock input 12.000MHz and 3.000MHz [24/2 and 24/8]
-      ROMs - 072D04 \  256kx8 DIP40 MaskROM
-             072D05 /  1Mx8 DIP40 MaskROM (Sound Samples)
-             072E03 -  32kx8 MaskROM (Z80 Sound Program)
-             072B08 \
-             072B09  |
-             072B10  | 512kx16 DIP40 MaskROM (Sprites)
-             072B11 /
-             072B06 \
-             072B07 /  256kx16 DIP40 MaskROM (Tiles)
-             072M13 \
-             072L12  |
-             072G02  | 128kx8 DIP32 MaskROM (Main Program)
-             072G01 /
+      ER5911 - EEPROM (128 bytes)
+      8464   - Fujitsu MB8464 8kx8 SRAM (DIP28)
+      8416   - Fujitsu MB8416 2kx8 SRAM (DIP24)
+      2018   - Motorola MCM2018 2kx8 SRAM (DIP24)
+      MB3722 - Audio Power AMP
+      Z80    - Clock 3.579545MHz
+      YM2151 - Clock 3.579545MHz
+      YM3012 - Clock 1.7897725MHz [3.579545/2]
+      CN6/7  - 15 pin connector for player 3 and player 4 controls
+      CN3    - 4 pin connector for stereo sound output for left & right speaker
+               (left speaker also outputs via JAMMA connector)
 
-     VSync - 59.1856Hz
-     HSync - 15.1566kHz
+      Custom Chips
+      ------------
+      053248 - CPU (QFP80). Clock input 12.000MHz [24/2]. Clock output 3.000MHz [24/8]
+      053260 - Sound chip (QFP80). Clock input 3.579545MHz. Clock output 1.7897725 [3.579545/2] for YM3012
+      053246 \
+      053247 / Sprite generators (QFP120)
+      052109 \
+      051962 / Tilemap Generators (QFP120)
+      053251 - Priority encoder (QFP100)
+      052535 - RGB DAC (ceramic encased SIP9)
+      051550 - EMI filter for credit/coin counter (ceramic encased SIP23)
+      005273 - Resistor array for player 3 & player 4 controls (ceramic encased SIP10)
+      053994 \
+      053995 / PALs (MMI PAL16L8, DIP20)
+
+      ROMs
+      ----
+      072D04 -  256kx8 DIP40 MaskROM (Sound Samples)
+      072D05 -  1Mx8 DIP40 MaskROM (Sound Samples)
+      072E03 -  32kx8 MaskROM (Z80 Sound Program)
+      072B08 \
+      072B09  |
+      072B10  | 512kx16 DIP40 MaskROM (Sprites)
+      072B11 /
+      072B06 \
+      072B07 /  256kx16 DIP40 MaskROM (Tiles)
+      072M13 \
+      072L12  |
+      072G02  | 128kx8 DIP32 MaskROM (Main Program)
+      072G01 /
+
+      Sync Measurements
+      -----------------
+      VSync - 59.1856Hz
+      HSync - 15.1566kHz
 
 ***************************************************************************/
 
@@ -294,7 +322,7 @@ static const k053247_interface simpsons_k053246_intf =
 static MACHINE_CONFIG_START( simpsons, simpsons_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8) /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", simpsons_state,  simpsons_irq) /* IRQ triggered by the 052109, FIRQ by the sprite hardware */
 
