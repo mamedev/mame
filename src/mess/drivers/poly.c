@@ -168,7 +168,6 @@ static ACIA6850_INTERFACE( acia_intf )
 
 static const mc6854_interface adlc_intf =
 {
-	DEVCB_NULL,
 	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_r),
 	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER(ECONET_TAG, econet_device, data_w),
 	NULL,
