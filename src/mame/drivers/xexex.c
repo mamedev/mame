@@ -544,13 +544,11 @@ void xexex_state::machine_reset()
 static MACHINE_CONFIG_START( xexex, xexex_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) // 16MHz (32MHz xtal)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // 16MHz
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xexex_state, xexex_interrupt, "screen", 0, 1)
 
-	// 8MHz (PCB shows one 32MHz/18.432MHz xtal, reference: www.system16.com)
-	// more likely 32MHz since 18.432MHz yields 4.608MHz(too slow) or 9.216MHz(too fast) with integer divisors
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4) // Z80E 8Mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
@@ -561,8 +559,8 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(8000000/512/288)
-	MCFG_SCREEN_RAW_PARAMS(8000000, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255)
+//  MCFG_SCREEN_REFRESH_RATE(XTAL_32MHz/4/512/288)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255) // 8Mhz horizontal dotclock
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 0, 0+256-1)
@@ -575,13 +573,13 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_K053246_ADD("k053246", xexex_k053246_intf)
 	MCFG_K053250_ADD("k053250", "screen", -5, -16)
 	MCFG_K053251_ADD("k053251")
-	MCFG_K053252_ADD("k053252", 32000000/4, xexex_k053252_intf)
+	MCFG_K053252_ADD("k053252", XTAL_32MHz/4, xexex_k053252_intf)
 	MCFG_K054338_ADD("k054338", xexex_k054338_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "filter1l", 0.50)
 	MCFG_SOUND_ROUTE(0, "filter1r", 0.50)
 	MCFG_SOUND_ROUTE(1, "filter2l", 0.50)
@@ -665,7 +663,7 @@ ROM_START( xexexa ) /* Asia, Version AA */
 	ROM_LOAD( "067b07.1e",   0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911.19b",  0x0000, 0x0080, CRC(051c14c6) SHA1(23addbaa2ce323c06551b343ca45dea4fd2b9eee) )
+	ROM_LOAD( "er5911(__xexexa).19b",  0x0000, 0x0080, CRC(051c14c6) SHA1(23addbaa2ce323c06551b343ca45dea4fd2b9eee) ) // No actual label so create a unique one for this set
 ROM_END
 
 ROM_START( xexexj ) /* Japan, Version AA */
@@ -697,7 +695,7 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_LOAD( "067b07.1e",   0x200000, 0x100000, CRC(ec87fe1b) SHA1(ec9823aea5a1fc5c47c8262e15e10b28be87231c) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911.19b",  0x0000, 0x0080, CRC(79a79c7b) SHA1(02eb235226949af0147d6d0fd2bd3d7a68083ae6) )
+	ROM_LOAD( "er5911(__xexexj).19b",  0x0000, 0x0080, CRC(79a79c7b) SHA1(02eb235226949af0147d6d0fd2bd3d7a68083ae6) ) // No actual label so create a unique one for this set
 ROM_END
 
 
