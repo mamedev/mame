@@ -103,7 +103,6 @@ void im6402_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_in_rri_cb, 0, sizeof(m_in_rri_cb));
 		memset(&m_out_tro_cb, 0, sizeof(m_out_tro_cb));
 		memset(&m_out_dr_cb, 0, sizeof(m_out_dr_cb));
 		memset(&m_out_tbre_cb, 0, sizeof(m_out_tbre_cb));
@@ -119,7 +118,6 @@ void im6402_device::device_config_complete()
 void im6402_device::device_start()
 {
 	// resolve callbacks
-	m_in_rri_func.resolve(m_in_rri_cb, *this);
 	m_out_tro_func.resolve(m_out_tro_cb, *this);
 	m_out_dr_func.resolve(m_out_dr_cb, *this);
 	m_out_tbre_func.resolve(m_out_tbre_cb, *this);
@@ -224,10 +222,7 @@ void im6402_device::tra_complete()
 
 void im6402_device::rcv_callback()
 {
-	if (m_in_rri_func.isnull())
-		receive_register_update_bit(get_in_data_bit());
-	else
-		receive_register_update_bit(m_in_rri_func());
+	receive_register_update_bit(get_in_data_bit());
 }
 
 
@@ -442,4 +437,16 @@ WRITE_LINE_MEMBER( im6402_device::epe_w )
 	if (LOG) logerror("IM6402 '%s' Even Parity Enable %u\n", tag(), state);
 
 	m_epe = state;
+}
+
+WRITE_LINE_MEMBER(im6402_device::write_rx)
+{
+	if (state)
+	{
+		input_callback(m_input_state | RX);
+	}
+	else
+	{
+		input_callback(m_input_state & ~RX);
+	}
 }

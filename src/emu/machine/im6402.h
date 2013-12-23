@@ -73,7 +73,6 @@ struct im6402_interface
 	int m_rrc;
 	int m_trc;
 
-	devcb_read_line     m_in_rri_cb;
 	devcb_write_line    m_out_tro_cb;
 	devcb_write_line    m_out_dr_cb;
 	devcb_write_line    m_out_tbre_cb;
@@ -101,6 +100,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( fe_r ) { return m_fe; }
 	DECLARE_READ_LINE_MEMBER( oe_r ) { return m_oe; }
 
+	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( rrc_w );
 	DECLARE_WRITE_LINE_MEMBER( trc_w );
 	DECLARE_WRITE_LINE_MEMBER( rrd_w );
@@ -133,7 +133,6 @@ private:
 	inline void set_tbre(int state);
 	inline void set_tre(int state);
 
-	devcb_resolved_read_line    m_in_rri_func;
 	devcb_resolved_write_line   m_out_tro_func;
 	devcb_resolved_write_line   m_out_dr_func;
 	devcb_resolved_write_line   m_out_tbre_func;

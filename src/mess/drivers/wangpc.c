@@ -943,7 +943,6 @@ static IM6402_INTERFACE( uart_intf )
 	0, // HACK should be 62500*16
 	62500*16,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_dr_w),
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, uart_tbre_w),
 	DEVCB_NULL

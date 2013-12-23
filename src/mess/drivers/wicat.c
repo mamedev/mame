@@ -574,7 +574,6 @@ struct im6402_interface wicat_video_uart_intf =
 	0,  // RRC
 	0,  // TRC
 
-	DEVCB_NULL, //m_in_rri_cb;
 	DEVCB_NULL, //m_out_tro_cb;
 	DEVCB_NULL, //m_out_dr_cb;
 	DEVCB_NULL, //m_out_tbre_cb;
