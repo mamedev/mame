@@ -196,9 +196,6 @@ public:
 };
 
 
-// slot devices
-#include "grip.h"
-
 SLOT_INTERFACE_EXTERN( ecbbus_cards );
 
 

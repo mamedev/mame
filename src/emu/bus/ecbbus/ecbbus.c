@@ -270,6 +270,9 @@ WRITE_LINE_MEMBER( ecbbus_device::nmi_w )
 //  SLOT_INTERFACE( ecbbus_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "grip.h"
+
 SLOT_INTERFACE_START( ecbbus_cards )
 	SLOT_INTERFACE("grip21", ECB_GRIP21)
 /*  SLOT_INTERFACE("grip25", ECB_GRIP25)
