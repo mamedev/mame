@@ -128,11 +128,8 @@ void mc6852_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_in_rx_data_cb, 0, sizeof(m_in_rx_data_cb));
 		memset(&m_out_tx_data_cb, 0, sizeof(m_out_tx_data_cb));
 		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_in_cts_cb, 0, sizeof(m_in_cts_cb));
-		memset(&m_in_dcd_cb, 0, sizeof(m_in_dcd_cb));
 		memset(&m_out_sm_dtr_cb, 0, sizeof(m_out_sm_dtr_cb));
 		memset(&m_out_tuf_cb, 0, sizeof(m_out_tuf_cb));
 	}
@@ -146,11 +143,8 @@ void mc6852_device::device_config_complete()
 void mc6852_device::device_start()
 {
 	// resolve callbacks
-	m_in_rx_data_func.resolve(m_in_rx_data_cb, *this);
 	m_out_tx_data_func.resolve(m_out_tx_data_cb, *this);
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_in_cts_func.resolve(m_in_cts_cb, *this);
-	m_in_dcd_func.resolve(m_in_dcd_cb, *this);
 	m_out_sm_dtr_func.resolve(m_out_sm_dtr_cb, *this);
 	m_out_tuf_func.resolve(m_out_tuf_cb, *this);
 
@@ -368,4 +362,14 @@ READ_LINE_MEMBER( mc6852_device::sm_dtr_r )
 READ_LINE_MEMBER( mc6852_device::tuf_r )
 {
 	return m_tuf;
+}
+
+
+//-------------------------------------------------
+//  write_rx -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mc6852_device::write_rx )
+{
+	m_rxd = state;
 }

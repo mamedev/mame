@@ -57,13 +57,10 @@ struct mc6852_interface
 	UINT32                  m_rx_clock;
 	UINT32                  m_tx_clock;
 
-	devcb_read_line         m_in_rx_data_cb;
 	devcb_write_line        m_out_tx_data_cb;
 
 	devcb_write_line        m_out_irq_cb;
 
-	devcb_read_line         m_in_cts_cb;
-	devcb_read_line         m_in_dcd_cb;
 	devcb_write_line        m_out_sm_dtr_cb;
 	devcb_write_line        m_out_tuf_cb;
 };
@@ -81,6 +78,7 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	DECLARE_WRITE_LINE_MEMBER( write_rx );
 	DECLARE_WRITE_LINE_MEMBER( rx_clk_w );
 	DECLARE_WRITE_LINE_MEMBER( tx_clk_w );
 	DECLARE_WRITE_LINE_MEMBER( cts_w );
@@ -122,6 +120,7 @@ private:
 	UINT8 m_rdr;            // receive data register
 	UINT8 m_rsr;            // receive shift register
 
+	int m_rxd;
 	int m_cts;              // clear to send
 	int m_dcd;              // data carrier detect
 	int m_sm_dtr;           // sync match/data terminal ready
