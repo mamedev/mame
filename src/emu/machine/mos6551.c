@@ -58,7 +58,6 @@ mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, MOS6551, "MOS6551", tag, owner, clock, "mos6551", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_irq_handler(*this),
-		m_read_rxd(*this),
 		m_txd_handler(*this),
 		m_rts_handler(*this),
 		m_dtr_handler(*this),
@@ -158,10 +157,7 @@ void mos6551_device::tra_complete()
 
 void mos6551_device::rcv_callback()
 {
-	if (m_read_rxd.isnull())
-		receive_register_update_bit(get_in_data_bit());
-	else
-		receive_register_update_bit(m_read_rxd());
+	receive_register_update_bit(get_in_data_bit());
 }
 
 

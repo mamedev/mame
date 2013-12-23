@@ -167,7 +167,6 @@ protected:
 	void update_serial();
 
 	devcb2_write_line m_irq_handler;
-	devcb2_read_line m_read_rxd;
 	devcb2_write_line m_txd_handler;
 	devcb2_write_line m_rts_handler;
 	devcb2_write_line m_dtr_handler;
