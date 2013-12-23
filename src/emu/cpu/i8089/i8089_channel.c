@@ -698,7 +698,7 @@ void i8089_channel::attention()
 
 		lpd(PP, CP, m_r[CP].w + 2);
 		movp_pm(TP, PP, m_r[PP].w);
-		movbi_mi(CP, 0xff, 1);
+		movbi_mi(CP, (INT8) 0xff, 1);
 		m_r[TP].t = 1;
 
 		m_r[PSW].w |= 1 << 2;
@@ -728,7 +728,7 @@ void i8089_channel::attention()
 
 		lpd(PP, CP, m_r[CP].w + 2);
 		lpd(TP, PP, m_r[PP].w);
-		movbi_mi(CP, 0xff, 1);
+		movbi_mi(CP, (INT8) 0xff, 1);
 
 		m_r[PSW].w |= 1 << 2;
 
@@ -755,7 +755,7 @@ void i8089_channel::attention()
 		// restore task pointer and parameter block
 		movp_pm(TP, PP, m_r[PP].w);
 		movb_rm(PSW, PP, m_r[PP].w + 3);
-		movbi_mi(CP, 0xff, m_r[CP].w + 1);
+		movbi_mi(CP, (INT8) 0xff, m_r[CP].w + 1);
 
 		m_r[PSW].w |= 1 << 2;
 
