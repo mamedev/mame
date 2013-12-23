@@ -2267,7 +2267,7 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_CPU_PROGRAM_MAP(namcostr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 
-	MCFG_TMP68301_ADD("tmp68301",tmp68301_reelquak_intf)
+	MCFG_TMP68301_ADD("tmp68301",tmp68301_default_intf)  // tmp68301_reelquak_intf   does this have a ticket dispenser?
 
 
 	// video hardware
