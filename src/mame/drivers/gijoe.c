@@ -12,7 +12,7 @@ GX069 PWB352065B
 |--------------------------------------------------------|
 |LA4705           069A04.1E      069A05.1H               |
 |          84256                 069A06.2H               |
-| 056747           |------|      069A07.4H               |
+| 054986A          |------|      069A07.4H               |
 |          Z80E    |054539|      069A08.6H               |
 |CN6               |      |                              |
 |          8416    |      |            |------| |------| |
@@ -47,7 +47,7 @@ Notes:
       CN6     - 4 pin connector for stereo sound output
       CN8/CN9 - 15 pin connectors for player 3 & player 4 controls
       069*    - EPROM/mask ROM
-      LA4705  - Power AMP IC
+      LA4705  - 15W 2-channel BTL audio power AMP
 
       Custom Chips
       ------------
@@ -60,7 +60,9 @@ Notes:
       052535  - Video DAC (one for each R,G,B video signal)
       051550  - EMI filter for credit/coin counter
       005273  - Resistor array for player 3 & player 4 controls
-      056747  - Audio DAC/filter
+      054986A - Audio DAC/filter + sound latch + Z80 memory mapper/banker (large ceramic SDIP64 module)
+                This module contains several surface mounted capacitors and resistors, 4558 OP amp,
+                Analog Devices AD1868 dual 18-bit audio DAC and a Konami 054321 QFP44 IC.
 
       Sync Measurements
       -----------------
