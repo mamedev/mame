@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 
 	MCFG_VIA6522_ADD("via0", 0, via0_intf)
 	MCFG_VIA6522_ADD("via1", 0, via1_intf)
-	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
+	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

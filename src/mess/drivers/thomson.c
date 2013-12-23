@@ -678,7 +678,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_PIA6821_ADD( THOM_PIA_MODEM, to7_pia6821_modem )
 
 /* acia */
-	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
+	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 
 /* to7 serial io line */
 	MCFG_TO7_IO_LINE_ADD("to7_io")

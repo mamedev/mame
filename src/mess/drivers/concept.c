@@ -233,8 +233,8 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
 
 	/* ACIAs */
-	MCFG_MOS6551_ADD(ACIA_0_TAG, XTAL_1_8432MHz, NULL)
-	MCFG_MOS6551_ADD(ACIA_1_TAG, XTAL_1_8432MHz, NULL)
+	MCFG_DEVICE_ADD(ACIA_0_TAG, MOS6551, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD(ACIA_1_TAG, MOS6551, XTAL_1_8432MHz)
 
 	MCFG_CONCEPT_EXP_PORT_ADD("exp1", concept_exp_devices, NULL)
 	MCFG_CONCEPT_EXP_PORT_ADD("exp2", concept_exp_devices, "fdc")   // Flat cable Hard Disk Controller in Slot 2

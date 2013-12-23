@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
 	//MCFG_CPU_IO_MAP(hd63701_slave_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MOS6551_ADD("acia65c51", XTAL_1_8432MHz, NULL)
+	MCFG_DEVICE_ADD("acia65c51", MOS6551, XTAL_1_8432MHz)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash

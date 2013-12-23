@@ -425,7 +425,7 @@ static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	MCFG_MACHINE_START_OVERRIDE(oric_state, telestrat )
 
 	/* acia */
-	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
+	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 
 	/* via */
 	MCFG_VIA6522_ADD( "via6522_1", 1000000, telestrat_via2_interface )

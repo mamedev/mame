@@ -98,7 +98,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_APPLEFDC_ADD("fdc", apple3_fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_interface,1,4)
 	/* acia */
-	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
+	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 
 	/* via */
 	MCFG_VIA6522_ADD("via6522_0", 1000000, apple3_via_0_intf)

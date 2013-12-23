@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
 	/* acia */
-	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
+	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 
 	/* via */
 	MCFG_VIA6522_ADD("via6522_0", 0, microtan_via6522_0)

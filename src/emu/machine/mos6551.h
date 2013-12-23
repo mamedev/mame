@@ -39,18 +39,17 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS6551_ADD(_tag, _clock, _irq) \
-	MCFG_DEVICE_ADD(_tag, MOS6551, _clock) \
-	downcast<mos6551_device *>(device)->set_irq_callback(DEVCB2_##_irq);
+#define MCFG_MOS6551_IRQ_HANDLER(_devcb) \
+	devcb = &mos6551_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_MOS6551_RXD_TXD_CALLBACKS(_rxd, _txd) \
-	downcast<mos6551_device *>(device)->set_rxd_txd_callbacks(DEVCB2_##_rxd, DEVCB2_##_txd);
+#define MCFG_MOS6551_TXD_HANDLER(_devcb) \
+	devcb = &mos6551_device::set_txd_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_MOS6551_RTS_CALLBACK(_rts) \
-	downcast<mos6551_device *>(device)->set_rts_callback(DEVCB2_##_rts);
+#define MCFG_MOS6551_RTS_HANDLER(_devcb) \
+	devcb = &mos6551_device::set_rts_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_MOS6551_DTR_CALLBACK(_dtr) \
-	downcast<mos6551_device *>(device)->set_dtr_callback(DEVCB2_##_dtr);
+#define MCFG_MOS6551_DTR_HANDLER(_devcb) \
+	devcb = &mos6551_device::set_dtr_handler(*device, DEVCB2_##_devcb);
 
 
 
@@ -67,13 +66,10 @@ public:
 	// construction/destruction
 	mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
-	template<class _rxd, class _txd> void set_rxd_txd_callbacks(_rxd rxd, _txd txd) {
-		m_read_rxd.set_callback(rxd);
-		m_write_txd.set_callback(txd);
-	}
-	template<class _rts> void set_rts_callback(_rts rts) { m_write_rts.set_callback(rts); }
-	template<class _dtr> void set_dtr_callback(_dtr dtr) { m_write_dtr.set_callback(dtr); }
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_txd_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_txd_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_rts_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_rts_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_dtr_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_dtr_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -170,11 +166,11 @@ protected:
 
 	void update_serial();
 
-	devcb2_write_line m_write_irq;
+	devcb2_write_line m_irq_handler;
 	devcb2_read_line m_read_rxd;
-	devcb2_write_line m_write_txd;
-	devcb2_write_line m_write_rts;
-	devcb2_write_line m_write_dtr;
+	devcb2_write_line m_txd_handler;
+	devcb2_write_line m_rts_handler;
+	devcb2_write_line m_dtr_handler;
 
 	UINT8 m_ctrl;
 	UINT8 m_cmd;
