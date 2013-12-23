@@ -477,7 +477,6 @@ static Z80STI_INTERFACE( sti_intf )
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),         // interrupt
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, grip_device, sti_gpio_r),    // GPIO read
 	DEVCB_NULL,                                             // GPIO write
-	DEVCB_NULL,                                             // serial input
 	DEVCB_NULL,                                             // serial output
 	DEVCB_NULL,                                             // timer A output
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, grip_device, speaker_w),    // timer B output

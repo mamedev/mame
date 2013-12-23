@@ -71,9 +71,6 @@ struct z80sti_interface
 	// this is called on each write of the GPIO pins
 	devcb_write8            m_out_gpio_cb;
 
-	// this gets called for each read of the SI pin (pin 38)
-	devcb_read_line         m_in_si_cb;
-
 	// this gets called for each change of the SO pin (pin 37)
 	devcb_write_line        m_out_so_cb;
 

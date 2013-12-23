@@ -123,7 +123,6 @@ void z80sti_device::device_config_complete()
 		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
 		memset(&m_in_gpio_cb, 0, sizeof(m_in_gpio_cb));
 		memset(&m_out_gpio_cb, 0, sizeof(m_out_gpio_cb));
-		memset(&m_in_si_cb, 0, sizeof(m_in_si_cb));
 		memset(&m_out_so_cb, 0, sizeof(m_out_so_cb));
 		memset(&m_out_tao_cb, 0, sizeof(m_out_tao_cb));
 		memset(&m_out_tbo_cb, 0, sizeof(m_out_tbo_cb));
@@ -142,7 +141,6 @@ void z80sti_device::device_start()
 	// resolve callbacks
 	m_in_gpio_func.resolve(m_in_gpio_cb, *this);
 	m_out_gpio_func.resolve(m_out_gpio_cb, *this);
-	m_in_si_func.resolve(m_in_si_cb, *this);
 	m_out_so_func.resolve(m_out_so_cb, *this);
 	m_out_timer_func[TIMER_A].resolve(m_out_tao_cb, *this);
 	m_out_timer_func[TIMER_B].resolve(m_out_tbo_cb, *this);
