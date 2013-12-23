@@ -71,7 +71,7 @@
 	</software>
 
 	<software name="m86v32">
-		<description>M86 v3.2 demo disk</description>
+		<description>M86 3.2 (modified CP/M-86)</description>
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
 		<part name="flop1" interface="floppy_5_25">
