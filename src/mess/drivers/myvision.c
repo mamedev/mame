@@ -17,8 +17,8 @@
     - Add clickable artwork
     - Verify sound chip model
     - Verify exact TMS9918 model
-    - Verify clock crystal(s) 
-    - Verify size of vram 
+    - Verify clock crystal(s)
+    - Verify size of vram
 
 ****************************************************************************/
 
@@ -225,12 +225,12 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 
 static const ay8910_interface myvision_ay8910_interface =
 {
-    AY8910_LEGACY_OUTPUT,
-    AY8910_DEFAULT_LOADS,
-    DEVCB_DRIVER_MEMBER(myvision_state, ay_port_a_r),
-    DEVCB_DRIVER_MEMBER(myvision_state, ay_port_b_r),
-    DEVCB_DRIVER_MEMBER(myvision_state, ay_port_a_w),
-    DEVCB_DRIVER_MEMBER(myvision_state, ay_port_b_w)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_DRIVER_MEMBER(myvision_state, ay_port_a_r),
+	DEVCB_DRIVER_MEMBER(myvision_state, ay_port_b_r),
+	DEVCB_DRIVER_MEMBER(myvision_state, ay_port_a_w),
+	DEVCB_DRIVER_MEMBER(myvision_state, ay_port_b_w)
 };
 
 
@@ -271,4 +271,3 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     INIT                  COMPANY        FULLNAME              FLAGS */
 COMP( 1983, myvision, 0,      0,       myvision,  myvision, driver_device,   0,   "Nichibutsu", "My Vision (KH-1000)", 0 )
-

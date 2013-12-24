@@ -1,7 +1,7 @@
 /*
-	Konami Ultra Sports hardware
+    Konami Ultra Sports hardware
 
-	Driver by Ville Linde
+    Driver by Ville Linde
 */
 
 #include "emu.h"
@@ -22,8 +22,8 @@ public:
 		m_k056800(*this, "k056800"),
 		m_workram(*this, "workram") { }
 
-	static const UINT32 VRAM_PAGES		= 2;
-	static const UINT32 VRAM_PAGE_BYTES	= 512 * 1024;
+	static const UINT32 VRAM_PAGES      = 2;
+	static const UINT32 VRAM_PAGE_BYTES = 512 * 1024;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -109,14 +109,14 @@ WRITE32_MEMBER(ultrsprt_state::eeprom_w)
 	if (ACCESSING_BITS_24_31)
 	{
 		/*
-			.... ...x - EEPROM DI
-			.... ..x. - EEPROM CLK
-			.... .x.. - EEPROM /CS
-			.... x... - VRAM page (CPU access)
-			...x .... - Coin counter
-			..x. .... - Watchdog /Reset
-			.x.. .... - Trackball /Reset
-			x... .... - Sound CPU /Reset
+		    .... ...x - EEPROM DI
+		    .... ..x. - EEPROM CLK
+		    .... .x.. - EEPROM /CS
+		    .... x... - VRAM page (CPU access)
+		    ...x .... - Coin counter
+		    ..x. .... - Watchdog /Reset
+		    .x.. .... - Trackball /Reset
+		    x... .... - Sound CPU /Reset
 		*/
 		ioport("EEPROMOUT")->write(data, 0xffffffff);
 

@@ -569,14 +569,14 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atarig42_0x200, atarig42 )
 	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
-	
+
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_ROMBASED)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atarig42_0x400, atarig42 )
 	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
-	
+
 	/* ASIC65 */
 	MCFG_ASIC65_ADD("asic65", ASIC65_GUARDIANS)
 MACHINE_CONFIG_END
@@ -783,24 +783,24 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 
 	/*
-    Road Riot color MUX
+	Road Riot color MUX
 
-    CRA10=!MGEP*!AN.VID7*AN.0               -- if (mopri < pfpri) && (!alpha)
-       +!AN.VID7*AN.0*MO.0                  or if (mopix == 0) && (!alpha)
+	CRA10=!MGEP*!AN.VID7*AN.0               -- if (mopri < pfpri) && (!alpha)
+	   +!AN.VID7*AN.0*MO.0                  or if (mopix == 0) && (!alpha)
 
-    CRA9=MGEP*!AN.VID7*AN.0*!MO.0           -- if (mopri >= pfpri) && (mopix != 0) && (!alpha)
-       +!AN.VID7*AN.0*PF.VID9               or if (pfpix & 0x200) && (!alpha)
+	CRA9=MGEP*!AN.VID7*AN.0*!MO.0           -- if (mopri >= pfpri) && (mopix != 0) && (!alpha)
+	   +!AN.VID7*AN.0*PF.VID9               or if (pfpix & 0x200) && (!alpha)
 
-    CRA8=MGEP*!AN.VID7*AN.0*!MO.0*MVID8     -- if (mopri >= pfpri) && (mopix != 0) && (mopix & 0x100) && (!alpha)
-       +!MGEP*!AN.VID7*AN.0*PF.VID8         or if (mopri < pfpri) && (pfpix & 0x100) && (!alpha)
-       +!AN.VID7*AN.0*MO.0*PF.VID8          or if (pfpix & 0x100) && (!alpha)
+	CRA8=MGEP*!AN.VID7*AN.0*!MO.0*MVID8     -- if (mopri >= pfpri) && (mopix != 0) && (mopix & 0x100) && (!alpha)
+	   +!MGEP*!AN.VID7*AN.0*PF.VID8         or if (mopri < pfpri) && (pfpix & 0x100) && (!alpha)
+	   +!AN.VID7*AN.0*MO.0*PF.VID8          or if (pfpix & 0x100) && (!alpha)
 
-    CRMUXB=!AN.VID7*AN.0                    -- if (!alpha)
+	CRMUXB=!AN.VID7*AN.0                    -- if (!alpha)
 
-    CRMUXA=!MGEP                            -- if (mopri < pfpri)
-       +MO.0                                or (mopix == 0)
-       +AN.VID7                             or (alpha)
-       +!AN.0
+	CRMUXA=!MGEP                            -- if (mopri < pfpri)
+	   +MO.0                                or (mopix == 0)
+	   +AN.VID7                             or (alpha)
+	   +!AN.0
 */
 }
 
@@ -818,24 +818,24 @@ DRIVER_INIT_MEMBER(atarig42_state,guardian)
 	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 
 	/*
-    Guardians color MUX
+	Guardians color MUX
 
-    CRA10=MGEP*!AN.VID7*AN.0*!MO.0          -- if (mopri >= pfpri) && (!alpha) && (mopix != 0)
+	CRA10=MGEP*!AN.VID7*AN.0*!MO.0          -- if (mopri >= pfpri) && (!alpha) && (mopix != 0)
 
-    CRA9=MGEP*!AN.VID7*AN.0*!MO.0*MVID9     -- if (mopri >= pfpri) && (!alpha) && (mopix != 0) && (mopix & 0x200)
-       +!MGEP*!AN.VID7*AN.0*PF.VID9         or if (mopri < pfpri) && (!alpha) && (pfpix & 0x200)
-       +!AN.VID7*AN.0*MO.0*PF.VID9          or if (mopix == 0) && (!alpha) && (pfpix & 0x200)
+	CRA9=MGEP*!AN.VID7*AN.0*!MO.0*MVID9     -- if (mopri >= pfpri) && (!alpha) && (mopix != 0) && (mopix & 0x200)
+	   +!MGEP*!AN.VID7*AN.0*PF.VID9         or if (mopri < pfpri) && (!alpha) && (pfpix & 0x200)
+	   +!AN.VID7*AN.0*MO.0*PF.VID9          or if (mopix == 0) && (!alpha) && (pfpix & 0x200)
 
-    CRA8=MGEP*!AN.VID7*AN.0*!MO.0*MVID8     -- if (mopri >= pfpri) && (!alpha) && (mopix != 0) && (mopix & 0x100)
-       +!MGEP*!AN.VID7*AN.0*PF.VID8         or if (mopri < pfpri) && (!alpha) && (pfpix & 0x100)
-       +!AN.VID7*AN.0*MO.0*PF.VID8          or if (mopix == 0) && (!alpha) && (pfpix & 0x100)
+	CRA8=MGEP*!AN.VID7*AN.0*!MO.0*MVID8     -- if (mopri >= pfpri) && (!alpha) && (mopix != 0) && (mopix & 0x100)
+	   +!MGEP*!AN.VID7*AN.0*PF.VID8         or if (mopri < pfpri) && (!alpha) && (pfpix & 0x100)
+	   +!AN.VID7*AN.0*MO.0*PF.VID8          or if (mopix == 0) && (!alpha) && (pfpix & 0x100)
 
-    CRMUXB=!AN.VID7*AN.0                    -- if (!alpha)
+	CRMUXB=!AN.VID7*AN.0                    -- if (!alpha)
 
-    CRMUXA=!MGEP                            -- if (mopri < pfpri)
-       +MO.0                                or (mopix == 0)
-       +AN.VID7                             or (alpha)
-       +!AN.0
+	CRMUXA=!MGEP                            -- if (mopri < pfpri)
+	   +MO.0                                or (mopix == 0)
+	   +AN.VID7                             or (alpha)
+	   +!AN.0
 */
 }
 

@@ -52,7 +52,7 @@ public:
 	optional_device<roc10937_t> m_vfd;
 	optional_device<okim6376_device> m_msm6376;
 	required_device<duartn68681_device> m_duart68681;
-	
+
 	UINT8 m_lamppos;
 	int m_alpha_clock;
 	int m_RAMEN;

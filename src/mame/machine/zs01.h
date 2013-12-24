@@ -15,8 +15,7 @@
 #include "machine/ds2401.h"
 
 #define MCFG_ZS01_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, ZS01, 0 ) \
-
+	MCFG_DEVICE_ADD( _tag, ZS01, 0 )
 #define MCFG_ZS01_DS2401( ds2401_tag ) \
 	zs01_device::static_set_ds2401_tag( *device, ds2401_tag );
 

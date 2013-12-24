@@ -18,7 +18,7 @@ class isa8_cga_device :
 		public device_isa8_card_interface
 {
 	friend class isa8_cga_superimpose_device;
-//	friend class isa8_ec1841_0002_device;
+//  friend class isa8_ec1841_0002_device;
 	friend class isa8_cga_poisk2_device;
 	friend class isa8_cga_pc1512_device;
 

@@ -6,11 +6,11 @@
     3 timers, address decoder, wait generator, interrupt controller,
     all integrated in a single chip.
 
-	TODO:
-	- Interrupt generation: handle pending / in-service mechanisms
-	- Parallel port: handle timing latency
-	- Serial port: not done at all
-	- (and many other things)
+    TODO:
+    - Interrupt generation: handle pending / in-service mechanisms
+    - Parallel port: handle timing latency
+    - Serial port: not done at all
+    - (and many other things)
 
 ***************************************************************************/
 
@@ -20,7 +20,7 @@
 const device_type TMP68301 = &device_creator<tmp68301_device>;
 
 static ADDRESS_MAP_START( tmp68301_regs, AS_0, 16, tmp68301_device )
-//	AM_RANGE(0x000,0x3ff) AM_RAM
+//  AM_RANGE(0x000,0x3ff) AM_RAM
 	AM_RANGE(0x094,0x095) AM_READWRITE(imr_r,imr_w)
 	AM_RANGE(0x098,0x099) AM_READWRITE(iisr_r,iisr_w)
 
@@ -63,9 +63,9 @@ READ16_MEMBER(tmp68301_device::scr_r)
 WRITE16_MEMBER(tmp68301_device::scr_w)
 {
 	/*
-		*--- ---- CKSE
-		--*- ---- RES
-		---- ---* INTM
+	    *--- ---- CKSE
+	    --*- ---- RES
+	    ---- ---* INTM
 	*/
 
 	COMBINE_DATA(&m_scr);

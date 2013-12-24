@@ -26,7 +26,7 @@
 // ======================> vic10_standard_cartridge_device
 
 class vic10_standard_cartridge_device :  public device_t,
-										 public device_vic10_expansion_card_interface
+											public device_vic10_expansion_card_interface
 {
 public:
 	// construction/destruction

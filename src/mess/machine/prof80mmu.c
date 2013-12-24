@@ -103,7 +103,7 @@ READ8_MEMBER( prof80_mmu_device::program_r )
 	{
 		offset |= 0xf0000;
 	}
-	
+
 	return this->space(AS_PROGRAM).read_byte(offset);
 }
 
@@ -123,6 +123,6 @@ WRITE8_MEMBER( prof80_mmu_device::program_w )
 	{
 		offset |= 0xf0000;
 	}
-	
+
 	this->space(AS_PROGRAM).write_byte(offset, data);
 }

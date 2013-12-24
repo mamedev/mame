@@ -483,8 +483,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 	int scanline = param;
 
 // already being generated  by MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
-//	if(scanline == 224)
-//		m_maincpu->set_input_line(6, HOLD_LINE);
+//  if(scanline == 224)
+//      m_maincpu->set_input_line(6, HOLD_LINE);
 
 	if(scanline == 0)
 		if (!m_irq4_disabled) m_maincpu->set_input_line(4, HOLD_LINE);
@@ -3288,11 +3288,11 @@ ROM_END
 ROM_START( thegladpcb )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "bios.42",    0x000000, 0x020000, CRC(517cf7a2) SHA1(f5720b29e3be6ec22be03a768618cb2a1aa4ade7) )
-	ROM_LOAD16_WORD_SWAP( "glad_v100.43",  0x100000, 0x080000, CRC(bcf3b172) SHA1(df7e2808c0341be0a59eefa852c857a3a919223e) ) 
+	ROM_LOAD16_WORD_SWAP( "glad_v100.43",  0x100000, 0x080000, CRC(bcf3b172) SHA1(df7e2808c0341be0a59eefa852c857a3a919223e) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "thegladpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
-	ROM_LOAD( "thegladpcb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(d7f06e2d) SHA1(9c3aca7a487f5329d84731e2c63d5ed591bf9d24) )	 // from 'thegladpcb set'
+	ROM_LOAD( "thegladpcb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(d7f06e2d) SHA1(9c3aca7a487f5329d84731e2c63d5ed591bf9d24) )    // from 'thegladpcb set'
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "igs_v100.62", 0x000000, 0x200000, CRC(0f3f511e) SHA1(28dd8d27495cec86e968a3ea549c5b30513dbb6e) )
@@ -3581,7 +3581,7 @@ ROM_START( killbldp )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	/* the first 0x268 bytes of this are EXECUTE ONLY in the original chip, attempting to read them even via the original CPU just returns what is on the bus */
-//	ROM_LOAD( "killbldp_igs027a.bin", 0x000000, 0x04000, CRC(c7868d90) SHA1(335c99933a38b77fcfc3f8004063f35124364f3e) ) // this is the original rom with the first 0x268 bytes from the bootleg - but it doesn't work?
+//  ROM_LOAD( "killbldp_igs027a.bin", 0x000000, 0x04000, CRC(c7868d90) SHA1(335c99933a38b77fcfc3f8004063f35124364f3e) ) // this is the original rom with the first 0x268 bytes from the bootleg - but it doesn't work?
 	/* there are some differences around 0x2e80, investigate - maybe above is badly dumped?, padding at 0x3ac0 is also different */
 	ROM_LOAD( "killbldp_igs027a_alt.bin", 0x000000, 0x04000, CRC(98316b06) SHA1(09be9fad24d68980a0a5beae60ced48012286216) ) // from a bootleg
 
@@ -3614,7 +3614,7 @@ ROM_START( svg )
 	ROM_LOAD16_WORD_SWAP( "u30.bin",      0x100000, 0x080000, CRC(34c18f3f) SHA1(42d1edd0dcfaa5e44861c6a1d4cb24f51ba23de8) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-//	ROM_LOAD( "svg_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // different from PCB version..
+//  ROM_LOAD( "svg_igs027a.bin", 0x000000, 0x04000, NO_DUMP ) // different from PCB version..
 	ROM_LOAD( "svg_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "svg_igs027a.bin", 0x0188, 0x3e78, BAD_DUMP CRC(7a59da5d) SHA1(d67ba465db40ca716b4b901b1c8e762716fb954e) ) // taken from svgpcb
 
@@ -3652,7 +3652,7 @@ ROM_START( svgpcb )
 	ROM_LOAD( "svgpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "svgcpb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(7a59da5d) SHA1(d67ba465db40ca716b4b901b1c8e762716fb954e) )
 
-	
+
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "svg_v100jp.u64", 0x000000, 0x400000, CRC(399d4a8b) SHA1(b120e8386a259e6fd7941acf3c33cf288eda616c) )
 	ROM_LOAD( "svg_v100jp.u65", 0x400000, 0x400000, CRC(6e1c33b1) SHA1(66f26b2f4c0b3dcf6d1bb1df48e2ddbcc9d9432d) )
@@ -3685,10 +3685,10 @@ ROM_START( happy6 )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	// data before 0x188 is read-protected and cannot be read even with a trojan (as with most 2001/2+ IGS titles)
-//	ROM_LOAD( "happy6_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+//  ROM_LOAD( "happy6_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 	// for testing only, this is from the gladiator and wrong for this game.
 	ROM_LOAD( "happy6_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
-	ROM_LOAD( "happy6_igs027a_v100_japan.bin", 0x0188, 0x3e78, BAD_DUMP CRC(d7f06e2d) SHA1(9c3aca7a487f5329d84731e2c63d5ed591bf9d24) )	 // from 'thegladpcb set'
+	ROM_LOAD( "happy6_igs027a_v100_japan.bin", 0x0188, 0x3e78, BAD_DUMP CRC(d7f06e2d) SHA1(9c3aca7a487f5329d84731e2c63d5ed591bf9d24) )   // from 'thegladpcb set'
 
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
@@ -4175,7 +4175,7 @@ GAME( 2005, killbldp,     pgm,       pgm_arm_type3,     pgm, pgm_arm_type3_state
 GAME( 2003, theglad,      pgm,       pgm_arm_type3,     theglad, pgm_arm_type3_state,    theglad,    ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V101) (ARM label V107, ROM 06/06/03 SHEN JIAN V107)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // ARM time: 16:17:27
 GAME( 2003, theglad101,   theglad,   pgm_arm_type3,     theglad, pgm_arm_type3_state,    theglad,    ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V101, ROM 03/13/03 SHEN JIAN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // ARM time: 14:06:44
 // the v100 68k ROM on this is older than the v101 set, this set also uses a different internal ROM to everything else, must be a very early release, maybe pre v100 proto with v100 strings?
-GAME( 2003, theglad100,   theglad,   pgm_arm_type3,     theglad, pgm_arm_type3_state,    theglada,   ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* need correct internal rom of IGS027A - we currently patch the one we have */ // ARM time: 10:39:25 
+GAME( 2003, theglad100,   theglad,   pgm_arm_type3,     theglad, pgm_arm_type3_state,    theglada,   ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* need correct internal rom of IGS027A - we currently patch the one we have */ // ARM time: 10:39:25
 // newer than ARM V100 Cart, older than ARM V101 Cart, same 68k rom as V101 Cart.
 GAME( 2003, thegladpcb,   theglad,   pgm_arm_type3,     pgm,    pgm_arm_type3_state,    theglad,    ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 02/25/03 SHEN JIAN) (Japan, JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )// ARM time: 16:32:21 // PCB version only released in Japan?
 

@@ -1066,7 +1066,7 @@ static MACHINE_CONFIG_START( legionna, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
-	
+
 	MCFG_SEIBU_COP_ADD("seibucop")
 
 	/* video hardware */
@@ -1096,7 +1096,7 @@ static MACHINE_CONFIG_START( heatbrl, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
-	
+
 	MCFG_SEIBU_COP_ADD("seibucop")
 
 	/* video hardware */
@@ -1125,7 +1125,7 @@ static MACHINE_CONFIG_START( godzilla, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
-	
+
 	MCFG_SEIBU_COP_ADD("seibucop")
 
 	/* video hardware */
@@ -1155,7 +1155,7 @@ static MACHINE_CONFIG_START( denjinmk, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
-	
+
 	MCFG_SEIBU_COP_ADD("seibucop")
 
 	/* video hardware */
@@ -1184,7 +1184,7 @@ static MACHINE_CONFIG_START( grainbow, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
-	
+
 	MCFG_SEIBU_COP_ADD("seibucop")
 
 	/* video hardware */
@@ -1214,7 +1214,7 @@ static MACHINE_CONFIG_START( cupsoc, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
-	
+
 	MCFG_SEIBU_COP_ADD("seibucop")
 
 	/* video hardware */
@@ -1248,7 +1248,7 @@ static MACHINE_CONFIG_START( cupsocbl, legionna_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold) /* VBL */
 
 	MCFG_SEIBU_COP_ADD("seibucop")
-	
+
 	/*Different Sound hardware*/
 	//SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)

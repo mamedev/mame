@@ -5,10 +5,10 @@
  *  Implementation of ASIC65
  *
  *************************************/
- 
- #include "cpu/tms32010/tms32010.h"
- 
- enum {
+
+	#include "cpu/tms32010/tms32010.h"
+
+	enum {
 	ASIC65_STANDARD,
 	ASIC65_STEELTAL,
 	ASIC65_GUARDIANS,
@@ -19,7 +19,7 @@ class asic65_device : public device_t
 {
 public:
 	asic65_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// (static) configuration helpers
 	static void set_type(device_t &device, int type) { downcast<asic65_device &>(device).m_asic65_type = type; }
 
@@ -27,14 +27,14 @@ public:
 	DECLARE_WRITE16_MEMBER( data_w );
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_READ16_MEMBER( io_r );
-	
+
 	TIMER_CALLBACK_MEMBER( m68k_asic65_deferred_w );
 	WRITE16_MEMBER( m68k_w );
 	READ16_MEMBER( m68k_r );
 	WRITE16_MEMBER( stat_w );
 	READ16_MEMBER( stat_r );
 	READ16_MEMBER( get_bio );
-	
+
 	enum
 	{
 		TIMER_M68K_ASIC65_DEFERRED_W

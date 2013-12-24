@@ -11,7 +11,7 @@ struct collision_info
 		hitbox(0),
 		hitbox_x(0),
 		hitbox_y(0) {}
-		
+
 	int x,y;
 	INT16 min_x,min_y,max_x,max_y;
 	UINT16 hitbox;
@@ -41,8 +41,8 @@ seibu_cop_legacy_device(const machine_config &mconfig, const char *tag, device_t
 	DECLARE_READ16_MEMBER( legionna_mcu_r );
 	DECLARE_WRITE16_MEMBER( legionna_mcu_w );
 
-	//DECLARE_READ16_MEMBER( raiden2_mcu_r );	unused
-	//DECLARE_WRITE16_MEMBER( raiden2_mcu_w );	unused
+	//DECLARE_READ16_MEMBER( raiden2_mcu_r );   unused
+	//DECLARE_WRITE16_MEMBER( raiden2_mcu_w );  unused
 
 protected:
 	// device-level overrides
@@ -97,4 +97,4 @@ private:
 extern const device_type SEIBU_COP_LEGACY;
 
 #define MCFG_SEIBU_COP_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEIBU_COP_LEGACY, 0) 
+	MCFG_DEVICE_ADD(_tag, SEIBU_COP_LEGACY, 0)

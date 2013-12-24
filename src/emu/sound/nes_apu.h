@@ -34,9 +34,9 @@
  * Also make sure to correspond the memory regions to those used in the
  * processor, as each is shared.
  */
- 
+
 #include "nes_defs.h"
- 
+
 /* GLOBAL CONSTANTS */
 #define  SYNCS_MAX1     0x20
 #define  SYNCS_MAX2     0x80
@@ -56,7 +56,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -77,7 +77,7 @@ private:
 	uint32  m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	uint32  m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
 	sound_stream *m_stream;
-	
+
 	void create_syncs(unsigned long sps);
 	int8 apu_square(square_t *chan);
 	int8 apu_triangle(triangle_t *chan);

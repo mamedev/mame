@@ -11,7 +11,7 @@ Questionable?
 
 * 강행돌파 [same as herknite?!?]
 
-* Tears - Another Story added (not 100% verified whether it is a final version or not) 
+* Tears - Another Story added (not 100% verified whether it is a final version or not)
 
 It is recommended to use the firmware 1.6.6 as default BIOS!
 
@@ -409,7 +409,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pinbdrea">
 		<description>Pinball Dreams (Eur)</description>
 		<year>2002</year>
@@ -421,7 +421,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sobemons">
 		<description>Story of Bug eyed Monster (Kor)</description>
 		<year>2003</year>
@@ -444,8 +444,8 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 				<rom name="winter is.smc" size="69207040" crc="62c4a3fb" sha1="cf072fae0825164ff8c7393ab513058b78c46061" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="suplusha">
 		<description>Super Plusha (Eur)</description>
 		<year>2002</year>
@@ -456,7 +456,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 				<rom name="super plusha.smc" size="17302528" crc="65da87fc" sha1="1e2e984014f184759a35df93160f0fb4d11c7742" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="talowila">
 		<description>Tales of Windy Land (Kor)</description>
@@ -468,7 +468,7 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 				<rom name="tales of windy land.smc" size="17302528" crc="83b9c315" sha1="51679a8197f721fc601ea0cd8c91a3bbabed9585" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="totogogo">
 		<description>Topy Topy Gogo (Eur)</description>
@@ -480,8 +480,8 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 				<rom name="topy topy gogo.smc" size="17302528" crc="9a5faa26" sha1="46e1f08ec260a633e8e4c44b3b46b5135e6c76a6" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 		<software name="tearsast">
 		<description>Tears - Another Story (Kor)</description>
 		<year>2003</year>
@@ -493,5 +493,5 @@ It is recommended to use the firmware 1.6.6 as default BIOS!
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

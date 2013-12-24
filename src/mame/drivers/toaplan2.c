@@ -37,7 +37,7 @@ Supported games:
     batsuguna   TP-030        Toaplan       Batsugun (older)
     batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
     pwrkick     ??????        Sunwise       Power Kick
-	othldrby    ??????        Sunwise       Othello Derby
+    othldrby    ??????        Sunwise       Othello Derby
     snowbro2    ??????        Hanafram      Snow Bros. 2 - With New Elves
 
     * This version of Whoopee!! is on a board labeled TP-020
@@ -5348,4 +5348,3 @@ GAME( 1999, bbakraid,   0,        bbakraid, bbakraid, toaplan2_state,  bbakraid,
 GAME( 1999, bbakraidj,  bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code
 GAME( 1999, bbakraidja, bbakraid, bbakraid, bbakraid, toaplan2_state,  bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
-

@@ -2,84 +2,84 @@
 
     ITT 3030
 
-	
-	ToDo:
-	- Check Beeper
-	- finish hooking up keyboard
-	- According to the manual, the keyboard is based on a 8278 ... it's nowhere to be found. The keyboard / video card has a 8741 instead of which a ROM dump exists
-	- serial port
-	- daisy chain
-	- ...
-	
 
-	CPU Board, all ICs shown:
-	
-	|-----------------------------------------------------------------|
-	|                                                                 |
-	|    74LS640N  	       Z80_Combo            74LS138N              |
-	|    			                                        74LS00N   |
-	|    74LS240N                               74LS74AN              |
-	|                                                       74LS00N   |
-	|C   74LS240N          Z80_CPU              74LS240N             C|
-	|N                                                      74LS74AN N|
-	|1   74LS241N                               74LS240N             2|
-	|                      ROM_1      74LS20N               74LS38N   |
-    |    74LS240N                               74LS240N	          |
-	|                                 74LS04N               74LS02N   |
-	|    74LS138N                               74LS74AN              |
-	|                                                       74LS175N  |
-	|    75154N        74LS156N                 74LS00N               |
-	|                                                       74LS123N  |
-	|	 75150P 75150P 74LS175N   X1  74LS00N   74LS132N              |
-	|-----------------------------------------------------------------|		
-	
-	Z80_Combo:	Mostek MK3886 Z80 Combo Chip, Serial, Timer, 256 bytes RAM, Interrupt Controller
-	Z80_CPU:	Zilog Z80A CPU
-	ROM_1:		NEC D2716D marked "BOOTV1.2"
-	X1:			Crystal 4,194 MHz
-	CN1:		Bus Connector
-	CN2:		Memory Board Connector
-	
-----------------------------------------------------------------------------------
-	
-	Video / Keyboard Combination board, all ICs shown:
-	
-	|-----------------------------------------------------------------|
-	|                                                                 |
-	|         X1     74276N      MCU_1                  74LS85N       |
-	|                                                                 |
-	|    74LS138N    74LS240                            74LS240N      |
-	|                            75LS257AN  74LS166AN                 |
-	|    74LS08N     74LS85N                            74LS241N      |
-	|                            75LS257AN  ROM_1                    C|
-	|    74LS132N    74LS32N                            74LS240N     N|
-	|                            75LS257AN                           1|
-	|    74LS10N     74LS08N                            74LS240N      |
-	|                            75LS257AN  RAM_1                     |
-	|    74LS163AN   74LS173AN                          74LS374N      |
-	|                                                                 |
-	|    74LS86N     74LS240N                           74LS640N      |
-	|                            Video_1                              |
-	|    74LS74AN    74LS240N                           74LS640N      |
-	|-----------------------------------------------------------------|
-	
-	X1:		Crystal 6 MHz
-	MCU_1:	NEC D8741AD marked "V1.1 3030"
-	ROM_1:	MBM 2716 marked "GB 136-0"
-	RAM_1:  NEC D4016D
-	Video_1	Video-IC SND5027E, compatible with TMS9927
+    ToDo:
+    - Check Beeper
+    - finish hooking up keyboard
+    - According to the manual, the keyboard is based on a 8278 ... it's nowhere to be found. The keyboard / video card has a 8741 instead of which a ROM dump exists
+    - serial port
+    - daisy chain
+    - ...
+
+
+    CPU Board, all ICs shown:
+
+    |-----------------------------------------------------------------|
+    |                                                                 |
+    |    74LS640N          Z80_Combo            74LS138N              |
+    |                                                       74LS00N   |
+    |    74LS240N                               74LS74AN              |
+    |                                                       74LS00N   |
+    |C   74LS240N          Z80_CPU              74LS240N             C|
+    |N                                                      74LS74AN N|
+    |1   74LS241N                               74LS240N             2|
+    |                      ROM_1      74LS20N               74LS38N   |
+    |    74LS240N                               74LS240N              |
+    |                                 74LS04N               74LS02N   |
+    |    74LS138N                               74LS74AN              |
+    |                                                       74LS175N  |
+    |    75154N        74LS156N                 74LS00N               |
+    |                                                       74LS123N  |
+    |    75150P 75150P 74LS175N   X1  74LS00N   74LS132N              |
+    |-----------------------------------------------------------------|
+
+    Z80_Combo:  Mostek MK3886 Z80 Combo Chip, Serial, Timer, 256 bytes RAM, Interrupt Controller
+    Z80_CPU:    Zilog Z80A CPU
+    ROM_1:      NEC D2716D marked "BOOTV1.2"
+    X1:         Crystal 4,194 MHz
+    CN1:        Bus Connector
+    CN2:        Memory Board Connector
 
 ----------------------------------------------------------------------------------
-	
-	Floppy Controller board, all ICs shown
 
-	|-----------------------------------------------------------------|
-	|                                                                 |
+    Video / Keyboard Combination board, all ICs shown:
+
+    |-----------------------------------------------------------------|
+    |                                                                 |
+    |         X1     74276N      MCU_1                  74LS85N       |
+    |                                                                 |
+    |    74LS138N    74LS240                            74LS240N      |
+    |                            75LS257AN  74LS166AN                 |
+    |    74LS08N     74LS85N                            74LS241N      |
+    |                            75LS257AN  ROM_1                    C|
+    |    74LS132N    74LS32N                            74LS240N     N|
+    |                            75LS257AN                           1|
+    |    74LS10N     74LS08N                            74LS240N      |
+    |                            75LS257AN  RAM_1                     |
+    |    74LS163AN   74LS173AN                          74LS374N      |
+    |                                                                 |
+    |    74LS86N     74LS240N                           74LS640N      |
+    |                            Video_1                              |
+    |    74LS74AN    74LS240N                           74LS640N      |
+    |-----------------------------------------------------------------|
+
+    X1:     Crystal 6 MHz
+    MCU_1:  NEC D8741AD marked "V1.1 3030"
+    ROM_1:  MBM 2716 marked "GB 136-0"
+    RAM_1:  NEC D4016D
+    Video_1 Video-IC SND5027E, compatible with TMS9927
+
+----------------------------------------------------------------------------------
+
+    Floppy Controller board, all ICs shown
+
+    |-----------------------------------------------------------------|
+    |                                                                 |
     |  X1   74LS51N    F    74LS74AN   74LS02N        MC4044P         |
     |                  D                        567                   |
     |     74LS04N      C    74LS00N    74LS01N  :::   MC4024P         |
-	|                                                                 |
-	|   74LS00N        1    74LS74AN   74LS74AN       74LS14N        C|
+    |                                                                 |
+    |   74LS00N        1    74LS74AN   74LS74AN       74LS14N        C|
     |                  7                                             N|
     |  74LS240N        9    74LS161N   74LS393N   74LS74AN           1|
     |                  1                                              |
@@ -88,103 +88,103 @@
     |    74LS123N   74LS04N  74LS163N   74LS14N    74LS241N           |
     |                                                                 |
     |     74LS393N   74LS138  74LS175N   74LS85N    74LS645N          |
-	|                                                                 |
-	|-----------------------------------------------------------------|
-	
-	X1:		Crystal 8 MHz
-	FDC:	Siemens SAB1791-02P
-	567:	Jumper Pad (emtpy)
+    |                                                                 |
+    |-----------------------------------------------------------------|
+
+    X1:     Crystal 8 MHz
+    FDC:    Siemens SAB1791-02P
+    567:    Jumper Pad (emtpy)
 
 ----------------------------------------------------------------------------------
-	
-	256K RAM board, all ICs shown: 
-	
-	|-----------------------------------------------------------------|
-	|                                                                 |
-	|   HM4864P   HM4864P   HM4864P   HM4864P       74LS245N          |
-	|                                                                 |
-	|   HM4864P   HM4864P   HM4864P   HM4864P       P     74LS14N     |
-	|                                               R                 |
-	|   HM4864P   HM4864P   HM4864P   HM4864P       M     74LS00N     |
-	|                                                                C|
-	|   HM4864P   HM4864P   HM4864P   HM4864P       AM         A     N|
-	|                                               29         M     1|
-	|   HM4864P   HM4864P   HM4864P   HM4864P       66         2      |
-	|                                               PC         9      |
-	|   HM4864P   HM4864P   HM4864P   HM4864P                  6      |
-	|                                               AM         4      |
-	|   HM4864P   HM4864P   HM4864P   HM4864P       29         8      |
-	|                                               66         P      |
-	|   HM4864P   HM4864P   HM4864P   HM4864P       PC         C      |
-	|                                                      SN7474N    |
-	|-----------------------------------------------------------------|	
-	
-	PRM: 	N82S129F 1K Bipolar PROM
-	        AM2966PC: Octal Dynamic Memory Drivers with Three-State Outputs
-			AM29648PC
-	CN1:	Connector to CN2 of Z80 CPU card
-	
+
+    256K RAM board, all ICs shown:
+
+    |-----------------------------------------------------------------|
+    |                                                                 |
+    |   HM4864P   HM4864P   HM4864P   HM4864P       74LS245N          |
+    |                                                                 |
+    |   HM4864P   HM4864P   HM4864P   HM4864P       P     74LS14N     |
+    |                                               R                 |
+    |   HM4864P   HM4864P   HM4864P   HM4864P       M     74LS00N     |
+    |                                                                C|
+    |   HM4864P   HM4864P   HM4864P   HM4864P       AM         A     N|
+    |                                               29         M     1|
+    |   HM4864P   HM4864P   HM4864P   HM4864P       66         2      |
+    |                                               PC         9      |
+    |   HM4864P   HM4864P   HM4864P   HM4864P                  6      |
+    |                                               AM         4      |
+    |   HM4864P   HM4864P   HM4864P   HM4864P       29         8      |
+    |                                               66         P      |
+    |   HM4864P   HM4864P   HM4864P   HM4864P       PC         C      |
+    |                                                      SN7474N    |
+    |-----------------------------------------------------------------|
+
+    PRM:    N82S129F 1K Bipolar PROM
+            AM2966PC: Octal Dynamic Memory Drivers with Three-State Outputs
+            AM29648PC
+    CN1:    Connector to CN2 of Z80 CPU card
+
 ----------------------------------------------------------------------------------
-	
-	Parallel I/O board, all ICs shown: 
-	
-	|-------------------------------------|                                                                 |
-	|                                     |
-	|  74   74                            |
-	|  LS   LS        Z80A PIO            |
-	|  00   14                            |
-	|   N    N                            |
-	|                                     |
-	|                                     |
-	|  74   74        74   74   D4   74   |
-	|  LS   LS        LS   LS   I3   LS   |
-	|  13   14        24   85   P2   64   |
-	|  2N    N        1N    N    1   0N   |
-	|                                     |
+
+    Parallel I/O board, all ICs shown:
+
+    |-------------------------------------|                                                                 |
+    |                                     |
+    |  74   74                            |
+    |  LS   LS        Z80A PIO            |
+    |  00   14                            |
+    |   N    N                            |
+    |                                     |
+    |                                     |
+    |  74   74        74   74   D4   74   |
+    |  LS   LS        LS   LS   I3   LS   |
+    |  13   14        24   85   P2   64   |
+    |  2N    N        1N    N    1   0N   |
+    |                                     |
     |             CN1                     |
-	|                                     |
-	|             74LS00N                 |
-	|-------------------------------------|	
+    |                                     |
+    |             74LS00N                 |
+    |-------------------------------------|
 
-	CN1: Bus connector
-	DIP: 4x DIP current setting: off-on-on-off, sets the address for the parallel port
-	
+    CN1: Bus connector
+    DIP: 4x DIP current setting: off-on-on-off, sets the address for the parallel port
+
 ----------------------------------------------------------------------------------
 
 Beeper Circuit, all ICs shown:
 
-	|---------------------------|                                                                 |
-	|                           |
-	|   BEEP       74LS132N     |
-	| R1                        |
+    |---------------------------|                                                                 |
+    |                           |
+    |   BEEP       74LS132N     |
+    | R1                        |
     |              74LS14N      |
     |                           |
     |   74LS132N   74LS193N     |
-	|                           |
-	|   74LS74AN   74LS165N     |
-	|            CN1            |
-	|---------------------------|
-	
-	CN1: Connector to mainboard
-	R1:  looks like a potentiometer
-	BEEP: Beeper ... touted in the manual as "Hupe" ... i.e. "horn" :)
-	
+    |                           |
+    |   74LS74AN   74LS165N     |
+    |            CN1            |
+    |---------------------------|
+
+    CN1: Connector to mainboard
+    R1:  looks like a potentiometer
+    BEEP: Beeper ... touted in the manual as "Hupe" ... i.e. "horn" :)
+
 ----------------------------------------------------------------------------------
-	
-	Other boards and extensions mentioned in the manual:
-	- S100 bus adapter board
-	- IEEE 488 bus adapter board
-	- 64K memory board
-	- 8086 CPU board
-	- external harddisk
-	- TV adapter B/W (TV, Save/Load from Audio Cassette) with PROM/RAM/BASIC-Module with 16K or 32K RAM
-	- TV adapter color with connection to Video / Keyboard combination card
-	- Monitor adapters B/W and color
-	- Video / Keyboard interface 2 with grayscale, 8 colors, loadable character set, blinking
-	- Graphics Adapter with 16 colours, hi-res 512x256 pixels
-	- RTC
-	- Arithmetics chip
- 
+
+    Other boards and extensions mentioned in the manual:
+    - S100 bus adapter board
+    - IEEE 488 bus adapter board
+    - 64K memory board
+    - 8086 CPU board
+    - external harddisk
+    - TV adapter B/W (TV, Save/Load from Audio Cassette) with PROM/RAM/BASIC-Module with 16K or 32K RAM
+    - TV adapter color with connection to Video / Keyboard combination card
+    - Monitor adapters B/W and color
+    - Video / Keyboard interface 2 with grayscale, 8 colors, loadable character set, blinking
+    - Graphics Adapter with 16 colours, hi-res 512x256 pixels
+    - RTC
+    - Arithmetics chip
+
 ***************************************************************************/
 
 
@@ -194,9 +194,9 @@ Beeper Circuit, all ICs shown:
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "formats/itt3030_dsk.h"
-#include "video/tms9927.h"			//Display hardware
+#include "video/tms9927.h"          //Display hardware
 #include "sound/beep.h"
-#include "cpu/mcs48/mcs48.h"		//Keyboard MCU ... talks to the 8278 on the keyboard circuit
+#include "cpu/mcs48/mcs48.h"        //Keyboard MCU ... talks to the 8278 on the keyboard circuit
 
 
 #define MAIN_CLOCK XTAL_4.194MHz
@@ -291,12 +291,12 @@ READ8_MEMBER(itt3030_state::vsync_r)
 
 	if (machine().primary_screen->vblank())
 	{
-		ret |= 0xc0;	// set both bits 6 and 7 if vblank
+		ret |= 0xc0;    // set both bits 6 and 7 if vblank
 	}
 
 	if (machine().primary_screen->hblank())
 	{
-		ret |= 0x80;	// set only bit 7 if hblank
+		ret |= 0x80;    // set only bit 7 if hblank
 	}
 
 	return ret;
@@ -317,16 +317,16 @@ WRITE8_MEMBER(itt3030_state::bank_w)
 	int bank = 0;
 	m_bank = data>>4;
 
-	if (m_bank & 1)	// bank 8
+	if (m_bank & 1) // bank 8
 	{
 		bank = 8;
 	}
 	else
 	{
-		bank = m_bank >> 1; 
+		bank = m_bank >> 1;
 	}
 
-//	printf("bank_w: new value %02x, m_bank %x, bank %x\n", data, m_bank, bank);
+//  printf("bank_w: new value %02x, m_bank %x, bank %x\n", data, m_bank, bank);
 
 	m_48kbank->set_bank(bank);
 }
@@ -376,10 +376,10 @@ static ADDRESS_MAP_START( itt3030_map, AS_PROGRAM, 8, itt3030_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lower48_map, AS_PROGRAM, 8, itt3030_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(bankl_r, bankl_w)	// pages 0-7
+	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(bankl_r, bankl_w)   // pages 0-7
 	AM_RANGE(0x80000, 0x807ff) AM_ROM AM_REGION("maincpu", 0)   // begin "page 8"
 	AM_RANGE(0x80800, 0x80fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x81000, 0x810ff) AM_RAM AM_MIRROR(0x100)	// only 256 bytes, but ROM also clears 11xx?
+	AM_RANGE(0x81000, 0x810ff) AM_RAM AM_MIRROR(0x100)  // only 256 bytes, but ROM also clears 11xx?
 	AM_RANGE(0x83000, 0x83fff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
@@ -396,7 +396,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(itt3030_state::kbd_fifo_r)
 {
-	return m_kbdmcu->upi41_master_r(space, 0);	// offset 0 is data, 1 is status
+	return m_kbdmcu->upi41_master_r(space, 0);  // offset 0 is data, 1 is status
 }
 
 READ8_MEMBER(itt3030_state::kbd_matrix_r)
@@ -407,7 +407,7 @@ READ8_MEMBER(itt3030_state::kbd_matrix_r)
 WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 {
 	ioport_port *ports[16] = { m_keyrow1, m_keyrow2, m_keyrow3, m_keyrow4, m_keyrow5, m_keyrow6, m_keyrow7, m_keyrow8, m_keyrow9,
-							   m_keyrow10, m_keyrow11, m_keyrow12, m_keyrow13, m_keyrow14, m_keyrow15, m_keyrow16 };
+								m_keyrow10, m_keyrow11, m_keyrow12, m_keyrow13, m_keyrow14, m_keyrow15, m_keyrow16 };
 	int col_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
 	int tmp_read;
 
@@ -424,7 +424,7 @@ WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 }
 
 // Schematics say:
-// Port 1 goes to the keyboard matrix.  
+// Port 1 goes to the keyboard matrix.
 // bits 0-3 select matrix rows, bits 4-6 choose column to read, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 // T0 is the key matrix return
 // Port 2 bit 2 is shown as "IRQ" on the schematics, and the code does a lot with it as well (debug?)
@@ -451,7 +451,7 @@ static INPUT_PORTS_START( itt3030 )
 
 	PORT_START("ROW3")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')	// actually UK pound symbol
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')   // actually UK pound symbol
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
@@ -499,21 +499,21 @@ static INPUT_PORTS_START( itt3030 )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
 
 	PORT_START("ROW10")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_F9) 
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_F9)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
 
 	PORT_START("ROW11")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_F10) 
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_F10)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('@') PORT_CHAR('?')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('`')
 
 	PORT_START("ROW12")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_F11) PORT_CHAR(27)                                    
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_F11) PORT_CHAR(27)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('/') PORT_CHAR('\\')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(']') PORT_CHAR('}')
@@ -523,11 +523,11 @@ static INPUT_PORTS_START( itt3030 )
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(R)") PORT_CODE(KEYCODE_F12) PORT_CHAR('=')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('~')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_CHAR('^')	// PC doesn't have 3 keys to the right of L, so we sub DEL for the 3rd one
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_CHAR('^')    // PC doesn't have 3 keys to the right of L, so we sub DEL for the 3rd one
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 
 	PORT_START("ROW14")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(CL)") PORT_CODE(KEYCODE_F13) PORT_CHAR(4)	// produces control-D always
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(CL)") PORT_CODE(KEYCODE_F13) PORT_CHAR(4)    // produces control-D always
 	PORT_BIT(0x001e, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("ROW15")
@@ -563,7 +563,7 @@ void itt3030_state::machine_start()
 	save_item(NAME(m_kbdclk));
 	save_item(NAME(m_kbdread));
 
-	m_kbdclk = 0;	// must be initialized here b/c mcs48_reset() causes write of 0xff to all ports
+	m_kbdclk = 0;   // must be initialized here b/c mcs48_reset() causes write of 0xff to all ports
 }
 
 void itt3030_state::machine_reset()
@@ -576,7 +576,7 @@ void itt3030_state::machine_reset()
 }
 
 FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
-  FLOPPY_ITT3030_FORMAT
+	FLOPPY_ITT3030_FORMAT
 FLOPPY_FORMATS_END
 
 
@@ -587,8 +587,8 @@ SLOT_INTERFACE_END
 
 static struct tms9927_interface crtc_intf =
 {
-	16,		// pixels per video memory address
-	NULL	// "self-load data"?
+	16,     // pixels per video memory address
+	NULL    // "self-load data"?
 };
 
 static MACHINE_CONFIG_START( itt3030, itt3030_state )
@@ -608,7 +608,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_SCREEN_UPDATE_DRIVER(itt3030_state, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*16-1)
-	
+
 	/* devices */
 	MCFG_DEVICE_ADD("lowerbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(lower48_map)
@@ -635,7 +635,7 @@ static MACHINE_CONFIG_START( itt3030, itt3030_state )
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
-	
+
 MACHINE_CONFIG_END
 
 
@@ -655,4 +655,3 @@ ROM_START( itt3030 )
 ROM_END
 
 GAME( 1982, itt3030,  0,   itt3030,  itt3030,  driver_device, 0,      ROT0, "ITT RFA",      "ITT3030", GAME_NOT_WORKING | GAME_NO_SOUND )
-

@@ -1637,7 +1637,7 @@ void hng64_state::screen_eof_hng64(screen_device &screen, bool state)
 {
 	// rising edge
 	//if (state)
-	//	clear3d();
+	//  clear3d();
 }
 
 void hng64_state::video_start()

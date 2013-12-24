@@ -546,7 +546,7 @@ WRITE8_MEMBER(polygonet_state::sound_ctrl_w)
 {
 	// .... .xxx - Sound bank
 	// ...x .... - NMI clear (clocked?)
-	
+
 	if ((m_sound_ctrl & 7) != (data & 7))
 		membank("bank1")->set_entry(data & 7);
 

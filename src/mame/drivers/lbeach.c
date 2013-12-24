@@ -8,7 +8,7 @@
   16MHz XTAL, M6800 @ 500kHz
   2x 5101 sram 256x4bit (256 byte) battery backed
   4x 4045 sram 1kx4 (2K byte)
-  
+
   Game should be in b&w? But then highlighted blocks in testmode
   would be invisible.
 
@@ -129,7 +129,7 @@ void lbeach_state::video_start()
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lbeach_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
-	
+
 	m_screen->register_screen_bitmap(m_colmap_car);
 }
 
@@ -151,7 +151,7 @@ UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &b
 
 	m_collision_bg_car = 0;
 	m_collision_fg_car = 0;
-	
+
 	for (int y = sprite_y; y < (sprite_y + 16); y++)
 	{
 		for (int x = sprite_x; x < (sprite_x + 16) && cliprect.contains(x, y); x++)
@@ -160,7 +160,7 @@ UINT32 lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 &b
 			m_collision_fg_car |= (fg_bitmap.pix16(y, x) & m_colmap_car.pix16(y, x) & 1);
 		}
 	}
-	
+
 	// draw fg layer (tiles)
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -202,7 +202,7 @@ READ8_MEMBER(lbeach_state::lbeach_in2_r)
 	// d6 and d7 are for collision detection
 	UINT8 d6 = m_collision_fg_car ? 0x40 : 0;
 	UINT8 d7 = m_collision_bg_car ? 0x80 : 0;
-	
+
 	return (ioport("IN2")->read() & 0x3f) | d6 | d7;
 }
 
@@ -216,12 +216,12 @@ static ADDRESS_MAP_START( lbeach_map, AS_PROGRAM, 8, lbeach_state )
 	AM_RANGE(0x8000, 0x8000) AM_WRITEONLY AM_SHARE("scroll_y")
 	AM_RANGE(0x8001, 0x8001) AM_WRITEONLY AM_SHARE("sprite_x")
 	AM_RANGE(0x8002, 0x8002) AM_WRITEONLY AM_SHARE("sprite_code")
-//	AM_RANGE(0x8003, 0x8003) AM_WRITENOP // ?
-//	AM_RANGE(0x8004, 0x8004) AM_WRITENOP // ?
-//	AM_RANGE(0x8005, 0x8005) AM_WRITENOP // ?
+//  AM_RANGE(0x8003, 0x8003) AM_WRITENOP // ?
+//  AM_RANGE(0x8004, 0x8004) AM_WRITENOP // ?
+//  AM_RANGE(0x8005, 0x8005) AM_WRITENOP // ?
 	AM_RANGE(0x8007, 0x8007) AM_WRITENOP // probably watchdog
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-//	AM_RANGE(0xa003, 0xa003) AM_READNOP // ? tests d7 at game over
+//  AM_RANGE(0xa003, 0xa003) AM_READNOP // ? tests d7 at game over
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END

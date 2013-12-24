@@ -934,8 +934,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( racknrol_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE("snsnd", sn76489a_device, write)
-//	AM_RANGE(0x1e, 0x1e) AM_WRITENOP
-//	AM_RANGE(0x1f, 0x1f) AM_WRITENOP
+//  AM_RANGE(0x1e, 0x1e) AM_WRITENOP
+//  AM_RANGE(0x1f, 0x1f) AM_WRITENOP
 	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_SHARE("racknrol_tbank")
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END

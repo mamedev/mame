@@ -17,7 +17,7 @@
 #include "machine/upd765.h"
 
 #define Z80_TAG         "z1"
-#define MMU_TAG			"mmu"
+#define MMU_TAG         "mmu"
 #define UPD765_TAG      "z38"
 #define UPD1990A_TAG    "z43"
 #define RS232_A_TAG     "rs232a"

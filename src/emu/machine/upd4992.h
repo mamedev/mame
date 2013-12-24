@@ -2,7 +2,7 @@
 // copyright-holders: Angelo Salese
 /***************************************************************************
 
-	uPD4992 RTC
+    uPD4992 RTC
 
 ***************************************************************************/
 
@@ -27,7 +27,7 @@
 // ======================> upd4992_device
 
 class upd4992_device : public device_t,
-					   public device_rtc_interface
+						public device_rtc_interface
 {
 public:
 	// construction/destruction

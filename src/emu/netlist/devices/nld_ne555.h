@@ -23,22 +23,21 @@
 #include "nld_twoterm.h"
 
 #define NETDEV_NE555(_name)                                                        \
-		NET_REGISTER_DEV(NE555, _name)                                             \
-
+		NET_REGISTER_DEV(NE555, _name)
 NETLIB_DEVICE(NE555,
-    NETLIB_NAME(R) m_R1;
-    NETLIB_NAME(R) m_R2;
-    NETLIB_NAME(R) m_R3;
-    NETLIB_NAME(R) m_RDIS;
+	NETLIB_NAME(R) m_R1;
+	NETLIB_NAME(R) m_R2;
+	NETLIB_NAME(R) m_R3;
+	NETLIB_NAME(R) m_RDIS;
 
-    netlist_logic_input_t m_RESET;
-    netlist_analog_input_t m_THRES;
-    netlist_analog_input_t m_TRIG;
-    netlist_analog_output_t m_OUT;
+	netlist_logic_input_t m_RESET;
+	netlist_analog_input_t m_THRES;
+	netlist_analog_input_t m_TRIG;
+	netlist_analog_output_t m_OUT;
 
-    bool m_last_out;
+	bool m_last_out;
 
-    double clamp(const double v, const double a, const double b);
+	double clamp(const double v, const double a, const double b);
 
 );
 

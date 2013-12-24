@@ -67,7 +67,7 @@ void c64_pagefox_cartridge_device::device_start()
 {
 	// allocate memory
 	m_ram.allocate(0x8000);
-	
+
 	// state saving
 	save_item(NAME(m_bank));
 }

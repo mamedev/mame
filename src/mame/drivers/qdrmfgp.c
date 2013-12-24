@@ -30,7 +30,7 @@ GP1 HDD data contents:
 #include "includes/qdrmfgp.h"
 
 
-#define IDE_HACK	1
+#define IDE_HACK    1
 
 
 /*************************************

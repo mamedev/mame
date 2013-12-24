@@ -739,7 +739,7 @@ public:
 	DECLARE_READ16_MEMBER( adsp_control_r );
 	DECLARE_WRITE16_MEMBER( adsp_control_w );
 	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);
-	
+
 	// protection specific variables and functions (see machine/stvprot.c)
 	UINT32 m_abus_protenable;
 	UINT32 m_abus_prot_addr;
@@ -751,21 +751,21 @@ public:
 	UINT8 m_char_offset; //helper to jump the decoding of the NULL chars.
 
 	UINT32 (*m_prot_readback)(address_space&,int,UINT32);
-	
+
 	DECLARE_READ32_MEMBER( common_prot_r );
 	DECLARE_WRITE32_MEMBER( common_prot_w );
-		
+
 	void install_common_protection();
-	
+
 	void install_twcup98_protection();
 	void install_sss_protection();
 	void install_astrass_protection();
 	void install_rsgun_protection();
 	void install_elandore_protection();
 	void install_ffreveng_protection();
-	
-	void stv_register_protection_savestates();	
-	
+
+	void stv_register_protection_savestates();
+
 	// Decathlete specific variables and functions (see machine/decathlt.c)
 	UINT32 m_decathlt_protregs[4];
 	UINT32 m_decathlt_lastcount;
@@ -774,7 +774,7 @@ public:
 	UINT32 m_decathlt_prot_uploadoffset;
 	UINT16 m_decathlt_prottable1[24];
 	UINT16 m_decathlt_prottable2[128];
-	
+
 	DECLARE_READ32_MEMBER( decathlt_prot_r );
 	DECLARE_WRITE32_MEMBER( decathlt_prot1_w );
 	DECLARE_WRITE32_MEMBER( decathlt_prot2_w );

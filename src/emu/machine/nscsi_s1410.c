@@ -10,7 +10,7 @@ nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, const char
 void nscsi_s1410_device::device_reset()
 {
 	nscsi_harddisk_device::device_reset();
-	
+
 	// initialize drive characteristics
 	params[0] = 0;
 	params[1] = 153;
@@ -44,7 +44,7 @@ void nscsi_s1410_device::scsi_command()
 			scsi_status_complete(SS_NOT_READY);
 			return;
 		}
-		
+
 		scsi_status_complete(SS_GOOD);
 		break;
 
@@ -56,7 +56,7 @@ void nscsi_s1410_device::scsi_command()
 
 		lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
 		blocks = (bytes_per_sector == 256) ? 32 : 17;
-		
+
 		int track_length = blocks*bytes_per_sector;
 		UINT8 *data = global_alloc_array(UINT8,track_length);
 		memset(data, 0xc6, track_length);
@@ -76,7 +76,7 @@ void nscsi_s1410_device::scsi_command()
 			scsi_status_complete(SS_NOT_READY);
 			return;
 		}
-		
+
 		scsi_data_in(2, 3);
 		scsi_status_complete(SS_GOOD);
 		break;
@@ -103,7 +103,7 @@ void nscsi_s1410_device::scsi_command()
 		}
 		scsi_status_complete(SS_GOOD);
 		break;
-		
+
 	case SC_READ_ECC_BURST:
 	case SC_RAM_DIAG:
 	case SC_DRIVE_DIAG:
@@ -135,7 +135,7 @@ void nscsi_s1410_device::scsi_put_data(int id, int pos, UINT8 data)
 	switch(scsi_cmdbuf[0]) {
 	case SC_FORMAT_ALT_TRACK:
 		break;
-	
+
 	case SC_INIT_DRIVE_PARAMS:
 		params[pos] = data;
 		break;

@@ -81,8 +81,8 @@ READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
 		case 0x33: return 0x49;
 		case 0x34: return 0x32;
 
-	//	default:
-	//		 logerror("ASIC3 R: CMD %2.2X PC: %6.6x\n", m_asic3_reg, space.device().safe_pc());
+	//  default:
+	//       logerror("ASIC3 R: CMD %2.2X PC: %6.6x\n", m_asic3_reg, space.device().safe_pc());
 	}
 
 	return 0;
@@ -103,10 +103,10 @@ WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w)
 			m_asic3_latch[m_asic3_reg] = data << 1;
 		break;
 
-	//	case 0x03: // move.w  #$88, $c0400e.l
-	//	case 0x04: // move.w  #$84, $c0400e.l
-	//	case 0x05: // move.w  #$A0, $c0400e.l
-	//	break;
+	//  case 0x03: // move.w  #$88, $c0400e.l
+	//  case 0x04: // move.w  #$84, $c0400e.l
+	//  case 0x05: // move.w  #$A0, $c0400e.l
+	//  break;
 
 		case 0x40:
 			m_asic3_hilo = (m_asic3_hilo << 8) | data;
@@ -131,8 +131,8 @@ WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w)
 		}
 		break;
 
-	//	case 0x50: // move.w  #$50, $c0400e.l
-	//	break;
+	//  case 0x50: // move.w  #$50, $c0400e.l
+	//  break;
 
 		case 0x80:
 		case 0x81:
@@ -150,7 +150,7 @@ WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w)
 		break;
 
 		default:
-			 logerror("ASIC3 W: CMD %2.2X DATA: %4.4x, PC: %6.6x\n", m_asic3_reg, data, space.device().safe_pc());
+				logerror("ASIC3 W: CMD %2.2X DATA: %4.4x, PC: %6.6x\n", m_asic3_reg, data, space.device().safe_pc());
 	}
 }
 

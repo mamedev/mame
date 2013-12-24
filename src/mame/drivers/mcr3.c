@@ -536,32 +536,26 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(mcr3_state::spyhuntpr_a800_w)
 {
-
 }
 
 WRITE8_MEMBER(mcr3_state::spyhuntpr_a801_w)
 {
-
 }
 
 WRITE8_MEMBER(mcr3_state::spyhuntpr_a802_w)
 {
-
 }
 
 WRITE8_MEMBER(mcr3_state::spyhuntpr_a803_w)
 {
-
 }
 
 WRITE8_MEMBER(mcr3_state::spyhuntpr_a900_w)
 {
-
 }
 
 WRITE8_MEMBER(mcr3_state::spyhuntpr_fd00_w)
 {
-
 }
 
 static ADDRESS_MAP_START( spyhuntpr_map, AS_PROGRAM, 8, mcr3_state )
@@ -579,12 +573,12 @@ static ADDRESS_MAP_START( spyhuntpr_map, AS_PROGRAM, 8, mcr3_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM //AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_RAM AM_WRITE(spyhuntpr_paletteram_w) AM_SHARE("paletteram")
-	
+
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("IN2")
 	AM_RANGE(0xfc03, 0xfc03) AM_READ_PORT("IN3")
-	
+
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE( spyhuntpr_fd00_w )
 
 	AM_RANGE(0xfe00, 0xffff) AM_RAM // a modified copy of spriteram for this hw??
@@ -592,7 +586,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(mcr3_state::spyhuntpr_port04_w)
 {
-
 }
 
 static ADDRESS_MAP_START( spyhuntpr_portmap, AS_IO, 8, mcr3_state )
@@ -601,7 +594,7 @@ static ADDRESS_MAP_START( spyhuntpr_portmap, AS_IO, 8, mcr3_state )
 	AM_RANGE(0x04, 0x04) AM_WRITE(spyhuntpr_port04_w)
 	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP // was watchdog
-//	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
+//  AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
@@ -1404,7 +1397,7 @@ MACHINE_CONFIG_END
 static ADDRESS_MAP_START( spyhuntpr_sound_map, AS_PROGRAM, 8, mcr3_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-//	AM_RANGE(0xfe00, 0xffff) AM_RAM
+//  AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spyhuntpr_sound_portmap, AS_IO, 8, mcr3_state )
@@ -1437,9 +1430,9 @@ static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
 	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
-	
+
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
@@ -1461,7 +1454,7 @@ static MACHINE_CONFIG_START( spyhuntpr, mcr3_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000 )
 	MCFG_CPU_PROGRAM_MAP(spyhuntpr_sound_map)
 	MCFG_CPU_IO_MAP(spyhuntpr_sound_portmap)
-//	MCFG_CPU_PERIODIC_INT_DRIVER(mcr3_state, irq0_line_hold, 4*60)
+//  MCFG_CPU_PERIODIC_INT_DRIVER(mcr3_state, irq0_line_hold, 4*60)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1787,7 +1780,7 @@ ROM_START( spyhuntpr )
 	ROM_CONTINUE(0x3002, 0x200)
 	ROM_CONTINUE(0x3003, 0x200)
 	ROM_CONTINUE(0x3802, 0x200)
-	ROM_CONTINUE(0x3803, 0x200)	
+	ROM_CONTINUE(0x3803, 0x200)
 	ROM_LOAD32_BYTE( "8.bin",   0x4000, 0x200, CRC(e699b329) SHA1(cb4b8c7b6fa1cb1144a18f1442dc3b267c408914) )
 	ROM_CONTINUE(0x4001, 0x200)
 	ROM_CONTINUE(0x4800, 0x200)
@@ -1819,7 +1812,7 @@ ROM_START( spyhuntpr )
 	ROM_CONTINUE(0x7002, 0x200)
 	ROM_CONTINUE(0x7003, 0x200)
 	ROM_CONTINUE(0x7802, 0x200)
-	ROM_CONTINUE(0x7803, 0x200)	
+	ROM_CONTINUE(0x7803, 0x200)
 
 	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "10.bin",   0x00000, 0x4000, CRC(6f9fd416) SHA1(a51c86e5b22c91fc44673f53400b58af40b18065) )
@@ -1994,9 +1987,9 @@ DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 DRIVER_INIT_MEMBER(mcr3_state,spyhuntpr)
 {
 	mcr_common_init();
-//	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-//	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
-//	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+//  machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+//  machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
+//  machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;

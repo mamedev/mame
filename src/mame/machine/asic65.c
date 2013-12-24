@@ -555,7 +555,7 @@ MACHINE_CONFIG_FRAGMENT( asic65 )
 	MCFG_CPU_ADD("asic65cpu", TMS32010, 20000000)
 	MCFG_CPU_PROGRAM_MAP(asic65_program_map)
 	MCFG_CPU_IO_MAP(asic65_io_map)
-MACHINE_CONFIG_END 
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  machine_config_additions - device-specific

@@ -73,7 +73,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<nesapu_device> m_nesapu;
 	required_device<ppu2c0x_device> m_ppu;
-	
+
 	UINT8* m_nt_ram;
 	UINT8* m_nt_page[4];
 	UINT32 m_in_0;

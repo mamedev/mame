@@ -45,7 +45,7 @@ const adam_format::format adam_format::formats[] = {
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000,  8, 40, 1, 512, {}, 1, {}, 100, 22, 100
 	},
-	
+
 	// Unverified gap sizes -->
 	{   /*  320K 5 1/4 inch double density */
 		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,

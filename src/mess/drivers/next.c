@@ -966,7 +966,7 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
 	MCFG_MCCS1850_ADD("rtc", XTAL_32_768kHz,
-					  line_cb_t(), line_cb_t(), line_cb_t())
+						line_cb_t(), line_cb_t(), line_cb_t())
 	MCFG_SCC8530_ADD("scc", XTAL_25MHz, line_cb_t(FUNC(next_state::scc_irq), static_cast<next_state *>(owner)))
 	MCFG_NEXTKBD_ADD("keyboard",
 						line_cb_t(FUNC(next_state::keyboard_irq), static_cast<next_state *>(owner)),

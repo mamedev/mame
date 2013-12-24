@@ -43,7 +43,7 @@ public:
 	optional_device<astrocade_device> m_astrocade_sound1;
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_protected_ram;
-	
+
 	UINT8 m_video_config;
 	UINT8 m_sparkle[4];
 	char m_totalword[256];
@@ -152,11 +152,11 @@ public:
 	void execute_blit(address_space &space);
 	void init_sparklestar();
 	virtual void machine_start();
-	
+
 	/*----------- defined in audio/wow.c -----------*/
 	DECLARE_READ8_MEMBER( wow_speech_r );
 	CUSTOM_INPUT_MEMBER( wow_speech_status_r );
-	
+
 	/*----------- defined in audio/gorf.c -----------*/
 	DECLARE_READ8_MEMBER( gorf_speech_r );
 	CUSTOM_INPUT_MEMBER( gorf_speech_status_r );

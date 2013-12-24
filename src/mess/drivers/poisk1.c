@@ -99,7 +99,7 @@ READ8_MEMBER(p1_state::p1_ppi_portb_r)
 	if (m_kbpoll_mask & 0x40) { key &= ioport("Y7")->read(); }
 	if (m_kbpoll_mask & 0x80) { key &= ioport("Y8")->read(); }
 	ret = key & 0xff;
-//	DBG_LOG(1,"p1_ppi_portb_r",("= %02X\n", ret));
+//  DBG_LOG(1,"p1_ppi_portb_r",("= %02X\n", ret));
 	return ret;
 }
 
@@ -143,27 +143,27 @@ WRITE8_MEMBER(p1_state::p1_ppi2_portb_w)
 
 I8255_INTERFACE( p1_ppi8255_interface_1 )
 {
-/*60H*/	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_porta_r),
+/*60H*/ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_porta_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_porta_w),
-/*69H*/	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_portb_r),
+/*69H*/ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_portb_r),
 	DEVCB_NULL,
-/*6AH*/	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_portc_r),
+/*6AH*/ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_portc_r),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi_portc_w)
 };
 
 I8255_INTERFACE( p1_ppi8255_interface_2 )
 {
-/*68H*/	DEVCB_NULL,
+/*68H*/ DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi2_porta_w),
-/*61H*/	DEVCB_NULL,
+/*61H*/ DEVCB_NULL,
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi2_portb_w),
-/*62H*/	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi2_portc_r),
+/*62H*/ DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, p1_state, p1_ppi2_portc_r),
 	DEVCB_NULL
 };
 
 READ8_MEMBER(p1_state::p1_ppi_r)
 {
-//	DBG_LOG(1,"p1ppi",("R %.2x\n", 0x60+offset));
+//  DBG_LOG(1,"p1ppi",("R %.2x\n", 0x60+offset));
 	switch (offset) {
 		case 0:
 			return m_ppi8255n1->read(space, 0);
@@ -185,7 +185,7 @@ READ8_MEMBER(p1_state::p1_ppi_r)
 
 WRITE8_MEMBER(p1_state::p1_ppi_w)
 {
-//	DBG_LOG(1,"p1ppi",("W %.2x $%02x\n", 0x60+offset, data));
+//  DBG_LOG(1,"p1ppi",("W %.2x $%02x\n", 0x60+offset, data));
 	switch (offset) {
 		case 0:
 			return m_ppi8255n1->write(space, 0, data);

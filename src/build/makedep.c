@@ -138,17 +138,17 @@ int main(int argc, char *argv[])
 			(*excpathhead)->pathlen = (*excpathhead)->path.len();
 			excpathhead = &(*excpathhead)->next;
 		}
-		
+
 		else if (arg[0] == '-' && arg[1] == 'F')
 		{
 			argnum++;
 		}
 
-        else if (arg[0] == '-' && arg[1] == 'D')
-        {
-            // some pkgconfigs return defines (e.g. pkg-config QtGui --cflags) ==> ignore
-            argnum++;
-        }
+		else if (arg[0] == '-' && arg[1] == 'D')
+		{
+			// some pkgconfigs return defines (e.g. pkg-config QtGui --cflags) ==> ignore
+			argnum++;
+		}
 
 		// ignore -include which is used by sdlmame to include sdlprefix.h before all other includes
 		else if (strcmp(arg,"-include") == 0)

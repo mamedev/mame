@@ -46,9 +46,9 @@ public:
 	tilemap_t *m_roz_tilemap;
 	UINT16 m_ttl_vram[0x800];
 	UINT16 m_roz_vram[0x800];
-	
+
 	/* sound */
-	UINT8 m_sound_ctrl;	
+	UINT8 m_sound_ctrl;
 	UINT8 m_sound_intck;
 
 	/* memory buffers */

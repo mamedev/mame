@@ -18,7 +18,7 @@ ADDRESS_MAP_END
 
 mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MB8795, "Fujitsu MB8795", tag, owner, clock, "mb8795", __FILE__),
-	  device_network_interface(mconfig, *this, 10)
+		device_network_interface(mconfig, *this, 10)
 {
 }
 
@@ -205,9 +205,9 @@ void mb8795_device::tx_dma_w(UINT8 data, bool eof)
 
 	if(eof) {
 		logerror("%s: send packet, dest=%02x.%02x.%02x.%02x.%02x.%02x len=%04x loopback=%s\n", tag(),
-				 txbuf[0], txbuf[1], txbuf[2], txbuf[3], txbuf[4], txbuf[5],
-				 txlen,
-				 txmode & EN_TMD_LB_DISABLE ? "off" : "on");
+					txbuf[0], txbuf[1], txbuf[2], txbuf[3], txbuf[4], txbuf[5],
+					txlen,
+					txmode & EN_TMD_LB_DISABLE ? "off" : "on");
 
 		if(txlen > 1500)
 			txlen = 1500; // Weird packet send on loopback test in the next

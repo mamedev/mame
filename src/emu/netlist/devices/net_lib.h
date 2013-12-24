@@ -136,7 +136,7 @@ NETLIB_DEVICE(nic7450,
  */
 
 NETLIB_SUBDEVICE(nic74107Asub,
-    netlist_ttl_input_t m_clk;
+	netlist_ttl_input_t m_clk;
 
 	netlist_ttl_output_t m_Q;
 	netlist_ttl_output_t m_QQ;

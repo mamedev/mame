@@ -79,7 +79,7 @@ const abc800_format::format abc800_format::formats[] = {
 		2000, 16, 40, 1, 256, {}, 1, {}, 55, 22, 54
 	},
 
-	// track description 
+	// track description
 	// 55x4e 12x00 3xf5 fe 2x00 01 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 2x00 02 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7
 	// 54x4e 12x00 3xf5 fe 2x00 03 01 f7 22x4e 12x00 3xf5 fb 256xe5 f7

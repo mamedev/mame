@@ -4,15 +4,15 @@ const device_type NSCSI_CB = &device_creator<nscsi_callback_device>;
 
 nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: nscsi_device(mconfig, NSCSI_CB, "SCSI callback (new)", tag, owner, clock, "nscsi_cb", __FILE__),
-	  m_write_rst(*this),
-	  m_write_atn(*this),
-	  m_write_ack(*this),
-	  m_write_req(*this),
-	  m_write_msg(*this),
-	  m_write_io(*this),
-	  m_write_cd(*this),
-	  m_write_sel(*this),
-	  m_write_bsy(*this)
+		m_write_rst(*this),
+		m_write_atn(*this),
+		m_write_ack(*this),
+		m_write_req(*this),
+		m_write_msg(*this),
+		m_write_io(*this),
+		m_write_cd(*this),
+		m_write_sel(*this),
+		m_write_bsy(*this)
 {
 }
 

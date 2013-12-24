@@ -690,7 +690,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_ADD("floppycpu",N8X300,XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_flop_mem)
 	MCFG_CPU_IO_MAP(wicat_flop_io)
-//	MCFG_FD1795_ADD("fdc")
+//  MCFG_FD1795_ADD("fdc")
 
 MACHINE_CONFIG_END
 

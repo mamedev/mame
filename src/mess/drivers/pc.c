@@ -1075,7 +1075,7 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	MCFG_CPU_PROGRAM_MAP(tandy1000_map) \
 	MCFG_CPU_IO_MAP(tandy1000_io)  \
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pc_frame_interrupt, "pcvideo_t1000:screen", 0, 1) //with this line commented out, it boots further though keyboard doesn't work, obviously
-	
+
 	MCFG_MACHINE_START_OVERRIDE(tandy_pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
@@ -1144,8 +1144,8 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	MCFG_CPU_PROGRAM_MAP(tandy1000_16_map) \
 	MCFG_CPU_IO_MAP(tandy1000_16_io)  \
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pc_frame_interrupt, "pcvideo_t1000:screen", 0, 1)
-	
-	
+
+
 	MCFG_MACHINE_START_OVERRIDE(tandy_pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(tandy_pc_state,tandy1000rl)
 
@@ -1215,8 +1215,8 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	MCFG_CPU_PROGRAM_MAP(tandy1000_286_map) \
 	MCFG_CPU_IO_MAP(tandy1000_286_io)  \
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pc_frame_interrupt, "pcvideo_t1000:screen", 0, 1)
-	
-	
+
+
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
@@ -1302,7 +1302,7 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map) \
 	MCFG_CPU_IO_MAP(ibmpcjr_io)  \
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pcjr_frame_interrupt, "pcvideo_pcjr:screen", 0, 1) //with this line commented out, it boots further though keyboard doesn't work, obviously
-	
+
 	MCFG_MACHINE_START_OVERRIDE(pc_state,pcjr)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pcjr)
 

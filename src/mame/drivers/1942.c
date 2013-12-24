@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(_1942_state::c1942p_f600_w)
 {
-//	printf("c1942p_f600_w %02x\n", data);
+//  printf("c1942p_f600_w %02x\n", data);
 }
 
 WRITE8_MEMBER(_1942_state::c1942p_palette_w)
@@ -124,7 +124,7 @@ WRITE8_MEMBER(_1942_state::c1942p_palette_w)
 static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	
+
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(c1942_fgvideoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(c1942_bgvideoram_w) AM_SHARE("bg_videoram")
 
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( c1942p_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0xf701, 0xf701) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf702, 0xf702) AM_READ_PORT("DSWB")
 	AM_RANGE(0xf703, 0xf703) AM_READ_PORT("P1")
-	AM_RANGE(0xf704, 0xf704) AM_READ_PORT("P2")  
+	AM_RANGE(0xf704, 0xf704) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1942_state )

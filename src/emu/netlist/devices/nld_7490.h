@@ -58,26 +58,26 @@
 #include "../nl_base.h"
 
 #define TTL_7490(_name, _CLK, _R1, _R2, _R91, _R92)                                 \
-        NET_REGISTER_DEV(7490, _name)                                               \
-        NET_CONNECT(_name, CLK, _CLK)                                               \
-        NET_CONNECT(_name, R1,  _R1)                                                \
-        NET_CONNECT(_name, R2,  _R2)                                                \
-        NET_CONNECT(_name, R91, _R91)                                               \
-        NET_CONNECT(_name, R92, _R92)
+		NET_REGISTER_DEV(7490, _name)                                               \
+		NET_CONNECT(_name, CLK, _CLK)                                               \
+		NET_CONNECT(_name, R1,  _R1)                                                \
+		NET_CONNECT(_name, R2,  _R2)                                                \
+		NET_CONNECT(_name, R91, _R91)                                               \
+		NET_CONNECT(_name, R92, _R92)
 
 
 NETLIB_DEVICE(7490,
-    ATTR_HOT void update_outputs();
+	ATTR_HOT void update_outputs();
 
-    netlist_ttl_input_t m_R1;
-    netlist_ttl_input_t m_R2;
-    netlist_ttl_input_t m_R91;
-    netlist_ttl_input_t m_R92;
-    netlist_ttl_input_t m_clk;
+	netlist_ttl_input_t m_R1;
+	netlist_ttl_input_t m_R2;
+	netlist_ttl_input_t m_R91;
+	netlist_ttl_input_t m_R92;
+	netlist_ttl_input_t m_clk;
 
-    UINT8 m_cnt;
+	UINT8 m_cnt;
 
-    netlist_ttl_output_t m_Q[4];
+	netlist_ttl_output_t m_Q[4];
 );
 
 #endif /* NLD_7490_H_ */

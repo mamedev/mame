@@ -163,11 +163,11 @@ const device_type Z8611 = &device_creator<z8611_device>;
 ***************************************************************************/
 
 static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, z8_device )
-    AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8, z8_device )
-    AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -846,4 +846,3 @@ void z8_device::execute_set_input(int inputnum, int state)
 
 	}
 }
-

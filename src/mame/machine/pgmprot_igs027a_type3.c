@@ -54,13 +54,13 @@ WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_ram_sel_w )
 READ32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_r )
 {
 	UINT32 retdata = m_svg_shareram[m_svg_ram_sel & 1][offset];
-//	printf("(%08x) ARM7: shared read (bank %02x) offset - %08x retdata - %08x mask - %08x\n", space.device().safe_pc(), m_svg_ram_sel, offset*4, retdata, mem_mask );
+//  printf("(%08x) ARM7: shared read (bank %02x) offset - %08x retdata - %08x mask - %08x\n", space.device().safe_pc(), m_svg_ram_sel, offset*4, retdata, mem_mask );
 	return retdata;
 }
 
 WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_w )
 {
-//	printf("(%08x) ARM7: shared write (bank %02x) offset - %08x retdata - %08x mask - %08x\n", space.device().safe_pc(), m_svg_ram_sel, offset*4, data, mem_mask );
+//  printf("(%08x) ARM7: shared write (bank %02x) offset - %08x retdata - %08x mask - %08x\n", space.device().safe_pc(), m_svg_ram_sel, offset*4, data, mem_mask );
 	COMBINE_DATA(&m_svg_shareram[m_svg_ram_sel & 1][offset]);
 }
 
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32, pgm_arm_type3_state )
 	AM_RANGE(0x40000018, 0x4000001b) AM_WRITE(svg_arm7_ram_sel_w) /* RAM SEL */
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
 
-//	AM_RANGE(0xc0000000, 0xffffffff) AM_RAM
+//  AM_RANGE(0xc0000000, 0xffffffff) AM_RAM
 
 ADDRESS_MAP_END
 
@@ -169,7 +169,7 @@ MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 		int regionhack = ioport("RegionHack")->read();
 		if (regionhack != 0xff)
 		{
-//			printf("%04x\n", temp16[(base) / 2]);
+//          printf("%04x\n", temp16[(base) / 2]);
 			temp16[(base) / 2] = regionhack; base += 2;
 		}
 	}
@@ -260,7 +260,7 @@ READ32_MEMBER(pgm_arm_type3_state::svg_speedup_r )
 {
 	int pc = space.device().safe_pc();
 	if (pc == 0x9e0) space.device().execute().eat_cycles(500);
-//	else printf("killbldp_speedup_r %08x\n", pc);
+//  else printf("killbldp_speedup_r %08x\n", pc);
 	return m_armrom[0x9e0/4];
 }
 
@@ -376,7 +376,7 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xE080; base += 2;
 	temp16[(base) /2] = 0x6000; base += 2;
 	temp16[(base) /2] = 0xE587; base += 2;
-	
+
 	// set the SR13 to something sensible
 	temp16[(base) /2] = 0x00D3; base += 2;
 	temp16[(base) /2] = 0xE3A0; base += 2;
@@ -410,12 +410,12 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 		base = 0x154;
 
 		// this actually makes matters worse here
-//		temp16[(base) / 2] = 0x1010; base += 2;
-//		temp16[(base) / 2] = 0xe59f; base += 2;
-//		temp16[(base) / 2] = 0x0001; base += 2;
-//		temp16[(base) / 2] = 0xe3a0; base += 2;
-//		temp16[(base) / 2] = 0x0000; base += 2;
-//		temp16[(base) / 2] = 0xe581; base += 2;
+//      temp16[(base) / 2] = 0x1010; base += 2;
+//      temp16[(base) / 2] = 0xe59f; base += 2;
+//      temp16[(base) / 2] = 0x0001; base += 2;
+//      temp16[(base) / 2] = 0xe3a0; base += 2;
+//      temp16[(base) / 2] = 0x0000; base += 2;
+//      temp16[(base) / 2] = 0xe581; base += 2;
 
 		temp16[(base) / 2] = 0xf000; base += 2;
 		temp16[(base) / 2] = 0xe59f; base += 2;
@@ -424,12 +424,12 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 		temp16[(base) / 2] = 0x0028; base += 2;
 		temp16[(base) / 2] = 0x0800; base += 2;
 
-//		temp16[(base) / 2] = 0x003c; base += 2;
-//		temp16[(base) / 2] = 0x1000; base += 2;
+//      temp16[(base) / 2] = 0x003c; base += 2;
+//      temp16[(base) / 2] = 0x1000; base += 2;
 
 	}
 
-	
+
 	base = 0;
 	temp16[(base) /2] = 0x000a; base += 2;
 	temp16[(base) /2] = 0xEA00; base += 2;
@@ -459,7 +459,7 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xFF1E; base += 2;
 	temp16[(base) /2] = 0xE12F; base += 2;
 
-//	base = 0xfc; // already at 0xfc
+//  base = 0xfc; // already at 0xfc
 	temp16[(base) /2] = 0xE004; base += 2; // based on killbldp
 	temp16[(base) /2] = 0xE52D; base += 2;
 	temp16[(base) /2] = 0x0013; base += 2;
@@ -471,11 +471,11 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xFF1E; base += 2;
 	temp16[(base) /2] = 0xE12F; base += 2;
 
-//	base = 0x110; // already at 0x110
-//	temp16[(base) /2] = 0xff1e; base += 2;
-//	temp16[(base) /2] = 0xe12f; base += 2;
-//	temp16[(base) /2] = 0xf302; base += 2;
-//	temp16[(base) /2] = 0xe3a0; base += 2;
+//  base = 0x110; // already at 0x110
+//  temp16[(base) /2] = 0xff1e; base += 2;
+//  temp16[(base) /2] = 0xe12f; base += 2;
+//  temp16[(base) /2] = 0xf302; base += 2;
+//  temp16[(base) /2] = 0xe3a0; base += 2;
 	// set up stack again, soft-reset reset with a ram variable set to 0
 	temp16[(base) /2] = 0x00D1; base += 2;
 	temp16[(base) /2] = 0xE3A0; base += 2;
@@ -499,7 +499,7 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xE3A0; base += 2;
 
 
-	 
+
 
 	base = 0x150;
 	temp16[(base) /2] = 0xff1e; base += 2;
@@ -517,10 +517,10 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	svg_basic_init();
 	pgm_theglad_decrypt(machine());
 	svg_latch_init();
-//	pgm_create_dummy_internal_arm_region(0x188);
+//  pgm_create_dummy_internal_arm_region(0x188);
 
 	pgm_create_dummy_internal_arm_region_theglad(0);
-	
+
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
 }
@@ -606,11 +606,11 @@ void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base
 
 	for (int i = 0; i < 131; i++)
 	{
-//		UINT32 addr = extprot[(base/2)] | (extprot[(base/2) + 1] << 16);
+//      UINT32 addr = extprot[(base/2)] | (extprot[(base/2) + 1] << 16);
 		extprot[(base / 2)] = subroutine_addresses[i];
 
 		base += 4;
-//		printf("%04x (%08x)\n", subroutine_addresses[i], addr );
+//      printf("%04x (%08x)\n", subroutine_addresses[i], addr );
 	}
 }
 
@@ -619,7 +619,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state, theglada)
 	DRIVER_INIT_CALL(theglad);
 
 	pgm_patch_external_arm_rom_jumptable_theglada(0x82078);
-	
+
 }
 
 INPUT_PORTS_START( theglad )
@@ -692,18 +692,18 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::killbldp_speedup_r),this));
 
-//	UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
-//	int base = 0xfc; // startup table uploads
-//	temp16[(base) /2] = 0x0000; base += 2;	
-//	temp16[(base) /2] = 0xE1A0; base += 2;	
-	
-//	base = 0xd4; // startup table uploads
-//	temp16[(base) /2] = 0x0000; base += 2;	
-//	temp16[(base) /2] = 0xE1A0; base += 2;	
+//  UINT16 *temp16 = (UINT16 *)memregion("prot")->base();
+//  int base = 0xfc; // startup table uploads
+//  temp16[(base) /2] = 0x0000; base += 2;
+//  temp16[(base) /2] = 0xE1A0; base += 2;
+
+//  base = 0xd4; // startup table uploads
+//  temp16[(base) /2] = 0x0000; base += 2;
+//  temp16[(base) /2] = 0xE1A0; base += 2;
 //
-//	base = 0x120; // reset game state, uncomment this to break boot sequence how theglad was broken...
-//	temp16[(base) /2] = 0x0000; base += 2;	
-//	temp16[(base) /2] = 0xE1A0; base += 2;	
+//  base = 0x120; // reset game state, uncomment this to break boot sequence how theglad was broken...
+//  temp16[(base) /2] = 0x0000; base += 2;
+//  temp16[(base) /2] = 0xE1A0; base += 2;
 
 }
 
@@ -757,7 +757,7 @@ void pgm_arm_type3_state::pgm_descramble_happy6(UINT8* src)
 {
 	UINT8* buffer = auto_alloc_array(machine(), UINT8, 0x800000);
 	int writeaddress = 0;
-	
+
 	for (int j = 0; j < 0x800; j += 0x200)
 	{
 		for (int i = j; i < 0x800000; i += 0x800)
@@ -807,7 +807,7 @@ INPUT_PORTS_END
 DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
 {
 	UINT8 *src;
-	
+
 	src = (UINT8 *)(machine().root_device().memregion("tiles")->base()) + 0x180000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);

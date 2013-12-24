@@ -5534,7 +5534,7 @@ The CG2298 graphics can support the following XnnnnnnP Data game types:
 
   Super Aces shows as just Bonus Poker
   Triple Bonus Poker Plus shows as just Triple Bonus
- 
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00017.u67",   0x00000, 0x10000, CRC(129e6eaa) SHA1(1dd2b83a672a618f338b553a6cbd598b6d4ce672) )

@@ -2151,7 +2151,7 @@ const rom_entry *isa8_ec1841_0002_device::device_rom_region() const
 WRITE8_MEMBER( isa8_ec1841_0002_device::char_ram_write )
 {
 	offset ^= BIT(offset, 12);
-//	logerror("write char ram %04x %02x\n",offset,data);
+//  logerror("write char ram %04x %02x\n",offset,data);
 	m_chr_gen_base[offset + 0x0000] = data;
 	m_chr_gen_base[offset + 0x0800] = data;
 	m_chr_gen_base[offset + 0x1000] = data;

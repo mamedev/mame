@@ -40,15 +40,15 @@
 #include "nld_signal.h"
 
 #define TTL_7430_NAND(_name, _I1, _I2, _I3, _I4, _I5, _I6, _I7, _I8)                \
-        NET_REGISTER_DEV(7430, _name)                                               \
-        NET_CONNECT(_name, A, _I1)                                                  \
-        NET_CONNECT(_name, B, _I2)                                                  \
-        NET_CONNECT(_name, C, _I3)                                                  \
-        NET_CONNECT(_name, D, _I4)                                                  \
-        NET_CONNECT(_name, E, _I5)                                                  \
-        NET_CONNECT(_name, F, _I6)                                                  \
-        NET_CONNECT(_name, G, _I7)                                                  \
-        NET_CONNECT(_name, H, _I8)
+		NET_REGISTER_DEV(7430, _name)                                               \
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)                                                  \
+		NET_CONNECT(_name, C, _I3)                                                  \
+		NET_CONNECT(_name, D, _I4)                                                  \
+		NET_CONNECT(_name, E, _I5)                                                  \
+		NET_CONNECT(_name, F, _I6)                                                  \
+		NET_CONNECT(_name, G, _I7)                                                  \
+		NET_CONNECT(_name, H, _I8)
 
 
 NETLIB_SIGNAL(7430, 8, 0, 0);

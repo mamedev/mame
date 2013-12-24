@@ -393,7 +393,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
-	
+
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
 	virtual void machine_start();

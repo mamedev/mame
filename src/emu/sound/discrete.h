@@ -4531,7 +4531,7 @@ discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, co
 template <class C>
 discrete_base_node *discrete_create_node(discrete_device * pdev, const discrete_block *block)
 {
-    return discrete_node_factory< C >().Create(pdev, block);
+	return discrete_node_factory< C >().Create(pdev, block);
 }
 
 #define DISCRETE_SOUND_EXTERN(name) extern const discrete_block name##_discrete_interface[]

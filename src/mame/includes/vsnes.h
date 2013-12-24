@@ -10,8 +10,8 @@ public:
 		m_subcpu(*this, "sub"),
 		m_nesapu1(*this, "nesapu1"),
 		m_nesapu2(*this, "nesapu2"),
-		m_ppu1(*this, "ppu1"),		
-		m_ppu2(*this, "ppu2"),		
+		m_ppu1(*this, "ppu1"),
+		m_ppu2(*this, "ppu2"),
 		m_work_ram(*this, "work_ram"),
 		m_work_ram_1(*this, "work_ram_1")
 		{ }

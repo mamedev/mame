@@ -1599,7 +1599,7 @@ static MACHINE_CONFIG_DERIVED( steeltal, multisync_msp )
 	MCFG_DEVICE_REMOVE("rspeaker")
 
 	MCFG_ASIC65_ADD("asic65", ASIC65_STEELTAL)         /* ASIC65 on DSPCOM board */
-	
+
 	/* sund hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -4390,7 +4390,7 @@ void harddriv_state::init_dsk2()
 /* COMMON INIT: initialize the DSPCOM add-on board */
 void harddriv_state::init_dspcom()
 {
-	 /* install ASIC65 */
+		/* install ASIC65 */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x900000, 0x900003, write16_delegate(FUNC(asic65_device::data_w), (asic65_device*)m_asic65));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x900000, 0x900003, read16_delegate(FUNC(asic65_device::read), (asic65_device*)m_asic65));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x901000, 0x910001, read16_delegate(FUNC(asic65_device::io_r), (asic65_device*)m_asic65));

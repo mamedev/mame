@@ -128,7 +128,7 @@ bool mpeg_audio::read_header_amm(bool layer25)
 	int stereo_mode_ext = gb(2);
 	param_index = gb(3);
 	gb(1); // must be zero
-	
+
 	channel_count = stereo_mode != 3 ? 2 : 1;
 
 	total_bands = total_band_counts[param_index];
@@ -137,7 +137,7 @@ bool mpeg_audio::read_header_amm(bool layer25)
 		joint_bands = joint_band_counts[stereo_mode_ext];
 	if(joint_bands > total_bands )
 		joint_bands = total_bands;
-	
+
 	return true;
 }
 

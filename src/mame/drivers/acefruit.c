@@ -44,14 +44,14 @@ public:
 	UINT32 screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(acefruit_vblank);
 	void acefruit_update_irq(int vpos);
-	
+
 	enum
 	{
 		TIMER_ACEFRUIT_REFRESH
 	};
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);	
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -83,7 +83,7 @@ void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch(id)
 	{
 	case TIMER_ACEFRUIT_REFRESH:
-			
+
 			m_screen->update_partial(vpos );
 			acefruit_update_irq(vpos);
 

@@ -292,11 +292,11 @@ public:
 	required_device<duartn68681_device> m_duart;
 	optional_device<asic65_device> m_asic65;
 	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
-	
+
 	/*----------- defined in audio/harddriv.c -----------*/
 
 	void hdsnd_init();
-	
+
 	/*----------- defined in machine/harddriv.c -----------*/
 
 	/* Driver/Multisync board */
@@ -329,7 +329,7 @@ public:
 	DECLARE_WRITE16_MEMBER( hdgsp_io_w );
 
 	DECLARE_WRITE16_MEMBER( hdgsp_protection_w );
-	
+
 	/* ADSP board */
 	DECLARE_READ16_MEMBER( hd68k_adsp_program_r );
 	DECLARE_WRITE16_MEMBER( hd68k_adsp_program_w );
@@ -346,11 +346,11 @@ public:
 
 	DECLARE_READ16_MEMBER( hdadsp_special_r );
 	DECLARE_WRITE16_MEMBER( hdadsp_special_w );
-	
+
 	/* DS III/IV board */
 	void update_ds3_irq();
 	void update_ds3_sirq();
-	
+
 	DECLARE_WRITE16_MEMBER( hd68k_ds3_control_w );
 	DECLARE_READ16_MEMBER( hd68k_ds3_girq_state_r );
 
@@ -377,7 +377,7 @@ public:
 	DECLARE_WRITE16_MEMBER( hdds3_sdsp_control_w );
 	DECLARE_READ16_MEMBER( hdds3_xdsp_control_r );
 	DECLARE_WRITE16_MEMBER( hdds3_xdsp_control_w );
-	
+
 	/* DSK board */
 	DECLARE_WRITE16_MEMBER( hd68k_dsk_control_w );
 	DECLARE_READ16_MEMBER( hd68k_dsk_ram_r );
@@ -418,7 +418,7 @@ public:
 	/* ADSP optimizations */
 	DECLARE_READ16_MEMBER( hdadsp_speedup_r );
 	DECLARE_READ16_MEMBER( hdds3_speedup_r );
-	
+
 	/*----------- defined in video/harddriv.c -----------*/
 	DECLARE_READ16_MEMBER( hdgsp_control_lo_r );
 	DECLARE_WRITE16_MEMBER( hdgsp_control_lo_w );

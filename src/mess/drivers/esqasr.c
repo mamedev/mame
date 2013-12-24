@@ -8,31 +8,31 @@
         CPU: 68302 MCU
         Sound: ES5506
         Effects: ES5510
-    	FDC: NEC uPD72069
-    	DUART: 2681
- 
+        FDC: NEC uPD72069
+        DUART: 2681
+
     Memory map:
     0x000000-0x03ffff   OS ROM
     0xfb0000-0xfcffff   OS RAM
- 
- 
+
+
     ASR-X hardware:
-	    CPU: 68340 MCU
+        CPU: 68340 MCU
         Sound: ES5506
         Effects: ES5511
-    	FDC: NEC uPD72069
- 
-   	http://www.gweep.net/~shifty/music/asrxhack/
- 
+        FDC: NEC uPD72069
+
+    http://www.gweep.net/~shifty/music/asrxhack/
+
     Memory map:
     0x00000000-0x000fffff   OS ROM
     0x00800000-0x008000ff   ESP2 5511?
     0x00f00000-0x00f007ff   Unknown
     0x08000000-0x08200000   RAM
     0x0be00000-0x0befffff   RAM (size unknown)
- 
+
     These may want to be separated when they run more.
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -99,7 +99,7 @@ static const es5506_interface es5506_config =
 };
 
 static MACHINE_CONFIG_START( asr, esqasr_state )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)	// actually MC68302
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // actually MC68302
 	MCFG_CPU_PROGRAM_MAP(asr_map)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
@@ -115,7 +115,7 @@ static MACHINE_CONFIG_START( asr, esqasr_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( asrx, esqasr_state )
-	MCFG_CPU_ADD("maincpu", M68020, XTAL_16MHz)	// unknown, possibly 68340?
+	MCFG_CPU_ADD("maincpu", M68020, XTAL_16MHz) // unknown, possibly 68340?
 	MCFG_CPU_PROGRAM_MAP(asrx_map)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
@@ -135,8 +135,8 @@ INPUT_PORTS_END
 
 ROM_START( asr10 )
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "asr-648c-lo-1.5b.bin", 0x000001, 0x020000, CRC(8e437843) SHA1(418f042acbc5323f5b59cbbd71fdc8b2d851f7d0) ) 
-	ROM_LOAD16_BYTE( "asr-65e0-hi-1.5b.bin", 0x000000, 0x020000, CRC(b37cd3b6) SHA1(c4371848428a628b5e5a50e99be602d7abfc7904) ) 
+	ROM_LOAD16_BYTE( "asr-648c-lo-1.5b.bin", 0x000001, 0x020000, CRC(8e437843) SHA1(418f042acbc5323f5b59cbbd71fdc8b2d851f7d0) )
+	ROM_LOAD16_BYTE( "asr-65e0-hi-1.5b.bin", 0x000000, 0x020000, CRC(b37cd3b6) SHA1(c4371848428a628b5e5a50e99be602d7abfc7904) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
@@ -146,8 +146,8 @@ ROM_END
 
 ROM_START( asrx )
 	ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "asr267lo.bin", 0x000001, 0x080000, CRC(7408d441) SHA1(0113f84b6d224bf1423ad62c173f32a0c95ca715) ) 
-	ROM_LOAD16_BYTE( "asr267hi.bin", 0x000000, 0x080000, CRC(7df14ea7) SHA1(895b99013c0f924edb52612eb93c3e6babb9f053) ) 
+	ROM_LOAD16_BYTE( "asr267lo.bin", 0x000001, 0x080000, CRC(7408d441) SHA1(0113f84b6d224bf1423ad62c173f32a0c95ca715) )
+	ROM_LOAD16_BYTE( "asr267hi.bin", 0x000000, 0x080000, CRC(7df14ea7) SHA1(895b99013c0f924edb52612eb93c3e6babb9f053) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)

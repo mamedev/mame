@@ -1227,7 +1227,7 @@ WRITE_LINE_MEMBER( z80dart_channel::rxc_w )
 		m_rx_clock++;
 		if (m_rx_clock == clocks)
 			m_rx_clock = 0;
-			
+
 	}
 }
 
@@ -1249,7 +1249,7 @@ WRITE_LINE_MEMBER( z80dart_channel::txc_w )
 		m_tx_clock++;
 		if (m_tx_clock == clocks)
 			m_tx_clock = 0;
-			
+
 	}
 }
 
@@ -1339,4 +1339,3 @@ WRITE_LINE_MEMBER(z80dart_channel::write_rx)
 		input_callback(m_input_state & ~RX);
 	}
 }
-

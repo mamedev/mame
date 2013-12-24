@@ -15,7 +15,7 @@
 
     TODO:
 
-	- floppy Err on A: Select
+    - floppy Err on A: Select
     - NE555 timeout is 10x too high
     - grip31 does not work
     - UNIO card (Z80-STI, Z80-SIO, 2x centronics)

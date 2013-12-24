@@ -35,10 +35,10 @@
 #include "nld_signal.h"
 
 #define TTL_7427_NOR(_name, _I1, _I2, _I3)                                          \
-        NET_REGISTER_DEV(7427, _name)                                               \
-        NET_CONNECT(_name, A, _I1)                                                  \
-        NET_CONNECT(_name, B, _I2)                                                  \
-        NET_CONNECT(_name, C, _I3)
+		NET_REGISTER_DEV(7427, _name)                                               \
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)                                                  \
+		NET_CONNECT(_name, C, _I3)
 
 NETLIB_SIGNAL(7427, 3, 1, 0);
 

@@ -381,7 +381,7 @@ void es5505_device::device_start()
 	/* initialize the regions */
 	m_region_base[0] = m_es5505_region0 ? (UINT16 *)machine().root_device().memregion(m_es5505_region0)->base() : NULL;
 	m_region_base[1] = m_es5505_region1 ? (UINT16 *)machine().root_device().memregion(m_es5505_region1)->base() : NULL;
-	
+
 	/* initialize the rest of the structure */
 	m_master_clock = clock();
 	m_irq_callback_func.resolve(m_es5505_irq_callback, *this);
@@ -2208,7 +2208,6 @@ READ16_MEMBER( es5505_device::read )
 
 void es5505_device::voice_bank_w(int voice, int bank)
 {
-	
 #if RAINE_CHECK
 	m_voice[voice].control = CONTROL_STOPMASK;
 #endif
@@ -2226,7 +2225,6 @@ void es550x_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-		
 #if MAKE_WAVS
 	/* start the logging once we have a sample rate */
 	if (m_sample_rate)
@@ -2273,7 +2271,6 @@ void es5506_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 
 void es5505_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-		
 #if MAKE_WAVS
 	/* start the logging once we have a sample rate */
 	if (m_sample_rate)

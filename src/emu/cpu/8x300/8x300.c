@@ -1,10 +1,10 @@
 /*
  * 8x300.c
  *
- *	Implementation of the Scientific Micro Systems SMS300 / Signetics 8X300 CPU
+ *  Implementation of the Scientific Micro Systems SMS300 / Signetics 8X300 CPU
  *  Created on: 18/12/2013
  *
- *	Written by Barry Rodewald
+ *  Written by Barry Rodewald
  */
 
 #include "debugger.h"
@@ -56,7 +56,7 @@ void n8x300_cpu_device::set_reg(UINT8 reg, UINT8 val)
 	case 0x05: m_R5 = val; break;
 	case 0x06: m_R6 = val; break;
 	case 0x07: m_IVL = val; break;
-//	OVF is read-only
+//  OVF is read-only
 	case 0x09: m_R11 = val; break;
 	case 0x0f: m_IVR = val; break;
 	default: logerror("8X300: Invalid register %02x written to.\n",reg); break;
@@ -74,10 +74,10 @@ UINT8 n8x300_cpu_device::get_reg(UINT8 reg)
 	case 0x04: return m_R4;
 	case 0x05: return m_R5;
 	case 0x06: return m_R6;
-//	IVL is write-only
+//  IVL is write-only
 	case 0x08: return m_OVF;
 	case 0x09: return m_R11;
-//	IVR is write-only
+//  IVR is write-only
 	default: logerror("8X300: Invalid register %02x read.\n",reg); return 0;
 	}
 	return 0;
@@ -142,9 +142,9 @@ void n8x300_cpu_device::state_string_export(const device_state_entry &entry, ast
 {
 	switch (entry.index())
 	{
-//		case STATE_GENFLAGS:
-//			string.printf("%c%c%c%c%c%c",
-//			break;
+//      case STATE_GENFLAGS:
+//          string.printf("%c%c%c%c%c%c",
+//          break;
 	}
 }
 
@@ -550,4 +550,3 @@ offs_t n8x300_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 	extern CPU_DISASSEMBLE( n8x300 );
 	return CPU_DISASSEMBLE_NAME(n8x300)(this, buffer, pc, oprom, opram, options);
 }
-

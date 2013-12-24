@@ -177,7 +177,7 @@ void a2bus_sn76489_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
 		case 3:
 			if (m_has4thsn)
 			{
-				m_sn4->write(space, 0, data); 
+				m_sn4->write(space, 0, data);
 				m_latch3 = data;
 			}
 			break;

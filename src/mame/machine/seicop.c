@@ -1649,7 +1649,7 @@ seibu_cop_legacy_device::seibu_cop_legacy_device(const machine_config &mconfig, 
 	memset(m_cop_dma_size, 0, sizeof(UINT16)*0x200);
 	memset(m_cop_dma_dst, 0, sizeof(UINT16)*0x200);
 	memset(m_seibu_vregs, 0, sizeof(UINT16)*0x50/2);
-	
+
 	for (int i = 0; i < 8; i++)
 	{
 		m_cop_register[i] = 0;
@@ -1673,7 +1673,7 @@ void seibu_cop_legacy_device::device_config_complete()
 void seibu_cop_legacy_device::device_start()
 {
 	m_cop_mcu_ram = reinterpret_cast<UINT16 *>(machine().root_device().memshare("cop_mcu_ram")->ptr());
-	
+
 	save_item(NAME(m_cop_438));
 	save_item(NAME(m_cop_43a));
 	save_item(NAME(m_cop_43c));
@@ -2238,7 +2238,7 @@ READ16_MEMBER( seibu_cop_legacy_device::generic_cop_r )
 WRITE16_MEMBER( seibu_cop_legacy_device::generic_cop_w )
 {
 	UINT32 temp32;
-	
+
 	switch (offset)
 	{
 		default:

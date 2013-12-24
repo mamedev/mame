@@ -307,7 +307,7 @@ explorer        // bootleg
 strfbomb        // bootleg
 scrambp         // bootleg (Billport S.A.)
 scrampt         // bootleg (Petaco S.A.)
-scramrf			// bootleg (Recreativos Franco)
+scramrf         // bootleg (Recreativos Franco)
 atlantis        // (c) 1981 Comsoft
 atlantis2       // (c) 1981 Comsoft
 theend          // (c) 1980 Konami
@@ -1629,7 +1629,7 @@ stargrds        // (c) 1987
 maxrpm          // (c) 1986
 spyhunt         // (c) 1983
 spyhuntp        // (c) 1983
-spyhuntpr		//
+spyhuntpr       //
 turbotag        // (c) 1985
 crater          // (c) 1984
 // MCR 68000
@@ -2113,11 +2113,11 @@ cadashu         // C21 (c) 1989 Taito America Corporation
 cadashi         // C21 (c) 1989 Taito Corporation Japan
 cadashf         // C21 (c) 1989 Taito Corporation Japan
 cadashg         // C21 (c) 1989 Taito Corporation Japan
-cadashp			// prototype
+cadashp         // prototype
 parentj         // C42 (c) 199? Taito
 galmedes        // (c) 1992 Visco (Japan)
 earthjkr        // (c) 1993 Visco (Japan)
-earthjkrp		//
+earthjkrp       //
 eto             // (c) 1994 Visco (Japan)
 wgp             // C32 (c) 1989 Taito America Corporation (US)
 wgpj            // C32 (c) 1989 Taito Corporation (Japan)
@@ -2219,7 +2219,7 @@ lagirl          // plgirls bootleg?
 
 // Taito H-System games
 syvalion        // B51 (c) 1988 Taito Corporation (Japan)
-syvalionp		//
+syvalionp       //
 recordbr        // B56 (c) 1988 Taito Corporation Japan (World)
 gogold          // B56 (c) 1988 Taito Corporation (Japan)
 dleague         // C02 (c) 1990 Taito America Corporation (US)
@@ -2309,14 +2309,14 @@ gunbustrj       // D27 (c) 1992 Taito Corporation (Japan)
 superchs        // D46 (c) 1992 Taito Corporation Japan (World)
 superchsu       // D46 (c) 1992 Taito America Corporation (US)
 superchsj       // D46 (c) 1992 Taito Corporation (Japan)
-superchsp		// prototype
+superchsp       // prototype
 groundfx        // D51 (c) 1992 Taito Coporation
 undrfire        // D67 (c) 1993 Taito Coporation Japan (World)
 undrfireu       // D67 (c) 1993 Taito America Corporation (US)
 undrfirej       // D67 (c) 1993 Taito Coporation (Japan)
 cbombers        // D83 (c) 1993 Taito Coporation Japan (World)
 cbombersj       // D83 (c) 1993 Taito Coporation (Japan)
-cbombersp		//
+cbombersp       //
 
 // Taito F2 games
 finalb          // 1989.?? B82 (c) 1988 Taito Corporation Japan (World)
@@ -2653,7 +2653,7 @@ batsugun        // TP-030 (c) 1993 Toaplan
 batsuguna       // TP-030 (c) 1993 Toaplan
 batsugunsp      // TP-??? (c) 1993 Toaplan
 snowbro2        // TP-??? (c) 1994 Hanafram
-pwrkick			// (c) 1994 Sunwise
+pwrkick         // (c) 1994 Sunwise
 sstriker        // (c) 1993 Raizing
 sstrikera       // (c) 1993 Raizing
 mahoudai        // (c) 1993 Raizing + Able license
@@ -2862,7 +2862,7 @@ higemaru        //  9/1984 (c) 1984
 1942abl         // bootleg
 1942b           // 12/1984 (c) 1984
 1942w           // 12/1984 (c) 1984 + Williams Electronics license (c) 1985
-1942p			// prototype
+1942p           // prototype
 exedexes        //  2/1985 (c) 1985
 savgbees        //  2/1985 (c) 1985 + Memetron license
 commando        //  5/1985 (c) 1985 (World)
@@ -5132,7 +5132,7 @@ f355bios        // 1999.07 F355 Challenge (BIOS)
 f355            // 1999.07 F355 Challenge
 f355twin        // 1999.07 F355 Challenge Twin
 shangril        // 1999.08 Dengen Tenshi Taisen Janshi Shangri-la
-tduno           // 1999.08 Touch de UNO! / Unou Nouryoku Check Machine 
+tduno           // 1999.08 Touch de UNO! / Unou Nouryoku Check Machine
 vs2_2k          // 1999.08 Virtua Striker 2 version 2000 (Rev C)
 suchie3         // 1999.09 Idol Janshi Su-Chi-Pi 3
 jambo           // 1999.09 Jambo! Safari (Rev A)
@@ -5612,7 +5612,7 @@ cbdash          // 44 1985.08 Boulder Dash
 begas           // (c) 1983
 begas1          // (c) 1983
 cobra           // (c) 1984
-cobraa			//
+cobraa          //
 rblaster        // (c) 1985
 
 // other Data East games
@@ -8938,7 +8938,7 @@ starfigh        // (c) 1990 SunA
 hardhea2        // (c) 1991 SunA
 brickzn         // (c) 1992 SunA
 brickznv4       // (c) 1992 SunA
-brickzn11		// (c) 1992 SunA
+brickzn11       // (c) 1992 SunA
 bestbest        // (c) 1994 SunA
 sunaq           // (c) 1994 SunA
 bssoccer        // (c) 1996 SunA
@@ -9271,7 +9271,7 @@ mmpanic         // "70" 1992 Nakanihon/Taito
 quizchq         // "73" (c) 1993 Nakanihon
 quizchql        // "73" (c) 1993 Laxan
 funkyfig        // "74" (c) 1993 Nakanihon + East Technology
-funkyfiga		//
+funkyfiga       //
 animaljr        // "75" 1993 Nakanihon/Taito (USA)
 animaljrs       // "75" 1993 Nakanihon/Taito (Spanish version)
 animaljrj       // "75" 1993 Nakanihon/Taito (Japan)
@@ -9527,7 +9527,7 @@ martmastc       //
 martmastc102        //
 theglad         // (c) 2003 The Gladiator
 theglad100      //
-theglad101		//
+theglad101      //
 thegladpcb      //
 dw2001          // (c) 2001 Dragon World 2001
 dwpc            // (c) 2001 Dragon World Pretty Chance
@@ -9744,7 +9744,7 @@ pzletime
 ar_bios
 ar_airh         // (c) 1988
 ar_airh2        // (c) 1988
-ar_blast		// (c) 1988
+ar_blast        // (c) 1988
 ar_bowl         // (c) 1988
 ar_dart         // (c) 1987
 ar_dart2        // (c) 1987
@@ -9755,7 +9755,7 @@ ar_ldrba        // (c) 1988 v2.4
 ar_ldrbb        // (c) 1988
 ar_ninj         // (c) 1987
 ar_ninj2        // (c) 1987
-ar_pm			// (c) 198?
+ar_pm           // (c) 198?
 ar_rdwr         // (c) 1988
 ar_sdwr         // (c) 1988
 ar_sdwr2        // (c) 1988
@@ -9763,7 +9763,7 @@ ar_socc         // (c) 1989
 ar_spot         // (c) 1990
 ar_sprg         // (c) 1987
 ar_xeon         // (c) 1988
-ar_dlta			// (c) 198?
+ar_dlta         // (c) 198?
 
 // Sente Super System
 mquake          // (c) 1987
@@ -9977,7 +9977,7 @@ nost            // (c) 1993 Face
 nostj           // (c) 1993 Face
 nostk           // (c) 1993 Face
 4enraya         // (c) 1990 IDSA
-4enrayaa		//
+4enrayaa        //
 unkpacg         // (c) 19?? ???
 oneshot         // no copyright notice
 maddonna        // (c) 1995 Tuning
@@ -10447,7 +10447,7 @@ tattack         // (c) 198? Shonan
 mosaicf2        // (c) 1999 F2 System
 finalgdr        // (c) 2001 Semicom
 mrkicker        // (c) 2001 Semicom
-wivernwg		// (c) 2001 Semicom
+wivernwg        // (c) 2001 Semicom
 wyvernwg        // (c) 2001 Semicom / Game Vision
 wyvernwga       // (c) 2001 Semicom / Game Vision
 rbmk            // (c) 1995 GMS

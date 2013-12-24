@@ -46,9 +46,9 @@ public:
 	int         m_sprite_colorbase;
 
 	/* sound */
-	UINT8		m_sound_ctrl;
-	UINT8		m_sound_status;
-	UINT8		m_sound_nmi_clk;
+	UINT8       m_sound_ctrl;
+	UINT8       m_sound_status;
+	UINT8       m_sound_nmi_clk;
 
 	DECLARE_READ16_MEMBER(rng_sysregs_r);
 	DECLARE_WRITE16_MEMBER(rng_sysregs_w);

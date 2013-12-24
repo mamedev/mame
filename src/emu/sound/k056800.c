@@ -59,7 +59,7 @@ READ8_MEMBER( k056800_device::host_r )
 {
 	UINT32 r = offset & 7;
 	UINT8 data = 0;
-	
+
 	switch (r)
 	{
 		case 0:
@@ -102,7 +102,7 @@ WRITE8_MEMBER( k056800_device::host_w )
 			// .... ...x - Mute front
 			// .... ..x. - Mute rear
 			break;
-			
+
 		case 7:
 			// Sound interrupt
 			m_int_pending = true;
@@ -119,7 +119,7 @@ READ8_MEMBER( k056800_device::sound_r )
 {
 	UINT32 r = offset & 7;
 	UINT8 data = 0;
-	
+
 	switch (r)
 	{
 		case 0:
@@ -144,7 +144,7 @@ WRITE8_MEMBER( k056800_device::sound_w )
 		case 1:
 			m_snd_to_host_regs[r] = data;
 			break;
-			
+
 		case 2:
 		case 3:
 			// TODO: Unknown
@@ -167,7 +167,7 @@ WRITE8_MEMBER( k056800_device::sound_w )
 				m_int_handler(CLEAR_LINE);
 			}
 			break;
-			
+
 		case 5:
 			// TODO: Unknown
 			break;

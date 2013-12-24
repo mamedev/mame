@@ -63,7 +63,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
 	// d0-d5: engine sound
 	// d6: bell sound
 	// d7: backdrop lamp dim control
-	
+
 	output_set_lamp_value(80, data >> 7 & 1);
 }
 
@@ -71,16 +71,16 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 {
 	// d0-3, d7: selected rows
 	int rows = (data & 0xf) | (data >> 3 & 0x10);
-	
+
 	// d4-d6: column
 	int col = data >> 4 & 7;
-	
+
 	// refresh lamp status
 	for (int i = 0; i < 5; i++)
 		output_set_lamp_value(col * 10 + i, rows >> i & 1);
 
 	/* lamps info:
-	
+
 	00: upper right load zone
 	01: lower right load zone
 	02: lost cargo
@@ -128,9 +128,9 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 	72: extended play
 	73: credit
 	74: game over
-	
+
 	(80: backdrop dim)
-	
+
 	*/
 }
 

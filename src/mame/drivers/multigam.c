@@ -119,11 +119,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_nesapu(*this, "nesapu"),
 		m_ppu(*this, "ppu") { }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<nesapu_device> m_nesapu;
 	required_device<ppu2c0x_device> m_ppu;
-	
+
 	UINT8* m_nt_ram;
 	UINT8* m_vram;
 	UINT8* m_nt_page[4];
@@ -875,7 +875,7 @@ WRITE8_MEMBER(multigam_state::mmc1_rom_switch_w)
 void multigam_state::multigam_init_mmc1(UINT8 *prg_base, int prg_size, int chr_bank_base)
 {
 	UINT8* dst = memregion("maincpu")->base();
-	
+
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x8000), 0x8000);
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(multigam_state::mmc1_rom_switch_w),this));

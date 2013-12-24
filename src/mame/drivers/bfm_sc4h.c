@@ -702,7 +702,7 @@ void m68307_duart_irq_handler(device_t *device, int state, UINT8 vector)
 void m68307_duart_tx(device_t *device, int channel, UINT8 data)
 {
 	if (channel==0)
- 	{
+	{
 		logerror("m68307_duart_tx %02x\n",data);
 	}
 	else

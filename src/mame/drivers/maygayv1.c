@@ -227,7 +227,7 @@ public:
 	required_device<i8052_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<duartn68681_device> m_duart68681;
-	
+
 	int m_vsync_latch_preset;
 	UINT8 m_p1;
 	UINT8 m_p3;

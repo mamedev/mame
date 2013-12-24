@@ -142,7 +142,7 @@ READ8_MEMBER( mkit09_state::pa_r )
 		sprintf(kbdrow,"X%d",m_keydata);
 		return ioport(kbdrow)->read();
 	}
-		
+
 	return 0xff;
 }
 

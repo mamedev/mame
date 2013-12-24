@@ -28,7 +28,7 @@
 		} \
 	} while (0)
 
-#define KM1809VG7_TAG	"d17"
+#define KM1809VG7_TAG   "d17"
 
 
 //**************************************************************************
@@ -109,7 +109,7 @@ READ8_MEMBER(p1_hdc_device::p1_HDC_r)
 	UINT8 data = 0x00;
 
 	switch (offset >> 8) {
-		case 8:		data = m_hdc->read(space, offset & 255);
+		case 8:     data = m_hdc->read(space, offset & 255);
 	}
 	DBG_LOG(1,"hdc",("R $%04x == $%02x\n", offset, data));
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 {
 	DBG_LOG(1,"hdc",("W $%04x <- $%02x\n", offset, data));
 	switch (offset >> 8) {
-		case 8:		m_hdc->write(space, offset & 255, data, 0);
+		case 8:     m_hdc->write(space, offset & 255, data, 0);
 	}
 }
 
@@ -144,7 +144,7 @@ void p1_hdc_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_rom(this, 0xe2000, 0xe27ff, 0, 0, "XXX", "p1_hdc");
-	m_isa->install_memory(0xd0000, 0xd0fff, 0, 0, 
+	m_isa->install_memory(0xd0000, 0xd0fff, 0, 0,
 		READ8_DELEGATE(p1_hdc_device, p1_HDC_r),
 		WRITE8_DELEGATE(p1_hdc_device, p1_HDC_w) );
 }

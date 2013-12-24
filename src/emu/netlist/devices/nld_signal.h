@@ -93,7 +93,7 @@ public:
 		{
 			register_input(sIN[i], m_i[i]);
 		}
-        save(NAME(m_active));
+		save(NAME(m_active));
 	}
 
 	#if (USE_DEACTIVE_DEVICE)
@@ -167,7 +167,7 @@ public:
 		{
 			register_input(sIN[i], m_i[i], netlist_input_t::STATE_INP_ACTIVE);
 		}
-        save(NAME(m_active));
+		save(NAME(m_active));
 	}
 
 	#if (USE_DEACTIVE_DEVICE)

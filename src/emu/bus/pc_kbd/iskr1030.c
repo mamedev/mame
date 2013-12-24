@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( iskr_1030_keyboard_io, AS_IO, 8, iskr_1030_keyboard_de
 	AM_RANGE(0x00, 0xFF) AM_RAM
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-//	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
+//  AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(t1_r)
 ADDRESS_MAP_END
 
@@ -358,7 +358,7 @@ WRITE_LINE_MEMBER( iskr_1030_keyboard_device::data_write )
 READ8_MEMBER( iskr_1030_keyboard_device::t0_r )
 {
 	return 0;
-//	return clock_signal();
+//  return clock_signal();
 }
 
 

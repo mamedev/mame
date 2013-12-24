@@ -2,13 +2,13 @@
 // copyright-holders: ?
 /***************************************************************************
 
-	Skeleton driver for XaviX TV PNP console and childs (Let's! Play TV Classic)
+    Skeleton driver for XaviX TV PNP console and childs (Let's! Play TV Classic)
 
-	CPU is M6502 derivative, almost likely to be a G65816
+    CPU is M6502 derivative, almost likely to be a G65816
 
-	TODO:
-	- understand how to map ROM at 0x800000-0x9fffff / 0xc00000 / 0xdfffff
-	  banks (granted that we have the ROM for that, of course)
+    TODO:
+    - understand how to map ROM at 0x800000-0x9fffff / 0xc00000 / 0xdfffff
+      banks (granted that we have the ROM for that, of course)
 
 ***************************************************************************/
 

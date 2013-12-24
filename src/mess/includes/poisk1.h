@@ -16,7 +16,7 @@
 #include "machine/xsu_cards.h"
 #include "sound/speaker.h"
 
-#define POISK1_UPDATE_ROW(name)	\
+#define POISK1_UPDATE_ROW(name) \
 	void name(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *videoram, UINT16 ma, UINT8 ra, UINT8 stride)
 
 class p1_state : public driver_device
@@ -49,7 +49,7 @@ public:
 	DECLARE_MACHINE_RESET(poisk1);
 
 	IRQ_CALLBACK_MEMBER(p1_irq_callback);
-	
+
 	virtual void palette_init();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

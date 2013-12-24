@@ -45,28 +45,28 @@
 #include "nld_signal.h"
 
 #define TTL_7474(_name, _CLK, _D, _CLRQ, _PREQ)                                     \
-        NET_REGISTER_DEV(7474, _name)                                               \
-        NET_CONNECT(_name, CLK, _CLK)                                               \
-        NET_CONNECT(_name, D,  _D)                                                  \
-        NET_CONNECT(_name, CLRQ,  _CLRQ)                                            \
-        NET_CONNECT(_name, PREQ,  _PREQ)
+		NET_REGISTER_DEV(7474, _name)                                               \
+		NET_CONNECT(_name, CLK, _CLK)                                               \
+		NET_CONNECT(_name, D,  _D)                                                  \
+		NET_CONNECT(_name, CLRQ,  _CLRQ)                                            \
+		NET_CONNECT(_name, PREQ,  _PREQ)
 
 NETLIB_SUBDEVICE(7474sub,
-    netlist_ttl_input_t m_clk;
+	netlist_ttl_input_t m_clk;
 
-    UINT8 m_nextD;
-    netlist_ttl_output_t m_Q;
-    netlist_ttl_output_t m_QQ;
+	UINT8 m_nextD;
+	netlist_ttl_output_t m_Q;
+	netlist_ttl_output_t m_QQ;
 
-    ATTR_HOT inline void newstate(const UINT8 state);
+	ATTR_HOT inline void newstate(const UINT8 state);
 );
 
 NETLIB_DEVICE(7474,
-    NETLIB_NAME(7474sub) sub;
+	NETLIB_NAME(7474sub) sub;
 
-    netlist_ttl_input_t m_D;
-    netlist_ttl_input_t m_clrQ;
-    netlist_ttl_input_t m_preQ;
+	netlist_ttl_input_t m_D;
+	netlist_ttl_input_t m_clrQ;
+	netlist_ttl_input_t m_preQ;
 );
 
 

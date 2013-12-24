@@ -550,10 +550,10 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 
 	case T10MMC_CMD_READ_TOC_PMA_ATIP:
 		/*
-			Track numbers are problematic here: 0 = lead-in, 0xaa = lead-out.
-			That makes sense in terms of how real-world CDs are referred to, but
-			our internal routines for tracks use "0" as track 1.  That probably
-			should be fixed...
+		    Track numbers are problematic here: 0 = lead-in, 0xaa = lead-out.
+		    That makes sense in terms of how real-world CDs are referred to, but
+		    our internal routines for tracks use "0" as track 1.  That probably
+		    should be fixed...
 		*/
 		{
 			bool msf = (command[1] & 0x2) != 0;

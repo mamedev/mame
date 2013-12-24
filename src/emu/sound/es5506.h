@@ -64,7 +64,7 @@ struct es550x_voice
 		index(0),
 		filtcount(0),
 		accum_mask(0) {}
-	
+
 	/* external state */
 	UINT32      control;                /* control register */
 	UINT32      freqcount;              /* frequency count register */
@@ -139,9 +139,9 @@ protected:
 	#if MAKE_WAVS
 	void *      m_wavraw;                 /* raw waveform */
 	#endif
-	
+
 	FILE *m_eslog;
-	
+
 	void update_irq_state();
 	void update_internal_irq_state();
 	void compute_tables();
@@ -158,7 +158,7 @@ class es5506_device : public es550x_device,
 public:
 	es5506_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~es5506_device() {}
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	void voice_bank_w(int voice, int bank);
@@ -170,8 +170,8 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
-	
+
+
 	void generate_samples(INT32 **outputs, int offset, int samples);
 
 private:
@@ -191,7 +191,7 @@ class es5505_device : public es550x_device,
 {
 public:
 	es5505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 	void voice_bank_w(int voice, int bank);
@@ -200,11 +200,11 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	
+
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 	void generate_samples(INT32 **outputs, int offset, int samples);
-	
+
 private:
 	// internal state
 	inline void reg_write_low(es550x_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask);

@@ -170,8 +170,8 @@
     Promoted Fortune Hunter and clone to working status, as they were in fact working for quite a while.
     Fixed ROM names for kgbird/kgbirda; 5c and 10c variants were mixed up.
 
-	11/12/13 - Lord-Data
-	Added hopper and meter outputs.
+    11/12/13 - Lord-Data
+    Added hopper and meter outputs.
 
     ****************************************************************************
 
@@ -631,12 +631,12 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 					printf("Unhandled Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
 					break;
 			}
-			
+
 			m_samples->start(i,0); // pulse sound for mechanical meters
 		}
 		else
 		{
-			// if there is not a value set, this meter is not active, reset output to 0 
+			// if there is not a value set, this meter is not active, reset output to 0
 			switch(i+1)
 			{
 				case 4:
@@ -649,7 +649,7 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 					break;
 			}
 		}
-	} 
+	}
 }
 
 /* sound interface for playing mechanical meter sound */
@@ -715,7 +715,7 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 //   CBOPT1 - Bit7 - Cash box optics
 /* Coin input... CBOPT2 goes LOW, then the optic detectors OPTA1 / OPTB1 detect the coin passing */
 /* The timer causes one credit, per 150ms or so... */
-	
+
 	switch(m_inscrd)
 	{
 	case 0x00:
@@ -864,7 +864,7 @@ WRITE8_MEMBER(aristmk4_state::via_cb2_w)
 	if (data==0x01)
 		m_hopper_motor=data;
 	else if (m_hopper_motor<0x02)
-		m_hopper_motor=data; 
+		m_hopper_motor=data;
 
 	output_set_value("hopper_motor", m_hopper_motor); // stop motor
 }
@@ -1016,14 +1016,14 @@ INPUT PORTS
 static INPUT_PORTS_START(aristmk4)
 
 	PORT_START("via_port_b")
-	PORT_DIPNAME( 0x10, 0x00, "1" )																							// "COIN FAULT"
+	PORT_DIPNAME( 0x10, 0x00, "1" )                                                                                         // "COIN FAULT"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) ) PORT_DIPLOCATION("AY:1")
-	PORT_DIPNAME( 0x20, 0x00, "2" )																							// "COIN FAULT"
+	PORT_DIPNAME( 0x20, 0x00, "2" )                                                                                         // "COIN FAULT"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) ) PORT_DIPLOCATION("AY:2")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hopper Coin Release") PORT_CODE(KEYCODE_BACKSLASH)				// "ILLEGAL COIN PAID"
-	
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hopper Coin Release") PORT_CODE(KEYCODE_BACKSLASH)              // "ILLEGAL COIN PAID"
+
 	PORT_DIPNAME( 0x80, 0x00, "CBOPT1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("AY:4")
@@ -1037,7 +1037,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x04, 0x00, "HOPHI2") // hopper 2 full
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5002:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DOPTI")  // photo optic door																			DOOR OPEN SENSE SWITCH
+	PORT_DIPNAME( 0x08, 0x00, "DOPTI")  // photo optic door                                                                         DOOR OPEN SENSE SWITCH
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Audit Key") PORT_TOGGLE PORT_CODE(KEYCODE_K) // AUDTSW

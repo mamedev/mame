@@ -561,16 +561,16 @@ static INPUT_PORTS_START( lethalen )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Language) )		PORT_DIPLOCATION("DSW:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Language) )       PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x10, DEF_STR(English) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Spanish) )
-	PORT_DIPNAME( 0x20, 0x00, "Game Type" )			PORT_DIPLOCATION("DSW:3")
+	PORT_DIPNAME( 0x20, 0x00, "Game Type" )         PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x20, "Street" )
 	PORT_DIPSETTING(    0x00, "Arcade" )
-	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )		PORT_DIPLOCATION("DSW:2")
+	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )        PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(    0x40, "Common" )
 	PORT_DIPSETTING(    0x00, "Independent" )
-	PORT_DIPNAME( 0x80, 0x80, "Sound Output" )		PORT_DIPLOCATION("DSW:1")
+	PORT_DIPNAME( 0x80, 0x80, "Sound Output" )      PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Mono ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Stereo ) )
 
@@ -595,13 +595,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( lethalenj )
 	PORT_INCLUDE( lethalen )
 
-        PORT_MODIFY("DSW")  /* Normal DIPs appear to do nothing for Japan region - wrong location?  Set to unknown */
-        PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:4")
-        PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:3")
-        PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:2")
-        PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:1")
+		PORT_MODIFY("DSW")  /* Normal DIPs appear to do nothing for Japan region - wrong location?  Set to unknown */
+		PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:4")
+		PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:3")
+		PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:2")
+		PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:1")
 
-        PORT_MODIFY("LIGHT0_X")
+		PORT_MODIFY("LIGHT0_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_MODIFY("LIGHT0_Y")
@@ -618,7 +618,7 @@ static INPUT_PORTS_START( lethalene ) /* European region does not have non-engli
 	PORT_INCLUDE( lethalen )
 
 	PORT_MODIFY("DSW")
-        PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSW:4")
+		PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSW:4")
 INPUT_PORTS_END
 
 static const gfx_layout lethal_6bpp =

@@ -25,7 +25,7 @@ public:
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram2;
 	optional_shared_ptr<UINT8> m_mcu_ram;
-	
+
 	/* video-related */
 	bitmap_ind16    *m_tmp_bitmap1;
 	bitmap_ind16    *m_tmp_bitmap2;
@@ -114,12 +114,12 @@ public:
 	void fortyl_plot_pix( int offset );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	
+
 	enum
 	{
 		TIMER_NMI_CALLBACK
 	};
 
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);	
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

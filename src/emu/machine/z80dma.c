@@ -123,7 +123,7 @@ const int TM_SEARCH_TRANSFER    = 0x03;
 #define EOB_F_CLEAR             (m_status |= 0x20)
 
 #define READY_ACTIVE_HIGH       ((WR5>>3) & 0x01)
-#define AUTO_RESTART			((WR5>>5) & 0x01)
+#define AUTO_RESTART            ((WR5>>5) & 0x01)
 
 #define INTERRUPT_ENABLE        (WR3 & 0x20)
 #define INT_ON_MATCH            (INTERRUPT_CTRL & 0x01)

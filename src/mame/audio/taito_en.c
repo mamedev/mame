@@ -50,7 +50,7 @@ void taito_en_device::device_start()
 	save_item(NAME(m_es5510_dadr_latch));
 	save_item(NAME(m_es5510_gpr_latch));
 	save_item(NAME(m_es5510_ram_sel));
-	
+
 	m_duart68681 = machine().device<duartn68681_device>("duart68681");
 }
 

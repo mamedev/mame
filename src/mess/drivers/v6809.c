@@ -317,8 +317,8 @@ WRITE_LINE_MEMBER( v6809_state::speaker_en_w )
 
 WRITE_LINE_MEMBER( v6809_state::speaker_w )
 {
-//	if (m_speaker_en)
-//		m_speaker->level_w(state);
+//  if (m_speaker_en)
+//      m_speaker->level_w(state);
 }
 
 static const ptm6840_interface mc6840_intf =

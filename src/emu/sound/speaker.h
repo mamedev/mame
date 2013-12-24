@@ -83,7 +83,7 @@ private:
 	void speaker_postload();
 
 	// DC blocker state
-	double	m_prevx, m_prevy;
+	double  m_prevx, m_prevy;
 };
 
 extern const device_type SPEAKER_SOUND;

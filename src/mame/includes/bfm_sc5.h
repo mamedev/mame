@@ -24,7 +24,7 @@ public:
 	DECLARE_READ8_MEMBER( sc5_mux1_r );
 	DECLARE_WRITE8_MEMBER( sc5_mux1_w );
 	DECLARE_WRITE8_MEMBER( sc5_mux2_w );
-	
+
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_txa);
 	DECLARE_READ8_MEMBER(bfm_sc5_duart_input_r);

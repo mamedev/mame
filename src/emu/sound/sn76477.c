@@ -301,7 +301,7 @@ void sn76477_device::device_start()
 	}
 
 	intialize_noise();
-	
+
 	/* set up interface values */
 	_SN76477_enable_w(m_intf_enable);
 	_SN76477_vco_w(m_intf_vco);

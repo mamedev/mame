@@ -40,7 +40,7 @@ protected:
 	// device_plus4_expansion_card_interface overrides
 	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 
-	
+
 };
 
 

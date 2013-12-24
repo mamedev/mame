@@ -103,7 +103,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sc4_mem_w);
 
 	DECLARE_READ16_MEMBER(sc4_cs1_r);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
 	DECLARE_READ8_MEMBER(bfm_sc4_duart_input_r);

@@ -20,7 +20,7 @@ Commands:
     M : MEMory manipulation
     G : GO
   F10 : RESet
-  ESC : BRK    
+  ESC : BRK
 
 Functions (press F1 then the indicated number):
     0 : FILL

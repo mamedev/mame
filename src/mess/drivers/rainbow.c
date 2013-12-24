@@ -2,57 +2,57 @@
     DEC Rainbow 100
 
     Driver-in-progress by R. Belmont and Miodrag Milanovic.
-	Portions (2013) by Karl-Ludwig Deisenhofer (VT video, floppy, preliminary keyboard, DIP switches).
+    Portions (2013) by Karl-Ludwig Deisenhofer (VT video, floppy, preliminary keyboard, DIP switches).
 
     STATE AS OF DECEMBER 2013
     --------------------------
-	- FLOPPY TIMING: 'wd17xx_complete_command' * must * be hard wired to about 13 usecs.
-	  Line 1063 in 'wd17xx.c' has to be changed (until legacy code here is removed):
-	  -      w->timer_cmd->adjust(attotime::from_usec(usecs));
-	  +      w->timer_cmd->adjust(attotime::from_usec(13)); 
+    - FLOPPY TIMING: 'wd17xx_complete_command' * must * be hard wired to about 13 usecs.
+      Line 1063 in 'wd17xx.c' has to be changed (until legacy code here is removed):
+      -      w->timer_cmd->adjust(attotime::from_usec(usecs));
+      +      w->timer_cmd->adjust(attotime::from_usec(13));
 
     - WORKAROUND AVAILABLE: keyboard emulation incomplete (inhibits the system from booting with ERROR 50 on cold or ERROR 13 on warm boot).
-	- NOT WORKING: serial (ERROR 60). 
+    - NOT WORKING: serial (ERROR 60).
     - NOT WORKING: printer interface (ERROR 40). Like error 60 not mission-critical.
 
     - NON-CRITICAL: watchdog logic (triggered after 108 ms without interrupts on original machine) still does not work as intended.
 
-					Timer is reset by TWO sources: the VERT INT L from the DC012, or the MHFU ENB L from the enable flip-flop.
-					The MHFU gets active if the 8088 has not acknowledged a video processor interrupt within approx. 108 milliseconds.
-	
-					BIOS assumes a power-up reset if MHFU detection is disabled - and assumes a MHFU reset if MHFU detection is ENABLED.
-					
-					As there is no reset switch, only a limited software reset exists on a real DEC-100 (CTRL-SETUP within SETUP).
+                    Timer is reset by TWO sources: the VERT INT L from the DC012, or the MHFU ENB L from the enable flip-flop.
+                    The MHFU gets active if the 8088 has not acknowledged a video processor interrupt within approx. 108 milliseconds.
+
+                    BIOS assumes a power-up reset if MHFU detection is disabled - and assumes a MHFU reset if MHFU detection is ENABLED.
+
+                    As there is no reset switch, only a limited software reset exists on a real DEC-100 (CTRL-SETUP within SETUP).
 
     - TO BE IMPLEMENTED AS SLOT DEVICES (for now, DIP settings affect 'system_parameter_r' only and are disabled):
             * Color graphics option (uses NEC upd7220 GDC)
             * Extended communication option (same as BUNDLE_OPTION ?)
 
     - OTHER UPGRADES (NEC_V20 should be easy, the TURBOW is harder to come by)
-			* Suitable Solutions TURBOW286: 12 Mhz, 68-pin, low power AMD N80L286-12 and WAYLAND/EDSUN EL286-88-10-B ( 80286 to 8088 Processor Signal Converter )
-			  plus DC 7174 or DT 7174 (barely readable). Add-on card, replaces main 8088 cpu (via ribbon cable). Altered BOOT ROM labeled 'TBSS1.3 - 3ED4'.
+            * Suitable Solutions TURBOW286: 12 Mhz, 68-pin, low power AMD N80L286-12 and WAYLAND/EDSUN EL286-88-10-B ( 80286 to 8088 Processor Signal Converter )
+              plus DC 7174 or DT 7174 (barely readable). Add-on card, replaces main 8088 cpu (via ribbon cable). Altered BOOT ROM labeled 'TBSS1.3 - 3ED4'.
 
-			* NEC_V20 (requires modded BOOT ROM because of - at least 2 - hard coded timing loops): 
-                 100A:         100B/100+:						100B+ ALTERNATE RECOMMENDATION (fixes RAM size auto-detection problems when V20 is in place.
-	                                                            Tested on a 30+ year old live machine. Your mileage may vary)
+            * NEC_V20 (requires modded BOOT ROM because of - at least 2 - hard coded timing loops):
+                 100A:         100B/100+:                       100B+ ALTERNATE RECOMMENDATION (fixes RAM size auto-detection problems when V20 is in place.
+                                                                Tested on a 30+ year old live machine. Your mileage may vary)
 
-                 Location Data	Location Data                   Loc.|Data								
-	             ....     ..    ....     ..  ------------------ 00C6 46 [ increases 'wait for Z80' from approx. 27,5 ms (old value 40) to 30,5 ms ]
-	             ....     ..    ....     ..  ------------------ 0303 00 [ disable CHECKSUM ]
-                 043F     64    072F     64	<----------------->	072F 73 [ increases minimum cycle time from 2600 (64) to 3000 ms (73) ]
-                 067D	  20	0B36     20	<-----------------> 0B36 20 [ USE A VALUE OF 20 FOR THE NEC - as in the initial patch! CHANGES CAUSE VFR-ERROR 10 ]
-                 1FFE     2B	3FFE     1B  (BIOS CHECKSUM)    
-                 1FFF     70	3FFF     88  (BIOS CHECKSUM)    
+                 Location Data  Location Data                   Loc.|Data
+                 ....     ..    ....     ..  ------------------ 00C6 46 [ increases 'wait for Z80' from approx. 27,5 ms (old value 40) to 30,5 ms ]
+                 ....     ..    ....     ..  ------------------ 0303 00 [ disable CHECKSUM ]
+                 043F     64    072F     64 <-----------------> 072F 73 [ increases minimum cycle time from 2600 (64) to 3000 ms (73) ]
+                 067D     20    0B36     20 <-----------------> 0B36 20 [ USE A VALUE OF 20 FOR THE NEC - as in the initial patch! CHANGES CAUSE VFR-ERROR 10 ]
+                 1FFE     2B    3FFE     1B  (BIOS CHECKSUM)
+                 1FFF     70    3FFF     88  (BIOS CHECKSUM)
 
-			 => the 'leaked' DOS 3.10 Beta -for Rainbow- 'should not be used' on rigs with NEC V20. It possibly wasn't tested, but boots and runs well.
-			 => on the NEC, auto detection (of option RAM) fails with the original V20 patch (above, left)
-			    Expect RAM related system crashes after swapping CPUs and altering physical RAM _afterwards_.
-				Hard coded CPU loops are to blame. Try values from the alternate patch (right). 
-			 => AAD/AAM - Intel 8088 honors the second byte (operand), NEC V20 ignores it and always uses base 0Ah (10). 
-			 => UNDOCUMENTED: NEC V20 does not have "POP CS" (opcode 0F). There are more differences (opcode D6; the 2 byte POP: 8F Cx; FF Fx instructions)
-			    Commercial programs had to be patched back then (as was the case with Loderunner for PC).
-			 => NEW OPCODES: REPC, REPNC, CHKIND, PREPARE, DISPOSE; BCD string operations (ADD4S, CMP4S, SUB4S), bit-ops (NOT, SET, TEST, ROL4, ROR4)
-			    WARNING: undoc'd opcodes, INS, EXT and 8080 behaviour are unemulated yet! MESS' CPU source has up-to-date info. 
+             => the 'leaked' DOS 3.10 Beta -for Rainbow- 'should not be used' on rigs with NEC V20. It possibly wasn't tested, but boots and runs well.
+             => on the NEC, auto detection (of option RAM) fails with the original V20 patch (above, left)
+                Expect RAM related system crashes after swapping CPUs and altering physical RAM _afterwards_.
+                Hard coded CPU loops are to blame. Try values from the alternate patch (right).
+             => AAD/AAM - Intel 8088 honors the second byte (operand), NEC V20 ignores it and always uses base 0Ah (10).
+             => UNDOCUMENTED: NEC V20 does not have "POP CS" (opcode 0F). There are more differences (opcode D6; the 2 byte POP: 8F Cx; FF Fx instructions)
+                Commercial programs had to be patched back then (as was the case with Loderunner for PC).
+             => NEW OPCODES: REPC, REPNC, CHKIND, PREPARE, DISPOSE; BCD string operations (ADD4S, CMP4S, SUB4S), bit-ops (NOT, SET, TEST, ROL4, ROR4)
+                WARNING: undoc'd opcodes, INS, EXT and 8080 behaviour are unemulated yet! MESS' CPU source has up-to-date info.
 
     Meaning of Diagnostics LEDs (from PC100ESV1.PDF found, e.g.,
     on ftp://ftp.update.uu.se/pub/rainbow/doc/rainbow-docs/
@@ -138,7 +138,7 @@ PCB # 5416206 / 5016205-01C1:
 |        ROM (4K)           ...J7...  | ...J9 = RX50 |
 |------------PCB# 5416206 / 5016205-01C1-------------|
 NOTES
-W5 + W6 are out when 16K x 8 EPROMS are used  
+W5 + W6 are out when 16K x 8 EPROMS are used
 / W5 + W6 installed => 32 K x 8 EPROMs (pin 27 = A14)
 
 W13, W14, W15, W18 = for manufacturing tests.
@@ -146,12 +146,12 @@ W13, W14, W15, W18 = for manufacturing tests.
 => W18 pulls DSR to ground and affects 8251A - port $11 (bit 7)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!! DO NOT SHORT JUMPER / CONNECTOR [W90] ON LIVE HARDWARE  !! 
-!!                                                         !!   
+!! DO NOT SHORT JUMPER / CONNECTOR [W90] ON LIVE HARDWARE  !!
+!!                                                         !!
 !! WARNING:  CIRCUIT DAMAGE could occur if this jumper is  !!
-!! set by end users.        See PDF document AA-V523A-TV.  !! 
-!!                                                         !!   
-!! W90 connects to pin 2 (Voltage Bias on PWR connector J8)!! 
+!! set by end users.        See PDF document AA-V523A-TV.  !!
+!!                                                         !!
+!! W90 connects to pin 2 (Voltage Bias on PWR connector J8)!!
 !! and is designed FOR ===> FACTORY TESTS OF THE PSU <===  !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -161,8 +161,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 ****************************************************************************/
 
 // Workarounds DO NOT APPLY to the 190-B ROM. Only enable when compiling the 'rainbow' driver -
-//#define FORCE_RAINBOW_100_LOGO 
-#define KBD_DELAY 875 // (debounce delay). Recommended: 875. 
+//#define FORCE_RAINBOW_100_LOGO
+#define KBD_DELAY 875 // (debounce delay). Recommended: 875.
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -310,7 +310,7 @@ public:
 
 
 void rainbow_state::machine_start()
-{  
+{
 	m_image[0] = subdevice(FLOPPY_0);
 	m_image[1] = subdevice(FLOPPY_1);
 	m_image[2] = subdevice(FLOPPY_2);
@@ -329,13 +329,13 @@ void rainbow_state::machine_start()
 
 	UINT8 *rom = memregion("maincpu")->base();
 
-	
-#ifdef FORCE_RAINBOW_100_LOGO
- rom[0xf4174]=0xeb; // jmps  RAINBOW100_LOGO__loc_33D
- rom[0xf4175]=0x08;  
 
- rom[0xf4000 + 0x364a]= 0x0a;  
- rom[0xf4384]=0xeb; // JMPS  =>  BOOT80 
+#ifdef FORCE_RAINBOW_100_LOGO
+	rom[0xf4174]=0xeb; // jmps  RAINBOW100_LOGO__loc_33D
+	rom[0xf4175]=0x08;
+
+	rom[0xf4000 + 0x364a]= 0x0a;
+	rom[0xf4384]=0xeb; // JMPS  =>  BOOT80
 #endif
 
 	// Enables PORT90_W + PORT91_W via BIOS call (offset +$21 in HIGH ROM)
@@ -382,12 +382,12 @@ static ADDRESS_MAP_START( rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 	//  - ED000 - ED0FF is the area the _DEC-100-B BIOS_ accesses - and checks.
 
 	//  - Specs say that the CPU has direct access to volatile RAM only.
-	//    So NVRAM is hidden now and loads & saves are triggered within the 
+	//    So NVRAM is hidden now and loads & saves are triggered within the
 	//    'diagnostic_w' handler (similar to real hardware).
 
-	//  - Address bits 8-12 are ignored (-> AM_MIRROR). 
-	AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00) 
-	AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram") 
+	//  - Address bits 8-12 are ignored (-> AM_MIRROR).
+	AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") AM_MIRROR(0x1f00)
+	AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
@@ -410,8 +410,8 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 
 	AM_RANGE (0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
 
-	// 0x0C Video processor DC012 
-	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w) 
+	// 0x0C Video processor DC012
+	AM_RANGE (0x0c, 0x0c) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
 
 	// TODO: unmapped [0e] : PRINTER BIT RATE REGISTER (WO)
 
@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 
 	// UNMAPPED:
 	// 0x20 - 0x2f ***** EXTENDED COMM. OPTION (option select 1)- for example:
-	// 0x27		(RESET EXTENDED COMM OPTION) - OUT 27 @ offset 1EA7 
+	// 0x27     (RESET EXTENDED COMM OPTION) - OUT 27 @ offset 1EA7
 
 	// 0x40  COMMUNICATIONS DATA REGISTER (MPSC)
 	// 0x41  PRINTER DATA REGISTER (MPSC)
@@ -428,20 +428,20 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	// 0x43  PRINTER CONTROL / STATUS REGISTER (MPSC)
 
 	// 0x50 - 0xf  ***** OPTIONAL COLOR GRAPHICS - for example:
-	// 0x50     (RESET_GRAPH. OPTION) - OUT 50 @ offsets F5EB5 + F5EB9 
+	// 0x50     (RESET_GRAPH. OPTION) - OUT 50 @ offsets F5EB5 + F5EB9
 
 	// ===========================================================
-	// TODO: hard disc emulation!                                
-	// ------ Rainbow uses 'WD 1010 AL' (Western Digital 1983)   
-	//        Register compatible to WD2010 (present in MESS)    
-	// R/W REGISTERS 60 - 68 (?)                                 
+	// TODO: hard disc emulation!
+	// ------ Rainbow uses 'WD 1010 AL' (Western Digital 1983)
+	//        Register compatible to WD2010 (present in MESS)
+	// R/W REGISTERS 60 - 68 (?)
 	// ===========================================================
 	// HARD DISC SIZES AND LIMITS
-	//   HARDWARE: 
-	//      Controller has a built-in limit of 8 heads / 1024 cylinders (67 MB). Standard geometry is 4 surfaces. 
-	//   SOFTWARE: the DEC boot loader (and FDISK from DOS 3.10) initially allowed a maximum hard disc size of 20 MB. 
-    //   - DOS 3 has a 1024 cylinder limit (32 MB). 
-    //   - the custom boot loader that comes with 'WUTIL 3.2' allows 117 MB and 8 surfaces.
+	//   HARDWARE:
+	//      Controller has a built-in limit of 8 heads / 1024 cylinders (67 MB). Standard geometry is 4 surfaces.
+	//   SOFTWARE: the DEC boot loader (and FDISK from DOS 3.10) initially allowed a maximum hard disc size of 20 MB.
+	//   - DOS 3 has a 1024 cylinder limit (32 MB).
+	//   - the custom boot loader that comes with 'WUTIL 3.2' allows 117 MB and 8 surfaces.
 	AM_RANGE (0x68, 0x68) AM_READ(hd_status_68_r)
 
 	AM_RANGE (0x90, 0x90) AM_WRITE(PORT90_W)
@@ -472,7 +472,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( rainbow100b_in )
 /* DIP switches */
 		PORT_START("MONITOR TYPE")
-		PORT_DIPNAME( 0x03, 0x03, "MONOCHROME MONITOR") 
+		PORT_DIPNAME( 0x03, 0x03, "MONOCHROME MONITOR")
 		PORT_DIPSETTING(    0x01, "PAPER WHITE" )
 		PORT_DIPSETTING(    0x02, "GREEN" )
 		PORT_DIPSETTING(    0x03, "AMBER" )
@@ -516,25 +516,25 @@ static INPUT_PORTS_START( rainbow100b_in )
 		PORT_DIPNAME( 0x08, 0x08, "W15 (FACTORY TEST C, LEAVE OFF)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    // DSR = 1 when switch is OFF - see i8251.c (status_r) 
+	// DSR = 1 when switch is OFF - see i8251.c (status_r)
 	PORT_START("W18")
-		PORT_DIPNAME( 0x01, 0x00, "W18 (FACTORY TEST D, LEAVE OFF) (8251A: DSR)") PORT_TOGGLE 
+		PORT_DIPNAME( 0x01, 0x00, "W18 (FACTORY TEST D, LEAVE OFF) (8251A: DSR)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 		PORT_WRITE_LINE_DEVICE_MEMBER("kbdser", i8251_device, write_dsr)
 
-    // J17 jumper on FDC controller board shifts drive select (experimental) -
-	PORT_START("FLOPPY CONTROLLER") 
+	// J17 jumper on FDC controller board shifts drive select (experimental) -
+	PORT_START("FLOPPY CONTROLLER")
 		PORT_DIPNAME( 0x02, 0x00, "J17 DRIVE SELECT (A => C and B => D)") PORT_TOGGLE
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
-// 800K native format (80 * 10). Also reads VT-180 disks and PC-DOS 360 k disks 
+// 800K native format (80 * 10). Also reads VT-180 disks and PC-DOS 360 k disks
 // ( both: 512 byte sectors, single sided, 9 sectors per track, 40 tracks )
 static LEGACY_FLOPPY_OPTIONS_START( dec100_floppy )
-    LEGACY_FLOPPY_OPTION( dec100_floppy, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL )
-	LEGACY_FLOPPY_OPTION( dec100_floppy, "img", "DEC Rainbow 100", basicdsk_identify_default, basicdsk_construct_default,    NULL,             
+	LEGACY_FLOPPY_OPTION( dec100_floppy, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL )
+	LEGACY_FLOPPY_OPTION( dec100_floppy, "img", "DEC Rainbow 100", basicdsk_identify_default, basicdsk_construct_default,    NULL,
 		HEADS([1])
 		TRACKS(40/[80])
 		SECTORS(9/[10])
@@ -543,7 +543,7 @@ static LEGACY_FLOPPY_OPTIONS_START( dec100_floppy )
 		FIRST_SECTOR_ID([1])
 						)
 LEGACY_FLOPPY_OPTIONS_END
- 
+
 void rainbow_state::machine_reset()
 {
 	if (COLD_BOOT == 1)
@@ -595,9 +595,9 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 	m_crtc->palette_select( m_inp9->read() );
 
 	if ( m_SCREEN_BLANK )
-		 m_crtc->video_blanking(bitmap, cliprect);
-	else 
-		 m_crtc->video_update(bitmap, cliprect);
+			m_crtc->video_blanking(bitmap, cliprect);
+	else
+			m_crtc->video_update(bitmap, cliprect);
 	return 0;
 }
 
@@ -606,12 +606,12 @@ UINT32 rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 
 
 // Unexpected low RAM sizes are an indication of option RAM (at worst: 128 K on board) failure.
 // While motherboard errors often render the system unbootable, bad option RAM (> 128 K)
-// can be narrowed down with the Diagnostic Disk and codes from the 'Pocket Service Guide' 
+// can be narrowed down with the Diagnostic Disk and codes from the 'Pocket Service Guide'
 // EK-PC100-PS-002 (APPENDIX B.2.2); pc100ps2.pdf
 // ================================================================
 // - Simulate floating bus for initial RAM detection -
 // FIXME: code valid ONLY within ROM section F4Exxx.
-// 
+//
 // NOTE: MS-DOS 2.x unfortunately probes RAM in a similar way.
 // => SET OPTION RAM to 896 K for unknown applications (and DOS) <=
 // ================================================================
@@ -619,12 +619,12 @@ READ8_MEMBER(rainbow_state::floating_bus_r)
 {
 	int pc = space.device().safe_pc();
 
-	if ( ((pc & 0xFFF00) == 0xF4E00) && 
-		 ( m_maincpu->state_int(I8086_DS) >= m_inp8->read() )
-	   )
+	if ( ((pc & 0xFFF00) == 0xF4E00) &&
+			( m_maincpu->state_int(I8086_DS) >= m_inp8->read() )
+		)
 	{
 		return (offset>>16) + 2;
-	} 
+	}
 	else
 		return space.read_byte(offset);
 }
@@ -694,11 +694,11 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 // Until a full-blown hard-disc emulation evolves, deliver an error message:
 READ8_MEMBER(rainbow_state::hd_status_68_r)
 {
-	// Top 3 bits = status / error code 
+	// Top 3 bits = status / error code
 	// SEE ->   W_INCHESTER__loc_80E
 
 	// return 0xa0; // A0 : OK, DRIVE IS READY (!)
-	
+
 	return 0xe0; //  => 21 DRIVE NOT READY (BIOS; when W is pressed on boot screen)
 }
 
@@ -712,22 +712,22 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
    ( 1 means NOT present )
 */
 	// Hard coded value 0x2000 - see DIP switch setup!
-	return 0x0f - m_inp5->read() 
-	            - 0                 // floppy is hard coded in emulator.
-				- m_inp7->read() 
+	return 0x0f - m_inp5->read()
+				- 0                 // floppy is hard coded in emulator.
+				- m_inp7->read()
 				- ((m_inp8->read() > 0x2000) ? 8 : 0);
 }
 
 READ8_MEMBER(rainbow_state::comm_control_r)
-{ 
-/*	[02] COMMUNICATIONS STATUS REGISTER - PAGE 154 (**** READ **** )
-	Used to read status of SERIAL port, IRQ line of each CPU, and MHFU logic enable signal.
+{
+/*  [02] COMMUNICATIONS STATUS REGISTER - PAGE 154 (**** READ **** )
+    Used to read status of SERIAL port, IRQ line of each CPU, and MHFU logic enable signal.
 
 //    What the specs says on how MHFU detection is disabled:
-//	  1.  by first disabling interrupts with CLI
-//	  2.  by writing 0x00 to port 0x10C (handled by 'dc012_w' in vtvideo) 
-//	 (3.) MHFU is re-enabled by writing to 0x0c (or automatically after STI - when under BIOS control ?)
-*/	
+//    1.  by first disabling interrupts with CLI
+//    2.  by writing 0x00 to port 0x10C (handled by 'dc012_w' in vtvideo)
+//   (3.) MHFU is re-enabled by writing to 0x0c (or automatically after STI - when under BIOS control ?)
+*/
 	// During boot phase 2, do not consider MHFU ENABLE. Prevents ERROR 16.
 	int data;
 	if (COLD_BOOT == 2)
@@ -736,9 +736,9 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 		data = m_crtc->MHFU(1);
 
 	return (  ( (data > 0) ? 0x00 : 0x20) |// (L): status of MHFU flag => bit pos.5
-                  (	(INT88)    ? 0x00 : 0x40 ) |               // (L)
-                  (	(INTZ80)   ? 0x00 : 0x80 )                 // (L)
-           ); 
+					(   (INT88)    ? 0x00 : 0x40 ) |               // (L)
+					(   (INTZ80)   ? 0x00 : 0x80 )                 // (L)
+			);
 }
 
 WRITE8_MEMBER(rainbow_state::comm_control_w)
@@ -765,9 +765,8 @@ WRITE8_MEMBER(rainbow_state::PORT90_W)
 
 	m_KBD = 0; // reset previous command.
 
-  if(MOTOR_DISABLE_counter == 0) 
-  {
-
+	if(MOTOR_DISABLE_counter == 0)
+	{
 	if (data == LK_CMD_POWER_UP) {      // Powerup (beep)
 		//m_beep->set_state(1);
 		//m_beep_counter=600;  // BELL = 125 ms
@@ -800,7 +799,7 @@ WRITE8_MEMBER(rainbow_state::PORT90_W)
 		m_KBD = data;
 	}
 
-  } // prevent beeps during disk load operations
+	} // prevent beeps during disk load operations
 }
 
 WRITE8_MEMBER(rainbow_state::PORT91_W)
@@ -823,20 +822,20 @@ WRITE8_MEMBER(rainbow_state::PORT91_W)
 
 	// NVRAM offet $A8 : BELL VOLUME (=> ENABLE BELL 0x23)
 	if ( (m_KBD == LK_CMD_BELL) || (m_KBD == LK_CMD_ENB_BELL) )    /* BOTH sound or enable bell have a parameter */
-	{ 	/* max volume is 0, lowest is 0x7 */
-//		printf("\n%02x BELL CMD has bell volume = %02x\n", m_KBD, 8 - (data & 7));
+	{   /* max volume is 0, lowest is 0x7 */
+//      printf("\n%02x BELL CMD has bell volume = %02x\n", m_KBD, 8 - (data & 7));
 		m_KBD = 0; // reset previous command.
 	}
 
 	// NVRAM offet $A9 = KEYCLICK VOLUME (=> ENABLE CLK 0x1b)
 	// NVRAM offset $8C = KEYCLICK ENABLE / DISABLE (0/1)
-	if ( ( m_KBD == LK_CMD_ENB_KEYCLK ) || ( m_KBD == LK_CMD_SOUND_CLK ) )  /* BOTH keyclick cmds have a parameter */ 
-	{	// max volume is 0, lowest is 0x7  - 87 (BELL VOL:1) and  80 (BELL VOL:8)
-//		printf("\n%02x CLICK CMD - keyclick volume = %02x\n", m_KBD, 8 - (data & 7));
+	if ( ( m_KBD == LK_CMD_ENB_KEYCLK ) || ( m_KBD == LK_CMD_SOUND_CLK ) )  /* BOTH keyclick cmds have a parameter */
+	{   // max volume is 0, lowest is 0x7  - 87 (BELL VOL:1) and  80 (BELL VOL:8)
+//      printf("\n%02x CLICK CMD - keyclick volume = %02x\n", m_KBD, 8 - (data & 7));
 		m_KBD = 0; // reset previous command.
 	}
 
-if (m_KBD > 0)	
+if (m_KBD > 0)
 	printf("UNHANDLED PARAM FOR MODE: %02x / KBD PARAM %02x to AH (91) \n", m_KBD, data);
 
 }
@@ -846,7 +845,7 @@ READ8_MEMBER(rainbow_state::i8088_latch_r)
 //    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
 	m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
 
-	INT88 = false; // BISLANG:  INTZ80 = false; //   
+	INT88 = false; // BISLANG:  INTZ80 = false; //
 	return m_8088_mailbox;
 }
 
@@ -857,7 +856,7 @@ WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 	m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf7);
 	m_z80_mailbox = data;
 
-   INTZ80 = true; //
+	INTZ80 = true; //
 }
 
 // Z80 reads port 0x00
@@ -867,7 +866,7 @@ READ8_MEMBER(rainbow_state::z80_latch_r)
 //    printf("Read %02x from Z80 mailbox\n", m_z80_mailbox);
 	m_z80->set_input_line(0, CLEAR_LINE);
 
-	INTZ80 = false; // BISLANG: INT88 = false; 
+	INTZ80 = false; // BISLANG: INT88 = false;
 	return m_z80_mailbox;
 }
 
@@ -879,7 +878,7 @@ WRITE8_MEMBER(rainbow_state::z80_latch_w)
 	m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, 0x27);
 	m_8088_mailbox = data;
 
-	INT88 = true; 
+	INT88 = true;
 }
 
 // WRITE to 0x20
@@ -891,7 +890,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskdiag_read_w)
 // (Z80) : PORT 21H  _READ_
 READ8_MEMBER(rainbow_state::z80_generalstat_r)
 {
-/*	
+/*
 General / diag.status register Z80 / see page 157 (table 4-18).
 
 D7 : STEP L : reflects status of STEP signal _FROM FDC_
@@ -910,20 +909,20 @@ D0 : ZFLIP L: (read from the diagnostic control register of Z80A)
 NOTES: ALL LOW ACTIVE - EXCEPT TR00
 */
 	// * TRACK 00 *  signal for current drive
-	int tk00 = ( floppy_tk00_r( m_image[m_unit] ) == CLEAR_LINE ) ? 0x20 : 0x00; 
+	int tk00 = ( floppy_tk00_r( m_image[m_unit] ) == CLEAR_LINE ) ? 0x20 : 0x00;
 
-	int fdc_ready = floppy_drive_get_flag_state( m_image[m_unit] , FLOPPY_DRIVE_READY); 
+	int fdc_ready = floppy_drive_get_flag_state( m_image[m_unit] , FLOPPY_DRIVE_READY);
 
 	int data=(   0x80                    |   // (STEP L)
-//		     (  (fdc_write_gate) )       |   
-			 (  (tk00)           )                             | 
-//			 (   fdc_direction)                                |     
-		     (  (fdc_ready)? 0x00 : 0x08 )                     |
-		     (	(INT88)    ? 0x00 : 0x04 )                     |    
-             (	(INTZ80)   ? 0x00 : 0x02 )                     |     
-			 (  (m_zflip)  ? 0x00 : 0x01 )
+//           (  (fdc_write_gate) )       |
+				(  (tk00)           )                             |
+//           (   fdc_direction)                                |
+				(  (fdc_ready)? 0x00 : 0x08 )                     |
+				(   (INT88)    ? 0x00 : 0x04 )                     |
+				(   (INTZ80)   ? 0x00 : 0x02 )                     |
+				(  (m_zflip)  ? 0x00 : 0x01 )
 			);
-	
+
 	return data;
 }
 
@@ -945,14 +944,14 @@ WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
 // (Z80) : PORT 40H _READ_
 
 // **********************************************************************
-//  POLARITY OF _DRQ_ AND _IRQ_ (depends on controller type!)  
+//  POLARITY OF _DRQ_ AND _IRQ_ (depends on controller type!)
 // **********************************************************************
 READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 {
 static int last_track;
 int track = wd17xx_track_r(m_fdc, space, 0);
 
-if (track != last_track) 
+if (track != last_track)
 	printf("\n%02d",track);
 last_track = track;
 
@@ -960,29 +959,29 @@ last_track = track;
 
 // AND 00111011 - return what was WRITTEN to D5-D3, D1, D0 previously
 //                (except D7,D6,D2)
-int data = m_z80_diskcontrol && 0x3b;       
+int data = m_z80_diskcontrol && 0x3b;
 
-// D7: DRQ: reflects status of DATA REQUEST signal from FDC. 
+// D7: DRQ: reflects status of DATA REQUEST signal from FDC.
 // '1' indicates that FDC has read data OR requires new write data.
-data |= wd17xx_drq_r(m_fdc) ? 0x80 : 0x00;  
+data |= wd17xx_drq_r(m_fdc) ? 0x80 : 0x00;
 
-// D6: IRQ: indicates INTERRUPT REQUEST signal from FDC. Indicates that a 
-//          status bit has changed. Set to 1 at the completion of any 
+// D6: IRQ: indicates INTERRUPT REQUEST signal from FDC. Indicates that a
+//          status bit has changed. Set to 1 at the completion of any
 //          command (.. see page 207 or 5-25).
-data |= wd17xx_intrq_r(m_fdc) ? 0x40 : 0x00;                       
+data |= wd17xx_intrq_r(m_fdc) ? 0x40 : 0x00;
 
-// D5: SIDE 0H: status of side select signal at J2 + J3 of RX50 controller. 
-//	            For 1 sided drives, this bit will always read low (0).
+// D5: SIDE 0H: status of side select signal at J2 + J3 of RX50 controller.
+//              For 1 sided drives, this bit will always read low (0).
 
 // D4: MOTOR 1 ON L: 0 = indicates MOTOR 1 ON bit is set in drive control reg.
-// D3: MOTOR 0 ON L: 0 = indicates MOTOR 0 ON bit is set in drive  " 
+// D3: MOTOR 0 ON L: 0 = indicates MOTOR 0 ON bit is set in drive  "
 
 // D2: TG43 L :  0 = INDICATES TRACK > 43 SIGNAL FROM FDC TO DISK DRIVE.
-data |= ( track > 43) ? 0x00 : 0x04; 
+data |= ( track > 43) ? 0x00 : 0x04;
 
 // D1: DS1 H: reflect status of bits 0 and 1 form disk.control reg.
-// D0: DS0 H: "  
-  return data;
+// D0: DS0 H: "
+	return data;
 }
 
 // (Z80) : PORT 40H  * WRITE *
@@ -1006,25 +1005,25 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	int selected_drive = 255;
 
 	if (flopimg_get_image( floppy_get_device( machine(), drive ) ) != NULL)
-	{	selected_drive = drive;
+	{   selected_drive = drive;
 		wd17xx_set_drive(m_fdc, selected_drive);
 	}
 
 	// WD emulation (wd17xx.c) will ignore 'side select' if set to WD1793.
 	// Is it safe to * always assume * single sided 400 K disks?
-	wd17xx_set_side(m_fdc, (data & 20) ? 1 : 0);  
+	wd17xx_set_side(m_fdc, (data & 20) ? 1 : 0);
 
 	wd17xx_dden_w(m_fdc, 0); /* SEE 'WRITE_TRACK' : 1 = SD; 0 = DD; enable double density */
 
-    output_set_value("driveled0",  (selected_drive == 0) ? 1 : 0 ); 
-	output_set_value("driveled1",  (selected_drive == 1) ? 1 : 0 ); 
+	output_set_value("driveled0",  (selected_drive == 0) ? 1 : 0 );
+	output_set_value("driveled1",  (selected_drive == 1) ? 1 : 0 );
 
-	output_set_value("driveled2",  (selected_drive == 2) ? 1 : 0 ); 
-	output_set_value("driveled3",  (selected_drive == 3) ? 1 : 0 ); 
+	output_set_value("driveled2",  (selected_drive == 2) ? 1 : 0 );
+	output_set_value("driveled3",  (selected_drive == 3) ? 1 : 0 );
 
-	if (selected_drive < 4) 
-	{	    
-			m_unit = selected_drive; 
+	if (selected_drive < 4)
+	{
+			m_unit = selected_drive;
 
 			// MOTOR ON flags 1+2 proved to be unreliable in this context.
 			// So this timeout only disables LEDs.
@@ -1037,14 +1036,14 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 				floppy_mon_w(m_image[f_num], (f_num == selected_drive) ? CLEAR_LINE : ASSERT_LINE);
 
 				// Parameters: DRIVE, STATE, FLAG
-				floppy_drive_set_ready_state( m_image[f_num], 
-					                          (f_num == selected_drive) ? 1 : 0, 
-											  (f_num == selected_drive) ? force_ready : 0
+				floppy_drive_set_ready_state( m_image[f_num],
+												(f_num == selected_drive) ? 1 : 0,
+												(f_num == selected_drive) ? force_ready : 0
 											);
-			}	
+			}
 	}
 
-   m_z80_diskcontrol = data;
+	m_z80_diskcontrol = data;
 }
 
 READ8_MEMBER( rainbow_state::read_video_ram_r )
@@ -1068,8 +1067,8 @@ READ8_MEMBER( rainbow_state::diagnostic_r )
 
 	return ( (m_diagnostic & (0xf1)) | (    m_inp1->read() |
 											m_inp2->read() |
-											m_inp3->read()   
-									   )
+											m_inp3->read()
+										)
 			);
 }
 
@@ -1078,14 +1077,14 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 //    printf("%02x to diag port (PC=%x)\n", data, space.device().safe_pc());
 	m_SCREEN_BLANK = (data & 2) ? false : true;
 
-	//  SAVE / PROGRAM NVM: transfer data from volatile memory to NVM 
-	if ( !(data & 0x40)  && (m_diagnostic & 0x40) ) 
-		memcpy( m_p_nvram, m_p_vol_ram, 256); 
+	//  SAVE / PROGRAM NVM: transfer data from volatile memory to NVM
+	if ( !(data & 0x40)  && (m_diagnostic & 0x40) )
+		memcpy( m_p_nvram, m_p_vol_ram, 256);
 
-	// READ / RECALL NVM: transfer data from NVM to volatile memory 
-	if ( (data & 0x80)  && !(m_diagnostic & 0x80) ) 
+	// READ / RECALL NVM: transfer data from NVM to volatile memory
+	if ( (data & 0x80)  && !(m_diagnostic & 0x80) )
 		memcpy( m_p_vol_ram, m_p_nvram, 256);
-		
+
 	if (!(data & 1))
 	{
 		m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -1100,16 +1099,16 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 		m_z80->reset();
 	}
 
-	/*	Page 197 or 5-13 of formatter description:
-		ZRESET L : this low input from the 8088 diagnostic write register
-		resets the formatter controller, loads 03H into the command register, 
-		and resets the not ready (status bit 7).
+	/*  Page 197 or 5-13 of formatter description:
+	    ZRESET L : this low input from the 8088 diagnostic write register
+	    resets the formatter controller, loads 03H into the command register,
+	    and resets the not ready (status bit 7).
 
-		When ZRESET goes high (1), a restore command is executed regardless
-		of the state of the ready signal from the diskette drive and 
-		01H is loaded into the sector register.
+	    When ZRESET goes high (1), a restore command is executed regardless
+	    of the state of the ready signal from the diskette drive and
+	    01H is loaded into the sector register.
 	*/
-	
+
 	// reset device when going from high to low,
 	// restore command when going from low to high :
 	wd17xx_mr_w(m_fdc, (data & 1) ? 1 : 0);
@@ -1156,7 +1155,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 	m_kbd8251->transmit_clock();
 	m_kbd8251->receive_clock();
 
-	if (MOTOR_DISABLE_counter) 
+	if (MOTOR_DISABLE_counter)
 		MOTOR_DISABLE_counter--;
 
 	if (MOTOR_DISABLE_counter == 1)
@@ -1167,13 +1166,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 			output_set_value("driveled3", 0); // DRIVE 3 (D)
 	}
 
-    if ( m_crtc->MHFU(1) ) // MHFU ENABLED ?
-    {	         
-/*				int data = m_crtc->MHFU(-1); // increment MHFU, return new value
+	if ( m_crtc->MHFU(1) ) // MHFU ENABLED ?
+	{
+/*              int data = m_crtc->MHFU(-1); // increment MHFU, return new value
                 //  if (data >  480) ...
-				//	   m_crtc->MHFU(-100); 
-				//	   machine().schedule_hard_reset(); // not exactly a proper watchdog reset
-*/				
+                //     m_crtc->MHFU(-100);
+                //     machine().schedule_hard_reset(); // not exactly a proper watchdog reset
+*/
 	}
 
 	if (m_beep_counter > 1)
@@ -1274,7 +1273,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_FD1793_ADD("wd1793", rainbow_wd17xx_interface )
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(floppy_intf) 
+	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(floppy_intf)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","rainbow")
 
 	MCFG_I8251_ADD("kbdser", i8251_intf)
@@ -1286,7 +1285,7 @@ MACHINE_CONFIG_END
 
 
 
-// ROM definition for 100-B 
+// ROM definition for 100-B
 ROM_START( rainbow )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "23-022e5-00.bin",  0xf0000, 0x4000, CRC(9d1332b4) SHA1(736306d2a36bd44f95a39b36ebbab211cc8fea6e))
@@ -1304,8 +1303,8 @@ ROM_END
 // 'Rainbow 190 B' (announced March 1985) is identical hardware with alternate ROM v5.05
 // According to an article in Wall Street Journal, it came with a 10 MB HD and 640 K RAM.
 
-// We have no version history. The BOOT 2.4 README reveals 'recent ROM changes for MASS 11' 
-// in January 1985. These were not contained in the older version 04.03.11 (for PC-100-A) 
+// We have no version history. The BOOT 2.4 README reveals 'recent ROM changes for MASS 11'
+// in January 1985. These were not contained in the older version 04.03.11 (for PC-100-A)
 // and also not present in version 05.03 (from PC-100B / PC100B+).
 
 // A first glance:
@@ -1316,7 +1315,7 @@ ROM_START( rainb190 )
 	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "dec190rom0.bin",  0xf0000, 0x4000, CRC(FAC191D2) )
 	ROM_RELOAD(0xf4000,0x4000)
-	ROM_LOAD( "dec190rom1.bin", 0xf8000, 0x4000, CRC(5CE59632) ) 
+	ROM_LOAD( "dec190rom1.bin", 0xf8000, 0x4000, CRC(5CE59632) )
 
 	ROM_RELOAD(0xfc000,0x4000)
 	ROM_REGION(0x1000, "chargen", 0)

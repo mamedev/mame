@@ -29,7 +29,7 @@ struct tmp68301_interface
 {
 	devcb_read16         m_in_parallel_cb;
 	devcb_write16        m_out_parallel_cb;
-// 	TODO: serial ports
+//  TODO: serial ports
 };
 
 class tmp68301_device : public device_t,

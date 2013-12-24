@@ -11,13 +11,13 @@
     - Implement DVD routing and YUV decoding;
     - game timings seem busted, could be due of missing DVD hook-up
     - csplayh1: inputs doesn't work at all, slower than the others too
-	- h8 type is almost likely to be wrong;
+    - h8 type is almost likely to be wrong;
 
-	DVD Notes:
-	- TMP68301 communicates with h8 via their respective internal serial comms
-	- First command is a "?P<CR>", which, according to the Pioneer V5000 protocol manual
-	  is an Active Mode request. Manual is at:
-	  http://www.pioneerelectronics.com/ephox/StaticFiles/Manuals/Business/Pio%20V5000-RS232%20-%20CPM.pdf
+    DVD Notes:
+    - TMP68301 communicates with h8 via their respective internal serial comms
+    - First command is a "?P<CR>", which, according to the Pioneer V5000 protocol manual
+      is an Active Mode request. Manual is at:
+      http://www.pioneerelectronics.com/ephox/StaticFiles/Manuals/Business/Pio%20V5000-RS232%20-%20CPM.pdf
       After returning a correct status code, tmp68301 sends "FSDVD04.MPG00001<CR>" to serial, probably tries
       to playback the file ...
 

@@ -318,7 +318,7 @@ static void build_command_line(int argc, char *argv[])
 	else if (!strcmp(argv[1], "ar"))
 	{
 		transtable = ar_translate;
-		
+
 		if (!icl_compile)
 		{
 			executable = "link.exe";

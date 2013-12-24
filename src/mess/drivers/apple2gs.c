@@ -511,7 +511,7 @@ ROM_START(apple2gsr0)
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE00)
 ROM_END
 
-ROM_START(apple2gsr0p)	// 6/19/1986 Cortland prototype
+ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_REGION(0xc00,"m50740",0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
@@ -535,4 +535,3 @@ COMP( 1989, apple2gsr3lp, apple2gs, 0,  apple2gs, apple2gs, driver_device,   0, 
 COMP( 1987, apple2gsr1, apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM01)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0, apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00)", GAME_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0p,apple2gs, 0,    apple2gsr1, apple2gs, driver_device, 0, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", GAME_SUPPORTS_SAVE )
-

@@ -41,7 +41,7 @@ const device_type NES_EXROM = &device_creator<nes_exrom_device>;
 
 
 nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_EXROM, "NES Cart ExROM (MMC-5) PCB", tag, owner, clock, "nes_exrom", __FILE__)					
+					: nes_nrom_device(mconfig, NES_EXROM, "NES Cart ExROM (MMC-5) PCB", tag, owner, clock, "nes_exrom", __FILE__)
 {
 }
 

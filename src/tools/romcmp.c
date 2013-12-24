@@ -472,7 +472,7 @@ static int load_files(int i, int *found, const char *path)
 				UINT64 size = d->size;
 				while (size && (size & 1) == 0) size >>= 1;
 				//if (size & ~1)
-				//	printf("%-23s %-23s ignored (not a ROM)\n",i ? "" : d_name,i ? d_name : "");
+				//  printf("%-23s %-23s ignored (not a ROM)\n",i ? "" : d_name,i ? d_name : "");
 				//else
 				{
 					strcpy(files[i][found[i]].name,d_name);

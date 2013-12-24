@@ -83,8 +83,8 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 	key |= ioport("Y10")->read();
 	key |= ioport("Y11")->read();
 	key |= ioport("Y12")->read();
-//	DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
-//      	(key || m_kbd.pulsing) ? " will IRQ" : ""));
+//  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, m_kbd.pulsing,
+//          (key || m_kbd.pulsing) ? " will IRQ" : ""));
 
 	/*
 	   If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
@@ -110,10 +110,10 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_porta_w)
 
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 {
-//	DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
+//  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	machine().device<pit8253_device>("pit8253")->gate2_w(BIT(data, 0));
-//	mc1502_speaker_set_spkrdata(BIT(data, 1));
+//  mc1502_speaker_set_spkrdata(BIT(data, 1));
 	m_centronics->strobe_w(BIT(data, 2));
 	m_centronics->autofeed_w(BIT(data, 3));
 	m_centronics->init_prime_w(BIT(data, 4));
@@ -124,7 +124,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 // bit 3: i8251 SYNDET pin triggers NMI (default = 1 = no)
 WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
 {
-//	DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
+//  DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
 	m_ppi_portc = data & 15;
 }
 
@@ -154,8 +154,8 @@ READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
 	data = ( data & ~0x10 ) | ( (BIT(m_ppi_portb, 1) && timer2_output) ? 0x10 : 0x00 );
 
-//	DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
-//      	data, tap_val, timer2_output, machine().describe_context()));
+//  DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
+//          data, tap_val, timer2_output, machine().describe_context()));
 	return data;
 }
 
@@ -176,7 +176,7 @@ READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 	if (m_kbd.mask & 0x0400) { key |= ioport("Y11")->read(); }
 	if (m_kbd.mask & 0x0800) { key |= ioport("Y12")->read(); }
 	key ^= 0xff;
-//	DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
+//  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
 	return key;
 }
 
@@ -188,14 +188,14 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portb_w)
 		m_kbd.mask |= 1 << 11;
 	else
 		m_kbd.mask &= ~(1 << 11);
-//	DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+//  DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
 WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
 {
 	m_kbd.mask &= ~(7 << 8);
 	m_kbd.mask |= ((data ^ 7) & 7) << 8;
-//	DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
+//  DBG_LOG(2,"mc1502_kppi_portc_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
 I8255_INTERFACE( mc1502_ppi8255_interface_1 )
@@ -244,7 +244,7 @@ WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out1_changed)
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out2_changed)
 {
-//	mc1502_speaker_set_input( state );
+//  mc1502_speaker_set_input( state );
 	m_cassette->output(state ? 1 : -1);
 }
 
@@ -311,9 +311,9 @@ MACHINE_RESET_MEMBER( mc1502_state, mc1502 )
 
 static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8, mc1502_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x97fff) AM_RAM	/* 96K on mainboard + 512K on extension card */
+	AM_RANGE(0x00000, 0x97fff) AM_RAM   /* 96K on mainboard + 512K on extension card */
 	AM_RANGE(0xc0000, 0xfbfff) AM_NOP
-//	AM_RANGE(0xe8000, 0xeffff) AM_ROM       /* BASIC */
+//  AM_RANGE(0xe8000, 0xeffff) AM_ROM       /* BASIC */
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -379,7 +379,7 @@ static MACHINE_CONFIG_START( mc1502, mc1502_state )
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
-//	MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
+//  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

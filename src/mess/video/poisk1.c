@@ -82,12 +82,12 @@ WRITE8_MEMBER(p1_state::p1_vram_w)
 
 // CGA emulator
 /*
-068h	D42	0..2	R, G, B		XXX Foreground/Background color
-		3	NMI DISABLE	NMI trap  1: Disabled  0: Enabled
-		4	PALETTE		XXX Colour palette  0: XXX  1: XXX
-		5	I (INTENS)	XXX Foreground/Background color intensity
-		6	DISPLAY BANK	XXX Video RAM page
-		7	HIRES		1: 640x200  0: 320x200
+068h    D42 0..2    R, G, B     XXX Foreground/Background color
+        3   NMI DISABLE NMI trap  1: Disabled  0: Enabled
+        4   PALETTE     XXX Colour palette  0: XXX  1: XXX
+        5   I (INTENS)  XXX Foreground/Background color intensity
+        6   DISPLAY BANK    XXX Video RAM page
+        7   HIRES       1: 640x200  0: 320x200
 */
 
 WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
@@ -125,8 +125,8 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 }
 
 /*
-06Ah	Dxx	6	Enable/Disable color burst (?)
-		7	Enable/Disable D7H/D7L
+06Ah    Dxx 6   Enable/Disable color burst (?)
+        7   Enable/Disable D7H/D7L
 */
 
 WRITE8_MEMBER(p1_state::p1_ppi_portc_w)
@@ -151,13 +151,13 @@ void p1_state::set_palette_luts(void)
 	}
 	// B&W -- XXX
 /*
-	if ( m_video.mode_control_6a & 0x40 )
-	{
-		m_video.palette_lut_2bpp[1] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 3;
-		m_video.palette_lut_2bpp[2] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 4;
-		m_video.palette_lut_2bpp[3] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 7;
-	}
-	else
+    if ( m_video.mode_control_6a & 0x40 )
+    {
+        m_video.palette_lut_2bpp[1] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 3;
+        m_video.palette_lut_2bpp[2] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 4;
+        m_video.palette_lut_2bpp[3] = ( ( m_video.color_select_68 & 0x20 ) >> 2 ) | 7;
+    }
+    else
 */
 	{
 		// PALETTE

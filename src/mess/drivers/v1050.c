@@ -142,7 +142,7 @@ Notes:
 
     TODO:
 
-	- floppy 1 is broken
+    - floppy 1 is broken
     - write to banked RAM at 0x0000-0x1fff when ROM is active
     - real keyboard w/i8049
     - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)

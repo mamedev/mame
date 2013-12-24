@@ -41,7 +41,7 @@ const device_type T11 = &device_creator<t11_device>;
 t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, T11, "T11", tag, owner, clock, "t11", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
- 	, c_initial_mode(0)
+	, c_initial_mode(0)
 {
 	m_is_octal = true;
 }
@@ -379,4 +379,3 @@ offs_t t11_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opro
 	extern CPU_DISASSEMBLE( t11 );
 	return CPU_DISASSEMBLE_NAME(t11)(this, buffer, pc, oprom, opram, options);
 }
-

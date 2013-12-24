@@ -87,7 +87,7 @@ void ht68k_state::machine_reset()
 	memcpy((UINT8*)m_p_ram.target(),user1,0x8000);
 
 	m_maincpu->reset();
-	
+
 	m_fdc->reset();
 	m_fdc->set_floppy(NULL);
 }

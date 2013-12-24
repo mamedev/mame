@@ -70,18 +70,18 @@
 // ----------------------------------------------------------------------------------------
 
 #define NETLIST_MEMREGION(_name)                                                    \
-        netlist.parse((char *)downcast<netlist_mame_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());
+		netlist.parse((char *)downcast<netlist_mame_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());
 
 #define NETDEV_ANALOG_CALLBACK(_name, _IN, _class, _member, _tag) \
-        { \
-            NETLIB_NAME(analog_callback) *dev = downcast<NETLIB_NAME(analog_callback) *>(netlist.register_dev(NET_NEW(analog_callback), # _name)); \
-            netlist_analog_output_delegate d = netlist_analog_output_delegate(& _class :: _member, # _class "::" # _member, _tag, (_class *) 0); \
-            dev->register_callback(d); \
-        } \
-        NET_CONNECT(_name, IN, _IN)
+		{ \
+			NETLIB_NAME(analog_callback) *dev = downcast<NETLIB_NAME(analog_callback) *>(netlist.register_dev(NET_NEW(analog_callback), # _name)); \
+			netlist_analog_output_delegate d = netlist_analog_output_delegate(& _class :: _member, # _class "::" # _member, _tag, (_class *) 0); \
+			dev->register_callback(d); \
+		} \
+		NET_CONNECT(_name, IN, _IN)
 
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
-    void _name(const double data, const attotime &time)
+	void _name(const double data, const attotime &time)
 
 class netlist_mame_device;
 
@@ -89,26 +89,26 @@ class netlist_mame_t : public netlist_base_t
 {
 public:
 
-    netlist_mame_t(netlist_mame_device &parent)
-    : netlist_base_t(),
-        m_parent(parent)
-    {}
-    virtual ~netlist_mame_t() { };
+	netlist_mame_t(netlist_mame_device &parent)
+	: netlist_base_t(),
+		m_parent(parent)
+	{}
+	virtual ~netlist_mame_t() { };
 
-    inline running_machine &machine();
+	inline running_machine &machine();
 
-    netlist_mame_device &parent() { return m_parent; }
+	netlist_mame_device &parent() { return m_parent; }
 
 protected:
 
-    void vfatalerror(const char *format, va_list ap) const
-    {
-        emu_fatalerror error(format, ap);
-        throw error;
-    }
+	void vfatalerror(const char *format, va_list ap) const
+	{
+		emu_fatalerror error(format, ap);
+		throw error;
+	}
 
 private:
-    netlist_mame_device &m_parent;
+	netlist_mame_device &m_parent;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -121,21 +121,21 @@ private:
 // ======================> netlist_mame_device
 
 class netlist_mame_device : public device_t,
-						    public device_execute_interface
-		                    //public device_state_interface
-						    //, public device_memory_interface
+							public device_execute_interface
+							//public device_state_interface
+							//, public device_memory_interface
 {
 public:
 
 	template<bool _Required, class _NETClass>
 	class output_finder;
-    template<class C>
+	template<class C>
 	class optional_output;
 	template<class C>
 	class required_output;
-    template<class C>
+	template<class C>
 	class optional_param;
-    template<class C>
+	template<class C>
 	class required_param;
 	class on_device_start;
 
@@ -159,7 +159,7 @@ protected:
 	virtual void device_stop();
 	virtual void device_reset();
 	virtual void device_post_load();
-    virtual void device_pre_save();
+	virtual void device_pre_save();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
 	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
@@ -173,8 +173,8 @@ protected:
 // more save state ... needs to go somewhere else
 
 	struct qentry {
-        netlist_time m_time;
-	    char m_name[64];
+		netlist_time m_time;
+		char m_name[64];
 	};
 
 	qentry qtemp[1024];
@@ -193,7 +193,7 @@ private:
 
 inline running_machine &netlist_mame_t::machine()
 {
-    return m_parent.machine();
+	return m_parent.machine();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -205,75 +205,75 @@ typedef device_delegate<void (const double, const attotime &)> netlist_analog_ou
 class NETLIB_NAME(analog_callback) : public netlist_device_t
 {
 public:
-    NETLIB_NAME(analog_callback)()
-        : netlist_device_t() { }
+	NETLIB_NAME(analog_callback)()
+		: netlist_device_t() { }
 
-    ATTR_COLD void start()
-    {
-        register_input("IN", m_in);
-        m_callback.bind_relative_to(downcast<netlist_mame_t &>(netlist()).machine().root_device());
-    }
+	ATTR_COLD void start()
+	{
+		register_input("IN", m_in);
+		m_callback.bind_relative_to(downcast<netlist_mame_t &>(netlist()).machine().root_device());
+	}
 
-    ATTR_COLD void register_callback(netlist_analog_output_delegate callback)
-    {
-        m_callback = callback;
-    }
+	ATTR_COLD void register_callback(netlist_analog_output_delegate callback)
+	{
+		m_callback = callback;
+	}
 
-    ATTR_HOT void update()
-    {
-        // FIXME: Remove after device cleanup
-        if (!m_callback.isnull())
-            m_callback(INPANALOG(m_in), downcast<netlist_mame_t &>(netlist()).parent().local_time());
-    }
+	ATTR_HOT void update()
+	{
+		// FIXME: Remove after device cleanup
+		if (!m_callback.isnull())
+			m_callback(INPANALOG(m_in), downcast<netlist_mame_t &>(netlist()).parent().local_time());
+	}
 
 private:
-    netlist_analog_input_t m_in;
-    netlist_analog_output_delegate m_callback;
+	netlist_analog_input_t m_in;
+	netlist_analog_output_delegate m_callback;
 };
 
 class NETLIB_NAME(sound) : public netlist_device_t
 {
 public:
-    NETLIB_NAME(sound)()
-        : netlist_device_t() { }
+	NETLIB_NAME(sound)()
+		: netlist_device_t() { }
 
-    static const int BUFSIZE = 2048;
+	static const int BUFSIZE = 2048;
 
-    ATTR_COLD void start()
-    {
-        register_input("IN", m_in);
-        m_cur = 0;
-        m_last_pos = 0;
-        m_last_buffer = netlist_time::zero;
-        m_sample = netlist_time::zero;  // FIXME: divide by zero
-     }
+	ATTR_COLD void start()
+	{
+		register_input("IN", m_in);
+		m_cur = 0;
+		m_last_pos = 0;
+		m_last_buffer = netlist_time::zero;
+		m_sample = netlist_time::zero;  // FIXME: divide by zero
+		}
 
-    ATTR_HOT void sound_update()
-    {
-        netlist_time current = netlist().time();
-        int pos = (current - m_last_buffer) / m_sample;
-        if (pos >= BUFSIZE)
-            netlist().xfatalerror("sound %s: exceeded BUFSIZE\n", name().cstr());
-        while (m_last_pos < pos )
-        {
-            m_buffer[m_last_pos++] = m_cur;
-        }
-    }
+	ATTR_HOT void sound_update()
+	{
+		netlist_time current = netlist().time();
+		int pos = (current - m_last_buffer) / m_sample;
+		if (pos >= BUFSIZE)
+			netlist().xfatalerror("sound %s: exceeded BUFSIZE\n", name().cstr());
+		while (m_last_pos < pos )
+		{
+			m_buffer[m_last_pos++] = m_cur;
+		}
+	}
 
-    ATTR_HOT void update()
-    {
-        double val = INPANALOG(m_in);
-        sound_update();
-        m_cur = val;
-    }
+	ATTR_HOT void update()
+	{
+		double val = INPANALOG(m_in);
+		sound_update();
+		m_cur = val;
+	}
 
 private:
-    netlist_analog_input_t m_in;
-    netlist_time m_sample;
-    double m_cur;
-    int m_last_pos;
-    netlist_time m_last_buffer;
-    stream_sample_t m_buffer[BUFSIZE];
+	netlist_analog_input_t m_in;
+	netlist_time m_sample;
+	double m_cur;
+	int m_last_pos;
+	netlist_time m_last_buffer;
+	stream_sample_t m_buffer[BUFSIZE];
 };
 
 

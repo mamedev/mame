@@ -6,14 +6,14 @@
 */
 
 /* LK201-AA keyboard matrix (8048 version with updates)
-   Source: VCB02 Technical Reference. 
+   Source: VCB02 Technical Reference.
 
-   KBD controller scan matrix (PORT 1): 8 x BCD IN => 18 DECIMAL OUT 
+   KBD controller scan matrix (PORT 1): 8 x BCD IN => 18 DECIMAL OUT
 
    Keyboard itself:
-   18 x IN (KEYBOARD DRIVE) KBD 17... KBD 0 => 
-   8 OUT (keyboard data @ D7..D0) 
-   
+   18 x IN (KEYBOARD DRIVE) KBD 17... KBD 0 =>
+   8 OUT (keyboard data @ D7..D0)
+
    to => PORT 0 @ KBD controller.
 
 ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
@@ -34,7 +34,7 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 --------|----|----|----|---|---|---|---|---
 ..KBD13:|Ins.|--- |'Do'|Prev { |"  |[R]|[R]
 ........|Here|-   |    Scrn| [ |'  |   |
-........|E17 |E11 |G16 |D17|D11|C11|   |            
+........|E17 |E11 |G16 |D17|D11|C11|   |
 --------|----|----|----|---|---|---|---|---
 ..KBD12:|Find|+   |Help|Se-| } |Re-|C:L| |
 ........|    |=   |    |lect ] |turn...| \
@@ -45,14 +45,14 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 ........|G14 | E13|....|E10|D10|...|C10|B10
 --------|----|----|----|---|---|---|---|---
 ..KBD10:|[R] |F12 |[R] |F13| ( |O  |L  | .
-........|....|(BS)|    |(LF) 9 |   |   | . 
+........|....|(BS)|    |(LF) 9 |   |   | .
 ........|....|G12 |....|G13|E09|D09|C09|B09
 --------|----|----|----|---|---|---|---|---
 ..KBD_9:|[R] |F11 |[R] |[R]|*  |I  |K  | ,
 ........|....|ESC |    |   |8  |   |   | ,
 ........|....|G11 |....|...|E08|D08|C08|B08
 --------|----|----|----|---|---|---|---|---
-..KBD_8:|[R] |Main|[R] Exit|&  |U  |J  |M  
+..KBD_8:|[R] |Main|[R] Exit|&  |U  |J  |M
 ........|    |Scrn|    |   |7  |   |   |
 ........|    |G08 |    |G09|E07|D07|C07|B07
 --------|----|----|----|---|---|---|---|---
@@ -65,7 +65,7 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 ........|....|....|....|G05|E05|D05|C05|B05
 --------|----|----|----|---|---|---|---|---
 ..KBD_5: F4  |Break [R]|$  |R  |F  |V  |Space
-........|....|....|....|4  |   |   |   |         
+........|....|....|....|4  |   |   |   |
 ........ G02 |G03 |....|E04 D04 C04 B04 A01-A09
 --------|----|----|----|---|---|---|---|---
 ..KBD_4: [R] |Prt.|[R] |Set|#  |E  |D  |C
@@ -77,7 +77,7 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 ........|G99 |E02 |....|D00|D02|C02|B02|B00
 --------|----|----|----|---|---|---|---|---
 ..KBD_2: [R] |[R] |[R] |~  |!  |Q  |A  |Z
-........|..............|...|1  
+........|..............|...|1
 ........|..............|E00 E01 D01 C01 B01
 --------|----|----|----|---|---|---|---|---
 ..KBD_1: Ctrl|Lock|Comp|[R]
@@ -93,13 +93,13 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
   Normally only the N0 keyswitch is implemented as a double-sized key.
   NOTE 3) Return key occupies 2 positions that are
   decoded as the Return (C13) key.
-  
+
   C:D - Cursor down (B17)
   C:U - Cursor up (C17)
   C:R - Cursor right (B18)
   C:L - Cursor left (B16)
  */
- 
+
 #include "emu.h"
 #include "dec_lk201.h"
 #include "cpu/m6805/m6805.h"

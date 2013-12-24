@@ -682,7 +682,7 @@ int tms57002_device::decode_get_pc()
 	for(;;) {
 		short ipc;
 		UINT32 opcode = program->read_dword(adr << 2);
-		
+
 		cs.inc = 0;
 
 		if((opcode & 0xfc0000) == 0xfc0000)
@@ -743,11 +743,11 @@ void tms57002_device::execute_run()
 			case 1:
 				++ca;
 				goto inst;
-			
+
 			case 2:
 				++id;
 				goto inst;
-			
+
 			case 3:
 				++ca, ++id;
 				goto inst;

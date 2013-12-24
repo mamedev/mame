@@ -163,7 +163,7 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				}
 			}
 		}
-		
+
 		// process channels
 		INT32 mix = 0;
 
@@ -174,11 +174,11 @@ void ymz770_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 				// force finish current block
 				mix += (m_channels[ch].output_data[m_channels[ch].output_ptr++]*m_channels[ch].volume);
 				m_channels[ch].output_remaining--;
-				
+
 				if (m_channels[ch].output_remaining == 0 && !m_channels[ch].is_playing)
 					m_channels[ch].decoder->clear();
 			}
-			
+
 			else if (m_channels[ch].is_playing)
 			{
 retry:
@@ -254,11 +254,11 @@ void ymz770_device::internal_reg_write(UINT8 reg, UINT8 data)
 				m_mute = data & 1;
 				m_doen = data >> 1 & 1;
 				break;
-			
+
 			case 0x01:
 				m_vlma = data;
 				break;
-			
+
 			case 0x02:
 				m_bsl = data & 7;
 				m_cpl = data >> 4 & 7;
@@ -308,7 +308,7 @@ void ymz770_device::internal_reg_write(UINT8 reg, UINT8 data)
 				break;
 		}
 	}
-	
+
 	// sequencer registers
 	else
 	{

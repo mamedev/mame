@@ -291,4 +291,3 @@ DRIVER_INIT_MEMBER(esqkt_state, kt)
 }
 
 CONS( 1996, kt76, 0, 0, kt, kt, esqkt_state, kt, "Ensoniq", "KT-76", GAME_NOT_WORKING )
-

@@ -81,10 +81,10 @@ public:
 };
 
 /*
-	slot 0 selects RAM
-	slot 1 selects ?
-	slot 2 selects code ROMs
-	slot 3 selects data ROMs
+    slot 0 selects RAM
+    slot 1 selects ?
+    slot 2 selects code ROMs
+    slot 3 selects data ROMs
 */
 void sangho_state::pzlestar_map_banks()
 {

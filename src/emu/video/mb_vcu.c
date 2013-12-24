@@ -278,7 +278,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 	UINT8 pen = 0;
 	UINT8 cur_layer;
 
-//	cur_layer = (m_mode & 0x3);
+//  cur_layer = (m_mode & 0x3);
 	cur_layer = 0;
 
 	switch(m_mode >> 2)

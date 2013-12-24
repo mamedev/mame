@@ -35,9 +35,9 @@
 #include "nld_signal.h"
 
 #define TTL_7402_NOR(_name, _I1, _I2)                                               \
-        NET_REGISTER_DEV(7402, _name)                                               \
-        NET_CONNECT(_name, A, _I1)                                                  \
-        NET_CONNECT(_name, B, _I2)
+		NET_REGISTER_DEV(7402, _name)                                               \
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)
 
 NETLIB_SIGNAL(7402, 2, 1, 0);
 

@@ -273,26 +273,26 @@ READ16_MEMBER(igs025_device::killbld_igs025_prot_r)
 
 		case 0x05:
 		{
-					 switch (m_kb_ptr)
-					 {
-					 case 1:
-						 return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
+						switch (m_kb_ptr)
+						{
+						case 1:
+							return 0x3f00 | ((m_kb_game_id >> 0) & 0xff);
 
-					 case 2:
-						 return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
+						case 2:
+							return 0x3f00 | ((m_kb_game_id >> 8) & 0xff);
 
-					 case 3:
-						 return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
+						case 3:
+							return 0x3f00 | ((m_kb_game_id >> 16) & 0xff);
 
-					 case 4:
-						 return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
+						case 4:
+							return 0x3f00 | ((m_kb_game_id >> 24) & 0xff);
 
-					 default: // >= 5
-						 return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
-					 }
+						default: // >= 5
+							return 0x3f00 | BITSWAP8(m_kb_prot_hold, 5, 2, 9, 7, 10, 13, 12, 15);
+						}
 
-					 return 0x3f00;
-					 //return 0;
+						return 0x3f00;
+						//return 0;
 		}
 
 		case 0x40:

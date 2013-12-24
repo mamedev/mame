@@ -223,7 +223,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ec1847_io, AS_IO, 8, ec184x_state )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender
+//  AM_RANGE(0x0210, 0x021f) AM_RAM // internal (non-standard?) bus extender
 ADDRESS_MAP_END
 
 
@@ -251,12 +251,12 @@ static MACHINE_CONFIG_START( ec1840, ec184x_state )
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(ec1840)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "mda", false)	// cga is? an option
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "mda", false)   // cga is? an option
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)	// native variant(s?) not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)	// native serial not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, NULL, false)	// native mouse port not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)	// game port is an option
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)    // native variant(s?) not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)    // native serial not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, NULL, false)    // native mouse port not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)    // game port is an option
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
@@ -271,7 +271,7 @@ static MACHINE_CONFIG_START( ec1841, ec184x_state )
 	MCFG_CPU_PROGRAM_MAP(ec1841_map)
 	MCFG_CPU_IO_MAP(ec1841_io)
 
-//	MCFG_MACHINE_START_OVERRIDE(ec184x_state, ec184x)
+//  MCFG_MACHINE_START_OVERRIDE(ec184x_state, ec184x)
 	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec184x)
 
 	MCFG_EC1841_MOTHERBOARD_ADD("mb", "maincpu")
@@ -279,10 +279,10 @@ static MACHINE_CONFIG_START( ec1841, ec184x_state )
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga_ec1841", false)// mda is an option
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)	// native variants not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)	// native serial not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, NULL, false)	// native mouse port not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)	// game port is? an option
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)    // native variants not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)    // native serial not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, NULL, false)    // native mouse port not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)    // game port is? an option
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( ec1841, ec184x_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("1024K,1576K,2048K")	// 640K variant not emulated
+	MCFG_RAM_EXTRA_OPTIONS("1024K,1576K,2048K") // 640K variant not emulated
 MACHINE_CONFIG_END
 
 // XXX verify everything
@@ -302,10 +302,10 @@ static MACHINE_CONFIG_START( ec1847, ec184x_state )
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(ec1847)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", false)	// cga, ega and vga(?) are options too
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", false)  // cga, ega and vga(?) are options too
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)	// native variant (wd1010 + z80) not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)	// native serial (2x8251) not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)    // native variant (wd1010 + z80) not emulated
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, NULL, false)    // native serial (2x8251) not emulated
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, NULL, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, NULL, false)
 

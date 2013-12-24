@@ -35,13 +35,13 @@
 #include "nld_signal.h"
 
 #define TTL_7486_XOR(_name, _A, _B)                                                 \
-        NET_REGISTER_DEV(7486, _name)                                               \
-        NET_CONNECT(_name, A, _A)                                                   \
-        NET_CONNECT(_name, B, _B)
+		NET_REGISTER_DEV(7486, _name)                                               \
+		NET_CONNECT(_name, A, _A)                                                   \
+		NET_CONNECT(_name, B, _B)
 
 NETLIB_DEVICE(7486,
-        netlist_ttl_input_t m_A;
-        netlist_ttl_input_t m_B;
-        netlist_ttl_output_t m_Q;
+		netlist_ttl_input_t m_A;
+		netlist_ttl_input_t m_B;
+		netlist_ttl_output_t m_Q;
 );
 #endif /* NLD_7486_H_ */

@@ -5802,7 +5802,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( thunderlbl )
 	PORT_INCLUDE(thunderl)
-	
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
@@ -8758,7 +8758,7 @@ static MACHINE_CONFIG_DERIVED( thunderlbl, thunderl )
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
 	MCFG_DEVICE_REMOVE("x1snd")
-	
+
 	MCFG_YM2151_ADD("ymsnd", 16000000/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

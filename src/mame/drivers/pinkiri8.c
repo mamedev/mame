@@ -198,17 +198,17 @@ void pinkiri8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 	/*  "vram1" (video map 0xfc2000)
 
-		tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
+	    tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
 
-		"vram2" (video map 0xfc3800)
+	    "vram2" (video map 0xfc3800)
 
-		yyyy yyyy | ???? ???? |
+	    yyyy yyyy | ???? ???? |
 
 
-		widths come from "widthflags" (0xfc3780)
-		"unk1" (0xfc3700) and "unk2" (0xfc37c0) are a mystery
+	    widths come from "widthflags" (0xfc3780)
+	    "unk1" (0xfc3700) and "unk2" (0xfc37c0) are a mystery
 
-		*/
+	    */
 
 		spr_offs = ((m_janshi_vram1[(i*4)+0] & 0xff) | (m_janshi_vram1[(i*4)+1]<<8)) & 0xffff;
 		col = (m_janshi_vram1[(i*4)+2] & 0xf8) >> 3;
@@ -321,7 +321,6 @@ void pinkiri8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* update palette */
 	for (int pen = 0; pen < 0x800 ; pen++)
 	{

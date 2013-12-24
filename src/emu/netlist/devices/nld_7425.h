@@ -39,11 +39,11 @@
 #include "nld_signal.h"
 
 #define TTL_7425_NOR(_name, _I1, _I2, _I3, _I4)                                     \
-        NET_REGISTER_DEV(7425, _name)                                               \
-        NET_CONNECT(_name, A, _I1)                                                  \
-        NET_CONNECT(_name, B, _I2)                                                  \
-        NET_CONNECT(_name, C, _I3)                                                  \
-        NET_CONNECT(_name, D, _I4)
+		NET_REGISTER_DEV(7425, _name)                                               \
+		NET_CONNECT(_name, A, _I1)                                                  \
+		NET_CONNECT(_name, B, _I2)                                                  \
+		NET_CONNECT(_name, C, _I3)                                                  \
+		NET_CONNECT(_name, D, _I4)
 
 
 NETLIB_SIGNAL(7425, 4, 1, 0);

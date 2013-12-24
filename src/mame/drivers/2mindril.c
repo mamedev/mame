@@ -50,7 +50,7 @@ public:
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_iodata;
-	
+
 	/* input-related */
 	UINT16        m_defender_sensor;
 	UINT16        m_shutter_sensor;
@@ -76,7 +76,7 @@ public:
 		TIMER_SHUTTER_REQ,
 		TIMER_DEFENDER_REQ
 	};
-	
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	#endif
@@ -152,7 +152,7 @@ void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int par
 			m_shutter_sensor = param;
 			break;
 	case TIMER_DEFENDER_REQ:
- 			m_defender_sensor = param;
+			m_defender_sensor = param;
 			break;
 	default:
 			assert_always(FALSE, "Unknown id in _2mindril_state::device_timer");

@@ -1,34 +1,34 @@
 /*
-	Konami Endeavour hardware (gambling games)
+    Konami Endeavour hardware (gambling games)
 
 
-	Hardware:
+    Hardware:
 
-	1. Backplane PCB (GGAT2 PWB(A1) 10000094517)
-	   - VGA connector
-	   - RJ45 connector
+    1. Backplane PCB (GGAT2 PWB(A1) 10000094517)
+       - VGA connector
+       - RJ45 connector
 
-	2. Main PCB (GGAT2 PWB(B2) 0000093536)
-	   - PowerPC 403GCX
-	   - Unknown large QFP IC under heatsink (0000057714/Firebeat GCU?)
-	   - Xilinx CPLD
-	   - 2 x Hynix RAM
-	   - 4 x HY57V641620 SDRAM
-	   - 2 x Hynix RAM (sound?)
-	   - 2 x EPROMs
-	   - 1 x SRAM (battery backup?)
-	   - 2 x CR2032, 2 x supercaps
-	   - Unknown Fujitsu IC
-	   - YMZ280B
-	   - Sound amplifier with heatsink
+    2. Main PCB (GGAT2 PWB(B2) 0000093536)
+       - PowerPC 403GCX
+       - Unknown large QFP IC under heatsink (0000057714/Firebeat GCU?)
+       - Xilinx CPLD
+       - 2 x Hynix RAM
+       - 4 x HY57V641620 SDRAM
+       - 2 x Hynix RAM (sound?)
+       - 2 x EPROMs
+       - 1 x SRAM (battery backup?)
+       - 2 x CR2032, 2 x supercaps
+       - Unknown Fujitsu IC
+       - YMZ280B
+       - Sound amplifier with heatsink
 
-	3. I/O PCB (GGAT2 PWB(B2) ???????????)
-	   - H8/3001
-	   - EPROM socket
-	   - Various CPLDs
+    3. I/O PCB (GGAT2 PWB(B2) ???????????)
+       - H8/3001
+       - EPROM socket
+       - Various CPLDs
 
-	I think they use CF cards for resources, one game has what appears to be a dump of one
-	but the rest don't.  It's quite possibly (even likely) that all the sets here are incomplete.
+    I think they use CF cards for resources, one game has what appears to be a dump of one
+    but the rest don't.  It's quite possibly (even likely) that all the sets here are incomplete.
 */
 
 
@@ -238,7 +238,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(konendev_state,konendev)
 {
-
 }
 
 // has a flash dump?

@@ -12,7 +12,7 @@
 
 class netlist_parser
 {
-    NETLIST_PREVENT_COPYING(netlist_parser)
+	NETLIST_PREVENT_COPYING(netlist_parser)
 public:
 	netlist_parser(netlist_setup_t &setup)
 	: m_setup(setup) {}
@@ -20,10 +20,10 @@ public:
 	void parse(const char *buf);
 	void net_alias();
 	void netdev_param();
-    void net_c();
+	void net_c();
 	void netdev_const(const pstring &dev_name);
 	void netdev_device(const pstring &dev_type);
-    void netdev_device(const pstring &dev_type, const pstring &default_param, bool isString = false);
+	void netdev_device(const pstring &dev_type, const pstring &default_param, bool isString = false);
 
 private:
 

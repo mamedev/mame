@@ -37,7 +37,7 @@ public:
 	{
 		CTS = 0x0001, /* Clear to Send.       (INPUT)  Other end of connection is ready to accept data */
 		RTS = 0x0002, /* Request to Send.     (OUTPUT) This end is ready to send data, and requests if the other */
-		              /*                               end is ready to accept it */
+						/*                               end is ready to accept it */
 		DSR = 0x0004, /* Data Set ready.      (INPUT)  Other end of connection has data */
 		DTR = 0x0008, /* Data terminal Ready. (OUTPUT) TX contains new data. */
 		RX  = 0x0010, /* Recieve data.        (INPUT)  */
@@ -159,7 +159,7 @@ private:
 
 
 class serial_source_device :  public device_t,
-							  public device_serial_interface
+								public device_serial_interface
 {
 public:
 	// construction/destruction

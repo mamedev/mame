@@ -77,11 +77,11 @@ public:
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
 /*
-	TIMER_CALLBACK_MEMBER(fdc_motor_callback);
-	static struct {
-		int         fdc_motor_on;
-		emu_timer   *fdc_motor_timer;
-	} m_motor;
+    TIMER_CALLBACK_MEMBER(fdc_motor_callback);
+    static struct {
+        int         fdc_motor_on;
+        emu_timer   *fdc_motor_timer;
+    } m_motor;
 */
 	const char *m_cputag;
 };

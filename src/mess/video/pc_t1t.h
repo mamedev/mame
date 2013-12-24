@@ -14,7 +14,7 @@ struct reg
 			index = 0;
 			memset(&data, 0, sizeof(data));
 		}
-		
+
 	UINT8 index;
 	UINT8 data[0x20];
 	/* see vgadoc
@@ -35,8 +35,8 @@ public:
 	pc_t1t_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_PALETTE_INIT( pcjr );
-	
-	DECLARE_WRITE_LINE_MEMBER( t1000_de_changed );	
+
+	DECLARE_WRITE_LINE_MEMBER( t1000_de_changed );
 
 	required_device<mc6845_device> m_mc6845;
 	UINT8 m_mode_control, m_color_select;
@@ -60,7 +60,7 @@ public:
 	UINT8   m_display_enable;
 	UINT8   m_vsync;
 	UINT8   m_palette_base;
-	
+
 	int mode_control_r(void);
 	void color_select_w(int data);
 	int color_select_r(void);
@@ -87,20 +87,20 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
-	
+
 private:
 	UINT8 *m_t1_displayram;
 	void mode_switch( void );
 	void vga_data_w(int data);
 	void bank_w(int data);
 	void mode_control_w(int data);
-};	
+};
 
 extern const device_type PCVIDEO_T1000;
 
 #define MCFG_PCVIDEO_T1000_ADD(_tag) \
 		MCFG_DEVICE_ADD(_tag, PCVIDEO_T1000, 0)
-	
+
 class pcvideo_pcjr_device :  public pc_t1t_device
 {
 public:
@@ -109,7 +109,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
-	
+
 	UINT8   *m_jxkanji;
 
 protected:

@@ -777,7 +777,7 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 	}
 
 	m_line_count = 0;
-	
+
 	// loop over primitives
 	for (render_primitive *prim = m_window->primlist->first(); prim != NULL; prim = prim->next())
 		if (prim->type == render_primitive::LINE && PRIMFLAG_GET_VECTOR(prim->flags))
@@ -1485,7 +1485,7 @@ void renderer::batch_vectors()
 	{
 		start_index %= m_line_count;
 	}
-	
+
 	m_line_count = 0;
 }
 

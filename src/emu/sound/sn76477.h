@@ -82,7 +82,7 @@ class sn76477_device : public device_t,
 public:
 	sn76477_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~sn76477_device() {}
-	
+
 	/* these functions take 0 or 1 as a logic input */
 	WRITE_LINE_MEMBER( enable_w );      /* active LO, 0 = enabled, 1 = disabled */
 	WRITE_LINE_MEMBER( mixer_a_w );
@@ -106,8 +106,8 @@ public:
 
 	/* these functions take a capacitor value in Farads or the voltage on it in Volts */
 	#define SN76477_EXTERNAL_VOLTAGE_DISCONNECT   (-1.0)    /* indicates that the voltage is internally computed,
-															   can be used in all the functions that take a
-															   voltage on a capacitor */
+                                                               can be used in all the functions that take a
+                                                               voltage on a capacitor */
 	void one_shot_cap_w(double data);
 	void one_shot_cap_voltage_w(double data);
 	void slf_cap_w(double data);
@@ -131,7 +131,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 private:
 	/* chip's external interface */
 	UINT32 m_enable;
@@ -167,7 +167,7 @@ private:
 	double m_amplitude_res;
 	double m_feedback_res;
 	double m_pitch_voltage;
-	
+
 	// internal state
 	double m_one_shot_cap_voltage;        /* voltage on the one-shot cap */
 	UINT32 m_one_shot_running_ff;         /* 1 = one-shot running, 0 = stopped */
@@ -191,9 +191,9 @@ private:
 	/* others */
 	sound_stream *m_channel;              /* returned by stream_create() */
 	int m_our_sample_rate;                    /* from machine.sample_rate() */
-	
+
 	wav_file *m_file;                     /* handle of the wave file to produce */
-	
+
 	double compute_one_shot_cap_charging_rate();
 	double compute_one_shot_cap_discharging_rate();
 	double compute_slf_cap_charging_rate();
@@ -206,7 +206,7 @@ private:
 	double compute_attack_decay_cap_charging_rate();
 	double compute_attack_decay_cap_discharging_rate();
 	double compute_center_to_peak_voltage_out();
-	
+
 	void log_enable_line();
 	void log_mixer_mode();
 	void log_envelope_mode();
@@ -223,16 +223,16 @@ private:
 	void log_decay_time();
 	void log_voltage_out();
 	void log_complete_state();
-	
+
 	void open_wav_file();
 	void close_wav_file();
 	void add_wav_data(INT16 data_l, INT16 data_r);
-	
+
 	void intialize_noise();
 	inline UINT32 generate_next_real_noise_bit();
-	
+
 	void state_save_register();
-	
+
 	void _SN76477_enable_w(UINT32 data);
 	void _SN76477_vco_w(UINT32 data);
 	void _SN76477_mixer_a_w(UINT32 data);

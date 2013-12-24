@@ -640,7 +640,7 @@ ROM_START( cobraa )
 	ROM_REGION( 0x40000, "misc", 0 )
 	ROM_LOAD( "lp4-1.pal16l8cn.bin",        0x0000, 0x40000, CRC(4aeb2c7e) SHA1(3c962656cffc8d927047c64a15afccab767d776f) ) // dumped with cgfm's tool
 	ROM_LOAD( "lp4-1.pal16l8cn.pld",        0x0000, 0x00f71, CRC(ac1f1177) SHA1(ab721a840207354916c96e0ae83220fed12c6352) )
-//	ROM_LOAD( "lp4-2-pal10l8.d6.jed",       0x0000, 0x00249, CRC(309b3ce5) SHA1(04f185911d33730004c7cd44a693dd1b69b82032) )
+//  ROM_LOAD( "lp4-2-pal10l8.d6.jed",       0x0000, 0x00249, CRC(309b3ce5) SHA1(04f185911d33730004c7cd44a693dd1b69b82032) )
 	ROM_LOAD( "lp4-2-pal10l8.d6.bin",       0x0000, 0x0002c, CRC(e594fd13) SHA1(4bb8a9b7cf8f8eaa3c9f290b6e5085a10c927e20) )
 
 	ROM_REGION( 0x20, "proms", 0 )

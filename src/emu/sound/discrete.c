@@ -698,7 +698,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 	{
 		const discrete_block *block = block_list[i];
 
-        //discrete_base_node *node = block->factory->Create(this, block);
+		//discrete_base_node *node = block->factory->Create(this, block);
 		discrete_base_node *node = block->factory(this, block);
 		/* keep track of special nodes */
 		if (block->node == NODE_SPECIAL)

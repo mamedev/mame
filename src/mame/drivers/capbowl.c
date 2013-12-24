@@ -92,7 +92,7 @@
 #include "sound/2203intf.h"
 #include "sound/dac.h"
 
-#define MASTER_CLOCK		XTAL_8MHz
+#define MASTER_CLOCK        XTAL_8MHz
 
 
 /*************************************
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 
 	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-//	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // TODO
+//  MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // TODO
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 

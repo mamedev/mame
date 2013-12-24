@@ -1610,7 +1610,7 @@ void vegas_state::remap_dynamic_addresses()
 	/* unmap everything we know about */
 	for (addr = 0; addr < m_dynamic_count; addr++)
 		m_maincpu->space(AS_PROGRAM).unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
-	
+
 	for (l_addr = 0; l_addr < m_legacy_dynamic_count; l_addr++)
 		m_maincpu->space(AS_PROGRAM).unmap_readwrite(l_dynamic[l_addr].start, l_dynamic[l_addr].end);
 
@@ -1741,7 +1741,7 @@ void vegas_state::remap_dynamic_addresses()
 		if (!dynamic[addr].write.isnull())
 			space.install_write_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].write);
 	}
-	
+
 	for (l_addr = 0; l_addr < m_legacy_dynamic_count; l_addr++)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", l_dynamic[l_addr].start, l_dynamic[l_addr].end, l_dynamic[l_addr].rdname, l_dynamic[l_addr].wrname);

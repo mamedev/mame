@@ -14,7 +14,7 @@
 
     TODO:
 
-	- 3 expansion slots
+    - 3 expansion slots
     - palette RAM should be written during HBLANK
     - DART clocks
     - winchester hard disk
@@ -240,7 +240,7 @@ static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
 	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE(AY8912_TAG, ay8910_device, data_r, data_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0x03) AM_WRITE(system_w)
-//	AM_RANGE(0x20, 0x27) AM_NOP // winchester controller
+//  AM_RANGE(0x20, 0x27) AM_NOP // winchester controller
 //  AM_RANGE(0x60, 0x6f) analog I/O (SINTEF)
 //  AM_RANGE(0x60, 0x67) digital I/O (RVO)
 //  AM_RANGE(0x70, 0x77) analog/digital I/O
@@ -491,18 +491,18 @@ static Z80DART_INTERFACE( dart_intf )
 READ8_MEMBER( tiki100_state::pio_pb_r )
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
+
+	    0
+	    1
+	    2
+	    3
 	    4       ACK
 	    5       BUSY
 	    6       NO PAPER
 	    7       UNIT SELECT, tape in
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -521,18 +521,18 @@ READ8_MEMBER( tiki100_state::pio_pb_r )
 WRITE8_MEMBER( tiki100_state::pio_pb_w )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       STRB
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
+	    1
+	    2
+	    3
+	    4
+	    5
 	    6       tape out
-	    7       
-	
+	    7
+
 	*/
 
 	// centronics

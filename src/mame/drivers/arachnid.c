@@ -1,7 +1,7 @@
 /*
-	Arachnid - English Mark Darts
+    Arachnid - English Mark Darts
 
-	Driver by Jim Stolis.
+    Driver by Jim Stolis.
 
     --- Technical Notes ---
     Name:    English Mark Darts
@@ -9,49 +9,49 @@
     Year:    1987/88/89/90
 
     --- Hardware ---
-	A 6809 CPU (U3) is clocked by a 556 (U2) circuit with 3 Pin addressing decoding via a 74LS138 (U14)
-	Program ROM is a 27256 (U15)
-	Two 6821 PIAs (U4/U17) are used for I/O
-	Video is processed via a TMS9118 (U11) with two TMS4416 (U12/U13) as RAM
-	Main RAM is a 2K 6116 (U23) chip
-	Sound is generated via a PTM 6840 (U16) directly to an amplified speaker
+    A 6809 CPU (U3) is clocked by a 556 (U2) circuit with 3 Pin addressing decoding via a 74LS138 (U14)
+    Program ROM is a 27256 (U15)
+    Two 6821 PIAs (U4/U17) are used for I/O
+    Video is processed via a TMS9118 (U11) with two TMS4416 (U12/U13) as RAM
+    Main RAM is a 2K 6116 (U23) chip
+    Sound is generated via a PTM 6840 (U16) directly to an amplified speaker
 
-	--- Target Interface Board ---
-	The target interface board is used to combine 33 conductors from the switch matrix
-	into 16 conductors.  The middle 13 pin connector is common to all switches.
+    --- Target Interface Board ---
+    The target interface board is used to combine 33 conductors from the switch matrix
+    into 16 conductors.  The middle 13 pin connector is common to all switches.
 
-	3 connectors and their labels
-	EFBHDACGH	NMPLMNJOMIKOP	EBACFDCEAHB
+    3 connectors and their labels
+    EFBHDACGH   NMPLMNJOMIKOP   EBACFDCEAHB
 
-	Switch Matrix Table
-	Score	Single	Double	Triple
-	1		DN		EN		FN
-	2		AL		BL		CL
-	3		AN		BN		CN
-	4		DL		EL		FL
-	5		AP		BP		CP
-	6		GL		HL		GP
-	7		DO		EO		FO
-	8		GI		HI		GM
-	9		AO		BO		CO
-	10		AI		BI		CI
-	11		AK		BK		CK
-	12		DP		EP		FP
-	13		AM		BM		CM
-	14		GK		HK		GO
-	15		GJ		HJ		GN
-	16		AJ		BJ		CJ
-	17		DM		EM		FM
-	18		DI		EI		FI
-	19		DJ		EJ		FJ
-	20		DK		EK		FK
-	Bull	--		HM		--
+    Switch Matrix Table
+    Score   Single  Double  Triple
+    1       DN      EN      FN
+    2       AL      BL      CL
+    3       AN      BN      CN
+    4       DL      EL      FL
+    5       AP      BP      CP
+    6       GL      HL      GP
+    7       DO      EO      FO
+    8       GI      HI      GM
+    9       AO      BO      CO
+    10      AI      BI      CI
+    11      AK      BK      CK
+    12      DP      EP      FP
+    13      AM      BM      CM
+    14      GK      HK      GO
+    15      GJ      HJ      GN
+    16      AJ      BJ      CJ
+    17      DM      EM      FM
+    18      DI      EI      FI
+    19      DJ      EJ      FJ
+    20      DK      EK      FK
+    Bull    --      HM      --
 
 
-	TODO:
-	- Dip Switches (Controls credits per coin), Currently 2 coins per credit
-	- Test Mode Won't Activate
-	- Layout with Lamps	
+    TODO:
+    - Dip Switches (Controls credits per coin), Currently 2 coins per credit
+    - Test Mode Won't Activate
+    - Layout with Lamps
 */
 
 #include "emu.h"
@@ -65,10 +65,10 @@
 #define SCREEN_TAG      "screen"
 #define M6809_TAG       "u3"
 #define TMS9118_TAG     "u11"
-#define PIA6821_U4_TAG	"u4"
-#define PIA6821_U17_TAG	"u17"
-#define	PTM6840_TAG		"u16"
-#define SPEAKER_TAG		"speaker"
+#define PIA6821_U4_TAG  "u4"
+#define PIA6821_U17_TAG "u17"
+#define PTM6840_TAG     "u16"
+#define SPEAKER_TAG     "speaker"
 
 class arachnid_state : public driver_device
 {
@@ -95,11 +95,11 @@ public:
 	DECLARE_WRITE8_MEMBER( pia_u4_pb_w );
 	DECLARE_WRITE8_MEMBER( pia_u4_pca_w );
 	DECLARE_WRITE8_MEMBER( pia_u4_pcb_w );
-	
+
 	DECLARE_READ8_MEMBER( pia_u17_pa_r );
 	DECLARE_READ8_MEMBER( pia_u17_pca_r );
-	DECLARE_WRITE8_MEMBER( pia_u17_pb_w );	
-	DECLARE_WRITE8_MEMBER( pia_u17_pcb_w );	
+	DECLARE_WRITE8_MEMBER( pia_u17_pb_w );
+	DECLARE_WRITE8_MEMBER( pia_u17_pcb_w );
 
 	DECLARE_WRITE8_MEMBER(ptm_o1_callback);
 
@@ -421,14 +421,14 @@ WRITE8_MEMBER( arachnid_state::pia_u17_pcb_w )
 
 static const pia6821_interface pia_u4_intf =
 {
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pa_r),	// input A - From Switch Matrix
+	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pa_r),   // input A - From Switch Matrix
 	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pb_r),   // input B - From Switch Matrix
 	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pca_r),  // input CA1 - SW1 Coin In (Coin Door)
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pcb_r),	// input CB1 - SW2 Test Mode (Coin Door)
+	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pcb_r),  // input CB1 - SW2 Test Mode (Coin Door)
 	DEVCB_NULL,                                         // input CA2
-	DEVCB_NULL,										    // input CB2
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pa_w),	// output A - To Switch Matrix
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pb_w),	// output B - To Switch Matrix
+	DEVCB_NULL,                                         // input CB2
+	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pa_w),   // output A - To Switch Matrix
+	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pb_w),   // output B - To Switch Matrix
 	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pca_w),  // output CA2 - Remove Darts Lamp
 	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pcb_w),  // output CB2 - Throw Darts Lamp
 	DEVCB_NULL,                                         // irq A
@@ -437,15 +437,15 @@ static const pia6821_interface pia_u4_intf =
 
 static const pia6821_interface pia_u17_intf =
 {
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pa_r),	// input A - Select, Player Change, Coin, Test, DIPSW1
-	DEVCB_NULL,											// input B
+	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pa_r),  // input A - Select, Player Change, Coin, Test, DIPSW1
+	DEVCB_NULL,                                         // input B
 	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pca_r), // input CA1 - 1000 Hz Input
-	DEVCB_NULL,											// input CB1
+	DEVCB_NULL,                                         // input CB1
 	DEVCB_NULL,                                         // input CA2
-	DEVCB_NULL,										    // input CB2
-	DEVCB_NULL,											// output A
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pb_w),	// output B - Select Lamp, Player Change Lamp
-	DEVCB_NULL,											// output CA2
+	DEVCB_NULL,                                         // input CB2
+	DEVCB_NULL,                                         // output A
+	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pb_w),  // output B - Select Lamp, Player Change Lamp
+	DEVCB_NULL,                                         // output CA2
 	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pcb_w), // output CB2 - Target Lamp
 	DEVCB_NULL,                                         // irq A
 	DEVCB_NULL                                          // irq B
@@ -461,7 +461,6 @@ static const pia6821_interface pia_u17_intf =
 
 void arachnid_state::machine_start()
 {
-
 }
 
 /***************************************************************************

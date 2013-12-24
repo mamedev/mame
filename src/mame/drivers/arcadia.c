@@ -395,8 +395,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD16_BYTE_BIOS( 5, "gcp_v400_1-hi.u16", 0x000000, 0x10000, CRC(69295167) SHA1(855f53abbb9dc15e5518e16c5c2dfe4134d07306) ) \
 	ROM_LOAD16_BYTE_BIOS( 5, "gcp_v400_1-lo.u11", 0x000001, 0x10000, CRC(504c2171) SHA1(a93367f520afb86c97c0a191714b72823c95cdd2) ) \
 	ROM_LOAD16_BYTE_BIOS( 5, "gcp_v400_2-hi.u17", 0x020000, 0x10000, CRC(13fb4e2d) SHA1(3eef07aecc3a201ae0b20634c7fd0c87c89fd7f1) ) \
-	ROM_LOAD16_BYTE_BIOS( 5, "gcp_v400_2-lo.u12", 0x020001, 0x10000, CRC(a5cc4515) SHA1(80070521476e92323a6baa6e55928ca5b751a332) ) \
-
+	ROM_LOAD16_BYTE_BIOS( 5, "gcp_v400_2-lo.u12", 0x020001, 0x10000, CRC(a5cc4515) SHA1(80070521476e92323a6baa6e55928ca5b751a332) )
 
 ROM_START( ar_bios )
 	ARCADIA_BIOS
@@ -952,7 +951,7 @@ DRIVER_INIT_MEMBER(arcadia_amiga_state,socc) { arcadia_init(); generic_decode("u
 DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg) { arcadia_init(); generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon) { arcadia_init(); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,pm)   { arcadia_init(); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
-DRIVER_INIT_MEMBER(arcadia_amiga_state,dlta) { arcadia_init(); generic_decode("user3", 4, 6, 5, 7, 3, 2, 1, 0); generic_decode("user3", 7, 6, 0, 4, 3, 2, 1, 5); generic_decode("user3", 7, 6, 5, 4, 1, 2, 3, 0);  generic_decode("user3", 7, 6, 2, 4, 3, 5, 1, 0);  generic_decode("user3", 7, 6, 3, 4, 5, 2, 1, 0); generic_decode("user3", 7, 4, 5, 6, 3, 2, 1, 0);  generic_decode("user3", 7, 5, 6, 4, 3, 2, 1, 0); } 
+DRIVER_INIT_MEMBER(arcadia_amiga_state,dlta) { arcadia_init(); generic_decode("user3", 4, 6, 5, 7, 3, 2, 1, 0); generic_decode("user3", 7, 6, 0, 4, 3, 2, 1, 5); generic_decode("user3", 7, 6, 5, 4, 1, 2, 3, 0);  generic_decode("user3", 7, 6, 2, 4, 3, 5, 1, 0);  generic_decode("user3", 7, 6, 3, 4, 5, 2, 1, 0); generic_decode("user3", 7, 4, 5, 6, 3, 2, 1, 0);  generic_decode("user3", 7, 5, 6, 4, 3, 2, 1, 0); }
 
 
 

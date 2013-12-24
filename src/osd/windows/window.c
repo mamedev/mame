@@ -1347,7 +1347,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 		case WM_SYSCOMMAND:
 		{
 			UINT16 cmd = wparam & 0xfff0;
-			
+
 			// prevent screensaver or monitor power events
 			if (cmd == SC_MONITORPOWER || cmd == SC_SCREENSAVE)
 				return 1;

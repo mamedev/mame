@@ -80,7 +80,7 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_l3_w);
 	DECLARE_WRITE16_MEMBER(pgm_tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(pgm_bg_videoram_w);
-	
+
 	DECLARE_DRIVER_INIT(pgm);
 
 	TILE_GET_INFO_MEMBER(get_pgm_tx_tilemap_tile_info);

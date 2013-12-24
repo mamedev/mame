@@ -84,7 +84,7 @@
 			<color red="0.70" green="0.70" blue="0.70" />
 		</text>
 	</element>
-	
+
 	<element name="l8wait">
 		<text string="WAIT">
 			<color red="1.0" green="1.0" blue="1.0" />

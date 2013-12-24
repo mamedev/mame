@@ -1425,7 +1425,7 @@ void v99x8_device::mode_graphic7(const pen_t *pens, _PixelType *ln, int line)
 		for (x=0;x<64;x++)
 		{
 			int colour[4];
- 		   	int ind;
+			int ind;
 
 			colour[0] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
 			nametbl_addr++;
@@ -1435,8 +1435,8 @@ void v99x8_device::mode_graphic7(const pen_t *pens, _PixelType *ln, int line)
 			nametbl_addr++;
 			colour[3] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
 
- 		  	ind = (colour[0] & 7) << 11 | (colour[1] & 7) << 14 |
-		    (colour[2] & 7) << 5 | (colour[3] & 7) << 8;
+			ind = (colour[0] & 7) << 11 | (colour[1] & 7) << 14 |
+			(colour[2] & 7) << 5 | (colour[3] & 7) << 8;
 
 			*ln++ = s_pal_indYJK[ind | ((colour[0] >> 3) & 31)];
 			if (_Width > 512)
@@ -1465,7 +1465,7 @@ void v99x8_device::mode_graphic7(const pen_t *pens, _PixelType *ln, int line)
 		for (x=0;x<64;x++)
 		{
 			int colour[4];
- 		   	int ind;
+			int ind;
 
 			colour[0] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
 			nametbl_addr++;
@@ -1475,8 +1475,8 @@ void v99x8_device::mode_graphic7(const pen_t *pens, _PixelType *ln, int line)
 			nametbl_addr++;
 			colour[3] = m_vram_space->read_byte(((nametbl_addr&1) << 16) | (nametbl_addr>>1));
 
- 		  	ind = (colour[0] & 7) << 11 | (colour[1] & 7) << 14 |
-		    (colour[2] & 7) << 5 | (colour[3] & 7) << 8;
+			ind = (colour[0] & 7) << 11 | (colour[1] & 7) << 14 |
+			(colour[2] & 7) << 5 | (colour[3] & 7) << 8;
 
 			*ln++ = colour[0] & 8 ? m_pal_ind16[colour[0] >> 4] : s_pal_indYJK[ind | ((colour[0] >> 3) & 30)];
 			if (_Width > 512)

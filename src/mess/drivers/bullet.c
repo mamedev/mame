@@ -53,7 +53,7 @@ Notes:
     - memory banking is broken
     - z80dart wait/ready
     - IMI 7710 Winchester controller
-    	chdman createhd -o imi7710.chd -chs 350,3,10 -ss 1024
+        chdman createhd -o imi7710.chd -chs 350,3,10 -ss 1024
     - revision E model
 
 */

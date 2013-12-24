@@ -201,9 +201,9 @@ WRITE8_MEMBER(rungun_state::sound_status_w)
 WRITE8_MEMBER(rungun_state::sound_ctrl_w)
 {
 	/*
-		.... xxxx - Z80 ROM bank
-		...x .... - NMI enable/acknowledge
-		xx.. .... - BLT2/1 (?)
+	    .... xxxx - Z80 ROM bank
+	    ...x .... - NMI enable/acknowledge
+	    xx.. .... - BLT2/1 (?)
 	*/
 
 	membank("bank2")->set_entry(data & 0x07);

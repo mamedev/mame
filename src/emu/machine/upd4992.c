@@ -2,13 +2,13 @@
 // copyright-holders: Angelo Salese
 /***************************************************************************
 
-	uPD4992 parallel RTC
+    uPD4992 parallel RTC
 
-	TODO:
-	- Add timers
-	- Add leap year count
-	- Add 12 hours mode
-	- Add mode/control register
+    TODO:
+    - Add timers
+    - Add leap year count
+    - Add 12 hours mode
+    - Add mode/control register
 
 ***************************************************************************/
 
@@ -35,7 +35,7 @@ const device_type UPD4992 = &device_creator<upd4992_device>;
 
 upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD4992, "uPD4992", tag, owner, clock, "upd4992", __FILE__),
-	  device_rtc_interface(mconfig, *this)
+		device_rtc_interface(mconfig, *this)
 {
 }
 

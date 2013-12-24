@@ -93,7 +93,7 @@ public:
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<s3c2410_device> m_s3c2410;
 	required_shared_ptr<UINT32> m_system_memory;
-		
+
 	int m_security_count;
 	UINT32 m_bballoon_port[20];
 	struct nand_t m_nand;
@@ -614,7 +614,7 @@ WRITE32_MEMBER(ghosteo_state::soundlatch_w)
 void ghosteo_state::machine_start()
 {
 	m_flash = (UINT8 *)memregion( "user1")->base();
-	
+
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
 	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_QS1000_ADD("qs1000", XTAL_24MHz, qs1000_intf)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -736,10 +736,10 @@ ROM_START( bballoon )
 	ROM_LOAD( "flash.u1",     0x000000, 0x2000000, BAD_DUMP CRC(73285634) SHA1(4d0210c1bebdf3113a99978ffbcd77d6ee854168) ) // missing ECC data
 
 	// banked every 0x10000 bytes ?
-	ROM_REGION( 0x080000, "qs1000:cpu", 0 ) 
+	ROM_REGION( 0x080000, "qs1000:cpu", 0 )
 	ROM_LOAD( "b2.u20",       0x000000, 0x080000, CRC(0a12334c) SHA1(535b5b34f28435517218100d70147d87809f485a) )
 
-	ROM_REGION( 0x1000000, "qs1000", 0 ) 
+	ROM_REGION( 0x1000000, "qs1000", 0 )
 	ROM_LOAD( "b1.u16",       0x000000, 0x100000, CRC(c42c1c85) SHA1(e1f49d556ffd6bc27142a7784c3bb8e37999857d) ) /* QDSP samples (SFX) */
 	ROM_LOAD( "qs1001a.u17",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) /* QDSP wavetable rom */
 ROM_END
@@ -752,7 +752,7 @@ ROM_START( hapytour ) /* Same hardware: GHOST Ver1.1 2003.03.28 */
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 )
 	ROM_LOAD( "ht.u20",       0x000000, 0x080000, CRC(c0581fce) SHA1(dafce679002534ffabed249a92e6b83301b8312b) )
 
-	ROM_REGION( 0x1000000, "qs1000", 0 ) 
+	ROM_REGION( 0x1000000, "qs1000", 0 )
 	ROM_LOAD( "ht.u16",       0x000000, 0x100000, CRC(6a590a3a) SHA1(c1140f70c919661162334db66c6aa0ad656bfc47) ) /* QDSP samples (SFX) */
 	ROM_LOAD( "qs1001a.u17",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) /* QDSP wavetable rom */
 ROM_END
@@ -766,7 +766,7 @@ ROM_START( touryuu )
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 )
 	ROM_LOAD( "4m.eeprom_c.s(bad1h).u20",       0x000000, 0x080000, CRC(f81a6530) SHA1(c7fa412102328d06823e73d7d07cadfc25db6d28) )
 
-	ROM_REGION( 0x1000000, "qs1000", 0 ) 
+	ROM_REGION( 0x1000000, "qs1000", 0 )
 	ROM_LOAD( "8m.eprom_c.s(f8b1h).u16",       0x000000, 0x100000, CRC(238a85ab) SHA1(ddd79429c0c1e67fcbca1e4ebded97ea46229f0b) ) /* QDSP samples (SFX) */
 	ROM_LOAD( "qs1001a.u17",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) /* QDSP wavetable rom */
 ROM_END

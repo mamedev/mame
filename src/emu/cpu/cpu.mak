@@ -77,7 +77,7 @@ CPUOBJS += $(CPUOBJ)/8x300/8x300.o
 DASMOBJS += $(CPUOBJ)/8x300/8x300dasm.o
 endif
 
-$(CPUOBJ)/8x300/8x300.o:	$(CPUSRC)/8x300/8x300.c \
+$(CPUOBJ)/8x300/8x300.o:    $(CPUSRC)/8x300/8x300.c \
 							$(CPUSRC)/8x300/8x300.h
 
 #-------------------------------------------------

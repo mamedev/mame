@@ -42,9 +42,9 @@ void t10sbc::ExecCommand()
 
 	case T10SBC_CMD_SEEK_6:
 		m_lba = (command[1]&0x1f)<<16 | command[2]<<8 | command[3];
-		
+
 		logerror("S1410: SEEK to LBA %x\n", m_lba);
-		
+
 		m_phase = SCSI_PHASE_STATUS;
 		m_transfer_length = 0;
 		break;

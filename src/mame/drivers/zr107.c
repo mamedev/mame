@@ -207,7 +207,7 @@ public:
 	int m_ccu_vctl;
 	UINT8 m_sound_ctrl;
 	UINT8 m_sound_intck;
-	
+
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ8_MEMBER(sysreg_r);
 	DECLARE_WRITE8_MEMBER(sysreg_w);
@@ -841,12 +841,12 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 
 	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))	
+	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_1))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_K054539_ADD("k054539_1", XTAL_18_432MHz, k054539_config)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(zr107_state, k054539_irq_gen))	
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(zr107_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 

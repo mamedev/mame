@@ -26,8 +26,6 @@
 
 void _1942_state::create_palette()
 {
-
-
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
@@ -63,7 +61,7 @@ void _1942_state::palette_init()
 	machine().colortable = colortable_alloc(machine(), 0x600);
 
 	create_palette();
-	
+
 	const UINT8 *color_prom = memregion("proms")->base();
 	int i, colorbase;
 	color_prom += 3 * 256;
@@ -97,13 +95,13 @@ void _1942_state::palette_init()
 	{
 		colortable_entry_set_value(machine().colortable, i, i);
 	}
-		
+
 }
 
 void _1942_state::palette_init_1942p()
 {
 	machine().colortable = colortable_alloc(machine(), 0x500);
-	
+
 	for (int i = 0; i < 0x400; i++)
 	{
 		colortable_entry_set_value(machine().colortable, i, i);
@@ -291,8 +289,8 @@ void _1942_state::draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprec
 		code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
 				+ 2 * (m_spriteram[offs] & 0x80);
 		col = m_spriteram[offs + 3] & 0x0f;
-		
-		
+
+
 		sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
 		sy = m_spriteram[offs + 1];
 

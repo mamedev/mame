@@ -412,17 +412,17 @@ static INPUT_PORTS_START( hiimpact )
 	PORT_DIPSETTING(      0x0058, DEF_STR( 2C_1C ))        PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
 	PORT_DIPSETTING(      0x0068, "2 Coins/1 Credit 4/3" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
 	PORT_DIPSETTING(      0x0048, "2 Coins/1 Credit 4/4" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
-	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000) /* 25 cents; 4 chutes - dollar/quarter/dime/nickel */ 
+	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000) /* 25 cents; 4 chutes - dollar/quarter/dime/nickel */
 	PORT_DIPSETTING(      0x0078, "1DM/1 Credit 6/5" )     PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000) /* German coinage; these 4 have 2 chutes (1DM/5DM) */
 	PORT_DIPSETTING(      0x0058, "1DM/1 Credit 7/5" )     PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
 	PORT_DIPSETTING(      0x0068, "1DM/1 Credit 8/5" )     PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
 	PORT_DIPSETTING(      0x0048, "1DM/1 Credit" )         PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
-	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000) /* 1/1DM 6/5DM; 3 chutes (5DM/2DM/1DM) */ 
+	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000) /* 1/1DM 6/5DM; 3 chutes (5DM/2DM/1DM) */
 	PORT_DIPSETTING(      0x0078, "5F/2 Credits 10/5" )    PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000) /* French coinage; 2 chutes (5F/10F) */
 	PORT_DIPSETTING(      0x0058, "5F/2 Credits" )         PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
 	PORT_DIPSETTING(      0x0068, "5F/1 Credit 10/3" )     PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
 	PORT_DIPSETTING(      0x0048, "5F/1 Credit" )          PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
-	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000) /* 1/3F 2/5F 5/10F; 3 chutes (1F/5F/10F) */ 
+	PORT_DIPSETTING(      0x0070, "ECA" )                  PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000) /* 1/3F 2/5F 5/10F; 3 chutes (1F/5F/10F) */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Free_Play ))
 	PORT_DIPSETTING(      0x0038, "Other (See Service Menu)" )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Players )) PORT_DIPLOCATION("SW1:1")

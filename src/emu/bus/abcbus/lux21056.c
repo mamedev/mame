@@ -30,12 +30,12 @@
 
     $ mess abc800m -bus abc850 -flop1 ufd631 -hard ro202.chd
     $ mess abc800m -bus abc850 -bus:abc850:io2 xebec,bios=basf6186 -flop1 ufd631 -hard basf6186.chd
-    
-	or with the ABC 852 attached:
+
+    or with the ABC 852 attached:
 
     $ mess abc800m -bus abc852 -flop1 ufd631 -hard basf6185.chd
     $ mess abc800m -bus abc852 -bus:abc852:io2 xebec,bios=nec5126 -flop1 ufd631 -hard nec5126.chd
-    
+
     or with the ABC 856 attached:
 
     $ mess abc800m -bus abc856 -flop1 ufd631 -hard micr1325.chd
@@ -59,12 +59,12 @@
     Enter "DOSGEN,F HD0:" to start the formatting utility.
     Enter "J", and enter "J" to confirm the formatting.
 
-	If you have a 20MB image, format the second partition by entering "DOSGEN,F HD1:", "J", and "J".
+    If you have a 20MB image, format the second partition by entering "DOSGEN,F HD1:", "J", and "J".
 
-	If you have a 60MB image, format the third partition by entering "DOSGEN,F HD2:", "J", and "J",
-	and format the fourth partition by entering "DOSGEN,F HD3:", "J", and "J".
+    If you have a 60MB image, format the third partition by entering "DOSGEN,F HD2:", "J", and "J",
+    and format the fourth partition by entering "DOSGEN,F HD3:", "J", and "J".
 
-	You can now list your freshly created partitions by	entering "LIB".
+    You can now list your freshly created partitions by entering "LIB".
 
     Or skip all of the above and use the preformatted images in the software list:
 

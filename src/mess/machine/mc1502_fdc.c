@@ -212,16 +212,16 @@ void mc1502_fdc_device::device_start()
 	set_isa_device();
 
 	// BIOS 5.0, 5.2
-	m_isa->install_device(0x010c, 0x010f, 0, 0, 
+	m_isa->install_device(0x010c, 0x010f, 0, 0,
 		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
 		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
 	m_isa->install_device(this, 0x0100, 0x010b, 0, 0, FUNC(mc1502_FDC_r), FUNC(mc1502_FDC_w) );
 	// BIOS 5.31, 5.33
 /*
-	m_isa->install_device(0x010c, 0x010f, 0, 0, 
-		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
-		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
-	m_isa->install_device(this, 0x0100, 0x010b, 0, 0, FUNC(mc1502_FDC_r), FUNC(mc1502_FDC_w) );
+    m_isa->install_device(0x010c, 0x010f, 0, 0,
+        READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
+        WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
+    m_isa->install_device(this, 0x0100, 0x010b, 0, 0, FUNC(mc1502_FDC_r), FUNC(mc1502_FDC_w) );
 */
 	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq), this));
 	m_fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(mc1502_fdc_device::mc1502_fdc_irq_drq), this));

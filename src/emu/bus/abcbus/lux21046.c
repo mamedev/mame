@@ -498,7 +498,7 @@ INPUT_PORTS_START( abc830 )
 	PORT_START("SW3")
 	PORT_DIPNAME( 0x7f, 0x2d, "Card Address" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
 	PORT_DIPSETTING(    0x2d, "45" )
-	
+
 	PORT_START("S1") // also S3,S5
 	PORT_DIPNAME( 0x01, 0x01, "Interface Type" )
 	PORT_DIPSETTING(    0x00, "ABC 1600" )
@@ -549,7 +549,7 @@ INPUT_PORTS_START( abc832 )
 	PORT_START("SW3")
 	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
 	PORT_DIPSETTING(    0x2c, "44" )
-	
+
 	PORT_START("S1") // also S3,S5
 	PORT_DIPNAME( 0x01, 0x01, "Interface Type" )
 	PORT_DIPSETTING(    0x00, "ABC 1600" )
@@ -629,7 +629,7 @@ INPUT_PORTS_START( abc838 )
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
-	
+
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x0f, 0x0e, "Drive Type" ) PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x0e, "BASF 6105" )
@@ -688,7 +688,7 @@ INPUT_PORTS_START( abc850 )
 	PORT_START("SW3")
 	PORT_DIPNAME( 0x7f, 0x2c, "Card Address" ) PORT_DIPLOCATION("SW3:1,2,3,4,5,6,7")
 	PORT_DIPSETTING(    0x2c, "44" )
-	
+
 	PORT_START("S1") // also S3,S5
 	PORT_DIPNAME( 0x01, 0x01, "Interface Type" )
 	PORT_DIPSETTING(    0x00, "ABC 1600" )
@@ -1125,11 +1125,11 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 
 	if (BIT(data, 2))
 	{
-	    m_fdc->set_unscaled_clock(XTAL_16MHz/16);
+		m_fdc->set_unscaled_clock(XTAL_16MHz/16);
 	}
 	else
 	{
-	    m_fdc->set_unscaled_clock(XTAL_16MHz/8);
+		m_fdc->set_unscaled_clock(XTAL_16MHz/8);
 	}
 }
 

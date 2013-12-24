@@ -63,14 +63,14 @@ void k054539_device::static_set_interface(device_t &device, const k054539_interf
    22d: Data read/write port
    22e: ROM/RAM select (00..7f == ROM banks, 80 = Reverb RAM)
    22f: Global control:
-		.......x - Enable PCM
-		......x. - Timer related?
-		...x.... - Enable ROM/RAM readback from 0x22d
-		..x..... - Timer output enable?
-		x....... - Disable register RAM updates
+        .......x - Enable PCM
+        ......x. - Timer related?
+        ...x.... - Enable ROM/RAM readback from 0x22d
+        ..x..... - Timer output enable?
+        x....... - Disable register RAM updates
 
-	The chip has an optional 0x8000 byte reverb buffer.
-	The reverb delay is actually an offset in this buffer.
+    The chip has an optional 0x8000 byte reverb buffer.
+    The reverb delay is actually an offset in this buffer.
 */
 
 void k054539_device::init_flags(int _flags)
@@ -440,7 +440,7 @@ WRITE8_MEMBER(k054539_device::write)
 			cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 			cur_ptr = 0;
 		break;
-		
+
 		case 0x22f:
 			if (!(data & 0x20)) // Disable timer output?
 			{

@@ -370,8 +370,8 @@ WRITE8_MEMBER( mc2661_device::write )
 			UINT32 tx_baud = baud_rates[data & 0x0f];
 			if(data & 0x10)  // internal receiver clock
 			{
-//				if((m_mr[0] & 0x03) != 0)
-//					rx_baud *= 16;
+//              if((m_mr[0] & 0x03) != 0)
+//                  rx_baud *= 16;
 			}
 			else  // external receiver clock
 			{
@@ -390,8 +390,8 @@ WRITE8_MEMBER( mc2661_device::write )
 			}
 			if(data & 0x20)  // internal transmitter clock
 			{
-//				if((m_mr[0] & 0x03) != 0)
-//					tx_baud *= 16;
+//              if((m_mr[0] & 0x03) != 0)
+//                  tx_baud *= 16;
 			}
 			else  // external transmitter clock
 			{

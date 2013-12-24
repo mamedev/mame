@@ -13,8 +13,7 @@
 ***************************************************************************/
 
 #define MCFG_K056800_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, K056800, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, K056800, _clock)
 #define MCFG_K056800_INT_HANDLER(_devcb) \
 	devcb = &k056800_device::set_int_handler(*device, DEVCB2_##_devcb);
 
@@ -45,12 +44,12 @@ protected:
 
 private:
 	// internal state
-	bool				m_int_pending;
-	bool				m_int_enabled;
-	UINT8				m_host_to_snd_regs[4];
-	UINT8				m_snd_to_host_regs[2];
+	bool                m_int_pending;
+	bool                m_int_enabled;
+	UINT8               m_host_to_snd_regs[4];
+	UINT8               m_snd_to_host_regs[2];
 
-	devcb2_write_line	m_int_handler;
+	devcb2_write_line   m_int_handler;
 };
 
 extern const device_type K056800;

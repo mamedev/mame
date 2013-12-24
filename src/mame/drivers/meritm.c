@@ -1484,7 +1484,7 @@ ROM_START( megat2 ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
 	ROM_RELOAD(                        0x380000, 0x080000)
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) ) 
+	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) )
 ROM_END
 
 ROM_START( megat2a ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
@@ -1499,7 +1499,7 @@ ROM_START( megat2a ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 *
 	ROM_RELOAD(                        0x380000, 0x080000)
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) ) 
+	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) )
 ROM_END
 
 ROM_START( megat2b ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
@@ -1514,7 +1514,7 @@ ROM_START( megat2b ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 *
 	ROM_RELOAD(                        0x380000, 0x080000)
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) ) 
+	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) )
 ROM_END
 
 ROM_START( megat2mn ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
@@ -1529,7 +1529,7 @@ ROM_START( megat2mn ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 
 	ROM_RELOAD(                        0x380000, 0x080000)
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) ) 
+	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) )
 ROM_END
 
 ROM_START( megat2ca ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
@@ -1544,7 +1544,7 @@ ROM_START( megat2ca ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 
 	ROM_RELOAD(                        0x380000, 0x080000)
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) ) 
+	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) )
 ROM_END
 
 ROM_START( megat2caa ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
@@ -1559,7 +1559,7 @@ ROM_START( megat2caa ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0
 	ROM_RELOAD(                        0x380000, 0x080000)
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) ) 
+	ROM_LOAD( "9255-10-01-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(b13c68d2) SHA1(99f9584ba005d32ad8abefd64159a8c296dcd580) )
 ROM_END
 
 ROM_START( megat3 ) /* Dallas DS1204V security key at U5 labeled 9255-20-01 U5-RO1 C1995 MII */

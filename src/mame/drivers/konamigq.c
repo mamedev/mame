@@ -94,7 +94,7 @@ public:
 	DECLARE_MACHINE_RESET(konamigq);
 	INTERRUPT_GEN_MEMBER(tms_sync);
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
-	
+
 	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 };
