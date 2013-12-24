@@ -491,7 +491,7 @@ void debug_view_memory::recompute()
 	}
 
 	// derive total sizes from that
-	m_total.y = ((UINT64)m_maxaddr - (UINT64)m_byte_offset + (UINT64)m_bytes_per_row - 1) / m_bytes_per_row;
+	m_total.y = ((UINT64)m_maxaddr - (UINT64)m_byte_offset + (UINT64)m_bytes_per_row /*- 1*/) / m_bytes_per_row;
 
 	// reset the current cursor position
 	set_cursor_pos(pos);
