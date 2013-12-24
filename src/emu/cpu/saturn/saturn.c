@@ -111,6 +111,7 @@ void saturn_device::device_start()
 	memset(m_rstk, 0, sizeof(m_rstk));
 	m_out = 0;
 	m_carry = 0;
+	m_decimal = 0;
 	m_st = 0;
 	m_hst = 0;
 	m_nmi_state = 0;
