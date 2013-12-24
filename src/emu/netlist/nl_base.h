@@ -287,7 +287,7 @@ public:
 
 	ATTR_COLD const pstring &name() const;
 
-	PSTATE_INTERFACE(*m_netlist, name())
+	PSTATE_INTERFACE_DECL()
 
 	ATTR_HOT inline const type_t type() const { return m_objtype; }
 	ATTR_HOT inline const family_t family() const { return m_family; }
@@ -1132,6 +1132,8 @@ private:
 // ----------------------------------------------------------------------------------------
 // Inline implementations
 // ----------------------------------------------------------------------------------------
+
+PSTATE_INTERFACE(netlist_object_t, m_netlist, name())
 
 ATTR_HOT inline void netlist_param_str_t::setTo(const pstring &param)
 {
