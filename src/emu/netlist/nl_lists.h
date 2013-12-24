@@ -205,10 +205,11 @@ public:
 		m_end = &m_list[0];
 	}
 
-	// save state support
+	// save state support & mame disasm
 
 	ATTR_COLD entry_t *listptr() { return &m_list[0]; }
 	ATTR_COLD int count() const { return m_end - m_list; }
+    ATTR_HOT inline entry_t & operator[](const int & index) { return m_list[index]; }
 
 #if (NL_KEEP_STATISTICS)
 	// profiling

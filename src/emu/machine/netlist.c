@@ -60,15 +60,23 @@
 
 const device_type NETLIST = &device_creator<netlist_mame_device>;
 
+static ADDRESS_MAP_START(program_dummy, AS_PROGRAM, 8, netlist_mame_device)
+    AM_RANGE(0x000, 0x3ff) AM_ROM
+ADDRESS_MAP_END
+
 netlist_mame_device::netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NETLIST, "netlist", tag, owner, clock, "netlist_mame", __FILE__),
 		device_execute_interface(mconfig, *this),
-		//device_state_interface(mconfig, *this),
+        device_state_interface(mconfig, *this),
+        device_disasm_interface(mconfig, *this),
+        device_memory_interface(mconfig, *this),
 		m_device_start_list(100),
+        m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(program_dummy)),
 		m_netlist(NULL),
 		m_setup(NULL),
 		m_setup_func(NULL),
-		m_icount(0)
+		m_icount(0),
+		m_genPC(0)
 {
 }
 
@@ -113,6 +121,23 @@ void netlist_mame_device::device_start()
 
 	save_state();
 
+	// State support
+
+    state_add(STATE_GENPC, "curpc", m_genPC).noshow();
+
+    for (int i=0; i < m_netlist->m_nets.count(); i++)
+    {
+        netlist_net_t *n = m_netlist->m_nets[i];
+        if (n->isRailNet())
+        {
+            state_add(i*2, n->name(), n->m_cur.Q);
+        }
+        else
+        {
+            state_add(i*2+1, n->name(), n->m_cur.Analog).formatstr("%20s");
+        }
+    }
+
 	// set our instruction counter
 	m_icountptr = &m_icount;
 }
@@ -136,39 +161,16 @@ void netlist_mame_device::device_stop()
 
 ATTR_COLD void netlist_mame_device::device_post_load()
 {
-	LOG_DEV_CALLS(("device_post_load\n"));
-	m_netlist->queue().clear();
-	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist->time().as_double(), qsize));
-	for (int i = 0; i < qsize; i++ )
-	{
-		netlist_net_t *n = m_netlist->find_net(qtemp[i].m_name);
-		NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
-		NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(), qtemp[i].m_time.as_double()));
-		m_netlist->queue().push(netlist_base_t::queue_t::entry_t(qtemp[i].m_time, *n));
-	}
+    LOG_DEV_CALLS(("device_post_load\n"));
+
+    m_netlist->post_load();
 }
 
 ATTR_COLD void netlist_mame_device::device_pre_save()
 {
 	LOG_DEV_CALLS(("device_pre_save\n"));
 
-	qsize = m_netlist->queue().count();
-	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist->time().as_double(), qsize));
-	for (int i = 0; i < qsize; i++ )
-	{
-		qtemp[i].m_time =  m_netlist->queue().listptr()[i].time();
-		const char *p = m_netlist->queue().listptr()[i].object().name().cstr();
-		int n = MIN(63, strlen(p));
-		strncpy(qtemp[i].m_name, p, n);
-		qtemp[i].m_name[n] = 0;
-	}
-#if 0
-
-	netlist_time *nlt = (netlist_time *) ;
-	netlist_base_t::queue_t::entry_t *p = m_netlist->queue().listptr()[i];
-	netlist_time *nlt = (netlist_time *) p->time_ptr();
-	save_pointer(nlt->get_internaltype_ptr(), "queue", 1, i);
-#endif
+	m_netlist->pre_save();
 }
 
 void netlist_mame_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -179,43 +181,35 @@ void netlist_mame_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 ATTR_COLD void netlist_mame_device::save_state()
 {
-	for (pstate_entry_t::list_t::entry_t *p = m_netlist->save_list().first(); p != NULL; p = m_netlist->save_list().next(p))
-	{
-		pstate_entry_t *s = p->object();
-		NL_VERBOSE_OUT(("saving state for %s\n", s->m_name.cstr()));
-		switch (s->m_dt)
-		{
-			case DT_DOUBLE:
-				save_pointer((double *) s->m_ptr, s->m_name, s->m_count);
-				break;
-			case DT_INT64:
-				save_pointer((INT64 *) s->m_ptr, s->m_name, s->m_count);
-				break;
-			case DT_INT8:
-				save_pointer((INT8 *) s->m_ptr, s->m_name, s->m_count);
-				break;
-			case DT_INT:
-				save_pointer((int *) s->m_ptr, s->m_name, s->m_count);
-				break;
-			case DT_BOOLEAN:
-				save_pointer((bool *) s->m_ptr, s->m_name, s->m_count);
-				break;
-			case NOT_SUPPORTED:
-			default:
-				m_netlist->xfatalerror("found unsupported save element %s\n", s->m_name.cstr());
-				break;
-		}
-	}
+    for (pstate_entry_t::list_t::entry_t *p = m_netlist->save_list().first(); p != NULL; p = m_netlist->save_list().next(p))
+    {
+        pstate_entry_t *s = p->object();
+        NL_VERBOSE_OUT(("saving state for %s\n", s->m_name.cstr()));
+        switch (s->m_dt)
+        {
+            case DT_DOUBLE:
+                save_pointer((double *) s->m_ptr, s->m_name, s->m_count);
+                break;
+            case DT_INT64:
+                save_pointer((INT64 *) s->m_ptr, s->m_name, s->m_count);
+                break;
+            case DT_INT8:
+                save_pointer((INT8 *) s->m_ptr, s->m_name, s->m_count);
+                break;
+            case DT_INT:
+                save_pointer((int *) s->m_ptr, s->m_name, s->m_count);
+                break;
+            case DT_BOOLEAN:
+                save_pointer((bool *) s->m_ptr, s->m_name, s->m_count);
+                break;
+            case DT_CUSTOM:
+            case NOT_SUPPORTED:
+            default:
+                m_netlist->xfatalerror("found unsupported save element %s\n", s->m_name.cstr());
+                break;
+        }
+    }
 
-	// handle the queue
-
-	save_item(NAME(qsize));
-	for (int i = 0; i < m_netlist->queue().capacity(); i++ )
-	{
-		save_pointer(qtemp[i].m_time.get_internaltype_ptr(), "queue_time", 1, i);
-		save_pointer(qtemp[i].m_name, "queue_name", sizeof(qtemp[i].m_name), i);
-
-	}
 }
 
 ATTR_COLD UINT64 netlist_mame_device::execute_clocks_to_cycles(UINT64 clocks) const
@@ -228,14 +222,45 @@ ATTR_COLD UINT64 netlist_mame_device::execute_cycles_to_clocks(UINT64 cycles) co
 	return cycles;
 }
 
+ATTR_COLD offs_t netlist_mame_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+    //char tmp[16];
+    unsigned startpc = pc;
+    int relpc = pc - m_genPC;
+    //UINT16 opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
+    //UINT8 inst = opcode >> 13;
+
+    if (relpc >= 0 && relpc < m_netlist->queue().count())
+    {
+        //            sprintf(buffer, "%04x %02d %s", pc, relpc, m_netlist->queue()[m_netlist->queue().count() - relpc - 1].object().name().cstr());
+        int dpc = m_netlist->queue().count() - relpc - 1;
+        sprintf(buffer, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_netlist->queue()[dpc].object().name().cstr(),
+                m_netlist->queue()[dpc].time().as_double());
+    }
+    else
+        sprintf(buffer, "%s", "");
+    pc+=1;
+    return (pc - startpc);
+}
+
 ATTR_HOT void netlist_mame_device::execute_run()
 {
 	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
-
 	// debugging
 	//m_ppc = m_pc; // copy PC to previous PC
 	if (check_debugger)
-		debugger_instruction_hook(this, 0); //m_pc);
-
-	m_netlist->process_queue(m_icount);
+	{
+	    while (m_icount > 0)
+	    {
+	        int m_temp = 1;
+            m_genPC++;
+            m_genPC &= 255;
+	        debugger_instruction_hook(this, m_genPC);
+	        m_netlist->process_queue(m_temp);
+	        m_icount -= (1 - m_temp);
+	    }
+	}
+	else
+	    m_netlist->process_queue(m_icount);
 }
+

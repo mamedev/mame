@@ -121,9 +121,10 @@ private:
 // ======================> netlist_mame_device
 
 class netlist_mame_device : public device_t,
-							public device_execute_interface
-							//public device_state_interface
-							//, public device_memory_interface
+						    public device_execute_interface,
+		                    public device_state_interface,
+		                    public device_disasm_interface,
+						    public device_memory_interface
 {
 public:
 
@@ -166,6 +167,37 @@ protected:
 
 	ATTR_HOT virtual void execute_run();
 
+    // device_disasm_interface overrides
+    ATTR_COLD virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
+    ATTR_COLD virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
+    ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+    // device_memory_interface overrides
+
+    address_space_config m_program_config;
+
+    virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+    {
+        switch (spacenum)
+        {
+            case AS_PROGRAM: return &m_program_config;
+            case AS_IO:      return NULL;
+            default:         return NULL;
+        }
+    }
+
+    virtual void state_string_export(const device_state_entry &entry, astring &string)
+    {
+        if (entry.index() >= 0)
+        {
+            if (entry.index() & 1)
+                string.format("%10.6f", *((double *) entry.dataptr()));
+            else
+                string.format("%d", *((netlist_sig_t *) entry.dataptr()));
+        }
+    }
+
+
 	netlist_mame_t *m_netlist;
 
 	netlist_setup_t *m_setup;
@@ -187,6 +219,8 @@ private:
 	void (*m_setup_func)(netlist_setup_t &);
 
 	int m_icount;
+    int m_genPC;
+
 
 
 };

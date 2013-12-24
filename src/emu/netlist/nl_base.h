@@ -289,13 +289,6 @@ public:
 
 	PSTATE_INTERFACE(*m_netlist, name())
 
-#if 0
-	template<class C> ATTR_COLD void save(C &state, const pstring &stname)
-	{
-		save_state_ptr(stname, nl_datatype<C>::type, sizeof(C), &state);
-	}
-#endif
-
 	ATTR_HOT inline const type_t type() const { return m_objtype; }
 	ATTR_HOT inline const family_t family() const { return m_family; }
 
@@ -306,11 +299,6 @@ public:
 	ATTR_HOT inline const netlist_base_t & RESTRICT netlist() const { return *m_netlist; }
 
 protected:
-
-#if 0
-	// pstate_interface virtual
-	ATTR_COLD virtual void save_state_ptr(const pstring &stname, const netlist_data_type_e, const int size, const int count, void *ptr);
-#endif
 
 	// must call parent save_register !
 	ATTR_COLD virtual void save_register() { };
@@ -470,7 +458,7 @@ private:
 class netlist_logic_input_t : public netlist_input_t
 {
 public:
-	netlist_logic_input_t()
+    ATTR_COLD netlist_logic_input_t()
 		: netlist_input_t(INPUT, LOGIC)
 	{
 		// default to TTL
@@ -495,7 +483,7 @@ public:
 class netlist_ttl_input_t : public netlist_logic_input_t
 {
 public:
-	netlist_ttl_input_t()
+    ATTR_COLD netlist_ttl_input_t()
 		: netlist_logic_input_t() { set_thresholds(0.8 , 2.0); }
 };
 
@@ -506,7 +494,7 @@ public:
 class netlist_analog_input_t : public netlist_input_t
 {
 public:
-	netlist_analog_input_t()
+    ATTR_COLD netlist_analog_input_t()
 		: netlist_input_t(INPUT, ANALOG) { }
 
 	ATTR_HOT inline const bool is_highz() const;
@@ -598,16 +586,16 @@ public:
 
 	netlist_core_terminal_t *m_head;
 
-protected:
-
+// the following three must be public for mame support
+//protected:
 
 	hybrid_t m_last;
 	hybrid_t m_cur;
 	hybrid_t m_new;
 
+protected:
 	UINT32 m_num_cons;
 
-protected:
 	ATTR_COLD virtual void save_register()
 	{
 		save(NAME(m_last.Analog));
@@ -955,8 +943,33 @@ private:
 
 
 // ----------------------------------------------------------------------------------------
+// netlist_queue_t
+// ----------------------------------------------------------------------------------------
+
+class netlist_queue_t : public netlist_timed_queue<netlist_net_t, netlist_time, 512>,
+                        public pstate_callback_t
+{
+public:
+
+    netlist_queue_t(netlist_base_t &nl);
+
+    void register_state(pstate_manager_t &manager, const pstring &module);
+    void on_pre_save();
+    void on_post_load();
+
+    pstate_callback_t &callback() { return *this; }
+
+private:
+    netlist_base_t &m_netlist;
+    int m_qsize;
+    netlist_time::INTERNALTYPE m_times[512];
+    char m_name[512][64];
+};
+
+// ----------------------------------------------------------------------------------------
 // netlist_base_t
 // ----------------------------------------------------------------------------------------
+
 
 typedef tagmap_t<netlist_device_t *, 393> tagmap_devices_t;
 
@@ -965,17 +978,15 @@ class netlist_base_t : public netlist_object_t, public pstate_manager_t
 	NETLIST_PREVENT_COPYING(netlist_base_t)
 public:
 
-	typedef netlist_timed_queue<netlist_net_t, netlist_time, 512> queue_t;
-
 	netlist_base_t();
 	virtual ~netlist_base_t();
 
-	ATTR_HOT inline const queue_t &queue() const { return m_queue; }
-	ATTR_HOT inline queue_t &queue() { return m_queue; }
+    ATTR_HOT inline const netlist_queue_t &queue() const { return m_queue; }
+    ATTR_HOT inline netlist_queue_t &queue() { return m_queue; }
 
 	ATTR_HOT inline void push_to_queue(netlist_net_t &out, const netlist_time &attime)
 	{
-		m_queue.push(queue_t::entry_t(attime, out));
+		m_queue.push(netlist_queue_t::entry_t(attime, out));
 	}
 
 	ATTR_HOT NETLIB_NAME(solver) *solver() const { return m_solver; }
@@ -1006,14 +1017,16 @@ protected:
 	virtual void vfatalerror(const char *format, va_list ap) const = 0;
 
 protected:
-	ATTR_COLD virtual void save_register()
-	{
-		//queue_t                     m_queue;
-		save(NAME(m_time_ps));
-		save(NAME(m_rem));
-		save(NAME(m_div));
-		netlist_object_t::save_register();
-	}
+    ATTR_COLD virtual void save_register()
+    {
+        //netlist_queue_t                     m_queue;
+        //netlist().save_manager(m_queue.callback(), "m_queue");
+        save(NAME(m_queue.callback()));
+        save(NAME(m_time_ps));
+        save(NAME(m_rem));
+        save(NAME(m_div));
+        netlist_object_t::save_register();
+    }
 
 #if (NL_KEEP_STATISTICS)
 	// performance
@@ -1025,8 +1038,8 @@ protected:
 private:
 	ATTR_HOT void update_time(const netlist_time t, INT32 &atime);
 
-	netlist_time                m_time_ps;
-	queue_t                     m_queue;
+    netlist_time                m_time_ps;
+    netlist_queue_t             m_queue;
 	UINT32                      m_rem;
 	UINT32                      m_div;
 
@@ -1253,16 +1266,16 @@ class net_device_t_base_factory
 {
 	NETLIST_PREVENT_COPYING(net_device_t_base_factory)
 public:
-	net_device_t_base_factory(const pstring &name, const pstring &classname)
+	ATTR_COLD net_device_t_base_factory(const pstring &name, const pstring &classname)
 	: m_name(name), m_classname(classname)
 	{}
 
-	virtual ~net_device_t_base_factory() {}
+	ATTR_COLD virtual ~net_device_t_base_factory() {}
 
-	virtual netlist_device_t *Create() const = 0;
+	ATTR_COLD virtual netlist_device_t *Create() const = 0;
 
-	const pstring &name() const { return m_name; }
-	const pstring &classname() const { return m_classname; }
+	ATTR_COLD const pstring &name() const { return m_name; }
+	ATTR_COLD const pstring &classname() const { return m_classname; }
 protected:
 	pstring m_name;                             /* device name */
 	pstring m_classname;                        /* device class name */
@@ -1273,10 +1286,10 @@ class net_device_t_factory : public net_device_t_base_factory
 {
 	NETLIST_PREVENT_COPYING(net_device_t_factory)
 public:
-	net_device_t_factory(const pstring &name, const pstring &classname)
+	ATTR_COLD net_device_t_factory(const pstring &name, const pstring &classname)
 	: net_device_t_base_factory(name, classname) { }
 
-	netlist_device_t *Create() const
+	ATTR_COLD netlist_device_t *Create() const
 	{
 		netlist_device_t *r = new C();
 		//r->init(setup, name);
@@ -1288,19 +1301,19 @@ class netlist_factory
 {
 public:
 
-	netlist_factory();
-	~netlist_factory();
+    ATTR_COLD netlist_factory();
+    ATTR_COLD ~netlist_factory();
 
-	void initialize();
+    ATTR_COLD void initialize();
 
-	template<class _C>
-	void register_device(const pstring &name, const pstring &classname)
+    template<class _C>
+    ATTR_COLD void register_device(const pstring &name, const pstring &classname)
 	{
 		m_list.add(new net_device_t_factory< _C >(name, classname) );
 	}
 
-	netlist_device_t *new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const;
-	netlist_device_t *new_device_by_name(const pstring &name, netlist_setup_t &setup) const;
+    ATTR_COLD netlist_device_t *new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const;
+    ATTR_COLD netlist_device_t *new_device_by_name(const pstring &name, netlist_setup_t &setup) const;
 
 private:
 	typedef netlist_list_t<net_device_t_base_factory *> list_t;
