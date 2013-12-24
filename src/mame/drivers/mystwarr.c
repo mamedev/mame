@@ -19,7 +19,80 @@
  * Game status:
  * - All games are playable with sound and correct colors.
  * - Metamorphic Force's intro needs alpha blended sprites.
- */
+
+Mystic Warriors
+Konami 1993
+
+PCB Layout
+----------
+GX128 PWB353366A
+|--------------------------------------------------------|
+|LA4705   128A07.1D                  128A08.1H 128A09.1K |
+|054986A  128A06.2D  62256           128A10.3H  |------| |
+|          |------||------|            |------| |054156| |
+|CN2       |054539||054539|            |054157| |      | |
+|128A05.6B |      ||      |            |      | |      | |
+|Z80E      |      ||      |            |      | |      | |
+|          |      ||      |            |      | |------| |
+|          |------||------|            |------|          |
+|           4464                                         |
+|           055983                   |------|            |
+| 051550                             |055555|            |
+|J                                   |      |  128A11.10K|
+|A 054573  |------| 2018             |      |  128A12.12K|
+|M 054573  |054338| 2018             |------|            |
+|M 054573  |      | 2018                                 |
+|A 054574  |      |                  |------|   |------| |
+| 18.432MHz|------|                  |053246A   |055673| |
+| 32MHz                              |      |   |      | |
+| 24MHz      053252                  |      |   |      | |
+| ER5911.15B                         |      |   |------| |
+|                                    |------|            |
+|                      056371                 128A13.17K |
+|DSW(4)      |------|                 62256              |
+|            |68000 |      128A04.19G 62256   128A14.19K |
+|005273(X10) |      | 128A03.19F                         |
+|            |      | 128JAA02.20G            128A15.20K |
+|        CN4 |------| 128JAA01.20F                       |
+|TEST_SW CN3          62256  62256            128A16.22K |
+|--------------------------------------------------------|
+Notes:
+      68000  - Clock 16.000MHz [32/2]
+      Z80E   - Clock 8.000MHz [32/4]
+      2018   - Motorola MCM2018 2kx8 SRAM (DIP24)
+      4464   - Panasonic MN4464 8kx8 SRAM (DIP28)
+      62256  - Hitachi HM62256 32kx8 SRAM (DIP28)
+      ER5911 - EEPROM (128 bytes)
+      CN2    - 4 pin connector for stereo sound output
+      128*   - EPROM/mask ROM
+      LA4705 - 15W 2-channel BTL audio power AMP
+
+      Custom Chips
+      ------------
+      055555  - Mixer/Priority encoder
+      053252  - Timing/Interrupt controller. Clock input 24MHz
+      054157  \
+      054156  / Tilemap generators
+      053246A \
+      055673  / Sprite generators
+      054539  - 8-Channel ADPCM sound generator. Clock input 18.432MHz. Clock outputs 18.432/4 & 18.432/8
+      054573  - Video DAC (one for each R,G,B video signal)
+      054574  - Possibly RGB mixer/DAC/filter? (connected to 054573)
+      054338  - Color mixer for special effects/alpha blending etc (connected to 054573 & 054574 and 2018 RAM)
+      051550  - EMI filter for credit/coin counter
+      005273  - Resistor array for player 3 & player 4 controls
+      054986A - Audio DAC/filter + sound latch + Z80 memory mapper/banker (large ceramic SDIP64 module)
+                This module contains several surface mounted capacitors and resistors, 4558 OP amp,
+                Analog Devices AD1868 dual 18-bit audio DAC and a Konami 054321 QFP44 IC. Clock input 8.000MHz [32/4]
+      054983  - MMI PAL16L8
+      056371  - MMI PAL20L10
+
+      Sync Measurements
+      -----------------
+      HSync - 15.2042kHz
+      VSync - 59.1879Hz
+
+**************************************************************************/
 
 #include "emu.h"
 #include "video/k053250.h"

@@ -146,6 +146,89 @@ Address          Dir Data     Name      Description
 1xxxxxxxxxxxxxxx R   xxxxxxxx PROM      program ROM
 
 
+Lethal Enforcers
+Konami 1992
+
+PCB Layout
+----------
+GX191 PWB353060A
+|--------------------------------------------------------|
+|LA4705           191A03.A4  |------|191A04.A8 191A05.A10|
+|CN6     84256     |------|  |053245A                    |
+|         18.432MHz|054539|  |      |  |------| |------| |
+| 054986A          |      |  |      |  |053244A |053244A |
+|                  |      |  |------|  |      | |      | |
+|                  |------|            |      | |      | |
+|     Z80B        191A02.F4   LH5116   |------| |------| |
+|                  LH5116                                |
+|                                        191A06.G9       |
+|                                                        |
+|                                                        |
+|J 051550                                                |
+|A                            CY7C185                    |
+|M 052535                     CY7C185                    |
+|M 052535                                                |
+|A 052535                                                |
+|                                                        |
+|                                                        |
+|                                                        |
+|                  054884     LH5116                     |
+|                             MN4464                     |
+|     005273                  MN4464   |------| |------| |
+|     005273                  MN4464   |054157| |054157| |
+| DSW(4)                      LH5116   |      | |      | |
+|      ER5911.Q2   007644     |------| |      | |      | |
+|TEST_SW           054000     |054156| |------| |------| |
+|                  MN4464     |      |                   |
+|                191UAD01.U4  |      |                   |
+|                   007324    |------|                   |
+|  CN8                              191A07.V8  191A08.V10|
+|  CN7   24MHz   HD63C09EP          191A09.X8  191A10.X10|
+|--------------------------------------------------------|
+Notes:
+      63C09EP - Clock 3.000MHz [24/8]
+      Z80B    - Clock 6.000MHz [24/4]
+      84256   - Fujitsu 84256 32kx8 SRAM (DIP28)
+      LH5116  - Sharp LH5116 2kx8 SRAM (DIP24)
+      CY7C185 - Cypress CY7C185 8kx8 SRAM (DIP28)
+      MN4464  - Panasonic MN4464 8kx8 SRAM (DIP28)
+      ER5911  - EEPROM (128 bytes)
+      CN6     - 4 pin connector for stereo sound output
+      CN7/CN8 - 4 pin connectors for standard light guns
+                Pin numbering from left to right is 4 3 2 1
+                Pin 1 - Opto
+                Pin 2 - Ground
+                Pin 3 - Trigger
+                Pin 4 - +5v
+      191*    - EPROM/mask ROM
+      LA4705  - 15W 2-channel BTL audio power AMP
+
+      Custom Chips
+      ------------
+      054000  - Collision/protection
+      007324  - Resistor array package containing eight 150 ohm resistors. The IC looks like a DIP16 logic chip
+                but with an epoxy top. The schematics show it connected to the 6309 data lines (D0-D7), main
+                8k program RAM (D0-D7) and the 054000. It is a simple resistor array (x8)
+      007644  - ? (DIP22)
+      054157  \
+      054156  / Tilemap generators
+      053244A \
+      053245A / Sprite generators
+      054539  - 8-Channel ADPCM sound generator. Clock input 18.432MHz. Clock outputs 18.432/4 & 18.432/8
+      052535  - Video DAC (one for each R,G,B video signal)
+      051550  - EMI filter for credit/coin counter
+      005273  - Resistor array for gun trigger and 1 player/2 player start
+      054884  - MMI PAL16L8
+      054986A - Audio DAC/filter + sound latch + Z80 memory mapper/banker (large ceramic SDIP64 module)
+                This module contains several surface mounted capacitors and resistors, 4558 OP amp,
+                Analog Devices AD1868 dual 18-bit audio DAC and a Konami 054321 QFP44 IC.
+
+      Sync Measurements
+      -----------------
+      HSync - 15.2038kHz
+      VSync - 59.6380Hz
+
+
 note:
 
 lethal enforcers has 2 sprite rendering chips working in parallel mixing
