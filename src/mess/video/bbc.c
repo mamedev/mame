@@ -10,8 +10,6 @@
     mames built in mc6845, there are a number of features now incorrect
     or missing in this build:
 
-    Cursors are missing.
-    Mode 7 is shifted to the right by a couple of character.
     BBC split modes no longer work (Like is used in Elite.)
 
 ******************************************************************************/
@@ -169,8 +167,6 @@ static MC6845_UPDATE_ROW( vid_update_row )
 	bbc_state *state = device->machine().driver_data<bbc_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
-	//logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
-
 	if (state->m_videoULA_teletext_normal_select)
 	{
 		state->m_trom->lose_w(1);
@@ -182,17 +178,18 @@ static MC6845_UPDATE_ROW( vid_update_row )
 			//Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
 			//Teletext Latch bit 7 goes to LOSE on the Teletext chip
 
-			state->m_trom->write((state->m_Teletext_Latch&0x3f)|(state->m_Teletext_Latch&0x40));
-
-			state->m_trom->f1_w(1);
-			state->m_trom->f1_w(0);
-
 			if (((ma>>13)&1)==0)
 			{
 				state->m_Teletext_Latch=0;
 			} else {
 				state->m_Teletext_Latch=(state->m_BBC_Video_RAM[state->calculate_video_address(ma+x_pos,ra)]);
 			}
+
+			state->m_trom->write((state->m_Teletext_Latch&0x3f)|(state->m_Teletext_Latch&0x40));
+
+			state->m_trom->f1_w(1);
+			state->m_trom->f1_w(0);
+
 			for(int pixelno=0;pixelno<6;pixelno++)
 			{
 				state->m_trom->tr6_w(1);
