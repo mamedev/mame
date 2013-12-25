@@ -4,6 +4,7 @@
 #define __LK201_H__
 
 #include "emu.h"
+#include "sound/beep.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -44,7 +45,7 @@
 
 // ======================> lk201_device
 
-class lk201_device :  public device_t
+class lk201_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
@@ -61,18 +62,56 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
+	virtual ioport_constructor device_input_ports() const;
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	required_device<cpu_device> m_maincpu;
+	// device_serial overrides
+	virtual void rcv_complete();    // Rx completed receiving byte
+	virtual void tra_complete();    // Tx completed sending byte
+	virtual void tra_callback();    // Tx send bit
+	void input_callback(UINT8 state);
 
 private:
 	UINT8 ddrs[3];
 	UINT8 ports[3];
+	UINT8 led_data;
+	UINT8 kbd_data;
+
+	UINT8 sci_ctl2;
+	UINT8 sci_status;
+	UINT8 sci_data;
+
+	UINT8 spi_status;
+	UINT8 spi_data;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<beep_device> m_speaker;
+
+	required_ioport m_kbd0;
+	required_ioport m_kbd1;
+	required_ioport m_kbd2;
+	required_ioport m_kbd3;
+	required_ioport m_kbd4;
+	required_ioport m_kbd5;
+	required_ioport m_kbd6;
+	required_ioport m_kbd7;
+	required_ioport m_kbd8;
+	required_ioport m_kbd9;
+	required_ioport m_kbd10;
+	required_ioport m_kbd11;
+	required_ioport m_kbd12;
+	required_ioport m_kbd13;
+	required_ioport m_kbd14;
+	required_ioport m_kbd15;
+	required_ioport m_kbd16;
+	required_ioport m_kbd17;
 
 	void send_port(address_space &space, UINT8 offset, UINT8 data);
+	void update_interrupts();
 };
 
 // device type definition

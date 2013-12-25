@@ -1134,6 +1134,7 @@ void rainbow_state::update_kbd_irq()
 WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
 {
 //    printf("%02x to keyboard\n", state);
+	m_lk201->rx_w(state);
 }
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_rxready_w)
@@ -1277,7 +1278,7 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list","rainbow")
 
 	MCFG_I8251_ADD("kbdser", i8251_intf)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", rainbow_state, keyboard_tick, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", rainbow_state, keyboard_tick, attotime::from_hz(4800*16))	// 8251 is set to /16 on the clock input
 
 	MCFG_LK201_ADD()
 	MCFG_NVRAM_ADD_0FILL("nvram")
