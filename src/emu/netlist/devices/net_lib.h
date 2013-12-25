@@ -68,6 +68,8 @@
 #include "nld_7486.h"
 #include "nld_7490.h"
 #include "nld_7493.h"
+#include "nld_74107.h"
+#include "nld_74153.h"
 #include "nld_9316.h"
 
 #include "nld_ne555.h"
@@ -99,25 +101,7 @@
 		NET_CONNECT(_name, BIQ, _BIQ)                                               \
 		NET_CONNECT(_name, RBIQ, _RBIQ)
 
-#define TTL_74107A(_name, _CLK, _J, _K, _CLRQ)                                      \
-		NET_REGISTER_DEV(nic74107A, _name)                                          \
-		NET_CONNECT(_name, CLK, _CLK)                                               \
-		NET_CONNECT(_name, J,  _J)                                                  \
-		NET_CONNECT(_name, K,  _K)                                                  \
-		NET_CONNECT(_name, CLRQ,  _CLRQ)
 
-#define TTL_74107(_name, _CLK, _J, _K, _CLRQ)                                       \
-		TTL_74107A(_name, _CLK, _J, _K, _CLRQ)
-
-#define TTL_74153(_name, _A1, _A2, _A3, _A4, _A, _B, _GA)                           \
-		NET_REGISTER_DEV(nic74153, _name)                                           \
-		NET_CONNECT(_name, A1, _A1)                                                 \
-		NET_CONNECT(_name, A2, _A2)                                                 \
-		NET_CONNECT(_name, A3, _A3)                                                 \
-		NET_CONNECT(_name, A4, _A4)                                                 \
-		NET_CONNECT(_name, A, _A)                                                   \
-		NET_CONNECT(_name, B, _B)                                                   \
-		NET_CONNECT(_name, GA, _GA)
 
 // ----------------------------------------------------------------------------------------
 // Standard devices ...
@@ -131,56 +115,6 @@ NETLIB_DEVICE(nic7450,
 	netlist_ttl_output_t m_Q;
 );
 
-/* 74107 does latch data during high !
- * For modelling purposes, we assume 74107 and 74107A are the same
- */
-
-NETLIB_SUBDEVICE(nic74107Asub,
-	netlist_ttl_input_t m_clk;
-
-	netlist_ttl_output_t m_Q;
-	netlist_ttl_output_t m_QQ;
-
-	netlist_sig_t m_Q1;
-	netlist_sig_t m_Q2;
-	netlist_sig_t m_F;
-
-	ATTR_HOT void newstate(const netlist_sig_t state);
-
-);
-
-NETLIB_DEVICE(nic74107A,
-	NETLIB_NAME(nic74107Asub) sub;
-
-	netlist_ttl_input_t m_J;
-	netlist_ttl_input_t m_K;
-	netlist_ttl_input_t m_clrQ;
-
-);
-
-class NETLIB_NAME(nic74107) : public NETLIB_NAME(nic74107A)
-{
-public:
-	NETLIB_NAME(nic74107) ()
-	:   NETLIB_NAME(nic74107A) () {}
-
-};
-
-
-/* ripple-carry counter on low-high clock transition */
-
-
-
-/* one half of a nic74153 */
-
-NETLIB_DEVICE(nic74153,
-	netlist_ttl_input_t m_I[4];
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_GA;
-
-	netlist_ttl_output_t m_AY;
-);
 
 NETLIB_SUBDEVICE(nic7448_sub,
 	ATTR_HOT void update_outputs(UINT8 v);

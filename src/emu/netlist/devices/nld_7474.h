@@ -24,7 +24,7 @@
  *          |  0  |  0  |  X  | X || 1 |  1  | (*)
  *          |  1  |  1  |  R  | 1 || 1 |  0  |
  *          |  1  |  1  |  R  | 0 || 0 |  1  |
- *          |  1  |  1  |  L  | X || Q0| Q0Q |
+ *          |  1  |  1  |  0  | X || Q0| Q0Q |
  *          +-----+-----+-----+---++---+-----+
  *
  *  (*) his configuration is nonstable that is it will not persist

@@ -199,18 +199,7 @@ protected:
 
 
 	netlist_mame_t *m_netlist;
-
 	netlist_setup_t *m_setup;
-
-// more save state ... needs to go somewhere else
-
-	struct qentry {
-		netlist_time m_time;
-		char m_name[64];
-	};
-
-	qentry qtemp[1024];
-	int qsize;
 
 private:
 

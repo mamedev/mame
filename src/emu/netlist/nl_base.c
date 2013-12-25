@@ -45,17 +45,13 @@ void netlist_queue_t::on_pre_save()
 
 void netlist_queue_t::on_post_load()
 {
-    printf("on_post_load\n");
     this->clear();
-    printf("qsize %d\n", m_qsize);
     NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist->time().as_double(), qsize));
     for (int i = 0; i < m_qsize; i++ )
     {
         netlist_net_t *n = m_netlist.find_net(&(m_name[i][0]));
         NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
-        printf("Got %s ==> %p\n", m_name[i], n);
         NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(), qtemp[i].m_time.as_double()));
-        printf("schedule time %f (%f)\n", n->time().as_double(), netlist_time::from_raw(m_times[i]).as_double());
         this->push(netlist_queue_t::entry_t(netlist_time::from_raw(m_times[i]), *n));
     }
 }

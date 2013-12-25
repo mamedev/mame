@@ -456,8 +456,6 @@ protected:
 	netlist_terminal_t m_OP2;
 	netlist_terminal_t m_ON2;
 
-	double m_mult;
-
 	netlist_param_double_t m_RO;
 };
 

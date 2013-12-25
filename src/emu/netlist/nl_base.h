@@ -368,7 +368,11 @@ public:
 	netlist_core_terminal_t *m_update_list_next;
 
 protected:
-	ATTR_COLD virtual void save_register() { save(NAME(m_state)); netlist_owned_object_t::save_register(); }
+	ATTR_COLD virtual void save_register()
+	{
+	    save(NAME(m_state));
+	    netlist_owned_object_t::save_register();
+	}
 
 private:
 	netlist_net_t * RESTRICT m_net;
@@ -497,7 +501,6 @@ public:
     ATTR_COLD netlist_analog_input_t()
 		: netlist_input_t(INPUT, ANALOG) { }
 
-	ATTR_HOT inline const bool is_highz() const;
 	ATTR_HOT inline const double Q_Analog() const;
 };
 
@@ -1019,8 +1022,6 @@ protected:
 protected:
     ATTR_COLD virtual void save_register()
     {
-        //netlist_queue_t                     m_queue;
-        //netlist().save_manager(m_queue.callback(), "m_queue");
         save(NAME(m_queue.callback()));
         save(NAME(m_time_ps));
         save(NAME(m_rem));
@@ -1252,12 +1253,6 @@ ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::last_Q() const
 ATTR_HOT inline const double netlist_analog_input_t::Q_Analog() const
 {
 	return net().Q_Analog();
-}
-
-//FIXME: Legacy ... must be removed
-ATTR_HOT inline const bool netlist_analog_input_t::is_highz() const
-{
-	return (net().Q_Analog() == NETLIST_HIGHIMP_V);
 }
 
 // ----------------------------------------------------------------------------------------

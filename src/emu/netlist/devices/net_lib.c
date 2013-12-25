@@ -218,128 +218,6 @@ NETLIB_UPDATE(nic7450)
 
 
 
-
-NETLIB_START(nic74107Asub)
-{
-	register_input("CLK", m_clk, netlist_input_t::STATE_INP_HL);
-	register_output("Q", m_Q);
-	register_output("QQ", m_QQ);
-
-	m_Q.initial(0);
-	m_QQ.initial(1);
-
-	save(NAME(m_Q1));
-	save(NAME(m_Q2));
-	save(NAME(m_F));
-}
-
-NETLIB_START(nic74107A)
-{
-	register_sub(sub, "sub");
-
-	register_subalias("CLK", sub.m_clk);
-	register_input("J", m_J);
-	register_input("K", m_K);
-	register_input("CLRQ", m_clrQ);
-	register_subalias("Q", sub.m_Q);
-	register_subalias("QQ", sub.m_QQ);
-
-	sub.m_Q.initial(0);
-	sub.m_QQ.initial(1);
-}
-
-ATTR_HOT inline void NETLIB_NAME(nic74107Asub)::newstate(const netlist_sig_t state)
-{
-	const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
-#if 1
-	OUTLOGIC(m_Q, state, delay[state ^ 1]);
-	OUTLOGIC(m_QQ, state ^ 1, delay[state]);
-#else
-	if (state != Q.new_Q())
-	{
-		Q.setToNoCheck(state, delay[1-state]);
-		QQ.setToNoCheck(1-state, delay[state]);
-	}
-#endif
-}
-
-NETLIB_UPDATE(nic74107Asub)
-{
-	{
-		const netlist_sig_t t = m_Q.net().new_Q();
-		newstate((!t & m_Q1) | (t & m_Q2) | m_F);
-		if (!m_Q1)
-			m_clk.inactivate();
-	}
-}
-
-NETLIB_UPDATE(nic74107A)
-{
-	if (INPLOGIC(m_J) & INPLOGIC(m_K))
-	{
-		sub.m_Q1 = 1;
-		sub.m_Q2 = 0;
-		sub.m_F  = 0;
-	}
-	else if (!INPLOGIC(m_J) & INPLOGIC(m_K))
-	{
-		sub.m_Q1 = 0;
-		sub.m_Q2 = 0;
-		sub.m_F  = 0;
-	}
-	else if (INPLOGIC(m_J) & !INPLOGIC(m_K))
-	{
-		sub.m_Q1 = 0;
-		sub.m_Q2 = 0;
-		sub.m_F  = 1;
-	}
-	else
-	{
-		sub.m_Q1 = 0;
-		sub.m_Q2 = 1;
-		sub.m_F  = 0;
-		sub.m_clk.inactivate();
-	}
-	if (!INPLOGIC(m_clrQ))
-	{
-		sub.m_clk.inactivate();
-		sub.newstate(0);
-	}
-	else if (!sub.m_Q2)
-		sub.m_clk.activate_hl();
-	//if (!sub.m_Q2 & INPLOGIC(m_clrQ))
-	//  sub.m_clk.activate_hl();
-}
-
-NETLIB_START(nic74153)
-{
-	register_input("A1", m_I[0]);
-	register_input("A2", m_I[1]);
-	register_input("A3", m_I[2]);
-	register_input("A4", m_I[3]);
-	register_input("A", m_A);
-	register_input("B", m_B);
-	register_input("GA", m_GA);
-
-	register_output("AY", m_AY);
-}
-
-NETLIB_UPDATE(nic74153)
-{
-	const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
-	if (!INPLOGIC(m_GA))
-	{
-		UINT8 chan = (INPLOGIC(m_A) | (INPLOGIC(m_B)<<1));
-		UINT8 t = INPLOGIC(m_I[chan]);
-		OUTLOGIC(m_AY, t, delay[t] ); /* data to y only, FIXME */
-	}
-	else
-	{
-		OUTLOGIC(m_AY, 0, delay[0]);
-	}
-}
-
-
 #define xstr(s) # s
 #define ENTRY1(_nic, _name) register_device<_nic>( # _name, xstr(_nic) );
 #define ENTRY(_nic, _name) ENTRY1(NETLIB_NAME(_nic), _name)
@@ -379,7 +257,6 @@ void netlist_factory::initialize()
 	ENTRY(solver,               NETDEV_SOLVER)
 	ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
 	ENTRY(nicRSFF,              NETDEV_RSFF)
-	ENTRY(nicMixer8,            NETDEV_MIXER)
 	ENTRY(7400,                 TTL_7400_NAND)
 	ENTRY(7402,                 TTL_7402_NOR)
 	ENTRY(nic7404,              TTL_7404_INVERT)
@@ -400,7 +277,6 @@ void netlist_factory::initialize()
 	ENTRY(nic74153,             TTL_74153)
 	ENTRY(9316,                 TTL_9316)
 	ENTRY(NE555,                NETDEV_NE555)
-	ENTRY(nicNE555N_MSTABLE,    NE555N_MSTABLE)
 }
 
 netlist_device_t *netlist_factory::new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const

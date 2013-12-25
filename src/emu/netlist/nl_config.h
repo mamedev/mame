@@ -37,7 +37,7 @@
 #define NETLIST_CLOCK               (NETLIST_INTERNAL_RES / NETLIST_DIV)
 
 //FIXME: LEGACY
-#define NETLIST_HIGHIMP_V   (1.23456e20)        /* some voltage we should never see */
+//#define NETLIST_HIGHIMP_V   (1.23456e20)        /* some voltage we should never see */
 
 #define NETLIST_GMIN    (1e-9)
 

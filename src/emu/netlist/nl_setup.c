@@ -15,7 +15,6 @@
 static NETLIST_START(base)
 	NETDEV_TTL_CONST(ttlhigh, 1)
 	NETDEV_TTL_CONST(ttllow, 0)
-	NETDEV_ANALOG_CONST(NC, NETLIST_HIGHIMP_V)
 
 	NET_MODEL(".model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
 	NET_MODEL(".model 1N4148 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
