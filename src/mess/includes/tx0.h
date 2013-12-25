@@ -8,6 +8,7 @@
 #define TX0_H_
 
 #include "video/crt.h"
+#include "cpu/pdp1/tx0.h"
 
 enum state_t
 {
@@ -161,7 +162,7 @@ public:
 	TIMER_CALLBACK_MEMBER(prt_callback);
 	TIMER_CALLBACK_MEMBER(dis_callback);
 	void tx0_machine_stop();
-	required_device<cpu_device> m_maincpu;
+	required_device<tx0_device> m_maincpu;
 	inline void tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void tx0_plot(int x, int y);
 	void tx0_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
@@ -183,6 +184,16 @@ public:
 	void schedule_select();
 	void schedule_unselect();
 	void tx0_keyboard();
+	DECLARE_WRITE_LINE_MEMBER(tx0_io_cpy);
+	DECLARE_WRITE_LINE_MEMBER(tx0_io_r1l);
+	DECLARE_WRITE_LINE_MEMBER(tx0_io_r3l);
+	DECLARE_WRITE_LINE_MEMBER(tx0_io_p6h);
+	DECLARE_WRITE_LINE_MEMBER(tx0_io_p7h);
+	DECLARE_WRITE_LINE_MEMBER(tx0_io_prt);
+	DECLARE_WRITE_LINE_MEMBER(tx0_io_dis);
+	DECLARE_WRITE_LINE_MEMBER(tx0_sel);
+	DECLARE_WRITE_LINE_MEMBER(tx0_io_reset_callback);
+	void magtape_callback();
 };
 
 /* defines for each bit and mask in input port "CSW" */
