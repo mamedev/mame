@@ -14,9 +14,9 @@
   - Replacing the battery backed ram with an eeprom is not really an option since the game stores the
     current credits count in the battery backed ram.
   - System clock is 12 Mhz. The CPU clock is unknown.
-  - The Alternate Gfx mode is funky. Not only it has different bitmaps, but also the strings with the
+  - The Alternate GFX mode is funky. Not only it has different bitmaps, but also the strings with the
     game options are truncated. Title is also truncated.
-
+  - At least one bootleg board exist.
 
 *******************************************************************************************************
 
@@ -66,26 +66,26 @@
 
   MARKED   PINS     ID    TYPE        DETAILS
 
-  - U1 : 40-pin IC  YES   CPU         MOTOROLA M6809
-  - U2 : 28-pin IC  YES   ROM U2      M27128A
-  - U3 : 28-pin IC  YES   ROM U3      M27128A
-  - U4 : 40-pin IC  YES   PIA         ST EF6821P
-  - U5 : 16-pin IC  NO
-  - U6 : 16-pin IC  NO
-  - U7 : 16-pin IC  NO
-  - U8 : 16-pin IC  NO
-  - U9 : 40-pin IC  YES   CRTC        HD6845 / UM6845
-  - U10: 28-pin IC  YES   RAM         ???? (Battery NVR)
-  - U11: 14-pin IC  NO
-  - U12: 14-pin IC  NO
-  - U13: 20-pin IC  NO
-  - U14: 20-pin IC  NO
-  - U15: 20-pin IC  NO
-  - U16: 20-pin IC  NO
-  - U17: 14-pin IC  NO
-  - U18: 14-pin IC  NO
-  - U19: 16-pin IC  YES   WATCHDOG    MAXIM MAX691
-  - U20: 16-pin IC  YES   DARLINGTON  ULN2003
+  - U1 : 40-pin IC  YES   CPU         MOTOROLA M6809EP               (8-bit microprocessor)
+  - U2 : 28-pin IC  YES   ROM         M27128A                        (NMOS 128K 16K x 8 UV EPROM)
+  - U3 : 28-pin IC  YES   ROM         M27128A                        (NMOS 128K 16K x 8 UV EPROM)
+  - U4 : 40-pin IC  YES   I/O         ST EF6821P                     (PIA: Peripheral Interface Adapter)
+  - U5 : 16-pin IC  YES   TTL         ST M74HC157B1                  (Quad 2 Channel Multiplexer)
+  - U6 : 16-pin IC  YES   TTL         ST M74HC157B1                  (Quad 2 Channel Multiplexer)
+  - U7 : 16-pin IC  YES   TTL         ST M74HC157B1                  (Quad 2 Channel Multiplexer)
+  - U8 : 16-pin IC  YES   TTL         ST M74HC157B1                  (Quad 2 Channel Multiplexer)
+  - U9 : 40-pin IC  YES   CRTC        HD6845 / UM6845 / GS GM68A45S  (CRT Controller)
+  - U10: 28-pin IC  YES   RAM         KM62256BLP-10                  (32K x 8 Low Power CMOS Static RAM)
+  - U11: 14-pin IC  YES   TTL         SN74LS95BN                     (4-bit Parallel-Access Shift Registers)
+  - U12: 14-pin IC  YES   TTL         SN74LS95BN                     (4-bit Parallel-Access Shift Registers)
+  - U13: 20-pin IC  YES   TTL         SN74LS244N                     (Octal Buffers and Line Drivers with 3-State outputs)
+  - U14: 20-pin IC  YES   TTL         HD74LS374                      (Octal D-type Flip-Flops with noninverted 3-state output)
+  - U15: 20-pin IC  NO    PLD         ???
+  - U16: 20-pin IC  YES   PLD         PALCE16V8H-25                  (EE CMOS Zero-Power 20-Pin Universal Programmable Array Logic)
+  - U17: 14-pin IC  YES   TTL         HD74LS00P                      (Quadruple 2-Input NAND Gates)
+  - U18: 14-pin IC  YES   TTL         KS74HCTLS86N                   (Quad 2−Input Exclusive OR Gate)
+  - U19: 16-pin IC  YES   WATCHDOG    MAXIM MAX691                   (Microprocessor Supervisory Circuits)
+  - U20: 16-pin IC  YES   DARLINGTON  ULN2003                        (7 NPN Darlington transistor pairs with high voltage and current capability)
 
 
                              M6809
@@ -494,5 +494,5 @@ ROM_START( truco )
 	ROM_LOAD( "truco.u2",   0x0c000, 0x4000, CRC(ff355750) SHA1(1538f20b1919928ffca439e4046a104ddfbc756c) )
 ROM_END
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    INIT  ROT    COMPANY           FULLNAME     FLAGS  */
-GAME( 198?, truco,   0,      truco,   truco, driver_device,   0,    ROT0, "Playtronic SRL", "Truco-Tron", 0 )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE            INIT  ROT    COMPANY           FULLNAME     FLAGS  */
+GAME( 198?, truco,   0,      truco,   truco,   driver_device,   0,    ROT0, "Playtronic SRL", "Truco-Tron", 0 )
