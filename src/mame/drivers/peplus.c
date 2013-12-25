@@ -2801,7 +2801,7 @@ PayTable    As  2PR  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2020.u72",  0x00000, 0x8000, CRC(3dc6f3f6) SHA1(c701f3b0fa16a614c9a4094f385c3f75d72cef3b) ) /* CG2020, like 20/20 vision for 1 Eyed Jacks :-) */
-	ROM_LOAD( "mgo-cg2020.u73",  0x08000, 0x8000, CRC(71847102) SHA1(a860ef28351f0b7b82c05db26712d50a6f5d3732) )
+	ROM_LOAD( "mgo-cg2020.u73",  0x08000, 0x8000, CRC(71847102) SHA1(a860ef28351f0b7b82c05db26712d50a6f5d3732) ) /* Superseded by CG2243 which also works */
 	ROM_LOAD( "mbo-cg2020.u74",  0x10000, 0x8000, CRC(710c717c) SHA1(4e2d463c9f94d446149374d5f66f88d403bd6064) )
 	ROM_LOAD( "mxo-cg2020.u75",  0x18000, 0x8000, CRC(78d6eac3) SHA1(09b614abe5f5509f3050c2cec94dc794e2b4db0d) )
 
