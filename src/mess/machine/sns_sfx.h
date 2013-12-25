@@ -19,7 +19,7 @@ public:
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	required_device<device_t> m_superfx;
+	required_device<superfx_device> m_superfx;
 
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);

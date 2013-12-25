@@ -85,16 +85,11 @@ WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
 	machine().device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, state);
 }
 
-static SUPERFX_CONFIG( snes_sfx_config )
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, sns_rom_superfx_device, snes_extern_irq_w)  /* IRQ line from cart */
-};
-
 
 static MACHINE_CONFIG_FRAGMENT( snes_sfx )
 	MCFG_CPU_ADD("superfx", SUPERFX, 21480000)  /* 21.48MHz */
 	MCFG_CPU_PROGRAM_MAP(sfx_map)
-	MCFG_CPU_CONFIG(snes_sfx_config)
+	MCFG_SUPERFX_OUT_IRQ(WRITELINE(sns_rom_superfx_device, snes_extern_irq_w))  /* IRQ line from cart */
 MACHINE_CONFIG_END
 
 machine_config_constructor sns_rom_superfx_device::device_mconfig_additions() const
@@ -104,12 +99,12 @@ machine_config_constructor sns_rom_superfx_device::device_mconfig_additions() co
 
 READ8_MEMBER( sns_rom_superfx_device::chip_read )
 {
-	return superfx_mmio_read(m_superfx, offset);
+	return m_superfx->mmio_read(offset);
 }
 
 WRITE8_MEMBER( sns_rom_superfx_device::chip_write )
 {
-	superfx_mmio_write(m_superfx, offset, data);
+	m_superfx->mmio_write(offset, data);
 }
 
 
@@ -124,7 +119,7 @@ READ8_MEMBER(sns_rom_superfx_device::read_h)
 		return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
 	else if (offset < 0x600000)
 	{
-		if (superfx_access_rom(m_superfx))
+		if (m_superfx->access_rom())
 		{
 			return m_rom[rom_bank_map[(offset - 0x400000) / 0x8000] * 0x8000 + (offset & 0x7fff)];
 		}
@@ -142,13 +137,13 @@ READ8_MEMBER(sns_rom_superfx_device::read_h)
 
 READ8_MEMBER( sns_rom_superfx_device::read_ram )
 {
-	if (superfx_access_ram(m_superfx))
+	if (m_superfx->access_ram())
 		return sfx_ram[offset & 0xfffff];
 	return 0xff;    // should be open bus...
 }
 
 WRITE8_MEMBER( sns_rom_superfx_device::write_ram )
 {
-	if (superfx_access_ram(m_superfx))
+	if (m_superfx->access_ram())
 		sfx_ram[offset & 0xfffff] = data;
 }
