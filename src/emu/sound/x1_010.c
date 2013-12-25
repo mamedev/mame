@@ -89,12 +89,12 @@ x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, dev
 		m_stream(NULL),
 		m_region(NULL),
 		m_sound_enable(0),
-		//m_reg[0x2000],
-		//m_HI_WORD_BUF[0x2000],
-		//m_smp_offset[SETA_NUM_CHANNELS],
-		//m_env_offset[SETA_NUM_CHANNELS],
 		m_base_clock(0)
 {
+	memset(m_reg, 0, sizeof(m_reg));
+	memset(m_HI_WORD_BUF, 0, sizeof(m_HI_WORD_BUF));
+	memset(m_smp_offset, 0, sizeof(SETA_NUM_CHANNELS));
+	memset(m_env_offset, 0, sizeof(SETA_NUM_CHANNELS));
 }
 
 //-------------------------------------------------

@@ -750,10 +750,16 @@ INTERRUPT_GEN_MEMBER(realbrk_state::realbrk_interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-static TMP68301_INTERFACE( tmp68301_interface )
+static TMP68301_INTERFACE( tmp68301_default_interface )
 {
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER16(realbrk_state,realbrk_flipscreen_w)
+};
+
+static TMP68301_INTERFACE( tmp68301_pkgnsh_interface )
+{
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( realbrk, realbrk_state )
@@ -763,7 +769,7 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_CPU_PROGRAM_MAP(realbrk_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", realbrk_state,  realbrk_interrupt)
 
-	MCFG_TMP68301_ADD("tmp68301", tmp68301_interface)
+	MCFG_TMP68301_ADD("tmp68301", tmp68301_default_interface)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -792,9 +798,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
+	
+	MCFG_TMP68301_MODIFY("tmp68301", tmp68301_pkgnsh_interface)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pkgnshdx, realbrk )
+static MACHINE_CONFIG_DERIVED( pkgnshdx, pkgnsh )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnshdx_mem)
 MACHINE_CONFIG_END
