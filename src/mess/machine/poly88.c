@@ -25,9 +25,6 @@ void poly88_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	case TIMER_CASSETTE:
 		poly88_cassette_timer_callback(ptr, param);
 		break;
-	case TIMER_SETUP_MACHINE_STATE:
-		setup_machine_state(ptr, param);
-		break;
 	default:
 		assert_always(FALSE, "Unknown id in poly88_state::device_timer");
 	}
@@ -159,6 +156,11 @@ IRQ_CALLBACK_MEMBER(poly88_state::poly88_irq_callback)
 	return m_int_vector;
 }
 
+WRITE_LINE_MEMBER(poly88_state::write_cas_tx)
+{
+	m_cas_tx = state;
+}
+
 TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 {
 	int data;
@@ -182,7 +184,7 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 						{
 							data = (!m_previous_level && current_level) ? 1 : 0;
 //data = current_level;
-							m_sercas->send_bit(data);
+							m_uart->write_rx(data);
 							m_uart->receive_clock();
 
 							m_clk_level_tape = 1;
@@ -193,7 +195,7 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 		/* tape writing */
 		if (m_cassette->get_state()&CASSETTE_RECORD)
 		{
-			data = m_sercas->get_in_data_bit();
+			data = m_cas_tx;
 			data ^= m_clk_level_tape;
 			m_cassette->output(data&0x01 ? 1 : -1);
 
@@ -214,11 +216,6 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(poly88_state::setup_machine_state)
-{
-	m_uart->connect(m_sercas);
-}
-
 DRIVER_INIT_MEMBER(poly88_state,poly88)
 {
 	m_previous_level = 0;
@@ -234,8 +231,6 @@ void poly88_state::machine_reset()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(poly88_state::poly88_irq_callback),this));
 	m_intr = 0;
 	m_last_code = 0;
-
-	timer_set(attotime::zero, TIMER_SETUP_MACHINE_STATE);
 }
 
 INTERRUPT_GEN_MEMBER(poly88_state::poly88_interrupt)
@@ -252,7 +247,7 @@ WRITE_LINE_MEMBER(poly88_state::poly88_usart_rxready)
 
 const i8251_interface poly88_usart_interface=
 {
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(poly88_state,write_cas_tx),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(poly88_state,poly88_usart_rxready),

@@ -18,8 +18,7 @@ public:
 	{
 		TIMER_USART,
 		TIMER_KEYBOARD,
-		TIMER_CASSETTE,
-		TIMER_SETUP_MACHINE_STATE
+		TIMER_CASSETTE
 	};
 
 	poly88_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -27,7 +26,6 @@ public:
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_uart(*this, "uart"),
-		m_sercas(*this, "sercas"),
 		m_cassette(*this, "cassette"),
 		m_linec(*this, "LINEC"),
 		m_line0(*this, "LINE0"),
@@ -59,7 +57,7 @@ public:
 	TIMER_CALLBACK_MEMBER(poly88_usart_timer_callback);
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(poly88_cassette_timer_callback);
-	TIMER_CALLBACK_MEMBER(setup_machine_state);
+	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
 	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( poly88 );
@@ -67,7 +65,6 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
-	required_device<serial_source_device> m_sercas;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport m_linec;
 	required_ioport m_line0;
@@ -79,6 +76,8 @@ protected:
 	required_ioport m_line6;
 	UINT8 row_number(UINT8 code);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	int m_cas_tx;
 };
 
 
