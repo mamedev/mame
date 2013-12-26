@@ -43,7 +43,7 @@ protected:
 private:
 	required_device<wd2010_device> m_hdc;
 
-	UINT8 m_ram[0x800];
+	//UINT8 m_ram[0x800];
 
 public:
 	DECLARE_READ8_MEMBER(p1_HDC_r);

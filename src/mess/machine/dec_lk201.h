@@ -83,7 +83,7 @@ private:
 
 	UINT8 sci_ctl2;
 	UINT8 sci_status;
-	UINT8 sci_data;
+	//UINT8 sci_data;
 
 	UINT8 spi_status;
 	UINT8 spi_data;
