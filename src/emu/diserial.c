@@ -470,37 +470,3 @@ void device_serial_interface::connect(device_serial_interface *other_connection)
 	/* let a know the state of b */
 	other_connection->serial_connection_out();
 }
-
-
-
-const device_type SERIAL_SOURCE = &device_creator<serial_source_device>;
-
-//-------------------------------------------------
-//  serial_source_device - constructor
-//-------------------------------------------------
-
-serial_source_device::serial_source_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SERIAL_SOURCE, "Serial source", tag, owner, clock, "serial_source", __FILE__),
-		device_serial_interface(mconfig, *this)
-{
-}
-
-void serial_source_device::device_start()
-{
-}
-
-void serial_source_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
-}
-
-void serial_source_device::input_callback(UINT8 state)
-{
-	m_input_state = state;
-}
-
-void serial_source_device::send_bit(UINT8 data)
-{
-	set_out_data_bit(data);
-	serial_connection_out();
-}

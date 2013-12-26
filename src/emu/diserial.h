@@ -157,25 +157,4 @@ private:
 	void rcv_edge();
 };
 
-
-class serial_source_device :  public device_t,
-								public device_serial_interface
-{
-public:
-	// construction/destruction
-	serial_source_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	virtual void input_callback(UINT8 state);
-	void send_bit(UINT8 data);
-protected:
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-};
-
-extern const device_type SERIAL_SOURCE;
-
-#define MCFG_SERIAL_SOURCE_ADD(_tag)    \
-	MCFG_DEVICE_ADD((_tag), SERIAL_SOURCE, 0)
-
 #endif  /* __DISERIAL_H__ */
