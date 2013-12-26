@@ -254,8 +254,6 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 		{
 			hsync_time = machine().primary_screen->time_until_pos(machine().primary_screen->vpos()+1,m_crtc.hbegin);
 			m_scanline_timer->adjust(hsync_time, 1);
-	//      if(!(m_mfp.gpio & 0x40))  // if GPIP6 is active, clear it
-	//          m_mfp.gpio |= 0x40;
 		}
 	}
 }
@@ -457,15 +455,6 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 
 READ16_MEMBER(x68k_state::x68k_crtc_r )
 {
-#if 0
-	switch(offset)
-	{
-	default:
-		logerror("CRTC: [%08x] Read from CRTC register %i\n",activecpu_get_pc(),offset);
-		return 0xff;
-	}
-#endif
-
 	if(offset < 24)
 	{
 //      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",m_maincpu->safe_pc(),m_crtc.reg[offset],offset);
@@ -1068,13 +1057,6 @@ static const gfx_layout x68k_pcg_16 =
 	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
 	128*8
 };
-
-#if 0
-static GFXDECODEINFO_START( x68k )
-	GFXDECODE_ENTRY( "user1", 0, x68k_pcg_8, 0x100, 16 )  // 8x8 sprite tiles
-	GFXDECODE_ENTRY( "user1", 0, x68k_pcg_16, 0x100, 16 )  // 16x16 sprite tiles
-GFXDECODEINFO_END
-#endif
 
 TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile)
 {

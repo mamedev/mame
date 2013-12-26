@@ -46,11 +46,6 @@ class x68k_state : public driver_device
 public:
 	enum
 	{
-		TIMER_MFP_UPDATE_IRQ,
-		TIMER_MFP_TIMER_A,
-		TIMER_MFP_TIMER_B,
-		TIMER_MFP_TIMER_C,
-		TIMER_MFP_TIMER_D,
 		TIMER_X68K_LED,
 		TIMER_X68K_KEYBOARD_POLL,
 		TIMER_X68K_SCC_ACK,
@@ -136,35 +131,13 @@ public:
 	} m_adpcm;
 	struct
 	{
-		int gpdr;  // [0]  GPIP data register.  Typically all inputs.
 		int aer;   // [1]  GPIP active edge register.  Determines on which transition an IRQ is triggered.  0 = 1->0
-		int ddr;   // [2]  GPIP data direction register.  Determines which GPIP bits are inputs (0) or outputs (1)
-		int iera;  // [3]  Interrupt enable register A.
-		int ierb;  // [4]  Interrupt enable register B.
-		int ipra;  // [5]  Interrupt pending register A.
-		int iprb;  // [6]  Interrupt pending register B.
-		int isra;  // [7]  Interrupt in-service register A.
-		int isrb;  // [8]  Interrupt in-service register B.
-		int imra;  // [9]  Interrupt mask register A.
-		int imrb;  // [10] Interrupt mask register B.
-		int vr;    // [11] Vector register
-		int tacr;  // [12] Timer A control register
-		int tbcr;  // [13] Timer B control register
-		int tcdcr; // [14] Timer C & D control register
 		int tadr;  // [15] Timer A data register
 		int tbdr;  // [16] Timer B data register
 		int tcdr;  // [17] Timer C data register
 		int tddr;  // [18] Timer D data register
-		int scr;   // [19] Synchronous character register
-		int ucr;   // [20] USART control register
 		int rsr;   // [21] Receiver status register
 		int tsr;   // [22] Transmitter status register
-		int udr;   // [23] USART data register
-		struct
-		{
-			int counter;
-			int prescaler;
-		} timer[4];
 		struct
 		{
 			unsigned char recv_buffer;
@@ -172,9 +145,7 @@ public:
 			int recv_enable;
 			int send_enable;
 		} usart;
-		int vector;
 		int irqline;
-		int eoi_mode;
 		int current_irq;
 		unsigned char gpio;
 	} m_mfp;  // MC68901 Multifunction Peripheral (4MHz)
@@ -303,7 +274,6 @@ public:
 	DECLARE_VIDEO_START(x68000);
 	DECLARE_PALETTE_INIT(x68000);
 	UINT32 screen_update_x68000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(x68k_vsync_irq);
 	TIMER_CALLBACK_MEMBER(mfp_update_irq);
 	TIMER_CALLBACK_MEMBER(mfp_timer_a_callback);
 	TIMER_CALLBACK_MEMBER(mfp_timer_b_callback);

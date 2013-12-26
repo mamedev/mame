@@ -140,66 +140,18 @@
 
 
 
-//emu_timer* mfp_timer[4];
-//emu_timer* mfp_irq;
-
-// MFP is clocked at 4MHz, so at /4 prescaler the timer is triggered after 1us (4 cycles)
-// No longer necessary with the new MFP core
-#ifdef UNUSED_FUNCTION
-attotime x68k_state::prescale(int val)
-{
-	switch(val)
-	{
-		case 0: return attotime::from_nsec(0);
-		case 1: return attotime::from_nsec(1000);
-		case 2: return attotime::from_nsec(2500);
-		case 3: return attotime::from_nsec(4000);
-		case 4: return attotime::from_nsec(12500);
-		case 5: return attotime::from_nsec(16000);
-		case 6: return attotime::from_nsec(25000);
-		case 7: return attotime::from_nsec(50000);
-		default:
-			fatalerror("out of range\n");
-	}
-}
-#endif
-
 void x68k_state::mfp_init()
 {
 	m_mfp.tadr = m_mfp.tbdr = m_mfp.tcdr = m_mfp.tddr = 0xff;
 
 	m_mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
 	m_mfp.current_irq = -1;  // No current interrupt
-
-#if 0
-	mfp_timer[0] = timer_alloc(TIMER_MFP_TIMER_A);
-	mfp_timer[1] = timer_alloc(TIMER_MFP_TIMER_B);
-	mfp_timer[2] = timer_alloc(TIMER_MFP_TIMER_C);
-	mfp_timer[3] = timer_alloc(TIMER_MFP_TIMER_D);
-	mfp_irq = timer_alloc(TIMER_MFP_UPDATE_IRQ);
-	mfp_irq->adjust(attotime::zero, 0, attotime::from_usec(32));
-#endif
 }
 
 void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
-	case TIMER_MFP_UPDATE_IRQ:
-		//mfp_update_irq(ptr, param);
-		break;
-	case TIMER_MFP_TIMER_A:
-		//mfp_timer_a_callback(ptr, param);
-		break;
-	case TIMER_MFP_TIMER_B:
-		//mfp_timer_b_callback(ptr, param);
-		break;
-	case TIMER_MFP_TIMER_C:
-		//mfp_timer_c_callback(ptr, param);
-		break;
-	case TIMER_MFP_TIMER_D:
-		//mfp_timer_d_callback(ptr, param);
-		break;
 	case TIMER_X68K_LED:
 		x68k_led_callback(ptr, param);
 		break;
@@ -244,136 +196,6 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		assert_always(FALSE, "Unknown id in x68k_state::device_timer");
 	}
 }
-
-
-#ifdef UNUSED_FUNCTION
-TIMER_CALLBACK_MEMBER(x68k_state::mfp_update_irq)
-{
-	int x;
-
-	if((m_ioc.irqstatus & 0xc0) != 0)
-		return;
-
-	// check for pending IRQs, in priority order
-	if(m_mfp.ipra != 0)
-	{
-		for(x=7;x>=0;x--)
-		{
-			if((m_mfp.ipra & (1 << x)) && (m_mfp.imra & (1 << x)))
-			{
-				m_current_irq_line = m_mfp.irqline;
-				m_mfp.current_irq = x + 8;
-				// assert IRQ line
-//              if(m_mfp.iera & (1 << x))
-				{
-					m_current_vector[6] = (m_mfp.vr & 0xf0) | (x+8);
-					m_maincpu->set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | (x + 8));
-//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(m_mfp.vr & 0xf0) | (x+8),m_mfp.irqline);
-					return;  // one at a time only
-				}
-			}
-		}
-	}
-	if(m_mfp.iprb != 0)
-	{
-		for(x=7;x>=0;x--)
-		{
-			if((m_mfp.iprb & (1 << x)) && (m_mfp.imrb & (1 << x)))
-			{
-				m_current_irq_line = m_mfp.irqline;
-				m_mfp.current_irq = x;
-				// assert IRQ line
-//              if(m_mfp.ierb & (1 << x))
-				{
-					m_current_vector[6] = (m_mfp.vr & 0xf0) | x;
-					m_maincpu->set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | x);
-//                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(m_mfp.vr & 0xf0) | x,m_mfp.irqline);
-					return;  // one at a time only
-				}
-			}
-		}
-	}
-}
-
-void x68k_state::mfp_trigger_irq(int irq)
-{
-	// check if interrupt is enabled
-	if(irq > 7)
-	{
-		if(!(m_mfp.iera & (1 << (irq-8))))
-			return;  // not enabled, no action taken
-	}
-	else
-	{
-		if(!(m_mfp.ierb & (1 << irq)))
-			return;  // not enabled, no action taken
-	}
-
-	// set requested IRQ as pending
-	if(irq > 7)
-		m_mfp.ipra |= (1 << (irq-8));
-	else
-		m_mfp.iprb |= (1 << irq);
-
-	// check for IRQs to be called
-//  mfp_update_irq(0);
-
-}
-
-TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_a_callback)
-{
-	m_mfp.timer[0].counter--;
-	if(m_mfp.timer[0].counter == 0)
-	{
-		m_mfp.timer[0].counter = m_mfp.tadr;
-		mfp_trigger_irq(MFP_IRQ_TIMERA);
-	}
-}
-
-TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_b_callback)
-{
-	m_mfp.timer[1].counter--;
-	if(m_mfp.timer[1].counter == 0)
-	{
-		m_mfp.timer[1].counter = m_mfp.tbdr;
-			mfp_trigger_irq(MFP_IRQ_TIMERB);
-	}
-}
-
-TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_c_callback)
-{
-	m_mfp.timer[2].counter--;
-	if(m_mfp.timer[2].counter == 0)
-	{
-		m_mfp.timer[2].counter = m_mfp.tcdr;
-			mfp_trigger_irq(MFP_IRQ_TIMERC);
-	}
-}
-
-TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_d_callback)
-{
-	m_mfp.timer[3].counter--;
-	if(m_mfp.timer[3].counter == 0)
-	{
-		m_mfp.timer[3].counter = m_mfp.tddr;
-			mfp_trigger_irq(MFP_IRQ_TIMERD);
-	}
-}
-
-void x68k_state::mfp_set_timer(int timer, unsigned char data)
-{
-	if((data & 0x07) == 0x0000)
-	{  // Timer stop
-		mfp_timer[timer]->adjust(attotime::zero);
-		logerror("MFP: Timer #%i stopped. \n",timer);
-		return;
-	}
-
-	mfp_timer[timer]->adjust(attotime::zero, 0, prescale(data & 0x07));
-	logerror("MFP: Timer #%i set to %2.1fus\n",timer, prescale(data & 0x07).as_double() * 1000000);
-
-}
-#endif
 
 // LED timer callback
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_led_callback)
@@ -569,18 +391,6 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_keyboard_poll)
 	}
 }
 
-
-#ifdef UNUSED_FUNCTION
-void x68k_state::mfp_recv_data(int data)
-{
-	m_mfp.rsr |= 0x80;  // Buffer full
-	m_mfp.tsr |= 0x80;
-	m_mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
-	m_mfp.vector = m_current_vector[6] = (m_mfp.vr & 0xf0) | 0x0c;
-//  mfp_trigger_irq(MFP_IRQ_RX_FULL);
-//  logerror("MFP: Receive buffer full IRQ sent\n");
-}
-#endif
 
 // mouse input
 // port B of the Z8530 SCC
@@ -1277,15 +1087,6 @@ READ16_MEMBER(x68k_state::x68k_sysport_r)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-READ16_MEMBER(x68k_state::x68k_mfp_r)
-{
-	device_t *x68k_mfp = machine().device(MC68901_TAG);
-
-	return mc68901_register_r(x68k_mfp, offset);
-}
-#endif
-
 READ16_MEMBER(x68k_state::x68k_mfp_r)
 {
 	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
@@ -1293,50 +1094,6 @@ READ16_MEMBER(x68k_state::x68k_mfp_r)
 //  logerror("MFP: [%08x] Reading offset %i\n",space.device().safe_pc(),offset);
 	switch(offset)
 	{
-#if 0
-	case 0x00:  // GPIP - General purpose I/O register (read-only)
-		ret = 0x23;
-		if(machine.primary_screen->vpos() == m_crtc.reg[9])
-			ret |= 0x40;
-		if(m_crtc.vblank == 0)
-			ret |= 0x10;  // Vsync signal (low if in vertical retrace)
-//      if(m_mfp.isrb & 0x08)
-//          ret |= 0x08;  // FM IRQ signal
-		if(machine.primary_screen->hpos() > m_crtc.width - 32)
-			ret |= 0x80;  // Hsync signal
-//      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",space.device().safe_pc(),offset,ret);
-		return ret;  // bit 5 is always 1
-	case 3:
-		return m_mfp.iera;
-	case 4:
-		return m_mfp.ierb;
-	case 5:
-		return m_mfp.ipra;
-	case 6:
-		return m_mfp.iprb;
-	case 7:
-		if(m_mfp.eoi_mode == 0)  // forced low in auto EOI mode
-			return 0;
-		else
-			return m_mfp.isra;
-	case 8:
-		if(m_mfp.eoi_mode == 0)  // forced low in auto EOI mode
-			return 0;
-		else
-			return m_mfp.isrb;
-	case 9:
-		return m_mfp.imra;
-	case 10:
-		return m_mfp.imrb;
-	case 15:  // TADR
-		return m_mfp.timer[0].counter;  // Timer data registers return their main counter values
-	case 16:  // TBDR
-		return m_mfp.timer[1].counter;
-	case 17:  // TCDR
-		return m_mfp.timer[2].counter;
-	case 18:  // TDDR
-		return m_mfp.timer[3].counter;
-#endif
 	case 21:  // RSR
 		return m_mfp.rsr;
 	case 22:  // TSR
@@ -1371,86 +1128,6 @@ WRITE16_MEMBER(x68k_state::x68k_mfp_w)
 	*/
 	switch(offset)
 	{
-#if 0
-	case 0:  // GPDR
-		// All bits are inputs generally, so no action taken.
-		break;
-	case 1:  // AER
-		m_mfp.aer = data;
-		break;
-	case 2:  // DDR
-		m_mfp.ddr = data;  // usually all bits are 0 (input)
-		break;
-	case 3:  // IERA
-		m_mfp.iera = data;
-		break;
-	case 4:  // IERB
-		m_mfp.ierb = data;
-		break;
-	case 5:  // IPRA
-		m_mfp.ipra = data;
-		break;
-	case 6:  // IPRB
-		m_mfp.iprb = data;
-		break;
-	case 7:
-		m_mfp.isra = data;
-		break;
-	case 8:
-		m_mfp.isrb = data;
-		break;
-	case 9:
-		m_mfp.imra = data;
-//      mfp_update_irq(0);
-//      logerror("MFP: IRQ Mask A write: %02x\n",data);
-		break;
-	case 10:
-		m_mfp.imrb = data;
-//      mfp_update_irq(0);
-//      logerror("MFP: IRQ Mask B write: %02x\n",data);
-		break;
-	case 11:  // VR
-		m_mfp.vr = 0x40;//data;  // High 4 bits = high 4 bits of IRQ vector
-		m_mfp.eoi_mode = data & 0x08;  // 0 = Auto, 1 = Software End-of-interrupt
-		if(m_mfp.eoi_mode == 0)  // In-service registers are cleared if this bit is cleared.
-		{
-			m_mfp.isra = 0;
-			m_mfp.isrb = 0;
-		}
-		break;
-	case 12:  // TACR
-		m_mfp.tacr = data;
-		mfp_set_timer(0,data & 0x0f);
-		break;
-	case 13:  // TBCR
-		m_mfp.tbcr = data;
-		mfp_set_timer(1,data & 0x0f);
-		break;
-	case 14:  // TCDCR
-		m_mfp.tcdcr = data;
-		mfp_set_timer(2,(data & 0x70)>>4);
-		mfp_set_timer(3,data & 0x07);
-		break;
-	case 15:  // TADR
-		m_mfp.tadr = data;
-		m_mfp.timer[0].counter = data;
-		break;
-	case 16:  // TBDR
-		m_mfp.tbdr = data;
-		m_mfp.timer[1].counter = data;
-		break;
-	case 17:  // TCDR
-		m_mfp.tcdr = data;
-		m_mfp.timer[2].counter = data;
-		break;
-	case 18:  // TDDR
-		m_mfp.tddr = data;
-		m_mfp.timer[3].counter = data;
-		break;
-	case 20:
-		m_mfp.ucr = data;
-		break;
-#endif
 	case 21:
 		if(data & 0x01)
 			m_mfp.usart.recv_enable = 1;
@@ -1509,7 +1186,6 @@ WRITE_LINE_MEMBER(x68k_state::x68k_rtc_alarm_irq)
 		{
 			m_mfp.gpio |= 0x01;
 			m_mfpdev->i0_w(1);
-			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 		}
 	}
 	else
@@ -1518,7 +1194,6 @@ WRITE_LINE_MEMBER(x68k_state::x68k_rtc_alarm_irq)
 		{
 			m_mfp.gpio &= ~0x01;
 			m_mfpdev->i0_w(0);
-			//mfp_trigger_irq(MFP_IRQ_GPIP0);  // RTC ALARM
 		}
 	}
 }
@@ -1539,14 +1214,6 @@ READ16_MEMBER(x68k_state::x68k_sram_r)
 //      return 0x0000;
 	if(offset == 0x08/2)
 		return m_ram->size() >> 16;  // RAM size
-#if 0
-	if(offset == 0x46/2)
-		return 0x0024;
-	if(offset == 0x6e/2)
-		return 0xff00;
-	if(offset == 0x70/2)
-		return 0x0700;
-#endif
 	return m_nvram16[offset];
 }
 
@@ -1554,14 +1221,6 @@ READ32_MEMBER(x68k_state::x68k_sram32_r)
 {
 	if(offset == 0x08/4)
 		return (m_ram->size() & 0xffff0000);  // RAM size
-#if 0
-	if(offset == 0x46/2)
-		return 0x0024;
-	if(offset == 0x6e/2)
-		return 0xff00;
-	if(offset == 0x70/2)
-		return 0x0700;
-#endif
 	return m_nvram32[offset];
 }
 
@@ -1840,8 +1499,6 @@ READ8_MEMBER( x68k_state::mfp_gpio_r )
 	data &= ~(m_crtc.vblank << 4);
 	data |= 0x23;  // GPIP5 is unused, always 1
 
-//  m_mfpdev->tai_w(state->m_crtc.vblank);
-
 	return data;
 }
 
@@ -1869,25 +1526,6 @@ WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
 	m_maincpu->set_input_line(6, state);
 	m_current_vector[6] = 0;
 	m_mfp_prev = state;
-}
-
-INTERRUPT_GEN_MEMBER(x68k_state::x68k_vsync_irq)
-{
-#if 0
-	x68k_state *state = machine.driver_data<x68k_state>();
-	if(m_mfp.ierb & 0x40)
-	{
-		m_mfp.isrb |= 0x40;
-		m_current_vector[6] = (m_mfp.vr & 0xf0) | 0x06;  // GPIP4 (V-DISP)
-		m_current_irq_line = 6;
-		mfp_timer_a_callback(0);  // Timer A is usually always in event count mode, and is tied to V-DISP
-		mfp_trigger_irq(MFP_IRQ_GPIP4);
-	}
-	if(m_crtc.height == 256)
-		machine.primary_screen->update_partial(256);//m_crtc.reg[4]/2);
-	else
-		machine.primary_screen->update_partial(512);//m_crtc.reg[4]);
-#endif
 }
 
 IRQ_CALLBACK_MEMBER(x68k_state::x68k_int_ack)
@@ -2701,7 +2339,6 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", x68k_state,  x68k_vsync_irq)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(x68k_state, x68000 )
