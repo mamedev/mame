@@ -828,7 +828,7 @@
      degrees. Not proof that these were released as originals,
      or just a hack.
 
-  [2013/08/11]
+  [2013/12/25]
   - Added default NVRAM to mongolnw and soccernw, allowing boot them.
      Both games are promoted to working state, but flagged as 'game
      unemulated protection' due to the lack of MCU emulation.
