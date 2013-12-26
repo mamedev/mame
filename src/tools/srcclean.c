@@ -81,24 +81,31 @@ int main(int argc, char *argv[])
 	int escape = 0;
 	int consume = 0;
 	const int tab_size = 4;
+	bool arg_found = true;
+	bool dry_run = false;
 
-	/* print usage info */
-	if (argc < 2)
-	{
-		printf("Usage:\nsrcclean [-u] <file>\n");
-		return 0;
+	while (arg_found && argc > 1) {
+	    if (strcmp(argv[1], "-u") == 0)
+	    {
+	        unix_le = true;
+	        argc--;
+	        argv++;
+	    }
+	    else if (strcmp(argv[1], "-d") == 0)
+        {
+            dry_run = true;
+            argc--;
+            argv++;
+        }
+	    else
+	        arg_found = false;
+
 	}
 
-	if (strcmp(argv[1], "-u") == 0)
-	{
-        unix_le = true;
-        argc--;
-        argv++;
-	}
-
+    /* print usage info */
     if (argc < 2)
     {
-        printf("Usage:\nsrcclean [-u] <file>\n");
+        printf("Usage:\nsrcclean [-u] [-d] <file>\n");
         return 0;
     }
 
@@ -382,10 +389,13 @@ int main(int argc, char *argv[])
         if (fixed_dos_style) printf(" fixed Dos-style line-ends");
 		printf("\n");
 
-		/* write the file */
-		file = fopen(argv[1], "wb");
-        fwrite(modified, 1, dst, file);
-		fclose(file);
+		if (!dry_run)
+		{
+	        /* write the file */
+	        file = fopen(argv[1], "wb");
+	        fwrite(modified, 1, dst, file);
+	        fclose(file);
+		}
 	}
 
 	return 0;
