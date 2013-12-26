@@ -38,10 +38,12 @@ static UINT8 modified[MAX_FILE_SIZE];
 
 int main(int argc, char *argv[])
 {
+    bool unix_le = false;
 	int removed_tabs = 0;
 	int added_tabs = 0;
 	int removed_spaces = 0;
 	int removed_continuations = 0;
+    int fixed_dos_style = 0;
 	int fixed_mac_style = 0;
 	int fixed_nix_style = 0;
 	int added_newline = 0;
@@ -64,11 +66,24 @@ int main(int argc, char *argv[])
 	const int tab_size = 4;
 
 	/* print usage info */
-	if (argc != 2)
+	if (argc < 2)
 	{
-		printf("Usage:\nsrcclean <file>\n");
+		printf("Usage:\nsrcclean [-u] <file>\n");
 		return 0;
 	}
+
+	if (strcmp(argv[1], "-u") == 0)
+	{
+        unix_le = true;
+        argc--;
+        argv++;
+	}
+
+    if (argc < 2)
+    {
+        printf("Usage:\nsrcclean [-u] <file>\n");
+        return 0;
+    }
 
 	/* read the file */
 	file = fopen(argv[1], "rb");
@@ -202,13 +217,18 @@ int main(int argc, char *argv[])
 			}
 
 			/* insert a proper CR/LF */
-			modified[dst++] = 0x0d;
+			if (!unix_le)
+			    modified[dst++] = 0x0d;
 			modified[dst++] = 0x0a;
 			col = 0;
 
 			/* skip over any LF in the source file */
 			if (ch == 0x0d && original[src] == 0x0a)
-				src++;
+			{
+                src++;
+                if (unix_le)
+                    fixed_dos_style = 1;
+			}
 			else if (ch == 0x0a)
 				fixed_nix_style = 1;
 			else
@@ -338,6 +358,7 @@ int main(int argc, char *argv[])
 		if (hichars) printf(" fixed %d high-ASCII char(s)", hichars);
 		if (fixed_nix_style) printf(" fixed *nix-style line-ends");
 		if (fixed_mac_style) printf(" fixed Mac-style line-ends");
+        if (fixed_dos_style) printf(" fixed Dos-style line-ends");
 		printf("\n");
 
 		/* write the file */
