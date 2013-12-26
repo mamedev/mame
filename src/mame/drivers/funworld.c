@@ -66,8 +66,8 @@
   * Jolly Joker (40bet, croatian hack),               Impera,             198?.
   * Multi Win (Ver.0167, encrypted),                  Fun World,          1992.
   * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
-  * Mongolfier New (Italian),                         bootleg,            199?.
-  * Soccer New (Italian),                             bootleg,            199?.
+  * Mongolfier New (Italian),                         unknown,            199?.
+  * Soccer New (Italian),                             unknown,            199?.
   * Saloon (French, encrypted),                       unknown,            199?.
   * Fun World Quiz (Austrian),                        Fun World,          198?.
   * Witch Royal (Export version 2.1),                 Video Klein,        199?.
@@ -827,6 +827,11 @@
      Almost all the sets on this driver were hacked in different
      degrees. Not proof that these were released as originals,
      or just a hack.
+
+  [2013/08/11]
+  - Added default NVRAM to mongolnw and soccernw, allowing boot them.
+     Both games are promoted to working state, but flagged as 'game
+     unemulated protection' due to the lack of MCU emulation.
 
 
   *** TO DO ***
@@ -4602,6 +4607,10 @@ ROM_END
     - 2x 8 DIP switches
     - 1x 4 DIP switches
     - 1x green led
+
+    ----------------------------------------------
+
+    Needs FF in the NVRAM offset 0x82 to boot...
 */
 
 ROM_START( mongolnw )
@@ -4617,6 +4626,9 @@ ROM_START( mongolnw )
 	ROM_IGNORE(                        0x8000 ) /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "mong.rc.c1.u2", 0x8000, 0x8000, CRC(e3fc24c4) SHA1(ea4e67ace63b55a76365f7e11a67c7d420a52dd7) )
 	ROM_IGNORE(                        0x8000 ) /* Identical halves. Discarding 2nd half */
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "mongolnw_nvram.bin", 0x0000, 0x0800, CRC(700531fa) SHA1(a8bcf86df6bd06d2ee54b4898dd7822060b81dba) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29pc_mf.u24", 0x0000, 0x0200, CRC(da9181af) SHA1(1b30d992f3b2a4b3bd81e3f99632311988e2e8d1) )
@@ -4655,6 +4667,10 @@ ROM_END
     soccer1.u2          1ST AND 2ND HALF IDENTICAL
     soccer2.u3          1ST AND 2ND HALF IDENTICAL
     tsc87c52-sn.u40           1xxxxxxxxxxxx = 0xFF
+
+    ----------------------------------------------
+
+    Needs FF in the NVRAM offset 0x82 to boot...
 */
 
 ROM_START( soccernw )
@@ -4670,6 +4686,9 @@ ROM_START( soccernw )
 	ROM_IGNORE(                     0x8000 )    /* Identical halves. Discarding 2nd half */
 	ROM_LOAD( "soccer1.u2", 0x8000, 0x8000, CRC(564cc467) SHA1(8f90c4bacd97484623666b25dae77e628908e243) )
 	ROM_IGNORE(                     0x8000 )    /* Identical halves. Discarding 2nd half */
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "soccernw_nvram.bin", 0x0000, 0x0800, CRC(607247bd) SHA1(06bbed08166d8930f14e1f41843ac7faeded263d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29pc_sn.u24", 0x0000, 0x0200, CRC(d02894fc) SHA1(adcdc912cc0b7a7f67b122fa94fca921c957b282) )
@@ -4996,6 +5015,18 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2c)
 }
 
 
+DRIVER_INIT_MEMBER(funworld_state, mongolnw)
+{
+/* temporary patch to avoid hardware errors for debug purposes */
+	UINT8 *ROM = memregion("maincpu")->base();
+
+	ROM[0x9115] = 0xa5;
+	
+/* prevent one test from triggering hardware error */
+	ROM[0xb8f3] = 0xff;
+}
+
+
 DRIVER_INIT_MEMBER(funworld_state, soccernw)
 {
 /* temporary patch to avoid hardware errors for debug purposes */
@@ -5003,13 +5034,10 @@ DRIVER_INIT_MEMBER(funworld_state, soccernw)
 
 	ROM[0x80b2] = 0xa9;
 	ROM[0x80b3] = 0x00;
-
-//  DEBUG
-//  run to $810a
-
-//  ROM[0xa33a] = 0xea;
-//  ROM[0xa33b] = 0xea;
-//  ROM[0xa33c] = 0xea;
+	ROM[0x9115] = 0xa5;
+	
+/* prevent one test from triggering hardware error */
+	ROM[0xb8f3] = 0xff;
 }
 
 
@@ -5074,7 +5102,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 	}
 
 	auto_free(machine(), buffer);
-
+ 
 
 	/******************************
 	*   Graphics ROM decryption   *
@@ -5413,8 +5441,8 @@ GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  driver_device,  0,       
 GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      GAME_NOT_WORKING )
 
 // MCU based games...
-GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Mongolfier New (Italian)",                        GAME_NOT_WORKING )
-GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw, ROT0, "bootleg",         "Soccer New (Italian)",                            GAME_NOT_WORKING )
+GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, mongolnw, ROT0, "<unknown>",       "Mongolfier New (Italian)",                        GAME_UNEMULATED_PROTECTION )
+GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw, ROT0, "<unknown>",       "Soccer New (Italian)",                            GAME_UNEMULATED_PROTECTION )
 
 // Other games...
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,   driver_device,  0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
