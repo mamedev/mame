@@ -140,14 +140,6 @@
 
 
 
-void x68k_state::mfp_init()
-{
-	m_mfp.tadr = m_mfp.tbdr = m_mfp.tcdr = m_mfp.tddr = 0xff;
-
-	m_mfp.irqline = 6;  // MFP is connected to 68000 IRQ line 6
-	m_mfp.current_irq = -1;  // No current interrupt
-}
-
 void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -1532,7 +1524,6 @@ IRQ_CALLBACK_MEMBER(x68k_state::x68k_int_ack)
 {
 	if(irqline == 6)  // MFP
 	{
-		m_mfp.current_irq = -1;
 		if(m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
 			m_current_vector[6] = m_mfpdev->get_vector();
 		else
@@ -2141,8 +2132,6 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	m_crtc.reg[7] = 552;  // Vertical end
 	m_crtc.reg[8] = 27;   // Horizontal adjust
 
-	mfp_init();
-
 	m_scanline = machine().primary_screen->vpos();// = m_crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
@@ -2288,8 +2277,6 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 
 	// copy last half of BIOS to a user region, to use for inital startup
 	memcpy(user2,(rom+0xff0000),0x10000);
-
-	mfp_init();
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x68k_state::x68k_int_ack),this));
 

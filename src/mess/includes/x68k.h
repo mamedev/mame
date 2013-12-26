@@ -132,10 +132,6 @@ public:
 	struct
 	{
 		int aer;   // [1]  GPIP active edge register.  Determines on which transition an IRQ is triggered.  0 = 1->0
-		int tadr;  // [15] Timer A data register
-		int tbdr;  // [16] Timer B data register
-		int tcdr;  // [17] Timer C data register
-		int tddr;  // [18] Timer D data register
 		int rsr;   // [21] Receiver status register
 		int tsr;   // [22] Transmitter status register
 		struct
@@ -145,8 +141,6 @@ public:
 			int recv_enable;
 			int send_enable;
 		} usart;
-		int irqline;
-		int current_irq;
 		unsigned char gpio;
 	} m_mfp;  // MC68901 Multifunction Peripheral (4MHz)
 	struct
@@ -304,7 +298,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
 
-	void mfp_init();
 	void x68k_keyboard_ctrl_w(int data);
 	int x68k_keyboard_pop_scancode();
 	void x68k_keyboard_push_scancode(unsigned char code);
