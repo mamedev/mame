@@ -31,6 +31,23 @@ static UINT8 original[MAX_FILE_SIZE];
 static UINT8 modified[MAX_FILE_SIZE];
 
 
+static int le_convert(char *buffer, int size)
+{
+    char *pos;
+    char *end = buffer + size;
+
+    /* brute force */
+    *end = 0;
+    pos = strchr(buffer, 0x0d);
+    while (pos != NULL)
+    {
+        memmove(pos, pos+1,end - pos + 1);
+        size--;
+        buffer = pos + 1;
+        pos = strchr(buffer, 0x0d);
+    }
+    return size;
+}
 
 /***************************************************************************
     MAIN
@@ -94,6 +111,10 @@ int main(int argc, char *argv[])
 	}
 	bytes = fread(original, 1, MAX_FILE_SIZE, file);
 	fclose(file);
+
+	/* check whether we have dos line endings and are in unix mode */
+	if (unix_le && (strchr((char *) original, 0x0d) != NULL))
+	    fixed_dos_style = 1;
 
 	/* determine if we are a C file */
 	ext = strrchr(argv[1], '.');
@@ -217,18 +238,13 @@ int main(int argc, char *argv[])
 			}
 
 			/* insert a proper CR/LF */
-			if (!unix_le)
-			    modified[dst++] = 0x0d;
+		    modified[dst++] = 0x0d;
 			modified[dst++] = 0x0a;
 			col = 0;
 
 			/* skip over any LF in the source file */
 			if (ch == 0x0d && original[src] == 0x0a)
-			{
                 src++;
-                if (unix_le)
-                    fixed_dos_style = 1;
-			}
 			else if (ch == 0x0a)
 				fixed_nix_style = 1;
 			else
@@ -344,6 +360,11 @@ int main(int argc, char *argv[])
 		}
 	}
 
+    /* convert to unix_le if requested */
+
+    if (unix_le)
+        dst = le_convert((char *) modified, dst);
+
 	/* if the result == original, skip it */
 	if (dst != bytes || memcmp(original, modified, bytes))
 	{
@@ -356,14 +377,14 @@ int main(int argc, char *argv[])
 		if (removed_tabs) printf(" removed %d tab(s)", removed_tabs);
 		if (added_tabs) printf(" added %d tab(s)", added_tabs);
 		if (hichars) printf(" fixed %d high-ASCII char(s)", hichars);
-		if (fixed_nix_style) printf(" fixed *nix-style line-ends");
+		if (fixed_nix_style && !unix_le) printf(" fixed *nix-style line-ends");
 		if (fixed_mac_style) printf(" fixed Mac-style line-ends");
         if (fixed_dos_style) printf(" fixed Dos-style line-ends");
 		printf("\n");
 
 		/* write the file */
 		file = fopen(argv[1], "wb");
-		fwrite(modified, 1, dst, file);
+        fwrite(modified, 1, dst, file);
 		fclose(file);
 	}
 
