@@ -1439,6 +1439,23 @@ static MACHINE_CONFIG_START( asst128, pc_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+
+	MCFG_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0], XTAL_1_8432MHz )   /* TODO: Verify model */
+	MCFG_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1], XTAL_1_8432MHz )   /* TODO: Verify model */
+
+	MCFG_RS232_PORT_ADD( "serport0", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_0", ins8250_uart_device, cts_w))
+
+	MCFG_RS232_PORT_ADD( "serport1", ibm5150_com, NULL )
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, dsr_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, ri_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("ins8250_1", ins8250_uart_device, cts_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( iskr3104, pc_state )
@@ -2322,6 +2339,7 @@ ROM_START( pc10iii )
 	ROMX_LOAD("318085-08.u201", 0xf8000, 0x8000, CRC(7e228dc8) SHA1(958dfdd637bd31c01b949fac729d6973a7e630bc), ROM_BIOS(7))
 	ROM_REGION(0x8000, "gfx1", 0)
 	ROM_LOAD("318086-02.u607", 0x0000, 0x8000, CRC(b406651c) SHA1(856f58353391a74a06ebb8ec9f8333d7d69e5fd6))
+	//ROM_LOAD("5788005.u33", 0x00000, 0x2000, BAD_DUMP CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* temp so you can read the text */
 ROM_END
 
 ROM_START( mbc16 )
