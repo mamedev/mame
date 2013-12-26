@@ -30,14 +30,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_gvram(*this, "gvram"),
 		m_vram(*this, "vram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+	{ }
 
 	UINT8 *m_char_rom;
 	required_shared_ptr<UINT16> m_gvram;
 	required_shared_ptr<UINT16> m_vram;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-
-	mc6845_device *m_mc6845;
 
 	struct {
 		UINT16 cmd;
@@ -56,6 +56,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_fp6000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device>m_crtc;
 };
 
 void fp6000_state::video_start()
@@ -158,13 +159,13 @@ WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
 WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
 {
 	m_crtc_index = data;
-	m_mc6845->address_w(space, offset, data);
+	m_crtc->address_w(space, offset, data);
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_mc6845->register_w(space, offset, data);
+	m_crtc->register_w(space, offset, data);
 }
 
 static ADDRESS_MAP_START(fp6000_map, AS_PROGRAM, 16, fp6000_state )
@@ -277,7 +278,6 @@ GFXDECODE_END
 void fp6000_state::machine_start()
 {
 	m_char_rom = memregion("pcg")->base();
-	m_mc6845 = machine().device<mc6845_device>("crtc");
 }
 
 void fp6000_state::machine_reset()
