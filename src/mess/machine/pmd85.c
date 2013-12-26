@@ -762,14 +762,15 @@ void pmd85_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_RESET:
 		pmd_reset(ptr, param);
 		break;
-	case TIMER_SETUP_MACHINE_STATE:
-		setup_machine_state(ptr, param);
-		break;
 	default:
 		assert_always(FALSE, "Unknown id in pmd85_state::device_timer");
 	}
 }
 
+WRITE_LINE_MEMBER(pmd85_state::write_cas_tx)
+{
+	m_cas_tx = state;
+}
 
 TIMER_CALLBACK_MEMBER(pmd85_state::pmd85_cassette_timer_callback)
 {
@@ -797,7 +798,7 @@ TIMER_CALLBACK_MEMBER(pmd85_state::pmd85_cassette_timer_callback)
 						{
 							data = (!m_previous_level && current_level) ? 1 : 0;
 
-							m_sercas->send_bit(data);
+							m_uart->write_rx(data);
 							m_uart->receive_clock();
 
 							m_clk_level_tape = 1;
@@ -817,7 +818,7 @@ TIMER_CALLBACK_MEMBER(pmd85_state::pmd85_cassette_timer_callback)
 		/* tape writing */
 		if (m_cassette->get_state()&CASSETTE_RECORD)
 		{
-			data = m_sercas->get_in_data_bit();
+			data = m_cas_tx;
 			data ^= m_clk_level_tape;
 			m_cassette->output(data&0x01 ? 1 : -1);
 
@@ -921,15 +922,6 @@ DRIVER_INIT_MEMBER(pmd85_state,c2717)
 	pmd85_common_driver_init();
 }
 
-TIMER_CALLBACK_MEMBER(pmd85_state::setup_machine_state)
-{
-	if (m_model != MATO)
-	{
-		m_uart->connect(m_sercas);
-	}
-}
-
-
 void pmd85_state::machine_reset()
 {
 	int i, j;
@@ -957,8 +949,6 @@ void pmd85_state::machine_reset()
 	m_pmd853_memory_mapping = 1;
 	m_startup_mem_map = 1;
 	(this->*update_memory)();
-
-	timer_set(attotime::zero, TIMER_SETUP_MACHINE_STATE);
 
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(pmd85_state::pmd85_opbaseoverride), this));
 }

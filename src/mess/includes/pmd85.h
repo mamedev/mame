@@ -20,8 +20,7 @@ public:
 	enum
 	{
 		TIMER_CASSETTE,
-		TIMER_RESET,
-		TIMER_SETUP_MACHINE_STATE
+		TIMER_RESET
 	};
 
 	pmd85_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -29,7 +28,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_cassette(*this, "cassette"),
-		m_sercas(*this, "sercas"),
 		m_pit8253(*this, "pit8253"),
 		m_uart(*this, "uart"),
 		m_ppi8255_0(*this, "ppi8255_0"),
@@ -83,7 +81,7 @@ public:
 	UINT32 screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pmd85_cassette_timer_callback);
 	TIMER_CALLBACK_MEMBER(pmd_reset);
-	TIMER_CALLBACK_MEMBER(setup_machine_state);
+	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
 	DECLARE_READ8_MEMBER(pmd85_ppi_0_porta_r);
 	DECLARE_READ8_MEMBER(pmd85_ppi_0_portb_r);
 	DECLARE_READ8_MEMBER(pmd85_ppi_0_portc_r);
@@ -116,7 +114,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
-	required_device<serial_source_device> m_sercas;
 	required_device<pit8253_device> m_pit8253;
 	optional_device<i8251_device> m_uart;
 	optional_device<i8255_device> m_ppi8255_0;
@@ -153,6 +150,8 @@ protected:
 	void pmd85_common_driver_init();
 	void pmd85_draw_scanline(bitmap_ind16 &bitmap, int pmd85_scanline);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	int m_cas_tx;
 };
 
 

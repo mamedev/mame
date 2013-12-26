@@ -542,6 +542,17 @@ static const cassette_interface pmd85_cassette_interface =
 	NULL
 };
 
+const i8251_interface pmd85_i8251_interface =
+{
+	DEVCB_DRIVER_LINE_MEMBER(pmd85_state, write_cas_tx),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 
 /* machine definition */
 static MACHINE_CONFIG_START( pmd85, pmd85_state )
@@ -574,8 +585,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_CASSETTE_ADD( "cassette", pmd85_cassette_interface )
 
 	/* uart */
-	MCFG_I8251_ADD("uart", default_i8251_interface)
-	MCFG_SERIAL_SOURCE_ADD("sercas")
+	MCFG_I8251_ADD("uart", pmd85_i8251_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
