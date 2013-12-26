@@ -619,7 +619,7 @@ void i80186_cpu_device::device_reset()
 {
 	i8086_common_cpu_device::device_reset();
 	/* reset the interrupt state */
-	m_intr.priority_mask        = 0x0007;
+	m_intr.priority_mask    = 0x0007;
 	m_intr.timer            = 0x000f;
 	m_intr.dma[0]           = 0x000f;
 	m_intr.dma[1]           = 0x000f;
@@ -639,7 +639,10 @@ void i80186_cpu_device::device_reset()
 	m_dma[1].drq_delay = false;
 	m_dma[0].drq_state = false;
 	m_dma[1].drq_state = false;
-
+	m_timer[0].control = 0;
+	m_timer[1].control = 0;
+	m_timer[2].control = 0;
+	
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback),this));
 }
 
