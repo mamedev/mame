@@ -13,6 +13,7 @@
 #define FIXFREQ_H
 
 #include "emu.h"
+#include "machine/netlist.h"
 
 #define FIXFREQ_INTERFACE(name) \
 	const fixedfreq_interface (name) =
@@ -56,7 +57,7 @@ public:
 
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void update_vid(const double newval, const attotime cur_time);
+	NETDEV_ANALOG_CALLBACK_MEMBER(update_vid);
 
 protected:
 	// device-level overrides

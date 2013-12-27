@@ -245,18 +245,18 @@ UINT32 fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-void fixedfreq_device::update_vid(double newval, attotime cur_time)
+NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 {
 	bitmap_rgb32 *bm = m_bitmap[m_cur_bm];
 	const int has_fields = (m_fieldcount > 1) ? 1: 0;
 
-	int pixels = round((cur_time - m_line_time).as_double() / m_clock_period.as_double());
-	attotime time = (cur_time - m_last_time);
+	int pixels = round((time - m_line_time).as_double() / m_clock_period.as_double());
+	attotime delta_time = (time - m_last_time);
 
-	if (newval == m_vid)
+	if (data == m_vid)
 		return;
 
-	ATTR_UNUSED int sync = sync_separator(time, newval);
+	ATTR_UNUSED int sync = sync_separator(delta_time, data);
 
 	if (m_last_y < bm->height())
 	{
@@ -297,19 +297,19 @@ void fixedfreq_device::update_vid(double newval, attotime cur_time)
 		m_last_y = m_vbackporch - m_vsync; // 6; // FIXME: needed for pong - need to be able to adjust screen parameters
 		// toggle bitmap
 		m_cur_bm ^= 1;
-		update_screen_parameters(cur_time - m_last_vsync_time);
-		m_last_vsync_time = cur_time;
+		update_screen_parameters(time - m_last_vsync_time);
+		m_last_vsync_time = time;
 	}
 
 	if ((sync & 2) && !m_sig_vsync)
 	{
 		m_last_y += m_fieldcount;
 		m_last_x = 0;
-		m_line_time = cur_time;
+		m_line_time = time;
 	}
 
-	m_last_time = cur_time;
-	m_vid = newval;
+	m_last_time = time;
+	m_vid = data;
 
 }
 
