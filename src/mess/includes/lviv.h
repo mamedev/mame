@@ -16,11 +16,6 @@
 class lviv_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_RESET
-	};
-
 	lviv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -34,7 +29,6 @@ public:
 	UINT8 m_startup_mem_map;
 	DECLARE_READ8_MEMBER(lviv_io_r);
 	DECLARE_WRITE8_MEMBER(lviv_io_w);
-	DECLARE_DIRECT_UPDATE_MEMBER(lviv_directoverride);
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
@@ -61,9 +55,7 @@ public:
 	void dump_registers();
 	int lviv_verify_snapshot (UINT8 * data, UINT32 size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( lviv );
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	DECLARE_INPUT_CHANGED_MEMBER(lviv_reset);
 };
 
 

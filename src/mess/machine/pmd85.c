@@ -759,9 +759,6 @@ void pmd85_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_CASSETTE:
 		pmd85_cassette_timer_callback(ptr, param);
 		break;
-	case TIMER_RESET:
-		pmd_reset(ptr, param);
-		break;
 	default:
 		assert_always(FALSE, "Unknown id in pmd85_state::device_timer");
 	}
@@ -838,16 +835,9 @@ TIMER_CALLBACK_MEMBER(pmd85_state::pmd85_cassette_timer_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pmd85_state::pmd_reset)
+INPUT_CHANGED_MEMBER(pmd85_state::pmd85_reset)
 {
 	machine().schedule_soft_reset();
-}
-
-DIRECT_UPDATE_MEMBER(pmd85_state::pmd85_opbaseoverride)
-{
-	if (m_io_reset->read() & 0x01)
-		timer_set(attotime::from_usec(10), TIMER_RESET);
-	return address;
 }
 
 void pmd85_state::pmd85_common_driver_init()
@@ -949,6 +939,4 @@ void pmd85_state::machine_reset()
 	m_pmd853_memory_mapping = 1;
 	m_startup_mem_map = 1;
 	(this->*update_memory)();
-
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(pmd85_state::pmd85_opbaseoverride), this));
 }

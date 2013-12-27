@@ -40,23 +40,9 @@ void lviv_state::lviv_update_memory ()
 	}
 }
 
-void lviv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+INPUT_CHANGED_MEMBER(lviv_state::lviv_reset)
 {
-	switch (id)
-	{
-	case TIMER_RESET:
-		machine().schedule_soft_reset();
-		break;
-	default:
-		assert_always(FALSE, "Unknown id in lviv_state::device_timer");
-	}
-}
-
-DIRECT_UPDATE_MEMBER(lviv_state::lviv_directoverride)
-{
-	if (ioport("RESET")->read() & 0x01)
-		timer_set(attotime::from_usec(10), TIMER_RESET);
-	return address;
+	machine().schedule_soft_reset();
 }
 
 READ8_MEMBER(lviv_state::lviv_ppi_0_porta_r)
@@ -230,8 +216,6 @@ void lviv_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *mem;
-
-	space.set_direct_update_handler(direct_update_delegate(FUNC(lviv_state::lviv_directoverride), this));
 
 	m_video_ram = m_ram->pointer() + 0xc000;
 
