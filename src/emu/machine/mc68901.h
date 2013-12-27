@@ -270,6 +270,7 @@ private:
 	UINT8 m_tsr;                            /* transmitter status register */
 	UINT8 m_rsr;                            /* receiver status register */
 	UINT8 m_udr;                            /* USART data register */
+	int m_udr_written;
 
 	/* counter timer state */
 	UINT8 m_tmc[4];     /* timer main counters */
@@ -285,19 +286,6 @@ private:
 	int m_rxtx_word;                        /* word length */
 	int m_rxtx_start;                       /* start bits */
 	int m_rxtx_stop;                        /* stop bits */
-
-	/* receive state */
-	UINT8 m_rx_buffer;                      /* receive buffer */
-	int m_rx_bits;                          /* receive bit count */
-	int m_rx_parity;                        /* receive parity bit */
-	int m_rx_state;                         /* receive state */
-
-	/* transmit state */
-	UINT8 m_tx_buffer;                      /* transmit buffer */
-	int m_tx_bits;                          /* transmit bit count */
-	int m_tx_parity;                        /* transmit parity bit */
-	int m_tx_state;                         /* transmit state */
-	int m_xmit_state;                       /* transmitter state */
 
 	// timers
 	emu_timer *m_timer[4]; /* counter timers */

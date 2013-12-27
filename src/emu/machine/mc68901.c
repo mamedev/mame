@@ -408,15 +408,7 @@ void mc68901_device::device_start()
 	save_item(NAME(m_rsr));
 	save_item(NAME(m_tsr));
 	save_item(NAME(m_udr));
-	save_item(NAME(m_rx_bits));
-	save_item(NAME(m_tx_bits));
-	save_item(NAME(m_rx_parity));
-	save_item(NAME(m_tx_parity));
-	save_item(NAME(m_rx_state));
-	save_item(NAME(m_tx_state));
-	save_item(NAME(m_rx_buffer));
-	save_item(NAME(m_tx_buffer));
-	save_item(NAME(m_xmit_state));
+	save_item(NAME(m_udr_written));
 	save_item(NAME(m_rxtx_word));
 	save_item(NAME(m_rxtx_start));
 	save_item(NAME(m_rxtx_stop));
@@ -431,10 +423,8 @@ void mc68901_device::device_start()
 
 void mc68901_device::device_reset()
 {
-	m_xmit_state = XMIT_OFF;
-	m_rx_state = SERIAL_STOP;
-	m_rx_buffer = 0;
-	m_tx_buffer = 0;
+	m_tsr = 0;
+	m_udr_written = 0;
 
 	// Avoid read-before-write
 	m_ipr = m_imr = 0;
@@ -463,6 +453,8 @@ void mc68901_device::device_reset()
 	register_w(REGISTER_SCR, 0);
 	register_w(REGISTER_UCR, 0);
 	register_w(REGISTER_RSR, 0);
+
+	transmit_register_reset();
 }
 
 
@@ -498,6 +490,19 @@ void mc68901_device::tra_callback()
 
 void mc68901_device::tra_complete()
 {
+	if (m_tsr & TSR_XMIT_ENABLE)
+	{
+		if (m_udr_written)
+		{
+			transmit_register_setup(m_udr);
+			m_udr_written = 0;
+			m_tsr |= TSR_BUFFER_EMPTY;
+		}
+	}
+	else
+	{
+		m_tsr |= TSR_END_OF_XMIT;
+	}
 }
 
 
@@ -573,7 +578,7 @@ READ8_MEMBER( mc68901_device::read )
 		{
 			/* clear UE bit (in reality, this won't be cleared until one full clock cycle of the transmitter has passed since the bit was set) */
 			UINT8 tsr = m_tsr;
-			m_tsr &= 0xbf;
+			m_tsr &= ~TSR_UNDERRUN_ERROR;
 
 			return tsr;
 		}
@@ -999,11 +1004,16 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 		break;
 
 	case REGISTER_TSR:
+		m_tsr = (m_tsr & (TSR_BUFFER_EMPTY | TSR_UNDERRUN_ERROR | TSR_END_OF_XMIT)) | (data & ~(TSR_BUFFER_EMPTY | TSR_UNDERRUN_ERROR | TSR_END_OF_XMIT));
+
 		if ((data & TSR_XMIT_ENABLE) == 0)
 		{
 			if (LOG) logerror("MC68901 '%s' Transmitter Disabled\n", tag());
 
-			m_tsr = data & 0x27;
+			m_tsr &= ~TSR_UNDERRUN_ERROR;
+
+			if (is_transmit_register_empty())
+				m_tsr |= TSR_END_OF_XMIT;
 		}
 		else
 		{
@@ -1043,15 +1053,29 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 				if (LOG) logerror("MC68901 '%s' Transmitter Auto Turnaround Disabled\n", tag());
 			}
 
-			m_tsr = data & 0x2f;
-			m_tsr |= TSR_BUFFER_EMPTY;  // x68000 expects the buffer to be empty, so this will do for now
+			m_tsr &= ~TSR_END_OF_XMIT;
+
+			if(m_udr_written && is_transmit_register_empty())
+			{
+				transmit_register_setup(m_udr);
+				m_udr_written = 0;
+				m_tsr |= TSR_BUFFER_EMPTY;
+			}
 		}
 		break;
 
 	case REGISTER_UDR:
 		if (LOG) logerror("MC68901 '%s' UDR %x\n", tag(), data);
 		m_udr = data;
-		//m_tsr &= ~TSR_BUFFER_EMPTY;
+		m_udr_written = 1;
+		m_tsr &= ~TSR_BUFFER_EMPTY;
+
+		if ((m_tsr & TSR_XMIT_ENABLE) && is_transmit_register_empty())
+		{
+			transmit_register_setup(m_udr);
+			m_udr_written = 0;
+			m_tsr |= TSR_BUFFER_EMPTY;
+		}
 		break;
 	}
 }
