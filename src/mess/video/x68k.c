@@ -1230,13 +1230,6 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 	}
 
 #ifdef MAME_DEBUG
-	if(machine().input().code_pressed(KEYCODE_I))
-	{
-		m_mfp.isra = 0;
-		m_mfp.isrb = 0;
-//      mfp_trigger_irq(MFP_IRQ_GPIP6);
-//      m_maincpu->set_input_line_and_vector(6,ASSERT_LINE,0x43);
-	}
 	if(machine().input().code_pressed(KEYCODE_9))
 	{
 		m_sprite_shift--;
