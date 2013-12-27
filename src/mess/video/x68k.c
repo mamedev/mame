@@ -286,7 +286,6 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_irq)
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
 {
-	device_t *x68k_mfp = machine().device(MC68901_TAG);
 	int val = param;
 	attotime irq_time;
 	int vblank_line;
@@ -310,11 +309,8 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
 		logerror("CRTC: VBlank off\n");
 	}
 
-	if (x68k_mfp != NULL)
-	{
-		m_mfpdev->tai_w(!m_crtc.vblank);
-		m_mfpdev->i4_w(!m_crtc.vblank);
-	}
+	m_mfpdev->tai_w(!m_crtc.vblank);
+	m_mfpdev->i4_w(!m_crtc.vblank);
 }
 
 
@@ -1252,12 +1248,8 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 //  popmessage("VBlank : scanline = %i",m_scanline);
 //  popmessage("CRTC/BG compare H-TOTAL %i/%i H-DISP %i/%i V-DISP %i/%i BG Res %02x",m_crtc.reg[0],m_spritereg[0x405],m_crtc.reg[2],m_spritereg[0x406],
 //      m_crtc.reg[6],m_spritereg[0x407],m_spritereg[0x408]);
-//  popmessage("IER %02x %02x  IPR %02x %02x  ISR %02x %02x  IMR %02x %02x", m_mfp.iera,m_mfp.ierb,m_mfp.ipra,m_mfp.iprb,
-//      m_mfp.isra,m_mfp.isrb,m_mfp.imra,m_mfp.imrb);
 //  popmessage("BG Scroll - BG0 X %i Y %i  BG1 X %i Y %i",m_spriteram[0x400],m_spriteram[0x401],m_spriteram[0x402],m_spriteram[0x403]);
 //  popmessage("Keyboard buffer position = %i",m_keyboard.headpos);
-//  popmessage("IERA = 0x%02x, IERB = 0x%02x",m_mfp.iera,m_mfp.ierb);
-//  popmessage("IPRA = 0x%02x, IPRB = 0x%02x",m_mfp.ipra,m_mfp.iprb);
 //  popmessage("uPD72065 status = %02x",upd765_status_r(machine(), space, 0));
 //  popmessage("Layer enable - 0x%02x",m_video.reg[2] & 0xff);
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",

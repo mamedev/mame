@@ -317,7 +317,6 @@ void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
 		if(m_keyboard.enabled != 0)
 		{
 			m_mfp.rsr |= 0x80;  // Buffer full
-//          mfp_trigger_irq(MFP_IRQ_RX_FULL);
 			if(ioport("options")->read() & 0x01)
 			{
 				m_current_vector[6] = 0x4c;
@@ -330,9 +329,7 @@ void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
 	if(m_keyboard.headpos > 15)
 	{
 		m_keyboard.headpos = 0;
-//      mfp_trigger_irq(MFP_IRQ_RX_ERROR);
 		m_current_vector[6] = 0x4b;
-//      m_maincpu->set_input_line_and_vector(6,ASSERT_LINE,0x4b);
 	}
 }
 
