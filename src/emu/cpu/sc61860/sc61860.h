@@ -37,6 +37,23 @@
    64 kb external ram (first 8kbyte not seen for program execution?) */
 
 
+enum
+{
+	SC61860_PC=1, SC61860_DP,
+	SC61860_P, SC61860_Q, SC61860_R,
+	SC61860_CARRY,
+	SC61860_ZERO,
+	// the following are in the internal ram!
+	SC61860_BA,
+	SC61860_X, SC61860_Y,
+	SC61860_I, SC61860_J, SC61860_K, SC61860_L, SC61860_V, SC61860_W,
+	SC61860_H
+
+//  SC61860_NMI_STATE,
+//  SC61860_IRQ_STATE
+};
+
+
 struct sc61860_cpu_core
 {
 	devcb_read_line reset;

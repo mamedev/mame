@@ -1750,7 +1750,6 @@ DASMOBJS += $(CPUOBJ)/sc61860/scdasm.o
 endif
 
 $(CPUOBJ)/sc61860/sc61860.o:    $(CPUSRC)/sc61860/sc61860.h \
-								$(CPUSRC)/sc61860/sc.h \
 								$(CPUSRC)/sc61860/scops.c \
 								$(CPUSRC)/sc61860/sctable.c
 

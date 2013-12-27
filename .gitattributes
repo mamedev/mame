@@ -1352,7 +1352,6 @@ src/emu/cpu/saturn/saturn.c svneol=native#text/plain
 src/emu/cpu/saturn/saturn.h svneol=native#text/plain
 src/emu/cpu/saturn/saturnds.c svneol=native#text/plain
 src/emu/cpu/sc61860/readpc.c svneol=native#text/plain
-src/emu/cpu/sc61860/sc.h svneol=native#text/plain
 src/emu/cpu/sc61860/sc61860.c svneol=native#text/plain
 src/emu/cpu/sc61860/sc61860.h svneol=native#text/plain
 src/emu/cpu/sc61860/scdasm.c svneol=native#text/plain

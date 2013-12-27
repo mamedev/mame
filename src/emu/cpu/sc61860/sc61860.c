@@ -31,7 +31,25 @@
 #include "debugger.h"
 
 #include "sc61860.h"
-#include "sc.h"
+
+
+#define I 0
+#define J 1
+#define A 2
+#define B 3
+#define XL 4
+#define XH 5
+#define YL 6
+#define YH 7
+#define K 8
+#define L 9
+#define V 10 // some docus m
+#define W 11 // some docus n
+#define IA 92
+#define IB 93
+#define F0 94
+#define C 95
+
 
 #define VERBOSE 0
 
