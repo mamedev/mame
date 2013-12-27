@@ -18,14 +18,14 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/bml3bus.h"
 #include "video/mc6845.h"
-#include "sound/beep.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "sound/2203intf.h"
 #include "machine/bml3mp1802.h"
 #include "machine/bml3mp1805.h"
 #include "machine/bml3kanji.h"
-
+#include "sound/speaker.h"
+//#include "sound/wave.h"
 //#include "imagedev/cassette.h"
 
 // System clock definitions, from the MB-6890 servce manual, p.48:
@@ -67,22 +67,16 @@ class bml3_state : public driver_device
 {
 public:
 	bml3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_bml3bus(*this, "bml3bus"),
-		m_crtc(*this, "crtc"),
-		//m_cass(*this, "cassette"),
-		m_beep(*this, "beeper"),
-		m_ym2203(*this, "ym2203")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_bml3bus(*this, "bml3bus")
+		, m_crtc(*this, "crtc")
+		//, m_cass(*this, "cassette")
+		, m_speaker(*this, "speaker")
+		, m_ym2203(*this, "ym2203")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<bml3bus_device> m_bml3bus;
-	required_device<mc6845_device> m_crtc;
-	//required_device<cassette_image_device> m_cass;
-	required_device<beep_device> m_beep;
-	optional_device<ym2203_device> m_ym2203;
+	DECLARE_READ8_MEMBER(bml3_6845_r);
 	DECLARE_WRITE8_MEMBER(bml3_6845_w);
 	DECLARE_READ8_MEMBER(bml3_keyboard_r);
 	DECLARE_WRITE8_MEMBER(bml3_keyboard_w);
@@ -115,9 +109,19 @@ public:
 	DECLARE_READ8_MEMBER(bml3_f000_r); DECLARE_WRITE8_MEMBER(bml3_f000_w);
 	DECLARE_READ8_MEMBER(bml3_fff0_r); DECLARE_WRITE8_MEMBER(bml3_fff0_w);
 
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_chargen;
+	UINT8 m_hres_reg;
+	UINT8 m_crtc_vreg[0x100];
+	// INTERRUPT_GEN_MEMBER(bml3_irq);
+	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
+	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	DECLARE_READ8_MEMBER(bml3_ym2203_r);
+	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
+private:
+	UINT8 m_psg_latch;
 	UINT8 m_attr_latch;
 	UINT8 m_io_latch;
-	UINT8 m_hres_reg;
 	UINT8 m_vres_reg;
 	UINT8 m_keyb_interrupt_disabled;
 	UINT8 m_keyb_nmi_disabled;
@@ -127,26 +131,19 @@ public:
 	UINT8 m_keyb_capslock_led_on;
 	UINT8 m_keyb_hiragana_led_on;
 	UINT8 m_keyb_katakana_led_on;
-	UINT8 *m_p_chargen;
-	UINT8 m_psg_latch;
+	virtual void machine_reset();
+	virtual void machine_start();
+	virtual void palette_init();
 	void m6845_change_clock(UINT8 setting);
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	UINT8 m_crtc_index;
 	UINT8 *m_extram;
 	UINT8 m_firq_mask,m_firq_status;
-
-protected:
-	virtual void machine_reset();
-
-	virtual void machine_start();
-	virtual void video_start();
-	virtual void palette_init();
-public:
-	UINT32 screen_update_bml3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	// INTERRUPT_GEN_MEMBER(bml3_irq);
-	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	DECLARE_READ8_MEMBER(bml3_ym2203_r);
-	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
+	required_device<cpu_device> m_maincpu;
+	required_device<bml3bus_device> m_bml3bus;
+	required_device<mc6845_device> m_crtc;
+	//required_device<cassette_image_device> m_cass;
+	required_device<speaker_sound_device> m_speaker;
+	optional_device<ym2203_device> m_ym2203;
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -167,135 +164,13 @@ public:
 #define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
-void bml3_state::video_start()
+
+READ8_MEMBER( bml3_state::bml3_6845_r )
 {
-	m_p_chargen = memregion("chargen")->base();
-}
-
-UINT32 bml3_state::screen_update_bml3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// The MB-6890 has a 5-bit colour RAM region.  The meaning of the bits are:
-	// 0: blue
-	// 1: red
-	// 2: green
-	// 3: reverse/inverse video
-	// 4: graphic (not character)
-
-	int x,y,hf,count;
-	int xi,yi;
-	int width,interlace,lowres;
-	int bgcolor;
-	int rawbits,dots[2],color,reverse,graphic;
-	UINT8 *vram = memregion("vram")->base();
-
-	count = 0x0000;
-
-	width = (m_hres_reg & 0x80) ? 80 : 40;
-	interlace = (m_vres_reg & 0x08) ? 1 : 0;
-	lowres = (m_hres_reg & 0x40) ? 1 : 0;
-	bgcolor = m_hres_reg & 0x07;
-
-	// redundant initializers to keep compiler happy
-	rawbits = dots[0] = dots[1] = color = reverse = graphic = 0;
-
-//  popmessage("%02x %02x",m_hres_reg,m_vres_reg);
-
-	for(y=0;y<25;y++)
-	{
-		for(x=0;x<width;x++)
-		{
-			for(yi=0;yi<8;yi++)
-			{
-				if (!lowres || yi == 0) {
-					int offset = count + yi * (width / 40 * 0x400) + mc6845_start_addr - 0x400;
-					if (offset >= 0x0000 && offset < 0x4000) {
-						rawbits = vram[offset+0x0000];
-						color = vram[offset+0x4000] & 7;
-						reverse = vram[offset+0x4000] & 8;
-						graphic = vram[offset+0x4000] & 0x10;
-					}
-					else {
-						// outside vram - don't know what should happen here
-						rawbits = color = reverse = graphic = 0;
-					}
-				}
-				if (graphic) {
-					if (lowres) {
-						// low-res graphics, each tile has 8 bits arranged as follows:
-						// 4 0
-						// 5 1
-						// 6 2
-						// 7 3
-						dots[0] = dots[1] = (rawbits >> yi/2 & 0x11) * 0xf;
-					}
-					else {
-						dots[0] = dots[1] = rawbits;
-					}
-				}
-				else {
-					// character mode
-					int tile = rawbits  & 0x7f;
-					int tile_bank = (rawbits & 0x80) >> 7;
-					if (interlace) {
-						dots[0] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(yi<<1)];
-						dots[1] = m_p_chargen[(tile_bank<<11)|(tile<<4)|(yi<<1)|tile_bank];
-					}
-					else {
-						dots[0] = dots[1] = m_p_chargen[(tile<<4)|(yi<<1)|tile_bank];
-					}
-				}
-				for(hf=0;hf<=interlace;hf++)
-				{
-					for(xi=0;xi<8;xi++)
-					{
-						int pen;
-
-						if(reverse)
-							pen = (dots[hf] >> (7-xi) & 1) ? bgcolor : color;
-						else
-							pen = (dots[hf] >> (7-xi) & 1) ? color : bgcolor;
-
-						bitmap.pix16((y*8+yi)*(interlace+1)+hf, x*8+xi) = pen;
-					}
-				}
-			}
-
-			if(mc6845_cursor_addr-mc6845_start_addr == count)
-			{
-				int xc,yc,cursor_on;
-
-				cursor_on = 0;
-				switch(mc6845_cursor_y_start & 0x60)
-				{
-					case 0x00: cursor_on = 1; break; //always on
-					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
-				}
-
-				if(cursor_on)
-				{
-					for(yc=0;yc<(8-(mc6845_cursor_y_start & 7));yc++)
-					{
-						for(xc=0;xc<8;xc++)
-						{
-							if(interlace)
-							{
-								bitmap.pix16((y*8+yc+7)*2+0, x*8+xc) = 7;
-								bitmap.pix16((y*8+yc+7)*2+1, x*8+xc) = 7;
-							}
-							else
-								bitmap.pix16(y*8+yc+7, x*8+xc) = 7;
-						}
-					}
-				}
-			}
-
-			count++;
-		}
-	}
-
-	return 0;
+	if (offset)
+		return m_crtc->register_r(space, 0);
+	else
+		return m_crtc->status_r(space, 0);
 }
 
 WRITE8_MEMBER( bml3_state::bml3_6845_w )
@@ -373,23 +248,20 @@ WRITE8_MEMBER( bml3_state::bml3_vres_reg_w )
 
 READ8_MEMBER( bml3_state::bml3_vram_r )
 {
-	UINT8 *vram = memregion("vram")->base();
-
 	// Bit 7 masks reading back to the latch
-	if ((m_attr_latch & 0x80) == 0) {
-		m_attr_latch = vram[offset+0x4000];
+	if (!BIT(m_attr_latch, 7))
+	{
+		m_attr_latch = m_p_videoram[offset+0x4000];
 	}
 
-	return vram[offset];
+	return m_p_videoram[offset];
 }
 
 WRITE8_MEMBER( bml3_state::bml3_vram_w )
 {
-	UINT8 *vram = memregion("vram")->base();
-
-	vram[offset] = data;
+	m_p_videoram[offset] = data;
 	// color ram is 5-bit
-	vram[offset+0x4000] = m_attr_latch & 0x1F;
+	m_p_videoram[offset+0x4000] = m_attr_latch & 0x1F;
 }
 
 READ8_MEMBER( bml3_state::bml3_psg_latch_r)
@@ -444,7 +316,7 @@ READ8_MEMBER( bml3_state::bml3_beep_r)
 
 WRITE8_MEMBER( bml3_state::bml3_beep_w)
 {
-	m_beep->set_state(!BIT(data, 7));
+	m_speaker->level_w(BIT(data, 7));
 }
 
 READ8_MEMBER( bml3_state::bml3_a000_r) { return m_extram[offset + 0xa000]; }
@@ -505,7 +377,7 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
 	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
-	AM_RANGE(0xffc6, 0xffc7) AM_WRITE(bml3_6845_w)
+	AM_RANGE(0xffc6, 0xffc7) AM_READWRITE(bml3_6845_r,bml3_6845_w)
 	// KBNMI - Keyboard "Break" key non-maskable interrupt
 	AM_RANGE(0xffc8, 0xffc8) AM_READ(bml3_keyb_nmi_r) // keyboard nmi
 	// DIPSW - DIP switches on system mainboard
@@ -518,7 +390,7 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0xffd0, 0xffd0) AM_WRITE(bml3_hres_reg_w)
 	// TRACE - Trace counter
 //  AM_RANGE(0xffd1, 0xffd1)
-	// REMOTE - Remote relay control for cassette?
+	// REMOTE - Remote relay control for cassette - bit 7
 //  AM_RANGE(0xffd2, 0xffd2)
 	// MUSIC_SEL - Music select: toggle audio output level when rising
 	AM_RANGE(0xffd3, 0xffd3) AM_READWRITE(bml3_beep_r,bml3_beep_w)
@@ -699,13 +571,102 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0xffe00000,IP_ACTIVE_HIGH,IPT_UNKNOWN)
 INPUT_PORTS_END
 
+static MC6845_UPDATE_ROW( update_row )
+{
+	bml3_state *state = device->machine().driver_data<bml3_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	// The MB-6890 has a 5-bit colour RAM region.  The meaning of the bits are:
+	// 0: blue
+	// 1: red
+	// 2: green
+	// 3: reverse/inverse video
+	// 4: graphic (not character)
+
+	UINT8 x=0,hf=0,xi=0,interlace=0,bgcolor=0,rawbits=0,dots[2],color=0,pen=0;
+	bool reverse=0,graphic=0,lowres=0;
+	UINT16 mem=0;
+
+	interlace = (state->m_crtc_vreg[8] & 3) ? 1 : 0;
+	lowres = BIT(state->m_hres_reg, 6);
+	bgcolor = state->m_hres_reg & 7;
+
+	if (interlace)
+	{
+		ra >>= 1;
+		if (y > 0x176) return;
+	}
+
+	// redundant initializers to keep compiler happy
+	dots[0] = dots[1] = 0;
+
+	for(x=0; x<x_count; x++)
+	{
+		if (lowres)
+			mem = (ma + x - 0x400) & 0x3fff;
+		else
+			mem = (ma + x + ra * x_count/40 * 0x400 -0x400) & 0x3fff;
+
+		color = state->m_p_videoram[mem|0x4000] & 7;
+		reverse = BIT(state->m_p_videoram[mem|0x4000], 3) ^ (x == cursor_x);
+		graphic = BIT(state->m_p_videoram[mem|0x4000], 4);
+
+		rawbits = state->m_p_videoram[mem];
+
+		if (graphic)
+		{
+			if (lowres)
+			{
+				// low-res graphics, each tile has 8 bits arranged as follows:
+				// 4 0
+				// 5 1
+				// 6 2
+				// 7 3
+				dots[0] = dots[1] = (rawbits >> ra/2 & 0x11) * 0xf;
+			}
+			else
+			{
+				dots[0] = dots[1] = rawbits;
+			}
+		}
+		else
+		{
+			// character mode
+			int tile = rawbits & 0x7f;
+			int tile_bank = BIT(rawbits, 7);
+			if (interlace)
+			{
+				dots[0] = state->m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)];
+				dots[1] = state->m_p_chargen[(tile_bank<<11)|(tile<<4)|(ra<<1)|tile_bank];
+			}
+			else
+			{
+				dots[0] = dots[1] = state->m_p_chargen[(tile<<4)|(ra<<1)|tile_bank];
+			}
+		}
+
+		for(hf=0;hf<=interlace;hf++)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				if(reverse)
+					pen = (dots[hf] >> (7-xi) & 1) ? bgcolor : color;
+				else
+					pen = (dots[hf] >> (7-xi) & 1) ? color : bgcolor;
+
+				bitmap.pix32(y, x*8+xi) = palette[pen];
+				// when the mc6845 device gains full interlace&video support, replace the line above with the line below
+				// bitmap.pix32(y*(interlace+1)+hf, x*8+xi) = palette[pen];
+			}
+		}
+	}
+}
 
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
-	NULL,       /* row update callback */
+	update_row,       /* row update callback */
 	NULL,       /* after pixel update callback */
 	DEVCB_NULL, /* callback for display state changes */
 	DEVCB_NULL, /* callback for cursor state changes */
@@ -788,9 +749,9 @@ void bml3_state::palette_init()
 
 void bml3_state::machine_start()
 {
-	m_beep->set_frequency(1200); //guesswork
-	m_beep->set_state(0);
 	m_extram = auto_alloc_array(machine(),UINT8,0x10000);
+	m_p_chargen = memregion("chargen")->base();
+	m_p_videoram = memregion("vram")->base();
 }
 
 void bml3_state::machine_reset()
@@ -987,7 +948,7 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bml3_state, screen_update_bml3)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_PALETTE_LENGTH(8)
 
 	/* Devices */
@@ -1001,8 +962,10 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	//MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* slot devices */
 	MCFG_BML3BUS_BUS_ADD("bml3bus", "maincpu", bml3bus_intf)
