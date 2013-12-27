@@ -24,12 +24,12 @@ pstring::str_t *pstring::m_zero = NULL;
 //#define DEBUG_MODE      (0)
 
 #ifdef MAME_DEBUG
-    #ifndef IMMEDIATE_MODE
-        #define IMMEDIATE_MODE  (1)
-    #endif
-    #ifndef DEBUG_MODE
-        #define DEBUG_MODE      (0)
-    #endif
+	#ifndef IMMEDIATE_MODE
+		#define IMMEDIATE_MODE  (1)
+	#endif
+	#ifndef DEBUG_MODE
+		#define DEBUG_MODE      (0)
+	#endif
 #else
 	#ifndef IMMEDIATE_MODE
 		#define IMMEDIATE_MODE  (1)

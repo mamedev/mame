@@ -59,11 +59,30 @@
 #define MCFG_NETLIST_ADD(_tag, _setup )                                             \
 	MCFG_DEVICE_ADD(_tag, NETLIST, NETLIST_CLOCK)                                   \
 	MCFG_NETLIST_SETUP(_setup)
+
 #define MCFG_NETLIST_REPLACE(_tag, _setup)                                          \
 	MCFG_DEVICE_REPLACE(_tag, NETLIST, NETLIST_CLOCK)                               \
 	MCFG_NETLIST_SETUP(_setup)
+
 #define MCFG_NETLIST_SETUP(_setup)                                                  \
-	netlist_mame_device::static_set_constructor(*device, NETLIST_NAME(_setup));
+	netlist_mame_device_t::static_set_constructor(*device, NETLIST_NAME(_setup));
+
+#define MCFG_NETLIST_ANALOG_INPUT(_basetag, _tag, _name)                            \
+	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ANALOG_INPUT, 0)                     \
+	netlist_mame_analog_input_t::static_set_name(*device, _name);
+
+#define MCFG_NETLIST_ANALOG_INPUT_MULT_OFFSET(_mult, _offset)                       \
+	netlist_mame_analog_input_t::static_set_mult_offset(*device, _mult, _offset);
+
+#define NETLIST_ANALOG_PORT_CHANGED(_base, _tag)                                    \
+	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_analog_input_t, input_changed, 0)
+
+#define MCFG_NETLIST_LOGIC_INPUT(_basetag, _tag, _name, _shift, _mask)              \
+	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_INPUT, 0)                      \
+	netlist_mame_logic_input_t::static_set_params(*device, _name, _mask, _shift);
+
+#define NETLIST_LOGIC_PORT_CHANGED(_base, _tag)                                     \
+	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_t, input_changed, 0)
 
 // ----------------------------------------------------------------------------------------
 // Extensions to interface netlist with MAME code ....
@@ -83,13 +102,13 @@
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)
 
-class netlist_mame_device;
+class netlist_mame_device_t;
 
 class netlist_mame_t : public netlist_base_t
 {
 public:
 
-	netlist_mame_t(netlist_mame_device &parent)
+	netlist_mame_t(netlist_mame_device_t &parent)
 	: netlist_base_t(),
 		m_parent(parent)
 	{}
@@ -97,7 +116,7 @@ public:
 
 	inline running_machine &machine();
 
-	netlist_mame_device &parent() { return m_parent; }
+	netlist_mame_device_t &parent() { return m_parent; }
 
 protected:
 
@@ -108,50 +127,29 @@ protected:
 	}
 
 private:
-	netlist_mame_device &m_parent;
+	netlist_mame_device_t &m_parent;
 };
 
 // ----------------------------------------------------------------------------------------
-// MAME glue classes
+// netlist_mame_device_t
 // ----------------------------------------------------------------------------------------
 
-
-
-
-// ======================> netlist_mame_device
-
-class netlist_mame_device : public device_t,
-						    public device_execute_interface,
-		                    public device_state_interface,
-		                    public device_disasm_interface,
-						    public device_memory_interface
+class netlist_mame_device_t : public device_t,
+								public device_execute_interface,
+								public device_state_interface,
+								public device_disasm_interface,
+								public device_memory_interface
 {
 public:
 
-	template<bool _Required, class _NETClass>
-	class output_finder;
-	template<class C>
-	class optional_output;
-	template<class C>
-	class required_output;
-	template<class C>
-	class optional_param;
-	template<class C>
-	class required_param;
-	class on_device_start;
-
 	// construction/destruction
-	netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~netlist_mame_device() {}
+	netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~netlist_mame_device_t() {}
 
 	static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
 
 	netlist_setup_t &setup() { return *m_setup; }
 	netlist_mame_t &netlist() { return *m_netlist; }
-
-	typedef netlist_list_t<on_device_start *> device_start_list_t;
-
-	device_start_list_t m_device_start_list;
 
 protected:
 	// device-level overrides
@@ -167,35 +165,35 @@ protected:
 
 	ATTR_HOT virtual void execute_run();
 
-    // device_disasm_interface overrides
-    ATTR_COLD virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-    ATTR_COLD virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
-    ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	// device_disasm_interface overrides
+	ATTR_COLD virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
+	ATTR_COLD virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
+	ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
-    // device_memory_interface overrides
+	// device_memory_interface overrides
 
-    address_space_config m_program_config;
+	address_space_config m_program_config;
 
-    virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
-    {
-        switch (spacenum)
-        {
-            case AS_PROGRAM: return &m_program_config;
-            case AS_IO:      return NULL;
-            default:         return NULL;
-        }
-    }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+	{
+		switch (spacenum)
+		{
+			case AS_PROGRAM: return &m_program_config;
+			case AS_IO:      return NULL;
+			default:         return NULL;
+		}
+	}
 
-    virtual void state_string_export(const device_state_entry &entry, astring &string)
-    {
-        if (entry.index() >= 0)
-        {
-            if (entry.index() & 1)
-                string.format("%10.6f", *((double *) entry.dataptr()));
-            else
-                string.format("%d", *((netlist_sig_t *) entry.dataptr()));
-        }
-    }
+	virtual void state_string_export(const device_state_entry &entry, astring &string)
+	{
+		if (entry.index() >= 0)
+		{
+			if (entry.index() & 1)
+				string.format("%10.6f", *((double *) entry.dataptr()));
+			else
+				string.format("%d", *((netlist_sig_t *) entry.dataptr()));
+		}
+	}
 
 
 	netlist_mame_t *m_netlist;
@@ -208,9 +206,7 @@ private:
 	void (*m_setup_func)(netlist_setup_t &);
 
 	int m_icount;
-    int m_genPC;
-
-
+	int m_genPC;
 
 };
 
@@ -218,6 +214,102 @@ inline running_machine &netlist_mame_t::machine()
 {
 	return m_parent.machine();
 }
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_sub_interface
+// ----------------------------------------------------------------------------------------
+
+class netlist_mame_sub_interface
+{
+public:
+	// construction/destruction
+	netlist_mame_sub_interface(netlist_mame_device_t &obj) : m_object(obj) {}
+	virtual ~netlist_mame_sub_interface() { }
+
+	virtual void custom_netlist_additions(netlist_base_t &netlist) { }
+
+	inline netlist_mame_device_t &object() { return m_object; }
+private:
+	netlist_mame_device_t &m_object;
+};
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_analog_input_t
+// ----------------------------------------------------------------------------------------
+
+class netlist_mame_analog_input_t : public device_t,
+									public netlist_mame_sub_interface
+{
+public:
+
+	// construction/destruction
+	netlist_mame_analog_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~netlist_mame_analog_input_t() { }
+
+	static void static_set_name(device_t &device, const char *param_name);
+	static void static_set_mult_offset(device_t &device, const double mult, const double offset);
+
+	inline void write(const double val) { m_param->setTo(val * m_mult + m_offset); }
+
+	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed)
+	{
+		if (m_auto_port)
+			write(((double) newval - (double) field.minval())/((double) (field.maxval()-field.minval()) ) );
+		else
+			write(newval);
+	}
+	inline DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
+	inline DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
+	inline DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
+	inline DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
+	inline DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+private:
+	netlist_param_double_t *m_param;
+	double m_offset;
+	double m_mult;
+	bool   m_auto_port;
+	pstring m_param_name;
+};
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_logic_input_t
+// ----------------------------------------------------------------------------------------
+
+class netlist_mame_logic_input_t :  public device_t,
+									public netlist_mame_sub_interface
+{
+public:
+
+	// construction/destruction
+	netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~netlist_mame_logic_input_t() { }
+
+	static void static_set_params(device_t &device, const char *param_name, const UINT32 mask, const UINT32 shift);
+
+	inline void write(const UINT32 val) { m_param->setTo((val >> m_shift) & m_mask); }
+
+	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
+	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
+	DECLARE_WRITE8_MEMBER(write8)               { write(data);   }
+	DECLARE_WRITE16_MEMBER(write16)             { write(data);   }
+	DECLARE_WRITE32_MEMBER(write32)             { write(data);   }
+	DECLARE_WRITE64_MEMBER(write64)             { write(data);   }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+private:
+	netlist_param_int_t *m_param;
+	UINT32 m_mask;
+	UINT32 m_shift;
+	pstring m_param_name;
+};
 
 // ----------------------------------------------------------------------------------------
 // netdev_callback
@@ -300,110 +392,9 @@ private:
 };
 
 
-// ======================> netlist_output_finder
-
-class netlist_mame_device::on_device_start
-{
-public:
-	virtual bool OnDeviceStart() = 0;
-	virtual ~on_device_start() {}
-};
-
-// device finder template
-template<bool _Required, class _NETClass>
-class netlist_mame_device::output_finder : public object_finder_base<_NETClass>,
-		netlist_mame_device::on_device_start
-{
-public:
-	// construction/destruction
-	output_finder(device_t &base, const char *tag, const char *output)
-		: object_finder_base<_NETClass>(base, tag), m_netlist(NULL), m_output(output) { }
-
-	// finder
-	virtual bool findit(bool isvalidation = false)
-	{
-		if (isvalidation) return true;
-		device_t *device = this->m_base.subdevice(this->m_tag);
-		m_netlist = dynamic_cast<netlist_mame_device *>(device);
-		if (device != NULL && m_netlist == NULL)
-		{
-			void mame_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
-			mame_printf_warning("Device '%s' found but is not netlist\n", this->m_tag);
-		}
-		m_netlist->m_device_start_list.add(this);
-		return this->report_missing(m_netlist != NULL, "device", _Required);
-	}
-
-protected:
-	netlist_mame_device *m_netlist;
-	const char *m_output;
-};
-
-// optional device finder
-template<class C>
-class netlist_mame_device::optional_output : public netlist_mame_device::output_finder<false, C>
-{
-public:
-	optional_output(device_t &base, const char *tag, const char *output) : output_finder<false, C>(base, tag, output) { }
-
-	virtual ~optional_output() {};
-
-	virtual bool OnDeviceStart()
-	{
-		this->m_target = dynamic_cast<C *>(this->m_netlist->setup().find_terminal(this->m_output, netlist_object_t::OUTPUT, false));
-		return this->report_missing(this->m_target != NULL, "output", false);
-	}
-
-};
-
-// required devices are similar but throw an error if they are not found
-template<class C>
-class netlist_mame_device::required_output : public netlist_mame_device::output_finder<true, C>
-{
-public:
-	required_output(device_t &base, const char *tag, const char *output) : output_finder<true, C>(base, tag, output) { }
-
-	virtual ~required_output() {};
-
-	virtual bool OnDeviceStart()
-	{
-		this->m_target = dynamic_cast<C *>(this->m_netlist->setup().find_terminal(this->m_output, netlist_object_t::OUTPUT));
-		return this->report_missing(this->m_target != NULL, "output", true);
-	}
-
-};
-
-// optional device finder
-template<class C>
-class netlist_mame_device::optional_param : public netlist_mame_device::output_finder<false, C>
-{
-public:
-	optional_param(device_t &base, const char *tag, const char *output) : output_finder<false, C>(base, tag, output) { }
-
-	virtual bool OnDeviceStart()
-	{
-		this->m_target = dynamic_cast<C *>(this->m_netlist->setup().find_param(this->m_output, false));
-		return this->report_missing(this->m_target != NULL, "parameter", false);
-	}
-
-};
-
-// required devices are similar but throw an error if they are not found
-template<class C>
-class netlist_mame_device::required_param : public netlist_mame_device::output_finder<true, C>
-{
-public:
-	required_param(device_t &base, const char *tag, const char *output) : output_finder<true, C>(base, tag, output) { }
-
-	virtual bool OnDeviceStart()
-	{
-		this->m_target = dynamic_cast<C *>( this->m_netlist->setup().find_param(this->m_output));
-		return this->report_missing(this->m_target != NULL, "parameter", true);
-	}
-};
-
-
 // device type definition
 extern const device_type NETLIST;
+extern const device_type NETLIST_ANALOG_INPUT;
+extern const device_type NETLIST_LOGIC_INPUT;
 
 #endif

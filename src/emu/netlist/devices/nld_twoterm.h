@@ -128,6 +128,7 @@ NETLIB_DEVICE_WITH_PARAMS(POT,
 
 	netlist_param_double_t m_R;
 	netlist_param_double_t m_Dial;
+	netlist_param_logic_t m_DialIsLog;
 );
 
 
@@ -345,7 +346,7 @@ public:
 protected:
 
 	ATTR_COLD virtual void start();
-	ATTR_COLD void update_param();
+	ATTR_HOT void update_param();
 
 	double m_gB; // base conductance / switch on
 	double m_gC; // collector conductance / switch on

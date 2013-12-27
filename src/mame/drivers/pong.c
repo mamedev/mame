@@ -370,6 +370,7 @@ static NETLIST_START(pong_schematics)
 	// ----------------------------------------------------------------------------------------
 
 	NETDEV_POT(ic_b9_POT, RES_K(1))     // This is a guess!!
+	NETDEV_PARAM(ic_b9_POT.DIALLOG, 1)  // Log Dial ...
 	NETDEV_R(ic_b9_RPRE, 470)
 
 	NET_C(ic_b9_POT.1, V5)
@@ -377,7 +378,7 @@ static NETLIST_START(pong_schematics)
 	NET_C(ic_b9_POT.2, ic_b9_RPRE.1)
 	NET_C(ic_b9_RPRE.2, ic_b9.CONT)
 
-	NETDEV_R(ic_b9_R, RES_K(71))
+	NETDEV_R(ic_b9_R, RES_K(81))        // Adjustment pot
 	NETDEV_C(ic_b9_C, CAP_U(.1))
 	NETDEV_D(ic_b9_D, 1N914)
 	NETDEV_NE555(ic_b9)
@@ -409,6 +410,7 @@ static NETLIST_START(pong_schematics)
 	// ----------------------------------------------------------------------------------------
 
 	NETDEV_POT(ic_a9_POT, RES_K(1))     // This is a guess!!
+    NETDEV_PARAM(ic_a9_POT.DIALLOG, 1)  // Log Dial ...
 	NETDEV_R(ic_a9_RPRE, 470)
 
 	NET_C(ic_a9_POT.1, V5)
@@ -416,7 +418,7 @@ static NETLIST_START(pong_schematics)
 	NET_C(ic_a9_POT.2, ic_a9_RPRE.1)
 	NET_C(ic_a9_RPRE.2, ic_a9.CONT)
 
-	NETDEV_R(ic_a9_R, RES_K(71))
+	NETDEV_R(ic_a9_R, RES_K(81))        // Adjustment pot
 	NETDEV_C(ic_a9_C, CAP_U(.1))
 	NETDEV_D(ic_a9_D, 1N914)
 	NETDEV_NE555(ic_a9)
@@ -792,29 +794,19 @@ public:
 			m_video(*this, "fixfreq"),
 
 			m_dac(*this, "dac"),                /* just to have a sound device */
-			m_srst(*this, "maincpu", "SRST"),
-			m_p_P0(*this, "maincpu", "ic_b9_POT.DIAL"),
-			m_p_P1(*this, "maincpu", "ic_a9_POT.DIAL"),
-			m_sw1a(*this, "maincpu", "sw1a.POS"),
-			m_sw1b(*this, "maincpu", "sw1b.POS"),
-			m_p_R0(*this, "maincpu", "ic_a9_R.R"),
-			m_p_R1(*this, "maincpu", "ic_b9_R.R")
+			m_sw1a(*this, "maincpu:sw1a"),
+			m_sw1b(*this, "maincpu:sw1b")
 	{
 	}
 
 	// devices
-	required_device<netlist_mame_device> m_maincpu;
+	required_device<netlist_mame_device_t> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 	required_device<dac_device> m_dac; /* just to have a sound device */
 
 	// sub devices
-	netlist_mame_device::required_output<netlist_logic_output_t> m_srst;
-	netlist_mame_device::required_param<netlist_param_double_t> m_p_P0;
-	netlist_mame_device::required_param<netlist_param_double_t> m_p_P1;
-	netlist_mame_device::required_param<netlist_param_int_t> m_sw1a;
-	netlist_mame_device::required_param<netlist_param_int_t> m_sw1b;
-	netlist_mame_device::required_param<netlist_param_double_t> m_p_R0;
-	netlist_mame_device::required_param<netlist_param_double_t> m_p_R1;
+	required_device<netlist_mame_logic_input_t> m_sw1a;
+	required_device<netlist_mame_logic_input_t> m_sw1b;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -825,12 +817,6 @@ public:
 		//printf("snd %f\n", newval);
 		//dac_w(m_dac, 0, newval*64);
 		m_dac->write_unsigned8(64*data);
-	}
-
-	NETDEV_ANALOG_CALLBACK_MEMBER(video_cb)
-	{
-		m_video->update_vid(data, time);
-		//printf("%20.15f\n", newval);
 	}
 
 protected:
@@ -851,7 +837,7 @@ static NETLIST_START(pong)
 	NETLIST_MEMREGION("maincpu")
 
 	NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
-	NETDEV_ANALOG_CALLBACK(video_cb, videomix, pong_state, video_cb, "")
+	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 NETLIST_END
 
 static NETLIST_START(pong_fast)
@@ -859,7 +845,7 @@ static NETLIST_START(pong_fast)
 	NETLIST_INCLUDE(pong_schematics)
 
 	NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
-	NETDEV_ANALOG_CALLBACK(video_cb, videomix, pong_state, video_cb, "")
+    NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 
 NETLIST_END
 
@@ -879,63 +865,34 @@ void pong_state::video_start()
 
 INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
-	double pad;
 	int numpad = (FPTR) (param);
 
 	switch (numpad)
 	{
-	case IC_PADDLE1:
-	case IC_PADDLE2:
-	{
-		// http://ion.chem.usu.edu/~sbialkow/Classes/564/Thevenin/Thevenin.html
-
-		double fac = (double) newval / (double) 256;
-		fac = (exp(fac) - 1.0) / (exp(1.0) -1.0) ;
-		switch (numpad)
-		{
-		case IC_PADDLE1:    m_p_P0->setTo(fac); break;
-		case IC_PADDLE2:    m_p_P1->setTo(fac); break;
-		}
-		break;
-	}
 	case IC_SWITCH:
-		m_sw1a->setTo(newval ? 1 : 0);
-		m_sw1b->setTo(newval ? 1 : 0);
-		break;
-	case IC_COIN:
-		m_srst->set_Q(newval & 1, NLTIME_FROM_US(500));
-		break;
-	case IC_VR1:
-	case IC_VR2:
-		pad = (double) newval / (double) 100 * RES_K(50) + RES_K(56);
-		switch (numpad)
-		{
-		case IC_VR1:    m_p_R0->setTo(pad); break;
-		case IC_VR2:    m_p_R1->setTo(pad); break;
-		}
+		m_sw1a->write(newval ? 1 : 0);
+		m_sw1b->write(newval ? 1 : 0);
 		break;
 	}
-
-
 }
 
 static INPUT_PORTS_START( pong )
 	PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed,IC_PADDLE1)
+    PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)   NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot0")
 
 	PORT_START( "PADDLE1" ) /* fake input port for player 2 paddle */
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_PADDLE2)
+    PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0) PORT_PLAYER(2) NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot1")
 
 	PORT_START("IN0") /* fake as well */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_COIN)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "srst")
 	PORT_DIPNAME( 0x06, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_SWITCH)
 	PORT_DIPSETTING(    0x00, "11" )
 	PORT_DIPSETTING(    0x06, "15" )
 
 	PORT_START("VR1")
-	PORT_ADJUSTER( 50, "VR1 - 50k, Paddle 1 adjustment" )   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR1)
+	PORT_ADJUSTER( 50, "VR1 - 50k, Paddle 1 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr0")
 	PORT_START("VR2")
-	PORT_ADJUSTER( 50, "VR2 - 50k, Paddle 2 adjustment" )   PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_VR2)
+	PORT_ADJUSTER( 50, "VR2 - 50k, Paddle 2 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr1")
 	//PORT_START("GATESPEED")
 	//PORT_ADJUSTER( 100, "Logic Gate Delay" ) PORT_MINMAX(10, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_GATEDELAY)
 
@@ -945,6 +902,15 @@ static MACHINE_CONFIG_START( pong, pong_state )
 
 	/* basic machine hardware */
 	MCFG_NETLIST_ADD("maincpu", pong)
+    MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
+    MCFG_NETLIST_ANALOG_INPUT_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
+    MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr1", "ic_a9_R.R")
+    MCFG_NETLIST_ANALOG_INPUT_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
+    MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "ic_b9_POT.DIAL")
+    MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "ic_a9_POT.DIAL")
+    MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "sw1a.POS", 0, 0x01)
+    MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "sw1b.POS", 0, 0x01)
+    MCFG_NETLIST_LOGIC_INPUT("maincpu", "srst", "SRST.OUT", 0, 0x01)
 
 	/* video hardware */
 
@@ -962,7 +928,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pongf, pong )
 
 	/* basic machine hardware */
-	MCFG_NETLIST_REPLACE("maincpu", pong_fast)
+    MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_NETLIST_SETUP(pong_fast)
 
 MACHINE_CONFIG_END
 

@@ -110,13 +110,13 @@ public:
 
 	virtual ~netlist_tool_t() { };
 
-	void read_netlist(const char *buffer)
-	{
-		m_setup = new netlist_setup_t(*this);
-		this->set_clock_freq(NETLIST_CLOCK);
+    void read_netlist(const char *buffer)
+    {
+        m_setup = new netlist_setup_t(*this);
+        this->init_object(*this, "netlist");
+        m_setup->init();
 
-		// register additional devices
-		//m_setup->factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback");
+        this->set_clock_freq(NETLIST_CLOCK);
 
 		// read the netlist ...
 		//m_setup_func(*m_setup);

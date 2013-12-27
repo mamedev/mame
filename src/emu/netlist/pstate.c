@@ -32,12 +32,12 @@ ATTR_COLD void pstate_manager_t::save_state_ptr(const pstring &stname, const pst
 
 ATTR_COLD void pstate_manager_t::pre_save()
 {
-    for (int i=0; i < m_callback.count(); i++)
-        m_callback[i]->on_pre_save();
+	for (int i=0; i < m_callback.count(); i++)
+		m_callback[i]->on_pre_save();
 }
 
 ATTR_COLD void pstate_manager_t::post_load()
 {
-    for (int i=0; i < m_callback.count(); i++)
-        m_callback[i]->on_post_load();
+	for (int i=0; i < m_callback.count(); i++)
+		m_callback[i]->on_post_load();
 }

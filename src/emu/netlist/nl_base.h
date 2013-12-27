@@ -185,7 +185,7 @@ typedef delegate<void ()> net_update_delegate;
 //#define NETLIB_CONSTRUCTOR(_chip) ATTR_COLD _chip :: _chip (netlist_setup_t &setup, const char *name)
 //          : net_device_t(setup, name)
 
-#define NETLIB_UPDATE_PARAM(_chip) ATTR_COLD ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
+#define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: _name _params
 
 #define NETLIB_UPDATE_TERMINALS() ATTR_HOT ATTR_ALIGN inline void update_terminals(void)
@@ -370,8 +370,8 @@ public:
 protected:
 	ATTR_COLD virtual void save_register()
 	{
-	    save(NAME(m_state));
-	    netlist_owned_object_t::save_register();
+		save(NAME(m_state));
+		netlist_owned_object_t::save_register();
 	}
 
 private:
@@ -462,7 +462,7 @@ private:
 class netlist_logic_input_t : public netlist_input_t
 {
 public:
-    ATTR_COLD netlist_logic_input_t()
+	ATTR_COLD netlist_logic_input_t()
 		: netlist_input_t(INPUT, LOGIC)
 	{
 		// default to TTL
@@ -487,7 +487,7 @@ public:
 class netlist_ttl_input_t : public netlist_logic_input_t
 {
 public:
-    ATTR_COLD netlist_ttl_input_t()
+	ATTR_COLD netlist_ttl_input_t()
 		: netlist_logic_input_t() { set_thresholds(0.8 , 2.0); }
 };
 
@@ -498,7 +498,7 @@ public:
 class netlist_analog_input_t : public netlist_input_t
 {
 public:
-    ATTR_COLD netlist_analog_input_t()
+	ATTR_COLD netlist_analog_input_t()
 		: netlist_input_t(INPUT, ANALOG) { }
 
 	ATTR_HOT inline const double Q_Analog() const;
@@ -596,22 +596,32 @@ public:
 	hybrid_t m_cur;
 	hybrid_t m_new;
 
+    /* use this to register state.... */
+    ATTR_COLD virtual void late_save_register()
+    {
+        save(NAME(m_last.Analog));
+        save(NAME(m_cur.Analog));
+        save(NAME(m_new.Analog));
+        save(NAME(m_last.Q));
+        save(NAME(m_cur.Q));
+        save(NAME(m_new.Q));
+        save(NAME(m_time));
+        save(NAME(m_active));
+        save(NAME(m_in_queue));
+        netlist_object_t::save_register();
+    }
+
 protected:
 	UINT32 m_num_cons;
 
+	/* we don't use this to save state
+	 * because we may get deleted again ...
+	 */
 	ATTR_COLD virtual void save_register()
 	{
-		save(NAME(m_last.Analog));
-		save(NAME(m_cur.Analog));
-		save(NAME(m_new.Analog));
-		save(NAME(m_last.Q));
-		save(NAME(m_cur.Q));
-		save(NAME(m_new.Q));
-		save(NAME(m_time));
-		save(NAME(m_active));
-		save(NAME(m_in_queue));
-		netlist_object_t::save_register();
+	    //assert_always(false, "trying too early to register state in netlist_net_t");
 	}
+
 
 private:
 	ATTR_HOT void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask) const;
@@ -950,23 +960,23 @@ private:
 // ----------------------------------------------------------------------------------------
 
 class netlist_queue_t : public netlist_timed_queue<netlist_net_t, netlist_time, 512>,
-                        public pstate_callback_t
+						public pstate_callback_t
 {
 public:
 
-    netlist_queue_t(netlist_base_t &nl);
+	netlist_queue_t(netlist_base_t &nl);
 
-    void register_state(pstate_manager_t &manager, const pstring &module);
-    void on_pre_save();
-    void on_post_load();
+	void register_state(pstate_manager_t &manager, const pstring &module);
+	void on_pre_save();
+	void on_post_load();
 
-    pstate_callback_t &callback() { return *this; }
+	pstate_callback_t &callback() { return *this; }
 
 private:
-    netlist_base_t &m_netlist;
-    int m_qsize;
-    netlist_time::INTERNALTYPE m_times[512];
-    char m_name[512][64];
+	netlist_base_t &m_netlist;
+	int m_qsize;
+	netlist_time::INTERNALTYPE m_times[512];
+	char m_name[512][64];
 };
 
 // ----------------------------------------------------------------------------------------
@@ -984,8 +994,8 @@ public:
 	netlist_base_t();
 	virtual ~netlist_base_t();
 
-    ATTR_HOT inline const netlist_queue_t &queue() const { return m_queue; }
-    ATTR_HOT inline netlist_queue_t &queue() { return m_queue; }
+	ATTR_HOT inline const netlist_queue_t &queue() const { return m_queue; }
+	ATTR_HOT inline netlist_queue_t &queue() { return m_queue; }
 
 	ATTR_HOT inline void push_to_queue(netlist_net_t &out, const netlist_time &attime)
 	{
@@ -1020,14 +1030,14 @@ protected:
 	virtual void vfatalerror(const char *format, va_list ap) const = 0;
 
 protected:
-    ATTR_COLD virtual void save_register()
-    {
-        save(NAME(m_queue.callback()));
-        save(NAME(m_time_ps));
-        save(NAME(m_rem));
-        save(NAME(m_div));
-        netlist_object_t::save_register();
-    }
+	ATTR_COLD virtual void save_register()
+	{
+		save(NAME(m_queue.callback()));
+		save(NAME(m_time_ps));
+		save(NAME(m_rem));
+		save(NAME(m_div));
+		netlist_object_t::save_register();
+	}
 
 #if (NL_KEEP_STATISTICS)
 	// performance
@@ -1039,8 +1049,8 @@ protected:
 private:
 	ATTR_HOT void update_time(const netlist_time t, INT32 &atime);
 
-    netlist_time                m_time_ps;
-    netlist_queue_t             m_queue;
+	netlist_time                m_time_ps;
+	netlist_queue_t             m_queue;
 	UINT32                      m_rem;
 	UINT32                      m_div;
 
@@ -1298,19 +1308,19 @@ class netlist_factory
 {
 public:
 
-    ATTR_COLD netlist_factory();
-    ATTR_COLD ~netlist_factory();
+	ATTR_COLD netlist_factory();
+	ATTR_COLD ~netlist_factory();
 
-    ATTR_COLD void initialize();
+	ATTR_COLD void initialize();
 
-    template<class _C>
-    ATTR_COLD void register_device(const pstring &name, const pstring &classname)
+	template<class _C>
+	ATTR_COLD void register_device(const pstring &name, const pstring &classname)
 	{
 		m_list.add(new net_device_t_factory< _C >(name, classname) );
 	}
 
-    ATTR_COLD netlist_device_t *new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const;
-    ATTR_COLD netlist_device_t *new_device_by_name(const pstring &name, netlist_setup_t &setup) const;
+	ATTR_COLD netlist_device_t *new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const;
+	ATTR_COLD netlist_device_t *new_device_by_name(const pstring &name, netlist_setup_t &setup) const;
 
 private:
 	typedef netlist_list_t<net_device_t_base_factory *> list_t;

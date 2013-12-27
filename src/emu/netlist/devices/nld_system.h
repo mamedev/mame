@@ -81,8 +81,10 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 // Special support devices ...
 // ----------------------------------------------------------------------------------------
 
-NETLIB_DEVICE(logic_input,
+NETLIB_DEVICE_WITH_PARAMS(logic_input,
 	netlist_ttl_output_t m_Q;
+
+	netlist_param_logic_t m_OUT;
 );
 
 NETLIB_DEVICE(analog_input,

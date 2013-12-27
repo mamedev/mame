@@ -98,7 +98,7 @@ NETLIB_UPDATE(9316)
 	OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
 }
 
-inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))
+NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(20);
 	OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
@@ -107,7 +107,7 @@ inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))
 	OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
 }
 
-inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
+NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(20);
 #if 0

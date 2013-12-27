@@ -62,43 +62,43 @@
 #include "../nl_base.h"
 
 #define TTL_74107A(_name, _CLK, _J, _K, _CLRQ)                                      \
-        NET_REGISTER_DEV(nic74107A, _name)                                          \
-        NET_CONNECT(_name, CLK, _CLK)                                               \
-        NET_CONNECT(_name, J,  _J)                                                  \
-        NET_CONNECT(_name, K,  _K)                                                  \
-        NET_CONNECT(_name, CLRQ,  _CLRQ)
+		NET_REGISTER_DEV(nic74107A, _name)                                          \
+		NET_CONNECT(_name, CLK, _CLK)                                               \
+		NET_CONNECT(_name, J,  _J)                                                  \
+		NET_CONNECT(_name, K,  _K)                                                  \
+		NET_CONNECT(_name, CLRQ,  _CLRQ)
 
 #define TTL_74107(_name, _CLK, _J, _K, _CLRQ)                                       \
-        TTL_74107A(_name, _CLK, _J, _K, _CLRQ)
+		TTL_74107A(_name, _CLK, _J, _K, _CLRQ)
 
 NETLIB_SUBDEVICE(nic74107Asub,
-    netlist_ttl_input_t m_clk;
+	netlist_ttl_input_t m_clk;
 
-    netlist_ttl_output_t m_Q;
-    netlist_ttl_output_t m_QQ;
+	netlist_ttl_output_t m_Q;
+	netlist_ttl_output_t m_QQ;
 
-    netlist_sig_t m_Q1;
-    netlist_sig_t m_Q2;
-    netlist_sig_t m_F;
+	netlist_sig_t m_Q1;
+	netlist_sig_t m_Q2;
+	netlist_sig_t m_F;
 
-    ATTR_HOT void newstate(const netlist_sig_t state);
+	ATTR_HOT void newstate(const netlist_sig_t state);
 
 );
 
 NETLIB_DEVICE(nic74107A,
-    NETLIB_NAME(nic74107Asub) sub;
+	NETLIB_NAME(nic74107Asub) sub;
 
-    netlist_ttl_input_t m_J;
-    netlist_ttl_input_t m_K;
-    netlist_ttl_input_t m_clrQ;
+	netlist_ttl_input_t m_J;
+	netlist_ttl_input_t m_K;
+	netlist_ttl_input_t m_clrQ;
 
 );
 
 class NETLIB_NAME(nic74107) : public NETLIB_NAME(nic74107A)
 {
 public:
-    NETLIB_NAME(nic74107) ()
-    :   NETLIB_NAME(nic74107A) () {}
+	NETLIB_NAME(nic74107) ()
+	:   NETLIB_NAME(nic74107A) () {}
 
 };
 

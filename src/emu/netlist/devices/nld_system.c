@@ -73,10 +73,16 @@ NETLIB_UPDATE(clock)
 NETLIB_START(logic_input)
 {
 	register_output("Q", m_Q);
+	register_param("OUT", m_OUT, 0);
 }
 
 NETLIB_UPDATE(logic_input)
 {
+}
+
+NETLIB_UPDATE_PARAM(logic_input)
+{
+	OUTLOGIC(m_Q, m_OUT.Value() & 1, NLTIME_IMMEDIATE);
 }
 
 // ----------------------------------------------------------------------------------------

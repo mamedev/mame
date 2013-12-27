@@ -11,6 +11,7 @@
 #include "nl_util.h"
 #include "devices/nld_system.h"
 #include "devices/nld_solver.h"
+#include "devices/nld_twoterm.h"
 
 static NETLIST_START(base)
 	NETDEV_TTL_CONST(ttlhigh, 1)
@@ -521,6 +522,8 @@ void netlist_setup_t::connect(netlist_core_terminal_t &t1, netlist_core_terminal
 
 void netlist_setup_t::resolve_inputs()
 {
+    bool has_twoterms = false;
+
 	NL_VERBOSE_OUT(("Resolving ...\n"));
 	for (tagmap_link_t::entry_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
 	{
@@ -540,7 +543,6 @@ void netlist_setup_t::resolve_inputs()
 			//VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
 	}
 
-#if 0
 	NL_VERBOSE_OUT(("deleting empty nets ...\n"));
 
 	// delete empty nets ...
@@ -556,10 +558,44 @@ void netlist_setup_t::resolve_inputs()
 			pn--;
 		}
 	}
-#endif
-	if (m_netlist.solver() != NULL)
-		m_netlist.solver()->post_start();
 
+    /* now that nets were deleted ... register all net items */
+    NL_VERBOSE_OUT(("late state saving for nets ...\n"));
+
+    for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+        pn->object()->late_save_register();
+
+    NL_VERBOSE_OUT(("looking for terminals not connected ...\n"));
+    for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
+    {
+        if (!entry->object()->has_net())
+            netlist().xfatalerror("Found terminal %s without a net\n",
+                    entry->object()->name().cstr());
+    }
+
+
+    NL_VERBOSE_OUT(("looking for two terms connected to rail nets ...\n"));
+    for (tagmap_devices_t::entry_t *entry = netlist().m_devices.first(); entry != NULL; entry = netlist().m_devices.next(entry))
+    {
+        NETLIB_NAME(twoterm) *t = dynamic_cast<NETLIB_NAME(twoterm) *>(entry->object());
+        if (t != NULL)
+        {
+            has_twoterms = true;
+            if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+                netlist().xfatalerror("Found device %s connected only to railterminals %s/%s\n",
+                        t->name().cstr(), t->m_N.net().name().cstr(), t->m_P.net().name().cstr());
+        }
+    }
+
+    NL_VERBOSE_OUT(("initialize solver ...\n"));
+
+	if (m_netlist.solver() == NULL)
+	{
+	    if (!has_twoterms)
+	        netlist().xfatalerror("No solver found for this net although analog elements are present\n");
+	}
+	else
+		m_netlist.solver()->post_start();
 
 }
 
@@ -581,17 +617,27 @@ void netlist_setup_t::start_devices()
 
 
 	NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
-	/* find the main clock ... */
+
+	/* find the main clock and solver ... */
+	bool has_mainclock = false;
+    bool has_solver = false;
+
 	for (tagmap_devices_t::entry_t *entry = netlist().m_devices.first(); entry != NULL; entry = netlist().m_devices.next(entry))
 	{
 		netlist_device_t *dev = entry->object();
 		if (dynamic_cast<NETLIB_NAME(mainclock)*>(dev) != NULL)
 		{
+		    if (has_mainclock)
+		        m_netlist.xfatalerror("Found more than one mainclock");
 			m_netlist.set_mainclock_dev(dynamic_cast<NETLIB_NAME(mainclock)*>(dev));
+			has_mainclock = true;
 		}
 		if (dynamic_cast<NETLIB_NAME(solver)*>(dev) != NULL)
 		{
+		    if (has_solver)
+                m_netlist.xfatalerror("Found more than one solver");
 			m_netlist.set_solver_dev(dynamic_cast<NETLIB_NAME(solver)*>(dev));
+			has_solver = true;
 		}
 	}
 

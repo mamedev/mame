@@ -56,6 +56,7 @@ NETLIB_UPDATE(R)
 
 NETLIB_UPDATE_PARAM(R)
 {
+	//printf("updating %s to %f\n", name().cstr(), m_R.Value());
 	set_R(m_R.Value());
 }
 
@@ -76,6 +77,7 @@ NETLIB_START(POT)
 
 	register_param("R", m_R, 1.0 / NETLIST_GMIN);
 	register_param("DIAL", m_Dial, 0.5);
+	register_param("DIALLOG", m_DialIsLog, 0);
 
 }
 
@@ -87,8 +89,11 @@ NETLIB_UPDATE(POT)
 
 NETLIB_UPDATE_PARAM(POT)
 {
-	m_R1.set_R(MAX(m_R.Value() * m_Dial.Value(), NETLIST_GMIN));
-	m_R2.set_R(MAX(m_R.Value() * (1.0 - m_Dial.Value()), NETLIST_GMIN));
+	double v = m_Dial.Value();
+	if (m_DialIsLog.Value())
+		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
+	m_R1.set_R(MAX(m_R.Value() * v, NETLIST_GMIN));
+	m_R2.set_R(MAX(m_R.Value() * (1.0 - v), NETLIST_GMIN));
 }
 // ----------------------------------------------------------------------------------------
 // nld_C

@@ -15,45 +15,45 @@ const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 // ----------------------------------------------------------------------------------------
 
 netlist_queue_t::netlist_queue_t(netlist_base_t &nl)
-    : netlist_timed_queue<netlist_net_t, netlist_time, 512>(), pstate_callback_t(),
-      m_netlist(nl),
-      m_qsize(0)
+	: netlist_timed_queue<netlist_net_t, netlist_time, 512>(), pstate_callback_t(),
+		m_netlist(nl),
+		m_qsize(0)
 {  }
 
 void netlist_queue_t::register_state(pstate_manager_t &manager, const pstring &module)
 {
-    NL_VERBOSE_OUT(("register_state\n"));
-    manager.save_manager(m_qsize, module + "." + "qsize");
-    manager.save_manager(m_times, module + "." + "times");
-    manager.save_manager(&(m_name[0][0]), module + "." + "names", sizeof(m_name));
+	NL_VERBOSE_OUT(("register_state\n"));
+	manager.save_item(m_qsize, module + "." + "qsize");
+	manager.save_item(m_times, module + "." + "times");
+	manager.save_item(&(m_name[0][0]), module + "." + "names", sizeof(m_name));
 }
 void netlist_queue_t::on_pre_save()
 {
-    NL_VERBOSE_OUT(("on_pre_save\n"));
-    m_qsize = this->count();
-    NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist->time().as_double(), qsize));
-    for (int i = 0; i < m_qsize; i++ )
-    {
-        m_times[i] =  this->listptr()[i].time().as_raw();
-        const char *p = this->listptr()[i].object().name().cstr();
-        int n = MIN(63, strlen(p));
-        strncpy(&(m_name[i][0]), p, n);
-        m_name[i][n] = 0;
-    }
+	NL_VERBOSE_OUT(("on_pre_save\n"));
+	m_qsize = this->count();
+	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist->time().as_double(), qsize));
+	for (int i = 0; i < m_qsize; i++ )
+	{
+		m_times[i] =  this->listptr()[i].time().as_raw();
+		const char *p = this->listptr()[i].object().name().cstr();
+		int n = MIN(63, strlen(p));
+		strncpy(&(m_name[i][0]), p, n);
+		m_name[i][n] = 0;
+	}
 }
 
 
 void netlist_queue_t::on_post_load()
 {
-    this->clear();
-    NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist->time().as_double(), qsize));
-    for (int i = 0; i < m_qsize; i++ )
-    {
-        netlist_net_t *n = m_netlist.find_net(&(m_name[i][0]));
-        NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
-        NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(), qtemp[i].m_time.as_double()));
-        this->push(netlist_queue_t::entry_t(netlist_time::from_raw(m_times[i]), *n));
-    }
+	this->clear();
+	NL_VERBOSE_OUT(("current time %f qsize %d\n", m_netlist->time().as_double(), qsize));
+	for (int i = 0; i < m_qsize; i++ )
+	{
+		netlist_net_t *n = m_netlist.find_net(&(m_name[i][0]));
+		NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
+		NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(), qtemp[i].m_time.as_double()));
+		this->push(netlist_queue_t::entry_t(netlist_time::from_raw(m_times[i]), *n));
+	}
 }
 
 // ----------------------------------------------------------------------------------------
@@ -108,13 +108,13 @@ ATTR_COLD void netlist_owned_object_t::init_object(netlist_core_device_t &dev,
 // ----------------------------------------------------------------------------------------
 
 netlist_base_t::netlist_base_t()
-    :   netlist_object_t(NETLIST, GENERIC),
-        m_time_ps(netlist_time::zero),
-        m_queue(*this),
-        m_rem(0),
-        m_div(NETLIST_DIV),
-        m_mainclock(NULL),
-        m_solver(NULL)
+	:   netlist_object_t(NETLIST, GENERIC),
+		m_time_ps(netlist_time::zero),
+		m_queue(*this),
+		m_rem(0),
+		m_div(NETLIST_DIV),
+		m_mainclock(NULL),
+		m_solver(NULL)
 {
 }
 
@@ -216,12 +216,12 @@ ATTR_HOT ATTR_ALIGN inline void netlist_base_t::update_time(const netlist_time t
 
 ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(INT32 &atime)
 {
-    if (m_mainclock == NULL)
-    {
-        while ( (atime > 0) && (m_queue.is_not_empty()))
-        {
-            const netlist_queue_t::entry_t &e = m_queue.pop();
-            update_time(e.time(), atime);
+	if (m_mainclock == NULL)
+	{
+		while ( (atime > 0) && (m_queue.is_not_empty()))
+		{
+			const netlist_queue_t::entry_t &e = m_queue.pop();
+			update_time(e.time(), atime);
 
 			//if (FATAL_ERROR_AFTER_NS)
 			//  NL_VERBOSE_OUT(("%s\n", e.object().netdev()->name().cstr());
@@ -254,8 +254,8 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(INT32 &atime)
 
 					NETLIB_NAME(mainclock)::mc_update(mcQ, time() + inc);
 
-                }
-                const netlist_queue_t::entry_t &e = m_queue.pop();
+				}
+				const netlist_queue_t::entry_t &e = m_queue.pop();
 
 				update_time(e.time(), atime);
 
