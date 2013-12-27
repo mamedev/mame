@@ -1160,36 +1160,6 @@ READ16_MEMBER(x68k_state::x68k_ppi_r)
 	return ppi->read(space,offset & 0x03);
 }
 
-READ16_MEMBER(x68k_state::x68k_rtc_r)
-{
-	return m_rtc->read(space, offset);
-}
-
-WRITE16_MEMBER(x68k_state::x68k_rtc_w)
-{
-	m_rtc->write(space, offset, data);
-}
-
-WRITE_LINE_MEMBER(x68k_state::x68k_rtc_alarm_irq)
-{
-	if(m_mfp.aer & 0x01)
-	{
-		if(state == 1)
-		{
-			m_mfp.gpio |= 0x01;
-			m_mfpdev->i0_w(1);
-		}
-	}
-	else
-	{
-		if(state == 0)
-		{
-			m_mfp.gpio &= ~0x01;
-			m_mfpdev->i0_w(0);
-		}
-	}
-}
-
 
 WRITE16_MEMBER(x68k_state::x68k_sram_w)
 {
@@ -1574,7 +1544,7 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
 	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(x68k_mfp_r, x68k_mfp_w)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE(x68k_rtc_r, x68k_rtc_w)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, mc68901_device, read, write, 0x00ff)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
@@ -1612,7 +1582,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
 	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(x68k_mfp_r, x68k_mfp_w)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE(x68k_rtc_r, x68k_rtc_w)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, mc68901_device, read, write, 0x00ff)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
@@ -1652,7 +1622,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE16(x68k_dmac_r, x68k_dmac_w,0xffffffff)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE16(x68k_areaset_r, x68k_areaset_w,0xffffffff)
 	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE16(x68k_mfp_r, x68k_mfp_w,0xffffffff)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE16(x68k_rtc_r, x68k_rtc_w,0xffffffff)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, mc68901_device, read, write, 0x00ff00ff)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16(x68k_sysport_r, x68k_sysport_w,0xffffffff)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16(x68k_fm_r, x68k_fm_w,0xffffffff)
@@ -1732,7 +1702,7 @@ static const okim6258_interface x68k_okim6258_interface =
 
 static RP5C15_INTERFACE( rtc_intf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state,x68k_rtc_alarm_irq),
+	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, i0_w),
 	DEVCB_NULL
 };
 

@@ -131,7 +131,6 @@ public:
 	} m_adpcm;
 	struct
 	{
-		int aer;   // [1]  GPIP active edge register.  Determines on which transition an IRQ is triggered.  0 = 1->0
 		int rsr;   // [21] Receiver status register
 		int tsr;   // [22] Transmitter status register
 		struct
@@ -326,8 +325,6 @@ public:
 	DECLARE_WRITE16_MEMBER(x68k_mfp_w);
 	DECLARE_WRITE16_MEMBER(x68k_ppi_w);
 	DECLARE_READ16_MEMBER(x68k_ppi_r);
-	DECLARE_READ16_MEMBER(x68k_rtc_r);
-	DECLARE_WRITE16_MEMBER(x68k_rtc_w);
 	DECLARE_WRITE16_MEMBER(x68k_sram_w);
 	DECLARE_READ16_MEMBER(x68k_sram_r);
 	DECLARE_READ32_MEMBER(x68k_sram32_r);
