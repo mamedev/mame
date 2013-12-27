@@ -125,9 +125,8 @@ void pc1350_state::machine_start()
 		space.nop_readwrite(0x2000, 0x3fff);
 	}
 
-	device_t *main_cpu = m_maincpu;
 	UINT8 *ram = memregion("maincpu")->base() + 0x2000;
-	UINT8 *cpu = sc61860_internal_ram(main_cpu);
+	UINT8 *cpu = m_maincpu->internal_ram();
 
 	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
 	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x5000);

@@ -9,6 +9,7 @@
 #ifndef PC1350_H_
 #define PC1350_H_
 
+#include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 
@@ -46,7 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(pc1350_keyboard_line_r);
 
 	virtual void machine_start();
-	required_device<cpu_device> m_maincpu;
+	required_device<sc61860_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
 protected:

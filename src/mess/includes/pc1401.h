@@ -9,6 +9,7 @@
 #ifndef PC1401_H_
 #define PC1401_H_
 
+#include "cpu/sc61860/sc61860.h"
 #include "machine/nvram.h"
 
 #define CONTRAST (ioport("DSW0")->read() & 0x07)
@@ -44,7 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc1401_lcd_write);
 
 	virtual void machine_start();
-	required_device<cpu_device> m_maincpu;
+	required_device<sc61860_device> m_maincpu;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

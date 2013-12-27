@@ -26,414 +26,412 @@
  *
  *****************************************************************************/
 
-INLINE UINT8 READ_OP(sc61860_state *cpustate)
+UINT8 sc61860_device::READ_OP()
 {
-	return cpustate->direct->read_decrypted_byte(cpustate->pc++);
+	return m_direct->read_decrypted_byte(m_pc++);
 }
 
-INLINE UINT8 READ_OP_ARG(sc61860_state *cpustate)
+UINT8 sc61860_device::READ_OP_ARG()
 {
-	return cpustate->direct->read_raw_byte(cpustate->pc++);
+	return m_direct->read_raw_byte(m_pc++);
 }
 
-INLINE UINT16 READ_OP_ARG_WORD(sc61860_state *cpustate)
+UINT16 sc61860_device::READ_OP_ARG_WORD()
 {
-	UINT16 t=cpustate->direct->read_decrypted_byte(cpustate->pc++)<<8;
-	t|=cpustate->direct->read_decrypted_byte(cpustate->pc++);
+	UINT16 t=m_direct->read_decrypted_byte(m_pc++)<<8;
+	t|=m_direct->read_decrypted_byte(m_pc++);
 	return t;
 }
 
-INLINE UINT8 READ_BYTE(sc61860_state *cpustate, UINT16 adr)
+UINT8 sc61860_device::READ_BYTE(UINT16 adr)
 {
-	return cpustate->program->read_byte(adr);
+	return m_program->read_byte(adr);
 }
 
-INLINE void WRITE_BYTE(sc61860_state *cpustate, UINT16 a, UINT8 v)
+void sc61860_device::WRITE_BYTE(UINT16 a, UINT8 v)
 {
-	cpustate->program->write_byte(a, v);
+	m_program->write_byte(a, v);
 }
 
-INLINE UINT8 READ_RAM(sc61860_state *cpustate, int r)
+UINT8 sc61860_device::READ_RAM(int r)
 {
-	return cpustate->ram[r];
+	return m_ram[r];
 }
 
-INLINE void WRITE_RAM(sc61860_state *cpustate, int r, UINT8 v)
+void sc61860_device::WRITE_RAM(int r, UINT8 v)
 {
-	cpustate->ram[r] = v;
+	m_ram[r] = v;
 }
 
-INLINE void PUSH(sc61860_state *cpustate, UINT8 v)
+void sc61860_device::PUSH(UINT8 v)
 {
-	cpustate->r--;
-	WRITE_RAM(cpustate, cpustate->r, v);
+	m_r--;
+	WRITE_RAM(m_r, v);
 }
 
-INLINE UINT8 POP(sc61860_state *cpustate)
+UINT8 sc61860_device::POP()
 {
-	UINT8 t = READ_RAM(cpustate, cpustate->r);
-	cpustate->r++;
+	UINT8 t = READ_RAM(m_r);
+	m_r++;
 	return t;
 }
 
-INLINE void sc61860_load_imm(sc61860_state *cpustate, int r, UINT8 v)
+void sc61860_device::sc61860_load_imm(int r, UINT8 v)
 {
-	WRITE_RAM(cpustate, r, v);
+	WRITE_RAM(r, v);
 }
 
-INLINE void sc61860_load(sc61860_state *cpustate)
+void sc61860_device::sc61860_load()
 {
-	WRITE_RAM(cpustate, A, READ_RAM(cpustate, cpustate->p));
+	WRITE_RAM(A, READ_RAM(m_p));
 }
 
-INLINE void sc61860_load_imm_p(sc61860_state *cpustate, UINT8 v)
+void sc61860_device::sc61860_load_imm_p(UINT8 v)
 {
-	cpustate->p=v&0x7f;
+	m_p=v&0x7f;
 }
 
-INLINE void sc61860_load_imm_q(sc61860_state *cpustate, UINT8 v)
+void sc61860_device::sc61860_load_imm_q(UINT8 v)
 {
-	cpustate->q=v&0x7f;
+	m_q=v&0x7f;
 }
 
-INLINE void sc61860_load_r(sc61860_state *cpustate)
+void sc61860_device::sc61860_load_r()
 {
-	cpustate->r = READ_RAM(cpustate, A) & 0x7f;
+	m_r = READ_RAM(A) & 0x7f;
 }
 
-INLINE void sc61860_load_ext(sc61860_state *cpustate, int r)
+void sc61860_device::sc61860_load_ext(int r)
 {
-	WRITE_RAM(cpustate, r, READ_BYTE(cpustate, cpustate->dp));
+	WRITE_RAM(r, READ_BYTE(m_dp));
 }
 
-INLINE void sc61860_load_dp(sc61860_state *cpustate)
+void sc61860_device::sc61860_load_dp()
 {
-	cpustate->dp=READ_OP_ARG_WORD(cpustate);
+	m_dp=READ_OP_ARG_WORD();
 }
 
-INLINE void sc61860_load_dl(sc61860_state *cpustate)
+void sc61860_device::sc61860_load_dl()
 {
-	cpustate->dp=(cpustate->dp&~0xff)|READ_OP_ARG(cpustate);
+	m_dp=(m_dp&~0xff)|READ_OP_ARG();
 }
 
-INLINE void sc61860_store_p(sc61860_state *cpustate)
+void sc61860_device::sc61860_store_p()
 {
-	WRITE_RAM(cpustate, A, cpustate->p);
+	WRITE_RAM(A, m_p);
 }
 
-INLINE void sc61860_store_q(sc61860_state *cpustate)
+void sc61860_device::sc61860_store_q()
 {
-	WRITE_RAM(cpustate, A, cpustate->q);
+	WRITE_RAM(A, m_q);
 }
 
-INLINE void sc61860_store_r(sc61860_state *cpustate)
+void sc61860_device::sc61860_store_r()
 {
-	WRITE_RAM(cpustate, A, cpustate->r);
+	WRITE_RAM(A, m_r);
 }
 
-INLINE void sc61860_store_ext(sc61860_state *cpustate, int r)
+void sc61860_device::sc61860_store_ext(int r)
 {
-	WRITE_BYTE(cpustate, cpustate->dp, READ_RAM(cpustate, r));
+	WRITE_BYTE(m_dp, READ_RAM(r));
 }
 
-INLINE void sc61860_exam(sc61860_state *cpustate, int a, int b)
+void sc61860_device::sc61860_exam(int a, int b)
 {
-	UINT8 t = READ_RAM(cpustate, a);
-	WRITE_RAM(cpustate, a, READ_RAM(cpustate, b));
-	WRITE_RAM(cpustate, b, t);
+	UINT8 t = READ_RAM(a);
+	WRITE_RAM(a, READ_RAM(b));
+	WRITE_RAM(b, t);
 }
 
-INLINE void sc61860_test(sc61860_state *cpustate, int reg, UINT8 value)
+void sc61860_device::sc61860_test(int reg, UINT8 value)
 {
-	cpustate->zero=(READ_RAM(cpustate, reg) & value)==0;
+	m_zero=(READ_RAM(reg) & value)==0;
 }
 
-INLINE void sc61860_test_ext(sc61860_state *cpustate)
+void sc61860_device::sc61860_test_ext()
 {
-	cpustate->zero=(READ_BYTE(cpustate, cpustate->dp)&READ_OP_ARG(cpustate))==0;
+	m_zero=(READ_BYTE(m_dp)&READ_OP_ARG())==0;
 }
 
-INLINE void sc61860_and(sc61860_state *cpustate, int reg, UINT8 value)
+void sc61860_device::sc61860_and(int reg, UINT8 value)
 {
-	UINT8 t = READ_RAM(cpustate, reg) & value;
-	WRITE_RAM(cpustate, reg,  t);
-	cpustate->zero=t==0;
+	UINT8 t = READ_RAM(reg) & value;
+	WRITE_RAM(reg,  t);
+	m_zero=t==0;
 }
 
-INLINE void sc61860_and_ext(sc61860_state *cpustate)
+void sc61860_device::sc61860_and_ext()
 {
-	UINT8 t = READ_BYTE(cpustate, cpustate->dp) & READ_OP_ARG(cpustate);
-	cpustate->zero=t==0;
-	WRITE_BYTE(cpustate, cpustate->dp, t);
+	UINT8 t = READ_BYTE(m_dp) & READ_OP_ARG();
+	m_zero=t==0;
+	WRITE_BYTE(m_dp, t);
 }
 
-INLINE void sc61860_or(sc61860_state *cpustate, int reg, UINT8 value)
+void sc61860_device::sc61860_or(int reg, UINT8 value)
 {
-	UINT8 t = READ_RAM(cpustate, reg) | value;
-	WRITE_RAM(cpustate, reg, t);
-	cpustate->zero=t==0;
+	UINT8 t = READ_RAM(reg) | value;
+	WRITE_RAM(reg, t);
+	m_zero=t==0;
 }
 
-INLINE void sc61860_or_ext(sc61860_state *cpustate)
+void sc61860_device::sc61860_or_ext()
 {
-	UINT8 t=READ_BYTE(cpustate, cpustate->dp)|READ_OP_ARG(cpustate);
-	cpustate->zero=t==0;
-	WRITE_BYTE(cpustate, cpustate->dp, t);
+	UINT8 t=READ_BYTE(m_dp)|READ_OP_ARG();
+	m_zero=t==0;
+	WRITE_BYTE(m_dp, t);
 }
 
-INLINE void sc61860_rotate_right(sc61860_state *cpustate)
+void sc61860_device::sc61860_rotate_right()
 {
-	int t = READ_RAM(cpustate, A);
-	if (cpustate->carry) t|=0x100;
-	cpustate->carry=t&1;
-	WRITE_RAM(cpustate, A, t>>1);
+	int t = READ_RAM(A);
+	if (m_carry) t|=0x100;
+	m_carry=t&1;
+	WRITE_RAM(A, t>>1);
 }
 
-INLINE void sc61860_rotate_left(sc61860_state *cpustate)
+void sc61860_device::sc61860_rotate_left()
 {
-	int t = READ_RAM(cpustate, A) << 1;
-	if (cpustate->carry) t|=1;
-	cpustate->carry=t&0x100;
-	WRITE_RAM(cpustate, A, t);
+	int t = READ_RAM(A) << 1;
+	if (m_carry) t|=1;
+	m_carry=t&0x100;
+	WRITE_RAM(A, t);
 }
 
-INLINE void sc61860_swap(sc61860_state *cpustate)
+void sc61860_device::sc61860_swap()
 {
-	int t = READ_RAM(cpustate, A);
-	WRITE_RAM(cpustate, A, (t<<4)|((t>>4)&0xf));
-}
-
-// q=reg sideeffect
-INLINE void sc61860_inc(sc61860_state *cpustate, int reg)
-{
-	UINT8 t = READ_RAM(cpustate, reg) + 1;
-	cpustate->q=reg;
-	WRITE_RAM(cpustate, reg, t);
-	cpustate->zero=t==0;
-	cpustate->carry=t==0;
-}
-
-INLINE void sc61860_inc_p(sc61860_state *cpustate)
-{
-	cpustate->p++;
+	int t = READ_RAM(A);
+	WRITE_RAM(A, (t<<4)|((t>>4)&0xf));
 }
 
 // q=reg sideeffect
-INLINE void sc61860_dec(sc61860_state *cpustate, int reg)
+void sc61860_device::sc61860_inc(int reg)
 {
-	UINT8 t = READ_RAM(cpustate, reg) - 1;
-	cpustate->q=reg;
-	WRITE_RAM(cpustate, reg, t);
-	cpustate->zero=t==0;
-	cpustate->carry=t==0xff;
+	UINT8 t = READ_RAM(reg) + 1;
+	m_q=reg;
+	WRITE_RAM(reg, t);
+	m_zero=t==0;
+	m_carry=t==0;
 }
 
-INLINE void sc61860_dec_p(sc61860_state *cpustate)
+void sc61860_device::sc61860_inc_p()
 {
-	cpustate->p--;
+	m_p++;
 }
 
-INLINE void sc61860_add(sc61860_state *cpustate, int reg, UINT8 value)
+// q=reg sideeffect
+void sc61860_device::sc61860_dec(int reg)
 {
-	int t = READ_RAM(cpustate, reg) + value;
-	WRITE_RAM(cpustate, reg, t);
-	cpustate->zero=(t&0xff)==0;
-	cpustate->carry=t>=0x100;
+	UINT8 t = READ_RAM(reg) - 1;
+	m_q=reg;
+	WRITE_RAM(reg, t);
+	m_zero=t==0;
+	m_carry=t==0xff;
 }
 
-INLINE void sc61860_add_carry(sc61860_state *cpustate)
+void sc61860_device::sc61860_dec_p()
 {
-	int t = READ_RAM(cpustate, cpustate->p) + READ_RAM(cpustate, A);
-	if (cpustate->carry) t++;
-	WRITE_RAM(cpustate, cpustate->p, t);
-	cpustate->zero=(t&0xff)==0;
-	cpustate->carry=t>=0x100;
+	m_p--;
+}
+
+void sc61860_device::sc61860_add(int reg, UINT8 value)
+{
+	int t = READ_RAM(reg) + value;
+	WRITE_RAM(reg, t);
+	m_zero=(t&0xff)==0;
+	m_carry=t>=0x100;
+}
+
+void sc61860_device::sc61860_add_carry()
+{
+	int t = READ_RAM(m_p) + READ_RAM(A);
+	if (m_carry) t++;
+	WRITE_RAM(m_p, t);
+	m_zero=(t&0xff)==0;
+	m_carry=t>=0x100;
 }
 
 // p++ sideeffect
-INLINE void sc61860_add_word(sc61860_state *cpustate)
+void sc61860_device::sc61860_add_word()
 {
-	int t = READ_RAM(cpustate, cpustate->p) + READ_RAM(cpustate, A), t2;
-	WRITE_RAM(cpustate, cpustate->p, t);
-	cpustate->p++;
-	t2 = READ_RAM(cpustate, cpustate->p) + READ_RAM(cpustate, B);
+	int t = READ_RAM(m_p) + READ_RAM(A), t2;
+	WRITE_RAM(m_p, t);
+	m_p++;
+	t2 = READ_RAM(m_p) + READ_RAM(B);
 	if (t>=0x100) t2++;
-	WRITE_RAM(cpustate, cpustate->p, t2);
-	cpustate->zero=(t2&0xff)==0 &&(t&0xff)==0;
-	cpustate->carry=t2>=0x100;
+	WRITE_RAM(m_p, t2);
+	m_zero=(t2&0xff)==0 &&(t&0xff)==0;
+	m_carry=t2>=0x100;
 }
 
 
-INLINE void sc61860_sub(sc61860_state *cpustate, int reg, UINT8 value)
+void sc61860_device::sc61860_sub(int reg, UINT8 value)
 {
-	int t = READ_RAM(cpustate, reg) - value;
-	WRITE_RAM(cpustate, reg, t);
-	cpustate->zero=(t&0xff)==0;
-	cpustate->carry=t<0;
+	int t = READ_RAM(reg) - value;
+	WRITE_RAM(reg, t);
+	m_zero=(t&0xff)==0;
+	m_carry=t<0;
 }
 
-INLINE void sc61860_sub_carry(sc61860_state *cpustate)
+void sc61860_device::sc61860_sub_carry()
 {
-	int t = READ_RAM(cpustate, cpustate->p) - READ_RAM(cpustate, A);
-	if (cpustate->carry) t--;
-	WRITE_RAM(cpustate, cpustate->p, t);
-	cpustate->zero=(t&0xff)==0;
-	cpustate->carry=t<0;
+	int t = READ_RAM(m_p) - READ_RAM(A);
+	if (m_carry) t--;
+	WRITE_RAM(m_p, t);
+	m_zero=(t&0xff)==0;
+	m_carry=t<0;
 }
 
 
 // p++ sideeffect
-INLINE void sc61860_sub_word(sc61860_state *cpustate)
+void sc61860_device::sc61860_sub_word()
 {
-	int t = READ_RAM(cpustate, cpustate->p) - READ_RAM(cpustate, A), t2;
-	WRITE_RAM(cpustate, cpustate->p, t);
-	cpustate->p++;
-	t2 = READ_RAM(cpustate, cpustate->p) - READ_RAM(cpustate, B);
+	int t = READ_RAM(m_p) - READ_RAM(A), t2;
+	WRITE_RAM(m_p, t);
+	m_p++;
+	t2 = READ_RAM(m_p) - READ_RAM(B);
 	if (t<0) t2--;
-	WRITE_RAM(cpustate, cpustate->p, t2);
-	cpustate->zero=(t2&0xff)==0 && (t&0xff)==0;
-	cpustate->carry=t2<0;
+	WRITE_RAM(m_p, t2);
+	m_zero=(t2&0xff)==0 && (t&0xff)==0;
+	m_carry=t2<0;
 }
 
-INLINE void sc61860_cmp(sc61860_state *cpustate, int reg, UINT8 value)
+void sc61860_device::sc61860_cmp(int reg, UINT8 value)
 {
-	int t = READ_RAM(cpustate, reg) - value;
-	cpustate->zero=t==0;
-	cpustate->carry=t<0;
+	int t = READ_RAM(reg) - value;
+	m_zero=t==0;
+	m_carry=t<0;
 }
 
-INLINE void sc61860_pop(sc61860_state *cpustate)
+void sc61860_device::sc61860_pop()
 {
-	WRITE_RAM(cpustate, A, POP(cpustate));
+	WRITE_RAM(A, POP());
 }
 
-INLINE void sc61860_push(sc61860_state *cpustate)
+void sc61860_device::sc61860_push()
 {
-	PUSH(cpustate, READ_RAM(cpustate, A));
+	PUSH(READ_RAM(A));
 }
 
-INLINE void sc61860_prepare_table_call(sc61860_state *cpustate)
+void sc61860_device::sc61860_prepare_table_call()
 {
 	int adr;
-	cpustate->h=READ_OP(cpustate);
-	adr=READ_OP_ARG_WORD(cpustate);
-	PUSH(cpustate, adr>>8);
-	PUSH(cpustate, adr&0xff);
+	m_h=READ_OP();
+	adr=READ_OP_ARG_WORD();
+	PUSH(adr>>8);
+	PUSH(adr&0xff);
 }
 
-INLINE void sc61860_execute_table_call(sc61860_state *cpustate)
+void sc61860_device::sc61860_execute_table_call()
 {
 	int i, v, adr;
-	for (i=0; i<cpustate->h; i++) {
-		v=READ_OP(cpustate);
-		adr=READ_OP_ARG_WORD(cpustate);
-		cpustate->zero=v==READ_RAM(cpustate, A);
-		if (cpustate->zero) {
-			cpustate->pc=adr;
+	for (i=0; i<m_h; i++) {
+		v=READ_OP();
+		adr=READ_OP_ARG_WORD();
+		m_zero=v==READ_RAM(A);
+		if (m_zero) {
+			m_pc=adr;
 			return;
 		}
 	}
-	cpustate->pc=READ_OP_ARG_WORD(cpustate);
+	m_pc=READ_OP_ARG_WORD();
 }
 
 
-INLINE void sc61860_call(sc61860_state *cpustate, UINT16 adr)
+void sc61860_device::sc61860_call(UINT16 adr)
 {
-	PUSH(cpustate, cpustate->pc>>8);
-	PUSH(cpustate, cpustate->pc&0xff);
-	cpustate->pc=adr;
+	PUSH(m_pc>>8);
+	PUSH(m_pc&0xff);
+	m_pc=adr;
 }
 
-INLINE void sc61860_return(sc61860_state *cpustate)
+void sc61860_device::sc61860_return()
 {
-	UINT16 t=POP(cpustate);
-	t|=POP(cpustate)<<8;
-	cpustate->pc=t;
+	UINT16 t=POP();
+	t|=POP()<<8;
+	m_pc=t;
 }
 
-INLINE void sc61860_jump(sc61860_state *cpustate, int yes)
+void sc61860_device::sc61860_jump(int yes)
 {
-	UINT16 adr = READ_OP_ARG_WORD(cpustate);
+	UINT16 adr = READ_OP_ARG_WORD();
 	if (yes) {
-		cpustate->pc=adr;
+		m_pc=adr;
 	}
 }
 
-INLINE void sc61860_jump_rel_plus(sc61860_state *cpustate, int yes)
+void sc61860_device::sc61860_jump_rel_plus(int yes)
 {
-	UINT16 adr = cpustate->pc + READ_OP_ARG(cpustate);
+	UINT16 adr = m_pc + READ_OP_ARG();
 	if (yes) {
-		cpustate->pc=adr;
-		cpustate->icount-=3;
+		m_pc=adr;
+		m_icount-=3;
 	}
 }
 
-INLINE void sc61860_jump_rel_minus(sc61860_state *cpustate, int yes)
+void sc61860_device::sc61860_jump_rel_minus(int yes)
 {
-	UINT16 adr = cpustate->pc - READ_OP_ARG(cpustate);
+	UINT16 adr = m_pc - READ_OP_ARG();
 	if (yes) {
-		cpustate->pc=adr;
-		cpustate->icount-=3;
+		m_pc=adr;
+		m_icount-=3;
 	}
 }
 
-INLINE void sc61860_loop(sc61860_state *cpustate)
+void sc61860_device::sc61860_loop()
 {
-	UINT16 adr = cpustate->pc - READ_OP_ARG(cpustate);
-	UINT8 t = READ_RAM(cpustate, cpustate->r) - 1;
-	WRITE_RAM(cpustate, cpustate->r, t);
-	cpustate->zero=t==0;
-	cpustate->carry=t==0xff;
-	if (!cpustate->carry) {
-		cpustate->pc=adr;
-		adr=POP(cpustate);
-		cpustate->icount-=3;
+	UINT16 adr = m_pc - READ_OP_ARG();
+	UINT8 t = READ_RAM(m_r) - 1;
+	WRITE_RAM(m_r, t);
+	m_zero=t==0;
+	m_carry=t==0xff;
+	if (!m_carry) {
+		m_pc=adr;
+		adr=POP();
+		m_icount-=3;
 	}
 }
 
-INLINE void sc61860_leave(sc61860_state *cpustate)
+void sc61860_device::sc61860_leave()
 {
-	WRITE_RAM(cpustate, cpustate->r, 0);
+	WRITE_RAM(m_r, 0);
 }
 
-INLINE void sc61860_wait(sc61860_state *cpustate)
+void sc61860_device::sc61860_wait()
 {
-	int t=READ_OP(cpustate);
-	cpustate->icount-=t;
-	cpustate->icount-=t;
-	cpustate->icount-=3;
+	int t=READ_OP();
+	m_icount-=t;
+	m_icount-=t;
+	m_icount-=3;
 }
 
-INLINE void sc61860_set_carry(sc61860_state *cpustate)
+void sc61860_device::sc61860_set_carry()
 {
-	cpustate->carry=1;
-	cpustate->zero=1;
+	m_carry=1;
+	m_zero=1;
 }
 
-INLINE void sc61860_reset_carry(sc61860_state *cpustate)
+void sc61860_device::sc61860_reset_carry()
 {
-	cpustate->carry=0;
-	cpustate->zero=1;
+	m_carry=0;
+	m_zero=1;
 }
 
-INLINE void sc61860_out_a(sc61860_state *cpustate)
+void sc61860_device::sc61860_out_a()
 {
-	cpustate->q=IA;
-	if (!cpustate->outa.isnull())
-		cpustate->outa(0,READ_RAM(cpustate, IA));
+	m_q=IA;
+	m_outa(READ_RAM(IA));
 }
 
-INLINE void sc61860_out_b(sc61860_state *cpustate)
+void sc61860_device::sc61860_out_b()
 {
-	cpustate->q=IB;
-	if (!cpustate->outb.isnull())
-		cpustate->outb(0, READ_RAM(cpustate, IB));
+	m_q=IB;
+	m_outb( READ_RAM(IB));
 }
 
-INLINE void sc61860_out_f(sc61860_state *cpustate)
+void sc61860_device::sc61860_out_f()
 {
-	cpustate->q=F0;
-	/*READ_RAM(cpustate, F0); */
+	m_q=F0;
+	/*READ_RAM(F0); */
 }
 
 
@@ -444,28 +442,27 @@ INLINE void sc61860_out_f(sc61860_state *cpustate)
    c4 beeper frequency (1 4khz, 0 2khz), or (c5=0) membran pos1/pos2
    c5 beeper on
    c6 beeper steuerung*/
-INLINE void sc61860_out_c(sc61860_state *cpustate)
+void sc61860_device::sc61860_out_c()
 {
-	cpustate->q=C;
-	if (!cpustate->outc.isnull())
-		cpustate->outc(0, READ_RAM(cpustate, C));
-	cpustate->c = READ_RAM(cpustate, C);
+	m_q=C;
+	m_outc( READ_RAM(C));
+	m_c = READ_RAM(C);
 }
 
-INLINE void sc61860_in_a(sc61860_state *cpustate)
+void sc61860_device::sc61860_in_a()
 {
 	int data=0;
-	if (!cpustate->ina.isnull()) data=cpustate->ina(0);
-	WRITE_RAM(cpustate, A, data);
-	cpustate->zero=data==0;
+	data=m_ina();
+	WRITE_RAM(A, data);
+	m_zero=data==0;
 }
 
-INLINE void sc61860_in_b(sc61860_state *cpustate)
+void sc61860_device::sc61860_in_b()
 {
 	int data=0;
-	if (!cpustate->inb.isnull()) data=cpustate->inb(0);
-	WRITE_RAM(cpustate, A, data);
-	cpustate->zero=data==0;
+	data=m_inb();
+	WRITE_RAM(A, data);
+	m_zero=data==0;
 }
 
 /* 0 systemclock 512ms
@@ -476,16 +473,16 @@ INLINE void sc61860_in_b(sc61860_state *cpustate)
    5 ?
    6 reset
    7 cassette input */
-INLINE void sc61860_test_special(sc61860_state *cpustate)
+void sc61860_device::sc61860_test_special()
 {
 	int t=0;
-	if (cpustate->timer.t512ms) t|=1;
-	if (cpustate->timer.t2ms) t|=2;
-	if (!cpustate->brk.isnull()&&cpustate->brk()) t|=8;
-	if (!cpustate->reset.isnull()&&cpustate->reset()) t|=0x40;
-	if (!cpustate->x.isnull()&&cpustate->x()) t|=0x80;
+	if (m_timer.t512ms) t|=1;
+	if (m_timer.t2ms) t|=2;
+	if (!m_brk.isnull()&&m_brk()) t|=8;
+	if (!m_reset.isnull()&&m_reset()) t|=0x40;
+	if (!m_x.isnull()&&m_x()) t|=0x80;
 
-	cpustate->zero=(t&READ_OP(cpustate))==0;
+	m_zero=(t&READ_OP())==0;
 }
 
 /************************************************************************************
@@ -493,281 +490,281 @@ INLINE void sc61860_test_special(sc61860_state *cpustate)
 ***********************************************************************************/
 
 // p-=I+1 sideeffect
-INLINE void sc61860_add_bcd_a(sc61860_state *cpustate)
+void sc61860_device::sc61860_add_bcd_a()
 {
-	UINT8 help = READ_RAM(cpustate, A);
+	UINT8 help = READ_RAM(A);
 	int i, hlp, hlp1 = 0;
-	cpustate->zero=1;
-	for (i=0; i <= READ_RAM(cpustate, I); i++) {
-		int t = READ_RAM(cpustate, cpustate->p);
+	m_zero=1;
+	for (i=0; i <= READ_RAM(I); i++) {
+		int t = READ_RAM(m_p);
 		hlp1 = (t & 0x0f) + (help & 0x0f) + hlp1;
 		if (hlp1 > 9) { hlp = hlp1 - 0x0a; hlp1 = 0x10; }
 		else { hlp = hlp1; hlp1 = 0x00; }
 		hlp1 = (t & 0xf0) + (help & 0xf0) + hlp1;
-		if (hlp1 > 0x90) { WRITE_RAM(cpustate, cpustate->p, hlp1 - 0xa0 + hlp); hlp1 = 1; }
-		else { WRITE_RAM(cpustate, cpustate->p, hlp1 + hlp); hlp1 = 0; }
-		if ( READ_RAM(cpustate, cpustate->p) != 0 ) cpustate->zero = 0;
-		cpustate->p--;
+		if (hlp1 > 0x90) { WRITE_RAM(m_p, hlp1 - 0xa0 + hlp); hlp1 = 1; }
+		else { WRITE_RAM(m_p, hlp1 + hlp); hlp1 = 0; }
+		if ( READ_RAM(m_p) != 0 ) m_zero = 0;
+		m_p--;
 		help = 0;
 	}
-	cpustate->carry= ( hlp1 ) ? 1 : 0;
-	cpustate->icount-=3*(READ_RAM(cpustate, I)+1);
+	m_carry= ( hlp1 ) ? 1 : 0;
+	m_icount-=3*(READ_RAM(I)+1);
 }
 
 
 // p-=I+1, q-=I+2 sideeffect
-INLINE void sc61860_add_bcd(sc61860_state *cpustate)
+void sc61860_device::sc61860_add_bcd()
 {
 	int i, hlp, hlp1 = 0;
-	cpustate->zero=1;
-	for (i=0; i <= READ_RAM(cpustate, I); i++) {
-		int t = READ_RAM(cpustate, cpustate->p);
-		int t2 = READ_RAM(cpustate, cpustate->q);
+	m_zero=1;
+	for (i=0; i <= READ_RAM(I); i++) {
+		int t = READ_RAM(m_p);
+		int t2 = READ_RAM(m_q);
 		hlp1 = (t & 0x0f) + (t2 & 0x0f) + hlp1;
 		if (hlp1 > 9) { hlp = hlp1 - 0x0a; hlp1 = 0x10; }
 		else { hlp = hlp1; hlp1 = 0x00; }
 		hlp1 = (t & 0xf0) + (t2 & 0xf0) + hlp1;
-		cpustate->q--;
-		if (hlp1 > 0x90) { WRITE_RAM(cpustate, cpustate->p, hlp1 - 0xa0 + hlp); hlp1 = 1; }
-		else { WRITE_RAM(cpustate, cpustate->p, hlp1 + hlp); hlp1 = 0; }
-		if ( READ_RAM(cpustate, cpustate->p) != 0 ) cpustate->zero = 0;
-		cpustate->p--;
+		m_q--;
+		if (hlp1 > 0x90) { WRITE_RAM(m_p, hlp1 - 0xa0 + hlp); hlp1 = 1; }
+		else { WRITE_RAM(m_p, hlp1 + hlp); hlp1 = 0; }
+		if ( READ_RAM(m_p) != 0 ) m_zero = 0;
+		m_p--;
 	}
-	cpustate->carry= ( hlp1 ) ? 1 : 0;
-	cpustate->icount-=3*(READ_RAM(cpustate, I)+1);
-	cpustate->q--;
+	m_carry= ( hlp1 ) ? 1 : 0;
+	m_icount-=3*(READ_RAM(I)+1);
+	m_q--;
 }
 
 
 // p-=I+1 sideeffect
-INLINE void sc61860_sub_bcd_a(sc61860_state *cpustate)
+void sc61860_device::sc61860_sub_bcd_a()
 {
-	UINT8 help = READ_RAM(cpustate, A);
+	UINT8 help = READ_RAM(A);
 	int i, hlp, hlp1 = 0;
-	cpustate->zero=1;
-	for (i=0; i <= READ_RAM(cpustate, I); i++) {
-		int t = READ_RAM(cpustate, cpustate->p);
+	m_zero=1;
+	for (i=0; i <= READ_RAM(I); i++) {
+		int t = READ_RAM(m_p);
 		hlp1 = (t & 0x0f) - (help & 0x0f) - hlp1;
 		if ( hlp1 < 0 ) { hlp = hlp1 + 0x0a; hlp1 = 0x10; }
 		else { hlp = hlp1; hlp1 = 0x00; }
 		hlp1 = (t & 0xf0) - (help & 0xf0) - hlp1;
-		if ( hlp1 < 0 ) { WRITE_RAM(cpustate, cpustate->p, hlp1 + 0xa0 + hlp); hlp1 = 1; }
-		else { WRITE_RAM(cpustate, cpustate->p, hlp1 + hlp); hlp1 = 0; }
-		if ( READ_RAM(cpustate, cpustate->p) != 0 ) cpustate->zero = 0;
-		cpustate->p--;
+		if ( hlp1 < 0 ) { WRITE_RAM(m_p, hlp1 + 0xa0 + hlp); hlp1 = 1; }
+		else { WRITE_RAM(m_p, hlp1 + hlp); hlp1 = 0; }
+		if ( READ_RAM(m_p) != 0 ) m_zero = 0;
+		m_p--;
 		help = 0;
 	}
-	cpustate->carry= ( hlp1 ) ? 1 : 0;
-	cpustate->icount-=3*(READ_RAM(cpustate, I)+1);
+	m_carry= ( hlp1 ) ? 1 : 0;
+	m_icount-=3*(READ_RAM(I)+1);
 }
 
 
 // p-=I+1, q-=I+2 sideeffect
-INLINE void sc61860_sub_bcd(sc61860_state *cpustate)
+void sc61860_device::sc61860_sub_bcd()
 {
 	int i, hlp, hlp1 = 0;
-	cpustate->zero=1;
-	for (i=0; i <= READ_RAM(cpustate, I); i++) {
-		int t = READ_RAM(cpustate, cpustate->p);
-		int t2 = READ_RAM(cpustate, cpustate->q);
+	m_zero=1;
+	for (i=0; i <= READ_RAM(I); i++) {
+		int t = READ_RAM(m_p);
+		int t2 = READ_RAM(m_q);
 		hlp1 = (t & 0x0f) - (t2 & 0x0f) - hlp1;
 		if ( hlp1 < 0 ) { hlp = hlp1 + 0x0a; hlp1 = 0x10; }
 		else { hlp = hlp1; hlp1 = 0x00; }
 		hlp1 = (t & 0xf0) - (t2 & 0xf0) - hlp1;
-		cpustate->q--;
-		if ( hlp1 < 0 ) { WRITE_RAM(cpustate, cpustate->p, hlp1 + 0xa0 + hlp); hlp1 = 1; }
-		else { WRITE_RAM(cpustate, cpustate->p, hlp1 + hlp); hlp1 = 0; }
-		if ( READ_RAM(cpustate, cpustate->p) != 0 ) cpustate->zero = 0;
-		cpustate->p--;
+		m_q--;
+		if ( hlp1 < 0 ) { WRITE_RAM(m_p, hlp1 + 0xa0 + hlp); hlp1 = 1; }
+		else { WRITE_RAM(m_p, hlp1 + hlp); hlp1 = 0; }
+		if ( READ_RAM(m_p) != 0 ) m_zero = 0;
+		m_p--;
 	}
-	cpustate->carry= ( hlp1 ) ? 1 : 0;
-	cpustate->icount-=3*(READ_RAM(cpustate, I)+1);
-	cpustate->q--;
+	m_carry= ( hlp1 ) ? 1 : 0;
+	m_icount-=3*(READ_RAM(I)+1);
+	m_q--;
 }
 
 /* side effect p-i-1 -> p correct! */
-INLINE void sc61860_shift_left_nibble(sc61860_state *cpustate)
+void sc61860_device::sc61860_shift_left_nibble()
 {
 	int i,t=0;
-	for (i=0; i<=READ_RAM(cpustate, I); i++) {
-		t |= READ_RAM(cpustate, cpustate->p)<<4;
-		WRITE_RAM(cpustate, cpustate->p, t);
-		cpustate->p--;
+	for (i=0; i<=READ_RAM(I); i++) {
+		t |= READ_RAM(m_p)<<4;
+		WRITE_RAM(m_p, t);
+		m_p--;
 		t>>=8;
-		cpustate->icount--;
+		m_icount--;
 	}
 }
 
 /* side effect p+i+1 -> p correct! */
-INLINE void sc61860_shift_right_nibble(sc61860_state *cpustate)
+void sc61860_device::sc61860_shift_right_nibble()
 {
 	int i,t=0;
-	for (i=0; i<=READ_RAM(cpustate, I); i++) {
-		t |= READ_RAM(cpustate, cpustate->p);
-		WRITE_RAM(cpustate, cpustate->p, t>>4);
-		cpustate->p++;
+	for (i=0; i<=READ_RAM(I); i++) {
+		t |= READ_RAM(m_p);
+		WRITE_RAM(m_p, t>>4);
+		m_p++;
 		t=(t<<8)&0xf00;
-		cpustate->icount--;
+		m_icount--;
 	}
 }
 
 // q=reg+1 sideeffect
-INLINE void sc61860_inc_load_dp(sc61860_state *cpustate, int reg)
+void sc61860_device::sc61860_inc_load_dp(int reg)
 {
-	UINT8 t = READ_RAM(cpustate, reg) + 1;
-	UINT8 t2 = READ_RAM(cpustate, reg + 1);
-	WRITE_RAM(cpustate, reg, t);
-	if (t == 0) { t2++; WRITE_RAM(cpustate, reg + 1, t2); }
-	cpustate->dp=t|(t2<<8);
-	cpustate->q=reg+1;
+	UINT8 t = READ_RAM(reg) + 1;
+	UINT8 t2 = READ_RAM(reg + 1);
+	WRITE_RAM(reg, t);
+	if (t == 0) { t2++; WRITE_RAM(reg + 1, t2); }
+	m_dp=t|(t2<<8);
+	m_q=reg+1;
 }
 
 // q=reg+1 sideeffect
-INLINE void sc61860_dec_load_dp(sc61860_state *cpustate, int reg)
+void sc61860_device::sc61860_dec_load_dp(int reg)
 {
-	UINT8 t = READ_RAM(cpustate, reg) - 1;
-	UINT8 t2 = READ_RAM(cpustate, reg + 1);
-	WRITE_RAM(cpustate, reg, t);
-	if (t == 0xff) { t2--; WRITE_RAM(cpustate, reg + 1, t2); }
-	cpustate->dp=t|(t2<<8);
-	cpustate->q=reg+1;
+	UINT8 t = READ_RAM(reg) - 1;
+	UINT8 t2 = READ_RAM(reg + 1);
+	WRITE_RAM(reg, t);
+	if (t == 0xff) { t2--; WRITE_RAM(reg + 1, t2); }
+	m_dp=t|(t2<<8);
+	m_q=reg+1;
 }
 
 // q=XH sideeffect
-INLINE void sc61860_inc_load_dp_load(sc61860_state *cpustate)
+void sc61860_device::sc61860_inc_load_dp_load()
 {
-	sc61860_inc_load_dp(cpustate, XL);
-	WRITE_RAM(cpustate, A, READ_BYTE(cpustate, cpustate->dp));
+	sc61860_inc_load_dp(XL);
+	WRITE_RAM(A, READ_BYTE(m_dp));
 }
 
 // q=XH sideeffect
-INLINE void sc61860_dec_load_dp_load(sc61860_state *cpustate)
+void sc61860_device::sc61860_dec_load_dp_load()
 {
-	sc61860_dec_load_dp(cpustate, XL);
-	WRITE_RAM(cpustate, A, READ_BYTE(cpustate, cpustate->dp));
+	sc61860_dec_load_dp(XL);
+	WRITE_RAM(A, READ_BYTE(m_dp));
 }
 
 // q=YH sideeffect
-INLINE void sc61860_inc_load_dp_store(sc61860_state *cpustate)
+void sc61860_device::sc61860_inc_load_dp_store()
 {
-	sc61860_inc_load_dp(cpustate, YL);
-	WRITE_BYTE(cpustate, cpustate->dp, READ_RAM(cpustate, A));
+	sc61860_inc_load_dp(YL);
+	WRITE_BYTE(m_dp, READ_RAM(A));
 }
 
 // q=YH sideeffect
-INLINE void sc61860_dec_load_dp_store(sc61860_state *cpustate)
+void sc61860_device::sc61860_dec_load_dp_store()
 {
-	sc61860_dec_load_dp(cpustate, YL);
-	WRITE_BYTE(cpustate, cpustate->dp, READ_RAM(cpustate, A));
+	sc61860_dec_load_dp(YL);
+	WRITE_BYTE(m_dp, READ_RAM(A));
 }
 
-INLINE void sc61860_fill(sc61860_state *cpustate)
+void sc61860_device::sc61860_fill()
 {
 	int i;
-	for (i=0;i<=READ_RAM(cpustate, I);i++) {
-		WRITE_RAM(cpustate, cpustate->p, READ_RAM(cpustate, A)); /* could be overwritten? */
-		cpustate->p++;
-		cpustate->icount--;
+	for (i=0;i<=READ_RAM(I);i++) {
+		WRITE_RAM(m_p, READ_RAM(A)); /* could be overwritten? */
+		m_p++;
+		m_icount--;
 	}
 }
 
-INLINE void sc61860_fill_ext(sc61860_state *cpustate)
+void sc61860_device::sc61860_fill_ext()
 {
 	int i;
-	for (i=0;i<=READ_RAM(cpustate, I);i++) {
-		WRITE_BYTE(cpustate, cpustate->dp, READ_RAM(cpustate, A));
-		if (i!=READ_RAM(cpustate, I)) cpustate->dp++;
-		cpustate->icount-=3;
+	for (i=0;i<=READ_RAM(I);i++) {
+		WRITE_BYTE(m_dp, READ_RAM(A));
+		if (i!=READ_RAM(I)) m_dp++;
+		m_icount-=3;
 	}
 }
 
 // p+=count+1, q+=count+1 sideeffects
-INLINE void sc61860_copy(sc61860_state *cpustate, int count)
+void sc61860_device::sc61860_copy(int count)
 {
 	int i;
 	for (i=0; i<=count; i++) {
-		WRITE_RAM(cpustate, cpustate->p, READ_RAM(cpustate, cpustate->q));
-		cpustate->p++;
-		cpustate->q++;
-		cpustate->icount-=2;
+		WRITE_RAM(m_p, READ_RAM(m_q));
+		m_p++;
+		m_q++;
+		m_icount-=2;
 	}
 
 }
 
 // p+=count+1, dp+=count sideeffects
-INLINE void sc61860_copy_ext(sc61860_state *cpustate, int count)
+void sc61860_device::sc61860_copy_ext(int count)
 {
 	int i;
 	for (i=0; i<=count; i++) {
-		WRITE_RAM(cpustate, cpustate->p, READ_BYTE(cpustate, cpustate->dp));
-		cpustate->p++;
-		if (i!=count) cpustate->dp++;
-		cpustate->icount-=4;
+		WRITE_RAM(m_p, READ_BYTE(m_dp));
+		m_p++;
+		if (i!=count) m_dp++;
+		m_icount-=4;
 	}
 }
 
-INLINE void sc61860_copy_int(sc61860_state *cpustate, int count)
+void sc61860_device::sc61860_copy_int(int count)
 {
 	int i;
 	for (i=0; i<=count; i++) {
-		UINT8 t = READ_BYTE(cpustate, (READ_RAM(cpustate, A)|(READ_RAM(cpustate, B)<<8))); /* internal rom! */
-		WRITE_RAM(cpustate, cpustate->p, t);
-		cpustate->p++;
+		UINT8 t = READ_BYTE((READ_RAM(A)|(READ_RAM(B)<<8))); /* internal rom! */
+		WRITE_RAM(m_p, t);
+		m_p++;
 		if (i!=count) {
-			t = READ_RAM(cpustate, A) + 1;
-			WRITE_RAM(cpustate, A, t);
+			t = READ_RAM(A) + 1;
+			WRITE_RAM(A, t);
 			if (t==0) {
-				t = READ_RAM(cpustate, B) + 1;
-				WRITE_RAM(cpustate, B, t);
+				t = READ_RAM(B) + 1;
+				WRITE_RAM(B, t);
 			}
 		}
-		cpustate->icount-=4;
+		m_icount-=4;
 	}
 }
 
-INLINE void sc61860_exchange(sc61860_state *cpustate, int count)
+void sc61860_device::sc61860_exchange(int count)
 {
 	int i;
 	UINT8 t;
 	for (i=0; i<=count; i++) {
-		t = READ_RAM(cpustate, cpustate->p);
-		WRITE_RAM(cpustate, cpustate->p, READ_RAM(cpustate, cpustate->q));
-		WRITE_RAM(cpustate, cpustate->q, t);
-		cpustate->p++;
-		cpustate->q++;
-		cpustate->icount-=3;
+		t = READ_RAM(m_p);
+		WRITE_RAM(m_p, READ_RAM(m_q));
+		WRITE_RAM(m_q, t);
+		m_p++;
+		m_q++;
+		m_icount-=3;
 	}
 }
 
-INLINE void sc61860_exchange_ext(sc61860_state *cpustate, int count)
+void sc61860_device::sc61860_exchange_ext(int count)
 {
 	int i;
 	UINT8 t;
 	for (i=0; i<=count; i++) {
-		t = READ_RAM(cpustate, cpustate->p);
-		WRITE_RAM(cpustate, cpustate->p, READ_BYTE(cpustate, cpustate->dp));
-		cpustate->p++;
-		WRITE_BYTE(cpustate, cpustate->dp, t);
-		if (i!=count) cpustate->dp++;
-		cpustate->icount-=6;
+		t = READ_RAM(m_p);
+		WRITE_RAM(m_p, READ_BYTE(m_dp));
+		m_p++;
+		WRITE_BYTE(m_dp, t);
+		if (i!=count) m_dp++;
+		m_icount-=6;
 	}
 }
 
 // undocumented
 // only 1 opcode working in pc1403
 // both opcodes working in pc1350
-INLINE void sc61860_wait_x(sc61860_state *cpustate, int level)
+void sc61860_device::sc61860_wait_x(int level)
 {
 	int c;
-	cpustate->zero=level;
+	m_zero=level;
 
-	if (!cpustate->x.isnull()) {
-		for (c=READ_RAM(cpustate, I); c>=0; c--) {
-			UINT8 t = (READ_RAM(cpustate, cpustate->p)+1)&0x7f;
-			WRITE_RAM(cpustate, cpustate->p, t);
-			cpustate->zero=cpustate->x();
-			cpustate->icount-=4;
-			if (level != cpustate->zero) break;
+	if (!m_x.isnull()) {
+		for (c=READ_RAM(I); c>=0; c--) {
+			UINT8 t = (READ_RAM(m_p)+1)&0x7f;
+			WRITE_RAM(m_p, t);
+			m_zero=m_x();
+			m_icount-=4;
+			if (level != m_zero) break;
 		}
 	}
 }

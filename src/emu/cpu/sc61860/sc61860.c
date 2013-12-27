@@ -55,61 +55,45 @@
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-/****************************************************************************
- * The 61860 registers.
- ****************************************************************************/
-struct sc61860_state
+
+const device_type SC61860 = &device_creator<sc61860_device>;
+
+
+sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, SC61860, "SC61860", tag, owner, clock, "sc61860", __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
+	, m_reset(*this)
+	, m_brk(*this)
+	, m_x(*this)
+	, m_ina(*this)
+	, m_outa(*this)
+	, m_inb(*this)
+	, m_outb(*this)
+	, m_outc(*this)
 {
-	sc61860_cpu_core *config;
-	UINT8 p, q, r; //7 bits only?
-
-	UINT8 c;        // port c, used for HLT.
-	UINT8 d, h;
-	UINT16 oldpc, pc, dp;
-
-	int carry, zero;
-
-	struct { int t2ms, t512ms; int count; } timer;
-
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	int icount;
-	UINT8 ram[0x100]; // internal special ram, should be 0x60, 0x100 to avoid memory corruption for now
-
-	devcb_resolved_read_line reset;
-	devcb_resolved_read_line brk;
-	devcb_resolved_read_line x;
-	devcb_resolved_read8 ina;
-	devcb_resolved_write8 outa;
-	devcb_resolved_read8 inb;
-	devcb_resolved_write8 outb;
-	devcb_resolved_write8 outc;
-
-};
-
-INLINE sc61860_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == SC61860);
-	return (sc61860_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-UINT8 *sc61860_internal_ram(device_t *device)
+
+offs_t sc61860_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	sc61860_state *cpustate = get_safe_token(device);
-	return cpustate->ram;
+	extern CPU_DISASSEMBLE( sc61860 );
+	return CPU_DISASSEMBLE_NAME(sc61860)(this, buffer, pc, oprom, opram, options);
 }
 
-static TIMER_CALLBACK(sc61860_2ms_tick)
+
+UINT8 *sc61860_device::internal_ram()
 {
-	sc61860_state *cpustate = (sc61860_state *)ptr;
-	if (--cpustate->timer.count == 0)
+	return m_ram;
+}
+
+TIMER_CALLBACK_MEMBER(sc61860_device::sc61860_2ms_tick)
+{
+	if (--m_timer.count == 0)
 	{
-		cpustate->timer.count = 128;
-		cpustate->timer.t512ms = !cpustate->timer.t512ms;
+		m_timer.count = 128;
+		m_timer.t512ms = !m_timer.t512ms;
 	}
-	cpustate->timer.t2ms = !cpustate->timer.t2ms;
+	m_timer.t2ms = !m_timer.t2ms;
 }
 
 /***************************************************************
@@ -118,170 +102,161 @@ static TIMER_CALLBACK(sc61860_2ms_tick)
 #include "scops.c"
 #include "sctable.c"
 
-static CPU_RESET( sc61860 )
+void sc61860_device::device_reset()
 {
-	sc61860_state *cpustate = get_safe_token(device);
-	cpustate->timer.t2ms=0;
-	cpustate->timer.t512ms=0;
-	cpustate->timer.count=256;
-	cpustate->pc=0;
+	m_timer.t2ms=0;
+	m_timer.t512ms=0;
+	m_timer.count=256;
+	m_pc=0;
 }
 
-static CPU_INIT( sc61860 )
+void sc61860_device::device_start()
 {
-	sc61860_state *cpustate = get_safe_token(device);
-	cpustate->config = (sc61860_cpu_core *) device->static_config();
-	device->machine().scheduler().timer_pulse(attotime::from_hz(500), FUNC(sc61860_2ms_tick), 0, cpustate);
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->reset.resolve(cpustate->config->reset,*device);
-	cpustate->brk.resolve(  cpustate->config->brk,*device);
-	cpustate->x.resolve(    cpustate->config->x,*device);
-	cpustate->ina.resolve(  cpustate->config->ina,*device);
-	cpustate->outa.resolve( cpustate->config->outa,*device);
-	cpustate->inb.resolve(  cpustate->config->inb,*device);
-	cpustate->outb.resolve( cpustate->config->outb,*device);
-	cpustate->outc.resolve( cpustate->config->outc,*device);
+	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate( FUNC(sc61860_device::sc61860_2ms_tick), this));
+
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_reset.resolve();
+	m_brk.resolve();
+	m_x.resolve();
+	m_ina.resolve();
+	m_outa.resolve();
+	m_inb.resolve();
+	m_outb.resolve();
+	m_outc.resolve();
+
+	m_p = 0;
+	m_q = 0;
+	m_r = 0;
+	m_c = 0;
+	m_d = 0;
+	m_h = 0;
+	m_oldpc = 0;
+	m_dp = 0;
+	m_carry = 0;
+	m_zero = 0;
+	memset( m_ram, 0, sizeof(m_ram) );
+
+	save_item(NAME(m_p));
+	save_item(NAME(m_q));
+	save_item(NAME(m_r));
+	save_item(NAME(m_c));
+	save_item(NAME(m_d));
+	save_item(NAME(m_h));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_dp));
+	save_item(NAME(m_carry));
+	save_item(NAME(m_zero));
+	save_item(NAME(m_timer.t2ms));
+	save_item(NAME(m_timer.t512ms));
+	save_item(NAME(m_timer.count));
+	save_item(NAME(m_ram));
+
+	state_add( SC61860_PC,    "PC",    m_pc            ).formatstr("%04X");
+	state_add( SC61860_DP,    "DP",    m_dp            ).formatstr("%04X");
+	state_add( SC61860_P,     "P",     m_p             ).mask(0x7f).formatstr("%02X");
+	state_add( SC61860_Q,     "Q",     m_q             ).mask(0x7f).formatstr("%02X");
+	state_add( SC61860_R,     "R",     m_r             ).mask(0x7f).formatstr("%02X");
+	state_add( SC61860_I,     "I",     m_ram[I]        ).formatstr("%02X");
+	state_add( SC61860_J,     "J",     m_ram[J]        ).formatstr("%02X");
+	state_add( SC61860_K,     "K",     m_ram[K]        ).formatstr("%02X");
+	state_add( SC61860_L,     "L",     m_ram[L]        ).formatstr("%02X");
+	state_add( SC61860_V,     "V",     m_ram[V]        ).formatstr("%02X");
+	state_add( SC61860_W,     "Wx",    m_ram[W]        ).formatstr("%02X");
+	state_add( SC61860_H,     "W",     m_h             ).formatstr("%02X");
+	state_add( SC61860_BA,    "BA",    m_debugger_temp ).callimport().callexport().formatstr("%04X");
+	state_add( SC61860_X,     "X",     m_debugger_temp ).callimport().callexport().formatstr("%04X");
+	state_add( SC61860_Y,     "Y",     m_debugger_temp ).callimport().callexport().formatstr("%04X");
+	state_add( SC61860_CARRY, "Carry", m_carry         ).mask(1).formatstr("%1u");
+	state_add( SC61860_ZERO,  "Zero" , m_zero          ).mask(1).formatstr("%1u");
+
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS",  m_debugger_temp).formatstr("%2s").noshow();
+	state_add(STATE_GENSP, "GENSP", m_r).mask(0x7f).formatstr("%02X").noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", m_oldpc).formatstr("%04X").noshow();
+
+	m_icountptr = &m_icount;
 }
 
-static CPU_EXECUTE( sc61860 )
-{
-	sc61860_state *cpustate = get_safe_token(device);
 
+void sc61860_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c", m_zero?'Z':'.', m_carry ? 'C':'.');
+			break;
+	}
+}
+
+
+void sc61860_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case SC61860_BA:
+			m_ram[A] = m_debugger_temp & 0xff;
+			m_ram[B] = ( m_debugger_temp >> 8 ) & 0xff;
+			break;
+
+		case SC61860_X:
+			m_ram[XL] = m_debugger_temp & 0xff;
+			m_ram[XH] = ( m_debugger_temp >> 8 ) & 0xff;
+			break;
+
+		case SC61860_Y:
+			m_ram[YL] = m_debugger_temp & 0xff;
+			m_ram[YH] = ( m_debugger_temp >> 8 ) & 0xff;
+			break;
+	}
+}
+
+
+void sc61860_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case SC61860_BA:
+			m_debugger_temp = ( m_ram[B] << 8 ) | m_ram[A];
+			break;
+
+		case SC61860_X:
+			m_debugger_temp = ( m_ram[XH] << 8 ) | m_ram[XL];
+			break;
+
+		case SC61860_Y:
+			m_debugger_temp = ( m_ram[YH] << 8 ) | m_ram[YL];
+			break;
+	}
+}
+
+
+void sc61860_device::execute_run()
+{
 	do
 	{
-		cpustate->oldpc = cpustate->pc;
+		m_oldpc = m_pc;
 
-		debugger_instruction_hook(device, cpustate->pc);
+		debugger_instruction_hook(this, m_pc);
 
-		sc61860_instruction(cpustate);
+		sc61860_instruction();
 
 #if 0
 		/* Are we in HLT-mode? */
-		if (cpustate->c & 4)
+		if (m_c & 4)
 		{
-			if ((cpustate->config && cpustate->config->ina && (cpustate->config->ina(cpustate)!=0)) || cpustate->timer.t512ms)
+			if (((m_ina()!=0)) || m_timer.t512ms)
 			{
-				cpustate->c&=0xfb;
-				if (cpustate->config->outc) cpustate->config->outc(cpustate->c);
+				m_c&=0xfb;
+				m_outc(m_c);
 			}
-			cpustate->icount-=4;
+			m_icount-=4;
 		}
-		else if(cpustate->c & 8) {}
+		else if(m_c & 8) {}
 
-		else sc61860_instruction(cpustate);
+		else sc61860_instruction();
 #endif
 
-	} while (cpustate->icount > 0);
+	} while (m_icount > 0);
 }
 
-
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( sc61860 )
-{
-	sc61860_state *cpustate = get_safe_token(device);
-	switch (state)
-	{
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SC61860_PC:         cpustate->pc = info->i; break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + SC61860_R:          cpustate->r = info->i & 0x7F;                       break;
-		case CPUINFO_INT_REGISTER + SC61860_DP:         cpustate->dp = info->i;         break;
-		case CPUINFO_INT_REGISTER + SC61860_P:          cpustate->p = info->i & 0x7F;       break;
-		case CPUINFO_INT_REGISTER + SC61860_Q:          cpustate->q = info->i & 0x7F;       break;
-		case CPUINFO_INT_REGISTER + SC61860_CARRY:      cpustate->carry = info->i;          break;
-		case CPUINFO_INT_REGISTER + SC61860_ZERO:       cpustate->zero = info->i;           break;
-	}
-}
-
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-CPU_GET_INFO( sc61860 )
-{
-	sc61860_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(sc61860_state);                break;
-		case CPUINFO_INT_INPUT_LINES:                       info->i = 0;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_BIG;                   break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 2;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 4;                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 8;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;                  break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->oldpc;                      break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SC61860_PC:             info->i =  cpustate->pc;                        break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + SC61860_R:              info->i =  cpustate->r;                     break;
-		case CPUINFO_INT_REGISTER + SC61860_DP:             info->i =  cpustate->dp;                        break;
-		case CPUINFO_INT_REGISTER + SC61860_P:              info->i =  cpustate->p;                     break;
-		case CPUINFO_INT_REGISTER + SC61860_Q:              info->i =  cpustate->q;                     break;
-		case CPUINFO_INT_REGISTER + SC61860_CARRY:          info->i =  cpustate->carry;                 break;
-		case CPUINFO_INT_REGISTER + SC61860_ZERO:           info->i =  cpustate->zero;                  break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(sc61860);             break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(sc61860);                        break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(sc61860);                  break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(sc61860);              break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                              break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(sc61860);              break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;                   break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "SC61860"); break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "sc61860"); break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "SC61860"); break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0beta"); break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__); break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Peter Trauner, all rights reserved."); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c", cpustate->zero?'Z':'.', cpustate->carry ? 'C':'.');
-			break;
-
-		case CPUINFO_STR_REGISTER + SC61860_PC:     sprintf(info->s, "PC:%.4x", cpustate->pc);break;
-		case CPUINFO_STR_REGISTER + SC61860_DP:     sprintf(info->s, "DP:%.4x", cpustate->dp);break;
-		case CPUINFO_STR_REGISTER + SC61860_P:      sprintf(info->s, "P:%.2x", cpustate->p);break;
-		case CPUINFO_STR_REGISTER + SC61860_Q:      sprintf(info->s, "Q:%.2x", cpustate->q);break;
-		case CPUINFO_STR_REGISTER + SC61860_R:      sprintf(info->s, "R:%.2x", cpustate->r);break;
-		case CPUINFO_STR_REGISTER + SC61860_I:      sprintf(info->s, "I:%.2x", cpustate->ram[I]);break;
-		case CPUINFO_STR_REGISTER + SC61860_J:      sprintf(info->s, "J:%.2x", cpustate->ram[J]);break;
-		case CPUINFO_STR_REGISTER + SC61860_K:      sprintf(info->s, "K:%.2x", cpustate->ram[K]);break;
-		case CPUINFO_STR_REGISTER + SC61860_L:      sprintf(info->s, "L:%.2x", cpustate->ram[L]);break;
-		case CPUINFO_STR_REGISTER + SC61860_V:      sprintf(info->s, "V:%.2x", cpustate->ram[V]);break;
-		case CPUINFO_STR_REGISTER + SC61860_W:      sprintf(info->s, "W:%.2x", cpustate->ram[W]);break;
-		case CPUINFO_STR_REGISTER + SC61860_H:      sprintf(info->s, "W:%.2x", cpustate->h);break;
-		case CPUINFO_STR_REGISTER + SC61860_BA:     sprintf(info->s, "BA:%.2x%.2x", cpustate->ram[B], cpustate->ram[A]);break;
-		case CPUINFO_STR_REGISTER + SC61860_X:      sprintf(info->s, "X: %.2x%.2x", cpustate->ram[XH], cpustate->ram[XL]);break;
-		case CPUINFO_STR_REGISTER + SC61860_Y:      sprintf(info->s, "Y: %.2x%.2x", cpustate->ram[YH], cpustate->ram[YL]);break;
-		case CPUINFO_STR_REGISTER + SC61860_CARRY:  sprintf(info->s, "Carry: %d", cpustate->carry);break;
-		case CPUINFO_STR_REGISTER + SC61860_ZERO:   sprintf(info->s, "Zero: %d", cpustate->zero);break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(SC61860, sc61860);

@@ -708,14 +708,6 @@ static GFXDECODE_START( pc1251 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1251_charlayout, 0, 8 )
 GFXDECODE_END
 
-static const sc61860_cpu_core pc1401_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc1401_state,pc1401_reset), DEVCB_DRIVER_LINE_MEMBER(pc1401_state,pc1401_brk), DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_ina), DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_outa),
-	DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_inb), DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_outb),
-	DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_outc)
-};
-
 static MACHINE_CONFIG_FRAGMENT( pocketc )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -746,7 +738,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( pc1401, pc1401_state )
 	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc1401_mem)
-	MCFG_CPU_CONFIG(pc1401_config)
+	MCFG_SC61860_CONFIG(
+		READLINE(pc1401_state,pc1401_reset), READLINE(pc1401_state,pc1401_brk), NULL,
+		READ8(pc1401_state,pc1401_ina), WRITE8(pc1401_state,pc1401_outa),
+		READ8(pc1401_state,pc1401_inb), WRITE8(pc1401_state,pc1401_outb),
+		WRITE8(pc1401_state,pc1401_outc)
+	)
 
 	MCFG_FRAGMENT_ADD(pocketc)
 
@@ -759,18 +756,15 @@ static MACHINE_CONFIG_DERIVED( pc1402, pc1401 )
 	MCFG_CPU_PROGRAM_MAP( pc1402_mem)
 MACHINE_CONFIG_END
 
-static const sc61860_cpu_core pc1251_config =
-{
-	DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(pc1251_state,pc1251_brk), DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_ina), DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_outa),
-	DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_inb), DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_outb),
-	DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_outc)
-};
-
 static MACHINE_CONFIG_START( pc1250, pc1251_state )
 	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP( pc1250_mem)
-	MCFG_CPU_CONFIG( pc1251_config )
+	MCFG_SC61860_CONFIG(
+		NULL, READLINE(pc1251_state,pc1251_brk), NULL,
+		READ8(pc1251_state,pc1251_ina), WRITE8(pc1251_state,pc1251_outa),
+		READ8(pc1251_state,pc1251_inb), WRITE8(pc1251_state,pc1251_outb),
+		WRITE8(pc1251_state,pc1251_outc)
+	)
 
 	MCFG_FRAGMENT_ADD(pocketc)
 
@@ -804,18 +798,15 @@ static MACHINE_CONFIG_DERIVED( pc1261, pc1260 )
 	MCFG_CPU_PROGRAM_MAP( pc1261_mem)
 MACHINE_CONFIG_END
 
-static const sc61860_cpu_core pc1350_config =
-{
-	DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(pc1350_state,pc1350_brk), DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_ina), DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_outa),
-	DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_inb), DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_outb),
-	DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_outc)
-};
-
 static MACHINE_CONFIG_START( pc1350, pc1350_state )
 	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP( pc1350_mem)
-	MCFG_CPU_CONFIG( pc1350_config )
+	MCFG_SC61860_CONFIG(
+		NULL, READLINE(pc1350_state,pc1350_brk), NULL,
+		READ8(pc1350_state,pc1350_ina), WRITE8(pc1350_state,pc1350_outa),
+		READ8(pc1350_state,pc1350_inb), WRITE8(pc1350_state,pc1350_outb),
+		WRITE8(pc1350_state,pc1350_outc)
+	)
 
 	MCFG_FRAGMENT_ADD( pocketc )
 
@@ -835,24 +826,17 @@ static MACHINE_CONFIG_START( pc1350, pc1350_state )
 	MCFG_RAM_EXTRA_OPTIONS("12K,20K")
 MACHINE_CONFIG_END
 
-static const sc61860_cpu_core pc1403_config =
-{
-	DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(pc1403_state,pc1403_brk), DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc1403_state,pc1403_ina), DEVCB_DRIVER_MEMBER(pc1403_state,pc1403_outa),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc1403_state,pc1403_outc)
-};
-
 static MACHINE_CONFIG_START( pc1403, pc1403_state )
-	MCFG_CPU_ADD("maincpu", SC61860, 192000)        /* 7.8336 MHz */
-	MCFG_CPU_PROGRAM_MAP(pc1401_mem)
-	MCFG_CPU_CONFIG(pc1401_config)
+	MCFG_CPU_ADD( "maincpu", SC61860, 256000 )
+	MCFG_CPU_PROGRAM_MAP( pc1403_mem)
+	MCFG_SC61860_CONFIG(
+		NULL, READLINE(pc1403_state,pc1403_brk), NULL,
+		READ8(pc1403_state,pc1403_ina), WRITE8(pc1403_state,pc1403_outa),
+		NULL, NULL,
+		WRITE8(pc1403_state,pc1403_outc)
+	)
 
 	MCFG_FRAGMENT_ADD( pocketc )
-
-	MCFG_CPU_REPLACE( "maincpu", SC61860, 256000 )
-	MCFG_CPU_PROGRAM_MAP( pc1403_mem)
-	MCFG_CPU_CONFIG( pc1403_config )
 
 	/*
 	   aim: show sharp with keyboard

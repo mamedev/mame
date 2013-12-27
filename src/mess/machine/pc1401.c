@@ -111,9 +111,8 @@ READ_LINE_MEMBER(pc1401_state::pc1401_reset)
 
 void pc1401_state::machine_start()
 {
-	device_t *main_cpu = m_maincpu;
 	UINT8 *ram = memregion("maincpu")->base() + 0x2000;
-	UINT8 *cpu = sc61860_internal_ram(main_cpu);
+	UINT8 *cpu = m_maincpu->internal_ram();
 
 	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
 	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x2800);
