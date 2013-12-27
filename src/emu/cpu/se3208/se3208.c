@@ -10,26 +10,6 @@
 
 */
 
-struct se3208_state_t
-{
-	//GPR
-	UINT32 R[8];
-	//SPR
-	UINT32 PC;
-	UINT32 SR;
-	UINT32 SP;
-	UINT32 ER;
-	UINT32 PPC;
-
-	device_irq_acknowledge_callback irq_callback;
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	UINT8 IRQ;
-	UINT8 NMI;
-
-	int icount;
-};
 
 #define FLAG_C      0x0080
 #define FLAG_V      0x0010
@@ -42,9 +22,9 @@ struct se3208_state_t
 #define FLAG_ENI    0x2000
 #define FLAG_NMI    0x4000
 
-#define CLRFLAG(f)  se3208_state->SR&=~(f);
-#define SETFLAG(f)  se3208_state->SR|=(f);
-#define TESTFLAG(f) (se3208_state->SR&(f))
+#define CLRFLAG(f)  m_SR&=~(f);
+#define SETFLAG(f)  m_SR|=(f);
+#define TESTFLAG(f) (m_SR&(f))
 
 #define EXTRACT(val,sbit,ebit)  (((val)>>sbit)&((1<<((ebit-sbit)+1))-1))
 #define SEX8(val)   ((val&0x80)?(val|0xFFFFFF00):(val&0xFF))
@@ -54,18 +34,20 @@ struct se3208_state_t
 #define SEX(bits,val)   ((val)&(1<<(bits-1))?((val)|(~((1<<bits)-1))):(val&((1<<bits)-1)))
 
 //Precompute the instruction decoding in a big table
-typedef void (*_OP)(se3208_state_t *se3208_state, UINT16 Opcode);
-#define INST(a) static void a(se3208_state_t *se3208_state, UINT16 Opcode)
-static _OP *OpTable=NULL;
+#define INST(a) void se3208_device::a(UINT16 Opcode)
 
-INLINE se3208_state_t *get_safe_token(device_t *device)
+
+const device_type SE3208 = &device_creator<se3208_device>;
+
+
+se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, SE3208, "SE3208", tag, owner, clock, "se3208", __FILE__)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 {
-	assert(device != NULL);
-	assert(device->type() == SE3208);
-	return (se3208_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-INLINE UINT32 read_dword_unaligned(address_space &space, UINT32 address)
+
+UINT32 se3208_device::read_dword_unaligned(address_space &space, UINT32 address)
 {
 	if (address & 3)
 		return space.read_byte(address) | space.read_byte(address+1)<<8 | space.read_byte(address+2)<<16 | space.read_byte(address+3)<<24;
@@ -73,7 +55,7 @@ INLINE UINT32 read_dword_unaligned(address_space &space, UINT32 address)
 		return space.read_dword(address);
 }
 
-INLINE UINT16 read_word_unaligned(address_space &space, UINT32 address)
+UINT16 se3208_device::read_word_unaligned(address_space &space, UINT32 address)
 {
 	if (address & 1)
 		return space.read_byte(address) | space.read_byte(address+1)<<8;
@@ -81,7 +63,7 @@ INLINE UINT16 read_word_unaligned(address_space &space, UINT32 address)
 		return space.read_word(address);
 }
 
-INLINE void write_dword_unaligned(address_space &space, UINT32 address, UINT32 data)
+void se3208_device::write_dword_unaligned(address_space &space, UINT32 address, UINT32 data)
 {
 	if (address & 3)
 	{
@@ -96,7 +78,7 @@ INLINE void write_dword_unaligned(address_space &space, UINT32 address, UINT32 d
 	}
 }
 
-INLINE void write_word_unaligned(address_space &space, UINT32 address, UINT16 data)
+void se3208_device::write_word_unaligned(address_space &space, UINT32 address, UINT16 data)
 {
 	if (address & 1)
 	{
@@ -110,39 +92,39 @@ INLINE void write_word_unaligned(address_space &space, UINT32 address, UINT16 da
 }
 
 
-INLINE UINT8 SE3208_Read8(se3208_state_t *se3208_state, UINT32 addr)
+UINT8 se3208_device::SE3208_Read8(UINT32 addr)
 {
-	return se3208_state->program->read_byte(addr);
+	return m_program->read_byte(addr);
 }
 
-INLINE UINT16 SE3208_Read16(se3208_state_t *se3208_state, UINT32 addr)
+UINT16 se3208_device::SE3208_Read16(UINT32 addr)
 {
-	return read_word_unaligned(*se3208_state->program,addr);
+	return read_word_unaligned(*m_program,addr);
 }
 
-INLINE UINT32 SE3208_Read32(se3208_state_t *se3208_state, UINT32 addr)
+UINT32 se3208_device::SE3208_Read32(UINT32 addr)
 {
-	return read_dword_unaligned(*se3208_state->program,addr);
+	return read_dword_unaligned(*m_program,addr);
 }
 
-INLINE void SE3208_Write8(se3208_state_t *se3208_state, UINT32 addr,UINT8 val)
+void se3208_device::SE3208_Write8(UINT32 addr,UINT8 val)
 {
-	se3208_state->program->write_byte(addr,val);
+	m_program->write_byte(addr,val);
 }
 
-INLINE void SE3208_Write16(se3208_state_t *se3208_state, UINT32 addr,UINT16 val)
+void se3208_device::SE3208_Write16(UINT32 addr,UINT16 val)
 {
-	write_word_unaligned(*se3208_state->program,addr,val);
+	write_word_unaligned(*m_program,addr,val);
 }
 
-INLINE void SE3208_Write32(se3208_state_t *se3208_state, UINT32 addr,UINT32 val)
+void se3208_device::SE3208_Write32(UINT32 addr,UINT32 val)
 {
-	write_dword_unaligned(*se3208_state->program,addr,val);
+	write_dword_unaligned(*m_program,addr,val);
 }
 
 
 
-INLINE UINT32 AddWithFlags(se3208_state_t *se3208_state, UINT32 a,UINT32 b)
+UINT32 se3208_device::AddWithFlags(UINT32 a,UINT32 b)
 {
 	UINT32 r=a+b;
 	CLRFLAG(FLAG_Z|FLAG_C|FLAG_V|FLAG_S);
@@ -157,7 +139,7 @@ INLINE UINT32 AddWithFlags(se3208_state_t *se3208_state, UINT32 a,UINT32 b)
 	return r;
 }
 
-INLINE UINT32 SubWithFlags(se3208_state_t *se3208_state, UINT32 a,UINT32 b) //a-b
+UINT32 se3208_device::SubWithFlags(UINT32 a,UINT32 b) //a-b
 {
 	UINT32 r=a-b;
 	CLRFLAG(FLAG_Z|FLAG_C|FLAG_V|FLAG_S);
@@ -172,9 +154,9 @@ INLINE UINT32 SubWithFlags(se3208_state_t *se3208_state, UINT32 a,UINT32 b) //a-
 	return r;
 }
 
-INLINE UINT32 AdcWithFlags(se3208_state_t *se3208_state,UINT32 a,UINT32 b)
+UINT32 se3208_device::AdcWithFlags(UINT32 a,UINT32 b)
 {
-	UINT32 C=(se3208_state->SR&FLAG_C)?1:0;
+	UINT32 C=(m_SR&FLAG_C)?1:0;
 	UINT32 r=a+b+C;
 	CLRFLAG(FLAG_Z|FLAG_C|FLAG_V|FLAG_S);
 	if(!r)
@@ -189,9 +171,9 @@ INLINE UINT32 AdcWithFlags(se3208_state_t *se3208_state,UINT32 a,UINT32 b)
 
 }
 
-INLINE UINT32 SbcWithFlags(se3208_state_t *se3208_state,UINT32 a,UINT32 b)
+UINT32 se3208_device::SbcWithFlags(UINT32 a,UINT32 b)
 {
-	UINT32 C=(se3208_state->SR&FLAG_C)?1:0;
+	UINT32 C=(m_SR&FLAG_C)?1:0;
 	UINT32 r=a-b-C;
 	CLRFLAG(FLAG_Z|FLAG_C|FLAG_V|FLAG_S);
 	if(!r)
@@ -205,7 +187,7 @@ INLINE UINT32 SbcWithFlags(se3208_state_t *se3208_state,UINT32 a,UINT32 b)
 	return r;
 }
 
-INLINE UINT32 MulWithFlags(se3208_state_t *se3208_state,UINT32 a,UINT32 b)
+UINT32 se3208_device::MulWithFlags(UINT32 a,UINT32 b)
 {
 	INT64 r=(INT64) a*(INT64) b;
 	CLRFLAG(FLAG_V);
@@ -214,12 +196,12 @@ INLINE UINT32 MulWithFlags(se3208_state_t *se3208_state,UINT32 a,UINT32 b)
 	return (UINT32) (r&0xffffffff);
 }
 
-INLINE UINT32 NegWithFlags(se3208_state_t *se3208_state,UINT32 a)
+UINT32 se3208_device::NegWithFlags(UINT32 a)
 {
-	return SubWithFlags(se3208_state,0,a);
+	return SubWithFlags(0,a);
 }
 
-INLINE UINT32 AsrWithFlags(se3208_state_t *se3208_state,UINT32 Val, UINT8 By)
+UINT32 se3208_device::AsrWithFlags(UINT32 Val, UINT8 By)
 {
 	signed int v=(signed int) Val;
 	v>>=By;
@@ -233,7 +215,7 @@ INLINE UINT32 AsrWithFlags(se3208_state_t *se3208_state,UINT32 Val, UINT8 By)
 	return (UINT32) v;
 }
 
-INLINE UINT32 LsrWithFlags(se3208_state_t *se3208_state,UINT32 Val, UINT8 By)
+UINT32 se3208_device::LsrWithFlags(UINT32 Val, UINT8 By)
 {
 	UINT32 v=Val;
 	v>>=By;
@@ -247,7 +229,7 @@ INLINE UINT32 LsrWithFlags(se3208_state_t *se3208_state,UINT32 Val, UINT8 By)
 	return v;
 }
 
-INLINE UINT32 AslWithFlags(se3208_state_t *se3208_state,UINT32 Val, UINT8 By)
+UINT32 se3208_device::AslWithFlags(UINT32 Val, UINT8 By)
 {
 	UINT32 v=Val;
 	v<<=By;
@@ -275,15 +257,15 @@ INST(LDB)
 	UINT32 Val;
 
 	if(Index)
-		Index=se3208_state->R[Index];
+		Index=m_R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read8(se3208_state, Index+Offset);
-	se3208_state->R[SrcDst]=SEX8(Val);
+	Val=SE3208_Read8(Index+Offset);
+	m_R[SrcDst]=SEX8(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -295,14 +277,14 @@ INST(STB)
 	UINT32 SrcDst=EXTRACT(Opcode,8,10);
 
 	if(Index)
-		Index=se3208_state->R[Index];
+		Index=m_R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write8(se3208_state, Index+Offset,ZEX8(se3208_state->R[SrcDst]));
+	SE3208_Write8(Index+Offset,ZEX8(m_R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -317,15 +299,15 @@ INST(LDS)
 	Offset<<=1;
 
 	if(Index)
-		Index=se3208_state->R[Index];
+		Index=m_R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read16(se3208_state, Index+Offset);
-	se3208_state->R[SrcDst]=SEX16(Val);
+	Val=SE3208_Read16(Index+Offset);
+	m_R[SrcDst]=SEX16(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -339,14 +321,14 @@ INST(STS)
 	Offset<<=1;
 
 	if(Index)
-		Index=se3208_state->R[Index];
+		Index=m_R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write16(se3208_state, Index+Offset,ZEX16(se3208_state->R[SrcDst]));
+	SE3208_Write16(Index+Offset,ZEX16(m_R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -360,14 +342,14 @@ INST(LD)
 	Offset<<=2;
 
 	if(Index)
-		Index=se3208_state->R[Index];
+		Index=m_R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	se3208_state->R[SrcDst]=SE3208_Read32(se3208_state, Index+Offset);
+	m_R[SrcDst]=SE3208_Read32(Index+Offset);
 
 	CLRFLAG(FLAG_E);
 }
@@ -381,14 +363,14 @@ INST(ST)
 	Offset<<=2;
 
 	if(Index)
-		Index=se3208_state->R[Index];
+		Index=m_R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write32(se3208_state, Index+Offset,se3208_state->R[SrcDst]);
+	SE3208_Write32(Index+Offset,m_R[SrcDst]);
 
 	CLRFLAG(FLAG_E);
 }
@@ -401,15 +383,15 @@ INST(LDBU)
 	UINT32 Val;
 
 	if(Index)
-		Index=se3208_state->R[Index];
+		Index=m_R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read8(se3208_state, Index+Offset);
-	se3208_state->R[SrcDst]=ZEX8(Val);
+	Val=SE3208_Read8(Index+Offset);
+	m_R[SrcDst]=ZEX8(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -424,15 +406,15 @@ INST(LDSU)
 	Offset<<=1;
 
 	if(Index)
-		Index=se3208_state->R[Index];
+		Index=m_R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read16(se3208_state, Index+Offset);
-	se3208_state->R[SrcDst]=ZEX16(Val);
+	Val=SE3208_Read16(Index+Offset);
+	m_R[SrcDst]=ZEX16(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -442,9 +424,9 @@ INST(LERI)
 {
 	UINT32 Imm=EXTRACT(Opcode,0,13);
 	if(TESTFLAG(FLAG_E))
-		se3208_state->ER=(EXTRACT(se3208_state->ER,0,17)<<14)|Imm;
+		m_ER=(EXTRACT(m_ER,0,17)<<14)|Imm;
 	else
-		se3208_state->ER=SEX(14,Imm);
+		m_ER=SEX(14,Imm);
 
 
 	SETFLAG(FLAG_E);
@@ -453,15 +435,15 @@ INST(LERI)
 INST(LDSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,7);
-	UINT32 Index=se3208_state->SP;
+	UINT32 Index=m_SP;
 	UINT32 SrcDst=EXTRACT(Opcode,8,10);
 
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	se3208_state->R[SrcDst]=SE3208_Read32(se3208_state, Index+Offset);
+	m_R[SrcDst]=SE3208_Read32(Index+Offset);
 
 	CLRFLAG(FLAG_E);
 }
@@ -469,29 +451,29 @@ INST(LDSP)
 INST(STSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,7);
-	UINT32 Index=se3208_state->SP;
+	UINT32 Index=m_SP;
 	UINT32 SrcDst=EXTRACT(Opcode,8,10);
 
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write32(se3208_state, Index+Offset,se3208_state->R[SrcDst]);
+	SE3208_Write32(Index+Offset,m_R[SrcDst]);
 
 	CLRFLAG(FLAG_E);
 }
 
-static void PushVal(se3208_state_t *se3208_state, UINT32 Val)
+void se3208_device::PushVal(UINT32 Val)
 {
-	se3208_state->SP-=4;
-	SE3208_Write32(se3208_state, se3208_state->SP,Val);
+	m_SP-=4;
+	SE3208_Write32(m_SP,Val);
 }
 
-static UINT32 PopVal(se3208_state_t *se3208_state)
+UINT32 se3208_device::PopVal()
 {
-	UINT32 Val=SE3208_Read32(se3208_state, se3208_state->SP);
-	se3208_state->SP+=4;
+	UINT32 Val=SE3208_Read32(m_SP);
+	m_SP+=4;
 	return Val;
 }
 
@@ -499,55 +481,55 @@ INST(PUSH)
 {
 	UINT32 Set=EXTRACT(Opcode,0,10);
 	if(Set&(1<<10))
-		PushVal(se3208_state,se3208_state->PC);
+		PushVal(m_PC);
 	if(Set&(1<<9))
-		PushVal(se3208_state,se3208_state->SR);
+		PushVal(m_SR);
 	if(Set&(1<<8))
-		PushVal(se3208_state,se3208_state->ER);
+		PushVal(m_ER);
 	if(Set&(1<<7))
-		PushVal(se3208_state,se3208_state->R[7]);
+		PushVal(m_R[7]);
 	if(Set&(1<<6))
-		PushVal(se3208_state,se3208_state->R[6]);
+		PushVal(m_R[6]);
 	if(Set&(1<<5))
-		PushVal(se3208_state,se3208_state->R[5]);
+		PushVal(m_R[5]);
 	if(Set&(1<<4))
-		PushVal(se3208_state,se3208_state->R[4]);
+		PushVal(m_R[4]);
 	if(Set&(1<<3))
-		PushVal(se3208_state,se3208_state->R[3]);
+		PushVal(m_R[3]);
 	if(Set&(1<<2))
-		PushVal(se3208_state,se3208_state->R[2]);
+		PushVal(m_R[2]);
 	if(Set&(1<<1))
-		PushVal(se3208_state,se3208_state->R[1]);
+		PushVal(m_R[1]);
 	if(Set&(1<<0))
-		PushVal(se3208_state,se3208_state->R[0]);
+		PushVal(m_R[0]);
 }
 
 INST(POP)
 {
 	UINT32 Set=EXTRACT(Opcode,0,10);
 	if(Set&(1<<0))
-		se3208_state->R[0]=PopVal(se3208_state);
+		m_R[0]=PopVal();
 	if(Set&(1<<1))
-		se3208_state->R[1]=PopVal(se3208_state);
+		m_R[1]=PopVal();
 	if(Set&(1<<2))
-		se3208_state->R[2]=PopVal(se3208_state);
+		m_R[2]=PopVal();
 	if(Set&(1<<3))
-		se3208_state->R[3]=PopVal(se3208_state);
+		m_R[3]=PopVal();
 	if(Set&(1<<4))
-		se3208_state->R[4]=PopVal(se3208_state);
+		m_R[4]=PopVal();
 	if(Set&(1<<5))
-		se3208_state->R[5]=PopVal(se3208_state);
+		m_R[5]=PopVal();
 	if(Set&(1<<6))
-		se3208_state->R[6]=PopVal(se3208_state);
+		m_R[6]=PopVal();
 	if(Set&(1<<7))
-		se3208_state->R[7]=PopVal(se3208_state);
+		m_R[7]=PopVal();
 	if(Set&(1<<8))
-		se3208_state->ER=PopVal(se3208_state);
+		m_ER=PopVal();
 	if(Set&(1<<9))
-		se3208_state->SR=PopVal(se3208_state);
+		m_SR=PopVal();
 	if(Set&(1<<10))
 	{
-		se3208_state->PC=PopVal(se3208_state)-2;        //PC automatically incresases by 2
+		m_PC=PopVal()-2;        //PC automatically incresases by 2
 	}
 }
 
@@ -557,16 +539,16 @@ INST(LEATOSP)
 	UINT32 Index=EXTRACT(Opcode,3,5);
 
 	if(Index)
-		Index=se3208_state->R[Index];
+		Index=m_R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 	else
 		Offset=SEX(4,Offset);
 
-	se3208_state->SP=Index+Offset;
+	m_SP=Index+Offset;
 
 	CLRFLAG(FLAG_E);
 }
@@ -577,11 +559,11 @@ INST(LEAFROMSP)
 	UINT32 Index=EXTRACT(Opcode,3,5);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 	else
 		Offset=SEX(4,Offset);
 
-	se3208_state->R[Index]=se3208_state->SP+Offset;
+	m_R[Index]=m_SP+Offset;
 
 	CLRFLAG(FLAG_E);
 }
@@ -593,11 +575,11 @@ INST(LEASPTOSP)
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,23)<<8)|(Offset&0xff);
+		Offset=(EXTRACT(m_ER,0,23)<<8)|(Offset&0xff);
 	else
 		Offset=SEX(10,Offset);
 
-	se3208_state->SP=se3208_state->SP+Offset;
+	m_SP=m_SP+Offset;
 
 	CLRFLAG(FLAG_E);
 }
@@ -607,7 +589,7 @@ INST(MOV)
 	UINT32 Src=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,9,11);
 
-	se3208_state->R[Dst]=se3208_state->R[Src];
+	m_R[Dst]=m_R[Src];
 }
 
 INST(LDI)
@@ -616,11 +598,11 @@ INST(LDI)
 	UINT32 Imm=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX8(Imm);
 
-	se3208_state->R[Dst]=Imm;
+	m_R[Dst]=Imm;
 
 	CLRFLAG(FLAG_E);
 }
@@ -628,15 +610,15 @@ INST(LDI)
 INST(LDBSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=se3208_state->SP;
+	UINT32 Index=m_SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 	UINT32 Val;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read8(se3208_state, Index+Offset);
-	se3208_state->R[SrcDst]=SEX8(Val);
+	Val=SE3208_Read8(Index+Offset);
+	m_R[SrcDst]=SEX8(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -644,13 +626,13 @@ INST(LDBSP)
 INST(STBSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=se3208_state->SP;
+	UINT32 Index=m_SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write8(se3208_state, Index+Offset,ZEX8(se3208_state->R[SrcDst]));
+	SE3208_Write8(Index+Offset,ZEX8(m_R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -658,17 +640,17 @@ INST(STBSP)
 INST(LDSSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=se3208_state->SP;
+	UINT32 Index=m_SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 	UINT32 Val;
 
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read16(se3208_state, Index+Offset);
-	se3208_state->R[SrcDst]=SEX16(Val);
+	Val=SE3208_Read16(Index+Offset);
+	m_R[SrcDst]=SEX16(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -676,15 +658,15 @@ INST(LDSSP)
 INST(STSSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=se3208_state->SP;
+	UINT32 Index=m_SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write16(se3208_state, Index+Offset,ZEX16(se3208_state->R[SrcDst]));
+	SE3208_Write16(Index+Offset,ZEX16(m_R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -692,15 +674,15 @@ INST(STSSP)
 INST(LDBUSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=se3208_state->SP;
+	UINT32 Index=m_SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 	UINT32 Val;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read8(se3208_state, Index+Offset);
-	se3208_state->R[SrcDst]=ZEX8(Val);
+	Val=SE3208_Read8(Index+Offset);
+	m_R[SrcDst]=ZEX8(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -708,17 +690,17 @@ INST(LDBUSP)
 INST(LDSUSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=se3208_state->SP;
+	UINT32 Index=m_SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 	UINT32 Val;
 
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(m_ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read16(se3208_state, Index+Offset);
-	se3208_state->R[SrcDst]=ZEX16(Val);
+	Val=SE3208_Read16(Index+Offset);
+	m_R[SrcDst]=ZEX16(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -730,11 +712,11 @@ INST(ADDI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	se3208_state->R[Dst]=AddWithFlags(se3208_state,se3208_state->R[Src],Imm);
+	m_R[Dst]=AddWithFlags(m_R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -746,11 +728,11 @@ INST(SUBI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	se3208_state->R[Dst]=SubWithFlags(se3208_state,se3208_state->R[Src],Imm);
+	m_R[Dst]=SubWithFlags(m_R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -762,11 +744,11 @@ INST(ADCI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	se3208_state->R[Dst]=AdcWithFlags(se3208_state,se3208_state->R[Src],Imm);
+	m_R[Dst]=AdcWithFlags(m_R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -778,11 +760,11 @@ INST(SBCI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	se3208_state->R[Dst]=SbcWithFlags(se3208_state,se3208_state->R[Src],Imm);
+	m_R[Dst]=SbcWithFlags(m_R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -794,16 +776,16 @@ INST(ANDI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	se3208_state->R[Dst]=se3208_state->R[Src]&Imm;
+	m_R[Dst]=m_R[Src]&Imm;
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!se3208_state->R[Dst])
+	if(!m_R[Dst])
 		SETFLAG(FLAG_Z);
-	if(se3208_state->R[Dst]&0x80000000)
+	if(m_R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -814,16 +796,16 @@ INST(ORI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	se3208_state->R[Dst]=se3208_state->R[Src]|Imm;
+	m_R[Dst]=m_R[Src]|Imm;
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!se3208_state->R[Dst])
+	if(!m_R[Dst])
 		SETFLAG(FLAG_Z);
-	if(se3208_state->R[Dst]&0x80000000)
+	if(m_R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -834,16 +816,16 @@ INST(XORI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	se3208_state->R[Dst]=se3208_state->R[Src]^Imm;
+	m_R[Dst]=m_R[Src]^Imm;
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!se3208_state->R[Dst])
+	if(!m_R[Dst])
 		SETFLAG(FLAG_Z);
-	if(se3208_state->R[Dst]&0x80000000)
+	if(m_R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -853,11 +835,11 @@ INST(CMPI)
 	UINT32 Src=EXTRACT(Opcode,3,5);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	SubWithFlags(se3208_state,se3208_state->R[Src],Imm);
+	SubWithFlags(m_R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -869,11 +851,11 @@ INST(TSTI)
 	UINT32 Dst;
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(m_ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	Dst=se3208_state->R[Src]&Imm;
+	Dst=m_R[Src]&Imm;
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
 	if(!Dst)
@@ -888,7 +870,7 @@ INST(ADD)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	se3208_state->R[Dst]=AddWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
+	m_R[Dst]=AddWithFlags(m_R[Src1],m_R[Src2]);
 }
 
 INST(SUB)
@@ -897,7 +879,7 @@ INST(SUB)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	se3208_state->R[Dst]=SubWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
+	m_R[Dst]=SubWithFlags(m_R[Src1],m_R[Src2]);
 }
 
 INST(ADC)
@@ -906,7 +888,7 @@ INST(ADC)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	se3208_state->R[Dst]=AdcWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
+	m_R[Dst]=AdcWithFlags(m_R[Src1],m_R[Src2]);
 }
 
 INST(SBC)
@@ -915,7 +897,7 @@ INST(SBC)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	se3208_state->R[Dst]=SbcWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
+	m_R[Dst]=SbcWithFlags(m_R[Src1],m_R[Src2]);
 }
 
 INST(AND)
@@ -924,12 +906,12 @@ INST(AND)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	se3208_state->R[Dst]=se3208_state->R[Src1]&se3208_state->R[Src2];
+	m_R[Dst]=m_R[Src1]&m_R[Src2];
 
 	CLRFLAG(FLAG_S|FLAG_Z);
-	if(!se3208_state->R[Dst])
+	if(!m_R[Dst])
 		SETFLAG(FLAG_Z);
-	if(se3208_state->R[Dst]&0x80000000)
+	if(m_R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -939,12 +921,12 @@ INST(OR)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	se3208_state->R[Dst]=se3208_state->R[Src1]|se3208_state->R[Src2];
+	m_R[Dst]=m_R[Src1]|m_R[Src2];
 
 	CLRFLAG(FLAG_S|FLAG_Z);
-	if(!se3208_state->R[Dst])
+	if(!m_R[Dst])
 		SETFLAG(FLAG_Z);
-	if(se3208_state->R[Dst]&0x80000000)
+	if(m_R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 
 }
@@ -955,12 +937,12 @@ INST(XOR)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	se3208_state->R[Dst]=se3208_state->R[Src1]^se3208_state->R[Src2];
+	m_R[Dst]=m_R[Src1]^m_R[Src2];
 
 	CLRFLAG(FLAG_S|FLAG_Z);
-	if(!se3208_state->R[Dst])
+	if(!m_R[Dst])
 		SETFLAG(FLAG_Z);
-	if(se3208_state->R[Dst]&0x80000000)
+	if(m_R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 
 }
@@ -970,7 +952,7 @@ INST(CMP)
 	UINT32 Src2=EXTRACT(Opcode,9,11);
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 
-	SubWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
+	SubWithFlags(m_R[Src1],m_R[Src2]);
 }
 
 INST(TST)
@@ -979,7 +961,7 @@ INST(TST)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst;
 
-	Dst=se3208_state->R[Src1]&se3208_state->R[Src2];
+	Dst=m_R[Src1]&m_R[Src2];
 
 	CLRFLAG(FLAG_S|FLAG_Z);
 	if(!Dst)
@@ -994,7 +976,7 @@ INST(MULS)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	se3208_state->R[Dst]=MulWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
+	m_R[Dst]=MulWithFlags(m_R[Src1],m_R[Src2]);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1004,7 +986,7 @@ INST(NEG)
 	UINT32 Dst=EXTRACT(Opcode,9,11);
 	UINT32 Src=EXTRACT(Opcode,3,5);
 
-	se3208_state->R[Dst]=NegWithFlags(se3208_state,se3208_state->R[Src]);
+	m_R[Dst]=NegWithFlags(m_R[Src]);
 }
 
 INST(CALL)
@@ -1012,12 +994,12 @@ INST(CALL)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
-	PushVal(se3208_state,se3208_state->PC+2);
-	se3208_state->PC=se3208_state->PC+Offset;
+	PushVal(m_PC+2);
+	m_PC=m_PC+Offset;
 
 	CLRFLAG(FLAG_E);
 }
@@ -1027,14 +1009,14 @@ INST(JV)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_V))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1046,14 +1028,14 @@ INST(JNV)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!TESTFLAG(FLAG_V))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1064,14 +1046,14 @@ INST(JC)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_C))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1082,14 +1064,14 @@ INST(JNC)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!TESTFLAG(FLAG_C))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1100,14 +1082,14 @@ INST(JP)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!TESTFLAG(FLAG_S))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1118,14 +1100,14 @@ INST(JM)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_S))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1136,14 +1118,14 @@ INST(JNZ)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!TESTFLAG(FLAG_Z))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1154,14 +1136,14 @@ INST(JZ)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_Z))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1174,14 +1156,14 @@ INST(JGE)
 	UINT32 V=TESTFLAG(FLAG_V)?1:0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!(S^V))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1194,14 +1176,14 @@ INST(JLE)
 	UINT32 V=TESTFLAG(FLAG_V)?1:0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_Z) || (S^V))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 	CLRFLAG(FLAG_E);
 }
@@ -1211,14 +1193,14 @@ INST(JHI)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!(TESTFLAG(FLAG_Z) || TESTFLAG(FLAG_C)))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1229,14 +1211,14 @@ INST(JLS)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_Z) || TESTFLAG(FLAG_C))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1249,14 +1231,14 @@ INST(JGT)
 	UINT32 V=TESTFLAG(FLAG_V)?1:0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!(TESTFLAG(FLAG_Z) || (S^V)))
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1269,14 +1251,14 @@ INST(JLT)
 	UINT32 V=TESTFLAG(FLAG_V)?1:0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(S^V)
 	{
-		se3208_state->PC=se3208_state->PC+Offset;
+		m_PC=m_PC+Offset;
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1289,13 +1271,13 @@ INST(JMP)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(m_ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 
 	Offset<<=1;
 
-	se3208_state->PC=se3208_state->PC+Offset;
+	m_PC=m_PC+Offset;
 
 	CLRFLAG(FLAG_E);
 }
@@ -1304,7 +1286,7 @@ INST(JR)
 {
 	UINT32 Src=EXTRACT(Opcode,0,3);
 
-	se3208_state->PC=se3208_state->R[Src]-2;
+	m_PC=m_R[Src]-2;
 
 	CLRFLAG(FLAG_E);
 }
@@ -1312,8 +1294,8 @@ INST(JR)
 INST(CALLR)
 {
 	UINT32 Src=EXTRACT(Opcode,0,3);
-	PushVal(se3208_state,se3208_state->PC+2);
-	se3208_state->PC=se3208_state->R[Src]-2;
+	PushVal(m_PC+2);
+	m_PC=m_R[Src]-2;
 
 	CLRFLAG(FLAG_E);
 }
@@ -1326,9 +1308,9 @@ INST(ASR)
 	UINT32 Cnt=EXTRACT(Opcode,5,7);
 
 	if(CS)
-		se3208_state->R[Dst]=AsrWithFlags(se3208_state,se3208_state->R[Dst],se3208_state->R[Cnt]&0x1f);
+		m_R[Dst]=AsrWithFlags(m_R[Dst],m_R[Cnt]&0x1f);
 	else
-		se3208_state->R[Dst]=AsrWithFlags(se3208_state,se3208_state->R[Dst],Imm&0x1f);
+		m_R[Dst]=AsrWithFlags(m_R[Dst],Imm&0x1f);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1341,9 +1323,9 @@ INST(LSR)
 	UINT32 Cnt=EXTRACT(Opcode,5,7);
 
 	if(CS)
-		se3208_state->R[Dst]=LsrWithFlags(se3208_state,se3208_state->R[Dst],se3208_state->R[Cnt]&0x1f);
+		m_R[Dst]=LsrWithFlags(m_R[Dst],m_R[Cnt]&0x1f);
 	else
-		se3208_state->R[Dst]=LsrWithFlags(se3208_state,se3208_state->R[Dst],Imm&0x1f);
+		m_R[Dst]=LsrWithFlags(m_R[Dst],Imm&0x1f);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1356,9 +1338,9 @@ INST(ASL)
 	UINT32 Cnt=EXTRACT(Opcode,5,7);
 
 	if(CS)
-		se3208_state->R[Dst]=AslWithFlags(se3208_state,se3208_state->R[Dst],se3208_state->R[Cnt]&0x1f);
+		m_R[Dst]=AslWithFlags(m_R[Dst],m_R[Cnt]&0x1f);
 	else
-		se3208_state->R[Dst]=AslWithFlags(se3208_state,se3208_state->R[Dst],Imm&0x1f);
+		m_R[Dst]=AslWithFlags(m_R[Dst],Imm&0x1f);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1366,14 +1348,14 @@ INST(ASL)
 INST(EXTB)
 {
 	UINT32 Dst=EXTRACT(Opcode,0,3);
-	UINT32 Val=se3208_state->R[Dst];
+	UINT32 Val=m_R[Dst];
 
-	se3208_state->R[Dst]=SEX8(Val);
+	m_R[Dst]=SEX8(Val);
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!se3208_state->R[Dst])
+	if(!m_R[Dst])
 		SETFLAG(FLAG_Z);
-	if(se3208_state->R[Dst]&0x80000000)
+	if(m_R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 
 }
@@ -1381,14 +1363,14 @@ INST(EXTB)
 INST(EXTS)
 {
 	UINT32 Dst=EXTRACT(Opcode,0,3);
-	UINT32 Val=se3208_state->R[Dst];
+	UINT32 Val=m_R[Dst];
 
-	se3208_state->R[Dst]=SEX16(Val);
+	m_R[Dst]=SEX16(Val);
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!se3208_state->R[Dst])
+	if(!m_R[Dst])
 		SETFLAG(FLAG_Z);
-	if(se3208_state->R[Dst]&0x80000000)
+	if(m_R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -1396,14 +1378,14 @@ INST(SET)
 {
 	UINT32 Imm=EXTRACT(Opcode,0,3);
 
-	se3208_state->SR|=(1<<Imm);
+	m_SR|=(1<<Imm);
 }
 
 INST(CLR)
 {
 	UINT32 Imm=EXTRACT(Opcode,0,3);
 
-	se3208_state->SR&=~(1<<Imm);
+	m_SR&=~(1<<Imm);
 }
 
 INST(SWI)
@@ -1412,12 +1394,12 @@ INST(SWI)
 
 	if(!TESTFLAG(FLAG_ENI))
 		return;
-	PushVal(se3208_state,se3208_state->PC);
-	PushVal(se3208_state,se3208_state->SR);
+	PushVal(m_PC);
+	PushVal(m_SR);
 
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);
 
-	se3208_state->PC=SE3208_Read32(se3208_state, 4*Imm+0x40)-2;
+	m_PC=SE3208_Read32(4*Imm+0x40)-2;
 }
 
 INST(HALT)
@@ -1442,7 +1424,7 @@ INST(MVFC)
 }
 
 
-static _OP DecodeOp(UINT16 Opcode)
+se3208_device::_OP se3208_device::DecodeOp(UINT16 Opcode)
 {
 	switch(EXTRACT(Opcode,14,15))
 	{
@@ -1452,38 +1434,38 @@ static _OP DecodeOp(UINT16 Opcode)
 				switch(Op)
 				{
 					case 0x0:
-						return LDB;
+						return &se3208_device::LDB;
 					case 0x1:
-						return LDS;
+						return &se3208_device::LDS;
 					case 0x2:
-						return LD;
+						return &se3208_device::LD;
 					case 0x3:
-						return LDBU;
+						return &se3208_device::LDBU;
 					case 0x4:
-						return STB;
+						return &se3208_device::STB;
 					case 0x5:
-						return STS;
+						return &se3208_device::STS;
 					case 0x6:
-						return ST;
+						return &se3208_device::ST;
 					case 0x7:
-						return LDSU;
+						return &se3208_device::LDSU;
 				}
 			}
 			break;
 		case 0x1:
-			return LERI;
+			return &se3208_device::LERI;
 		case 0x2:
 			{
 				switch(EXTRACT(Opcode,11,13))
 				{
 					case 0:
-						return LDSP;
+						return &se3208_device::LDSP;
 					case 1:
-						return STSP;
+						return &se3208_device::STSP;
 					case 2:
-						return PUSH;
+						return &se3208_device::PUSH;
 					case 3:
-						return POP;
+						return &se3208_device::POP;
 					case 4:
 					case 5:
 					case 6:
@@ -1499,30 +1481,30 @@ static _OP DecodeOp(UINT16 Opcode)
 						switch(EXTRACT(Opcode,6,8))
 						{
 							case 0:
-								return ADDI;
+								return &se3208_device::ADDI;
 							case 1:
-								return ADCI;
+								return &se3208_device::ADCI;
 							case 2:
-								return SUBI;
+								return &se3208_device::SUBI;
 							case 3:
-								return SBCI;
+								return &se3208_device::SBCI;
 							case 4:
-								return ANDI;
+								return &se3208_device::ANDI;
 							case 5:
-								return ORI;
+								return &se3208_device::ORI;
 							case 6:
-								return XORI;
+								return &se3208_device::XORI;
 							case 7:
 								switch(EXTRACT(Opcode,0,2))
 								{
 									case 0:
-										return CMPI;
+										return &se3208_device::CMPI;
 									case 1:
-										return TSTI;
+										return &se3208_device::TSTI;
 									case 2:
-										return LEATOSP;
+										return &se3208_device::LEATOSP;
 									case 3:
-										return LEAFROMSP;
+										return &se3208_device::LEAFROMSP;
 								}
 								break;
 						}
@@ -1537,30 +1519,30 @@ static _OP DecodeOp(UINT16 Opcode)
 					switch(EXTRACT(Opcode,6,8))
 					{
 						case 0:
-							return ADD;
+							return &se3208_device::ADD;
 						case 1:
-							return ADC;
+							return &se3208_device::ADC;
 						case 2:
-							return SUB;
+							return &se3208_device::SUB;
 						case 3:
-							return SBC;
+							return &se3208_device::SBC;
 						case 4:
-							return AND;
+							return &se3208_device::AND;
 						case 5:
-							return OR;
+							return &se3208_device::OR;
 						case 6:
-							return XOR;
+							return &se3208_device::XOR;
 						case 7:
 							switch(EXTRACT(Opcode,0,2))
 							{
 								case 0:
-									return CMP;
+									return &se3208_device::CMP;
 								case 1:
-									return TST;
+									return &se3208_device::TST;
 								case 2:
-									return MOV;
+									return &se3208_device::MOV;
 								case 3:
-									return NEG;
+									return &se3208_device::NEG;
 							}
 							break;
 					}
@@ -1569,42 +1551,42 @@ static _OP DecodeOp(UINT16 Opcode)
 					switch(EXTRACT(Opcode,8,11))
 					{
 						case 0x0:
-							return JNV;
+							return &se3208_device::JNV;
 						case 0x1:
-							return JV;
+							return &se3208_device::JV;
 						case 0x2:
-							return JP;
+							return &se3208_device::JP;
 						case 0x3:
-							return JM;
+							return &se3208_device::JM;
 						case 0x4:
-							return JNZ;
+							return &se3208_device::JNZ;
 						case 0x5:
-							return JZ;
+							return &se3208_device::JZ;
 						case 0x6:
-							return JNC;
+							return &se3208_device::JNC;
 						case 0x7:
-							return JC;
+							return &se3208_device::JC;
 						case 0x8:
-							return JGT;
+							return &se3208_device::JGT;
 						case 0x9:
-							return JLT;
+							return &se3208_device::JLT;
 						case 0xa:
-							return JGE;
+							return &se3208_device::JGE;
 						case 0xb:
-							return JLE;
+							return &se3208_device::JLE;
 						case 0xc:
-							return JHI;
+							return &se3208_device::JHI;
 						case 0xd:
-							return JLS;
+							return &se3208_device::JLS;
 						case 0xe:
-							return JMP;
+							return &se3208_device::JMP;
 						case 0xf:
-							return CALL;
+							return &se3208_device::CALL;
 					}
 					break;
 				case 2:
 					if(Opcode&(1<<11))
-						return LDI;
+						return &se3208_device::LDI;
 					else    //SP Ops
 					{
 						if(Opcode&(1<<10))
@@ -1612,24 +1594,24 @@ static _OP DecodeOp(UINT16 Opcode)
 							switch(EXTRACT(Opcode,7,9))
 							{
 								case 0:
-									return LDBSP;
+									return &se3208_device::LDBSP;
 								case 1:
-									return LDSSP;
+									return &se3208_device::LDSSP;
 								case 3:
-									return LDBUSP;
+									return &se3208_device::LDBUSP;
 								case 4:
-									return STBSP;
+									return &se3208_device::STBSP;
 								case 5:
-									return STSSP;
+									return &se3208_device::STSSP;
 								case 7:
-									return LDSUSP;
+									return &se3208_device::LDSUSP;
 							}
 						}
 						else
 						{
 							if(Opcode&(1<<9))
 							{
-								return LEASPTOSP;
+								return &se3208_device::LEASPTOSP;
 							}
 							else
 							{
@@ -1641,21 +1623,21 @@ static _OP DecodeOp(UINT16 Opcode)
 									switch(EXTRACT(Opcode,4,7))
 									{
 										case 0:
-											return EXTB;
+											return &se3208_device::EXTB;
 										case 1:
-											return EXTS;
+											return &se3208_device::EXTS;
 										case 8:
-											return JR;
+											return &se3208_device::JR;
 										case 9:
-											return CALLR;
+											return &se3208_device::CALLR;
 										case 10:
-											return SET;
+											return &se3208_device::SET;
 										case 11:
-											return CLR;
+											return &se3208_device::CLR;
 										case 12:
-											return SWI;
+											return &se3208_device::SWI;
 										case 13:
-											return HALT;
+											return &se3208_device::HALT;
 									}
 								}
 							}
@@ -1672,22 +1654,22 @@ static _OP DecodeOp(UINT16 Opcode)
 							switch(EXTRACT(Opcode,3,4))
 							{
 								case 0:
-									return ASR;
+									return &se3208_device::ASR;
 								case 1:
-									return LSR;
+									return &se3208_device::LSR;
 								case 2:
-									return ASL;
+									return &se3208_device::ASL;
 								//case 3:
-								//  return LSL;
+								//  return &se3208_device::LSL;
 							}
 							break;
 						case 4:
-							return MULS;
+							return &se3208_device::MULS;
 						case 6:
 							if(Opcode&(1<<3))
-								return MVFC;
+								return &se3208_device::MVFC;
 							else
-								return MVTC;
+								return &se3208_device::MVTC;
 							break;
 					}
 					break;
@@ -1695,246 +1677,158 @@ static _OP DecodeOp(UINT16 Opcode)
 			break;
 
 	}
-	return INVALIDOP;
+	return &se3208_device::INVALIDOP;
 }
 
 
-static void BuildTable(void)
+void se3208_device::BuildTable(void)
 {
 	int i;
-	if(!OpTable)
-		OpTable=global_alloc_array(_OP, 0x10000);
 	for(i=0;i<0x10000;++i)
 		OpTable[i]=DecodeOp(i);
 }
 
-static CPU_RESET( se3208 )
+void se3208_device::device_reset()
 {
-	se3208_state_t *se3208_state = get_safe_token(device);
-
-	device_irq_acknowledge_callback save_irqcallback = se3208_state->irq_callback;
-	memset(se3208_state,0,sizeof(se3208_state_t));
-	se3208_state->irq_callback = save_irqcallback;
-	se3208_state->device = device;
-	se3208_state->program = &device->space(AS_PROGRAM);
-	se3208_state->direct = &se3208_state->program->direct();
-	se3208_state->PC=SE3208_Read32(se3208_state, 0);
-	se3208_state->SR=0;
-	se3208_state->IRQ=CLEAR_LINE;
-	se3208_state->NMI=CLEAR_LINE;
+	for ( int i = 0; i < 8; i++ )
+	{
+		m_R[i] = 0;
+	}
+	m_SP = 0;
+	m_ER = 0;
+	m_PPC = 0;
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_PC=SE3208_Read32(0);
+	m_SR=0;
+	m_IRQ=CLEAR_LINE;
+	m_NMI=CLEAR_LINE;
 }
 
-static void SE3208_NMI(se3208_state_t *se3208_state)
+void se3208_device::SE3208_NMI()
 {
-	PushVal(se3208_state,se3208_state->PC);
-	PushVal(se3208_state,se3208_state->SR);
+	PushVal(m_PC);
+	PushVal(m_SR);
 
 	CLRFLAG(FLAG_NMI|FLAG_ENI|FLAG_E|FLAG_M);
 
-	se3208_state->PC=SE3208_Read32(se3208_state, 4);
+	m_PC=SE3208_Read32(4);
 }
 
-static void SE3208_Interrupt(se3208_state_t *se3208_state)
+void se3208_device::SE3208_Interrupt()
 {
 	if(!TESTFLAG(FLAG_ENI))
 		return;
 
-	PushVal(se3208_state,se3208_state->PC);
-	PushVal(se3208_state,se3208_state->SR);
+	PushVal(m_PC);
+	PushVal(m_SR);
 
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);
 
 
 	if(!(TESTFLAG(FLAG_AUT)))
-		se3208_state->PC=SE3208_Read32(se3208_state, 8);
+		m_PC=SE3208_Read32(8);
 	else
-		se3208_state->PC=SE3208_Read32(se3208_state, 4*se3208_state->irq_callback(se3208_state->device, 0));
+		m_PC=SE3208_Read32(4*standard_irq_callback(0));
 }
 
 
-static CPU_EXECUTE( se3208 )
+void se3208_device::execute_run()
 {
-	se3208_state_t *se3208_state = get_safe_token(device);
-
 	do
 	{
-		UINT16 Opcode=se3208_state->direct->read_decrypted_word(se3208_state->PC, WORD_XOR_LE(0));
+		UINT16 Opcode=m_direct->read_decrypted_word(m_PC, WORD_XOR_LE(0));
 
-		debugger_instruction_hook(device, se3208_state->PC);
+		debugger_instruction_hook(this, m_PC);
 
-		OpTable[Opcode](se3208_state, Opcode);
-		se3208_state->PPC=se3208_state->PC;
-		se3208_state->PC+=2;
+		(this->*OpTable[Opcode])(Opcode);
+		m_PPC=m_PC;
+		m_PC+=2;
 		//Check interrupts
-		if(se3208_state->NMI==ASSERT_LINE)
+		if(m_NMI==ASSERT_LINE)
 		{
-			SE3208_NMI(se3208_state);
-			se3208_state->NMI=CLEAR_LINE;
+			SE3208_NMI();
+			m_NMI=CLEAR_LINE;
 		}
-		else if(se3208_state->IRQ==ASSERT_LINE && TESTFLAG(FLAG_ENI))
+		else if(m_IRQ==ASSERT_LINE && TESTFLAG(FLAG_ENI))
 		{
-			SE3208_Interrupt(se3208_state);
+			SE3208_Interrupt();
 		}
-		--(se3208_state->icount);
-	} while(se3208_state->icount>0);
+		--(m_icount);
+	} while(m_icount>0);
 }
 
-static CPU_INIT( se3208 )
+void se3208_device::device_start()
 {
-	se3208_state_t *se3208_state = get_safe_token(device);
-
 	BuildTable();
 
-	se3208_state->irq_callback = irqcallback;
-	se3208_state->device = device;
-	se3208_state->program = &device->space(AS_PROGRAM);
-	se3208_state->direct = &se3208_state->program->direct();
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+
+	save_item(NAME(m_R));
+	save_item(NAME(m_PC));
+	save_item(NAME(m_SR));
+	save_item(NAME(m_SP));
+	save_item(NAME(m_ER));
+	save_item(NAME(m_IRQ));
+	save_item(NAME(m_NMI));
+
+	state_add( SE3208_PC,  "PC", m_PC).formatstr("%08X");
+	state_add( SE3208_SR,  "SR", m_SR).formatstr("%08X");
+	state_add( SE3208_ER,  "ER", m_ER).formatstr("%08X");
+	state_add( SE3208_SP,  "SP", m_SP).formatstr("%08X");
+	state_add( SE3208_R0,  "R0", m_R[ 0]).formatstr("%08X");
+	state_add( SE3208_R1,  "R1", m_R[ 1]).formatstr("%08X");
+	state_add( SE3208_R2,  "R2", m_R[ 2]).formatstr("%08X");
+	state_add( SE3208_R3,  "R3", m_R[ 3]).formatstr("%08X");
+	state_add( SE3208_R4,  "R4", m_R[ 4]).formatstr("%08X");
+	state_add( SE3208_R5,  "R5", m_R[ 5]).formatstr("%08X");
+	state_add( SE3208_R6,  "R6", m_R[ 6]).formatstr("%08X");
+	state_add( SE3208_R7,  "R7", m_R[ 7]).formatstr("%08X");
+	state_add( SE3208_PPC, "PPC", m_PPC).formatstr("%08X");
+
+	state_add(STATE_GENPC, "GENPC", m_PC).noshow();
+	state_add(STATE_GENSP, "GENSP", m_SP).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).formatstr("%10s").noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", m_PPC).noshow();
+
+	m_icountptr = &m_icount;
 }
 
-static CPU_EXIT( se3208 )
+
+void se3208_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	if(OpTable) {
-		global_free(OpTable);
-		OpTable = NULL;
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c %c%c%c%c%c",
+					m_SR&FLAG_C?'C':'.',
+					m_SR&FLAG_V?'V':'.',
+					m_SR&FLAG_S?'S':'.',
+					m_SR&FLAG_Z?'Z':'.',
+
+					m_SR&FLAG_M?'M':'.',
+					m_SR&FLAG_E?'E':'.',
+					m_SR&FLAG_AUT?'A':'.',
+					m_SR&FLAG_ENI?'I':'.',
+					m_SR&FLAG_NMI?'N':'.'
+			);
+			break;
 	}
 }
 
-
-static void set_irq_line(se3208_state_t *se3208_state, int line,int state)
+void se3208_device::execute_set_input( int line, int state )
 {
 	if(line==INPUT_LINE_NMI)    //NMI
-		se3208_state->NMI=state;
+		m_NMI=state;
 	else
-		se3208_state->IRQ=state;
+		m_IRQ=state;
 }
 
-
-static CPU_SET_INFO( se3208 )
+offs_t se3208_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	se3208_state_t *se3208_state = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + SE3208_INT:      set_irq_line(se3208_state, 0, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  set_irq_line(se3208_state, INPUT_LINE_NMI, info->i);    break;
-
-		case CPUINFO_INT_REGISTER + SE3208_PC:
-		case CPUINFO_INT_PC:                            se3208_state->PC = info->i;                 break;
-		case CPUINFO_INT_REGISTER + SE3208_SP:
-		case CPUINFO_INT_SP:                            se3208_state->SP = info->i;                 break;
-		case CPUINFO_INT_REGISTER + SE3208_ER:          se3208_state->ER = info->i;                 break;
-		case CPUINFO_INT_REGISTER + SE3208_SR:          se3208_state->SR = info->i;                 break;
-		case CPUINFO_INT_REGISTER + SE3208_R0:          se3208_state->R[ 0] = info->i;              break;
-		case CPUINFO_INT_REGISTER + SE3208_R1:          se3208_state->R[ 1] = info->i;              break;
-		case CPUINFO_INT_REGISTER + SE3208_R2:          se3208_state->R[ 2] = info->i;              break;
-		case CPUINFO_INT_REGISTER + SE3208_R3:          se3208_state->R[ 3] = info->i;              break;
-		case CPUINFO_INT_REGISTER + SE3208_R4:          se3208_state->R[ 4] = info->i;              break;
-		case CPUINFO_INT_REGISTER + SE3208_R5:          se3208_state->R[ 5] = info->i;              break;
-		case CPUINFO_INT_REGISTER + SE3208_R6:          se3208_state->R[ 6] = info->i;              break;
-		case CPUINFO_INT_REGISTER + SE3208_R7:          se3208_state->R[ 7] = info->i;              break;
-	}
+	extern CPU_DISASSEMBLE( se3208 );
+	return CPU_DISASSEMBLE_NAME(se3208)(this, buffer, pc, oprom, opram, options);
 }
 
 
-CPU_GET_INFO( se3208 )
-{
-	se3208_state_t *se3208_state = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(se3208_state_t);               break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 1;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;                    break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 2;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 1;                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;                  break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
-
-		case CPUINFO_INT_INPUT_STATE + SE3208_INT:      info->i = se3208_state->IRQ;                    break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = se3208_state->NMI;                    break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    info->i = se3208_state->PPC;                    break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SE3208_PC:          info->i = se3208_state->PC;                 break;
-		case CPUINFO_INT_REGISTER + SE3208_SP:
-		case CPUINFO_INT_SP:                            info->i = se3208_state->SP;                 break;
-		case CPUINFO_INT_REGISTER + SE3208_SR:          info->i = se3208_state->SR;                 break;
-		case CPUINFO_INT_REGISTER + SE3208_ER:          info->i = se3208_state->ER;                 break;
-		case CPUINFO_INT_REGISTER + SE3208_R0:          info->i = se3208_state->R[ 0];              break;
-		case CPUINFO_INT_REGISTER + SE3208_R1:          info->i = se3208_state->R[ 1];              break;
-		case CPUINFO_INT_REGISTER + SE3208_R2:          info->i = se3208_state->R[ 2];              break;
-		case CPUINFO_INT_REGISTER + SE3208_R3:          info->i = se3208_state->R[ 3];              break;
-		case CPUINFO_INT_REGISTER + SE3208_R4:          info->i = se3208_state->R[ 4];              break;
-		case CPUINFO_INT_REGISTER + SE3208_R5:          info->i = se3208_state->R[ 5];              break;
-		case CPUINFO_INT_REGISTER + SE3208_R6:          info->i = se3208_state->R[ 6];              break;
-		case CPUINFO_INT_REGISTER + SE3208_R7:          info->i = se3208_state->R[ 7];              break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(se3208);      break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(se3208);     break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(se3208);   break;
-		case CPUINFO_FCT_EXIT:                          info->exit = CPU_EXIT_NAME(se3208);     break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(se3208);break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                      break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(se3208);       break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &se3208_state->icount;           break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "SE3208");              break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "se3208");              break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Advanced Digital Chips Inc."); break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.00");                break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Miguel Angel Horna, all rights reserved."); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c %c%c%c%c%c",
-					se3208_state->SR&FLAG_C?'C':'.',
-					se3208_state->SR&FLAG_V?'V':'.',
-					se3208_state->SR&FLAG_S?'S':'.',
-					se3208_state->SR&FLAG_Z?'Z':'.',
-
-					se3208_state->SR&FLAG_M?'M':'.',
-					se3208_state->SR&FLAG_E?'E':'.',
-					se3208_state->SR&FLAG_AUT?'A':'.',
-					se3208_state->SR&FLAG_ENI?'I':'.',
-					se3208_state->SR&FLAG_NMI?'N':'.'
-
-					);
-
-			break;
-
-		case CPUINFO_STR_REGISTER + SE3208_PC:              sprintf(info->s, "PC  :%08X", se3208_state->PC); break;
-		case CPUINFO_STR_REGISTER + SE3208_SR:              sprintf(info->s, "SR  :%08X", se3208_state->SR); break;
-		case CPUINFO_STR_REGISTER + SE3208_ER:              sprintf(info->s, "ER  :%08X", se3208_state->ER); break;
-		case CPUINFO_STR_REGISTER + SE3208_SP:              sprintf(info->s, "SP  :%08X", se3208_state->SP); break;
-		case CPUINFO_STR_REGISTER + SE3208_R0:              sprintf(info->s, "R0  :%08X", se3208_state->R[ 0]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R1:              sprintf(info->s, "R1  :%08X", se3208_state->R[ 1]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R2:              sprintf(info->s, "R2  :%08X", se3208_state->R[ 2]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R3:              sprintf(info->s, "R3  :%08X", se3208_state->R[ 3]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R4:              sprintf(info->s, "R4  :%08X", se3208_state->R[ 4]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R5:              sprintf(info->s, "R5  :%08X", se3208_state->R[ 5]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R6:              sprintf(info->s, "R6  :%08X", se3208_state->R[ 6]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R7:              sprintf(info->s, "R7  :%08X", se3208_state->R[ 7]); break;
-		case CPUINFO_STR_REGISTER + SE3208_PPC:             sprintf(info->s, "PPC  :%08X", se3208_state->PPC); break;
-	}
-}
-
-
-DEFINE_LEGACY_CPU_DEVICE(SE3208, se3208);
