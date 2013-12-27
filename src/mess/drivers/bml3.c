@@ -121,7 +121,7 @@ public:
 private:
 	UINT8 m_psg_latch;
 	UINT8 m_attr_latch;
-	UINT8 m_io_latch;
+	//UINT8 m_io_latch;
 	UINT8 m_vres_reg;
 	UINT8 m_keyb_interrupt_disabled;
 	UINT8 m_keyb_nmi_disabled;
