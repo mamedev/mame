@@ -293,20 +293,26 @@ inline void mc68901_device::timer_input(int index, int value)
 
 inline void mc68901_device::gpio_input(int bit, int state)
 {
-	if (BIT(m_gpip, bit) && !state) // if transition from 1 to 0 is detected...
+	if (state != BIT(m_gpip, bit))
 	{
-		if (LOG) logerror("MC68901 '%s' Edge Transition Detected on GPIO%u\n", tag(), bit);
-
-		if (m_ier & INT_MASK_GPIO[bit]) // AND interrupt enabled bit is set...
+		if (state == BIT(m_aer, bit))
 		{
-			if (LOG) logerror("MC68901 '%s' Interrupt Pending for GPIO%u\n", tag(), bit);
+			if (LOG) logerror("MC68901 '%s' Edge Transition Detected on GPIO%u\n", tag(), bit);
 
-			take_interrupt(INT_MASK_GPIO[bit]); // set interrupt pending bit
+			if (m_ier & INT_MASK_GPIO[bit]) // AND interrupt enabled bit is set...
+			{
+				if (LOG) logerror("MC68901 '%s' Interrupt Pending for GPIO%u\n", tag(), bit);
+
+				take_interrupt(INT_MASK_GPIO[bit]); // set interrupt pending bit
+			}
 		}
-	}
 
-	m_gpip &= ((1 << bit) ^ 0xff);
-	m_gpip |= (state << bit);
+
+		if (state)
+			m_gpip &= ~(1 << bit);
+		else
+			m_gpip |= (1 << bit);
+	}
 }
 
 
