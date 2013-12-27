@@ -44,7 +44,7 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_tra_clock_state = false;
 	m_tra_rate = attotime::never;
 	m_rcv_rate = attotime::never;
-	m_tra_flags = 0;
+	m_tra_flags = TRANSMIT_REGISTER_EMPTY;
 	m_rcv_register_data = 0x8000;
 	m_rcv_bit_count = 0;
 	m_connection_state = 0;
@@ -80,11 +80,16 @@ void device_serial_interface::set_tra_rate(attotime rate)
 
 void device_serial_interface::tra_edge()
 {
-	tra_callback();
-	if(is_transmit_register_empty())
+	if (!is_transmit_register_empty())
+	{
+		tra_callback();
+		if (is_transmit_register_empty())
+			tra_complete();
+	}
+
+	if (is_transmit_register_empty() && !m_tra_rate.is_never())
 	{
 		m_tra_clock->adjust(attotime::never);
-		tra_complete();
 	}
 }
 
