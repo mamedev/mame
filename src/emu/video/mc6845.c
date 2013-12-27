@@ -517,6 +517,17 @@ void mc6845_device::recompute_parameters(bool postload)
 
 			attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_clock) * (m_horiz_char_total + 1) * vert_pix_total;
 
+			// This doubles the vertical resolution, required for 'interlace and video' mode support.
+			// Tested and works for super80v, which was designed with this in mind (choose green or monochrome colour in config switches).
+			// However it breaks some other drivers (apricot,a6809,victor9k,bbc(mode7)).
+			// So, it is commented out for now.
+			// Also, the mode-register change needs to be added to the changed-parameter tests above.
+			if (MODE_INTERLACE_AND_VIDEO)
+			{
+				//max_visible_y *= 2;
+				//vert_pix_total *= 2;
+			}
+
 			if(m_show_border_area)
 				visarea.set(0, horiz_pix_total+1, 0, vert_pix_total+1);
 			else
@@ -648,8 +659,8 @@ void mc6845_device::handle_line_timer()
 
 	// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
 	// The correct test would be:
-	// if ( m_raster_counter == m_max_ras_addr )
-	if ( m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) )
+	// if ( m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr) )
+	if ( m_raster_counter == m_max_ras_addr )
 	{
 		/* Check if we have reached the end of the vertical area */
 		if ( m_line_counter == m_vert_char_total )
