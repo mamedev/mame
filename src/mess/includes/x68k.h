@@ -21,26 +21,6 @@
 #define GFX256    1
 #define GFX65536  2
 
-enum
-{
-	MFP_IRQ_GPIP0 = 0,
-	MFP_IRQ_GPIP1,
-	MFP_IRQ_GPIP2,
-	MFP_IRQ_GPIP3,
-	MFP_IRQ_TIMERD,
-	MFP_IRQ_TIMERC,
-	MFP_IRQ_GPIP4,
-	MFP_IRQ_GPIP5,
-	MFP_IRQ_TIMERB,
-	MFP_IRQ_TX_ERROR,
-	MFP_IRQ_TX_EMPTY,
-	MFP_IRQ_RX_ERROR,
-	MFP_IRQ_RX_FULL,
-	MFP_IRQ_TIMERA,
-	MFP_IRQ_GPIP6,
-	MFP_IRQ_GPIP7
-};  // MC68901 IRQ priority levels
-
 class x68k_state : public driver_device
 {
 public:
@@ -267,11 +247,6 @@ public:
 	DECLARE_VIDEO_START(x68000);
 	DECLARE_PALETTE_INIT(x68000);
 	UINT32 screen_update_x68000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(mfp_update_irq);
-	TIMER_CALLBACK_MEMBER(mfp_timer_a_callback);
-	TIMER_CALLBACK_MEMBER(mfp_timer_b_callback);
-	TIMER_CALLBACK_MEMBER(mfp_timer_c_callback);
-	TIMER_CALLBACK_MEMBER(mfp_timer_d_callback);
 	TIMER_CALLBACK_MEMBER(x68k_led_callback);
 	TIMER_CALLBACK_MEMBER(x68k_keyboard_poll);
 	TIMER_CALLBACK_MEMBER(x68k_scc_ack);
