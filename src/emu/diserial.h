@@ -48,8 +48,13 @@ public:
 	device_serial_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_serial_interface();
 
-	virtual void input_callback(UINT8 state) = 0;
+	void connect(device_serial_interface *other_connection);
+	DECLARE_WRITE_LINE_MEMBER(rx_w);
+	DECLARE_WRITE_LINE_MEMBER(tx_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(rx_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
+protected:
 	void set_data_frame(int num_data_bits, int stop_bit_count, int parity_code, bool synchronous);
 
 	void receive_register_reset();
@@ -65,10 +70,6 @@ public:
 	void set_rate(attotime rate) { set_rcv_rate(rate); set_tra_rate(rate); }
 	void set_rate(UINT32 clock, int div) { set_rcv_rate(clock, div); set_tra_rate(clock, div); }
 	void set_rate(int baud) { set_rcv_rate(baud); set_tra_rate(baud); }
-
-	DECLARE_WRITE_LINE_MEMBER(tx_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(rx_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 	void transmit_register_reset();
 	void transmit_register_add_bit(int bit);
@@ -90,9 +91,8 @@ public:
 
 	void set_other_connection(device_serial_interface *other_connection);
 
-	void connect(device_serial_interface *other_connection);
-	DECLARE_WRITE_LINE_MEMBER(rx_w);
-protected:
+	virtual void input_callback(UINT8 state) = 0;
+
 	UINT8 m_input_state;
 	UINT8 m_connection_state;
 	virtual void tra_callback() { }

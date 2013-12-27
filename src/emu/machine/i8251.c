@@ -754,6 +754,18 @@ WRITE_LINE_MEMBER(i8251_device::write_rx)
 	}
 }
 
+WRITE_LINE_MEMBER(i8251_device::write_cts)
+{
+	if (state)
+	{
+		input_callback(m_input_state | CTS);
+	}
+	else
+	{
+		input_callback(m_input_state & ~CTS);
+	}
+}
+
 WRITE_LINE_MEMBER(i8251_device::write_dsr)
 {
 	if (state)

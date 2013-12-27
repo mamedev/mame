@@ -561,7 +561,7 @@ void rainbow_state::machine_reset()
 	m_z80_halted = true;
 	m_kbd_tx_ready = m_kbd_rx_ready = false;
 
-	m_kbd8251->input_callback(device_serial_interface::CTS); // raise clear to send
+	m_kbd8251->write_cts(1);
 
 	m_KBD = 0;
 

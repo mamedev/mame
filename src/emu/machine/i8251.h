@@ -84,6 +84,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxc_w ) { if (state) receive_clock(); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_rx );
+	DECLARE_WRITE_LINE_MEMBER( write_cts );
 	DECLARE_WRITE_LINE_MEMBER( write_dsr );
 
 	void receive_character(UINT8 ch);
