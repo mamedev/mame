@@ -9,6 +9,7 @@
 /nvram
 /obj
 /snap
+src/osd/winui
 src/regtests/chdman/temp
 src/regtests/jedutil/output
 /sta

@@ -581,6 +581,22 @@ public:
 	ATTR_HOT inline void push_to_queue(const netlist_time &delay);
 	ATTR_HOT bool is_queued() { return m_in_queue == 1; }
 
+	/* internal state support
+	 * FIXME: get rid of this and implement export/import in MAME
+	 */
+    ATTR_COLD inline netlist_sig_t &Q_state_ptr()
+    {
+        assert(family() == LOGIC);
+        return m_cur.Q;
+    }
+
+    ATTR_COLD inline double &Q_Analog_state_ptr()
+    {
+        //assert(object_type(SIGNAL_MASK) == SIGNAL_ANALOG);
+        assert(family() == ANALOG);
+        return m_cur.Analog;
+    }
+
 	// m_terms is only used by analog subsystem
 	typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
 
@@ -588,13 +604,6 @@ public:
 	netlist_matrix_solver_t *m_solver;
 
 	netlist_core_terminal_t *m_head;
-
-// the following three must be public for mame support
-//protected:
-
-	hybrid_t m_last;
-	hybrid_t m_cur;
-	hybrid_t m_new;
 
     /* use this to register state.... */
     ATTR_COLD virtual void late_save_register()
@@ -612,7 +621,12 @@ public:
     }
 
 protected:
-	UINT32 m_num_cons;
+
+    UINT32 m_num_cons;
+
+	hybrid_t m_last;
+	hybrid_t m_cur;
+	hybrid_t m_new;
 
 	/* we don't use this to save state
 	 * because we may get deleted again ...

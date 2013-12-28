@@ -290,10 +290,10 @@ LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwa
 
 ifeq ($(DIRECTINPUT),8)
 LIBS += -ldinput8
-CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0800
+CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0800 -Idirectx
 else
 LIBS += -ldinput
-CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0700
+CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0700 -Idirectx
 endif
 
 LIBS += -lcomdlg32

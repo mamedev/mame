@@ -59,14 +59,14 @@ USE_DISPATCH_GL = 1
 # active development on sdlmame or SDL.
 
 # uncomment the next line to compile and link against SDL2.0
-# SDL_LIBVER = sdl2
+SDL_LIBVER = sdl2
 
 # uncomment the next line to use couriersud's multi-keyboard patch for SDL 2.1? (this API was removed prior to the 2.0 release)
 # SDL2_MULTIAPI = 1
 
 # uncomment the next line to specify where you have installed
 # SDL. Equivalent to the ./configure --prefix=<path>
-# SDL_INSTALL_ROOT = /usr/local/sdl13
+SDL_INSTALL_ROOT = /usr/local/sdl20
 
 # uncomment to disable the Qt debugger (on non-OSX this disables all debugging)
 # NO_USE_QTDEBUG = 1

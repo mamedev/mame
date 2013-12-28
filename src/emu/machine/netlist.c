@@ -200,11 +200,11 @@ void netlist_mame_device_t::device_start()
 		netlist_net_t *n = m_netlist->m_nets[i];
 		if (n->isRailNet())
 		{
-			state_add(i*2, n->name(), n->m_cur.Q);
+			state_add(i*2, n->name(), n->Q_state_ptr());
 		}
 		else
 		{
-			state_add(i*2+1, n->name(), n->m_cur.Analog).formatstr("%20s");
+			state_add(i*2+1, n->name(), n->Q_Analog_state_ptr()).formatstr("%20s");
 		}
 	}
 
