@@ -106,6 +106,8 @@ protected:
 	// Must be called from device_timer in the underlying device
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	bool m_start_bit_hack_for_external_clocks;
+
 private:
 	enum { TRA_TIMER_ID = 10000, RCV_TIMER_ID };
 

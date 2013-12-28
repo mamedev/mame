@@ -50,6 +50,8 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_connection_state = 0;
 	m_rcv_flags = 0;
 	m_input_state = 0;
+	m_rcv_line = 0;
+	m_start_bit_hack_for_external_clocks = false;
 }
 
 device_serial_interface::~device_serial_interface()
@@ -178,6 +180,8 @@ WRITE_LINE_MEMBER(device_serial_interface::rx_w)
 		if(m_rcv_clock && !(m_rcv_rate.is_never()))
 			// make start delay just a bit longer to make sure we are called after the sender
 			m_rcv_clock->adjust(((m_rcv_rate*3)/2), 0, m_rcv_rate);
+		else if(m_start_bit_hack_for_external_clocks)
+			m_rcv_bit_count_received--;
 	}
 	return;
 }
@@ -199,7 +203,6 @@ void device_serial_interface::receive_register_update_bit(int bit)
 	/* shift new bit in */
 	m_rcv_register_data = (m_rcv_register_data & 0x7fff) | (bit<<15);
 	/* update bit count received */
-	m_rcv_bit_count_received++;
 
 	/* asynchronous mode */
 	if (m_rcv_flags & RECEIVE_REGISTER_WAITING_FOR_START_BIT)
@@ -225,6 +228,8 @@ void device_serial_interface::receive_register_update_bit(int bit)
 	else
 	if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
 	{
+		m_rcv_bit_count_received++;
+
 		/* received all bits? */
 		if (m_rcv_bit_count_received==m_rcv_bit_count)
 		{

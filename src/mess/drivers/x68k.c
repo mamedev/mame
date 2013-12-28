@@ -128,6 +128,7 @@
 #include "formats/xdf_dsk.h"
 #include "formats/dim_dsk.h"
 #include "machine/x68k_hdc.h"
+#include "machine/x68k_kbd.h"
 #include "includes/x68k.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
@@ -146,9 +147,6 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	{
 	case TIMER_X68K_LED:
 		x68k_led_callback(ptr, param);
-		break;
-	case TIMER_X68K_KEYBOARD_POLL:
-		x68k_keyboard_poll(ptr, param);
 		break;
 	case TIMER_X68K_SCC_ACK:
 		x68k_scc_ack(ptr, param);
@@ -221,163 +219,6 @@ READ16_MEMBER(x68k_state::x68k_dmac_r)
 {
 	device_t* device = machine().device("hd63450");
 	return hd63450_r(device, space, offset, mem_mask);
-}
-
-void x68k_state::x68k_keyboard_ctrl_w(int data)
-{
-	/* Keyboard control commands:
-	   00xxxxxx - TV Control
-	              Not of much use as yet
-
-	   01000xxy - y = Mouse control signal
-
-	   01001xxy - y = Keyboard enable
-
-	   010100xy - y = Sharp X1 display compatibility mode
-
-	   010101xx - xx = LED brightness (00 = bright, 11 = dark)
-
-	   010110xy - y = Display control enable
-
-	   010111xy - y = Display control via the Opt. 2 key enable
-
-	   0110xxxx - xxxx = Key delay (default 500ms)
-	                     100 * (delay time) + 200ms
-
-	   0111xxxx - xxxx = Key repeat rate  (default 110ms)
-	                     (repeat rate)^2*5 + 30ms
-
-	   1xxxxxxx - xxxxxxx = keyboard LED status
-	              b6 = "full size"
-	              b5 = hiragana
-	              b4 = insert
-	              b3 = caps
-	              b2 = code input
-	              b1 = romaji input
-	              b0 = kana
-	*/
-
-	if(data & 0x80)  // LED status
-	{
-		output_set_value("key_led_kana",(data & 0x01) ? 0 : 1);
-		output_set_value("key_led_romaji",(data & 0x02) ? 0 : 1);
-		output_set_value("key_led_code",(data & 0x04) ? 0 : 1);
-		output_set_value("key_led_caps",(data & 0x08) ? 0 : 1);
-		output_set_value("key_led_insert",(data & 0x10) ? 0 : 1);
-		output_set_value("key_led_hiragana",(data & 0x20) ? 0 : 1);
-		output_set_value("key_led_fullsize",(data & 0x40) ? 0 : 1);
-		logerror("KB: LED status set to %02x\n",data & 0x7f);
-	}
-
-	if((data & 0xc0) == 0)  // TV control
-	{
-		// nothing for now
-	}
-
-	if((data & 0xf8) == 0x48)  // Keyboard enable
-	{
-		m_keyboard.enabled = data & 0x01;
-		logerror("KB: Keyboard enable bit = %i\n",m_keyboard.enabled);
-	}
-
-	if((data & 0xf0) == 0x60)  // Key delay time
-	{
-		m_keyboard.delay = data & 0x0f;
-		logerror("KB: Keypress delay time is now %ims\n",(data & 0x0f)*100+200);
-	}
-
-	if((data & 0xf0) == 0x70)  // Key repeat rate
-	{
-		m_keyboard.repeat = data & 0x0f;
-		logerror("KB: Keypress repeat rate is now %ims\n",((data & 0x0f)^2)*5+30);
-	}
-
-}
-
-int x68k_state::x68k_keyboard_pop_scancode()
-{
-	int ret;
-	if(m_keyboard.keynum == 0)  // no scancodes in USART buffer
-		return 0x00;
-
-	m_keyboard.keynum--;
-	ret = m_keyboard.buffer[m_keyboard.tailpos++];
-	if(m_keyboard.tailpos > 15)
-		m_keyboard.tailpos = 0;
-
-	logerror("MFP: Keyboard buffer pop 0x%02x\n",ret);
-	return ret;
-}
-
-void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
-{
-	m_keyboard.keynum++;
-	if(m_keyboard.keynum >= 1)
-	{ // keyboard buffer full
-		if(m_keyboard.enabled != 0)
-		{
-			m_mfp.rsr |= 0x80;  // Buffer full
-			if(ioport("options")->read() & 0x01)
-			{
-				m_current_vector[6] = 0x4c;
-				m_maincpu->set_input_line_and_vector(6,ASSERT_LINE,0x4c);
-				logerror("MFP: Receive buffer full IRQ sent\n");
-			}
-		}
-	}
-	m_keyboard.buffer[m_keyboard.headpos++] = code;
-	if(m_keyboard.headpos > 15)
-	{
-		m_keyboard.headpos = 0;
-		m_current_vector[6] = 0x4b;
-	}
-}
-
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_keyboard_poll)
-{
-	int x;
-	static const char *const keynames[] = { "key1", "key2", "key3", "key4" };
-
-	for(x=0;x<0x80;x++)
-	{
-		// adjust delay/repeat timers
-		if(m_keyboard.keytime[x] > 0)
-		{
-			m_keyboard.keytime[x] -= 5;
-		}
-		if(!(ioport(keynames[x / 32])->read() & (1 << (x % 32))))
-		{
-			if(m_keyboard.keyon[x] != 0)
-			{
-				x68k_keyboard_push_scancode(0x80 + x);
-				m_keyboard.keytime[x] = 0;
-				m_keyboard.keyon[x] = 0;
-				m_keyboard.last_pressed = 0;
-				logerror("KB: Released key 0x%02x\n",x);
-			}
-		}
-		// check to see if a key is being held
-		if(m_keyboard.keyon[x] != 0 && m_keyboard.keytime[x] == 0 && m_keyboard.last_pressed == x)
-		{
-			if(ioport(keynames[m_keyboard.last_pressed / 32])->read() & (1 << (m_keyboard.last_pressed % 32)))
-			{
-				x68k_keyboard_push_scancode(m_keyboard.last_pressed);
-				m_keyboard.keytime[m_keyboard.last_pressed] = (m_keyboard.repeat^2)*5+30;
-				logerror("KB: Holding key 0x%02x\n",m_keyboard.last_pressed);
-			}
-		}
-		if((ioport(keynames[x / 32])->read() & (1 << (x % 32))))
-		{
-			if(m_keyboard.keyon[x] == 0)
-			{
-				x68k_keyboard_push_scancode(x);
-				m_keyboard.keytime[x] = m_keyboard.delay * 100 + 200;
-				m_keyboard.keyon[x] = 1;
-				m_keyboard.last_pressed = x;
-				logerror("KB: Pushed key 0x%02x\n",x);
-			}
-		}
-	}
 }
 
 
@@ -1076,75 +917,6 @@ READ16_MEMBER(x68k_state::x68k_sysport_r)
 	}
 }
 
-READ16_MEMBER(x68k_state::x68k_mfp_r)
-{
-	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
-	// MFP Timer C, and the power switch
-//  logerror("MFP: [%08x] Reading offset %i\n",space.device().safe_pc(),offset);
-	switch(offset)
-	{
-	case 21:  // RSR
-		return m_mfp.rsr;
-	case 22:  // TSR
-		return m_mfp.tsr | 0x80;  // buffer is typically empty?
-	case 23:
-		return x68k_keyboard_pop_scancode();
-	default:
-		if (ACCESSING_BITS_0_7) return m_mfpdev->read(space, offset);
-	}
-	return 0xffff;
-}
-
-WRITE16_MEMBER(x68k_state::x68k_mfp_w)
-{
-	/* For the Interrupt registers, the bits are set out as such:
-	   Reg A - bit 7: GPIP7 (HSync)
-	           bit 6: GPIP6 (CRTC CIRQ)
-	           bit 5: Timer A
-	           bit 4: Receive buffer full
-	           bit 3: Receive error
-	           bit 2: Transmit buffer empty
-	           bit 1: Transmit error
-	           bit 0: Timer B
-	   Reg B - bit 7: GPIP5 (Unused, always 1)
-	           bit 6: GPIP4 (VSync)
-	           bit 5: Timer C
-	           bit 4: Timer D
-	           bit 3: GPIP3 (FM IRQ)
-	           bit 2: GPIP2 (Power switch)
-	           bit 1: GPIP1 (EXPON)
-	           bit 0: GPIP0 (Alarm)
-	*/
-	switch(offset)
-	{
-	case 21:
-		if(data & 0x01)
-			m_mfp.usart.recv_enable = 1;
-		else
-			m_mfp.usart.recv_enable = 0;
-		break;
-	case 22:
-		if(data & 0x01)
-			m_mfp.usart.send_enable = 1;
-		else
-			m_mfp.usart.send_enable = 0;
-		break;
-	case 23:
-		if(m_mfp.usart.send_enable != 0)
-		{
-			// Keyboard control command.
-			m_mfp.usart.send_buffer = data;
-			x68k_keyboard_ctrl_w(data);
-//          logerror("MFP: [%08x] USART Sent data %04x\n",space.device().safe_pc(),data);
-		}
-		break;
-	default:
-		if (ACCESSING_BITS_0_7) m_mfpdev->write(space, offset, data & 0xff);
-		return;
-	}
-}
-
-
 WRITE16_MEMBER(x68k_state::x68k_ppi_w)
 {
 	i8255_device *ppi = machine().device<i8255_device>("ppi8255");
@@ -1540,8 +1312,8 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
-	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(x68k_mfp_r, x68k_mfp_w)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
+	AM_RANGE(0xe88000, 0xe89fff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
@@ -1578,8 +1350,8 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
-	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(x68k_mfp_r, x68k_mfp_w)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
+	AM_RANGE(0xe88000, 0xe89fff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
@@ -1618,8 +1390,8 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE16(x68k_vid_r, x68k_vid_w,0xffffffff)
 	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE16(x68k_dmac_r, x68k_dmac_w,0xffffffff)
 	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE16(x68k_areaset_r, x68k_areaset_w,0xffffffff)
-	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE16(x68k_mfp_r, x68k_mfp_w,0xffffffff)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff00ff)
+	AM_RANGE(0xe88000, 0xe89fff) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff00ff)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff00ff)
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16(x68k_sysport_r, x68k_sysport_w,0xffffffff)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16(x68k_fm_r, x68k_fm_w,0xffffffff)
@@ -1645,7 +1417,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER( x68k_state::mfp_tdo_w )
+WRITE_LINE_MEMBER( x68k_state::mfp_tbo_w )
 {
 	m_mfpdev->clock_w(state);
 }
@@ -1659,12 +1431,17 @@ static MC68901_INTERFACE( mfp_interface )
 	DEVCB_DRIVER_MEMBER(x68k_state, mfp_gpio_r),        /* GPIO read */
 	DEVCB_NULL,                                         /* GPIO write */
 	DEVCB_NULL,                                         /* TAO */
-	DEVCB_NULL,                                         /* TBO */
+	DEVCB_DRIVER_LINE_MEMBER(x68k_state, mfp_tbo_w),    /* TBO */
 	DEVCB_NULL,                                         /* TCO */
-	DEVCB_DRIVER_LINE_MEMBER(x68k_state, mfp_tdo_w),    /* TDO */
-	DEVCB_NULL,                                         /* serial output */
+	DEVCB_NULL,                                         /* TDO */
+	DEVCB_DEVICE_LINE_MEMBER("keyboard", serial_keyboard_device, rx_w), /* serial output */
 	DEVCB_NULL,
 	DEVCB_NULL
+};
+
+static struct serial_keyboard_interface x68k_keyboard_interface =
+{
+	DEVCB_DEVICE_LINE_MEMBER(MC68901_TAG, mc68901_device, write_rx)
 };
 
 static I8255A_INTERFACE( ppi_interface )
@@ -1737,134 +1514,7 @@ static INPUT_PORTS_START( x68000 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)  PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
 
-	PORT_START( "key1" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_UNUSED) // unused
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)  /* ESC */
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("1  !  \xE3\x83\x8C") PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!') /* 1 ! */
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("2  \"  \xE3\x83\x95") PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"') /* 2 " */
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("3  #  \xE3\x82\xA2  \xE3\x82\xA1") PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#') /* 3 # */
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("4  $  \xE3\x82\xA6  \xE3\x82\xA5") PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$') /* 4 $ */
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("5  %  \xE3\x82\xA8  \xE3\x82\xA7") PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%') /* 5 % */
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("6  &  \xE3\x82\xAA  \xE3\x82\xA9") PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&') /* 6 & */
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("7  \'  \xE3\x83\xA4  \xE3\x83\xA3") PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'') /* 7 ' */
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("8  (  \xE3\x83\xA6  \xE3\x83\xA5") PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(') /* 8 ( */
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("9  )  \xE3\x83\xA8  \xE3\x83\xA7") PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')') /* 9 ) */
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("0  \xE3\x83\xAF  \xE3\x83\xB2") PORT_CODE(KEYCODE_0)  PORT_CHAR('0')                /* 0 */
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("-  =  \xE3\x83\x9B") PORT_CODE(KEYCODE_MINUS)  PORT_CHAR('-') PORT_CHAR('=') /* - = */
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("^  \xE3\x83\x98") PORT_CHAR('^') /* ^ */
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xC2\xA5  \xE3\x83\xBC  |") PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|') /* Yen | */
-	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8) /* Backspace */
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_CODE(KEYCODE_TAB)  PORT_CHAR(9)  /* Tab */
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Q  \xE3\x82\xBF") PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q')  /* Q */
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("W  \xE3\x83\x86") PORT_CODE(KEYCODE_W)  PORT_CHAR('W')  /* W */
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("E  \xE3\x82\xA4  \xE3\x82\xA3") PORT_CODE(KEYCODE_E)  PORT_CHAR('E')  /* E */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("R  \xE3\x82\xB9") PORT_CODE(KEYCODE_R)  PORT_CHAR('R')  /* R */
-	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("T  \xE3\x82\xAB") PORT_CODE(KEYCODE_T)  PORT_CHAR('T')  /* T */
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Y  \xE3\x83\xB3") PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y')  /* Y */
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("U  \xE3\x83\x8A") PORT_CODE(KEYCODE_U)  PORT_CHAR('U')  /* U */
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("I  \xE3\x83\x8B") PORT_CODE(KEYCODE_I)  PORT_CHAR('I')  /* I */
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("O  \xE3\x83\xA9") PORT_CODE(KEYCODE_O)  PORT_CHAR('O')  /* O */
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("P  \xE3\x82\xBB") PORT_CODE(KEYCODE_P)  PORT_CHAR('P')  /* P */
-	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("@  `  \xE3\x82\x9B") PORT_CHAR('@') PORT_CHAR('`')  /* @ */
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("[  {  \xE3\x82\x9C \xE3\x80\x8C") PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')  /* [ { */
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_CODE(KEYCODE_ENTER)  PORT_CHAR(13)  /* Return */
-	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("A  \xE3\x83\x81") PORT_CODE(KEYCODE_A)  PORT_CHAR('A')  /* A */
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("S  \xE3\x83\x88") PORT_CODE(KEYCODE_S)  PORT_CHAR('S')  /* S */
-
-	PORT_START( "key2" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("D  \xE3\x82\xB7") PORT_CODE(KEYCODE_D)  PORT_CHAR('D')  /* D */
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F  \xE3\x83\x8F") PORT_CODE(KEYCODE_F)  PORT_CHAR('F')  /* F */
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("G  \xE3\x82\xAD") PORT_CODE(KEYCODE_G)  PORT_CHAR('G')  /* G */
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("H  \xE3\x82\xAF") PORT_CODE(KEYCODE_H)  PORT_CHAR('H')  /* H */
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("J  \xE3\x83\x9E") PORT_CODE(KEYCODE_J)  PORT_CHAR('J')  /* J */
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("K  \xE3\x83\x8E") PORT_CODE(KEYCODE_K)  PORT_CHAR('K')  /* K */
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("L  \xE3\x83\xAA") PORT_CODE(KEYCODE_L)  PORT_CHAR('L')  /* L */
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(";  +  \xE3\x83\xAC") PORT_CODE(KEYCODE_COLON)  PORT_CHAR(';')  PORT_CHAR('+')  /* ; + */
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(":  *  \xE3\x82\xB1") PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR(':')  PORT_CHAR('*')  /* : * */
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("]  }  \xE3\x83\xA0  \xE3\x80\x8D") PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR(']')  PORT_CHAR('}')  /* ] } */
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Z  \xE3\x83\x84  \xE3\x83\x83") PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z')  /* Z */
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("X  \xE3\x82\xB5") PORT_CODE(KEYCODE_X)  PORT_CHAR('X')  /* X */
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("C  \xE3\x82\xBD") PORT_CODE(KEYCODE_C)  PORT_CHAR('C')  /* C */
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("V  \xE3\x83\x92") PORT_CODE(KEYCODE_V)  PORT_CHAR('V')  /* V */
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("B  \xE3\x82\xB3") PORT_CODE(KEYCODE_B)  PORT_CHAR('B')  /* B */
-	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("N  \xE3\x83\x9F") PORT_CODE(KEYCODE_N)  PORT_CHAR('N')  /* N */
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("M  \xE3\x83\xA2") PORT_CODE(KEYCODE_M)  PORT_CHAR('M')  /* M */
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(",  <  \xE3\x83\x8D  \xE3\x80\x81") PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',')  PORT_CHAR('<')  /* , < */
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME(".  >  \xE3\x83\xAB  \xE3\x80\x82") PORT_CODE(KEYCODE_STOP)  PORT_CHAR('.')  PORT_CHAR('>')  /* . > */
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("/  ?  \xE3\x83\xA1  \xE3\x83\xBB") PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/')  PORT_CHAR('?')  /* / ? */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("_  \xE3\x83\xAD") PORT_CHAR('_')  /* Underscore (shifted only?) */
-	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Space")  PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')  /* Space */
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Home")  PORT_CODE(KEYCODE_HOME)  /* Home */
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Delete")  PORT_CODE(KEYCODE_DEL)  /* Del */
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Roll Up")  PORT_CODE(KEYCODE_PGUP)  /* Roll Up */
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Roll Down")  PORT_CODE(KEYCODE_PGDN)  /* Roll Down */
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Undo")  PORT_CODE(KEYCODE_END)  /* Undo */
-	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Left")  PORT_CODE(KEYCODE_LEFT)  /* Left */
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Up")  PORT_CODE(KEYCODE_UP)  /* Up */
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Right")  PORT_CODE(KEYCODE_RIGHT)  /* Right */
-	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Cursor Down")  PORT_CODE(KEYCODE_DOWN)  /* Down */
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey CLR")  PORT_CODE(KEYCODE_NUMLOCK)  /* CLR */
-
-	PORT_START( "key3" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey /")  PORT_CODE(KEYCODE_SLASH_PAD)  /* / (numpad) */
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey *")  PORT_CODE(KEYCODE_ASTERISK)  /* * (numpad) */
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey -")  PORT_CODE(KEYCODE_MINUS_PAD)  /* - (numpad) */
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 7")  PORT_CODE(KEYCODE_7_PAD)  /* 7 (numpad) */
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 8")  PORT_CODE(KEYCODE_8_PAD)  /* 8 (numpad) */
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 9")  PORT_CODE(KEYCODE_9_PAD)  /* 9 (numpad) */
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey +")  PORT_CODE(KEYCODE_PLUS_PAD)  /* + (numpad) */
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 4")  PORT_CODE(KEYCODE_4_PAD)  /* 4 (numpad) */
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 5")  PORT_CODE(KEYCODE_5_PAD)  /* 5 (numpad) */
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 6")  PORT_CODE(KEYCODE_6_PAD)  /* 6 (numpad) */
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey =")  /* = (numpad) */
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 1")  PORT_CODE(KEYCODE_1_PAD)  /* 1 (numpad) */
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 2")  PORT_CODE(KEYCODE_2_PAD)  /* 2 (numpad) */
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 3")  PORT_CODE(KEYCODE_3_PAD)  /* 3 (numpad) */
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey Enter")  PORT_CODE(KEYCODE_ENTER_PAD)  /* Enter (numpad) */
-	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey 0")  PORT_CODE(KEYCODE_0_PAD)  /* 0 (numpad) */
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey ,")  /* , (numpad) */
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Tenkey .")  PORT_CODE(KEYCODE_DEL_PAD)  /* 2 (numpad) */
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE8\xA8\x98\xE5\x8F\xB7 (Symbolic input)")  /* Sign / Symbolic input (babelfish translation) */
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE7\x99\xBB\xE9\x8C\xB2 (Register)")  /* Register (babelfish translation) */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Help")  /* Help */
-	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF1")  PORT_CODE(KEYCODE_F11)  /* XF1 */
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF2")  PORT_CODE(KEYCODE_F12)  /* XF2 */
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF3")  /* XF3 */
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF4")  /* XF4 */
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("XF5")  /* XF5 */
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xe3\x81\x8b\xe3\x81\xaa (Kana)")  /* Kana */
-	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xe3\x83\xad\xe3\x83\xbc\xe3\x83\x9e\xe5\xad\x97 (Romaji)")  /* Romaji */
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE3\x82\xB3\xE3\x83\xBC\xE3\x83\x89 (Code input)")  /* Code input */
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Caps")  PORT_CODE(KEYCODE_CAPSLOCK)  /* Caps lock */
-	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Insert")  PORT_CODE(KEYCODE_INSERT)  /* Insert */
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE3\x81\xB2\xE3\x82\x89\xE3\x81\x8C\xE3\x81\xAA (Hiragana)")  /* Hiragana */
-
-	PORT_START( "key4" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("\xE5\x85\xA8\xE8\xA7\x92 (Full size)")  /* Full size (babelfish translation) */
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Break")  /* Break */
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Copy")  /* Copy */
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F1")  PORT_CODE(KEYCODE_F1)  /* F1 */
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F2")  PORT_CODE(KEYCODE_F2)  /* F2 */
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F3")  PORT_CODE(KEYCODE_F3)  /* F3 */
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F4")  PORT_CODE(KEYCODE_F4)  /* F4 */
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F5")  PORT_CODE(KEYCODE_F5)  /* F5 */
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F6")  PORT_CODE(KEYCODE_F6)  /* F6 */
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F7")  PORT_CODE(KEYCODE_F7)  /* F7 */
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F8")  PORT_CODE(KEYCODE_F8)  /* F8 */
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F9")  PORT_CODE(KEYCODE_F9)  /* F9 */
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("F10")  PORT_CODE(KEYCODE_F10)  /* F10 */
-		// 0x6d reserved
-		// 0x6e reserved
-		// 0x6f reserved
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Shift")  PORT_CODE(KEYCODE_LSHIFT)  /* Shift */
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Ctrl")  PORT_CODE(KEYCODE_LCONTROL)  /* Ctrl */
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Opt. 1")  PORT_CODE(KEYCODE_PRTSCR) /* Opt1 */
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_KEYBOARD )  PORT_NAME("Opt. 2")  PORT_CODE(KEYCODE_PAUSE)  /* Opt2 */
-
 	PORT_START("options")
-	PORT_CONFNAME( 0x01, 0x01, "Enable keyboard hack")
-	PORT_CONFSETTING(   0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(   0x01, DEF_STR( On ))
 	PORT_CONFNAME( 0x02, 0x02, "Enable fake bus errors")
 	PORT_CONFSETTING(   0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(   0x02, DEF_STR( On ))
@@ -2084,10 +1734,6 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	memset(m_ram->pointer(),0,m_ram->size());
 	memcpy(m_ram->pointer(),romdata,8);
 
-	// init keyboard
-	m_keyboard.delay = 500;  // 3*100+200
-	m_keyboard.repeat = 110;  // 4^2*5+30
-
 	// initialise CRTC, set registers to defaults for the standard text mode (768x512)
 	m_crtc.reg[0] = 137;  // Horizontal total  (in characters)
 	m_crtc.reg[1] = 14;   // Horizontal sync end
@@ -2149,9 +1795,6 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 	space.install_write_handler(0xed0000,0xed3fff,0xffffffff,0,write16_delegate(FUNC(x68k_state::x68k_sram_w),this));
 	membank("bank4")->set_base(m_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
-	// start keyboard timer
-	m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
-
 	// start mouse timer
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
 	m_mouse.inputtype = 0;
@@ -2195,9 +1838,6 @@ MACHINE_START_MEMBER(x68k_state,x68030)
 	space.install_read_handler(0xed0000,0xed3fff,0xffffffff,0,read32_delegate(FUNC(x68k_state::x68k_sram32_r),this));
 	space.install_write_handler(0xed0000,0xed3fff,0xffffffff,0,write32_delegate(FUNC(x68k_state::x68k_sram32_w),this));
 	membank("bank4")->set_base(m_nvram32);  // so that code in SRAM is executable, there is an option for booting from SRAM
-
-	// start keyboard timer
-	m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
 
 	// start mouse timer
 	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_msec(1));  // a guess for now
@@ -2247,10 +1887,6 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x68k_state::x68k_int_ack),this));
 
-	// init keyboard
-	m_keyboard.delay = 500;  // 3*100+200
-	m_keyboard.repeat = 110;  // 4^2*5+30
-	m_kb_timer = timer_alloc(TIMER_X68K_KEYBOARD_POLL);
 	m_scanline_timer = timer_alloc(TIMER_X68K_HSYNC);
 	m_raster_irq = timer_alloc(TIMER_X68K_CRTC_RASTER_IRQ);
 	m_vblank_irq = timer_alloc(TIMER_X68K_CRTC_VBLANK_IRQ);
@@ -2300,6 +1936,8 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 
 	/* device hardware */
 	MCFG_MC68901_ADD(MC68901_TAG, 4000000, mfp_interface)
+
+	MCFG_X68K_KEYBOARD_ADD("keyboard", x68k_keyboard_interface)
 
 	MCFG_I8255A_ADD( "ppi8255",  ppi_interface )
 

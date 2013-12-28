@@ -361,6 +361,8 @@ void mc68901_device::device_config_complete()
 
 void mc68901_device::device_start()
 {
+	m_start_bit_hack_for_external_clocks = true;
+
 	/* resolve callbacks */
 	m_in_gpio_func.resolve(m_in_gpio_cb, *this);
 	m_out_gpio_func.resolve(m_out_gpio_cb, *this);

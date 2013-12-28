@@ -27,7 +27,6 @@ public:
 	enum
 	{
 		TIMER_X68K_LED,
-		TIMER_X68K_KEYBOARD_POLL,
 		TIMER_X68K_SCC_ACK,
 		TIMER_MD_6BUTTON_PORT1_TIMEOUT,
 		TIMER_MD_6BUTTON_PORT2_TIMEOUT,
@@ -66,7 +65,7 @@ public:
 	optional_shared_ptr<UINT32> m_gvram32;
 	optional_shared_ptr<UINT32> m_tvram32;
 
-	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
+	DECLARE_WRITE_LINE_MEMBER( mfp_tbo_w );
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 
 	void fdc_irq(bool state);
@@ -111,15 +110,6 @@ public:
 	} m_adpcm;
 	struct
 	{
-		int rsr;   // [21] Receiver status register
-		int tsr;   // [22] Transmitter status register
-		struct
-		{
-			unsigned char recv_buffer;
-			unsigned char send_buffer;
-			int recv_enable;
-			int send_enable;
-		} usart;
 		unsigned char gpio;
 	} m_mfp;  // MC68901 Multifunction Peripheral (4MHz)
 	struct
@@ -169,20 +159,6 @@ public:
 	} m_video;
 	struct
 	{
-		int delay;  // keypress delay after initial press
-		int repeat; // keypress repeat rate
-		int enabled;  // keyboard enabled?
-		unsigned char led_status;  // keyboard LED status
-		unsigned char buffer[16];
-		int headpos;  // scancodes are added here
-		int tailpos;  // scancodes are read from here
-		int keynum;  // number of scancodes in buffer
-		int keytime[0x80];  // time until next keypress
-		int keyon[0x80];  // is 1 if key is pressed, used to determine if the key state has changed from 1 to 0
-		int last_pressed;  // last key pressed, for repeat key handling
-	} m_keyboard;
-	struct
-	{
 		int irqstatus;
 		int fdcvector;
 		int fddvector;
@@ -214,7 +190,6 @@ public:
 	UINT8 m_current_irq_line;
 	unsigned int m_scanline;
 	int m_led_state;
-	emu_timer* m_kb_timer;
 	emu_timer* m_mouse_timer;
 	emu_timer* m_led_timer;
 	emu_timer* m_net_timer;
@@ -248,7 +223,6 @@ public:
 	DECLARE_PALETTE_INIT(x68000);
 	UINT32 screen_update_x68000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(x68k_led_callback);
-	TIMER_CALLBACK_MEMBER(x68k_keyboard_poll);
 	TIMER_CALLBACK_MEMBER(x68k_scc_ack);
 	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
 	TIMER_CALLBACK_MEMBER(md_6button_port2_timeout);
@@ -272,9 +246,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
 
-	void x68k_keyboard_ctrl_w(int data);
-	int x68k_keyboard_pop_scancode();
-	void x68k_keyboard_push_scancode(unsigned char code);
 	int x68k_read_mouse();
 	void x68k_set_adpcm();
 	UINT8 md_3button_r(int port);
@@ -296,8 +267,6 @@ public:
 	DECLARE_READ16_MEMBER(x68k_ioc_r);
 	DECLARE_WRITE16_MEMBER(x68k_sysport_w);
 	DECLARE_READ16_MEMBER(x68k_sysport_r);
-	DECLARE_READ16_MEMBER(x68k_mfp_r);
-	DECLARE_WRITE16_MEMBER(x68k_mfp_w);
 	DECLARE_WRITE16_MEMBER(x68k_ppi_w);
 	DECLARE_READ16_MEMBER(x68k_ppi_r);
 	DECLARE_WRITE16_MEMBER(x68k_sram_w);
