@@ -707,6 +707,12 @@ WRITE16_MEMBER( megast_state::fpu_w )
 {
 }
 
+WRITE_LINE_MEMBER( st_state::write_monochrome )
+{
+	m_monochrome = state;
+	m_mfp->i7_w(m_monochrome);
+}
+
 
 
 //**************************************************************************
@@ -720,7 +726,8 @@ WRITE16_MEMBER( megast_state::fpu_w )
 void ste_state::dmasound_set_state(int level)
 {
 	m_dmasnd_active = level;
-	m_mfp->tai_w(level);
+	m_mfp->tai_w(m_dmasnd_active);
+	m_mfp->i7_w(m_monochrome ^ m_dmasnd_active);
 
 	if (level == 0)
 	{
@@ -733,6 +740,12 @@ void ste_state::dmasound_set_state(int level)
 	}
 }
 
+
+WRITE_LINE_MEMBER( ste_state::write_monochrome )
+{
+	m_monochrome = state;
+	m_mfp->i7_w(m_monochrome ^ m_dmasnd_active);
+}
 
 //-------------------------------------------------
 //  dmasound_tick -
@@ -1572,7 +1585,7 @@ static INPUT_PORTS_START( st )
 	PORT_CONFNAME( 0x01, 0x00, "Input Port 0 Device")
 	PORT_CONFSETTING( 0x00, "Mouse" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
-	PORT_CONFNAME( 0x80, 0x80, "Monitor")
+	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, st_state, write_monochrome)
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1224)" )
 
@@ -1610,7 +1623,7 @@ static INPUT_PORTS_START( ste )
 	PORT_CONFNAME( 0x01, 0x00, "Input Port 0 Device")
 	PORT_CONFSETTING( 0x00, "Mouse" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
-	PORT_CONFNAME( 0x80, 0x80, "Monitor")
+	PORT_CONFNAME( 0x80, 0x80, "Monitor") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ste_state, write_monochrome)
 	PORT_CONFSETTING( 0x00, "Monochrome (Atari SM124)" )
 	PORT_CONFSETTING( 0x80, "Color (Atari SC1435)" )
 
@@ -1924,7 +1937,7 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	data |= m_rs232->ri_r() << 6;
 
 	// monochrome monitor detect
-	data |= m_config->read() & 0x80;
+	data |= m_monochrome << 7;
 
 	return data;
 }
@@ -1995,7 +2008,7 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	data |= m_rs232->ri_r() << 6;
 
 	// monochrome monitor detect, DMA sound active
-	data |= (m_config->read() & 0x80) ^ (m_dmasnd_active << 7);
+	data |= (m_monochrome ^ m_dmasnd_active) << 7;
 
 	return data;
 }
@@ -2388,6 +2401,9 @@ static MACHINE_CONFIG_START( st, st_state )
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
@@ -2448,6 +2464,9 @@ static MACHINE_CONFIG_START( megast, megast_state )
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
@@ -2517,6 +2536,9 @@ static MACHINE_CONFIG_START( ste, ste_state )
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))
@@ -2596,6 +2618,9 @@ static MACHINE_CONFIG_START( stbook, stbook_state )
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, write_rx))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i1_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i2_w))
+	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(MC68901_TAG, mc68901_device, i6_w))
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(st_state, midi_rx_w))

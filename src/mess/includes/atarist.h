@@ -119,7 +119,8 @@ public:
 			m_ikbd_mouse_px(IKBD_MOUSE_PHASE_STATIC),
 			m_ikbd_mouse_py(IKBD_MOUSE_PHASE_STATIC),
 			m_ikbd_mouse_pc(0),
-			m_ikbd_joy(1)
+			m_ikbd_joy(1),
+			m_monochrome(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -330,6 +331,9 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	IRQ_CALLBACK_MEMBER(atarist_int_ack);
 
+	int m_monochrome;
+	virtual DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
@@ -390,6 +394,7 @@ public:
 	DECLARE_WRITE16_MEMBER( microwire_mask_w );
 
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
+	virtual DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
 	void dmasound_set_state(int level);
 	void dmasound_tick();
