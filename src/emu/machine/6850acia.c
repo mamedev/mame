@@ -59,7 +59,10 @@ const device_type ACIA6850 = &device_creator<acia6850_device>;
 //-------------------------------------------------
 
 acia6850_device::acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ACIA6850, "6850 ACIA", tag, owner, clock, "acia6850", __FILE__)
+	: device_t(mconfig, ACIA6850, "6850 ACIA", tag, owner, clock, "acia6850", __FILE__),
+	m_rxd(0),
+	m_dcd(0),
+	m_cts(0)
 {
 	memset(static_cast<acia6850_interface *>(this), 0, sizeof(acia6850_interface));
 }
