@@ -409,6 +409,8 @@ void mc68901_device::device_start()
 	save_item(NAME(m_tsr));
 	save_item(NAME(m_udr));
 	save_item(NAME(m_udr_written));
+	save_item(NAME(m_rcv));
+	save_item(NAME(m_rcv_pending));
 	save_item(NAME(m_rxtx_word));
 	save_item(NAME(m_rxtx_start));
 	save_item(NAME(m_rxtx_stop));
@@ -455,6 +457,7 @@ void mc68901_device::device_reset()
 	register_w(REGISTER_RSR, 0);
 
 	transmit_register_reset();
+	receive_register_reset();
 }
 
 
@@ -497,6 +500,16 @@ void mc68901_device::tra_complete()
 			transmit_register_setup(m_udr);
 			m_udr_written = 0;
 			m_tsr |= TSR_BUFFER_EMPTY;
+
+			if (m_ier & IR_XMIT_BUFFER_EMPTY)
+			{
+				take_interrupt(IR_XMIT_BUFFER_EMPTY);
+			}
+		}
+		else
+		{
+			m_tsr |= TSR_UNDERRUN_ERROR;
+			// TODO: transmit error?
 		}
 	}
 	else
@@ -507,21 +520,17 @@ void mc68901_device::tra_complete()
 
 
 //-------------------------------------------------
-//  rcv_callback -
-//-------------------------------------------------
-
-void mc68901_device::rcv_callback()
-{
-	receive_register_update_bit(get_in_data_bit());
-}
-
-
-//-------------------------------------------------
 //  rcv_complete -
 //-------------------------------------------------
 
 void mc68901_device::rcv_complete()
 {
+	receive_register_extract();
+	m_rcv = get_received_char();
+	//if (m_rcv_pending) TODO: error?
+		
+	m_rcv_pending = 1;
+	rx_buffer_full();
 }
 
 
@@ -570,9 +579,7 @@ READ8_MEMBER( mc68901_device::read )
 
 	case REGISTER_SCR:   return m_scr;
 	case REGISTER_UCR:   return m_ucr;
-	case REGISTER_RSR:
-		m_rsr_read = 1;
-		return m_rsr;
+	case REGISTER_RSR:   return m_rsr;
 
 	case REGISTER_TSR:
 		{
@@ -584,17 +591,8 @@ READ8_MEMBER( mc68901_device::read )
 		}
 
 	case REGISTER_UDR:
-		/* load RSR with latched value */
-		m_rsr = (m_next_rsr & 0x7c) | (m_rsr & 0x03);
-		m_next_rsr = 0;
-
-		if (m_rsr & 0x78)
-		{
-			/* signal receiver error interrupt */
-			rx_error();
-		}
-
-		return m_udr;
+		m_rcv_pending = 0;
+		return m_rcv;
 
 	default:                      return 0;
 	}
@@ -1135,14 +1133,7 @@ WRITE_LINE_MEMBER( mc68901_device::tbi_w )
 
 WRITE_LINE_MEMBER(mc68901_device::write_rx)
 {
-	if (state)
-	{
-		input_callback(m_input_state | RX);
-	}
-	else
-	{
-		input_callback(m_input_state & ~RX);
-	}
+	device_serial_interface::rx_w(state);
 }
 
 WRITE_LINE_MEMBER(mc68901_device::write_dsr)

@@ -134,7 +134,6 @@ protected:
 	// device_serial_interface overrides
 	virtual void tra_callback();
 	virtual void tra_complete();
-	virtual void rcv_callback();
 	virtual void rcv_complete();
 	virtual void input_callback(UINT8 state);
 
@@ -271,6 +270,8 @@ private:
 	UINT8 m_rsr;                            /* receiver status register */
 	UINT8 m_udr;                            /* USART data register */
 	int m_udr_written;
+	UINT8 m_rcv;
+	int m_rcv_pending;
 
 	/* counter timer state */
 	UINT8 m_tmc[4];     /* timer main counters */
