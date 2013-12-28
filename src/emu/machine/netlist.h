@@ -57,11 +57,11 @@
 // MAME specific configuration
 
 #define MCFG_NETLIST_ADD(_tag, _setup )                                             \
-	MCFG_DEVICE_ADD(_tag, NETLIST, NETLIST_CLOCK)                                   \
+	MCFG_DEVICE_ADD(_tag, NETLIST_CPU, NETLIST_CLOCK)                               \
 	MCFG_NETLIST_SETUP(_setup)
 
 #define MCFG_NETLIST_REPLACE(_tag, _setup)                                          \
-	MCFG_DEVICE_REPLACE(_tag, NETLIST, NETLIST_CLOCK)                               \
+	MCFG_DEVICE_REPLACE(_tag, NETLIST_CPU, NETLIST_CLOCK)                           \
 	MCFG_NETLIST_SETUP(_setup)
 
 #define MCFG_NETLIST_SETUP(_setup)                                                  \
@@ -134,25 +134,22 @@ private:
 // netlist_mame_device_t
 // ----------------------------------------------------------------------------------------
 
-class netlist_mame_device_t : public device_t,
-								public device_execute_interface,
-								public device_state_interface,
-								public device_disasm_interface,
-								public device_memory_interface
+class netlist_mame_device_t : public device_t
 {
 public:
 
 	// construction/destruction
 	netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *file);
 	virtual ~netlist_mame_device_t() {}
 
 	static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
 
-	netlist_setup_t &setup() { return *m_setup; }
-	netlist_mame_t &netlist() { return *m_netlist; }
+	ATTR_HOT inline netlist_setup_t &setup() { return *m_setup; }
+	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
@@ -160,60 +157,94 @@ protected:
 	virtual void device_post_load();
 	virtual void device_pre_save();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
-
-	ATTR_HOT virtual void execute_run();
-
-	// device_disasm_interface overrides
-	ATTR_COLD virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	ATTR_COLD virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
-	ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-
-	// device_memory_interface overrides
-
-	address_space_config m_program_config;
-
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return NULL;
-			default:         return NULL;
-		}
-	}
-
-	virtual void state_string_export(const device_state_entry &entry, astring &string)
-	{
-		if (entry.index() >= 0)
-		{
-			if (entry.index() & 1)
-				string.format("%10.6f", *((double *) entry.dataptr()));
-			else
-				string.format("%d", *((netlist_sig_t *) entry.dataptr()));
-		}
-	}
-
-
-	netlist_mame_t *m_netlist;
-	netlist_setup_t *m_setup;
 
 private:
+    void save_state();
 
-	void save_state();
+	netlist_mame_t *m_netlist;
+    netlist_setup_t *m_setup;
 
 	void (*m_setup_func)(netlist_setup_t &);
-
-	int m_icount;
-	int m_genPC;
-
 };
 
 inline running_machine &netlist_mame_t::machine()
 {
 	return m_parent.machine();
 }
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_cpu_device_t
+// ----------------------------------------------------------------------------------------
+
+class netlist_mame_cpu_device_t : public netlist_mame_device_t,
+                                  public device_execute_interface,
+                                  public device_state_interface,
+                                  public device_disasm_interface,
+                                  public device_memory_interface
+{
+public:
+
+    // construction/destruction
+    netlist_mame_cpu_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    virtual ~netlist_mame_cpu_device_t() {}
+
+    static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
+
+protected:
+    // device_t overrides
+    //virtual void device_config_complete();
+    virtual void device_start();
+    //virtual void device_stop();
+    //virtual void device_reset();
+    //virtual void device_post_load();
+    //virtual void device_pre_save();
+    //virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+    // device_execute_interface overrides
+
+    virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
+    virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
+
+    ATTR_HOT virtual void execute_run();
+
+    // device_disasm_interface overrides
+    ATTR_COLD virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
+    ATTR_COLD virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
+    ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+    // device_memory_interface overrides
+
+    address_space_config m_program_config;
+
+    virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
+    {
+        switch (spacenum)
+        {
+            case AS_PROGRAM: return &m_program_config;
+            case AS_IO:      return NULL;
+            default:         return NULL;
+        }
+    }
+
+    //  device_state_interface overrides
+
+    virtual void state_string_export(const device_state_entry &entry, astring &string)
+    {
+        if (entry.index() >= 0)
+        {
+            if (entry.index() & 1)
+                string.format("%10.6f", *((double *) entry.dataptr()));
+            else
+                string.format("%d", *((netlist_sig_t *) entry.dataptr()));
+        }
+    }
+
+private:
+
+    int m_icount;
+    int m_genPC;
+
+};
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_sub_interface
@@ -327,6 +358,7 @@ public:
 	{
 		register_input("IN", m_in);
 		m_callback.bind_relative_to(downcast<netlist_mame_t &>(netlist()).machine().root_device());
+		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
 	}
 
 	ATTR_COLD void register_callback(netlist_analog_output_delegate callback)
@@ -336,14 +368,13 @@ public:
 
 	ATTR_HOT void update()
 	{
-		// FIXME: Remove after device cleanup
-		if (!m_callback.isnull())
-			m_callback(INPANALOG(m_in), downcast<netlist_mame_t &>(netlist()).parent().local_time());
+        m_callback(INPANALOG(m_in), m_cpu_device->local_time());
 	}
 
 private:
 	netlist_analog_input_t m_in;
 	netlist_analog_output_delegate m_callback;
+	netlist_mame_cpu_device_t *m_cpu_device;
 };
 
 class NETLIB_NAME(sound) : public netlist_device_t
@@ -393,7 +424,8 @@ private:
 
 
 // device type definition
-extern const device_type NETLIST;
+extern const device_type NETLIST_CORE;
+extern const device_type NETLIST_CPU;
 extern const device_type NETLIST_ANALOG_INPUT;
 extern const device_type NETLIST_LOGIC_INPUT;
 
