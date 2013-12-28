@@ -2059,6 +2059,22 @@ ROM_START( magworm )
 ROM_END
 
 
+ROM_START( magworma ) 
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h41.1d",  0x2000, 0x0800, CRC(773a3da6) SHA1(577ae0578231df83a768d6a50b86dcaf715a32d7) )
+	ROM_LOAD( "h42.1e",  0x2800, 0x0800, CRC(482c7808) SHA1(6d274a988e603d33131cb6ffbfe2cdd22fabf25b) )
+	ROM_LOAD( "h43.1fh", 0x3000, 0x0800, CRC(1c46f769) SHA1(dc25ab3d9abf2180d3ff20f96b69fd6ed3b0e08c) )
+	ROM_LOAD( "h44.1j",  0x3800, 0x0800, CRC(19a79e26) SHA1(0485ae6d21ad7c9d04475ad7858c47205830df84) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) /* same as magworm */
+	ROM_LOAD( "h45.7hj", 0x0000, 0x0800, CRC(cea64e1a) SHA1(9022102124e1ad93f912ce8bdf85f8a886b0879b) )
+	ROM_LOAD( "h45.7f",  0x0800, 0x0800, CRC(24558ea5) SHA1(8cd7131e19afd7a96191b1b3c3fba7ae9a140f4b) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom.4p", 0x0000, 0x0200, CRC(a5101624) SHA1(36d11e343a78046b99ea1a2daba4908ec60ae61e) ) /* not used */
+ROM_END
+
+
 ROM_START( milliped )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136013-104.1mn", 0x4000, 0x1000, CRC(40711675) SHA1(b595d6a0f5d3c611ade1b83a94c3b909d2124dc4) )
@@ -2203,7 +2219,8 @@ GAME( 1980, centipdb, centiped, centipdb, centiped, driver_device, 0,        ROT
 GAME( 1989, centipdd, centiped, centiped, centiped, driver_device, 0,        ROT270, "hack (Two-Bit Score)", "Centipede Dux (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1980, caterplr, centiped, caterplr, caterplr, driver_device, 0,        ROT270, "bootleg", "Caterpillar (bootleg of Centipede)", GAME_SUPPORTS_SAVE )
 GAME( 1980, millpac,  centiped, centipdb, centiped, driver_device, 0,        ROT270, "bootleg? (Valadon Automation)", "Millpac (bootleg of Centipede)", GAME_SUPPORTS_SAVE )
-GAME( 1980, magworm,  centiped, magworm,  magworm, driver_device,  0,        ROT270, "bootleg", "Magic Worm (bootleg of Centipede)", GAME_SUPPORTS_SAVE )
+GAME( 1980, magworm,  centiped, magworm,  magworm,  driver_device, 0,        ROT270, "bootleg", "Magic Worm (bootleg of Centipede)", GAME_SUPPORTS_SAVE )
+GAME( 1980, magworma, centiped, magworm,  magworm,  driver_device, 0,        ROT270, "bootleg", "Magic Worm (bootleg of Centipede) alternate", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1982, milliped, 0,        milliped, milliped, driver_device, 0,        ROT270, "Atari",   "Millipede", GAME_SUPPORTS_SAVE )
 GAME( 1989, millipdd, milliped, milliped, milliped, driver_device, 0,        ROT270, "hack (Two-Bit Score)", "Millipede Dux (hack)", GAME_SUPPORTS_SAVE )
 GAME( 2002, multiped, 0,        multiped, multiped, centiped_state, multiped, ROT270, "hack (Braze Technologies)", "Multipede (Centipede/Millipede multigame kit)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

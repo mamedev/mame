@@ -95,6 +95,7 @@ piranhao        // GL
 nmouse          // (c) 1981 Amenip (Palcom Queen River)
 nmouseb         // (c) 1981 Amenip Nova Games Ltd.
 mspacman        // (c) 1981 Midway  // made by General Computer
+mspacmancr      // bootleg on Crush Roller board
 mspacmnf        // hack
 mspacmat        // hack
 msheartb        // hack
@@ -6746,6 +6747,7 @@ centipdd        // hack by Two Bit Score
 caterplr        // (bootleg)
 millpac         // Valadon
 magworm         // (bootleg)
+magworma        // (bootleg)
 mazeinv         // (proto)          (c) 1982
 milliped        // 136013           (c) 1982
 multiped        // hack
