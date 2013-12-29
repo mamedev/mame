@@ -313,7 +313,6 @@ static MC68901_INTERFACE( mfp_intf )
 	0,                                                  /* receive clock */
 	0,                                                  /* transmit clock */
 	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_4),        /* interrupt */
-	DEVCB_NULL,                                         /* GPIO read */
 	DEVCB_NULL,                                         /* GPIO write */
 	DEVCB_NULL,                                         /* TAO */
 	DEVCB_NULL,                                         /* TBO */
