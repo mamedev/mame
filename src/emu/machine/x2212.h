@@ -25,6 +25,13 @@
 	MCFG_DEVICE_ADD(_tag, X2212, 0) \
 	x2212_device::static_set_auto_save(*device);
 
+#define MCFG_X2210_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, X2210, 0)
+
+#define MCFG_X2210_ADD_AUTOSAVE(_tag) \
+	MCFG_DEVICE_ADD(_tag, X2210, 0) \
+	x2212_device::static_set_auto_save(*device);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -40,6 +47,7 @@ class x2212_device :    public device_t,
 public:
 	// construction/destruction
 	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// inline configuration helpers
 	static void static_set_auto_save(device_t &device);
@@ -67,7 +75,7 @@ protected:
 	virtual void nvram_read(emu_file &file);
 	virtual void nvram_write(emu_file &file);
 
-	static const int SIZE_DATA = 0x100;
+	int SIZE_DATA;
 
 	// configuration state
 	bool                        m_auto_save;
@@ -84,9 +92,20 @@ protected:
 	bool        m_array_recall;
 };
 
+class x2210_device :    public x2212_device
+{
+public:
+	x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
 
 // device type definition
 extern const device_type X2212;
+extern const device_type X2210;
 
 
 #endif

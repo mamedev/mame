@@ -30,6 +30,7 @@ ADDRESS_MAP_END
 
 // device type definition
 const device_type X2212 = &device_creator<x2212_device>;
+const device_type X2210 = &device_creator<x2210_device>;
 
 //-------------------------------------------------
 //  x2212_device - constructor
@@ -47,6 +48,17 @@ x2212_device::x2212_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
+x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_memory_interface(mconfig, *this),
+		device_nvram_interface(mconfig, *this),
+		m_auto_save(false),
+		m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_sram_map)),
+		m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_e2prom_map)),
+		m_store(false),
+		m_array_recall(false)
+{
+}
 
 //-------------------------------------------------
 //  static_set_auto_save - configuration helper
@@ -70,6 +82,19 @@ void x2212_device::device_start()
 
 	m_sram = m_addrspace[0];
 	m_e2prom = m_addrspace[1];
+
+	SIZE_DATA = 0x100;
+}
+
+void x2210_device::device_start()
+{
+	save_item(NAME(m_store));
+	save_item(NAME(m_array_recall));
+
+	m_sram = m_addrspace[0];
+	m_e2prom = m_addrspace[1];
+
+	SIZE_DATA = 0x40;
 }
 
 
@@ -224,4 +249,10 @@ WRITE_LINE_MEMBER( x2212_device::recall )
 	if (state != 0 && !m_array_recall)
 		recall();
 	m_array_recall = (state != 0);
+}
+
+
+x2210_device::x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: x2212_device(mconfig, X2210, "X2210", tag, owner, clock, "x2210", __FILE__)
+{
 }
