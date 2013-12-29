@@ -299,7 +299,6 @@ public:
 	int m_shifter_vblank_start;
 
 	/* blitter state */
-	int m_blitter_done;
 	UINT16 m_blitter_halftone[16];
 	INT16 m_blitter_src_inc_x;
 	INT16 m_blitter_src_inc_y;

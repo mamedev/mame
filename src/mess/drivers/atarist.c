@@ -1896,52 +1896,6 @@ static ACIA6850_INTERFACE( acia_midi_intf )
 //  MC68901_INTERFACE( mfp_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( st_state::mfp_gpio_r )
-{
-	/*
-
-	    bit     description
-
-	    0       Centronics BUSY
-	    1       RS232 DCD
-	    2       RS232 CTS
-	    3       Blitter done
-	    4       Keyboard/MIDI
-	    5       FDC
-	    6       RS232 RI
-	    7       Monochrome monitor detect
-
-	*/
-
-	UINT8 data = 0;
-
-	// centronics busy
-	data |= m_centronics->busy_r();
-
-	// data carrier detect
-	data |= m_rs232->dcd_r() << 1;
-
-	// clear to send
-	data |= m_rs232->cts_r() << 2;
-
-	// blitter done
-	data |= m_blitter_done << 3;
-
-	// keyboard/MIDI interrupt
-	data |= (!(m_acia_ikbd_irq || m_acia_midi_irq)) << 4;
-
-	// floppy interrupt request
-	data |= !m_fdc->intrq_r() << 5;
-
-	// ring indicator
-	data |= m_rs232->ri_r() << 6;
-
-	// monochrome monitor detect
-	data |= m_monochrome << 7;
-
-	return data;
-}
-
 WRITE_LINE_MEMBER( st_state::mfp_tdo_w )
 {
 	m_mfp->clock_w(state);
@@ -1953,7 +1907,6 @@ static MC68901_INTERFACE( mfp_intf )
 	0,                                                  /* receive clock */
 	0,                                                  /* transmit clock */
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6),       /* interrupt */
-	DEVCB_DRIVER_MEMBER(st_state, mfp_gpio_r),          /* GPIO read */
 	DEVCB_NULL,                                         /* GPIO write */
 	DEVCB_NULL,                                         /* TAO */
 	DEVCB_NULL,                                         /* TBO */
@@ -1967,59 +1920,12 @@ static MC68901_INTERFACE( mfp_intf )
 //  MC68901_INTERFACE( atariste_mfp_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( ste_state::mfp_gpio_r )
-{
-	/*
-
-	    bit     description
-
-	    0       Centronics BUSY
-	    1       RS232 DCD
-	    2       RS232 CTS
-	    3       Blitter done
-	    4       Keyboard/MIDI
-	    5       FDC
-	    6       RS232 RI
-	    7       Monochrome monitor detect / DMA sound active
-
-	*/
-
-	UINT8 data = 0;
-
-	// centronics busy
-	data |= m_centronics->busy_r();
-
-	// data carrier detect
-	data |= m_rs232->dcd_r() << 1;
-
-	// clear to send
-	data |= m_rs232->cts_r() << 2;
-
-	// blitter done
-	data |= m_blitter_done << 3;
-
-	// keyboard/MIDI interrupt
-	data |= (!(m_acia_ikbd_irq || m_acia_midi_irq)) << 4;
-
-	// floppy interrupt request
-	data |= !m_fdc->intrq_r() << 5;
-
-	// ring indicator
-	data |= m_rs232->ri_r() << 6;
-
-	// monochrome monitor detect, DMA sound active
-	data |= (m_monochrome ^ m_dmasnd_active) << 7;
-
-	return data;
-}
-
 static MC68901_INTERFACE( atariste_mfp_intf )
 {
 	Y1,                                                 /* timer clock */
 	0,                                                  /* receive clock */
 	0,                                                  /* transmit clock */
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6),       /* interrupt */
-	DEVCB_DRIVER_MEMBER(ste_state, mfp_gpio_r),         /* GPIO read */
 	DEVCB_NULL,                                         /* GPIO write */
 	DEVCB_NULL,                                         /* TAO */
 	DEVCB_NULL,                                         /* TBO */
@@ -2033,50 +1939,8 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 //  MC68901_INTERFACE( stbook_mfp_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( stbook_state::mfp_gpio_r )
-{
-	/*
 
-	    bit     description
-
-	    0       Centronics BUSY
-	    1       RS232 DCD
-	    2       RS232 CTS
-	    3       Blitter done
-	    4       Keyboard/MIDI
-	    5       FDC
-	    6       RS232 RI
-	    7       POWER ALARMS
-
-	*/
-
-	UINT8 data = 0;
-
-	// centronics busy
-	data |= m_centronics->busy_r();
-
-	// data carrier detect
-	data |= m_rs232->dcd_r() << 1;
-
-	// clear to send
-	data |= m_rs232->cts_r() << 2;
-
-	// blitter done
-	data |= m_blitter_done << 3;
-
-	// keyboard/MIDI interrupt
-	data |= (!(m_acia_ikbd_irq || m_acia_midi_irq)) << 4;
-
-	// floppy data request
-	data |= !m_fdc->intrq_r() << 5;
-
-	// ring indicator
-	data |= m_rs232->ri_r() << 6;
-
-	// TODO power alarms
-
-	return data;
-}
+// TODO power alarms (i7_w)
 
 static MC68901_INTERFACE( stbook_mfp_intf )
 {
@@ -2084,7 +1948,6 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 	0,                                                  /* receive clock */
 	0,                                                  /* transmit clock */
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6),       /* interrupt */
-	DEVCB_DRIVER_MEMBER(stbook_state, mfp_gpio_r),      /* GPIO read */
 	DEVCB_NULL,                                         /* GPIO write */
 	DEVCB_NULL,                                         /* TAO */
 	DEVCB_NULL,                                         /* TBO */
@@ -2265,6 +2128,11 @@ void st_state::machine_start()
 
 	m_fdc->setup_drq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_drq_w), this));
 	m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(st_state::fdc_intrq_w), this));
+
+	/// TODO: get callbacks to trigger these.
+	m_mfp->i0_w(1);
+	m_mfp->i5_w(1);
+	m_mfp->i7_w(1);
 }
 
 
@@ -2310,6 +2178,11 @@ void ste_state::machine_start()
 
 	/* register for state saving */
 	state_save();
+
+	/// TODO: get callbacks to trigger these.
+	m_mfp->i0_w(1);
+	m_mfp->i5_w(1);
+	m_mfp->i7_w(1);
 }
 
 
@@ -2346,6 +2219,10 @@ void stbook_state::machine_start()
 
 	/* register for state saving */
 	ste_state::state_save();
+
+	/// TODO: get callbacks to trigger these.
+	m_mfp->i0_w(1);
+	m_mfp->i5_w(1);
 }
 
 FLOPPY_FORMATS_MEMBER( st_state::floppy_formats )

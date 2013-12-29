@@ -720,8 +720,7 @@ void st_state::blitter_tick()
 
 	m_blitter_ctrl &= 0x7f;
 
-	m_blitter_done = 0;
-	m_mfp->i3_w(m_blitter_done);
+	m_mfp->i3_w(0);
 }
 
 
@@ -1047,8 +1046,7 @@ WRITE16_MEMBER( st_state::blitter_ctrl_w )
 		{
 			if ((data >> 8) & ATARIST_BLITTER_CTRL_BUSY)
 			{
-				m_blitter_done = 1;
-				m_mfp->i3_w(m_blitter_done);
+				m_mfp->i3_w(1);
 
 				int nops = BLITTER_NOPS[m_blitter_op][m_blitter_hop]; // each NOP takes 4 cycles
 				timer_set(attotime::from_hz((Y2/4)/(4*nops)), TIMER_BLITTER_TICK);

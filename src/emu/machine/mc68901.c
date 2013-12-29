@@ -293,7 +293,7 @@ inline void mc68901_device::timer_input(int index, int value)
 
 inline void mc68901_device::gpio_input(int bit, int state)
 {
-	if (state != BIT(m_gpip, bit))
+	if (state != BIT(m_gpio_input, bit))
 	{
 		if (state == BIT(m_aer, bit))
 		{
@@ -309,9 +309,9 @@ inline void mc68901_device::gpio_input(int bit, int state)
 
 
 		if (state)
-			m_gpip &= ~(1 << bit);
+			m_gpio_input |= (1 << bit);
 		else
-			m_gpip |= (1 << bit);
+			m_gpio_input &= ~(1 << bit);
 	}
 }
 
@@ -328,8 +328,7 @@ inline void mc68901_device::gpio_input(int bit, int state)
 mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC68901, "Motorola MC68901", tag, owner, clock, "mc68901", __FILE__),
 		device_serial_interface(mconfig, *this),
-		m_gpip(0),
-		m_tsr(TSR_BUFFER_EMPTY)
+		m_gpio_input(0)
 {
 }
 
@@ -364,7 +363,6 @@ void mc68901_device::device_start()
 	m_start_bit_hack_for_external_clocks = true;
 
 	/* resolve callbacks */
-	m_in_gpio_func.resolve(m_in_gpio_cb, *this);
 	m_out_gpio_func.resolve(m_out_gpio_cb, *this);
 	m_out_so_func.resolve(m_out_so_cb, *this);
 	m_out_tao_func.resolve(m_out_tao_cb, *this);
@@ -554,9 +552,7 @@ READ8_MEMBER( mc68901_device::read )
 {
 	switch (offset)
 	{
-	case REGISTER_GPIP:
-		m_gpip = m_in_gpio_func(0);
-		return m_gpip;
+	case REGISTER_GPIP:  return (m_gpio_input & ~m_ddr) | (m_gpip & m_ddr);
 
 	case REGISTER_AER:   return m_aer;
 	case REGISTER_DDR:   return m_ddr;

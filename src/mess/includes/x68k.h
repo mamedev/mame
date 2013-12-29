@@ -66,7 +66,6 @@ public:
 	optional_shared_ptr<UINT32> m_tvram32;
 
 	DECLARE_WRITE_LINE_MEMBER( mfp_tbo_w );
-	DECLARE_READ8_MEMBER( mfp_gpio_r );
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
@@ -108,10 +107,6 @@ public:
 		int pan;  // ADPCM output switch
 		int clock;  // ADPCM clock speed
 	} m_adpcm;
-	struct
-	{
-		unsigned char gpio;
-	} m_mfp;  // MC68901 Multifunction Peripheral (4MHz)
 	struct
 	{
 		unsigned short reg[24];  // registers

@@ -1212,25 +1212,12 @@ WRITE_LINE_MEMBER(x68k_state::x68k_fm_irq)
 {
 	if(state == CLEAR_LINE)
 	{
-		m_mfp.gpio |= 0x08;
 		m_mfpdev->i3_w(1);
 	}
 	else
 	{
-		m_mfp.gpio &= ~0x08;
 		m_mfpdev->i3_w(0);
 	}
-}
-
-READ8_MEMBER( x68k_state::mfp_gpio_r )
-{
-	UINT8 data = m_mfp.gpio;
-
-	data &= ~(m_crtc.hblank << 7);
-	data &= ~(m_crtc.vblank << 4);
-	data |= 0x23;  // GPIP5 is unused, always 1
-
-	return data;
 }
 
 WRITE8_MEMBER(x68k_state::x68030_adpcm_w)
@@ -1428,7 +1415,6 @@ static MC68901_INTERFACE( mfp_interface )
 	0,                                                  /* receive clock */
 	0,                                                  /* transmit clock */
 	DEVCB_DRIVER_LINE_MEMBER(x68k_state,mfp_irq_callback),                      /* interrupt */
-	DEVCB_DRIVER_MEMBER(x68k_state, mfp_gpio_r),        /* GPIO read */
 	DEVCB_NULL,                                         /* GPIO write */
 	DEVCB_NULL,                                         /* TAO */
 	DEVCB_DRIVER_LINE_MEMBER(x68k_state, mfp_tbo_w),    /* TBO */
@@ -1755,7 +1741,15 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	// start HBlank timer
 	m_scanline_timer->adjust(machine().primary_screen->scan_period(), 1);
 
-	m_mfp.gpio = 0xfb;
+	/// TODO: get callbacks to trigger these
+	m_mfpdev->i0_w(1); // alarm
+	m_mfpdev->i1_w(1); // expon
+	m_mfpdev->i2_w(0); // pow sw
+	m_mfpdev->i3_w(1); // fmirq
+	m_mfpdev->i4_w(1); // v-disp
+	m_mfpdev->i5_w(1); // unused (always set)
+	m_mfpdev->i6_w(1); // cirq
+	m_mfpdev->i7_w(1); // h-sync
 
 	// reset output values
 	output_set_value("key_led_kana",1);

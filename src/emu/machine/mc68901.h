@@ -79,7 +79,6 @@ struct mc68901_interface
 
 	devcb_write_line        m_out_irq_cb;
 
-	devcb_read8             m_in_gpio_cb;
 	devcb_write8            m_out_gpio_cb;
 
 	devcb_write_line        m_out_tao_cb;
@@ -237,7 +236,6 @@ private:
 	static const int GPIO_TIMER[];
 	static const int PRESCALER[];
 
-	devcb_resolved_read8        m_in_gpio_func;
 	devcb_resolved_write8       m_out_gpio_func;
 	devcb_resolved_write_line   m_out_so_func;
 	devcb_resolved_write_line   m_out_tao_func;
@@ -272,6 +270,7 @@ private:
 	int m_udr_written;
 	UINT8 m_rcv;
 	int m_rcv_pending;
+	UINT8 m_gpio_input;
 
 	/* counter timer state */
 	UINT8 m_tmc[4];     /* timer main counters */

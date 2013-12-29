@@ -260,7 +260,6 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_end)
 {
-	m_mfp.gpio |= 0x40;
 	m_mfpdev->i6_w(1);
 }
 
@@ -272,7 +271,6 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_irq)
 
 	if(scan <= m_crtc.vtotal)
 	{
-		m_mfp.gpio &= ~0x40;  // GPIP6
 		m_mfpdev->i6_w(0);
 		machine().primary_screen->update_partial(scan);
 		irq_time = machine().primary_screen->time_until_pos(scan,m_crtc.hbegin);
