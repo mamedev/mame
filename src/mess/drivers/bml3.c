@@ -1,5 +1,5 @@
 // license:?
-// copyright-holders:Angelo Salese, Jonathan Edwards, Christopher Edwards
+// copyright-holders:Angelo Salese, Jonathan Edwards, Christopher Edwards,Robbbert
 /**************************************************************************************
 
     Basic Master Level 3 (MB-689x) (c) 1980 Hitachi
@@ -7,7 +7,6 @@
     Driver by Angelo Salese, Jonathan Edwards and Christopher Edwards
 
     TODO:
-    - tape support
     - implement sound as a bml3bus slot device
     - account for hardware differences between MB-6890, MB-6891 and MB-6892
       (e.g. custom font support on the MB-6892)
@@ -16,17 +15,17 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/bml3bus.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "sound/2203intf.h"
+#include "sound/speaker.h"
+#include "sound/wave.h"
+#include "imagedev/cassette.h"
+#include "machine/bml3bus.h"
 #include "machine/bml3mp1802.h"
 #include "machine/bml3mp1805.h"
 #include "machine/bml3kanji.h"
-#include "sound/speaker.h"
-//#include "sound/wave.h"
-//#include "imagedev/cassette.h"
 
 // System clock definitions, from the MB-6890 servce manual, p.48:
 
@@ -71,9 +70,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_bml3bus(*this, "bml3bus")
 		, m_crtc(*this, "crtc")
-		//, m_cass(*this, "cassette")
+		, m_cass(*this, "cassette")
 		, m_speaker(*this, "speaker")
 		, m_ym2203(*this, "ym2203")
+		, m_uart(*this, "acia6850")
 	{ }
 
 	DECLARE_READ8_MEMBER(bml3_6845_r);
@@ -94,13 +94,12 @@ public:
 	DECLARE_READ8_MEMBER(bml3_keyb_nmi_r);
 	DECLARE_WRITE8_MEMBER(bml3_firq_mask_w);
 	DECLARE_READ8_MEMBER(bml3_firq_status_r);
-
+	DECLARE_WRITE8_MEMBER(relay_w);
 	DECLARE_WRITE8_MEMBER(bml3bus_nmi_w);
 	DECLARE_WRITE8_MEMBER(bml3bus_irq_w);
 	DECLARE_WRITE8_MEMBER(bml3bus_firq_w);
-
-	DECLARE_WRITE_LINE_MEMBER( bml3_acia_tx_w );
-	DECLARE_WRITE_LINE_MEMBER( bml3_acia_rts_w );
+	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
+	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
 
 	DECLARE_READ8_MEMBER(bml3_a000_r); DECLARE_WRITE8_MEMBER(bml3_a000_w);
@@ -115,35 +114,41 @@ public:
 	UINT8 m_crtc_vreg[0x100];
 	// INTERRUPT_GEN_MEMBER(bml3_irq);
 	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
+	TIMER_DEVICE_CALLBACK_MEMBER(bml3_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(bml3_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_READ8_MEMBER(bml3_ym2203_r);
 	DECLARE_WRITE8_MEMBER(bml3_ym2203_w);
 private:
 	UINT8 m_psg_latch;
 	UINT8 m_attr_latch;
-	//UINT8 m_io_latch;
 	UINT8 m_vres_reg;
-	UINT8 m_keyb_interrupt_disabled;
-	UINT8 m_keyb_nmi_disabled;
-	UINT8 m_keyb_counter_operation_disabled;
+	bool m_keyb_interrupt_disabled;
+	bool m_keyb_nmi_disabled; // not used yet
+	bool m_keyb_counter_operation_disabled;
 	UINT8 m_keyb_empty_scan;
 	UINT8 m_keyb_scancode;
-	UINT8 m_keyb_capslock_led_on;
-	UINT8 m_keyb_hiragana_led_on;
-	UINT8 m_keyb_katakana_led_on;
+	bool m_keyb_capslock_led_on;
+	bool m_keyb_hiragana_led_on;
+	bool m_keyb_katakana_led_on;
+	bool m_cassbit;
+	bool m_cassold;
+	UINT8 m_cass_data[4];
 	virtual void machine_reset();
 	virtual void machine_start();
 	virtual void palette_init();
 	void m6845_change_clock(UINT8 setting);
 	UINT8 m_crtc_index;
 	UINT8 *m_extram;
-	UINT8 m_firq_mask,m_firq_status;
+	UINT8 m_firq_mask;
+	UINT8 m_firq_status;
 	required_device<cpu_device> m_maincpu;
 	required_device<bml3bus_device> m_bml3bus;
 	required_device<mc6845_device> m_crtc;
-	//required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cass;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<ym2203_device> m_ym2203;
+	required_device<acia6850_device> m_uart;
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -196,12 +201,12 @@ READ8_MEMBER( bml3_state::bml3_keyboard_r )
 
 WRITE8_MEMBER( bml3_state::bml3_keyboard_w )
 {
-	m_keyb_katakana_led_on = (data & 0x01) != 0;
-	m_keyb_hiragana_led_on = (data & 0x02) != 0;
-	m_keyb_capslock_led_on = (data & 0x04) != 0;
-	m_keyb_counter_operation_disabled = (data & 0x08) != 0;
-	m_keyb_interrupt_disabled = (data & 0x40) == 0;
-	m_keyb_nmi_disabled = (data & 0x80) == 0;
+	m_keyb_katakana_led_on = BIT(data, 0);
+	m_keyb_hiragana_led_on = BIT(data, 1);
+	m_keyb_capslock_led_on = BIT(data, 2);
+	m_keyb_counter_operation_disabled = BIT(data, 3);
+	m_keyb_interrupt_disabled = !BIT(data, 6);
+	m_keyb_nmi_disabled = !BIT(data, 7);
 }
 
 void bml3_state::m6845_change_clock(UINT8 setting)
@@ -319,6 +324,12 @@ WRITE8_MEMBER( bml3_state::bml3_beep_w)
 	m_speaker->level_w(BIT(data, 7));
 }
 
+WRITE8_MEMBER( bml3_state::relay_w )
+{
+	m_cass->change_state(
+		BIT(data,7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+}
+
 READ8_MEMBER( bml3_state::bml3_a000_r) { return m_extram[offset + 0xa000]; }
 WRITE8_MEMBER( bml3_state::bml3_a000_w) { m_extram[offset + 0xa000] = data; }
 READ8_MEMBER( bml3_state::bml3_c000_r) { return m_extram[offset + 0xc000]; }
@@ -374,6 +385,7 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x43ff) AM_READWRITE(bml3_vram_r,bml3_vram_w)
 	AM_RANGE(0x4400, 0x9fff) AM_RAM
+	AM_RANGE(0xff40, 0xff46) AM_NOP // lots of unknown reads and writes
 	AM_RANGE(0xffc0, 0xffc3) AM_DEVREADWRITE("pia6821", pia6821_device, read, write)
 	AM_RANGE(0xffc4, 0xffc4) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
 	AM_RANGE(0xffc5, 0xffc5) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
@@ -391,13 +403,13 @@ static ADDRESS_MAP_START(bml3_mem, AS_PROGRAM, 8, bml3_state)
 	// TRACE - Trace counter
 //  AM_RANGE(0xffd1, 0xffd1)
 	// REMOTE - Remote relay control for cassette - bit 7
-//  AM_RANGE(0xffd2, 0xffd2)
+	AM_RANGE(0xffd2, 0xffd2) AM_WRITE(relay_w)
 	// MUSIC_SEL - Music select: toggle audio output level when rising
 	AM_RANGE(0xffd3, 0xffd3) AM_READWRITE(bml3_beep_r,bml3_beep_w)
 	// TIME_MASK - Prohibit timer IRQ
 	AM_RANGE(0xffd4, 0xffd4) AM_WRITE(bml3_firq_mask_w)
 	// LPENBL - Light pen operation enable
-//  AM_RANGE(0xffd5, 0xffd5)
+	AM_RANGE(0xffd5, 0xffd5) AM_NOP
 	// INTERLACE_SEL - Interlaced video mode (manual has "INTERACE SEL"!)
 	AM_RANGE(0xffd6, 0xffd6) AM_WRITE(bml3_vres_reg_w)
 //  AM_RANGE(0xffd7, 0xffd7) baud select
@@ -683,7 +695,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 	if(!(m_keyb_scancode & 0x80))
 	{
 		m_keyb_scancode = (m_keyb_scancode + 1) & 0x7F;
-		if (m_keyb_counter_operation_disabled) {
+		if (m_keyb_counter_operation_disabled)
+		{
 			m_keyb_scancode &= 0x7;
 		}
 
@@ -714,12 +727,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 				m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 		}
 		/* Don't need this apparently...
-		else {
+		else
+		{
 		    m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 		}
 		*/
 	}
+}
 
+TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_p )
+{
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_uart->write_rx((m_cass_data[1] < 12) ? 1 : 0);
+		m_cass_data[1] = 0;
+	}
 }
 
 #if 0
@@ -752,6 +779,21 @@ void bml3_state::machine_start()
 	m_extram = auto_alloc_array(machine(),UINT8,0x10000);
 	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("vram")->base();
+	m_psg_latch = 0;
+	m_attr_latch = 0;
+	m_vres_reg = 0;
+	m_keyb_interrupt_disabled = 0;
+	m_keyb_nmi_disabled = 0;
+	m_keyb_counter_operation_disabled = 0;
+	m_keyb_empty_scan = 0;
+	m_keyb_scancode = 0;
+	m_keyb_capslock_led_on = 0;
+	m_keyb_hiragana_led_on = 0;
+	m_keyb_katakana_led_on = 0;
+	m_crtc_index = 0;
+	m_firq_status = 0;
+	m_cassbit = 0;
+	m_cassold = 0;
 }
 
 void bml3_state::machine_reset()
@@ -885,7 +927,8 @@ static const pia6821_interface bml3_pia_config =
 
 WRITE_LINE_MEMBER( bml3_state::bml3_acia_tx_w )
 {
-	logerror("%02x TAPE\n",state);
+	//logerror("%02x TAPE\n",state);
+	m_cassbit = state;
 }
 
 
@@ -899,15 +942,31 @@ WRITE_LINE_MEMBER( bml3_state::bml3_acia_irq_w )
 	logerror("%02x TAPE IRQ\n",state);
 }
 
-
+// 600 baud x 16(divider) = 9600
 static ACIA6850_INTERFACE( bml3_acia_if )
 {
-	600,
-	600,
+	9600,
+	9600,
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_tx_w),
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_irq_w)
 };
+
+TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_c )
+{
+	m_cass_data[3]++;
+
+	if (m_cassbit != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = m_cassbit;
+	}
+
+	if (m_cassbit)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+}
 
 static const ay8910_interface ay8910_config =
 {
@@ -957,13 +1016,16 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(H_CLOCK/2))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
 	MCFG_PIA6821_ADD("pia6821", bml3_pia_config)
 	MCFG_ACIA6850_ADD("acia6850", bml3_acia_if)
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
