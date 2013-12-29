@@ -359,15 +359,57 @@ void z80dart_device::reset_interrupts()
 void z80dart_device::trigger_interrupt(int index, int state)
 {
 	UINT8 vector = m_chanB->m_wr[2];
-	int priority = (index << 2) | state;
+	int priority;
+
+	if((m_variant == TYPE_I8274) || (m_variant == TYPE_UPD7201))
+	{
+		int prio_level = 0;
+		switch(state)
+		{
+			case z80dart_channel::INT_TRANSMIT:
+				prio_level = 1;
+				break;
+			case z80dart_channel::INT_RECEIVE:
+			case z80dart_channel::INT_SPECIAL:
+				prio_level = 0;
+				break;
+			case z80dart_channel::INT_EXTERNAL:
+				prio_level = 2;
+				break;
+		}
+
+		if(m_chanA->m_wr[2] & z80dart_channel::WR2_PRIORITY)
+		{
+			priority = (prio_level * 2) + index;
+		}
+		else
+		{
+			priority = (prio_level == 2) ? index + 4 : ((index * 2) + prio_level);
+		}
+		if ((index == CHANNEL_B) && (m_chanB->m_wr[1] & z80dart_channel::WR1_STATUS_VECTOR))
+		{
+			vector = (!index << 2) | state;
+			if((m_chanA->m_wr[1] & 0x18) == z80dart_channel::WR2_MODE_8086_8088)
+			{
+				vector = (m_chanB->m_wr[2] & 0xf8) | vector;
+			}
+			else
+			{
+				vector = (m_chanB->m_wr[2] & 0xe3) | (vector << 2);
+			}
+		}
+	}
+	else
+	{
+		priority = (index << 2) | state;
+		if ((index == CHANNEL_B) && (m_chanB->m_wr[1] & z80dart_channel::WR1_STATUS_VECTOR))
+		{
+			// status affects vector
+			vector = (m_chanB->m_wr[2] & 0xf1) | (!index << 3) | (state << 1);
+		}
+	}
 
 	LOG(("Z80DART \"%s\" Channel %c : Interrupt Request %u\n", tag(), 'A' + index, state));
-
-	if ((index == CHANNEL_B) && (m_chanB->m_wr[1] & z80dart_channel::WR1_STATUS_VECTOR))
-	{
-		// status affects vector
-		vector = (m_chanB->m_wr[2] & 0xf1) | (!index << 3) | (state << 1);
-	}
 
 	// update vector register
 	m_chanB->m_rr[2] = vector;

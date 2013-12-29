@@ -54,8 +54,8 @@ void isbc_215g_device::find_sector()
 
 UINT16 isbc_215g_device::read_sector()
 {
-	UINT16 bps = 64 << ((m_idcompare[0] >> 4) & 3);
-	if(m_secoffset >= bps)
+	UINT16 wps = 64 << ((m_idcompare[0] >> 4) & 3);
+	if(m_secoffset >= wps)
 		return 0;
 	return m_sector[m_secoffset++];
 }
@@ -314,7 +314,7 @@ WRITE8_MEMBER(isbc_215g_device::write)
 	if(!offset)
 	{
 		if(!data && (m_reset == 2))
-				m_dmac->reset();
+			m_dmac->reset();
 		m_out_irq_func(0);
 		m_dmac->ca_w(data != 2);
 		m_dmac->ca_w(0);

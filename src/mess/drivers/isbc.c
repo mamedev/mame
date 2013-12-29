@@ -51,6 +51,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(lpt_ack);
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
+	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_READ8_MEMBER(ppi_b_r);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
@@ -245,12 +246,18 @@ static I8274_INTERFACE(isbc_uart8274_interface)
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE_MEMBER("pic_0", pic8259_device, ir6_w),
+	DEVCB_DRIVER_LINE_MEMBER(isbc_state, isbc_uart8274_irq),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
+
+WRITE_LINE_MEMBER(isbc_state::isbc_uart8274_irq)
+{
+	m_uart8274->m1_r(); // always set
+	m_pic_0->ir6_w(state);
+}
 
 static const i8251_interface isbc_uart8251_interface =
 {
