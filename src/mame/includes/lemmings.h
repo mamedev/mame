@@ -44,7 +44,7 @@ public:
 	DECLARE_WRITE16_MEMBER(lemmings_control_w);
 	DECLARE_READ16_MEMBER(lemmings_trackball_r);
 	DECLARE_WRITE16_MEMBER(lemmings_palette_24bit_w);
-	DECLARE_WRITE16_MEMBER(lemmings_sound_w);
+	void lemmings_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask );
 	DECLARE_WRITE8_MEMBER(lemmings_sound_ack_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_0_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_1_w);

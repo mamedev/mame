@@ -59,7 +59,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_palette_24bit_w)
 	palette_set_color(machine(), offset / 2, MAKE_RGB(r, g, b));
 }
 
-WRITE16_MEMBER(lemmings_state::lemmings_sound_w)
+void lemmings_state::lemmings_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(1, HOLD_LINE);
@@ -98,9 +98,7 @@ static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16, lemmings_state )
 	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(lemmings_palette_24bit_w) AM_SHARE("paletteram")
 	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE(lemmings_control_w) AM_SHARE("control_data")
 	AM_RANGE(0x190000, 0x19000f) AM_READ(lemmings_trackball_r)
-//  AM_RANGE(0x1a0000, 0x1a07ff) AM_DEVREAD("ioprot", deco146_device,lemmings_prot_r)
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(lem_protection_region_0_146_r,lem_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
-	AM_RANGE(0x1a0064, 0x1a0065) AM_WRITE(lemmings_sound_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* 1 written once a frame */
 	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write) /* 1 written once a frame */
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(lemmings_vram_w) AM_SHARE("vram_data")
@@ -277,6 +275,7 @@ static MACHINE_CONFIG_START( lemmings, lemmings_state )
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(lemmings_state, lemmings_sound_cb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
