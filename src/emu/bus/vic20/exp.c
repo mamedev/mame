@@ -9,10 +9,7 @@
 
 **********************************************************************/
 
-#include "emu.h"
 #include "exp.h"
-#include "formats\imageutl.h"
-#include "emuopts.h"
 
 
 
@@ -130,7 +127,7 @@ bool vic20_expansion_slot_device::call_load()
 				// read the header
 				UINT8 header[2];
 				fread(&header, 2);
-				UINT16 address = pick_integer_le(header, 0, 2);
+				UINT16 address = (header[1] << 8) | header[0];
 
 				switch (address)
 				{
