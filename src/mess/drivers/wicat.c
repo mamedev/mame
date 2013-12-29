@@ -44,7 +44,7 @@ public:
 		, m_videouart0(*this,"videouart0")
 		, m_videouart1(*this,"videouart1")
 		, m_videouart(*this,"videouart")
-		, m_videosram(*this,"videosram")
+		, m_videosram(*this,"vsram")
 		, m_chargen(*this,"g2char")
 	{ }
 
@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE8_MEMBER(video_uart1_w);
 	DECLARE_READ8_MEMBER(videosram_r);
 	DECLARE_WRITE8_MEMBER(videosram_w);
+	DECLARE_WRITE8_MEMBER(videosram_store_w);
+	DECLARE_WRITE8_MEMBER(videosram_recall_w);
 	DECLARE_READ8_MEMBER(video_timer_r);
 	DECLARE_WRITE8_MEMBER(video_timer_w);
 	DECLARE_READ8_MEMBER(vram_r);
@@ -77,6 +79,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(dma_nmi_cb);
 	DECLARE_WRITE_LINE_MEMBER(crtc_cb);
+	DECLARE_READ8_MEMBER(hdc_r);
+	DECLARE_WRITE8_MEMBER(hdc_w);
 
 	required_shared_ptr<UINT8> m_vram;
 	required_device<m68000_device> m_maincpu;
@@ -94,7 +98,7 @@ public:
 	required_device<mc2661_device> m_videouart0;
 	required_device<mc2661_device> m_videouart1;
 	required_device<im6402_device> m_videouart;
-	required_device<x2212_device> m_videosram;
+	required_device<x2210_device> m_videosram;
 	required_memory_region m_chargen;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
@@ -106,14 +110,23 @@ private:
 	virtual void machine_reset();
 	virtual void driver_start();
 
+	void poll_kb();
+	void send_key(UINT8 val);
+
 	emu_timer* m_video_timer;
+	emu_timer* m_kb_timer;
+	emu_timer* m_kb_serial_timer;
 	static const device_timer_id VIDEO_TIMER = 0;
+	static const device_timer_id KB_TIMER = 1;
+	static const device_timer_id KB_SERIAL_TIMER = 2;
 
 	UINT8 m_portA;
 	UINT8 m_portB;
 	bool m_video_timer_irq;
 	UINT8 m_nmi_enable;
 	UINT8 m_crtc_irq;
+	UINT16 m_kb_data;
+	UINT8 m_kb_bit;
 };
 
 
@@ -136,6 +149,8 @@ static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 	AM_RANGE(0xf00040, 0xf0005f) AM_DEVREADWRITE8("via",via6522_device,read,write,0xff00)
 	AM_RANGE(0xf00060, 0xf0007f) AM_DEVREADWRITE8("rtc",mm58274c_device,read,write,0xff00)
 	AM_RANGE(0xf000d0, 0xf000d1) AM_WRITE(parallel_led_w)
+	AM_RANGE(0xf00180, 0xf0018f) AM_READWRITE8(hdc_r,hdc_w,0xffff)
+	// F00190 - Floppy controller
 	AM_RANGE(0xf00f00, 0xf00fff) AM_READWRITE(invalid_r,invalid_w)
 ADDRESS_MAP_END
 
@@ -151,6 +166,8 @@ static ADDRESS_MAP_START(wicat_video_io, AS_IO, 8, wicat_state)
 	AM_RANGE(0x0200,0x0207) AM_READWRITE(video_uart1_r,video_uart1_w)  // INS2651 UART #2
 	AM_RANGE(0x0304,0x0304) AM_READ(video_status_r)
 	AM_RANGE(0x0400,0x047f) AM_READWRITE(videosram_r,videosram_w)  // XD2210  4-bit NOVRAM
+	AM_RANGE(0x0500,0x0500) AM_WRITE(videosram_recall_w)
+	AM_RANGE(0x0600,0x0600) AM_WRITE(videosram_store_w)
 	AM_RANGE(0x0700,0x0700) AM_DEVREADWRITE("videouart",im6402_device,read,write)  // UART?
 	AM_RANGE(0x0800,0x080f) AM_READWRITE(video_ctrl_r,video_ctrl_w)
 	AM_RANGE(0x0a00,0x0a1f) AM_READWRITE(video_dma_r,video_dma_w) // DMA
@@ -174,11 +191,30 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( wicat )
+	PORT_START("kb0")
+	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT(0xfff7ffff,IP_ACTIVE_HIGH,IPT_UNUSED)
+
+	PORT_START("kb1")
+
+	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+
 INPUT_PORTS_END
 
 void wicat_state::driver_start()
 {
 	m_video_timer = timer_alloc(VIDEO_TIMER);
+	m_kb_timer = timer_alloc(KB_TIMER);
+	m_kb_serial_timer = timer_alloc(KB_SERIAL_TIMER);
 }
 
 void wicat_state::machine_start()
@@ -187,12 +223,18 @@ void wicat_state::machine_start()
 
 void wicat_state::machine_reset()
 {
-	// on the terminal board /DCD on both INS2651s is tied to GND
+	// on the terminal board /DCD on both INS2651s are tied to GND
 	m_videouart0->dcd_w(0);
 	m_videouart1->dcd_w(0);
 	m_uart0->dcd_w(0);
+	m_uart1->dcd_w(0);
+	m_uart2->dcd_w(0);
+	m_uart3->dcd_w(0);
+	m_uart4->dcd_w(0);
+	m_uart5->dcd_w(0);
 	m_video_timer_irq = false;
 	m_video_timer->adjust(attotime::zero,0,attotime::from_hz(60));
+	m_kb_timer->adjust(attotime::zero,0,attotime::from_msec(50));
 	m_nmi_enable = 0;
 	m_crtc_irq = CLEAR_LINE;
 }
@@ -205,8 +247,54 @@ void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_video_timer_irq = true;
 		m_videocpu->set_input_line(INPUT_LINE_IRQ0,ASSERT_LINE);
 		break;
+	case KB_TIMER:
+		poll_kb();
+		break;
+	case KB_SERIAL_TIMER:
+		m_videouart1->rx_w((m_kb_data >> (m_kb_bit)) & 0x01);
+		m_kb_bit++;
+		if(m_kb_bit > 10)
+		{
+			m_kb_serial_timer->reset();
+			m_videouart1->dsr_w(0);
+		}
+		break;
 	}
 }
+
+void wicat_state::poll_kb()
+{
+	UINT8 line;
+	UINT8 val = 0;
+	UINT8 x;
+	UINT32 data;
+	char kbtag[8];
+
+	for(line=0;line<2;line++)
+	{
+		sprintf(kbtag,"kb%i",line);
+		data = ioport(kbtag)->read();
+		for(x=0;x<32;x++)
+		{
+			if(data & (1<<x))
+			{
+				send_key(val);
+				return;
+			}
+			val++;
+		}
+	}
+}
+
+void wicat_state::send_key(UINT8 val)
+{
+	// based on settings in the terminal NOVRAM, the keyboard is using 1200 baud, 7 bits, 2 stop bits
+	logerror("Sending key %i\n",val);
+	m_kb_data = 0x0003 | (val << 3);
+	m_kb_bit = 0;
+	m_kb_serial_timer->adjust(attotime::zero,0,attotime::from_hz(1200));
+}
+
 WRITE16_MEMBER( wicat_state::parallel_led_w )
 {
 	// bit 0 - parallel port A direction (0 = input)
@@ -266,6 +354,31 @@ READ16_MEMBER(wicat_state::memmap_r)
 WRITE16_MEMBER(wicat_state::memmap_w)
 {
 	popmessage("Memory mapping register EFFC01 written!");
+}
+
+// WD1000 Winchester Disk controller (10MB 5 1/4" HD)
+// for now, we'll just try to tell the system there is no HD
+READ8_MEMBER(wicat_state::hdc_r)
+{
+	switch(offset)
+	{
+	case 0x00:  // Error register
+		return 0x00;
+	case 0x06:  // Status register
+		return 0x04;
+	}
+	return 0x00;
+}
+
+WRITE8_MEMBER(wicat_state::hdc_w)
+{
+	switch(offset)
+	{
+	case 0x06:  // Command register
+		logerror("HDC: Command %1x\n",(data & 0xf0) >> 4);
+		m_maincpu->set_input_line(M68K_IRQ_5,HOLD_LINE);
+		break;
+	}
 }
 
 READ8_MEMBER(wicat_state::video_r)
@@ -339,14 +452,9 @@ WRITE8_HANDLER(wicat_state::video_uart1_w)
 	m_videouart1->write(space,noff,data);
 }
 
-// XD2210 256 x 4bit NOVRAM
+// XD2210 64 x 4bit NOVRAM
 READ8_MEMBER(wicat_state::videosram_r)
 {
-	if(offset == 0x08 || offset == 0x0c)
-		return 0x08;
-	if(offset == 0x06 || offset == 0x0a)
-		return 0x0e;
-
 	if(offset & 0x01)
 		return 0xff;
 	else
@@ -357,6 +465,26 @@ WRITE8_MEMBER(wicat_state::videosram_w)
 {
 	if(!(offset & 0x01))
 		m_videosram->write(space,offset/2,data);
+}
+
+WRITE8_MEMBER(wicat_state::videosram_store_w)
+{
+	if(data & 0x01)  // unsure of the actual bit checked, the terminal code just writes 0xff
+	{
+		m_videosram->store(1);
+		m_videosram->store(0);
+		logerror("XD2210: Store triggered.\n");
+	}
+}
+
+WRITE8_MEMBER(wicat_state::videosram_recall_w)
+{
+	if(data & 0x01)  // unsure of the actual bit checked, the terminal code just writes 0xff
+	{
+		m_videosram->recall(1);
+		m_videosram->recall(0);
+		logerror("XD2210: Store triggered.\n");
+	}
 }
 
 READ8_MEMBER(wicat_state::video_timer_r)
@@ -442,8 +570,8 @@ I8275_DISPLAY_PIXELS(wicat_display_pixels)
 // internal terminal
 static mc2661_interface wicat_uart0_intf =
 {
-	19200,  // RXC
-	19200,  // TXC
+	0,  // RXC
+	0,  // TXC
 	DEVCB_DEVICE_LINE_MEMBER("videouart0",mc2661_device, rx_w),  // TXD out
 	DEVCB_CPU_INPUT_LINE("maincpu",M68K_IRQ_2),  // RXRDY out
 	DEVCB_NULL,  // TXRDY out
@@ -543,8 +671,8 @@ static mc2661_interface wicat_uart6_intf =
 // terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
 static mc2661_interface wicat_video_uart0_intf =
 {
-	19200,  // RXC
-	19200,  // TXC
+	0,  // RXC
+	0,  // TXC
 	DEVCB_DEVICE_LINE_MEMBER("uart0",mc2661_device, rx_w),  // RXD out
 	DEVCB_CPU_INPUT_LINE("videocpu",INPUT_LINE_IRQ0),  // RXRDY out
 	DEVCB_NULL,  // TXRDY out
@@ -564,7 +692,7 @@ static mc2661_interface wicat_video_uart1_intf =
 	DEVCB_NULL,  // TXRDY out
 	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),  // RTS out
 	DEVCB_NULL, //DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),  // DTR out
-	DEVCB_CPU_INPUT_LINE("videocpu",INPUT_LINE_IRQ0),  // TXEMT out
+	DEVCB_NULL,  // TXEMT out
 	DEVCB_NULL,  // BKDET out
 	DEVCB_NULL   // XSYNC out
 };
@@ -672,7 +800,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_IM6402_ADD("videouart", wicat_video_uart_intf)
 	MCFG_MC2661_ADD("videouart0", XTAL_5_0688MHz, wicat_video_uart0_intf)  // the INS2651 looks similar enough to the MC2661...
 	MCFG_MC2661_ADD("videouart1", XTAL_5_0688MHz, wicat_video_uart1_intf)
-	MCFG_X2212_ADD("videosram")  // XD2210
+	MCFG_X2210_ADD("vsram")  // XD2210
 
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_SIZE(720,300)
@@ -690,7 +818,8 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_ADD("floppycpu",N8X300,XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_flop_mem)
 	MCFG_CPU_IO_MAP(wicat_flop_io)
-//  MCFG_FD1795_ADD("fdc")
+	MCFG_FD1795_ADD("fdc",default_wd17xx_interface_2_drives)
+
 
 MACHINE_CONFIG_END
 
@@ -733,6 +862,9 @@ ROM_START( wicat )
 	ROM_LOAD16_BYTE("1term6.o",   0x06001, 0x0800, CRC(e245ff49) SHA1(9a34e6cf6013b1044cccf26371cc3a000f17b58c) )
 	ROM_LOAD16_BYTE("1term7.e",   0x07000, 0x0800, CRC(0c918550) SHA1(2ef6ce41cc2643d45c4bae31ce151d8b6c363471) )
 	ROM_LOAD16_BYTE("1term7.o",   0x07001, 0x0800, CRC(71fdc692) SHA1(d6f12ec20ff2e4948f54b0c79f11ccbdc9db865c) )
+	ROM_REGION(0x40, "g1novram", 0)
+	ROM_LOAD       ("ee2-2.bin",  0x00000, 0x0040, CRC(8f265118) SHA1(6bd74e3d01cf85cca1abcc15cb229dbd63022978) )
+
 
 	ROM_REGION16_BE(0x8000, "g2", 0)
 	ROM_LOAD16_BYTE("2term0.e",   0x00000, 0x0800, CRC(29e5dd68) SHA1(9023f53d554b9ef4f4efc731645ba42f728bcd2c) )
@@ -751,6 +883,8 @@ ROM_START( wicat )
 	ROM_LOAD16_BYTE("2term6.o",   0x06001, 0x0800, CRC(0afb566c) SHA1(761455ced46b6fccd0be9c8fa920f7954a36972b) )
 	ROM_LOAD16_BYTE("2term7.e",   0x07000, 0x0800, CRC(033ea830) SHA1(27c33eea2df812a1a96e2f47ba7993e2ca3675ad) )
 	ROM_LOAD16_BYTE("2term7.o",   0x07001, 0x0800, CRC(e157c5d2) SHA1(3cd1ea0fb9df1358e8a358468a4df5e4eaaa86a2) )
+	ROM_REGION(0x40, "vsram", 0)
+	ROM_LOAD       ("ee8-82.bin",  0x00000, 0x0040, CRC(dfb4b0fb) SHA1(12304f5c5236791f5e931d9e49b4a70dcbba55c0) )
 
 	// Terminal Video board
 	ROM_REGION(0x1000, "g2char", 0)
