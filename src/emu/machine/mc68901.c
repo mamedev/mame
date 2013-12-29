@@ -316,6 +316,16 @@ inline void mc68901_device::gpio_input(int bit, int state)
 }
 
 
+void mc68901_device::gpio_output()
+{
+	UINT8 new_gpio_output = m_gpip & m_ddr;
+
+	if (m_gpio_output != new_gpio_output)
+	{
+		m_gpio_output = new_gpio_output;
+		m_out_gpio_func(0, m_gpio_output);
+	}
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -328,7 +338,8 @@ inline void mc68901_device::gpio_input(int bit, int state)
 mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MC68901, "Motorola MC68901", tag, owner, clock, "mc68901", __FILE__),
 		device_serial_interface(mconfig, *this),
-		m_gpio_input(0)
+		m_gpio_input(0),
+		m_gpio_output(0xff)
 {
 }
 
@@ -407,10 +418,12 @@ void mc68901_device::device_start()
 	save_item(NAME(m_ucr));
 	save_item(NAME(m_rsr));
 	save_item(NAME(m_tsr));
-	save_item(NAME(m_udr));
-	save_item(NAME(m_udr_written));
-	save_item(NAME(m_rcv));
-	save_item(NAME(m_rcv_pending));
+	save_item(NAME(m_transmit_buffer));
+	save_item(NAME(m_transmit_pending));
+	save_item(NAME(m_receive_buffer));
+	save_item(NAME(m_receive_pending));
+	save_item(NAME(m_gpio_input));
+	save_item(NAME(m_gpio_output));
 	save_item(NAME(m_rxtx_word));
 	save_item(NAME(m_rxtx_start));
 	save_item(NAME(m_rxtx_stop));
@@ -426,7 +439,7 @@ void mc68901_device::device_start()
 void mc68901_device::device_reset()
 {
 	m_tsr = 0;
-	m_udr_written = 0;
+	m_transmit_pending = 0;
 
 	// Avoid read-before-write
 	m_ipr = m_imr = 0;
@@ -495,10 +508,10 @@ void mc68901_device::tra_complete()
 {
 	if (m_tsr & TSR_XMIT_ENABLE)
 	{
-		if (m_udr_written)
+		if (m_transmit_pending)
 		{
-			transmit_register_setup(m_udr);
-			m_udr_written = 0;
+			transmit_register_setup(m_transmit_buffer);
+			m_transmit_pending = 0;
 			m_tsr |= TSR_BUFFER_EMPTY;
 
 			if (m_ier & IR_XMIT_BUFFER_EMPTY)
@@ -526,10 +539,10 @@ void mc68901_device::tra_complete()
 void mc68901_device::rcv_complete()
 {
 	receive_register_extract();
-	m_rcv = get_received_char();
-	//if (m_rcv_pending) TODO: error?
+	m_receive_buffer = get_received_char();
+	//if (m_receive_pending) TODO: error?
 		
-	m_rcv_pending = 1;
+	m_receive_pending = 1;
 	rx_buffer_full();
 }
 
@@ -589,8 +602,8 @@ READ8_MEMBER( mc68901_device::read )
 		}
 
 	case REGISTER_UDR:
-		m_rcv_pending = 0;
-		return m_rcv;
+		m_receive_pending = 0;
+		return m_receive_buffer;
 
 	default:                      return 0;
 	}
@@ -608,9 +621,8 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 	{
 	case REGISTER_GPIP:
 		if (LOG) logerror("MC68901 '%s' General Purpose I/O : %x\n", tag(), data);
-		m_gpip = data & m_ddr;
-
-		m_out_gpio_func(0, m_gpip);
+		m_gpip = data;
+		gpio_output();
 		break;
 
 	case REGISTER_AER:
@@ -621,6 +633,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 	case REGISTER_DDR:
 		if (LOG) logerror("MC68901 '%s' Data Direction Register : %x\n", tag(), data);
 		m_ddr = data;
+		gpio_output();
 		break;
 
 	case REGISTER_IERA:
@@ -1051,10 +1064,10 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 			m_tsr &= ~TSR_END_OF_XMIT;
 
-			if(m_udr_written && is_transmit_register_empty())
+			if (m_transmit_pending && is_transmit_register_empty())
 			{
-				transmit_register_setup(m_udr);
-				m_udr_written = 0;
+				transmit_register_setup(m_transmit_buffer);
+				m_transmit_pending = 0;
 				m_tsr |= TSR_BUFFER_EMPTY;
 			}
 		}
@@ -1062,14 +1075,14 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 	case REGISTER_UDR:
 		if (LOG) logerror("MC68901 '%s' UDR %x\n", tag(), data);
-		m_udr = data;
-		m_udr_written = 1;
+		m_transmit_buffer = data;
+		m_transmit_pending = 1;
 		m_tsr &= ~TSR_BUFFER_EMPTY;
 
 		if ((m_tsr & TSR_XMIT_ENABLE) && is_transmit_register_empty())
 		{
-			transmit_register_setup(m_udr);
-			m_udr_written = 0;
+			transmit_register_setup(m_transmit_buffer);
+			m_transmit_pending = 0;
 			m_tsr |= TSR_BUFFER_EMPTY;
 		}
 		break;

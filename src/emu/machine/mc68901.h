@@ -143,6 +143,7 @@ protected:
 	void timer_count(int index);
 	void timer_input(int index, int value);
 	void gpio_input(int bit, int state);
+	void gpio_output();
 	void register_w(offs_t offset, UINT8 data);
 
 private:
@@ -266,11 +267,12 @@ private:
 	UINT8 m_ucr;                            /* USART control register */
 	UINT8 m_tsr;                            /* transmitter status register */
 	UINT8 m_rsr;                            /* receiver status register */
-	UINT8 m_udr;                            /* USART data register */
-	int m_udr_written;
-	UINT8 m_rcv;
-	int m_rcv_pending;
+	UINT8 m_transmit_buffer;                /* USART data register */
+	int m_transmit_pending;
+	UINT8 m_receive_buffer;
+	int m_receive_pending;
 	UINT8 m_gpio_input;
+	UINT8 m_gpio_output;
 
 	/* counter timer state */
 	UINT8 m_tmc[4];     /* timer main counters */
