@@ -197,6 +197,15 @@ WRITE_LINE_MEMBER( vip_expansion_slot_device::run_w ) { if (m_card != NULL) m_ca
 //  SLOT_INTERFACE vip_expansion_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "vp550.h"
+#include "vp570.h"
+#include "vp575.h"
+#include "vp585.h"
+#include "vp590.h"
+#include "vp595.h"
+#include "vp700.h"
+
 SLOT_INTERFACE_START( vip_expansion_cards )
 	SLOT_INTERFACE("super", VP550)
 	//SLOT_INTERFACE("eprom", VP560)

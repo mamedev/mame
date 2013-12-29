@@ -9,6 +9,9 @@
 */
 
 #include "includes/c128.h"
+#include "bus/cbmiec/c1571.h"
+#include "bus/cbmiec/c1581.h"
+#include "cpu/z80/z80.h"
 #include "machine/cbm_snqk.h"
 #include "imagedev/cartslot.h"
 #include "sound/dac.h"

@@ -253,6 +253,11 @@ WRITE_LINE_MEMBER( videobrain_expansion_slot_device::extres_w ) { m_out_extres_f
 //  SLOT_INTERFACE_START( vidbrain_expansion_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "std.h"
+#include "money_minder.h"
+#include "timeshare.h"
+
 SLOT_INTERFACE_START( vidbrain_expansion_cards )
 	SLOT_INTERFACE_INTERNAL("standard", VB_STD)
 	SLOT_INTERFACE_INTERNAL("moneyminder", VB_MONEY_MINDER)

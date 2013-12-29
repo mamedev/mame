@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "exp.h"
+#include "formats\imageutl.h"
 #include "emuopts.h"
 
 
@@ -209,6 +210,15 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 //-------------------------------------------------
 //  SLOT_INTERFACE( vic20_expansion_cards )
 //-------------------------------------------------
+
+// slot devices
+#include "megacart.h"
+#include "std.h"
+#include "vic1010.h"
+#include "vic1110.h"
+#include "vic1111.h"
+#include "vic1112.h"
+#include "vic1210.h"
 
 SLOT_INTERFACE_START( vic20_expansion_cards )
 	SLOT_INTERFACE("exp", VIC1010)

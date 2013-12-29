@@ -196,6 +196,11 @@ void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, UINT
 //  SLOT_INTERFACE( cbm2_expansion_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "24k.h"
+#include "hrg.h"
+#include "std.h"
+
 SLOT_INTERFACE_START( cbm2_expansion_cards )
 	SLOT_INTERFACE("24k", CBM2_24K)
 	SLOT_INTERFACE_INTERNAL("standard", CBM2_STD)

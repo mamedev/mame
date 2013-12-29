@@ -83,6 +83,21 @@ void abcbus_slot_device::device_start()
 //  SLOT_INTERFACE( abcbus_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "abc890.h"
+#include "dos.h"
+#include "fd2.h"
+#include "hdc.h"
+#include "lux10828.h"
+#include "lux21046.h"
+#include "lux21056.h"
+#include "lux4105.h"
+#include "uni800.h"
+#include "sio.h"
+#include "slutprov.h"
+#include "turbo.h"
+
+
 SLOT_INTERFACE_START( abcbus_cards )
 	SLOT_INTERFACE("abc830", ABC830)
 	SLOT_INTERFACE("abc832", ABC832)

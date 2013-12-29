@@ -132,11 +132,6 @@ protected:
 extern const device_type CBM2_EXPANSION_SLOT;
 
 
-// slot devices
-#include "24k.h"
-#include "hrg.h"
-#include "std.h"
-
 SLOT_INTERFACE_EXTERN( cbm2_expansion_cards );
 
 

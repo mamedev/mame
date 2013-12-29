@@ -160,16 +160,6 @@ protected:
 extern const device_type COMX_EXPANSION_SLOT;
 
 
-// slot devices
-#include "clm.h"
-#include "eprom.h"
-#include "expbox.h"
-#include "fdc.h"
-#include "joycard.h"
-#include "printer.h"
-#include "ram.h"
-#include "thermal.h"
-
 SLOT_INTERFACE_EXTERN( comx_expansion_cards );
 
 

@@ -194,6 +194,10 @@ int pet_expansion_slot_device::phi2()
 //  SLOT_INTERFACE( pet_expansion_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "64k.h"
+#include "superpet.h"
+
 SLOT_INTERFACE_START( pet_expansion_cards )
 	SLOT_INTERFACE("64k", PET_64K)
 	SLOT_INTERFACE("superpet", SUPERPET)

@@ -139,6 +139,14 @@ DEVICE_INPUT_DEFAULTS_END
 //  S100_INTERFACE( s100_intf )
 //-------------------------------------------------
 
+// slot devices
+//#include "bus/s100/dj2db.h"
+//#include "bus/s100/djdma.h"
+//#include "bus/s100/mm65k16s.h"
+#include "bus/s100/nsmdsa.h"
+#include "bus/s100/nsmdsad.h"
+//#include "bus/s100/wunderbus.h"
+
 static SLOT_INTERFACE_START( horizon_s100_cards )
 	SLOT_INTERFACE("mdsa", S100_MDS_A)
 	SLOT_INTERFACE("mdsad", S100_MDS_AD)

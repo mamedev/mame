@@ -181,9 +181,13 @@ WRITE8_MEMBER( bw2_expansion_slot_device::modsel_w )
 }
 
 
+
 //-------------------------------------------------
 //  SLOT_INTERFACE( bw2_expansion_cards )
 //-------------------------------------------------
+
+// slot devices
+#include "ramcard.h"
 
 SLOT_INTERFACE_START( bw2_expansion_cards )
 	SLOT_INTERFACE("ramcard", BW2_RAMCARD)

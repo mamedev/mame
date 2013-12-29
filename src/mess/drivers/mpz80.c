@@ -672,6 +672,14 @@ static S100_INTERFACE( s100_intf )
 	DEVCB_NULL
 };
 
+// slot devices
+#include "bus/s100/dj2db.h"
+#include "bus/s100/djdma.h"
+#include "bus/s100/mm65k16s.h"
+//#include "bus/s100/nsmdsa.h"
+//#include "bus/s100/nsmdsad.h"
+#include "bus/s100/wunderbus.h"
+
 static SLOT_INTERFACE_START( mpz80_s100_cards )
 	SLOT_INTERFACE("mm65k16s", S100_MM65K16S)
 	SLOT_INTERFACE("wunderbus", S100_WUNDERBUS)

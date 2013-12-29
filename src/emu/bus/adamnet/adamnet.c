@@ -251,6 +251,13 @@ WRITE_LINE_MEMBER( adamnet_device::reset_w )
 //  SLOT_INTERFACE( adamnet_devices )
 //-------------------------------------------------
 
+// slot devices
+#include "ddp.h"
+#include "fdc.h"
+#include "kb.h"
+#include "printer.h"
+#include "spi.h"
+
 SLOT_INTERFACE_START( adamnet_devices )
 	SLOT_INTERFACE("ddp", ADAM_DDP)
 	SLOT_INTERFACE("fdc", ADAM_FDC)

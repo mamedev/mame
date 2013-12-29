@@ -172,9 +172,6 @@ protected:
 extern const device_type VIC10_EXPANSION_SLOT;
 
 
-// slot devices
-#include "std.h"
-
 SLOT_INTERFACE_EXTERN( vic10_expansion_cards );
 
 

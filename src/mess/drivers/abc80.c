@@ -534,6 +534,11 @@ void abc80_state::machine_start()
 //  MACHINE DRIVERS
 //**************************************************************************
 
+DEVICE_INPUT_DEFAULTS_START( abc830_slow )
+	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
+	DEVICE_INPUT_DEFAULTS("S1", 0x01, 0x01)
+DEVICE_INPUT_DEFAULTS_END
+
 //-------------------------------------------------
 //  MACHINE_CONFIG( abc80 )
 //-------------------------------------------------

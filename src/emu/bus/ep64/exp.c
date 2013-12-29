@@ -85,6 +85,9 @@ void ep64_expansion_bus_slot_device::device_reset()
 //  SLOT_INTERFACE( ep64_expansion_bus_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "exdos.h"
+
 SLOT_INTERFACE_START( ep64_expansion_bus_cards )
 	SLOT_INTERFACE("exdos", EP64_EXDOS)
 SLOT_INTERFACE_END

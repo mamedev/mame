@@ -334,6 +334,16 @@ device_wangpcbus_card_interface::~device_wangpcbus_card_interface()
 //  SLOT_INTERFACE( wangpc_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "emb.h"
+#include "lic.h"
+#include "lvc.h"
+#include "mcc.h"
+#include "mvc.h"
+#include "rtc.h"
+#include "tig.h"
+#include "wdc.h"
+
 SLOT_INTERFACE_START( wangpc_cards )
 	SLOT_INTERFACE("emb", WANGPC_EMB) // extended memory board
 	SLOT_INTERFACE("lic", WANGPC_LIC) // local interconnect option card

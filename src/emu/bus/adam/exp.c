@@ -247,6 +247,11 @@ void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, UINT8
 WRITE_LINE_MEMBER( adam_expansion_slot_device::int_w ) { m_out_int_func(state); }
 
 
+// slot devices
+#include "adamlink.h"
+#include "ide.h"
+#include "ram.h"
+
 //-------------------------------------------------
 //  SLOT_INTERFACE( adam_slot1_devices )
 //-------------------------------------------------

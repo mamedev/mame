@@ -198,6 +198,11 @@ void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 //  SLOT_INTERFACE( plus4_expansion_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "c1551.h"
+#include "sid.h"
+#include "std.h"
+
 SLOT_INTERFACE_START( plus4_expansion_cards )
 	SLOT_INTERFACE("c1551", C1551)
 	SLOT_INTERFACE("sid", PLUS4_SID)

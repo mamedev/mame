@@ -226,6 +226,16 @@ WRITE_LINE_MEMBER( comx_expansion_slot_device::clear_w ) { m_out_clear_func(stat
 //  SLOT_INTERFACE( comx_expansion_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "clm.h"
+#include "eprom.h"
+#include "expbox.h"
+#include "fdc.h"
+#include "joycard.h"
+#include "printer.h"
+#include "ram.h"
+#include "thermal.h"
+
 SLOT_INTERFACE_START( comx_expansion_cards )
 	SLOT_INTERFACE("eb", COMX_EB)
 	SLOT_INTERFACE("fd", COMX_FD)

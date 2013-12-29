@@ -370,6 +370,15 @@ UINT8 ieee488_device::get_data()
 //  SLOT_INTERFACE( cbm_ieee488_devices )
 //-------------------------------------------------
 
+// slot devices
+#include "c2031.h"
+#include "c2040.h"
+#include "c8280.h"
+#include "d9060.h"
+#include "hardbox.h"
+#include "shark.h"
+#include "softbox.h"
+
 SLOT_INTERFACE_START( cbm_ieee488_devices )
 	SLOT_INTERFACE("c2040", C2040)
 	SLOT_INTERFACE("c3040", C3040)

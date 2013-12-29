@@ -140,11 +140,6 @@ protected:
 extern const device_type ADAM_EXPANSION_SLOT;
 
 
-// slot devices
-#include "adamlink.h"
-#include "ide.h"
-#include "ram.h"
-
 SLOT_INTERFACE_EXTERN( adam_slot1_devices );
 SLOT_INTERFACE_EXTERN( adam_slot2_devices );
 SLOT_INTERFACE_EXTERN( adam_slot3_devices );

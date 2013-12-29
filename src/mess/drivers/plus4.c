@@ -13,6 +13,9 @@
 */
 
 #include "includes/plus4.h"
+#include "imagedev/cartslot.h"
+#include "machine/cbm_snqk.h"
+#include "sound/t6721a.h"
 
 
 

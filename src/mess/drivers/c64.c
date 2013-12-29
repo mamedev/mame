@@ -16,6 +16,8 @@
 */
 
 #include "includes/c64.h"
+#include "bus/cbmiec/c1541.h"
+#include "machine/cbm_snqk.h"
 
 
 

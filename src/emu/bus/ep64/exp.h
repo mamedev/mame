@@ -142,9 +142,6 @@ protected:
 extern const device_type EP64_EXPANSION_BUS_SLOT;
 
 
-// slot devices
-#include "exdos.h"
-
 SLOT_INTERFACE_EXTERN( ep64_expansion_bus_cards );
 
 

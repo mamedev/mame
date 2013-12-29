@@ -485,6 +485,17 @@ int cbm_iec_device::get_signal(int signal)
 //  SLOT_INTERFACE( cbm_iec_devices )
 //-------------------------------------------------
 
+// slot devices
+#include "c1541.h"
+#include "c1571.h"
+#include "c1581.h"
+#include "c64_nl10.h"
+#include "cmdhd.h"
+#include "diag264_lb_iec.h"
+#include "fd2000.h"
+#include "interpod.h"
+#include "serialbox.h"
+
 SLOT_INTERFACE_START( cbm_iec_devices )
 	SLOT_INTERFACE("c1540", C1540)
 	SLOT_INTERFACE("c1541", C1541)

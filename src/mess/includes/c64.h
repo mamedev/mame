@@ -12,11 +12,10 @@
 #include "bus/pet/cass.h"
 #include "bus/vcs/ctrl.h"
 #include "cpu/m6502/m6510.h"
-#include "machine/cbm_snqk.h"
+#include "imagedev/snapquik.h"
 #include "machine/mos6526.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
-#include "sound/dac.h"
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 

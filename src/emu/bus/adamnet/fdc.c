@@ -358,12 +358,3 @@ WRITE8_MEMBER( adam_fdc_device::p2_w )
 
 	m_bus->txd_w(this, BIT(data, 4));
 }
-
-
-//-------------------------------------------------
-//  DEVICE_INPUT_DEFAULTS( drive2 )
-//-------------------------------------------------
-
-DEVICE_INPUT_DEFAULTS_START( drive2 )
-	DEVICE_INPUT_DEFAULTS("SW3", 0x01, 0x01)
-DEVICE_INPUT_DEFAULTS_END

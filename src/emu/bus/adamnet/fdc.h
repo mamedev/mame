@@ -71,9 +71,4 @@ protected:
 extern const device_type ADAM_FDC;
 
 
-// default inputs
-extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( drive2 )[];
-
-
-
 #endif

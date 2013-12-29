@@ -173,11 +173,6 @@ protected:
 extern const device_type VIDEOBRAIN_EXPANSION_SLOT;
 
 
-// slot devices
-#include "std.h"
-#include "money_minder.h"
-#include "timeshare.h"
-
 SLOT_INTERFACE_EXTERN( vidbrain_expansion_cards );
 
 

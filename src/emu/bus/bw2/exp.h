@@ -127,9 +127,6 @@ protected:
 extern const device_type BW2_EXPANSION_SLOT;
 
 
-// slot devices
-#include "ramcard.h"
-
 SLOT_INTERFACE_EXTERN( bw2_expansion_cards );
 
 

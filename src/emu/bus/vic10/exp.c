@@ -236,6 +236,9 @@ WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_card != NULL) m_c
 //  SLOT_INTERFACE( vic10_expansion_cards )
 //-------------------------------------------------
 
+// slot devices
+#include "std.h"
+
 SLOT_INTERFACE_START( vic10_expansion_cards )
 	// the following need ROMs from the software list
 	SLOT_INTERFACE_INTERNAL("standard", VIC10_STD)

@@ -249,15 +249,6 @@ extern const device_type IEEE488;
 extern const device_type IEEE488_SLOT;
 
 
-// slot devices
-#include "c2031.h"
-#include "c2040.h"
-#include "c8280.h"
-#include "d9060.h"
-#include "hardbox.h"
-#include "shark.h"
-#include "softbox.h"
-
 SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
 
 

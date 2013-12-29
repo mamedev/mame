@@ -162,15 +162,6 @@ protected:
 extern const device_type VIC20_EXPANSION_SLOT;
 
 
-// slot devices
-#include "megacart.h"
-#include "std.h"
-#include "vic1010.h"
-#include "vic1110.h"
-#include "vic1111.h"
-#include "vic1112.h"
-#include "vic1210.h"
-
 SLOT_INTERFACE_EXTERN( vic20_expansion_cards );
 
 

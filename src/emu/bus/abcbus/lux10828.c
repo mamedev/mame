@@ -688,18 +688,3 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 
 	m_fdc->gen_w(offset, data);
 }
-
-
-
-//**************************************************************************
-//  LUXOR 55 10828 DEVICE INPUT DEFAULTS
-//**************************************************************************
-
-//-------------------------------------------------
-//  DEVICE_INPUT_DEFAULTS( abc830_slow )
-//-------------------------------------------------
-
-DEVICE_INPUT_DEFAULTS_START( abc830_slow )
-	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
-	DEVICE_INPUT_DEFAULTS("S1", 0x01, 0x01)
-DEVICE_INPUT_DEFAULTS_END

@@ -112,10 +112,4 @@ private:
 // device type definition
 extern const device_type LUXOR_55_10828;
 
-
-// default input ports
-extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc830_slow )[];
-
-
-
 #endif

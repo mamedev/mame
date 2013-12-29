@@ -135,10 +135,6 @@ protected:
 extern const device_type PET_EXPANSION_SLOT;
 
 
-// slot devices
-#include "64k.h"
-#include "superpet.h"
-
 SLOT_INTERFACE_EXTERN( pet_expansion_cards );
 
 
