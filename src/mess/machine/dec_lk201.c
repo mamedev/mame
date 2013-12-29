@@ -3,6 +3,7 @@
     Emulation by R. Belmont & M. Burke
 
     This is the later "cost-reduced" 6805 version; there's also an 8048 version.
+    The LK-201 mechanical elements are described in US Patent 4,467,150
 */
 
 /* LK201-AA keyboard matrix (8048 version with updates)
