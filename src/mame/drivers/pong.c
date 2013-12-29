@@ -901,7 +901,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( pong, pong_state )
 
 	/* basic machine hardware */
-	MCFG_NETLIST_ADD("maincpu", pong)
+	MCFG_NETLIST_ADD("maincpu", pong, MASTER_CLOCK * 2)
     MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
     MCFG_NETLIST_ANALOG_INPUT_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
     MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr1", "ic_a9_R.R")

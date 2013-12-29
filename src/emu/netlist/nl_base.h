@@ -1018,7 +1018,8 @@ public:
 
 	ATTR_HOT NETLIB_NAME(solver) *solver() const { return m_solver; }
 
-	ATTR_HOT void process_queue(INT32 &atime);
+	ATTR_HOT void process_queue(const netlist_time delta);
+	ATTR_HOT inline void abort_current_queue_slice() { m_stop = netlist_time::zero; }
 
 	ATTR_HOT inline const netlist_time &time() const { return m_time_ps; }
 
@@ -1027,8 +1028,6 @@ public:
 	ATTR_COLD void set_setup(netlist_setup_t *asetup) { m_setup = asetup;  }
 
 	ATTR_COLD netlist_net_t *find_net(const pstring &name);
-
-	ATTR_COLD void set_clock_freq(UINT64 clockfreq);
 
 	ATTR_COLD netlist_setup_t &setup() { return *m_setup; }
 	ATTR_COLD void reset();
@@ -1048,8 +1047,6 @@ protected:
 	{
 		save(NAME(m_queue.callback()));
 		save(NAME(m_time_ps));
-		save(NAME(m_rem));
-		save(NAME(m_div));
 		netlist_object_t::save_register();
 	}
 
@@ -1061,12 +1058,10 @@ protected:
 #endif
 
 private:
-	ATTR_HOT void update_time(const netlist_time t, INT32 &atime);
+	netlist_time                m_stop;     // target time for current queue processing
 
 	netlist_time                m_time_ps;
 	netlist_queue_t             m_queue;
-	UINT32                      m_rem;
-	UINT32                      m_div;
 
 	NETLIB_NAME(mainclock) *    m_mainclock;
 	NETLIB_NAME(solver) *       m_solver;

@@ -43,7 +43,9 @@ public:
 
 	ATTR_HOT inline const netlist_time &operator=(const netlist_time &right) { m_time = right.m_time; return *this; }
 	ATTR_HOT inline const netlist_time &operator=(const double &right) { m_time = (INTERNALTYPE) ( right * (double) RESOLUTION); return *this; }
-	ATTR_HOT inline operator double() const { return as_double(); }
+
+	// issues with ISO C++ standard
+	//ATTR_HOT inline operator double() const { return as_double(); }
 
 	ATTR_HOT inline const netlist_time &operator+=(const netlist_time &right) { m_time += right.m_time; return *this; }
 

@@ -140,6 +140,10 @@ ADDRESS_MAP_END
 
 netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NETLIST_CORE, "Netlist core device", tag, owner, clock, "netlist_core", __FILE__),
+	    m_icount(0),
+        m_div(0),
+        m_rem(0),
+        m_old(netlist_time::zero),
         m_netlist(NULL),
         m_setup(NULL),
         m_setup_func(NULL)
@@ -148,6 +152,10 @@ netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, cons
 
 netlist_mame_device_t::netlist_mame_device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *file)
     : device_t(mconfig, type, name, tag, owner, clock, shortname, file),
+        m_icount(0),
+        m_div(0),
+        m_rem(0),
+        m_old(netlist_time::zero),
         m_netlist(NULL),
         m_setup(NULL),
         m_setup_func(NULL)
@@ -170,12 +178,12 @@ void netlist_mame_device_t::device_start()
 {
 	LOG_DEV_CALLS(("device_start %s\n", tag()));
 
+	printf("clock is %d\n", clock());
+
 	m_netlist = global_alloc_clear(netlist_mame_t(*this));
 	m_setup = global_alloc_clear(netlist_setup_t(*m_netlist));
 	netlist().init_object(*m_netlist, "netlist");
 	m_setup->init();
-
-	netlist().set_clock_freq(this->clock());
 
 	// register additional devices
 
@@ -197,13 +205,32 @@ void netlist_mame_device_t::device_start()
 	m_setup->start_devices();
 	m_setup->resolve_inputs();
 
+    netlist().save(NAME(m_rem));
+    netlist().save(NAME(m_div));
+    netlist().save(NAME(m_old));
+
 	save_state();
 
+    m_old = netlist_time::zero;
+    m_rem = 0;
+
 }
+
+void netlist_mame_device_t::device_clock_changed()
+{
+    //printf("device_clock_changed\n");
+    m_div = netlist_time::from_hz(clock()).as_raw();
+    //m_rem = 0;
+    NL_VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clockfreq, m_div));
+    //printf("Setting clock %d and divisor %d\n", clock(), m_div);
+}
+
 
 void netlist_mame_device_t::device_reset()
 {
 	LOG_DEV_CALLS(("device_reset\n"));
+    m_old = netlist_time::zero;
+    m_rem = 0;
 	netlist().reset();
 }
 
@@ -234,6 +261,19 @@ ATTR_COLD void netlist_mame_device_t::device_pre_save()
 
 void netlist_mame_device_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+}
+
+ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::update_time_x()
+{
+    const netlist_time delta = netlist().time() - m_old + netlist_time::from_raw(m_rem);
+    m_old = netlist().time();
+    m_icount -= divu_64x32_rem(delta.as_raw(), m_div, &m_rem);
+}
+
+ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
+{
+    if (m_icount <= 0)
+        netlist().abort_current_queue_slice();
 }
 
 ATTR_COLD void netlist_mame_device_t::save_state()
@@ -279,8 +319,7 @@ netlist_mame_cpu_device_t::netlist_mame_cpu_device_t(const machine_config &mconf
         device_state_interface(mconfig, *this),
         device_disasm_interface(mconfig, *this),
         device_memory_interface(mconfig, *this),
-        m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(program_dummy)),
-        m_icount(0)
+        m_program_config("program", ENDIANNESS_LITTLE, 8, 12, 0, ADDRESS_MAP_NAME(program_dummy))
 {
 }
 
@@ -352,14 +391,16 @@ ATTR_HOT void netlist_mame_cpu_device_t::execute_run()
 	{
 		while (m_icount > 0)
 		{
-			int m_temp = 1;
 			m_genPC++;
 			m_genPC &= 255;
 			debugger_instruction_hook(this, m_genPC);
-			netlist().process_queue(m_temp);
-			m_icount -= (1 - m_temp);
+			netlist().process_queue(netlist_time::from_raw(m_div));
+	        update_time_x();
 		}
 	}
 	else
-		netlist().process_queue(m_icount);
+	{
+        netlist().process_queue(netlist_time::from_raw(m_div) * m_icount);
+        update_time_x();
+	}
 }

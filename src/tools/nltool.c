@@ -116,8 +116,6 @@ public:
         this->init_object(*this, "netlist");
         m_setup->init();
 
-        this->set_clock_freq(NETLIST_CLOCK);
-
 		// read the netlist ...
 		//m_setup_func(*m_setup);
 
@@ -183,17 +181,12 @@ int main(int argc, char *argv[])
 	nt.read_netlist(filetobuf(opts.value("f")));
 	double ttr = opts.float_value("ttr");
 
-	INT64 tt = ttr * NETLIST_CLOCK;
-
 	printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
 	printf("runnning ...\n");
 	t = osd_ticks();
-	while (tt>0)
-	{
-		INT32 tr = MIN(tt, NETLIST_CLOCK / 10);
-		tt -= tr;
-		nt.process_queue(tr);
-	}
+
+	nt.process_queue(netlist_time::from_double(ttr));
+
 	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
 	printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
 

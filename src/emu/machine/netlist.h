@@ -56,8 +56,8 @@
 
 // MAME specific configuration
 
-#define MCFG_NETLIST_ADD(_tag, _setup )                                             \
-	MCFG_DEVICE_ADD(_tag, NETLIST_CPU, NETLIST_CLOCK)                               \
+#define MCFG_NETLIST_ADD(_tag, _setup, _clock )                                     \
+	MCFG_DEVICE_ADD(_tag, NETLIST_CPU, _clock)                                      \
 	MCFG_NETLIST_SETUP(_setup)
 
 #define MCFG_NETLIST_REPLACE(_tag, _setup)                                          \
@@ -148,6 +148,12 @@ public:
 	ATTR_HOT inline netlist_setup_t &setup() { return *m_setup; }
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
 
+    ATTR_HOT inline netlist_time last_time_update() { return m_old; }
+	ATTR_HOT void update_time_x();
+	ATTR_HOT void check_mame_abort_slice();
+
+    int m_icount;
+
 protected:
 	// device_t overrides
 	virtual void device_config_complete();
@@ -157,12 +163,20 @@ protected:
 	virtual void device_post_load();
 	virtual void device_pre_save();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+    //virtual void device_debug_setup();
+    virtual void device_clock_changed();
+
+    UINT32              m_div;
 
 private:
     void save_state();
 
-	netlist_mame_t *m_netlist;
-    netlist_setup_t *m_setup;
+    /* timing support here - so sound can hijack it ... */
+    UINT32              m_rem;
+    netlist_time        m_old;
+
+	netlist_mame_t *    m_netlist;
+    netlist_setup_t *   m_setup;
 
 	void (*m_setup_func)(netlist_setup_t &);
 };
@@ -241,7 +255,6 @@ protected:
 
 private:
 
-    int m_icount;
     int m_genPC;
 
 };
@@ -368,7 +381,9 @@ public:
 
 	ATTR_HOT void update()
 	{
+	    m_cpu_device->update_time_x();
         m_callback(INPANALOG(m_in), m_cpu_device->local_time());
+        m_cpu_device->check_mame_abort_slice();
 	}
 
 private:
