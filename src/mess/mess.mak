@@ -2217,6 +2217,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/poly.o      \
 	$(MESS_DRIVERS)/pt68k4.o    \
 	$(MESS_DRIVERS)/ptcsol.o    \
+	$(MESS_DRIVERS)/pulsar.o    \
 	$(MESS_DRIVERS)/pv9234.o    \
 	$(MESS_DRIVERS)/qtsbc.o     \
 	$(MESS_DRIVERS)/rvoice.o    \

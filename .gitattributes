@@ -7209,6 +7209,7 @@ src/mess/drivers/psion.c svneol=native#text/plain
 src/mess/drivers/psx.c svneol=native#text/plain
 src/mess/drivers/pt68k4.c svneol=native#text/plain
 src/mess/drivers/ptcsol.c svneol=native#text/plain
+src/mess/drivers/pulsar.c svneol=native#text/plain
 src/mess/drivers/pv1000.c svneol=native#text/plain
 src/mess/drivers/pv2000.c svneol=native#text/plain
 src/mess/drivers/pv9234.c svneol=native#text/plain
