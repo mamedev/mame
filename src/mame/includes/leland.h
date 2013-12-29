@@ -316,6 +316,5 @@ ADDRESS_MAP_EXTERN(ataxx_80186_map_io, 16);
 
 /*----------- defined in video/leland.c -----------*/
 
-DECLARE_WRITE8_DEVICE_HANDLER( leland_gfx_port_w );
 MACHINE_CONFIG_EXTERN( leland_video );
 MACHINE_CONFIG_EXTERN( ataxx_video );
