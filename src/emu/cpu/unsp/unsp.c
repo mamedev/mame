@@ -10,14 +10,23 @@
 #include "debugger.h"
 #include "unsp.h"
 
-INLINE unsp_state *get_safe_token(device_t *device)
+
+const device_type UNSP = &device_creator<unsp_device>;
+
+
+unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, UNSP, "u'nSP", tag, owner, clock, "unsp", __FILE__)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 23, 0)
 {
-	assert(device != NULL);
-	assert(device->type() == UNSP);
-	return (unsp_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);
+
+offs_t unsp_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( unsp );
+	return CPU_DISASSEMBLE_NAME(unsp)(this, buffer, pc, oprom, opram, options);
+}
+
 
 /*****************************************************************************/
 
@@ -30,8 +39,8 @@ static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);
 
 #define UNSP_LPC            (((UNSP_REG(SR) & 0x3f) << 16) | UNSP_REG(PC))
 
-#define UNSP_REG(reg)       unsp->r[UNSP_##reg - 1]
-#define UNSP_REG_I(reg)     unsp->r[reg]
+#define UNSP_REG(reg)       m_r[UNSP_##reg - 1]
+#define UNSP_REG_I(reg)     m_r[reg]
 #define UNSP_LREG_I(reg)    (((UNSP_REG(SR) << 6) & 0x3f0000) | UNSP_REG_I(reg))
 
 #define UNSP_N  0x0200
@@ -42,43 +51,43 @@ static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);
 #define STANDARD_ALU_CASES \
 		case 0: \
 			lres = r0 + r1; \
-			unsp_update_nzsc(unsp, lres, r0, r1); \
+			unsp_update_nzsc(lres, r0, r1); \
 			break; \
 		case 1: \
 			lres = r0 + r1; \
 			if(UNSP_REG(SR) & UNSP_C) lres++; \
-			unsp_update_nzsc(unsp, lres, r0, r1); \
+			unsp_update_nzsc(lres, r0, r1); \
 			break; \
 		case 3: \
 			lres = r0 + (~r1 & 0x0000ffff); \
 			if(UNSP_REG(SR) & UNSP_C) lres++; \
-			unsp_update_nzsc(unsp, lres, r0, r1); \
+			unsp_update_nzsc(lres, r0, r1); \
 			break; \
 		case 2: \
 		case 4: \
 			lres = r0 + (~r1 & 0x0000ffff) + 1; \
-			unsp_update_nzsc(unsp, lres, r0, r1); \
+			unsp_update_nzsc(lres, r0, r1); \
 			break; \
 		case 6: \
 			lres = -r1; \
-			unsp_update_nz(unsp, lres); \
+			unsp_update_nz(lres); \
 			break; \
 		case 8: \
 			lres = r0 ^ r1; \
-			unsp_update_nz(unsp, lres); \
+			unsp_update_nz(lres); \
 			break; \
 		case 9: \
 			lres = r1; \
-			unsp_update_nz(unsp, lres); \
+			unsp_update_nz(lres); \
 			break; \
 		case 10: \
 			lres = r0 | r1; \
-			unsp_update_nz(unsp, lres); \
+			unsp_update_nz(lres); \
 			break; \
 		case 11: \
 		case 12: \
 			lres = r0 & r1; \
-			unsp_update_nz(unsp, lres); \
+			unsp_update_nz(lres); \
 			break
 
 #define WRITEBACK_OPA \
@@ -89,47 +98,91 @@ static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state);
 
 /*****************************************************************************/
 
-static void unimplemented_opcode(unsp_state *unsp, UINT16 op)
+void unsp_device::unimplemented_opcode(UINT16 op)
 {
 	fatalerror("UNSP: unknown opcode %04x at %04x\n", op, UNSP_LPC << 1);
 }
 
 /*****************************************************************************/
 
-INLINE UINT16 READ16(unsp_state *unsp, UINT32 address)
+UINT16 unsp_device::READ16(UINT32 address)
 {
-	return unsp->program->read_word(address << 1);
+	return m_program->read_word(address << 1);
 }
 
-INLINE void WRITE16(unsp_state *unsp, UINT32 address, UINT16 data)
+void unsp_device::WRITE16(UINT32 address, UINT16 data)
 {
-	unsp->program->write_word(address << 1, data);
-}
-
-/*****************************************************************************/
-
-static CPU_INIT( unsp )
-{
-	unsp_state *unsp = get_safe_token(device);
-	memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
-
-	unsp->device = device;
-	unsp->program = &device->space(AS_PROGRAM);
-}
-
-static CPU_RESET( unsp )
-{
-	unsp_state *unsp = get_safe_token(device);
-	memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
-
-	UNSP_REG(PC) = READ16(unsp, 0xfff7);
-	unsp->irq = 0;
-	unsp->fiq = 0;
+	m_program->write_word(address << 1, data);
 }
 
 /*****************************************************************************/
 
-static void unsp_update_nz(unsp_state *unsp, UINT32 value)
+void unsp_device::device_start()
+{
+	memset(m_r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
+	m_irq = 0;
+	m_fiq = 0;
+	m_curirq = 0;
+	m_sirq = 0;
+	m_sb = 0;
+	m_saved_sb = 0;
+
+	m_program = &space(AS_PROGRAM);
+
+	state_add( UNSP_SP,  "SP", UNSP_REG(SP)).formatstr("%04X");
+	state_add( UNSP_R1,  "R1", UNSP_REG(R1)).formatstr("%04X");
+	state_add( UNSP_R2,  "R2", UNSP_REG(R2)).formatstr("%04X");
+	state_add( UNSP_R3,  "R3", UNSP_REG(R3)).formatstr("%04X");
+	state_add( UNSP_R4,  "R4", UNSP_REG(R4)).formatstr("%04X");
+	state_add( UNSP_BP,  "BP", UNSP_REG(BP)).formatstr("%04X");
+	state_add( UNSP_SR,  "SR", UNSP_REG(SR)).formatstr("%04X");
+	state_add( UNSP_PC,  "PC", m_debugger_temp).callimport().callexport().formatstr("%06X");
+	state_add( UNSP_IRQ, "IRQ", m_irq).formatstr("%1u");
+	state_add( UNSP_FIQ, "FIQ", m_fiq).formatstr("%1u");
+	state_add( UNSP_SB,  "SB", m_sb).formatstr("%1u");
+
+	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
+
+	m_icountptr = &m_icount;
+}
+
+void unsp_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case UNSP_PC:
+			m_debugger_temp = UNSP_LPC << 1;
+			break;
+
+		case STATE_GENPC:
+			m_debugger_temp = UNSP_LPC << 1;
+			break;
+	}
+}
+
+void unsp_device::state_import(const device_state_entry &entry)
+{
+    switch (entry.index())
+    {
+        case UNSP_PC:
+			UNSP_REG(PC) = (m_debugger_temp & 0x0001fffe) >> 1;
+			UNSP_REG(SR) = (UNSP_REG(SR) & 0xffc0) | ((m_debugger_temp & 0x007e0000) >> 17);
+            break;
+    }
+}
+
+void unsp_device::device_reset()
+{
+	memset(m_r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
+
+	UNSP_REG(PC) = READ16(0xfff7);
+	m_irq = 0;
+	m_fiq = 0;
+}
+
+/*****************************************************************************/
+
+void unsp_device::unsp_update_nz(UINT32 value)
 {
 	UNSP_REG(SR) &= ~(UNSP_N | UNSP_Z);
 	if(value & 0x8000)
@@ -142,10 +195,10 @@ static void unsp_update_nz(unsp_state *unsp, UINT32 value)
 	}
 }
 
-static void unsp_update_nzsc(unsp_state *unsp, UINT32 value, UINT16 r0, UINT16 r1)
+void unsp_device::unsp_update_nzsc(UINT32 value, UINT16 r0, UINT16 r1)
 {
 	UNSP_REG(SR) &= ~(UNSP_C | UNSP_S);
-	unsp_update_nz(unsp, value);
+	unsp_update_nz(value);
 	if(value != (UINT16)value)
 	{
 		UNSP_REG(SR) |= UNSP_C;
@@ -157,29 +210,28 @@ static void unsp_update_nzsc(unsp_state *unsp, UINT32 value, UINT16 r0, UINT16 r
 	}
 }
 
-static void unsp_push(unsp_state *unsp, UINT16 value, UINT16 *reg)
+void unsp_device::unsp_push(UINT16 value, UINT16 *reg)
 {
-	WRITE16(unsp, (*reg)--, value);
+	WRITE16((*reg)--, value);
 }
 
-static UINT16 unsp_pop(unsp_state *unsp, UINT16 *reg)
+UINT16 unsp_device::unsp_pop(UINT16 *reg)
 {
-	return READ16(unsp, ++(*reg));
+	return READ16(++(*reg));
 }
 
-static CPU_EXECUTE( unsp )
+void unsp_device::execute_run()
 {
-	unsp_state *unsp = get_safe_token(device);
 	UINT32 op;
 	UINT32 lres;
 	UINT16 r0, r1;
 	lres = 0;
 
-	while (unsp->icount > 0)
+	while (m_icount > 0)
 	{
-		debugger_instruction_hook(device, UNSP_LPC<<1);
+		debugger_instruction_hook(this, UNSP_LPC<<1);
 
-		op = READ16(unsp, UNSP_LPC);
+		op = READ16(UNSP_LPC);
 
 		UNSP_REG(PC)++;
 
@@ -271,15 +323,15 @@ static CPU_EXECUTE( unsp )
 				// r, [bp+imm6]
 				case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x06: case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d:
 					r0 = UNSP_REG_I(OPA);
-					r1 = READ16(unsp, UNSP_REG(BP) + OPIMM);
+					r1 = READ16(UNSP_REG(BP) + OPIMM);
 					switch(OP0)
 					{
 						STANDARD_ALU_CASES;
 						case 13: // store r, [bp+imm6]
-							WRITE16(unsp, UNSP_REG(BP) + OPIMM, UNSP_REG_I(OPA));
+							WRITE16(UNSP_REG(BP) + OPIMM, UNSP_REG_I(OPA));
 							break;
 						default:
-							unimplemented_opcode(unsp, op);
+							unimplemented_opcode(op);
 							break;
 					}
 					WRITEBACK_OPA;
@@ -293,7 +345,7 @@ static CPU_EXECUTE( unsp )
 					{
 						STANDARD_ALU_CASES;
 						default:
-							unimplemented_opcode(unsp, op);
+							unimplemented_opcode(op);
 							break;
 					}
 					WRITEBACK_OPA;
@@ -303,38 +355,38 @@ static CPU_EXECUTE( unsp )
 				case 0x29:
 					if(op == 0x9a90) // retf
 					{
-						UNSP_REG(SR) = unsp_pop(unsp, &UNSP_REG(SP));
-						UNSP_REG(PC) = unsp_pop(unsp, &UNSP_REG(SP));
+						UNSP_REG(SR) = unsp_pop(&UNSP_REG(SP));
+						UNSP_REG(PC) = unsp_pop(&UNSP_REG(SP));
 						break;
 					}
 					else if(op == 0x9a98) // reti
 					{
 						int i;
-						UNSP_REG(SR) = unsp_pop(unsp, &UNSP_REG(SP));
-						UNSP_REG(PC) = unsp_pop(unsp, &UNSP_REG(SP));
-						if(unsp->fiq & 2)
+						UNSP_REG(SR) = unsp_pop(&UNSP_REG(SP));
+						UNSP_REG(PC) = unsp_pop(&UNSP_REG(SP));
+						if(m_fiq & 2)
 						{
-							unsp->fiq &= 1;
+							m_fiq &= 1;
 						}
-						else if(unsp->irq & 2)
+						else if(m_irq & 2)
 						{
-							unsp->irq &= 1;
+							m_irq &= 1;
 						}
-						unsp->sirq &= ~(1 << unsp->curirq);
+						m_sirq &= ~(1 << m_curirq);
 						for(i = 0; i < 9; i++)
 						{
-							if((unsp->sirq & (1 << i)) != 0 && i != unsp->curirq)
+							if((m_sirq & (1 << i)) != 0 && i != m_curirq)
 							{
-								unsp->sirq &= ~(1 << i);
-								unsp->curirq = 0;
-								unsp_set_irq_line(unsp, UNSP_IRQ0_LINE + i, 1);
+								m_sirq &= ~(1 << i);
+								m_curirq = 0;
+								execute_set_input(UNSP_IRQ0_LINE + i, 1);
 								i = -1;
 								break;
 							}
 						}
 						if(i != -1)
 						{
-							unsp->curirq = 0;
+							m_curirq = 0;
 						}
 						break;
 					}
@@ -344,7 +396,7 @@ static CPU_EXECUTE( unsp )
 						r1 = OPA;
 						while(r0--)
 						{
-							UNSP_REG_I(++r1) = unsp_pop(unsp, &UNSP_REG_I(OPB));
+							UNSP_REG_I(++r1) = unsp_pop(&UNSP_REG_I(OPB));
 						}
 					}
 					break;
@@ -355,7 +407,7 @@ static CPU_EXECUTE( unsp )
 					r1 = OPA;
 					while(r0--)
 					{
-						unsp_push(unsp, UNSP_REG_I(r1--), &UNSP_REG_I(OPB));
+						unsp_push(UNSP_REG_I(r1--), &UNSP_REG_I(OPB));
 					}
 					break;
 
@@ -365,30 +417,30 @@ static CPU_EXECUTE( unsp )
 					{
 						case 0: // r, [r]
 							r0 = UNSP_REG_I(OPA);
-							r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+							r1 = READ16((OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 							switch(OP0)
 							{
 								STANDARD_ALU_CASES;
 								case 13: // store r, [r]
-									WRITE16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB), UNSP_REG_I(OPA));
+									WRITE16((OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB), UNSP_REG_I(OPA));
 									break;
 								default:
-									unimplemented_opcode(unsp, op);
+									unimplemented_opcode(op);
 									break;
 							}
 							WRITEBACK_OPA;
 							break;
 						case 1: // r, [<ds:>r--]
 							r0 = UNSP_REG_I(OPA);
-							r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+							r1 = READ16((OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 							switch(OP0)
 							{
 								STANDARD_ALU_CASES;
 								case 13: // store r, [<ds:>r--]
-									WRITE16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB), UNSP_REG_I(OPA));
+									WRITE16((OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB), UNSP_REG_I(OPA));
 									break;
 								default:
-									unimplemented_opcode(unsp, op);
+									unimplemented_opcode(op);
 									break;
 							}
 							UNSP_REG_I(OPB)--;
@@ -396,15 +448,15 @@ static CPU_EXECUTE( unsp )
 							break;
 						case 2: // r, [<ds:>r++]
 							r0 = UNSP_REG_I(OPA);
-							r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+							r1 = READ16((OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 							switch(OP0)
 							{
 								STANDARD_ALU_CASES;
 								case 13: // store r, [<ds:>r++]
-									WRITE16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB), UNSP_REG_I(OPA));
+									WRITE16((OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB), UNSP_REG_I(OPA));
 									break;
 								default:
-									unimplemented_opcode(unsp, op);
+									unimplemented_opcode(op);
 									break;
 							}
 							UNSP_REG_I(OPB)++;
@@ -413,12 +465,12 @@ static CPU_EXECUTE( unsp )
 						case 3: // r, [<ds:>++r]
 							UNSP_REG_I(OPB)++;
 							r0 = UNSP_REG_I(OPA);
-							r1 = READ16(unsp, (OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
+							r1 = READ16((OPN & 4) ? UNSP_LREG_I(OPB) : UNSP_REG_I(OPB));
 							switch(OP0)
 							{
 								STANDARD_ALU_CASES;
 								default:
-									unimplemented_opcode(unsp, op);
+									unimplemented_opcode(op);
 									break;
 							}
 							WRITEBACK_OPA;
@@ -438,7 +490,7 @@ static CPU_EXECUTE( unsp )
 							{
 								STANDARD_ALU_CASES;
 								default:
-									unimplemented_opcode(unsp, op);
+									unimplemented_opcode(op);
 									break;
 							}
 							WRITEBACK_OPA;
@@ -449,33 +501,33 @@ static CPU_EXECUTE( unsp )
 							if(!((OP0 == 4 || OP0 == 6 || OP0 == 9 || OP0 == 12) && OPA != OPB))
 							{
 								r0 = UNSP_REG_I(OPB);
-								r1 = READ16(unsp, UNSP_LPC);
+								r1 = READ16(UNSP_LPC);
 								UNSP_REG(PC)++;
 								switch(OP0)
 								{
 									STANDARD_ALU_CASES;
 									default:
-										unimplemented_opcode(unsp, op);
+										unimplemented_opcode(op);
 										break;
 								}
 								WRITEBACK_OPA;
 							}
 							else
 							{
-								unimplemented_opcode(unsp, op);
+								unimplemented_opcode(op);
 							}
 							break;
 
 						// ALU, Direct 16
 						case 2: // r, [imm16]
 							r0 = UNSP_REG_I(OPB);
-							r1 = READ16(unsp, READ16(unsp, UNSP_LPC));
+							r1 = READ16(READ16(UNSP_LPC));
 							UNSP_REG(PC)++;
 							switch(OP0)
 							{
 								STANDARD_ALU_CASES;
 								default:
-									unimplemented_opcode(unsp, op);
+									unimplemented_opcode(op);
 									break;
 							}
 							WRITEBACK_OPA;
@@ -489,12 +541,12 @@ static CPU_EXECUTE( unsp )
 							{
 								STANDARD_ALU_CASES;
 								default:
-									unimplemented_opcode(unsp, op);
+									unimplemented_opcode(op);
 									break;
 							}
 							if(OP0 != 4 && OP0 < 12)
 							{
-								WRITE16(unsp, READ16(unsp, UNSP_LPC), (UINT16)lres);
+								WRITE16(READ16(UNSP_LPC), (UINT16)lres);
 							}
 							UNSP_REG(PC)++;
 							break;
@@ -502,23 +554,23 @@ static CPU_EXECUTE( unsp )
 						// ALU, Shifted
 						default:
 						{
-							UINT32 shift = (UNSP_REG_I(OPB) << 4) | unsp->sb;
+							UINT32 shift = (UNSP_REG_I(OPB) << 4) | m_sb;
 							if(shift & 0x80000)
 							{
 								shift |= 0xf00000;
 							}
 							shift >>= (OPN - 3);
-							unsp->sb = shift & 0x0f;
+							m_sb = shift & 0x0f;
 							r1 = (shift >> 4) & 0x0000ffff;
 
 							switch(OP0)
 							{
 								case 9: // load r, r asr n
-									unsp_update_nz(unsp, r1);
+									unsp_update_nz(r1);
 									UNSP_REG_I(OPA) = r1;
 									break;
 								default:
-									unimplemented_opcode(unsp, op);
+									unimplemented_opcode(op);
 									break;
 							}
 							break;
@@ -531,17 +583,17 @@ static CPU_EXECUTE( unsp )
 					{
 						if(OPA == OPB)
 						{
-							WRITE16(unsp, READ16(unsp, UNSP_LPC), UNSP_REG_I(OPB));
+							WRITE16(READ16(UNSP_LPC), UNSP_REG_I(OPB));
 							UNSP_REG(PC)++;
 						}
 						else
 						{
-							unimplemented_opcode(unsp, op);
+							unimplemented_opcode(op);
 						}
 					}
 					else
 					{
-						unimplemented_opcode(unsp, op);
+						unimplemented_opcode(op);
 					}
 					break;
 
@@ -552,20 +604,20 @@ static CPU_EXECUTE( unsp )
 						switch(OP0)
 						{
 							case 9: // load r, r >> imm2
-								lres = ((UNSP_REG_I(OPB) << 4) | unsp->sb) >> (OPN - 3);
-								unsp->sb = lres & 0x0f;
-								unsp_update_nz(unsp, (UINT16)(lres >> 4));
+								lres = ((UNSP_REG_I(OPB) << 4) | m_sb) >> (OPN - 3);
+								m_sb = lres & 0x0f;
+								unsp_update_nz((UINT16)(lres >> 4));
 								UNSP_REG_I(OPA) = (UINT16)(lres >> 4);
 								break;
 							default:
-								unimplemented_opcode(unsp, op);
+								unimplemented_opcode(op);
 								break;
 						}
 					}
 					else
 					{
-						UINT32 shift = ((unsp->sb << 16) | UNSP_REG_I(OPB)) << (OPN + 1);
-						unsp->sb = (shift >> 16) & 0x0f;
+						UINT32 shift = ((m_sb << 16) | UNSP_REG_I(OPB)) << (OPN + 1);
+						m_sb = (shift >> 16) & 0x0f;
 						r0 = UNSP_REG_I(OPA);
 						r1 = shift & 0x0000ffff;
 
@@ -573,21 +625,21 @@ static CPU_EXECUTE( unsp )
 						{
 							case 0: // add r, r << imm2
 								lres = r0 + r1;
-								unsp_update_nzsc(unsp, lres, r0, r1);
+								unsp_update_nzsc(lres, r0, r1);
 								UNSP_REG_I(OPA) = (UINT16)lres;
 								break;
 							case 9: // load r, r << imm2
 								lres = r1;
-								unsp_update_nz(unsp, lres);
+								unsp_update_nz(lres);
 								UNSP_REG_I(OPA) = (UINT16)lres;
 								break;
 							case 10: // or r, r << imm2
 								lres = r0 | r1;
-								unsp_update_nz(unsp, lres);
+								unsp_update_nz(lres);
 								UNSP_REG_I(OPA) = (UINT16)lres;
 								break;
 							default:
-								unimplemented_opcode(unsp, op);
+								unimplemented_opcode(op);
 								break;
 						}
 					}
@@ -597,25 +649,25 @@ static CPU_EXECUTE( unsp )
 				case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x66: case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c:
 					if(OPN & 4) // ROR
 					{
-						lres = ((((unsp->sb << 16) | UNSP_REG_I(OPB)) << 4) | unsp->sb) >> (OPN - 3);
-						unsp->sb = lres & 0x0f;
+						lres = ((((m_sb << 16) | UNSP_REG_I(OPB)) << 4) | m_sb) >> (OPN - 3);
+						m_sb = lres & 0x0f;
 						r1 = (UINT16)(lres >> 4);
 					}
 					else
 					{
-						lres = ((((unsp->sb << 16) | UNSP_REG_I(OPB)) << 4) | unsp->sb) << (OPN + 1);
-						unsp->sb = (lres >> 20) & 0x0f;
+						lres = ((((m_sb << 16) | UNSP_REG_I(OPB)) << 4) | m_sb) << (OPN + 1);
+						m_sb = (lres >> 20) & 0x0f;
 						r1 = (UINT16)(lres >> 4);
 					}
 
 					switch(OP0)
 					{
 						case 9: // load r, r ror imm2
-							unsp_update_nz(unsp, r1);
+							unsp_update_nz(r1);
 							UNSP_REG_I(OPA) = r1;
 							break;
 						default:
-							unimplemented_opcode(unsp, op);
+							unimplemented_opcode(op);
 							break;
 					}
 					break;
@@ -623,24 +675,24 @@ static CPU_EXECUTE( unsp )
 				// ALU, Direct 8
 				case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x76: case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c:
 					//print("%s %s, [%02x]", alu[OP0], reg[OPA], OPIMM);
-					unimplemented_opcode(unsp, op);
+					unimplemented_opcode(op);
 					break;
 
 				// Call
 				case 0x1f:
 					if(OPA == 0)
 					{
-						r1 = READ16(unsp, UNSP_LPC);
+						r1 = READ16(UNSP_LPC);
 						UNSP_REG(PC)++;
-						unsp_push(unsp, UNSP_REG(PC), &UNSP_REG(SP));
-						unsp_push(unsp, UNSP_REG(SR), &UNSP_REG(SP));
+						unsp_push(UNSP_REG(PC), &UNSP_REG(SP));
+						unsp_push(UNSP_REG(SR), &UNSP_REG(SP));
 						UNSP_REG(PC) = r1;
 						UNSP_REG(SR) &= 0xffc0;
 						UNSP_REG(SR) |= OPIMM;
 					}
 					else
 					{
-						unimplemented_opcode(unsp, op);
+						unimplemented_opcode(op);
 					}
 					break;
 
@@ -648,7 +700,7 @@ static CPU_EXECUTE( unsp )
 				case 0x2f: case 0x3f: case 0x6f: case 0x7f:
 					if (OPA == 7 && OP1 == 2)
 					{
-						UNSP_REG(PC) = READ16(unsp, UNSP_LPC);
+						UNSP_REG(PC) = READ16(UNSP_LPC);
 						UNSP_REG(SR) &= 0xffc0;
 						UNSP_REG(SR) |= OPIMM;
 					}
@@ -669,7 +721,7 @@ static CPU_EXECUTE( unsp )
 					}
 					else
 					{
-						unimplemented_opcode(unsp, op);
+						unimplemented_opcode(op);
 					}
 					break;
 
@@ -692,7 +744,7 @@ static CPU_EXECUTE( unsp )
 					}
 					else
 					{
-						unimplemented_opcode(unsp, op);
+						unimplemented_opcode(op);
 					}
 					break;
 
@@ -703,32 +755,32 @@ static CPU_EXECUTE( unsp )
 						switch(OPIMM)
 						{
 							case 0:
-								unsp->irq &= ~1;
-								unsp->fiq &= ~1;
+								m_irq &= ~1;
+								m_fiq &= ~1;
 								break;
 							case 1:
-								unsp->irq |=  1;
-								unsp->fiq &= ~1;
+								m_irq |=  1;
+								m_fiq &= ~1;
 								break;
 							case 2:
-								unsp->irq &= ~1;
-								unsp->fiq |=  1;
+								m_irq &= ~1;
+								m_fiq |=  1;
 								break;
 							case 3:
-								unsp->irq |=  1;
-								unsp->fiq |=  1;
+								m_irq |=  1;
+								m_fiq |=  1;
 								break;
 							case 8: // irq off
-								unsp->irq &= ~1;
+								m_irq &= ~1;
 								break;
 							case 9: // irq on
-								unsp->irq |= 1;
+								m_irq |= 1;
 								break;
 							case 12: // fiq off
-								unsp->fiq &= ~1;
+								m_fiq &= ~1;
 								break;
 							case 13: // fiq on
-								unsp->fiq |= 1;
+								m_fiq |= 1;
 								break;
 							case 37: // nop
 								break;
@@ -736,29 +788,29 @@ static CPU_EXECUTE( unsp )
 					}
 					else
 					{
-						unimplemented_opcode(unsp, op);
+						unimplemented_opcode(op);
 					}
 					break;
 			}
 		}
 
-		unsp->icount -= 5;
-		unsp->icount = MAX(unsp->icount, 0);
+		m_icount -= 5;
+		m_icount = MAX(m_icount, 0);
 	}
 }
 
 
 /*****************************************************************************/
 
-static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state)
+void unsp_device::execute_set_input(int irqline, int state)
 {
 	UINT16 irq_vector = 0;
 
-	unsp->sirq &= ~(1 << irqline);
+	m_sirq &= ~(1 << irqline);
 
 	if(!state)
 	{
-		logerror("clearing irq %d (%04x, %04x)\n", irqline, unsp->sirq, unsp->curirq);
+		logerror("clearing irq %d (%04x, %04x)\n", irqline, m_sirq, m_curirq);
 		return;
 	}
 
@@ -772,154 +824,43 @@ static void unsp_set_irq_line(unsp_state *unsp, int irqline, int state)
 		case UNSP_IRQ5_LINE:
 		case UNSP_IRQ6_LINE:
 		case UNSP_IRQ7_LINE:
-			if(unsp->fiq & 2)
+			if(m_fiq & 2)
 			{
 				// FIQ is being serviced, ignore this IRQ trigger.
-				unsp->sirq |= state << irqline;
+				m_sirq |= state << irqline;
 				return;
 			}
-			if(unsp->irq != 1)
+			if(m_irq != 1)
 			{
 				// IRQ is disabled, ignore this IRQ trigger.
-				unsp->sirq |= state << irqline;
+				m_sirq |= state << irqline;
 				return;
 			}
-			unsp->irq |= 2;
-			unsp->curirq |= (1 << irqline);
-			logerror("taking irq %d (%04x, %04x)\n", irqline, unsp->sirq, unsp->curirq);
+			m_irq |= 2;
+			m_curirq |= (1 << irqline);
+			logerror("taking irq %d (%04x, %04x)\n", irqline, m_sirq, m_curirq);
 			irq_vector = 0xfff8 + (irqline - UNSP_IRQ0_LINE);
 			break;
 		case UNSP_FIQ_LINE:
-			if(unsp->fiq != 1)
+			if(m_fiq != 1)
 			{
 				// FIQ is disabled, ignore this FIQ trigger.
-				unsp->sirq |= state << irqline;
+				m_sirq |= state << irqline;
 				return;
 			}
-			unsp->fiq |= 2;
-			unsp->curirq |= (1 << irqline);
-			logerror("taking fiq %d (%04x, %04x)\n", irqline, unsp->sirq, unsp->curirq);
+			m_fiq |= 2;
+			m_curirq |= (1 << irqline);
+			logerror("taking fiq %d (%04x, %04x)\n", irqline, m_sirq, m_curirq);
 			irq_vector = 0xfff6;
 			break;
 		case UNSP_BRK_LINE:
 			break;
 	}
 
-	unsp->saved_sb = unsp->sb;
-	unsp_push(unsp, UNSP_REG(PC), &UNSP_REG(SP));
-	unsp_push(unsp, UNSP_REG(SR), &UNSP_REG(SP));
-	UNSP_REG(PC) = READ16(unsp, irq_vector);
+	m_saved_sb = m_sb;
+	unsp_push(UNSP_REG(PC), &UNSP_REG(SP));
+	unsp_push(UNSP_REG(SR), &UNSP_REG(SP));
+	UNSP_REG(PC) = READ16(irq_vector);
 	UNSP_REG(SR) = 0;
 }
 
-static CPU_SET_INFO( unsp )
-{
-	unsp_state *unsp = get_safe_token(device);
-
-	switch (state)
-	{
-		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ0_LINE:
-		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ1_LINE:
-		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ2_LINE:
-		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ3_LINE:
-		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ4_LINE:
-		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ5_LINE:
-		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ6_LINE:
-		case CPUINFO_INT_INPUT_STATE + UNSP_IRQ7_LINE:
-		case CPUINFO_INT_INPUT_STATE + UNSP_FIQ_LINE:
-		case CPUINFO_INT_INPUT_STATE + UNSP_BRK_LINE:
-			unsp_set_irq_line(unsp, state - CPUINFO_INT_INPUT_STATE, (int)info->i);
-			break;
-
-		case CPUINFO_INT_REGISTER + UNSP_SP:            UNSP_REG(SP) = info->i;     break;
-		case CPUINFO_INT_REGISTER + UNSP_R1:            UNSP_REG(R1) = info->i;     break;
-		case CPUINFO_INT_REGISTER + UNSP_R2:            UNSP_REG(R2) = info->i;     break;
-		case CPUINFO_INT_REGISTER + UNSP_R3:            UNSP_REG(R3) = info->i;     break;
-		case CPUINFO_INT_REGISTER + UNSP_R4:            UNSP_REG(R4) = info->i;     break;
-		case CPUINFO_INT_REGISTER + UNSP_BP:            UNSP_REG(BP) = info->i;     break;
-		case CPUINFO_INT_REGISTER + UNSP_SR:            UNSP_REG(SR) = info->i;     break;
-		case CPUINFO_INT_PC: /* Intentional fallthrough */
-		case CPUINFO_INT_REGISTER + UNSP_PC:
-			UNSP_REG(PC) = (info->i & 0x0001fffe) >> 1;
-			UNSP_REG(SR) = (UNSP_REG(SR) & 0xffc0) | ((info->i & 0x007e0000) >> 17);
-			break;
-		case CPUINFO_INT_REGISTER + UNSP_IRQ:           unsp->irq = info->i;        break;
-		case CPUINFO_INT_REGISTER + UNSP_FIQ:           unsp->fiq = info->i;        break;
-		case CPUINFO_INT_REGISTER + UNSP_SB:            unsp->sb = info->i;         break;
-	}
-}
-
-CPU_GET_INFO( unsp )
-{
-	unsp_state *unsp = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch(state)
-	{
-		case CPUINFO_INT_CONTEXT_SIZE:          info->i = sizeof(unsp_state);   break;
-		case CPUINFO_INT_INPUT_LINES:           info->i = 0;                    break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:    info->i = 0;                    break;
-		case CPUINFO_INT_ENDIANNESS:            info->i = ENDIANNESS_BIG;       break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:      info->i = 1;                    break;
-		case CPUINFO_INT_CLOCK_DIVIDER:         info->i = 1;                    break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES: info->i = 2;                    break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES: info->i = 4;                    break;
-		case CPUINFO_INT_MIN_CYCLES:            info->i = 5;                    break;
-		case CPUINFO_INT_MAX_CYCLES:            info->i = 5;                    break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM: info->i = 16;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 23;                   break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:    info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:    info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:    info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:      info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:      info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:      info->i = 0;                    break;
-
-		case CPUINFO_INT_REGISTER + UNSP_SP:    info->i = UNSP_REG(SP);         break;
-		case CPUINFO_INT_REGISTER + UNSP_R1:    info->i = UNSP_REG(R1);         break;
-		case CPUINFO_INT_REGISTER + UNSP_R2:    info->i = UNSP_REG(R2);         break;
-		case CPUINFO_INT_REGISTER + UNSP_R3:    info->i = UNSP_REG(R3);         break;
-		case CPUINFO_INT_REGISTER + UNSP_R4:    info->i = UNSP_REG(R4);         break;
-		case CPUINFO_INT_REGISTER + UNSP_BP:    info->i = UNSP_REG(BP);         break;
-		case CPUINFO_INT_REGISTER + UNSP_SR:    info->i = UNSP_REG(SR);         break;
-		case CPUINFO_INT_PC:    /* Intentional fallthrough */
-		case CPUINFO_INT_REGISTER + UNSP_PC:    info->i = UNSP_LPC << 1;        break;
-		case CPUINFO_INT_REGISTER + UNSP_IRQ:   info->i = unsp->irq;            break;
-		case CPUINFO_INT_REGISTER + UNSP_FIQ:   info->i = unsp->fiq;            break;
-		case CPUINFO_INT_REGISTER + UNSP_SB:    info->i = unsp->sb;             break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(unsp);        break;
-		case CPUINFO_FCT_INIT:                  info->init = CPU_INIT_NAME(unsp);               break;
-		case CPUINFO_FCT_RESET:                 info->reset = CPU_RESET_NAME(unsp);             break;
-		case CPUINFO_FCT_EXECUTE:               info->execute = CPU_EXECUTE_NAME(unsp);         break;
-		case CPUINFO_FCT_BURN:                  info->burn = NULL;                              break;
-		case CPUINFO_FCT_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(unsp); break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &unsp->icount;                   break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                  strcpy(info->s, "u'nSP");               break;
-		case CPUINFO_STR_SHORTNAME:             strcpy(info->s, "unsp");               break;
-		case CPUINFO_STR_FAMILY:                strcpy(info->s, "u'nSP");                   break;
-		case CPUINFO_STR_VERSION:               strcpy(info->s, "1.0");                         break;
-		case CPUINFO_STR_SOURCE_FILE:           strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:               strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-
-		case CPUINFO_STR_FLAGS:                         strcpy(info->s, " ");                   break;
-
-		case CPUINFO_STR_REGISTER + UNSP_SP:            sprintf(info->s, "SP: %04x", UNSP_REG(SP)); break;
-		case CPUINFO_STR_REGISTER + UNSP_R1:            sprintf(info->s, "R1: %04x", UNSP_REG(R1)); break;
-		case CPUINFO_STR_REGISTER + UNSP_R2:            sprintf(info->s, "R2: %04x", UNSP_REG(R2)); break;
-		case CPUINFO_STR_REGISTER + UNSP_R3:            sprintf(info->s, "R3: %04x", UNSP_REG(R3)); break;
-		case CPUINFO_STR_REGISTER + UNSP_R4:            sprintf(info->s, "R4: %04x", UNSP_REG(R4)); break;
-		case CPUINFO_STR_REGISTER + UNSP_BP:            sprintf(info->s, "BP: %04x", UNSP_REG(BP)); break;
-		case CPUINFO_STR_REGISTER + UNSP_SR:            sprintf(info->s, "SR: %04x", UNSP_REG(SR)); break;
-		case CPUINFO_STR_REGISTER + UNSP_PC:            sprintf(info->s, "PC: %06x (%06x)", UNSP_LPC, UNSP_LPC << 1); break;
-		case CPUINFO_STR_REGISTER + UNSP_IRQ:           sprintf(info->s, "IRQ: %d", unsp->irq);     break;
-		case CPUINFO_STR_REGISTER + UNSP_FIQ:           sprintf(info->s, "FIQ: %d", unsp->fiq);     break;
-		case CPUINFO_STR_REGISTER + UNSP_SB:            sprintf(info->s, "SB: %d", unsp->sb);       break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(UNSP, unsp);
