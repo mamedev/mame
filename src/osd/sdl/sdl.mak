@@ -66,7 +66,7 @@ USE_DISPATCH_GL = 1
 
 # uncomment the next line to specify where you have installed
 # SDL. Equivalent to the ./configure --prefix=<path>
-# SDL_INSTALL_ROOT = /usr/local/sdl13
+# SDL_INSTALL_ROOT = /usr/local/sdl20
 
 # uncomment to disable the Qt debugger (on non-OSX this disables all debugging)
 # NO_USE_QTDEBUG = 1
