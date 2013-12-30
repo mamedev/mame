@@ -81,6 +81,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_cb);
 	DECLARE_READ8_MEMBER(hdc_r);
 	DECLARE_WRITE8_MEMBER(hdc_w);
+	DECLARE_WRITE_LINE_MEMBER(kb_data_ready);
 
 	required_shared_ptr<UINT8> m_vram;
 	required_device<m68000_device> m_maincpu;
@@ -123,10 +124,12 @@ private:
 	UINT8 m_portA;
 	UINT8 m_portB;
 	bool m_video_timer_irq;
+	bool m_video_kb_irq;
 	UINT8 m_nmi_enable;
 	UINT8 m_crtc_irq;
 	UINT16 m_kb_data;
 	UINT8 m_kb_bit;
+	UINT32 m_kb_keys[8];
 };
 
 
@@ -168,9 +171,8 @@ static ADDRESS_MAP_START(wicat_video_io, AS_IO, 8, wicat_state)
 	AM_RANGE(0x0400,0x047f) AM_READWRITE(videosram_r,videosram_w)  // XD2210  4-bit NOVRAM
 	AM_RANGE(0x0500,0x0500) AM_WRITE(videosram_recall_w)
 	AM_RANGE(0x0600,0x0600) AM_WRITE(videosram_store_w)
-	AM_RANGE(0x0700,0x0700) AM_DEVREADWRITE("videouart",im6402_device,read,write)  // UART?
 	AM_RANGE(0x0800,0x080f) AM_READWRITE(video_ctrl_r,video_ctrl_w)
-	AM_RANGE(0x0a00,0x0a1f) AM_READWRITE(video_dma_r,video_dma_w) // DMA
+	AM_RANGE(0x0a00,0x0a1f) AM_READWRITE(video_dma_r,video_dma_w) // AM9517A DMA
 	AM_RANGE(0x0b00,0x0b03) AM_READWRITE(video_r,video_w)  // i8275 CRTC
 	AM_RANGE(0x0e00,0x0eff) AM_RAM
 	AM_RANGE(0x4000,0x5fff) AM_RAM AM_SHARE("vram") // video RAM?
@@ -192,11 +194,10 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( wicat )
 	PORT_START("kb0")
-	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0xfff7ffff,IP_ACTIVE_HIGH,IPT_UNUSED)
+	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Retrn") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 
 	PORT_START("kb1")
-
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
@@ -208,6 +209,36 @@ static INPUT_PORTS_START( wicat )
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 
+	PORT_START("kb2")
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
+
+	PORT_START("kb3")
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 INPUT_PORTS_END
 
 void wicat_state::driver_start()
@@ -232,11 +263,22 @@ void wicat_state::machine_reset()
 	m_uart3->dcd_w(0);
 	m_uart4->dcd_w(0);
 	m_uart5->dcd_w(0);
+
+	// initialise im6402 (terminal board)
+	m_videouart->cls1_w(1);
+	m_videouart->cls2_w(1);
+	m_videouart->pi_w(1);
+	m_videouart->sbs_w(0);
+	m_videouart->crl_w(1);
+
 	m_video_timer_irq = false;
+	m_video_kb_irq = false;
 	m_video_timer->adjust(attotime::zero,0,attotime::from_hz(60));
 	m_kb_timer->adjust(attotime::zero,0,attotime::from_msec(50));
 	m_nmi_enable = 0;
 	m_crtc_irq = CLEAR_LINE;
+	for(int x=0;x<8;x++)
+		m_kb_keys[x] = 0;
 }
 
 void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -251,12 +293,11 @@ void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		poll_kb();
 		break;
 	case KB_SERIAL_TIMER:
-		m_videouart1->rx_w((m_kb_data >> (m_kb_bit)) & 0x01);
+		m_videouart->write_rx((m_kb_data >> (m_kb_bit)) & 0x01);
 		m_kb_bit++;
 		if(m_kb_bit > 10)
 		{
 			m_kb_serial_timer->reset();
-			m_videouart1->dsr_w(0);
 		}
 		break;
 	}
@@ -270,17 +311,19 @@ void wicat_state::poll_kb()
 	UINT32 data;
 	char kbtag[8];
 
-	for(line=0;line<2;line++)
+	for(line=0;line<4;line++)
 	{
 		sprintf(kbtag,"kb%i",line);
 		data = ioport(kbtag)->read();
 		for(x=0;x<32;x++)
 		{
-			if(data & (1<<x))
+			if((data & (1<<x)) && !(m_kb_keys[line] & (1<<x)))
 			{
 				send_key(val);
+				m_kb_keys[line] |= (1 << x);
 				return;
 			}
+			m_kb_keys[line] &= ~(1 << x);
 			val++;
 		}
 	}
@@ -290,7 +333,7 @@ void wicat_state::send_key(UINT8 val)
 {
 	// based on settings in the terminal NOVRAM, the keyboard is using 1200 baud, 7 bits, 2 stop bits
 	logerror("Sending key %i\n",val);
-	m_kb_data = 0x0003 | (val << 3);
+	m_kb_data = 0x0001 | (val << 2);
 	m_kb_bit = 0;
 	m_kb_serial_timer->adjust(attotime::zero,0,attotime::from_hz(1200));
 }
@@ -499,13 +542,23 @@ READ8_MEMBER(wicat_state::video_timer_r)
 			m_video_timer_irq = false;
 			m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
 		}
+		if(m_video_kb_irq)
+		{
+			ret |= 0x10;
+			m_video_kb_irq = false;
+			m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
+		}
 	}
+	if(offset == 0x02)
+		return m_videouart->read(space,0);
 	return ret;
 }
 
 WRITE8_MEMBER(wicat_state::video_timer_w)
 {
 	logerror("I/O port 0x%04x write %02x\n",offset,data);
+	if(offset == 0x02)
+		m_videouart->write(space,0,data);
 }
 
 READ8_MEMBER(wicat_state::video_ctrl_r)
@@ -541,6 +594,12 @@ WRITE_LINE_MEMBER(wicat_state::dma_nmi_cb)
 		if(m_nmi_enable != 0)
 			m_videocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	}
+}
+
+WRITE_LINE_MEMBER(wicat_state::kb_data_ready)
+{
+	m_video_kb_irq = state ? ASSERT_LINE : CLEAR_LINE;
+	m_videocpu->set_input_line(INPUT_LINE_IRQ0,m_video_kb_irq);
 }
 
 WRITE_LINE_MEMBER(wicat_state::crtc_cb)
@@ -701,9 +760,8 @@ struct im6402_interface wicat_video_uart_intf =
 {
 	0,  // RRC
 	0,  // TRC
-
 	DEVCB_NULL, //m_out_tro_cb;
-	DEVCB_NULL, //m_out_dr_cb;
+	DEVCB_DRIVER_LINE_MEMBER(wicat_state,kb_data_ready), //m_out_dr_cb;
 	DEVCB_NULL, //m_out_tbre_cb;
 	DEVCB_NULL, //m_out_tre_cb;
 };
