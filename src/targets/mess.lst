@@ -399,6 +399,9 @@
 @magnavox
 /mess/drivers/odyssey2
 
+@makerbot
+/mess/drivers/replicator
+
 @mattel
 /mess/drivers/aquarius
 /mess/drivers/juicebox

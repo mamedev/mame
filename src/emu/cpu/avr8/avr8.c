@@ -9,9 +9,25 @@
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-      Unimplemented opcodes: ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, EICALL, JMP, CALL
+      Unimplemented opcodes: SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, EICALL, JMP, CALL
 
     - Changelist -
+      29 Dec. 2013 [Felipe Sanches]
+      - Added crude boilerplate code for Timer/Counter #4
+
+      25 Dec. 2013 [Felipe Sanches]
+      - Updated AVR8_REGIDX_* enum based on ATMEGA640/1280/2560 datasheet
+
+      24 Dec. 2013 [Felipe Sanches]
+      - update data memory mapping so that all 0x200 register addresses are accessible
+
+      23 Dec. 2013 [Felipe Sanches]
+      - Added ELPM instructions
+      - Added fuse bits macros
+      - Added reset logic to decide initial program counter based on fuse bits configuration
+      - Added initial support for ATMEGA1280 and ATMEGA2560
+      - Use register names in the disassembly of IN and OUT instructions
+
       23 Dec. 2012 [Sandro Ronco]
       - Added CPSE, LD Z+, ST -Z/-Y/-X and ICALL opcodes
       - Fixed Z flag in CPC, SBC and SBCI opcodes
@@ -109,6 +125,26 @@ enum
 	WGM02_FAST_PWM_CMP
 };
 
+enum
+{
+	WGM4_NORMAL = 0,
+	WGM4_PWM_8_PC,
+	WGM4_PWM_9_PC,
+	WGM4_PWM_10_PC,
+	WGM4_CTC_OCR,
+	WGM4_FAST_PWM_8,
+	WGM4_FAST_PWM_9,
+	WGM4_FAST_PWM_10,
+	WGM4_PWM_PFC_ICR,
+	WGM4_PWM_PFC_OCR,
+	WGM4_PWM_PC_ICR,
+	WGM4_PWM_PC_OCR,
+	WGM4_CTC_ICR,
+	WGM4_RESERVED,
+	WGM4_FAST_PWM_ICR,
+	WGM4_FAST_PWM_OCR
+};
+
 static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 
 #define SREG_R(b) ((m_r[AVR8_REGIDX_SREG] & (1 << (b))) >> (b))
@@ -140,6 +176,8 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 #define SPREG           ((m_r[AVR8_REGIDX_SPH] << 8) | m_r[AVR8_REGIDX_SPL])
 
 // I/O Defines
+#define AVR8_OCR1CH             (m_r[AVR8_REGIDX_OCR1CH])
+#define AVR8_OCR1CL             (m_r[AVR8_REGIDX_OCR1CL])
 #define AVR8_OCR1BH             (m_r[AVR8_REGIDX_OCR1BH])
 #define AVR8_OCR1BL             (m_r[AVR8_REGIDX_OCR1BL])
 #define AVR8_OCR1AH             (m_r[AVR8_REGIDX_OCR1AH])
@@ -271,6 +309,51 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 #define AVR8_TIFR2_TOV2_SHIFT   0
 #define AVR8_TIFR2_MASK         (AVR8_TIFR2_TOV2_MASK | AVR8_TIFR2_OCF2B_MASK | AVR8_TIFR2_OCF2A_MASK)
 
+#define AVR8_TCCR4B                 (m_r[AVR8_REGIDX_TCCR4B])
+#define AVR8_TCCR4B_FOC4A_MASK      0x80
+#define AVR8_TCCR4B_FOC4A_SHIFT     7
+#define AVR8_TCCR4B_FOC4B_MASK      0x40
+#define AVR8_TCCR4B_FOC4B_SHIFT     6
+#define AVR8_TCCR4B_FOC4C_MASK      0x20
+#define AVR8_TCCR4B_FOC4C_SHIFT     5
+#define AVR8_TCCR4B_WGM4_32_MASK    0x18
+#define AVR8_TCCR4B_WGM4_32_SHIFT   3
+#define AVR8_TCCR4B_CS_MASK         0x07
+#define AVR8_TCCR4B_CS_SHIFT        0
+#define AVR8_TIMER4_CLOCK_SELECT    ((AVR8_TCCR4B & AVR8_TCCR4B_CS_MASK) >> AVR8_TCCR4B_CS_SHIFT)
+
+#define AVR8_TCCR4A                 (m_r[AVR8_REGIDX_TCCR4A])
+#define AVR8_TCCR4A_COM4A_MASK      0xc0
+#define AVR8_TCCR4A_COM4A_SHIFT     6
+#define AVR8_TCCR4A_COM4B_MASK      0x30
+#define AVR8_TCCR4A_COM4B_SHIFT     4
+#define AVR8_TCCR4A_WGM4_10_MASK    0x03
+#define AVR8_TCCR4A_WGM4_10_SHIFT   0
+#define AVR8_TCCR4A_COM4A           ((AVR8_TCCR4A & AVR8_TCCR4A_COM4A_MASK) >> AVR8_TCCR4A_COM4A_SHIFT)
+#define AVR8_TCCR4A_COM4B           ((AVR8_TCCR4A & AVR8_TCCR4A_COM4B_MASK) >> AVR8_TCCR4A_COM4B_SHIFT)
+#define AVR8_TCCR4A_WGM2_10         (AVR8_TCCR4A & AVR8_TCCR4A_WGM2_10_MASK)
+
+#define AVR8_WGM4_32 ((AVR8_TCCR4B & AVR8_TCCR4B_WGM4_32_MASK) >> AVR8_TCCR4B_WGM4_32_SHIFT)
+#define AVR8_WGM4_10 ((AVR8_TCCR4A & AVR8_TCCR4A_WGM4_10_MASK) >> AVR8_TCCR4A_WGM4_10_SHIFT)
+#define AVR8_WGM4 ((AVR8_WGM4_32 << 2) | AVR8_WGM4_10)
+
+#define AVR8_TIMSK4             (m_r[AVR8_REGIDX_TIMSK4])
+#define AVR8_TIMSK4_OCIE4B_MASK 0x04
+#define AVR8_TIMSK4_OCIE4A_MASK 0x02
+#define AVR8_TIMSK4_TOIE4_MASK  0x01
+#define AVR8_TIMSK4_OCIE4B      ((AVR8_TIMSK4 & AVR8_TIMSK4_OCIE4B_MASK) >> 2)
+#define AVR8_TIMSK4_OCIE4A      ((AVR8_TIMSK4 & AVR8_TIMSK4_OCIE4A_MASK) >> 1)
+#define AVR8_TIMSK4_TOIE4       (AVR8_TIMSK4 & AVR8_TIMSK4_TOIE4_MASK)
+
+#define AVR8_TIFR4              (m_r[AVR8_REGIDX_TIFR4])
+#define AVR8_TIFR4_OCF4B_MASK   0x04
+#define AVR8_TIFR4_OCF4B_SHIFT  2
+#define AVR8_TIFR4_OCF4A_MASK   0x02
+#define AVR8_TIFR4_OCF4A_SHIFT  1
+#define AVR8_TIFR4_TOV4_MASK    0x01
+#define AVR8_TIFR4_TOV4_SHIFT   0
+#define AVR8_TIFR4_MASK         (AVR8_TIFR4_TOV4_MASK | AVR8_TIFR4_OCF4B_MASK | AVR8_TIFR4_OCF4A_MASK)
+
 #define AVR8_OCR0A              m_r[AVR8_REGIDX_OCR0A]
 #define AVR8_OCR0B              m_r[AVR8_REGIDX_OCR0B]
 #define AVR8_TCNT0              m_r[AVR8_REGIDX_TCNT0]
@@ -278,6 +361,7 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 
 #define AVR8_OCR1A              ((AVR8_OCR1AH << 8) | AVR8_OCR1AL)
 #define AVR8_OCR1B              ((AVR8_OCR1BH << 8) | AVR8_OCR1BL)
+#define AVR8_OCR1C              ((AVR8_OCR1CH << 8) | AVR8_OCR1CL)
 #define AVR8_ICR1               ((AVR8_ICR1H  << 8) | AVR8_ICR1L)
 #define AVR8_TCNT1              ((AVR8_TCNT1H << 8) | AVR8_TCNT1L)
 #define AVR8_WGM1               (((AVR8_TCCR1B & 0x18) >> 1) | (AVR8_TCCR1A & 0x03))
@@ -287,6 +371,21 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 #define AVR8_OCR2B              m_r[AVR8_REGIDX_OCR2B]
 #define AVR8_TCNT2              m_r[AVR8_REGIDX_TCNT2]
 #define AVR8_WGM2               (((AVR8_TCCR2B & 0x08) >> 1) | (AVR8_TCCR2A & 0x03))
+
+#define AVR8_TCNT3L             m_r[AVR8_REGIDX_TCNT3L]
+#define AVR8_TCNT3H             m_r[AVR8_REGIDX_TCNT3H]
+
+#define AVR8_ICR4               ((AVR8_ICR4H  << 8) | AVR8_ICR4L)
+#define AVR8_ICR4H              (m_r[AVR8_REGIDX_ICR4H])
+#define AVR8_ICR4L              (m_r[AVR8_REGIDX_ICR4L])
+#define AVR8_OCR4AH              m_r[AVR8_REGIDX_OCR4AH]
+#define AVR8_OCR4AL              m_r[AVR8_REGIDX_OCR4AL]
+#define AVR8_OCR4A              ((AVR8_OCR4AH << 8) | AVR8_OCR4AL)
+#define AVR8_OCR4B              m_r[AVR8_REGIDX_OCR4B]
+#define AVR8_TCNT4              m_r[AVR8_REGIDX_TCNT4]
+
+#define AVR8_TCNT4L             m_r[AVR8_REGIDX_TCNT4L]
+#define AVR8_TCNT4H             m_r[AVR8_REGIDX_TCNT4H]
 
 #define AVR8_GTCCR_PSRASY_MASK  0x02
 #define AVR8_GTCCR_PSRASY_SHIFT 1
@@ -313,13 +412,27 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 
 const device_type ATMEGA88 = &device_creator<atmega88_device>;
 const device_type ATMEGA644 = &device_creator<atmega644_device>;
+const device_type ATMEGA1280 = &device_creator<atmega1280_device>;
+const device_type ATMEGA2560 = &device_creator<atmega2560_device>;
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
 //**************************************************************************
 
-static ADDRESS_MAP_START( avr8_internal_map, AS_DATA, 8, avr8_device )
+static ADDRESS_MAP_START( atmega88_internal_map, AS_DATA, 8, atmega88_device )
 	AM_RANGE(0x0000, 0x00ff) AM_READWRITE( regs_r, regs_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( atmega644_internal_map, AS_DATA, 8, atmega644_device )
+	AM_RANGE(0x0000, 0x00ff) AM_READWRITE( regs_r, regs_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( atmega1280_internal_map, AS_DATA, 8, atmega1280_device )
+	AM_RANGE(0x0000, 0x01ff) AM_READWRITE( regs_r, regs_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( atmega2560_internal_map, AS_DATA, 8, atmega2560_device )
+	AM_RANGE(0x0000, 0x01ff) AM_READWRITE( regs_r, regs_w )
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -327,7 +440,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: avr8_device(mconfig, "ATMEGA88", tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(avr8_internal_map), "atmega88", __FILE__)
+	: avr8_device(mconfig, "ATMEGA88", tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(atmega88_internal_map), CPU_TYPE_ATMEGA88, "atmega88", __FILE__)
 {
 }
 
@@ -336,7 +449,25 @@ atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: avr8_device(mconfig, "ATMEGA644", tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(avr8_internal_map), "atmega644", __FILE__)
+	: avr8_device(mconfig, "ATMEGA644", tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(atmega644_internal_map), CPU_TYPE_ATMEGA644, "atmega644", __FILE__)
+{
+}
+
+//-------------------------------------------------
+//  atmega1280_device - constructor
+//-------------------------------------------------
+
+atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: avr8_device(mconfig, "ATMEGA1280", tag, owner, clock, ATMEGA1280, 0x1ffff, ADDRESS_MAP_NAME(atmega1280_internal_map), CPU_TYPE_ATMEGA1280, "atmega1280", __FILE__)
+{
+}
+
+//-------------------------------------------------
+//  atmega2560_device - constructor
+//-------------------------------------------------
+
+atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: avr8_device(mconfig, "ATMEGA2560", tag, owner, clock, ATMEGA2560, 0x3ffff, ADDRESS_MAP_NAME(atmega2560_internal_map), CPU_TYPE_ATMEGA2560, "atmega2560", __FILE__)
 {
 }
 
@@ -344,14 +475,19 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //  avr8_device - constructor
 //-------------------------------------------------
 
-avr8_device::avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, const char *shortname, const char *source)
+avr8_device::avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 addr_mask, address_map_constructor internal_map, UINT8 cpu_type, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+		m_shifted_pc(0),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 22),
 		m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
-		m_io_config("io", ENDIANNESS_LITTLE, 8, 2),
+		m_io_config("io", ENDIANNESS_LITTLE, 8, 4),
 		m_eeprom(NULL),
+    m_cpu_type(cpu_type),
+    m_lfuses(0x62),
+    m_hfuses(0x99),
+    m_efuses(0xFF),
+    m_lock_bits(0xFF),
 		m_pc(0),
-		m_shifted_pc(0),
 		m_timer0_top(0),
 		m_timer0_increment(1),
 		m_timer0_prescale(0),
@@ -364,6 +500,10 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *name, const 
 		m_timer2_increment(1),
 		m_timer2_prescale(0),
 		m_timer2_prescale_count(0),
+		m_timer4_top(0),
+		m_timer4_increment(1),
+		m_timer4_prescale(0),
+		m_timer4_prescale_count(0),
 		m_spi_active(false),
 		m_spi_prescale(0),
 		m_spi_prescale_count(0),
@@ -387,6 +527,41 @@ void avr8_device::static_set_config(device_t &device, const avr8_config &config)
 	static_cast<avr8_config &>(avr8) = config;
 }
 
+//-------------------------------------------------
+//  static_set_low_fuses
+//-------------------------------------------------
+
+void avr8_device::set_low_fuses(const UINT8 byte)
+{
+  m_lfuses = byte;
+}
+
+//-------------------------------------------------
+//  static_set_high_fuses
+//-------------------------------------------------
+
+void avr8_device::set_high_fuses(const UINT8 byte)
+{
+  m_hfuses = byte;
+}
+
+//-------------------------------------------------
+//  static_set_extended_fuses
+//-------------------------------------------------
+
+void avr8_device::set_extended_fuses(const UINT8 byte)
+{
+  m_efuses = byte;
+}
+
+//-------------------------------------------------
+//  static_set_lock_bits
+//-------------------------------------------------
+
+void avr8_device::set_lock_bits(const UINT8 byte)
+{
+  m_lock_bits = byte;
+}
 
 //-------------------------------------------------
 //  unimplemented_opcode - bail on unspuported
@@ -395,7 +570,8 @@ void avr8_device::static_set_config(device_t &device, const avr8_config &config)
 
 void avr8_device::unimplemented_opcode(UINT32 op)
 {
-	fatalerror("AVR8: unknown opcode (%08x) at %08x\n", op, m_pc);
+//  debugger_break(machine());
+	fatalerror("AVR8: unknown opcode (%08x) at %08x\n", op, m_shifted_pc);
 }
 
 
@@ -443,7 +619,9 @@ void avr8_device::device_start()
 	state_add(STATE_GENPC,     "GENPC",     m_shifted_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_r[AVR8_REGIDX_SREG]).callimport().callexport().formatstr("%8s").noshow();
 	state_add(AVR8_SREG,       "STATUS",    m_r[AVR8_REGIDX_SREG]).mask(0xff);
-	state_add(AVR8_PC,         "PC",        m_shifted_pc).mask(0xffff);
+	state_add(AVR8_PC,         "PC",        m_shifted_pc).mask(m_addr_mask);
+	state_add(AVR8_SPH,        "SPH",       m_r[AVR8_REGIDX_SPH]).mask(0xff);
+	state_add(AVR8_SPL,        "SPL",       m_r[AVR8_REGIDX_SPL]).mask(0xff);
 	state_add(AVR8_R0,         "R0",        m_r[ 0]).mask(0xff);
 	state_add(AVR8_R1,         "R1",        m_r[ 1]).mask(0xff);
 	state_add(AVR8_R2,         "R2",        m_r[ 2]).mask(0xff);
@@ -492,6 +670,10 @@ void avr8_device::device_start()
 	save_item(NAME(m_timer2_increment));
 	save_item(NAME(m_timer2_prescale));
 	save_item(NAME(m_timer2_prescale_count));
+	save_item(NAME(m_timer4_top));
+	save_item(NAME(m_timer4_increment));
+	save_item(NAME(m_timer4_prescale));
+	save_item(NAME(m_timer4_prescale_count));
 	save_item(NAME(m_addr_mask));
 	save_item(NAME(m_interrupt_pending));
 	save_item(NAME(m_icount));
@@ -509,10 +691,31 @@ void avr8_device::device_start()
 
 void avr8_device::device_reset()
 {
+  logerror("AVR low fuse bits: 0x%02X\n", m_lfuses);
+  logerror("AVR high fuse bits: 0x%02X\n", m_hfuses);
+  logerror("AVR extended fuse bits: 0x%02X\n", m_efuses);
+  logerror("AVR lock bits: 0x%02X\n", m_lock_bits);
+
+  switch ((m_hfuses & (BOOTSZ1|BOOTSZ0)) >> 1){
+    case 0: m_boot_size = 4096; break;
+    case 1: m_boot_size = 2048; break;
+    case 2: m_boot_size = 1024; break;
+    case 3: m_boot_size = 512; break;
+    default: break;
+  }
+
+  if (m_hfuses & BOOTRST){
+    m_shifted_pc = 0x0000;
+    logerror("Booting AVR core from address 0x0000\n");
+  } else {
+    m_shifted_pc = (m_addr_mask + 1) - 2*m_boot_size;
+    logerror("AVR Boot loader section size: %d words\n", m_boot_size);
+  }
+
 	m_r[AVR8_REGIDX_SPL] = 0;
 	m_r[AVR8_REGIDX_SPH] = 0;
 
-	for (int i = 0; i < 256; i++)
+	for (int i = 0; i < 0x200; i++)
 	{
 		m_r[i] = 0;
 	}
@@ -536,16 +739,29 @@ void avr8_device::device_reset()
 	m_timer2_prescale = 0;
 	m_timer2_prescale_count = 0;
 
+	m_timer4_top = 0;
+	m_timer4_increment = 1;
+	m_timer4_prescale = 0;
+	m_timer4_prescale_count = 0;
+
 	AVR8_TIMSK1 = 0;
 	AVR8_OCR1AH = 0;
 	AVR8_OCR1AL = 0;
 	AVR8_OCR1BH = 0;
 	AVR8_OCR1BL = 0;
+	AVR8_OCR1CH = 0;
+	AVR8_OCR1CL = 0;
 	AVR8_ICR1H = 0;
 	AVR8_ICR1L = 0;
 	AVR8_TCNT1H = 0;
 	AVR8_TCNT1L = 0;
 	AVR8_TCNT2 = 0;
+
+	AVR8_TIMSK4 = 0;
+	AVR8_TCNT4H = 0;
+	AVR8_ICR4H = 0;
+	AVR8_ICR4L = 0;
+	AVR8_TCNT4L = 0;
 
 	m_interrupt_pending = false;
 
@@ -751,6 +967,38 @@ void atmega644_device::update_interrupt(int source)
 	}
 }
 
+//TODO: review this!
+void atmega1280_device::update_interrupt(int source)
+{
+	CInterruptCondition condition = s_mega644_int_conditions[source];
+
+	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
+	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
+
+	set_irq_line(condition.m_intindex << 1, intstate);
+
+	if (intstate)
+	{
+		m_r[condition.m_regindex] &= ~condition.m_regmask;
+	}
+}
+
+//TODO: review this!
+void atmega2560_device::update_interrupt(int source)
+{
+	CInterruptCondition condition = s_mega644_int_conditions[source];
+
+	int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
+	intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
+
+	set_irq_line(condition.m_intindex << 1, intstate);
+
+	if (intstate)
+	{
+		m_r[condition.m_regindex] &= ~condition.m_regmask;
+	}
+}
+
 
 //**************************************************************************
 //  REGISTER HANDLING
@@ -768,7 +1016,7 @@ void avr8_device::timer_tick(int cycles)
 			{
 				UINT8 out_bit = (m_r[AVR8_REGIDX_SPDR] & (1 << m_spi_prescale_countdown)) >> m_spi_prescale_countdown;
 				m_spi_prescale_countdown--;
-				m_io->write_byte(0x01, (m_r[AVR8_REGIDX_PORTB] &~ AVR8_PORTB_MOSI) | (out_bit ? AVR8_PORTB_MOSI : 0));
+				m_io->write_byte(AVR8_IO_PORTB, (m_r[AVR8_REGIDX_PORTB] &~ AVR8_PORTB_MOSI) | (out_bit ? AVR8_PORTB_MOSI : 0));
 				m_r[AVR8_REGIDX_PORTB] = (m_r[AVR8_REGIDX_PORTB] &~ AVR8_PORTB_MOSI) | (out_bit ? AVR8_PORTB_MOSI : 0);
 				m_spi_prescale_count -= m_spi_prescale;
 			}
@@ -803,6 +1051,17 @@ void avr8_device::timer_tick(int cycles)
 				m_timer2_prescale_count -= m_timer2_prescale;
 			}
 		}
+
+		if (m_timer4_prescale != 0)
+		{
+			m_timer4_prescale_count++;
+			if (m_timer4_prescale_count == m_timer4_prescale)
+			{
+				timer4_tick();
+				m_timer4_prescale_count -= m_timer4_prescale;
+			}
+		}
+
 	}
 }
 
@@ -1476,6 +1735,264 @@ void avr8_device::update_ocr2(UINT8 newval, UINT8 reg)
 	// Nothing needs to be done? All handled in timer callback
 }
 
+/************************************************************************************************/
+
+void avr8_device::timer4_tick()
+{
+	/* TODO: Handle comparison, setting OC1x pins, detection of BOTTOM and TOP */
+
+	UINT16 count = (m_r[AVR8_REGIDX_TCNT4H] << 8) | m_r[AVR8_REGIDX_TCNT4L];
+
+	// Cache things in array form to avoid a compare+branch inside a potentially high-frequency timer
+	//UINT8 compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1A_MASK) >> AVR8_TCCR1A_COM1A_SHIFT,
+								//(m_r[AVR8_REGIDX_TCCR1A] & AVR8_TCCR1A_COM1B_MASK) >> AVR8_TCCR1A_COM1B_SHIFT };
+	UINT16 ocr4[2] = { (m_r[AVR8_REGIDX_OCR4AH] << 8) | m_r[AVR8_REGIDX_OCR4AL],
+						(m_r[AVR8_REGIDX_OCR4BH] << 8) | m_r[AVR8_REGIDX_OCR4BL] };
+//TODO	UINT8 ocf4[2] = { (1 << AVR8_TIFR4_OCF4A_SHIFT), (1 << AVR8_TIFR4_OCF4B_SHIFT) };
+//TODO	UINT8 int4[2] = { AVR8_INTIDX_OCF4A, AVR8_INTIDX_OCF4B };
+	INT32 increment = m_timer4_increment;
+
+	for(INT32 reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
+	{
+		switch(AVR8_WGM4)
+		{
+			case WGM4_FAST_PWM_8:
+			case WGM4_FAST_PWM_9:
+			case WGM4_FAST_PWM_10:
+        if (count == m_timer4_top){
+          //printf("[T4] tick WGM4_FAST_PWM_8: %d\n", count);
+          count=0;
+        }
+        break;
+
+			case WGM4_CTC_OCR:
+        //printf("[T4] tick WGM4_CTC_OCR: %d\n", count);
+				if (count == 0xffff)
+				{
+					m_r[AVR8_REGIDX_TIFR4] |= AVR8_TIFR4_TOV4_MASK;
+					update_interrupt(AVR8_INTIDX_TOV4);
+					count = 0;
+					increment = 0;
+				}
+
+				if (count == ocr4[reg])
+				{
+					if (reg == 0)
+					{
+						count = 0;
+						increment = 0;
+					}
+//TODO					m_r[AVR8_REGIDX_TIFR4] |= ocf4[reg];
+//TODO					update_interrupt(int4[reg]);
+				}
+				else if (count == 0)
+				{
+					if (reg == 0)
+					{
+//TODO						m_r[AVR8_REGIDX_TIFR4] &= ~AVR8_TIFR4_TOV4_MASK;
+//TODO						update_interrupt(AVR8_INTIDX_TOV4);
+					}
+
+//TODO					m_r[AVR8_REGIDX_TIFR4] &= ~ocf4[reg];
+//TODO					update_interrupt(int4[reg]);
+				}
+				break;
+
+			case WGM1_FAST_PWM_OCR:
+				if(count == ocr4[reg])
+				{
+					if (reg == 0)
+					{
+//TODO						m_r[AVR8_REGIDX_TIFR4] |= AVR8_TIFR4_TOV4_MASK;
+//TODO						update_interrupt(AVR8_INTIDX_TOV4);
+						count = 0;
+						increment = 0;
+					}
+
+//TODO					m_r[AVR8_REGIDX_TIFR4] |= ocf4[reg];
+//TODO					update_interrupt(int4[reg]);
+				}
+				else if(count == 0)
+				{
+					if (reg == 0)
+					{
+//TODO						m_r[AVR8_REGIDX_TIFR4] &= ~AVR8_TIFR4_TOV4_MASK;
+//TODO						update_interrupt(AVR8_INTIDX_TOV4);
+					}
+
+//TODO					m_r[AVR8_REGIDX_TIFR4] &= ~ocf4[reg];
+//TODO					update_interrupt(int4[reg]);
+				}
+				break;
+
+			default:
+//        printf("[T4] tick Unknown waveform generation mode: %d\n", count);
+
+				verboselog(m_pc, 0, "update_timer4_compare_mode: Unknown waveform generation mode: %02x\n", wgm4);
+				break;
+		}
+		/*
+		switch(compare_mode[reg])
+		{
+		    case 0:
+		        //verboselog(m_pc, 0, "update_timer4_compare_mode: Normal port operation (OC1 disconnected)\n");
+		        break;
+
+		    case 1:
+		    case 2:
+		        // TODO
+		        break;
+
+		    case 3:
+		        break;
+		}
+		*/
+	}
+
+	count += increment;
+	m_r[AVR8_REGIDX_TCNT4H] = (count >> 8) & 0xff;
+	m_r[AVR8_REGIDX_TCNT4L] = count & 0xff;
+}
+
+void avr8_device::update_timer4_clock_source()
+{
+  debugger_break(machine());
+	switch(AVR8_TIMER4_CLOCK_SELECT)
+	{
+		case 0: // Counter stopped
+			m_timer4_prescale = 0;
+      //printf("[T4]: Counter stopped\n");
+			break;
+		case 1: // Clk/1; no prescaling
+			m_timer4_prescale = 1;
+      //printf("[T4]: prescale = 1\n");
+			break;
+		case 2: // Clk/8
+			m_timer4_prescale = 8;
+      //printf("[T4]: prescale = 8\n");
+			break;
+		case 3: // Clk/64
+			m_timer4_prescale = 64;
+      //printf("[T4]: prescale = 64\n");
+			break;
+		case 4: // Clk/256
+			m_timer4_prescale = 256;
+      //printf("[T4]: prescale = 256\n");
+			break;
+		case 5: // Clk/1024
+			m_timer4_prescale = 1024;
+      //printf("[T4]: prescale = 1024\n");
+			break;
+		case 6: // T0 trigger, falling edge
+		case 7: // T0 trigger, rising edge
+      //printf("[T4]: update_timer4_clock_source: T0 Trigger mode not implemented yet\n");
+			m_timer4_prescale = 0;
+			verboselog(m_pc, 0, "update_timer4_clock_source: T0 Trigger mode not implemented yet\n");
+			break;
+	}
+
+	if (m_timer4_prescale_count > m_timer4_prescale)
+	{
+		m_timer4_prescale_count = m_timer4_prescale - 1;
+	}
+}
+
+void avr8_device::update_timer4_waveform_gen_mode()
+{
+  //printf("[T4] AVR8_WGM4 = %d\n", AVR8_WGM4);
+
+	switch(AVR8_WGM4)
+	{
+		case WGM4_NORMAL:
+			m_timer4_top = 0xffff;
+			break;
+
+		case WGM4_PWM_8_PC:
+		case WGM4_FAST_PWM_8:
+			m_timer4_top = 0x00ff;
+			break;
+
+		case WGM4_PWM_9_PC:
+		case WGM4_FAST_PWM_9:
+			m_timer4_top = 0x01ff;
+			break;
+
+		case WGM4_PWM_10_PC:
+		case WGM4_FAST_PWM_10:
+			m_timer4_top = 0x03ff;
+			break;
+
+		case WGM4_PWM_PFC_ICR:
+		case WGM4_PWM_PC_ICR:
+		case WGM4_CTC_ICR:
+		case WGM4_FAST_PWM_ICR:
+			m_timer4_top = AVR8_ICR4;
+			break;
+
+		case WGM4_PWM_PFC_OCR:
+		case WGM4_PWM_PC_OCR:
+		case WGM4_CTC_OCR:
+		case WGM4_FAST_PWM_OCR:
+			m_timer4_top = AVR8_OCR4A;
+			break;
+
+		default:
+    	m_timer4_top = 0;
+			verboselog(m_pc, 0, "update_timer4_waveform_gen_mode: Unsupported waveform generation type: %d\n", AVR8_WGM4);
+			break;
+	}
+}
+
+
+void avr8_device::changed_tccr4a(UINT8 data)
+{
+	UINT8 oldtccr = AVR8_TCCR4A;
+	UINT8 newtccr = data;
+	UINT8 changed = newtccr ^ oldtccr;
+
+	AVR8_TCCR4A = data;
+
+	if(changed & AVR8_TCCR4A_WGM4_10_MASK)
+	{
+		// TODO
+		update_timer4_waveform_gen_mode();
+	}
+}
+
+void avr8_device::changed_tccr4b(UINT8 data)
+{
+	UINT8 oldtccr = AVR8_TCCR4B;
+	UINT8 newtccr = data;
+	UINT8 changed = newtccr ^ oldtccr;
+
+	AVR8_TCCR4B = data;
+
+	if(changed & AVR8_TCCR4B_FOC4A_MASK)
+	{
+		// TODO
+//		timer4_force_output_compare(AVR8_REG_A);
+	}
+
+	if(changed & AVR8_TCCR4B_FOC4B_MASK)
+	{
+		// TODO
+//		timer4_force_output_compare(AVR8_REG_B);
+	}
+
+	if(changed & AVR8_TCCR4B_WGM4_32_MASK)
+	{
+		update_timer4_waveform_gen_mode();
+	}
+
+	if(changed & AVR8_TCCR4B_CS_MASK)
+	{
+		update_timer4_clock_source();
+	}
+}
+
+/************************************************************************************************/
+
+
 /****************/
 /* SPI Handling */
 /****************/
@@ -1578,6 +2095,8 @@ void avr8_device::change_spsr(UINT8 data)
 
 WRITE8_MEMBER( avr8_device::regs_w )
 {
+	//printf("<<< WRITE offset [%04x]=%02x >>>\n", offset, data);
+
 	switch( offset )
 	{
 		case AVR8_REGIDX_R0:
@@ -1612,6 +2131,74 @@ WRITE8_MEMBER( avr8_device::regs_w )
 		case AVR8_REGIDX_R29:
 		case AVR8_REGIDX_R30:
 		case AVR8_REGIDX_R31:
+			m_r[offset] = data;
+			break;
+
+		case AVR8_REGIDX_PORTA:
+      m_io->write_byte(AVR8_IO_PORTA, data);
+      m_r[AVR8_REGIDX_PORTA] = data;
+      break;
+
+		case AVR8_REGIDX_PORTB:
+      m_io->write_byte(AVR8_IO_PORTB, data);
+      m_r[AVR8_REGIDX_PORTB] = data;
+      break;
+
+		case AVR8_REGIDX_PORTC:
+      m_io->write_byte(AVR8_IO_PORTC, data);
+      m_r[AVR8_REGIDX_PORTC] = data;
+      break;
+
+		case AVR8_REGIDX_PORTD:
+      m_io->write_byte(AVR8_IO_PORTD, data);
+      m_r[AVR8_REGIDX_PORTD] = data;
+      break;
+
+		case AVR8_REGIDX_PORTE:
+      m_io->write_byte(AVR8_IO_PORTE, data);
+      m_r[AVR8_REGIDX_PORTE] = data;
+      break;
+
+		case AVR8_REGIDX_PORTF:
+      m_io->write_byte(AVR8_IO_PORTF, data);
+      m_r[AVR8_REGIDX_PORTF] = data;
+      break;
+
+		case AVR8_REGIDX_PORTG:
+      m_io->write_byte(AVR8_IO_PORTG, data);
+      m_r[AVR8_REGIDX_PORTG] = data;
+      break;
+
+		case AVR8_REGIDX_PORTH:
+      m_io->write_byte(AVR8_IO_PORTH, data);
+      m_r[AVR8_REGIDX_PORTH] = data;
+      break;
+
+		case AVR8_REGIDX_PORTJ:
+      m_io->write_byte(AVR8_IO_PORTJ, data);
+      m_r[AVR8_REGIDX_PORTJ] = data;
+      break;
+
+		case AVR8_REGIDX_PORTK:
+      m_io->write_byte(AVR8_IO_PORTK, data);
+      m_r[AVR8_REGIDX_PORTK] = data;
+      break;
+
+		case AVR8_REGIDX_PORTL:
+      m_io->write_byte(AVR8_IO_PORTL, data);
+      m_r[AVR8_REGIDX_PORTL] = data;
+      break;
+
+		case AVR8_REGIDX_DDRA:
+		case AVR8_REGIDX_DDRB:
+		case AVR8_REGIDX_DDRC:
+		case AVR8_REGIDX_DDRD:
+		case AVR8_REGIDX_EEARL:
+		case AVR8_REGIDX_EEARH:
+		case AVR8_REGIDX_SREG:
+    case AVR8_REGIDX_RAMPZ:
+		case AVR8_REGIDX_SPH:
+		case AVR8_REGIDX_SPL:
 			m_r[offset] = data;
 			break;
 
@@ -1635,14 +2222,6 @@ WRITE8_MEMBER( avr8_device::regs_w )
 			update_ocr0(AVR8_OCR0B, AVR8_REG_B);
 			break;
 
-		case AVR8_REGIDX_TIMSK0:
-			verboselog(m_pc, 0, "AVR8: TIMSK0 = %02x\n", data );
-			m_r[AVR8_REGIDX_TIMSK0] = data;
-			update_interrupt(AVR8_INTIDX_OCF0A);
-			update_interrupt(AVR8_INTIDX_OCF0B);
-			update_interrupt(AVR8_INTIDX_TOV0);
-			break;
-
 		case AVR8_REGIDX_TIFR0:
 			verboselog(m_pc, 0, "AVR8: TIFR0 = %02x\n", data );
 			m_r[AVR8_REGIDX_TIFR0] &= ~(data & AVR8_TIFR0_MASK);
@@ -1655,45 +2234,6 @@ WRITE8_MEMBER( avr8_device::regs_w )
 			AVR8_TCNT0 = data;
 			break;
 
-		case AVR8_REGIDX_TCCR1B:
-			verboselog(m_pc, 0, "AVR8: TCCR1B = %02x\n", data );
-			changed_tccr1b(data);
-			break;
-
-		case AVR8_REGIDX_TCCR1A:
-			verboselog(m_pc, 0, "AVR8: TCCR1A = %02x\n", data );
-			changed_tccr1a(data);
-			break;
-
-		case AVR8_REGIDX_OCR1BH:
-			verboselog(m_pc, 0, "AVR8: OCR1BH = %02x\n", data );
-			update_ocr1((AVR8_OCR1B & 0x00ff) | (data << 8), AVR8_REG_B);
-			break;
-
-		case AVR8_REGIDX_OCR1BL:
-			verboselog(m_pc, 0, "AVR8: OCR1BL = %02x\n", data );
-			update_ocr1((AVR8_OCR1B & 0xff00) | data, AVR8_REG_B);
-			break;
-
-		case AVR8_REGIDX_OCR1AH:
-			verboselog(m_pc, 0, "AVR8: OCR1AH = %02x\n", data );
-			update_ocr1((AVR8_OCR1A & 0x00ff) | (data << 8), AVR8_REG_A);
-			break;
-
-		case AVR8_REGIDX_OCR1AL:
-			verboselog(m_pc, 0, "AVR8: OCR1AL = %02x\n", data );
-			update_ocr1((AVR8_OCR1A & 0xff00) | data, AVR8_REG_A);
-			break;
-
-		case AVR8_REGIDX_TIMSK1:
-			verboselog(m_pc, 0, "AVR8: TIMSK1 = %02x\n", data );
-			m_r[AVR8_REGIDX_TIMSK1] = data;
-			update_interrupt(AVR8_INTIDX_ICF1);
-			update_interrupt(AVR8_INTIDX_OCF1A);
-			update_interrupt(AVR8_INTIDX_OCF1B);
-			update_interrupt(AVR8_INTIDX_TOV1);
-			break;
-
 		case AVR8_REGIDX_TIFR1:
 			verboselog(m_pc, 0, "AVR8: TIFR1 = %02x\n", data );
 			m_r[AVR8_REGIDX_TIFR1] &= ~(data & AVR8_TIFR1_MASK);
@@ -1701,39 +2241,6 @@ WRITE8_MEMBER( avr8_device::regs_w )
 			update_interrupt(AVR8_INTIDX_OCF1A);
 			update_interrupt(AVR8_INTIDX_OCF1B);
 			update_interrupt(AVR8_INTIDX_TOV1);
-			break;
-
-		case AVR8_REGIDX_TCNT1H:
-			AVR8_TCNT1H = data;
-			break;
-
-		case AVR8_REGIDX_TCNT1L:
-			AVR8_TCNT1L = data;
-			break;
-
-		case AVR8_REGIDX_TCCR2B:
-			verboselog(m_pc, 0, "AVR8: TCCR2B = %02x\n", data );
-			break;
-
-		case AVR8_REGIDX_TCCR2A:
-			verboselog(m_pc, 0, "AVR8: TCCR2A = %02x\n", data );
-			changed_tccr2a(data);
-			break;
-
-		case AVR8_REGIDX_OCR2A:
-			update_ocr2(data, AVR8_REG_A);
-			break;
-
-		case AVR8_REGIDX_OCR2B:
-			update_ocr2(data, AVR8_REG_B);
-			break;
-
-		case AVR8_REGIDX_TIMSK2:
-			verboselog(m_pc, 0, "AVR8: TIMSK2 = %02x\n", data );
-			m_r[AVR8_REGIDX_TIMSK2] = data;
-			update_interrupt(AVR8_INTIDX_OCF2A);
-			update_interrupt(AVR8_INTIDX_OCF2B);
-			update_interrupt(AVR8_INTIDX_TOV2);
 			break;
 
 		case AVR8_REGIDX_TIFR2:
@@ -1744,28 +2251,12 @@ WRITE8_MEMBER( avr8_device::regs_w )
 			update_interrupt(AVR8_INTIDX_TOV2);
 			break;
 
-		case AVR8_REGIDX_TCNT2:
-			AVR8_TCNT2 = data;
-			break;
-
 		case AVR8_REGIDX_GTCCR:
 			if (data & AVR8_GTCCR_PSRASY_MASK)
 			{
 				data &= ~AVR8_GTCCR_PSRASY_MASK;
 				m_timer2_prescale_count = 0;
 			}
-			break;
-
-		case AVR8_REGIDX_SPL:
-		case AVR8_REGIDX_SPH:
-		case AVR8_REGIDX_DDRA:
-		case AVR8_REGIDX_DDRB:
-		case AVR8_REGIDX_DDRC:
-		case AVR8_REGIDX_DDRD:
-		case AVR8_REGIDX_EEARL:
-		case AVR8_REGIDX_EEARH:
-		case AVR8_REGIDX_SREG:
-			m_r[offset] = data;
 			break;
 
 		case AVR8_REGIDX_EECR:
@@ -1779,32 +2270,12 @@ WRITE8_MEMBER( avr8_device::regs_w )
 
 		case AVR8_REGIDX_GPIOR0:
 			verboselog(m_pc, 1, "AVR8: GPIOR0 Write: %02x\n", data);
-			m_r[offset] = data;
+			m_r[AVR8_REGIDX_GPIOR0] = data;
 			break;
 
 		case AVR8_REGIDX_GPIOR1:
 		case AVR8_REGIDX_GPIOR2:
 			m_r[offset] = data;
-			break;
-
-		case AVR8_REGIDX_PORTA:
-			m_io->write_byte(0x00, data);
-			m_r[AVR8_REGIDX_PORTA] = data;
-			break;
-
-		case AVR8_REGIDX_PORTB:
-			m_io->write_byte(0x01, data);
-			m_r[AVR8_REGIDX_PORTB] = data;
-			break;
-
-		case AVR8_REGIDX_PORTC:
-			m_io->write_byte(0x02, data);
-			m_r[AVR8_REGIDX_PORTC] = data;
-			break;
-
-		case AVR8_REGIDX_PORTD:
-			m_io->write_byte(0x03, data);
-			m_r[AVR8_REGIDX_PORTD] = data;
 			break;
 
 		case AVR8_REGIDX_SPSR:
@@ -1824,15 +2295,431 @@ WRITE8_MEMBER( avr8_device::regs_w )
 			break;
 		}
 
+    case AVR8_REGIDX_WDTCSR:
+			verboselog(m_pc, 0, "AVR8: WDTCSR = %02x\n", data );
+      //TODO: changed_wdtcsr(data);
+      break;
+
+    case AVR8_REGIDX_CLKPR:
+			verboselog(m_pc, 0, "AVR8: CLKPR = %02x\n", data );
+      //TODO: changed_clkpr(data);
+      break;
+
+    case AVR8_REGIDX_PRR0:
+			verboselog(m_pc, 0, "AVR8: PRR0 = %02x\n", data );
+      //TODO: changed_prr0(data);
+      break;
+
+    case AVR8_REGIDX_PRR1:
+			verboselog(m_pc, 0, "AVR8: PRR1 = %02x\n", data );
+      //TODO: changed_prr1(data);
+      break;
+
+    case AVR8_REGIDX_OSCCAL:
+			verboselog(m_pc, 0, "AVR8: OSCCAL = %02x\n", data );
+      //TODO: changed_osccal(data);
+      break;
+
+    case AVR8_REGIDX_PCICR:
+			verboselog(m_pc, 0, "AVR8: PCICR = %02x\n", data );
+      //TODO: changed_pcicr(data);
+      break;
+
+    case AVR8_REGIDX_EICRA:
+			verboselog(m_pc, 0, "AVR8: EICRA = %02x\n", data );
+      //TODO: changed_eicra(data);
+      break;
+
+    case AVR8_REGIDX_EICRB:
+			verboselog(m_pc, 0, "AVR8: EICRB = %02x\n", data );
+      //TODO: changed_eicrb(data);
+      break;
+
+    case AVR8_REGIDX_PCMSK0:
+			verboselog(m_pc, 0, "AVR8: PCMSK0 = %02x\n", data );
+      //TODO: changed_pcmsk0(data);
+      break;
+
+    case AVR8_REGIDX_PCMSK1:
+			verboselog(m_pc, 0, "AVR8: PCMSK1 = %02x\n", data );
+      //TODO: changed_pcmsk1(data);
+      break;
+
+    case AVR8_REGIDX_PCMSK2:
+			verboselog(m_pc, 0, "AVR8: PCMSK2 = %02x\n", data );
+      //TODO: changed_pcmsk2(data);
+      break;
+
+		case AVR8_REGIDX_TIMSK0:
+			verboselog(m_pc, 0, "AVR8: TIMSK0 = %02x\n", data );
+			m_r[AVR8_REGIDX_TIMSK0] = data;
+			update_interrupt(AVR8_INTIDX_OCF0A);
+			update_interrupt(AVR8_INTIDX_OCF0B);
+			update_interrupt(AVR8_INTIDX_TOV0);
+			break;
+
+		case AVR8_REGIDX_TIMSK1:
+			verboselog(m_pc, 0, "AVR8: TIMSK1 = %02x\n", data );
+			m_r[AVR8_REGIDX_TIMSK1] = data;
+			update_interrupt(AVR8_INTIDX_ICF1);
+			update_interrupt(AVR8_INTIDX_OCF1A);
+			update_interrupt(AVR8_INTIDX_OCF1B);
+			update_interrupt(AVR8_INTIDX_TOV1);
+			break;
+
+		case AVR8_REGIDX_TIMSK2:
+			verboselog(m_pc, 0, "AVR8: TIMSK2 = %02x\n", data );
+			m_r[AVR8_REGIDX_TIMSK2] = data;
+			update_interrupt(AVR8_INTIDX_OCF2A);
+			update_interrupt(AVR8_INTIDX_OCF2B);
+			update_interrupt(AVR8_INTIDX_TOV2);
+			break;
+
+		case AVR8_REGIDX_TIMSK3:
+			verboselog(m_pc, 0, "AVR8: TIMSK3 = %02x\n", data );
+			m_r[AVR8_REGIDX_TIMSK3] = data;
+			update_interrupt(AVR8_INTIDX_OCF3A);
+			update_interrupt(AVR8_INTIDX_OCF3B);
+			update_interrupt(AVR8_INTIDX_TOV3);
+			break;
+
+		case AVR8_REGIDX_TIMSK4:
+			verboselog(m_pc, 0, "AVR8: TIMSK4 = %02x\n", data );
+			m_r[AVR8_REGIDX_TIMSK4] = data;
+			update_interrupt(AVR8_INTIDX_OCF4A);
+			update_interrupt(AVR8_INTIDX_OCF4B);
+			update_interrupt(AVR8_INTIDX_TOV4);
+			break;
+
+		case AVR8_REGIDX_TIMSK5:
+			verboselog(m_pc, 0, "AVR8: TIMSK5 = %02x\n", data );
+			m_r[AVR8_REGIDX_TIMSK5] = data;
+			update_interrupt(AVR8_INTIDX_OCF5A);
+			update_interrupt(AVR8_INTIDX_OCF5B);
+			update_interrupt(AVR8_INTIDX_TOV5);
+			break;
+
+    case AVR8_REGIDX_XMCRA:
+			verboselog(m_pc, 0, "AVR8: XMCRA = %02x\n", data );
+      //TODO: changed_xmcra(data);
+      break;
+
+    case AVR8_REGIDX_XMCRB:
+			verboselog(m_pc, 0, "AVR8: XMCRB = %02x\n", data );
+      //TODO: changed_xmcrb(data);
+      break;
+
+    case AVR8_REGIDX_ADCL:
+			verboselog(m_pc, 0, "AVR8: ADCL = %02x\n", data );
+      //TODO: changed_adcl(data);
+      break;
+
+    case AVR8_REGIDX_ADCH:
+			verboselog(m_pc, 0, "AVR8: ADCH = %02x\n", data );
+      //TODO: changed_adch(data);
+      break;
+
+    case AVR8_REGIDX_ADCSRA:
+			verboselog(m_pc, 0, "AVR8: ADCSRA = %02x\n", data );
+      //TODO: changed_adcsra(data);
+      break;
+
+    case AVR8_REGIDX_ADCSRB:
+			verboselog(m_pc, 0, "AVR8: ADCSRB = %02x\n", data );
+      //TODO: changed_adcsrb(data);
+      break;
+
+    case AVR8_REGIDX_ADMUX:
+			verboselog(m_pc, 0, "AVR8: ADMUX = %02x\n", data );
+      //TODO: changed_admux(data);
+      break;
+
+    case AVR8_REGIDX_DIDR0:
+			verboselog(m_pc, 0, "AVR8: DIDR0 = %02x\n", data );
+      //TODO: changed_didr0(data);
+      break;
+
+    case AVR8_REGIDX_DIDR1:
+			verboselog(m_pc, 0, "AVR8: DIDR1 = %02x\n", data );
+      //TODO: changed_didr1(data);
+      break;
+
+    case AVR8_REGIDX_DIDR2:
+			verboselog(m_pc, 0, "AVR8: DIDR2 = %02x\n", data );
+      //TODO: changed_didr2(data);
+      break;
+
+		case AVR8_REGIDX_TCCR1A:
+			verboselog(m_pc, 0, "AVR8: TCCR1A = %02x\n", data );
+			changed_tccr1a(data);
+			break;
+
+		case AVR8_REGIDX_TCCR1B:
+			verboselog(m_pc, 0, "AVR8: TCCR1B = %02x\n", data );
+			changed_tccr1b(data);
+			break;
+
+		case AVR8_REGIDX_TCCR1C:
+			verboselog(m_pc, 0, "AVR8: TCCR1C = %02x\n", data );
+			//TODO: changed_tccr1c(data);
+			break;
+
+		case AVR8_REGIDX_TCNT1L:
+			AVR8_TCNT1L = data;
+			break;
+
+		case AVR8_REGIDX_TCNT1H:
+			AVR8_TCNT1H = data;
+			break;
+
+		case AVR8_REGIDX_ICR1L:
+			//TODO: ICR1L
+			break;
+
+		case AVR8_REGIDX_ICR1H:
+			//TODO: ICR1H
+			break;
+
+		case AVR8_REGIDX_OCR1AL:
+			verboselog(m_pc, 0, "AVR8: OCR1AL = %02x\n", data );
+			update_ocr1((AVR8_OCR1A & 0xff00) | data, AVR8_REG_A);
+			break;
+
+		case AVR8_REGIDX_OCR1AH:
+			verboselog(m_pc, 0, "AVR8: OCR1AH = %02x\n", data );
+			update_ocr1((AVR8_OCR1A & 0x00ff) | (data << 8), AVR8_REG_A);
+			break;
+
+		case AVR8_REGIDX_OCR1BL:
+			verboselog(m_pc, 0, "AVR8: OCR1BL = %02x\n", data );
+			update_ocr1((AVR8_OCR1B & 0xff00) | data, AVR8_REG_B);
+			break;
+
+		case AVR8_REGIDX_OCR1BH:
+			verboselog(m_pc, 0, "AVR8: OCR1BH = %02x\n", data );
+			update_ocr1((AVR8_OCR1B & 0x00ff) | (data << 8), AVR8_REG_B);
+			break;
+
+		case AVR8_REGIDX_OCR1CL:
+			verboselog(m_pc, 0, "AVR8: OCR1CL = %02x\n", data );
+			update_ocr1((AVR8_OCR1C & 0xff00) | data, AVR8_REG_C);
+			break;
+
+		case AVR8_REGIDX_OCR1CH:
+			verboselog(m_pc, 0, "AVR8: OCR1CH = %02x\n", data );
+			update_ocr1((AVR8_OCR1C & 0x00ff) | (data << 8), AVR8_REG_C);
+			break;
+
+		case AVR8_REGIDX_TCCR3A:
+			verboselog(m_pc, 0, "AVR8: TCCR3A = %02x\n", data );
+//TODO:			changed_tccr3a(data);
+			break;
+
+		case AVR8_REGIDX_TCCR3B:
+			verboselog(m_pc, 0, "AVR8: TCCR3B = %02x\n", data );
+//TODO:			changed_tccr3b(data);
+			break;
+
+		case AVR8_REGIDX_TCCR3C:
+			verboselog(m_pc, 0, "AVR8: TCCR3C = %02x\n", data );
+//TODO:			changed_tccr3c(data);
+			break;
+
+		case AVR8_REGIDX_TCNT3L:
+			AVR8_TCNT3L = data;
+			break;
+
+		case AVR8_REGIDX_TCNT3H:
+			AVR8_TCNT3H = data;
+			break;
+
+		case AVR8_REGIDX_ICR3L:
+			//TODO: ICR3L
+			break;
+
+		case AVR8_REGIDX_ICR3H:
+			//TODO: ICR3H
+			break;
+
+		case AVR8_REGIDX_OCR3AL:
+			verboselog(m_pc, 0, "AVR8: OCR3AL = %02x\n", data );
+//TODO:			update_ocr3((AVR8_OCR3A & 0xff00) | data, AVR8_REG_A);
+			break;
+
+		case AVR8_REGIDX_OCR3AH:
+			verboselog(m_pc, 0, "AVR8: OCR3AH = %02x\n", data );
+//TODO:			update_ocr3((AVR8_OCR3A & 0x00ff) | (data << 8), AVR8_REG_A);
+			break;
+
+		case AVR8_REGIDX_OCR3BL:
+			verboselog(m_pc, 0, "AVR8: OCR3BL = %02x\n", data );
+//TODO:			update_ocr3((AVR8_OCR3B & 0xff00) | data, AVR8_REG_B);
+			break;
+
+		case AVR8_REGIDX_OCR3BH:
+			verboselog(m_pc, 0, "AVR8: OCR3BH = %02x\n", data );
+//TODO:			update_ocr3((AVR8_OCR3B & 0x00ff) | (data << 8), AVR8_REG_B);
+			break;
+
+		case AVR8_REGIDX_OCR3CL:
+			verboselog(m_pc, 0, "AVR8: OCR3CL = %02x\n", data );
+//TODO:			update_ocr3((AVR8_OCR3C & 0xff00) | data, AVR8_REG_C);
+			break;
+
+		case AVR8_REGIDX_OCR3CH:
+			verboselog(m_pc, 0, "AVR8: OCR3CH = %02x\n", data );
+//TODO:			update_ocr3((AVR8_OCR3C & 0x00ff) | (data << 8), AVR8_REG_C);
+			break;
+
+		case AVR8_REGIDX_TCCR4A:
+			verboselog(m_pc, 0, "AVR8: TCCR4A = %02x\n", data );
+      changed_tccr4a(data);
+			break;
+
+		case AVR8_REGIDX_TCCR4B:
+			verboselog(m_pc, 0, "AVR8: TCCR4B = %02x\n", data );
+      changed_tccr4b(data);
+			break;
+
+		case AVR8_REGIDX_TCCR4C:
+			verboselog(m_pc, 0, "AVR8: TCCR4C = %02x\n", data );
+//TODO:			changed_tccr4c(data);
+			break;
+
+		case AVR8_REGIDX_TCNT4L:
+			AVR8_TCNT4L = data;
+			break;
+
+		case AVR8_REGIDX_TCNT4H:
+			AVR8_TCNT4H = data;
+			break;
+
+		case AVR8_REGIDX_ICR4L:
+			//TODO: ICR4L
+			break;
+
+		case AVR8_REGIDX_ICR4H:
+			//TODO: ICR4H
+			break;
+
+		case AVR8_REGIDX_OCR4AL:
+			verboselog(m_pc, 0, "AVR8: OCR4AL = %02x\n", data );
+//TODO:			update_ocr4((AVR8_OCR4A & 0xff00) | data, AVR8_REG_A);
+			break;
+
+		case AVR8_REGIDX_OCR4AH:
+			verboselog(m_pc, 0, "AVR8: OCR4AH = %02x\n", data );
+//TODO:			update_ocr4((AVR8_OCR4A & 0x00ff) | (data << 8), AVR8_REG_A);
+			break;
+
+		case AVR8_REGIDX_OCR4BL:
+			verboselog(m_pc, 0, "AVR8: OCR4BL = %02x\n", data );
+//TODO:			update_ocr4((AVR8_OCR4B & 0xff00) | data, AVR8_REG_B);
+			break;
+
+		case AVR8_REGIDX_OCR4BH:
+			verboselog(m_pc, 0, "AVR8: OCR4BH = %02x\n", data );
+//TODO:			update_ocr4((AVR8_OCR4B & 0x00ff) | (data << 8), AVR8_REG_B);
+			break;
+
+		case AVR8_REGIDX_OCR4CL:
+			verboselog(m_pc, 0, "AVR8: OCR4CL = %02x\n", data );
+//TODO:			update_ocr4((AVR8_OCR4C & 0xff00) | data, AVR8_REG_C);
+			break;
+
+		case AVR8_REGIDX_OCR4CH:
+			verboselog(m_pc, 0, "AVR8: OCR4CH = %02x\n", data );
+//TODO:			update_ocr4((AVR8_OCR4C & 0x00ff) | (data << 8), AVR8_REG_C);
+			break;
+
+		case AVR8_REGIDX_TCCR2A:
+			verboselog(m_pc, 0, "AVR8: TCCR2A = %02x\n", data );
+			changed_tccr2a(data);
+			break;
+
+		case AVR8_REGIDX_TCCR2B:
+			verboselog(m_pc, 0, "AVR8: TCCR2B = %02x\n", data );
+			changed_tccr2b(data);
+			break;
+
+		case AVR8_REGIDX_TCNT2:
+			AVR8_TCNT2 = data;
+			break;
+
+		case AVR8_REGIDX_OCR2A:
+			update_ocr2(data, AVR8_REG_A);
+			break;
+
+		case AVR8_REGIDX_OCR2B:
+			update_ocr2(data, AVR8_REG_B);
+			break;
+
+		case AVR8_REGIDX_ASSR:
+			verboselog(m_pc, 0, "AVR8: ASSR = %02x\n", data );
+			//TODO: changed_assr(data);
+			break;
+
+		case AVR8_REGIDX_TWBR:
+			verboselog(m_pc, 0, "AVR8: TWBR = %02x\n", data );
+			//TODO: changed_twbr(data);
+			break;
+
+		case AVR8_REGIDX_TWSR:
+			verboselog(m_pc, 0, "AVR8: TWSR = %02x\n", data );
+			//TODO: changed_twsr(data);
+			break;
+
+		case AVR8_REGIDX_TWAR:
+			verboselog(m_pc, 0, "AVR8: TWAR = %02x\n", data );
+			//TODO: changed_twar(data);
+			break;
+
+		case AVR8_REGIDX_TWDR:
+			verboselog(m_pc, 0, "AVR8: TWDR = %02x\n", data );
+			//TODO: changed_twdr(data);
+			break;
+
+		case AVR8_REGIDX_TWCR:
+			verboselog(m_pc, 0, "AVR8: TWCR = %02x\n", data );
+			//TODO: changed_twcr(data);
+      m_r[AVR8_REGIDX_TWCR] = data;
+			break;
+
+		case AVR8_REGIDX_TWAMR:
+			verboselog(m_pc, 0, "AVR8: TWAMR = %02x\n", data );
+			//TODO: changed_twamr(data);
+			break;
+
+		case AVR8_REGIDX_UCSR0A:
+			verboselog(m_pc, 0, "AVR8: UCSR0A = %02x\n", data );
+			//TODO: changed_ucsr0a(data);
+			break;
+
+		case AVR8_REGIDX_UCSR0B:
+			verboselog(m_pc, 0, "AVR8: UCSR0B = %02x\n", data );
+			//TODO: changed_ucsr0b(data);
+			break;
+
+		case AVR8_REGIDX_UCSR0C:
+			verboselog(m_pc, 0, "AVR8: UCSR0C = %02x\n", data );
+			//TODO: changed_ucsr0c(data);
+			break;
+/*
+		case AVR8_REGIDX_:
+			verboselog(m_pc, 0, "AVR8:  = %02x\n", data );
+			//TODO: changed_(data);
+			break;
+*/
 		default:
-			verboselog(m_pc, 0, "AVR8: Unknown Register Write: %02x = %02x\n", (UINT8)offset, data);
+			verboselog(m_pc, 0, "AVR8: Unknown Register Write: %03x = %02x\n", offset, data);
 			break;
 	}
 }
 
 READ8_MEMBER( avr8_device::regs_r )
 {
-	//printf("offset %04x\n", offset);
+//	printf("--- READ offset %04x ---\n", offset);
+
 	switch( offset )
 	{
 		case AVR8_REGIDX_R0:
@@ -1869,38 +2756,91 @@ READ8_MEMBER( avr8_device::regs_r )
 		case AVR8_REGIDX_R31:
 			return m_r[offset];
 
-		case AVR8_REGIDX_SPL:
-		case AVR8_REGIDX_SPH:
-		case AVR8_REGIDX_TCNT1L:
-		case AVR8_REGIDX_TCNT1H:
-		case AVR8_REGIDX_TCNT2:
 		case AVR8_REGIDX_PORTA:
 		case AVR8_REGIDX_PORTB:
 		case AVR8_REGIDX_PORTC:
 		case AVR8_REGIDX_PORTD:
+		case AVR8_REGIDX_PORTE:
+		case AVR8_REGIDX_PORTF:
+		case AVR8_REGIDX_PORTG:
+		case AVR8_REGIDX_PORTH:
+		case AVR8_REGIDX_PORTJ:
+		case AVR8_REGIDX_PORTK:
+		case AVR8_REGIDX_PORTL:
 		case AVR8_REGIDX_DDRA:
 		case AVR8_REGIDX_DDRB:
 		case AVR8_REGIDX_DDRC:
 		case AVR8_REGIDX_DDRD:
+		case AVR8_REGIDX_DDRE:
+		case AVR8_REGIDX_DDRF:
+		case AVR8_REGIDX_DDRG:
+		case AVR8_REGIDX_DDRH:
+		case AVR8_REGIDX_DDRJ:
+		case AVR8_REGIDX_DDRK:
+		case AVR8_REGIDX_DDRL:
+		case AVR8_REGIDX_TWCR:/*TODO: needed for Replicator 1 <------- BLOQUEIA PROGRESSO DA EXECUÇÃO DO FIRMWARE no endereço 105EC*/
+		case AVR8_REGIDX_UCSR0B:/*TODO: needed for Replicator 1 */
+		case AVR8_REGIDX_SPDR:  /*TODO: needed for Replicator 1 */
+		case AVR8_REGIDX_SPSR:  /*TODO: needed for Replicator 1 */
+    case AVR8_REGIDX_ADCSRA:   /*TODO: needed for Replicator 1 */
+    case AVR8_REGIDX_ADCSRB:   /*TODO: needed for Replicator 1 */
 		case AVR8_REGIDX_GPIOR0:
 		case AVR8_REGIDX_GPIOR1:
 		case AVR8_REGIDX_GPIOR2:
 		case AVR8_REGIDX_EEDR:
+		case AVR8_REGIDX_SPL:
+		case AVR8_REGIDX_SPH:
 		case AVR8_REGIDX_SREG:
+    case AVR8_REGIDX_EECR: /*TODO: needed for Replicator 1 */
 			return m_r[offset];
+
+		case AVR8_REGIDX_TWSR:
+      //quick hack: by returning a value != 0x08 we induce an error state that makes the object code jump out of the wait loop and continue execution failing the 2-wire write operation.
+      //TODO: implement-me!
+			return 0x00; /*TODO: needed for Replicator 1 */
 
 		// TODO: consider the DDRx
 		case AVR8_REGIDX_PINA:
-			return m_io->read_byte(AVR8_REG_A);
+      return m_io->read_byte(AVR8_REG_A);
+
 		case AVR8_REGIDX_PINB:
-			return m_io->read_byte(AVR8_REG_B);
+      return m_io->read_byte(AVR8_REG_B);
+
 		case AVR8_REGIDX_PINC:
-			return m_io->read_byte(AVR8_REG_C);
+      return m_io->read_byte(AVR8_REG_C);
+
 		case AVR8_REGIDX_PIND:
-			return m_io->read_byte(AVR8_REG_D);
+      return m_io->read_byte(AVR8_REG_D);
+
+		case AVR8_REGIDX_PINE:
+      return m_io->read_byte(AVR8_REG_E);
+
+		case AVR8_REGIDX_PINF:
+      return m_io->read_byte(AVR8_REG_F);
+
+		case AVR8_REGIDX_PING:
+      return m_io->read_byte(AVR8_REG_G);
+
+		case AVR8_REGIDX_PINH:
+      return m_io->read_byte(AVR8_REG_H);
+
+		case AVR8_REGIDX_PINJ:
+      return m_io->read_byte(AVR8_REG_J);
+
+		case AVR8_REGIDX_PINK:
+      return m_io->read_byte(AVR8_REG_K);
+
+		case AVR8_REGIDX_PINL:
+      return m_io->read_byte(AVR8_REG_L);
+
+		case AVR8_REGIDX_TCNT1L:
+		case AVR8_REGIDX_TCNT1H:
+		case AVR8_REGIDX_TCNT2:
+		case AVR8_REGIDX_UCSR0A:
+			return m_r[offset];
 
 		default:
-			verboselog(m_pc, 0, "AVR8: Unknown Register Read: %02x\n", (UINT8)offset);
+			printf("[%08X] AVR8: Unknown Register Read: 0x%03X\n", m_shifted_pc, offset);
 			return 0;
 	}
 }
@@ -1961,6 +2901,7 @@ void avr8_device::execute_run()
 	UINT8 rr = 0;
 	UINT8 res = 0;
 	UINT16 pd = 0;
+	UINT32 pd32 = 0;
 	INT16 sd = 0;
 	INT32 opcycles = 1;
 
@@ -2289,12 +3230,17 @@ void avr8_device::execute_run()
 								opcycles = 3;
 								break;
 							case 0x0006:    // ELPM Rd,Z
-								//output += sprintf( output, "ELPM    R%d, Z", RD5(op) );
-								unimplemented_opcode(op);
+								m_r[RD5(op)] = m_program->read_byte((m_r[AVR8_REGIDX_RAMPZ] << 16) | ZREG);
+								opcycles = 3;
 								break;
 							case 0x0007:    // ELPM Rd,Z+
-								//output += sprintf( output, "ELPM    R%d, Z+", RD5(op) );
-								unimplemented_opcode(op);
+								pd32 = (m_r[AVR8_REGIDX_RAMPZ] << 16) | ZREG;
+                m_r[RD5(op)] = m_program->read_byte(pd32);
+                pd32++;
+                m_r[AVR8_REGIDX_RAMPZ] = (pd32 >> 16) & 0x00ff;
+                m_r[31] = (pd32 >> 8) & 0x00ff;
+								m_r[30] = pd32 & 0x00ff;
+                opcycles = 3;
 								break;
 							case 0x0009:    // LD Rd,Y+
 								pd = YREG;
@@ -2303,7 +3249,7 @@ void avr8_device::execute_run()
 								m_r[29] = (pd >> 8) & 0x00ff;
 								m_r[28] = pd & 0x00ff;
 								opcycles = 2;
-								break;
+                break;
 							case 0x000a:    // LD Rd,-Y
 								pd = YREG;
 								pd--;
@@ -2658,7 +3604,9 @@ void avr8_device::execute_run()
 										break;
 									case 0x00a0:    // WDR
 										//output += sprintf( output, "WDR" );
-										unimplemented_opcode(op);
+										//unimplemented_opcode(op); //TODO: necessary for emulating the Replicator 1
+                    //printf("Watchdot Reset!\n");
+										opcycles = 1;
 										break;
 									case 0x00c0:    // LPM
 										m_r[0] = m_program->read_byte(ZREG);

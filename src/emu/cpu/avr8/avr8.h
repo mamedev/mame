@@ -46,6 +46,23 @@
 
 #define MCFG_CPU_AVR8_CONFIG(_config) \
 	avr8_device::static_set_config(*device, _config);
+
+//**************************************************************************
+//  FUSE BITS CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CPU_AVR8_LFUSE(byte) \
+	((avr8_device*) device)->set_low_fuses(byte);
+
+#define MCFG_CPU_AVR8_HFUSE(byte) \
+	((avr8_device*) device)->set_high_fuses(byte);
+
+#define MCFG_CPU_AVR8_EFUSE(byte) \
+	((avr8_device*) device)->set_extended_fuses(byte);
+
+#define MCFG_CPU_AVR8_LOCK(byte) \
+	((avr8_device*) device)->set_lock_bits(byte);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -73,6 +90,12 @@ public:
 	// inline configuration helpers
 	static void static_set_config(device_t &device, const avr8_config &config);
 
+  // fuse configs
+	void set_low_fuses(UINT8 byte);
+	void set_high_fuses(UINT8 byte);
+	void set_extended_fuses(UINT8 byte);
+	void set_lock_bits(UINT8 byte);
+
 	// public interfaces
 	virtual void update_interrupt(int source);
 	UINT64 get_elapsed_cycles()
@@ -83,9 +106,18 @@ public:
 	// register handling
 	DECLARE_WRITE8_MEMBER( regs_w );
 	DECLARE_READ8_MEMBER( regs_r );
+	UINT32 m_shifted_pc;
 
 protected:
-	avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map, const char *shortname, const char *source);
+	enum
+	{
+		CPU_TYPE_ATMEGA88,
+		CPU_TYPE_ATMEGA644,
+		CPU_TYPE_ATMEGA1280,
+		CPU_TYPE_ATMEGA2560
+	};
+
+	avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map, UINT8 cpu_type, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start();
@@ -115,10 +147,19 @@ protected:
 	const address_space_config m_io_config;
 	UINT8 *m_eeprom;
 
+  // bootloader
+	UINT16 m_boot_size;
+	UINT8 m_cpu_type;
+
+  // Fuses
+  UINT8 m_lfuses;
+  UINT8 m_hfuses;
+  UINT8 m_efuses;
+  UINT8 m_lock_bits;
+
 	// CPU registers
 	UINT32 m_pc;
-	UINT32 m_shifted_pc;
-	UINT8 m_r[256];
+	UINT8 m_r[0x200];
 
 	// internal timers
 	UINT8 m_timer0_top;
@@ -135,6 +176,11 @@ protected:
 	INT32 m_timer2_increment;
 	UINT16 m_timer2_prescale;
 	UINT16 m_timer2_prescale_count;
+
+	UINT16 m_timer4_top;
+	INT32 m_timer4_increment;
+	UINT16 m_timer4_prescale;
+	UINT16 m_timer4_prescale_count;
 
 	// SPI
 	bool m_spi_active;
@@ -209,6 +255,26 @@ protected:
 	void update_ocr2(UINT8 newval, UINT8 reg);
 	void timer2_force_output_compare(int reg);
 
+	// timer 3
+/*
+	void timer3_tick();
+	void changed_tccr3a(UINT8 data);
+	void changed_tccr3b(UINT8 data);
+	void update_timer3_waveform_gen_mode();
+	void update_timer3_clock_source();
+	void update_ocr3(UINT8 newval, UINT8 reg);
+	void timer3_force_output_compare(int reg);
+*/
+
+	// timer 4
+	void timer4_tick();
+	void changed_tccr4a(UINT8 data);
+	void changed_tccr4b(UINT8 data);
+	void update_timer4_waveform_gen_mode();
+	void update_timer4_clock_source();
+	//void update_ocr4(UINT8 newval, UINT8 reg);
+	//void timer4_force_output_compare(int reg);
+
 	// address spaces
 	address_space *m_program;
 	address_space *m_data;
@@ -218,6 +284,8 @@ protected:
 // device type definition
 extern const device_type ATMEGA88;
 extern const device_type ATMEGA644;
+extern const device_type ATMEGA1280;
+extern const device_type ATMEGA2560;
 
 // ======================> atmega88_device
 
@@ -235,6 +303,28 @@ class atmega644_device : public avr8_device
 public:
 	// construction/destruction
 	atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void update_interrupt(int source);
+};
+
+// ======================> atmega1280_device
+
+class atmega1280_device : public avr8_device
+{
+public:
+	// construction/destruction
+	atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void update_interrupt(int source);
+};
+
+// ======================> atmega2560_device
+
+class atmega2560_device : public avr8_device
+{
+public:
+	// construction/destruction
+	atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual void update_interrupt(int source);
 };
@@ -282,7 +372,8 @@ enum
 	AVR8_X,
 	AVR8_Y,
 	AVR8_Z,
-	AVR8_SP,
+	AVR8_SPH,
+	AVR8_SPL,
 };
 
 enum
@@ -348,7 +439,7 @@ enum
 // Used by I/O register handling
 enum
 {
-	AVR8_REGIDX_R0 = 0,
+	AVR8_REGIDX_R0 = 0x00,
 	AVR8_REGIDX_R1,
 	AVR8_REGIDX_R2,
 	AVR8_REGIDX_R3,
@@ -380,7 +471,6 @@ enum
 	AVR8_REGIDX_R29,
 	AVR8_REGIDX_R30,
 	AVR8_REGIDX_R31,
-
 	AVR8_REGIDX_PINA = 0x20,
 	AVR8_REGIDX_DDRA,
 	AVR8_REGIDX_PORTA,
@@ -393,12 +483,22 @@ enum
 	AVR8_REGIDX_PIND,
 	AVR8_REGIDX_DDRD,
 	AVR8_REGIDX_PORTD,
-
+	AVR8_REGIDX_PINE,
+	AVR8_REGIDX_DDRE,
+	AVR8_REGIDX_PORTE,
+	AVR8_REGIDX_PINF,
+	AVR8_REGIDX_DDRF,
+	AVR8_REGIDX_PORTF,
+	AVR8_REGIDX_PING,
+	AVR8_REGIDX_DDRG,
+	AVR8_REGIDX_PORTG,
 	AVR8_REGIDX_TIFR0 = 0x35,
 	AVR8_REGIDX_TIFR1,
 	AVR8_REGIDX_TIFR2,
-
-	AVR8_REGIDX_PCIFR = 0x3b,
+	AVR8_REGIDX_TIFR3,
+	AVR8_REGIDX_TIFR4,
+	AVR8_REGIDX_TIFR5,
+	AVR8_REGIDX_PCIFR = 0x3B,
 	AVR8_REGIDX_EIFR,
 	AVR8_REGIDX_EIMSK,
 	AVR8_REGIDX_GPIOR0,
@@ -412,53 +512,66 @@ enum
 	AVR8_REGIDX_TCNT0,
 	AVR8_REGIDX_OCR0A,
 	AVR8_REGIDX_OCR0B,
-
-	AVR8_REGIDX_GPIOR1 = 0x4a,
+  //0x49: Reserved
+	AVR8_REGIDX_GPIOR1 = 0x4A,
 	AVR8_REGIDX_GPIOR2,
 	AVR8_REGIDX_SPCR,
 	AVR8_REGIDX_SPSR,
 	AVR8_REGIDX_SPDR,
-
+  //0x4F: Reserved
 	AVR8_REGIDX_ACSR = 0x50,
-
+	AVR8_REGIDX_OCDR,
+  //0x52: Reserved
 	AVR8_REGIDX_SMCR = 0x53,
 	AVR8_REGIDX_MCUSR,
 	AVR8_REGIDX_MCUCR,
-
+  //0x56: Reserved
 	AVR8_REGIDX_SPMCSR = 0x57,
-
-	AVR8_REGIDX_SPL = 0x5d,
+  //0x58: Reserved
+  //0x59: Reserved
+  //0x5A: Reserved
+	AVR8_REGIDX_RAMPZ = 0x5B,
+	AVR8_REGIDX_EIND,
+	AVR8_REGIDX_SPL,
 	AVR8_REGIDX_SPH,
 	AVR8_REGIDX_SREG,
-	AVR8_REGIDX_WDTCSR,
+//--------------------------
+	AVR8_REGIDX_WDTCSR = 0x60,
 	AVR8_REGIDX_CLKPR,
-
-	AVR8_REGIDX_PRR = 0x64,
-
-	AVR8_REGIDX_OSCCAL = 0x66,
-
+  //0x62: Reserved
+  //0x63: Reserved
+	AVR8_REGIDX_PRR0 = 0x64,
+	AVR8_REGIDX_PRR1,
+	AVR8_REGIDX_OSCCAL,
+  //0x67: Reserved
 	AVR8_REGIDX_PCICR = 0x68,
 	AVR8_REGIDX_EICRA,
-
-	AVR8_REGIDX_PCMSK0 = 0x6B,
+	AVR8_REGIDX_EICRB,
+	AVR8_REGIDX_PCMSK0,
 	AVR8_REGIDX_PCMSK1,
 	AVR8_REGIDX_PCMSK2,
 	AVR8_REGIDX_TIMSK0,
 	AVR8_REGIDX_TIMSK1,
 	AVR8_REGIDX_TIMSK2,
-
+	AVR8_REGIDX_TIMSK3,
+	AVR8_REGIDX_TIMSK4,
+	AVR8_REGIDX_TIMSK5,
+	AVR8_REGIDX_XMCRA,
+	AVR8_REGIDX_XMCRB,
+  //0x76: Reserved
+  //0x77: Reserved
 	AVR8_REGIDX_ADCL = 0x78,
 	AVR8_REGIDX_ADCH,
 	AVR8_REGIDX_ADCSRA,
 	AVR8_REGIDX_ADCSRB,
 	AVR8_REGIDX_ADMUX,
-
-	AVR8_REGIDX_DIDR0 = 0x7e,
+	AVR8_REGIDX_DIDR2,
+	AVR8_REGIDX_DIDR0,
 	AVR8_REGIDX_DIDR1,
 	AVR8_REGIDX_TCCR1A,
 	AVR8_REGIDX_TCCR1B,
 	AVR8_REGIDX_TCCR1C,
-
+  //0x83: Reserved
 	AVR8_REGIDX_TCNT1L = 0x84,
 	AVR8_REGIDX_TCNT1H,
 	AVR8_REGIDX_ICR1L,
@@ -467,54 +580,244 @@ enum
 	AVR8_REGIDX_OCR1AH,
 	AVR8_REGIDX_OCR1BL,
 	AVR8_REGIDX_OCR1BH,
-
-	AVR8_REGIDX_TCCR2A = 0xb0,
+	AVR8_REGIDX_OCR1CL,
+	AVR8_REGIDX_OCR1CH,
+  //0x8E: Reserved
+  //0x8F: Reserved
+	AVR8_REGIDX_TCCR3A = 0x90,
+	AVR8_REGIDX_TCCR3B,
+	AVR8_REGIDX_TCCR3C,
+  //0x93: Reserved
+	AVR8_REGIDX_TCNT3L = 0x94,
+	AVR8_REGIDX_TCNT3H,
+	AVR8_REGIDX_ICR3L,
+	AVR8_REGIDX_ICR3H,
+	AVR8_REGIDX_OCR3AL,
+	AVR8_REGIDX_OCR3AH,
+	AVR8_REGIDX_OCR3BL,
+	AVR8_REGIDX_OCR3BH,
+	AVR8_REGIDX_OCR3CL,
+	AVR8_REGIDX_OCR3CH,
+  //0x9E: Reserved
+  //0x9F: Reserved
+	AVR8_REGIDX_TCCR4A = 0xA0,
+	AVR8_REGIDX_TCCR4B,
+	AVR8_REGIDX_TCCR4C,
+  //0xA3: Reserved
+	AVR8_REGIDX_TCNT4L = 0xA4,
+	AVR8_REGIDX_TCNT4H,
+	AVR8_REGIDX_ICR4L,
+	AVR8_REGIDX_ICR4H,
+	AVR8_REGIDX_OCR4AL,
+	AVR8_REGIDX_OCR4AH,
+	AVR8_REGIDX_OCR4BL,
+	AVR8_REGIDX_OCR4BH,
+	AVR8_REGIDX_OCR4CL,
+	AVR8_REGIDX_OCR4CH,
+  //0xAE: Reserved
+  //0xAF: Reserved
+	AVR8_REGIDX_TCCR2A = 0xB0,
 	AVR8_REGIDX_TCCR2B,
 	AVR8_REGIDX_TCNT2,
 	AVR8_REGIDX_OCR2A,
 	AVR8_REGIDX_OCR2B,
-
-	AVR8_REGIDX_ASSR = 0xb6,
-
-	AVR8_REGIDX_TWBR = 0xb8,
+  //0xB5: Reserved
+	AVR8_REGIDX_ASSR = 0xB6,
+  //0xB7: Reserved
+	AVR8_REGIDX_TWBR = 0xB8,
 	AVR8_REGIDX_TWSR,
 	AVR8_REGIDX_TWAR,
 	AVR8_REGIDX_TWDR,
 	AVR8_REGIDX_TWCR,
 	AVR8_REGIDX_TWAMR,
-
-	AVR8_REGIDX_UCSR0A = 0xc0,
+  //0xBE: Reserved
+  //0xBF: Reserved
+	AVR8_REGIDX_UCSR0A = 0xC0,
 	AVR8_REGIDX_UCSR0B,
 	AVR8_REGIDX_UCSR0C,
-
-	AVR8_REGIDX_UBRR0L = 0xc4,
+  //0xC3: Reserved
+	AVR8_REGIDX_UBRR0L = 0xC4,
 	AVR8_REGIDX_UBRR0H,
-	AVR8_REGIDX_UDR0
+	AVR8_REGIDX_UDR0,
+  //0xC7: Reserved
+	AVR8_REGIDX_UCSR1A = 0xC8,
+	AVR8_REGIDX_UCSR1B,
+	AVR8_REGIDX_UCSR1C,
+  //0xCB: Reserved
+	AVR8_REGIDX_UBRR1L = 0xCC,
+	AVR8_REGIDX_UBRR1H,
+	AVR8_REGIDX_UDR1,
+  //0xCF: Reserved
+	AVR8_REGIDX_UCSR2A = 0xD0,
+	AVR8_REGIDX_UCSR2B,
+	AVR8_REGIDX_UCSR2C,
+  //0xD3: Reserved
+	AVR8_REGIDX_UBRR2L = 0xD4,
+	AVR8_REGIDX_UBRR2H,
+	AVR8_REGIDX_UDR2,
+  //0xD7: Reserved
+  //0xD8: Reserved
+  //0xD9: Reserved
+  //0xDA: Reserved
+  //0xDB: Reserved
+  //0xDC: Reserved
+  //0xDD: Reserved
+  //0xDE: Reserved
+  //0xDF: Reserved
+  //0xE0: Reserved
+  //0xE1: Reserved
+  //0xE2: Reserved
+  //0xE3: Reserved
+  //0xE4: Reserved
+  //0xE5: Reserved
+  //0xE6: Reserved
+  //0xE7: Reserved
+  //0xE8: Reserved
+  //0xE9: Reserved
+  //0xEA: Reserved
+  //0xEB: Reserved
+  //0xEC: Reserved
+  //0xED: Reserved
+  //0xEE: Reserved
+  //0xEF: Reserved
+  //0xF0: Reserved
+  //0xF1: Reserved
+  //0xF2: Reserved
+  //0xF3: Reserved
+  //0xF4: Reserved
+  //0xF5: Reserved
+  //0xF6: Reserved
+  //0xF7: Reserved
+  //0xF8: Reserved
+  //0xF9: Reserved
+  //0xFA: Reserved
+  //0xFB: Reserved
+  //0xFC: Reserved
+  //0xFD: Reserved
+  //0xFE: Reserved
+  //0xFF: Reserved
+	AVR8_REGIDX_PINH = 0x100,
+	AVR8_REGIDX_DDRH,
+	AVR8_REGIDX_PORTH,
+	AVR8_REGIDX_PINJ,
+	AVR8_REGIDX_DDRJ,
+	AVR8_REGIDX_PORTJ,
+	AVR8_REGIDX_PINK,
+	AVR8_REGIDX_DDRK,
+	AVR8_REGIDX_PORTK,
+	AVR8_REGIDX_PINL,
+	AVR8_REGIDX_DDRL,
+	AVR8_REGIDX_PORTL
 };
 
+enum {
+  AVR8_IO_PORTA = 0,
+  AVR8_IO_PORTB, 
+  AVR8_IO_PORTC,
+  AVR8_IO_PORTD,
+  AVR8_IO_PORTE,
+  AVR8_IO_PORTF,
+  AVR8_IO_PORTG,
+  AVR8_IO_PORTH,
+  AVR8_IO_PORTJ,
+  AVR8_IO_PORTK,
+  AVR8_IO_PORTL
+};
+
+//TODO: AVR8_REG_* and AVR8_IO_PORT* seem to serve the same purpose and thus should be unified. Verify this!
 enum
 {
 	AVR8_REG_A = 0,
 	AVR8_REG_B,
 	AVR8_REG_C,
 	AVR8_REG_D,
+	AVR8_REG_E,
+	AVR8_REG_F,
+	AVR8_REG_G,
+	AVR8_REG_H,
+	AVR8_REG_J,
+	AVR8_REG_K,
+	AVR8_REG_L,
 };
 
 enum
 {
 	AVR8_INTIDX_SPI,
+
 	AVR8_INTIDX_OCF0B,
 	AVR8_INTIDX_OCF0A,
 	AVR8_INTIDX_TOV0,
+
 	AVR8_INTIDX_ICF1,
+
 	AVR8_INTIDX_OCF1B,
 	AVR8_INTIDX_OCF1A,
 	AVR8_INTIDX_TOV1,
+
 	AVR8_INTIDX_OCF2B,
 	AVR8_INTIDX_OCF2A,
 	AVR8_INTIDX_TOV2,
 
+//------ TODO: review this --------
+	AVR8_INTIDX_OCF3B,
+	AVR8_INTIDX_OCF3A,
+	AVR8_INTIDX_TOV3,
+
+	AVR8_INTIDX_OCF4B,
+	AVR8_INTIDX_OCF4A,
+	AVR8_INTIDX_TOV4,
+
+	AVR8_INTIDX_OCF5B,
+	AVR8_INTIDX_OCF5A,
+	AVR8_INTIDX_TOV5,
+//---------------------------------
+
 	AVR8_INTIDX_COUNT,
+};
+
+//lock bit masks
+enum
+{
+  LB1 = (1 << 0),
+  LB2 = (1 << 1),
+  BLB01 = (1 << 2),
+  BLB02 = (1 << 3),
+  BLB11 = (1 << 4),
+  BLB12 = (1 << 5),
+};
+
+//extended fuses bit masks
+enum
+{
+  BODLEVEL0 = (1 << 0),
+  BODLEVEL1 = (1 << 1),
+  BODLEVEL2 = (1 << 2),
+};
+
+//high fuses bit masks
+enum
+{
+  BOOTRST = (1 << 0),
+  BOOTSZ0 = (1 << 1),
+  BOOTSZ1 = (1 << 2),
+  EESAVE = (1 << 3),
+  WDTON = (1 << 4),
+  SPIEN = (1 << 5),
+  JTAGEN = (1 << 6),
+  OCDEN = (1 << 7),
+};
+
+//low fuses bit masks
+enum
+{
+  CKSEL0 = (1 << 0),
+  CKSEL1 = (1 << 1),
+  CKSEL2 = (1 << 2),
+  CKSEL3 = (1 << 3),
+  SUT0 = (1 << 4),
+  SUT1 = (1 << 5),
+  CKOUT = (1 << 6),
+  CKDIV8 = (1 << 7),
 };
 
 #define AVR8_EECR_EERE          0x01

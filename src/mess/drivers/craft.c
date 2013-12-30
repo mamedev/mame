@@ -106,11 +106,11 @@ WRITE8_MEMBER(craft_state::port_w)
 {
 	switch( offset )
 	{
-		case 0x00: // Port A
+		case AVR8_IO_PORTA: // Port A
 			// Unhandled
 			break;
 
-		case 0x01: // Port B
+		case AVR8_IO_PORTB: // Port B
 		{
 			UINT8 old_port_b = m_port_b;
 			UINT8 pins = data;
@@ -129,13 +129,13 @@ WRITE8_MEMBER(craft_state::port_w)
 			break;
 		}
 
-		case 0x02: // Port C
+		case AVR8_IO_PORTC: // Port C
 			video_update();
 			m_port_c = data;
 			m_latched_color = m_port_c;
 			break;
 
-		case 0x03: // Port D
+		case AVR8_IO_PORTD: // Port D
 		{
 			m_port_d = data;
 			UINT8 audio_sample = (data & 0x02) | ((data & 0xf4) >> 2);
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( craft_data_map, AS_DATA, 8, craft_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( craft_io_map, AS_IO, 8, craft_state )
-	AM_RANGE(0x00, 0x03) AM_READWRITE( port_r, port_w )
+	AM_RANGE(AVR8_IO_PORTA, AVR8_IO_PORTD) AM_READWRITE( port_r, port_w )
 ADDRESS_MAP_END
 
 /****************************************************\

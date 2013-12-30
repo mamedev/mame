@@ -30,6 +30,8 @@ CPU_DISASSEMBLE( avr8 )
 	UINT32 op = oprom[pos++];
 	op |= oprom[pos++] << 8;
 	UINT32 addr = 0;
+  const char* register_names[0x40] = {"PINA", "DDRA", "PORTA", "PINB", "DDRB", "PORTB", "PINC", "DDRC", "PORTC", "PIND", "DDRD", "PORTD", "PINE", "DDRE", "PORTE", "PINF", "DDRF", "PORTF", "PING", "DDRG", "PORTG", "TIFR0", "TIFR1", "TIFR2","TIFR3", "TIFR4", "TIFR5", "PCIFR", "EIFR", "EIMSK", "GPIOR0", "EECR", "EEDR", "EEARL", "EEARH", "GTCCR", "TCCR0A", "TCCR0B", "TCNT0", "OCR0A", "OCR0B", "0x29", "GPIOR1", "GPIOR2", "SPCR", "SPSR", "SPDR", "0x2F", "ACSR", "OCDR", "0x32", "SMCR", "MCUSR", "MCUCR", "0x36", "SPMCSR", "0x38", "0x39", "0x3A", "RAMPZ", "EIND", "SPL", "SPH", "SREG"};
+
 	switch(op & 0xf000)
 	{
 		case 0x0000:
@@ -478,11 +480,19 @@ CPU_DISASSEMBLE( avr8 )
 		case 0xb000:
 			if(op & 0x0800)
 			{
-				output += sprintf( output, "OUT     0x%02x, R%d", ACONST6(op), RD5(op) );
+        if (ACONST6(op) < 0x40 ) {
+  				output += sprintf( output, "OUT     %s, R%d", register_names[ACONST6(op)], RD5(op) );
+        } else {
+  				output += sprintf( output, "OUT     0x%02x, R%d", ACONST6(op), RD5(op) );
+        }
 			}
 			else
 			{
-				output += sprintf( output, "IN      R%d, 0x%02x", RD5(op), ACONST6(op) );
+        if (ACONST6(op) < 0x40 ) {
+  				output += sprintf( output, "IN      R%d, %s", RD5(op), register_names[ACONST6(op)] );
+        } else {
+  				output += sprintf( output, "IN      R%d, 0x%02x", RD5(op), ACONST6(op) );
+        }
 			}
 			break;
 		case 0xc000:

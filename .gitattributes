@@ -7223,6 +7223,7 @@ src/mess/drivers/radio86.c svneol=native#text/plain
 src/mess/drivers/rainbow.c svneol=native#text/plain
 src/mess/drivers/ravens.c svneol=native#text/plain
 src/mess/drivers/rd110.c svneol=native#text/plain
+src/mess/drivers/replicator.c svneol=native#text/plain
 src/mess/drivers/rex6000.c svneol=native#text/plain
 src/mess/drivers/rm380z.c svneol=native#text/plain
 src/mess/drivers/rmnimbus.c svneol=native#text/plain

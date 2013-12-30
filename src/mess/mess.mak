@@ -598,6 +598,7 @@ DRVLIBS += \
 	$(MESSOBJ)/kyocera.a \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/magnavox.a \
+	$(MESSOBJ)/makerbot.a \
 	$(MESSOBJ)/matsushi.a \
 	$(MESSOBJ)/mattel.a \
 	$(MESSOBJ)/mb.a \
@@ -1397,6 +1398,9 @@ $(MESSOBJ)/luxor.a:             \
 
 $(MESSOBJ)/magnavox.a:          \
 	$(MESS_DRIVERS)/odyssey2.o  \
+
+$(MESSOBJ)/makerbot.a:          \
+	$(MESS_DRIVERS)/replicator.o  \
 
 $(MESSOBJ)/mattel.a:            \
 	$(MESS_DRIVERS)/aquarius.o  \
