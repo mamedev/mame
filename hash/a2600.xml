@@ -1816,7 +1816,7 @@ Info from Atariage and Atarimania
 		<info name="programmer" value="Dan Hitchens" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="bezerk.bin" size="4096" crc="2e8b4b5f" sha1="08bcbc8954473e8f0242b881315b0af4466998ae" offset="0" />
+				<rom name="berzerk.bin" size="4096" crc="2e8b4b5f" sha1="08bcbc8954473e8f0242b881315b0af4466998ae" offset="0" />
 			</dataarea>
 		</part>
 	</software>
