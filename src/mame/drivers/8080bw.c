@@ -199,6 +199,7 @@
 #include "sound/speaker.h"
 #include "includes/8080bw.h"
 
+#include "attackfc.lh"
 #include "cosmicm.lh"
 #include "galactic.lh"
 #include "gunchamp.lh"
@@ -3017,7 +3018,6 @@ INPUT_PORTS_END
 
   Attack Force, by E.G.S., Italy
   Not much information is available for this game.
-  It may have had an amber monitor?
 
   20MHz XTAL, 2MHz CPU
   video: 15625Hz
@@ -4684,7 +4684,7 @@ GAMEL(1979, skylove,    0,        shuttlei,  skylove,   driver_device, 0, ROT270
 GAME (1978, claybust,   0,        claybust,  claybust,  driver_device, 0, ROT0,   "Model Racing", "Claybuster", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // no titlescreen, Claybuster according to flyers
 GAMEL(1980, gunchamp,   0,        claybust,  gunchamp,  driver_device, 0, ROT0,   "Model Racing", "Gun Champ", GAME_SUPPORTS_SAVE | GAME_NO_SOUND, layout_gunchamp ) // no titlescreen, Gun Champ according to original cab
 GAME( 1980?,astropal,   0,        astropal,  astropal,  driver_device, 0, ROT0,   "Sidam?", "Astropal", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1979?,attackfc,   0,        attackfc,  attackfc,  _8080bw_state, attackfc, ROT0, "Electronic Games Systems", "Attack Force", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAMEL(1979?,attackfc,   0,        attackfc,  attackfc,  _8080bw_state, attackfc, ROT0, "Electronic Games Systems", "Attack Force", GAME_SUPPORTS_SAVE | GAME_NO_SOUND, layout_attackfc )
 
 GAME( 2002, invmulti,   0,        invmulti,  invmulti,  _8080bw_state, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03D)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2002, invmultim3a,invmulti, invmulti,  invmulti,  _8080bw_state, invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (M8.03A)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

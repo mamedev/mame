@@ -5415,6 +5415,7 @@ src/mame/layout/atari_s1.lay svneol=native#text/xml
 src/mame/layout/atari_s2.lay svneol=native#text/xml
 src/mame/layout/atarifb.lay svneol=native#text/xml
 src/mame/layout/atarifb4.lay svneol=native#text/xml
+src/mame/layout/attackfc.lay svneol=native#text/xml
 src/mame/layout/avalnche.lay svneol=native#text/xml
 src/mame/layout/babydad.lay svneol=native#text/xml
 src/mame/layout/babypkr.lay svneol=native#text/xml

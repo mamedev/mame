@@ -2268,7 +2268,8 @@ $(DRIVERS)/24cdjuke.o:  $(LAYOUT)/24cdjuke.lh
 
 $(DRIVERS)/30test.o:    $(LAYOUT)/30test.lh
 
-$(DRIVERS)/8080bw.o:    $(LAYOUT)/cosmicm.lh \
+$(DRIVERS)/8080bw.o:    $(LAYOUT)/attackfc.lh \
+			$(LAYOUT)/cosmicm.lh \
 			$(LAYOUT)/galactic.lh \
 			$(LAYOUT)/gunchamp.lh \
 			$(LAYOUT)/shuttlei.lh \
