@@ -24,22 +24,22 @@ public:
 	// construction/destruction
 	segaorun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag),
-			m_mapper(*this, "mapper"),
-			m_maincpu(*this, "maincpu"),
-			m_subcpu(*this, "subcpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_i8255(*this, "i8255"),
-			m_nvram(*this, "nvram"),
-			m_sprites(*this, "sprites"),
-			m_segaic16vid(*this, "segaic16vid"),
-			m_segaic16road(*this, "segaic16road"),
-			m_workram(*this, "workram"),
-			m_custom_map(NULL),
-			m_shangon_video(false),
-			m_scanline_timer(NULL),
-			m_irq2_state(0),
-			m_adc_select(0),
-			m_vblank_irq_state(0)
+		m_mapper(*this, "mapper"),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_i8255(*this, "i8255"),
+		m_nvram(*this, "nvram"),
+		m_sprites(*this, "sprites"),
+		m_segaic16vid(*this, "segaic16vid"),
+		m_segaic16road(*this, "segaic16road"),
+		m_workram(*this, "workram"),
+		m_custom_map(NULL),
+		m_shangon_video(false),
+		m_scanline_timer(NULL),
+		m_irq2_state(0),
+		m_adc_select(0),
+		m_vblank_irq_state(0)
 	{ }
 
 	// PPI read/write handlers
@@ -49,6 +49,8 @@ public:
 	DECLARE_WRITE8_MEMBER( unknown_porta_w );
 	DECLARE_WRITE8_MEMBER( unknown_portb_w );
 	DECLARE_WRITE8_MEMBER( video_control_w );
+	DECLARE_READ8_MEMBER( bankmotor_limit_r );
+	DECLARE_WRITE8_MEMBER( bankmotor_pos_w );
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index);
