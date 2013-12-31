@@ -1,117 +1,117 @@
 // stack is LIFO and is 8 levels deep, there is no stackpointer on the real chip
-INLINE void PUSH_STACK(tms32051_state *cpustate, UINT16 pc)
+void tms32051_device::PUSH_STACK(UINT16 pc)
 {
-	cpustate->pcstack_ptr = (cpustate->pcstack_ptr - 1) & 7;
-	cpustate->pcstack[cpustate->pcstack_ptr] = pc;
+	m_pcstack_ptr = (m_pcstack_ptr - 1) & 7;
+	m_pcstack[m_pcstack_ptr] = pc;
 }
 
-INLINE UINT16 POP_STACK(tms32051_state *cpustate)
+UINT16 tms32051_device::POP_STACK()
 {
-	UINT16 pc = cpustate->pcstack[cpustate->pcstack_ptr];
-	cpustate->pcstack_ptr = (cpustate->pcstack_ptr + 1) & 7;
-	cpustate->pcstack[(cpustate->pcstack_ptr + 7) & 7] = cpustate->pcstack[(cpustate->pcstack_ptr + 6) & 7];
+	UINT16 pc = m_pcstack[m_pcstack_ptr];
+	m_pcstack_ptr = (m_pcstack_ptr + 1) & 7;
+	m_pcstack[(m_pcstack_ptr + 7) & 7] = m_pcstack[(m_pcstack_ptr + 6) & 7];
 	return pc;
 }
 
-INLINE INT32 SUB(tms32051_state *cpustate, UINT32 a, UINT32 b)
+INT32 tms32051_device::SUB(UINT32 a, UINT32 b)
 {
 	UINT32 res = a - b;
 
 	// C is cleared if borrow was generated
-	cpustate->st1.c = (b > a) ? 0 : 1;
+	m_st1.c = (b > a) ? 0 : 1;
 
 	// check overflow
 	if ((a ^ b) & (a ^ res) & 0x80000000)
 	{
-		if (cpustate->st0.ovm)  // overflow saturation mode
+		if (m_st0.ovm)  // overflow saturation mode
 		{
 			res = ((INT32)(res) < 0) ? 0x7fffffff : 0x80000000;
 		}
 
 		// set OV, this is a sticky flag
-		cpustate->st0.ov = 1;
+		m_st0.ov = 1;
 	}
 
 	return (INT32)(res);
 }
 
-INLINE INT32 ADD(tms32051_state *cpustate, UINT32 a, UINT32 b)
+INT32 tms32051_device::ADD(UINT32 a, UINT32 b)
 {
 	UINT32 res = a + b;
 
 	// C is set if carry was generated
-	cpustate->st1.c = (a > res) ? 1 : 0;
+	m_st1.c = (a > res) ? 1 : 0;
 
 	// check overflow
 	if ((a ^ res) & (b ^ res) & 0x80000000)
 	{
-		if (cpustate->st0.ovm)  // overflow saturation mode
+		if (m_st0.ovm)  // overflow saturation mode
 		{
 			res = ((INT32)(res) < 0) ? 0x7fffffff : 0x80000000;
 		}
 
 		// set OV, this is a sticky flag
-		cpustate->st0.ov = 1;
+		m_st0.ov = 1;
 	}
 
 	return (INT32)(res);
 }
 
 
-INLINE void UPDATE_AR(tms32051_state *cpustate, int ar, int step)
+void tms32051_device::UPDATE_AR(int ar, int step)
 {
-	int cenb1 = (cpustate->cbcr >> 3) & 0x1;
-	int car1 = cpustate->cbcr & 0x7;
-	int cenb2 = (cpustate->cbcr >> 7) & 0x1;
-	int car2 = (cpustate->cbcr >> 4) & 0x7;
+	int cenb1 = (m_cbcr >> 3) & 0x1;
+	int car1 = m_cbcr & 0x7;
+	int cenb2 = (m_cbcr >> 7) & 0x1;
+	int car2 = (m_cbcr >> 4) & 0x7;
 
 	if (cenb1 && ar == car1)
 	{
 		// update circular buffer 1, note that it only checks ==
-		if (cpustate->ar[ar] == cpustate->cber1)
+		if (m_ar[ar] == m_cber1)
 		{
-			cpustate->ar[ar] = cpustate->cbsr1;
+			m_ar[ar] = m_cbsr1;
 		}
 		else
 		{
-			cpustate->ar[ar] += step;
+			m_ar[ar] += step;
 		}
 	}
 	else if (cenb2 && ar == car2)
 	{
 		// update circular buffer 2, note that it only checks ==
-		if (cpustate->ar[ar] == cpustate->cber2)
+		if (m_ar[ar] == m_cber2)
 		{
-			cpustate->ar[ar] = cpustate->cbsr2;
+			m_ar[ar] = m_cbsr2;
 		}
 		else
 		{
-			cpustate->ar[ar] += step;
+			m_ar[ar] += step;
 		}
 	}
 	else
 	{
-		cpustate->ar[ar] += step;
+		m_ar[ar] += step;
 	}
 }
 
-INLINE void UPDATE_ARP(tms32051_state *cpustate, int nar)
+void tms32051_device::UPDATE_ARP(int nar)
 {
-	cpustate->st1.arb = cpustate->st0.arp;
-	cpustate->st0.arp = nar;
+	m_st1.arb = m_st0.arp;
+	m_st0.arp = nar;
 }
 
-static UINT16 GET_ADDRESS(tms32051_state *cpustate)
+UINT16 tms32051_device::GET_ADDRESS()
 {
-	if (cpustate->op & 0x80)        // Indirect Addressing
+	if (m_op & 0x80)        // Indirect Addressing
 	{
 		UINT16 ea;
-		int arp = cpustate->st0.arp;
-		int nar = cpustate->op & 0x7;
+		int arp = m_st0.arp;
+		int nar = m_op & 0x7;
 
-		ea = cpustate->ar[arp];
+		ea = m_ar[arp];
 
-		switch ((cpustate->op >> 3) & 0xf)
+		switch ((m_op >> 3) & 0xf)
 		{
 			case 0x0:   // *            (no operation)
 			{
@@ -119,104 +119,104 @@ static UINT16 GET_ADDRESS(tms32051_state *cpustate)
 			}
 			case 0x1:   // *, ARn       (NAR -> ARP)
 			{
-				UPDATE_ARP(cpustate, nar);
+				UPDATE_ARP(nar);
 				break;
 			}
 			case 0x2:   // *-           ((CurrentAR)-1 -> CurrentAR)
 			{
-				UPDATE_AR(cpustate, arp, -1);
+				UPDATE_AR(arp, -1);
 				break;
 			}
 			case 0x3:   // *-, ARn      ((CurrentAR)-1 -> CurrentAR, NAR -> ARP)
 			{
-				UPDATE_AR(cpustate, arp, -1);
-				UPDATE_ARP(cpustate, nar);
+				UPDATE_AR(arp, -1);
+				UPDATE_ARP(nar);
 				break;
 			}
 			case 0x4:   // *+           ((CurrentAR)+1 -> CurrentAR)
 			{
-				UPDATE_AR(cpustate, arp, 1);
+				UPDATE_AR(arp, 1);
 				break;
 			}
 			case 0x5:   // *+, ARn      ((CurrentAR)+1 -> CurrentAR, NAR -> ARP)
 			{
-				UPDATE_AR(cpustate, arp, 1);
-				UPDATE_ARP(cpustate, nar);
+				UPDATE_AR(arp, 1);
+				UPDATE_ARP(nar);
 				break;
 			}
 			case 0xa:   // *0-          ((CurrentAR) - INDX)
 			{
-				UPDATE_AR(cpustate, arp, -cpustate->indx);
+				UPDATE_AR(arp, -m_indx);
 				break;
 			}
 			case 0xb:   // *0-, ARn     ((CurrentAR) - INDX -> CurrentAR, NAR -> ARP)
 			{
-				UPDATE_AR(cpustate, arp, -cpustate->indx);
-				UPDATE_ARP(cpustate, nar);
+				UPDATE_AR(arp, -m_indx);
+				UPDATE_ARP(nar);
 				break;
 			}
 			case 0xc:   // *0+          ((CurrentAR) + INDX -> CurrentAR)
 			{
-				UPDATE_AR(cpustate, arp, cpustate->indx);
+				UPDATE_AR(arp, m_indx);
 				break;
 			}
 			case 0xd:   // *0+, ARn     ((CurrentAR) + INDX -> CurrentAR, NAR -> ARP)
 			{
-				UPDATE_AR(cpustate, arp, cpustate->indx);
-				UPDATE_ARP(cpustate, nar);
+				UPDATE_AR(arp, m_indx);
+				UPDATE_ARP(nar);
 				break;
 			}
 
-			default:    fatalerror("32051: GET_ADDRESS: unimplemented indirect addressing mode %d at %04X (%04X)\n", (cpustate->op >> 3) & 0xf, cpustate->pc, cpustate->op);
+			default:    fatalerror("32051: GET_ADDRESS: unimplemented indirect addressing mode %d at %04X (%04X)\n", (m_op >> 3) & 0xf, m_pc, m_op);
 		}
 
 		return ea;
 	}
 	else                    // Direct Addressing
 	{
-		return cpustate->st0.dp | (cpustate->op & 0x7f);
+		return m_st0.dp | (m_op & 0x7f);
 	}
 }
 
-INLINE int GET_ZLVC_CONDITION(tms32051_state *cpustate, int zlvc, int zlvc_mask)
+int tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
 {
 	if (zlvc_mask & 0x2)        // OV-bit
 	{
-		if ((zlvc & 0x2) && cpustate->st0.ov)                           // OV
+		if ((zlvc & 0x2) && m_st0.ov)                           // OV
 		{
 			// clear OV
-			cpustate->st0.ov = 0;
+			m_st0.ov = 0;
 
 			return 1;
 		}
-		else if ((zlvc & 0x2) == 0 && cpustate->st0.ov == 0)            // NOV
+		else if ((zlvc & 0x2) == 0 && m_st0.ov == 0)            // NOV
 			return 1;
 	}
 	if (zlvc_mask & 0x1)        // C-bit
 	{
-		if ((zlvc & 0x1) && cpustate->st1.c)                            // C
+		if ((zlvc & 0x1) && m_st1.c)                            // C
 			return 1;
-		else if ((zlvc & 0x1) == 0 && cpustate->st1.c == 0)         // NC
+		else if ((zlvc & 0x1) == 0 && m_st1.c == 0)         // NC
 			return 1;
 	}
 	if (zlvc_mask & 0x8)        // Z-bit
 	{
-		if ((zlvc & 0x8) && (INT32)(cpustate->acc) == 0)                // EQ
+		if ((zlvc & 0x8) && (INT32)(m_acc) == 0)                // EQ
 			return 1;
-		else if ((zlvc & 0x8) == 0 && (INT32)(cpustate->acc) != 0)  // NEQ
+		else if ((zlvc & 0x8) == 0 && (INT32)(m_acc) != 0)  // NEQ
 			return 1;
 	}
 	if (zlvc_mask & 0x4)        // L-bit
 	{
-		if ((zlvc & 0x4) && (INT32)(cpustate->acc) < 0)             // LT
+		if ((zlvc & 0x4) && (INT32)(m_acc) < 0)             // LT
 			return 1;
-		else if ((zlvc & 0x4) == 0 && (INT32)(cpustate->acc) > 0)       // GT
+		else if ((zlvc & 0x4) == 0 && (INT32)(m_acc) > 0)       // GT
 			return 1;
 	}
 	return 0;
 }
 
-INLINE int GET_TP_CONDITION(tms32051_state *cpustate, int tp)
+int tms32051_device::GET_TP_CONDITION(int tp)
 {
 	switch (tp)
 	{
@@ -227,11 +227,11 @@ INLINE int GET_TP_CONDITION(tms32051_state *cpustate, int tp)
 		}
 		case 1:     // TC = 1
 		{
-			return cpustate->st1.tc;
+			return m_st1.tc;
 		}
 		case 2:     // TC = 0
 		{
-			return cpustate->st1.tc ^ 1;
+			return m_st1.tc ^ 1;
 		}
 		case 3:     // always false
 		{
@@ -241,9 +241,9 @@ INLINE int GET_TP_CONDITION(tms32051_state *cpustate, int tp)
 	return 0;
 }
 
-INLINE INT32 PREG_PSCALER(tms32051_state *cpustate, INT32 preg)
+INT32 tms32051_device::PREG_PSCALER(INT32 preg)
 {
-	switch (cpustate->st1.pm & 3)
+	switch (m_st1.pm & 3)
 	{
 		case 0:     // No shift
 		{
@@ -267,34 +267,31 @@ INLINE INT32 PREG_PSCALER(tms32051_state *cpustate, INT32 preg)
 
 
 
-static void op_invalid(tms32051_state *cpustate)
+void tms32051_device::op_invalid()
 {
-	fatalerror("32051: invalid op at %08X\n", cpustate->pc-1);
+	fatalerror("32051: invalid op at %08X\n", m_pc-1);
 }
-
-static void op_group_be(tms32051_state *cpustate);
-static void op_group_bf(tms32051_state *cpustate);
 
 /*****************************************************************************/
 
-static void op_abs(tms32051_state *cpustate)
+void tms32051_device::op_abs()
 {
-	fatalerror("32051: unimplemented op abs at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op abs at %08X\n", m_pc-1);
 }
 
-static void op_adcb(tms32051_state *cpustate)
+void tms32051_device::op_adcb()
 {
-	fatalerror("32051: unimplemented op adcb at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op adcb at %08X\n", m_pc-1);
 }
 
-static void op_add_mem(tms32051_state *cpustate)
+void tms32051_device::op_add_mem()
 {
 	INT32 d;
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
-	int shift = (cpustate->op >> 8) & 0xf;
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
+	int shift = (m_op >> 8) & 0xf;
 
-	if (cpustate->st1.sxm)
+	if (m_st1.sxm)
 	{
 		d = (INT32)(INT16)(data) << shift;
 	}
@@ -303,27 +300,27 @@ static void op_add_mem(tms32051_state *cpustate)
 		d = (UINT32)(UINT16)(data) << shift;
 	}
 
-	cpustate->acc = ADD(cpustate, cpustate->acc, d);
+	m_acc = ADD(m_acc, d);
 
 	CYCLES(1);
 }
 
-static void op_add_simm(tms32051_state *cpustate)
+void tms32051_device::op_add_simm()
 {
-	UINT16 imm = cpustate->op & 0xff;
+	UINT16 imm = m_op & 0xff;
 
-	cpustate->acc = ADD(cpustate, cpustate->acc, imm);
+	m_acc = ADD(m_acc, imm);
 
 	CYCLES(1);
 }
 
-static void op_add_limm(tms32051_state *cpustate)
+void tms32051_device::op_add_limm()
 {
 	INT32 d;
-	UINT16 imm = ROPCODE(cpustate);
-	int shift = cpustate->op & 0xf;
+	UINT16 imm = ROPCODE();
+	int shift = m_op & 0xf;
 
-	if (cpustate->st1.sxm)
+	if (m_st1.sxm)
 	{
 		d = (INT32)(INT16)(imm) << shift;
 	}
@@ -332,392 +329,392 @@ static void op_add_limm(tms32051_state *cpustate)
 		d = (UINT32)(UINT16)(imm) << shift;
 	}
 
-	cpustate->acc = ADD(cpustate, cpustate->acc, d);
+	m_acc = ADD(m_acc, d);
 
 	CYCLES(2);
 }
 
-static void op_add_s16_mem(tms32051_state *cpustate)
+void tms32051_device::op_add_s16_mem()
 {
-	fatalerror("32051: unimplemented op add s16 mem at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op add s16 mem at %08X\n", m_pc-1);
 }
 
-static void op_addb(tms32051_state *cpustate)
+void tms32051_device::op_addb()
 {
-	cpustate->acc = ADD(cpustate, cpustate->acc, cpustate->accb);
+	m_acc = ADD(m_acc, m_accb);
 
 	CYCLES(1);
 }
 
-static void op_addc(tms32051_state *cpustate)
+void tms32051_device::op_addc()
 {
-	fatalerror("32051: unimplemented op addc at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op addc at %08X\n", m_pc-1);
 }
 
-static void op_adds(tms32051_state *cpustate)
+void tms32051_device::op_adds()
 {
-	fatalerror("32051: unimplemented op adds at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op adds at %08X\n", m_pc-1);
 }
 
-static void op_addt(tms32051_state *cpustate)
+void tms32051_device::op_addt()
 {
-	fatalerror("32051: unimplemented op addt at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op addt at %08X\n", m_pc-1);
 }
 
-static void op_and_mem(tms32051_state *cpustate)
+void tms32051_device::op_and_mem()
 {
-	fatalerror("32051: unimplemented op and mem at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op and mem at %08X\n", m_pc-1);
 }
 
-static void op_and_limm(tms32051_state *cpustate)
+void tms32051_device::op_and_limm()
 {
-	UINT32 imm = ROPCODE(cpustate);
-	int shift = cpustate->op & 0xf;
+	UINT32 imm = ROPCODE();
+	int shift = m_op & 0xf;
 
-	cpustate->acc &= imm << shift;
+	m_acc &= imm << shift;
 
 	CYCLES(2);
 }
 
-static void op_and_s16_limm(tms32051_state *cpustate)
+void tms32051_device::op_and_s16_limm()
 {
-	fatalerror("32051: unimplemented op and s16 limm at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op and s16 limm at %08X\n", m_pc-1);
 }
 
-static void op_andb(tms32051_state *cpustate)
+void tms32051_device::op_andb()
 {
-	fatalerror("32051: unimplemented op andb at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op andb at %08X\n", m_pc-1);
 }
 
-static void op_bsar(tms32051_state *cpustate)
+void tms32051_device::op_bsar()
 {
-	int shift = (cpustate->op & 0xf) + 1;
+	int shift = (m_op & 0xf) + 1;
 
-	if (cpustate->st1.sxm)
+	if (m_st1.sxm)
 	{
-		cpustate->acc = (INT32)(cpustate->acc) >> shift;
+		m_acc = (INT32)(m_acc) >> shift;
 	}
 	else
 	{
-		cpustate->acc = (UINT32)(cpustate->acc) >> shift;
+		m_acc = (UINT32)(m_acc) >> shift;
 	}
 
 	CYCLES(1);
 }
 
-static void op_cmpl(tms32051_state *cpustate)
+void tms32051_device::op_cmpl()
 {
-	cpustate->acc = ~(UINT32)(cpustate->acc);
+	m_acc = ~(UINT32)(m_acc);
 
 	CYCLES(1);
 }
 
-static void op_crgt(tms32051_state *cpustate)
+void tms32051_device::op_crgt()
 {
-	if (cpustate->acc >= cpustate->accb)
+	if (m_acc >= m_accb)
 	{
-		cpustate->accb = cpustate->acc;
-		cpustate->st1.c = 1;
+		m_accb = m_acc;
+		m_st1.c = 1;
 	}
 	else
 	{
-		cpustate->acc = cpustate->accb;
-		cpustate->st1.c = 0;
+		m_acc = m_accb;
+		m_st1.c = 0;
 	}
 
 	CYCLES(1);
 }
 
-static void op_crlt(tms32051_state *cpustate)
+void tms32051_device::op_crlt()
 {
-	if (cpustate->acc >= cpustate->accb)
+	if (m_acc >= m_accb)
 	{
-		cpustate->acc = cpustate->accb;
-		cpustate->st1.c = 0;
+		m_acc = m_accb;
+		m_st1.c = 0;
 	}
 	else
 	{
-		cpustate->accb = cpustate->acc;
-		cpustate->st1.c = 1;
+		m_accb = m_acc;
+		m_st1.c = 1;
 	}
 
 	CYCLES(1);
 }
 
-static void op_exar(tms32051_state *cpustate)
+void tms32051_device::op_exar()
 {
-	INT32 tmp = cpustate->acc;
-	cpustate->acc = cpustate->accb;
-	cpustate->accb = tmp;
+	INT32 tmp = m_acc;
+	m_acc = m_accb;
+	m_accb = tmp;
 
 	CYCLES(1);
 }
 
-static void op_lacb(tms32051_state *cpustate)
+void tms32051_device::op_lacb()
 {
-	cpustate->acc = cpustate->accb;
+	m_acc = m_accb;
 
 	CYCLES(1);
 }
 
-static void op_lacc_mem(tms32051_state *cpustate)
+void tms32051_device::op_lacc_mem()
 {
-	int shift = (cpustate->op >> 8) & 0xf;
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	int shift = (m_op >> 8) & 0xf;
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
 
-	if (cpustate->st1.sxm)
+	if (m_st1.sxm)
 	{
-		cpustate->acc = (INT32)(INT16)(data) << shift;
+		m_acc = (INT32)(INT16)(data) << shift;
 	}
 	else
 	{
-		cpustate->acc = (UINT32)(UINT16)(data) << shift;
+		m_acc = (UINT32)(UINT16)(data) << shift;
 	}
 
 	CYCLES(1);
 }
 
-static void op_lacc_limm(tms32051_state *cpustate)
+void tms32051_device::op_lacc_limm()
 {
-	UINT16 imm = ROPCODE(cpustate);
-	int shift = cpustate->op & 0xf;
+	UINT16 imm = ROPCODE();
+	int shift = m_op & 0xf;
 
-	if (cpustate->st1.sxm)
+	if (m_st1.sxm)
 	{
-		cpustate->acc = (INT32)(INT16)(imm) << shift;
+		m_acc = (INT32)(INT16)(imm) << shift;
 	}
 	else
 	{
-		cpustate->acc = (UINT32)(UINT16)(imm) << shift;
+		m_acc = (UINT32)(UINT16)(imm) << shift;
 	}
 
 	CYCLES(1);
 }
 
-static void op_lacc_s16_mem(tms32051_state *cpustate)
+void tms32051_device::op_lacc_s16_mem()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	cpustate->acc = DM_READ16(cpustate, ea) << 16;
+	UINT16 ea = GET_ADDRESS();
+	m_acc = DM_READ16(ea) << 16;
 
 	CYCLES(1);
 }
 
-static void op_lacl_simm(tms32051_state *cpustate)
+void tms32051_device::op_lacl_simm()
 {
-	cpustate->acc = cpustate->op & 0xff;
+	m_acc = m_op & 0xff;
 
 	CYCLES(1);
 }
 
-static void op_lacl_mem(tms32051_state *cpustate)
+void tms32051_device::op_lacl_mem()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	cpustate->acc = DM_READ16(cpustate, ea) & 0xffff;
+	UINT16 ea = GET_ADDRESS();
+	m_acc = DM_READ16(ea) & 0xffff;
 
 	CYCLES(1);
 }
 
-static void op_lact(tms32051_state *cpustate)
+void tms32051_device::op_lact()
 {
-	fatalerror("32051: unimplemented op lact at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lact at %08X\n", m_pc-1);
 }
 
-static void op_lamm(tms32051_state *cpustate)
+void tms32051_device::op_lamm()
 {
-	UINT16 ea = GET_ADDRESS(cpustate) & 0x7f;
-	cpustate->acc = DM_READ16(cpustate, ea) & 0xffff;
+	UINT16 ea = GET_ADDRESS() & 0x7f;
+	m_acc = DM_READ16(ea) & 0xffff;
 
 	CYCLES(1);
 }
 
-static void op_neg(tms32051_state *cpustate)
+void tms32051_device::op_neg()
 {
-	if ((UINT32)(cpustate->acc) == 0x80000000)
+	if ((UINT32)(m_acc) == 0x80000000)
 	{
-		cpustate->st0.ov = 1;
-		cpustate->st1.c = 0;
-		cpustate->acc = (cpustate->st0.ovm) ? 0x7fffffff : 0x80000000;
+		m_st0.ov = 1;
+		m_st1.c = 0;
+		m_acc = (m_st0.ovm) ? 0x7fffffff : 0x80000000;
 	}
 	else
 	{
-		cpustate->acc = 0 - (UINT32)(cpustate->acc);
-		cpustate->st1.c = (cpustate->acc == 0) ? 1 : 0;
+		m_acc = 0 - (UINT32)(m_acc);
+		m_st1.c = (m_acc == 0) ? 1 : 0;
 	}
 
 	CYCLES(1);
 }
 
-static void op_norm(tms32051_state *cpustate)
+void tms32051_device::op_norm()
 {
-	fatalerror("32051: unimplemented op norm at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op norm at %08X\n", m_pc-1);
 }
 
-static void op_or_mem(tms32051_state *cpustate)
+void tms32051_device::op_or_mem()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
 
-	cpustate->acc |= (UINT32)(data);
+	m_acc |= (UINT32)(data);
 
 	CYCLES(1);
 }
 
-static void op_or_limm(tms32051_state *cpustate)
+void tms32051_device::op_or_limm()
 {
-	UINT32 imm = ROPCODE(cpustate);
-	int shift = cpustate->op & 0xf;
+	UINT32 imm = ROPCODE();
+	int shift = m_op & 0xf;
 
-	cpustate->acc |= imm << shift;
+	m_acc |= imm << shift;
 
 	CYCLES(1);
 }
 
-static void op_or_s16_limm(tms32051_state *cpustate)
+void tms32051_device::op_or_s16_limm()
 {
-	fatalerror("32051: unimplemented op or s16 limm at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op or s16 limm at %08X\n", m_pc-1);
 }
 
-static void op_orb(tms32051_state *cpustate)
+void tms32051_device::op_orb()
 {
-	cpustate->acc |= cpustate->accb;
+	m_acc |= m_accb;
 
 	CYCLES(1);
 }
 
-static void op_rol(tms32051_state *cpustate)
+void tms32051_device::op_rol()
 {
-	fatalerror("32051: unimplemented op rol at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op rol at %08X\n", m_pc-1);
 }
 
-static void op_rolb(tms32051_state *cpustate)
+void tms32051_device::op_rolb()
 {
-	UINT32 acc = cpustate->acc;
-	UINT32 accb = cpustate->accb;
-	UINT32 c = cpustate->st1.c & 1;
+	UINT32 acc = m_acc;
+	UINT32 accb = m_accb;
+	UINT32 c = m_st1.c & 1;
 
-	cpustate->acc = (acc << 1) | ((accb >> 31) & 1);
-	cpustate->accb = (accb << 1) | c;
-	cpustate->st1.c = (acc >> 31) & 1;
+	m_acc = (acc << 1) | ((accb >> 31) & 1);
+	m_accb = (accb << 1) | c;
+	m_st1.c = (acc >> 31) & 1;
 
 	CYCLES(1);
 }
 
-static void op_ror(tms32051_state *cpustate)
+void tms32051_device::op_ror()
 {
-	fatalerror("32051: unimplemented op ror at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op ror at %08X\n", m_pc-1);
 }
 
-static void op_rorb(tms32051_state *cpustate)
+void tms32051_device::op_rorb()
 {
-	fatalerror("32051: unimplemented op rorb at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op rorb at %08X\n", m_pc-1);
 }
 
-static void op_sacb(tms32051_state *cpustate)
+void tms32051_device::op_sacb()
 {
-	cpustate->accb = cpustate->acc;
+	m_accb = m_acc;
 
 	CYCLES(1);
 }
 
-static void op_sach(tms32051_state *cpustate)
+void tms32051_device::op_sach()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	int shift = (cpustate->op >> 8) & 0x7;
+	UINT16 ea = GET_ADDRESS();
+	int shift = (m_op >> 8) & 0x7;
 
-	DM_WRITE16(cpustate, ea, (UINT16)((cpustate->acc << shift) >> 16));
+	DM_WRITE16(ea, (UINT16)((m_acc << shift) >> 16));
 	CYCLES(1);
 }
 
-static void op_sacl(tms32051_state *cpustate)
+void tms32051_device::op_sacl()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	int shift = (cpustate->op >> 8) & 0x7;
+	UINT16 ea = GET_ADDRESS();
+	int shift = (m_op >> 8) & 0x7;
 
-	DM_WRITE16(cpustate, ea, (UINT16)(cpustate->acc << shift));
+	DM_WRITE16(ea, (UINT16)(m_acc << shift));
 	CYCLES(1);
 }
 
-static void op_samm(tms32051_state *cpustate)
+void tms32051_device::op_samm()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
+	UINT16 ea = GET_ADDRESS();
 	ea &= 0x7f;
 
-	DM_WRITE16(cpustate, ea, (UINT16)(cpustate->acc));
+	DM_WRITE16(ea, (UINT16)(m_acc));
 	CYCLES(1);
 }
 
-static void op_sath(tms32051_state *cpustate)
+void tms32051_device::op_sath()
 {
-	fatalerror("32051: unimplemented op sath at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sath at %08X\n", m_pc-1);
 }
 
-static void op_satl(tms32051_state *cpustate)
+void tms32051_device::op_satl()
 {
-	fatalerror("32051: unimplemented op satl at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op satl at %08X\n", m_pc-1);
 }
 
-static void op_sbb(tms32051_state *cpustate)
+void tms32051_device::op_sbb()
 {
-	cpustate->acc = SUB(cpustate, cpustate->acc, cpustate->accb);
-
-	CYCLES(1);
-}
-
-static void op_sbbb(tms32051_state *cpustate)
-{
-	fatalerror("32051: unimplemented op sbbb at %08X\n", cpustate->pc-1);
-}
-
-static void op_sfl(tms32051_state *cpustate)
-{
-	cpustate->st1.c = (cpustate->acc >> 31) & 1;
-	cpustate->acc = cpustate->acc << 1;
+	m_acc = SUB(m_acc, m_accb);
 
 	CYCLES(1);
 }
 
-static void op_sflb(tms32051_state *cpustate)
+void tms32051_device::op_sbbb()
 {
-	UINT32 acc = cpustate->acc;
-	UINT32 accb = cpustate->accb;
+	fatalerror("32051: unimplemented op sbbb at %08X\n", m_pc-1);
+}
 
-	cpustate->acc = (acc << 1) | ((accb >> 31) & 1);
-	cpustate->accb = (accb << 1);
-	cpustate->st1.c = (acc >> 31) & 1;
+void tms32051_device::op_sfl()
+{
+	m_st1.c = (m_acc >> 31) & 1;
+	m_acc = m_acc << 1;
 
 	CYCLES(1);
 }
 
-static void op_sfr(tms32051_state *cpustate)
+void tms32051_device::op_sflb()
 {
-	cpustate->st1.c = cpustate->acc & 1;
+	UINT32 acc = m_acc;
+	UINT32 accb = m_accb;
 
-	if (cpustate->st1.sxm)
+	m_acc = (acc << 1) | ((accb >> 31) & 1);
+	m_accb = (accb << 1);
+	m_st1.c = (acc >> 31) & 1;
+
+	CYCLES(1);
+}
+
+void tms32051_device::op_sfr()
+{
+	m_st1.c = m_acc & 1;
+
+	if (m_st1.sxm)
 	{
-		cpustate->acc = (INT32)(cpustate->acc) >> 1;
+		m_acc = (INT32)(m_acc) >> 1;
 	}
 	else
 	{
-		cpustate->acc = (UINT32)(cpustate->acc) >> 1;
+		m_acc = (UINT32)(m_acc) >> 1;
 	}
 
 	CYCLES(1);
 }
 
-static void op_sfrb(tms32051_state *cpustate)
+void tms32051_device::op_sfrb()
 {
-	fatalerror("32051: unimplemented op sfrb at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sfrb at %08X\n", m_pc-1);
 }
 
-static void op_sub_mem(tms32051_state *cpustate)
+void tms32051_device::op_sub_mem()
 {
 	INT32 d;
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
-	int shift = (cpustate->op >> 8) & 0xf;
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
+	int shift = (m_op >> 8) & 0xf;
 
-	if (cpustate->st1.sxm)
+	if (m_st1.sxm)
 	{
 		d = (INT32)(INT16)(data) << shift;
 	}
@@ -726,32 +723,32 @@ static void op_sub_mem(tms32051_state *cpustate)
 		d = (UINT32)(UINT16)(data) << shift;
 	}
 
-	cpustate->acc = SUB(cpustate, cpustate->acc, d);
+	m_acc = SUB(m_acc, d);
 
 	CYCLES(1);
 }
 
-static void op_sub_s16_mem(tms32051_state *cpustate)
+void tms32051_device::op_sub_s16_mem()
 {
-	fatalerror("32051: unimplemented op sub s16 mem at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sub s16 mem at %08X\n", m_pc-1);
 }
 
-static void op_sub_simm(tms32051_state *cpustate)
+void tms32051_device::op_sub_simm()
 {
-	UINT16 imm = cpustate->op & 0xff;
+	UINT16 imm = m_op & 0xff;
 
-	cpustate->acc = SUB(cpustate, cpustate->acc, imm);
+	m_acc = SUB(m_acc, imm);
 
 	CYCLES(1);
 }
 
-static void op_sub_limm(tms32051_state *cpustate)
+void tms32051_device::op_sub_limm()
 {
 	INT32 d;
-	UINT16 imm = ROPCODE(cpustate);
-	int shift = cpustate->op & 0xf;
+	UINT16 imm = ROPCODE();
+	int shift = m_op & 0xf;
 
-	if (cpustate->st1.sxm)
+	if (m_st1.sxm)
 	{
 		d = (INT32)(INT16)(imm) << shift;
 	}
@@ -760,119 +757,119 @@ static void op_sub_limm(tms32051_state *cpustate)
 		d = (UINT32)(UINT16)(imm) << shift;
 	}
 
-	cpustate->acc = SUB(cpustate, cpustate->acc, d);
+	m_acc = SUB(m_acc, d);
 
 	CYCLES(2);
 }
 
-static void op_subb(tms32051_state *cpustate)
+void tms32051_device::op_subb()
 {
-	fatalerror("32051: unimplemented op subb at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op subb at %08X\n", m_pc-1);
 }
 
-static void op_subc(tms32051_state *cpustate)
+void tms32051_device::op_subc()
 {
-	fatalerror("32051: unimplemented op subc at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op subc at %08X\n", m_pc-1);
 }
 
-static void op_subs(tms32051_state *cpustate)
+void tms32051_device::op_subs()
 {
-	fatalerror("32051: unimplemented op subs at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op subs at %08X\n", m_pc-1);
 }
 
-static void op_subt(tms32051_state *cpustate)
+void tms32051_device::op_subt()
 {
-	fatalerror("32051: unimplemented op subt at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op subt at %08X\n", m_pc-1);
 }
 
-static void op_xor_mem(tms32051_state *cpustate)
+void tms32051_device::op_xor_mem()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
 
-	cpustate->acc ^= (UINT32)(data);
+	m_acc ^= (UINT32)(data);
 
 	CYCLES(1);
 }
 
-static void op_xor_limm(tms32051_state *cpustate)
+void tms32051_device::op_xor_limm()
 {
-	UINT32 imm = ROPCODE(cpustate);
-	int shift = cpustate->op & 0xf;
+	UINT32 imm = ROPCODE();
+	int shift = m_op & 0xf;
 
-	cpustate->acc ^= imm << shift;
+	m_acc ^= imm << shift;
 
 	CYCLES(1);
 }
 
-static void op_xor_s16_limm(tms32051_state *cpustate)
+void tms32051_device::op_xor_s16_limm()
 {
-	fatalerror("32051: unimplemented op xor s16 limm at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op xor s16 limm at %08X\n", m_pc-1);
 }
 
-static void op_xorb(tms32051_state *cpustate)
+void tms32051_device::op_xorb()
 {
-	fatalerror("32051: unimplemented op xorb at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op xorb at %08X\n", m_pc-1);
 }
 
-static void op_zalr(tms32051_state *cpustate)
+void tms32051_device::op_zalr()
 {
-	fatalerror("32051: unimplemented op zalr at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op zalr at %08X\n", m_pc-1);
 }
 
-static void op_zap(tms32051_state *cpustate)
+void tms32051_device::op_zap()
 {
-	cpustate->acc = 0;
-	cpustate->preg = 0;
+	m_acc = 0;
+	m_preg = 0;
 
 	CYCLES(1);
 }
 
 /*****************************************************************************/
 
-static void op_adrk(tms32051_state *cpustate)
+void tms32051_device::op_adrk()
 {
-	UINT16 imm = cpustate->op & 0xff;
-	UPDATE_AR(cpustate, cpustate->st0.arp, imm);
+	UINT16 imm = m_op & 0xff;
+	UPDATE_AR(m_st0.arp, imm);
 
 	CYCLES(1);
 }
 
-static void op_cmpr(tms32051_state *cpustate)
+void tms32051_device::op_cmpr()
 {
-	cpustate->st1.tc = 0;
+	m_st1.tc = 0;
 
-	switch (cpustate->op & 0x3)
+	switch (m_op & 0x3)
 	{
 		case 0:         // (CurrentAR) == ARCR
 		{
-			if (cpustate->ar[cpustate->st0.arp] == cpustate->arcr)
+			if (m_ar[m_st0.arp] == m_arcr)
 			{
-				cpustate->st1.tc = 1;
+				m_st1.tc = 1;
 			}
 			break;
 		}
 		case 1:         // (CurrentAR) < ARCR
 		{
-			if (cpustate->ar[cpustate->st0.arp] < cpustate->arcr)
+			if (m_ar[m_st0.arp] < m_arcr)
 			{
-				cpustate->st1.tc = 1;
+				m_st1.tc = 1;
 			}
 			break;
 		}
 		case 2:         // (CurrentAR) > ARCR
 		{
-			if (cpustate->ar[cpustate->st0.arp] > cpustate->arcr)
+			if (m_ar[m_st0.arp] > m_arcr)
 			{
-				cpustate->st1.tc = 1;
+				m_st1.tc = 1;
 			}
 			break;
 		}
 		case 3:         // (CurrentAR) != ARCR
 		{
-			if (cpustate->ar[cpustate->st0.arp] != cpustate->arcr)
+			if (m_ar[m_st0.arp] != m_arcr)
 			{
-				cpustate->st1.tc = 1;
+				m_st1.tc = 1;
 			}
 			break;
 		}
@@ -881,108 +878,108 @@ static void op_cmpr(tms32051_state *cpustate)
 	CYCLES(1);
 }
 
-static void op_lar_mem(tms32051_state *cpustate)
+void tms32051_device::op_lar_mem()
 {
-	int arx = (cpustate->op >> 8) & 0x7;
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	int arx = (m_op >> 8) & 0x7;
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
 
-	cpustate->ar[arx] = data;
+	m_ar[arx] = data;
 
 	CYCLES(2);
 }
 
-static void op_lar_simm(tms32051_state *cpustate)
+void tms32051_device::op_lar_simm()
 {
-	int arx = (cpustate->op >> 8) & 0x7;
-	cpustate->ar[arx] = cpustate->op & 0xff;
+	int arx = (m_op >> 8) & 0x7;
+	m_ar[arx] = m_op & 0xff;
 
 	CYCLES(2);
 }
 
-static void op_lar_limm(tms32051_state *cpustate)
+void tms32051_device::op_lar_limm()
 {
-	int arx = cpustate->op & 0x7;
-	UINT16 imm = ROPCODE(cpustate);
-	cpustate->ar[arx] = imm;
+	int arx = m_op & 0x7;
+	UINT16 imm = ROPCODE();
+	m_ar[arx] = imm;
 
 	CYCLES(2);
 }
 
-static void op_ldp_mem(tms32051_state *cpustate)
+void tms32051_device::op_ldp_mem()
 {
-	fatalerror("32051: unimplemented op ldp mem at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op ldp mem at %08X\n", m_pc-1);
 }
 
-static void op_ldp_imm(tms32051_state *cpustate)
+void tms32051_device::op_ldp_imm()
 {
-	cpustate->st0.dp = (cpustate->op & 0x1ff) << 7;
+	m_st0.dp = (m_op & 0x1ff) << 7;
 	CYCLES(2);
 }
 
-static void op_mar(tms32051_state *cpustate)
+void tms32051_device::op_mar()
 {
 	// direct addressing is NOP
-	if (cpustate->op & 0x80)
+	if (m_op & 0x80)
 	{
-		GET_ADDRESS(cpustate);
+		GET_ADDRESS();
 	}
 	CYCLES(1);
 }
 
-static void op_sar(tms32051_state *cpustate)
+void tms32051_device::op_sar()
 {
-	int arx = (cpustate->op >> 8) & 0x7;
-	UINT16 ar = cpustate->ar[arx];
-	UINT16 ea = GET_ADDRESS(cpustate);
-	DM_WRITE16(cpustate, ea, ar);
+	int arx = (m_op >> 8) & 0x7;
+	UINT16 ar = m_ar[arx];
+	UINT16 ea = GET_ADDRESS();
+	DM_WRITE16(ea, ar);
 
 	CYCLES(1);
 }
 
-static void op_sbrk(tms32051_state *cpustate)
+void tms32051_device::op_sbrk()
 {
-	UINT16 imm = cpustate->op & 0xff;
-	UPDATE_AR(cpustate, cpustate->st0.arp, -imm);
+	UINT16 imm = m_op & 0xff;
+	UPDATE_AR(m_st0.arp, -imm);
 
 	CYCLES(1);
 }
 
 /*****************************************************************************/
 
-static void op_b(tms32051_state *cpustate)
+void tms32051_device::op_b()
 {
-	UINT16 pma = ROPCODE(cpustate);
-	GET_ADDRESS(cpustate);      // update AR/ARP
+	UINT16 pma = ROPCODE();
+	GET_ADDRESS();      // update AR/ARP
 
-	CHANGE_PC(cpustate, pma);
+	CHANGE_PC(pma);
 	CYCLES(4);
 }
 
-static void op_bacc(tms32051_state *cpustate)
+void tms32051_device::op_bacc()
 {
-	CHANGE_PC(cpustate, (UINT16)(cpustate->acc));
+	CHANGE_PC((UINT16)(m_acc));
 
 	CYCLES(4);
 }
 
-static void op_baccd(tms32051_state *cpustate)
+void tms32051_device::op_baccd()
 {
-	UINT16 pc = (UINT16)(cpustate->acc);
+	UINT16 pc = (UINT16)(m_acc);
 
-	delay_slot(cpustate, cpustate->pc);
-	CHANGE_PC(cpustate, pc);
+	delay_slot(m_pc);
+	CHANGE_PC(pc);
 
 	CYCLES(2);
 }
 
-static void op_banz(tms32051_state *cpustate)
+void tms32051_device::op_banz()
 {
-	UINT16 pma = ROPCODE(cpustate);
+	UINT16 pma = ROPCODE();
 
-	if (cpustate->ar[cpustate->st0.arp] != 0)
+	if (m_ar[m_st0.arp] != 0)
 	{
-		CHANGE_PC(cpustate, pma);
+		CHANGE_PC(pma);
 		CYCLES(4);
 	}
 	else
@@ -990,37 +987,21 @@ static void op_banz(tms32051_state *cpustate)
 		CYCLES(2);
 	}
 
-	GET_ADDRESS(cpustate);      // modify AR/ARP
+	GET_ADDRESS();      // modify AR/ARP
 }
 
-static void op_banzd(tms32051_state *cpustate)
+void tms32051_device::op_banzd()
 {
-	fatalerror("32051: unimplemented op banzd at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op banzd at %08X\n", m_pc-1);
 }
 
-static void op_bcnd(tms32051_state *cpustate)
+void tms32051_device::op_bcnd()
 {
-	UINT16 pma = ROPCODE(cpustate);
+	UINT16 pma = ROPCODE();
 
-	if (GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
-		CHANGE_PC(cpustate, pma);
-		CYCLES(4);
-	}
-	else
-	{
-		CYCLES(2);
-	}
-}
-
-static void op_bcndd(tms32051_state *cpustate)
-{
-	UINT16 pma = ROPCODE(cpustate);
-
-	if (GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
-	{
-		delay_slot(cpustate, cpustate->pc);
-		CHANGE_PC(cpustate, pma);
+		CHANGE_PC(pma);
 		CYCLES(4);
 	}
 	else
@@ -1029,95 +1010,111 @@ static void op_bcndd(tms32051_state *cpustate)
 	}
 }
 
-static void op_bd(tms32051_state *cpustate)
+void tms32051_device::op_bcndd()
 {
-	UINT16 pma = ROPCODE(cpustate);
-	GET_ADDRESS(cpustate);      // update AR/ARP
+	UINT16 pma = ROPCODE();
 
-	delay_slot(cpustate, cpustate->pc);
-	CHANGE_PC(cpustate, pma);
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
+	{
+		delay_slot(m_pc);
+		CHANGE_PC(pma);
+		CYCLES(4);
+	}
+	else
+	{
+		CYCLES(2);
+	}
+}
+
+void tms32051_device::op_bd()
+{
+	UINT16 pma = ROPCODE();
+	GET_ADDRESS();      // update AR/ARP
+
+	delay_slot(m_pc);
+	CHANGE_PC(pma);
 	CYCLES(2);
 }
 
-static void op_cala(tms32051_state *cpustate)
+void tms32051_device::op_cala()
 {
-	PUSH_STACK(cpustate, cpustate->pc);
+	PUSH_STACK(m_pc);
 
-	CHANGE_PC(cpustate, cpustate->acc);
+	CHANGE_PC(m_acc);
 
 	CYCLES(4);
 }
 
-static void op_calad(tms32051_state *cpustate)
+void tms32051_device::op_calad()
 {
-	UINT16 pma = cpustate->acc;
-	PUSH_STACK(cpustate, cpustate->pc+2);
+	UINT16 pma = m_acc;
+	PUSH_STACK(m_pc+2);
 
-	delay_slot(cpustate, cpustate->pc);
-	CHANGE_PC(cpustate, pma);
+	delay_slot(m_pc);
+	CHANGE_PC(pma);
 
 	CYCLES(4);
 }
 
-static void op_call(tms32051_state *cpustate)
+void tms32051_device::op_call()
 {
-	UINT16 pma = ROPCODE(cpustate);
-	GET_ADDRESS(cpustate);      // update AR/ARP
-	PUSH_STACK(cpustate, cpustate->pc);
+	UINT16 pma = ROPCODE();
+	GET_ADDRESS();      // update AR/ARP
+	PUSH_STACK(m_pc);
 
-	CHANGE_PC(cpustate, pma);
+	CHANGE_PC(pma);
 
 	CYCLES(4);
 }
 
-static void op_calld(tms32051_state *cpustate)
+void tms32051_device::op_calld()
 {
-	UINT16 pma = ROPCODE(cpustate);
-	GET_ADDRESS(cpustate);      // update AR/ARP
-	PUSH_STACK(cpustate, cpustate->pc+2);
+	UINT16 pma = ROPCODE();
+	GET_ADDRESS();      // update AR/ARP
+	PUSH_STACK(m_pc+2);
 
-	delay_slot(cpustate, cpustate->pc);
-	CHANGE_PC(cpustate, pma);
+	delay_slot(m_pc);
+	CHANGE_PC(pma);
 
 	CYCLES(4);
 }
 
-static void op_cc(tms32051_state *cpustate)
+void tms32051_device::op_cc()
 {
-	fatalerror("32051: unimplemented op cc at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op cc at %08X\n", m_pc-1);
 }
 
-static void op_ccd(tms32051_state *cpustate)
+void tms32051_device::op_ccd()
 {
-	UINT16 pma = ROPCODE(cpustate);
+	UINT16 pma = ROPCODE();
 
-	if (GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
-		PUSH_STACK(cpustate, cpustate->pc+2);
+		PUSH_STACK(m_pc+2);
 
-		delay_slot(cpustate, cpustate->pc);
-		CHANGE_PC(cpustate, pma);
+		delay_slot(m_pc);
+		CHANGE_PC(pma);
 	}
 
 	CYCLES(2);
 }
 
-static void op_intr(tms32051_state *cpustate)
+void tms32051_device::op_intr()
 {
-	fatalerror("32051: unimplemented op intr at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op intr at %08X\n", m_pc-1);
 }
 
-static void op_nmi(tms32051_state *cpustate)
+void tms32051_device::op_nmi()
 {
-	fatalerror("32051: unimplemented op nmi at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op nmi at %08X\n", m_pc-1);
 }
 
-static void op_retc(tms32051_state *cpustate)
+void tms32051_device::op_retc()
 {
-	if ((cpustate->op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
+	if ((m_op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
-		UINT16 pc = POP_STACK(cpustate);
-		CHANGE_PC(cpustate, pc);
+		UINT16 pc = POP_STACK();
+		CHANGE_PC(pc);
 		CYCLES(4);
 	}
 	else
@@ -1126,13 +1123,13 @@ static void op_retc(tms32051_state *cpustate)
 	}
 }
 
-static void op_retcd(tms32051_state *cpustate)
+void tms32051_device::op_retcd()
 {
-	if ((cpustate->op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
+	if ((m_op & 0x3ff) == 0x300 || GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
-		UINT16 pc = POP_STACK(cpustate);
-		delay_slot(cpustate, cpustate->pc);
-		CHANGE_PC(cpustate, pc);
+		UINT16 pc = POP_STACK();
+		delay_slot(m_pc);
+		CHANGE_PC(pc);
 		CYCLES(4);
 	}
 	else
@@ -1141,665 +1138,665 @@ static void op_retcd(tms32051_state *cpustate)
 	}
 }
 
-static void op_rete(tms32051_state *cpustate)
+void tms32051_device::op_rete()
 {
-	UINT16 pc = POP_STACK(cpustate);
-	CHANGE_PC(cpustate, pc);
+	UINT16 pc = POP_STACK();
+	CHANGE_PC(pc);
 
-	cpustate->st0.intm = 0;
+	m_st0.intm = 0;
 
-	restore_interrupt_context(cpustate);
+	restore_interrupt_context();
 
 	CYCLES(4);
 }
 
-static void op_reti(tms32051_state *cpustate)
+void tms32051_device::op_reti()
 {
-	fatalerror("32051: unimplemented op reti at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op reti at %08X\n", m_pc-1);
 }
 
-static void op_trap(tms32051_state *cpustate)
+void tms32051_device::op_trap()
 {
-	fatalerror("32051: unimplemented op trap at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op trap at %08X\n", m_pc-1);
 }
 
-static void op_xc(tms32051_state *cpustate)
+void tms32051_device::op_xc()
 {
-	if (GET_ZLVC_CONDITION(cpustate, (cpustate->op >> 4) & 0xf, cpustate->op & 0xf) || GET_TP_CONDITION(cpustate, (cpustate->op >> 8) & 0x3))
+	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) || GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
 		CYCLES(1);
 	}
 	else
 	{
-		int n = ((cpustate->op >> 12) & 0x1) + 1;
-		CHANGE_PC(cpustate, cpustate->pc + n);
+		int n = ((m_op >> 12) & 0x1) + 1;
+		CHANGE_PC(m_pc + n);
 		CYCLES(1 + n);
 	}
 }
 
 /*****************************************************************************/
 
-static void op_bldd_slimm(tms32051_state *cpustate)
+void tms32051_device::op_bldd_slimm()
 {
-	UINT16 pfc = ROPCODE(cpustate);
+	UINT16 pfc = ROPCODE();
 
-	while (cpustate->rptc > -1)
+	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS(cpustate);
-		UINT16 data = DM_READ16(cpustate, pfc);
-		DM_WRITE16(cpustate, ea, data);
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = DM_READ16(pfc);
+		DM_WRITE16(ea, data);
 		pfc++;
 		CYCLES(2);
 
-		cpustate->rptc--;
+		m_rptc--;
 	};
 }
 
-static void op_bldd_dlimm(tms32051_state *cpustate)
+void tms32051_device::op_bldd_dlimm()
 {
-	UINT16 pfc = ROPCODE(cpustate);
+	UINT16 pfc = ROPCODE();
 
-	while (cpustate->rptc > -1)
+	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS(cpustate);
-		UINT16 data = DM_READ16(cpustate, ea);
-		DM_WRITE16(cpustate, pfc, data);
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = DM_READ16(ea);
+		DM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(2);
 
-		cpustate->rptc--;
+		m_rptc--;
 	};
 }
 
-static void op_bldd_sbmar(tms32051_state *cpustate)
+void tms32051_device::op_bldd_sbmar()
 {
-	fatalerror("32051: unimplemented op bldd sbmar at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op bldd sbmar at %08X\n", m_pc-1);
 }
 
-static void op_bldd_dbmar(tms32051_state *cpustate)
+void tms32051_device::op_bldd_dbmar()
 {
-	UINT16 pfc = cpustate->bmar;
+	UINT16 pfc = m_bmar;
 
-	while (cpustate->rptc > -1)
+	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS(cpustate);
-		UINT16 data = DM_READ16(cpustate, ea);
-		DM_WRITE16(cpustate, pfc, data);
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = DM_READ16(ea);
+		DM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(2);
 
-		cpustate->rptc--;
+		m_rptc--;
 	};
 }
 
-static void op_bldp(tms32051_state *cpustate)
+void tms32051_device::op_bldp()
 {
-	UINT16 pfc = cpustate->bmar;
+	UINT16 pfc = m_bmar;
 
-	while (cpustate->rptc > -1)
+	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS(cpustate);
-		UINT16 data = DM_READ16(cpustate, ea);
-		PM_WRITE16(cpustate, pfc, data);
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = DM_READ16(ea);
+		PM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(1);
 
-		cpustate->rptc--;
+		m_rptc--;
 	};
 }
 
-static void op_blpd_bmar(tms32051_state *cpustate)
+void tms32051_device::op_blpd_bmar()
 {
-	fatalerror("32051: unimplemented op bpld bmar at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op bpld bmar at %08X\n", m_pc-1);
 }
 
-static void op_blpd_imm(tms32051_state *cpustate)
+void tms32051_device::op_blpd_imm()
 {
-	UINT16 pfc = ROPCODE(cpustate);
+	UINT16 pfc = ROPCODE();
 
-	while (cpustate->rptc > -1)
+	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS(cpustate);
-		UINT16 data = PM_READ16(cpustate, pfc);
-		DM_WRITE16(cpustate, ea, data);
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = PM_READ16(pfc);
+		DM_WRITE16(ea, data);
 		pfc++;
 		CYCLES(2);
 
-		cpustate->rptc--;
+		m_rptc--;
 	};
 }
 
 /*****************************************************************************/
 
-static void op_dmov(tms32051_state *cpustate)
+void tms32051_device::op_dmov()
 {
-	fatalerror("32051: unimplemented op dmov at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op dmov at %08X\n", m_pc-1);
 }
 
-static void op_in(tms32051_state *cpustate)
+void tms32051_device::op_in()
 {
-	fatalerror("32051: unimplemented op in at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op in at %08X\n", m_pc-1);
 }
 
-static void op_lmmr(tms32051_state *cpustate)
+void tms32051_device::op_lmmr()
 {
-	UINT16 pfc = ROPCODE(cpustate);
+	UINT16 pfc = ROPCODE();
 
-	while (cpustate->rptc > -1)
+	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS(cpustate);
-		UINT16 data = DM_READ16(cpustate, pfc);
-		DM_WRITE16(cpustate, ea & 0x7f, data);
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = DM_READ16(pfc);
+		DM_WRITE16(ea & 0x7f, data);
 		pfc++;
 		CYCLES(2);
 
-		cpustate->rptc--;
+		m_rptc--;
 	};
 }
 
-static void op_out(tms32051_state *cpustate)
+void tms32051_device::op_out()
 {
-	fatalerror("32051: unimplemented op out at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op out at %08X\n", m_pc-1);
 }
 
-static void op_smmr(tms32051_state *cpustate)
+void tms32051_device::op_smmr()
 {
-	UINT16 pfc = ROPCODE(cpustate);
+	UINT16 pfc = ROPCODE();
 
-	while (cpustate->rptc > -1)
+	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS(cpustate);
-		UINT16 data = DM_READ16(cpustate, ea & 0x7f);
-		DM_WRITE16(cpustate, pfc, data);
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = DM_READ16(ea & 0x7f);
+		DM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(2);
 
-		cpustate->rptc--;
+		m_rptc--;
 	};
 }
 
-static void op_tblr(tms32051_state *cpustate)
+void tms32051_device::op_tblr()
 {
-	UINT16 pfc = (UINT16)(cpustate->acc);
+	UINT16 pfc = (UINT16)(m_acc);
 
-	while (cpustate->rptc > -1)
+	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS(cpustate);
-		UINT16 data = PM_READ16(cpustate, pfc);
-		DM_WRITE16(cpustate, ea, data);
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = PM_READ16(pfc);
+		DM_WRITE16(ea, data);
 		pfc++;
 		CYCLES(2);
 
-		cpustate->rptc--;
+		m_rptc--;
 	};
 }
 
-static void op_tblw(tms32051_state *cpustate)
+void tms32051_device::op_tblw()
 {
-	UINT16 pfc = (UINT16)(cpustate->acc);
+	UINT16 pfc = (UINT16)(m_acc);
 
-	while (cpustate->rptc > -1)
+	while (m_rptc > -1)
 	{
-		UINT16 ea = GET_ADDRESS(cpustate);
-		UINT16 data = DM_READ16(cpustate, ea);
-		PM_WRITE16(cpustate, pfc, data);
+		UINT16 ea = GET_ADDRESS();
+		UINT16 data = DM_READ16(ea);
+		PM_WRITE16(pfc, data);
 		pfc++;
 		CYCLES(2);
 
-		cpustate->rptc--;
+		m_rptc--;
 	};
 }
 
 /*****************************************************************************/
 
-static void op_apl_dbmr(tms32051_state *cpustate)
+void tms32051_device::op_apl_dbmr()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
-	data &= cpustate->dbmr;
-	DM_WRITE16(cpustate, ea, data);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
+	data &= m_dbmr;
+	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
 
-static void op_apl_imm(tms32051_state *cpustate)
+void tms32051_device::op_apl_imm()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 imm = ROPCODE(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 imm = ROPCODE();
+	UINT16 data = DM_READ16(ea);
 	data &= imm;
-	DM_WRITE16(cpustate, ea, data);
+	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
 
-static void op_cpl_dbmr(tms32051_state *cpustate)
+void tms32051_device::op_cpl_dbmr()
 {
-	fatalerror("32051: unimplemented op cpl dbmr at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op cpl dbmr at %08X\n", m_pc-1);
 }
 
-static void op_cpl_imm(tms32051_state *cpustate)
+void tms32051_device::op_cpl_imm()
 {
-	UINT16 imm = ROPCODE(cpustate);
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	UINT16 imm = ROPCODE();
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
 
-	cpustate->st1.tc = (data == imm) ? 1 : 0;
+	m_st1.tc = (data == imm) ? 1 : 0;
 
 	CYCLES(1);
 }
 
-static void op_opl_dbmr(tms32051_state *cpustate)
+void tms32051_device::op_opl_dbmr()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
-	data |= cpustate->dbmr;
-	DM_WRITE16(cpustate, ea, data);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
+	data |= m_dbmr;
+	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
 
-static void op_opl_imm(tms32051_state *cpustate)
+void tms32051_device::op_opl_imm()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 imm = ROPCODE(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 imm = ROPCODE();
+	UINT16 data = DM_READ16(ea);
 	data |= imm;
-	DM_WRITE16(cpustate, ea, data);
+	DM_WRITE16(ea, data);
 	CYCLES(1);
 }
 
-static void op_splk(tms32051_state *cpustate)
+void tms32051_device::op_splk()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 imm = ROPCODE(cpustate);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 imm = ROPCODE();
 
-	DM_WRITE16(cpustate, ea, imm);
+	DM_WRITE16(ea, imm);
 
 	CYCLES(2);
 }
 
-static void op_xpl_dbmr(tms32051_state *cpustate)
+void tms32051_device::op_xpl_dbmr()
 {
-	fatalerror("32051: unimplemented op xpl dbmr at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op xpl dbmr at %08X\n", m_pc-1);
 }
 
-static void op_xpl_imm(tms32051_state *cpustate)
+void tms32051_device::op_xpl_imm()
 {
-	fatalerror("32051: unimplemented op xpl imm at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op xpl imm at %08X\n", m_pc-1);
 }
 
-static void op_apac(tms32051_state *cpustate)
+void tms32051_device::op_apac()
 {
-	INT32 spreg = PREG_PSCALER(cpustate, cpustate->preg);
-	cpustate->acc = ADD(cpustate, cpustate->acc, spreg);
+	INT32 spreg = PREG_PSCALER(m_preg);
+	m_acc = ADD(m_acc, spreg);
 
 	CYCLES(1);
 }
 
-static void op_lph(tms32051_state *cpustate)
+void tms32051_device::op_lph()
 {
-	fatalerror("32051: unimplemented op lph at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lph at %08X\n", m_pc-1);
 }
 
-static void op_lt(tms32051_state *cpustate)
+void tms32051_device::op_lt()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
 
-	cpustate->treg0 = data;
-	if (cpustate->pmst.trm == 0)
+	m_treg0 = data;
+	if (m_pmst.trm == 0)
 	{
-		cpustate->treg1 = data;
-		cpustate->treg2 = data;
+		m_treg1 = data;
+		m_treg2 = data;
 	}
 
 	CYCLES(1);
 }
 
-static void op_lta(tms32051_state *cpustate)
+void tms32051_device::op_lta()
 {
 	INT32 spreg;
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
 
-	cpustate->treg0 = data;
-	spreg = PREG_PSCALER(cpustate, cpustate->preg);
-	cpustate->acc = ADD(cpustate, cpustate->acc, spreg);
-	if (cpustate->pmst.trm == 0)
+	m_treg0 = data;
+	spreg = PREG_PSCALER(m_preg);
+	m_acc = ADD(m_acc, spreg);
+	if (m_pmst.trm == 0)
 	{
-		cpustate->treg1 = data;
-		cpustate->treg2 = data;
+		m_treg1 = data;
+		m_treg2 = data;
 	}
 
 	CYCLES(1);
 }
 
-static void op_ltd(tms32051_state *cpustate)
+void tms32051_device::op_ltd()
 {
-	fatalerror("32051: unimplemented op ltd at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op ltd at %08X\n", m_pc-1);
 }
 
-static void op_ltp(tms32051_state *cpustate)
+void tms32051_device::op_ltp()
 {
-	fatalerror("32051: unimplemented op ltp at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op ltp at %08X\n", m_pc-1);
 }
 
-static void op_lts(tms32051_state *cpustate)
+void tms32051_device::op_lts()
 {
-	fatalerror("32051: unimplemented op lts at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lts at %08X\n", m_pc-1);
 }
 
-static void op_mac(tms32051_state *cpustate)
+void tms32051_device::op_mac()
 {
-	fatalerror("32051: unimplemented op mac at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mac at %08X\n", m_pc-1);
 }
 
-static void op_macd(tms32051_state *cpustate)
+void tms32051_device::op_macd()
 {
-	fatalerror("32051: unimplemented op macd at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op macd at %08X\n", m_pc-1);
 }
 
-static void op_madd(tms32051_state *cpustate)
+void tms32051_device::op_madd()
 {
-	fatalerror("32051: unimplemented op madd at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op madd at %08X\n", m_pc-1);
 }
 
-static void op_mads(tms32051_state *cpustate)
+void tms32051_device::op_mads()
 {
-	fatalerror("32051: unimplemented op mads at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mads at %08X\n", m_pc-1);
 }
 
-static void op_mpy_mem(tms32051_state *cpustate)
+void tms32051_device::op_mpy_mem()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	INT16 data = DM_READ16(cpustate, ea);
+	UINT16 ea = GET_ADDRESS();
+	INT16 data = DM_READ16(ea);
 
-	cpustate->preg = (INT32)(data) * (INT32)(INT16)(cpustate->treg0);
+	m_preg = (INT32)(data) * (INT32)(INT16)(m_treg0);
 
 	CYCLES(1);
 }
 
-static void op_mpy_simm(tms32051_state *cpustate)
+void tms32051_device::op_mpy_simm()
 {
-	fatalerror("32051: unimplemented op mpy simm at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpy simm at %08X\n", m_pc-1);
 }
 
-static void op_mpy_limm(tms32051_state *cpustate)
+void tms32051_device::op_mpy_limm()
 {
-	fatalerror("32051: unimplemented op mpy limm at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpy limm at %08X\n", m_pc-1);
 }
 
-static void op_mpya(tms32051_state *cpustate)
+void tms32051_device::op_mpya()
 {
-	fatalerror("32051: unimplemented op mpya at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpya at %08X\n", m_pc-1);
 }
 
-static void op_mpys(tms32051_state *cpustate)
+void tms32051_device::op_mpys()
 {
-	fatalerror("32051: unimplemented op mpys at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpys at %08X\n", m_pc-1);
 }
 
-static void op_mpyu(tms32051_state *cpustate)
+void tms32051_device::op_mpyu()
 {
-	fatalerror("32051: unimplemented op mpyu at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op mpyu at %08X\n", m_pc-1);
 }
 
-static void op_pac(tms32051_state *cpustate)
+void tms32051_device::op_pac()
 {
-	fatalerror("32051: unimplemented op pac at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op pac at %08X\n", m_pc-1);
 }
 
-static void op_spac(tms32051_state *cpustate)
+void tms32051_device::op_spac()
 {
-	fatalerror("32051: unimplemented op spac at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op spac at %08X\n", m_pc-1);
 }
 
-static void op_sph(tms32051_state *cpustate)
+void tms32051_device::op_sph()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 spreg = (UINT16)(PREG_PSCALER(cpustate, cpustate->preg) >> 16);
-	DM_WRITE16(cpustate, ea, spreg);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 spreg = (UINT16)(PREG_PSCALER(m_preg) >> 16);
+	DM_WRITE16(ea, spreg);
 
 	CYCLES(1);
 }
 
-static void op_spl(tms32051_state *cpustate)
+void tms32051_device::op_spl()
 {
-	fatalerror("32051: unimplemented op spl at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op spl at %08X\n", m_pc-1);
 }
 
-static void op_spm(tms32051_state *cpustate)
+void tms32051_device::op_spm()
 {
-	cpustate->st1.pm = cpustate->op & 0x3;
+	m_st1.pm = m_op & 0x3;
 
 	CYCLES(1);
 }
 
-static void op_sqra(tms32051_state *cpustate)
+void tms32051_device::op_sqra()
 {
-	fatalerror("32051: unimplemented op sqra at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sqra at %08X\n", m_pc-1);
 }
 
-static void op_sqrs(tms32051_state *cpustate)
+void tms32051_device::op_sqrs()
 {
-	fatalerror("32051: unimplemented op sqrs at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sqrs at %08X\n", m_pc-1);
 }
 
-static void op_zpr(tms32051_state *cpustate)
+void tms32051_device::op_zpr()
 {
-	fatalerror("32051: unimplemented op zpr at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op zpr at %08X\n", m_pc-1);
 }
 
-static void op_bit(tms32051_state *cpustate)
+void tms32051_device::op_bit()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
 
-	cpustate->st1.tc = (data >> (~cpustate->op >> 8 & 0xf)) & 1;
+	m_st1.tc = (data >> (~m_op >> 8 & 0xf)) & 1;
 
 	CYCLES(1);
 }
 
-static void op_bitt(tms32051_state *cpustate)
+void tms32051_device::op_bitt()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
 
-	cpustate->st1.tc = (data >> (~cpustate->treg2 & 0xf)) & 1;
+	m_st1.tc = (data >> (~m_treg2 & 0xf)) & 1;
 
 	CYCLES(1);
 }
 
-static void op_clrc_ov(tms32051_state *cpustate)
+void tms32051_device::op_clrc_ov()
 {
-	cpustate->st0.ovm = 0;
+	m_st0.ovm = 0;
 
 	CYCLES(1);
 }
 
-static void op_clrc_ext(tms32051_state *cpustate)
+void tms32051_device::op_clrc_ext()
 {
-	cpustate->st1.sxm = 0;
+	m_st1.sxm = 0;
 
 	CYCLES(1);
 }
 
-static void op_clrc_hold(tms32051_state *cpustate)
+void tms32051_device::op_clrc_hold()
 {
-	fatalerror("32051: unimplemented op clrc hold at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op clrc hold at %08X\n", m_pc-1);
 }
 
-static void op_clrc_tc(tms32051_state *cpustate)
+void tms32051_device::op_clrc_tc()
 {
-	fatalerror("32051: unimplemented op clrc tc at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op clrc tc at %08X\n", m_pc-1);
 }
 
-static void op_clrc_carry(tms32051_state *cpustate)
+void tms32051_device::op_clrc_carry()
 {
-	fatalerror("32051: unimplemented op clrc carry at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op clrc carry at %08X\n", m_pc-1);
 }
 
-static void op_clrc_cnf(tms32051_state *cpustate)
+void tms32051_device::op_clrc_cnf()
 {
-	cpustate->st1.cnf = 0;
+	m_st1.cnf = 0;
 
 	CYCLES(1);
 }
 
-static void op_clrc_intm(tms32051_state *cpustate)
+void tms32051_device::op_clrc_intm()
 {
-	cpustate->st0.intm = 0;
+	m_st0.intm = 0;
 
-	check_interrupts(cpustate);
+	check_interrupts();
 
 	CYCLES(1);
 }
 
-static void op_clrc_xf(tms32051_state *cpustate)
+void tms32051_device::op_clrc_xf()
 {
-	fatalerror("32051: unimplemented op clrc xf at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op clrc xf at %08X\n", m_pc-1);
 }
 
-static void op_idle(tms32051_state *cpustate)
+void tms32051_device::op_idle()
 {
-	fatalerror("32051: unimplemented op idle at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op idle at %08X\n", m_pc-1);
 }
 
-static void op_idle2(tms32051_state *cpustate)
+void tms32051_device::op_idle2()
 {
-	fatalerror("32051: unimplemented op idle2 at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op idle2 at %08X\n", m_pc-1);
 }
 
-static void op_lst_st0(tms32051_state *cpustate)
+void tms32051_device::op_lst_st0()
 {
-	fatalerror("32051: unimplemented op lst st0 at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lst st0 at %08X\n", m_pc-1);
 }
 
-static void op_lst_st1(tms32051_state *cpustate)
+void tms32051_device::op_lst_st1()
 {
-	fatalerror("32051: unimplemented op lst st1 at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op lst st1 at %08X\n", m_pc-1);
 }
 
-static void op_pop(tms32051_state *cpustate)
+void tms32051_device::op_pop()
 {
-	cpustate->acc = POP_STACK(cpustate);
+	m_acc = POP_STACK();
 
 	CYCLES(1);
 }
 
-static void op_popd(tms32051_state *cpustate)
+void tms32051_device::op_popd()
 {
-	fatalerror("32051: unimplemented op popd at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op popd at %08X\n", m_pc-1);
 }
 
-static void op_pshd(tms32051_state *cpustate)
+void tms32051_device::op_pshd()
 {
-	fatalerror("32051: unimplemented op pshd at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op pshd at %08X\n", m_pc-1);
 }
 
-static void op_push(tms32051_state *cpustate)
+void tms32051_device::op_push()
 {
-	fatalerror("32051: unimplemented op push at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op push at %08X\n", m_pc-1);
 }
 
-static void op_rpt_mem(tms32051_state *cpustate)
+void tms32051_device::op_rpt_mem()
 {
-	UINT16 ea = GET_ADDRESS(cpustate);
-	UINT16 data = DM_READ16(cpustate, ea);
-	cpustate->rptc = data;
-	cpustate->rpt_start = cpustate->pc;
-	cpustate->rpt_end = cpustate->pc;
+	UINT16 ea = GET_ADDRESS();
+	UINT16 data = DM_READ16(ea);
+	m_rptc = data;
+	m_rpt_start = m_pc;
+	m_rpt_end = m_pc;
 
 	CYCLES(1);
 }
 
-static void op_rpt_limm(tms32051_state *cpustate)
+void tms32051_device::op_rpt_limm()
 {
-	cpustate->rptc = (UINT16)ROPCODE(cpustate);
-	cpustate->rpt_start = cpustate->pc;
-	cpustate->rpt_end = cpustate->pc;
+	m_rptc = (UINT16)ROPCODE();
+	m_rpt_start = m_pc;
+	m_rpt_end = m_pc;
 
 	CYCLES(2);
 }
 
-static void op_rpt_simm(tms32051_state *cpustate)
+void tms32051_device::op_rpt_simm()
 {
-	cpustate->rptc = (cpustate->op & 0xff);
-	cpustate->rpt_start = cpustate->pc;
-	cpustate->rpt_end = cpustate->pc;
+	m_rptc = (m_op & 0xff);
+	m_rpt_start = m_pc;
+	m_rpt_end = m_pc;
 
 	CYCLES(1);
 }
 
-static void op_rptb(tms32051_state *cpustate)
+void tms32051_device::op_rptb()
 {
-	UINT16 pma = ROPCODE(cpustate);
-	cpustate->pmst.braf = 1;
-	cpustate->pasr = cpustate->pc;
-	cpustate->paer = pma + 1;
+	UINT16 pma = ROPCODE();
+	m_pmst.braf = 1;
+	m_pasr = m_pc;
+	m_paer = pma + 1;
 
 	CYCLES(2);
 }
 
-static void op_rptz(tms32051_state *cpustate)
+void tms32051_device::op_rptz()
 {
-	fatalerror("32051: unimplemented op rptz at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op rptz at %08X\n", m_pc-1);
 }
 
-static void op_setc_ov(tms32051_state *cpustate)
+void tms32051_device::op_setc_ov()
 {
-	cpustate->st0.ovm = 1;
+	m_st0.ovm = 1;
 
 	CYCLES(1);
 }
 
-static void op_setc_ext(tms32051_state *cpustate)
+void tms32051_device::op_setc_ext()
 {
-	cpustate->st1.sxm = 1;
+	m_st1.sxm = 1;
 
 	CYCLES(1);
 }
 
-static void op_setc_hold(tms32051_state *cpustate)
+void tms32051_device::op_setc_hold()
 {
-	fatalerror("32051: unimplemented op setc hold at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op setc hold at %08X\n", m_pc-1);
 }
 
-static void op_setc_tc(tms32051_state *cpustate)
+void tms32051_device::op_setc_tc()
 {
-	fatalerror("32051: unimplemented op setc tc at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op setc tc at %08X\n", m_pc-1);
 }
 
-static void op_setc_carry(tms32051_state *cpustate)
+void tms32051_device::op_setc_carry()
 {
-	fatalerror("32051: unimplemented op setc carry at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op setc carry at %08X\n", m_pc-1);
 }
 
-static void op_setc_xf(tms32051_state *cpustate)
+void tms32051_device::op_setc_xf()
 {
-	fatalerror("32051: unimplemented op setc xf at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op setc xf at %08X\n", m_pc-1);
 }
 
-static void op_setc_cnf(tms32051_state *cpustate)
+void tms32051_device::op_setc_cnf()
 {
-	cpustate->st1.cnf = 1;
+	m_st1.cnf = 1;
 
 	CYCLES(1);
 }
 
-static void op_setc_intm(tms32051_state *cpustate)
+void tms32051_device::op_setc_intm()
 {
-	cpustate->st0.intm = 1;
+	m_st0.intm = 1;
 
-	check_interrupts(cpustate);
+	check_interrupts();
 
 	CYCLES(1);
 }
 
-static void op_sst_st0(tms32051_state *cpustate)
+void tms32051_device::op_sst_st0()
 {
-	fatalerror("32051: unimplemented op sst st0 at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sst st0 at %08X\n", m_pc-1);
 }
 
-static void op_sst_st1(tms32051_state *cpustate)
+void tms32051_device::op_sst_st1()
 {
-	fatalerror("32051: unimplemented op sst st1 at %08X\n", cpustate->pc-1);
+	fatalerror("32051: unimplemented op sst st1 at %08X\n", m_pc-1);
 }
