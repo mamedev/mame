@@ -16,6 +16,7 @@
 #include "sha1.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
+#include "netlist/nl_util.h"
 #include "options.h"
 
 /***************************************************************************
@@ -58,7 +59,8 @@ void free_file_line( void *memory, const char *file, int line )
 
 struct options_entry oplist[] =
 {
-	{ "time_to_run;ttr", "1.0", OPTION_FLOAT,   "time to run the emulation (seconds)" },
+	{ "time_to_run;t",   "1.0", OPTION_FLOAT,   "time to run the emulation (seconds)" },
+    { "logs;l",          "",    OPTION_STRING,  "colon separated list of terminals to log" },
 	{ "f",               "-",   OPTION_STRING,  "file to process (default is stdin)" },
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
 	{ NULL }
@@ -91,7 +93,7 @@ const char *filetobuf(pstring fname)
 		long fsize = ftell(f);
 		fseek(f, 0, SEEK_SET);
 
-		char *buf = (char *) malloc(fsize);
+		char *buf = (char *) malloc(fsize + 1);
 		fread(buf, fsize, 1, f);
 		buf[fsize] = 0;
 		fclose(f);
@@ -104,7 +106,7 @@ class netlist_tool_t : public netlist_base_t
 public:
 
 	netlist_tool_t()
-	: netlist_base_t(), m_setup(NULL)
+	: netlist_base_t(), m_logs(""), m_setup(NULL)
 	{
 	}
 
@@ -120,6 +122,7 @@ public:
 		//m_setup_func(*m_setup);
 
 		m_setup->parse(buffer);
+		log_setup();
 
 		// start devices
 		m_setup->start_devices();
@@ -128,6 +131,20 @@ public:
 		this->reset();
 	}
 
+    void log_setup()
+    {
+        NL_VERBOSE_OUT(("Creating dynamic logs ...\n"));
+        nl_util::pstring_list ll = nl_util::split(m_logs, ":");
+        for (int i=0; i < ll.count(); i++)
+        {
+            netlist_device_t *nc = m_setup->factory().new_device_by_classname("nld_log", *m_setup);
+            pstring name = "log_" + ll[i];
+            m_setup->register_dev(nc, name);
+            m_setup->register_link(name + ".I", ll[i]);
+        }
+    }
+
+    pstring m_logs;
 protected:
 
 	void vfatalerror(const char *format, va_list ap) const
@@ -139,6 +156,7 @@ protected:
 private:
 	netlist_setup_t *m_setup;
 };
+
 
 void usage(core_options &opts)
 {
@@ -178,8 +196,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	nt.m_logs = opts.value("l");
 	nt.read_netlist(filetobuf(opts.value("f")));
-	double ttr = opts.float_value("ttr");
+	double ttr = opts.float_value("t");
 
 	printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
 	printf("runnning ...\n");

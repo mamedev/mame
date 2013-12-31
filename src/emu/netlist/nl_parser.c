@@ -14,9 +14,32 @@
 // A netlist parser
 // ----------------------------------------------------------------------------------------
 
+ATTR_COLD void netlist_parser::error(const char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+
+    pstring errmsg1 =pstring(format).vprintf(ap);
+    va_end(ap);
+
+    char buf[300];
+    int bufp = 0;
+    const char *p = m_line_ptr;
+    while (*p && *p != 10)
+        buf[bufp++] = *p++;
+    buf[bufp] = 0;
+
+    m_setup.netlist().xfatalerror("line %d: error: %s\n\t\t%s\n", m_line, errmsg1.cstr(), buf);
+
+    //throw error;
+}
+
+
 void netlist_parser::parse(const char *buf)
 {
 	m_px = buf;
+	m_line_ptr = buf;
+	m_line = 1;
 
 	while (!eof())
 	{
@@ -41,9 +64,27 @@ void netlist_parser::parse(const char *buf)
 			netdev_device(n, "model", true);
 		else if ((n == "NETDEV_TTL_CONST") || (n == "NETDEV_ANALOG_CONST"))
 			netdev_const(n);
+		else if (n == "NETLIST_START")
+		    netdev_netlist_start();
+        else if (n == "NETLIST_END")
+            netdev_netlist_end();
 		else
 			netdev_device(n);
 	}
+}
+
+void netlist_parser::netdev_netlist_start()
+{
+    // don't do much
+    skipws();
+    /*pstring dummyname = */ getname(')');
+    //check_char(')');
+}
+
+void netlist_parser::netdev_netlist_end()
+{
+    // don't do much
+    check_char(')');
 }
 
 void netlist_parser::net_alias()
@@ -196,6 +237,9 @@ void netlist_parser::skipws()
 		case 10:
 		case 13:
 			break;
+		case '#':
+		    skipeol(); // treat preprocessor defines as comments
+		    break;
 		case '/':
 			c = getc();
 			if (c == '/')
@@ -205,8 +249,9 @@ void netlist_parser::skipws()
 			else if (c == '*')
 			{
 				int f=0;
-				while ((c = getc()) != 0 )
+				while (!eof() )
 				{
+				    c = getc();
 					if (f == 0 && c == '*')
 						f=1;
 					else if (f == 1 && c== '/' )
@@ -225,32 +270,39 @@ void netlist_parser::skipws()
 
 pstring netlist_parser::getname(char sep)
 {
-	char buf[300];
-	char *p1 = buf;
-	char c;
-
-	while ((c=getc()) != sep)
-		*p1++ = c;
-	*p1 = 0;
-	return pstring(buf);
+	pstring ret = getname2(sep, 0);
+	getc(); // undo the undo ...
+	return ret;
 }
 
 pstring netlist_parser::getname2(char sep1, char sep2)
 {
-	char buf[300];
-	char *p1 = buf;
-	char c=getc();
-
-	while ((c != sep1) && (c != sep2))
-	{
-		*p1++ = c;
-		c = getc();
-	}
-	*p1 = 0;
-	ungetc();
-	return pstring(buf);
+    static const char *allowed = "0123456789_.ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return getname2_ext(sep1, sep2, allowed);
 }
 
+pstring netlist_parser::getname2_ext(char sep1, char sep2, const char *allowed)
+{
+    char buf[300];
+    char *p1 = buf;
+    char c=getc();
+
+    while ((c != sep1) && (c != sep2))
+    {
+        char cU = toupper(c);
+        if (strchr(allowed, cU) != NULL)
+            *p1++ = c;
+        else
+        {
+            *p1 = 0;
+            error("illegal character <%c> in name ...\n", c);
+        }
+        c = getc();
+    }
+    *p1 = 0;
+    ungetc();
+    return pstring(buf);
+}
 void netlist_parser::check_char(char ctocheck)
 {
 	skipws();
@@ -259,26 +311,27 @@ void netlist_parser::check_char(char ctocheck)
 	{
 		return;
 	}
-	m_setup.netlist().xfatalerror("Parser: expected '%c' found '%c'\n", ctocheck, c);
+	error("expected '%c' found '%c'\n", ctocheck, c);
 }
 
 double netlist_parser::eval_param()
 {
 	static const char *macs[6] = {"", "RES_K(", "RES_M(", "CAP_U(", "CAP_N(", "CAP_P("};
+	static const char *allowed = "RESKMUNPAC_0123456789E+-.";
 	static double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	int i;
 	int f=0;
 	bool e;
 	double ret;
 
-	pstring s = getname2(')',',');
+	pstring s = getname2_ext(')',',', allowed);
 
 	for (i=1; i<6;i++)
 		if (strncmp(s.cstr(), macs[i], strlen(macs[i])) == 0)
 			f = i;
 	ret = s.substr(strlen(macs[f])).as_double(&e);
 	if ((f>0) && e)
-		m_setup.netlist().xfatalerror("Parser: Error with parameter ...\n");
+		error("Error with parameter ...\n");
 	if (f>0)
 		check_char(')');
 	return ret * facs[f];
@@ -286,6 +339,11 @@ double netlist_parser::eval_param()
 
 unsigned char netlist_parser::getc()
 {
+    if (*m_px == 10)
+    {
+        m_line++;
+        m_line_ptr = m_px + 1;
+    }
 	if (*m_px)
 		return *(m_px++);
 	else

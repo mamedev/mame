@@ -44,15 +44,16 @@
 #define NETDEV_PARAM(_name, _val)                                                   \
 		netlist.register_param(# _name, _val);
 
-#define NETDEV_PARAMI(_name, _param, _val)                                           \
+#define NETDEV_PARAMI(_name, _param, _val)                                          \
 		netlist.register_param(# _name "." # _param, _val);
 
 #define NETLIST_NAME(_name) netlist ## _ ## _name
 
-#define NETLIST_START(_name) \
-ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
+#define NETLIST_START(_name)                                                        \
+ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist)                        \
 {
-#define NETLIST_END  }
+
+#define NETLIST_END()  }
 
 #define NETLIST_INCLUDE(_name)                                                      \
 		NETLIST_NAME(_name)(netlist);

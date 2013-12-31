@@ -16,12 +16,13 @@
 static NETLIST_START(base)
 	NETDEV_TTL_CONST(ttlhigh, 1)
 	NETDEV_TTL_CONST(ttllow, 0)
+    NETDEV_ANALOG_CONST(GND, 0)
 
 	NET_MODEL(".model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
 	NET_MODEL(".model 1N4148 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
 	NET_MODEL(".MODEL BC237B NPN(IS=1.8E-14 ISE=5.0E-14 ISC=1.72E-13 XTI=3 BF=400 BR=35.5 IKF=0.14 IKR=0.03 XTB=1.5 VAF=80 VAR=12.5 VJE=0.58 VJC=0.54 RE=0.6 RC=0.25 RB=0.56 CJE=13E-12 CJC=4E-12 XCJC=0.75 FC=0.5 NF=0.9955 NR=1.005 NE=1.46 NC=1.27 MJE=0.33 MJC=0.33 TF=0.64E-9 TR=50.72E-9 EG=1.11 KF=0 AF=1 VCEO=45V ICRATING=100M MFG=ZETEX)")
 
-NETLIST_END
+NETLIST_END()
 
 
 // ----------------------------------------------------------------------------------------

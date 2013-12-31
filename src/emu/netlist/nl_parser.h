@@ -15,7 +15,7 @@ class netlist_parser
 	NETLIST_PREVENT_COPYING(netlist_parser)
 public:
 	netlist_parser(netlist_setup_t &setup)
-	: m_setup(setup) {}
+	: m_line(1), m_line_ptr(NULL), m_px(NULL), m_setup(setup) {}
 
 	void parse(const char *buf);
 	void net_alias();
@@ -24,13 +24,17 @@ public:
 	void netdev_const(const pstring &dev_name);
 	void netdev_device(const pstring &dev_type);
 	void netdev_device(const pstring &dev_type, const pstring &default_param, bool isString = false);
+    void netdev_netlist_start();
+    void netdev_netlist_end();
 
+    void error(const char *format, ...);
 private:
 
 	void skipeol();
 	void skipws();
 	pstring getname(char sep);
 	pstring getname2(char sep1, char sep2);
+    pstring getname2_ext(char sep1, char sep2, const char *allowed);
 	void check_char(char ctocheck);
 	double eval_param();
 
@@ -38,6 +42,8 @@ private:
 	void ungetc();
 	bool eof() { return *m_px == 0; }
 
+	int m_line;
+	const char * m_line_ptr;
 	const char * m_px;
 	netlist_setup_t &m_setup;
 };

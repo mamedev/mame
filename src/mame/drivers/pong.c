@@ -82,8 +82,13 @@ enum input_changed_enum
 };
 
 static NETLIST_START(pong_schematics)
+    NETDEV_SOLVER(Solver)
+    NETDEV_PARAM(Solver.FREQ, 48000)
+    NETDEV_ANALOG_CONST(V5, 5)
+
 	NETDEV_TTL_CONST(high, 1)
 	NETDEV_TTL_CONST(low, 0)
+
 #if 1
 #if 0
 	/* this is the clock circuit in schematics. */
@@ -562,228 +567,7 @@ static NETLIST_START(pong_schematics)
 
 	NET_ALIAS(videomix, RV3.2)
 
-	NETDEV_SOLVER(Solver)
-	NETDEV_PARAM(Solver.FREQ, 48000)
-	NETDEV_ANALOG_CONST(V5, 5)
-	NETDEV_ANALOG_CONST(V1, 1)
-	NETDEV_ANALOG_CONST(GND, 0)
-
-#if 0
-	NETDEV_R(R1, 10)
-	NETDEV_R(R2, 10)
-	NETDEV_R(R3, 10)
-	NET_C(V5,R1.1)
-	NET_C(R1.2, R2.1)
-	NET_C(R2.2, R3.1)
-	NET_C(R3.2, GND)
-#endif
-#if 0
-	NETDEV_R(R4, 1000)
-	NETDEV_C(C1, 1e-6)
-	NET_C(V5,R4.1)
-	NET_C(R4.2, C1.1)
-	NET_C(C1.2, GND)
-	//NETDEV_LOG(log1, C1.1)
-#endif
-
-#define tt(_n) \
-	NETDEV_R(R ## _n, 1000) \
-	NETDEV_D(D ## _n) \
-	NET_C(V5, R ## _n.1) \
-	NET_C(R ## _n.2, D ## _n.A) \
-	NET_C(D ## _n.K, GND)
-
-/*    tt(20)
-    tt(21)
-    tt(22)
-    tt(23)
-    tt(24)
-    tt(25)
-    tt(26)
-    tt(27)
-    tt(28)
-    tt(29)
-*/
-
-#if 0
-	NETDEV_R(R5, 1000)
-	NETDEV_1N914(D1)
-	NET_C(V5, R5.1)
-	NET_C(R5.2, D1.A)
-	NET_C(D1.K, GND)
-	//NETDEV_LOG(log1, D1.A)
-#endif
-
-#if 0
-	// astable NAND Multivibrator
-	NETDEV_R(R1, 1000)
-	NETDEV_C(C1, 1e-6)
-	TTL_7400_NAND(n1,R1.1,R1.1)
-	TTL_7400_NAND(n2,R1.2,R1.2)
-	NET_C(n1.Q, R1.2)
-	NET_C(n2.Q, C1.1)
-	NET_C(C1.2, R1.1)
-	//NETDEV_LOG(log2, C1.2)
-	//NETDEV_LOG(log2, n1.Q)
-	//NETDEV_LOG(log3, n2.Q)
-#endif
-
-#if 0
-	// astable NE555, 1.13 ms period
-	NETDEV_R(RA, 5000)
-	NETDEV_R(RB, 3000)
-	NETDEV_C(C, 0.15e-6)
-	NETDEV_NE555(555)
-
-	NET_C(GND, 555.GND)
-	NET_C(V5, 555.VCC)
-
-	NET_C(RA.1, 555.VCC)
-	NET_C(RA.2, 555.DISCH)
-
-	NET_C(RB.1, 555.DISCH)
-	NET_C(RB.2, 555.TRIG)
-
-	NET_C(RB.2, 555.THRESH)
-
-	NET_C(555.TRIG, C.1)
-	NET_C(C.2, GND)
-	//NETDEV_LOG(log2, C.1)
-	//NETDEV_LOG(log3, 555.OUT)
-#endif
-
-#if 0
-	NETDEV_BC238B(Q)
-	NETDEV_R(RB, 1000)
-	NETDEV_R(RC, 1000)
-
-	NET_C(RC.1, V5)
-	NET_C(RC.2, Q.C)
-	NET_C(RB.1, 128H)
-	NET_C(RB.2, Q.B)
-	NET_C(Q.E, GND)
-	//NETDEV_LOG(logB, Q.B)
-	//NETDEV_LOG(logC, Q.C)
-#endif
-
-#if 0
-	NETDEV_VCVS(VV)
-	NETDEV_R(R1, 1000)
-	NETDEV_R(R2, 10000)
-
-	NET_C(V5, R1.1)
-	NET_C(R1.2, VV.IN)
-	NET_C(R2.1, VV.OP)
-	NET_C(R2.2, VV.IN)
-	NET_C(VV.ON, GND)
-	NET_C(VV.IP, GND)
-	NETDEV_LOG(logX, VV.OP)
-
-#endif
-
-#if 0
-	NETDEV_VCCS(VV)
-	NETDEV_PARAM(VV.G, 100000)  // typical OP-AMP amplification
-	NETDEV_R(R1, 1000)
-	NETDEV_R(R2, 1)
-	NETDEV_R(R3, 10000)
-
-	NET_C(4V, R1.1)
-	NET_C(R1.2, VV.IN)
-	NET_C(R2.1, VV.OP)
-	NET_C(R3.1, VV.IN)
-	NET_C(R3.2, VV.OP)
-	NET_C(R2.2, GND)
-	NET_C(VV.ON, GND)
-	NET_C(VV.IP, GND)
-	//NETDEV_LOG(logX, VV.OP)
-	//NETDEV_LOG(logY, 4V)
-
-#endif
-
-#if 0
-	NETDEV_VCVS(VV)
-	NETDEV_PARAM(VV.G, 100000)  // typical OP-AMP amplification
-	NETDEV_PARAM(VV.RO, 50)  // typical OP-AMP amplification
-	NETDEV_R(R1, 1000)
-	NETDEV_R(R3, 10000) // ==> 10x amplification (inverting)
-
-	NET_C(4V, R1.1)
-	NET_C(R1.2, VV.IN)
-	NET_C(R3.1, VV.IN)
-	NET_C(R3.2, VV.OP)
-	NET_C(VV.ON, GND)
-	NET_C(VV.IP, GND)
-	NETDEV_LOG(logX, VV.OP)
-	NETDEV_LOG(logY, 4V)
-
-#endif
-
-#if 0
-	// Impedance converter with resistor
-	NETDEV_VCVS(VV)
-	NETDEV_PARAM(VV.G, 100000)  // typical OP-AMP amplification
-	NETDEV_PARAM(VV.RO, 50)  // typical OP-AMP amplification
-	NETDEV_R(R3, 10000)
-
-	NET_C(4V, VV.IP)
-	NET_C(R3.1, VV.IN)
-	NET_C(R3.2, VV.OP)
-	NET_C(VV.ON, GND)
-	NETDEV_LOG(logX, VV.OP)
-	NETDEV_LOG(logY, 4V)
-
-#endif
-
-#if 0
-	// Impedance converter without resistor
-	NETDEV_VCVS(VV)
-	NETDEV_PARAM(VV.G, 100000)  // typical OP-AMP amplification
-	NETDEV_PARAM(VV.RO, 50)  // typical OP-AMP amplification
-
-	NET_C(4V, VV.IP)
-	NET_C(VV.IN, VV.OP)
-	NET_C(VV.ON, GND)
-	NETDEV_LOG(logX, VV.OP)
-	NETDEV_LOG(logY, 4V)
-
-#endif
-
-#if 0
-	/* Impedance converter current source opamp model from
-	 *
-	 * http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
-	 *
-	 * Bandwidth 10Mhz
-	 *
-	 */
-	NETDEV_VCCS(G1)
-	NETDEV_PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
-	NETDEV_R(RP1, 1000)
-	NETDEV_C(CP1, 1.59e-6)   // <== change to 1.59e-3 for 10Khz bandwidth
-	NETDEV_VCVS(EBUF)
-	NETDEV_PARAM(EBUF.RO, 50)
-	NETDEV_PARAM(EBUF.G, 1)
-
-	NET_C(G1.IP, 4V)
-	NET_C(G1.IN, EBUF.OP)
-	NET_C(EBUF.ON, GND)
-
-	NET_C(G1.ON, GND)
-	NET_C(RP1.2, GND)
-	NET_C(CP1.2, GND)
-	NET_C(EBUF.IN, GND)
-
-	NET_C(RP1.1, G1.OP)
-	NET_C(CP1.1, RP1.1)
-	NET_C(EBUF.IP, RP1.1)
-
-	//NETDEV_LOG(logX, EBUF.OP)
-	//NETDEV_LOG(logY, 4V)
-
-#endif
-
-NETLIST_END
+NETLIST_END()
 
 class pong_state : public driver_device
 {
@@ -838,7 +622,7 @@ static NETLIST_START(pong)
 
 	NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
 	NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
-NETLIST_END
+NETLIST_END()
 
 static NETLIST_START(pong_fast)
 
@@ -847,7 +631,7 @@ static NETLIST_START(pong_fast)
 	NETDEV_ANALOG_CALLBACK(sound_cb, sound, pong_state, sound_cb, "")
     NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
 
-NETLIST_END
+NETLIST_END()
 
 void pong_state::machine_start()
 {
