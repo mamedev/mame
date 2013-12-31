@@ -296,22 +296,22 @@ const UINT32 MASTER_CLOCK_25MHz = XTAL_25_1748MHz;
 //  PPI INTERFACES
 //**************************************************************************
 
-static I8255_INTERFACE(single_ppi_intf)
+static I8255_INTERFACE(outrun_ppi_intf)
+{
+	DEVCB_DRIVER_MEMBER(segaorun_state, bankmotor_limit_r),
+	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_porta_w),
+	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_r),
+	DEVCB_DRIVER_MEMBER(segaorun_state, bankmotor_control_w),
+	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portc_r),
+	DEVCB_DRIVER_MEMBER(segaorun_state, video_control_w)
+};
+
+static I8255_INTERFACE(shangon_ppi_intf)
 {
 	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_porta_r),
 	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_porta_w),
 	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_r),
 	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_w),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portc_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, video_control_w)
-};
-
-static I8255_INTERFACE(deluxe_ppi_intf)
-{
-	DEVCB_DRIVER_MEMBER(segaorun_state, bankmotor_limit_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_porta_w),
-	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portb_r),
-	DEVCB_DRIVER_MEMBER(segaorun_state, bankmotor_pos_w),
 	DEVCB_DRIVER_MEMBER(segaorun_state, unknown_portc_r),
 	DEVCB_DRIVER_MEMBER(segaorun_state, video_control_w)
 };
@@ -369,7 +369,7 @@ WRITE8_MEMBER( segaorun_state::unknown_portb_w )
 
 WRITE8_MEMBER( segaorun_state::video_control_w )
 {
-	// Output port C:
+	// PPI Output port C:
 	//  D7: SG1 -- connects to sprite chip
 	//  D6: SG0 -- connects to mixing
 	//  D5: Screen display (1= blanked, 0= displayed)
@@ -390,46 +390,48 @@ WRITE8_MEMBER( segaorun_state::video_control_w )
 
 READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 {
-	// Input port A
 	UINT8 ret = 0xff;
 
-	// d3: right limit
-	// d4: center
-	// d5: left limit
-	// other bits: ?
-	UINT8 pos = ioport("ADC3")->read();
+	// PPI Input port A:
+	//  D5: left limit
+	//  D4: center
+	//  D3: right limit
+	//  other bits: ?
+	UINT8 pos = m_bankmotor_pos >> 8 & 0xff;
+
+	// these values may need to be tweaked when hooking up real motors to MAME
+	const int left_limit = 0x20;
+	const int center = 0x80;
+	const int right_limit = 0xe0;
+	const int tolerance = 2;
 	
-	// these may need to be calibrated when emulating it in a real cab
-	const UINT8 right = 0xe0;
-	const UINT8 center = 0x80;
-	const UINT8 left = 0x20;
-	
-	if (pos >= right)
-		ret ^= 0x08;
-	else if (pos == center)
-		ret ^= 0x10;
-	else if (pos <= left)
+	if (pos <= left_limit + tolerance)
 		ret ^= 0x20;
-	
+	else if (pos >= center - tolerance && pos <= center + tolerance)
+		ret ^= 0x10;
+	else if (pos >= right_limit - tolerance)
+		ret ^= 0x08;
+
 	return ret;
 }
 
 
 //-------------------------------------------------
-//  bankmotor_pos_w - bank motor control
+//  bankmotor_control_w - bank motor control
 //  for deluxe cabs
 //-------------------------------------------------
 
-WRITE8_MEMBER( segaorun_state::bankmotor_pos_w )
+WRITE8_MEMBER( segaorun_state::bankmotor_control_w )
 {
-	// Output port B
+	// PPI Output port B
 	data &= 0x0f;
 
 	if (data == 0)
 		return;
 	
-	// motor "position" is 1 - 15, with 8 being centered
-	// this is converted to speed and direction
+	m_bankmotor_delta = 8 - data;
+	
+	// convert to speed and direction for output
 	if (data < 8)
 	{
 		// left
@@ -660,6 +662,9 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 					next_scanline = 65;
 					m_subcpu->set_input_line(4, CLEAR_LINE);
 					break;
+				
+				default:
+					break;
 			}
 
 			// update IRQs on the main CPU
@@ -669,7 +674,26 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			timer.adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 			break;
 		}
+
+		default:
+			assert_always(FALSE, "Unknown id in segaorun_state::device_timer");
 	}
+}
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(segaorun_state::bankmotor_update)
+{
+	// arbitrary timer for updating bank motor position
+	// these values may need to be tweaked when hooking up real motors to MAME
+	const int speed = 100;
+	const int left_limit = 0x2000;
+	const int right_limit = 0xe000;
+	
+	m_bankmotor_pos += speed * m_bankmotor_delta;
+	if (m_bankmotor_pos <= left_limit)
+		m_bankmotor_pos = left_limit;
+	else if (m_bankmotor_pos >= right_limit)
+		m_bankmotor_pos = right_limit;
 }
 
 
@@ -945,6 +969,12 @@ ADDRESS_MAP_END
 //  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
+CUSTOM_INPUT_MEMBER(segaorun_state::bankmotor_pos_r)
+{
+	return m_bankmotor_pos >> 8 & 0xff;
+}
+
+
 static INPUT_PORTS_START( outrun_generic )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -989,12 +1019,8 @@ static INPUT_PORTS_START( outrun_generic )
 	PORT_START("ADC2")  // brake
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
-	/* Bank Motor Position */
-	/* This is set to the same axis as the wheel to allow for proper ff data in deluxe(Moving) cabs */
-	/* Move the stick left and right during motor warmup to prevent "engine or limit sw trouble" */
-	/* On a motion sim this should be binded to the READ pot for the motor */
 	PORT_START("ADC3")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Bank Motor Position")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segaorun_state, bankmotor_pos_r, NULL)
 INPUT_PORTS_END
 
 
@@ -1019,7 +1045,7 @@ static INPUT_PORTS_START( outrundx )
 	PORT_INCLUDE( outrun_generic )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x00, "Not Moving" )
 	PORT_DIPSETTING(    0x01, "Moving" )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:2")
@@ -1087,9 +1113,6 @@ static INPUT_PORTS_START( toutrunc )
 	PORT_DIPNAME( 0x08, 0x08, "Turbo" ) PORT_DIPLOCATION("SWB:4")
 //  PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x08, "Use Turbo Shifter" )
-
-	PORT_MODIFY("ADC3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1176,7 +1199,7 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_I8255_ADD( "i8255", deluxe_ppi_intf )
+	MCFG_I8255_ADD( "i8255", outrun_ppi_intf )
 	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper, mapper_sound_r, mapper_sound_w)
 
 	// video hardware
@@ -1211,17 +1234,17 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
 
+	// basic machine hardware
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
+
 	// video hardware
 	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun, outrun_base )
+static MACHINE_CONFIG_DERIVED( outrun, outrundx )
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	// video hardware
-	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
@@ -1231,22 +1254,12 @@ static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
 	MCFG_CPU_PROGRAM_MAP(outrun_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrunc_fd1094, outrun_fd1094 )
-
-	// basic machine hardware
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(outrun_map)
-
-	MCFG_DEVICE_REMOVE("i8255")
-	MCFG_I8255_ADD( "i8255", single_ppi_intf )
-MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
 
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("i8255")
-	MCFG_I8255_ADD( "i8255", single_ppi_intf )
+	MCFG_I8255_ADD( "i8255", shangon_ppi_intf )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2388,6 +2401,6 @@ GAME( 1987, shangon1, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon
 GAME( 1991, shangonle,shangon, shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega", "Limited Edition Hang-On", 0 )
 GAMEL(1989, toutrun,  0,       outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (Out Run upgrade, FD1094 317-0118)", 0,           layout_outrun ) // Cabinet determined by dipswitch settings
 GAMEL(1989, toutrunj, toutrun, outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (Japan, Out Run upgrade, FD1094 317-0117)", 0,    layout_outrun ) // Cabinet determined by dipswitch settings
-GAMEL(1989, toutrun3, toutrun, outrunc_fd1094,  toutrunc, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-0107)", 0,                   layout_outrun )
-GAMEL(1989, toutrun2, toutrun, outrunc_fd1094,  toutrunc, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-0106)", 0,                   layout_outrun )
+GAMEL(1989, toutrun3, toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-0107)", 0,                   layout_outrun )
+GAMEL(1989, toutrun2, toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-0106)", 0,                   layout_outrun )
 GAMEL(1989, toutrun1, toutrun, outrun_fd1094,   toutrunm, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0,            layout_outrun )

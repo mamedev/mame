@@ -33,13 +33,16 @@ public:
 		m_sprites(*this, "sprites"),
 		m_segaic16vid(*this, "segaic16vid"),
 		m_segaic16road(*this, "segaic16road"),
+		m_bankmotor_timer(*this, "bankmotor"),
 		m_workram(*this, "workram"),
 		m_custom_map(NULL),
 		m_shangon_video(false),
 		m_scanline_timer(NULL),
 		m_irq2_state(0),
 		m_adc_select(0),
-		m_vblank_irq_state(0)
+		m_vblank_irq_state(0),
+		m_bankmotor_pos(0x8000),
+		m_bankmotor_delta(0)
 	{ }
 
 	// PPI read/write handlers
@@ -50,7 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER( unknown_portb_w );
 	DECLARE_WRITE8_MEMBER( video_control_w );
 	DECLARE_READ8_MEMBER( bankmotor_limit_r );
-	DECLARE_WRITE8_MEMBER( bankmotor_pos_w );
+	DECLARE_WRITE8_MEMBER( bankmotor_control_w );
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index);
@@ -79,6 +82,9 @@ public:
 	DECLARE_WRITE16_HANDLER( sega_textram_0_w ) { m_segaic16vid->segaic16_textram_0_w(space,offset,data,mem_mask); };
 	DECLARE_READ16_HANDLER( sega_road_control_0_r ) { return m_segaic16road->segaic16_road_control_0_r(space,offset,mem_mask); };
 	DECLARE_WRITE16_HANDLER( sega_road_control_0_w ) { m_segaic16road->segaic16_road_control_0_w(space,offset,data,mem_mask); };
+
+	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
+	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
 
 protected:
 	// timer IDs
@@ -114,6 +120,7 @@ protected:
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
+	optional_device<timer_device> m_bankmotor_timer;
 
 	// memory
 	required_shared_ptr<UINT16> m_workram;
@@ -129,4 +136,6 @@ protected:
 	UINT8               m_irq2_state;
 	UINT8               m_adc_select;
 	UINT8               m_vblank_irq_state;
+	int                 m_bankmotor_pos;
+	int                 m_bankmotor_delta;
 };
