@@ -4621,7 +4621,7 @@ ROM_END
 
 ROM_START( snowbro2b ) // seems to be the same data as the main set, but with the extra user1 rom and different rom layout
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
-	ROM_LOAD16_BYTE( "sb2-prg1.U39", 0x000000, 0x040000, CRC(e1fec8a2) SHA1(30c1a351070d784da9ba0dca68be8a262dba2045) )
+	ROM_LOAD16_BYTE( "sb2-prg1.u39", 0x000000, 0x040000, CRC(e1fec8a2) SHA1(30c1a351070d784da9ba0dca68be8a262dba2045) )
 	ROM_LOAD16_BYTE( "sb2-prg0.u23", 0x000001, 0x040000, CRC(b473cd57) SHA1(331130faa9de01b3ca93845174e8c3684bd269c7) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) // one of these seems badly read, check
