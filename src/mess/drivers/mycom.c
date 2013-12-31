@@ -39,11 +39,12 @@
     TODO/info:
     - Sound not working. The info makes its way to the audio chip but for
       some unknown reason, nothing is heard.
-    - FDC, type 1771, single sided, capacity 143KBytes, not connected up
+    - FDC, little info, guessing (143kb, single sided, 525sd)
     - Cassette doesn't load
     - Printer
     - Keyboard lookup table for Kana and Shifted Kana
     - Keyboard autorepeat
+    - Need software
 
 *******************************************************************************/
 
@@ -54,30 +55,56 @@
 #include "sound/sn76496.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
-#include "machine/wd17xx.h"
 #include "machine/msm5832.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "machine/wd_fdc.h"
 
-#define MSM5832RS_TAG "rtc"
 
 class mycom_state : public driver_device
 {
 public:
 	mycom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ppi0(*this, "ppi8255_0"),
-	m_ppi1(*this, "ppi8255_1"),
-	m_ppi2(*this, "ppi8255_2"),
-	m_cass(*this, "cassette"),
-	m_wave(*this, WAVE_TAG),
-	m_crtc(*this, "crtc"),
-	m_fdc(*this, "fdc"),
-	m_audio(*this, "sn1"),
-	m_rtc(*this, MSM5832RS_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppi0(*this, "ppi8255_0")
+		, m_ppi1(*this, "ppi8255_1")
+		, m_ppi2(*this, "ppi8255_2")
+		, m_cass(*this, "cassette")
+		, m_wave(*this, WAVE_TAG)
+		, m_crtc(*this, "crtc")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_audio(*this, "sn1")
+		, m_rtc(*this, "rtc")
 	{ }
 
+	DECLARE_READ8_MEMBER(mycom_upper_r);
+	DECLARE_WRITE8_MEMBER(mycom_upper_w);
+	DECLARE_READ8_MEMBER(vram_data_r);
+	DECLARE_WRITE8_MEMBER(vram_data_w);
+	DECLARE_WRITE8_MEMBER(mycom_00_w);
+	DECLARE_WRITE8_MEMBER(mycom_04_w);
+	DECLARE_WRITE8_MEMBER(mycom_06_w);
+	DECLARE_WRITE8_MEMBER(mycom_0a_w);
+	DECLARE_READ8_MEMBER(mycom_05_r);
+	DECLARE_READ8_MEMBER(mycom_06_r);
+	DECLARE_READ8_MEMBER(mycom_08_r);
+	DECLARE_DRIVER_INIT(mycom);
+	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
+	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
+	UINT8 *m_p_videoram;
+	UINT8 *m_p_chargen;
+	UINT8 m_0a;
+private:
+	UINT16 m_i_videoram;
+	UINT8 m_keyb_press;
+	UINT8 m_keyb_press_flag;
+	UINT8 m_sn_we;
+	UINT32 m_upper_sw;
+	UINT8 *m_p_ram;
+	virtual void machine_reset();
+	virtual void machine_start();
+	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
 	required_device<i8255_device> m_ppi1;
@@ -85,35 +112,11 @@ public:
 	required_device<cassette_image_device> m_cass;
 	required_device<wave_device> m_wave;
 	required_device<mc6845_device> m_crtc;
-	required_device<fd1771_device> m_fdc;
+	required_device<fd1771_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<sn76489_device> m_audio;
 	required_device<msm5832_device> m_rtc;
-	DECLARE_READ8_MEMBER( mycom_upper_r );
-	DECLARE_WRITE8_MEMBER( mycom_upper_w );
-	DECLARE_READ8_MEMBER( vram_data_r );
-	DECLARE_WRITE8_MEMBER( vram_data_w );
-	DECLARE_WRITE8_MEMBER( mycom_00_w );
-	DECLARE_WRITE8_MEMBER( mycom_04_w );
-	DECLARE_WRITE8_MEMBER( mycom_06_w );
-	DECLARE_WRITE8_MEMBER( mycom_0a_w );
-	DECLARE_READ8_MEMBER( mycom_05_r );
-	DECLARE_READ8_MEMBER( mycom_06_r );
-	DECLARE_READ8_MEMBER( mycom_08_r );
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_chargen;
-	UINT16 m_i_videoram;
-	UINT8 m_keyb_press;
-	UINT8 m_keyb_press_flag;
-	UINT8 m_0a;
-	UINT8 m_sn_we;
-	UINT32 m_upper_sw;
-	UINT8 *m_p_ram;
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
-	DECLARE_DRIVER_INIT(mycom);
-	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
-	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 };
 
 
@@ -227,7 +230,7 @@ static ADDRESS_MAP_START(mycom_io, AS_IO, 8, mycom_state)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("fdc", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1771_t, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -456,8 +459,8 @@ static I8255_INTERFACE( ppi8255_intf_2 )
 {
 	DEVCB_NULL,         /* Port A read */
 	DEVCB_NULL,         /* Port A write */
-	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_r),         /* Port B read */
-	DEVCB_DEVICE_MEMBER(MSM5832RS_TAG, msm5832_device, data_w),         /* Port B write */
+	DEVCB_DEVICE_MEMBER("rtc", msm5832_device, data_r),         /* Port B read */
+	DEVCB_DEVICE_MEMBER("rtc", msm5832_device, data_w),         /* Port B write */
 	DEVCB_NULL,         /* Port C read */
 	DEVCB_DRIVER_MEMBER(mycom_state,mycom_rtc_w)            /* Port C write */
 };
@@ -515,36 +518,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 	}
 }
 
-// The floppy parameters are unknown, the below is copied from another driver
-static LEGACY_FLOPPY_OPTIONS_START(mycom)
-	LEGACY_FLOPPY_OPTION(mycom, "fdd", "mycom disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([82])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface mycom_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(mycom),
-	NULL,
-	NULL
-};
-
-static const wd17xx_interface wd1771_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL, // no information available
-	DEVCB_NULL,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
-};
 
 
 /*************************************
@@ -563,6 +536,10 @@ static const sn76496_config psg_intf =
 	DEVCB_NULL
 };
 
+
+static SLOT_INTERFACE_START( mycom_floppies )
+	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
+SLOT_INTERFACE_END
 
 void mycom_state::machine_start()
 {
@@ -615,10 +592,11 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_SOUND_CONFIG(psg_intf)
 
 	/* Devices */
-	MCFG_MSM5832_ADD(MSM5832RS_TAG, XTAL_32_768kHz)
+	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
-	MCFG_FD1771_ADD("fdc", wd1771_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mycom_floppy_interface)
+	MCFG_FD1771x_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", mycom_state, mycom_kbd, attotime::from_hz(20))
 MACHINE_CONFIG_END
