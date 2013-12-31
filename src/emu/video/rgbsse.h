@@ -247,7 +247,7 @@ extern const struct _rgbsse_statics
 {
 	__m128  dummy_for_alignment;
 	INT16   maxbyte[8];
-	INT16   scale_table[256+1][8];
+	INT16   scale_table[256][8];
 } rgbsse_statics;
 
 
@@ -264,7 +264,7 @@ extern const struct _rgbsse_statics
 INLINE void rgbint_blend(rgbint *color1, const rgbint *color2, UINT8 color1scale)
 {
 	*color1 = _mm_unpacklo_epi16(*color1, *color2);
-	*color1 = _mm_madd_epi16(*color1, *(__m128i *)&rgbsse_statics.scale_table[color1scale+1][0]);
+	*color1 = _mm_madd_epi16(*color1, *(__m128i *)&rgbsse_statics.scale_table[color1scale][0]);
 	*color1 = _mm_srli_epi32(*color1, 8);
 	*color1 = _mm_packs_epi32(*color1, *color1);
 }

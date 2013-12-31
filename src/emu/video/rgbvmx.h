@@ -216,7 +216,7 @@ INLINE void rgbaint_subr(rgbaint *color1, const rgbaint *color2)
 extern const struct _rgbvmx_statics
 {
 	rgbaint maxbyte;
-	rgbaint scale_table[256+1];
+	rgbaint scale_table[256];
 } rgbvmx_statics;
 
 
@@ -234,7 +234,7 @@ INLINE void rgbint_blend(rgbint *color1, const rgbint *color2, UINT8 color1scale
 {
 	vector signed int temp;
 	*color1 = vec_mergeh(*color1, *color2);
-	temp = vec_msum(*color1, rgbvmx_statics.scale_table[color1scale+1], vec_splat_s32(0));
+	temp = vec_msum(*color1, rgbvmx_statics.scale_table[color1scale], vec_splat_s32(0));
 	temp = (vector signed int)vec_sr(temp, vec_splat_u32(8));
 	*color1 = vec_packs(temp, temp);
 }
@@ -249,7 +249,7 @@ INLINE void rgbaint_blend(rgbaint *color1, const rgbaint *color2, UINT8 color1sc
 {
 	vector signed int temp;
 	*color1 = vec_mergeh(*color1, *color2);
-	temp = vec_msum(*color1, rgbvmx_statics.scale_table[color1scale+1], vec_splat_s32(0));
+	temp = vec_msum(*color1, rgbvmx_statics.scale_table[color1scale], vec_splat_s32(0));
 	temp = (vector signed int)vec_sr(temp, vec_splat_u32(8));
 	*color1 = vec_packs(temp, temp);
 }

@@ -284,7 +284,7 @@ INLINE void rgbaint_shr(rgbaint *color, UINT8 shift)
 
 INLINE void rgbint_blend(rgbint *color1, const rgbint *color2, UINT8 color1scale)
 {
-	int scale1 = (int)color1scale + 1;
+	int scale1 = (int)color1scale;
 	int scale2 = 256 - scale1;
 
 	color1->r = (color1->r * scale1 + color2->r * scale2) >> 8;
@@ -300,7 +300,7 @@ INLINE void rgbint_blend(rgbint *color1, const rgbint *color2, UINT8 color1scale
 
 INLINE void rgbaint_blend(rgbaint *color1, const rgbaint *color2, UINT8 color1scale)
 {
-	int scale1 = (int)color1scale + 1;
+	int scale1 = (int)color1scale;
 	int scale2 = 256 - scale1;
 
 	color1->a = (color1->a * scale1 + color2->a * scale2) >> 8;
