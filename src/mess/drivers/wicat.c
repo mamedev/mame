@@ -472,25 +472,25 @@ WRITE8_MEMBER(wicat_state::video_dma_w)
 		m_videodma->write(space,offset/2,data);
 }
 
-READ8_HANDLER(wicat_state::video_uart0_r)
+READ8_MEMBER(wicat_state::video_uart0_r)
 {
 	UINT16 noff = offset >> 1;
 	return m_videouart0->read(space,noff);
 }
 
-WRITE8_HANDLER(wicat_state::video_uart0_w)
+WRITE8_MEMBER(wicat_state::video_uart0_w)
 {
 	UINT16 noff = offset >> 1;
 	m_videouart0->write(space,noff,data);
 }
 
-READ8_HANDLER(wicat_state::video_uart1_r)
+READ8_MEMBER(wicat_state::video_uart1_r)
 {
 	UINT16 noff = offset >> 1;
 	return m_videouart1->read(space,noff);
 }
 
-WRITE8_HANDLER(wicat_state::video_uart1_w)
+WRITE8_MEMBER(wicat_state::video_uart1_w)
 {
 	UINT16 noff = offset >> 1;
 	m_videouart1->write(space,noff,data);

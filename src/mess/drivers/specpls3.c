@@ -299,7 +299,7 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_7ffd_w )
 	spectrum_plus3_update_memory();
 }
 
-WRITE8_HANDLER( spectrum_state::spectrum_plus3_port_1ffd_w )
+WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
 {
 	/* D0-D1: ROM/RAM paging */
 	/* D2: Affects if d0-d1 work on ram/rom */

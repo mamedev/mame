@@ -24,8 +24,8 @@ public:
 		, m_terminal(*this, TERMINAL_TAG)
 		{ }
 
-	DECLARE_READ8_HANDLER(rs232_r);
-	DECLARE_WRITE8_HANDLER(rs232_w);
+	DECLARE_READ8_MEMBER(rs232_r);
+	DECLARE_WRITE8_MEMBER(rs232_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	virtual void machine_reset();
 	UINT8 m_term_data;
