@@ -71,10 +71,6 @@ static ADDRESS_MAP_START( c2031_mem, AS_PROGRAM, 8, c2031_device )
 ADDRESS_MAP_END
 
 
-//-------------------------------------------------
-//  via6522_interface via0_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( c2031_device::via0_irq_w )
 {
 	m_via0_irq = state;
@@ -216,29 +212,6 @@ READ_LINE_MEMBER( c2031_device::via0_ca2_r )
 	return get_device_number();
 }
 
-static const via6522_interface via0_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_ca1_r),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_ca2_r),
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL, // PLL SYN
-
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via0_irq_w)
-};
-
-
-//-------------------------------------------------
-//  via6522_interface via1_intf
-//-------------------------------------------------
 
 WRITE_LINE_MEMBER( c2031_device::via1_irq_w )
 {
@@ -305,25 +278,6 @@ WRITE8_MEMBER( c2031_device::via1_pb_w )
 	m_ga->ds_w((data >> 5) & 0x03);
 }
 
-static const via6522_interface via1_intf =
-{
-	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via1_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, byte_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via1_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, soe_w),
-	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, oe_w),
-
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2031_device, via1_irq_w)
-};
-
 
 //-------------------------------------------------
 //  C64H156_INTERFACE( ga_intf )
@@ -381,8 +335,24 @@ static MACHINE_CONFIG_FRAGMENT( c2031 )
 	MCFG_CPU_PROGRAM_MAP(c2031_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
-	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, XTAL_16MHz/16)
+	MCFG_VIA6522_READPA_HANDLER(READ8(c2031_device, via0_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(c2031_device, via0_pb_r))
+	MCFG_VIA6522_READCA1_HANDLER(READLINE(c2031_device, via0_ca1_r))
+	MCFG_VIA6522_READCA2_HANDLER(READLINE(c2031_device, via0_ca2_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(c2031_device, via0_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(c2031_device, via0_pb_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(c2031_device, via0_irq_w))
+
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL_16MHz/16)
+	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(C64H156_TAG, c64h156_device, yb_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(c2031_device, via1_pb_r))
+	MCFG_VIA6522_READCA1_HANDLER(DEVREADLINE(C64H156_TAG, c64h156_device, byte_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8(C64H156_TAG, c64h156_device, yb_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(c2031_device, via1_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(C64H156_TAG, c64h156_device, soe_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(C64H156_TAG, c64h156_device, oe_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(c2031_device, via1_irq_w))
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c2031_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)

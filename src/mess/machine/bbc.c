@@ -1158,28 +1158,28 @@ READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
 
 
 /* vertical sync pulse from video circuit */
-READ8_MEMBER(bbc_state::bbcb_via_system_read_ca1)
+READ_LINE_MEMBER(bbc_state::bbcb_via_system_read_ca1)
 {
 	return 0x01;
 }
 
 
 /* joystick EOC */
-READ8_MEMBER(bbc_state::bbcb_via_system_read_cb1)
+READ_LINE_MEMBER(bbc_state::bbcb_via_system_read_cb1)
 {
-	return uPD7002_EOC_r(machine().device("upd7002"), space, 0);
+	return uPD7002_EOC_r(machine().device("upd7002"), generic_space(), 0);
 }
 
 
 /* keyboard pressed detect */
-READ8_MEMBER(bbc_state::bbcb_via_system_read_ca2)
+READ_LINE_MEMBER(bbc_state::bbcb_via_system_read_ca2)
 {
 	return 0x01;
 }
 
 
 /* light pen strobe detect (not emulated) */
-READ8_MEMBER(bbc_state::bbcb_via_system_read_cb2)
+READ_LINE_MEMBER(bbc_state::bbcb_via_system_read_cb2)
 {
 	return 0x01;
 }
@@ -1191,24 +1191,6 @@ WRITE_LINE_MEMBER(bbc_state::bbcb_via_system_irq_w)
 
 	check_interrupts();
 }
-
-const via6522_interface bbcb_system_via =
-{
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_system_read_porta),
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_system_read_portb),
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_system_read_ca1),
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_system_read_cb1),
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_system_read_ca2),
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_system_read_cb2),
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_system_write_porta),
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_system_write_portb),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbcb_via_system_irq_w)
-};
-
 
 /**********************************************************************
 USER VIA
@@ -1236,23 +1218,6 @@ WRITE_LINE_MEMBER(bbc_state::bbcb_via_user_irq_w)
 
 	check_interrupts();
 }
-
-const via6522_interface bbcb_user_via =
-{
-	DEVCB_NULL, //via_user_read_porta,
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_user_read_portb),
-	DEVCB_NULL, //via_user_read_ca1,
-	DEVCB_NULL, //via_user_read_cb1,
-	DEVCB_NULL, //via_user_read_ca2,
-	DEVCB_NULL, //via_user_read_cb2,
-	DEVCB_DEVICE_MEMBER("centronics", centronics_device, write),
-	DEVCB_DRIVER_MEMBER(bbc_state,bbcb_via_user_write_portb),
-	DEVCB_NULL, //via_user_write_ca1
-	DEVCB_NULL, //via_user_write_cb1
-	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),
-	DEVCB_NULL, //via_user_write_cb2,
-	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbcb_via_user_irq_w)
-};
 
 
 /**************************************

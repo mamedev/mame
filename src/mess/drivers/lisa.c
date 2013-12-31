@@ -172,8 +172,16 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","lisa")
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", 500000, lisa_via6522_0_intf)
-	MCFG_VIA6522_ADD("via6522_1", 500000, lisa_via6522_1_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 500000)
+	MCFG_VIA6522_READPB_HANDLER(READ8(lisa_state, COPS_via_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(lisa_state, COPS_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(lisa_state, COPS_via_out_b))
+	MCFG_VIA6522_CA1_HANDLER(WRITELINE(lisa_state, COPS_via_out_ca2))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(lisa_state, COPS_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(lisa_state, COPS_via_irq_func))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 500000)
+	MCFG_VIA6522_READPB_HANDLER(READ8(lisa_state, parallel_via_in_b))
 
 	MCFG_SCC8530_ADD("scc", 7833600, line_cb_t(FUNC(lisa_state::set_scc_interrupt), static_cast<lisa_state *>(owner)))
 MACHINE_CONFIG_END
@@ -187,10 +195,10 @@ static MACHINE_CONFIG_DERIVED( lisa210, lisa )
 	MCFG_IWM_MODIFY("fdc", lisa210_fdc_interface)
 
 	/* via */
-	MCFG_DEVICE_REMOVE("via6522_0")
-	MCFG_DEVICE_REMOVE("via6522_1")
-	MCFG_VIA6522_ADD("via6522_0", 1250000, lisa_via6522_0_intf)
-	MCFG_VIA6522_ADD("via6522_1", 1250000, lisa_via6522_1_intf)
+	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_DEVICE_CLOCK(1250000)
+	MCFG_DEVICE_MODIFY("via6522_1")
+	MCFG_DEVICE_CLOCK(1250000)
 MACHINE_CONFIG_END
 
 

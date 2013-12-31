@@ -46,12 +46,12 @@ READ8_MEMBER(gameplan_state::trvquest_question_r)
 	return memregion("questions")->base()[*m_trvquest_question * 0x2000 + offset];
 }
 
-WRITE8_MEMBER(gameplan_state::trvquest_coin_w)
+WRITE_LINE_MEMBER(gameplan_state::trvquest_coin_w)
 {
-	coin_counter_w(machine(), 0, ~data & 1);
+	coin_counter_w(machine(), 0, ~state & 1);
 }
 
-WRITE8_MEMBER(gameplan_state::trvquest_misc_w)
+WRITE_LINE_MEMBER(gameplan_state::trvquest_misc_w)
 {
 	// data & 1 -> led on/off ?
 }
@@ -145,24 +145,6 @@ static INPUT_PORTS_START( trvquest )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const via6522_interface via_1_interface =
-{
-	/*inputs : A/B         */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_NULL, DEVCB_NULL,
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,trvquest_coin_w), DEVCB_NULL,
-	/*irq                  */ DEVCB_NULL
-};
-
-static const via6522_interface via_2_interface =
-{
-	/*inputs : A/B         */ DEVCB_INPUT_PORT("UNK"), DEVCB_INPUT_PORT("DSW"),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_NULL, DEVCB_NULL,
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,trvquest_misc_w), DEVCB_NULL,
-	/*irq                  */ DEVCB_DRIVER_LINE_MEMBER(gameplan_state,via_irq)
-};
-
 
 MACHINE_START_MEMBER(gameplan_state,trvquest)
 {
@@ -210,9 +192,22 @@ static MACHINE_CONFIG_START( trvquest, gameplan_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", 0, trvquest_via_0_interface)
-	MCFG_VIA6522_ADD("via6522_1", 0, via_1_interface)
-	MCFG_VIA6522_ADD("via6522_2", 0, via_2_interface)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_VIA6522_READPB_HANDLER(READ8(gameplan_state,vblank_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, video_data_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, gameplan_video_command_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, video_command_trigger_w))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN0"))
+	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, trvquest_coin_w))
+
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(IOPORT("UNK"))
+	MCFG_VIA6522_READPB_HANDLER(IOPORT("DSW"))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, trvquest_misc_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(gameplan_state, via_irq))
 MACHINE_CONFIG_END
 
 ROM_START( trvquest )

@@ -47,8 +47,8 @@ public:
 	DECLARE_READ8_MEMBER(io1_r);
 	DECLARE_WRITE8_MEMBER(io2_w);
 	DECLARE_READ8_MEMBER(io2_r);
-	DECLARE_WRITE8_MEMBER(via1_irq);
-	DECLARE_WRITE8_MEMBER(via2_irq);
+	DECLARE_WRITE_LINE_MEMBER(via1_irq);
+	DECLARE_WRITE_LINE_MEMBER(via2_irq);
 	void dacia_receive(UINT8 data);
 	DECLARE_WRITE8_MEMBER(dacia_w);
 	DECLARE_READ8_MEMBER(dacia_r);
@@ -481,9 +481,9 @@ WRITE8_MEMBER(cops_state::io2_w)
  *
  *************************************/
 
-WRITE8_MEMBER(cops_state::via1_irq)
+WRITE_LINE_MEMBER(cops_state::via1_irq)
 {
-	if ( data == ASSERT_LINE )
+	if ( state == ASSERT_LINE )
 	{
 		m_irq |= 1;
 	}
@@ -494,15 +494,6 @@ WRITE8_MEMBER(cops_state::via1_irq)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, m_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const via6522_interface via_1_interface =
-{
-	DEVCB_NULL, DEVCB_NULL,                             /*inputs : A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*inputs : CA/B1,CA/B2 */
-	DEVCB_NULL, DEVCB_NULL,                             /*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*outputs: CA/B1,CA/B2 */
-	DEVCB_DRIVER_MEMBER(cops_state,via1_irq)            /*irq                  */
-};
-
 /*************************************
  *
  *  VIA 2 (U27)
@@ -512,9 +503,9 @@ static const via6522_interface via_1_interface =
  *
  *************************************/
 
-WRITE8_MEMBER(cops_state::via2_irq)
+WRITE_LINE_MEMBER(cops_state::via2_irq)
 {
-	if ( data == ASSERT_LINE )
+	if ( state == ASSERT_LINE )
 	{
 		m_irq |= 2;
 	}
@@ -525,32 +516,6 @@ WRITE8_MEMBER(cops_state::via2_irq)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, m_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-static const via6522_interface via_2_interface =
-{
-	DEVCB_NULL, DEVCB_NULL,                             /*inputs : A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*inputs : CA/B1,CA/B2 */
-	DEVCB_NULL, DEVCB_NULL,                             /*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*outputs: CA/B1,CA/B2 */
-	DEVCB_DRIVER_MEMBER(cops_state,via2_irq)            /*irq                  */
-};
-
-/*************************************
- *
- *  VIA 3
- *   PA0-7 CDROM
- *   PB0-8 CDROM
- *
- *************************************/
-
-static const via6522_interface via_3_interface =
-{
-	DEVCB_DRIVER_MEMBER(cops_state, cdrom_data_r), DEVCB_NULL,                              /*inputs : A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*inputs : CA/B1,CA/B2 */
-	DEVCB_DRIVER_MEMBER(cops_state, cdrom_data_w), DEVCB_DRIVER_MEMBER(cops_state, cdrom_ctrl_w),                               /*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,     /*outputs: CA/B1,CA/B2 */
-	DEVCB_NULL                                          /*irq                  */
-};
 
 /*************************************
  *
@@ -640,9 +605,16 @@ static MACHINE_CONFIG_START( cops, cops_state )
 	MCFG_PALETTE_LENGTH(8)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_1", 0, via_1_interface)
-	MCFG_VIA6522_ADD("via6522_2", 0, via_2_interface)
-	MCFG_VIA6522_ADD("via6522_3", 0, via_3_interface)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via1_irq))
+
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cops_state, via2_irq))
+
+	MCFG_DEVICE_ADD("via6522_3", VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(READ8(cops_state, cdrom_data_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cops_state, cdrom_data_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, cdrom_ctrl_w))
 
 	/* acia */
 //  MCFG_MOS6551_ADD("acia6551_1", XTAL_1_8432MHz, NULL)

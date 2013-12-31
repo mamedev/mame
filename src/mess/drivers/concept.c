@@ -230,7 +230,13 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_MM58274C_ADD("mm58274c", concept_mm58274c_interface)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1022750)
+	MCFG_VIA6522_READPA_HANDLER(READ8(concept_state, via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(concept_state, via_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(concept_state, via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(concept_state, via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(concept_state, via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(concept_state, via_irq_func))
 
 	/* ACIAs */
 	MCFG_DEVICE_ADD(ACIA_0_TAG, MOS6551, XTAL_1_8432MHz)

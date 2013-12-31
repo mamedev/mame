@@ -293,22 +293,6 @@ WRITE_LINE_MEMBER(jr100_state::jr100_via_write_cb2)
 {
 	m_cassette->output(state ? -1.0 : +1.0);
 }
-static const via6522_interface jr100_via_intf =
-{
-	DEVCB_NULL,                                         /* in_a_func */
-	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_read_b),                  /* in_b_func */
-	DEVCB_NULL,                                         /* in_ca1_func */
-	DEVCB_NULL,                                         /* in_cb1_func */
-	DEVCB_NULL,                                         /* in_ca2_func */
-	DEVCB_NULL,                                         /* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_a),                 /* out_a_func */
-	DEVCB_DRIVER_MEMBER(jr100_state,jr100_via_write_b),                 /* out_b_func */
-	DEVCB_NULL,                                         /* out_ca1_func */
-	DEVCB_NULL,                                         /* out_cb1_func */
-	DEVCB_NULL,                                         /* out_ca2_func */
-	DEVCB_DRIVER_LINE_MEMBER(jr100_state, jr100_via_write_cb2),                 /* out_cb2_func */
-	DEVCB_NULL                                          /* irq_func */
-};
 static const cassette_interface jr100_cassette_interface =
 {
 	cassette_default_formats,
@@ -404,8 +388,11 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
-
-	MCFG_VIA6522_ADD("via", XTAL_14_31818MHz / 16, jr100_via_intf)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL_14_31818MHz / 16)
+	MCFG_VIA6522_READPB_HANDLER(READ8(jr100_state,jr100_via_read_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(jr100_state,jr100_via_write_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(jr100_state,jr100_via_write_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(jr100_state, jr100_via_write_cb2))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

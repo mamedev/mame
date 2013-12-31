@@ -385,10 +385,6 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  via6522_interface via1_intf
-//-------------------------------------------------
-
 READ8_MEMBER( vic20_state::via1_pa_r )
 {
 	/*
@@ -452,27 +448,6 @@ WRITE8_MEMBER( vic20_state::via1_pa_w )
 	m_iec->atn_w(!BIT(data, 7));
 }
 
-static const via6522_interface via1_intf =
-{
-	DEVCB_DRIVER_MEMBER(vic20_state, via1_pa_r),
-	DEVCB_DEVICE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, pb_r),
-	DEVCB_INPUT_PORT("RESTORE"),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vic20_state, via1_pa_w),
-	DEVCB_DEVICE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, pb_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, cb1_w),
-	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w),
-	DEVCB_DEVICE_LINE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, cb2_w),
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, M6502_NMI_LINE)
-};
-
-
-//-------------------------------------------------
-//  via6522_interface via2_intf
-//-------------------------------------------------
 
 READ8_MEMBER( vic20_state::via2_pa_r )
 {
@@ -568,25 +543,6 @@ WRITE_LINE_MEMBER( vic20_state::via2_cb2_w )
 	m_iec->data_w(!state);
 }
 
-static const via6522_interface via2_intf =
-{
-	DEVCB_DRIVER_MEMBER(vic20_state, via2_pa_r),
-	DEVCB_DRIVER_MEMBER(vic20_state, via2_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vic20_state, via2_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(vic20_state, via2_ca2_w),
-	DEVCB_DRIVER_LINE_MEMBER(vic20_state, via2_cb2_w),
-
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, M6502_IRQ_LINE)
-};
-
 
 //-------------------------------------------------
 //  VIC20_EXPANSION_INTERFACE( expansion_intf )
@@ -664,8 +620,26 @@ void vic20_state::machine_reset()
 
 static MACHINE_CONFIG_START( vic20, vic20_state )
 	// devices
-	MCFG_VIA6522_ADD(M6522_1_TAG, 0, via1_intf)
-	MCFG_VIA6522_ADD(M6522_2_TAG, 0, via2_intf)
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via1_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(DEVREAD8(VIC20_USER_PORT_TAG, vic20_user_port_device, pb_r))
+	MCFG_VIA6522_READCA1_HANDLER(IOPORT("RESTORE"))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vic20_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITE8(VIC20_USER_PORT_TAG, vic20_user_port_device, pb_w))
+	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE(VIC20_USER_PORT_TAG, vic20_user_port_device, cb1_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(VIC20_USER_PORT_TAG, vic20_user_port_device, cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(M6502_TAG, m6502_device, nmi_line))
+
+	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via2_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(vic20_state, via2_pb_r))
+	MCFG_VIA6522_READCA1_HANDLER(DEVREADLINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via2_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(vic20_state, via2_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(vic20_state, via2_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(M6502_TAG, m6502_device, irq_line))
+
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(M6522_2_TAG, via6522_device, write_ca1))
 	MCFG_CBM_IEC_ADD("c1541")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(M6522_2_TAG, via6522_device, write_cb1))

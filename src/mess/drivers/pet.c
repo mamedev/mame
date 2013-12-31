@@ -786,10 +786,6 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  via6522_interface via_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( pet_state::via_irq_w )
 {
 	m_via_irq = state;
@@ -873,23 +869,6 @@ WRITE_LINE_MEMBER( pet_state::via_cb2_w )
 
 	m_user->cb2_w(state);
 }
-
-const via6522_interface via_intf =
-{
-	DEVCB_DEVICE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, pa_r),
-	DEVCB_DRIVER_MEMBER(pet_state, via_pb_r),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT2_TAG, pet_datassette_port_device, read),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pet_state, via_pa_w),
-	DEVCB_DRIVER_MEMBER(pet_state, via_pb_w),
-	DEVCB_DEVICE_LINE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, ca1_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_ca2_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_cb2_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_irq_w)
-};
 
 
 //-------------------------------------------------
@@ -1467,7 +1446,17 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(120))
 
 	// devices
-	MCFG_VIA6522_ADD(M6522_TAG, XTAL_8MHz/8, via_intf)
+	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL_8MHz/8)
+	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(PET_USER_PORT_TAG, pet_user_port_device, pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(pet_state, via_pb_r))
+	MCFG_VIA6522_READCB1_HANDLER(DEVREADLINE(PET_DATASSETTE_PORT2_TAG, pet_datassette_port_device, read))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(pet_state, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(pet_state, via_pb_w))
+	MCFG_VIA6522_CA1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, ca1_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(pet_state, via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(pet_state, via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(pet_state, via_irq_w))
+
 	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
 	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
 	MCFG_CBM_IEEE488_ADD("c4040")
@@ -1747,7 +1736,17 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
+	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL_16MHz/16)
+	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(PET_USER_PORT_TAG, pet_user_port_device, pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(pet_state, via_pb_r))
+	MCFG_VIA6522_READCB1_HANDLER(DEVREADLINE(PET_DATASSETTE_PORT2_TAG, pet_datassette_port_device, read))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(pet_state, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(pet_state, via_pb_w))
+	MCFG_VIA6522_CA1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, ca1_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(pet_state, via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(pet_state, via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(pet_state, via_irq_w))
+
 	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
 	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
 	MCFG_CBM_IEEE488_ADD("c8050")

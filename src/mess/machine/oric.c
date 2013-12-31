@@ -302,34 +302,34 @@ WRITE8_MEMBER(oric_state::oric_via_out_b_func)
 }
 
 
-READ8_MEMBER(oric_state::oric_via_in_ca2_func)
+READ_LINE_MEMBER(oric_state::oric_via_in_ca2_func)
 {
 	return m_psg_control & 1;
 }
 
-READ8_MEMBER(oric_state::oric_via_in_cb2_func)
+READ_LINE_MEMBER(oric_state::oric_via_in_cb2_func)
 {
 	return (m_psg_control>>1) & 1;
 }
 
-WRITE8_MEMBER(oric_state::oric_via_out_ca2_func)
+WRITE_LINE_MEMBER(oric_state::oric_via_out_ca2_func)
 {
 	m_psg_control &=~1;
 
-	if (data)
+	if (state)
 		m_psg_control |=1;
 
-	oric_psg_connection_refresh(space);
+	oric_psg_connection_refresh(generic_space());
 }
 
-WRITE8_MEMBER(oric_state::oric_via_out_cb2_func)
+WRITE_LINE_MEMBER(oric_state::oric_via_out_cb2_func)
 {
 	m_psg_control &=~2;
 
-	if (data)
+	if (state)
 		m_psg_control |=2;
 
-	oric_psg_connection_refresh(space);
+	oric_psg_connection_refresh(generic_space());
 }
 
 
@@ -384,23 +384,6 @@ CB2
  PSG BDIR line
 
 */
-
-const via6522_interface oric_6522_interface=
-{
-	DEVCB_DRIVER_MEMBER(oric_state,oric_via_in_a_func),
-	DEVCB_DRIVER_MEMBER(oric_state,oric_via_in_b_func),
-	DEVCB_NULL,             /* printer acknowledge - handled by callback*/
-	DEVCB_NULL,             /* tape input - handled by timer */
-	DEVCB_DRIVER_MEMBER(oric_state,oric_via_in_ca2_func),
-	DEVCB_DRIVER_MEMBER(oric_state,oric_via_in_cb2_func),
-	DEVCB_DRIVER_MEMBER(oric_state,oric_via_out_a_func),
-	DEVCB_DRIVER_MEMBER(oric_state,oric_via_out_b_func),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(oric_state,oric_via_out_ca2_func),
-	DEVCB_DRIVER_MEMBER(oric_state,oric_via_out_cb2_func),
-	DEVCB_DRIVER_LINE_MEMBER(oric_state,oric_via_irq_func),
-};
 
 
 
@@ -1322,23 +1305,6 @@ WRITE_LINE_MEMBER(oric_state::telestrat_via2_irq_func)
 
 	oric_refresh_ints();
 }
-
-const via6522_interface telestrat_via2_interface=
-{
-	DEVCB_DRIVER_MEMBER(oric_state,telestrat_via2_in_a_func),
-	DEVCB_DRIVER_MEMBER(oric_state,telestrat_via2_in_b_func),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(oric_state,telestrat_via2_out_a_func),
-	DEVCB_DRIVER_MEMBER(oric_state,telestrat_via2_out_b_func),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(oric_state,telestrat_via2_irq_func),
-};
 
 #if 0
 /* interrupt state from acia6551 */

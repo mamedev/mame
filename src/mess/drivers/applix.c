@@ -826,23 +826,6 @@ WRITE_LINE_MEMBER( applix_state::vsync_w )
 	m_via->write_ca2(state);
 }
 
-static const via6522_interface applix_via =
-{
-	DEVCB_DRIVER_MEMBER(applix_state, applix_pa_r), // in port A
-	DEVCB_DRIVER_MEMBER(applix_state, applix_pb_r), // in port B
-	DEVCB_NULL, // in CA1 cent ack
-	DEVCB_NULL, // in CB1 kbd clk
-	DEVCB_NULL, // in CA2 vsync
-	DEVCB_NULL, // in CB2 kdb data
-	DEVCB_DRIVER_MEMBER(applix_state, applix_pa_w),// out Port A
-	DEVCB_DRIVER_MEMBER(applix_state, applix_pb_w), // out port B
-	DEVCB_NULL, // out CA1
-	DEVCB_NULL, // out CB1
-	DEVCB_NULL, // out CA2
-	DEVCB_NULL, // out CB2
-	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_2) //IRQ
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
 {
 	/* cassette - turn 2500/5000Hz to a bit */
@@ -907,7 +890,17 @@ static MACHINE_CONFIG_START( applix, applix_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1875000, applix_crtc) // 6545
-	MCFG_VIA6522_ADD("via6522", 0, applix_via)
+	MCFG_DEVICE_ADD("via6522", VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(READ8(applix_state, applix_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(applix_state, applix_pb_r))
+	// in CA1 cent ack
+	// in CB1 kbd clk
+	// in CA2 vsync
+	// in CB2 kdb data
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(applix_state, applix_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(applix_state, applix_pb_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq2))
+
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", applix_centronics_config)
 	MCFG_CASSETTE_ADD("cassette", applix_cassette_interface)
 	MCFG_WD1772x_ADD("fdc", XTAL_16MHz / 2) //connected to Z80H clock pin

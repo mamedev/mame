@@ -134,8 +134,7 @@ public:
 	DECLARE_READ8_MEMBER(via_b_in);
 	DECLARE_WRITE8_MEMBER(via_a_out);
 	DECLARE_WRITE8_MEMBER(via_b_out);
-	DECLARE_WRITE8_MEMBER(via_ca2_out);
-	DECLARE_WRITE8_MEMBER(via_irq);
+	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
 	DECLARE_READ8_MEMBER(dips1_r);
 	DECLARE_WRITE8_MEMBER(input_mux_w);
 	DECLARE_DRIVER_INIT(bmcbowl);
@@ -257,15 +256,9 @@ WRITE8_MEMBER(bmcbowl_state::via_b_out)
 	//used
 }
 
-WRITE8_MEMBER(bmcbowl_state::via_ca2_out)
+WRITE_LINE_MEMBER(bmcbowl_state::via_ca2_out)
 {
 	//used
-}
-
-
-WRITE8_MEMBER(bmcbowl_state::via_irq)
-{
-		m_maincpu->set_input_line(4, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -475,15 +468,6 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static const via6522_interface via_interface =
-{
-	/*inputs : A/B         */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(bmcbowl_state,via_b_in),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_DRIVER_MEMBER(bmcbowl_state,via_a_out), DEVCB_DRIVER_MEMBER(bmcbowl_state,via_b_out),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(bmcbowl_state,via_ca2_out), DEVCB_NULL,
-	/*irq                  */ DEVCB_DRIVER_MEMBER(bmcbowl_state,via_irq)
-};
-
 static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
@@ -512,7 +496,12 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", 1000000, via_interface)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_VIA6522_READPB_HANDLER(READ8(bmcbowl_state,via_b_in))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bmcbowl_state, via_a_out))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bmcbowl_state, via_b_out))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(bmcbowl_state, via_ca2_out))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq4))
 MACHINE_CONFIG_END
 
 ROM_START( bmcbowl )

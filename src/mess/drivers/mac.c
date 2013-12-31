@@ -962,7 +962,17 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
-	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
+	
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+#ifdef MAC_USE_EMULATED_KBD
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_via_in_cb2))
+#endif
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
 	MCFG_MACKBD_ADD()
 	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(mac_state, mac_kbd_clk_in))
@@ -1006,7 +1016,14 @@ static MACHINE_CONFIG_DERIVED( macse, macplus )
 	MCFG_CPU_PROGRAM_MAP(macse_map)
 
 	MCFG_DEVICE_REMOVE("via6522_0")
-	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_adb_via_in_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1024,7 +1041,14 @@ static MACHINE_CONFIG_DERIVED( macclasc, macplus )
 	MCFG_CPU_PROGRAM_MAP(macse_map)
 
 	MCFG_DEVICE_REMOVE("via6522_0")
-	MCFG_VIA6522_ADD("via6522_0", 1000000, mac_via6522_adb_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_adb_via_in_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1072,7 +1096,16 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
-	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+#ifdef MAC_USE_EMULATED_KBD
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_via_in_cb2))
+#endif
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1118,8 +1151,21 @@ static MACHINE_CONFIG_START( macii, mac_state )
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
-	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
-	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, C7M/10)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_adb_via_in_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, C7M/10)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1168,7 +1214,14 @@ static MACHINE_CONFIG_START( maciifx, mac_state )
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
-	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, C7M/10)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_adb_via_in_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1371,8 +1424,21 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
-	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
-	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_adb_via_in_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1419,8 +1485,21 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
-	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
-	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_adb_via_in_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1487,8 +1566,21 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
-	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
-	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_adb_via_in_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1656,8 +1748,21 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
-	MCFG_VIA6522_ADD("via6522_0", 783360, mac_via6522_adb_intf)
-	MCFG_VIA6522_ADD("via6522_1", 783360, mac_via6522_2_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_adb_via_in_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1701,8 +1806,21 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 
-	MCFG_VIA6522_ADD("via6522_0", C7M/10, mac_via6522_adb_intf)
-	MCFG_VIA6522_ADD("via6522_1", C7M/10, mac_via6522_2_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, C7M/10)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(mac_state,mac_adb_via_in_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, C7M/10)
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
 
 	MCFG_SCSIBUS_ADD("scsi")
 	MCFG_SCSIDEV_ADD("scsi:harddisk1", SCSIHD, SCSI_ID_6)

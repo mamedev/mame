@@ -68,10 +68,6 @@ enum model_t
 
 };
 
-/*----------- defined in machine/pcimac.c -----------*/
-
-extern const via6522_interface pcimac_via6522_intf;
-
 
 /* Mac driver data */
 
@@ -162,8 +158,8 @@ public:
 	DECLARE_READ8_MEMBER(mac_via_in_b);
 	DECLARE_WRITE8_MEMBER(mac_via_out_a);
 	DECLARE_WRITE8_MEMBER(mac_via_out_b);
-	DECLARE_READ8_MEMBER(mac_adb_via_in_cb2);
-	DECLARE_WRITE8_MEMBER(mac_adb_via_out_cb2);
+	DECLARE_READ_LINE_MEMBER(mac_adb_via_in_cb2);
+	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	void mac_driver_init(model_t model);
 };

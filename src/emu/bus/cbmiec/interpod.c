@@ -122,30 +122,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  via6522_interface via_intf
-//-------------------------------------------------
-
-static const via6522_interface via_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  riot6532_interface riot_intf
 //-------------------------------------------------
 
@@ -181,7 +157,7 @@ static MACHINE_CONFIG_FRAGMENT( interpod )
 	MCFG_CPU_ADD(R6502_TAG, M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(interpod_mem)
 
-	MCFG_VIA6522_ADD(R6522_TAG, 1000000, via_intf)
+	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, 1000000)
 	MCFG_RIOT6532_ADD(R6532_TAG, 1000000, riot_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
 

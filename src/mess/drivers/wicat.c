@@ -767,23 +767,6 @@ struct im6402_interface wicat_video_uart_intf =
 	DEVCB_NULL, //m_out_tre_cb;
 };
 
-static via6522_interface wicat_via_intf =
-{
-	DEVCB_DRIVER_MEMBER(wicat_state,via_a_r),  // Port A in
-	DEVCB_DRIVER_MEMBER(wicat_state,via_b_r),  // Port B in
-	DEVCB_NULL,  // CA1 in
-	DEVCB_NULL,  // CB1 in
-	DEVCB_NULL,  // CA2 in
-	DEVCB_NULL,  // CB2 in
-	DEVCB_DRIVER_MEMBER(wicat_state,via_a_w),  // Port A out
-	DEVCB_DRIVER_MEMBER(wicat_state,via_b_w),  // Port B out
-	DEVCB_NULL,  // CA1 out
-	DEVCB_NULL,  // CB1 out
-	DEVCB_NULL,  // CA2 out
-	DEVCB_NULL,  // CB2 out
-	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_1)  // IRQ
-};
-
 static mm58274c_interface wicat_rtc_intf =
 {
 	0,  // 12 hour
@@ -808,7 +791,12 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_mem)
 
-	MCFG_VIA6522_ADD("via",XTAL_4MHz,wicat_via_intf)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz)
+	MCFG_VIA6522_READPA_HANDLER(READ8(wicat_state, via_a_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(wicat_state, via_b_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(wicat_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(wicat_state, via_b_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq1))
 
 	MCFG_MM58274C_ADD("rtc",wicat_rtc_intf)  // actually an MM58174AN, but should be compatible
 

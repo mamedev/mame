@@ -90,7 +90,5 @@ public:
 /*----------- defined in machine/apple3.c -----------*/
 
 extern const applefdc_interface apple3_fdc_interface;
-extern const via6522_interface apple3_via_0_intf;
-extern const via6522_interface apple3_via_1_intf;
 
 #endif /* APPLE3_H_ */

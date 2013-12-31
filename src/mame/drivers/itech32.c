@@ -720,9 +720,9 @@ WRITE8_MEMBER(itech32_state::drivedge_portb_out)
 }
 
 
-WRITE8_MEMBER(itech32_state::drivedge_turbo_light)
+WRITE_LINE_MEMBER(itech32_state::drivedge_turbo_light)
 {
-	set_led_status(machine(), 0, data);
+	set_led_status(machine(), 0, state);
 }
 
 
@@ -736,33 +736,6 @@ WRITE8_MEMBER(itech32_state::pia_portb_out)
 	machine().device<ticket_dispenser_device>("ticket")->write(machine().driver_data()->generic_space(), 0, (data & 0x10) << 3);
 	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
-
-
-
-/*************************************
- *
- *  Sound 6522 VIA handling
- *
- *************************************/
-
-static const via6522_interface via_interface =
-{
-	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(itech32_state,pia_portb_out),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("soundcpu", M6809_FIRQ_LINE)
-};
-
-
-static const via6522_interface drivedge_via_interface =
-{
-	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(itech32_state,drivedge_portb_out),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(itech32_state,drivedge_turbo_light),
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("soundcpu", M6809_FIRQ_LINE)
-};
 
 
 
@@ -1721,7 +1694,9 @@ static MACHINE_CONFIG_START( timekill, itech32_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", SOUND_CLOCK/8, via_interface)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, SOUND_CLOCK/8)
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(itech32_state,pia_portb_out))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("soundcpu", m6809_device, firq_line))
 MACHINE_CONFIG_END
 
 
@@ -1749,6 +1724,10 @@ static MACHINE_CONFIG_DERIVED( drivedge, bloodstm )
 
 	MCFG_CPU_ADD("dsp2", TMS32031, TMS_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(drivedge_tms2_map)
+
+	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(itech32_state,drivedge_portb_out))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(itech32_state,drivedge_turbo_light))
 
 //  MCFG_CPU_ADD("comm", M6803, 8000000/4) -- network CPU
 

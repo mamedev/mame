@@ -116,10 +116,6 @@ static ADDRESS_MAP_START( fd4000_mem, AS_PROGRAM, 8, fd4000_device )
 ADDRESS_MAP_END
 
 
-//-------------------------------------------------
-//  via6522_interface via_intf
-//-------------------------------------------------
-
 READ8_MEMBER( fd2000_device::via_pa_r )
 {
 	/*
@@ -201,25 +197,6 @@ WRITE8_MEMBER( fd2000_device::via_pb_w )
 	*/
 }
 
-static const via6522_interface via_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, fd2000_device, via_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, fd2000_device, via_pb_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, fd2000_device, via_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, fd2000_device, via_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL
-};
-
 static SLOT_INTERFACE_START( fd2000_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD ) // TEAC FD-235HF
 SLOT_INTERFACE_END
@@ -242,7 +219,12 @@ static MACHINE_CONFIG_FRAGMENT( fd2000 )
 	MCFG_CPU_ADD(G65SC02PI2_TAG, M65C02, XTAL_24MHz/12)
 	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
 
-	MCFG_VIA6522_ADD(G65SC22P2_TAG, XTAL_24MHz/12, via_intf)
+	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL_24MHz/12)
+	MCFG_VIA6522_READPA_HANDLER(READ8(fd2000_device, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(fd2000_device, via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(fd2000_device, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(fd2000_device, via_pb_w))
+
 	MCFG_DP8473_ADD(DP8473V_TAG)
 
 	MCFG_FLOPPY_DRIVE_ADD(DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
@@ -257,7 +239,12 @@ static MACHINE_CONFIG_FRAGMENT( fd4000 )
 	MCFG_CPU_ADD(R65C02P4_TAG, M65C02, XTAL_24MHz/6)
 	MCFG_CPU_PROGRAM_MAP(fd4000_mem)
 
-	MCFG_VIA6522_ADD(G65SC22P2_TAG, XTAL_24MHz/12, via_intf)
+	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL_24MHz/12)
+	MCFG_VIA6522_READPA_HANDLER(READ8(fd2000_device, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(fd2000_device, via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(fd2000_device, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(fd2000_device, via_pb_w))
+
 	MCFG_PC8477A_ADD(PC8477AV1_TAG)
 
 	MCFG_FLOPPY_DRIVE_ADD(PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)

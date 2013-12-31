@@ -169,10 +169,6 @@ static const mc6854_interface adlc_intf =
 };
 
 
-//-------------------------------------------------
-//  via6522_interface via_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( e01_device::via_irq_w )
 {
 	m_via_irq = state;
@@ -184,25 +180,6 @@ WRITE_LINE_MEMBER( e01_device::clk_en_w )
 {
 	m_clk_en = state;
 }
-
-static const via6522_interface via_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, via_irq_w)
-};
 
 
 //-------------------------------------------------
@@ -294,7 +271,10 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(e01_device, rtc_irq_w))
 
 	// devices
-	MCFG_VIA6522_ADD(R6522_TAG, XTAL_8MHz/4, via_intf)
+	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, XTAL_8MHz/4)
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8(CENTRONICS_TAG, centronics_device, write))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(e01_device, via_irq_w))
+
 	MCFG_MC6854_ADD(MC6854_TAG, adlc_intf)
 	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_8MHz/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", floppy_image_device::default_floppy_formats)

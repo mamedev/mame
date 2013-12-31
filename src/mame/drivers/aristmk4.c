@@ -324,14 +324,13 @@ public:
 	DECLARE_READ8_MEMBER(via_b_r);
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
-	DECLARE_READ8_MEMBER(via_ca2_r);
-	DECLARE_READ8_MEMBER(via_cb2_r);
-	DECLARE_WRITE8_MEMBER(via_ca2_w);
-	DECLARE_WRITE8_MEMBER(via_cb2_w);
+	DECLARE_READ_LINE_MEMBER(via_ca2_r);
+	DECLARE_READ_LINE_MEMBER(via_cb2_r);
+	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE8_MEMBER(pblp_out);
 	DECLARE_WRITE8_MEMBER(pbltlp_out);
 	DECLARE_WRITE8_MEMBER(zn434_w);
-	DECLARE_WRITE8_MEMBER(firq);
 	DECLARE_READ8_MEMBER(pa1_r);
 	DECLARE_READ8_MEMBER(pb1_r);
 	DECLARE_READ8_MEMBER(pc1_r);
@@ -834,7 +833,7 @@ WRITE8_MEMBER(aristmk4_state::via_b_w)
 	}
 }
 
-READ8_MEMBER(aristmk4_state::via_ca2_r)
+READ_LINE_MEMBER(aristmk4_state::via_ca2_r)
 {
 	//logerror("Via Port CA2 read %02X\n",0) ;
 	// CA2 is connected to CDSOL1 on schematics ?
@@ -842,7 +841,7 @@ READ8_MEMBER(aristmk4_state::via_ca2_r)
 	return 0 ;
 }
 
-READ8_MEMBER(aristmk4_state::via_cb2_r)
+READ_LINE_MEMBER(aristmk4_state::via_cb2_r)
 {
 	//logerror("Via Port CB2 read %02X\n",0) ;
 	// CB2 is connected to HOPMO1 on schematics ?
@@ -850,21 +849,21 @@ READ8_MEMBER(aristmk4_state::via_cb2_r)
 	return 0 ;
 }
 
-WRITE8_MEMBER(aristmk4_state::via_ca2_w)
+WRITE_LINE_MEMBER(aristmk4_state::via_ca2_w)
 {
 	//logerror("Via Port CA2 write %02X\n",data) ;
 }
 
-WRITE8_MEMBER(aristmk4_state::via_cb2_w)
+WRITE_LINE_MEMBER(aristmk4_state::via_cb2_w)
 {
 	// CB2 = hopper motor (HOPMO1). When it is 0x01, it is not running (active low)
 	// when it goes to 0, we're expecting to coins to be paid out, handled in via_b_r
 	// as soon as it is 1, HOPCO1 to remain 'ON'
 
-	if (data==0x01)
-		m_hopper_motor=data;
+	if (state==0x01)
+		m_hopper_motor=state;
 	else if (m_hopper_motor<0x02)
-		m_hopper_motor=data;
+		m_hopper_motor=state;
 
 	output_set_value("hopper_motor", m_hopper_motor); // stop motor
 }
@@ -1567,22 +1566,6 @@ static const ay8910_interface ay8910_config2 =
 	DEVCB_DRIVER_MEMBER(aristmk4_state,pbltlp_out)  // Port B write - goes to lamps on the buttons x4 and light tower x4
 };
 
-WRITE8_MEMBER(aristmk4_state::firq)
-{
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, data ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static const via6522_interface via_interface =
-{
-	/*inputs : A/B      */ DEVCB_DRIVER_MEMBER(aristmk4_state,via_a_r),DEVCB_DRIVER_MEMBER(aristmk4_state,via_b_r),
-	/*inputs : CA/B1,CA/B2  */ DEVCB_NULL,DEVCB_NULL,DEVCB_DRIVER_MEMBER(aristmk4_state,via_ca2_r),DEVCB_DRIVER_MEMBER(aristmk4_state,via_cb2_r),
-	/*outputs: A/B      */ DEVCB_DRIVER_MEMBER(aristmk4_state,via_a_w), DEVCB_DRIVER_MEMBER(aristmk4_state,via_b_w),
-	/*outputs: CA/B1,CA/B2  */ DEVCB_NULL,DEVCB_NULL,DEVCB_DRIVER_MEMBER(aristmk4_state,via_ca2_w),DEVCB_DRIVER_MEMBER(aristmk4_state,via_cb2_w),
-	/*irq           */ DEVCB_DRIVER_MEMBER(aristmk4_state,firq)
-
-	// CA1 is connected to +5V, CB1 is not connected.
-};
-
 static const pia6821_interface aristmk4_pia1_intf =
 {
 	DEVCB_DRIVER_MEMBER(aristmk4_state, mkiv_pia_ina),  // port A in
@@ -1743,7 +1726,18 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_SCREEN_UPDATE_DRIVER(aristmk4_state, screen_update_aristmk4)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
-	MCFG_VIA6522_ADD("via6522_0", 0, via_interface) /* 1 MHz.(only 1 or 2 MHz.are valid) */
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0) /* 1 MHz.(only 1 or 2 MHz.are valid) */
+	MCFG_VIA6522_READPA_HANDLER(READ8(aristmk4_state, via_a_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(aristmk4_state, via_b_r))
+	MCFG_VIA6522_READCA2_HANDLER(READLINE(aristmk4_state, via_ca2_r))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(aristmk4_state, via_cb2_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(aristmk4_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aristmk4_state, via_b_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(aristmk4_state, via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(aristmk4_state, via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, firq_line))
+	// CA1 is connected to +5V, CB1 is not connected.
+
 	MCFG_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
 	MCFG_MC6845_ADD("crtc", C6545_1, "screen", MAIN_CLOCK/8, mc6845_intf) // TODO: type is unknown
 	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )

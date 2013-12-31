@@ -102,61 +102,6 @@ static INPUT_PORTS_START( aim65_40 )
 INPUT_PORTS_END
 
 /***************************************************************************
-    DEVICE INTERFACES
-***************************************************************************/
-
-static const via6522_interface user_via_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const via6522_interface system_via_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const via6522_interface kb_via_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
@@ -171,9 +116,9 @@ static MACHINE_CONFIG_START( aim65_40, aim65_40_state )
 	/* sound hardware */
 
 	/* devices */
-	MCFG_VIA6522_ADD(M6522_0_TAG, 0, user_via_intf)
-	MCFG_VIA6522_ADD(M6522_1_TAG, 0, system_via_intf)
-	MCFG_VIA6522_ADD(M6522_2_TAG, 0, kb_via_intf)
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 0)
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 0)
+	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 0)
 	MCFG_DEVICE_ADD(M6551_TAG, MOS6551, XTAL_1_8432MHz)
 MACHINE_CONFIG_END
 

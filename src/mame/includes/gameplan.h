@@ -64,10 +64,10 @@ public:
 	required_device<via6522_device> m_via_2;
 	DECLARE_WRITE8_MEMBER(io_select_w);
 	DECLARE_READ8_MEMBER(io_port_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(audio_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_w);
+	DECLARE_WRITE_LINE_MEMBER(audio_reset_w);
 	DECLARE_WRITE8_MEMBER(audio_cmd_w);
-	DECLARE_WRITE8_MEMBER(audio_trigger_w);
+	DECLARE_WRITE_LINE_MEMBER(audio_trigger_w);
 	DECLARE_WRITE_LINE_MEMBER(r6532_irq);
 	DECLARE_WRITE8_MEMBER(r6532_soundlatch_w);
 	DECLARE_MACHINE_START(gameplan);
@@ -94,18 +94,14 @@ public:
 	void leprechn_get_pens( pen_t *pens );
 	DECLARE_WRITE_LINE_MEMBER(via_irq);
 	DECLARE_READ8_MEMBER(trvquest_question_r);
-	DECLARE_WRITE8_MEMBER(trvquest_coin_w);
-	DECLARE_WRITE8_MEMBER(trvquest_misc_w);
+	DECLARE_WRITE_LINE_MEMBER(trvquest_coin_w);
+	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in video/gameplan.c -----------*/
-
-extern const via6522_interface gameplan_via_0_interface;
-extern const via6522_interface leprechn_via_0_interface;
-extern const via6522_interface trvquest_via_0_interface;
 
 MACHINE_CONFIG_EXTERN( gameplan_video );
 MACHINE_CONFIG_EXTERN( leprechn_video );

@@ -119,7 +119,14 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", 0, vectrex_via6522_interface)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(READ8(vectrex_state, vectrex_via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(vectrex_state, vectrex_via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vectrex_state, v_via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vectrex_state, v_via_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(vectrex_state, v_via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(vectrex_state, v_via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vectrex_state, vectrex_via_irq))
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -209,8 +216,8 @@ static MACHINE_CONFIG_DERIVED( raaspec, vectrex )
 	MCFG_VIDEO_START_OVERRIDE(vectrex_state,raaspec)
 
 	/* via */
-	MCFG_DEVICE_REMOVE("via6522_0")
-	MCFG_VIA6522_ADD("via6522_0", 0, spectrum1_via6522_interface)
+	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_VIA6522_READPB_HANDLER(READ8(vectrex_state, vectrex_s1_via_pb_r))
 
 	MCFG_DEVICE_REMOVE("cart")
 MACHINE_CONFIG_END

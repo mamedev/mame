@@ -101,8 +101,16 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", 1000000, apple3_via_0_intf)
-	MCFG_VIA6522_ADD("via6522_1", 2000000, apple3_via_1_intf)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_0_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_0_out_b))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 2000000)
+	MCFG_VIA6522_READPA_HANDLER(READ8(apple3_state, apple3_via_1_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(apple3_state, apple3_via_1_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_1_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_1_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple2_via_1_irq_func))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

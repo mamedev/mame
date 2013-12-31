@@ -9,7 +9,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/6522via.h"
 #include "machine/8530scc.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/applefdc.h"
@@ -25,17 +24,6 @@
 
 
 /* VIA1 Handlers */
-
-const via6522_interface pcimac_via6522_intf =
-{
-	DEVCB_DRIVER_MEMBER(macpci_state,mac_via_in_a), DEVCB_DRIVER_MEMBER(macpci_state,mac_via_in_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(macpci_state,mac_adb_via_in_cb2),
-	DEVCB_DRIVER_MEMBER(macpci_state,mac_via_out_a), DEVCB_DRIVER_MEMBER(macpci_state,mac_via_out_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(macpci_state,mac_adb_via_out_cb2),
-	DEVCB_DRIVER_LINE_MEMBER(macpci_state,mac_via_irq)
-};
 
 WRITE_LINE_MEMBER(macpci_state::mac_via_irq)
 {
@@ -106,7 +94,7 @@ WRITE16_MEMBER ( macpci_state::mac_via_w )
 	m_maincpu->adjust_icount(m_via_cycles);
 }
 
-READ8_MEMBER(macpci_state::mac_adb_via_in_cb2)
+READ_LINE_MEMBER(macpci_state::mac_adb_via_in_cb2)
 {
 	UINT8 ret;
 	ret = m_cuda->get_via_data();
@@ -117,9 +105,9 @@ READ8_MEMBER(macpci_state::mac_adb_via_in_cb2)
 	return ret;
 }
 
-WRITE8_MEMBER(macpci_state::mac_adb_via_out_cb2)
+WRITE_LINE_MEMBER(macpci_state::mac_adb_via_out_cb2)
 {
-	m_cuda->set_via_data(data & 1);
+	m_cuda->set_via_data(state);
 }
 
 void macpci_state::machine_start()

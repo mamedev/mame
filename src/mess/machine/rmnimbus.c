@@ -2985,23 +2985,6 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_via_irq_w)
 		external_int(VIA_INT,0x00);
 }
 
-const via6522_interface nimbus_via =
-{
-	DEVCB_NULL, //via_user_read_porta,
-	DEVCB_DRIVER_MEMBER(rmnimbus_state,nimbus_via_read_portb),
-	DEVCB_NULL, //via_user_read_ca1,
-	DEVCB_NULL, //via_user_read_cb1,
-	DEVCB_NULL, //via_user_read_ca2,
-	DEVCB_NULL, //via_user_read_cb2,
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
-	DEVCB_DRIVER_MEMBER(rmnimbus_state,nimbus_via_write_portb),
-	DEVCB_NULL, //via_user_write_ca1
-	DEVCB_NULL, //via_user_write_cb1
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),
-	DEVCB_NULL, //via_user_write_cb2,
-	DEVCB_DRIVER_LINE_MEMBER(rmnimbus_state,nimbus_via_irq_w)
-};
-
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_ack_w)
 {
 	via6522_device *via_1 = machine().device<via6522_device>(VIA_TAG);

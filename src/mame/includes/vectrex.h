@@ -112,8 +112,8 @@ public:
 	DECLARE_READ8_MEMBER(vectrex_s1_via_pb_r);
 	DECLARE_WRITE8_MEMBER(v_via_pb_w);
 	DECLARE_WRITE8_MEMBER(v_via_pa_w);
-	DECLARE_WRITE8_MEMBER(v_via_ca2_w);
-	DECLARE_WRITE8_MEMBER(v_via_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(v_via_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(v_via_cb2_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( vectrex_cart );
 	DECLARE_WRITE_LINE_MEMBER(vectrex_via_irq);
 
@@ -142,10 +142,5 @@ protected:
 	void vectrex_add_point_stereo(int x, int y, rgb_t color, int intensity);
 	int vectrex_verify_cart(char *data);
 };
-
-/*---------- defined in video/vectrex.c -----------*/
-
-extern const via6522_interface vectrex_via6522_interface;
-extern const via6522_interface spectrum1_via6522_interface;
 
 #endif /* VECTREX_H_ */

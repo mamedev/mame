@@ -301,57 +301,6 @@ void sym1_state::machine_reset()
 	m_maincpu->reset();
 }
 
-const via6522_interface sym1_via0 =
-{
-	DEVCB_NULL,
-	DEVCB_UNMAPPED,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_UNMAPPED,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
-};
-
-const via6522_interface sym1_via1 =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
-};
-
-const via6522_interface sym1_via2 =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(sym1_state, sym1_via2_a_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
-};
-
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -391,9 +340,16 @@ static MACHINE_CONFIG_START( sym1, sym1_state )
 	// devices
 	MCFG_RIOT6532_ADD("riot", SYM1_CLOCK, sym1_r6532_interface)
 	MCFG_TTL74145_ADD("ttl74145", sym1_ttl74145_intf)
-	MCFG_VIA6522_ADD("via6522_0", 0, sym1_via0)
-	MCFG_VIA6522_ADD("via6522_1", 0, sym1_via1)
-	MCFG_VIA6522_ADD("via6522_2", 0, sym1_via2)
+
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
+
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(sym1_state, sym1_via2_a_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

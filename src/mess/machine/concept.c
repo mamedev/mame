@@ -33,19 +33,7 @@ enum
 /*static int ready;*/           /* ready line from monochip, role unknown */
 
 /* Via */
-static void via_irq_func(device_t *device, int state);
 
-
-const via6522_interface concept_via6522_intf =
-{   /* main via */
-	DEVCB_DRIVER_MEMBER(concept_state,via_in_a), DEVCB_DRIVER_MEMBER(concept_state,via_in_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(concept_state,via_out_a), DEVCB_DRIVER_MEMBER(concept_state,via_out_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(concept_state,via_out_cb2),
-	DEVCB_LINE(via_irq_func)
-};
 
 void concept_state::machine_start()
 {
@@ -223,18 +211,17 @@ WRITE8_MEMBER(concept_state::via_out_b)
 /*
     VIA CB2: used as sound output
 */
-WRITE8_MEMBER(concept_state::via_out_cb2)
+WRITE_LINE_MEMBER(concept_state::via_out_cb2)
 {
-	LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", data));
+	LOG(("via_out_cb2: Sound control written: data=0x%2.2x\n", state));
 }
 
 /*
     VIA irq -> 68k level 5
 */
-static void via_irq_func(device_t *device, int state)
+WRITE_LINE_MEMBER(concept_state::via_irq_func)
 {
-	concept_state *drvstate = device->machine().driver_data<concept_state>();
-	drvstate->concept_set_interrupt(TIMINT_level, state);
+	concept_set_interrupt(TIMINT_level, state);
 }
 
 READ16_MEMBER(concept_state::concept_io_r)

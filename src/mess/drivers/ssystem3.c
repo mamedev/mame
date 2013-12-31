@@ -207,21 +207,6 @@ WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
 	via_0->write_portb(space,0, d );
 }
 
-static const via6522_interface ssystem3_via_config=
-{
-	DEVCB_DRIVER_MEMBER(ssystem3_state,ssystem3_via_read_a),//read8_machine_func in_a_func;
-	DEVCB_DRIVER_MEMBER(ssystem3_state,ssystem3_via_read_b),//read8_machine_func in_b_func;
-	DEVCB_NULL,//read8_machine_func in_ca1_func;
-	DEVCB_NULL,//read8_machine_func in_cb1_func;
-	DEVCB_NULL,//read8_machine_func in_ca2_func;
-	DEVCB_NULL,//read8_machine_func in_cb2_func;
-	DEVCB_DRIVER_MEMBER(ssystem3_state,ssystem3_via_write_a),//write8_machine_func out_a_func;
-	DEVCB_DRIVER_MEMBER(ssystem3_state,ssystem3_via_write_b),//write8_machine_func out_b_func;
-	DEVCB_NULL,//write8_machine_func out_ca2_func;
-	DEVCB_NULL,//write8_machine_func out_cb2_func;
-	DEVCB_NULL,//void (*irq_func)(int state);
-};
-
 DRIVER_INIT_MEMBER(ssystem3_state,ssystem3)
 {
 	ssystem3_playfield_reset();
@@ -318,7 +303,11 @@ static MACHINE_CONFIG_START( ssystem3, ssystem3_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", 0, ssystem3_via_config)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(READ8(ssystem3_state,ssystem3_via_read_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(ssystem3_state,ssystem3_via_read_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(ssystem3_state,ssystem3_via_write_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(ssystem3_state,ssystem3_via_write_b))
 MACHINE_CONFIG_END
 
 

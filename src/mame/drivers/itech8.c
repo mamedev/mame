@@ -549,23 +549,6 @@ static const pia6821_interface pia_interface =
 
 /*************************************
  *
- *  6522 VIA interface
- *
- *************************************/
-
-static const via6522_interface via_interface =
-{
-	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(itech8_state, pia_portb_out),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("soundcpu", M6809_FIRQ_LINE)
-};
-
-
-
-/*************************************
- *
  *  Interrupt handling
  *
  *************************************/
@@ -1704,7 +1687,9 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", CLOCK_8MHz/4, via_interface)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, CLOCK_8MHz/4)
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(itech8_state, pia_portb_out))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("soundcpu", m6809_device, firq_line))
 MACHINE_CONFIG_END
 
 

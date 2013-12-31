@@ -563,10 +563,6 @@ static I8255_INTERFACE( ppi_intf )
 	DEVCB_DRIVER_MEMBER(atom_state, ppi_pc_w)
 };
 
-/*-------------------------------------------------
-    via6522_interface via_intf
--------------------------------------------------*/
-
 READ8_MEMBER( atom_state::printer_busy )
 {
 	return m_centronics->busy_r() << 7;
@@ -576,23 +572,6 @@ WRITE8_MEMBER( atom_state::printer_data )
 {
 	m_centronics->write(space, 0, data & 0x7f);
 }
-
-static const via6522_interface via_intf =
-{
-	DEVCB_DRIVER_MEMBER(atom_state, printer_busy),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(atom_state, printer_data),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE(SY6502_TAG, INPUT_LINE_IRQ0)
-};
 
 /*-------------------------------------------------
     i8271_interface fdc_intf
@@ -871,7 +850,13 @@ static MACHINE_CONFIG_START( atom, atom_state )
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
-	MCFG_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
+
+	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
+	MCFG_VIA6522_READPA_HANDLER(READ8(atom_state, printer_busy))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(atom_state, printer_data))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
+
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
@@ -942,7 +927,13 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
-	MCFG_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
+
+	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
+	MCFG_VIA6522_READPA_HANDLER(READ8(atom_state, printer_busy))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(atom_state, printer_data))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
+
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, atom_centronics_config)
 	MCFG_CASSETTE_ADD("cassette", atom_cassette_interface)

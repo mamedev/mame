@@ -33,23 +33,6 @@ enum {
 
 /*********************************************************************
 
-   Local variables
-
-*********************************************************************/
-
-const via6522_interface vectrex_via6522_interface =
-{
-	DEVCB_DRIVER_MEMBER(vectrex_state,vectrex_via_pa_r), DEVCB_DRIVER_MEMBER(vectrex_state,vectrex_via_pb_r),         /* read PA/B */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,                     /* read ca1, cb1, ca2, cb2 */
-	DEVCB_DRIVER_MEMBER(vectrex_state,v_via_pa_w), DEVCB_DRIVER_MEMBER(vectrex_state,v_via_pb_w),         /* write PA/B */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(vectrex_state,v_via_ca2_w), DEVCB_DRIVER_MEMBER(vectrex_state,v_via_cb2_w), /* write ca1, cb1, ca2, cb2 */
-	DEVCB_DRIVER_LINE_MEMBER(vectrex_state,vectrex_via_irq),                      /* IRQ */
-};
-
-
-
-/*********************************************************************
-
    Lightpen
 
 *********************************************************************/
@@ -381,18 +364,18 @@ WRITE8_MEMBER(vectrex_state::v_via_pa_w)
 }
 
 
-WRITE8_MEMBER(vectrex_state::v_via_ca2_w)
+WRITE_LINE_MEMBER(vectrex_state::v_via_ca2_w)
 {
-	if (data == 0)
+	if (state == 0)
 		timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_VECTREX_ZERO_INTEGRATORS);
 }
 
 
-WRITE8_MEMBER(vectrex_state::v_via_cb2_w)
+WRITE_LINE_MEMBER(vectrex_state::v_via_cb2_w)
 {
 	int dx, dy;
 
-	if (m_cb2 != data)
+	if (m_cb2 != state)
 	{
 		/* Check lightpen */
 		if (m_lightpen_port != 0)
@@ -406,13 +389,13 @@ WRITE8_MEMBER(vectrex_state::v_via_cb2_w)
 
 				dx = abs(m_pen_x - m_x_int);
 				dy = abs(m_pen_y - m_y_int);
-				if (dx < 500000 && dy < 500000 && data > 0)
+				if (dx < 500000 && dy < 500000 && state > 0)
 					timer_set(attotime::zero, TIMER_LIGHTPEN_TRIGGER);
 			}
 		}
 
-		timer_set(attotime::zero, TIMER_UPDATE_SIGNAL, data, &m_blank);
-		m_cb2 = data;
+		timer_set(attotime::zero, TIMER_UPDATE_SIGNAL, state, &m_blank);
+		m_cb2 = state;
 	}
 }
 
@@ -422,14 +405,6 @@ WRITE8_MEMBER(vectrex_state::v_via_cb2_w)
    RA+A Spectrum I+
 
 *****************************************************************/
-
-const via6522_interface spectrum1_via6522_interface =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(vectrex_state,vectrex_via_pa_r), DEVCB_DRIVER_MEMBER(vectrex_state,vectrex_s1_via_pb_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(vectrex_state,v_via_pa_w), DEVCB_DRIVER_MEMBER(vectrex_state,v_via_pb_w), DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(vectrex_state,v_via_ca2_w), DEVCB_DRIVER_MEMBER(vectrex_state,v_via_cb2_w),
-	/*irq                      */ DEVCB_DRIVER_LINE_MEMBER(vectrex_state,vectrex_via_irq),
-};
-
 
 WRITE8_MEMBER(vectrex_state::raaspec_led_w)
 {

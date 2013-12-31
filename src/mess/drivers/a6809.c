@@ -198,23 +198,6 @@ WRITE_LINE_MEMBER( a6809_state::cass_w )
 	m_cass_state = state;
 }
 
-static const via6522_interface via_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(a6809_state, pb_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(a6809_state, cass_w), // out CB2
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_c)
 {
 	m_cass_data[3]++;
@@ -275,7 +258,11 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_VIA6522_ADD("via", XTAL_4MHz / 4, via_intf)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
+	MCFG_VIA6522_READPB_HANDLER(READ8(a6809_state, pb_r))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(a6809_state, cass_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_4MHz / 2, a6809_crtc6845_interface)
 	MCFG_SAA5050_ADD("saa5050", 6000000, a6809_saa5050_intf)
 	MCFG_ASCII_KEYBOARD_ADD("keyboard", kb_intf)

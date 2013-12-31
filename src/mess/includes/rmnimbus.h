@@ -369,8 +369,6 @@ enum
 
 #define VIA_INT                 0x03
 
-extern const via6522_interface nimbus_via;
-
 
 /*----------- defined in video/rmnimbus.c -----------*/
 

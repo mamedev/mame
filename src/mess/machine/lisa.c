@@ -85,29 +85,6 @@ the drive type (TWIGGY or 3.5'')) */
     a hard disk
 */
 
-const via6522_interface lisa_via6522_0_intf =
-{
-	/* COPS via */
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_in_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_a), DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_b),
-	DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_ca2), DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_cb2),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(lisa_state,COPS_via_irq_func)
-};
-
-const via6522_interface lisa_via6522_1_intf =
-{
-	/* parallel interface via - incomplete */
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(lisa_state,parallel_via_in_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL
-};
-
 /*
     floppy disk interface
 */
@@ -408,7 +385,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 	COPS_send_data_if_possible();
 
 	/* some pull-ups allow the COPS to read 1s when the VIA port is not set as output */
-	command = (m_COPS_command | (~ m_via0->read(space, VIA_DDRA))) & 0xff;
+	command = (m_COPS_command | (~ m_via0->read(space, via6522_device::VIA_DDRA))) & 0xff;
 
 //    printf("Dropping Ready, command = %02x\n", command);
 
@@ -655,9 +632,9 @@ WRITE8_MEMBER(lisa_state::COPS_via_out_a)
 	m_COPS_command = data;
 }
 
-WRITE8_MEMBER(lisa_state::COPS_via_out_ca2)
+WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
 {
-	m_hold_COPS_data = data;
+	m_hold_COPS_data = state;
 
 	/*logerror("COPS CA2 line state : %d\n", val);*/
 
@@ -695,7 +672,7 @@ READ8_MEMBER(lisa_state::COPS_via_in_b)
 WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 {
 	/* pull-up */
-	data |= (~ m_via0->read(space,VIA_DDRA)) & 0x01;
+	data |= (~ m_via0->read(space, via6522_device::VIA_DDRA)) & 0x01;
 
 	if (data & 0x01)
 	{
@@ -716,9 +693,9 @@ WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 	}
 }
 
-WRITE8_MEMBER(lisa_state::COPS_via_out_cb2)
+WRITE_LINE_MEMBER(lisa_state::COPS_via_out_cb2)
 {
-	m_speaker->level_w(data);
+	m_speaker->level_w(state);
 }
 
 void lisa_state::COPS_via_irq_func(int val)
@@ -1030,7 +1007,7 @@ void lisa_state::machine_reset()
 	init_COPS();
 
 	{
-		COPS_via_out_ca2(generic_space(), 0, 0);    /* VIA core forgets to do so */
+		COPS_via_out_ca2(0);    /* VIA core forgets to do so */
 	}
 
 	/* initialize floppy */

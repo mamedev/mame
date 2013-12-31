@@ -206,10 +206,10 @@ public:
 	TIMER_CALLBACK_MEMBER(read_COPS_command);
 	TIMER_CALLBACK_MEMBER(set_COPS_ready);
 	DECLARE_WRITE8_MEMBER(COPS_via_out_a);
-	DECLARE_WRITE8_MEMBER(COPS_via_out_ca2);
+	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_ca2);
 	DECLARE_READ8_MEMBER(COPS_via_in_b);
 	DECLARE_WRITE8_MEMBER(COPS_via_out_b);
-	DECLARE_WRITE8_MEMBER(COPS_via_out_cb2);
+	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_cb2);
 	DECLARE_READ8_MEMBER(parallel_via_in_b);
 
 	void field_interrupts();
@@ -230,9 +230,6 @@ public:
 
 
 /*----------- defined in machine/lisa.c -----------*/
-
-extern const via6522_interface lisa_via6522_0_intf;
-extern const via6522_interface lisa_via6522_1_intf;
 
 extern NVRAM_HANDLER(lisa);
 

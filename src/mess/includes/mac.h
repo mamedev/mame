@@ -142,10 +142,6 @@ enum model_t
 
 /*----------- defined in machine/mac.c -----------*/
 
-extern const via6522_interface mac_via6522_intf;
-extern const via6522_interface mac_via6522_2_intf;
-extern const via6522_interface mac_via6522_adb_intf;
-
 void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
 
 /*----------- defined in audio/mac.c -----------*/
@@ -512,10 +508,10 @@ public:
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
-	DECLARE_READ8_MEMBER(mac_via_in_cb2);
-	DECLARE_WRITE8_MEMBER(mac_via_out_cb2);
-	DECLARE_READ8_MEMBER(mac_adb_via_in_cb2);
-	DECLARE_WRITE8_MEMBER(mac_adb_via_out_cb2);
+	DECLARE_READ_LINE_MEMBER(mac_via_in_cb2);
+	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
+	DECLARE_READ_LINE_MEMBER(mac_adb_via_in_cb2);
+	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_READ8_MEMBER(mac_via_in_a);
 	DECLARE_READ8_MEMBER(mac_via_in_b);
 	DECLARE_WRITE8_MEMBER(mac_via_out_a);

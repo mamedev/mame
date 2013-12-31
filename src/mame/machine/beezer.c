@@ -28,14 +28,6 @@
 
     TODO: find a better way to attach ca2 read to beezer_line_r
     */
-const via6522_interface b_via_0_interface =
-{
-	/*inputs : A/B         */ DEVCB_DRIVER_MEMBER(beezer_state,b_via_0_pa_r), DEVCB_DRIVER_MEMBER(beezer_state,b_via_0_pb_r),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca2), DEVCB_DRIVER_LINE_MEMBER(beezer_state, b_via_0_ca2_r), DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca1),
-	/*outputs: A/B         */ DEVCB_DRIVER_MEMBER(beezer_state,b_via_0_pa_w), DEVCB_DRIVER_MEMBER(beezer_state,b_via_0_pb_w),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, write_ca1),
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
-};
 
 /* VIA 1 (U18 @3C on schematics)
     port A:
@@ -60,14 +52,6 @@ const via6522_interface b_via_0_interface =
     TODO: the entirety of port B, much needs tracing
     TODO: ports CB1 and CB2, need tracing; ports CA1 and CA2 could use verify as well
     */
-const via6522_interface b_via_1_interface =
-{
-	/*inputs : A/B         */ DEVCB_DRIVER_MEMBER(beezer_state,b_via_1_pa_r), DEVCB_DRIVER_MEMBER(beezer_state,b_via_1_pb_r),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, read_cb2), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, read_cb1), DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_DRIVER_MEMBER(beezer_state,b_via_1_pa_w), DEVCB_DRIVER_MEMBER(beezer_state,b_via_1_pb_w),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, write_cb1), DEVCB_NULL,
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("audiocpu", M6809_IRQ_LINE)
-};
 
 READ_LINE_MEMBER(beezer_state::b_via_0_ca2_r)
 {

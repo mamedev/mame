@@ -121,44 +121,6 @@ extern TIMER_CALLBACK(mac_pmu_tick);    // macadb.c
 
 static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
-const via6522_interface mac_via6522_intf =
-{
-	DEVCB_DRIVER_MEMBER(mac_state,mac_via_in_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via_in_b),
-	DEVCB_NULL, DEVCB_NULL,
-
-#ifdef MAC_USE_EMULATED_KBD
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(mac_state,mac_via_in_cb2),
-#else
-	DEVCB_NULL, DEVCB_NULL,
-#endif
-	DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_cb2),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state,mac_via_irq)
-};
-
-const via6522_interface mac_via6522_adb_intf =
-{
-	DEVCB_DRIVER_MEMBER(mac_state,mac_via_in_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via_in_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(mac_state,mac_adb_via_in_cb2),
-	DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(mac_state,mac_adb_via_out_cb2),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state,mac_via_irq)
-};
-
-const via6522_interface mac_via6522_2_intf =
-{
-	DEVCB_DRIVER_MEMBER(mac_state,mac_via2_in_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via2_in_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(mac_state,mac_via2_out_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via2_out_b),
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(mac_state,mac_via2_irq)
-};
-
 // returns non-zero if this Mac has ADB
 int mac_state::has_adb()
 {
@@ -678,13 +640,13 @@ WRITE_LINE_MEMBER(mac_state::mac_kbd_clk_in)
 }
 
 #ifdef MAC_USE_EMULATED_KBD
-READ8_MEMBER(mac_state::mac_via_in_cb2)
+READ_LINE_MEMBER(mac_state::mac_via_in_cb2)
 {
 	printf("Read %d from keyboard (PC=%x)\n", (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0, m_maincpu->pc());
 	return (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0;
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_cb2)
+WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
 {
 	printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
 	m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
@@ -730,9 +692,9 @@ void mac_state::kbd_shift_out(int data)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_cb2)
+WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
 {
-	if (m_kbd_comm == FALSE && data == 0)
+	if (m_kbd_comm == FALSE && state == 0)
 	{
 		/* Mac pulls CB2 down to initiate communication */
 		m_kbd_comm = TRUE;
@@ -742,7 +704,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_cb2)
 	if (m_kbd_comm == TRUE && m_kbd_receive == TRUE)
 	{
 		/* Shift in what mac is sending */
-		m_kbd_shift_reg = (m_kbd_shift_reg & ~1) | data;
+		m_kbd_shift_reg = (m_kbd_shift_reg & ~1) | state;
 	}
 }
 
@@ -1166,7 +1128,7 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 		fdc->write((offset >> 8), data>>8);
 }
 
-READ8_MEMBER(mac_state::mac_adb_via_in_cb2)
+READ_LINE_MEMBER(mac_state::mac_adb_via_in_cb2)
 {
 	UINT8 ret;
 	if (ADB_IS_EGRET)
@@ -1194,21 +1156,21 @@ READ8_MEMBER(mac_state::mac_adb_via_in_cb2)
 	return ret;
 }
 
-WRITE8_MEMBER(mac_state::mac_adb_via_out_cb2)
+WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 {
-//        printf("VIA OUT CB2 = %x\n", data);
+//        printf("VIA OUT CB2 = %x\n", state);
 	if (ADB_IS_EGRET)
 	{
-		m_egret->set_via_data(data & 1);
+		m_egret->set_via_data(state & 1);
 	}
 	else if (ADB_IS_CUDA)
 	{
-		m_cuda->set_via_data(data & 1);
+		m_cuda->set_via_data(state & 1);
 	}
 	else
 	{
 		m_adb_command <<= 1;
-		m_adb_command |= data & 1;
+		m_adb_command |= state & 1;
 	}
 }
 

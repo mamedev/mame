@@ -411,16 +411,6 @@ READ8_MEMBER(atarisy1_state::via_pb_r)
 }
 
 
-static const via6522_interface via_interface =
-{
-	/*inputs : A/B         */ DEVCB_DRIVER_MEMBER(atarisy1_state,via_pa_r), DEVCB_DRIVER_MEMBER(atarisy1_state,via_pb_r),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_DRIVER_MEMBER(atarisy1_state,via_pa_w), DEVCB_DRIVER_MEMBER(atarisy1_state,via_pb_w),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irq                  */ DEVCB_NULL
-};
-
-
 
 /*************************************
  *
@@ -777,7 +767,11 @@ static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", 0, via_interface)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(READ8(atarisy1_state, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(atarisy1_state, via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(atarisy1_state, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(atarisy1_state, via_pb_w))
 MACHINE_CONFIG_END
 
 

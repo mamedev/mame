@@ -111,20 +111,10 @@ READ8_MEMBER(gameplan_state::io_port_r)
 }
 
 
-WRITE8_MEMBER(gameplan_state::coin_w)
+WRITE_LINE_MEMBER(gameplan_state::coin_w)
 {
-	coin_counter_w(machine(), 0, ~data & 1);
+	coin_counter_w(machine(), 0, ~state & 1);
 }
-
-
-static const via6522_interface via_1_interface =
-{
-	DEVCB_DRIVER_MEMBER(gameplan_state,io_port_r), DEVCB_NULL,   /*inputs : A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,      /*inputs : CA/B1,CA/B2 */
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,io_select_w),     /*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,coin_w), /*outputs: CA/B1,CA/B2 */
-	DEVCB_NULL               /*irq                  */
-};
 
 
 
@@ -134,11 +124,11 @@ static const via6522_interface via_1_interface =
  *
  *************************************/
 
-WRITE8_MEMBER(gameplan_state::audio_reset_w)
+WRITE_LINE_MEMBER(gameplan_state::audio_reset_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
 
-	if (data == 0)
+	if (state == 0)
 	{
 		m_riot->reset();
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -152,20 +142,10 @@ WRITE8_MEMBER(gameplan_state::audio_cmd_w)
 }
 
 
-WRITE8_MEMBER(gameplan_state::audio_trigger_w)
+WRITE_LINE_MEMBER(gameplan_state::audio_trigger_w)
 {
-	m_riot->porta_in_set(data << 7, 0x80);
+	m_riot->porta_in_set(state << 7, 0x80);
 }
-
-
-static const via6522_interface via_2_interface =
-{
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),                /*inputs : A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,                           /*inputs : CA/B1,CA/B2 */
-	DEVCB_DRIVER_MEMBER(gameplan_state,audio_cmd_w), DEVCB_NULL,                          /*outputs: A/B         */
-	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,audio_trigger_w), DEVCB_DRIVER_MEMBER(gameplan_state,audio_reset_w), /*outputs: CA/B1,CA/B2 */
-	DEVCB_NULL                                    /*irq                  */
-};
 
 
 
@@ -1016,9 +996,23 @@ static MACHINE_CONFIG_START( gameplan, gameplan_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* via */
-	MCFG_VIA6522_ADD("via6522_0", 0, gameplan_via_0_interface)
-	MCFG_VIA6522_ADD("via6522_1", 0, via_1_interface)
-	MCFG_VIA6522_ADD("via6522_2", 0, via_2_interface)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_VIA6522_READPB_HANDLER(READ8(gameplan_state, vblank_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, video_data_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, gameplan_video_command_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, video_command_trigger_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(gameplan_state, via_irq))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(READ8(gameplan_state, io_port_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, io_select_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gameplan_state, coin_w))
+
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
+	MCFG_VIA6522_READPB_HANDLER(READ8(driver_device, soundlatch_byte_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, audio_cmd_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, audio_trigger_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gameplan_state, audio_reset_w))
 MACHINE_CONFIG_END
 
 
@@ -1034,8 +1028,8 @@ static MACHINE_CONFIG_DERIVED( leprechn, gameplan )
 	MCFG_FRAGMENT_ADD(leprechn_video)
 
 	/* via */
-	MCFG_DEVICE_REMOVE("via6522_0")
-	MCFG_VIA6522_ADD("via6522_0", 0, leprechn_via_0_interface)
+	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, leprechn_video_command_w))
 MACHINE_CONFIG_END
 
 

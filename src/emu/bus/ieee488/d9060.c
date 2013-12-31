@@ -336,10 +336,6 @@ static const riot6532_interface riot1_intf =
 };
 
 
-//-------------------------------------------------
-//  via6522_interface via_intf
-//-------------------------------------------------
-
 READ8_MEMBER( base_d9060_device::via_pb_r )
 {
 	/*
@@ -425,25 +421,6 @@ WRITE_LINE_MEMBER( base_d9060_device::req_w )
 	m_via->write_ca1(state);
 }
 
-static const via6522_interface via_intf =
-{
-	DEVCB_DEVICE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_data_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_req_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, scsi_data_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, via_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, ack_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_d9060_device, enable_w),
-
-	DEVCB_CPU_INPUT_LINE(M6502_HDC_TAG, INPUT_LINE_IRQ0)
-};
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( d9060 )
@@ -461,7 +438,15 @@ static MACHINE_CONFIG_FRAGMENT( d9060 )
 	MCFG_CPU_ADD(M6502_HDC_TAG, M6502, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d9060_hdc_mem)
 
-	MCFG_VIA6522_ADD(M6522_TAG, XTAL_4MHz/4, via_intf)
+	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL_4MHz/4)
+	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(SASIBUS_TAG ":host", scsicb_device, scsi_data_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(base_d9060_device, via_pb_r))
+	MCFG_VIA6522_READCA1_HANDLER(DEVREADLINE(SASIBUS_TAG ":host", scsicb_device, scsi_req_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(base_d9060_device, scsi_data_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(base_d9060_device, via_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(base_d9060_device, ack_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(base_d9060_device, enable_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(M6502_HDC_TAG, m6502_device, irq_line))
 
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", D9060HD, SCSI_ID_0)

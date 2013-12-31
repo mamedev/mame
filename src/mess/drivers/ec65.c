@@ -33,7 +33,7 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(ec65_via_read_a);
-	DECLARE_READ8_MEMBER(ec65_read_ca1 );
+	DECLARE_READ_LINE_MEMBER(ec65_read_ca1);
 	DECLARE_READ8_MEMBER(ec65_via_read_b);
 	DECLARE_WRITE8_MEMBER(ec65_via_write_a);
 	DECLARE_WRITE8_MEMBER(ec65_via_write_b);
@@ -100,7 +100,7 @@ READ8_MEMBER( ec65_state::ec65_via_read_a)
 	return m_keyboard_input;
 }
 
-READ8_MEMBER( ec65_state::ec65_read_ca1 )
+READ_LINE_MEMBER( ec65_state::ec65_read_ca1 )
 {
 	return 0;
 }
@@ -117,40 +117,6 @@ WRITE8_MEMBER( ec65_state::ec65_via_write_a )
 WRITE8_MEMBER( ec65_state::ec65_via_write_b )
 {
 }
-
-static const via6522_interface ec65_via_1_intf=
-{
-	DEVCB_NULL,   /* in_a_func */
-	DEVCB_DRIVER_MEMBER(ec65_state, ec65_via_read_b),   /* in_b_func */
-	DEVCB_NULL,                       /* in_ca1_func */
-	DEVCB_NULL,                       /* in_cb1_func */
-	DEVCB_NULL,                       /* in_ca2_func */
-	DEVCB_NULL,                       /* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(ec65_state, ec65_via_write_a),  /* out_a_func */
-	DEVCB_DRIVER_MEMBER(ec65_state, ec65_via_write_b),  /* out_b_func */
-	DEVCB_NULL,                       /* out_ca1_func */
-	DEVCB_NULL,                       /* out_cb1_func */
-	DEVCB_NULL,                       /* out_ca2_func */
-	DEVCB_NULL,                       /* out_cb2_func */
-	DEVCB_NULL,                       /* irq_func */
-};
-
-static const via6522_interface ec65_via_0_intf=
-{
-	DEVCB_DRIVER_MEMBER(ec65_state, ec65_via_read_a),      /* in_a_func */
-	DEVCB_NULL,      /* in_b_func */
-	DEVCB_DRIVER_MEMBER(ec65_state, ec65_read_ca1),      /* in_ca1_func */
-	DEVCB_NULL,      /* in_cb1_func */
-	DEVCB_NULL,      /* in_ca2_func */
-	DEVCB_NULL,      /* in_cb2_func */
-	DEVCB_NULL,      /* out_a_func */
-	DEVCB_NULL,      /* out_b_func */
-	DEVCB_NULL,      /* out_ca1_func */
-	DEVCB_NULL,      /* out_cb1_func */
-	DEVCB_NULL,      /* out_ca2_func */
-	DEVCB_NULL,      /* out_cb2_func */
-	DEVCB_NULL,      /* irq_func */
-};
 
 /* Input ports */
 static INPUT_PORTS_START( ec65 )
@@ -269,8 +235,16 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	/* devices */
 	MCFG_PIA6821_ADD( PIA6821_TAG, ec65_pia_interface )
 	MCFG_ACIA6850_ADD(ACIA6850_TAG, ec65_acia_intf)
-	MCFG_VIA6522_ADD(VIA6522_0_TAG, XTAL_4MHz / 4, ec65_via_0_intf)
-	MCFG_VIA6522_ADD(VIA6522_1_TAG, XTAL_4MHz / 4, ec65_via_1_intf)
+
+	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL_4MHz / 4)
+	MCFG_VIA6522_READPA_HANDLER(READ8(ec65_state, ec65_via_read_a))
+	MCFG_VIA6522_READCA1_HANDLER(READLINE(ec65_state, ec65_read_ca1))
+
+	MCFG_DEVICE_ADD(VIA6522_1_TAG, VIA6522, XTAL_4MHz / 4)
+	MCFG_VIA6522_READPB_HANDLER(READ8(ec65_state, ec65_via_read_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(ec65_state, ec65_via_write_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(ec65_state, ec65_via_write_b))
+
 	MCFG_DEVICE_ADD(ACIA6551_TAG, MOS6551, XTAL_1_8432MHz)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END

@@ -332,10 +332,10 @@ public:
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_porta);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_portb);
-	DECLARE_READ8_MEMBER(bbcb_via_system_read_ca1);
-	DECLARE_READ8_MEMBER(bbcb_via_system_read_cb1);
-	DECLARE_READ8_MEMBER(bbcb_via_system_read_ca2);
-	DECLARE_READ8_MEMBER(bbcb_via_system_read_cb2);
+	DECLARE_READ_LINE_MEMBER(bbcb_via_system_read_ca1);
+	DECLARE_READ_LINE_MEMBER(bbcb_via_system_read_cb1);
+	DECLARE_READ_LINE_MEMBER(bbcb_via_system_read_ca2);
+	DECLARE_READ_LINE_MEMBER(bbcb_via_system_read_cb2);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_via_system_irq_w);
 	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
 	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
@@ -398,9 +398,6 @@ public:
 /*----------- defined in machine/bbc.c -----------*/
 
 extern const mc6845_interface bbc_mc6845_intf;
-
-extern const via6522_interface bbcb_system_via;
-extern const via6522_interface bbcb_user_via;
 
 extern const i8271_interface bbc_i8271_interface;
 extern const wd17xx_interface bbc_wd17xx_interface;

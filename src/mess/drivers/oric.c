@@ -406,7 +406,16 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_CASSETTE_ADD( "cassette", oric_cassette_interface )
 
 	/* via */
-	MCFG_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )
+	MCFG_DEVICE_ADD( "via6522_0", VIA6522, 1000000 )
+	MCFG_VIA6522_READPA_HANDLER(READ8(oric_state, oric_via_in_a_func))
+	MCFG_VIA6522_READPB_HANDLER(READ8(oric_state, oric_via_in_b_func))
+	MCFG_VIA6522_READCA2_HANDLER(READLINE(oric_state, oric_via_in_ca2_func))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(oric_state, oric_via_in_cb2_func))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(oric_state, oric_via_out_a_func))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(oric_state, oric_via_out_b_func))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(oric_state, oric_via_out_ca2_func))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(oric_state, oric_via_out_cb2_func))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(oric_state, oric_via_irq_func))
 
 	MCFG_WD1770_ADD("wd179x", oric_wd17xx_interface )
 
@@ -428,7 +437,12 @@ static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 
 	/* via */
-	MCFG_VIA6522_ADD( "via6522_1", 1000000, telestrat_via2_interface )
+	MCFG_DEVICE_ADD( "via6522_1", VIA6522, 1000000 )
+	MCFG_VIA6522_READPA_HANDLER(READ8(oric_state, telestrat_via2_in_a_func))
+	MCFG_VIA6522_READPB_HANDLER(READ8(oric_state, telestrat_via2_in_b_func))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(oric_state, telestrat_via2_out_a_func))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(oric_state, telestrat_via2_out_b_func))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(oric_state, telestrat_via2_irq_func))
 MACHINE_CONFIG_END
 
 

@@ -1311,40 +1311,6 @@ static const acia6850_interface swyft_acia_config =
 	DEVCB_NULL
 };
 
-static const via6522_interface swyft_via0_config =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_pa_r), // PA in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_pb_r), // PB in
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_ca1_r), // CA1 in callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_cb1_r), // CB1 in callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_ca2_r), // CA2 in callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_cb2_r), // CB2 in callback
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_pa_w), // PA out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_pb_w), // PB out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_ca1_w), // CA1 out callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_cb1_w), // CA2 out callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_ca2_w), // CB1 out callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_cb2_w), // CB2 out callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via0_int_w), // interrupt callback
-};
-
-static const via6522_interface swyft_via1_config =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_pa_r), // PA in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_pb_r), // PB in
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_ca1_r), // CA1 in callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_cb1_r), // CB1 in callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_ca2_r), // CA2 in callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_cb2_r), // CB2 in callback
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_pa_w), // PA out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_pb_w), // PB out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_ca1_w), // CA1 out callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_cb1_w), // CA2 out callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_ca2_w), // CB1 out callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_cb2_w), // CB2 out callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, cat_state, via1_int_w), // interrupt callback
-};
-
 READ8_MEMBER( cat_state::swyft_d0000 )
 {
 	// wtf is this supposed to be?
@@ -1567,8 +1533,35 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_VIDEO_START_OVERRIDE(cat_state,swyft)
 
 	MCFG_ACIA6850_ADD("acia6850", swyft_acia_config) // unknown clock
-	MCFG_VIA6522_ADD("via6522_0", XTAL_15_8976MHz/16, swyft_via0_config) // unknown clock, GUESSED
-	MCFG_VIA6522_ADD("via6522_1", XTAL_15_8976MHz/16, swyft_via1_config) // unknown clock, GUESSED
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_15_8976MHz/16) // unknown clock, GUESSED
+	MCFG_VIA6522_READPA_HANDLER(READ8(cat_state, via0_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(cat_state, via0_pb_r))
+	MCFG_VIA6522_READCA1_HANDLER(READLINE(cat_state, via0_ca1_r))
+	MCFG_VIA6522_READCB1_HANDLER(READLINE(cat_state, via0_cb1_r))
+	MCFG_VIA6522_READCA2_HANDLER(READLINE(cat_state, via0_ca2_r))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(cat_state, via0_cb2_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cat_state, via0_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cat_state, via0_pb_w))
+	MCFG_VIA6522_CA1_HANDLER(WRITELINE(cat_state, via0_ca1_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(cat_state, via0_cb1_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(cat_state, via0_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(cat_state, via0_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cat_state, via0_int_w))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_15_8976MHz/16) // unknown clock, GUESSED
+	MCFG_VIA6522_READPA_HANDLER(READ8(cat_state, via1_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(cat_state, via1_pb_r))
+	MCFG_VIA6522_READCA1_HANDLER(READLINE(cat_state, via1_ca1_r))
+	MCFG_VIA6522_READCB1_HANDLER(READLINE(cat_state, via1_cb1_r))
+	MCFG_VIA6522_READCA2_HANDLER(READLINE(cat_state, via1_ca2_r))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(cat_state, via1_cb2_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cat_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cat_state, via1_pb_w))
+	MCFG_VIA6522_CA1_HANDLER(WRITELINE(cat_state, via1_ca1_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(cat_state, via1_cb1_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(cat_state, via1_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(cat_state, via1_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(cat_state, via1_int_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */

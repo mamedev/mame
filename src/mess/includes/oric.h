@@ -136,10 +136,10 @@ public:
 	DECLARE_READ8_MEMBER(oric_via_in_b_func);
 	DECLARE_WRITE8_MEMBER(oric_via_out_a_func);
 	DECLARE_WRITE8_MEMBER(oric_via_out_b_func);
-	DECLARE_READ8_MEMBER(oric_via_in_ca2_func);
-	DECLARE_READ8_MEMBER(oric_via_in_cb2_func);
-	DECLARE_WRITE8_MEMBER(oric_via_out_ca2_func);
-	DECLARE_WRITE8_MEMBER(oric_via_out_cb2_func);
+	DECLARE_READ_LINE_MEMBER(oric_via_in_ca2_func);
+	DECLARE_READ_LINE_MEMBER(oric_via_in_cb2_func);
+	DECLARE_WRITE_LINE_MEMBER(oric_via_out_ca2_func);
+	DECLARE_WRITE_LINE_MEMBER(oric_via_out_cb2_func);
 	DECLARE_WRITE_LINE_MEMBER(oric_jasmin_wd179x_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(oric_microdisc_wd179x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(oric_microdisc_wd179x_drq_w);
@@ -198,8 +198,6 @@ protected:
 };
 
 /*----------- defined in machine/oric.c -----------*/
-extern const via6522_interface oric_6522_interface;
-extern const via6522_interface telestrat_via2_interface;
 extern const wd17xx_interface oric_wd17xx_interface;
 
 #endif /* ORIC_H_ */

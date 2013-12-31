@@ -698,7 +698,16 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
 	/* devices */
-	MCFG_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
+	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
+	MCFG_VIA6522_READCA1_HANDLER(READLINE(bbc_state, bbcb_via_system_read_ca1))
+	MCFG_VIA6522_READCB1_HANDLER(READLINE(bbc_state, bbcb_via_system_read_cb1))
+	MCFG_VIA6522_READCA2_HANDLER(READLINE(bbc_state, bbcb_via_system_read_ca2))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(bbc_state, bbcb_via_system_read_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_portb))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
 MACHINE_CONFIG_END
 
 
@@ -721,7 +730,13 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 //  MCFG_TMS52XX_SPEECHROM("vsm")
 
 	/* devices */
-	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
+	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
+
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 
 	/* printer */
@@ -765,7 +780,13 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 	MCFG_SCREEN_REFRESH_RATE(60)
 
 	/* devices */
-	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
+	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
+
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 
 	/* printer */
@@ -889,8 +910,23 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* devices */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
-	MCFG_VIA6522_ADD("via6522_0", 1000000, bbcb_system_via)
-	MCFG_VIA6522_ADD("via6522_1", 1000000, bbcb_user_via)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
+	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
+	MCFG_VIA6522_READCA1_HANDLER(READLINE(bbc_state, bbcb_via_system_read_ca1))
+	MCFG_VIA6522_READCB1_HANDLER(READLINE(bbc_state, bbcb_via_system_read_cb1))
+	MCFG_VIA6522_READCA2_HANDLER(READLINE(bbc_state, bbcb_via_system_read_ca2))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(bbc_state, bbcb_via_system_read_cb2))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_portb))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
+	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_user_write_portb))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
 	/* fdc */
 	MCFG_WD1770_ADD("wd177x", bbc_wd17xx_interface )

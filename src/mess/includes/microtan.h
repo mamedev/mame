@@ -65,24 +65,24 @@ public:
 	TIMER_CALLBACK_MEMBER(microtan_pulse_nmi);
 	DECLARE_READ8_MEMBER(via_0_in_a);
 	DECLARE_READ8_MEMBER(via_0_in_b);
-	DECLARE_READ8_MEMBER(via_0_in_ca1);
-	DECLARE_READ8_MEMBER(via_0_in_cb1);
-	DECLARE_READ8_MEMBER(via_0_in_ca2);
-	DECLARE_READ8_MEMBER(via_0_in_cb2);
+	DECLARE_READ_LINE_MEMBER(via_0_in_ca1);
+	DECLARE_READ_LINE_MEMBER(via_0_in_cb1);
+	DECLARE_READ_LINE_MEMBER(via_0_in_ca2);
+	DECLARE_READ_LINE_MEMBER(via_0_in_cb2);
 	DECLARE_WRITE8_MEMBER(via_0_out_a);
 	DECLARE_WRITE8_MEMBER(via_0_out_b);
-	DECLARE_WRITE8_MEMBER(via_0_out_ca2);
-	DECLARE_WRITE8_MEMBER(via_0_out_cb2);
+	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
+	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
 	DECLARE_READ8_MEMBER(via_1_in_a);
 	DECLARE_READ8_MEMBER(via_1_in_b);
-	DECLARE_READ8_MEMBER(via_1_in_ca1);
-	DECLARE_READ8_MEMBER(via_1_in_cb1);
-	DECLARE_READ8_MEMBER(via_1_in_ca2);
-	DECLARE_READ8_MEMBER(via_1_in_cb2);
+	DECLARE_READ_LINE_MEMBER(via_1_in_ca1);
+	DECLARE_READ_LINE_MEMBER(via_1_in_cb1);
+	DECLARE_READ_LINE_MEMBER(via_1_in_ca2);
+	DECLARE_READ_LINE_MEMBER(via_1_in_cb2);
 	DECLARE_WRITE8_MEMBER(via_1_out_a);
 	DECLARE_WRITE8_MEMBER(via_1_out_b);
-	DECLARE_WRITE8_MEMBER(via_1_out_ca2);
-	DECLARE_WRITE8_MEMBER(via_1_out_cb2);
+	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);
+	DECLARE_WRITE_LINE_MEMBER(via_1_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(via_0_irq);
 	DECLARE_WRITE_LINE_MEMBER(via_1_irq);
 	required_device<cpu_device> m_maincpu;
@@ -102,9 +102,4 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
-
-/*----------- defined in machine/microtan.c -----------*/
-
-extern const via6522_interface microtan_via6522_0;
-extern const via6522_interface microtan_via6522_1;
 #endif /* MICROTAN_H_ */

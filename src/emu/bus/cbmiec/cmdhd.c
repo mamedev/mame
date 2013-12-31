@@ -74,54 +74,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  via6522_interface via1_intf
-//-------------------------------------------------
-
-static const via6522_interface via1_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  via6522_interface via2_intf
-//-------------------------------------------------
-
-static const via6522_interface via2_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  I8255A_INTERFACE( ppi_intf )
 //-------------------------------------------------
 
@@ -144,8 +96,8 @@ static MACHINE_CONFIG_FRAGMENT( cmd_hd )
 	MCFG_CPU_ADD(M6502_TAG, M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(cmd_hd_mem)
 
-	MCFG_VIA6522_ADD(M6522_1_TAG, 2000000, via1_intf)
-	MCFG_VIA6522_ADD(M6522_2_TAG, 2000000, via2_intf)
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 2000000)
+	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 2000000)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	//MCFG_RTC72421A_ADD(RTC72421A_TAG)
 

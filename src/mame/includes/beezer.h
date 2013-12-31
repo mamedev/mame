@@ -113,9 +113,3 @@ private:
 };
 
 extern const device_type BEEZER;
-
-
-/*----------- defined in machine/beezer.c -----------*/
-
-extern const via6522_interface b_via_0_interface;
-extern const via6522_interface b_via_1_interface;

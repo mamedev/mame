@@ -65,15 +65,11 @@ public:
 	DECLARE_WRITE8_MEMBER(via_out_a);
 	DECLARE_READ8_MEMBER(via_in_b);
 	DECLARE_WRITE8_MEMBER(via_out_b);
-	DECLARE_WRITE8_MEMBER(via_out_cb2);
+	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
+	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
 	void concept_set_interrupt(int level, int state);
 	inline void post_in_KeyQueue(int keycode);
 	void poll_keyboard();
 };
-
-
-/*----------- defined in machine/concept.c -----------*/
-
-extern const via6522_interface concept_via6522_intf;
 
 #endif /* CONCEPT_H_ */

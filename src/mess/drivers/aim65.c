@@ -155,42 +155,6 @@ static const riot6532_interface aim65_riot_interface =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
-/* system via interface Z32 */
-static const via6522_interface aim65_system_via =
-{
-	DEVCB_NULL, // in port A
-	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pb_r), // in port B
-	DEVCB_NULL, // in CA1 printer ready?
-	DEVCB_NULL, // in CB1
-	DEVCB_NULL, // in CA2
-	DEVCB_NULL, // in CB2
-	DEVCB_NULL, // out Port A
-	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pb_w), // out port B
-	DEVCB_NULL, // out CA1
-	DEVCB_NULL, // out CB1 printer start
-	DEVCB_NULL, // out CA2 cass control (H=in)
-	DEVCB_NULL, // out CB2 turn printer on
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE) //IRQ
-};
-
-/* user via interface Z1 */
-static const via6522_interface aim65_user_via =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
-};
-
 /* R6520 interface U1 */
 static const pia6821_interface aim65_pia_config =
 {
@@ -360,8 +324,19 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 
 	/* other devices */
 	MCFG_RIOT6532_ADD("riot", AIM65_CLOCK, aim65_riot_interface)
-	MCFG_VIA6522_ADD("via6522_0", 0, aim65_system_via)
-	MCFG_VIA6522_ADD("via6522_1", 0, aim65_user_via)
+
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_VIA6522_READPB_HANDLER(READ8(aim65_state, aim65_pb_r))
+	// in CA1 printer ready?
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pb_w))
+	// out CB1 printer start
+	// out CA2 cass control (H=in)
+	// out CB2 turn printer on
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
+
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
+
 	MCFG_PIA6821_ADD("pia6821", aim65_pia_config)
 
 	MCFG_CASSETTE_ADD( "cassette", aim65_1_cassette_interface )

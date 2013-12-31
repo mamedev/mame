@@ -376,43 +376,6 @@ void clcd_state::palette_init()
 	palette_set_color(machine(), 3, MAKE_RGB(32,240,32));
 }
 
-static const via6522_interface via0_intf =
-{
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(clcd_state, via0_pa_r),
-	DEVCB_DRIVER_MEMBER(clcd_state, via0_pb_r),
-	DEVCB_NULL, // RESTORE
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(clcd_state, via0_cb2_r),
-	DEVCB_DRIVER_MEMBER(clcd_state, via0_pa_w),
-	DEVCB_DRIVER_MEMBER(clcd_state, via0_pb_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(clcd_state, via0_cb1_w),
-	DEVCB_NULL,//DEVCB_DRIVER_LINE_MEMBER(clcd_state, via0_ca2_w), // CASS MOTOR
-	DEVCB_NULL,
-
-	DEVCB_CPU_INPUT_LINE("maincpu", M65C02_IRQ_LINE)
-};
-
-static const via6522_interface via1_intf =
-{
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(clcd_state, via1_pa_r),
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(clcd_state, via1_pb_r),
-	DEVCB_NULL, // CASS READ
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(clcd_state, via1_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,//DEVCB_DRIVER_LINE_MEMBER(clcd_state, via1_ca2_w),
-	DEVCB_NULL,//DEVCB_DRIVER_LINE_MEMBER(clcd_state, via1_cb2_w),
-
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI)
-};
-
 static const gfx_layout charset_8x8 =
 {
 	6,8,
@@ -433,8 +396,17 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 	MCFG_CPU_ADD("maincpu",M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)
 
-	MCFG_VIA6522_ADD("via0", 0, via0_intf)
-	MCFG_VIA6522_ADD("via1", 0, via1_intf)
+	MCFG_DEVICE_ADD("via0", VIA6522, 0)
+	MCFG_VIA6522_READPB_HANDLER(READ8(clcd_state, via0_pb_r))
+	MCFG_VIA6522_READCB2_HANDLER(READLINE(clcd_state, via0_cb2_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(clcd_state, via0_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(clcd_state, via0_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(clcd_state, via0_cb1_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
+
+	MCFG_DEVICE_ADD("via1", VIA6522, 0)
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
+
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 
 	/* video hardware */

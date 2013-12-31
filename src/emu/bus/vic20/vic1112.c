@@ -29,10 +29,6 @@
 const device_type VIC1112 = &device_creator<vic1112_device>;
 
 
-//-------------------------------------------------
-//  via6522_interface via0_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( vic1112_device::via0_irq_w )
 {
 	m_via0_irq = state;
@@ -90,29 +86,6 @@ WRITE8_MEMBER( vic1112_device::via0_pb_w )
 	m_bus->ndac_w(BIT(data, 2));
 }
 
-static const via6522_interface via0_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, via0_pb_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, via0_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, via0_irq_w)
-};
-
-
-//-------------------------------------------------
-//  via6522_interface via1_intf
-//-------------------------------------------------
 
 WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
 {
@@ -121,33 +94,24 @@ WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
 	m_slot->irq_w(m_via0_irq | m_via1_irq);
 }
 
-static const via6522_interface via1_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, srq_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, atn_w),
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_w),
-
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1112_device, via1_irq_w)
-};
-
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( vic1112 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vic1112 )
-	MCFG_VIA6522_ADD(M6522_0_TAG, 0, via0_intf)
-	MCFG_VIA6522_ADD(M6522_1_TAG, 0, via1_intf)
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, 0)
+	MCFG_VIA6522_READPB_HANDLER(READ8(vic1112_device, via0_pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic1112_device, via0_pb_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vic1112_device, via0_irq_w))
+
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 0)
+	MCFG_VIA6522_READPB_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
+	MCFG_VIA6522_READCB1_HANDLER(DEVREADLINE(IEEE488_TAG, ieee488_device, srq_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, atn_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(vic1112_device, via1_irq_w))
 
 	MCFG_CBM_IEEE488_ADD(NULL)
 	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_cb1))
