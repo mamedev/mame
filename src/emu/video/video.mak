@@ -105,6 +105,38 @@ VIDEOOBJS+= $(VIDEOOBJ)/ef9340_1.o
 endif
 
 #-------------------------------------------------
+#@src/emu/video/epic12.h,VIDEOS += EPIC12
+#-------------------------------------------------
+
+ifneq ($(filter EPIC12,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/epic12.o
+VIDEOOBJS+= $(VIDEOOBJ)/epic12_blit0.o
+VIDEOOBJS+= $(VIDEOOBJ)/epic12_blit1.o
+VIDEOOBJS+= $(VIDEOOBJ)/epic12_blit2.o
+VIDEOOBJS+= $(VIDEOOBJ)/epic12_blit3.o
+VIDEOOBJS+= $(VIDEOOBJ)/epic12_blit4.o
+VIDEOOBJS+= $(VIDEOOBJ)/epic12_blit5.o
+VIDEOOBJS+= $(VIDEOOBJ)/epic12_blit6.o
+VIDEOOBJS+= $(VIDEOOBJ)/epic12_blit7.o
+VIDEOOBJS+= $(VIDEOOBJ)/epic12_blit8.o
+
+$(VIDEOOBJ)/epic12o: $(VIDEOSRC)/epic12.h
+
+$(VIDEOOBJ)/epic12_blit0.o: $(VIDEOSRC)/epic12.h $(VIDEOSRC)/epic12in.inc
+$(VIDEOOBJ)/epic12_blit1.o: $(VIDEOSRC)/epic12.h $(VIDEOSRC)/epic12in.inc
+$(VIDEOOBJ)/epic12_blit2.o: $(VIDEOSRC)/epic12.h $(VIDEOSRC)/epic12in.inc
+$(VIDEOOBJ)/epic12_blit3.o: $(VIDEOSRC)/epic12.h $(VIDEOSRC)/epic12in.inc
+$(VIDEOOBJ)/epic12_blit4.o: $(VIDEOSRC)/epic12.h $(VIDEOSRC)/epic12in.inc
+$(VIDEOOBJ)/epic12_blit5.o: $(VIDEOSRC)/epic12.h $(VIDEOSRC)/epic12in.inc
+$(VIDEOOBJ)/epic12_blit6.o: $(VIDEOSRC)/epic12.h $(VIDEOSRC)/epic12in.inc
+$(VIDEOOBJ)/epic12_blit7.o: $(VIDEOSRC)/epic12.h $(VIDEOSRC)/epic12in.inc
+$(VIDEOOBJ)/epic12_blit8.o: $(VIDEOSRC)/epic12.h $(VIDEOSRC)/epic12in.inc
+
+$(VIDEOSRC)/epic12in.inc: $(VIDEOSRC)/epic12pixel.inc
+
+endif
+
+#-------------------------------------------------
 #
 #@src/emu/video/fixfreq.h,VIDEOS += FIXFREQ
 #-------------------------------------------------

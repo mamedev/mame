@@ -4619,6 +4619,21 @@ ROM_START( snowbro2 )
 	ROM_LOAD( "rom4", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
 ROM_END
 
+ROM_START( snowbro2b ) // seems to be the same data as the main set, but with the extra user1 rom and different rom layout
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_BYTE( "sb2-prg1.U39", 0x000000, 0x040000, CRC(e1fec8a2) SHA1(30c1a351070d784da9ba0dca68be8a262dba2045) )
+	ROM_LOAD16_BYTE( "sb2-prg0.u23", 0x000001, 0x040000, CRC(b473cd57) SHA1(331130faa9de01b3ca93845174e8c3684bd269c7) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) // one of these seems badly read, check
+	ROM_LOAD( "sb2-gfx.u177", 0x000000, 0x200000, BAD_DUMP CRC(ebeec910) SHA1(e179f393b98135caa8419b68cd979038ab47a413) )
+	ROM_LOAD( "sb2-gfx.u175", 0x200000, 0x200000, BAD_DUMP CRC(72622795) SHA1(03f041e30b78da2c554b70ed0e5dae7f0214103d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )         /* ADPCM Samples */
+	ROM_LOAD( "sb2-snd.4", 0x00000, 0x80000, CRC(638f341e) SHA1(aa3fca25f099339ece1878ea730c5e9f18ec4823) )
+
+	ROM_REGION( 0x8000, "user1", 0 )            /* ??? Some sort of table - same as other bootleg boards */
+	ROM_LOAD( "sb2-unk.u100", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+ROM_END
 
 /* -------------------------- Raizing games ------------------------- */
 
@@ -5316,6 +5331,7 @@ GAME( 1994, pwrkick,    0,        pwrkick,  pwrkick, driver_device,    0,       
 GAME( 1995, othldrby,   0,        othldrby, othldrby,driver_device,    0,       ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
 
 GAME( 1994, snowbro2,   0,        snowbro2, snowbro2, driver_device,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
+GAME( 1994, snowbro2b,  snowbro2, snowbro2, snowbro2, driver_device,   0,       ROT0,   "bootleg", "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg)", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, sstriker,   0,        mahoudai, sstriker, driver_device,   0,       ROT270, "Raizing", "Sorcer Striker (set 1)" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
 GAME( 1993, sstrikera,  sstriker, mahoudai, sstrikera, driver_device,  0,       ROT270, "Raizing", "Sorcer Striker (set 2)" , GAME_SUPPORTS_SAVE ) // from Korean board
