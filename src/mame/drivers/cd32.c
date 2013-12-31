@@ -882,6 +882,7 @@ CONS( 1993, cd32,    0,       0,      cd32,   cd32,   cd32_state, cd32,   "Commo
    Harem Challenge      |      | 1995
    Laser Quiz           |      | 1995
    Laser Quiz 2 "Italy" |  1.0 | 1995
+   Laser Strixx			|	   | 1995
    Laser Strixx 2       |      | 1995
    Magic Premium        |  1.1 | 1996
    Laser Quiz France    |  1.0 | 1995

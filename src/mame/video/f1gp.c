@@ -53,7 +53,7 @@ VIDEO_START_MEMBER(f1gp_state,f1gp)
 	m_zoomdata = (UINT16 *)memregion("gfx4")->base();
 	machine().gfx[3]->set_source((UINT8 *)m_zoomdata);
 
-//  save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes());
+	save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes()/2);
 }
 
 
@@ -67,7 +67,7 @@ VIDEO_START_MEMBER(f1gp_state,f1gpb)
 	m_zoomdata = (UINT16 *)memregion("gfx4")->base();
 	machine().gfx[3]->set_source((UINT8 *)m_zoomdata);
 
-//  save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes());
+	save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes()/2);
 }
 
 /* new hw type */
