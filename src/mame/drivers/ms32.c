@@ -254,74 +254,74 @@ WRITE8_MEMBER(ms32_state::ms32_nvram_w8)
 
 READ8_MEMBER(ms32_state::ms32_priram_r8)
 {
-	return m_priram_8[offset];
+	return m_priram[offset];
 }
 
 WRITE8_MEMBER(ms32_state::ms32_priram_w8)
 {
-	m_priram_8[offset] = data;
+	m_priram[offset] = data;
 }
 
 READ16_MEMBER(ms32_state::ms32_palram_r16)
 {
-	return m_palram_16[offset];
+	return m_palram[offset];
 }
 
 WRITE16_MEMBER(ms32_state::ms32_palram_w16)
 {
-	COMBINE_DATA(&m_palram_16[offset]);
+	COMBINE_DATA(&m_palram[offset]);
 }
 
 READ16_MEMBER(ms32_state::ms32_rozram_r16)
 {
-	return m_rozram_16[offset];
+	return m_rozram[offset];
 }
 
 WRITE16_MEMBER(ms32_state::ms32_rozram_w16)
 {
-	COMBINE_DATA(&m_rozram_16[offset]);
+	COMBINE_DATA(&m_rozram[offset]);
 	m_roz_tilemap->mark_tile_dirty(offset/2);
 }
 
 READ16_MEMBER(ms32_state::ms32_lineram_r16)
 {
-	return m_lineram_16[offset];
+	return m_lineram[offset];
 }
 
 WRITE16_MEMBER(ms32_state::ms32_lineram_w16)
 {
-	COMBINE_DATA(&m_lineram_16[offset]);
+	COMBINE_DATA(&m_lineram[offset]);
 }
 
 READ16_MEMBER(ms32_state::ms32_sprram_r16)
 {
-	return m_sprram_16[offset];
+	return m_sprram[offset];
 }
 
 WRITE16_MEMBER(ms32_state::ms32_sprram_w16)
 {
-	COMBINE_DATA(&m_sprram_16[offset]);
+	COMBINE_DATA(&m_sprram[offset]);
 }
 
 READ16_MEMBER(ms32_state::ms32_txram_r16)
 {
-	return m_txram_16[offset];
+	return m_txram[offset];
 }
 
 WRITE16_MEMBER(ms32_state::ms32_txram_w16)
 {
-	COMBINE_DATA(&m_txram_16[offset]);
+	COMBINE_DATA(&m_txram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
 READ16_MEMBER(ms32_state::ms32_bgram_r16)
 {
-	return m_bgram_16[offset];
+	return m_bgram[offset];
 }
 
 WRITE16_MEMBER(ms32_state::ms32_bgram_w16)
 {
-	COMBINE_DATA(&m_bgram_16[offset]);
+	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 	m_bg_tilemap_alt->mark_tile_dirty(offset/2);
 }
@@ -339,18 +339,18 @@ static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
 	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)  // nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
-	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8(ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) /* priram is 8-bit wide, 0x2000 in size */
+	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8(ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) AM_SHARE("priram") /* priram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
-	AM_RANGE(0xc1400000, 0xc143ffff) AM_READWRITE16(ms32_palram_r16, ms32_palram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* palram is 16-bit wide, 0x20000 in size */
+	AM_RANGE(0xc1400000, 0xc143ffff) AM_READWRITE16(ms32_palram_r16, ms32_palram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) AM_SHARE("palram") /* palram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
-	AM_RANGE(0xc2000000, 0xc201ffff) AM_READWRITE16(ms32_rozram_r16, ms32_rozram_w16, 0x0000ffff) AM_MIRROR(0x3c1e0000) /* rozram is 16-bit wide, 0x10000 in size */
+	AM_RANGE(0xc2000000, 0xc201ffff) AM_READWRITE16(ms32_rozram_r16, ms32_rozram_w16, 0x0000ffff) AM_MIRROR(0x3c1e0000) AM_SHARE("rozram") /* rozram is 16-bit wide, 0x10000 in size */
 /*  AM_RANGE(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
-	AM_RANGE(0xc2200000, 0xc2201fff) AM_READWRITE16(ms32_lineram_r16,ms32_lineram_w16,0x0000ffff) AM_MIRROR(0x3c1fe000) /* lineram is 16-bit wide, 0x1000 in size */
+	AM_RANGE(0xc2200000, 0xc2201fff) AM_READWRITE16(ms32_lineram_r16,ms32_lineram_w16,0x0000ffff) AM_MIRROR(0x3c1fe000) AM_SHARE("lineram") /* lineram is 16-bit wide, 0x1000 in size */
 /*  AM_RANGE(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
-	AM_RANGE(0xc2800000, 0xc283ffff) AM_READWRITE16(ms32_sprram_r16, ms32_sprram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* spriteram is 16-bit wide, 0x20000 in size */
+	AM_RANGE(0xc2800000, 0xc283ffff) AM_READWRITE16(ms32_sprram_r16, ms32_sprram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) AM_SHARE("sprram") /* spriteram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
-	AM_RANGE(0xc2c00000, 0xc2c07fff) AM_READWRITE16(ms32_txram_r16,  ms32_txram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* txram is 16-bit wide, 0x4000 in size */
-	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* bgram is 16-bit wide, 0x4000 in size */
+	AM_RANGE(0xc2c00000, 0xc2c07fff) AM_READWRITE16(ms32_txram_r16,  ms32_txram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) AM_SHARE("txram") /* txram is 16-bit wide, 0x4000 in size */
+	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) AM_SHARE("bgram") /* bgram is 16-bit wide, 0x4000 in size */
 /*  AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
 	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_SHARE("mainram")                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
 	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROMBANK("bank1")                                                AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
@@ -381,12 +381,12 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(ms32_state::ms32_extra_w16)
 {
-	COMBINE_DATA(&m_f1superb_extraram_16[offset]);
+	COMBINE_DATA(&m_f1superb_extraram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
 READ16_MEMBER(ms32_state::ms32_extra_r16)
 {
-	return m_f1superb_extraram_16[offset];
+	return m_f1superb_extraram[offset];
 }
 
 WRITE32_MEMBER(ms32_state::ms32_irq2_guess_w)
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 	AM_RANGE(0xfd140000, 0xfd143fff) AM_RAM // used when you start enabling fpu ints
 	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM // same data here
 
-	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
+	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) AM_SHARE("f1sb_extraram") // definitely line ram
 	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM // scroll info for lineram?
 
 	AM_IMPORT_FROM(ms32_map)

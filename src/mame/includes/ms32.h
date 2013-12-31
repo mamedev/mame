@@ -8,6 +8,14 @@ public:
 		m_tx_scroll(*this, "tx_scroll"),
 		m_bg_scroll(*this, "bg_scroll"),
 		m_mahjong_input_select(*this, "mahjong_select"),
+		m_priram(*this, "priram", 32),
+		m_palram(*this, "palram", 32),
+		m_rozram(*this, "rozram", 32),
+		m_lineram(*this, "lineram", 32),
+		m_sprram(*this, "sprram", 32),
+		m_txram(*this, "txram", 32),
+		m_bgram(*this, "bgram", 32),
+		m_f1superb_extraram(*this, "f1sb_extraram", 32),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu")  { }
 
@@ -16,6 +24,14 @@ public:
 	required_shared_ptr<UINT32> m_tx_scroll;
 	required_shared_ptr<UINT32> m_bg_scroll;
 	required_shared_ptr<UINT32> m_mahjong_input_select;
+	required_shared_ptr<UINT8> m_priram;
+	required_shared_ptr<UINT16> m_palram;
+	required_shared_ptr<UINT16> m_rozram;
+	required_shared_ptr<UINT16> m_lineram;
+	required_shared_ptr<UINT16> m_sprram;
+	required_shared_ptr<UINT16> m_txram;
+	required_shared_ptr<UINT16> m_bgram;
+	optional_shared_ptr<UINT16> m_f1superb_extraram;
 	UINT8 *m_nvram_8;
 	UINT32 m_to_main;
 	UINT16 m_irqreq;
@@ -23,15 +39,7 @@ public:
 	tilemap_t *m_roz_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_alt;
-	UINT8* m_priram_8;
-	UINT16* m_palram_16;
-	UINT16* m_rozram_16;
-	UINT16* m_lineram_16;
-	UINT16* m_sprram_16;
-	UINT16* m_txram_16;
-	UINT16* m_bgram_16;
 	UINT32 m_tilemaplayoutcontrol;
-	UINT16* m_f1superb_extraram_16;
 	tilemap_t* m_extra_tilemap;
 	bitmap_ind16 m_temp_bitmap_tilemaps;
 	bitmap_ind16 m_temp_bitmap_sprites;
