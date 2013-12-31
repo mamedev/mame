@@ -144,8 +144,8 @@ void x2212_device::nvram_default()
 
 void x2212_device::nvram_read(emu_file &file)
 {
-	UINT8 buffer[SIZE_DATA];
-	file.read(buffer, sizeof(buffer));
+	UINT8 *buffer = (UINT8 *) alloca(SIZE_DATA);
+	file.read(buffer, SIZE_DATA);
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 	{
 		m_sram->write_byte(byte, 0xff);
@@ -165,10 +165,10 @@ void x2212_device::nvram_write(emu_file &file)
 	if (m_auto_save)
 		store();
 
-	UINT8 buffer[SIZE_DATA];
+	UINT8 *buffer = (UINT8 *) alloca(SIZE_DATA);
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 		buffer[byte] = m_e2prom->read_byte(byte);
-	file.write(buffer, sizeof(buffer));
+	file.write(buffer, SIZE_DATA);
 }
 
 
