@@ -53,6 +53,7 @@
 #define MCFG_VIA6522_WRITEPB_HANDLER(_devcb) \
 	devcb = &via6522_device::set_writepb_handler(*device, DEVCB2_##_devcb);
 
+// NOT USED
 #define MCFG_VIA6522_CA1_HANDLER(_devcb) \
 	devcb = &via6522_device::set_ca1_handler(*device, DEVCB2_##_devcb);
 
