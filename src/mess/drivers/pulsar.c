@@ -7,17 +7,33 @@ Pulsar Little Big Board
 2013-12-29 Skeleton driver.
 
 Chips: Z80A @4MHz, Z80DART, FD1797-02, 8255A-5, AY-5-8116, MSM5832.
-Crystals: 4 MHz, 5.0688 MHz
+Crystals: 4 MHz, 5.0688 MHz, 32768.
 
 This is a complete CP/M single-board computer. You needed to supply your own
 power supply and serial terminal.
 
+The terminal must be set for 9600 baud, 7 bits, even parity, 1 stop bit.
+
+
 ToDo:
-- Hook up 8255
-- Add 5832 rtc
-- Find out why data from board is corrupt but from keyboard is fine
+- Hook up the rs232, once the bugs in z80dart/rs232 are sorted
+   (data from board is corrupt but from keyboard is fine)
 - Need software
 
+
+Monitor Commands:
+B - Boot from disk
+D - Dump memory
+F - Fill memory
+G - Go
+I - In port
+L - Load bootstrap from drive A to 0x80
+M - Modify memory
+O - Out port
+P - choose which rs232 channel for the console
+T - Test memory
+V - Move memory
+X - Test off-board memory banks
 
 ****************************************************************************/
 
@@ -25,10 +41,12 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80dart.h"
+#include "machine/msm5832.h"
 #include "machine/i8255.h"
 #include "machine/com8116.h"
 #include "machine/serial.h"
 #include "machine/wd_fdc.h"
+#include "machine/terminal.h"
 
 
 class pulsar_state : public driver_device
@@ -41,40 +59,34 @@ public:
 		, m_brg(*this, "brg")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
+		, m_terminal(*this, TERMINAL_TAG)
+		, m_rtc(*this, "rtc")
 	{ }
 
 	DECLARE_DRIVER_INIT(pulsar);
 	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
 	DECLARE_WRITE8_MEMBER(baud_w);
-	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_WRITE_LINE_MEMBER(fr_w);
 	DECLARE_WRITE_LINE_MEMBER(ft_w);
+	DECLARE_WRITE8_MEMBER(ppi_pa_w);
+	DECLARE_WRITE8_MEMBER(ppi_pb_w);
+	DECLARE_WRITE8_MEMBER(ppi_pc_w);
+	DECLARE_READ8_MEMBER(ppi_pc_r);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_READ8_MEMBER(keyin_r);
+	DECLARE_READ8_MEMBER(status_r);
 private:
+	UINT8 m_term_data;
+	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<com8116_device> m_brg;
 	required_device<fd1797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
+	required_device<generic_terminal_device> m_terminal;
+	required_device<msm5832_device> m_rtc;
 };
-
-/*
-d0..d3 Drive select 0-3 (we only emulate 1 drive)
-d4     Side select 0=side0
-d5     /DDEN
-d6     Banking 0=rom
-d7     FDC master clock 0=8MHz 1=16MHz (for 20cm disks, not emulated)
-*/
-WRITE8_MEMBER( pulsar_state::port00_w )
-{
-	membank("bankr1")->set_entry(BIT(data, 6));
-	m_fdc->dden_w(BIT(data, 5));
-	floppy_image_device *floppy = NULL;
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	m_fdc->set_floppy(floppy);
-	if (floppy)
-		floppy->ss_w(BIT(data, 4));
-}
 
 static ADDRESS_MAP_START(pulsar_mem, AS_PROGRAM, 8, pulsar_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -86,22 +98,26 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pulsar_io, AS_IO, 8, pulsar_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x0c) AM_DEVREADWRITE("z80dart", z80dart_device, ba_cd_r, ba_cd_w)
+	//AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x0c) AM_DEVREADWRITE("z80dart", z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ(keyin_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0xc1, 0xc1) AM_READ(status_r)
 	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xf0, 0xff) AM_WRITE(baud_w)
 ADDRESS_MAP_END
 
+// Schematic has the labels for FT and FR the wrong way around,
+//  the pin numbers are correct.
 WRITE_LINE_MEMBER( pulsar_state::fr_w )
 {
-	m_dart->rxcb_w(state);
-	m_dart->txcb_w(state);
+	m_dart->rxca_w(state);
+	m_dart->txca_w(state);
 }
 
 WRITE_LINE_MEMBER( pulsar_state::ft_w )
 {
-	m_dart->rxca_w(state);
-	m_dart->txca_w(state);
+	m_dart->rxcb_w(state);
+	m_dart->txcb_w(state);
 }
 
 WRITE8_MEMBER( pulsar_state::baud_w )
@@ -113,7 +129,7 @@ WRITE8_MEMBER( pulsar_state::baud_w )
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 TIMER_CALLBACK_MEMBER( pulsar_state::pulsar_reset)
 {
-	membank("bankr0")->set_entry(0);
+	membank("bankr0")->set_entry(1);
 }
 
 static const z80_daisy_config daisy_chain_intf[] =
@@ -122,14 +138,61 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ NULL }
 };
 
+/*
+d0..d3 Drive select 0-3 (we only emulate 1 drive)
+d4     Side select 0=side0
+d5     /DDEN
+d6     /DSK_WAITEN (don't know what this is, not emulated)
+d7     XMEMEX line (for external memory, not emulated)
+*/
+WRITE8_MEMBER( pulsar_state::ppi_pa_w )
+{
+	m_floppy = NULL;
+	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
+	m_fdc->set_floppy(m_floppy);
+	m_fdc->dden_w(BIT(data, 5));
+}
+
+/*
+d0..d3 RTC address
+d4     RTC read line (inverted in emulation)
+d5     RTC write line (inverted in emulation)
+d6     RTC hold line
+d7     Allow 64k of ram
+*/
+WRITE8_MEMBER( pulsar_state::ppi_pb_w )
+{
+	m_rtc->address_w(data & 0x0f);
+	m_rtc->read_w(!BIT(data, 4));
+	m_rtc->write_w(!BIT(data, 5));
+	m_rtc->hold_w(BIT(data, 6));
+	membank("bankr1")->set_entry(BIT(data, 7));
+}
+
+/*
+d0..d3 Data lines to rtc
+d7     /2 SIDES (assumed to be side select)
+*/
+WRITE8_MEMBER( pulsar_state::ppi_pc_w )
+{
+	m_rtc->data_w(space, 0, data & 15);
+	if (m_floppy)
+		m_floppy->ss_w(BIT(data, 7));
+}
+
+READ8_MEMBER( pulsar_state::ppi_pc_r )
+{
+	return m_rtc->data_r(space, 0);
+}
+
 static I8255_INTERFACE( ppi_intf )
 {
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pa_r),   // Port A read
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pa_w),   // Port A write
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pb_r),   // Port B read
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pb_w),   // Port B write
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pc_r),   // Port C read
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pc_w),   // Port C write
+	DEVCB_NULL,   // Port A read
+	DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pa_w),   // Port A write
+	DEVCB_NULL,   // Port B read
+	DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pb_w),   // Port B write
+	DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pc_r),   // Port C read
+	DEVCB_DRIVER_MEMBER(pulsar_state, ppi_pc_w),   // Port C write
 };
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -141,9 +204,9 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
+	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -170,11 +233,12 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( pulsar_state, pulsar )
 {
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(pulsar_state::pulsar_reset),this));
+	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(pulsar_state::pulsar_reset),this));
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
-	membank("bankr1")->set_entry(0); // point at rom
+	membank("bankr1")->set_entry(1); // point at rom
 	membank("bankw1")->set_entry(0); // always write to ram
+	m_rtc->cs_w(1); // always enabled
 }
 
 DRIVER_INIT_MEMBER( pulsar_state, pulsar )
@@ -185,10 +249,32 @@ DRIVER_INIT_MEMBER( pulsar_state, pulsar )
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 
-	membank("bankr1")->configure_entry(1, &main[0xf800]);
-	membank("bankr1")->configure_entry(0, &main[0x10000]);
+	membank("bankr1")->configure_entry(0, &main[0xf800]);
+	membank("bankr1")->configure_entry(1, &main[0x10000]);
 	membank("bankw1")->configure_entry(0, &main[0xf800]);
 }
+
+READ8_MEMBER( pulsar_state::keyin_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
+READ8_MEMBER( pulsar_state::status_r )
+{
+	return (m_term_data) ? 5 : 4;
+}
+
+WRITE8_MEMBER( pulsar_state::kbd_put )
+{
+	m_term_data = data;
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_DRIVER_MEMBER(pulsar_state, kbd_put)
+};
 
 static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	/* basic machine hardware */
@@ -200,13 +286,16 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 
 	/* Devices */
 	MCFG_I8255_ADD( "ppi", ppi_intf )
+	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, WRITELINE(pulsar_state, fr_w), WRITELINE(pulsar_state, ft_w))
 	MCFG_Z80DART_ADD("z80dart",  XTAL_4MHz, dart_intf )
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	//MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
 	//MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("z80dart", z80dart_device, dcda_w))
 	//MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ctsa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
+	//MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ria_w))
+	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 	MCFG_FD1797x_ADD("fdc", XTAL_4MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
@@ -220,4 +309,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1980, pulsar, 0,      0,       pulsar,    pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1981, pulsar, 0,      0,       pulsar,    pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", GAME_NO_SOUND_HW)
