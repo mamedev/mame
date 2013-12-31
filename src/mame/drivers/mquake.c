@@ -4,6 +4,31 @@
 
     Preliminary driver by Mariusz Wojcieszek
 
+
+    Notes:
+
+    It's possible that the Moonquake set is actually a hardware diagnostic program
+    rather than the game itself. The origin of the set and the state of the PCB
+    from which it was dumped are unknown.
+
+    * There are no references to Moonquake within the entire ROM data.
+
+    * No code paths lead out of the test mode.
+
+    * The non-test-mode data starts at 0xf03c3e. Curiously, there are no FF values
+    within the data and large sections are repeated (see 0xf20000, 0xf40092, 0xf60023
+    and 0xfa0046). Initially thought to be encrypted/compressed data, it may instead
+    be randomly-generated data for testing the ROM banks.
+
+    * ROMs 5L/5H are not present in a photo of a known-working PCB.
+
+    * The ES5503 ROMs only contain speech for the sound bank tests.
+
+    * The external interrupt (INT6) is related to the ES5503 but appears to be unused
+    by the diagnostic program.
+
+    * The internal program of the I/O MCU (68705) is undumped.
+
 **************************************************************************************/
 
 
@@ -358,7 +383,7 @@ static MACHINE_CONFIG_START( mquake, mquake_state )
 	MCFG_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_MACHINE_START_OVERRIDE(amiga_state, amiga )
+	MCFG_MACHINE_START_OVERRIDE(amiga_state, amiga)
 	MCFG_MACHINE_RESET_OVERRIDE(mquake_state,mquake)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -425,6 +450,9 @@ ROM_START( mquake )
 	ROM_LOAD16_BYTE( "rom4h.bin",    0x80001, 0x10000, CRC(eee39fec) SHA1(713e24fa5f4ba0a8bc7bf67ed2d9e079fd3aa5d6) )
 	ROM_LOAD16_BYTE( "rom5l.bin",    0xa0000, 0x10000, CRC(7b6ec532) SHA1(e19005269673134431eb55053d650f747f614b89) )
 	ROM_LOAD16_BYTE( "rom5h.bin",    0xa0001, 0x10000, CRC(ed8ec9b7) SHA1(510416bc88382e7a548635dcba53a2b615272e0f) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "68705.bin", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION(0x040000, "es5503", 0)
 	ROM_LOAD( "qrom0.bin",    0x000000, 0x010000, CRC(753e29b4) SHA1(4c7ccff02d310c7c669aa170e8efb6f2cb996432) )
