@@ -36,6 +36,11 @@ Knights of Valour 3
 
 NO internal ROMs are dumped.
 
+Other games that might be on this HW
+
+Jigsaw World Arena
+Puzzle of Ocha / Ochainu No Pazuru
+
 */
 
 // document these exist, but leave disabled for now, can't be doing with the drama
@@ -279,7 +284,7 @@ ROM_START( kov2nlo )
 	ROM_LOAD16_WORD_SWAP( "ig-a3_sp.u37",            0x00000000, 0x2000000, CRC(45cdf422) SHA1(8005d284bcee73cff37a147fcd1c3e9f039a7203) )
 ROM_END
 
-#ifdef OTHER_PGM2_SETS
+
 ROM_START( ddpdojh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "ddpdoj_igs036.rom",       0x00000000, 0x0004000, NO_DUMP )
@@ -304,9 +309,9 @@ ROM_START( ddpdojh )
 
 	ROM_REGION( 0x1000000, "ymz770", ROMREGION_ERASEFF ) /* ymz770 */
 	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) )
-
 ROM_END
 
+#ifdef OTHER_PGM2_SETS
 ROM_START( kov3 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "kov3_igs036.rom",         0x00000000, 0x0004000, NO_DUMP )
@@ -431,8 +436,8 @@ GAME( 2007, orleg2o,      orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,     
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, China)", GAME_IS_SKELETON )
 GAME( 2008, kov2nlo,      kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, China)", GAME_IS_SKELETON )
 
-#ifdef OTHER_PGM2_SETS
-GAME( 2009, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", GAME_IS_SKELETON )
 
+GAME( 2009, ddpdojh,      0,    pgm2,    pgm2, pgm2_state,     ddpdojh,    ROT270, "IGS", "Dodonpachi Daioujou Tamashii (V201, China)", GAME_IS_SKELETON )
+#ifdef OTHER_PGM2_SETS
 GAME( 2009, kov3,         0,    pgm2,    pgm2, pgm2_state,     kov3,       ROT0, "IGS", "Knights of Valour 3 (V102, China)", GAME_IS_SKELETON )
 #endif
