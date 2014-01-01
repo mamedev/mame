@@ -45,9 +45,10 @@ public:
 		m_col5(*this,"COL5"),
 		m_col6(*this,"COL6"),
 		m_col7(*this,"COL7"),
-		m_special(*this,"SPECIAL")
-	,
-		m_maincpu(*this, "maincpu") {
+		m_special(*this,"SPECIAL"),
+		m_maincpu(*this, "maincpu"),
+		m_via0(*this, "via0")
+	{
 	}
 
 	TILE_GET_INFO_MEMBER(get_clcd_tilemap_tile_info)
@@ -202,18 +203,10 @@ public:
 				}
 
 				keyShift = 0x10000;
+
+				m_via0->write_cb2( ( keyData & keyShift ) != 0 );
 			}
 		}
-	}
-
-	READ8_MEMBER( via0_pb_r )
-	{
-		return 0;
-	}
-
-	READ_LINE_MEMBER( via0_cb2_r )
-	{
-		return ( keyData & keyShift ) != 0;
 	}
 
 	WRITE_LINE_MEMBER( via0_cb1_w )
@@ -226,6 +219,8 @@ public:
 			if( keyClockState )
 			{
 				keyShift >>= 1;
+
+				m_via0->write_cb2( ( keyData & keyShift ) != 0 );
 			}
 		}
 	}
@@ -249,6 +244,7 @@ private:
 	required_ioport m_col7;
 	required_ioport m_special;
 	required_device<cpu_device> m_maincpu;
+	required_device<via6522_device> m_via0;
 };
 
 static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
@@ -397,8 +393,6 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)
 
 	MCFG_DEVICE_ADD("via0", VIA6522, 0)
-	MCFG_VIA6522_READPB_HANDLER(READ8(clcd_state, via0_pb_r))
-	MCFG_VIA6522_READCB2_HANDLER(READLINE(clcd_state, via0_cb2_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(clcd_state, via0_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(clcd_state, via0_pb_w))
 	MCFG_VIA6522_CB1_HANDLER(WRITELINE(clcd_state, via0_cb1_w))

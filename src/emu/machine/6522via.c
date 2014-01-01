@@ -1103,11 +1103,11 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 
 WRITE_LINE_MEMBER( via6522_device::write_cb2 )
 {
-	/* CB2 is in input mode */
-	if (CB2_INPUT(m_pcr))
+	/* the new state has caused a transition */
+	if (m_in_cb2 != state)
 	{
-		/* the new state has caused a transition */
-		if (m_in_cb2 != state)
+		/* CB2 is in input mode */
+		if (CB2_INPUT(m_pcr))
 		{
 			/* handle the active transition */
 			if ((state && CB2_LOW_TO_HIGH(m_pcr)) || (!state && CB2_HIGH_TO_LOW(m_pcr)))
@@ -1115,8 +1115,9 @@ WRITE_LINE_MEMBER( via6522_device::write_cb2 )
 				/* mark the IRQ */
 				set_int(INT_CB2);
 			}
-			/* set the new value for CB2 */
-			m_in_cb2 = state;
 		}
+
+		/* set the new value for CB2 */
+		m_in_cb2 = state;
 	}
 }
