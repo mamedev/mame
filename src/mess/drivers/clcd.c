@@ -203,8 +203,6 @@ public:
 				}
 
 				keyShift = 0x10000;
-
-				m_via0->write_cb2( ( keyData & keyShift ) != 0 );
 			}
 		}
 	}
