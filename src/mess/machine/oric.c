@@ -302,16 +302,6 @@ WRITE8_MEMBER(oric_state::oric_via_out_b_func)
 }
 
 
-READ_LINE_MEMBER(oric_state::oric_via_in_ca2_func)
-{
-	return m_psg_control & 1;
-}
-
-READ_LINE_MEMBER(oric_state::oric_via_in_cb2_func)
-{
-	return (m_psg_control>>1) & 1;
-}
-
 WRITE_LINE_MEMBER(oric_state::oric_via_out_ca2_func)
 {
 	m_psg_control &=~1;

@@ -136,8 +136,6 @@ public:
 	DECLARE_READ8_MEMBER(oric_via_in_b_func);
 	DECLARE_WRITE8_MEMBER(oric_via_out_a_func);
 	DECLARE_WRITE8_MEMBER(oric_via_out_b_func);
-	DECLARE_READ_LINE_MEMBER(oric_via_in_ca2_func);
-	DECLARE_READ_LINE_MEMBER(oric_via_in_cb2_func);
 	DECLARE_WRITE_LINE_MEMBER(oric_via_out_ca2_func);
 	DECLARE_WRITE_LINE_MEMBER(oric_via_out_cb2_func);
 	DECLARE_WRITE_LINE_MEMBER(oric_jasmin_wd179x_drq_w);
