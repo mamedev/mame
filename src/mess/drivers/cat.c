@@ -460,15 +460,11 @@ public:
 	DECLARE_WRITE8_MEMBER(swyft_via0_w);
 	DECLARE_READ8_MEMBER(via0_pa_r);
 	DECLARE_WRITE8_MEMBER(via0_pa_w);
-	DECLARE_READ_LINE_MEMBER(via0_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(via0_ca1_w);
-	DECLARE_READ_LINE_MEMBER(via0_ca2_r);
 	DECLARE_WRITE_LINE_MEMBER(via0_ca2_w);
 	DECLARE_READ8_MEMBER(via0_pb_r);
 	DECLARE_WRITE8_MEMBER(via0_pb_w);
-	DECLARE_READ_LINE_MEMBER(via0_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb1_w);
-	DECLARE_READ_LINE_MEMBER(via0_cb2_r);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via0_int_w);
 
@@ -476,15 +472,11 @@ public:
 	DECLARE_WRITE8_MEMBER(swyft_via1_w);
 	DECLARE_READ8_MEMBER(via1_pa_r);
 	DECLARE_WRITE8_MEMBER(via1_pa_w);
-	DECLARE_READ_LINE_MEMBER(via1_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(via1_ca1_w);
-	DECLARE_READ_LINE_MEMBER(via1_ca2_r);
 	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
 	DECLARE_READ8_MEMBER(via1_pb_r);
 	DECLARE_WRITE8_MEMBER(via1_pb_w);
-	DECLARE_READ_LINE_MEMBER(via1_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb1_w);
-	DECLARE_READ_LINE_MEMBER(via1_cb2_r);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_int_w);
 
@@ -1269,6 +1261,16 @@ ADDRESS_MAP_END
 MACHINE_START_MEMBER(cat_state,swyft)
 {
 	//m_6ms_timer = timer_alloc(TIMER_COUNTER_6MS); // CRUDE HACK
+
+	m_via0->write_ca1(1);
+	m_via0->write_ca2(1);
+	m_via0->write_cb1(1);
+	m_via0->write_cb2(1);
+
+	m_via1->write_ca1(1);
+	m_via1->write_ca2(1);
+	m_via1->write_cb1(1);
+	m_via1->write_cb2(1);
 }
 
 MACHINE_RESET_MEMBER(cat_state,swyft)
@@ -1378,21 +1380,9 @@ WRITE8_MEMBER( cat_state::via0_pa_w )
 	logerror("VIA0: Port A written with data of 0x%02x!\n", data);
 }
 
-READ_LINE_MEMBER ( cat_state::via0_ca1_r )
-{
-	logerror("VIA0: CA1 read!\n");
-	return 1;
-}
-
 WRITE_LINE_MEMBER ( cat_state::via0_ca1_w )
 {
 	logerror("VIA0: CA1 written with %d!\n", state);
-}
-
-READ_LINE_MEMBER ( cat_state::via0_ca2_r )
-{
-	logerror("VIA0: CA2 read!\n");
-	return 1;
 }
 
 WRITE_LINE_MEMBER ( cat_state::via0_ca2_w )
@@ -1411,21 +1401,9 @@ WRITE8_MEMBER( cat_state::via0_pb_w )
 	logerror("VIA0: Port B written with data of 0x%02x!\n", data);
 }
 
-READ_LINE_MEMBER ( cat_state::via0_cb1_r )
-{
-	logerror("VIA0: CB1 read!\n");
-	return 1;
-}
-
 WRITE_LINE_MEMBER ( cat_state::via0_cb1_w )
 {
 	logerror("VIA0: CB1 written with %d!\n", state);
-}
-
-READ_LINE_MEMBER ( cat_state::via0_cb2_r )
-{
-	logerror("VIA0: CB2 read!\n");
-	return 1;
 }
 
 WRITE_LINE_MEMBER ( cat_state::via0_cb2_w )
@@ -1450,21 +1428,9 @@ WRITE8_MEMBER( cat_state::via1_pa_w )
 	logerror(" VIA1: Port A written with data of 0x%02x!\n", data);
 }
 
-READ_LINE_MEMBER ( cat_state::via1_ca1_r )
-{
-	logerror(" VIA1: CA1 read!\n");
-	return 1;
-}
-
 WRITE_LINE_MEMBER ( cat_state::via1_ca1_w )
 {
 	logerror(" VIA1: CA1 written with %d!\n", state);
-}
-
-READ_LINE_MEMBER ( cat_state::via1_ca2_r )
-{
-	logerror(" VIA1: CA2 read!\n");
-	return 1;
 }
 
 WRITE_LINE_MEMBER ( cat_state::via1_ca2_w )
@@ -1483,21 +1449,9 @@ WRITE8_MEMBER( cat_state::via1_pb_w )
 	logerror(" VIA1: Port B written with data of 0x%02x!\n", data);
 }
 
-READ_LINE_MEMBER ( cat_state::via1_cb1_r )
-{
-	logerror(" VIA1: CB1 read!\n");
-	return 1;
-}
-
 WRITE_LINE_MEMBER ( cat_state::via1_cb1_w )
 {
 	logerror(" VIA1: CB1 written with %d!\n", state);
-}
-
-READ_LINE_MEMBER ( cat_state::via1_cb2_r )
-{
-	logerror(" VIA1: CB2 read!\n");
-	return 1;
 }
 
 WRITE_LINE_MEMBER ( cat_state::via1_cb2_w )
@@ -1536,10 +1490,6 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_15_8976MHz/16) // unknown clock, GUESSED
 	MCFG_VIA6522_READPA_HANDLER(READ8(cat_state, via0_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(cat_state, via0_pb_r))
-	MCFG_VIA6522_READCA1_HANDLER(READLINE(cat_state, via0_ca1_r))
-	MCFG_VIA6522_READCB1_HANDLER(READLINE(cat_state, via0_cb1_r))
-	MCFG_VIA6522_READCA2_HANDLER(READLINE(cat_state, via0_ca2_r))
-	MCFG_VIA6522_READCB2_HANDLER(READLINE(cat_state, via0_cb2_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cat_state, via0_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cat_state, via0_pb_w))
 	MCFG_VIA6522_CA1_HANDLER(WRITELINE(cat_state, via0_ca1_w))
@@ -1551,10 +1501,6 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_15_8976MHz/16) // unknown clock, GUESSED
 	MCFG_VIA6522_READPA_HANDLER(READ8(cat_state, via1_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(cat_state, via1_pb_r))
-	MCFG_VIA6522_READCA1_HANDLER(READLINE(cat_state, via1_ca1_r))
-	MCFG_VIA6522_READCB1_HANDLER(READLINE(cat_state, via1_cb1_r))
-	MCFG_VIA6522_READCA2_HANDLER(READLINE(cat_state, via1_ca2_r))
-	MCFG_VIA6522_READCB2_HANDLER(READLINE(cat_state, via1_cb2_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cat_state, via1_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cat_state, via1_pb_w))
 	MCFG_VIA6522_CA1_HANDLER(WRITELINE(cat_state, via1_ca1_w))
