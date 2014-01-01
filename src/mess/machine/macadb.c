@@ -612,7 +612,11 @@ TIMER_CALLBACK(mac_adb_tick)
 		mac->m_adb_extclock ^= 1;
 		mac->m_via1->write_cb1(mac->m_adb_extclock);
 
-		if (mac->m_adb_direction == 0)
+		if (mac->m_adb_direction)
+		{
+			mac->m_adb_command <<= 1;
+		}
+		else
 		{
 			mac->m_via1->write_cb2((mac->m_adb_send & 0x80)>>7);
 			mac->m_adb_send <<= 1;
@@ -620,11 +624,6 @@ TIMER_CALLBACK(mac_adb_tick)
 
 		mac->m_adb_extclock ^= 1;
 		mac->m_via1->write_cb1(mac->m_adb_extclock);
-
-		if (mac->m_adb_direction)
-		{
-			mac->m_adb_command <<= 1;
-		}
 
 		mac->m_adb_timer_ticks--;
 		if (!mac->m_adb_timer_ticks)
