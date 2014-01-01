@@ -324,8 +324,6 @@ public:
 	DECLARE_READ8_MEMBER(via_b_r);
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
-	DECLARE_READ_LINE_MEMBER(via_ca2_r);
-	DECLARE_READ_LINE_MEMBER(via_cb2_r);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE8_MEMBER(pblp_out);
@@ -833,24 +831,9 @@ WRITE8_MEMBER(aristmk4_state::via_b_w)
 	}
 }
 
-READ_LINE_MEMBER(aristmk4_state::via_ca2_r)
-{
-	//logerror("Via Port CA2 read %02X\n",0) ;
-	// CA2 is connected to CDSOL1 on schematics ?
-
-	return 0 ;
-}
-
-READ_LINE_MEMBER(aristmk4_state::via_cb2_r)
-{
-	//logerror("Via Port CB2 read %02X\n",0) ;
-	// CB2 is connected to HOPMO1 on schematics ?
-
-	return 0 ;
-}
-
 WRITE_LINE_MEMBER(aristmk4_state::via_ca2_w)
 {
+	// CA2 is connected to CDSOL1 on schematics ?
 	//logerror("Via Port CA2 write %02X\n",data) ;
 }
 
@@ -1729,8 +1712,6 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0) /* 1 MHz.(only 1 or 2 MHz.are valid) */
 	MCFG_VIA6522_READPA_HANDLER(READ8(aristmk4_state, via_a_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(aristmk4_state, via_b_r))
-	MCFG_VIA6522_READCA2_HANDLER(READLINE(aristmk4_state, via_ca2_r))
-	MCFG_VIA6522_READCB2_HANDLER(READLINE(aristmk4_state, via_cb2_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(aristmk4_state, via_a_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(aristmk4_state, via_b_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(aristmk4_state, via_ca2_w))
