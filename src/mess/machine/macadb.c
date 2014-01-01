@@ -621,6 +621,11 @@ TIMER_CALLBACK(mac_adb_tick)
 		mac->m_adb_extclock ^= 1;
 		mac->m_via1->write_cb1(mac->m_adb_extclock);
 
+		if (mac->m_adb_direction)
+		{
+			mac->m_adb_command <<= 1;
+		}
+
 		mac->m_adb_timer_ticks--;
 		if (!mac->m_adb_timer_ticks)
 		{
