@@ -27,6 +27,7 @@
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "scsi:539x_1"
 #define MAC_539X_2_TAG "scsi:539x_2"
+#define MACKBD_TAG  "mackbd"
 
 // uncomment to run i8021 keyboard in orignal Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
@@ -512,9 +513,7 @@ public:
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
-	DECLARE_READ_LINE_MEMBER(mac_via_in_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
-	DECLARE_READ_LINE_MEMBER(mac_adb_via_in_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_READ8_MEMBER(mac_via_in_a);
 	DECLARE_READ8_MEMBER(mac_via_in_b);

@@ -633,17 +633,12 @@ void mac_state::keyboard_init()
 
 /******************* Keyboard <-> VIA communication ***********************/
 
+#ifdef MAC_USE_EMULATED_KBD
+
 WRITE_LINE_MEMBER(mac_state::mac_kbd_clk_in)
 {
 	printf("CLK: %d\n", state^1);
 	m_via1->write_cb1(state ? 0 : 1);
-}
-
-#ifdef MAC_USE_EMULATED_KBD
-READ_LINE_MEMBER(mac_state::mac_via_in_cb2)
-{
-	printf("Read %d from keyboard (PC=%x)\n", (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0, m_maincpu->pc());
-	return (m_mackbd->data_r() == ASSERT_LINE) ? 1 : 0;
 }
 
 WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
@@ -1128,34 +1123,6 @@ WRITE16_MEMBER ( mac_state::mac_iwm_w )
 		fdc->write((offset >> 8), data>>8);
 }
 
-READ_LINE_MEMBER(mac_state::mac_adb_via_in_cb2)
-{
-	UINT8 ret;
-	if (ADB_IS_EGRET)
-	{
-		ret = m_egret->get_via_data();
-		#if LOG_ADB
-		printf("68K: Read VIA_DATA %x\n", ret);
-		#endif
-	}
-	else if (ADB_IS_CUDA)
-	{
-		ret = m_cuda->get_via_data();
-		#if LOG_ADB
-		printf("68K: Read VIA_DATA %x\n", ret);
-		#endif
-	}
-	else
-	{
-		ret = (m_adb_send & 0x80)>>7;
-		m_adb_send <<= 1;
-	}
-
-//  printf("VIA IN CB2 = %x\n", ret);
-
-	return ret;
-}
-
 WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 {
 //        printf("VIA OUT CB2 = %x\n", state);
@@ -1169,8 +1136,10 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 	}
 	else
 	{
-		m_adb_command <<= 1;
-		m_adb_command |= state & 1;
+		if (state)
+			m_adb_command |= 1;
+		else
+			m_adb_command &= ~1;
 	}
 }
 

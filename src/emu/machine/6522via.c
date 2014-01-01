@@ -150,12 +150,11 @@ via6522_device::via6522_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock, "via6522", __FILE__),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
-		m_in_cb2_handler(*this),
 		m_out_a_handler(*this),
 		m_out_b_handler(*this),
 		m_ca1_handler(*this),
-		m_cb1_handler(*this),
 		m_ca2_handler(*this),
+		m_cb1_handler(*this),
 		m_cb2_handler(*this),
 		m_irq_handler(*this),
 		m_irq(CLEAR_LINE)
@@ -171,7 +170,6 @@ void via6522_device::device_start()
 {
 	m_in_a_handler.resolve();
 	m_in_b_handler.resolve();
-	m_in_cb2_handler.resolve();
 	m_out_a_handler.resolve_safe();
 	m_out_b_handler.resolve_safe();
 	m_ca1_handler.resolve();
@@ -373,11 +371,6 @@ void via6522_device::shift()
 		m_cb1_handler(0);
 		m_cb1_handler(1);
 
-		if (!m_in_cb2_handler.isnull())
-		{
-			m_in_cb2 = m_in_cb2_handler();
-		}
-
 		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
 
 		m_shift_counter = (m_shift_counter + 1) % 8;
@@ -401,11 +394,6 @@ void via6522_device::shift()
 
 	if (SI_EXT_CONTROL(m_acr))
 	{
-		if (!m_in_cb2_handler.isnull())
-		{
-			m_in_cb2 = m_in_cb2_handler();
-		}
-
 		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
 
 		m_shift_counter = (m_shift_counter + 1) % 8;

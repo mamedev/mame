@@ -210,7 +210,8 @@ ioport_constructor mackbd_device::device_input_ports() const
 mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MACKBD, "Macintosh keyboard", tag, owner, clock, "mackbd", __FILE__),
 	m_maincpu(*this, MACKBD_CPU_TAG),
-	m_clkout_handler(*this)
+	m_clkout_handler(*this),
+	m_dataout_handler(*this)
 {
 }
 
@@ -318,11 +319,6 @@ WRITE8_MEMBER(mackbd_device::p2_w)
 READ8_MEMBER(mackbd_device::t1_r)
 {
 	return (ioport("MODS")->read() & 0x2) ? 0xff : 0x00;
-}
-
-READ_LINE_MEMBER(mackbd_device::data_r)
-{
-	return data_to_mac ? ASSERT_LINE : CLEAR_LINE;
 }
 
 WRITE_LINE_MEMBER(mackbd_device::data_w)
