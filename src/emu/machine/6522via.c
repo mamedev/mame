@@ -961,6 +961,13 @@ WRITE8_MEMBER( via6522_device::write )
 	}
 }
 
+void via6522_device::write_pa(int line, int state)
+{
+	if (state)
+		m_in_a |= (1 << line);
+	else
+		m_in_a &= ~(1 << line);
+}
 
 /*-------------------------------------------------
     ca1_w - interface setting VIA port CA1 input
@@ -1034,6 +1041,13 @@ WRITE_LINE_MEMBER( via6522_device::write_ca2 )
 	}
 }
 
+void via6522_device::write_pb(int line, int state)
+{
+	if (state)
+		m_in_b |= (1 << line);
+	else
+		m_in_b &= ~(1 << line);
+}
 
 /*-------------------------------------------------
     cb1_w - interface setting VIA port CB1 input

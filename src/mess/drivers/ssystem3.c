@@ -195,16 +195,22 @@ READ8_MEMBER(ssystem3_state::ssystem3_via_read_b)
 
 WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
 {
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	UINT8 d;
-
 	ssystem3_playfield_write(data&1, data&8);
 	ssystem3_lcd_write(data&4, data&2);
 
-	d=ssystem3_via_read_b(space, 0, mem_mask)&~0x40;
+	// TODO: figure out what this is trying to achieve
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
+	UINT8 d=ssystem3_via_read_b(space, 0, mem_mask)&~0x40;
 	if (data&0x80) d|=0x40;
 	//  d&=~0x8f;
-	via_0->write_portb(space,0, d );
+	via_0->write_pb0((d>>0)&1);
+	via_0->write_pb1((d>>1)&1);
+	via_0->write_pb2((d>>2)&1);
+	via_0->write_pb3((d>>3)&1);
+	via_0->write_pb4((d>>4)&1);
+	via_0->write_pb5((d>>5)&1);
+	via_0->write_pb6((d>>6)&1);
+	via_0->write_pb7((d>>7)&1);
 }
 
 DRIVER_INIT_MEMBER(ssystem3_state,ssystem3)

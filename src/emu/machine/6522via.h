@@ -112,12 +112,25 @@ public:
 	DECLARE_READ_LINE_MEMBER( read_cb1 ) { return m_in_cb1; }
 	DECLARE_READ_LINE_MEMBER( read_cb2 ) { return m_in_cb2; }
 
-	// TODO: CONVERT THESE TO WRITE LINE
-	DECLARE_WRITE8_MEMBER( write_porta ) { m_in_a = data; }
-	DECLARE_WRITE8_MEMBER( write_portb ) { m_in_b = data; }
-
+	DECLARE_WRITE_LINE_MEMBER( write_pa0 ) { write_pa(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa1 ) { write_pa(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa2 ) { write_pa(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa3 ) { write_pa(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa4 ) { write_pa(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa5 ) { write_pa(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa6 ) { write_pa(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pa7 ) { write_pa(7, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_ca1 );
 	DECLARE_WRITE_LINE_MEMBER( write_ca2 );
+
+	DECLARE_WRITE_LINE_MEMBER( write_pb0 ) { write_pb(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb1 ) { write_pb(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb2 ) { write_pb(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb3 ) { write_pb(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb4 ) { write_pb(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb5 ) { write_pb(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb6 ) { write_pb(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( write_pb7 ) { write_pb(7, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_cb1 );
 	DECLARE_WRITE_LINE_MEMBER( write_cb2 );
 
@@ -159,6 +172,8 @@ private:
 	void set_int(int data);
 	void clear_int(int data);
 	void shift();
+	void write_pa(int line, int state);
+	void write_pb(int line, int state);
 
 	// TODO: REMOVE THESE
 	devcb2_read8 m_in_a_handler;
