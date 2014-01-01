@@ -169,34 +169,6 @@ READ8_MEMBER(microtan_state::via_0_in_b)
 	return data;
 }
 
-READ_LINE_MEMBER(microtan_state::via_0_in_ca1)
-{
-	int data = 1;
-	LOG(("microtan_via_0_in_ca1 %d\n", data));
-	return data;
-}
-
-READ_LINE_MEMBER(microtan_state::via_0_in_cb1)
-{
-	int data = 1;
-	LOG(("microtan_via_0_in_cb1 %d\n", data));
-	return data;
-}
-
-READ_LINE_MEMBER(microtan_state::via_0_in_ca2)
-{
-	int data = 1;
-	LOG(("microtan_via_0_in_ca2 %d\n", data));
-	return data;
-}
-
-READ_LINE_MEMBER(microtan_state::via_0_in_cb2)
-{
-	int data = 1;
-	LOG(("microtan_via_0_in_cb2 %d\n", data));
-	return data;
-}
-
 WRITE8_MEMBER(microtan_state::via_0_out_a)
 {
 	LOG(("microtan_via_0_out_a %02X\n", data));
@@ -240,34 +212,6 @@ READ8_MEMBER(microtan_state::via_1_in_b)
 {
 	int data = 0xff;
 	LOG(("microtan_via_1_in_b %02X\n", data));
-	return data;
-}
-
-READ_LINE_MEMBER(microtan_state::via_1_in_ca1)
-{
-	int data = 1;
-	LOG(("microtan_via_1_in_ca1 %d\n", data));
-	return data;
-}
-
-READ_LINE_MEMBER(microtan_state::via_1_in_cb1)
-{
-	int data = 1;
-	LOG(("microtan_via_1_in_cb1 %d\n", data));
-	return data;
-}
-
-READ_LINE_MEMBER(microtan_state::via_1_in_ca2)
-{
-	int data = 1;
-	LOG(("microtan_via_1_in_ca2 %d\n", data));
-	return data;
-}
-
-READ_LINE_MEMBER(microtan_state::via_1_in_cb2)
-{
-	int data = 1;
-	LOG(("microtan_via_1_in_cb2 %d\n", data));
 	return data;
 }
 
@@ -317,13 +261,12 @@ void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 TIMER_CALLBACK_MEMBER(microtan_state::microtan_read_cassette)
 {
 	double level = m_cassette->input();
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)
-		via_0->write_cb2(0);
+		m_via6522_0->write_cb2(0);
 	else if (level > +0.07)
-		via_0->write_cb2(1);
+		m_via6522_0->write_cb2(1);
 }
 
 READ8_MEMBER(microtan_state::microtan_sound_r)
@@ -547,6 +490,16 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 	}
 
 	m_timer = timer_alloc(TIMER_READ_CASSETTE);
+
+	m_via6522_0->write_ca1(1);
+	m_via6522_0->write_cb1(1);
+	m_via6522_0->write_ca2(1);
+	m_via6522_0->write_cb2(1);
+
+	m_via6522_1->write_ca1(1);
+	m_via6522_1->write_cb1(1);
+	m_via6522_1->write_ca2(1);
+	m_via6522_1->write_cb2(1);
 }
 
 void microtan_state::machine_reset()
@@ -761,8 +714,6 @@ void microtan_state::microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_s
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
 	ay8910_device *ay8910 = machine().device<ay8910_device>("ay8910.1");
 
 	/* check for .DMP file format */
@@ -819,11 +770,11 @@ void microtan_state::microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_s
 
 		/* first set of VIA6522 registers */
 		for (i = 0; i < 16; i++ )
-			via_0->write(space, i, snapshot_buff[base++]);
+			m_via6522_0->write(space, i, snapshot_buff[base++]);
 
 		/* second set of VIA6522 registers */
 		for (i = 0; i < 16; i++ )
-			via_1->write(space, i, snapshot_buff[base++]);
+			m_via6522_1->write(space, i, snapshot_buff[base++]);
 
 		/* microtan IO bff0-bfff */
 		for (i = 0; i < 16; i++ )
