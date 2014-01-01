@@ -253,7 +253,8 @@ victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig
 		m_ya(*this, "YA"),
 		m_yb(*this, "YB"),
 		m_yc(*this, "YC"),
-		m_write_kbrdy(*this),
+		m_kbrdy_handler(*this),
+		m_kbdata_handler(*this),
 		m_y(0),
 		m_kbrdy(1),
 		m_kbdata(1),
@@ -269,7 +270,8 @@ victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig
 void victor9k_keyboard_device::device_start()
 {
 	// resolve callbacks
-	m_write_kbrdy.resolve_safe();
+	m_kbrdy_handler.resolve_safe();
+	m_kbdata_handler.resolve_safe();
 
 	// state saving
 	save_item(NAME(m_y));
@@ -384,10 +386,16 @@ WRITE8_MEMBER( victor9k_keyboard_device::kb_p2_w )
 	if (m_kbrdy != kbrdy)
 	{
 		m_kbrdy = kbrdy;
-		m_write_kbrdy(m_kbrdy);
+		m_kbrdy_handler(m_kbrdy);
 	}
 
-	m_kbdata = BIT(data, 3);
+	int kbdata = BIT(data, 3);
+
+	if (m_kbdata != kbdata)
+	{
+		m_kbdata = kbdata;
+		m_kbdata_handler(m_kbdata);
+	}
 
 	logerror("P2 %01x\n", data & 0x0f);
 }
