@@ -6,8 +6,7 @@
   using a Super Shanghai board and comparisons with the old protection
   simulations.
 
-  The 104 emulation (deco104.c) currently only has per-game cases and
-  is incomplete.
+  The Deco 104 emulation is handled through deco104.c
 
   The Deco 146 and 104 chips act as I/O chips and as protection devices
   by using 2 banks of 0x80 words of RAM built into the chips.
