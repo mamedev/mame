@@ -157,6 +157,12 @@ via6522_device::via6522_device(const machine_config &mconfig, const char *tag, d
 		m_cb1_handler(*this),
 		m_cb2_handler(*this),
 		m_irq_handler(*this),
+		m_in_a(0),
+		m_in_ca1(0),
+		m_in_ca2(0),
+		m_in_b(0),
+		m_in_cb1(0),
+		m_in_cb2(0),
 		m_irq(CLEAR_LINE)
 {
 }
@@ -188,8 +194,6 @@ void via6522_device::device_start()
 	m_ca2_timer = timer_alloc(TIMER_CA2);
 	m_shift_timer = timer_alloc(TIMER_SHIFT);
 	m_pcr = 0;
-	m_in_ca1 = 0;
-	m_in_ca2 = 0;
 
 	/* Default clock is from CPU1 */
 	if (clock() == 0)
@@ -236,15 +240,9 @@ void via6522_device::device_start()
 
 void via6522_device::device_reset()
 {
-	m_in_a = 0;
-	m_in_ca1 = 0;
-	m_in_ca2 = 0;
 	m_out_a = 0;
 	m_out_ca2 = 0;
 	m_ddr_a = 0;
-	m_in_b = 0;
-	m_in_cb1 = 0;
-	m_in_cb2 = 0;
 	m_out_b = 0;
 	m_out_cb2 = 0;
 	m_ddr_b = 0;
@@ -321,8 +319,6 @@ void via6522_device::shift()
 		m_sr =  (m_sr << 1) | m_out_cb2;
 
 		m_cb2_handler(m_out_cb2);
-
-		m_in_cb1=1;
 
 		/* this should be one cycle wide */
 		m_cb1_handler(0);
@@ -957,13 +953,14 @@ void via6522_device::write_pa(int line, int state)
 
 WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 {
-	/* handle the active transition */
-	if (state != m_in_ca1)
+	if (m_in_ca1 != state)
 	{
-		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), state);
+		m_in_ca1 = state;
 
-		if ((CA1_LOW_TO_HIGH(m_pcr) && state) || (CA1_HIGH_TO_LOW(m_pcr) && !state))
+		if (TRACE_VIA)
+			logerror("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), m_in_ca1);
+
+		if ((m_in_ca1 && CA1_LOW_TO_HIGH(m_pcr)) || (!m_in_ca1 && CA1_HIGH_TO_LOW(m_pcr)))
 		{
 			if (PA_LATCH_ENABLE(m_acr))
 			{
@@ -993,8 +990,6 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 				}
 			}
 		}
-
-		m_in_ca1 = state;
 	}
 }
 
@@ -1005,20 +1000,19 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 
 WRITE_LINE_MEMBER( via6522_device::write_ca2 )
 {
-	/* CA2 is in input mode */
-	if (CA2_INPUT(m_pcr))
+	if (m_in_ca2 != state)
 	{
-		/* the new state has caused a transition */
-		if (m_in_ca2 != state)
+		m_in_ca2 = state;
+
+		/* CA2 is in input mode */
+		if (CA2_INPUT(m_pcr))
 		{
 			/* handle the active transition */
-			if ((state && CA2_LOW_TO_HIGH(m_pcr)) || (!state && CA2_HIGH_TO_LOW(m_pcr)))
+			if ((m_in_ca2 && CA2_LOW_TO_HIGH(m_pcr)) || (!m_in_ca2 && CA2_HIGH_TO_LOW(m_pcr)))
 			{
 				/* mark the IRQ */
 				set_int(INT_CA2);
 			}
-			/* set the new value for CA2 */
-			m_in_ca2 = state;
 		}
 	}
 }
@@ -1037,10 +1031,11 @@ void via6522_device::write_pb(int line, int state)
 
 WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 {
-	/* handle the active transition */
-	if (state != m_in_cb1)
+	if (m_in_cb1 != state)
 	{
-		if ((CB1_LOW_TO_HIGH(m_pcr) && state) || (CB1_HIGH_TO_LOW(m_pcr) && !state))
+		m_in_cb1 = state;
+
+		if ((m_in_cb1 && CB1_LOW_TO_HIGH(m_pcr)) || (!m_in_cb1 && CB1_HIGH_TO_LOW(m_pcr)))
 		{
 			if (PB_LATCH_ENABLE(m_acr))
 			{
@@ -1053,6 +1048,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 					logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", machine().describe_context(), tag());
 				}
 			}
+
 			if (SO_EXT_CONTROL(m_acr) || SI_EXT_CONTROL(m_acr))
 			{
 				shift();
@@ -1074,7 +1070,6 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 				}
 			}
 		}
-		m_in_cb1 = state;
 	}
 }
 
@@ -1085,21 +1080,19 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 
 WRITE_LINE_MEMBER( via6522_device::write_cb2 )
 {
-	/* the new state has caused a transition */
 	if (m_in_cb2 != state)
 	{
+		m_in_cb2 = state;
+
 		/* CB2 is in input mode */
 		if (CB2_INPUT(m_pcr))
 		{
 			/* handle the active transition */
-			if ((state && CB2_LOW_TO_HIGH(m_pcr)) || (!state && CB2_HIGH_TO_LOW(m_pcr)))
+			if ((m_in_cb2 && CB2_LOW_TO_HIGH(m_pcr)) || (!m_in_cb2 && CB2_HIGH_TO_LOW(m_pcr)))
 			{
 				/* mark the IRQ */
 				set_int(INT_CB2);
 			}
 		}
-
-		/* set the new value for CB2 */
-		m_in_cb2 = state;
 	}
 }
