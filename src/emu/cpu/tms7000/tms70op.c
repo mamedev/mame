@@ -25,13 +25,13 @@
 
 #include "emu.h"
 
-static void illegal(tms7000_state *cpustate)
+void tms7000_device::illegal()
 {
 	/* This is a guess */
-	cpustate->icount -= 4;
+	m_icount -= 4;
 }
 
-static void adc_b2a(tms7000_state *cpustate)
+void tms7000_device::adc_b2a()
 {
 	UINT16  t;
 
@@ -43,10 +43,10 @@ static void adc_b2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void adc_r2a(tms7000_state *cpustate)
+void tms7000_device::adc_r2a()
 {
 	UINT16  t;
 	UINT8   v;
@@ -61,10 +61,10 @@ static void adc_r2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void adc_r2b(tms7000_state *cpustate)
+void tms7000_device::adc_r2b()
 {
 	UINT16  t;
 	UINT8   v;
@@ -79,10 +79,10 @@ static void adc_r2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void adc_r2r(tms7000_state *cpustate)
+void tms7000_device::adc_r2r()
 {
 	UINT16  t;
 	UINT8   i,j;
@@ -98,10 +98,10 @@ static void adc_r2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void adc_i2a(tms7000_state *cpustate)
+void tms7000_device::adc_i2a()
 {
 	UINT16  t;
 	UINT8   v;
@@ -116,10 +116,10 @@ static void adc_i2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void adc_i2b(tms7000_state *cpustate)
+void tms7000_device::adc_i2b()
 {
 	UINT16  t;
 	UINT8   v;
@@ -134,10 +134,10 @@ static void adc_i2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void adc_i2r(tms7000_state *cpustate)
+void tms7000_device::adc_i2r()
 {
 	UINT16  t;
 	UINT8   i,j;
@@ -153,10 +153,10 @@ static void adc_i2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void add_b2a(tms7000_state *cpustate)
+void tms7000_device::add_b2a()
 {
 	UINT16  t;
 
@@ -168,10 +168,10 @@ static void add_b2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void add_r2a(tms7000_state *cpustate)
+void tms7000_device::add_r2a()
 {
 	UINT16  t;
 	UINT8   v;
@@ -186,10 +186,10 @@ static void add_r2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void add_r2b(tms7000_state *cpustate)
+void tms7000_device::add_r2b()
 {
 	UINT16  t;
 	UINT8   v;
@@ -204,10 +204,10 @@ static void add_r2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void add_r2r(tms7000_state *cpustate)
+void tms7000_device::add_r2r()
 {
 	UINT16  t;
 	UINT8   i,j;
@@ -223,10 +223,10 @@ static void add_r2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void add_i2a(tms7000_state *cpustate)
+void tms7000_device::add_i2a()
 {
 	UINT16  t;
 	UINT8   v;
@@ -241,10 +241,10 @@ static void add_i2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void add_i2b(tms7000_state *cpustate)
+void tms7000_device::add_i2b()
 {
 	UINT16  t;
 	UINT8   v;
@@ -259,10 +259,10 @@ static void add_i2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void add_i2r(tms7000_state *cpustate)
+void tms7000_device::add_i2r()
 {
 	UINT16  t;
 	UINT8   i,j;
@@ -278,10 +278,10 @@ static void add_i2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void and_b2a(tms7000_state *cpustate)
+void tms7000_device::and_b2a()
 {
 	UINT8   t;
 
@@ -292,10 +292,10 @@ static void and_b2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void and_r2a(tms7000_state *cpustate)
+void tms7000_device::and_r2a()
 {
 	UINT8   t;
 	UINT8   v;
@@ -309,10 +309,10 @@ static void and_r2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void and_r2b(tms7000_state *cpustate)
+void tms7000_device::and_r2b()
 {
 	UINT8   t;
 	UINT8   v;
@@ -326,10 +326,10 @@ static void and_r2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void and_r2r(tms7000_state *cpustate)
+void tms7000_device::and_r2r()
 {
 	UINT8   t;
 	UINT8   i,j;
@@ -344,10 +344,10 @@ static void and_r2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void and_i2a(tms7000_state *cpustate)
+void tms7000_device::and_i2a()
 {
 	UINT8   t;
 	UINT8   v;
@@ -361,10 +361,10 @@ static void and_i2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void and_i2b(tms7000_state *cpustate)
+void tms7000_device::and_i2b()
 {
 	UINT8   t;
 	UINT8   v;
@@ -378,10 +378,10 @@ static void and_i2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void and_i2r(tms7000_state *cpustate)
+void tms7000_device::and_i2r()
 {
 	UINT8   t;
 	UINT8   i,j;
@@ -396,10 +396,10 @@ static void and_i2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void andp_a2p(tms7000_state *cpustate)
+void tms7000_device::andp_a2p()
 {
 	UINT8   t;
 	UINT8   v;
@@ -412,10 +412,10 @@ static void andp_a2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void andp_b2p(tms7000_state *cpustate)
+void tms7000_device::andp_b2p()
 {
 	UINT8   t;
 	UINT8   v;
@@ -428,11 +428,11 @@ static void andp_b2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
 
-static void movp_i2p(tms7000_state *cpustate)
+void tms7000_device::movp_i2p()
 {
 	UINT8   i,v;
 
@@ -444,10 +444,10 @@ static void movp_i2p(tms7000_state *cpustate)
 	SET_N8(i);
 	SET_Z8(i);
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 
-static void andp_i2p(tms7000_state *cpustate)
+void tms7000_device::andp_i2p()
 {
 	UINT8   t;
 	UINT8   i,v;
@@ -461,38 +461,38 @@ static void andp_i2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 
-static void br_dir(tms7000_state *cpustate)
+void tms7000_device::br_dir()
 {
 	PAIR p;
 
 	IMMWORD( p );
 	pPC = p.d;
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void br_ind(tms7000_state *cpustate)
+void tms7000_device::br_ind()
 {
 	UINT8   v;
 
 	IMMBYTE( v );
-	PC.w.l = RRF16(cpustate,v);
+	PC.w.l = RRF16(v);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void br_inx(tms7000_state *cpustate)
+void tms7000_device::br_inx()
 {
 	PAIR p;
 
 	IMMWORD( p );
 	pPC = p.w.l + RDB;
-	cpustate->icount -= 12;
+	m_icount -= 12;
 }
 
-static void btjo_b2a(tms7000_state *cpustate)
+void tms7000_device::btjo_b2a()
 {
 	UINT8   t;
 
@@ -508,16 +508,16 @@ static void btjo_b2a(tms7000_state *cpustate)
 
 		SIMMBYTE( j );
 		pPC += j;
-		cpustate->icount -= 9;
+		m_icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 }
 
-static void btjo_r2a(tms7000_state *cpustate)
+void tms7000_device::btjo_r2a()
 {
 	UINT8   t,r;
 
@@ -534,16 +534,16 @@ static void btjo_r2a(tms7000_state *cpustate)
 
 		SIMMBYTE( j );
 		pPC += j;
-		cpustate->icount -= 9;
+		m_icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 }
 
-static void btjo_r2b(tms7000_state *cpustate)
+void tms7000_device::btjo_r2b()
 {
 	UINT8   t,r;
 
@@ -560,16 +560,16 @@ static void btjo_r2b(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 12;
+		m_icount -= 12;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 10;
+		m_icount -= 10;
 	}
 }
 
-static void btjo_r2r(tms7000_state *cpustate)
+void tms7000_device::btjo_r2r()
 {
 	UINT8   t,r,s;
 
@@ -587,16 +587,16 @@ static void btjo_r2r(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 14;
+		m_icount -= 14;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 12;
+		m_icount -= 12;
 	}
 }
 
-static void btjo_i2a(tms7000_state *cpustate)
+void tms7000_device::btjo_i2a()
 {
 	UINT8   t,r;
 
@@ -613,16 +613,16 @@ static void btjo_i2a(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 11;
+		m_icount -= 11;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 9;
+		m_icount -= 9;
 	}
 }
 
-static void btjo_i2b(tms7000_state *cpustate)
+void tms7000_device::btjo_i2b()
 {
 	UINT8   t,i;
 
@@ -639,16 +639,16 @@ static void btjo_i2b(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 11;
+		m_icount -= 11;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 9;
+		m_icount -= 9;
 	}
 }
 
-static void btjo_i2r(tms7000_state *cpustate)
+void tms7000_device::btjo_i2r()
 {
 	UINT8   t,i,r;
 
@@ -666,16 +666,16 @@ static void btjo_i2r(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 13;
+		m_icount -= 13;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 11;
+		m_icount -= 11;
 	}
 }
 
-static void btjop_ap(tms7000_state *cpustate)
+void tms7000_device::btjop_ap()
 {
 	UINT8   t,p;
 
@@ -693,16 +693,16 @@ static void btjop_ap(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 13;
+		m_icount -= 13;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 11;
+		m_icount -= 11;
 	}
 }
 
-static void btjop_bp(tms7000_state *cpustate)
+void tms7000_device::btjop_bp()
 {
 	UINT8   t,p;
 
@@ -720,16 +720,16 @@ static void btjop_bp(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 12;
+		m_icount -= 12;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 10;
+		m_icount -= 10;
 	}
 }
 
-static void btjop_ip(tms7000_state *cpustate)
+void tms7000_device::btjop_ip()
 {
 	UINT8   t,p,i;
 
@@ -748,16 +748,16 @@ static void btjop_ip(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 14;
+		m_icount -= 14;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 12;
+		m_icount -= 12;
 	}
 }
 
-static void btjz_b2a(tms7000_state *cpustate)
+void tms7000_device::btjz_b2a()
 {
 	UINT8   t;
 
@@ -773,16 +773,16 @@ static void btjz_b2a(tms7000_state *cpustate)
 
 		SIMMBYTE( j );
 		pPC += j;
-		cpustate->icount -= 9;
+		m_icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 }
 
-static void btjz_r2a(tms7000_state *cpustate)
+void tms7000_device::btjz_r2a()
 {
 	UINT8   t,r;
 
@@ -799,16 +799,16 @@ static void btjz_r2a(tms7000_state *cpustate)
 
 		SIMMBYTE( j );
 		pPC += j;
-		cpustate->icount -= 9;
+		m_icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 }
 
-static void btjz_r2b(tms7000_state *cpustate)
+void tms7000_device::btjz_r2b()
 {
 	UINT8   t,r;
 
@@ -825,16 +825,16 @@ static void btjz_r2b(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 12;
+		m_icount -= 12;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 10;
+		m_icount -= 10;
 	}
 }
 
-static void btjz_r2r(tms7000_state *cpustate)
+void tms7000_device::btjz_r2r()
 {
 	UINT8   t,r,s;
 
@@ -852,16 +852,16 @@ static void btjz_r2r(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 14;
+		m_icount -= 14;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 12;
+		m_icount -= 12;
 	}
 }
 
-static void btjz_i2a(tms7000_state *cpustate)
+void tms7000_device::btjz_i2a()
 {
 	UINT8   t,r;
 
@@ -878,16 +878,16 @@ static void btjz_i2a(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 11;
+		m_icount -= 11;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 9;
+		m_icount -= 9;
 	}
 }
 
-static void btjz_i2b(tms7000_state *cpustate)
+void tms7000_device::btjz_i2b()
 {
 	UINT8   t,i;
 
@@ -904,16 +904,16 @@ static void btjz_i2b(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 11;
+		m_icount -= 11;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 9;
+		m_icount -= 9;
 	}
 }
 
-static void btjz_i2r(tms7000_state *cpustate)
+void tms7000_device::btjz_i2r()
 {
 	UINT8   t,i,r;
 
@@ -931,16 +931,16 @@ static void btjz_i2r(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 13;
+		m_icount -= 13;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 11;
+		m_icount -= 11;
 	}
 }
 
-static void btjzp_ap(tms7000_state *cpustate)
+void tms7000_device::btjzp_ap()
 {
 	UINT8   t,p;
 
@@ -958,16 +958,16 @@ static void btjzp_ap(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 13;
+		m_icount -= 13;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 11;
+		m_icount -= 11;
 	}
 }
 
-static void btjzp_bp(tms7000_state *cpustate)
+void tms7000_device::btjzp_bp()
 {
 	UINT8   t,p;
 
@@ -985,16 +985,16 @@ static void btjzp_bp(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 12;
+		m_icount -= 12;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 10;
+		m_icount -= 10;
 	}
 }
 
-static void btjzp_ip(tms7000_state *cpustate)
+void tms7000_device::btjzp_ip()
 {
 	UINT8   t,p,i;
 
@@ -1013,16 +1013,16 @@ static void btjzp_ip(tms7000_state *cpustate)
 
 		SIMMBYTE(j);
 		pPC += j;
-		cpustate->icount -= 14;
+		m_icount -= 14;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 12;
+		m_icount -= 12;
 	}
 }
 
-static void call_dir(tms7000_state *cpustate)
+void tms7000_device::call_dir()
 {
 	PAIR    tPC;
 
@@ -1030,52 +1030,52 @@ static void call_dir(tms7000_state *cpustate)
 	PUSHWORD( PC );
 	pPC = tPC.d;
 
-	cpustate->icount -= 14;
+	m_icount -= 14;
 }
 
-static void call_ind(tms7000_state *cpustate)
+void tms7000_device::call_ind()
 {
 	UINT8   v;
 
 	IMMBYTE( v );
 	PUSHWORD( PC );
-	PC.w.l = RRF16(cpustate,v);
+	PC.w.l = RRF16(v);
 
-	cpustate->icount -= 13;
+	m_icount -= 13;
 }
 
-static void call_inx(tms7000_state *cpustate)
+void tms7000_device::call_inx()
 {
 	PAIR    tPC;
 
 	IMMWORD( tPC );
 	PUSHWORD( PC );
 	pPC = tPC.w.l + RDB;
-	cpustate->icount -= 16;
+	m_icount -= 16;
 }
 
-static void clr_a(tms7000_state *cpustate)
+void tms7000_device::clr_a()
 {
 	WRA(0);
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void clr_b(tms7000_state *cpustate)
+void tms7000_device::clr_b()
 {
 	WRB(0);
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void clr_r(tms7000_state *cpustate)
+void tms7000_device::clr_r()
 {
 	UINT8   r;
 
 	IMMBYTE(r);
 	WM(r,0);
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void clrc(tms7000_state *cpustate)
+void tms7000_device::clrc()
 {
 	UINT8   a;
 
@@ -1085,10 +1085,10 @@ static void clrc(tms7000_state *cpustate)
 	SET_N8(a);
 	SET_Z8(a);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void cmp_ba(tms7000_state *cpustate)
+void tms7000_device::cmp_ba()
 {
 	UINT16 t;
 
@@ -1103,10 +1103,10 @@ static void cmp_ba(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void cmp_ra(tms7000_state *cpustate)
+void tms7000_device::cmp_ra()
 {
 	UINT16  t;
 	UINT8   r;
@@ -1123,10 +1123,10 @@ static void cmp_ra(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void cmp_rb(tms7000_state *cpustate)
+void tms7000_device::cmp_rb()
 {
 	UINT16  t;
 	UINT8   r;
@@ -1143,10 +1143,10 @@ static void cmp_rb(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void cmp_rr(tms7000_state *cpustate)
+void tms7000_device::cmp_rr()
 {
 	UINT16  t;
 	UINT8   r,s;
@@ -1164,10 +1164,10 @@ static void cmp_rr(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void cmp_ia(tms7000_state *cpustate)
+void tms7000_device::cmp_ia()
 {
 	UINT16  t;
 	UINT8   i;
@@ -1184,10 +1184,10 @@ static void cmp_ia(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void cmp_ib(tms7000_state *cpustate)
+void tms7000_device::cmp_ib()
 {
 	UINT16  t;
 	UINT8   i;
@@ -1204,10 +1204,10 @@ static void cmp_ib(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void cmp_ir(tms7000_state *cpustate)
+void tms7000_device::cmp_ir()
 {
 	UINT16  t;
 	UINT8   i,r;
@@ -1225,10 +1225,10 @@ static void cmp_ir(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void cmpa_dir(tms7000_state *cpustate)
+void tms7000_device::cmpa_dir()
 {
 	UINT16  t;
 	PAIR    i;
@@ -1245,17 +1245,17 @@ static void cmpa_dir(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 12;
+	m_icount -= 12;
 }
 
-static void cmpa_ind(tms7000_state *cpustate)
+void tms7000_device::cmpa_ind()
 {
 	UINT16  t;
 	PAIR    p;
 	INT8    i;
 
 	IMMBYTE(i);
-	p.w.l = RRF16(cpustate,i);
+	p.w.l = RRF16(i);
 	t = RDA - RM(p.w.l);
 
 	CLR_NZC;
@@ -1267,10 +1267,10 @@ static void cmpa_ind(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 
-static void cmpa_inx(tms7000_state *cpustate)
+void tms7000_device::cmpa_inx()
 {
 	UINT16  t;
 	PAIR    i;
@@ -1287,10 +1287,10 @@ static void cmpa_inx(tms7000_state *cpustate)
 	else
 		SET_C8( ~t );
 
-	cpustate->icount -= 14;
+	m_icount -= 14;
 }
 
-static void dac_b2a(tms7000_state *cpustate)
+void tms7000_device::dac_b2a()
 {
 	UINT16  t;
 
@@ -1306,10 +1306,10 @@ static void dac_b2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void dac_r2a(tms7000_state *cpustate)
+void tms7000_device::dac_r2a()
 {
 	UINT8   r;
 	UINT16  t;
@@ -1328,10 +1328,10 @@ static void dac_r2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void dac_r2b(tms7000_state *cpustate)
+void tms7000_device::dac_r2b()
 {
 	UINT8   r;
 	UINT16  t;
@@ -1350,10 +1350,10 @@ static void dac_r2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void dac_r2r(tms7000_state *cpustate)
+void tms7000_device::dac_r2r()
 {
 	UINT8   r,s;
 	UINT16  t;
@@ -1373,10 +1373,10 @@ static void dac_r2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 12;
+	m_icount -= 12;
 }
 
-static void dac_i2a(tms7000_state *cpustate)
+void tms7000_device::dac_i2a()
 {
 	UINT8   i;
 	UINT16  t;
@@ -1395,10 +1395,10 @@ static void dac_i2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void dac_i2b(tms7000_state *cpustate)
+void tms7000_device::dac_i2b()
 {
 	UINT8   i;
 	UINT16  t;
@@ -1417,10 +1417,10 @@ static void dac_i2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void dac_i2r(tms7000_state *cpustate)
+void tms7000_device::dac_i2r()
 {
 	UINT8   i,r;
 	UINT16  t;
@@ -1440,10 +1440,10 @@ static void dac_i2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 
-static void dec_a(tms7000_state *cpustate)
+void tms7000_device::dec_a()
 {
 	UINT16 t;
 
@@ -1456,10 +1456,10 @@ static void dec_a(tms7000_state *cpustate)
 	SET_Z8(t);
 	SET_C8(~t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void dec_b(tms7000_state *cpustate)
+void tms7000_device::dec_b()
 {
 	UINT16 t;
 
@@ -1472,10 +1472,10 @@ static void dec_b(tms7000_state *cpustate)
 	SET_Z8(t);
 	SET_C8(~t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void dec_r(tms7000_state *cpustate)
+void tms7000_device::dec_r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -1491,17 +1491,17 @@ static void dec_r(tms7000_state *cpustate)
 	SET_Z8(t);
 	SET_C8(~t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void decd_a(tms7000_state *cpustate)
+void tms7000_device::decd_a()
 {
 	PAIR    t;
 
 	t.w.h = 0;
-	t.w.l = RRF16(cpustate,0);
+	t.w.l = RRF16(0);
 	t.d -= 1;
-	WRF16(cpustate,0,t);
+	WRF16(0,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
@@ -1509,17 +1509,17 @@ static void decd_a(tms7000_state *cpustate)
 
 	SET_C16(~(t.d));
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void decd_b(tms7000_state *cpustate)
+void tms7000_device::decd_b()
 {
 	PAIR    t;
 
 	t.w.h = 0;
-	t.w.l = RRF16(cpustate,1);
+	t.w.l = RRF16(1);
 	t.d -= 1;
-	WRF16(cpustate,1,t);
+	WRF16(1,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
@@ -1527,19 +1527,19 @@ static void decd_b(tms7000_state *cpustate)
 
 	SET_C16(~(t.d));
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void decd_r(tms7000_state *cpustate)
+void tms7000_device::decd_r()
 {
 	UINT8   r;
 	PAIR    t;
 
 	IMMBYTE(r);
 	t.w.h = 0;
-	t.w.l = RRF16(cpustate,r);
+	t.w.l = RRF16(r);
 	t.d -= 1;
-	WRF16(cpustate,r,t);
+	WRF16(r,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
@@ -1547,16 +1547,16 @@ static void decd_r(tms7000_state *cpustate)
 
 	SET_C16(~(t.d));
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 
-static void dint(tms7000_state *cpustate)
+void tms7000_device::dint()
 {
 	CLR_NZCI;
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void djnz_a(tms7000_state *cpustate)
+void tms7000_device::djnz_a()
 {
 	UINT16 t;
 
@@ -1574,16 +1574,16 @@ static void djnz_a(tms7000_state *cpustate)
 
 		SIMMBYTE(s);
 		pPC += s;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 2;
+		m_icount -= 2;
 	}
 }
 
-static void djnz_b(tms7000_state *cpustate)
+void tms7000_device::djnz_b()
 {
 	UINT16 t;
 
@@ -1601,16 +1601,16 @@ static void djnz_b(tms7000_state *cpustate)
 
 		SIMMBYTE(s);
 		pPC += s;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 2;
+		m_icount -= 2;
 	}
 }
 
-static void djnz_r(tms7000_state *cpustate)
+void tms7000_device::djnz_r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -1631,16 +1631,16 @@ static void djnz_r(tms7000_state *cpustate)
 
 		SIMMBYTE(s);
 		pPC += s;
-		cpustate->icount -= 9;
+		m_icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 3;
+		m_icount -= 3;
 	}
 }
 
-static void dsb_b2a(tms7000_state *cpustate)
+void tms7000_device::dsb_b2a()
 {
 	UINT16  t;
 
@@ -1656,10 +1656,10 @@ static void dsb_b2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void dsb_r2a(tms7000_state *cpustate)
+void tms7000_device::dsb_r2a()
 {
 	UINT8   r;
 	UINT16  t;
@@ -1678,10 +1678,10 @@ static void dsb_r2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void dsb_r2b(tms7000_state *cpustate)
+void tms7000_device::dsb_r2b()
 {
 	UINT8   r;
 	UINT16  t;
@@ -1700,10 +1700,10 @@ static void dsb_r2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void dsb_r2r(tms7000_state *cpustate)
+void tms7000_device::dsb_r2r()
 {
 	UINT8   r,s;
 	UINT16  t;
@@ -1723,10 +1723,10 @@ static void dsb_r2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 12;
+	m_icount -= 12;
 }
 
-static void dsb_i2a(tms7000_state *cpustate)
+void tms7000_device::dsb_i2a()
 {
 	UINT8   i;
 	UINT16  t;
@@ -1745,10 +1745,10 @@ static void dsb_i2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void dsb_i2b(tms7000_state *cpustate)
+void tms7000_device::dsb_i2b()
 {
 	UINT8   i;
 	UINT16  t;
@@ -1767,10 +1767,10 @@ static void dsb_i2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void dsb_i2r(tms7000_state *cpustate)
+void tms7000_device::dsb_i2r()
 {
 	UINT8   r,i;
 	UINT16  t;
@@ -1790,23 +1790,23 @@ static void dsb_i2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 
-static void eint(tms7000_state *cpustate)
+void tms7000_device::eint()
 {
 	pSR |= (SR_N|SR_Z|SR_C|SR_I);
-	cpustate->icount -= 5;
-	tms7000_check_IRQ_lines(cpustate);
+	m_icount -= 5;
+	tms7000_check_IRQ_lines();
 }
 
-static void idle(tms7000_state *cpustate)
+void tms7000_device::idle()
 {
-	cpustate->idle_state = 1;
-	cpustate->icount -= 6;
+	m_idle_state = 1;
+	m_icount -= 6;
 }
 
-static void inc_a(tms7000_state *cpustate)
+void tms7000_device::inc_a()
 {
 	UINT16  t;
 
@@ -1819,10 +1819,10 @@ static void inc_a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void inc_b(tms7000_state *cpustate)
+void tms7000_device::inc_b()
 {
 	UINT16  t;
 
@@ -1835,10 +1835,10 @@ static void inc_b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void inc_r(tms7000_state *cpustate)
+void tms7000_device::inc_r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -1854,10 +1854,10 @@ static void inc_r(tms7000_state *cpustate)
 	SET_Z8(t);
 	SET_C8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void inv_a(tms7000_state *cpustate)
+void tms7000_device::inv_a()
 {
 	UINT16 t;
 
@@ -1868,10 +1868,10 @@ static void inv_a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void inv_b(tms7000_state *cpustate)
+void tms7000_device::inv_b()
 {
 	UINT16 t;
 
@@ -1882,10 +1882,10 @@ static void inv_b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void inv_r(tms7000_state *cpustate)
+void tms7000_device::inv_r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -1900,10 +1900,10 @@ static void inv_r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void jc(tms7000_state *cpustate)
+void tms7000_device::jc()
 {
 	if( pSR & SR_C )
 	{
@@ -1911,16 +1911,16 @@ static void jc(tms7000_state *cpustate)
 
 		SIMMBYTE( s );
 		pPC += s;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 5;
+		m_icount -= 5;
 	}
 }
 
-static void jeq(tms7000_state *cpustate)
+void tms7000_device::jeq()
 {
 	if( pSR & SR_Z )
 	{
@@ -1928,21 +1928,21 @@ static void jeq(tms7000_state *cpustate)
 
 		SIMMBYTE( s );
 		pPC += s;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 5;
+		m_icount -= 5;
 	}
 }
 
-static void jl(tms7000_state *cpustate)
+void tms7000_device::jl()
 {
 	if( pSR & SR_C )
 	{
 		pPC++;
-		cpustate->icount -= 5;
+		m_icount -= 5;
 	}
 	else
 	{
@@ -1950,20 +1950,20 @@ static void jl(tms7000_state *cpustate)
 
 		SIMMBYTE( s );
 		pPC += s;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 }
 
-static void jmp(tms7000_state *cpustate)
+void tms7000_device::jmp()
 {
 	INT8 s;
 
 	SIMMBYTE( s );
 	pPC += s;
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void j_jn(tms7000_state *cpustate)
+void tms7000_device::j_jn()
 {
 	if( pSR & SR_N )
 	{
@@ -1971,22 +1971,22 @@ static void j_jn(tms7000_state *cpustate)
 
 		SIMMBYTE( s );
 		pPC += s;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 5;
+		m_icount -= 5;
 	}
 
 }
 
-static void jne(tms7000_state *cpustate)
+void tms7000_device::jne()
 {
 	if( pSR & SR_Z )
 	{
 		pPC++;
-		cpustate->icount -= 5;
+		m_icount -= 5;
 	}
 	else
 	{
@@ -1994,16 +1994,16 @@ static void jne(tms7000_state *cpustate)
 
 		SIMMBYTE( s );
 		pPC += s;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 }
 
-static void jp(tms7000_state *cpustate)
+void tms7000_device::jp()
 {
 	if( pSR & (SR_Z|SR_N) )
 	{
 		pPC++;
-		cpustate->icount -= 5;
+		m_icount -= 5;
 	}
 	else
 	{
@@ -2011,11 +2011,11 @@ static void jp(tms7000_state *cpustate)
 
 		SIMMBYTE( s );
 		pPC += s;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 }
 
-static void jpz(tms7000_state *cpustate)
+void tms7000_device::jpz()
 {
 	if ((pSR & SR_N) == 0)
 	{
@@ -2023,16 +2023,16 @@ static void jpz(tms7000_state *cpustate)
 
 		SIMMBYTE( s );
 		pPC += s;
-		cpustate->icount -= 7;
+		m_icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		cpustate->icount -= 5;
+		m_icount -= 5;
 	}
 }
 
-static void lda_dir(tms7000_state *cpustate)
+void tms7000_device::lda_dir()
 {
 	UINT16  t;
 	PAIR    i;
@@ -2045,17 +2045,17 @@ static void lda_dir(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 
-static void lda_ind(tms7000_state *cpustate)
+void tms7000_device::lda_ind()
 {
 	UINT16  t;
 	PAIR    p;
 	INT8    i;
 
 	IMMBYTE(i);
-	p.w.l=RRF16(cpustate,i);
+	p.w.l=RRF16(i);
 	t = RM(p.w.l);
 	WRA(t);
 
@@ -2063,10 +2063,10 @@ static void lda_ind(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void lda_inx(tms7000_state *cpustate)
+void tms7000_device::lda_inx()
 {
 	UINT16  t;
 	PAIR    i;
@@ -2079,16 +2079,16 @@ static void lda_inx(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 13;
+	m_icount -= 13;
 }
 
-static void ldsp(tms7000_state *cpustate)
+void tms7000_device::ldsp()
 {
 	pSP = RDB;
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void mov_a2b(tms7000_state *cpustate)
+void tms7000_device::mov_a2b()
 {
 	UINT16  t;
 
@@ -2099,10 +2099,10 @@ static void mov_a2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void mov_b2a(tms7000_state *cpustate)
+void tms7000_device::mov_b2a()
 {
 	UINT16  t;
 
@@ -2113,11 +2113,11 @@ static void mov_b2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
 
-static void mov_a2r(tms7000_state *cpustate)
+void tms7000_device::mov_a2r()
 {
 	UINT8   r;
 	UINT16  t;
@@ -2131,10 +2131,10 @@ static void mov_a2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void mov_b2r(tms7000_state *cpustate)
+void tms7000_device::mov_b2r()
 {
 	UINT8   r;
 	UINT16  t;
@@ -2148,10 +2148,10 @@ static void mov_b2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void mov_r2a(tms7000_state *cpustate)
+void tms7000_device::mov_r2a()
 {
 	UINT8   r;
 	UINT16  t;
@@ -2164,10 +2164,10 @@ static void mov_r2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void mov_r2b(tms7000_state *cpustate)
+void tms7000_device::mov_r2b()
 {
 	UINT8   r;
 	UINT16  t;
@@ -2180,10 +2180,10 @@ static void mov_r2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void mov_r2r(tms7000_state *cpustate)
+void tms7000_device::mov_r2r()
 {
 	UINT8   r,s;
 	UINT16  t;
@@ -2197,10 +2197,10 @@ static void mov_r2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void mov_i2a(tms7000_state *cpustate)
+void tms7000_device::mov_i2a()
 {
 	UINT16  t;
 
@@ -2211,10 +2211,10 @@ static void mov_i2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void mov_i2b(tms7000_state *cpustate)
+void tms7000_device::mov_i2b()
 {
 	UINT16  t;
 
@@ -2225,10 +2225,10 @@ static void mov_i2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void mov_i2r(tms7000_state *cpustate)
+void tms7000_device::mov_i2r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -2241,45 +2241,45 @@ static void mov_i2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void movd_imm(tms7000_state *cpustate)
+void tms7000_device::movd_imm()
 {
 	PAIR    t;
 	UINT8   r;
 
 	IMMWORD(t);
 	IMMBYTE(r);
-	WRF16(cpustate,r,t);
+	WRF16(r,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 15;
+	m_icount -= 15;
 
 }
 
-static void movd_r(tms7000_state *cpustate)
+void tms7000_device::movd_r()
 {
 	PAIR    t;
 	UINT8   r,s;
 
 	IMMBYTE(r);
 	IMMBYTE(s);
-	t.w.l = RRF16(cpustate,r);
-	WRF16(cpustate,s,t);
+	t.w.l = RRF16(r);
+	WRF16(s,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 14;
+	m_icount -= 14;
 
 }
 
-static void movd_inx(tms7000_state *cpustate)
+void tms7000_device::movd_inx()
 {
 	PAIR    t;
 	UINT8   r;
@@ -2287,16 +2287,16 @@ static void movd_inx(tms7000_state *cpustate)
 	IMMWORD(t);
 	t.w.l += RDB;
 	IMMBYTE(r);
-	WRF16(cpustate,r,t);
+	WRF16(r,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 17;
+	m_icount -= 17;
 }
 
-static void movp_a2p(tms7000_state *cpustate)
+void tms7000_device::movp_a2p()
 {
 	UINT8   p;
 	UINT16  t;
@@ -2309,10 +2309,10 @@ static void movp_a2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void movp_b2p(tms7000_state *cpustate)
+void tms7000_device::movp_b2p()
 {
 	UINT8   p;
 	UINT16  t;
@@ -2325,12 +2325,12 @@ static void movp_b2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
 #if 0
 /* this appears to be unused */
-static void movp_r2p(tms7000_state *cpustate)
+void tms7000_device::movp_r2p()
 {
 	UINT8   p,r;
 	UINT16  t;
@@ -2344,11 +2344,11 @@ static void movp_r2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 #endif
 
-static void movp_p2a(tms7000_state *cpustate)
+void tms7000_device::movp_p2a()
 {
 	UINT8   p;
 	UINT16  t;
@@ -2361,10 +2361,10 @@ static void movp_p2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void movp_p2b(tms7000_state *cpustate)
+void tms7000_device::movp_p2b()
 {
 	UINT8   p;
 	UINT16  t;
@@ -2377,26 +2377,26 @@ static void movp_p2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void mpy_ba(tms7000_state *cpustate)
+void tms7000_device::mpy_ba()
 {
 	PAIR t;
 
 	t.w.l = RDA * RDB;
 
-	WRF16(cpustate,0x01,t);
+	WRF16(0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 43;
+	m_icount -= 43;
 
 }
 
-static void mpy_ra(tms7000_state *cpustate)
+void tms7000_device::mpy_ra()
 {
 	PAIR    t;
 	UINT8   r;
@@ -2405,17 +2405,17 @@ static void mpy_ra(tms7000_state *cpustate)
 
 	t.w.l = RDA * RM(r);
 
-	WRF16(cpustate,0x01,t);
+	WRF16(0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 46;
+	m_icount -= 46;
 
 }
 
-static void mpy_rb(tms7000_state *cpustate)
+void tms7000_device::mpy_rb()
 {
 	PAIR    t;
 	UINT8   r;
@@ -2424,17 +2424,17 @@ static void mpy_rb(tms7000_state *cpustate)
 
 	t.w.l = RDB * RM(r);
 
-	WRF16(cpustate,0x01,t);
+	WRF16(0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 46;
+	m_icount -= 46;
 
 }
 
-static void mpy_rr(tms7000_state *cpustate)
+void tms7000_device::mpy_rr()
 {
 	PAIR    t;
 	UINT8   r,s;
@@ -2444,17 +2444,17 @@ static void mpy_rr(tms7000_state *cpustate)
 
 	t.w.l = RM(s) * RM(r);
 
-	WRF16(cpustate,0x01,t);
+	WRF16(0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 48;
+	m_icount -= 48;
 
 }
 
-static void mpy_ia(tms7000_state *cpustate)
+void tms7000_device::mpy_ia()
 {
 	PAIR    t;
 	UINT8   i;
@@ -2463,17 +2463,17 @@ static void mpy_ia(tms7000_state *cpustate)
 
 	t.w.l = RDA * i;
 
-	WRF16(cpustate,0x01,t);
+	WRF16(0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 45;
+	m_icount -= 45;
 
 }
 
-static void mpy_ib(tms7000_state *cpustate)
+void tms7000_device::mpy_ib()
 {
 	PAIR    t;
 	UINT8   i;
@@ -2482,17 +2482,17 @@ static void mpy_ib(tms7000_state *cpustate)
 
 	t.w.l = RDB * i;
 
-	WRF16(cpustate,0x01,t);
+	WRF16(0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 45;
+	m_icount -= 45;
 
 }
 
-static void mpy_ir(tms7000_state *cpustate)
+void tms7000_device::mpy_ir()
 {
 	PAIR    t;
 	UINT8   i,r;
@@ -2502,22 +2502,22 @@ static void mpy_ir(tms7000_state *cpustate)
 
 	t.w.l = RM(r) * i;
 
-	WRF16(cpustate,0x01,t);
+	WRF16(0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	cpustate->icount -= 47;
+	m_icount -= 47;
 
 }
 
-static void nop(tms7000_state *cpustate)
+void tms7000_device::nop()
 {
-	cpustate->icount -= 4;
+	m_icount -= 4;
 }
 
-static void or_b2a(tms7000_state *cpustate)
+void tms7000_device::or_b2a()
 {
 	UINT8   t;
 
@@ -2528,10 +2528,10 @@ static void or_b2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void or_r2a(tms7000_state *cpustate)
+void tms7000_device::or_r2a()
 {
 	UINT8   t;
 	UINT8   v;
@@ -2545,10 +2545,10 @@ static void or_r2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void or_r2b(tms7000_state *cpustate)
+void tms7000_device::or_r2b()
 {
 	UINT8   t;
 	UINT8   v;
@@ -2562,10 +2562,10 @@ static void or_r2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void or_r2r(tms7000_state *cpustate)
+void tms7000_device::or_r2r()
 {
 	UINT8   t;
 	UINT8   i,j;
@@ -2580,10 +2580,10 @@ static void or_r2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void or_i2a(tms7000_state *cpustate)
+void tms7000_device::or_i2a()
 {
 	UINT8   t;
 	UINT8   v;
@@ -2597,10 +2597,10 @@ static void or_i2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void or_i2b(tms7000_state *cpustate)
+void tms7000_device::or_i2b()
 {
 	UINT8   t;
 	UINT8   v;
@@ -2614,10 +2614,10 @@ static void or_i2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void or_i2r(tms7000_state *cpustate)
+void tms7000_device::or_i2r()
 {
 	UINT8   t;
 	UINT8   i,j;
@@ -2632,10 +2632,10 @@ static void or_i2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void orp_a2p(tms7000_state *cpustate)
+void tms7000_device::orp_a2p()
 {
 	UINT8   t;
 	UINT8   v;
@@ -2648,10 +2648,10 @@ static void orp_a2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void orp_b2p(tms7000_state *cpustate)
+void tms7000_device::orp_b2p()
 {
 	UINT8   t;
 	UINT8   v;
@@ -2664,10 +2664,10 @@ static void orp_b2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void orp_i2p(tms7000_state *cpustate)
+void tms7000_device::orp_i2p()
 {
 	UINT8   t;
 	UINT8   i,v;
@@ -2681,10 +2681,10 @@ static void orp_i2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 
-static void pop_a(tms7000_state *cpustate)
+void tms7000_device::pop_a()
 {
 	UINT16  t;
 
@@ -2695,10 +2695,10 @@ static void pop_a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void pop_b(tms7000_state *cpustate)
+void tms7000_device::pop_b()
 {
 	UINT16  t;
 
@@ -2709,10 +2709,10 @@ static void pop_b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void pop_r(tms7000_state *cpustate)
+void tms7000_device::pop_r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -2725,20 +2725,20 @@ static void pop_r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void pop_st(tms7000_state *cpustate)
+void tms7000_device::pop_st()
 {
 	UINT16  t;
 
 	PULLBYTE(t);
 	pSR = t;
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void push_a(tms7000_state *cpustate)
+void tms7000_device::push_a()
 {
 	UINT16  t;
 
@@ -2749,10 +2749,10 @@ static void push_a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void push_b(tms7000_state *cpustate)
+void tms7000_device::push_b()
 {
 	UINT16  t;
 
@@ -2763,10 +2763,10 @@ static void push_b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void push_r(tms7000_state *cpustate)
+void tms7000_device::push_r()
 {
 	UINT16  t;
 	INT8    r;
@@ -2779,34 +2779,34 @@ static void push_r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void push_st(tms7000_state *cpustate)
+void tms7000_device::push_st()
 {
 	UINT16  t;
 	t = pSR;
 	PUSHBYTE(t);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void reti(tms7000_state *cpustate)
+void tms7000_device::reti()
 {
 	PULLWORD( PC );
 	PULLBYTE( pSR );
 
-	cpustate->icount -= 9;
-	tms7000_check_IRQ_lines(cpustate);
+	m_icount -= 9;
+	tms7000_check_IRQ_lines();
 }
 
-static void rets(tms7000_state *cpustate)
+void tms7000_device::rets()
 {
 	PULLWORD( PC );
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void rl_a(tms7000_state *cpustate)
+void tms7000_device::rl_a()
 {
 	UINT16  t;
 
@@ -2822,10 +2822,10 @@ static void rl_a(tms7000_state *cpustate)
 	SET_Z8(t);
 	WRA(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void rl_b(tms7000_state *cpustate)
+void tms7000_device::rl_b()
 {
 	UINT16  t;
 
@@ -2841,10 +2841,10 @@ static void rl_b(tms7000_state *cpustate)
 	SET_Z8(t);
 	WRB(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void rl_r(tms7000_state *cpustate)
+void tms7000_device::rl_r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -2862,10 +2862,10 @@ static void rl_r(tms7000_state *cpustate)
 	SET_Z8(t);
 	WM(r,t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void rlc_a(tms7000_state *cpustate)
+void tms7000_device::rlc_a()
 {
 	UINT16  t;
 	int     old_carry;
@@ -2884,10 +2884,10 @@ static void rlc_a(tms7000_state *cpustate)
 	SET_Z8(t);
 	WRA(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void rlc_b(tms7000_state *cpustate)
+void tms7000_device::rlc_b()
 {
 	UINT16  t;
 	int     old_carry;
@@ -2906,10 +2906,10 @@ static void rlc_b(tms7000_state *cpustate)
 	SET_Z8(t);
 	WRB(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void rlc_r(tms7000_state *cpustate)
+void tms7000_device::rlc_r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -2930,10 +2930,10 @@ static void rlc_r(tms7000_state *cpustate)
 	SET_Z8(t);
 	WM(r,t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void rr_a(tms7000_state *cpustate)
+void tms7000_device::rr_a()
 {
 	UINT16  t;
 	int     old_bit0;
@@ -2956,10 +2956,10 @@ static void rr_a(tms7000_state *cpustate)
 
 	WRA(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void rr_b(tms7000_state *cpustate)
+void tms7000_device::rr_b()
 {
 	UINT16  t;
 	int     old_bit0;
@@ -2982,10 +2982,10 @@ static void rr_b(tms7000_state *cpustate)
 
 	WRB(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void rr_r(tms7000_state *cpustate)
+void tms7000_device::rr_r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -3011,10 +3011,10 @@ static void rr_r(tms7000_state *cpustate)
 
 	WM(r,t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void rrc_a(tms7000_state *cpustate)
+void tms7000_device::rrc_a()
 {
 	UINT16  t;
 	int     old_bit0;
@@ -3035,10 +3035,10 @@ static void rrc_a(tms7000_state *cpustate)
 
 	WRA(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void rrc_b(tms7000_state *cpustate)
+void tms7000_device::rrc_b()
 {
 	UINT16  t;
 	int     old_bit0;
@@ -3059,10 +3059,10 @@ static void rrc_b(tms7000_state *cpustate)
 
 	WRB(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void rrc_r(tms7000_state *cpustate)
+void tms7000_device::rrc_r()
 {
 	UINT16  t;
 	UINT8   r;
@@ -3085,10 +3085,10 @@ static void rrc_r(tms7000_state *cpustate)
 
 	WM(r,t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void sbb_ba(tms7000_state *cpustate)
+void tms7000_device::sbb_ba()
 {
 	UINT16  t;
 
@@ -3100,10 +3100,10 @@ static void sbb_ba(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void sbb_ra(tms7000_state *cpustate)
+void tms7000_device::sbb_ra()
 {
 	UINT16  t;
 	UINT8   r;
@@ -3117,10 +3117,10 @@ static void sbb_ra(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void sbb_rb(tms7000_state *cpustate)
+void tms7000_device::sbb_rb()
 {
 	UINT16  t;
 	UINT8   r;
@@ -3134,10 +3134,10 @@ static void sbb_rb(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void sbb_rr(tms7000_state *cpustate)
+void tms7000_device::sbb_rr()
 {
 	UINT16  t;
 	UINT8   r,s;
@@ -3152,10 +3152,10 @@ static void sbb_rr(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void sbb_ia(tms7000_state *cpustate)
+void tms7000_device::sbb_ia()
 {
 	UINT16  t;
 	UINT8   i;
@@ -3169,10 +3169,10 @@ static void sbb_ia(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void sbb_ib(tms7000_state *cpustate)
+void tms7000_device::sbb_ib()
 {
 	UINT16  t;
 	UINT8   i;
@@ -3186,10 +3186,10 @@ static void sbb_ib(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void sbb_ir(tms7000_state *cpustate)
+void tms7000_device::sbb_ir()
 {
 	UINT16  t;
 	UINT8   r,i;
@@ -3204,18 +3204,18 @@ static void sbb_ir(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void setc(tms7000_state *cpustate)
+void tms7000_device::setc()
 {
 	CLR_NZC;
 	pSR |= (SR_C|SR_Z);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void sta_dir(tms7000_state *cpustate)
+void tms7000_device::sta_dir()
 {
 	UINT16  t;
 	PAIR    i;
@@ -3229,17 +3229,17 @@ static void sta_dir(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
 
-static void sta_ind(tms7000_state *cpustate)
+void tms7000_device::sta_ind()
 {
 	UINT16  t;
 	PAIR    p;
 	INT8    r;
 
 	IMMBYTE(r);
-	p.w.l = RRF16(cpustate,r);
+	p.w.l = RRF16(r);
 	t = RDA;
 	WM(p.w.l,t);
 
@@ -3247,10 +3247,10 @@ static void sta_ind(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void sta_inx(tms7000_state *cpustate)
+void tms7000_device::sta_inx()
 {
 	UINT16  t;
 	PAIR    i;
@@ -3263,17 +3263,17 @@ static void sta_inx(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 13;
+	m_icount -= 13;
 }
 
-static void stsp(tms7000_state *cpustate)
+void tms7000_device::stsp()
 {
 	WRB(pSP);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void sub_ba(tms7000_state *cpustate)
+void tms7000_device::sub_ba()
 {
 	UINT16  t;
 
@@ -3285,10 +3285,10 @@ static void sub_ba(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void sub_ra(tms7000_state *cpustate)
+void tms7000_device::sub_ra()
 {
 	UINT16  t;
 	UINT8   r;
@@ -3302,10 +3302,10 @@ static void sub_ra(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void sub_rb(tms7000_state *cpustate)
+void tms7000_device::sub_rb()
 {
 	UINT16  t;
 	UINT8   r;
@@ -3319,10 +3319,10 @@ static void sub_rb(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void sub_rr(tms7000_state *cpustate)
+void tms7000_device::sub_rr()
 {
 	UINT16  t;
 	UINT8   r,s;
@@ -3337,10 +3337,10 @@ static void sub_rr(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void sub_ia(tms7000_state *cpustate)
+void tms7000_device::sub_ia()
 {
 	UINT16  t;
 	UINT8   i;
@@ -3354,10 +3354,10 @@ static void sub_ia(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void sub_ib(tms7000_state *cpustate)
+void tms7000_device::sub_ib()
 {
 	UINT16  t;
 	UINT8   i;
@@ -3371,10 +3371,10 @@ static void sub_ib(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void sub_ir(tms7000_state *cpustate)
+void tms7000_device::sub_ir()
 {
 	UINT16  t;
 	UINT8   r,i;
@@ -3389,178 +3389,178 @@ static void sub_ir(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void trap_0(tms7000_state *cpustate)
+void tms7000_device::trap_0()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xfffe);
-	cpustate->icount -= 14;
+	pPC = RM16(0xfffe);
+	m_icount -= 14;
 }
 
-static void trap_1(tms7000_state *cpustate)
+void tms7000_device::trap_1()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xfffc);
-	cpustate->icount -= 14;
+	pPC = RM16(0xfffc);
+	m_icount -= 14;
 }
 
-static void trap_2(tms7000_state *cpustate)
+void tms7000_device::trap_2()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xfffa);
-	cpustate->icount -= 14;
+	pPC = RM16(0xfffa);
+	m_icount -= 14;
 }
 
-static void trap_3(tms7000_state *cpustate)
+void tms7000_device::trap_3()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xfff8);
-	cpustate->icount -= 14;
+	pPC = RM16(0xfff8);
+	m_icount -= 14;
 }
 
-static void trap_4(tms7000_state *cpustate)
+void tms7000_device::trap_4()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xfff6);
-	cpustate->icount -= 14;
+	pPC = RM16(0xfff6);
+	m_icount -= 14;
 }
 
-static void trap_5(tms7000_state *cpustate)
+void tms7000_device::trap_5()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xfff4);
-	cpustate->icount -= 14;
+	pPC = RM16(0xfff4);
+	m_icount -= 14;
 }
 
-static void trap_6(tms7000_state *cpustate)
+void tms7000_device::trap_6()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xfff2);
-	cpustate->icount -= 14;
+	pPC = RM16(0xfff2);
+	m_icount -= 14;
 }
 
-static void trap_7(tms7000_state *cpustate)
+void tms7000_device::trap_7()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xfff0);
-	cpustate->icount -= 14;
+	pPC = RM16(0xfff0);
+	m_icount -= 14;
 }
 
-static void trap_8(tms7000_state *cpustate)
+void tms7000_device::trap_8()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffee);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffee);
+	m_icount -= 14;
 }
 
-static void trap_9(tms7000_state *cpustate)
+void tms7000_device::trap_9()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffec);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffec);
+	m_icount -= 14;
 }
 
-static void trap_10(tms7000_state *cpustate)
+void tms7000_device::trap_10()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffea);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffea);
+	m_icount -= 14;
 }
 
-static void trap_11(tms7000_state *cpustate)
+void tms7000_device::trap_11()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffe8);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffe8);
+	m_icount -= 14;
 }
 
-static void trap_12(tms7000_state *cpustate)
+void tms7000_device::trap_12()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffe6);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffe6);
+	m_icount -= 14;
 }
 
-static void trap_13(tms7000_state *cpustate)
+void tms7000_device::trap_13()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffe4);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffe4);
+	m_icount -= 14;
 }
 
-static void trap_14(tms7000_state *cpustate)
+void tms7000_device::trap_14()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffe2);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffe2);
+	m_icount -= 14;
 }
 
-static void trap_15(tms7000_state *cpustate)
+void tms7000_device::trap_15()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffe0);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffe0);
+	m_icount -= 14;
 }
 
-static void trap_16(tms7000_state *cpustate)
+void tms7000_device::trap_16()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffde);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffde);
+	m_icount -= 14;
 }
 
-static void trap_17(tms7000_state *cpustate)
+void tms7000_device::trap_17()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffdc);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffdc);
+	m_icount -= 14;
 }
 
-static void trap_18(tms7000_state *cpustate)
+void tms7000_device::trap_18()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffda);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffda);
+	m_icount -= 14;
 }
 
-static void trap_19(tms7000_state *cpustate)
+void tms7000_device::trap_19()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffd8);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffd8);
+	m_icount -= 14;
 }
 
-static void trap_20(tms7000_state *cpustate)
+void tms7000_device::trap_20()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffd6);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffd6);
+	m_icount -= 14;
 }
 
-static void trap_21(tms7000_state *cpustate)
+void tms7000_device::trap_21()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffd4);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffd4);
+	m_icount -= 14;
 }
 
-static void trap_22(tms7000_state *cpustate)
+void tms7000_device::trap_22()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffd2);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffd2);
+	m_icount -= 14;
 }
 
-static void trap_23(tms7000_state *cpustate)
+void tms7000_device::trap_23()
 {
 	PUSHWORD( PC );
-	pPC = RM16(cpustate, 0xffd0);
-	cpustate->icount -= 14;
+	pPC = RM16(0xffd0);
+	m_icount -= 14;
 }
 
-static void swap_a(tms7000_state *cpustate)
+void tms7000_device::swap_a()
 {
 	UINT8   a,b;
 	UINT16  t;
@@ -3579,10 +3579,10 @@ static void swap_a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -=8;
+	m_icount -=8;
 }
 
-static void swap_b(tms7000_state *cpustate)
+void tms7000_device::swap_b()
 {
 	UINT8   a,b;
 	UINT16  t;
@@ -3601,10 +3601,10 @@ static void swap_b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -=8;
+	m_icount -=8;
 }
 
-static void swap_r(tms7000_state *cpustate)
+void tms7000_device::swap_r()
 {
 	UINT8   a,b,r;
 	UINT16  t;
@@ -3624,10 +3624,10 @@ static void swap_r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -=8;
+	m_icount -=8;
 }
 
-static void swap_r_exl(tms7000_state *cpustate)
+void tms7000_device::swap_r_exl()
 {
 	UINT8   a,b,r;
 	UINT16  t;
@@ -3645,7 +3645,7 @@ static void swap_r_exl(tms7000_state *cpustate)
 		SET_N8(t);
 		SET_Z8(t);
 
-		cpustate->icount -= 9;  /* ?????? */
+		m_icount -= 9;  /* ?????? */
 	}
 	else
 	{   /* stright swap Rn instruction */
@@ -3663,11 +3663,11 @@ static void swap_r_exl(tms7000_state *cpustate)
 		SET_N8(t);
 		SET_Z8(t);
 
-		cpustate->icount -=8;
+		m_icount -=8;
 	}
 }
 
-static void tstb(tms7000_state *cpustate)
+void tms7000_device::tstb()
 {
 	UINT16  t;
 
@@ -3677,10 +3677,10 @@ static void tstb(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void xchb_a(tms7000_state *cpustate)
+void tms7000_device::xchb_a()
 {
 	UINT16  t,u;
 
@@ -3694,10 +3694,10 @@ static void xchb_a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void xchb_b(tms7000_state *cpustate)
+void tms7000_device::xchb_b()
 {
 	UINT16  t;
 /*  UINT16  u;  */
@@ -3712,10 +3712,10 @@ static void xchb_b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 6;
+	m_icount -= 6;
 }
 
-static void xchb_r(tms7000_state *cpustate)
+void tms7000_device::xchb_r()
 {
 	UINT16  t,u;
 	UINT8   r;
@@ -3732,10 +3732,10 @@ static void xchb_r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void xor_b2a(tms7000_state *cpustate)
+void tms7000_device::xor_b2a()
 {
 	UINT8   t;
 
@@ -3746,10 +3746,10 @@ static void xor_b2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 5;
+	m_icount -= 5;
 }
 
-static void xor_r2a(tms7000_state *cpustate)
+void tms7000_device::xor_r2a()
 {
 	UINT8   t;
 	UINT8   v;
@@ -3763,10 +3763,10 @@ static void xor_r2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void xor_r2b(tms7000_state *cpustate)
+void tms7000_device::xor_r2b()
 {
 	UINT8   t;
 	UINT8   v;
@@ -3780,10 +3780,10 @@ static void xor_r2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 8;
+	m_icount -= 8;
 }
 
-static void xor_r2r(tms7000_state *cpustate)
+void tms7000_device::xor_r2r()
 {
 	UINT8   t;
 	UINT8   i,j;
@@ -3798,10 +3798,10 @@ static void xor_r2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void xor_i2a(tms7000_state *cpustate)
+void tms7000_device::xor_i2a()
 {
 	UINT8   t;
 	UINT8   v;
@@ -3815,10 +3815,10 @@ static void xor_i2a(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void xor_i2b(tms7000_state *cpustate)
+void tms7000_device::xor_i2b()
 {
 	UINT8   t;
 	UINT8   v;
@@ -3832,10 +3832,10 @@ static void xor_i2b(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 7;
+	m_icount -= 7;
 }
 
-static void xor_i2r(tms7000_state *cpustate)
+void tms7000_device::xor_i2r()
 {
 	UINT8   t;
 	UINT8   i,j;
@@ -3850,10 +3850,10 @@ static void xor_i2r(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void xorp_a2p(tms7000_state *cpustate)
+void tms7000_device::xorp_a2p()
 {
 	UINT8   t;
 	UINT8   v;
@@ -3866,10 +3866,10 @@ static void xorp_a2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 10;
+	m_icount -= 10;
 }
 
-static void xorp_b2p(tms7000_state *cpustate)
+void tms7000_device::xorp_b2p()
 {
 	UINT8   t;
 	UINT8   v;
@@ -3882,10 +3882,10 @@ static void xorp_b2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 9;
+	m_icount -= 9;
 }
 
-static void xorp_i2p(tms7000_state *cpustate)
+void tms7000_device::xorp_i2p()
 {
 	UINT8   t;
 	UINT8   i,v;
@@ -3899,5 +3899,5 @@ static void xorp_i2p(tms7000_state *cpustate)
 	SET_N8(t);
 	SET_Z8(t);
 
-	cpustate->icount -= 11;
+	m_icount -= 11;
 }
