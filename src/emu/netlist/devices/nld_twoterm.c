@@ -228,10 +228,7 @@ NETLIB_UPDATE_PARAM(QBJT_switch<_type>)
 
 	// Assume 5mA Collector current for switch operation
 
-	if (_type == BJT_NPN)
-		m_V = d.V(0.005 / alpha);
-	else
-		m_V = - d.V(0.005 / alpha);
+    m_V = d.V(0.005 / alpha);
 
 	m_gB = d.gI(0.005 / alpha);
 	if (m_gB < NETLIST_GMIN)

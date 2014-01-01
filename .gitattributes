@@ -348,6 +348,7 @@ keymaps/km_se_LINUX.map svneol=native#text/plain
 keymaps/km_se_OSX.map svneol=native#text/plain
 /makefile svneol=native#text/plain
 nl_examples/7400_astable.c svneol=native#text/plain
+nl_examples/bjt.c svneol=native#text/plain
 nl_examples/ne555_astable.c svneol=native#text/plain
 nl_examples/opamp.c svneol=native#text/plain
 src/build/build.mak svneol=native#text/plain

@@ -314,13 +314,14 @@ public:
 	{
 		double vE = INPANALOG(m_EV);
 		double vB = INPANALOG(m_BV);
+		double m = (_type == BJT_NPN) ? 1 : -1;
 
-		int new_state = (vB - vE > m_V ) ? 1 : 0;
+		int new_state = ((vB - vE) * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
 		{
 			double gb = m_gB;
 			double gc = m_gC;
-			double v  = m_V;
+			double v  = m_V * m;
 			if (!new_state )
 			{
 				// not conducting
