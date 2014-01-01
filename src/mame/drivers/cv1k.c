@@ -462,7 +462,7 @@ static MACHINE_CONFIG_START( cv1k, cv1k_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cv1k_state, cv1k)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-    MCFG_YMZ770_ADD("ymz770", 16384000)
+	MCFG_YMZ770_ADD("ymz770", 16384000)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -867,14 +867,12 @@ ROM_START( mushisam )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(e3d05c9f) SHA1(130c3d62317da1729c85bd178bd51500edd73ada) )
 ROM_END
 
-
 ROM_START( mushisama )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP("mushisama_u4", 0x000000, 0x200000, CRC(0b5b30b2) SHA1(35fd1bb1561c30b311b4325bc8f4628f2fccd20b) ) /* (2004/10/12 MASTER VER.) */
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	//ROM_LOAD("mushisama_u2", 0x000000, 0x8400000, CRC(b1f826dc) SHA1(c287bd9f571d0df03d7fcbcf3c57c74ce564ab05) ) /* (2004/10/12 MASTER VER.) */
 	ROM_LOAD("mushisama_u2", 0x000000, 0x8400000, CRC(f1e0cf65) SHA1(d00d950422309fdf08efe1e2d5f040beb45ee6fb) ) /* (2004/10/12 MASTER VER.) */
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
@@ -888,7 +886,6 @@ ROM_START( mushisamb )
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-//	ROM_LOAD("mushisamb_u2", 0x000000, 0x8400000, CRC(2cd13810) SHA1(40e45e201b60e63a060b68d4cc767eb64cfb99c2) ) /* (2004/10/12 MASTER VER) */
 	ROM_LOAD("mushisamb_u2", 0x000000, 0x8400000, CRC(6cc9d1a9) SHA1(17907798dce1defadd10354cec6c8d364e045570) ) /* (2004/10/12 MASTER VER) */
 		
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
@@ -934,7 +931,6 @@ ROM_START( mushitama )
 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(701a912a) SHA1(85c198946fb693d99928ea2595c84ba4d9dc8157) )
 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(6feeb9a1) SHA1(992711c80e660c32f97b343c2ce8184fddd7364e) )
 ROM_END
-
 
 ROM_START( futari15 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
@@ -1033,7 +1029,6 @@ ROM_START( deathsml )
 	ROM_RELOAD(0x200000,0x200000)
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-//	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(d45b0698) SHA1(7077b9445f5ed4749c7f683191ccd312180fac38) ) /* (2007/10/09 MASTER VER) */ // one bad asset?
 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(59ef5d78) SHA1(426e506b6d88948aa55aec71c0db6e91da3d490d) ) /* (2007/10/09 MASTER VER) */
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
@@ -1121,26 +1116,22 @@ ROM_END
 
 ROM_START( ddpdfk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "(__ddpdfk)u4", 0x0000, 0x400000, CRC(9976d699) SHA1(9dfe9d1daf6f638cafce8cdc5230209e2bcb7522) )
+	ROM_LOAD16_WORD_SWAP( "ddpdfk_u4", 0x0000, 0x400000, CRC(9976d699) SHA1(9dfe9d1daf6f638cafce8cdc5230209e2bcb7522) ) /* (2008/06/23  MASTER VER 1.5) */
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "(__ddpdfk)u2", 0x000000, 0x8400000, CRC(84a51a4f) SHA1(291a6279c0746d2eb8630e7d6d886043f0cfdd94) )
-//	ROM_LOAD( "u2_bad1", 0x000000, 0x8400000, CRC(05e5d333) SHA1(3324fc3b092cbb56d3cfb539c8fd919f55abe910) ) // 1 corrupted image
-//	ROM_LOAD( "u2_bad2", 0x000000, 0x8400000, CRC(ce641eab) SHA1(fd86e141a049cc12c7169ad43b5ebe068ea61402) ) // 8 corrupted image(s)
+	ROM_LOAD( "ddpdfk_u2", 0x000000, 0x8400000, CRC(84a51a4f) SHA1(291a6279c0746d2eb8630e7d6d886043f0cfdd94) ) /* (2008/06/23  MASTER VER 1.5) */
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(27032cde) SHA1(5b58d0140d72b91db4e763ca4af93060d36ac74d) )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(a6178c2c) SHA1(7742ad1de2e4b0d0206ad11d467ea35da36352df) )
 ROM_END
 
-
-
 ROM_START( ddpdfk10 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "(__ddpdfk10)u4", 0x0000, 0x400000, CRC(a3d650b2) SHA1(46a7551760e18c2cecd372c3f4be16f6600efc2c) )
+	ROM_LOAD16_WORD_SWAP( "ddpdfk10_u4", 0x0000, 0x400000, CRC(a3d650b2) SHA1(46a7551760e18c2cecd372c3f4be16f6600efc2c) ) /* (2008/05/16  MASTER VER) */
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "(__ddpdfk10)u2", 0x000000, 0x8400000, CRC(d349cb2a) SHA1(c364c36b69b93f8f62390f185d044f51056669ff) )
+	ROM_LOAD( "ddpdfk10_u2", 0x000000, 0x8400000, CRC(d349cb2a) SHA1(c364c36b69b93f8f62390f185d044f51056669ff) ) /* (2008/05/16  MASTER VER) */
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(27032cde) SHA1(5b58d0140d72b91db4e763ca4af93060d36ac74d) )
@@ -1149,14 +1140,14 @@ ROM_END
 
 ROM_START( dsmbl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "(__dsmbl)u4", 0x000000, 0x400000, CRC(77fc5ad1) SHA1(afe044fc16e9494143c876879b033caccd08cf22) )
+	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(77fc5ad1) SHA1(afe044fc16e9494143c876879b033caccd08cf22) ) /* (2008/10/06 MEGABLACK LABEL VER) */
 
 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "(__dsmbl)u2", 0x000000, 0x8400000, CRC(d6b85b7a) SHA1(4674f6ad07f6a03904ca3d05060816b8fe061add) )
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(d6b85b7a) SHA1(4674f6ad07f6a03904ca3d05060816b8fe061add) ) /* (2008/10/06 MEGABLACK LABEL VER) */
 
 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "(__dsmbl)u23", 0x000000, 0x400000, CRC(a9536a6a) SHA1(4b9dcaf6803b1fcfdf73ae9daabc4508fec71631) )
-	ROM_LOAD16_WORD_SWAP( "(__dsmbl)u24", 0x400000, 0x400000, CRC(3b673326) SHA1(1ae847eb4e752fef1d72081d82344f0ad0537c31) )
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(a9536a6a) SHA1(4b9dcaf6803b1fcfdf73ae9daabc4508fec71631) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(3b673326) SHA1(1ae847eb4e752fef1d72081d82344f0ad0537c31) )
 ROM_END
 
 
@@ -1166,7 +1157,7 @@ READ64_MEMBER( cv1k_state::mushisam_speedup_r )
 	int pc = m_maincpu->pc();
 	if ( pc == 0xc04a0aa ) m_maincpu->spin_until_time( attotime::from_usec(10)); // mushisam
 	else if (pc == 0xc04a0da)  m_maincpu->spin_until_time( attotime::from_usec(10)); // mushitam
-//  else printf("read %08x\n", m_maincpu->pc());
+//	else printf("read %08x\n", m_maincpu->pc());
 	return cv1k_ram[0x0022f0/8];
 }
 
@@ -1178,7 +1169,7 @@ DRIVER_INIT_MEMBER(cv1k_state,mushisam)
 READ64_MEMBER( cv1k_state::mushisama_speedup_r )
 {
 	if (m_maincpu->pc()== 0xc04a2aa ) m_maincpu->spin_until_time( attotime::from_usec(10)); // mushisam
-//  else printf("read %08x\n", m_maincpu->pc());
+//	else printf("read %08x\n", m_maincpu->pc());
 	return cv1k_ram[0x00024d8/8];
 }
 
@@ -1194,7 +1185,7 @@ READ64_MEMBER( cv1k_state::espgal2_speedup_r )
 	if ( pc == 0xc05177a ) m_maincpu->spin_until_time( attotime::from_usec(10)); // espgal2
 	if ( pc == 0xc05176a ) m_maincpu->spin_until_time( attotime::from_usec(10)); // futari15 / futari15a / futari10 / futariblk / ibarablk / ibarablka / mmpork / mmmbanc
 	if ( pc == 0xc0519a2 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // deathsml
-	if ( pc == 0xc1d1346 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // dpddfk
+	if ( pc == 0xc1d1346 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // dpddfk / dsmbl
 //	else printf("read %08x\n", m_maincpu->pc());
 	return cv1k_ram[0x002310/8];
 }
@@ -1208,43 +1199,43 @@ DRIVER_INIT_MEMBER(cv1k_state,espgal2)
 // The black label versions are intentionally not set as clones, they were re-releases with different game codes, not bugfixes.
 
 // CA011  Mushihime-Sama
-GAME( 2004, mushisam,   0,        cv1k, cv1k, cv1k_state, mushisama, ROT270, "Cave", "Mushihime-Sama (2004/10/12.MASTER VER.)",                          0 )
-GAME( 2004, mushisama,  mushisam, cv1k, cv1k, cv1k_state, mushisam,  ROT270, "Cave", "Mushihime-Sama (2004/10/12 MASTER VER.)",                          0 )
-GAME( 2004, mushisamb,  mushisam, cv1k, cv1k, cv1k_state, mushisama, ROT270, "Cave", "Mushihime-Sama (2004/10/12 MASTER VER)",                           0 )
+GAME( 2004, mushisam,   0,        cv1k,   cv1k, cv1k_state, mushisama, ROT270, "Cave", "Mushihime-Sama (2004/10/12.MASTER VER.)",                        0 )
+GAME( 2004, mushisama,  mushisam, cv1k,   cv1k, cv1k_state, mushisam,  ROT270, "Cave", "Mushihime-Sama (2004/10/12 MASTER VER.)",                        0 )
+GAME( 2004, mushisamb,  mushisam, cv1k,   cv1k, cv1k_state, mushisama, ROT270, "Cave", "Mushihime-Sama (2004/10/12 MASTER VER)",                         0 )
 
 // CA012  Ibara
-GAME( 2005, ibara,      0,        cv1k, cv1k, cv1k_state, mushisam,  ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                   0 )
+GAME( 2005, ibara,      0,        cv1k,   cv1k, cv1k_state, mushisam,  ROT270, "Cave", "Ibara (2005/03/22 MASTER VER..)",                                0 )
 
 // CA012B Ibara Kuro Black Label
-GAME( 2006, ibarablk,   0,        cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                 0 )
-GAME( 2006, ibarablka,  ibarablk, cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                  0 )
+GAME( 2006, ibarablk,   0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",               0 )
+GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                0 )
 
 // CA013  Espgaluda II
-GAME( 2005, espgal2,    0,        cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Espgaluda II (2005/11/14 MASTER VER)",                             0 )
+GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Espgaluda II (2005/11/14 MASTER VER)",                           0 )
 
 // CA???  Puzzle! Mushihime-Tama
-GAME( 2005, mushitam,   0,        cv1k, cv1k, cv1k_state, mushisam,  ROT0,   "Cave", "Puzzle! Mushihime-Tama (2005/09/09.MASTER VER)",                   0 )
-GAME( 2005, mushitama,  mushitam, cv1k, cv1k, cv1k_state, mushisam,  ROT0,   "Cave", "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                   0 )
+GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, mushisam,  ROT0,   "Cave", "Puzzle! Mushihime-Tama (2005/09/09.MASTER VER)",                 0 )
+GAME( 2005, mushitama,  mushitam, cv1k,   cv1k, cv1k_state, mushisam,  ROT0,   "Cave", "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                 0 )
 
 // CA014  Pink Sweets: Ibara Sorekara
-GAME( 2006, pinkswts,   0,        cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",          0 )
-GAME( 2006, pinkswtsa,  pinkswts, cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",           0 )
-GAME( 2006, pinkswtsb,  pinkswts, cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",             0 )
-GAME( 2006, pinkswtsx,  pinkswts, cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",             0 ) // defaults to freeplay, possibly bootlegged from show/dev version?
+GAME( 2006, pinkswts,   0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",        0 )
+GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",         0 )
+GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",           0 )
+GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",           0 ) // defaults to freeplay, possibly bootlegged from show/dev version?
 
 // CA015  Mushihime-Sama Futari
-GAME( 2006, futari15,   0,        cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",      0 )
-GAME( 2006, futari15a,  futari15, cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",        0 )
-GAME( 2006, futari10,   futari15, cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",           0 )
+GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",    0 )
+GAME( 2006, futari15a,  futari15, cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",      0 )
+GAME( 2006, futari10,   futari15, cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",         0 )
 
 // CA016  Muchi Muchi Pork!
-GAME( 2007, mmpork,     0,        cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                       0 )
+GAME( 2007, mmpork,     0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                     0 )
 
 // CA015B Mushihime-Sama Futari Black Label
-GAME( 2007, futaribl,   0,        cv1k, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",   0 )
+GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT270, "Cave", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)", 0 )
 
 // CA017  Deathsmiles
-GAME( 2007, deathsml,   0,        cv1k, cv1k, cv1k_state, espgal2,   ROT0,   "Cave", "Deathsmiles (2007/10/09 MASTER VER)",                              0 )
+GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT0,   "Cave", "Deathsmiles (2007/10/09 MASTER VER)",                            0 )
 
 // CA017B Deathsmiles Black Label
 GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, espgal2,   ROT0,   "Cave", "Deathsmiles MegaBlack Label (2008/10/06 MEGABLACK LABEL VER)",   0 )
@@ -1254,7 +1245,7 @@ GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, espgal2,   ROT270, "
 GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, espgal2,   ROT270, "Cave", "DoDonPachi Dai-Fukkatsu Ver 1.0 (2008/05/16  MASTER VER)",       0 )
 
 // CMDL01 Medal Mahjong Moukari Bancho
-GAME( 2007, mmmbanc,    0,        cv1k, cv1k, cv1k_state, espgal2,   ROT0,   "Cave", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",             GAME_NOT_WORKING )
+GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT0,   "Cave", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",           GAME_NOT_WORKING )
 
 
 
