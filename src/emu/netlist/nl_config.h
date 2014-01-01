@@ -16,7 +16,6 @@
 //  SETUP
 //============================================================
 
-#define USE_DELEGATES           (0)
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc
  * This is intended for non-mame usage.
@@ -24,7 +23,9 @@
  */
 #define USE_PMFDELEGATES        (0)
 
-// Next if enabled adds 20% performance ... but is not guaranteed to be absolutely timing correct.
+// This used to add 20% performance ... but is not guaranteed to be absolutely timing correct.
+// Update 01.01.2014: Currently, enabling this has no observable impact on performance.
+
 #define USE_DEACTIVE_DEVICE     (0)
 
 // Use nano-second resolution - Sufficient for now

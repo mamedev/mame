@@ -302,7 +302,7 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 			case DT_CUSTOM:
 			case NOT_SUPPORTED:
 			default:
-				netlist().xfatalerror("found unsupported save element %s\n", s->m_name.cstr());
+				netlist().error("found unsupported save element %s\n", s->m_name.cstr());
 				break;
 		}
 	}
@@ -373,7 +373,7 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(char *buffer, off
 	{
 		//            sprintf(buffer, "%04x %02d %s", pc, relpc, netlist().queue()[netlist().queue().count() - relpc - 1].object().name().cstr());
 		int dpc = netlist().queue().count() - relpc - 1;
-		sprintf(buffer, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object().name().cstr(),
+		sprintf(buffer, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object()->name().cstr(),
 				netlist().queue()[dpc].time().as_double());
 	}
 	else

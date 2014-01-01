@@ -49,17 +49,15 @@ public:
 #if (USE_DEACTIVE_DEVICE)
 	ATTR_HOT void inc_active()
 	{
-		if (m_active == 0)
+		if (++m_active == 1)
 		{
 			update();
 		}
-		m_active++;
 	}
 
 	ATTR_HOT void dec_active()
 	{
-		m_active--;
-		if (m_active == 0)
+		if (--m_active == 0)
 		{
 			for (int i = 0; i< _numdev; i++)
 				m_i[i].inactivate();
@@ -99,17 +97,15 @@ public:
 	#if (USE_DEACTIVE_DEVICE)
 		ATTR_HOT void inc_active()
 		{
-			if (m_active == 0)
+			if (++m_active == 1)
 			{
 				update();
 			}
-			m_active++;
 		}
 
 		ATTR_HOT void dec_active()
 		{
-			m_active--;
-			if (m_active == 0)
+			if (--m_active == 0)
 			{
 				for (int i = 0; i< _numdev; i++)
 					m_i[i].inactivate();
@@ -173,17 +169,15 @@ public:
 	#if (USE_DEACTIVE_DEVICE)
 		ATTR_HOT void inc_active()
 		{
-			if (m_active == 0)
+			if (++m_active == 1)
 			{
 				update();
 			}
-			m_active++;
 		}
 
 		ATTR_HOT void dec_active()
 		{
-			m_active--;
-			if (m_active == 0)
+			if (--m_active == 0)
 			{
 				m_i[0].inactivate();
 				m_i[1].inactivate();

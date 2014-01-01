@@ -291,7 +291,7 @@ netlist_device_t *netlist_factory::new_device_by_classname(const pstring &classn
 		}
 		p++;
 	}
-	setup.netlist().xfatalerror("Class %s not found!\n", classname.cstr());
+	setup.netlist().error("Class %s not found!\n", classname.cstr());
 	return NULL; // appease code analysis
 }
 
@@ -307,6 +307,6 @@ netlist_device_t *netlist_factory::new_device_by_name(const pstring &name, netli
 		}
 		p++;
 	}
-	setup.netlist().xfatalerror("Class %s not found!\n", name.cstr());
+	setup.netlist().error("Class %s not found!\n", name.cstr());
 	return NULL; // appease code analysis
 }

@@ -29,7 +29,7 @@ ATTR_COLD void netlist_parser::error(const char *format, ...)
         buf[bufp++] = *p++;
     buf[bufp] = 0;
 
-    m_setup.netlist().xfatalerror("line %d: error: %s\n\t\t%s\n", m_line, errmsg1.cstr(), buf);
+    m_setup.netlist().error("line %d: error: %s\n\t\t%s\n", m_line, errmsg1.cstr(), buf);
 
     //throw error;
 }
@@ -317,7 +317,7 @@ void netlist_parser::check_char(char ctocheck)
 double netlist_parser::eval_param()
 {
 	static const char *macs[6] = {"", "RES_K(", "RES_M(", "CAP_U(", "CAP_N(", "CAP_P("};
-	static const char *allowed = "RESKMUNPAC_0123456789E+-.";
+	static const char *allowed = "RESKMUNPAC_0123456789E(+-.";
 	static double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	int i;
 	int f=0;

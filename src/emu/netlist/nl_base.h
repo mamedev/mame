@@ -163,12 +163,8 @@
 
 class netlist_core_device_t;
 
-#if USE_DELEGATES
 #if USE_PMFDELEGATES
 typedef void (*net_update_delegate)(netlist_core_device_t *);
-#else
-typedef delegate<void ()> net_update_delegate;
-#endif
 #endif
 
 //============================================================
@@ -578,7 +574,7 @@ public:
 		return m_cur.Analog;
 	}
 
-	ATTR_HOT inline void push_to_queue(const netlist_time &delay);
+	ATTR_HOT inline void push_to_queue(const netlist_time delay);
 	ATTR_HOT bool is_queued() { return m_in_queue == 1; }
 
 	/* internal state support
@@ -681,15 +677,14 @@ public:
 	ATTR_COLD void initial(const netlist_sig_t val);
 	ATTR_COLD void set_levels(const double low, const double high);
 
-	ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time &delay)
+	ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time delay)
 	{
-		netlist_net_t &anet = net();
+		assert(net().m_num_cons != 1);
 
-		if (EXPECTED(newQ != anet.m_new.Q))
+		if (EXPECTED(newQ !=  net().m_new.Q))
 		{
-			anet.m_new.Q = newQ;
-			if (anet.m_num_cons)
-				anet.push_to_queue(delay);
+		    net().m_new.Q = newQ;
+		    net().push_to_queue(delay);
 		}
 	}
 };
@@ -711,7 +706,7 @@ public:
 
 	ATTR_COLD void initial(const double val);
 
-	ATTR_HOT inline void set_Q(const double newQ, const netlist_time &delay)
+	ATTR_HOT inline void set_Q(const double newQ, const netlist_time delay)
 	{
 		if (newQ != net().m_new.Analog)
 		{
@@ -852,12 +847,8 @@ public:
 
 	ATTR_HOT inline void update_dev()
 	{
-#if USE_DELEGATES
 #if USE_PMFDELEGATES
 		static_update(this);
-#else
-		static_update();
-#endif
 #else
 		update();
 #endif
@@ -871,7 +862,7 @@ public:
 		return inp.Q();
 	}
 
-	ATTR_HOT inline void OUTLOGIC(netlist_logic_output_t &out, const netlist_sig_t val, const netlist_time &delay)
+	ATTR_HOT inline void OUTLOGIC(netlist_logic_output_t &out, const netlist_sig_t val, const netlist_time delay)
 	{
 		out.set_Q(val, delay);
 	}
@@ -890,7 +881,7 @@ public:
 
 	ATTR_HOT inline const double TERMANALOG(const netlist_terminal_t &term) const { return term.net().Q_Analog(); }
 
-	ATTR_HOT inline void OUTANALOG(netlist_analog_output_t &out, const double val, const netlist_time &delay)
+	ATTR_HOT inline void OUTANALOG(netlist_analog_output_t &out, const double val, const netlist_time delay)
 	{
 		out.set_Q(val, delay);
 	}
@@ -908,7 +899,7 @@ public:
 	INT32 stat_count;
 #endif
 
-#if USE_DELEGATES
+#if USE_PMFDELEGATES
 	net_update_delegate static_update;
 #endif
 
@@ -973,7 +964,7 @@ private:
 // netlist_queue_t
 // ----------------------------------------------------------------------------------------
 
-class netlist_queue_t : public netlist_timed_queue<netlist_net_t, netlist_time, 512>,
+class netlist_queue_t : public netlist_timed_queue<netlist_net_t *, netlist_time, 512>,
 						public pstate_callback_t
 {
 public:
@@ -1011,7 +1002,7 @@ public:
 	ATTR_HOT inline const netlist_queue_t &queue() const { return m_queue; }
 	ATTR_HOT inline netlist_queue_t &queue() { return m_queue; }
 
-	ATTR_HOT inline void push_to_queue(netlist_net_t &out, const netlist_time &attime)
+	ATTR_HOT inline void push_to_queue(netlist_net_t *out, const netlist_time attime)
 	{
 		m_queue.push(netlist_queue_t::entry_t(attime, out));
 	}
@@ -1021,7 +1012,7 @@ public:
 	ATTR_HOT void process_queue(const netlist_time delta);
 	ATTR_HOT inline void abort_current_queue_slice() { m_stop = netlist_time::zero; }
 
-	ATTR_HOT inline const netlist_time &time() const { return m_time_ps; }
+	ATTR_HOT inline const netlist_time time() const { return m_time_ps; }
 
 	ATTR_COLD void set_mainclock_dev(NETLIB_NAME(mainclock) *dev);
 	ATTR_COLD void set_solver_dev(NETLIB_NAME(solver) *dev);
@@ -1032,7 +1023,7 @@ public:
 	ATTR_COLD netlist_setup_t &setup() { return *m_setup; }
 	ATTR_COLD void reset();
 
-	ATTR_COLD void xfatalerror(const char *format, ...) const;
+	ATTR_COLD void error(const char *format, ...) const;
 
 	tagmap_devices_t m_devices;
 	netlist_net_t::list_t m_nets;
@@ -1042,7 +1033,6 @@ protected:
 	// any derived netlist must override this ...
 	virtual void vfatalerror(const char *format, va_list ap) const = 0;
 
-protected:
 	ATTR_COLD virtual void save_register()
 	{
 		save(NAME(m_queue.callback()));
@@ -1079,7 +1069,6 @@ public:
 	ATTR_COLD nld_a_to_d_proxy(netlist_input_t &in_proxied)
 			: netlist_device_t()
 	{
-		//assert(in_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
 		assert(in_proxied.family() == LOGIC);
 		m_I.m_high_thresh_V = in_proxied.m_high_thresh_V;
 		m_I.m_low_thresh_V = in_proxied.m_low_thresh_V;
@@ -1120,7 +1109,6 @@ public:
 	ATTR_COLD nld_d_to_a_proxy(netlist_output_t &out_proxied)
 			: netlist_device_t()
 	{
-		//assert(out_proxied.object_type(SIGNAL_MASK) == SIGNAL_DIGITAL);
 		assert(out_proxied.family() == LOGIC);
 		m_low_V = out_proxied.m_low_V;
 		m_high_V = out_proxied.m_high_V;
@@ -1211,7 +1199,7 @@ ATTR_HOT inline void netlist_input_t::activate_lh()
 }
 
 
-ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time &delay)
+ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
 {
 	// if (m_in_queue == 1) return; FIXME: check this at some time
 	m_time = netlist().time() + delay;
@@ -1219,7 +1207,7 @@ ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time &delay)
 	if (m_in_queue)
 	{
 		//m_in_queue = 1;     /* pending */
-		netlist().push_to_queue(*this, m_time);
+		netlist().push_to_queue(this, m_time);
 	}
 }
 
@@ -1227,20 +1215,19 @@ ATTR_HOT inline void netlist_net_t::inc_active()
 {
 	m_active++;
 
-	if (USE_DEACTIVE_DEVICE)
-		if (m_active == 1 && m_in_queue > 0)
-		{
-			m_last = m_cur;
-			railterminal().netdev().inc_active();
-			m_cur = m_new;
-		}
+	if (USE_DEACTIVE_DEVICE && m_active == 1 && m_in_queue > 0)
+    {
+        m_last = m_cur;
+        railterminal().netdev().inc_active();
+        m_cur = m_new;
+    }
 
-	if (EXPECTED(m_active == 1 && m_in_queue == 0))
+	if (m_active == 1 && m_in_queue == 0)
 	{
-		if (EXPECTED(m_time > netlist().time()))
+		if (m_time > netlist().time())
 		{
 			m_in_queue = 1;     /* pending */
-			netlist().push_to_queue(*this, m_time);
+			netlist().push_to_queue(this, m_time);
 		}
 		else
 		{
@@ -1253,9 +1240,8 @@ ATTR_HOT inline void netlist_net_t::inc_active()
 ATTR_HOT inline void netlist_net_t::dec_active()
 {
 	m_active--;
-	if (USE_DEACTIVE_DEVICE)
-		if (m_active == 0)
-			railterminal().netdev().dec_active();
+	if (USE_DEACTIVE_DEVICE && (m_active == 0))
+        railterminal().netdev().dec_active();
 
 }
 

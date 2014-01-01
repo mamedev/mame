@@ -365,7 +365,7 @@ class NETLIB_NAME(analog_callback) : public netlist_device_t
 {
 public:
 	NETLIB_NAME(analog_callback)()
-		: netlist_device_t() { }
+		: netlist_device_t(), m_cpu_device(NULL) { }
 
 	ATTR_COLD void start()
 	{
@@ -414,7 +414,7 @@ public:
 		netlist_time current = netlist().time();
 		int pos = (current - m_last_buffer) / m_sample;
 		if (pos >= BUFSIZE)
-			netlist().xfatalerror("sound %s: exceeded BUFSIZE\n", name().cstr());
+			netlist().error("sound %s: exceeded BUFSIZE\n", name().cstr());
 		while (m_last_pos < pos )
 		{
 			m_buffer[m_last_pos++] = m_cur;

@@ -461,7 +461,7 @@ static NETLIST_START(pong_schematics)
 	TTL_7402_NOR(ic_d2c, ic_e3c.Q, ic_e3b.Q)
 	TTL_7404_INVERT(ic_g1a, 32V)
 	TTL_7425_NOR(ic_f2a, ic_g1a.Q, 64V, 128V, ic_d2c.Q)
-	NET_ALIAS(c5-en, ic_f2a.Q)
+	NET_ALIAS(c5_en, ic_f2a.Q)
 
 	// ----------------------------------------------------------------------------------------
 	// Score logic ...
@@ -507,7 +507,7 @@ static NETLIST_START(pong_schematics)
 	TTL_74153(ic_c6a, high, score1_1, high, score2_1, 32H, 64H, low)
 	TTL_74153(ic_c6b, score1_10Q, score1_2, score2_10Q, score2_2, 32H, 64H, low)
 
-	TTL_7448(ic_c5, ic_c6a.AY, ic_c6b.AY, ic_d6a.AY, ic_d6b.AY, high, c5-en, high)
+	TTL_7448(ic_c5, ic_c6a.AY, ic_c6b.AY, ic_d6a.AY, ic_d6b.AY, high, c5_en, high)
 
 	TTL_7404_INVERT(ic_e4b, 16H)
 	TTL_7427_NOR(ic_e5c, ic_e4b.Q, 8H, 4H)
@@ -592,7 +592,7 @@ public:
 	required_device<netlist_mame_logic_input_t> m_sw1a;
 	required_device<netlist_mame_logic_input_t> m_sw1b;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	//UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
@@ -677,8 +677,6 @@ static INPUT_PORTS_START( pong )
 	PORT_ADJUSTER( 50, "VR1 - 50k, Paddle 1 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr0")
 	PORT_START("VR2")
 	PORT_ADJUSTER( 50, "VR2 - 50k, Paddle 2 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr1")
-	//PORT_START("GATESPEED")
-	//PORT_ADJUSTER( 100, "Logic Gate Delay" ) PORT_MINMAX(10, 200) PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_GATEDELAY)
 
 INPUT_PORTS_END
 

@@ -52,7 +52,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 					NL_VERBOSE_OUT(("Added input\n"));
 					break;
 				default:
-					owner().netlist().xfatalerror("unhandled element found\n");
+					owner().netlist().error("unhandled element found\n");
 					break;
 			}
 		}

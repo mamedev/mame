@@ -15,7 +15,7 @@ const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 // ----------------------------------------------------------------------------------------
 
 netlist_queue_t::netlist_queue_t(netlist_base_t &nl)
-	: netlist_timed_queue<netlist_net_t, netlist_time, 512>(), pstate_callback_t(),
+	: netlist_timed_queue<netlist_net_t *, netlist_time, 512>(), pstate_callback_t(),
 		m_netlist(nl),
 		m_qsize(0)
 {  }
@@ -36,7 +36,7 @@ void netlist_queue_t::on_pre_save()
 	for (int i = 0; i < m_qsize; i++ )
 	{
 		m_times[i] =  this->listptr()[i].time().as_raw();
-		const char *p = this->listptr()[i].object().name().cstr();
+		const char *p = this->listptr()[i].object()->name().cstr();
 		int n = MIN(63, strlen(p));
 		strncpy(&(m_name[i][0]), p, n);
 		m_name[i][n] = 0;
@@ -53,7 +53,7 @@ void netlist_queue_t::on_post_load()
 		netlist_net_t *n = m_netlist.find_net(&(m_name[i][0]));
 		NL_VERBOSE_OUT(("Got %s ==> %p\n", qtemp[i].m_name, n));
 		NL_VERBOSE_OUT(("schedule time %f (%f)\n", n->time().as_double(), qtemp[i].m_time.as_double()));
-		this->push(netlist_queue_t::entry_t(netlist_time::from_raw(m_times[i]), *n));
+		this->push(netlist_queue_t::entry_t(netlist_time::from_raw(m_times[i]), n));
 	}
 }
 
@@ -82,7 +82,7 @@ ATTR_COLD void netlist_object_t::init_object(netlist_base_t &nl, const pstring &
 ATTR_COLD const pstring &netlist_object_t::name() const
 {
 	if (m_name == "")
-		netlist().xfatalerror("object not initialized");
+		netlist().error("object not initialized");
 	return m_name;
 }
 
@@ -197,12 +197,12 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
         {
             const netlist_queue_t::entry_t &e = m_queue.pop();
             m_time_ps = e.time();
-            e.object().update_devs();
+            e.object()->update_devs();
 
             add_to_stat(m_perf_out_processed, 1);
             if (FATAL_ERROR_AFTER_NS)
                 if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
-                    xfatalerror("Stopped");
+                    error("Stopped");
         }
         if (m_queue.is_empty())
             m_time_ps = m_stop;
@@ -223,7 +223,7 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
 
                 const netlist_queue_t::entry_t &e = m_queue.pop();
                 m_time_ps = e.time();
-                e.object().update_devs();
+                e.object()->update_devs();
 
             } else {
                 m_time_ps = mcQ.time();
@@ -231,14 +231,14 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time delta)
             }
             if (FATAL_ERROR_AFTER_NS)
                 if (time() > NLTIME_FROM_NS(FATAL_ERROR_AFTER_NS))
-                    xfatalerror("Stopped");
+                    error("Stopped");
 
             add_to_stat(m_perf_out_processed, 1);
         }
     }
 }
 
-ATTR_COLD void netlist_base_t::xfatalerror(const char *format, ...) const
+ATTR_COLD void netlist_base_t::error(const char *format, ...) const
 {
 	va_list ap;
 	va_start(ap, format);
@@ -273,14 +273,9 @@ ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstri
 {
 	init_object(anetlist, name);
 
-#if USE_DELEGATES
 #if USE_PMFDELEGATES
 	void (netlist_core_device_t::* pFunc)() = &netlist_core_device_t::update;
 	static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
-#else
-	static_update = net_update_delegate(&netlist_core_device_t::update, "update", this);
-	// get the pointer to the member function
-#endif
 #endif
 
 }
@@ -383,7 +378,7 @@ static void init_term(netlist_core_device_t &dev, netlist_core_terminal_t &term,
 				dynamic_cast<netlist_terminal_t &>(term).init_object(dev, dev.name() + ".INTTERM", aState);
 				break;
 			default:
-				dev.netlist().xfatalerror("Unknown terminal type");
+				dev.netlist().error("Unknown terminal type");
 				break;
 		}
 	}
@@ -455,7 +450,7 @@ ATTR_COLD void netlist_net_t::merge_net(netlist_net_t *othernet)
 		return; // Nothing to do
 
 	if (this->isRailNet() && othernet->isRailNet())
-		netlist().xfatalerror("Trying to merge to rail nets\n");
+		netlist().error("Trying to merge to rail nets\n");
 
 	if (othernet->isRailNet())
 	{
@@ -505,32 +500,31 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 	assert(m_num_cons != 0);
 
 	assert(this->isRailNet());
-	{
-		const UINT32 masks[4] = { 1, 5, 3, 1 };
-		m_cur = m_new;
-		m_in_queue = 2; /* mark as taken ... */
 
-		const UINT32 mask = masks[ (m_last.Q  << 1) | m_cur.Q ];
+	const UINT32 masks[4] = { 1, 5, 3, 1 };
+    m_cur = m_new;
+    m_in_queue = 2; /* mark as taken ... */
 
-		netlist_core_terminal_t *p = m_head;
-		switch (m_num_cons)
-		{
-		case 2:
-			update_dev(p, mask);
-			p = p->m_update_list_next;
-		case 1:
-			update_dev(p, mask);
-			break;
-		default:
-			do
-			{
-				update_dev(p, mask);
-				p = p->m_update_list_next;
-			} while (p != NULL);
-			break;
-		}
-		m_last = m_cur;
-	}
+    const UINT32 mask = masks[ (m_last.Q  << 1) | m_cur.Q ];
+
+    netlist_core_terminal_t *p = m_head;
+    switch (m_num_cons)
+    {
+    case 2:
+        update_dev(p, mask);
+        p = p->m_update_list_next;
+    case 1:
+        update_dev(p, mask);
+        break;
+    default:
+        do
+        {
+            update_dev(p, mask);
+            p = p->m_update_list_next;
+        } while (p != NULL);
+        break;
+    }
+    m_last = m_cur;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -688,7 +682,7 @@ ATTR_COLD double netlist_param_model_t::dValue(const pstring &entity, const doub
 		tmp = tmp.substr(p, pblank - p);
 		int pequal = tmp.find("=", 0);
 		if (pequal < 0)
-			netlist().xfatalerror("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
+			netlist().error("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
 		tmp = tmp.substr(pequal+1);
 		double factor = 1.0;
 		switch (*(tmp.right(1).cstr()))
@@ -716,7 +710,7 @@ ATTR_COLD double netlist_param_model_t::dValue(const pstring &entity, const doub
 
 ATTR_HOT inline void NETLIB_NAME(mainclock)::mc_update(netlist_net_t &net, const netlist_time curtime)
 {
-	net.m_new.Q = !net.m_new.Q;
+	net.m_new.Q ^= 1;
 	net.set_time(curtime);
 	net.update_devs();
 }
