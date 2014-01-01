@@ -53,12 +53,6 @@
     TODO: ports CB1 and CB2, need tracing; ports CA1 and CA2 could use verify as well
     */
 
-READ_LINE_MEMBER(beezer_state::b_via_0_ca2_r)
-{
-	return 0; // TODO: TDISP on schematic, same as D5 bit of scanline count from 74LS161 counter at 7A; attach properly
-
-}
-
 READ8_MEMBER(beezer_state::b_via_0_pa_r)
 {
 	return (m_banklatch&0x38)<<2; // return X,Y,Z bits TODO: the Z bit connects somewhere else... where?
