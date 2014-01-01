@@ -259,7 +259,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_VIA6522_READPB_HANDLER(READ8(mirage_state, mirage_via_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mirage_state, mirage_via_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mirage_state, mirage_via_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
 	MCFG_ACIA6850_ADD("acia6850", mirage_acia6850_interface)
 

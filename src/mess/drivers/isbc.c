@@ -138,6 +138,11 @@ static const serial_terminal_interface terminal_intf =
 	DEVCB_DEVICE_LINE_MEMBER("uart8251", i8251_device, write_rx)
 };
 
+static const serial_terminal_interface rpc86_terminal_intf =
+{
+	DEVCB_NULL // No UART hooked up yet
+};
+
 static const serial_terminal_interface isbc_terminal_intf =
 {
 	DEVCB_DEVICE_LINE_MEMBER("uart8274", z80dart_device, rxb_w)
@@ -314,7 +319,7 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_PIC8259_ADD("pic_0", INPUTLINE(":maincpu", 0), VCC, NULL)
 
 	/* video hardware */
-	MCFG_SERIAL_TERMINAL_ADD("terminal", terminal_intf, 300)
+	MCFG_SERIAL_TERMINAL_ADD("terminal", rpc86_terminal_intf, 300)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( isbc286, isbc_state )
