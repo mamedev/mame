@@ -572,9 +572,6 @@ READ8_MEMBER(bbc_state::bbcm_r)
 
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
-		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
-
 		myo = offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) return bbc_6845_r(space, myo-0x00);     /* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
@@ -592,8 +589,8 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x30) && (myo<=0x33)) return 0xfe;                                /* page select */
 		if ((myo>=0x34) && (myo<=0x37)) return bbcm_ACCCON_read(space, myo-0x34);   /* ACCCON */
 		if ((myo>=0x38) && (myo<=0x3f)) return 0xfe;                                /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) return via_0->read(space, myo-0x40);
-		if ((myo>=0x60) && (myo<=0x7f)) return via_1->read(space, myo-0x60);
+		if ((myo>=0x40) && (myo<=0x5f)) return m_via6522_0->read(space, myo-0x40);
+		if ((myo>=0x60) && (myo<=0x7f)) return m_via6522_1->read(space, myo-0x60);
 		if ((myo>=0x80) && (myo<=0x9f)) return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf)) return m_adlc->read(space, myo & 0x03);
 		if ((myo>=0xc0) && (myo<=0xdf)) return 0xfe;
@@ -609,9 +606,6 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 
 	if ((offset>=0x200) && (offset<=0x2ff)) /* SHEILA */
 	{
-		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
-
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x07)) bbc_6845_w(space, myo-0x00, data);           /* Video Controller */
 		if ((myo>=0x08) && (myo<=0x0f))
@@ -629,8 +623,8 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(space, myo-0x30, data);     /* page select */
 		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(space, myo-0x34, data);   /* ACCCON */
 		//if ((myo>=0x38) && (myo<=0x3f))                                           /* NC ?? */
-		if ((myo>=0x40) && (myo<=0x5f)) via_0->write(space, myo-0x40, data);
-		if ((myo>=0x60) && (myo<=0x7f)) via_1->write(space, myo-0x60, data);
+		if ((myo>=0x40) && (myo<=0x5f)) m_via6522_0->write(space, myo-0x40, data);
+		if ((myo>=0x60) && (myo<=0x7f)) m_via6522_1->write(space, myo-0x60, data);
 		//if ((myo>=0x80) && (myo<=0x9f))
 		if ((myo>=0xa0) && (myo<=0xbf)) m_adlc->write(space, myo & 0x03, data);
 		//if ((myo>=0xc0) && (myo<=0xdf))
@@ -744,7 +738,6 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 		"COL0", "COL1", "COL2", "COL3", "COL4",
 		"COL5", "COL6", "COL7", "COL8", "COL9"
 	};
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 
 	/* only do auto scan if keyboard is not enabled */
 	if (m_b3_keyboard == 1)
@@ -760,16 +753,16 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 			     being pressed on the selected m_column */
 			if ((ioport(colnames[m_column])->read() | 0x01) != 0xff)
 			{
-				via_0->write_ca2(1);
+				m_via6522_0->write_ca2(1);
 			}
 			else
 			{
-				via_0->write_ca2(0);
+				m_via6522_0->write_ca2(0);
 			}
 		}
 		else
 		{
-			via_0->write_ca2(0);
+			m_via6522_0->write_ca2(0);
 		}
 	}
 }
@@ -781,7 +774,6 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcm_keyscan)
 		"COL0", "COL1", "COL2", "COL3", "COL4",
 		"COL5", "COL6", "COL7", "COL8", "COL9"
 	};
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 
 	/* only do auto scan if keyboard is not enabled */
 	if (m_b3_keyboard == 1)
@@ -799,16 +791,16 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcm_keyscan)
 			     being pressed on the selected m_column */
 			if ((ioport(colnames[m_column])->read() | 0x01) != 0xff)
 			{
-				via_0->write_ca2(1);
+				m_via6522_0->write_ca2(1);
 			}
 			else
 			{
-				via_0->write_ca2(0);
+				m_via6522_0->write_ca2(0);
 			}
 		}
 		else
 		{
-			via_0->write_ca2(0);
+			m_via6522_0->write_ca2(0);
 		}
 	}
 }
@@ -824,7 +816,6 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 		"COL0", "COL1", "COL2", "COL3", "COL4",
 		"COL5", "COL6", "COL7", "COL8", "COL9"
 	};
-	via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
 
 	m_column = data & 0x0f;
 	row = (data>>4) & 0x07;
@@ -848,11 +839,11 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 
 	if ((res | 1) != 0xff)
 	{
-		via_0->write_ca2(1);
+		m_via6522_0->write_ca2(1);
 	}
 	else
 	{
-		via_0->write_ca2(0);
+		m_via6522_0->write_ca2(0);
 	}
 
 	return (data & 0x7f) | (bit<<7);
@@ -1154,34 +1145,6 @@ READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
 	//logerror("SYSTEM read portb %d\n",0xf | input_port(machine, "IN0") | (TMSint<<6)|(TMSrdy<<7));
 
 	return (0xf | ioport("IN0")->read() | (TMSint<<6)|(TMSrdy<<7));
-}
-
-
-/* vertical sync pulse from video circuit */
-READ_LINE_MEMBER(bbc_state::bbcb_via_system_read_ca1)
-{
-	return 0x01;
-}
-
-
-/* joystick EOC */
-READ_LINE_MEMBER(bbc_state::bbcb_via_system_read_cb1)
-{
-	return uPD7002_EOC_r(machine().device("upd7002"), generic_space(), 0);
-}
-
-
-/* keyboard pressed detect */
-READ_LINE_MEMBER(bbc_state::bbcb_via_system_read_ca2)
-{
-	return 0x01;
-}
-
-
-/* light pen strobe detect (not emulated) */
-READ_LINE_MEMBER(bbc_state::bbcb_via_system_read_cb2)
-{
-	return 0x01;
 }
 
 
@@ -2160,6 +2123,12 @@ DRIVER_INIT_MEMBER(bbc_state,bbc)
 	m_serproc_data = 0;
 	m_cass_out_enabled = 0;
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::bbc_tape_timer_cb),this));
+
+	/* vertical sync pulse from video circuit */
+	m_via6522_0->write_ca1(1);
+
+	/* light pen strobe detect (not emulated) */
+	m_via6522_0->write_cb2(1);
 }
 
 DRIVER_INIT_MEMBER(bbc_state,bbcm)
@@ -2170,6 +2139,12 @@ DRIVER_INIT_MEMBER(bbc_state,bbcm)
 	m_serproc_data = 0;
 	m_cass_out_enabled = 0;
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::bbc_tape_timer_cb),this));
+
+	/* vertical sync pulse from video circuit */
+	m_via6522_0->write_ca1(1);
+
+	/* light pen strobe detect (not emulated) */
+	m_via6522_0->write_cb2(1);
 }
 
 MACHINE_START_MEMBER(bbc_state,bbca)

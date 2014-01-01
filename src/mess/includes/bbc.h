@@ -42,6 +42,8 @@ public:
 		m_cassette(*this, "cassette"),
 		m_acia(*this, "acia6850"),
 		m_rs232(*this, RS232_TAG),
+		m_via6522_0(*this, "via6522_0"),
+		m_via6522_1(*this, "via6522_1"),
 		m_ACCCON_IRR(CLEAR_LINE),
 		m_via_system_irq(CLEAR_LINE),
 		m_via_user_irq(CLEAR_LINE),
@@ -68,6 +70,9 @@ public:
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<acia6850_device> m_acia;
 	optional_device<rs232_port_device> m_rs232;
+	required_device<via6522_device> m_via6522_0;
+	optional_device<via6522_device> m_via6522_1;
+
 
 	void check_interrupts();
 
@@ -332,10 +337,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bbcb_via_system_write_portb);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_porta);
 	DECLARE_READ8_MEMBER(bbcb_via_system_read_portb);
-	DECLARE_READ_LINE_MEMBER(bbcb_via_system_read_ca1);
-	DECLARE_READ_LINE_MEMBER(bbcb_via_system_read_cb1);
-	DECLARE_READ_LINE_MEMBER(bbcb_via_system_read_ca2);
-	DECLARE_READ_LINE_MEMBER(bbcb_via_system_read_cb2);
 	DECLARE_WRITE_LINE_MEMBER(bbcb_via_system_irq_w);
 	DECLARE_READ8_MEMBER(bbcb_via_user_read_portb);
 	DECLARE_WRITE8_MEMBER(bbcb_via_user_write_portb);
