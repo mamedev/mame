@@ -731,16 +731,6 @@ WRITE8_MEMBER( victor9k_state::via4_pb_w )
 	m_st[1] = data >> 4;
 }
 
-READ_LINE_MEMBER( victor9k_state::ds0_r )
-{
-	return m_ds0;
-}
-
-READ_LINE_MEMBER( victor9k_state::ds1_r )
-{
-	return m_ds1;
-}
-
 WRITE_LINE_MEMBER( victor9k_state::mode_w )
 {
 }
@@ -789,21 +779,6 @@ WRITE8_MEMBER( victor9k_state::via5_pb_w )
 	    PB7     WD7
 
 	*/
-}
-
-READ_LINE_MEMBER( victor9k_state::brdy_r )
-{
-	return m_brdy;
-}
-
-READ_LINE_MEMBER( victor9k_state::rdy0_r )
-{
-	return m_rdy0;
-}
-
-READ_LINE_MEMBER( victor9k_state::rdy1_r )
-{
-	return m_rdy1;
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via5_irq_w )
@@ -943,11 +918,6 @@ WRITE8_MEMBER( victor9k_state::via6_pb_w )
 	m_stp[1] = BIT(data, 7);
 }
 
-READ_LINE_MEMBER( victor9k_state::gcrerr_r )
-{
-	return m_gcrerr;
-}
-
 WRITE_LINE_MEMBER( victor9k_state::drw_w )
 {
 }
@@ -1055,6 +1025,9 @@ void victor9k_state::machine_start()
 	// memory banking
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_ram(0x00000, m_ram->size() - 1, m_ram->pointer());
+
+	m_via5->write_ca1(m_brdy);
+	m_via6->write_ca1(m_gcrerr);
 }
 
 
@@ -1130,8 +1103,6 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via3_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_4_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_READCA1_HANDLER(READLINE(victor9k_state, ds0_r))
-	MCFG_VIA6522_READCB1_HANDLER(READLINE(victor9k_state, ds1_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via4_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via4_pb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor9k_state, mode_w))
@@ -1139,16 +1110,12 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	MCFG_DEVICE_ADD(M6522_5_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_READPA_HANDLER(READ8(victor9k_state, via5_pa_r))
-	MCFG_VIA6522_READCA1_HANDLER(READLINE(victor9k_state, brdy_r))
-	MCFG_VIA6522_READCA2_HANDLER(READLINE(victor9k_state, rdy0_r))
-	MCFG_VIA6522_READCB2_HANDLER(READLINE(victor9k_state, rdy1_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via5_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via5_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_6_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_READPA_HANDLER(READ8(victor9k_state, via6_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(victor9k_state, via6_pb_r))
-	MCFG_VIA6522_READCA1_HANDLER(READLINE(victor9k_state, gcrerr_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via6_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via6_pb_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor9k_state, drw_w))
