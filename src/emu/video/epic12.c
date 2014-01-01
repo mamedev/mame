@@ -137,7 +137,8 @@ UINT64 epic12_device_blit_delay;
 inline UINT16 epic12_device::READ_NEXT_WORD(offs_t *addr)
 {
 //  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
-	UINT16 data =  use_ram[((*addr&(m_main_rammask))>>1)^3]; // this probably needs to be made endian safe tho
+	UINT16 data = use_ram[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)];
+	
 	*addr += 2;
 
 //  printf("data %04x\n", data);
@@ -147,8 +148,8 @@ inline UINT16 epic12_device::READ_NEXT_WORD(offs_t *addr)
 inline UINT16 epic12_device::COPY_NEXT_WORD(address_space &space, offs_t *addr)
 {
 //  UINT16 data = space.read_word(*addr); // going through the memory system is 'more correct' but noticably slower
-	UINT16 data =  epic12_device_ram16[((*addr&(m_main_rammask))>>1)^3]; // this probably needs to be made endian safe tho
-	epic12_device_ram16_copy[((*addr&(m_main_rammask))>>1)^3] = data;
+	UINT16 data = epic12_device_ram16[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)];
+	epic12_device_ram16_copy[((*addr & m_main_rammask) >> 1) ^ NATIVE_ENDIAN_VALUE_LE_BE(3, 0)] = data;
 
 	*addr += 2;
 
