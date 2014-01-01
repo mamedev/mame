@@ -316,10 +316,8 @@ TKG-03 and -04 boards and greatly increases the speed and amount of fireballs
 showing on all levels.  Such behavior can be seen easily on the Rivet Board,
 where most of the fireballs have appeared even before removing the first rivet.
 
-It was added to the dkong and dkongo sets initially (as dkonghrd and dkongohrd)
-as they share the same roms remaining as observed from the dumper.  Hopefully
-confirmation and information will come along later which confirms this is a
-legitimate Nintendo Kit.
+Hopefully confirmation and information will come along later which confirms
+this is a legitimate Nintendo Kit.
 
 ***************************************************************************/
 
@@ -1947,7 +1945,6 @@ ROM_START( dkonghrd )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
 	ROM_LOAD( "dk5ahard.bin", 0x3000, 0x1000, CRC(a990729b) SHA1(ebb050ce2504fe5f2bbf1fc56018f85a083fe4d0) )
-
 	/* space for diagnostic ROM */
 
 	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
@@ -1999,36 +1996,6 @@ ROM_START( dkongo )
 	ROM_LOAD( "c-2j.bpr",     0x0100, 0x0100, CRC(d6412358) SHA1(f9c872da2fe8e800574ae3bf483fb3ccacc92eb3) ) /* palette high 4 bits (inverted) */
 	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
 ROM_END
-
-ROM_START( dkongohrd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dk5ehard.bin", 0x0000, 0x1000, CRC(a9445215) SHA1(9f2ca30cc0a26f5294395c204c6213769628cdfc) )
-	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )    /* tkg3c.5g */
-	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )    /* tkg3c.5h */
-	ROM_LOAD( "dk5ahard.bin", 0x3000, 0x1000, CRC(a990729b) SHA1(ebb050ce2504fe5f2bbf1fc56018f85a083fe4d0) )
-	/* space for diagnostic ROM */
-
-	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
-	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
-	ROM_RELOAD(               0x0800, 0x0800 )
-	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "v_5h_b.bin",   0x0000, 0x0800, CRC(12c8c95d) SHA1(a57ff5a231c45252a63b354137c920a1379b70a3) )
-	ROM_LOAD( "v_3pt.bin",    0x0800, 0x0800, CRC(15e9c5e9) SHA1(976eb1e18c74018193a35aa86cff482ebfc5cc4e) )
-
-	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "l_4m_b.bin",   0x0000, 0x0800, CRC(59f8054d) SHA1(793dba9bf5a5fe76328acdfb90815c243d2a65f1) )
-	ROM_LOAD( "l_4n_b.bin",   0x0800, 0x0800, CRC(672e4714) SHA1(92e5d379f4838ac1fa44d448ce7d142dae42102f) )
-	ROM_LOAD( "l_4r_b.bin",   0x1000, 0x0800, CRC(feaa59ee) SHA1(ecf95db5a20098804fc8bd59232c66e2e0ed3db4) )
-	ROM_LOAD( "l_4s_b.bin",   0x1800, 0x0800, CRC(20f2ef7e) SHA1(3bc482a38bf579033f50082748ee95205b0f673d) )
-
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "c-2k.bpr",     0x0000, 0x0100, CRC(e273ede5) SHA1(b50ec9e1837c00c20fb2a4369ec7dd0358321127) ) /* palette low 4 bits (inverted) */
-	ROM_LOAD( "c-2j.bpr",     0x0100, 0x0100, CRC(d6412358) SHA1(f9c872da2fe8e800574ae3bf483fb3ccacc92eb3) ) /* palette high 4 bits (inverted) */
-	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
-ROM_END
-
 
 ROM_START( dkongj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3272,9 +3239,8 @@ GAME( 1980, radarscp,  0,        radarscp,  radarscp, driver_device, 0,        R
 GAME( 1980, radarscp1, radarscp, radarscp1, radarscp, driver_device, 0,        ROT90,  "Nintendo", "Radar Scope (TRS01)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, dkong,     0,        dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong (US set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkonghrd,  dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong (US set 1) with Hard Kit", GAME_SUPPORTS_SAVE )
+GAME( 1981, dkonghrd,  dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo of America", "Donkey Kong (hard kit)", GAME_SUPPORTS_SAVE ) // not sure if original or bootleg (see notes on top of driver file)
 GAME( 1981, dkongo,    dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (US set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkongohrd, dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (US set 2) with Hard Kit", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongj,    dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjo,   dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjo1,  dkong,    dkong2b,   dkong,    driver_device, 0,        ROT90,  "Nintendo", "Donkey Kong (Japan set 3)", GAME_SUPPORTS_SAVE )
