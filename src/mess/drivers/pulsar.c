@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( pulsar )
+ROM_START( pulsarlb )
 	ROM_REGION( 0x10800, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mp7a.bin", 0x10000, 0x800, CRC(726b8a19) SHA1(43b2af84d5622c1f67584c501b730acf002a6113) )
 ROM_END
@@ -309,4 +309,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1981, pulsar, 0,      0,       pulsar,    pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", GAME_NO_SOUND_HW)
+COMP( 1981, pulsarlb, 0,      0,       pulsar,    pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", GAME_NO_SOUND_HW)
