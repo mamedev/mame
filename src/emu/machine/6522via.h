@@ -31,18 +31,6 @@
 #define MCFG_VIA6522_READPB_HANDLER(_devcb) \
 	devcb = &via6522_device::set_readpb_handler(*device, DEVCB2_##_devcb);
 
-// NOT USED
-#define MCFG_VIA6522_READCA1_HANDLER(_devcb) \
-	devcb = &via6522_device::set_readca1_handler(*device, DEVCB2_##_devcb);
-
-// NOT USED
-#define MCFG_VIA6522_READCB1_HANDLER(_devcb) \
-	devcb = &via6522_device::set_readcb1_handler(*device, DEVCB2_##_devcb);
-
-// NOT USED
-#define MCFG_VIA6522_READCA2_HANDLER(_devcb) \
-	devcb = &via6522_device::set_readca2_handler(*device, DEVCB2_##_devcb);
-
 #define MCFG_VIA6522_READCB2_HANDLER(_devcb) \
 	devcb = &via6522_device::set_readcb2_handler(*device, DEVCB2_##_devcb);
 
@@ -86,9 +74,6 @@ public:
 	// TODO: REMOVE THESE
 	template<class _Object> static devcb2_base &set_readpa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_a_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_readpb_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_b_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_readca1_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_ca1_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_readcb1_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_cb1_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_readca2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_ca2_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_readcb2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_in_cb2_handler.set_callback(object); }
 
 	// TODO: CONVERT THESE TO WRITE LINE
@@ -170,9 +155,6 @@ private:
 	// TODO: REMOVE THESE
 	devcb2_read8 m_in_a_handler;
 	devcb2_read8 m_in_b_handler;
-	devcb2_read_line m_in_ca1_handler;
-	devcb2_read_line m_in_cb1_handler;
-	devcb2_read_line m_in_ca2_handler;
 	devcb2_read_line m_in_cb2_handler;
 
 	// TODO: CONVERT THESE TO WRITE LINE

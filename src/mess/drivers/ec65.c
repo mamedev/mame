@@ -33,7 +33,6 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(ec65_via_read_a);
-	DECLARE_READ_LINE_MEMBER(ec65_read_ca1);
 	DECLARE_READ8_MEMBER(ec65_via_read_b);
 	DECLARE_WRITE8_MEMBER(ec65_via_write_a);
 	DECLARE_WRITE8_MEMBER(ec65_via_write_b);
@@ -98,11 +97,6 @@ static ACIA6850_INTERFACE( ec65_acia_intf )
 READ8_MEMBER( ec65_state::ec65_via_read_a)
 {
 	return m_keyboard_input;
-}
-
-READ_LINE_MEMBER( ec65_state::ec65_read_ca1 )
-{
-	return 0;
 }
 
 READ8_MEMBER( ec65_state::ec65_via_read_b)
@@ -238,7 +232,6 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 
 	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL_4MHz / 4)
 	MCFG_VIA6522_READPA_HANDLER(READ8(ec65_state, ec65_via_read_a))
-	MCFG_VIA6522_READCA1_HANDLER(READLINE(ec65_state, ec65_read_ca1))
 
 	MCFG_DEVICE_ADD(VIA6522_1_TAG, VIA6522, XTAL_4MHz / 4)
 	MCFG_VIA6522_READPB_HANDLER(READ8(ec65_state, ec65_via_read_b))
