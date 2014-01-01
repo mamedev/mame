@@ -78,10 +78,6 @@ public:
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
 	DECLARE_READ8_MEMBER(mirage_via_read_porta);
 	DECLARE_READ8_MEMBER(mirage_via_read_portb);
-	DECLARE_READ_LINE_MEMBER(mirage_via_read_ca1);
-	DECLARE_READ_LINE_MEMBER(mirage_via_read_cb1);
-	DECLARE_READ_LINE_MEMBER(mirage_via_read_ca2);
-	DECLARE_READ_LINE_MEMBER(mirage_via_read_cb2);
 
 	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
 
@@ -238,31 +234,6 @@ READ8_MEMBER(mirage_state::mirage_via_read_portb)
 	return 0x60;
 }
 
-// external sync pulse
-READ_LINE_MEMBER(mirage_state::mirage_via_read_ca1)
-{
-	return 0;
-}
-
-// keyscan
-READ_LINE_MEMBER(mirage_state::mirage_via_read_cb1)
-{
-	return 0;
-}
-
-// keyscan
-READ_LINE_MEMBER(mirage_state::mirage_via_read_ca2)
-{
-	return 0;
-}
-
-
-// keyscan
-READ_LINE_MEMBER(mirage_state::mirage_via_read_cb2)
-{
-	return 0;
-}
-
 static ACIA6850_INTERFACE( mirage_acia6850_interface )
 {
 	0,              // tx clock
@@ -286,10 +257,6 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_DEVICE_ADD("via6522", VIA6522, 1000000)
 	MCFG_VIA6522_READPA_HANDLER(READ8(mirage_state, mirage_via_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(mirage_state, mirage_via_read_portb))
-	MCFG_VIA6522_READCA1_HANDLER(READLINE(mirage_state, mirage_via_read_ca1))
-	MCFG_VIA6522_READCB1_HANDLER(READLINE(mirage_state, mirage_via_read_cb1))
-	MCFG_VIA6522_READCA2_HANDLER(READLINE(mirage_state, mirage_via_read_ca2))
-	MCFG_VIA6522_READCB2_HANDLER(READLINE(mirage_state, mirage_via_read_cb2))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mirage_state, mirage_via_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mirage_state, mirage_via_write_portb))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
