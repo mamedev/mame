@@ -79,8 +79,6 @@
 
 class via6522_device :  public device_t
 {
-	friend class dart_channel;
-
 public:
 	// construction/destruction
 	via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -105,12 +103,6 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-
-	// TODO: REMOVE THESE
-	DECLARE_READ_LINE_MEMBER( read_ca1 ) { return m_in_ca1; }
-	DECLARE_READ_LINE_MEMBER( read_ca2 ) { return m_in_ca2; }
-	DECLARE_READ_LINE_MEMBER( read_cb1 ) { return m_in_cb1; }
-	DECLARE_READ_LINE_MEMBER( read_cb2 ) { return m_in_cb2; }
 
 	DECLARE_WRITE_LINE_MEMBER( write_pa0 ) { write_pa(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pa1 ) { write_pa(1, state); }

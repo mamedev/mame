@@ -216,8 +216,10 @@ public:
 		m_key6(*this, "KEY6"),
 		m_montype(*this, "MONTYPE"),
 		m_vram(*this,"vram"),
-		m_vram16(*this,"vram16")
-		{ }
+		m_vram16(*this,"vram16"),
+		m_via2_ca1_hack(0)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via1;
@@ -442,6 +444,8 @@ private:
 
 	// HMC for x100 PowerMacs
 	UINT64 m_hmc_reg, m_hmc_shiftout;
+
+	int m_via2_ca1_hack;
 
 public:
 	emu_timer *m_scanline_timer;

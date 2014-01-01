@@ -1844,6 +1844,7 @@ void mac_state::machine_reset()
 	}
 	else if (MAC_HAS_VIA2)  // prime CB1 for ASC and slot interrupts
 	{
+		m_via2_ca1_hack = 1;
 		m_via2->write_ca1(1);
 		m_via2->write_cb1(1);
 	}
@@ -2115,14 +2116,16 @@ void mac_state::nubus_slot_interrupt(UINT8 slot, UINT32 state)
 		if ((m_nubus_irq_state & mask) != mask)
 		{
 			// HACK: sometimes we miss an ack (possible misbehavior in the VIA?)
-			if (m_via2->read_ca1() == 0)
+			if (m_via2_ca1_hack == 0)
 			{
 				m_via2->write_ca1(1);
 			}
+			m_via2_ca1_hack = 0;
 			m_via2->write_ca1(0);
 		}
 		else
 		{
+			m_via2_ca1_hack = 1;
 			m_via2->write_ca1(1);
 		}
 	}
