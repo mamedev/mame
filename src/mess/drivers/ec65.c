@@ -28,18 +28,15 @@ class ec65_state : public driver_device
 public:
 	ec65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_via_0(*this, VIA6522_0_TAG),
-	m_p_videoram(*this, "videoram"),
+		m_via_0(*this, VIA6522_0_TAG),
+		m_via_1(*this, VIA6522_1_TAG),
+		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ8_MEMBER(ec65_via_read_a);
-	DECLARE_READ8_MEMBER(ec65_via_read_b);
-	DECLARE_WRITE8_MEMBER(ec65_via_write_a);
-	DECLARE_WRITE8_MEMBER(ec65_via_write_b);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 *m_p_chargen;
-	UINT8 m_keyboard_input;
 	optional_device<via6522_device> m_via_0;
+	optional_device<via6522_device> m_via_1;
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_reset();
 	virtual void video_start();
@@ -94,24 +91,6 @@ static ACIA6850_INTERFACE( ec65_acia_intf )
 	DEVCB_NULL
 };
 
-READ8_MEMBER( ec65_state::ec65_via_read_a)
-{
-	return m_keyboard_input;
-}
-
-READ8_MEMBER( ec65_state::ec65_via_read_b)
-{
-	return 0xff;
-}
-
-WRITE8_MEMBER( ec65_state::ec65_via_write_a )
-{
-}
-
-WRITE8_MEMBER( ec65_state::ec65_via_write_b )
-{
-}
-
 /* Input ports */
 static INPUT_PORTS_START( ec65 )
 INPUT_PORTS_END
@@ -120,7 +99,14 @@ WRITE8_MEMBER( ec65_state::kbd_put )
 {
 	if (data)
 	{
-		m_keyboard_input = data;
+		m_via_0->write_pa0((data>>0)&1);
+		m_via_0->write_pa1((data>>1)&1);
+		m_via_0->write_pa2((data>>2)&1);
+		m_via_0->write_pa3((data>>3)&1);
+		m_via_0->write_pa4((data>>4)&1);
+		m_via_0->write_pa5((data>>5)&1);
+		m_via_0->write_pa6((data>>6)&1);
+		m_via_0->write_pa7((data>>7)&1);
 		m_via_0->write_ca1(1);
 		m_via_0->write_ca1(0);
 	}
@@ -134,6 +120,14 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 void ec65_state::machine_reset()
 {
+	m_via_1->write_pb0(1);
+	m_via_1->write_pb1(1);
+	m_via_1->write_pb2(1);
+	m_via_1->write_pb3(1);
+	m_via_1->write_pb4(1);
+	m_via_1->write_pb5(1);
+	m_via_1->write_pb6(1);
+	m_via_1->write_pb7(1);
 }
 
 void ec65_state::video_start()
@@ -231,12 +225,8 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_ACIA6850_ADD(ACIA6850_TAG, ec65_acia_intf)
 
 	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL_4MHz / 4)
-	MCFG_VIA6522_READPA_HANDLER(READ8(ec65_state, ec65_via_read_a))
 
 	MCFG_DEVICE_ADD(VIA6522_1_TAG, VIA6522, XTAL_4MHz / 4)
-	MCFG_VIA6522_READPB_HANDLER(READ8(ec65_state, ec65_via_read_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(ec65_state, ec65_via_write_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(ec65_state, ec65_via_write_b))
 
 	MCFG_DEVICE_ADD(ACIA6551_TAG, MOS6551, XTAL_1_8432MHz)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)

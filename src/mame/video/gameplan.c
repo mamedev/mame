@@ -239,13 +239,6 @@ WRITE_LINE_MEMBER(gameplan_state::via_irq)
 }
 
 
-READ8_MEMBER(gameplan_state::vblank_r)
-{
-	/* this is needed for trivia quest */
-	return 0x20;
-}
-
-
 TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
 {
 	/* !VBLANK is connected to CA1 */

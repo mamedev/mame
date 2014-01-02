@@ -106,8 +106,6 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_0_out_b))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 2000000)
-	MCFG_VIA6522_READPA_HANDLER(READ8(apple3_state, apple3_via_1_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(apple3_state, apple3_via_1_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_1_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple2_via_1_irq_func))

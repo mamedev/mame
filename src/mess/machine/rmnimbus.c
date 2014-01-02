@@ -1242,6 +1242,15 @@ void rmnimbus_state::machine_reset()
 
 DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
 {
+/* USER VIA 6522 port B is connected to the BBC user port */
+	m_via->write_pb0(1);
+	m_via->write_pb1(1);
+	m_via->write_pb2(1);
+	m_via->write_pb3(1);
+	m_via->write_pb4(1);
+	m_via->write_pb5(1);
+	m_via->write_pb6(1);
+	m_via->write_pb7(1);
 }
 
 void rmnimbus_state::machine_start()
@@ -2970,11 +2979,6 @@ collector output only. It usially acts as the printer strobe line.
 ***********************************************************************/
 
 /* USER VIA 6522 port B is connected to the BBC user port */
-READ8_MEMBER(rmnimbus_state::nimbus_via_read_portb)
-{
-	return 0xff;
-}
-
 WRITE8_MEMBER(rmnimbus_state::nimbus_via_write_portb)
 {
 }

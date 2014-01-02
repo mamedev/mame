@@ -162,13 +162,6 @@ READ8_MEMBER(microtan_state::via_0_in_a)
 	return data;
 }
 
-READ8_MEMBER(microtan_state::via_0_in_b)
-{
-	int data = 0xff;
-	LOG(("microtan_via_0_in_b %02X\n", data));
-	return data;
-}
-
 WRITE8_MEMBER(microtan_state::via_0_out_a)
 {
 	LOG(("microtan_via_0_out_a %02X\n", data));
@@ -201,19 +194,6 @@ WRITE_LINE_MEMBER(microtan_state::via_0_irq)
 /**************************************************************
  * VIA callback functions for VIA #1
  **************************************************************/
-READ8_MEMBER(microtan_state::via_1_in_a)
-{
-	int data = 0xff;
-	LOG(("microtan_via_1_in_a %02X\n", data));
-	return data;
-}
-
-READ8_MEMBER(microtan_state::via_1_in_b)
-{
-	int data = 0xff;
-	LOG(("microtan_via_1_in_b %02X\n", data));
-	return data;
-}
 
 WRITE8_MEMBER(microtan_state::via_1_out_a)
 {
@@ -492,13 +472,39 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 	m_timer = timer_alloc(TIMER_READ_CASSETTE);
 
 	m_via6522_0->write_ca1(1);
-	m_via6522_0->write_cb1(1);
 	m_via6522_0->write_ca2(1);
+
+	m_via6522_0->write_pb0(1);
+	m_via6522_0->write_pb1(1);
+	m_via6522_0->write_pb2(1);
+	m_via6522_0->write_pb3(1);
+	m_via6522_0->write_pb4(1);
+	m_via6522_0->write_pb5(1);
+	m_via6522_0->write_pb6(1);
+	m_via6522_0->write_pb7(1);
+	m_via6522_0->write_cb1(1);
 	m_via6522_0->write_cb2(1);
 
+	m_via6522_1->write_pa0(1);
+	m_via6522_1->write_pa1(1);
+	m_via6522_1->write_pa2(1);
+	m_via6522_1->write_pa3(1);
+	m_via6522_1->write_pa4(1);
+	m_via6522_1->write_pa5(1);
+	m_via6522_1->write_pa6(1);
+	m_via6522_1->write_pa7(1);
 	m_via6522_1->write_ca1(1);
-	m_via6522_1->write_cb1(1);
 	m_via6522_1->write_ca2(1);
+
+	m_via6522_1->write_pb0(1);
+	m_via6522_1->write_pb1(1);
+	m_via6522_1->write_pb2(1);
+	m_via6522_1->write_pb3(1);
+	m_via6522_1->write_pb4(1);
+	m_via6522_1->write_pb5(1);
+	m_via6522_1->write_pb6(1);
+	m_via6522_1->write_pb7(1);
+	m_via6522_1->write_cb1(1);
 	m_via6522_1->write_cb2(1);
 }
 

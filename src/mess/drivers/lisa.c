@@ -173,7 +173,6 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 500000)
-	MCFG_VIA6522_READPB_HANDLER(READ8(lisa_state, COPS_via_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(lisa_state, COPS_via_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(lisa_state, COPS_via_out_b))
 	MCFG_VIA6522_CA1_HANDLER(WRITELINE(lisa_state, COPS_via_out_ca2))
@@ -181,7 +180,6 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(lisa_state, COPS_via_irq_func))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 500000)
-	MCFG_VIA6522_READPB_HANDLER(READ8(lisa_state, parallel_via_in_b))
 
 	MCFG_SCC8530_ADD("scc", 7833600, line_cb_t(FUNC(lisa_state::set_scc_interrupt), static_cast<lisa_state *>(owner)))
 MACHINE_CONFIG_END

@@ -332,7 +332,6 @@ static MACHINE_CONFIG_START( nimbus, rmnimbus_state )
 	MCFG_ER59256_ADD(ER59256_TAG)
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, 1000000)
-	MCFG_VIA6522_READPB_HANDLER(READ8(rmnimbus_state,nimbus_via_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8(CENTRONICS_TAG, centronics_device, write))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(rmnimbus_state,nimbus_via_write_portb))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))

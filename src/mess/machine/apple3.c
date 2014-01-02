@@ -249,11 +249,9 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 
 INTERRUPT_GEN_MEMBER(apple3_state::apple3_interrupt)
 {
-	via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
-
-	via_1->write_ca2((AY3600_keydata_strobe_r(machine()) & 0x80) ? 1 : 0);
-	via_1->write_cb1(machine().primary_screen->vblank());
-	via_1->write_cb2(machine().primary_screen->vblank());
+	m_via_1->write_ca2((AY3600_keydata_strobe_r(machine()) & 0x80) ? 1 : 0);
+	m_via_1->write_cb1(machine().primary_screen->vblank());
+	m_via_1->write_cb2(machine().primary_screen->vblank());
 }
 
 
@@ -444,11 +442,8 @@ void apple3_state::apple3_update_memory()
 
 	/* reinstall VIA handlers */
 	{
-		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
-
-		space.install_readwrite_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_0), write8_delegate(FUNC(via6522_device::write),via_0));
-		space.install_readwrite_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_1), write8_delegate(FUNC(via6522_device::write),via_1));
+		space.install_readwrite_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate(FUNC(via6522_device::read),m_via_0.target()), write8_delegate(FUNC(via6522_device::write),m_via_0.target()));
+		space.install_readwrite_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate(FUNC(via6522_device::read),m_via_1.target()), write8_delegate(FUNC(via6522_device::write),m_via_1.target()));
 	}
 }
 
@@ -463,10 +458,6 @@ void apple3_state::apple3_via_out(UINT8 *var, UINT8 data)
 	}
 }
 
-
-/* these are here to appease the Apple /// confidence tests */
-READ8_MEMBER(apple3_state::apple3_via_1_in_a){ return ~0; }
-READ8_MEMBER(apple3_state::apple3_via_1_in_b){ return ~0; }
 
 WRITE8_MEMBER(apple3_state::apple3_via_0_out_a)
 {
@@ -690,6 +681,26 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_0_a = ~0;
 	m_via_1_a = ~0;
 	m_via_1_irq = 0;
+
+	/* these are here to appease the Apple /// confidence tests */
+	m_via_1->write_pa0(1);
+	m_via_1->write_pa1(1);
+	m_via_1->write_pa2(1);
+	m_via_1->write_pa3(1);
+	m_via_1->write_pa4(1);
+	m_via_1->write_pa5(1);
+	m_via_1->write_pa6(1);
+	m_via_1->write_pa7(1);
+
+	m_via_1->write_pb0(1);
+	m_via_1->write_pb1(1);
+	m_via_1->write_pb2(1);
+	m_via_1->write_pb3(1);
+	m_via_1->write_pb4(1);
+	m_via_1->write_pb5(1);
+	m_via_1->write_pb6(1);
+	m_via_1->write_pb7(1);
+
 	apple3_update_memory();
 
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), this));
