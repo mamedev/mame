@@ -34,7 +34,10 @@ const device_type VIC1011 = &device_creator<vic1011_device>;
 
 static MACHINE_CONFIG_FRAGMENT( vic1011 )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, rxd_w))
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, write_rxd))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, write_dcdin))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, write_cts))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(DEVICE_SELF, vic1011_device, write_dsr))
 MACHINE_CONFIG_END
 
 
@@ -74,80 +77,43 @@ void vic1011_device::device_start()
 {
 }
 
-
-//-------------------------------------------------
-//  vic20_pb_r - port B read
-//-------------------------------------------------
-
-UINT8 vic1011_device::vic20_pb_r(address_space &space, offs_t offset)
+WRITE_LINE_MEMBER( vic1011_device::write_rxd )
 {
-	/*
-
-	    bit     description
-
-	    0       Sin
-	    1
-	    2
-	    3
-	    4       DCDin
-	    5
-	    6       CTS
-	    7       DSR
-
-	*/
-
-	UINT8 data = 0;
-
-	data |= !m_rs232->rx();
-	data |= m_rs232->dcd_r() << 4;
-	data |= m_rs232->cts_r() << 6;
-	data |= m_rs232->dsr_r() << 7;
-
-	return data;
+	m_slot->m_b_handler(!state);
+	m_slot->m_c_handler(!state);
 }
 
-
-//-------------------------------------------------
-//  vic20_pb_w - port B write
-//-------------------------------------------------
-
-void vic1011_device::vic20_pb_w(address_space &space, offs_t offset, UINT8 data)
+void vic1011_device::write_d(int state)
 {
-	/*
-
-	    bit     description
-
-	    0
-	    1       RTS
-	    2       DTR
-	    3
-	    4
-	    5       DCDout
-	    6
-	    7
-
-	*/
-
-	m_rs232->rts_w(BIT(data, 1));
-	m_rs232->dtr_w(BIT(data, 2));
+	m_rs232->rts_w(state);
 }
 
+void vic1011_device::write_e(int state)
+{
+	m_rs232->dtr_w(state);
+}
 
-//-------------------------------------------------
-//  vic20_cb2_w - CB2 write
-//-------------------------------------------------
+WRITE_LINE_MEMBER( vic1011_device::write_dcdin )
+{
+	m_slot->m_h_handler(state);
+}
 
-void vic1011_device::vic20_cb2_w(int state)
+void vic1011_device::write_j(int state)
+{
+	/// dcdout
+}
+
+WRITE_LINE_MEMBER( vic1011_device::write_cts )
+{
+	m_slot->m_k_handler(state);
+}
+
+WRITE_LINE_MEMBER( vic1011_device::write_dsr )
+{
+	m_slot->m_l_handler(state);
+}
+
+void vic1011_device::write_m(int state)
 {
 	m_rs232->tx(!state);
-}
-
-
-//-------------------------------------------------
-//  rxd_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( vic1011_device::rxd_w )
-{
-	m_slot->via_cb1_w(!state);
 }

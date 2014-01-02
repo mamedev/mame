@@ -36,16 +36,18 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	DECLARE_WRITE_LINE_MEMBER( rxd_w );
+	DECLARE_WRITE_LINE_MEMBER( write_rxd );
+	DECLARE_WRITE_LINE_MEMBER( write_d );
+	DECLARE_WRITE_LINE_MEMBER( write_e );
+	DECLARE_WRITE_LINE_MEMBER( write_dcdin );
+	DECLARE_WRITE_LINE_MEMBER( write_j );
+	DECLARE_WRITE_LINE_MEMBER( write_cts );
+	DECLARE_WRITE_LINE_MEMBER( write_dsr );
+	DECLARE_WRITE_LINE_MEMBER( write_m );
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-
-	// device_vic20_user_port_interface overrides
-	virtual UINT8 vic20_pb_r(address_space &space, offs_t offset);
-	virtual void vic20_pb_w(address_space &space, offs_t offset, UINT8 data);
-	virtual void vic20_cb2_w(int state);
 
 private:
 	required_device<rs232_port_device> m_rs232;

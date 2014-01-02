@@ -45,73 +45,127 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define VIC20_USER_PORT_INTERFACE(_name) \
-	const vic20_user_port_interface (_name) =
-
-
-#define MCFG_VIC20_USER_PORT_ADD(_tag, _config, _slot_intf, _def_slot) \
+#define MCFG_VIC20_USER_PORT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, VIC20_USER_PORT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
+#define MCFG_VIC20_USER_PORT_3_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_3_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_4_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_4_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_5_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_5_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_6_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_6_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_7_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_7_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_8_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_8_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_B_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_b_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_C_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_c_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_D_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_d_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_E_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_e_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_F_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_f_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_H_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_h_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_J_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_j_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_K_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_k_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_L_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_l_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_M_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_m_handler(*device, DEVCB2_##_devcb);
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vic20_user_port_interface
-
-struct vic20_user_port_interface
-{
-	devcb_write_line    m_out_light_pen_cb;
-	devcb_write_line    m_out_cb1_cb;
-	devcb_write_line    m_out_cb2_cb;
-	devcb_write_line    m_out_reset_cb;
-};
-
-
 // ======================> vic20_user_port_device
 
 class device_vic20_user_port_interface;
 
 class vic20_user_port_device : public device_t,
-								public vic20_user_port_interface,
-								public device_slot_interface
+	public device_slot_interface
 {
 public:
 	// construction/destruction
 	vic20_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// computer interface
-	DECLARE_READ8_MEMBER( pb_r );
-	DECLARE_WRITE8_MEMBER( pb_w );
-	DECLARE_READ_LINE_MEMBER( joy0_r );
-	DECLARE_READ_LINE_MEMBER( joy1_r );
-	DECLARE_READ_LINE_MEMBER( joy2_r );
-	DECLARE_READ_LINE_MEMBER( light_pen_r );
-	DECLARE_READ_LINE_MEMBER( cassette_switch_r );
-	DECLARE_WRITE_LINE_MEMBER( cb1_w );
-	DECLARE_WRITE_LINE_MEMBER( cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( atn_w );
-	DECLARE_WRITE_LINE_MEMBER( port_reset_w );
+	template<class _Object> static devcb2_base &set_3_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_3_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_4_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_4_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_5_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_5_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_6_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_6_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_7_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_7_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_8_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_8_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_b_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_b_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_c_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_c_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_d_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_d_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_e_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_e_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_f_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_f_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_h_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_h_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_j_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_j_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_k_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_k_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_l_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_l_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_m_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_m_handler.set_callback(object); }
 
-	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( light_pen_w ) { m_out_light_pen_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( via_cb1_w ) { m_out_cb1_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( via_cb2_w ) { m_out_cb2_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_out_reset_func(state); }
+	// computer interface
+	DECLARE_WRITE_LINE_MEMBER( write_7 );
+	DECLARE_WRITE_LINE_MEMBER( write_9 );
+	DECLARE_WRITE_LINE_MEMBER( write_b );
+	DECLARE_WRITE_LINE_MEMBER( write_c );
+	DECLARE_WRITE_LINE_MEMBER( write_d );
+	DECLARE_WRITE_LINE_MEMBER( write_e );
+	DECLARE_WRITE_LINE_MEMBER( write_f );
+	DECLARE_WRITE_LINE_MEMBER( write_h );
+	DECLARE_WRITE_LINE_MEMBER( write_j );
+	DECLARE_WRITE_LINE_MEMBER( write_k );
+	DECLARE_WRITE_LINE_MEMBER( write_l );
+	DECLARE_WRITE_LINE_MEMBER( write_m );
+
+	// device interface
+	devcb2_write_line m_3_handler;
+	devcb2_write_line m_4_handler;
+	devcb2_write_line m_5_handler;
+	devcb2_write_line m_6_handler;
+	devcb2_write_line m_7_handler;
+	devcb2_write_line m_8_handler;
+	devcb2_write_line m_b_handler;
+	devcb2_write_line m_c_handler;
+	devcb2_write_line m_d_handler;
+	devcb2_write_line m_e_handler;
+	devcb2_write_line m_f_handler;
+	devcb2_write_line m_h_handler;
+	devcb2_write_line m_j_handler;
+	devcb2_write_line m_k_handler;
+	devcb2_write_line m_l_handler;
+	devcb2_write_line m_m_handler;
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-
-	devcb_resolved_write_line   m_out_light_pen_func;
-	devcb_resolved_write_line   m_out_cb1_func;
-	devcb_resolved_write_line   m_out_cb2_func;
-	devcb_resolved_write_line   m_out_reset_func;
 
 	device_vic20_user_port_interface *m_card;
 };
@@ -123,21 +177,21 @@ protected:
 class device_vic20_user_port_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
 	device_vic20_user_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic20_user_port_interface();
 
-	virtual UINT8 vic20_pb_r(address_space &space, offs_t offset) { return 0xff; };
-	virtual void vic20_pb_w(address_space &space, offs_t offset, UINT8 data) { };
-
-	virtual int vic20_joy0_r() { return 1; };
-	virtual int vic20_joy1_r() { return 1; };
-	virtual int vic20_joy2_r() { return 1; };
-	virtual int vic20_light_pen_r() { return 1; };
-	virtual int vic20_cassette_switch_r() { return 1; };
-	virtual void vic20_cb1_w(int state) { };
-	virtual void vic20_cb2_w(int state) { };
-	virtual void vic20_atn_w(int state) { };
+	DECLARE_WRITE_LINE_MEMBER( write_7 ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_9 ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_b ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_c ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_d ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_e ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_f ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_h ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_j ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_k ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_l ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_m ) {};
 
 protected:
 	vic20_user_port_device *m_slot;
@@ -147,12 +201,6 @@ protected:
 // device type definition
 extern const device_type VIC20_USER_PORT;
 
-
-// slot devices
-#include "vic1011.h"
-
 SLOT_INTERFACE_EXTERN( vic20_user_port_cards );
-
-
 
 #endif
