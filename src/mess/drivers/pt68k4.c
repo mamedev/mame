@@ -15,7 +15,25 @@ Some pics: http://www.wormfood.net/old_computers/
 Note: bios 0 works with the terminal. When first started, press Enter
       to get the logo. Enter HE to get a list of commands. Terminate
       numeric entries with a Space (not Enter!).
-
+ 
+Chips: 
+    68230 Parallel Interface/Timer @ FE0080
+    68681 DUART/Timer (x2) @ FE0000 and FE0040
+    WD37C65 FDC @ FE0101/3/etc (compatible with PC NEC765)
+    Floppy drive select @ FE00C1: bits 0/1 drive select 0-3, bit 5 = 1 for double density, bit 6 = side select
+    MK48T02 TimeKeeper @ FF0FF1/3/5/etc.
+    Keyboard at FE01C1 (status/IRQ clear)/FE01C3 (AT scan codes)
+ 
+Video: ISA MDA or CGA-style boards
+    MDA maps VRAM at D60000, 6845 address at FA0769, 6845 data at FA076B, control latch at FA0771
+    CGA maps VRAM at D70000, 6845 address at FA07A9, 6845 data at FA07AB, control port at FA07B1, color set at FA07B3, CGA status at FA07B5
+ 
+    HUMBUG BIOS tests MDA and CGA VRAM to determine existence, falls back to serial console if neither exists.  If both exist, MDA is used.
+    VRAM is every other byte for ISA cards.  (Only 8 bit cards are supported).
+ 
+IRQs: 
+	5: keyboard has new scan code available, all others don't exist
+ 
 ****************************************************************************/
 
 #include "emu.h"
