@@ -832,7 +832,7 @@ WRITE8_MEMBER( px4_state::px4_artdor_w )
 	if (ART_TX_ENABLED && is_transmit_register_empty())
 	{
 		transmit_register_setup(m_artdor);
-		m_artsr |= ART_TXRDY;
+		m_artsr &= ~ART_TXEMPTY;
 	}
 	else
 	{
