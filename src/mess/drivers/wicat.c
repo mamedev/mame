@@ -20,7 +20,7 @@ Wicat - various systems.
 #include "video/i8275x.h"
 #include "machine/am9517a.h"
 #include "machine/x2212.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "wicat.lh"
 
 class wicat_state : public driver_device
@@ -104,7 +104,7 @@ public:
 	required_device<im6402_device> m_videouart;
 	required_device<x2210_device> m_videosram;
 	required_memory_region m_chargen;
-	required_device<fd1795_device> m_fdc;
+	required_device<fd1795_t> m_fdc;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -460,16 +460,16 @@ READ8_MEMBER(wicat_state::fdc_r)
 	switch(offset)
 	{
 	case 0x00:
-		ret = wd17xx_status_r(this,space,0);
+		ret = m_fdc->status_r(space,0);
 		break;
 	case 0x01:
-		ret = wd17xx_track_r(this,space,0);
+		ret = m_fdc->track_r(space,0);
 		break;
 	case 0x02:
-		ret = wd17xx_sector_r(this,space,0);
+		ret = m_fdc->sector_r(space,0);
 		break;
 	case 0x03:
-		ret = wd17xx_data_r(this,space,0);
+		ret = m_fdc->data_r(space,0);
 		break;
 	case 0x08:
 		// Interrupt status (TODO, not part of the FD1795)
@@ -484,16 +484,16 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 	switch(offset)
 	{
 	case 0x00:
-		wd17xx_command_w(this,space,0,data);
+		m_fdc->cmd_w(space,0,data);
 		break;
 	case 0x01:
-		wd17xx_track_w(this,space,0,data);
+		m_fdc->track_w(space,0,data);
 		break;
 	case 0x02:
-		wd17xx_sector_w(this,space,0,data);
+		m_fdc->sector_w(space,0,data);
 		break;
 	case 0x03:
-		wd17xx_data_w(this,space,0,data);
+		m_fdc->data_w(space,0,data);
 		break;
 	case 0x08:
 		// Interrupt disable / Drive select (TODO, not part of the FD1795)
@@ -941,7 +941,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_ADD("floppycpu",N8X300,XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_wd1000_mem)
 	MCFG_CPU_IO_MAP(wicat_wd1000_io)
-	MCFG_FD1795_ADD("fdc",default_wd17xx_interface_2_drives)
+	MCFG_FD1795x_ADD("fdc",XTAL_8MHz)
 
 
 MACHINE_CONFIG_END
