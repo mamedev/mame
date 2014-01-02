@@ -27,7 +27,7 @@ bitbanger_device::bitbanger_device(const machine_config &mconfig, const char *ta
 {
 	m_output_timer = NULL;
 	m_input_timer = NULL;
-	m_output_value = 0;
+	m_output_value = 1;
 	m_build_count = 0;
 	m_build_byte = 0;
 	m_idle_delay = attotime::zero;
