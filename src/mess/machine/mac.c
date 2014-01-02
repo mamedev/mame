@@ -1185,13 +1185,6 @@ READ8_MEMBER(mac_state::mac_via_in_a)
 
 	switch (m_model)
 	{
-		case MODEL_MAC_PORTABLE:
-		case MODEL_MAC_PB100:
-			#if LOG_ADB
-//          printf("Read PM data %x\n", m_pm_data_recv);
-			#endif
-			return m_pm_data_recv;
-
 		case MODEL_MAC_CLASSIC:
 		case MODEL_MAC_II:
 		case MODEL_MAC_II_FDHD:
@@ -1244,58 +1237,83 @@ READ8_MEMBER(mac_state::mac_via_in_a)
 	return 0x80;
 }
 
+READ8_MEMBER(mac_state::mac_via_in_a_pmu)
+{
+//  printf("VIA1 IN_A (PC %x)\n", m_maincpu->safe_pc());
+
+	#if LOG_ADB
+//	printf("Read PM data %x\n", m_pm_data_recv);
+	#endif
+	return m_pm_data_recv;
+}
+
 READ8_MEMBER(mac_state::mac_via_in_b)
 {
 	int val = 0;
-	// portable/PB100 is pretty different
-	if (m_model >= MODEL_MAC_PORTABLE && m_model <= MODEL_MAC_PB100)
+	/* video beam in display (! VBLANK && ! HBLANK basically) */
+	if (machine().primary_screen)
 	{
-//      printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
-		val = 0x80 | 0x04 | m_pm_ack;   // SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
+		if (machine().primary_screen->vpos() >= MAC_V_VIS)
+			val |= 0x40;
+	}
+
+	if (ADB_IS_BITBANG_CLASS)
+	{
+		val |= m_adb_state<<4;
+
+		if (!m_adb_irq_pending)
+		{
+			val |= 0x08;
+		}
+
+		val |= m_rtc->data_r();
+	}
+	else if (ADB_IS_EGRET)
+	{
+		val |= m_egret->get_xcvr_session()<<3;
+	}
+	else if (ADB_IS_CUDA)
+	{
+		val |= m_cuda->get_treq()<<3;
 	}
 	else
 	{
-		/* video beam in display (! VBLANK && ! HBLANK basically) */
-		if (machine().primary_screen)
-		{
-			if (machine().primary_screen->vpos() >= MAC_V_VIS)
-				val |= 0x40;
-		}
+		if (m_mouse_bit_y)  /* Mouse Y2 */
+			val |= 0x20;
+		if (m_mouse_bit_x)  /* Mouse X2 */
+			val |= 0x10;
+		if ((m_mouse0->read() & 0x01) == 0)
+			val |= 0x08;
 
-		if (ADB_IS_BITBANG_CLASS)
-		{
-			val |= m_adb_state<<4;
-
-			if (!m_adb_irq_pending)
-			{
-				val |= 0x08;
-			}
-
-			val |= m_rtc->data_r();
-		}
-		else if (ADB_IS_EGRET)
-		{
-			val |= m_egret->get_xcvr_session()<<3;
-		}
-		else if (ADB_IS_CUDA)
-		{
-			val |= m_cuda->get_treq()<<3;
-		}
-		else
-		{
-			if (m_mouse_bit_y)  /* Mouse Y2 */
-				val |= 0x20;
-			if (m_mouse_bit_x)  /* Mouse X2 */
-				val |= 0x10;
-			if ((m_mouse0->read() & 0x01) == 0)
-				val |= 0x08;
-
-			if (!ADB_IS_PM_CLASS)
-			{
-				val |= m_rtc->data_r();
-			}
-		}
+		val |= m_rtc->data_r();
 	}
+
+//  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
+
+	return val;
+}
+
+READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
+{
+	int val = 0;
+	// TODO: is this valid for VIA2 PMU machines?
+	/* video beam in display (! VBLANK && ! HBLANK basically) */
+	if (machine().primary_screen)
+	{
+		if (machine().primary_screen->vpos() >= MAC_V_VIS)
+			val |= 0x40;
+	}
+
+//  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
+
+	return val;
+}
+
+READ8_MEMBER(mac_state::mac_via_in_b_pmu)
+{
+	int val = 0;
+//	printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
+	val = 0x80 | 0x04 | m_pm_ack;   // SCC wait/request (bit 2 must be set at 900c1a or startup tests always fail)
 
 //  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
 
@@ -1307,15 +1325,6 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 	mac_sound_device *sound = machine().device<mac_sound_device>("custom");
 	device_t *fdc = machine().device("fdc");
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
-
-	if (ADB_IS_PM_VIA1)
-	{
-		#if LOG_ADB
-//      printf("%02x to PM\n", data);
-		#endif
-		m_pm_data_send = data;
-		return;
-	}
 
 	set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
@@ -1344,79 +1353,35 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 	}
 }
 
+WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
+{
+//  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+
+	#if LOG_ADB
+//	printf("%02x to PM\n", data);
+	#endif
+	m_pm_data_send = data;
+	return;
+}
+
 WRITE8_MEMBER(mac_state::mac_via_out_b)
 {
 	mac_sound_device *sound = machine().device<mac_sound_device>("custom");
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
-	if (ADB_IS_PM_VIA1)
-	{
-		device_t *fdc = machine().device("fdc");
-
-		sony_set_sel_line(fdc,(data & 0x20) >> 5);
-		m_drive_select = ((data & 0x10) >> 4);
-
-		if ((data & 1) && !(m_pm_req & 1))
-		{
-			#if LOG_ADB
-			printf("PM: 68k dropping /REQ\n");
-			#endif
-
-			if (m_pm_state == 0)     // do this in receive state only
-			{
-				m_pm_data_recv = 0xff;
-				m_pm_ack |= 2;
-
-				// check if length byte matches
-				if ((m_pm_dptr >= 2) && (m_pm_cmd[1] == (m_pm_dptr-2)))
-				{
-					pmu_exec();
-					#if LOG_ADB
-					printf("PMU exec: command %02x length %d\n", m_pm_cmd[0], m_pm_cmd[1]);
-					#endif
-				}
-			}
-		}
-		else if (!(data & 1) && (m_pm_req & 1))
-		{
-			if (m_pm_state == 0)
-			{
-				#if LOG_ADB
-				printf("PM: 68k asserting /REQ, clocking in byte [%d] = %02x\n", m_pm_dptr, m_pm_data_send);
-				#endif
-				m_pm_ack &= ~2; // clear, we're waiting for more bytes
-				m_pm_cmd[m_pm_dptr++] = m_pm_data_send;
-			}
-			else    // receiving, so this is different
-			{
-				m_pm_data_recv = m_pm_out[m_pm_sptr++];
-				m_pm_slen--;
-				m_pm_ack |= 2;  // raise ACK to indicate available byte
-				#if LOG_ADB
-				printf("PM: 68k asserted /REQ, sending byte %02x\n", m_pm_data_recv);
-				#endif
-
-				// another byte to send?
-				if (m_pm_slen)
-				{
-					m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-				}
-				else
-				{
-					m_pm_state = 0; // back to receive state
-					m_pmu_send_timer->adjust(attotime::never);
-				}
-			}
-		}
-
-		m_pm_req = data & 1;
-		return;
-	}
-
 	if (AUDIO_IS_CLASSIC)
 	{
 		sound->enable_sound((data & 0x80) == 0);
 	}
+
+	m_rtc->ce_w((data & 0x04)>>2);
+	m_rtc->data_w(data & 0x01);
+	m_rtc->clk_w((data >> 1) & 0x01);
+}
+
+WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
+{
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
 	// SE and Classic have SCSI enable/disable here
 	if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
@@ -1437,36 +1402,103 @@ WRITE8_MEMBER(mac_state::mac_via_out_b)
 		}
 	}
 
-	if (ADB_IS_BITBANG_CLASS)
-	{
-		mac_adb_newaction((data & 0x30) >> 4);
+	mac_adb_newaction((data & 0x30) >> 4);
 
-		m_rtc->ce_w((data & 0x04)>>2);
-		m_rtc->data_w(data & 0x01);
-		m_rtc->clk_w((data >> 1) & 0x01);
-	}
-	else if (ADB_IS_EGRET)
+	m_rtc->ce_w((data & 0x04)>>2);
+	m_rtc->data_w(data & 0x01);
+	m_rtc->clk_w((data >> 1) & 0x01);
+}
+
+WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
+{
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+
+	#if LOG_ADB
+	printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
+	#endif
+	m_egret->set_via_full((data&0x10) ? 1 : 0);
+	m_egret->set_sys_session((data&0x20) ? 1 : 0);
+}
+
+WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
+{
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+
+	#if LOG_ADB
+	printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
+	#endif
+	m_cuda->set_byteack((data&0x10) ? 1 : 0);
+	m_cuda->set_tip((data&0x20) ? 1 : 0);
+}
+
+WRITE8_MEMBER(mac_state::mac_via_out_b_via2pmu)
+{
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+}
+
+WRITE8_MEMBER(mac_state::mac_via_out_b_pmu)
+{
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+
+	device_t *fdc = machine().device("fdc");
+
+	sony_set_sel_line(fdc,(data & 0x20) >> 5);
+	m_drive_select = ((data & 0x10) >> 4);
+
+	if ((data & 1) && !(m_pm_req & 1))
 	{
 		#if LOG_ADB
-		printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
+		printf("PM: 68k dropping /REQ\n");
 		#endif
-		m_egret->set_via_full((data&0x10) ? 1 : 0);
-		m_egret->set_sys_session((data&0x20) ? 1 : 0);
+
+		if (m_pm_state == 0)     // do this in receive state only
+		{
+			m_pm_data_recv = 0xff;
+			m_pm_ack |= 2;
+
+			// check if length byte matches
+			if ((m_pm_dptr >= 2) && (m_pm_cmd[1] == (m_pm_dptr-2)))
+			{
+				pmu_exec();
+				#if LOG_ADB
+				printf("PMU exec: command %02x length %d\n", m_pm_cmd[0], m_pm_cmd[1]);
+				#endif
+			}
+		}
 	}
-	else if (ADB_IS_CUDA)
+	else if (!(data & 1) && (m_pm_req & 1))
 	{
-		#if LOG_ADB
-		printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
-		#endif
-		m_cuda->set_byteack((data&0x10) ? 1 : 0);
-		m_cuda->set_tip((data&0x20) ? 1 : 0);
+		if (m_pm_state == 0)
+		{
+			#if LOG_ADB
+			printf("PM: 68k asserting /REQ, clocking in byte [%d] = %02x\n", m_pm_dptr, m_pm_data_send);
+			#endif
+			m_pm_ack &= ~2; // clear, we're waiting for more bytes
+			m_pm_cmd[m_pm_dptr++] = m_pm_data_send;
+		}
+		else    // receiving, so this is different
+		{
+			m_pm_data_recv = m_pm_out[m_pm_sptr++];
+			m_pm_slen--;
+			m_pm_ack |= 2;  // raise ACK to indicate available byte
+			#if LOG_ADB
+			printf("PM: 68k asserted /REQ, sending byte %02x\n", m_pm_data_recv);
+			#endif
+
+			// another byte to send?
+			if (m_pm_slen)
+			{
+				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+			}
+			else
+			{
+				m_pm_state = 0; // back to receive state
+				m_pmu_send_timer->adjust(attotime::never);
+			}
+		}
 	}
-	else if (!ADB_IS_PM_CLASS)
-	{
-		m_rtc->ce_w((data & 0x04)>>2);
-		m_rtc->data_w(data & 0x01);
-		m_rtc->clk_w((data >> 1) & 0x01);
-	}
+
+	m_pm_req = data & 1;
 }
 
 WRITE_LINE_MEMBER(mac_state::mac_via_irq)
@@ -1508,7 +1540,7 @@ WRITE16_MEMBER ( mac_state::mac_via_w )
 }
 
 /* *************************************************************************
- * VIA 2 (on Mac IIs and PowerMacs)
+ * VIA 2 (on Mac IIs, PowerBooks > 100, and PowerMacs)
  * *************************************************************************/
 
 WRITE_LINE_MEMBER(mac_state::mac_via2_irq)
@@ -1549,11 +1581,8 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 READ8_MEMBER(mac_state::mac_via2_in_a)
 {
 	UINT8 result;
-	if (ADB_IS_PM_VIA2)
-	{
-		result = m_pm_data_recv;
-	}
-	else if ((m_model == MODEL_MAC_QUADRA_700) || (m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
+
+	if ((m_model == MODEL_MAC_QUADRA_700) || (m_model == MODEL_MAC_QUADRA_900) || (m_model == MODEL_MAC_QUADRA_950))
 	{
 		result = 0x80 | m_nubus_irq_state;
 	}
@@ -1565,21 +1594,14 @@ READ8_MEMBER(mac_state::mac_via2_in_a)
 	return result;
 }
 
+READ8_MEMBER(mac_state::mac_via2_in_a_pmu)
+{
+	return m_pm_data_recv;
+}
+
 READ8_MEMBER(mac_state::mac_via2_in_b)
 {
 //  logerror("VIA2 IN B (PC %x)\n", m_maincpu->safe_pc());
-
-	if (ADB_IS_PM_VIA2)
-	{
-		if (m_pm_ack == 2)
-		{
-			return 0xcf;
-		}
-		else
-		{
-			return 0xcd;
-		}
-	}
 
 	if ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_LC_II) || (m_model == MODEL_MAC_CLASSIC_II))
 	{
@@ -1594,89 +1616,103 @@ READ8_MEMBER(mac_state::mac_via2_in_b)
 	return 0xcf;        // indicate no NuBus transaction error
 }
 
+READ8_MEMBER(mac_state::mac_via2_in_b_pmu)
+{
+//  logerror("VIA2 IN B (PC %x)\n", m_maincpu->safe_pc());
+
+	if (m_pm_ack == 2)
+	{
+		return 0xcf;
+	}
+	else
+	{
+		return 0xcd;
+	}
+}
+
 WRITE8_MEMBER(mac_state::mac_via2_out_a)
 {
 //  logerror("VIA2 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
-	if (ADB_IS_PM_VIA2)
-	{
-		m_pm_data_send = data;
-		return;
-	}
+}
+
+WRITE8_MEMBER(mac_state::mac_via2_out_a_pmu)
+{
+//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+	m_pm_data_send = data;
 }
 
 WRITE8_MEMBER(mac_state::mac_via2_out_b)
 {
 //  logerror("VIA2 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
-	if (ADB_IS_PM_VIA2)
-	{
-		if ((data & 4) && !(m_pm_req & 4))
-		{
-			#if LOG_ADB
-			printf("PM: 68k dropping /REQ\n");
-			#endif
-
-			if (m_pm_state == 0)     // do this in receive state only
-			{
-				m_pm_data_recv = 0xff;
-				m_pm_ack |= 2;
-
-				// check if length byte matches
-				if ((m_pm_dptr >= 2) && (m_pm_cmd[1] == (m_pm_dptr-2)))
-				{
-					pmu_exec();
-					#if LOG_ADB
-					printf("PMU exec: command %02x length %d\n", m_pm_cmd[0], m_pm_cmd[1]);
-					#endif
-				}
-			}
-		}
-		else if (!(data & 4) && (m_pm_req & 4))
-		{
-			if (m_pm_state == 0)
-			{
-				#if LOG_ADB
-				printf("PM: 68k asserting /REQ, clocking in byte [%d] = %02x\n", m_pm_dptr, m_pm_data_send);
-				#endif
-				m_pm_ack &= ~2; // clear, we're waiting for more bytes
-				m_pm_cmd[m_pm_dptr++] = m_pm_data_send;
-			}
-			else    // receiving, so this is different
-			{
-				m_pm_data_recv = m_pm_out[m_pm_sptr++];
-				m_pm_slen--;
-				m_pm_ack |= 2;  // raise ACK to indicate available byte
-				#if LOG_ADB
-				printf("PM: 68k asserted /REQ, sending byte %02x\n", m_pm_data_recv);
-				#endif
-
-				// another byte to send?
-				if (m_pm_slen)
-				{
-					m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
-				}
-				else
-				{
-					m_pm_state = 0; // back to receive state
-					m_pmu_send_timer->adjust(attotime::never);
-				}
-			}
-		}
-
-		m_pm_req = data & 4;
-		return;
-	}
-	else
-	{
-		// chain 60.15 Hz to VIA1
-		m_via1->write_ca1(data>>7);
-	}
+	// chain 60.15 Hz to VIA1
+	m_via1->write_ca1(data>>7);
 
 	if (m_model == MODEL_MAC_II)
 	{
 		m68000_base_device *m68k = downcast<m68000_base_device *>(m_maincpu.target());
 		m68k_set_hmmu_enable(m68k, (data & 0x8) ? M68K_HMMU_DISABLE : M68K_HMMU_ENABLE_II);
 	}
+}
+
+WRITE8_MEMBER(mac_state::mac_via2_out_b_pmu)
+{
+//	logerror("VIA2 OUT B PMU: %02x (PC %x)\n", data, m_maincpu->pc());
+
+	if ((data & 4) && !(m_pm_req & 4))
+	{
+		#if LOG_ADB
+		printf("PM: 68k dropping /REQ\n");
+		#endif
+
+		if (m_pm_state == 0)     // do this in receive state only
+		{
+			m_pm_data_recv = 0xff;
+			m_pm_ack |= 2;
+
+			// check if length byte matches
+			if ((m_pm_dptr >= 2) && (m_pm_cmd[1] == (m_pm_dptr-2)))
+			{
+				pmu_exec();
+				#if LOG_ADB
+				printf("PMU exec: command %02x length %d\n", m_pm_cmd[0], m_pm_cmd[1]);
+				#endif
+			}
+		}
+	}
+	else if (!(data & 4) && (m_pm_req & 4))
+	{
+		if (m_pm_state == 0)
+		{
+			#if LOG_ADB
+			printf("PM: 68k asserting /REQ, clocking in byte [%d] = %02x\n", m_pm_dptr, m_pm_data_send);
+			#endif
+			m_pm_ack &= ~2; // clear, we're waiting for more bytes
+			m_pm_cmd[m_pm_dptr++] = m_pm_data_send;
+		}
+		else    // receiving, so this is different
+		{
+			m_pm_data_recv = m_pm_out[m_pm_sptr++];
+			m_pm_slen--;
+			m_pm_ack |= 2;  // raise ACK to indicate available byte
+			#if LOG_ADB
+			printf("PM: 68k asserted /REQ, sending byte %02x\n", m_pm_data_recv);
+			#endif
+
+			// another byte to send?
+			if (m_pm_slen)
+			{
+				m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+			}
+			else
+			{
+				m_pm_state = 0; // back to receive state
+				m_pmu_send_timer->adjust(attotime::never);
+			}
+		}
+	}
+
+	m_pm_req = data & 4;
 }
 
 // This signal is generated internally on RBV, V8, Sonora, VASP, Eagle, etc.
@@ -1704,7 +1740,6 @@ void mac_state::machine_start()
 			this->m_adb_timer->adjust(attotime::never);
 			m_pmu_int_status = 0;
 		}
-
 	}
 
 	if (machine().primary_screen)
