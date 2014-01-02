@@ -74,6 +74,8 @@
 
 #include "nld_ne555.h"
 
+#include "nld_switches.h"
+
 #include "nld_log.h"
 
 #include "nld_solver.h"

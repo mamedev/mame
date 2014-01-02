@@ -69,7 +69,9 @@ ATTR_HOT inline void netlist_matrix_solver_t::step(const netlist_time delta)
 ATTR_HOT inline void netlist_matrix_solver_t::update_inputs()
 {
 	for (dev_list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
-		p->object()->update_dev();
+	{
+        p->object()->update_dev();
+	}
 }
 
 

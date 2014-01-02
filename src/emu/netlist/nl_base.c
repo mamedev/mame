@@ -341,7 +341,7 @@ ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, const ne
 
 	setup().register_alias(alias, term.name());
 
-	if (term.isType(netlist_terminal_t::INPUT))
+	if (term.isType(netlist_terminal_t::INPUT) || term.isType(netlist_terminal_t::TERMINAL))
 		m_terminals.add(name);
 }
 

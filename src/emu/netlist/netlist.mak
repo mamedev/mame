@@ -33,6 +33,7 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/devices/nld_74153.o \
 	$(NETLISTOBJ)/devices/nld_9316.o \
 	$(NETLISTOBJ)/devices/nld_ne555.o \
+	$(NETLISTOBJ)/devices/nld_switches.o \
 	$(NETLISTOBJ)/devices/nld_legacy.o \
 	$(NETLISTOBJ)/devices/net_lib.o \
 	$(NETLISTOBJ)/devices/nld_log.o \
