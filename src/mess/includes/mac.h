@@ -27,6 +27,7 @@
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "scsi:539x_1"
 #define MAC_539X_2_TAG "scsi:539x_2"
+#define MACKBD_TAG "mackbd"
 
 // uncomment to run i8021 keyboard in orignal Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
@@ -200,7 +201,7 @@ public:
 		m_539x_1(*this, MAC_539X_1_TAG),
 		m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "scsi:ncr5380"),
-		m_mackbd(*this, MACKBD_DEFAULT_TAG),
+		m_mackbd(*this, MACKBD_TAG),
 		m_rtc(*this,"rtc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
