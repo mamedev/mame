@@ -1383,8 +1383,8 @@ void wd_fdc_t::live_run(attotime limit)
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
 			}
 
-			if(dden && (cur_live.shift_reg == 0xf57e || cur_live.shift_reg == 0xf57f)) {
-				cur_live.crc = cur_live.shift_reg == 0xf57e ? 0xef21 : 0xff00;
+			if(dden && cur_live.shift_reg == 0xf57e) {
+				cur_live.crc = 0xef21;
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;
 				if(main_state == READ_ID)
