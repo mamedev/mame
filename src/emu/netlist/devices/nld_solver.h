@@ -36,16 +36,18 @@ public:
 	ATTR_HOT void update_inputs();
 
 	ATTR_HOT inline bool is_dynamic() { return m_dynamic.count() > 0; }
+    ATTR_HOT inline bool is_timestep() { return m_steps.count() > 0; }
 
-	inline const NETLIB_NAME(solver) &owner() const;
+	ATTR_HOT inline const NETLIB_NAME(solver) &owner() const;
 
 	double m_accuracy;
 	double m_convergence_factor;
+	int m_resched_loops;
 
 private:
 	netlist_net_t::list_t m_nets;
 	dev_list_t m_dynamic;
-	dev_list_t m_inps;
+	netlist_core_terminal_t::list_t m_inps;
 	dev_list_t m_steps;
 
 	NETLIB_NAME(solver) *m_owner;
@@ -64,6 +66,7 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 		netlist_param_double_t m_sync_delay;
 		netlist_param_double_t m_accuracy;
 		netlist_param_double_t m_convergence;
+        netlist_param_int_t m_resched_loops;
 
 		netlist_time m_inc;
 		netlist_time m_last_step;
@@ -72,21 +75,25 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 		netlist_matrix_solver_t::list_t m_mat_solvers;
 public:
 
-		~NETLIB_NAME(solver)();
+		ATTR_COLD ~NETLIB_NAME(solver)();
 
 		ATTR_HOT inline void schedule();
 
 		ATTR_COLD void post_start();
+		ATTR_COLD void reset()
+		{
+		    m_last_step = netlist_time::zero;
+		}
 );
 
-inline void NETLIB_NAME(solver)::schedule()
+ATTR_HOT inline void NETLIB_NAME(solver)::schedule()
 {
 	// FIXME: time should be parameter;
 	if (!m_Q_sync.net().is_queued())
 		m_Q_sync.net().push_to_queue(m_nt_sync_delay);
 }
 
-inline const NETLIB_NAME(solver) &netlist_matrix_solver_t::owner() const
+ATTR_HOT inline const NETLIB_NAME(solver) &netlist_matrix_solver_t::owner() const
 {
 	return *m_owner;
 }

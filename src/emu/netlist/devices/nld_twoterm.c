@@ -207,6 +207,12 @@ NETLIB_START(QBJT_switch<_type>)
 	setup().connect(m_RB.m_N, m_EV);
 
 	save(NAME(m_state_on));
+
+    m_RB.set(NETLIST_GMIN, 0.0, 0.0);
+    m_RC.set(NETLIST_GMIN, 0.0, 0.0);
+
+    m_state_on = 0;
+
 }
 
 NETLIB_UPDATE(Q)

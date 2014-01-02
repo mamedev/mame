@@ -5,6 +5,7 @@
 
 #include "nl_base.h"
 #include "devices/nld_system.h"
+#include "devices/nld_solver.h"
 #include "pstring.h"
 #include "nl_util.h"
 
@@ -170,6 +171,8 @@ ATTR_COLD void netlist_base_t::reset()
 	m_queue.clear();
 	if (m_mainclock != NULL)
 		m_mainclock->m_Q.net().set_time(netlist_time::zero);
+    if (m_solver != NULL)
+        m_solver->reset();
 
 	// FIXME: some const devices rely on this
 	/* make sure params are set now .. */
@@ -429,6 +432,9 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
 	, m_in_queue(2)
 	, m_railterminal(NULL)
 {
+    m_last.Analog = -123456789.0; // set to something we will never hit.
+    m_new.Analog = 0.0;
+    m_cur.Analog = 0.0;
 };
 
 ATTR_COLD void netlist_net_t::init_object(netlist_base_t &nl, const pstring &aname)

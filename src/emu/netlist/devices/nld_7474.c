@@ -47,13 +47,13 @@ NETLIB_START(7474)
 {
 	register_sub(sub, "sub");
 
-	register_subalias("CLK",  sub.m_clk);
-	register_input("D",    m_D);
-	register_input("CLRQ", m_clrQ);
-	register_input("PREQ", m_preQ);
+	register_subalias("CLK",    sub.m_clk);
+	register_input("D",         m_D);
+	register_input("CLRQ",      m_clrQ);
+	register_input("PREQ",      m_preQ);
 
-	register_subalias("Q",   sub.m_Q);
-	register_subalias("QQ",  sub.m_QQ);
+	register_subalias("Q",      sub.m_Q);
+	register_subalias("QQ",     sub.m_QQ);
 
 }
 
@@ -64,6 +64,9 @@ NETLIB_START(7474sub)
 	register_output("Q",   m_Q);
 	register_output("QQ",  m_QQ);
 
+	m_nextD = 0;
 	m_Q.initial(1);
 	m_QQ.initial(0);
+
+	save(NAME(m_nextD));
 }

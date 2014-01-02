@@ -178,7 +178,7 @@ void netlist_mame_device_t::device_start()
 {
 	LOG_DEV_CALLS(("device_start %s\n", tag()));
 
-	printf("clock is %d\n", clock());
+	//printf("clock is %d\n", clock());
 
 	m_netlist = global_alloc_clear(netlist_mame_t(*this));
 	m_setup = global_alloc_clear(netlist_setup_t(*m_netlist));

@@ -47,8 +47,8 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 					NL_VERBOSE_OUT(("Added terminal\n"));
 					break;
 				case netlist_terminal_t::INPUT:
-					if (!m_inps.contains(&p->netdev()))
-						m_inps.add(&p->netdev());
+					if (!m_inps.contains(p))
+						m_inps.add(p);
 					NL_VERBOSE_OUT(("Added input\n"));
 					break;
 				default:
@@ -68,103 +68,85 @@ ATTR_HOT inline void netlist_matrix_solver_t::step(const netlist_time delta)
 
 ATTR_HOT inline void netlist_matrix_solver_t::update_inputs()
 {
-	for (dev_list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+	for (netlist_core_terminal_t::list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
 	{
-        p->object()->update_dev();
+	    if (p->object()->net().m_last.Analog != p->object()->net().m_cur.Analog)
+	    {
+	        p->object()->netdev().update_dev();
+	    }
 	}
+    for (netlist_core_terminal_t::list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+    {
+        p->object()->net().m_last.Analog = p->object()->net().m_cur.Analog;
+    }
+
 }
 
 
 ATTR_HOT inline bool netlist_matrix_solver_t::solve()
 {
-	bool resched = false;
+	bool resched;
+	// FIXME: There may be situations where we *could* need more than one iteration for dynamic elements
 
-	/* update all non-linear devices  */
-	for (dev_list_t::entry_t *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
-		switch (p->object()->family())
-		{
-			case netlist_device_t::DIODE:
-				static_cast<NETLIB_NAME(D) *>(p->object())->update_terminals();
-				break;
-			default:
-				p->object()->update_terminals();
-				break;
-		}
+    int  resched_cnt = (is_dynamic() ? /* 0 */ 1 : 1);
+    ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
 
-	for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
-	{
-		netlist_net_t *net = pn->object();
+    do {
+        resched = false;
+        /* update all non-linear devices  */
+        for (dev_list_t::entry_t *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
+            switch (p->object()->family())
+            {
+                case netlist_device_t::DIODE:
+                    static_cast<NETLIB_NAME(D) *>(p->object())->update_terminals();
+                    break;
+                default:
+                    p->object()->update_terminals();
+                    break;
+            }
 
-		double gtot = 0;
-		double gabs = 0;
-		double iIdr = 0;
-		const netlist_net_t::terminal_list_t &terms = net->m_terms;
-#if 1
-		switch (terms.count())
-		{
-			case 1:
-				{
-					const netlist_terminal_t *pt = terms.first()->object();
-					gtot = pt->m_gt;
-					gabs = fabs(pt->m_go);
-					iIdr = pt->m_Idr + pt->m_go * pt->m_otherterm->net().Q_Analog();
-				}
-				break;
-			case 2:
-				{
-					const netlist_terminal_t *pt1 = terms[0];
-					const netlist_terminal_t *pt2 = terms[1];
-					gtot = pt1->m_gt + pt2->m_gt;
-					gabs = fabs(pt1->m_go) + fabs(pt2->m_go);
-					iIdr = pt1->m_Idr + pt1->m_go * pt1->m_otherterm->net().Q_Analog()
-							+ pt2->m_Idr + pt2->m_go * pt2->m_otherterm->net().Q_Analog();
-				}
-				break;
-			case 3:
-				{
-					const netlist_terminal_t *pt1 = terms[0];
-					const netlist_terminal_t *pt2 = terms[1];
-					const netlist_terminal_t *pt3 = terms[2];
-					gtot = pt1->m_gt + pt2->m_gt + pt3->m_gt;
-					gabs = fabs(pt1->m_go) + fabs(pt2->m_go) + fabs(pt3->m_go);
-					iIdr = pt1->m_Idr + pt1->m_go * pt1->m_otherterm->net().Q_Analog()
-							+ pt2->m_Idr + pt2->m_go * pt2->m_otherterm->net().Q_Analog()
-							+ pt3->m_Idr + pt3->m_go * pt3->m_otherterm->net().Q_Analog();
-				}
-				break;
-			default:
-				for (netlist_net_t::terminal_list_t::entry_t *e = terms.first(); e != NULL; e = terms.next(e))
-				{
-					netlist_terminal_t *pt = e->object();
-					gtot += pt->m_gt;
-					gabs += fabs(pt->m_go);
-					iIdr += pt->m_Idr + pt->m_go * pt->m_otherterm->net().Q_Analog();
-				}
-				break;
-		}
-#else
-		for (netlist_net_t::terminal_list_t::entry_t *e = terms.first(); e != NULL; e = terms.next(e))
-		{
-			netlist_terminal_t *pt = e->object();
-			gtot += pt->m_gt;
-			gabs += fabs(pt->m_go);
-			iIdr += pt->m_Idr + pt->m_go * pt->m_otherterm->net().Q_Analog();
-		}
-#endif
-		double new_val;
-		gabs *= m_convergence_factor;
-		if (gabs > gtot)
-			new_val = (net->m_cur.Analog * gabs + iIdr) / (gtot + gabs);
-		else
-			new_val = iIdr / gtot;
+        for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+        {
+            netlist_net_t *net = pn->object();
+            const netlist_net_t::terminal_list_t &terms = net->m_terms;
 
-		if (fabs(new_val - net->m_cur.Analog) > m_accuracy)
-			resched = true;
-		net->m_cur.Analog = net->m_new.Analog = new_val;
+            double gtot = 0;
+            double gabs = 0;
+            double iIdr = 0;
+            double new_val;
 
-		NL_VERBOSE_OUT(("Info: %d\n", pn->object()->m_num_cons));
-		//NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
-	}
+            for (int i = 0; i < terms.count(); i++)
+            {
+                gtot += terms[i]->m_gt;
+                gabs += fabs(terms[i]->m_go);
+                iIdr += terms[i]->m_Idr + terms[i]->m_go * terms[i]->m_otherterm->net().Q_Analog();
+            }
+
+            gabs *= m_convergence_factor;
+            if (gabs > gtot)
+                new_val = (net->m_cur.Analog * gabs + iIdr) / (gtot + gabs);
+            else
+                new_val = iIdr / gtot;
+
+            if (fabs(new_val - net->m_cur.Analog) > m_accuracy)
+            {
+                resched = true;
+                last_resched_net = net;
+            }
+
+            net->m_cur.Analog = net->m_new.Analog = new_val;
+
+            NL_VERBOSE_OUT(("Info: %d\n", pn->object()->m_num_cons));
+            //NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
+        }
+        resched_cnt++;
+    } while ((resched && (resched_cnt < m_resched_loops)) || (resched_cnt <= 1));
+
+    if (!resched)
+        update_inputs();
+    //if (resched)
+        //printf("Resched on net %s first term %s\n", last_resched_net->name().cstr(), last_resched_net->m_terms[0]->name().cstr());
+
 	return resched;
 }
 
@@ -174,7 +156,7 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
 
 typedef netlist_net_t::list_t  *net_groups_t;
 
-static bool already_processed(net_groups_t groups, int &cur_group, netlist_net_t *net)
+ATTR_COLD static bool already_processed(net_groups_t groups, int &cur_group, netlist_net_t *net)
 {
 	if (net->isRailNet())
 		return true;
@@ -186,7 +168,7 @@ static bool already_processed(net_groups_t groups, int &cur_group, netlist_net_t
 	return false;
 }
 
-static void process_net(net_groups_t groups, int &cur_group, netlist_net_t *net)
+ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_net_t *net)
 {
 	/* add the net */
 	if (net->m_head == NULL)
@@ -219,6 +201,7 @@ NETLIB_START(solver)
 
 	register_param("ACCURACY", m_accuracy, 1e-3);
 	register_param("CONVERG", m_convergence, 0.3);
+    register_param("RESCHED_LOOPS", m_resched_loops, 15);
 
 	// internal staff
 
@@ -251,44 +234,8 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 
 }
 
-NETLIB_FUNC_VOID(solver, post_start, ())
-{
-	netlist_net_t::list_t groups[100];
-	int cur_group = -1;
-
-	SOLVER_VERBOSE_OUT(("Scanning net groups ...\n"));
-	// determine net groups
-	for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
-	{
-		if (!already_processed(groups, cur_group, pn->object()))
-		{
-			cur_group++;
-			process_net(groups, cur_group, pn->object());
-		}
-	}
-
-	// setup the solvers
-	SOLVER_VERBOSE_OUT(("Found %d net groups in %d nets\n", cur_group + 1, m_nets.count()));
-	for (int i = 0; i <= cur_group; i++)
-	{
-		netlist_matrix_solver_t *ms = new netlist_matrix_solver_t();
-		ms->m_accuracy = m_accuracy.Value();
-		ms->m_convergence_factor = m_convergence.Value();
-		ms->setup(groups[i], *this);
-		m_mat_solvers.add(ms);
-		SOLVER_VERBOSE_OUT(("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr()));
-		SOLVER_VERBOSE_OUT(("  has %s elements\n", ms->is_dynamic() ? "dynamic" : "no dynamic"));
-	}
-
-}
-
 NETLIB_UPDATE(solver)
 {
-	//m_Q.setToNoCheck(!m_Q.new_Q(), m_inc  );
-	//OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
-
-	bool resched = false;
-	int  resched_cnt = 0;
 	netlist_time now = netlist().time();
 	netlist_time delta = now - m_last_step;
 
@@ -305,30 +252,50 @@ NETLIB_UPDATE(solver)
 	bool global_resched = false;
 	for (netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
 	{
-		resched_cnt = (e->object()->is_dynamic() ? 0 : 1);
-		do {
-			resched = e->object()->solve();
-			resched_cnt++;
-		} while ((resched && (resched_cnt < 5)) || (resched_cnt <= 1));
-		global_resched = global_resched || resched;
+	    global_resched = global_resched || e->object()->solve();
 	}
-	//if (global_resched)
-	//    printf("rescheduled\n");
 	if (global_resched)
 	{
 		schedule();
 	}
 	else
 	{
-		/* update all inputs connected */
-		for (netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
-		{
-			e->object()->update_inputs();
-		}
-
 		/* step circuit */
 		if (!m_Q_step.net().is_queued())
 			m_Q_step.net().push_to_queue(m_inc);
 	}
+
+}
+
+ATTR_COLD void NETLIB_NAME(solver)::post_start()
+{
+    netlist_net_t::list_t groups[100];
+    int cur_group = -1;
+
+    SOLVER_VERBOSE_OUT(("Scanning net groups ...\n"));
+    // determine net groups
+    for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+    {
+        if (!already_processed(groups, cur_group, pn->object()))
+        {
+            cur_group++;
+            process_net(groups, cur_group, pn->object());
+        }
+    }
+
+    // setup the solvers
+    SOLVER_VERBOSE_OUT(("Found %d net groups in %d nets\n", cur_group + 1, netlist().m_nets.count()));
+    for (int i = 0; i <= cur_group; i++)
+    {
+        netlist_matrix_solver_t *ms = new netlist_matrix_solver_t();
+        ms->m_accuracy = m_accuracy.Value();
+        ms->m_convergence_factor = m_convergence.Value();
+        ms->m_resched_loops = m_resched_loops.Value();
+        ms->setup(groups[i], *this);
+        m_mat_solvers.add(ms);
+        SOLVER_VERBOSE_OUT(("%d ==> %d nets %s\n", i, groups[i].count(), groups[i].first()->object()->m_head->name().cstr()));
+        SOLVER_VERBOSE_OUT(("       has %s elements\n", ms->is_dynamic() ? "dynamic" : "no dynamic"));
+        SOLVER_VERBOSE_OUT(("       has %s elements\n", ms->is_timestep() ? "timestep" : "no timestep"));
+    }
 
 }

@@ -332,6 +332,8 @@ class netlist_core_terminal_t : public netlist_owned_object_t
 	NETLIST_PREVENT_COPYING(netlist_core_terminal_t)
 public:
 
+    typedef netlist_list_t<netlist_core_terminal_t *> list_t;
+
 	/* needed here ... */
 
 	enum state_e {
@@ -1093,8 +1095,8 @@ protected:
 			OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
 		else if (m_I.Q_Analog() < m_I.m_low_thresh_V)
 			OUTLOGIC(m_Q, 0, NLTIME_FROM_NS(1));
-		else
-			OUTLOGIC(m_Q, m_Q.net().last_Q(), NLTIME_FROM_NS(1));
+		//else
+		//	OUTLOGIC(m_Q, m_Q.net().last_Q(), NLTIME_FROM_NS(1));
 	}
 
 };
