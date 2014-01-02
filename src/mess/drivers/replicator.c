@@ -22,10 +22,19 @@ Changelog:
 
 // TODO:
 // * figure out what's wrong with the keypad inputs (interface seems to be blocked in the first screen)
-// * fix avr8 timer/counter #4 so that we get the buzzer to work
+// * fix avr8 timer/counter #0 (toggle OC0B) and #5 (overflow interrupt "Microsecond timer") so that we get the buzzer to work
 // * figure-out correct size of internal EEPROM
 // * emulate an SD Card
 // * implement avr8 WDR (watchdog reset) opcode
+
+#include "emu.h"
+#include "cpu/avr8/avr8.h"
+#include "video/hd44780.h"
+#include "rendlay.h"
+#include "debugger.h"
+#include "sound/dac.h"
+
+#define MASTER_CLOCK    16000000
 
 #define LOG_PORTS 0
 
@@ -139,15 +148,6 @@ Changelog:
 #define Z_MIN (1 << 6)
 #define Z_MAX (1 << 7)
 
-
-#include "emu.h"
-#include "cpu/avr8/avr8.h"
-#include "video/hd44780.h"
-#include "rendlay.h"
-#include "debugger.h"
-
-#define MASTER_CLOCK    16000000
-
 /****************************************************\
 * I/O devices                                        *
 \****************************************************/
@@ -158,7 +158,8 @@ public:
 	replicator_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_lcdc(*this, "hd44780")
+		m_lcdc(*this, "hd44780"),
+		m_dac(*this, "dac")
 	{
 	}
 
@@ -180,6 +181,7 @@ public:
 
 	required_device<avr8_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
+	required_device<dac_device> m_dac;
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
@@ -445,10 +447,10 @@ WRITE8_MEMBER(replicator_state::port_w)
     {
       if (data == m_port_g) break;
 
-#if LOG_PORTS
 			UINT8 old_port_g = m_port_g;
 			UINT8 changed = data ^ old_port_g;
 
+#if LOG_PORTS
       printf("[%08X] ", m_maincpu->m_shifted_pc);
 			if(changed & EX4_1280) printf("[G] EX4_1280: %s\n", data & EX4_1280 ? "HIGH" : "LOW");
 			if(changed & EX3_1280) printf("[G] EX3_1280: %s\n", data & EX3_1280 ? "HIGH" : "LOW");
@@ -456,6 +458,16 @@ WRITE8_MEMBER(replicator_state::port_w)
 			if(changed & CUTOFF_SR_CHECK) printf("[G] CUTOFF_SR_CHECK: %s\n", data & CUTOFF_SR_CHECK ? "HIGH" : "LOW");
 			if(changed & BUZZ) printf("[G] BUZZ: %s\n", data & BUZZ ? "HIGH" : "LOW");
 #endif
+
+			if(changed & BUZZ){
+      /* FIX-ME: What is the largest sample value allowed?
+         I'm using 0x3F based on what I see in src/mess/drivers/craft.c
+         But as the method is called "write_unsigned8", I guess we could have samples with values up to 0xFF, right?
+         Anyway... With the 0x3F value we'll get a sound that is not so loud, which may be less annoying... :-)
+      */
+			  UINT8 audio_sample = (data & BUZZ) ? 0x3F : 0;
+			  m_dac->write_unsigned8(audio_sample << 1);
+      }
 
 			m_port_g = data;
       break;
@@ -662,10 +674,11 @@ static MACHINE_CONFIG_START( replicator, replicator_state )
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(4, 20)
 
-  /*TODO:
-    Add sound config:
-    - A buzzer connected to the PG5 pin that is driven by Timer/Counter #4
-  */
+	/* sound hardware */
+  /* A piezo is connected to the PORT G bit 5 (OC0B pin driven by Timer/Counter #4) */
+	MCFG_SPEAKER_STANDARD_MONO("buzzer")
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(0, "buzzer", 1.00)
 
 MACHINE_CONFIG_END
 
@@ -679,4 +692,4 @@ ROM_START( replica1 )
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY          FULLNAME */
-CONS(2012, replica1,    0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", GAME_NOT_WORKING|GAME_NO_SOUND)
+CONS(2012, replica1,    0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", GAME_NOT_WORKING)
