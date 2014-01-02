@@ -54,8 +54,6 @@ public:
 	DECLARE_READ16_MEMBER(memmap_r);
 	DECLARE_WRITE16_MEMBER(memmap_w);
 	DECLARE_WRITE16_MEMBER(parallel_led_w);
-	DECLARE_READ8_MEMBER(via_a_r);
-	DECLARE_READ8_MEMBER(via_b_r);
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
 	DECLARE_READ8_MEMBER(video_r);
@@ -367,16 +365,6 @@ WRITE16_MEMBER( wicat_state::parallel_led_w )
 	output_set_value("led4",(~data) & 0x2000);
 	output_set_value("led5",(~data) & 0x4000);
 	output_set_value("led6",(~data) & 0x8000);
-}
-
-READ8_MEMBER( wicat_state::via_a_r )
-{
-	return m_portA;
-}
-
-READ8_MEMBER( wicat_state::via_b_r )
-{
-	return m_portB;
 }
 
 WRITE8_MEMBER( wicat_state::via_a_w )
@@ -868,8 +856,6 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_PROGRAM_MAP(wicat_mem)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz)
-	MCFG_VIA6522_READPA_HANDLER(READ8(wicat_state, via_a_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(wicat_state, via_b_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(wicat_state, via_a_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(wicat_state, via_b_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq1))
