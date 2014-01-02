@@ -153,6 +153,8 @@ void egret_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 					printf("EG-> VIA_DATA: %d (PC=%x)\n", (data>>5)&1, m_maincpu->pc());
 					#endif
 					via_data = (data>>5) & 1;
+					via6522_device *via1 = machine().device<via6522_device>("via6522_0");
+					via1->write_cb2(via_data);
 				}
 				if (via_clock != ((data>>4)&1))
 				{
