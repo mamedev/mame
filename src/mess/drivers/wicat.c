@@ -46,6 +46,7 @@ public:
 		, m_videouart(*this,"videouart")
 		, m_videosram(*this,"vsram")
 		, m_chargen(*this,"g2char")
+		, m_fdc(*this,"fdc")
 	{ }
 
 	DECLARE_READ16_MEMBER(invalid_r);
@@ -81,6 +82,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_cb);
 	DECLARE_READ8_MEMBER(hdc_r);
 	DECLARE_WRITE8_MEMBER(hdc_w);
+	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_WRITE_LINE_MEMBER(kb_data_ready);
 
 	required_shared_ptr<UINT8> m_vram;
@@ -101,6 +104,7 @@ public:
 	required_device<im6402_device> m_videouart;
 	required_device<x2210_device> m_videosram;
 	required_memory_region m_chargen;
+	required_device<fd1795_device> m_fdc;
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -152,8 +156,8 @@ static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 	AM_RANGE(0xf00040, 0xf0005f) AM_DEVREADWRITE8("via",via6522_device,read,write,0xff00)
 	AM_RANGE(0xf00060, 0xf0007f) AM_DEVREADWRITE8("rtc",mm58274c_device,read,write,0xff00)
 	AM_RANGE(0xf000d0, 0xf000d1) AM_WRITE(parallel_led_w)
-	AM_RANGE(0xf00180, 0xf0018f) AM_READWRITE8(hdc_r,hdc_w,0xffff)
-	// F00190 - Floppy controller
+	AM_RANGE(0xf00180, 0xf0018f) AM_READWRITE8(hdc_r,hdc_w,0xffff)  // WD1000
+	AM_RANGE(0xf00190, 0xf0019f) AM_READWRITE8(fdc_r,fdc_w,0xffff)  // FD1795
 	AM_RANGE(0xf00f00, 0xf00fff) AM_READWRITE(invalid_r,invalid_w)
 ADDRESS_MAP_END
 
@@ -180,20 +184,21 @@ static ADDRESS_MAP_START(wicat_video_io, AS_IO, 8, wicat_state)
 	AM_RANGE(0x9000,0x9fff) AM_ROM AM_REGION("g2char",0x0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(wicat_flop_mem, AS_PROGRAM, 16, wicat_state)
+static ADDRESS_MAP_START(wicat_wd1000_mem, AS_PROGRAM, 16, wicat_state)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM AM_REGION("wd3", 0x0000)
 	AM_RANGE(0x1800, 0x1fff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(wicat_flop_io, AS_IO, 8, wicat_state)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM  // left bank
-	AM_RANGE(0x0100, 0x01ff) AM_RAM  // right bank  -- one of these probably is RAM...
+static ADDRESS_MAP_START(wicat_wd1000_io, AS_IO, 8, wicat_state)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM  // left bank  - RAM
+	AM_RANGE(0x0100, 0x01ff) AM_RAM  // right bank - I/O ports (TODO)
 ADDRESS_MAP_END
 
 
 /* Input ports */
 static INPUT_PORTS_START( wicat )
 	PORT_START("kb0")
+	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(7)
 	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Retrn") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 
@@ -240,6 +245,19 @@ static INPUT_PORTS_START( wicat )
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Unknown (7F)") PORT_CODE(KEYCODE_F4)
+
+	PORT_START("kb4")
+
+	PORT_START("kb5")
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Unknown (AA)") PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Unknown (B0)") PORT_CODE(KEYCODE_F3)
+
+	PORT_START("kb6")
+
+	PORT_START("kb7")
+	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Set-up (FE)") PORT_CODE(KEYCODE_F1)
+
 INPUT_PORTS_END
 
 void wicat_state::driver_start()
@@ -312,7 +330,7 @@ void wicat_state::poll_kb()
 	UINT32 data;
 	char kbtag[8];
 
-	for(line=0;line<4;line++)
+	for(line=0;line<8;line++)
 	{
 		sprintf(kbtag,"kb%i",line);
 		data = ioport(kbtag)->read();
@@ -375,17 +393,23 @@ WRITE8_MEMBER( wicat_state::via_b_w )
 
 READ16_MEMBER( wicat_state::invalid_r )
 {
-	m68k_set_buserror_details(m_maincpu,0x300000+offset*2-2,0,m68k_get_fc(m_maincpu));
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	if(!space.debugger_access())
+	{
+		m68k_set_buserror_details(m_maincpu,0x300000+offset*2-2,0,m68k_get_fc(m_maincpu));
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	}
 	return 0xff;
 }
 
 WRITE16_MEMBER( wicat_state::invalid_w )
 {
-	m68k_set_buserror_details(m_maincpu,0x300000+offset*2-2,1,m68k_get_fc(m_maincpu));
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	if(!space.debugger_access())
+	{
+		m68k_set_buserror_details(m_maincpu,0x300000+offset*2-2,1,m68k_get_fc(m_maincpu));
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	}
 }
 
 // TODO
@@ -409,7 +433,7 @@ READ8_MEMBER(wicat_state::hdc_r)
 	case 0x00:  // Error register
 		return 0x00;
 	case 0x06:  // Status register
-		return 0x04;
+		return 0x05;
 	}
 	return 0x00;
 }
@@ -418,9 +442,61 @@ WRITE8_MEMBER(wicat_state::hdc_w)
 {
 	switch(offset)
 	{
+	case 0x01:  // Data register
+		logerror("HDC: Data %02x\n",data);
+		break;
 	case 0x06:  // Command register
 		logerror("HDC: Command %1x\n",(data & 0xf0) >> 4);
 		m_maincpu->set_input_line(M68K_IRQ_5,HOLD_LINE);
+		break;
+	}
+}
+
+READ8_MEMBER(wicat_state::fdc_r)
+{
+	UINT8 ret = 0x00;
+
+	popmessage("FDC: read offset %02x",offset);
+	switch(offset)
+	{
+	case 0x00:
+		ret = wd17xx_status_r(this,space,0);
+		break;
+	case 0x01:
+		ret = wd17xx_track_r(this,space,0);
+		break;
+	case 0x02:
+		ret = wd17xx_sector_r(this,space,0);
+		break;
+	case 0x03:
+		ret = wd17xx_data_r(this,space,0);
+		break;
+	case 0x08:
+		// Interrupt status (TODO, not part of the FD1795)
+		break;
+	}
+	return ret;
+}
+
+WRITE8_MEMBER(wicat_state::fdc_w)
+{
+	popmessage("FDC: write offset %02x data %02x",offset,data);
+	switch(offset)
+	{
+	case 0x00:
+		wd17xx_command_w(this,space,0,data);
+		break;
+	case 0x01:
+		wd17xx_track_w(this,space,0,data);
+		break;
+	case 0x02:
+		wd17xx_sector_w(this,space,0,data);
+		break;
+	case 0x03:
+		wd17xx_data_w(this,space,0,data);
+		break;
+	case 0x08:
+		// Interrupt disable / Drive select (TODO, not part of the FD1795)
 		break;
 	}
 }
@@ -861,10 +937,10 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_wicat)
 
-	/* Winchester Floppy Controller */
+	/* Winchester Disk Controller (WD1000 + FD1795) */
 	MCFG_CPU_ADD("floppycpu",N8X300,XTAL_8MHz)
-	MCFG_CPU_PROGRAM_MAP(wicat_flop_mem)
-	MCFG_CPU_IO_MAP(wicat_flop_io)
+	MCFG_CPU_PROGRAM_MAP(wicat_wd1000_mem)
+	MCFG_CPU_IO_MAP(wicat_wd1000_io)
 	MCFG_FD1795_ADD("fdc",default_wd17xx_interface_2_drives)
 
 
@@ -938,11 +1014,11 @@ ROM_START( wicat )
 	ROM_LOAD       ("ascii.chr",  0x00000, 0x0800, CRC(43e26e37) SHA1(f3d5d16040c66f0e827f72a35d4694ca62950949) )
 	ROM_LOAD       ("apl.chr",    0x00800, 0x0800, CRC(8c6d698e) SHA1(147dd9296fe2efc6140fa148a6edf673c33f9371) )
 
-	// Winchester Floppy Controller  (Signetics N8X300I + FD1795)
+	// Winchester Disk Controller  (WD1000 (comprised of an 8X300 + some WD1100-xx bits), FD1795 (FDC))
 	ROM_REGION16_BE(0x1800, "wd3", 0)
-	ROM_LOAD16_BYTE("wd3.u96",    0x00000, 0x0800, CRC(52736e61) SHA1(71c7c9170c733c483393969cb1cb3798b3eb980c) )
-	ROM_LOAD16_BYTE("wd3.u97",    0x00001, 0x0800, CRC(a66619ec) SHA1(5d091ac7c88f2f45b4a05e78bfc7a16c206b31ff) )
-	ROM_LOAD       ("wd3.u95",    0x01000, 0x0800, CRC(80bb0617) SHA1(ac0f3194fcbef77532571baa3fec78b3010528bf) )
+	ROM_LOAD16_BYTE("wd3.u96",    0x00000, 0x0800, CRC(52736e61) SHA1(71c7c9170c733c483393969cb1cb3798b3eb980c) )  // 8X300 code even
+	ROM_LOAD16_BYTE("wd3.u97",    0x00001, 0x0800, CRC(a66619ec) SHA1(5d091ac7c88f2f45b4a05e78bfc7a16c206b31ff) )  // 8X300 code odd
+	ROM_LOAD       ("wd3.u95",    0x01000, 0x0800, CRC(80bb0617) SHA1(ac0f3194fcbef77532571baa3fec78b3010528bf) )  // "Fast IO select" bytes
 ROM_END
 
 
