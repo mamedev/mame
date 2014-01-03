@@ -27,6 +27,7 @@
 #define IEC_TAG         "iec"
 #define SCREEN_TAG      "screen"
 #define CONTROL1_TAG    "joy1"
+#define VIC20_USER_PORT_TAG     "user"
 
 class vic20_state : public driver_device
 {
@@ -117,6 +118,12 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_vc20 );
 	// keyboard state
 	int m_key_col;
+	int m_light_pen;
+	int m_user_joy0;
+	int m_user_joy1;
+	int m_user_joy2;
+	int m_user_light_pen;
+	int m_user_cassette_switch;
 
 	enum
 	{
@@ -151,13 +158,6 @@ public:
 		IO2 = 6,
 		IO3 = 7
 	};
-
-	int m_light_pen;
-	int m_user_joy0;
-	int m_user_joy1;
-	int m_user_joy2;
-	int m_user_light_pen;
-	int m_user_cassette_switch;
 };
 
 #endif

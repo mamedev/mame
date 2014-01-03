@@ -591,6 +591,12 @@ void vic20_state::machine_start()
 
 	// state saving
 	save_item(NAME(m_key_col));
+	save_item(NAME(m_light_pen));
+	save_item(NAME(m_user_joy0));
+	save_item(NAME(m_user_joy1));
+	save_item(NAME(m_user_joy2));
+	save_item(NAME(m_user_light_pen));
+	save_item(NAME(m_user_cassette_switch));
 }
 
 

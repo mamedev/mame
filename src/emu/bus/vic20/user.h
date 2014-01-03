@@ -34,14 +34,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define VIC20_USER_PORT_TAG     "user"
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
@@ -66,6 +58,9 @@
 
 #define MCFG_VIC20_USER_PORT_8_HANDLER(_devcb) \
 	devcb = &vic20_user_port_device::set_8_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_VIC20_USER_PORT_9_HANDLER(_devcb) \
+	devcb = &vic20_user_port_device::set_9_handler(*device, DEVCB2_##_devcb);
 
 #define MCFG_VIC20_USER_PORT_B_HANDLER(_devcb) \
 	devcb = &vic20_user_port_device::set_b_handler(*device, DEVCB2_##_devcb);
@@ -119,6 +114,7 @@ public:
 	template<class _Object> static devcb2_base &set_6_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_6_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_7_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_7_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_8_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_8_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_9_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_9_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_b_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_b_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_c_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_c_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_d_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_d_handler.set_callback(object); }
@@ -131,7 +127,12 @@ public:
 	template<class _Object> static devcb2_base &set_m_handler(device_t &device, _Object object) { return downcast<vic20_user_port_device &>(device).m_m_handler.set_callback(object); }
 
 	// computer interface
+	DECLARE_WRITE_LINE_MEMBER( write_3 );
+	DECLARE_WRITE_LINE_MEMBER( write_4 );
+	DECLARE_WRITE_LINE_MEMBER( write_5 );
+	DECLARE_WRITE_LINE_MEMBER( write_6 );
 	DECLARE_WRITE_LINE_MEMBER( write_7 );
+	DECLARE_WRITE_LINE_MEMBER( write_8 );
 	DECLARE_WRITE_LINE_MEMBER( write_9 );
 	DECLARE_WRITE_LINE_MEMBER( write_b );
 	DECLARE_WRITE_LINE_MEMBER( write_c );
@@ -151,6 +152,7 @@ public:
 	devcb2_write_line m_6_handler;
 	devcb2_write_line m_7_handler;
 	devcb2_write_line m_8_handler;
+	devcb2_write_line m_9_handler;
 	devcb2_write_line m_b_handler;
 	devcb2_write_line m_c_handler;
 	devcb2_write_line m_d_handler;
@@ -180,7 +182,12 @@ public:
 	device_vic20_user_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic20_user_port_interface();
 
+	DECLARE_WRITE_LINE_MEMBER( write_3 ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_4 ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_5 ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_6 ) {}
 	DECLARE_WRITE_LINE_MEMBER( write_7 ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_8 ) {}
 	DECLARE_WRITE_LINE_MEMBER( write_9 ) {}
 	DECLARE_WRITE_LINE_MEMBER( write_b ) {}
 	DECLARE_WRITE_LINE_MEMBER( write_c ) {}
