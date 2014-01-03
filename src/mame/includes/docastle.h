@@ -1,3 +1,9 @@
+/***************************************************************************
+
+  Mr. Do's Castle hardware
+
+***************************************************************************/
+
 #include "sound/msm5205.h"
 
 class docastle_state : public driver_device
@@ -5,12 +11,18 @@ class docastle_state : public driver_device
 public:
 	docastle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_slave(*this, "slave"),
-		m_msm(*this, "msm"){ }
+		m_msm(*this, "msm"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram")
+	{ }
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_slave;
+	optional_device<msm5205_device> m_msm;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -27,11 +39,6 @@ public:
 	int      m_adpcm_status;
 	UINT8    m_buffer0[9];
 	UINT8    m_buffer1[9];
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_slave;
-	optional_device<msm5205_device> m_msm;
 
 	DECLARE_READ8_MEMBER(docastle_shared0_r);
 	DECLARE_READ8_MEMBER(docastle_shared1_r);

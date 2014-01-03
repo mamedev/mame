@@ -1,10 +1,8 @@
 /***************************************************************************
 
-  video.c
+  Mr. Do's Castle hardware
 
   Functions to emulate the video hardware of the machine.
-
-  (Cocktail mode implemented by Chad Hendrickson Aug 1, 1999)
 
 ***************************************************************************/
 
@@ -111,7 +109,7 @@ TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
 
 void docastle_state::video_start_common( UINT32 tile_transmask )
 {
-	m_do_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(docastle_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_do_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(docastle_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
 }
 
@@ -152,7 +150,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			 p = palette
 			 t = tile number
 
-			 */
+			*/
 
 			code = m_spriteram[offs + 3];
 			color = m_spriteram[offs + 2] & 0x0f;
@@ -178,7 +176,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			 p = palette
 			 t = tile number
 
-			 */
+			*/
 
 			code = m_spriteram[offs + 3];
 			color = m_spriteram[offs + 2] & 0x1f;
@@ -190,8 +188,8 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 		if (flip_screen())
 		{
-			sx = 240 - sx;
-			sy = 240 - sy;
+			sx = 296 - sx;
+			sy = 248 - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}

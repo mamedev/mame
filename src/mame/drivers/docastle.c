@@ -37,7 +37,7 @@ c002      DSWA
 c003      IN0
           bit 4-7 = joystick player 2
           bit 0-3 = joystick player 1
-c004      flipscreen (proper cocktail mode implemented by Chad Hendrickson Aug 1, 1999)
+c004      flipscreen
 c005      IN1
           bit 7 = START 2
           bit 6 = unused
@@ -89,7 +89,7 @@ read:
 e000-e008 data from first CPU
 c003      bit 0-3 = joystick
           bit 4-7 = ?
-c004      flipscreen (proper cocktail mode implemented by Chad Hendrickson Aug 1, 1999)
+c004      flipscreen
 c005      bit 0 = fire
           bit 1 = fire (again?!)
           bit 2 = ?
@@ -240,8 +240,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( docastle_io_map, AS_IO, 8, docastle_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_NOP // goes to CRT 46505S
-	AM_RANGE(0x02, 0x02) AM_NOP // goes to CRT 46505S
+	AM_RANGE(0x00, 0x00) AM_WRITENOP //AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x02, 0x02) AM_WRITENOP //AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
 
@@ -596,28 +596,25 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map)
 	MCFG_CPU_IO_MAP(docastle_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, irq0_line_hold)
 
 	MCFG_CPU_ADD("slave", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(docastle_state, irq0_line_hold,  8*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(docastle_state, irq0_line_hold, 8*60) // ?
 
 	MCFG_CPU_ADD("cpu3", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map3)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state,  nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
 	/* video hardware */
+	//MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, mc6845_intf)
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.60) // measured on pcb, real refresh rate should be derived from XTAL_9_828MHz, how?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 0+8, 0x110-24, 0x108, 0+32, 0xe0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 
 	MCFG_GFXDECODE(docastle)
 	MCFG_PALETTE_LENGTH(512)
-
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -642,7 +639,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( dorunrun, docastle )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dorunrun_map)
 
@@ -656,7 +652,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(idsoccer_map)
 
