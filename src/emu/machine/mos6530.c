@@ -17,7 +17,6 @@ and should be verified against real hardware.
 
 #include "emu.h"
 #include "mos6530.h"
-#include "devlegcy.h"
 
 
 /***************************************************************************
@@ -33,56 +32,100 @@ enum
 
 #define TIMER_FLAG      0x80
 
+/***************************************************************************
+    DEVICE INTERFACE
+***************************************************************************/
+
+const device_type MOS6530 = &device_creator<mos6530_device>;
+
+mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MOS6530, "MOS6530", tag, owner, clock, "mos6530", __FILE__)
+{
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mos6530_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const mos6530_interface *intf = reinterpret_cast<const mos6530_interface *>(static_config());
+	if (intf != NULL)
+			*static_cast<mos6530_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
+		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
+		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
+		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mos6530_device::device_start()
+{
+	/* set static values */
+	m_clock = clock();
+
+	/* resolve callbacks */
+	m_port[0].in_port_func.resolve(m_in_pa_cb, *this);
+	m_port[1].in_port_func.resolve(m_in_pb_cb, *this);
+	m_port[0].out_port_func.resolve(m_out_pa_cb, *this);
+	m_port[1].out_port_func.resolve(m_out_pb_cb, *this);
+
+	/* allocate timers */
+	m_timer = timer_alloc(TIMER_END_CALLBACK);
+
+	/* register for save states */
+	save_item(NAME(m_port[0].in));
+	save_item(NAME(m_port[0].out));
+	save_item(NAME(m_port[0].ddr));
+	save_item(NAME(m_port[1].in));
+	save_item(NAME(m_port[1].out));
+	save_item(NAME(m_port[1].ddr));
+
+	save_item(NAME(m_irqstate));
+	save_item(NAME(m_irqenable));
+
+	save_item(NAME(m_timershift));
+	save_item(NAME(m_timerstate));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void mos6530_device::device_reset()
+{
+	/* reset I/O states */
+	m_port[0].out = 0;
+	m_port[0].ddr = 0;
+	m_port[1].out = 0;
+	m_port[1].ddr = 0;
+
+	/* reset IRQ states */
+	m_irqenable = 0;
+	m_irqstate = TIMER_FLAG;
+	update_irqstate();
+
+	/* reset timer states */
+	m_timershift = 0;
+	m_timerstate = TIMER_IDLE;
+	m_timer->adjust(attotime::never);
+}
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-struct mos6530_port
-{
-	devcb_resolved_read8        in_port_func;
-	devcb_resolved_write8       out_port_func;
-
-	UINT8               in;
-	UINT8               out;
-	UINT8               ddr;
-};
-
-
-struct mos6530_state
-{
-	devcb_resolved_write_line   out_irq_func;
-
-	mos6530_port    port[2];
-
-	UINT8           irqstate;
-	UINT8           irqenable;
-
-	UINT8           timershift;
-	UINT8           timerstate;
-	emu_timer *     timer;
-
-	UINT32          clock;
-};
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    get_safe_token - convert a device's token
-    into a mos6530_state
--------------------------------------------------*/
-
-INLINE mos6530_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == MOS6530);
-	return (mos6530_state *)downcast<mos6530_device *>(device)->token();
-}
 
 
 /*-------------------------------------------------
@@ -90,18 +133,17 @@ INLINE mos6530_state *get_safe_token(device_t *device)
     based on interrupt enables
 -------------------------------------------------*/
 
-INLINE void update_irqstate(device_t *device)
+void mos6530_device::update_irqstate()
 {
-	mos6530_state *miot = get_safe_token(device);
-	UINT8 out = miot->port[1].out;
+	UINT8 out = m_port[1].out;
 
-	if ( miot->irqenable )
-		out = ( ( miot->irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( out & 0x7F );
+	if ( m_irqenable )
+		out = ( ( m_irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( out & 0x7F );
 
-	if (!miot->port[1].out_port_func.isnull())
-		miot->port[1].out_port_func(0, out);
+	if (!m_port[1].out_port_func.isnull())
+		m_port[1].out_port_func(0, out);
 	else
-		logerror("6530MIOT chip %s: Port B is being written to but has no handler.\n", device->tag());
+		logerror("6530MIOT chip %s: Port B is being written to but has no handler.\n", tag());
 }
 
 
@@ -109,19 +151,19 @@ INLINE void update_irqstate(device_t *device)
     get_timer - return the current timer value
 -------------------------------------------------*/
 
-INLINE UINT8 get_timer(mos6530_state *miot)
+UINT8 mos6530_device::get_timer()
 {
 	/* if idle, return 0 */
-	if (miot->timerstate == TIMER_IDLE)
+	if (m_timerstate == TIMER_IDLE)
 		return 0;
 
 	/* if counting, return the number of ticks remaining */
-	else if (miot->timerstate == TIMER_COUNTING)
-		return miot->timer->remaining().as_ticks(miot->clock) >> miot->timershift;
+	else if (m_timerstate == TIMER_COUNTING)
+		return m_timer->remaining().as_ticks(m_clock) >> m_timershift;
 
 	/* if finishing, return the number of ticks without the shift */
 	else
-		return miot->timer->remaining().as_ticks(miot->clock);
+		return m_timer->remaining().as_ticks(m_clock);
 }
 
 
@@ -134,33 +176,34 @@ INLINE UINT8 get_timer(mos6530_state *miot)
     timer
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( timer_end_callback )
+void mos6530_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	device_t *device = (device_t *)ptr;
-	mos6530_state *miot = get_safe_token(device);
-
-	assert(miot->timerstate != TIMER_IDLE);
-
-	/* if we finished counting, switch to the finishing state */
-	if (miot->timerstate == TIMER_COUNTING)
+	switch (id)
 	{
-		miot->timerstate = TIMER_FINISHING;
-		miot->timer->adjust(attotime::from_ticks(256, miot->clock));
+		// deferred reset
+		case TIMER_END_CALLBACK:
+			assert(m_timerstate != TIMER_IDLE);
 
-		/* signal timer IRQ as well */
-		miot->irqstate |= TIMER_FLAG;
-		update_irqstate(device);
-	}
+			/* if we finished counting, switch to the finishing state */
+			if (m_timerstate == TIMER_COUNTING)
+			{
+				m_timerstate = TIMER_FINISHING;
+				m_timer->adjust(attotime::from_ticks(256, m_clock));
 
-	/* if we finished finishing, switch to the idle state */
-	else if (miot->timerstate == TIMER_FINISHING)
-	{
-		miot->timerstate = TIMER_IDLE;
-		miot->timer->adjust(attotime::never);
+				/* signal timer IRQ as well */
+				m_irqstate |= TIMER_FLAG;
+				update_irqstate();
+			}
+
+			/* if we finished finishing, switch to the idle state */
+			else if (m_timerstate == TIMER_FINISHING)
+			{
+				m_timerstate = TIMER_IDLE;
+				m_timer->adjust(attotime::never);
+			}
+			break;
 	}
 }
-
-
 
 /***************************************************************************
     I/O ACCESS
@@ -170,10 +213,8 @@ static TIMER_CALLBACK( timer_end_callback )
     mos6530_w - master I/O write access
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( mos6530_w )
+WRITE8_MEMBER( mos6530_device::write )
 {
-	mos6530_state *miot = get_safe_token(device);
-
 	/* if A2 == 1, we are writing to the timer */
 	if (offset & 0x04)
 	{
@@ -182,30 +223,30 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 		INT64 target;
 
 		/* A0-A1 contain the timer divisor */
-		miot->timershift = timershift[offset & 3];
+		m_timershift = timershift[offset & 3];
 
 		/* A3 contains the timer IRQ enable */
 		if (offset & 8)
-			miot->irqenable |= TIMER_FLAG;
+			m_irqenable |= TIMER_FLAG;
 		else
-			miot->irqenable &= ~TIMER_FLAG;
+			m_irqenable &= ~TIMER_FLAG;
 
 		/* writes here clear the timer flag */
-		if (miot->timerstate != TIMER_FINISHING || get_timer(miot) != 0xff)
-			miot->irqstate &= ~TIMER_FLAG;
-		update_irqstate(device);
+		if (m_timerstate != TIMER_FINISHING || get_timer() != 0xff)
+			m_irqstate &= ~TIMER_FLAG;
+		update_irqstate();
 
 		/* update the timer */
-		miot->timerstate = TIMER_COUNTING;
-		target = curtime.as_ticks(miot->clock) + 1 + (data << miot->timershift);
-		miot->timer->adjust(attotime::from_ticks(target, miot->clock) - curtime);
+		m_timerstate = TIMER_COUNTING;
+		target = curtime.as_ticks(m_clock) + 1 + (data << m_timershift);
+		m_timer->adjust(attotime::from_ticks(target, m_clock) - curtime);
 	}
 
 	/* if A2 == 0, we are writing to the I/O section */
 	else
 	{
 		/* A1 selects the port */
-		mos6530_port *port = &miot->port[(offset >> 1) & 1];
+		mos6530_port *port = &m_port[(offset >> 1) & 1];
 
 		/* if A0 == 1, we are writing to the port's DDR */
 		if (offset & 1)
@@ -217,16 +258,16 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 			UINT8 olddata = port->out;
 			port->out = data;
 
-			if ( ( offset & 2 ) && miot->irqenable )
+			if ( ( offset & 2 ) && m_irqenable )
 			{
-				olddata = ( ( miot->irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( olddata & 0x7F );
-				data = ( ( miot->irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( data & 0x7F );
+				olddata = ( ( m_irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( olddata & 0x7F );
+				data = ( ( m_irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( data & 0x7F );
 			}
 
 			if (!port->out_port_func.isnull())
 				port->out_port_func(0, data);
 			else
-				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag(), 'A' + (offset & 1), space.machine().firstcpu->pc(), data);
+				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", tag(), 'A' + (offset & 1), space.machine().firstcpu->pc(), data);
 		}
 	}
 }
@@ -236,39 +277,38 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
     mos6530_r - master I/O read access
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( mos6530_r )
+READ8_MEMBER( mos6530_device::read )
 {
-	mos6530_state *miot = get_safe_token(device);
 	UINT8 val = 0;
 
 	/* if A2 == 1 and A0 == 1, we are reading interrupt flags */
 	if ((offset & 0x05) == 0x05)
 	{
-		val = miot->irqstate;
+		val = m_irqstate;
 	}
 
 	/* if A2 == 1 and A0 == 0, we are reading the timer */
 	else if ((offset & 0x05) == 0x04)
 	{
-		val = get_timer(miot);
+		val = get_timer();
 
 		/* A3 contains the timer IRQ enable */
 		if (offset & 8)
-			miot->irqenable |= TIMER_FLAG;
+			m_irqenable |= TIMER_FLAG;
 		else
-			miot->irqenable &= ~TIMER_FLAG;
+			m_irqenable &= ~TIMER_FLAG;
 
 		/* implicitly clears the timer flag */
-		if (miot->timerstate != TIMER_FINISHING || val != 0xff)
-			miot->irqstate &= ~TIMER_FLAG;
-		update_irqstate(device);
+		if (m_timerstate != TIMER_FINISHING || val != 0xff)
+			m_irqstate &= ~TIMER_FLAG;
+		update_irqstate();
 	}
 
 	/* if A2 == 0 and A0 == anything, we are reading from ports */
 	else
 	{
 		/* A1 selects the port */
-		mos6530_port *port = &miot->port[(offset >> 1) & 1];
+		mos6530_port *port = &m_port[(offset >> 1) & 1];
 
 		/* if A0 == 1, we are reading the port's DDR */
 		if (offset & 1)
@@ -279,8 +319,8 @@ READ8_DEVICE_HANDLER( mos6530_r )
 		{
 			UINT8   out = port->out;
 
-			if ( ( offset & 2 ) && miot->irqenable )
-				out = ( ( miot->irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( out & 0x7F );
+			if ( ( offset & 2 ) && m_irqenable )
+				out = ( ( m_irqstate & TIMER_FLAG ) ? 0x00 : 0x80 ) | ( out & 0x7F );
 
 			/* call the input callback if it exists */
 			if (!port->in_port_func.isnull())
@@ -288,7 +328,7 @@ READ8_DEVICE_HANDLER( mos6530_r )
 				port->in = port->in_port_func(0);
 			}
 			else
-				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag(), 'A' + (offset & 1), space.machine().firstcpu->pc());
+				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", tag(), 'A' + (offset & 1), space.machine().firstcpu->pc());
 
 			/* apply the DDR to the result */
 			val = (out & port->ddr) | (port->in & ~port->ddr);
@@ -303,10 +343,9 @@ READ8_DEVICE_HANDLER( mos6530_r )
     value
 -------------------------------------------------*/
 
-void mos6530_porta_in_set(device_t *device, UINT8 data, UINT8 mask)
+void mos6530_device::porta_in_set(UINT8 data, UINT8 mask)
 {
-	mos6530_state *miot = get_safe_token(device);
-	miot->port[0].in = (miot->port[0].in & ~mask) | (data & mask);
+	m_port[0].in = (m_port[0].in & ~mask) | (data & mask);
 }
 
 
@@ -315,10 +354,9 @@ void mos6530_porta_in_set(device_t *device, UINT8 data, UINT8 mask)
     value
 -------------------------------------------------*/
 
-void mos6530_portb_in_set(device_t *device, UINT8 data, UINT8 mask)
+void mos6530_device::portb_in_set(UINT8 data, UINT8 mask)
 {
-	mos6530_state *miot = get_safe_token(device);
-	miot->port[1].in = (miot->port[1].in & ~mask) | (data & mask);
+	m_port[1].in = (m_port[1].in & ~mask) | (data & mask);
 }
 
 
@@ -327,10 +365,9 @@ void mos6530_portb_in_set(device_t *device, UINT8 data, UINT8 mask)
     value
 -------------------------------------------------*/
 
-UINT8 mos6530_porta_in_get(device_t *device)
+UINT8 mos6530_device::porta_in_get()
 {
-	mos6530_state *miot = get_safe_token(device);
-	return miot->port[0].in;
+	return m_port[0].in;
 }
 
 
@@ -339,10 +376,9 @@ UINT8 mos6530_porta_in_get(device_t *device)
     value
 -------------------------------------------------*/
 
-UINT8 mos6530_portb_in_get(device_t *device)
+UINT8 mos6530_device::portb_in_get()
 {
-	mos6530_state *miot = get_safe_token(device);
-	return miot->port[1].in;
+	return m_port[1].in;
 }
 
 
@@ -351,10 +387,9 @@ UINT8 mos6530_portb_in_get(device_t *device)
     value
 -------------------------------------------------*/
 
-UINT8 mos6530_porta_out_get(device_t *device)
+UINT8 mos6530_device::porta_out_get()
 {
-	mos6530_state *miot = get_safe_token(device);
-	return miot->port[0].out;
+	return m_port[0].out;
 }
 
 
@@ -363,108 +398,7 @@ UINT8 mos6530_porta_out_get(device_t *device)
     value
 -------------------------------------------------*/
 
-UINT8 mos6530_portb_out_get(device_t *device)
+UINT8 mos6530_device::portb_out_get()
 {
-	mos6530_state *miot = get_safe_token(device);
-	return miot->port[1].out;
-}
-
-
-/***************************************************************************
-    DEVICE INTERFACE
-***************************************************************************/
-
-static DEVICE_START( mos6530 )
-{
-	mos6530_state *miot = get_safe_token(device);
-	const mos6530_interface *intf = (const mos6530_interface*)device->static_config();
-
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag() != NULL);
-
-	/* set static values */
-	miot->clock = device->clock();
-
-	/* resolve callbacks */
-	miot->port[0].in_port_func.resolve(intf->in_pa_func, *device);
-	miot->port[1].in_port_func.resolve(intf->in_pb_func, *device);
-	miot->port[0].out_port_func.resolve(intf->out_pa_func, *device);
-	miot->port[1].out_port_func.resolve(intf->out_pb_func, *device);
-
-	/* allocate timers */
-	miot->timer = device->machine().scheduler().timer_alloc(FUNC(timer_end_callback), (void *)device);
-
-	/* register for save states */
-	device->save_item(NAME(miot->port[0].in));
-	device->save_item(NAME(miot->port[0].out));
-	device->save_item(NAME(miot->port[0].ddr));
-	device->save_item(NAME(miot->port[1].in));
-	device->save_item(NAME(miot->port[1].out));
-	device->save_item(NAME(miot->port[1].ddr));
-
-	device->save_item(NAME(miot->irqstate));
-	device->save_item(NAME(miot->irqenable));
-
-	device->save_item(NAME(miot->timershift));
-	device->save_item(NAME(miot->timerstate));
-}
-
-
-static DEVICE_RESET( mos6530 )
-{
-	mos6530_state *miot = get_safe_token(device);
-
-	/* reset I/O states */
-	miot->port[0].out = 0;
-	miot->port[0].ddr = 0;
-	miot->port[1].out = 0;
-	miot->port[1].ddr = 0;
-
-	/* reset IRQ states */
-	miot->irqenable = 0;
-	miot->irqstate = TIMER_FLAG;
-	update_irqstate(device);
-
-	/* reset timer states */
-	miot->timershift = 0;
-	miot->timerstate = TIMER_IDLE;
-	miot->timer->adjust(attotime::never);
-}
-
-
-const device_type MOS6530 = &device_creator<mos6530_device>;
-
-mos6530_device::mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS6530, "MOS6530", tag, owner, clock, "mos6530", __FILE__)
-{
-	m_token = global_alloc_clear(mos6530_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mos6530_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void mos6530_device::device_start()
-{
-	DEVICE_START_NAME( mos6530 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void mos6530_device::device_reset()
-{
-	DEVICE_RESET_NAME( mos6530 )(this);
+	return m_port[1].out;
 }
