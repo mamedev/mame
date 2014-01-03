@@ -152,6 +152,7 @@ Touchscreen
  - Used for mmmbanc, needs SH3 serial support.
 
 Remaining Video issues
+ - measure h/v video timing
  - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
  - is the use of the 'scroll' registers 100% correct? (related to above?)
  - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
@@ -215,11 +216,13 @@ public:
     DECLARE_DRIVER_INIT(espgal2);
 };
 
-/***************************************************************************
-                                Video Hardware
-***************************************************************************/
+
+#define MASTER_CLOCK  XTAL_12_8MHz
+#define CPU_CLOCK     (MASTER_CLOCK * 8)
 
 
+
+/**************************************************************************/
 
 UINT32 cv1k_state::screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -402,10 +405,6 @@ INPUT_PORTS_END
 
 
 
-#define CAVE_CPU_CLOCK 12800000 * 8
-#define CAVE_CPU_CLOCK_D 166666666
-
-
 // none of this is verified
 // (the sh3 is different to the sh4 anyway, should be changed)
 static const struct sh4_config sh4cpu_config = {
@@ -418,7 +417,7 @@ static const struct sh4_config sh4cpu_config = {
 	1,
 	1, // md7 (master?)
 	0,
-	CAVE_CPU_CLOCK // influences music sequencing in ddpdfk at least
+	CPU_CLOCK // influences music sequencing in ddpdfk at least
 };
 
 
@@ -439,7 +438,7 @@ MACHINE_RESET_MEMBER( cv1k_state, cv1k )
 
 static MACHINE_CONFIG_START( cv1k, cv1k_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH3BE, CAVE_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", SH3BE, CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(cv1k_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
@@ -462,7 +461,7 @@ static MACHINE_CONFIG_START( cv1k, cv1k_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cv1k_state, cv1k)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YMZ770_ADD("ymz770", 16384000)
+	MCFG_YMZ770_ADD("ymz770", XTAL_16_384MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -473,7 +472,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cv1k_d, cv1k )
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", SH3BE, CAVE_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", SH3BE, CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(cv1k_d_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
