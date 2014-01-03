@@ -35,10 +35,29 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS6529_ADD(_tag, _read, _write) \
-	MCFG_DEVICE_ADD(_tag, MOS6529, 0) \
-	downcast<mos6529_device *>(device)->set_callbacks(DEVCB2_##_read, DEVCB2_##_write);
+#define MCFG_MOS6529_P0_HANDLER(_devcb) \
+	devcb = &mos6529_device::set_p0_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_MOS6529_P1_HANDLER(_devcb) \
+	devcb = &mos6529_device::set_p1_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_MOS6529_P2_HANDLER(_devcb) \
+	devcb = &mos6529_device::set_p2_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_MOS6529_P3_HANDLER(_devcb) \
+	devcb = &mos6529_device::set_p3_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_MOS6529_P4_HANDLER(_devcb) \
+	devcb = &mos6529_device::set_p4_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_MOS6529_P5_HANDLER(_devcb) \
+	devcb = &mos6529_device::set_p5_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_MOS6529_P6_HANDLER(_devcb) \
+	devcb = &mos6529_device::set_p6_handler(*device, DEVCB2_##_devcb);
+
+#define MCFG_MOS6529_P7_HANDLER(_devcb) \
+	devcb = &mos6529_device::set_p7_handler(*device, DEVCB2_##_devcb);
 
 
 //**************************************************************************
@@ -53,27 +72,45 @@ public:
 	// construction/destruction
 	mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
-		m_read_port.set_callback(rd);
-		m_write_port.set_callback(wr);
-	}
+	template<class _Object> static devcb2_base &set_p0_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p0_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_p1_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p1_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_p2_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p2_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_p3_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p3_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_p4_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p4_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_p5_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p5_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_p6_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p6_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_p7_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p7_handler.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( write_p0 ) { if (state) m_input |= 1; else m_input &= ~1; }
+	DECLARE_WRITE_LINE_MEMBER( write_p1 ) { if (state) m_input |= 2; else m_input &= ~2; }
+	DECLARE_WRITE_LINE_MEMBER( write_p2 ) { if (state) m_input |= 4; else m_input &= ~4; }
+	DECLARE_WRITE_LINE_MEMBER( write_p3 ) { if (state) m_input |= 8; else m_input &= ~8; }
+	DECLARE_WRITE_LINE_MEMBER( write_p4 ) { if (state) m_input |= 16; else m_input &= ~16; }
+	DECLARE_WRITE_LINE_MEMBER( write_p5 ) { if (state) m_input |= 32; else m_input &= ~32; }
+	DECLARE_WRITE_LINE_MEMBER( write_p6 ) { if (state) m_input |= 64; else m_input &= ~64; }
+	DECLARE_WRITE_LINE_MEMBER( write_p7 ) { if (state) m_input |= 128; else m_input &= ~128; }
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 
-private:
-	devcb2_read8  m_read_port;
-	devcb2_write8 m_write_port;
+	UINT8 m_input;
+
+	devcb2_write_line m_p0_handler;
+	devcb2_write_line m_p1_handler;
+	devcb2_write_line m_p2_handler;
+	devcb2_write_line m_p3_handler;
+	devcb2_write_line m_p4_handler;
+	devcb2_write_line m_p5_handler;
+	devcb2_write_line m_p6_handler;
+	devcb2_write_line m_p7_handler;
 };
 
 
 // device type definition
 extern const device_type MOS6529;
-
-
 
 #endif

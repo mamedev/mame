@@ -26,7 +26,7 @@
 // ======================> diag264_user_port_loopback_device
 
 class diag264_user_port_loopback_device :  public device_t,
-											public device_plus4_user_port_interface
+	public device_plus4_user_port_interface
 {
 public:
 	// construction/destruction
@@ -37,27 +37,26 @@ protected:
 	virtual void device_start();
 
 	// device_plus4_user_port_interface overrides
-	virtual UINT8 plus4_p_r() { logerror("P read %02x\n", ((m_p << 4) & 0xf0) | (m_p >> 4)); return ((m_p << 4) & 0xf0) | (m_p >> 4); }
-	virtual void plus4_p_w(UINT8 data) { logerror("P write %02x\n", data); m_p = data; }
-	virtual int plus4_rxd_r() { return m_txd; }
-	virtual int plus4_dcd_r() { return m_dtr; }
-	virtual int plus4_dsr_r() { return m_rts; }
-	virtual void plus4_txd_w(int state) { m_txd = state; }
-	virtual void plus4_dtr_w(int state) { m_dtr = state; }
-	virtual void plus4_rts_w(int state) { m_rts = state; }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_b) { m_slot->m_6_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_k) { m_slot->m_7_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_4) { m_slot->m_j_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_5) { m_slot->m_f_handler(state); }
 
-private:
-	UINT8 m_p;
+	virtual DECLARE_WRITE_LINE_MEMBER(write_6) { m_slot->m_b_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_7) { m_slot->m_k_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_j) { m_slot->m_4_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_f) { m_slot->m_5_handler(state); }
 
-	int m_txd;
-	int m_rts;
-	int m_dtr;
+	//virtual DECLARE_WRITE_LINE_MEMBER(write_c) { m_slot->m_m_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_d) { m_slot->m_l_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(write_e) { m_slot->m_h_handler(state); }
+
+	virtual DECLARE_WRITE_LINE_MEMBER(write_m) { m_slot->m_c_handler(state); }
+	//virtual DECLARE_WRITE_LINE_MEMBER(write_l) { m_slot->m_d_handler(state); }
+	//virtual DECLARE_WRITE_LINE_MEMBER(write_h) { m_slot->m_e_handler(state); }
 };
-
 
 // device type definition
 extern const device_type DIAG264_USER_PORT_LOOPBACK;
-
-
 
 #endif
