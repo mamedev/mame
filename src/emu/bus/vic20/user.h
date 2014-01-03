@@ -175,30 +175,48 @@ protected:
 
 // ======================> device_vic20_user_port_interface
 
-// class representing interface-specific live vic20_expansion card
+// class representing interface-specific vic20_expansion card
 class device_vic20_user_port_interface : public device_slot_card_interface
 {
 public:
 	device_vic20_user_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic20_user_port_interface();
 
-	DECLARE_WRITE_LINE_MEMBER( write_3 ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_4 ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_5 ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_6 ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_7 ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_8 ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_9 ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_b ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_c ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_d ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_e ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_f ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_h ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_j ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_k ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_l ) {}
-	DECLARE_WRITE_LINE_MEMBER( write_m ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_3 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_4 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_5 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_6 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_7 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_8 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_9 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_b ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_c ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_d ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_e ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_f ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_h ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_j ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_k ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_l ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) {}
+
+	DECLARE_WRITE_LINE_MEMBER( output_3 ) { m_slot->m_3_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_4 ) { m_slot->m_4_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_5 ) { m_slot->m_5_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_6 ) { m_slot->m_6_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_7 ) { m_slot->m_7_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_8 ) { m_slot->m_8_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_9 ) { m_slot->m_9_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_b ) { m_slot->m_b_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_c ) { m_slot->m_c_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_d ) { m_slot->m_d_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_e ) { m_slot->m_e_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_f ) { m_slot->m_f_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_h ) { m_slot->m_h_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_j ) { m_slot->m_j_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_k ) { m_slot->m_k_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_l ) { m_slot->m_l_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER( output_m ) { m_slot->m_m_handler(state); }
 
 protected:
 	vic20_user_port_device *m_slot;

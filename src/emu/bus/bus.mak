@@ -147,14 +147,12 @@ BUSOBJS += $(BUSOBJ)/c64/westermann.o
 BUSOBJS += $(BUSOBJ)/c64/xl80.o
 BUSOBJS += $(BUSOBJ)/c64/zaxxon.o
 BUSOBJS += $(BUSOBJ)/c64/user.o
-BUSOBJS += $(BUSOBJ)/c64/4cga.o
 BUSOBJS += $(BUSOBJ)/c64/4dxh.o
 BUSOBJS += $(BUSOBJ)/c64/4ksa.o
 BUSOBJS += $(BUSOBJ)/c64/4tba.o
 BUSOBJS += $(BUSOBJ)/c64/16kb.o
 BUSOBJS += $(BUSOBJ)/c64/bn1541.o
 BUSOBJS += $(BUSOBJ)/c64/geocable.o
-BUSOBJS += $(BUSOBJ)/c64/vic1011.o
 endif
 
 
@@ -426,6 +424,7 @@ BUSOBJS += $(BUSOBJ)/vic20/vic1111.o
 BUSOBJS += $(BUSOBJ)/vic20/vic1112.o
 BUSOBJS += $(BUSOBJ)/vic20/vic1210.o
 BUSOBJS += $(BUSOBJ)/vic20/user.o
+BUSOBJS += $(BUSOBJ)/vic20/4cga.o
 BUSOBJS += $(BUSOBJ)/vic20/vic1011.o
 endif
 

@@ -139,23 +139,23 @@ void vic20_user_port_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER( vic20_user_port_device::write_3 ) { if (m_card != NULL) m_card->write_3(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_4 ) { if (m_card != NULL) m_card->write_4(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_5 ) { if (m_card != NULL) m_card->write_5(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_6 ) { if (m_card != NULL) m_card->write_6(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_7 ) { if (m_card != NULL) m_card->write_7(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_8 ) { if (m_card != NULL) m_card->write_8(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_9 ) { if (m_card != NULL) m_card->write_9(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_b ) { if (m_card != NULL) m_card->write_b(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_c ) { if (m_card != NULL) m_card->write_c(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_d ) { if (m_card != NULL) m_card->write_d(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_e ) { if (m_card != NULL) m_card->write_e(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_f ) { if (m_card != NULL) m_card->write_f(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_h ) { if (m_card != NULL) m_card->write_h(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_j ) { if (m_card != NULL) m_card->write_j(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_k ) { if (m_card != NULL) m_card->write_k(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_l ) { if (m_card != NULL) m_card->write_l(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::write_m ) { if (m_card != NULL) m_card->write_m(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_3 ) { if (m_card != NULL) m_card->input_3(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_4 ) { if (m_card != NULL) m_card->input_4(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_5 ) { if (m_card != NULL) m_card->input_5(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_6 ) { if (m_card != NULL) m_card->input_6(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_7 ) { if (m_card != NULL) m_card->input_7(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_8 ) { if (m_card != NULL) m_card->input_8(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_9 ) { if (m_card != NULL) m_card->input_9(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_b ) { if (m_card != NULL) m_card->input_b(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_c ) { if (m_card != NULL) m_card->input_c(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_d ) { if (m_card != NULL) m_card->input_d(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_e ) { if (m_card != NULL) m_card->input_e(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_f ) { if (m_card != NULL) m_card->input_f(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_h ) { if (m_card != NULL) m_card->input_h(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_j ) { if (m_card != NULL) m_card->input_j(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_k ) { if (m_card != NULL) m_card->input_k(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_l ) { if (m_card != NULL) m_card->input_l(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_m ) { if (m_card != NULL) m_card->input_m(state); }
 
 
 
@@ -164,8 +164,10 @@ WRITE_LINE_MEMBER( vic20_user_port_device::write_m ) { if (m_card != NULL) m_car
 //-------------------------------------------------
 
 // slot devices
+#include "4cga.h"
 #include "vic1011.h"
 
 SLOT_INTERFACE_START( vic20_user_port_cards )
+	SLOT_INTERFACE("4cga", C64_4CGA)
 	SLOT_INTERFACE("rs232", VIC1011)
 SLOT_INTERFACE_END
