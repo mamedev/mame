@@ -672,23 +672,6 @@ WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 	awp_draw_reel(5);
 }
 
-
-static const duartn68681_config bfm_sc4_duart68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(sc4_state, bfm_sc4_duart_irq_handler),
-	DEVCB_DRIVER_LINE_MEMBER(sc4_state, bfm_sc4_duart_txa),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(sc4_state, bfm_sc4_duart_input_r),
-	DEVCB_DRIVER_MEMBER(sc4_state, bfm_sc4_duart_output_w),
-	// TODO: What are the actual frequencies?
-	XTAL_16MHz/2/8,     /* IP2/RxCB clock */
-	XTAL_16MHz/2/16,    /* IP3/TxCA clock */
-	XTAL_16MHz/2/16,    /* IP4/RxCA clock */
-	XTAL_16MHz/2/8,     /* IP5/TxCB clock */
-};
-
-
-
 void m68307_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
 	sc4_state *drvstate = device->machine().driver_data<sc4_state>();
@@ -758,7 +741,12 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_DUARTN68681_ADD("duart68681", 16000000/4, bfm_sc4_duart68681_config) // ?? Mhz
+	MCFG_DUARTN68681_ADD("duart68681", 16000000/4) // ?? Mhz
+	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(XTAL_16MHz/2/8, XTAL_16MHz/2/16, XTAL_16MHz/2/16, XTAL_16MHz/2/8)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(sc4_state, bfm_sc4_duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(sc4_state, bfm_sc4_duart_txa))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(sc4_state, bfm_sc4_duart_input_r))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(sc4_state, bfm_sc4_duart_output_w))
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 

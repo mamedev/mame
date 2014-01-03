@@ -957,16 +957,6 @@ WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
 	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
 };
 
-static const duartn68681_config maygayv1_duart68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(maygayv1_state, duart_irq_handler),
-	DEVCB_DRIVER_LINE_MEMBER(maygayv1_state, duart_txa),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 READ8_MEMBER(maygayv1_state::data_to_i8031)
 {
 	return m_d68681_val;
@@ -1061,8 +1051,9 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_DUARTN68681_ADD("duart68681", DUART_CLOCK, maygayv1_duart68681_config)
-
+	MCFG_DUARTN68681_ADD("duart68681", DUART_CLOCK)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

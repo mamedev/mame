@@ -2,30 +2,32 @@
 #define _N68681_H
 
 
-#define MCFG_DUARTN68681_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, DUARTN68681, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_DUARTN68681_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, DUARTN68681, _clock)
 
-#define MCFG_DUARTN68681_REPLACE(_tag, _clock, _config) \
-	MCFG_DEVICE_REPLACE(_tag, DUARTN68681, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_DUARTN68681_REPLACE(_tag, _clock) \
+	MCFG_DEVICE_REPLACE(_tag, DUARTN68681, _clock)
 
-#define MCFG_DUART68681_CHANNEL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DUART68681CHANNEL, 0)
+#define MCFG_DUARTN68681_IRQ_CALLBACK(_cb) \
+	downcast<duartn68681_device *>(device)->set_irq_cb(DEVCB2_##_cb);
+
+#define MCFG_DUARTN68681_A_TX_CALLBACK(_cb) \
+	downcast<duartn68681_device *>(device)->set_a_tx_cb(DEVCB2_##_cb);
+
+#define MCFG_DUARTN68681_B_TX_CALLBACK(_cb) \
+	downcast<duartn68681_device *>(device)->set_b_tx_cb(DEVCB2_##_cb);
+
+#define MCFG_DUARTN68681_INPORT_CALLBACK(_cb) \
+	downcast<duartn68681_device *>(device)->set_inport_cb(DEVCB2_##_cb);
+
+#define MCFG_DUARTN68681_OUTPORT_CALLBACK(_cb) \
+	downcast<duartn68681_device *>(device)->set_outport_cb(DEVCB2_##_cb);
+
+#define MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(_a, _b, _c, _d) \
+	duartn68681_device::static_set_clocks(*device, _a, _b, _c, _d);
+
 // forward declaration
 class duartn68681_device;
-
-struct duartn68681_config
-{
-	devcb_write_line    m_out_irq_cb;
-	devcb_write_line    m_out_a_tx_cb;
-	devcb_write_line    m_out_b_tx_cb;
-	devcb_read8         m_in_port_cb;
-	devcb_write8        m_out_port_cb;
-
-	/* clocks for external baud rates */
-	INT32 ip3clk, ip4clk, ip5clk, ip6clk;
-};
 
 #define MC68681_RX_FIFO_SIZE                3
 
@@ -91,7 +93,7 @@ private:
 	void recalc_framing();
 };
 
-class duartn68681_device : public device_t, public duartn68681_config
+class duartn68681_device : public device_t
 {
 	friend class duart68681_channel;
 
@@ -101,6 +103,9 @@ public:
 	required_device<duart68681_channel> m_chanA;
 	required_device<duart68681_channel> m_chanB;
 
+	// inline configuration helpers
+	static void static_set_clocks(device_t &device, int clk3, int clk4, int clk5, int clk6);
+
 	// API
 	DECLARE_READ8_HANDLER(read);
 	DECLARE_WRITE8_HANDLER(write);
@@ -109,9 +114,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((UINT8)state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->device_serial_interface::rx_w((UINT8)state); }
 
+	template<class _write> void set_irq_cb(_write wr) { write_irq.set_callback(wr); }
+	template<class _write> void set_a_tx_cb(_write wr) { write_a_tx.set_callback(wr); }
+	template<class _write> void set_b_tx_cb(_write wr) { write_b_tx.set_callback(wr); }
+	template<class _read>  void set_inport_cb(_read rd) { read_inport.set_callback(rd); }
+	template<class _write> void set_outport_cb(_write wr) { write_outport.set_callback(wr); }
+
+	devcb2_write_line write_irq, write_a_tx, write_b_tx;
+	devcb2_read8 read_inport;
+	devcb2_write8 write_outport;
+	INT32 ip3clk, ip4clk, ip5clk, ip6clk;
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;

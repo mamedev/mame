@@ -596,34 +596,6 @@ static INPUT_PORTS_START( nevada )
 INPUT_PORTS_END
 
 /***************************************************************************/
-static const duartn68681_config nevada_duart18_68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(nevada_state, duart18_irq_handler),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_NULL
-};
-/***************************************************************************/
-static const duartn68681_config nevada_duart39_68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(nevada_state, duart39_irq_handler),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("DSW2"),
-	DEVCB_NULL
-};
-/***************************************************************************/
-static const duartn68681_config nevada_duart40_68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(nevada_state, duart40_irq_handler),
-	DEVCB_DEVICE_LINE_MEMBER("microtouch", microtouch_serial_device, rx),
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("DSW3"),
-	DEVCB_NULL
-};
-
-/***************************************************************************/
 /*************************
 *     Machine Reset      *
 *************************/
@@ -667,9 +639,19 @@ static MACHINE_CONFIG_START( nevada, nevada_state )
 	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_DUARTN68681_ADD( "duart18_68681", XTAL_3_6864MHz , nevada_duart18_68681_config )  // UARTA = Modem 1200Baud
-	MCFG_DUARTN68681_ADD( "duart39_68681", XTAL_3_6864MHz , nevada_duart39_68681_config )  // UARTA = Printer
-	MCFG_DUARTN68681_ADD( "duart40_68681", XTAL_3_6864MHz , nevada_duart40_68681_config )  // UARTA = Touch , UARTB = Bill Acceptor
+	MCFG_DUARTN68681_ADD( "duart18_68681", XTAL_3_6864MHz )  // UARTA = Modem 1200Baud
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart18_irq_handler))
+	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW1"))
+
+	MCFG_DUARTN68681_ADD( "duart39_68681", XTAL_3_6864MHz )  // UARTA = Printer
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart39_irq_handler))
+	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW2"))
+
+	MCFG_DUARTN68681_ADD( "duart40_68681", XTAL_3_6864MHz )  // UARTA = Touch , UARTB = Bill Acceptor
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart40_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW3"))
+
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart40_68681", duartn68681_device, rx_a_w) )
 	/* devices */
 	MCFG_MSM6242_ADD("rtc", nevada_rtc_intf)

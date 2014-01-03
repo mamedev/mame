@@ -188,8 +188,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	DECLARE_READ16_MEMBER(es5510_dsp_r);
-	DECLARE_WRITE16_MEMBER(es5510_dsp_w);
 	DECLARE_READ16_MEMBER(lower_r);
 	DECLARE_WRITE16_MEMBER(lower_w);
 
@@ -512,18 +510,6 @@ WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
 	m_panel->rx_w(state);
 }
 
-static const duartn68681_config duart_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(esq5505_state, duart_irq_handler),
-	DEVCB_DRIVER_LINE_MEMBER(esq5505_state, duart_tx_a),
-	DEVCB_DRIVER_LINE_MEMBER(esq5505_state, duart_tx_b),
-	DEVCB_DRIVER_MEMBER(esq5505_state, duart_input),
-	DEVCB_DRIVER_MEMBER(esq5505_state, duart_output),
-
-	500000, 500000, // IP3, IP4
-	1000000, 1000000, // IP5, IP6
-};
-
 static void esq_dma_end(running_machine &machine, int channel, int irq)
 {
 	device_t *device = machine.device("mc68450");
@@ -666,7 +652,13 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
-	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
+	MCFG_DUARTN68681_ADD("duart", 4000000)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
+	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(esq5505_state, duart_input))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
+	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
@@ -722,7 +714,13 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
-	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
+	MCFG_DUARTN68681_ADD("duart", 4000000)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
+	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(esq5505_state, duart_input))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
+	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx

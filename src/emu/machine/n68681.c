@@ -54,8 +54,8 @@ const device_type DUARTN68681 = &device_creator<duartn68681_device>;
 const device_type DUART68681CHANNEL = &device_creator<duart68681_channel>;
 
 MACHINE_CONFIG_FRAGMENT( duart68681 )
-	MCFG_DUART68681_CHANNEL_ADD(CHANA_TAG)
-	MCFG_DUART68681_CHANNEL_ADD(CHANB_TAG)
+	MCFG_DEVICE_ADD(CHANA_TAG, DUART68681CHANNEL, 0)
+	MCFG_DEVICE_ADD(CHANB_TAG, DUART68681CHANNEL, 0)
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -65,8 +65,27 @@ MACHINE_CONFIG_END
 duartn68681_device::duartn68681_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DUARTN68681, "DUART 68681 (new)", tag, owner, clock, "dun68681", __FILE__),
 	m_chanA(*this, CHANA_TAG),
-	m_chanB(*this, CHANB_TAG)
+	m_chanB(*this, CHANB_TAG),
+	write_irq(*this),
+	write_a_tx(*this),
+	write_b_tx(*this),
+	read_inport(*this),
+	write_outport(*this)
 {
+}
+
+//-------------------------------------------------
+//  static_set_clocks - configuration helper to set
+//  the external clocks
+//-------------------------------------------------
+
+void duartn68681_device::static_set_clocks(device_t &device, int clk3, int clk4, int clk5, int clk6)
+{
+	duartn68681_device &duart = downcast<duartn68681_device &>(device);
+	duart.ip3clk = clk3;
+	duart.ip4clk = clk4;
+	duart.ip5clk = clk5;
+	duart.ip6clk = clk6;
 }
 
 /*-------------------------------------------------
@@ -75,11 +94,11 @@ duartn68681_device::duartn68681_device(const machine_config &mconfig, const char
 
 void duartn68681_device::device_start()
 {
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_a_tx_func.resolve(m_out_a_tx_cb, *this);
-	m_out_b_tx_func.resolve(m_out_b_tx_cb, *this);
-	m_in_port_func.resolve(m_in_port_cb, *this);
-	m_out_port_func.resolve(m_out_port_cb, *this);
+	write_irq.resolve_safe();
+	write_a_tx.resolve_safe();
+	write_b_tx.resolve_safe();
+	read_inport.resolve_safe(0);
+	write_outport.resolve_safe();
 
 	duart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(duartn68681_device::duart_timer_callback),this), NULL);
 
@@ -109,32 +128,7 @@ void duartn68681_device::device_reset()
 	IP_last_state = 0;  /* last state of IP bits */
 	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
 
-	m_out_port_func(0, OPR ^ 0xff);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void duartn68681_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const duartn68681_config *intf = reinterpret_cast<const duartn68681_config *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<duartn68681_config *>(this) = *intf;
-	}
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_a_tx_cb, 0, sizeof(m_out_a_tx_cb));
-		memset(&m_out_b_tx_cb, 0, sizeof(m_out_b_tx_cb));
-		memset(&m_in_port_cb, 0, sizeof(m_in_port_cb));
-		memset(&m_out_port_cb, 0, sizeof(m_out_port_cb));
-	}
+	write_outport(OPR ^ 0xff);
 }
 
 machine_config_constructor duartn68681_device::device_mconfig_additions() const
@@ -162,12 +156,12 @@ void duartn68681_device::update_interrupts()
 	if ( (ISR & IMR) != 0 )
 	{
 		LOG(( "68681: Interrupt line active (IMR & ISR = %02X)\n", (ISR & IMR) ));
-		m_out_irq_func(ASSERT_LINE);
+		write_irq(ASSERT_LINE);
 	}
 	else
 	{
 		LOG(( "68681: Interrupt line not active (IMR & ISR = %02X)\n", ISR & IMR));
-		m_out_irq_func(CLEAR_LINE);
+		write_irq(CLEAR_LINE);
 	}
 };
 
@@ -271,7 +265,7 @@ READ8_MEMBER( duartn68681_device::read )
 
 		case 0x04: /* IPCR */
 		{
-			UINT8 IP = m_in_port_func(0);
+			UINT8 IP = read_inport();
 
 			r = (((IP_last_state ^ IP) & 0x0f) << 4) | (IP & 0x0f);
 			IP_last_state = IP;
@@ -299,7 +293,7 @@ READ8_MEMBER( duartn68681_device::read )
 			break;
 
 		case 0x0d: /* IP */
-			r = m_in_port_func(0);
+			r = read_inport();
 			break;
 
 		case 0x0e: /* Start counter command */
@@ -412,12 +406,12 @@ WRITE8_MEMBER( duartn68681_device::write )
 
 		case 0x0e: /* Set Output Port Bits */
 			OPR |= data;
-			m_out_port_func(0, OPR ^ 0xff);
+			write_outport(OPR ^ 0xff);
 			break;
 
 		case 0x0f: /* Reset Output Port Bits */
 			OPR &= ~data;
-			m_out_port_func(0, OPR ^ 0xff);
+			write_outport(OPR ^ 0xff);
 			break;
 	}
 }
@@ -583,11 +577,11 @@ void duart68681_channel::tra_callback()
 //  printf("ch %d transmit %d\n", m_ch, bit);
 	if (m_ch == 0)
 	{
-		m_uart->m_out_a_tx_func(bit);
+		m_uart->write_a_tx(bit);
 	}
 	else
 	{
-		m_uart->m_out_b_tx_func(bit);
+		m_uart->write_b_tx(bit);
 	}
 }
 

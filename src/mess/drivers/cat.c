@@ -1112,15 +1112,6 @@ WRITE8_MEMBER(cat_state::cat_duart_output)
 #endif
 }
 
-static const duartn68681_config cat_duart_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(cat_state, cat_duart_irq_handler), /* irq callback */
-	DEVCB_DRIVER_LINE_MEMBER(cat_state, cat_duart_txa),         /* serial transmit A */
-	DEVCB_NULL,                                                 /* serial transmit B */
-	DEVCB_DRIVER_MEMBER(cat_state, cat_duart_input),            /* input port */
-	DEVCB_DRIVER_MEMBER(cat_state, cat_duart_output),           /* output port */
-};
-
 static MACHINE_CONFIG_START( cat, cat_state )
 
 	/* basic machine hardware */
@@ -1143,7 +1134,11 @@ static MACHINE_CONFIG_START( cat, cat_state )
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
-	MCFG_DUARTN68681_ADD( "duartn68681", XTAL_19_968MHz*2/11, cat_duart_config ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
+	MCFG_DUARTN68681_ADD( "duartn68681", XTAL_19_968MHz*2/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(cat_state, cat_duart_input))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(cat_state, cat_duart_output))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
