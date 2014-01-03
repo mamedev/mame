@@ -16,7 +16,7 @@
 
 
 template <class _ListClass, int _NumElem = 128>
-struct netlist_list_t
+class netlist_list_t
 {
 public:
 
