@@ -180,18 +180,18 @@ public:
 	device_vic20_user_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic20_user_port_interface();
 
-	DECLARE_WRITE_LINE_MEMBER( write_7 ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_9 ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_b ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_c ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_d ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_e ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_f ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_h ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_j ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_k ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_l ) {};
-	DECLARE_WRITE_LINE_MEMBER( write_m ) {};
+	DECLARE_WRITE_LINE_MEMBER( write_7 ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_9 ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_b ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_c ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_d ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_e ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_f ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_h ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_j ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_k ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_l ) {}
+	DECLARE_WRITE_LINE_MEMBER( write_m ) {}
 
 protected:
 	vic20_user_port_device *m_slot;
