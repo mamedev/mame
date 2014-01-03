@@ -7025,6 +7025,7 @@ src/mess/drivers/hp16500.c svneol=native#text/plain
 src/mess/drivers/hp48.c svneol=native#text/plain
 src/mess/drivers/hp49gp.c svneol=native#text/plain
 src/mess/drivers/hp9k.c svneol=native#text/plain
+src/mess/drivers/hprot1.c svneol=native#text/plain
 src/mess/drivers/hpz80unk.c svneol=native#text/plain
 src/mess/drivers/ht68k.c svneol=native#text/plain
 src/mess/drivers/huebler.c svneol=native#text/plain

@@ -2177,6 +2177,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/ft68m.o     \
 	$(MESS_DRIVERS)/grfd2301.o  \
 	$(MESS_DRIVERS)/harriet.o   \
+	$(MESS_DRIVERS)/hprot1.o    \
 	$(MESS_DRIVERS)/hpz80unk.o  \
 	$(MESS_DRIVERS)/ht68k.o     \
 	$(MESS_DRIVERS)/ibm6580.o   \
