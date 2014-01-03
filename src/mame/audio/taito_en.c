@@ -316,18 +316,6 @@ WRITE_LINE_MEMBER(taito_en_device::duart_irq_handler)
     IP4: 0.5MHz
     IP5: 1MHz
 */
-static const duartn68681_config taito_en_duart68681_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("taito_en", taito_en_device, duart_irq_handler),
-	DEVCB_NULL,               /* tx_a callback */
-	DEVCB_NULL,               /* tx_b callback */
-	DEVCB_NULL,               /* input port read */
-	DEVCB_NULL,               /* output port write */
-	XTAL_16MHz/2/8,     /* IP2/RxCB clock */
-	XTAL_16MHz/2/16,    /* IP3/TxCA clock */
-	XTAL_16MHz/2/16,    /* IP4/RxCA clock */
-	XTAL_16MHz/2/8,     /* IP5/TxCB clock */
-};
 
 static const mb87078_interface taito_en_mb87078_intf =
 {
@@ -354,7 +342,10 @@ MACHINE_CONFIG_FRAGMENT( taito_en_sound )
 	MCFG_CPU_ADD("audiocpu", M68000, XTAL_30_4761MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(en_sound_map)
 
-	MCFG_DUARTN68681_ADD("duart68681", XTAL_16MHz / 4, taito_en_duart68681_config)
+	MCFG_DUARTN68681_ADD("duart68681", XTAL_16MHz / 4)
+	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(XTAL_16MHz/2/8, XTAL_16MHz/2/16, XTAL_16MHz/2/16, XTAL_16MHz/2/8)
+	MCFG_DUARTN68681_IRQ_CALLBACK(DEVWRITELINE("taito_en", taito_en_device, duart_irq_handler))
+
 	MCFG_MB87078_ADD("mb87078", taito_en_mb87078_intf)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
