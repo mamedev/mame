@@ -63,6 +63,7 @@ vic20_user_port_device::vic20_user_port_device(const machine_config &mconfig, co
 	m_6_handler(*this),
 	m_7_handler(*this),
 	m_8_handler(*this),
+	m_9_handler(*this),
 	m_b_handler(*this),
 	m_c_handler(*this),
 	m_d_handler(*this),
@@ -92,6 +93,7 @@ void vic20_user_port_device::device_start()
 	m_6_handler.resolve_safe();
 	m_7_handler.resolve_safe();
 	m_8_handler.resolve_safe();
+	m_9_handler.resolve_safe();
 	m_b_handler.resolve_safe();
 	m_c_handler.resolve_safe();
 	m_d_handler.resolve_safe();
@@ -110,6 +112,7 @@ void vic20_user_port_device::device_start()
 	m_6_handler(1);
 	m_7_handler(1);
 	m_8_handler(1);
+	m_9_handler(1);
 	m_b_handler(1);
 	m_c_handler(1);
 	m_d_handler(1);
@@ -136,7 +139,12 @@ void vic20_user_port_device::device_reset()
 }
 
 
+WRITE_LINE_MEMBER( vic20_user_port_device::write_3 ) { if (m_card != NULL) m_card->write_3(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_4 ) { if (m_card != NULL) m_card->write_4(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_5 ) { if (m_card != NULL) m_card->write_5(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_6 ) { if (m_card != NULL) m_card->write_6(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::write_7 ) { if (m_card != NULL) m_card->write_7(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::write_8 ) { if (m_card != NULL) m_card->write_8(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::write_9 ) { if (m_card != NULL) m_card->write_9(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::write_b ) { if (m_card != NULL) m_card->write_b(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::write_c ) { if (m_card != NULL) m_card->write_c(state); }
