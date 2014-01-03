@@ -434,13 +434,45 @@ WRITE8_MEMBER(wicat_state::hdc_w)
 {
 	switch(offset)
 	{
+	case 0x00:  // Write precomp / Error register
+		logerror("HDC: Write precomp %02x\n",data);
+		break;
 	case 0x01:  // Data register
 		logerror("HDC: Data %02x\n",data);
+		break;
+	case 0x02:  // Sector Number
+		logerror("HDC: Sector Number %02x\n",data);
+		break;
+	case 0x03:  // Sector Count
+		logerror("HDC: Sector Count %02x\n",data);
+		break;
+	case 0x04:  // Cylinder High
+		logerror("HDC: Cylinder High %02x\n",data);
+		break;
+	case 0x05:  // Cylinder Low
+		logerror("HDC: Cylinder Low %02x\n",data);
 		break;
 	case 0x06:  // Command register
 		logerror("HDC: Command %1x\n",(data & 0xf0) >> 4);
 		m_maincpu->set_input_line(M68K_IRQ_5,HOLD_LINE);
 		break;
+	case 0x07:  // Size / Drive / Head
+		logerror("HDC: Size / Drive / Head %02x\n",data);
+		break;
+	case 0x0c:  // DMA mid
+		logerror("HDC: DMA address mid %02x\n",data);
+		break;
+	case 0x0d:  // DMA low
+		logerror("HDC: DMA address low %02x\n",data);
+		break;
+	case 0x0e:  // DMA R/W
+		logerror("HDC: DMA R/W %02x\n",data);
+		break;
+	case 0x0f:  // DMA high
+		logerror("HDC: DMA address high %02x\n",data);
+		break;
+	default:
+		logerror("HDC: Write to unknown register %02x\n",data);
 	}
 }
 
@@ -881,7 +913,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 
 	MCFG_MM58274C_ADD("rtc",wicat_rtc_intf)  // actually an MM58174AN, but should be compatible
 
-	MCFG_MC2661_ADD("uart0", XTAL_5_0688MHz, wicat_uart0_intf)  // connected to terminal board (TODO)
+	MCFG_MC2661_ADD("uart0", XTAL_5_0688MHz, wicat_uart0_intf)  // connected to terminal board
 	MCFG_MC2661_ADD("uart1", XTAL_5_0688MHz, wicat_uart1_intf)
 	MCFG_MC2661_ADD("uart2", XTAL_5_0688MHz, wicat_uart2_intf)
 	MCFG_MC2661_ADD("uart3", XTAL_5_0688MHz, wicat_uart3_intf)
@@ -943,7 +975,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_DEFAULT_LAYOUT(layout_wicat)
 
 	/* Winchester Disk Controller (WD1000 + FD1795) */
-	MCFG_CPU_ADD("floppycpu",N8X300,XTAL_8MHz)
+	MCFG_CPU_ADD("wd1kcpu",N8X300,XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_wd1000_mem)
 	MCFG_CPU_IO_MAP(wicat_wd1000_io)
 	MCFG_FD1795x_ADD("fdc",XTAL_8MHz)
