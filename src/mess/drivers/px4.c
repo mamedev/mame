@@ -127,7 +127,6 @@ public:
 	UINT8 m_artcr;
 	UINT8 m_swr;
 
-	int rxd_r();
 	void txd_w(int data);
 
 	// 7508 internal
@@ -156,10 +155,15 @@ public:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	DECLARE_WRITE_LINE_MEMBER( serial_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( serial_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( serial_dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( serial_cts_w );
+	DECLARE_WRITE_LINE_MEMBER( sio_rx_w );
+	DECLARE_WRITE_LINE_MEMBER( sio_pin_w );
+
+	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
+	DECLARE_WRITE_LINE_MEMBER( rs232_cts_w );
+
+	int m_sio_pin;
 
 	int m_rs232_dcd;
 	int m_rs232_cts;
@@ -208,6 +212,9 @@ public:
 	TIMER_CALLBACK_MEMBER(receive_data);
 	TIMER_DEVICE_CALLBACK_MEMBER(frc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(upd7508_1sec_callback);
+
+private:
+	DECLARE_WRITE_LINE_MEMBER( serial_rx_w );
 };
 
 
@@ -411,18 +418,18 @@ WRITE8_MEMBER( px4_state::px4_ier_w )
 // status register
 READ8_MEMBER( px4_state::px4_str_r )
 {
-	UINT8 result = 0;
+	UINT8 data = 0;
 
-	if (VERBOSE)
+	if (0)
 		logerror("%s: px4_str_r\n", machine().describe_context());
 
-	result |= (m_ext_cas)->input() > 0 ? 1 : 0;
-	result |= 1 << 1;   // BCRD, barcode reader input
-	result |= 1 << 2;   // RDY signal from 7805
-	result |= 1 << 3;   // RDYSIO, enable access to the 7805
-	result |= m_bankr & 0xf0;   // bit 4-7, BANK - memory bank
+	data |= (m_ext_cas)->input() > 0 ? 1 : 0;
+	data |= 1 << 1;   // BCRD, barcode reader input
+	data |= 1 << 2;   // RDY signal from 7805
+	data |= 1 << 3;   // RDYSIO, enable access to the 7805
+	data |= m_bankr & 0xf0;   // bit 4-7, BANK - memory bank
 
-	return result;
+	return data;
 }
 
 // helper function to map rom capsules
@@ -670,17 +677,34 @@ WRITE_LINE_MEMBER( px4_state::serial_rx_w )
 		input_callback(m_input_state & ~RX);
 }
 
-WRITE_LINE_MEMBER( px4_state::serial_dcd_w )
+WRITE_LINE_MEMBER( px4_state::sio_rx_w )
+{
+	if (!BIT(m_swr, 3) && BIT(m_swr, 2))
+		serial_rx_w(state);
+}
+
+WRITE_LINE_MEMBER( px4_state::sio_pin_w )
+{
+	m_sio_pin = state;
+}
+
+WRITE_LINE_MEMBER( px4_state::rs232_rx_w )
+{
+	if (BIT(m_swr, 3))
+		serial_rx_w(state);
+}
+
+WRITE_LINE_MEMBER( px4_state::rs232_dcd_w )
 {
 	m_rs232_dcd = state;
 }
 
-WRITE_LINE_MEMBER( px4_state::serial_dsr_w )
+WRITE_LINE_MEMBER( px4_state::rs232_dsr_w )
 {
 	m_artsr |= !state << 7;
 }
 
-WRITE_LINE_MEMBER( px4_state::serial_cts_w )
+WRITE_LINE_MEMBER( px4_state::rs232_cts_w )
 {
 	m_rs232_cts = state;
 }
@@ -760,30 +784,15 @@ void px4_state::input_callback(UINT8 state)
 	m_input_state = state;
 }
 
-// helper function to read from selected serial port
-int px4_state::rxd_r()
-{
-	if (BIT(m_swr, 3))
-		// from rs232
-		return get_in_data_bit();
-	else
-		if (BIT(m_swr, 2))
-			// from sio
-			return m_sio->rx_r();
-		else
-			// from cartridge
-			return 0;
-}
-
 // helper function to write to selected serial port
 void px4_state::txd_w(int data)
 {
 	if (BIT(m_swr, 2))
-		// from sio
+		// to sio
 		m_sio->tx_w(data);
 	else
 		if (BIT(m_swr, 3))
-			// from rs232
+			// to rs232
 			m_rs232->tx(data);
 		// else to cartridge
 }
@@ -808,7 +817,7 @@ WRITE8_MEMBER( px4_state::px4_ctgif_w )
 READ8_MEMBER( px4_state::px4_artdir_r )
 {
 	if (VERBOSE)
-		logerror("%s: px4_artdir_r\n", machine().describe_context());
+		logerror("%s: px4_artdir_r (%02x)\n", machine().describe_context(), m_artdir);
 
 	// clear ready
 	m_artsr &= ~ART_RXRDY;
@@ -873,10 +882,10 @@ READ8_MEMBER( px4_state::px4_iostr_r )
 	data |= !m_centronics->pe_r() << 1;
 
 	// sio status
-	data |= !m_sio->pin_r() << 2;
+	data |= !m_sio_pin << 2;
 
 	// serial data
-	data |= rxd_r() << 3;
+	data |= get_in_data_bit() << 3;
 
 	// rs232 status
 	data |= !m_rs232_dcd << 4;
@@ -886,9 +895,7 @@ READ8_MEMBER( px4_state::px4_iostr_r )
 	data |= 0 << 7;   // bit 7, caud - audio input from cartridge
 
 	if (0)
-		logerror("%s: px4_iostr_r (%02x)\n", machine().describe_context(), data);
-
-	logerror("%s: px4_iostr_r: rx = %d, dcd = %d, cts = %d\n", machine().describe_context(), BIT(data, 3), BIT(data, 4), BIT(data, 5));
+		logerror("%s: px4_iostr_r: rx = %d, dcd = %d, cts = %d\n", machine().describe_context(), BIT(data, 3), BIT(data, 4), BIT(data, 5));
 
 	return data;
 }
@@ -933,7 +940,7 @@ WRITE8_MEMBER( px4_state::px4_ioctlr_w )
 	m_centronics->strobe_w(!BIT(data, 0));
 	m_centronics->init_prime_w(BIT(data, 1));
 
-	m_sio->pout_w(!BIT(data, 2));
+	m_sio->pout_w(BIT(data, 2));
 
 	// bit 3, cartridge reset
 
@@ -1189,7 +1196,7 @@ static INPUT_PORTS_START( px4_dips )
 	PORT_START("dips")
 
 	PORT_DIPNAME(0x0f, 0x0f, "Character set")
-	PORT_DIPLOCATION("DIP:8,7,6,5")
+	PORT_DIPLOCATION("PX-4:8,7,6,5")
 	PORT_DIPSETTING(0x0f, "ASCII")
 	PORT_DIPSETTING(0x0e, "France")
 	PORT_DIPSETTING(0x0d, "Germany")
@@ -1202,7 +1209,7 @@ static INPUT_PORTS_START( px4_dips )
 	PORT_DIPSETTING(0x06, "Norway")
 
 	PORT_DIPNAME(0x30, 0x30, "LST device")
-	PORT_DIPLOCATION("DIP:4,3")
+	PORT_DIPLOCATION("PX-4:4,3")
 	PORT_DIPSETTING(0x00, "SIO")
 	PORT_DIPSETTING(0x10, "Cartridge printer")
 	PORT_DIPSETTING(0x20, "RS-232C")
@@ -1210,13 +1217,13 @@ static INPUT_PORTS_START( px4_dips )
 
 	// available for user applications
 	PORT_DIPNAME(0x40, 0x40, "Not used")
-	PORT_DIPLOCATION("DIP:2")
+	PORT_DIPLOCATION("PX-4:2")
 	PORT_DIPSETTING(0x40, "Enable")
 	PORT_DIPSETTING(0x00, "Disable")
 
 	// this is automatically selected by the os, the switch has no effect
 	PORT_DIPNAME(0x80, 0x00, "Keyboard type")
-	PORT_DIPLOCATION("DIP:1")
+	PORT_DIPLOCATION("PX-4:1")
 	PORT_DIPSETTING(0x80, "Item keyboard")
 	PORT_DIPSETTING(0x00, "Standard keyboard")
 INPUT_PORTS_END
@@ -1398,13 +1405,15 @@ static MACHINE_CONFIG_START( px4, px4_state )
 
 	// sio port
 	MCFG_EPSON_SIO_ADD("sio", NULL)
+	MCFG_EPSON_SIO_RX(WRITELINE(px4_state, sio_rx_w))
+	MCFG_EPSON_SIO_PIN(WRITELINE(px4_state, sio_pin_w))
 
 	// rs232 port
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
-	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(px4_state, serial_rx_w))
-	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(px4_state, serial_dcd_w))
-	MCFG_RS232_OUT_DSR_HANDLER(WRITELINE(px4_state, serial_dsr_w))
-	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(px4_state, serial_cts_w))
+	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(px4_state, rs232_rx_w))
+	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(px4_state, rs232_dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(WRITELINE(px4_state, rs232_dsr_w))
+	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(px4_state, rs232_cts_w))
 
 	// rom capsules
 	MCFG_CARTSLOT_ADD("capsule1")

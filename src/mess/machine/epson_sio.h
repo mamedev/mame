@@ -23,6 +23,12 @@
 	MCFG_DEVICE_ADD(_tag, EPSON_SIO, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(epson_sio_devices, _def_slot, false)
 
+#define MCFG_EPSON_SIO_RX(_rx) \
+	downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB2_##_rx);
+
+#define MCFG_EPSON_SIO_PIN(_pin) \
+	downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB2_##_pin);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -39,11 +45,17 @@ public:
 	epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~epson_sio_device();
 
-	DECLARE_READ_LINE_MEMBER(rx_r);
-	DECLARE_READ_LINE_MEMBER(pin_r);
+	// callbacks
+	template<class _rx> void set_rx_callback(_rx rx) { m_write_rx.set_callback(rx); }
+	template<class _pin> void set_pin_callback(_pin pin) { m_write_pin.set_callback(pin); }
 
-	DECLARE_WRITE_LINE_MEMBER(tx_w);
-	DECLARE_WRITE_LINE_MEMBER(pout_w);
+	// called from owner
+	DECLARE_WRITE_LINE_MEMBER( tx_w );
+	DECLARE_WRITE_LINE_MEMBER( pout_w );
+
+	// called from subdevice
+	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_write_rx(state); }
+	DECLARE_WRITE_LINE_MEMBER( pin_w ) { m_write_pin(state); }
 
 protected:
 	// device-level overrides
@@ -51,6 +63,10 @@ protected:
 	virtual void device_reset();
 
 	device_epson_sio_interface *m_cart;
+
+private:
+	devcb2_write_line m_write_rx;
+	devcb2_write_line m_write_pin;
 };
 
 
@@ -61,9 +77,6 @@ public:
 	// construction/destruction
 	device_epson_sio_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_epson_sio_interface();
-
-	virtual int rx_r() { return 1; };
-	virtual int pin_r() { return 1; };
 
 	virtual void tx_w(int state) { };
 	virtual void pout_w(int state) { };
