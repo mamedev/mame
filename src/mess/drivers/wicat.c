@@ -31,6 +31,7 @@ public:
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
 		, m_rtc(*this, "rtc")
+		, m_via(*this, "via")
 		, m_uart0(*this,"uart0")
 		, m_uart1(*this,"uart1")
 		, m_uart2(*this,"uart2")
@@ -82,11 +83,14 @@ public:
 	DECLARE_WRITE8_MEMBER(hdc_w);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
+	DECLARE_READ16_MEMBER(via_r);
+	DECLARE_WRITE16_MEMBER(via_w);
 	DECLARE_WRITE_LINE_MEMBER(kb_data_ready);
 
 	required_shared_ptr<UINT8> m_vram;
 	required_device<m68000_device> m_maincpu;
 	required_device<mm58274c_device> m_rtc;
+	required_device<via6522_device> m_via;
 	required_device<mc2661_device> m_uart0;
 	required_device<mc2661_device> m_uart1;
 	required_device<mc2661_device> m_uart2;
@@ -136,7 +140,7 @@ private:
 
 
 static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
-	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_UNMAP_LOW
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_REGION("c2", 0x0000)
 	AM_RANGE(0x020000, 0x1fffff) AM_RAM
@@ -151,7 +155,7 @@ static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 	AM_RANGE(0xf00020, 0xf00027) AM_DEVREADWRITE8("uart4",mc2661_device,read,write,0xff00)
 	AM_RANGE(0xf00028, 0xf0002f) AM_DEVREADWRITE8("uart5",mc2661_device,read,write,0xff00)
 	AM_RANGE(0xf00030, 0xf00037) AM_DEVREADWRITE8("uart6",mc2661_device,read,write,0xff00)
-	AM_RANGE(0xf00040, 0xf0005f) AM_DEVREADWRITE8("via",via6522_device,read,write,0xff00)
+	AM_RANGE(0xf00040, 0xf0005f) AM_READWRITE(via_r, via_w)
 	AM_RANGE(0xf00060, 0xf0007f) AM_DEVREADWRITE8("rtc",mm58274c_device,read,write,0xff00)
 	AM_RANGE(0xf000d0, 0xf000d1) AM_WRITE(parallel_led_w)
 	AM_RANGE(0xf00180, 0xf0018f) AM_READWRITE8(hdc_r,hdc_w,0xffff)  // WD1000
@@ -487,6 +491,21 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 		// Interrupt disable / Drive select (TODO, not part of the FD1795)
 		break;
 	}
+}
+
+READ16_MEMBER(wicat_state::via_r)
+{
+	if(ACCESSING_BITS_0_7)
+		return m_via->read(space,offset);
+	return 0x00;
+}
+
+WRITE16_MEMBER(wicat_state::via_w)
+{
+	if(ACCESSING_BITS_0_7)
+		m_via->write(space,offset,data);
+	if(ACCESSING_BITS_8_15)
+		m_via->write(space,offset,data>>8);
 }
 
 READ8_MEMBER(wicat_state::video_r)
@@ -855,10 +874,10 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(wicat_mem)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL_8MHz)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(wicat_state, via_a_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(wicat_state, via_b_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m68000_device, write_irq1))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
 
 	MCFG_MM58274C_ADD("rtc",wicat_rtc_intf)  // actually an MM58174AN, but should be compatible
 
