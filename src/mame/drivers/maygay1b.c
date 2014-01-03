@@ -849,15 +849,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 };
 
-static const duartn68681_config maygaym1_duart68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(maygay1b_state, duart_irq_handler),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(maygay1b_state, m1_duart_r),
-	DEVCB_NULL
-};
-
 // machine driver for maygay m1 board /////////////////////////////////
 
 
@@ -867,7 +858,10 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_CPU_ADD("maincpu", M6809, M1_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(m1_memmap)
 
-	MCFG_DUARTN68681_ADD("duart68681", M1_DUART_CLOCK, maygaym1_duart68681_config)
+	MCFG_DUARTN68681_ADD("duart68681", M1_DUART_CLOCK)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(maygay1b_state, duart_irq_handler))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(maygay1b_state, m1_duart_r))
+
 	MCFG_PIA6821_ADD("pia", m1_pia_intf)
 	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
