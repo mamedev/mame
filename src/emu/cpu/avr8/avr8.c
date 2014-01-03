@@ -1464,7 +1464,7 @@ void avr8_device::update_timer_waveform_gen_mode(UINT8 t, UINT8 mode)
       break;
   }
 
-  if (m_timer_top[t] == -1){
+  if (m_timer_top[t] == 0xFFFF){
     m_timer_top[t] = 0;
 		printf("update_timer_waveform_gen_mode: Timer #%d - Unsupported waveform generation type: %d\n", t, mode);
 	}
@@ -1790,7 +1790,7 @@ void avr8_device::update_timer_clock_source(UINT8 t, UINT8 clock_select)
 
   printf("update_timer_clock_source: t=%d cs=%d\n", t, clock_select);
 
-  if (m_timer_prescale[t] == -1){
+  if (m_timer_prescale[t] == 0xFFFF){
     printf("[Timer #%d]: update_timer_clock_source: External trigger mode not implemented yet\n", t);
     m_timer_prescale[t] = 0;
   }
