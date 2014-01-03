@@ -33,13 +33,10 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 class firetrk_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_PERIODIC
-	};
-
 	firetrk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_discrete(*this, "discrete"),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_scroll_y(*this, "scroll_y"),
@@ -48,15 +45,11 @@ public:
 		m_blink(*this, "blink"),
 		m_drone_x(*this, "drone_x"),
 		m_drone_y(*this, "drone_y"),
-		m_drone_rot(*this, "drone_rot"),
-		m_discrete(*this, "discrete"),
-		m_maincpu(*this, "maincpu") { }
+		m_drone_rot(*this, "drone_rot")
+	{ }
 
-	UINT8 m_in_service_mode;
-	UINT32 m_dial[2];
-	UINT8 m_steer_dir[2];
-	UINT8 m_steer_flag[2];
-	UINT8 m_gear;
+	required_device<cpu_device> m_maincpu;
+	required_device<discrete_device> m_discrete;
 	required_shared_ptr<UINT8> m_alpha_num_ram;
 	required_shared_ptr<UINT8> m_playfield_ram;
 	required_shared_ptr<UINT8> m_scroll_y;
@@ -66,7 +59,13 @@ public:
 	optional_shared_ptr<UINT8> m_drone_x;
 	optional_shared_ptr<UINT8> m_drone_y;
 	optional_shared_ptr<UINT8> m_drone_rot;
-	required_device<discrete_device> m_discrete;
+
+	UINT8 m_in_service_mode;
+	UINT32 m_dial[2];
+	UINT8 m_steer_dir[2];
+	UINT8 m_steer_flag[2];
+	UINT8 m_gear;
+
 	UINT8 m_flash;
 	UINT8 m_crash[2];
 	UINT8 m_skid[2];
@@ -76,6 +75,7 @@ public:
 	UINT32 m_color2_mask;
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
+
 	DECLARE_WRITE8_MEMBER(firetrk_output_w);
 	DECLARE_WRITE8_MEMBER(superbug_output_w);
 	DECLARE_WRITE8_MEMBER(montecar_output_1_w);
@@ -112,8 +112,7 @@ public:
 	UINT32 screen_update_firetrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_superbug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_montecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(firetrk_interrupt);
-	TIMER_CALLBACK_MEMBER(periodic_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(firetrk_scanline);
 	DECLARE_WRITE8_MEMBER(firetrk_skid_reset_w);
 	DECLARE_WRITE8_MEMBER(montecar_skid_reset_w);
 	DECLARE_WRITE8_MEMBER(firetrk_crash_snd_w);
@@ -127,15 +126,10 @@ public:
 	void montecar_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int is_collision_detection);
 	void check_collision(firetrk_state *state, int which);
 	void set_service_mode(int enable);
-	required_device<cpu_device> m_maincpu;
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
 /*----------- defined in audio/firetrk.c -----------*/
-
 
 DISCRETE_SOUND_EXTERN( firetrk );
 DISCRETE_SOUND_EXTERN( superbug );
