@@ -504,7 +504,7 @@ WRITE16_MEMBER(wicat_state::via_w)
 {
 	if(ACCESSING_BITS_0_7)
 		m_via->write(space,offset,data);
-	if(ACCESSING_BITS_8_15)
+	else if(ACCESSING_BITS_8_15)
 		m_via->write(space,offset,data>>8);
 }
 
