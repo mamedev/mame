@@ -162,8 +162,8 @@ protected:
 	UINT8 m_r[0x200];
 
 	// internal timers
-	UINT16 m_timer_top[6];
-	INT32 m_timer_increment[6];
+	INT32 m_timer_top[6];
+	UINT8 m_timer_increment[6];
 	UINT16 m_timer_prescale[6];
 	UINT16 m_timer_prescale_count[6];
 

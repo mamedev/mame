@@ -1464,7 +1464,7 @@ void avr8_device::update_timer_waveform_gen_mode(UINT8 t, UINT8 mode)
       break;
   }
 
-  if (m_timer_top[t] == 0xFFFF){
+  if (m_timer_top[t] == -1){
     m_timer_top[t] = 0;
 		printf("update_timer_waveform_gen_mode: Timer #%d - Unsupported waveform generation type: %d\n", t, mode);
 	}
