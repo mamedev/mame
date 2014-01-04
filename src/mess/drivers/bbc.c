@@ -46,7 +46,6 @@
 #include "cpu/m6502/m65sc02.h"
 #include "machine/6522via.h"
 #include "machine/mc146818.h"       /* RTC & CMOS RAM */
-#include "machine/upd7002.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/econet/econet.h"
 #include "sound/tms5220.h"          /* Speech */
@@ -184,7 +183,7 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)          /*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_disc_r, bbc_disc_w)                               /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
@@ -213,7 +212,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)          /*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)                    /*    fe80-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
@@ -243,7 +242,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)          /*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)                    /*    fe80-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
@@ -1108,8 +1107,8 @@ ROM_START(bbcb)
 	//ROM_LOAD("torchz80_094.bin", 0x0000, 0x2000, CRC(49989bd4) SHA1(62b57c858a3baa4ff943c31f77d331c414772a61))
 	//ROM_LOAD("torchz80_102.bin", 0x0000, 0x2000, CRC(2eb40a21) SHA1(e6ee738e5f2f8556002b79d18caa8ef21f14e08d))
 
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
-	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
+	//ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
+	//ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
 ROM_END
 
 ROM_START(bbcb_de)

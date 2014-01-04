@@ -44,6 +44,7 @@ public:
 		m_rs232(*this, RS232_TAG),
 		m_via6522_0(*this, "via6522_0"),
 		m_via6522_1(*this, "via6522_1"),
+		m_upd7002(*this, "upd7002"),
 		m_ACCCON_IRR(CLEAR_LINE),
 		m_via_system_irq(CLEAR_LINE),
 		m_via_user_irq(CLEAR_LINE),
@@ -72,6 +73,7 @@ public:
 	optional_device<rs232_port_device> m_rs232;
 	required_device<via6522_device> m_via6522_0;
 	optional_device<via6522_device> m_via6522_1;
+	optional_device<upd7002_device> m_upd7002;
 
 
 	void check_interrupts();
@@ -405,6 +407,6 @@ extern const wd17xx_interface bbc_wd17xx_interface;
 
 /* tape support */
 
-extern const uPD7002_interface bbc_uPD7002;
+extern const upd7002_interface bbc_uPD7002;
 
 #endif /* BBC_H_ */

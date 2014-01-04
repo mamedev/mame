@@ -18,7 +18,6 @@
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "includes/bbc.h"
-#include "machine/upd7002.h"
 #include "machine/i8271.h"
 #include "machine/mc146818.h"
 #include "bus/centronics/ctronics.h"
@@ -582,7 +581,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 				return m_acia->data_read(space,0);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;                                /* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(machine().device("upd7002"), space, myo-0x18);         /* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) return m_upd7002->read(space, myo-0x18);         /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;                                /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24);  /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);   /* disc control latch */
@@ -616,7 +615,7 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 				m_acia->data_write(space, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10, data);     /* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(machine().device("upd7002"), space, myo-0x18, data);         /* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) m_upd7002->write(space, myo-0x18, data);         /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20, data);      /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24, data);  /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28, data);   /* disc control latch */
@@ -1210,7 +1209,7 @@ static UPD7002_EOC(BBC_uPD7002_EOC)
 	via_0->write_cb1(data);
 }
 
-const uPD7002_interface bbc_uPD7002 =
+const upd7002_interface bbc_uPD7002 =
 {
 	BBC_get_analogue_input,
 	BBC_uPD7002_EOC
