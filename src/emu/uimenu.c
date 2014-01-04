@@ -750,7 +750,7 @@ void ui_menu::handle_events()
 	ui_event local_menu_event;
 
 	/* loop while we have interesting events */
-	while (ui_input_pop_event(machine(), &local_menu_event) && !stop)
+	while (!stop && ui_input_pop_event(machine(), &local_menu_event))
 	{
 		switch (local_menu_event.event_type)
 		{
