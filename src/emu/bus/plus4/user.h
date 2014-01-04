@@ -16,7 +16,7 @@
                      P3       5      E       DTR
                      P4       6      F       P7
                      P5       7      H       DCD
-                     P0       8      J       P6
+                    RxC       8      J       P6
                     ATN       9      K       P1
                   +9VAC      10      L       DSR
                   +9VAC      11      M       TxD
