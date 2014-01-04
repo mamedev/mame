@@ -78,3 +78,23 @@ c64_4tba_device::c64_4tba_device(const machine_config &mconfig, const char *tag,
 void c64_4tba_device::device_start()
 {
 }
+
+
+//-------------------------------------------------
+//  input_4
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( c64_4tba_device::input_4 )
+{
+	output_6(state);
+}
+
+
+//-------------------------------------------------
+//  input_6
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( c64_4tba_device::input_6 )
+{
+	output_4(state);
+}

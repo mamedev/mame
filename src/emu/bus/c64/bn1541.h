@@ -61,6 +61,7 @@ protected:
 	virtual void parallel_data_w(UINT8 data);
 	virtual void parallel_strobe_w(int state);
 
+	// device_pet_user_port_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER(input_8);
 	virtual WRITE_LINE_MEMBER(input_c) { if (state) m_parallel_output |= 1; else m_parallel_output &= ~1; update_output(); }
 	virtual WRITE_LINE_MEMBER(input_d) { if (state) m_parallel_output |= 2; else m_parallel_output &= ~2; update_output(); }

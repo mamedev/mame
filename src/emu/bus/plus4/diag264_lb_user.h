@@ -47,13 +47,13 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(input_j) { output_4(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER(input_f) { output_5(state); }
 
-	//virtual DECLARE_WRITE_LINE_MEMBER(input_c) { output_m(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_c) { output_m(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER(input_d) { output_l(state); }
 	virtual DECLARE_WRITE_LINE_MEMBER(input_e) { output_h(state); }
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_m) { output_c(state); }
-	//virtual DECLARE_WRITE_LINE_MEMBER(input_l) { output_d(state); }
-	//virtual DECLARE_WRITE_LINE_MEMBER(input_h) { output_e(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_l) { output_d(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_h) { output_e(state); }
 };
 
 // device type definition

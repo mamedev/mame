@@ -36,6 +36,10 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
+	// device_pet_user_port_interface overrides
+	virtual DECLARE_WRITE_LINE_MEMBER( input_4 );
+	virtual DECLARE_WRITE_LINE_MEMBER( input_6 );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
