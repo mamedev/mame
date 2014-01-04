@@ -552,7 +552,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MC6845_INTERFACE( mc6845_intf )
+static MC6845_INTERFACE( crtc_intf )
 {
 	false,      /* show border area */
 	8,-8,32,32, /* visarea adjustment */
@@ -631,7 +631,7 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, crtc_intf)
 	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 0+8, 0x110-24, 0x108, 0+32, 0xe0) // from crtc
@@ -1120,8 +1120,8 @@ GAME( 1984, dorunrun2, dorunrun, dorunrun, dorunrun, driver_device, 0, ROT0,   "
 GAME( 1984, dorunrunc, dorunrun, docastle, dorunrun, driver_device, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1984, dorunrunca,dorunrun, docastle, dorunrun, driver_device, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, spiero,    dorunrun, dorunrun, dorunrun, driver_device, 0, ROT0,   "Universal", "Super Pierrot (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, dowild,    0,        dorunrun, dowild, driver_device,   0, ROT0,   "Universal", "Mr. Do's Wild Ride", GAME_SUPPORTS_SAVE )
-GAME( 1984, jjack,     0,        dorunrun, jjack, driver_device,    0, ROT270, "Universal", "Jumping Jack", GAME_SUPPORTS_SAVE )
+GAME( 1984, dowild,    0,        dorunrun, dowild,   driver_device, 0, ROT0,   "Universal", "Mr. Do's Wild Ride", GAME_SUPPORTS_SAVE )
+GAME( 1984, jjack,     0,        dorunrun, jjack,    driver_device, 0, ROT270, "Universal", "Jumping Jack", GAME_SUPPORTS_SAVE )
 GAME( 1984, kickridr,  0,        dorunrun, kickridr, driver_device, 0, ROT0,   "Universal", "Kick Rider", GAME_SUPPORTS_SAVE )
 GAME( 1985, idsoccer,  0,        idsoccer, idsoccer, driver_device, 0, ROT0,   "Universal", "Indoor Soccer (set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1985, idsoccera, idsoccer, idsoccer, idsoccer, driver_device, 0, ROT0,   "Universal", "Indoor Soccer (set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
