@@ -1690,14 +1690,14 @@ void renderer::draw_quad(const render_primitive *prim)
 		return;
 
 	// fill in the vertexes clockwise
-	vertex[0].x = prim->bounds.x0 - 0.5f;
-	vertex[0].y = prim->bounds.y0 - 0.5f;
-	vertex[1].x = prim->bounds.x1 - 0.5f;
-	vertex[1].y = prim->bounds.y0 - 0.5f;
-	vertex[2].x = prim->bounds.x0 - 0.5f;
-	vertex[2].y = prim->bounds.y1 - 0.5f;
-	vertex[3].x = prim->bounds.x1 - 0.5f;
-	vertex[3].y = prim->bounds.y1 - 0.5f;
+	vertex[0].x = roundf(prim->bounds.x0) - 0.5f;
+	vertex[0].y = roundf(prim->bounds.y0) - 0.5f;
+	vertex[1].x = roundf(prim->bounds.x1) - 0.5f;
+	vertex[1].y = roundf(prim->bounds.y0) - 0.5f;
+	vertex[2].x = roundf(prim->bounds.x0) - 0.5f;
+	vertex[2].y = roundf(prim->bounds.y1) - 0.5f;
+	vertex[3].x = roundf(prim->bounds.x1) - 0.5f;
+	vertex[3].y = roundf(prim->bounds.y1) - 0.5f;
 	float width = prim->bounds.x1 - prim->bounds.x0;
 	float height = prim->bounds.y1 - prim->bounds.y0;
 
