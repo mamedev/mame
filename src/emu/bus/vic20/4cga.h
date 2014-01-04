@@ -40,15 +40,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_joy3_1) { if (state) m_joy3 |= 2; else m_joy3 &= ~2; update_output(); }
 	DECLARE_WRITE_LINE_MEMBER(write_joy3_2) { if (state) m_joy3 |= 4; else m_joy3 &= ~4; update_output(); }
 	DECLARE_WRITE_LINE_MEMBER(write_joy3_3) { if (state) m_joy3 |= 8; else m_joy3 &= ~8; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy3_4) { if (state) m_joy3 |= 16; else m_joy3 &= ~16; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy3_5) { if (state) m_joy3 |= 32; else m_joy3 &= ~32; update_output(); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_joy4_0) { if (state) m_joy4 |= 1; else m_joy4 &= ~1; update_output(); }
 	DECLARE_WRITE_LINE_MEMBER(write_joy4_1) { if (state) m_joy4 |= 2; else m_joy4 &= ~2; update_output(); }
 	DECLARE_WRITE_LINE_MEMBER(write_joy4_2) { if (state) m_joy4 |= 4; else m_joy4 &= ~4; update_output(); }
 	DECLARE_WRITE_LINE_MEMBER(write_joy4_3) { if (state) m_joy4 |= 8; else m_joy4 &= ~8; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy4_4) { if (state) m_joy4 |= 16; else m_joy4 &= ~16; update_output(); }
-	DECLARE_WRITE_LINE_MEMBER(write_joy4_5) { if (state) m_joy4 |= 32; else m_joy4 &= ~32; update_output(); }
 
 protected:
 	// device-level overrides
