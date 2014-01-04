@@ -388,6 +388,7 @@ MACHINE_CONFIG_END
 static MC6845_INTERFACE( svi806_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8 /*?*/,
 	NULL,
 	svi806_crtc6845_update_row,

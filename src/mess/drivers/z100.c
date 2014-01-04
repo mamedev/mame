@@ -617,6 +617,7 @@ READ8_MEMBER( z100_state::get_slave_ack )
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

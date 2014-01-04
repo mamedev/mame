@@ -996,6 +996,7 @@ static MC6845_UPDATE_ROW( vk100_update_row )
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,
+	0,0,0,0,
 	12,
 	NULL,
 	vk100_update_row,

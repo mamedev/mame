@@ -140,6 +140,7 @@ MC6845_UPDATE_ROW( mbc200_update_row )
 static MC6845_INTERFACE( mbc200_crtc )
 {
 	false,
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of dots per character */
 	NULL,
 	mbc200_update_row,      /* handler to display a scanline */

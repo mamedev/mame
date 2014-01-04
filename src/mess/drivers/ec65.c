@@ -168,6 +168,7 @@ static MC6845_UPDATE_ROW( ec65_update_row )
 static MC6845_INTERFACE( ec65_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8 /*?*/,
 	NULL,
 	ec65_update_row,

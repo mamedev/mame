@@ -185,6 +185,7 @@ static VIDEO_START( cga_mc1502 );
 static MC6845_INTERFACE( mc6845_cga_intf )
 {
 	false,                          /* show border area */
+	0,0,0,0,                        /* visarea adjustment */
 	8,                              /* numbers of pixels per video memory address */
 	NULL,                           /* begin_update */
 	cga_update_row,                 /* update_row */

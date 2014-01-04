@@ -21,6 +21,7 @@
 MC6845_INTERFACE( twincobr_mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	2,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

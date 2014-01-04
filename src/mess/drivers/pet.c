@@ -1173,6 +1173,7 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,
+	0,0,0,0,
 	2*8,
 	NULL,
 	pet80_update_row,
@@ -1236,6 +1237,7 @@ static MC6845_UPDATE_ROW( cbm8296_update_row )
 static MC6845_INTERFACE( cbm8296_crtc_intf )
 {
 	false,
+	0,0,0,0,
 	2*8,
 	NULL,
 	cbm8296_update_row,

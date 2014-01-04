@@ -78,12 +78,13 @@ GFXDECODE_END
 static MC6845_INTERFACE( mc6845_mda_intf )
 {
 	false,              /* show border area */
+	0,0,0,0,            /* visarea adjustment */
 	9,                  /* number of pixels per video memory address */
 	NULL,               /* begin_update */
 	mda_update_row,     /* update_row */
 	NULL,               /* end_update */
-	DEVCB_NULL,             /* on_de_changed */
-	DEVCB_NULL,             /* on_cur_changed */
+	DEVCB_NULL,         /* on_de_changed */
+	DEVCB_NULL,         /* on_cur_changed */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_mda_device, hsync_changed),    /* on_hsync_changed */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_mda_device, vsync_changed),    /* on_vsync_changed */
 	NULL
@@ -498,6 +499,7 @@ The divder/pixels per 6845 clock is 9 for text mode and 16 for graphics mode.
 static MC6845_INTERFACE( mc6845_hercules_intf )
 {
 	false,                  /* show border area */
+	0,0,0,0,                /* visarea adjustment */
 	9,                      /* number of pixels per video memory address */
 	NULL,                   /* begin_update */
 	mda_update_row,         /* update_row */

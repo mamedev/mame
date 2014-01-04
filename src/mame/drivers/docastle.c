@@ -153,6 +153,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "video/mc6845.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
 #include "includes/docastle.h"
@@ -240,8 +241,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( docastle_io_map, AS_IO, 8, docastle_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP //AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP //AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
 
@@ -544,6 +545,29 @@ static GFXDECODE_START( docastle )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32*2 )
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  6845 CRTC interface
+ *
+ *************************************/
+
+static MC6845_INTERFACE( mc6845_intf )
+{
+	false,      /* show border area */
+	8,-8,32,32, /* visarea adjustment */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
+};
+
+
 /* Sound Interfaces */
 
 static const msm5205_interface msm5205_config =
@@ -607,7 +631,7 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
 	/* video hardware */
-	//MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, mc6845_intf)
 	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 0+8, 0x110-24, 0x108, 0+32, 0xe0) // from crtc

@@ -249,6 +249,7 @@ static MC6845_UPDATE_ROW( zrt80_update_row )
 static MC6845_INTERFACE( zrt80_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8 /*?*/,
 	NULL,
 	zrt80_update_row,

@@ -287,6 +287,7 @@ static const speaker_interface speaker_intf =
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	grip_update_row,
@@ -302,6 +303,7 @@ static MC6845_INTERFACE( crtc_intf )
 static MC6845_INTERFACE( grip5_crtc_intf )
 {
     false,
+	0,0,0,0,
     8,
     NULL,
     grip5_update_row,

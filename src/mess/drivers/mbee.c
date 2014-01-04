@@ -662,6 +662,7 @@ SLOT_INTERFACE_END
 static MC6845_INTERFACE( mbee_crtc )
 {
 	false,
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of dots per character */
 	NULL,
 	mbee_update_row,        /* handler to display a scanline */
@@ -677,6 +678,7 @@ static MC6845_INTERFACE( mbee_crtc )
 static MC6845_INTERFACE( mbeeic_crtc )
 {
 	false,
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of dots per character */
 	NULL,
 	mbeeic_update_row,      /* handler to display a scanline */
@@ -691,6 +693,7 @@ static MC6845_INTERFACE( mbeeic_crtc )
 static MC6845_INTERFACE( mbeeppc_crtc )
 {
 	false,
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of dots per character */
 	NULL,
 	mbeeppc_update_row,     /* handler to display a scanline */
@@ -705,6 +708,7 @@ static MC6845_INTERFACE( mbeeppc_crtc )
 static MC6845_INTERFACE( mbee256_crtc )
 {
 	false,
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of dots per character */
 	NULL,
 	mbeeppc_update_row,     /* handler to display a scanline */

@@ -207,6 +207,7 @@ static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
 static MC6845_INTERFACE( crtc_intf )
 {
 	true,
+	0,0,0,0,
 	32,
 	NULL,
 	abc1600_update_row,

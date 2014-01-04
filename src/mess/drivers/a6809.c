@@ -132,6 +132,7 @@ static MC6845_UPDATE_ROW( a6809_update_row )
 static MC6845_INTERFACE( a6809_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	12,
 	NULL,
 	a6809_update_row,

@@ -134,6 +134,7 @@ static MC6845_UPDATE_ROW( comx_clm_update_row )
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	comx_clm_update_row,

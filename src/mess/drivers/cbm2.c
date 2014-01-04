@@ -1133,6 +1133,7 @@ static MC6845_UPDATE_ROW( crtc_update_row )
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,
+	0,0,0,0,
 	9,
 	NULL,
 	crtc_update_row,

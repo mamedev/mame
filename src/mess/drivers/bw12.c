@@ -356,6 +356,7 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 static MC6845_INTERFACE( bw12_mc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	bw12_update_row,

@@ -161,6 +161,7 @@ WRITE_LINE_MEMBER( mbc55x_state::vid_vsync_changed )
 MC6845_INTERFACE( mb55x_mc6845_intf )
 {
 	false,                          /* show border area */
+	0,0,0,0,                        /* visarea adjustment */
 	8,                              /* numbers of pixels per video memory address */
 	NULL,                           /* begin_update */
 	vid_update_row,                 /* update_row */

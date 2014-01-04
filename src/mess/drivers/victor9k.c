@@ -308,6 +308,7 @@ WRITE_LINE_MEMBER(victor9k_state::vert_w)
 static MC6845_INTERFACE( hd46505s_intf )
 {
 	false,
+	0,0,0,0,
 	10,
 	NULL,
 	victor9k_update_row,

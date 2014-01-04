@@ -26,9 +26,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_fdc(*this, "fdc"),
-	m_crtc(*this, "crtc")
-	,
-		m_p_vram(*this, "p_vram"){ }
+	m_crtc(*this, "crtc"),
+	m_p_vram(*this, "p_vram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mb8877_device> m_fdc;
@@ -235,6 +234,7 @@ GFXDECODE_END
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

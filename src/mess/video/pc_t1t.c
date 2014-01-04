@@ -88,13 +88,14 @@ static MC6845_UPDATE_ROW( t1000_update_row );
 static MC6845_INTERFACE( mc6845_t1000_intf )
 {
 	false,                  /* show border area */
+	0,0,0,0,                /* visarea adjustment */
 	8,                      /* numbers of pixels per video memory address */
 	NULL,                   /* begin_update */
 	t1000_update_row,       /* update_row */
 	NULL,                   /* end_update */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pc_t1t_device, t1000_de_changed),       /* on_de_changed */
-	DEVCB_NULL,                 /* on_cur_changed */
-	DEVCB_NULL,                 /* on_hsync_changed */
+	DEVCB_NULL,             /* on_cur_changed */
+	DEVCB_NULL,             /* on_hsync_changed */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pcvideo_t1000_device, t1000_vsync_changed),        /* on_vsync_changed */
 	NULL,
 };
@@ -120,13 +121,14 @@ machine_config_constructor pcvideo_t1000_device::device_mconfig_additions() cons
 static MC6845_INTERFACE( mc6845_pcjr_intf )
 {
 	false,                  /* show border area */
+	0,0,0,0,                /* visarea adjustment */
 	8,                      /* numbers of pixels per video memory address */
 	NULL,                   /* begin_update */
 	t1000_update_row,       /* update_row */
 	NULL,                   /* end_update */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pc_t1t_device, t1000_de_changed),       /* on_de_changed */
-	DEVCB_NULL,                 /* on_cur_changed */
-	DEVCB_NULL,                 /* on_hsync_changed */
+	DEVCB_NULL,             /* on_cur_changed */
+	DEVCB_NULL,             /* on_hsync_changed */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pcvideo_pcjr_device, pcjr_vsync_changed),     /* on_vsync_changed */
 	NULL
 };

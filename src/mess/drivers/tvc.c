@@ -636,6 +636,7 @@ QUICKLOAD_LOAD_MEMBER( tvc_state,tvc64)
 static MC6845_INTERFACE( tvc_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8 /*?*/,
 	NULL,
 	tvc_update_row,

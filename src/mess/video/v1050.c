@@ -98,6 +98,7 @@ WRITE_LINE_MEMBER( v1050_state::crtc_vs_w )
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	v1050_update_row,

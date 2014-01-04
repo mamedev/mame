@@ -436,6 +436,7 @@ void camplynx_state::video_start()
 static MC6845_INTERFACE( lynx48k_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	lynx48k_update_row,
@@ -451,6 +452,7 @@ static MC6845_INTERFACE( lynx48k_crtc6845_interface )
 static MC6845_INTERFACE( lynx128k_crtc6845_interface )
 {
 	false,
+	0,0,0,0,        /* visarea adjustment */
 	8,              /* dots per character */
 	NULL,
 	lynx128k_update_row,        /* callback to display one scanline */

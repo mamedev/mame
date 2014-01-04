@@ -613,6 +613,7 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 static MC6845_INTERFACE( bigbord2_crtc )
 {
 	false,
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of dots per character */
 	NULL,
 	bigbord2_update_row,        /* handler to display a scanline */

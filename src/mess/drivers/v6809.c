@@ -192,7 +192,8 @@ MC6845_ON_UPDATE_ADDR_CHANGED( v6809_update_addr )
 static MC6845_INTERFACE( v6809_crtc )
 {
 	false,
-	8,              /* number of dots per character */
+	0,0,0,0,                /* visarea adjustment */
+	8,                      /* number of dots per character */
 	NULL,
 	v6809_update_row,       /* handler to display a scanline */
 	NULL,
