@@ -656,6 +656,7 @@ WRITE_LINE_MEMBER(vic20_state::write_user_cassette_switch)
 static MACHINE_CONFIG_START( vic20, vic20_state )
 	// devices
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 0)
+	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via1_pa_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vic20_state, via1_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via1_pb_w))
 	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE(VIC20_USER_PORT_TAG, vic20_user_port_device, write_b))
