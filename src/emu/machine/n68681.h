@@ -9,19 +9,19 @@
 	MCFG_DEVICE_REPLACE(_tag, DUARTN68681, _clock)
 
 #define MCFG_DUARTN68681_IRQ_CALLBACK(_cb) \
-	downcast<duartn68681_device *>(device)->set_irq_cb(DEVCB2_##_cb);
+	devcb = &duartn68681_device::set_irq_cb(*device, DEVCB2_##_cb);
 
 #define MCFG_DUARTN68681_A_TX_CALLBACK(_cb) \
-	downcast<duartn68681_device *>(device)->set_a_tx_cb(DEVCB2_##_cb);
+	devcb = &duartn68681_device::set_a_tx_cb(*device, DEVCB2_##_cb);
 
 #define MCFG_DUARTN68681_B_TX_CALLBACK(_cb) \
-	downcast<duartn68681_device *>(device)->set_b_tx_cb(DEVCB2_##_cb);
+	devcb = &duartn68681_device::set_b_tx_cb(*device, DEVCB2_##_cb);
 
 #define MCFG_DUARTN68681_INPORT_CALLBACK(_cb) \
-	downcast<duartn68681_device *>(device)->set_inport_cb(DEVCB2_##_cb);
+	devcb = &duartn68681_device::set_inport_cb(*device, DEVCB2_##_cb);
 
 #define MCFG_DUARTN68681_OUTPORT_CALLBACK(_cb) \
-	downcast<duartn68681_device *>(device)->set_outport_cb(DEVCB2_##_cb);
+	devcb = &duartn68681_device::set_outport_cb(*device, DEVCB2_##_cb);
 
 #define MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(_a, _b, _c, _d) \
 	duartn68681_device::static_set_clocks(*device, _a, _b, _c, _d);
@@ -114,11 +114,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((UINT8)state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->device_serial_interface::rx_w((UINT8)state); }
 
-	template<class _write> void set_irq_cb(_write wr) { write_irq.set_callback(wr); }
-	template<class _write> void set_a_tx_cb(_write wr) { write_a_tx.set_callback(wr); }
-	template<class _write> void set_b_tx_cb(_write wr) { write_b_tx.set_callback(wr); }
-	template<class _read>  void set_inport_cb(_read rd) { read_inport.set_callback(rd); }
-	template<class _write> void set_outport_cb(_write wr) { write_outport.set_callback(wr); }
+	template<class _Object> static devcb2_base &set_irq_cb(device_t &device, _Object object) { return downcast<duartn68681_device &>(device).write_irq.set_callback(object); }
+	template<class _Object> static devcb2_base &set_a_tx_cb(device_t &device, _Object object) { return downcast<duartn68681_device &>(device).write_a_tx.set_callback(object); }
+	template<class _Object> static devcb2_base &set_b_tx_cb(device_t &device, _Object object) { return downcast<duartn68681_device &>(device).write_b_tx.set_callback(object); }
+	template<class _Object> static devcb2_base &set_inport_cb(device_t &device, _Object object) { return downcast<duartn68681_device &>(device).read_inport.set_callback(object); }
+	template<class _Object> static devcb2_base &set_outport_cb(device_t &device, _Object object) { return downcast<duartn68681_device &>(device).write_outport.set_callback(object); }
 
 	devcb2_write_line write_irq, write_a_tx, write_b_tx;
 	devcb2_read8 read_inport;
