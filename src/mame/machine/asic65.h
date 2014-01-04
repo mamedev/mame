@@ -59,7 +59,7 @@ private:
 	UINT8   m_last_bank;
 
 	/* ROM-based interface states */
-	required_device<legacy_cpu_device> m_ourcpu;
+	required_device<cpu_device> m_ourcpu;
 	UINT8   m_tfull;
 	UINT8   m_68full;
 	UINT8   m_cmd;
