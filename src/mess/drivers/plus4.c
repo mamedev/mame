@@ -40,7 +40,7 @@
 
 QUICKLOAD_LOAD_MEMBER( plus4_state, cbm_c16 )
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
+	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
 
 //**************************************************************************

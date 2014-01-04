@@ -15,7 +15,7 @@
 
 QUICKLOAD_LOAD_MEMBER( vic20_state, cbm_vc20 )
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
+	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
 
 //**************************************************************************
@@ -673,8 +673,7 @@ static MACHINE_CONFIG_START( vic20, vic20_state )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(M6502_TAG, m6502_device, irq_line))
 
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(M6522_2_TAG, via6522_device, write_ca1))
-	MCFG_CBM_IEC_ADD(NULL)
-//	MCFG_CBM_IEC_ADD("c1541") - breaks quick load
+	MCFG_CBM_IEC_ADD("c1541")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(M6522_2_TAG, via6522_device, write_cb1))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")

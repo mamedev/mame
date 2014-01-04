@@ -23,14 +23,13 @@
 
 
 int general_cbm_loadsnap( device_image_interface &image, const char *file_type, int snapshot_size,
-								offs_t offset, void (*cbm_sethiaddress)(running_machine &machine, UINT16 hiaddress) )
+	address_space &space, offs_t offset, void (*cbm_sethiaddress)(running_machine &machine, UINT16 hiaddress) )
 {
 	char buffer[7];
 	UINT8 *data = NULL;
 	UINT32 bytesread;
 	UINT16 address = 0;
 	int i;
-	address_space &space = image.device().machine().firstcpu->space(AS_PROGRAM);
 
 	if (!file_type)
 		goto error;

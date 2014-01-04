@@ -171,7 +171,7 @@ static void cbm_pet_quick_sethiaddress( running_machine &machine, UINT16 hiaddre
 
 QUICKLOAD_LOAD_MEMBER( pet_state, cbm_pet )
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_pet_quick_sethiaddress);
+	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
 }
 
 

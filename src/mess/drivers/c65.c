@@ -70,7 +70,7 @@ static void cbm_c65_quick_sethiaddress( running_machine &machine, UINT16 hiaddre
 
 QUICKLOAD_LOAD_MEMBER( c65_state, cbm_c65 )
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_c65_quick_sethiaddress);
+	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_c65_quick_sethiaddress);
 }
 
 /*************************************
