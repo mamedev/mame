@@ -165,5 +165,8 @@ WRITE_LINE_MEMBER( pet_user_port_device::write_m ) { if (m_card != NULL) m_card-
 //  SLOT_INTERFACE( pet_user_port_cards )
 //-------------------------------------------------
 
+#include "petuja.h"
+
 SLOT_INTERFACE_START( pet_user_port_cards )
+	SLOT_INTERFACE("petuja", PET_USERPORT_JOYSTICK_ADAPTER)
 SLOT_INTERFACE_END
