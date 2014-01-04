@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:smf
 /**********************************************************************
 
     Commodore 64 User Port emulation
@@ -29,7 +29,7 @@
 #ifndef __C64_USER_PORT__
 #define __C64_USER_PORT__
 
-#include "bus/vic20/user.h"
+#include "bus/pet/user.h"
 
 SLOT_INTERFACE_EXTERN( c64_user_port_cards );
 

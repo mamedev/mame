@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:smf
 /**********************************************************************
 
     Diag264 User Port Loop Back Connector emulation
@@ -26,7 +26,7 @@
 // ======================> diag264_user_port_loopback_device
 
 class diag264_user_port_loopback_device :  public device_t,
-	public device_plus4_user_port_interface
+	public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
@@ -36,24 +36,24 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 
-	// device_plus4_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER(write_b) { m_slot->m_6_handler(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_k) { m_slot->m_7_handler(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_4) { m_slot->m_j_handler(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_5) { m_slot->m_f_handler(state); }
+	// device_pet_user_port_interface overrides
+	virtual DECLARE_WRITE_LINE_MEMBER(input_b) { output_6(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_k) { output_7(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_4) { output_j(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_5) { output_f(state); }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(write_6) { m_slot->m_b_handler(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_7) { m_slot->m_k_handler(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_j) { m_slot->m_4_handler(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_f) { m_slot->m_5_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_6) { output_b(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_7) { output_k(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_j) { output_4(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_f) { output_5(state); }
 
-	//virtual DECLARE_WRITE_LINE_MEMBER(write_c) { m_slot->m_m_handler(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_d) { m_slot->m_l_handler(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER(write_e) { m_slot->m_h_handler(state); }
+	//virtual DECLARE_WRITE_LINE_MEMBER(input_c) { output_m(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_d) { output_l(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_e) { output_h(state); }
 
-	virtual DECLARE_WRITE_LINE_MEMBER(write_m) { m_slot->m_c_handler(state); }
-	//virtual DECLARE_WRITE_LINE_MEMBER(write_l) { m_slot->m_d_handler(state); }
-	//virtual DECLARE_WRITE_LINE_MEMBER(write_h) { m_slot->m_e_handler(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER(input_m) { output_c(state); }
+	//virtual DECLARE_WRITE_LINE_MEMBER(input_l) { output_d(state); }
+	//virtual DECLARE_WRITE_LINE_MEMBER(input_h) { output_e(state); }
 };
 
 // device type definition

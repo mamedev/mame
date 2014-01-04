@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, smf
 /**********************************************************************
 
     SpeedDOS / Burst Nibbler 1541/1571 Parallel Cable emulation
@@ -65,7 +65,7 @@ device_c64_floppy_parallel_interface::~device_c64_floppy_parallel_interface()
 
 c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_BN1541, "C64 Burst Nibbler 1541/1571 Parallel Cable", tag, owner, clock, "c64_bn1541", __FILE__),
-	device_vic20_user_port_interface(mconfig, *this),
+	device_pet_user_port_interface(mconfig, *this),
 	device_c64_floppy_parallel_interface(mconfig, *this)
 {
 }

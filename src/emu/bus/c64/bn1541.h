@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, smf
 /**********************************************************************
 
     SpeedDOS / Burst Nibbler 1541/1571 Parallel Cable emulation
@@ -46,7 +46,7 @@ protected:
 // ======================> c64_bn1541_device
 
 class c64_bn1541_device : public device_t,
-	public device_vic20_user_port_interface,
+	public device_pet_user_port_interface,
 	public device_c64_floppy_parallel_interface
 {
 public:

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, smf
 /**********************************************************************
 
     geoCable Centronics Cable emulation
@@ -28,7 +28,7 @@
 // ======================> c64_geocable_device
 
 class c64_geocable_device : public device_t,
-							public device_vic20_user_port_interface
+	public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
@@ -44,7 +44,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 
-	// device_vic20_user_port_interface overrides
+	// device_pet_user_port_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER(input_8);
 	virtual WRITE_LINE_MEMBER(input_c) { if (state) m_parallel_output |= 1; else m_parallel_output &= ~1; update_output(); }
 	virtual WRITE_LINE_MEMBER(input_d) { if (state) m_parallel_output |= 2; else m_parallel_output &= ~2; update_output(); }

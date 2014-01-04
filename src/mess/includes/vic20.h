@@ -27,7 +27,7 @@
 #define IEC_TAG         "iec"
 #define SCREEN_TAG      "screen"
 #define CONTROL1_TAG    "joy1"
-#define VIC20_USER_PORT_TAG     "user"
+#define PET_USER_PORT_TAG     "user"
 
 class vic20_state : public driver_device
 {
@@ -41,7 +41,7 @@ public:
 			m_iec(*this, CBM_IEC_TAG),
 			m_joy(*this, CONTROL1_TAG),
 			m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
-			m_user(*this, VIC20_USER_PORT_TAG),
+			m_user(*this, PET_USER_PORT_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_basic(*this, "basic"),
@@ -67,7 +67,7 @@ public:
 	required_device<cbm_iec_device> m_iec;
 	required_device<vcs_control_port_device> m_joy;
 	required_device<vic20_expansion_slot_device> m_exp;
-	required_device<vic20_user_port_device> m_user;
+	required_device<pet_user_port_device> m_user;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_memory_region m_basic;

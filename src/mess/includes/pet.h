@@ -27,6 +27,7 @@
 #define SCREEN_TAG      "screen"
 #define PLA1_TAG        "ue6"
 #define PLA2_TAG        "ue5"
+#define PET_USER_PORT_TAG "user"
 
 class pet_state : public driver_device
 {

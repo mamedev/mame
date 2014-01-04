@@ -27,7 +27,7 @@
 // ======================> c64_4cga_device
 
 class c64_4cga_device : public device_t,
-	public device_vic20_user_port_interface
+	public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
@@ -50,7 +50,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 
-	// device_vic20_user_port_interface overrides
+	// device_pet_user_port_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER( input_l );
 
 private:

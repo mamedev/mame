@@ -35,7 +35,7 @@
 #define SCREEN_VDC_TAG  "screen80"
 #define CONTROL1_TAG    "joy1"
 #define CONTROL2_TAG    "joy2"
-#define VIC20_USER_PORT_TAG     "user"
+#define PET_USER_PORT_TAG     "user"
 
 class c128_state : public driver_device
 {
@@ -55,7 +55,7 @@ public:
 			m_joy1(*this, CONTROL1_TAG),
 			m_joy2(*this, CONTROL2_TAG),
 			m_exp(*this, C64_EXPANSION_SLOT_TAG),
-			m_user(*this, VIC20_USER_PORT_TAG),
+			m_user(*this, PET_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_rom(*this, M8502_TAG),
@@ -113,7 +113,7 @@ public:
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<c64_expansion_slot_device> m_exp;
-	required_device<vic20_user_port_device> m_user;
+	required_device<pet_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_memory_region m_rom;

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:smf
 /**********************************************************************
 
     The Digital Excess & Hitmen 4-Player Joystick adapter emulation
@@ -27,7 +27,7 @@
 // ======================> c64_4dxh_device
 
 class c64_4dxh_device : public device_t,
-	public device_vic20_user_port_interface
+	public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
