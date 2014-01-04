@@ -51,7 +51,9 @@ const device_type EPSON_SMD_130 = &device_creator<epson_smd_130>;
 const device_type EPSON_SMD_140 = &device_creator<epson_smd_140>;
 const device_type EPSON_SMD_150 = &device_creator<epson_smd_150>;
 const device_type EPSON_SMD_160 = &device_creator<epson_smd_160>;
+#endif
 const device_type EPSON_SMD_165 = &device_creator<epson_smd_165>;
+#if 0
 const device_type EPSON_SMD_170 = &device_creator<epson_smd_170>;
 const device_type EPSON_SMD_180 = &device_creator<epson_smd_180>;
 const device_type EPSON_SMD_240L = &device_creator<epson_smd_240l>;
@@ -1505,6 +1507,40 @@ void floppy_8_dsdd::handled_variants(UINT32 *variants, int &var_count) const
 //**************************************************************************
 //  SPECIFIC FLOPPY DRIVE DEFINITIONS
 //**************************************************************************
+
+//-------------------------------------------------
+//  epson smd-165
+//
+//  track to track: 6 ms
+//  average: 97 ms
+//  setting time: 15 ms
+//  motor start time: 1 s
+//
+//-------------------------------------------------
+
+epson_smd_165::epson_smd_165(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, EPSON_SD_321, "EPSON SMD-165 Floppy Disk Drive", tag, owner, clock, "epson_smd_165", __FILE__)
+{
+}
+
+epson_smd_165::~epson_smd_165()
+{
+}
+
+void epson_smd_165::setup_characteristics()
+{
+	form_factor = floppy_image::FF_35;
+	tracks = 40;
+	sides = 2;
+	set_rpm(300);
+}
+
+void epson_smd_165::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::DSSD;
+}
 
 //-------------------------------------------------
 //  epson sd-320
