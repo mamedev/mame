@@ -300,7 +300,7 @@ bool floppy_image_device::call_load()
 	best_format->load(&io, form_factor, image);
 	output_format = is_readonly() ? 0 : best_format;
 
-	revolution_start_time = motor_always_on ? machine().time() : attotime::never;
+	revolution_start_time = mon ? attotime::never : machine().time();
 	revolution_count = 0;
 
 	index_resync();
