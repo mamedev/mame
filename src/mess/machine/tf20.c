@@ -104,7 +104,7 @@ static UPD7201_INTERFACE( tf20_upd7201_intf )
 };
 
 static SLOT_INTERFACE_START( tf20_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( tf20 )
@@ -123,8 +123,8 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_UPD765A_ADD("5a", true, true)
 
 	// floppy drives
-	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "sd320", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "sd320", floppy_image_device::default_floppy_formats)
 
 	// serial interface to another device
 	MCFG_EPSON_SIO_ADD("sio", NULL)
@@ -147,7 +147,7 @@ machine_config_constructor epson_tf20_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, EPSON_TF20, "EPSON TF-20 dual floppy drive", tag, owner, clock, "epson_tf20", __FILE__),
+	device_t(mconfig, EPSON_TF20, "EPSON TF-20 Dual Floppy Disk Drive", tag, owner, clock, "epson_tf20", __FILE__),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "19b"),
 	m_ram(*this, "ram"),

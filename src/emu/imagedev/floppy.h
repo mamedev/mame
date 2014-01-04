@@ -389,6 +389,26 @@ protected:
 	virtual void setup_characteristics();
 };
 
+class epson_sd_320 : public floppy_image_device {
+public:
+	epson_sd_320(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~epson_sd_320();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual const char *image_interface() const { return "floppy_5_25"; }
+protected:
+	virtual void setup_characteristics();
+};
+
+class epson_sd_321 : public floppy_image_device {
+public:
+	epson_sd_321(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~epson_sd_321();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual const char *image_interface() const { return "floppy_5_25"; }
+protected:
+	virtual void setup_characteristics();
+};
+
 class sony_oa_d31v : public floppy_image_device {
 public:
 	sony_oa_d31v(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -459,6 +479,8 @@ extern const device_type FLOPPY_8_SSSD;
 extern const device_type FLOPPY_8_DSSD;
 extern const device_type FLOPPY_8_SSDD;
 extern const device_type FLOPPY_8_DSDD;
+extern const device_type EPSON_SD_320;
+extern const device_type EPSON_SD_321;
 extern const device_type SONY_OA_D31V;
 extern const device_type SONY_OA_D32W;
 extern const device_type SONY_OA_D32V;
