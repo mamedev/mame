@@ -735,7 +735,8 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 {
 	static const char *const colnames[] = {
 		"COL0", "COL1", "COL2", "COL3", "COL4",
-		"COL5", "COL6", "COL7", "COL8", "COL9"
+		"COL5", "COL6", "COL7", "COL8", "COL9",
+		"COL10", "COL11", "COL12"
 	};
 
 	/* only do auto scan if keyboard is not enabled */
@@ -745,7 +746,8 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
 		m_column = (m_column + 1) % 16;
-		if (m_column < 10)
+
+		if (m_column < 13)
 		{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
@@ -765,45 +767,6 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 		}
 	}
 }
-
-
-INTERRUPT_GEN_MEMBER(bbc_state::bbcm_keyscan)
-{
-	static const char *const colnames[] = {
-		"COL0", "COL1", "COL2", "COL3", "COL4",
-		"COL5", "COL6", "COL7", "COL8", "COL9"
-	};
-
-	/* only do auto scan if keyboard is not enabled */
-	if (m_b3_keyboard == 1)
-	{
-		/* KBD IC1 4 bit addressable counter */
-		/* KBD IC3 4 to 10 line decoder */
-		/* keyboard not enabled so increment counter */
-		m_column = (m_column + 1) % 16;
-
-		/* this IF should be removed as soon as the dip switches (keyboard keys) are set for the master */
-		if (m_column < 10)
-		{
-			/* KBD IC4 8 input NAND gate */
-			/* set the value of via_system ca2, by checking for any keys
-			     being pressed on the selected m_column */
-			if ((ioport(colnames[m_column])->read() | 0x01) != 0xff)
-			{
-				m_via6522_0->write_ca2(1);
-			}
-			else
-			{
-				m_via6522_0->write_ca2(0);
-			}
-		}
-		else
-		{
-			m_via6522_0->write_ca2(0);
-		}
-	}
-}
-
 
 
 int bbc_state::bbc_keyboard(address_space &space, int data)
@@ -813,7 +776,8 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 	int res;
 	static const char *const colnames[] = {
 		"COL0", "COL1", "COL2", "COL3", "COL4",
-		"COL5", "COL6", "COL7", "COL8", "COL9"
+		"COL5", "COL6", "COL7", "COL8", "COL9",
+		"COL10", "COL11", "COL12"
 	};
 
 	m_column = data & 0x0f;
@@ -821,7 +785,7 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 
 	bit = 0;
 
-	if (m_column < 10)
+	if (m_column < 13)
 	{
 		res = ioport(colnames[m_column])->read();
 	}
