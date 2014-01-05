@@ -87,8 +87,10 @@ NETLIB_DEVICE_WITH_PARAMS(logic_input,
 	netlist_param_logic_t m_OUT;
 );
 
-NETLIB_DEVICE(analog_input,
+NETLIB_DEVICE_WITH_PARAMS(analog_input,
 	netlist_analog_output_t m_Q;
+
+    netlist_param_double_t m_OUT;
 );
 
 

@@ -92,8 +92,14 @@ NETLIB_UPDATE_PARAM(logic_input)
 NETLIB_START(analog_input)
 {
 	register_output("Q", m_Q);
+    register_param("OUT", m_OUT, 0.0);
 }
 
 NETLIB_UPDATE(analog_input)
 {
+}
+
+NETLIB_UPDATE_PARAM(analog_input)
+{
+    OUTANALOG(m_Q, m_OUT.Value(), NLTIME_IMMEDIATE);
 }

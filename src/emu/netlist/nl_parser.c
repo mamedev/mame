@@ -68,6 +68,8 @@ void netlist_parser::parse(const char *buf)
             netdev_device(n, "model", true);
 		else if ((n == "NETDEV_TTL_CONST") || (n == "NETDEV_ANALOG_CONST"))
 			netdev_const(n);
+		else if ((n == "NET_MODEL"))
+		    net_model();
 		else if (n == "NETLIST_START")
 		    netdev_netlist_start();
         else if (n == "NETLIST_END")
@@ -88,6 +90,15 @@ void netlist_parser::netdev_netlist_start()
 void netlist_parser::netdev_netlist_end()
 {
     // don't do much
+    skipws();
+    check_char(')');
+}
+
+void netlist_parser::net_model()
+{
+    // don't do much
+    pstring model = getstring();
+    m_setup.register_model(model);
     check_char(')');
 }
 
@@ -272,6 +283,17 @@ void netlist_parser::skipws()
 	}
 }
 
+pstring netlist_parser::getstring()
+{
+    skipws();
+    check_char('"');
+    pstring ret = getname2_ext('"', 0, NULL);
+    check_char('"');
+    skipws();
+    return ret;
+}
+
+
 pstring netlist_parser::getname(char sep)
 {
 	pstring ret = getname2(sep, 0);
@@ -287,14 +309,14 @@ pstring netlist_parser::getname2(char sep1, char sep2)
 
 pstring netlist_parser::getname2_ext(char sep1, char sep2, const char *allowed)
 {
-    char buf[300];
+    char buf[1024];
     char *p1 = buf;
     char c=getc();
 
     while ((c != sep1) && (c != sep2))
     {
         char cU = toupper(c);
-        if (strchr(allowed, cU) != NULL)
+        if ((allowed == NULL) || strchr(allowed, cU) != NULL)
             *p1++ = c;
         else
         {

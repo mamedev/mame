@@ -228,15 +228,15 @@ NETLIB_UPDATE_PARAM(QBJT_switch<_type>)
 	double NF = m_model.dValue("NF", 1);
 	//double VJE = m_model.dValue("VJE", 0.75);
 
-	double alpha = BF / (1.0 + BF);
+	//double alpha = BF / (1.0 + BF);
 
 	diode d(IS, NF);
 
 	// Assume 5mA Collector current for switch operation
 
-    m_V = d.V(0.005 / alpha);
+    m_V = d.V(0.005 / BF);
 
-	m_gB = d.gI(0.005 / alpha);
+	m_gB = d.gI(0.005 / BF);
 	if (m_gB < NETLIST_GMIN)
 		m_gB = NETLIST_GMIN;
 	m_gC = BF * m_gB; // very rough estimate
