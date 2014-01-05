@@ -36,16 +36,16 @@
 	MCFG_DEVICE_REMOVE(EGRET_TAG)
 
 #define MCFG_EGRET_RESET_CALLBACK(_cb) \
-	downcast<egret_device *>(device)->set_reset_cb(DEVCB2_##_cb);
+	devcb = &egret_device::set_reset_cb(*device, DEVCB2_##_cb);
 
 #define MCFG_EGRET_LINECHANGE_CALLBACK(_cb) \
-	downcast<egret_device *>(device)->set_linechange_cb(DEVCB2_##_cb);
+	devcb = &egret_device::set_linechange_cb(*device, DEVCB2_##_cb);
 
 #define MCFG_EGRET_VIA_CLOCK_CALLBACK(_cb) \
-	downcast<egret_device *>(device)->set_via_clock_cb(DEVCB2_##_cb);
+	devcb = &egret_device::set_via_clock_cb(*device, DEVCB2_##_cb);
 
 #define MCFG_EGRET_VIA_DATA_CALLBACK(_cb) \
-	downcast<egret_device *>(device)->set_via_data_cb(DEVCB2_##_cb);
+	devcb = &egret_device::set_via_data_cb(*device, DEVCB2_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -94,10 +94,10 @@ public:
 
 	int rom_offset;
 
-	template<class _write> void set_reset_cb(_write wr) { write_reset.set_callback(wr); }
-	template<class _write> void set_linechange_cb(_write wr) { write_linechange.set_callback(wr); }
-	template<class _write> void set_via_clock_cb(_write wr) { write_via_clock.set_callback(wr); }
-	template<class _write> void set_via_data_cb(_write wr) { write_via_data.set_callback(wr); }
+	template<class _Object> static devcb2_base &set_reset_cb(device_t &device, _Object wr) { return downcast<egret_device &>(device).write_reset.set_callback(wr); }
+	template<class _Object> static devcb2_base &set_linechange_cb(device_t &device, _Object wr) { return downcast<egret_device &>(device).write_linechange.set_callback(wr); }
+	template<class _Object> static devcb2_base &set_via_clock_cb(device_t &device, _Object wr) { return downcast<egret_device &>(device).write_via_clock.set_callback(wr); }
+	template<class _Object> static devcb2_base &set_via_data_cb(device_t &device, _Object wr) { return downcast<egret_device &>(device).write_via_data.set_callback(wr); }
 
 	devcb2_write_line write_reset, write_linechange, write_via_clock, write_via_data;
 
