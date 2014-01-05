@@ -2930,6 +2930,36 @@ ROM_START( cookbib )
 	ROM_LOAD16_BYTE( "uor4.bin",  0x40001, 0x20000, CRC(bed9ed2d) SHA1(7103b99cd0d54df864ea4a0f269011e30ad29ed7) )
 ROM_END
 
+ROM_START( cookbiba )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "d13.u818",  0x00001, 0x20000, CRC(19c75b1f) SHA1(c6c920d7cb1616b828cc8245cd8f7beb72753b7c) )
+	ROM_LOAD16_BYTE( "d14.u817",  0x00000, 0x20000, CRC(0021349f) SHA1(ae3dbda2fd0e99ce037e35b87a554fbe28b5fe14) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "d12.ub5", 0x00000, 0x10000 , CRC(0a16e0b4) SHA1(c20e8cf2b4fc6cf22d9588ff4b3e15cac8ebf505) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , BAD_DUMP CRC(a77d13f4) SHA1(13db72f5b171b0c1226e97ea98d9edd7144d56d9) ) // wrong for this set
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "sound.uc1", 0x00000, 0x20000, CRC(545e19b6) SHA1(ef518bbe44b22e7ef77ee6af337ebcad9b2674e0) )
+
+	ROM_REGION( 0x80000, "tilegfx", 0 ) /* */
+	ROM_LOAD16_BYTE( "srom5.bin", 0x00001, 0x40000, CRC(73a46e43) SHA1(054fac2dc5dffcbb9d81600689c07774d2e200b6) )
+	ROM_LOAD16_BYTE( "srom6.bin", 0x00000, 0x40000, CRC(ade2dbec) SHA1(12d385d22307d8251e711788dff2e503c8f8ca7c) )
+
+	ROM_REGION( 0x80000, "sprgfx", 0 ) /* GFX */
+	ROM_LOAD16_BYTE( "d17.uor1",  0x00000, 0x20000, CRC(2fab7c2d) SHA1(6024d3428cc09905c791a3f394487b8bb484a131) )
+	ROM_LOAD16_BYTE( "d18.uor2",  0x00001, 0x20000, CRC(341750a0) SHA1(a218ec0e61591b02bf1a8ba69f2af8d8d29fda8a) )
+	ROM_LOAD16_BYTE( "d19.uor3",  0x40000, 0x20000, CRC(343d2e41) SHA1(d1b123bb4c8749a1cda2c4e25eef09f46ecd68aa) )
+	ROM_LOAD16_BYTE( "d20.uor4",  0x40001, 0x20000, CRC(c35cc03d) SHA1(cbf51cee2a39e3ea3d421a9e0b2422b1ad306031))
+ROM_END
+
+
 /* Choky Choky */
 
 ROM_START( chokchok )
@@ -3572,7 +3602,8 @@ GAME( 1994, magicbal, 0,       metlsavr,    magicbal, tumbleb_state, chokchok, R
 GAME( 1995, chokchok, 0,       chokchok,    chokchok, tumbleb_state, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  )
 GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar, tumbleb_state,   wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
 GAME( 1995, htchctch, 0,       htchctch,    htchctch, tumbleb_state, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
-GAME( 1995, cookbib,  0,       cookbib,     cookbib, tumbleb_state,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
+GAME( 1995, cookbib,  0,       cookbib,     cookbib, tumbleb_state,  htchctch, ROT0, "SemiCom", "Cookie & Bibi (set 1)" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
+GAME( 1995, cookbiba, cookbib, cookbib,     cookbib, tumbleb_state,  htchctch, ROT0, "SemiCom", "Cookie & Bibi (set 2)" , GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1996, carket,   0,       htchctch,    carket,  tumbleb_state,  carket,   ROT0, "SemiCom", "Carket Ball", GAME_NOT_WORKING  ) // we're not using the MCU data from the right game, audio ends up bad after inserting a coin, maybe other issues
 GAME( 1996, wondl96,  0,       cookbib_mcu, wondl96, tumbleb_state,  wondl96,  ROT0, "SemiCom", "Wonder League '96 (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1996, sdfight,  0,       sdfight,     sdfight, tumbleb_state,  bcstory,  ROT0, "SemiCom", "SD Fighters (Korea)", GAME_SUPPORTS_SAVE )
