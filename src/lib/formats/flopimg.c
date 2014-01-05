@@ -1088,6 +1088,7 @@ bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *
 	return !type_no_data(type) &&
 		type != RAW &&
 		type != RAWBITS &&
+		type != FM &&
 		(type != CRC || (crcs[p1].type != CRC_CCITT && crcs[p1].type != CRC_CCITT_FM && crcs[p1].type != CRC_AMIGA));
 }
 
