@@ -1280,7 +1280,7 @@ static void video_reset(device_t *device)
 /* machine start (called only once) */
 MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 {
-	mpu4_config_common(machine());
+	mpu4_config_common();
 
 	m_mod_number=4; //No AY chip
 	/* setup communications */
@@ -1297,7 +1297,7 @@ MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
 {
 	m_vfd->reset(); //for debug ports only
 
-	mpu4_stepper_reset(this);
+	mpu4_stepper_reset();
 
 	m_lamp_strobe    = 0;
 	m_lamp_strobe2   = 0;
