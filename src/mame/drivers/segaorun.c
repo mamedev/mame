@@ -2466,7 +2466,7 @@ GAMEL(1986, outrunra, outrun,  outrun,          outrun,   segaorun_state,outrun,
 GAMEL(1986, outruno,  outrun,  outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega", "Out Run (sitdown/upright)", 0,                                  layout_outrun ) // Upright/Sitdown determined by dipswitch settings
 GAMEL(1986, outrundx, outrun,  outrundx,        outrundx, segaorun_state,outrun,  ROT0,   "Sega", "Out Run (deluxe sitdown)", 0,                                   layout_outrun )
 GAMEL(1986, outrunb,  outrun,  outrun,          outrun,   segaorun_state,outrunb, ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
-GAMEL(1986, outrunj,  outrun,  outrun_fd1089a,  outrun,   segaorun_state,outrun,  ROT0,   "Sega", "Out Run (Japan, FD1089A 317-0019)", 0,                                            layout_outrun ) // No Japanese text, different course order
+GAMEL(1986, outrunj,  outrun,  outrun_fd1089a,  outrun,   segaorun_state,outrun,  ROT0,   "Sega", "Out Run (Japan, FD1089A 317-0019)", 0,                          layout_outrun ) // No Japanese text, different course order
 GAME( 1987, shangon,  0,       shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega", "Super Hang-On (sitdown/upright, unprotected)", 0 )
 GAME( 1987, shangon3, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega", "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
 GAME( 1987, shangon2, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega", "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )

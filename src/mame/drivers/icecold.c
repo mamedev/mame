@@ -360,6 +360,7 @@ static const ay8910_interface icecold_ay8910_1_intf =
 
 
 static MACHINE_CONFIG_START( icecold, icecold_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz/4)
 	MCFG_CPU_PROGRAM_MAP(icecold_map)
@@ -422,5 +423,5 @@ ROM_START(zekepeak)
 ROM_END
 
 
-GAME(1983,  icecold ,  0      ,  icecold,  icecold, driver_device,  0,  ROT0,  "Taito",    "Ice Cold Beer",      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1983,  zekepeak,  icecold,  icecold,  icecold, driver_device,  0,  ROT0,  "Taito",    "Zeke's Peak"  ,      GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1983,  icecold,   0,        icecold,  icecold, driver_device,  0,  ROT0,  "Taito",    "Ice Cold Beer",      GAME_NOT_WORKING | GAME_MECHANICAL)
+GAME(1983,  zekepeak,  icecold,  icecold,  icecold, driver_device,  0,  ROT0,  "Taito",    "Zeke's Peak",        GAME_NOT_WORKING | GAME_MECHANICAL)
