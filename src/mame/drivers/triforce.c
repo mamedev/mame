@@ -17,34 +17,40 @@ use with Namco ROM carts.
 
 Games on this system include....
 
-   Year   Game                                                      Manufacturer        Media             Key Chip
-+-+------+----------------------------------------------------------+------------------+-----------------+--------------|
-| | 2002 | Starfox Armada (planned, but not released)               | Namco / Nintendo | ROM Cart?       | ?            |
-|*| 2002 | Virtua Striker 2002 (Japan)                              | Sega             | GDROM GDT-0001  | 317-0337-JPN |
-|*| 2002 | Virtua Striker 2002 (Export)                             | Sega             | GDROM GDT-0002  | 317-0337-EXP |
-| | 2003 | F-Zero AX                                                | Sega / Nintendo  | GDROM GDT-0004  | ?            |
-|*| 2003 | The Key Of Avalon: The Wizard Master (server) (Rev C)    | Sega             | GDROM GDT-0005C | ?            |
-| | 2003 | The Key Of Avalon: The Wizard Master (client) (Rev C)    | Sega             | GDROM GDT-0006C | ?            |
-|*| 2003 | Gekitou Pro Yakyuu Mizushima Shinji All Stars (Rev C)    | Sega             | GDROM GDT-0008C | 317-0371-JPN |
-| | 2003 | The Key Of Avalon 1.10                                   | Sega             | GDROM ?         | ?            |
-| | 2003 | The Key Of Avalon 1.20: Summon The New Monster           | Sega             | GDROM ?         | ?            |
-|*| 2004 | The Key Of Avalon 1.30: Chaotic Sabbat (server) (Rev C)  | Sega             | GDROM GDT-0009C | ?            |
-|*| 2004 | The Key Of Avalon 1.30: Chaotic Sabbat (client) (Rev C)  | Sega             | GDROM GDT-0010C | ?            |
-|*| 2004 | Firmware Update                                          | Sega             | GDROM GDT-0011  | ?            |
-|*| 2004 | Virtua Striker 4 (Japan) (Rev E)                         | Sega             | GDROM GDT-0013E | 317-0391-JPN |
-|*| 2004 | Virtua Striker 4 (Export)                                | Sega             | GDROM GDT-0015  | 317-0393-EXP |
-| | 2004 | The Key Of Avalon 2: Eutaxy Commandment (server)         | Sega             | GDROM GDT-0016  | ?            |
-|*| 2004 | The Key Of Avalon 2: Eutaxy Commandment (client) (Rev B) | Sega             | GDROM GDT-0017B | ?            |
-| | 2004 | F-Zero AX - Monster Ride Cycraft Edition                 | Sega / Nintendo  | GDROM ?         | ?            |
-| | 2005 | Donkey Kong Jungle Fever                                 | Namco / Nintendo | ROM Cart        | ?            |
-|*| 2005 | Mario Kart Arcade GP                                     | Namco / Nintendo | ROM Cart        | 317-5109-COM |
-| | 2005 | The Key Of Avalon 2.5: War of the Key                    | Sega             | GDROM ?         | ?            |
-|*| 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev D)                | Sega             | GDROM GDT-0020D | ?            |
-|*| 2006 | Virtua Striker 4 Ver.2006 (Export)                       | Sega             | GDROM GDT-0021  | ?            |
-|*| 2006 | Triforce Firmware Update for Compact Flash Box           | Sega             | GDROM GDT-0022A | 317-0567-COM |
-| | 2006 | Donkey Kong:Banana Kingdom                               | Namco / Nintendo | ROM Cart ?      | ?            |
-| | 2007 | Mario Kart Arcade GP 2                                   | Namco / Nintendo | ROM Cart        | ?            |
-+-+------+----------------------------------------------------------+------------------+-----------------+--------------+
+   Year   Game                                                      Manufacturer        Media   Number           Key Chip        PIC16C621A
++-+------+----------------------------------------------------------+------------------+-------|----------------+--------------|---------------|
+| | 2002 | Starfox Armada (planned, but not released)               | Namco / Nintendo | Cart? |                |              |               |
+|*| 2002 | Virtua Striker 2002 (Japan)                              | Sega             | GDROM | GDT-0001       | 317-0337-JPN |               |
+|*| 2002 | Virtua Striker 2002 (Export)                             | Sega             | GDROM | GDT-0002       | 317-0337-EXP |               |
+| | 2003 | F-Zero AX                                                | Sega / Nintendo  | GDROM | GDT-0004       |              |               |
+| | 2003 | F-Zero AX (Rev A)                                        | Sega / Nintendo  | GDROM | GDT-0004A      |              |               |
+| | 2003 | F-Zero AX (Rev B)                                        | Sega / Nintendo  | GDROM | GDT-0004B      |              |               |
+|*| 2003 | F-Zero AX (Rev C)                                        | Sega / Nintendo  | GDROM | GDT-0004C      |              |               |
+|*| 2003 | F-Zero AX (Rev D)                                        | Sega / Nintendo  | GDROM | GDT-0004D      |              |               |
+|*| 2003 | F-Zero AX (Rev E)                                        | Sega / Nintendo  | GDROM | GDT-0004E      |              |               |
+|*| 2003 | The Key Of Avalon: The Wizard Master (server) (Rev C)    | Sega             | GDROM | GDT-0005C      |              |               |
+| | 2003 | The Key Of Avalon: The Wizard Master (client) (Rev C)    | Sega             | GDROM | GDT-0006C      |              |               |
+|*| 2003 | Gekitou Pro Yakyuu Mizushima Shinji All Stars (Rev C)    | Sega             | GDROM | GDT-0008C      | 317-0371-JPN |               |
+| | 2003 | The Key Of Avalon 1.10                                   | Sega             | GDROM |                |              |               |
+| | 2003 | The Key Of Avalon 1.20: Summon The New Monster           | Sega             | GDROM |                |              |               |
+|*| 2004 | The Key Of Avalon 1.30: Chaotic Sabbat (server) (Rev C)  | Sega             | GDROM | GDT-0009C      |              |               |
+|*| 2004 | The Key Of Avalon 1.30: Chaotic Sabbat (client) (Rev C)  | Sega             | GDROM | GDT-0010C      |              |               |
+|*| 2004 | Firmware Update                                          | Sega             | GDROM | GDT-0011       |              |               |
+|*| 2004 | Virtua Striker 4 (Japan) (Rev E)                         | Sega             | GDROM | GDT-0013E      | 317-0391-JPN |               |
+|*| 2004 | Virtua Striker 4 (Export)                                | Sega             | GDROM | GDT-0015       | 317-0393-EXP |               |
+| | 2004 | The Key Of Avalon 2: Eutaxy Commandment (server)         | Sega             | GDROM | GDT-0016       |              |               |
+|*| 2004 | The Key Of Avalon 2: Eutaxy Commandment (client) (Rev B) | Sega             | GDROM | GDT-0017B      |              |               |
+| | 2004 | F-Zero AX - Monster Ride Cycraft Edition                 | Sega / Nintendo  | GDROM |                |              |               |
+| | 2005 | Donkey Kong Jungle Fever                                 | Namco / Nintendo | Cart  |                |              |               |
+|*| 2005 | Mario Kart Arcade GP (MKA1 Ver.A1)                       | Namco / Nintendo | Cart  | 837-14343-4T1  | 317-5109-COM | 253-5509-5109 |
+|*| 2005 | Mario Kart Arcade GP (MKA2 Ver.B)                        | Namco / Nintendo | Cart  | 837-14343-R4S0 | 317-5109-COM | 253-5509-5109 |
+| | 2005 | The Key Of Avalon 2.5: War of the Key                    | Sega             | GDROM |                |              |               |
+|*| 2006 | Virtua Striker 4 Ver.2006 (Japan) (Rev D)                | Sega             | GDROM | GDT-0020D      |              |               |
+|*| 2006 | Virtua Striker 4 Ver.2006 (Export)                       | Sega             | GDROM | GDT-0021       |              |               |
+|*| 2006 | Triforce Firmware Update for Compact Flash Box           | Sega             | GDROM | GDT-0022A      | 317-0567-COM |               |
+| | 2006 | Donkey Kong:Banana Kingdom                               | Namco / Nintendo | Cart? |                |              |               |
+| | 2007 | Mario Kart Arcade GP 2                                   | Namco / Nintendo | Cart  |                |              |               |
++-+------+----------------------------------------------------------+------------------+-------|----------------+--------------+---------------|
 * denotes these games are archived.
 
 
@@ -188,18 +194,7 @@ Notes:
       DSW       - 2-position DIP Switch, present only on Sega GDROM version PCB
       PIC16C621 - DIP18 socket and 4MHz OSC on a 90-degrees-mounted small PCB for
                   Microchip PIC16C621A protection key chip
-
- ? ? ? ? ? ? ? ? ?Usage:
- ? ? ? ? ? ? ? ? ?+-----------------------+-----------------+----------------+
- ? ? ? ? ? ? ? ? ?| ? ? ? ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ? | Sega Security ?|
- ? ? ? ? ? ? ? ? ?| Game ? ? ? ? ? ? ? ? ?| Sticker ? ? ? ? | Part Number ? ?|
- ? ? ? ? ? ? ? ? ?+-----------------------+-----------------+----------------+
- ? ? ? ? ? ? ? ? ?| Mario Kart Arcade GP ?| 253-5509-5109 ? | 317-5109-COM ? |
- ? ? ? ? ? ? ? ? ?| Nintendo/Namco, 2005 ?| ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ?|
- ? ? ? ? ? ? ? ? ?| ? ? ? ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ?|
- ? ? ? ? ? ? ? ? ?| Namco Code: MKA2Ver.B | ? ? ? ? ? ? ? ? | ? ? ? ? ? ? ? ?|
- ? ? ? ? ? ? ? ? ?+-----------------------+-----------------+----------------+
-
+ 
 ROM Board (attached to CN3 of Media Board, ONLY for use with Namco ROM cart version of the Media Board)
 ---------
 
@@ -797,4 +792,4 @@ GAME( 2004, avalon20, triforce, triforcegd,    triforce, driver_device, 0, ROT0,
 GAME( 2006, vs42006,  triforce, triforcegd,    triforce, driver_device, 0, ROT0, "Sega",  "Virtua Striker 4 Ver.2006 (Japan) (Rev D) (GDT-0020D)", GAME_IS_SKELETON )
 
 // ROM games
-GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco", "Mario Kart Arcade GP", GAME_IS_SKELETON )
+GAME( 2005, mkartagp, triforce, triforce_base, triforce, driver_device, 0, ROT0, "Namco", "Mario Kart Arcade GP (MKA2 Ver.B)", GAME_IS_SKELETON )
