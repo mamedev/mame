@@ -4,7 +4,6 @@
  */
 
 #include "nld_twoterm.h"
-#include "nld_system.h"
 #include "nld_solver.h"
 
 // ----------------------------------------------------------------------------------------

@@ -53,7 +53,6 @@
 #include "../nl_base.h"
 #include "nld_signal.h"
 #include "nld_system.h"
-#include "nld_twoterm.h"
 
 #include "nld_7400.h"
 #include "nld_7402.h"
@@ -74,11 +73,12 @@
 
 #include "nld_ne555.h"
 
-#include "nld_switches.h"
-
 #include "nld_log.h"
 
-#include "nld_solver.h"
+#include "../analog/nld_twoterm.h"
+#include "../analog/nld_solver.h"
+#include "../analog/nld_switches.h"
+
 
 #include "nld_legacy.h"
 

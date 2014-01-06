@@ -4,7 +4,7 @@
  */
 
 #include "nld_system.h"
-#include "nld_twoterm.h"
+//#include "nld_twoterm.h"
 
 // ----------------------------------------------------------------------------------------
 // netdev_const

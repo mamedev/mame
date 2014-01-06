@@ -10,8 +10,8 @@
 #include "nl_parser.h"
 #include "nl_util.h"
 #include "devices/nld_system.h"
-#include "devices/nld_solver.h"
-#include "devices/nld_twoterm.h"
+#include "analog/nld_solver.h"
+#include "analog/nld_twoterm.h"
 
 static NETLIST_START(base)
 	NETDEV_TTL_CONST(ttlhigh, 1)

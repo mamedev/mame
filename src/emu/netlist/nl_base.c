@@ -5,7 +5,7 @@
 
 #include "nl_base.h"
 #include "devices/nld_system.h"
-#include "devices/nld_solver.h"
+#include "analog/nld_solver.h"
 #include "pstring.h"
 #include "nl_util.h"
 
