@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(mekd2_state, mekd2_key_r))
-	MCFG_PIA6821_READCA2_HANDLER(READLINE(mekd2_state, mekd2_key40_r))
+	MCFG_PIA6821_READCB1_HANDLER(READLINE(mekd2_state, mekd2_key40_r))
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(mekd2_state, mekd2_segment_w))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(mekd2_state, mekd2_digit_w))
 	MCFG_PIA6821_CA2_HANDLER(WRITELINE(mekd2_state, mekd2_nmi_w))

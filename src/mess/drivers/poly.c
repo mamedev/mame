@@ -194,7 +194,7 @@ static MACHINE_CONFIG_START( poly, poly_state )
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA6821_READPB_HANDLER(READ8(poly_state, pia1_b_in))
-	MCFG_PIA6821_READCA2_HANDLER(READLINE(poly_state, pia1_cb1_in))
+	MCFG_PIA6821_READCB1_HANDLER(READLINE(poly_state, pia1_cb1_in))
 	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
