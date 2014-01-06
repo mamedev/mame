@@ -35,7 +35,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ay8910_0_b_w );
 	DECLARE_WRITE8_MEMBER( ay8910_1_a_w );
 	DECLARE_WRITE8_MEMBER( ay8910_1_b_w );
-	DECLARE_READ_LINE_MEMBER( sint_r );
 	DECLARE_WRITE8_MEMBER( motors_w );
 
 	// driver_device overrides
@@ -285,11 +284,6 @@ WRITE8_MEMBER( icecold_state::ay8910_1_b_w )
 	}
 }
 
-READ_LINE_MEMBER( icecold_state::sint_r )
-{
-	return m_sint;
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_sint_timer)
 {
 	m_sint = !m_sint;
@@ -378,7 +372,6 @@ static MACHINE_CONFIG_START( icecold, icecold_state )
 
 	MCFG_DEVICE_ADD( "pia1", PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(icecold_state, ay_r))
-	MCFG_PIA6821_READCA1_HANDLER(READLINE(icecold_state, sint_r))
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(icecold_state, ay_w))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(icecold_state, snd_ctrl_w))
 	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, firq_line))

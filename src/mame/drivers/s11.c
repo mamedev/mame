@@ -213,11 +213,10 @@ WRITE8_MEMBER( s11_state::sound_w )
 WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 {
 // sound ns
-	m_ca1 = state;
 	if(m_pias)
-		m_pias->ca1_w(m_ca1);
+		m_pias->ca1_w(state);
 	if(m_pia40)
-		m_pia40->cb2_w(m_ca1);
+		m_pia40->cb2_w(state);
 }
 
 WRITE8_MEMBER( s11_state::lamp0_w )
@@ -325,11 +324,6 @@ WRITE8_MEMBER( s11_state::bank_w )
 {
 	membank("bank0")->set_entry(BIT(data, 1));
 	membank("bank1")->set_entry(BIT(data, 0));
-}
-
-READ_LINE_MEMBER( s11_state::pias_ca1_r )
-{
-	return m_ca1;
 }
 
 WRITE_LINE_MEMBER( s11_state::pias_ca2_w )
@@ -470,7 +464,6 @@ static MACHINE_CONFIG_START( s11, s11_state )
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(s11_state, dac_r))
-	MCFG_PIA6821_READCA1_HANDLER(READLINE(s11_state, pias_ca1_r))
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(s11_state, dac_w))
 	MCFG_PIA6821_CA2_HANDLER(WRITELINE(s11_state, pias_ca2_w))
@@ -491,7 +484,6 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
 	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA6821_READCA1_HANDLER(READLINE(s11_state, pias_ca1_r))
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(s11_state, pia40_pa_w))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(s11_state, pia40_pb_w))
 	MCFG_PIA6821_CB2_HANDLER(WRITELINE(s11_state, pia40_cb2_w))

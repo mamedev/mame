@@ -74,7 +74,6 @@ public:
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pias_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
@@ -105,7 +104,6 @@ private:
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
-	bool m_ca1;
 	bool m_data_ok;
 };
 
@@ -243,8 +241,7 @@ READ_LINE_MEMBER( s8_state::pia21_ca1_r )
 WRITE_LINE_MEMBER( s8_state::pia21_ca2_w )
 {
 // sound ns
-	m_ca1 = state;
-	m_pias->ca1_w(m_ca1);
+	m_pias->ca1_w(state);
 }
 
 WRITE8_MEMBER( s8_state::lamp0_w )
@@ -292,11 +289,6 @@ READ8_MEMBER( s8_state::switch_r )
 WRITE8_MEMBER( s8_state::switch_w )
 {
 	m_kbdrow = data;
-}
-
-READ_LINE_MEMBER( s8_state::pias_ca1_r )
-{
-	return m_ca1;
 }
 
 WRITE_LINE_MEMBER( s8_state::pias_ca2_w )
@@ -385,7 +377,6 @@ static MACHINE_CONFIG_START( s8, s8_state )
 
 	MCFG_DEVICE_ADD("pias", PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(s8_state, dac_r))
-	MCFG_PIA6821_READCA1_HANDLER(READLINE(s8_state, pias_ca1_r))
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(s8_state, sound_w))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(s8_state, dac_w))
 	MCFG_PIA6821_CA2_HANDLER(WRITELINE(s8_state, pias_ca2_w))

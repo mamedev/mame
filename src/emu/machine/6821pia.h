@@ -46,9 +46,6 @@
 #define MCFG_PIA6821_READCB1_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_readcb1_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_READCB2_HANDLER(_devcb) \
-	devcb = &pia6821_device::set_readcb2_handler(*device, DEVCB2_##_devcb);
-
 // TODO: CONVERT THESE TO WRITE LINE
 #define MCFG_PIA6821_WRITEPA_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_writepa_handler(*device, DEVCB2_##_devcb);
@@ -88,7 +85,6 @@ public:
 	template<class _Object> static devcb2_base &set_readca1_handler(device_t &device, _Object object) { return downcast<pia6821_device &>(device).m_in_ca1_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_readca2_handler(device_t &device, _Object object) { return downcast<pia6821_device &>(device).m_in_ca2_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_readcb1_handler(device_t &device, _Object object) { return downcast<pia6821_device &>(device).m_in_cb1_handler.set_callback(object); }
-	template<class _Object> static devcb2_base &set_readcb2_handler(device_t &device, _Object object) { return downcast<pia6821_device &>(device).m_in_cb2_handler.set_callback(object); }
 
 	// TODO: CONVERT THESE TO WRITE LINE
 	template<class _Object> static devcb2_base &set_writepa_handler(device_t &device, _Object object) { return downcast<pia6821_device &>(device).m_out_a_handler.set_callback(object); }
@@ -107,31 +103,23 @@ public:
 	UINT8 port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
 	void set_port_a_z_mask(UINT8 data) { m_port_a_z_mask = data; }// see second note in .c
 
-	DECLARE_READ8_MEMBER( porta_r );
-	UINT8 porta_r() { return porta_r(machine().driver_data()->generic_space(), 0); }
 	DECLARE_WRITE8_MEMBER( porta_w );
 	void porta_w(UINT8 data) { porta_w(machine().driver_data()->generic_space(), 0, data); }
 	void set_a_input(UINT8 data, UINT8 z_mask);
 	UINT8 a_output();
 
-	DECLARE_READ_LINE_MEMBER( ca1_r );
 	DECLARE_WRITE_LINE_MEMBER( ca1_w );
 
-	DECLARE_READ_LINE_MEMBER( ca2_r );
 	DECLARE_WRITE_LINE_MEMBER( ca2_w );
 	int ca2_output();
 	int ca2_output_z();
 
-	DECLARE_READ8_MEMBER( portb_r );
-	UINT8 portb_r() { return portb_r(machine().driver_data()->generic_space(), 0); }
 	DECLARE_WRITE8_MEMBER( portb_w );
 	void portb_w(UINT8 data) { portb_w(machine().driver_data()->generic_space(), 0, data); }
 	UINT8 b_output();
 
-	DECLARE_READ_LINE_MEMBER( cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( cb1_w );
 
-	DECLARE_READ_LINE_MEMBER( cb2_r );
 	DECLARE_WRITE_LINE_MEMBER( cb2_w );
 	int cb2_output();
 	int cb2_output_z();
@@ -184,7 +172,6 @@ private:
 	devcb2_read_line m_in_ca1_handler;
 	devcb2_read_line m_in_cb1_handler;
 	devcb2_read_line m_in_ca2_handler;
-	devcb2_read_line m_in_cb2_handler;
 	devcb2_write8 m_out_a_handler;
 	devcb2_write8 m_out_b_handler;
 	devcb2_write_line m_ca2_handler;

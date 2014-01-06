@@ -401,11 +401,6 @@ READ8_MEMBER( bw12_state::pia_pa_r )
 	return data;
 }
 
-READ_LINE_MEMBER( bw12_state::pia_cb1_r )
-{
-	return m_key_stb;
-}
-
 WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
 {
 	if (state)
@@ -639,7 +634,6 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(bw12_state, pia_pa_r))
 	MCFG_PIA6821_READCA1_HANDLER(DEVREADLINE(CENTRONICS_TAG, centronics_device, ack_r))
-	MCFG_PIA6821_READCB1_HANDLER(READLINE(bw12_state, pia_cb1_r))
 	MCFG_PIA6821_WRITEPB_HANDLER(DEVWRITE8(CENTRONICS_TAG, centronics_device, write))
 	MCFG_PIA6821_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
 	MCFG_PIA6821_CB2_HANDLER(WRITELINE(bw12_state, pia_cb2_w))

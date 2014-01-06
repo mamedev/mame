@@ -870,7 +870,8 @@ READ8_MEMBER( victory_sound_device::response_r )
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", m_maincpu->pcbase(), ret);
 
-	m_pia1->cb1_w(0);
+	m_pia1_cb1 = 0;
+	m_pia1->cb1_w(m_pia1_cb1);
 
 	return ret;
 }
@@ -878,7 +879,7 @@ READ8_MEMBER( victory_sound_device::response_r )
 
 READ8_MEMBER( victory_sound_device::status_r )
 {
-	UINT8 ret = (m_pia1->ca1_r() << 7) | (m_pia1->cb1_r() << 6);
+	UINT8 ret = (m_pia1_ca1 << 7) | (m_pia1_cb1 << 6);
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", m_maincpu->pcbase(), ret);
 
@@ -889,7 +890,8 @@ READ8_MEMBER( victory_sound_device::status_r )
 TIMER_CALLBACK_MEMBER( victory_sound_device::delayed_command_w )
 {
 	m_pia1->set_a_input(param, 0);
-	m_pia1->ca1_w(0);
+	m_pia1_ca1 = 0;
+	m_pia1->ca1_w(m_pia1_ca1);
 }
 
 WRITE8_MEMBER( victory_sound_device::command_w )
@@ -904,7 +906,11 @@ WRITE_LINE_MEMBER( victory_sound_device::irq_clear_w )
 {
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", machine().describe_context(), state);
 
-	if (!state) m_pia1->ca1_w(1);
+	if (!state)
+	{
+		m_pia1_ca1 = 1;
+		m_pia1->ca1_w(m_pia1_ca1);
+	}
 }
 
 
@@ -913,7 +919,10 @@ WRITE_LINE_MEMBER( victory_sound_device::main_ack_w )
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", machine().describe_context(), state);
 
 	if (m_victory_sound_response_ack_clk && !state)
-		m_pia1->cb1_w(1);
+	{
+		m_pia1_cb1 = 1;
+		m_pia1->cb1_w(m_pia1_cb1);
+	}
 
 	m_victory_sound_response_ack_clk = state;
 }
@@ -979,12 +988,14 @@ void victory_sound_device::device_reset()
 
 	/* the flip-flop @ F4 is reset */
 	m_victory_sound_response_ack_clk = 0;
-	m_pia1->cb1_w(1);
+	m_pia1_cb1 = 1;
+	m_pia1->cb1_w(m_pia1_cb1);
 
 	/* these two lines shouldn't be needed, but it avoids the log entry
 	   as the sound CPU checks port A before the main CPU ever writes to it */
 	m_pia1->set_a_input(0, 0);
-	m_pia1->ca1_w(1);
+	m_pia1_ca1 = 1;
+	m_pia1->ca1_w(m_pia1_ca1);
 }
 
 //-------------------------------------------------

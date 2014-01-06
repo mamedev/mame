@@ -164,6 +164,9 @@ private:
 	UINT8 m_victory_sound_response_ack_clk; /* 7474 @ F4 */
 
 	TIMER_CALLBACK_MEMBER( delayed_command_w );
+
+	int m_pia1_ca1;
+	int m_pia1_cb1;
 };
 
 extern const device_type EXIDY_VICTORY;

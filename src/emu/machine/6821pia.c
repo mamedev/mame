@@ -54,7 +54,6 @@ pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, d
 	m_in_ca1_handler(*this),
 	m_in_cb1_handler(*this),
 	m_in_ca2_handler(*this),
-	m_in_cb2_handler(*this),
 	m_out_a_handler(*this),
 	m_out_b_handler(*this),
 	m_ca2_handler(*this),
@@ -81,7 +80,6 @@ void pia6821_device::device_start()
 	m_in_ca1_handler.resolve();
 	m_in_cb1_handler.resolve();
 	m_in_ca2_handler.resolve();
-	m_in_cb2_handler.resolve();
 	m_out_a_handler.resolve();
 	m_out_b_handler.resolve();
 	m_ca2_handler.resolve();
@@ -550,13 +548,9 @@ UINT8 pia6821_device::control_b_r()
 		m_logged_cb1_not_connected = true;
 	}
 
-	if(!m_in_cb2_handler.isnull())
+	if(!m_logged_cb2_not_connected && C2_INPUT(m_ctl_b) && !m_in_cb2_pushed)
 	{
-		cb2_w(m_in_cb2_handler());
-	}
-	else if(!m_logged_cb2_not_connected && C2_INPUT(m_ctl_b) && !m_in_cb2_pushed)
-	{
-		logerror("PIA #%s: Error! No CB2 read handler. Three-state pin is undefined\n", tag());
+		logerror("PIA #%s: Error! Three-state pin is undefined\n", tag());
 		m_logged_cb2_not_connected = true;
 	}
 
@@ -893,16 +887,6 @@ void pia6821_device::reg_w(UINT8 offset, UINT8 data)
 
 
 //-------------------------------------------------
-//  porta_r
-//-------------------------------------------------
-
-READ8_MEMBER( pia6821_device::porta_r )
-{
-	return m_in_a;
-}
-
-
-//-------------------------------------------------
 //  set_a_input
 //-------------------------------------------------
 
@@ -941,16 +925,6 @@ UINT8 pia6821_device::a_output()
 
 
 //-------------------------------------------------
-//  ca1_r
-//-------------------------------------------------
-
-READ_LINE_MEMBER( pia6821_device::ca1_r )
-{
-	return m_in_ca1;
-}
-
-
-//-------------------------------------------------
 //  ca1_w
 //-------------------------------------------------
 
@@ -979,16 +953,6 @@ WRITE_LINE_MEMBER( pia6821_device::ca1_w )
 	// set the new value for CA1
 	m_in_ca1 = state;
 	m_in_ca1_pushed = true;
-}
-
-
-//-------------------------------------------------
-//  ca2_r
-//-------------------------------------------------
-
-READ_LINE_MEMBER( pia6821_device::ca2_r )
-{
-	return m_in_ca2;
 }
 
 
@@ -1046,16 +1010,6 @@ int pia6821_device::ca2_output_z()
 
 
 //-------------------------------------------------
-//  portb_r
-//-------------------------------------------------
-
-READ8_MEMBER( pia6821_device::portb_r )
-{
-	return m_in_b;
-}
-
-
-//-------------------------------------------------
 //  portb_w
 //-------------------------------------------------
 
@@ -1079,16 +1033,6 @@ UINT8 pia6821_device::b_output()
 	m_out_b_needs_pulled = false;
 
 	return get_out_b_value();
-}
-
-
-//-------------------------------------------------
-//  cb1_r
-//-------------------------------------------------
-
-READ_LINE_MEMBER( pia6821_device::cb1_r )
-{
-	return m_in_cb1;
 }
 
 
@@ -1120,16 +1064,6 @@ WRITE_LINE_MEMBER( pia6821_device::cb1_w )
 	// set the new value for CB1
 	m_in_cb1 = state;
 	m_in_cb1_pushed = true;
-}
-
-
-//-------------------------------------------------
-//  cb2_r
-//-------------------------------------------------
-
-READ_LINE_MEMBER( pia6821_device::cb2_r )
-{
-	return m_in_cb2;
 }
 
 

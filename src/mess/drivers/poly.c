@@ -59,7 +59,6 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(pia1_b_in);
-	DECLARE_READ_LINE_MEMBER(pia1_cb1_in);
 	DECLARE_READ8_MEMBER(videoram_r);
 	UINT8 m_term_data;
 	bool m_term_key;
@@ -106,12 +105,6 @@ READ8_MEMBER( poly_state::pia1_b_in )
 	UINT8 data = m_term_data;
 	m_term_data &= 0x7f;
 	return data;
-}
-
-READ_LINE_MEMBER( poly_state::pia1_cb1_in )
-{
-// return kbd strobe value
-	return 0;
 }
 
 
@@ -194,7 +187,7 @@ static MACHINE_CONFIG_START( poly, poly_state )
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA6821_READPB_HANDLER(READ8(poly_state, pia1_b_in))
-	MCFG_PIA6821_READCB1_HANDLER(READLINE(poly_state, pia1_cb1_in))
+	// CB1 kbd strobe
 	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 

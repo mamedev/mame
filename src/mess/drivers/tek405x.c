@@ -452,11 +452,6 @@ WRITE_LINE_MEMBER( tek4051_state::adot_w )
 {
 }
 
-READ_LINE_MEMBER( tek4051_state::viewcause_r )
-{
-	return 0;
-}
-
 WRITE_LINE_MEMBER( tek4051_state::bufclk_w )
 {
 }
@@ -527,21 +522,6 @@ WRITE8_MEMBER( tek4051_state::sb_w )
 	    PB7     SB7
 
 	*/
-}
-
-READ_LINE_MEMBER( tek4051_state::rdbyte_r )
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( tek4051_state::mdata_r )
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( tek4051_state::fmark_r )
-{
-	return 0;
 }
 
 WRITE_LINE_MEMBER( tek4051_state::sot_w )
@@ -651,11 +631,6 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	m_gpib->ren_w(!BIT(data, 7));
 }
 
-READ_LINE_MEMBER( tek4051_state::key_r )
-{
-	return m_key;
-}
-
 WRITE_LINE_MEMBER( tek4051_state::kb_halt_w )
 {
 }
@@ -727,26 +702,6 @@ WRITE8_MEMBER( tek4051_state::tape_pia_pb_w )
 	    PB7     FSENABLE-0
 
 	*/
-}
-
-READ_LINE_MEMBER( tek4051_state::rmark_r )
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( tek4051_state::lohole_r )
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( tek4051_state::filfnd_r )
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( tek4051_state::uphole_r )
-{
-	return 0;
 }
 
 WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqa_w )
@@ -1075,7 +1030,7 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 
 	MCFG_DEVICE_ADD(MC6820_X_TAG, PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(tek4051_state, x_pia_pa_r))
-	MCFG_PIA6821_READCB1_HANDLER(READLINE(tek4051_state, viewcause_r))
+	// CB1 viewcause
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(tek4051_state, x_pia_pa_w))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, x_pia_pb_w))
 	MCFG_PIA6821_CA2_HANDLER(WRITELINE(tek4051_state, adot_w))
@@ -1085,9 +1040,9 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 
 	MCFG_DEVICE_ADD(MC6820_Y_TAG, PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(tek4051_state, sa_r))
-	MCFG_PIA6821_READCA1_HANDLER(READLINE(tek4051_state, rdbyte_r))
-	MCFG_PIA6821_READCB1_HANDLER(READLINE(tek4051_state, mdata_r))
-	MCFG_PIA6821_READCB2_HANDLER(READLINE(tek4051_state, fmark_r))
+	// CA1 rdbyte
+	// CB1 mdata
+	// CB2 fmark
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(tek4051_state, y_pia_pa_w))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, sb_w))
 	MCFG_PIA6821_CA2_HANDLER(WRITELINE(tek4051_state, sot_w))
@@ -1097,7 +1052,7 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_DEVICE_ADD(MC6820_KB_TAG, PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(tek4051_state, kb_pia_pa_r))
 	MCFG_PIA6821_READPB_HANDLER(READ8(tek4051_state, kb_pia_pb_r))
-	MCFG_PIA6821_READCA1_HANDLER(READLINE(tek4051_state, key_r))
+	// CA1 key
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, kb_pia_pb_w))
 	MCFG_PIA6821_CA2_HANDLER(WRITELINE(tek4051_state, kb_halt_w))
 	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(tek4051_state, kb_pia_irqa_w))
@@ -1105,10 +1060,10 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 
 	MCFG_DEVICE_ADD(MC6820_TAPE_TAG, PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(tek4051_state, tape_pia_pa_r))
-	MCFG_PIA6821_READCA1_HANDLER(READLINE(tek4051_state, rmark_r))
-	MCFG_PIA6821_READCB1_HANDLER(READLINE(tek4051_state, lohole_r))
-	MCFG_PIA6821_READCA2_HANDLER(READLINE(tek4051_state, filfnd_r))
-	MCFG_PIA6821_READCB2_HANDLER(READLINE(tek4051_state, uphole_r))
+	// CA1 rmark
+	// CB1 lohole
+	// CA2 filfnd
+	// CB2 uphole
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(tek4051_state, tape_pia_pa_w))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, tape_pia_pb_w))
 	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(tek4051_state, tape_pia_irqa_w))

@@ -88,10 +88,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apf_mc6847_fs_w);
 	DECLARE_READ8_MEMBER(apf_m1000_pia_in_a_func);
 	DECLARE_READ8_MEMBER(apf_m1000_pia_in_b_func);
-	DECLARE_READ_LINE_MEMBER(apf_m1000_pia_in_ca1_func);
-	DECLARE_READ_LINE_MEMBER(apf_m1000_pia_in_cb1_func);
-	DECLARE_READ_LINE_MEMBER(apf_m1000_pia_in_ca2_func);
-	DECLARE_READ_LINE_MEMBER(apf_m1000_pia_in_cb2_func);
 	DECLARE_WRITE8_MEMBER(apf_m1000_pia_out_a_func);
 	DECLARE_WRITE8_MEMBER(apf_m1000_pia_out_b_func);
 	DECLARE_WRITE_LINE_MEMBER(apf_m1000_pia_out_ca2_func);
@@ -100,10 +96,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apf_m1000_irq_b_func);
 	DECLARE_READ8_MEMBER(apf_imagination_pia_in_a_func);
 	DECLARE_READ8_MEMBER(apf_imagination_pia_in_b_func);
-	DECLARE_READ_LINE_MEMBER(apf_imagination_pia_in_ca1_func);
-	DECLARE_READ_LINE_MEMBER(apf_imagination_pia_in_cb1_func);
-	DECLARE_READ_LINE_MEMBER(apf_imagination_pia_in_ca2_func);
-	DECLARE_READ_LINE_MEMBER(apf_imagination_pia_in_cb2_func);
 	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_a_func);
 	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_b_func);
 	DECLARE_WRITE_LINE_MEMBER(apf_imagination_pia_out_ca2_func);
@@ -164,26 +156,6 @@ READ8_MEMBER( apf_state::apf_m1000_pia_in_a_func)
 READ8_MEMBER( apf_state::apf_m1000_pia_in_b_func)
 {
 	return 0xff;
-}
-
-READ_LINE_MEMBER( apf_state::apf_m1000_pia_in_ca1_func)
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( apf_state::apf_m1000_pia_in_cb1_func)
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( apf_state::apf_m1000_pia_in_ca2_func)
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( apf_state::apf_m1000_pia_in_cb2_func)
-{
-	return 0;
 }
 
 
@@ -255,26 +227,6 @@ READ8_MEMBER( apf_state::apf_imagination_pia_in_b_func)
 		data =(1<<7);
 
 	return data;
-}
-
-READ_LINE_MEMBER( apf_state::apf_imagination_pia_in_ca1_func)
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( apf_state::apf_imagination_pia_in_cb1_func)
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( apf_state::apf_imagination_pia_in_ca2_func)
-{
-	return 0;
-}
-
-READ_LINE_MEMBER( apf_state::apf_imagination_pia_in_cb2_func)
-{
-	return 0;
 }
 
 
@@ -678,10 +630,6 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(apf_state, apf_m1000_pia_in_a_func))
 	MCFG_PIA6821_READPB_HANDLER(READ8(apf_state, apf_m1000_pia_in_b_func))
-	MCFG_PIA6821_READCA1_HANDLER(READLINE(apf_state, apf_m1000_pia_in_ca1_func))
-	MCFG_PIA6821_READCB1_HANDLER(READLINE(apf_state, apf_m1000_pia_in_cb1_func))
-	MCFG_PIA6821_READCA2_HANDLER(READLINE(apf_state, apf_m1000_pia_in_ca2_func))
-	MCFG_PIA6821_READCB2_HANDLER(READLINE(apf_state, apf_m1000_pia_in_cb2_func))
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(apf_state, apf_m1000_pia_out_a_func))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(apf_state, apf_m1000_pia_out_b_func))
 	MCFG_PIA6821_CA2_HANDLER(WRITELINE(apf_state, apf_m1000_pia_out_ca2_func))
@@ -692,10 +640,6 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA6821_READPA_HANDLER(READ8(apf_state, apf_imagination_pia_in_a_func))
 	MCFG_PIA6821_READPB_HANDLER(READ8(apf_state, apf_imagination_pia_in_b_func))
-	MCFG_PIA6821_READCA1_HANDLER(READLINE(apf_state, apf_imagination_pia_in_ca1_func))
-	MCFG_PIA6821_READCB1_HANDLER(READLINE(apf_state, apf_imagination_pia_in_cb1_func))
-	MCFG_PIA6821_READCA2_HANDLER(READLINE(apf_state, apf_imagination_pia_in_ca2_func))
-	MCFG_PIA6821_READCB2_HANDLER(READLINE(apf_state, apf_imagination_pia_in_cb2_func))
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(apf_state, apf_imagination_pia_out_a_func))
 	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(apf_state, apf_imagination_pia_out_b_func))
 	MCFG_PIA6821_CA2_HANDLER(WRITELINE(apf_state, apf_imagination_pia_out_ca2_func))

@@ -61,7 +61,6 @@ public:
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pias_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ8_MEMBER(pia28_w7_r);
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
@@ -117,7 +116,6 @@ private:
 	UINT8 m_diag;
 	UINT32 m_segment1;
 	UINT32 m_segment2;
-	bool m_ca1;
 	emu_timer* m_irq_timer;
 	bool m_irq_active;
 };
