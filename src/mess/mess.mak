@@ -2333,6 +2333,7 @@ $(MESS_DRIVERS)/apollo.o:   $(MESS_LAYOUT)/apollo_dsp.lh
 $(MESS_DRIVERS)/apricotp.o: $(MESS_LAYOUT)/apricotp.lh
 $(MESS_DRIVERS)/avigo.o:    $(MESS_LAYOUT)/avigo.lh
 $(MESS_DRIVERS)/babbage.o:  $(MESS_LAYOUT)/babbage.lh
+$(MESS_DRIVERS)/bbc.o:      $(MESS_LAYOUT)/bbc.lh
 $(MESS_DRIVERS)/beta.o:     $(MESS_LAYOUT)/beta.lh
 $(MESS_DRIVERS)/bob85.o:    $(MESS_LAYOUT)/bob85.lh
 $(MAME_DRIVERS)/cdi.o:      $(MAME_LAYOUT)/cdi.lh

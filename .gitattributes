@@ -7634,6 +7634,7 @@ src/mess/layout/apollo_dsp.lay svneol=native#text/xml
 src/mess/layout/apricotp.lay svneol=native#text/xml
 src/mess/layout/avigo.lay svneol=native#text/xml
 src/mess/layout/babbage.lay svneol=native#text/xml
+src/mess/layout/bbc.lay svneol=native#text/xml
 src/mess/layout/beta.lay svneol=native#text/xml
 src/mess/layout/bob85.lay svneol=native#text/xml
 src/mess/layout/borisdpl.lay svneol=native#text/xml

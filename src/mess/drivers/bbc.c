@@ -50,6 +50,7 @@
 #include "bus/econet/econet.h"
 #include "sound/tms5220.h"          /* Speech */
 #include "video/saa5050.h"          /* Teletext */
+#include "bbc.lh"
 
 /* Devices */
 #include "imagedev/flopdrv.h"
@@ -722,6 +723,8 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_SIZE(640, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
@@ -730,8 +733,11 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_PALETTE_INIT_OVERRIDE(bbc_state, bbc)
 	MCFG_SAA5050_ADD("saa5050", XTAL_12MHz/2, trom_intf)
 
+	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbca)
+
+	MCFG_DEFAULT_LAYOUT(layout_bbc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -752,7 +758,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
-	/* devices */
+	/* system via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
@@ -780,7 +786,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 //  MCFG_SOUND_ADD("tms5220", TMS5220, 640000)
 //  MCFG_TMS52XX_SPEECHROM("vsm")
 
-	/* devices */
+	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
@@ -788,6 +794,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
+	/* adc */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 
 	/* printer */
@@ -828,9 +835,11 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	/* devices */
+	/* system via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
@@ -838,6 +847,7 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
+	/* adc */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 
 	/* printer */
@@ -909,18 +919,21 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)
 
+	MCFG_DEFAULT_LAYOUT(layout_bbc)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
-	MCFG_SCREEN_SIZE(800, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 300-1)
+	MCFG_SCREEN_SIZE(640, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(bbc_state, bbc)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
 
 	MCFG_SAA5050_ADD("saa5050", XTAL_12MHz/2, trom_intf)
 
+	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbcm)
 
@@ -954,13 +967,16 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
 	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
-	/* devices */
+	/* adc */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
+
+	/* system via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
@@ -968,6 +984,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_portb))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
 
+	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))

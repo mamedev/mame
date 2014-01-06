@@ -581,7 +581,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 				return m_acia->data_read(space,0);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;                                /* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return m_upd7002->read(space, myo-0x18);         /* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) return m_upd7002->read(space, myo-0x18);    /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;                                /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24);  /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);   /* disc control latch */
@@ -615,7 +615,7 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 				m_acia->data_write(space, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10, data);     /* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) m_upd7002->write(space, myo-0x18, data);         /* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) m_upd7002->write(space, myo-0x18, data);    /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20, data);      /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24, data);  /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28, data);   /* disc control latch */
@@ -958,6 +958,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b6_caps_lock_led = 1;
 				/* call caps lock led update */
+				output_set_value("capslock_led", m_b6_caps_lock_led);
 			}
 			break;
 		case 7:
@@ -965,6 +966,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b7_shift_lock_led = 1;
 				/* call shift lock led update */
+				output_set_value("shiftlock_led", m_b7_shift_lock_led);
 			}
 			break;
 		}
@@ -1043,6 +1045,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b6_caps_lock_led = 0;
 				/* call caps lock led update */
+				output_set_value("capslock_led", m_b6_caps_lock_led);
 			}
 			break;
 		case 7:
@@ -1050,6 +1053,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b7_shift_lock_led = 0;
 				/* call shift lock led update */
+				output_set_value("shiftlock_led", m_b7_shift_lock_led);
 			}
 			break;
 		}
@@ -1254,7 +1258,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 		{
 			if (m_wav_len>(9*3))
 			{
-				//this is to long to recive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
+				//this is too long to receive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
 				logerror ("Cassette length %d\n",m_wav_len);
 				m_nr_high_tones = 0;
 				m_dcd_cass = 0;
@@ -1393,6 +1397,7 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 		m_cass_out_phase = 0;
 		m_cass_out_samples_to_go = 4;
 	}
+	output_set_value("motor_led", !status);
 }
 
 
