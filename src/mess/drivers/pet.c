@@ -878,10 +878,6 @@ WRITE_LINE_MEMBER( pet_state::via_cb2_w )
 }
 
 
-//-------------------------------------------------
-//  pia6821_interface pia1_intf
-//-------------------------------------------------
-
 WRITE_LINE_MEMBER( pet_state::pia1_irqa_w )
 {
 	m_pia1a_irq = state;
@@ -1010,42 +1006,6 @@ WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 	m_blanktv = state;
 }
 
-const pia6821_interface pia1_intf =
-{
-	DEVCB_DRIVER_MEMBER(pet_state, pia1_pa_r),
-	DEVCB_DRIVER_MEMBER(pet_state, pia1_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_cb1_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pet_state, pia1_pa_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_ca2_w),
-	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_irqb_w)
-};
-
-const pia6821_interface pet2001b_pia1_intf =
-{
-	DEVCB_DRIVER_MEMBER(pet_state, pia1_pa_r),
-	DEVCB_DRIVER_MEMBER(pet2001b_state, pia1_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_cb1_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pet_state, pia1_pa_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_ca2_w),
-	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_irqb_w)
-};
-
-
-//-------------------------------------------------
-//  pia6821_interface pia2_intf
-//-------------------------------------------------
 
 WRITE_LINE_MEMBER( pet_state::pia2_irqa_w )
 {
@@ -1060,22 +1020,6 @@ WRITE_LINE_MEMBER( pet_state::pia2_irqb_w )
 
 	check_interrupts();
 }
-
-const pia6821_interface pia2_intf =
-{
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, atn_r),
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, srq_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ndac_w),
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, dav_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia2_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia2_irqb_w)
-};
 
 
 //**************************************************************************
@@ -1452,8 +1396,27 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(pet_state, via_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(pet_state, via_irq_w))
 
-	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
-	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
+	MCFG_DEVICE_ADD(M6520_1_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(READ8(pet_state, pia1_pa_r))
+	MCFG_PIA6821_READPB_HANDLER(READ8(pet_state, pia1_pb_r))
+	MCFG_PIA6821_READCA1_HANDLER(DEVREADLINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read))
+	MCFG_PIA6821_READCA2_HANDLER(READLINE(pet_state, pia1_cb1_r))
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(pet_state, pia1_pa_w))
+	MCFG_PIA6821_CA2_HANDLER(WRITELINE(pet_state, pia1_ca2_w))
+	MCFG_PIA6821_CB2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(pet_state, pia1_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(pet_state, pia1_irqb_w))
+
+	MCFG_DEVICE_ADD(M6520_2_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
+	MCFG_PIA6821_READCA1_HANDLER(DEVREADLINE(IEEE488_TAG, ieee488_device, atn_r))
+	MCFG_PIA6821_READCA2_HANDLER(DEVREADLINE(IEEE488_TAG, ieee488_device, srq_r))
+	MCFG_PIA6821_WRITEPB_HANDLER(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_PIA6821_CA2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
+	MCFG_PIA6821_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(pet_state, pia2_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(pet_state, pia2_irqb_w))
+
 	MCFG_CBM_IEEE488_ADD("c4040")
 	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(M6520_2_TAG, pia6821_device, cb1_w))
 	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE(M6520_2_TAG, pia6821_device, ca1_w))
@@ -1581,8 +1544,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED_CLASS( pet2001b, pet2001n, pet2001b_state )
-	MCFG_DEVICE_REMOVE(M6520_1_TAG)
-	MCFG_PIA6821_ADD(M6520_1_TAG, pet2001b_pia1_intf)
+	MCFG_DEVICE_MODIFY(M6520_1_TAG)
+	MCFG_PIA6821_READPB_HANDLER(READ8(pet2001b_state, pia1_pb_r))
 MACHINE_CONFIG_END
 
 
@@ -1752,8 +1715,27 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(pet_state, via_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(pet_state, via_irq_w))
 
-	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
-	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
+	MCFG_DEVICE_ADD(M6520_1_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(READ8(pet_state, pia1_pa_r))
+	MCFG_PIA6821_READPB_HANDLER(READ8(pet_state, pia1_pb_r))
+	MCFG_PIA6821_READCA1_HANDLER(DEVREADLINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read))
+	MCFG_PIA6821_READCA2_HANDLER(READLINE(pet_state, pia1_cb1_r))
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(pet_state, pia1_pa_w))
+	MCFG_PIA6821_CA2_HANDLER(WRITELINE(pet_state, pia1_ca2_w))
+	MCFG_PIA6821_CB2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(pet_state, pia1_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(pet_state, pia1_irqb_w))
+
+	MCFG_DEVICE_ADD(M6520_2_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
+	MCFG_PIA6821_READCA1_HANDLER(DEVREADLINE(IEEE488_TAG, ieee488_device, atn_r))
+	MCFG_PIA6821_READCA2_HANDLER(DEVREADLINE(IEEE488_TAG, ieee488_device, srq_r))
+	MCFG_PIA6821_WRITEPB_HANDLER(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_PIA6821_CA2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
+	MCFG_PIA6821_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(pet_state, pia2_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(pet_state, pia2_irqb_w))
+
 	MCFG_CBM_IEEE488_ADD("c8050")
 	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(M6520_2_TAG, pia6821_device, cb1_w))
 	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE(M6520_2_TAG, pia6821_device, ca1_w))

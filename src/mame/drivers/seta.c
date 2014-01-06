@@ -9126,38 +9126,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::inttoote_interrupt)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-static const pia6821_interface inttoote_pia0_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface inttoote_pia1_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
 static MSM6242_INTERFACE( rtc_intf )
 {
 	DEVCB_NULL
@@ -9170,8 +9138,8 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 	MCFG_CPU_PROGRAM_MAP(inttoote_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, inttoote_interrupt, "screen", 0, 1)
 
-	MCFG_PIA6821_ADD("pia0", inttoote_pia0_intf)
-	MCFG_PIA6821_ADD("pia1", inttoote_pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 

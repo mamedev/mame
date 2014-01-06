@@ -126,22 +126,22 @@ void thomson_state::to7_set_cassette( int data )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_set_cassette_motor )
+WRITE_LINE_MEMBER( thomson_state::to7_set_cassette_motor )
 {
-	cassette_state state =  m_cassette->get_state();
+	cassette_state cassstate =  m_cassette->get_state();
 	double pos = m_cassette->get_position();
 
 	LOG (( "$%04x %f to7_set_cassette_motor: cassette motor %s bitpos=%i\n",
-			m_maincpu->pc(), machine().time().as_double(), data ? "off" : "on",
+			m_maincpu->pc(), machine().time().as_double(), state ? "off" : "on",
 			(int) (pos / TO7_BIT_LENGTH) ));
 
-	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !data && pos > 0.3 )
+	if ( (cassstate & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED && !state && pos > 0.3 )
 	{
 		/* rewind a little before starting the motor */
 		m_cassette->seek(-0.3, SEEK_CUR );
 	}
 
-	m_cassette->change_state(data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR );
+	m_cassette->change_state(state ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR );
 }
 
 
@@ -197,22 +197,22 @@ void thomson_state::mo5_set_cassette( int data )
 
 
 
-WRITE8_MEMBER( thomson_state::mo5_set_cassette_motor )
+WRITE_LINE_MEMBER( thomson_state::mo5_set_cassette_motor )
 {
-	cassette_state state = m_cassette->get_state();
+	cassette_state cassstate = m_cassette->get_state();
 	double pos = m_cassette->get_position();
 
 	LOG (( "$%04x %f mo5_set_cassette_motor: cassette motor %s hbitpos=%i\n",
-			m_maincpu->pc(), machine().time().as_double(), data ? "off" : "on",
+			m_maincpu->pc(), machine().time().as_double(), state ? "off" : "on",
 			(int) (pos / MO5_HBIT_LENGTH) ));
 
-	if ( (state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !data && pos > 0.3 )
+	if ( (cassstate & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED &&  !state && pos > 0.3 )
 	{
 		/* rewind a little before starting the motor */
 		m_cassette->seek(-0.3, SEEK_CUR );
 	}
 
-	m_cassette->change_state(data ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR );
+	m_cassette->change_state(state ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR );
 }
 
 
@@ -556,9 +556,9 @@ void thomson_state::to7_set_init( int init )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_sys_cb2_out )
+WRITE_LINE_MEMBER( thomson_state::to7_sys_cb2_out )
 {
-	m_to7_lightpen = !data;
+	m_to7_lightpen = !state;
 }
 
 
@@ -608,24 +608,6 @@ READ8_MEMBER( thomson_state::to7_sys_portb_in )
 	/* lightpen low */
 	return to7_lightpen_gpl( TO7_LIGHTPEN_DECAL, m_to7_lightpen_step ) & 0xff;
 }
-
-
-
-const pia6821_interface to7_pia6821_sys =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_sys_porta_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_sys_portb_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_sys_portb_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_set_cassette_motor),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_sys_cb2_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1)
-};
 
 
 
@@ -725,12 +707,12 @@ WRITE8_MEMBER( thomson_state::to7_io_portb_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_io_cb2_out )
+WRITE_LINE_MEMBER( thomson_state::to7_io_cb2_out )
 {
-	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), data ));
+	LOG_IO(( "$%04x %f to7_io_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state ));
 
 	/* send STROBE to printer */
-	m_centronics->strobe_w(data);
+	m_centronics->strobe_w(state);
 }
 
 
@@ -741,23 +723,6 @@ void to7_io_line_device::input_callback(UINT8 state)
 	LOG_IO(( "%f to7_io_in_callback:  cts=%i dsr=%i rd=%i\n", machine().time().as_double(), (state & device_serial_interface::CTS) ? 1 : 0, (state & device_serial_interface::DSR) ? 1 : 0, (int)get_in_data_bit() ));
 }
 
-
-
-const pia6821_interface to7_pia6821_io =
-{
-	DEVCB_DEVICE_MEMBER("to7_io", to7_io_line_device, porta_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("to7_io", to7_io_line_device, porta_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_io_portb_out),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_io_cb2_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1)
-};
 
 
 const centronics_interface to7_centronics_config =
@@ -809,22 +774,6 @@ WRITE_LINE_MEMBER( thomson_state::to7_modem_cb )
 }
 
 
-
-const pia6821_interface to7_pia6821_modem =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 WRITE_LINE_MEMBER( thomson_state::to7_modem_tx_w )
 {
@@ -1029,29 +978,11 @@ WRITE8_MEMBER( thomson_state::to7_game_portb_out )
 
 
 
-WRITE8_MEMBER( thomson_state::to7_game_cb2_out )
+WRITE_LINE_MEMBER( thomson_state::to7_game_cb2_out )
 {
 	/* undocumented */
 	/* some TO8 games (e.g.: F15) seem to write here a lot */
 }
-
-
-
-const pia6821_interface to7_pia6821_game =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_porta_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_portb_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_portb_out),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_cb2_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_irq_1),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_irq_1)
-};
 
 
 
@@ -1454,10 +1385,10 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 
 
 
-WRITE8_MEMBER( thomson_state::to770_sys_cb2_out )
+WRITE_LINE_MEMBER( thomson_state::to770_sys_cb2_out )
 {
 	/* video overlay: black pixels are transparent and show TV image underneath */
-	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", m_maincpu->pc(), data ));
+	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", m_maincpu->pc(), state ));
 }
 
 
@@ -1532,24 +1463,6 @@ WRITE8_MEMBER( thomson_state::to770_sys_portb_out )
 {
 	to770_update_ram_bank();
 }
-
-
-
-const pia6821_interface to770_pia6821_sys =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to770_sys_porta_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to770_sys_portb_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_set_cassette_motor),
-	DEVCB_DRIVER_MEMBER(thomson_state, to770_sys_cb2_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1)
-};
 
 
 
@@ -1778,24 +1691,6 @@ READ8_MEMBER( thomson_state::mo5_sys_portb_in )
 
 	return ( ioport(keynames[lin])->read() & (1 << col) ) ? 0x80 : 0;
 }
-
-
-
-const pia6821_interface mo5_pia6821_sys =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, mo5_sys_porta_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo5_sys_portb_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, mo5_sys_porta_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo5_sys_portb_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo5_set_cassette_motor),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_irq_1) /* WARNING: differs from TO7 ! */
-};
 
 
 
@@ -2950,26 +2845,6 @@ WRITE8_MEMBER( thomson_state::to9_sys_portb_out )
 
 
 
-const pia6821_interface to9_pia6821_sys =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to9_sys_porta_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to9_sys_porta_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to9_sys_portb_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_set_cassette_motor),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1)
-};
-
-
-
-
-
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
@@ -3944,24 +3819,6 @@ WRITE8_MEMBER( thomson_state::to8_sys_portb_out )
 
 
 
-const pia6821_interface to8_pia6821_sys =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to8_sys_porta_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to9_sys_porta_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to8_sys_portb_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_set_cassette_motor),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1)
-};
-
-
-
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
@@ -4156,24 +4013,6 @@ MACHINE_START_MEMBER( thomson_state, to8 )
 
 
 /* ------------ system PIA 6821 ------------ */
-
-
-
-const pia6821_interface to9p_pia6821_sys =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to9_sys_porta_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, to9_sys_porta_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to8_sys_portb_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_set_cassette_motor),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1)
-};
 
 
 
@@ -4624,31 +4463,13 @@ WRITE8_MEMBER( thomson_state::mo6_game_porta_out )
 
 
 
-WRITE8_MEMBER( thomson_state::mo6_game_cb2_out )
+WRITE_LINE_MEMBER( thomson_state::mo6_game_cb2_out )
 {
-	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), data ));
+	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state ));
 
 	/* centronics strobe */
-	m_centronics->strobe_w(data);
+	m_centronics->strobe_w(state);
 }
-
-
-
-const pia6821_interface mo6_pia6821_game =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_porta_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_portb_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_game_porta_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_portb_out),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_game_cb2_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_irq_1),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_irq_1)
-};
 
 
 
@@ -4750,29 +4571,11 @@ WRITE8_MEMBER( thomson_state::mo6_sys_portb_out )
 
 
 
-WRITE8_MEMBER( thomson_state::mo6_sys_cb2_out )
+WRITE_LINE_MEMBER( thomson_state::mo6_sys_cb2_out )
 {
 	/* SCART pin 8 = slow switch (?) */
-	LOG(( "mo6_sys_cb2_out: SCART slow switch set to %i\n", data ));
+	LOG(( "mo6_sys_cb2_out: SCART slow switch set to %i\n", state ));
 }
-
-
-
-const pia6821_interface mo6_pia6821_sys =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_sys_porta_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_sys_portb_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_sys_porta_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_sys_portb_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo5_set_cassette_motor),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_sys_cb2_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_irq_1) /* differs from TO */
-};
 
 
 
@@ -5144,46 +4947,9 @@ WRITE8_MEMBER( thomson_state::mo5nr_sys_porta_out )
 
 
 
-const pia6821_interface mo5nr_pia6821_sys =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_sys_porta_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo5nr_sys_portb_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, mo5nr_sys_porta_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_sys_portb_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo5_set_cassette_motor),
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_sys_cb2_out),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_firq_1),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_irq_1) /* differs from TO */
-};
-
-
-
-
 /* ------------ game 6821 PIA ------------ */
 
 /* similar to the MO6, without the printer */
-
-
-
-const pia6821_interface mo5nr_pia6821_game =
-{
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_porta_in),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_portb_in),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(thomson_state, mo6_game_porta_out),
-	DEVCB_DRIVER_MEMBER(thomson_state, to7_game_portb_out),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_irq_1),
-	DEVCB_DRIVER_LINE_MEMBER(thomson_state, thom_irq_1)
-};
 
 
 

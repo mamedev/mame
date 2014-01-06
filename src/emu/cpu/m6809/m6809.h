@@ -34,6 +34,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( irq_line );
 	DECLARE_WRITE_LINE_MEMBER( firq_line );
+	DECLARE_WRITE_LINE_MEMBER( nmi_line );
 
 protected:
 	// device-level overrides

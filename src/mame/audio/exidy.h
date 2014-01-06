@@ -147,8 +147,8 @@ public:
 	DECLARE_READ8_MEMBER( response_r );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( command_w );
-	DECLARE_WRITE8_MEMBER( irq_clear_w );
-	DECLARE_WRITE8_MEMBER( main_ack_w );
+	DECLARE_WRITE_LINE_MEMBER( irq_clear_w );
+	DECLARE_WRITE_LINE_MEMBER( main_ack_w );
 
 protected:
 	// device-level overrides

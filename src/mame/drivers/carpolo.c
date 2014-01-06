@@ -247,8 +247,18 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
                                                        but it's supposed to happen 60
                                                        times a sec, so it's a good place */
 
-	MCFG_PIA6821_ADD("pia0", carpolo_pia0_intf)
-	MCFG_PIA6821_ADD("pia1", carpolo_pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA6821_READPB_HANDLER(READ8(carpolo_state, pia_0_port_b_r))
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(carpolo_state, pia_0_port_a_w))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(carpolo_state, pia_0_port_b_w))
+	MCFG_PIA6821_CA2_HANDLER(WRITELINE(carpolo_state, coin1_interrupt_clear_w))
+	MCFG_PIA6821_CB2_HANDLER(WRITELINE(carpolo_state,coin2_interrupt_clear_w))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(READ8(carpolo_state, pia_1_port_a_r))
+	MCFG_PIA6821_READPB_HANDLER(READ8(carpolo_state, pia_1_port_b_r))
+	MCFG_PIA6821_CA2_HANDLER(WRITELINE(carpolo_state, coin3_interrupt_clear_w))
+	MCFG_PIA6821_CB2_HANDLER(WRITELINE(carpolo_state, coin4_interrupt_clear_w))
 
 	MCFG_7474_ADD("7474_2s_1", NOOP, WRITELINE(carpolo_state, carpolo_7474_2s_1_q_cb))
 	MCFG_7474_ADD("7474_2s_2", NOOP, WRITELINE(carpolo_state, carpolo_7474_2s_2_q_cb))

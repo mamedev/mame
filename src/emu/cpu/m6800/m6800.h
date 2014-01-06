@@ -65,6 +65,9 @@ public:
 	DECLARE_READ8_MEMBER( m6801_io_r );
 	DECLARE_WRITE8_MEMBER( m6801_io_w );
 
+	DECLARE_WRITE_LINE_MEMBER( irq_line );
+	DECLARE_WRITE_LINE_MEMBER( nmi_line );
+
 protected:
 	// device-level overrides
 	virtual void device_start();

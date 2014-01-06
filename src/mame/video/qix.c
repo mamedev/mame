@@ -81,9 +81,9 @@ WRITE_LINE_MEMBER(qix_state::display_enable_changed)
  *
  *************************************/
 
-WRITE8_MEMBER(qix_state::qix_flip_screen_w)
+WRITE_LINE_MEMBER(qix_state::qix_flip_screen_w)
 {
-	m_flip = data;
+	m_flip = state;
 }
 
 

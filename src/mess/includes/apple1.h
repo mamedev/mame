@@ -8,7 +8,6 @@
 #define APPLE1_H_
 
 #include "imagedev/snapquik.h"
-#include "machine/6821pia.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 
@@ -59,7 +58,7 @@ public:
 	TIMER_CALLBACK_MEMBER(apple1_dsp_ready_end);
 	DECLARE_READ8_MEMBER(apple1_pia0_kbdin);
 	DECLARE_WRITE8_MEMBER(apple1_pia0_dspout);
-	DECLARE_WRITE8_MEMBER(apple1_pia0_dsp_write_signal);
+	DECLARE_WRITE_LINE_MEMBER(apple1_pia0_dsp_write_signal);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	void terminal_draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, terminal_t *terminal);
@@ -85,10 +84,6 @@ public:
 	required_device<ram_device> m_ram;
 };
 
-
-/*----------- defined in machine/apple1.c -----------*/
-
-extern const pia6821_interface apple1_pia0;
 
 /*----------- defined in drivers/apple1.c -----------*/
 

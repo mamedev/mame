@@ -96,8 +96,6 @@ public:
 	optional_device<coco_vhd_image_device> m_vhd_0;
 	optional_device<coco_vhd_image_device> m_vhd_1;
 
-	static const pia6821_interface pia0_config;
-	static const pia6821_interface pia1_config;
 	static const cococart_interface cartridge_config;
 	static const bitbanger_config coco_bitbanger_config;
 	static const cassette_interface coco_cassette_interface;
@@ -116,6 +114,24 @@ public:
 	virtual DECLARE_WRITE8_MEMBER( ff40_write );
 	DECLARE_READ8_MEMBER( ff60_read );
 	DECLARE_WRITE8_MEMBER( ff60_write );
+
+	// PIA0
+	DECLARE_WRITE8_MEMBER( pia0_pa_w );
+	DECLARE_WRITE8_MEMBER( pia0_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
+	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
+
+	// PIA1
+	DECLARE_READ8_MEMBER( pia1_pa_r );
+	DECLARE_READ8_MEMBER( pia1_pb_r );
+	DECLARE_WRITE8_MEMBER( pia1_pa_w );
+	DECLARE_WRITE8_MEMBER( pia1_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
+	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
+	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
 	// floating bus
 	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
@@ -142,24 +158,6 @@ protected:
 	virtual void cart_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
 	virtual void update_cart_base(UINT8 *cart_base) = 0;
-
-	// PIA0
-	DECLARE_WRITE8_MEMBER( pia0_pa_w );
-	DECLARE_WRITE8_MEMBER( pia0_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
-
-	// PIA1
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
-	DECLARE_WRITE8_MEMBER( pia1_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
 private:
 	// timer constants

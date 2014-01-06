@@ -274,28 +274,6 @@ WRITE_LINE_MEMBER( dragon_alpha_state::pia2_firq_b )
 
 
 
-//-------------------------------------------------
-//  pia2_config
-//-------------------------------------------------
-
-const pia6821_interface dragon_alpha_state::pia2_config =
-{
-	DEVCB_NULL,                                                 /* port A input */
-	DEVCB_NULL,                                                 /* port B input */
-	DEVCB_NULL,                                                 /* CA1 input */
-	DEVCB_NULL,                                                 /* CB1 input */
-	DEVCB_NULL,                                                 /* CA2 input */
-	DEVCB_NULL,                                                 /* CB2 input */
-	DEVCB_DRIVER_MEMBER(dragon_alpha_state, pia2_pa_w),         /* port A output */
-	DEVCB_NULL,                                                 /* port B output */
-	DEVCB_NULL,                                                 /* CA2 output */
-	DEVCB_NULL,                                                 /* CB2 output */
-	DEVCB_DRIVER_LINE_MEMBER(dragon_alpha_state, pia2_firq_a),  /* IRQA output */
-	DEVCB_DRIVER_LINE_MEMBER(dragon_alpha_state, pia2_firq_b)   /* IRQB output */
-};
-
-
-
 /***************************************************************************
   CPU INTERRUPTS
 ***************************************************************************/

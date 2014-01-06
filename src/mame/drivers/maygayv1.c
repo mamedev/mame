@@ -979,24 +979,6 @@ WRITE8_MEMBER(maygayv1_state::b_writ)
 }
 
 
-/* U25 ST 2 9148 EF68B21P */
-static const pia6821_interface pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),     /* port A in */
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),     /* port A out */
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-
 void maygayv1_state::machine_start()
 {
 	i82716_t &i82716 = m_i82716;
@@ -1035,8 +1017,12 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_CPU_DATA_MAP(sound_data)
 	MCFG_CPU_IO_MAP(sound_io)
 
-	MCFG_PIA6821_ADD("pia", pia_intf)
-
+	/* U25 ST 2 9148 EF68B21P */
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(READ8(maygayv1_state, b_read))
+	MCFG_PIA6821_READPB_HANDLER(READ8(maygayv1_state, b_read))
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(maygayv1_state, b_writ))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(maygayv1_state, b_writ))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

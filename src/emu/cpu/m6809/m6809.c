@@ -564,3 +564,8 @@ WRITE_LINE_MEMBER( m6809_base_device::firq_line )
 {
 	set_input_line( M6809_FIRQ_LINE, state );
 }
+
+WRITE_LINE_MEMBER( m6809_base_device::nmi_line )
+{
+	set_input_line( INPUT_LINE_NMI, state );
+}

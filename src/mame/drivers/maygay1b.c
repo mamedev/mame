@@ -539,22 +539,6 @@ WRITE8_MEMBER(maygay1b_state::m1_pia_portb_w)
 		if ( data & (1 << i) )      output_set_indexed_value("triac", i, data & (1 << i));
 }
 
-static const pia6821_interface m1_pia_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_pia_porta_w),     /* port A out */
-	DEVCB_DRIVER_MEMBER(maygay1b_state,m1_pia_portb_w),     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
 // input ports for M1 board ////////////////////////////////////////
 
 INPUT_PORTS_START( maygay_m1 )
@@ -862,7 +846,10 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(maygay1b_state, duart_irq_handler))
 	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(maygay1b_state, m1_duart_r))
 
-	MCFG_PIA6821_ADD("pia", m1_pia_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(maygay1b_state, m1_pia_porta_w))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(maygay1b_state, m1_pia_portb_w))
+
 	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd",YM2149, M1_MASTER_CLOCK)

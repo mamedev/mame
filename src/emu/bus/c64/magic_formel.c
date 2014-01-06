@@ -29,10 +29,6 @@
 const device_type C64_MAGIC_FORMEL = &device_creator<c64_magic_formel_cartridge_device>;
 
 
-//-------------------------------------------------
-//  pia6821_interface pia_intf
-//-------------------------------------------------
-
 WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
 {
 	/*
@@ -93,29 +89,15 @@ WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
 	}
 }
 
-static const pia6821_interface pia_intf =
-{
-	DEVCB_NULL,     // input A
-	DEVCB_NULL,     // input B
-	DEVCB_NULL,                                     // input CA1
-	DEVCB_NULL,                                         // input CB1
-	DEVCB_NULL,                                         // input CA2
-	DEVCB_NULL,                                         // input CB2
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_formel_cartridge_device, pia_pa_w),        // output A
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_formel_cartridge_device, pia_pb_w),        // output B
-	DEVCB_NULL,                                         // output CA2
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_formel_cartridge_device, pia_cb2_w),      // output CB2
-	DEVCB_NULL,                                         // irq A
-	DEVCB_NULL                                          // irq B
-};
-
-
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_magic_formel )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_magic_formel )
-	MCFG_PIA6821_ADD(MC6821_TAG, pia_intf)
+	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pa_w))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pb_w))
+	MCFG_PIA6821_CB2_HANDLER(WRITELINE(c64_magic_formel_cartridge_device, pia_cb2_w))
 MACHINE_CONFIG_END
 
 

@@ -392,10 +392,6 @@ void tek4052_state::video_start()
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  pia6821_interface x_pia_intf
-//-------------------------------------------------
-
 READ8_MEMBER( tek4051_state::x_pia_pa_r )
 {
 	/*
@@ -476,27 +472,6 @@ WRITE_LINE_MEMBER( tek4051_state::x_pia_irqb_w )
 	m_x_pia_irqb = state;
 	update_irq();
 }
-
-static const pia6821_interface x_pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(tek4051_state, x_pia_pa_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, viewcause_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tek4051_state, x_pia_pa_w),
-	DEVCB_DRIVER_MEMBER(tek4051_state, x_pia_pb_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, adot_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, bufclk_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, x_pia_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, x_pia_irqb_w)
-};
-
-
-//-------------------------------------------------
-//  pia6821_interface y_pia_intf
-//-------------------------------------------------
 
 READ8_MEMBER( tek4051_state::sa_r )
 {
@@ -585,26 +560,6 @@ WRITE_LINE_MEMBER( tek4051_state::y_pia_irqb_w )
 	update_nmi();
 }
 
-static const pia6821_interface y_pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(tek4051_state, sa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, rdbyte_r),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, mdata_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, fmark_r),
-	DEVCB_DRIVER_MEMBER(tek4051_state, y_pia_pa_w),
-	DEVCB_DRIVER_MEMBER(tek4051_state, sb_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, sot_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, y_pia_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, y_pia_irqb_w)
-};
-
-
-//-------------------------------------------------
-//  pia6821_interface kb_pia_intf
-//-------------------------------------------------
 
 READ8_MEMBER( tek4051_state::kb_pia_pa_r )
 {
@@ -717,26 +672,6 @@ WRITE_LINE_MEMBER( tek4051_state::kb_pia_irqb_w )
 	update_irq();
 }
 
-static const pia6821_interface kb_pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(tek4051_state, kb_pia_pa_r),
-	DEVCB_DRIVER_MEMBER(tek4051_state, kb_pia_pb_r),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, key_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tek4051_state, kb_pia_pb_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, kb_halt_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, kb_pia_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, kb_pia_irqb_w)
-};
-
-
-//-------------------------------------------------
-//  pia6821_interface tape_pia_intf
-//-------------------------------------------------
 
 READ8_MEMBER( tek4051_state::tape_pia_pa_r )
 {
@@ -826,26 +761,6 @@ WRITE_LINE_MEMBER( tek4051_state::tape_pia_irqb_w )
 	update_nmi();
 }
 
-static const pia6821_interface tape_pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(tek4051_state, tape_pia_pa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, rmark_r),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, lohole_r),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, filfnd_r),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, uphole_r),
-	DEVCB_DRIVER_MEMBER(tek4051_state, tape_pia_pa_w),
-	DEVCB_DRIVER_MEMBER(tek4051_state, tape_pia_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, tape_pia_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, tape_pia_irqb_w)
-};
-
-
-//-------------------------------------------------
-//  pia6821_interface gpib_pia_intf
-//-------------------------------------------------
 
 WRITE8_MEMBER( tek4051_state::dio_w )
 {
@@ -967,26 +882,6 @@ WRITE_LINE_MEMBER( tek4051_state::gpib_pia_irqb_w )
 	update_irq();
 }
 
-static const pia6821_interface gpib_pia_intf =
-{
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),
-	DEVCB_DRIVER_MEMBER(tek4051_state, gpib_pia_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, eoi_r),
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, srq_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tek4051_state, dio_w),
-	DEVCB_DRIVER_MEMBER(tek4051_state, gpib_pia_pb_w),
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, talk_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, gpib_pia_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, gpib_pia_irqb_w)
-};
-
-
-//-------------------------------------------------
-//  pia6821_interface com_pia_intf
-//-------------------------------------------------
 
 WRITE8_MEMBER( tek4051_state::com_pia_pa_w )
 {
@@ -1080,22 +975,6 @@ WRITE_LINE_MEMBER( tek4051_state::com_pia_irqb_w )
 	m_com_pia_irqb = state;
 	update_irq();
 }
-
-static const pia6821_interface com_pia_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tek4051_state, com_pia_pb_r),
-	DEVCB_NULL, // SRX (RS-232 pin 12)
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(tek4051_state, com_pia_pa_w),
-	DEVCB_DRIVER_MEMBER(tek4051_state, com_pia_pb_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, com_pia_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(tek4051_state, com_pia_irqb_w)
-};
 
 
 //-------------------------------------------------
@@ -1193,12 +1072,67 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 
 	// devices
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", tek4051_state, keyboard_tick, attotime::from_hz(XTAL_12_5MHz/15/4))
-	MCFG_PIA6821_ADD(MC6820_X_TAG, x_pia_intf)
-	MCFG_PIA6821_ADD(MC6820_Y_TAG, y_pia_intf)
-	MCFG_PIA6821_ADD(MC6820_KB_TAG, kb_pia_intf)
-	MCFG_PIA6821_ADD(MC6820_TAPE_TAG, tape_pia_intf)
-	MCFG_PIA6821_ADD(MC6820_GPIB_TAG, gpib_pia_intf)
-	MCFG_PIA6821_ADD(MC6820_COM_TAG, com_pia_intf)
+
+	MCFG_DEVICE_ADD(MC6820_X_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(READ8(tek4051_state, x_pia_pa_r))
+	MCFG_PIA6821_READCA2_HANDLER(READLINE(tek4051_state, viewcause_r))
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(tek4051_state, x_pia_pa_w))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, x_pia_pb_w))
+	MCFG_PIA6821_CA2_HANDLER(WRITELINE(tek4051_state, adot_w))
+	MCFG_PIA6821_CB2_HANDLER(WRITELINE(tek4051_state, bufclk_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(tek4051_state, x_pia_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(tek4051_state, x_pia_irqb_w))
+
+	MCFG_DEVICE_ADD(MC6820_Y_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(READ8(tek4051_state, sa_r))
+	MCFG_PIA6821_READCA1_HANDLER(READLINE(tek4051_state, rdbyte_r))
+	MCFG_PIA6821_READCA2_HANDLER(READLINE(tek4051_state, mdata_r))
+	MCFG_PIA6821_READCB2_HANDLER(READLINE(tek4051_state, fmark_r))
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(tek4051_state, y_pia_pa_w))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, sb_w))
+	MCFG_PIA6821_CA2_HANDLER(WRITELINE(tek4051_state, sot_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(tek4051_state, y_pia_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(tek4051_state, y_pia_irqb_w))
+
+	MCFG_DEVICE_ADD(MC6820_KB_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(READ8(tek4051_state, kb_pia_pa_r))
+	MCFG_PIA6821_READPB_HANDLER(READ8(tek4051_state, kb_pia_pb_r))
+	MCFG_PIA6821_READCA1_HANDLER(READLINE(tek4051_state, key_r))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, kb_pia_pb_w))
+	MCFG_PIA6821_CA2_HANDLER(WRITELINE(tek4051_state, kb_halt_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(tek4051_state, kb_pia_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(tek4051_state, kb_pia_irqb_w))
+
+	MCFG_DEVICE_ADD(MC6820_TAPE_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(READ8(tek4051_state, tape_pia_pa_r))
+	MCFG_PIA6821_READCA1_HANDLER(READLINE(tek4051_state, rmark_r))
+	MCFG_PIA6821_READCA2_HANDLER(READLINE(tek4051_state, lohole_r))
+	MCFG_PIA6821_READCB1_HANDLER(READLINE(tek4051_state, filfnd_r))
+	MCFG_PIA6821_READCB2_HANDLER(READLINE(tek4051_state, uphole_r))
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(tek4051_state, tape_pia_pa_w))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, tape_pia_pb_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(tek4051_state, tape_pia_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(tek4051_state, tape_pia_irqb_w))
+
+	MCFG_DEVICE_ADD(MC6820_GPIB_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
+	MCFG_PIA6821_READPB_HANDLER(READ8(tek4051_state, gpib_pia_pb_r))
+	MCFG_PIA6821_READCA1_HANDLER(DEVREADLINE(IEEE488_TAG, ieee488_device, eoi_r))
+	MCFG_PIA6821_READCA2_HANDLER(DEVREADLINE(IEEE488_TAG, ieee488_device, srq_r))
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(tek4051_state, dio_w))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, gpib_pia_pb_w))
+	MCFG_PIA6821_CB2_HANDLER(WRITELINE(tek4051_state, talk_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(tek4051_state, gpib_pia_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(tek4051_state, gpib_pia_irqb_w))
+
+	MCFG_DEVICE_ADD(MC6820_COM_TAG, PIA6821, 0)
+	MCFG_PIA6821_READPB_HANDLER(READ8(tek4051_state, com_pia_pb_r))
+	//CA1 - SRX (RS-232 pin 12)
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(tek4051_state, com_pia_pa_w))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tek4051_state, com_pia_pb_w))
+	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(tek4051_state, com_pia_irqa_w))
+	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(tek4051_state, com_pia_irqb_w))
+
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
 	MCFG_IEEE488_BUS_ADD()
 

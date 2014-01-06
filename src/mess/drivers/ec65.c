@@ -66,22 +66,6 @@ static ADDRESS_MAP_START(ec65k_mem, AS_PROGRAM, 8, ec65_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static const pia6821_interface ec65_pia_interface=
-{
-	DEVCB_NULL,     /* port A input */
-	DEVCB_NULL,     /* port B input */
-	DEVCB_NULL,     /* CA1 input */
-	DEVCB_NULL,     /* CB1 input */
-	DEVCB_NULL,     /* CA2 input */
-	DEVCB_NULL,     /* CB2 input */
-	DEVCB_NULL,     /* port A output */
-	DEVCB_NULL,     /* port B output */
-	DEVCB_NULL,     /* CA2 output */
-	DEVCB_NULL,     /* CB2 output */
-	DEVCB_NULL,     /* IRQA output */
-	DEVCB_NULL      /* IRQB output */
-};
-
 static ACIA6850_INTERFACE( ec65_acia_intf )
 {
 	0,
@@ -222,7 +206,7 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 
 
 	/* devices */
-	MCFG_PIA6821_ADD( PIA6821_TAG, ec65_pia_interface )
+	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
 	MCFG_ACIA6850_ADD(ACIA6850_TAG, ec65_acia_intf)
 
 	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL_4MHz / 4)

@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "includes/atari.h"
-#include "ataridev.h"
 #include "machine/ram.h"
 #include "hashfile.h"
 

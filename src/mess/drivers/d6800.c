@@ -333,22 +333,6 @@ WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
 
 }
 
-static const pia6821_interface d6800_mc6821_intf =
-{
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_keyboard_r), /* port A input */
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_cassette_r), /* port B input */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_keydown_r), /* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_rtc_pulse), /* CB1 input */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_fn_key_r),  /* CA2 input */
-	DEVCB_NULL,                     /* CB2 input */
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_keyboard_w), /* port A output */
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_cassette_w), /* port B output */
-	DEVCB_NULL,                     /* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_screen_w),  /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB output */
-};
-
 /* Machine Initialization */
 
 void d6800_state::machine_start()
@@ -449,7 +433,18 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_PIA6821_ADD("pia", d6800_mc6821_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA6821_READPA_HANDLER(READ8(d6800_state, d6800_keyboard_r))
+	MCFG_PIA6821_READPB_HANDLER(READ8(d6800_state, d6800_cassette_r))
+	MCFG_PIA6821_READCA1_HANDLER(READLINE(d6800_state, d6800_keydown_r))
+	MCFG_PIA6821_READCA2_HANDLER(READLINE(d6800_state, d6800_rtc_pulse))
+	MCFG_PIA6821_READCB1_HANDLER(READLINE(d6800_state, d6800_fn_key_r))
+	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(d6800_state, d6800_keyboard_w))
+	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(d6800_state, d6800_cassette_w))
+	MCFG_PIA6821_CB2_HANDLER(WRITELINE(d6800_state, d6800_screen_w))
+	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+
 	MCFG_CASSETTE_ADD("cassette", d6800_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_c", d6800_state, d6800_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))
