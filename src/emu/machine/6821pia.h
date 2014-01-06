@@ -103,8 +103,8 @@ public:
 	UINT8 port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
 	void set_port_a_z_mask(UINT8 data) { m_port_a_z_mask = data; }// see second note in .c
 
-	DECLARE_WRITE8_MEMBER( porta_w );
-	void porta_w(UINT8 data) { porta_w(machine().driver_data()->generic_space(), 0, data); }
+	DECLARE_WRITE8_MEMBER( porta_w ) { porta_w(data); }
+	void porta_w(UINT8 data);
 	void set_a_input(UINT8 data, UINT8 z_mask);
 	UINT8 a_output();
 
@@ -114,8 +114,8 @@ public:
 	int ca2_output();
 	int ca2_output_z();
 
-	DECLARE_WRITE8_MEMBER( portb_w );
-	void portb_w(UINT8 data) { portb_w(machine().driver_data()->generic_space(), 0, data); }
+	DECLARE_WRITE8_MEMBER( portb_w ) { portb_w(data); }
+	void portb_w(UINT8 data);
 	UINT8 b_output();
 
 	DECLARE_WRITE_LINE_MEMBER( cb1_w );

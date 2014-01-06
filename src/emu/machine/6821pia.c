@@ -906,7 +906,7 @@ void pia6821_device::set_a_input(UINT8 data, UINT8 z_mask)
 //  pia6821_porta_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( pia6821_device::porta_w )
+void pia6821_device::porta_w(UINT8 data)
 {
 	set_a_input(data, 0);
 }
@@ -1013,7 +1013,7 @@ int pia6821_device::ca2_output_z()
 //  portb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( pia6821_device::portb_w )
+void pia6821_device::portb_w(UINT8 data)
 {
 	assert_always(m_in_b_handler.isnull(), "pia_set_input_b() called when in_b_func implemented");
 

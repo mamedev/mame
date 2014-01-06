@@ -170,7 +170,7 @@ INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 		m_last = ioport("INPUT")->read() & 0x0f;
 		generic_pulse_irq_line(device.execute(), 0, 1);
 	}
-	m_pia_u1->set_a_input(ioport("INPUT")->read() & 0x0f, 0);
+	m_pia_u1->porta_w(ioport("INPUT")->read() & 0x0f);
 	m_pia_u1->ca1_w(ioport("INPUT")->read() & 0x10);
 	m_pia_u1->ca2_w(ioport("INPUT")->read() & 0x20);
 }

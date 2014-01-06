@@ -889,7 +889,7 @@ READ8_MEMBER( victory_sound_device::status_r )
 
 TIMER_CALLBACK_MEMBER( victory_sound_device::delayed_command_w )
 {
-	m_pia1->set_a_input(param, 0);
+	m_pia1->porta_w(param);
 	m_pia1_ca1 = 0;
 	m_pia1->ca1_w(m_pia1_ca1);
 }
@@ -993,7 +993,7 @@ void victory_sound_device::device_reset()
 
 	/* these two lines shouldn't be needed, but it avoids the log entry
 	   as the sound CPU checks port A before the main CPU ever writes to it */
-	m_pia1->set_a_input(0, 0);
+	m_pia1->porta_w(0);
 	m_pia1_ca1 = 1;
 	m_pia1->ca1_w(m_pia1_ca1);
 }
