@@ -4590,13 +4590,13 @@ mwalkbl         // BOOTLEG
 
 
 // Outrun Hardware
-				// 1986.09 Outrun (Japan)
 				// 1986.11 Outrun (US)
 				// 1986.?? Outrun (World)
 outrun          // Revision B
 outrunra        // Revision A
 outruno         // First version
 outrundx        // Deluxe version
+outrunj         // 1986.09 Outrun (Japan)
 outrunb         // 1986 (protected beta bootleg)
 				// 1987.04 Super Hang-On (Japan)
 				// 1987.06 Super Hang-On (US)
