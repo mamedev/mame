@@ -32,6 +32,7 @@ public:
 
 	// return true if a reschedule is needed ...
 	ATTR_HOT bool solve();
+    ATTR_HOT int solve_non_dynamic();
 	ATTR_HOT void step(const netlist_time delta);
 	ATTR_HOT void update_inputs();
 

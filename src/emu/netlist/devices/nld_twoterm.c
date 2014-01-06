@@ -251,6 +251,60 @@ template NETLIB_UPDATE_PARAM(QBJT_switch<NETLIB_NAME(Q)::BJT_NPN>);
 template NETLIB_UPDATE_PARAM(QBJT_switch<NETLIB_NAME(Q)::BJT_PNP>);
 
 // ----------------------------------------------------------------------------------------
+// nld_Q - Ebers Moll
+// ----------------------------------------------------------------------------------------
+
+template <NETLIB_NAME(Q)::q_type _type>
+NETLIB_START(QBJT_EB<_type>)
+{
+    NETLIB_NAME(Q)::start();
+
+    register_terminal("B", m_D_BE.m_tt.m_P);   // Anode
+    register_terminal("E", m_D_BE.m_tt.m_N);   // Cathode
+
+    register_terminal("_B1", m_D_BC.m_tt.m_P); // Anode
+    register_terminal("C", m_D_BC.m_tt.m_N);   // Cathode
+
+    register_terminal("_B2", m_I_BE.m_P);
+    register_terminal("_E2", m_I_BE.m_N);
+
+    register_terminal("_B3", m_I_BC.m_P);
+    register_terminal("_C1", m_I_BC.m_N);
+
+    setup().connect(m_D_BE.m_tt.m_P, m_D_BC.m_tt.m_P);
+    setup().connect(m_D_BE.m_tt.m_P, m_I_BE.m_P);
+    setup().connect(m_D_BE.m_tt.m_P, m_I_BC.m_P);
+
+    setup().connect(m_D_BE.m_tt.m_N, m_I_BE.m_N);
+    setup().connect(m_D_BC.m_tt.m_N, m_I_BC.m_N);
+
+}
+
+
+template <NETLIB_NAME(Q)::q_type _type>
+NETLIB_UPDATE_PARAM(QBJT_EB<_type>)
+{
+    double IS = m_model.dValue("IS", 1e-15);
+    double BF = m_model.dValue("BF", 100);
+    double NF = m_model.dValue("NF", 1);
+    double BR = m_model.dValue("BR", 1);
+    double NR = m_model.dValue("NR", 1);
+    //double VJE = m_model.dValue("VJE", 0.75);
+
+    m_alpha_f = BF / (1.0 + BF);
+    m_alpha_r = BR / (1.0 + BR);
+
+    m_D_BE.set_param(IS / m_alpha_f, NF);
+    m_D_BC.set_param(IS / m_alpha_r, NR);
+
+}
+
+template NETLIB_START(QBJT_EB<NETLIB_NAME(Q)::BJT_NPN>);
+template NETLIB_START(QBJT_EB<NETLIB_NAME(Q)::BJT_PNP>);
+template NETLIB_UPDATE_PARAM(QBJT_EB<NETLIB_NAME(Q)::BJT_NPN>);
+template NETLIB_UPDATE_PARAM(QBJT_EB<NETLIB_NAME(Q)::BJT_PNP>);
+
+// ----------------------------------------------------------------------------------------
 // nld_VCCS
 // ----------------------------------------------------------------------------------------
 

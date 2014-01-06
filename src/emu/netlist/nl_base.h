@@ -272,6 +272,7 @@ public:
 		BJT_SWITCH = 7,  // BJT(Switch)
 		VCVS       = 8,  // Voltage controlled voltage source
 		VCCS       = 9,  // Voltage controlled voltage source
+		BJT_EB     = 10, // BJT(Ebers-Moll)
 	};
 
 	ATTR_COLD netlist_object_t(const type_t atype, const family_t afamily);

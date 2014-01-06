@@ -34,7 +34,9 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 							if (!m_steps.contains(&p->netdev()))
 								m_steps.add(&p->netdev());
 							break;
-						case netlist_device_t::DIODE:
+						case netlist_device_t::BJT_EB:
+						    printf("Found ebers moll\n");
+                        case netlist_device_t::DIODE:
 						//case netlist_device_t::VCVS:
 						//case netlist_device_t::BJT_SWITCH:
 							if (!m_dynamic.contains(&p->netdev()))
@@ -82,28 +84,15 @@ ATTR_HOT inline void netlist_matrix_solver_t::update_inputs()
 
 }
 
-
-ATTR_HOT inline bool netlist_matrix_solver_t::solve()
+ATTR_HOT inline int netlist_matrix_solver_t::solve_non_dynamic()
 {
-	bool resched;
-	// FIXME: There may be situations where we *could* need more than one iteration for dynamic elements
+    bool resched;
 
-    int  resched_cnt = (is_dynamic() ? /* 0 */ 1 : 1);
+    int  resched_cnt = 0;
     ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
 
     do {
         resched = false;
-        /* update all non-linear devices  */
-        for (dev_list_t::entry_t *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
-            switch (p->object()->family())
-            {
-                case netlist_device_t::DIODE:
-                    static_cast<NETLIB_NAME(D) *>(p->object())->update_terminals();
-                    break;
-                default:
-                    p->object()->update_terminals();
-                    break;
-            }
 
         for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
         {
@@ -140,7 +129,46 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
             //NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
         }
         resched_cnt++;
-    } while ((resched && (resched_cnt < m_resched_loops)) || (resched_cnt <= 1));
+    } while (resched && (resched_cnt < m_resched_loops / 2 ));
+
+    return resched_cnt;
+}
+
+
+ATTR_HOT inline bool netlist_matrix_solver_t::solve()
+{
+	bool resched = false;
+	// FIXME: There may be situations where we *could* need more than one iteration for dynamic elements
+
+    int  resched_cnt = 0;
+    ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
+
+    if (is_dynamic())
+    {
+        int this_resched;
+        do
+        {
+            /* update all non-linear devices  */
+            for (dev_list_t::entry_t *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
+                switch (p->object()->family())
+                {
+                    case netlist_device_t::DIODE:
+                        static_cast<NETLIB_NAME(D) *>(p->object())->update_terminals();
+                        break;
+                    default:
+                        p->object()->update_terminals();
+                        break;
+                }
+            this_resched = solve_non_dynamic();
+            resched_cnt += this_resched;
+        } while (this_resched > 1 && resched_cnt < m_resched_loops);
+    }
+    else
+    {
+        resched_cnt = solve_non_dynamic();
+    }
+    if (resched_cnt >= m_resched_loops)
+        resched = true;
 
     if (!resched)
         update_inputs();
@@ -199,7 +227,8 @@ NETLIB_START(solver)
 	register_param("FREQ", m_freq, 48000.0);
 	m_inc = netlist_time::from_hz(m_freq.Value());
 
-	register_param("ACCURACY", m_accuracy, 1e-3);
+    //register_param("ACCURACY", m_accuracy, 1e-3);
+	register_param("ACCURACY", m_accuracy, 1e-6);
 	register_param("CONVERG", m_convergence, 0.3);
     register_param("RESCHED_LOOPS", m_resched_loops, 15);
 

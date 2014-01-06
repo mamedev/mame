@@ -66,6 +66,10 @@ void netlist_parser::parse(const char *buf)
             netdev_device(n, "model", true);
         else if (n == "NETDEV_QPNP")
             netdev_device(n, "model", true);
+        else if (n == "NETDEV_QNPN_EB")
+            netdev_device(n, "model", true);
+        else if (n == "NETDEV_QPNP_EB")
+            netdev_device(n, "model", true);
 		else if ((n == "NETDEV_TTL_CONST") || (n == "NETDEV_ANALOG_CONST"))
 			netdev_const(n);
 		else if ((n == "NET_MODEL"))

@@ -84,6 +84,8 @@ enum input_changed_enum
 static NETLIST_START(pong_schematics)
     NETDEV_SOLVER(Solver)
     NETDEV_PARAM(Solver.FREQ, 48000)
+    NETDEV_PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
+
     NETDEV_ANALOG_CONST(V5, 5)
 
 	NETDEV_TTL_CONST(high, 1)
