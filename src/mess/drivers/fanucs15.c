@@ -114,6 +114,8 @@ static ADDRESS_MAP_START(gfxcpu_mem, AS_PROGRAM, 16, fanucs15_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(convcpu_mem, AS_PROGRAM, 16, fanucs15_state)
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("conversational", 0x40000)
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("conversational", 0)
 ADDRESS_MAP_END
 
