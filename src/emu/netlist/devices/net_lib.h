@@ -75,9 +75,11 @@
 
 #include "nld_log.h"
 
-#include "../analog/nld_twoterm.h"
+#include "../analog/nld_bjt.h"
+#include "../analog/nld_fourterm.h"
 #include "../analog/nld_solver.h"
 #include "../analog/nld_switches.h"
+#include "../analog/nld_twoterm.h"
 
 
 #include "nld_legacy.h"

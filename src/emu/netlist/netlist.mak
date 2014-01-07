@@ -28,9 +28,11 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/nl_setup.o \
 	$(NETLISTOBJ)/pstring.o \
 	$(NETLISTOBJ)/pstate.o \
+	$(NETLISTOBJ)/analog/nld_bjt.o \
+	$(NETLISTOBJ)/analog/nld_fourterm.o \
 	$(NETLISTOBJ)/analog/nld_solver.o \
-	$(NETLISTOBJ)/analog/nld_twoterm.o \
 	$(NETLISTOBJ)/analog/nld_switches.o \
+	$(NETLISTOBJ)/analog/nld_twoterm.o \
 	$(NETLISTOBJ)/devices/nld_7404.o \
 	$(NETLISTOBJ)/devices/nld_7474.o \
 	$(NETLISTOBJ)/devices/nld_7483.o \

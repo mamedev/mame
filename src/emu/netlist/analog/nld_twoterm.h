@@ -57,23 +57,6 @@
 		NET_REGISTER_DEV(D, _name)                                                  \
 		NETDEV_PARAMI(_name, model, # _model)
 
-#define NETDEV_QPNP(_name, _model)                                                 \
-		NET_REGISTER_DEV(QPNP_switch, _name)                                       \
-		NETDEV_PARAMI(_name,  model, # _model)
-
-#define NETDEV_QNPN(_name, _model)                                                 \
-		NET_REGISTER_DEV(QNPN_switch, _name)                                       \
-		NETDEV_PARAMI(_name,  model, # _model)
-
-#define NETDEV_QPNP_EB(_name, _model)                                              \
-        NET_REGISTER_DEV(QPNP_EB, _name)                                           \
-        NETDEV_PARAMI(_name,  model, # _model)
-
-#define NETDEV_QNPN_EB(_name, _model)                                              \
-        NET_REGISTER_DEV(QNPN_switch, _name)                                       \
-        NETDEV_PARAMI(_name,  model, # _model)
-
-
 // ----------------------------------------------------------------------------------------
 // Implementation
 // ----------------------------------------------------------------------------------------
@@ -100,6 +83,9 @@ public:
 		m_N.m_Idr = ( -V) * G + I;
 		m_P.m_Idr = (  V) * G - I;
 	}
+
+    ATTR_HOT inline double deltaV() { return m_P.net().Q_Analog()- m_N.net().Q_Analog(); }
+
 protected:
 	ATTR_COLD virtual void start();
 	ATTR_HOT ATTR_ALIGN void update();
@@ -153,7 +139,7 @@ public:
 	ATTR_HOT void step_time(const double st)
 	{
 		double G = m_C.Value() / st;
-		double I = -G * (m_P.net().Q_Analog()- m_N.net().Q_Analog());
+		double I = -G * deltaV();
 		set(G, 0.0, I);
 	}
 
@@ -164,6 +150,89 @@ protected:
 
 	netlist_param_double_t m_C;
 
+};
+
+
+// ----------------------------------------------------------------------------------------
+// A generic diode model to be used in other devices (Diode, BJT ...)
+// ----------------------------------------------------------------------------------------
+
+class netlist_generic_diode
+{
+public:
+    netlist_generic_diode() {}
+
+    ATTR_HOT inline void update_diode(const double nVd)
+    {
+        //FIXME: Optimize cutoff case
+
+        if (nVd < -5.0 * m_Vt)
+        {
+            m_Vd = nVd;
+            m_G = NETLIST_GMIN;
+            m_Id = - m_Is;
+        }
+        else if (nVd < m_Vcrit)
+        {
+            m_Vd = nVd;
+
+            const double eVDVt = exp(m_Vd * m_VtInv);
+            m_Id = m_Is * (eVDVt - 1.0);
+            m_G = m_Is * m_VtInv * eVDVt;
+        }
+        else
+        {
+#if defined(_MSC_VER) && _MSC_VER < 1800
+            m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
+#else
+            m_Vd = m_Vd + log1p((nVd - m_Vd) * m_VtInv) * m_Vt;
+#endif
+            const double eVDVt = exp(m_Vd * m_VtInv);
+            m_Id = m_Is * (eVDVt - 1.0);
+
+            m_G = m_Is * m_VtInv * eVDVt;
+        }
+
+        //printf("nVd %f m_Vd %f Vcrit %f\n", nVd, m_Vd, m_Vcrit);
+    }
+
+    void set_param(const double Is, const double n)
+    {
+        m_Is = Is;
+        m_n = n;
+
+        m_Vt = 0.0258 * m_n;
+
+        m_Vcrit = m_Vt * log(m_Vt / m_Is / sqrt(2.0));
+        m_VtInv = 1.0 / m_Vt;
+
+        m_Vd = 0.7;
+    }
+
+    ATTR_HOT inline double I() { return m_Id; }
+    ATTR_HOT inline double G() { return m_G; }
+    ATTR_HOT inline double Ieq() { return (m_Id - m_Vd * m_G); }
+
+    /* owning object must save those ... */
+
+    void save(pstring name, netlist_object_t &parent)
+    {
+        parent.save(m_Vd, name + ".m_Vd");
+        parent.save(m_Id, name + ".m_Id");
+        parent.save(m_G, name + ".m_G");
+    }
+
+private:
+    double m_Vd;
+    double m_Id;
+    double m_G;
+
+    double m_Vt;
+    double m_Is;
+    double m_n;
+
+    double m_VtInv;
+    double m_Vcrit;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -206,42 +275,8 @@ public:
 
 	NETLIB_UPDATE_TERMINALS()
 	{
-		const double nVd = m_P.net().Q_Analog()- m_N.net().Q_Analog();
-
-		//FIXME: Optimize cutoff case
-
-		double Id;
-		double G;
-
-		if (nVd < -5.0 * m_Vt)
-		{
-			m_Vd = nVd;
-			G = NETLIST_GMIN;
-			Id = - m_Is;
-		}
-		else if (nVd < m_Vcrit)
-		{
-			m_Vd = nVd;
-
-			const double eVDVt = exp(m_Vd * m_VtInv);
-			Id = m_Is * (eVDVt - 1.0);
-			G = m_Is * m_VtInv * eVDVt;
-		}
-		else
-		{
-#if defined(_MSC_VER) && _MSC_VER < 1800
-			m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
-#else
-			m_Vd = m_Vd + log1p((nVd - m_Vd) * m_VtInv) * m_Vt;
-#endif
-			const double eVDVt = exp(m_Vd * m_VtInv);
-			Id = m_Is * (eVDVt - 1.0);
-
-			G = m_Is * m_VtInv * eVDVt;
-		}
-
-		double I = (Id - m_Vd * G);
-		set(G, 0.0, I);
+	    m_D.update_diode(deltaV());
+		set(m_D.G(), 0.0, m_D.Ieq());
 	}
 
 protected:
@@ -251,374 +286,9 @@ protected:
 
 	netlist_param_model_t m_model;
 
-	double m_Vt;
-	double m_Is;
-	double m_n;
-
-	double m_VtInv;
-	double m_Vcrit;
-	double m_Vd;
-
+	netlist_generic_diode m_D;
 };
 
-// ----------------------------------------------------------------------------------------
-// nld_Q - Base classes
-// ----------------------------------------------------------------------------------------
-
-// Have a common start for transistors
-
-class NETLIB_NAME(Q) : public netlist_device_t
-{
-public:
-    enum q_type {
-        BJT_NPN,
-        BJT_PNP
-    };
-
-    ATTR_COLD NETLIB_NAME(Q)(const q_type atype, const family_t afamily)
-    : netlist_device_t(afamily)
-    , m_qtype(atype) { }
-
-    inline q_type qtype() const { return m_qtype; }
-    inline bool is_qtype(q_type atype) const { return m_qtype == atype; }
-protected:
-    ATTR_COLD virtual void start();
-    ATTR_HOT ATTR_ALIGN void update();
-
-    netlist_param_model_t m_model;
-private:
-    q_type m_qtype;
-};
-
-class NETLIB_NAME(QBJT) : public NETLIB_NAME(Q)
-{
-public:
-
-    ATTR_COLD NETLIB_NAME(QBJT)(const q_type atype, const family_t afamily)
-    : NETLIB_NAME(Q)(atype, afamily) { }
-
-protected:
-
-private:
-};
-
-// ----------------------------------------------------------------------------------------
-// nld_QBJT_switch
-// ----------------------------------------------------------------------------------------
-
-
-/*
- *         + -              C
- *   B ----VVV----+         |
- *                |         |
- *                Rb        Rc
- *                Rb        Rc
- *                Rb        Rc
- *                |         |
- *                +----+----+
- *                     |
- *                     E
- */
-
-template <NETLIB_NAME(Q)::q_type _type>
-class NETLIB_NAME(QBJT_switch) : public NETLIB_NAME(QBJT)
-{
-public:
-    ATTR_COLD NETLIB_NAME(QBJT_switch)()
-    : NETLIB_NAME(QBJT)(_type, BJT_SWITCH), m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0), m_state_on(0) { }
-
-    NETLIB_UPDATEI()
-    {
-        double vE = INPANALOG(m_EV);
-        double vB = INPANALOG(m_BV);
-        double m = (_type == BJT_NPN) ? 1 : -1;
-
-        int new_state = ((vB - vE) * m > m_V ) ? 1 : 0;
-        if (m_state_on ^ new_state)
-        {
-            double gb = m_gB;
-            double gc = m_gC;
-            double v  = m_V * m;
-            if (!new_state )
-            {
-                // not conducting
-                gb = NETLIST_GMIN;
-                v = 0;
-                gc = NETLIST_GMIN;
-            }
-            m_RB.set(gb, v,   0.0);
-            m_RC.set(gc, 0.0, 0.0);
-            m_state_on = new_state;
-            m_RB.update_dev();
-            m_RC.update_dev();
-        }
-
-    }
-
-    NETLIB_NAME(R) m_RB;
-    NETLIB_NAME(R) m_RC;
-
-    netlist_analog_input_t m_BV;
-    netlist_analog_input_t m_EV;
-
-protected:
-
-    ATTR_COLD virtual void start();
-    ATTR_HOT void update_param();
-
-    double m_gB; // base conductance / switch on
-    double m_gC; // collector conductance / switch on
-    double m_V; // internal voltage source
-    UINT8 m_state_on;
-
-private:
-};
-
-typedef NETLIB_NAME(QBJT_switch)<NETLIB_NAME(Q)::BJT_PNP> NETLIB_NAME(QPNP_switch);
-typedef NETLIB_NAME(QBJT_switch)<NETLIB_NAME(Q)::BJT_NPN> NETLIB_NAME(QNPN_switch);
-
-// ----------------------------------------------------------------------------------------
-// nld_QBJT_EB
-// ----------------------------------------------------------------------------------------
-
-struct generic_diode
-{
-    generic_diode() : m_tt(netlist_object_t::ANALOG) {}
-
-    ATTR_HOT inline void update_diode()
-    {
-        //FIXME: Optimize cutoff case
-
-        const double nVd = m_tt.m_P.net().Q_Analog()- m_tt.m_N.net().Q_Analog();
-
-        double G;
-
-        if (nVd < -5.0 * m_Vt)
-        {
-            m_Vd = nVd;
-            G = NETLIST_GMIN;
-            m_Id = - m_Is;
-        }
-        else if (nVd < m_Vcrit)
-        {
-            m_Vd = nVd;
-
-            const double eVDVt = exp(m_Vd * m_VtInv);
-            m_Id = m_Is * (eVDVt - 1.0);
-            G = m_Is * m_VtInv * eVDVt;
-        }
-        else
-        {
-#if defined(_MSC_VER) && _MSC_VER < 1800
-            m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
-#else
-            m_Vd = m_Vd + log1p((nVd - m_Vd) * m_VtInv) * m_Vt;
-#endif
-            const double eVDVt = exp(m_Vd * m_VtInv);
-            m_Id = m_Is * (eVDVt - 1.0);
-
-            G = m_Is * m_VtInv * eVDVt;
-        }
-
-        double I = (m_Id - m_Vd * G);
-        m_tt.set(G, 0.0, I);
-        //printf("nVd %f m_Vd %f Vcrit %f\n", nVd, m_Vd, m_Vcrit);
-    }
-
-    void set_param(const double Is, const double n)
-    {
-        m_Is = Is;
-        m_n = n;
-
-        m_Vt = 0.0258 * m_n;
-
-        m_Vcrit = m_Vt * log(m_Vt / m_Is / sqrt(2.0));
-        m_VtInv = 1.0 / m_Vt;
-
-        m_Vd = 0.7;
-    }
-
-    ATTR_HOT inline double I() { return m_Id; }
-
-    nld_twoterm m_tt;
-
-private:
-    double m_Id;
-
-    double m_Vt;
-    double m_Is;
-    double m_n;
-
-    double m_VtInv;
-    double m_Vcrit;
-    double m_Vd;
-};
-
-
-template <NETLIB_NAME(Q)::q_type _type>
-class NETLIB_NAME(QBJT_EB) : public NETLIB_NAME(QBJT)
-{
-public:
-    ATTR_COLD NETLIB_NAME(QBJT_EB)()
-    : NETLIB_NAME(QBJT)(_type, BJT_EB),
-      m_I_BC(netlist_object_t::ANALOG),
-      m_I_BE(netlist_object_t::ANALOG)
-      { }
-
-    NETLIB_UPDATE_TERMINALS()
-    {
-        m_D_BE.update_diode();
-        m_D_BC.update_diode();
-        m_I_BC.set(0.0, 0.0, - m_alpha_f * m_D_BE.I());
-        m_I_BE.set(0.0, 0.0, - m_alpha_r * m_D_BC.I());
-    }
-
-protected:
-
-    ATTR_COLD virtual void start();
-    ATTR_HOT void update_param();
-
-    generic_diode m_D_BE;
-    generic_diode m_D_BC;
-
-    nld_twoterm m_I_BC;
-    nld_twoterm m_I_BE;
-
-    double m_alpha_f;
-    double m_alpha_r;
-
-private:
-};
-
-typedef NETLIB_NAME(QBJT_EB)<NETLIB_NAME(Q)::BJT_PNP> NETLIB_NAME(QPNP_EB);
-typedef NETLIB_NAME(QBJT_EB)<NETLIB_NAME(Q)::BJT_NPN> NETLIB_NAME(QNPN_EB);
-
-// ----------------------------------------------------------------------------------------
-// nld_CCCS
-// ----------------------------------------------------------------------------------------
-
-/*
- *   Current controlled current source
- *
- *   IP ---+           +------> OP
- *         |           |
- *         RI          I
- *         RI => G =>  I    IOut = (V(IP)-V(IN)) / RI  * G
- *         RI          I
- *         |           |
- *   IN ---+           +------< ON
- *
- *   G=1 ==> 1A ==> 1A
- *
- *   RI = 1
- *
- *   FIXME: This needs extremely high levels of accuracy to work
- *          With the current default of 1mv we can only measure
- *          currents of 1mA. Therefore not yet implemented.
- *
- */
-
-
-// ----------------------------------------------------------------------------------------
-// nld_VCCS
-// ----------------------------------------------------------------------------------------
-
-/*
- *   Voltage controlled current source
- *
- *   IP ---+           +------> OP
- *         |           |
- *         RI          I
- *         RI => G =>  I    IOut = (V(IP)-V(IN)) * G
- *         RI          I
- *         |           |
- *   IN ---+           +------< ON
- *
- *   G=1 ==> 1V ==> 1A
- *
- *   RI = 1 / NETLIST_GMIN
- *
- */
-
-#define NETDEV_VCCS(_name)                                                         \
-		NET_REGISTER_DEV(VCCS, _name)
-//NETDEV_PARAMI(_name, model, _model)
-
-class NETLIB_NAME(VCCS) : public netlist_device_t
-{
-public:
-	ATTR_COLD NETLIB_NAME(VCCS)()
-	: netlist_device_t(VCCS) {  }
-	ATTR_COLD NETLIB_NAME(VCCS)(const family_t afamily)
-	: netlist_device_t(afamily) {  }
-
-protected:
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void update_param();
-	ATTR_HOT ATTR_ALIGN void update();
-
-	ATTR_COLD void configure(const double Gfac, const double GI);
-
-	netlist_terminal_t m_OP;
-	netlist_terminal_t m_ON;
-
-	netlist_terminal_t m_IP;
-	netlist_terminal_t m_IN;
-
-	netlist_terminal_t m_OP1;
-	netlist_terminal_t m_ON1;
-
-	netlist_param_double_t m_G;
-};
-
-// ----------------------------------------------------------------------------------------
-// nld_VCVS
-// ----------------------------------------------------------------------------------------
-
-/*
- *   Voltage controlled voltage source
- *
- *   Parameters:
- *     G        Default: 1
- *     RO       Default: 1  (would be typically 50 for an op-amp
- *
- *   IP ---+           +--+---- OP
- *         |           |  |
- *         RI          I  RO
- *         RI => G =>  I  RO              V(OP) - V(ON) = (V(IP)-V(IN)) * G
- *         RI          I  RO
- *         |           |  |
- *   IN ---+           +--+---- ON
- *
- *   G=1 ==> 1V ==> 1V
- *
- *   RI = 1 / NETLIST_GMIN
- *
- *   Internal GI = G / RO
- *
- */
-
-#define NETDEV_VCVS(_name)                                                         \
-		NET_REGISTER_DEV(VCVS, _name)
-//NETDEV_PARAMI(_name, model, _model)
-
-
-class NETLIB_NAME(VCVS) : public NETLIB_NAME(VCCS)
-{
-public:
-	ATTR_COLD NETLIB_NAME(VCVS)()
-	: NETLIB_NAME(VCCS)(VCVS) { }
-
-protected:
-	ATTR_COLD virtual void start();
-	ATTR_COLD virtual void update_param();
-	//ATTR_HOT ATTR_ALIGN void update();
-
-	netlist_terminal_t m_OP2;
-	netlist_terminal_t m_ON2;
-
-	netlist_param_double_t m_RO;
-};
 
 
 #endif /* NLD_TWOTERM_H_ */
