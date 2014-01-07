@@ -153,14 +153,23 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "sound/msm5205.h"
 #include "sound/sn76496.h"
 #include "includes/docastle.h"
 
 
 
 /* Read/Write Handlers */
+WRITE_LINE_MEMBER(docastle_state::docastle_tint)
+{
+	if (state)
+	{
+		int ma6 = m_crtc->get_ma() & 0x40;
+		if (ma6 & ~m_prev_ma6) // MA6 rising edge
+			m_slave->set_input_line(0, HOLD_LINE);
+		m_prev_ma6 = ma6;
+	}
+}
+
 WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 {
 	if (m_adpcm_pos >= memregion("adpcm")->bytes())
@@ -221,10 +230,9 @@ static ADDRESS_MAP_START( docastle_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_READWRITE(docastle_flipscreen_off_r, docastle_flipscreen_off_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x0080) AM_MASK(0x0080) AM_READWRITE(flipscreen_r, flipscreen_w)
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc084, 0xc084) AM_READWRITE(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("sn1", sn76489a_device, write)
 	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("sn3", sn76489a_device, write)
@@ -268,10 +276,9 @@ static ADDRESS_MAP_START( dorunrun_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_READWRITE(docastle_flipscreen_off_r, docastle_flipscreen_off_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x0080) AM_MASK(0x0080) AM_READWRITE(flipscreen_r, flipscreen_w)
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc084, 0xc084) AM_READWRITE(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
 	AM_RANGE(0xe000, 0xe008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
 ADDRESS_MAP_END
 
@@ -296,10 +303,9 @@ static ADDRESS_MAP_START( idsoccer_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(docastle_flipscreen_off_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x0080) AM_MASK(0x0080) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(flipscreen_w)
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc084, 0xc084) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(docastle_flipscreen_on_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("sn1", sn76489a_device, write)
 	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("sn3", sn76489a_device, write)
@@ -555,14 +561,14 @@ GFXDECODE_END
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,      /* show border area */
-	8,-8,32,32, /* visarea adjustment */
+	8,-8,0,0,   /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
 	NULL,       /* after pixel update callback */
 	DEVCB_NULL, /* callback for display state changes */
 	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
+	DEVCB_DRIVER_LINE_MEMBER(docastle_state, docastle_tint), /* HSYNC callback */
 	DEVCB_NULL, /* VSYNC callback */
 	NULL        /* update address callback */
 };
@@ -599,6 +605,7 @@ void docastle_state::machine_reset()
 		m_buffer1[i] = 0;
 	}
 
+	m_prev_ma6 = 0;
 	m_adpcm_pos = m_adpcm_idle = 0;
 	m_adpcm_data = -1;
 	m_adpcm_status = 0;
@@ -606,6 +613,7 @@ void docastle_state::machine_reset()
 
 void docastle_state::machine_start()
 {
+	save_item(NAME(m_prev_ma6));
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_adpcm_idle));
@@ -624,7 +632,6 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 
 	MCFG_CPU_ADD("slave", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(docastle_state, irq0_line_hold, 8*60) // ?
 
 	MCFG_CPU_ADD("cpu3", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map3)
@@ -634,7 +641,7 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, crtc_intf)
 	
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 0+8, 0x110-24, 0x108, 0+32, 0xe0) // from crtc
+	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 0, 0x100, 0x108, 0, 0xc0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 
 	MCFG_GFXDECODE(docastle)

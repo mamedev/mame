@@ -73,30 +73,17 @@ WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(docastle_state::docastle_flipscreen_off_r)
+READ8_MEMBER(docastle_state::flipscreen_r)
 {
-	flip_screen_set(0);
-	m_do_tilemap->mark_all_dirty();
-	return 0;
+	flip_screen_set_no_update(offset);
+	m_do_tilemap->set_flip(offset ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	return (offset ? 1 : 0); // is this really needed?
 }
 
-READ8_MEMBER(docastle_state::docastle_flipscreen_on_r)
+WRITE8_MEMBER(docastle_state::flipscreen_w)
 {
-	flip_screen_set(1);
-	m_do_tilemap->mark_all_dirty();
-	return 1;
-}
-
-WRITE8_MEMBER(docastle_state::docastle_flipscreen_off_w)
-{
-	flip_screen_set(0);
-	m_do_tilemap->mark_all_dirty();
-}
-
-WRITE8_MEMBER(docastle_state::docastle_flipscreen_on_w)
-{
-	flip_screen_set(1);
-	m_do_tilemap->mark_all_dirty();
+	flip_screen_set_no_update(offset);
+	m_do_tilemap->set_flip(offset ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
@@ -110,6 +97,8 @@ TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
 void docastle_state::video_start_common( UINT32 tile_transmask )
 {
 	m_do_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(docastle_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_do_tilemap->set_scrolldx(0, 0x138 - 0x100);
+	m_do_tilemap->set_scrolldy(-32, 0x108 - 0x100 - (-32));
 	m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
 }
 
@@ -155,7 +144,7 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			code = m_spriteram[offs + 3];
 			color = m_spriteram[offs + 2] & 0x0f;
 			sx = ((m_spriteram[offs + 1] + 8) & 0xff) - 8;
-			sy = m_spriteram[offs];
+			sy = m_spriteram[offs] - 32;
 			flipx = m_spriteram[offs + 2] & 0x40;
 			flipy = 0;
 			if (m_spriteram[offs + 2] & 0x10) code += 0x100;
@@ -181,15 +170,15 @@ void docastle_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 			code = m_spriteram[offs + 3];
 			color = m_spriteram[offs + 2] & 0x1f;
 			sx = ((m_spriteram[offs + 1] + 8) & 0xff) - 8;
-			sy = m_spriteram[offs];
+			sy = m_spriteram[offs] - 32;
 			flipx = m_spriteram[offs + 2] & 0x40;
 			flipy = m_spriteram[offs + 2] & 0x80;
 		}
 
 		if (flip_screen())
 		{
-			sx = 296 - sx;
-			sy = 248 - sy;
+			sx = 240 - sx;
+			sy = 176 - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
