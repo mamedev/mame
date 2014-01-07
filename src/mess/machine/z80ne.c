@@ -13,8 +13,6 @@
 
 /* Components */
 #include "machine/ay31015.h"
-#include "machine/kr2376.h"
-#include "video/mc6847.h"
 #include "machine/wd17xx.h"
 
 /* Devices */
@@ -200,8 +198,8 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
 
 void z80ne_state::reset_lx388()
 {
-	kr2376_set_input_pin( m_lx388_kr2376, KR2376_DSII, 0);
-	kr2376_set_input_pin( m_lx388_kr2376, KR2376_PII, 0);
+	m_lx388_kr2376->set_input_pin( KR2376_DSII, 0);
+	m_lx388_kr2376->set_input_pin( KR2376_PII, 0);
 }
 
 void z80ne_state::reset_lx382_banking()
@@ -619,8 +617,8 @@ READ8_MEMBER(z80ne_state::lx388_data_r)
 {
 	UINT8 data;
 
-	data = kr2376_data_r(m_lx388_kr2376, space, 0) & 0x7f;
-	data |= kr2376_get_output_pin(m_lx388_kr2376, KR2376_SO) << 7;
+	data = m_lx388_kr2376->data_r(space, 0) & 0x7f;
+	data |= m_lx388_kr2376->get_output_pin(KR2376_SO) << 7;
 	return data;
 }
 

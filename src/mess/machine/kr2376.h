@@ -33,36 +33,6 @@
 #ifndef __KR2376__
 #define __KR2376__
 
-typedef void (*kr2376_on_strobe_changed_func) (device_t *device, int level);
-#define KR2376_ON_STROBE_CHANGED(name) void name(device_t *device, int level)
-
-class kr2376_device : public device_t
-{
-public:
-	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~kr2376_device() { global_free(m_token); }
-
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-private:
-	// internal state
-	void *m_token;
-};
-
-extern const device_type KR2376;
-
-
-#define MCFG_KR2376_ADD(_tag, _intrf) \
-	MCFG_DEVICE_ADD(_tag, KR2376, 0) \
-	MCFG_DEVICE_CONFIG(_intrf)
-
-#define MCFG_KR2376_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag, KR2376)
-
 /*
  * Input pins
  */
@@ -78,27 +48,76 @@ enum kr2376_output_pin_t
 	KR2376_PO=7         /* PO    - Pin  7 - Parity Output */
 };
 
+typedef void (*kr2376_on_strobe_changed_func) (device_t *device, int level);
+#define KR2376_ON_STROBE_CHANGED(name) void name(device_t *device, int level)
+
 /* interface */
 struct kr2376_interface
 {
 	/* The clock of the chip (Typical 50 kHz) */
-	int clock;
+	int m_our_clock;
 
 	/* This will be called for every change of the strobe pin (pin 16). Optional */
-	devcb_write_line on_strobe_changed_cb;
+	devcb_write_line m_on_strobe_changed_cb;
 };
+
+class kr2376_device : public device_t,
+								public kr2376_interface
+{
+public:
+	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~kr2376_device() {}
+	
+	/* keyboard data */
+	DECLARE_READ8_MEMBER( data_r );
+
+	/* Set an input pin */
+	void set_input_pin( kr2376_input_pin_t pin, int data );
+
+	/* Get an output pin */
+	int get_output_pin( kr2376_output_pin_t pin );
+
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual ioport_constructor device_input_ports() const;
+	
+private:
+	// internal state
+	int m_pins[41];
+
+	int m_ring11;                     /* sense input scan counter */
+	int m_ring8;                      /* drive output scan counter */
+	int m_modifiers;                  /* modifier inputs */
+
+	int m_strobe;                     /* strobe output */
+	int m_strobe_old;
+	int m_parity;
+	int m_data;
+
+	/* timers */
+	emu_timer *m_scan_timer;          /* keyboard scan timer */
+	devcb_resolved_write_line m_on_strobe_changed;
+	
+	enum
+	{
+		TIMER_SCAN_TICK
+	};
+	
+	void change_output_lines();
+	void clock_scan_counters();
+	void detect_keypress();
+};
+
+extern const device_type KR2376;
+
+
+#define MCFG_KR2376_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, KR2376, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
+
 #define KR2376_INTERFACE(name) const kr2376_interface (name)=
-/* keyboard matrix */
-INPUT_PORTS_EXTERN( kr2376 );
-
-/* keyboard data */
-DECLARE_READ8_DEVICE_HANDLER( kr2376_data_r );
-
-/* Set an input pin */
-void kr2376_set_input_pin( device_t *device, kr2376_input_pin_t pin, int data );
-
-
-/* Get an output pin */
-int kr2376_get_output_pin( device_t *device, kr2376_output_pin_t pin );
 
 #endif

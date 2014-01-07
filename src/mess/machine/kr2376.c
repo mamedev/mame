@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "kr2376.h"
-#include "devlegcy.h"
 
 static const UINT8 KR2376_KEY_CODES[3][8][11] =
 {
@@ -65,118 +64,142 @@ static const UINT8 KR2376_KEY_CODES[3][8][11] =
 	}
 };
 
-struct kr2376_t
+
+const device_type KR2376 = &device_creator<kr2376_device>;
+
+kr2376_device::kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, KR2376, "SMC KR2376", tag, owner, clock, "kr2376", __FILE__)
 {
-	const kr2376_interface *intf;
-	int pins[41];
+}
 
-	int ring11;                     /* sense input scan counter */
-	int ring8;                      /* drive output scan counter */
-	int modifiers;                  /* modifier inputs */
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-	int strobe;                     /* strobe output */
-	int strobe_old;
-	int parity;
-	int data;
-
-	/* timers */
-	emu_timer *scan_timer;          /* keyboard scan timer */
-	devcb_resolved_write_line on_strobe_changed;
-};
-
-INLINE kr2376_t *get_safe_token(device_t *device)
+void kr2376_device::device_config_complete()
 {
-	assert(device != NULL);
-	assert(device->type() == KR2376);
+	// inherit a copy of the static data
+	const kr2376_interface *intf = reinterpret_cast<const kr2376_interface *>(static_config());
+	if (intf != NULL)
+			*static_cast<kr2376_interface *>(this) = *intf;
 
-	return (kr2376_t *)downcast<kr2376_device *>(device)->token();
+	// or initialize to defaults if none provided
+	else
+	{
+		m_our_clock = 0;
+		memset(&m_on_strobe_changed_cb, 0, sizeof(m_on_strobe_changed_cb));
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void kr2376_device::device_start()
+{
+	m_on_strobe_changed.resolve(m_on_strobe_changed_cb, *this);
+
+	/* set initial values */
+	m_ring11 = 0;
+	m_ring8 = 0;
+	m_modifiers = 0;
+	m_strobe = 0;
+	m_strobe_old = 0;
+	m_parity = 0;
+	m_data = 0;
+	change_output_lines();
+
+	/* create the timers */
+	m_scan_timer = timer_alloc(TIMER_SCAN_TICK);
+	m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(m_our_clock));
+
+	/* register for state saving */
+	save_item(NAME(m_ring11));
+	save_item(NAME(m_ring8));
+	save_item(NAME(m_modifiers));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_strobe_old));
+	save_item(NAME(m_parity));
+	save_item(NAME(m_data));
 }
 
 /*-------------------------------------------------
-    kr2376_set_input_pin - set an input pin
+    set_input_pin - set an input pin
 -------------------------------------------------*/
-void kr2376_set_input_pin( device_t *device, kr2376_input_pin_t pin, int data )
+void kr2376_device::set_input_pin( kr2376_input_pin_t pin, int data )
 {
-	kr2376_t *kr2376 = get_safe_token(device);
-
 	data = data ? 1 : 0;
 	switch ( pin )
 	{
 	case KR2376_PII:
 	case KR2376_DSII:
-		kr2376->pins[pin] = data;
+		m_pins[pin] = data;
 		break;
 	}
 }
 
 
 /*-------------------------------------------------
-    kr2376_get_output_pin - get the status of an output pin
+    get_output_pin - get the status of an output pin
 -------------------------------------------------*/
-int kr2376_get_output_pin( device_t *device, kr2376_output_pin_t pin )
+int kr2376_device::get_output_pin( kr2376_output_pin_t pin )
 {
-	kr2376_t    *kr2376 = get_safe_token(device);
-
-	return kr2376->pins[pin];
+	return m_pins[pin];
 }
 
 
-static void change_output_lines(device_t *device)
+void kr2376_device::change_output_lines()
 {
-	kr2376_t *kr2376 = get_safe_token(device);
-
-	if (kr2376->strobe != kr2376->strobe_old)
+	if (m_strobe != m_strobe_old)
 	{
-		kr2376->strobe_old = kr2376->strobe;
+		m_strobe_old = m_strobe;
 
-		if (kr2376->strobe) // strobe 0 --> 1 transition
+		if (m_strobe) // strobe 0 --> 1 transition
 		{
 			/* update parity */
-			kr2376->pins[KR2376_PO] = kr2376->parity ^ kr2376->pins[KR2376_PII];
+			m_pins[KR2376_PO] = m_parity ^ m_pins[KR2376_PII];
 		}
-		kr2376->pins[KR2376_SO] = kr2376->strobe ^ kr2376->pins[KR2376_DSII];
-		if (!kr2376->on_strobe_changed.isnull())
-			kr2376->on_strobe_changed(kr2376->strobe ^ kr2376->pins[KR2376_DSII]);
+		m_pins[KR2376_SO] = m_strobe ^ m_pins[KR2376_DSII];
+		if (!m_on_strobe_changed.isnull())
+			m_on_strobe_changed(m_strobe ^ m_pins[KR2376_DSII]);
 	}
 }
 
-static void clock_scan_counters(device_t *device)
+void kr2376_device::clock_scan_counters()
 {
-	kr2376_t *kr2376 = get_safe_token(device);
-
 	/* ring counters inhibited while strobe active */
-	if (!kr2376->strobe)
+	if (!m_strobe)
 	{
-		kr2376->ring11++;
-		if (kr2376->ring11 == 11)
+		m_ring11++;
+		if (m_ring11 == 11)
 		{
-			kr2376->ring11 = 0;
-			kr2376->ring8++;
-			if (kr2376->ring8 == 8)
-				kr2376->ring8 = 0;
+			m_ring11 = 0;
+			m_ring8++;
+			if (m_ring8 == 8)
+				m_ring8 = 0;
 		}
 	}
 }
 
-static void detect_keypress(device_t *device)
+void kr2376_device::detect_keypress()
 {
-	kr2376_t *kr2376= get_safe_token(device);
-
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7" };
 
-	if (device->machine().root_device().ioport(keynames[kr2376->ring8])->read() == (1 << kr2376->ring11))
+	if (ioport(keynames[m_ring8])->read() == (1 << m_ring11))
 	{
-		kr2376->modifiers = device->machine().root_device().ioport("MODIFIERS")->read();
+		m_modifiers = ioport("MODIFIERS")->read();
 
-		kr2376->strobe = 1;
+		m_strobe = 1;
 		/*  strobe 0->1 transition, encode char and update parity */
-		if (!kr2376->strobe_old)
+		if (!m_strobe_old)
 		{
 			int i;
 			int parbit;
-			int shift = BIT(kr2376->modifiers, 0);
-			int control = BIT(kr2376->modifiers, 1);
-			int alpha = BIT(kr2376->modifiers, 2);
+			int shift = BIT(m_modifiers, 0);
+			int control = BIT(m_modifiers, 1);
+			int alpha = BIT(m_modifiers, 2);
 			int table = 0;
 
 			if (shift || alpha)
@@ -184,41 +207,42 @@ static void detect_keypress(device_t *device)
 			else if (control)
 				table = 2;
 
-			kr2376->data = KR2376_KEY_CODES[table][kr2376->ring8][kr2376->ring11];
+			m_data = KR2376_KEY_CODES[table][m_ring8][m_ring11];
 
 			/* Compute ODD parity */
-			kr2376->parity = kr2376->data;
+			m_parity = m_data;
 			parbit = 0;
 			for (i=0; i<8; i++)
-				parbit ^= (kr2376->parity >> i) & 1;
-			kr2376->parity = parbit;
+				parbit ^= (m_parity >> i) & 1;
+			m_parity = parbit;
 		}
 	}
 	else
 	{
-		kr2376->strobe = 0;
+		m_strobe = 0;
 	}
 }
 
-static TIMER_CALLBACK( kr2376_scan_tick )
+void kr2376_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	device_t *device = (device_t *)ptr;
-
-	change_output_lines(device);
-	clock_scan_counters(device);
-	detect_keypress(device);
+	switch (id)
+		{
+			case TIMER_SCAN_TICK:
+				change_output_lines();
+				clock_scan_counters();
+				detect_keypress();
+			break;
+		}
 }
 
 /* Keyboard Data */
 
-READ8_DEVICE_HANDLER( kr2376_data_r )
+READ8_MEMBER( kr2376_device::data_r )
 {
-	kr2376_t *kr2376 = get_safe_token(device);
-
-	if (kr2376->pins[KR2376_DSII])
-		return kr2376->data ^ 0xff;
+	if (m_pins[KR2376_DSII])
+		return m_data ^ 0xff;
 	else
-		return kr2376->data;
+		return m_data;
 }
 
 /* Input Ports */
@@ -335,69 +359,11 @@ INPUT_PORTS_START( kr2376 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 INPUT_PORTS_END
 
-
-static DEVICE_START( kr2376 )
-{
-	kr2376_t *kr2376 = get_safe_token(device);
-
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag() != NULL);
-
-	kr2376->intf = (const kr2376_interface*)device->static_config();
-
-	assert(kr2376->intf != NULL);
-	assert(kr2376->intf->clock > 0);
-
-	kr2376->on_strobe_changed.resolve(kr2376->intf->on_strobe_changed_cb, *device);
-
-	/* set initial values */
-	kr2376->ring11 = 0;
-	kr2376->ring8 = 0;
-	kr2376->modifiers = 0;
-	kr2376->strobe = 0;
-	kr2376->strobe_old = 0;
-	kr2376->parity = 0;
-	kr2376->data = 0;
-	change_output_lines(device);
-
-	/* create the timers */
-	kr2376->scan_timer = device->machine().scheduler().timer_alloc(FUNC(kr2376_scan_tick), (void *)device);
-	kr2376->scan_timer->adjust(attotime::zero, 0, attotime::from_hz(kr2376->intf->clock));
-
-	/* register for state saving */
-	device->save_item(NAME(kr2376->ring11));
-	device->save_item(NAME(kr2376->ring8));
-	device->save_item(NAME(kr2376->modifiers));
-	device->save_item(NAME(kr2376->strobe));
-	device->save_item(NAME(kr2376->strobe_old));
-	device->save_item(NAME(kr2376->parity));
-	device->save_item(NAME(kr2376->data));
-}
-
-const device_type KR2376 = &device_creator<kr2376_device>;
-
-kr2376_device::kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KR2376, "SMC KR2376", tag, owner, clock, "kr2376", __FILE__)
-{
-	m_token = global_alloc_clear(kr2376_t);
-}
-
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
-void kr2376_device::device_config_complete()
+ioport_constructor kr2376_device::device_input_ports() const
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void kr2376_device::device_start()
-{
-	DEVICE_START_NAME( kr2376 )(this);
+	return INPUT_PORTS_NAME( kr2376 );
 }
