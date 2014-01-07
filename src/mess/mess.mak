@@ -1007,6 +1007,7 @@ $(MESSOBJ)/bally.a:             \
 	$(MESS_DRIVERS)/astrocde.o  \
 
 $(MESSOBJ)/bandai.a:            \
+	$(MESS_DRIVERS)/sv8000.o    \
 	$(MESS_DRIVERS)/rx78.o      \
 	$(MESS_DRIVERS)/wswan.o     \
 	$(MESS_MACHINE)/wswan.o     \
