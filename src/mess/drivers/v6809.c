@@ -356,13 +356,13 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA6821_READPB_HANDLER(READ8(v6809_state, pb_r))
 	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(v6809_state, pa_w))
-	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
-	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
 
 // no idea what this does
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
-	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
 
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)
 	MCFG_ACIA6850_ADD("acia0", mc6850_intf)
