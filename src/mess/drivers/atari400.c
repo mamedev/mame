@@ -2487,9 +2487,9 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_VIDEO_START(atari)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("djoy_0_1"))
-	MCFG_PIA6821_READPB_HANDLER(IOPORT("djoy_2_3"))
-	MCFG_PIA6821_CB2_HANDLER(DEVWRITELINE("fdc", atari_fdc_device, pia_cb2_w))
+	MCFG_PIA_READPA_HANDLER(IOPORT("djoy_0_1"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("djoy_2_3"))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("fdc", atari_fdc_device, pia_cb2_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2597,7 +2597,7 @@ static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(a400_state, a600xl_pia_pb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a600xl_pia_pb_w))
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )    // FIXME?
 
@@ -2623,7 +2623,7 @@ static MACHINE_CONFIG_DERIVED( a800xl, atari_common )
 	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(a400_state, a800xl_pia_pb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a800xl_pia_pb_w))
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
@@ -2653,7 +2653,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( a1200xl, a800xl )
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(a400_state, a1200xl_pia_pb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a1200xl_pia_pb_w))
 
 MACHINE_CONFIG_END
 
@@ -2665,7 +2665,7 @@ static MACHINE_CONFIG_DERIVED( xegs, a800xl )
 	MCFG_MACHINE_START_OVERRIDE( a400_state, xegs )
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(a400_state, xegs_pia_pb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, xegs_pia_pb_w))
 
 	MCFG_DEVICE_REMOVE("cart1")
 	MCFG_DEVICE_REMOVE("cart_list")
@@ -2697,7 +2697,7 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA6821_CB2_HANDLER(NULL) // FIXME: is there anything connected here
+	MCFG_PIA_CB2_HANDLER(NULL) // FIXME: is there anything connected here
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 

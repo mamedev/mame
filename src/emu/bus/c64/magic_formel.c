@@ -95,9 +95,9 @@ WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
 
 static MACHINE_CONFIG_FRAGMENT( c64_magic_formel )
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pa_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pb_w))
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(c64_magic_formel_cartridge_device, pia_cb2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(c64_magic_formel_cartridge_device, pia_cb2_w))
 MACHINE_CONFIG_END
 
 

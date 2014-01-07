@@ -321,8 +321,8 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
 
 	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(aim65_state, aim65_pia_a_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pia_b_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aim65_state, aim65_pia_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pia_b_w))
 
 	MCFG_CASSETTE_ADD( "cassette", aim65_1_cassette_interface )
 	MCFG_CASSETTE_ADD( "cassette2", aim65_2_cassette_interface )

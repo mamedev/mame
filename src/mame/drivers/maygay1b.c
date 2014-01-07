@@ -847,8 +847,8 @@ MACHINE_CONFIG_START( maygay_m1, maygay1b_state )
 	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(maygay1b_state, m1_duart_r))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(maygay1b_state, m1_pia_porta_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(maygay1b_state, m1_pia_portb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(maygay1b_state, m1_pia_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maygay1b_state, m1_pia_portb_w))
 
 	MCFG_MSC1937_ADD("vfd",0,RIGHT_TO_LEFT)
 	MCFG_SPEAKER_STANDARD_MONO("mono")

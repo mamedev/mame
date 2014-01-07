@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
 
 	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(bml3_state, bml3_piaA_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(bml3_state, bml3_piaA_w))
 
 	MCFG_ACIA6850_ADD("acia6850", bml3_acia_if)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )

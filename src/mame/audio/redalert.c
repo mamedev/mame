@@ -363,9 +363,9 @@ MACHINE_CONFIG_FRAGMENT( demoneye_audio )
 	MCFG_CPU_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
 
 	MCFG_DEVICE_ADD("sndpia", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(redalert_state, demoneye_ay8910_latch_2_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(redalert_state, demoneye_ay8910_data_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(redalert_state, demoneye_ay8910_latch_1_w))
+	MCFG_PIA_READPA_HANDLER(READ8(redalert_state, demoneye_ay8910_latch_2_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(redalert_state, demoneye_ay8910_data_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(redalert_state, demoneye_ay8910_latch_1_w))
 
 	MCFG_SOUND_START_OVERRIDE( redalert_state, demoneye )
 

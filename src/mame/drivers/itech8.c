@@ -1715,9 +1715,9 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
 	MCFG_CPU_PROGRAM_MAP(sound3812_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA6821_READPB_HANDLER(DEVREADLINE("ticket", ticket_dispenser_device, line_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(itech8_state, pia_porta_out))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(itech8_state, pia_portb_out))
+	MCFG_PIA_READPB_HANDLER(DEVREADLINE("ticket", ticket_dispenser_device, line_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(itech8_state, pia_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(itech8_state, pia_portb_out))
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)

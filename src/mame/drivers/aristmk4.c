@@ -1705,11 +1705,11 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	// CA1 is connected to +5V, CB1 is not connected.
 
 	MCFG_DEVICE_ADD("pia6821_0", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(aristmk4_state, mkiv_pia_ina))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outa))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outb))
-	MCFG_PIA6821_CA2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_ca2))
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_cb2))
+	MCFG_PIA_READPA_HANDLER(READ8(aristmk4_state, mkiv_pia_ina))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outa))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outb))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_ca2))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_cb2))
 
 	MCFG_MC6845_ADD("crtc", C6545_1, "screen", MAIN_CLOCK/8, mc6845_intf) // TODO: type is unknown
 	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )

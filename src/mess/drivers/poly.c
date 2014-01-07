@@ -182,14 +182,14 @@ static MACHINE_CONFIG_START( poly, poly_state )
 	MCFG_SAA5050_ADD("saa5050", 6000000, poly_saa5050_intf)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
-	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA6821_READPB_HANDLER(READ8(poly_state, pia1_b_in))
+	MCFG_PIA_READPB_HANDLER(READ8(poly_state, pia1_b_in))
 	// CB1 kbd strobe
-	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
-	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
 	MCFG_PTM6840_ADD("ptm", poly_ptm_intf)
 	MCFG_ACIA6850_ADD("acia", acia_intf)

@@ -79,12 +79,12 @@ MACHINE_CONFIG_FRAGMENT( s11c_bg )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
 	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(s11c_bg_device, pia40_pa_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(s11c_bg_device, pia40_pb_w))
-	MCFG_PIA6821_CA2_HANDLER(WRITELINE(s11c_bg_device, pia40_ca2_w))
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(s11c_bg_device, pia40_cb2_w))
-	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, firq_line))
-	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, nmi_line))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11c_bg_device, pia40_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11c_bg_device, pia40_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s11c_bg_device, pia40_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s11c_bg_device, pia40_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, firq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, nmi_line))
 MACHINE_CONFIG_END
 
 machine_config_constructor s11c_bg_device::device_mconfig_additions() const

@@ -3696,13 +3696,13 @@ static MACHINE_CONFIG_START( goldnpkr_base, goldnpkr_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(goldnpkr_state, goldnpkr_mux_port_r))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(goldnpkr_state, lamps_a_w))
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, goldnpkr_mux_port_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, lamps_a_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("SW1"))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, sound_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(goldnpkr_state, mux_w))
+	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, sound_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, mux_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3736,8 +3736,8 @@ static MACHINE_CONFIG_DERIVED( pottnpkr, goldnpkr_base )
 	MCFG_CPU_PROGRAM_MAP(pottnpkr_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3754,8 +3754,8 @@ static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 	MCFG_CPU_PROGRAM_MAP(witchcrd_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
@@ -3775,10 +3775,10 @@ static MACHINE_CONFIG_DERIVED( wcfalcon, goldnpkr_base )
 	MCFG_CPU_PROGRAM_MAP(witchcrd_falcon_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w)) /* port A out, custom handler due to address + data are muxed */
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w)) /* port A out, custom handler due to address + data are muxed */
 
 	/* video hardware */
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
@@ -3798,8 +3798,8 @@ static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 	MCFG_CPU_PROGRAM_MAP(wildcard_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
 //  MCFG_GFXDECODE(wildcard)
@@ -3821,8 +3821,8 @@ static MACHINE_CONFIG_DERIVED( wcrdxtnd, goldnpkr_base )
 	MCFG_CPU_PROGRAM_MAP(wcrdxtnd_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE(wcrdxtnd)
@@ -3848,10 +3848,10 @@ static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 	MCFG_CPU_IO_MAP(wildcrdb_mcu_io_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w))
 
 	/* video hardware */
 //  MCFG_GFXDECODE(wildcard)
@@ -3873,8 +3873,8 @@ static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 	MCFG_CPU_PROGRAM_MAP(genie_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
@@ -3907,16 +3907,16 @@ static MACHINE_CONFIG_DERIVED( bchancep, goldnpkr_base )
 	MCFG_CPU_PROGRAM_MAP(bchancep_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(goldnpkr_state, pia0_a_r))
-	MCFG_PIA6821_READPB_HANDLER(READ8(goldnpkr_state, pia0_b_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, pia0_a_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(goldnpkr_state, pia0_b_w))
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pia0_a_r))
+	MCFG_PIA_READPB_HANDLER(READ8(goldnpkr_state, pia0_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, pia0_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, pia0_b_w))
 
 	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA6821_READPA_HANDLER(READ8(goldnpkr_state, pia1_a_r))
-	MCFG_PIA6821_READPB_HANDLER(READ8(goldnpkr_state, pia1_b_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(goldnpkr_state, pia1_a_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(goldnpkr_state, pia1_b_w))
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pia1_a_r))
+	MCFG_PIA_READPB_HANDLER(READ8(goldnpkr_state, pia1_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, pia1_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, pia1_b_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

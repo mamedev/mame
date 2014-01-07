@@ -895,11 +895,11 @@ static MACHINE_CONFIG_FRAGMENT( c1541pdc )
 	MCFG_CPU_PROGRAM_MAP(c1541pdc_mem)
 
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
-	MCFG_PIA6821_READPB_HANDLER(READ8(c1541_prologic_dos_classic_device, pia_pb_r))
-	MCFG_PIA6821_READCA1_HANDLER(DEVREADLINE(CENTRONICS_TAG, centronics_device, ack_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(c1541_prologic_dos_classic_device, pia_pa_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(c1541_prologic_dos_classic_device, pia_pb_w))
-	MCFG_PIA6821_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+	MCFG_PIA_READPB_HANDLER(READ8(c1541_prologic_dos_classic_device, pia_pb_r))
+	MCFG_PIA_READCA1_HANDLER(DEVREADLINE(CENTRONICS_TAG, centronics_device, ack_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c1541_prologic_dos_classic_device, pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c1541_prologic_dos_classic_device, pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
 
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 MACHINE_CONFIG_END

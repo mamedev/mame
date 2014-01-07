@@ -1019,10 +1019,10 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 
 	/* U25 ST 2 9148 EF68B21P */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(maygayv1_state, b_read))
-	MCFG_PIA6821_READPB_HANDLER(READ8(maygayv1_state, b_read))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(maygayv1_state, b_writ))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(maygayv1_state, b_writ))
+	MCFG_PIA_READPA_HANDLER(READ8(maygayv1_state, b_read))
+	MCFG_PIA_READPB_HANDLER(READ8(maygayv1_state, b_read))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(maygayv1_state, b_writ))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maygayv1_state, b_writ))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

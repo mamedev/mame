@@ -768,13 +768,13 @@ static MACHINE_CONFIG_START( megadpkr, blitz_state )
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(blitz_state, megadpkr_mux_port_r))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(blitz_state, lamps_a_w))
+	MCFG_PIA_READPA_HANDLER(READ8(blitz_state, megadpkr_mux_port_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blitz_state, lamps_a_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("SW1"))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(blitz_state, sound_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(blitz_state, mux_w))
+	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(blitz_state, sound_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blitz_state, mux_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

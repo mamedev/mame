@@ -190,12 +190,12 @@ static MACHINE_CONFIG_START( mkit09, mkit09_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(mkit09_state, pa_r))
-	MCFG_PIA6821_READPB_HANDLER(READ8(mkit09_state, pb_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(mkit09_state, pa_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(mkit09_state, pb_w))
-	MCFG_PIA6821_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
-	MCFG_PIA6821_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_READPA_HANDLER(READ8(mkit09_state, pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(mkit09_state, pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mkit09_state, pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mkit09_state, pb_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 MACHINE_CONFIG_END

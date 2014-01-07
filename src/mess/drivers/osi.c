@@ -838,10 +838,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( c1pmf, c1p, c1pmf_state )
 	MCFG_CPU_PROGRAM_MAP(c1pmf_mem)
 
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(c1pmf_state, osi470_pia_pa_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(c1pmf_state, osi470_pia_pa_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(c1pmf_state, osi470_pia_pb_w))
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(c1pmf_state, osi470_pia_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(c1pmf_state, osi470_pia_pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c1pmf_state, osi470_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c1pmf_state, osi470_pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(c1pmf_state, osi470_pia_cb2_w))
 
 	/* floppy ACIA */
 	MCFG_ACIA6850_ADD("acia_1", osi470_acia_intf)

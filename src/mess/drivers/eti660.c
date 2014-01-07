@@ -242,8 +242,8 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 
 	/* devices */
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(eti660_state, pia_pa_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(eti660_state, pia_pa_w))
+	MCFG_PIA_READPA_HANDLER(READ8(eti660_state, pia_pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eti660_state, pia_pa_w))
 
 	MCFG_CASSETTE_ADD("cassette", eti660_cassette_interface)
 

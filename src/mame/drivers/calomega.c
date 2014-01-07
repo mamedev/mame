@@ -2639,13 +2639,13 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(calomega_state,s903_mux_port_r))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(calomega_state,lamps_903a_w))
+	MCFG_PIA_READPA_HANDLER(READ8(calomega_state,s903_mux_port_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state,lamps_903a_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("SW1"))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(calomega_state, lamps_903b_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(calomega_state, s903_mux_w))
+	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(calomega_state, lamps_903b_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state, s903_mux_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2695,11 +2695,11 @@ static MACHINE_CONFIG_DERIVED( sys905, sys903 )
 	MCFG_CPU_PROGRAM_MAP(sys905_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(calomega_state,s905_mux_port_r))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(calomega_state,lamps_905_w))
+	MCFG_PIA_READPA_HANDLER(READ8(calomega_state,s905_mux_port_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state,lamps_905_w))
 
 	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(calomega_state, s905_mux_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state, s905_mux_w))
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8912")
@@ -2717,17 +2717,17 @@ static MACHINE_CONFIG_DERIVED( sys906, sys903 )
 	MCFG_CPU_PROGRAM_MAP(sys906_map)
 
 	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(calomega_state, pia0_ain_r))
-	MCFG_PIA6821_READPB_HANDLER(READ8(calomega_state, pia0_bin_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(calomega_state, pia0_aout_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(calomega_state, pia0_bout_w))
-	MCFG_PIA6821_CA2_HANDLER(WRITELINE(calomega_state, pia0_ca2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(calomega_state, pia0_ain_r))
+	MCFG_PIA_READPB_HANDLER(READ8(calomega_state, pia0_bin_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(calomega_state, pia0_aout_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state, pia0_bout_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(calomega_state, pia0_ca2_w))
 
 	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA6821_READPA_HANDLER(READ8(calomega_state, pia1_ain_r))
-	MCFG_PIA6821_READPB_HANDLER(READ8(calomega_state, pia1_bin_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(calomega_state, pia1_aout_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(calomega_state, pia1_bout_w))
+	MCFG_PIA_READPA_HANDLER(READ8(calomega_state, pia1_ain_r))
+	MCFG_PIA_READPB_HANDLER(READ8(calomega_state, pia1_bin_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(calomega_state, pia1_aout_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state, pia1_bout_w))
 
 	MCFG_GFXDECODE(sys906)
 

@@ -1043,15 +1043,15 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(_5clown_state, mux_port_r))
-	MCFG_PIA6821_READPB_HANDLER(READ8(_5clown_state, pia0_b_r))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(_5clown_state, counters_w))
+	MCFG_PIA_READPA_HANDLER(READ8(_5clown_state, mux_port_r))
+	MCFG_PIA_READPB_HANDLER(READ8(_5clown_state, pia0_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(_5clown_state, counters_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("SW4"))
-	MCFG_PIA6821_READPB_HANDLER(READ8(_5clown_state, pia1_b_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(_5clown_state, trigsnd_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(_5clown_state, mux_w))
+	MCFG_PIA_READPA_HANDLER(IOPORT("SW4"))
+	MCFG_PIA_READPB_HANDLER(READ8(_5clown_state, pia1_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(_5clown_state, trigsnd_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(_5clown_state, mux_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

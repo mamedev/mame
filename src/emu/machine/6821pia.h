@@ -31,38 +31,38 @@
 ***************************************************************************/
 
 // TODO: REMOVE THESE
-#define MCFG_PIA6821_READPA_HANDLER(_devcb) \
+#define MCFG_PIA_READPA_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_readpa_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_READPB_HANDLER(_devcb) \
+#define MCFG_PIA_READPB_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_readpb_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_READCA1_HANDLER(_devcb) \
+#define MCFG_PIA_READCA1_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_readca1_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_READCA2_HANDLER(_devcb) \
+#define MCFG_PIA_READCA2_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_readca2_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_READCB1_HANDLER(_devcb) \
+#define MCFG_PIA_READCB1_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_readcb1_handler(*device, DEVCB2_##_devcb);
 
 // TODO: CONVERT THESE TO WRITE LINE
-#define MCFG_PIA6821_WRITEPA_HANDLER(_devcb) \
+#define MCFG_PIA_WRITEPA_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_writepa_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_WRITEPB_HANDLER(_devcb) \
+#define MCFG_PIA_WRITEPB_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_writepb_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_CA2_HANDLER(_devcb) \
+#define MCFG_PIA_CA2_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_ca2_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_CB2_HANDLER(_devcb) \
+#define MCFG_PIA_CB2_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_cb2_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_IRQA_HANDLER(_devcb) \
+#define MCFG_PIA_IRQA_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_irqa_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PIA6821_IRQB_HANDLER(_devcb) \
+#define MCFG_PIA_IRQB_HANDLER(_devcb) \
 	devcb = &pia6821_device::set_irqb_handler(*device, DEVCB2_##_devcb);
 
 

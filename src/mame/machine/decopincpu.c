@@ -201,43 +201,43 @@ static MACHINE_CONFIG_FRAGMENT( decocpu1 )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0) // 5F - PIA at 0x2100
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, solenoid1_w))
-	MCFG_PIA6821_CA2_HANDLER(WRITELINE(decocpu_type1_device, pia21_ca2_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, solenoid1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(decocpu_type1_device, pia21_ca2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia24", PIA6821, 0) // 11D - PIA at 0x2400
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, lamp0_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, lamp1_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, lamp1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia28", PIA6821, 0) // 11B - PIA at 0x2800
-	MCFG_PIA6821_READPA_HANDLER(READ8(decocpu_type1_device, display_strobe_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_strobe_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out1_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, display_strobe_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_strobe_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia2c", PIA6821, 0) // 9B - PIA at 0x2c00
-	MCFG_PIA6821_READPB_HANDLER(READ8(decocpu_type1_device, display_in3_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out2_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out3_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_READPB_HANDLER(READ8(decocpu_type1_device, display_in3_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out2_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out3_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia30", PIA6821, 0) // 8H - PIA at 0x3000
-	MCFG_PIA6821_READPA_HANDLER(READ8(decocpu_type1_device, switch_r))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, switch_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, switch_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_DEVICE_ADD("pia34", PIA6821, 0) // 7B - PIA at 0x3400
-	MCFG_PIA6821_READPA_HANDLER(READ8(decocpu_type1_device, dmdstatus_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out4_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, sound_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, dmdstatus_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out4_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, sound_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END

@@ -425,7 +425,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 // port A - disk select etc, beeper
 // port B - parallel interface
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(zorba_state, pia0_porta_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zorba_state, pia0_porta_w))
 
 // IEEE488 interface
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)

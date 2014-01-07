@@ -403,10 +403,10 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(maxaflex_state, maxaflex_atari_pia_pa_r))
-	MCFG_PIA6821_READPB_HANDLER(READ8(maxaflex_state, maxaflex_atari_pia_pb_r))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(maxaflex_state, a600xl_pia_pb_w))
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(maxaflex_state, atari_pia_cb2_w))
+	MCFG_PIA_READPA_HANDLER(READ8(maxaflex_state, maxaflex_atari_pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(maxaflex_state, maxaflex_atari_pia_pb_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maxaflex_state, a600xl_pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(maxaflex_state, atari_pia_cb2_w))
 
 	MCFG_TIMER_DRIVER_ADD("mcu_timer", maxaflex_state, mcu_timer_proc)
 

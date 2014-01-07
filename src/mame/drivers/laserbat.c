@@ -758,11 +758,11 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(laserbat_state, zaccaria_cb1_toggle,  (double)3580000/4096)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(laserbat_state, zaccaria_port0a_r))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(laserbat_state, zaccaria_port0a_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(laserbat_state, zaccaria_port0b_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(laserbat_state, zaccaria_irq0a))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(laserbat_state, zaccaria_irq0b))
+	MCFG_PIA_READPA_HANDLER(READ8(laserbat_state, zaccaria_port0a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(laserbat_state, zaccaria_port0a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(laserbat_state, zaccaria_port0b_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(laserbat_state, zaccaria_irq0a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(laserbat_state, zaccaria_irq0b))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -321,12 +321,12 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(READ8(tugboat_state,tugboat_input_r))
+	MCFG_PIA_READPA_HANDLER(READ8(tugboat_state,tugboat_input_r))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("DSW"))
-	MCFG_PIA6821_READPB_HANDLER(READ8(tugboat_state, tugboat_ctrl_r))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(tugboat_state, tugboat_ctrl_w))
+	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
+	MCFG_PIA_READPB_HANDLER(READ8(tugboat_state, tugboat_ctrl_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tugboat_state, tugboat_ctrl_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -1463,19 +1463,19 @@ static MACHINE_CONFIG_START( defender, williams_state )
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA6821_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(williams_state, williams_snd_cmd_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state, williams_main_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state, williams_main_irq))
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state, williams_snd_cmd_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state, williams_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
 
 
@@ -1509,7 +1509,7 @@ static MACHINE_CONFIG_DERIVED( williams_muxed, williams )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
 MACHINE_CONFIG_END
 
 
@@ -1528,8 +1528,8 @@ static MACHINE_CONFIG_DERIVED( spdball, williams )
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_3", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("IN3"))
-	MCFG_PIA6821_READPB_HANDLER(IOPORT("IN4"))
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN3"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("IN4"))
 MACHINE_CONFIG_END
 
 
@@ -1539,8 +1539,8 @@ static MACHINE_CONFIG_DERIVED( lottofun, williams )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA6821_WRITEPB_HANDLER(DEVWRITE8("ticket", ticket_dispenser_device, write))
-	MCFG_PIA6821_CA2_HANDLER(WRITELINE(williams_state, lottofun_coin_lock_w))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("ticket", ticket_dispenser_device, write))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(williams_state, lottofun_coin_lock_w))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
@@ -1560,7 +1560,7 @@ static MACHINE_CONFIG_DERIVED( alienar, defender )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
 MACHINE_CONFIG_END
 
 
@@ -1574,11 +1574,11 @@ static MACHINE_CONFIG_DERIVED( sinistar, williams_extra_ram )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(williams_state, williams_49way_port_0_r))
+	MCFG_PIA_READPA_HANDLER(READ8(williams_state, williams_49way_port_0_r))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA6821_CA2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, digit_w))
-	MCFG_PIA6821_CB2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, clock_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, digit_w))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, clock_w))
 MACHINE_CONFIG_END
 
 
@@ -1596,11 +1596,11 @@ static MACHINE_CONFIG_DERIVED( playball, williams )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(williams_state, playball_snd_cmd_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state, playball_snd_cmd_w))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA6821_CA2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, digit_w))
-	MCFG_PIA6821_CB2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, clock_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, digit_w))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, clock_w))
 MACHINE_CONFIG_END
 
 
@@ -1620,8 +1620,8 @@ static MACHINE_CONFIG_DERIVED( blastkit, williams )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(williams_state, williams_input_port_49way_0_5_r))
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
+	MCFG_PIA_READPA_HANDLER(READ8(williams_state, williams_input_port_49way_0_5_r))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
 MACHINE_CONFIG_END
 
 
@@ -1633,15 +1633,15 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(williams_state, williams_49way_port_0_r))
+	MCFG_PIA_READPA_HANDLER(READ8(williams_state, williams_49way_port_0_r))
 
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(williams_state, blaster_snd_cmd_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state, blaster_snd_cmd_w))
 
 	MCFG_DEVICE_ADD("pia_2b", PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(DEVWRITE8("wmsdac_b", dac_device, write_unsigned8))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq_b))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq_b))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("wmsdac_b", dac_device, write_unsigned8))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq_b))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq_b))
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("wmsdac")
@@ -1690,23 +1690,23 @@ static MACHINE_CONFIG_START( williams2, williams_state )
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA6821_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA6821_CA2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(williams_state, williams_port_select_w))
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(williams_state,williams2_snd_cmd_w))
-	MCFG_PIA6821_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state,williams2_snd_cmd_w))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(DEVWRITE8("pia_1", pia6821_device, portb_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
-	MCFG_PIA6821_CA2_HANDLER(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("pia_1", pia6821_device, portb_w))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
 
 
@@ -1725,13 +1725,13 @@ static MACHINE_CONFIG_DERIVED( mysticm, williams2_extra_ram )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA6821_CA2_HANDLER(NULL)
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state,williams_main_firq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state,mysticm_main_irq))
+	MCFG_PIA_CA2_HANDLER(NULL)
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_firq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,mysticm_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state,mysticm_main_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state,mysticm_main_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,mysticm_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,mysticm_main_irq))
 MACHINE_CONFIG_END
 
 
@@ -1741,17 +1741,17 @@ static MACHINE_CONFIG_DERIVED( tshoot, williams2 )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA6821_READPA_HANDLER(READ8(williams_state,tshoot_input_port_0_3_r))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(williams_state,tshoot_lamp_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(williams_state,tshoot_input_port_0_3_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state,tshoot_lamp_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,tshoot_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(williams_state,tshoot_maxvol_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(williams_state,tshoot_maxvol_w))
 MACHINE_CONFIG_END
 
 
@@ -1766,12 +1766,12 @@ static MACHINE_CONFIG_DERIVED_CLASS( joust2, williams2, joust2_state )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA6821_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(joust2_state,joust2_snd_cmd_w))
-	MCFG_PIA6821_CA2_HANDLER(WRITELINE(joust2_state,joust2_pia_3_cb1_w))
-	MCFG_PIA6821_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(joust2_state,joust2_snd_cmd_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(joust2_state,joust2_pia_3_cb1_w))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
 MACHINE_CONFIG_END
 
 

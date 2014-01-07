@@ -387,21 +387,21 @@ static MACHINE_CONFIG_START( toratora, toratora_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 16)    /* timer counting at 16 Hz */
 
 	MCFG_DEVICE_ADD("pia_u1", PIA6821, 0)
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(toratora_state,port_b_u1_w))
-	MCFG_PIA6821_IRQA_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
-	MCFG_PIA6821_IRQB_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,port_b_u1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
 
 	MCFG_DEVICE_ADD("pia_u2", PIA6821, 0)
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(toratora_state, sn1_port_a_u2_u3_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(toratora_state, sn1_port_b_u2_u3_w))
-	MCFG_PIA6821_CA2_HANDLER(WRITELINE(toratora_state, sn1_ca2_u2_u3_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state, sn1_port_a_u2_u3_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state, sn1_port_b_u2_u3_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state, sn1_ca2_u2_u3_w))
 
 	MCFG_DEVICE_ADD("pia_u3", PIA6821, 0)
-	MCFG_PIA6821_READPB_HANDLER(IOPORT("DSW"))
-	MCFG_PIA6821_WRITEPA_HANDLER(WRITE8(toratora_state,sn2_port_a_u2_u3_w))
-	MCFG_PIA6821_WRITEPB_HANDLER(WRITE8(toratora_state,sn2_port_b_u2_u3_w))
-	MCFG_PIA6821_CA2_HANDLER(WRITELINE(toratora_state,sn2_ca2_u2_u3_w))
-	MCFG_PIA6821_CB2_HANDLER(WRITELINE(toratora_state,cb2_u3_w))
+	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state,sn2_port_a_u2_u3_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,sn2_port_b_u2_u3_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state,sn2_ca2_u2_u3_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(toratora_state,cb2_u3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
