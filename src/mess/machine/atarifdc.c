@@ -766,7 +766,7 @@ atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *ta
 	m_serout_count(0),
 	m_serout_offs(0),
 	m_serout_chksum(0),
-	m_serout_delay(0),
+//	m_serout_delay(0),
 	m_serin_count(0),
 	m_serin_offs(0),
 	m_serin_chksum(0),

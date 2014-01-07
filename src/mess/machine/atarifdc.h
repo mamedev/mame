@@ -49,7 +49,7 @@ private:
 	int  m_serout_offs;
 	UINT8 m_serout_buff[512];
 	UINT8 m_serout_chksum;
-	int  m_serout_delay;
+//	int  m_serout_delay;
 
 	int  m_serin_count;
 	int  m_serin_offs;
