@@ -6998,6 +6998,7 @@ src/mess/drivers/evmbug.c svneol=native#text/plain
 src/mess/drivers/ex800.c svneol=native#text/plain
 src/mess/drivers/exelv.c svneol=native#text/plain
 src/mess/drivers/exp85.c svneol=native#text/plain
+src/mess/drivers/fanucs15.c svneol=native#text/plain
 src/mess/drivers/fidelz80.c svneol=native#text/plain
 src/mess/drivers/fk1.c svneol=native#text/plain
 src/mess/drivers/fm7.c svneol=native#text/plain
