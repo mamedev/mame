@@ -1319,9 +1319,9 @@ void z80dart_channel::update_serial()
 	int stop_bit_count = get_stop_bits();
 	int parity_code = PARITY_NONE;
 
-	if (m_wr[1] & WR4_PARITY_ENABLE)
+	if (m_wr[4] & WR4_PARITY_ENABLE)
 	{
-		if (m_wr[1] & WR4_PARITY_EVEN)
+		if (m_wr[4] & WR4_PARITY_EVEN)
 			parity_code = PARITY_EVEN;
 		else
 			parity_code = PARITY_ODD;
