@@ -7,11 +7,24 @@
 
         2014/01/07 Skeleton driver.
 
+The Bandai Supoer Vision 8000 contains:
+- NEC D78C (Z80)
+- AY-3-8910
+- AMI S68047P (6847 variant)
+- NEC D8255C
+
+Looking at the code of the cartridges it seems there is:
+- 1KB of main system RAM
+- 3KB of video RAM
+
     TODO:
-    - Implement S68074P video chip
     - Figure out configuration of S68047P pins through 8910 port A
     - Figure out input ports, left and right might be swapped
     - Verify clock
+    - Figure out IRQ source
+
+    KNOWN ISSUES:
+    - pacpac and submar wait for an irq, where is that coming from? vblank?
 
 ****************************************************************************/
 
@@ -21,6 +34,7 @@
 #include "imagedev/cartslot.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
+#include "video/mc6847.h"
 
 
 class sv8000_state : public driver_device
@@ -29,12 +43,15 @@ public:
 	sv8000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_s68047p(*this, "s68047p")
+		, m_videoram(*this, "videoram")
 		, m_io_row0_left(*this, "ROW0_LEFT")
 		, m_io_row1_left(*this, "ROW1_LEFT")
 		, m_io_row2_left(*this, "ROW2_LEFT")
 	{ }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
+
 	DECLARE_READ8_MEMBER( ay_port_a_r );
 	DECLARE_READ8_MEMBER( ay_port_b_r );
 	DECLARE_WRITE8_MEMBER( ay_port_a_w );
@@ -47,16 +64,30 @@ public:
 	DECLARE_READ8_MEMBER( i8255_portc_r );
 	DECLARE_WRITE8_MEMBER( i8255_portc_w );
 
+	DECLARE_READ8_MEMBER( mc6847_videoram_r );
+
 private:
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	required_device<cpu_device> m_maincpu;
+	required_device<mc6847_base_device> m_s68047p;
+	required_shared_ptr<const UINT8> m_videoram;
 	required_ioport m_io_row0_left;
 	required_ioport m_io_row1_left;
 	required_ioport m_io_row2_left;
 
 	UINT8 m_column;
+
+	// graphics signals
+	UINT8 m_ag;
+	UINT8 m_gm2;
+	UINT8 m_gm1;
+	UINT8 m_gm0;
+	UINT8 m_as;
+	UINT8 m_css;
+	UINT8 m_intext;
+	UINT8 m_inv;
 };
 
 
@@ -64,7 +95,7 @@ static ADDRESS_MAP_START(sv8000_mem, AS_PROGRAM, 8, sv8000_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x83ff ) AM_RAM // Work RAM??
-	AM_RANGE( 0xc000, 0xcbff ) AM_RAM // Display RAM??
+	AM_RANGE( 0xc000, 0xcbff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 
@@ -117,6 +148,15 @@ INPUT_PORTS_END
 
 void sv8000_state::machine_start()
 {
+	m_ag = 0;
+	m_gm2 = 0;
+	m_gm1 = 0;
+	m_gm0 = 0;
+	m_as = 0;
+	m_css = 0;
+	m_intext = 0;
+	m_inv = 0;
+
 	save_item(NAME(m_column));
 }
 
@@ -241,14 +281,53 @@ READ8_MEMBER( sv8000_state::ay_port_b_r )
 
 
 // Possibly connected to S68047P for selecting text/graphics modes
+// misvader:
+// 0x42 01000010 set on normal text screen
+// 0x5A 01011010 set for a 256x192 bit mapped screen 3KB in 6KB mode?
+//
+// spfire:
+// 0x42 01000010 text
+// 0x5A 01011010 graphics 3KB in 6KB mode?
+//
+// othello:
+// 0x02 00000010 normal text screen
+//
+// gunprof:
+// 0x00 00000000 text
+// 0x38 00111000 graphics 3KB mode  1-101
+//
+// pacpac:
+// 0x00 00000000 text
+// 0x5A 01011010 graphics 3KB in 6KB mode?  1-111
+//
+// submar:
+// 0x00 00000000 text
+// 0x5A 01011010 graphics 3KB in 6KB mode?
+//
+// beamgala:
+// 0x5A 01011010 graphics 3KB in 6KB mode?
+//
 WRITE8_MEMBER( sv8000_state::ay_port_a_w )
 {
+printf("ay_porta_w: %02X\n", data);
 	logerror("ay_port_a_w: %02X\n", data);
+
+	// Lacking schematics, these are all wild guesses
+	m_ag = ( data & 0x18 );
+	m_gm2 = ( data & 0x10 );
+	m_gm1 = ( data & 0x40 );
+	m_gm0 = ( data & 0x08 );
+
+	m_s68047p->ag_w( m_ag ? ASSERT_LINE : CLEAR_LINE );
+	m_s68047p->gm2_w( m_gm2 ? ASSERT_LINE : CLEAR_LINE );
+	m_s68047p->gm1_w( m_gm1 ? ASSERT_LINE : CLEAR_LINE );
+	m_s68047p->gm0_w( m_gm0 ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
 WRITE8_MEMBER( sv8000_state::ay_port_b_w )
 {
+printf("ay_portb_w: %02X\n", data);
 	logerror("ay_port_b_w: %02X\n", data);
 }
 
@@ -264,6 +343,52 @@ static const ay8910_interface sv8000_ay8910_interface =
 };
 
 
+READ8_MEMBER( sv8000_state::mc6847_videoram_r )
+{
+	if (offset == ~0) return 0xff;
+
+	if ( m_ag ) {
+		if ( m_gm1 ) {
+			// 256 x 192 / 6KB
+			offset = ( ( offset & 0x1fc0 ) >> 1 ) | ( offset & 0x1f );
+			return m_videoram[offset % 0xc00];
+		}
+ 		else
+		{
+			// 256 x 96 / 3KB
+			return m_videoram[offset % 0xc00];
+		}
+	}
+	// Standard text
+	UINT8 data = m_videoram[offset % 0xc00];
+
+	m_s68047p->inv_w( ( data & 0x80 ) ? ASSERT_LINE : CLEAR_LINE );
+
+	return data;
+}
+
+
+static const mc6847_interface sv8000_mc6847_interface =
+{
+	"screen",
+	DEVCB_DRIVER_MEMBER(sv8000_state,mc6847_videoram_r),   // data fetch
+	DEVCB_NULL,
+	DEVCB_NULL,
+
+	DEVCB_NULL,                 /* AG */
+	DEVCB_NULL,                 /* GM2 */
+	DEVCB_NULL,                 /* GM1 */
+	DEVCB_NULL,                 /* GM0 */
+	DEVCB_NULL,                 /* CSS */
+	DEVCB_NULL,                 /* AS */
+	DEVCB_NULL,                 /* INTEXT */
+	DEVCB_NULL,                 /* INV */
+
+	NULL,
+	false
+};
+
+
 static MACHINE_CONFIG_START( sv8000, sv8000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_10_738635MHz/3)  /* Not verified */
@@ -274,6 +399,8 @@ static MACHINE_CONFIG_START( sv8000, sv8000_state )
 
 	/* video hardware */
 	// S68047P - Unknown whether the internal or an external character rom is used
+	MCFG_MC6847_ADD("s68047p", MC6847_NTSC, XTAL_10_738635MHz/3, sv8000_mc6847_interface )  // Clock not verified
+	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "s68047p")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
