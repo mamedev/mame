@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "exp.h"
-#include "video/ef9345.h"
 
 
 
@@ -27,22 +26,17 @@
 // ======================> cbm2_graphic_cartridge_device
 
 class cbm2_graphic_cartridge_device : public device_t,
-										public device_cbm2_expansion_card_interface
+									  public device_cbm2_expansion_card_interface
 {
 public:
 	// construction/destruction
+	cbm2_graphic_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	cbm2_graphic_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const;
 
 protected:
-	enum
-	{
-		TYPE_A,
-		TYPE_B
-	};
-
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
@@ -52,14 +46,41 @@ protected:
 	virtual void cbm2_bd_w(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3);
 
 private:
-	//required_device<ef9345_device> m_gdc;
+	//required_device<ef9365_device> m_gdc;
+	required_memory_region m_bank3;
+};
 
-	int m_variant;
+
+// ======================> cbm2_graphic_cartridge_a_device
+
+class cbm2_graphic_cartridge_a_device :  public cbm2_graphic_cartridge_device
+{
+public:
+	// construction/destruction
+	cbm2_graphic_cartridge_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+
+// ======================> cbm2_graphic_cartridge_b_device
+
+class cbm2_graphic_cartridge_b_device :  public cbm2_graphic_cartridge_device
+{
+public:
+	// construction/destruction
+	cbm2_graphic_cartridge_b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 
 // device type definition
-extern const device_type CBM2_GRAPHIC;
+extern const device_type CBM2_HRG_A;
+extern const device_type CBM2_HRG_B;
+
 
 
 #endif
