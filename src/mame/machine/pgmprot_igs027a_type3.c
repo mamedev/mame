@@ -162,6 +162,7 @@ MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 	if (!strcmp(machine().system().name, "theglad100")) base = 0x3316;
 	if (!strcmp(machine().system().name, "theglad101")) base = 0x3316;
 	if (!strcmp(machine().system().name, "happy6")) base = 0x3586;
+	if (!strcmp(machine().system().name, "happy6101")) base = 0x3586;
 	if (!strcmp(machine().system().name, "svgpcb")) base = 0x3a8e;
 
 	if (base != -1)
