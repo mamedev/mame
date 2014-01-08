@@ -503,7 +503,7 @@ WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
 
 	set_tra_rate(m_baud[baud]);
 	set_rcv_rate(m_baud[baud]);
-	set_data_frame(m_databits[databits], m_parity[parity], m_stopbits[stopbits], false);
+	set_data_frame(m_databits[databits], m_stopbits[stopbits], m_parity[parity], false);
 }
 
 void serial_terminal_device::device_reset()
