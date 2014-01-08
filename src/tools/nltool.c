@@ -62,6 +62,7 @@ struct options_entry oplist[] =
 	{ "time_to_run;t",   "1.0", OPTION_FLOAT,   "time to run the emulation (seconds)" },
     { "logs;l",          "",    OPTION_STRING,  "colon separated list of terminals to log" },
 	{ "f",               "-",   OPTION_STRING,  "file to process (default is stdin)" },
+	{ "listdevices;ld",  "",    OPTION_BOOLEAN, "list all devices available for use" },
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
 	{ NULL }
 };
@@ -112,11 +113,15 @@ public:
 
 	virtual ~netlist_tool_t() { };
 
-    void read_netlist(const char *buffer)
-    {
+	void init()
+	{
         m_setup = new netlist_setup_t(*this);
         this->init_object(*this, "netlist");
         m_setup->init();
+	}
+
+    void read_netlist(const char *buffer)
+    {
 
 		// read the netlist ...
 		//m_setup_func(*m_setup);
@@ -171,6 +176,71 @@ void usage(core_options &opts)
 	fprintf(stderr, "%s\n", opts.output_help(buffer));
 }
 
+static void run(core_options &opts)
+{
+    netlist_tool_t nt;
+    osd_ticks_t t = osd_ticks();
+
+    nt.init();
+    nt.m_logs = opts.value("l");
+    nt.read_netlist(filetobuf(opts.value("f")));
+    double ttr = opts.float_value("t");
+
+    printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
+    printf("runnning ...\n");
+    t = osd_ticks();
+
+    nt.process_queue(netlist_time::from_double(ttr));
+
+    double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
+    printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
+}
+
+static void listdevices()
+{
+    netlist_tool_t nt;
+    nt.init();
+    const netlist_factory_t::list_t &list = nt.setup().factory().list();
+
+    for (int i=0; i < list.count(); i++)
+    {
+        pstring out = pstring::sprintf("%-20s %s(<id>", list[i]->classname().cstr(),
+                list[i]->name().cstr() );
+        pstring terms("");
+
+        net_device_t_base_factory *f = list[i];
+        netlist_device_t *d = f->Create();
+        d->init(nt, pstring::sprintf("dummy%d", i));
+
+        // get the list of terminals ...
+        for (int j=0; j < d->m_terminals.count(); j++)
+        {
+            pstring inp = d->m_terminals[j];
+            if (inp.startsWith(d->name() + "."))
+                inp = inp.substr(d->name().len() + 1);
+            terms += "," + inp;
+        }
+
+        if (list[i]->param_desc().startsWith("+"))
+        {
+            out += "," + list[i]->param_desc().substr(1);
+            terms = "";
+        }
+        else if (list[i]->param_desc() == "-")
+        {
+            /* no params at all */
+        }
+        else
+        {
+            out += "," + list[i]->param_desc();
+        }
+        out += ")";
+        printf("%s\n", out.cstr());
+        if (terms != "")
+            printf("Terminals: %s\n", terms.substr(1).cstr());
+    }
+}
+
 /*-------------------------------------------------
     main - primary entry point
 -------------------------------------------------*/
@@ -178,10 +248,8 @@ void usage(core_options &opts)
 int main(int argc, char *argv[])
 {
 	//int result;
-	netlist_tool_t nt;
 	core_options opts(oplist);
 	astring aerror("");
-	osd_ticks_t t = osd_ticks();
 
 	fprintf(stderr, "%s", "WARNING: This is Work In Progress! - It may fail anytime\n");
 	if (!opts.parse_command_line(argc, argv, OPTION_PRIORITY_DEFAULT, aerror))
@@ -190,24 +258,21 @@ int main(int argc, char *argv[])
 		usage(opts);
 		return 1;
 	}
+
 	if (opts.bool_value("h"))
 	{
 		usage(opts);
 		return 1;
 	}
 
-	nt.m_logs = opts.value("l");
-	nt.read_netlist(filetobuf(opts.value("f")));
-	double ttr = opts.float_value("t");
-
-	printf("startup time ==> %5.3f\n", (double) (osd_ticks() - t) / (double) osd_ticks_per_second() );
-	printf("runnning ...\n");
-	t = osd_ticks();
-
-	nt.process_queue(netlist_time::from_double(ttr));
-
-	double emutime = (double) (osd_ticks() - t) / (double) osd_ticks_per_second();
-	printf("%f seconds emulation took %f real time ==> %5.2f%%\n", ttr, emutime, ttr/emutime*100.0);
+    if (opts.bool_value("ld"))
+    {
+        listdevices();
+    }
+    else
+    {
+        run(opts);
+    }
 
 	return 0;
 }

@@ -165,33 +165,34 @@ void netlist_parser::netdev_const(const pstring &dev_name)
 void netlist_parser::netdev_device(const pstring &dev_type)
 {
 	pstring devname;
+	net_device_t_base_factory *f = m_setup.factory().factory_by_name(dev_type, m_setup);
 	netlist_device_t *dev;
+	nl_util::pstring_list termlist = f->term_param_list();
 	int cnt;
 
 	skipws();
 	devname = getname2(',', ')');
-	dev = m_setup.factory().new_device_by_name(dev_type, m_setup);
+	dev = f->Create();
 	m_setup.register_dev(dev, devname);
 	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
 	cnt = 0;
 	while (getc() != ')')
 	{
+
+        if (cnt >= termlist.count())
+            fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), termlist.count(), cnt);
 		skipws();
 		pstring output_name = getname2(',', ')');
+#if 0
 		pstring alias = pstring::sprintf("%s.[%d]", devname.cstr(), cnt);
 		NL_VERBOSE_OUT(("Parser: ID: %s %s\n", output_name.cstr(), alias.cstr()));
 		m_setup.register_link(alias, output_name);
+#else
+        m_setup.register_link(devname + "." + termlist[cnt], output_name);
+#endif
 		skipws();
 		cnt++;
 	}
-/*
-    if (cnt != dev->m_terminals.count() && !dev->variable_input_count())
-        fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), dev->m_terminals.count(), cnt);
-    if (dev->variable_input_count())
-    {
-        NL_VERBOSE_OUT(("variable inputs %s: %d\n", dev->name().cstr(), cnt));
-    }
-    */
 }
 
 void netlist_parser::netdev_device(const pstring &dev_type, const pstring &default_param, bool isString)

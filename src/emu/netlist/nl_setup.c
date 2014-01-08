@@ -146,7 +146,7 @@ pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in)
 	return "Error";
 }
 
-void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const pstring &name, netlist_object_t &obj, const netlist_input_t::state_e state)
+void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name, netlist_object_t &obj, const netlist_input_t::state_e state)
 {
 	switch (obj.type())
 	{
@@ -156,9 +156,9 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
 			{
 				netlist_core_terminal_t &term = dynamic_cast<netlist_core_terminal_t &>(obj);
 				if (obj.isType(netlist_terminal_t::OUTPUT))
-					dynamic_cast<netlist_output_t &>(term).init_object(upd_dev, dev.name() + "." + name);
+					dynamic_cast<netlist_output_t &>(term).init_object(dev, dev.name() + "." + name);
 				else
-					term.init_object(upd_dev, dev.name() + "." + name, state);
+					term.init_object(dev, dev.name() + "." + name, state);
 
 				if (!(m_terminals.add(term.name(), &term, false)==TMERR_NONE))
 					netlist().error("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), term.name().cstr());
@@ -276,7 +276,7 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 		if (dev == NULL)
 			netlist().error("Device for %s not found\n", name.cstr());
 		int c = atoi(ret.substr(p+2,ret.len()-p-3));
-		temp = dev->name() + "." + dev->m_terminals[c];
+		temp = dev->m_terminals[c];
 		// reresolve ....
 		do {
 			ret = temp;

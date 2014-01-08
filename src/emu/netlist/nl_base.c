@@ -338,30 +338,32 @@ ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstri
 	dev.init(netlist(), this->name() + "." + name);
 }
 
-ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, const netlist_core_terminal_t &term)
+ATTR_COLD void netlist_device_t::register_subalias(const pstring &name, netlist_core_terminal_t &term)
 {
 	pstring alias = this->name() + "." + name;
 
 	setup().register_alias(alias, term.name());
 
 	if (term.isType(netlist_terminal_t::INPUT) || term.isType(netlist_terminal_t::TERMINAL))
-		m_terminals.add(name);
+		m_terminals.add(alias);
 }
 
 ATTR_COLD void netlist_device_t::register_terminal(const pstring &name, netlist_terminal_t &port)
 {
-	setup().register_object(*this,*this,name, port, netlist_terminal_t::STATE_INP_ACTIVE);
+	setup().register_object(*this, name, port, netlist_terminal_t::STATE_INP_ACTIVE);
+    if (port.isType(netlist_terminal_t::INPUT) || port.isType(netlist_terminal_t::TERMINAL))
+        m_terminals.add(port.name());
 }
 
 ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_output_t &port)
 {
-	setup().register_object(*this,*this,name, port, netlist_terminal_t::STATE_OUT);
+	setup().register_object(*this, name, port, netlist_terminal_t::STATE_OUT);
 }
 
 ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp, netlist_input_t::state_e type)
 {
-	m_terminals.add(name);
-	setup().register_object(*this, *this, name, inp, type);
+	setup().register_object(*this, name, inp, type);
+    m_terminals.add(inp.name());
 }
 
 //FIXME: Get rid of this
@@ -402,21 +404,21 @@ ATTR_COLD void netlist_device_t::register_link_internal(netlist_input_t &in, net
 }
 
 template <class C, class T>
-ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, C &param, const T initialVal)
+ATTR_COLD void netlist_device_t::register_param(const pstring &sname, C &param, const T initialVal)
 {
-	pstring fullname = dev.name() + "." + sname;
-	param.init_object(dev, fullname);
+	pstring fullname = this->name() + "." + sname;
+	param.init_object(*this, fullname);
 	param.initial(initialVal);
 	//FIXME: pass fullname from above
-	setup().register_object(*this, *this, fullname, param, netlist_terminal_t::STATE_NONEX);
+	setup().register_object(*this, fullname, param, netlist_terminal_t::STATE_NONEX);
 }
 
-template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_double_t &param, const double initialVal);
-template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_int_t &param, const int initialVal);
-template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_logic_t &param, const int initialVal);
-template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_str_t &param, const char * const initialVal);
-template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_str_t &param, const pstring &initialVal);
-template ATTR_COLD void netlist_device_t::register_param(netlist_core_device_t &dev, const pstring &sname, netlist_param_model_t &param, const char * const initialVal);
+template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_double_t &param, const double initialVal);
+template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_int_t &param, const int initialVal);
+template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_logic_t &param, const int initialVal);
+template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_str_t &param, const char * const initialVal);
+template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_str_t &param, const pstring &initialVal);
+template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_model_t &param, const char * const initialVal);
 
 
 // ----------------------------------------------------------------------------------------

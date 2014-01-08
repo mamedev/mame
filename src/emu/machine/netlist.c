@@ -187,7 +187,7 @@ void netlist_mame_device_t::device_start()
 
 	// register additional devices
 
-	m_setup->factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback");
+	m_setup->factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-");
 
 	m_setup_func(*m_setup);
 

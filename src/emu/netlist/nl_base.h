@@ -154,6 +154,7 @@
 #include "nl_config.h"
 #include "nl_lists.h"
 #include "nl_time.h"
+#include "nl_util.h"
 #include "pstring.h"
 #include "pstate.h"
 
@@ -930,7 +931,7 @@ public:
 	ATTR_COLD netlist_setup_t &setup();
 
 	ATTR_COLD void register_sub(netlist_device_t &dev, const pstring &name);
-	ATTR_COLD void register_subalias(const pstring &name, const netlist_core_terminal_t &term);
+	ATTR_COLD void register_subalias(const pstring &name, netlist_core_terminal_t &term);
 
 	ATTR_COLD void register_terminal(const pstring &name, netlist_terminal_t &port);
 
@@ -941,7 +942,7 @@ public:
 	ATTR_COLD void register_link_internal(netlist_input_t &in, netlist_output_t &out, const netlist_input_t::state_e aState);
 	ATTR_COLD void register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, const netlist_input_t::state_e aState);
 
-	/* driving logic outputs don't count in here */
+	/* FIXME: driving logic outputs don't count in here */
 	netlist_list_t<pstring, 20> m_terminals;
 
 protected:
@@ -951,13 +952,7 @@ protected:
 	ATTR_HOT virtual void update_terminals() { }
 
 	template <class C, class T>
-	ATTR_COLD void register_param(const pstring &sname, C &param, const T initialVal)
-	{
-		register_param(*this, sname, param, initialVal);
-	}
-
-	template <class C, class T>
-	ATTR_COLD void register_param(netlist_core_device_t &dev, const pstring &sname, C &param, const T initialVal);
+	ATTR_COLD void register_param(const pstring &sname, C &param, const T initialVal);
 
 private:
 };
@@ -1271,8 +1266,9 @@ class net_device_t_base_factory
 {
 	NETLIST_PREVENT_COPYING(net_device_t_base_factory)
 public:
-	ATTR_COLD net_device_t_base_factory(const pstring &name, const pstring &classname)
-	: m_name(name), m_classname(classname)
+	ATTR_COLD net_device_t_base_factory(const pstring &name, const pstring &classname,
+	        const pstring &def_param)
+	: m_name(name), m_classname(classname), m_def_param(def_param)
 	{}
 
 	ATTR_COLD virtual ~net_device_t_base_factory() {}
@@ -1281,9 +1277,20 @@ public:
 
 	ATTR_COLD const pstring &name() const { return m_name; }
 	ATTR_COLD const pstring &classname() const { return m_classname; }
+    ATTR_COLD const pstring &param_desc() const { return m_def_param; }
+
+    ATTR_COLD const nl_util::pstring_list term_param_list()
+    {
+        if (m_def_param.startsWith("+"))
+            return nl_util::split(m_def_param.substr(1), ",");
+        else
+            return nl_util::pstring_list();
+    }
+
 protected:
 	pstring m_name;                             /* device name */
 	pstring m_classname;                        /* device class name */
+	pstring m_def_param;                        /* default parameter */
 };
 
 template <class C>
@@ -1291,8 +1298,9 @@ class net_device_t_factory : public net_device_t_base_factory
 {
 	NETLIST_PREVENT_COPYING(net_device_t_factory)
 public:
-	ATTR_COLD net_device_t_factory(const pstring &name, const pstring &classname)
-	: net_device_t_base_factory(name, classname) { }
+	ATTR_COLD net_device_t_factory(const pstring &name, const pstring &classname,
+	        const pstring &def_param)
+	: net_device_t_base_factory(name, classname, def_param) { }
 
 	ATTR_COLD netlist_device_t *Create() const
 	{
@@ -1302,26 +1310,30 @@ public:
 	}
 };
 
-class netlist_factory
+class netlist_factory_t
 {
 public:
+    typedef netlist_list_t<net_device_t_base_factory *> list_t;
 
-	ATTR_COLD netlist_factory();
-	ATTR_COLD ~netlist_factory();
+	ATTR_COLD netlist_factory_t();
+	ATTR_COLD ~netlist_factory_t();
 
 	ATTR_COLD void initialize();
 
 	template<class _C>
-	ATTR_COLD void register_device(const pstring &name, const pstring &classname)
+	ATTR_COLD void register_device(const pstring &name, const pstring &classname,
+	        const pstring &def_param)
 	{
-		m_list.add(new net_device_t_factory< _C >(name, classname) );
+		m_list.add(new net_device_t_factory< _C >(name, classname, def_param) );
 	}
 
 	ATTR_COLD netlist_device_t *new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const;
 	ATTR_COLD netlist_device_t *new_device_by_name(const pstring &name, netlist_setup_t &setup) const;
+    ATTR_COLD net_device_t_base_factory * factory_by_name(const pstring &name, netlist_setup_t &setup) const;
+
+	const list_t &list() { return m_list; }
 
 private:
-	typedef netlist_list_t<net_device_t_base_factory *> list_t;
 	list_t m_list;
 
 };
