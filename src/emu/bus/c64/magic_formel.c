@@ -9,6 +9,14 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- pia6821 port A DDR needs to reset to 0xff or this won't boot
+
+*/
+
 #include "magic_formel.h"
 
 
@@ -19,7 +27,6 @@
 
 #define MC6821_TAG      "mc6821"
 
-#define PA4     (m_pb7_ff ? m_ram_oe : 0)
 
 
 //**************************************************************************
@@ -46,10 +53,7 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
 
 	*/
 
-	logerror("PA %02x\n",data);
 	m_rom_bank = data & 0x0f;
-
-	m_rom_oe = BIT(data, 3);
 
 	m_ram_oe = BIT(data, 4);
 }
@@ -65,29 +69,30 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pb_w )
 	    PB2     RAM A9
 	    PB3     RAM A8
 	    PB4     RAM A12
-	    PB5
+	    PB5		U9A clr
 	    PB6
 	    PB7     ROMH enable
 
 	*/
-	logerror("PB %02x\n",data);
+
 	m_ram_bank = data & 0x1f;
 
-	m_pb7 = BIT(data, 7);
-
-	if (!m_pb7)
+	if (!BIT(data, 5))
 	{
-		m_pb7_ff = 1;
+		m_u9a = 0;
 	}
+
+	m_pb7 = BIT(data, 7);
 }
 
 WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
 {
 	if (!state)
 	{
-		m_cb2_ff = 1;
+		m_u9b = 1;
 	}
 }
+
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_magic_formel )
@@ -118,9 +123,9 @@ machine_config_constructor c64_magic_formel_cartridge_device::device_mconfig_add
 
 INPUT_CHANGED_MEMBER( c64_magic_formel_cartridge_device::freeze )
 {
-	if (newval && (m_pb7_ff & m_cb2_ff))
+	if (newval && (!m_u9a && !m_u9b))
 	{
-		m_cb2_ff = 0;
+		m_u9b = 1;
 
 		m_slot->nmi_w(ASSERT_LINE);
 	}
@@ -167,11 +172,10 @@ c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machi
 	m_ram(*this, "ram"),
 	m_rom_bank(0),
 	m_ram_bank(0),
-	m_pb7_ff(0),
-	m_cb2_ff(0),
-	m_rom_oe(0),
 	m_ram_oe(0),
-	m_pb7(1)
+	m_pb7(1),
+	m_u9a(1),
+	m_u9b(1)
 {
 }
 
@@ -188,11 +192,10 @@ void c64_magic_formel_cartridge_device::device_start()
 	// state saving
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_pb7_ff));
-	save_item(NAME(m_cb2_ff));
-	save_item(NAME(m_rom_oe));
 	save_item(NAME(m_ram_oe));
 	save_item(NAME(m_pb7));
+	save_item(NAME(m_u9a));
+	save_item(NAME(m_u9b));
 }
 
 
@@ -204,11 +207,10 @@ void c64_magic_formel_cartridge_device::device_reset()
 {
 	m_rom_bank = 0;
 	m_ram_bank = 0;
-	m_pb7_ff = 0;
-	m_cb2_ff = 0;
-	m_rom_oe = 0;
 	m_ram_oe = 0;
-	m_pb7 = 1;
+	m_pb7 = 0;
+	m_u9a = 1;
+	m_u9b = 1;
 }
 
 
@@ -218,13 +220,12 @@ void c64_magic_formel_cartridge_device::device_reset()
 
 UINT8 c64_magic_formel_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!romh && !m_rom_oe)
+	if (!romh)
 	{
-		UINT8 bank = m_pb7_ff ? m_rom_bank : 0;
-		offs_t addr = (bank << 13) | (offset & 0x1fff);
+		offs_t addr = (m_rom_bank << 13) | (offset & 0x1fff);
 		data = m_romh[addr];
 	}
-	else if (!io1 && !PA4)
+	else if (!io1 && !m_ram_oe)
 	{
 		offs_t addr = (m_ram_bank << 8) | (offset & 0xff);
 		data = m_ram[addr];
@@ -240,20 +241,21 @@ UINT8 c64_magic_formel_cartridge_device::c64_cd_r(address_space &space, offs_t o
 
 void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!io1)
+	if (!io1 && !m_ram_oe)
 	{
 		offs_t addr = (m_ram_bank << 8) | (offset & 0xff);
 		m_ram[addr] = data;
 	}
-	else if (!io2 && !(m_cb2_ff & PA4))
+	else if (!io2 && !(!m_u9b && m_ram_oe))
 	{
 		offs_t addr = (offset >> 6) & 0x03;
 		UINT8 new_data = (BIT(data, 1) << 7) | (offset & 0x3f);
+
 		m_pia->write(space, addr, new_data);
 	}
 	else if (offset == 0x0001)
 	{
-		m_pb7_ff = 0;
+		m_u9a = 1;
 	}
 }
 
@@ -264,5 +266,5 @@ void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t of
 
 int c64_magic_formel_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return !(ba & rw & ((offset & 0xe000) == 0xe000) & !(m_pb7 & m_cb2_ff));
+	return !(ba && rw && ((offset & 0xe000) == 0xe000) && !(!m_pb7 && !m_u9b));
 }
