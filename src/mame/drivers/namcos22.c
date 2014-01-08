@@ -1598,8 +1598,11 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 	// It works in combination with keycus_w, but not yet understood how.
 	
 //  printf("Hit keycus offs %x mask %x PC=%x\n", offset, mem_mask, space.device().safe_pc());
-	
+
 	// protection (not used for all games)
+	// note: some games will XOR this register against a magic value, but that doesn't mean
+	// that the magic value is the keycus id. For example dirtdash XORs against $2c79, but its
+	// keycus id is $01a2 evident from a simple compare.
 	switch (m_gametype)
 	{
 		case NAMCOS22_RIDGE_RACER2:
@@ -5622,7 +5625,8 @@ DRIVER_INIT_MEMBER(namcos22_state,propcycl)
 {
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 
-	/* patch out strange routine (uninitialized-eprom related?) */
+	// patch out strange routine (uninitialized-eeprom related?)
+	// maybe needs more accurate 28C64 eeprom device emulation
 	ROM[0x1992C/4] = 0x4e754e75;
 
 	/**
