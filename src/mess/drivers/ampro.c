@@ -18,7 +18,6 @@ of a hard drive of up to 88MB.
 ToDo:
 - (maybe) add scsi interface
 - Add printer
-- Restore serial comms when breakage gets fixed
 
 ****************************************************************************/
 
@@ -29,7 +28,6 @@ ToDo:
 #include "machine/z80dart.h"
 #include "machine/serial.h"
 #include "machine/wd_fdc.h"
-#include "machine/terminal.h"
 
 
 class ampro_state : public driver_device
@@ -42,7 +40,6 @@ public:
 		, m_ctc (*this, "z80ctc")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
-		, m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	DECLARE_DRIVER_INIT(ampro);
@@ -52,16 +49,12 @@ public:
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
 private:
-	UINT8 m_term_data;
-	bool m_status;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<z80ctc_device> m_ctc;
 	required_device<wd1772_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
-	required_device<generic_terminal_device> m_terminal;
 };
 
 /*
@@ -87,38 +80,13 @@ READ8_MEMBER( ampro_state::io_r )
 	if (offset < 0x40)
 		return m_ctc->read(offset>>4);
 	else
-	if (offset == 0x44)
-	{
-		if ((m_status) || (m_term_data))
-			return 5; else return 4;
-	}
-	else
-	if (offset == 0x40)
-	{
-		UINT8 ret = m_term_data;
-		m_term_data = 0;
-		return ret;
-	}
-
-	return m_dart->ba_cd_r(space, offset>>2);		
+		return m_dart->ba_cd_r(space, offset>>2);
 }
 
 WRITE8_MEMBER( ampro_state::io_w )
 {
 	if (offset < 0x40)
 		m_ctc->write(offset>>4, data);
-	else
-	if (offset == 0x44)
-	{
-		if (data==1)
-			m_status = 1;
-	}
-	else
-	if (offset == 0x40)
-	{
-			m_status = 0;
-			m_terminal->write(space, 0, data);
-	}
 	else
 		m_dart->ba_cd_w(space, offset>>2, data);
 }
@@ -154,9 +122,9 @@ static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -219,16 +187,6 @@ DRIVER_INIT_MEMBER( ampro_state, ampro )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-WRITE8_MEMBER( ampro_state::kbd_put )
-{
-	m_term_data = data;
-}
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(ampro_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( ampro, ampro_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
@@ -240,9 +198,8 @@ static MACHINE_CONFIG_START( ampro, ampro_state )
 	/* Devices */
 	MCFG_Z80CTC_ADD( "z80ctc",   XTAL_16MHz / 4, ctc_intf )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_16MHz / 4, dart_intf )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	//MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", ampro_state, ctc_tick, attotime::from_hz(XTAL_16MHz / 8))
 	MCFG_WD1772x_ADD("fdc", XTAL_16MHz / 2)
