@@ -243,6 +243,7 @@ public:
 	int m_p4;
 	UINT16 m_su_82;
 	UINT16 m_keycus_id;
+	UINT16 m_keycus_rng;
 	int m_gametype;
 	int m_is_ss22;
 	int m_chipselect;
@@ -364,8 +365,8 @@ public:
 	DECLARE_READ8_MEMBER(namcos22_system_controller_r);
 	DECLARE_WRITE8_MEMBER(namcos22s_system_controller_w);
 	DECLARE_WRITE8_MEMBER(namcos22_system_controller_w);
-	DECLARE_READ32_MEMBER(namcos22_keycus_r);
-	DECLARE_WRITE32_MEMBER(namcos22_keycus_w);
+	DECLARE_READ16_MEMBER(namcos22_keycus_r);
+	DECLARE_WRITE16_MEMBER(namcos22_keycus_w);
 	DECLARE_READ16_MEMBER(namcos22_portbit_r);
 	DECLARE_WRITE16_MEMBER(namcos22_portbit_w);
 	DECLARE_READ16_MEMBER(namcos22_dipswitch_r);
