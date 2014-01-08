@@ -1024,8 +1024,8 @@ UINT8 z80dart_channel::data_read()
 		// load data from the FIFO
 		data = m_rx_data_fifo[m_rx_fifo];
 
-		// load error status from the FIFO, retain overrun and parity errors
-		m_rr[1] = (m_rr[1] & (RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo];
+		// load error status from the FIFO
+		m_rr[1] = (m_rr[1] & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo];
 
 		// decrease FIFO pointer
 		m_rx_fifo--;
