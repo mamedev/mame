@@ -42,7 +42,7 @@ protected:
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
-	required_device<device_t> m_beta;
+	required_device<beta_disk_device> m_beta;
 
 private:
 	UINT8 *m_p_ram;
@@ -54,12 +54,12 @@ DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 {
 	UINT16 pc = m_maincpu->state_int(STATE_GENPCBASE);
 
-	if (m_beta->started() && betadisk_is_active(m_beta))
+	if (m_beta->started() && m_beta->is_active())
 	{
 		if (pc >= 0x4000)
 		{
 			m_ROMSelection = BIT(m_port_7ffd_data, 4);
-			betadisk_disable(m_beta);
+			m_beta->disable();
 			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 		}
 	}
@@ -67,7 +67,7 @@ DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 	{
 		m_ROMSelection = 3;
 		if (m_beta->started())
-			betadisk_enable(m_beta);
+			m_beta->enable();
 
 	}
 	if(address<=0x3fff)
@@ -95,7 +95,7 @@ void atm_state::atm_update_memory()
 
 	m_bank4->set_base(messram + ((m_port_7ffd_data & 0x07) * 0x4000));
 
-	if (m_beta->started() && betadisk_is_active(m_beta) && !( m_port_7ffd_data & 0x10 ) )
+	if (m_beta->started() && m_beta->is_active() && !( m_port_7ffd_data & 0x10 ) )
 		m_ROMSelection = 3;
 	else
 		/* ROM switching */
@@ -120,12 +120,12 @@ WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
 
 static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
-	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(atm_port_7ffd_w)  AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
@@ -142,8 +142,8 @@ MACHINE_RESET_MEMBER(atm_state,atm)
 
 	if (m_beta->started())
 	{
-		betadisk_enable(m_beta);
-		betadisk_clear_status(m_beta);
+		m_beta->enable();
+		m_beta->clear_status();
 	}
 	space.set_direct_update_handler(direct_update_delegate(FUNC(atm_state::atm_direct), this));
 
