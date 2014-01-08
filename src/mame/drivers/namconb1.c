@@ -275,9 +275,8 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "includes/namcoic.h"
 #include "sound/c352.h"
 #include "cpu/m37710/m37710.h"
-#include "mcfglgcy.h"
 
-#define NB1_NVMEM_SIZE (0x800)
+#define MASTER_CLOCK    XTAL_48_384MHz
 
 
 /****************************************************************************/
@@ -556,44 +555,6 @@ READ32_MEMBER(namconb1_state::namconb_cpureg_r)
 
 /****************************************************************************/
 
-static NVRAM_HANDLER( namconb1 )
-{
-	namconb1_state *state = machine.driver_data<namconb1_state>();
-	int i;
-	UINT8 data[4];
-	if( read_or_write )
-	{
-		for( i=0; i<NB1_NVMEM_SIZE/4; i++ )
-		{
-			UINT32 dword = state->m_nvmem32[i];
-			data[0] = dword>>24;
-			data[1] = (dword&0x00ff0000)>>16;
-			data[2] = (dword&0x0000ff00)>>8;
-			data[3] = dword&0xff;
-			file->write( data, 4 );
-		}
-	}
-	else
-	{
-		if (file)
-		{
-			for( i=0; i<NB1_NVMEM_SIZE/4; i++ )
-			{
-				file->read( data, 4 );
-				state->m_nvmem32[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
-			}
-		}
-		else
-		{
-			memset( state->m_nvmem32, 0x00, NB1_NVMEM_SIZE );
-			if( state->m_gametype == NAMCONB1_GUNBULET )
-			{
-				state->m_nvmem32[0] = 0x0f260f26; /* default gun calibration */
-			}
-		}
-	}
-} /* namconb1 */
-
 MACHINE_START_MEMBER(namconb1_state,namconb)
 {
 	m_vblank_irq_active = 0;
@@ -862,7 +823,7 @@ static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namconb_cpureg_r, namconb1_cpureg_w)
-	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_SHARE("nvmem32")
+	AM_RANGE(0x580000, 0x5807ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
 	AM_RANGE(0x620000, 0x620007) AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
 	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_r,namco_tilemapvideoram32_w )
@@ -890,7 +851,7 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_SHARE("spritebank32")
 	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_SHARE("tilebank32")
 	AM_RANGE(0x980000, 0x98000f) AM_READWRITE16(c169_roz_bank_r,c169_roz_bank_w,0xffffffff)
-	AM_RANGE(0xa00000, 0xa007ff) AM_RAM AM_SHARE("nvmem32")
+	AM_RANGE(0xa00000, 0xa007ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
 	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE(namconb_cpureg_r, namconb2_cpureg_w)
 ADDRESS_MAP_END
@@ -1013,19 +974,18 @@ static ADDRESS_MAP_START( namcoc75_io, AS_IO, 8, namconb1_state )
 	AM_RANGE(M37710_ADC0_L, M37710_ADC0_L) AM_READ(dac0_r)
 ADDRESS_MAP_END
 
-#define MASTER_CLOCK_HZ 48384000
 
 static MACHINE_CONFIG_START( namconb1, namconb1_state )
-	MCFG_CPU_ADD("maincpu", M68EC020,MASTER_CLOCK_HZ/2)
+	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb1_am)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namconb1_state,  namconb1_interrupt)
 
-	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
+	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namconb1_state, mcu_interrupt, "screen", 0, 1)
 
-	MCFG_NVRAM_HANDLER(namconb1)
+	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1040,7 +1000,7 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb1)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_C352_ADD("c352", MASTER_CLOCK_HZ/2)
+	MCFG_C352_ADD("c352", MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -1048,16 +1008,16 @@ static MACHINE_CONFIG_START( namconb1, namconb1_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( namconb2, namconb1_state )
-	MCFG_CPU_ADD("maincpu", M68EC020,MASTER_CLOCK_HZ/2)
+	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namconb2_am)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namconb1_state,  namconb2_interrupt)
 
-	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
+	MCFG_CPU_ADD("mcu", M37702, MASTER_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
 	MCFG_CPU_IO_MAP(namcoc75_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("mcu_st", namconb1_state, mcu_interrupt, "screen", 0, 1)
 
-	MCFG_NVRAM_HANDLER(namconb1)
+	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_START_OVERRIDE(namconb1_state,namconb)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1072,7 +1032,7 @@ static MACHINE_CONFIG_START( namconb2, namconb1_state )
 	MCFG_VIDEO_START_OVERRIDE(namconb1_state,namconb2)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_C352_ADD("c352", MASTER_CLOCK_HZ/2)
+	MCFG_C352_ADD("c352", MASTER_CLOCK/2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
@@ -1110,6 +1070,9 @@ ROM_START( ptblank ) /* World set using 4Mb sound data rom (verified) */
 
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
 	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
+
+	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
+	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
 ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
@@ -1141,6 +1104,9 @@ ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
 
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
 	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
+
+	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
+	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
 ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data rom (verified) */
@@ -1172,6 +1138,9 @@ ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data rom (verified) */
 
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
 	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
+
+	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
+	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
 ROM_START( nebulray )
