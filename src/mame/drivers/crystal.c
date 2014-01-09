@@ -193,6 +193,8 @@ public:
 	DECLARE_DRIVER_INIT(officeye);
 	DECLARE_DRIVER_INIT(crysking);
 	DECLARE_DRIVER_INIT(evosocc);
+	DECLARE_DRIVER_INIT(donghaer);
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1124,6 +1126,23 @@ DRIVER_INIT_MEMBER(crystal_state,officeye)
 	Rom[WORD_XOR_LE(0xDAD0/2)]=0x9001;	//PUSH R0
 }
 
+DRIVER_INIT_MEMBER(crystal_state, donghaer)
+{
+	UINT16 *Rom = (UINT16*)memregion("user1")->base();
+
+	Rom[WORD_XOR_LE(0x037A2 / 2)] = 0x9004;	// PUSH	%R2
+	Rom[WORD_XOR_LE(0x037A4 / 2)] = 0x8202;	// LD	(%SP,0x8),%R2
+
+	Rom[WORD_XOR_LE(0x03834 / 2)] = 0x9001;	// PUSH	%R0
+	Rom[WORD_XOR_LE(0x03836 / 2)] = 0x9200;	// PUSH %SR
+
+	Rom[WORD_XOR_LE(0x0AC9E / 2)] = 0x9004;	// PUSH	%R2
+	Rom[WORD_XOR_LE(0x0ACA0 / 2)] = 0x4081;	// LERI	0x81
+
+	/* almost certainly another patch needed, possibly not using a PUSH (so more difficult to figure out) */
+}
+
+
 
 
 GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
@@ -1131,4 +1150,4 @@ GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT
 GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga", "Evolution Soccer", 0 )
 GAME( 2003, topbladv, crysbios, topbladv, crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
 GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi", "Office Yeo In Cheon Ha (version 1.2)", GAME_NOT_WORKING ) // still has some instability issues
-GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  officeye, ROT0, "Danbi", "Donggul Donggul Haerong", GAME_NOT_WORKING )
+GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi", "Donggul Donggul Haerong", GAME_NOT_WORKING )
