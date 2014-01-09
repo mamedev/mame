@@ -16,6 +16,8 @@ const device_type I8244 = &device_creator<i8244_device>;
 const device_type I8245 = &device_creator<i8245_device>;
 
 
+// Kevtris verified that the data below matches a dump
+// taken from a real chip.
 static const UINT8 c_shape[0x40 * 8] =
 {
 	0x7C,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00, // 0
