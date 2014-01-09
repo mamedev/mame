@@ -1139,7 +1139,8 @@ DRIVER_INIT_MEMBER(crystal_state, donghaer)
 	Rom[WORD_XOR_LE(0x0AC9E / 2)] = 0x9004;	// PUSH	%R2
 	Rom[WORD_XOR_LE(0x0ACA0 / 2)] = 0x4081;	// LERI	0x81
 
-	/* almost certainly another patch needed, possibly not using a PUSH (so more difficult to figure out) */
+	Rom[WORD_XOR_LE(0x19C70 / 2)] = 0x900C;	// PUSH	%R2-%R3 
+	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001;	// PUSH %R0
 }
 
 
