@@ -330,10 +330,10 @@ printf("ay_porta_w: %02X\n", data);
 	logerror("ay_port_a_w: %02X\n", data);
 
 	// Lacking schematics, these are all wild guesses
-	m_ag = ( data & 0x18 );
-	m_gm2 = ( data & 0x10 );
-	m_gm1 = ( data & 0x40 );
-	m_gm0 = ( data & 0x08 );
+	m_ag = BIT(data, 4);
+	m_gm2 = BIT(data, 6);
+	m_gm1 = BIT(data, 3);
+	m_gm0 = BIT(data, 3);
 
 	m_s68047p->ag_w( m_ag ? ASSERT_LINE : CLEAR_LINE );
 	m_s68047p->gm2_w( m_gm2 ? ASSERT_LINE : CLEAR_LINE );
@@ -364,8 +364,10 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 {
 	if (offset == ~0) return 0xff;
 
-	if ( m_ag ) {
-		if ( m_gm1 ) {
+	if ( m_ag )
+	{
+		if ( m_gm2 )
+		{
 			// 256 x 192 / 6KB
 			offset = ( ( offset & 0x1fc0 ) >> 1 ) | ( offset & 0x1f );
 			return m_videoram[offset % 0xc00];
@@ -376,8 +378,10 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 			return m_videoram[offset % 0xc00];
 		}
 	}
+
 	// Standard text
 	UINT8 data = m_videoram[offset % 0xc00];
+	if (!data) data = 0x20; //bodge
 
 	m_s68047p->inv_w( ( data & 0x80 ) ? ASSERT_LINE : CLEAR_LINE );
 
