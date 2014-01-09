@@ -16,8 +16,6 @@ The terminal must be set for 9600 baud, 7 bits, even parity, 1 stop bit.
 
 
 ToDo:
-- Hook up the rs232, once the bugs in z80dart/rs232 are sorted
-   (data from board is corrupt but from keyboard is fine)
 - Need software
 
 
@@ -46,7 +44,6 @@ X - Test off-board memory banks
 #include "machine/com8116.h"
 #include "machine/serial.h"
 #include "machine/wd_fdc.h"
-#include "machine/terminal.h"
 
 
 class pulsar_state : public driver_device
@@ -264,9 +261,7 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	MCFG_Z80DART_ADD("z80dart",  XTAL_4MHz, dart_intf )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
-	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("z80dart", z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ctsa_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ria_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 	MCFG_FD1797x_ADD("fdc", XTAL_4MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525dd", floppy_image_device::default_floppy_formats)
