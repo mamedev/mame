@@ -283,6 +283,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+
+	AM_RANGE(0x200000, 0x2fffff) AM_ROM AM_REGION("maincpudata", 0)
+
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fgvideoram")
 	AM_RANGE(0x520000, 0x53ffff) AM_WRITE(galpanic_bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w)
@@ -941,6 +944,8 @@ ROM_START( galhustl )
 	ROM_LOAD16_BYTE( "ue17.3", 0x00000, 0x80000, CRC(b2583dbb) SHA1(536f4aa2246ec816c4f270f9d42acc090718ee8b) )
 	ROM_LOAD16_BYTE( "ud17.4", 0x00001, 0x80000, CRC(470a3668) SHA1(ad86e96ab8f1f5da23fb1feaabfb9c757965418e) )
 
+	ROM_REGION16_BE( 0x100000, "maincpudata", ROMREGION_ERASEFF ) /* 68000 Data */
+
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
 	ROM_LOAD( "galhstl1.ub6", 0x00000, 0x80000,  CRC(23848790) SHA1(2e77fbe04f46e258daecb4c5917e383c7c06a306) )
@@ -949,6 +954,25 @@ ROM_START( galhustl )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "galhstl5.u5", 0x00000, 0x80000, CRC(44a18f15) SHA1(1217cf7fbbb442358b15016099efeface5dcbd22) )
+ROM_END
+
+ROM_START( pgalvip )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "afega_15.ue17", 0x00000, 0x20000, CRC(050060ca) SHA1(1e2a1d6aaf5038269d192baf3520f4af7a299325) )
+	ROM_LOAD16_BYTE( "afega_16.ud17", 0x00001, 0x20000, CRC(d32e4052) SHA1(632d9affee92a526c0e9399230ecf485922c6df4) )
+
+	ROM_REGION16_BE( 0x100000, "maincpudata", ROMREGION_ERASEFF ) /* 68000 Data */
+	ROM_LOAD16_BYTE( "afega_13.rob1", 0x00000, 0x80000, CRC(ac51ef72) SHA1(01acb29ff474c52fcb323cdb14e0d6f804c93255) )
+	ROM_LOAD16_BYTE( "afega_14.roa1", 0x00001, 0x80000, CRC(0877c00f) SHA1(91c325d6c21045f08abca86a9c4d46023363dd2e) )
+
+	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "afega_12.ub6", 0x00000, 0x20000,  CRC(d32a6c0c) SHA1(6f16043ed1e174b42de83462e2ea7a601bac6678) )
+	ROM_RELOAD(               0x40000, 0x20000 )
+	ROM_LOAD( "afega_11.uc6", 0xc0000, 0x80000,  CRC(2168e54a) SHA1(87534334b16d3ddc3daefcb1b8086aff44157ccf) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "afega_17.u5", 0x00000, 0x80000, CRC(a8a50745) SHA1(e51963947c7a7556b8531d172b9d7bf9f321b21b) )
 ROM_END
 
 /*
@@ -1028,5 +1052,6 @@ GAME( 1996, missmw96, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "C
 GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
 GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
 GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", GAME_NO_COCKTAIL )
-GAME( 1997, galhustl, 0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International",        "Gals Hustler", 0 )
+GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P", GAME_IMPERFECT_GRAPHICS ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
+GAME( 1997, galhustl, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International",        "Gals Hustler", 0 ) // hack of the above?
 GAME( 1995, zipzap,   0,        zipzap,   zipzap,    driver_device, 0, ROT90, "Barko Corp",               "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
