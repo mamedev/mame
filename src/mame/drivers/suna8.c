@@ -2322,8 +2322,37 @@ All versions come with roms simply numbered 1 through 15 even if the data
 ***************************************************************************/
 
 ROM_START( rranger )
+	// Sharp Image License but distributed by CAPCOM U.S.A. Inc.  PCB came with ROM 1 labeled as 01 CAPCOM
+	// PCB have been see with ROM 1 simply labled as 1 in either RED and BLUE print.
 	ROM_REGION( 0x48000, "maincpu", 0 )     /* Main Z80 Code */
-	ROM_LOAD( "1(__rranger).e2", 0x00000, 0x8000, CRC(4fb4f096) SHA1(c5ac3e04080cdcf570769918587e8cf8d455fc30) ) // V 2.0 1988,4,15
+	ROM_LOAD( "01_capcom.e2", 0x00000, 0x8000, CRC(ff1868cf) SHA1(54175111d8e39894ff11a779057f0bc061d63912) ) // V 2.0 1988,4,15
+	ROM_LOAD( "2.f2", 0x10000, 0x8000, CRC(ff65af29) SHA1(90f9a0c862e2a9da0343446a325961ab29d26b4b) )
+	ROM_LOAD( "3.h2", 0x18000, 0x8000, CRC(64e09436) SHA1(077f0d38d489562532d5f7678434a85ca04d373c) )
+	ROM_LOAD( "4.i2", 0x30000, 0x8000, CRC(4346fae6) SHA1(a9f000e4427a1e9902627402dce14dc8ee04dbf8) )
+	ROM_CONTINUE(     0x20000, 0x8000 )
+	ROM_LOAD( "5.j2", 0x38000, 0x8000, CRC(6a7ca1c3) SHA1(0f0b508e9b20909e9efa07b42d67732082b6940b) )
+	ROM_CONTINUE(     0x28000, 0x8000 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
+	ROM_LOAD( "14.j13", 0x0000, 0x8000, CRC(11c83aa1) SHA1(d1f75096528b220a3f858eac62e3b4111fa013de) )
+
+	ROM_REGION( 0x8000, "samples", 0 )  /* Samples */
+	ROM_LOAD( "15.e13", 0x0000, 0x8000, CRC(28c2c87e) SHA1(ec0d92140ef44df822f2229e79b915e051caa033) )
+
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_LOAD( "6(__rranger).p5",  0x00000, 0x8000, CRC(57543643) SHA1(59c7717321314678e61b50767e168eb2a73147d3) ) // Sharp Image license
+	ROM_LOAD( "7.p6",   0x08000, 0x8000, CRC(9f35dbfa) SHA1(8a8f158ad7f0bc6b43eaa95959af3ab58cf14d6d) )
+	ROM_LOAD( "8.p7",   0x10000, 0x8000, CRC(f400db89) SHA1(a07b226af40cac5a20739bb8f4226909724fda86) )
+	ROM_LOAD( "9.p8",   0x18000, 0x8000, CRC(fa2a11ea) SHA1(ea29ade1254caa2a3bd4b4816fe338f238025284) )
+	ROM_LOAD( "10(__rranger).p9", 0x20000, 0x8000, CRC(42c4fdbf) SHA1(fd8b267d5098b640e731942b922149866ece1dc6) ) // Sharp Image license
+	ROM_LOAD( "11.p10", 0x28000, 0x8000, CRC(19037a7b) SHA1(a6843b0220bab5c47307a0c761d5bd638716aef0) )
+	ROM_LOAD( "12.p11", 0x30000, 0x8000, CRC(c59c0ec7) SHA1(80003f3e33610a84f6e194918276d5f60145b00e) )
+	ROM_LOAD( "13.p12", 0x38000, 0x8000, CRC(9809fee8) SHA1(b7e0664702d0c1f77247d7c76a381b24687a09ea) )
+ROM_END
+
+ROM_START( rrangerb ) // protection is patched out in this set.
+	ROM_REGION( 0x48000, "maincpu", 0 )     /* Main Z80 Code */
+	ROM_LOAD( "1(__rrangerb).e2", 0x00000, 0x8000, CRC(4fb4f096) SHA1(c5ac3e04080cdcf570769918587e8cf8d455fc30) ) // V 2.0 1988,4,15
 	ROM_LOAD( "2.f2", 0x10000, 0x8000, CRC(ff65af29) SHA1(90f9a0c862e2a9da0343446a325961ab29d26b4b) )
 	ROM_LOAD( "3.h2", 0x18000, 0x8000, CRC(64e09436) SHA1(077f0d38d489562532d5f7678434a85ca04d373c) )
 	ROM_LOAD( "4.i2", 0x30000, 0x8000, CRC(4346fae6) SHA1(a9f000e4427a1e9902627402dce14dc8ee04dbf8) )
@@ -2818,12 +2847,13 @@ DRIVER_INIT_MEMBER(suna8_state,suna8)
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",                       "Super Ranger (v2.0)",                        0 )
-GAME( 1988, rranger,   sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0, unprotected, bootleg?)", 0 ) // protection is patched out in this.
-GAME( 1988, srangero,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",                       "Super Ranger (older)",                       0 )
-GAME( 1988, srangern,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (NOVA license)",        "Super Ranger (older, NOVA license)",         0 )
-GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (WDK license)",         "Super Ranger (older, WDK license)",          0 )
-GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "bootleg (NYWA)",             "Super Ranger (older, bootleg)",              0 )
+GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",                       "Super Ranger (v2.0)",                0 )
+GAME( 1988, rranger,   sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)",                0 )
+GAME( 1988, rrangerb,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "bootleg",                    "Rough Ranger (v2.0, bootleg)",       0 )
+GAME( 1988, srangero,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",                       "Super Ranger (older)",               0 )
+GAME( 1988, srangern,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (NOVA license)",        "Super Ranger (older, NOVA license)", 0 )
+GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (WDK license)",         "Super Ranger (older, WDK license)",  0 )
+GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "bootleg (NYWA)",             "Super Ranger (older, bootleg)",      0 )
 
 GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, hardhead,  ROT0,  "SunA",                       "Hard Head",                   0 )
 GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg)",         0 )
