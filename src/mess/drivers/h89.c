@@ -30,14 +30,10 @@ class h89_state : public driver_device
 public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_uart(*this, "ins8250"),
-			m_terminal(*this, TERMINAL_TAG)
+			m_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<ins8250_device> m_uart;
-	required_device<serial_terminal_device> m_terminal;
 
 	DECLARE_WRITE8_MEMBER( port_f2_w );
 

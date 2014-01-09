@@ -32,7 +32,6 @@ public:
 	isbc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, "terminal"),
 	m_uart8251(*this, "uart8251"),
 	m_uart8274(*this, "uart8274"),
 	m_pic_0(*this, "pic_0"),
@@ -41,7 +40,6 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_terminal_device> m_terminal;
 	optional_device<i8251_device> m_uart8251;
 	optional_device<i8274_device> m_uart8274;
 	required_device<pic8259_device> m_pic_0;
