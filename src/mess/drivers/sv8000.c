@@ -1,9 +1,9 @@
 // license:BSD
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Robbbert
 /***************************************************************************
 
     Bandai Super Vision 8000 (TV Jack 8000)
-      driver by Wilbert Pol, ranger_lennier, and Charles McDonald
+      driver by Wilbert Pol, Robbbert, ranger_lennier, and Charles McDonald
 
         2014/01/07 Skeleton driver.
 
@@ -18,13 +18,9 @@ Looking at the code of the cartridges it seems there is:
 - 3KB of video RAM
 
     TODO:
-    - Figure out configuration of S68047P pins through 8910 port A
-    - Figure out input ports, left and right might be swapped
+    - Check configuration of S68047P pins through 8910 port A against
+      schematics
     - Verify clock
-    - Figure out IRQ source
-
-    KNOWN ISSUES:
-    - pacpac and submar wait for an irq, where is that coming from? vblank?
 
 ****************************************************************************/
 
@@ -72,7 +68,7 @@ private:
 	virtual void machine_reset();
 
 	required_device<cpu_device> m_maincpu;
-	required_device<mc6847_base_device> m_s68047p;
+	required_device<s68047_device> m_s68047p;
 	required_shared_ptr<const UINT8> m_videoram;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
@@ -175,6 +171,14 @@ void sv8000_state::machine_start()
 	m_inv = 0;
 
 	save_item(NAME(m_column));
+	save_item(NAME(m_ag));
+	save_item(NAME(m_gm2));
+	save_item(NAME(m_gm1));
+	save_item(NAME(m_gm0));
+	save_item(NAME(m_as));
+	save_item(NAME(m_css));
+	save_item(NAME(m_intext));
+	save_item(NAME(m_inv));
 }
 
 
@@ -215,14 +219,14 @@ DEVICE_IMAGE_LOAD_MEMBER( sv8000_state, cart )
 
 READ8_MEMBER( sv8000_state::i8255_porta_r )
 {
-	logerror("i8255_porta_r\n");
+	//logerror("i8255_porta_r\n");
 	return m_io_joy->read();
 }
 
 
 WRITE8_MEMBER( sv8000_state::i8255_porta_w )
 {
-	logerror("i8255_porta_w: %02X\n", data);
+	//logerror("i8255_porta_w: %02X\n", data);
 }
 
 
@@ -230,7 +234,7 @@ READ8_MEMBER( sv8000_state::i8255_portb_r )
 {
 	UINT8 data = 0xff;
 
-	logerror("i8255_portb_r\n");
+	//logerror("i8255_portb_r\n");
 
 	if ( ! ( m_column & 0x01 ) )
 	{
@@ -250,20 +254,20 @@ READ8_MEMBER( sv8000_state::i8255_portb_r )
 
 WRITE8_MEMBER( sv8000_state::i8255_portb_w )
 {
-	logerror("i8255_portb_w: %02X\n", data);
+	//logerror("i8255_portb_w: %02X\n", data);
 }
 
 
 READ8_MEMBER( sv8000_state::i8255_portc_r )
 {
-	logerror("i8255_portc_r\n");
+	//logerror("i8255_portc_r\n");
 	return 0xFF;
 }
 
 
 WRITE8_MEMBER( sv8000_state::i8255_portc_w )
 {
-	logerror("i8255_portc_w: %02X\n", data);
+	//logerror("i8255_portc_w: %02X\n", data);
 	m_column = data;
 }
 
@@ -283,7 +287,7 @@ READ8_MEMBER( sv8000_state::ay_port_a_r )
 {
 	UINT8 data = 0xFF;
 
-	logerror("ay_port_a_r\n");
+	//logerror("ay_port_a_r\n");
 	return data;
 }
 
@@ -292,7 +296,7 @@ READ8_MEMBER( sv8000_state::ay_port_b_r )
 {
 	UINT8 data = 0xff;
 
-	logerror("ay_port_b_r\n");
+	//logerror("ay_port_b_r\n");
 	return data;
 }
 
@@ -308,14 +312,15 @@ READ8_MEMBER( sv8000_state::ay_port_b_r )
 //
 // othello:
 // 0x02 00000010 normal text screen
+// 0x58 01011000 graphics 3KB in 6KB mode?
 //
 // gunprof:
 // 0x00 00000000 text
-// 0x38 00111000 graphics 3KB mode  1-101
+// 0x38 00111000 graphics 3KB mode
 //
 // pacpac:
 // 0x00 00000000 text
-// 0x5A 01011010 graphics 3KB in 6KB mode?  1-111
+// 0x5A 01011010 graphics 3KB in 6KB mode?
 //
 // submar:
 // 0x00 00000000 text
@@ -326,26 +331,28 @@ READ8_MEMBER( sv8000_state::ay_port_b_r )
 //
 WRITE8_MEMBER( sv8000_state::ay_port_a_w )
 {
-printf("ay_porta_w: %02X\n", data);
-	logerror("ay_port_a_w: %02X\n", data);
+	//logerror("ay_port_a_w: %02X\n", data);
 
 	// Lacking schematics, these are all wild guesses
+	// Having bit 1 set makes black display as blue??
 	m_ag = BIT(data, 4);
 	m_gm2 = BIT(data, 6);
 	m_gm1 = BIT(data, 3);
 	m_gm0 = BIT(data, 3);
+	m_css = m_ag;
 
 	m_s68047p->ag_w( m_ag ? ASSERT_LINE : CLEAR_LINE );
 	m_s68047p->gm2_w( m_gm2 ? ASSERT_LINE : CLEAR_LINE );
 	m_s68047p->gm1_w( m_gm1 ? ASSERT_LINE : CLEAR_LINE );
 	m_s68047p->gm0_w( m_gm0 ? ASSERT_LINE : CLEAR_LINE );
+	m_s68047p->css_w( m_css ? ASSERT_LINE : CLEAR_LINE );
+	m_s68047p->hack_black_becomes_blue( BIT(data, 1) );
 }
 
 
 WRITE8_MEMBER( sv8000_state::ay_port_b_w )
 {
-printf("ay_portb_w: %02X\n", data);
-	logerror("ay_port_b_w: %02X\n", data);
+	//logerror("ay_port_b_w: %02X\n", data);
 }
 
 
@@ -421,7 +428,7 @@ static MACHINE_CONFIG_START( sv8000, sv8000_state )
 
 	/* video hardware */
 	// S68047P - Unknown whether the internal or an external character rom is used
-	MCFG_MC6847_ADD("s68047p", MC6847_NTSC, XTAL_10_738635MHz/3, sv8000_mc6847_interface )  // Clock not verified
+	MCFG_MC6847_ADD("s68047p", S68047, XTAL_10_738635MHz/3, sv8000_mc6847_interface )  // Clock not verified
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "s68047p")
 
 	/* sound hardware */
@@ -449,5 +456,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   INIT                  COMPANY   FULLNAME                            FLAGS */
-COMP( 1979, sv8000, 0,      0,       sv8000,  sv8000, driver_device,   0,   "Bandai", "Super Vision 8000 (TV Jack 8000)", GAME_IS_SKELETON )
+COMP( 1979, sv8000, 0,      0,       sv8000,  sv8000, driver_device,   0,   "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )
 

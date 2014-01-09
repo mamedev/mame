@@ -113,6 +113,7 @@ protected:
 	static const UINT8 ntsc_square_fontdata8x12[];
 	static const UINT8 semigraphics4_fontdata8x12[];
 	static const UINT8 semigraphics6_fontdata8x12[];
+	static const UINT8 s68047_fontdata8x12[];
 
 	// pixel definitions
 	typedef UINT32 pixel_t;
@@ -519,6 +520,14 @@ protected:
 	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 scanline);
 	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock);
 
+	void set_custom_palette(const pixel_t *custom_palette)
+	{
+		if ( m_palette != m_bw_palette )
+		{
+			m_palette = custom_palette ? custom_palette : s_palette;
+		}
+	}
+
 private:
 	struct video_scanline
 	{
@@ -634,6 +643,17 @@ public:
 	mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class s68047_device : public mc6847_base_device
+{
+public:
+    s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	void hack_black_becomes_blue(bool flag);
+
+private:
+    static const UINT32 s_s68047_hack_palette[16];
+};
+
 
 extern const device_type MC6847_NTSC;
 extern const device_type MC6847_PAL;
@@ -641,5 +661,6 @@ extern const device_type MC6847Y_NTSC;
 extern const device_type MC6847Y_PAL;
 extern const device_type MC6847T1_NTSC;
 extern const device_type MC6847T1_PAL;
+extern const device_type S68047;
 
 #endif /* __MC6847__ */
