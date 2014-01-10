@@ -1303,20 +1303,6 @@ WRITE_LINE_MEMBER( z80dart_channel::txc_w )
 
 void z80dart_channel::update_serial()
 {
-	int clocks = get_clock_mode();
-
-	set_data_frame(num_data_bits, stop_bit_count, parity_code, false);
-
-	if (m_rxc > 0)
-	{
-		set_rcv_rate(m_rxc / clocks);
-	}
-
-	if (m_txc > 0)
-	{
-		set_tra_rate(m_txc / clocks);
-	}
-
 	int num_data_bits = get_rx_word_length();
 	int stop_bit_count = get_stop_bits();
 	int parity_code = PARITY_NONE;
@@ -1327,6 +1313,20 @@ void z80dart_channel::update_serial()
 			parity_code = PARITY_EVEN;
 		else
 			parity_code = PARITY_ODD;
+	}
+
+	set_data_frame(num_data_bits, stop_bit_count, parity_code, false);
+
+	int clocks = get_clock_mode();
+
+	if (m_rxc > 0)
+	{
+		set_rcv_rate(m_rxc / clocks);
+	}
+
+	if (m_txc > 0)
+	{
+		set_tra_rate(m_txc / clocks);
 	}
 }
 
