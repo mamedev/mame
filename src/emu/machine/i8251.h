@@ -129,6 +129,7 @@ private:
 
 	/* data being received */
 	UINT8 m_data;
+	bool m_tx_busy, m_disable_tx_pending;
 };
 
 // device type definition

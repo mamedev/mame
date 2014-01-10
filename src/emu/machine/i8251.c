@@ -172,13 +172,13 @@ void i8251_device::transmit_clock()
 	else
 		return;
 
-	/* transmit enable? */
+	/* transmit enabled? */
 	if (m_command & (1<<0))
 	{
-		/* transmit register full? */
+		/* do we have a character to send? */
 		if ((m_status & I8251_STATUS_TX_READY)==0)
 		{
-			/* if transmit reg is empty */
+			/* is diserial ready for it? */
 			if (is_transmit_register_empty())
 			{
 				/* set it up */
@@ -193,17 +193,31 @@ void i8251_device::transmit_clock()
 			}
 		}
 
-		/* if transmit is not empty... transmit data */
+		/* if diserial has bits to send, make them so */
 		if (!is_transmit_register_empty())
 		{
 			UINT8 data = transmit_register_get_data_bit();
-	//      logerror("I8251\n");
-			//transmit_register_send_bit();
+			m_tx_busy = true;
 			m_out_txd_func(data);
 
 			m_connection_state &= ~TX;
 			m_connection_state|=(data<<5);
 			serial_connection_out();
+		}
+
+		// is transmitter totally done?
+		if ((m_status & I8251_STATUS_TX_READY) && is_transmit_register_empty())
+		{
+			m_tx_busy = false;
+
+			if (m_disable_tx_pending)
+			{
+				LOG(("Applying pending disable\n")); 
+				m_disable_tx_pending = false;
+				m_command &= ~(1<<0);
+				set_out_data_bit(1);
+				update_tx_ready();
+			}
 		}
 	}
 
@@ -325,6 +339,7 @@ void i8251_device::device_reset()
 	m_data = 0;
 	m_rxc = m_txc = 0;
 	m_br_factor = 1;
+	m_tx_busy = m_disable_tx_pending = false;
 
 	/* update tx empty pin output */
 	update_tx_empty();
@@ -584,10 +599,30 @@ WRITE8_MEMBER(i8251_device::control_w)
 		if (data & (1<<0))
 		{
 			LOG(("transmit enable\n"));
+
+			/* if we get a tx enable with a disable pending, cancel the disable */
+			m_disable_tx_pending = false;
 		}
 		else
 		{
-			LOG(("transmit disable\n"));
+			if (m_tx_busy)
+			{
+				if (!m_disable_tx_pending)
+				{
+					LOG(("Tx busy, set pending disable\n")); 
+				}
+				m_disable_tx_pending = true;
+				m_command |= (1<<0);
+			}
+			else
+			{
+				LOG(("transmit disable\n")); 
+				if ((data & (1<<0))==0)
+				{
+					/* held in high state when transmit disable */
+					set_out_data_bit(1);
+				}
+			}
 		}
 
 
@@ -628,12 +663,6 @@ WRITE8_MEMBER(i8251_device::control_w)
 		if (data & (1<<1))
 		{
 			m_connection_state |= DTR;
-		}
-
-		if ((data & (1<<0))==0)
-		{
-			/* held in high state when transmit disable */
-			set_out_data_bit(1);
 		}
 
 
@@ -684,7 +713,7 @@ WRITE8_MEMBER(i8251_device::data_w)
 {
 	m_data = data;
 
-	//logerror("write data: %02x\n",data);
+//	printf("i8251 transmit char: %02x\n",data);
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
@@ -705,7 +734,7 @@ WRITE8_MEMBER(i8251_device::data_w)
 
 void i8251_device::receive_character(UINT8 ch)
 {
-	//logerror("i8251 receive char: %02x\n",ch);
+//	printf("i8251 receive char: %02x\n",ch);
 
 	m_data = ch;
 
