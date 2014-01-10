@@ -1305,6 +1305,8 @@ void z80dart_channel::update_serial()
 {
 	int clocks = get_clock_mode();
 
+	set_data_frame(num_data_bits, stop_bit_count, parity_code, false);
+
 	if (m_rxc > 0)
 	{
 		set_rcv_rate(m_rxc / clocks);
@@ -1326,8 +1328,6 @@ void z80dart_channel::update_serial()
 		else
 			parity_code = PARITY_ODD;
 	}
-
-	set_data_frame(num_data_bits, stop_bit_count, parity_code, false);
 }
 
 
