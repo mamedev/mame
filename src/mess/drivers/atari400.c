@@ -2697,6 +2697,8 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_MODIFY("pia")
+	MCFG_PIA_READPA_HANDLER(NULL) // FIXME: is there anything connected here
+	MCFG_PIA_READPB_HANDLER(NULL) // FIXME: is there anything connected here
 	MCFG_PIA_CB2_HANDLER(NULL) // FIXME: is there anything connected here
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
