@@ -134,16 +134,15 @@ TODO:
   12) Mr do moves. Kills 'A' monster. Shows winning extra Mr do.
 
   Small changes to the CPU speed or refresh rate alter the demo timing and can cause
-  the above sequence (not) to work (e.g. Mr Do might not fill all monsters at once
+  the above sequence (not) to work (e.g. Mr Do might not kill all monsters at once
   on the first round).
   Note that this only works in the dorunrun2 set. The dorunrun set works slightly
   differently, however it hasn't been compared with the real board so it might be
   right.
-- unknown ports 0 and 2
+
 - bad communication in idsoccer
 - adpcm status in idsoccer
 - real values for the adpcm interface in idsoccer
-- handle flipscreen on/off based on address line A7 (cX0X/cX8X)
 
 
 2008-08
@@ -164,7 +163,7 @@ WRITE_LINE_MEMBER(docastle_state::docastle_tint)
 	if (state)
 	{
 		int ma6 = m_crtc->get_ma() & 0x40;
-		if (ma6 & ~m_prev_ma6) // MA6 rising edge
+		if (ma6 && !m_prev_ma6) // MA6 rising edge
 			m_slave->set_input_line(0, HOLD_LINE);
 		m_prev_ma6 = ma6;
 	}
@@ -558,6 +557,13 @@ GFXDECODE_END
  *
  *************************************/
 
+/*
+The games program the CRTC for a width of 32 characters (256 pixels).
+However, the DE output from the CRTC is first ANDed with the NAND of
+MA1 through MA4, and then delayed by 8 pixel clocks; this effectively
+blanks the first 8 pixels and last 8 pixels of each line.
+*/
+
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,      /* show border area */
@@ -641,7 +647,7 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, crtc_intf)
 	
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 0, 0x100, 0x108, 0, 0xc0) // from crtc
+	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 
 	MCFG_GFXDECODE(docastle)
