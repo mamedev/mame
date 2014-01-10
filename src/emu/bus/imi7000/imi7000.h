@@ -51,15 +51,15 @@
 //**************************************************************************
 
 #define MCFG_IMI7000_BUS_ADD(_def_slot1, _def_slot2, _def_slot3, _def_slot4) \
+	MCFG_DEVICE_ADD(IMI7000_BUS_TAG, IMI7000_BUS, 0) \
 	MCFG_DEVICE_ADD(IMI7000_BUS_TAG":0", IMI7000_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(imi7000_devices, _def_slot1, false) \
 	MCFG_DEVICE_ADD(IMI7000_BUS_TAG":1", IMI7000_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(imi7000_devices, _def_slot1, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(imi7000_devices, _def_slot2, false) \
 	MCFG_DEVICE_ADD(IMI7000_BUS_TAG":2", IMI7000_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(imi7000_devices, _def_slot1, false) \
+	MCFG_DEVICE_SLOT_INTERFACE(imi7000_devices, _def_slot3, false) \
 	MCFG_DEVICE_ADD(IMI7000_BUS_TAG":3", IMI7000_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(imi7000_devices, _def_slot1, false) \
-	MCFG_DEVICE_ADD(IMI7000_BUS_TAG, IMI7000_BUS, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(imi7000_devices, _def_slot4, false)
 
 
 
