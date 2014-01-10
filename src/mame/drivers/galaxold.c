@@ -873,12 +873,8 @@ static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-/* the nmi line seems to be inverted on the cpu plugin board */
-READ8_MEMBER(galaxold_state::ttl7474_trampoline){ device_t *device = machine().device("7474_9m_1"); return downcast<ttl7474_device *>(device)->output_comp_r(); }
-
 static ADDRESS_MAP_START( hunchbkg_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READNOP // not used
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(ttl7474_trampoline)
 ADDRESS_MAP_END
 
 
@@ -2596,6 +2592,10 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 
 	MCFG_CPU_PROGRAM_MAP(hunchbkg)
 	MCFG_CPU_IO_MAP(hunchbkg_io)
+
+	MCFG_DEVICE_MODIFY("7474_9m_1")
+	/* the nmi line seems to be inverted on the cpu plugin board */
+	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", s2650_device, write_sense))
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
 

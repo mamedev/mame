@@ -232,8 +232,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/s2650/s2650.h"
-#include "sound/dac.h"
 #include "includes/lazercmd.h"
 
 // color overlays, bbonk does not have an overlay
@@ -259,7 +257,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::lazercmd_timer)
 	{
 		m_timer_count = 0;
 		m_sense_state ^= 1;
-		m_maincpu->set_input_line(1, (m_sense_state) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->write_sense(m_sense_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

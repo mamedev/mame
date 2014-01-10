@@ -31,6 +31,8 @@ public:
 	// construction/destruction
 	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_WRITE_LINE_MEMBER(write_sense);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -94,8 +96,6 @@ private:
 	void s2650_set_flag(int state);
 	int s2650_get_flag();
 	void s2650_set_sense(int state);
-	int s2650_get_sense();
-
 };
 
 

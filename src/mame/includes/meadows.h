@@ -3,6 +3,8 @@
     Meadows S2650 hardware
 
 *************************************************************************/
+#include "emu.h"
+#include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
 
@@ -14,8 +16,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_dac(*this, "dac"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples")
+	{
+	}
 
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -53,7 +58,8 @@ public:
 	INTERRUPT_GEN_MEMBER(minferno_interrupt);
 	INTERRUPT_GEN_MEMBER(audio_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
+	optional_device<s2650_device> m_audiocpu;
 	optional_device<dac_device> m_dac;
 	optional_device<samples_device> m_samples;
 };

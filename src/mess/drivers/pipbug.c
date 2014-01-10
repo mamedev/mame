@@ -54,7 +54,6 @@ public:
 	}
 
 	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
-	DECLARE_READ8_MEMBER(pipbug_serial_r);
 	DECLARE_WRITE8_MEMBER(pipbug_serial_w);
 	required_device<rs232_port_device> m_rs232;
 	required_device<cpu_device> m_maincpu;
@@ -64,11 +63,6 @@ public:
 WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
 {
 // 0x80 is written here - not connected in the baby 2650
-}
-
-READ8_MEMBER( pipbug_state::pipbug_serial_r )
-{
-	return m_rs232->rx();
 }
 
 WRITE8_MEMBER( pipbug_state::pipbug_serial_w )
@@ -83,9 +77,10 @@ static ADDRESS_MAP_START(pipbug_mem, AS_PROGRAM, 8, pipbug_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pipbug_io, AS_IO, 8, pipbug_state)
-	ADDRESS_MAP_UNMAP_HIGH
+//	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(pipbug_ctrl_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(pipbug_serial_r,pipbug_serial_w)
+	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_WRITE(pipbug_serial_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READNOP // this has to return zero or the parameter to write_sense is ignored
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -181,6 +176,7 @@ static MACHINE_CONFIG_START( pipbug, pipbug_state )
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("maincpu", s2650_device, write_sense))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
 	/* quickload */

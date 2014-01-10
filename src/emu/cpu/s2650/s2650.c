@@ -17,6 +17,8 @@
 #include "s2650.h"
 #include "s2650cpu.h"
 
+#define S2650_SENSE_LINE INPUT_LINE_IRQ1
+
 /* define this to have some interrupt information logged */
 #define VERBOSE 0
 
@@ -913,16 +915,19 @@ void s2650_device::device_reset()
 
 void s2650_device::execute_set_input(int irqline, int state)
 {
-	if (irqline == 1)
+	switch (irqline)
 	{
+	case INPUT_LINE_IRQ0:
+		m_irq_state = state;
+		break;
+
+	case S2650_SENSE_LINE:
 		if (state == CLEAR_LINE)
 			s2650_set_sense(0);
 		else
 			s2650_set_sense(1);
-		return;
+		break;
 	}
-
-	m_irq_state = state;
 }
 
 void s2650_device::s2650_set_flag(int state)
@@ -946,11 +951,9 @@ void s2650_device::s2650_set_sense(int state)
 		set_psu(m_psu & ~SI);
 }
 
-int s2650_device::s2650_get_sense()
+WRITE_LINE_MEMBER(s2650_device::write_sense)
 {
-	/* OR'd with Input to allow for external connections */
-
-	return (((m_psu & SI) ? 1 : 0) | ((m_io->read_byte(S2650_SENSE_PORT) & SI) ? 1 : 0));
+	set_input_line(S2650_SENSE_LINE, state);
 }
 
 void s2650_device::execute_run()
