@@ -39,6 +39,9 @@
 #define MCFG_LK201_REMOVE() \
 	MCFG_DEVICE_REMOVE(LK201_TAG)
 
+#define MCFG_LK201_SET_TX_CALLBACK(_cb) \
+	devcb = &lk201_device::set_tx_cb(*device, DEVCB2_##_cb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -59,6 +62,10 @@ public:
 	DECLARE_WRITE8_MEMBER( sci_w );
 	DECLARE_READ8_MEMBER( spi_r );
 	DECLARE_WRITE8_MEMBER( spi_w );
+
+	template<class _Object> static devcb2_base &set_tx_cb(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_write.set_callback(wr); }
+
+	devcb2_write_line m_tx_write;
 
 protected:
 	// device-level overrides

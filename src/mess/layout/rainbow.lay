@@ -18,10 +18,10 @@
 	</element>
 
 	<element name="greenkbd" defstate="0">
-		<disk state="0">
+		<disk state="1">
 			<color red="0.0" green="0.75" blue="0.0" />
 		</disk>
-		<disk state="1">
+		<disk state="0">
 			<color red="0.0" green="0.20" blue="0.0" />
 		</disk>
 	</element>
@@ -85,26 +85,27 @@
 		</text>
 	</element>
 
-	<element name="l8wait">
-		<text string="WAIT">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="l9">
-		<text string="COMP">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="l10">
-		<text string="LOCK">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
-	<element name="l11">
+	<element name="l8_hold">
 		<text string="HOLD">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
+	<element name="l9_lock">
+		<text string="LOCK">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>	
+	<element name="l10_comp">
+		<text string="COMP">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="l11_wait">
+		<text string="WAIT">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
 
 	<view name="Default Layout">
 		<screen index="0">
@@ -145,16 +146,17 @@
 		<bezel name="led7" element="sysled">
 			<bounds x="15" y="196" width="10" height="10" />
 		</bezel>
-		<bezel name="led8" element="greenkbd">
+
+		<bezel name="led_hold" element="greenkbd">
 			<bounds x="15" y="226" width="10" height="10" />
 		</bezel>
-		<bezel name="led9" element="greenkbd">
+		<bezel name="led_lock" element="greenkbd">
 			<bounds x="15" y="246" width="10" height="10" />
 		</bezel>
-		<bezel name="led10" element="greenkbd">
+		<bezel name="led_compose" element="greenkbd">
 			<bounds x="15" y="265" width="10" height="10" />
 		</bezel>
-		<bezel name="led11" element="greenkbd">
+		<bezel name="led_wait" element="greenkbd">
 			<bounds x="15" y="285" width="10" height="10" />
 		</bezel>
 
@@ -192,16 +194,16 @@
 		<bezel name="label7" element="l7">
 			<bounds x="0" y="193" width="15" height="16" />
 		</bezel>
-		<bezel name="label8" element="l8wait">
+		<bezel name="label8" element="l8_hold">
 			<bounds x="0" y="222" width="15" height="16" />
 		</bezel>
-		<bezel name="label9" element="l9">
+		<bezel name="label9" element="l9_lock">
 			<bounds x="0" y="242" width="15" height="16" />
 		</bezel>
-		<bezel name="label10" element="l10">
+		<bezel name="label10" element="l10_comp">
 			<bounds x="0" y="262" width="15" height="16" />
 		</bezel>
-		<bezel name="label11" element="l11">
+		<bezel name="label11" element="l11_wait">
 			<bounds x="0" y="282" width="15" height="16" />
 		</bezel>
 	</view>
