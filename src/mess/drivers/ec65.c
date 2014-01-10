@@ -35,12 +35,21 @@ public:
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 *m_p_chargen;
-	optional_device<via6522_device> m_via_0;
-	optional_device<via6522_device> m_via_1;
+	required_device<via6522_device> m_via_0;
+	required_device<via6522_device> m_via_1;
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_reset();
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
+};
+
+class ec65k_state : public driver_device
+{
+public:
+	ec65k_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+	{
+	}
 };
 
 static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
@@ -217,7 +226,7 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ec65k, ec65_state )
+static MACHINE_CONFIG_START( ec65k, ec65k_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",G65816, XTAL_4MHz) // can use 4,2 or 1 MHz
