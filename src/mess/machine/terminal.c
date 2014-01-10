@@ -501,9 +501,9 @@ WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
 	UINT8 parity = m_io_term_parity->read();
 	UINT8 stopbits = m_io_term_stopbits->read();
 
+	set_data_frame(m_databits[databits], m_stopbits[stopbits], m_parity[parity], false);
 	set_tra_rate(m_baud[baud]);
 	set_rcv_rate(m_baud[baud]);
-	set_data_frame(m_databits[databits], m_stopbits[stopbits], m_parity[parity], false);
 }
 
 void serial_terminal_device::device_reset()
