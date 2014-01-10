@@ -1347,7 +1347,7 @@ WRITE_LINE_MEMBER( c128_state::exp_dma_w )
 
 WRITE_LINE_MEMBER( c128_state::exp_reset_w )
 {
-	if (state == ASSERT_LINE)
+	if (!state)
 	{
 		machine_reset();
 	}
