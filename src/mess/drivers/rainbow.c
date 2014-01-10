@@ -318,10 +318,9 @@ void rainbow_state::machine_start()
 	save_item(NAME(m_kbd_tx_ready));
 	save_item(NAME(m_kbd_rx_ready));
 
+#ifdef FORCE_RAINBOW_100_LOGO
 	UINT8 *rom = memregion("maincpu")->base();
 
-
-#ifdef FORCE_RAINBOW_100_LOGO
 	rom[0xf4174]=0xeb; // jmps  RAINBOW100_LOGO__loc_33D
 	rom[0xf4175]=0x08;
 
