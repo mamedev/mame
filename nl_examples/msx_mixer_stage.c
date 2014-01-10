@@ -50,7 +50,7 @@ NETLIST_START(msx)
     NET_C(R21.1, V5)
     NET_C(R21.2, R23.2)
 
-    NETDEV_QNPN_EB(T2, ss9014)
+    NETDEV_QBJT_EB(T2, "ss9014")
 
     NET_C(R9.1, V12)
     NET_C(R9.2, T2.C)

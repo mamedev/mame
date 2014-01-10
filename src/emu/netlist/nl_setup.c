@@ -207,9 +207,10 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 							{
 								if (m_models[i].ucase().startsWith(search))
 								{
-									int pl=m_models[i].find("(");
-									int pr=m_models[i].find("(");
-									dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i].substr(pl+1,pr-pl-1));
+									//int pl=m_models[i].find("(");
+									//int pr=m_models[i].find(")");
+									//dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i].substr(pl+1,pr-pl-1));
+                                    dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i]);
 									found = true;
 									break;
 								}

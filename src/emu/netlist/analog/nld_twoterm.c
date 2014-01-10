@@ -134,8 +134,8 @@ NETLIB_START(D)
 
 NETLIB_UPDATE_PARAM(D)
 {
-	double Is = m_model.dValue("Is", 1e-15);
-	double n = m_model.dValue("N", 1);
+	double Is = m_model.model_value("Is", 1e-15);
+	double n = m_model.model_value("N", 1);
 
 	m_D.set_param(Is, n);
 }

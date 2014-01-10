@@ -55,7 +55,7 @@
 /* Generic Diode */
 #define NETDEV_D(_name,  _model)                                                    \
 		NET_REGISTER_DEV(D, _name)                                                  \
-		NETDEV_PARAMI(_name, model, # _model)
+		NETDEV_PARAMI(_name, model, _model)
 
 // ----------------------------------------------------------------------------------------
 // Implementation

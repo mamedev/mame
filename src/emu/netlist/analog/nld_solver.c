@@ -6,6 +6,10 @@
 #include "nld_solver.h"
 #include "nld_twoterm.h"
 
+#if HAS_OPENMP
+#include "omp.h"
+#endif
+
 // ----------------------------------------------------------------------------------------
 // netlist_matrix_solver
 // ----------------------------------------------------------------------------------------
@@ -15,13 +19,17 @@
 
 ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &aowner)
 {
+    /* make sure we loop at least once */
+    m_resched = true;
+
 	m_owner = &aowner;
 	for (netlist_net_t::list_t::entry_t *pn = nets.first(); pn != NULL; pn = nets.next(pn))
 	{
 		NL_VERBOSE_OUT(("setting up net\n"));
 
-		m_nets.add(pn->object());
-		pn->object()->m_solver = this;
+	    m_nets.add(pn->object());
+
+	    pn->object()->m_solver = this;
 
 		for (netlist_core_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
 		{
@@ -35,7 +43,6 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 								m_steps.add(&p->netdev());
 							break;
 						case netlist_device_t::BJT_EB:
-						    printf("Found ebers moll\n");
                         case netlist_device_t::DIODE:
 						//case netlist_device_t::VCVS:
 						//case netlist_device_t::BJT_SWITCH:
@@ -86,11 +93,16 @@ ATTR_HOT inline void netlist_matrix_solver_t::update_inputs()
 
 ATTR_HOT inline int netlist_matrix_solver_t::solve_non_dynamic()
 {
-    bool resched;
+    bool resched = false;
 
     int  resched_cnt = 0;
     ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
 
+    /* over-relaxation not really works on these matrices */
+    const double w = 1.0; //2.0 / (1.0 + sin(3.14159 / (m_nets.count()+1)));
+    const double w1 = 1.0 - w;
+
+    //printf("%f %d\n", w, m_nets.count());
     do {
         resched = false;
 
@@ -110,12 +122,11 @@ ATTR_HOT inline int netlist_matrix_solver_t::solve_non_dynamic()
                 gabs += fabs(terms[i]->m_go);
                 iIdr += terms[i]->m_Idr + terms[i]->m_go * terms[i]->m_otherterm->net().Q_Analog();
             }
-
             gabs *= m_convergence_factor;
             if (gabs > gtot)
                 new_val = (net->m_cur.Analog * gabs + iIdr) / (gtot + gabs);
             else
-                new_val = iIdr / gtot;
+                new_val = w1 * net->m_cur.Analog + w * iIdr / gtot;
 
             if (fabs(new_val - net->m_cur.Analog) > m_accuracy)
             {
@@ -129,7 +140,7 @@ ATTR_HOT inline int netlist_matrix_solver_t::solve_non_dynamic()
             //NL_VERBOSE_OUT(("New: %lld %f %f\n", netlist().time().as_raw(), netlist().time().as_double(), new_val));
         }
         resched_cnt++;
-    } while (resched && (resched_cnt < m_resched_loops / 2 ));
+    } while (resched && (resched_cnt < m_resched_loops / 3 ));
 
     return resched_cnt;
 }
@@ -137,11 +148,10 @@ ATTR_HOT inline int netlist_matrix_solver_t::solve_non_dynamic()
 
 ATTR_HOT inline bool netlist_matrix_solver_t::solve()
 {
-	bool resched = false;
-	// FIXME: There may be situations where we *could* need more than one iteration for dynamic elements
-
     int  resched_cnt = 0;
     ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
+
+    m_resched = false;
 
     if (is_dynamic())
     {
@@ -168,14 +178,12 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
         resched_cnt = solve_non_dynamic();
     }
     if (resched_cnt >= m_resched_loops)
-        resched = true;
+        m_resched = true;
 
-    if (!resched)
-        update_inputs();
     //if (resched)
         //printf("Resched on net %s first term %s\n", last_resched_net->name().cstr(), last_resched_net->m_terms[0]->name().cstr());
 
-	return resched;
+	return m_resched;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -198,18 +206,18 @@ ATTR_COLD static bool already_processed(net_groups_t groups, int &cur_group, net
 
 ATTR_COLD static void process_net(net_groups_t groups, int &cur_group, netlist_net_t *net)
 {
-	/* add the net */
 	if (net->m_head == NULL)
 		return;
+    /* add the net */
 	groups[cur_group].add(net);
 	for (netlist_core_terminal_t *p = net->m_head; p != NULL; p = p->m_update_list_next)
 	{
 		if (p->isType(netlist_terminal_t::TERMINAL))
 		{
 			netlist_terminal_t *pt = static_cast<netlist_terminal_t *>(p);
-			netlist_net_t *nnet = &pt->m_otherterm->net();
-			if (!already_processed(groups, cur_group, nnet))
-				process_net(groups, cur_group, nnet);
+			netlist_net_t *other_net = &pt->m_otherterm->net();
+			if (!already_processed(groups, cur_group, other_net))
+				process_net(groups, cur_group, other_net);
 		}
 	}
 }
@@ -230,7 +238,7 @@ NETLIB_START(solver)
     //register_param("ACCURACY", m_accuracy, 1e-3);
 	register_param("ACCURACY", m_accuracy, 1e-6);
 	register_param("CONVERG", m_convergence, 0.3);
-    register_param("RESCHED_LOOPS", m_resched_loops, 15);
+    register_param("RESCHED_LOOPS", m_resched_loops, 35);
 
 	// internal staff
 
@@ -279,10 +287,34 @@ NETLIB_UPDATE(solver)
 		}
 	}
 	bool global_resched = false;
-	for (netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
-	{
-	    global_resched = global_resched || e->object()->solve();
-	}
+	bool this_resched[100];
+
+#if HAS_OPENMP && USE_OPENMP
+    int t_cnt = m_mat_solvers.count();
+    omp_set_num_threads(3);
+    omp_set_dynamic(0);
+    #pragma omp parallel
+    {
+        int i;
+        #pragma omp for nowait
+        for (i = 0; i <  t_cnt; i++)
+        {
+            this_resched[i] = m_mat_solvers[i]->solve();
+        }
+    }
+#else
+    for (int i = 0; i < m_mat_solvers.count(); i++)
+    {
+        this_resched[i] = m_mat_solvers[i]->solve();
+    }
+#endif
+
+    for (int i = 0; i <  m_mat_solvers.count(); i++)
+    {
+        global_resched = global_resched || this_resched[i];
+        if (!this_resched[i])
+            m_mat_solvers[i]->update_inputs();
+    }
 	if (global_resched)
 	{
 		schedule();

@@ -45,8 +45,7 @@ NETLIB_START(Q)
     register_param("model", m_model, "");
 }
 
-template <NETLIB_NAME(Q)::q_type _type>
-NETLIB_START(QBJT_switch<_type>)
+NETLIB_START(QBJT_switch)
 {
     NETLIB_NAME(Q)::start();
 
@@ -77,13 +76,14 @@ NETLIB_UPDATE(Q)
     netlist().solver()->schedule();
 }
 
-template <NETLIB_NAME(Q)::q_type _type>
-NETLIB_UPDATE_PARAM(QBJT_switch<_type>)
+NETLIB_UPDATE_PARAM(QBJT_switch)
 {
-    double IS = m_model.dValue("IS", 1e-15);
-    double BF = m_model.dValue("BF", 100);
-    double NF = m_model.dValue("NF", 1);
+    double IS = m_model.model_value("IS", 1e-15);
+    double BF = m_model.model_value("BF", 100);
+    double NF = m_model.model_value("NF", 1);
     //double VJE = m_model.dValue("VJE", 0.75);
+
+    set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
 
     double alpha = BF / (1.0 + BF);
 
@@ -106,17 +106,11 @@ NETLIB_UPDATE_PARAM(QBJT_switch<_type>)
     m_RC.set(NETLIST_GMIN, 0.0, 0.0);
 }
 
-template NETLIB_START(QBJT_switch<NETLIB_NAME(Q)::BJT_NPN>);
-template NETLIB_START(QBJT_switch<NETLIB_NAME(Q)::BJT_PNP>);
-template NETLIB_UPDATE_PARAM(QBJT_switch<NETLIB_NAME(Q)::BJT_NPN>);
-template NETLIB_UPDATE_PARAM(QBJT_switch<NETLIB_NAME(Q)::BJT_PNP>);
-
 // ----------------------------------------------------------------------------------------
 // nld_Q - Ebers Moll
 // ----------------------------------------------------------------------------------------
 
-template <NETLIB_NAME(Q)::q_type _type>
-NETLIB_START(QBJT_EB<_type>)
+NETLIB_START(QBJT_EB)
 {
     NETLIB_NAME(Q)::start();
 
@@ -145,15 +139,16 @@ NETLIB_START(QBJT_EB<_type>)
 }
 
 
-template <NETLIB_NAME(Q)::q_type _type>
-NETLIB_UPDATE_PARAM(QBJT_EB<_type>)
+NETLIB_UPDATE_PARAM(QBJT_EB)
 {
-    double IS = m_model.dValue("IS", 1e-15);
-    double BF = m_model.dValue("BF", 100);
-    double NF = m_model.dValue("NF", 1);
-    double BR = m_model.dValue("BR", 1);
-    double NR = m_model.dValue("NR", 1);
+    double IS = m_model.model_value("IS", 1e-15);
+    double BF = m_model.model_value("BF", 100);
+    double NF = m_model.model_value("NF", 1);
+    double BR = m_model.model_value("BR", 1);
+    double NR = m_model.model_value("NR", 1);
     //double VJE = m_model.dValue("VJE", 0.75);
+
+    set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
 
     m_alpha_f = BF / (1.0 + BF);
     m_alpha_r = BR / (1.0 + BR);
@@ -162,9 +157,4 @@ NETLIB_UPDATE_PARAM(QBJT_EB<_type>)
     m_gD_BC.set_param(IS / m_alpha_r, NR);
 
 }
-
-template NETLIB_START(QBJT_EB<NETLIB_NAME(Q)::BJT_NPN>);
-template NETLIB_START(QBJT_EB<NETLIB_NAME(Q)::BJT_PNP>);
-template NETLIB_UPDATE_PARAM(QBJT_EB<NETLIB_NAME(Q)::BJT_NPN>);
-template NETLIB_UPDATE_PARAM(QBJT_EB<NETLIB_NAME(Q)::BJT_PNP>);
 

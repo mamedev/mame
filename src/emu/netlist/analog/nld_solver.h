@@ -22,11 +22,15 @@
 
 class NETLIB_NAME(solver);
 
+/* FIXME: these should become proper devices */
+
 class netlist_matrix_solver_t
 {
 public:
 	typedef netlist_list_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
+
+	netlist_matrix_solver_t() : m_resched(false) {}
 
 	ATTR_COLD void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
 
@@ -50,8 +54,9 @@ private:
 	dev_list_t m_dynamic;
 	netlist_core_terminal_t::list_t m_inps;
 	dev_list_t m_steps;
+    bool m_resched;
 
-	NETLIB_NAME(solver) *m_owner;
+    NETLIB_NAME(solver) *m_owner;
 };
 
 NETLIB_DEVICE_WITH_PARAMS(solver,
@@ -89,7 +94,6 @@ public:
 
 ATTR_HOT inline void NETLIB_NAME(solver)::schedule()
 {
-	// FIXME: time should be parameter;
 	if (!m_Q_sync.net().is_queued())
 		m_Q_sync.net().push_to_queue(m_nt_sync_delay);
 }

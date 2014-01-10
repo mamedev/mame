@@ -54,24 +54,6 @@ void netlist_parser::parse(const char *buf)
 			net_c();
 		else if (n == "NETDEV_PARAM")
 			netdev_param();
-		else if (n == "NETDEV_R")
-			netdev_device(n, "R");
-		else if (n == "NETDEV_C")
-			netdev_device(n, "C");
-		else if (n == "NETDEV_POT")
-			netdev_device(n, "R");
-		else if (n == "NETDEV_D")
-			netdev_device(n, "model", true);
-        else if (n == "NETDEV_QNPN")
-            netdev_device(n, "model", true);
-        else if (n == "NETDEV_QPNP")
-            netdev_device(n, "model", true);
-        else if (n == "NETDEV_QNPN_EB")
-            netdev_device(n, "model", true);
-        else if (n == "NETDEV_QPNP_EB")
-            netdev_device(n, "model", true);
-		else if ((n == "NETDEV_TTL_CONST") || (n == "NETDEV_ANALOG_CONST"))
-			netdev_const(n);
 		else if ((n == "NET_MODEL"))
 		    net_model();
 		else if (n == "NETLIST_START")
@@ -143,88 +125,58 @@ void netlist_parser::netdev_param()
 	check_char(')');
 }
 
-void netlist_parser::netdev_const(const pstring &dev_name)
-{
-	pstring name;
-	netlist_device_t *dev;
-	pstring paramfq;
-	double val;
-
-	skipws();
-	name = getname(',');
-	dev = m_setup.factory().new_device_by_name(dev_name, m_setup);
-	m_setup.register_dev(dev, name);
-	skipws();
-	val = eval_param();
-	paramfq = name + ".CONST";
-	NL_VERBOSE_OUT(("Parser: Const: %s %f\n", name.cstr(), val));
-	check_char(')');
-	m_setup.register_param(paramfq, val);
-}
-
 void netlist_parser::netdev_device(const pstring &dev_type)
 {
 	pstring devname;
 	net_device_t_base_factory *f = m_setup.factory().factory_by_name(dev_type, m_setup);
 	netlist_device_t *dev;
 	nl_util::pstring_list termlist = f->term_param_list();
+	pstring def_param = f->def_param();
+
 	int cnt;
 
 	skipws();
 	devname = getname2(',', ')');
 	dev = f->Create();
 	m_setup.register_dev(dev, devname);
-	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
-	cnt = 0;
-	while (getc() != ')')
-	{
 
-        if (cnt >= termlist.count())
-            fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), termlist.count(), cnt);
+	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
+
+	if (def_param != "")
+	{
+        pstring paramfq = devname + "." + def_param;
+	    NL_VERBOSE_OUT(("Defparam: %s\n", def_param.cstr()));
+        check_char(',');
+	    skipws();
+	    if (peekc() == '"')
+	    {
+            pstring val = getstring();
+            m_setup.register_param(paramfq, val);
+	    }
+	    else
+	    {
+	        double val = eval_param();
+	        m_setup.register_param(paramfq, val);
+	    }
+	    if (termlist.count() > 0)
+	        check_char(',');
+	}
+
+	cnt = 0;
+	while (getc() != ')' && cnt < termlist.count())
+	{
 		skipws();
 		pstring output_name = getname2(',', ')');
-#if 0
-		pstring alias = pstring::sprintf("%s.[%d]", devname.cstr(), cnt);
-		NL_VERBOSE_OUT(("Parser: ID: %s %s\n", output_name.cstr(), alias.cstr()));
-		m_setup.register_link(alias, output_name);
-#else
-        m_setup.register_link(devname + "." + termlist[cnt], output_name);
-#endif
+
+		m_setup.register_link(devname + "." + termlist[cnt], output_name);
+
 		skipws();
 		cnt++;
 	}
+    if (cnt != termlist.count())
+        fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), termlist.count(), cnt);
 }
 
-void netlist_parser::netdev_device(const pstring &dev_type, const pstring &default_param, bool isString)
-{
-	netlist_device_t *dev;
-
-	skipws();
-	pstring devname = getname2(',', ')');
-	pstring defparam = devname + "." + default_param;
-	dev = m_setup.factory().new_device_by_name(dev_type, m_setup);
-	m_setup.register_dev(dev, devname);
-	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
-	if (getc() != ')')
-	{
-		// have a default param
-		skipws();
-		if (isString)
-		{
-			pstring val = getname(')');
-			ungetc();
-			NL_VERBOSE_OUT(("Parser: Default param: %s %s\n", defparam.cstr(), val.cstr()));
-			m_setup.register_param(defparam, val);
-		}
-		else
-		{
-			double val = eval_param();
-			NL_VERBOSE_OUT(("Parser: Default param: %s %f\n", defparam.cstr(), val));
-			m_setup.register_param(defparam, val);
-		}
-	}
-	check_char(')');
-}
 
 // ----------------------------------------------------------------------------------------
 // private
@@ -360,12 +312,21 @@ double netlist_parser::eval_param()
 	for (i=1; i<6;i++)
 		if (strncmp(s.cstr(), macs[i], strlen(macs[i])) == 0)
 			f = i;
-	ret = s.substr(strlen(macs[f])).as_double(&e);
-	if ((f>0) && e)
+    if (f>0)
+        check_char(')');
+	s = s.substr(strlen(macs[f]));
+	ret = s.as_double(&e);
+//    if ((f>0) && e)
+	if (e)
 		error("Error with parameter ...\n");
-	if (f>0)
-		check_char(')');
 	return ret * facs[f];
+}
+
+unsigned char netlist_parser::peekc()
+{
+    unsigned char c = getc();
+    ungetc();
+    return c;
 }
 
 unsigned char netlist_parser::getc()

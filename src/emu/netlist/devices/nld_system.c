@@ -37,7 +37,8 @@ NETLIB_UPDATE(analog_const)
 
 NETLIB_UPDATE_PARAM(analog_const)
 {
-	m_Q.initial(m_const.Value());
+	//m_Q.initial(m_const.Value());
+    OUTANALOG(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
 }
 
 // ----------------------------------------------------------------------------------------

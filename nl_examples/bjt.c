@@ -18,7 +18,7 @@ NETLIST_START(bjt)
 
     /* NPN - example */
 
-    NETDEV_QNPN(Q, BC237B)
+    NETDEV_QNPN(Q, "BC237B")
     NETDEV_R(RB, 1000)
     NETDEV_R(RC, 1000)
 
@@ -30,7 +30,7 @@ NETLIST_START(bjt)
 
     /* PNP - example */
 
-    NETDEV_QPNP(Q1, BC556B)
+    NETDEV_QPNP(Q1, "BC556B")
     NETDEV_R(RB1, 1000)
     NETDEV_R(RC1, 1000)
 

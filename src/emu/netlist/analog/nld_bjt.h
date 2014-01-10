@@ -13,21 +13,13 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_QPNP(_name, _model)                                                 \
-        NET_REGISTER_DEV(QPNP_switch, _name)                                       \
-        NETDEV_PARAMI(_name,  model, # _model)
+#define NETDEV_QBJT_SW(_name, _model)                                           \
+        NET_REGISTER_DEV(QBJT_switch, _name)                                    \
+        NETDEV_PARAMI(_name,  model,   _model)
 
-#define NETDEV_QNPN(_name, _model)                                                 \
-        NET_REGISTER_DEV(QNPN_switch, _name)                                       \
-        NETDEV_PARAMI(_name,  model, # _model)
-
-#define NETDEV_QPNP_EB(_name, _model)                                              \
-        NET_REGISTER_DEV(QPNP_EB, _name)                                           \
-        NETDEV_PARAMI(_name,  model, # _model)
-
-#define NETDEV_QNPN_EB(_name, _model)                                              \
-        NET_REGISTER_DEV(QNPN_switch, _name)                                       \
-        NETDEV_PARAMI(_name,  model, # _model)
+#define NETDEV_QBJT_EB(_name, _model)                                           \
+        NET_REGISTER_DEV(QBJT_EB, _name)                                        \
+        NETDEV_PARAMI(_name,  model,   _model)
 
 
 // ----------------------------------------------------------------------------------------
@@ -44,12 +36,13 @@ public:
         BJT_PNP
     };
 
-    ATTR_COLD NETLIB_NAME(Q)(const q_type atype, const family_t afamily)
+    ATTR_COLD NETLIB_NAME(Q)(const family_t afamily)
     : netlist_device_t(afamily)
-    , m_qtype(atype) { }
+    , m_qtype(BJT_NPN) { }
 
     inline q_type qtype() const { return m_qtype; }
     inline bool is_qtype(q_type atype) const { return m_qtype == atype; }
+    inline void set_qtype(q_type atype) { m_qtype = atype; }
 protected:
     ATTR_COLD virtual void start();
     ATTR_HOT ATTR_ALIGN void update();
@@ -63,8 +56,8 @@ class NETLIB_NAME(QBJT) : public NETLIB_NAME(Q)
 {
 public:
 
-    ATTR_COLD NETLIB_NAME(QBJT)(const q_type atype, const family_t afamily)
-    : NETLIB_NAME(Q)(atype, afamily) { }
+    ATTR_COLD NETLIB_NAME(QBJT)(const family_t afamily)
+    : NETLIB_NAME(Q)(afamily) { }
 
 protected:
 
@@ -92,18 +85,17 @@ private:
  *                     E
  */
 
-template <NETLIB_NAME(Q)::q_type _type>
 class NETLIB_NAME(QBJT_switch) : public NETLIB_NAME(QBJT)
 {
 public:
     ATTR_COLD NETLIB_NAME(QBJT_switch)()
-    : NETLIB_NAME(QBJT)(_type, BJT_SWITCH), m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0), m_state_on(0) { }
+    : NETLIB_NAME(QBJT)(BJT_SWITCH), m_gB(NETLIST_GMIN), m_gC(NETLIST_GMIN), m_V(0.0), m_state_on(0) { }
 
     NETLIB_UPDATEI()
     {
         double vE = INPANALOG(m_EV);
         double vB = INPANALOG(m_BV);
-        double m = (_type == BJT_NPN) ? 1 : -1;
+        double m = (is_qtype( BJT_NPN) ? 1 : -1);
 
         int new_state = ((vB - vE) * m > m_V ) ? 1 : 0;
         if (m_state_on ^ new_state)
@@ -146,22 +138,15 @@ protected:
 private:
 };
 
-typedef NETLIB_NAME(QBJT_switch)<NETLIB_NAME(Q)::BJT_PNP> NETLIB_NAME(QPNP_switch);
-typedef NETLIB_NAME(QBJT_switch)<NETLIB_NAME(Q)::BJT_NPN> NETLIB_NAME(QNPN_switch);
-
 // ----------------------------------------------------------------------------------------
 // nld_QBJT_EB
 // ----------------------------------------------------------------------------------------
 
-
-
-
-template <NETLIB_NAME(Q)::q_type _type>
 class NETLIB_NAME(QBJT_EB) : public NETLIB_NAME(QBJT)
 {
 public:
     ATTR_COLD NETLIB_NAME(QBJT_EB)()
-    : NETLIB_NAME(QBJT)(_type, BJT_EB),
+    : NETLIB_NAME(QBJT)(BJT_EB),
       m_D_BC(netlist_object_t::ANALOG),
       m_D_BE(netlist_object_t::ANALOG),
       m_I_BC(netlist_object_t::ANALOG),
@@ -199,9 +184,5 @@ protected:
 
 private:
 };
-
-typedef NETLIB_NAME(QBJT_EB)<NETLIB_NAME(Q)::BJT_PNP> NETLIB_NAME(QPNP_EB);
-typedef NETLIB_NAME(QBJT_EB)<NETLIB_NAME(Q)::BJT_NPN> NETLIB_NAME(QNPN_EB);
-
 
 #endif /* NLD_BJT_H_ */

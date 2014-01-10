@@ -822,7 +822,8 @@ public:
 	ATTR_HOT inline const pstring &Value() const     { return m_param;     }
 
 	/* these should be cached! */
-	ATTR_COLD double dValue(const pstring &entity, const double defval = 0.0) const;
+	ATTR_COLD double model_value(const pstring &entity, const double defval = 0.0) const;
+    ATTR_COLD const pstring model_type() const;
 
 private:
 	pstring m_param;
@@ -1285,6 +1286,14 @@ public:
             return nl_util::split(m_def_param.substr(1), ",");
         else
             return nl_util::pstring_list();
+    }
+
+    ATTR_COLD const pstring def_param()
+    {
+        if (m_def_param.startsWith("+") || m_def_param.equals("-"))
+            return "";
+        else
+            return m_def_param;
     }
 
 protected:

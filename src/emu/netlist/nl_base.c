@@ -629,14 +629,16 @@ ATTR_COLD netlist_ttl_output_t::netlist_ttl_output_t()
 ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
 	: netlist_output_t(OUTPUT, ANALOG)
 {
-	net().m_cur.Analog = 0.0;
-	net().m_new.Analog = 99.0;
+    net().m_last.Analog = 0.97;
+	net().m_cur.Analog = 0.98;
+	net().m_new.Analog = 0.99;
 }
 
 ATTR_COLD void netlist_analog_output_t::initial(const double val)
 {
-	net().m_cur.Analog = val;
-	net().m_new.Analog = 99.0;
+    net().m_cur.Analog = val * 0.98;
+	net().m_cur.Analog = val * 0.99;
+	net().m_new.Analog = val * 1.0;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -678,7 +680,20 @@ ATTR_COLD netlist_param_model_t::netlist_param_model_t()
 {
 }
 
-ATTR_COLD double netlist_param_model_t::dValue(const pstring &entity, const double defval) const
+ATTR_COLD const pstring netlist_param_model_t::model_type() const
+{
+    pstring tmp = this->Value();
+    // .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
+    int p = tmp.find("(");
+    int p1 = p;
+    while (--p >= 0 && tmp[p] != ' ')
+        ;
+
+    return tmp.substr(p+1, p1-p-1).ucase();
+}
+
+
+ATTR_COLD double netlist_param_model_t::model_value(const pstring &entity, const double defval) const
 {
 	pstring tmp = this->Value();
 	// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
