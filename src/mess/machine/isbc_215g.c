@@ -11,6 +11,8 @@ isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *ta
 	m_dmac(*this, "u84"),
 	m_hdd0(*this, "drive0"),
 	m_hdd1(*this, "drive1"),
+	m_sbx1(*this, "sbx1"),
+	m_sbx2(*this, "sbx2"),
 	m_out_irq_func(*this)
 {
 }
@@ -84,6 +86,9 @@ READ16_MEMBER(isbc_215g_device::io_r)
 			// e: drive req
 			// f: index latch
 			data |= (!m_idfound) << 6;
+			data |= (m_sbx1->get_card_device() ? 0 : 1) << 8;
+			data |= m_isbx_irq[0] << 9;
+			data |= m_isbx_irq[1] << 10;
 			data |= m_index << 15;
 			break;
 		case 0x04:
@@ -96,6 +101,9 @@ READ16_MEMBER(isbc_215g_device::io_r)
 			// 5: vendor bit 0
 			// 6: track 0/busy
 			// 7: wp
+			data |= m_sbx2->get_card_device() ? 0 : 1;
+			data |= m_isbx_irq[2] << 1;
+			data |= m_isbx_irq[3] << 2;
 			data |= (!m_cyl[m_drive]) ? 0 : 0x40;
 			break;
 		case 0x08:
@@ -177,7 +185,7 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 		case 0x0c:
 			//unit select
 			// 0: step/wr
-			// 1: sbx 1 opt 0/1
+			// 1: sbx 1 opt 0/1 (sbx2?)
 			// 2: sbx 2 opt 0/1
 			// 3: unit select 0
 			// 4: unit select 1
@@ -185,6 +193,11 @@ WRITE16_MEMBER(isbc_215g_device::io_w)
 			// 6: format
 			// 7: format wr gate
 			m_drive = (data >> 3) & 1; // st406 two drives only
+			if(((data >> 1) & 1) != m_fdctc)
+			{
+				m_fdctc = !m_fdctc;
+				m_sbx2->opt0_w(m_fdctc);
+			}
 			break;
 		case 0x10:
 			//pit ch 0
@@ -255,6 +268,26 @@ static ADDRESS_MAP_START(isbc_215g_io, AS_IO, 16, isbc_215g_device)
 	AM_RANGE(0xc0e0, 0xc0ef) AM_DEVREADWRITE8("sbx2", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
 ADDRESS_MAP_END
 
+WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_00_w)
+{
+	m_isbx_irq[0] = state ? true : false;
+}
+
+WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_01_w)
+{
+	m_isbx_irq[1] = state ? true : false;
+}
+
+WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_10_w)
+{
+	m_isbx_irq[2] = state ? true : false;
+}
+
+WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_11_w)
+{
+	m_isbx_irq[3] = state ? true : false;
+}
+
 static MACHINE_CONFIG_FRAGMENT( isbc_215g )
 	MCFG_CPU_ADD("u84", I8089, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(isbc_215g_mem)
@@ -265,7 +298,11 @@ static MACHINE_CONFIG_FRAGMENT( isbc_215g )
 	MCFG_HARDDISK_ADD("drive1")
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, NULL)
-	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, NULL)
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_00_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_01_w))
+	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, "fdc_218a")
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_10_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(isbc_215g_device, isbx_irq_11_w))
 MACHINE_CONFIG_END
 
 machine_config_constructor isbc_215g_device::device_mconfig_additions() const
@@ -294,6 +331,10 @@ void isbc_215g_device::device_reset()
 		m_geom[1] = hard_disk_get_info(m_hdd1->get_hard_disk_file());
 	else
 		m_geom[1] = 0;
+
+	m_reset = false;
+	m_fdctc = false;
+	m_isbx_irq[0] = m_isbx_irq[1] = m_isbx_irq[2] = m_isbx_irq[3] = false;
 }
 
 void isbc_215g_device::device_start()
@@ -306,7 +347,9 @@ void isbc_215g_device::device_start()
 	m_drive = 0;
 	m_head = 0;
 	m_stepdir = false;
+
 	m_out_irq_func.resolve_safe();
+
 }
 
 WRITE8_MEMBER(isbc_215g_device::write)

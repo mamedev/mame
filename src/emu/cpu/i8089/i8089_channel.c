@@ -698,7 +698,7 @@ void i8089_channel::attention()
 
 		lpd(PP, CP, m_r[CP].w + 2);
 		movp_pm(TP, PP, m_r[PP].w);
-		movbi_mi(CP, (INT8) 0xff, 1);
+		movbi_mi(CP, (INT8) 0xff, m_r[CP].w + 1);
 		m_r[TP].t = 1;
 
 		m_r[PSW].w |= 1 << 2;

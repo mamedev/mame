@@ -106,7 +106,8 @@ void isbc_218a_device::device_start()
 
 void isbc_218a_device::device_reset()
 {
-	m_fdc->reset();
+	m_reset = false;
+	m_motor = false;
 }
 
 
@@ -151,7 +152,7 @@ UINT8 isbc_218a_device::mcs1_r(address_space &space, offs_t offset)
 
 	switch (offset)
 	{
-	case 4: data = m_reset; break;
+	case 4: data = m_motor; break;
 	}
 
 	return data;
@@ -166,11 +167,14 @@ void isbc_218a_device::mcs1_w(address_space &space, offs_t offset, UINT8 data)
 {
 	switch (offset)
 	{
-	case 2: m_floppy0->get_device()->mon_w(data & 1); break;
-	case 4:
-		if(!(data & 1) && m_reset)
+	case 2:
+		if((data & 1) && m_reset)
 			m_fdc->soft_reset();
-		m_reset = (data & 1) ? true : false;
+		m_reset = (data & 1) ? false : true;
+		break;
+	case 4:
+		m_motor = data & 1;
+		m_floppy0->get_device()->mon_w(!(data & 1));
 		break;
 	case 6: m_fdc->tc_w(data & 1); break;
 	}

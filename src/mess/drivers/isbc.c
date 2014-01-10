@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( isbc286, isbc_state )
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("uart8274", z80dart_device, dcda_w))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("uart8274", z80dart_device, ctsa_w))
 
-	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, "fdc_218a")
+	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, NULL)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir3_w))
 	MCFG_ISBX_SLOT_MINTR1_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir4_w))
 	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, NULL)

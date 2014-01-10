@@ -22,6 +22,11 @@ public:
 	DECLARE_READ16_MEMBER(mem_r);
 	DECLARE_WRITE16_MEMBER(mem_w);
 
+	DECLARE_WRITE_LINE_MEMBER(isbx_irq_00_w);
+	DECLARE_WRITE_LINE_MEMBER(isbx_irq_01_w);
+	DECLARE_WRITE_LINE_MEMBER(isbx_irq_10_w);
+	DECLARE_WRITE_LINE_MEMBER(isbx_irq_11_w);
+
 	static void static_set_wakeup_addr(device_t &device, UINT32 wakeup) { downcast<isbc_215g_device &>(device).m_wakeup = wakeup; }
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_215g_device &>(device).m_maincpu_tag = maincpu_tag; }
 	template<class _Object> static devcb2_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<isbc_215g_device &>(device).m_out_irq_func.set_callback(object); }
@@ -37,6 +42,9 @@ private:
 	required_device<i8089_device> m_dmac;
 	required_device<harddisk_image_device> m_hdd0;
 	required_device<harddisk_image_device> m_hdd1;
+	required_device<isbx_slot_device> m_sbx1;
+	required_device<isbx_slot_device> m_sbx2;
+
 	devcb2_write_line m_out_irq_func;
 
 	int m_reset;
@@ -46,6 +54,8 @@ private:
 	UINT16 m_cyl[2];
 	UINT8 m_idcompare[4], m_drive, m_head;
 	bool m_idfound, m_index, m_stepdir, m_wrgate, m_rdgate, m_amsrch;
+
+	bool m_isbx_irq[4], m_fdctc;
 
 	const struct hard_disk_info* m_geom[2];
 };
