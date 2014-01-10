@@ -60,7 +60,11 @@ typedef UINT8 netlist_sig_t;
 //  General Macros
 //============================================================
 
+#if defined(_OPENMP)
 #define HAS_OPENMP ( _OPENMP >= 200805 )
+#else
+#define HAS_OPENMP (0)
+#endif
 
 // prevent implicit copying
 #define NETLIST_PREVENT_COPYING(_name)          \
