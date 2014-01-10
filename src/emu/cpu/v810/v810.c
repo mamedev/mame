@@ -34,113 +34,110 @@
 #define clkIF 3
 #define clkMEM 3
 
-struct v810_state
-{
-	UINT32 reg[65];
-	UINT8 irq_line;
-	UINT8 irq_state;
-	UINT8 nmi_line;
-	device_irq_acknowledge_callback irq_callback;
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	address_space *io;
-	UINT32 PPC;
-	int icount;
-};
 
-INLINE v810_state *get_safe_token(device_t *device)
+const device_type V810 = &device_creator<v810_device>;
+
+
+v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, V810, "V810", tag, owner, clock, "v810", __FILE__)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
 {
-	assert(device != NULL);
-	assert(device->type() == V810);
-	return (v810_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-#define R0 reg[0]
-#define R1 reg[1]
-#define R2 reg[2]
-#define SP reg[3]
-#define R4 reg[4]
-#define R5 reg[5]
-#define R6 reg[6]
-#define R7 reg[7]
-#define R8 reg[8]
-#define R9 reg[9]
-#define R10 reg[10]
-#define R11 reg[11]
-#define R12 reg[12]
-#define R13 reg[13]
-#define R14 reg[14]
-#define R15 reg[15]
-#define R16 reg[16]
-#define R17 reg[17]
-#define R18 reg[18]
-#define R19 reg[19]
-#define R20 reg[20]
-#define R21 reg[21]
-#define R22 reg[22]
-#define R23 reg[23]
-#define R24 reg[24]
-#define R25 reg[25]
-#define R26 reg[26]
-#define R27 reg[27]
-#define R28 reg[28]
-#define R29 reg[29]
-#define R30 reg[30]
-#define R31 reg[31]
 
-#define EIPC    reg[32]
-#define EIPSW   reg[33]
-#define FEPC    reg[34]
-#define FEPSW   reg[35]
-#define ECR     reg[36]
-#define PSW     reg[37]
-#define PIR     reg[38]
-#define TKCW    reg[39]
-#define CHCW    reg[56]
-#define ADTRE   reg[57]
+offs_t v810_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( v810 );
+	return CPU_DISASSEMBLE_NAME(v810)(this, buffer, pc, oprom, opram, options);
+}
 
-#define PC      reg[64]
+
+#define R0 m_reg[0]
+#define R1 m_reg[1]
+#define R2 m_reg[2]
+#define SP m_reg[3]
+#define R4 m_reg[4]
+#define R5 m_reg[5]
+#define R6 m_reg[6]
+#define R7 m_reg[7]
+#define R8 m_reg[8]
+#define R9 m_reg[9]
+#define R10 m_reg[10]
+#define R11 m_reg[11]
+#define R12 m_reg[12]
+#define R13 m_reg[13]
+#define R14 m_reg[14]
+#define R15 m_reg[15]
+#define R16 m_reg[16]
+#define R17 m_reg[17]
+#define R18 m_reg[18]
+#define R19 m_reg[19]
+#define R20 m_reg[20]
+#define R21 m_reg[21]
+#define R22 m_reg[22]
+#define R23 m_reg[23]
+#define R24 m_reg[24]
+#define R25 m_reg[25]
+#define R26 m_reg[26]
+#define R27 m_reg[27]
+#define R28 m_reg[28]
+#define R29 m_reg[29]
+#define R30 m_reg[30]
+#define R31 m_reg[31]
+
+#define EIPC    m_reg[32]
+#define EIPSW   m_reg[33]
+#define FEPC    m_reg[34]
+#define FEPSW   m_reg[35]
+#define ECR     m_reg[36]
+#define PSW     m_reg[37]
+#define PIR     m_reg[38]
+#define TKCW    m_reg[39]
+#define CHCW    m_reg[56]
+#define ADTRE   m_reg[57]
+
+#define PC      m_reg[64]
 
 /* Flags */
-#define GET_Z                   ( cpustate->PSW & 0x00000001)
-#define GET_S                   ((cpustate->PSW & 0x00000002)>>1)
-#define GET_OV                  ((cpustate->PSW & 0x00000004)>>2)
-#define GET_CY                  ((cpustate->PSW & 0x00000008)>>3)
-#define GET_ID                  ((cpustate->PSW & 0x00001000)>>12)
-#define GET_AE                  ((cpustate->PSW & 0x00002000)>>13)
-#define GET_EP                  ((cpustate->PSW & 0x00004000)>>14)
-#define GET_NP                  ((cpustate->PSW & 0x00008000)>>15)
+#define GET_Z                   ( PSW & 0x00000001)
+#define GET_S                   ((PSW & 0x00000002)>>1)
+#define GET_OV                  ((PSW & 0x00000004)>>2)
+#define GET_CY                  ((PSW & 0x00000008)>>3)
+#define GET_ID                  ((PSW & 0x00001000)>>12)
+#define GET_AE                  ((PSW & 0x00002000)>>13)
+#define GET_EP                  ((PSW & 0x00004000)>>14)
+#define GET_NP                  ((PSW & 0x00008000)>>15)
 
-#define SET_Z(val)              (cpustate->PSW = (cpustate->PSW & ~0x00000001) | (val))
-#define SET_S(val)              (cpustate->PSW = (cpustate->PSW & ~0x00000002) | ((val) << 1))
-#define SET_OV(val)             (cpustate->PSW = (cpustate->PSW & ~0x00000004) | ((val) << 2))
-#define SET_CY(val)             (cpustate->PSW = (cpustate->PSW & ~0x00000008) | ((val) << 3))
-#define SET_ID(val)             (cpustate->PSW = (cpustate->PSW & ~0x00001000) | ((val) << 12))
-#define SET_AE(val)             (cpustate->PSW = (cpustate->PSW & ~0x00002000) | ((val) << 13))
-#define SET_EP(val)             (cpustate->PSW = (cpustate->PSW & ~0x00004000) | ((val) << 14))
-#define SET_NP(val)             (cpustate->PSW = (cpustate->PSW & ~0x00008000) | ((val) << 15))
+#define SET_Z(val)              (PSW = (PSW & ~0x00000001) | (val))
+#define SET_S(val)              (PSW = (PSW & ~0x00000002) | ((val) << 1))
+#define SET_OV(val)             (PSW = (PSW & ~0x00000004) | ((val) << 2))
+#define SET_CY(val)             (PSW = (PSW & ~0x00000008) | ((val) << 3))
+#define SET_ID(val)             (PSW = (PSW & ~0x00001000) | ((val) << 12))
+#define SET_AE(val)             (PSW = (PSW & ~0x00002000) | ((val) << 13))
+#define SET_EP(val)             (PSW = (PSW & ~0x00004000) | ((val) << 14))
+#define SET_NP(val)             (PSW = (PSW & ~0x00008000) | ((val) << 15))
 
-#define R_B(cs, addr) ((cs)->program->read_byte(addr))
-#define R_H(cs, addr) ((cs)->program->read_word(addr))
-#define R_W(cs, addr) ((cs)->program->read_dword(addr))
-
-
-#define W_B(cs, addr, val) ((cs)->program->write_byte(addr,val))
-#define W_H(cs, addr, val) ((cs)->program->write_word(addr,val))
-#define W_W(cs, addr, val) ((cs)->program->write_dword(addr,val))
+#define R_B(addr) (m_program->read_byte(addr))
+#define R_H(addr) (m_program->read_word(addr))
+#define R_W(addr) (m_program->read_dword(addr))
 
 
-#define RIO_B(cs, addr) ((cs)->io->read_byte(addr))
-#define RIO_H(cs, addr) ((cs)->io->read_word(addr))
-#define RIO_W(cs, addr) ((cs)->io->read_dword(addr))
+#define W_B(addr, val) (m_program->write_byte(addr,val))
+#define W_H(addr, val) (m_program->write_word(addr,val))
+#define W_W(addr, val) (m_program->write_dword(addr,val))
 
 
-#define WIO_B(cs, addr, val) ((cs)->io->write_byte(addr,val))
-#define WIO_H(cs, addr, val) ((cs)->io->write_word(addr,val))
-#define WIO_W(cs, addr, val) ((cs)->io->write_dword(addr,val))
+#define RIO_B(addr) (m_io->read_byte(addr))
+#define RIO_H(addr) (m_io->read_word(addr))
+#define RIO_W(addr) (m_io->read_dword(addr))
 
-#define R_OP(cs, addr)  ((cs)->direct->read_decrypted_word(addr))
+
+#define WIO_B(addr, val) (m_io->write_byte(addr,val))
+#define WIO_H(addr, val) (m_io->write_word(addr,val))
+#define WIO_W(addr, val) (m_io->write_dword(addr,val))
+
+#define R_OP(addr)  (m_direct->read_decrypted_word(addr))
 
 #define GET1 (op&0x1f)
 #define GET2 ((op>>5)&0x1f)
@@ -153,10 +150,10 @@ INLINE v810_state *get_safe_token(device_t *device)
 #define D9(x) ((x&0x1ff)|((x&0x100)?0xfffffe00:0))
 #define SO(opcode) (((opcode)&0xfc00)>>10)
 
-#define CHECK_CY(x) cpustate->PSW=(cpustate->PSW & ~8)|(((x) & (((UINT64)1) << 32)) ? 8 : 0)
-#define CHECK_OVADD(x,y,z)  cpustate->PSW=(cpustate->PSW & ~0x00000004) |(( ((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 4: 0)
-#define CHECK_OVSUB(x,y,z)  cpustate->PSW=(cpustate->PSW & ~0x00000004) |(( ((y) ^ (z)) & ((x) ^ (y)) & 0x80000000) ? 4: 0)
-#define CHECK_ZS(x) cpustate->PSW=(cpustate->PSW & ~3)|((UINT32)(x)==0)|(((x)&0x80000000) ? 2: 0)
+#define CHECK_CY(x) PSW=(PSW & ~8)|(((x) & (((UINT64)1) << 32)) ? 8 : 0)
+#define CHECK_OVADD(x,y,z)  PSW=(PSW & ~0x00000004) |(( ((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 4: 0)
+#define CHECK_OVSUB(x,y,z)  PSW=(PSW & ~0x00000004) |(( ((y) ^ (z)) & ((x) ^ (y)) & 0x80000000) ? 4: 0)
+#define CHECK_ZS(x) PSW=(PSW & ~3)|((UINT32)(x)==0)|(((x)&0x80000000) ? 2: 0)
 
 
 #define ADD(dst, src)       { UINT64 res=(UINT64)(dst)+(UINT64)(src); SetCF(res); SetOF_Add(res,src,dst); SetSZPF(res); dst=(UINT32)res; }
@@ -165,115 +162,115 @@ INLINE v810_state *get_safe_token(device_t *device)
 
 
 
-static void SETREG(v810_state *cpustate,UINT32 reg,UINT32 val)
+void v810_device::SETREG(UINT32 reg,UINT32 val)
 {
 	if(reg)
-		cpustate->reg[reg]=val;
+		m_reg[reg]=val;
 }
 
-static UINT32 GETREG(v810_state *cpustate,UINT32 reg)
+UINT32 v810_device::GETREG(UINT32 reg)
 {
 	if(reg)
-		return cpustate->reg[reg];
+		return m_reg[reg];
 	else
 		return 0;
 }
 
-static UINT32 opUNDEF(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opUNDEF(UINT32 op)
 {
-	logerror("V810: Unknown opcode %x @ %x",op,cpustate->PC-2);
+	logerror("V810: Unknown opcode %x @ %x",op,PC-2);
 	return clkIF;
 }
 
-static UINT32 opMOVr(v810_state *cpustate,UINT32 op) // mov reg1, reg2
+UINT32 v810_device::opMOVr(UINT32 op) // mov reg1, reg2
 {
-	SETREG(cpustate,GET2,GETREG(cpustate,GET1));
+	SETREG(GET2,GETREG(GET1));
 	return clkIF;
 }
 
-static UINT32 opMOVEA(v810_state *cpustate,UINT32 op)   // movea imm16, reg1, reg2
+UINT32 v810_device::opMOVEA(UINT32 op)   // movea imm16, reg1, reg2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=R_OP(PC);
+	PC+=2;
 	op2=I16(op2);
-	SETREG(cpustate,GET2,op1+op2);
+	SETREG(GET2,op1+op2);
 	return clkIF;
 }
 
-static UINT32 opMOVHI(v810_state *cpustate,UINT32 op)   // movhi imm16, reg1 ,reg2
+UINT32 v810_device::opMOVHI(UINT32 op)   // movhi imm16, reg1 ,reg2
 {
-	UINT32 op2=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 op2=R_OP(PC);
+	PC+=2;
 	op2=UI16(op2);
 	op2<<=16;
-	SETREG(cpustate,GET2,GETREG(cpustate,GET1)+op2);
+	SETREG(GET2,GETREG(GET1)+op2);
 	return clkIF;
 }
 
-static UINT32 opMOVi(v810_state *cpustate,UINT32 op)    // mov imm5,r2
+UINT32 v810_device::opMOVi(UINT32 op)    // mov imm5,r2
 {
-	SETREG(cpustate,GET2,I5(op));
+	SETREG(GET2,I5(op));
 	return clkIF;
 }
 
-static UINT32 opADDr(v810_state *cpustate,UINT32 op)    // add r1,r2
+UINT32 v810_device::opADDr(UINT32 op)    // add r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	UINT64 res=(UINT64)op2+(UINT64)op1;
 	CHECK_CY(res);
 	CHECK_OVADD(op1,op2,res);
 	CHECK_ZS(res);
-	SETREG(cpustate,GET2,res);
+	SETREG(GET2,res);
 	return clkIF;
 }
 
-static UINT32 opADDi(v810_state *cpustate,UINT32 op)    // add imm5,r2
+UINT32 v810_device::opADDi(UINT32 op)    // add imm5,r2
 {
 	UINT32 op1=I5(op);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op2=GETREG(GET2);
 	UINT64 res=(UINT64)op2+(UINT64)op1;
 	CHECK_CY(res);
 	CHECK_OVADD(op1,op2,res);
 	CHECK_ZS(res);
-	SETREG(cpustate,GET2,res);
+	SETREG(GET2,res);
 	return clkIF;
 }
 
 
-static UINT32 opADDI(v810_state *cpustate,UINT32 op)    // addi imm16, reg1, reg2
+UINT32 v810_device::opADDI(UINT32 op)    // addi imm16, reg1, reg2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=R_OP(cpustate,cpustate->PC);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=R_OP(PC);
 	UINT64 res;
-	cpustate->PC+=2;
+	PC+=2;
 	op2=I16(op2);
 	res=(UINT64)op2+(UINT64)op1;
 	CHECK_CY(res);
 	CHECK_OVADD(op1,op2,res);
 	CHECK_ZS(res);
-	SETREG(cpustate,GET2,res);
+	SETREG(GET2,res);
 	return clkIF;
 }
 
-static UINT32 opSUBr(v810_state *cpustate,UINT32 op)    // sub r1,r2
+UINT32 v810_device::opSUBr(UINT32 op)    // sub r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	UINT64 res=(UINT64)op2-(UINT64)op1;
 	CHECK_CY(res);
 	CHECK_OVSUB(op1,op2,res);
 	CHECK_ZS(res);
-	SETREG(cpustate,GET2,res);
+	SETREG(GET2,res);
 	return clkIF;
 }
 
 
-static UINT32 opCMPr(v810_state *cpustate,UINT32 op)    // cmp r1,r2
+UINT32 v810_device::opCMPr(UINT32 op)    // cmp r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	UINT64 res=(UINT64)op2-(UINT64)op1;
 	CHECK_CY(res);
 	CHECK_OVSUB(op1,op2,res);
@@ -281,10 +278,10 @@ static UINT32 opCMPr(v810_state *cpustate,UINT32 op)    // cmp r1,r2
 	return clkIF;
 }
 
-static UINT32 opCMPi(v810_state *cpustate,UINT32 op)    // cmpi imm5,r2
+UINT32 v810_device::opCMPi(UINT32 op)    // cmpi imm5,r2
 {
 	UINT32 op1=I5(op);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op2=GETREG(GET2);
 	UINT64 res=(UINT64)op2-(UINT64)op1;
 	CHECK_CY(res);
 	CHECK_OVSUB(op1,op2,res);
@@ -292,7 +289,7 @@ static UINT32 opCMPi(v810_state *cpustate,UINT32 op)    // cmpi imm5,r2
 	return clkIF;
 }
 
-static UINT32 opSETFi(v810_state *cpustate,UINT32 op)   // setf imm5,r2
+UINT32 v810_device::opSETFi(UINT32 op)   // setf imm5,r2
 {
 	UINT32 op1=I5(op);
 	UINT8 res=0;
@@ -363,116 +360,116 @@ static UINT32 opSETFi(v810_state *cpustate,UINT32 op)   // setf imm5,r2
 			res=!(GET_Z||(GET_OV^GET_S));
 			break;
 	}
-	SETREG(cpustate,GET2,res);
+	SETREG(GET2,res);
 	return clkIF;
 }
 
 
-static UINT32 opANDr(v810_state *cpustate,UINT32 op)    // and r1,r2
+UINT32 v810_device::opANDr(UINT32 op)    // and r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	op2&=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
-	SETREG(cpustate,GET2,op2);
+	SETREG(GET2,op2);
 	return clkIF;
 }
 
-static UINT32 opANDI(v810_state *cpustate,UINT32 op)    // andi imm16,r1,r2
+UINT32 v810_device::opANDI(UINT32 op)    // andi imm16,r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=R_OP(PC);
+	PC+=2;
 	op2=UI16(op2);
 	op2&=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
 	SET_S(0);
-	SETREG(cpustate,GET2,op2);
+	SETREG(GET2,op2);
 	return clkIF;
 }
 
-static UINT32 opORr(v810_state *cpustate,UINT32 op) // or r1,r2
+UINT32 v810_device::opORr(UINT32 op) // or r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	op2|=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
-	SETREG(cpustate,GET2,op2);
+	SETREG(GET2,op2);
 	return clkIF;
 }
 
-static UINT32 opORI(v810_state *cpustate,UINT32 op) // ori imm16,r1,r2
+UINT32 v810_device::opORI(UINT32 op) // ori imm16,r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=R_OP(PC);
+	PC+=2;
 	op2=UI16(op2);
 	op2|=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
 	SET_S(0);
-	SETREG(cpustate,GET2,op2);
+	SETREG(GET2,op2);
 	return clkIF;
 }
 
-static UINT32 opXORr(v810_state *cpustate,UINT32 op)    // xor r1,r2
+UINT32 v810_device::opXORr(UINT32 op)    // xor r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	op2^=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
-	SETREG(cpustate,GET2,op2);
+	SETREG(GET2,op2);
 	return clkIF;
 }
 
 
-static UINT32 opLDSR(v810_state *cpustate,UINT32 op) // ldsr reg2,regID
+UINT32 v810_device::opLDSR(UINT32 op) // ldsr reg2,regID
 {
 	UINT32 op1=UI5(op);
-	SETREG(cpustate,32+op1,GETREG(cpustate,GET2));
+	SETREG(32+op1,GETREG(GET2));
 	return clkIF;
 }
 
-static UINT32 opSTSR(v810_state *cpustate,UINT32 op) // ldsr regID,reg2
+UINT32 v810_device::opSTSR(UINT32 op) // ldsr regID,reg2
 {
 	UINT32 op1=UI5(op);
-	SETREG(cpustate,GET2,GETREG(cpustate,32+op1));
+	SETREG(GET2,GETREG(32+op1));
 	return clkIF;
 }
 
 
-static UINT32 opXORI(v810_state *cpustate,UINT32 op)    // xori imm16,r1,r2
+UINT32 v810_device::opXORI(UINT32 op)    // xori imm16,r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=R_OP(PC);
+	PC+=2;
 	op2=UI16(op2);
 	op2^=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
 	SET_S(0);
-	SETREG(cpustate,GET2,op2);
+	SETREG(GET2,op2);
 	return clkIF;
 }
 
-static UINT32 opNOTr(v810_state *cpustate,UINT32 op)    // not r1,r2
+UINT32 v810_device::opNOTr(UINT32 op)    // not r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
+	UINT32 op1=GETREG(GET1);
 	UINT32 op2=~op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
-	SETREG(cpustate,GET2,op2);
+	SETREG(GET2,op2);
 	return clkIF;
 }
 
-static UINT32 opSHLr(v810_state *cpustate,UINT32 op)    // shl r1,r2
+UINT32 v810_device::opSHLr(UINT32 op)    // shl r1,r2
 {
 	UINT64 tmp;
-	UINT32 count=GETREG(cpustate,GET1);
+	UINT32 count=GETREG(GET1);
 	count&=0x1f;
 
 	SET_OV(0);
@@ -480,16 +477,16 @@ static UINT32 opSHLr(v810_state *cpustate,UINT32 op)    // shl r1,r2
 
 	if(count)
 	{
-		tmp=GETREG(cpustate,GET2);
+		tmp=GETREG(GET2);
 		tmp<<=count;
 		CHECK_CY(tmp);
-		SETREG(cpustate,GET2,tmp&0xffffffff);
-		CHECK_ZS(GETREG(cpustate,GET2));
+		SETREG(GET2,tmp&0xffffffff);
+		CHECK_ZS(GETREG(GET2));
 	}
 	return clkIF;
 }
 
-static UINT32 opSHLi(v810_state *cpustate,UINT32 op)    // shl imm5,r2
+UINT32 v810_device::opSHLi(UINT32 op)    // shl imm5,r2
 {
 	UINT64 tmp;
 	UINT32 count=UI5(op);
@@ -499,34 +496,34 @@ static UINT32 opSHLi(v810_state *cpustate,UINT32 op)    // shl imm5,r2
 
 	if(count)
 	{
-		tmp=GETREG(cpustate,GET2);
+		tmp=GETREG(GET2);
 		tmp<<=count;
 		CHECK_CY(tmp);
-		SETREG(cpustate,GET2,tmp&0xffffffff);
+		SETREG(GET2,tmp&0xffffffff);
 	}
-	CHECK_ZS(GETREG(cpustate,GET2));
+	CHECK_ZS(GETREG(GET2));
 	return clkIF;
 }
 
-static UINT32 opSHRr(v810_state *cpustate,UINT32 op)    // shr r1,r2
+UINT32 v810_device::opSHRr(UINT32 op)    // shr r1,r2
 {
 	UINT64 tmp;
-	UINT32 count=GETREG(cpustate,GET1);
+	UINT32 count=GETREG(GET1);
 	count&=0x1f;
 	SET_OV(0);
 	SET_CY(0);
 	if(count)
 	{
-		tmp=GETREG(cpustate,GET2);
+		tmp=GETREG(GET2);
 		tmp>>=count-1;
 		SET_CY(tmp&1);
-		SETREG(cpustate,GET2,(tmp>>1)&0xffffffff);
+		SETREG(GET2,(tmp>>1)&0xffffffff);
 	}
-	CHECK_ZS(GETREG(cpustate,GET2));
+	CHECK_ZS(GETREG(GET2));
 	return clkIF;
 }
 
-static UINT32 opSHRi(v810_state *cpustate,UINT32 op)    // shr imm5,r2
+UINT32 v810_device::opSHRi(UINT32 op)    // shr imm5,r2
 {
 	UINT64 tmp;
 	UINT32 count=UI5(op);
@@ -534,36 +531,36 @@ static UINT32 opSHRi(v810_state *cpustate,UINT32 op)    // shr imm5,r2
 	SET_CY(0);
 	if(count)
 	{
-		tmp=GETREG(cpustate,GET2);
+		tmp=GETREG(GET2);
 		tmp>>=count-1;
 		SET_CY(tmp&1);
 		tmp>>=1;
-		SETREG(cpustate,GET2,tmp&0xffffffff);
+		SETREG(GET2,tmp&0xffffffff);
 	}
-	CHECK_ZS(GETREG(cpustate,GET2));
+	CHECK_ZS(GETREG(GET2));
 	return clkIF;
 }
 
-static UINT32 opSARr(v810_state *cpustate,UINT32 op)    // sar r1,r2
+UINT32 v810_device::opSARr(UINT32 op)    // sar r1,r2
 {
 	INT32 tmp;
-	UINT32 count=GETREG(cpustate,GET1);
+	UINT32 count=GETREG(GET1);
 	count&=0x1f;
 	SET_OV(0);
 	SET_CY(0);
 	if(count)
 	{
-		tmp=GETREG(cpustate,GET2);
+		tmp=GETREG(GET2);
 		tmp>>=count-1;
 		SET_CY(tmp&1);
 		tmp>>=1;
-		SETREG(cpustate,GET2,tmp);
+		SETREG(GET2,tmp);
 	}
-	CHECK_ZS(GETREG(cpustate,GET2));
+	CHECK_ZS(GETREG(GET2));
 	return clkIF;
 }
 
-static UINT32 opSARi(v810_state *cpustate,UINT32 op)    // sar imm5,r2
+UINT32 v810_device::opSARi(UINT32 op)    // sar imm5,r2
 {
 	INT32 tmp;
 	UINT32 count=UI5(op);
@@ -571,79 +568,79 @@ static UINT32 opSARi(v810_state *cpustate,UINT32 op)    // sar imm5,r2
 	SET_CY(0);
 	if(count)
 	{
-		tmp=GETREG(cpustate,GET2);
+		tmp=GETREG(GET2);
 		tmp>>=count-1;
 		SET_CY(tmp&1);
 		tmp>>=1;
-		SETREG(cpustate,GET2,tmp);
+		SETREG(GET2,tmp);
 	}
-	CHECK_ZS(GETREG(cpustate,GET2));
+	CHECK_ZS(GETREG(GET2));
 	return clkIF;
 }
 
-static UINT32 opJMPr(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opJMPr(UINT32 op)
 {
-	cpustate->PC=GETREG(cpustate,GET1)&~1;
+	PC=GETREG(GET1)&~1;
 	return clkIF+2;
 }
 
 
-static UINT32 opJR(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opJR(UINT32 op)
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC=cpustate->PC-2+(D26(op,tmp)&~1);
+	UINT32 tmp=R_OP(PC);
+	PC=PC-2+(D26(op,tmp)&~1);
 	return clkIF+2;
 }
 
-static UINT32 opJAL(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opJAL(UINT32 op)
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
-	cpustate->R31=cpustate->PC;
-	cpustate->PC+=D26(op,tmp);
-	cpustate->PC-=4;
-	cpustate->PC&=~1;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
+	R31=PC;
+	PC+=D26(op,tmp);
+	PC-=4;
+	PC&=~1;
 	return clkIF+2;
 }
 
 
-static UINT32 opEI(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opEI(UINT32 op)
 {
 	SET_ID(0);
 	return clkIF;
 }
 
-static UINT32 opDI(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opDI(UINT32 op)
 {
 	SET_ID(1);
 	return clkIF;
 }
 
-static UINT32 opTRAP(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opTRAP(UINT32 op)
 {
-	printf("V810: TRAP @ %X\n",cpustate->PC-2);
+	printf("V810: TRAP @ %X\n",PC-2);
 	return clkIF;
 }
 
-static UINT32 opRETI(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opRETI(UINT32 op)
 {
 	if(GET_NP) {
-		cpustate->PC = cpustate->FEPC;
-		cpustate->PSW = cpustate->FEPSW;
+		PC = FEPC;
+		PSW = FEPSW;
 	} else {
-		cpustate->PC = cpustate->EIPC;
-		cpustate->PSW = cpustate->EIPSW;
+		PC = EIPC;
+		PSW = EIPSW;
 	}
 	return clkIF;
 }
 
-static UINT32 opHALT(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opHALT(UINT32 op)
 {
-	printf("V810: HALT @ %X",cpustate->PC-2);
+	printf("V810: HALT @ %X",PC-2);
 	return clkIF;
 }
 
-static UINT32 opB(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opB(UINT32 op)
 {
 	int doBranch=0;
 	switch((op>>9)&0xf)
@@ -714,150 +711,150 @@ static UINT32 opB(v810_state *cpustate,UINT32 op)
 	}
 	if(doBranch)
 	{
-			cpustate->PC=cpustate->PC-2+(D9(op)&~1);
+			PC=PC-2+(D9(op)&~1);
 	}
 	return clkIF;
 }
 
-static UINT32 opLDB(v810_state *cpustate,UINT32 op) // ld.b disp16[reg1],reg2
+UINT32 v810_device::opLDB(UINT32 op) // ld.b disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	tmp=R_B(cpustate,tmp);
+	tmp+=GETREG(GET1);
+	tmp=R_B(tmp);
 	tmp|=(tmp&0x80)?0xffffff00:0;
-	SETREG(cpustate,GET2,tmp);
+	SETREG(GET2,tmp);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opLDH(v810_state *cpustate,UINT32 op) // ld.h disp16[reg1],reg2
+UINT32 v810_device::opLDH(UINT32 op) // ld.h disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	tmp=R_H(cpustate,tmp&~1);
+	tmp+=GETREG(GET1);
+	tmp=R_H(tmp&~1);
 	tmp|=(tmp&0x8000)?0xffff0000:0;
-	SETREG(cpustate,GET2,tmp);
+	SETREG(GET2,tmp);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opLDW(v810_state *cpustate,UINT32 op) // ld.w disp16[reg1],reg2
+UINT32 v810_device::opLDW(UINT32 op) // ld.w disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	tmp=R_W(cpustate,tmp&~3);
-	SETREG(cpustate,GET2,tmp);
+	tmp+=GETREG(GET1);
+	tmp=R_W(tmp&~3);
+	SETREG(GET2,tmp);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opINB(v810_state *cpustate,UINT32 op) // in.b disp16[reg1],reg2
+UINT32 v810_device::opINB(UINT32 op) // in.b disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	tmp=RIO_B(cpustate,tmp);
-	SETREG(cpustate,GET2,tmp);
+	tmp+=GETREG(GET1);
+	tmp=RIO_B(tmp);
+	SETREG(GET2,tmp);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opCAXI(v810_state *cpustate,UINT32 op)    // caxi disp16[reg1],reg2
+UINT32 v810_device::opCAXI(UINT32 op)    // caxi disp16[reg1],reg2
 {
 	printf("V810 CAXI execute\n");
-	cpustate->PC+=2;
+	PC+=2;
 	return clkIF;
 }
 
-static UINT32 opINH(v810_state *cpustate,UINT32 op) // in.h disp16[reg1],reg2
+UINT32 v810_device::opINH(UINT32 op) // in.h disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	tmp=RIO_H(cpustate,tmp&~1);
-	SETREG(cpustate,GET2,tmp);
+	tmp+=GETREG(GET1);
+	tmp=RIO_H(tmp&~1);
+	SETREG(GET2,tmp);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opINW(v810_state *cpustate,UINT32 op) // in.w disp16[reg1],reg2
+UINT32 v810_device::opINW(UINT32 op) // in.w disp16[reg1],reg2
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	tmp=RIO_W(cpustate,tmp&~3);
-	SETREG(cpustate,GET2,tmp);
+	tmp+=GETREG(GET1);
+	tmp=RIO_W(tmp&~3);
+	SETREG(GET2,tmp);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opSTB(v810_state *cpustate,UINT32 op) // st.b reg2, disp16[reg1]
+UINT32 v810_device::opSTB(UINT32 op) // st.b reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	W_B(cpustate,tmp,GETREG(cpustate,GET2)&0xff);
+	tmp+=GETREG(GET1);
+	W_B(tmp,GETREG(GET2)&0xff);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opSTH(v810_state *cpustate,UINT32 op) // st.h reg2, disp16[reg1]
+UINT32 v810_device::opSTH(UINT32 op) // st.h reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	W_H(cpustate,tmp&~1,GETREG(cpustate,GET2)&0xffff);
+	tmp+=GETREG(GET1);
+	W_H(tmp&~1,GETREG(GET2)&0xffff);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opSTW(v810_state *cpustate,UINT32 op) // st.w reg2, disp16[reg1]
+UINT32 v810_device::opSTW(UINT32 op) // st.w reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	W_W(cpustate,tmp&~3,GETREG(cpustate,GET2));
+	tmp+=GETREG(GET1);
+	W_W(tmp&~3,GETREG(GET2));
 	return clkIF+clkMEM;
 }
 
-static UINT32 opOUTB(v810_state *cpustate,UINT32 op)    // out.b reg2, disp16[reg1]
+UINT32 v810_device::opOUTB(UINT32 op)    // out.b reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	WIO_B(cpustate,tmp,GETREG(cpustate,GET2)&0xff);
+	tmp+=GETREG(GET1);
+	WIO_B(tmp,GETREG(GET2)&0xff);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opOUTH(v810_state *cpustate,UINT32 op)    // out.h reg2, disp16[reg1]
+UINT32 v810_device::opOUTH(UINT32 op)    // out.h reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	WIO_H(cpustate,tmp&~1,GETREG(cpustate,GET2)&0xffff);
+	tmp+=GETREG(GET1);
+	WIO_H(tmp&~1,GETREG(GET2)&0xffff);
 	return clkIF+clkMEM;
 }
 
-static UINT32 opOUTW(v810_state *cpustate,UINT32 op)    // out.w reg2, disp16[reg1]
+UINT32 v810_device::opOUTW(UINT32 op)    // out.w reg2, disp16[reg1]
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	tmp=D16(tmp);
-	tmp+=GETREG(cpustate,GET1);
-	WIO_W(cpustate,tmp&~3,GETREG(cpustate,GET2));
+	tmp+=GETREG(GET1);
+	WIO_W(tmp&~3,GETREG(GET2));
 	return clkIF+clkMEM;
 }
 
-static UINT32 opMULr(v810_state *cpustate,UINT32 op)    // mul r1,r2
+UINT32 v810_device::opMULr(UINT32 op)    // mul r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	UINT64 tmp;
 	tmp=(INT64)(INT32)op1*(INT64)(INT32)op2;
 	op2=tmp&0xffffffff;
@@ -866,15 +863,15 @@ static UINT32 opMULr(v810_state *cpustate,UINT32 op)    // mul r1,r2
 	SET_Z( (tmp|op2)==0 );
 	SET_OV((tmp!=0));
 	SET_CY((tmp!=0));
-	SETREG(cpustate,GET2,op2);
-	SETREG(cpustate,30,tmp);
+	SETREG(GET2,op2);
+	SETREG(30,tmp);
 	return clkIF;
 }
 
-static UINT32 opMULUr(v810_state *cpustate,UINT32 op)   // mulu r1,r2
+UINT32 v810_device::opMULUr(UINT32 op)   // mulu r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	UINT64 tmp;
 	tmp=(UINT64)op1*(UINT64)op2;
 	op2=tmp&0xffffffff;
@@ -883,84 +880,84 @@ static UINT32 opMULUr(v810_state *cpustate,UINT32 op)   // mulu r1,r2
 	SET_Z( (tmp|op2)==0 );
 	SET_OV((tmp!=0));
 	SET_CY((tmp!=0));
-	SETREG(cpustate,GET2,op2);
-	SETREG(cpustate,30,tmp);
+	SETREG(GET2,op2);
+	SETREG(30,tmp);
 	return clkIF;
 }
 
-static UINT32 opDIVr(v810_state *cpustate,UINT32 op)    // div r1,r2
+UINT32 v810_device::opDIVr(UINT32 op)    // div r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	if(op1)
 	{
-		SETREG(cpustate,30,(INT32)((INT32)op2%(INT32)op1));
-		SETREG(cpustate,GET2,(INT32)((INT32)op2/(INT32)op1));
-		SET_OV((op1^op2^GETREG(cpustate,GET2)) == 0x80000000);
-		CHECK_ZS(GETREG(cpustate,GET2));
+		SETREG(30,(INT32)((INT32)op2%(INT32)op1));
+		SETREG(GET2,(INT32)((INT32)op2/(INT32)op1));
+		SET_OV((op1^op2^GETREG(GET2)) == 0x80000000);
+		CHECK_ZS(GETREG(GET2));
 	}
 	else
 		printf("DIVr divide by zero?\n");
 	return clkIF;
 }
 
-static UINT32 opDIVUr(v810_state *cpustate,UINT32 op)   // divu r1,r2
+UINT32 v810_device::opDIVUr(UINT32 op)   // divu r1,r2
 {
-	UINT32 op1=GETREG(cpustate,GET1);
-	UINT32 op2=GETREG(cpustate,GET2);
+	UINT32 op1=GETREG(GET1);
+	UINT32 op2=GETREG(GET2);
 	if(op1)
 	{
-		SETREG(cpustate,30,(INT32)(op2%op1));
-		SETREG(cpustate,GET2,(INT32)(op2/op1));
-		SET_OV((op1^op2^GETREG(cpustate,GET2)) == 0x80000000);
-		CHECK_ZS(GETREG(cpustate,GET2));
+		SETREG(30,(INT32)(op2%op1));
+		SETREG(GET2,(INT32)(op2/op1));
+		SET_OV((op1^op2^GETREG(GET2)) == 0x80000000);
+		CHECK_ZS(GETREG(GET2));
 	}
 	else
 		printf("DIVUr divide by zero?\n");
 	return clkIF;
 }
 
-static void opADDF(v810_state *cpustate,UINT32 op)
+void v810_device::opADDF(UINT32 op)
 {
 	//TODO: CY
-	float val1=u2f(GETREG(cpustate,GET1));
-	float val2=u2f(GETREG(cpustate,GET2));
+	float val1=u2f(GETREG(GET1));
+	float val2=u2f(GETREG(GET2));
 	SET_OV(0);
 	val2+=val1;
 	SET_Z((val2==0.0)?1:0);
 	SET_S((val2<0.0)?1:0);
-	SETREG(cpustate,GET2,f2u(val2));
+	SETREG(GET2,f2u(val2));
 }
 
-static void opSUBF(v810_state *cpustate,UINT32 op)
+void v810_device::opSUBF(UINT32 op)
 {
-	float val1=u2f(GETREG(cpustate,GET1));
-	float val2=u2f(GETREG(cpustate,GET2));
+	float val1=u2f(GETREG(GET1));
+	float val2=u2f(GETREG(GET2));
 	SET_OV(0);
 	SET_CY((val2<val1)?1:0);
 	val2-=val1;
 	SET_Z((val2==0.0)?1:0);
 	SET_S((val2<0.0)?1:0);
-	SETREG(cpustate,GET2,f2u(val2));
+	SETREG(GET2,f2u(val2));
 }
 
-static void opMULF(v810_state *cpustate,UINT32 op)
+void v810_device::opMULF(UINT32 op)
 {
 	//TODO: CY
-	float val1=u2f(GETREG(cpustate,GET1));
-	float val2=u2f(GETREG(cpustate,GET2));
+	float val1=u2f(GETREG(GET1));
+	float val2=u2f(GETREG(GET2));
 	SET_OV(0);
 	val2*=val1;
 	SET_Z((val2==0.0)?1:0);
 	SET_S((val2<0.0)?1:0);
-	SETREG(cpustate,GET2,f2u(val2));
+	SETREG(GET2,f2u(val2));
 }
 
-static void opDIVF(v810_state *cpustate,UINT32 op)
+void v810_device::opDIVF(UINT32 op)
 {
 	//TODO: CY
-	float val1=u2f(GETREG(cpustate,GET1));
-	float val2=u2f(GETREG(cpustate,GET2));
+	float val1=u2f(GETREG(GET1));
+	float val2=u2f(GETREG(GET2));
 	SET_OV(0);
 	if(val1!=0)
 		val2/=val1;
@@ -968,22 +965,22 @@ static void opDIVF(v810_state *cpustate,UINT32 op)
 		printf("DIVF divide by zero?\n");
 	SET_Z((val2==0.0)?1:0);
 	SET_S((val2<0.0)?1:0);
-	SETREG(cpustate,GET2,f2u(val2));
+	SETREG(GET2,f2u(val2));
 }
 
-static void opTRNC(v810_state *cpustate,UINT32 op)
+void v810_device::opTRNC(UINT32 op)
 {
-	float val1=u2f(GETREG(cpustate,GET1));
+	float val1=u2f(GETREG(GET1));
 	SET_OV(0);
 	SET_Z((val1==0.0)?1:0);
 	SET_S((val1<0.0)?1:0);
-	SETREG(cpustate,GET2,(INT32)val1);
+	SETREG(GET2,(INT32)val1);
 }
 
-static void opCMPF(v810_state *cpustate,UINT32 op)
+void v810_device::opCMPF(UINT32 op)
 {
-	float val1=u2f(GETREG(cpustate,GET1));
-	float val2=u2f(GETREG(cpustate,GET2));
+	float val1=u2f(GETREG(GET1));
+	float val2=u2f(GETREG(GET2));
 	SET_OV(0);
 	SET_CY((val2<val1)?1:0);
 	val2-=val1;
@@ -991,74 +988,74 @@ static void opCMPF(v810_state *cpustate,UINT32 op)
 	SET_S((val2<0.0)?1:0);
 }
 
-static void opCVTS(v810_state *cpustate,UINT32 op)
+void v810_device::opCVTS(UINT32 op)
 {
-	float val1=u2f(GETREG(cpustate,GET1));
+	float val1=u2f(GETREG(GET1));
 	SET_OV(0);
 	SET_Z((val1==0.0)?1:0);
 	SET_S((val1<0.0)?1:0);
-	SETREG(cpustate,GET2,(INT32)val1);
+	SETREG(GET2,(INT32)val1);
 }
 
-static void opCVTW(v810_state *cpustate,UINT32 op)
+void v810_device::opCVTW(UINT32 op)
 {
 	//TODO: CY
-	float val1=(INT32)GETREG(cpustate,GET1);
+	float val1=(INT32)GETREG(GET1);
 	SET_OV(0);
 	SET_Z((val1==0.0)?1:0);
 	SET_S((val1<0.0)?1:0);
-	SETREG(cpustate,GET2,f2u(val1));
+	SETREG(GET2,f2u(val1));
 }
 
-static void opMPYHW(v810_state *cpustate,UINT32 op)
+void v810_device::opMPYHW(UINT32 op)
 {
-	int val1=(GETREG(cpustate,GET1) & 0xffff);
-	int val2=(GETREG(cpustate,GET2) & 0xffff);
+	int val1=(GETREG(GET1) & 0xffff);
+	int val2=(GETREG(GET2) & 0xffff);
 	SET_OV(0);
 	val2*=val1;
 	SET_Z((val2==0.0)?1:0);
 	SET_S((val2<0.0)?1:0);
-	SETREG(cpustate,GET2,val2);
+	SETREG(GET2,val2);
 }
 
-static void opXB(v810_state *cpustate,UINT32 op)
+void v810_device::opXB(UINT32 op)
 {
-	int val=GETREG(cpustate,GET2);
+	int val=GETREG(GET2);
 	SET_OV(0);
 	val = (val & 0xffff0000) | ((val & 0xff) << 8) | ((val & 0xff00) >> 8);
 	SET_Z((val==0.0)?1:0);
 	SET_S((val<0.0)?1:0);
-	SETREG(cpustate,GET2,val);
+	SETREG(GET2,val);
 }
 
 
-static void opXH(v810_state *cpustate,UINT32 op)
+void v810_device::opXH(UINT32 op)
 {
-	int val=GETREG(cpustate,GET2);
+	int val=GETREG(GET2);
 	SET_OV(0);
 	val = ((val & 0xffff0000)>>16) | ((val & 0xffff)<<16);
 	SET_Z((val==0.0)?1:0);
 	SET_S((val<0.0)?1:0);
-	SETREG(cpustate,GET2,val);
+	SETREG(GET2,val);
 }
 
-static UINT32 opFpoint(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opFpoint(UINT32 op)
 {
-	UINT32 tmp=R_OP(cpustate,cpustate->PC);
-	cpustate->PC+=2;
+	UINT32 tmp=R_OP(PC);
+	PC+=2;
 	switch((tmp&0xfc00)>>10)
 	{
-			case 0x0: opCMPF(cpustate,op);break;
-			case 0x2: opCVTW(cpustate,op);break;
-			case 0x3: opCVTS(cpustate,op);break;
-			case 0x4: opADDF(cpustate,op);break;
-			case 0x5: opSUBF(cpustate,op);break;
-			case 0x6: opMULF(cpustate,op);break;
-			case 0x7: opDIVF(cpustate,op);break;
-			case 0x8: opXB(cpustate,op);  break; // *
-			case 0x9: opXH(cpustate,op);  break; // *
-			case 0xb: opTRNC(cpustate,op);break;
-			case 0xc: opMPYHW(cpustate,op); break; // *
+			case 0x0: opCMPF(op);break;
+			case 0x2: opCVTW(op);break;
+			case 0x3: opCVTS(op);break;
+			case 0x4: opADDF(op);break;
+			case 0x5: opSUBF(op);break;
+			case 0x6: opMULF(op);break;
+			case 0x7: opDIVF(op);break;
+			case 0x8: opXB(op);  break; // *
+			case 0x9: opXH(op);  break; // *
+			case 0xb: opTRNC(op);break;
+			case 0xc: opMPYHW(op); break; // *
 			// * <- Virtual Boy specific?
 			default: printf("Floating point %02x\n",(tmp&0xfc00) >> 10);break;
 	}
@@ -1066,7 +1063,7 @@ static UINT32 opFpoint(v810_state *cpustate,UINT32 op)
 }
 
 /* TODO: clocks */
-static UINT32 opBSU(v810_state *cpustate,UINT32 op)
+UINT32 v810_device::opBSU(UINT32 op)
 {
 	if(!(op & 8))
 		fatalerror("V810: unknown BSU opcode %04x\n",op);
@@ -1076,79 +1073,79 @@ static UINT32 opBSU(v810_state *cpustate,UINT32 op)
 		UINT32 dsttmp,tmp;
 		UINT8 srctmp;
 
-//      printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",cpustate->R26,cpustate->R27,cpustate->R28,cpustate->R29,cpustate->R30);
+//      printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",R26,R27,R28,R29,R30);
 
-		dstbit = cpustate->R26 & 0x1f;
-		srcbit = cpustate->R27 & 0x1f;
-		size =  cpustate->R28;
-		dst = cpustate->R29 & ~3;
-		src = cpustate->R30 & ~3;
+		dstbit = R26 & 0x1f;
+		srcbit = R27 & 0x1f;
+		size =  R28;
+		dst = R29 & ~3;
+		src = R30 & ~3;
 
 		switch(op & 0xf)
 		{
 			case 0x8: // ORBSU
-				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
-				dsttmp = R_W(cpustate,dst);
+				srctmp = (R_W(src) >> srcbit) & 1;
+				dsttmp = R_W(dst);
 
 				tmp = dsttmp | (srctmp << dstbit);
 
-				W_W(cpustate,dst,tmp);
+				W_W(dst,tmp);
 				break;
 			case 0x9: // ANDBSU
-				srctmp = ((R_W(cpustate,src) >> srcbit) & 1) ^ 1;
-				dsttmp = R_W(cpustate,dst);
+				srctmp = ((R_W(src) >> srcbit) & 1) ^ 1;
+				dsttmp = R_W(dst);
 
 				tmp = dsttmp & (~(srctmp << dstbit));
 
-				W_W(cpustate,dst,tmp);
+				W_W(dst,tmp);
 				break;
 			case 0xa: // XORBSU
-				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
-				dsttmp = R_W(cpustate,dst);
+				srctmp = (R_W(src) >> srcbit) & 1;
+				dsttmp = R_W(dst);
 
 				tmp = dsttmp ^ (srctmp << dstbit);
 
-				W_W(cpustate,dst,tmp);
+				W_W(dst,tmp);
 				break;
 			case 0xb: // MOVBSU
-				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
-				dsttmp = (R_W(cpustate,dst) & ~(1 << dstbit));
+				srctmp = (R_W(src) >> srcbit) & 1;
+				dsttmp = (R_W(dst) & ~(1 << dstbit));
 
 				tmp = (srctmp << dstbit) | dsttmp;
 
-				W_W(cpustate,dst,tmp);
+				W_W(dst,tmp);
 				break;
 			case 0xc: // ORNBSU
-				srctmp = ((R_W(cpustate,src) >> srcbit) & 1) ^ 1;
-				dsttmp = R_W(cpustate,dst);
+				srctmp = ((R_W(src) >> srcbit) & 1) ^ 1;
+				dsttmp = R_W(dst);
 
 				tmp = dsttmp | (srctmp << dstbit);
 
-				W_W(cpustate,dst,tmp);
+				W_W(dst,tmp);
 				break;
 			case 0xd: // ANDNBSU
-				srctmp = (R_W(cpustate,src) >> srcbit) & 1;
-				dsttmp = R_W(cpustate,dst);
+				srctmp = (R_W(src) >> srcbit) & 1;
+				dsttmp = R_W(dst);
 
 				tmp = dsttmp & (~(srctmp << dstbit));
 
-				W_W(cpustate,dst,tmp);
+				W_W(dst,tmp);
 				break;
 			case 0xe: // XORNBSU
-				srctmp = ((R_W(cpustate,src) >> srcbit) & 1) ^ 1;
-				dsttmp = R_W(cpustate,dst);
+				srctmp = ((R_W(src) >> srcbit) & 1) ^ 1;
+				dsttmp = R_W(dst);
 
 				tmp = dsttmp ^ (srctmp << dstbit);
 
-				W_W(cpustate,dst,tmp);
+				W_W(dst,tmp);
 				break;
 			case 0xf: // NOTBSU
-				srctmp = ((R_W(cpustate,src) >> srcbit) & 1) ^ 1;
-				dsttmp = (R_W(cpustate,dst) & ~(1 << dstbit));
+				srctmp = ((R_W(src) >> srcbit) & 1) ^ 1;
+				dsttmp = (R_W(dst) & ~(1 << dstbit));
 
 				tmp = (srctmp << dstbit) | dsttmp;
 
-				W_W(cpustate,dst,tmp);
+				W_W(dst,tmp);
 				break;
 			default: fatalerror("V810: unemulated BSU opcode %04x\n",op);
 		}
@@ -1167,266 +1164,164 @@ static UINT32 opBSU(v810_state *cpustate,UINT32 op)
 
 		size --;
 
-		cpustate->R26 = dstbit;
-		cpustate->R27 = srcbit;
-		cpustate->R28 = size;
-		cpustate->R29 = dst;
-		cpustate->R30 = src;
+		R26 = dstbit;
+		R27 = srcbit;
+		R28 = size;
+		R29 = dst;
+		R30 = src;
 
 		if(size != 0)
-			cpustate->PC-=2;
+			PC-=2;
 	}
 
 	return clkIF+1; //TODO: correct?
 }
 
-static UINT32 (*const OpCodeTable[64])(v810_state *cpustate,UINT32 op) =
+const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 {
-	/* 0x00 */ opMOVr,      // mov r1,r2            1
-	/* 0x01 */ opADDr,      // add r1,r2            1
-	/* 0x02 */ opSUBr,      // sub r1,r2            1
-	/* 0x03 */ opCMPr,      // cmp2 r1,r2           1
-	/* 0x04 */ opSHLr,      // shl r1,r2            1
-	/* 0x05 */ opSHRr,      // shr r1,r2            1
-	/* 0x06 */ opJMPr,      // jmp [r1]             1
-	/* 0x07 */ opSARr,      // sar r1,r2            1
-	/* 0x08 */ opMULr,      // mul r1,r2            1
-	/* 0x09 */ opDIVr,      // div r1,r2            1
-	/* 0x0a */ opMULUr,     // mulu r1,r2           1
-	/* 0x0b */ opDIVUr,     // divu r1,r2           1
-	/* 0x0c */ opORr,       // or r1,r2             1
-	/* 0x0d */ opANDr,      // and r1,r2            1
-	/* 0x0e */ opXORr,      // xor r1,r2            1
-	/* 0x0f */ opNOTr,      // not r1,r2            1
-	/* 0x10 */ opMOVi,      // mov imm5,r2          2
-	/* 0x11 */ opADDi,      // add imm5,r2          2
-	/* 0x12 */ opSETFi,     // setf imm5,r2         2
-	/* 0x13 */ opCMPi,      // cmp imm5,r2          2
-	/* 0x14 */ opSHLi,      // shl imm5,r2          2
-	/* 0x15 */ opSHRi,      // shr imm5,r2          2
-	/* 0x16 */ opEI,        // ei               2
-	/* 0x17 */ opSARi,      // sar imm5,r2          2
-	/* 0x18 */ opTRAP,
-	/* 0x19 */ opRETI,
-	/* 0x1a */ opHALT,      // halt             2
-	/* 0x1b */ opUNDEF,
-	/* 0x1c */ opLDSR,      // ldsr reg2,regID          2
-	/* 0x1d */ opSTSR,      // stsr regID,reg2          2
-	/* 0x1e */ opDI,    // DI               2
-	/* 0x1f */ opBSU,
-	/* 0x20 */ opB,     // Branch (7 bit opcode)
-	/* 0x21 */ opB,     // Branch (7 bit opcode)
-	/* 0x22 */ opB,     // Branch (7 bit opcode)
-	/* 0x23 */ opB,     // Branch (7 bit opcode)
-	/* 0x24 */ opB,     // Branch (7 bit opcode)
-	/* 0x25 */ opB,     // Branch (7 bit opcode)
-	/* 0x26 */ opB,     // Branch (7 bit opcode)
-	/* 0x27 */ opB,     // Branch (7 bit opcode)
-	/* 0x28 */ opMOVEA,     // movea imm16, reg1, reg2  5
-	/* 0x29 */ opADDI,      // addi imm16, reg1, reg2   5
-	/* 0x2a */ opJR,    // jr disp26            4
-	/* 0x2b */ opJAL,   // jal disp26           4
-	/* 0x2c */ opORI,   // ori imm16, reg1, reg2    5
-	/* 0x2d */ opANDI,      // andi imm16, reg1, reg2   5
-	/* 0x2e */ opXORI,      // xori imm16, reg1, reg2   5
-	/* 0x2f */ opMOVHI,     // movhi imm16, reg1 ,reg2  5
-	/* 0x30 */ opLDB,   // ld.b disp16[reg1],reg2   6a
-	/* 0x31 */ opLDH,   // ld.h disp16[reg1],reg2   6a
-	/* 0x32 */ opUNDEF,
-	/* 0x33 */ opLDW,   // ld.w disp16[reg1],reg2   6a
-	/* 0x34 */ opSTB,   // st.b reg2, disp16[reg1]  6b
-	/* 0x35 */ opSTH,   // st.h reg2, disp16[reg1]  6b
-	/* 0x36 */ opUNDEF,
-	/* 0x37 */ opSTW,   // st.w reg2, disp16[reg1]  6b
-	/* 0x38 */ opINB,   // in.b disp16[reg1], reg2  6a
-	/* 0x39 */ opINH,   // in.h disp16[reg1], reg2  6a
-	/* 0x3a */ opCAXI,      // caxi disp16[reg1],reg2   6a
-	/* 0x3b */ opINW,   // in.w disp16[reg1], reg2  6a
-	/* 0x3c */ opOUTB,      // out.b reg2, disp16[reg1]     6b
-	/* 0x3d */ opOUTH,      // out.h reg2, disp16[reg1]     6b
-	/* 0x3e */ opFpoint, //floating point opcodes
-	/* 0x3f */ opOUTW   // out.w reg2, disp16[reg1]     6b
+	/* 0x00 */ &v810_device::opMOVr,      // mov r1,r2            1
+	/* 0x01 */ &v810_device::opADDr,      // add r1,r2            1
+	/* 0x02 */ &v810_device::opSUBr,      // sub r1,r2            1
+	/* 0x03 */ &v810_device::opCMPr,      // cmp2 r1,r2           1
+	/* 0x04 */ &v810_device::opSHLr,      // shl r1,r2            1
+	/* 0x05 */ &v810_device::opSHRr,      // shr r1,r2            1
+	/* 0x06 */ &v810_device::opJMPr,      // jmp [r1]             1
+	/* 0x07 */ &v810_device::opSARr,      // sar r1,r2            1
+	/* 0x08 */ &v810_device::opMULr,      // mul r1,r2            1
+	/* 0x09 */ &v810_device::opDIVr,      // div r1,r2            1
+	/* 0x0a */ &v810_device::opMULUr,     // mulu r1,r2           1
+	/* 0x0b */ &v810_device::opDIVUr,     // divu r1,r2           1
+	/* 0x0c */ &v810_device::opORr,       // or r1,r2             1
+	/* 0x0d */ &v810_device::opANDr,      // and r1,r2            1
+	/* 0x0e */ &v810_device::opXORr,      // xor r1,r2            1
+	/* 0x0f */ &v810_device::opNOTr,      // not r1,r2            1
+	/* 0x10 */ &v810_device::opMOVi,      // mov imm5,r2          2
+	/* 0x11 */ &v810_device::opADDi,      // add imm5,r2          2
+	/* 0x12 */ &v810_device::opSETFi,     // setf imm5,r2         2
+	/* 0x13 */ &v810_device::opCMPi,      // cmp imm5,r2          2
+	/* 0x14 */ &v810_device::opSHLi,      // shl imm5,r2          2
+	/* 0x15 */ &v810_device::opSHRi,      // shr imm5,r2          2
+	/* 0x16 */ &v810_device::opEI,        // ei               2
+	/* 0x17 */ &v810_device::opSARi,      // sar imm5,r2          2
+	/* 0x18 */ &v810_device::opTRAP,
+	/* 0x19 */ &v810_device::opRETI,
+	/* 0x1a */ &v810_device::opHALT,      // halt             2
+	/* 0x1b */ &v810_device::opUNDEF,
+	/* 0x1c */ &v810_device::opLDSR,      // ldsr reg2,regID          2
+	/* 0x1d */ &v810_device::opSTSR,      // stsr regID,reg2          2
+	/* 0x1e */ &v810_device::opDI,    // DI               2
+	/* 0x1f */ &v810_device::opBSU,
+	/* 0x20 */ &v810_device::opB,     // Branch (7 bit opcode)
+	/* 0x21 */ &v810_device::opB,     // Branch (7 bit opcode)
+	/* 0x22 */ &v810_device::opB,     // Branch (7 bit opcode)
+	/* 0x23 */ &v810_device::opB,     // Branch (7 bit opcode)
+	/* 0x24 */ &v810_device::opB,     // Branch (7 bit opcode)
+	/* 0x25 */ &v810_device::opB,     // Branch (7 bit opcode)
+	/* 0x26 */ &v810_device::opB,     // Branch (7 bit opcode)
+	/* 0x27 */ &v810_device::opB,     // Branch (7 bit opcode)
+	/* 0x28 */ &v810_device::opMOVEA,     // movea imm16, reg1, reg2  5
+	/* 0x29 */ &v810_device::opADDI,      // addi imm16, reg1, reg2   5
+	/* 0x2a */ &v810_device::opJR,    // jr disp26            4
+	/* 0x2b */ &v810_device::opJAL,   // jal disp26           4
+	/* 0x2c */ &v810_device::opORI,   // ori imm16, reg1, reg2    5
+	/* 0x2d */ &v810_device::opANDI,      // andi imm16, reg1, reg2   5
+	/* 0x2e */ &v810_device::opXORI,      // xori imm16, reg1, reg2   5
+	/* 0x2f */ &v810_device::opMOVHI,     // movhi imm16, reg1 ,reg2  5
+	/* 0x30 */ &v810_device::opLDB,   // ld.b disp16[reg1],reg2   6a
+	/* 0x31 */ &v810_device::opLDH,   // ld.h disp16[reg1],reg2   6a
+	/* 0x32 */ &v810_device::opUNDEF,
+	/* 0x33 */ &v810_device::opLDW,   // ld.w disp16[reg1],reg2   6a
+	/* 0x34 */ &v810_device::opSTB,   // st.b reg2, disp16[reg1]  6b
+	/* 0x35 */ &v810_device::opSTH,   // st.h reg2, disp16[reg1]  6b
+	/* 0x36 */ &v810_device::opUNDEF,
+	/* 0x37 */ &v810_device::opSTW,   // st.w reg2, disp16[reg1]  6b
+	/* 0x38 */ &v810_device::opINB,   // in.b disp16[reg1], reg2  6a
+	/* 0x39 */ &v810_device::opINH,   // in.h disp16[reg1], reg2  6a
+	/* 0x3a */ &v810_device::opCAXI,      // caxi disp16[reg1],reg2   6a
+	/* 0x3b */ &v810_device::opINW,   // in.w disp16[reg1], reg2  6a
+	/* 0x3c */ &v810_device::opOUTB,      // out.b reg2, disp16[reg1]     6b
+	/* 0x3d */ &v810_device::opOUTH,      // out.h reg2, disp16[reg1]     6b
+	/* 0x3e */ &v810_device::opFpoint, //floating point opcodes
+	/* 0x3f */ &v810_device::opOUTW   // out.w reg2, disp16[reg1]     6b
 };
 
-static CPU_INIT( v810 )
+void v810_device::device_start()
 {
-	v810_state *cpustate = get_safe_token(device);
+	m_irq_state = CLEAR_LINE;
+	m_irq_line = 0;
+	m_nmi_line = CLEAR_LINE;
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_io = &space(AS_IO);
 
-	cpustate->irq_state = CLEAR_LINE;
-	cpustate->irq_line = 0;
-	cpustate->nmi_line = CLEAR_LINE;
-	cpustate->irq_callback = irqcallback;
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = &device->space(AS_IO);
+	m_irq_line = 0;
+	m_irq_state = 0;
+	m_nmi_line = 0;
 
-	device->save_item(NAME(cpustate->reg));
-	device->save_item(NAME(cpustate->irq_line));
-	device->save_item(NAME(cpustate->irq_state));
-	device->save_item(NAME(cpustate->nmi_line));
-	device->save_item(NAME(cpustate->PPC));
+	save_item(NAME(m_reg));
+	save_item(NAME(m_irq_line));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_nmi_line));
+	save_item(NAME(m_PPC));
 
+	state_add( V810_PC,    "PC",    PC).formatstr("%08X");
+	state_add( V810_R0,    "R0",    R0).formatstr("%08X");
+	state_add( V810_R1,    "R1",    R1).formatstr("%08X");
+	state_add( V810_R2,    "R2",    R2).formatstr("%08X");
+	state_add( V810_SP,    "SP",    SP).formatstr("%08X");
+	state_add( V810_R4,    "R4",    R4).formatstr("%08X");
+	state_add( V810_R5,    "R5",    R5).formatstr("%08X");
+	state_add( V810_R6,    "R6",    R6).formatstr("%08X");
+	state_add( V810_R7,    "R7",    R7).formatstr("%08X");
+	state_add( V810_R8,    "R8",    R8).formatstr("%08X");
+	state_add( V810_R9,    "R9",    R9).formatstr("%08X");
+	state_add( V810_R10,   "R10",   R10).formatstr("%08X");
+	state_add( V810_R11,   "R11",   R11).formatstr("%08X");
+	state_add( V810_R12,   "R12",   R12).formatstr("%08X");
+	state_add( V810_R13,   "R13",   R13).formatstr("%08X");
+	state_add( V810_R14,   "R14",   R14).formatstr("%08X");
+	state_add( V810_R15,   "R15",   R15).formatstr("%08X");
+	state_add( V810_R16,   "R16",   R16).formatstr("%08X");
+	state_add( V810_R17,   "R17",   R17).formatstr("%08X");
+	state_add( V810_R18,   "R18",   R18).formatstr("%08X");
+	state_add( V810_R19,   "R19",   R19).formatstr("%08X");
+	state_add( V810_R20,   "R20",   R20).formatstr("%08X");
+	state_add( V810_R21,   "R21",   R21).formatstr("%08X");
+	state_add( V810_R22,   "R22",   R22).formatstr("%08X");
+	state_add( V810_R23,   "R23",   R23).formatstr("%08X");
+	state_add( V810_R24,   "R24",   R24).formatstr("%08X");
+	state_add( V810_R25,   "R25",   R25).formatstr("%08X");
+	state_add( V810_R26,   "R26",   R26).formatstr("%08X");
+	state_add( V810_R27,   "R27",   R27).formatstr("%08X");
+	state_add( V810_R28,   "R28",   R28).formatstr("%08X");
+	state_add( V810_R29,   "R29",   R29).formatstr("%08X");
+	state_add( V810_R30,   "R30",   R30).formatstr("%08X");
+	state_add( V810_R31,   "R31",   R31).formatstr("%08X");
+	state_add( V810_EIPC,  "EIPC",  EIPC).formatstr("%08X");
+	state_add( V810_PSW,   "PSW",   PSW).formatstr("%08X");
+	state_add( V810_EIPSW, "EIPSW", EIPSW).formatstr("%08X");
+	state_add( V810_FEPC,  "FEPC",  FEPC).formatstr("%08X");
+	state_add( V810_FEPSW, "FEPSW", FEPSW).formatstr("%08X");
+	state_add( V810_ECR,   "ECR",   ECR).formatstr("%08X");
+	state_add( V810_PIR,   "PIR",   PIR).formatstr("%08X");
+	state_add( V810_TKCW,  "TKCW",  TKCW).formatstr("%08X");
+	state_add( V810_CHCW,  "CHCW",  CHCW).formatstr("%08X");
+	state_add( V810_ADTRE, "ADTRE", ADTRE).formatstr("%08X");
+
+	state_add(STATE_GENPC, "GENPC", PC).noshow();
+	state_add(STATE_GENSP, "GENSP", SP).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", PSW).formatstr("%8s").noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", m_PPC).noshow();
+
+	m_icountptr = &m_icount;
 }
 
-static CPU_RESET( v810 )
+void v810_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	v810_state *cpustate = get_safe_token(device);
-	int i;
-	for(i=0;i<64;i++)   cpustate->reg[i]=0;
-	cpustate->PC = 0xfffffff0;
-	cpustate->PSW = 0x1000;
-	cpustate->ECR   = 0x0000fff0;
-}
-
-static void take_interrupt(v810_state *cpustate)
-{
-	cpustate->EIPC = cpustate->PC;
-	cpustate->EIPSW = cpustate->PSW;
-
-	cpustate->PC = 0xfffffe00 | (cpustate->irq_line << 4);
-	cpustate->ECR = 0xfe00 | (cpustate->irq_line << 4);
-
-	UINT8 num = cpustate->irq_line + 1;
-	if (num==0x10) num=0x0f;
-
-	cpustate->PSW &= 0xfff0ffff; // clear interrupt level
-	SET_EP(1);
-	SET_ID(1);
-	cpustate->PSW |= num << 16;
-
-	cpustate->icount-= clkIF;
-}
-
-static CPU_EXECUTE( v810 )
-{
-	v810_state *cpustate = get_safe_token(device);
-
-	if (cpustate->irq_state != CLEAR_LINE) {
-		if (!(GET_NP | GET_EP | GET_ID)) {
-			if (cpustate->irq_line >=((cpustate->PSW & 0xF0000) >> 16)) {
-				take_interrupt(cpustate);
-			}
-		}
-	}
-	while(cpustate->icount>0)
+	switch (entry.index())
 	{
-		UINT32 op;
-
-		cpustate->PPC=cpustate->PC;
-		debugger_instruction_hook(device, cpustate->PC);
-		op=R_OP(cpustate,cpustate->PC);
-		cpustate->PC+=2;
-		int cnt;
-		cnt = OpCodeTable[op>>10](cpustate,op);
-		cpustate->icount-= cnt;
-	}
-}
-
-
-static void set_irq_line(v810_state *cpustate, int irqline, int state)
-{
-	cpustate->irq_state = state;
-	cpustate->irq_line = irqline;
-}
-
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( v810 )
-{
-	v810_state *cpustate = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:               set_irq_line(cpustate, 0, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 1:               set_irq_line(cpustate, 1, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 2:               set_irq_line(cpustate, 2, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 3:               set_irq_line(cpustate, 3, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 4:               set_irq_line(cpustate, 4, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 5:               set_irq_line(cpustate, 5, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 6:               set_irq_line(cpustate, 6, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 7:               set_irq_line(cpustate, 7, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 8:               set_irq_line(cpustate, 8, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 9:               set_irq_line(cpustate, 9, info->i);             break;
-		case CPUINFO_INT_INPUT_STATE + 10:              set_irq_line(cpustate, 10, info->i);                break;
-		case CPUINFO_INT_INPUT_STATE + 11:              set_irq_line(cpustate, 11, info->i);                break;
-		case CPUINFO_INT_INPUT_STATE + 12:              set_irq_line(cpustate, 12, info->i);                break;
-		case CPUINFO_INT_INPUT_STATE + 13:              set_irq_line(cpustate, 13, info->i);                break;
-		case CPUINFO_INT_INPUT_STATE + 14:              set_irq_line(cpustate, 14, info->i);                break;
-		case CPUINFO_INT_INPUT_STATE + 15:              set_irq_line(cpustate, 15, info->i);                break;
-
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  set_irq_line(cpustate, INPUT_LINE_NMI, info->i);    break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    cpustate->PPC = info->i;                        break;
-
-		case CPUINFO_INT_REGISTER + V810_PC:
-		case CPUINFO_INT_PC:                            cpustate->PC = info->i;                             break;
-
-		case CPUINFO_INT_REGISTER + V810_R0:            cpustate->R0 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + V810_R1:            cpustate->R1 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + V810_R2:            cpustate->R2 = info->i;                         break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + V810_SP:            cpustate->SP = info->i;                         break;
-		case CPUINFO_INT_REGISTER + V810_R4:            cpustate->R4 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + V810_R5:            cpustate->R5 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + V810_R6:            cpustate->R6 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + V810_R7:            cpustate->R7 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + V810_R8:            cpustate->R8 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + V810_R9:            cpustate->R9 = info->i;                         break;
-		case CPUINFO_INT_REGISTER + V810_R10:           cpustate->R10 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R11:           cpustate->R11 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R12:           cpustate->R12 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R13:           cpustate->R13 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R14:           cpustate->R14 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R15:           cpustate->R15 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R16:           cpustate->R16 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R17:           cpustate->R17 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R18:           cpustate->R18 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R19:           cpustate->R19 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R20:           cpustate->R20 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R21:           cpustate->R21 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R22:           cpustate->R22 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R23:           cpustate->R23 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R24:           cpustate->R24 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R25:           cpustate->R25 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R26:           cpustate->R26 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R27:           cpustate->R27 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R28:           cpustate->R28 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R29:           cpustate->R29 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R30:           cpustate->R30 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_R31:           cpustate->R31 = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_PSW:           cpustate->PSW = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_EIPC:          cpustate->EIPC = info->i;                           break;
-		case CPUINFO_INT_REGISTER + V810_EIPSW:         cpustate->EIPSW = info->i;                      break;
-		case CPUINFO_INT_REGISTER + V810_FEPC:          cpustate->FEPC = info->i;                           break;
-		case CPUINFO_INT_REGISTER + V810_FEPSW:         cpustate->FEPSW = info->i;                      break;
-		case CPUINFO_INT_REGISTER + V810_ECR:           cpustate->ECR = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_PIR:           cpustate->PIR = info->i;                            break;
-		case CPUINFO_INT_REGISTER + V810_TKCW:          cpustate->TKCW = info->i;                           break;
-		case CPUINFO_INT_REGISTER + V810_CHCW:          cpustate->CHCW = info->i;                           break;
-		case CPUINFO_INT_REGISTER + V810_ADTRE:         cpustate->ADTRE = info->i;                      break;
-	}
-}
-
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-CPU_GET_INFO( v810 )
-{
-	v810_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c",
+		case STATE_GENFLAGS:
+			string.printf( "%c%c%c%c%c%c%c%c",
 				GET_AE ? 'A':'.',
 				GET_NP ? 'N':'.',
 				GET_EP ? 'E':'.',
@@ -1434,159 +1329,67 @@ CPU_GET_INFO( v810 )
 				GET_CY ? 'C':'.',
 				GET_OV ? 'V':'.',
 				GET_S ?  'S':'.',
-				GET_Z ?  'Z':'.');
+				GET_Z ?  'Z':'.'
+			);
 			break;
-
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(v810_state);           break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 16;                           break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 2;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 3;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 6;                            break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 32;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;                  break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                   break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 32;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 32;                   break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
-
-		case CPUINFO_INT_INPUT_STATE + 0:               info->i = (cpustate->irq_line == 0) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 1:               info->i = (cpustate->irq_line == 1) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 2:               info->i = (cpustate->irq_line == 2) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 3:               info->i = (cpustate->irq_line == 3) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 4:               info->i = (cpustate->irq_line == 4) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 5:               info->i = (cpustate->irq_line == 5) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 6:               info->i = (cpustate->irq_line == 6) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 7:               info->i = (cpustate->irq_line == 7) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 8:               info->i = (cpustate->irq_line == 8) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 9:               info->i = (cpustate->irq_line == 9) ? cpustate->irq_state : CLEAR_LINE;         break;
-		case CPUINFO_INT_INPUT_STATE + 10:              info->i = (cpustate->irq_line == 10) ? cpustate->irq_state : CLEAR_LINE;            break;
-		case CPUINFO_INT_INPUT_STATE + 11:              info->i = (cpustate->irq_line == 11) ? cpustate->irq_state : CLEAR_LINE;            break;
-		case CPUINFO_INT_INPUT_STATE + 12:              info->i = (cpustate->irq_line == 12) ? cpustate->irq_state : CLEAR_LINE;            break;
-		case CPUINFO_INT_INPUT_STATE + 13:              info->i = (cpustate->irq_line == 13) ? cpustate->irq_state : CLEAR_LINE;            break;
-		case CPUINFO_INT_INPUT_STATE + 14:              info->i = (cpustate->irq_line == 14) ? cpustate->irq_state : CLEAR_LINE;            break;
-		case CPUINFO_INT_INPUT_STATE + 15:              info->i = (cpustate->irq_line == 15) ? cpustate->irq_state : CLEAR_LINE;            break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = cpustate->nmi_line;           break;
-
-		case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->PPC;                break;
-
-		case CPUINFO_INT_REGISTER + V810_PC:
-		case CPUINFO_INT_PC:                            info->i = cpustate->PC;                 break;
-
-		case CPUINFO_INT_REGISTER + V810_R0:            info->i = cpustate->R0;                 break;
-		case CPUINFO_INT_REGISTER + V810_R1:            info->i = cpustate->R1;                 break;
-		case CPUINFO_INT_REGISTER + V810_R2:            info->i = cpustate->R2;                 break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + V810_SP:            info->i = cpustate->SP;                 break;
-		case CPUINFO_INT_REGISTER + V810_R4:            info->i = cpustate->R4;                 break;
-		case CPUINFO_INT_REGISTER + V810_R5:            info->i = cpustate->R5;                 break;
-		case CPUINFO_INT_REGISTER + V810_R6:            info->i = cpustate->R6;                 break;
-		case CPUINFO_INT_REGISTER + V810_R7:            info->i = cpustate->R7;                 break;
-		case CPUINFO_INT_REGISTER + V810_R8:            info->i = cpustate->R8;                 break;
-		case CPUINFO_INT_REGISTER + V810_R9:            info->i = cpustate->R9;                 break;
-		case CPUINFO_INT_REGISTER + V810_R10:           info->i = cpustate->R10;                break;
-		case CPUINFO_INT_REGISTER + V810_R11:           info->i = cpustate->R11;                break;
-		case CPUINFO_INT_REGISTER + V810_R12:           info->i = cpustate->R12;                break;
-		case CPUINFO_INT_REGISTER + V810_R13:           info->i = cpustate->R13;                break;
-		case CPUINFO_INT_REGISTER + V810_R14:           info->i = cpustate->R14;                break;
-		case CPUINFO_INT_REGISTER + V810_R15:           info->i = cpustate->R15;                break;
-		case CPUINFO_INT_REGISTER + V810_R16:           info->i = cpustate->R16;                break;
-		case CPUINFO_INT_REGISTER + V810_R17:           info->i = cpustate->R17;                break;
-		case CPUINFO_INT_REGISTER + V810_R18:           info->i = cpustate->R18;                break;
-		case CPUINFO_INT_REGISTER + V810_R19:           info->i = cpustate->R19;                break;
-		case CPUINFO_INT_REGISTER + V810_R20:           info->i = cpustate->R20;                break;
-		case CPUINFO_INT_REGISTER + V810_R21:           info->i = cpustate->R21;                break;
-		case CPUINFO_INT_REGISTER + V810_R22:           info->i = cpustate->R22;                break;
-		case CPUINFO_INT_REGISTER + V810_R23:           info->i = cpustate->R23;                break;
-		case CPUINFO_INT_REGISTER + V810_R24:           info->i = cpustate->R24;                break;
-		case CPUINFO_INT_REGISTER + V810_R25:           info->i = cpustate->R25;                break;
-		case CPUINFO_INT_REGISTER + V810_R26:           info->i = cpustate->R26;                break;
-		case CPUINFO_INT_REGISTER + V810_R27:           info->i = cpustate->R27;                break;
-		case CPUINFO_INT_REGISTER + V810_R28:           info->i = cpustate->R28;                break;
-		case CPUINFO_INT_REGISTER + V810_R29:           info->i = cpustate->R29;                break;
-		case CPUINFO_INT_REGISTER + V810_R30:           info->i = cpustate->R30;                break;
-		case CPUINFO_INT_REGISTER + V810_R31:           info->i = cpustate->R31;                break;
-		case CPUINFO_INT_REGISTER + V810_PSW:           info->i = cpustate->PSW;                break;
-		case CPUINFO_INT_REGISTER + V810_EIPC:          info->i = cpustate->EIPC;               break;
-		case CPUINFO_INT_REGISTER + V810_EIPSW:         info->i = cpustate->EIPSW;              break;
-		case CPUINFO_INT_REGISTER + V810_FEPC:          info->i = cpustate->FEPC;               break;
-		case CPUINFO_INT_REGISTER + V810_FEPSW:         info->i = cpustate->FEPSW;              break;
-		case CPUINFO_INT_REGISTER + V810_ECR:           info->i = cpustate->ECR;                break;
-		case CPUINFO_INT_REGISTER + V810_PIR:           info->i = cpustate->PIR;                break;
-		case CPUINFO_INT_REGISTER + V810_TKCW:          info->i = cpustate->TKCW;               break;
-		case CPUINFO_INT_REGISTER + V810_CHCW:          info->i = cpustate->CHCW;               break;
-		case CPUINFO_INT_REGISTER + V810_ADTRE:         info->i = cpustate->ADTRE;              break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:                      info->setinfo = CPU_SET_INFO_NAME(v810);        break;
-		case CPUINFO_FCT_INIT:                          info->init = CPU_INIT_NAME(v810);               break;
-		case CPUINFO_FCT_RESET:                         info->reset = CPU_RESET_NAME(v810);             break;
-		case CPUINFO_FCT_EXIT:                          info->exit = NULL;                              break;
-		case CPUINFO_FCT_EXECUTE:                       info->execute = CPU_EXECUTE_NAME(v810);         break;
-		case CPUINFO_FCT_BURN:                          info->burn = NULL;                              break;
-		case CPUINFO_FCT_DISASSEMBLE:                   info->disassemble = CPU_DISASSEMBLE_NAME(v810); break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;               break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "V810");                break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "v810");                break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "NEC V810");            break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "1.0");                 break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Tomasz Slanina");      break;
-
-		case CPUINFO_STR_REGISTER + V810_PC:            sprintf(info->s, "PC:%08X", cpustate->PC);      break;
-		case CPUINFO_STR_REGISTER + V810_R0:            sprintf(info->s, "R0 :%08X", cpustate->R0);     break;
-		case CPUINFO_STR_REGISTER + V810_R1:            sprintf(info->s, "R1 :%08X", cpustate->R1);     break;
-		case CPUINFO_STR_REGISTER + V810_R2:            sprintf(info->s, "R2 :%08X", cpustate->R2);     break;
-		case CPUINFO_STR_REGISTER + V810_SP:            sprintf(info->s, "SP :%08X", cpustate->SP);     break;
-		case CPUINFO_STR_REGISTER + V810_R4:            sprintf(info->s, "R4 :%08X", cpustate->R4);     break;
-		case CPUINFO_STR_REGISTER + V810_R5:            sprintf(info->s, "R5 :%08X", cpustate->R5);     break;
-		case CPUINFO_STR_REGISTER + V810_R6:            sprintf(info->s, "R6 :%08X", cpustate->R6);     break;
-		case CPUINFO_STR_REGISTER + V810_R7:            sprintf(info->s, "R7 :%08X", cpustate->R7);     break;
-		case CPUINFO_STR_REGISTER + V810_R8:            sprintf(info->s, "R8 :%08X", cpustate->R8);     break;
-		case CPUINFO_STR_REGISTER + V810_R9:            sprintf(info->s, "R9 :%08X", cpustate->R9);     break;
-		case CPUINFO_STR_REGISTER + V810_R10:           sprintf(info->s, "R10:%08X", cpustate->R10);        break;
-		case CPUINFO_STR_REGISTER + V810_R11:           sprintf(info->s, "R11:%08X", cpustate->R11);        break;
-		case CPUINFO_STR_REGISTER + V810_R12:           sprintf(info->s, "R12:%08X", cpustate->R12);        break;
-		case CPUINFO_STR_REGISTER + V810_R13:           sprintf(info->s, "R13:%08X", cpustate->R13);        break;
-		case CPUINFO_STR_REGISTER + V810_R14:           sprintf(info->s, "R14:%08X", cpustate->R14);        break;
-		case CPUINFO_STR_REGISTER + V810_R15:           sprintf(info->s, "R15:%08X", cpustate->R15);        break;
-		case CPUINFO_STR_REGISTER + V810_R16:           sprintf(info->s, "R16:%08X", cpustate->R16);        break;
-		case CPUINFO_STR_REGISTER + V810_R17:           sprintf(info->s, "R17:%08X", cpustate->R17);        break;
-		case CPUINFO_STR_REGISTER + V810_R18:           sprintf(info->s, "R18:%08X", cpustate->R18);        break;
-		case CPUINFO_STR_REGISTER + V810_R19:           sprintf(info->s, "R19:%08X", cpustate->R19);        break;
-		case CPUINFO_STR_REGISTER + V810_R20:           sprintf(info->s, "R20:%08X", cpustate->R20);        break;
-		case CPUINFO_STR_REGISTER + V810_R21:           sprintf(info->s, "R21:%08X", cpustate->R21);        break;
-		case CPUINFO_STR_REGISTER + V810_R22:           sprintf(info->s, "R22:%08X", cpustate->R22);        break;
-		case CPUINFO_STR_REGISTER + V810_R23:           sprintf(info->s, "R23:%08X", cpustate->R23);        break;
-		case CPUINFO_STR_REGISTER + V810_R24:           sprintf(info->s, "R24:%08X", cpustate->R24);        break;
-		case CPUINFO_STR_REGISTER + V810_R25:           sprintf(info->s, "R25:%08X", cpustate->R25);        break;
-		case CPUINFO_STR_REGISTER + V810_R26:           sprintf(info->s, "R26:%08X", cpustate->R26);        break;
-		case CPUINFO_STR_REGISTER + V810_R27:           sprintf(info->s, "R27:%08X", cpustate->R27);        break;
-		case CPUINFO_STR_REGISTER + V810_R28:           sprintf(info->s, "R28:%08X", cpustate->R28);        break;
-		case CPUINFO_STR_REGISTER + V810_R29:           sprintf(info->s, "R29:%08X", cpustate->R29);        break;
-		case CPUINFO_STR_REGISTER + V810_R30:           sprintf(info->s, "R30:%08X", cpustate->R30);        break;
-		case CPUINFO_STR_REGISTER + V810_R31:           sprintf(info->s, "R31:%08X", cpustate->R31);        break;
-		case CPUINFO_STR_REGISTER + V810_EIPC:          sprintf(info->s, "EIPC :%08X", cpustate->EIPC); break;
-		case CPUINFO_STR_REGISTER + V810_PSW:           sprintf(info->s, "PSW  :%08X", cpustate->PSW);  break;
-		case CPUINFO_STR_REGISTER + V810_EIPSW:         sprintf(info->s, "EIPSW:%08X", cpustate->EIPSW);    break;
-		case CPUINFO_STR_REGISTER + V810_FEPC:          sprintf(info->s, "FEPC :%08X", cpustate->FEPC); break;
-		case CPUINFO_STR_REGISTER + V810_FEPSW:         sprintf(info->s, "FEPSW:%08X", cpustate->FEPSW);    break;
-		case CPUINFO_STR_REGISTER + V810_ECR:           sprintf(info->s, "ECR  :%08X", cpustate->ECR);  break;
-		case CPUINFO_STR_REGISTER + V810_PIR:           sprintf(info->s, "PIR  :%08X", cpustate->PIR);  break;
-		case CPUINFO_STR_REGISTER + V810_TKCW:          sprintf(info->s, "TKCW :%08X", cpustate->TKCW); break;
-		case CPUINFO_STR_REGISTER + V810_CHCW:          sprintf(info->s, "CHCW :%08X", cpustate->CHCW); break;
-		case CPUINFO_STR_REGISTER + V810_ADTRE:         sprintf(info->s, "ADTRE:%08X", cpustate->ADTRE);    break;
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(V810, v810);
+void v810_device::device_reset()
+{
+	int i;
+	for(i=0;i<64;i++)   m_reg[i]=0;
+	PC = 0xfffffff0;
+	PSW = 0x1000;
+	ECR   = 0x0000fff0;
+}
+
+void v810_device::take_interrupt()
+{
+	EIPC = PC;
+	EIPSW = PSW;
+
+	PC = 0xfffffe00 | (m_irq_line << 4);
+	ECR = 0xfe00 | (m_irq_line << 4);
+
+	UINT8 num = m_irq_line + 1;
+	if (num==0x10) num=0x0f;
+
+	PSW &= 0xfff0ffff; // clear interrupt level
+	SET_EP(1);
+	SET_ID(1);
+	PSW |= num << 16;
+
+	m_icount-= clkIF;
+}
+
+void v810_device::execute_run()
+{
+	if (m_irq_state != CLEAR_LINE) {
+		if (!(GET_NP | GET_EP | GET_ID)) {
+			if (m_irq_line >=((PSW & 0xF0000) >> 16)) {
+				take_interrupt();
+			}
+		}
+	}
+	while(m_icount>0)
+	{
+		UINT32 op;
+
+		m_PPC=PC;
+		debugger_instruction_hook(this, PC);
+		op=R_OP(PC);
+		PC+=2;
+		int cnt;
+		cnt = (this->*s_OpCodeTable[op>>10])(op);
+		m_icount-= cnt;
+	}
+}
+
+
+void v810_device::execute_set_input( int irqline, int state)
+{
+	m_irq_state = state;
+	m_irq_line = irqline;
+}
+
