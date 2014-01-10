@@ -7460,6 +7460,37 @@ ROM_START( clubkrte )
 	ROM_LOAD( "mpr-22703.ic11", 0xa800000, 0x1000000, CRC(702b8b4a) SHA1(3a8dfde458f341e7db20664382b9fce2b6e5d462) )
 ROM_END
 
+ROM_START( clubkprz )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-24065.ic11", 0x000000, 0x400000, CRC(7c331cb8) SHA1(f7e1cffbad576482a91bc1dc9129c689f0bebb25) ) 
+	ROM_LOAD32_WORD( "opr-24066.17s", 0x0800000, 0x800000, CRC(b22cfa7b) SHA1(e0f795dc9d3a2dd1869f85f3eedd0f8d703a1be8) ) 
+	ROM_LOAD32_WORD( "opr-24067.18",  0x0800002, 0x800000, CRC(0d2d1290) SHA1(a26fa82fc87d6ed60095b2e778b649fcbb8bb1ee) ) 
+	ROM_LOAD32_WORD( "opr-24068.19s", 0x1800000, 0x800000, CRC(d320009b) SHA1(76677eacd18770d091fc19e31be3d84410ed3256) ) 
+	ROM_LOAD32_WORD( "opr-24069.20",  0x1800002, 0x800000, CRC(56145c73) SHA1(a74a97a431a315f86a1b25d1fc9cc1fb93146776) ) 
+	ROM_LOAD32_WORD( "opr-24070.21s", 0x2800000, 0x800000, CRC(10a0c315) SHA1(337902393e215d94954f123c6b016925486c3374) ) 
+	ROM_LOAD32_WORD( "opr-24071.22",  0x2800002, 0x800000, CRC(040e1329) SHA1(cebf8bc48a745811bcc6bce0ad880eca392428f9) ) 
+	ROM_LOAD32_WORD( "opr-24072.23s", 0x3800000, 0x800000, CRC(1e9834e4) SHA1(a226689190739a39016b78c881f92b9bbb8d830e) ) 
+	ROM_LOAD32_WORD( "opr-24073.24",  0x3800002, 0x800000, CRC(51fb7d42) SHA1(fb0bffeb181b1f3efcfa22aabda1bea926d9048b) ) 
+	ROM_LOAD32_WORD( "opr-24074.25s", 0x4800000, 0x800000, CRC(636625fe) SHA1(fffd766cf14e66d10071a342573535ac708f87b7) ) 
+	ROM_LOAD32_WORD( "opr-24075.26",  0x4800002, 0x800000, CRC(9eee9689) SHA1(831ac7713cc4f47679609361f0e1c67bb028e795) ) 
+	ROM_LOAD32_WORD( "opr-24076.27s", 0x5800000, 0x800000, CRC(a89a5555) SHA1(c2c0eeb50f1afe6c7c3d978a99c6eaac96062bf0) ) 
+	ROM_LOAD32_WORD( "opr-24077.28",  0x5800002, 0x800000, CRC(1e11d0aa) SHA1(1cc4dd05e1fbd0fde669b40aa49098c14eafd035) ) 
+	ROM_LOAD32_WORD( "opr-24078.29",  0x6800000, 0x800000, CRC(a83f5f88) SHA1(ef0787cf84847e74fa3bb38d7133d87607df84fb) ) 
+	ROM_LOAD32_WORD( "opr-24079.30s", 0x6800002, 0x800000, CRC(57efa68f) SHA1(5dd863dfb035489de3bbb3c3f72ee5d87ec322be) ) 
+	ROM_LOAD32_WORD( "opr-24080.31",  0x7800000, 0x800000, CRC(307c480e) SHA1(6e52f252f557988e52c42d495713a374507b5895) ) 
+	ROM_LOAD32_WORD( "opr-24081.32s", 0x7800002, 0x800000, CRC(61085bdc) SHA1(48fe7f34bb5f50825b3c77d587e07f3adab1cf86) ) 
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "at25010.ic3s", 0x000000, 0x000084, CRC(0142d8be) SHA1(5922b6c47b12b19e1fa7bbe9aae391905038a7ff) ) 
+
+	ROM_REGION( 4, "rom_key", 0 )	// 317-0368-COM
+	ROM_LOAD( "clubkprz-key.bin", 0x000000, 0x000004, CRC(c9ed13c1) SHA1(2907985375cd5b04846e7214d200926be64d06fd) ) 
+ROM_END
+
 /**********************************************
  *
  * Naomi 2 GD-ROM defines
@@ -8223,7 +8254,7 @@ ROM_END
 /* 0087 */ GAME( 2002, kingrt66, naomi2,  naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "King of Route 66 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0095 */ GAME( 2002, soulsurf, naomi2,  naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "Soul Surfer (Rev A)", GAME_FLAGS )
 /* 0106 */ GAME( 2002, vf4evoct, naomi2,  naomi2m1, naomi, naomi_state, vf4evoct, ROT0, "Sega", "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-// 0129 Club Kart Prize
+/* 0129 */ GAME( 2003, clubkprz, naomi2,  naomi2m2, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart Prize (Rev D)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */ GAME( 1999, pstone,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
