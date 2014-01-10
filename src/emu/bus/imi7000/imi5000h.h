@@ -17,19 +17,11 @@
 #define __IMI5000H__
 
 #include "emu.h"
+#include "imi7000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_IMI5000H_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, IMI5000H, 0)
 
 
 
@@ -39,7 +31,8 @@
 
 // ======================> imi5000h_device
 
-class imi5000h_device :  public device_t
+class imi5000h_device :  public device_t,
+						 public device_imi7000_interface
 {
 public:
 	// construction/destruction

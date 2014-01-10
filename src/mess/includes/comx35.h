@@ -12,7 +12,6 @@
 #include "imagedev/printer.h"
 #include "imagedev/snapquik.h"
 #include "machine/cdp1871.h"
-#include "machine/comxpl80.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
 #include "sound/cdp1869.h"

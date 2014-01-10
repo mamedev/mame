@@ -40,6 +40,7 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/econet \
 	$(EMUOBJ)/bus/ep64 \
 	$(EMUOBJ)/bus/ieee488 \
+	$(EMUOBJ)/bus/imi7000 \
 	$(EMUOBJ)/bus/isbx \
 	$(EMUOBJ)/bus/pc_kbd \
 	$(EMUOBJ)/bus/pet \

@@ -255,6 +255,14 @@ static I8255A_INTERFACE( ppi1_intf )
 };
 
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "TERM_BAUD", 0xff, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_DATABITS", 0xff, 0x02 ) // 7
+	DEVICE_INPUT_DEFAULTS( "TERM_PARITY", 0xff, 0x02 ) // E
+	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x00 ) // 1
+DEVICE_INPUT_DEFAULTS_END
+
+
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( softbox )
 //-------------------------------------------------
@@ -277,6 +285,9 @@ static MACHINE_CONFIG_FRAGMENT( softbox )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+	//MCFG_IMI7000_BUS_ADD("imi5000h", NULL, NULL, NULL)
+
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 MACHINE_CONFIG_END
 
 
