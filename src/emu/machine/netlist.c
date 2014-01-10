@@ -278,9 +278,9 @@ ATTR_HOT ATTR_ALIGN void netlist_mame_device_t::check_mame_abort_slice()
 
 ATTR_COLD void netlist_mame_device_t::save_state()
 {
-	for (pstate_entry_t::list_t::entry_t *p = netlist().save_list().first(); p != NULL; p = netlist().save_list().next(p))
+	for (pstate_entry_t * const *p = netlist().save_list().first(); p != NULL; p = netlist().save_list().next(p))
 	{
-		pstate_entry_t *s = p->object();
+		pstate_entry_t *s = *p;
 		NL_VERBOSE_OUT(("saving state for %s\n", s->m_name.cstr()));
 		switch (s->m_dt)
 		{
@@ -337,7 +337,7 @@ void netlist_mame_cpu_device_t::device_start()
     for (int i=0; i < netlist().m_nets.count(); i++)
     {
         netlist_net_t *n = netlist().m_nets[i];
-        if (n->isRailNet())
+        if (n->isFamily(netlist_object_t::LOGIC))
         {
             state_add(i*2, n->name(), n->Q_state_ptr());
         }

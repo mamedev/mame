@@ -92,12 +92,12 @@ void netlist_setup_t::remove_dev(const pstring &name)
 	remove_start_with<tagmap_terminal_t>(m_terminals, temp);
 	remove_start_with<tagmap_param_t>(m_params, temp);
 
-	tagmap_link_t::entry_t *p = m_links.first();
+	const link_t *p = m_links.first();
 	while (p != NULL)
 	{
-		tagmap_link_t::entry_t *n = m_links.next(p);
-		if (temp.equals(p->object().e1.substr(0,temp.len())) || temp.equals(p->object().e2.substr(0,temp.len())))
-			m_links.remove(p->object());
+	    const link_t *n = m_links.next(p);
+		if (temp.equals(p->e1.substr(0,temp.len())) || temp.equals(p->e2.substr(0,temp.len())))
+			m_links.remove(*p);
 		p = n;
 	}
 	netlist().m_devices.remove(name);
@@ -527,10 +527,10 @@ void netlist_setup_t::resolve_inputs()
     bool has_twoterms = false;
 
 	NL_VERBOSE_OUT(("Resolving ...\n"));
-	for (tagmap_link_t::entry_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
+	for (const link_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
 	{
-		const pstring t1s = entry->object().e1;
-		const pstring t2s = entry->object().e2;
+		const pstring t1s = entry->e1;
+		const pstring t2s = entry->e2;
 		netlist_core_terminal_t *t1 = find_terminal(t1s);
 		netlist_core_terminal_t *t2 = find_terminal(t2s);
 
@@ -548,12 +548,12 @@ void netlist_setup_t::resolve_inputs()
 	NL_VERBOSE_OUT(("deleting empty nets ...\n"));
 
 	// delete empty nets ...
-	for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+	for (netlist_net_t *const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
 	{
-		if (pn->object()->m_head == NULL)
+		if ((*pn)->m_head == NULL)
 		{
 			NL_VERBOSE_OUT(("Deleting net ...\n"));
-			netlist_net_t *to_delete = pn->object();
+			netlist_net_t *to_delete = *pn;
 			netlist().m_nets.remove(to_delete);
 			if (!to_delete->isRailNet())
 				delete to_delete;
@@ -564,8 +564,8 @@ void netlist_setup_t::resolve_inputs()
     /* now that nets were deleted ... register all net items */
     NL_VERBOSE_OUT(("late state saving for nets ...\n"));
 
-    for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
-        pn->object()->late_save_register();
+    for (netlist_net_t * const * pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+        (*pn)->late_save_register();
 
     NL_VERBOSE_OUT(("looking for terminals not connected ...\n"));
     for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
@@ -573,6 +573,12 @@ void netlist_setup_t::resolve_inputs()
         if (!entry->object()->has_net())
             netlist().error("Found terminal %s without a net\n",
                     entry->object()->name().cstr());
+        // FIXME: need a warning callback ....
+#if 0
+        else if (entry->object()->net().num_cons() == 0)
+            netlist().error("Found terminal %s without connections\n",
+                    entry->object()->name().cstr());
+#endif
     }
 
 

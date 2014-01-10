@@ -597,6 +597,8 @@ public:
         return m_cur.Analog;
     }
 
+    ATTR_HOT inline int num_cons() { return m_num_cons; }
+
 	// m_terms is only used by analog subsystem
 	typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
 
@@ -683,8 +685,6 @@ public:
 
 	ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time delay)
 	{
-		assert(net().m_num_cons != 1);
-
 		if (EXPECTED(newQ !=  net().m_new.Q))
 		{
 		    net().m_new.Q = newQ;

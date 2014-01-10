@@ -23,15 +23,15 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
     m_resched = true;
 
 	m_owner = &aowner;
-	for (netlist_net_t::list_t::entry_t *pn = nets.first(); pn != NULL; pn = nets.next(pn))
+	for (netlist_net_t * const * pn = nets.first(); pn != NULL; pn = nets.next(pn))
 	{
 		NL_VERBOSE_OUT(("setting up net\n"));
 
-	    m_nets.add(pn->object());
+	    m_nets.add(*pn);
 
-	    pn->object()->m_solver = this;
+	    (*pn)->m_solver = this;
 
-		for (netlist_core_terminal_t *p = pn->object()->m_head; p != NULL; p = p->m_update_list_next)
+		for (netlist_core_terminal_t *p = (*pn)->m_head; p != NULL; p = p->m_update_list_next)
 		{
 			switch (p->type())
 			{
@@ -52,7 +52,7 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 						default:
 							break;
 					}
-					pn->object()->m_terms.add(static_cast<netlist_terminal_t *>(p));
+					(*pn)->m_terms.add(static_cast<netlist_terminal_t *>(p));
 					NL_VERBOSE_OUT(("Added terminal\n"));
 					break;
 				case netlist_terminal_t::INPUT:
@@ -71,22 +71,22 @@ ATTR_COLD void netlist_matrix_solver_t::setup(netlist_net_t::list_t &nets, NETLI
 ATTR_HOT inline void netlist_matrix_solver_t::step(const netlist_time delta)
 {
 	const double dd = delta.as_double();
-	for (dev_list_t::entry_t *p = m_steps.first(); p != NULL; p = m_steps.next(p))
-		p->object()->step_time(dd);
+	for (netlist_core_device_t * const *p = m_steps.first(); p != NULL; p = m_steps.next(p))
+		(*p)->step_time(dd);
 }
 
 ATTR_HOT inline void netlist_matrix_solver_t::update_inputs()
 {
-	for (netlist_core_terminal_t::list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+	for (netlist_core_terminal_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
 	{
-	    if (p->object()->net().m_last.Analog != p->object()->net().m_cur.Analog)
+	    if ((*p)->net().m_last.Analog != (*p)->net().m_cur.Analog)
 	    {
-	        p->object()->netdev().update_dev();
+	        (*p)->netdev().update_dev();
 	    }
 	}
-    for (netlist_core_terminal_t::list_t::entry_t *p = m_inps.first(); p != NULL; p = m_inps.next(p))
+    for (netlist_core_terminal_t * const *p = m_inps.first(); p != NULL; p = m_inps.next(p))
     {
-        p->object()->net().m_last.Analog = p->object()->net().m_cur.Analog;
+        (*p)->net().m_last.Analog = (*p)->net().m_cur.Analog;
     }
 
 }
@@ -106,9 +106,9 @@ ATTR_HOT inline int netlist_matrix_solver_t::solve_non_dynamic()
     do {
         resched = false;
 
-        for (netlist_net_t::list_t::entry_t *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
+        for (netlist_net_t * const *pn = m_nets.first(); pn != NULL; pn = m_nets.next(pn))
         {
-            netlist_net_t *net = pn->object();
+            netlist_net_t *net = *pn;
             const netlist_net_t::terminal_list_t &terms = net->m_terms;
 
             double gtot = 0;
@@ -159,14 +159,14 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
         do
         {
             /* update all non-linear devices  */
-            for (dev_list_t::entry_t *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
-                switch (p->object()->family())
+            for (netlist_core_device_t * const *p = m_dynamic.first(); p != NULL; p = m_dynamic.next(p))
+                switch ((*p)->family())
                 {
                     case netlist_device_t::DIODE:
-                        static_cast<NETLIB_NAME(D) *>(p->object())->update_terminals();
+                        static_cast<NETLIB_NAME(D) *>((*p))->update_terminals();
                         break;
                     default:
-                        p->object()->update_terminals();
+                        (*p)->update_terminals();
                         break;
                 }
             this_resched = solve_non_dynamic();
@@ -261,11 +261,11 @@ NETLIB_UPDATE_PARAM(solver)
 
 NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 {
-	netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first();
+	netlist_matrix_solver_t * const *e = m_mat_solvers.first();
 	while (e != NULL)
 	{
-		netlist_matrix_solver_t::list_t::entry_t *en = m_mat_solvers.next(e);
-		delete e->object();
+		netlist_matrix_solver_t * const *en = m_mat_solvers.next(e);
+		delete *e;
 		e = en;
 	}
 
@@ -281,9 +281,9 @@ NETLIB_UPDATE(solver)
 		NL_VERBOSE_OUT(("Step!\n"));
 		/* update all terminals for new time step */
 		m_last_step = now;
-		for (netlist_matrix_solver_t::list_t::entry_t *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
+		for (netlist_matrix_solver_t * const *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
 		{
-			e->object()->step(delta);
+			(*e)->step(delta);
 		}
 	}
 	bool global_resched = false;
@@ -335,12 +335,12 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 
     SOLVER_VERBOSE_OUT(("Scanning net groups ...\n"));
     // determine net groups
-    for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+    for (netlist_net_t * const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
     {
-        if (!already_processed(groups, cur_group, pn->object()))
+        if (!already_processed(groups, cur_group, *pn))
         {
             cur_group++;
-            process_net(groups, cur_group, pn->object());
+            process_net(groups, cur_group, *pn);
         }
     }
 

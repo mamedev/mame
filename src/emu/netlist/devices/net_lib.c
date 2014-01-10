@@ -228,9 +228,9 @@ netlist_factory_t::netlist_factory_t()
 
 netlist_factory_t::~netlist_factory_t()
 {
-	for (list_t::entry_t *e = m_list.first(); e != NULL; e = m_list.next(e))
+	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
 	{
-		net_device_t_base_factory *p = e->object();
+		net_device_t_base_factory *p = *e;
 		delete p;
 	}
 	m_list.reset();
@@ -281,9 +281,9 @@ void netlist_factory_t::initialize()
 
 netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const
 {
-	for (list_t::entry_t *e = m_list.first(); e != NULL; e = m_list.next(e))
+	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
 	{
-		net_device_t_base_factory *p = e->object();
+		net_device_t_base_factory *p = *e;
 		if (strcmp(p->classname(), classname) == 0)
 		{
 			netlist_device_t *ret = p->Create();
@@ -303,9 +303,9 @@ netlist_device_t *netlist_factory_t::new_device_by_name(const pstring &name, net
 
 net_device_t_base_factory * netlist_factory_t::factory_by_name(const pstring &name, netlist_setup_t &setup) const
 {
-    for (list_t::entry_t *e = m_list.first(); e != NULL; e = m_list.next(e))
+    for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
     {
-        net_device_t_base_factory *p = e->object();
+        net_device_t_base_factory *p = *e;
         if (strcmp(p->name(), name) == 0)
         {
             return p;

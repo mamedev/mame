@@ -20,27 +20,17 @@ class netlist_list_t
 {
 public:
 
-	struct entry_t
-	{
-	    friend class netlist_list_t;
-	public:
-		// keep compatibility with tagmap
-		ATTR_HOT inline _ListClass object() { return m_obj; }
-	private:
-		_ListClass m_obj;
-	};
-
 	ATTR_COLD netlist_list_t(int numElements = _NumElem)
 	{
 		m_num_elements = numElements;
-		m_list = new entry_t[m_num_elements];
+		m_list = new _ListClass[m_num_elements];
         m_count = 0;
 	}
 
 	ATTR_COLD netlist_list_t(const netlist_list_t &rhs)
 	{
 	    m_num_elements = rhs.capacity();
-		m_list = new entry_t[m_num_elements];
+		m_list = new _ListClass[m_num_elements];
 		m_count = 0;
 		for (int i=0; i<rhs.count(); i++)
 		{
@@ -63,21 +53,21 @@ public:
 		delete[] m_list;
 	}
 
-	ATTR_HOT inline void add(const _ListClass elem)
+	ATTR_HOT inline void add(const _ListClass &elem)
 	{
 		if (m_count >= m_num_elements)
 			resize(m_num_elements * 2);
 
-		m_list[m_count++].m_obj = elem;
+		m_list[m_count++] = elem;
 	}
 
 	ATTR_HOT inline void resize(const int new_size)
 	{
 		int cnt = count();
-		entry_t *m_new = new entry_t[new_size];
-		entry_t *pd = m_new;
+		_ListClass *m_new = new _ListClass[new_size];
+		_ListClass *pd = m_new;
 
-		for (entry_t *ps = m_list; ps < m_list + cnt; ps++, pd++)
+		for (_ListClass *ps = m_list; ps < m_list + cnt; ps++, pd++)
 			*pd = *ps;
 		delete[] m_list;
 		m_list = m_new;
@@ -85,11 +75,11 @@ public:
 		m_num_elements = new_size;
 	}
 
-	ATTR_HOT inline void remove(const _ListClass elem)
+	ATTR_HOT inline void remove(const _ListClass &elem)
 	{
-		for (int i =0; i < m_count; i++)
+		for (int i = 0; i < m_count; i++)
 		{
-			if (m_list[i].object() == elem)
+			if (m_list[i] == elem)
 			{
 			    m_count --;
 				while (i < m_count)
@@ -102,19 +92,19 @@ public:
 		}
 	}
 
-	ATTR_HOT inline bool contains(const _ListClass elem) const
+	ATTR_HOT inline bool contains(const _ListClass &elem) const
 	{
-		for (entry_t *i = m_list; i < m_list + m_count; i++)
+		for (_ListClass *i = m_list; i < m_list + m_count; i++)
 		{
-			if (i->object() == elem)
+			if (*i == elem)
 				return true;
 		}
 		return false;
 	}
 
-	ATTR_HOT inline entry_t *first() const { return ((m_count > 0) ? &m_list[0] : NULL ); }
-	ATTR_HOT inline entry_t *next(entry_t *lc) const { return ((lc < last()) ? lc + 1 : NULL ); }
-	ATTR_HOT inline entry_t *last() const { return &m_list[m_count -1]; }
+	ATTR_HOT inline const _ListClass *first() const { return ((m_count > 0) ? &m_list[0] : NULL ); }
+	ATTR_HOT inline const _ListClass *next(const _ListClass *lc) const { return ((lc < last()) ? lc + 1 : NULL ); }
+	ATTR_HOT inline const _ListClass *last() const { return &m_list[m_count -1]; }
 	ATTR_HOT inline int count() const { return m_count; }
 	ATTR_HOT inline bool empty() const { return (m_count == 0); }
 	ATTR_HOT inline void reset() { m_count = 0; }
@@ -122,19 +112,19 @@ public:
 
 	ATTR_COLD void reset_and_free()
 	{
-		for (entry_t *i = m_list; i < m_list + m_count; i++)
+		for (_ListClass *i = m_list; i < m_list + m_count; i++)
 		{
-			delete i->object();
+			delete *i;
 		}
 		reset();
 	}
 
-	ATTR_HOT inline _ListClass& operator[](const int & index) { return m_list[index].m_obj; }
-	ATTR_HOT inline const _ListClass& operator[](const int & index) const { return m_list[index].m_obj; }
+	ATTR_HOT inline _ListClass& operator[](const int & index) { return m_list[index]; }
+	ATTR_HOT inline const _ListClass& operator[](const int & index) const { return m_list[index]; }
 
 private:
 	int m_count;
-	entry_t * m_list;
+	_ListClass * m_list;
 	int m_num_elements;
 	//_ListClass m_list[_NumElements];
 };

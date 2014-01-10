@@ -132,12 +132,12 @@ netlist_base_t::~netlist_base_t()
 {
 	tagmap_free_entries<tagmap_devices_t>(m_devices);
 
-	netlist_net_t::list_t::entry_t *p = m_nets.first();
+	netlist_net_t * const *p = m_nets.first();
 	while (p != NULL)
 	{
-		netlist_net_t::list_t::entry_t *pn = m_nets.next(p);
-		if (!p->object()->isRailNet())
-			delete p->object();
+		netlist_net_t * const *pn = m_nets.next(p);
+		if (!(*p)->isRailNet())
+			delete (*p);
 		p = pn;
 	}
 
@@ -147,10 +147,10 @@ netlist_base_t::~netlist_base_t()
 
 ATTR_COLD netlist_net_t *netlist_base_t::find_net(const pstring &name)
 {
-	for (netlist_net_t::list_t::entry_t *p = m_nets.first(); p != NULL; p = m_nets.next(p))
+	for (netlist_net_t * const *p = m_nets.first(); p != NULL; p = m_nets.next(p))
 	{
-		if (p->object()->name() == name)
-			return p->object();
+		if ((*p)->name() == name)
+			return *p;
 	}
 	return NULL;
 }
