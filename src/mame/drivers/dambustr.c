@@ -51,7 +51,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "audio/galaxian.h"
 #include "includes/galaxold.h"
-#include "machine/7474.h"
 
 
 class dambustr_state : public galaxold_state
@@ -253,8 +252,11 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
 
-	MCFG_7474_ADD("7474_9m_1", WRITELINE(dambustr_state,galaxold_7474_9m_1_callback), NOOP)
-	MCFG_7474_ADD("7474_9m_2", NOOP, WRITELINE(dambustr_state,galaxold_7474_9m_2_q_callback))
+	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
+	MCFG_7474_OUTPUT_CB(WRITELINE(dambustr_state,galaxold_7474_9m_1_callback))
+
+	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(dambustr_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", dambustr_state, galaxold_interrupt_timer)
 

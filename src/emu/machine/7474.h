@@ -50,18 +50,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_7474_ADD(_tag, _output_cb, _comp_output_cb) \
-	MCFG_DEVICE_ADD(_tag, MACHINE_TTL7474, 0) \
-	MCFG_7474_OUTPUT_CB(_output_cb) \
-	MCFG_7474_COMP_OUTPUT_CB(_comp_output_cb)
-
-#define MCFG_7474_REPLACE(_tag, _output_cb, _comp_output_cb) \
-	MCFG_DEVICE_REPLACE(_tag, TTL7474, 0) \
-	MCFG_7474_OUTPUT_CB(_output_cb) \
-	MCFG_7474_COMP_OUTPUT_CB(_comp_output_cb)
-
 #define MCFG_7474_OUTPUT_CB(_devcb) \
 	devcb = &ttl7474_device::set_output_cb(*device, DEVCB2_##_devcb);
+
 #define MCFG_7474_COMP_OUTPUT_CB(_devcb) \
 	devcb = &ttl7474_device::set_comp_output_cb(*device, DEVCB2_##_devcb);
 
@@ -122,7 +113,7 @@ private:
 
 
 // device type definition
-extern const device_type MACHINE_TTL7474;
+extern const device_type TTL7474;
 
 
 #endif /* __TTL7474_H__ */

@@ -364,7 +364,6 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/7474.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
@@ -2351,8 +2350,11 @@ static MACHINE_CONFIG_START( galaxold_base, galaxold_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,galaxold)
 
-	MCFG_7474_ADD("7474_9m_1", WRITELINE(galaxold_state,galaxold_7474_9m_1_callback), NOOP)
-	MCFG_7474_ADD("7474_9m_2", NOOP, WRITELINE(galaxold_state,galaxold_7474_9m_2_q_callback))
+	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
+	MCFG_7474_OUTPUT_CB(WRITELINE(galaxold_state,galaxold_7474_9m_1_callback))
+
+	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(galaxold_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", galaxold_state, galaxold_interrupt_timer)
 

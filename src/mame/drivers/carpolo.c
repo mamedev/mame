@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/7474.h"
 #include "machine/74153.h"
 #include "machine/6821pia.h"
 #include "includes/carpolo.h"
@@ -260,18 +259,26 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
 	MCFG_PIA_CA2_HANDLER(WRITELINE(carpolo_state, coin3_interrupt_clear_w))
 	MCFG_PIA_CB2_HANDLER(WRITELINE(carpolo_state, coin4_interrupt_clear_w))
 
-	MCFG_7474_ADD("7474_2s_1", NOOP, WRITELINE(carpolo_state, carpolo_7474_2s_1_q_cb))
-	MCFG_7474_ADD("7474_2s_2", NOOP, WRITELINE(carpolo_state, carpolo_7474_2s_2_q_cb))
-	MCFG_7474_ADD("7474_2u_1", NOOP, WRITELINE(carpolo_state, carpolo_7474_2u_1_q_cb))
-	MCFG_7474_ADD("7474_2u_2", NOOP, WRITELINE(carpolo_state, carpolo_7474_2u_2_q_cb))
-	MCFG_7474_ADD("7474_1f_1", NOOP, NOOP)
-	MCFG_7474_ADD("7474_1f_2", NOOP, NOOP)
-	MCFG_7474_ADD("7474_1d_1", NOOP, NOOP)
-	MCFG_7474_ADD("7474_1d_2", NOOP, NOOP)
-	MCFG_7474_ADD("7474_1c_1", NOOP, NOOP)
-	MCFG_7474_ADD("7474_1c_2", NOOP, NOOP)
-	MCFG_7474_ADD("7474_1a_1", NOOP, NOOP)
-	MCFG_7474_ADD("7474_1a_2", NOOP, NOOP)
+	MCFG_DEVICE_ADD("7474_2s_1", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(carpolo_state, carpolo_7474_2s_1_q_cb))
+
+	MCFG_DEVICE_ADD("7474_2s_2", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(carpolo_state, carpolo_7474_2s_2_q_cb))
+
+	MCFG_DEVICE_ADD("7474_2u_1", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(carpolo_state, carpolo_7474_2u_1_q_cb))
+
+	MCFG_DEVICE_ADD("7474_2u_2", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(carpolo_state, carpolo_7474_2u_2_q_cb))
+
+	MCFG_DEVICE_ADD("7474_1f_1", TTL7474, 0)
+	MCFG_DEVICE_ADD("7474_1f_2", TTL7474, 0)
+	MCFG_DEVICE_ADD("7474_1d_1", TTL7474, 0)
+	MCFG_DEVICE_ADD("7474_1d_2", TTL7474, 0)
+	MCFG_DEVICE_ADD("7474_1c_1", TTL7474, 0)
+	MCFG_DEVICE_ADD("7474_1c_2", TTL7474, 0)
+	MCFG_DEVICE_ADD("7474_1a_1", TTL7474, 0)
+	MCFG_DEVICE_ADD("7474_1a_2", TTL7474, 0)
 
 	MCFG_74148_ADD("74148_3s", carpolo_ttl74148_intf)
 	MCFG_74153_ADD("74153_1k", carpolo_ttl74153_intf)

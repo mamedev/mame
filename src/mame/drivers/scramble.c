@@ -30,7 +30,6 @@ Notes:
 #include "cpu/s2650/s2650.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "machine/7474.h"
 #include "machine/i8255.h"
 #include "includes/scramble.h"
 
@@ -1362,7 +1361,7 @@ I8255A_INTERFACE( scramble_ppi_1_intf )
 	DEVCB_NULL,                             /* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
 	DEVCB_NULL,                             /* Port B read */
-	DEVCB_HANDLER(scramble_sh_irqtrigger_w),/* Port B write */
+	DEVCB_DRIVER_MEMBER(scramble_state, scramble_sh_irqtrigger_w),/* Port B write */
 	DEVCB_NULL,                             /* Port C read */
 	DEVCB_NULL                              /* Port C write */
 };
@@ -1372,7 +1371,7 @@ I8255A_INTERFACE( stratgyx_ppi_1_intf )
 	DEVCB_NULL,                             /* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
 	DEVCB_NULL,                             /* Port B read */
-	DEVCB_HANDLER(scramble_sh_irqtrigger_w),/* Port B write */
+	DEVCB_DRIVER_MEMBER(scramble_state, scramble_sh_irqtrigger_w),/* Port B write */
 	DEVCB_INPUT_PORT("IN3"),                /* Port C read */
 	DEVCB_NULL                              /* Port C write */
 };
@@ -1382,7 +1381,7 @@ I8255A_INTERFACE( scramble_protection_ppi_1_intf )
 	DEVCB_NULL,                             /* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
 	DEVCB_NULL,                             /* Port B read */
-	DEVCB_HANDLER(scramble_sh_irqtrigger_w),/* Port B write */
+	DEVCB_DRIVER_MEMBER(scramble_state, scramble_sh_irqtrigger_w),/* Port B write */
 	DEVCB_DRIVER_MEMBER(scramble_state, scramble_protection_r), /* Port C read */
 	DEVCB_DRIVER_MEMBER(scramble_state, scramble_protection_w)  /* Port C write */
 };
@@ -1392,7 +1391,7 @@ I8255A_INTERFACE( mrkougar_ppi_1_intf )
 	DEVCB_NULL,                             /* Port A read */
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),/* Port A write */
 	DEVCB_NULL,                             /* Port B read */
-	DEVCB_HANDLER(mrkougar_sh_irqtrigger_w),/* Port B write */
+	DEVCB_DRIVER_MEMBER(scramble_state, mrkougar_sh_irqtrigger_w),/* Port B write */
 	DEVCB_NULL,                             /* Port C read */
 	DEVCB_NULL                              /* Port C write */
 };
@@ -1451,10 +1450,14 @@ static MACHINE_CONFIG_START( scramble, scramble_state )
 	MCFG_CPU_PROGRAM_MAP(scramble_sound_map)
 	MCFG_CPU_IO_MAP(scramble_sound_io_map)
 
-	MCFG_7474_ADD("7474_9m_1", WRITELINE(scramble_state,galaxold_7474_9m_1_callback), NOOP)
-	MCFG_7474_ADD("7474_9m_2", NOOP, WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
+	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
+	MCFG_7474_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_1_callback))
 
-	MCFG_7474_ADD("konami_7474", NOOP, WRITELINE(scramble_state,scramble_sh_7474_q_callback))
+	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
+
+	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,scramble_sh_7474_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 
@@ -1687,9 +1690,14 @@ static MACHINE_CONFIG_START( ad2083, scramble_state )
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(ad2083_map)
 
-	MCFG_7474_ADD("konami_7474", NOOP, WRITELINE(scramble_state,scramble_sh_7474_q_callback))
-	MCFG_7474_ADD("7474_9m_1", WRITELINE(scramble_state,galaxold_7474_9m_1_callback), NOOP)
-	MCFG_7474_ADD("7474_9m_2", NOOP, WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
+	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,scramble_sh_7474_q_callback))
+
+	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
+	MCFG_7474_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_1_callback))
+
+	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scramble_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scramble_state, galaxold_interrupt_timer)
 

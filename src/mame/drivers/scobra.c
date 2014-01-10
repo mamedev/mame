@@ -35,7 +35,6 @@ Notes/Tidbits:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "machine/7474.h"
 #include "sound/ay8910.h"
 #include "includes/scramble.h"
 
@@ -735,15 +734,19 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 	MCFG_CPU_PROGRAM_MAP(scobra_sound_map)
 	MCFG_CPU_IO_MAP(scobra_sound_io_map)
 
-	MCFG_7474_ADD("konami_7474", NOOP, WRITELINE(scobra_state,scramble_sh_7474_q_callback))
+	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scobra_state,scramble_sh_7474_q_callback))
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
 	MCFG_I8255A_ADD( "ppi8255_0", scramble_ppi_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
-	MCFG_7474_ADD("7474_9m_1", WRITELINE(scobra_state,galaxold_7474_9m_1_callback), NOOP)
-	MCFG_7474_ADD("7474_9m_2", NOOP, WRITELINE(scobra_state,galaxold_7474_9m_2_q_callback))
+	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
+	MCFG_7474_OUTPUT_CB(WRITELINE(scobra_state,galaxold_7474_9m_1_callback))
+
+	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scobra_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 
@@ -857,12 +860,16 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 	MCFG_CPU_PROGRAM_MAP(hustler_sound_map)
 	MCFG_CPU_IO_MAP(hustler_sound_io_map)
 
-	MCFG_7474_ADD("konami_7474", NOOP, WRITELINE(scobra_state,scramble_sh_7474_q_callback))
+	MCFG_DEVICE_ADD("konami_7474", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scobra_state,scramble_sh_7474_q_callback))
 
 	MCFG_MACHINE_RESET_OVERRIDE(scobra_state,scramble)
 
-	MCFG_7474_ADD("7474_9m_1", WRITELINE(scobra_state,galaxold_7474_9m_1_callback), NOOP)
-	MCFG_7474_ADD("7474_9m_2", NOOP, WRITELINE(scobra_state,galaxold_7474_9m_2_q_callback))
+	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
+	MCFG_7474_OUTPUT_CB(WRITELINE(scobra_state,galaxold_7474_9m_1_callback))
+
+	MCFG_DEVICE_ADD("7474_9m_2", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scobra_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 

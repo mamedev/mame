@@ -6,11 +6,14 @@ class scramble_state : public galaxold_state
 public:
 	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaxold_state(mconfig, type, tag),
-			m_ppi8255_0(*this, "ppi8255_0"),
-			m_ppi8255_1(*this, "ppi8255_1"),
-			m_soundram(*this, "soundram")
-	{ }
+		m_konami_7474(*this, "konami_7474"),
+		m_ppi8255_0(*this, "ppi8255_0"),
+		m_ppi8255_1(*this, "ppi8255_1"),
+		m_soundram(*this, "soundram")
+	{
+	}
 
+	optional_device<ttl7474_device> m_konami_7474;
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;
 	optional_shared_ptr<UINT8> m_soundram;
@@ -83,6 +86,10 @@ public:
 	DECLARE_WRITE8_MEMBER( cavelon_banksw_w );
 	DECLARE_READ8_MEMBER( hunchbks_mirror_r );
 	DECLARE_WRITE8_MEMBER( hunchbks_mirror_w );
+	void sh_init();
+	DECLARE_WRITE8_MEMBER( scramble_sh_irqtrigger_w );
+	DECLARE_WRITE8_MEMBER( mrkougar_sh_irqtrigger_w );
+	IRQ_CALLBACK_MEMBER( scramble_sh_irq_callback );
 };
 
 
@@ -94,16 +101,10 @@ extern const i8255_interface(stratgyx_ppi_1_intf);
 
 /*----------- defined in audio/scramble.c -----------*/
 
-void scramble_sh_init(running_machine &machine);
-
-
 DECLARE_READ8_DEVICE_HANDLER( scramble_portB_r );
 DECLARE_READ8_DEVICE_HANDLER( frogger_portB_r );
 
 DECLARE_READ8_DEVICE_HANDLER( hotshock_soundlatch_r );
-
-DECLARE_WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w );
-DECLARE_WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w );
 
 DECLARE_WRITE8_DEVICE_HANDLER( harem_portA_w );
 DECLARE_WRITE8_DEVICE_HANDLER( harem_portB_w );
