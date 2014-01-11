@@ -1656,7 +1656,6 @@ static MACHINE_CONFIG_START( dkong_base, dkong_state )
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK_1H)
 	MCFG_CPU_PROGRAM_MAP(dkong_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  vblank_irq)
-	MCFG_S2650_FLAG_HANDLER(WRITELINE(dkong_state, s2650_fo_w))
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
@@ -1777,6 +1776,7 @@ static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
 	MCFG_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
 	MCFG_CPU_PROGRAM_MAP(s2650_map)
 	MCFG_CPU_IO_MAP(s2650_io_map)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(dkong_state, s2650_fo_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  s2650_interrupt)
 
 	MCFG_DEVICE_MODIFY("dma8257")
