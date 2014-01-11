@@ -16,39 +16,19 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_TTL_CONST(_name, _v)                                                 \
-		NET_REGISTER_DEV(ttl_const, _name)                                          \
-		NETDEV_PARAM(_name.CONST, _v)
+#define NETDEV_TTL_INPUT(_name, _v)                                                 \
+		NET_REGISTER_DEV(ttl_input, _name)                                          \
+		NETDEV_PARAM(_name.IN, _v)
 
-#define NETDEV_ANALOG_CONST(_name, _v)                                              \
-		NET_REGISTER_DEV(analog_const, _name)                                       \
-		NETDEV_PARAM(_name.CONST, _v)
+#define NETDEV_ANALOG_INPUT(_name, _v)                                              \
+		NET_REGISTER_DEV(analog_input, _name)                                       \
+		NETDEV_PARAM(_name.IN, _v)
 
 #define NETDEV_MAINCLOCK(_name)                                                     \
 		NET_REGISTER_DEV(mainclock, _name)
 
 #define NETDEV_CLOCK(_name)                                                         \
 		NET_REGISTER_DEV(clock, _name)
-
-#define NETDEV_LOGIC_INPUT(_name)                                                   \
-		NET_REGISTER_DEV(logic_input, _name)
-
-#define NETDEV_ANALOG_INPUT(_name)                                                  \
-		NET_REGISTER_DEV(analog_input, _name)
-
-// ----------------------------------------------------------------------------------------
-// netdev_*_const
-// ----------------------------------------------------------------------------------------
-
-NETLIB_DEVICE_WITH_PARAMS(ttl_const,
-	netlist_ttl_output_t m_Q;
-	netlist_param_logic_t m_const;
-);
-
-NETLIB_DEVICE_WITH_PARAMS(analog_const,
-	netlist_analog_output_t m_Q;
-	netlist_param_double_t m_const;
-);
 
 // ----------------------------------------------------------------------------------------
 // mainclock
@@ -81,16 +61,16 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 // Special support devices ...
 // ----------------------------------------------------------------------------------------
 
-NETLIB_DEVICE_WITH_PARAMS(logic_input,
+NETLIB_DEVICE_WITH_PARAMS(ttl_input,
 	netlist_ttl_output_t m_Q;
 
-	netlist_param_logic_t m_OUT;
+	netlist_param_logic_t m_IN;
 );
 
 NETLIB_DEVICE_WITH_PARAMS(analog_input,
 	netlist_analog_output_t m_Q;
 
-    netlist_param_double_t m_OUT;
+    netlist_param_double_t m_IN;
 );
 
 

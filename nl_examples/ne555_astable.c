@@ -17,7 +17,7 @@ NETLIST_START(ne555_astable)
     NETDEV_SOLVER(Solver)
     NETDEV_PARAM(Solver.FREQ, 48000)
 
-    NETDEV_ANALOG_CONST(V5, 5)  // 5V
+    NETDEV_ANALOG_INPUT(V5, 5)  // 5V
 
     /* Wiring up the ne555 */
 

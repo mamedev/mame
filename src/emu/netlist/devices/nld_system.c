@@ -4,52 +4,6 @@
  */
 
 #include "nld_system.h"
-//#include "nld_twoterm.h"
-
-// ----------------------------------------------------------------------------------------
-// netdev_const
-// ----------------------------------------------------------------------------------------
-
-NETLIB_START(ttl_const)
-{
-	register_output("Q", m_Q);
-	register_param("CONST", m_const, 0);
-}
-
-NETLIB_RESET(ttl_const)
-{
-}
-
-NETLIB_UPDATE(ttl_const)
-{
-    OUTLOGIC(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
-}
-
-NETLIB_UPDATE_PARAM(ttl_const)
-{
-    OUTLOGIC(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
-}
-
-NETLIB_START(analog_const)
-{
-	register_output("Q", m_Q);
-	register_param("CONST", m_const, 0.0);
-}
-
-NETLIB_RESET(analog_const)
-{
-}
-
-NETLIB_UPDATE(analog_const)
-{
-    OUTANALOG(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
-}
-
-NETLIB_UPDATE_PARAM(analog_const)
-{
-	//m_Q.initial(m_const.Value());
-    OUTANALOG(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
-}
 
 // ----------------------------------------------------------------------------------------
 // clock
@@ -85,24 +39,24 @@ NETLIB_UPDATE(clock)
 // logic_input
 // ----------------------------------------------------------------------------------------
 
-NETLIB_START(logic_input)
+NETLIB_START(ttl_input)
 {
 	register_output("Q", m_Q);
-	register_param("OUT", m_OUT, 0);
+	register_param("IN", m_IN, 0);
 }
 
-NETLIB_RESET(logic_input)
+NETLIB_RESET(ttl_input)
 {
 }
 
-NETLIB_UPDATE(logic_input)
+NETLIB_UPDATE(ttl_input)
 {
-    OUTLOGIC(m_Q, m_OUT.Value() & 1, NLTIME_IMMEDIATE);
+    OUTLOGIC(m_Q, m_IN.Value() & 1, NLTIME_IMMEDIATE);
 }
 
-NETLIB_UPDATE_PARAM(logic_input)
+NETLIB_UPDATE_PARAM(ttl_input)
 {
-	OUTLOGIC(m_Q, m_OUT.Value() & 1, NLTIME_IMMEDIATE);
+	OUTLOGIC(m_Q, m_IN.Value() & 1, NLTIME_IMMEDIATE);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -112,7 +66,7 @@ NETLIB_UPDATE_PARAM(logic_input)
 NETLIB_START(analog_input)
 {
 	register_output("Q", m_Q);
-    register_param("OUT", m_OUT, 0.0);
+    register_param("IN", m_IN, 0.0);
 }
 
 NETLIB_RESET(analog_input)
@@ -121,10 +75,10 @@ NETLIB_RESET(analog_input)
 
 NETLIB_UPDATE(analog_input)
 {
-    OUTANALOG(m_Q, m_OUT.Value(), NLTIME_IMMEDIATE);
+    OUTANALOG(m_Q, m_IN.Value(), NLTIME_IMMEDIATE);
 }
 
 NETLIB_UPDATE_PARAM(analog_input)
 {
-    OUTANALOG(m_Q, m_OUT.Value(), NLTIME_IMMEDIATE);
+    OUTANALOG(m_Q, m_IN.Value(), NLTIME_IMMEDIATE);
 }
