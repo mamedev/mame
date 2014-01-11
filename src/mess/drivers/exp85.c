@@ -1,3 +1,4 @@
+/// TODO CONVERT TO RS232
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 /***************************************************************************
@@ -29,15 +30,11 @@
 */
 
 
-#include "emu.h"
+#include "includes/exp85.h"
 #include "cpu/i8085/i8085.h"
-#include "imagedev/cassette.h"
 #include "machine/i8155.h"
 #include "machine/i8355.h"
-#include "machine/terminal.h"
-#include "sound/speaker.h"
 #include "machine/ram.h"
-#include "includes/exp85.h"
 
 /* Memory Maps */
 
@@ -155,7 +152,7 @@ READ_LINE_MEMBER( exp85_state::sid_r )
 	}
 	else
 	{
-		data = m_terminal->tx_r();
+		data = m_rs232->rx();
 	}
 
 	return data;
@@ -169,7 +166,7 @@ WRITE_LINE_MEMBER( exp85_state::sod_w )
 	}
 	else
 	{
-		m_terminal->rx_w(state);
+		m_rs232->tx(state);
 	}
 }
 
@@ -229,8 +226,9 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
 	MCFG_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
 	MCFG_CASSETTE_ADD("cassette", exp85_cassette_interface)
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
-	MCFG_DEVICE_INPUT_DEFAULTS(terminal)
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
