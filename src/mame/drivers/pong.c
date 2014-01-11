@@ -86,10 +86,10 @@ static NETLIST_START(pong_schematics)
     NETDEV_PARAM(Solver.FREQ, 48000)
     NETDEV_PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 
-    NETDEV_ANALOG_CONST(V5, 5)
+    NETDEV_ANALOG_INPUT(V5, 5)
 
-	NETDEV_TTL_CONST(high, 1)
-	NETDEV_TTL_CONST(low, 0)
+	NETDEV_TTL_INPUT(high, 1)
+	NETDEV_TTL_INPUT(low, 0)
 
 #if 1
 #if 0
@@ -121,13 +121,13 @@ static NETLIST_START(pong_schematics)
 
     /* Coin, antenna and startup circuit */
 
-    NETDEV_ANALOG_CONST(STOPG, 0)
+    NETDEV_ANALOG_INPUT(STOPG, 0)
     NET_ALIAS(SRSTQ, RYf.2)
     NET_ALIAS(SRST, RYc.2)
 
     /* SRSTQ has a diode to +3V to protect against overvoltage - omitted */
 
-    NETDEV_LOGIC_INPUT(antenna)
+    NETDEV_TTL_INPUT(antenna, 0)
 
     NET_ALIAS(runQ, Q1.C)
 
@@ -769,7 +769,7 @@ static MACHINE_CONFIG_START( pong, pong_state )
     MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "sw1a.POS", 0, 0x01)
     MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "sw1b.POS", 0, 0x01)
     MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "coinsw.POS", 0, 0x01)
-    MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.OUT", 0, 0x01)
+    MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
 
 	/* video hardware */
 
