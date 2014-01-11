@@ -52,6 +52,7 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_input_state = 0;
 	m_rcv_line = 0;
 	m_start_bit_hack_for_external_clocks = false;
+	m_synchronous = false;
 }
 
 device_serial_interface::~device_serial_interface()
