@@ -35,7 +35,6 @@
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "machine/ram.h"
-#include "machine/terminal.h"
 
 /* Memory Maps */
 
@@ -179,11 +178,6 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "TERM_PARITY", 0xff, 0x02 ) // E
 	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x00 ) // 1
 DEVICE_INPUT_DEFAULTS_END
-
-static const serial_terminal_interface terminal_intf =
-{
-	DEVCB_NULL
-};
 
 /* Machine Initialization */
 
