@@ -35,6 +35,7 @@
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "machine/ram.h"
+#include "machine/terminal.h"
 
 /* Memory Maps */
 
