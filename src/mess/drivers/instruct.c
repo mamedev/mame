@@ -90,7 +90,7 @@ private:
 // flag led
 WRITE_LINE_MEMBER( instruct_state::flag_w )
 {
-	output_set_value("led8", state);
+	output_set_value("led8", !state);
 }
 
 // user port
