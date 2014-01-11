@@ -469,8 +469,8 @@ void lk201_device::device_start()
 
 void lk201_device::device_reset()
 {
-	set_rate(4800); 							
 	set_data_frame(8, 1, PARITY_NONE, false);
+	set_rate(4800); 							
 
 	sci_status = (SCSR_TC | SCSR_TDRE);
 
