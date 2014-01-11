@@ -44,6 +44,18 @@
 #include "drawd3d.h"
 
 
+// Visual Studio 2013 is the first version that supports roundf
+#if defined(_MSC_VER) && (_MSC_VER < 1800)
+
+float roundf(float f)
+{
+	if (f < 0)
+		return ceil(f - 0.5);
+
+	return floor(f + 0.5);
+}
+
+#endif
 
 //============================================================
 //  DEBUGGING
