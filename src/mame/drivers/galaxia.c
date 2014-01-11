@@ -151,7 +151,6 @@ static ADDRESS_MAP_START( galaxia_io_map, AS_IO, 8, galaxia_state )
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(galaxia_collision_r, galaxia_ctrlport_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(galaxia_collision_clear, galaxia_dataport_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 

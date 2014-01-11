@@ -126,7 +126,6 @@ static ADDRESS_MAP_START( quasar_io, AS_IO, 8, quasar_state )
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READ(cvs_collision_clear) AM_WRITE(quasar_sh_command_w)
 	AM_RANGE(S2650_CTRL_PORT,  S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITENOP
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 /*************************************

@@ -653,13 +653,13 @@ WRITE8_MEMBER(dkong_state::s2650_data_w)
 	m_hunchloopback = data;
 }
 
-WRITE8_MEMBER(dkong_state::s2650_fo_w)
+WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
 {
 #if DEBUG_PROTECTION
 	logerror("write : pc = %04x, FO = %02x\n",space.device().safe_pc(), data);
 #endif
 
-	m_main_fo = data;
+	m_main_fo = state;
 
 	if (m_main_fo)
 		m_hunchloopback = 0xfb;
@@ -884,7 +884,6 @@ static ADDRESS_MAP_START( s2650_io_map, AS_IO, 8, dkong_state )
 	AM_RANGE(0x00, 0x00) AM_READ(s2650_port0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(s2650_port1_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_WRITE(s2650_fo_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(s2650_data_w)
 ADDRESS_MAP_END
 
@@ -1657,6 +1656,7 @@ static MACHINE_CONFIG_START( dkong_base, dkong_state )
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK_1H)
 	MCFG_CPU_PROGRAM_MAP(dkong_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  vblank_irq)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(dkong_state, s2650_fo_w))
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)

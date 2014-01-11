@@ -24,7 +24,6 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_video_ram(*this, "video_ram"),
 			m_bullet_ram(*this, "bullet_ram"),
-			m_fo_state(*this, "fo_state"),
 			m_cvs_4_bit_dac_data(*this, "4bit_dac"),
 			m_tms5110_ctl_data(*this, "tms5110_ctl"),
 			m_dac3_state(*this, "dac3_state"),
@@ -42,7 +41,6 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_bullet_ram;
-	required_shared_ptr<UINT8> m_fo_state;
 	optional_shared_ptr<UINT8> m_cvs_4_bit_dac_data;
 	optional_shared_ptr<UINT8> m_tms5110_ctl_data;
 	optional_shared_ptr<UINT8> m_dac3_state;
@@ -59,6 +57,7 @@ public:
 	int        m_stars_scroll;
 
 	/* misc */
+	int m_s2650_flag;
 	emu_timer  *m_cvs_393hz_timer;
 	UINT8      m_cvs_393hz_clock;
 
@@ -83,6 +82,7 @@ public:
 	UINT8      m_character_ram[3 * 0x800];  /* only half is used, but
                                                by allocating twice the amount,
                                                we can use the same gfx_layout */
+	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag);
 	DECLARE_READ8_MEMBER(cvs_input_r);
 	DECLARE_READ8_MEMBER(cvs_393hz_clock_r);
 	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_lo_w);

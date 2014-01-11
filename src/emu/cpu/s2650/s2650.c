@@ -34,7 +34,8 @@ const device_type S2650 = &device_creator<s2650_device>;
 s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, S2650, "S2650", tag, owner, clock, "s2650", __FILE__ )
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 15)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9),
+	m_flag_handler(*this)
 {
 }
 
@@ -151,7 +152,7 @@ inline void s2650_device::set_psu(UINT8 new_val)
 
 	m_psu = new_val;
 	if ((new_val ^ old) & FO)
-		m_io->write_byte(S2650_FO_PORT, (new_val & FO) ? 1 : 0);
+		m_flag_handler((new_val & FO) ? 1 : 0);
 }
 
 inline UINT8 s2650_device::get_sp()
@@ -781,6 +782,8 @@ static void BRA_EA(void) _BRA_EA()
 
 void s2650_device::device_start()
 {
+	m_flag_handler.resolve_safe();
+
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);

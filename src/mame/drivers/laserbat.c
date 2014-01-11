@@ -178,7 +178,6 @@ static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state )
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(laserbat_csound2_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 
@@ -191,7 +190,6 @@ static ADDRESS_MAP_START( catnmous_io_map, AS_IO, 8, laserbat_state )
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // unknown
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 // the same as in zaccaria.c ?

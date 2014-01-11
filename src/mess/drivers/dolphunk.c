@@ -99,7 +99,7 @@ public:
 	{ }
 
 	DECLARE_READ8_MEMBER(cass_r);
-	DECLARE_WRITE8_MEMBER(cass_w);
+	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_WRITE8_MEMBER(port06_w);
@@ -119,9 +119,9 @@ READ8_MEMBER( dolphunk_state::cass_r )
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-WRITE8_MEMBER( dolphunk_state::cass_w )
+WRITE_LINE_MEMBER( dolphunk_state::cass_w )
 {
-	m_cass_state = BIT(data, 0); // get flag bit
+	m_cass_state = state; // get flag bit
 }
 
 WRITE8_MEMBER( dolphunk_state::port00_w )
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( dolphunk_io, AS_IO, 8, dolphunk_state )
 	AM_RANGE(0x00, 0x03) AM_WRITE(port00_w) // 4-led display
 	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)  // speaker (NOT a keyclick)
 	AM_RANGE(0x07, 0x07) AM_READ(port07_r) // pushbuttons
-	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(cass_r,cass_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
 	AM_RANGE(0x102, 0x103) AM_NOP // stops error log filling up while using debug
 ADDRESS_MAP_END
 
@@ -220,6 +220,7 @@ static MACHINE_CONFIG_START( dolphunk, dolphunk_state )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(dolphunk_mem)
 	MCFG_CPU_IO_MAP(dolphunk_io)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(dolphunk_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_dolphunk)

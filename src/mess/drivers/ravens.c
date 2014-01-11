@@ -96,7 +96,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_MACHINE_RESET(ravens2);
 	DECLARE_READ8_MEMBER(cass_r);
-	DECLARE_WRITE8_MEMBER(cass_w);
+	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 	UINT8 m_term_char;
 	UINT8 m_term_data;
@@ -105,9 +105,9 @@ public:
 	required_device<cassette_image_device> m_cass;
 };
 
-WRITE8_MEMBER( ravens_state::cass_w )
+WRITE_LINE_MEMBER( ravens_state::cass_w )
 {
-	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
+	m_cass->output(state ? -1.0 : +1.0);
 }
 
 READ8_MEMBER( ravens_state::cass_r )
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( ravens_io, AS_IO, 8, ravens_state )
 	AM_RANGE(0x09, 0x09) AM_WRITE(leds_w) // LED output port
 	AM_RANGE(0x10, 0x15) AM_WRITE(display_w) // 6-led display
 	AM_RANGE(0x17, 0x17) AM_READ(port17_r) // pushbuttons
-	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(cass_r,cass_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
 	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w)
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(port1c_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(cass_r,cass_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cass_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -341,6 +341,7 @@ static MACHINE_CONFIG_START( ravens, ravens_state )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
 	MCFG_CPU_IO_MAP(ravens_io)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(ravens_state, cass_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ravens)
@@ -360,6 +361,8 @@ static MACHINE_CONFIG_START( ravens2, ravens_state )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
 	MCFG_CPU_IO_MAP(ravens2_io)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(ravens_state, cass_w))
+
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */

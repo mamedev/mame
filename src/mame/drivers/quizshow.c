@@ -41,14 +41,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_main_ram(*this, "main_ram"),
-		m_fo_state(*this, "fo_state")
+		m_main_ram(*this, "main_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	required_shared_ptr<UINT8> m_main_ram;
-	required_shared_ptr<UINT8> m_fo_state;
 
 	tilemap_t *m_tilemap;
 	UINT32 m_clocks;
@@ -240,7 +238,6 @@ static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8, quizshow_state )
 //  AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_NOP // unused
 //  AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // unused
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(quizshow_tape_signal_r)
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 
