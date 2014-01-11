@@ -655,7 +655,7 @@ static MACHINE_CONFIG_DERIVED( mcu, qix )
 
 	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
 
-	MCFG_DEVICE_MODIFY("pia1")
+	MCFG_DEVICE_MODIFY("pia0")
 	MCFG_PIA_READPB_HANDLER(READ8(qix_state, qixmcu_coin_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qixmcu_coin_w))
 
