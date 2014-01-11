@@ -146,7 +146,7 @@ static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 	AM_RANGE(0x020000, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x2fffff) AM_RAM
 	AM_RANGE(0x300000, 0xdfffff) AM_READWRITE(invalid_r,invalid_w)
-	AM_RANGE(0xeff800, 0xeffbff) AM_RAM  // memory mapping SRAM, used during boot sequence for the stack (TODO)
+	AM_RANGE(0xeff800, 0xeffbff) AM_RAM  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
 	AM_RANGE(0xeffc00, 0xeffc01) AM_READWRITE(memmap_r,memmap_w)
 	AM_RANGE(0xf00000, 0xf00007) AM_DEVREADWRITE8("uart0",mc2661_device,read,write,0xff00)  // UARTs
 	AM_RANGE(0xf00008, 0xf0000f) AM_DEVREADWRITE8("uart1",mc2661_device,read,write,0xff00)
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START(wicat_mem, AS_PROGRAM, 16, wicat_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(wicat_video_mem, AS_PROGRAM, 16, wicat_state)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("g2", 0x0000)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("g1", 0x0000)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -363,12 +363,12 @@ WRITE16_MEMBER( wicat_state::parallel_led_w )
 {
 	// bit 0 - parallel port A direction (0 = input)
 	// bit 1 - parallel port B direction (0 = input)
-	output_set_value("led1",(~data) & 0x0400);
-	output_set_value("led2",(~data) & 0x0800);
-	output_set_value("led3",(~data) & 0x1000);
-	output_set_value("led4",(~data) & 0x2000);
-	output_set_value("led5",(~data) & 0x4000);
-	output_set_value("led6",(~data) & 0x8000);
+	output_set_value("led1",data & 0x0400);
+	output_set_value("led2",data & 0x0800);
+	output_set_value("led3",data & 0x1000);
+	output_set_value("led4",data & 0x2000);
+	output_set_value("led5",data & 0x4000);
+	output_set_value("led6",data & 0x8000);
 }
 
 WRITE8_MEMBER( wicat_state::via_a_w )
@@ -459,16 +459,16 @@ WRITE8_MEMBER(wicat_state::hdc_w)
 	case 0x07:  // Size / Drive / Head
 		logerror("HDC: Size / Drive / Head %02x\n",data);
 		break;
-	case 0x0c:  // DMA mid
+	case 0x0c:  // DMA bits 9-16
 		logerror("HDC: DMA address mid %02x\n",data);
 		break;
-	case 0x0d:  // DMA low
+	case 0x0d:  // DMA bits 1-8  (bit 0 cannot be set)
 		logerror("HDC: DMA address low %02x\n",data);
 		break;
 	case 0x0e:  // DMA R/W
 		logerror("HDC: DMA R/W %02x\n",data);
 		break;
-	case 0x0f:  // DMA high
+	case 0x0f:  // DMA bits 17-23
 		logerror("HDC: DMA address high %02x\n",data);
 		break;
 	default:
@@ -692,7 +692,11 @@ READ8_MEMBER(wicat_state::video_status_r)
 {
 	// this port is read in the NVI IRQ routine, which if bit 2 is set, will unmask DMA channel 0.  But no idea what triggers it...
 	if(m_crtc_irq == ASSERT_LINE)
+	{
+		m_crtc_irq = CLEAR_LINE;
+		m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
 		return 0x04;
+	}
 	else
 		return 0x00;
 }
@@ -1005,6 +1009,7 @@ ROM_START( wicat )
 	ROM_LOAD16_BYTE("wd3_15.b7",  0x01001, 0x0800, CRC(9d986585) SHA1(1ac7579c692f827b121c56dac0a77b15400caba1) )
 
 	// Terminal CPU board (Graphical)
+	// "MG8000 VERSION 3.0"
 	ROM_REGION16_BE(0x8000, "g1", 0)
 	ROM_LOAD16_BYTE("1term0.e",   0x00000, 0x0800, CRC(a9aade37) SHA1(644e9362d5a9523be5c6f39a650b574735dbd4a2) )
 	ROM_LOAD16_BYTE("1term0.o",   0x00001, 0x0800, CRC(8026b5b7) SHA1(cb93e0595b321889694cbb87f497d244e6a2d648) )
@@ -1022,10 +1027,10 @@ ROM_START( wicat )
 	ROM_LOAD16_BYTE("1term6.o",   0x06001, 0x0800, CRC(e245ff49) SHA1(9a34e6cf6013b1044cccf26371cc3a000f17b58c) )
 	ROM_LOAD16_BYTE("1term7.e",   0x07000, 0x0800, CRC(0c918550) SHA1(2ef6ce41cc2643d45c4bae31ce151d8b6c363471) )
 	ROM_LOAD16_BYTE("1term7.o",   0x07001, 0x0800, CRC(71fdc692) SHA1(d6f12ec20ff2e4948f54b0c79f11ccbdc9db865c) )
-	ROM_REGION(0x40, "g1novram", 0)
-	ROM_LOAD       ("ee2-2.bin",  0x00000, 0x0040, CRC(8f265118) SHA1(6bd74e3d01cf85cca1abcc15cb229dbd63022978) )
+	ROM_REGION(0x40, "vsram", 0)
+	ROM_LOAD       ("ee8-82.bin",  0x00000, 0x0040, CRC(dfb4b0fb) SHA1(12304f5c5236791f5e931d9e49b4a70dcbba55c0) )
 
-
+	// "MG8000 VERSION 1.1"
 	ROM_REGION16_BE(0x8000, "g2", 0)
 	ROM_LOAD16_BYTE("2term0.e",   0x00000, 0x0800, CRC(29e5dd68) SHA1(9023f53d554b9ef4f4efc731645ba42f728bcd2c) )
 	ROM_LOAD16_BYTE("2term0.o",   0x00001, 0x0800, CRC(91edd05d) SHA1(378b06fc8316199b7c580a6e7f28368dacdac5a9) )
@@ -1043,8 +1048,8 @@ ROM_START( wicat )
 	ROM_LOAD16_BYTE("2term6.o",   0x06001, 0x0800, CRC(0afb566c) SHA1(761455ced46b6fccd0be9c8fa920f7954a36972b) )
 	ROM_LOAD16_BYTE("2term7.e",   0x07000, 0x0800, CRC(033ea830) SHA1(27c33eea2df812a1a96e2f47ba7993e2ca3675ad) )
 	ROM_LOAD16_BYTE("2term7.o",   0x07001, 0x0800, CRC(e157c5d2) SHA1(3cd1ea0fb9df1358e8a358468a4df5e4eaaa86a2) )
-	ROM_REGION(0x40, "vsram", 0)
-	ROM_LOAD       ("ee8-82.bin",  0x00000, 0x0040, CRC(dfb4b0fb) SHA1(12304f5c5236791f5e931d9e49b4a70dcbba55c0) )
+	ROM_REGION(0x40, "g2novram", 0)
+	ROM_LOAD       ("ee2-2.bin",  0x00000, 0x0040, CRC(8f265118) SHA1(6bd74e3d01cf85cca1abcc15cb229dbd63022978) )
 
 	// Terminal Video board
 	ROM_REGION(0x1000, "g2char", 0)
