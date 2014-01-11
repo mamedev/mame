@@ -88,6 +88,7 @@ public:
 
 protected:
 	ATTR_COLD virtual void start();
+    ATTR_COLD virtual void reset();
 	ATTR_HOT ATTR_ALIGN void update();
 
 private:
@@ -106,6 +107,7 @@ public:
 
 protected:
 	ATTR_COLD virtual void start();
+    ATTR_COLD virtual void reset();
 	ATTR_HOT ATTR_ALIGN void update();
 };
 

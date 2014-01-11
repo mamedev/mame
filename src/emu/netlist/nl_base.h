@@ -182,6 +182,8 @@ typedef void (*net_update_delegate)(netlist_core_device_t *);
 //#define NETLIB_CONSTRUCTOR(_chip) ATTR_COLD _chip :: _chip (netlist_setup_t &setup, const char *name)
 //          : net_device_t(setup, name)
 
+#define NETLIB_RESET(_chip) ATTR_COLD void NETLIB_NAME(_chip) :: reset(void)
+
 #define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: _name _params
 
@@ -198,6 +200,7 @@ typedef void (*net_update_delegate)(netlist_core_device_t *);
 		_extra                                                                      \
 		ATTR_HOT void update();                                                     \
 		ATTR_HOT void start();                                                      \
+        ATTR_HOT void reset();                                                      \
 		_priv                                                                       \
 	}
 
@@ -217,6 +220,7 @@ typedef void (*net_update_delegate)(netlist_core_device_t *);
 	/*protected:*/                                                                  \
 		ATTR_HOT void update();                                                     \
 		ATTR_HOT void start();                                                      \
+        ATTR_HOT void reset();                                                      \
 	public:                                                                         \
 		_priv                                                                       \
 	}
@@ -532,6 +536,7 @@ public:
 
 	ATTR_COLD netlist_net_t(const type_t atype, const family_t afamily);
 	ATTR_COLD void init_object(netlist_base_t &nl, const pstring &aname);
+	ATTR_COLD void reset();
 
 	ATTR_COLD void register_con(netlist_core_terminal_t &terminal);
 	ATTR_COLD void merge_net(netlist_net_t *othernet);
@@ -910,10 +915,16 @@ public:
 	net_update_delegate static_update;
 #endif
 
+    ATTR_COLD void inline do_reset()
+    {
+        reset();
+    }
+
 protected:
 
 	ATTR_HOT virtual void update() { }
 	ATTR_COLD virtual void start() { }
+    ATTR_COLD virtual void reset() = 0;
 
 private:
 };
@@ -1085,8 +1096,12 @@ protected:
 	{
 		register_input("I", m_I, netlist_terminal_t::STATE_INP_ACTIVE);
 		register_output("Q", m_Q);
-		m_Q.initial(1);
 	}
+
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(1);
+    }
 
 	ATTR_HOT ATTR_ALIGN void update()
 	{
@@ -1125,8 +1140,12 @@ protected:
 	{
 		register_input("I", m_I, netlist_terminal_t::STATE_INP_ACTIVE);
 		register_output("Q", m_Q);
-		m_Q.initial(0);
 	}
+
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(0);
+    }
 
 	ATTR_HOT ATTR_ALIGN void update()
 	{

@@ -11,16 +11,19 @@ NETLIB_START(nic74107Asub)
 	register_output("Q", m_Q);
 	register_output("QQ", m_QQ);
 
-	m_Q.initial(0);
-	m_QQ.initial(1);
-
-	m_Q1 = 0;
-	m_Q2 = 0;
-	m_F = 0;
-
 	save(NAME(m_Q1));
 	save(NAME(m_Q2));
 	save(NAME(m_F));
+}
+
+NETLIB_RESET(nic74107Asub)
+{
+    m_Q.initial(0);
+    m_QQ.initial(1);
+
+    m_Q1 = 0;
+    m_Q2 = 0;
+    m_F = 0;
 }
 
 NETLIB_START(nic74107A)
@@ -34,6 +37,11 @@ NETLIB_START(nic74107A)
 	register_subalias("Q", sub.m_Q);
 	register_subalias("QQ", sub.m_QQ);
 
+}
+
+NETLIB_RESET(nic74107A)
+{
+    sub.reset();
 }
 
 ATTR_HOT inline void NETLIB_NAME(nic74107Asub)::newstate(const netlist_sig_t state)

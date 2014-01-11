@@ -29,12 +29,13 @@ NETLIB_START(9316)
 
 }
 
+NETLIB_RESET(9316)
+{
+    sub.do_reset();
+}
+
 NETLIB_START(9316_sub)
 {
-	m_cnt = 0;
-	m_loadq = 1;
-	m_ent = 1;
-
 	register_input("CLK", m_clk, netlist_input_t::STATE_INP_LH);
 
 	register_input("A", m_A, netlist_input_t::STATE_INP_PASSIVE);
@@ -51,6 +52,13 @@ NETLIB_START(9316_sub)
 	save(NAME(m_cnt));
 	save(NAME(m_loadq));
 	save(NAME(m_ent));
+}
+
+NETLIB_RESET(9316_sub)
+{
+    m_cnt = 0;
+    m_loadq = 1;
+    m_ent = 1;
 }
 
 NETLIB_UPDATE(9316_sub)

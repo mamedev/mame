@@ -88,10 +88,6 @@ public:
 		ATTR_HOT inline void schedule1();
 
 		ATTR_COLD void post_start();
-		ATTR_COLD void reset()
-		{
-		    m_last_step = netlist_time::zero;
-		}
 );
 
 ATTR_HOT inline void NETLIB_NAME(solver)::schedule1()

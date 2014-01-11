@@ -73,4 +73,12 @@ inline NETLIB_START(7400pin)
 	register_subalias("11", m_4.m_Q);
 }
 
+inline NETLIB_RESET(7400pin)
+{
+    m_1.do_reset();
+    m_2.do_reset();
+    m_3.do_reset();
+    m_4.do_reset();
+}
+
 #endif /* NLD_7400_H_ */

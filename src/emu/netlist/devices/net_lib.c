@@ -72,6 +72,11 @@ NETLIB_START(nic7448)
 	register_subalias("g", sub.m_g);
 }
 
+NETLIB_RESET(nic7448)
+{
+    sub.do_reset();
+}
+
 NETLIB_UPDATE(nic7448)
 {
 	if (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ))
@@ -103,8 +108,6 @@ NETLIB_UPDATE(nic7448)
 
 NETLIB_START(nic7448_sub)
 {
-	m_state = 0;
-
 	register_input("A0", m_A0);
 	register_input("A1", m_A1);
 	register_input("A2", m_A2);
@@ -120,6 +123,11 @@ NETLIB_START(nic7448_sub)
 	register_output("g", m_g);
 
 	save(NAME(m_state));
+}
+
+NETLIB_RESET(nic7448_sub)
+{
+    m_state = 0;
 }
 
 NETLIB_UPDATE(nic7448_sub)
@@ -177,6 +185,10 @@ NETLIB_START(nic7450)
 	register_input("I3", m_I2);
 	register_input("I4", m_I3);
 	register_output("Q", m_Q);
+}
+
+NETLIB_RESET(nic7450)
+{
 }
 
 NETLIB_UPDATE(nic7450)

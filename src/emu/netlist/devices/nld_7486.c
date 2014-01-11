@@ -12,6 +12,10 @@ NETLIB_START(7486)
 	register_output("Q", m_Q);
 }
 
+NETLIB_RESET(7486)
+{
+}
+
 NETLIB_UPDATE(7486)
 {
 	static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };

@@ -7,8 +7,6 @@
 
 NETLIB_START(7490)
 {
-	m_cnt = 0;
-
 	register_input("CLK", m_clk);
 	register_input("R1",  m_R1);
 	register_input("R2",  m_R2);
@@ -22,6 +20,11 @@ NETLIB_START(7490)
 
 	save(NAME(m_cnt));
 
+}
+
+NETLIB_RESET(7490)
+{
+    m_cnt = 0;
 }
 
 NETLIB_UPDATE(7490)

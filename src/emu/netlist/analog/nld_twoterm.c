@@ -21,6 +21,11 @@ NETLIB_START(twoterm)
 {
 }
 
+NETLIB_RESET(twoterm)
+{
+}
+
+
 NETLIB_UPDATE(twoterm)
 {
 	/* only called if connected to a rail net ==> notify the solver to recalculate */
@@ -43,6 +48,12 @@ NETLIB_START(R_base)
 	register_terminal("2", m_N);
 }
 
+NETLIB_RESET(R_base)
+{
+    NETLIB_NAME(twoterm)::reset();
+    set_R(1.0 / NETLIST_GMIN);
+}
+
 NETLIB_UPDATE(R_base)
 {
 	NETLIB_NAME(twoterm)::update();
@@ -52,6 +63,11 @@ NETLIB_START(R)
 {
 	NETLIB_NAME(R_base)::start();
 	register_param("R", m_R, 1.0 / NETLIST_GMIN);
+}
+
+NETLIB_RESET(R)
+{
+    NETLIB_NAME(R_base)::reset();
 }
 
 NETLIB_UPDATE(R)
@@ -86,6 +102,12 @@ NETLIB_START(POT)
 	register_param("DIAL", m_Dial, 0.5);
 	register_param("DIALLOG", m_DialIsLog, 0);
 
+}
+
+NETLIB_RESET(POT)
+{
+    m_R1.do_reset();
+    m_R2.do_reset();
 }
 
 NETLIB_UPDATE(POT)

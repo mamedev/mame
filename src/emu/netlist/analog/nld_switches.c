@@ -11,14 +11,10 @@
 
 NETLIB_START(switch2)
 {
-
     register_sub(m_R[0], "R1");
     register_sub(m_R[1], "R2");
 
     register_param("POS", m_POS, 0);
-
-    m_R[0].set_R(R_ON);
-    m_R[1].set_R(R_OFF);
 
     setup().connect(m_R[0].m_N, m_R[1].m_N);
 
@@ -26,6 +22,15 @@ NETLIB_START(switch2)
     register_subalias("i2", m_R[1].m_P);
 
     register_subalias("Q", m_R[0].m_N);
+}
+
+NETLIB_RESET(switch2)
+{
+    m_R[0].do_reset();
+    m_R[1].do_reset();
+
+    m_R[0].set_R(R_ON);
+    m_R[1].set_R(R_OFF);
 }
 
 NETLIB_UPDATE(switch2)

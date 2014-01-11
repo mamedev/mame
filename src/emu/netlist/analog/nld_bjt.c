@@ -45,6 +45,14 @@ NETLIB_START(Q)
     register_param("model", m_model, "");
 }
 
+NETLIB_RESET(Q)
+{
+}
+
+// ----------------------------------------------------------------------------------------
+// nld_QBJT_switch
+// ----------------------------------------------------------------------------------------
+
 NETLIB_START(QBJT_switch)
 {
     NETLIB_NAME(Q)::start();
@@ -153,6 +161,11 @@ NETLIB_START(QBJT_EB)
         m_gD_BE.set_param(IS / m_alpha_f, NF);
         m_gD_BC.set_param(IS / m_alpha_r, NR);
     }
+}
+
+NETLIB_RESET(QBJT_EB)
+{
+    NETLIB_NAME(Q)::reset();
 }
 
 NETLIB_UPDATE(QBJT_EB)

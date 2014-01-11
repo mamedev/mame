@@ -16,6 +16,10 @@ NETLIB_START(log)
 	m_file = fopen(filename, "w");
 }
 
+NETLIB_RESET(log)
+{
+}
+
 NETLIB_UPDATE(log)
 {
 	fprintf(m_file, "%e %e\n", netlist().time().as_double(), INPANALOG(m_I));
@@ -30,6 +34,10 @@ NETLIB_START(logD)
 {
 	NETLIB_NAME(log)::start();
 	register_input("I2", m_I2);
+}
+
+NETLIB_RESET(logD)
+{
 }
 
 NETLIB_UPDATE(logD)

@@ -271,6 +271,12 @@ NETLIB_START(solver)
 
 }
 
+NETLIB_RESET(solver)
+{
+    m_last_step = netlist_time::zero;
+}
+
+
 NETLIB_UPDATE_PARAM(solver)
 {
 	m_inc = netlist_time::from_hz(m_freq.Value());

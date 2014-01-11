@@ -9,7 +9,11 @@ NETLIB_START(nic7404)
 {
 	register_input("A", m_I);
 	register_output("Q", m_Q);
-	m_Q.initial(1);
+}
+
+NETLIB_RESET(nic7404)
+{
+    m_Q.initial(1);
 }
 
 NETLIB_UPDATE(nic7404)

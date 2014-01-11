@@ -13,7 +13,7 @@ NETLIST_START(msx)
     NETDEV_PARAM(clk.FREQ, 1000) // 1000 Hz
     NETDEV_SOLVER(Solver)
     NETDEV_PARAM(Solver.FREQ, 48000)
-    NETDEV_PARAM(Solver.ACCURACY, 1e-5)
+    NETDEV_PARAM(Solver.ACCURACY, 1e-4)
 
     NETDEV_R(RAY8910, 2345)     // Max Voltage
 

@@ -374,6 +374,10 @@ public:
 		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
 	}
 
+    ATTR_COLD void reset()
+    {
+    }
+
 	ATTR_COLD void register_callback(netlist_analog_output_delegate callback)
 	{
 		m_callback = callback;
@@ -403,11 +407,15 @@ public:
 	ATTR_COLD void start()
 	{
 		register_input("IN", m_in);
-		m_cur = 0;
-		m_last_pos = 0;
-		m_last_buffer = netlist_time::zero;
-		m_sample = netlist_time::zero;  // FIXME: divide by zero
-		}
+	}
+
+    ATTR_COLD void reset()
+    {
+        m_cur = 0;
+        m_last_pos = 0;
+        m_last_buffer = netlist_time::zero;
+        m_sample = netlist_time::zero;  // FIXME: divide by zero
+    }
 
 	ATTR_HOT void sound_update()
 	{

@@ -7,8 +7,6 @@
 
 NETLIB_START(7483)
 {
-	m_lastr = 0;
-
 	register_input("A1", m_A1);
 	register_input("A2", m_A2);
 	register_input("A3", m_A3);
@@ -26,6 +24,11 @@ NETLIB_START(7483)
 	register_output("C4", m_C4);
 
 	save(NAME(m_lastr));
+}
+
+NETLIB_RESET(7483)
+{
+    m_lastr = 0;
 }
 
 NETLIB_UPDATE(7483)

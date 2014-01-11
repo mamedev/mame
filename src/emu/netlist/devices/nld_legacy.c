@@ -12,8 +12,12 @@ NETLIB_START(nicRSFF)
 	register_input("R", m_R);
 	register_output("Q", m_Q);
 	register_output("QQ", m_QQ);
-	m_Q.initial(0);
-	m_QQ.initial(1);
+}
+
+NETLIB_RESET(nicRSFF)
+{
+    m_Q.initial(0);
+    m_QQ.initial(1);
 }
 
 NETLIB_UPDATE(nicRSFF)

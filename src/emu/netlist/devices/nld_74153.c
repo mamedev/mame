@@ -18,6 +18,10 @@ NETLIB_START(nic74153)
 	register_output("AY", m_Y); //FIXME: Change netlists
 }
 
+NETLIB_RESET(nic74153)
+{
+}
+
 /* FIXME: timing is not 100% accurate, Strobe and Select inputs have a
  *        slightly longer timing.
  *        Convert this to sub-devices at some time.

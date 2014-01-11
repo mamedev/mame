@@ -167,12 +167,24 @@ ATTR_COLD void netlist_base_t::set_solver_dev(NETLIB_NAME(solver) *dev)
 
 ATTR_COLD void netlist_base_t::reset()
 {
+    printf("in reset\n");
 	m_time_ps = netlist_time::zero;
 	m_queue.clear();
 	if (m_mainclock != NULL)
 		m_mainclock->m_Q.net().set_time(netlist_time::zero);
     if (m_solver != NULL)
-        m_solver->reset();
+        m_solver->do_reset();
+
+    // Reset all nets once !
+    for (int i = 0; i < m_nets.count(); i++)
+        m_nets[i]->reset();
+
+    // Reset all devices once !
+    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+    {
+        netlist_device_t *dev = entry->object();
+        dev->do_reset();
+    }
 
 	// Step all devices once !
 	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
@@ -427,7 +439,8 @@ template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, n
 
 ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamily)
 	: netlist_object_t(atype, afamily)
-	,  m_head(NULL)
+    , m_solver(NULL)
+	, m_head(NULL)
 	, m_num_cons(0)
 	, m_time(netlist_time::zero)
 	, m_active(0)
@@ -438,6 +451,19 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
     m_new.Analog = 0.0;
     m_cur.Analog = 0.0;
 };
+
+ATTR_COLD void netlist_net_t::reset()
+{
+    m_last.Analog = -123456789.0; // set to something we will never hit.
+    m_new.Analog = 0.0;
+    m_cur.Analog = 0.0;
+    m_last.Q = 0; // set to something we will never hit.
+    m_new.Q = 0;
+    m_cur.Q = 0;
+    m_time = netlist_time::zero;
+    //m_active = 0; // FIXME
+    m_in_queue = 2;
+}
 
 ATTR_COLD void netlist_net_t::init_object(netlist_base_t &nl, const pstring &aname)
 {
@@ -750,6 +776,11 @@ NETLIB_START(mainclock)
 
 	register_param("FREQ", m_freq, 7159000.0 * 5);
 	m_inc = netlist_time::from_hz(m_freq.Value()*2);
+}
+
+NETLIB_RESET(mainclock)
+{
+    m_Q.net().set_time(netlist_time::zero);
 }
 
 NETLIB_UPDATE_PARAM(mainclock)

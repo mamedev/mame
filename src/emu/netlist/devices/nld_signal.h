@@ -42,8 +42,13 @@ public:
 		{
 			register_input(sIN[i], m_i[i], netlist_input_t::STATE_INP_ACTIVE);
 		}
-		m_Q.initial(1);
 		save(NAME(m_active));
+	}
+
+	ATTR_COLD void reset()
+	{
+        m_Q.initial(1);
+        m_active = 1;
 	}
 
 #if (USE_DEACTIVE_DEVICE)
@@ -79,7 +84,6 @@ public:
 	net_signal_t()
 	: netlist_device_t(), m_active(1)
 	{
-		m_Q.initial(1);
 	}
 
 	ATTR_COLD void start()
@@ -93,6 +97,12 @@ public:
 		}
 		save(NAME(m_active));
 	}
+
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(1);
+        m_active = 1;
+    }
 
 	#if (USE_DEACTIVE_DEVICE)
 		ATTR_HOT void inc_active()
@@ -151,7 +161,6 @@ public:
 	xx_net_signal_t()
 	: netlist_device_t(), m_active(1)
 	{
-		m_Q.initial(1);
 	}
 
 	ATTR_COLD void start()
@@ -165,6 +174,12 @@ public:
 		}
 		save(NAME(m_active));
 	}
+
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(1);
+        m_active = 1;
+    }
 
 	#if (USE_DEACTIVE_DEVICE)
 		ATTR_HOT void inc_active()

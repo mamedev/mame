@@ -16,6 +16,10 @@ NETLIB_START(VCCS)
     configure(1.0, NETLIST_GMIN);
 }
 
+NETLIB_RESET(VCCS)
+{
+}
+
 ATTR_COLD void NETLIB_NAME(VCCS)::configure(const double Gfac, const double GI)
 {
     register_param("G", m_G, 1.0);

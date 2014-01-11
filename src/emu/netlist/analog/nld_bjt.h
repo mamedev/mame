@@ -45,6 +45,7 @@ public:
     inline void set_qtype(q_type atype) { m_qtype = atype; }
 protected:
     ATTR_COLD virtual void start();
+    ATTR_COLD virtual void reset();
     ATTR_HOT ATTR_ALIGN void update();
 
     netlist_param_model_t m_model;
@@ -168,6 +169,7 @@ public:
 protected:
 
     ATTR_COLD virtual void start();
+    ATTR_COLD virtual void reset();
     ATTR_HOT void update_param();
     ATTR_HOT ATTR_ALIGN void virtual update();
 
