@@ -68,12 +68,14 @@
 
     2013/10/27 Robert Tuccitto  Modernized screen parameters for NTSC & PAL.
 
-    2013/11/03 Robert Tuccitto Fixed correctly typo under 26.7 7$.
+    2013/11/03 Robert Tuccitto  Fixed correctly typo under 26.7 7$.
 
-    2013/11/23 Robert Tuccitto Added NTSC Palette Notes
+    2013/11/23 Robert Tuccitto  Added NTSC Palette Notes.
 
-    2014/01/02 Robert Tuccitto Corrected joystick buttons assignment & minor
-                               palette notes cleanup.
+    2014/01/02 Robert Tuccitto  Corrected joystick buttons assignment & minor
+                                palette notes cleanup.
+    2014/01/09 Robert Tuccitto  Positional description for difficulty
+                                switches added. 
 ***************************************************************************/
 
 #include "emu.h"
@@ -152,11 +154,11 @@ static INPUT_PORTS_START( a7800 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_DIPNAME(0x40, 0x40, "Left Difficulty Switch")
-	PORT_DIPSETTING(0x40, "A" )
-	PORT_DIPSETTING(0x00, "B" )
+	PORT_DIPSETTING(0x40, "A - Right Position" )
+	PORT_DIPSETTING(0x00, "B - Left Position" )
 	PORT_DIPNAME(0x80, 0x80, "Right Difficulty Switch")
-	PORT_DIPSETTING(0x80, "A" )
-	PORT_DIPSETTING(0x00, "B" )
+	PORT_DIPSETTING(0x80, "A - Right Position" )
+	PORT_DIPSETTING(0x00, "B - Left Position" )
 INPUT_PORTS_END
 
 /***************************************************************************
