@@ -137,6 +137,8 @@ NETLIB_FUNC_VOID(nic7448_sub, update_outputs, (UINT8 v))
 	assert(v<16);
 	if (v != m_state)
 	{
+	    // max transfer time is 100 NS */
+
 		OUTLOGIC(m_a, tab7448[v][0], NLTIME_FROM_NS(100));
 		OUTLOGIC(m_b, tab7448[v][1], NLTIME_FROM_NS(100));
 		OUTLOGIC(m_c, tab7448[v][2], NLTIME_FROM_NS(100));

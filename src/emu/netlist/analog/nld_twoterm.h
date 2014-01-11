@@ -160,7 +160,10 @@ protected:
 class netlist_generic_diode
 {
 public:
-    netlist_generic_diode() {}
+    netlist_generic_diode()
+    {
+        m_Vd = 0.7;
+    }
 
     ATTR_HOT inline void update_diode(const double nVd)
     {
@@ -205,8 +208,6 @@ public:
 
         m_Vcrit = m_Vt * log(m_Vt / m_Is / sqrt(2.0));
         m_VtInv = 1.0 / m_Vt;
-
-        m_Vd = 0.7;
     }
 
     ATTR_HOT inline double I() { return m_Id; }

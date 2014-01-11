@@ -186,6 +186,23 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
 	return m_resched;
 }
 
+ATTR_HOT void netlist_matrix_solver_t::schedule()
+{
+    if (!solve())
+    {
+       // printf("update_inputs\n");
+        update_inputs();
+    }
+    else
+    {
+        //printf("resched\n");
+        if (m_owner != NULL) this->m_owner->schedule1();
+    }
+    //solve();
+    //    update_inputs();
+}
+
+
 // ----------------------------------------------------------------------------------------
 // solver
 // ----------------------------------------------------------------------------------------
@@ -275,6 +292,9 @@ NETLIB_UPDATE(solver)
 {
 	netlist_time now = netlist().time();
 	netlist_time delta = now - m_last_step;
+	bool do_full = (USE_ALTERNATE_SCHEDULING ? false : true);
+    bool global_resched = false;
+    bool this_resched[100];
 
 	if (delta >= m_inc)
 	{
@@ -285,9 +305,9 @@ NETLIB_UPDATE(solver)
 		{
 			(*e)->step(delta);
 		}
-	}
-	bool global_resched = false;
-	bool this_resched[100];
+	} else
+	    do_full = true; // we have been called inbetween updates
+
 
 #if HAS_OPENMP && USE_OPENMP
     int t_cnt = m_mat_solvers.count();
@@ -305,19 +325,24 @@ NETLIB_UPDATE(solver)
 #else
     for (int i = 0; i < m_mat_solvers.count(); i++)
     {
-        this_resched[i] = m_mat_solvers[i]->solve();
+        if (do_full || (m_mat_solvers[i]->is_timestep()))
+            this_resched[i] = m_mat_solvers[i]->solve();
     }
 #endif
 
     for (int i = 0; i <  m_mat_solvers.count(); i++)
     {
+        if (do_full || m_mat_solvers[i]->is_timestep())
+        {
         global_resched = global_resched || this_resched[i];
         if (!this_resched[i])
             m_mat_solvers[i]->update_inputs();
+        }
     }
+
 	if (global_resched)
 	{
-		schedule();
+		schedule1();
 	}
 	else
 	{

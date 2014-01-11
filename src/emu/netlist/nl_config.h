@@ -34,6 +34,8 @@
 #define NETLIST_INTERNAL_RES        (U64(1000000000))
 //#define NETLIST_INTERNAL_RES      (U64(1000000000000))
 
+#define USE_ALTERNATE_SCHEDULING (1)
+
 #define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
 
 #define NETLIST_GMIN    (1e-9)
@@ -119,7 +121,7 @@ typedef UINT8 netlist_sig_t;
 //============================================================
 
 #if (USE_OPENMP)
-#if (!HAS_OPEN_MP)
+#if (!(HAS_OPENMP))
 #warning To use openmp compile and link with "-fopenmp"
 #endif
 #endif

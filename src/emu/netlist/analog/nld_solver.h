@@ -30,7 +30,7 @@ public:
 	typedef netlist_list_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
 
-	netlist_matrix_solver_t() : m_resched(false) {}
+	netlist_matrix_solver_t() : m_resched(false), m_owner(NULL) {}
 
 	ATTR_COLD void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
 
@@ -39,6 +39,8 @@ public:
     ATTR_HOT int solve_non_dynamic();
 	ATTR_HOT void step(const netlist_time delta);
 	ATTR_HOT void update_inputs();
+
+	ATTR_HOT void schedule();
 
 	ATTR_HOT inline bool is_dynamic() { return m_dynamic.count() > 0; }
     ATTR_HOT inline bool is_timestep() { return m_steps.count() > 0; }
@@ -83,7 +85,7 @@ public:
 
 		ATTR_COLD ~NETLIB_NAME(solver)();
 
-		ATTR_HOT inline void schedule();
+		ATTR_HOT inline void schedule1();
 
 		ATTR_COLD void post_start();
 		ATTR_COLD void reset()
@@ -92,7 +94,7 @@ public:
 		}
 );
 
-ATTR_HOT inline void NETLIB_NAME(solver)::schedule()
+ATTR_HOT inline void NETLIB_NAME(solver)::schedule1()
 {
 	if (!m_Q_sync.net().is_queued())
 		m_Q_sync.net().push_to_queue(m_nt_sync_delay);

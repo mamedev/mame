@@ -169,6 +169,7 @@ protected:
 
     ATTR_COLD virtual void start();
     ATTR_HOT void update_param();
+    ATTR_HOT ATTR_ALIGN void virtual update();
 
     netlist_generic_diode m_gD_BC;
     netlist_generic_diode m_gD_BE;

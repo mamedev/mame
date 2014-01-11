@@ -174,19 +174,19 @@ ATTR_COLD void netlist_base_t::reset()
     if (m_solver != NULL)
         m_solver->reset();
 
-	// FIXME: some const devices rely on this
-	/* make sure params are set now .. */
-	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
-	{
-		entry->object()->update_param();
-	}
-
 	// Step all devices once !
 	for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 	{
 		netlist_device_t *dev = entry->object();
 		dev->update_dev();
 	}
+
+	// FIXME: some const devices rely on this
+    /* make sure params are set now .. */
+    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+    {
+        entry->object()->update_param();
+    }
 }
 
 
@@ -533,6 +533,12 @@ ATTR_HOT inline void netlist_net_t::update_devs()
         break;
     }
     m_last = m_cur;
+}
+
+ATTR_HOT void netlist_net_t::solve()
+{
+    if (m_solver != NULL)
+        m_solver->schedule();
 }
 
 // ----------------------------------------------------------------------------------------

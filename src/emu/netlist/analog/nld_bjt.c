@@ -69,41 +69,42 @@ NETLIB_START(QBJT_switch)
 
     m_state_on = 0;
 
+    {
+        double IS = m_model.model_value("IS", 1e-15);
+        double BF = m_model.model_value("BF", 100);
+        double NF = m_model.model_value("NF", 1);
+        //double VJE = m_model.dValue("VJE", 0.75);
+
+        set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
+
+        double alpha = BF / (1.0 + BF);
+
+        diode d(IS, NF);
+
+        // Assume 5mA Collector current for switch operation
+
+        m_V = d.V(0.005 / alpha);
+
+        /* Base current is 0.005 / beta
+         * as a rough estimate, we just scale the conductance down */
+
+        m_gB = d.gI(0.005 / alpha) / BF;
+
+        if (m_gB < NETLIST_GMIN)
+            m_gB = NETLIST_GMIN;
+        m_gC = BF * m_gB; // very rough estimate
+        //printf("%f %f \n", m_V, m_gB);
+    }
+
 }
 
 NETLIB_UPDATE(Q)
 {
-    netlist().solver()->schedule();
+    netlist().solver()->schedule1();
 }
 
 NETLIB_UPDATE_PARAM(QBJT_switch)
 {
-    double IS = m_model.model_value("IS", 1e-15);
-    double BF = m_model.model_value("BF", 100);
-    double NF = m_model.model_value("NF", 1);
-    //double VJE = m_model.dValue("VJE", 0.75);
-
-    set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
-
-    double alpha = BF / (1.0 + BF);
-
-    diode d(IS, NF);
-
-    // Assume 5mA Collector current for switch operation
-
-    m_V = d.V(0.005 / alpha);
-
-    /* Base current is 0.005 / beta
-     * as a rough estimate, we just scale the conductance down */
-
-    m_gB = d.gI(0.005 / alpha) / BF;
-
-    if (m_gB < NETLIST_GMIN)
-        m_gB = NETLIST_GMIN;
-    m_gC = BF * m_gB; // very rough estimate
-    //printf("%f %f \n", m_V, m_gB);
-    m_RB.set(NETLIST_GMIN, 0.0, 0.0);
-    m_RC.set(NETLIST_GMIN, 0.0, 0.0);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -136,25 +137,37 @@ NETLIB_START(QBJT_EB)
     m_gD_BE.save("m_D_BE", *this);
     m_gD_BC.save("m_D_BC", *this);
 
+    {
+        double IS = m_model.model_value("IS", 1e-15);
+        double BF = m_model.model_value("BF", 100);
+        double NF = m_model.model_value("NF", 1);
+        double BR = m_model.model_value("BR", 1);
+        double NR = m_model.model_value("NR", 1);
+        //double VJE = m_model.dValue("VJE", 0.75);
+
+        set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
+
+        m_alpha_f = BF / (1.0 + BF);
+        m_alpha_r = BR / (1.0 + BR);
+
+        m_gD_BE.set_param(IS / m_alpha_f, NF);
+        m_gD_BC.set_param(IS / m_alpha_r, NR);
+    }
+}
+
+NETLIB_UPDATE(QBJT_EB)
+{
+#if !(USE_ALTERNATE_SCHEDULING)
+    netlist().solver()->schedule1();
+#else
+    m_D_BE.m_P.net().solve();
+    m_D_BE.m_N.net().solve();
+    m_D_BC.m_P.net().solve();
+#endif
 }
 
 
 NETLIB_UPDATE_PARAM(QBJT_EB)
 {
-    double IS = m_model.model_value("IS", 1e-15);
-    double BF = m_model.model_value("BF", 100);
-    double NF = m_model.model_value("NF", 1);
-    double BR = m_model.model_value("BR", 1);
-    double NR = m_model.model_value("NR", 1);
-    //double VJE = m_model.dValue("VJE", 0.75);
-
-    set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
-
-    m_alpha_f = BF / (1.0 + BF);
-    m_alpha_r = BR / (1.0 + BR);
-
-    m_gD_BE.set_param(IS / m_alpha_f, NF);
-    m_gD_BC.set_param(IS / m_alpha_r, NR);
-
 }
 

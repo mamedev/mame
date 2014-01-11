@@ -44,6 +44,9 @@ NETLIB_UPDATE_PARAM(switch2)
         m_R[0].set_R(R_OFF);
         m_R[1].set_R(R_ON);
     }
-    m_R[0].update_dev();
-    m_R[1].update_dev();
+    if (USE_ALTERNATE_SCHEDULING)
+    {
+        m_R[0].update_dev();
+        m_R[1].update_dev();
+    }
 }

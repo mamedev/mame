@@ -605,6 +605,8 @@ public:
 	terminal_list_t m_terms;
 	netlist_matrix_solver_t *m_solver;
 
+	ATTR_HOT void solve();
+
 	netlist_core_terminal_t *m_head;
 
     /* use this to register state.... */

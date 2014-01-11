@@ -18,11 +18,12 @@ NETLIB_START(ttl_const)
 
 NETLIB_UPDATE(ttl_const)
 {
+    OUTLOGIC(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
 }
 
 NETLIB_UPDATE_PARAM(ttl_const)
 {
-	OUTLOGIC(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
+    OUTLOGIC(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
 }
 
 NETLIB_START(analog_const)
@@ -33,6 +34,7 @@ NETLIB_START(analog_const)
 
 NETLIB_UPDATE(analog_const)
 {
+    OUTANALOG(m_Q, m_const.Value(), NLTIME_IMMEDIATE);
 }
 
 NETLIB_UPDATE_PARAM(analog_const)
@@ -79,6 +81,7 @@ NETLIB_START(logic_input)
 
 NETLIB_UPDATE(logic_input)
 {
+    OUTLOGIC(m_Q, m_OUT.Value() & 1, NLTIME_IMMEDIATE);
 }
 
 NETLIB_UPDATE_PARAM(logic_input)
@@ -98,6 +101,7 @@ NETLIB_START(analog_input)
 
 NETLIB_UPDATE(analog_input)
 {
+    OUTANALOG(m_Q, m_OUT.Value(), NLTIME_IMMEDIATE);
 }
 
 NETLIB_UPDATE_PARAM(analog_input)

@@ -55,7 +55,14 @@ NETLIB_UPDATE_PARAM(VCCS)
 NETLIB_UPDATE(VCCS)
 {
     /* only called if connected to a rail net ==> notify the solver to recalculate */
-    netlist().solver()->schedule();
+#if !(USE_ALTERNATE_SCHEDULING)
+    netlist().solver()->schedule1();
+#else
+    m_IP.net().solve();
+    m_IN.net().solve();
+    m_OP.net().solve();
+    m_ON.net().solve();
+#endif
 }
 
 // ----------------------------------------------------------------------------------------

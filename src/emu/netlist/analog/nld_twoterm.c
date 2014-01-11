@@ -24,7 +24,13 @@ NETLIB_START(twoterm)
 NETLIB_UPDATE(twoterm)
 {
 	/* only called if connected to a rail net ==> notify the solver to recalculate */
-	netlist().solver()->schedule();
+#if !(USE_ALTERNATE_SCHEDULING)
+	netlist().solver()->schedule1();
+#else
+    /* we only need to call the non-rail terminal */
+    m_P.net().solve();
+    m_N.net().solve();
+#endif
 }
 
 // ----------------------------------------------------------------------------------------
@@ -57,6 +63,8 @@ NETLIB_UPDATE_PARAM(R)
 {
 	//printf("updating %s to %f\n", name().cstr(), m_R.Value());
 	set_R(m_R.Value());
+    if (USE_ALTERNATE_SCHEDULING)
+        update_dev();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -93,7 +101,14 @@ NETLIB_UPDATE_PARAM(POT)
 		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
 	m_R1.set_R(MAX(m_R.Value() * v, NETLIST_GMIN));
 	m_R2.set_R(MAX(m_R.Value() * (1.0 - v), NETLIST_GMIN));
+	// force a schedule all
+	if (USE_ALTERNATE_SCHEDULING)
+	{
+	    m_R1.update_dev();
+	    m_R2.update_dev();
+	}
 }
+
 // ----------------------------------------------------------------------------------------
 // nld_C
 // ----------------------------------------------------------------------------------------
@@ -104,12 +119,14 @@ NETLIB_START(C)
 	register_terminal("2", m_N);
 
 	register_param("C", m_C, 1e-6);
+
+	// set up the element
+    set(m_C.Value() / 1e-9, 0.0, 0.0);
 }
 
 NETLIB_UPDATE_PARAM(C)
 {
-	// set to some very small step time for now
-	step_time(1e-9);
+	//step_time(1e-9);
 }
 
 NETLIB_UPDATE(C)
