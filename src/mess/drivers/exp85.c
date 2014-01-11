@@ -1,4 +1,3 @@
-/// TODO CONVERT TO RS232
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 /***************************************************************************
