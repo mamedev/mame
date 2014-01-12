@@ -593,19 +593,23 @@ ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const p
 	net().register_railterminal(*this);
 }
 
+// ----------------------------------------------------------------------------------------
+// netlist_logic_output_t
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
+    : netlist_output_t(OUTPUT, LOGIC), m_proxy(NULL)
+{
+    // Default to TTL
+    m_low_V = 0.1;  // these depend on sinked/sourced current. Values should be suitable for typical applications.
+    m_high_V = 4.8;
+}
+
 ATTR_COLD void netlist_logic_output_t::initial(const netlist_sig_t val)
 {
 	net().m_cur.Q = val;
 	net().m_new.Q = val;
 	net().m_last.Q = !val;
-}
-
-ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
-	: netlist_output_t(OUTPUT, LOGIC)
-{
-	// Default to TTL
-	m_low_V = 0.1;  // these depend on sinked/sourced current. Values should be suitable for typical applications.
-	m_high_V = 4.8;
 }
 
 ATTR_COLD void netlist_logic_output_t::set_levels(const double low, const double high)

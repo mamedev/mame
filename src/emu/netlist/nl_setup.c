@@ -349,6 +349,29 @@ netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool requi
 	return ret;
 }
 
+nld_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
+{
+    assert(out.isFamily(netlist_terminal_t::LOGIC));
+
+    netlist_logic_output_t &out_cast = dynamic_cast<netlist_logic_output_t &>(out);
+    nld_d_to_a_proxy *proxy = out_cast.get_proxy();
+
+    if (proxy == NULL)
+    {
+        // create a new one ...
+        proxy = new nld_d_to_a_proxy(out);
+        pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
+        m_proxy_cnt++;
+
+        proxy->init(netlist(), x);
+        register_dev(proxy, x);
+
+        out.net().register_con(proxy->m_I);
+        out_cast.set_proxy(proxy);
+
+    }
+    return proxy;
+}
 
 void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t &out)
 {
@@ -367,15 +390,9 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 	}
 	else if (out.isFamily(netlist_terminal_t::LOGIC) && in.isFamily(netlist_terminal_t::ANALOG))
 	{
-		nld_d_to_a_proxy *proxy = new nld_d_to_a_proxy(out);
-		pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
-		m_proxy_cnt++;
+        nld_d_to_a_proxy *proxy = get_d_a_proxy(out);
 
-		proxy->init(netlist(), x);
-		register_dev(proxy, x);
-
-		proxy->m_Q.net().register_con(in);
-		out.net().register_con(proxy->m_I);
+        proxy->m_Q.net().register_con(in);
 	}
 	else
 	{
@@ -428,14 +445,7 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
 	else if (out.isFamily(netlist_terminal_t::LOGIC))
 	{
 		NL_VERBOSE_OUT(("connect_terminal_output: connecting proxy\n"));
-		nld_d_to_a_proxy *proxy = new nld_d_to_a_proxy(out);
-		pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
-		m_proxy_cnt++;
-
-		proxy->init(netlist(), x);
-		register_dev(proxy, x);
-
-		out.net().register_con(proxy->m_I);
+		nld_d_to_a_proxy *proxy = get_d_a_proxy(out);
 
 		if (in.has_net())
 			proxy->m_Q.net().merge_net(&in.net());

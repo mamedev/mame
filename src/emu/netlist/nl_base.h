@@ -247,6 +247,7 @@ class netlist_base_t;
 class netlist_matrix_solver_t;
 class NETLIB_NAME(solver);
 class NETLIB_NAME(mainclock);
+class nld_d_to_a_proxy;
 
 // ----------------------------------------------------------------------------------------
 // netlist_object_t
@@ -711,6 +712,9 @@ public:
 	ATTR_COLD void initial(const netlist_sig_t val);
 	ATTR_COLD void set_levels(const double low, const double high);
 
+	ATTR_COLD nld_d_to_a_proxy *get_proxy() { return m_proxy; }
+    ATTR_COLD void set_proxy(nld_d_to_a_proxy *proxy) { m_proxy = proxy; }
+
 	ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time delay)
 	{
 		if (EXPECTED(newQ !=  net().m_new.Q))
@@ -719,6 +723,8 @@ public:
 		    net().push_to_queue(delay);
 		}
 	}
+private:
+	nld_d_to_a_proxy *m_proxy;
 };
 
 class netlist_ttl_output_t : public netlist_logic_output_t

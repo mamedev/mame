@@ -162,6 +162,7 @@ private:
 	pstring objtype_as_astr(netlist_object_t &in);
 
 	const pstring resolve_alias(const pstring &name) const;
+	nld_d_to_a_proxy *get_d_a_proxy(netlist_output_t &out);
 };
 
 #endif /* NLSETUP_H_ */
