@@ -2404,6 +2404,8 @@ $(DRIVERS)/dragrace.o:  $(LAYOUT)/dragrace.lh
 
 $(DRIVERS)/ecoinfr.o:   $(LAYOUT)/ecoinfr.lh
 
+$(DRIVERS)/ecoinf2.o:   $(LAYOUT)/ecoinf2.lh
+
 $(DRIVERS)/ecoinf3.o:   $(LAYOUT)/ecoinf3.lh
 
 $(DRIVERS)/firebeat.o:  $(LAYOUT)/firebeat.lh

@@ -653,7 +653,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
  *************************************/
 
 static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(68000_map)
 
 	MCFG_ACIA6850_ADD("acia6850_0", acia0_if)
@@ -848,6 +848,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
 	m_vfd->reset();
 }
 
+
 /*************************************
  *
  *  Machine driver
@@ -856,7 +857,8 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
 
 // later (incompatible with earlier revision) motherboards used a YM2413
 MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map)
 
 	MCFG_ACIA6850_ADD("acia6850_0", acia0_if)
@@ -892,7 +894,7 @@ MACHINE_CONFIG_END
 
 // the first rev PCB used an SAA1099
 MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map_saa)
 
 	MCFG_ACIA6850_ADD("acia6850_0", acia0_if)

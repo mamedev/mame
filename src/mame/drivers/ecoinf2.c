@@ -3,25 +3,278 @@
  at least some of these are multiple part cabs, with both top and bottom units all linked together
  see the 'Top Box Roms' in some of the sets.
 
- This HW seems similar, but not idential to the Pyramid HW in ecoinf3.c
+ This HW seems similar, but not identical to the Pyramid HW in ecoinf3.c
 
 */
 
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "machine/i8255.h"
+#include "machine/steppers.h" // stepper motor
+#include "machine/meters.h"
+#include "video/awpvid.h" // drawing reels
+#include "ecoinf2.lh"
 
 class ecoinf2_state : public driver_device
 {
 public:
 	ecoinf2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),	
+		m_coins(*this, "COINS"),
+		m_key(*this, "PERKEY"),
+		m_panel(*this, "PANEL")
+	{
+		strobe_amount = 0;
+		strobe_addr = 0;
+	}
+
+	required_device<cpu_device> m_maincpu;
+	required_ioport m_coins;
+	required_ioport m_key;
+	required_ioport m_panel;
+
+	UINT16 m_lamps[16];
+	UINT16 m_leds[16];
+	//UINT16 m_chars[14];
+//	void update_display();
+	int m_optic_pattern;
+	int strobe_addr;
+	int strobe_amount;
+
 	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
 	DECLARE_DRIVER_INIT(ecoinf2);
-	required_device<cpu_device> m_maincpu;
+
+		void update_lamps(void)
+	{
+		for (int i=0; i<16; i++)
+		{
+			for (int bit=0;bit<16;bit++)
+			{
+				int data = ((m_lamps[i] << bit)&0x8000)>>15;
+
+				output_set_indexed_value("lamp", (i*16)+bit, data );
+			}
+		}
+	}
+	void update_leds(void)
+	{
+		for (int i=0; i<16; i++)
+		{
+			for (int bit=0;bit<16;bit++)
+			{
+				int data = ((m_leds[i] << bit)&0x8000)>>15;
+
+				output_set_digit_value((i*16)+bit, data );
+			}
+		}
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_a_strobedat0)
+	{
+		if (strobe_amount)
+		{
+			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0xff00) | (data & 0x00ff);
+			strobe_amount--;
+		}
+	}
+	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_b_strobedat1)
+	{
+		if (strobe_amount)
+		{
+			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0x00ff) | (data << 8);
+			strobe_amount--;
+		}
+	}
+	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_c_strobe)
+	{
+//		if (data>=0xf0)
+		{
+			strobe_addr = data & 0xf;
+
+			// hack, it writes values for the lamps, then writes 0x00 afterwards, probably giving the bulbs power, then removing the power
+			// before switching the strobe to the next line?
+			strobe_amount = 2;
+
+			update_lamps();
+			update_leds();
+		}
+	//	else logerror("%04x - ppi8255_ic10_(used)write_c %02x (UNUSUAL?)\n", m_maincpu->pcbase(), data);
+	}
+
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic13_write_a_strobedat0)
+	{
+		if (strobe_amount)
+		{
+			m_leds[strobe_addr] = (m_leds[strobe_addr] &0xff00) | (data & 0x00ff);
+		}
+	}
+	DECLARE_WRITE8_MEMBER(ppi8255_ic13_write_b_strobedat1)
+	{
+		if (strobe_amount)
+		{
+			m_leds[strobe_addr] = (m_leds[strobe_addr] &0x00ff) | (data << 8);
+		}
+	}
+
+	DECLARE_READ8_MEMBER(ppi8255_ic13_read_c_panel)
+	{
+		return m_panel->read();
+	}
+
+
+	DECLARE_READ8_MEMBER(ppi8255_ic22_read_a_levels)
+	{
+		return 0;//m_levels->read();
+	}
+	DECLARE_READ8_MEMBER(ppi8255_ic22_read_b_coins)
+	{
+		return m_coins->read();
+	}
+	DECLARE_READ8_MEMBER(ppi8255_ic22_read_c_misc)
+	{
+		int combined_meter = MechMtr_GetActivity(0) | MechMtr_GetActivity(1) |
+							MechMtr_GetActivity(2) | MechMtr_GetActivity(3) |
+							MechMtr_GetActivity(4) | MechMtr_GetActivity(5) |
+							MechMtr_GetActivity(6) | MechMtr_GetActivity(7);
+
+		if(combined_meter)
+		{
+			return 0x20;
+		}
+		else
+		{
+			return 0x00;
+		}
+
+//		return m_misc->read();
+	}
+
+
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_a_meters)
+	{
+		int meter;
+		for (meter = 0; meter < 8; meter ++)
+		{
+			MechMtr_update(meter, (data & (1 << meter)));
+		}
+
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_b_payouts)
+	{
+		//TODO: Fix up payout enables - all available bits enable one slide each
+		output_set_value("coinlamp0", data&0x40 );
+		output_set_value("coinlamp1", data&0x80 );
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_c_inhibits)
+	{
+		coin_lockout_w(machine(), 0, (data & 0x01) );
+		coin_lockout_w(machine(), 1, (data & 0x02) );
+		coin_lockout_w(machine(), 2, (data & 0x04) );
+		coin_lockout_w(machine(), 3, (data & 0x08) );
+		coin_lockout_w(machine(), 4, (data & 0x10) );	
+		
+		//int wdog = (data& 0x80);
+	}
+	
+
+
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_a_reel01)
+	{
+		stepper_update(0, data&0x0f);
+		stepper_update(1, (data>>4)&0x0f);
+
+		if ( stepper_optic_state(0) ) m_optic_pattern |=  0x10;
+		else                          m_optic_pattern &= ~0x10;
+		if ( stepper_optic_state(1) ) m_optic_pattern |=  0x20;
+		else                          m_optic_pattern &= ~0x20;
+
+		awp_draw_reel(0);
+		awp_draw_reel(1);
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_b_reel23)
+	{
+		stepper_update(2, data&0x0f);
+		stepper_update(3, (data>>4)&0x0f);
+
+		if ( stepper_optic_state(2) ) m_optic_pattern |=  0x40;
+		else                          m_optic_pattern &= ~0x40;
+		if ( stepper_optic_state(3) ) m_optic_pattern |=  0x80;
+		else                          m_optic_pattern &= ~0x80;
+
+		awp_draw_reel(2);
+		awp_draw_reel(3);
+	}
+
+	DECLARE_READ8_MEMBER(ppi8255_ic23_read_c_key)
+	{
+		int data = m_optic_pattern;
+		data |= m_key->read();
+		return data;
+	}
+
+	DECLARE_MACHINE_START(ecoinf2);
+
 };
 
+
+static I8255_INTERFACE (ppi8255_ic10_intf)//lamps
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic10_write_a_strobedat0),           /* Port A write */
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic10_write_b_strobedat1),           /* Port B write */
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic10_write_c_strobe)            /* Port C write */
+};
+
+static I8255_INTERFACE (ppi8255_ic13_intf)//leds
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic13_write_a_strobedat0),           /* Port A write */
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic13_write_b_strobedat1),           /* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic13_read_c_panel),            /* Port C read */
+	DEVCB_NULL
+};
+
+static I8255_INTERFACE (ppi8255_ic22_intf)//inputs
+{
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic22_read_a_levels),          /* Port A read - manual says level switches*/
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic22_read_b_coins),           /* Port B read*/
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic22_read_c_misc),            /* Port C read (0x20 appears to be meter power)*/
+	DEVCB_NULL
+};
+	
+// IC24 is the workhorse of the Phoenix, it seems to handle meters, payslides, coin lamps, inhibits and the watchdog! */
+static I8255_INTERFACE (ppi8255_ic24_intf)//coins and related
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic24_write_a_meters),          /* Port A write*/
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic24_write_b_payouts),         /* Port B write*/
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic24_write_c_inhibits),         /* Port C write*/
+};
+
+static I8255_INTERFACE (ppi8255_ic23_intf)//reels
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic23_write_a_reel01),          /* Port A write*/
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic23_write_b_reel23),         /* Port B write*/
+	DEVCB_DRIVER_MEMBER(ecoinf2_state,ppi8255_ic23_read_c_key),            /* Port C read (optos and keys)*/
+	DEVCB_NULL
+};
 
 WRITE8_MEMBER(ecoinf2_state::ox_port5c_out_w)
 {
@@ -35,36 +288,30 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oxo_portmap, AS_IO, 8, ecoinf2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x5c, 0x5c) AM_WRITE(ox_port5c_out_w)
+	AM_RANGE(0x00, 0x3f) AM_RAM // z180 internal area?
+
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ic10_lamp", i8255_device, read, write) //*
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("ic24_coin", i8255_device, read, write) //*
+	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("ic22_inpt", i8255_device, read, write) //*
+	AM_RANGE(0x4c, 0x4f) AM_DEVREADWRITE("ic23_reel", i8255_device, read, write)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("ic13_leds", i8255_device, read, write) //*
+//	AM_RANGE(0x54, 0x57) AM_DEVREADWRITE("ic25_dips", i8255_device, read, write) // is this an 8255, or a mirrored byte read?
+
+	
+//	AM_RANGE(0x5c, 0x5c) AM_WRITE(ox_port5c_out_w)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( ecoinf2 )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0:01" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "IN0:02" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "IN0:04" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN0:08" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN0:10" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN0:20" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN0:40" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN0:80" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("COINS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN5) PORT_NAME("200p?")//PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "IN1:01" )
@@ -247,7 +494,66 @@ static INPUT_PORTS_START( ecoinf2 )
 	PORT_DIPNAME( 0x80, 0x80, "IN7:80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	
+	PORT_START("PANEL")
+	PORT_DIPNAME( 0x01, 0x01, "IN8:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN8:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "IN8:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "IN8:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "IN8:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "IN8:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "IN8:40" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "IN8:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("PERKEY")
+	PORT_CONFNAME( 0x0F, 0x00, "Percentage Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted / 68% (Invalid for UK Games)"  )
+	PORT_CONFSETTING(    0x01, "70" )
+	PORT_CONFSETTING(    0x02, "72" )
+	PORT_CONFSETTING(    0x03, "74" )
+	PORT_CONFSETTING(    0x04, "76" )
+	PORT_CONFSETTING(    0x05, "78" )
+	PORT_CONFSETTING(    0x06, "80" )
+	PORT_CONFSETTING(    0x07, "82" )
+	PORT_CONFSETTING(    0x08, "84" )
+	PORT_CONFSETTING(    0x09, "86" )
+	PORT_CONFSETTING(    0x0A, "88" )
+	PORT_CONFSETTING(    0x0B, "90" )
+	PORT_CONFSETTING(    0x0C, "92" )
+	PORT_CONFSETTING(    0x0D, "94" )
+	PORT_CONFSETTING(    0x0E, "96" )
+	PORT_CONFSETTING(    0x0F, "98" )
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL) //reel opto
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL) //reel opto
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL) //reel opto
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) //reel opto
+
 INPUT_PORTS_END
+
+MACHINE_START_MEMBER(ecoinf2_state,ecoinf2)
+{
+	MechMtr_config(machine(),8);
+	for ( int n = 0; n < 4; n++ )
+	{
+		stepper_config(machine(), n, &ecoin_interface_200step_reel);
+	}
+}
 
 
 static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
@@ -255,6 +561,18 @@ static MACHINE_CONFIG_START( ecoinf2_oxo, ecoinf2_state )
 	MCFG_CPU_ADD("maincpu", Z180,4000000) // some of these hit invalid opcodes with a plain z80, some don't?
 	MCFG_CPU_PROGRAM_MAP(oxo_memmap)
 	MCFG_CPU_IO_MAP(oxo_portmap)
+	
+	MCFG_DEFAULT_LAYOUT(layout_ecoinf2)
+
+	MCFG_MACHINE_START_OVERRIDE(ecoinf2_state, ecoinf2 )
+
+	MCFG_I8255_ADD( "ic10_lamp", ppi8255_ic10_intf )
+	MCFG_I8255_ADD( "ic24_coin", ppi8255_ic24_intf )
+	MCFG_I8255_ADD( "ic22_inpt", ppi8255_ic22_intf )
+	MCFG_I8255_ADD( "ic23_reel", ppi8255_ic23_intf )
+	MCFG_I8255_ADD( "ic13_leds", ppi8255_ic13_intf )
+//	MCFG_I8255_ADD( "ic25_dips", ppi8255_ic25_intf )
+
 MACHINE_CONFIG_END
 
 
