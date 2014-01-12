@@ -6955,6 +6955,7 @@ src/mess/drivers/coco3.c svneol=native#text/plain
 src/mess/drivers/codata.c svneol=native#text/plain
 src/mess/drivers/coleco.c svneol=native#text/plain
 src/mess/drivers/compis.c svneol=native#text/plain
+src/mess/drivers/compucolor.c svneol=native#text/plain
 src/mess/drivers/comquest.c svneol=native#text/plain
 src/mess/drivers/comx35.c svneol=native#text/plain
 src/mess/drivers/concept.c svneol=native#text/plain

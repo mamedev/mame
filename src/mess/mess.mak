@@ -597,6 +597,7 @@ DRVLIBS += \
 	$(MESSOBJ)/interton.a \
 	$(MESSOBJ)/intv.a \
 	$(MESSOBJ)/isa.a \
+	$(MESSOBJ)/isc.a \
 	$(MESSOBJ)/kaypro.a \
 	$(MESSOBJ)/koei.a \
 	$(MESSOBJ)/kyocera.a \
@@ -1387,6 +1388,9 @@ $(MESSOBJ)/intv.a:              \
 	$(MESS_VIDEO)/stic.o        \
 	$(MESS_MACHINE)/intv.o      \
 	$(MESS_DRIVERS)/intv.o      \
+
+$(MESSOBJ)/isc.a:               \
+	$(MESS_DRIVERS)/compucolor.o\
 
 $(MESSOBJ)/kaypro.a:            \
 	$(MESS_DRIVERS)/kaypro.o    \
