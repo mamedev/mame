@@ -231,7 +231,7 @@ void netlist_mame_device_t::device_reset()
 	LOG_DEV_CALLS(("device_reset\n"));
     m_old = netlist_time::zero;
     m_rem = 0;
-	netlist().reset();
+	netlist().do_reset();
 }
 
 void netlist_mame_device_t::device_stop()
