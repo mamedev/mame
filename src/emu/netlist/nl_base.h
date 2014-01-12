@@ -245,9 +245,10 @@ class netlist_param_t;
 class netlist_setup_t;
 class netlist_base_t;
 class netlist_matrix_solver_t;
+class NETLIB_NAME(gnd);
 class NETLIB_NAME(solver);
 class NETLIB_NAME(mainclock);
-class nld_d_to_a_proxy;
+class NETLIB_NAME(d_to_a_proxy);
 
 // ----------------------------------------------------------------------------------------
 // netlist_object_t
@@ -279,6 +280,7 @@ public:
 		VCVS       = 8,  // Voltage controlled voltage source
 		VCCS       = 9,  // Voltage controlled voltage source
 		BJT_EB     = 10, // BJT(Ebers-Moll)
+        GND        = 11, // BJT(Ebers-Moll)
 	};
 
 	ATTR_COLD netlist_object_t(const type_t atype, const family_t afamily);
@@ -1039,8 +1041,6 @@ public:
 		m_queue.push(netlist_queue_t::entry_t(attime, out));
 	}
 
-	ATTR_HOT NETLIB_NAME(solver) *solver() const { return m_solver; }
-
 	ATTR_HOT void process_queue(const netlist_time delta);
 	ATTR_HOT inline void abort_current_queue_slice() { m_stop = netlist_time::zero; }
 
@@ -1048,12 +1048,14 @@ public:
 
 	ATTR_COLD void set_mainclock_dev(NETLIB_NAME(mainclock) *dev);
 	ATTR_COLD void set_solver_dev(NETLIB_NAME(solver) *dev);
+    ATTR_COLD void set_gnd_dev(NETLIB_NAME(gnd) *dev);
 	ATTR_COLD void set_setup(netlist_setup_t *asetup) { m_setup = asetup;  }
 
-	ATTR_COLD netlist_net_t *find_net(const pstring &name);
+    ATTR_HOT NETLIB_NAME(solver) *solver() const { return m_solver; }
+    ATTR_HOT NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
+    ATTR_COLD netlist_setup_t &setup() { return *m_setup; }
 
-	ATTR_COLD netlist_setup_t &setup() { return *m_setup; }
-	ATTR_COLD void reset();
+	ATTR_COLD netlist_net_t *find_net(const pstring &name);
 
 	ATTR_COLD void error(const char *format, ...) const;
 
@@ -1065,6 +1067,8 @@ protected:
 	// any derived netlist must override this ...
 	virtual void vfatalerror(const char *format, va_list ap) const = 0;
 
+	/* from netlist_object */
+    ATTR_COLD virtual void reset();
 	ATTR_COLD virtual void save_register()
 	{
 		save(NAME(m_queue.callback()));
@@ -1087,6 +1091,7 @@ private:
 
 	NETLIB_NAME(mainclock) *    m_mainclock;
 	NETLIB_NAME(solver) *       m_solver;
+    NETLIB_NAME(gnd) *          m_gnd;
 
 	netlist_setup_t *m_setup;
 };

@@ -267,6 +267,7 @@ void netlist_factory_t::initialize()
 	ENTRY(clock,                NETDEV_CLOCK,           "-")   // FIXME
 	ENTRY(mainclock,            NETDEV_MAINCLOCK,       "-")   // FIXME
 	ENTRY(solver,               NETDEV_SOLVER,          "-")   // FIXME
+    ENTRY(gnd,                  NETDEV_GND,             "-")
 	ENTRY(switch2,              NETDEV_SWITCH2,         "+i1,i2")
 	ENTRY(nicRSFF,              NETDEV_RSFF,            "+S,R")
 	ENTRY(7400,                 TTL_7400_NAND,          "+A,B")

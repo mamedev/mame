@@ -165,6 +165,11 @@ ATTR_COLD void netlist_base_t::set_solver_dev(NETLIB_NAME(solver) *dev)
 	m_solver = dev;
 }
 
+ATTR_COLD void netlist_base_t::set_gnd_dev(NETLIB_NAME(gnd) *dev)
+{
+    m_gnd = dev;
+}
+
 ATTR_COLD void netlist_base_t::reset()
 {
 	m_time_ps = netlist_time::zero;

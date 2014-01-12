@@ -30,6 +30,9 @@
 #define NETDEV_CLOCK(_name)                                                         \
 		NET_REGISTER_DEV(clock, _name)
 
+#define NETDEV_GND()                                                                \
+        NET_REGISTER_DEV(gnd, GND)
+
 // ----------------------------------------------------------------------------------------
 // mainclock
 // ----------------------------------------------------------------------------------------
@@ -72,6 +75,41 @@ NETLIB_DEVICE_WITH_PARAMS(analog_input,
 
     netlist_param_double_t m_IN;
 );
+
+// ----------------------------------------------------------------------------------------
+// nld_gnd
+// ----------------------------------------------------------------------------------------
+
+class nld_gnd : public netlist_device_t
+{
+public:
+    ATTR_COLD nld_gnd()
+            : netlist_device_t(GND) { }
+
+    ATTR_COLD virtual ~nld_gnd() {}
+
+protected:
+
+    ATTR_COLD void start()
+    {
+        register_output("Q", m_Q);
+    }
+
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(0.001); // Make sure update outputs something
+    }
+
+    ATTR_HOT ATTR_ALIGN void update()
+    {
+        OUTANALOG(m_Q, 0.0, NLTIME_IMMEDIATE);
+    }
+
+private:
+    netlist_analog_output_t m_Q;
+
+};
+
 
 // ----------------------------------------------------------------------------------------
 // netdev_a_to_d

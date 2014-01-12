@@ -16,7 +16,7 @@
 static NETLIST_START(base)
 	NETDEV_TTL_INPUT(ttlhigh, 1)
 	NETDEV_TTL_INPUT(ttllow, 0)
-    NETDEV_ANALOG_INPUT(GND, 0)
+    NETDEV_GND()
 
 	NET_MODEL(".model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
 	NET_MODEL(".model 1N4148 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
@@ -639,6 +639,7 @@ void netlist_setup_t::start_devices()
 	/* find the main clock and solver ... */
 	bool has_mainclock = false;
     bool has_solver = false;
+    bool has_gnd = false;
 
 	for (tagmap_devices_t::entry_t *entry = netlist().m_devices.first(); entry != NULL; entry = netlist().m_devices.next(entry))
 	{
@@ -657,6 +658,13 @@ void netlist_setup_t::start_devices()
 			m_netlist.set_solver_dev(dynamic_cast<NETLIB_NAME(solver)*>(dev));
 			has_solver = true;
 		}
+        if (dynamic_cast<NETLIB_NAME(gnd)*>(dev) != NULL)
+        {
+            if (has_gnd)
+                m_netlist.error("Found more than one gnd node");
+            m_netlist.set_gnd_dev(dynamic_cast<NETLIB_NAME(gnd)*>(dev));
+            has_gnd = true;
+        }
 	}
 
 	NL_VERBOSE_OUT(("Initializing devices ...\n"));
