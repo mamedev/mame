@@ -7098,6 +7098,7 @@ src/mess/drivers/lx800.c svneol=native#text/plain
 src/mess/drivers/lynx.c svneol=native#text/plain
 src/mess/drivers/m20.c svneol=native#text/plain
 src/mess/drivers/m5.c svneol=native#text/plain
+src/mess/drivers/m6805evs.c svneol=native#text/plain
 src/mess/drivers/m79152pc.c svneol=native#text/plain
 src/mess/drivers/mac.c svneol=native#text/plain
 src/mess/drivers/macpci.c svneol=native#text/plain

@@ -1479,6 +1479,7 @@ $(MESSOBJ)/mos.a:               \
 	$(MESS_DRIVERS)/kim1.o      \
 
 $(MESSOBJ)/motorola.a:          \
+	$(MESS_DRIVERS)/m6805evs.o  \
 	$(MESS_DRIVERS)/mekd2.o     \
 
 $(MESSOBJ)/multitch.a:          \
