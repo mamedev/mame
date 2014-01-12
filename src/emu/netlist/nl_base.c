@@ -11,6 +11,14 @@
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
+netlist_logic_family_desc_t netlist_family_ttl =
+{
+        0.8, // m_low_thresh_V
+        2.0, // m_high_thresh_V
+        0.3, // m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
+        3.4, // m_high_V
+};
+
 // ----------------------------------------------------------------------------------------
 // netlist_queue_t
 // ----------------------------------------------------------------------------------------
@@ -278,13 +286,20 @@ ATTR_COLD void netlist_base_t::error(const char *format, ...) const
 // net_core_device_t
 // ----------------------------------------------------------------------------------------
 
+#if 0
 ATTR_COLD netlist_core_device_t::netlist_core_device_t()
-: netlist_object_t(DEVICE, GENERIC)
+: netlist_object_t(DEVICE, GENERIC), m_family_desc(NULL)
+{
+}
+#endif
+
+ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
+: netlist_object_t(DEVICE, afamily), m_family_desc(NULL)
 {
 }
 
-ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
-: netlist_object_t(DEVICE, afamily)
+ATTR_COLD netlist_core_device_t::netlist_core_device_t(const netlist_logic_family_desc_t *family_desc)
+: netlist_object_t(DEVICE, GENERIC), m_family_desc(family_desc)
 {
 }
 
@@ -317,19 +332,21 @@ ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(
 
 }
 
+
 // ----------------------------------------------------------------------------------------
 // net_device_t
 // ----------------------------------------------------------------------------------------
 
 netlist_device_t::netlist_device_t()
-	: netlist_core_device_t(),
+	: netlist_core_device_t(&netlist_family_ttl),
 		m_terminals(20)
 {
 }
 
 netlist_device_t::netlist_device_t(const family_t afamily)
 	: netlist_core_device_t(afamily),
-		m_terminals(20){
+		m_terminals(20)
+{
 }
 
 netlist_device_t::~netlist_device_t()
@@ -373,12 +390,14 @@ ATTR_COLD void netlist_device_t::register_terminal(const pstring &name, netlist_
 
 ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_output_t &port)
 {
+    port.m_family_desc = this->m_family_desc;
 	setup().register_object(*this, name, port);
 }
 
 ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp)
 {
     // FIXME: change register_object as well
+    inp.m_family_desc = this->m_family_desc;
 	setup().register_object(*this, name, inp);
     m_terminals.add(inp.name());
 }
@@ -554,6 +573,7 @@ ATTR_HOT void netlist_net_t::solve()
 
 ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, const family_t afamily)
 : netlist_owned_object_t(atype, afamily)
+, m_family_desc(NULL)
 , m_update_list_next(NULL)
 , m_net(NULL)
 , m_state(STATE_NONEX)
@@ -583,8 +603,6 @@ ATTR_COLD void netlist_core_terminal_t::set_net(netlist_net_t &anet)
 
 netlist_output_t::netlist_output_t(const type_t atype, const family_t afamily)
 	: netlist_core_terminal_t(atype, afamily)
-	, m_low_V(0.0)
-	, m_high_V(0.0)
 	, m_my_net(NET, afamily)
 {
 	//m_net = new net_net_t(NET_DIGITAL);
@@ -605,9 +623,6 @@ ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const p
 ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
     : netlist_output_t(OUTPUT, LOGIC), m_proxy(NULL)
 {
-    // Default to TTL
-    m_low_V = 0.1;  // these depend on sinked/sourced current. Values should be suitable for typical applications.
-    m_high_V = 4.8;
 }
 
 ATTR_COLD void netlist_logic_output_t::initial(const netlist_sig_t val)
@@ -617,12 +632,6 @@ ATTR_COLD void netlist_logic_output_t::initial(const netlist_sig_t val)
 	net().m_last.Q = !val;
 }
 
-ATTR_COLD void netlist_logic_output_t::set_levels(const double low, const double high)
-{
-	m_low_V = low;
-	m_high_V = high;
-}
-
 // ----------------------------------------------------------------------------------------
 // netlist_ttl_output_t
 // ----------------------------------------------------------------------------------------
@@ -630,7 +639,6 @@ ATTR_COLD void netlist_logic_output_t::set_levels(const double low, const double
 ATTR_COLD netlist_ttl_output_t::netlist_ttl_output_t()
 	: netlist_logic_output_t()
 {
-	set_levels(0.3, 3.4);
 }
 
 // ----------------------------------------------------------------------------------------

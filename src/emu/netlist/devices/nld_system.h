@@ -122,8 +122,7 @@ public:
             : netlist_device_t()
     {
         assert(in_proxied.family() == LOGIC);
-        m_I.m_high_thresh_V = in_proxied.m_high_thresh_V;
-        m_I.m_low_thresh_V = in_proxied.m_low_thresh_V;
+        m_I.m_family_desc = in_proxied.m_family_desc;
     }
 
     ATTR_COLD virtual ~nld_a_to_d_proxy() {}
@@ -145,9 +144,9 @@ protected:
 
     ATTR_HOT ATTR_ALIGN void update()
     {
-        if (m_I.Q_Analog() > m_I.m_high_thresh_V)
+        if (m_I.Q_Analog() > m_I.m_family_desc->m_high_thresh_V)
             OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
-        else if (m_I.Q_Analog() < m_I.m_low_thresh_V)
+        else if (m_I.Q_Analog() < m_I.m_family_desc->m_low_thresh_V)
             OUTLOGIC(m_Q, 0, NLTIME_FROM_NS(1));
         //else
         //  OUTLOGIC(m_Q, m_Q.net().last_Q(), NLTIME_FROM_NS(1));
@@ -159,26 +158,46 @@ protected:
 // netdev_d_to_a
 // ----------------------------------------------------------------------------------------
 
-class nld_d_to_a_proxy : public netlist_device_t
+class nld_base_d_to_a_proxy : public netlist_device_t
 {
 public:
-    ATTR_COLD nld_d_to_a_proxy(netlist_output_t &out_proxied)
+    ATTR_COLD nld_base_d_to_a_proxy(netlist_output_t &out_proxied)
             : netlist_device_t()
     {
         assert(out_proxied.family() == LOGIC);
-        m_low_V = out_proxied.m_low_V;
-        m_high_V = out_proxied.m_high_V;
+        m_family_desc = out_proxied.m_family_desc;
     }
 
-    ATTR_COLD virtual ~nld_d_to_a_proxy() {}
+    ATTR_COLD virtual ~nld_base_d_to_a_proxy() {}
+
+    ATTR_COLD virtual netlist_core_terminal_t &out() = 0;
 
     netlist_ttl_input_t m_I;
-    netlist_analog_output_t m_Q;
 
 protected:
     ATTR_COLD void start()
     {
         register_input("I", m_I);
+    }
+
+private:
+};
+
+
+class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
+{
+public:
+    ATTR_COLD nld_d_to_a_proxy(netlist_output_t &out_proxied)
+            : nld_base_d_to_a_proxy(out_proxied)
+    {
+    }
+
+    ATTR_COLD virtual ~nld_d_to_a_proxy() {}
+
+protected:
+    ATTR_COLD void start()
+    {
+        nld_base_d_to_a_proxy::start();
         register_output("Q", m_Q);
     }
 
@@ -187,14 +206,18 @@ protected:
         m_Q.initial(0);
     }
 
+    ATTR_COLD virtual netlist_core_terminal_t &out()
+    {
+        return m_Q;
+    }
+
     ATTR_HOT ATTR_ALIGN void update()
     {
-        OUTANALOG(m_Q, INPLOGIC(m_I) ? m_high_V : m_low_V, NLTIME_FROM_NS(1));
+        OUTANALOG(m_Q, INPLOGIC(m_I) ? m_family_desc->m_high_V : m_family_desc->m_low_V, NLTIME_FROM_NS(1));
     }
 
 private:
-    double m_low_V;
-    double m_high_V;
+    netlist_analog_output_t m_Q;
 };
 
 #endif /* NLD_SYSTEM_H_ */

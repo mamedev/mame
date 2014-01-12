@@ -248,7 +248,28 @@ class netlist_matrix_solver_t;
 class NETLIB_NAME(gnd);
 class NETLIB_NAME(solver);
 class NETLIB_NAME(mainclock);
-class NETLIB_NAME(d_to_a_proxy);
+class NETLIB_NAME(base_d_to_a_proxy);
+
+// ----------------------------------------------------------------------------------------
+// netlist_output_family_t
+// ----------------------------------------------------------------------------------------
+
+struct netlist_logic_family_desc_t
+{
+    double m_low_thresh_V;
+    double m_high_thresh_V;
+    double m_low_V;
+    double m_high_V;
+};
+
+/* Terminals inherit the family description from the netlist_device
+ * The default is the ttl family, but any device can override the family.
+ * For individual terminals, these can be overwritten as well.
+ *
+ * Only devices of type GENERIC should have a family description entry
+ */
+
+extern netlist_logic_family_desc_t netlist_family_ttl;
 
 // ----------------------------------------------------------------------------------------
 // netlist_object_t
@@ -378,6 +399,8 @@ public:
 		m_state = astate;
 	}
 
+	const netlist_logic_family_desc_t *m_family_desc;
+
 	netlist_core_terminal_t *m_update_list_next;
 
 protected:
@@ -457,8 +480,6 @@ public:
 
 	ATTR_COLD netlist_input_t(const type_t atype, const family_t afamily)
 		: netlist_core_terminal_t(atype, afamily)
-		, m_low_thresh_V(0)
-		, m_high_thresh_V(0)
 	{
 		set_state(STATE_INP_ACTIVE);
 	}
@@ -467,9 +488,6 @@ public:
 	ATTR_HOT inline void activate();
 	ATTR_HOT inline void activate_hl();
 	ATTR_HOT inline void activate_lh();
-
-	double m_low_thresh_V;
-	double m_high_thresh_V;
 
 protected:
     ATTR_COLD virtual void reset()
@@ -490,19 +508,11 @@ public:
 	ATTR_COLD netlist_logic_input_t()
 		: netlist_input_t(INPUT, LOGIC)
 	{
-		// default to TTL
-		m_low_thresh_V = 0.8;
-		m_high_thresh_V = 2.0;
 	}
 
 	ATTR_HOT inline const netlist_sig_t Q() const;
 	ATTR_HOT inline const netlist_sig_t last_Q() const;
 
-	ATTR_COLD inline void set_thresholds(const double low, const double high)
-	{
-		m_low_thresh_V = low;
-		m_high_thresh_V = high;
-	}
 };
 
 // ----------------------------------------------------------------------------------------
@@ -513,7 +523,7 @@ class netlist_ttl_input_t : public netlist_logic_input_t
 {
 public:
 	ATTR_COLD netlist_ttl_input_t()
-		: netlist_logic_input_t() { set_thresholds(0.8 , 2.0); }
+		: netlist_logic_input_t() { }
 };
 
 // ----------------------------------------------------------------------------------------
@@ -690,10 +700,6 @@ public:
 	ATTR_COLD netlist_output_t(const type_t atype, const family_t afamily);
 
 	ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
-
-	double m_low_V;
-	double m_high_V;
-
     ATTR_COLD virtual void reset()
     {
         set_state(STATE_OUT);
@@ -712,10 +718,9 @@ public:
 	ATTR_COLD netlist_logic_output_t();
 
 	ATTR_COLD void initial(const netlist_sig_t val);
-	ATTR_COLD void set_levels(const double low, const double high);
 
-	ATTR_COLD nld_d_to_a_proxy *get_proxy() { return m_proxy; }
-    ATTR_COLD void set_proxy(nld_d_to_a_proxy *proxy) { m_proxy = proxy; }
+	ATTR_COLD nld_base_d_to_a_proxy *get_proxy() { return m_proxy; }
+    ATTR_COLD void set_proxy(nld_base_d_to_a_proxy *proxy) { m_proxy = proxy; }
 
 	ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time delay)
 	{
@@ -726,7 +731,7 @@ public:
 		}
 	}
 private:
-	nld_d_to_a_proxy *m_proxy;
+	nld_base_d_to_a_proxy *m_proxy;
 };
 
 class netlist_ttl_output_t : public netlist_logic_output_t
@@ -880,8 +885,9 @@ public:
 
 	typedef netlist_list_t<netlist_core_device_t *> list_t;
 
-	ATTR_COLD netlist_core_device_t();
+	//ATTR_COLD netlist_core_device_t();
 	ATTR_COLD netlist_core_device_t(const family_t afamily);
+    ATTR_COLD netlist_core_device_t(const netlist_logic_family_desc_t *family_desc);
 
 	ATTR_COLD virtual ~netlist_core_device_t();
 
@@ -947,6 +953,8 @@ public:
 #if USE_PMFDELEGATES
 	net_update_delegate static_update;
 #endif
+
+	const netlist_logic_family_desc_t *m_family_desc;
 
 protected:
 
