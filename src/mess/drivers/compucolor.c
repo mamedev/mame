@@ -51,4 +51,4 @@ ROM_START( compclr2 )
 	ROM_LOAD( "timing.rom", 0x00, 0x20, BAD_DUMP CRC(27ae54bc) SHA1(ccb056fbc1ec2132f2602217af64d77237494afb) )
 ROM_END
 
-COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, driver_device, 0,      "Intelligent System Corporation",  "Compucolor II",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, driver_device, 0,      "Intelligent Systems Corporation",  "Compucolor II",  GAME_IS_SKELETON | GAME_NOT_WORKING | GAME_NO_SOUND )
