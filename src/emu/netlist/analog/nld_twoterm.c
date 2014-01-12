@@ -96,7 +96,7 @@ NETLIB_START(POT)
 	register_subalias("2", m_R1.m_N);
 	register_subalias("3", m_R2.m_N);
 
-	setup().connect(m_R2.m_P, m_R1.m_N);
+	connect(m_R2.m_P, m_R1.m_N);
 
 	register_param("R", m_R, 1.0 / NETLIST_GMIN);
 	register_param("DIAL", m_Dial, 0.5);

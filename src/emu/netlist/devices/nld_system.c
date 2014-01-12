@@ -12,12 +12,12 @@
 NETLIB_START(clock)
 {
 	register_output("Q", m_Q);
-	//register_input("FB", m_feedback);
+	register_input("FB", m_feedback);
 
 	register_param("FREQ", m_freq, 7159000.0 * 5.0);
 	m_inc = netlist_time::from_hz(m_freq.Value()*2);
 
-	register_link_internal(m_feedback, m_Q, netlist_input_t::STATE_INP_ACTIVE);
+	connect(m_feedback, m_Q);
 
 }
 

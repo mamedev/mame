@@ -7,7 +7,7 @@
 
 NETLIB_START(nic74107Asub)
 {
-	register_input("CLK", m_clk, netlist_input_t::STATE_INP_HL);
+	register_input("CLK", m_clk);
 	register_output("Q", m_Q);
 	register_output("QQ", m_QQ);
 
@@ -18,6 +18,7 @@ NETLIB_START(nic74107Asub)
 
 NETLIB_RESET(nic74107Asub)
 {
+    m_clk.set_state(netlist_input_t::STATE_INP_HL);
     m_Q.initial(0);
     m_QQ.initial(1);
 

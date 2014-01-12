@@ -300,8 +300,14 @@ public:
 	ATTR_HOT inline netlist_base_t & RESTRICT netlist() { return *m_netlist; }
 	ATTR_HOT inline const netlist_base_t & RESTRICT netlist() const { return *m_netlist; }
 
+    ATTR_COLD void inline do_reset()
+    {
+        reset();
+    }
+
 protected:
 
+    ATTR_COLD virtual void reset() = 0;
 	// must call parent save_register !
 	ATTR_COLD virtual void save_register() { };
 
@@ -354,7 +360,7 @@ public:
 
 	ATTR_COLD netlist_core_terminal_t(const type_t atype, const family_t afamily);
 
-	ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname, const state_e astate);
+	//ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
 
 	ATTR_COLD void set_net(netlist_net_t &anet);
 	ATTR_COLD inline bool has_net() const { return (m_net != NULL); }
@@ -428,6 +434,12 @@ protected:
 		netlist_core_terminal_t::save_register();
 	}
 
+	ATTR_COLD virtual void reset()
+	{
+	    set_state(STATE_INP_ACTIVE);
+	}
+
+
 };
 
 
@@ -455,6 +467,12 @@ public:
 
 	double m_low_thresh_V;
 	double m_high_thresh_V;
+
+protected:
+    ATTR_COLD virtual void reset()
+    {
+        set_state(STATE_INP_ACTIVE);
+    }
 
 private:
 };
@@ -536,7 +554,6 @@ public:
 
 	ATTR_COLD netlist_net_t(const type_t atype, const family_t afamily);
 	ATTR_COLD void init_object(netlist_base_t &nl, const pstring &aname);
-	ATTR_COLD void reset();
 
 	ATTR_COLD void register_con(netlist_core_terminal_t &terminal);
 	ATTR_COLD void merge_net(netlist_net_t *othernet);
@@ -644,6 +661,7 @@ protected:
 	{
 	    //assert_always(false, "trying too early to register state in netlist_net_t");
 	}
+    ATTR_COLD virtual void reset();
 
 
 private:
@@ -673,7 +691,10 @@ public:
 	double m_low_V;
 	double m_high_V;
 
-protected:
+    ATTR_COLD virtual void reset()
+    {
+        set_state(STATE_OUT);
+    }
 
 private:
 	netlist_net_t m_my_net;
@@ -748,6 +769,10 @@ public:
 	ATTR_COLD netlist_param_t(const param_type_t atype);
 
 	ATTR_HOT inline const param_type_t param_type() const { return m_param_type; }
+
+protected:
+
+	ATTR_COLD virtual void reset() { }
 
 private:
 	const param_type_t m_param_type;
@@ -915,16 +940,10 @@ public:
 	net_update_delegate static_update;
 #endif
 
-    ATTR_COLD void inline do_reset()
-    {
-        reset();
-    }
-
 protected:
 
 	ATTR_HOT virtual void update() { }
 	ATTR_COLD virtual void start() { }
-    ATTR_COLD virtual void reset() = 0;
 
 private:
 };
@@ -946,17 +965,12 @@ public:
 
 	ATTR_COLD void register_sub(netlist_device_t &dev, const pstring &name);
 	ATTR_COLD void register_subalias(const pstring &name, netlist_core_terminal_t &term);
-
 	ATTR_COLD void register_terminal(const pstring &name, netlist_terminal_t &port);
-
 	ATTR_COLD void register_output(const pstring &name, netlist_output_t &out);
+	ATTR_COLD void register_input(const pstring &name, netlist_input_t &in);
 
-	ATTR_COLD void register_input(const pstring &name, netlist_input_t &in, const netlist_input_t::state_e state = netlist_input_t::STATE_INP_ACTIVE);
+	ATTR_COLD void connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
 
-	ATTR_COLD void register_link_internal(netlist_input_t &in, netlist_output_t &out, const netlist_input_t::state_e aState);
-	ATTR_COLD void register_link_internal(netlist_core_device_t &dev, netlist_input_t &in, netlist_output_t &out, const netlist_input_t::state_e aState);
-
-	/* FIXME: driving logic outputs don't count in here */
 	netlist_list_t<pstring, 20> m_terminals;
 
 protected:
@@ -1069,92 +1083,6 @@ private:
 	NETLIB_NAME(solver) *       m_solver;
 
 	netlist_setup_t *m_setup;
-};
-
-// ----------------------------------------------------------------------------------------
-// netdev_a_to_d
-// ----------------------------------------------------------------------------------------
-
-class nld_a_to_d_proxy : public netlist_device_t
-{
-public:
-	ATTR_COLD nld_a_to_d_proxy(netlist_input_t &in_proxied)
-			: netlist_device_t()
-	{
-		assert(in_proxied.family() == LOGIC);
-		m_I.m_high_thresh_V = in_proxied.m_high_thresh_V;
-		m_I.m_low_thresh_V = in_proxied.m_low_thresh_V;
-	}
-
-	ATTR_COLD virtual ~nld_a_to_d_proxy() {}
-
-	netlist_analog_input_t m_I;
-	netlist_ttl_output_t m_Q;
-
-protected:
-	ATTR_COLD void start()
-	{
-		register_input("I", m_I, netlist_terminal_t::STATE_INP_ACTIVE);
-		register_output("Q", m_Q);
-	}
-
-    ATTR_COLD void reset()
-    {
-        m_Q.initial(1);
-    }
-
-	ATTR_HOT ATTR_ALIGN void update()
-	{
-		if (m_I.Q_Analog() > m_I.m_high_thresh_V)
-			OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
-		else if (m_I.Q_Analog() < m_I.m_low_thresh_V)
-			OUTLOGIC(m_Q, 0, NLTIME_FROM_NS(1));
-		//else
-		//	OUTLOGIC(m_Q, m_Q.net().last_Q(), NLTIME_FROM_NS(1));
-	}
-
-};
-
-// ----------------------------------------------------------------------------------------
-// netdev_d_to_a
-// ----------------------------------------------------------------------------------------
-
-class nld_d_to_a_proxy : public netlist_device_t
-{
-public:
-	ATTR_COLD nld_d_to_a_proxy(netlist_output_t &out_proxied)
-			: netlist_device_t()
-	{
-		assert(out_proxied.family() == LOGIC);
-		m_low_V = out_proxied.m_low_V;
-		m_high_V = out_proxied.m_high_V;
-	}
-
-	ATTR_COLD virtual ~nld_d_to_a_proxy() {}
-
-	netlist_ttl_input_t m_I;
-	netlist_analog_output_t m_Q;
-
-protected:
-	ATTR_COLD void start()
-	{
-		register_input("I", m_I, netlist_terminal_t::STATE_INP_ACTIVE);
-		register_output("Q", m_Q);
-	}
-
-    ATTR_COLD void reset()
-    {
-        m_Q.initial(0);
-    }
-
-	ATTR_HOT ATTR_ALIGN void update()
-	{
-		OUTANALOG(m_Q, INPLOGIC(m_I) ? m_high_V : m_low_V, NLTIME_FROM_NS(1));
-	}
-
-private:
-	double m_low_V;
-	double m_high_V;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -1300,22 +1228,8 @@ public:
 	ATTR_COLD const pstring &name() const { return m_name; }
 	ATTR_COLD const pstring &classname() const { return m_classname; }
     ATTR_COLD const pstring &param_desc() const { return m_def_param; }
-
-    ATTR_COLD const nl_util::pstring_list term_param_list()
-    {
-        if (m_def_param.startsWith("+"))
-            return nl_util::split(m_def_param.substr(1), ",");
-        else
-            return nl_util::pstring_list();
-    }
-
-    ATTR_COLD const pstring def_param()
-    {
-        if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-            return "";
-        else
-            return m_def_param;
-    }
+    ATTR_COLD const nl_util::pstring_list term_param_list();
+    ATTR_COLD const pstring def_param();
 
 protected:
 	pstring m_name;                             /* device name */

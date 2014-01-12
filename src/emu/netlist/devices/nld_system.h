@@ -73,6 +73,90 @@ NETLIB_DEVICE_WITH_PARAMS(analog_input,
     netlist_param_double_t m_IN;
 );
 
+// ----------------------------------------------------------------------------------------
+// netdev_a_to_d
+// ----------------------------------------------------------------------------------------
 
+class nld_a_to_d_proxy : public netlist_device_t
+{
+public:
+    ATTR_COLD nld_a_to_d_proxy(netlist_input_t &in_proxied)
+            : netlist_device_t()
+    {
+        assert(in_proxied.family() == LOGIC);
+        m_I.m_high_thresh_V = in_proxied.m_high_thresh_V;
+        m_I.m_low_thresh_V = in_proxied.m_low_thresh_V;
+    }
+
+    ATTR_COLD virtual ~nld_a_to_d_proxy() {}
+
+    netlist_analog_input_t m_I;
+    netlist_ttl_output_t m_Q;
+
+protected:
+    ATTR_COLD void start()
+    {
+        register_input("I", m_I);
+        register_output("Q", m_Q);
+    }
+
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(1);
+    }
+
+    ATTR_HOT ATTR_ALIGN void update()
+    {
+        if (m_I.Q_Analog() > m_I.m_high_thresh_V)
+            OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
+        else if (m_I.Q_Analog() < m_I.m_low_thresh_V)
+            OUTLOGIC(m_Q, 0, NLTIME_FROM_NS(1));
+        //else
+        //  OUTLOGIC(m_Q, m_Q.net().last_Q(), NLTIME_FROM_NS(1));
+    }
+
+};
+
+// ----------------------------------------------------------------------------------------
+// netdev_d_to_a
+// ----------------------------------------------------------------------------------------
+
+class nld_d_to_a_proxy : public netlist_device_t
+{
+public:
+    ATTR_COLD nld_d_to_a_proxy(netlist_output_t &out_proxied)
+            : netlist_device_t()
+    {
+        assert(out_proxied.family() == LOGIC);
+        m_low_V = out_proxied.m_low_V;
+        m_high_V = out_proxied.m_high_V;
+    }
+
+    ATTR_COLD virtual ~nld_d_to_a_proxy() {}
+
+    netlist_ttl_input_t m_I;
+    netlist_analog_output_t m_Q;
+
+protected:
+    ATTR_COLD void start()
+    {
+        register_input("I", m_I);
+        register_output("Q", m_Q);
+    }
+
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(0);
+    }
+
+    ATTR_HOT ATTR_ALIGN void update()
+    {
+        OUTANALOG(m_Q, INPLOGIC(m_I) ? m_high_V : m_low_V, NLTIME_FROM_NS(1));
+    }
+
+private:
+    double m_low_V;
+    double m_high_V;
+};
 
 #endif /* NLD_SYSTEM_H_ */

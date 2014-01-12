@@ -170,7 +170,7 @@ public:
 		register_output("Q", m_Q);
 		for (int i=0; i < 2; i++)
 		{
-			register_input(sIN[i], m_i[i], netlist_input_t::STATE_INP_ACTIVE);
+			register_input(sIN[i], m_i[i]);
 		}
 		save(NAME(m_active));
 	}

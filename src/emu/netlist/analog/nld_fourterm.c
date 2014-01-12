@@ -29,8 +29,8 @@ ATTR_COLD void NETLIB_NAME(VCCS)::configure(const double Gfac, const double GI)
     register_terminal("OP", m_OP);
     register_terminal("ON", m_ON);
 
-    m_OP1.init_object(*this, name() + ".OP1", netlist_core_terminal_t::STATE_INP_ACTIVE);
-    m_ON1.init_object(*this, name() + ".ON1", netlist_core_terminal_t::STATE_INP_ACTIVE);
+    m_OP1.init_object(*this, name() + ".OP1");
+    m_ON1.init_object(*this, name() + ".ON1");
 
     const double m_mult = m_G.Value() * Gfac; // 1.0 ==> 1V ==> 1A
     m_IP.set(GI);
@@ -48,8 +48,8 @@ ATTR_COLD void NETLIB_NAME(VCCS)::configure(const double Gfac, const double GI)
     m_ON1.set(m_mult, 0.0);
     m_ON1.m_otherterm = &m_IN;
 
-    setup().connect(m_OP, m_OP1);
-    setup().connect(m_ON, m_ON1);
+    connect(m_OP, m_OP1);
+    connect(m_ON, m_ON1);
 }
 
 NETLIB_UPDATE_PARAM(VCCS)
@@ -81,16 +81,16 @@ NETLIB_START(VCVS)
 
     configure(gRO, NETLIST_GMIN);
 
-    m_OP2.init_object(*this, "OP2", netlist_core_terminal_t::STATE_INP_ACTIVE);
-    m_ON2.init_object(*this, "ON2", netlist_core_terminal_t::STATE_INP_ACTIVE);
+    m_OP2.init_object(*this, "OP2");
+    m_ON2.init_object(*this, "ON2");
 
     m_OP2.set(gRO);
     m_ON2.set(gRO);
     m_OP2.m_otherterm = &m_ON2;
     m_ON2.m_otherterm = &m_OP2;
 
-    setup().connect(m_OP2, m_OP1);
-    setup().connect(m_ON2, m_ON1);
+    connect(m_OP2, m_OP1);
+    connect(m_ON2, m_ON1);
 }
 
 NETLIB_UPDATE_PARAM(VCVS)

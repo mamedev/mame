@@ -66,9 +66,9 @@ NETLIB_START(QBJT_switch)
     register_subalias("E", m_RB.m_N);
     register_subalias("C", m_RC.m_P);
 
-    setup().connect(m_RB.m_N, m_RC.m_N);
-    setup().connect(m_RB.m_P, m_BV);
-    setup().connect(m_RB.m_N, m_EV);
+    connect(m_RB.m_N, m_RC.m_N);
+    connect(m_RB.m_P, m_BV);
+    connect(m_RB.m_N, m_EV);
 
     save(NAME(m_state_on));
 
@@ -135,12 +135,12 @@ NETLIB_START(QBJT_EB)
     register_terminal("_B3", m_I_BC.m_P);
     register_terminal("_C1", m_I_BC.m_N);
 
-    setup().connect(m_D_BE.m_P, m_D_BC.m_P);
-    setup().connect(m_D_BE.m_P, m_I_BE.m_P);
-    setup().connect(m_D_BE.m_P, m_I_BC.m_P);
+    connect(m_D_BE.m_P, m_D_BC.m_P);
+    connect(m_D_BE.m_P, m_I_BE.m_P);
+    connect(m_D_BE.m_P, m_I_BC.m_P);
 
-    setup().connect(m_D_BE.m_N, m_I_BE.m_N);
-    setup().connect(m_D_BC.m_N, m_I_BC.m_N);
+    connect(m_D_BE.m_N, m_I_BE.m_N);
+    connect(m_D_BC.m_N, m_I_BC.m_N);
 
     m_gD_BE.save("m_D_BE", *this);
     m_gD_BC.save("m_D_BC", *this);

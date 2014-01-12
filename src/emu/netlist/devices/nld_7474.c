@@ -64,7 +64,7 @@ NETLIB_RESET(7474)
 
 NETLIB_START(7474sub)
 {
-	register_input("CLK",  m_clk, netlist_input_t::STATE_INP_LH);
+	register_input("CLK",  m_clk);
 
 	register_output("Q",   m_Q);
 	register_output("QQ",  m_QQ);
@@ -74,6 +74,8 @@ NETLIB_START(7474sub)
 
 NETLIB_RESET(7474sub)
 {
+    m_clk.set_state(netlist_input_t::STATE_INP_LH);
+
     m_nextD = 0;
     m_Q.initial(1);
     m_QQ.initial(0);

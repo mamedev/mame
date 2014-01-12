@@ -16,7 +16,7 @@ NETLIB_START(switch2)
 
     register_param("POS", m_POS, 0);
 
-    setup().connect(m_R[0].m_N, m_R[1].m_N);
+    connect(m_R[0].m_N, m_R[1].m_N);
 
     register_subalias("i1", m_R[0].m_P);
     register_subalias("i2", m_R[1].m_P);

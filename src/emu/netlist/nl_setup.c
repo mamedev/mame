@@ -146,7 +146,7 @@ pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in)
 	return "Error";
 }
 
-void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name, netlist_object_t &obj, const netlist_input_t::state_e state)
+void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name, netlist_object_t &obj)
 {
 	switch (obj.type())
 	{
@@ -158,7 +158,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 				if (obj.isType(netlist_terminal_t::OUTPUT))
 					dynamic_cast<netlist_output_t &>(term).init_object(dev, dev.name() + "." + name);
 				else
-					term.init_object(dev, dev.name() + "." + name, state);
+					term.init_object(dev, dev.name() + "." + name);
 
 				if (!(m_terminals.add(term.name(), &term, false)==TMERR_NONE))
 					netlist().error("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), term.name().cstr());

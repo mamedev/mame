@@ -259,13 +259,11 @@ NETLIB_START(solver)
 
 	// internal staff
 
-	register_input("FB_sync", m_fb_sync, netlist_input_t::STATE_INP_ACTIVE);
-	register_input("FB_step", m_fb_step, netlist_input_t::STATE_INP_ACTIVE);
+	register_input("FB_sync", m_fb_sync);
+	register_input("FB_step", m_fb_step);
 
-	setup().connect(m_fb_sync, m_Q_sync);
-	setup().connect(m_fb_step, m_Q_step);
-
-	m_last_step = netlist_time::zero;
+	connect(m_fb_sync, m_Q_sync);
+	connect(m_fb_step, m_Q_step);
 
 	save(NAME(m_last_step));
 

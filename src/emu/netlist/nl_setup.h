@@ -118,7 +118,7 @@ public:
 	void register_param(const pstring &param, const pstring &value);
 	void register_param(const pstring &param, const double value);
 
-	void register_object(netlist_device_t &dev, const pstring &name, netlist_object_t &obj, netlist_input_t::state_e state);
+	void register_object(netlist_device_t &dev, const pstring &name, netlist_object_t &obj);
 	void connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
 
 	netlist_core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
