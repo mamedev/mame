@@ -22,6 +22,7 @@
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "imagedev/snapquik.h"
 
 
 #define LOG 1
@@ -31,11 +32,12 @@ class phunsy_state : public driver_device
 {
 public:
 	phunsy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_speaker(*this, "speaker"),
-	m_cass(*this, "cassette"),
-	m_videoram(*this, "videoram") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
+		, m_p_videoram(*this, "videoram")
+	{ }
 
 	DECLARE_READ8_MEMBER( phunsy_data_r );
 	DECLARE_WRITE8_MEMBER( phunsy_1800_w );
@@ -44,19 +46,20 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+private:
 	const UINT8 *m_p_chargen;
+	UINT8       m_u_bank;
 	UINT8       m_data_out;
 	UINT8       m_keyboard_input;
-	UINT8       m_q_bank;
-	UINT8       m_u_bank;
 	UINT8       m_ram_1800[0x800];
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void palette_init();
 };
 
@@ -79,11 +82,11 @@ READ8_MEMBER( phunsy_state::cass_r )
 
 static ADDRESS_MAP_START(phunsy_mem, AS_PROGRAM, 8, phunsy_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff) AM_ROM
-	AM_RANGE( 0x0800, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_SHARE("videoram") // Video RAM
-	AM_RANGE( 0x1800, 0x1fff) AM_RAM_WRITE( phunsy_1800_w ) AM_ROMBANK("bank1") // Banked RAM/ROM
-	AM_RANGE( 0x4000, 0xffff) AM_RAMBANK("bank2") // Banked RAM
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0800, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram") // Video RAM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE( phunsy_1800_w ) AM_ROMBANK("bank1") // Banked RAM/ROM
+	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("bank2") // Banked RAM
 ADDRESS_MAP_END
 
 
@@ -93,7 +96,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 		logerror("%s: phunsy_ctrl_w %02x\n", machine().describe_context(), data);
 
 	m_u_bank = data >> 4;
-	m_q_bank = data & 0x0F;
+	UINT8 q_bank = data & 0x0F;
 
 	switch( m_u_bank )
 	{
@@ -109,7 +112,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 		break;
 	}
 
-	membank( "bank2" )->set_base( memregion("ram_4000")->base() + 0x4000 * m_q_bank );
+	membank( "bank2" )->set_base( memregion("ram_4000")->base() + 0x4000 * q_bank );
 }
 
 
@@ -140,7 +143,7 @@ WRITE8_MEMBER( phunsy_state::phunsy_data_w )
 
 READ8_MEMBER( phunsy_state::phunsy_data_r )
 {
-	UINT8 data;
+	UINT8 data = 0xff;
 
 	if (LOG)
 		logerror("%s: phunsy_data_r\n", machine().describe_context());
@@ -200,10 +203,9 @@ void phunsy_state::machine_reset()
 {
 	membank( "bank1" )->set_base( m_ram_1800 );
 	membank( "bank2" )->set_base( memregion("ram_4000")->base() );
-
-	m_u_bank = 0;
-	m_q_bank = 0;
 	m_keyboard_input = 0xFF;
+	m_u_bank = 0;
+	m_data_out = 0;
 }
 
 
@@ -237,7 +239,7 @@ UINT32 phunsy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 			for (x = ma; x < ma+64; x++)
 			{
-				chr = m_videoram[x];
+				chr = m_p_videoram[x];
 
 				if (BIT(chr, 7))
 				{
@@ -288,6 +290,56 @@ static GFXDECODE_START( phunsy )
 	GFXDECODE_ENTRY( "chargen", 0x0000, phunsy_charlayout, 1, 3 )
 GFXDECODE_END
 
+// quickloads can start from various addresses, and the files have no header.
+QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT16 i;
+	UINT16 quick_addr = 0x1800;
+	UINT8 *quick_data;
+	int result = IMAGE_INIT_FAIL;
+	int quick_length = image.length();
+	if (quick_length > 0x4000)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.message(" File too long");
+	}
+	else
+	{
+		quick_data = (UINT8*)malloc(quick_length);
+		if (!quick_data)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+			image.message(" Cannot open file");
+		}
+		else
+		{
+			membank( "bank1" )->set_base( m_ram_1800 );
+			m_u_bank = 0;
+
+			UINT16 exec_addr = quick_addr + 2;
+
+			for (i = 0; i < quick_length; i++)
+				space.write_byte(i+quick_addr, quick_data[i]);
+
+			/* display a message about the loaded quickload */
+			image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+			// Start the quickload
+			m_maincpu->set_state_int(S2650_R0, exec_addr>>8);
+			m_maincpu->set_state_int(S2650_R1, 0x08);
+			m_maincpu->set_state_int(S2650_R2, 0xe0);
+			m_maincpu->set_state_int(S2650_R3, 0x83);
+			m_maincpu->set_state_int(S2650_PC, exec_addr);
+
+			result = IMAGE_INIT_PASS;
+		}
+
+		free( quick_data );
+	}
+
+	return result;
+}
 
 static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	/* basic machine hardware */
@@ -319,6 +371,9 @@ static MACHINE_CONFIG_START( phunsy, phunsy_state )
 	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", phunsy_state, phunsy, "bin", 2)
 MACHINE_CONFIG_END
 
 
