@@ -1645,7 +1645,7 @@ DRIVER_INIT_MEMBER(cvs_state,raiders)
 
 	offs_t offs;
 
-	/* data lines D1 and D5 swapped */
+	/* data lines D1 and D6 swapped */
 	for (offs = 0; offs < 0x7400; offs++)
 		ROM[offs] = BITSWAP8(ROM[offs],7,1,5,4,3,2,6,0);
 
