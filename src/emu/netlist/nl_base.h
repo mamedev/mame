@@ -1067,6 +1067,19 @@ public:
 
 	ATTR_COLD void error(const char *format, ...) const;
 
+	template<class _C>
+	netlist_list_t<_C> get_device_list()
+	{
+	    netlist_list_t<_C> tmp;
+	    for (tagmap_devices_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+	    {
+	        _C dev = dynamic_cast<_C>(entry->object());
+	        if (dev != NULL)
+	            tmp.add(dev);
+	    }
+	    return tmp;
+	}
+
 	tagmap_devices_t m_devices;
 	netlist_net_t::list_t m_nets;
 

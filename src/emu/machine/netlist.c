@@ -56,6 +56,7 @@
 
 const device_type NETLIST_CORE = &device_creator<netlist_mame_device_t>;
 const device_type NETLIST_CPU = &device_creator<netlist_mame_cpu_device_t>;
+const device_type NETLIST_SOUND = &device_creator<netlist_mame_sound_device_t>;
 const device_type NETLIST_ANALOG_INPUT = &device_creator<netlist_mame_analog_input_t>;
 const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input_t>;
 
@@ -187,7 +188,7 @@ void netlist_mame_device_t::device_start()
 
 	// register additional devices
 
-	m_setup->factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-");
+	nl_register_devices();
 
 	m_setup_func(*m_setup);
 
@@ -351,6 +352,12 @@ void netlist_mame_cpu_device_t::device_start()
     m_icountptr = &m_icount;
 }
 
+
+void netlist_mame_cpu_device_t::nl_register_devices()
+{
+    setup().factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-");
+}
+
 ATTR_COLD UINT64 netlist_mame_cpu_device_t::execute_clocks_to_cycles(UINT64 clocks) const
 {
 	return clocks;
@@ -404,3 +411,73 @@ ATTR_HOT void netlist_mame_cpu_device_t::execute_run()
         update_time_x();
 	}
 }
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_sound_device_t
+// ----------------------------------------------------------------------------------------
+
+netlist_mame_sound_device_t::netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : netlist_mame_device_t(mconfig, NETLIST_CPU, "Netlist sound device", tag, owner, clock, "netlist_sound", __FILE__),
+        device_sound_interface(mconfig, *this)
+{
+}
+
+
+void netlist_mame_sound_device_t::device_start()
+{
+    netlist_mame_device_t::device_start();
+
+    LOG_DEV_CALLS(("device_start %s\n", tag()));
+
+    netlist_list_t<nld_sound *> outdevs = netlist().get_device_list<nld_sound *>();
+    if (outdevs.count() == 0)
+        fatalerror("No output devices");
+
+    m_num_outputs = outdevs.count();
+    m_num_inputs = 0;
+
+    /* resort channels */
+    for (int i=0; i < MAX_OUT; i++) m_out[i] = NULL;
+    for (int i=0; i < m_num_outputs; i++)
+    {
+        int chan = outdevs[i]->m_channel.Value();
+        if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.count())
+            fatalerror("illegal channel number");
+        m_out[chan] = outdevs[i];
+        m_out[chan]->m_sample = netlist_time::from_hz(clock());
+        m_out[chan]->m_buffer = NULL;
+    }
+
+    /* initialize the stream(s) */
+    m_stream = machine().sound().stream_alloc(*this, m_num_inputs, m_num_outputs, clock());
+
+}
+
+void netlist_mame_sound_device_t::nl_register_devices()
+{
+    setup().factory().register_device<nld_sound>( "NETDEV_SOUND_OUT", "nld_sound", "+CHAN");
+}
+
+
+void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+    for (int i=0; i < m_num_outputs; i++)
+    {
+        m_out[i]->m_buffer = outputs[i];
+    }
+
+    netlist_time cur = netlist().time();
+
+    //printf("current time %f\n", netlist().time().as_double());
+
+    netlist().process_queue(netlist_time::from_raw(m_div) * samples);
+
+    cur += (netlist_time::from_raw(m_div) * samples);
+
+    for (int i=0; i < m_num_outputs; i++)
+    {
+        m_out[i]->sound_update(cur);
+        m_out[i]->buffer_reset(cur);
+    }
+}
+

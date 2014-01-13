@@ -148,7 +148,7 @@ NETLIB_START(C)
 
 NETLIB_UPDATE_PARAM(C)
 {
-	//step_time(1e-9);
+	step_time(1.0/48000.0);
 }
 
 NETLIB_UPDATE(C)

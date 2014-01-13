@@ -46,6 +46,7 @@ public:
     ATTR_HOT inline bool is_timestep() { return m_steps.count() > 0; }
 
 	ATTR_HOT inline const NETLIB_NAME(solver) &owner() const;
+	ATTR_COLD void reset();
 
 	double m_accuracy;
 	double m_convergence_factor;
@@ -57,6 +58,7 @@ private:
 	netlist_core_terminal_t::list_t m_inps;
 	dev_list_t m_steps;
     bool m_resched;
+    netlist_time m_last_step;
 
     NETLIB_NAME(solver) *m_owner;
 };

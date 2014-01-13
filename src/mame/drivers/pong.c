@@ -20,6 +20,8 @@ TODO:
 #include "video/fixfreq.h"
 #include "astring.h"
 
+//#define TEST_SOUND
+
 /*
  * H count width to 512
  * Reset at 1C6 = 454
@@ -705,6 +707,34 @@ static NETLIST_START(pong_fast)
 
 NETLIST_END()
 
+#ifdef TESTSOUND
+static NETLIST_START(test)
+
+    /*
+     * Astable multivibrator using two 7400 gates (or inverters)
+     *
+     */
+
+    /* Standard stuff */
+
+    NETDEV_SOLVER(Solver)
+    NETDEV_PARAM(Solver.FREQ, 48000)
+
+    // astable NAND Multivibrator
+    NETDEV_R(R1, 1000)
+    NETDEV_C(C1, 1e-6)
+    TTL_7400_NAND(n1,R1.1,R1.1)
+    TTL_7400_NAND(n2,R1.2,R1.2)
+    NET_C(n1.Q, R1.2)
+    NET_C(n2.Q, C1.1)
+    NET_C(C1.2, R1.1)
+
+    NETDEV_SOUND_OUT(CH0, 0)
+    NET_C(CH0.IN, n2.Q)
+
+NETLIST_END()
+#endif
+
 void pong_state::machine_start()
 {
 }
@@ -758,8 +788,9 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( pong, pong_state )
 
 	/* basic machine hardware */
-    //MCFG_NETLIST_ADD("maincpu", pong, MASTER_CLOCK * 8)
-	MCFG_NETLIST_ADD("maincpu", pong, NETLIST_CLOCK)
+    MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+    MCFG_NETLIST_SETUP(pong)
+
     MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
     MCFG_NETLIST_ANALOG_INPUT_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
     MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr1", "ic_a9_R.R")
@@ -781,6 +812,12 @@ static MACHINE_CONFIG_START( pong, pong_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 48000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+#ifdef TEST_SOUND
+    MCFG_SOUND_ADD("snd_test", NETLIST_SOUND, 24000)
+    MCFG_NETLIST_SETUP(test)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+#endif
 
 MACHINE_CONFIG_END
 

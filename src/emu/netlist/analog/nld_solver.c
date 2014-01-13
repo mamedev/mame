@@ -153,6 +153,19 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
 
     m_resched = false;
 
+    if (USE_ALTERNATE_SCHEDULING)
+    {
+        netlist_time now = owner().netlist().time();
+        netlist_time delta = now - m_last_step;
+        if (delta >= netlist_time::from_nsec(5)) // always update capacitors
+        {
+            NL_VERBOSE_OUT(("Step!\n"));
+            /* update all terminals for new time step */
+            m_last_step = now;
+            step(delta);
+        }
+    }
+
     if (is_dynamic())
     {
         int this_resched;
@@ -202,6 +215,10 @@ ATTR_HOT void netlist_matrix_solver_t::schedule()
     //    update_inputs();
 }
 
+ATTR_COLD void netlist_matrix_solver_t::reset()
+{
+    m_last_step = netlist_time::zero;
+}
 
 // ----------------------------------------------------------------------------------------
 // solver
@@ -272,6 +289,8 @@ NETLIB_START(solver)
 NETLIB_RESET(solver)
 {
     m_last_step = netlist_time::zero;
+    for (int i = 0; i < m_mat_solvers.count(); i++)
+        m_mat_solvers[i]->reset();
 }
 
 
@@ -300,7 +319,11 @@ NETLIB_UPDATE(solver)
     bool global_resched = false;
     bool this_resched[100];
 
-	if (delta >= m_inc)
+    if (delta < m_inc)
+        do_full = true; // we have been called between updates
+
+    //FIXME: make this a parameter
+	if (!USE_ALTERNATE_SCHEDULING && delta >= netlist_time::from_nsec(5)) // always update capacitors
 	{
 		NL_VERBOSE_OUT(("Step!\n"));
 		/* update all terminals for new time step */
@@ -309,8 +332,7 @@ NETLIB_UPDATE(solver)
 		{
 			(*e)->step(delta);
 		}
-	} else
-	    do_full = true; // we have been called inbetween updates
+	}
 
 
 #if HAS_OPENMP && USE_OPENMP
