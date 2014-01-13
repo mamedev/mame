@@ -862,14 +862,14 @@ READ8_MEMBER( px4_state::px4_artsr_r )
 // art mode register
 WRITE8_MEMBER( px4_state::px4_artmr_w )
 {
-	int data_bits = BIT(data, 2) ? 8 : 7;
-	int parity = BIT(data, 4) ? (BIT(data, 5) ? PARITY_EVEN : PARITY_ODD) : PARITY_NONE;
-	int stop_bits = BIT(data, 7) ? 2 : 1;
+	int data_bit_count = BIT(data, 2) ? 8 : 7;
+	parity_t parity = BIT(data, 4) ? (BIT(data, 5) ? PARITY_EVEN : PARITY_ODD) : PARITY_NONE;
+	stop_bits_t stop_bits = BIT(data, 7) ? STOP_BITS_2 : STOP_BITS_1;
 
 	if (VERBOSE)
-		logerror("%s: serial frame setup: %d-%d-%d\n", tag(), data_bits, stop_bits, parity);
+		logerror("%s: serial frame setup: %d-%s-%d\n", tag(), data_bit_count, device_serial_interface::parity_tostring(parity), stop_bits);
 
-	set_data_frame(data_bits, stop_bits, parity, false);
+	set_data_frame(1, data_bit_count, parity, stop_bits);
 }
 
 // io status register

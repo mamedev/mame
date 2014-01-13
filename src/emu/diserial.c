@@ -21,7 +21,25 @@ start of start bit. This is used to synchronise with the data being transfered *
 
 device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device),
-		m_other_connection(NULL)
+	m_input_state(0),
+	m_connection_state(0),
+	m_start_bit_hack_for_external_clocks(false),
+	m_df_start_bit_count(0),
+	m_df_word_length(0),
+	m_df_parity(PARITY_NONE),
+	m_df_stop_bit_count(STOP_BITS_0),
+	m_rcv_register_data(0x8000),
+	m_rcv_flags(0),
+	m_rcv_bit_count(0),
+	m_tra_flags(TRANSMIT_REGISTER_EMPTY),
+	m_rcv_clock(NULL),
+	m_tra_clock(NULL),
+	m_rcv_rate(attotime::never),
+	m_tra_rate(attotime::never),
+	m_rcv_line(0),
+	m_tra_clock_state(false),
+	m_rcv_clock_state(false),
+	m_other_connection(NULL)
 {
 	/* if sum of all bits in the byte is even, then the data
 	has even parity, otherwise it has odd parity */
@@ -38,21 +56,6 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 
 		m_serial_parity_table[i] = sum & 0x01;
 	}
-	m_rcv_clock = NULL;
-	m_tra_clock = NULL;
-	m_rcv_clock_state = false;
-	m_tra_clock_state = false;
-	m_tra_rate = attotime::never;
-	m_rcv_rate = attotime::never;
-	m_tra_flags = TRANSMIT_REGISTER_EMPTY;
-	m_rcv_register_data = 0x8000;
-	m_rcv_bit_count = 0;
-	m_connection_state = 0;
-	m_rcv_flags = 0;
-	m_input_state = 0;
-	m_rcv_line = 0;
-	m_start_bit_hack_for_external_clocks = false;
-	m_synchronous = false;
 }
 
 device_serial_interface::~device_serial_interface()
@@ -139,12 +142,32 @@ void device_serial_interface::device_timer(emu_timer &timer, device_timer_id id,
 }
 
 
-void device_serial_interface::set_data_frame(int num_data_bits, int stop_bit_count, int parity_code, bool synchronous)
+void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_count, parity_t parity, stop_bits_t stop_bits)
 {
-	m_df_word_length = num_data_bits;
-	m_df_stop_bit_count = stop_bit_count;
-	m_df_parity = parity_code;
-	m_synchronous = synchronous;
+	m_df_word_length = data_bit_count;
+
+	switch (stop_bits)
+	{
+	case STOP_BITS_0:
+	default:
+		m_df_stop_bit_count = 0;
+		break;
+
+	case STOP_BITS_1:
+		m_df_stop_bit_count = 1;
+		break;
+
+	case STOP_BITS_1_5:
+		m_df_stop_bit_count = 2; // TODO: support 1.5 stop bits
+		break;
+
+	case STOP_BITS_2:
+		m_df_stop_bit_count = 2;
+		break;
+	}
+
+	m_df_parity = parity;
+	m_df_start_bit_count = start_bit_count;
 
 	m_rcv_bit_count = m_df_word_length + m_df_stop_bit_count;
 
@@ -158,7 +181,7 @@ void device_serial_interface::receive_register_reset()
 {
 	m_rcv_bit_count_received = 0;
 	m_rcv_flags &=~RECEIVE_REGISTER_FULL;
-	if (m_synchronous)
+	if (m_df_start_bit_count == 0)
 	{
 		m_rcv_flags |= RECEIVE_REGISTER_SYNCHRONISED;
 		m_rcv_flags &=~RECEIVE_REGISTER_WAITING_FOR_START_BIT;
@@ -331,9 +354,11 @@ void device_serial_interface::transmit_register_setup(UINT8 data_byte)
 	m_tra_bit_count = 0;
 	m_tra_flags &=~TRANSMIT_REGISTER_EMPTY;
 
-	if (!m_synchronous)
-		/* start bit */
+	/* start bit */
+	for (i=0; i<m_df_start_bit_count; i++)
+	{
 		transmit_register_add_bit(0);
+	}
 
 	/* data bits */
 	transmit_data = data_byte;
@@ -480,4 +505,49 @@ void device_serial_interface::connect(device_serial_interface *other_connection)
 	serial_connection_out();
 	/* let a know the state of b */
 	other_connection->serial_connection_out();
+}
+
+const char *device_serial_interface::parity_tostring(parity_t parity)
+{
+	switch (parity)
+	{
+	case PARITY_NONE:
+		return "NONE";
+
+	case PARITY_ODD:
+		return "ODD";
+
+	case PARITY_EVEN:
+		return "EVEN";
+
+	case PARITY_MARK:
+		return "MARK";
+
+	case PARITY_SPACE:
+		return "SPACE";
+
+	default:
+		return "UNKNOWN";
+	}
+}
+
+const char *device_serial_interface::stop_bits_tostring(stop_bits_t stop_bits)
+{
+	switch (stop_bits)
+	{
+	case STOP_BITS_0:
+		return "0";
+
+	case STOP_BITS_1:
+		return "1";
+
+	case STOP_BITS_1_5:
+		return "1.5";
+
+	case STOP_BITS_2:
+		return "2";
+
+	default:
+		return "UNKNOWN";
+	}
 }

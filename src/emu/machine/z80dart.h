@@ -431,7 +431,7 @@ protected:
 	void set_rts(int state);
 
 	int get_clock_mode();
-	float get_stop_bits();
+	stop_bits_t get_stop_bits();
 	int get_rx_word_length();
 	int get_tx_word_length();
 

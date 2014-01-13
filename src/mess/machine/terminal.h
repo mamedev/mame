@@ -110,7 +110,9 @@ protected:
 	virtual void send_key(UINT8 code);
 
 private:
-	required_ioport m_io_term_baud;
+	required_ioport m_io_term_txbaud;
+	required_ioport m_io_term_rxbaud;
+	required_ioport m_io_term_startbits;
 	required_ioport m_io_term_databits;
 	required_ioport m_io_term_parity;
 	required_ioport m_io_term_stopbits;

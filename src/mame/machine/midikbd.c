@@ -76,7 +76,7 @@ void midi_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, in
 
 void midi_keyboard_device::device_start()
 {
-	set_data_frame(8, 1, PARITY_NONE, false); //8N1?
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1); //8N1?
 	set_tra_rate(clock());
 	m_out_tx_func.resolve_safe();
 	m_head = m_tail = 0;

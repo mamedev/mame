@@ -292,7 +292,7 @@ microtouch_serial_device::microtouch_serial_device(const machine_config &mconfig
 void microtouch_serial_device::device_start()
 {
 	microtouch_device::device_start();
-	set_data_frame(8, 1, PARITY_NONE, false); //8N1?
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1); //8N1?
 	set_tra_rate(clock());
 	set_rcv_rate(clock());
 	m_out_stx_func.resolve_safe();

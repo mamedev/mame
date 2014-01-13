@@ -285,9 +285,6 @@ private:
 	/* serial state */
 	UINT8 m_next_rsr;                       /* receiver status register latch */
 	int m_rsr_read;                         /* receiver status register read flag */
-	int m_rxtx_word;                        /* word length */
-	int m_rxtx_start;                       /* start bits */
-	int m_rxtx_stop;                        /* stop bits */
 
 	// timers
 	emu_timer *m_timer[4]; /* counter timers */

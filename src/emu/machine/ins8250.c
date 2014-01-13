@@ -239,26 +239,44 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			break;
 		case 3:
 			m_regs.lcr = data;
+
+			{
+			int data_bit_count = (m_regs.lcr & 3) + 5;
+			parity_t parity;
+			stop_bits_t stop_bits;
+
 			switch ((m_regs.lcr>>3) & 7)
 			{
 			case 1:
-				tmp = PARITY_ODD;
+				parity = PARITY_ODD;
 				break;
+
 			case 3:
-				tmp = PARITY_EVEN;
+				parity = PARITY_EVEN;
 				break;
+
 			case 5:
-				tmp = PARITY_MARK;
+				parity = PARITY_MARK;
 				break;
+
 			case 7:
-				tmp = PARITY_SPACE;
+				parity = PARITY_SPACE;
 				break;
+
 			default:
-				tmp = PARITY_NONE;
+				parity = PARITY_NONE;
 				break;
 			}
-			// if 5 data bits and stb = 1, stop bits is supposed to be 1.5
-			set_data_frame((m_regs.lcr & 3) + 5, (m_regs.lcr & 4)?2:1, tmp, false);
+
+			if (!(m_regs.lcr & 4))
+				stop_bits = STOP_BITS_1;
+			else if (data_bit_count == 5)
+				stop_bits = STOP_BITS_1_5;
+			else
+				stop_bits = STOP_BITS_2;
+
+			set_data_frame(1, data_bit_count, parity, stop_bits);
+			}
 			break;
 		case 4:
 			if ( ( m_regs.mcr & 0x1f ) != ( data & 0x1f ) )

@@ -34,8 +34,8 @@ struct serial_image_interface
 {
 	int m_baud_rate;
 	int m_data_bits;
-	int m_stop_bits;
-	int m_parity;
+	device_serial_interface::stop_bits_t m_stop_bits;
+	device_serial_interface::parity_t m_parity;
 	bool m_transmit_on_start;
 	const char *m_tag_connected;
 };

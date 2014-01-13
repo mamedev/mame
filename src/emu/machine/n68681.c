@@ -786,24 +786,7 @@ void duart68681_channel::write_MR(UINT8 data)
 
 void duart68681_channel::recalc_framing()
 {
-	int parity = 0, stopbits = 0;
-
-	switch ((MR2 >> 2) & 3)
-	{
-		case 0:
-		case 1:
-			stopbits = 1;
-			break;
-
-		case 2: // "1.5 async, 2 sync"
-			stopbits = 2;
-			break;
-
-		case 3:
-			stopbits = 2;
-			break;
-	}
-
+	parity_t parity = PARITY_NONE;
 	switch ((MR1>>3) & 3)
 	{
 		case 0: // with parity
@@ -837,9 +820,26 @@ void duart68681_channel::recalc_framing()
 			break;
 	}
 
+	stop_bits_t stopbits = STOP_BITS_0;
+	switch ((MR2 >> 2) & 3)
+	{
+		case 0:
+		case 1:
+			stopbits = STOP_BITS_1;
+			break;
+
+		case 2: // "1.5 async, 2 sync"
+			stopbits = STOP_BITS_1_5;
+			break;
+
+		case 3:
+			stopbits = STOP_BITS_2;
+			break;
+	}
+
 	//printf("ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
 
-	set_data_frame((MR1 & 3)+5, stopbits, parity, false);
+	set_data_frame(1, (MR1 & 3)+5, parity, stopbits);
 }
 
 void duart68681_channel::write_CR(UINT8 data)

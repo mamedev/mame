@@ -414,7 +414,7 @@ WRITE8_MEMBER(i8251_device::control_w)
 
 				LOG(("Character length: %d\n", (((data>>2) & 0x03)+5)));
 
-				int parity = PARITY_NONE;
+				parity_t parity;
 
 				if (data & (1<<4))
 				{
@@ -434,59 +434,38 @@ WRITE8_MEMBER(i8251_device::control_w)
 				else
 				{
 					LOG(("parity check disabled\n"));
+					parity = PARITY_NONE;
 				}
 
-				{
-					UINT8 stop_bit_length;
+				stop_bits_t stop_bits;
 
-					stop_bit_length = (data>>6) & 0x03;
-
-					switch (stop_bit_length)
-					{
-						case 0:
-						{
-							/* inhibit */
-							LOG(("stop bit: inhibit\n"));
-						}
-						break;
-
-						case 1:
-						{
-							/* 1 */
-							LOG(("stop bit: 1 bit\n"));
-						}
-						break;
-
-						case 2:
-						{
-							/* 1.5 */
-							LOG(("stop bit: 1.5 bits\n"));
-						}
-						break;
-
-						case 3:
-						{
-							/* 2 */
-							LOG(("stop bit: 2 bits\n"));
-						}
-						break;
-					}
-				}
-
-				int word_length = ((data>>2) & 0x03)+5;
-				int stop_bit_count = 1;
 				switch ((data>>6) & 0x03)
 				{
-					case 0:
-					case 1:
-						stop_bit_count =  1;
-						break;
-					case 2:
-					case 3:
-						stop_bit_count =  2;
-						break;
+				case 0:
+				default:
+					stop_bits = STOP_BITS_0;
+					LOG(("stop bit: inhibit\n"));
+					break;
+
+				case 1:
+					stop_bits = STOP_BITS_1;
+					LOG(("stop bit: 1 bit\n"));
+					break;
+
+				case 2:
+					stop_bits = STOP_BITS_1_5;
+					LOG(("stop bit: 1.5 bits\n"));
+					break;
+
+				case 3:
+					stop_bits = STOP_BITS_2;
+					LOG(("stop bit: 2 bits\n"));
+					break;
 				}
-				set_data_frame(word_length,stop_bit_count,parity,false);
+
+				int data_bits_count = ((data>>2) & 0x03)+5;
+
+				set_data_frame(1, data_bits_count, parity, stop_bits);
 
 				switch (data & 0x03)
 				{

@@ -50,8 +50,8 @@ void serial_image_device::device_config_complete()
 	{
 		m_baud_rate = 2400;
 		m_data_bits = 8;
-		m_stop_bits = 2;
 		m_parity = PARITY_NONE;
+		m_stop_bits = STOP_BITS_2;
 		m_transmit_on_start = FALSE;
 		m_tag_connected = NULL;
 	}
@@ -80,7 +80,7 @@ void serial_image_device::input_callback(UINT8 state)
 
 void serial_image_device::device_start()
 {
-	set_data_frame(m_data_bits, m_stop_bits, m_parity, false);
+	set_data_frame(1, m_data_bits, m_parity, m_stop_bits);
 
 	m_timer = machine().scheduler().timer_alloc(FUNC(serial_device_baud_rate_callback), this);
 

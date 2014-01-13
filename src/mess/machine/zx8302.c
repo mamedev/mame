@@ -404,7 +404,7 @@ WRITE8_MEMBER( zx8302_device::control_w )
 	m_baudx4_timer->adjust(attotime::zero, 0, attotime::from_hz(baudx4));
 
 	set_tra_rate(baud);
-	set_data_frame(8, 2, PARITY_NONE, false);
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 }
 
 

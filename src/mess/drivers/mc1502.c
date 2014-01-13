@@ -44,7 +44,7 @@ static const cassette_interface mc1502_cassette_interface =
 
 static const serial_image_interface mc1502_serial =
 {
-	9600, 8, 1, device_serial_interface::PARITY_NONE, 1, "upd8251"
+	9600, 8, device_serial_interface::STOP_BITS_1, device_serial_interface::PARITY_NONE, 1, "upd8251"
 };
 
 // Timer
