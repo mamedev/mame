@@ -13,7 +13,6 @@ public:
 		m_k053252(*this, "k053252"),
 		m_k056832(*this, "k056832"),
 		m_k055673(*this, "k055673"),
-		m_k054338(*this, "k054338"),
 		m_gx_workram(*this,"gx_workram"),
 		m_spriteram(*this,"spriteram")
 		{ }
@@ -22,7 +21,6 @@ public:
 	required_device<k053252_device> m_k053252;
 	required_device<k056832_device> m_k056832;
 	required_device<k055673_device> m_k055673;
-	required_device<k054338_device> m_k054338;
 	required_shared_ptr<UINT16> m_gx_workram;
 	optional_shared_ptr<UINT16> m_spriteram;
 
