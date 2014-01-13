@@ -14,6 +14,8 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "imagedev/floppy.h"
+#include "machine/ram.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
 
@@ -303,6 +305,10 @@ void compucolor2_state::palette_init()
 	}
 }
 
+static SLOT_INTERFACE_START( compucolor2_floppies )
+	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
+SLOT_INTERFACE_END
+
 static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_17_9712MHz/9)
@@ -320,10 +326,20 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_DEVICE_CONFIG(crtc_intf)
 
 	// devices
-	/*MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL_17_9712MHz/9)
-	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE(I8080_TAG, I8085_INTR_LINE))
+	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL_17_9712MHz/9)
+	/*MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE(I8080_TAG, I8085_INTR_LINE))
 	MCFG_TMS5501_XI_CALLBACK(READ8(compucolor2_state, xi_r))
 	MCFG_TMS5501_XO_CALLBACK(WRITE8(compucolor2_state, xo_w))*/
+	MCFG_FLOPPY_DRIVE_ADD(TMS5501_TAG":0", compucolor2_floppies, "525sssd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(TMS5501_TAG":1", compucolor2_floppies, NULL,      floppy_image_device::default_floppy_formats)
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "compclr2_flop")
 MACHINE_CONFIG_END
 
 ROM_START( compclr2 )
