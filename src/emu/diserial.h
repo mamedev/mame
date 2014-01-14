@@ -18,6 +18,25 @@
 class device_serial_interface : public device_interface
 {
 public:
+	enum
+	{
+		/* receive is waiting for start bit. The transition from high-low indicates
+		start of start bit. This is used to synchronise with the data being transfered */
+		RECEIVE_REGISTER_WAITING_FOR_START_BIT = 0x01,
+
+		/* receive is synchronised with data, data bits will be clocked in */
+		RECEIVE_REGISTER_SYNCHRONISED = 0x02,
+
+		/* set if receive register has been filled */
+		RECEIVE_REGISTER_FULL = 0x04
+	};
+
+	enum
+	{
+		/* register is empty and ready to be filled with data */
+		TRANSMIT_REGISTER_EMPTY = 0x0001
+	};
+
 	/* parity selections */
 	/* if all the bits are added in a byte, if the result is:
 	   even -> parity is even
@@ -95,6 +114,8 @@ protected:
 
 	bool is_receive_register_full();
 	bool is_transmit_register_empty();
+	bool is_receive_register_synchronized() { return m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED; }
+	bool is_receive_register_shifting() { return m_rcv_bit_count_received > 0; }
 
 	UINT8 get_received_char() { return m_rcv_byte_received; }
 

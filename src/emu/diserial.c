@@ -7,18 +7,6 @@
 
 #include "emu.h"
 
-
-/* receive is waiting for start bit. The transition from high-low indicates
-start of start bit. This is used to synchronise with the data being transfered */
-#define RECEIVE_REGISTER_WAITING_FOR_START_BIT 0x01
-/* receive is synchronised with data, data bits will be clocked in */
-#define RECEIVE_REGISTER_SYNCHRONISED 0x02
-/* set if receive register has been filled */
-#define RECEIVE_REGISTER_FULL 0x04
-
-/* register is empty and ready to be filled with data */
-#define TRANSMIT_REGISTER_EMPTY 0x0001
-
 device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device),
 	m_input_state(0),
