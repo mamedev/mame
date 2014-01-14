@@ -1006,17 +1006,17 @@ MACHINE_RESET_MEMBER(cvs_state,cvs)
 static MACHINE_CONFIG_START( cvs, cvs_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 894886.25)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_main_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cvs_state,  cvs_main_cpu_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cvs_state, cvs_main_cpu_interrupt)
 	MCFG_S2650_FLAG_HANDLER(WRITELINE(cvs_state, write_s2650_flag))
 
-	MCFG_CPU_ADD("audiocpu", S2650, 894886.25)
+	MCFG_CPU_ADD("audiocpu", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_dac_cpu_io_map)
 
-	MCFG_CPU_ADD("speech", S2650, 894886.25)
+	MCFG_CPU_ADD("speech", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_speech_cpu_io_map)
 
@@ -1057,7 +1057,7 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_DAC_ADD("dac3")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("tms", TMS5100, 640000)
+	MCFG_SOUND_ADD("tms", TMS5100, XTAL_640kHz)
 	MCFG_SOUND_CONFIG(tms5100_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
