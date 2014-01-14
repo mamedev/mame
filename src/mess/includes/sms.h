@@ -48,7 +48,7 @@ public:
 		m_port_persist(*this, "PERSISTENCE"),
 		m_is_gamegear(0),
 		m_is_region_japan(0),
-		m_is_korean(0),
+		m_is_mark_iii(0),
 		m_is_sdisp(0),
 		m_has_bios_0400(0),
 		m_has_bios_2000(0),
@@ -103,7 +103,7 @@ public:
 	// model identifiers
 	UINT8 m_is_gamegear;
 	UINT8 m_is_region_japan;
-	UINT8 m_is_korean;
+	UINT8 m_is_mark_iii;
 	UINT8 m_is_sdisp;
 	UINT8 m_has_bios_0400;
 	UINT8 m_has_bios_2000;
@@ -174,7 +174,6 @@ public:
 protected:
 	void setup_bios();
 	void setup_rom();
-	void setup_sms_cart();
 	void lphaser_hcount_latch();
 	void sms_get_inputs(address_space &space);
 };

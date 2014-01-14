@@ -55,7 +55,7 @@ sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, cons
 	device_sms_control_port_interface(mconfig, *this),
 	m_rfire_sw(*this, "rfu_sw"),
 	m_subctrl_port(*this, "ctrl"),
-	m_rapid_fire_interval(RAPID_FIRE_INTERVAL)
+	m_interval(RAPID_FIRE_INTERVAL)
 {
 }
 
@@ -66,14 +66,13 @@ sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, cons
 
 void sms_rapid_fire_device::device_start()
 {
-	save_item(NAME(m_rapid_fire_state));
+	m_start_time = machine().time();
+	m_read_state = 0;
+
+	save_item(NAME(m_start_time));
+	save_item(NAME(m_read_state));
+
 	m_subctrl_port->device_start();
-}
-
-
-void sms_rapid_fire_device::device_reset()
-{
-	m_rapid_fire_state = 0;
 }
 
 
@@ -85,18 +84,18 @@ UINT8 sms_rapid_fire_device::peripheral_r()
 {
 	UINT8 data = 0xff;
 
-	int n_intervals = machine().time().as_double() / m_rapid_fire_interval.as_double();
-	m_rapid_fire_state = n_intervals & 1;
+	int num_intervals = (machine().time() - m_start_time).as_double() / m_interval.as_double();
+	m_read_state = num_intervals & 1;
 
 	data = m_subctrl_port->port_r();
 
 	/* Check Rapid Fire switch for Button 1 (TL) */
 	if (!(data & 0x20) && (m_rfire_sw->read() & 0x01))
-		data |= m_rapid_fire_state << 5;
+		data |= m_read_state << 5;
 
 	/* Check Rapid Fire switch for Button 2 (TR) */
 	if (!(data & 0x80) && (m_rfire_sw->read() & 0x02))
-		data |= m_rapid_fire_state << 7;
+		data |= m_read_state << 7;
 
 	return data;
 }

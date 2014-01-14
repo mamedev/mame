@@ -1793,6 +1793,7 @@ $(MESSOBJ)/sega.a:              \
 	$(MESS_MACHINE)/sms_lphaser.o \
 	$(MESS_MACHINE)/sms_paddle.o  \
 	$(MESS_MACHINE)/sms_sports.o  \
+	$(MESS_MACHINE)/sms_sportsjp.o \
 	$(MESS_MACHINE)/sms_rfu.o     \
 	$(MESS_MACHINE)/sega8_slot.o  \
 	$(MESS_MACHINE)/sega8_rom.o \

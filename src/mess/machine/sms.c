@@ -25,7 +25,7 @@ void sms_state::lphaser_hcount_latch()
 WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 {
 	// Check if TH of controller port 1 is set to input (1)
-	if (m_is_korean || (m_io_ctrl_reg & 0x02))
+	if (m_io_ctrl_reg & 0x02)
 	{
 		if (state == 0)
 		{
@@ -33,7 +33,7 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 		}
 		else
 		{
-			// If previous state was 0 and now is 1, latch hcount.
+			// State is 1. If changed from 0, hcount is latched.
 			if (m_ctrl1_th_state == 0)
 				lphaser_hcount_latch();
 		}
@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 {
 	// Check if TH of controller port 2 is set to input (1)
-	if (m_is_korean || (m_io_ctrl_reg & 0x08))
+	if (m_io_ctrl_reg & 0x08)
 	{
 		if (state == 0)
 		{
@@ -53,7 +53,7 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 		}
 		else
 		{
-			// If previous state was 0 and now is 1, latch hcount.
+			// State is 1. If changed from 0, hcount is latched.
 			if (m_ctrl2_th_state == 0)
 				lphaser_hcount_latch();
 		}
@@ -69,6 +69,10 @@ void sms_state::sms_get_inputs( address_space &space )
 	m_port_dc_reg = 0xff;
 	m_port_dd_reg = 0xff;
 
+	// The bit order of the emulated controller port tries to follow its
+	// physical pins numbering. For register bits whose order differs,
+	// it's necessary move the equivalent controller bits to match.
+
 	data1 = m_port_ctrl1->port_r();
 	m_port_dc_reg &= ~0x0f | data1; // Up, Down, Left, Right
 	m_port_dc_reg &= ~0x10 | (data1 >> 1); // TL (Button 1)
@@ -80,8 +84,8 @@ void sms_state::sms_get_inputs( address_space &space )
 	m_port_dd_reg &= ~0x04 | (data2 >> 3); // TL (Button 1)
 	m_port_dd_reg &= ~0x08 | (data2 >> 4); // TR (Button 2)
 
-	// Japanese consoles do not have TH line connected.
-	if (!m_is_region_japan || m_is_korean)
+	// Sega Mark III does not have TH line connected.
+	if (!m_is_mark_iii)
 	{
 		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
 		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
@@ -104,7 +108,7 @@ READ8_MEMBER(sms_state::sms_fm_detect_r)
 	}
 	else
 	{
-		if (m_bios_port & IO_CHIP)
+		if (!m_is_mark_iii && (m_bios_port & IO_CHIP))
 		{
 			return 0xff;
 		}
@@ -213,14 +217,23 @@ WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 	else
 		m_paused = 0;
 
-	// clear TH latch of the controller ports
-	m_ctrl1_th_latch = 0;
-	m_ctrl2_th_latch = 0;
+	if (!m_is_mark_iii)
+	{
+		// clear TH latch of the controller ports
+		m_ctrl1_th_latch = 0;
+		m_ctrl2_th_latch = 0;
+	}
 }
 
 
 READ8_MEMBER(sms_state::sms_input_port_dc_r)
 {
+	if (m_is_mark_iii)
+	{
+		sms_get_inputs(space);
+		return m_port_dc_reg;
+	}
+
 	if (m_bios_port & IO_CHIP)
 	{
 		return 0xff;
@@ -230,7 +243,7 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 		sms_get_inputs(space);
 
 		// Check if TR of controller port 1 is set to output (0)
-		if (!m_is_region_japan && !(m_io_ctrl_reg & 0x01))
+		if (!(m_io_ctrl_reg & 0x01))
 		{
 			// Read TR state set through IO control port
 			m_port_dc_reg &= ~0x20 | ((m_io_ctrl_reg & 0x10) << 1);
@@ -243,6 +256,12 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 
 READ8_MEMBER(sms_state::sms_input_port_dd_r)
 {
+	if (m_is_mark_iii)
+	{
+		sms_get_inputs(space);
+		return m_port_dd_reg;
+	}
+
 	if (m_bios_port & IO_CHIP)
 		return 0xff;
 
@@ -255,14 +274,14 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	}
 
 	// Check if TR of controller port 2 is set to output (0)
-	if (!m_is_region_japan && !(m_io_ctrl_reg & 0x04))
+	if (!(m_io_ctrl_reg & 0x04))
 	{
 		// Read TR state set through IO control port
 		m_port_dd_reg &= ~0x08 | ((m_io_ctrl_reg & 0x40) >> 3);
 	}
 
 	// Check if TH of controller port 1 is set to output (0)
-	if (!m_is_region_japan && !(m_io_ctrl_reg & 0x02))
+	if (!(m_io_ctrl_reg & 0x02))
 	{
 		// Read TH state set through IO control port
 		m_port_dd_reg &= ~0x40 | ((m_io_ctrl_reg & 0x20) << 1);
@@ -277,7 +296,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 	}
 
 	// Check if TH of controller port 2 is set to output (0)
-	if (!m_is_region_japan && !(m_io_ctrl_reg & 0x08))
+	if (!(m_io_ctrl_reg & 0x08))
 	{
 		// Read TH state set through IO control port
 		m_port_dd_reg &= ~0x80 | (m_io_ctrl_reg & 0x80);
@@ -373,7 +392,16 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 	m_mapper[offset] = data;
 	m_mainram[0x1ffc + offset] = data;
 
-	if (m_bios_port & IO_BIOS_ROM || (m_is_gamegear && m_BIOS == NULL))
+	if (m_is_mark_iii)
+	{
+		if (m_cartslot && m_cartslot->m_cart)
+			cartridge_selected = true;
+		else if (m_cardslot && m_cardslot->m_cart)
+			card_selected = true;
+		else
+			return; // nothing to page in
+	}
+	else if (m_bios_port & IO_BIOS_ROM || (m_is_gamegear && m_BIOS == NULL))
 	{
 		if (!(m_bios_port & IO_CARTRIDGE) || (m_is_gamegear && m_BIOS == NULL))
 			cartridge_selected = true;
@@ -394,7 +422,7 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 	switch (offset)
 	{
 		case 0: // Control RAM/ROM
-			if (!(data & 0x08) && !(m_bios_port & IO_BIOS_ROM) && bios_selected)    // BIOS ROM
+			if (!(data & 0x08) && bios_selected && !(m_bios_port & IO_BIOS_ROM))    // BIOS ROM
 			{
 				if (!m_has_bios_0400 && !m_has_bios_2000)
 				{
@@ -677,6 +705,29 @@ void sms_state::setup_rom()
 	m_bank_enabled[1] = ENABLE_NONE;
 	m_bank_enabled[2] = ENABLE_NONE;
 
+	if (m_is_mark_iii)
+	{
+		// Mark III uses the card slot by default, but has hardware method
+		// that prioritizes the cartridge slot if it has a cartridge inserted.
+		if (m_cartslot && m_cartslot->m_cart)
+		{
+			m_bank_enabled[3] = ENABLE_CART;
+			m_bank_enabled[0] = ENABLE_CART;
+			m_bank_enabled[1] = ENABLE_CART;
+			m_bank_enabled[2] = ENABLE_CART;
+			logerror("Switched in cartridge rom.\n");
+		}
+		else
+		{
+			m_bank_enabled[3] = ENABLE_CARD;
+			m_bank_enabled[0] = ENABLE_CARD;
+			m_bank_enabled[1] = ENABLE_CARD;
+			m_bank_enabled[2] = ENABLE_CARD;
+			logerror("Switching to card rom port.\n");
+		}
+		return;
+	}
+
 	/* 2. check and set up expansion port */
 	if (!(m_bios_port & IO_EXPANSION) && (m_bios_port & IO_CARTRIDGE) && (m_bios_port & IO_CARD))
 	{
@@ -746,7 +797,6 @@ void sms_state::setup_bios()
 	if (m_BIOS == NULL || m_BIOS[0] == 0x00)
 	{
 		m_BIOS = NULL;
-		m_bios_port |= IO_BIOS_ROM;
 		m_has_bios_0400 = 0;
 		m_has_bios_2000 = 0;
 		m_has_bios_full = 0;
@@ -759,14 +809,22 @@ void sms_state::setup_bios()
 		m_bios_page[1] = (1 < m_bios_page_count) ? 1 : 0;
 		m_bios_page[2] = (2 < m_bios_page_count) ? 2 : 0;
 	}
+
+	if (!m_is_mark_iii)
+	{
+		m_bios_port = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
+		if (!m_BIOS)
+		{
+			m_bios_port &= ~(IO_CARTRIDGE);
+			m_bios_port |= IO_BIOS_ROM;
+		}
+	}
 }
 
 MACHINE_START_MEMBER(sms_state,sms)
 {
 	char str[7];
 
-	m_left_lcd = machine().device("left_lcd");
-	m_right_lcd = machine().device("right_lcd");
 	m_space = &m_maincpu->space(AS_PROGRAM);
 
 	// alibaba and blockhol are ports of games for the MSX system. The
@@ -775,30 +833,44 @@ MACHINE_START_MEMBER(sms_state,sms)
 	// the "call $4010" without a following RET statement. That is basically
 	// a bug in the program code. The only way this cartridge could have run
 	// successfully on a real unit is if the RAM would be initialized with
-	// a F0 pattern on power up; F0 = RET P. Do that only for consoles in
-	// Japan region (including KR), until confirmed on other consoles.
+	// a F0 pattern on power up; F0 = RET P. Do that only for consoles of
+	// Japan region (including Korea), until confirmed on other consoles.
 	if (m_is_region_japan)
 	{
 		memset((UINT8*)m_space->get_write_ptr(0xc000), 0xf0, 0x1fff);
 	}
 
-	save_item(NAME(m_fm_detect));
-	save_item(NAME(m_io_ctrl_reg));
 	save_item(NAME(m_paused));
-	save_item(NAME(m_bios_port));
 	save_item(NAME(m_mapper));
 	save_item(NAME(m_port_dc_reg));
 	save_item(NAME(m_port_dd_reg));
-	save_item(NAME(m_gg_sio));
 	save_item(NAME(m_bank_enabled));
-	save_item(NAME(m_bios_page));
 
-	save_item(NAME(m_ctrl1_th_state));
-	save_item(NAME(m_ctrl2_th_state));
-	save_item(NAME(m_ctrl1_th_latch));
-	save_item(NAME(m_ctrl2_th_latch));
-	save_item(NAME(m_sscope_state));
-	save_item(NAME(m_frame_sscope_state));
+	if (m_has_fm)
+	{
+		save_item(NAME(m_fm_detect));
+	}
+
+	if (!m_is_mark_iii)
+	{
+		save_item(NAME(m_bios_port));
+		save_item(NAME(m_bios_page));
+		save_item(NAME(m_io_ctrl_reg));
+		save_item(NAME(m_ctrl1_th_latch));
+		save_item(NAME(m_ctrl2_th_latch));
+	}
+
+	if (m_is_gamegear)
+	{
+		save_item(NAME(m_gg_sio));
+	}
+	else
+	{
+		save_item(NAME(m_ctrl1_th_state));
+		save_item(NAME(m_ctrl2_th_state));
+		save_item(NAME(m_sscope_state));
+		save_item(NAME(m_frame_sscope_state));
+	}
 
 	if (m_is_sdisp)
 	{
@@ -830,9 +902,38 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 MACHINE_RESET_MEMBER(sms_state,sms)
 {
-	m_io_ctrl_reg = 0xff;
 	if (m_has_fm)
 		m_fm_detect = 0x01;
+
+	if (!m_is_mark_iii)
+	{
+		m_io_ctrl_reg = 0xff;
+		m_bios_port = 0;
+		m_ctrl1_th_latch = 0;
+		m_ctrl2_th_latch = 0;
+	}
+
+	if (m_is_gamegear)
+	{
+		if (m_cartslot->m_cart && m_cartslot->m_cart->get_sms_mode())
+			m_vdp->set_sega315_5124_compatibility_mode(true);
+
+		/* Initialize SIO stuff for GG */
+		m_gg_sio[0] = 0x7f;
+		m_gg_sio[1] = 0xff;
+		m_gg_sio[2] = 0x00;
+		m_gg_sio[3] = 0xff;
+		m_gg_sio[4] = 0x00;
+	}
+	else
+	{
+		m_ctrl1_th_state = 1;
+		m_ctrl2_th_state = 1;
+		m_lphaser_x_offs = (m_cartslot->m_cart) ? m_cartslot->m_cart->get_lphaser_xoffs() : 44;
+
+		m_sscope_state = 0;
+		m_frame_sscope_state = 0;
+	}
 
 	if (m_is_sdisp)
 	{
@@ -840,30 +941,8 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 		m_current_cartridge = 0;
 	}
 
-	m_bios_port = 0;
-
 	setup_bios();
-	setup_sms_cart();
 	setup_rom();
-
-	if (m_cartslot->m_cart && m_cartslot->m_cart->get_sms_mode())
-		m_vdp->set_sega315_5124_compatibility_mode(true);
-
-	/* Initialize SIO stuff for GG */
-	m_gg_sio[0] = 0x7f;
-	m_gg_sio[1] = 0xff;
-	m_gg_sio[2] = 0x00;
-	m_gg_sio[3] = 0xff;
-	m_gg_sio[4] = 0x00;
-
-	m_ctrl1_th_state = 1;
-	m_ctrl2_th_state = 1;
-	m_ctrl1_th_latch = 0;
-	m_ctrl2_th_latch = 0;
-	m_lphaser_x_offs = (m_cartslot->m_cart) ? m_cartslot->m_cart->get_lphaser_xoffs() : 44;
-
-	m_sscope_state = 0;
-	m_frame_sscope_state = 0;
 }
 
 READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
@@ -932,25 +1011,10 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 	}
 }
 
-void sms_state::setup_sms_cart()
-{
-	m_bios_port = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
-	if (!m_is_gamegear && !m_BIOS)
-	{
-		m_bios_port |= IO_BIOS_ROM;
-
-		// Mark-III has hardware method that prioritizes cartridge slot.
-		if (m_cartslot && m_cartslot->m_cart)
-			m_bios_port &= ~(IO_CARTRIDGE);
-		else
-			m_bios_port &= ~(IO_CARD);
-	}
-}
-
-
 DRIVER_INIT_MEMBER(sms_state,sg1000m3)
 {
 	m_is_region_japan = 1;
+	m_is_mark_iii = 1;
 	m_has_fm = 1;
 }
 
@@ -973,8 +1037,6 @@ DRIVER_INIT_MEMBER(sms_state,sms2kr)
 {
 	m_is_region_japan = 1;
 	m_has_bios_full = 1;
-	m_has_fm = 1;
-	m_is_korean = 1;
 }
 
 
@@ -1001,6 +1063,9 @@ DRIVER_INIT_MEMBER(sms_state,gamegeaj)
 
 VIDEO_START_MEMBER(sms_state,sms1)
 {
+	m_left_lcd = machine().device("left_lcd");
+	m_right_lcd = machine().device("right_lcd");
+
 	m_main_scr->register_screen_bitmap(m_prevleft_bitmap);
 	m_main_scr->register_screen_bitmap(m_prevright_bitmap);
 	save_item(NAME(m_prevleft_bitmap));

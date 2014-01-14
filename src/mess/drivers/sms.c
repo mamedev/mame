@@ -10,11 +10,14 @@
  To do:
 
  - SIO interface for Game Gear (needs netplay, I guess)
- - SMS Store Display Unit
- - Keyboard support for Sega Mark-III (sg1000m3 driver)
- - Mark-III expansion slot, used by keyboard and FM module
- - Japanese Sports Pad model used by the game Sports Pad Soccer
-   (info: http://www.smspower.org/forums/viewtopic.php?t=11876)
+ - Gear to Gear Port SMS Controller Adaptor
+ - SMS Store Display Unit (Kiosk)
+ - Sega Game Box 9
+ - SMS Disk System (floppy disk drive) - unreleased
+ - Sega Graphic Board (black version) - unreleased
+ - Rapid button of japanese Master System & korean Gam*Boy I
+ - Keyboard support for Sega Mark III (sg1000m3 driver)
+ - Mark III expansion slot, used by keyboard and FM module
  - Software compatibility flags, by region and/or BIOS
  - Emulate SRAM cartridges? (for use with Bock's dump tool)
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
@@ -297,7 +300,7 @@ static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
 ADDRESS_MAP_END
 
 
-// I/O ports $3E and $3F do not exist on Mark-III
+// I/O ports $3E and $3F do not exist on Mark III
 static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -320,16 +323,17 @@ static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 ADDRESS_MAP_END
 
 
-// It seems the Korean version does some more strict decoding on the I/O
+// It seems the Korean versions do some more strict decoding on the I/O
 // addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
 // Leaving the mirrors breaks the Korean cartridge bublboky.
-// The version is derived from japanene SMS, that has no output on its
-// controller ports, so port $3F probably does not exist, like on Mark-III.
-static ADDRESS_MAP_START( sms_fm_io, AS_IO, 8, sms_state )
+// Assume the same for the japanese SMS, which derived the first korean
+// version.
+static ADDRESS_MAP_START( smsj_io, AS_IO, 8, sms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_bios_w)
+	AM_RANGE(0x3f, 0x3f)                 AM_WRITE(sms_io_control_w)
 	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
 	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
@@ -400,6 +404,13 @@ static INPUT_PORTS_START( sms1 )
 
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset Button")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( smsj )
+	PORT_INCLUDE( sg1000m3 )
+
+	//PORT_START("RAPID")
+	//PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Rapid Button") /* Not implemented */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gg )
@@ -528,6 +539,30 @@ static MACHINE_CONFIG_START( sms_ntsc_base, sms_state )
 	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(WRITELINE(sms_state, sms_ctrl2_th_input))
 	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_state, sms_pixel_color))
 MACHINE_CONFIG_END
+
+/*
+    For SMS drivers, the ratio between CPU and pixel clocks, set through dividers, is 2/3. The
+    division that sets the pixel clock, in MCFG_SCREEN_RAW_PARAMS(), results in a remainder
+    that is discarded internally. Due to this rounding, the cycle time and the screen pixel
+    time, derived from their clocks, do not longer match (inversely) the exact original ratio
+    of these clocks. The SMS VDP emulation controls some properties (counters/flags) through
+    screen timing, that the core calculates based on the emulation time. The VDP properties
+    are read in the CPU timeslice. When a CPU operation that access the VDP is executed, the
+    elapsed emulation time is also based on how many CPU cycles have elapsed since start of
+    the current timeslice. Depending on this amount of CPU cycles, when the core divides the
+    elapsed time by the pixel time, the obtained pixel count may be less than expected. Flubba's
+    VDPTest ROM relies on exact results. A workaround is to use an additional macro, for each
+    driver, that resets the refresh rate, and by consequence the pixel time, without discard
+    the remainder of the division. Considered a hack, it's not applied. The line that would be
+    added, after MCFG_SCREEN_RAW_PARAMS(), is one of the following, according to the TV system
+    of the driver.
+
+    - For NTSC drivers:
+    MCFG_SCREEN_REFRESH_RATE((double) XTAL_53_693175MHz/10 / (SEGA315_5124_WIDTH * SEGA315_5124_HEIGHT_NTSC))
+
+    - For PAL drivers:
+    MCFG_SCREEN_REFRESH_RATE((double) MASTER_CLOCK_PAL/10 / (SEGA315_5124_WIDTH * SEGA315_5124_HEIGHT_PAL))
+*/
 
 static MACHINE_CONFIG_DERIVED( sms2_ntsc, sms_ntsc_base )
 	/* video hardware */
@@ -753,13 +788,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sms_fm, sms1_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(sms_fm_io)
-
-	// Japanese sms and sg1000m3 consoles do not have TH input
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
-	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
-	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+	MCFG_CPU_IO_MAP(smsj_io)
 
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -769,16 +798,19 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, sms_fm )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sg1000m3_io)
 
+	// Mark III does not have TH input
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL2_TAG)
+	MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(NULL)
+
 	MCFG_DEVICE_REMOVE("slot")
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, NULL)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sms2_fm, sms2_ntsc )
+static MACHINE_CONFIG_DERIVED( sms2_kr, sms2_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(sms_fm_io)
-
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_53_693175MHz/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_CPU_IO_MAP(smsj_io)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gamegear, sms_state )
@@ -926,7 +958,7 @@ ROM_END
   Game driver(s)
 
   US
-   - Sega Master System I (sms1)
+   - Sega Master System (I) (sms1)
      - prototype (M404) bios - 1986
      - without built-in game v1.3 - 1986
      - built-in Hang On/Safari Hunt v2.4 - 1988
@@ -943,11 +975,15 @@ ROM_END
      - without built-in game v2.1 - 1987
 
   KR
-   - Sega Master System II (sms2kr)
-     - built-in Alex Kidd in Miracle World (Korean)
+   - Samsung Gam*Boy (same as smsj)
+     - without built-in game v2.1 - 1989
+       (same smsj driver used, despite units with plug-in AC adaptor
+        have FM and the ones with built-in AC adaptor do not)
+   - Samsung Gam*Boy II / Aladdin Boy (sms2kr)
+     - built-in Alex Kidd in Miracle World (Korean) - 1992 for A.Boy
 
   EU
-   - Sega Master System I (sms1pal)
+   - Sega Master System (I) (sms1pal)
      - without built-in game v1.3 - 1986
      - built-in Hang On/Safari Hunt v2.4 - 1988
      - built-in Hang On v3.4 - 1988
@@ -958,11 +994,26 @@ ROM_END
      - built-in Sonic the Hedgehog - 1991
 
   BR
-   - Sega Master System I - 1987
-   - Sega Master System II???
-   - Sega Master System III - Tec Toy, 1987
-   - Sega Master System Compact - Tec Toy, 1992
-   - Sega Master System Girl - Tec Toy, 1992
+   - Tec Toy Master System (I) (same as sms1)
+     - built-in Hang On/Safari Hunt v2.4 - 1989
+   - Tec Toy Master System II (same as sms1)
+     - built-in Alex Kidd in Miracle World - 1991
+   - Tec Toy Master System III Compact (same as sms)
+     - built-in Alex Kidd in Miracle World - 1992
+     - built-in Sonic the Hedgehog - 1993
+     - built-in World Cup Italia '90 (Super Futebol II) - 1994
+     - built-in Hang On/Safari Hunt v2.4 (blue L.Phaser pack)
+   - Tec Toy Master System Super Compact (no driver)
+     - built-in Alex Kidd in Miracle World - 1993 (or 1994?)
+     - built-in Sonic the Hedgehog - 1993
+     - built-in World Cup Italia '90 (Super Futebol II) - 1994
+   - Tec Toy Master System Girl (no driver)
+     - built-in Monica no Castelo do Dragao
+     - built-in Sonic the Hedgehog (T. Monica em O Resgate pack)
+  Notes about BR:
+   - PAL-M has same frequency and line count of NTSC
+   - Tec Toy later changed its logo twice and its name to Tectoy
+   - 20XX models (Handy, Collection, Evolution...) likely have SoC hardware
 
 ***************************************************************************/
 
@@ -971,10 +1022,10 @@ CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    sg1000m3, sms_state,   
 CONS( 1986, sms1,       sms,        0,      sms1_ntsc,   sms1,     sms_state,      sms1,     "Sega",     "Master System I",                  GAME_SUPPORTS_SAVE )
 CONS( 1986, sms1pal,    sms,        0,      sms1_pal,    sms1,     sms_state,      sms1,     "Sega",     "Master System I (PAL)" ,           GAME_SUPPORTS_SAVE )
 CONS( 1986, smssdisp,   sms,        0,      sms_sdisp,   sms,      smssdisp_state, smssdisp, "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-CONS( 1987, smsj,       sms,        0,      sms_fm,      sms1,     sms_state,      smsj,     "Sega",     "Master System (Japan)",            GAME_SUPPORTS_SAVE )
+CONS( 1987, smsj,       sms,        0,      sms_fm,      smsj,     sms_state,      smsj,     "Sega",     "Master System (Japan)",            GAME_SUPPORTS_SAVE )
 CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms,      sms_state,      sms1,     "Sega",     "Master System II",                 GAME_SUPPORTS_SAVE )
 CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms,      sms_state,      sms1,     "Sega",     "Master System II (PAL)",           GAME_SUPPORTS_SAVE )
-CONS( 1990, sms2kr,     sms,        0,      sms2_fm,     sms,      sms_state,      sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               GAME_SUPPORTS_SAVE )
+CONS( 1990, sms2kr,     sms,        0,      sms2_kr,     sms,      sms_state,      sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               GAME_SUPPORTS_SAVE )
 
 CONS( 1990, gamegear,   0,          sms,    gamegear,    gg,       sms_state,      gamegear, "Sega",     "Game Gear (Europe/America)",       GAME_SUPPORTS_SAVE )
 CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg,       sms_state,      gamegeaj, "Sega",     "Game Gear (Japan)",                GAME_SUPPORTS_SAVE )

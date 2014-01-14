@@ -25,7 +25,7 @@ CUSTOM_INPUT_MEMBER( sms_paddle_device::dir_pins_r )
 {
 	UINT8 data = m_paddle_x->read();
 
-	if (m_paddle_read_state)
+	if (m_read_state)
 		data >>= 4;
 
 	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
@@ -36,7 +36,7 @@ CUSTOM_INPUT_MEMBER( sms_paddle_device::dir_pins_r )
 CUSTOM_INPUT_MEMBER( sms_paddle_device::tr_pin_r )
 {
 	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
-	return ~m_paddle_read_state;
+	return ~m_read_state;
 }
 
 
@@ -77,7 +77,7 @@ sms_paddle_device::sms_paddle_device(const machine_config &mconfig, const char *
 	device_sms_control_port_interface(mconfig, *this),
 	m_paddle_pins(*this, "CTRL_PORT"),
 	m_paddle_x(*this, "PADDLE_X"),
-	m_paddle_interval(PADDLE_INTERVAL)
+	m_interval(PADDLE_INTERVAL)
 {
 }
 
@@ -88,13 +88,11 @@ sms_paddle_device::sms_paddle_device(const machine_config &mconfig, const char *
 
 void sms_paddle_device::device_start()
 {
-	save_item(NAME(m_paddle_read_state));
-}
+	m_start_time = machine().time();
+	m_read_state = 0;
 
-
-void sms_paddle_device::device_reset()
-{
-	m_paddle_read_state = 0;
+	save_item(NAME(m_start_time));
+	save_item(NAME(m_read_state));
 }
 
 
@@ -104,8 +102,8 @@ void sms_paddle_device::device_reset()
 
 UINT8 sms_paddle_device::peripheral_r()
 {
-	int n_intervals = machine().time().as_double() / m_paddle_interval.as_double();
-	m_paddle_read_state = n_intervals & 1;
+	int num_intervals = (machine().time() - m_start_time).as_double() / m_interval.as_double();
+	m_read_state = num_intervals & 1;
 
 	return m_paddle_pins->read();
 }

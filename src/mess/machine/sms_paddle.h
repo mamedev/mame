@@ -40,7 +40,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 
 	// device_sms_control_port_interface overrides
 	virtual UINT8 peripheral_r();
@@ -49,8 +48,9 @@ private:
 	required_ioport m_paddle_pins;
 	required_ioport m_paddle_x;
 
-	UINT8 m_paddle_read_state;
-	const attotime m_paddle_interval;
+	UINT8 m_read_state;
+	attotime m_start_time;
+	const attotime m_interval;
 };
 
 
