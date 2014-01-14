@@ -37,13 +37,15 @@ const device_type CRT5057 = &device_creator<crt5057_device>;
 
 tms9927_device::tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 				: device_t(mconfig, TMS9927, "TMS9927", tag, owner, clock, "tms9927", __FILE__),
-					device_video_interface(mconfig, *this)
+					device_video_interface(mconfig, *this),
+					m_write_vsyn(*this)
 {
 }
 
 tms9927_device::tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 				: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-					device_video_interface(mconfig, *this)
+					device_video_interface(mconfig, *this),
+					m_write_vsyn(*this)
 {
 }
 
@@ -98,6 +100,12 @@ void tms9927_device::device_start()
 		assert(m_selfload != NULL);
 	}
 
+	// resolve callbacks
+	m_write_vsyn.resolve_safe();
+
+	// allocate timers
+	m_vsync_timer = timer_alloc(TIMER_VSYNC);
+
 	/* register for state saving */
 	machine().save().register_postload(save_prepost_delegate(FUNC(tms9927_device::state_postload), this));
 
@@ -130,6 +138,30 @@ void tms9927_device::device_stop()
 
 
 
+//-------------------------------------------------
+//  device_timer - handle timer events
+//-------------------------------------------------
+
+void tms9927_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_VSYNC:
+		m_vsyn = !m_vsyn;
+
+		m_write_vsyn(m_vsyn);
+
+		if (m_vsyn)
+		{
+			m_vsync_timer->adjust(m_screen->time_until_pos(3));
+		}
+		else
+		{
+			m_vsync_timer->adjust(m_screen->time_until_pos(0));
+		}
+		break;
+	}
+}
 
 void tms9927_device::state_postload()
 {
@@ -297,4 +329,7 @@ void tms9927_device::recompute_parameters(int postload)
 	refresh = HZ_TO_ATTOSECONDS(m_clock) * m_total_hpix * m_total_vpix;
 
 	m_screen->configure(m_total_hpix, m_total_vpix, visarea, refresh);
+
+	m_vsyn = 0;
+	m_vsync_timer->adjust(m_screen->time_until_pos(0, 0));
 }
