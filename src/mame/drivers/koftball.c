@@ -31,6 +31,7 @@ ft5_v6_c4.u58 /
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "sound/2413intf.h"
 
 
 class koftball_state : public driver_device
@@ -41,15 +42,16 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_main_ram(*this, "main_ram"),
 		m_bmc_1_videoram(*this, "bmc_1_videoram"),
-		m_bmc_2_videoram(*this, "bmc_2_videoram"){ }
+		m_bmc_2_videoram(*this, "bmc_2_videoram"),
+		m_colorram(*this, "colorram", 16) { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_main_ram;
 	required_shared_ptr<UINT16> m_bmc_1_videoram;
 	required_shared_ptr<UINT16> m_bmc_2_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
-	UINT8 *m_bmc_colorram;
 	int m_clr_offset;
 	UINT16 m_prot_data;
 
@@ -112,14 +114,14 @@ WRITE16_MEMBER(koftball_state::bmc_RAMDAC_offset_w)
 
 WRITE16_MEMBER(koftball_state::bmc_RAMDAC_color_w)
 {
-	m_bmc_colorram[m_clr_offset]=data;
-	palette_set_color_rgb(machine(),m_clr_offset/3,pal6bit(m_bmc_colorram[(m_clr_offset/3)*3]),pal6bit(m_bmc_colorram[(m_clr_offset/3)*3+1]),pal6bit(m_bmc_colorram[(m_clr_offset/3)*3+2]));
+	m_colorram[m_clr_offset]=data;
+	palette_set_color_rgb(machine(),m_clr_offset/3,pal6bit(m_colorram[(m_clr_offset/3)*3]),pal6bit(m_colorram[(m_clr_offset/3)*3+1]),pal6bit(m_colorram[(m_clr_offset/3)*3+2]));
 	m_clr_offset=(m_clr_offset+1)%768;
 }
 
 READ16_MEMBER(koftball_state::bmc_RAMDAC_color_r)
 {
-	return m_bmc_colorram[m_clr_offset];
+	return m_colorram[m_clr_offset];
 }
 
 READ16_MEMBER(koftball_state::random_number_r)
@@ -172,12 +174,10 @@ static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x2a0000, 0x2a001f) AM_READ(random_number_r)
 	AM_RANGE(0x2b0000, 0x2b0003) AM_READ(random_number_r)
 	AM_RANGE(0x2d8000, 0x2d8001) AM_READ(random_number_r)
-	/*sound chip or mcu comm ? maybe just i/o (offset 0xe=lamps?)*/
-	AM_RANGE(0x2da000, 0x2da001) AM_WRITENOP /* offset ? */
-	AM_RANGE(0x2da002, 0x2da003) AM_WRITENOP /* data ? */
+	AM_RANGE(0x2da000, 0x2da003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
 
-	AM_RANGE(0x2db000, 0x2db001) AM_WRITE(bmc_RAMDAC_offset_w)
-	AM_RANGE(0x2db002, 0x2db003) AM_READWRITE(bmc_RAMDAC_color_r, bmc_RAMDAC_color_w)
+	AM_RANGE(0x2db000, 0x2db001) AM_WRITE(bmc_RAMDAC_offset_w) AM_SHARE("colorram")
+	AM_RANGE(0x2db002, 0x2db003) AM_READWRITE(bmc_RAMDAC_color_r, bmc_RAMDAC_color_w) 
 	AM_RANGE(0x2db004, 0x2db005) AM_WRITENOP
 	AM_RANGE(0x2dc000, 0x2dc001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x2f0000, 0x2f0003) AM_READ_PORT("INPUTS")
@@ -241,7 +241,7 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( koftball, koftball_state )
-	MCFG_CPU_ADD("maincpu", M68000, 21477270/2 )
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(koftball_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", koftball_state, bmc_interrupt, "screen", 0, 1)
 
@@ -258,6 +258,10 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)  // guessed chip type, clock not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_LOW) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
@@ -307,7 +311,8 @@ static const UINT16 nvram[]=
 #endif
 DRIVER_INIT_MEMBER(koftball_state,koftball)
 {
-	m_bmc_colorram = auto_alloc_array(machine(), UINT8, 768);
+	save_item(NAME(m_clr_offset));
+	save_item(NAME(m_prot_data));
 
 #if NVRAM_HACK
 	{
@@ -321,4 +326,4 @@ DRIVER_INIT_MEMBER(koftball_state,koftball)
 #endif
 }
 
-GAME( 1995, koftball,    0, koftball,    koftball, koftball_state,    koftball, ROT0,  "BMC", "King of Football", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, koftball,    0, koftball,    koftball, koftball_state,    koftball, ROT0,  "BMC", "King of Football", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
