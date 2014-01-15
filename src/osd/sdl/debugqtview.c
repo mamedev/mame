@@ -2,7 +2,6 @@
 
 #include "debugqtview.h"
 
-
 DebuggerView::DebuggerView(const debug_view_type& type,
 							running_machine* machine,
 							QWidget* parent) :
@@ -34,7 +33,114 @@ DebuggerView::~DebuggerView()
 		m_machine->debug_view().free_view(*m_view);
 }
 
+// TODO: remove this version no later than January 1, 2015
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+void DebuggerView::paintEvent(QPaintEvent* event)
+{
+	// Tell the MAME debug view how much real estate is available
+	QFontMetrics actualFont = fontMetrics();
+	const int fontWidth = MAX(1, actualFont.width('_'));
+	const int fontHeight = MAX(1, actualFont.height());
+	m_view->set_visible_size(debug_view_xy(width()/fontWidth, height()/fontHeight));
 
+
+	// Handle the scroll bars
+	const int verticalScrollCharDiff = m_view->total_size().y - m_view->visible_size().y;
+	const int scrollSize = verticalScrollCharDiff < 0 ? 0 : verticalScrollCharDiff;
+	bool atEnd = false;
+	if (verticalScrollBar()->value() == verticalScrollBar()->maximum())
+	{
+		atEnd = true;
+	}
+	verticalScrollBar()->setRange(0, scrollSize);
+	if (m_preferBottom && atEnd)
+	{
+		verticalScrollBar()->setValue(scrollSize);
+	}
+
+
+	// Draw the viewport widget
+	QPainter painter(viewport());
+	painter.fillRect(0, 0, width(), height(), QBrush(Qt::white));
+	painter.setBackgroundMode(Qt::OpaqueMode);
+	painter.setBackground(QColor(255,255,255));
+
+	// Background control
+	QBrush bgBrush;
+	bgBrush.setStyle(Qt::SolidPattern);
+	painter.setPen(QPen(QColor(0,0,0)));
+
+	size_t viewDataOffset = 0;
+	const debug_view_xy& visibleCharDims = m_view->visible_size();
+	for (int y = 0; y < visibleCharDims.y; y++)
+	{
+		for (int x = 0; x < visibleCharDims.x; x++)
+		{
+			const unsigned char textAttr = m_view->viewdata()[viewDataOffset].attrib;
+
+			if (x == 0 || textAttr != m_view->viewdata()[viewDataOffset-1].attrib)
+			{
+				// Text color handling
+				QColor fgColor(0,0,0);
+				QColor bgColor(255,255,255);
+
+				if(textAttr & DCA_VISITED)
+				{
+					bgColor.setRgb(0xc6, 0xe2, 0xff);
+				}
+				if(textAttr & DCA_ANCILLARY)
+				{
+					bgColor.setRgb(0xe0, 0xe0, 0xe0);
+				}
+				if(textAttr & DCA_SELECTED)
+				{
+					bgColor.setRgb(0xff, 0x80, 0x80);
+				}
+				if(textAttr & DCA_CURRENT)
+				{
+					bgColor.setRgb(0xff, 0xff, 0x00);
+				}
+				if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
+				{
+					bgColor.setRgb(0xff,0xc0,0x80);
+				}
+				if(textAttr & DCA_CHANGED)
+				{
+					fgColor.setRgb(0xff, 0x00, 0x00);
+				}
+				if(textAttr & DCA_INVALID)
+				{
+					fgColor.setRgb(0x00, 0x00, 0xff);
+				}
+				if(textAttr & DCA_DISABLED)
+				{
+					fgColor.setRgb((fgColor.red()   + bgColor.red())   >> 1,
+									(fgColor.green() + bgColor.green()) >> 1,
+									(fgColor.blue()  + bgColor.blue())  >> 1);
+				}
+				if(textAttr & DCA_COMMENT)
+				{
+					fgColor.setRgb(0x00, 0x80, 0x00);
+				}
+
+				bgBrush.setColor(bgColor);
+				painter.setBackground(bgBrush);
+				painter.setPen(QPen(fgColor));
+			}
+
+			// Your character is not guaranteed to take up the entire fontWidth x fontHeight, so fill before.
+			painter.fillRect(x*fontWidth, y*fontHeight, fontWidth, fontHeight, bgBrush);
+
+			// There is a touchy interplay between font height, drawing difference, visible position, etc
+			// Fonts don't get drawn "down and to the left" like boxes, so some wiggling is needed.
+			painter.drawText(x*fontWidth,
+								(y*fontHeight + (fontHeight*0.80)),
+								QString(m_view->viewdata()[viewDataOffset].byte));
+			viewDataOffset++;
+		}
+	}
+}
+#else
 void DebuggerView::paintEvent(QPaintEvent* event)
 {
 	// Tell the MAME debug view how much real estate is available
@@ -142,7 +248,7 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 		}
 	}
 }
-
+#endif
 
 void DebuggerView::keyPressEvent(QKeyEvent* event)
 {
