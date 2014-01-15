@@ -127,13 +127,13 @@ cbm2_graphic_cartridge_device::cbm2_graphic_cartridge_device(const machine_confi
 }
 
 cbm2_graphic_cartridge_a_device::cbm2_graphic_cartridge_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	cbm2_graphic_cartridge_device(mconfig, CBM2_HRG_A, "CBM 500/600/700 High Resolution Graphics (A)", tag, owner, clock, "cbm2_hrg", __FILE__)
+	cbm2_graphic_cartridge_device(mconfig, CBM2_HRG_A, "CBM 500/600/700 High Resolution Graphics (A)", tag, owner, clock, "cbm2_hrga", __FILE__)
 	//m_gdc(*this, EF9365_TAG)
 {
 }
 
 cbm2_graphic_cartridge_b_device::cbm2_graphic_cartridge_b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	cbm2_graphic_cartridge_device(mconfig, CBM2_HRG_B, "CBM 500/600/700 High Resolution Graphics (B)", tag, owner, clock, "cbm2_hrg", __FILE__)
+	cbm2_graphic_cartridge_device(mconfig, CBM2_HRG_B, "CBM 500/600/700 High Resolution Graphics (B)", tag, owner, clock, "cbm2_hrgb", __FILE__)
 	//m_gdc(*this, EF9366_TAG)
 {
 }

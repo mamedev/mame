@@ -88,7 +88,7 @@ device_compucolor_floppy_port_interface::device_compucolor_floppy_port_interface
 //-------------------------------------------------
 
 compucolor_floppy_port_device::compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: serial_port_device(mconfig, COMPUCOLOR_FLOPPY_PORT, "Compucolor Floppy Port", tag, owner, clock, "rs232", __FILE__)
+	: serial_port_device(mconfig, COMPUCOLOR_FLOPPY_PORT, "Compucolor Floppy Port", tag, owner, clock, "compclr_flp_port", __FILE__)
 {
 }
 
