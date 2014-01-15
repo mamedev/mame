@@ -67,7 +67,7 @@ private:
 		GC,  // 20-bit general purpose address c
 		BC,  // byte count
 		TP,  // 20-bit task pointer
-		IX,  // byte count
+		IX,  // index
 		CC,  // mask compare
 		MC   // channel control
 	};
@@ -393,7 +393,7 @@ private:
 				else if (m_wb == 2)
 					sprintf(m_buffer, "lcall %s, %05x", m_offset, m_ppc + m_pc + (INT16) i);
 
-				m_flags = DASMFLAG_STEP_OVER;
+				m_flags |= DASMFLAG_STEP_OVER;
 			}
 			else
 				invalid();
@@ -401,7 +401,7 @@ private:
 
 		case 0x28: inst_rm("addb", "add"); break;
 		case 0x29: inst_rm("orb", "or"); break;
-		case 0x2a: inst_mr("andb", "and"); break;
+		case 0x2a: inst_rm("andb", "and"); break;
 		case 0x2b: inst_rm("notb", "not"); break;
 		case 0x2c: inst_jm("jmce", "ljmce"); break;
 		case 0x2d: inst_jm("jmcne", "ljmcne"); break;
