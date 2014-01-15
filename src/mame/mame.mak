@@ -2278,8 +2278,6 @@ $(DRIVERS)/8080bw.o:    $(LAYOUT)/attackfc.lh \
 			$(LAYOUT)/shuttlei.lh \
 			$(LAYOUT)/spacecom.lh
 
-$(DRIVERS)/ace.o:       $(LAYOUT)/ace.lh
-
 $(DRIVERS)/aces1.o:     $(LAYOUT)/aces1.lh
 
 $(DRIVERS)/acefruit.o:  $(LAYOUT)/sidewndr.lh
@@ -2687,8 +2685,7 @@ $(DRIVERS)/videopkr.o:  $(LAYOUT)/videopkr.lh \
 			$(LAYOUT)/babydad.lh
 
 $(DRIVERS)/warpwarp.o:  $(LAYOUT)/geebee.lh \
-			$(LAYOUT)/navarone.lh \
-			$(LAYOUT)/sos.lh
+			$(LAYOUT)/navarone.lh
 
 $(DRIVERS)/wpc_an.o:    $(LAYOUT)/wpc_an.lh
 
