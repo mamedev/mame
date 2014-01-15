@@ -480,9 +480,16 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xE3A0; base += 2;
 	temp16[(base) /2] = 0x0000; base += 2;
 	temp16[(base) /2] = 0xE581; base += 2;
-	temp16[(base) /2] = 0xF302; base += 2;
-	temp16[(base) /2] = 0xE3A0; base += 2;
-
+	if (is_svg == 0)
+	{ // jump to start of external rom
+		temp16[(base) / 2] = 0xF302; base += 2;
+		temp16[(base) / 2] = 0xE3A0; base += 2;
+	}
+	else
+	{
+		temp16[(base) / 2] = 0xf0b0; base += 2;
+		temp16[(base) / 2] = 0xe59f; base += 2;
+	}
 
 
 
