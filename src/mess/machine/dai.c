@@ -25,7 +25,7 @@ void dai_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_maincpu->set_pc(0xc000);
 		break;
 	case TIMER_TMS5501:
-		m_tms5501->set_pio_bit_7((ioport("IN8")->read() & 0x04) ? 1:0);
+		m_tms5501->xi7_w((ioport("IN8")->read() & 0x04) ? 1:0);
 		timer_set(attotime::from_hz(100), TIMER_TMS5501);
 		break;
 	default:
@@ -41,8 +41,8 @@ void dai_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 WRITE8_MEMBER(dai_state::dai_stack_interrupt_circuit_w)
 {
-	m_tms5501->set_sensor(1);
-	m_tms5501->set_sensor(0);
+	m_tms5501->sens_w(1);
+	m_tms5501->sens_w(0);
 }
 
 void dai_state::dai_update_memory(int dai_rom_bank)
@@ -69,22 +69,6 @@ WRITE8_MEMBER(dai_state::dai_keyboard_w)
 {
 	m_keyboard_scan_mask = data;
 }
-
-static TMS5501_IRQ_CALLBACK(dai_interrupt_callback)
-{
-	dai_state *drvstate = device.machine().driver_data<dai_state>();
-	if (intreq)
-		drvstate->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
-	else
-		drvstate->m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
-TMS5501_INTERFACE( dai_tms5501_interface )
-{
-	DEVCB_DRIVER_MEMBER(dai_state, dai_keyboard_r),
-	DEVCB_DRIVER_MEMBER(dai_state, dai_keyboard_w),
-	dai_interrupt_callback
-};
 
 I8255A_INTERFACE( dai_ppi82555_intf )
 {
@@ -117,8 +101,15 @@ const struct pit8253_interface dai_pit8253_intf =
 	}
 };
 
+IRQ_CALLBACK_MEMBER(dai_state::int_ack)
+{
+	return m_tms5501->get_vector();
+}
+
 void dai_state::machine_start()
 {
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(dai_state::int_ack),this));
+
 	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x010000, 0x1000);
 	timer_set(attotime::zero, TIMER_BOOTSTRAP);
 	timer_set(attotime::from_hz(100), TIMER_TMS5501);

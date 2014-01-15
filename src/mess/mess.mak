@@ -448,6 +448,7 @@ MACHINES += STVCD
 MACHINES += TC0091LVC
 MACHINES += TIMEKPR
 MACHINES += TMP68301
+MACHINES += TMS5501
 MACHINES += TMS6100
 MACHINES += TMS9901
 MACHINES += TMS9902
@@ -1147,7 +1148,6 @@ $(MESSOBJ)/dai.a:               \
 	$(MESS_DRIVERS)/dai.o       \
 	$(MESS_VIDEO)/dai.o         \
 	$(MESS_AUDIO)/dai.o         \
-	$(MESS_MACHINE)/tms5501.o   \
 	$(MESS_MACHINE)/dai.o       \
 
 $(MESSOBJ)/ddr.a:               \
@@ -1391,6 +1391,7 @@ $(MESSOBJ)/intv.a:              \
 
 $(MESSOBJ)/isc.a:               \
 	$(MESS_DRIVERS)/compucolor.o\
+	$(MESS_MACHINE)/compclr_flp.o\
 
 $(MESSOBJ)/kaypro.a:            \
 	$(MESS_DRIVERS)/kaypro.o    \
