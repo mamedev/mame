@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="compclr2_flop" description="Compucolor II Disk Images">
 
-	<software name="actsndwre">
+	<software name="asndware">
 		<description>action_soundware</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -170,7 +170,7 @@
 		</part>
 	</software>
 
-	<software name="asteroids">
+	<software name="asteroid">
 		<description>asteroids</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -986,7 +986,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162865">
 				<rom name="color_graphics_2_suits.ccvf" size="162865" crc="ec1ae1f9" sha1="b83a0e2d2313ff9497b7eebb51e8c40ed7780faf" offset="0"/>
 			</dataarea>
@@ -1474,7 +1474,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162890">
 				<rom name="ida_v2.6-sideb.ccvf" size="162890" crc="6a0dc149" sha1="845047f5a753a852f463eb60c4f160441415c936" offset="0"/>
 			</dataarea>
@@ -1557,7 +1557,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
 				<rom name="joystick-sideb.ccvf" size="162814" crc="bec15db9" sha1="400a9729783ffff8c5d54bf08fc6318651265a7d" offset="0"/>
 			</dataarea>
@@ -2176,7 +2176,7 @@
 		</part>
 	</software>
 
-	<software name="sndlitepn">
+	<software name="slitepen">
 		<description>sound_light_pen</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2336,7 +2336,7 @@
 		</part>
 	</software>
 
-	<software name="tabltenns">
+	<software name="tabltenn">
 		<description>table_tennis_for_two</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
