@@ -3264,18 +3264,13 @@ ROM_START( pepp0775 ) /* Normal board : Unknown Poker (PP0775) */
 	ROM_LOAD( "pp0775_a44-a73.u68",   0x00000, 0x10000, CRC(79a56642) SHA1(dfde6c12551e4f12a59e31c14fbfb9edb57e4fac) ) /* Game Version: A44, Library Version: A73 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2129.u72",   0x00000, 0x8000, CRC(f168f9ad) SHA1(acf98a155ccc892ac7c095bbd5538193c444ceb3) ) /* WRONG!! Use until the correct set is verified! */
-	ROM_LOAD( "mgo-cg2129.u73",   0x08000, 0x8000, CRC(40b6df21) SHA1(7de6ff24db09facae040b889612222a6b1ce1b4e) ) /* CG2003 & CG954 give same results, Others are clearly wrong */
-	ROM_LOAD( "mbo-cg2129.u74",   0x10000, 0x8000, CRC(508eab4b) SHA1(ba7920c3190302be924ef110b8a5e4c4c38ea535) ) /* Custom Arizona Charlie's Casino graphics */
-	ROM_LOAD( "mxo-cg2129.u75",   0x18000, 0x8000, CRC(e98a0efd) SHA1(eed9229f904a38435cd34e06b2c22fd323d73e2d) )
+	ROM_LOAD( "mro-cg2312.u77",  0x00000, 0x8000, CRC(29a9d408) SHA1(af8c18833ea268b80fabf3b539f35c6782a0309d) ) /* WRONG?!?! Use until the correct set is verified! */
+	ROM_LOAD( "mgo-cg2312.u78",  0x08000, 0x8000, CRC(b5ea2602) SHA1(82ee6d45dbc53ccf2d2a956daa83f41bb4a27384) ) /* Gives full paytable, but the hands listed is odd */
+	ROM_LOAD( "mbo-cg2312.u79",  0x10000, 0x8000, CRC(e349202c) SHA1(ef6a904112361425aef5824ae983c15d3456dc49) )
+	ROM_LOAD( "mxo-cg2312.u80",  0x18000, 0x8000, CRC(1e0d3df8) SHA1(716d6bd2b41ef41a7da393e805651c378a16e00e) ) /* These graphics don't seem to work with anything else */
 
-	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) ) /* X002287P - Pay The Ace */
-	ROM_LOAD( "mgo-cg2325.u78",  0x08000, 0x8000, CRC(a637679e) SHA1(4cb24f1f907ae482419981cac49af19ca1cdbc99) ) /* X002283P - Dealt Deuces Bonus Poker */
-	ROM_LOAD( "mbo-cg2325.u79",  0x10000, 0x8000, CRC(4a179b6d) SHA1(2ed51ed85444b939bbd48344f18fa97c146438ff) ) /* X002284P - Barbaric Deuces Wild Bonus Poker */
-	ROM_LOAD( "mxo-cg2325.u80",  0x18000, 0x8000, CRC(afae8fd5) SHA1(7c6380f21fe8444234ada8d88a46d3a4f1623b29) ) /* Use XP000057 program for all the above */
-
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap2129.u50", 0x0000, 0x0100, CRC(b00d19e5) SHA1(4e8d88748c7591246ccd02c959d78b50227ddafb) ) /* BPROM type N82S135N verified */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2312.u43", 0x0000, 0x0200, CRC(66971da6) SHA1(6984a68bc2f01009ad6a7a0705c00e715c29bb65) )
 ROM_END
 
 ROM_START( peip0074 ) /* Normal board : Joker Poker - French (IP0074) */
@@ -4170,14 +4165,19 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000055p.u66",   0x00000, 0x10000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) ) /* Deuces Wild Poker */
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_REGION( 0x040000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2324.u77",  0x00000, 0x8000, CRC(6eceef42) SHA1(a2ddd2a3290c41e510f483c6b633fe0002694d0b) ) /* Contains needed English / Spanish graphics */
 	ROM_LOAD( "mgo-cg2324.u78",  0x08000, 0x8000, CRC(26d0acbe) SHA1(09a9127deb88185cd5b748bac657461eadb2f48f) )
 	ROM_LOAD( "mbo-cg2324.u79",  0x10000, 0x8000, CRC(47baee32) SHA1(d8af09022ccb5fc06aa3aa4c200a734b66cbee00) )
 	ROM_LOAD( "mxo-cg2324.u80",  0x18000, 0x8000, CRC(60449fc0) SHA1(251d1e04786b70c1d2bc7b02f3b69cd58ac76398) )
+	ROM_LOAD( "mro-cg2430.u77",  0x00000, 0x10000, CRC(3df03923) SHA1(497951b02e192697fa06ea4f08885e140c767b41) )
+	ROM_LOAD( "mgo-cg2430.u78",  0x10000, 0x10000, CRC(8ba04eb8) SHA1(cfacb454a997738b5870054baaeb34efc189de6b) )
+	ROM_LOAD( "mbo-cg2430.u79",  0x20000, 0x10000, CRC(b5a15953) SHA1(ed88a23c4fbe2092856f623aea0a282cf4604f47) )
+	ROM_LOAD( "mxo-cg2430.u80",  0x30000, 0x10000, CRC(0f0cc2ed) SHA1(d381c0485da073f106ca1aab71c1c14fb2c0c49f) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
+	ROM_LOAD( "capx2430.u43", 0x0000, 0x0200, CRC(f96c0685) SHA1(908a0ae2cfc24a68198eca30624f12993b5010dc) )
 ROM_END
 
 ROM_START( pex0060p ) /* Superboard : Standard Draw Poker (X000060P+XP000038) */
