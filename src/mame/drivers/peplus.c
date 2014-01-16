@@ -1562,6 +1562,27 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
 ROM_END
 
+ROM_START( pepp0045 ) /* Normal board : 10's or Better (PP0045) */
+/*
+PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  P8A      1     1    3    4    5   8  25  50 300    800
+  % Range: 84.6-86.6%  Optimum: 88.6%  Hit Frequency: 49.2%
+     Programs Available: PP0045, X000045P
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0045_a45-a74.u68",   0x00000, 0x10000, CRC(9c7cf6d7) SHA1(3da9829678b853d85146b66b40800257a8eaa151) ) /* Game Version: A45, Library Version: A74 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg740.u72",   0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",   0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",   0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",   0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
+ROM_END
+
 ROM_START( pepp0046 ) /* Normal board : 10's or Better (PP0046) */
 /*
 PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
@@ -6074,6 +6095,7 @@ GAMEL(1987, pepp0014,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0040,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0040) Standard Draw Poker",           0, layout_pe_poker )
 GAMEL(1987, pepp0041,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0041) Standard Draw Poker",           0, layout_pe_poker )
 GAMEL(1987, pepp0043,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0043) 10's or Better",                0, layout_pe_poker )
+GAMEL(1987, pepp0045,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0045) 10's or Better",                0, layout_pe_poker )
 GAMEL(1987, pepp0046,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0046) 10's or Better",                0, layout_pe_poker )
 GAMEL(1987, pepp0053,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0053) Joker Poker",                   0, layout_pe_poker )
 GAMEL(1987, pepp0055,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0055) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
