@@ -45,8 +45,6 @@ protected:
 	const format *formats;
 
 	floppy_image_format_t::desc_e* get_desc_8n1(const format &f, int &current_size);
-	int compute_track_size(const format &f) const;
-	void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors) const;
 	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
 
 	static const format file_formats[];

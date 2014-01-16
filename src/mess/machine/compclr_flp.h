@@ -108,7 +108,6 @@ private:
 	int m_stp;
 	int m_sel;
 
-	attotime m_ctime;
 	attotime m_period;
 
 	compucolor_floppy_port_device *m_owner;

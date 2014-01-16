@@ -133,9 +133,10 @@ void compucolor_floppy_device::device_start()
 {
 	// allocate timer
 	m_timer = timer_alloc();
-	m_timer->adjust(attotime::from_hz(9600*8));
+	m_timer->adjust(attotime::from_hz(9600*8), 0, attotime::from_hz(9600*8));
 
 	// state saving
+	save_item(NAME(m_rw));
 	save_item(NAME(m_stp));
 	save_item(NAME(m_sel));
 }
@@ -173,12 +174,12 @@ void compucolor_floppy_device::tx(UINT8 state)
 
 void compucolor_floppy_device::rw_w(int state)
 {
-	m_rw = state;
-
-	if (m_rw)
+	if (!m_rw && state)
 	{
 		m_owner->out_rx(1);
 	}
+
+	m_rw = state;
 }
 
 
@@ -218,12 +219,12 @@ void compucolor_floppy_device::select_w(int state)
 {
 	m_floppy->mon_w(state);
 
-	m_sel = state;
-
-	if (m_sel)
+	if (!m_sel && state)
 	{
 		m_owner->out_rx(1);
 	}
+
+	m_sel = state;
 }
 
 
@@ -233,15 +234,10 @@ void compucolor_floppy_device::select_w(int state)
 
 bool compucolor_floppy_device::read_bit()
 {
-	attotime edge = m_floppy ? m_floppy->get_next_transition(machine().time()) : attotime::never;
-	attotime next = m_ctime + m_period;
+	attotime edge = m_floppy->get_next_transition(machine().time());
+	attotime next = machine().time() + m_period;
 
-	if (edge.is_never() || edge >= next)
-	{
-		return 0;
-	}
-
-	return 1;
+	return (edge.is_never() || edge >= next) ? 0 : 1;
 }
 
 
