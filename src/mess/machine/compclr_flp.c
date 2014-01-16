@@ -101,6 +101,9 @@ compucolor_floppy_device::compucolor_floppy_device(const machine_config &mconfig
 	: device_t(mconfig, COMPUCOLOR_FLOPPY, "Compucolor floppy", tag, owner, clock, "compclr_flp", __FILE__),
 		device_compucolor_floppy_port_interface(mconfig, *this),
 		m_floppy(*this, "floppy:525sssd"),
+		m_rw(1),
+		m_stp(0),
+		m_sel(1),
 		m_period(attotime::from_hz(9600*8))
 {
 	m_owner = dynamic_cast<compucolor_floppy_port_device *>(this->owner());

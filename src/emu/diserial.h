@@ -116,6 +116,8 @@ protected:
 	bool is_transmit_register_empty();
 	bool is_receive_register_synchronized() { return m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED; }
 	bool is_receive_register_shifting() { return m_rcv_bit_count_received > 0; }
+	bool is_receive_framing_error() { return m_rcv_framing_error; }
+	bool is_receive_parity_error() { return m_rcv_parity_error; }
 
 	UINT8 get_received_char() { return m_rcv_byte_received; }
 
@@ -167,6 +169,9 @@ private:
 	UINT8 m_rcv_bit_count;
 	/* the byte of data received */
 	UINT8 m_rcv_byte_received;
+	
+	bool m_rcv_framing_error;
+	bool m_rcv_parity_error;
 
 	// Transmit register
 	/* data */

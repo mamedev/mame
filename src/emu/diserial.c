@@ -19,6 +19,8 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_rcv_register_data(0x8000),
 	m_rcv_flags(0),
 	m_rcv_bit_count(0),
+	m_rcv_framing_error(false),
+	m_rcv_parity_error(false),
 	m_tra_flags(TRANSMIT_REGISTER_EMPTY),
 	m_rcv_clock(NULL),
 	m_tra_clock(NULL),
@@ -234,6 +236,8 @@ void device_serial_interface::receive_register_update_bit(int bit)
 				m_rcv_flags |=RECEIVE_REGISTER_SYNCHRONISED;
 				/* reset bit count received */
 				m_rcv_bit_count_received = 0;
+				m_rcv_framing_error = false;
+				m_rcv_parity_error = false;
 			}
 		}
 	}
@@ -241,6 +245,11 @@ void device_serial_interface::receive_register_update_bit(int bit)
 	if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
 	{
 		m_rcv_bit_count_received++;
+
+		if (!bit && (m_rcv_bit_count_received > (m_rcv_bit_count - m_df_stop_bit_count)))
+		{
+			m_rcv_framing_error = true;
+		}
 
 		/* received all bits? */
 		if (m_rcv_bit_count_received==m_rcv_bit_count)

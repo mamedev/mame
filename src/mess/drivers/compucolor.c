@@ -225,7 +225,7 @@ static INPUT_PORTS_START( compucolor2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("e E BSC RST") PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("u U INS LINE") PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F5 Y BAR X")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("AUTO")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("AUTO") PORT_CODE(KEYCODE_PGDN)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PRINT")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -336,29 +336,37 @@ READ8_MEMBER( compucolor2_state::xi_r )
 {
 	UINT8 data = 0xff;
 
-	switch (m_xo & 0x0f)
+	switch ((m_xo >> 4) & 0x03)
 	{
-	case 0: data &= m_y0->read(); break;
-	case 1: data &= m_y1->read(); break;
-	case 2: data &= m_y2->read(); break;
-	case 3: data &= m_y3->read(); break;
-	case 4: data &= m_y4->read(); break;
-	case 5: data &= m_y5->read(); break;
-	case 6: data &= m_y6->read(); break;
-	case 7: data &= m_y7->read(); break;
-	case 8: data &= m_y8->read(); break;
-	case 9: data &= m_y9->read(); break;
-	case 10: data &= m_y10->read(); break;
-	case 11: data &= m_y11->read(); break;
-	case 12: data &= m_y12->read(); break;
-	case 13: data &= m_y13->read(); break;
-	case 14: data &= m_y14->read(); break;
-	case 15: data &= m_y15->read(); break;
-	}
+	case 0:
+		switch (m_xo & 0x0f)
+		{
+		case 0: data &= m_y0->read(); break;
+		case 1: data &= m_y1->read(); break;
+		case 2: data &= m_y2->read(); break;
+		case 3: data &= m_y3->read(); break;
+		case 4: data &= m_y4->read(); break;
+		case 5: data &= m_y5->read(); break;
+		case 6: data &= m_y6->read(); break;
+		case 7: data &= m_y7->read(); break;
+		case 8: data &= m_y8->read(); break;
+		case 9: data &= m_y9->read(); break;
+		case 10: data &= m_y10->read(); break;
+		case 11: data &= m_y11->read(); break;
+		case 12: data &= m_y12->read(); break;
+		case 13: data &= m_y13->read(); break;
+		case 14: data &= m_y14->read(); break;
+		case 15: data &= m_y15->read(); break;
+		}
 
-	if (BIT(m_xo, 7))
-	{
-		data = (m_y128->read() & 0xf0) | (data & 0x0f);
+		if (BIT(m_xo, 7))
+		{
+			data = (m_y128->read() & 0xf0) | (data & 0x0f);
+		}
+		break;
+
+	default:
+		data = 0;
 	}
 
 	return data;
