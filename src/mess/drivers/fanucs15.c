@@ -10,14 +10,14 @@
 	bunch of boards plugged into a passive backplane.
 
 	Possible boards include:
-	A16B-2200-0020/04B : Main CPU Boa
+	A16B-2200-0020/04B : Base 2 Board (contains 12 MHz 68020 "CNC CPU" and 1 or 2 MB of DRAM)
 	A16B-2200-0090/07A : Digital Servo 4-Axis Controller Board (no ROMs on this board)
 	A16B-2200-0121/06C : Base 0 Board (1 ROM location but position is empty. -0120 has 6081 001A)
 
 	A16B-2200-0131/11B : Base 1 Board (15 ROMs on this board, 4040, 9030, AB02)
 		Fanuc FBI-A MB605111 (QFP100)
 		41256-12 (x18)
-		HD68HC000-12 (68000 CPU @ 12MHz, PLCC68)
+		HD68HC000-12 (68000 "PMC CPU" @ 12MHz, PLCC68)
 		Fanuc SLC01 MB661128 (PLCC68)
 		Fanuc BOC MB605117U (QFP100)
 		HM53461-12 (x5)
@@ -63,10 +63,10 @@
 	A20B-1003-0580/01A : PMC Cassette C (16000 Step + Pascal 128KB, small PCB in a yellow plastic box, contains just 2 EPROMs)
 
 	Summary of CPUs:
-	68020 (unknown speed) main CPU on "Base 2 board"
-	68000-12 sub CPU on "Base 1 board"
+	68020-12 main CPU on "Base 2 board" "CNC CPU"
+	68000-12 sub CPU on "Base 1 board" "PMC CPU"
 	68000-10 graphics CPU on "Graphic board"
-	80286-8 mill/lathe interface CPU
+	80286-8 mill/lathe interface CPU on "Conversation board"
  
 ****************************************************************************/
 
@@ -80,13 +80,13 @@ public:
 	fanucs15_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")		// main 68020
-		, m_subcpu(*this, "subcpu")			// sub 68000-12
+		, m_pmccpu(*this, "pmccpu")			// sub 68000-12
 		, m_gfxcpu(*this, "gfxcpu")			// gfx 68000-10
 		, m_convcpu(*this, "convcpu")		// conversational 80286-8
 	{ }
 
 	required_device<m68020_device> m_maincpu;
-	required_device<m68000_device> m_subcpu;
+	required_device<m68000_device> m_pmccpu;
 	required_device<m68000_device> m_gfxcpu;
 	required_device<i80286_cpu_device> m_convcpu;
 
@@ -100,11 +100,8 @@ static ADDRESS_MAP_START(maincpu_mem, AS_PROGRAM, 32, fanucs15_state)
 	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM	// initial stack
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(subcpu_mem, AS_PROGRAM, 16, fanucs15_state)
+static ADDRESS_MAP_START(pmccpu_mem, AS_PROGRAM, 16, fanucs15_state)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("base1a", 0)
-// some data ROM? (shared RAM?) goes at 80000 and prevents this from crashing.  not a program mirror, not the cassette.
-// logically this would be the 9030_001e ROM since the 001e suffix matches this program, but that + 0x140 has an odd DWORD which causes
-// an address error when used as a word pointer.  wheeeeee.
 	AM_RANGE(0xfde000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -115,7 +112,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(convcpu_mem, AS_PROGRAM, 16, fanucs15_state)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("conversational", 0x40000)
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM
+	AM_RANGE(0x040000, 0x07ffff) AM_ROM AM_REGION("conversational", 0)
+	AM_RANGE(0x800000, 0x87ffff) AM_RAM
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("conversational", 0)
 ADDRESS_MAP_END
 
@@ -129,30 +127,30 @@ void fanucs15_state::machine_reset()
 
 static MACHINE_CONFIG_START( fanucs15, fanucs15_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("subcpu", M68000, XTAL_12MHz)
-	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
+	MCFG_CPU_ADD("pmccpu", M68000, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP(pmccpu_mem)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("gfxcpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("gfxcpu", M68000, XTAL_10MHz)   	// wants bit 15 of 70500 to be set
 	MCFG_CPU_PROGRAM_MAP(gfxcpu_mem)
-
-	MCFG_CPU_ADD("convcpu", I80286, XTAL_8MHz)
-	MCFG_CPU_PROGRAM_MAP(convcpu_mem)
 	MCFG_DEVICE_DISABLE()
+
+	MCFG_CPU_ADD("convcpu", I80286, XTAL_8MHz)		// wants 70500 to return 0x8000 (same as what gfxcpu looks for, basically)
+	MCFG_CPU_PROGRAM_MAP(convcpu_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( fanucs15 )   
-	ROM_REGION16_BE( 0x48000, "base1a", 0 )	// 68000 sub CPU code and data on base 1 board
+	ROM_REGION16_BE( 0x50000, "base1a", 0 )	// 68000 sub CPU code and data on base 1 board (verified)
 	ROM_LOAD16_BYTE( "4040_001e_001.23m", 0x000001, 0x020000, CRC(2e12109f) SHA1(83ed846d3d59ab0d81b2e2e2231d1a444e462590) ) 
 	ROM_LOAD16_BYTE( "4040_002e_002.27m", 0x000000, 0x020000, CRC(a5469692) SHA1(31c44edb36fb69d3d418a97e32e4a2769d1ec9e7) ) 
-	ROM_LOAD( "9030_001e_381.18j", 0x040000, 0x008000, CRC(9f10a022) SHA1(dc4a242f7611143cc2d9564993fd5fa52f0ac13a) ) 
+	ROM_LOAD16_BYTE( "9030_001e_381.18j", 0x040001, 0x008000, CRC(9f10a022) SHA1(dc4a242f7611143cc2d9564993fd5fa52f0ac13a) )
 
-	ROM_REGION32_BE( 0x180000, "base1b", 0 )	// 68020 main CPU code and data on base 1 board
+	ROM_REGION32_BE( 0x180000, "base1b", 0 )	// 68020 main CPU code and data on base 1 board (verified)
 	ROM_LOAD16_BYTE( "ab02_081a_081.23e", 0x000001, 0x020000, CRC(5328b023) SHA1(661f2908f3287f7cd2b215cd29962f2789f7d99a) ) 
 	ROM_LOAD16_BYTE( "ab02_082a_082.27e", 0x000000, 0x020000, CRC(ad37740f) SHA1(e65cc0a8b4e515fcf5fcefde99e95d100d310018) ) 
 	ROM_LOAD16_BYTE( "ab02_0c1a_0c1.23f", 0x040001, 0x020000, CRC(62566569) SHA1(dd85b6e7875d996759b833552b00e1b3a0e3696b) ) 
@@ -189,3 +187,5 @@ ROM_END
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     CLASS          INIT COMPANY  FULLNAME       FLAGS */
 COMP( 1990, fanucs15, 0,      0,     fanucs15,  fanucs15, driver_device, 0,   "Fanuc", "System 15", GAME_NOT_WORKING | GAME_NO_SOUND)
+
+
