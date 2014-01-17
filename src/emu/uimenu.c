@@ -414,7 +414,7 @@ void ui_menu::draw(bool customonly)
 	int visible_lines;
 	int top_line;
 	int itemnum, linenum;
-	int mouse_hit, mouse_button;
+	bool mouse_hit, mouse_button;
 	render_target *mouse_target;
 	INT32 mouse_target_x, mouse_target_y;
 	float mouse_x = -1, mouse_y = -1;
@@ -487,14 +487,14 @@ void ui_menu::draw(bool customonly)
 	effective_left = visible_left + gutter_width;
 
 	/* locate mouse */
-	mouse_hit = FALSE;
-	mouse_button = FALSE;
+	mouse_hit = false;
+	mouse_button = false;
 	if (!customonly)
 	{
 		mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
 		if (mouse_target != NULL)
 			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
-				mouse_hit = TRUE;
+				mouse_hit = true;
 	}
 
 	/* loop over visible lines */

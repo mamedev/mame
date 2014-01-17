@@ -467,7 +467,7 @@ static void dview_draw_title(DView *dv)
 	}
 }
 
-static int dview_on_mouse(DView *dv, int mx, int my, int button)
+static int dview_on_mouse(DView *dv, int mx, int my, bool button)
 {
 	int clicked = (button && !dview_is_state(dv, VIEW_STATE_BUTTON));
 	int handled = TRUE;
@@ -1233,7 +1233,7 @@ static void handle_mouse(running_machine &machine)
 {
 	render_target * mouse_target;
 	INT32           x,y;
-	int             button;
+	bool            button;
 
 	if (menu != NULL)
 		return;

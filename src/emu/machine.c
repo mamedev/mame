@@ -483,7 +483,7 @@ void running_machine::schedule_exit()
 	if (m_exit_to_game_select && options().system_name()[0] != 0)
 	{
 		options().set_system_name("");
-		ui_menu_force_game_select(*this, &render().ui_container());
+		ui_menu_select_game::force_game_select(*this, &render().ui_container());
 	}
 
 	// otherwise, exit for real
@@ -767,6 +767,19 @@ void running_machine::resume()
 
 	// call the callbacks
 	call_notifiers(MACHINE_NOTIFY_RESUME);
+}
+
+
+//-------------------------------------------------
+//  toggle_pause - toggles the pause state
+//-------------------------------------------------
+
+void running_machine::toggle_pause()
+{
+	if (paused())
+		resume();
+	else
+		pause();
 }
 
 
