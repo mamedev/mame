@@ -119,7 +119,7 @@ bool ui_input_push_event(running_machine &machine, ui_event evt)
 
 	/* we may be called before the UI is initialized */
 	if (uidata == NULL)
-		return FALSE;
+		return false;
 
 	/* some pre-processing (this is an icky place to do this stuff!) */
 	switch (evt.event_type)

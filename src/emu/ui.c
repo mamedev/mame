@@ -1397,7 +1397,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 	}
 
 	/* determine if we should disable the rest of the UI */
-	int ui_disabled = (machine.ioport().has_keyboard() && !machine.ui_active());
+	bool ui_disabled = (machine.ioport().has_keyboard() && !machine.ui_active());
 
 	/* is ScrLk UI toggling applicable here? */
 	if (machine.ioport().has_keyboard())
