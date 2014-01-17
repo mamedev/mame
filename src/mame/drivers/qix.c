@@ -28,17 +28,12 @@
     TODO:
         * The Kram encryption algorithm is not understood. I merely provide tables to
           decrypt it, derived by comparison with the not encrypted versions.
-          The kram3 set used to be playable with the implementation in the MAME M6809
-          CPU core, encrypting only the first byte in 10 xx and 11 xx opcodes.
-          This should get a cleaner implementation. Until then, kram3 is broken on purpose.
 
           According to the QIX and Kram schematics, these games should be using 68A90Es.
           The 6809E has a 'Last Instruction Cycle' pin that is likely tied in with the encryption:
           "LIC is HIGH during the last cycle of every instruction and its transition from
           HIGH to LOW will indicate that the first byte of an opcode will be latched at
           the end of the present bus cycle"
-          Personally I'd expose the LIC output in a similar manner that was done for the 6502
-          sync output and handle the decryption in the driver.
 
         * I applied the interleave change only to elecyoyo because these games are
           really sensitive to timing, and kram's service mode was disturbed by it (the
