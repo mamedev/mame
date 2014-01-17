@@ -2,7 +2,7 @@
 
     ui/selgame.h
 
-    Internal MAME menus for the user interface.
+    Game selector
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -39,6 +39,9 @@ private:
 	driver_enumerator *drivlist;
 
 	void build_driver_list();
+	void inkey_select(const ui_menu_event *menu_event);
+	void inkey_cancel(const ui_menu_event *menu_event);
+	void inkey_special(const ui_menu_event *menu_event);
 };
 
 #endif  /* __UI_SELGAME_H__ */

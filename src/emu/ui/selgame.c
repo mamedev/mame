@@ -1,8 +1,8 @@
 /*********************************************************************
 
-    selgame.c
+    ui/selgame.c
 
-    Internal MAME menus for the user interface.
+    Game selector
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -114,63 +114,17 @@ void ui_menu_select_game::handle()
 		// handle selections
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			const game_driver *driver = (const game_driver *)menu_event->itemref;
-
-			// special case for configure inputs
-			if ((FPTR)driver == 1)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_groups(machine(), container)));
-
-			// anything else is a driver
-			else
+			switch(menu_event->iptkey)
 			{
-				// audit the game first to see if we're going to work
-				driver_enumerator enumerator(machine().options(), *driver);
-				enumerator.next();
-				media_auditor auditor(enumerator);
-				media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
-
-				// if everything looks good, schedule the new driver
-				if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE)
-				{
-					machine().schedule_new_driver(*driver);
-					ui_menu::stack_reset(machine());
-				}
-
-				// otherwise, display an error
-				else
-				{
-					reset(UI_MENU_RESET_REMEMBER_REF);
-					error = true;
-				}
-			}
-		}
-
-		// escape pressed with non-empty text clears the text
-		else if (menu_event->iptkey == IPT_UI_CANCEL && search[0] != 0)
-		{
-			// since we have already been popped, we must recreate ourself from scratch
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, NULL)));
-		}
-
-		// typed characters append to the buffer
-		else if (menu_event->iptkey == IPT_SPECIAL)
-		{
-			int buflen = strlen(search);
-
-			// if it's a backspace and we can handle it, do so
-			if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
-			{
-				*(char *)utf8_previous_char(&search[buflen]) = 0;
-				rerandomize = true;
-				reset(UI_MENU_RESET_SELECT_FIRST);
-			}
-
-			// if it's any other key and we're not maxed out, update
-			else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
-			{
-				buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
-				search[buflen] = 0;
-				reset(UI_MENU_RESET_SELECT_FIRST);
+				case IPT_UI_SELECT:
+					inkey_select(menu_event);
+					break;
+				case IPT_UI_CANCEL:
+					inkey_cancel(menu_event);
+					break;
+				case IPT_SPECIAL:
+					inkey_special(menu_event);
+					break;
 			}
 		}
 	}
@@ -181,6 +135,86 @@ void ui_menu_select_game::handle()
 							"The selected game is missing one or more required ROM or CHD images. "
 							"Please select a different game.\n\nPress any key to continue.",
 							JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+}
+
+
+//-------------------------------------------------
+//  inkey_select
+//-------------------------------------------------
+
+void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
+{
+	const game_driver *driver = (const game_driver *)menu_event->itemref;
+
+	// special case for configure inputs
+	if ((FPTR)driver == 1)
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_groups(machine(), container)));
+
+	// anything else is a driver
+	else
+	{
+		// audit the game first to see if we're going to work
+		driver_enumerator enumerator(machine().options(), *driver);
+		enumerator.next();
+		media_auditor auditor(enumerator);
+		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
+
+		// if everything looks good, schedule the new driver
+		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE)
+		{
+			machine().schedule_new_driver(*driver);
+			ui_menu::stack_reset(machine());
+		}
+
+		// otherwise, display an error
+		else
+		{
+			reset(UI_MENU_RESET_REMEMBER_REF);
+			error = true;
+		}
+	}
+}
+
+
+
+//-------------------------------------------------
+//  inkey_cancel
+//-------------------------------------------------
+
+void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
+{
+	// escape pressed with non-empty text clears the text
+	if (search[0] != 0)
+	{
+		// since we have already been popped, we must recreate ourself from scratch
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, NULL)));
+	}
+}
+
+
+//-------------------------------------------------
+//  inkey_special - typed characters append to the buffer
+//-------------------------------------------------
+
+void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
+{
+	int buflen = strlen(search);
+
+	// if it's a backspace and we can handle it, do so
+	if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
+	{
+		*(char *)utf8_previous_char(&search[buflen]) = 0;
+		rerandomize = true;
+		reset(UI_MENU_RESET_SELECT_FIRST);
+	}
+
+	// if it's any other key and we're not maxed out, update
+	else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
+	{
+		buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
+		search[buflen] = 0;
+		reset(UI_MENU_RESET_SELECT_FIRST);
+	}
 }
 
 
