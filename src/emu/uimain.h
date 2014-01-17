@@ -352,6 +352,9 @@ public:
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
+	// force game select menu
+	static void force_game_select(running_machine &machine, render_container *container);
+
 private:
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
 	UINT8               error;
@@ -374,7 +377,5 @@ public:
 
 private:
 };
-/* force game select menu */
-void ui_menu_force_game_select(running_machine &machine, render_container *container);
 
 #endif  /* __UIMAIN_H__ */

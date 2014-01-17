@@ -230,6 +230,7 @@ public:
 	int run(bool firstrun);
 	void pause();
 	void resume();
+	void toggle_pause();
 	void add_notifier(machine_notification event, machine_notify_delegate callback);
 	void call_notifiers(machine_notification which);
 	void add_logerror_callback(logerror_callback callback);

@@ -95,14 +95,14 @@ static UINT32 (*ui_handler_callback)(running_machine &, render_container *, UINT
 static UINT32 ui_handler_param;
 
 /* flag to track single stepping */
-static int single_step;
+static bool single_step;
 
 /* FPS counter display */
 static int showfps;
 static osd_ticks_t showfps_end;
 
 /* profiler display */
-static int show_profiler;
+static bool show_profiler;
 
 /* popup text display */
 static osd_ticks_t popup_text_end;
@@ -116,7 +116,7 @@ static slider_state *slider_list;
 static slider_state *slider_current;
 
 /* natural keyboard info */
-static int ui_use_natural_keyboard;
+static bool ui_use_natural_keyboard;
 static UINT8 non_char_keys_down[(ARRAY_LENGTH(non_char_keys) + 7) / 8];
 
 
@@ -278,7 +278,7 @@ int ui_init(running_machine &machine)
 	ui_gfx_init(machine);
 
 	/* reset globals */
-	single_step = FALSE;
+	single_step = false;
 	ui_set_handler(handler_messagebox, 0);
 	/* retrieve options */
 	ui_use_natural_keyboard = machine.options().natural_keyboard();
@@ -447,7 +447,7 @@ void ui_update_and_render(running_machine &machine, render_container *container)
 	if (ui_mouse_show || (ui_is_menu_active() && machine.options().ui_mouse()))
 	{
 		INT32 mouse_target_x, mouse_target_y;
-		int mouse_button;
+		bool mouse_button;
 		render_target *mouse_target = ui_input_find_mouse(machine, &mouse_target_x, &mouse_target_y, &mouse_button);
 
 		if (mouse_target != NULL)
@@ -1392,7 +1392,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 	if (single_step)
 	{
 		machine.pause();
-		single_step = FALSE;
+		single_step = false;
 	}
 
 	/* determine if we should disable the rest of the UI */
@@ -1500,13 +1500,11 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 		/* with a shift key, it is single step */
 		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
 		{
-			single_step = TRUE;
+			single_step = true;
 			machine.resume();
 		}
-		else if (machine.paused())
-			machine.resume();
 		else
-			machine.pause();
+			machine.toggle_pause();
 	}
 
 	/* handle a toggle cheats request */
@@ -2300,7 +2298,7 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, astring *st
     whether the natural keyboard is active
 -------------------------------------------------*/
 
-int ui_get_use_natural_keyboard(running_machine &machine)
+bool ui_get_use_natural_keyboard(running_machine &machine)
 {
 	return ui_use_natural_keyboard;
 }
@@ -2312,7 +2310,7 @@ int ui_get_use_natural_keyboard(running_machine &machine)
     whether the natural keyboard is active
 -------------------------------------------------*/
 
-void ui_set_use_natural_keyboard(running_machine &machine, int use_natural_keyboard)
+void ui_set_use_natural_keyboard(running_machine &machine, bool use_natural_keyboard)
 {
 	ui_use_natural_keyboard = use_natural_keyboard;
 	astring error;
