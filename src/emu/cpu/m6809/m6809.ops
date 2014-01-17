@@ -12,7 +12,9 @@ MAIN:
 	debugger_instruction_hook(this, m_pc.w);
 
 	// opcode fetch
+	m_lic_func(ASSERT_LINE);
 	@m_opcode = read_opcode();
+	m_lic_func(CLEAR_LINE);
 
 	// burn delay loops
 	burn_any_delay_loops();

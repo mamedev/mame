@@ -45,12 +45,14 @@ public:
 		m_videoram_mask(*this, "videoram_mask"),
 		m_paletteram(*this, "paletteram"),
 		m_scanline_latch(*this, "scanline_latch"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_bank0(*this, "bank0"),
+		m_bank1(*this, "bank1") { }
 
 	/* devices */
-	required_device<m6809_device> m_maincpu;
+	required_device<m6809e_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	required_device<m6809_device> m_videocpu;
+	required_device<m6809e_device> m_videocpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
@@ -77,6 +79,8 @@ public:
 	UINT8  m_leds;
 	required_shared_ptr<UINT8> m_scanline_latch;
 	optional_device<discrete_device> m_discrete;
+	optional_memory_bank m_bank0;
+	optional_memory_bank m_bank1;
 	pen_t m_pens[NUM_PENS];
 	DECLARE_WRITE8_MEMBER(zookeep_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(qix_data_firq_w);
@@ -132,11 +136,14 @@ public:
 	int kram3_permut1(int idx, int value);
 	int kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table);
 	int kram3_decrypt(int address, int value);
+	DECLARE_WRITE_LINE_MEMBER(kram3_lic_maincpu_changed);
+	DECLARE_WRITE_LINE_MEMBER(kram3_lic_videocpu_changed);
 };
 
 /*----------- defined in video/qix.c -----------*/
 
 MACHINE_CONFIG_EXTERN( qix_video );
+MACHINE_CONFIG_EXTERN( kram3_video );
 MACHINE_CONFIG_EXTERN( zookeep_video );
 MACHINE_CONFIG_EXTERN( slither_video );
 

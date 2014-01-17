@@ -338,6 +338,23 @@ static ADDRESS_MAP_START( qix_video_map, AS_PROGRAM, 8, qix_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( kram3_video_map, AS_PROGRAM, 8, qix_state )
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(qix_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITEONLY AM_SHARE("videoram_addr")
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READONLY AM_SHARE("scanline_latch")
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_device, address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE("vid_u18", mc6845_device, register_r, register_w)
+	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( zookeep_video_map, AS_PROGRAM, 8, qix_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
@@ -399,7 +416,7 @@ static MC6845_INTERFACE( mc6845_intf )
 
 
 MACHINE_CONFIG_FRAGMENT( qix_video )
-	MCFG_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
+	MCFG_CPU_ADD("videocpu", M6809E, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(qix_video_map)
 
 	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
@@ -409,6 +426,13 @@ MACHINE_CONFIG_FRAGMENT( qix_video )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100) /* from CRTC */
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_FRAGMENT( kram3_video )
+	MCFG_CPU_MODIFY("videocpu")
+	MCFG_CPU_PROGRAM_MAP(kram3_video_map)
+	MCFG_M6809E_LIC_CB(WRITELINE(qix_state,kram3_lic_videocpu_changed))
 MACHINE_CONFIG_END
 
 
