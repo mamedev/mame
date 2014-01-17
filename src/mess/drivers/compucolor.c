@@ -13,7 +13,7 @@
 	TODO:
 
 	- floppy
-	- video
+	- interlaced video
 	- add-on ROM
 	- add-on RAM
 	- add-on unit
@@ -92,6 +92,7 @@ public:
 	required_ioport m_y128;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 	virtual void palette_init();
 	
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -294,29 +295,23 @@ UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	for (int y = 0; y < 32*8; y++)
 	{
 		offs_t offset = (y / 8) * 128;
-		bool dbl = false;
 
 		for (int sx = 0; sx < 64; sx++)
 		{
 			UINT8 code = m_video_ram[offset++];
-			
-			if (sx == 0 && BIT(code, 7))
-			{
-				dbl = true;
-			}
-
-			offs_t char_offs = (code << 3) | (y & 0x07);
-			if (dbl) char_offs = (code << 3) | ((y >> 1) & 0x07);
-
-			UINT8 data = m_char_rom->base()[char_offs];
 			UINT8 attr = m_video_ram[offset++];
 			
+			offs_t char_offs = ((code & 0x7f) << 3) | (y & 0x07);
+			if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | ((y >> 1) & 0x07);
+
+			UINT8 data = m_char_rom->base()[char_offs];
+
 			rgb_t fg = m_palette[attr & 0x07];
 			rgb_t bg = m_palette[(attr >> 3) & 0x07];
 
 			for (int x = 0; x < 6; x++)
 			{
-				bitmap.pix32(y, (sx * 8) + x) = BIT(data, 7) ? fg : bg;
+				bitmap.pix32(y, (sx * 6) + x) = BIT(data, 7) ? fg : bg;
 
 				data <<= 1;
 			}
@@ -328,7 +323,7 @@ UINT32 compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 static struct tms9927_interface crtc_intf =
 {
-	8,      // pixels per video memory address
+	6,      // pixels per video memory address
 	NULL    // self-load data
 };
 
@@ -442,6 +437,12 @@ void compucolor2_state::machine_start()
 	save_item(NAME(m_xo));
 }
 
+void compucolor2_state::machine_reset()
+{
+	m_rs232->rts_w(1);
+	m_rs232->dtr_w(1);
+}
+
 void compucolor2_state::palette_init()
 {
 	for (int i = 0; i < 8; i++)
@@ -461,9 +462,9 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(compucolor2_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL_17_9712MHz/12)
+	MCFG_SCREEN_SIZE(64*6, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
+	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL_17_9712MHz/2)
 	MCFG_DEVICE_CONFIG(crtc_intf)
 	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
 

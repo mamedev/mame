@@ -458,7 +458,6 @@ WRITE_LINE_MEMBER( tms5501_device::rcv_w )
 	{
 		m_sta |= STA_FBD;
 	}
-	//logerror("RCV %u SR %u SBD %u FBD %u FE %u OE %u\n",state,m_sta&STA_SR?1:0,m_sta&STA_SBD?1:0,m_sta&STA_FBD?1:0,m_sta&STA_FE?1:0,m_sta&STA_OE?1:0);
 }
 
 

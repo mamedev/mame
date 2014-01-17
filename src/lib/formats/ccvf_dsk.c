@@ -110,7 +110,7 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		int offset = 0;
 	
 		for (int i=0; i<1920 && pos<size; i++, pos++) {
-			for (int bit=7; bit>=0; bit--) {
+			for (int bit=0; bit<8; bit++) {
 				bit_w(buffer, offset++, BIT(img[pos], bit), f.cell_size);
 			}
 		}
