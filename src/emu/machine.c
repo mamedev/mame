@@ -75,7 +75,7 @@
 #include "debugger.h"
 #include "render.h"
 #include "cheat.h"
-#include "uimain.h"
+#include "ui/selgame.h"
 #include "uiinput.h"
 #include "crsshair.h"
 #include "validity.h"

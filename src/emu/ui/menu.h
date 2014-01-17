@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    uimenu.h
+    ui/menu.h
 
     Internal MAME menus for the user interface.
 
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef __UIMENU_H__
-#define __UIMENU_H__
+#ifndef __UI_MENU_H__
+#define __UI_MENU_H__
 
 #include "render.h"
 
@@ -183,4 +183,4 @@ private:
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 };
 
-#endif  /* __UIMENU_H__ */
+#endif  /* __UI_MENU_H__ */

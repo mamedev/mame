@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "render.h"
-#include "uimain.h"
+#include "ui/selgame.h"
 
 
 //**************************************************************************

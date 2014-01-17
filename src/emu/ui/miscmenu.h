@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    uimain.h
+    ui/miscmenu.h
 
     Internal MAME menus for the user interface.
 
@@ -11,45 +11,11 @@
 
 #pragma once
 
-#ifndef __UIMAIN_H__
-#define __UIMAIN_H__
+#ifndef __UI_MISCMENU_H__
+#define __UI_MISCMENU_H__
 
 #include "crsshair.h"
 #include "drivenum.h"
-
-class ui_menu_main : public ui_menu {
-public:
-	ui_menu_main(running_machine &machine, render_container *container);
-	virtual ~ui_menu_main();
-	virtual void populate();
-	virtual void handle();
-
-private:
-	enum {
-		INPUT_GROUPS,
-		INPUT_SPECIFIC,
-		SETTINGS_DIP_SWITCHES,
-		SETTINGS_DRIVER_CONFIG,
-		ANALOG,
-		BOOKKEEPING,
-		GAME_INFO,
-		IMAGE_MENU_IMAGE_INFO,
-		IMAGE_MENU_FILE_MANAGER,
-		MESS_MENU_TAPE_CONTROL,
-		MESS_MENU_BITBANGER_CONTROL,
-		SLOT_DEVICES,
-		NETWORK_DEVICES,
-		KEYBOARD_MODE,
-		SLIDERS,
-		VIDEO_TARGETS,
-		VIDEO_OPTIONS,
-		CROSSHAIR,
-		CHEAT,
-		MEMORY_CARD,
-		SELECT_GAME,
-		BIOS_SELECTION,
-	};
-};
 
 class ui_menu_keyboard_mode : public ui_menu {
 public:
@@ -344,30 +310,6 @@ public:
 	virtual void handle();
 };
 
-class ui_menu_select_game : public ui_menu {
-public:
-	ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename);
-	virtual ~ui_menu_select_game();
-	virtual void populate();
-	virtual void handle();
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
-
-	// force game select menu
-	static void force_game_select(running_machine &machine, render_container *container);
-
-private:
-	enum { VISIBLE_GAMES_IN_LIST = 15 };
-	UINT8               error;
-	UINT8               rerandomize;
-	char                search[40];
-	int                 matchlist[VISIBLE_GAMES_IN_LIST];
-	const game_driver   **driverlist;
-
-	driver_enumerator *drivlist;
-
-	void build_driver_list();
-};
-
 class ui_menu_bios_selection : public ui_menu {
 public:
 	ui_menu_bios_selection(running_machine &machine, render_container *container);
@@ -378,4 +320,4 @@ public:
 private:
 };
 
-#endif  /* __UIMAIN_H__ */
+#endif  /* __UI_MISCMENU_H__ */

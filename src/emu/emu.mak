@@ -63,6 +63,7 @@ OBJDIRS += \
 	$(EMUOBJ)/machine \
 	$(EMUOBJ)/layout \
 	$(EMUOBJ)/imagedev \
+	$(EMUOBJ)/ui \
 	$(EMUOBJ)/video \
 
 OSDSRC = $(SRC)/osd
@@ -145,8 +146,10 @@ EMUOBJS = \
 	$(EMUOBJ)/uiimage.o \
 	$(EMUOBJ)/uiinput.o \
 	$(EMUOBJ)/uiswlist.o \
-	$(EMUOBJ)/uimain.o \
-	$(EMUOBJ)/uimenu.o \
+	$(EMUOBJ)/ui/menu.o \
+	$(EMUOBJ)/ui/mainmenu.o \
+	$(EMUOBJ)/ui/miscmenu.o \
+	$(EMUOBJ)/ui/selgame.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
 	$(EMUOBJ)/debug/debugcmd.o \
