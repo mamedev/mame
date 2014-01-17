@@ -2692,7 +2692,6 @@ time_t ioport_manager::initialize()
 					if (ROMENTRY_ISSYSTEM_BIOS(rom)) { m_has_bioses= true; break; }
 	}
 
-
 	// open playback and record files if specified
 	time_t basetime = playback_init();
 	record_init();
@@ -2717,8 +2716,7 @@ void ioport_manager::init_port_types()
 	for (input_type_entry *curtype = first_type(); curtype != NULL; curtype = curtype->next())
 	{
 		// first copy all the OSD-updated sequences into our current state
-		for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-			curtype->restore_default_seq();
+		curtype->restore_default_seq();
 
 		// also make a lookup table mapping type/player to the appropriate type list entry
 		m_type_to_entry[curtype->type()][curtype->player()] = curtype;
