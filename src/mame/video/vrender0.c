@@ -294,10 +294,11 @@ TILENAME(bpp, t, a)\
 				ty &= Maskh;\
 			}\
 \
-			if (t)\
+			if(t)\
 			{\
-				UINT32 Index = Quad->Tile[(ty >> 3) * (W) + (tx >> 3)];\
-				Offset = (Index << 6) + ((ty & 7) << 3) + (tx & 7);\
+				UINT32 Index=Quad->Tile[(ty>>3)*(W)+(tx>>3)];\
+				Offset=(Index<<6)+((ty&7)<<3)+(tx&7);\
+				if(Index==0) goto Clamped;\
 			}\
 			else\
 				Offset = ty * (Quad->TWidth) + tx;\
@@ -330,8 +331,8 @@ TILENAME(bpp, t, a)\
 				else\
 					*pixel = Color;\
 			}\
+			Clamped:\
 			++pixel;\
-Clamped:\
 			x_tx += Quad->Txdx;\
 			x_ty += Quad->Tydx;\
 		}\
