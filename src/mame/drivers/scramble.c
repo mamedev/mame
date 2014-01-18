@@ -1402,7 +1402,7 @@ static const ay8910_interface scramble_ay8910_interface_2 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_HANDLER(scramble_portB_r),
+	DEVCB_DRIVER_MEMBER(scramble_state, scramble_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1411,8 +1411,8 @@ static const ay8910_interface hotshock_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(hotshock_soundlatch_r),
-	DEVCB_HANDLER(scramble_portB_r),
+	DEVCB_DRIVER_MEMBER(scramble_state, hotshock_soundlatch_r),
+	DEVCB_DRIVER_MEMBER(scramble_state, scramble_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1433,8 +1433,8 @@ static const ay8910_interface harem_ay8910_interface_3 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,                     // Port A read
 	DEVCB_NULL,                     // Port B read
-	DEVCB_HANDLER(harem_portA_w),   // Port A write
-	DEVCB_HANDLER(harem_portB_w),   // Port B write
+	DEVCB_DRIVER_MEMBER(scramble_state, harem_portA_w),   // Port A write
+	DEVCB_DRIVER_MEMBER(scramble_state, harem_portB_w),   // Port B write
 };
 
 

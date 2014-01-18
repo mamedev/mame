@@ -1611,7 +1611,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
-//  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
+//  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
 //  AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVREADWRITE32("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, U64(0xffffffffffffffff))
 
