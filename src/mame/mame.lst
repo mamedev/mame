@@ -117,7 +117,7 @@ dremshpr        // (c) 1982 Sanritsu
 vanvan          // (c) 1983 Sanritsu
 vanvank         // (c) 1983 Karateco (bootleg?)
 vanvanb         // (c) 1983 Karateco (bootleg?)
-bwcasino        // (c) 1983 Epos Coropration
+bwcasino        // (c) 1983 Epos Corporation
 acitya          // (c) 1983 Epos Corporation
 theglobp        // (c) 1983 Epos Corporation
 sprglobp        // (c) 1983 Epos Corporation
@@ -2296,13 +2296,13 @@ spacegunj       // C57 (c) 1990 Taito Corporation (Japan)
 dblaxle         // C78 (c) 1991 Taito America Corporation (US)
 dblaxleu        // C78 (c) 1991 Taito America Corporation (US)
 pwheelsj        // C78 (c) 1991 Taito Corporation (Japan)
-racingb         // C84 (c) 1991 Taito Coropration ..
+racingb         // C84 (c) 1991 Taito Corporation ..
 
 // Taito Air System games
 mlanding        // ??? (c) 1987 Taito America Corporation (US)
-topland         // B62 (c) 1988 Taito Coporation Japan (World)
+topland         // B62 (c) 1988 Taito Corporation Japan (World)
 ainferno        // C45 (c) 1990 Taito America Corporation (US)
-ainfernoj       // C45 (c) 1990 Taito America Corporation (US)
+ainfernoj       // C45 (c) 1990 Taito Corporation (Japan)
 
 // enhanced Z-System hardware games
 gunbustr        // D27 (c) 1992 Taito Corporation Japan (World)
@@ -2312,12 +2312,12 @@ superchs        // D46 (c) 1992 Taito Corporation Japan (World)
 superchsu       // D46 (c) 1992 Taito America Corporation (US)
 superchsj       // D46 (c) 1992 Taito Corporation (Japan)
 superchsp       // prototype
-groundfx        // D51 (c) 1992 Taito Coporation
-undrfire        // D67 (c) 1993 Taito Coporation Japan (World)
+groundfx        // D51 (c) 1992 Taito Corporation
+undrfire        // D67 (c) 1993 Taito Corporation Japan (World)
 undrfireu       // D67 (c) 1993 Taito America Corporation (US)
-undrfirej       // D67 (c) 1993 Taito Coporation (Japan)
-cbombers        // D83 (c) 1993 Taito Coporation Japan (World)
-cbombersj       // D83 (c) 1993 Taito Coporation (Japan)
+undrfirej       // D67 (c) 1993 Taito Corporation (Japan)
+cbombers        // D83 (c) 1993 Taito Corporation Japan (World)
+cbombersj       // D83 (c) 1993 Taito Corporation (Japan)
 cbombersp       //
 
 // Taito F2 games
@@ -2657,6 +2657,7 @@ batsugunsp      // TP-??? (c) 1993 Toaplan
 snowbro2        // TP-??? (c) 1994 Hanafram
 snowbro2b		//
 pwrkick         // (c) 1994 Sunwise
+othldrby        // (c) 1995 Sunwise
 sstriker        // (c) 1993 Raizing
 sstrikera       // (c) 1993 Raizing
 mahoudai        // (c) 1993 Raizing + Able license
@@ -5906,7 +5907,7 @@ hvysmshj        // MBG (c) 1993 Data East Corporation (Japan)
 nslasher        // MBH (c) 1993 Data East Corporation
 nslasherj       // MBH (c) 1993 Data East Corporation (Japan)
 nslashers       // MBH (c) 1993 Data East Corporation
-nslasheru       // MBH (c) 1993 Data EAst Corporation (US)
+nslasheru       // MBH (c) 1993 Data East Corporation (US)
 				// MBI ??
 				// MBJ ??
 				// MBK ??
@@ -9923,7 +9924,6 @@ polyplay
 amspdwy         // no copyright notice, but (c) 1987 Enerdyne Technologies, Inc.
 amspdwya        // no copyright notice, but (c) 1987 Enerdyne Technologies, Inc.
 jankenmn        // (c) 1985 Sunwise
-othldrby        // (c) 1995 Sunwise
 quizpun         // (c) 1989 Space Computer System of Korea
 quizpun2        // (c) 1989 Space Computer System of Korea
 mosaic          // (c) 1990 Space
@@ -9969,9 +9969,9 @@ gt103asx        // (c) 1984 Greyhound Electronics
 reelfun         // (c) 1986 Grayhound Electronics
 reelfun1        // (c) 1986 Grayhound Electronics
 findout         // (c) 1987 [Elettronolo]
-quizvid         // (c) 1986 Greyhound Electronics
-quiz            // (c) 1986 Italian bootleg
-quiz211         // (c) 1986 Italian bootleg
+quizvid         // (c) 1986 Italian bootleg
+quiz            // (c) 1986 Elettronolo
+quiz211         // (c) 1986 Elettronolo
 jokpoker        // (c) 1982 Greyhound Electronics
 jokpokera       // (c) 1983 Greyhound Electronics
 jokpokerb       // (c) 1983 Greyhound Electronics

@@ -1991,7 +1991,7 @@ GAME( 1985, sextriv2, sextriv1, getrivia, sextriv1, driver_device, 0,       ROT0
 
 GAME( 1986, gt507uk,  0,        findout,  gt507uk, driver_device,  0,       ROT0, "Grayhound Electronics", "Trivia (UK Version 5.07)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
-GAME( 1986, quiz,     0,        findout,  quiz, driver_device,     0,       ROT0, "bootleg",               "Quiz (Revision 2)",                       GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, quiz,     0,        findout,  quiz, driver_device,     0,       ROT0, "Elettronolo",           "Quiz (Revision 2)",                       GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1986, quizvid,  0,        quizvid,  quiz, driver_device,     0,       ROT0, "bootleg",               "Video Quiz",                              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
