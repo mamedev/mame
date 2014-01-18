@@ -244,14 +244,14 @@ WRITE8_MEMBER( atom_state::eprom_w )
 
 static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8, atom_state )
 	AM_RANGE(0x0000, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVREADWRITE_LEGACY(I8271_TAG, i8271_r, i8271_w)
-	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE_LEGACY(I8271_TAG, i8271_data_r, i8271_data_w)
+	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_device, read, write)
+	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_device, data_r, data_w)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION(EXTROM_TAG, 0)
 	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
-//  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE_LEGACY(MC6854_TAG, mc6854_r, mc6854_w)
+//  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
 //  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
 	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
@@ -577,31 +577,30 @@ WRITE8_MEMBER( atom_state::printer_data )
     i8271_interface fdc_intf
 -------------------------------------------------*/
 
-static void atom_8271_interrupt_callback(device_t *device, int state)
+WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 {
-	atom_state *drvstate = device->machine().driver_data<atom_state>();
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
 	the nmi will be triggered, but when the state changes because the int
 	is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
-	if (state!=drvstate->m_previous_i8271_int_state)
+	if (state!=m_previous_i8271_int_state)
 	{
 		if (state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 
-	drvstate->m_previous_i8271_int_state = state;
+	m_previous_i8271_int_state = state;
 }
 
 static const i8271_interface fdc_intf =
 {
-	atom_8271_interrupt_callback,
+	DEVCB_DRIVER_LINE_MEMBER(atom_state, atom_8271_interrupt_callback),
 	NULL,
 	{ FLOPPY_0, FLOPPY_1 }
 };

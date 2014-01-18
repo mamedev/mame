@@ -18,7 +18,6 @@
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "includes/bbc.h"
-#include "machine/i8271.h"
 #include "machine/mc146818.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
@@ -1457,32 +1456,31 @@ WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 ***************************************/
 
 
-static void bbc_i8271_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(bbc_state::bbc_i8271_interrupt)
 {
-	bbc_state *drvstate = device->machine().driver_data<bbc_state>();
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
 	the nmi will be triggered, but when the state changes because the int
 	is cleared this will not cause another nmi */
 	/* I'll emulate it like this to be sure */
 
-	if (state!=drvstate->m_previous_i8271_int_state)
+	if (state!=m_previous_i8271_int_state)
 	{
 		if (state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 
-	drvstate->m_previous_i8271_int_state = state;
+	m_previous_i8271_int_state = state;
 }
 
 
 const i8271_interface bbc_i8271_interface=
 {
-	bbc_i8271_interrupt,
+	DEVCB_DRIVER_LINE_MEMBER(bbc_state, bbc_i8271_interrupt),
 	NULL,
 	{FLOPPY_0, FLOPPY_1}
 };
@@ -1491,7 +1489,6 @@ const i8271_interface bbc_i8271_interface=
 READ8_MEMBER(bbc_state::bbc_i8271_read)
 {
 	int ret;
-	device_t *i8271 = machine().device("i8271");
 	logerror("i8271 read %d  ",offset);
 	switch (offset)
 	{
@@ -1500,11 +1497,11 @@ READ8_MEMBER(bbc_state::bbc_i8271_read)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			ret=i8271_r(i8271, space, offset);
+			ret=m_i8271->read(space, offset);
 			logerror("  %d\n",ret);
 			break;
 		case 4:
-			ret=i8271_data_r(i8271, space, offset);
+			ret=m_i8271->data_r(space, offset);
 			logerror("  %d\n",ret);
 			break;
 		default:
@@ -1517,7 +1514,6 @@ READ8_MEMBER(bbc_state::bbc_i8271_read)
 
 WRITE8_MEMBER(bbc_state::bbc_i8271_write)
 {
-	device_t *i8271 = machine().device("i8271");
 	logerror("i8271 write  %d  %d\n",offset,data);
 
 	switch (offset)
@@ -1527,10 +1523,10 @@ WRITE8_MEMBER(bbc_state::bbc_i8271_write)
 		case 2:
 		case 3:
 			/* 8271 registers */
-			i8271_w(i8271, space, offset, data);
+			m_i8271->write(space, offset, data);
 			return;
 		case 4:
-			i8271_data_w(i8271, space, offset, data);
+			m_i8271->data_w(space, offset, data);
 			return;
 		default:
 			break;

@@ -97,6 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER( printer_data );
 	DECLARE_READ8_MEMBER( vdg_videoram_r );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_WRITE_LINE_MEMBER( atom_8271_interrupt_callback );
 
 	/* eprom state */
 	int m_eprom;

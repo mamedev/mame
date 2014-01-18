@@ -45,6 +45,7 @@ public:
 		m_via6522_0(*this, "via6522_0"),
 		m_via6522_1(*this, "via6522_1"),
 		m_upd7002(*this, "upd7002"),
+		m_i8271(*this, "i8271"),
 		m_ACCCON_IRR(CLEAR_LINE),
 		m_via_system_irq(CLEAR_LINE),
 		m_via_user_irq(CLEAR_LINE),
@@ -74,6 +75,7 @@ public:
 	required_device<via6522_device> m_via6522_0;
 	optional_device<via6522_device> m_via6522_1;
 	optional_device<upd7002_device> m_upd7002;
+	optional_device<i8271_device> m_i8271;
 
 
 	void check_interrupts();
@@ -355,6 +357,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dcd_serial);
 	DECLARE_WRITE_LINE_MEMBER(write_cts_serial);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	
+	DECLARE_WRITE_LINE_MEMBER(bbc_i8271_interrupt);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcb_cart );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcm_cart );
