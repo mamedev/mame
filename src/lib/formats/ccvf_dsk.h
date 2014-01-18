@@ -38,14 +38,12 @@ public:
 
 	virtual int identify(io_generic *io, UINT32 form_factor);
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	virtual bool save(io_generic *io, floppy_image *image);
 	virtual bool supports_save() const;
 
 protected:
 	const format *formats;
 
 	floppy_image_format_t::desc_e* get_desc_8n1(const format &f, int &current_size);
-	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
 
 	static const format file_formats[];
 };
