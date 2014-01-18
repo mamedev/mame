@@ -18,7 +18,7 @@ NETLIST_START(bjt)
 
     /* NPN - example */
 
-    NETDEV_QJT_SW(Q, "BC237B")
+    NETDEV_QBJT_SW(Q, "BC237B")
     NETDEV_R(RB, 1000)
     NETDEV_R(RC, 1000)
 
@@ -30,7 +30,7 @@ NETLIST_START(bjt)
 
     /* PNP - example */
 
-    NETDEV_QPNP(Q1, "BC556B")
+    NETDEV_QBJT_SW(Q1, "BC556B")
     NETDEV_R(RB1, 1000)
     NETDEV_R(RC1, 1000)
 
@@ -40,7 +40,7 @@ NETLIST_START(bjt)
     NET_C(RB1.2, Q1.B)
     NET_C(Q1.E, V3)
 
-    //NETDEV_LOG(logB, Q1.B)
-    //NETDEV_LOG(logC, Q1.C)
+    NETDEV_LOG(logB, Q.B)
+    NETDEV_LOG(logC, Q.C)
 
 NETLIST_END()

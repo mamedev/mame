@@ -553,7 +553,7 @@ public:
 	typedef netlist_list_t<netlist_net_t *> list_t;
 
 	friend class NETLIB_NAME(mainclock);
-	friend class netlist_matrix_solver_t;
+    friend class netlist_matrix_solver_t;
 	friend class netlist_logic_output_t;
 	friend class netlist_analog_output_t;
 
@@ -638,6 +638,7 @@ public:
 	typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
 
 	terminal_list_t m_terms;
+    terminal_list_t m_rails;  // FIXME: Make the solver use this !
 	netlist_matrix_solver_t *m_solver;
 
 	ATTR_HOT void solve();
@@ -659,13 +660,15 @@ public:
         netlist_object_t::save_register();
     }
 
-protected:
+//protected:  FIXME: needed by current solver code
 
     UINT32 m_num_cons;
 
 	hybrid_t m_last;
 	hybrid_t m_cur;
 	hybrid_t m_new;
+
+protected:
 
 	/* we don't use this to save state
 	 * because we may get deleted again ...

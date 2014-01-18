@@ -10,10 +10,11 @@ NETLIST_START(bjt)
     /* Standard stuff */
 
     NETDEV_CLOCK(clk)
-    NETDEV_PARAM(clk.FREQ, 1000) // 1000 Hz
+    NETDEV_PARAM(clk.FREQ, 10000) // 1000 Hz
     NETDEV_SOLVER(Solver)
     NETDEV_PARAM(Solver.FREQ, 48000)
-    NETDEV_PARAM(Solver.ACCURACY, 1e-4)
+    NETDEV_PARAM(Solver.ACCURACY, 1e-6)
+    NETDEV_PARAM(Solver.RESCHED_LOOPS, 50)
     NETDEV_ANALOG_INPUT(V5, 5)
     NETDEV_ANALOG_INPUT(V3, 3.5)
 
@@ -30,7 +31,13 @@ NETLIST_START(bjt)
     NET_C(RB.2, Q.B)
     NET_C(Q.E, GND)
 
-    //NETDEV_LOG(logB, Q.B)
-    //NETDEV_LOG(logC, Q.C)
+    // put some load on Q.C
+
+    NETDEV_R(RCE, 150000)
+    NET_C(RCE.1, Q.C)
+    NET_C(RCE.2, GND)
+
+    NETDEV_LOG(logB, Q.B)
+    NETDEV_LOG(logC, Q.C)
 
 NETLIST_END()

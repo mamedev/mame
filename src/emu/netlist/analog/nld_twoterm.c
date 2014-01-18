@@ -33,8 +33,10 @@ NETLIB_UPDATE(twoterm)
 	netlist().solver()->schedule1();
 #else
     /* we only need to call the non-rail terminal */
-    m_P.net().solve();
-    m_N.net().solve();
+    if (!m_P.net().isRailNet())
+        m_P.net().solve();
+    else
+        m_N.net().solve();
 #endif
 }
 

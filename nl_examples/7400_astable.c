@@ -16,6 +16,7 @@ NETLIST_START(7400_astable)
 
     NETDEV_SOLVER(Solver)
     NETDEV_PARAM(Solver.FREQ, 48000)
+    NETDEV_PARAM(Solver.ACCURACY, 1e-7)
 
     // astable NAND Multivibrator
     NETDEV_R(R1, 1000)

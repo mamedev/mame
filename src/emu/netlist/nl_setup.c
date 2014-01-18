@@ -188,10 +188,10 @@ void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name
 						case netlist_param_t::LOGIC:
 						{
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val->cstr()));
-							int vald = 0;
-							if (sscanf(val.cstr(), "%d", &vald) != 1)
+							double vald = 0;
+							if (sscanf(val.cstr(), "%lf", &vald) != 1)
 								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
-							dynamic_cast<netlist_param_int_t &>(param).initial(vald);
+							dynamic_cast<netlist_param_int_t &>(param).initial((int) vald);
 						}
 						break;
 						case netlist_param_t::STRING:
