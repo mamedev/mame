@@ -286,13 +286,6 @@ ATTR_COLD void netlist_base_t::error(const char *format, ...) const
 // net_core_device_t
 // ----------------------------------------------------------------------------------------
 
-#if 0
-ATTR_COLD netlist_core_device_t::netlist_core_device_t()
-: netlist_object_t(DEVICE, GENERIC), m_family_desc(NULL)
-{
-}
-#endif
-
 ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
 : netlist_object_t(DEVICE, afamily), m_family_desc(NULL)
 {
@@ -535,13 +528,20 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 
 	assert(this->isRailNet());
 
-	const UINT32 masks[4] = { 1, 5, 3, 1 };
+	static const UINT32 masks[4] = { 1, 5, 3, 1 };
+    const UINT32 mask = masks[ (m_last.Q  << 1) | m_new.Q ];
+
     m_cur = m_new;
     m_in_queue = 2; /* mark as taken ... */
 
-    const UINT32 mask = masks[ (m_last.Q  << 1) | m_cur.Q ];
-
     netlist_core_terminal_t *p = m_head;
+#if 0
+    do
+    {
+        update_dev(p, mask);
+        p = p->m_update_list_next;
+    } while (p != NULL);
+#else
     switch (m_num_cons)
     {
     case 2:
@@ -558,6 +558,7 @@ ATTR_HOT inline void netlist_net_t::update_devs()
         } while (p != NULL);
         break;
     }
+#endif
     m_last = m_cur;
 }
 

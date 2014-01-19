@@ -36,9 +36,10 @@ public:
 	ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
 
 	// return true if a reschedule is needed ...
-	ATTR_HOT virtual bool solve() = 0;
     ATTR_HOT virtual int solve_non_dynamic() = 0;
 	ATTR_HOT virtual void step(const netlist_time delta);
+
+    ATTR_HOT bool solve();
 
 	ATTR_HOT void update_inputs();
     ATTR_HOT void update_dynamic();
@@ -66,21 +67,30 @@ protected:
 };
 
 template <int m_N, int _storage_N>
-class netlist_matrix_solver_directb_t: public netlist_matrix_solver_t
+class netlist_matrix_solver_direct_t: public netlist_matrix_solver_t
 {
 public:
 
-    netlist_matrix_solver_directb_t() : netlist_matrix_solver_t() {}
+    netlist_matrix_solver_direct_t() : netlist_matrix_solver_t() {}
 
-    virtual ~netlist_matrix_solver_directb_t() {}
+    virtual ~netlist_matrix_solver_direct_t() {}
 
     ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
+    ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
+    ATTR_HOT virtual int solve_non_dynamic();
 
     ATTR_HOT inline const int N() const { return (m_N == 0) ? m_nets.count() : m_N; }
-    ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
 
 protected:
-    ATTR_HOT inline void build_LE(double (* RESTRICT m_A)[_storage_N], double (* RESTRICT m_RHS));
+    ATTR_HOT inline void build_LE(double (* RESTRICT A)[_storage_N], double (* RESTRICT RHS));
+    ATTR_HOT inline void gauss_LE(double (* RESTRICT A)[_storage_N],
+            double (* RESTRICT RHS),
+            double (* RESTRICT x));
+    ATTR_HOT inline double delta_and_store(
+            double (* RESTRICT RHS),
+            double (* RESTRICT V));
+
+    double m_RHS[_storage_N]; // right hand side - contains currents
 
 private:
 
@@ -101,68 +111,35 @@ class netlist_matrix_solver_gauss_seidel_t: public netlist_matrix_solver_t
 {
 public:
 
-    netlist_matrix_solver_gauss_seidel_t() : netlist_matrix_solver_t(), m_resched(false) {}
+    netlist_matrix_solver_gauss_seidel_t() : netlist_matrix_solver_t() {}
 
     virtual ~netlist_matrix_solver_gauss_seidel_t() {}
 
     ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
     {
-        m_resched = true;
         netlist_matrix_solver_t::setup(nets, owner);
     }
 
-    // return true if a reschedule is needed ...
-    ATTR_HOT bool solve();
     ATTR_HOT int solve_non_dynamic();
+
     ATTR_HOT inline const int N() const { if (m_N == 0) return m_nets.count(); else return m_N; }
 
     ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
 
 private:
-    bool m_resched;
 };
 
-class netlist_matrix_solver_direct1_t: public netlist_matrix_solver_directb_t<1,1>
+class netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
 {
 public:
-
-    netlist_matrix_solver_direct1_t() : netlist_matrix_solver_directb_t() {}
-
-    virtual ~netlist_matrix_solver_direct1_t() {}
-
-    ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
-    {
-        netlist_matrix_solver_directb_t::setup(nets, owner);
-    }
-
-    // return true if a reschedule is needed ...
-    ATTR_HOT bool solve();
     ATTR_HOT int solve_non_dynamic();
-
-    //ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
-
 private:
 };
 
-class netlist_matrix_solver_direct2_t: public netlist_matrix_solver_directb_t<2,2>
+class netlist_matrix_solver_direct2_t: public netlist_matrix_solver_direct_t<2,2>
 {
 public:
-
-    netlist_matrix_solver_direct2_t() : netlist_matrix_solver_directb_t() {}
-
-    virtual ~netlist_matrix_solver_direct2_t() {}
-
-    ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
-    {
-        netlist_matrix_solver_directb_t::setup(nets, owner);
-    }
-
-    // return true if a reschedule is needed ...
-    ATTR_HOT bool solve();
     ATTR_HOT int solve_non_dynamic();
-
-    //ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
-
 private:
 };
 

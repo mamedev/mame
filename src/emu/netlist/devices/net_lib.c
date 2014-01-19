@@ -199,10 +199,7 @@ NETLIB_UPDATE(nic7450)
 	m_I3.activate();
 	UINT8 t1 = INPLOGIC(m_I0) & INPLOGIC(m_I1);
 	UINT8 t2 = INPLOGIC(m_I2) & INPLOGIC(m_I3);
-#if 0
-	UINT8 t =  (t1 | t2) ^ 1;
-	OUTLOGIC(m_Q, t, t ? NLTIME_FROM_NS(22) : NLTIME_FROM_NS(15));
-#else
+
 	const netlist_time times[2] = { NLTIME_FROM_NS(22), NLTIME_FROM_NS(15) };
 
 	UINT8 res = 0;
@@ -225,8 +222,6 @@ NETLIB_UPDATE(nic7450)
 		}
 	}
 	OUTLOGIC(m_Q, res, times[1 - res]);// ? 22000 : 15000);
-
-#endif
 }
 
 

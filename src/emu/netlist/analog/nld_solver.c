@@ -140,13 +140,44 @@ ATTR_HOT inline void netlist_matrix_solver_t::step(const netlist_time delta)
         m_steps[k]->step_time(dd);
 }
 
+ATTR_HOT inline bool netlist_matrix_solver_t::solve()
+{
+    int  resched_cnt = 0;
+
+    netlist_time now = owner().netlist().time();
+    netlist_time delta = now - m_last_step;
+    if (delta >= netlist_time::from_nsec(1)) // always update capacitors
+    {
+        NL_VERBOSE_OUT(("Step!\n"));
+        /* update all terminals for new time step */
+        m_last_step = now;
+        step(delta);
+    }
+
+    if (is_dynamic())
+    {
+        int this_resched;
+        do
+        {
+            update_dynamic();
+            this_resched = solve_non_dynamic();
+            resched_cnt += this_resched;
+        } while (this_resched > 1 && resched_cnt < m_resched_loops);
+    }
+    else
+    {
+        resched_cnt = solve_non_dynamic();
+    }
+    return (resched_cnt >= m_resched_loops);
+}
+
 // ----------------------------------------------------------------------------------------
 // netlist_matrix_solver - Direct base
 // ----------------------------------------------------------------------------------------
 
 
 template <int m_N, int _storage_N>
-ATTR_COLD int netlist_matrix_solver_directb_t<m_N, _storage_N>::get_net_idx(netlist_net_t *net)
+ATTR_COLD int netlist_matrix_solver_direct_t<m_N, _storage_N>::get_net_idx(netlist_net_t *net)
 {
     for (int k = 0; k < N(); k++)
         if (m_nets[k] == net)
@@ -155,7 +186,7 @@ ATTR_COLD int netlist_matrix_solver_directb_t<m_N, _storage_N>::get_net_idx(netl
 }
 
 template <int m_N, int _storage_N>
-ATTR_COLD void netlist_matrix_solver_directb_t<m_N, _storage_N>::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
+ATTR_COLD void netlist_matrix_solver_direct_t<m_N, _storage_N>::setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
 {
     netlist_matrix_solver_t::setup(nets, owner);
 
@@ -201,7 +232,9 @@ ATTR_COLD void netlist_matrix_solver_directb_t<m_N, _storage_N>::setup(netlist_n
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline  void netlist_matrix_solver_directb_t<m_N, _storage_N>::build_LE(double (* RESTRICT m_A)[_storage_N], double (* RESTRICT m_RHS))
+ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE(
+        double (* RESTRICT A)[_storage_N],
+        double (* RESTRICT RHS))
 {
 
 #if 0
@@ -223,21 +256,116 @@ ATTR_HOT inline  void netlist_matrix_solver_directb_t<m_N, _storage_N>::build_LE
     for (int i = 0; i < m_rail_start; i++)
     {
         terms_t &t = m_terms[i];
-        m_RHS[t.net_this] += t.term->m_Idr;
-        m_A[t.net_this][t.net_this] += t.term->m_gt;
+        RHS[t.net_this] += t.term->m_Idr;
+        A[t.net_this][t.net_this] += t.term->m_gt;
 
-        m_A[t.net_this][t.net_other] += -t.term->m_go;
+        A[t.net_this][t.net_other] += -t.term->m_go;
     }
     for (int i = m_rail_start; i < m_term_num; i++)
     {
         terms_t &t = m_terms[i];
-        m_RHS[t.net_this] += t.term->m_Idr;
-        m_A[t.net_this][t.net_this] += t.term->m_gt;
+        RHS[t.net_this] += t.term->m_Idr;
+        A[t.net_this][t.net_this] += t.term->m_gt;
 
-        m_RHS[t.net_this] += t.term->m_go * t.term->m_otherterm->net().Q_Analog();
+        RHS[t.net_this] += t.term->m_go * t.term->m_otherterm->net().Q_Analog();
     }
 #endif
 }
+
+template <int m_N, int _storage_N>
+ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
+        double (* RESTRICT A)[_storage_N],
+        double (* RESTRICT RHS),
+        double (* RESTRICT x))
+{
+    for (int i = 0; i < N(); i++) {
+
+#if 0
+       /* Find the row with the largest first value */
+       maxrow = i;
+       for (j=i+1;j<n;j++) {
+          if (ABS(a[i][j]) > ABS(a[i][maxrow]))
+             maxrow = j;
+       }
+
+       /* Swap the maxrow and ith row */
+       for (k=i;k<n+1;k++) {
+          tmp = a[k][i];
+          a[k][i] = a[k][maxrow];
+          a[k][maxrow] = tmp;
+       }
+#endif
+       /* Singular matrix? */
+       double f = A[i][i];
+       //if (fabs(A[i][i]) < 1e-20) printf("Singular!");
+       f = 1.0 / f;
+
+       /* Eliminate column i from row j */
+       for (int j = i + 1; j < N(); j++)
+       {
+           double f1 = A[j][i] * f;
+
+           for (int k = i; k < N(); k++)
+           {
+               A[j][k] -= A[i][k] * f1;
+           }
+           RHS[j] -= RHS[i] * f1;
+       }
+    }
+
+    /* back substitution */
+    for (int j = N() - 1; j >= 0; j--)
+    {
+        double tmp = 0;
+        for (int k = j + 1; k < N(); k++)
+            tmp += A[j][k] * x[k];
+        x[j] = (RHS[j] - tmp) / A[j][j];
+    }
+
+}
+
+template <int m_N, int _storage_N>
+ATTR_HOT inline double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta_and_store(
+        double (* RESTRICT RHS),
+        double (* RESTRICT V))
+{
+    double cerr = 0;
+    double cerr2 = 0;
+    for (int i = 0; i < this->N(); i++)
+    {
+        double e = (V[i] - this->m_nets[i]->m_cur.Analog);
+        double e2 = (RHS[i] - this->m_RHS[i]);
+        cerr += e * e;
+        cerr2 += e2 * e2;
+        this->m_nets[i]->m_cur.Analog = this->m_nets[i]->m_new.Analog = V[i];
+        this->m_RHS[i] = RHS[i];
+    }
+    return (cerr + cerr2*(100000.0 * 100000.0)) / this->N();
+}
+
+template <int m_N, int _storage_N>
+ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic()
+{
+    double A[_storage_N][_storage_N] = { { 0.0 } };
+    double RHS[_storage_N] = { 0.0 };
+    double new_v[_storage_N] = { 0.0 };
+
+    this->build_LE(A, RHS);
+
+    this->gauss_LE(A, RHS, new_v);
+
+    if (this->is_dynamic())
+    {
+        double err = delta_and_store(RHS, new_v);
+
+        if (err > this->m_accuracy * this->m_accuracy)
+        {
+            return 2;
+        }
+    }
+    return 1;
+}
+
 
 // ----------------------------------------------------------------------------------------
 // netlist_matrix_solver - Direct1
@@ -246,12 +374,6 @@ ATTR_HOT inline  void netlist_matrix_solver_directb_t<m_N, _storage_N>::build_LE
 ATTR_HOT inline int netlist_matrix_solver_direct1_t::solve_non_dynamic()
 {
 #if 1
-    ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
-
-    /* over-relaxation not really works on these matrices */
-    //const double w = 1.0; //2.0 / (1.0 + sin(3.14159 / (m_nets.count()+1)));
-    //const double w1 = 1.0 - w;
-    //NL_VERBOSE_OUT(("%d %d\n", N(), 1);
 
     double gtot_t = 0.0;
     double RHS_t = 0.0;
@@ -294,40 +416,6 @@ ATTR_HOT inline int netlist_matrix_solver_direct1_t::solve_non_dynamic()
 }
 
 
-ATTR_HOT inline bool netlist_matrix_solver_direct1_t::solve()
-{
-    int  resched_cnt = 0;
-    ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
-
-    if (USE_ALTERNATE_SCHEDULING)
-    {
-        netlist_time now = owner().netlist().time();
-        netlist_time delta = now - m_last_step;
-        if (delta >= netlist_time::from_nsec(5)) // always update capacitors
-        {
-            NL_VERBOSE_OUT(("Step!\n"));
-            /* update all terminals for new time step */
-            m_last_step = now;
-            step(delta);
-        }
-    }
-
-    if (is_dynamic())
-    {
-        int this_resched;
-        do
-        {
-            update_dynamic();
-            this_resched = solve_non_dynamic();
-            resched_cnt += this_resched;
-        } while (this_resched > 1 && resched_cnt < m_resched_loops);
-    }
-    else
-    {
-        resched_cnt = solve_non_dynamic();
-    }
-    return (resched_cnt >= m_resched_loops);
-}
 
 // ----------------------------------------------------------------------------------------
 // netlist_matrix_solver - Direct2
@@ -335,73 +423,29 @@ ATTR_HOT inline bool netlist_matrix_solver_direct1_t::solve()
 
 ATTR_HOT int netlist_matrix_solver_direct2_t::solve_non_dynamic()
 {
-    double m_A[2][2] = { { 0.0 } };
-    double m_RHS[2] = { 0.0 };
+    double A[2][2] = { { 0.0 } };
+    double RHS[2] = { 0.0 };
 
-    build_LE(m_A, m_RHS);
+    build_LE(A, RHS);
+
     //NL_VERBOSE_OUT(("%f %f\n", new_val, m_RHS[0] / m_A[0][0]);
 
-    const double a = m_A[0][0];
-    const double b = m_A[0][1];
-    const double c = m_A[1][0];
-    const double d = m_A[1][1];
+    const double a = A[0][0];
+    const double b = A[0][1];
+    const double c = A[1][0];
+    const double d = A[1][1];
 
-    const double new_val1 = a / (a*d - b*c) * (m_RHS[1] - c / a * m_RHS[0]);
-    const double new_val0 = (m_RHS[0] - b * new_val1) / a;
+    double new_val[2];
+    new_val[1] = a / (a*d - b*c) * (RHS[1] - c / a * RHS[0]);
+    new_val[0] = (RHS[0] - b * new_val[1]) / a;
 
-    double e = (new_val0 - m_nets[0]->m_cur.Analog);
-    double cerr = e * e;
-    m_nets[0]->m_cur.Analog = m_nets[0]->m_new.Analog = new_val0;
-
-    e = (new_val1 - m_nets[1]->m_cur.Analog);
-    cerr += e * e;
-    m_nets[1]->m_cur.Analog = m_nets[1]->m_new.Analog = new_val1;
-
-    if (is_dynamic() && (cerr / N()  > m_accuracy * m_accuracy))
+    if (is_dynamic() && (delta_and_store(RHS, new_val)  > m_accuracy * m_accuracy))
     {
         return 2;
     }
     else
         return 1;
-
 }
-
-
-ATTR_HOT inline bool netlist_matrix_solver_direct2_t::solve()
-{
-    int  resched_cnt = 0;
-    ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
-
-    if (USE_ALTERNATE_SCHEDULING)
-    {
-        netlist_time now = owner().netlist().time();
-        netlist_time delta = now - m_last_step;
-        if (delta >= netlist_time::from_nsec(5)) // always update capacitors
-        {
-            NL_VERBOSE_OUT(("Step!\n"));
-            /* update all terminals for new time step */
-            m_last_step = now;
-            step(delta);
-        }
-    }
-
-    if (is_dynamic())
-    {
-        int this_resched;
-        do
-        {
-            update_dynamic();
-            this_resched = solve_non_dynamic();
-            resched_cnt += this_resched;
-        } while (this_resched > 1 && resched_cnt < m_resched_loops);
-    }
-    else
-    {
-        resched_cnt = solve_non_dynamic();
-    }
-    return (resched_cnt >= m_resched_loops);
-}
-
 
 // ----------------------------------------------------------------------------------------
 // netlist_matrix_solver - Gauss - Seidel
@@ -503,51 +547,6 @@ ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve
     return resched_cnt;
 }
 
-
-template <int m_N, int _storage_N>
-ATTR_HOT inline bool netlist_matrix_solver_gauss_seidel_t< m_N, _storage_N>::solve()
-{
-    int  resched_cnt = 0;
-    ATTR_UNUSED netlist_net_t *last_resched_net = NULL;
-
-    m_resched = false;
-
-    if (USE_ALTERNATE_SCHEDULING)
-    {
-        netlist_time now = owner().netlist().time();
-        netlist_time delta = now - m_last_step;
-        if (delta >= netlist_time::from_nsec(5)) // always update capacitors
-        {
-            NL_VERBOSE_OUT(("Step!\n"));
-            /* update all terminals for new time step */
-            m_last_step = now;
-            step(delta);
-        }
-    }
-
-    if (is_dynamic())
-    {
-        int this_resched;
-        do
-        {
-            update_dynamic();
-            this_resched = solve_non_dynamic();
-            resched_cnt += this_resched;
-        } while (this_resched > 1 && resched_cnt < m_resched_loops);
-    }
-    else
-    {
-        resched_cnt = solve_non_dynamic();
-    }
-    if (resched_cnt >= m_resched_loops)
-        m_resched = true;
-
-    //if (resched)
-        //NL_VERBOSE_OUT(("Resched on net %s first term %s\n", last_resched_net->name().cstr(), last_resched_net->m_terms[0]->name().cstr());
-
-	return m_resched;
-}
-
 // ----------------------------------------------------------------------------------------
 // solver
 // ----------------------------------------------------------------------------------------
@@ -594,14 +593,14 @@ NETLIB_START(solver)
 	register_output("Q_step", m_Q_step);
 	//register_input("FB", m_feedback);
 
-	register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(10).as_double());
+	register_param("SYNC_DELAY", m_sync_delay, NLTIME_FROM_NS(5).as_double());
 	m_nt_sync_delay = m_sync_delay.Value();
 
 	register_param("FREQ", m_freq, 48000.0);
 	m_inc = netlist_time::from_hz(m_freq.Value());
 
     //register_param("ACCURACY", m_accuracy, 1e-3);
-	register_param("ACCURACY", m_accuracy, 1e-6);
+	register_param("ACCURACY", m_accuracy, 1e-7);
 	register_param("CONVERG", m_convergence, 0.3);
     register_param("RESCHED_LOOPS", m_resched_loops, 35);
 
@@ -646,25 +645,14 @@ NETLIB_UPDATE(solver)
 {
 	netlist_time now = netlist().time();
 	netlist_time delta = now - m_last_step;
-	bool do_full = (USE_ALTERNATE_SCHEDULING ? false : true);
+	bool do_full = false;
     bool global_resched = false;
     bool this_resched[100];
 
     if (delta < m_inc)
         do_full = true; // we have been called between updates
 
-    //FIXME: make this a parameter
-	if (!USE_ALTERNATE_SCHEDULING && delta >= netlist_time::from_nsec(5)) // always update capacitors
-	{
-		NL_VERBOSE_OUT(("Step!\n"));
-		/* update all terminals for new time step */
-		for (netlist_matrix_solver_t * const *e = m_mat_solvers.first(); e != NULL; e = m_mat_solvers.next(e))
-		{
-			(*e)->step(delta);
-		}
-	}
     m_last_step = now;
-
 
 #if HAS_OPENMP && USE_OPENMP
     int t_cnt = m_mat_solvers.count();
@@ -739,20 +727,25 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
                 ms = new netlist_matrix_solver_direct1_t();
                 break;
             case 2:
-                //ms = new netlist_matrix_solver_gauss_seidel_t<2,2>();
-                // Below is only half as fast as gauss_seidel ....
                 ms = new netlist_matrix_solver_direct2_t();
                 break;
+            /* FIXME: There is an issue (singularity during gaussian elemination
+             *        with the direct solver - use gauss_seidel
+             */
             case 3:
+                //ms = new netlist_matrix_solver_direct_t<3,3>();
                 ms = new netlist_matrix_solver_gauss_seidel_t<3,3>();
                 break;
             case 4:
+                //ms = new netlist_matrix_solver_direct_t<4,4>();
                 ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
                 break;
             case 5:
+                //ms = new netlist_matrix_solver_direct_t<5,5>();
                 ms = new netlist_matrix_solver_gauss_seidel_t<5,5>();
                 break;
             default:
+                //ms = new netlist_matrix_solver_direct_t<0,16>();
                 ms = new netlist_matrix_solver_gauss_seidel_t<0,16>();
                 break;
         }

@@ -165,26 +165,15 @@ public:
 
 	ATTR_HOT ATTR_ALIGN void push(const entry_t &e)
 	{
-#if 0
-	    // less is more
-	    if (is_empty() || (e.time() <= (m_end - 1)->time()))
-		{
-			*m_end++ = e;
-			inc_stat(m_prof_end);
-		}
-		else
-#endif
-		{
-			entry_t * RESTRICT i = m_end++;
-			while ((i > &m_list[0]) && (e.time() > (i - 1)->time()) )
-			{
-			    i--;
-				*(i+1) = *i;
-				inc_stat(m_prof_sortmove);
-			}
-			*i = e;
-			inc_stat(m_prof_sort);
-		}
+        entry_t * RESTRICT i = m_end++;
+        while ((i > &m_list[0]) && (e.time() > (i - 1)->time()) )
+        {
+            i--;
+            *(i+1) = *i;
+            inc_stat(m_prof_sortmove);
+        }
+        *i = e;
+        inc_stat(m_prof_sort);
 		assert(m_end - m_list < _Size);
 	}
 
