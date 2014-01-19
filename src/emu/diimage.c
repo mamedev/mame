@@ -13,7 +13,7 @@
 #include "drivenum.h"
 #include "ui.h"
 #include "zippath.h"
-#include "uiimage.h"
+#include "ui/filemngr.h"
 #include "uiswlist.h"
 
 //**************************************************************************
