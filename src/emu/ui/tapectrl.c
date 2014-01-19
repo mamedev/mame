@@ -12,6 +12,12 @@
 #include "emu.h"
 #include "ui/tapectrl.h"
 
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
 #define TAPECMD_NULL            ((void *) 0x0000)
 #define TAPECMD_STOP            ((void *) 0x0001)
 #define TAPECMD_PLAY            ((void *) 0x0002)
@@ -21,18 +27,34 @@
 #define TAPECMD_SLIDER          ((void *) 0x0006)
 #define TAPECMD_SELECT          ((void *) 0x0007)
 
-ui_menu_mess_tape_control::ui_menu_mess_tape_control(running_machine &machine, render_container *container) : ui_menu(machine, container)
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+ui_menu_mess_tape_control::ui_menu_mess_tape_control(running_machine &machine, render_container *container)
+	: ui_menu(machine, container)
 {
 }
+
+
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
 
 ui_menu_mess_tape_control::~ui_menu_mess_tape_control()
 {
 }
 
-/*-------------------------------------------------
-    cassette_count - returns the number of cassette
-    devices in the machine
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  cassette_count - returns the number of cassette
+//  devices in the machine
+//-------------------------------------------------
 
 int ui_menu_mess_tape_control::cassette_count()
 {
@@ -41,11 +63,9 @@ int ui_menu_mess_tape_control::cassette_count()
 }
 
 
-
-/*-------------------------------------------------
-    menu_tape_control_populate - populates the
-    main tape control menu
--------------------------------------------------*/
+//-------------------------------------------------
+//  populate - populates the main tape control menu
+//-------------------------------------------------
 
 void ui_menu_mess_tape_control::populate()
 {
@@ -79,11 +99,11 @@ void ui_menu_mess_tape_control::populate()
 				tapeflags |= MENU_FLAG_RIGHT_ARROW;
 		}
 
-		/* name of tape */
+		// name of tape
 		item_append(device->device().name(), device->filename(), flags, TAPECMD_SELECT);
 
-		/* state */
-		tapecontrol_gettime(timepos, cassette, NULL, NULL);
+		// state
+		get_time_string(timepos, cassette, NULL, NULL);
 		state = cassette->get_state();
 		item_append(
 			(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
@@ -96,36 +116,36 @@ void ui_menu_mess_tape_control::populate()
 			tapeflags,
 			TAPECMD_SLIDER);
 
-		/* pause or stop */
+		// pause or stop
 		item_append("Pause/Stop", NULL, 0, TAPECMD_STOP);
 
-		/* play */
+		// play
 		item_append("Play", NULL, 0, TAPECMD_PLAY);
 
-		/* record */
+		// record
 		item_append("Record", NULL, 0, TAPECMD_RECORD);
 
-		/* rewind */
+		// rewind
 		item_append("Rewind", NULL, 0, TAPECMD_REWIND);
 
-		/* fast forward */
+		// fast forward
 		item_append("Fast Forward", NULL, 0, TAPECMD_FAST_FORWARD);
 	}
 	else
 	{
-		/* no tape loaded */
+		// no tape loaded
 		item_append("No Tape Image loaded", NULL, flags, NULL);
 	}
 }
 
 
-/*-------------------------------------------------
-    menu_tape_control - main tape control menu
--------------------------------------------------*/
+//-------------------------------------------------
+//  handle - main tape control menu
+//-------------------------------------------------
 
 void ui_menu_mess_tape_control::handle()
 {
-	/* do we have to load the device? */
+	// do we have to load the device?
 	if (device == NULL)
 	{
 		cassette_device_iterator iter(machine().root_device());
@@ -133,13 +153,13 @@ void ui_menu_mess_tape_control::handle()
 		reset((ui_menu_reset_options)0);
 	}
 
-	/* rebuild the menu - we have to do this so that the counter updates */
+	// rebuild the menu - we have to do this so that the counter updates
 	reset(UI_MENU_RESET_REMEMBER_POSITION);
 	populate();
 
 	cassette_image_device* cassette = dynamic_cast<cassette_image_device*>(&device->device());
 
-	/* process the menu */
+	// process the menu
 	const ui_menu_event *event = process(UI_MENU_PROCESS_LR_REPEAT);
 	if (event != NULL)
 	{
@@ -148,10 +168,9 @@ void ui_menu_mess_tape_control::handle()
 			case IPT_UI_LEFT:
 				if (event->itemref==TAPECMD_SLIDER)
 					cassette->seek(-1, SEEK_CUR);
-				else
-				if (event->itemref==TAPECMD_SELECT)
+				else if (event->itemref==TAPECMD_SELECT)
 				{
-					/* left arrow - rotate left through cassette devices */
+					// left arrow - rotate left through cassette devices
 					if (index > 0)
 						index--;
 					else
@@ -163,10 +182,9 @@ void ui_menu_mess_tape_control::handle()
 			case IPT_UI_RIGHT:
 				if (event->itemref==TAPECMD_SLIDER)
 					cassette->seek(+1, SEEK_CUR);
-				else
-				if (event->itemref==TAPECMD_SELECT)
+				else if (event->itemref==TAPECMD_SELECT)
 				{
-					/* right arrow - rotate right through cassette devices */
+					// right arrow - rotate right through cassette devices
 					if (index < cassette_count() - 1)
 						index++;
 					else
@@ -179,20 +197,15 @@ void ui_menu_mess_tape_control::handle()
 				{
 					if (event->itemref==TAPECMD_STOP)
 						cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
-					else
-					if (event->itemref==TAPECMD_PLAY)
+					else if (event->itemref==TAPECMD_PLAY)
 						cassette->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
-					else
-					if (event->itemref==TAPECMD_RECORD)
+					else if (event->itemref==TAPECMD_RECORD)
 						cassette->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
-					else
-					if (event->itemref==TAPECMD_REWIND)
+					else if (event->itemref==TAPECMD_REWIND)
 						cassette->seek(-30, SEEK_CUR);
-					else
-					if (event->itemref==TAPECMD_FAST_FORWARD)
+					else if (event->itemref==TAPECMD_FAST_FORWARD)
 						cassette->seek(30, SEEK_CUR);
-					else
-					if (event->itemref==TAPECMD_SLIDER)
+					else if (event->itemref==TAPECMD_SLIDER)
 						cassette->seek(0, SEEK_SET);
 				}
 				break;
@@ -201,12 +214,12 @@ void ui_menu_mess_tape_control::handle()
 }
 
 
-/*-------------------------------------------------
-    tapecontrol_gettime - returns a textual
-    representation of the time
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_time_string - returns a textual
+//  representation of the time
+//-------------------------------------------------
 
-astring &ui_menu_mess_tape_control::tapecontrol_gettime(astring &dest, cassette_image_device *cassette, int *curpos, int *endpos)
+void ui_menu_mess_tape_control::get_time_string(astring &dest, cassette_image_device *cassette, int *curpos, int *endpos)
 {
 	double t0, t1;
 
@@ -222,8 +235,4 @@ astring &ui_menu_mess_tape_control::tapecontrol_gettime(astring &dest, cassette_
 		*curpos = t0;
 	if (endpos != NULL)
 		*endpos = t1;
-
-	return dest;
 }
-
-

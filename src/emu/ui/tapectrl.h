@@ -28,7 +28,7 @@ private:
 	device_image_interface *device;
 	int cassette_count();
 
-	static astring &tapecontrol_gettime(astring &dest, cassette_image_device *cassette, int *curpos, int *endpos);
+	static void get_time_string(astring &dest, cassette_image_device *cassette, int *curpos, int *endpos);
 };
 
 #endif /* __UI_TAPECTRL_H__ */
