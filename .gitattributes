@@ -2160,6 +2160,7 @@ src/emu/netlist/analog/nld_twoterm.c svneol=native#text/plain
 src/emu/netlist/analog/nld_twoterm.h svneol=native#text/plain
 src/emu/netlist/devices/net_lib.c svneol=native#text/plain
 src/emu/netlist/devices/net_lib.h svneol=native#text/plain
+src/emu/netlist/devices/nld_7400.c svneol=native#text/plain
 src/emu/netlist/devices/nld_7400.h svneol=native#text/plain
 src/emu/netlist/devices/nld_7402.h svneol=native#text/plain
 src/emu/netlist/devices/nld_7404.c svneol=native#text/plain

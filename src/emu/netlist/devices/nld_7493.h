@@ -66,6 +66,9 @@
 		NET_CONNECT(_name, R1,  _R1)                                                \
 		NET_CONNECT(_name, R2,  _R2)
 
+#define TTL_7493_DIP(_name)                                                         \
+        NET_REGISTER_DEV(7493_dip, _name)
+
 NETLIB_SUBDEVICE(7493ff,
 	netlist_ttl_input_t m_I;
 	netlist_ttl_output_t m_Q;
@@ -82,5 +85,9 @@ NETLIB_DEVICE(7493,
 	NETLIB_NAME(7493ff) C;
 	NETLIB_NAME(7493ff) D;
 );
+
+NETLIB_DEVICE_DERIVED(7493_dip, 7493,
+);
+
 
 #endif /* NLD_7493_H_ */

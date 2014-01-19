@@ -61,7 +61,7 @@ void netlist_parser::parse(const char *buf)
         else if (n == "NETLIST_END")
             netdev_netlist_end();
 		else
-			DIODEevice(n);
+			device(n);
 	}
 }
 
@@ -125,7 +125,7 @@ void netlist_parser::netdev_param()
 	check_char(')');
 }
 
-void netlist_parser::DIODEevice(const pstring &dev_type)
+void netlist_parser::device(const pstring &dev_type)
 {
 	pstring devname;
 	net_device_t_base_factory *f = m_setup.factory().factory_by_name(dev_type, m_setup);

@@ -32,13 +32,13 @@
 
 #include "nld_signal.h"
 
-NETLIB_DEVICE(nic7404,
+NETLIB_DEVICE(7404,
 	netlist_ttl_input_t m_I;
 	netlist_ttl_output_t m_Q;
 );
 
 #define TTL_7404_INVERT(_name, _A)                                                  \
-		NET_REGISTER_DEV(nic7404, _name)                                            \
+		NET_REGISTER_DEV(7404, _name)                                               \
 		NET_CONNECT(_name, A, _A)
 
 #endif /* NLD_7404_H_ */

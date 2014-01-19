@@ -5,7 +5,7 @@
 
 #include "nld_74153.h"
 
-NETLIB_START(nic74153)
+NETLIB_START(74153)
 {
 	register_input("C0", m_C[0]);
 	register_input("C1", m_C[1]);
@@ -18,7 +18,7 @@ NETLIB_START(nic74153)
 	register_output("AY", m_Y); //FIXME: Change netlists
 }
 
-NETLIB_RESET(nic74153)
+NETLIB_RESET(74153)
 {
 }
 
@@ -27,7 +27,7 @@ NETLIB_RESET(nic74153)
  *        Convert this to sub-devices at some time.
  */
 
-NETLIB_UPDATE(nic74153)
+NETLIB_UPDATE(74153)
 {
 	const netlist_time delay[2] = { NLTIME_FROM_NS(23), NLTIME_FROM_NS(18) };
 	if (!INPLOGIC(m_G))

@@ -5,18 +5,18 @@
 
 #include "nld_7404.h"
 
-NETLIB_START(nic7404)
+NETLIB_START(7404)
 {
 	register_input("A", m_I);
 	register_output("Q", m_Q);
 }
 
-NETLIB_RESET(nic7404)
+NETLIB_RESET(7404)
 {
     m_Q.initial(1);
 }
 
-NETLIB_UPDATE(nic7404)
+NETLIB_UPDATE(7404)
 {
 	static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
 	UINT8 t = (INPLOGIC(m_I)) ^ 1;
