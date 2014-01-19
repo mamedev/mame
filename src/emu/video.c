@@ -601,7 +601,7 @@ inline bool video_manager::effective_throttle() const
 		return false;
 
 	// otherwise, it's up to the user
-	return m_throttle;
+	return throttled();
 }
 
 
@@ -1184,7 +1184,6 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 }
 
 
-
 //-------------------------------------------------
 //  record_frame - record a frame of a movie
 //-------------------------------------------------
@@ -1249,12 +1248,11 @@ void video_manager::record_frame()
 }
 
 
-
-/*-------------------------------------------------
-    video_assert_out_of_range_pixels - assert if
-    any pixels in the given bitmap contain an
-    invalid palette index
--------------------------------------------------*/
+//-------------------------------------------------
+//  video_assert_out_of_range_pixels - assert if
+//  any pixels in the given bitmap contain an
+//  invalid palette index
+//-------------------------------------------------
 
 bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bitmap)
 {
@@ -1273,4 +1271,14 @@ bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bi
 	}
 #endif
 	return false;
+}
+
+
+//-------------------------------------------------
+//	toggle_throttle
+//-------------------------------------------------
+
+void video_manager::toggle_throttle()
+{
+	set_throttled(!throttled());
 }

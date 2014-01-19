@@ -99,7 +99,7 @@ static UINT32 ui_handler_param;
 static bool single_step;
 
 /* FPS counter display */
-static int showfps;
+static bool showfps;
 static osd_ticks_t showfps_end;
 
 /* profiler display */
@@ -868,7 +868,7 @@ void ui_show_fps_temp(double seconds)
     ui_set_show_fps - show/hide the FPS counter
 -------------------------------------------------*/
 
-void ui_set_show_fps(int show)
+void ui_set_show_fps(bool show)
 {
 	showfps = show;
 	if (!show)
@@ -884,7 +884,7 @@ void ui_set_show_fps(int show)
     counter visibility state
 -------------------------------------------------*/
 
-int ui_get_show_fps(void)
+bool ui_get_show_fps(void)
 {
 	return showfps || (showfps_end != 0);
 }
@@ -894,7 +894,7 @@ int ui_get_show_fps(void)
     ui_set_show_profiler - show/hide the profiler
 -------------------------------------------------*/
 
-void ui_set_show_profiler(int show)
+void ui_set_show_profiler(bool show)
 {
 	show_profiler = show;
 	g_profiler.enable(show);
@@ -906,7 +906,7 @@ void ui_set_show_profiler(int show)
     profiler visibility state
 -------------------------------------------------*/
 
-int ui_get_show_profiler(void)
+bool ui_get_show_profiler(void)
 {
 	return show_profiler;
 }
@@ -1563,7 +1563,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 
 	/* toggle throttle? */
 	if (ui_input_pressed(machine, IPT_UI_THROTTLE))
-		machine.video().set_throttled(!machine.video().throttled());
+		machine.video().toggle_throttle();
 
 	/* check for fast forward */
 	if (machine.ioport().type_pressed(IPT_UI_FAST_FORWARD))

@@ -72,6 +72,9 @@ public:
 	void set_fastforward(bool ffwd = true) { m_fastforward = ffwd; }
 	void set_output_changed() { m_output_changed = true; }
 
+	// misc
+	void toggle_throttle();
+
 	// render a frame
 	void frame_update(bool debug = false);
 
