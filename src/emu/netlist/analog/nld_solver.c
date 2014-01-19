@@ -297,7 +297,7 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 #endif
        /* Singular matrix? */
        double f = A[i][i];
-       //if (fabs(A[i][i]) < 1e-20) printf("Singular!");
+       //if (fabs(f) < 1e-20) printf("Singular!");
        f = 1.0 / f;
 
        /* Eliminate column i from row j */
@@ -312,7 +312,6 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
            RHS[j] -= RHS[i] * f1;
        }
     }
-
     /* back substitution */
     for (int j = N() - 1; j >= 0; j--)
     {
@@ -322,12 +321,21 @@ ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
         x[j] = (RHS[j] - tmp) / A[j][j];
     }
 
+#if 0
+    for (int i = 0; i < N(); i++)
+    {
+        for (int k = 0; k < N(); k++)
+            printf("%f ", A[i][k]);
+        printf("| %f = %f \n", x[i], RHS[i]);
+    }
+    printf("\n");
+#endif
 }
 
 template <int m_N, int _storage_N>
-ATTR_HOT inline double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta_and_store(
-        double (* RESTRICT RHS),
-        double (* RESTRICT V))
+ATTR_HOT inline double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
+        const double (* RESTRICT RHS),
+        const double (* RESTRICT V))
 {
     double cerr = 0;
     double cerr2 = 0;
@@ -337,10 +345,26 @@ ATTR_HOT inline double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta_an
         double e2 = (RHS[i] - this->m_RHS[i]);
         cerr += e * e;
         cerr2 += e2 * e2;
-        this->m_nets[i]->m_cur.Analog = this->m_nets[i]->m_new.Analog = V[i];
-        this->m_RHS[i] = RHS[i];
     }
     return (cerr + cerr2*(100000.0 * 100000.0)) / this->N();
+}
+
+template <int m_N, int _storage_N>
+ATTR_HOT inline void netlist_matrix_solver_direct_t<m_N, _storage_N>::store(
+        const double (* RESTRICT RHS),
+        const double (* RESTRICT V))
+{
+    for (int i = 0; i < this->N(); i++)
+    {
+        this->m_nets[i]->m_cur.Analog = this->m_nets[i]->m_new.Analog = V[i];
+    }
+    if (RHS != NULL)
+    {
+        for (int i = 0; i < this->N(); i++)
+        {
+            this->m_RHS[i] = RHS[i];
+        }
+    }
 }
 
 template <int m_N, int _storage_N>
@@ -356,13 +380,17 @@ ATTR_HOT int netlist_matrix_solver_direct_t<m_N, _storage_N>::solve_non_dynamic(
 
     if (this->is_dynamic())
     {
-        double err = delta_and_store(RHS, new_v);
+        double err = delta(RHS, new_v);
+
+        store(RHS, new_v);
 
         if (err > this->m_accuracy * this->m_accuracy)
         {
             return 2;
         }
+        return 1;
     }
+    store(NULL, new_v);  // ==> No need to store RHS
     return 1;
 }
 
@@ -439,12 +467,17 @@ ATTR_HOT int netlist_matrix_solver_direct2_t::solve_non_dynamic()
     new_val[1] = a / (a*d - b*c) * (RHS[1] - c / a * RHS[0]);
     new_val[0] = (RHS[0] - b * new_val[1]) / a;
 
-    if (is_dynamic() && (delta_and_store(RHS, new_val)  > m_accuracy * m_accuracy))
+    if (is_dynamic())
     {
-        return 2;
+        double err = delta(RHS, new_val);
+        store(RHS, new_val);
+        if (err > m_accuracy * m_accuracy)
+            return 2;
+        else
+            return 1;
     }
-    else
-        return 1;
+    store(NULL, new_val);
+    return 1;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -729,20 +762,13 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
             case 2:
                 ms = new netlist_matrix_solver_direct2_t();
                 break;
-            /* FIXME: There is an issue (singularity during gaussian elemination
-             *        with the direct solver - use gauss_seidel
-             */
             case 3:
-                //ms = new netlist_matrix_solver_direct_t<3,3>();
-                ms = new netlist_matrix_solver_gauss_seidel_t<3,3>();
+                ms = new netlist_matrix_solver_direct_t<3,3>();
+                //ms = new netlist_matrix_solver_gauss_seidel_t<3,3>();
                 break;
             case 4:
-                //ms = new netlist_matrix_solver_direct_t<4,4>();
-                ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
-                break;
-            case 5:
-                //ms = new netlist_matrix_solver_direct_t<5,5>();
-                ms = new netlist_matrix_solver_gauss_seidel_t<5,5>();
+                ms = new netlist_matrix_solver_direct_t<4,4>();
+                //ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
                 break;
             default:
                 //ms = new netlist_matrix_solver_direct_t<0,16>();

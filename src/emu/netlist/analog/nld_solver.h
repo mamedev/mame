@@ -86,9 +86,10 @@ protected:
     ATTR_HOT inline void gauss_LE(double (* RESTRICT A)[_storage_N],
             double (* RESTRICT RHS),
             double (* RESTRICT x));
-    ATTR_HOT inline double delta_and_store(
-            double (* RESTRICT RHS),
-            double (* RESTRICT V));
+    ATTR_HOT inline double delta(
+            const double (* RESTRICT RHS),
+            const double (* RESTRICT V));
+    ATTR_HOT inline void store(const double (* RESTRICT RHS), const double (* RESTRICT V));
 
     double m_RHS[_storage_N]; // right hand side - contains currents
 
