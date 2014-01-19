@@ -161,12 +161,12 @@ void CLIB_DECL ui_popup_time(int seconds, const char *text, ...) ATTR_PRINTF(2,3
 
 /* get/set whether or not the FPS is displayed */
 void ui_show_fps_temp(double seconds);
-void ui_set_show_fps(int show);
-int ui_get_show_fps(void);
+void ui_set_show_fps(bool show);
+bool ui_get_show_fps(void);
 
 /* get/set whether or not the profiler is displayed */
-void ui_set_show_profiler(int show);
-int ui_get_show_profiler(void);
+void ui_set_show_profiler(bool show);
+bool ui_get_show_profiler(void);
 
 /* force the menus to display */
 void ui_show_menu(void);
