@@ -247,23 +247,23 @@ netlist_factory_t::~netlist_factory_t()
 
 void netlist_factory_t::initialize()
 {
-	ENTRY(R,                    NETDEV_R,               "R")
-	ENTRY(POT,                  NETDEV_POT,             "R")
-	ENTRY(C,                    NETDEV_C,               "C")
-	ENTRY(D,                    NETDEV_D,               "model")
+	ENTRY(R,                    RES,                    "R")
+	ENTRY(POT,                  POT,                    "R")
+	ENTRY(C,                    CAP,                    "C")
+	ENTRY(D,                    DIODE,                  "model")
 	ENTRY(VCVS,                 NETDEV_VCVS,            "-")
 	ENTRY(VCCS,                 NETDEV_VCCS,            "-")
-    ENTRY(QBJT_EB,              NETDEV_QBJT_EB,         "model")
-	ENTRY(QBJT_switch,          NETDEV_QBJT_SW,         "model")
-	ENTRY(ttl_input,            NETDEV_TTL_INPUT,       "IN")
-	ENTRY(analog_input,         NETDEV_ANALOG_INPUT,    "IN")
-	ENTRY(log,                  NETDEV_LOG,             "+I")
-	ENTRY(logD,                 NETDEV_LOGD,            "+I,I2")
-	ENTRY(clock,                NETDEV_CLOCK,           "-")   // FIXME
-	ENTRY(mainclock,            NETDEV_MAINCLOCK,       "-")   // FIXME
-	ENTRY(solver,               NETDEV_SOLVER,          "-")   // FIXME
+    ENTRY(QBJT_EB,              QBJT_EB,                "model")
+	ENTRY(QBJT_switch,          QBJT_SW,                "model")
+	ENTRY(ttl_input,            TTL_INPUT,              "IN")
+	ENTRY(analog_input,         ANALOG_INPUT,           "IN")
+	ENTRY(log,                  LOG,                    "+I")
+	ENTRY(logD,                 LOGD,                   "+I,I2")
+	ENTRY(clock,                CLOCK,                  "-")   // FIXME
+	ENTRY(mainclock,            MAINCLOCK,              "-")   // FIXME
+	ENTRY(solver,               SOLVER,                 "-")   // FIXME
     ENTRY(gnd,                  NETDEV_GND,             "-")
-	ENTRY(switch2,              NETDEV_SWITCH2,         "+i1,i2")
+	ENTRY(switch2,              SWITCH2,                "+i1,i2")
 	ENTRY(nicRSFF,              NETDEV_RSFF,            "+S,R")
 	ENTRY(7400,                 TTL_7400_NAND,          "+A,B")
 	ENTRY(7402,                 TTL_7402_NOR,           "+A,B")
@@ -284,7 +284,7 @@ void netlist_factory_t::initialize()
 	ENTRY(nic74107A,            TTL_74107A,             "+CLK,J,K,CLRQ")
 	ENTRY(nic74153,             TTL_74153,              "+C0,C1,C2,C3,A,B,G")
 	ENTRY(9316,                 TTL_9316,               "+CLK,ENP,ENT,CLRQ,LOADQ,A,B,C,D")
-	ENTRY(NE555,                NETDEV_NE555,           "-")
+	ENTRY(NE555,                NE555,                  "-")
 }
 
 netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const

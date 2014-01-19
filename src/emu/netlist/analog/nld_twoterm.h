@@ -39,21 +39,21 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_R(_name, _R)                                                         \
+#define RES(_name, _R)                                                         \
 		NET_REGISTER_DEV(R, _name)                                                  \
 		NETDEV_PARAMI(_name, R, _R)
 
-#define NETDEV_POT(_name, _R)                                                       \
+#define POT(_name, _R)                                                       \
 		NET_REGISTER_DEV(POT, _name)                                                \
 		NETDEV_PARAMI(_name, R, _R)
 
 
-#define NETDEV_C(_name, _C)                                                         \
+#define CAP(_name, _C)                                                         \
 		NET_REGISTER_DEV(C, _name)                                                  \
 		NETDEV_PARAMI(_name, C, _C)
 
 /* Generic Diode */
-#define NETDEV_D(_name,  _model)                                                    \
+#define DIODE(_name,  _model)                                                    \
 		NET_REGISTER_DEV(D, _name)                                                  \
 		NETDEV_PARAMI(_name, model, _model)
 

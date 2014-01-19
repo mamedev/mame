@@ -21,7 +21,7 @@ public:
 	void net_alias();
 	void netdev_param();
 	void net_c();
-	void netdev_device(const pstring &dev_type);
+	void DIODEevice(const pstring &dev_type);
     void netdev_netlist_start();
     void netdev_netlist_end();
     void net_model();

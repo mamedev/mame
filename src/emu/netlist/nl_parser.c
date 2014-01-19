@@ -48,11 +48,11 @@ void netlist_parser::parse(const char *buf)
 		if (eof()) break;
 		n = getname('(');
 		NL_VERBOSE_OUT(("Parser: Device: %s\n", n.cstr()));
-		if (n == "NET_ALIAS")
+		if (n == "ALIAS")
 			net_alias();
 		else if (n == "NET_C")
 			net_c();
-		else if (n == "NETDEV_PARAM")
+		else if (n == "PARAM")
 			netdev_param();
 		else if ((n == "NET_MODEL"))
 		    net_model();
@@ -61,7 +61,7 @@ void netlist_parser::parse(const char *buf)
         else if (n == "NETLIST_END")
             netdev_netlist_end();
 		else
-			netdev_device(n);
+			DIODEevice(n);
 	}
 }
 
@@ -125,7 +125,7 @@ void netlist_parser::netdev_param()
 	check_char(')');
 }
 
-void netlist_parser::netdev_device(const pstring &dev_type)
+void netlist_parser::DIODEevice(const pstring &dev_type)
 {
 	pstring devname;
 	net_device_t_base_factory *f = m_setup.factory().factory_by_name(dev_type, m_setup);

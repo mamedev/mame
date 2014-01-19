@@ -14,8 +14,8 @@
 #include "analog/nld_twoterm.h"
 
 static NETLIST_START(base)
-	NETDEV_TTL_INPUT(ttlhigh, 1)
-	NETDEV_TTL_INPUT(ttllow, 0)
+	TTL_INPUT(ttlhigh, 1)
+	TTL_INPUT(ttllow, 0)
     NETDEV_GND()
 
 	NET_MODEL(".model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")

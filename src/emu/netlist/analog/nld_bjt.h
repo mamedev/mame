@@ -13,11 +13,11 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_QBJT_SW(_name, _model)                                           \
+#define QBJT_SW(_name, _model)                                           \
         NET_REGISTER_DEV(QBJT_switch, _name)                                    \
         NETDEV_PARAMI(_name,  model,   _model)
 
-#define NETDEV_QBJT_EB(_name, _model)                                           \
+#define QBJT_EB(_name, _model)                                           \
         NET_REGISTER_DEV(QBJT_EB, _name)                                        \
         NETDEV_PARAMI(_name,  model,   _model)
 

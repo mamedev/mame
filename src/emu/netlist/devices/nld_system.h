@@ -16,18 +16,18 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_TTL_INPUT(_name, _v)                                                 \
+#define TTL_INPUT(_name, _v)                                                 \
 		NET_REGISTER_DEV(ttl_input, _name)                                          \
-		NETDEV_PARAM(_name.IN, _v)
+		PARAM(_name.IN, _v)
 
-#define NETDEV_ANALOG_INPUT(_name, _v)                                              \
+#define ANALOG_INPUT(_name, _v)                                              \
 		NET_REGISTER_DEV(analog_input, _name)                                       \
-		NETDEV_PARAM(_name.IN, _v)
+		PARAM(_name.IN, _v)
 
-#define NETDEV_MAINCLOCK(_name)                                                     \
+#define MAINCLOCK(_name)                                                     \
 		NET_REGISTER_DEV(mainclock, _name)
 
-#define NETDEV_CLOCK(_name)                                                         \
+#define CLOCK(_name)                                                         \
 		NET_REGISTER_DEV(clock, _name)
 
 #define NETDEV_GND()                                                                \
@@ -155,7 +155,7 @@ protected:
 };
 
 // ----------------------------------------------------------------------------------------
-// netdev_d_to_a
+// DIODE_to_a
 // ----------------------------------------------------------------------------------------
 
 class nld_base_d_to_a_proxy : public netlist_device_t

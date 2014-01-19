@@ -19,11 +19,11 @@ NETLIST_START(opamp)
 
     /* Standard stuff */
 
-    NETDEV_CLOCK(clk)
-    NETDEV_PARAM(clk.FREQ, 1000) // 1000 Hz
-    NETDEV_SOLVER(Solver)
-    NETDEV_PARAM(Solver.FREQ, 48000)
-    NETDEV_PARAM(Solver.ACCURACY, 1e-6)
+    CLOCK(clk)
+    PARAM(clk.FREQ, 1000) // 1000 Hz
+    SOLVER(Solver)
+    PARAM(Solver.FREQ, 48000)
+    PARAM(Solver.ACCURACY, 1e-6)
 
     /* Wiring up the opamp */
 
@@ -33,12 +33,12 @@ NETLIST_START(opamp)
     /* The opamp model */
 
     NETDEV_VCCS(G1)
-    NETDEV_PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
-    NETDEV_R(RP1, 1000)
-    NETDEV_C(CP1, 1.59e-6)   // <== change to 1.59e-3 for 10Khz bandwidth
+    PARAM(G1.G, 100)  // typical OP-AMP amplification 100 * 1000 = 100000
+    RES(RP1, 1000)
+    CAP(CP1, 1.59e-6)   // <== change to 1.59e-3 for 10Khz bandwidth
     NETDEV_VCVS(EBUF)
-    NETDEV_PARAM(EBUF.RO, 50)
-    NETDEV_PARAM(EBUF.G, 1)
+    PARAM(EBUF.RO, 50)
+    PARAM(EBUF.G, 1)
 
     NET_ALIAS(PLUS, G1.IP) // Positive input
     NET_ALIAS(MINUS, G1.IN) // Negative input
@@ -55,6 +55,6 @@ NETLIST_START(opamp)
     NET_C(CP1.1, RP1.1)
     NET_C(EBUF.IP, RP1.1)
 
-    //NETDEV_LOG(logX, OUT)
-    //NETDEV_LOG(logY, 4V)
+    //LOG(logX, OUT)
+    //LOG(logY, 4V)
 NETLIST_END()

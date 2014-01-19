@@ -17,7 +17,7 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_SWITCH2(_name, _i1, _i2)                                             \
+#define SWITCH2(_name, _i1, _i2)                                             \
 		NET_REGISTER_DEV(switch2, _name)                                            \
 		NET_CONNECT(_name, i1, _i1)                                                 \
 		NET_CONNECT(_name, i2, _i2)
