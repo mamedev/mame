@@ -1592,7 +1592,7 @@ DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
 
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
-CONS( 1990, aes,    0,      0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", 0)
+CONS( 1990, aes,    0,      0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", GAME_SUPPORTS_SAVE )
 
 DRIVER_INIT_MEMBER(ng_aes_state,neocdz)
 {
