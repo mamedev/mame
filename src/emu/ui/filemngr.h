@@ -1,8 +1,8 @@
 /***************************************************************************
 
-    uiimage.h
+    ui/filemngr.h
 
-    Internal MAME user interface image.
+    MESS's clunky built-in file manager
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef __UIIMAGE_H__
-#define __UIIMAGE_H__
+#ifndef __UI_FILEMNGR_H__
+#define __UI_FILEMNGR_H__
 
 class ui_menu_image_info : public ui_menu {
 public:
@@ -33,19 +33,6 @@ public:
 	virtual void populate();
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
-};
-
-class ui_menu_mess_tape_control : public ui_menu {
-public:
-	ui_menu_mess_tape_control(running_machine &machine, render_container *container);
-	virtual ~ui_menu_mess_tape_control();
-	virtual void populate();
-	virtual void handle();
-
-private:
-	int index;
-	device_image_interface *device;
-	int cassette_count();
 };
 
 class ui_menu_mess_bitbanger_control : public ui_menu {
@@ -157,4 +144,4 @@ private:
 	int *result;
 };
 
-#endif  /* __UIIMAGE_H__ */
+#endif  /* __UI_FILEMNGR_H__ */

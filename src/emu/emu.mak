@@ -143,13 +143,14 @@ EMUOBJS = \
 	$(EMUOBJ)/timer.o \
 	$(EMUOBJ)/ui.o \
 	$(EMUOBJ)/uigfx.o \
-	$(EMUOBJ)/uiimage.o \
 	$(EMUOBJ)/uiinput.o \
 	$(EMUOBJ)/uiswlist.o \
 	$(EMUOBJ)/ui/menu.o \
 	$(EMUOBJ)/ui/mainmenu.o \
 	$(EMUOBJ)/ui/miscmenu.o \
 	$(EMUOBJ)/ui/selgame.o \
+	$(EMUOBJ)/ui/filemngr.o \
+	$(EMUOBJ)/ui/tapectrl.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
 	$(EMUOBJ)/debug/debugcmd.o \

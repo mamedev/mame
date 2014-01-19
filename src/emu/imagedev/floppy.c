@@ -9,7 +9,7 @@
 #include "zippath.h"
 #include "floppy.h"
 #include "formats/imageutl.h"
-#include "uiimage.h"
+#include "ui/filemngr.h"
 
 
 // device type definition
