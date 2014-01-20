@@ -79,10 +79,6 @@ public:
 	DECLARE_WRITE8_MEMBER(hiram_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(isa_memory_r);
-	DECLARE_WRITE8_MEMBER(isa_memory_w);
-	DECLARE_READ8_MEMBER(isa_io_r);
-	DECLARE_WRITE8_MEMBER(isa_io_w);
 
 	DECLARE_WRITE8_MEMBER(duart1_out);
 
@@ -110,7 +106,7 @@ private:
 	int m_kbit;
 };
 
-// AT keyboard interface - done in TTL instead of an 804x
+// XT keyboard interface - done in TTL instead of an 804x
 WRITE_LINE_MEMBER(pt68k4_state::keyboard_clock_w)
 {
 //	printf("KCLK: %d\n", state ? 1 : 0);
@@ -152,32 +148,12 @@ WRITE8_MEMBER(pt68k4_state::duart1_out)
 	m_speaker->level_w((data >> 3) & 1);
 }
 
-READ8_MEMBER(pt68k4_state::isa_memory_r)
-{
-	return m_isa->prog_r(space, offset);
-}
-
-WRITE8_MEMBER(pt68k4_state::isa_memory_w)
-{
-	m_isa->prog_w(space, offset, data);
-}
-
-READ8_MEMBER(pt68k4_state::isa_io_r)
-{
-	return m_isa->io_r(space, offset);
-}
-
-WRITE8_MEMBER(pt68k4_state::isa_io_w)
-{
-	m_isa->io_w(space, offset, data);
-}
-
 static ADDRESS_MAP_START(pt68k4_mem, AS_PROGRAM, 16, pt68k4_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("rambase") // 1MB RAM (OS9 needs more)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE8(isa_memory_r, isa_memory_w, 0x00ff)
-	AM_RANGE(0xfa0000, 0xfbffff) AM_READWRITE8(isa_io_r, isa_io_w, 0x00ff)
+	AM_RANGE(0xc00000, 0xdfffff) AM_DEVREADWRITE8(ISABUS_TAG, isa8_device, prog_r, prog_w, 0x00ff)
+	AM_RANGE(0xfa0000, 0xfbffff) AM_DEVREADWRITE8(ISABUS_TAG, isa8_device, io_r, io_w, 0x00ff)
 	AM_RANGE(0xfe0000, 0xfe001f) AM_DEVREADWRITE8(DUART1_TAG, duartn68681_device, read, write, 0x00ff)
 	AM_RANGE(0xfe0040, 0xfe005f) AM_DEVREADWRITE8(DUART2_TAG, duartn68681_device, read, write, 0x00ff)
 	AM_RANGE(0xfe01c0, 0xfe01c3) AM_READWRITE8(keyboard_r, keyboard_w, 0x00ff)
@@ -332,5 +308,5 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1990, pt68k4,  0,       0,     pt68k4,    pt68k4, driver_device, 0,  "Peripheral Technology", "PT68K4", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, pt68k4,  0,       0,     pt68k4,    pt68k4, driver_device, 0,  "Peripheral Technology", "PT68K4", GAME_NOT_WORKING )
 
