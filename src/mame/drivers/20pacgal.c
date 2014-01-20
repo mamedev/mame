@@ -396,7 +396,6 @@ static MACHINE_CONFIG_START( 20pacgal, _20pacgal_state )
 	MCFG_CPU_IO_MAP(20pacgal_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _20pacgal_state,  vblank_irq)
 
-
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
 	/* video hardware */
@@ -421,8 +420,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( 25pacman, 20pacgal, _25pacman_state )
 	MCFG_CPU_PROGRAM_MAP(25pacman_map)
 	MCFG_CPU_IO_MAP(25pacman_io_map)
 
-
-	MCFG_SST_39VF020_ADD("flash") // wrong type, should be AM29LV20
+	MCFG_SST_39VF020_ADD("flash") // wrong type, should be AM29LV200
 MACHINE_CONFIG_END
 
 
@@ -447,7 +445,7 @@ ROM_START( 25pacmano ) /* Revision 2.00 */
 ROM_END
 
 // guzuta v2.2 PCB
-// this uses the main FLASH rom to save things instead of eeprom (type is AM29LV20)
+// this uses the main FLASH rom to save things instead of eeprom (type is AM29LV200)
 // different memory map.. no palette rom
 ROM_START( 25pacman ) /* Revision 3.00 */
 	ROM_REGION( 0x40000, "flash", 0 )
