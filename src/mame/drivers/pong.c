@@ -837,7 +837,7 @@ MACHINE_CONFIG_END
 
 ROM_START( pong ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* enough for netlist */
-    ROM_LOAD( "pong.netlist", 0x000000, 0x004400, CRC(64edd5a0) SHA1(9e661f2fba44f46015fdccffa7766dd4e61cdc7d) )
+    ROM_LOAD( "pong.netlist", 0x000000, 0x0043d9, CRC(64edd5a0) SHA1(9e661f2fba44f46015fdccffa7766dd4e61cdc7d) )
 ROM_END
 
 ROM_START( pongf ) /* dummy to satisfy game entry*/
