@@ -50,9 +50,9 @@ public:
 		m_bank1(*this, "bank1") { }
 
 	/* devices */
-	required_device<m6809e_device> m_maincpu;
+	required_device<m6809_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	required_device<m6809e_device> m_videocpu;
+	required_device<m6809_base_device> m_videocpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;

@@ -619,7 +619,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( qix_base, qix_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* high interleave needed to ensure correct text in service mode */
@@ -650,7 +650,7 @@ static MACHINE_CONFIG_DERIVED( qix, qix_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kram3, qix )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", M6809E, MAIN_CLOCK_OSC/4)  /* 1.25 MHz */
 	MCFG_CPU_PROGRAM_MAP(kram3_main_map)
 	MCFG_M6809E_LIC_CB(WRITELINE(qix_state,kram3_lic_maincpu_changed))
 
