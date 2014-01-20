@@ -226,7 +226,12 @@ TIMER_CALLBACK_MEMBER( duartn68681_device::duart_timer_callback )
 		// Timer mode
 		half_period ^= 1;
 
-		// TODO: Set OP3
+		// timer output to bit 3?
+		if ((OPCR & 0xc) == 0x4)
+		{
+			OPR ^= 0x8; 
+			write_outport(OPR ^ 0xff);
+		}
 
 		if (!half_period)
 		{
@@ -265,11 +270,11 @@ READ8_MEMBER( duartn68681_device::read )
 
 		case 0x04: /* IPCR */
 		{
-			UINT8 IP = read_inport();
+			r = IPCR;
 
-			r = (((IP_last_state ^ IP) & 0x0f) << 4) | (IP & 0x0f);
-			IP_last_state = IP;
-			ISR &= ~INT_INPUT_PORT_CHANGE;
+			// reading this clears all the input change bits
+			IPCR &= 0x0f;
+			ISR &= ~INT_INPUT_PORT_CHANGE; 
 			update_interrupts();
 		}
 		break;
@@ -293,8 +298,8 @@ READ8_MEMBER( duartn68681_device::read )
 			break;
 
 		case 0x0d: /* IP */
-			r = read_inport();
-			break;
+			r = read_inport();	// TODO: go away
+			break; 
 
 		case 0x0e: /* Start counter command */
 		{
@@ -302,7 +307,6 @@ READ8_MEMBER( duartn68681_device::read )
 			{
 				// Reset the timer
 				half_period = 0;
-				// TODO: Set OP3 to 1
 			}
 
 			int count = MAX(CTR.w.l, 1);
@@ -357,7 +361,6 @@ WRITE8_MEMBER( duartn68681_device::write )
 					UINT16 count = MAX(CTR.w.l, 1);
 					half_period = 0;
 
-					// TODO: Set OP3
 					duart68681_start_ct(count);
 				}
 				else
@@ -367,9 +370,15 @@ WRITE8_MEMBER( duartn68681_device::write )
 				}
 			}
 
+			// check for pending input port delta interrupts
+			if ((((IPCR>>4) & data) & 0x0f) != 0)
+			{
+				ISR |= INT_INPUT_PORT_CHANGE; 
+			}
+
 			m_chanA->ACR_updated();
 			m_chanB->ACR_updated();
-			m_chanA->update_interrupts(); // need to add ACR checking for IP delta ints
+			m_chanA->update_interrupts();
 			m_chanB->update_interrupts();
 			update_interrupts();
 			break;
@@ -399,7 +408,7 @@ WRITE8_MEMBER( duartn68681_device::write )
 			break;
 
 		case 0x0d: /* OPCR */
-			if (data != 0x00)
+			if ((data != 0x00) && ((data & 0xc) != 0x4))
 				logerror( "68681 (%s): Unhandled OPCR value: %02x\n", tag(), data);
 			OPCR = data;
 			break;
@@ -414,6 +423,100 @@ WRITE8_MEMBER( duartn68681_device::write )
 			write_outport(OPR ^ 0xff);
 			break;
 	}
+}
+
+WRITE_LINE_MEMBER( duartn68681_device::ip0_w )
+{
+	UINT8 newIP = (IP_last_state & ~0x01) | (state == ASSERT_LINE) ? 1 : 0;
+
+	if (newIP != IP_last_state)
+	{
+		IPCR &= ~0x0f;
+		IPCR |= (newIP & 0x0f);
+		IPCR |= 0x10;
+
+		if (ACR & 1)
+		{
+			ISR |= INT_INPUT_PORT_CHANGE; 
+			update_interrupts();
+		}
+	}
+
+	IP_last_state = newIP;
+}
+
+WRITE_LINE_MEMBER( duartn68681_device::ip1_w )
+{
+	UINT8 newIP = (IP_last_state & ~0x02) | (state == ASSERT_LINE) ? 2 : 0;
+
+	if (newIP != IP_last_state)
+	{
+		IPCR &= ~0x0f;
+		IPCR |= (newIP & 0x0f);
+		IPCR |= 0x20;
+
+		if (ACR & 2)
+		{
+			ISR |= INT_INPUT_PORT_CHANGE; 
+			update_interrupts();
+		}
+	}
+
+	IP_last_state = newIP;
+}
+
+WRITE_LINE_MEMBER( duartn68681_device::ip2_w )
+{
+	UINT8 newIP = (IP_last_state & ~0x04) | (state == ASSERT_LINE) ? 4 : 0;
+
+	if (newIP != IP_last_state)
+	{
+		IPCR &= ~0x0f;
+		IPCR |= (newIP & 0x0f);
+		IPCR |= 0x40;
+
+		if (ACR & 4)
+		{
+			ISR |= INT_INPUT_PORT_CHANGE; 
+			update_interrupts();
+		}
+	}
+
+	IP_last_state = newIP;
+}
+
+WRITE_LINE_MEMBER( duartn68681_device::ip3_w )
+{
+	UINT8 newIP = (IP_last_state & ~0x08) | (state == ASSERT_LINE) ? 8 : 0;
+
+	if (newIP != IP_last_state)
+	{
+		IPCR &= ~0x0f;
+		IPCR |= (newIP & 0x0f);
+		IPCR |= 0x80;
+
+		if (ACR & 8)
+		{
+			ISR |= INT_INPUT_PORT_CHANGE; 
+			update_interrupts();
+		}
+	}
+
+	IP_last_state = newIP;
+}
+
+WRITE_LINE_MEMBER( duartn68681_device::ip4_w )
+{
+	UINT8 newIP = (IP_last_state & ~0x10) | (state == ASSERT_LINE) ? 0x10 : 0;
+// TODO: special mode for ip4
+	IP_last_state = newIP;
+}
+
+WRITE_LINE_MEMBER( duartn68681_device::ip5_w )
+{
+	UINT8 newIP = (IP_last_state & ~0x20) | (state == ASSERT_LINE) ? 0x20 : 0;
+// TODO: special mode for ip5
+	IP_last_state = newIP;
 }
 
 duart68681_channel *duartn68681_device::get_channel(int chan)

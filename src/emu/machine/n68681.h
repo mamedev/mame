@@ -125,6 +125,14 @@ public:
 	devcb2_write8 write_outport;
 	INT32 ip3clk, ip4clk, ip5clk, ip6clk;
 
+	// new-style push handlers for input port bits
+	DECLARE_WRITE_LINE_MEMBER( ip0_w );
+	DECLARE_WRITE_LINE_MEMBER( ip1_w );
+	DECLARE_WRITE_LINE_MEMBER( ip2_w );
+	DECLARE_WRITE_LINE_MEMBER( ip3_w );
+	DECLARE_WRITE_LINE_MEMBER( ip4_w );
+	DECLARE_WRITE_LINE_MEMBER( ip5_w );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -142,6 +150,7 @@ private:
 	UINT8 OPCR; /* Output Port Conf. Register */
 	UINT8 OPR;  /* Output Port Register */
 	PAIR  CTR;  /* Counter/Timer Preset Value */
+	UINT8 IPCR; /* Input Port Control Register */
 
 	/* state */
 	UINT8 IP_last_state; /* last state of IP bits */
