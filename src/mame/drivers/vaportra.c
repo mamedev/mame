@@ -15,7 +15,6 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/vaportra.h"
-#include "video/decmxc06.h"
 
 /******************************************************************************/
 

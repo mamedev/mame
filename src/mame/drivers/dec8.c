@@ -49,7 +49,6 @@ To do:
 #include "sound/3526intf.h"
 #include "sound/msm5205.h"
 #include "includes/dec8.h"
-#include "video/decmxc06.h"
 #include "video/deckarn.h"
 #include "machine/deco222.h"
 
@@ -2325,7 +2324,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2417,7 +2416,7 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,3,3,0);
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
 	deco_mxc06_device::set_gfx_region(*device, 1);
 
 

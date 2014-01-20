@@ -84,6 +84,19 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 		if (sy >= 256) sy -= 512;
 		sx = 240 - sx;
 		sy = 240 - sy;
+		
+		// maybe, birdie try appears to specify the base code for each part..
+		code = spriteram[offs + 1] & 0x1fff;
+
+		code &= ~(h-1);
+
+		if (flipy)
+			incy = -1;
+		else
+			{
+				code += h-1;
+				incy = 1;
+			}
 
 
 		if (machine.driver_data()->flip_screen())
@@ -99,19 +112,6 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 
 		for (x = 0; x < w; x++)
 		{
-			// maybe, birdie try appears to specify the base code for each part..
-			code = spriteram[offs + 1] & 0x1fff;
-
-			code &= ~(h-1);
-
-			if (flipy)
-				incy = -1;
-			else
-			{
-				code += h-1;
-				incy = 1;
-			}
-
 			for (y = 0; y < h; y++)
 			{
 				if (spriteram[offs] & 0x8000)

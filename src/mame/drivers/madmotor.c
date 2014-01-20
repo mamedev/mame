@@ -19,7 +19,7 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/madmotor.h"
-#include "video/decmxc06.h"
+
 
 /******************************************************************************/
 
