@@ -845,5 +845,5 @@ ROM_START( pongf ) /* dummy to satisfy game entry*/
 ROM_END
 
 
-GAME( 1972, pong,  0, pong, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E)", GAME_SUPPORTS_SAVE )
-GAME( 1972, pongf,  0, pongf, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E), no subcycles", GAME_SUPPORTS_SAVE )
+GAME( 1972, pong,  0, pong, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E) external", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING)
+GAME( 1972, pongf,  0, pongf, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E)", GAME_SUPPORTS_SAVE )
