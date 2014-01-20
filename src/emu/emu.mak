@@ -144,12 +144,15 @@ EMUOBJS = \
 	$(EMUOBJ)/ui.o \
 	$(EMUOBJ)/uigfx.o \
 	$(EMUOBJ)/uiinput.o \
-	$(EMUOBJ)/uiswlist.o \
+	$(EMUOBJ)/ui/swlist.o \
 	$(EMUOBJ)/ui/menu.o \
 	$(EMUOBJ)/ui/mainmenu.o \
 	$(EMUOBJ)/ui/miscmenu.o \
 	$(EMUOBJ)/ui/selgame.o \
 	$(EMUOBJ)/ui/filemngr.o \
+	$(EMUOBJ)/ui/filesel.o \
+	$(EMUOBJ)/ui/imginfo.o \
+	$(EMUOBJ)/ui/bbcontrl.o \
 	$(EMUOBJ)/ui/tapectrl.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \

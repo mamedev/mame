@@ -13,8 +13,8 @@
 #include "drivenum.h"
 #include "ui.h"
 #include "zippath.h"
-#include "ui/filemngr.h"
-#include "uiswlist.h"
+#include "ui/filesel.h"
+#include "ui/swlist.h"
 
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE

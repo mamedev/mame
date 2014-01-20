@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    uiswlist.c
+    ui/swlist.c
 
     Internal MAME user interface for software list.
 
@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "ui.h"
-#include "uiswlist.h"
+#include "ui/swlist.h"
 
 
 /***************************************************************************

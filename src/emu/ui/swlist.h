@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    uiswlist.h
+    ui/swlist.h
 
     Internal MAME user interface for software list.
 
@@ -9,8 +9,8 @@
 
 ***************************************************************************/
 
-#ifndef __UISWLIST_H__
-#define __UISWLIST_H__
+#ifndef __UI_SWLIST_H__
+#define __UI_SWLIST_H__
 
 class ui_menu_software_parts : public ui_menu {
 public:
@@ -71,4 +71,4 @@ private:
 	const software_list_device **result;
 };
 
-#endif  /* __UISWLIST_H__ */
+#endif  /* __UI_SWLIST_H__ */
