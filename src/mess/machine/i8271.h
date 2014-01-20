@@ -98,8 +98,8 @@ private:
 	unsigned long m_HeadLoadTime;
 
 	/* id on disc to find */
-	int m_ID_C;
-	int m_ID_H;
+	//int m_ID_C;
+	//int m_ID_H;
 	int m_ID_R;
 	int m_ID_N;
 
@@ -114,7 +114,7 @@ private:
 	int m_Counter;
 
 	/* ==0, to cpu, !=0 =from cpu */
-	int m_data_direction;
+	//int m_data_direction;
 
 	emu_timer *m_data_timer;
 	emu_timer *m_command_complete_timer;

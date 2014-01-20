@@ -118,15 +118,15 @@ i8271_device::i8271_device(const machine_config &mconfig, const char *tag, devic
 	m_HeadSettlingTime(0),
 	m_IndexCountBeforeHeadUnload(0),
 	m_HeadLoadTime(0),
-	m_ID_C(0),
-	m_ID_H(0),
+	//m_ID_C(0),
+	//m_ID_H(0),
 	m_ID_R(0),
 	m_ID_N(0),
 	m_data_id(0),
 	m_ExecutionPhaseTransferCount(0),
 	m_ExecutionPhaseCount(0),
-	m_Counter(0),
-	m_data_direction(0)
+	m_Counter(0)
+	//m_data_direction(0)
 {
 	for (int i = 0; i < 8; i++ )
 	{
