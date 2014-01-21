@@ -1222,6 +1222,11 @@ iqunlim  // 199? IQ Unlimited (680x0)
 iqunlimz  // 1991 IQ Unlimited (Z80)
 gl3000s  // 199? Genius GL3000S
 glmmc  // 199? Genius Master Mega Color
+gl4004 // Genius Leader 4004 Quadro L (Germany)
+gl5000 // Genius Leader 5000 (Germany)
+gl5005x // Genius Leader 5005X (Germany)
+gl6000sl // Genius Leader 6000SL (Germany)
+
 
 // Tangerine
 microtan  // 1979 Microtan 65

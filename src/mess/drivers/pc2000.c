@@ -620,6 +620,46 @@ ROM_START( gl2000p )
 	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
+ROM_START( gl3000s )
+	ROM_REGION(0x40000, "bios", 0)
+	ROM_LOAD( "27-5713-00.bin", 0x000000, 0x040000, CRC(18b113e0) SHA1(27a12893c38068efa35a99fa97a260dbfbd497e3) )
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+ROM_END
+
+ROM_START( gl4004 )
+	ROM_REGION(0x80000, "bios", 0)
+	ROM_LOAD( "27-5762-00.u2", 0x000000, 0x080000, CRC(fb242f0f) SHA1(aae1beeb94873e29920726ad35475641d9f1e94e) )
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+ROM_END
+
+ROM_START( gl5000 )
+	ROM_REGION(0x80000, "bios", 0)
+	ROM_LOAD( "27-5912-00.u1", 0x000000, 0x080000, CRC(9fe4c04a) SHA1(823d1d46e49e21f921260296874bc3ee5f718a5f) )
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+ROM_END
+
+ROM_START( gl5005x )
+	ROM_REGION(0x200000, "bios", 0)
+	ROM_LOAD( "27-6426-00.u1", 0x000000, 0x200000, CRC(adde3581) SHA1(80f2bde7c5c339534614f24a9ca6ea362ee2f816) )
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+ROM_END
+
+ROM_START( gl6000sl )
+	ROM_REGION(0x80000, "bios", 0)
+	ROM_LOAD( "27-5894-01",   0x000000, 0x080000, CRC(7336231c) SHA1(35a1f739994b5c8fb67a7f76d423e50d8154e9ea) )
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
+ROM_END
+
 ROM_START( gln ) // not Z80 code
 	ROM_REGION( 0x80000, "bios", 0 )
 	ROM_LOAD( "27-5308-00_9524_d.bin", 0x000000, 0x080000, CRC(d1b994ee) SHA1(b5cf0810df0676712e4f30e279cc46c19b4277dd))
@@ -649,5 +689,10 @@ COMP( 1988, misterx,  0,       0,     misterx,   pc1000, driver_device,   0,  "V
 COMP( 1993, pc2000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "PreComputer 2000", GAME_NOT_WORKING)
 COMP( 1993, gl2000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000", GAME_NOT_WORKING)
 COMP( 1993, gl2000p,  gl2000,  0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000 Plus", GAME_NOT_WORKING)
+COMP( 19??, gl3000s,  0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 3000S (Germany)", GAME_IS_SKELETON)
+COMP( 19??, gl4004,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 4004 Quadro L (Germany)", GAME_IS_SKELETON)
+COMP( 19??, gl5000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 5000 (Germany)", GAME_IS_SKELETON)
+COMP( 19??, gl5005x,  0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 5005X (Germany)", GAME_IS_SKELETON)
+COMP( 19??, gl6000sl, 0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 6000SL (Germany)", GAME_IS_SKELETON)
 COMP( 199?, gln,      0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader Notebook", GAME_NOT_WORKING)
 COMP( 1991, iqunlimz, gl2000,  0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "IQ Unlimited (Z80)", GAME_NOT_WORKING)
