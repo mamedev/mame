@@ -32,7 +32,7 @@ const char *g64_format::extensions() const
 	return "g64,g41,g71";
 }
 
-const UINT32 g64_format::cell_size[] =
+const UINT32 g64_format::c1541_cell_size[] =
 {
 	4000, // 16MHz/16/4
 	3750, // 16MHz/15/4

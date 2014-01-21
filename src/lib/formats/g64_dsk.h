@@ -38,7 +38,7 @@ protected:
 		MASTERING = 0x2ac
 	};
 
-	static const UINT32 cell_size[];
+	static const UINT32 c1541_cell_size[];
 };
 
 extern const floppy_format_type FLOPPY_G64_FORMAT;
