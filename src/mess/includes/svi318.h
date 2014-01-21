@@ -9,6 +9,7 @@
 #ifndef SVI318_H_
 #define SVI318_H_
 
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
@@ -113,7 +114,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svi318_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(svi318_cart);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<dac_device> m_dac;

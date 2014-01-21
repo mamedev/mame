@@ -2895,7 +2895,7 @@ void amstrad_state::amstrad_common_init()
 
 	/* Using the cool code Juergen has provided, I will override
 	the timing tables with the values for the amstrad */
-	z80_set_cycle_tables(m_maincpu,
+	m_maincpu->z80_set_cycle_tables(
 		(const UINT8*)amstrad_cycle_table_op,
 		(const UINT8*)amstrad_cycle_table_cb,
 		(const UINT8*)amstrad_cycle_table_ed,

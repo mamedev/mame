@@ -364,7 +364,7 @@ void system1_state::machine_start()
 		membank("bank1")->configure_entry(0, memregion("maincpu")->base() + 0x8000);
 	membank("bank1")->set_entry(0);
 
-	z80_set_cycle_tables(m_maincpu, cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
+	m_maincpu->z80_set_cycle_tables(cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
 
 	m_mute_xor = 0x00;
 

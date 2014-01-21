@@ -1,3 +1,4 @@
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 
 class system1_state : public driver_device
@@ -123,7 +124,7 @@ public:
 	void bank44_custom_w(UINT8 data, UINT8 prevdata);
 	void bank0c_custom_w(UINT8 data, UINT8 prevdata);
 	void dakkochn_custom_w(UINT8 data, UINT8 prevdata);
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_mcu;
 };

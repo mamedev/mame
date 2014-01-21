@@ -7,6 +7,7 @@
 #ifndef AMSTRAD_H_
 #define AMSTRAD_H_
 
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/upd765.h"
 #include "video/mc6845.h"
@@ -147,7 +148,7 @@ public:
 		m_io_analog3(*this, "analog3"),
 		m_io_analog4(*this, "analog4") { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ay8910_device> m_ay;
 	optional_device<upd765_family_device> m_fdc;  // not on a GX4000
 	required_device<mc6845_device> m_crtc;
