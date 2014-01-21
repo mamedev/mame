@@ -7164,6 +7164,7 @@ src/mess/drivers/msx.c svneol=native#text/plain
 src/mess/drivers/mtx.c svneol=native#text/plain
 src/mess/drivers/multi16.c svneol=native#text/plain
 src/mess/drivers/multi8.c svneol=native#text/plain
+src/mess/drivers/mx2178.c svneol=native#text/plain
 src/mess/drivers/myb3k.c svneol=native#text/plain
 src/mess/drivers/mycom.c svneol=native#text/plain
 src/mess/drivers/myvision.c svneol=native#text/plain
