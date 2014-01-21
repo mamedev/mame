@@ -14,7 +14,7 @@
 
 pblockpool pstring::m_pool;
 
-pstring::str_t *pstring::m_zero = NULL;
+pstring::str_t pstring::m_zero;
 
 /*
  * Uncomment the following to override defaults
@@ -155,7 +155,7 @@ pstring pstring::vprintf(va_list args) const
 void pstring::sfree(str_t *s)
 {
 	s->m_ref_count--;
-	if (s->m_ref_count == 0)
+	if (s->m_ref_count == 0 && s != &m_zero)
 		m_pool.dealloc(s);
 }
 
@@ -178,9 +178,6 @@ pstring pstring::sprintf(const char *format, ...)
 void pstring::resetmem()
 {
 	// Release the 0 string
-	if (m_zero != NULL)
-		sfree(m_zero);
-	m_zero = NULL;
 	m_pool.m_shutdown = true;
 	m_pool.resetmem();
 }
