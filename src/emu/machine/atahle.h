@@ -64,8 +64,8 @@ protected:
 	virtual bool is_ready() = 0;
 	virtual void perform_diagnostic() = 0;
 	virtual void signature() = 0;
-	virtual UINT16 read_data(UINT16 mem_mask);
-	virtual void write_data(UINT16 data, UINT16 mem_mask);
+	virtual UINT16 read_data();
+	virtual void write_data(UINT16 data);
 
 	int bit_to_mode(UINT16 word);
 	int single_word_dma_mode();
@@ -133,8 +133,10 @@ protected:
 
 	enum
 	{
+		IDE_SET_FEATURES_ENABLE_8BIT_DATA_TRANSFERS = 0x01,
 		IDE_SET_FEATURES_TRANSFER_MODE = 0x03,
 		IDE_SET_FEATURES_DISABLE_REVERTING_TO_POWER_ON_DEFAULTS = 0x66,
+		IDE_SET_FEATURES_DISABLE_8BIT_DATA_TRANSFERS = 0x81,
 		IDE_SET_FEATURES_ENABLE_REVERTING_TO_POWER_ON_DEFAULTS = 0xcc
 	};
 
@@ -188,6 +190,7 @@ protected:
 
 	UINT16 m_identify_buffer[256];
 	bool m_revert_to_defaults;
+	bool m_8bit_data_transfers;
 
 private:
 	void update_irq();
