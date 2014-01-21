@@ -45,7 +45,7 @@ public:
 			m_io_extra(*this, "EXTRA")
 	{ }
 
-	required_device<legacy_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<intel_e28f008sa_device> m_flash0;
 	required_device<intel_e28f008sa_device> m_flash1;
 	required_device<pc_fdc_superio_device> m_fdc;

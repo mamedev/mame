@@ -100,7 +100,7 @@ public:
 			m_caps_lock(1)
 	{ }
 
-	required_device<legacy_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<m8502_device> m_subcpu;
 	required_device<mos8722_device> m_mmu;
 	required_device<mos8721_device> m_pla;
