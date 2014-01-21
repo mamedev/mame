@@ -62,7 +62,7 @@ void epic12_device::set_is_unsafe(device_t &device, int is_unsafe)
 
 }
 
-void epic12_device::set_cpu_device(device_t &device, legacy_cpu_device* maincpu)
+void epic12_device::set_cpu_device(device_t &device, cpu_device* maincpu)
 {
 	epic12_device &dev = downcast<epic12_device &>(device);
 	dev.m_maincpu = maincpu;

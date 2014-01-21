@@ -189,7 +189,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		cv1k_ram(*this, "mainram") { }
 
-	required_device<legacy_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<epic12_device> m_blitter;
 	required_device<serflash_device> m_serflash;
 	required_device<rtc9701_device> m_eeprom;

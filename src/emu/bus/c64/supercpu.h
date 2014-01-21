@@ -50,7 +50,7 @@ protected:
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw);
 
 private:
-	required_device<legacy_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<c64_expansion_slot_device> m_exp;
 
 	required_shared_ptr<UINT8> m_sram;

@@ -993,7 +993,7 @@ static void curthread_command(running_machine &machine, int ref, int params, con
 	offs_t address;
 	cpuinfo cpu_info;
 
-	CPU_GET_INFO_NAME(i386)((legacy_cpu_device *)machine.firstcpu,CPUINFO_INT_REGISTER + 44,&cpu_info);
+	fsbase = machine.firstcpu->state_int(44);
 	fsbase=cpu_info.i;
 	address=(offs_t)fsbase+0x28;
 	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&address))
