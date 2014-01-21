@@ -24,11 +24,21 @@ public:
 
 	virtual int identify(io_generic *io, UINT32 form_factor);
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	virtual bool save(io_generic *io, floppy_image *image);
 	virtual bool supports_save() const;
 
 protected:
-	static const UINT32 c1541_cell_size[];
+	enum
+	{
+		SIGNATURE = 0x0,
+		VERSION = 0x8,
+		TRACK_COUNT = 0x9,
+		MAX_TRACK_SIZE = 0xa,
+		TRACK_OFFSET = 0xc,
+		SPEED_ZONE = 0x15c,
+		MASTERING = 0x2ac
+	};
+
+	static const UINT32 cell_size[];
 };
 
 extern const floppy_format_type FLOPPY_G64_FORMAT;
