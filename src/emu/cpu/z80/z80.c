@@ -3716,16 +3716,16 @@ void z80_device::z80_set_cycle_tables(const UINT8 *op, const UINT8 *cb, const UI
 
 
 z80_device::z80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	cpu_device(mconfig, Z80, "Zilog Z-80", tag, owner, clock, "z80", __FILE__),
+	cpu_device(mconfig, Z80, "Z80", tag, owner, clock, "z80", __FILE__),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
-	m_io_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
+	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 {
 }
 
 z80_device::z80_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0),
-	m_io_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
+	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 {
 }
 

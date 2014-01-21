@@ -51,6 +51,7 @@ protected:
 	virtual UINT32 execute_min_cycles() const { return 2; }
 	virtual UINT32 execute_max_cycles() const { return 16; }
 	virtual UINT32 execute_input_lines() const { return 4; }
+	virtual UINT32 execute_default_irq_vector() const { return 0xff; }
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
 
@@ -63,7 +64,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
+	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
