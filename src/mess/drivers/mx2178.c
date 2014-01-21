@@ -1,4 +1,4 @@
-/***************************************************************************
+/***************************************************************************************************
 
     Skeleton driver for Memorex 2178
 
@@ -7,14 +7,21 @@
     There is a large piezo-beeper.
 
     TODO:
-    - Everything - this is just a skeleton
+    - Connect up the beeper
+    - RS232 not working (6850 parameters are /64, 8 bit, 2 stop bit, IRQ when key pressed)
+    - Unknown port i/o 80
+    - Unknown memory i/o C000, 4000
+    - Need schematic / tech manual
+    - Gets stuck waiting for E011 to become zero somehow. If you skip that, a status line appears.
+    - Doesn't seem to be any dips, looks like all settings and modes are controlled by keystrokes.
 
-
-****************************************************************************/
+***************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
+#include "machine/6850acia.h"
+#include "machine/serial.h"
 #include "machine/keyboard.h"
 
 
@@ -49,6 +56,8 @@ static ADDRESS_MAP_START(mx2178_io, AS_IO, 8, mx2178_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	//AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("acia", acia6850_device, status_read, control_write)
+	//AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("acia", acia6850_device, data_read, data_write)
 	AM_RANGE(0xa0, 0xa1) AM_READ(keyin_r)
 ADDRESS_MAP_END
 
@@ -66,12 +75,13 @@ READ8_MEMBER( mx2178_state::keyin_r )
 		return ret;
 	}
 	else
-		return (m_term_data) ? 1 : 0;
+		return (m_term_data) ? 0x83 : 0x82;
 }
 
 WRITE8_MEMBER( mx2178_state::kbd_put )
 {
 	m_term_data = data;
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
@@ -79,32 +89,44 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 	DEVCB_DRIVER_MEMBER(mx2178_state, kbd_put)
 };
 
+//-------------------------------------------------
+//  ACIA6850_INTERFACE( acia0_intf )
+//-------------------------------------------------
+
+static ACIA6850_INTERFACE( acia_intf )
+{
+	614400,
+	614400,
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)
+};
+
 static MC6845_UPDATE_ROW( update_row )
 {
 	mx2178_state *state = device->machine().driver_data<mx2178_state>();
 	const rgb_t *pens = palette_entry_list_raw(bitmap.palette());
-	UINT8 chr,gfx,fg=1,inv;
+	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
-		inv = (x == cursor_x) ? 0xff : 0;
 		mem = (ma + x) & 0x7ff;
 		chr = state->m_p_videoram[mem];
 
 		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_chargen[(chr<<4) | ra] ^ inv;
+		gfx = state->m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = pens[BIT(gfx, 7) ? fg : 0];
-		*p++ = pens[BIT(gfx, 6) ? fg : 0];
-		*p++ = pens[BIT(gfx, 5) ? fg : 0];
-		*p++ = pens[BIT(gfx, 4) ? fg : 0];
-		*p++ = pens[BIT(gfx, 3) ? fg : 0];
-		*p++ = pens[BIT(gfx, 2) ? fg : 0];
-		*p++ = pens[BIT(gfx, 1) ? fg : 0];
-		*p++ = pens[BIT(gfx, 0) ? fg : 0];
+		*p++ = pens[BIT(gfx, 7)];
+		*p++ = pens[BIT(gfx, 6)];
+		*p++ = pens[BIT(gfx, 5)];
+		*p++ = pens[BIT(gfx, 4)];
+		*p++ = pens[BIT(gfx, 3)];
+		*p++ = pens[BIT(gfx, 2)];
+		*p++ = pens[BIT(gfx, 1)];
+		*p++ = pens[BIT(gfx, 0)];
 	}
 }
 
@@ -151,7 +173,6 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	MCFG_CPU_ADD("maincpu", Z80, 18869600/5) // guess
 	MCFG_CPU_PROGRAM_MAP(mx2178_mem)
 	MCFG_CPU_IO_MAP(mx2178_io)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", mx2178_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -162,11 +183,16 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_GFXDECODE(mx2178)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
+	MCFG_PALETTE_INIT_OVERRIDE(driver_device, monochrome_green)
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 18869600 / 8, crtc_interface) // clk unknown
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	//MCFG_ACIA6850_ADD("acia", acia_intf)
+	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	//MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
+	//MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
+	//MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -181,4 +207,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 19??, mx2178, 0,      0,       mx2178,    mx2178, driver_device,  0,  "Memorex", "Memorex 2178", GAME_IS_SKELETON )
+COMP( 1984, mx2178, 0,      0,       mx2178,    mx2178, driver_device,  0,  "Memorex", "Memorex 2178", GAME_IS_SKELETON )
