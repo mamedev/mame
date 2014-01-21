@@ -101,8 +101,17 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 
 		if (machine.driver_data()->flip_screen())
 		{
-			sy = 240 - sy;
-			sx = 240 - sx;
+			 // workaround till all drivers using this device are updated to raw params
+			if (cliprect.max_x == 32*8-1) //actfancr.c, madmotor.c, stadhero.c and vaportra.c
+			{ 
+				sy = 240 - sy;
+				sx = 240 - sx;
+			}
+			else // dec0.c and dec8.c have been updated to raw params
+			{
+				sy = 240 + 8 - sy;
+				sx = 240 + 74 - sx;
+			}
 			if (flipx) flipx = 0; else flipx = 1;
 			if (flipy) flipy = 0; else flipy = 1;
 			mult = 16;
