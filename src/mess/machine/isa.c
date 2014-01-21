@@ -238,10 +238,10 @@ void isa8_device::device_start()
 
 	if (m_allocspaces)
 	{
-		// use our 8-bit spaces. isa16_device::device_start will override if 16-bit.
 		m_iospace = &space(AS_IO);
 		m_prgspace = &space(AS_PROGRAM);
-		m_iowidth = m_prgwidth = 8;
+		m_iowidth = m_iospace->data_width();
+		m_prgwidth = m_prgspace->data_width();
 	}
 	else	// use host CPU's program and I/O spaces directly
 	{
@@ -645,14 +645,6 @@ void isa16_device::device_start()
 	m_out_drq5_func.resolve(m_out_drq5_cb, *this);
 	m_out_drq6_func.resolve(m_out_drq6_cb, *this);
 	m_out_drq7_func.resolve(m_out_drq7_cb, *this);
-
-	// use 16-bit spaces for ISA16
-	if (m_allocspaces)
-	{
-		m_iospace = &space(AS_IO);
-		m_prgspace = &space(AS_PROGRAM);
-		m_iowidth = m_prgwidth = 16;
-	}
 }
 
 void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)

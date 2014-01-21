@@ -155,7 +155,18 @@ public:
 	static void static_set_custom_spaces(device_t &device);
 	template<class _iochck> void set_iochck_callback(_iochck iochck) { m_write_iochck.set_callback(iochck); }
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const { return (spacenum == AS_PROGRAM) ? &m_program_config : &m_io_config; }
+	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const 
+	{ 
+		switch (spacenum)
+		{
+			case AS_PROGRAM: return &m_program_config;
+			case AS_IO:		 return &m_io_config;
+			case AS_DATA:  	 return &m_program16_config;
+			case AS_3:		 return &m_io16_config;
+			default:		 fatalerror("isa: invalid memory space!\n");
+		}
+	}
 
 	ATTR_DEPRECATED void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
@@ -323,8 +334,18 @@ public:
 
 	void install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
 
-	// for ISA16, return the 16-bit configs instead
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const { return (spacenum == AS_PROGRAM) ? &m_program16_config : &m_io16_config; }
+	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const 
+	{ 
+		switch (spacenum)
+		{
+			case AS_PROGRAM: return &m_program16_config;
+			case AS_IO:		 return &m_io16_config;
+			case AS_DATA:	 return &m_program_config;
+			case AS_3:		 return &m_io_config;
+			default:		 fatalerror("isa: invalid memory space!\n");
+		}
+	}
 
 	DECLARE_WRITE_LINE_MEMBER( irq10_w );
 	DECLARE_WRITE_LINE_MEMBER( irq11_w );
