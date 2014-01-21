@@ -1058,7 +1058,6 @@ src/emu/cpu/g65816/g65816op.h svneol=native#text/plain
 src/emu/cpu/h6280/6280dasm.c svneol=native#text/plain
 src/emu/cpu/h6280/h6280.c svneol=native#text/plain
 src/emu/cpu/h6280/h6280.h svneol=native#text/plain
-src/emu/cpu/h6280/h6280ops.h svneol=native#text/plain
 src/emu/cpu/h83002/h8.h svneol=native#text/plain
 src/emu/cpu/h83002/h8_16.c svneol=native#text/plain
 src/emu/cpu/h83002/h8_8.c svneol=native#text/plain

@@ -15,6 +15,11 @@
 #ifndef __H6280_H__
 #define __H6280_H__
 
+#include "emu.h"
+
+#pragma push_macro("BIT")
+#undef BIT
+
 #define LAZY_FLAGS  0
 
 /***************************************************************************
@@ -85,7 +90,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
 
 	// device_disasm_interface overrides
@@ -177,6 +182,144 @@ protected:
 
 	PROTOTYPES(op);
 
+	UINT32 TRANSLATED(UINT16 addr);
+	void H6280_CYCLES(int cyc);
+	void SET_NZ(UINT8 n);
+	void CLEAR_T();
+	void DO_INTERRUPT(UINT16 vector);
+	void CHECK_AND_TAKE_IRQ_LINES();
+	void CHECK_IRQ_LINES();
+	void CHECK_VDC_VCE_PENALTY(UINT16 addr);
+	void BRA(bool cond);
+	void EA_ZPG();
+	void EA_TFLG();
+	void EA_ZPX();
+	void EA_ZPY();
+	void EA_ABS();
+	void EA_ABX();
+	void EA_ABY();
+	void EA_ZPI();
+	void EA_IDX();
+	void EA_IDY();
+	void EA_IND();
+	void EA_IAX();
+	UINT8 RD_IMM();
+	UINT8 RD_ZPG();
+	UINT8 RD_ZPX();
+	UINT8 RD_ZPY();
+	UINT8 RD_ABS();
+	UINT8 RD_ABX();
+	UINT8 RD_ABY();
+	UINT8 RD_ZPI();
+	UINT8 RD_IDX();
+	UINT8 RD_IDY();
+	UINT8 RD_TFL();
+	void WR_ZPG(UINT8 tmp);
+	void WR_ZPX(UINT8 tmp);
+	void WR_ZPY(UINT8 tmp);
+	void WR_ABS(UINT8 tmp);
+	void WR_ABX(UINT8 tmp);
+	void WR_ABY(UINT8 tmp);
+	void WR_ZPI(UINT8 tmp);
+	void WR_IDX(UINT8 tmp);
+	void WR_IDY(UINT8 tmp);
+	void WB_EA(UINT8 tmp);
+	void WB_EAZ(UINT8 tmp);
+	void COMPOSE_P(UINT8 SET, UINT8 CLR);
+	void TADC(UINT8 tmp);
+	void ADC(UINT8 tmp);
+	void TAND(UINT8 tmp);
+	void AND(UINT8 tmp);
+	UINT8 ASL(UINT8 tmp);
+	void BBR(int bit, UINT8 tmp);
+	void BBS(int bit, UINT8 tmp);
+	void BCC();
+	void BCS();
+	void BEQ();
+	void BIT(UINT8 tmp);
+	void BMI();
+	void BNE();
+	void BPL();
+	void BRK();
+	void BSR();
+	void BVC();
+	void BVS();
+	void CLA();
+	void CLC();
+	void CLD();
+	void CLI();
+	void CLV();
+	void CLX();
+	void CLY();
+	void CMP(UINT8 tmp);
+	void CPX(UINT8 tmp);
+	void CPY(UINT8 tmp);
+	UINT8 DEC(UINT8 tmp);
+	void DEX();
+	void DEY();
+	void TEOR(UINT8 tmp);
+	void EOR(UINT8 tmp);
+	UINT8 INC(UINT8 tmp);
+	void INX();
+	void INY();
+	void JMP();
+	void JSR();
+	void LDA(UINT8 tmp);
+	void LDX(UINT8 tmp);
+	void LDY(UINT8 tmp);
+	UINT8 LSR(UINT8 tmp);
+	void NOP();
+	void TORA(UINT8 tmp);
+	void ORA(UINT8 tmp);
+	void PHA();
+	void PHP();
+	void PHX();
+	void PHY();
+	void PLA();
+	void PLP();
+	void PLX();
+	void PLY();
+	UINT8 RMB(int bit, UINT8 tmp);
+	UINT8 ROL(UINT8 tmp);
+	UINT8 ROR(UINT8 tmp);
+	void RTI();
+	void RTS();
+	void SAX();
+	void SAY();
+	void TSBC(UINT8 tmp);
+	void SBC(UINT8 tmp);
+	void SEC();
+	void SED();
+	void SEI();
+	void SET();
+	UINT8 SMB(int bit, UINT8 tmp);
+	void ST0(UINT8 tmp);
+	void ST1(UINT8 tmp);
+	void ST2(UINT8 tmp);
+	UINT8 STA();
+	UINT8 STX();
+	UINT8 STY();
+	UINT8 STZ();
+	void SXY();
+	void TAI();
+	void TAM(UINT8 tmp);
+	void TAX();
+	void TAY();
+	void TDD();
+	void TIA();
+	void TII();
+	void TIN();
+	void TMA(UINT8 tmp);
+	UINT8 TRB(UINT8 tmp);
+	UINT8 TSB(UINT8 tmp);
+	void TSX();
+	void TST(UINT8 imm, UINT8 tmp);
+	void TXA();
+	void TXS();
+	void TYA();
+	void CSH();
+	void CSL();
+
 	enum
 	{
 		H6280_RESET_VEC = 0xfffe,
@@ -232,7 +375,6 @@ protected:
 
 extern const device_type H6280;
 
-
-CPU_DISASSEMBLE( h6280 );
+#pragma pop_macro("BIT")
 
 #endif /* __H6280_H__ */

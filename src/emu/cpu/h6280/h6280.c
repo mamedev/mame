@@ -108,14 +108,45 @@
 
 ******************************************************************************/
 
-#include "emu.h"
-#include "debugger.h"
 #include "h6280.h"
+#include "debugger.h"
 
-// include the macros
-#include "h6280ops.h"
+#undef BIT
 
-//static void set_irq_line(h6280_Regs* cpustate, int irqline, int state);
+/* 6280 flags */
+enum
+{
+	_fC = 0x01,
+	_fZ = 0x02,
+	_fI = 0x04,
+	_fD = 0x08,
+	_fB = 0x10,
+	_fT = 0x20,
+	_fV = 0x40,
+	_fN = 0x80
+};
+
+/* some shortcuts for improved readability */
+#define A   m_a
+#define X   m_x
+#define Y   m_y
+#define P   m_p
+#define S   m_sp.b.l
+
+#define EAL m_ea.b.l
+#define EAH m_ea.b.h
+#define EAW m_ea.w.l
+#define EAD m_ea.d
+
+#define ZPL m_zp.b.l
+#define ZPH m_zp.b.h
+#define ZPW m_zp.w.l
+#define ZPD m_zp.d
+
+#define PCL m_pc.b.l
+#define PCH m_pc.b.h
+#define PCW m_pc.w.l
+#define PCD m_pc.d
 
 //**************************************************************************
 //  DEVICE INTERFACE
@@ -222,14 +253,21 @@ void h6280_device::device_start()
 	save_item(NAME(m_irq_state[2]));
 	save_item(NAME(m_irq_pending));
 
-	#if LAZY_FLAGS
+#if LAZY_FLAGS
 	save_item(NAME(m_nz));
-	#endif
+#endif
 	save_item(NAME(m_io_buffer));
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
 	m_icount = 0;
+
+	/* clear pending interrupts */
+	for (int i = 0; i < 3; i++)
+	{
+		m_irq_state[i] = CLEAR_LINE;
+	}
+	m_nmi_state = CLEAR_LINE;
 }
 
 void h6280_device::device_reset()
@@ -273,13 +311,6 @@ void h6280_device::device_reset()
 	m_timer_status = 0;
 	m_timer_load = 128 * 1024;
 
-	/* clear pending interrupts */
-	for (int i = 0; i < 3; i++)
-	{
-		m_irq_state[i] = CLEAR_LINE;
-	}
-	m_nmi_state = CLEAR_LINE;
-
 	m_irq_pending = 0;
 }
 
@@ -289,24 +320,1577 @@ void h6280_device::device_stop()
 }
 
 
-//-------------------------------------------------
-//  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
-//  the space doesn't exist
-//-------------------------------------------------
-
-const address_space_config *h6280_device::memory_space_config(address_spacenum spacenum) const
+inline UINT32 h6280_device::TRANSLATED(UINT16 addr)
 {
-	if (spacenum == AS_PROGRAM)
-	{
-		return &m_program_config;
-	}
-	else if (spacenum == AS_IO)
-	{
-		return &m_io_config;
-	}
-	return NULL;
+	return ((m_mmr[((addr) >> 13) & 7] << 13) | ((addr) & 0x1fff));
 }
+
+inline void h6280_device::H6280_CYCLES(int cyc)
+{
+	m_icount -= ((cyc) * m_clocks_per_cycle);
+	m_timer_value -= ((cyc) * m_clocks_per_cycle);
+}
+
+#if LAZY_FLAGS
+
+#define NZ  m_NZ
+inline void h6280_device::SET_NZ(UINT8 n)
+{
+	P &= ~_fT;
+	NZ = ((n & _fN) << 8) | n;
+}
+
+#else
+
+inline void h6280_device::SET_NZ(UINT8 n)
+{
+	P = (P & ~(_fN|_fT|_fZ)) |
+		(n & _fN) |
+		((n == 0) ? _fZ : 0);
+}
+
+#endif
+
+inline void h6280_device::CLEAR_T()
+{
+	P &= ~_fT;
+}
+
+inline void h6280_device::DO_INTERRUPT(UINT16 vector)
+{
+	H6280_CYCLES(7);    /* 7 cycles for an int */
+	push(PCH);
+	push(PCL);
+	COMPOSE_P(0, _fB);
+	push(P);
+	P = (P & ~_fD) | _fI;   /* knock out D and set I flag */
+	PCL = program_read8(vector);
+	PCH = program_read8(vector + 1);
+}
+
+inline void h6280_device::CHECK_AND_TAKE_IRQ_LINES()
+{
+	if ( m_nmi_state != CLEAR_LINE ) {
+		m_nmi_state = CLEAR_LINE;
+		DO_INTERRUPT(H6280_NMI_VEC);
+	}
+	else if( !(P & _fI) )
+	{
+		if ( m_irq_state[2] != CLEAR_LINE &&
+				!(m_irq_mask & 0x4) )
+		{
+			DO_INTERRUPT(H6280_TIMER_VEC);
+		} else
+		if ( m_irq_state[0] != CLEAR_LINE &&
+				!(m_irq_mask & 0x2) )
+		{
+			DO_INTERRUPT(H6280_IRQ1_VEC);
+			standard_irq_callback(0);
+		} else
+		if ( m_irq_state[1] != CLEAR_LINE &&
+				!(m_irq_mask & 0x1) )
+		{
+			DO_INTERRUPT(H6280_IRQ2_VEC);
+			standard_irq_callback(1);
+		}
+	}
+}
+
+inline void h6280_device::CHECK_IRQ_LINES()
+{
+	if (!m_irq_pending)
+		m_irq_pending = 2;
+}
+
+/***************************************************************
+ *  CHECK_VDC_VCE_PENALTY
+ * The CPU inserts 1 clock delay when accessing the VDC or VCE
+ * area.
+ ***************************************************************/
+inline void h6280_device::CHECK_VDC_VCE_PENALTY(UINT16 addr)
+{
+	if ( ( TRANSLATED(addr) & 0x1FF800 ) == 0x1FE000 ) {
+		H6280_CYCLES(1);
+	}
+}
+
+/***************************************************************
+ *  BRA  branch relative
+ ***************************************************************/
+inline void h6280_device::BRA(bool cond)
+{
+	CLEAR_T();
+	if (cond)
+	{
+		H6280_CYCLES(4);
+		UINT8 tmp = read_opcode_arg();
+		PCW++;
+		EAW = PCW + (signed char)tmp;
+		PCD = EAD;
+	}
+	else
+	{
+		PCW++;
+		H6280_CYCLES(2);
+	}
+}
+
+/***************************************************************
+ *
+ * Helper macros to build the effective address
+ *
+ ***************************************************************/
+
+/***************************************************************
+ *  EA = zero page address
+ ***************************************************************/
+inline void h6280_device::EA_ZPG()
+{
+	ZPL = read_opcode_arg();
+	PCW++;
+	EAD = ZPD;
+}
+
+/***************************************************************
+ *  EA = zero page address - T flag
+ ***************************************************************/
+inline void h6280_device::EA_TFLG()
+{
+	ZPL = X;
+	EAD = ZPD;
+}
+
+/***************************************************************
+ *  EA = zero page address + X
+ ***************************************************************/
+inline void h6280_device::EA_ZPX()
+{
+	ZPL = read_opcode_arg() + X;
+	PCW++;
+	EAD = ZPD;
+}
+
+/***************************************************************
+ *  EA = zero page address + Y
+ ***************************************************************/
+inline void h6280_device::EA_ZPY()
+{
+	ZPL = read_opcode_arg() + Y;
+	PCW++;
+	EAD = ZPD;
+}
+
+/***************************************************************
+ *  EA = absolute address
+ ***************************************************************/
+inline void h6280_device::EA_ABS()
+{
+	EAL = read_opcode_arg();
+	PCW++;
+	EAH = read_opcode_arg();
+	PCW++;
+}
+
+/***************************************************************
+ *  EA = absolute address + X
+ ***************************************************************/
+inline void h6280_device::EA_ABX()
+{
+	EA_ABS();
+	EAW += X;
+}
+
+/***************************************************************
+ *  EA = absolute address + Y
+ ***************************************************************/
+inline void h6280_device::EA_ABY()
+{
+	EA_ABS();
+	EAW += Y;
+}
+
+/***************************************************************
+ *  EA = zero page indirect (65c02 pre indexed w/o X)
+ ***************************************************************/
+inline void h6280_device::EA_ZPI()
+{
+	ZPL = read_opcode_arg();
+	PCW++;
+	EAD = program_read16z(ZPD);
+}
+
+/***************************************************************
+ *  EA = zero page + X indirect (pre indexed)
+ ***************************************************************/
+inline void h6280_device::EA_IDX()
+{
+	ZPL = read_opcode_arg() + X;
+	PCW++;
+	EAD = program_read16z(ZPD);
+}
+
+/***************************************************************
+ *  EA = zero page indirect + Y (post indexed)
+ ***************************************************************/
+inline void h6280_device::EA_IDY()
+{
+	ZPL = read_opcode_arg();
+	PCW++;
+	EAD = program_read16z(ZPD);
+	EAW += Y;
+}
+
+/***************************************************************
+ *  EA = indirect (only used by JMP)
+ ***************************************************************/
+inline void h6280_device::EA_IND()
+{
+	EA_ABS();
+	UINT8 tmp = program_read8(EAD);
+	EAD++;
+	EAH = program_read8(EAD);
+	EAL = tmp;
+}
+
+/***************************************************************
+ *  EA = indirect plus x (only used by JMP)
+ ***************************************************************/
+inline void h6280_device::EA_IAX()
+{
+	EA_ABS();
+	EAD+=X;
+	UINT8 tmp = program_read8(EAD);
+	EAD++;
+	EAH = program_read8(EAD);
+	EAL = tmp;
+}
+
+inline UINT8 h6280_device::RD_IMM()
+{
+	UINT8 tmp = read_opcode_arg();
+	PCW++;
+	return tmp;
+}
+
+inline UINT8 h6280_device::RD_ZPG()
+{
+	EA_ZPG();
+	return program_read8z(EAD);
+}
+
+inline UINT8 h6280_device::RD_ZPX()
+{
+	EA_ZPX();
+	return program_read8z(EAD);
+}
+
+inline UINT8 h6280_device::RD_ZPY()
+{
+	EA_ZPY();
+	return program_read8z(EAD);
+}
+
+inline UINT8 h6280_device::RD_ABS()
+{
+	EA_ABS();
+	return program_read8(EAD);
+}
+
+inline UINT8 h6280_device::RD_ABX()
+{
+	EA_ABX();
+	return program_read8(EAD);
+}
+
+inline UINT8 h6280_device::RD_ABY()
+{
+	EA_ABY();
+	return program_read8(EAD);
+}
+
+inline UINT8 h6280_device::RD_ZPI()
+{
+	EA_ZPI();
+	return program_read8(EAD);
+}
+
+inline UINT8 h6280_device::RD_IDX()
+{
+	EA_IDX();
+	return program_read8(EAD);
+}
+
+inline UINT8 h6280_device::RD_IDY()
+{
+	EA_IDY();
+	return program_read8(EAD);
+}
+
+inline UINT8 h6280_device::RD_TFL()
+{
+	EA_TFLG();
+	return program_read8z(EAD);
+}
+
+inline void h6280_device::WR_ZPG(UINT8 tmp)
+{
+	EA_ZPG();
+	WB_EAZ(tmp);
+}
+
+inline void h6280_device::WR_ZPX(UINT8 tmp)
+{
+	EA_ZPX();
+	WB_EAZ(tmp);
+}
+
+inline void h6280_device::WR_ZPY(UINT8 tmp)
+{
+	EA_ZPY();
+	WB_EAZ(tmp);
+}
+
+inline void h6280_device::WR_ABS(UINT8 tmp)
+{
+	EA_ABS();
+	WB_EA(tmp);
+}
+
+inline void h6280_device::WR_ABX(UINT8 tmp)
+{
+	EA_ABX();
+	WB_EA(tmp);
+}
+
+inline void h6280_device::WR_ABY(UINT8 tmp)
+{
+	EA_ABY();
+	WB_EA(tmp);
+}
+
+inline void h6280_device::WR_ZPI(UINT8 tmp)
+{
+	EA_ZPI();
+	WB_EA(tmp);
+}
+
+inline void h6280_device::WR_IDX(UINT8 tmp)
+{
+	EA_IDX();
+	WB_EA(tmp);
+}
+
+inline void h6280_device::WR_IDY(UINT8 tmp)
+{
+	EA_IDY();
+	WB_EA(tmp);
+}
+
+inline void h6280_device::WB_EA(UINT8 tmp)
+{
+	program_write8(EAD, tmp);
+}
+
+inline void h6280_device::WB_EAZ(UINT8 tmp)
+{
+	program_write8z(EAD, tmp);
+}
+
+/***************************************************************
+ *
+ * Macros to emulate the 6280 opcodes
+ *
+ ***************************************************************/
+
+/***************************************************************
+ * compose the real flag register by
+ * including N and Z and set any
+ * SET and clear any CLR bits also
+ ***************************************************************/
+#if LAZY_FLAGS
+
+inline void h6280_device::COMPOSE_P(UINT8 SET, UINT8 CLR)
+{
+	P = (P & ~(_fN | _fZ | CLR)) |
+		(NZ >> 8) |
+		((NZ & 0xff) ? 0 : _fZ) |
+		SET;
+}
+
+#else
+
+inline void h6280_device::COMPOSE_P(UINT8 SET, UINT8 CLR)
+{
+	P = (P & ~CLR) | SET;
+}
+
+#endif
+
+/* 6280 ********************************************************
+ *  ADC Add with carry
+ ***************************************************************/
+inline void h6280_device::TADC(UINT8 tmp)
+{
+	CLEAR_T();
+	int tflagtemp = RD_TFL();
+	if (P & _fD)
+	{
+		int c = (P & _fC);
+		int lo = (tflagtemp & 0x0f) + (tmp & 0x0f) + c;
+		int hi = (tflagtemp & 0xf0) + (tmp & 0xf0);
+		P &= ~_fC;
+		if (lo > 0x09)
+		{
+			hi += 0x10;
+			lo += 0x06;
+		}
+		if (hi > 0x90)
+			hi += 0x60;
+		if (hi & 0xff00)
+			P |= _fC;
+		tflagtemp = (lo & 0x0f) + (hi & 0xf0);
+		H6280_CYCLES(1);
+	}
+	else
+	{
+		int c = (P & _fC);
+		int sum = tflagtemp + tmp + c;
+		P &= ~(_fV | _fC);
+		if (~(tflagtemp^tmp) & (tflagtemp^sum) & _fN)
+			P |= _fV;
+		if (sum & 0xff00)
+			P |= _fC;
+		tflagtemp = (UINT8) sum;
+	}
+	SET_NZ(tflagtemp);
+	WB_EAZ(tflagtemp);
+	H6280_CYCLES(3);
+}
+
+
+inline void h6280_device::ADC(UINT8 tmp)
+{
+	if(P & _fT)
+		TADC(tmp);
+	else {
+		if (P & _fD)
+		{
+			int c = (P & _fC);
+			int lo = (A & 0x0f) + (tmp & 0x0f) + c;
+			int hi = (A & 0xf0) + (tmp & 0xf0);
+			P &= ~_fC;
+			if (lo > 0x09)
+			{
+				hi += 0x10;
+				lo += 0x06;
+			}
+			if (hi > 0x90)
+				hi += 0x60;
+			if (hi & 0xff00)
+				P |= _fC;
+			A = (lo & 0x0f) + (hi & 0xf0);
+			H6280_CYCLES(1);
+		}
+		else
+		{
+			int c = (P & _fC);
+			int sum = A + tmp + c;
+			P &= ~(_fV | _fC);
+			if (~(A^tmp) & (A^sum) & _fN)
+				P |= _fV;
+			if (sum & 0xff00)
+				P |= _fC;
+			A = (UINT8) sum;
+		}
+		SET_NZ(A);
+	}
+}
+
+/* 6280 ********************************************************
+ *  AND Logical and
+ ***************************************************************/
+inline void h6280_device::TAND(UINT8 tmp)
+{
+	CLEAR_T();
+	int tflagtemp = RD_TFL();
+	tflagtemp = (UINT8)(tflagtemp & tmp);
+	WB_EAZ(tflagtemp);
+	SET_NZ(tflagtemp);
+	H6280_CYCLES(3);
+}
+
+inline void h6280_device::AND(UINT8 tmp)
+{
+	if(P & _fT)
+		TAND(tmp);
+	else {
+		A = (UINT8)(A & tmp);
+		SET_NZ(A);
+	}
+}
+
+/* 6280 ********************************************************
+ *  ASL Arithmetic shift left
+ ***************************************************************/
+inline UINT8 h6280_device::ASL(UINT8 tmp)
+{
+	CLEAR_T();
+	P = (P & ~_fC) | ((tmp >> 7) & _fC);
+	tmp = (UINT8)(tmp << 1);
+	SET_NZ(tmp);
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ *  BBR Branch if bit is reset
+ ***************************************************************/
+inline void h6280_device::BBR(int bit, UINT8 tmp)
+{
+	BRA(!(tmp & (1<<bit)));
+}
+
+/* 6280 ********************************************************
+ *  BBS Branch if bit is set
+ ***************************************************************/
+inline void h6280_device::BBS(int bit, UINT8 tmp)
+{
+	BRA(tmp & (1<<bit));
+}
+
+/* 6280 ********************************************************
+ *  BCC Branch if carry clear
+ ***************************************************************/
+inline void h6280_device::BCC()
+{
+	BRA(!(P & _fC));
+}
+
+/* 6280 ********************************************************
+ *  BCS Branch if carry set
+ ***************************************************************/
+inline void h6280_device::BCS()
+{
+	BRA(P & _fC);
+}
+
+/* 6280 ********************************************************
+ *  BEQ Branch if equal
+ ***************************************************************/
+inline void h6280_device::BEQ()
+{
+#if LAZY_FLAGS
+	BRA(!(NZ & 0xff));
+#else
+	BRA(P & _fZ);
+#endif
+}
+
+/* 6280 ********************************************************
+ *  BIT Bit test
+ ***************************************************************/
+inline void h6280_device::BIT(UINT8 tmp)
+{
+	P = (P & ~(_fN|_fV|_fT|_fZ))
+		| ((tmp&0x80) ? _fN:0)
+		| ((tmp&0x40) ? _fV:0)
+		| ((tmp&A)  ? 0:_fZ);
+}
+
+/* 6280 ********************************************************
+ *  BMI Branch if minus
+ ***************************************************************/
+inline void h6280_device::BMI()
+{
+#if LAZY_FLAGS
+	BRA(NZ & 0x8000);
+#else
+	BRA(P & _fN);
+#endif
+}
+
+/* 6280 ********************************************************
+ *  BNE Branch if not equal
+ ***************************************************************/
+inline void h6280_device::BNE()
+{
+#if LAZY_FLAGS
+	BRA(NZ & 0xff);
+#else
+	BRA(!(P & _fZ));
+#endif
+}
+
+/* 6280 ********************************************************
+ *  BPL Branch if plus
+ ***************************************************************/
+inline void h6280_device::BPL()
+{
+#if LAZY_FLAGS
+	BRA(!(NZ & 0x8000));
+#else
+	BRA(!(P & _fN));
+#endif
+}
+
+/* 6280 ********************************************************
+ *  BRK Break
+ *  increment PC, push PC hi, PC lo, flags (with B bit set),
+ *  set I flag, reset D flag and jump via IRQ vector
+ ***************************************************************/
+inline void h6280_device::BRK()
+{
+	logerror("BRK %04xn",PCW);
+	CLEAR_T();
+	PCW++;
+	push(PCH);
+	push(PCL);
+	push(P);
+	P = (P & ~_fD) | _fI;
+	PCL = program_read8(H6280_IRQ2_VEC);
+	PCH = program_read8(H6280_IRQ2_VEC+1);
+}
+
+/* 6280 ********************************************************
+ *  BSR Branch to subroutine
+ ***************************************************************/
+inline void h6280_device::BSR()
+{
+	push(PCH);
+	push(PCL);
+	H6280_CYCLES(4); /* 4 cycles here, 4 in BRA */
+	BRA(1);
+}
+
+/* 6280 ********************************************************
+ *  BVC Branch if overflow clear
+ ***************************************************************/
+inline void h6280_device::BVC()
+{
+	BRA(!(P & _fV));
+}
+
+/* 6280 ********************************************************
+ *  BVS Branch if overflow set
+ ***************************************************************/
+inline void h6280_device::BVS()
+{
+	BRA(P & _fV);
+}
+
+/* 6280 ********************************************************
+ *  CLA Clear accumulator
+ ***************************************************************/
+inline void h6280_device::CLA()
+{
+	CLEAR_T();
+	A = 0;
+}
+
+/* 6280 ********************************************************
+ *  CLC Clear carry flag
+ ***************************************************************/
+inline void h6280_device::CLC()
+{
+	CLEAR_T();
+	P &= ~_fC;
+}
+
+/* 6280 ********************************************************
+ *  CLD Clear decimal flag
+ ***************************************************************/
+inline void h6280_device::CLD()
+{
+	CLEAR_T();
+	P &= ~_fD;
+}
+
+/* 6280 ********************************************************
+ *  CLI Clear interrupt flag
+ ***************************************************************/
+inline void h6280_device::CLI()
+{
+	CLEAR_T();
+	if( P & _fI )
+	{
+		P &= ~_fI;
+		CHECK_IRQ_LINES();
+	}
+}
+
+
+/* 6280 ********************************************************
+ *  CLV Clear overflow flag
+ ***************************************************************/
+inline void h6280_device::CLV()
+{
+	CLEAR_T();
+	P &= ~_fV;
+}
+
+/* 6280 ********************************************************
+ *  CLX Clear index X
+ ***************************************************************/
+inline void h6280_device::CLX()
+{
+	CLEAR_T();
+	X = 0;
+}
+
+/* 6280 ********************************************************
+ *  CLY Clear index Y
+ ***************************************************************/
+inline void h6280_device::CLY()
+{
+	CLEAR_T();
+	Y = 0;
+}
+
+/* 6280 ********************************************************
+ *  CMP Compare accumulator
+ ***************************************************************/
+inline void h6280_device::CMP(UINT8 tmp)
+{
+	CLEAR_T();
+	P &= ~_fC;
+	if (A >= tmp)
+		P |= _fC;
+	SET_NZ((UINT8)(A - tmp));
+}
+
+/* 6280 ********************************************************
+ *  CPX Compare index X
+ ***************************************************************/
+inline void h6280_device::CPX(UINT8 tmp)
+{
+	CLEAR_T();
+	P &= ~_fC;
+	if (X >= tmp)
+		P |= _fC;
+	SET_NZ((UINT8)(X - tmp));
+}
+
+/* 6280 ********************************************************
+ *  CPY Compare index Y
+ ***************************************************************/
+inline void h6280_device::CPY(UINT8 tmp)
+{
+	CLEAR_T();
+	P &= ~_fC;
+	if (Y >= tmp)
+		P |= _fC;
+	SET_NZ((UINT8)(Y - tmp));
+}
+
+/* 6280 ********************************************************
+ *  DEC Decrement memory
+ ***************************************************************/
+inline UINT8 h6280_device::DEC(UINT8 tmp)
+{
+	CLEAR_T();
+	tmp = (UINT8)(tmp-1);
+	SET_NZ(tmp);
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ *  DEX Decrement index X
+ ***************************************************************/
+inline void h6280_device::DEX()
+{
+	CLEAR_T();
+	X = (UINT8)(X - 1);
+	SET_NZ(X);
+}
+
+/* 6280 ********************************************************
+ *  DEY Decrement index Y
+ ***************************************************************/
+inline void h6280_device::DEY()
+{
+	CLEAR_T();
+	Y = (UINT8)(Y - 1);
+	SET_NZ(Y);
+}
+
+/* 6280 ********************************************************
+ *  EOR Logical exclusive or
+ ***************************************************************/
+inline void h6280_device::TEOR(UINT8 tmp)
+{
+	CLEAR_T();
+	int tflagtemp = RD_TFL();
+	tflagtemp = (UINT8)(tflagtemp ^ tmp);
+	WB_EAZ(tflagtemp);
+	SET_NZ(tflagtemp);
+	H6280_CYCLES(3);
+}
+
+inline void h6280_device::EOR(UINT8 tmp)
+{
+	if(P & _fT)
+		TEOR(tmp);
+	else {
+		A = (UINT8)(A ^ tmp);
+		SET_NZ(A);
+	}
+}
+
+/* 6280 ********************************************************
+ *  INC Increment memory
+ ***************************************************************/
+inline UINT8 h6280_device::INC(UINT8 tmp)
+{
+	CLEAR_T();
+	tmp = (UINT8)(tmp+1);
+	SET_NZ(tmp);
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ *  INX Increment index X
+ ***************************************************************/
+inline void h6280_device::INX()
+{
+	CLEAR_T();
+	X = (UINT8)(X + 1);
+	SET_NZ(X);
+}
+
+/* 6280 ********************************************************
+ *  INY Increment index Y
+ ***************************************************************/
+inline void h6280_device::INY()
+{
+	CLEAR_T();
+	Y = (UINT8)(Y + 1);
+	SET_NZ(Y);
+}
+
+/* 6280 ********************************************************
+ *  JMP Jump to address
+ *  set PC to the effective address
+ ***************************************************************/
+inline void h6280_device::JMP()
+{
+	CLEAR_T();
+	PCD = EAD;
+}
+
+/* 6280 ********************************************************
+ *  JSR Jump to subroutine
+ *  decrement PC (sic!) push PC hi, push PC lo and set
+ *  PC to the effective address
+ ***************************************************************/
+inline void h6280_device::JSR()
+{
+	CLEAR_T();
+	PCW--;
+	push(PCH);
+	push(PCL);
+	PCD = EAD;
+}
+
+/* 6280 ********************************************************
+ *  LDA Load accumulator
+ ***************************************************************/
+inline void h6280_device::LDA(UINT8 tmp)
+{
+	CLEAR_T();
+	A = (UINT8)tmp;
+	SET_NZ(A);
+}
+
+/* 6280 ********************************************************
+ *  LDX Load index X
+ ***************************************************************/
+inline void h6280_device::LDX(UINT8 tmp)
+{
+	CLEAR_T();
+	X = (UINT8)tmp;
+	SET_NZ(X);
+}
+
+/* 6280 ********************************************************
+ *  LDY Load index Y
+ ***************************************************************/
+inline void h6280_device::LDY(UINT8 tmp)
+{
+	CLEAR_T();
+	Y = (UINT8)tmp;
+	SET_NZ(Y);
+}
+
+/* 6280 ********************************************************
+ *  LSR Logic shift right
+ *  0 -> [7][6][5][4][3][2][1][0] -> C
+ ***************************************************************/
+inline UINT8 h6280_device::LSR(UINT8 tmp)
+{
+	CLEAR_T();
+	P = (P & ~_fC) | (tmp & _fC);
+	tmp = (UINT8)tmp >> 1;
+	SET_NZ(tmp);
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ *  NOP No operation
+ ***************************************************************/
+inline void h6280_device::NOP()
+{
+	CLEAR_T();
+}
+
+/* 6280 ********************************************************
+ *  ORA Logical inclusive or
+ ***************************************************************/
+
+inline void h6280_device::TORA(UINT8 tmp)
+{
+	CLEAR_T();
+	int tflagtemp = RD_TFL();
+	tflagtemp = (UINT8)(tflagtemp | tmp);
+	WB_EAZ(tflagtemp);
+	SET_NZ(tflagtemp);
+	H6280_CYCLES(3);
+}
+
+inline void h6280_device::ORA(UINT8 tmp)
+{
+	if(P & _fT)
+		TORA(tmp);
+	else {
+		A = (UINT8)(A | tmp);
+		SET_NZ(A);
+	}
+}
+
+/* 6280 ********************************************************
+ *  PHA Push accumulator
+ ***************************************************************/
+inline void h6280_device::PHA()
+{
+	CLEAR_T();
+	push(A);
+}
+
+/* 6280 ********************************************************
+ *  PHP Push processor status (flags)
+ ***************************************************************/
+inline void h6280_device::PHP()
+{
+	CLEAR_T();
+	COMPOSE_P(0,0);
+	push(P);
+}
+
+/* 6280 ********************************************************
+ *  PHX Push index X
+ ***************************************************************/
+inline void h6280_device::PHX()
+{
+	CLEAR_T();
+	push(X);
+}
+
+/* 6280 ********************************************************
+ *  PHY Push index Y
+ ***************************************************************/
+inline void h6280_device::PHY()
+{
+	CLEAR_T();
+	push(Y);
+}
+
+/* 6280 ********************************************************
+ *  PLA Pull accumulator
+ ***************************************************************/
+inline void h6280_device::PLA()
+{
+	CLEAR_T();
+	pull(A);
+	SET_NZ(A);
+}
+
+/* 6280 ********************************************************
+ *  PLP Pull processor status (flags)
+ ***************************************************************/
+inline void h6280_device::PLP()
+{
+#if LAZY_FLAGS
+	pull(P);
+	P |= _fB;
+	NZ = ((P & _fN) << 8) |
+			((P & _fZ) ^ _fZ);
+	CHECK_IRQ_LINES();
+#else
+	pull(P);
+	P |= _fB;
+	CHECK_IRQ_LINES();
+#endif
+}
+
+/* 6280 ********************************************************
+ *  PLX Pull index X
+ ***************************************************************/
+inline void h6280_device::PLX()
+{
+	CLEAR_T();
+	pull(X);
+	SET_NZ(X);
+}
+
+/* 6280 ********************************************************
+ *  PLY Pull index Y
+ ***************************************************************/
+inline void h6280_device::PLY()
+{
+	CLEAR_T();
+	pull(Y);
+	SET_NZ(Y);
+}
+
+/* 6280 ********************************************************
+ *  RMB Reset memory bit
+ ***************************************************************/
+inline UINT8 h6280_device::RMB(int bit, UINT8 tmp)
+{
+	CLEAR_T();
+	tmp &= ~(1<<bit);
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ *  ROL Rotate left
+ *  new C <- [7][6][5][4][3][2][1][0] <- C
+ ***************************************************************/
+inline UINT8 h6280_device::ROL(UINT8 tmp)
+{
+	CLEAR_T();
+	int tmp9 = (tmp << 1) | (P & _fC);
+	P = (P & ~_fC) | ((tmp9 >> 8) & _fC);
+	tmp = (UINT8)tmp9;
+	SET_NZ(tmp);
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ *  ROR Rotate right
+ *  C -> [7][6][5][4][3][2][1][0] -> new C
+ ***************************************************************/
+inline UINT8 h6280_device::ROR(UINT8 tmp)
+{
+	CLEAR_T();
+	int tmp9 = tmp | (P & _fC) << 8;
+	P = (P & ~_fC) | (tmp & _fC);
+	tmp = (UINT8)(tmp9 >> 1);
+	SET_NZ(tmp);
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ *  RTI Return from interrupt
+ *  pull flags, pull PC lo, pull PC hi and increment PC
+ ***************************************************************/
+inline void h6280_device::RTI()
+{
+#if LAZY_FLAGS
+	pull(P);
+	P |= _fB;
+	NZ = ((P & _fN) << 8) |
+			((P & _fZ) ^ _fZ);
+	pull(PCL);
+	pull(PCH);
+	CHECK_IRQ_LINES();
+#else
+	pull(P);
+	P |= _fB;
+	pull(PCL);
+	pull(PCH);
+	CHECK_IRQ_LINES();
+#endif
+}
+
+/* 6280 ********************************************************
+ *  RTS Return from subroutine
+ *  pull PC lo, PC hi and increment PC
+ ***************************************************************/
+inline void h6280_device::RTS()
+{
+	CLEAR_T();
+	pull(PCL);
+	pull(PCH);
+	PCW++;
+}
+
+/* 6280 ********************************************************
+ *  SAX Swap accumulator and index X
+ ***************************************************************/
+inline void h6280_device::SAX()
+{
+	CLEAR_T();
+	UINT8 tmp = X;
+	X = A;
+	A = tmp;
+}
+
+/* 6280 ********************************************************
+ *  SAY Swap accumulator and index Y
+ ***************************************************************/
+inline void h6280_device::SAY()
+{
+	CLEAR_T();
+	UINT8 tmp = Y;
+	Y = A;
+	A = tmp;
+}
+
+/* 6280 ********************************************************
+ *  SBC Subtract with carry
+ ***************************************************************/
+inline void h6280_device::TSBC(UINT8 tmp)
+{
+	CLEAR_T();
+	int tflagtemp = RD_TFL();
+	if (P & _fD)
+	{
+		int c = (P & _fC) ^ _fC;
+		int sum = tflagtemp - tmp -c;
+		int lo = (tflagtemp & 0x0f) - (tmp & 0x0f) - c;
+		int hi = (tflagtemp & 0xf0) - (tmp & 0xf0);
+		P &= ~_fC;
+		if (lo & 0xf0)
+			lo -= 6;
+		if (lo & 0x80)
+			hi -= 0x10;
+		if (hi & 0x0f00)
+			hi -= 0x60;
+		if ((sum & 0xff00) == 0)
+			P |= _fC;
+		tflagtemp = (lo & 0x0f) + (hi & 0xf0);
+		H6280_CYCLES(1);
+	}
+	else
+	{
+		int c = (P & _fC) ^ _fC;
+		int sum = tflagtemp - tmp - c;
+		P &= ~(_fV | _fC);
+		if ((tflagtemp^tmp) & (tflagtemp^sum) & _fN)
+			P |= _fV;
+		if ((sum & 0xff00) == 0)
+			P |= _fC;
+		tflagtemp = (UINT8) sum;
+	}
+	SET_NZ(tflagtemp);
+	WB_EAZ(tflagtemp);
+	H6280_CYCLES(3);
+}
+
+inline void h6280_device::SBC(UINT8 tmp)
+{
+	if(P & _fT)
+		TSBC(tmp);
+	else {
+		if (P & _fD)
+		{
+			int c = (P & _fC) ^ _fC;
+			int sum = A - tmp - c;
+			int lo = (A & 0x0f) - (tmp & 0x0f) - c;
+			int hi = (A & 0xf0) - (tmp & 0xf0);
+			P &= ~_fC;
+			if (lo & 0xf0)
+				lo -= 6;
+			if (lo & 0x80)
+				hi -= 0x10;
+			if (hi & 0x0f00)
+				hi -= 0x60;
+			if ((sum & 0xff00) == 0)
+				P |= _fC;
+			A = (lo & 0x0f) + (hi & 0xf0);
+			H6280_CYCLES(1);
+		}
+		else
+		{
+			int c = (P & _fC) ^ _fC;
+			int sum = A - tmp - c;
+			P &= ~(_fV | _fC);
+			if ((A^tmp) & (A^sum) & _fN)
+				P |= _fV;
+			if ((sum & 0xff00) == 0)
+				P |= _fC;
+			A = (UINT8) sum;
+		}
+		SET_NZ(A);
+	}
+}
+
+/* 6280 ********************************************************
+ *  SEC Set carry flag
+ ***************************************************************/
+#if defined(SEC)
+#undef SEC
+#endif
+inline void h6280_device::SEC()
+{
+	CLEAR_T();
+	P |= _fC;
+}
+
+/* 6280 ********************************************************
+ *  SED Set decimal flag
+ ***************************************************************/
+inline void h6280_device::SED()
+{
+	CLEAR_T();
+	P |= _fD;
+}
+
+/* 6280 ********************************************************
+ *  SEI Set interrupt flag
+ ***************************************************************/
+inline void h6280_device::SEI()
+{
+	CLEAR_T();
+	P |= _fI;
+}
+
+/* 6280 ********************************************************
+ *  SET Set t flag
+ ***************************************************************/
+inline void h6280_device::SET()
+{
+	P |= _fT;
+}
+
+/* 6280 ********************************************************
+ *  SMB Set memory bit
+ ***************************************************************/
+inline UINT8 h6280_device::SMB(int bit, UINT8 tmp)
+{
+	CLEAR_T();
+	tmp |= (1<<bit);
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ *  ST0 Store at hardware address 0
+ ***************************************************************/
+inline void h6280_device::ST0(UINT8 tmp)
+{
+	CLEAR_T();
+	m_io->write_byte(0x0000,tmp);
+}
+
+/* 6280 ********************************************************
+ *  ST1 Store at hardware address 2
+ ***************************************************************/
+inline void h6280_device::ST1(UINT8 tmp)
+{
+	CLEAR_T();
+	m_io->write_byte(0x0002,tmp);
+}
+
+/* 6280 ********************************************************
+ *  ST2 Store at hardware address 3
+ ***************************************************************/
+inline void h6280_device::ST2(UINT8 tmp)
+{
+	CLEAR_T();
+	m_io->write_byte(0x0003,tmp);
+}
+
+/* 6280 ********************************************************
+ *  STA Store accumulator
+ ***************************************************************/
+inline UINT8 h6280_device::STA()
+{
+	CLEAR_T();
+	return A;
+}
+
+/* 6280 ********************************************************
+ *  STX Store index X
+ ***************************************************************/
+inline UINT8 h6280_device::STX()
+{
+	CLEAR_T();
+	return X;
+}
+
+/* 6280 ********************************************************
+ *  STY Store index Y
+ ***************************************************************/
+inline UINT8 h6280_device::STY()
+{
+	CLEAR_T();
+	return Y;
+}
+
+/* 6280 ********************************************************
+ * STZ  Store zero
+ ***************************************************************/
+inline UINT8 h6280_device::STZ()
+{
+	CLEAR_T();
+	return 0;
+}
+
+/* H6280 *******************************************************
+ *  SXY Swap index X and index Y
+ ***************************************************************/
+inline void h6280_device::SXY()
+{
+	CLEAR_T();
+	UINT8 tmp = X;
+	X = Y;
+	Y = tmp;
+}
+
+/* H6280 *******************************************************
+ *  TAI Transfer Alternate Increment
+ ***************************************************************/
+inline void h6280_device::TAI()
+{
+	CLEAR_T();
+	int from = program_read16(PCW);
+	int to = program_read16(PCW + 2);
+	int length = program_read16(PCW + 4);
+	PCW += 6;
+	int alternate = 0;
+	if (!length) length = 0x10000;
+	H6280_CYCLES( ((6 * length) + 17) );
+	while ((length--) != 0)
+	{
+		program_write8(to, program_read8(from + alternate));
+		to++;
+		alternate ^= 1;
+	}
+}
+
+/* H6280 *******************************************************
+ *  TAM Transfer accumulator to memory mapper register(s)
+ ***************************************************************/
+inline void h6280_device::TAM(UINT8 tmp)
+{
+	CLEAR_T();
+	if (tmp&0x01) m_mmr[0] = A;
+	if (tmp&0x02) m_mmr[1] = A;
+	if (tmp&0x04) m_mmr[2] = A;
+	if (tmp&0x08) m_mmr[3] = A;
+	if (tmp&0x10) m_mmr[4] = A;
+	if (tmp&0x20) m_mmr[5] = A;
+	if (tmp&0x40) m_mmr[6] = A;
+	if (tmp&0x80) m_mmr[7] = A;
+}
+
+/* 6280 ********************************************************
+ *  TAX Transfer accumulator to index X
+ ***************************************************************/
+inline void h6280_device::TAX()
+{
+	CLEAR_T();
+	X = A;
+	SET_NZ(X);
+}
+
+/* 6280 ********************************************************
+ *  TAY Transfer accumulator to index Y
+ ***************************************************************/
+inline void h6280_device::TAY()
+{
+	CLEAR_T();
+	Y = A;
+	SET_NZ(Y);
+}
+
+/* 6280 ********************************************************
+ *  TDD Transfer Decrement Decrement
+ ***************************************************************/
+inline void h6280_device::TDD()
+{
+	CLEAR_T();
+	int from = program_read16(PCW);
+	int to = program_read16(PCW + 2);
+	int length = program_read16(PCW + 4);
+	PCW+=6;
+	if (!length) length = 0x10000;
+	H6280_CYCLES( ((6 * length) + 17) );
+	while ((length--) != 0) {
+		program_write8(to, program_read8(from));
+		to--;
+		from--;
+	}
+}
+
+/* 6280 ********************************************************
+ *  TIA Transfer Increment Alternate
+ ***************************************************************/
+inline void h6280_device::TIA()
+{
+	CLEAR_T();
+	int from = program_read16(PCW);
+	int to  = program_read16(PCW + 2);
+	int length = program_read16(PCW + 4);
+	PCW+=6;
+	int alternate=0;
+	if (!length) length = 0x10000;
+	H6280_CYCLES( ((6 * length) + 17) );
+	while ((length--) != 0) {
+		program_write8(to + alternate, program_read8(from));
+		from++;
+		alternate ^= 1;
+	}
+}
+
+/* 6280 ********************************************************
+ *  TII Transfer Increment Increment
+ ***************************************************************/
+inline void h6280_device::TII()
+{
+	CLEAR_T();
+	int from = program_read16(PCW);
+	int to = program_read16(PCW + 2);
+	int length = program_read16(PCW + 4);
+	PCW += 6;
+	if (!length) length = 0x10000;
+	H6280_CYCLES( ((6 * length) + 17) );
+	while ((length--) != 0) {
+		program_write8(to, program_read8(from));
+		to++;
+		from++;
+	}
+}
+
+/* 6280 ********************************************************
+ *  TIN Transfer block, source increments every loop
+ ***************************************************************/
+inline void h6280_device::TIN()
+{
+	CLEAR_T();
+	int from = program_read16(PCW);
+	int to = program_read16(PCW + 2);
+	int length = program_read16(PCW + 4);
+	PCW+=6;
+	if (!length) length = 0x10000;
+	H6280_CYCLES( ((6 * length) + 17) );
+	while ((length--) != 0) {
+		program_write8(to, program_read8(from));
+		from++;
+	}
+}
+
+/* 6280 ********************************************************
+ *  TMA Transfer memory mapper register(s) to accumulator
+ *  the highest bit set in tmp is the one that counts
+ ***************************************************************/
+inline void h6280_device::TMA(UINT8 tmp)
+{
+	CLEAR_T();
+	if (tmp&0x01) A = m_mmr[0];
+	if (tmp&0x02) A = m_mmr[1];
+	if (tmp&0x04) A = m_mmr[2];
+	if (tmp&0x08) A = m_mmr[3];
+	if (tmp&0x10) A = m_mmr[4];
+	if (tmp&0x20) A = m_mmr[5];
+	if (tmp&0x40) A = m_mmr[6];
+	if (tmp&0x80) A = m_mmr[7];
+}
+
+/* 6280 ********************************************************
+ * TRB  Test and reset bits
+ ***************************************************************/
+inline UINT8 h6280_device::TRB(UINT8 tmp)
+{
+	CLEAR_T();
+	P = (P & ~(_fN|_fV|_fT|_fZ))
+		| ((tmp&0x80) ? _fN:0)
+		| ((tmp&0x40) ? _fV:0)
+		| ((tmp&~A)  ? 0:_fZ);
+	tmp &= ~A;
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ * TSB  Test and set bits
+ ***************************************************************/
+inline UINT8 h6280_device::TSB(UINT8 tmp)
+{
+	CLEAR_T();
+	P = (P & ~(_fN|_fV|_fT|_fZ))
+		| ((tmp&0x80) ? _fN:0)
+		| ((tmp&0x40) ? _fV:0)
+		| ((tmp|A)  ? 0:_fZ);
+	tmp |= A;
+	return tmp;
+}
+
+/* 6280 ********************************************************
+ *  TSX Transfer stack LSB to index X
+ ***************************************************************/
+inline void h6280_device::TSX()
+{
+	CLEAR_T();
+	X = S;
+	SET_NZ(X);
+}
+
+/* 6280 ********************************************************
+ *  TST
+ ***************************************************************/
+inline void h6280_device::TST(UINT8 imm, UINT8 tmp)
+{
+	P = (P & ~(_fN|_fV|_fT|_fZ))
+		| ((tmp&0x80) ? _fN:0)
+		| ((tmp&0x40) ? _fV:0)
+		| ((tmp&imm)  ? 0:_fZ);
+}
+
+/* 6280 ********************************************************
+ *  TXA Transfer index X to accumulator
+ ***************************************************************/
+inline void h6280_device::TXA()
+{
+	CLEAR_T();
+	A = X;
+	SET_NZ(A);
+}
+
+/* 6280 ********************************************************
+ *  TXS Transfer index X to stack LSB
+ *  no flags changed (sic!)
+ ***************************************************************/
+inline void h6280_device::TXS()
+{
+	CLEAR_T();
+	S = X;
+}
+
+/* 6280 ********************************************************
+ *  TYA Transfer index Y to accumulator
+ ***************************************************************/
+inline void h6280_device::TYA()
+{
+	CLEAR_T();
+	A = Y;
+	SET_NZ(A);
+}
+
+/* 6280 ********************************************************
+ * CSH Set CPU in high speed mode
+ ***************************************************************/
+inline void h6280_device::CSH()
+{
+	m_clocks_per_cycle = 1;
+}
+
+/* 6280 ********************************************************
+ * CSL Set CPU in low speed mode
+ ***************************************************************/
+inline void h6280_device::CSL()
+{
+	m_clocks_per_cycle = 4;
+}
+
 
 #define OP(prefix,opcode)  void h6280_device::prefix##_##opcode()
 
@@ -316,294 +1900,294 @@ const address_space_config *h6280_device::memory_space_config(address_spacenum s
  *   Hu6280 opcodes
  *
  *****************************************************************************
- * op       temp     cycles           rdmem   opc   wrmem   ******************/
-OP(op,00) {          H6280_CYCLES(8);         BRK;          } // 8 BRK
-OP(op,20) {          H6280_CYCLES(7); EA_ABS; JSR;          } // 7 JSR  ABS
-OP(op,40) {          H6280_CYCLES(7);         RTI;          } // 7 RTI
-OP(op,60) {          H6280_CYCLES(7);         RTS;          } // 7 RTS
-OP(op,80) { int tmp;                          BRA(1);       } // 4 BRA  REL
-OP(op,a0) { int tmp; H6280_CYCLES(2); RD_IMM; LDY;          } // 2 LDY  IMM
-OP(op,c0) { int tmp; H6280_CYCLES(2); RD_IMM; CPY;          } // 2 CPY  IMM
-OP(op,e0) { int tmp; H6280_CYCLES(2); RD_IMM; CPX;          } // 2 CPX  IMM
+ *    op    cycles           opc                       ***********************/
+OP(op,00) { H6280_CYCLES(8); BRK();                    } // 8 BRK
+OP(op,20) { H6280_CYCLES(7); EA_ABS(); JSR();          } // 7 JSR  ABS
+OP(op,40) { H6280_CYCLES(7); RTI();                    } // 7 RTI
+OP(op,60) { H6280_CYCLES(7); RTS();                    } // 7 RTS
+OP(op,80) {                  BRA(1);                   } // 4 BRA  REL
+OP(op,a0) { H6280_CYCLES(2); LDY(RD_IMM());            } // 2 LDY  IMM
+OP(op,c0) { H6280_CYCLES(2); CPY(RD_IMM());            } // 2 CPY  IMM
+OP(op,e0) { H6280_CYCLES(2); CPX(RD_IMM());            } // 2 CPX  IMM
 
-OP(op,10) { int tmp;                          BPL;          } // 2/4 BPL  REL
-OP(op,30) { int tmp;                          BMI;          } // 2/4 BMI  REL
-OP(op,50) { int tmp;                          BVC;          } // 2/4 BVC  REL
-OP(op,70) { int tmp;                          BVS;          } // 2/4 BVS  REL
-OP(op,90) { int tmp;                          BCC;          } // 2/4 BCC  REL
-OP(op,b0) { int tmp;                          BCS;          } // 2/4 BCS  REL
-OP(op,d0) { int tmp;                          BNE;          } // 2/4 BNE  REL
-OP(op,f0) { int tmp;                          BEQ;          } // 2/4 BEQ  REL
+OP(op,10) {                  BPL();                    } // 2/4 BPL  REL
+OP(op,30) {                  BMI();                    } // 2/4 BMI  REL
+OP(op,50) {                  BVC();                    } // 2/4 BVC  REL
+OP(op,70) {                  BVS();                    } // 2/4 BVS  REL
+OP(op,90) {                  BCC();                    } // 2/4 BCC  REL
+OP(op,b0) {                  BCS();                    } // 2/4 BCS  REL
+OP(op,d0) {                  BNE();                    } // 2/4 BNE  REL
+OP(op,f0) {                  BEQ();                    } // 2/4 BEQ  REL
 
-OP(op,01) { int tmp; H6280_CYCLES(7); RD_IDX; ORA;          } // 7 ORA  IDX
-OP(op,21) { int tmp; H6280_CYCLES(7); RD_IDX; AND;          } // 7 AND  IDX
-OP(op,41) { int tmp; H6280_CYCLES(7); RD_IDX; EOR;          } // 7 EOR  IDX
-OP(op,61) { int tmp; H6280_CYCLES(7); RD_IDX; ADC;          } // 7 ADC  IDX
-OP(op,81) { int tmp; H6280_CYCLES(7);         STA;  WR_IDX; } // 7 STA  IDX
-OP(op,a1) { int tmp; H6280_CYCLES(7); RD_IDX; LDA;          } // 7 LDA  IDX
-OP(op,c1) { int tmp; H6280_CYCLES(7); RD_IDX; CMP;          } // 7 CMP  IDX
-OP(op,e1) { int tmp; H6280_CYCLES(7); RD_IDX; SBC;          } // 7 SBC  IDX
+OP(op,01) { H6280_CYCLES(7); ORA(RD_IDX());            } // 7 ORA  IDX
+OP(op,21) { H6280_CYCLES(7); AND(RD_IDX());            } // 7 AND  IDX
+OP(op,41) { H6280_CYCLES(7); EOR(RD_IDX());            } // 7 EOR  IDX
+OP(op,61) { H6280_CYCLES(7); ADC(RD_IDX());            } // 7 ADC  IDX
+OP(op,81) { H6280_CYCLES(7); WR_IDX(STA());            } // 7 STA  IDX
+OP(op,a1) { H6280_CYCLES(7); LDA(RD_IDX());            } // 7 LDA  IDX
+OP(op,c1) { H6280_CYCLES(7); CMP(RD_IDX());            } // 7 CMP  IDX
+OP(op,e1) { H6280_CYCLES(7); SBC(RD_IDX());            } // 7 SBC  IDX
 
-OP(op,11) { int tmp; H6280_CYCLES(7); RD_IDY; ORA;          } // 7 ORA  IDY
-OP(op,31) { int tmp; H6280_CYCLES(7); RD_IDY; AND;          } // 7 AND  IDY
-OP(op,51) { int tmp; H6280_CYCLES(7); RD_IDY; EOR;          } // 7 EOR  IDY
-OP(op,71) { int tmp; H6280_CYCLES(7); RD_IDY; ADC;          } // 7 ADC  AZP
-OP(op,91) { int tmp; H6280_CYCLES(7);         STA;  WR_IDY; } // 7 STA  IDY
-OP(op,b1) { int tmp; H6280_CYCLES(7); RD_IDY; LDA;          } // 7 LDA  IDY
-OP(op,d1) { int tmp; H6280_CYCLES(7); RD_IDY; CMP;          } // 7 CMP  IDY
-OP(op,f1) { int tmp; H6280_CYCLES(7); RD_IDY; SBC;          } // 7 SBC  IDY
+OP(op,11) { H6280_CYCLES(7); ORA(RD_IDY());            } // 7 ORA  IDY
+OP(op,31) { H6280_CYCLES(7); AND(RD_IDY());            } // 7 AND  IDY
+OP(op,51) { H6280_CYCLES(7); EOR(RD_IDY());            } // 7 EOR  IDY
+OP(op,71) { H6280_CYCLES(7); ADC(RD_IDY());            } // 7 ADC  AZP
+OP(op,91) { H6280_CYCLES(7); WR_IDY(STA());            } // 7 STA  IDY
+OP(op,b1) { H6280_CYCLES(7); LDA(RD_IDY());            } // 7 LDA  IDY
+OP(op,d1) { H6280_CYCLES(7); CMP(RD_IDY());            } // 7 CMP  IDY
+OP(op,f1) { H6280_CYCLES(7); SBC(RD_IDY());            } // 7 SBC  IDY
 
-OP(op,02) { int tmp; H6280_CYCLES(3);         SXY;          } // 3 SXY
-OP(op,22) { int tmp; H6280_CYCLES(3);         SAX;          } // 3 SAX
-OP(op,42) { int tmp; H6280_CYCLES(3);         SAY;          } // 3 SAY
-OP(op,62) {          H6280_CYCLES(2);         CLA;          } // 2 CLA
-OP(op,82) {          H6280_CYCLES(2);         CLX;          } // 2 CLX
-OP(op,a2) { int tmp; H6280_CYCLES(2); RD_IMM; LDX;          } // 2 LDX  IMM
-OP(op,c2) {          H6280_CYCLES(2);         CLY;          } // 2 CLY
-OP(op,e2) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
+OP(op,02) { H6280_CYCLES(3); SXY();                    } // 3 SXY
+OP(op,22) { H6280_CYCLES(3); SAX();                    } // 3 SAX
+OP(op,42) { H6280_CYCLES(3); SAY();                    } // 3 SAY
+OP(op,62) { H6280_CYCLES(2); CLA();                    } // 2 CLA
+OP(op,82) { H6280_CYCLES(2); CLX();                    } // 2 CLX
+OP(op,a2) { H6280_CYCLES(2); LDX(RD_IMM());            } // 2 LDX  IMM
+OP(op,c2) { H6280_CYCLES(2); CLY();                    } // 2 CLY
+OP(op,e2) { H6280_CYCLES(2); NOP();                    } // 2 NOP
 
-OP(op,12) { int tmp; H6280_CYCLES(7); RD_ZPI; ORA;          } // 7 ORA  ZPI
-OP(op,32) { int tmp; H6280_CYCLES(7); RD_ZPI; AND;          } // 7 AND  ZPI
-OP(op,52) { int tmp; H6280_CYCLES(7); RD_ZPI; EOR;          } // 7 EOR  ZPI
-OP(op,72) { int tmp; H6280_CYCLES(7); RD_ZPI; ADC;          } // 7 ADC  ZPI
-OP(op,92) { int tmp; H6280_CYCLES(7);         STA;  WR_ZPI; } // 7 STA  ZPI
-OP(op,b2) { int tmp; H6280_CYCLES(7); RD_ZPI; LDA;          } // 7 LDA  ZPI
-OP(op,d2) { int tmp; H6280_CYCLES(7); RD_ZPI; CMP;          } // 7 CMP  ZPI
-OP(op,f2) { int tmp; H6280_CYCLES(7); RD_ZPI; SBC;          } // 7 SBC  ZPI
+OP(op,12) { H6280_CYCLES(7); ORA(RD_ZPI());            } // 7 ORA  ZPI
+OP(op,32) { H6280_CYCLES(7); AND(RD_ZPI());            } // 7 AND  ZPI
+OP(op,52) { H6280_CYCLES(7); EOR(RD_ZPI());            } // 7 EOR  ZPI
+OP(op,72) { H6280_CYCLES(7); ADC(RD_ZPI());            } // 7 ADC  ZPI
+OP(op,92) { H6280_CYCLES(7); WR_ZPI(STA());            } // 7 STA  ZPI
+OP(op,b2) { H6280_CYCLES(7); LDA(RD_ZPI());            } // 7 LDA  ZPI
+OP(op,d2) { H6280_CYCLES(7); CMP(RD_ZPI());            } // 7 CMP  ZPI
+OP(op,f2) { H6280_CYCLES(7); SBC(RD_ZPI());            } // 7 SBC  ZPI
 
-OP(op,03) { int tmp; H6280_CYCLES(5); RD_IMM; ST0;          } // 4 + 1 penalty cycle ST0  IMM
-OP(op,23) { int tmp; H6280_CYCLES(5); RD_IMM; ST2;          } // 4 + 1 penalty cycle ST2  IMM
-OP(op,43) { int tmp; H6280_CYCLES(4); RD_IMM; TMA;          } // 4 TMA
-OP(op,63) {          H6280_CYCLES(4);         NOP;          } // 2 NOP
-OP(op,83) { int tmp,tmp2; H6280_CYCLES(7); RD_IMM2; RD_ZPG; TST; } // 7 TST  IMM,ZPG
-OP(op,a3) { int tmp,tmp2; H6280_CYCLES(7); RD_IMM2; RD_ZPX; TST; } // 7 TST  IMM,ZPX
-OP(op,c3) { int to,from,length;               TDD;          } // 6*l+17 TDD  XFER
-OP(op,e3) { int to,from,length,alternate;     TIA;          } // 6*l+17 TIA  XFER
+OP(op,03) { H6280_CYCLES(5); ST0(RD_IMM());            } // 4 + 1 penalty cycle ST0  IMM
+OP(op,23) { H6280_CYCLES(5); ST2(RD_IMM());            } // 4 + 1 penalty cycle ST2  IMM
+OP(op,43) { H6280_CYCLES(4); TMA(RD_IMM());            } // 4 TMA
+OP(op,63) { H6280_CYCLES(4); NOP();                    } // 2 NOP
+OP(op,83) { H6280_CYCLES(7); int imm = RD_IMM(); TST(imm, RD_ZPG()); } // 7 TST  IMM,ZPG
+OP(op,a3) { H6280_CYCLES(7); int imm = RD_IMM(); TST(imm, RD_ZPX()); } // 7 TST  IMM,ZPX
+OP(op,c3) {                  TDD();                    } // 6*l+17 TDD  XFER
+OP(op,e3) {                  TIA();                    } // 6*l+17 TIA  XFER
 
-OP(op,13) { int tmp; H6280_CYCLES(5); RD_IMM; ST1;          } // 4 + 1 penalty cycle ST1
-OP(op,33) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,53) { int tmp; H6280_CYCLES(5); RD_IMM; TAM;          } // 5 TAM  IMM
-OP(op,73) { int to,from,length;               TII;          } // 6*l+17 TII  XFER
-OP(op,93) { int tmp,tmp2; H6280_CYCLES(8); RD_IMM2; RD_ABS; TST; } // 8 TST  IMM,ABS
-OP(op,b3) { int tmp,tmp2; H6280_CYCLES(8); RD_IMM2; RD_ABX; TST; } // 8 TST  IMM,ABX
-OP(op,d3) { int to,from,length;               TIN;          } // 6*l+17 TIN  XFER
-OP(op,f3) { int to,from,length,alternate;     TAI;          } // 6*l+17 TAI  XFER
+OP(op,13) { H6280_CYCLES(5); ST1(RD_IMM());            } // 4 + 1 penalty cycle ST1
+OP(op,33) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,53) { H6280_CYCLES(5); TAM(RD_IMM());            } // 5 TAM  IMM
+OP(op,73) {                  TII();                    } // 6*l+17 TII  XFER
+OP(op,93) { H6280_CYCLES(8); int imm = RD_IMM(); TST(imm, RD_ABS()); } // 8 TST  IMM,ABS
+OP(op,b3) { H6280_CYCLES(8); int imm = RD_IMM(); TST(imm, RD_ABX()); } // 8 TST  IMM,ABX
+OP(op,d3) {                  TIN();                    } // 6*l+17 TIN  XFER
+OP(op,f3) {                  TAI();                    } // 6*l+17 TAI  XFER
 
-OP(op,04) { int tmp; H6280_CYCLES(6); RD_ZPG; TSB;  WB_EAZ; } // 6 TSB  ZPG
-OP(op,24) { int tmp; H6280_CYCLES(4); RD_ZPG; HBIT;         } // 4 BIT  ZPG
-OP(op,44) { int tmp;                          BSR;          } // 8 BSR  REL
-OP(op,64) { int tmp; H6280_CYCLES(4);         STZ;  WR_ZPG; } // 4 STZ  ZPG
-OP(op,84) { int tmp; H6280_CYCLES(4);         STY;  WR_ZPG; } // 4 STY  ZPG
-OP(op,a4) { int tmp; H6280_CYCLES(4); RD_ZPG; LDY;          } // 4 LDY  ZPG
-OP(op,c4) { int tmp; H6280_CYCLES(4); RD_ZPG; CPY;          } // 4 CPY  ZPG
-OP(op,e4) { int tmp; H6280_CYCLES(4); RD_ZPG; CPX;          } // 4 CPX  ZPG
+OP(op,04) { H6280_CYCLES(6); WB_EAZ(TSB(RD_ZPG()));    } // 6 TSB  ZPG
+OP(op,24) { H6280_CYCLES(4); BIT(RD_ZPG());            } // 4 BIT  ZPG
+OP(op,44) {                  BSR();                    } // 8 BSR  REL
+OP(op,64) { H6280_CYCLES(4); WR_ZPG(STZ());            } // 4 STZ  ZPG
+OP(op,84) { H6280_CYCLES(4); WR_ZPG(STY());            } // 4 STY  ZPG
+OP(op,a4) { H6280_CYCLES(4); LDY(RD_ZPG());            } // 4 LDY  ZPG
+OP(op,c4) { H6280_CYCLES(4); CPY(RD_ZPG());            } // 4 CPY  ZPG
+OP(op,e4) { H6280_CYCLES(4); CPX(RD_ZPG());            } // 4 CPX  ZPG
 
-OP(op,14) { int tmp; H6280_CYCLES(6); RD_ZPG; TRB;  WB_EAZ; } // 6 TRB  ZPG
-OP(op,34) { int tmp; H6280_CYCLES(4); RD_ZPX; HBIT;         } // 4 BIT  ZPX
-OP(op,54) {         H6280_CYCLES(3);          CSL;          } // 3 CSL
-OP(op,74) { int tmp; H6280_CYCLES(4);         STZ;  WR_ZPX; } // 4 STZ  ZPX
-OP(op,94) { int tmp; H6280_CYCLES(4);         STY;  WR_ZPX; } // 4 STY  ZPX
-OP(op,b4) { int tmp; H6280_CYCLES(4); RD_ZPX; LDY;          } // 4 LDY  ZPX
-OP(op,d4) {         H6280_CYCLES(3);          CSH;          } // 3 CSH
-OP(op,f4) {         H6280_CYCLES(2);          SET;          } // 2 SET
+OP(op,14) { H6280_CYCLES(6); WB_EAZ(TRB(RD_ZPG()));    } // 6 TRB  ZPG
+OP(op,34) { H6280_CYCLES(4); BIT(RD_ZPX());            } // 4 BIT  ZPX
+OP(op,54) { H6280_CYCLES(3); CSL();                    } // 3 CSL
+OP(op,74) { H6280_CYCLES(4); WR_ZPX(STZ());            } // 4 STZ  ZPX
+OP(op,94) { H6280_CYCLES(4); WR_ZPX(STY());            } // 4 STY  ZPX
+OP(op,b4) { H6280_CYCLES(4); LDY(RD_ZPX());            } // 4 LDY  ZPX
+OP(op,d4) { H6280_CYCLES(3); CSH();                    } // 3 CSH
+OP(op,f4) { H6280_CYCLES(2); SET();                    } // 2 SET
 
-OP(op,05) { int tmp; H6280_CYCLES(4); RD_ZPG; ORA;          } // 4 ORA  ZPG
-OP(op,25) { int tmp; H6280_CYCLES(4); RD_ZPG; AND;          } // 4 AND  ZPG
-OP(op,45) { int tmp; H6280_CYCLES(4); RD_ZPG; EOR;          } // 4 EOR  ZPG
-OP(op,65) { int tmp; H6280_CYCLES(4); RD_ZPG; ADC;          } // 4 ADC  ZPG
-OP(op,85) { int tmp; H6280_CYCLES(4);         STA;  WR_ZPG; } // 4 STA  ZPG
-OP(op,a5) { int tmp; H6280_CYCLES(4); RD_ZPG; LDA;          } // 4 LDA  ZPG
-OP(op,c5) { int tmp; H6280_CYCLES(4); RD_ZPG; CMP;          } // 4 CMP  ZPG
-OP(op,e5) { int tmp; H6280_CYCLES(4); RD_ZPG; SBC;          } // 4 SBC  ZPG
+OP(op,05) { H6280_CYCLES(4); ORA(RD_ZPG());            } // 4 ORA  ZPG
+OP(op,25) { H6280_CYCLES(4); AND(RD_ZPG());            } // 4 AND  ZPG
+OP(op,45) { H6280_CYCLES(4); EOR(RD_ZPG());            } // 4 EOR  ZPG
+OP(op,65) { H6280_CYCLES(4); ADC(RD_ZPG());            } // 4 ADC  ZPG
+OP(op,85) { H6280_CYCLES(4); WR_ZPG(STA());            } // 4 STA  ZPG
+OP(op,a5) { H6280_CYCLES(4); LDA(RD_ZPG());            } // 4 LDA  ZPG
+OP(op,c5) { H6280_CYCLES(4); CMP(RD_ZPG());            } // 4 CMP  ZPG
+OP(op,e5) { H6280_CYCLES(4); SBC(RD_ZPG());            } // 4 SBC  ZPG
 
-OP(op,15) { int tmp; H6280_CYCLES(4); RD_ZPX; ORA;          } // 4 ORA  ZPX
-OP(op,35) { int tmp; H6280_CYCLES(4); RD_ZPX; AND;          } // 4 AND  ZPX
-OP(op,55) { int tmp; H6280_CYCLES(4); RD_ZPX; EOR;          } // 4 EOR  ZPX
-OP(op,75) { int tmp; H6280_CYCLES(4); RD_ZPX; ADC;          } // 4 ADC  ZPX
-OP(op,95) { int tmp; H6280_CYCLES(4);         STA;  WR_ZPX; } // 4 STA  ZPX
-OP(op,b5) { int tmp; H6280_CYCLES(4); RD_ZPX; LDA;          } // 4 LDA  ZPX
-OP(op,d5) { int tmp; H6280_CYCLES(4); RD_ZPX; CMP;          } // 4 CMP  ZPX
-OP(op,f5) { int tmp; H6280_CYCLES(4); RD_ZPX; SBC;          } // 4 SBC  ZPX
+OP(op,15) { H6280_CYCLES(4); ORA(RD_ZPX());            } // 4 ORA  ZPX
+OP(op,35) { H6280_CYCLES(4); AND(RD_ZPX());            } // 4 AND  ZPX
+OP(op,55) { H6280_CYCLES(4); EOR(RD_ZPX());            } // 4 EOR  ZPX
+OP(op,75) { H6280_CYCLES(4); ADC(RD_ZPX());            } // 4 ADC  ZPX
+OP(op,95) { H6280_CYCLES(4); WR_ZPX(STA());            } // 4 STA  ZPX
+OP(op,b5) { H6280_CYCLES(4); LDA(RD_ZPX());            } // 4 LDA  ZPX
+OP(op,d5) { H6280_CYCLES(4); CMP(RD_ZPX());            } // 4 CMP  ZPX
+OP(op,f5) { H6280_CYCLES(4); SBC(RD_ZPX());            } // 4 SBC  ZPX
 
-OP(op,06) { int tmp; H6280_CYCLES(6); RD_ZPG; ASL;  WB_EAZ; } // 6 ASL  ZPG
-OP(op,26) { int tmp; H6280_CYCLES(6); RD_ZPG; ROL;  WB_EAZ; } // 6 ROL  ZPG
-OP(op,46) { int tmp; H6280_CYCLES(6); RD_ZPG; LSR;  WB_EAZ; } // 6 LSR  ZPG
-OP(op,66) { int tmp; H6280_CYCLES(6); RD_ZPG; ROR;  WB_EAZ; } // 6 ROR  ZPG
-OP(op,86) { int tmp; H6280_CYCLES(4);         STX;  WR_ZPG; } // 4 STX  ZPG
-OP(op,a6) { int tmp; H6280_CYCLES(4); RD_ZPG; LDX;          } // 4 LDX  ZPG
-OP(op,c6) { int tmp; H6280_CYCLES(6); RD_ZPG; DEC;  WB_EAZ; } // 6 DEC  ZPG
-OP(op,e6) { int tmp; H6280_CYCLES(6); RD_ZPG; INC;  WB_EAZ; } // 6 INC  ZPG
+OP(op,06) { H6280_CYCLES(6); WB_EAZ(ASL(RD_ZPG()));    } // 6 ASL  ZPG
+OP(op,26) { H6280_CYCLES(6); WB_EAZ(ROL(RD_ZPG()));    } // 6 ROL  ZPG
+OP(op,46) { H6280_CYCLES(6); WB_EAZ(LSR(RD_ZPG()));    } // 6 LSR  ZPG
+OP(op,66) { H6280_CYCLES(6); WB_EAZ(ROR(RD_ZPG()));    } // 6 ROR  ZPG
+OP(op,86) { H6280_CYCLES(4); WR_ZPG(STX());            } // 4 STX  ZPG
+OP(op,a6) { H6280_CYCLES(4); LDX(RD_ZPG());            } // 4 LDX  ZPG
+OP(op,c6) { H6280_CYCLES(6); WB_EAZ(DEC(RD_ZPG()));    } // 6 DEC  ZPG
+OP(op,e6) { H6280_CYCLES(6); WB_EAZ(INC(RD_ZPG()));    } // 6 INC  ZPG
 
-OP(op,16) { int tmp; H6280_CYCLES(6); RD_ZPX; ASL;  WB_EAZ; } // 6 ASL  ZPX
-OP(op,36) { int tmp; H6280_CYCLES(6); RD_ZPX; ROL;  WB_EAZ; } // 6 ROL  ZPX
-OP(op,56) { int tmp; H6280_CYCLES(6); RD_ZPX; LSR;  WB_EAZ; } // 6 LSR  ZPX
-OP(op,76) { int tmp; H6280_CYCLES(6); RD_ZPX; ROR;  WB_EAZ; } // 6 ROR  ZPX
-OP(op,96) { int tmp; H6280_CYCLES(4);         STX;  WR_ZPY; } // 4 STX  ZPY
-OP(op,b6) { int tmp; H6280_CYCLES(4); RD_ZPY; LDX;          } // 4 LDX  ZPY
-OP(op,d6) { int tmp; H6280_CYCLES(6); RD_ZPX; DEC;  WB_EAZ; } // 6 DEC  ZPX
-OP(op,f6) { int tmp; H6280_CYCLES(6); RD_ZPX; INC;  WB_EAZ; } // 6 INC  ZPX
+OP(op,16) { H6280_CYCLES(6); WB_EAZ(ASL(RD_ZPX()));    } // 6 ASL  ZPX
+OP(op,36) { H6280_CYCLES(6); WB_EAZ(ROL(RD_ZPX()));    } // 6 ROL  ZPX
+OP(op,56) { H6280_CYCLES(6); WB_EAZ(LSR(RD_ZPX()));    } // 6 LSR  ZPX
+OP(op,76) { H6280_CYCLES(6); WB_EAZ(ROR(RD_ZPX()));    } // 6 ROR  ZPX
+OP(op,96) { H6280_CYCLES(4); WR_ZPY(STX());            } // 4 STX  ZPY
+OP(op,b6) { H6280_CYCLES(4); LDX(RD_ZPY());            } // 4 LDX  ZPY
+OP(op,d6) { H6280_CYCLES(6); WB_EAZ(DEC(RD_ZPX()));    } // 6 DEC  ZPX
+OP(op,f6) { H6280_CYCLES(6); WB_EAZ(INC(RD_ZPX()));    } // 6 INC  ZPX
 
-OP(op,07) { int tmp; H6280_CYCLES(7); RD_ZPG; RMB(0);WB_EAZ;} // 7 RMB0 ZPG
-OP(op,27) { int tmp; H6280_CYCLES(7); RD_ZPG; RMB(2);WB_EAZ;} // 7 RMB2 ZPG
-OP(op,47) { int tmp; H6280_CYCLES(7); RD_ZPG; RMB(4);WB_EAZ;} // 7 RMB4 ZPG
-OP(op,67) { int tmp; H6280_CYCLES(7); RD_ZPG; RMB(6);WB_EAZ;} // 7 RMB6 ZPG
-OP(op,87) { int tmp; H6280_CYCLES(7); RD_ZPG; SMB(0);WB_EAZ;} // 7 SMB0 ZPG
-OP(op,a7) { int tmp; H6280_CYCLES(7); RD_ZPG; SMB(2);WB_EAZ;} // 7 SMB2 ZPG
-OP(op,c7) { int tmp; H6280_CYCLES(7); RD_ZPG; SMB(4);WB_EAZ;} // 7 SMB4 ZPG
-OP(op,e7) { int tmp; H6280_CYCLES(7); RD_ZPG; SMB(6);WB_EAZ;} // 7 SMB6 ZPG
+OP(op,07) { H6280_CYCLES(7); WB_EAZ(RMB(0, RD_ZPG())); } // 7 RMB0 ZPG
+OP(op,27) { H6280_CYCLES(7); WB_EAZ(RMB(2, RD_ZPG())); } // 7 RMB2 ZPG
+OP(op,47) { H6280_CYCLES(7); WB_EAZ(RMB(4, RD_ZPG())); } // 7 RMB4 ZPG
+OP(op,67) { H6280_CYCLES(7); WB_EAZ(RMB(6, RD_ZPG())); } // 7 RMB6 ZPG
+OP(op,87) { H6280_CYCLES(7); WB_EAZ(SMB(0, RD_ZPG())); } // 7 SMB0 ZPG
+OP(op,a7) { H6280_CYCLES(7); WB_EAZ(SMB(2, RD_ZPG())); } // 7 SMB2 ZPG
+OP(op,c7) { H6280_CYCLES(7); WB_EAZ(SMB(4, RD_ZPG())); } // 7 SMB4 ZPG
+OP(op,e7) { H6280_CYCLES(7); WB_EAZ(SMB(6, RD_ZPG())); } // 7 SMB6 ZPG
 
-OP(op,17) { int tmp; H6280_CYCLES(7); RD_ZPG; RMB(1);WB_EAZ;} // 7 RMB1 ZPG
-OP(op,37) { int tmp; H6280_CYCLES(7); RD_ZPG; RMB(3);WB_EAZ;} // 7 RMB3 ZPG
-OP(op,57) { int tmp; H6280_CYCLES(7); RD_ZPG; RMB(5);WB_EAZ;} // 7 RMB5 ZPG
-OP(op,77) { int tmp; H6280_CYCLES(7); RD_ZPG; RMB(7);WB_EAZ;} // 7 RMB7 ZPG
-OP(op,97) { int tmp; H6280_CYCLES(7); RD_ZPG; SMB(1);WB_EAZ;} // 7 SMB1 ZPG
-OP(op,b7) { int tmp; H6280_CYCLES(7); RD_ZPG; SMB(3);WB_EAZ;} // 7 SMB3 ZPG
-OP(op,d7) { int tmp; H6280_CYCLES(7); RD_ZPG; SMB(5);WB_EAZ;} // 7 SMB5 ZPG
-OP(op,f7) { int tmp; H6280_CYCLES(7); RD_ZPG; SMB(7);WB_EAZ;} // 7 SMB7 ZPG
+OP(op,17) { H6280_CYCLES(7); WB_EAZ(RMB(1, RD_ZPG())); } // 7 RMB1 ZPG
+OP(op,37) { H6280_CYCLES(7); WB_EAZ(RMB(3, RD_ZPG())); } // 7 RMB3 ZPG
+OP(op,57) { H6280_CYCLES(7); WB_EAZ(RMB(5, RD_ZPG())); } // 7 RMB5 ZPG
+OP(op,77) { H6280_CYCLES(7); WB_EAZ(RMB(7, RD_ZPG())); } // 7 RMB7 ZPG
+OP(op,97) { H6280_CYCLES(7); WB_EAZ(SMB(1, RD_ZPG())); } // 7 SMB1 ZPG
+OP(op,b7) { H6280_CYCLES(7); WB_EAZ(SMB(3, RD_ZPG())); } // 7 SMB3 ZPG
+OP(op,d7) { H6280_CYCLES(7); WB_EAZ(SMB(5, RD_ZPG())); } // 7 SMB5 ZPG
+OP(op,f7) { H6280_CYCLES(7); WB_EAZ(SMB(7, RD_ZPG())); } // 7 SMB7 ZPG
 
-OP(op,08) {          H6280_CYCLES(3);         PHP;          } // 3 PHP
-OP(op,28) {          H6280_CYCLES(4);         PLP;          } // 4 PLP
-OP(op,48) {          H6280_CYCLES(3);         PHA;          } // 3 PHA
-OP(op,68) {          H6280_CYCLES(4);         PLA;          } // 4 PLA
-OP(op,88) {          H6280_CYCLES(2);         DEY;          } // 2 DEY
-OP(op,a8) {          H6280_CYCLES(2);         TAY;          } // 2 TAY
-OP(op,c8) {          H6280_CYCLES(2);         INY;          } // 2 INY
-OP(op,e8) {          H6280_CYCLES(2);         INX;          } // 2 INX
+OP(op,08) { H6280_CYCLES(3); PHP();                    } // 3 PHP
+OP(op,28) { H6280_CYCLES(4); PLP();                    } // 4 PLP
+OP(op,48) { H6280_CYCLES(3); PHA();                    } // 3 PHA
+OP(op,68) { H6280_CYCLES(4); PLA();                    } // 4 PLA
+OP(op,88) { H6280_CYCLES(2); DEY();                    } // 2 DEY
+OP(op,a8) { H6280_CYCLES(2); TAY();                    } // 2 TAY
+OP(op,c8) { H6280_CYCLES(2); INY();                    } // 2 INY
+OP(op,e8) { H6280_CYCLES(2); INX();                    } // 2 INX
 
-OP(op,18) {          H6280_CYCLES(2);         CLC;          } // 2 CLC
-OP(op,38) {          H6280_CYCLES(2);         SEC;          } // 2 SEC
-OP(op,58) {          H6280_CYCLES(2);         CLI;          } // 2 CLI
-OP(op,78) {          H6280_CYCLES(2);         SEI;          } // 2 SEI
-OP(op,98) {          H6280_CYCLES(2);         TYA;          } // 2 TYA
-OP(op,b8) {          H6280_CYCLES(2);         CLV;          } // 2 CLV
-OP(op,d8) {          H6280_CYCLES(2);         CLD;          } // 2 CLD
-OP(op,f8) {          H6280_CYCLES(2);         SED;          } // 2 SED
+OP(op,18) { H6280_CYCLES(2); CLC();                    } // 2 CLC
+OP(op,38) { H6280_CYCLES(2); SEC();                    } // 2 SEC
+OP(op,58) { H6280_CYCLES(2); CLI();                    } // 2 CLI
+OP(op,78) { H6280_CYCLES(2); SEI();                    } // 2 SEI
+OP(op,98) { H6280_CYCLES(2); TYA();                    } // 2 TYA
+OP(op,b8) { H6280_CYCLES(2); CLV();                    } // 2 CLV
+OP(op,d8) { H6280_CYCLES(2); CLD();                    } // 2 CLD
+OP(op,f8) { H6280_CYCLES(2); SED();                    } // 2 SED
 
-OP(op,09) { int tmp; H6280_CYCLES(2); RD_IMM; ORA;          } // 2 ORA  IMM
-OP(op,29) { int tmp; H6280_CYCLES(2); RD_IMM; AND;          } // 2 AND  IMM
-OP(op,49) { int tmp; H6280_CYCLES(2); RD_IMM; EOR;          } // 2 EOR  IMM
-OP(op,69) { int tmp; H6280_CYCLES(2); RD_IMM; ADC;          } // 2 ADC  IMM
-OP(op,89) { int tmp; H6280_CYCLES(2); RD_IMM; HBIT;         } // 2 BIT  IMM
-OP(op,a9) { int tmp; H6280_CYCLES(2); RD_IMM; LDA;          } // 2 LDA  IMM
-OP(op,c9) { int tmp; H6280_CYCLES(2); RD_IMM; CMP;          } // 2 CMP  IMM
-OP(op,e9) { int tmp; H6280_CYCLES(2); RD_IMM; SBC;          } // 2 SBC  IMM
+OP(op,09) { H6280_CYCLES(2); ORA(RD_IMM());            } // 2 ORA  IMM
+OP(op,29) { H6280_CYCLES(2); AND(RD_IMM());            } // 2 AND  IMM
+OP(op,49) { H6280_CYCLES(2); EOR(RD_IMM());            } // 2 EOR  IMM
+OP(op,69) { H6280_CYCLES(2); ADC(RD_IMM());            } // 2 ADC  IMM
+OP(op,89) { H6280_CYCLES(2); BIT(RD_IMM());            } // 2 BIT  IMM
+OP(op,a9) { H6280_CYCLES(2); LDA(RD_IMM());            } // 2 LDA  IMM
+OP(op,c9) { H6280_CYCLES(2); CMP(RD_IMM());            } // 2 CMP  IMM
+OP(op,e9) { H6280_CYCLES(2); SBC(RD_IMM());            } // 2 SBC  IMM
 
-OP(op,19) { int tmp; H6280_CYCLES(5); RD_ABY; ORA;          } // 5 ORA  ABY
-OP(op,39) { int tmp; H6280_CYCLES(5); RD_ABY; AND;          } // 5 AND  ABY
-OP(op,59) { int tmp; H6280_CYCLES(5); RD_ABY; EOR;          } // 5 EOR  ABY
-OP(op,79) { int tmp; H6280_CYCLES(5); RD_ABY; ADC;          } // 5 ADC  ABY
-OP(op,99) { int tmp; H6280_CYCLES(5);         STA;  WR_ABY; } // 5 STA  ABY
-OP(op,b9) { int tmp; H6280_CYCLES(5); RD_ABY; LDA;          } // 5 LDA  ABY
-OP(op,d9) { int tmp; H6280_CYCLES(5); RD_ABY; CMP;          } // 5 CMP  ABY
-OP(op,f9) { int tmp; H6280_CYCLES(5); RD_ABY; SBC;          } // 5 SBC  ABY
+OP(op,19) { H6280_CYCLES(5); ORA(RD_ABY());            } // 5 ORA  ABY
+OP(op,39) { H6280_CYCLES(5); AND(RD_ABY());            } // 5 AND  ABY
+OP(op,59) { H6280_CYCLES(5); EOR(RD_ABY());            } // 5 EOR  ABY
+OP(op,79) { H6280_CYCLES(5); ADC(RD_ABY());            } // 5 ADC  ABY
+OP(op,99) { H6280_CYCLES(5); WR_ABY(STA());            } // 5 STA  ABY
+OP(op,b9) { H6280_CYCLES(5); LDA(RD_ABY());            } // 5 LDA  ABY
+OP(op,d9) { H6280_CYCLES(5); CMP(RD_ABY());            } // 5 CMP  ABY
+OP(op,f9) { H6280_CYCLES(5); SBC(RD_ABY());            } // 5 SBC  ABY
 
-OP(op,0a) { int tmp; H6280_CYCLES(2); RD_ACC; ASL;  WB_ACC; } // 2 ASL  A
-OP(op,2a) { int tmp; H6280_CYCLES(2); RD_ACC; ROL;  WB_ACC; } // 2 ROL  A
-OP(op,4a) { int tmp; H6280_CYCLES(2); RD_ACC; LSR;  WB_ACC; } // 2 LSR  A
-OP(op,6a) { int tmp; H6280_CYCLES(2); RD_ACC; ROR;  WB_ACC; } // 2 ROR  A
-OP(op,8a) {         H6280_CYCLES(2);          TXA;          } // 2 TXA
-OP(op,aa) {         H6280_CYCLES(2);          TAX;          } // 2 TAX
-OP(op,ca) {         H6280_CYCLES(2);          DEX;          } // 2 DEX
-OP(op,ea) {         H6280_CYCLES(2);          NOP;          } // 2 NOP
+OP(op,0a) { H6280_CYCLES(2); A = ASL(A);               } // 2 ASL  A
+OP(op,2a) { H6280_CYCLES(2); A = ROL(A);               } // 2 ROL  A
+OP(op,4a) { H6280_CYCLES(2); A = LSR(A);               } // 2 LSR  A
+OP(op,6a) { H6280_CYCLES(2); A = ROR(A);               } // 2 ROR  A
+OP(op,8a) { H6280_CYCLES(2); TXA();                    } // 2 TXA
+OP(op,aa) { H6280_CYCLES(2); TAX();                    } // 2 TAX
+OP(op,ca) { H6280_CYCLES(2); DEX();                    } // 2 DEX
+OP(op,ea) { H6280_CYCLES(2); NOP();                    } // 2 NOP
 
-OP(op,1a) {         H6280_CYCLES(2);          INA;          } // 2 INC  A
-OP(op,3a) {         H6280_CYCLES(2);          DEA;          } // 2 DEC  A
-OP(op,5a) {         H6280_CYCLES(3);          PHY;          } // 3 PHY
-OP(op,7a) {         H6280_CYCLES(4);          PLY;          } // 4 PLY
-OP(op,9a) {         H6280_CYCLES(2);          TXS;          } // 2 TXS
-OP(op,ba) {         H6280_CYCLES(2);          TSX;          } // 2 TSX
-OP(op,da) {         H6280_CYCLES(3);          PHX;          } // 3 PHX
-OP(op,fa) {         H6280_CYCLES(4);          PLX;          } // 4 PLX
+OP(op,1a) { H6280_CYCLES(2); A = INC(A);               } // 2 INC  A
+OP(op,3a) { H6280_CYCLES(2); A = DEC(A);               } // 2 DEC  A
+OP(op,5a) { H6280_CYCLES(3); PHY();                    } // 3 PHY
+OP(op,7a) { H6280_CYCLES(4); PLY();                    } // 4 PLY
+OP(op,9a) { H6280_CYCLES(2); TXS();                    } // 2 TXS
+OP(op,ba) { H6280_CYCLES(2); TSX();                    } // 2 TSX
+OP(op,da) { H6280_CYCLES(3); PHX();                    } // 3 PHX
+OP(op,fa) { H6280_CYCLES(4); PLX();                    } // 4 PLX
 
-OP(op,0b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,2b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,4b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,6b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,8b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,ab) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,cb) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,eb) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
+OP(op,0b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,2b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,4b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,6b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,8b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,ab) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,cb) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,eb) { H6280_CYCLES(2); NOP();                    } // 2 NOP
 
-OP(op,1b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,3b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,5b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,7b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,9b) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,bb) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,db) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,fb) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
+OP(op,1b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,3b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,5b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,7b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,9b) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,bb) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,db) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,fb) { H6280_CYCLES(2); NOP();                    } // 2 NOP
 
-OP(op,0c) { int tmp; H6280_CYCLES(7); RD_ABS; TSB;  WB_EA;  } // 7 TSB  ABS
-OP(op,2c) { int tmp; H6280_CYCLES(5); RD_ABS; HBIT;         } // 5 BIT  ABS
-OP(op,4c) {          H6280_CYCLES(4); EA_ABS; JMP;          } // 4 JMP  ABS
-OP(op,6c) { int tmp; H6280_CYCLES(7); EA_IND; JMP;          } // 7 JMP  IND
-OP(op,8c) { int tmp; H6280_CYCLES(5);         STY;  WR_ABS; } // 5 STY  ABS
-OP(op,ac) { int tmp; H6280_CYCLES(5); RD_ABS; LDY;          } // 5 LDY  ABS
-OP(op,cc) { int tmp; H6280_CYCLES(5); RD_ABS; CPY;          } // 5 CPY  ABS
-OP(op,ec) { int tmp; H6280_CYCLES(5); RD_ABS; CPX;          } // 5 CPX  ABS
+OP(op,0c) { H6280_CYCLES(7); WB_EA(TSB(RD_ABS()));     } // 7 TSB  ABS
+OP(op,2c) { H6280_CYCLES(5); BIT(RD_ABS());            } // 5 BIT  ABS
+OP(op,4c) { H6280_CYCLES(4); EA_ABS(); JMP();          } // 4 JMP  ABS
+OP(op,6c) { H6280_CYCLES(7); EA_IND(); JMP();          } // 7 JMP  IND
+OP(op,8c) { H6280_CYCLES(5); WR_ABS(STY());            } // 5 STY  ABS
+OP(op,ac) { H6280_CYCLES(5); LDY(RD_ABS());            } // 5 LDY  ABS
+OP(op,cc) { H6280_CYCLES(5); CPY(RD_ABS());            } // 5 CPY  ABS
+OP(op,ec) { H6280_CYCLES(5); CPX(RD_ABS());            } // 5 CPX  ABS
 
-OP(op,1c) { int tmp; H6280_CYCLES(7); RD_ABS; TRB;  WB_EA;  } // 7 TRB  ABS
-OP(op,3c) { int tmp; H6280_CYCLES(5); RD_ABX; HBIT;         } // 5 BIT  ABX
-OP(op,5c) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,7c) { int tmp; H6280_CYCLES(7); EA_IAX; JMP;          } // 7 JMP  IAX
-OP(op,9c) { int tmp; H6280_CYCLES(5);         STZ;  WR_ABS; } // 5 STZ  ABS
-OP(op,bc) { int tmp; H6280_CYCLES(5); RD_ABX; LDY;          } // 5 LDY  ABX
-OP(op,dc) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
-OP(op,fc) {          H6280_CYCLES(2);         NOP;          } // 2 NOP
+OP(op,1c) { H6280_CYCLES(7); WB_EA(TRB(RD_ABS()));     } // 7 TRB  ABS
+OP(op,3c) { H6280_CYCLES(5); BIT(RD_ABX());            } // 5 BIT  ABX
+OP(op,5c) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,7c) { H6280_CYCLES(7); EA_IAX(); JMP();          } // 7 JMP  IAX
+OP(op,9c) { H6280_CYCLES(5); WR_ABS(STZ());            } // 5 STZ  ABS
+OP(op,bc) { H6280_CYCLES(5); LDY(RD_ABX());            } // 5 LDY  ABX
+OP(op,dc) { H6280_CYCLES(2); NOP();                    } // 2 NOP
+OP(op,fc) { H6280_CYCLES(2); NOP();                    } // 2 NOP
 
-OP(op,0d) { int tmp; H6280_CYCLES(5); RD_ABS; ORA;          } // 5 ORA  ABS
-OP(op,2d) { int tmp; H6280_CYCLES(5); RD_ABS; AND;          } // 5 AND  ABS
-OP(op,4d) { int tmp; H6280_CYCLES(5); RD_ABS; EOR;          } // 5 EOR  ABS
-OP(op,6d) { int tmp; H6280_CYCLES(5); RD_ABS; ADC;          } // 5 ADC  ABS
-OP(op,8d) { int tmp; H6280_CYCLES(5);         STA;  WR_ABS; } // 5 STA  ABS
-OP(op,ad) { int tmp; H6280_CYCLES(5); RD_ABS; LDA;          } // 5 LDA  ABS
-OP(op,cd) { int tmp; H6280_CYCLES(5); RD_ABS; CMP;          } // 5 CMP  ABS
-OP(op,ed) { int tmp; H6280_CYCLES(5); RD_ABS; SBC;          } // 5 SBC  ABS
+OP(op,0d) { H6280_CYCLES(5); ORA(RD_ABS());            } // 5 ORA  ABS
+OP(op,2d) { H6280_CYCLES(5); AND(RD_ABS());            } // 5 AND  ABS
+OP(op,4d) { H6280_CYCLES(5); EOR(RD_ABS());            } // 5 EOR  ABS
+OP(op,6d) { H6280_CYCLES(5); ADC(RD_ABS());            } // 5 ADC  ABS
+OP(op,8d) { H6280_CYCLES(5); WR_ABS(STA());            } // 5 STA  ABS
+OP(op,ad) { H6280_CYCLES(5); LDA(RD_ABS());            } // 5 LDA  ABS
+OP(op,cd) { H6280_CYCLES(5); CMP(RD_ABS());            } // 5 CMP  ABS
+OP(op,ed) { H6280_CYCLES(5); SBC(RD_ABS());            } // 5 SBC  ABS
 
-OP(op,1d) { int tmp; H6280_CYCLES(5); RD_ABX; ORA;          } // 5 ORA  ABX
-OP(op,3d) { int tmp; H6280_CYCLES(5); RD_ABX; AND;          } // 5 AND  ABX
-OP(op,5d) { int tmp; H6280_CYCLES(5); RD_ABX; EOR;          } // 5 EOR  ABX
-OP(op,7d) { int tmp; H6280_CYCLES(5); RD_ABX; ADC;          } // 5 ADC  ABX
-OP(op,9d) { int tmp; H6280_CYCLES(5);         STA;  WR_ABX; } // 5 STA  ABX
-OP(op,bd) { int tmp; H6280_CYCLES(5); RD_ABX; LDA;          } // 5 LDA  ABX
-OP(op,dd) { int tmp; H6280_CYCLES(5); RD_ABX; CMP;          } // 5 CMP  ABX
-OP(op,fd) { int tmp; H6280_CYCLES(5); RD_ABX; SBC;          } // 5 SBC  ABX
+OP(op,1d) { H6280_CYCLES(5); ORA(RD_ABX());            } // 5 ORA  ABX
+OP(op,3d) { H6280_CYCLES(5); AND(RD_ABX());            } // 5 AND  ABX
+OP(op,5d) { H6280_CYCLES(5); EOR(RD_ABX());            } // 5 EOR  ABX
+OP(op,7d) { H6280_CYCLES(5); ADC(RD_ABX());            } // 5 ADC  ABX
+OP(op,9d) { H6280_CYCLES(5); WR_ABX(STA());            } // 5 STA  ABX
+OP(op,bd) { H6280_CYCLES(5); LDA(RD_ABX());            } // 5 LDA  ABX
+OP(op,dd) { H6280_CYCLES(5); CMP(RD_ABX());            } // 5 CMP  ABX
+OP(op,fd) { H6280_CYCLES(5); SBC(RD_ABX());            } // 5 SBC  ABX
 
-OP(op,0e) { int tmp; H6280_CYCLES(7); RD_ABS; ASL;  WB_EA;  } // 7 ASL  ABS
-OP(op,2e) { int tmp; H6280_CYCLES(7); RD_ABS; ROL;  WB_EA;  } // 7 ROL  ABS
-OP(op,4e) { int tmp; H6280_CYCLES(7); RD_ABS; LSR;  WB_EA;  } // 7 LSR  ABS
-OP(op,6e) { int tmp; H6280_CYCLES(7); RD_ABS; ROR;  WB_EA;  } // 7 ROR  ABS
-OP(op,8e) { int tmp; H6280_CYCLES(5);         STX;  WR_ABS; } // 5 STX  ABS
-OP(op,ae) { int tmp; H6280_CYCLES(5); RD_ABS; LDX;          } // 5 LDX  ABS
-OP(op,ce) { int tmp; H6280_CYCLES(7); RD_ABS; DEC;  WB_EA;  } // 7 DEC  ABS
-OP(op,ee) { int tmp; H6280_CYCLES(7); RD_ABS; INC;  WB_EA;  } // 7 INC  ABS
+OP(op,0e) { H6280_CYCLES(7); WB_EA(ASL(RD_ABS()));     } // 7 ASL  ABS
+OP(op,2e) { H6280_CYCLES(7); WB_EA(ROL(RD_ABS()));     } // 7 ROL  ABS
+OP(op,4e) { H6280_CYCLES(7); WB_EA(LSR(RD_ABS()));     } // 7 LSR  ABS
+OP(op,6e) { H6280_CYCLES(7); WB_EA(ROR(RD_ABS()));     } // 7 ROR  ABS
+OP(op,8e) { H6280_CYCLES(5); WR_ABS(STX());            } // 5 STX  ABS
+OP(op,ae) { H6280_CYCLES(5); LDX(RD_ABS());            } // 5 LDX  ABS
+OP(op,ce) { H6280_CYCLES(7); WB_EA(DEC(RD_ABS()));     } // 7 DEC  ABS
+OP(op,ee) { H6280_CYCLES(7); WB_EA(INC(RD_ABS()));     } // 7 INC  ABS
 
-OP(op,1e) { int tmp; H6280_CYCLES(7); RD_ABX; ASL;  WB_EA;  } // 7 ASL  ABX
-OP(op,3e) { int tmp; H6280_CYCLES(7); RD_ABX; ROL;  WB_EA;  } // 7 ROL  ABX
-OP(op,5e) { int tmp; H6280_CYCLES(7); RD_ABX; LSR;  WB_EA;  } // 7 LSR  ABX
-OP(op,7e) { int tmp; H6280_CYCLES(7); RD_ABX; ROR;  WB_EA;  } // 7 ROR  ABX
-OP(op,9e) { int tmp; H6280_CYCLES(5);         STZ;  WR_ABX; } // 5 STZ  ABX
-OP(op,be) { int tmp; H6280_CYCLES(5); RD_ABY; LDX;          } // 5 LDX  ABY
-OP(op,de) { int tmp; H6280_CYCLES(7); RD_ABX; DEC;  WB_EA;  } // 7 DEC  ABX
-OP(op,fe) { int tmp; H6280_CYCLES(7); RD_ABX; INC;  WB_EA;  } // 7 INC  ABX
+OP(op,1e) { H6280_CYCLES(7); WB_EA(ASL(RD_ABX()));     } // 7 ASL  ABX
+OP(op,3e) { H6280_CYCLES(7); WB_EA(ROL(RD_ABX()));     } // 7 ROL  ABX
+OP(op,5e) { H6280_CYCLES(7); WB_EA(LSR(RD_ABX()));     } // 7 LSR  ABX
+OP(op,7e) { H6280_CYCLES(7); WB_EA(ROR(RD_ABX()));     } // 7 ROR  ABX
+OP(op,9e) { H6280_CYCLES(5); WR_ABX(STZ());            } // 5 STZ  ABX
+OP(op,be) { H6280_CYCLES(5); LDX(RD_ABY());            } // 5 LDX  ABY
+OP(op,de) { H6280_CYCLES(7); WB_EA(DEC(RD_ABX()));     } // 7 DEC  ABX
+OP(op,fe) { H6280_CYCLES(7); WB_EA(INC(RD_ABX()));     } // 7 INC  ABX
 
-OP(op,0f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBR(0);       } // 6/8 BBR0 ZPG,REL
-OP(op,2f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBR(2);       } // 6/8 BBR2 ZPG,REL
-OP(op,4f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBR(4);       } // 6/8 BBR4 ZPG,REL
-OP(op,6f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBR(6);       } // 6/8 BBR6 ZPG,REL
-OP(op,8f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(0);       } // 6/8 BBS0 ZPG,REL
-OP(op,af) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(2);       } // 6/8 BBS2 ZPG,REL
-OP(op,cf) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(4);       } // 6/8 BBS4 ZPG,REL
-OP(op,ef) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(6);       } // 6/8 BBS6 ZPG,REL
+OP(op,0f) { H6280_CYCLES(4); BBR(0, RD_ZPG());         } // 6/8 BBR0 ZPG,REL
+OP(op,2f) { H6280_CYCLES(4); BBR(2, RD_ZPG());         } // 6/8 BBR2 ZPG,REL
+OP(op,4f) { H6280_CYCLES(4); BBR(4, RD_ZPG());         } // 6/8 BBR4 ZPG,REL
+OP(op,6f) { H6280_CYCLES(4); BBR(6, RD_ZPG());         } // 6/8 BBR6 ZPG,REL
+OP(op,8f) { H6280_CYCLES(4); BBS(0, RD_ZPG());         } // 6/8 BBS0 ZPG,REL
+OP(op,af) { H6280_CYCLES(4); BBS(2, RD_ZPG());         } // 6/8 BBS2 ZPG,REL
+OP(op,cf) { H6280_CYCLES(4); BBS(4, RD_ZPG());         } // 6/8 BBS4 ZPG,REL
+OP(op,ef) { H6280_CYCLES(4); BBS(6, RD_ZPG());         } // 6/8 BBS6 ZPG,REL
 
-OP(op,1f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBR(1);       } // 6/8 BBR1 ZPG,REL
-OP(op,3f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBR(3);       } // 6/8 BBR3 ZPG,REL
-OP(op,5f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBR(5);       } // 6/8 BBR5 ZPG,REL
-OP(op,7f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBR(7);       } // 6/8 BBR7 ZPG,REL
-OP(op,9f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(1);       } // 6/8 BBS1 ZPG,REL
-OP(op,bf) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(3);       } // 6/8 BBS3 ZPG,REL
-OP(op,df) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(5);       } // 6/8 BBS5 ZPG,REL
-OP(op,ff) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(7);       } // 6/8 BBS7 ZPG,REL
+OP(op,1f) { H6280_CYCLES(4); BBR(1, RD_ZPG());         } // 6/8 BBR1 ZPG,REL
+OP(op,3f) { H6280_CYCLES(4); BBR(3, RD_ZPG());         } // 6/8 BBR3 ZPG,REL
+OP(op,5f) { H6280_CYCLES(4); BBR(5, RD_ZPG());         } // 6/8 BBR5 ZPG,REL
+OP(op,7f) { H6280_CYCLES(4); BBR(7, RD_ZPG());         } // 6/8 BBR7 ZPG,REL
+OP(op,9f) { H6280_CYCLES(4); BBS(1, RD_ZPG());         } // 6/8 BBS1 ZPG,REL
+OP(op,bf) { H6280_CYCLES(4); BBS(3, RD_ZPG());         } // 6/8 BBS3 ZPG,REL
+OP(op,df) { H6280_CYCLES(4); BBS(5, RD_ZPG());         } // 6/8 BBS5 ZPG,REL
+OP(op,ff) { H6280_CYCLES(4); BBS(7, RD_ZPG());         } // 6/8 BBS7 ZPG,REL
 
 //-------------------------------------------------
 //  state_string_export - export state as a string
@@ -852,7 +2436,7 @@ void h6280_device::execute_run()
 				if (!(P & _fI))
 				{
 					m_irq_pending--;
-					CHECK_AND_TAKE_IRQ_LINES;
+					CHECK_AND_TAKE_IRQ_LINES();
 				}
 			}
 			else
@@ -892,7 +2476,7 @@ void h6280_device::set_irq_line(int irqline, int state)
 		if (state != ASSERT_LINE)
 			return;
 		m_nmi_state = state;
-		CHECK_IRQ_LINES;
+		CHECK_IRQ_LINES();
 	}
 	else if (irqline < 3)
 	{
@@ -902,7 +2486,7 @@ void h6280_device::set_irq_line(int irqline, int state)
 
 		m_irq_state[irqline] = state;
 
-		CHECK_IRQ_LINES;
+		CHECK_IRQ_LINES();
 	}
 }
 
@@ -946,7 +2530,7 @@ WRITE8_MEMBER( h6280_device::irq_status_w )
 
 		case 2: /* Write irq mask */
 			m_irq_mask = data & 0x7;
-			CHECK_IRQ_LINES;
+			CHECK_IRQ_LINES();
 			break;
 
 		case 3: /* Timer irq ack */
@@ -972,7 +2556,7 @@ WRITE8_MEMBER( h6280_device::timer_w )
 
 		case 1: /* Counter enable */
 			if (data & 1)
-			{   /* stop -> start causes reload */
+			{/* stop -> start causes reload */
 				if(m_timer_status == 0)
 					m_timer_value = m_timer_load;
 			}
