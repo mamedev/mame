@@ -142,9 +142,11 @@ CPUS += PPS4
 CPUS += UPD7725
 CPUS += HD61700
 CPUS += LC8670
+CPUS += SCORE
 CPUS += ES5510
 CPUS += SCUDSP
 CPUS += IE15
+CPUS += 8X300
 
 #-------------------------------------------------
 # specify available sound cores
