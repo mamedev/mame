@@ -12,12 +12,13 @@
  - SIO interface for Game Gear (needs netplay, I guess)
  - Gear to Gear Port SMS Controller Adaptor
  - SMS Store Display Unit (Kiosk)
- - Sega Game Box 9
  - SMS Disk System (floppy disk drive) - unreleased
  - Sega Graphic Board (black version) - unreleased
- - Rapid button of japanese Master System & korean Gam*Boy I
+ - Rapid button of japanese Master System
  - Keyboard support for Sega Mark III (sg1000m3 driver)
  - Mark III expansion slot, used by keyboard and FM module
+ - Bus contention and data garbage on SMS when accessing multiple device slots
+ - Disabling of work RAM (no known software relies on that)
  - Software compatibility flags, by region and/or BIOS
  - Emulate SRAM cartridges? (for use with Bock's dump tool)
  - Support for other DE-9 compatible controllers, like the Mega Drive 6-Button
@@ -1014,6 +1015,12 @@ ROM_END
    - PAL-M has same frequency and line count of NTSC
    - Tec Toy later changed its logo twice and its name to Tectoy
    - 20XX models (Handy, Collection, Evolution...) likely have SoC hardware
+
+  These are coin-operated machines (stuff for MAME):
+
+   - Sega Game Box 9
+   - Sega Mark III Soft Desk 5
+   - Sega Mark III Soft Desk 10
 
 ***************************************************************************/
 
