@@ -106,7 +106,7 @@ enum
 ***************************************************************************/
 
 #define LOG_ACCESSES    0
-#define LOG_REGISTERS   0
+#define LOG_REGISTERS   1
 
 #define LOG_8514        1
 
@@ -1990,6 +1990,8 @@ void vga_device::device_reset()
 
 	/* TODO: real defaults */
 	vga.crtc.line_compare = 0x3ff;
+	/* indiana.c boot PROM doesn't set this and assumes it's 0xff */
+	vga.dac.mask = 0xff;
 }
 
 READ8_MEMBER(vga_device::mem_r)
