@@ -92,13 +92,14 @@ R-068 頑皮鬼 / Wánpí guǐ -> C-64 C_So! [dumped]
 R-069 花式撞球 / Huā shì zhuàngqiú -> C-71 Champion Billiards [dumped]
 R-070 桃太郎 / Táotàiláng -> C-69 Wonder Boy [dumped]
 
-R-101 奧運二代 / Àoyùn èr dài -> Hyper Sports 2 conversion from MSX1
-R-102 魔鬼樹 / Móguǐ shù -> Magical Tree conversion from MSX1
-R-103 功夫 / Gōngfu -> Yie Ar Kung-Fu conversion from MSX1
-R-104 娃娃歷險 / Wáwá lìxiǎn -> Cabbage Patch Kids conversion from MSX1
-Y-106 金字塔 / Jīnzìtǎ
-R-108 乒乓球 / Pīngpāng qiú -> Konami Ping Pong conversion from MSX1
-R-112 馬戲團 / Mǎxì tuán -> Circus Charlie conversion from MSX1
+R-101 奧運二代 / Àoyùn èr dài -> Hyper Sports 2 conversion from MSX1 [dumped]
+R-102 魔鬼樹 / Móguǐ shù -> Magical Tree conversion from MSX1 [dumped]
+R-103 功夫 / Gōngfu -> Yie Ar Kung-Fu conversion from MSX1 [dumped]
+R-104 娃娃歷險 / Wáwá lìxiǎn -> Cabbage Patch Kids conversion from MSX1 [dumped]
+Y-106 金字塔 / Jīnzìtǎ -> King's Valley conversion from MSX1? [dumped]
+R-108 乒乓球 / Pīngpāng qiú -> Konami Ping Pong conversion from MSX1 [dumped]
+R-112 馬戲團 / Mǎxì tuán -> Circus Charlie conversion from MSX1 [dumped]
+Y-116 魔王迷宮/ Mówáng mígōng -> The Castle conversion from MSX1 [dumped]
 
 
 Some alternate Aaronix taiwanese carts with generic label contain a regular JP build
@@ -231,6 +232,37 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="bombmnsp">
+		<description>Bomber Man Special (Tw)</description>
+		<year>1986?</year>
+		<publisher>DahJee</publisher>
+		<info name="alt_title" value="爆破隊 ~ Bàopò duì"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typeb"/>
+			<dataarea name="rom" size="49152">
+				<rom name="bomberman special (tw).bin" size="49152" crc="69fc1494" sha1="d1d56bcd996df94458f5901dc537a5e30021256b" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hongdui" cloneof="bombmnsp">
+		<description>Hongzha Dui (Tw)</description>
+		<year>1986?</year>
+		<publisher>DahJee</publisher>
+		<info name="serial" value="GR-009"/>
+		<info name="alt_title" value="轟炸隊 ~ Hōngzhà duì"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="49152">
+				<rom name="bomberman special [dahjee] (tw).bin" size="49152" crc="ce5648c3" sha1="455838571dd8287d491431e03269b0ccd292c8b8" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bombjackt2" cloneof="bombjack">
 		<description>Chaoren (Tw)</description>
 		<year>1985?</year>
@@ -285,6 +317,23 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 			<feature name="slot" value="castle" />
 			<dataarea name="rom" size="32768">
 				<rom name="mpr-10159.ic1" size="32768" crc="092f29d6" sha1="2681786bffccf58b59410c331865d30a4d027087" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is a port of the MSX version -->
+	<software name="castlet" cloneof="castle">
+		<description>Mowang migong ~ The Castle (Tw)</description>
+		<year>1986?</year>
+		<publisher>DahJee</publisher>
+		<info name="serial" value="Y-116"/>
+		<info name="alt_title" value="魔王迷宮 ~ Mówáng mígōng"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typeb"/>
+			<dataarea name="rom" size="49152">
+				<rom name="castle, the [msx] (tw).bin" size="49152" crc="2e366ccf" sha1="5a81d5103487695cabd811aabd9e71f48b9e7996" offset="000000" />
 			</dataarea>
 			<dataarea name="ram" size="8192">
 			</dataarea>
@@ -813,6 +862,21 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="dacike">
+		<description>Da Cike (Tw)</description>
+		<year>1986?</year>
+		<publisher>DahJee</publisher>
+		<info name="serial" value="GA-008"/>
+		<info name="alt_title" value="大刺客 ~ Dà cìkè, Yie Ar Kung-Fu II"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="49152">
+				<rom name="yie ar kung-fu ii [dahjee] (tw).bin" size="49152" crc="fc87463c" sha1="44fb2dca3774f859f0ae0ad4d809a67f760cf9ae" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="dokidoki">
 		<description>Dokidoki Penguin Land (Jpn)</description>
@@ -1562,6 +1626,22 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="moyuchua">
+		<description>Moyu Chuanqi (Tw)</description>
+		<year>1986?</year>
+		<publisher>Jumbo</publisher>
+		<info name="serial" value="GB-001"/>
+		<info name="alt_title" value="魔域伝奇 ~ Mó yù chuánqí, Knightmare"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="49152">
+				<rom name="knightmare [jumbo] (tw).bin" size="49152" crc="281d2888" sha1="babdb6b109b20e81c28cd892c2042723e9cbff49" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ninjapri">
 		<description>Ninja Princess (Jpn)</description>
 		<year>1986</year>
@@ -1911,6 +1991,68 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="rallyx">
+		<description>Rally-X (Tw)</description>
+		<year>1986?</year>
+		<publisher>DahJee</publisher>
+		<info name="alt_title" value="烏賊車 ~ Wūzéi chē"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typeb"/>
+			<dataarea name="rom" size="32768">
+				<rom name="rally-x (tw).bin" size="32768" crc="aaac12cf" sha1="0c1957a5faae5254c69f3331e79d87499dd7cf48" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duduche" cloneof="rallyx">
+		<description>Du Du Che (Tw)</description>
+		<year>1986?</year>
+		<publisher>DahJee</publisher>
+		<info name="serial" value="GR-010"/>
+		<info name="alt_title" value="嘟嘟車 ~ Dū dū chē"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="32768">
+				<rom name="rally-x [dahjee] (tw).bin" size="32768" crc="306d5f78" sha1="21770691191b62bafec9099bbe0f9942f5480f83" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadfght">
+		<description>Road Fighter (Tw)</description>
+		<year>1986?</year>
+		<publisher>Jumbo?</publisher>
+		<info name="alt_title" value="火鳳凰 ~ Huǒ fènghuáng"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typeb"/>
+			<dataarea name="rom" size="32768">
+				<rom name="road fighter (tw).bin" size="32768" crc="d2edd329" sha1="2755f74019dc94559fd0c2248e2ecb7f48879b90" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huojiche" cloneof="roadfght">
+		<description>Huojian Che (Tw)</description>
+		<year>1986?</year>
+		<publisher>Jumbo</publisher>
+		<info name="serial" value="GB-004"/>
+		<info name="alt_title" value="火箭車 ~ Huǒjiàn chē"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="32768">
+				<rom name="road fighter [jumbo] (tw).bin" size="32768" crc="29e047cc" sha1="4f1a139974e3db27af5973bc9572ed68acd6ea68" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rocknbol">
 		<description>Rock n' Bolt (Jpn)</description>
 		<year>1985</year>
@@ -2114,6 +2256,22 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="shinnyushain tooru kun (tw).bin" size="32768" crc="33fc5cf6" sha1="e47e56be455d46c6cc5334895e54069a85da6c3b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sxpao">
+		<description>Shuangxiang Pao (Tw)</description>
+		<year>1986?</year>
+		<publisher>Jumbo</publisher>
+		<info name="serial" value="GB-003"/>
+		<info name="alt_title" value="双響炮 ~ Shuāngxiǎng pào, TwinBee"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="49152">
+				<rom name="twinbee [jumbo] (tw).bin" size="49152" crc="c550b4f0" sha1="a8c30043c145e63f79a3265dde167529f0e08d49" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
 			</dataarea>
 		</part>
 	</software>
@@ -2413,6 +2571,22 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+	<software name="tankdazh">
+		<description>Tanke Dazhan (Tw)</description>
+		<year>1986?</year>
+		<publisher>DahJee</publisher>
+		<info name="serial" value="GR-014"/>
+		<info name="alt_title" value="坦克大戰 ~ Tǎnkè dàzhàn, Tank Battalion"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="32768">
+				<rom name="tank battalion [dahjee] (tw).bin" size="32768" crc="5cbd1163" sha1="0ca3b740b28266a2a606127ed8967c684b67cb44" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="terebioe">
 		<!-- Notes: This game used a tablet as controller, directly connected to the cart itself -->
 		<description>Terebi Oekaki (Jpn)</description>
@@ -2514,6 +2688,22 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="yie ar kung-fu (tw).bin" size="32768" crc="bb0f1930" sha1="0a6157837af2e5dec2e9b30d475b48fa7c14cc3e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yingchua">
+		<description>Yingzi Chuanshuo (Tw)</description>
+		<year>1986?</year>
+		<publisher>DahJee</publisher>
+		<info name="serial" value="GR-012"/>
+		<info name="alt_title" value="影子傳說 ~ Yǐngzi chuánshuō, Kage no Densetsu"/>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="dahjee_typea"/>
+			<dataarea name="rom" size="49152">
+				<rom name="legend of kage, the [dahjee] (tw).bin" size="49152" crc="2e7166d5" sha1="902dbb122bf0efc76604a876c3fae51c074bdc6a" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="9216">
 			</dataarea>
 		</part>
 	</software>

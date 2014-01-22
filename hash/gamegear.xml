@@ -9,7 +9,6 @@ The following games existed according to VGRebirth
   - Sonic Drift (Euro) by Sega
   - Super Golf (USA) by Sage's Creations
   - Terminator 2 - Judgement Day (Jpn) by Acclaim
-  - Zool (Euro) by Gremlin Interactive
 
 Other undumped games:
   - Woody Pop (Jpn) by Sega
@@ -9865,12 +9864,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="zool">
-		<description>Zool (USA)</description>
-		<year>1993</year>
-		<publisher>GameTek</publisher>
+		<description>Zool (Euro)</description>
+		<year>1994</year>
+		<publisher>Gremlin</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="zool (usa).bin" size="262144" crc="b287c695" sha1="8143c1d5e6c677ae5dd8143620b9fd02be8873f6" offset="000000" />
+				<rom name="zool (euro).bin" size="262144" crc="23904898" sha1="40b68abd8f2419178ea2e0d02412c29306bff46c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9885,6 +9884,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="zool no yume bouken (japan).bin" size="262144" crc="e35ef7ed" sha1="2c799ee084b858cb71cfaa7a3f6d3a4f364b6c43" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoolu" cloneof="zool">
+		<description>Zool (USA)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="zool (usa).bin" size="262144" crc="b287c695" sha1="8143c1d5e6c677ae5dd8143620b9fd02be8873f6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
