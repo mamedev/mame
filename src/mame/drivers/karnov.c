@@ -82,7 +82,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "includes/karnov.h"
-#include "video/deckarn.h"
 
 /*************************************
  *

@@ -49,7 +49,6 @@ To do:
 #include "sound/3526intf.h"
 #include "sound/msm5205.h"
 #include "includes/dec8.h"
-#include "video/deckarn.h"
 #include "machine/deco222.h"
 
 
@@ -2014,7 +2013,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2063,7 +2062,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2111,7 +2110,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2160,7 +2159,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2212,7 +2211,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2268,7 +2267,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2791,7 +2790,7 @@ ROM_START( ghostb )
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU */
-	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, BAD_DUMP CRC(18b7e1e6) SHA1(46b6d914ecee5e743ac805be1545ca44fb016d7d) ) /* Verfied label, but is it different the other DZ */
+	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, BAD_DUMP CRC(18b7e1e6) SHA1(46b6d914ecee5e743ac805be1545ca44fb016d7d) ) /* Verified label, but is it different the other DZ */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dz00.16b", 0x00000, 0x08000, CRC(992b4f31) SHA1(a9f255286193ccc261a9b6983aabf3c76ebe5ce5) )

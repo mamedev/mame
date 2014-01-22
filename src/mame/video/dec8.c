@@ -43,7 +43,6 @@ sprites.
 
 #include "emu.h"
 #include "includes/dec8.h"
-#include "video/deckarn.h"
 
 /***************************************************************************
 
@@ -303,7 +302,7 @@ UINT32 dec8_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &bit
 	
 	
 	m_tilegen1->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
+	m_spritegen_krn->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -375,7 +374,7 @@ UINT32 dec8_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8)+ m_scroll2[3]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
+	m_spritegen_krn->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -388,7 +387,7 @@ UINT32 dec8_state::screen_update_shackled(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
-	machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
+	m_spritegen_krn->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -515,9 +514,9 @@ UINT32 dec8_state::screen_update_gondo(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 2);
+	m_spritegen_krn->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 2);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 1);
+	m_spritegen_krn->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 1);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -528,7 +527,7 @@ UINT32 dec8_state::screen_update_garyoret(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
+	m_spritegen_krn->draw_sprites(machine(), bitmap, cliprect, m_buffered_spriteram16, 0x400, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
