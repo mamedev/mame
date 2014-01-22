@@ -362,7 +362,7 @@ static UINT8 to7_5p14sd_select;
 READ8_MEMBER( thomson_state::to7_5p14sd_r )
 {
 	if ( offset < 8 )
-		return mc6843_r( machine().device("mc6843"), space, offset );
+		return m_mc6843->read( space, offset );
 	else if ( offset >= 8 && offset <= 9 )
 		return to7_5p14sd_select;
 	else
@@ -375,7 +375,7 @@ READ8_MEMBER( thomson_state::to7_5p14sd_r )
 WRITE8_MEMBER( thomson_state::to7_5p14sd_w )
 {
 	if ( offset < 8 )
-		mc6843_w( machine().device("mc6843"), space, offset, data );
+		m_mc6843->write( space, offset, data );
 	else if ( offset >= 8 && offset <= 9 )
 	{
 		/* drive select */
@@ -407,8 +407,8 @@ WRITE8_MEMBER( thomson_state::to7_5p14sd_w )
 		if ( drive != -1 )
 		{
 			thom_floppy_active( 0 );
-			mc6843_set_drive( machine().device("mc6843"), drive );
-			mc6843_set_side( machine().device("mc6843"), side );
+			m_mc6843->set_drive( drive );
+			m_mc6843->set_side( side );
 			LOG(( "%f $%04x to7_5p14sd_w: $%02X set drive=%i side=%i\n",
 					machine().time().as_double(), m_maincpu->pc(), data, drive, side ));
 		}
@@ -420,7 +420,7 @@ WRITE8_MEMBER( thomson_state::to7_5p14sd_w )
 
 void thomson_state::to7_5p14_index_pulse_callback( device_t *controller,device_t *image, int state )
 {
-	mc6843_set_index_pulse( machine().device("mc6843"), state );
+	m_mc6843->set_index_pulse( state );
 }
 
 void thomson_state::to7_5p14sd_reset()
@@ -440,7 +440,7 @@ void thomson_state::to7_5p14sd_reset()
 
 
 
-const mc6843_interface to7_6843_itf = { NULL };
+const mc6843_interface to7_6843_itf = { DEVCB_NULL };
 
 
 
