@@ -3,9 +3,6 @@
 #ifndef __Z80_H__
 #define __Z80_H__
 
-#pragma push_macro("BIT")
-#undef BIT
-
 #include "z80daisy.h"
 
 enum
@@ -145,90 +142,90 @@ protected:
 	PROTOTYPES(fd);
 	PROTOTYPES(xycb);
 
-	void ENTER_HALT();
-	void LEAVE_HALT();
-	UINT8 IN(UINT16 port);
-	void OUT(UINT16 port, UINT8 value);
-	UINT8 RM(UINT16 addr);
-	void RM16(UINT16 addr, PAIR &r);
-	void WM(UINT16 addr, UINT8 value);
-	void WM16(UINT16 addr, PAIR &r);
-	UINT8 ROP();
-	UINT8 ARG();
-	UINT16 ARG16();
-	void EAX();
-	void EAY();
-	void POP(PAIR &r);
-	void PUSH(PAIR &r);
-	void JP(void);
-	void JP_COND(bool cond);
-	void JR();
-	void JR_COND(bool cond, UINT8 opcode);
-	void CALL();
-	void CALL_COND(bool cond, UINT8 opcode);
-	void RET_COND(bool cond, UINT8 opcode);
-	void RETN();
-	void RETI();
-	void LD_R_A();
-	void LD_A_R();
-	void LD_I_A();
-	void LD_A_I();
-	void RST(UINT16 addr);
-	UINT8 INC(UINT8 value);
-	UINT8 DEC(UINT8 value);
-	void RLCA();
-	void RRCA();
-	void RLA();
-	void RRA();
-	void RRD();
-	void RLD();
-	void ADD(UINT8 value);
-	void ADC(UINT8 value);
-	void SUB(UINT8 value);
-	void SBC(UINT8 value);
-	void NEG();
-	void DAA();
-	void AND(UINT8 value);
-	void OR(UINT8 value);
-	void XOR(UINT8 value);
-	void CP(UINT8 value);
-	void EX_AF();
-	void EX_DE_HL();
-	void EXX();
-	void EXSP(PAIR &r);
-	void ADD16(PAIR &dr, PAIR &sr);
-	void ADC16(PAIR &r);
-	void SBC16(PAIR &r);
-	UINT8 RLC(UINT8 value);
-	UINT8 RRC(UINT8 value);
-	UINT8 RL(UINT8 value);
-	UINT8 RR(UINT8 value);
-	UINT8 SLA(UINT8 value);
-	UINT8 SRA(UINT8 value);
-	UINT8 SLL(UINT8 value);
-	UINT8 SRL(UINT8 value);
-	void BIT(int bit, UINT8 value);
-	void BIT_HL(int bit, UINT8 value);
-	void BIT_XY(int bit, UINT8 value);
-	UINT8 RES(int bit, UINT8 value);
-	UINT8 SET(int bit, UINT8 value);
-	void LDI();
-	void CPI();
-	void INI();
-	void OUTI();
-	void LDD();
-	void CPD();
-	void IND();
-	void OUTD();
-	void LDIR();
-	void CPIR();
-	void INIR();
-	void OTIR();
-	void LDDR();
-	void CPDR();
-	void INDR();
-	void OTDR();
-	void EI();
+	void halt();
+	void leave_halt();
+	UINT8 in(UINT16 port);
+	void out(UINT16 port, UINT8 value);
+	UINT8 rm(UINT16 addr);
+	void rm16(UINT16 addr, PAIR &r);
+	void wm(UINT16 addr, UINT8 value);
+	void wm16(UINT16 addr, PAIR &r);
+	UINT8 rop();
+	UINT8 arg();
+	UINT16 arg16();
+	void eax();
+	void eay();
+	void pop(PAIR &r);
+	void push(PAIR &r);
+	void jp(void);
+	void jp_cond(bool cond);
+	void jr();
+	void jr_cond(bool cond, UINT8 opcode);
+	void call();
+	void call_cond(bool cond, UINT8 opcode);
+	void ret_cond(bool cond, UINT8 opcode);
+	void retn();
+	void reti();
+	void ld_r_a();
+	void ld_a_r();
+	void ld_i_a();
+	void ld_a_i();
+	void rst(UINT16 addr);
+	UINT8 inc(UINT8 value);
+	UINT8 dec(UINT8 value);
+	void rlca();
+	void rrca();
+	void rla();
+	void rra();
+	void rrd();
+	void rld();
+	void add_a(UINT8 value);
+	void adc_a(UINT8 value);
+	void sub(UINT8 value);
+	void sbc_a(UINT8 value);
+	void neg();
+	void daa();
+	void and_a(UINT8 value);
+	void or_a(UINT8 value);
+	void xor_a(UINT8 value);
+	void cp(UINT8 value);
+	void ex_af();
+	void ex_de_hl();
+	void exx();
+	void ex_sp(PAIR &r);
+	void add16(PAIR &dr, PAIR &sr);
+	void adc_hl(PAIR &r);
+	void sbc_hl(PAIR &r);
+	UINT8 rlc(UINT8 value);
+	UINT8 rrc(UINT8 value);
+	UINT8 rl(UINT8 value);
+	UINT8 rr(UINT8 value);
+	UINT8 sla(UINT8 value);
+	UINT8 sra(UINT8 value);
+	UINT8 sll(UINT8 value);
+	UINT8 srl(UINT8 value);
+	void bit(int bit, UINT8 value);
+	void bit_hl(int bit, UINT8 value);
+	void bit_xy(int bit, UINT8 value);
+	UINT8 res(int bit, UINT8 value);
+	UINT8 set(int bit, UINT8 value);
+	void ldi();
+	void cpi();
+	void ini();
+	void outi();
+	void ldd();
+	void cpd();
+	void ind();
+	void outd();
+	void ldir();
+	void cpir();
+	void inir();
+	void otir();
+	void lddr();
+	void cpdr();
+	void indr();
+	void otdr();
+	void ei();
 
 	void take_interrupt();
 
@@ -303,7 +300,5 @@ protected:
 };
 
 extern const device_type NSC800;
-
-#pragma pop_macro("BIT")
 
 #endif /* __Z80_H__ */

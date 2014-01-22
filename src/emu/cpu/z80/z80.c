@@ -107,7 +107,7 @@
  *      now also adjust the r register depending on the skipped opcodes.
  *   Changes in 2.2:
  *    - Fixed bugs in CPL, SCF and CCF instructions flag handling.
- *    - Changed variable ea and ARG16() function to UINT32; this
+ *    - Changed variable ea and arg16() function to UINT32; this
  *      produces slightly more efficient code.
  *    - The DD/FD XY CB opcodes where XY is 40-7F and Y is not 6/E
  *      are changed to calls to the X6/XE opcodes to reduce object size.
@@ -122,8 +122,6 @@
 #include "debugger.h"
 #include "z80.h"
 #include "z80daisy.h"
-
-#undef BIT
 
 #define VERBOSE             0
 
@@ -410,7 +408,7 @@ static const UINT8 cc_ex[0x100] = {
 /***************************************************************
  * Enter halt state; write 1 to fake port on first execution
  ***************************************************************/
-inline void z80_device::ENTER_HALT()
+inline void z80_device::halt()
 {
 	PC--;
 	m_halt = 1;
@@ -419,7 +417,7 @@ inline void z80_device::ENTER_HALT()
 /***************************************************************
  * Leave halt state; write 0 to fake port
  ***************************************************************/
-inline void z80_device::LEAVE_HALT()
+inline void z80_device::leave_halt()
 {
 	if( m_halt )
 	{
@@ -431,7 +429,7 @@ inline void z80_device::LEAVE_HALT()
 /***************************************************************
  * Input a byte from given I/O port
  ***************************************************************/
-inline UINT8 z80_device::IN(UINT16 port)
+inline UINT8 z80_device::in(UINT16 port)
 {
 	return m_io->read_byte(port);
 }
@@ -439,7 +437,7 @@ inline UINT8 z80_device::IN(UINT16 port)
 /***************************************************************
  * Output a byte to given I/O port
  ***************************************************************/
-inline void z80_device::OUT(UINT16 port, UINT8 value)
+inline void z80_device::out(UINT16 port, UINT8 value)
 {
 	m_io->write_byte(port, value);
 }
@@ -447,7 +445,7 @@ inline void z80_device::OUT(UINT16 port, UINT8 value)
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-inline UINT8 z80_device::RM(UINT16 addr)
+inline UINT8 z80_device::rm(UINT16 addr)
 {
 	return m_program->read_byte(addr);
 }
@@ -455,16 +453,16 @@ inline UINT8 z80_device::RM(UINT16 addr)
 /***************************************************************
  * Read a word from given memory location
  ***************************************************************/
-inline void z80_device::RM16(UINT16 addr, PAIR &r)
+inline void z80_device::rm16(UINT16 addr, PAIR &r)
 {
-	r.b.l = RM(addr);
-	r.b.h = RM((addr+1));
+	r.b.l = rm(addr);
+	r.b.h = rm((addr+1));
 }
 
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-inline void z80_device::WM(UINT16 addr, UINT8 value)
+inline void z80_device::wm(UINT16 addr, UINT8 value)
 {
 	m_program->write_byte(addr, value);
 }
@@ -472,18 +470,18 @@ inline void z80_device::WM(UINT16 addr, UINT8 value)
 /***************************************************************
  * Write a word to given memory location
  ***************************************************************/
-inline void z80_device::WM16(UINT16 addr, PAIR &r)
+inline void z80_device::wm16(UINT16 addr, PAIR &r)
 {
-	WM(addr, r.b.l);
-	WM((addr+1), r.b.h);
+	wm(addr, r.b.l);
+	wm((addr+1), r.b.h);
 }
 
 /***************************************************************
- * ROP() is identical to RM() except it is used for
+ * rop() is identical to rm() except it is used for
  * reading opcodes. In case of system with memory mapped I/O,
  * this function can be used to greatly speed up emulation
  ***************************************************************/
-inline UINT8 z80_device::ROP()
+inline UINT8 z80_device::rop()
 {
 	unsigned pc = PCD;
 	PC++;
@@ -491,19 +489,19 @@ inline UINT8 z80_device::ROP()
 }
 
 /****************************************************************
- * ARG() is identical to ROP() except it is used
+ * arg() is identical to rop() except it is used
  * for reading opcode arguments. This difference can be used to
  * support systems that use different encoding mechanisms for
  * opcodes and opcode arguments
  ***************************************************************/
-inline UINT8 z80_device::ARG()
+inline UINT8 z80_device::arg()
 {
 	unsigned pc = PCD;
 	PC++;
 	return m_direct->read_raw_byte(pc);
 }
 
-inline UINT16 z80_device::ARG16()
+inline UINT16 z80_device::arg16()
 {
 	unsigned pc = PCD;
 	PC += 2;
@@ -514,79 +512,79 @@ inline UINT16 z80_device::ARG16()
  * Calculate the effective address EA of an opcode using
  * IX+offset resp. IY+offset addressing.
  ***************************************************************/
-inline void z80_device::EAX()
+inline void z80_device::eax()
 {
-	m_ea = (UINT32)(UINT16)(IX + (INT8)ARG());
+	m_ea = (UINT32)(UINT16)(IX + (INT8)arg());
 	WZ = m_ea;
 }
 
-inline void z80_device::EAY()
+inline void z80_device::eay()
 {
-	m_ea = (UINT32)(UINT16)(IY + (INT8)ARG());
+	m_ea = (UINT32)(UINT16)(IY + (INT8)arg());
 	WZ = m_ea;
 }
 
 /***************************************************************
  * POP
  ***************************************************************/
-inline void z80_device::POP(PAIR &r)
+inline void z80_device::pop(PAIR &r)
 {
-	RM16(SPD, r);
+	rm16(SPD, r);
 	SP += 2;
 }
 
 /***************************************************************
  * PUSH
  ***************************************************************/
-inline void z80_device::PUSH(PAIR &r)
+inline void z80_device::push(PAIR &r)
 {
 	SP -= 2;
-	WM16(SPD, r);
+	wm16(SPD, r);
 }
 
 /***************************************************************
  * JP
  ***************************************************************/
-inline void z80_device::JP(void)
+inline void z80_device::jp(void)
 {
-	PCD = ARG16();
+	PCD = arg16();
 	WZ = PCD;
 }
 
 /***************************************************************
  * JP_COND
  ***************************************************************/
-inline void z80_device::JP_COND(bool cond)
+inline void z80_device::jp_cond(bool cond)
 {
 	if (cond)
 	{
-		PCD = ARG16();
+		PCD = arg16();
 		WZ = PCD;
 	}
 	else
 	{
-		WZ = ARG16(); /* implicit do PC += 2 */
+		WZ = arg16(); /* implicit do PC += 2 */
 	}
 }
 
 /***************************************************************
  * JR
  ***************************************************************/
-inline void z80_device::JR()
+inline void z80_device::jr()
 {
-	INT8 arg = (INT8)ARG();    /* ARG() also increments PC */
-	PC += arg;             /* so don't do PC += ARG() */
+	INT8 a = (INT8)arg();    /* arg() also increments PC */
+	PC += a;             /* so don't do PC += arg() */
 	WZ = PC;
 }
 
 /***************************************************************
  * JR_COND
  ***************************************************************/
-inline void z80_device::JR_COND(bool cond, UINT8 opcode)
+inline void z80_device::jr_cond(bool cond, UINT8 opcode)
 {
 	if (cond)
 	{
-		JR();
+		jr();
 		CC(ex, opcode);
 	}
 	else
@@ -596,41 +594,41 @@ inline void z80_device::JR_COND(bool cond, UINT8 opcode)
 /***************************************************************
  * CALL
  ***************************************************************/
-inline void z80_device::CALL()
+inline void z80_device::call()
 {
-	m_ea = ARG16();
+	m_ea = arg16();
 	WZ = m_ea;
-	PUSH(m_pc);
+	push(m_pc);
 	PCD = m_ea;
 }
 
 /***************************************************************
  * CALL_COND
  ***************************************************************/
-inline void z80_device::CALL_COND(bool cond, UINT8 opcode)
+inline void z80_device::call_cond(bool cond, UINT8 opcode)
 {
 	if (cond)
 	{
-		m_ea = ARG16();
+		m_ea = arg16();
 		WZ = m_ea;
-		PUSH(m_pc);
+		push(m_pc);
 		PCD = m_ea;
 		CC(ex, opcode);
 	}
 	else
 	{
-		WZ = ARG16();  /* implicit call PC+=2;   */
+		WZ = arg16();  /* implicit call PC+=2;   */
 	}
 }
 
 /***************************************************************
  * RET_COND
  ***************************************************************/
-inline void z80_device::RET_COND(bool cond, UINT8 opcode)
+inline void z80_device::ret_cond(bool cond, UINT8 opcode)
 {
 	if (cond)
 	{
-		POP(m_pc);
+		pop(m_pc);
 		WZ = PC;
 		CC(ex, opcode);
 	}
@@ -639,11 +637,11 @@ inline void z80_device::RET_COND(bool cond, UINT8 opcode)
 /***************************************************************
  * RETN
  ***************************************************************/
-inline void z80_device::RETN()
+inline void z80_device::retn()
 {
 	LOG(("Z80 '%s' RETN m_iff1:%d m_iff2:%d\n", 
 		tag(), m_iff1, m_iff2));
-	POP(m_pc);
+	pop(m_pc);
 	WZ = PC;
 	m_iff1 = m_iff2;
 }
@@ -651,9 +649,9 @@ inline void z80_device::RETN()
 /***************************************************************
  * RETI
  ***************************************************************/
-inline void z80_device::RETI()
+inline void z80_device::reti()
 {
-	POP(m_pc);
+	pop(m_pc);
 	WZ = PC;
 	m_iff1 = m_iff2;
 	m_daisy.call_reti_device();
@@ -662,7 +660,7 @@ inline void z80_device::RETI()
 /***************************************************************
  * LD   R,A
  ***************************************************************/
-inline void z80_device::LD_R_A()
+inline void z80_device::ld_r_a()
 {
 	m_r = A;
 	m_r2 = A & 0x80;            /* keep bit 7 of r */
@@ -671,7 +669,7 @@ inline void z80_device::LD_R_A()
 /***************************************************************
  * LD   A,R
  ***************************************************************/
-inline void z80_device::LD_A_R()
+inline void z80_device::ld_a_r()
 {
 	A = (m_r & 0x7f) | m_r2;
 	F = (F & CF) | SZ[A] | (m_iff2 << 2);
@@ -681,7 +679,7 @@ inline void z80_device::LD_A_R()
 /***************************************************************
  * LD   I,A
  ***************************************************************/
-inline void z80_device::LD_I_A()
+inline void z80_device::ld_i_a()
 {
 	m_i = A;
 }
@@ -689,7 +687,7 @@ inline void z80_device::LD_I_A()
 /***************************************************************
  * LD   A,I
  ***************************************************************/
-inline void z80_device::LD_A_I()
+inline void z80_device::ld_a_i()
 {
 	A = m_i;
 	F = (F & CF) | SZ[A] | (m_iff2 << 2);
@@ -699,9 +697,9 @@ inline void z80_device::LD_A_I()
 /***************************************************************
  * RST
  ***************************************************************/
-inline void z80_device::RST(UINT16 addr)
+inline void z80_device::rst(UINT16 addr)
 {
-	PUSH(m_pc);
+	push(m_pc);
 	PCD = addr;
 	WZ = PC;
 }
@@ -709,7 +707,7 @@ inline void z80_device::RST(UINT16 addr)
 /***************************************************************
  * INC  r8
  ***************************************************************/
-inline UINT8 z80_device::INC(UINT8 value)
+inline UINT8 z80_device::inc(UINT8 value)
 {
 	UINT8 res = value + 1;
 	F = (F & CF) | SZHV_inc[res];
@@ -719,7 +717,7 @@ inline UINT8 z80_device::INC(UINT8 value)
 /***************************************************************
  * DEC  r8
  ***************************************************************/
-inline UINT8 z80_device::DEC(UINT8 value)
+inline UINT8 z80_device::dec(UINT8 value)
 {
 	UINT8 res = value - 1;
 	F = (F & CF) | SZHV_dec[res];
@@ -729,7 +727,7 @@ inline UINT8 z80_device::DEC(UINT8 value)
 /***************************************************************
  * RLCA
  ***************************************************************/
-inline void z80_device::RLCA()
+inline void z80_device::rlca()
 {
 	A = (A << 1) | (A >> 7);
 	F = (F & (SF | ZF | PF)) | (A & (YF | XF | CF));
@@ -738,7 +736,7 @@ inline void z80_device::RLCA()
 /***************************************************************
  * RRCA
  ***************************************************************/
-inline void z80_device::RRCA()
+inline void z80_device::rrca()
 {
 	F = (F & (SF | ZF | PF)) | (A & CF);
 	A = (A >> 1) | (A << 7);
@@ -748,7 +746,7 @@ inline void z80_device::RRCA()
 /***************************************************************
  * RLA
  ***************************************************************/
-inline void z80_device::RLA()
+inline void z80_device::rla()
 {
 	UINT8 res = (A << 1) | (F & CF);
 	UINT8 c = (A & 0x80) ? CF : 0;
@@ -759,7 +757,7 @@ inline void z80_device::RLA()
 /***************************************************************
  * RRA
  ***************************************************************/
-inline void z80_device::RRA()
+inline void z80_device::rra()
 {
 	UINT8 res = (A >> 1) | (F << 7);
 	UINT8 c = (A & 0x01) ? CF : 0;
@@ -770,11 +768,11 @@ inline void z80_device::RRA()
 /***************************************************************
  * RRD
  ***************************************************************/
-inline void z80_device::RRD()
+inline void z80_device::rrd()
 {
-	UINT8 n = RM(HL);
+	UINT8 n = rm(HL);
 	WZ = HL+1;
-	WM(HL, (n >> 4) | (A << 4));
+	wm(HL, (n >> 4) | (A << 4));
 	A = (A & 0xf0) | (n & 0x0f);
 	F = (F & CF) | SZP[A];
 }
@@ -782,11 +780,11 @@ inline void z80_device::RRD()
 /***************************************************************
  * RLD
  ***************************************************************/
-inline void z80_device::RLD()
+inline void z80_device::rld()
 {
-	UINT8 n = RM(HL);
+	UINT8 n = rm(HL);
 	WZ = HL+1;
-	WM(HL, (n << 4) | (A & 0x0f));
+	wm(HL, (n << 4) | (A & 0x0f));
 	A = (A & 0xf0) | (n >> 4);
 	F = (F & CF) | SZP[A];
 }
@@ -794,7 +792,7 @@ inline void z80_device::RLD()
 /***************************************************************
  * ADD  A,n
  ***************************************************************/
-inline void z80_device::ADD(UINT8 value)
+inline void z80_device::add_a(UINT8 value)
 {
 	UINT32 ah = AFD & 0xff00;
 	UINT32 res = (UINT8)((ah >> 8) + value);
@@ -805,7 +803,7 @@ inline void z80_device::ADD(UINT8 value)
 /***************************************************************
  * ADC  A,n
  ***************************************************************/
-inline void z80_device::ADC(UINT8 value)
+inline void z80_device::adc_a(UINT8 value)
 {
 	UINT32 ah = AFD & 0xff00, c = AFD & 1;
 	UINT32 res = (UINT8)((ah >> 8) + value + c);
@@ -816,7 +814,7 @@ inline void z80_device::ADC(UINT8 value)
 /***************************************************************
  * SUB  n
  ***************************************************************/
-inline void z80_device::SUB(UINT8 value)
+inline void z80_device::sub(UINT8 value)
 {
 	UINT32 ah = AFD & 0xff00;
 	UINT32 res = (UINT8)((ah >> 8) - value);
@@ -827,7 +825,7 @@ inline void z80_device::SUB(UINT8 value)
 /***************************************************************
  * SBC  A,n
  ***************************************************************/
-inline void z80_device::SBC(UINT8 value)
+inline void z80_device::sbc_a(UINT8 value)
 {
 	UINT32 ah = AFD & 0xff00, c = AFD & 1;
 	UINT32 res = (UINT8)((ah >> 8) - value - c);
@@ -838,17 +836,17 @@ inline void z80_device::SBC(UINT8 value)
 /***************************************************************
  * NEG
  ***************************************************************/
-inline void z80_device::NEG()
+inline void z80_device::neg()
 {
 	UINT8 value = A;
 	A = 0;
-	SUB(value);
+	sub(value);
 }
 
 /***************************************************************
  * DAA
  ***************************************************************/
-inline void z80_device::DAA()
+inline void z80_device::daa()
 {
 	UINT8 a = A;
 	if (F & NF) {
@@ -867,7 +865,7 @@ inline void z80_device::DAA()
 /***************************************************************
  * AND  n
  ***************************************************************/
-inline void z80_device::AND(UINT8 value)
+inline void z80_device::and_a(UINT8 value)
 {
 	A &= value;
 	F = SZP[A] | HF;
@@ -876,7 +874,7 @@ inline void z80_device::AND(UINT8 value)
 /***************************************************************
  * OR   n
  ***************************************************************/
-inline void z80_device::OR(UINT8 value)
+inline void z80_device::or_a(UINT8 value)
 {
 	A |= value;
 	F = SZP[A];
@@ -885,7 +883,7 @@ inline void z80_device::OR(UINT8 value)
 /***************************************************************
  * XOR  n
  ***************************************************************/
-inline void z80_device::XOR(UINT8 value)
+inline void z80_device::xor_a(UINT8 value)
 {
 	A ^= value;
 	F = SZP[A];
@@ -894,7 +892,7 @@ inline void z80_device::XOR(UINT8 value)
 /***************************************************************
  * CP   n
  ***************************************************************/
-inline void z80_device::CP(UINT8 value)
+inline void z80_device::cp(UINT8 value)
 {
 	unsigned val = value;
 	UINT32 ah = AFD & 0xff00;
@@ -906,7 +904,7 @@ inline void z80_device::CP(UINT8 value)
 /***************************************************************
  * EX   AF,AF'
  ***************************************************************/
-inline void z80_device::EX_AF()
+inline void z80_device::ex_af()
 {
 	PAIR tmp;
 	tmp = m_af; m_af = m_af2; m_af2 = tmp;
@@ -915,7 +913,7 @@ inline void z80_device::EX_AF()
 /***************************************************************
  * EX   DE,HL
  ***************************************************************/
-inline void z80_device::EX_DE_HL()
+inline void z80_device::ex_de_hl()
 {
 	PAIR tmp;
 	tmp = m_de; m_de = m_hl; m_hl = tmp;
@@ -924,7 +922,7 @@ inline void z80_device::EX_DE_HL()
 /***************************************************************
  * EXX
  ***************************************************************/
-inline void z80_device::EXX()
+inline void z80_device::exx()
 {
 	PAIR tmp;
 	tmp = m_bc; m_bc = m_bc2; m_bc2 = tmp;
@@ -935,11 +933,11 @@ inline void z80_device::EXX()
 /***************************************************************
  * EX   (SP),r16
  ***************************************************************/
-inline void z80_device::EXSP(PAIR &r)
+inline void z80_device::ex_sp(PAIR &r)
 {
 	PAIR tmp = { { 0, 0, 0, 0 } };
-	RM16(SPD, tmp);
-	WM16(SPD, r);
+	rm16(SPD, tmp);
+	wm16(SPD, r);
 	r = tmp;
 	WZ = r.d;
 }
@@ -947,7 +945,7 @@ inline void z80_device::EXSP(PAIR &r)
 /***************************************************************
  * ADD16
  ***************************************************************/
-inline void z80_device::ADD16(PAIR &dr, PAIR &sr)
+inline void z80_device::add16(PAIR &dr, PAIR &sr)
 {
 	UINT32 res = dr.d + sr.d;
 	WZ = dr.d + 1;
@@ -958,9 +956,9 @@ inline void z80_device::ADD16(PAIR &dr, PAIR &sr)
 }
 
 /***************************************************************
- * ADC  r16,r16
+ * ADC  HL,r16
  ***************************************************************/
-inline void z80_device::ADC16(PAIR &r)
+inline void z80_device::adc_hl(PAIR &r)
 {
 	UINT32 res = HLD + r.d + (F & CF);
 	WZ = HL + 1;
@@ -973,9 +971,9 @@ inline void z80_device::ADC16(PAIR &r)
 }
 
 /***************************************************************
- * SBC  r16,r16
+ * SBC  HL,r16
  ***************************************************************/
-inline void z80_device::SBC16(PAIR &r)
+inline void z80_device::sbc_hl(PAIR &r)
 {
 	UINT32 res = HLD - r.d - (F & CF);
 	WZ = HL + 1;
@@ -990,7 +988,7 @@ inline void z80_device::SBC16(PAIR &r)
 /***************************************************************
  * RLC  r8
  ***************************************************************/
-inline UINT8 z80_device::RLC(UINT8 value)
+inline UINT8 z80_device::rlc(UINT8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
@@ -1002,7 +1000,7 @@ inline UINT8 z80_device::RLC(UINT8 value)
 /***************************************************************
  * RRC  r8
  ***************************************************************/
-inline UINT8 z80_device::RRC(UINT8 value)
+inline UINT8 z80_device::rrc(UINT8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
@@ -1014,7 +1012,7 @@ inline UINT8 z80_device::RRC(UINT8 value)
 /***************************************************************
  * RL   r8
  ***************************************************************/
-inline UINT8 z80_device::RL(UINT8 value)
+inline UINT8 z80_device::rl(UINT8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
@@ -1026,7 +1024,7 @@ inline UINT8 z80_device::RL(UINT8 value)
 /***************************************************************
  * RR   r8
  ***************************************************************/
-inline UINT8 z80_device::RR(UINT8 value)
+inline UINT8 z80_device::rr(UINT8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
@@ -1038,7 +1036,7 @@ inline UINT8 z80_device::RR(UINT8 value)
 /***************************************************************
  * SLA  r8
  ***************************************************************/
-inline UINT8 z80_device::SLA(UINT8 value)
+inline UINT8 z80_device::sla(UINT8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
@@ -1050,7 +1048,7 @@ inline UINT8 z80_device::SLA(UINT8 value)
 /***************************************************************
  * SRA  r8
  ***************************************************************/
-inline UINT8 z80_device::SRA(UINT8 value)
+inline UINT8 z80_device::sra(UINT8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
@@ -1062,7 +1060,7 @@ inline UINT8 z80_device::SRA(UINT8 value)
 /***************************************************************
  * SLL  r8
  ***************************************************************/
-inline UINT8 z80_device::SLL(UINT8 value)
+inline UINT8 z80_device::sll(UINT8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
@@ -1074,7 +1072,7 @@ inline UINT8 z80_device::SLL(UINT8 value)
 /***************************************************************
  * SRL  r8
  ***************************************************************/
-inline UINT8 z80_device::SRL(UINT8 value)
+inline UINT8 z80_device::srl(UINT8 value)
 {
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
@@ -1086,7 +1084,7 @@ inline UINT8 z80_device::SRL(UINT8 value)
 /***************************************************************
  * BIT  bit,r8
  ***************************************************************/
-inline void z80_device::BIT(int bit, UINT8 value)
+inline void z80_device::bit(int bit, UINT8 value)
 {
 	F = (F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (value & (YF|XF));
 }
@@ -1094,7 +1092,7 @@ inline void z80_device::BIT(int bit, UINT8 value)
 /***************************************************************
  * BIT  bit,(HL)
  ***************************************************************/
-inline void z80_device::BIT_HL(int bit, UINT8 value)
+inline void z80_device::bit_hl(int bit, UINT8 value)
 {
 	F = (F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | (WZ_H & (YF|XF));
 }
@@ -1102,7 +1100,7 @@ inline void z80_device::BIT_HL(int bit, UINT8 value)
 /***************************************************************
  * BIT  bit,(IX/Y+o)
  ***************************************************************/
-inline void z80_device::BIT_XY(int bit, UINT8 value)
+inline void z80_device::bit_xy(int bit, UINT8 value)
 {
 	F = (F & CF) | HF | (SZ_BIT[value & (1<<bit)] & ~(YF|XF)) | ((m_ea>>8) & (YF|XF));
 }
@@ -1110,7 +1108,7 @@ inline void z80_device::BIT_XY(int bit, UINT8 value)
 /***************************************************************
  * RES  bit,r8
  ***************************************************************/
-inline UINT8 z80_device::RES(int bit, UINT8 value)
+inline UINT8 z80_device::res(int bit, UINT8 value)
 {
 	return value & ~(1<<bit);
 }
@@ -1118,7 +1116,7 @@ inline UINT8 z80_device::RES(int bit, UINT8 value)
 /***************************************************************
  * SET  bit,r8
  ***************************************************************/
-inline UINT8 z80_device::SET(int bit, UINT8 value)
+inline UINT8 z80_device::set(int bit, UINT8 value)
 {
 	return value | (1<<bit);
 }
@@ -1126,10 +1124,10 @@ inline UINT8 z80_device::SET(int bit, UINT8 value)
 /***************************************************************
  * LDI
  ***************************************************************/
-inline void z80_device::LDI()
+inline void z80_device::ldi()
 {
-	UINT8 io = RM(HL);
-	WM(DE, io);
+	UINT8 io = rm(HL);
+	wm(DE, io);
 	F &= SF | ZF | CF;
 	if ((A + io) & 0x02) F |= YF; /* bit 1 -> flag 5 */
 	if ((A + io) & 0x08) F |= XF; /* bit 3 -> flag 3 */
@@ -1140,9 +1138,9 @@ inline void z80_device::LDI()
 /***************************************************************
  * CPI
  ***************************************************************/
-inline void z80_device::CPI()
+inline void z80_device::cpi()
 {
-	UINT8 val = RM(HL);
+	UINT8 val = rm(HL);
 	UINT8 res = A - val;
 	WZ++;
 	HL++; BC--;
@@ -1156,13 +1154,13 @@ inline void z80_device::CPI()
 /***************************************************************
  * INI
  ***************************************************************/
-inline void z80_device::INI()
+inline void z80_device::ini()
 {
 	unsigned t;
-	UINT8 io = IN(BC);
+	UINT8 io = in(BC);
 	WZ = BC + 1;
 	B--;
-	WM(HL, io);
+	wm(HL, io);
 	HL++;
 	F = SZ[B];
 	t = (unsigned)((C + 1) & 0xff) + (unsigned)io;
@@ -1174,13 +1172,13 @@ inline void z80_device::INI()
 /***************************************************************
  * OUTI
  ***************************************************************/
-inline void z80_device::OUTI()
+inline void z80_device::outi()
 {
 	unsigned t;
-	UINT8 io = RM(HL);
+	UINT8 io = rm(HL);
 	B--;
 	WZ = BC + 1;
-	OUT(BC, io);
+	out(BC, io);
 	HL++;
 	F = SZ[B];
 	t = (unsigned)L + (unsigned)io;
@@ -1192,10 +1190,10 @@ inline void z80_device::OUTI()
 /***************************************************************
  * LDD
  ***************************************************************/
-inline void z80_device::LDD()
+inline void z80_device::ldd()
 {
-	UINT8 io = RM(HL);
-	WM(DE, io);
+	UINT8 io = rm(HL);
+	wm(DE, io);
 	F &= SF | ZF | CF;
 	if ((A + io) & 0x02) F |= YF; /* bit 1 -> flag 5 */
 	if ((A + io) & 0x08) F |= XF; /* bit 3 -> flag 3 */
@@ -1206,9 +1204,9 @@ inline void z80_device::LDD()
 /***************************************************************
  * CPD
  ***************************************************************/
-inline void z80_device::CPD()
+inline void z80_device::cpd()
 {
-	UINT8 val = RM(HL);
+	UINT8 val = rm(HL);
 	UINT8 res = A - val;
 	WZ--;
 	HL--; BC--;
@@ -1222,13 +1220,13 @@ inline void z80_device::CPD()
 /***************************************************************
  * IND
  ***************************************************************/
-inline void z80_device::IND()
+inline void z80_device::ind()
 {
 	unsigned t;
-	UINT8 io = IN(BC);
+	UINT8 io = in(BC);
 	WZ = BC - 1;
 	B--;
-	WM(HL, io);
+	wm(HL, io);
 	HL--;
 	F = SZ[B];
 	t = ((unsigned)(C - 1) & 0xff) + (unsigned)io;
@@ -1240,13 +1238,13 @@ inline void z80_device::IND()
 /***************************************************************
  * OUTD
  ***************************************************************/
-inline void z80_device::OUTD()
+inline void z80_device::outd()
 {
 	unsigned t;
-	UINT8 io = RM(HL);
+	UINT8 io = rm(HL);
 	B--;
 	WZ = BC - 1;
-	OUT(BC, io);
+	out(BC, io);
 	HL--;
 	F = SZ[B];
 	t = (unsigned)L + (unsigned)io;
@@ -1258,9 +1256,9 @@ inline void z80_device::OUTD()
 /***************************************************************
  * LDIR
  ***************************************************************/
-inline void z80_device::LDIR()
+inline void z80_device::ldir()
 {
-	LDI();
+	ldi();
 	if (BC != 0)
 	{
 		PC -= 2;
@@ -1272,9 +1270,9 @@ inline void z80_device::LDIR()
 /***************************************************************
  * CPIR
  ***************************************************************/
-inline void z80_device::CPIR()
+inline void z80_device::cpir()
 {
-	CPI();
+	cpi();
 	if (BC != 0 && !(F & ZF))
 	{
 		PC -= 2;
@@ -1286,9 +1284,9 @@ inline void z80_device::CPIR()
 /***************************************************************
  * INIR
  ***************************************************************/
-inline void z80_device::INIR()
+inline void z80_device::inir()
 {
-	INI();
+	ini();
 	if (B != 0)
 	{
 		PC -= 2;
@@ -1299,9 +1297,9 @@ inline void z80_device::INIR()
 /***************************************************************
  * OTIR
  ***************************************************************/
-inline void z80_device::OTIR()
+inline void z80_device::otir()
 {
-	OUTI();
+	outi();
 	if (B != 0)
 	{
 		PC -= 2;
@@ -1312,9 +1310,9 @@ inline void z80_device::OTIR()
 /***************************************************************
  * LDDR
  ***************************************************************/
-inline void z80_device::LDDR()
+inline void z80_device::lddr()
 {
-	LDD();
+	ldd();
 	if (BC != 0)
 	{
 		PC -= 2;
@@ -1326,9 +1324,9 @@ inline void z80_device::LDDR()
 /***************************************************************
  * CPDR
  ***************************************************************/
-inline void z80_device::CPDR()
+inline void z80_device::cpdr()
 {
-	CPD();
+	cpd();
 	if (BC != 0 && !(F & ZF))
 	{
 		PC -= 2;
@@ -1340,9 +1338,9 @@ inline void z80_device::CPDR()
 /***************************************************************
  * INDR
  ***************************************************************/
-inline void z80_device::INDR()
+inline void z80_device::indr()
 {
-	IND();
+	ind();
 	if (B != 0)
 	{
 		PC -= 2;
@@ -1353,9 +1351,9 @@ inline void z80_device::INDR()
 /***************************************************************
  * OTDR
  ***************************************************************/
-inline void z80_device::OTDR()
+inline void z80_device::otdr()
 {
-	OUTD();
+	outd();
 	if (B != 0)
 	{
 		PC -= 2;
@@ -1366,7 +1364,7 @@ inline void z80_device::OTDR()
 /***************************************************************
  * EI
  ***************************************************************/
-inline void z80_device::EI()
+inline void z80_device::ei()
 {
 	m_iff1 = m_iff2 = 1;
 	m_after_ei = TRUE;
@@ -1376,370 +1374,370 @@ inline void z80_device::EI()
  * opcodes with CB prefix
  * rotate, shift and bit operations
  **********************************************************/
-OP(cb,00) { B = RLC(B);             } /* RLC  B           */
-OP(cb,01) { C = RLC(C);             } /* RLC  C           */
-OP(cb,02) { D = RLC(D);             } /* RLC  D           */
-OP(cb,03) { E = RLC(E);             } /* RLC  E           */
-OP(cb,04) { H = RLC(H);             } /* RLC  H           */
-OP(cb,05) { L = RLC(L);             } /* RLC  L           */
-OP(cb,06) { WM(HL, RLC(RM(HL)));    } /* RLC  (HL)        */
-OP(cb,07) { A = RLC(A);             } /* RLC  A           */
+OP(cb,00) { B = rlc(B);             } /* RLC  B           */
+OP(cb,01) { C = rlc(C);             } /* RLC  C           */
+OP(cb,02) { D = rlc(D);             } /* RLC  D           */
+OP(cb,03) { E = rlc(E);             } /* RLC  E           */
+OP(cb,04) { H = rlc(H);             } /* RLC  H           */
+OP(cb,05) { L = rlc(L);             } /* RLC  L           */
+OP(cb,06) { wm(HL, rlc(rm(HL)));    } /* RLC  (HL)        */
+OP(cb,07) { A = rlc(A);             } /* RLC  A           */
 
-OP(cb,08) { B = RRC(B);             } /* RRC  B           */
-OP(cb,09) { C = RRC(C);             } /* RRC  C           */
-OP(cb,0a) { D = RRC(D);             } /* RRC  D           */
-OP(cb,0b) { E = RRC(E);             } /* RRC  E           */
-OP(cb,0c) { H = RRC(H);             } /* RRC  H           */
-OP(cb,0d) { L = RRC(L);             } /* RRC  L           */
-OP(cb,0e) { WM(HL, RRC(RM(HL)));    } /* RRC  (HL)        */
-OP(cb,0f) { A = RRC(A);             } /* RRC  A           */
+OP(cb,08) { B = rrc(B);             } /* RRC  B           */
+OP(cb,09) { C = rrc(C);             } /* RRC  C           */
+OP(cb,0a) { D = rrc(D);             } /* RRC  D           */
+OP(cb,0b) { E = rrc(E);             } /* RRC  E           */
+OP(cb,0c) { H = rrc(H);             } /* RRC  H           */
+OP(cb,0d) { L = rrc(L);             } /* RRC  L           */
+OP(cb,0e) { wm(HL, rrc(rm(HL)));    } /* RRC  (HL)        */
+OP(cb,0f) { A = rrc(A);             } /* RRC  A           */
 
-OP(cb,10) { B = RL(B);              } /* RL   B           */
-OP(cb,11) { C = RL(C);              } /* RL   C           */
-OP(cb,12) { D = RL(D);              } /* RL   D           */
-OP(cb,13) { E = RL(E);              } /* RL   E           */
-OP(cb,14) { H = RL(H);              } /* RL   H           */
-OP(cb,15) { L = RL(L);              } /* RL   L           */
-OP(cb,16) { WM(HL, RL(RM(HL)));     } /* RL   (HL)        */
-OP(cb,17) { A = RL(A);              } /* RL   A           */
+OP(cb,10) { B = rl(B);              } /* RL   B           */
+OP(cb,11) { C = rl(C);              } /* RL   C           */
+OP(cb,12) { D = rl(D);              } /* RL   D           */
+OP(cb,13) { E = rl(E);              } /* RL   E           */
+OP(cb,14) { H = rl(H);              } /* RL   H           */
+OP(cb,15) { L = rl(L);              } /* RL   L           */
+OP(cb,16) { wm(HL, rl(rm(HL)));     } /* RL   (HL)        */
+OP(cb,17) { A = rl(A);              } /* RL   A           */
 
-OP(cb,18) { B = RR(B);              } /* RR   B           */
-OP(cb,19) { C = RR(C);              } /* RR   C           */
-OP(cb,1a) { D = RR(D);              } /* RR   D           */
-OP(cb,1b) { E = RR(E);              } /* RR   E           */
-OP(cb,1c) { H = RR(H);              } /* RR   H           */
-OP(cb,1d) { L = RR(L);              } /* RR   L           */
-OP(cb,1e) { WM(HL, RR(RM(HL)));     } /* RR   (HL)        */
-OP(cb,1f) { A = RR(A);              } /* RR   A           */
+OP(cb,18) { B = rr(B);              } /* RR   B           */
+OP(cb,19) { C = rr(C);              } /* RR   C           */
+OP(cb,1a) { D = rr(D);              } /* RR   D           */
+OP(cb,1b) { E = rr(E);              } /* RR   E           */
+OP(cb,1c) { H = rr(H);              } /* RR   H           */
+OP(cb,1d) { L = rr(L);              } /* RR   L           */
+OP(cb,1e) { wm(HL, rr(rm(HL)));     } /* RR   (HL)        */
+OP(cb,1f) { A = rr(A);              } /* RR   A           */
 
-OP(cb,20) { B = SLA(B);             } /* SLA  B           */
-OP(cb,21) { C = SLA(C);             } /* SLA  C           */
-OP(cb,22) { D = SLA(D);             } /* SLA  D           */
-OP(cb,23) { E = SLA(E);             } /* SLA  E           */
-OP(cb,24) { H = SLA(H);             } /* SLA  H           */
-OP(cb,25) { L = SLA(L);             } /* SLA  L           */
-OP(cb,26) { WM(HL, SLA(RM(HL)));    } /* SLA  (HL)        */
-OP(cb,27) { A = SLA(A);             } /* SLA  A           */
+OP(cb,20) { B = sla(B);             } /* SLA  B           */
+OP(cb,21) { C = sla(C);             } /* SLA  C           */
+OP(cb,22) { D = sla(D);             } /* SLA  D           */
+OP(cb,23) { E = sla(E);             } /* SLA  E           */
+OP(cb,24) { H = sla(H);             } /* SLA  H           */
+OP(cb,25) { L = sla(L);             } /* SLA  L           */
+OP(cb,26) { wm(HL, sla(rm(HL)));    } /* SLA  (HL)        */
+OP(cb,27) { A = sla(A);             } /* SLA  A           */
 
-OP(cb,28) { B = SRA(B);             } /* SRA  B           */
-OP(cb,29) { C = SRA(C);             } /* SRA  C           */
-OP(cb,2a) { D = SRA(D);             } /* SRA  D           */
-OP(cb,2b) { E = SRA(E);             } /* SRA  E           */
-OP(cb,2c) { H = SRA(H);             } /* SRA  H           */
-OP(cb,2d) { L = SRA(L);             } /* SRA  L           */
-OP(cb,2e) { WM(HL, SRA(RM(HL)));    } /* SRA  (HL)        */
-OP(cb,2f) { A = SRA(A);             } /* SRA  A           */
+OP(cb,28) { B = sra(B);             } /* SRA  B           */
+OP(cb,29) { C = sra(C);             } /* SRA  C           */
+OP(cb,2a) { D = sra(D);             } /* SRA  D           */
+OP(cb,2b) { E = sra(E);             } /* SRA  E           */
+OP(cb,2c) { H = sra(H);             } /* SRA  H           */
+OP(cb,2d) { L = sra(L);             } /* SRA  L           */
+OP(cb,2e) { wm(HL, sra(rm(HL)));    } /* SRA  (HL)        */
+OP(cb,2f) { A = sra(A);             } /* SRA  A           */
 
-OP(cb,30) { B = SLL(B);             } /* SLL  B           */
-OP(cb,31) { C = SLL(C);             } /* SLL  C           */
-OP(cb,32) { D = SLL(D);             } /* SLL  D           */
-OP(cb,33) { E = SLL(E);             } /* SLL  E           */
-OP(cb,34) { H = SLL(H);             } /* SLL  H           */
-OP(cb,35) { L = SLL(L);             } /* SLL  L           */
-OP(cb,36) { WM(HL, SLL(RM(HL)));    } /* SLL  (HL)        */
-OP(cb,37) { A = SLL(A);             } /* SLL  A           */
+OP(cb,30) { B = sll(B);             } /* SLL  B           */
+OP(cb,31) { C = sll(C);             } /* SLL  C           */
+OP(cb,32) { D = sll(D);             } /* SLL  D           */
+OP(cb,33) { E = sll(E);             } /* SLL  E           */
+OP(cb,34) { H = sll(H);             } /* SLL  H           */
+OP(cb,35) { L = sll(L);             } /* SLL  L           */
+OP(cb,36) { wm(HL, sll(rm(HL)));    } /* SLL  (HL)        */
+OP(cb,37) { A = sll(A);             } /* SLL  A           */
 
-OP(cb,38) { B = SRL(B);             } /* SRL  B           */
-OP(cb,39) { C = SRL(C);             } /* SRL  C           */
-OP(cb,3a) { D = SRL(D);             } /* SRL  D           */
-OP(cb,3b) { E = SRL(E);             } /* SRL  E           */
-OP(cb,3c) { H = SRL(H);             } /* SRL  H           */
-OP(cb,3d) { L = SRL(L);             } /* SRL  L           */
-OP(cb,3e) { WM(HL, SRL(RM(HL)));    } /* SRL  (HL)        */
-OP(cb,3f) { A = SRL(A);             } /* SRL  A           */
+OP(cb,38) { B = srl(B);             } /* SRL  B           */
+OP(cb,39) { C = srl(C);             } /* SRL  C           */
+OP(cb,3a) { D = srl(D);             } /* SRL  D           */
+OP(cb,3b) { E = srl(E);             } /* SRL  E           */
+OP(cb,3c) { H = srl(H);             } /* SRL  H           */
+OP(cb,3d) { L = srl(L);             } /* SRL  L           */
+OP(cb,3e) { wm(HL, srl(rm(HL)));    } /* SRL  (HL)        */
+OP(cb,3f) { A = srl(A);             } /* SRL  A           */
 
-OP(cb,40) { BIT(0, B);              } /* BIT  0,B         */
-OP(cb,41) { BIT(0, C);              } /* BIT  0,C         */
-OP(cb,42) { BIT(0, D);              } /* BIT  0,D         */
-OP(cb,43) { BIT(0, E);              } /* BIT  0,E         */
-OP(cb,44) { BIT(0, H);              } /* BIT  0,H         */
-OP(cb,45) { BIT(0, L);              } /* BIT  0,L         */
-OP(cb,46) { BIT_HL(0, RM(HL));      } /* BIT  0,(HL)      */
-OP(cb,47) { BIT(0, A);              } /* BIT  0,A         */
+OP(cb,40) { bit(0, B);              } /* BIT  0,B         */
+OP(cb,41) { bit(0, C);              } /* BIT  0,C         */
+OP(cb,42) { bit(0, D);              } /* BIT  0,D         */
+OP(cb,43) { bit(0, E);              } /* BIT  0,E         */
+OP(cb,44) { bit(0, H);              } /* BIT  0,H         */
+OP(cb,45) { bit(0, L);              } /* BIT  0,L         */
+OP(cb,46) { bit_hl(0, rm(HL));      } /* BIT  0,(HL)      */
+OP(cb,47) { bit(0, A);              } /* BIT  0,A         */
 
-OP(cb,48) { BIT(1, B);              } /* BIT  1,B         */
-OP(cb,49) { BIT(1, C);              } /* BIT  1,C         */
-OP(cb,4a) { BIT(1, D);              } /* BIT  1,D         */
-OP(cb,4b) { BIT(1, E);              } /* BIT  1,E         */
-OP(cb,4c) { BIT(1, H);              } /* BIT  1,H         */
-OP(cb,4d) { BIT(1, L);              } /* BIT  1,L         */
-OP(cb,4e) { BIT_HL(1, RM(HL));      } /* BIT  1,(HL)      */
-OP(cb,4f) { BIT(1, A);              } /* BIT  1,A         */
+OP(cb,48) { bit(1, B);              } /* BIT  1,B         */
+OP(cb,49) { bit(1, C);              } /* BIT  1,C         */
+OP(cb,4a) { bit(1, D);              } /* BIT  1,D         */
+OP(cb,4b) { bit(1, E);              } /* BIT  1,E         */
+OP(cb,4c) { bit(1, H);              } /* BIT  1,H         */
+OP(cb,4d) { bit(1, L);              } /* BIT  1,L         */
+OP(cb,4e) { bit_hl(1, rm(HL));      } /* BIT  1,(HL)      */
+OP(cb,4f) { bit(1, A);              } /* BIT  1,A         */
 
-OP(cb,50) { BIT(2, B);              } /* BIT  2,B         */
-OP(cb,51) { BIT(2, C);              } /* BIT  2,C         */
-OP(cb,52) { BIT(2, D);              } /* BIT  2,D         */
-OP(cb,53) { BIT(2, E);              } /* BIT  2,E         */
-OP(cb,54) { BIT(2, H);              } /* BIT  2,H         */
-OP(cb,55) { BIT(2, L);              } /* BIT  2,L         */
-OP(cb,56) { BIT_HL(2, RM(HL));      } /* BIT  2,(HL)      */
-OP(cb,57) { BIT(2, A);              } /* BIT  2,A         */
+OP(cb,50) { bit(2, B);              } /* BIT  2,B         */
+OP(cb,51) { bit(2, C);              } /* BIT  2,C         */
+OP(cb,52) { bit(2, D);              } /* BIT  2,D         */
+OP(cb,53) { bit(2, E);              } /* BIT  2,E         */
+OP(cb,54) { bit(2, H);              } /* BIT  2,H         */
+OP(cb,55) { bit(2, L);              } /* BIT  2,L         */
+OP(cb,56) { bit_hl(2, rm(HL));      } /* BIT  2,(HL)      */
+OP(cb,57) { bit(2, A);              } /* BIT  2,A         */
 
-OP(cb,58) { BIT(3, B);              } /* BIT  3,B         */
-OP(cb,59) { BIT(3, C);              } /* BIT  3,C         */
-OP(cb,5a) { BIT(3, D);              } /* BIT  3,D         */
-OP(cb,5b) { BIT(3, E);              } /* BIT  3,E         */
-OP(cb,5c) { BIT(3, H);              } /* BIT  3,H         */
-OP(cb,5d) { BIT(3, L);              } /* BIT  3,L         */
-OP(cb,5e) { BIT_HL(3, RM(HL));      } /* BIT  3,(HL)      */
-OP(cb,5f) { BIT(3, A);              } /* BIT  3,A         */
+OP(cb,58) { bit(3, B);              } /* BIT  3,B         */
+OP(cb,59) { bit(3, C);              } /* BIT  3,C         */
+OP(cb,5a) { bit(3, D);              } /* BIT  3,D         */
+OP(cb,5b) { bit(3, E);              } /* BIT  3,E         */
+OP(cb,5c) { bit(3, H);              } /* BIT  3,H         */
+OP(cb,5d) { bit(3, L);              } /* BIT  3,L         */
+OP(cb,5e) { bit_hl(3, rm(HL));      } /* BIT  3,(HL)      */
+OP(cb,5f) { bit(3, A);              } /* BIT  3,A         */
 
-OP(cb,60) { BIT(4, B);              } /* BIT  4,B         */
-OP(cb,61) { BIT(4, C);              } /* BIT  4,C         */
-OP(cb,62) { BIT(4, D);              } /* BIT  4,D         */
-OP(cb,63) { BIT(4, E);              } /* BIT  4,E         */
-OP(cb,64) { BIT(4, H);              } /* BIT  4,H         */
-OP(cb,65) { BIT(4, L);              } /* BIT  4,L         */
-OP(cb,66) { BIT_HL(4, RM(HL));      } /* BIT  4,(HL)      */
-OP(cb,67) { BIT(4, A);              } /* BIT  4,A         */
+OP(cb,60) { bit(4, B);              } /* BIT  4,B         */
+OP(cb,61) { bit(4, C);              } /* BIT  4,C         */
+OP(cb,62) { bit(4, D);              } /* BIT  4,D         */
+OP(cb,63) { bit(4, E);              } /* BIT  4,E         */
+OP(cb,64) { bit(4, H);              } /* BIT  4,H         */
+OP(cb,65) { bit(4, L);              } /* BIT  4,L         */
+OP(cb,66) { bit_hl(4, rm(HL));      } /* BIT  4,(HL)      */
+OP(cb,67) { bit(4, A);              } /* BIT  4,A         */
 
-OP(cb,68) { BIT(5, B);              } /* BIT  5,B         */
-OP(cb,69) { BIT(5, C);              } /* BIT  5,C         */
-OP(cb,6a) { BIT(5, D);              } /* BIT  5,D         */
-OP(cb,6b) { BIT(5, E);              } /* BIT  5,E         */
-OP(cb,6c) { BIT(5, H);              } /* BIT  5,H         */
-OP(cb,6d) { BIT(5, L);              } /* BIT  5,L         */
-OP(cb,6e) { BIT_HL(5, RM(HL));      } /* BIT  5,(HL)      */
-OP(cb,6f) { BIT(5, A);              } /* BIT  5,A         */
+OP(cb,68) { bit(5, B);              } /* BIT  5,B         */
+OP(cb,69) { bit(5, C);              } /* BIT  5,C         */
+OP(cb,6a) { bit(5, D);              } /* BIT  5,D         */
+OP(cb,6b) { bit(5, E);              } /* BIT  5,E         */
+OP(cb,6c) { bit(5, H);              } /* BIT  5,H         */
+OP(cb,6d) { bit(5, L);              } /* BIT  5,L         */
+OP(cb,6e) { bit_hl(5, rm(HL));      } /* BIT  5,(HL)      */
+OP(cb,6f) { bit(5, A);              } /* BIT  5,A         */
 
-OP(cb,70) { BIT(6, B);              } /* BIT  6,B         */
-OP(cb,71) { BIT(6, C);              } /* BIT  6,C         */
-OP(cb,72) { BIT(6, D);              } /* BIT  6,D         */
-OP(cb,73) { BIT(6, E);              } /* BIT  6,E         */
-OP(cb,74) { BIT(6, H);              } /* BIT  6,H         */
-OP(cb,75) { BIT(6, L);              } /* BIT  6,L         */
-OP(cb,76) { BIT_HL(6, RM(HL));      } /* BIT  6,(HL)      */
-OP(cb,77) { BIT(6, A);              } /* BIT  6,A         */
+OP(cb,70) { bit(6, B);              } /* BIT  6,B         */
+OP(cb,71) { bit(6, C);              } /* BIT  6,C         */
+OP(cb,72) { bit(6, D);              } /* BIT  6,D         */
+OP(cb,73) { bit(6, E);              } /* BIT  6,E         */
+OP(cb,74) { bit(6, H);              } /* BIT  6,H         */
+OP(cb,75) { bit(6, L);              } /* BIT  6,L         */
+OP(cb,76) { bit_hl(6, rm(HL));      } /* BIT  6,(HL)      */
+OP(cb,77) { bit(6, A);              } /* BIT  6,A         */
 
-OP(cb,78) { BIT(7, B);              } /* BIT  7,B         */
-OP(cb,79) { BIT(7, C);              } /* BIT  7,C         */
-OP(cb,7a) { BIT(7, D);              } /* BIT  7,D         */
-OP(cb,7b) { BIT(7, E);              } /* BIT  7,E         */
-OP(cb,7c) { BIT(7, H);              } /* BIT  7,H         */
-OP(cb,7d) { BIT(7, L);              } /* BIT  7,L         */
-OP(cb,7e) { BIT_HL(7, RM(HL));      } /* BIT  7,(HL)      */
-OP(cb,7f) { BIT(7, A);              } /* BIT  7,A         */
+OP(cb,78) { bit(7, B);              } /* BIT  7,B         */
+OP(cb,79) { bit(7, C);              } /* BIT  7,C         */
+OP(cb,7a) { bit(7, D);              } /* BIT  7,D         */
+OP(cb,7b) { bit(7, E);              } /* BIT  7,E         */
+OP(cb,7c) { bit(7, H);              } /* BIT  7,H         */
+OP(cb,7d) { bit(7, L);              } /* BIT  7,L         */
+OP(cb,7e) { bit_hl(7, rm(HL));      } /* BIT  7,(HL)      */
+OP(cb,7f) { bit(7, A);              } /* BIT  7,A         */
 
-OP(cb,80) { B = RES(0, B);          } /* RES  0,B         */
-OP(cb,81) { C = RES(0, C);          } /* RES  0,C         */
-OP(cb,82) { D = RES(0, D);          } /* RES  0,D         */
-OP(cb,83) { E = RES(0, E);          } /* RES  0,E         */
-OP(cb,84) { H = RES(0, H);          } /* RES  0,H         */
-OP(cb,85) { L = RES(0, L);          } /* RES  0,L         */
-OP(cb,86) { WM(HL, RES(0, RM(HL))); } /* RES  0,(HL)      */
-OP(cb,87) { A = RES(0, A);          } /* RES  0,A         */
+OP(cb,80) { B = res(0, B);          } /* RES  0,B         */
+OP(cb,81) { C = res(0, C);          } /* RES  0,C         */
+OP(cb,82) { D = res(0, D);          } /* RES  0,D         */
+OP(cb,83) { E = res(0, E);          } /* RES  0,E         */
+OP(cb,84) { H = res(0, H);          } /* RES  0,H         */
+OP(cb,85) { L = res(0, L);          } /* RES  0,L         */
+OP(cb,86) { wm(HL, res(0, rm(HL))); } /* RES  0,(HL)      */
+OP(cb,87) { A = res(0, A);          } /* RES  0,A         */
 
-OP(cb,88) { B = RES(1, B);          } /* RES  1,B         */
-OP(cb,89) { C = RES(1, C);          } /* RES  1,C         */
-OP(cb,8a) { D = RES(1, D);          } /* RES  1,D         */
-OP(cb,8b) { E = RES(1, E);          } /* RES  1,E         */
-OP(cb,8c) { H = RES(1, H);          } /* RES  1,H         */
-OP(cb,8d) { L = RES(1, L);          } /* RES  1,L         */
-OP(cb,8e) { WM(HL, RES(1, RM(HL))); } /* RES  1,(HL)      */
-OP(cb,8f) { A = RES(1, A);          } /* RES  1,A         */
+OP(cb,88) { B = res(1, B);          } /* RES  1,B         */
+OP(cb,89) { C = res(1, C);          } /* RES  1,C         */
+OP(cb,8a) { D = res(1, D);          } /* RES  1,D         */
+OP(cb,8b) { E = res(1, E);          } /* RES  1,E         */
+OP(cb,8c) { H = res(1, H);          } /* RES  1,H         */
+OP(cb,8d) { L = res(1, L);          } /* RES  1,L         */
+OP(cb,8e) { wm(HL, res(1, rm(HL))); } /* RES  1,(HL)      */
+OP(cb,8f) { A = res(1, A);          } /* RES  1,A         */
 
-OP(cb,90) { B = RES(2, B);          } /* RES  2,B         */
-OP(cb,91) { C = RES(2, C);          } /* RES  2,C         */
-OP(cb,92) { D = RES(2, D);          } /* RES  2,D         */
-OP(cb,93) { E = RES(2, E);          } /* RES  2,E         */
-OP(cb,94) { H = RES(2, H);          } /* RES  2,H         */
-OP(cb,95) { L = RES(2, L);          } /* RES  2,L         */
-OP(cb,96) { WM(HL, RES(2, RM(HL))); } /* RES  2,(HL)      */
-OP(cb,97) { A = RES(2, A);          } /* RES  2,A         */
+OP(cb,90) { B = res(2, B);          } /* RES  2,B         */
+OP(cb,91) { C = res(2, C);          } /* RES  2,C         */
+OP(cb,92) { D = res(2, D);          } /* RES  2,D         */
+OP(cb,93) { E = res(2, E);          } /* RES  2,E         */
+OP(cb,94) { H = res(2, H);          } /* RES  2,H         */
+OP(cb,95) { L = res(2, L);          } /* RES  2,L         */
+OP(cb,96) { wm(HL, res(2, rm(HL))); } /* RES  2,(HL)      */
+OP(cb,97) { A = res(2, A);          } /* RES  2,A         */
 
-OP(cb,98) { B = RES(3, B);          } /* RES  3,B         */
-OP(cb,99) { C = RES(3, C);          } /* RES  3,C         */
-OP(cb,9a) { D = RES(3, D);          } /* RES  3,D         */
-OP(cb,9b) { E = RES(3, E);          } /* RES  3,E         */
-OP(cb,9c) { H = RES(3, H);          } /* RES  3,H         */
-OP(cb,9d) { L = RES(3, L);          } /* RES  3,L         */
-OP(cb,9e) { WM(HL, RES(3, RM(HL))); } /* RES  3,(HL)      */
-OP(cb,9f) { A = RES(3, A);          } /* RES  3,A         */
+OP(cb,98) { B = res(3, B);          } /* RES  3,B         */
+OP(cb,99) { C = res(3, C);          } /* RES  3,C         */
+OP(cb,9a) { D = res(3, D);          } /* RES  3,D         */
+OP(cb,9b) { E = res(3, E);          } /* RES  3,E         */
+OP(cb,9c) { H = res(3, H);          } /* RES  3,H         */
+OP(cb,9d) { L = res(3, L);          } /* RES  3,L         */
+OP(cb,9e) { wm(HL, res(3, rm(HL))); } /* RES  3,(HL)      */
+OP(cb,9f) { A = res(3, A);          } /* RES  3,A         */
 
-OP(cb,a0) { B = RES(4, B);          } /* RES  4,B         */
-OP(cb,a1) { C = RES(4, C);          } /* RES  4,C         */
-OP(cb,a2) { D = RES(4, D);          } /* RES  4,D         */
-OP(cb,a3) { E = RES(4, E);          } /* RES  4,E         */
-OP(cb,a4) { H = RES(4, H);          } /* RES  4,H         */
-OP(cb,a5) { L = RES(4, L);          } /* RES  4,L         */
-OP(cb,a6) { WM(HL, RES(4, RM(HL))); } /* RES  4,(HL)      */
-OP(cb,a7) { A = RES(4, A);          } /* RES  4,A         */
+OP(cb,a0) { B = res(4, B);          } /* RES  4,B         */
+OP(cb,a1) { C = res(4, C);          } /* RES  4,C         */
+OP(cb,a2) { D = res(4, D);          } /* RES  4,D         */
+OP(cb,a3) { E = res(4, E);          } /* RES  4,E         */
+OP(cb,a4) { H = res(4, H);          } /* RES  4,H         */
+OP(cb,a5) { L = res(4, L);          } /* RES  4,L         */
+OP(cb,a6) { wm(HL, res(4, rm(HL))); } /* RES  4,(HL)      */
+OP(cb,a7) { A = res(4, A);          } /* RES  4,A         */
 
-OP(cb,a8) { B = RES(5, B);          } /* RES  5,B         */
-OP(cb,a9) { C = RES(5, C);          } /* RES  5,C         */
-OP(cb,aa) { D = RES(5, D);          } /* RES  5,D         */
-OP(cb,ab) { E = RES(5, E);          } /* RES  5,E         */
-OP(cb,ac) { H = RES(5, H);          } /* RES  5,H         */
-OP(cb,ad) { L = RES(5, L);          } /* RES  5,L         */
-OP(cb,ae) { WM(HL, RES(5, RM(HL))); } /* RES  5,(HL)      */
-OP(cb,af) { A = RES(5, A);          } /* RES  5,A         */
+OP(cb,a8) { B = res(5, B);          } /* RES  5,B         */
+OP(cb,a9) { C = res(5, C);          } /* RES  5,C         */
+OP(cb,aa) { D = res(5, D);          } /* RES  5,D         */
+OP(cb,ab) { E = res(5, E);          } /* RES  5,E         */
+OP(cb,ac) { H = res(5, H);          } /* RES  5,H         */
+OP(cb,ad) { L = res(5, L);          } /* RES  5,L         */
+OP(cb,ae) { wm(HL, res(5, rm(HL))); } /* RES  5,(HL)      */
+OP(cb,af) { A = res(5, A);          } /* RES  5,A         */
 
-OP(cb,b0) { B = RES(6, B);          } /* RES  6,B         */
-OP(cb,b1) { C = RES(6, C);          } /* RES  6,C         */
-OP(cb,b2) { D = RES(6, D);          } /* RES  6,D         */
-OP(cb,b3) { E = RES(6, E);          } /* RES  6,E         */
-OP(cb,b4) { H = RES(6, H);          } /* RES  6,H         */
-OP(cb,b5) { L = RES(6, L);          } /* RES  6,L         */
-OP(cb,b6) { WM(HL, RES(6, RM(HL))); } /* RES  6,(HL)      */
-OP(cb,b7) { A = RES(6, A);          } /* RES  6,A         */
+OP(cb,b0) { B = res(6, B);          } /* RES  6,B         */
+OP(cb,b1) { C = res(6, C);          } /* RES  6,C         */
+OP(cb,b2) { D = res(6, D);          } /* RES  6,D         */
+OP(cb,b3) { E = res(6, E);          } /* RES  6,E         */
+OP(cb,b4) { H = res(6, H);          } /* RES  6,H         */
+OP(cb,b5) { L = res(6, L);          } /* RES  6,L         */
+OP(cb,b6) { wm(HL, res(6, rm(HL))); } /* RES  6,(HL)      */
+OP(cb,b7) { A = res(6, A);          } /* RES  6,A         */
 
-OP(cb,b8) { B = RES(7, B);          } /* RES  7,B         */
-OP(cb,b9) { C = RES(7, C);          } /* RES  7,C         */
-OP(cb,ba) { D = RES(7, D);          } /* RES  7,D         */
-OP(cb,bb) { E = RES(7, E);          } /* RES  7,E         */
-OP(cb,bc) { H = RES(7, H);          } /* RES  7,H         */
-OP(cb,bd) { L = RES(7, L);          } /* RES  7,L         */
-OP(cb,be) { WM(HL, RES(7, RM(HL))); } /* RES  7,(HL)      */
-OP(cb,bf) { A = RES(7, A);          } /* RES  7,A         */
+OP(cb,b8) { B = res(7, B);          } /* RES  7,B         */
+OP(cb,b9) { C = res(7, C);          } /* RES  7,C         */
+OP(cb,ba) { D = res(7, D);          } /* RES  7,D         */
+OP(cb,bb) { E = res(7, E);          } /* RES  7,E         */
+OP(cb,bc) { H = res(7, H);          } /* RES  7,H         */
+OP(cb,bd) { L = res(7, L);          } /* RES  7,L         */
+OP(cb,be) { wm(HL, res(7, rm(HL))); } /* RES  7,(HL)      */
+OP(cb,bf) { A = res(7, A);          } /* RES  7,A         */
 
-OP(cb,c0) { B = SET(0, B);          } /* SET  0,B         */
-OP(cb,c1) { C = SET(0, C);          } /* SET  0,C         */
-OP(cb,c2) { D = SET(0, D);          } /* SET  0,D         */
-OP(cb,c3) { E = SET(0, E);          } /* SET  0,E         */
-OP(cb,c4) { H = SET(0, H);          } /* SET  0,H         */
-OP(cb,c5) { L = SET(0, L);          } /* SET  0,L         */
-OP(cb,c6) { WM(HL, SET(0, RM(HL))); } /* SET  0,(HL)      */
-OP(cb,c7) { A = SET(0, A);          } /* SET  0,A         */
+OP(cb,c0) { B = set(0, B);          } /* SET  0,B         */
+OP(cb,c1) { C = set(0, C);          } /* SET  0,C         */
+OP(cb,c2) { D = set(0, D);          } /* SET  0,D         */
+OP(cb,c3) { E = set(0, E);          } /* SET  0,E         */
+OP(cb,c4) { H = set(0, H);          } /* SET  0,H         */
+OP(cb,c5) { L = set(0, L);          } /* SET  0,L         */
+OP(cb,c6) { wm(HL, set(0, rm(HL))); } /* SET  0,(HL)      */
+OP(cb,c7) { A = set(0, A);          } /* SET  0,A         */
 
-OP(cb,c8) { B = SET(1, B);          } /* SET  1,B         */
-OP(cb,c9) { C = SET(1, C);          } /* SET  1,C         */
-OP(cb,ca) { D = SET(1, D);          } /* SET  1,D         */
-OP(cb,cb) { E = SET(1, E);          } /* SET  1,E         */
-OP(cb,cc) { H = SET(1, H);          } /* SET  1,H         */
-OP(cb,cd) { L = SET(1, L);          } /* SET  1,L         */
-OP(cb,ce) { WM(HL, SET(1, RM(HL))); } /* SET  1,(HL)      */
-OP(cb,cf) { A = SET(1, A);          } /* SET  1,A         */
+OP(cb,c8) { B = set(1, B);          } /* SET  1,B         */
+OP(cb,c9) { C = set(1, C);          } /* SET  1,C         */
+OP(cb,ca) { D = set(1, D);          } /* SET  1,D         */
+OP(cb,cb) { E = set(1, E);          } /* SET  1,E         */
+OP(cb,cc) { H = set(1, H);          } /* SET  1,H         */
+OP(cb,cd) { L = set(1, L);          } /* SET  1,L         */
+OP(cb,ce) { wm(HL, set(1, rm(HL))); } /* SET  1,(HL)      */
+OP(cb,cf) { A = set(1, A);          } /* SET  1,A         */
 
-OP(cb,d0) { B = SET(2, B);          } /* SET  2,B         */
-OP(cb,d1) { C = SET(2, C);          } /* SET  2,C         */
-OP(cb,d2) { D = SET(2, D);          } /* SET  2,D         */
-OP(cb,d3) { E = SET(2, E);          } /* SET  2,E         */
-OP(cb,d4) { H = SET(2, H);          } /* SET  2,H         */
-OP(cb,d5) { L = SET(2, L);          } /* SET  2,L         */
-OP(cb,d6) { WM(HL, SET(2, RM(HL))); } /* SET  2,(HL)      */
-OP(cb,d7) { A = SET(2, A);          } /* SET  2,A         */
+OP(cb,d0) { B = set(2, B);          } /* SET  2,B         */
+OP(cb,d1) { C = set(2, C);          } /* SET  2,C         */
+OP(cb,d2) { D = set(2, D);          } /* SET  2,D         */
+OP(cb,d3) { E = set(2, E);          } /* SET  2,E         */
+OP(cb,d4) { H = set(2, H);          } /* SET  2,H         */
+OP(cb,d5) { L = set(2, L);          } /* SET  2,L         */
+OP(cb,d6) { wm(HL, set(2, rm(HL))); } /* SET  2,(HL)      */
+OP(cb,d7) { A = set(2, A);          } /* SET  2,A         */
 
-OP(cb,d8) { B = SET(3, B);          } /* SET  3,B         */
-OP(cb,d9) { C = SET(3, C);          } /* SET  3,C         */
-OP(cb,da) { D = SET(3, D);          } /* SET  3,D         */
-OP(cb,db) { E = SET(3, E);          } /* SET  3,E         */
-OP(cb,dc) { H = SET(3, H);          } /* SET  3,H         */
-OP(cb,dd) { L = SET(3, L);          } /* SET  3,L         */
-OP(cb,de) { WM(HL, SET(3, RM(HL))); } /* SET  3,(HL)      */
-OP(cb,df) { A = SET(3, A);          } /* SET  3,A         */
+OP(cb,d8) { B = set(3, B);          } /* SET  3,B         */
+OP(cb,d9) { C = set(3, C);          } /* SET  3,C         */
+OP(cb,da) { D = set(3, D);          } /* SET  3,D         */
+OP(cb,db) { E = set(3, E);          } /* SET  3,E         */
+OP(cb,dc) { H = set(3, H);          } /* SET  3,H         */
+OP(cb,dd) { L = set(3, L);          } /* SET  3,L         */
+OP(cb,de) { wm(HL, set(3, rm(HL))); } /* SET  3,(HL)      */
+OP(cb,df) { A = set(3, A);          } /* SET  3,A         */
 
-OP(cb,e0) { B = SET(4, B);          } /* SET  4,B         */
-OP(cb,e1) { C = SET(4, C);          } /* SET  4,C         */
-OP(cb,e2) { D = SET(4, D);          } /* SET  4,D         */
-OP(cb,e3) { E = SET(4, E);          } /* SET  4,E         */
-OP(cb,e4) { H = SET(4, H);          } /* SET  4,H         */
-OP(cb,e5) { L = SET(4, L);          } /* SET  4,L         */
-OP(cb,e6) { WM(HL, SET(4, RM(HL))); } /* SET  4,(HL)      */
-OP(cb,e7) { A = SET(4, A);          } /* SET  4,A         */
+OP(cb,e0) { B = set(4, B);          } /* SET  4,B         */
+OP(cb,e1) { C = set(4, C);          } /* SET  4,C         */
+OP(cb,e2) { D = set(4, D);          } /* SET  4,D         */
+OP(cb,e3) { E = set(4, E);          } /* SET  4,E         */
+OP(cb,e4) { H = set(4, H);          } /* SET  4,H         */
+OP(cb,e5) { L = set(4, L);          } /* SET  4,L         */
+OP(cb,e6) { wm(HL, set(4, rm(HL))); } /* SET  4,(HL)      */
+OP(cb,e7) { A = set(4, A);          } /* SET  4,A         */
 
-OP(cb,e8) { B = SET(5, B);          } /* SET  5,B         */
-OP(cb,e9) { C = SET(5, C);          } /* SET  5,C         */
-OP(cb,ea) { D = SET(5, D);          } /* SET  5,D         */
-OP(cb,eb) { E = SET(5, E);          } /* SET  5,E         */
-OP(cb,ec) { H = SET(5, H);          } /* SET  5,H         */
-OP(cb,ed) { L = SET(5, L);          } /* SET  5,L         */
-OP(cb,ee) { WM(HL, SET(5, RM(HL))); } /* SET  5,(HL)      */
-OP(cb,ef) { A = SET(5, A);          } /* SET  5,A         */
+OP(cb,e8) { B = set(5, B);          } /* SET  5,B         */
+OP(cb,e9) { C = set(5, C);          } /* SET  5,C         */
+OP(cb,ea) { D = set(5, D);          } /* SET  5,D         */
+OP(cb,eb) { E = set(5, E);          } /* SET  5,E         */
+OP(cb,ec) { H = set(5, H);          } /* SET  5,H         */
+OP(cb,ed) { L = set(5, L);          } /* SET  5,L         */
+OP(cb,ee) { wm(HL, set(5, rm(HL))); } /* SET  5,(HL)      */
+OP(cb,ef) { A = set(5, A);          } /* SET  5,A         */
 
-OP(cb,f0) { B = SET(6, B);          } /* SET  6,B         */
-OP(cb,f1) { C = SET(6, C);          } /* SET  6,C         */
-OP(cb,f2) { D = SET(6, D);          } /* SET  6,D         */
-OP(cb,f3) { E = SET(6, E);          } /* SET  6,E         */
-OP(cb,f4) { H = SET(6, H);          } /* SET  6,H         */
-OP(cb,f5) { L = SET(6, L);          } /* SET  6,L         */
-OP(cb,f6) { WM(HL, SET(6, RM(HL))); } /* SET  6,(HL)      */
-OP(cb,f7) { A = SET(6, A);          } /* SET  6,A         */
+OP(cb,f0) { B = set(6, B);          } /* SET  6,B         */
+OP(cb,f1) { C = set(6, C);          } /* SET  6,C         */
+OP(cb,f2) { D = set(6, D);          } /* SET  6,D         */
+OP(cb,f3) { E = set(6, E);          } /* SET  6,E         */
+OP(cb,f4) { H = set(6, H);          } /* SET  6,H         */
+OP(cb,f5) { L = set(6, L);          } /* SET  6,L         */
+OP(cb,f6) { wm(HL, set(6, rm(HL))); } /* SET  6,(HL)      */
+OP(cb,f7) { A = set(6, A);          } /* SET  6,A         */
 
-OP(cb,f8) { B = SET(7, B);          } /* SET  7,B         */
-OP(cb,f9) { C = SET(7, C);          } /* SET  7,C         */
-OP(cb,fa) { D = SET(7, D);          } /* SET  7,D         */
-OP(cb,fb) { E = SET(7, E);          } /* SET  7,E         */
-OP(cb,fc) { H = SET(7, H);          } /* SET  7,H         */
-OP(cb,fd) { L = SET(7, L);          } /* SET  7,L         */
-OP(cb,fe) { WM(HL, SET(7, RM(HL))); } /* SET  7,(HL)      */
-OP(cb,ff) { A = SET(7, A);          } /* SET  7,A         */
+OP(cb,f8) { B = set(7, B);          } /* SET  7,B         */
+OP(cb,f9) { C = set(7, C);          } /* SET  7,C         */
+OP(cb,fa) { D = set(7, D);          } /* SET  7,D         */
+OP(cb,fb) { E = set(7, E);          } /* SET  7,E         */
+OP(cb,fc) { H = set(7, H);          } /* SET  7,H         */
+OP(cb,fd) { L = set(7, L);          } /* SET  7,L         */
+OP(cb,fe) { wm(HL, set(7, rm(HL))); } /* SET  7,(HL)      */
+OP(cb,ff) { A = set(7, A);          } /* SET  7,A         */
 
 
 /**********************************************************
 * opcodes with DD/FD CB prefix
 * rotate, shift and bit operations with (IX+o)
 **********************************************************/
-OP(xycb,00) { B = RLC(RM(m_ea)); WM(m_ea, B);    } /* RLC  B=(XY+o)    */
-OP(xycb,01) { C = RLC(RM(m_ea)); WM(m_ea, C);    } /* RLC  C=(XY+o)    */
-OP(xycb,02) { D = RLC(RM(m_ea)); WM(m_ea, D);    } /* RLC  D=(XY+o)    */
-OP(xycb,03) { E = RLC(RM(m_ea)); WM(m_ea, E);    } /* RLC  E=(XY+o)    */
-OP(xycb,04) { H = RLC(RM(m_ea)); WM(m_ea, H);    } /* RLC  H=(XY+o)    */
-OP(xycb,05) { L = RLC(RM(m_ea)); WM(m_ea, L);    } /* RLC  L=(XY+o)    */
-OP(xycb,06) { WM(m_ea, RLC(RM(m_ea)));           } /* RLC  (XY+o)      */
-OP(xycb,07) { A = RLC(RM(m_ea)); WM(m_ea, A);    } /* RLC  A=(XY+o)    */
+OP(xycb,00) { B = rlc(rm(m_ea)); wm(m_ea, B);    } /* RLC  B=(XY+o)    */
+OP(xycb,01) { C = rlc(rm(m_ea)); wm(m_ea, C);    } /* RLC  C=(XY+o)    */
+OP(xycb,02) { D = rlc(rm(m_ea)); wm(m_ea, D);    } /* RLC  D=(XY+o)    */
+OP(xycb,03) { E = rlc(rm(m_ea)); wm(m_ea, E);    } /* RLC  E=(XY+o)    */
+OP(xycb,04) { H = rlc(rm(m_ea)); wm(m_ea, H);    } /* RLC  H=(XY+o)    */
+OP(xycb,05) { L = rlc(rm(m_ea)); wm(m_ea, L);    } /* RLC  L=(XY+o)    */
+OP(xycb,06) { wm(m_ea, rlc(rm(m_ea)));           } /* RLC  (XY+o)      */
+OP(xycb,07) { A = rlc(rm(m_ea)); wm(m_ea, A);    } /* RLC  A=(XY+o)    */
 
-OP(xycb,08) { B = RRC(RM(m_ea)); WM(m_ea, B);    } /* RRC  B=(XY+o)    */
-OP(xycb,09) { C = RRC(RM(m_ea)); WM(m_ea, C);    } /* RRC  C=(XY+o)    */
-OP(xycb,0a) { D = RRC(RM(m_ea)); WM(m_ea, D);    } /* RRC  D=(XY+o)    */
-OP(xycb,0b) { E = RRC(RM(m_ea)); WM(m_ea, E);    } /* RRC  E=(XY+o)    */
-OP(xycb,0c) { H = RRC(RM(m_ea)); WM(m_ea, H);    } /* RRC  H=(XY+o)    */
-OP(xycb,0d) { L = RRC(RM(m_ea)); WM(m_ea, L);    } /* RRC  L=(XY+o)    */
-OP(xycb,0e) { WM(m_ea,RRC(RM(m_ea)));            } /* RRC  (XY+o)      */
-OP(xycb,0f) { A = RRC(RM(m_ea)); WM(m_ea, A);    } /* RRC  A=(XY+o)    */
+OP(xycb,08) { B = rrc(rm(m_ea)); wm(m_ea, B);    } /* RRC  B=(XY+o)    */
+OP(xycb,09) { C = rrc(rm(m_ea)); wm(m_ea, C);    } /* RRC  C=(XY+o)    */
+OP(xycb,0a) { D = rrc(rm(m_ea)); wm(m_ea, D);    } /* RRC  D=(XY+o)    */
+OP(xycb,0b) { E = rrc(rm(m_ea)); wm(m_ea, E);    } /* RRC  E=(XY+o)    */
+OP(xycb,0c) { H = rrc(rm(m_ea)); wm(m_ea, H);    } /* RRC  H=(XY+o)    */
+OP(xycb,0d) { L = rrc(rm(m_ea)); wm(m_ea, L);    } /* RRC  L=(XY+o)    */
+OP(xycb,0e) { wm(m_ea,rrc(rm(m_ea)));            } /* RRC  (XY+o)      */
+OP(xycb,0f) { A = rrc(rm(m_ea)); wm(m_ea, A);    } /* RRC  A=(XY+o)    */
 
-OP(xycb,10) { B = RL(RM(m_ea)); WM(m_ea, B);     } /* RL   B=(XY+o)    */
-OP(xycb,11) { C = RL(RM(m_ea)); WM(m_ea, C);     } /* RL   C=(XY+o)    */
-OP(xycb,12) { D = RL(RM(m_ea)); WM(m_ea, D);     } /* RL   D=(XY+o)    */
-OP(xycb,13) { E = RL(RM(m_ea)); WM(m_ea, E);     } /* RL   E=(XY+o)    */
-OP(xycb,14) { H = RL(RM(m_ea)); WM(m_ea, H);     } /* RL   H=(XY+o)    */
-OP(xycb,15) { L = RL(RM(m_ea)); WM(m_ea, L);     } /* RL   L=(XY+o)    */
-OP(xycb,16) { WM(m_ea,RL(RM(m_ea)));             } /* RL   (XY+o)      */
-OP(xycb,17) { A = RL(RM(m_ea)); WM(m_ea, A);     } /* RL   A=(XY+o)    */
+OP(xycb,10) { B = rl(rm(m_ea)); wm(m_ea, B);     } /* RL   B=(XY+o)    */
+OP(xycb,11) { C = rl(rm(m_ea)); wm(m_ea, C);     } /* RL   C=(XY+o)    */
+OP(xycb,12) { D = rl(rm(m_ea)); wm(m_ea, D);     } /* RL   D=(XY+o)    */
+OP(xycb,13) { E = rl(rm(m_ea)); wm(m_ea, E);     } /* RL   E=(XY+o)    */
+OP(xycb,14) { H = rl(rm(m_ea)); wm(m_ea, H);     } /* RL   H=(XY+o)    */
+OP(xycb,15) { L = rl(rm(m_ea)); wm(m_ea, L);     } /* RL   L=(XY+o)    */
+OP(xycb,16) { wm(m_ea,rl(rm(m_ea)));             } /* RL   (XY+o)      */
+OP(xycb,17) { A = rl(rm(m_ea)); wm(m_ea, A);     } /* RL   A=(XY+o)    */
 
-OP(xycb,18) { B = RR(RM(m_ea)); WM(m_ea, B);     } /* RR   B=(XY+o)    */
-OP(xycb,19) { C = RR(RM(m_ea)); WM(m_ea, C);     } /* RR   C=(XY+o)    */
-OP(xycb,1a) { D = RR(RM(m_ea)); WM(m_ea, D);     } /* RR   D=(XY+o)    */
-OP(xycb,1b) { E = RR(RM(m_ea)); WM(m_ea, E);     } /* RR   E=(XY+o)    */
-OP(xycb,1c) { H = RR(RM(m_ea)); WM(m_ea, H);     } /* RR   H=(XY+o)    */
-OP(xycb,1d) { L = RR(RM(m_ea)); WM(m_ea, L);     } /* RR   L=(XY+o)    */
-OP(xycb,1e) { WM(m_ea, RR(RM(m_ea)));            } /* RR   (XY+o)      */
-OP(xycb,1f) { A = RR(RM(m_ea)); WM(m_ea, A);     } /* RR   A=(XY+o)    */
+OP(xycb,18) { B = rr(rm(m_ea)); wm(m_ea, B);     } /* RR   B=(XY+o)    */
+OP(xycb,19) { C = rr(rm(m_ea)); wm(m_ea, C);     } /* RR   C=(XY+o)    */
+OP(xycb,1a) { D = rr(rm(m_ea)); wm(m_ea, D);     } /* RR   D=(XY+o)    */
+OP(xycb,1b) { E = rr(rm(m_ea)); wm(m_ea, E);     } /* RR   E=(XY+o)    */
+OP(xycb,1c) { H = rr(rm(m_ea)); wm(m_ea, H);     } /* RR   H=(XY+o)    */
+OP(xycb,1d) { L = rr(rm(m_ea)); wm(m_ea, L);     } /* RR   L=(XY+o)    */
+OP(xycb,1e) { wm(m_ea, rr(rm(m_ea)));            } /* RR   (XY+o)      */
+OP(xycb,1f) { A = rr(rm(m_ea)); wm(m_ea, A);     } /* RR   A=(XY+o)    */
 
-OP(xycb,20) { B = SLA(RM(m_ea)); WM(m_ea, B);    } /* SLA  B=(XY+o)    */
-OP(xycb,21) { C = SLA(RM(m_ea)); WM(m_ea, C);    } /* SLA  C=(XY+o)    */
-OP(xycb,22) { D = SLA(RM(m_ea)); WM(m_ea, D);    } /* SLA  D=(XY+o)    */
-OP(xycb,23) { E = SLA(RM(m_ea)); WM(m_ea, E);    } /* SLA  E=(XY+o)    */
-OP(xycb,24) { H = SLA(RM(m_ea)); WM(m_ea, H);    } /* SLA  H=(XY+o)    */
-OP(xycb,25) { L = SLA(RM(m_ea)); WM(m_ea, L);    } /* SLA  L=(XY+o)    */
-OP(xycb,26) { WM(m_ea, SLA(RM(m_ea)));           } /* SLA  (XY+o)      */
-OP(xycb,27) { A = SLA(RM(m_ea)); WM(m_ea, A);    } /* SLA  A=(XY+o)    */
+OP(xycb,20) { B = sla(rm(m_ea)); wm(m_ea, B);    } /* SLA  B=(XY+o)    */
+OP(xycb,21) { C = sla(rm(m_ea)); wm(m_ea, C);    } /* SLA  C=(XY+o)    */
+OP(xycb,22) { D = sla(rm(m_ea)); wm(m_ea, D);    } /* SLA  D=(XY+o)    */
+OP(xycb,23) { E = sla(rm(m_ea)); wm(m_ea, E);    } /* SLA  E=(XY+o)    */
+OP(xycb,24) { H = sla(rm(m_ea)); wm(m_ea, H);    } /* SLA  H=(XY+o)    */
+OP(xycb,25) { L = sla(rm(m_ea)); wm(m_ea, L);    } /* SLA  L=(XY+o)    */
+OP(xycb,26) { wm(m_ea, sla(rm(m_ea)));           } /* SLA  (XY+o)      */
+OP(xycb,27) { A = sla(rm(m_ea)); wm(m_ea, A);    } /* SLA  A=(XY+o)    */
 
-OP(xycb,28) { B = SRA(RM(m_ea)); WM(m_ea, B);    } /* SRA  B=(XY+o)    */
-OP(xycb,29) { C = SRA(RM(m_ea)); WM(m_ea, C);    } /* SRA  C=(XY+o)    */
-OP(xycb,2a) { D = SRA(RM(m_ea)); WM(m_ea, D);    } /* SRA  D=(XY+o)    */
-OP(xycb,2b) { E = SRA(RM(m_ea)); WM(m_ea, E);    } /* SRA  E=(XY+o)    */
-OP(xycb,2c) { H = SRA(RM(m_ea)); WM(m_ea, H);    } /* SRA  H=(XY+o)    */
-OP(xycb,2d) { L = SRA(RM(m_ea)); WM(m_ea, L);    } /* SRA  L=(XY+o)    */
-OP(xycb,2e) { WM(m_ea, SRA(RM(m_ea)));           } /* SRA  (XY+o)      */
-OP(xycb,2f) { A = SRA(RM(m_ea)); WM(m_ea, A);    } /* SRA  A=(XY+o)    */
+OP(xycb,28) { B = sra(rm(m_ea)); wm(m_ea, B);    } /* SRA  B=(XY+o)    */
+OP(xycb,29) { C = sra(rm(m_ea)); wm(m_ea, C);    } /* SRA  C=(XY+o)    */
+OP(xycb,2a) { D = sra(rm(m_ea)); wm(m_ea, D);    } /* SRA  D=(XY+o)    */
+OP(xycb,2b) { E = sra(rm(m_ea)); wm(m_ea, E);    } /* SRA  E=(XY+o)    */
+OP(xycb,2c) { H = sra(rm(m_ea)); wm(m_ea, H);    } /* SRA  H=(XY+o)    */
+OP(xycb,2d) { L = sra(rm(m_ea)); wm(m_ea, L);    } /* SRA  L=(XY+o)    */
+OP(xycb,2e) { wm(m_ea, sra(rm(m_ea)));           } /* SRA  (XY+o)      */
+OP(xycb,2f) { A = sra(rm(m_ea)); wm(m_ea, A);    } /* SRA  A=(XY+o)    */
 
-OP(xycb,30) { B = SLL(RM(m_ea)); WM(m_ea, B);    } /* SLL  B=(XY+o)    */
-OP(xycb,31) { C = SLL(RM(m_ea)); WM(m_ea, C);    } /* SLL  C=(XY+o)    */
-OP(xycb,32) { D = SLL(RM(m_ea)); WM(m_ea, D);    } /* SLL  D=(XY+o)    */
-OP(xycb,33) { E = SLL(RM(m_ea)); WM(m_ea, E);    } /* SLL  E=(XY+o)    */
-OP(xycb,34) { H = SLL(RM(m_ea)); WM(m_ea, H);    } /* SLL  H=(XY+o)    */
-OP(xycb,35) { L = SLL(RM(m_ea)); WM(m_ea, L);    } /* SLL  L=(XY+o)    */
-OP(xycb,36) { WM(m_ea, SLL(RM(m_ea)));           } /* SLL  (XY+o)      */
-OP(xycb,37) { A = SLL(RM(m_ea)); WM(m_ea, A);    } /* SLL  A=(XY+o)    */
+OP(xycb,30) { B = sll(rm(m_ea)); wm(m_ea, B);    } /* SLL  B=(XY+o)    */
+OP(xycb,31) { C = sll(rm(m_ea)); wm(m_ea, C);    } /* SLL  C=(XY+o)    */
+OP(xycb,32) { D = sll(rm(m_ea)); wm(m_ea, D);    } /* SLL  D=(XY+o)    */
+OP(xycb,33) { E = sll(rm(m_ea)); wm(m_ea, E);    } /* SLL  E=(XY+o)    */
+OP(xycb,34) { H = sll(rm(m_ea)); wm(m_ea, H);    } /* SLL  H=(XY+o)    */
+OP(xycb,35) { L = sll(rm(m_ea)); wm(m_ea, L);    } /* SLL  L=(XY+o)    */
+OP(xycb,36) { wm(m_ea, sll(rm(m_ea)));           } /* SLL  (XY+o)      */
+OP(xycb,37) { A = sll(rm(m_ea)); wm(m_ea, A);    } /* SLL  A=(XY+o)    */
 
-OP(xycb,38) { B = SRL(RM(m_ea)); WM(m_ea, B);    } /* SRL  B=(XY+o)    */
-OP(xycb,39) { C = SRL(RM(m_ea)); WM(m_ea, C);    } /* SRL  C=(XY+o)    */
-OP(xycb,3a) { D = SRL(RM(m_ea)); WM(m_ea, D);    } /* SRL  D=(XY+o)    */
-OP(xycb,3b) { E = SRL(RM(m_ea)); WM(m_ea, E);    } /* SRL  E=(XY+o)    */
-OP(xycb,3c) { H = SRL(RM(m_ea)); WM(m_ea, H);    } /* SRL  H=(XY+o)    */
-OP(xycb,3d) { L = SRL(RM(m_ea)); WM(m_ea, L);    } /* SRL  L=(XY+o)    */
-OP(xycb,3e) { WM(m_ea, SRL(RM(m_ea)));           } /* SRL  (XY+o)      */
-OP(xycb,3f) { A = SRL(RM(m_ea)); WM(m_ea, A);    } /* SRL  A=(XY+o)    */
+OP(xycb,38) { B = srl(rm(m_ea)); wm(m_ea, B);    } /* SRL  B=(XY+o)    */
+OP(xycb,39) { C = srl(rm(m_ea)); wm(m_ea, C);    } /* SRL  C=(XY+o)    */
+OP(xycb,3a) { D = srl(rm(m_ea)); wm(m_ea, D);    } /* SRL  D=(XY+o)    */
+OP(xycb,3b) { E = srl(rm(m_ea)); wm(m_ea, E);    } /* SRL  E=(XY+o)    */
+OP(xycb,3c) { H = srl(rm(m_ea)); wm(m_ea, H);    } /* SRL  H=(XY+o)    */
+OP(xycb,3d) { L = srl(rm(m_ea)); wm(m_ea, L);    } /* SRL  L=(XY+o)    */
+OP(xycb,3e) { wm(m_ea, srl(rm(m_ea)));           } /* SRL  (XY+o)      */
+OP(xycb,3f) { A = srl(rm(m_ea)); wm(m_ea, A);    } /* SRL  A=(XY+o)    */
 
 OP(xycb,40) { xycb_46();                         } /* BIT  0,(XY+o)    */
 OP(xycb,41) { xycb_46();                         } /* BIT  0,(XY+o)    */
@@ -1747,7 +1745,7 @@ OP(xycb,42) { xycb_46();                         } /* BIT  0,(XY+o)    */
 OP(xycb,43) { xycb_46();                         } /* BIT  0,(XY+o)    */
 OP(xycb,44) { xycb_46();                         } /* BIT  0,(XY+o)    */
 OP(xycb,45) { xycb_46();                         } /* BIT  0,(XY+o)    */
-OP(xycb,46) { BIT_XY(0, RM(m_ea));               } /* BIT  0,(XY+o)    */
+OP(xycb,46) { bit_xy(0, rm(m_ea));               } /* BIT  0,(XY+o)    */
 OP(xycb,47) { xycb_46();                         } /* BIT  0,(XY+o)    */
 
 OP(xycb,48) { xycb_4e();                         } /* BIT  1,(XY+o)    */
@@ -1756,7 +1754,7 @@ OP(xycb,4a) { xycb_4e();                         } /* BIT  1,(XY+o)    */
 OP(xycb,4b) { xycb_4e();                         } /* BIT  1,(XY+o)    */
 OP(xycb,4c) { xycb_4e();                         } /* BIT  1,(XY+o)    */
 OP(xycb,4d) { xycb_4e();                         } /* BIT  1,(XY+o)    */
-OP(xycb,4e) { BIT_XY(1, RM(m_ea));               } /* BIT  1,(XY+o)    */
+OP(xycb,4e) { bit_xy(1, rm(m_ea));               } /* BIT  1,(XY+o)    */
 OP(xycb,4f) { xycb_4e();                         } /* BIT  1,(XY+o)    */
 
 OP(xycb,50) { xycb_56();                         } /* BIT  2,(XY+o)    */
@@ -1765,7 +1763,7 @@ OP(xycb,52) { xycb_56();                         } /* BIT  2,(XY+o)    */
 OP(xycb,53) { xycb_56();                         } /* BIT  2,(XY+o)    */
 OP(xycb,54) { xycb_56();                         } /* BIT  2,(XY+o)    */
 OP(xycb,55) { xycb_56();                         } /* BIT  2,(XY+o)    */
-OP(xycb,56) { BIT_XY(2, RM(m_ea));               } /* BIT  2,(XY+o)    */
+OP(xycb,56) { bit_xy(2, rm(m_ea));               } /* BIT  2,(XY+o)    */
 OP(xycb,57) { xycb_56();                         } /* BIT  2,(XY+o)    */
 
 OP(xycb,58) { xycb_5e();                         } /* BIT  3,(XY+o)    */
@@ -1774,7 +1772,7 @@ OP(xycb,5a) { xycb_5e();                         } /* BIT  3,(XY+o)    */
 OP(xycb,5b) { xycb_5e();                         } /* BIT  3,(XY+o)    */
 OP(xycb,5c) { xycb_5e();                         } /* BIT  3,(XY+o)    */
 OP(xycb,5d) { xycb_5e();                         } /* BIT  3,(XY+o)    */
-OP(xycb,5e) { BIT_XY(3, RM(m_ea));               } /* BIT  3,(XY+o)    */
+OP(xycb,5e) { bit_xy(3, rm(m_ea));               } /* BIT  3,(XY+o)    */
 OP(xycb,5f) { xycb_5e();                         } /* BIT  3,(XY+o)    */
 
 OP(xycb,60) { xycb_66();                         } /* BIT  4,(XY+o)    */
@@ -1783,7 +1781,7 @@ OP(xycb,62) { xycb_66();                         } /* BIT  4,(XY+o)    */
 OP(xycb,63) { xycb_66();                         } /* BIT  4,(XY+o)    */
 OP(xycb,64) { xycb_66();                         } /* BIT  4,(XY+o)    */
 OP(xycb,65) { xycb_66();                         } /* BIT  4,(XY+o)    */
-OP(xycb,66) { BIT_XY(4, RM(m_ea));               } /* BIT  4,(XY+o)    */
+OP(xycb,66) { bit_xy(4, rm(m_ea));               } /* BIT  4,(XY+o)    */
 OP(xycb,67) { xycb_66();                         } /* BIT  4,(XY+o)    */
 
 OP(xycb,68) { xycb_6e();                         } /* BIT  5,(XY+o)    */
@@ -1792,7 +1790,7 @@ OP(xycb,6a) { xycb_6e();                         } /* BIT  5,(XY+o)    */
 OP(xycb,6b) { xycb_6e();                         } /* BIT  5,(XY+o)    */
 OP(xycb,6c) { xycb_6e();                         } /* BIT  5,(XY+o)    */
 OP(xycb,6d) { xycb_6e();                         } /* BIT  5,(XY+o)    */
-OP(xycb,6e) { BIT_XY(5, RM(m_ea));               } /* BIT  5,(XY+o)    */
+OP(xycb,6e) { bit_xy(5, rm(m_ea));               } /* BIT  5,(XY+o)    */
 OP(xycb,6f) { xycb_6e();                         } /* BIT  5,(XY+o)    */
 
 OP(xycb,70) { xycb_76();                         } /* BIT  6,(XY+o)    */
@@ -1801,7 +1799,7 @@ OP(xycb,72) { xycb_76();                         } /* BIT  6,(XY+o)    */
 OP(xycb,73) { xycb_76();                         } /* BIT  6,(XY+o)    */
 OP(xycb,74) { xycb_76();                         } /* BIT  6,(XY+o)    */
 OP(xycb,75) { xycb_76();                         } /* BIT  6,(XY+o)    */
-OP(xycb,76) { BIT_XY(6, RM(m_ea));               } /* BIT  6,(XY+o)    */
+OP(xycb,76) { bit_xy(6, rm(m_ea));               } /* BIT  6,(XY+o)    */
 OP(xycb,77) { xycb_76();                         } /* BIT  6,(XY+o)    */
 
 OP(xycb,78) { xycb_7e();                         } /* BIT  7,(XY+o)    */
@@ -1810,152 +1808,152 @@ OP(xycb,7a) { xycb_7e();                         } /* BIT  7,(XY+o)    */
 OP(xycb,7b) { xycb_7e();                         } /* BIT  7,(XY+o)    */
 OP(xycb,7c) { xycb_7e();                         } /* BIT  7,(XY+o)    */
 OP(xycb,7d) { xycb_7e();                         } /* BIT  7,(XY+o)    */
-OP(xycb,7e) { BIT_XY(7, RM(m_ea));               } /* BIT  7,(XY+o)    */
+OP(xycb,7e) { bit_xy(7, rm(m_ea));               } /* BIT  7,(XY+o)    */
 OP(xycb,7f) { xycb_7e();                         } /* BIT  7,(XY+o)    */
 
-OP(xycb,80) { B = RES(0, RM(m_ea)); WM(m_ea, B); } /* RES  0,B=(XY+o)  */
-OP(xycb,81) { C = RES(0, RM(m_ea)); WM(m_ea, C); } /* RES  0,C=(XY+o)  */
-OP(xycb,82) { D = RES(0, RM(m_ea)); WM(m_ea, D); } /* RES  0,D=(XY+o)  */
-OP(xycb,83) { E = RES(0, RM(m_ea)); WM(m_ea, E); } /* RES  0,E=(XY+o)  */
-OP(xycb,84) { H = RES(0, RM(m_ea)); WM(m_ea, H); } /* RES  0,H=(XY+o)  */
-OP(xycb,85) { L = RES(0, RM(m_ea)); WM(m_ea, L); } /* RES  0,L=(XY+o)  */
-OP(xycb,86) { WM(m_ea, RES(0, RM(m_ea)));        } /* RES  0,(XY+o)    */
-OP(xycb,87) { A = RES(0, RM(m_ea)); WM(m_ea, A); } /* RES  0,A=(XY+o)  */
+OP(xycb,80) { B = res(0, rm(m_ea)); wm(m_ea, B); } /* RES  0,B=(XY+o)  */
+OP(xycb,81) { C = res(0, rm(m_ea)); wm(m_ea, C); } /* RES  0,C=(XY+o)  */
+OP(xycb,82) { D = res(0, rm(m_ea)); wm(m_ea, D); } /* RES  0,D=(XY+o)  */
+OP(xycb,83) { E = res(0, rm(m_ea)); wm(m_ea, E); } /* RES  0,E=(XY+o)  */
+OP(xycb,84) { H = res(0, rm(m_ea)); wm(m_ea, H); } /* RES  0,H=(XY+o)  */
+OP(xycb,85) { L = res(0, rm(m_ea)); wm(m_ea, L); } /* RES  0,L=(XY+o)  */
+OP(xycb,86) { wm(m_ea, res(0, rm(m_ea)));        } /* RES  0,(XY+o)    */
+OP(xycb,87) { A = res(0, rm(m_ea)); wm(m_ea, A); } /* RES  0,A=(XY+o)  */
 
-OP(xycb,88) { B = RES(1, RM(m_ea)); WM(m_ea, B); } /* RES  1,B=(XY+o)  */
-OP(xycb,89) { C = RES(1, RM(m_ea)); WM(m_ea, C); } /* RES  1,C=(XY+o)  */
-OP(xycb,8a) { D = RES(1, RM(m_ea)); WM(m_ea, D); } /* RES  1,D=(XY+o)  */
-OP(xycb,8b) { E = RES(1, RM(m_ea)); WM(m_ea, E); } /* RES  1,E=(XY+o)  */
-OP(xycb,8c) { H = RES(1, RM(m_ea)); WM(m_ea, H); } /* RES  1,H=(XY+o)  */
-OP(xycb,8d) { L = RES(1, RM(m_ea)); WM(m_ea, L); } /* RES  1,L=(XY+o)  */
-OP(xycb,8e) { WM(m_ea, RES(1, RM(m_ea)));        } /* RES  1,(XY+o)    */
-OP(xycb,8f) { A = RES(1, RM(m_ea)); WM(m_ea, A); } /* RES  1,A=(XY+o)  */
+OP(xycb,88) { B = res(1, rm(m_ea)); wm(m_ea, B); } /* RES  1,B=(XY+o)  */
+OP(xycb,89) { C = res(1, rm(m_ea)); wm(m_ea, C); } /* RES  1,C=(XY+o)  */
+OP(xycb,8a) { D = res(1, rm(m_ea)); wm(m_ea, D); } /* RES  1,D=(XY+o)  */
+OP(xycb,8b) { E = res(1, rm(m_ea)); wm(m_ea, E); } /* RES  1,E=(XY+o)  */
+OP(xycb,8c) { H = res(1, rm(m_ea)); wm(m_ea, H); } /* RES  1,H=(XY+o)  */
+OP(xycb,8d) { L = res(1, rm(m_ea)); wm(m_ea, L); } /* RES  1,L=(XY+o)  */
+OP(xycb,8e) { wm(m_ea, res(1, rm(m_ea)));        } /* RES  1,(XY+o)    */
+OP(xycb,8f) { A = res(1, rm(m_ea)); wm(m_ea, A); } /* RES  1,A=(XY+o)  */
 
-OP(xycb,90) { B = RES(2, RM(m_ea)); WM(m_ea, B); } /* RES  2,B=(XY+o)  */
-OP(xycb,91) { C = RES(2, RM(m_ea)); WM(m_ea, C); } /* RES  2,C=(XY+o)  */
-OP(xycb,92) { D = RES(2, RM(m_ea)); WM(m_ea, D); } /* RES  2,D=(XY+o)  */
-OP(xycb,93) { E = RES(2, RM(m_ea)); WM(m_ea, E); } /* RES  2,E=(XY+o)  */
-OP(xycb,94) { H = RES(2, RM(m_ea)); WM(m_ea, H); } /* RES  2,H=(XY+o)  */
-OP(xycb,95) { L = RES(2, RM(m_ea)); WM(m_ea, L); } /* RES  2,L=(XY+o)  */
-OP(xycb,96) { WM(m_ea, RES(2, RM(m_ea)));        } /* RES  2,(XY+o)    */
-OP(xycb,97) { A = RES(2, RM(m_ea)); WM(m_ea, A); } /* RES  2,A=(XY+o)  */
+OP(xycb,90) { B = res(2, rm(m_ea)); wm(m_ea, B); } /* RES  2,B=(XY+o)  */
+OP(xycb,91) { C = res(2, rm(m_ea)); wm(m_ea, C); } /* RES  2,C=(XY+o)  */
+OP(xycb,92) { D = res(2, rm(m_ea)); wm(m_ea, D); } /* RES  2,D=(XY+o)  */
+OP(xycb,93) { E = res(2, rm(m_ea)); wm(m_ea, E); } /* RES  2,E=(XY+o)  */
+OP(xycb,94) { H = res(2, rm(m_ea)); wm(m_ea, H); } /* RES  2,H=(XY+o)  */
+OP(xycb,95) { L = res(2, rm(m_ea)); wm(m_ea, L); } /* RES  2,L=(XY+o)  */
+OP(xycb,96) { wm(m_ea, res(2, rm(m_ea)));        } /* RES  2,(XY+o)    */
+OP(xycb,97) { A = res(2, rm(m_ea)); wm(m_ea, A); } /* RES  2,A=(XY+o)  */
 
-OP(xycb,98) { B = RES(3, RM(m_ea)); WM(m_ea, B); } /* RES  3,B=(XY+o)  */
-OP(xycb,99) { C = RES(3, RM(m_ea)); WM(m_ea, C); } /* RES  3,C=(XY+o)  */
-OP(xycb,9a) { D = RES(3, RM(m_ea)); WM(m_ea, D); } /* RES  3,D=(XY+o)  */
-OP(xycb,9b) { E = RES(3, RM(m_ea)); WM(m_ea, E); } /* RES  3,E=(XY+o)  */
-OP(xycb,9c) { H = RES(3, RM(m_ea)); WM(m_ea, H); } /* RES  3,H=(XY+o)  */
-OP(xycb,9d) { L = RES(3, RM(m_ea)); WM(m_ea, L); } /* RES  3,L=(XY+o)  */
-OP(xycb,9e) { WM(m_ea, RES(3, RM(m_ea)));        } /* RES  3,(XY+o)    */
-OP(xycb,9f) { A = RES(3, RM(m_ea)); WM(m_ea, A); } /* RES  3,A=(XY+o)  */
+OP(xycb,98) { B = res(3, rm(m_ea)); wm(m_ea, B); } /* RES  3,B=(XY+o)  */
+OP(xycb,99) { C = res(3, rm(m_ea)); wm(m_ea, C); } /* RES  3,C=(XY+o)  */
+OP(xycb,9a) { D = res(3, rm(m_ea)); wm(m_ea, D); } /* RES  3,D=(XY+o)  */
+OP(xycb,9b) { E = res(3, rm(m_ea)); wm(m_ea, E); } /* RES  3,E=(XY+o)  */
+OP(xycb,9c) { H = res(3, rm(m_ea)); wm(m_ea, H); } /* RES  3,H=(XY+o)  */
+OP(xycb,9d) { L = res(3, rm(m_ea)); wm(m_ea, L); } /* RES  3,L=(XY+o)  */
+OP(xycb,9e) { wm(m_ea, res(3, rm(m_ea)));        } /* RES  3,(XY+o)    */
+OP(xycb,9f) { A = res(3, rm(m_ea)); wm(m_ea, A); } /* RES  3,A=(XY+o)  */
 
-OP(xycb,a0) { B = RES(4, RM(m_ea)); WM(m_ea, B); } /* RES  4,B=(XY+o)  */
-OP(xycb,a1) { C = RES(4, RM(m_ea)); WM(m_ea, C); } /* RES  4,C=(XY+o)  */
-OP(xycb,a2) { D = RES(4, RM(m_ea)); WM(m_ea, D); } /* RES  4,D=(XY+o)  */
-OP(xycb,a3) { E = RES(4, RM(m_ea)); WM(m_ea, E); } /* RES  4,E=(XY+o)  */
-OP(xycb,a4) { H = RES(4, RM(m_ea)); WM(m_ea, H); } /* RES  4,H=(XY+o)  */
-OP(xycb,a5) { L = RES(4, RM(m_ea)); WM(m_ea, L); } /* RES  4,L=(XY+o)  */
-OP(xycb,a6) { WM(m_ea, RES(4, RM(m_ea)));        } /* RES  4,(XY+o)    */
-OP(xycb,a7) { A = RES(4, RM(m_ea)); WM(m_ea, A); } /* RES  4,A=(XY+o)  */
+OP(xycb,a0) { B = res(4, rm(m_ea)); wm(m_ea, B); } /* RES  4,B=(XY+o)  */
+OP(xycb,a1) { C = res(4, rm(m_ea)); wm(m_ea, C); } /* RES  4,C=(XY+o)  */
+OP(xycb,a2) { D = res(4, rm(m_ea)); wm(m_ea, D); } /* RES  4,D=(XY+o)  */
+OP(xycb,a3) { E = res(4, rm(m_ea)); wm(m_ea, E); } /* RES  4,E=(XY+o)  */
+OP(xycb,a4) { H = res(4, rm(m_ea)); wm(m_ea, H); } /* RES  4,H=(XY+o)  */
+OP(xycb,a5) { L = res(4, rm(m_ea)); wm(m_ea, L); } /* RES  4,L=(XY+o)  */
+OP(xycb,a6) { wm(m_ea, res(4, rm(m_ea)));        } /* RES  4,(XY+o)    */
+OP(xycb,a7) { A = res(4, rm(m_ea)); wm(m_ea, A); } /* RES  4,A=(XY+o)  */
 
-OP(xycb,a8) { B = RES(5, RM(m_ea)); WM(m_ea, B); } /* RES  5,B=(XY+o)  */
-OP(xycb,a9) { C = RES(5, RM(m_ea)); WM(m_ea, C); } /* RES  5,C=(XY+o)  */
-OP(xycb,aa) { D = RES(5, RM(m_ea)); WM(m_ea, D); } /* RES  5,D=(XY+o)  */
-OP(xycb,ab) { E = RES(5, RM(m_ea)); WM(m_ea, E); } /* RES  5,E=(XY+o)  */
-OP(xycb,ac) { H = RES(5, RM(m_ea)); WM(m_ea, H); } /* RES  5,H=(XY+o)  */
-OP(xycb,ad) { L = RES(5, RM(m_ea)); WM(m_ea, L); } /* RES  5,L=(XY+o)  */
-OP(xycb,ae) { WM(m_ea, RES(5, RM(m_ea)));        } /* RES  5,(XY+o)    */
-OP(xycb,af) { A = RES(5, RM(m_ea)); WM(m_ea, A); } /* RES  5,A=(XY+o)  */
+OP(xycb,a8) { B = res(5, rm(m_ea)); wm(m_ea, B); } /* RES  5,B=(XY+o)  */
+OP(xycb,a9) { C = res(5, rm(m_ea)); wm(m_ea, C); } /* RES  5,C=(XY+o)  */
+OP(xycb,aa) { D = res(5, rm(m_ea)); wm(m_ea, D); } /* RES  5,D=(XY+o)  */
+OP(xycb,ab) { E = res(5, rm(m_ea)); wm(m_ea, E); } /* RES  5,E=(XY+o)  */
+OP(xycb,ac) { H = res(5, rm(m_ea)); wm(m_ea, H); } /* RES  5,H=(XY+o)  */
+OP(xycb,ad) { L = res(5, rm(m_ea)); wm(m_ea, L); } /* RES  5,L=(XY+o)  */
+OP(xycb,ae) { wm(m_ea, res(5, rm(m_ea)));        } /* RES  5,(XY+o)    */
+OP(xycb,af) { A = res(5, rm(m_ea)); wm(m_ea, A); } /* RES  5,A=(XY+o)  */
 
-OP(xycb,b0) { B = RES(6, RM(m_ea)); WM(m_ea, B); } /* RES  6,B=(XY+o)  */
-OP(xycb,b1) { C = RES(6, RM(m_ea)); WM(m_ea, C); } /* RES  6,C=(XY+o)  */
-OP(xycb,b2) { D = RES(6, RM(m_ea)); WM(m_ea, D); } /* RES  6,D=(XY+o)  */
-OP(xycb,b3) { E = RES(6, RM(m_ea)); WM(m_ea, E); } /* RES  6,E=(XY+o)  */
-OP(xycb,b4) { H = RES(6, RM(m_ea)); WM(m_ea, H); } /* RES  6,H=(XY+o)  */
-OP(xycb,b5) { L = RES(6, RM(m_ea)); WM(m_ea, L); } /* RES  6,L=(XY+o)  */
-OP(xycb,b6) { WM(m_ea, RES(6, RM(m_ea)));        } /* RES  6,(XY+o)    */
-OP(xycb,b7) { A = RES(6, RM(m_ea)); WM(m_ea, A); } /* RES  6,A=(XY+o)  */
+OP(xycb,b0) { B = res(6, rm(m_ea)); wm(m_ea, B); } /* RES  6,B=(XY+o)  */
+OP(xycb,b1) { C = res(6, rm(m_ea)); wm(m_ea, C); } /* RES  6,C=(XY+o)  */
+OP(xycb,b2) { D = res(6, rm(m_ea)); wm(m_ea, D); } /* RES  6,D=(XY+o)  */
+OP(xycb,b3) { E = res(6, rm(m_ea)); wm(m_ea, E); } /* RES  6,E=(XY+o)  */
+OP(xycb,b4) { H = res(6, rm(m_ea)); wm(m_ea, H); } /* RES  6,H=(XY+o)  */
+OP(xycb,b5) { L = res(6, rm(m_ea)); wm(m_ea, L); } /* RES  6,L=(XY+o)  */
+OP(xycb,b6) { wm(m_ea, res(6, rm(m_ea)));        } /* RES  6,(XY+o)    */
+OP(xycb,b7) { A = res(6, rm(m_ea)); wm(m_ea, A); } /* RES  6,A=(XY+o)  */
 
-OP(xycb,b8) { B = RES(7, RM(m_ea)); WM(m_ea, B); } /* RES  7,B=(XY+o)  */
-OP(xycb,b9) { C = RES(7, RM(m_ea)); WM(m_ea, C); } /* RES  7,C=(XY+o)  */
-OP(xycb,ba) { D = RES(7, RM(m_ea)); WM(m_ea, D); } /* RES  7,D=(XY+o)  */
-OP(xycb,bb) { E = RES(7, RM(m_ea)); WM(m_ea, E); } /* RES  7,E=(XY+o)  */
-OP(xycb,bc) { H = RES(7, RM(m_ea)); WM(m_ea, H); } /* RES  7,H=(XY+o)  */
-OP(xycb,bd) { L = RES(7, RM(m_ea)); WM(m_ea, L); } /* RES  7,L=(XY+o)  */
-OP(xycb,be) { WM(m_ea, RES(7, RM(m_ea)));        } /* RES  7,(XY+o)    */
-OP(xycb,bf) { A = RES(7, RM(m_ea)); WM(m_ea, A); } /* RES  7,A=(XY+o)  */
+OP(xycb,b8) { B = res(7, rm(m_ea)); wm(m_ea, B); } /* RES  7,B=(XY+o)  */
+OP(xycb,b9) { C = res(7, rm(m_ea)); wm(m_ea, C); } /* RES  7,C=(XY+o)  */
+OP(xycb,ba) { D = res(7, rm(m_ea)); wm(m_ea, D); } /* RES  7,D=(XY+o)  */
+OP(xycb,bb) { E = res(7, rm(m_ea)); wm(m_ea, E); } /* RES  7,E=(XY+o)  */
+OP(xycb,bc) { H = res(7, rm(m_ea)); wm(m_ea, H); } /* RES  7,H=(XY+o)  */
+OP(xycb,bd) { L = res(7, rm(m_ea)); wm(m_ea, L); } /* RES  7,L=(XY+o)  */
+OP(xycb,be) { wm(m_ea, res(7, rm(m_ea)));        } /* RES  7,(XY+o)    */
+OP(xycb,bf) { A = res(7, rm(m_ea)); wm(m_ea, A); } /* RES  7,A=(XY+o)  */
 
-OP(xycb,c0) { B = SET(0, RM(m_ea)); WM(m_ea, B); } /* SET  0,B=(XY+o)  */
-OP(xycb,c1) { C = SET(0, RM(m_ea)); WM(m_ea, C); } /* SET  0,C=(XY+o)  */
-OP(xycb,c2) { D = SET(0, RM(m_ea)); WM(m_ea, D); } /* SET  0,D=(XY+o)  */
-OP(xycb,c3) { E = SET(0, RM(m_ea)); WM(m_ea, E); } /* SET  0,E=(XY+o)  */
-OP(xycb,c4) { H = SET(0, RM(m_ea)); WM(m_ea, H); } /* SET  0,H=(XY+o)  */
-OP(xycb,c5) { L = SET(0, RM(m_ea)); WM(m_ea, L); } /* SET  0,L=(XY+o)  */
-OP(xycb,c6) { WM(m_ea, SET(0, RM(m_ea)));        } /* SET  0,(XY+o)    */
-OP(xycb,c7) { A = SET(0, RM(m_ea)); WM(m_ea, A); } /* SET  0,A=(XY+o)  */
+OP(xycb,c0) { B = set(0, rm(m_ea)); wm(m_ea, B); } /* SET  0,B=(XY+o)  */
+OP(xycb,c1) { C = set(0, rm(m_ea)); wm(m_ea, C); } /* SET  0,C=(XY+o)  */
+OP(xycb,c2) { D = set(0, rm(m_ea)); wm(m_ea, D); } /* SET  0,D=(XY+o)  */
+OP(xycb,c3) { E = set(0, rm(m_ea)); wm(m_ea, E); } /* SET  0,E=(XY+o)  */
+OP(xycb,c4) { H = set(0, rm(m_ea)); wm(m_ea, H); } /* SET  0,H=(XY+o)  */
+OP(xycb,c5) { L = set(0, rm(m_ea)); wm(m_ea, L); } /* SET  0,L=(XY+o)  */
+OP(xycb,c6) { wm(m_ea, set(0, rm(m_ea)));        } /* SET  0,(XY+o)    */
+OP(xycb,c7) { A = set(0, rm(m_ea)); wm(m_ea, A); } /* SET  0,A=(XY+o)  */
 
-OP(xycb,c8) { B = SET(1, RM(m_ea)); WM(m_ea, B); } /* SET  1,B=(XY+o)  */
-OP(xycb,c9) { C = SET(1, RM(m_ea)); WM(m_ea, C); } /* SET  1,C=(XY+o)  */
-OP(xycb,ca) { D = SET(1, RM(m_ea)); WM(m_ea, D); } /* SET  1,D=(XY+o)  */
-OP(xycb,cb) { E = SET(1, RM(m_ea)); WM(m_ea, E); } /* SET  1,E=(XY+o)  */
-OP(xycb,cc) { H = SET(1, RM(m_ea)); WM(m_ea, H); } /* SET  1,H=(XY+o)  */
-OP(xycb,cd) { L = SET(1, RM(m_ea)); WM(m_ea, L); } /* SET  1,L=(XY+o)  */
-OP(xycb,ce) { WM(m_ea, SET(1, RM(m_ea)));        } /* SET  1,(XY+o)    */
-OP(xycb,cf) { A = SET(1, RM(m_ea)); WM(m_ea, A); } /* SET  1,A=(XY+o)  */
+OP(xycb,c8) { B = set(1, rm(m_ea)); wm(m_ea, B); } /* SET  1,B=(XY+o)  */
+OP(xycb,c9) { C = set(1, rm(m_ea)); wm(m_ea, C); } /* SET  1,C=(XY+o)  */
+OP(xycb,ca) { D = set(1, rm(m_ea)); wm(m_ea, D); } /* SET  1,D=(XY+o)  */
+OP(xycb,cb) { E = set(1, rm(m_ea)); wm(m_ea, E); } /* SET  1,E=(XY+o)  */
+OP(xycb,cc) { H = set(1, rm(m_ea)); wm(m_ea, H); } /* SET  1,H=(XY+o)  */
+OP(xycb,cd) { L = set(1, rm(m_ea)); wm(m_ea, L); } /* SET  1,L=(XY+o)  */
+OP(xycb,ce) { wm(m_ea, set(1, rm(m_ea)));        } /* SET  1,(XY+o)    */
+OP(xycb,cf) { A = set(1, rm(m_ea)); wm(m_ea, A); } /* SET  1,A=(XY+o)  */
 
-OP(xycb,d0) { B = SET(2, RM(m_ea)); WM(m_ea, B); } /* SET  2,B=(XY+o)  */
-OP(xycb,d1) { C = SET(2, RM(m_ea)); WM(m_ea, C); } /* SET  2,C=(XY+o)  */
-OP(xycb,d2) { D = SET(2, RM(m_ea)); WM(m_ea, D); } /* SET  2,D=(XY+o)  */
-OP(xycb,d3) { E = SET(2, RM(m_ea)); WM(m_ea, E); } /* SET  2,E=(XY+o)  */
-OP(xycb,d4) { H = SET(2, RM(m_ea)); WM(m_ea, H); } /* SET  2,H=(XY+o)  */
-OP(xycb,d5) { L = SET(2, RM(m_ea)); WM(m_ea, L); } /* SET  2,L=(XY+o)  */
-OP(xycb,d6) { WM(m_ea, SET(2, RM(m_ea)));        } /* SET  2,(XY+o)    */
-OP(xycb,d7) { A = SET(2, RM(m_ea)); WM(m_ea, A); } /* SET  2,A=(XY+o)  */
+OP(xycb,d0) { B = set(2, rm(m_ea)); wm(m_ea, B); } /* SET  2,B=(XY+o)  */
+OP(xycb,d1) { C = set(2, rm(m_ea)); wm(m_ea, C); } /* SET  2,C=(XY+o)  */
+OP(xycb,d2) { D = set(2, rm(m_ea)); wm(m_ea, D); } /* SET  2,D=(XY+o)  */
+OP(xycb,d3) { E = set(2, rm(m_ea)); wm(m_ea, E); } /* SET  2,E=(XY+o)  */
+OP(xycb,d4) { H = set(2, rm(m_ea)); wm(m_ea, H); } /* SET  2,H=(XY+o)  */
+OP(xycb,d5) { L = set(2, rm(m_ea)); wm(m_ea, L); } /* SET  2,L=(XY+o)  */
+OP(xycb,d6) { wm(m_ea, set(2, rm(m_ea)));        } /* SET  2,(XY+o)    */
+OP(xycb,d7) { A = set(2, rm(m_ea)); wm(m_ea, A); } /* SET  2,A=(XY+o)  */
 
-OP(xycb,d8) { B = SET(3, RM(m_ea)); WM(m_ea, B); } /* SET  3,B=(XY+o)  */
-OP(xycb,d9) { C = SET(3, RM(m_ea)); WM(m_ea, C); } /* SET  3,C=(XY+o)  */
-OP(xycb,da) { D = SET(3, RM(m_ea)); WM(m_ea, D); } /* SET  3,D=(XY+o)  */
-OP(xycb,db) { E = SET(3, RM(m_ea)); WM(m_ea, E); } /* SET  3,E=(XY+o)  */
-OP(xycb,dc) { H = SET(3, RM(m_ea)); WM(m_ea, H); } /* SET  3,H=(XY+o)  */
-OP(xycb,dd) { L = SET(3, RM(m_ea)); WM(m_ea, L); } /* SET  3,L=(XY+o)  */
-OP(xycb,de) { WM(m_ea, SET(3, RM(m_ea)));        } /* SET  3,(XY+o)    */
-OP(xycb,df) { A = SET(3, RM(m_ea)); WM(m_ea, A); } /* SET  3,A=(XY+o)  */
+OP(xycb,d8) { B = set(3, rm(m_ea)); wm(m_ea, B); } /* SET  3,B=(XY+o)  */
+OP(xycb,d9) { C = set(3, rm(m_ea)); wm(m_ea, C); } /* SET  3,C=(XY+o)  */
+OP(xycb,da) { D = set(3, rm(m_ea)); wm(m_ea, D); } /* SET  3,D=(XY+o)  */
+OP(xycb,db) { E = set(3, rm(m_ea)); wm(m_ea, E); } /* SET  3,E=(XY+o)  */
+OP(xycb,dc) { H = set(3, rm(m_ea)); wm(m_ea, H); } /* SET  3,H=(XY+o)  */
+OP(xycb,dd) { L = set(3, rm(m_ea)); wm(m_ea, L); } /* SET  3,L=(XY+o)  */
+OP(xycb,de) { wm(m_ea, set(3, rm(m_ea)));        } /* SET  3,(XY+o)    */
+OP(xycb,df) { A = set(3, rm(m_ea)); wm(m_ea, A); } /* SET  3,A=(XY+o)  */
 
-OP(xycb,e0) { B = SET(4, RM(m_ea)); WM(m_ea, B); } /* SET  4,B=(XY+o)  */
-OP(xycb,e1) { C = SET(4, RM(m_ea)); WM(m_ea, C); } /* SET  4,C=(XY+o)  */
-OP(xycb,e2) { D = SET(4, RM(m_ea)); WM(m_ea, D); } /* SET  4,D=(XY+o)  */
-OP(xycb,e3) { E = SET(4, RM(m_ea)); WM(m_ea, E); } /* SET  4,E=(XY+o)  */
-OP(xycb,e4) { H = SET(4, RM(m_ea)); WM(m_ea, H); } /* SET  4,H=(XY+o)  */
-OP(xycb,e5) { L = SET(4, RM(m_ea)); WM(m_ea, L); } /* SET  4,L=(XY+o)  */
-OP(xycb,e6) { WM(m_ea, SET(4, RM(m_ea)));        } /* SET  4,(XY+o)    */
-OP(xycb,e7) { A = SET(4, RM(m_ea)); WM(m_ea, A); } /* SET  4,A=(XY+o)  */
+OP(xycb,e0) { B = set(4, rm(m_ea)); wm(m_ea, B); } /* SET  4,B=(XY+o)  */
+OP(xycb,e1) { C = set(4, rm(m_ea)); wm(m_ea, C); } /* SET  4,C=(XY+o)  */
+OP(xycb,e2) { D = set(4, rm(m_ea)); wm(m_ea, D); } /* SET  4,D=(XY+o)  */
+OP(xycb,e3) { E = set(4, rm(m_ea)); wm(m_ea, E); } /* SET  4,E=(XY+o)  */
+OP(xycb,e4) { H = set(4, rm(m_ea)); wm(m_ea, H); } /* SET  4,H=(XY+o)  */
+OP(xycb,e5) { L = set(4, rm(m_ea)); wm(m_ea, L); } /* SET  4,L=(XY+o)  */
+OP(xycb,e6) { wm(m_ea, set(4, rm(m_ea)));        } /* SET  4,(XY+o)    */
+OP(xycb,e7) { A = set(4, rm(m_ea)); wm(m_ea, A); } /* SET  4,A=(XY+o)  */
 
-OP(xycb,e8) { B = SET(5, RM(m_ea)); WM(m_ea, B); } /* SET  5,B=(XY+o)  */
-OP(xycb,e9) { C = SET(5, RM(m_ea)); WM(m_ea, C); } /* SET  5,C=(XY+o)  */
-OP(xycb,ea) { D = SET(5, RM(m_ea)); WM(m_ea, D); } /* SET  5,D=(XY+o)  */
-OP(xycb,eb) { E = SET(5, RM(m_ea)); WM(m_ea, E); } /* SET  5,E=(XY+o)  */
-OP(xycb,ec) { H = SET(5, RM(m_ea)); WM(m_ea, H); } /* SET  5,H=(XY+o)  */
-OP(xycb,ed) { L = SET(5, RM(m_ea)); WM(m_ea, L); } /* SET  5,L=(XY+o)  */
-OP(xycb,ee) { WM(m_ea, SET(5, RM(m_ea)));        } /* SET  5,(XY+o)    */
-OP(xycb,ef) { A = SET(5, RM(m_ea)); WM(m_ea, A); } /* SET  5,A=(XY+o)  */
+OP(xycb,e8) { B = set(5, rm(m_ea)); wm(m_ea, B); } /* SET  5,B=(XY+o)  */
+OP(xycb,e9) { C = set(5, rm(m_ea)); wm(m_ea, C); } /* SET  5,C=(XY+o)  */
+OP(xycb,ea) { D = set(5, rm(m_ea)); wm(m_ea, D); } /* SET  5,D=(XY+o)  */
+OP(xycb,eb) { E = set(5, rm(m_ea)); wm(m_ea, E); } /* SET  5,E=(XY+o)  */
+OP(xycb,ec) { H = set(5, rm(m_ea)); wm(m_ea, H); } /* SET  5,H=(XY+o)  */
+OP(xycb,ed) { L = set(5, rm(m_ea)); wm(m_ea, L); } /* SET  5,L=(XY+o)  */
+OP(xycb,ee) { wm(m_ea, set(5, rm(m_ea)));        } /* SET  5,(XY+o)    */
+OP(xycb,ef) { A = set(5, rm(m_ea)); wm(m_ea, A); } /* SET  5,A=(XY+o)  */
 
-OP(xycb,f0) { B = SET(6, RM(m_ea)); WM(m_ea, B); } /* SET  6,B=(XY+o)  */
-OP(xycb,f1) { C = SET(6, RM(m_ea)); WM(m_ea, C); } /* SET  6,C=(XY+o)  */
-OP(xycb,f2) { D = SET(6, RM(m_ea)); WM(m_ea, D); } /* SET  6,D=(XY+o)  */
-OP(xycb,f3) { E = SET(6, RM(m_ea)); WM(m_ea, E); } /* SET  6,E=(XY+o)  */
-OP(xycb,f4) { H = SET(6, RM(m_ea)); WM(m_ea, H); } /* SET  6,H=(XY+o)  */
-OP(xycb,f5) { L = SET(6, RM(m_ea)); WM(m_ea, L); } /* SET  6,L=(XY+o)  */
-OP(xycb,f6) { WM(m_ea, SET(6, RM(m_ea)));        } /* SET  6,(XY+o)    */
-OP(xycb,f7) { A = SET(6, RM(m_ea)); WM(m_ea, A); } /* SET  6,A=(XY+o)  */
+OP(xycb,f0) { B = set(6, rm(m_ea)); wm(m_ea, B); } /* SET  6,B=(XY+o)  */
+OP(xycb,f1) { C = set(6, rm(m_ea)); wm(m_ea, C); } /* SET  6,C=(XY+o)  */
+OP(xycb,f2) { D = set(6, rm(m_ea)); wm(m_ea, D); } /* SET  6,D=(XY+o)  */
+OP(xycb,f3) { E = set(6, rm(m_ea)); wm(m_ea, E); } /* SET  6,E=(XY+o)  */
+OP(xycb,f4) { H = set(6, rm(m_ea)); wm(m_ea, H); } /* SET  6,H=(XY+o)  */
+OP(xycb,f5) { L = set(6, rm(m_ea)); wm(m_ea, L); } /* SET  6,L=(XY+o)  */
+OP(xycb,f6) { wm(m_ea, set(6, rm(m_ea)));        } /* SET  6,(XY+o)    */
+OP(xycb,f7) { A = set(6, rm(m_ea)); wm(m_ea, A); } /* SET  6,A=(XY+o)  */
 
-OP(xycb,f8) { B = SET(7, RM(m_ea)); WM(m_ea, B); } /* SET  7,B=(XY+o)  */
-OP(xycb,f9) { C = SET(7, RM(m_ea)); WM(m_ea, C); } /* SET  7,C=(XY+o)  */
-OP(xycb,fa) { D = SET(7, RM(m_ea)); WM(m_ea, D); } /* SET  7,D=(XY+o)  */
-OP(xycb,fb) { E = SET(7, RM(m_ea)); WM(m_ea, E); } /* SET  7,E=(XY+o)  */
-OP(xycb,fc) { H = SET(7, RM(m_ea)); WM(m_ea, H); } /* SET  7,H=(XY+o)  */
-OP(xycb,fd) { L = SET(7, RM(m_ea)); WM(m_ea, L); } /* SET  7,L=(XY+o)  */
-OP(xycb,fe) { WM(m_ea, SET(7, RM(m_ea)));        } /* SET  7,(XY+o)    */
-OP(xycb,ff) { A = SET(7, RM(m_ea)); WM(m_ea, A); } /* SET  7,A=(XY+o)  */
+OP(xycb,f8) { B = set(7, rm(m_ea)); wm(m_ea, B); } /* SET  7,B=(XY+o)  */
+OP(xycb,f9) { C = set(7, rm(m_ea)); wm(m_ea, C); } /* SET  7,C=(XY+o)  */
+OP(xycb,fa) { D = set(7, rm(m_ea)); wm(m_ea, D); } /* SET  7,D=(XY+o)  */
+OP(xycb,fb) { E = set(7, rm(m_ea)); wm(m_ea, E); } /* SET  7,E=(XY+o)  */
+OP(xycb,fc) { H = set(7, rm(m_ea)); wm(m_ea, H); } /* SET  7,H=(XY+o)  */
+OP(xycb,fd) { L = set(7, rm(m_ea)); wm(m_ea, L); } /* SET  7,L=(XY+o)  */
+OP(xycb,fe) { wm(m_ea, set(7, rm(m_ea)));        } /* SET  7,(XY+o)    */
+OP(xycb,ff) { A = set(7, rm(m_ea)); wm(m_ea, A); } /* SET  7,A=(XY+o)  */
 
 OP(illegal,1) {
 	logerror("Z80 '%s' ill. opcode $%02x $%02x\n",
@@ -1975,7 +1973,7 @@ OP(dd,06) { illegal_1(); op_06();                            } /* DB   DD       
 OP(dd,07) { illegal_1(); op_07();                            } /* DB   DD          */
 
 OP(dd,08) { illegal_1(); op_08();                            } /* DB   DD          */
-OP(dd,09) { ADD16(m_ix, m_bc);                               } /* ADD  IX,BC       */
+OP(dd,09) { add16(m_ix, m_bc);                               } /* ADD  IX,BC       */
 OP(dd,0a) { illegal_1(); op_0a();                            } /* DB   DD          */
 OP(dd,0b) { illegal_1(); op_0b();                            } /* DB   DD          */
 OP(dd,0c) { illegal_1(); op_0c();                            } /* DB   DD          */
@@ -1993,7 +1991,7 @@ OP(dd,16) { illegal_1(); op_16();                            } /* DB   DD       
 OP(dd,17) { illegal_1(); op_17();                            } /* DB   DD          */
 
 OP(dd,18) { illegal_1(); op_18();                            } /* DB   DD          */
-OP(dd,19) { ADD16(m_ix, m_de);                               } /* ADD  IX,DE       */
+OP(dd,19) { add16(m_ix, m_de);                               } /* ADD  IX,DE       */
 OP(dd,1a) { illegal_1(); op_1a();                            } /* DB   DD          */
 OP(dd,1b) { illegal_1(); op_1b();                            } /* DB   DD          */
 OP(dd,1c) { illegal_1(); op_1c();                            } /* DB   DD          */
@@ -2002,34 +2000,34 @@ OP(dd,1e) { illegal_1(); op_1e();                            } /* DB   DD       
 OP(dd,1f) { illegal_1(); op_1f();                            } /* DB   DD          */
 
 OP(dd,20) { illegal_1(); op_20();                            } /* DB   DD          */
-OP(dd,21) { IX = ARG16();                                    } /* LD   IX,w        */
-OP(dd,22) { m_ea = ARG16(); WM16(m_ea, m_ix); WZ = m_ea + 1; } /* LD   (w),IX      */
+OP(dd,21) { IX = arg16();                                    } /* LD   IX,w        */
+OP(dd,22) { m_ea = arg16(); wm16(m_ea, m_ix); WZ = m_ea + 1; } /* LD   (w),IX      */
 OP(dd,23) { IX++;                                            } /* INC  IX          */
-OP(dd,24) { HX = INC(HX);                                    } /* INC  HX          */
-OP(dd,25) { HX = DEC(HX);                                    } /* DEC  HX          */
-OP(dd,26) { HX = ARG();                                      } /* LD   HX,n        */
+OP(dd,24) { HX = inc(HX);                                    } /* INC  HX          */
+OP(dd,25) { HX = dec(HX);                                    } /* DEC  HX          */
+OP(dd,26) { HX = arg();                                      } /* LD   HX,n        */
 OP(dd,27) { illegal_1(); op_27();                            } /* DB   DD          */
 
 OP(dd,28) { illegal_1(); op_28();                            } /* DB   DD          */
-OP(dd,29) { ADD16(m_ix, m_ix);                               } /* ADD  IX,IX       */
-OP(dd,2a) { m_ea = ARG16(); RM16(m_ea, m_ix); WZ = m_ea + 1; } /* LD   IX,(w)      */
+OP(dd,29) { add16(m_ix, m_ix);                               } /* ADD  IX,IX       */
+OP(dd,2a) { m_ea = arg16(); rm16(m_ea, m_ix); WZ = m_ea + 1; } /* LD   IX,(w)      */
 OP(dd,2b) { IX--;                                            } /* DEC  IX          */
-OP(dd,2c) { LX = INC(LX);                                    } /* INC  LX          */
-OP(dd,2d) { LX = DEC(LX);                                    } /* DEC  LX          */
-OP(dd,2e) { LX = ARG();                                      } /* LD   LX,n        */
+OP(dd,2c) { LX = inc(LX);                                    } /* INC  LX          */
+OP(dd,2d) { LX = dec(LX);                                    } /* DEC  LX          */
+OP(dd,2e) { LX = arg();                                      } /* LD   LX,n        */
 OP(dd,2f) { illegal_1(); op_2f();                            } /* DB   DD          */
 
 OP(dd,30) { illegal_1(); op_30();                            } /* DB   DD          */
 OP(dd,31) { illegal_1(); op_31();                            } /* DB   DD          */
 OP(dd,32) { illegal_1(); op_32();                            } /* DB   DD          */
 OP(dd,33) { illegal_1(); op_33();                            } /* DB   DD          */
-OP(dd,34) { EAX(); WM(m_ea, INC(RM(m_ea)));                  } /* INC  (IX+o)      */
-OP(dd,35) { EAX(); WM(m_ea, DEC(RM(m_ea)));                  } /* DEC  (IX+o)      */
-OP(dd,36) { EAX(); WM(m_ea, ARG());                          } /* LD   (IX+o),n    */
+OP(dd,34) { eax(); wm(m_ea, inc(rm(m_ea)));                  } /* INC  (IX+o)      */
+OP(dd,35) { eax(); wm(m_ea, dec(rm(m_ea)));                  } /* DEC  (IX+o)      */
+OP(dd,36) { eax(); wm(m_ea, arg());                          } /* LD   (IX+o),n    */
 OP(dd,37) { illegal_1(); op_37();                            } /* DB   DD          */
 
 OP(dd,38) { illegal_1(); op_38();                            } /* DB   DD          */
-OP(dd,39) { ADD16(m_ix, m_sp);                               } /* ADD  IX,SP       */
+OP(dd,39) { add16(m_ix, m_sp);                               } /* ADD  IX,SP       */
 OP(dd,3a) { illegal_1(); op_3a();                            } /* DB   DD          */
 OP(dd,3b) { illegal_1(); op_3b();                            } /* DB   DD          */
 OP(dd,3c) { illegal_1(); op_3c();                            } /* DB   DD          */
@@ -2043,7 +2041,7 @@ OP(dd,42) { illegal_1(); op_42();                            } /* DB   DD       
 OP(dd,43) { illegal_1(); op_43();                            } /* DB   DD          */
 OP(dd,44) { B = HX;                                          } /* LD   B,HX        */
 OP(dd,45) { B = LX;                                          } /* LD   B,LX        */
-OP(dd,46) { EAX(); B = RM(m_ea);                             } /* LD   B,(IX+o)    */
+OP(dd,46) { eax(); B = rm(m_ea);                             } /* LD   B,(IX+o)    */
 OP(dd,47) { illegal_1(); op_47();                            } /* DB   DD          */
 
 OP(dd,48) { illegal_1(); op_48();                            } /* DB   DD          */
@@ -2052,7 +2050,7 @@ OP(dd,4a) { illegal_1(); op_4a();                            } /* DB   DD       
 OP(dd,4b) { illegal_1(); op_4b();                            } /* DB   DD          */
 OP(dd,4c) { C = HX;                                          } /* LD   C,HX        */
 OP(dd,4d) { C = LX;                                          } /* LD   C,LX        */
-OP(dd,4e) { EAX(); C = RM(m_ea);                             } /* LD   C,(IX+o)    */
+OP(dd,4e) { eax(); C = rm(m_ea);                             } /* LD   C,(IX+o)    */
 OP(dd,4f) { illegal_1(); op_4f();                            } /* DB   DD          */
 
 OP(dd,50) { illegal_1(); op_50();                            } /* DB   DD          */
@@ -2061,7 +2059,7 @@ OP(dd,52) { illegal_1(); op_52();                            } /* DB   DD       
 OP(dd,53) { illegal_1(); op_53();                            } /* DB   DD          */
 OP(dd,54) { D = HX;                                          } /* LD   D,HX        */
 OP(dd,55) { D = LX;                                          } /* LD   D,LX        */
-OP(dd,56) { EAX(); D = RM(m_ea);                             } /* LD   D,(IX+o)    */
+OP(dd,56) { eax(); D = rm(m_ea);                             } /* LD   D,(IX+o)    */
 OP(dd,57) { illegal_1(); op_57();                            } /* DB   DD          */
 
 OP(dd,58) { illegal_1(); op_58();                            } /* DB   DD          */
@@ -2070,7 +2068,7 @@ OP(dd,5a) { illegal_1(); op_5a();                            } /* DB   DD       
 OP(dd,5b) { illegal_1(); op_5b();                            } /* DB   DD          */
 OP(dd,5c) { E = HX;                                          } /* LD   E,HX        */
 OP(dd,5d) { E = LX;                                          } /* LD   E,LX        */
-OP(dd,5e) { EAX(); E = RM(m_ea);                             } /* LD   E,(IX+o)    */
+OP(dd,5e) { eax(); E = rm(m_ea);                             } /* LD   E,(IX+o)    */
 OP(dd,5f) { illegal_1(); op_5f();                            } /* DB   DD          */
 
 OP(dd,60) { HX = B;                                          } /* LD   HX,B        */
@@ -2079,7 +2077,7 @@ OP(dd,62) { HX = D;                                          } /* LD   HX,D     
 OP(dd,63) { HX = E;                                          } /* LD   HX,E        */
 OP(dd,64) {                                                  } /* LD   HX,HX       */
 OP(dd,65) { HX = LX;                                         } /* LD   HX,LX       */
-OP(dd,66) { EAX(); H = RM(m_ea);                             } /* LD   H,(IX+o)    */
+OP(dd,66) { eax(); H = rm(m_ea);                             } /* LD   H,(IX+o)    */
 OP(dd,67) { HX = A;                                          } /* LD   HX,A        */
 
 OP(dd,68) { LX = B;                                          } /* LD   LX,B        */
@@ -2088,17 +2086,17 @@ OP(dd,6a) { LX = D;                                          } /* LD   LX,D     
 OP(dd,6b) { LX = E;                                          } /* LD   LX,E        */
 OP(dd,6c) { LX = HX;                                         } /* LD   LX,HX       */
 OP(dd,6d) {                                                  } /* LD   LX,LX       */
-OP(dd,6e) { EAX(); L = RM(m_ea);                             } /* LD   L,(IX+o)    */
+OP(dd,6e) { eax(); L = rm(m_ea);                             } /* LD   L,(IX+o)    */
 OP(dd,6f) { LX = A;                                          } /* LD   LX,A        */
 
-OP(dd,70) { EAX(); WM(m_ea, B);                              } /* LD   (IX+o),B    */
-OP(dd,71) { EAX(); WM(m_ea, C);                              } /* LD   (IX+o),C    */
-OP(dd,72) { EAX(); WM(m_ea, D);                              } /* LD   (IX+o),D    */
-OP(dd,73) { EAX(); WM(m_ea, E);                              } /* LD   (IX+o),E    */
-OP(dd,74) { EAX(); WM(m_ea, H);                              } /* LD   (IX+o),H    */
-OP(dd,75) { EAX(); WM(m_ea, L);                              } /* LD   (IX+o),L    */
+OP(dd,70) { eax(); wm(m_ea, B);                              } /* LD   (IX+o),B    */
+OP(dd,71) { eax(); wm(m_ea, C);                              } /* LD   (IX+o),C    */
+OP(dd,72) { eax(); wm(m_ea, D);                              } /* LD   (IX+o),D    */
+OP(dd,73) { eax(); wm(m_ea, E);                              } /* LD   (IX+o),E    */
+OP(dd,74) { eax(); wm(m_ea, H);                              } /* LD   (IX+o),H    */
+OP(dd,75) { eax(); wm(m_ea, L);                              } /* LD   (IX+o),L    */
 OP(dd,76) { illegal_1(); op_76();                            } /* DB   DD          */
-OP(dd,77) { EAX(); WM(m_ea, A);                              } /* LD   (IX+o),A    */
+OP(dd,77) { eax(); wm(m_ea, A);                              } /* LD   (IX+o),A    */
 
 OP(dd,78) { illegal_1(); op_78();                            } /* DB   DD          */
 OP(dd,79) { illegal_1(); op_79();                            } /* DB   DD          */
@@ -2106,79 +2104,79 @@ OP(dd,7a) { illegal_1(); op_7a();                            } /* DB   DD       
 OP(dd,7b) { illegal_1(); op_7b();                            } /* DB   DD          */
 OP(dd,7c) { A = HX;                                          } /* LD   A,HX        */
 OP(dd,7d) { A = LX;                                          } /* LD   A,LX        */
-OP(dd,7e) { EAX(); A = RM(m_ea);                             } /* LD   A,(IX+o)    */
+OP(dd,7e) { eax(); A = rm(m_ea);                             } /* LD   A,(IX+o)    */
 OP(dd,7f) { illegal_1(); op_7f();                            } /* DB   DD          */
 
 OP(dd,80) { illegal_1(); op_80();                            } /* DB   DD          */
 OP(dd,81) { illegal_1(); op_81();                            } /* DB   DD          */
 OP(dd,82) { illegal_1(); op_82();                            } /* DB   DD          */
 OP(dd,83) { illegal_1(); op_83();                            } /* DB   DD          */
-OP(dd,84) { ADD(HX);                                         } /* ADD  A,HX        */
-OP(dd,85) { ADD(LX);                                         } /* ADD  A,LX        */
-OP(dd,86) { EAX(); ADD(RM(m_ea));                            } /* ADD  A,(IX+o)    */
+OP(dd,84) { add_a(HX);                                       } /* ADD  A,HX        */
+OP(dd,85) { add_a(LX);                                       } /* ADD  A,LX        */
+OP(dd,86) { eax(); add_a(rm(m_ea));                          } /* ADD  A,(IX+o)    */
 OP(dd,87) { illegal_1(); op_87();                            } /* DB   DD          */
 
 OP(dd,88) { illegal_1(); op_88();                            } /* DB   DD          */
 OP(dd,89) { illegal_1(); op_89();                            } /* DB   DD          */
 OP(dd,8a) { illegal_1(); op_8a();                            } /* DB   DD          */
 OP(dd,8b) { illegal_1(); op_8b();                            } /* DB   DD          */
-OP(dd,8c) { ADC(HX);                                         } /* ADC  A,HX        */
-OP(dd,8d) { ADC(LX);                                         } /* ADC  A,LX        */
-OP(dd,8e) { EAX(); ADC(RM(m_ea));                            } /* ADC  A,(IX+o)    */
+OP(dd,8c) { adc_a(HX);                                       } /* ADC  A,HX        */
+OP(dd,8d) { adc_a(LX);                                       } /* ADC  A,LX        */
+OP(dd,8e) { eax(); adc_a(rm(m_ea));                          } /* ADC  A,(IX+o)    */
 OP(dd,8f) { illegal_1(); op_8f();                            } /* DB   DD          */
 
 OP(dd,90) { illegal_1(); op_90();                            } /* DB   DD          */
 OP(dd,91) { illegal_1(); op_91();                            } /* DB   DD          */
 OP(dd,92) { illegal_1(); op_92();                            } /* DB   DD          */
 OP(dd,93) { illegal_1(); op_93();                            } /* DB   DD          */
-OP(dd,94) { SUB(HX);                                         } /* SUB  HX          */
-OP(dd,95) { SUB(LX);                                         } /* SUB  LX          */
-OP(dd,96) { EAX(); SUB(RM(m_ea));                            } /* SUB  (IX+o)      */
+OP(dd,94) { sub(HX);                                         } /* SUB  HX          */
+OP(dd,95) { sub(LX);                                         } /* SUB  LX          */
+OP(dd,96) { eax(); sub(rm(m_ea));                            } /* SUB  (IX+o)      */
 OP(dd,97) { illegal_1(); op_97();                            } /* DB   DD          */
 
 OP(dd,98) { illegal_1(); op_98();                            } /* DB   DD          */
 OP(dd,99) { illegal_1(); op_99();                            } /* DB   DD          */
 OP(dd,9a) { illegal_1(); op_9a();                            } /* DB   DD          */
 OP(dd,9b) { illegal_1(); op_9b();                            } /* DB   DD          */
-OP(dd,9c) { SBC(HX);                                         } /* SBC  A,HX        */
-OP(dd,9d) { SBC(LX);                                         } /* SBC  A,LX        */
-OP(dd,9e) { EAX(); SBC(RM(m_ea));                            } /* SBC  A,(IX+o)    */
+OP(dd,9c) { sbc_a(HX);                                       } /* SBC  A,HX        */
+OP(dd,9d) { sbc_a(LX);                                       } /* SBC  A,LX        */
+OP(dd,9e) { eax(); sbc_a(rm(m_ea));                          } /* SBC  A,(IX+o)    */
 OP(dd,9f) { illegal_1(); op_9f();                            } /* DB   DD          */
 
 OP(dd,a0) { illegal_1(); op_a0();                            } /* DB   DD          */
 OP(dd,a1) { illegal_1(); op_a1();                            } /* DB   DD          */
 OP(dd,a2) { illegal_1(); op_a2();                            } /* DB   DD          */
 OP(dd,a3) { illegal_1(); op_a3();                            } /* DB   DD          */
-OP(dd,a4) { AND(HX);                                         } /* AND  HX          */
-OP(dd,a5) { AND(LX);                                         } /* AND  LX          */
-OP(dd,a6) { EAX(); AND(RM(m_ea));                            } /* AND  (IX+o)      */
+OP(dd,a4) { and_a(HX);                                       } /* AND  HX          */
+OP(dd,a5) { and_a(LX);                                       } /* AND  LX          */
+OP(dd,a6) { eax(); and_a(rm(m_ea));                          } /* AND  (IX+o)      */
 OP(dd,a7) { illegal_1(); op_a7();                            } /* DB   DD          */
 
 OP(dd,a8) { illegal_1(); op_a8();                            } /* DB   DD          */
 OP(dd,a9) { illegal_1(); op_a9();                            } /* DB   DD          */
 OP(dd,aa) { illegal_1(); op_aa();                            } /* DB   DD          */
 OP(dd,ab) { illegal_1(); op_ab();                            } /* DB   DD          */
-OP(dd,ac) { XOR(HX);                                         } /* XOR  HX          */
-OP(dd,ad) { XOR(LX);                                         } /* XOR  LX          */
-OP(dd,ae) { EAX(); XOR(RM(m_ea));                            } /* XOR  (IX+o)      */
+OP(dd,ac) { xor_a(HX);                                       } /* XOR  HX          */
+OP(dd,ad) { xor_a(LX);                                       } /* XOR  LX          */
+OP(dd,ae) { eax(); xor_a(rm(m_ea));                          } /* XOR  (IX+o)      */
 OP(dd,af) { illegal_1(); op_af();                            } /* DB   DD          */
 
 OP(dd,b0) { illegal_1(); op_b0();                            } /* DB   DD          */
 OP(dd,b1) { illegal_1(); op_b1();                            } /* DB   DD          */
 OP(dd,b2) { illegal_1(); op_b2();                            } /* DB   DD          */
 OP(dd,b3) { illegal_1(); op_b3();                            } /* DB   DD          */
-OP(dd,b4) { OR(HX);                                          } /* OR   HX          */
-OP(dd,b5) { OR(LX);                                          } /* OR   LX          */
-OP(dd,b6) { EAX(); OR(RM(m_ea));                             } /* OR   (IX+o)      */
+OP(dd,b4) { or_a(HX);                                        } /* OR   HX          */
+OP(dd,b5) { or_a(LX);                                        } /* OR   LX          */
+OP(dd,b6) { eax(); or_a(rm(m_ea));                           } /* OR   (IX+o)      */
 OP(dd,b7) { illegal_1(); op_b7();                            } /* DB   DD          */
 
 OP(dd,b8) { illegal_1(); op_b8();                            } /* DB   DD          */
 OP(dd,b9) { illegal_1(); op_b9();                            } /* DB   DD          */
 OP(dd,ba) { illegal_1(); op_ba();                            } /* DB   DD          */
 OP(dd,bb) { illegal_1(); op_bb();                            } /* DB   DD          */
-OP(dd,bc) { CP(HX);                                          } /* CP   HX          */
-OP(dd,bd) { CP(LX);                                          } /* CP   LX          */
-OP(dd,be) { EAX(); CP(RM(m_ea));                             } /* CP   (IX+o)      */
+OP(dd,bc) { cp(HX);                                          } /* CP   HX          */
+OP(dd,bd) { cp(LX);                                          } /* CP   LX          */
+OP(dd,be) { eax(); cp(rm(m_ea));                             } /* CP   (IX+o)      */
 OP(dd,bf) { illegal_1(); op_bf();                            } /* DB   DD          */
 
 OP(dd,c0) { illegal_1(); op_c0();                            } /* DB   DD          */
@@ -2193,7 +2191,7 @@ OP(dd,c7) { illegal_1(); op_c7();                            } /* DB   DD       
 OP(dd,c8) { illegal_1(); op_c8();                            } /* DB   DD          */
 OP(dd,c9) { illegal_1(); op_c9();                            } /* DB   DD          */
 OP(dd,ca) { illegal_1(); op_ca();                            } /* DB   DD          */
-OP(dd,cb) { EAX(); EXEC(xycb,ARG());                         } /* **   DD CB xx    */
+OP(dd,cb) { eax(); EXEC(xycb,arg());                         } /* **   DD CB xx    */
 OP(dd,cc) { illegal_1(); op_cc();                            } /* DB   DD          */
 OP(dd,cd) { illegal_1(); op_cd();                            } /* DB   DD          */
 OP(dd,ce) { illegal_1(); op_ce();                            } /* DB   DD          */
@@ -2218,11 +2216,11 @@ OP(dd,de) { illegal_1(); op_de();                            } /* DB   DD       
 OP(dd,df) { illegal_1(); op_df();                            } /* DB   DD          */
 
 OP(dd,e0) { illegal_1(); op_e0();                            } /* DB   DD          */
-OP(dd,e1) { POP(m_ix);                                       } /* POP  IX          */
+OP(dd,e1) { pop(m_ix);                                       } /* POP  IX          */
 OP(dd,e2) { illegal_1(); op_e2();                            } /* DB   DD          */
-OP(dd,e3) { EXSP(m_ix);                                      } /* EX   (SP),IX     */
+OP(dd,e3) { ex_sp(m_ix);                                     } /* EX   (SP),IX     */
 OP(dd,e4) { illegal_1(); op_e4();                            } /* DB   DD          */
-OP(dd,e5) { PUSH(m_ix);                                      } /* PUSH IX          */
+OP(dd,e5) { push(m_ix);                                      } /* PUSH IX          */
 OP(dd,e6) { illegal_1(); op_e6();                            } /* DB   DD          */
 OP(dd,e7) { illegal_1(); op_e7();                            } /* DB   DD          */
 
@@ -2266,7 +2264,7 @@ OP(fd,06) { illegal_1(); op_06();                            } /* DB   FD       
 OP(fd,07) { illegal_1(); op_07();                            } /* DB   FD          */
 
 OP(fd,08) { illegal_1(); op_08();                            } /* DB   FD          */
-OP(fd,09) { ADD16(m_iy, m_bc);                               } /* ADD  IY,BC       */
+OP(fd,09) { add16(m_iy, m_bc);                               } /* ADD  IY,BC       */
 OP(fd,0a) { illegal_1(); op_0a();                            } /* DB   FD          */
 OP(fd,0b) { illegal_1(); op_0b();                            } /* DB   FD          */
 OP(fd,0c) { illegal_1(); op_0c();                            } /* DB   FD          */
@@ -2284,7 +2282,7 @@ OP(fd,16) { illegal_1(); op_16();                            } /* DB   FD       
 OP(fd,17) { illegal_1(); op_17();                            } /* DB   FD          */
 
 OP(fd,18) { illegal_1(); op_18();                            } /* DB   FD          */
-OP(fd,19) { ADD16(m_iy, m_de);                               } /* ADD  IY,DE       */
+OP(fd,19) { add16(m_iy, m_de);                               } /* ADD  IY,DE       */
 OP(fd,1a) { illegal_1(); op_1a();                            } /* DB   FD          */
 OP(fd,1b) { illegal_1(); op_1b();                            } /* DB   FD          */
 OP(fd,1c) { illegal_1(); op_1c();                            } /* DB   FD          */
@@ -2293,34 +2291,34 @@ OP(fd,1e) { illegal_1(); op_1e();                            } /* DB   FD       
 OP(fd,1f) { illegal_1(); op_1f();                            } /* DB   FD          */
 
 OP(fd,20) { illegal_1(); op_20();                            } /* DB   FD          */
-OP(fd,21) { IY = ARG16();                                    } /* LD   IY,w        */
-OP(fd,22) { m_ea = ARG16(); WM16(m_ea, m_iy); WZ = m_ea + 1; } /* LD   (w),IY      */
+OP(fd,21) { IY = arg16();                                    } /* LD   IY,w        */
+OP(fd,22) { m_ea = arg16(); wm16(m_ea, m_iy); WZ = m_ea + 1; } /* LD   (w),IY      */
 OP(fd,23) { IY++;                                            } /* INC  IY          */
-OP(fd,24) { HY = INC(HY);                                    } /* INC  HY          */
-OP(fd,25) { HY = DEC(HY);                                    } /* DEC  HY          */
-OP(fd,26) { HY = ARG();                                      } /* LD   HY,n        */
+OP(fd,24) { HY = inc(HY);                                    } /* INC  HY          */
+OP(fd,25) { HY = dec(HY);                                    } /* DEC  HY          */
+OP(fd,26) { HY = arg();                                      } /* LD   HY,n        */
 OP(fd,27) { illegal_1(); op_27();                            } /* DB   FD          */
 
 OP(fd,28) { illegal_1(); op_28();                            } /* DB   FD          */
-OP(fd,29) { ADD16(m_iy, m_iy);                               } /* ADD  IY,IY       */
-OP(fd,2a) { m_ea = ARG16(); RM16(m_ea, m_iy); WZ = m_ea + 1; } /* LD   IY,(w)      */
+OP(fd,29) { add16(m_iy, m_iy);                               } /* ADD  IY,IY       */
+OP(fd,2a) { m_ea = arg16(); rm16(m_ea, m_iy); WZ = m_ea + 1; } /* LD   IY,(w)      */
 OP(fd,2b) { IY--;                                            } /* DEC  IY          */
-OP(fd,2c) { LY = INC(LY);                                    } /* INC  LY          */
-OP(fd,2d) { LY = DEC(LY);                                    } /* DEC  LY          */
-OP(fd,2e) { LY = ARG();                                      } /* LD   LY,n        */
+OP(fd,2c) { LY = inc(LY);                                    } /* INC  LY          */
+OP(fd,2d) { LY = dec(LY);                                    } /* DEC  LY          */
+OP(fd,2e) { LY = arg();                                      } /* LD   LY,n        */
 OP(fd,2f) { illegal_1(); op_2f();                            } /* DB   FD          */
 
 OP(fd,30) { illegal_1(); op_30();                            } /* DB   FD          */
 OP(fd,31) { illegal_1(); op_31();                            } /* DB   FD          */
 OP(fd,32) { illegal_1(); op_32();                            } /* DB   FD          */
 OP(fd,33) { illegal_1(); op_33();                            } /* DB   FD          */
-OP(fd,34) { EAY(); WM(m_ea, INC(RM(m_ea)));                  } /* INC  (IY+o)      */
-OP(fd,35) { EAY(); WM(m_ea, DEC(RM(m_ea)));                  } /* DEC  (IY+o)      */
-OP(fd,36) { EAY(); WM(m_ea, ARG());                          } /* LD   (IY+o),n    */
+OP(fd,34) { eay(); wm(m_ea, inc(rm(m_ea)));                  } /* INC  (IY+o)      */
+OP(fd,35) { eay(); wm(m_ea, dec(rm(m_ea)));                  } /* DEC  (IY+o)      */
+OP(fd,36) { eay(); wm(m_ea, arg());                          } /* LD   (IY+o),n    */
 OP(fd,37) { illegal_1(); op_37();                            } /* DB   FD          */
 
 OP(fd,38) { illegal_1(); op_38();                            } /* DB   FD          */
-OP(fd,39) { ADD16(m_iy, m_sp);                               } /* ADD  IY,SP       */
+OP(fd,39) { add16(m_iy, m_sp);                               } /* ADD  IY,SP       */
 OP(fd,3a) { illegal_1(); op_3a();                            } /* DB   FD          */
 OP(fd,3b) { illegal_1(); op_3b();                            } /* DB   FD          */
 OP(fd,3c) { illegal_1(); op_3c();                            } /* DB   FD          */
@@ -2334,7 +2332,7 @@ OP(fd,42) { illegal_1(); op_42();                            } /* DB   FD       
 OP(fd,43) { illegal_1(); op_43();                            } /* DB   FD          */
 OP(fd,44) { B = HY;                                          } /* LD   B,HY        */
 OP(fd,45) { B = LY;                                          } /* LD   B,LY        */
-OP(fd,46) { EAY(); B = RM(m_ea);                             } /* LD   B,(IY+o)    */
+OP(fd,46) { eay(); B = rm(m_ea);                             } /* LD   B,(IY+o)    */
 OP(fd,47) { illegal_1(); op_47();                            } /* DB   FD          */
 
 OP(fd,48) { illegal_1(); op_48();                            } /* DB   FD          */
@@ -2343,7 +2341,7 @@ OP(fd,4a) { illegal_1(); op_4a();                            } /* DB   FD       
 OP(fd,4b) { illegal_1(); op_4b();                            } /* DB   FD          */
 OP(fd,4c) { C = HY;                                          } /* LD   C,HY        */
 OP(fd,4d) { C = LY;                                          } /* LD   C,LY        */
-OP(fd,4e) { EAY(); C = RM(m_ea);                             } /* LD   C,(IY+o)    */
+OP(fd,4e) { eay(); C = rm(m_ea);                             } /* LD   C,(IY+o)    */
 OP(fd,4f) { illegal_1(); op_4f();                            } /* DB   FD          */
 
 OP(fd,50) { illegal_1(); op_50();                            } /* DB   FD          */
@@ -2352,7 +2350,7 @@ OP(fd,52) { illegal_1(); op_52();                            } /* DB   FD       
 OP(fd,53) { illegal_1(); op_53();                            } /* DB   FD          */
 OP(fd,54) { D = HY;                                          } /* LD   D,HY        */
 OP(fd,55) { D = LY;                                          } /* LD   D,LY        */
-OP(fd,56) { EAY(); D = RM(m_ea);                             } /* LD   D,(IY+o)    */
+OP(fd,56) { eay(); D = rm(m_ea);                             } /* LD   D,(IY+o)    */
 OP(fd,57) { illegal_1(); op_57();                            } /* DB   FD          */
 
 OP(fd,58) { illegal_1(); op_58();                            } /* DB   FD          */
@@ -2361,7 +2359,7 @@ OP(fd,5a) { illegal_1(); op_5a();                            } /* DB   FD       
 OP(fd,5b) { illegal_1(); op_5b();                            } /* DB   FD          */
 OP(fd,5c) { E = HY;                                          } /* LD   E,HY        */
 OP(fd,5d) { E = LY;                                          } /* LD   E,LY        */
-OP(fd,5e) { EAY(); E = RM(m_ea);                             } /* LD   E,(IY+o)    */
+OP(fd,5e) { eay(); E = rm(m_ea);                             } /* LD   E,(IY+o)    */
 OP(fd,5f) { illegal_1(); op_5f();                            } /* DB   FD          */
 
 OP(fd,60) { HY = B;                                          } /* LD   HY,B        */
@@ -2370,7 +2368,7 @@ OP(fd,62) { HY = D;                                          } /* LD   HY,D     
 OP(fd,63) { HY = E;                                          } /* LD   HY,E        */
 OP(fd,64) {                                                  } /* LD   HY,HY       */
 OP(fd,65) { HY = LY;                                         } /* LD   HY,LY       */
-OP(fd,66) { EAY(); H = RM(m_ea);                             } /* LD   H,(IY+o)    */
+OP(fd,66) { eay(); H = rm(m_ea);                             } /* LD   H,(IY+o)    */
 OP(fd,67) { HY = A;                                          } /* LD   HY,A        */
 
 OP(fd,68) { LY = B;                                          } /* LD   LY,B        */
@@ -2379,17 +2377,17 @@ OP(fd,6a) { LY = D;                                          } /* LD   LY,D     
 OP(fd,6b) { LY = E;                                          } /* LD   LY,E        */
 OP(fd,6c) { LY = HY;                                         } /* LD   LY,HY       */
 OP(fd,6d) {                                                  } /* LD   LY,LY       */
-OP(fd,6e) { EAY(); L = RM(m_ea);                             } /* LD   L,(IY+o)    */
+OP(fd,6e) { eay(); L = rm(m_ea);                             } /* LD   L,(IY+o)    */
 OP(fd,6f) { LY = A;                                          } /* LD   LY,A        */
 
-OP(fd,70) { EAY(); WM(m_ea, B);                              } /* LD   (IY+o),B    */
-OP(fd,71) { EAY(); WM(m_ea, C);                              } /* LD   (IY+o),C    */
-OP(fd,72) { EAY(); WM(m_ea, D);                              } /* LD   (IY+o),D    */
-OP(fd,73) { EAY(); WM(m_ea, E);                              } /* LD   (IY+o),E    */
-OP(fd,74) { EAY(); WM(m_ea, H);                              } /* LD   (IY+o),H    */
-OP(fd,75) { EAY(); WM(m_ea, L);                              } /* LD   (IY+o),L    */
+OP(fd,70) { eay(); wm(m_ea, B);                              } /* LD   (IY+o),B    */
+OP(fd,71) { eay(); wm(m_ea, C);                              } /* LD   (IY+o),C    */
+OP(fd,72) { eay(); wm(m_ea, D);                              } /* LD   (IY+o),D    */
+OP(fd,73) { eay(); wm(m_ea, E);                              } /* LD   (IY+o),E    */
+OP(fd,74) { eay(); wm(m_ea, H);                              } /* LD   (IY+o),H    */
+OP(fd,75) { eay(); wm(m_ea, L);                              } /* LD   (IY+o),L    */
 OP(fd,76) { illegal_1(); op_76();                            } /* DB   FD          */
-OP(fd,77) { EAY(); WM(m_ea, A);                              } /* LD   (IY+o),A    */
+OP(fd,77) { eay(); wm(m_ea, A);                              } /* LD   (IY+o),A    */
 
 OP(fd,78) { illegal_1(); op_78();                            } /* DB   FD          */
 OP(fd,79) { illegal_1(); op_79();                            } /* DB   FD          */
@@ -2397,79 +2395,79 @@ OP(fd,7a) { illegal_1(); op_7a();                            } /* DB   FD       
 OP(fd,7b) { illegal_1(); op_7b();                            } /* DB   FD          */
 OP(fd,7c) { A = HY;                                          } /* LD   A,HY        */
 OP(fd,7d) { A = LY;                                          } /* LD   A,LY        */
-OP(fd,7e) { EAY(); A = RM(m_ea);                             } /* LD   A,(IY+o)    */
+OP(fd,7e) { eay(); A = rm(m_ea);                             } /* LD   A,(IY+o)    */
 OP(fd,7f) { illegal_1(); op_7f();                            } /* DB   FD          */
 
 OP(fd,80) { illegal_1(); op_80();                            } /* DB   FD          */
 OP(fd,81) { illegal_1(); op_81();                            } /* DB   FD          */
 OP(fd,82) { illegal_1(); op_82();                            } /* DB   FD          */
 OP(fd,83) { illegal_1(); op_83();                            } /* DB   FD          */
-OP(fd,84) { ADD(HY);                                         } /* ADD  A,HY        */
-OP(fd,85) { ADD(LY);                                         } /* ADD  A,LY        */
-OP(fd,86) { EAY(); ADD(RM(m_ea));                            } /* ADD  A,(IY+o)    */
+OP(fd,84) { add_a(HY);                                       } /* ADD  A,HY        */
+OP(fd,85) { add_a(LY);                                       } /* ADD  A,LY        */
+OP(fd,86) { eay(); add_a(rm(m_ea));                          } /* ADD  A,(IY+o)    */
 OP(fd,87) { illegal_1(); op_87();                            } /* DB   FD          */
 
 OP(fd,88) { illegal_1(); op_88();                            } /* DB   FD          */
 OP(fd,89) { illegal_1(); op_89();                            } /* DB   FD          */
 OP(fd,8a) { illegal_1(); op_8a();                            } /* DB   FD          */
 OP(fd,8b) { illegal_1(); op_8b();                            } /* DB   FD          */
-OP(fd,8c) { ADC(HY);                                         } /* ADC  A,HY        */
-OP(fd,8d) { ADC(LY);                                         } /* ADC  A,LY        */
-OP(fd,8e) { EAY(); ADC(RM(m_ea));                            } /* ADC  A,(IY+o)    */
+OP(fd,8c) { adc_a(HY);                                       } /* ADC  A,HY        */
+OP(fd,8d) { adc_a(LY);                                       } /* ADC  A,LY        */
+OP(fd,8e) { eay(); adc_a(rm(m_ea));                          } /* ADC  A,(IY+o)    */
 OP(fd,8f) { illegal_1(); op_8f();                            } /* DB   FD          */
 
 OP(fd,90) { illegal_1(); op_90();                            } /* DB   FD          */
 OP(fd,91) { illegal_1(); op_91();                            } /* DB   FD          */
 OP(fd,92) { illegal_1(); op_92();                            } /* DB   FD          */
 OP(fd,93) { illegal_1(); op_93();                            } /* DB   FD          */
-OP(fd,94) { SUB(HY);                                         } /* SUB  HY          */
-OP(fd,95) { SUB(LY);                                         } /* SUB  LY          */
-OP(fd,96) { EAY(); SUB(RM(m_ea));                            } /* SUB  (IY+o)      */
+OP(fd,94) { sub(HY);                                         } /* SUB  HY          */
+OP(fd,95) { sub(LY);                                         } /* SUB  LY          */
+OP(fd,96) { eay(); sub(rm(m_ea));                            } /* SUB  (IY+o)      */
 OP(fd,97) { illegal_1(); op_97();                            } /* DB   FD          */
 
 OP(fd,98) { illegal_1(); op_98();                            } /* DB   FD          */
 OP(fd,99) { illegal_1(); op_99();                            } /* DB   FD          */
 OP(fd,9a) { illegal_1(); op_9a();                            } /* DB   FD          */
 OP(fd,9b) { illegal_1(); op_9b();                            } /* DB   FD          */
-OP(fd,9c) { SBC(HY);                                         } /* SBC  A,HY        */
-OP(fd,9d) { SBC(LY);                                         } /* SBC  A,LY        */
-OP(fd,9e) { EAY(); SBC(RM(m_ea));                            } /* SBC  A,(IY+o)    */
+OP(fd,9c) { sbc_a(HY);                                       } /* SBC  A,HY        */
+OP(fd,9d) { sbc_a(LY);                                       } /* SBC  A,LY        */
+OP(fd,9e) { eay(); sbc_a(rm(m_ea));                          } /* SBC  A,(IY+o)    */
 OP(fd,9f) { illegal_1(); op_9f();                            } /* DB   FD          */
 
 OP(fd,a0) { illegal_1(); op_a0();                            } /* DB   FD          */
 OP(fd,a1) { illegal_1(); op_a1();                            } /* DB   FD          */
 OP(fd,a2) { illegal_1(); op_a2();                            } /* DB   FD          */
 OP(fd,a3) { illegal_1(); op_a3();                            } /* DB   FD          */
-OP(fd,a4) { AND(HY);                                         } /* AND  HY          */
-OP(fd,a5) { AND(LY);                                         } /* AND  LY          */
-OP(fd,a6) { EAY(); AND(RM(m_ea));                            } /* AND  (IY+o)      */
+OP(fd,a4) { and_a(HY);                                       } /* AND  HY          */
+OP(fd,a5) { and_a(LY);                                       } /* AND  LY          */
+OP(fd,a6) { eay(); and_a(rm(m_ea));                          } /* AND  (IY+o)      */
 OP(fd,a7) { illegal_1(); op_a7();                            } /* DB   FD          */
 
 OP(fd,a8) { illegal_1(); op_a8();                            } /* DB   FD          */
 OP(fd,a9) { illegal_1(); op_a9();                            } /* DB   FD          */
 OP(fd,aa) { illegal_1(); op_aa();                            } /* DB   FD          */
 OP(fd,ab) { illegal_1(); op_ab();                            } /* DB   FD          */
-OP(fd,ac) { XOR(HY);                                         } /* XOR  HY          */
-OP(fd,ad) { XOR(LY);                                         } /* XOR  LY          */
-OP(fd,ae) { EAY(); XOR(RM(m_ea));                            } /* XOR  (IY+o)      */
+OP(fd,ac) { xor_a(HY);                                       } /* XOR  HY          */
+OP(fd,ad) { xor_a(LY);                                       } /* XOR  LY          */
+OP(fd,ae) { eay(); xor_a(rm(m_ea));                          } /* XOR  (IY+o)      */
 OP(fd,af) { illegal_1(); op_af();                            } /* DB   FD          */
 
 OP(fd,b0) { illegal_1(); op_b0();                            } /* DB   FD          */
 OP(fd,b1) { illegal_1(); op_b1();                            } /* DB   FD          */
 OP(fd,b2) { illegal_1(); op_b2();                            } /* DB   FD          */
 OP(fd,b3) { illegal_1(); op_b3();                            } /* DB   FD          */
-OP(fd,b4) { OR(HY);                                          } /* OR   HY          */
-OP(fd,b5) { OR(LY);                                          } /* OR   LY          */
-OP(fd,b6) { EAY(); OR(RM(m_ea));                             } /* OR   (IY+o)      */
+OP(fd,b4) { or_a(HY);                                        } /* OR   HY          */
+OP(fd,b5) { or_a(LY);                                        } /* OR   LY          */
+OP(fd,b6) { eay(); or_a(rm(m_ea));                           } /* OR   (IY+o)      */
 OP(fd,b7) { illegal_1(); op_b7();                            } /* DB   FD          */
 
 OP(fd,b8) { illegal_1(); op_b8();                            } /* DB   FD          */
 OP(fd,b9) { illegal_1(); op_b9();                            } /* DB   FD          */
 OP(fd,ba) { illegal_1(); op_ba();                            } /* DB   FD          */
 OP(fd,bb) { illegal_1(); op_bb();                            } /* DB   FD          */
-OP(fd,bc) { CP(HY);                                          } /* CP   HY          */
-OP(fd,bd) { CP(LY);                                          } /* CP   LY          */
-OP(fd,be) { EAY(); CP(RM(m_ea));                             } /* CP   (IY+o)      */
+OP(fd,bc) { cp(HY);                                          } /* CP   HY          */
+OP(fd,bd) { cp(LY);                                          } /* CP   LY          */
+OP(fd,be) { eay(); cp(rm(m_ea));                             } /* CP   (IY+o)      */
 OP(fd,bf) { illegal_1(); op_bf();                            } /* DB   FD          */
 
 OP(fd,c0) { illegal_1(); op_c0();                            } /* DB   FD          */
@@ -2484,7 +2482,7 @@ OP(fd,c7) { illegal_1(); op_c7();                            } /* DB   FD       
 OP(fd,c8) { illegal_1(); op_c8();                            } /* DB   FD          */
 OP(fd,c9) { illegal_1(); op_c9();                            } /* DB   FD          */
 OP(fd,ca) { illegal_1(); op_ca();                            } /* DB   FD          */
-OP(fd,cb) { EAY(); EXEC(xycb,ARG());                         } /* **   FD CB xx    */
+OP(fd,cb) { eay(); EXEC(xycb,arg());                         } /* **   FD CB xx    */
 OP(fd,cc) { illegal_1(); op_cc();                            } /* DB   FD          */
 OP(fd,cd) { illegal_1(); op_cd();                            } /* DB   FD          */
 OP(fd,ce) { illegal_1(); op_ce();                            } /* DB   FD          */
@@ -2509,11 +2507,11 @@ OP(fd,de) { illegal_1(); op_de();                            } /* DB   FD       
 OP(fd,df) { illegal_1(); op_df();                            } /* DB   FD          */
 
 OP(fd,e0) { illegal_1(); op_e0();                            } /* DB   FD          */
-OP(fd,e1) { POP(m_iy);                                       } /* POP  IY          */
+OP(fd,e1) { pop(m_iy);                                       } /* POP  IY          */
 OP(fd,e2) { illegal_1(); op_e2();                            } /* DB   FD          */
-OP(fd,e3) { EXSP(m_iy);                                      } /* EX   (SP),IY     */
+OP(fd,e3) { ex_sp(m_iy);                                     } /* EX   (SP),IY     */
 OP(fd,e4) { illegal_1(); op_e4();                            } /* DB   FD          */
-OP(fd,e5) { PUSH(m_iy);                                      } /* PUSH IY          */
+OP(fd,e5) { push(m_iy);                                      } /* PUSH IY          */
 OP(fd,e6) { illegal_1(); op_e6();                            } /* DB   FD          */
 OP(fd,e7) { illegal_1(); op_e7();                            } /* DB   FD          */
 
@@ -2625,75 +2623,75 @@ OP(ed,3d) { illegal_2();                                     } /* DB   ED       
 OP(ed,3e) { illegal_2();                                     } /* DB   ED          */
 OP(ed,3f) { illegal_2();                                     } /* DB   ED          */
 
-OP(ed,40) { B = IN(BC); F = (F & CF) | SZP[B];               } /* IN   B,(C)       */
-OP(ed,41) { OUT(BC, B);                                      } /* OUT  (C),B       */
-OP(ed,42) { SBC16(m_bc);                                     } /* SBC  HL,BC       */
-OP(ed,43) { m_ea = ARG16(); WM16(m_ea, m_bc); WZ = m_ea + 1; } /* LD   (w),BC      */
-OP(ed,44) { NEG();                                           } /* NEG              */
-OP(ed,45) { RETN();                                          } /* RETN             */
+OP(ed,40) { B = in(BC); F = (F & CF) | SZP[B];               } /* IN   B,(C)       */
+OP(ed,41) { out(BC, B);                                      } /* OUT  (C),B       */
+OP(ed,42) { sbc_hl(m_bc);                                    } /* SBC  HL,BC       */
+OP(ed,43) { m_ea = arg16(); wm16(m_ea, m_bc); WZ = m_ea + 1; } /* LD   (w),BC      */
+OP(ed,44) { neg();                                           } /* NEG              */
+OP(ed,45) { retn();                                          } /* RETN             */
 OP(ed,46) { m_im = 0;                                        } /* IM   0           */
-OP(ed,47) { LD_I_A();                                        } /* LD   i,A         */
+OP(ed,47) { ld_i_a();                                        } /* LD   i,A         */
 
-OP(ed,48) { C = IN(BC); F = (F & CF) | SZP[C];               } /* IN   C,(C)       */
-OP(ed,49) { OUT(BC, C);                                      } /* OUT  (C),C       */
-OP(ed,4a) { ADC16(m_bc);                                     } /* ADC  HL,BC       */
-OP(ed,4b) { m_ea = ARG16(); RM16(m_ea, m_bc); WZ = m_ea + 1; } /* LD   BC,(w)      */
-OP(ed,4c) { NEG();                                           } /* NEG              */
-OP(ed,4d) { RETI();                                          } /* RETI             */
+OP(ed,48) { C = in(BC); F = (F & CF) | SZP[C];               } /* IN   C,(C)       */
+OP(ed,49) { out(BC, C);                                      } /* OUT  (C),C       */
+OP(ed,4a) { adc_hl(m_bc);                                    } /* ADC  HL,BC       */
+OP(ed,4b) { m_ea = arg16(); rm16(m_ea, m_bc); WZ = m_ea + 1; } /* LD   BC,(w)      */
+OP(ed,4c) { neg();                                           } /* NEG              */
+OP(ed,4d) { reti();                                          } /* RETI             */
 OP(ed,4e) { m_im = 0;                                        } /* IM   0           */
-OP(ed,4f) { LD_R_A();                                        } /* LD   r,A         */
+OP(ed,4f) { ld_r_a();                                        } /* LD   r,A         */
 
-OP(ed,50) { D = IN(BC); F = (F & CF) | SZP[D];               } /* IN   D,(C)       */
-OP(ed,51) { OUT(BC, D);                                      } /* OUT  (C),D       */
-OP(ed,52) { SBC16(m_de);                                     } /* SBC  HL,DE       */
-OP(ed,53) { m_ea = ARG16(); WM16(m_ea, m_de); WZ = m_ea + 1; } /* LD   (w),DE      */
-OP(ed,54) { NEG();                                           } /* NEG              */
-OP(ed,55) { RETN();                                          } /* RETN             */
+OP(ed,50) { D = in(BC); F = (F & CF) | SZP[D];               } /* IN   D,(C)       */
+OP(ed,51) { out(BC, D);                                      } /* OUT  (C),D       */
+OP(ed,52) { sbc_hl(m_de);                                    } /* SBC  HL,DE       */
+OP(ed,53) { m_ea = arg16(); wm16(m_ea, m_de); WZ = m_ea + 1; } /* LD   (w),DE      */
+OP(ed,54) { neg();                                           } /* NEG              */
+OP(ed,55) { retn();                                          } /* RETN             */
 OP(ed,56) { m_im = 1;                                        } /* IM   1           */
-OP(ed,57) { LD_A_I();                                        } /* LD   A,i         */
+OP(ed,57) { ld_a_i();                                        } /* LD   A,i         */
  
-OP(ed,58) { E = IN(BC); F = (F & CF) | SZP[E];               } /* IN   E,(C)       */
-OP(ed,59) { OUT(BC, E);                                      } /* OUT  (C),E       */
-OP(ed,5a) { ADC16(m_de);                                     } /* ADC  HL,DE       */
-OP(ed,5b) { m_ea = ARG16(); RM16(m_ea, m_de); WZ = m_ea + 1; } /* LD   DE,(w)      */
-OP(ed,5c) { NEG();                                           } /* NEG              */
-OP(ed,5d) { RETI();                                          } /* RETI             */
+OP(ed,58) { E = in(BC); F = (F & CF) | SZP[E];               } /* IN   E,(C)       */
+OP(ed,59) { out(BC, E);                                      } /* OUT  (C),E       */
+OP(ed,5a) { adc_hl(m_de);                                    } /* ADC  HL,DE       */
+OP(ed,5b) { m_ea = arg16(); rm16(m_ea, m_de); WZ = m_ea + 1; } /* LD   DE,(w)      */
+OP(ed,5c) { neg();                                           } /* NEG              */
+OP(ed,5d) { reti();                                          } /* RETI             */
 OP(ed,5e) { m_im = 2;                                        } /* IM   2           */
-OP(ed,5f) { LD_A_R();                                        } /* LD   A,r         */
+OP(ed,5f) { ld_a_r();                                        } /* LD   A,r         */
 
-OP(ed,60) { H = IN(BC); F = (F & CF) | SZP[H];               } /* IN   H,(C)       */
-OP(ed,61) { OUT(BC, H);                                      } /* OUT  (C),H       */
-OP(ed,62) { SBC16(m_hl);                                     } /* SBC  HL,HL       */
-OP(ed,63) { m_ea = ARG16(); WM16(m_ea, m_hl); WZ = m_ea + 1; } /* LD   (w),HL      */
-OP(ed,64) { NEG();                                           } /* NEG              */
-OP(ed,65) { RETN();                                          } /* RETN             */
+OP(ed,60) { H = in(BC); F = (F & CF) | SZP[H];               } /* IN   H,(C)       */
+OP(ed,61) { out(BC, H);                                      } /* OUT  (C),H       */
+OP(ed,62) { sbc_hl(m_hl);                                    } /* SBC  HL,HL       */
+OP(ed,63) { m_ea = arg16(); wm16(m_ea, m_hl); WZ = m_ea + 1; } /* LD   (w),HL      */
+OP(ed,64) { neg();                                           } /* NEG              */
+OP(ed,65) { retn();                                          } /* RETN             */
 OP(ed,66) { m_im = 0;                                        } /* IM   0           */
-OP(ed,67) { RRD();                                           } /* RRD  (HL)        */
+OP(ed,67) { rrd();                                           } /* RRD  (HL)        */
 
-OP(ed,68) { L = IN(BC); F = (F & CF) | SZP[L];               } /* IN   L,(C)       */
-OP(ed,69) { OUT(BC, L);                                      } /* OUT  (C),L       */
-OP(ed,6a) { ADC16(m_hl);                                     } /* ADC  HL,HL       */
-OP(ed,6b) { m_ea = ARG16(); RM16(m_ea, m_hl); WZ = m_ea + 1; } /* LD   HL,(w)      */
-OP(ed,6c) { NEG();                                           } /* NEG              */
-OP(ed,6d) { RETI();                                          } /* RETI             */
+OP(ed,68) { L = in(BC); F = (F & CF) | SZP[L];               } /* IN   L,(C)       */
+OP(ed,69) { out(BC, L);                                      } /* OUT  (C),L       */
+OP(ed,6a) { adc_hl(m_hl);                                    } /* ADC  HL,HL       */
+OP(ed,6b) { m_ea = arg16(); rm16(m_ea, m_hl); WZ = m_ea + 1; } /* LD   HL,(w)      */
+OP(ed,6c) { neg();                                           } /* NEG              */
+OP(ed,6d) { reti();                                          } /* RETI             */
 OP(ed,6e) { m_im = 0;                                        } /* IM   0           */
-OP(ed,6f) { RLD();                                           } /* RLD  (HL)        */
+OP(ed,6f) { rld();                                           } /* RLD  (HL)        */
 
-OP(ed,70) { UINT8 res = IN(BC); F = (F & CF) | SZP[res];     } /* IN   0,(C)       */
-OP(ed,71) { OUT(BC, 0);                                      } /* OUT  (C),0       */
-OP(ed,72) { SBC16(m_sp);                                     } /* SBC  HL,SP       */
-OP(ed,73) { m_ea = ARG16(); WM16(m_ea, m_sp); WZ = m_ea + 1; } /* LD   (w),SP      */
-OP(ed,74) { NEG();                                           } /* NEG              */
-OP(ed,75) { RETN();                                          } /* RETN             */
+OP(ed,70) { UINT8 res = in(BC); F = (F & CF) | SZP[res];     } /* IN   0,(C)       */
+OP(ed,71) { out(BC, 0);                                      } /* OUT  (C),0       */
+OP(ed,72) { sbc_hl(m_sp);                                    } /* SBC  HL,SP       */
+OP(ed,73) { m_ea = arg16(); wm16(m_ea, m_sp); WZ = m_ea + 1; } /* LD   (w),SP      */
+OP(ed,74) { neg();                                           } /* NEG              */
+OP(ed,75) { retn();                                          } /* RETN             */
 OP(ed,76) { m_im = 1;                                        } /* IM   1           */
 OP(ed,77) { illegal_2();                                     } /* DB   ED,77       */
 
-OP(ed,78) { A = IN(BC); F = (F & CF) | SZP[A]; WZ = BC + 1;  } /* IN   A,(C)       */
-OP(ed,79) { OUT(BC, A);  WZ = BC + 1;                        } /* OUT  (C),A       */
-OP(ed,7a) { ADC16(m_sp);                                     } /* ADC  HL,SP       */
-OP(ed,7b) { m_ea = ARG16(); RM16(m_ea, m_sp); WZ = m_ea + 1; } /* LD   SP,(w)      */
-OP(ed,7c) { NEG();                                           } /* NEG              */
-OP(ed,7d) { RETI();                                          } /* RETI             */
+OP(ed,78) { A = in(BC); F = (F & CF) | SZP[A]; WZ = BC + 1;  } /* IN   A,(C)       */
+OP(ed,79) { out(BC, A);  WZ = BC + 1;                        } /* OUT  (C),A       */
+OP(ed,7a) { adc_hl(m_sp);                                    } /* ADC  HL,SP       */
+OP(ed,7b) { m_ea = arg16(); rm16(m_ea, m_sp); WZ = m_ea + 1; } /* LD   SP,(w)      */
+OP(ed,7c) { neg();                                           } /* NEG              */
+OP(ed,7d) { reti();                                          } /* RETI             */
 OP(ed,7e) { m_im = 2;                                        } /* IM   2           */
 OP(ed,7f) { illegal_2();                                     } /* DB   ED,7F       */
 
@@ -2733,37 +2731,37 @@ OP(ed,9d) { illegal_2();                                     } /* DB   ED       
 OP(ed,9e) { illegal_2();                                     } /* DB   ED          */
 OP(ed,9f) { illegal_2();                                     } /* DB   ED          */
 
-OP(ed,a0) { LDI();                                           } /* LDI              */
-OP(ed,a1) { CPI();                                           } /* CPI              */
-OP(ed,a2) { INI();                                           } /* INI              */
-OP(ed,a3) { OUTI();                                          } /* OUTI             */
+OP(ed,a0) { ldi();                                           } /* LDI              */
+OP(ed,a1) { cpi();                                           } /* CPI              */
+OP(ed,a2) { ini();                                           } /* INI              */
+OP(ed,a3) { outi();                                          } /* OUTI             */
 OP(ed,a4) { illegal_2();                                     } /* DB   ED          */
 OP(ed,a5) { illegal_2();                                     } /* DB   ED          */
 OP(ed,a6) { illegal_2();                                     } /* DB   ED          */
 OP(ed,a7) { illegal_2();                                     } /* DB   ED          */
 
-OP(ed,a8) { LDD();                                           } /* LDD              */
-OP(ed,a9) { CPD();                                           } /* CPD              */
-OP(ed,aa) { IND();                                           } /* IND              */
-OP(ed,ab) { OUTD();                                          } /* OUTD             */
+OP(ed,a8) { ldd();                                           } /* LDD              */
+OP(ed,a9) { cpd();                                           } /* CPD              */
+OP(ed,aa) { ind();                                           } /* IND              */
+OP(ed,ab) { outd();                                          } /* OUTD             */
 OP(ed,ac) { illegal_2();                                     } /* DB   ED          */
 OP(ed,ad) { illegal_2();                                     } /* DB   ED          */
 OP(ed,ae) { illegal_2();                                     } /* DB   ED          */
 OP(ed,af) { illegal_2();                                     } /* DB   ED          */
 
-OP(ed,b0) { LDIR();                                          } /* LDIR             */
-OP(ed,b1) { CPIR();                                          } /* CPIR             */
-OP(ed,b2) { INIR();                                          } /* INIR             */
-OP(ed,b3) { OTIR();                                          } /* OTIR             */
+OP(ed,b0) { ldir();                                          } /* LDIR             */
+OP(ed,b1) { cpir();                                          } /* CPIR             */
+OP(ed,b2) { inir();                                          } /* INIR             */
+OP(ed,b3) { otir();                                          } /* OTIR             */
 OP(ed,b4) { illegal_2();                                     } /* DB   ED          */
 OP(ed,b5) { illegal_2();                                     } /* DB   ED          */
 OP(ed,b6) { illegal_2();                                     } /* DB   ED          */
 OP(ed,b7) { illegal_2();                                     } /* DB   ED          */
 
-OP(ed,b8) { LDDR();                                          } /* LDDR             */
-OP(ed,b9) { CPDR();                                          } /* CPDR             */
-OP(ed,ba) { INDR();                                          } /* INDR             */
-OP(ed,bb) { OTDR();                                          } /* OTDR             */
+OP(ed,b8) { lddr();                                          } /* LDDR             */
+OP(ed,b9) { cpdr();                                          } /* CPDR             */
+OP(ed,ba) { indr();                                          } /* INDR             */
+OP(ed,bb) { otdr();                                          } /* OTDR             */
 OP(ed,bc) { illegal_2();                                     } /* DB   ED          */
 OP(ed,bd) { illegal_2();                                     } /* DB   ED          */
 OP(ed,be) { illegal_2();                                     } /* DB   ED          */
@@ -2846,75 +2844,75 @@ OP(ed,ff) { illegal_2();                                     } /* DB   ED       
  * main opcodes
  **********************************************************/
 OP(op,00) {                                                                       } /* NOP              */
-OP(op,01) { BC = ARG16();                                                         } /* LD   BC,w        */
-OP(op,02) { WM(BC,A); WZ_L = (BC + 1) & 0xFF;  WZ_H = A;                          } /* LD (BC),A */
+OP(op,01) { BC = arg16();                                                         } /* LD   BC,w        */
+OP(op,02) { wm(BC,A); WZ_L = (BC + 1) & 0xFF;  WZ_H = A;                          } /* LD (BC),A */
 OP(op,03) { BC++;                                                                 } /* INC  BC          */
-OP(op,04) { B = INC(B);                                                           } /* INC  B           */
-OP(op,05) { B = DEC(B);                                                           } /* DEC  B           */
-OP(op,06) { B = ARG();                                                            } /* LD   B,n         */
-OP(op,07) { RLCA();                                                               } /* RLCA             */
+OP(op,04) { B = inc(B);                                                           } /* INC  B           */
+OP(op,05) { B = dec(B);                                                           } /* DEC  B           */
+OP(op,06) { B = arg();                                                            } /* LD   B,n         */
+OP(op,07) { rlca();                                                               } /* RLCA             */
 
-OP(op,08) { EX_AF();                                                              } /* EX   AF,AF'      */
-OP(op,09) { ADD16(m_hl, m_bc);                                                    } /* ADD  HL,BC       */
-OP(op,0a) { A = RM(BC);  WZ=BC+1;                                                 } /* LD   A,(BC)      */
+OP(op,08) { ex_af();                                                              } /* EX   AF,AF'      */
+OP(op,09) { add16(m_hl, m_bc);                                                    } /* ADD  HL,BC       */
+OP(op,0a) { A = rm(BC);  WZ=BC+1;                                                 } /* LD   A,(BC)      */
 OP(op,0b) { BC--;                                                                 } /* DEC  BC          */
-OP(op,0c) { C = INC(C);                                                           } /* INC  C           */
-OP(op,0d) { C = DEC(C);                                                           } /* DEC  C           */
-OP(op,0e) { C = ARG();                                                            } /* LD   C,n         */
-OP(op,0f) { RRCA();                                                               } /* RRCA             */
+OP(op,0c) { C = inc(C);                                                           } /* INC  C           */
+OP(op,0d) { C = dec(C);                                                           } /* DEC  C           */
+OP(op,0e) { C = arg();                                                            } /* LD   C,n         */
+OP(op,0f) { rrca();                                                               } /* RRCA             */
 
-OP(op,10) { B--; JR_COND(B, 0x10);                                                } /* DJNZ o           */
-OP(op,11) { DE = ARG16();                                                         } /* LD   DE,w        */
-OP(op,12) { WM(DE,A); WZ_L = (DE + 1) & 0xFF;  WZ_H = A;                          } /* LD (DE),A */
+OP(op,10) { B--; jr_cond(B, 0x10);                                                } /* DJNZ o           */
+OP(op,11) { DE = arg16();                                                         } /* LD   DE,w        */
+OP(op,12) { wm(DE,A); WZ_L = (DE + 1) & 0xFF;  WZ_H = A;                          } /* LD (DE),A */
 OP(op,13) { DE++;                                                                 } /* INC  DE          */
-OP(op,14) { D = INC(D);                                                           } /* INC  D           */
-OP(op,15) { D = DEC(D);                                                           } /* DEC  D           */
-OP(op,16) { D = ARG();                                                            } /* LD   D,n         */
-OP(op,17) { RLA();                                                                } /* RLA              */
+OP(op,14) { D = inc(D);                                                           } /* INC  D           */
+OP(op,15) { D = dec(D);                                                           } /* DEC  D           */
+OP(op,16) { D = arg();                                                            } /* LD   D,n         */
+OP(op,17) { rla();                                                                } /* RLA              */
 
-OP(op,18) { JR();                                                                 } /* JR   o           */
-OP(op,19) { ADD16(m_hl, m_de);                                                    } /* ADD  HL,DE       */
-OP(op,1a) { A = RM(DE); WZ = DE + 1;                                              } /* LD   A,(DE)      */
+OP(op,18) { jr();                                                                 } /* JR   o           */
+OP(op,19) { add16(m_hl, m_de);                                                    } /* ADD  HL,DE       */
+OP(op,1a) { A = rm(DE); WZ = DE + 1;                                              } /* LD   A,(DE)      */
 OP(op,1b) { DE--;                                                                 } /* DEC  DE          */
-OP(op,1c) { E = INC(E);                                                           } /* INC  E           */
-OP(op,1d) { E = DEC(E);                                                           } /* DEC  E           */
-OP(op,1e) { E = ARG();                                                            } /* LD   E,n         */
-OP(op,1f) { RRA();                                                                } /* RRA              */
+OP(op,1c) { E = inc(E);                                                           } /* INC  E           */
+OP(op,1d) { E = dec(E);                                                           } /* DEC  E           */
+OP(op,1e) { E = arg();                                                            } /* LD   E,n         */
+OP(op,1f) { rra();                                                                } /* RRA              */
 
-OP(op,20) { JR_COND(!(F & ZF), 0x20);                                             } /* JR   NZ,o        */
-OP(op,21) { HL = ARG16();                                                         } /* LD   HL,w        */
-OP(op,22) { m_ea = ARG16(); WM16(m_ea, m_hl); WZ = m_ea + 1;                      } /* LD   (w),HL      */
+OP(op,20) { jr_cond(!(F & ZF), 0x20);                                             } /* JR   NZ,o        */
+OP(op,21) { HL = arg16();                                                         } /* LD   HL,w        */
+OP(op,22) { m_ea = arg16(); wm16(m_ea, m_hl); WZ = m_ea + 1;                      } /* LD   (w),HL      */
 OP(op,23) { HL++;                                                                 } /* INC  HL          */
-OP(op,24) { H = INC(H);                                                           } /* INC  H           */
-OP(op,25) { H = DEC(H);                                                           } /* DEC  H           */
-OP(op,26) { H = ARG();                                                            } /* LD   H,n         */
-OP(op,27) { DAA();                                                                } /* DAA              */
+OP(op,24) { H = inc(H);                                                           } /* INC  H           */
+OP(op,25) { H = dec(H);                                                           } /* DEC  H           */
+OP(op,26) { H = arg();                                                            } /* LD   H,n         */
+OP(op,27) { daa();                                                                } /* DAA              */
 
-OP(op,28) { JR_COND(F & ZF, 0x28);                                                } /* JR   Z,o         */
-OP(op,29) { ADD16(m_hl, m_hl);                                                    } /* ADD  HL,HL       */
-OP(op,2a) { m_ea = ARG16(); RM16(m_ea, m_hl); WZ = m_ea+1;                        } /* LD   HL,(w)      */
+OP(op,28) { jr_cond(F & ZF, 0x28);                                                } /* JR   Z,o         */
+OP(op,29) { add16(m_hl, m_hl);                                                    } /* ADD  HL,HL       */
+OP(op,2a) { m_ea = arg16(); rm16(m_ea, m_hl); WZ = m_ea+1;                        } /* LD   HL,(w)      */
 OP(op,2b) { HL--;                                                                 } /* DEC  HL          */
-OP(op,2c) { L = INC(L);                                                           } /* INC  L           */
-OP(op,2d) { L = DEC(L);                                                           } /* DEC  L           */
-OP(op,2e) { L = ARG();                                                            } /* LD   L,n         */
+OP(op,2c) { L = inc(L);                                                           } /* INC  L           */
+OP(op,2d) { L = dec(L);                                                           } /* DEC  L           */
+OP(op,2e) { L = arg();                                                            } /* LD   L,n         */
 OP(op,2f) { A ^= 0xff; F = (F & (SF | ZF | PF | CF)) | HF | NF | (A & (YF | XF)); } /* CPL              */
 
-OP(op,30) { JR_COND(!(F & CF), 0x30);                                             } /* JR   NC,o        */
-OP(op,31) { SP = ARG16();                                                         } /* LD   SP,w        */
-OP(op,32) { m_ea = ARG16(); WM(m_ea, A); WZ_L = (m_ea + 1) & 0xFF; WZ_H = A;      } /* LD   (w),A       */
+OP(op,30) { jr_cond(!(F & CF), 0x30);                                             } /* JR   NC,o        */
+OP(op,31) { SP = arg16();                                                         } /* LD   SP,w        */
+OP(op,32) { m_ea = arg16(); wm(m_ea, A); WZ_L = (m_ea + 1) & 0xFF; WZ_H = A;      } /* LD   (w),A       */
 OP(op,33) { SP++;                                                                 } /* INC  SP          */
-OP(op,34) { WM(HL, INC(RM(HL)));                                                  } /* INC  (HL)        */
-OP(op,35) { WM(HL, DEC(RM(HL)));                                                  } /* DEC  (HL)        */
-OP(op,36) { WM(HL, ARG());                                                        } /* LD   (HL),n      */
+OP(op,34) { wm(HL, inc(rm(HL)));                                                  } /* INC  (HL)        */
+OP(op,35) { wm(HL, dec(rm(HL)));                                                  } /* DEC  (HL)        */
+OP(op,36) { wm(HL, arg());                                                        } /* LD   (HL),n      */
 OP(op,37) { F = (F & (SF | ZF | YF | XF | PF)) | CF | (A & (YF | XF));            } /* SCF              */
 
-OP(op,38) { JR_COND(F & CF, 0x38);                                                } /* JR   C,o         */
-OP(op,39) { ADD16(m_hl, m_sp);                                                    } /* ADD  HL,SP       */
-OP(op,3a) { m_ea = ARG16(); A = RM(m_ea); WZ = m_ea + 1;                          } /* LD   A,(w)       */
+OP(op,38) { jr_cond(F & CF, 0x38);                                                } /* JR   C,o         */
+OP(op,39) { add16(m_hl, m_sp);                                                    } /* ADD  HL,SP       */
+OP(op,3a) { m_ea = arg16(); A = rm(m_ea); WZ = m_ea + 1;                          } /* LD   A,(w)       */
 OP(op,3b) { SP--;                                                                 } /* DEC  SP          */
-OP(op,3c) { A = INC(A);                                                           } /* INC  A           */
-OP(op,3d) { A = DEC(A);                                                           } /* DEC  A           */
-OP(op,3e) { A = ARG();                                                            } /* LD   A,n         */
+OP(op,3c) { A = inc(A);                                                           } /* INC  A           */
+OP(op,3d) { A = dec(A);                                                           } /* DEC  A           */
+OP(op,3e) { A = arg();                                                            } /* LD   A,n         */
 OP(op,3f) { F = ((F&(SF|ZF|YF|XF|PF|CF))|((F&CF)<<4)|(A&(YF|XF)))^CF;             } /* CCF        */
 
 OP(op,40) {                                                                       } /* LD   B,B         */
@@ -2923,7 +2921,7 @@ OP(op,42) { B = D;                                                              
 OP(op,43) { B = E;                                                                } /* LD   B,E         */
 OP(op,44) { B = H;                                                                } /* LD   B,H         */
 OP(op,45) { B = L;                                                                } /* LD   B,L         */
-OP(op,46) { B = RM(HL);                                                           } /* LD   B,(HL)      */
+OP(op,46) { B = rm(HL);                                                           } /* LD   B,(HL)      */
 OP(op,47) { B = A;                                                                } /* LD   B,A         */
 
 OP(op,48) { C = B;                                                                } /* LD   C,B         */
@@ -2932,7 +2930,7 @@ OP(op,4a) { C = D;                                                              
 OP(op,4b) { C = E;                                                                } /* LD   C,E         */
 OP(op,4c) { C = H;                                                                } /* LD   C,H         */
 OP(op,4d) { C = L;                                                                } /* LD   C,L         */
-OP(op,4e) { C = RM(HL);                                                           } /* LD   C,(HL)      */
+OP(op,4e) { C = rm(HL);                                                           } /* LD   C,(HL)      */
 OP(op,4f) { C = A;                                                                } /* LD   C,A         */
 
 OP(op,50) { D = B;                                                                } /* LD   D,B         */
@@ -2941,7 +2939,7 @@ OP(op,52) {                                                                     
 OP(op,53) { D = E;                                                                } /* LD   D,E         */
 OP(op,54) { D = H;                                                                } /* LD   D,H         */
 OP(op,55) { D = L;                                                                } /* LD   D,L         */
-OP(op,56) { D = RM(HL);                                                           } /* LD   D,(HL)      */
+OP(op,56) { D = rm(HL);                                                           } /* LD   D,(HL)      */
 OP(op,57) { D = A;                                                                } /* LD   D,A         */
 
 OP(op,58) { E = B;                                                                } /* LD   E,B         */
@@ -2950,7 +2948,7 @@ OP(op,5a) { E = D;                                                              
 OP(op,5b) {                                                                       } /* LD   E,E         */
 OP(op,5c) { E = H;                                                                } /* LD   E,H         */
 OP(op,5d) { E = L;                                                                } /* LD   E,L         */
-OP(op,5e) { E = RM(HL);                                                           } /* LD   E,(HL)      */
+OP(op,5e) { E = rm(HL);                                                           } /* LD   E,(HL)      */
 OP(op,5f) { E = A;                                                                } /* LD   E,A         */
 
 OP(op,60) { H = B;                                                                } /* LD   H,B         */
@@ -2959,7 +2957,7 @@ OP(op,62) { H = D;                                                              
 OP(op,63) { H = E;                                                                } /* LD   H,E         */
 OP(op,64) {                                                                       } /* LD   H,H         */
 OP(op,65) { H = L;                                                                } /* LD   H,L         */
-OP(op,66) { H = RM(HL);                                                           } /* LD   H,(HL)      */
+OP(op,66) { H = rm(HL);                                                           } /* LD   H,(HL)      */
 OP(op,67) { H = A;                                                                } /* LD   H,A         */
 
 OP(op,68) { L = B;                                                                } /* LD   L,B         */
@@ -2968,17 +2966,17 @@ OP(op,6a) { L = D;                                                              
 OP(op,6b) { L = E;                                                                } /* LD   L,E         */
 OP(op,6c) { L = H;                                                                } /* LD   L,H         */
 OP(op,6d) {                                                                       } /* LD   L,L         */
-OP(op,6e) { L = RM(HL);                                                           } /* LD   L,(HL)      */
+OP(op,6e) { L = rm(HL);                                                           } /* LD   L,(HL)      */
 OP(op,6f) { L = A;                                                                } /* LD   L,A         */
 
-OP(op,70) { WM(HL, B);                                                            } /* LD   (HL),B      */
-OP(op,71) { WM(HL, C);                                                            } /* LD   (HL),C      */
-OP(op,72) { WM(HL, D);                                                            } /* LD   (HL),D      */
-OP(op,73) { WM(HL, E);                                                            } /* LD   (HL),E      */
-OP(op,74) { WM(HL, H);                                                            } /* LD   (HL),H      */
-OP(op,75) { WM(HL, L);                                                            } /* LD   (HL),L      */
-OP(op,76) { ENTER_HALT();                                                         } /* halt             */
-OP(op,77) { WM(HL, A);                                                            } /* LD   (HL),A      */
+OP(op,70) { wm(HL, B);                                                            } /* LD   (HL),B      */
+OP(op,71) { wm(HL, C);                                                            } /* LD   (HL),C      */
+OP(op,72) { wm(HL, D);                                                            } /* LD   (HL),D      */
+OP(op,73) { wm(HL, E);                                                            } /* LD   (HL),E      */
+OP(op,74) { wm(HL, H);                                                            } /* LD   (HL),H      */
+OP(op,75) { wm(HL, L);                                                            } /* LD   (HL),L      */
+OP(op,76) { halt();                                                               } /* halt             */
+OP(op,77) { wm(HL, A);                                                            } /* LD   (HL),A      */
 
 OP(op,78) { A = B;                                                                } /* LD   A,B         */
 OP(op,79) { A = C;                                                                } /* LD   A,C         */
@@ -2986,152 +2984,152 @@ OP(op,7a) { A = D;                                                              
 OP(op,7b) { A = E;                                                                } /* LD   A,E         */
 OP(op,7c) { A = H;                                                                } /* LD   A,H         */
 OP(op,7d) { A = L;                                                                } /* LD   A,L         */
-OP(op,7e) { A = RM(HL);                                                           } /* LD   A,(HL)      */
+OP(op,7e) { A = rm(HL);                                                           } /* LD   A,(HL)      */
 OP(op,7f) {                                                                       } /* LD   A,A         */
 
-OP(op,80) { ADD(B);                                                               } /* ADD  A,B         */
-OP(op,81) { ADD(C);                                                               } /* ADD  A,C         */
-OP(op,82) { ADD(D);                                                               } /* ADD  A,D         */
-OP(op,83) { ADD(E);                                                               } /* ADD  A,E         */
-OP(op,84) { ADD(H);                                                               } /* ADD  A,H         */
-OP(op,85) { ADD(L);                                                               } /* ADD  A,L         */
-OP(op,86) { ADD(RM(HL));                                                          } /* ADD  A,(HL)      */
-OP(op,87) { ADD(A);                                                               } /* ADD  A,A         */
+OP(op,80) { add_a(B);                                                             } /* ADD  A,B         */
+OP(op,81) { add_a(C);                                                             } /* ADD  A,C         */
+OP(op,82) { add_a(D);                                                             } /* ADD  A,D         */
+OP(op,83) { add_a(E);                                                             } /* ADD  A,E         */
+OP(op,84) { add_a(H);                                                             } /* ADD  A,H         */
+OP(op,85) { add_a(L);                                                             } /* ADD  A,L         */
+OP(op,86) { add_a(rm(HL));                                                        } /* ADD  A,(HL)      */
+OP(op,87) { add_a(A);                                                             } /* ADD  A,A         */
 
-OP(op,88) { ADC(B);                                                               } /* ADC  A,B         */
-OP(op,89) { ADC(C);                                                               } /* ADC  A,C         */
-OP(op,8a) { ADC(D);                                                               } /* ADC  A,D         */
-OP(op,8b) { ADC(E);                                                               } /* ADC  A,E         */
-OP(op,8c) { ADC(H);                                                               } /* ADC  A,H         */
-OP(op,8d) { ADC(L);                                                               } /* ADC  A,L         */
-OP(op,8e) { ADC(RM(HL));                                                          } /* ADC  A,(HL)      */
-OP(op,8f) { ADC(A);                                                               } /* ADC  A,A         */
+OP(op,88) { adc_a(B);                                                             } /* ADC  A,B         */
+OP(op,89) { adc_a(C);                                                             } /* ADC  A,C         */
+OP(op,8a) { adc_a(D);                                                             } /* ADC  A,D         */
+OP(op,8b) { adc_a(E);                                                             } /* ADC  A,E         */
+OP(op,8c) { adc_a(H);                                                             } /* ADC  A,H         */
+OP(op,8d) { adc_a(L);                                                             } /* ADC  A,L         */
+OP(op,8e) { adc_a(rm(HL));                                                        } /* ADC  A,(HL)      */
+OP(op,8f) { adc_a(A);                                                             } /* ADC  A,A         */
 
-OP(op,90) { SUB(B);                                                               } /* SUB  B           */
-OP(op,91) { SUB(C);                                                               } /* SUB  C           */
-OP(op,92) { SUB(D);                                                               } /* SUB  D           */
-OP(op,93) { SUB(E);                                                               } /* SUB  E           */
-OP(op,94) { SUB(H);                                                               } /* SUB  H           */
-OP(op,95) { SUB(L);                                                               } /* SUB  L           */
-OP(op,96) { SUB(RM(HL));                                                          } /* SUB  (HL)        */
-OP(op,97) { SUB(A);                                                               } /* SUB  A           */
+OP(op,90) { sub(B);                                                               } /* SUB  B           */
+OP(op,91) { sub(C);                                                               } /* SUB  C           */
+OP(op,92) { sub(D);                                                               } /* SUB  D           */
+OP(op,93) { sub(E);                                                               } /* SUB  E           */
+OP(op,94) { sub(H);                                                               } /* SUB  H           */
+OP(op,95) { sub(L);                                                               } /* SUB  L           */
+OP(op,96) { sub(rm(HL));                                                          } /* SUB  (HL)        */
+OP(op,97) { sub(A);                                                               } /* SUB  A           */
 
-OP(op,98) { SBC(B);                                                               } /* SBC  A,B         */
-OP(op,99) { SBC(C);                                                               } /* SBC  A,C         */
-OP(op,9a) { SBC(D);                                                               } /* SBC  A,D         */
-OP(op,9b) { SBC(E);                                                               } /* SBC  A,E         */
-OP(op,9c) { SBC(H);                                                               } /* SBC  A,H         */
-OP(op,9d) { SBC(L);                                                               } /* SBC  A,L         */
-OP(op,9e) { SBC(RM(HL));                                                          } /* SBC  A,(HL)      */
-OP(op,9f) { SBC(A);                                                               } /* SBC  A,A         */
+OP(op,98) { sbc_a(B);                                                             } /* SBC  A,B         */
+OP(op,99) { sbc_a(C);                                                             } /* SBC  A,C         */
+OP(op,9a) { sbc_a(D);                                                             } /* SBC  A,D         */
+OP(op,9b) { sbc_a(E);                                                             } /* SBC  A,E         */
+OP(op,9c) { sbc_a(H);                                                             } /* SBC  A,H         */
+OP(op,9d) { sbc_a(L);                                                             } /* SBC  A,L         */
+OP(op,9e) { sbc_a(rm(HL));                                                        } /* SBC  A,(HL)      */
+OP(op,9f) { sbc_a(A);                                                             } /* SBC  A,A         */
 
-OP(op,a0) { AND(B);                                                               } /* AND  B           */
-OP(op,a1) { AND(C);                                                               } /* AND  C           */
-OP(op,a2) { AND(D);                                                               } /* AND  D           */
-OP(op,a3) { AND(E);                                                               } /* AND  E           */
-OP(op,a4) { AND(H);                                                               } /* AND  H           */
-OP(op,a5) { AND(L);                                                               } /* AND  L           */
-OP(op,a6) { AND(RM(HL));                                                          } /* AND  (HL)        */
-OP(op,a7) { AND(A);                                                               } /* AND  A           */
+OP(op,a0) { and_a(B);                                                             } /* AND  B           */
+OP(op,a1) { and_a(C);                                                             } /* AND  C           */
+OP(op,a2) { and_a(D);                                                             } /* AND  D           */
+OP(op,a3) { and_a(E);                                                             } /* AND  E           */
+OP(op,a4) { and_a(H);                                                             } /* AND  H           */
+OP(op,a5) { and_a(L);                                                             } /* AND  L           */
+OP(op,a6) { and_a(rm(HL));                                                        } /* AND  (HL)        */
+OP(op,a7) { and_a(A);                                                             } /* AND  A           */
 
-OP(op,a8) { XOR(B);                                                               } /* XOR  B           */
-OP(op,a9) { XOR(C);                                                               } /* XOR  C           */
-OP(op,aa) { XOR(D);                                                               } /* XOR  D           */
-OP(op,ab) { XOR(E);                                                               } /* XOR  E           */
-OP(op,ac) { XOR(H);                                                               } /* XOR  H           */
-OP(op,ad) { XOR(L);                                                               } /* XOR  L           */
-OP(op,ae) { XOR(RM(HL));                                                          } /* XOR  (HL)        */
-OP(op,af) { XOR(A);                                                               } /* XOR  A           */
+OP(op,a8) { xor_a(B);                                                             } /* XOR  B           */
+OP(op,a9) { xor_a(C);                                                             } /* XOR  C           */
+OP(op,aa) { xor_a(D);                                                             } /* XOR  D           */
+OP(op,ab) { xor_a(E);                                                             } /* XOR  E           */
+OP(op,ac) { xor_a(H);                                                             } /* XOR  H           */
+OP(op,ad) { xor_a(L);                                                             } /* XOR  L           */
+OP(op,ae) { xor_a(rm(HL));                                                        } /* XOR  (HL)        */
+OP(op,af) { xor_a(A);                                                             } /* XOR  A           */
 
-OP(op,b0) { OR(B);                                                                } /* OR   B           */
-OP(op,b1) { OR(C);                                                                } /* OR   C           */
-OP(op,b2) { OR(D);                                                                } /* OR   D           */
-OP(op,b3) { OR(E);                                                                } /* OR   E           */
-OP(op,b4) { OR(H);                                                                } /* OR   H           */
-OP(op,b5) { OR(L);                                                                } /* OR   L           */
-OP(op,b6) { OR(RM(HL));                                                           } /* OR   (HL)        */
-OP(op,b7) { OR(A);                                                                } /* OR   A           */
+OP(op,b0) { or_a(B);                                                              } /* OR   B           */
+OP(op,b1) { or_a(C);                                                              } /* OR   C           */
+OP(op,b2) { or_a(D);                                                              } /* OR   D           */
+OP(op,b3) { or_a(E);                                                              } /* OR   E           */
+OP(op,b4) { or_a(H);                                                              } /* OR   H           */
+OP(op,b5) { or_a(L);                                                              } /* OR   L           */
+OP(op,b6) { or_a(rm(HL));                                                         } /* OR   (HL)        */
+OP(op,b7) { or_a(A);                                                              } /* OR   A           */
 
-OP(op,b8) { CP(B);                                                                } /* CP   B           */
-OP(op,b9) { CP(C);                                                                } /* CP   C           */
-OP(op,ba) { CP(D);                                                                } /* CP   D           */
-OP(op,bb) { CP(E);                                                                } /* CP   E           */
-OP(op,bc) { CP(H);                                                                } /* CP   H           */
-OP(op,bd) { CP(L);                                                                } /* CP   L           */
-OP(op,be) { CP(RM(HL));                                                           } /* CP   (HL)        */
-OP(op,bf) { CP(A);                                                                } /* CP   A           */
+OP(op,b8) { cp(B);                                                                } /* CP   B           */
+OP(op,b9) { cp(C);                                                                } /* CP   C           */
+OP(op,ba) { cp(D);                                                                } /* CP   D           */
+OP(op,bb) { cp(E);                                                                } /* CP   E           */
+OP(op,bc) { cp(H);                                                                } /* CP   H           */
+OP(op,bd) { cp(L);                                                                } /* CP   L           */
+OP(op,be) { cp(rm(HL));                                                           } /* CP   (HL)        */
+OP(op,bf) { cp(A);                                                                } /* CP   A           */
 
-OP(op,c0) { RET_COND(!(F & ZF), 0xc0);                                            } /* RET  NZ          */
-OP(op,c1) { POP(m_bc);                                                            } /* POP  BC          */
-OP(op,c2) { JP_COND(!(F & ZF));                                                   } /* JP   NZ,a        */
-OP(op,c3) { JP();                                                                 } /* JP   a           */
-OP(op,c4) { CALL_COND(!(F & ZF), 0xc4);                                           } /* CALL NZ,a        */
-OP(op,c5) { PUSH(m_bc);                                                           } /* PUSH BC          */
-OP(op,c6) { ADD(ARG());                                                           } /* ADD  A,n         */
-OP(op,c7) { RST(0x00);                                                            } /* RST  0           */
+OP(op,c0) { ret_cond(!(F & ZF), 0xc0);                                            } /* RET  NZ          */
+OP(op,c1) { pop(m_bc);                                                            } /* POP  BC          */
+OP(op,c2) { jp_cond(!(F & ZF));                                                   } /* JP   NZ,a        */
+OP(op,c3) { jp();                                                                 } /* JP   a           */
+OP(op,c4) { call_cond(!(F & ZF), 0xc4);                                           } /* CALL NZ,a        */
+OP(op,c5) { push(m_bc);                                                           } /* PUSH BC          */
+OP(op,c6) { add_a(arg());                                                         } /* ADD  A,n         */
+OP(op,c7) { rst(0x00);                                                            } /* RST  0           */
 
-OP(op,c8) { RET_COND(F & ZF, 0xc8);                                               } /* RET  Z           */
-OP(op,c9) { POP(m_pc); WZ = PCD;                                                  } /* RET              */
-OP(op,ca) { JP_COND(F & ZF);                                                      } /* JP   Z,a         */
-OP(op,cb) { m_r++; EXEC(cb,ROP());                                                } /* **** CB xx       */
-OP(op,cc) { CALL_COND(F & ZF, 0xcc);                                              } /* CALL Z,a         */
-OP(op,cd) { CALL();                                                               } /* CALL a           */
-OP(op,ce) { ADC(ARG());                                                           } /* ADC  A,n         */
-OP(op,cf) { RST(0x08);                                                            } /* RST  1           */
+OP(op,c8) { ret_cond(F & ZF, 0xc8);                                               } /* RET  Z           */
+OP(op,c9) { pop(m_pc); WZ = PCD;                                                  } /* RET              */
+OP(op,ca) { jp_cond(F & ZF);                                                      } /* JP   Z,a         */
+OP(op,cb) { m_r++; EXEC(cb,rop());                                                } /* **** CB xx       */
+OP(op,cc) { call_cond(F & ZF, 0xcc);                                              } /* CALL Z,a         */
+OP(op,cd) { call();                                                               } /* CALL a           */
+OP(op,ce) { adc_a(arg());                                                         } /* ADC  A,n         */
+OP(op,cf) { rst(0x08);                                                            } /* RST  1           */
 
-OP(op,d0) { RET_COND(!(F & CF), 0xd0);                                            } /* RET  NC          */
-OP(op,d1) { POP(m_de);                                                            } /* POP  DE          */
-OP(op,d2) { JP_COND(!(F & CF));                                                   } /* JP   NC,a        */
-OP(op,d3) { unsigned n = ARG() | (A << 8); OUT(n, A); WZ_L = ((n & 0xff) + 1) & 0xff;  WZ_H = A;   } /* OUT  (n),A       */
-OP(op,d4) { CALL_COND(!(F & CF), 0xd4);                                           } /* CALL NC,a        */
-OP(op,d5) { PUSH(m_de);                                                           } /* PUSH DE          */
-OP(op,d6) { SUB(ARG());                                                           } /* SUB  n           */
-OP(op,d7) { RST(0x10);                                                            } /* RST  2           */
+OP(op,d0) { ret_cond(!(F & CF), 0xd0);                                            } /* RET  NC          */
+OP(op,d1) { pop(m_de);                                                            } /* POP  DE          */
+OP(op,d2) { jp_cond(!(F & CF));                                                   } /* JP   NC,a        */
+OP(op,d3) { unsigned n = arg() | (A << 8); out(n, A); WZ_L = ((n & 0xff) + 1) & 0xff;  WZ_H = A;   } /* OUT  (n),A       */
+OP(op,d4) { call_cond(!(F & CF), 0xd4);                                           } /* CALL NC,a        */
+OP(op,d5) { push(m_de);                                                           } /* PUSH DE          */
+OP(op,d6) { sub(arg());                                                           } /* SUB  n           */
+OP(op,d7) { rst(0x10);                                                            } /* RST  2           */
 
-OP(op,d8) { RET_COND(F & CF, 0xd8);                                               } /* RET  C           */
-OP(op,d9) { EXX();                                                                } /* EXX              */
-OP(op,da) { JP_COND(F & CF);                                                      } /* JP   C,a         */
-OP(op,db) { unsigned n = ARG() | (A << 8); A = IN(n); WZ = n + 1;                 } /* IN   A,(n)  */
-OP(op,dc) { CALL_COND(F & CF, 0xdc);                                              } /* CALL C,a         */
-OP(op,dd) { m_r++; EXEC(dd,ROP());                                                } /* **** DD xx       */
-OP(op,de) { SBC(ARG());                                                           } /* SBC  A,n         */
-OP(op,df) { RST(0x18);                                                            } /* RST  3           */
+OP(op,d8) { ret_cond(F & CF, 0xd8);                                               } /* RET  C           */
+OP(op,d9) { exx();                                                                } /* EXX              */
+OP(op,da) { jp_cond(F & CF);                                                      } /* JP   C,a         */
+OP(op,db) { unsigned n = arg() | (A << 8); A = in(n); WZ = n + 1;                 } /* IN   A,(n)  */
+OP(op,dc) { call_cond(F & CF, 0xdc);                                              } /* CALL C,a         */
+OP(op,dd) { m_r++; EXEC(dd,rop());                                                } /* **** DD xx       */
+OP(op,de) { sbc_a(arg());                                                         } /* SBC  A,n         */
+OP(op,df) { rst(0x18);                                                            } /* RST  3           */
 
-OP(op,e0) { RET_COND(!(F & PF), 0xe0);                                            } /* RET  PO          */
-OP(op,e1) { POP(m_hl);                                                            } /* POP  HL          */
-OP(op,e2) { JP_COND(!(F & PF));                                                   } /* JP   PO,a        */
-OP(op,e3) { EXSP(m_hl);                                                           } /* EX   HL,(SP)     */
-OP(op,e4) { CALL_COND(!(F & PF), 0xe4);                                           } /* CALL PO,a        */
-OP(op,e5) { PUSH(m_hl);                                                           } /* PUSH HL          */
-OP(op,e6) { AND(ARG());                                                           } /* AND  n           */
-OP(op,e7) { RST(0x20);                                                            } /* RST  4           */
+OP(op,e0) { ret_cond(!(F & PF), 0xe0);                                            } /* RET  PO          */
+OP(op,e1) { pop(m_hl);                                                            } /* POP  HL          */
+OP(op,e2) { jp_cond(!(F & PF));                                                   } /* JP   PO,a        */
+OP(op,e3) { ex_sp(m_hl);                                                          } /* EX   HL,(SP)     */
+OP(op,e4) { call_cond(!(F & PF), 0xe4);                                           } /* CALL PO,a        */
+OP(op,e5) { push(m_hl);                                                           } /* PUSH HL          */
+OP(op,e6) { and_a(arg());                                                         } /* AND  n           */
+OP(op,e7) { rst(0x20);                                                            } /* RST  4           */
 
-OP(op,e8) { RET_COND(F & PF, 0xe8);                                               } /* RET  PE          */
+OP(op,e8) { ret_cond(F & PF, 0xe8);                                               } /* RET  PE          */
 OP(op,e9) { PC = HL;                                                              } /* JP   (HL)        */
-OP(op,ea) { JP_COND(F & PF);                                                      } /* JP   PE,a        */
-OP(op,eb) { EX_DE_HL();                                                           } /* EX   DE,HL       */
-OP(op,ec) { CALL_COND(F & PF, 0xec);                                              } /* CALL PE,a        */
-OP(op,ed) { m_r++; EXEC(ed,ROP());                                                } /* **** ED xx       */
-OP(op,ee) { XOR(ARG());                                                           } /* XOR  n           */
-OP(op,ef) { RST(0x28);                                                            } /* RST  5           */
+OP(op,ea) { jp_cond(F & PF);                                                      } /* JP   PE,a        */
+OP(op,eb) { ex_de_hl();                                                           } /* EX   DE,HL       */
+OP(op,ec) { call_cond(F & PF, 0xec);                                              } /* CALL PE,a        */
+OP(op,ed) { m_r++; EXEC(ed,rop());                                                } /* **** ED xx       */
+OP(op,ee) { xor_a(arg());                                                         } /* XOR  n           */
+OP(op,ef) { rst(0x28);                                                            } /* RST  5           */
 
-OP(op,f0) { RET_COND(!(F & SF), 0xf0);                                            } /* RET  P           */
-OP(op,f1) { POP(m_af);                                                            } /* POP  AF          */
-OP(op,f2) { JP_COND(!(F & SF));                                                   } /* JP   P,a         */
+OP(op,f0) { ret_cond(!(F & SF), 0xf0);                                            } /* RET  P           */
+OP(op,f1) { pop(m_af);                                                            } /* POP  AF          */
+OP(op,f2) { jp_cond(!(F & SF));                                                   } /* JP   P,a         */
 OP(op,f3) { m_iff1 = m_iff2 = 0;                                                  } /* DI               */
-OP(op,f4) { CALL_COND(!(F & SF), 0xf4);                                           } /* CALL P,a         */
-OP(op,f5) { PUSH(m_af);                                                           } /* PUSH AF          */
-OP(op,f6) { OR(ARG());                                                            } /* OR   n           */
-OP(op,f7) { RST(0x30);                                                            } /* RST  6           */
+OP(op,f4) { call_cond(!(F & SF), 0xf4);                                           } /* CALL P,a         */
+OP(op,f5) { push(m_af);                                                           } /* PUSH AF          */
+OP(op,f6) { or_a(arg());                                                          } /* OR   n           */
+OP(op,f7) { rst(0x30);                                                            } /* RST  6           */
 
-OP(op,f8) { RET_COND(F & SF, 0xf8);                                               } /* RET  M           */
+OP(op,f8) { ret_cond(F & SF, 0xf8);                                               } /* RET  M           */
 OP(op,f9) { SP = HL;                                                              } /* LD   SP,HL       */
-OP(op,fa) { JP_COND(F & SF);                                                      } /* JP   M,a         */
-OP(op,fb) { EI();                                                                 } /* EI               */
-OP(op,fc) { CALL_COND(F & SF, 0xfc);                                              } /* CALL M,a         */
-OP(op,fd) { m_r++; EXEC(fd,ROP());                                                } /* **** FD xx       */
-OP(op,fe) { CP(ARG());                                                            } /* CP   n           */
-OP(op,ff) { RST(0x38);                                                            } /* RST  7           */
+OP(op,fa) { jp_cond(F & SF);                                                      } /* JP   M,a         */
+OP(op,fb) { ei();                                                                 } /* EI               */
+OP(op,fc) { call_cond(F & SF, 0xfc);                                              } /* CALL M,a         */
+OP(op,fd) { m_r++; EXEC(fd,rop());                                                } /* **** FD xx       */
+OP(op,fe) { cp(arg());                                                            } /* CP   n           */
+OP(op,ff) { rst(0x38);                                                            } /* RST  7           */
 
 
 void z80_device::take_interrupt()
@@ -3142,7 +3140,7 @@ void z80_device::take_interrupt()
 	PRVPC = -1;
 
 	/* Check if processor was halted */
-	LEAVE_HALT();
+	leave_halt();
 
 	/* Clear both interrupt flip flops */
 	m_iff1 = m_iff2 = 0;
@@ -3161,8 +3159,8 @@ void z80_device::take_interrupt()
 	if( m_im == 2 )
 	{
 		irq_vector = (irq_vector & 0xff) | (m_i << 8);
-		PUSH(m_pc);
-		RM16(irq_vector, m_pc);
+		push(m_pc);
+		rm16(irq_vector, m_pc);
 		LOG(("Z80 '%s' IM2 [$%04x] = $%04x\n", tag(), irq_vector, PCD));
 		/* CALL opcode timing + 'interrupt latency' cycles */
 		m_icount -= m_cc_op[0xcd] + m_cc_ex[0xff];
@@ -3172,7 +3170,7 @@ void z80_device::take_interrupt()
 	if( m_im == 1 )
 	{
 		LOG(("Z80 '%s' IM1 $0038\n", tag()));
-		PUSH(m_pc);
+		push(m_pc);
 		PCD = 0x0038;
 		/* RST $38 + 'interrupt latency' cycles */
 		m_icount -= m_cc_op[0xff] + cc_ex[0xff];
@@ -3190,7 +3188,7 @@ void z80_device::take_interrupt()
 			switch (irq_vector & 0xff0000)
 			{
 				case 0xcd0000:  /* call */
-					PUSH(m_pc);
+					push(m_pc);
 					PCD = irq_vector & 0xffff;
 						/* CALL $xxxx cycles */
 					m_icount -= m_cc_op[0xcd];
@@ -3201,7 +3199,7 @@ void z80_device::take_interrupt()
 					m_icount -= m_cc_op[0xc3];
 					break;
 				default:        /* rst (or other opcodes?) */
-					PUSH(m_pc);
+					push(m_pc);
 					PCD = irq_vector & 0x0038;
 					/* RST $xx cycles */
 					m_icount -= m_cc_op[0xff];
@@ -3221,24 +3219,24 @@ void nsc800_device::take_interrupt_nsc800()
 	PRVPC = -1;
 
 	/* Check if processor was halted */
-	LEAVE_HALT();
+	leave_halt();
 
 	/* Clear both interrupt flip flops */
 	m_iff1 = m_iff2 = 0;
 
 	if (m_nsc800_irq_state[NSC800_RSTA])
 	{
-		PUSH(m_pc);
+		push(m_pc);
 		PCD = 0x003c;
 	}
 	else if (m_nsc800_irq_state[NSC800_RSTB])
 	{
-		PUSH(m_pc);
+		push(m_pc);
 		PCD = 0x0034;
 	}
 	else if (m_nsc800_irq_state[NSC800_RSTC])
 	{
-		PUSH(m_pc);
+		push(m_pc);
 		PCD = 0x002c;
 	}
 
@@ -3487,7 +3485,7 @@ void z80_device::execute_run()
 	{
 		LOG(("Z80 '%s' take NMI\n", tag()));
 		PRVPC = -1;            /* there isn't a valid previous program counter */
-		LEAVE_HALT();            /* Check if processor was halted */
+		leave_halt();            /* Check if processor was halted */
 
 #if HAS_LDAIR_QUIRK
 		/* reset parity flag after LD A,I or LD A,R */
@@ -3496,7 +3494,7 @@ void z80_device::execute_run()
 		m_after_ldair = FALSE;
 
 		m_iff1 = 0;
-		PUSH(m_pc);
+		push(m_pc);
 		PCD = 0x0066;
 		WZ=PCD;
 		m_icount -= 11;
@@ -3520,7 +3518,7 @@ void z80_device::execute_run()
 		PRVPC = PCD;
 		debugger_instruction_hook(this, PCD);
 		m_r++;
-		EXEC(op,ROP());
+		EXEC(op,rop());
 	} while (m_icount > 0);
 }
 
@@ -3533,10 +3531,10 @@ void nsc800_device::execute_run()
 	{
 		LOG(("Z80 '%s' take NMI\n", tag()));
 		PRVPC = -1;            /* there isn't a valid previous program counter */
-		LEAVE_HALT();            /* Check if processor was halted */
+		leave_halt();            /* Check if processor was halted */
 
 		m_iff1 = 0;
-		PUSH(m_pc);
+		push(m_pc);
 		PCD = 0x0066;
 		WZ=PCD;
 		m_icount -= 11;
@@ -3558,7 +3556,7 @@ void nsc800_device::execute_run()
 		PRVPC = PCD;
 		debugger_instruction_hook(this, PCD);
 		m_r++;
-		EXEC(op,ROP());
+		EXEC(op,rop());
 	} while (m_icount > 0);
 }
 
