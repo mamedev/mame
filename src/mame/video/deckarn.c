@@ -71,8 +71,20 @@ void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_i
 		y = 256 - y;
 		if (machine.driver_data()->flip_screen())
 		{
-			y = 240 - y;
-			x = 240 - x;
+			// workaround till all drivers using this device are updated to raw params
+			
+			if (cliprect.max_x == 32*8-1) //karnov.c
+			{
+				y = 240 - y;
+				x = 240 - x;
+			}
+			
+			else //dec8.c has been updated to raw params
+			{
+				y = 240 + 8 - y;
+				x = 240 + 74 - x;
+			}
+			
 			if (fx) fx = 0; else fx = 1;
 			if (fy) fy = 0; else fy = 1;
 			if (extra) y = y - 16;
