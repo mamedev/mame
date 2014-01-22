@@ -366,6 +366,38 @@ IRQ_CALLBACK_MEMBER(jaguar_state::jaguar_irq_callback)
 }
 
 
+/// HACK: Maximum force requests data but doesn't transfer it all before issuing another command.
+/// According to the ATA specification this is not allowed, more investigation is required.
+
+#include "machine/idehd.h"
+
+extern const device_type COJAG_HARDDISK;
+
+class cojag_hdd : public ide_hdd_device
+{
+public:
+	cojag_hdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: ide_hdd_device(mconfig, COJAG_HARDDISK, "cojag HDD", tag, owner, clock, "cojag_hdd", __FILE__)
+	{
+	}
+
+	virtual WRITE16_HANDLER(write_cs0)
+	{
+		// the first write is to the device head register
+		if( offset == 6 && (m_status & IDE_STATUS_DRQ))
+		{
+			m_status &= ~IDE_STATUS_DRQ;
+		}
+
+		ide_hdd_device::write_cs0(space, offset, data, mem_mask);
+	}
+};
+
+const device_type COJAG_HARDDISK = &device_creator<cojag_hdd>;
+
+SLOT_INTERFACE_START(cojag_devices)
+	SLOT_INTERFACE("hdd", COJAG_HARDDISK)
+SLOT_INTERFACE_END
 
 /*************************************
  *
@@ -1785,7 +1817,7 @@ static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", NULL, true)
+	MCFG_VT83C461_ADD("ide", cojag_devices, "hdd", NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(jaguar_state, external_int))
 
 	/* video hardware */
