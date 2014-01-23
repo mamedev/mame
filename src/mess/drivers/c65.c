@@ -60,10 +60,8 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 #include "bus/cbmiec/cbmiec.h"
 #include "machine/ram.h"
 
-static void cbm_c65_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )
+static void cbm_c65_quick_sethiaddress( address_space &space, UINT16 hiaddress )
 {
-	address_space &space = machine.firstcpu->space(AS_PROGRAM);
-
 	space.write_byte(0x82, hiaddress & 0xff);
 	space.write_byte(0x83, hiaddress >> 8);
 }

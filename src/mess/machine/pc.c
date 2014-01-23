@@ -229,19 +229,19 @@ static emu_timer    *pc_int_delay_timer;
 
 TIMER_CALLBACK_MEMBER(pc_state::pcjr_delayed_pic8259_irq)
 {
-	machine().firstcpu->set_input_line(0, param ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(pc_state::pcjr_pic8259_set_int_line)
 {
-	UINT32 pc = machine().firstcpu->pc();
+	UINT32 pc = m_maincpu->pc();
 	if ( (pc == 0xF0453) || (pc == 0xFF196) )
 	{
-		pc_int_delay_timer->adjust( machine().firstcpu->cycles_to_attotime(20), state );
+		pc_int_delay_timer->adjust( m_maincpu->cycles_to_attotime(20), state );
 	}
 	else
 	{
-		machine().firstcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -457,7 +457,7 @@ static struct {
 READ8_MEMBER(pc_state::pcjr_nmi_enable_r)
 {
 	pcjr_keyb.latch = 0;
-	machine().firstcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return nmi_enabled;
 }
 
@@ -511,7 +511,7 @@ static void pcjr_set_keyb_int(running_machine &machine, int state)
 
 		pcjr_keyb.latch = 1;
 	}
-	machine.firstcpu->set_input_line(INPUT_LINE_NMI, pcjr_keyb.latch && nmi_enabled);
+	drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI, pcjr_keyb.latch && nmi_enabled);
 }
 
 

@@ -157,10 +157,8 @@ ROM sockets:  UA3   2K or 4K character
 
 
 
-static void cbm_pet_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )
+static void cbm_pet_quick_sethiaddress( address_space &space, UINT16 hiaddress )
 {
-	address_space &space = machine.firstcpu->space(AS_PROGRAM);
-
 	space.write_byte(0x2e, hiaddress & 0xff);
 	space.write_byte(0x2c, hiaddress & 0xff);
 	space.write_byte(0x2a, hiaddress & 0xff);

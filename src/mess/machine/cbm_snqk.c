@@ -23,7 +23,7 @@
 
 
 int general_cbm_loadsnap( device_image_interface &image, const char *file_type, int snapshot_size,
-	address_space &space, offs_t offset, void (*cbm_sethiaddress)(running_machine &machine, UINT16 hiaddress) )
+	address_space &space, offs_t offset, void (*cbm_sethiaddress)(address_space &space, UINT16 hiaddress) )
 {
 	char buffer[7];
 	UINT8 *data = NULL;
@@ -80,7 +80,7 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 	for (i = 0; i < snapshot_size; i++)
 		space.write_byte(address + i + offset, data[i]);
 
-	cbm_sethiaddress(image.device().machine(), address + snapshot_size);
+	cbm_sethiaddress(space, address + snapshot_size);
 	free(data);
 	return IMAGE_INIT_PASS;
 
@@ -90,10 +90,8 @@ error:
 	return IMAGE_INIT_FAIL;
 }
 
-void cbm_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )
+void cbm_quick_sethiaddress( address_space &space, UINT16 hiaddress )
 {
-	address_space &space = machine.firstcpu->space(AS_PROGRAM);
-
 	space.write_byte(0x31, hiaddress & 0xff);
 	space.write_byte(0x2f, hiaddress & 0xff);
 	space.write_byte(0x2d, hiaddress & 0xff);

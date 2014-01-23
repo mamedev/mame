@@ -213,7 +213,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 	/* see if the PC matches */
 	if ((space.device().safe_pcbase() & 0x1fffffff) == m_speedup_pc)
 	{
-		UINT64 curr_cycles = machine().firstcpu->total_cycles();
+		UINT64 curr_cycles = m_maincpu->total_cycles();
 
 		/* if less than 50 cycles from the last time, count it */
 		if (curr_cycles - m_last_cycles < 50)

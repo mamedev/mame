@@ -366,7 +366,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 	UINT8 coin_out = 0x00;
 	UINT8 coin_optics = 0x00;
 	UINT8 door_optics = 0x00;
-	UINT32 curr_cycles = machine().firstcpu->total_cycles();
+	UINT32 curr_cycles = m_maincpu->total_cycles();
 
 	UINT8 in = 0x00;
 	UINT8 val = 0x00;
@@ -389,7 +389,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 			// Test for Coin-In
 			if ((ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && m_coin_state == 0) {
 				m_coin_state = 1; // Start Coin Cycle
-				m_last_cycles = machine().firstcpu->total_cycles();
+				m_last_cycles = m_maincpu->total_cycles();
 #if DEBUG_OUTPUT
 				mame_printf_info("coin=%02X\n", m_coin_state);
 #endif
@@ -399,7 +399,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 					m_coin_state++;
 					if (m_coin_state > 5)
 						m_coin_state = 0;
-					m_last_cycles = machine().firstcpu->total_cycles();
+					m_last_cycles = m_maincpu->total_cycles();
 #if DEBUG_OUTPUT
 					mame_printf_info("coin=%02X\n", m_coin_state);
 #endif
@@ -451,7 +451,7 @@ READ8_MEMBER(splus_state::splus_serial_r)
 					m_coin_out_state = 3; // Coin-Out On
 				}
 
-				m_last_coin_out = machine().firstcpu->total_cycles();
+				m_last_coin_out = m_maincpu->total_cycles();
 			}
 
 			// Set Coin Out State

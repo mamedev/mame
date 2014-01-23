@@ -233,7 +233,7 @@ const i8251_interface mc1502_i8251_interface =
 WRITE_LINE_MEMBER(mc1502_state::mc1502_i8251_syndet)
 {
 	if (!BIT(m_ppi_portc,3))
-		machine().firstcpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(mc1502_state::mc1502_pit8253_out1_changed)

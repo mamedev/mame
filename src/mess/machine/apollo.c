@@ -438,7 +438,7 @@ READ8_MEMBER(apollo_state::apollo_dma_read_byte){
 		offset &= 0x3ff;
 	}
 
-	data = machine().firstcpu->space(AS_PROGRAM).read_byte(page_offset + offset);
+	data = m_maincpu->space(AS_PROGRAM).read_byte(page_offset + offset);
 
 	if (VERBOSE > 1 || offset < 4 || (offset & 0xff) == 0 || (offset & 0xff) == 0xff)
 	{
@@ -458,7 +458,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_byte){
 		offset &= 0x3ff;
 	}
 	// FIXME: MSB not available, writing only LSB
-	machine().firstcpu->space(AS_PROGRAM).write_byte(page_offset + offset, data);
+	m_maincpu->space(AS_PROGRAM).write_byte(page_offset + offset, data);
 
 	if (VERBOSE > 1 || offset < 4 || (offset & 0xff) == 0 || (offset & 0xff) == 0xff)
 	{
@@ -481,7 +481,7 @@ READ8_MEMBER(apollo_state::apollo_dma_read_word){
 		offset = (offset << 1) & 0x3ff;
 	}
 
-	data = machine().firstcpu->space(AS_PROGRAM).read_byte(page_offset + offset);
+	data = m_maincpu->space(AS_PROGRAM).read_byte(page_offset + offset);
 
 	SLOG1(("dma read word at offset %x+%03x = %04x", page_offset, offset , data));
 	// FIXME: MSB will get lost
@@ -505,7 +505,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_word){
 		offset = (offset << 1) & 0x3ff;
 	}
 
-	machine().firstcpu->space(AS_PROGRAM).write_byte(page_offset + offset, data);
+	m_maincpu->space(AS_PROGRAM).write_byte(page_offset + offset, data);
 	SLOG1(("dma write word at offset %x+%03x = %02x", page_offset, offset, data));
 }
 
@@ -1293,11 +1293,11 @@ SLOT_INTERFACE_END
 
 
 void apollo_state::fdc_interrupt(bool state) {
-	apollo_pic_set_irq_line( machine().firstcpu, APOLLO_IRQ_FDC, state ? ASSERT_LINE : CLEAR_LINE);
+	apollo_pic_set_irq_line( m_maincpu, APOLLO_IRQ_FDC, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void apollo_state::fdc_dma_drq(bool state) {
-	apollo_dma_fdc_drq(machine().firstcpu, state);
+	apollo_dma_fdc_drq(m_maincpu, state);
 }
 
 /***************************************************************************
@@ -1306,7 +1306,7 @@ void apollo_state::fdc_dma_drq(bool state) {
 
 static void apollo_3c505_set_irq(device_t *device, int state) {
 	// DLOG2(("apollo_3c505_interrupt: state=%x", state ));
-	apollo_pic_set_irq_line(device->machine().firstcpu, APOLLO_IRQ_ETH1, state);
+	apollo_pic_set_irq_line(device->machine().driver_data<apollo_state>()->m_maincpu, APOLLO_IRQ_ETH1, state);
 }
 
 static int apollo_3c505_tx_data(device_t *device,
@@ -1350,7 +1350,7 @@ static THREECOM3C505_INTERFACE(apollo_3c505_config) = {
 static void apollo_wdc_set_irq(const running_machine *machine, int state) {
 //  FIXME:
 //  MLOG2(("apollo_wdc_set_irq: state=%x", state ));
-	apollo_pic_set_irq_line(machine->firstcpu, APOLLO_IRQ_WIN1, state);
+	apollo_pic_set_irq_line(machine->driver_data<apollo_state>()->m_maincpu, APOLLO_IRQ_WIN1, state);
 }
 
 static const omti8621_config apollo_wdc_config = {
@@ -1363,13 +1363,13 @@ static const omti8621_config apollo_wdc_config = {
 
 static void apollo_ctape_set_irq(const device_t *device, int state) {
 	DLOG2(("apollo_ctape_set_irq: state=%x", state ));
-	apollo_pic_set_irq_line(device->machine().firstcpu, APOLLO_IRQ_CTAPE, state);
+	apollo_pic_set_irq_line(device->machine().driver_data<apollo_state>()->m_maincpu, APOLLO_IRQ_CTAPE, state);
 }
 
 
 static void apollo_ctape_dma_drq(const device_t *device, int state) {
 	DLOG2(("apollo_ctape_dma_drq: state=%x", state ));
-	apollo_dma_ctape_drq(device->machine().firstcpu, state);
+	apollo_dma_ctape_drq(device->machine().driver_data<apollo_state>()->m_maincpu, state);
 }
 
 static const sc499_interface apollo_ctape_config = {

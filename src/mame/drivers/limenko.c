@@ -1076,9 +1076,9 @@ ROM_END
 
 READ32_MEMBER(limenko_state::dynabomb_speedup_r)
 {
-	if(machine().firstcpu->pc() == 0xc25b8)
+	if(m_maincpu->pc() == 0xc25b8)
 	{
-		machine().firstcpu->eat_cycles(50);
+		m_maincpu->eat_cycles(50);
 	}
 
 	return m_mainram[0xe2784/4];
@@ -1086,9 +1086,9 @@ READ32_MEMBER(limenko_state::dynabomb_speedup_r)
 
 READ32_MEMBER(limenko_state::legendoh_speedup_r)
 {
-	if(machine().firstcpu->pc() == 0x23e32)
+	if(m_maincpu->pc() == 0x23e32)
 	{
-		machine().firstcpu->eat_cycles(50);
+		m_maincpu->eat_cycles(50);
 	}
 
 	return m_mainram[0x32ab0/4];
@@ -1096,9 +1096,9 @@ READ32_MEMBER(limenko_state::legendoh_speedup_r)
 
 READ32_MEMBER(limenko_state::sb2003_speedup_r)
 {
-	if(machine().firstcpu->pc() == 0x26da4)
+	if(m_maincpu->pc() == 0x26da4)
 	{
-		machine().firstcpu->eat_cycles(50);
+		m_maincpu->eat_cycles(50);
 	}
 
 	return m_mainram[0x135800/4];
@@ -1106,9 +1106,9 @@ READ32_MEMBER(limenko_state::sb2003_speedup_r)
 
 READ32_MEMBER(limenko_state::spotty_speedup_r)
 {
-	if(machine().firstcpu->pc() == 0x8560)
+	if(m_maincpu->pc() == 0x8560)
 	{
-		machine().firstcpu->eat_cycles(50);
+		m_maincpu->eat_cycles(50);
 	}
 
 	return m_mainram[0x6626c/4];

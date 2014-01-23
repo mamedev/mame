@@ -681,7 +681,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
 {
-	address_space &space = machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int sample = m_audio->sample_r(space,0);
 	if (sample)
 		m_audio->sample_w(space,0,sample);
@@ -689,7 +689,7 @@ INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
 
 INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 {
-	address_space &space = machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int sample = m_audio->sample_r(space,0);
 	if (sample != 0x80)
 		m_audio->sample_w(space,0,sample);

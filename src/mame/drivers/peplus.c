@@ -647,7 +647,7 @@ READ8_MEMBER(peplus_state::peplus_input0_r)
         833.3 cycles per millisecond
         10 ms = 8333 cycles
 */
-	UINT64 curr_cycles = machine().firstcpu->total_cycles();
+	UINT64 curr_cycles = m_maincpu->total_cycles();
 
 	// Allow Bill Insert if DBV Enabled
 	if (m_bv_enable_state == 0x01 && ((ioport("DBV")->read_safe(0xff) & 0x01) == 0x00)) {
@@ -865,7 +865,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 	UINT8 bank_a = 0x50; // Turn Off Low Battery and Hopper Full Statuses
 	UINT8 coin_optics = 0x00;
 	UINT8 coin_out = 0x00;
-	UINT64 curr_cycles = machine().firstcpu->total_cycles();
+	UINT64 curr_cycles = m_maincpu->total_cycles();
 	UINT16 door_wait = 500;
 
 	UINT8 sda = 0;
@@ -876,14 +876,14 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 
 	if ((ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && m_coin_state == 0) {
 		m_coin_state = 1; // Start Coin Cycle
-		m_last_cycles = machine().firstcpu->total_cycles();
+		m_last_cycles = m_maincpu->total_cycles();
 	} else {
 		/* Process Next Coin Optic State */
 		if (curr_cycles - m_last_cycles > 600000/6 && m_coin_state != 0) {
 			m_coin_state++;
 			if (m_coin_state > 5)
 				m_coin_state = 0;
-			m_last_cycles = machine().firstcpu->total_cycles();
+			m_last_cycles = m_maincpu->total_cycles();
 		}
 	}
 
@@ -918,7 +918,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 		} else {
 			m_door_open = 1;
 		}
-		m_last_door = machine().firstcpu->total_cycles();
+		m_last_door = m_maincpu->total_cycles();
 	}
 
 	if (curr_cycles - m_last_coin_out > 600000/12 && m_coin_out_state != 0) { // Guessing with 600000
@@ -928,7 +928,7 @@ READ8_MEMBER(peplus_state::peplus_input_bank_a_r)
 			m_coin_out_state = 3; // Coin-Out On
 		}
 
-		m_last_coin_out = machine().firstcpu->total_cycles();
+		m_last_coin_out = m_maincpu->total_cycles();
 	}
 
 	switch (m_coin_out_state)
