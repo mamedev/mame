@@ -38,9 +38,10 @@ public:
 
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_ram(*this, "ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram") { }
 
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_hd46505_0_reg[18];
 	UINT8 m_hd46505_1_reg[18];
@@ -53,15 +54,26 @@ public:
 	DECLARE_READ8_MEMBER(tugboat_input_r);
 	DECLARE_READ8_MEMBER(tugboat_ctrl_r);
 	DECLARE_WRITE8_MEMBER(tugboat_ctrl_w);
+	virtual void driver_init();
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_tugboat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
+		int addr,int gfx0,int gfx1,int transparency);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
+
+void tugboat_state::driver_init()
+{
+	/*save_item(NAME(m_hd46505_0_reg));
+	save_item(NAME(m_hd46505_0_reg));
+	save_item(NAME(m_reg0));
+	save_item(NAME(m_reg1));
+	save_item(NAME(m_ctrl));*/
+}
 
 /*  there isn't the usual resistor array anywhere near the color prom,
     just four 1k resistors. */
@@ -108,17 +120,16 @@ WRITE8_MEMBER(tugboat_state::tugboat_score_w)
 		if (offset<0x8 ) m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
 }
 
-static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,
+void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		int addr,int gfx0,int gfx1,int transparency)
 {
-	tugboat_state *state = machine.driver_data<tugboat_state>();
 	int x,y;
 
 	for (y = 0;y < 32;y++)
 	{
 		for (x = 0;x < 32;x++)
 		{
-			int code = (state->m_ram[addr + 0x400] << 8) | state->m_ram[addr];
+			int code = (m_ram[addr + 0x400] << 8) | m_ram[addr];
 			int color = (code & 0x3c00) >> 10;
 			int rgn;
 
@@ -131,7 +142,7 @@ static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap,const re
 				rgn = gfx1;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[rgn],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[rgn],
 					code,
 					color,
 					0,0,
@@ -149,8 +160,8 @@ UINT32 tugboat_state::screen_update_tugboat(screen_device &screen, bitmap_ind16 
 	int startaddr1 = m_hd46505_1_reg[0x0c]*256 + m_hd46505_1_reg[0x0d];
 
 
-	draw_tilemap(machine(), bitmap,cliprect,startaddr0,0,1,FALSE);
-	draw_tilemap(machine(), bitmap,cliprect,startaddr1,2,3,TRUE);
+	draw_tilemap(bitmap,cliprect,startaddr0,0,1,FALSE);
+	draw_tilemap(bitmap,cliprect,startaddr1,2,3,TRUE);
 	return 0;
 }
 
@@ -195,7 +206,7 @@ void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void tugboat_state::machine_reset()
 {
-	timer_set(m_screen->time_until_pos(30*8+4), TIMER_INTERRUPT);
+	timer_set(m_screen->time_until_pos(0), TIMER_INTERRUPT);
 }
 
 
