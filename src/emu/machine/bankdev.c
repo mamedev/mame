@@ -84,11 +84,6 @@ void address_map_bank_device::device_start()
 	save_item(NAME(m_offset));
 }
 
-void address_map_bank_device::device_reset()
-{
-	m_offset = 0;
-}
-
 void address_map_bank_device::set_bank(offs_t bank)
 {
 	m_offset = bank * m_stride;
