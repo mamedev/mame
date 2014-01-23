@@ -146,10 +146,10 @@ public:
 				break;
 
 			case MMU_MODE_TEST:
-				m_bank1->set_bank(0x04 + 0x100);
-				m_bank2->set_bank(0x10 + 0x100);
-				m_bank3->set_bank(0x20 + 0x100);
-				m_bank4->set_bank(0x30 + 0x100);
+				m_bank1->set_bank(0x04 + 0x200);
+				m_bank2->set_bank(0x10 + 0x200);
+				m_bank3->set_bank(0x20 + 0x200);
+				m_bank4->set_bank(0x30 + 0x200);
 				break;
 			}
 		}
@@ -439,13 +439,16 @@ static NVRAM_HANDLER( clcd )
 }
 
 static ADDRESS_MAP_START( clcd_banked_mem, AS_PROGRAM, 8, clcd_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("maincpu",0)
-	AM_RANGE(0x41000, 0x43fff) AM_READ(mmu_offset1_r)
-	AM_RANGE(0x44000, 0x47fff) AM_READ(mmu_offset2_r)
-	AM_RANGE(0x48000, 0x4bfff) AM_READ(mmu_offset3_r)
-	AM_RANGE(0x4c000, 0x4dfff) AM_READ(mmu_offset4_r)
-	AM_RANGE(0x4e000, 0x4f7ff) AM_READ(mmu_offset5_r)
+	/* KERN/APPL/RAM */
+	AM_RANGE(0x00000, 0x1ffff) AM_MIRROR(0x40000) AM_READWRITE(ram_r, ram_w)
+	AM_RANGE(0x20000, 0x3ffff) AM_MIRROR(0x40000) AM_ROM AM_REGION("maincpu",0)
+
+	/* TEST */
+	AM_RANGE(0x81000, 0x83fff) AM_READ(mmu_offset1_r)
+	AM_RANGE(0x84000, 0x87fff) AM_READ(mmu_offset2_r)
+	AM_RANGE(0x88000, 0x8bfff) AM_READ(mmu_offset3_r)
+	AM_RANGE(0x8c000, 0x8dfff) AM_READ(mmu_offset4_r)
+	AM_RANGE(0x8e000, 0x8f7ff) AM_READ(mmu_offset5_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
