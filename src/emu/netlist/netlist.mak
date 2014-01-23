@@ -34,7 +34,12 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/analog/nld_switches.o \
 	$(NETLISTOBJ)/analog/nld_twoterm.o \
 	$(NETLISTOBJ)/devices/nld_7400.o \
+	$(NETLISTOBJ)/devices/nld_7402.o \
 	$(NETLISTOBJ)/devices/nld_7404.o \
+	$(NETLISTOBJ)/devices/nld_7410.o \
+	$(NETLISTOBJ)/devices/nld_7420.o \
+	$(NETLISTOBJ)/devices/nld_7425.o \
+	$(NETLISTOBJ)/devices/nld_7427.o \
 	$(NETLISTOBJ)/devices/nld_7474.o \
 	$(NETLISTOBJ)/devices/nld_7483.o \
 	$(NETLISTOBJ)/devices/nld_7486.o \

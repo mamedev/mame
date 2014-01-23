@@ -11,7 +11,7 @@
  *       NC |3           12| C2
  *       C1 |4    7420   11| NC
  *       D1 |5           10| B2
- *       Y! |6            9| A2
+ *       Y1 |6            9| A2
  *      GND |7            8| Y2
  *          +--------------+
  *                  ____
@@ -44,5 +44,14 @@
 
 
 NETLIB_SIGNAL(7420, 4, 0, 0);
+
+#define TTL_7420_DIP(_name)                                                         \
+        NET_REGISTER_DEV(7420_dip, _name)
+
+NETLIB_DEVICE(7420_dip,
+
+    NETLIB_NAME(7420) m_1;
+    NETLIB_NAME(7420) m_2;
+);
 
 #endif /* NLD_7420_H_ */
