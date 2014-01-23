@@ -507,8 +507,8 @@ READ8_MEMBER( mc6843_device::read )
 	{
 		int cmd = m_CMR & 0x0f;
 
-		LOG(( "%f $%04x mc6843_r: data input cmd=%s(%i), pos=%i/%i, GCR=%i, ",
-				machine().time().as_double(), machine().firstcpu->pcbase( ),
+		LOG(( "%f %s mc6843_r: data input cmd=%s(%i), pos=%i/%i, GCR=%i, ",
+				machine().time().as_double(), machine().describe_context(),
 				mc6843_cmd[cmd], cmd, m_data_idx,
 				m_data_size, m_GCR ));
 
@@ -561,7 +561,7 @@ READ8_MEMBER( mc6843_device::read )
 		{
 			/* XXX TODO: other read modes */
 			data = m_data[0];
-			logerror( "$%04x mc6843 read in unsupported command mode %i\n", machine().firstcpu->pcbase( ), cmd );
+			logerror( "%s mc6843 read in unsupported command mode %i\n", machine().describe_context(), cmd );
 		}
 
 		LOG(( "data=%02X\n", data ));
@@ -571,15 +571,15 @@ READ8_MEMBER( mc6843_device::read )
 
 	case 1: /* Current-Track Address Register (CTAR) */
 		data = m_CTAR;
-		LOG(( "%f $%04x mc6843_r: read CTAR %i (actual=%i)\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ), data,
+		LOG(( "%f %s mc6843_r: read CTAR %i (actual=%i)\n",
+				machine().time().as_double(), machine().describe_context(), data,
 				floppy_drive_get_current_track( floppy_image( ) ) ));
 		break;
 
 	case 2: /* Interrupt Status Register (ISR) */
 		data = m_ISR;
-		LOG(( "%f $%04x mc6843_r: read ISR %02X: cmd=%scomplete settle=%scomplete sense-rq=%i STRB=%i\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ), data,
+		LOG(( "%f %s mc6843_r: read ISR %02X: cmd=%scomplete settle=%scomplete sense-rq=%i STRB=%i\n",
+				machine().time().as_double(), machine().describe_context(), data,
 				(data & 1) ? "" : "not-" , (data & 2) ? "" : "not-",
 				(data >> 2) & 1, (data >> 3) & 1 ));
 
@@ -604,8 +604,8 @@ READ8_MEMBER( mc6843_device::read )
 			m_STRA |= 0x40;
 
 		data = m_STRA;
-		LOG(( "%f $%04x mc6843_r: read STRA %02X: data-rq=%i del-dta=%i ready=%i t0=%i wp=%i trk-dif=%i idx=%i busy=%i\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ), data,
+		LOG(( "%f %s mc6843_r: read STRA %02X: data-rq=%i del-dta=%i ready=%i t0=%i wp=%i trk-dif=%i idx=%i busy=%i\n",
+				machine().time().as_double(), machine().describe_context(), data,
 				data & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1,
 				(data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 ));
 		break;
@@ -613,8 +613,8 @@ READ8_MEMBER( mc6843_device::read )
 
 	case 4: /* Status Register B (STRB) */
 		data = m_STRB;
-		LOG(( "%f $%04x mc6843_r: read STRB %02X: data-err=%i CRC-err=%i dta--mrk-err=%i sect-mrk-err=%i seek-err=%i fi=%i wr-err=%i hard-err=%i\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ), data,
+		LOG(( "%f %s mc6843_r: read STRB %02X: data-err=%i CRC-err=%i dta--mrk-err=%i sect-mrk-err=%i seek-err=%i fi=%i wr-err=%i hard-err=%i\n",
+				machine().time().as_double(), machine().describe_context(), data,
 				data & 1, (data >> 1) & 1, (data >> 2) & 1, (data >> 3) & 1,
 				(data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1 ));
 
@@ -625,13 +625,13 @@ READ8_MEMBER( mc6843_device::read )
 
 	case 7: /* Logical-Track Address Register (LTAR) */
 		data = m_LTAR;
-		LOG(( "%f $%04x mc6843_r: read LTAR %i (actual=%i)\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ), data,
+		LOG(( "%f %s mc6843_r: read LTAR %i (actual=%i)\n",
+				machine().time().as_double(), machine().describe_context(), data,
 				floppy_drive_get_current_track( floppy_image( ) ) ));
 		break;
 
 	default:
-		logerror( "$%04x mc6843 invalid read offset %i\n", machine().firstcpu->pcbase( ), offset );
+		logerror( "%s mc6843 invalid read offset %i\n", machine().describe_context(), offset );
 	}
 
 	return data;
@@ -645,8 +645,8 @@ WRITE8_MEMBER( mc6843_device::write )
 		int cmd = m_CMR & 0x0f;
 		int FWF = (m_CMR >> 4) & 1;
 
-		LOG(( "%f $%04x mc6843_w: data output cmd=%s(%i), pos=%i/%i, GCR=%i, data=%02X\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ),
+		LOG(( "%f %s mc6843_w: data output cmd=%s(%i), pos=%i/%i, GCR=%i, data=%02X\n",
+				machine().time().as_double(), machine().describe_context(),
 				mc6843_cmd[cmd], cmd, m_data_idx,
 				m_data_size, m_GCR, data ));
 
@@ -663,7 +663,7 @@ WRITE8_MEMBER( mc6843_device::write )
 				/* end of sector write */
 				device_t* img = floppy_image( );
 
-				LOG(( "%f $%04x mc6843_w: write sector %i\n", machine().time().as_double(), machine().firstcpu->pcbase( ), m_data_id ));
+				LOG(( "%f %s mc6843_w: write sector %i\n", machine().time().as_double(), machine().describe_context(), m_data_id ));
 
 				floppy_drive_write_sector_data(
 					img, m_side, m_data_id,
@@ -727,7 +727,7 @@ WRITE8_MEMBER( mc6843_device::write )
 					UINT8 track  = m_data[1];
 					UINT8 sector = m_data[3];
 					UINT8 filler = 0xe5; /* standard Thomson filler */
-					LOG(( "%f $%04x mc6843_w: address id detected track=%i sector=%i\n", machine().time().as_double(), machine().firstcpu->pcbase( ), track, sector));
+					LOG(( "%f %s mc6843_w: address id detected track=%i sector=%i\n", machine().time().as_double(), machine().describe_context(), track, sector));
 					floppy_drive_format_sector( img, m_side, sector, track, 0, sector, 0, filler );
 				}
 				else
@@ -749,15 +749,15 @@ WRITE8_MEMBER( mc6843_device::write )
 		else
 		{
 			/* XXX TODO: other write modes */
-			logerror( "$%04x mc6843 write %02X in unsupported command mode %i (FWF=%i)\n", machine().firstcpu->pcbase( ), data, cmd, FWF );
+			logerror( "%s mc6843 write %02X in unsupported command mode %i (FWF=%i)\n", machine().describe_context(), data, cmd, FWF );
 		}
 		break;
 	}
 
 	case 1: /* Current-Track Address Register (CTAR) */
 		m_CTAR = data;
-		LOG(( "%f $%04x mc6843_w: set CTAR to %i %02X (actual=%i) \n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ), m_CTAR, data,
+		LOG(( "%f %s mc6843_w: set CTAR to %i %02X (actual=%i) \n",
+				machine().time().as_double(), machine().describe_context(), m_CTAR, data,
 				floppy_drive_get_current_track( floppy_image( ) ) ));
 		break;
 
@@ -765,8 +765,8 @@ WRITE8_MEMBER( mc6843_device::write )
 	{
 		int cmd = data & 15;
 
-		LOG(( "%f $%04x mc6843_w: set CMR to $%02X: cmd=%s(%i) FWF=%i DMA=%i ISR3-intr=%i fun-intr=%i\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ),
+		LOG(( "%f %s mc6843_w: set CMR to $%02X: cmd=%s(%i) FWF=%i DMA=%i ISR3-intr=%i fun-intr=%i\n",
+				machine().time().as_double(), machine().describe_context(),
 				data, mc6843_cmd[cmd], cmd, (data >> 4) & 1, (data >> 5) & 1,
 				(data >> 6) & 1, (data >> 7) & 1 ));
 
@@ -812,36 +812,36 @@ WRITE8_MEMBER( mc6843_device::write )
 		m_SUR = data;
 
 		/* assume CLK freq = 1MHz (IBM 3740 compatibility) */
-		LOG(( "%f $%04x mc6843_w: set SUR to $%02X: head settling time=%fms, track-to-track seek time=%f\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ),
+		LOG(( "%f %s mc6843_w: set SUR to $%02X: head settling time=%fms, track-to-track seek time=%f\n",
+				machine().time().as_double(), machine().describe_context(),
 				data, 4.096 * (data & 15), 1.024 * ((data >> 4) & 15) ));
 		break;
 
 	case 4: /* Sector Address Register (SAR) */
 		m_SAR = data & 0x1f;
-		LOG(( "%f $%04x mc6843_w: set SAR to %i (%02X)\n", machine().time().as_double(), machine().firstcpu->pcbase( ), m_SAR, data ));
+		LOG(( "%f %s mc6843_w: set SAR to %i (%02X)\n", machine().time().as_double(), machine().describe_context(), m_SAR, data ));
 		break;
 
 	case 5: /* General Count Register (GCR) */
 		m_GCR = data & 0x7f;
-		LOG(( "%f $%04x mc6843_w: set GCR to %i (%02X)\n", machine().time().as_double(), machine().firstcpu->pcbase( ), m_GCR, data ));
+		LOG(( "%f %s mc6843_w: set GCR to %i (%02X)\n", machine().time().as_double(), machine().describe_context(), m_GCR, data ));
 		break;
 
 	case 6: /* CRC Control Register (CCR) */
 		m_CCR = data & 3;
-		LOG(( "%f $%04x mc6843_w: set CCR to %02X: CRC=%s shift=%i\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ), data,
+		LOG(( "%f %s mc6843_w: set CCR to %02X: CRC=%s shift=%i\n",
+				machine().time().as_double(), machine().describe_context(), data,
 				(data & 1) ? "enabled" : "disabled", (data >> 1) & 1 ));
 		break;
 
 	case 7: /* Logical-Track Address Register (LTAR) */
 		m_LTAR = data & 0x7f;
-		LOG(( "%f $%04x mc6843_w: set LTAR to %i %02X (actual=%i)\n",
-				machine().time().as_double(), machine().firstcpu->pcbase( ), m_LTAR, data,
+		LOG(( "%f %s mc6843_w: set LTAR to %i %02X (actual=%i)\n",
+				machine().time().as_double(), machine().describe_context(), m_LTAR, data,
 				floppy_drive_get_current_track( floppy_image( ) ) ));
 		break;
 
 	default:
-		logerror( "$%04x mc6843 invalid write offset %i (data=$%02X)\n", machine().firstcpu->pcbase( ), offset, data );
+		logerror( "%s mc6843 invalid write offset %i (data=$%02X)\n", machine().describe_context(), offset, data );
 	}
 }

@@ -525,12 +525,12 @@ READ8_MEMBER( mea8000_device::read )
 	case 1:
 		/* ready to accept next frame */
 #if 0
-		LOG(("$%04x %f: mea8000_r ready=%i\n", machine().firstcpu->pcbase(), machine().time().as_double(), accept_byte()));
+		LOG(("%s %f: mea8000_r ready=%i\n", machine().describe_context(), machine().time().as_double(), accept_byte()));
 #endif
 		return accept_byte() << 7;
 
 	default:
-		logerror("$%04x mea8000_r invalid read offset %i\n", machine().firstcpu->pcbase(), offset);
+		logerror("%s mea8000_r invalid read offset %i\n", machine().describe_context(), offset);
 	}
 	return 0;
 }
@@ -544,19 +544,19 @@ WRITE8_MEMBER( mea8000_device::write )
 		{
 			/* got pitch byte before first frame */
 			m_pitch = 2 * data;
-			LOG(("$%04x %f: mea8000_w pitch %i\n", machine().firstcpu->pcbase(), machine().time().as_double(), m_pitch));
+			LOG(("%s %f: mea8000_w pitch %i\n", machine().describe_context(), machine().time().as_double(), m_pitch));
 			m_state = MEA8000_WAIT_FIRST;
 			m_bufpos = 0;
 		}
 		else if (m_bufpos == 4)
 		{
 			/* overflow */
-			LOG(("$%04x %f: mea8000_w data overflow %02X\n", machine().firstcpu->pcbase(), machine().time().as_double(), data));
+			LOG(("%s %f: mea8000_w data overflow %02X\n", machine().describe_context(), machine().time().as_double(), data));
 		}
 		else
 		{
 			/* enqueue frame byte */
-			LOG(("$%04x %f: mea8000_w data %02X in frame pos %i\n", machine().firstcpu->pcbase(), machine().time().as_double(),
+			LOG(("%s %f: mea8000_w data %02X in frame pos %i\n", machine().describe_context(), machine().time().as_double(),
 					data, m_bufpos));
 			m_buf[m_bufpos] = data;
 			m_bufpos++;
@@ -589,8 +589,8 @@ WRITE8_MEMBER( mea8000_device::write )
 		if (stop)
 			stop_frame();
 
-		LOG(( "$%04x %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
-				machine().firstcpu->pcbase(), machine().time().as_double(), data,
+		LOG(( "%s %f: mea8000_w command %02X stop=%i cont=%i roe=%i\n",
+				machine().describe_context(), machine().time().as_double(), data,
 				stop, m_cont, m_roe));
 
 		update_req();
@@ -598,6 +598,6 @@ WRITE8_MEMBER( mea8000_device::write )
 	}
 
 	default:
-		logerror( "$%04x mea8000_w invalid write offset %i\n", machine().firstcpu->pcbase( ), offset);
+		logerror( "%s mea8000_w invalid write offset %i\n", machine().describe_context(), offset);
 	}
 }

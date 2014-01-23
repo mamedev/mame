@@ -834,8 +834,8 @@ READ8_MEMBER( mc6854_device::read )
 	{
 	case 0: /* status register 1 */
 		update_sr1( );
-		LOG(( "%f $%04x mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n",
-				space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), m_sr1,
+		LOG(( "%f %s mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n",
+				space.machine().time().as_double(), machine().describe_context(), m_sr1,
 				( m_sr1 & RDA) ? 1 : 0, ( m_sr1 & S2RQ) ? 1 : 0,
 				( m_sr1 & FD ) ? 1 : 0, ( m_sr1 & CTS ) ? 1 : 0,
 				( m_sr1 & TU ) ? 1 : 0, ( m_sr1 & TDRA) ? 1 : 0,
@@ -844,8 +844,8 @@ READ8_MEMBER( mc6854_device::read )
 
 	case 1: /* status register 2 */
 		update_sr2( );
-		LOG(( "%f $%04x mc6854_r: get SR2=$%02X (ap=%i,fv=%i,ridle=%i,rabt=%i,err=%i,dcd=%i,ovrn=%i,rda2=%i)\n",
-				space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), m_sr2,
+		LOG(( "%f %s mc6854_r: get SR2=$%02X (ap=%i,fv=%i,ridle=%i,rabt=%i,err=%i,dcd=%i,ovrn=%i,rda2=%i)\n",
+				space.machine().time().as_double(), machine().describe_context(), m_sr2,
 				( m_sr2 & AP   ) ? 1 : 0, ( m_sr2 & FV  ) ? 1 : 0,
 				( m_sr2 & RIDLE) ? 1 : 0, ( m_sr2 & RABT) ? 1 : 0,
 				( m_sr2 & ERR  ) ? 1 : 0, ( m_sr2 & DCD ) ? 1 : 0,
@@ -856,13 +856,13 @@ READ8_MEMBER( mc6854_device::read )
 	case 3:
 	{
 		UINT8 data = rfifo_pop( );
-		LOG(( "%f $%04x mc6854_r: get data $%02X\n",
-				space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), data ));
+		LOG(( "%f %s mc6854_r: get data $%02X\n",
+				space.machine().time().as_double(), machine().describe_context(), data ));
 		return data;
 	}
 
 	default:
-		logerror( "$%04x mc6854 invalid read offset %i\n", space.machine().firstcpu->pcbase( ), offset );
+		logerror( "%s mc6854 invalid read offset %i\n", machine().describe_context(), offset );
 	}
 	return 0;
 }
@@ -875,16 +875,16 @@ WRITE8_MEMBER( mc6854_device::write )
 	{
 	case 0: /* control register 1 */
 		m_cr1 = data;
-		LOG(( "%f $%04x mc6854_w: set CR1=$%02X (ac=%i,irq=%c%c,%sreset=%c%c)\n",
-				space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), m_cr1,
+		LOG(( "%f %s mc6854_w: set CR1=$%02X (ac=%i,irq=%c%c,%sreset=%c%c)\n",
+				space.machine().time().as_double(), machine().describe_context(), m_cr1,
 				AC ? 1 : 0,
 				RIE ? 'r' : '-', TIE ? 't' : '-',
 				DISCONTINUE ? "discontinue," : "",
 				RRESET ? 'r' : '-', TRESET ? 't' : '-'
 				));
 		if ( m_cr1 & 0xc )
-			logerror( "$%04x mc6854 DMA not handled (CR1=$%02X)\n",
-					space.machine().firstcpu->pcbase( ), m_cr1 );
+			logerror( "%s mc6854 DMA not handled (CR1=$%02X)\n",
+					machine().describe_context(), m_cr1 );
 		if ( DISCONTINUE )
 		{
 			/* abort receive FIFO but keeps shift register & synchro */
@@ -912,16 +912,16 @@ WRITE8_MEMBER( mc6854_device::write )
 		{
 			/* control register 3 */
 			m_cr3 = data;
-			LOG(( "%f $%04x mc6854_w: set CR3=$%02X (lcf=%i,aex=%i,idl=%i,fdse=%i,loop=%i,tst=%i,dtr=%i)\n",
-					space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), m_cr3,
+			LOG(( "%f %s mc6854_w: set CR3=$%02X (lcf=%i,aex=%i,idl=%i,fdse=%i,loop=%i,tst=%i,dtr=%i)\n",
+					space.machine().time().as_double(), machine().describe_context(), m_cr3,
 					LCF ? (CEX ? 16 : 8) : 0,  AEX ? 1 : 0,
 					IDL0 ? 0 : 1, FDSE ? 1 : 0, LOOP ? 1 : 0,
 					TST ? 1 : 0, DTR ? 1 : 0
 					));
 			if ( LOOP )
-				logerror( "$%04x mc6854 loop mode not handled (CR3=$%02X)\n", space.machine().firstcpu->pcbase( ), m_cr3 );
+				logerror( "%s mc6854 loop mode not handled (CR3=$%02X)\n", machine().describe_context(), m_cr3 );
 			if ( TST )
-				logerror( "$%04x mc6854 test mode not handled (CR3=$%02X)\n", space.machine().firstcpu->pcbase( ), m_cr3 );
+				logerror( "%s mc6854 test mode not handled (CR3=$%02X)\n", machine().describe_context(), m_cr3 );
 
 			m_out_dtr_func( DTR ? 1 : 0 );
 
@@ -930,14 +930,14 @@ WRITE8_MEMBER( mc6854_device::write )
 		{
 			/* control register 2 */
 			m_cr2 = data;
-			LOG(( "%f $%04x mc6854_w: set CR2=$%02X (pse=%i,bytes=%i,fmidle=%i,%s,tlast=%i,clr=%c%c,rts=%i)\n",
-					space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), m_cr2,
+			LOG(( "%f %s mc6854_w: set CR2=$%02X (pse=%i,bytes=%i,fmidle=%i,%s,tlast=%i,clr=%c%c,rts=%i)\n",
+					space.machine().time().as_double(), machine().describe_context(), m_cr2,
 					PSE ? 1 : 0,  TWOBYTES ? 2 : 1,  FMIDLE ? 1 : 0,
 					FCTDRA ? "fc" : "tdra", TLAST ? 1 : 0,
 					data & 0x20 ? 'r' : '-',  data & 0x40 ? 't' : '-',
 					RTS ? 1 : 0 ));
 			if ( PSE )
-				logerror( "$%04x mc6854 status prioritization not handled (CR2=$%02X)\n", space.machine().firstcpu->pcbase( ), m_cr2 );
+				logerror( "%s mc6854 status prioritization not handled (CR2=$%02X)\n", machine().describe_context(), m_cr2 );
 			if ( TLAST )
 				tfifo_terminate( );
 			if ( data & 0x20 )
@@ -961,7 +961,7 @@ WRITE8_MEMBER( mc6854_device::write )
 		break;
 
 	case 2: /* transmitter data: continue data */
-		LOG(( "%f $%04xmc6854_w: push data=$%02X\n", space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), data ));
+		LOG(( "%f %smc6854_w: push data=$%02X\n", space.machine().time().as_double(), machine().describe_context(), data ));
 		tfifo_push( data );
 		break;
 
@@ -970,7 +970,7 @@ WRITE8_MEMBER( mc6854_device::write )
 		{
 			/* control register 4 */
 			m_cr4 = data;
-			LOG(( "%f $%04x mc6854_w: set CR4=$%02X (interframe=%i,tlen=%i,rlen=%i,%s%s)\n", space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), m_cr4,
+			LOG(( "%f %s mc6854_w: set CR4=$%02X (interframe=%i,tlen=%i,rlen=%i,%s%s)\n", space.machine().time().as_double(), machine().describe_context(), m_cr4,
 					TWOINTER ? 2 : 1,
 					TWL, RWL,
 					ABT ? ( ABTEX ? "abort-ext," : "abort,") : "",
@@ -985,14 +985,14 @@ WRITE8_MEMBER( mc6854_device::write )
 		else
 		{
 			/* transmitter data: last data */
-			LOG(( "%f $%04x mc6854_w: push last-data=$%02X\n", space.machine().time().as_double(), space.machine().firstcpu->pcbase( ), data ));
+			LOG(( "%f %s mc6854_w: push last-data=$%02X\n", space.machine().time().as_double(), machine().describe_context(), data ));
 			tfifo_push( data );
 			tfifo_terminate( );
 		}
 		break;
 
 	default:
-		logerror( "$%04x mc6854 invalid write offset %i (data=$%02X)\n", space.machine().firstcpu->pcbase( ), offset, data );
+		logerror( "%s mc6854 invalid write offset %i (data=$%02X)\n", machine().describe_context(), offset, data );
 	}
 }
 
