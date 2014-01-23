@@ -25,6 +25,17 @@
 		</part>
 	</software>
 
+	<software name="basic" supported="yes">
+		<description>APF Basic</description>
+		<year>1979</year>
+		<publisher>APF</publisher>
+		<part name="cart" interface="apfm1000_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="basic_80.rom" size="8192" crc="a4c69fae" sha1="7f98aa482589bf7c5a26d338fec105e797ba43f6" offset="0" />
+				<rom name="basic_68.rom" size="4096" crc="ef049ab8" sha1="c4c12aade95dd89a4750fe7f89d57256c93da068" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="blckjack" supported="no">
 		<description>Blackjack</description>
 		<year>1979</year>
