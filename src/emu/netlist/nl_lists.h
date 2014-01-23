@@ -102,6 +102,16 @@ public:
 		return false;
 	}
 
+    ATTR_HOT inline int indexof(const _ListClass &elem) const
+    {
+        for (int i = 0; i < m_count; i++)
+        {
+            if (m_list[i] == elem)
+                return i;
+        }
+        return -1;
+    }
+
 	ATTR_HOT inline const _ListClass *first() const { return ((m_count > 0) ? &m_list[0] : NULL ); }
 	ATTR_HOT inline const _ListClass *next(const _ListClass *lc) const { return ((lc < last()) ? lc + 1 : NULL ); }
 	ATTR_HOT inline const _ListClass *last() const { return &m_list[m_count -1]; }

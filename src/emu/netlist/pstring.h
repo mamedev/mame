@@ -120,8 +120,8 @@ public:
 	//
 	inline int len() const { return m_ptr->len(); }
 
-	inline bool equals(const pstring &string) { return (pcmp(string.cstr(), m_ptr->str()) == 0); }
-	inline bool iequals(const pstring &string) { return (pcmpi(string.cstr(), m_ptr->str()) == 0); }
+	inline bool equals(const pstring &string) const { return (pcmp(string.cstr(), m_ptr->str()) == 0); }
+	inline bool iequals(const pstring &string) const { return (pcmpi(string.cstr(), m_ptr->str()) == 0); }
 
 	inline int cmp(const pstring &string) const { return pcmp(string.cstr()); }
 	inline int cmpi(const pstring &string) const { return pcmpi(cstr(), string.cstr()); }
