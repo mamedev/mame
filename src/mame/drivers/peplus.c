@@ -3558,6 +3558,20 @@ ROM_START( peps0207 ) /* Normal board : Red White & Blue Slots (PS0207) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
+ROM_START( peps0296 ) /* Normal board : Haywire (PS0296) */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps0296_561-959.u68",   0x00000, 0x10000, CRC(da871550) SHA1(99e7a4fc77731b185751622ba2e08a44ad8eb7f9) ) /* 3 Coins Max / 1 Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1220.u72",   0x00000, 0x8000, CRC(ad101bc1) SHA1(64d801522d32c35ac0fd359a9b1ca51dfe2e7467) )
+	ROM_LOAD( "mgo-cg1220.u73",   0x08000, 0x8000, CRC(22b64f11) SHA1(39f350433fc2c96b3848d5af3cc106290b7540c9) )
+	ROM_LOAD( "mbo-cg1220.u74",   0x10000, 0x8000, CRC(8ba1ddb3) SHA1(d5d8621b14ed4873cb1343b97202a1536763eee8) )
+	ROM_LOAD( "mxo-cg1220.u75",   0x18000, 0x8000, CRC(07bc5413) SHA1(fcba1b60a2eb6bba4f7bb5ef3e67ff23dd036bf5) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1228.u50", 0x0000, 0x0100, CRC(e15b6db9) SHA1(3c637d1ff95a34bfa0259f7fe74989535b2b3a25) )
+ROM_END
+
 ROM_START( peps0298 ) /* Normal board : Double Diamond Slots (PS0298) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0298_569-a2c.u68",   0x00000, 0x10000, CRC(3af2eb50) SHA1(1b2e1036f78658da3821bcf88a48b5068b2421b2) ) /* 5 Coins Max / 5 Lines */
@@ -6500,7 +6514,7 @@ ROM_END
 
 ROM_START( pexmp030 ) /* Superboard : 5-in-1 Wingboard (XMP00030) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xmp00030.u67",   0x00000, 0x10000, CRC(da3fcb6f) SHA1(114e581e5ebb5c40c3f3da2784122d3281f269ee) )
+	ROM_LOAD( "xmp00030.u67",   0x00000, 0x10000, CRC(da3fcb6f) SHA1(114e581e5ebb5c40c3f3da2784122d3281f269ee) ) /*  11/12/00   @ IGT  L01-0197  */ 
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002066p.u66",   0x00000, 0x10000, CRC(01236011) SHA1(3edfee014705b3540386c5e42026ab93628b2597) ) /* Double Double Bonus Poker */
@@ -6652,6 +6666,7 @@ GAMEL(1996, peps0047, 0,        peplus, peplus_slots, peplus_state, peplus,   RO
 GAMEL(1996, peps0092, peps0047, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0092) Wild Cherry Slots",             GAME_NOT_WORKING, layout_pe_slots ) /* Needs MxO-CG1004.Uxx graphics roms redumped */
 GAMEL(1996, peps0206, peps0021, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0206) Red White & Blue Slots",        0, layout_pe_slots )
 GAMEL(1996, peps0207, peps0021, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0207) Red White & Blue Slots",        0, layout_pe_slots )
+GAMEL(1996, peps0296, 0,        peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0296) Haywire",                       0, layout_pe_slots )
 GAMEL(1996, peps0298, peps0042, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0298) Double Diamond Slots",          0, layout_pe_slots )
 GAMEL(1996, peps0308, 0,        peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",          0, layout_pe_slots )
 GAMEL(1996, peps0364, peps0021, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0364) Red White & Blue Slots",        0, layout_pe_slots )
