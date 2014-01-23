@@ -16,6 +16,7 @@
 #include "machine/mos6551.h"
 #include "machine/ram.h"
 #include "rendlay.h"
+#include "mcfglgcy.h"
 
 class clcd_state : public driver_device
 {
@@ -59,15 +60,22 @@ public:
 		SET_TILE_INFO_MEMBER(0, code & 0x7f, ( code & 0x80 ) >> 7, 0);
 	}
 
-	virtual void machine_start()
+	virtual void driver_start()
 	{
-		// HACK: allow this to boot up
-		UINT8 *ROM = memregion("maincpu")->base();
-		ROM[0x185bb] = 0xea;
-		ROM[0x185bc] = 0xea;
-
 		m_mmu_mode = MMU_MODE_TEST;
 		update_mmu_mode(MMU_MODE_KERN);
+
+		save_item(NAME(m_mmu_mode));
+		save_item(NAME(m_mmu_saved_mode));
+		save_item(NAME(m_mmu_offset1));
+		save_item(NAME(m_mmu_offset2));
+		save_item(NAME(m_mmu_offset3));
+		save_item(NAME(m_mmu_offset4));
+		save_item(NAME(m_mmu_offset5));
+		save_item(NAME(m_key_clk));
+		save_item(NAME(m_key_poll));
+		save_item(NAME(m_key_column));
+		save_item(NAME(m_key_shift));
 	}
 
 	virtual void video_start()
@@ -100,7 +108,7 @@ public:
 		}
 	}
 
-	enum mmu_mode_t
+	enum
 	{
 		MMU_MODE_KERN,
 		MMU_MODE_APPL,
@@ -108,7 +116,7 @@ public:
 		MMU_MODE_TEST
 	};
 
-	void update_mmu_mode(mmu_mode_t new_mode)
+	void update_mmu_mode(int new_mode)
 	{
 		if (m_mmu_mode != new_mode)
 		{
@@ -117,10 +125,10 @@ public:
 			switch( m_mmu_mode )
 			{
 			case MMU_MODE_KERN:
-				m_bank1->set_bank(0x04);
+				m_bank1->set_bank(0x04 + 0x00);
 				update_mmu_offset5();
-				m_bank3->set_bank(0xe0);
-				m_bank4->set_bank(0xf0);
+				m_bank3->set_bank(0x20 + 0xc0);
+				m_bank4->set_bank(0x30 + 0xc0);
 				break;
 
 			case MMU_MODE_APPL:
@@ -138,10 +146,10 @@ public:
 				break;
 
 			case MMU_MODE_TEST:
-				m_bank1->set_bank(0x104);
-				m_bank2->set_bank(0x110);
-				m_bank3->set_bank(0x120);
-				m_bank4->set_bank(0x130);
+				m_bank1->set_bank(0x04 + 0x100);
+				m_bank2->set_bank(0x10 + 0x100);
+				m_bank3->set_bank(0x20 + 0x100);
+				m_bank4->set_bank(0x30 + 0x100);
 				break;
 			}
 		}
@@ -159,7 +167,7 @@ public:
 	{
 		if (m_mmu_mode == MMU_MODE_APPL)
 		{
-			m_bank2->set_bank(0x10 + m_mmu_offset2);
+			m_bank2->set_bank((0x10 + m_mmu_offset2) & 0xff);
 		}
 	}
 
@@ -167,7 +175,7 @@ public:
 	{
 		if (m_mmu_mode == MMU_MODE_APPL)
 		{
-			m_bank3->set_bank(0x20 + m_mmu_offset3);
+			m_bank3->set_bank((0x20 + m_mmu_offset3) & 0xff);
 		}
 	}
 
@@ -175,7 +183,7 @@ public:
 	{
 		if (m_mmu_mode == MMU_MODE_APPL)
 		{
-			m_bank4->set_bank(0x30 + m_mmu_offset4);
+			m_bank4->set_bank((0x30 + m_mmu_offset4) & 0xff);
 		}
 	}
 
@@ -183,7 +191,7 @@ public:
 	{
 		if (m_mmu_mode == MMU_MODE_KERN)
 		{
-			m_bank2->set_bank(0x10 + m_mmu_offset5);
+			m_bank2->set_bank((0x10 + m_mmu_offset5) & 0xff);
 		}
 	}
 
@@ -370,6 +378,11 @@ public:
 		}
 	}
 
+	ram_device *ram()
+	{
+		return m_ram;
+	}
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;
@@ -380,8 +393,8 @@ private:
 	required_device<address_map_bank_device> m_bank4;
 	tilemap_t *m_tilemap;
 	virtual void palette_init();
-	mmu_mode_t m_mmu_mode;
-	mmu_mode_t m_mmu_saved_mode;
+	int m_mmu_mode;
+	int m_mmu_saved_mode;
 	UINT8 m_mmu_offset1;
 	UINT8 m_mmu_offset2;
 	UINT8 m_mmu_offset3;
@@ -401,6 +414,29 @@ private:
 	required_ioport m_col7;
 	required_ioport m_special;
 };
+
+static NVRAM_HANDLER( clcd )
+{
+	clcd_state *state = machine.driver_data<clcd_state>();
+
+	if (read_or_write)
+	{
+		file->write(state->ram()->pointer(), state->ram()->size());
+	}
+	else if (file)
+	{
+		file->read(state->ram()->pointer(), state->ram()->size());
+	}
+	else
+	{
+		// leave whatever ram device defaulted to
+
+		//// HACK: this forces ram to be initialised
+		UINT8 *ROM = state->memregion("maincpu")->base();
+		ROM[0x185bb] = 0xea;
+		ROM[0x185bc] = 0xea;
+	}
+}
 
 static ADDRESS_MAP_START( clcd_banked_mem, AS_PROGRAM, 8, clcd_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(ram_r, ram_w)
@@ -609,6 +645,7 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 	MCFG_RAM_ADD( "ram" )
 	MCFG_RAM_DEFAULT_VALUE(0)
 	MCFG_RAM_DEFAULT_SIZE( "128k" )
+	MCFG_NVRAM_HANDLER(clcd)
 MACHINE_CONFIG_END
 
 
@@ -622,4 +659,4 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                         FULLNAME       FLAGS */
-COMP( 1985, clcd,   0,      0,       clcd,      clcd, driver_device,     0, "Commodore Business Machines", "LCD (Prototype)", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1985, clcd,   0,      0,       clcd,      clcd, driver_device,     0, "Commodore Business Machines", "LCD (Prototype)", GAME_NO_SOUND )
