@@ -237,7 +237,7 @@ UINT8 ncr5380_device::ncr5380_read_reg(UINT32 offset)
 	}
 
 	if (VERBOSE)
-		logerror("NCR5380: read %s (reg %d) = %02x [PC=%x]\n", rnames[reg], reg, rv, machine().firstcpu->pc());
+		logerror("%s NCR5380: read %s (reg %d) = %02x\n", machine().describe_context(), rnames[reg], reg, rv);
 
 	return rv;
 }
@@ -247,7 +247,7 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 	int reg = offset & 7;
 
 	if (VERBOSE)
-		logerror("NCR5380: %02x to %s (reg %d) [PC=%x]\n", data, wnames[reg], reg, machine().firstcpu->pc());
+		logerror("%s NCR5380: %02x to %s (reg %d)\n", machine().describe_context(), data, wnames[reg], reg);
 
 	switch( reg )
 	{
@@ -334,7 +334,7 @@ void ncr5380_device::ncr5380_write_reg(UINT32 offset, UINT8 data)
 					if (get_cmd_len(m_5380_Command[0]) == m_cmd_ptr)
 					{
 						if (VERBOSE)
-							logerror("NCR5380: Command (to ID %d): %x %x %x %x %x %x %x %x %x %x (PC %x)\n", m_last_id, m_5380_Command[0], m_5380_Command[1], m_5380_Command[2], m_5380_Command[3], m_5380_Command[4], m_5380_Command[5], m_5380_Command[6], m_5380_Command[7], m_5380_Command[8], m_5380_Command[9], machine().firstcpu->pc());
+							logerror("%s NCR5380: Command (to ID %d): %x %x %x %x %x %x %x %x %x %x\n", machine().describe_context(), m_last_id, m_5380_Command[0], m_5380_Command[1], m_5380_Command[2], m_5380_Command[3], m_5380_Command[4], m_5380_Command[5], m_5380_Command[6], m_5380_Command[7], m_5380_Command[8], m_5380_Command[9]);
 
 						m_scsi_devices[m_last_id]->SetCommand(&m_5380_Command[0], 16);
 						m_scsi_devices[m_last_id]->ExecCommand();
