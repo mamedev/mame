@@ -190,6 +190,7 @@ int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, INT16 *buffer, in
 	int signal = voice->signal;
 	int step = voice->step;
 	int val;
+	bool endflag = false;
 
 	/* two cases: first cases is non-looping */
 	if (!voice->looping)
@@ -222,10 +223,8 @@ int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, INT16 *buffer, in
 			position++;
 			if (position >= voice->stop)
 			{
-				if (!samples)
-					samples |= 0x10000;
-
-				break;
+				if (samples == 0)
+					endflag = true;
 			}
 		}
 	}
@@ -276,10 +275,8 @@ int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, INT16 *buffer, in
 			}
 			if (position >= voice->stop)
 			{
-				if (!samples)
-					samples |= 0x10000;
-
-				break;
+				if (samples == 0)
+					endflag = true;
 			}
 		}
 	}
@@ -289,7 +286,10 @@ int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, INT16 *buffer, in
 	voice->signal = signal;
 	voice->step = step;
 
-	return samples;
+	if (endflag)
+		return 0x10000;
+	else
+		return samples;
 }
 
 
@@ -304,6 +304,7 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, INT16 *buffer, int
 {
 	int position = voice->position;
 	int val;
+	bool endflag = false;
 
 	/* two cases: first cases is non-looping */
 	if (!voice->looping)
@@ -322,10 +323,8 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, INT16 *buffer, int
 			position += 2;
 			if (position >= voice->stop)
 			{
-				if (!samples)
-					samples |= 0x10000;
-
-				break;
+				if (samples == 0)
+					endflag = true;
 			}
 		}
 	}
@@ -352,10 +351,8 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, INT16 *buffer, int
 			}
 			if (position >= voice->stop)
 			{
-				if (!samples)
-					samples |= 0x10000;
-
-				break;
+				if (samples == 0)
+					endflag = true;
 			}
 		}
 	}
@@ -363,7 +360,10 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, INT16 *buffer, int
 	/* update the parameters */
 	voice->position = position;
 
-	return samples;
+	if (endflag)
+		return 0x10000;
+	else
+		return samples;
 }
 
 
@@ -378,6 +378,7 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, INT16 *buffer, in
 {
 	int position = voice->position;
 	int val;
+	bool endflag = false;
 
 	/* two cases: first cases is non-looping */
 	if (!voice->looping)
@@ -396,10 +397,8 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, INT16 *buffer, in
 			position += 4;
 			if (position >= voice->stop)
 			{
-				if (!samples)
-					samples |= 0x10000;
-
-				break;
+				if (samples == 0)
+					endflag = true;
 			}
 		}
 	}
@@ -426,10 +425,8 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, INT16 *buffer, in
 			}
 			if (position >= voice->stop)
 			{
-				if (!samples)
-					samples |= 0x10000;
-
-				break;
+				if (samples == 0)
+					endflag = true;
 			}
 		}
 	}
@@ -437,7 +434,10 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, INT16 *buffer, in
 	/* update the parameters */
 	voice->position = position;
 
-	return samples;
+	if (endflag)
+		return 0x10000;
+	else
+		return samples;
 }
 
 
@@ -517,7 +517,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* if there are leftovers, ramp back to 0 */
 		if (samples_left)
 		{
-			/* note: samples_left bit 16 is set if the voice was finished at the same time the function ended */
+			/* NOTE: samples_left bit 16 is set if the voice was finished at the same time the function ended */
 			int base = new_samples - (samples_left & 0xffff);
 			int i, t = (base == 0) ? curr : m_scratch[base - 1];
 			for (i = 0; i < (samples_left & 0xffff); i++)
