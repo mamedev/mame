@@ -34,11 +34,15 @@ text screen in the superior part of the graphical screen.
 6600, 6500-6503 wd179x disc controller? 6400, 6401
 
 
-The M1000 contains the RAM, ROM, CPU, PIA0, joysticks, Video and cart slot, and thus was a TV Game computer.
-The MPA-10 contains the main keyboard, cassette support, PIA1 and was a base unit.
-When the two were joined, and with the custom cassette player, they formed the Imagination Machine.
-Although the BASIC cart could be plugged into the M1000, it could not be used as it needs the main keyboard.
-
+- The M1000 contains the RAM, ROM, CPU, PIA0, handsets, Video and cart slot, and thus was a TV Game computer.
+- The MPA-10 was a base unit containing the main keyboard, custom cassette recorder and PIA1.
+- When the two were joined, they formed the Imagination Machine.
+- Although the BASIC cart could be plugged into the M1000, it could not be used as it needs the main keyboard.
+- BB-01 Building Block - provides 4 cart slots. Includes a RS-232 cart for a printer or modem.
+- R8-K 8K RAM Expansion cart.
+- FI-100 Minifloppy Disk Interface Cartridge - drives 1 or 2 5 1/4" floppy drives on AS-400 bus.
+- A cassette program must be loaded on the same memory size it was saved from. Since the standard machine
+  had 8K, almost all tapes require this exact amount of RAM to be present.
 
 
 ToDo:
@@ -103,11 +107,11 @@ public:
 	DECLARE_READ8_MEMBER(apf_wd179x_sector_r);
 	DECLARE_READ8_MEMBER(apf_wd179x_data_r);
 private:
-	unsigned char m_keyboard_data;
-	unsigned char m_pad_data;
-	UINT8 m_mc6847_css;
+	UINT8 m_keyboard_data;
+	UINT8 m_pad_data;
 	UINT8 m_portb;
-	virtual void machine_start();
+	bool m_ca2;
+	virtual void machine_reset();
 	required_shared_ptr<UINT8> m_p_videoram;
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -122,12 +126,25 @@ private:
 
 READ8_MEMBER( apf_state::apf_mc6847_videoram_r )
 {
-	offset &= 0x1ff;
-	m_crtc->css_w(m_mc6847_css && BIT(m_p_videoram[offset], 6));
-	m_crtc->inv_w(BIT(m_p_videoram[offset], 6));
-	m_crtc->as_w(BIT(m_p_videoram[offset], 7));
+	if BIT(m_pad_data, 7) // ag line
+	{
+		UINT16 part1 = offset & 0x1f;
+		UINT16 part2 = (offset & 0x1e0) >> 5;
+		UINT16 part3 = (offset & 0x1e00) >> 4;
+		UINT16 latch = m_p_videoram[part3 | part1] & 0x3f;
+		m_crtc->css_w(BIT(latch, 5));
+		latch = (latch & 0x1f) << 4;
+		return m_p_videoram[latch | part2 | 0x200];
+	}
+	else
+	{
+		offset = (offset & 0x1ff) | 0x200;
+		m_crtc->css_w(m_ca2 && BIT(m_p_videoram[offset], 6));
+		m_crtc->inv_w(BIT(m_p_videoram[offset], 6));
+		m_crtc->as_w(BIT(m_p_videoram[offset], 7));
 
-	return m_p_videoram[offset];
+		return m_p_videoram[offset];
+	}
 }
 
 WRITE_LINE_MEMBER( apf_state::apf_mc6847_fs_w )
@@ -153,7 +170,7 @@ READ8_MEMBER( apf_state::pia0_porta_r )
 
 WRITE8_MEMBER( apf_state::pia0_portb_w )
 {
-	/* bit 7..4 video control -- TODO: bit 5 and 4? */
+	/* bit 7..6 video control */
 	m_crtc->ag_w(BIT(data, 7));
 	m_crtc->gm0_w(BIT(data, 6));
 
@@ -163,7 +180,7 @@ WRITE8_MEMBER( apf_state::pia0_portb_w )
 
 WRITE_LINE_MEMBER( apf_state::pia0_ca2_w )
 {
-	m_mc6847_css = state;
+	m_ca2 = state;
 }
 
 READ8_MEMBER( apf_state::pia1_porta_r )
@@ -201,10 +218,12 @@ WRITE8_MEMBER( apf_state::pia1_portb_w )
 		m_cass->output(BIT(data, 6) ? -1.0 : 1.0);
 }
 
-void apf_state::machine_start()
+void apf_state::machine_reset()
 {
 	m_portb = 0;
-	m_mc6847_css = 0;
+	m_ca2 = 0;
+	m_crtc->gm1_w(1);
+	m_crtc->gm2_w(1);
 
 	if (m_cass) // apfimag only
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -296,12 +315,10 @@ static ADDRESS_MAP_START( apf_imagination_map, AS_PROGRAM, 8, apf_state )
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
-	AM_RANGE( 0x0000, 0x01ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE( 0x0200, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
+static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
+	AM_RANGE( 0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x2000, 0x3fff) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE( 0x4000, 0x47ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x6000, 0x63ff) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE( 0x6800, 0x7fff) AM_ROM AM_REGION("cart", 0x2000)
 	AM_RANGE( 0x8000, 0x9fff) AM_ROM AM_REGION("cart", 0)
 	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
@@ -309,17 +326,11 @@ static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE( 0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
-	AM_RANGE( 0x0000, 0x01ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE( 0x0200, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x2000, 0x3fff) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE( 0x4000, 0x47ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x6800, 0x7fff) AM_ROM AM_REGION("cart", 0x2000)
-	AM_RANGE( 0x8000, 0x9fff) AM_ROM AM_REGION("cart", 0)
-	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
-	AM_RANGE( 0xc000, 0xdfff) AM_RAM // expansion
-	AM_RANGE( 0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
+static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
+	AM_IMPORT_FROM(apfm1000_map)
+	AM_RANGE( 0x6000, 0x63ff) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 ADDRESS_MAP_END
+
 
 /* The following input ports definitions are wrong and can't be debugged unless the driver
    is capable of running more cartridges. However each of the controllers supported by the M-1000
@@ -614,8 +625,8 @@ ROM_END
 
 ROM_START(apfm1000)
 	ROM_REGION(0x0800,"roms", 0)
-	ROM_LOAD("apf_4000.rom",0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1) )
-//  ROM_LOAD("apf-m1000rom.bin",0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4) )
+	ROM_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1) )
+//  ROM_LOAD("apf-m1000rom.bin", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4) )
 
 	ROM_REGION(0x3800,"cart", ROMREGION_ERASEFF)
 	ROM_CART_LOAD("cart", 0x0000, 0x3800, ROM_OPTIONAL)

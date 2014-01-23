@@ -7,7 +7,7 @@
 
         2014/01/07 Skeleton driver.
 
-The Bandai Supoer Vision 8000 contains:
+The Bandai Super Vision 8000 contains:
 - NEC D78C (Z80)
 - AY-3-8910
 - AMI S68047P (6847 variant)
