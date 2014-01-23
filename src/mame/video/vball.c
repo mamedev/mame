@@ -128,8 +128,8 @@ void vball_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		if (flip_screen())
 		{
-			sx = 240 - sx;
-			sy = 240 - sy;
+			sx = 240 + 128 - sx;
+			sy = 240 + 16 - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 			dy = -dy;

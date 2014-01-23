@@ -157,8 +157,8 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			{
 				flipy = !flipy;
 				flipx = !flipx;
-				ypos=240-ypos;
-				xpos=240-xpos;
+				ypos=240+16-ypos;
+				xpos=240+64-xpos;
 			}
 
 			for (count=0;count<chain;count++)

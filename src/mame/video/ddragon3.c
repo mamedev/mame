@@ -211,8 +211,8 @@ void ddragon3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (flip_screen()) {
 				if (flipy) flipy=0; else flipy=1;
 				if (flipx) flipx=0; else flipx=1;
-				ypos=240-ypos-m_sprite_xoff;
-				xpos=304-xpos;
+				ypos=240+16-ypos-m_sprite_xoff;
+				xpos=304+128-xpos;
 			}
 
 			for (count=0;count<chain;count++) {
