@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "ui/menu.h"
 #include "ui/bbcontrl.h"
-#include "imagedev/bitbngr.h"
 
 
 /***************************************************************************
@@ -33,7 +32,8 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_mess_bitbanger_control::ui_menu_mess_bitbanger_control(running_machine &machine, render_container *container) : ui_menu(machine, container)
+ui_menu_mess_bitbanger_control::ui_menu_mess_bitbanger_control(running_machine &machine, render_container *container, bitbanger_device *device)
+	: ui_menu_device_control<bitbanger_device>(machine, container, device)
 {
 }
 
@@ -48,66 +48,53 @@ ui_menu_mess_bitbanger_control::~ui_menu_mess_bitbanger_control()
 
 
 //-------------------------------------------------
-//  bitbanger_count - returns the number of bitbanger
-//  devices in the machine
-//-------------------------------------------------
-
-int ui_menu_mess_bitbanger_control::bitbanger_count()
-{
-	bitbanger_device_iterator iter(machine().root_device());
-	return iter.count();
-}
-
-
-//-------------------------------------------------
 //  populate - populates the main bitbanger control menu
 //-------------------------------------------------
 
 void ui_menu_mess_bitbanger_control::populate()
 {
-	int count = bitbanger_count();
 	UINT32 flags = 0, mode_flags = 0, baud_flags = 0, tune_flags = 0;
 
-	if( count > 0 )
+	if( count() > 0 )
 	{
-		if( index == (count-1) )
+		int index = current_index();
+
+		if( index == (count()-1) )
 			flags |= MENU_FLAG_LEFT_ARROW;
 		else
 			flags |= MENU_FLAG_RIGHT_ARROW;
 	}
 
-	if ((device != NULL) && (device->exists()))
+	if ((current_device() != NULL) && (current_device()->exists()))
 	{
-		bitbanger_device *bitbanger = downcast<bitbanger_device *>(&device->device());
-
-		if (bitbanger->inc_mode(TRUE))
+		if (current_device()->inc_mode(TRUE))
 			mode_flags |= MENU_FLAG_RIGHT_ARROW;
 
-		if (bitbanger->dec_mode(TRUE))
+		if (current_device()->dec_mode(TRUE))
 			mode_flags |= MENU_FLAG_LEFT_ARROW;
 
-		if (bitbanger->inc_baud(TRUE))
+		if (current_device()->inc_baud(TRUE))
 			baud_flags |= MENU_FLAG_RIGHT_ARROW;
 
-		if (bitbanger->dec_baud(TRUE))
+		if (current_device()->dec_baud(TRUE))
 			baud_flags |= MENU_FLAG_LEFT_ARROW;
 
-		if (bitbanger->inc_tune(TRUE))
+		if (current_device()->inc_tune(TRUE))
 			tune_flags |= MENU_FLAG_RIGHT_ARROW;
 
-		if (bitbanger->dec_tune(TRUE))
+		if (current_device()->dec_tune(TRUE))
 			tune_flags |= MENU_FLAG_LEFT_ARROW;
 
 		// name of bitbanger file
-		item_append(device->device().name(), device->filename(), flags, BITBANGERCMD_SELECT);
-		item_append("Device Mode:", bitbanger->mode_string(), mode_flags, BITBANGERCMD_MODE);
-		item_append("Baud:", bitbanger->baud_string(), baud_flags, BITBANGERCMD_BAUD);
-		item_append("Baud Tune:", bitbanger->tune_string(), tune_flags, BITBANGERCMD_TUNE);
+		item_append(current_device()->device().name(), current_device()->filename(), flags, BITBANGERCMD_SELECT);
+		item_append("Device Mode:", current_device()->mode_string(), mode_flags, BITBANGERCMD_MODE);
+		item_append("Baud:", current_device()->baud_string(), baud_flags, BITBANGERCMD_BAUD);
+		item_append("Baud Tune:", current_device()->tune_string(), tune_flags, BITBANGERCMD_TUNE);
 		item_append("Protocol:", "8-1-N", 0, NULL);
 	}
 	else
 	{
-		// no tape loaded
+		// no bitbanger loaded
 		item_append("No Bitbanger Image loaded", NULL, flags, NULL);
 	}
 }
@@ -119,17 +106,6 @@ void ui_menu_mess_bitbanger_control::populate()
 
 void ui_menu_mess_bitbanger_control::handle()
 {
-	// do we have to load the device?
-	if (device == NULL)
-	{
-		bitbanger_device_iterator iter(machine().root_device());
-		device = iter.byindex(index);
-		reset((ui_menu_reset_options)0);
-	}
-
-	// get the bitbanger
-	bitbanger_device *bitbanger = downcast<bitbanger_device *>(device);
-
 	// rebuild the menu
 	reset(UI_MENU_RESET_REMEMBER_POSITION);
 	populate();
@@ -142,52 +118,25 @@ void ui_menu_mess_bitbanger_control::handle()
 		{
 			case IPT_UI_LEFT:
 				if (event->itemref==BITBANGERCMD_SELECT)
-				{
-					// left arrow - rotate left through cassette devices
-					if (index > 0)
-						index--;
-					else
-						index = bitbanger_count() - 1;
-					device = NULL;
-				}
+					previous();
 				else if (event->itemref==BITBANGERCMD_MODE)
-				{
-					bitbanger->dec_mode(FALSE);
-				}
+					current_device()->dec_mode(false);
 				else if (event->itemref==BITBANGERCMD_BAUD)
-				{
-					bitbanger->dec_baud(FALSE);
-				}
+					current_device()->dec_baud(false);
 				else if (event->itemref==BITBANGERCMD_TUNE)
-				{
-					bitbanger->dec_tune(FALSE);
-				}
+					current_device()->dec_tune(false);
 				break;
 
 			case IPT_UI_RIGHT:
 				if (event->itemref==BITBANGERCMD_SELECT)
-				{
-					// right arrow - rotate right through cassette devices
-					if (index < bitbanger_count() - 1)
-						index++;
-					else
-						index = 0;
-					device = NULL;
-				}
+					next();
 				else if (event->itemref==BITBANGERCMD_MODE)
-				{
-					bitbanger->inc_mode(FALSE);
-				}
+					current_device()->inc_mode(false);
 				else if (event->itemref==BITBANGERCMD_BAUD)
-				{
-					bitbanger->inc_baud(FALSE);
-				}
+					current_device()->inc_baud(false);
 				else if (event->itemref==BITBANGERCMD_TUNE)
-				{
-					bitbanger->inc_tune(FALSE);
-				}
+					current_device()->inc_tune(false);
 				break;
 		}
 	}
 }
-

@@ -14,17 +14,15 @@
 #ifndef __UI_BBCONTRL_H__
 #define __UI_BBCONTRL_H__
 
-class ui_menu_mess_bitbanger_control : public ui_menu {
+#include "imagedev/bitbngr.h"
+#include "ui/devctrl.h"
+
+class ui_menu_mess_bitbanger_control : public ui_menu_device_control<bitbanger_device> {
 public:
-	ui_menu_mess_bitbanger_control(running_machine &machine, render_container *container);
+	ui_menu_mess_bitbanger_control(running_machine &machine, render_container *container, bitbanger_device *bitbanger);
 	virtual ~ui_menu_mess_bitbanger_control();
 	virtual void populate();
 	virtual void handle();
-
-private:
-	int index;
-	device_image_interface *device;
-	int bitbanger_count();
 };
 
 #endif // __UI_BBCONTRL_H__

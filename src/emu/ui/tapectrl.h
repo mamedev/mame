@@ -15,19 +15,16 @@
 #define __UI_TAPECTRL_H__
 
 #include "imagedev/cassette.h"
+#include "ui/devctrl.h"
 
-class ui_menu_mess_tape_control : public ui_menu {
+class ui_menu_mess_tape_control : public ui_menu_device_control<cassette_image_device> {
 public:
-	ui_menu_mess_tape_control(running_machine &machine, render_container *container);
+	ui_menu_mess_tape_control(running_machine &machine, render_container *container, cassette_image_device *device);
 	virtual ~ui_menu_mess_tape_control();
 	virtual void populate();
 	virtual void handle();
 
 private:
-	int index;
-	device_image_interface *device;
-	int cassette_count();
-
 	static void get_time_string(astring &dest, cassette_image_device *cassette, int *curpos, int *endpos);
 };
 

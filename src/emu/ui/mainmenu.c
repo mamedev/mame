@@ -187,11 +187,11 @@ void ui_menu_main::handle()
 			break;
 
 		case MESS_MENU_TAPE_CONTROL:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_mess_tape_control(machine(), container)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_mess_tape_control(machine(), container, NULL)));
 			break;
 
 		case MESS_MENU_BITBANGER_CONTROL:
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_mess_bitbanger_control(machine(), container)));
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_mess_bitbanger_control(machine(), container, NULL)));
 			break;
 
 		case SLOT_DEVICES:
