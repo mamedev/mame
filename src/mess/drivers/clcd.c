@@ -6,27 +6,15 @@
         G65SC51
         M65C22P2 x 2
 
-random notes:
-irq handler
-
-fa80
-fc00
-
-
-
-fa00: make sure monitor is banked in at c000
-
-fb00/fa80 lda/sta called from ram/fixed?
-fb00/fa00 lda/sta called from rom/fixed?
-fa80/fa00 lda     called from rom/fixed?
-
 ****************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
+#include "machine/bankdev.h"
 #include "machine/mos6551.h"
+#include "machine/ram.h"
 #include "rendlay.h"
 
 class clcd_state : public driver_device
@@ -34,33 +22,52 @@ class clcd_state : public driver_device
 public:
 	clcd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_ram(*this,"ram"),
-		keyClockState(0),
-		keyReadState(0),
-		m_col0(*this,"COL0"),
-		m_col1(*this,"COL1"),
-		m_col2(*this,"COL2"),
-		m_col3(*this,"COL3"),
-		m_col4(*this,"COL4"),
-		m_col5(*this,"COL5"),
-		m_col6(*this,"COL6"),
-		m_col7(*this,"COL7"),
-		m_special(*this,"SPECIAL"),
 		m_maincpu(*this, "maincpu"),
-		m_via0(*this, "via0")
+		m_via0(*this, "via0"),
+		m_ram(*this,"ram"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_mmu_mode(MMU_MODE_KERN),
+		m_mmu_saved_mode(MMU_MODE_KERN),
+		m_mmu_offset1(0),
+		m_mmu_offset2(0),
+		m_mmu_offset3(0),
+		m_mmu_offset4(0),
+		m_mmu_offset5(0),
+		m_key_clk(0),
+		m_key_poll(0),
+		m_key_column(0),
+		m_key_shift(0),
+		m_col0(*this, "COL0"),
+		m_col1(*this, "COL1"),
+		m_col2(*this, "COL2"),
+		m_col3(*this, "COL3"),
+		m_col4(*this, "COL4"),
+		m_col5(*this, "COL5"),
+		m_col6(*this, "COL6"),
+		m_col7(*this, "COL7"),
+		m_special(*this, "SPECIAL")
 	{
 	}
 
 	TILE_GET_INFO_MEMBER(get_clcd_tilemap_tile_info)
 	{
-		int code  = m_ram.target()[((tile_index / 80) * 128) + (tile_index % 80) + 0x800];
+		int code  = m_ram->pointer()[((tile_index / 80) * 128) + (tile_index % 80) + 0x800];
 
 		SET_TILE_INFO_MEMBER(0, code & 0x7f, ( code & 0x80 ) >> 7, 0);
 	}
 
 	virtual void machine_start()
 	{
-		membank("bankedroms")->configure_entries(0, 0x100, memregion("bankedroms")->base(), 0x400);
+		// HACK: allow this to boot up
+		UINT8 *ROM = memregion("maincpu")->base();
+		ROM[0x185bb] = 0xea;
+		ROM[0x185bc] = 0xea;
+
+		m_mmu_mode = MMU_MODE_TEST;
+		update_mmu_mode(MMU_MODE_KERN);
 	}
 
 	virtual void video_start()
@@ -75,80 +82,219 @@ public:
 		return 0;
 	}
 
-	DECLARE_WRITE8_MEMBER(ramwrite_w)
+	READ8_MEMBER(ram_r)
 	{
-		// this area might be shared between rom & ram or it might be ram only
-//      printf( "ram write:%04x %02x\n", offset, data );
+		if (offset < m_ram->size())
+		{
+			return m_ram->pointer()[offset];
+		}
+
+		return 0xff;
 	}
 
-	// these seem to control what appears in the memory space at various addresses.
-	// whether they just affect data access or instruction fetching as well is unknown.
-
-	DECLARE_WRITE8_MEMBER(fa00_w)
+	WRITE8_MEMBER(ram_w)
 	{
-//      printf( "fa00\n" );
+		if (offset < m_ram->size())
+		{
+			m_ram->pointer()[offset] = data;
+		}
 	}
 
-	DECLARE_WRITE8_MEMBER(fa80_w)
+	enum mmu_mode_t
 	{
-//      printf( "fa80\n" );
+		MMU_MODE_KERN,
+		MMU_MODE_APPL,
+		MMU_MODE_RAM,
+		MMU_MODE_TEST
+	};
+
+	void update_mmu_mode(mmu_mode_t new_mode)
+	{
+		if (m_mmu_mode != new_mode)
+		{
+			m_mmu_mode = new_mode;
+
+			switch( m_mmu_mode )
+			{
+			case MMU_MODE_KERN:
+				m_bank1->set_bank(0x04);
+				update_mmu_offset5();
+				m_bank3->set_bank(0xe0);
+				m_bank4->set_bank(0xf0);
+				break;
+
+			case MMU_MODE_APPL:
+				update_mmu_offset1();
+				update_mmu_offset2();
+				update_mmu_offset3();
+				update_mmu_offset4();
+				break;
+
+			case MMU_MODE_RAM:
+				m_bank1->set_bank(0x04);
+				m_bank2->set_bank(0x10);
+				m_bank3->set_bank(0x20);
+				m_bank4->set_bank(0x30);
+				break;
+
+			case MMU_MODE_TEST:
+				m_bank1->set_bank(0x104);
+				m_bank2->set_bank(0x110);
+				m_bank3->set_bank(0x120);
+				m_bank4->set_bank(0x130);
+				break;
+			}
+		}
 	}
 
-	DECLARE_WRITE8_MEMBER(fb00_w)
+	void update_mmu_offset1()
 	{
-//      printf( "fb00\n" );
+		if (m_mmu_mode == MMU_MODE_APPL)
+		{
+			m_bank1->set_bank(0x04 + m_mmu_offset1);
+		}
 	}
 
-	DECLARE_WRITE8_MEMBER(fb80_w)
+	void update_mmu_offset2()
 	{
-//      printf( "fb80\n" );
+		if (m_mmu_mode == MMU_MODE_APPL)
+		{
+			m_bank2->set_bank(0x10 + m_mmu_offset2);
+		}
 	}
 
-	DECLARE_WRITE8_MEMBER(fc00_w)
+	void update_mmu_offset3()
 	{
-//      printf( "fc00\n" );
+		if (m_mmu_mode == MMU_MODE_APPL)
+		{
+			m_bank3->set_bank(0x20 + m_mmu_offset3);
+		}
 	}
 
-	DECLARE_WRITE8_MEMBER(fc80_w)
+	void update_mmu_offset4()
 	{
-//      printf( "fc80\n" );
+		if (m_mmu_mode == MMU_MODE_APPL)
+		{
+			m_bank4->set_bank(0x30 + m_mmu_offset4);
+		}
 	}
 
-	DECLARE_WRITE8_MEMBER(fd00_w)
+	void update_mmu_offset5()
 	{
-//      printf( "fd00\n" );
+		if (m_mmu_mode == MMU_MODE_KERN)
+		{
+			m_bank2->set_bank(0x10 + m_mmu_offset5);
+		}
 	}
 
-	DECLARE_WRITE8_MEMBER(fd80_w)
+	WRITE8_MEMBER(mmu_mode_kern_w)
 	{
-//      printf( "fd80\n" );
+		update_mmu_mode(MMU_MODE_KERN);
 	}
 
-	DECLARE_WRITE8_MEMBER(fe00_w)
+	WRITE8_MEMBER(mmu_mode_appl_w)
 	{
-//      printf( "fe00\n" );
+		update_mmu_mode(MMU_MODE_APPL);
 	}
 
-	DECLARE_WRITE8_MEMBER(fe80_w)
+	WRITE8_MEMBER(mmu_mode_ram_w)
 	{
-//      printf( "fe80\n" );
+		update_mmu_mode(MMU_MODE_RAM);
 	}
 
-	DECLARE_WRITE8_MEMBER(rombank_w)
+	WRITE8_MEMBER(mmu_mode_recall_w)
 	{
-//      printf( "rom bank %02x\n", data);
-		// this might be for ram banking
-		membank("bankedroms")->set_entry(0);
+		update_mmu_mode(m_mmu_saved_mode);
 	}
 
-	DECLARE_WRITE8_MEMBER(ff80_w)
+	WRITE8_MEMBER(mmu_mode_save_w)
 	{
-//      printf( "ff80:%02x %02x\n", offset, data );
+		m_mmu_saved_mode = m_mmu_mode;
+	}
+
+	WRITE8_MEMBER(mmu_mode_test_w)
+	{
+		update_mmu_mode(MMU_MODE_TEST);
+	}
+
+	WRITE8_MEMBER(mmu_offset1_w)
+	{
+		if (m_mmu_offset1 != data)
+		{
+			m_mmu_offset1 = data;
+			update_mmu_offset1();
+		}
+	}
+
+	WRITE8_MEMBER(mmu_offset2_w)
+	{
+		if (m_mmu_offset2 != data)
+		{
+			m_mmu_offset2 = data;
+			update_mmu_offset2();
+		}
+	}
+
+	WRITE8_MEMBER(mmu_offset3_w)
+	{
+		if (m_mmu_offset3 != data)
+		{
+			m_mmu_offset3 = data;
+			update_mmu_offset3();
+		}
+	}
+
+	WRITE8_MEMBER(mmu_offset4_w)
+	{
+		if (m_mmu_offset4 != data)
+		{
+			m_mmu_offset4 = data;
+			update_mmu_offset4();
+		}
+	}
+
+	WRITE8_MEMBER(mmu_offset5_w)
+	{
+		if (m_mmu_offset5 != data)
+		{
+			m_mmu_offset5 = data;
+			update_mmu_offset5();
+		}
+	}
+
+	READ8_MEMBER(mmu_offset1_r)
+	{
+		return m_mmu_offset1;
+	}
+
+	READ8_MEMBER(mmu_offset2_r)
+	{
+		return m_mmu_offset2;
+	}
+
+	READ8_MEMBER(mmu_offset3_r)
+	{
+		return m_mmu_offset3;
+	}
+
+	READ8_MEMBER(mmu_offset4_r)
+	{
+		return m_mmu_offset4;
+	}
+
+	READ8_MEMBER(mmu_offset5_r)
+	{
+		return m_mmu_offset5;
+	}
+
+	WRITE8_MEMBER( lcd_w )
+	{
+		/// TODO: support bitmap and different font sizes
 	}
 
 	WRITE8_MEMBER( via0_pa_w )
 	{
-		keyColumnSelect = data;
+		m_key_column = data;
 	}
 
 	int read_column( int column )
@@ -185,53 +331,66 @@ public:
 
 	WRITE8_MEMBER( via0_pb_w )
 	{
-		int newKeyReadState = data & 1;
-		if( keyReadState != newKeyReadState )
-		{
-			keyReadState = newKeyReadState;
+		write_key_poll(data & 1);
+	}
 
-			if( newKeyReadState != 0 )
+	WRITE_LINE_MEMBER( write_key_poll )
+	{
+		if( m_key_poll != state )
+		{
+			m_key_poll = state;
+
+			if( m_key_poll != 0 )
 			{
-				keyData = m_special->read();
+				m_key_shift = m_special->read();
 
 				for( int i = 0; i < 8; i++ )
 				{
-					if( ( keyColumnSelect & ( 128 >> i ) ) == 0 )
+					if( ( m_key_column & ( 128 >> i ) ) == 0 )
 					{
-						keyData |= read_column( i ) << 8;
+						m_key_shift |= read_column( i ) << 8;
 					}
 				}
-
-				keyShift = 0x10000;
 			}
 		}
 	}
 
 	WRITE_LINE_MEMBER( via0_cb1_w )
 	{
-		int newKeyClockState = state & 1;
-		if( keyClockState != newKeyClockState )
+		int newm_key_clk = state & 1;
+		if( m_key_clk != newm_key_clk )
 		{
-			keyClockState = newKeyClockState;
+			m_key_clk = newm_key_clk;
 
-			if( keyClockState )
+			if( m_key_clk )
 			{
-				keyShift >>= 1;
-
-				m_via0->write_cb2( ( keyData & keyShift ) != 0 );
+				m_via0->write_cb2( ( m_key_shift & 0x8000 ) != 0 );
+				m_key_shift <<= 1;
 			}
 		}
 	}
 
 private:
-	required_shared_ptr<UINT8> m_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<via6522_device> m_via0;
+	required_device<ram_device> m_ram;
+	required_device<address_map_bank_device> m_bank1;
+	required_device<address_map_bank_device> m_bank2;
+	required_device<address_map_bank_device> m_bank3;
+	required_device<address_map_bank_device> m_bank4;
 	tilemap_t *m_tilemap;
-	int keyData;
-	int keyShift;
-	int keyColumnSelect;
-	int keyClockState;
-	int keyReadState;
 	virtual void palette_init();
+	mmu_mode_t m_mmu_mode;
+	mmu_mode_t m_mmu_saved_mode;
+	UINT8 m_mmu_offset1;
+	UINT8 m_mmu_offset2;
+	UINT8 m_mmu_offset3;
+	UINT8 m_mmu_offset4;
+	UINT8 m_mmu_offset5;
+	int m_key_clk;
+	int m_key_poll;
+	int m_key_column;
+	UINT16 m_key_shift;
 	required_ioport m_col0;
 	required_ioport m_col1;
 	required_ioport m_col2;
@@ -241,30 +400,40 @@ private:
 	required_ioport m_col6;
 	required_ioport m_col7;
 	required_ioport m_special;
-	required_device<cpu_device> m_maincpu;
-	required_device<via6522_device> m_via0;
 };
 
+static ADDRESS_MAP_START( clcd_banked_mem, AS_PROGRAM, 8, clcd_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_READWRITE(ram_r, ram_w)
+	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("maincpu",0)
+	AM_RANGE(0x41000, 0x43fff) AM_READ(mmu_offset1_r)
+	AM_RANGE(0x44000, 0x47fff) AM_READ(mmu_offset2_r)
+	AM_RANGE(0x48000, 0x4bfff) AM_READ(mmu_offset3_r)
+	AM_RANGE(0x4c000, 0x4dfff) AM_READ(mmu_offset4_r)
+	AM_RANGE(0x4e000, 0x4f7ff) AM_READ(mmu_offset5_r)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bankedroms") AM_WRITE(ramwrite_w)
-	AM_RANGE(0x8000, 0xf6ff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xf800, 0xf80f) AM_DEVREADWRITE("via0", via6522_device, read, write)
-	AM_RANGE(0xf880, 0xf88f) AM_DEVREADWRITE("via1", via6522_device, read, write)
-	AM_RANGE(0xf980, 0xf981) AM_DEVREADWRITE("acia", mos6551_device, read, write)
-	AM_RANGE(0xfa00, 0xffff) AM_ROM AM_REGION("maincpu", 0x7a00)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(fa00_w)
-	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(fa80_w)
-	AM_RANGE(0xfb00, 0xfb00) AM_WRITE(fb00_w)
-	AM_RANGE(0xfb80, 0xfb80) AM_WRITE(fb80_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(fc00_w)
-	AM_RANGE(0xfc80, 0xfc80) AM_WRITE(fc80_w)
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(fd00_w)
-	AM_RANGE(0xfd80, 0xfd80) AM_WRITE(fd80_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(fe00_w)
-	AM_RANGE(0xfe80, 0xfe80) AM_WRITE(fe80_w)
-	AM_RANGE(0xff00, 0xff00) AM_WRITE(rombank_w)
-	AM_RANGE(0xff80, 0xff83) AM_WRITE(ff80_w)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(ram_r, ram_w)
+	AM_RANGE(0x1000, 0x3fff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank2", address_map_bank_device, read8, write8)
+	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank3", address_map_bank_device, read8, write8)
+	AM_RANGE(0xc000, 0xf7ff) AM_DEVREADWRITE("bank4", address_map_bank_device, read8, write8)
+	AM_RANGE(0xf800, 0xf80f) AM_MIRROR(0x70) AM_DEVREADWRITE("via0", via6522_device, read, write)
+	AM_RANGE(0xf880, 0xf88f) AM_MIRROR(0x70) AM_DEVREADWRITE("via1", via6522_device, read, write)
+	AM_RANGE(0xf980, 0xf983) AM_MIRROR(0x7c) AM_DEVREADWRITE("acia", mos6551_device, read, write)
+	AM_RANGE(0xfa00, 0xffff) AM_ROM AM_REGION("maincpu", 0x1fa00)
+	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0x7f) AM_WRITE(mmu_mode_kern_w)
+	AM_RANGE(0xfa80, 0xfa80) AM_MIRROR(0x7f) AM_WRITE(mmu_mode_appl_w)
+	AM_RANGE(0xfb00, 0xfb00) AM_MIRROR(0x7f) AM_WRITE(mmu_mode_ram_w)
+	AM_RANGE(0xfb80, 0xfb80) AM_MIRROR(0x7f) AM_WRITE(mmu_mode_recall_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x7f) AM_WRITE(mmu_mode_save_w)
+	AM_RANGE(0xfc80, 0xfc80) AM_MIRROR(0x7f) AM_WRITE(mmu_mode_test_w)
+	AM_RANGE(0xfd00, 0xfd00) AM_MIRROR(0x7f) AM_WRITE(mmu_offset1_w)
+	AM_RANGE(0xfd80, 0xfd80) AM_MIRROR(0x7f) AM_WRITE(mmu_offset2_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x7f) AM_WRITE(mmu_offset3_w)
+	AM_RANGE(0xfe80, 0xfe80) AM_MIRROR(0x7f) AM_WRITE(mmu_offset4_w)
+	AM_RANGE(0xff00, 0xff00) AM_MIRROR(0x7f) AM_WRITE(mmu_offset5_w)
+	AM_RANGE(0xff80, 0xff83) AM_MIRROR(0x7c) AM_WRITE(lcd_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -370,7 +539,7 @@ void clcd_state::palette_init()
 	palette_set_color(machine(), 3, MAKE_RGB(32,240,32));
 }
 
-static const gfx_layout charset_8x8 =
+static const gfx_layout charset_6x8 =
 {
 	6,8,
 	128,
@@ -382,7 +551,7 @@ static const gfx_layout charset_8x8 =
 };
 
 static GFXDECODE_START( clcd )
-	GFXDECODE_ENTRY( "maincpu", 0x7700, charset_8x8, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x1f700, charset_6x8, 0, 1 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( clcd, clcd_state )
@@ -401,6 +570,30 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 
+	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+
+	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+
+	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+
+	MCFG_DEVICE_ADD("bank4", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(80)
@@ -412,21 +605,21 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 
 	MCFG_PALETTE_LENGTH(4)
 	MCFG_GFXDECODE(clcd)
+
+	MCFG_RAM_ADD( "ram" )
+	MCFG_RAM_DEFAULT_VALUE(0)
+	MCFG_RAM_DEFAULT_SIZE( "128k" )
 MACHINE_CONFIG_END
 
-/* ROM definition */
+
 ROM_START( clcd )
-
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "kizapr.u102",        0x00000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
-
-	ROM_REGION( 0x40000, "bankedroms", 0 )
-	ROM_LOAD( "sizapr.u103",        0x00000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ss-calc-13apr.u105", 0x00000, 0x8000, CRC(88a587a7) SHA1(b08f3169b7cd696bb6a9b6e6e87a077345377ac4))
 	ROM_LOAD( "sept-m-13apr.u104",  0x08000, 0x8000, CRC(41028c3c) SHA1(fcab6f0bbeef178eb8e5ecf82d9c348d8f318a8f))
-	ROM_LOAD( "ss-calc-13apr.u105", 0x10000, 0x8000, CRC(88a587a7) SHA1(b08f3169b7cd696bb6a9b6e6e87a077345377ac4))
+	ROM_LOAD( "sizapr.u103",        0x10000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
+	ROM_LOAD( "kizapr.u102",        0x18000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
 ROM_END
 
-/* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                         FULLNAME       FLAGS */
 COMP( 1985, clcd,   0,      0,       clcd,      clcd, driver_device,     0, "Commodore Business Machines", "LCD (Prototype)", GAME_NOT_WORKING | GAME_NO_SOUND )
