@@ -113,9 +113,7 @@ protected:
 
 private:
     void skipeol();
-    void skipws();
 
-    unsigned char peekc();
     unsigned char getc();
     void ungetc();
     bool eof() { return *m_px == 0; }

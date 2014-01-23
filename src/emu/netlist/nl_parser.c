@@ -42,54 +42,6 @@ void ptokenizer::skipeol()
     }
 }
 
-void ptokenizer::skipws()
-{
-    while (unsigned char c = getc())
-    {
-        switch (c)
-        {
-        case ' ':
-        case 9:
-        case 10:
-        case 13:
-            break;
-        case '#':
-            skipeol(); // treat preprocessor defines as comments
-            break;
-        case '/':
-            c = getc();
-            if (c == '/')
-            {
-                skipeol();
-            }
-            else if (c == '*')
-            {
-                int f=0;
-                while (!eof() )
-                {
-                    c = getc();
-                    if (f == 0 && c == '*')
-                        f=1;
-                    else if (f == 1 && c== '/' )
-                        break;
-                    else
-                        f=0;
-                }
-            }
-            break;
-        default:
-            ungetc();
-            return;
-        }
-    }
-}
-
-unsigned char ptokenizer::peekc()
-{
-    unsigned char c = getc();
-    ungetc();
-    return c;
-}
 
 unsigned char ptokenizer::getc()
 {
