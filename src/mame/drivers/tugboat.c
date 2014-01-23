@@ -54,7 +54,7 @@ public:
 	DECLARE_READ8_MEMBER(tugboat_input_r);
 	DECLARE_READ8_MEMBER(tugboat_ctrl_r);
 	DECLARE_WRITE8_MEMBER(tugboat_ctrl_w);
-	virtual void driver_init();
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_tugboat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -66,7 +66,7 @@ protected:
 };
 
 
-void tugboat_state::driver_init()
+void tugboat_state::machine_start()
 {
 	/*save_item(NAME(m_hd46505_0_reg));
 	save_item(NAME(m_hd46505_0_reg));
