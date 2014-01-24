@@ -40,15 +40,35 @@ text screen in the superior part of the graphical screen.
 - Although the BASIC cart could be plugged into the M1000, it could not be used as it needs the main keyboard.
 - BB-01 Building Block - provides 4 cart slots. Includes a RS-232 cart for a printer or modem.
 - R8-K 8K RAM Expansion cart.
-- FI-100 Minifloppy Disk Interface Cartridge - drives 1 or 2 5 1/4" floppy drives on AS-400 bus.
+- FI-100 Minifloppy Disk Interface Cartridge - drives 1 or 2 D100-0 floppy drives on AS-400 bus.
+- D100-0 Floppy drive 5 1/4"
 - A cassette program must be loaded on the same memory size it was saved from. Since the standard machine
   had 8K, almost all tapes require this exact amount of RAM to be present.
+
+
+Status of cart-based games
+--------------------------
+backgammon - displays the board with some bad gfx then freezes
+baseball - first innings works but freezes afterward. Bad gfx along the bottom
+basic - works in apfimag only (as designed)
+blackjack - works but gfx are mostly bad
+bowling - works
+boxing - works
+brickdown - works
+columns - runs but seems to be buggy
+casino - appears to work (don't know how to play)
+catena - works
+hangman - works
+pinball - works
+rocket patrol - works, bad gfx along the bottom and when a ship blows up
+space destroyer - needs a special mapping, it works fine when this is done (uses left joystick)
+ufo - works
 
 
 ToDo:
 -----
 - When pasting a large program, characters can be lost
-- Graphics are corrupted
+- Some graphics are corrupted
 - Tape loading is not very reliable
 - Add back the disk support
 - Need disk-based software
@@ -321,6 +341,8 @@ static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE( 0x4000, 0x47ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x6800, 0x7fff) AM_ROM AM_REGION("cart", 0x2000)
 	AM_RANGE( 0x8000, 0x9fff) AM_ROM AM_REGION("cart", 0)
+	//AM_RANGE( 0x8000, 0x97ff) AM_ROM AM_REGION("cart", 0)
+	//AM_RANGE( 0x9800, 0x9fff) AM_RAM
 	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
 	AM_RANGE( 0xc000, 0xdfff) AM_RAM // expansion
 	AM_RANGE( 0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
@@ -615,22 +637,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START(apfimag)
-	ROM_REGION(0x0800,"roms", 0)
-	ROM_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1) )
-
-	ROM_REGION(0x3800,"cart", ROMREGION_ERASEFF)
-	ROM_CART_LOAD("cart", 0x0000, 0x3800, ROM_OPTIONAL)
-ROM_END
-
 ROM_START(apfm1000)
 	ROM_REGION(0x0800,"roms", 0)
-	ROM_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1) )
-//  ROM_LOAD("apf-m1000rom.bin", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4) )
+	ROM_SYSTEM_BIOS( 0, "0", "Standard" )
+	ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "trash", "Trash II" )
+	ROMX_LOAD("trash-ii.bin", 0x0000, 0x0800, CRC(3bd8640a) SHA1(da4cd8163990adbc5acd3eab604b41e1066bb832), ROM_BIOS(2) )
+	ROM_IGNORE(0x0800)
 
 	ROM_REGION(0x3800,"cart", ROMREGION_ERASEFF)
 	ROM_CART_LOAD("cart", 0x0000, 0x3800, ROM_OPTIONAL)
 ROM_END
+
+#define rom_apfimag rom_apfm1000
+
+//ROM_LOAD("apf-m1000rom.bin", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4) )
 
 /***************************************************************************
 
@@ -639,5 +660,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME     PARENT     COMPAT  MACHINE     INPUT      CLASS          INIT         COMPANY               FULLNAME */
-COMP(1977, apfimag,  apfm1000,  0,      apfimag,    apfimag,   driver_device,  0,   "APF Electronics Inc", "APF Imagination Machine" , GAME_NOT_WORKING )
+COMP(1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   driver_device,  0,   "APF Electronics Inc", "APF Imagination Machine" , GAME_NOT_WORKING )
 CONS(1978, apfm1000, 0,         0,      apfm1000,   apfm1000,  driver_device,  0,   "APF Electronics Inc", "APF M-1000" , GAME_NOT_WORKING)
