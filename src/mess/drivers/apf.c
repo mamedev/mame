@@ -48,29 +48,29 @@ text screen in the superior part of the graphical screen.
 
 Status of cart-based games
 --------------------------
-backgammon - displays the board with some bad gfx then freezes
-baseball - first innings works but freezes afterward. Bad gfx along the bottom
+backgammon - works, needs offset of 0x120, bottom line is coming from 0x3E0, should be 0x380
+baseball - works, needs offset of 0x200, some bad colours
 basic - works in apfimag only (as designed)
-blackjack - works but gfx are mostly bad
+blackjack - works, some bad colours
 bowling - works
 boxing - works
 brickdown - works
 columns - runs but seems to be buggy
-casino - appears to work (don't know how to play)
+casino - appears to work (need instructions)
 catena - works
 hangman - works
 pinball - works
-rocket patrol - works, bad gfx along the bottom and when a ship blows up
-space destroyer - needs a special mapping, it works fine when this is done (uses left joystick)
+rocket patrol - works, some bad colours
+space destroyer - works but you must use -ram 9K option (uses left joystick)
 ufo - works
 
 
 ToDo:
 -----
 - When pasting a large program, characters can be lost
-- Some graphics are corrupted
+- Some bad colours or graphics
 - Tape loading is not very reliable
-- Add back the disk support
+- Add back the disk support when we can get some info on it
 - Need disk-based software
 
 
@@ -127,6 +127,7 @@ public:
 	DECLARE_READ8_MEMBER(apf_wd179x_sector_r);
 	DECLARE_READ8_MEMBER(apf_wd179x_data_r);
 private:
+	UINT8 m_latch;
 	UINT8 m_keyboard_data;
 	UINT8 m_pad_data;
 	UINT8 m_portb;
@@ -146,24 +147,26 @@ private:
 
 READ8_MEMBER( apf_state::apf_mc6847_videoram_r )
 {
-	if BIT(m_pad_data, 7) // ag line
+	if BIT(m_pad_data, 7) // AG line
 	{
+		if BIT(m_pad_data, 6) // GM0 (fixes rocket and blackjack)
+			offset -= 0x400;
+
 		UINT16 part1 = offset & 0x1f;
 		UINT16 part2 = (offset & 0x1e0) >> 5;
 		UINT16 part3 = (offset & 0x1e00) >> 4;
-		UINT16 latch = m_p_videoram[part3 | part1] & 0x3f;
-		m_crtc->css_w(BIT(latch, 5));
-		latch = (latch & 0x1f) << 4;
-		return m_p_videoram[latch | part2 | 0x200];
+		if (m_ca2) m_latch = m_p_videoram[part3 | part1] & 0x3f; // get chr
+		m_crtc->css_w(BIT(m_latch, 5));
+		UINT16 latch = (m_latch & 0x1f) << 4;
+		return m_p_videoram[latch | part2 | 0x200]; // get gfx
 	}
 	else
 	{
-		offset = (offset & 0x1ff) | 0x200;
-		m_crtc->css_w(m_ca2 && BIT(m_p_videoram[offset], 6));
-		m_crtc->inv_w(BIT(m_p_videoram[offset], 6));
-		m_crtc->as_w(BIT(m_p_videoram[offset], 7));
-
-		return m_p_videoram[offset];
+		UINT8 data = m_p_videoram[(offset & 0x1ff) | 0x200];
+		if (m_ca2) m_crtc->css_w(BIT(data, 6));
+		m_crtc->inv_w(BIT(data, 6));
+		m_crtc->as_w(BIT(data, 7));
+		return data;
 	}
 }
 
@@ -250,8 +253,15 @@ void apf_state::machine_reset()
 
 	/* if we specified 8K of RAM, delete the extended RAM */
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	if (m_ram->size() == 8*1024)
+	if (m_ram->size() < 16*1024)
 		space.unmap_readwrite(0xc000, 0xdfff);
+
+	/* 9K indicates special mapping for space destroyer */
+	if (m_ram->size() == 9*1024)
+	{
+		space.unmap_readwrite(0x9800, 0x9fff);
+		space.install_ram(0x9800, 0x9bff, m_ram->pointer());
+	}
 }
 
 WRITE8_MEMBER( apf_state::apf_dischw_w)
@@ -341,8 +351,6 @@ static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE( 0x4000, 0x47ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE( 0x6800, 0x7fff) AM_ROM AM_REGION("cart", 0x2000)
 	AM_RANGE( 0x8000, 0x9fff) AM_ROM AM_REGION("cart", 0)
-	//AM_RANGE( 0x8000, 0x97ff) AM_ROM AM_REGION("cart", 0)
-	//AM_RANGE( 0x9800, 0x9fff) AM_RAM
 	AM_RANGE( 0xa000, 0xbfff) AM_RAM // standard
 	AM_RANGE( 0xc000, 0xdfff) AM_RAM // expansion
 	AM_RANGE( 0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
@@ -354,9 +362,7 @@ static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 ADDRESS_MAP_END
 
 
-/* The following input ports definitions are wrong and can't be debugged unless the driver
-   is capable of running more cartridges. However each of the controllers supported by the M-1000
-   have these features:
+/* Each controller has these features:
 
    1 8-way joystick
    1 big red fire button on the upper side
@@ -373,9 +379,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( apfm1000 )
 
-	/*
-	   Using another known APF emulator, this simple Basic program can be used to read
-	   the joysticks and the keyboard:
+/*
+	   This simple Basic program can be used to read the joysticks and the keyboard:
 
 	   10 PRINT KEY$(n);
 	   20 GOTO 10
@@ -395,11 +400,9 @@ static INPUT_PORTS_START( apfm1000 )
 	                                        "?" for "Cl"
 	                                        "!" for "En"
 
-	*/
 
-/*
   ? player right is player 1
- */
+*/
 
 	/* line 0 */
 	PORT_START("joy0")
@@ -603,7 +606,7 @@ static MACHINE_CONFIG_START( apfm1000, apf_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K")
+	MCFG_RAM_EXTRA_OPTIONS("9K, 16K")
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("apfm1000_cart")
@@ -660,5 +663,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME     PARENT     COMPAT  MACHINE     INPUT      CLASS          INIT         COMPANY               FULLNAME */
-COMP(1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   driver_device,  0,   "APF Electronics Inc", "APF Imagination Machine" , GAME_NOT_WORKING )
-CONS(1978, apfm1000, 0,         0,      apfm1000,   apfm1000,  driver_device,  0,   "APF Electronics Inc", "APF M-1000" , GAME_NOT_WORKING)
+COMP(1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   driver_device,  0,   "APF Electronics Inc", "APF Imagination Machine" , 0 )
+CONS(1978, apfm1000, 0,         0,      apfm1000,   apfm1000,  driver_device,  0,   "APF Electronics Inc", "APF M-1000" , 0 )
