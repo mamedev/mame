@@ -671,20 +671,47 @@ void duart68681_channel::tra_complete()
 	else
 		m_uart->clear_ISR_bits(INT_TXRDYB);
 
+	// if local loopback is on, write the transmitted data as if a byte had been received
+	if ((MR2 & 0xC0) == 0x80)
+	{
+		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
+		{
+			LOG(( "68681: FIFO overflow\n" ));
+			SR |= STATUS_OVERRUN_ERROR;
+		}
+		else
+		{
+			rx_fifo[rx_fifo_write_ptr++]= tx_data;
+			if (rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE)
+			{
+				rx_fifo_write_ptr = 0;
+			}
+			rx_fifo_num++;
+		}
+	}
+
 	update_interrupts();
 }
 
 void duart68681_channel::tra_callback()
 {
-	int bit = transmit_register_get_data_bit();
-//  printf("ch %d transmit %d\n", m_ch, bit);
-	if (m_ch == 0)
+	// don't actually send in loopback mode
+	if ((MR2&0xC0) != 0x80)
 	{
-		m_uart->write_a_tx(bit);
+		int bit = transmit_register_get_data_bit();
+	//  printf("ch %d transmit %d\n", m_ch, bit);
+		if (m_ch == 0)
+		{
+			m_uart->write_a_tx(bit);
+		}
+		else
+		{
+			m_uart->write_b_tx(bit);
+		}
 	}
-	else
+	else	// must call this to advance the transmitter
 	{
-		m_uart->write_b_tx(bit);
+		transmit_register_get_data_bit();
 	}
 }
 
@@ -694,21 +721,24 @@ void duart68681_channel::input_callback(UINT8 state)
 
 void duart68681_channel::update_interrupts()
 {
-	if ( rx_fifo_num > 0 )
+	if (rx_enabled)
 	{
-		SR |= STATUS_RECEIVER_READY;
-	}
-	else
-	{
-		SR &= ~STATUS_RECEIVER_READY;
-	}
-	if ( rx_fifo_num == MC68681_RX_FIFO_SIZE )
-	{
-		SR |= STATUS_FIFO_FULL;
-	}
-	else
-	{
-		SR &= ~STATUS_FIFO_FULL;
+		if (rx_fifo_num > 0) 
+		{
+			SR |= STATUS_RECEIVER_READY;
+		}
+		else
+		{
+			SR &= ~STATUS_RECEIVER_READY;
+		}
+		if ( rx_fifo_num == MC68681_RX_FIFO_SIZE )
+		{
+			SR |= STATUS_FIFO_FULL;
+		}
+		else
+		{
+			SR &= ~STATUS_FIFO_FULL;
+		}
 	}
 
 	// Handle the TxEMT and TxRDY bits based on mode
@@ -809,6 +839,8 @@ UINT8 duart68681_channel::read_rx_fifo()
 	rx_fifo_num--;
 	update_interrupts();
 
+//	printf("Rx read %02x\n", rv);
+
 	return rv;
 };
 
@@ -857,7 +889,7 @@ void duart68681_channel::write_chan_reg(int reg, UINT8 data)
 		CSR = data;
 		tx_baud_rate = m_uart->calc_baud(m_ch, data & 0xf);
 		rx_baud_rate = m_uart->calc_baud(m_ch, (data>>4) & 0xf);
-		//printf("ch %d CSR %02x Tx baud %d Rx baud %d\n", m_ch, data, tx_baud_rate, rx_baud_rate);
+//		printf("ch %d CSR %02x Tx baud %d Rx baud %d\n", m_ch, data, tx_baud_rate, rx_baud_rate);
 		set_rcv_rate(rx_baud_rate);
 		set_tra_rate(tx_baud_rate);
 		break;
@@ -1032,48 +1064,18 @@ void duart68681_channel::write_TX(UINT8 data)
          printf("Write %02x to TX when TX not ready!\n", data);
     }*/
 
-//  printf("ch %d Tx %02x\n", m_ch, data);
+//	printf("ch %d Tx %02x\n", m_ch, data);
 
-	// send the byte unless we're in loopback mode;
-	// in loopback mode do NOT 'actually' send the byte: the TXn pin is held high when loopback mode is on.
-	if ((MR2&0xC0) != 0x80)
-	{
-		tx_ready = 0;
-		SR &= ~STATUS_TRANSMITTER_READY;
+	tx_ready = 0;
+	SR &= ~STATUS_TRANSMITTER_READY;
 
-		if (m_ch == 0)
-			m_uart->clear_ISR_bits(INT_TXRDYA);
-		else
-			m_uart->clear_ISR_bits(INT_TXRDYB);
+	if (m_ch == 0)
+		m_uart->clear_ISR_bits(INT_TXRDYA);
+	else
+		m_uart->clear_ISR_bits(INT_TXRDYB);
 
-		// send tx_data
-		transmit_register_setup(tx_data);
-	}
-	// if local loopback is on, write the transmitted data as if a byte had been received
-	else if ((MR2 & 0xC0) == 0x80)
-	{
-		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
-		{
-			LOG(( "68681: FIFO overflow\n" ));
-			SR |= STATUS_OVERRUN_ERROR;
-		}
-		else
-		{
-			rx_fifo[rx_fifo_write_ptr++]= tx_data;
-			if (rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE)
-			{
-				rx_fifo_write_ptr = 0;
-			}
-			rx_fifo_num++;
-		}
-
-		tx_ready = 1;
-		SR |= STATUS_TRANSMITTER_READY;
-		if (m_ch == 0)
-			m_uart->set_ISR_bits(INT_TXRDYA);
-		else
-			m_uart->set_ISR_bits(INT_TXRDYB);
-	}
+	// send tx_data
+	transmit_register_setup(tx_data);
 
 	update_interrupts();
 };
