@@ -74,7 +74,8 @@ The "rc" feature is used to indicate the source of the clock signal
             <feature name="rc" value="100pf/23.2K" />
             <dataarea name="rom" size="2048">
                 <rom name="mp3475nll_4972" size="2048" crc="460ac30e" sha1="93ffb75b82d1f48f451e0e1158d5a8d1cd465fe5" offset="0" />
-
+			</dataarea>
+		</part>
     </software>
 
 	<software name="connect4">
