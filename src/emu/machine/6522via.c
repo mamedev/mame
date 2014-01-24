@@ -212,6 +212,7 @@ void via6522_device::device_start()
 	save_item(NAME(m_in_cb1));
 	save_item(NAME(m_in_cb2));
 	save_item(NAME(m_out_b));
+	save_item(NAME(m_out_cb1));
 	save_item(NAME(m_out_cb2));
 	save_item(NAME(m_ddr_b));
 	save_item(NAME(m_t1cl));
@@ -244,6 +245,7 @@ void via6522_device::device_reset()
 	m_out_ca2 = 0;
 	m_ddr_a = 0;
 	m_out_b = 0;
+	m_out_cb1 = 0;
 	m_out_cb2 = 0;
 	m_ddr_b = 0;
 
@@ -311,87 +313,15 @@ void via6522_device::clear_int(int data)
     via_shift
 -------------------------------------------------*/
 
-void via6522_device::shift()
+void via6522_device::shift_out()
 {
-	if (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
+	m_out_cb2 = (m_sr >> 7) & 1;
+	m_sr =  (m_sr << 1) | m_out_cb2;
+
+	m_cb2_handler(m_out_cb2);
+
+	if (!SO_T2_RATE(m_acr))
 	{
-		m_out_cb2 = (m_sr >> 7) & 1;
-		m_sr =  (m_sr << 1) | m_out_cb2;
-
-		m_cb2_handler(m_out_cb2);
-
-		/* this should be one cycle wide */
-		m_cb1_handler(0);
-		m_cb1_handler(1);
-
-		m_shift_counter = (m_shift_counter + 1) % 8;
-
-		if (m_shift_counter)
-		{
-			if (SO_O2_CONTROL(m_acr)) {
-				m_shift_timer->adjust(clocks_to_attotime(2));
-			} else {
-				m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
-			}
-		}
-		else
-		{
-			if (!(m_ifr & INT_SR))
-			{
-				set_int(INT_SR);
-			}
-		}
-	}
-
-	if (SO_EXT_CONTROL(m_acr))
-	{
-		m_out_cb2 = (m_sr >> 7) & 1;
-		m_sr =  (m_sr << 1) | m_out_cb2;
-
-		m_cb2_handler(m_out_cb2);
-
-		m_shift_counter = (m_shift_counter + 1) % 8;
-
-		if (m_shift_counter == 0)
-		{
-			if (!(m_ifr & INT_SR))
-			{
-				set_int(INT_SR);
-			}
-		}
-	}
-
-	if (SI_O2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
-	{
-		/* this should be one cycle wide */
-		m_cb1_handler(0);
-		m_cb1_handler(1);
-
-		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
-
-		m_shift_counter = (m_shift_counter + 1) % 8;
-
-		if (m_shift_counter)
-		{
-			if (SI_O2_CONTROL(m_acr)) {
-				m_shift_timer->adjust(clocks_to_attotime(2));
-			} else {
-				m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
-			}
-		}
-		else
-		{
-			if (!(m_ifr & INT_SR))
-			{
-				set_int(INT_SR);
-			}
-		}
-	}
-
-	if (SI_EXT_CONTROL(m_acr))
-	{
-		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
-
 		m_shift_counter = (m_shift_counter + 1) % 8;
 
 		if (m_shift_counter == 0)
@@ -404,6 +334,21 @@ void via6522_device::shift()
 	}
 }
 
+void via6522_device::shift_in()
+{
+	m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
+
+	m_shift_counter = (m_shift_counter + 1) % 8;
+
+	if (m_shift_counter == 0)
+	{
+		if (!(m_ifr & INT_SR))
+		{
+			set_int(INT_SR);
+		}
+	}
+}
+
 
 void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -411,7 +356,38 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		// shift timer
 		case TIMER_SHIFT:
-			shift();
+			m_out_cb1 = !m_out_cb1;
+
+			if (m_out_cb1)
+			{
+				if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+				{
+					shift_out();
+				}
+
+				m_cb1_handler(m_out_cb1);
+
+				if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
+				{
+					shift_in();
+				}
+			}
+			else
+			{
+				m_cb1_handler(m_out_cb1);
+			}
+
+			if (SO_T2_RATE(m_acr) || m_shift_counter || m_out_cb1)
+			{
+				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+				{
+					m_shift_timer->adjust(clocks_to_attotime(1));
+				}
+				else
+				{
+					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
+				}
+			}
 			break;
 
 		// t1 timeout
@@ -643,11 +619,11 @@ READ8_MEMBER( via6522_device::read )
 		clear_int(INT_SR);
 		if (SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(2));
+			m_shift_timer->adjust(clocks_to_attotime(1));
 		}
 		if (SI_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
+			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
 		}
 		break;
 
@@ -843,11 +819,11 @@ WRITE8_MEMBER( via6522_device::write )
 		clear_int(INT_SR);
 		if (SO_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(2));
+			m_shift_timer->adjust(clocks_to_attotime(1));
 		}
-		if (SO_T2_CONTROL(m_acr))
+		if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
+			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
 		}
 		break;
 
@@ -1049,9 +1025,14 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 				}
 			}
 
-			if (SO_EXT_CONTROL(m_acr) || SI_EXT_CONTROL(m_acr))
+			if (SO_EXT_CONTROL(m_acr))
 			{
-				shift();
+				shift_out();
+			}
+
+			if (SI_EXT_CONTROL(m_acr))
+			{
+				shift_in();
 			}
 
 			set_int(INT_CB1);

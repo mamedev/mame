@@ -144,7 +144,8 @@ private:
 	inline void set_irq_line(int state);
 	void set_int(int data);
 	void clear_int(int data);
-	void shift();
+	void shift_out();
+	void shift_in();
 	void write_pa(int line, int state);
 	void write_pb(int line, int state);
 
@@ -173,6 +174,7 @@ private:
 	UINT8 m_in_cb1;
 	UINT8 m_in_cb2;
 	UINT8 m_out_b;
+	UINT8 m_out_cb1;
 	UINT8 m_out_cb2;
 	UINT8 m_ddr_b;
 
