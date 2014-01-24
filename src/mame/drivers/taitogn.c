@@ -342,7 +342,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mn10200(*this, "mn10200"),
 		m_flashbank(*this, "flashbank"),
-		m_mb3773(*this, "mb3773")
+		m_mb3773(*this, "mb3773"),
+		m_zoom(*this, "taito_zoom")
 	{
 	}
 
@@ -382,6 +383,7 @@ private:
 	required_device<cpu_device> m_mn10200;
 	required_device<address_map_bank_device> m_flashbank;
 	required_device<mb3773_device> m_mb3773;
+	required_device<taito_zoom_device> m_zoom;
 };
 
 
@@ -578,7 +580,7 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE8(control_r, control_w, 0x000000ff)
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE16(control2_w, 0x0000ffff)
 	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE16(gn_1fb70000_r, gn_1fb70000_w, 0x0000ffff)
-	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM // 256 bytes com zone with the mn102, low bytes of words only, with additional comm at 1fb80000
+	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comms with the MN10200, with additional comms at 1fb80000
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, taitogn_state )
