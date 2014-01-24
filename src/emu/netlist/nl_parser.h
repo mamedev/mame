@@ -14,6 +14,8 @@ class ptokenizer
 {
     NETLIST_PREVENT_COPYING(ptokenizer)
 public:
+    virtual ~ptokenizer() {}
+
     ptokenizer()
     : m_line(1), m_line_ptr(NULL), m_px(NULL)
     {}
