@@ -3502,7 +3502,7 @@ ROM_START( peps0045 ) /* Normal board : Red White & Blue Slots (PS0045) - Payout
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0047 ) /* Normal board : Wild Cherry (PS0047) - Payout 90.20% */
+ROM_START( peps0047 ) /* Normal board : Wild Cherry Slots (PS0047) - Payout 90.20% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0047_569-a2c.u68",   0x00000, 0x10000, CRC(b7df1cf8) SHA1(5c5392b7b3a387ccb45fe96310b47078215f2ea0) ) /* 2 Coins Max / 1 Line */
 
@@ -3516,7 +3516,7 @@ ROM_START( peps0047 ) /* Normal board : Wild Cherry (PS0047) - Payout 90.20% */
 	ROM_LOAD( "cap1004.u50", 0x0000, 0x0100, CRC(5eced808) SHA1(b40b8efa8cbc76cff7560c36939275eb360c6f11) )
 ROM_END
 
-ROM_START( peps0092 ) /* Normal board : Wild Cherry (PS0092) - Payout 90.18% */
+ROM_START( peps0092 ) /* Normal board : Wild Cherry Slots (PS0092) - Payout 90.18% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0092_569-a2c.u68",   0x00000, 0x10000, CRC(d533f6d5) SHA1(9c470f7c474022445aeb45ee8c5757d1b6957a91) ) /* 3 Coins Max / 1 Line */
 
@@ -3558,7 +3558,7 @@ ROM_START( peps0207 ) /* Normal board : Red White & Blue Slots (PS0207) - Payout
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0296 ) /* Normal board : Haywire (PS0296) - Payout 90.00% */
+ROM_START( peps0296 ) /* Normal board : Haywire Slots (PS0296) - Payout 90.00% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0296_561-959.u68",   0x00000, 0x10000, CRC(da871550) SHA1(99e7a4fc77731b185751622ba2e08a44ad8eb7f9) ) /* 3 Coins Max / 1 Line */
 
