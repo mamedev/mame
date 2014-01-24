@@ -8,7 +8,7 @@ The following board types are known to exist:
 4971-REV-C - used for i8021 based game(s). Found in Connect Four
 7924952D02 - used for shrink DIP version of the tms1100. Found in Super Blockbuster
 
-The "pcb" feature is used to indicate the baord type
+The "pcb" feature is used to indicate the board type
 The "paddle" feature is used to indicate whether there is paddle circuitry on the board
 The "rc" feature is used to indicate the source of the clock signal
 -->
