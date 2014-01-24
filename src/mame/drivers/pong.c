@@ -542,7 +542,7 @@ static NETLIST_START(pong_schematics)
     // ----------------------------------------------------------------------------------------
 
     TTL_7402_NOR(ic_f5b, L, Missed)
-    TTL_7490(ic_c7, ic_f5b, SRST, SRST, low, low)
+    TTL_7490(ic_c7, ic_f5b, ic_c7.QA, SRST, SRST, low, low)
     TTL_74107(ic_c8a, ic_c7.QD, high, high, SRSTQ)
     SWITCH2(sw1a, high, ic_c7.QC)
     PARAM(sw1a.POS, 0)
@@ -557,7 +557,7 @@ static NETLIST_START(pong_schematics)
     ALIAS(score1_10Q, ic_c8a.QQ)
 
     TTL_7402_NOR(ic_f5a, R, Missed)
-    TTL_7490(ic_d7, ic_f5a, SRST, SRST, low, low)
+    TTL_7490(ic_d7, ic_f5a, ic_d7.QA, SRST, SRST, low, low)
     TTL_74107(ic_c8b, ic_d7.QD, high, high, SRSTQ)
     SWITCH2(sw1b, high, ic_d7.QC)
     PARAM(sw1b.POS, 0)
@@ -707,7 +707,7 @@ static NETLIST_START(pong_fast)
 
 NETLIST_END()
 
-#ifdef TESTSOUND
+#ifdef TEST_SOUND
 static NETLIST_START(test)
 
     /*
@@ -837,7 +837,7 @@ MACHINE_CONFIG_END
 
 ROM_START( pong ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* enough for netlist */
-    ROM_LOAD( "pong.netlist", 0x000000, 0x0043d9, CRC(64edd5a0) SHA1(9e661f2fba44f46015fdccffa7766dd4e61cdc7d) )
+    ROM_LOAD( "pong.netlist", 0x000000, 17790 /*0x0043d9*/, CRC(64edd5a0) SHA1(9e661f2fba44f46015fdccffa7766dd4e61cdc7d) )
 ROM_END
 
 ROM_START( pongf ) /* dummy to satisfy game entry*/

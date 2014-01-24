@@ -97,7 +97,7 @@
 
 #define NETDEV_SOUND_OUT(_name, _v)                                                 \
         NET_REGISTER_DEV(sound, _name)                                              \
-        PARAM_name.CHAN, _v)
+        PARAM(_name.CHAN, _v)
 
 
 class netlist_mame_device_t;

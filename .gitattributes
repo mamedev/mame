@@ -2176,6 +2176,7 @@ src/emu/netlist/devices/nld_7425.c svneol=native#text/plain
 src/emu/netlist/devices/nld_7425.h svneol=native#text/plain
 src/emu/netlist/devices/nld_7427.c svneol=native#text/plain
 src/emu/netlist/devices/nld_7427.h svneol=native#text/plain
+src/emu/netlist/devices/nld_7430.c svneol=native#text/plain
 src/emu/netlist/devices/nld_7430.h svneol=native#text/plain
 src/emu/netlist/devices/nld_7474.c svneol=native#text/plain
 src/emu/netlist/devices/nld_7474.h svneol=native#text/plain
