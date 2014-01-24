@@ -3418,7 +3418,7 @@ ROM_START( peke1013 ) /* Normal board : Keno 2-10 Spot (KE1013) */
 	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
 ROM_END
 
-ROM_START( peps0014 ) /* Normal board : Super Joker Slots (PS0014) */
+ROM_START( peps0014 ) /* Normal board : Super Joker Slots (PS0014) - Payout 90.11% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0014_569-a2c.u68",   0x00000, 0x10000, CRC(368c3f58) SHA1(ebefcefbb5386659680719936bff72ad61087343) ) /* 3 Coins Max / 1 Line */
 
@@ -3432,7 +3432,7 @@ ROM_START( peps0014 ) /* Normal board : Super Joker Slots (PS0014) */
 	ROM_LOAD( "cap916.u50", 0x0000, 0x0100, CRC(b9a5ee21) SHA1(d3c952f594baca9dc234602d90c506dd537c4dcc) )
 ROM_END
 
-ROM_START( peps0021 ) /* Normal board : Red White & Blue Slots (PS0021) */
+ROM_START( peps0021 ) /* Normal board : Red White & Blue Slots (PS0021) - Payout 92.51% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0021_569-a2c.u68",   0x00000, 0x10000, CRC(e87d5040) SHA1(e7478e845c888d97190f0398da4bfb043222a3c1) ) /* 3 Coins Max / 1 Line */
 
@@ -3446,7 +3446,7 @@ ROM_START( peps0021 ) /* Normal board : Red White & Blue Slots (PS0021) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0022 ) /* Normal board : Red White & Blue Slots (PS0022) */
+ROM_START( peps0022 ) /* Normal board : Red White & Blue Slots (PS0022) - Payout 90.08% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0022_569-a2c.u68",   0x00000, 0x10000, CRC(d65c0939) SHA1(d91f472a43f77f9df8845e97561540f988e522e3) ) /* 3 Coins Max / 1 Line */
 
@@ -3460,7 +3460,7 @@ ROM_START( peps0022 ) /* Normal board : Red White & Blue Slots (PS0022) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0042 ) /* Normal board : Double Diamond Slots (PS0042) */
+ROM_START( peps0042 ) /* Normal board : Double Diamond Slots (PS0042) - Payout 92.58% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0042_569-a2c.u68",   0x00000, 0x10000, CRC(b891f04b) SHA1(e735de918e6d91fd87cc85ff40f187dc421a8cf2) ) /* 3 Coins Max / 1 Line */
 
@@ -3474,7 +3474,7 @@ ROM_START( peps0042 ) /* Normal board : Double Diamond Slots (PS0042) */
 	ROM_LOAD( "cap1003.u50", 0x0000, 0x0100, CRC(cc400805) SHA1(f5ac48ad2a5df64da150f09f2ea5d910230bde56) )
 ROM_END
 
-ROM_START( peps0043 ) /* Normal board : Double Diamond Slots (PS0043) */
+ROM_START( peps0043 ) /* Normal board : Double Diamond Slots (PS0043) - Payout 90.10% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0043_569-a2c.u68",   0x00000, 0x10000, CRC(d612429c) SHA1(95eb4774482a930066456d517fb2e4f67d4df4cb) ) /* 3 Coins Max / 1 Line */
 
@@ -3488,7 +3488,7 @@ ROM_START( peps0043 ) /* Normal board : Double Diamond Slots (PS0043) */
 	ROM_LOAD( "cap1003.u50", 0x0000, 0x0100, CRC(cc400805) SHA1(f5ac48ad2a5df64da150f09f2ea5d910230bde56) )
 ROM_END
 
-ROM_START( peps0045 ) /* Normal board : Red White & Blue Slots (PS0045) */
+ROM_START( peps0045 ) /* Normal board : Red White & Blue Slots (PS0045) - Payout 87.56% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0045_569-a2c.u68",   0x00000, 0x10000, CRC(de180b84) SHA1(0d592d7d535b0aacbd62c18ac222da770fab7b85) ) /* 3 Coins Max / 3 Lines */
 
@@ -3502,7 +3502,7 @@ ROM_START( peps0045 ) /* Normal board : Red White & Blue Slots (PS0045) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0047 ) /* Normal board : Wild Cherry (PS0047) */
+ROM_START( peps0047 ) /* Normal board : Wild Cherry (PS0047) - Payout 90.20% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0047_569-a2c.u68",   0x00000, 0x10000, CRC(b7df1cf8) SHA1(5c5392b7b3a387ccb45fe96310b47078215f2ea0) ) /* 2 Coins Max / 1 Line */
 
@@ -3516,7 +3516,7 @@ ROM_START( peps0047 ) /* Normal board : Wild Cherry (PS0047) */
 	ROM_LOAD( "cap1004.u50", 0x0000, 0x0100, CRC(5eced808) SHA1(b40b8efa8cbc76cff7560c36939275eb360c6f11) )
 ROM_END
 
-ROM_START( peps0092 ) /* Normal board : Wild Cherry (PS0092) */
+ROM_START( peps0092 ) /* Normal board : Wild Cherry (PS0092) - Payout 90.18% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0092_569-a2c.u68",   0x00000, 0x10000, CRC(d533f6d5) SHA1(9c470f7c474022445aeb45ee8c5757d1b6957a91) ) /* 3 Coins Max / 1 Line */
 
@@ -3530,7 +3530,7 @@ ROM_START( peps0092 ) /* Normal board : Wild Cherry (PS0092) */
 	ROM_LOAD( "cap1004.u50", 0x0000, 0x0100, CRC(5eced808) SHA1(b40b8efa8cbc76cff7560c36939275eb360c6f11) )
 ROM_END
 
-ROM_START( peps0206 ) /* Normal board : Red White & Blue Slots (PS0206) */
+ROM_START( peps0206 ) /* Normal board : Red White & Blue Slots (PS0206) - Payout 85.13% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0206_569-a2c.u68",   0x00000, 0x10000, CRC(e165efc0) SHA1(170f917740c63b0b00f424ce02bfd04dc48a1397) ) /* 3 Coins Max / 1 Line */
 
@@ -3544,7 +3544,7 @@ ROM_START( peps0206 ) /* Normal board : Red White & Blue Slots (PS0206) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0207 ) /* Normal board : Red White & Blue Slots (PS0207) */
+ROM_START( peps0207 ) /* Normal board : Red White & Blue Slots (PS0207) - Payout 90.14% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0207_569-a2c.u68",   0x00000, 0x10000, CRC(e7c5f103) SHA1(6e420c151e07863b21a423f8743da360d6389cde) ) /* 3 Coins Max / 3 Lines */
 
@@ -3558,7 +3558,7 @@ ROM_START( peps0207 ) /* Normal board : Red White & Blue Slots (PS0207) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0296 ) /* Normal board : Haywire (PS0296) */
+ROM_START( peps0296 ) /* Normal board : Haywire (PS0296) - Payout 90.00% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0296_561-959.u68",   0x00000, 0x10000, CRC(da871550) SHA1(99e7a4fc77731b185751622ba2e08a44ad8eb7f9) ) /* 3 Coins Max / 1 Line */
 
@@ -3572,7 +3572,7 @@ ROM_START( peps0296 ) /* Normal board : Haywire (PS0296) */
 	ROM_LOAD( "cap1228.u50", 0x0000, 0x0100, CRC(e15b6db9) SHA1(3c637d1ff95a34bfa0259f7fe74989535b2b3a25) )
 ROM_END
 
-ROM_START( peps0298 ) /* Normal board : Double Diamond Slots (PS0298) */
+ROM_START( peps0298 ) /* Normal board : Double Diamond Slots (PS0298) - Payout 87.42% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0298_569-a2c.u68",   0x00000, 0x10000, CRC(3af2eb50) SHA1(1b2e1036f78658da3821bcf88a48b5068b2421b2) ) /* 5 Coins Max / 5 Lines */
 
@@ -3586,7 +3586,7 @@ ROM_START( peps0298 ) /* Normal board : Double Diamond Slots (PS0298) */
 	ROM_LOAD( "cap1003.u50", 0x0000, 0x0100, CRC(cc400805) SHA1(f5ac48ad2a5df64da150f09f2ea5d910230bde56) )
 ROM_END
 
-ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) */
+ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) - Payout 90.10% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0308_569-a2c.u68",   0x00000, 0x10000, CRC(fe30e081) SHA1(d216cbc6336727caf359e6b178c856ab2659cabd) ) /* 5 Coins Max / 5 Lines */
 
@@ -3600,7 +3600,7 @@ ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) */
 	ROM_LOAD( "cap911.u50", 0x0000, 0x0100, CRC(f117e781) SHA1(ba9d850c93e5f3abc26b0ba51f67fa7c07e05f59) )
 ROM_END
 
-ROM_START( peps0364 ) /* Normal board : Red White & Blue Slots (PS0364) */
+ROM_START( peps0364 ) /* Normal board : Red White & Blue Slots (PS0364) - Payout 90.09% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0364_569-a2c.u68",   0x00000, 0x10000, CRC(596c4ae4) SHA1(a06626fb7d17fd12c7514d435031924973e4ba55) ) /* 3 Coins Max / 1 Line (show alt graphics??) */
 
@@ -3614,7 +3614,7 @@ ROM_START( peps0364 ) /* Normal board : Red White & Blue Slots (PS0364) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0426 ) /* Normal board : Sizzling Sevens Slots (PS0268) */
+ROM_START( peps0426 ) /* Normal board : Sizzling Sevens Slots (PS0268) - Payout 90.35% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0426_571-a3h.u68",   0x00000, 0x10000, CRC(b53771c1) SHA1(23fccd5facb98fc83b8903946435be4f15199ff8) ) /* 3 Coins Max / 1 Lines */
 
@@ -3628,7 +3628,7 @@ ROM_START( peps0426 ) /* Normal board : Sizzling Sevens Slots (PS0268) */
 	ROM_LOAD( "cap1428.u50", 0x0000, 0x0100, CRC(c15aae14) SHA1(9b2784ad3da7afdb7778cae9906d0a7c76df7a32) )
 ROM_END
 
-ROM_START( peps0581 ) /* Normal board : Red White & Blue Slots (PS0581) */
+ROM_START( peps0581 ) /* Normal board : Red White & Blue Slots (PS0581) - Payout 85.06% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0581_571-a3h.u68",   0x00000, 0x10000, CRC(8730cbf3) SHA1(2e81aec6982909511a9782f60ff506215f9aac7c) ) /* 5 Coins Max / 5 Lines */
 
@@ -3642,7 +3642,7 @@ ROM_START( peps0581 ) /* Normal board : Red White & Blue Slots (PS0581) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) */
+ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) - Payout 90.02% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0615_586-a6c.u68",   0x00000, 0x10000, CRC(d27dd6ab) SHA1(b3f065f507191682edbd93b07b72ed87bf6ae9b1) ) /* 3 Coins Max / 1 Line */
 
@@ -3656,7 +3656,7 @@ ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) ) /* WRONG!! - Should be CAP2246 here */
 ROM_END
 
-ROM_START( peps0631 ) /* Normal board : Red White & Blue Slots (PS0631) */
+ROM_START( peps0631 ) /* Normal board : Red White & Blue Slots (PS0631) - Payout 89.96% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0631_586-a6c.u68",   0x00000, 0x10000, CRC(3d4c52dd) SHA1(f6b31a77de52c0d6402b51349f34bdb687b27178) ) /* 3 Coins Max / 1 Line (show alt graphics??) */
 
@@ -3670,7 +3670,7 @@ ROM_START( peps0631 ) /* Normal board : Red White & Blue Slots (PS0631) */
 	ROM_LOAD( "cap960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
 ROM_END
 
-ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) */
+ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) - Payout 95.00% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0716_589-a6x.u68",   0x00000, 0x10000, CRC(7615d7b6) SHA1(91fe62eec720a0dc2ebf48835065148f19499d16) ) /* 2 Coins Max / 1 Line */
 
@@ -6666,7 +6666,7 @@ GAMEL(1996, peps0047, 0,        peplus, peplus_slots, peplus_state, peplus,   RO
 GAMEL(1996, peps0092, peps0047, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0092) Wild Cherry Slots",             GAME_NOT_WORKING, layout_pe_slots ) /* Needs MxO-CG1004.Uxx graphics roms redumped */
 GAMEL(1996, peps0206, peps0021, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0206) Red White & Blue Slots",        0, layout_pe_slots )
 GAMEL(1996, peps0207, peps0021, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0207) Red White & Blue Slots",        0, layout_pe_slots )
-GAMEL(1996, peps0296, 0,        peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0296) Haywire",                       0, layout_pe_slots )
+GAMEL(1996, peps0296, 0,        peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0296) Haywire Slots",                 0, layout_pe_slots )
 GAMEL(1996, peps0298, peps0042, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0298) Double Diamond Slots",          0, layout_pe_slots )
 GAMEL(1996, peps0308, 0,        peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",          0, layout_pe_slots )
 GAMEL(1996, peps0364, peps0021, peplus, peplus_slots, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0364) Red White & Blue Slots",        0, layout_pe_slots )
