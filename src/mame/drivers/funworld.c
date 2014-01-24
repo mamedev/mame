@@ -51,6 +51,7 @@
   * Royal Card (TAB original),                        TAB Austria,        1991.
   * Royal Card (Slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
+  * Unknown encrypted Royal Card (Dino4 HW),          unknown,            1997.
   * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
   * Lucky Lady (4x1 aces),                            TAB Austria,        1991.
   * Magic Card II (Bulgarian),                        Impera,             1996.
@@ -436,6 +437,8 @@
   monglfir:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
   soccernw:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
+  rcdino4:   0x7C  0x60  0x65  0x08  0x21  0x08  0x1F  0x1F  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+  
 
 ***********************************************************************************
 
@@ -833,6 +836,13 @@
      Both games are promoted to working state, but flagged as 'game
      unemulated protection' due to the lack of MCU emulation.
 
+  [2014/01/23]
+  - Added unknown encrypted Royal Card. This game is running on Dino 4
+     encrypted hardware, with a CPU+PLCC daughterboard.
+  - Decrypted program address + data, but code still jumps into $48xx
+     range where there's no valid code.
+  - Decoded and partially decrypted the graphics set.
+
 
   *** TO DO ***
 
@@ -1004,6 +1014,7 @@ static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads */
 	AM_RANGE(0x3e00, 0x3fff) AM_RAM /* some games use $3e03-05 range for protection */
+	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* used by rcdino4 (dino4 hw ) */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -4906,6 +4917,36 @@ ROM_START( jolycdsp )   /* Encrypted program in a module. Blue TAB PCB encrypted
 ROM_END
 
 
+/*
+Unknown encrypted Royal Card
+Dino4 hardware with daughterboard (CPU+PLCC)
+
+1x Rockwell R65C02P4 CPU (11450-14 Mexico 9802 B54074-2)
+1x Unknown sanded 44 pin PLCC
+
+2x 68C21
+1x 6845
+1x YM2149F
+
+16Mhz xtal
+
+*/
+
+ROM_START( rcdino4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ryc_1a.u2",  0x0000, 0x10000, CRC(a22704d6) SHA1(0f5721a042d7ec8f4c9a93b38c2a9e3b2d115fc5) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "m27c512.u2",  0x0000, 0x8000, CRC(915f1e59) SHA1(2eb2a7acca50318eb1775b01a00b1d3c74e1522c) )
+	ROM_IGNORE(                      0x8000 )   /* Identical halves. Discarding 2nd half */
+	ROM_LOAD( "m27c512.u20", 0x8000, 0x8000, CRC(86e55f5a) SHA1(be71301b6887e8cc5924864d0f97b54e0668875e) )
+	ROM_IGNORE(                      0x8000 )   /* Identical halves. Discarding 2nd half */
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29pc.u25", 0x0000, 0x0200, CRC(649e6ccc) SHA1(674a5ea3b4b2e7de766e787debef5f695bff7a40) )
+ROM_END
+
+
 /**************************
 *  Driver Initialization  *
 **************************/
@@ -5335,6 +5376,83 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 }
 
 
+DRIVER_INIT_MEMBER(funworld_state, rcdino4)
+/*****************************************************
+
+  Dino4 hardware with CPU+PLCC daughterboard
+
+  Program ROM data & address lines are swapped.
+  GFX ROMs address lines are swapped and data encrypted.
+
+  Color PROM seems straight.
+
+******************************************************/
+{
+	UINT8 *rom = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+	int start = 0x0000;
+
+	UINT8 *gfxrom = memregion("gfx1")->base();
+	int sizeg = memregion("gfx1")->bytes();
+	int startg = 0;
+
+	UINT8 *buffer;
+	int i, a;
+
+	/*****************************
+	*   Program ROM decryption   *
+	*****************************/
+
+	/* data lines swap: 76543210 -> 76543120 */
+
+	for (i = start; i < size; i++)
+	{
+		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
+	}
+
+	buffer = auto_alloc_array(machine(), UINT8, size);
+	memcpy(buffer, rom, size);
+
+
+	/* address lines swap: fedcba9876543210 -> fedcba9867543210 */
+
+	for (i = start; i < size; i++)
+	{
+		a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+		rom[a] = buffer[i];
+	}
+
+	auto_free(machine(), buffer);
+
+	
+	/******************************
+	*   Graphics ROM decryption   *
+	******************************/
+
+	buffer = auto_alloc_array(machine(), UINT8, sizeg);
+	memcpy(buffer, gfxrom, sizeg);
+
+	/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
+
+	for (i = startg; i < sizeg; i++)
+	{
+		a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+		gfxrom[a] = buffer[i];
+	}
+
+	auto_free(machine(), buffer);
+
+	
+	int x;
+	UINT8 *src = memregion( "gfx1" )->base();
+
+	for (x = 0x0000; x < 0x10000; x++)
+	{
+		src[x] = src[x] ^ 0x81;
+	}
+	
+}
+
 /**********************************************
 *                Game Drivers                 *
 **********************************************/
@@ -5387,6 +5505,7 @@ GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  driver_device,  0,       
 GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  driver_device,  0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
 GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  funworld_state, royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  GAME_NOT_WORKING )
 GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  driver_device,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    0 )
+GAME(  1987, rcdino4,   royalcrd, cuoreuno, cuoreuno,  funworld_state, rcdino4,  ROT0, "<unknown>",       "Unknown encrypted Royal Card (Dino4 HW)",         GAME_NOT_WORKING )
 GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  driver_device,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )
 
 // Lucky Lady based...
