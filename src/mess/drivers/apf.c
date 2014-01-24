@@ -162,8 +162,8 @@ READ8_MEMBER( apf_state::apf_mc6847_videoram_r )
 		UINT16 part1 = offset & 0x1f;
 		UINT16 part2 = (offset & 0x1e0) >> 5;
 		UINT16 part3 = (offset & 0x1e00) >> 4;
-		if (m_ca2) m_latch = m_p_videoram[part3 | part1] & 0x3f; // get chr
-		m_crtc->css_w(BIT(m_latch, 5));
+		if (m_ca2) m_latch = m_p_videoram[part3 | part1]; // get chr
+		m_crtc->css_w(BIT(m_latch, 6));
 		UINT16 latch = (m_latch & 0x1f) << 4;
 		return m_p_videoram[latch | part2 | 0x200]; // get gfx
 	}
