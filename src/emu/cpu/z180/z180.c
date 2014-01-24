@@ -89,7 +89,6 @@ Hitachi HD647180 series:
 #include "emu.h"
 #include "debugger.h"
 #include "z180.h"
-#include "cpu/z80/z80daisy.h"
 
 #define VERBOSE 0
 
@@ -114,49 +113,24 @@ Hitachi HD647180 series:
 /* The Z180 registers. HALT is set to 1 when the CPU is halted, the refresh */
 /* register is calculated as follows: refresh=(Regs.R&127)|(Regs.R2&128)    */
 /****************************************************************************/
-struct z180_state
-{
-	PAIR    PREPC,PC,SP,AF,BC,DE,HL,IX,IY;
-	PAIR    AF2,BC2,DE2,HL2;
-	UINT8   R,R2,IFF1,IFF2,HALT,IM,I;
-	UINT8   tmdr_latch;                     /* flag latched TMDR0H, TMDR1H values */
-	UINT8   read_tcr_tmdr[2];               /* flag to indicate that TCR or TMDR was read */
-	UINT32  iol;                            /* I/O line status bits */
-	UINT8   io[64];                         /* 64 internal 8 bit registers */
-	offs_t  mmu[16];                        /* MMU address translation */
-	UINT8   tmdrh[2];                       /* latched TMDR0H and TMDR1H values */
-	UINT16  tmdr_value[2];                  /* TMDR values used byt PRT0 and PRT1 as down counter */
-	UINT8   tif[2];                         /* TIF0 and TIF1 values */
-	UINT8   nmi_state;                      /* nmi line state */
-	UINT8   nmi_pending;                    /* nmi pending */
-	UINT8   irq_state[3];                   /* irq line states (INT0,INT1,INT2) */
-	UINT8   int_pending[Z180_INT_MAX + 1];  /* interrupt pending */
-	UINT8   after_EI;                       /* are we in the EI shadow? */
-	UINT32  ea;
-	UINT8   timer_cnt;                      /* timer counter / divide by 20 */
-	UINT8   dma0_cnt;                       /* dma0 counter / divide by 20 */
-	UINT8   dma1_cnt;                       /* dma1 counter / divide by 20 */
-	z80_daisy_chain daisy;
-	device_irq_acknowledge_callback irq_callback;
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	address_space *iospace;
-	UINT8   rtemp;
-	UINT32  ioltemp;
-	int icount;
-	int extra_cycles;           /* extra cpu cycles */
-	UINT8 *cc[6];
-};
 
-INLINE z180_state *get_safe_token(device_t *device)
+const device_type Z180 = &device_creator<z180_device>;
+
+
+z180_device::z180_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, Z180, "Z180", tag, owner, clock, "z180", __FILE__)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 {
-	assert(device != NULL);
-	assert(device->type() == Z180);
-	return (z180_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-static void set_irq_line(z180_state *cpustate, int irqline, int state);
+
+offs_t z180_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( z180 );
+	return CPU_DISASSEMBLE_NAME(z180)(this, buffer, pc, oprom, opram, options);
+}
+
 
 #define CF  0x01
 #define NF  0x02
@@ -198,45 +172,45 @@ static void set_irq_line(z180_state *cpustate, int irqline, int state);
 #undef _C
 #undef _L
 
-#define _PPC    PREPC.d /* previous program counter */
+#define _PPC    m_PREPC.d /* previous program counter */
 
-#define _PCD    PC.d
-#define _PC     PC.w.l
+#define _PCD    m_PC.d
+#define _PC     m_PC.w.l
 
-#define _SPD    SP.d
-#define _SP     SP.w.l
+#define _SPD    m_SP.d
+#define _SP     m_SP.w.l
 
-#define _AFD    AF.d
-#define _AF     AF.w.l
-#define _A      AF.b.h
-#define _F      AF.b.l
+#define _AFD    m_AF.d
+#define _AF     m_AF.w.l
+#define _A      m_AF.b.h
+#define _F      m_AF.b.l
 
-#define _BCD    BC.d
-#define _BC     BC.w.l
-#define _B      BC.b.h
-#define _C      BC.b.l
+#define _BCD    m_BC.d
+#define _BC     m_BC.w.l
+#define _B      m_BC.b.h
+#define _C      m_BC.b.l
 
-#define _DED    DE.d
-#define _DE     DE.w.l
-#define _D      DE.b.h
-#define _E      DE.b.l
+#define _DED    m_DE.d
+#define _DE     m_DE.w.l
+#define _D      m_DE.b.h
+#define _E      m_DE.b.l
 
-#define _HLD    HL.d
-#define _HL     HL.w.l
-#define _H      HL.b.h
-#define _L      HL.b.l
+#define _HLD    m_HL.d
+#define _HL     m_HL.w.l
+#define _H      m_HL.b.h
+#define _L      m_HL.b.l
 
-#define _IXD    IX.d
-#define _IX     IX.w.l
-#define _HX     IX.b.h
-#define _LX     IX.b.l
+#define _IXD    m_IX.d
+#define _IX     m_IX.w.l
+#define _HX     m_IX.b.h
+#define _LX     m_IX.b.l
 
-#define _IYD    IY.d
-#define _IY     IY.w.l
-#define _HY     IY.b.h
-#define _LY     IY.b.l
+#define _IYD    m_IY.d
+#define _IY     m_IY.w.l
+#define _HY     m_IY.b.h
+#define _LY     m_IY.b.l
 
-#define IO(n)       io[(n)-Z180_CNTLA0]
+#define IO(n)       m_io[(n)-Z180_CNTLA0]
 #define IO_CNTLA0   IO(Z180_CNTLA0)
 #define IO_CNTLA1   IO(Z180_CNTLA1)
 #define IO_CNTLB0   IO(Z180_CNTLB0)
@@ -819,13 +793,6 @@ static UINT8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 
 static UINT8 *SZHVC_add;
 static UINT8 *SZHVC_sub;
 
-static UINT8 z180_readcontrol(z180_state *cpustate, offs_t port);
-static void z180_writecontrol(z180_state *cpustate, offs_t port, UINT8 data);
-static int z180_dma0(z180_state *cpustate, int max_cycles);
-static int z180_dma1(z180_state *cpustate);
-static CPU_BURN( z180 );
-static CPU_SET_INFO( z180 );
-
 #include "z180ops.h"
 #include "z180tbl.h"
 
@@ -836,800 +803,800 @@ static CPU_SET_INFO( z180 );
 #include "z180ed.c"
 #include "z180op.c"
 
-static UINT8 z180_readcontrol(z180_state *cpustate, offs_t port)
+UINT8 z180_device::z180_readcontrol(offs_t port)
 {
 	/* normal external readport */
-	UINT8 data = cpustate->iospace->read_byte(port);
+	UINT8 data = m_iospace->read_byte(port);
 
 	/* remap internal I/O registers */
-	if((port & (cpustate->IO_IOCR & 0xc0)) == (cpustate->IO_IOCR & 0xc0))
-		port = port - (cpustate->IO_IOCR & 0xc0);
+	if((port & (IO_IOCR & 0xc0)) == (IO_IOCR & 0xc0))
+		port = port - (IO_IOCR & 0xc0);
 
 	/* but ignore the data and read the internal register */
 	switch (port + Z180_CNTLA0)
 	{
 	case Z180_CNTLA0:
-		data = cpustate->IO_CNTLA0 & Z180_CNTLA0_RMASK;
-		LOG(("Z180 '%s' CNTLA0 rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_CNTLA0 & Z180_CNTLA0_RMASK;
+		LOG(("Z180 '%s' CNTLA0 rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_CNTLA1:
-		data = cpustate->IO_CNTLA1 & Z180_CNTLA1_RMASK;
-		LOG(("Z180 '%s' CNTLA1 rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_CNTLA1 & Z180_CNTLA1_RMASK;
+		LOG(("Z180 '%s' CNTLA1 rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_CNTLB0:
-		data = cpustate->IO_CNTLB0 & Z180_CNTLB0_RMASK;
-		LOG(("Z180 '%s' CNTLB0 rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_CNTLB0 & Z180_CNTLB0_RMASK;
+		LOG(("Z180 '%s' CNTLB0 rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_CNTLB1:
-		data = cpustate->IO_CNTLB1 & Z180_CNTLB1_RMASK;
-		LOG(("Z180 '%s' CNTLB1 rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_CNTLB1 & Z180_CNTLB1_RMASK;
+		LOG(("Z180 '%s' CNTLB1 rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_STAT0:
-		data = cpustate->IO_STAT0 & Z180_STAT0_RMASK;
+		data = IO_STAT0 & Z180_STAT0_RMASK;
 data |= 0x02; // kludge for 20pacgal
-		LOG(("Z180 '%s' STAT0  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		LOG(("Z180 '%s' STAT0  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_STAT1:
-		data = cpustate->IO_STAT1 & Z180_STAT1_RMASK;
-		LOG(("Z180 '%s' STAT1  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_STAT1 & Z180_STAT1_RMASK;
+		LOG(("Z180 '%s' STAT1  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_TDR0:
-		data = cpustate->IO_TDR0 & Z180_TDR0_RMASK;
-		LOG(("Z180 '%s' TDR0   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_TDR0 & Z180_TDR0_RMASK;
+		LOG(("Z180 '%s' TDR0   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_TDR1:
-		data = cpustate->IO_TDR1 & Z180_TDR1_RMASK;
-		LOG(("Z180 '%s' TDR1   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_TDR1 & Z180_TDR1_RMASK;
+		LOG(("Z180 '%s' TDR1   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_RDR0:
-		data = cpustate->IO_RDR0 & Z180_RDR0_RMASK;
-		LOG(("Z180 '%s' RDR0   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_RDR0 & Z180_RDR0_RMASK;
+		LOG(("Z180 '%s' RDR0   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_RDR1:
-		data = cpustate->IO_RDR1 & Z180_RDR1_RMASK;
-		LOG(("Z180 '%s' RDR1   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_RDR1 & Z180_RDR1_RMASK;
+		LOG(("Z180 '%s' RDR1   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_CNTR:
-		data = cpustate->IO_CNTR & Z180_CNTR_RMASK;
+		data = IO_CNTR & Z180_CNTR_RMASK;
 		data &= ~0x10; // Super Famicom Box sets the TE bit then wants it to be toggled after 8 bits transmitted
-		LOG(("Z180 '%s' CNTR   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		LOG(("Z180 '%s' CNTR   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_TRDR:
-		data = cpustate->IO_TRDR & Z180_TRDR_RMASK;
-		logerror("Z180 '%s' TRDR   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]);
+		data = IO_TRDR & Z180_TRDR_RMASK;
+		logerror("Z180 '%s' TRDR   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]);
 		break;
 
 	case Z180_TMDR0L:
-		data = cpustate->tmdr_value[0] & Z180_TMDR0L_RMASK;
-		LOG(("Z180 '%s' TMDR0L rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = m_tmdr_value[0] & Z180_TMDR0L_RMASK;
+		LOG(("Z180 '%s' TMDR0L rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		/* if timer is counting, latch the MSB and set the latch flag */
-		if ((cpustate->IO_TCR & Z180_TCR_TDE0) == 0)
+		if ((IO_TCR & Z180_TCR_TDE0) == 0)
 		{
-			cpustate->tmdr_latch |= 1;
-			cpustate->tmdrh[0] = (cpustate->tmdr_value[0] & 0xff00) >> 8;
+			m_tmdr_latch |= 1;
+			m_tmdrh[0] = (m_tmdr_value[0] & 0xff00) >> 8;
 		}
 
-		if(cpustate->read_tcr_tmdr[0])
+		if(m_read_tcr_tmdr[0])
 		{
-			cpustate->tif[0] = 0; // reset TIF0
-			cpustate->read_tcr_tmdr[0] = 0;
+			m_tif[0] = 0; // reset TIF0
+			m_read_tcr_tmdr[0] = 0;
 		}
 		else
 		{
-			cpustate->read_tcr_tmdr[0] = 1;
+			m_read_tcr_tmdr[0] = 1;
 		}
 		break;
 
 	case Z180_TMDR0H:
 		/* read latched value? */
-		if (cpustate->tmdr_latch & 1)
+		if (m_tmdr_latch & 1)
 		{
-			cpustate->tmdr_latch &= ~1;
-			data = cpustate->tmdrh[0];
+			m_tmdr_latch &= ~1;
+			data = m_tmdrh[0];
 		}
 		else
 		{
-			data = (cpustate->tmdr_value[0] & 0xff00) >> 8;
+			data = (m_tmdr_value[0] & 0xff00) >> 8;
 		}
 
-		if(cpustate->read_tcr_tmdr[0])
+		if(m_read_tcr_tmdr[0])
 		{
-			cpustate->tif[0] = 0; // reset TIF0
-			cpustate->read_tcr_tmdr[0] = 0;
+			m_tif[0] = 0; // reset TIF0
+			m_read_tcr_tmdr[0] = 0;
 		}
 		else
 		{
-			cpustate->read_tcr_tmdr[0] = 1;
+			m_read_tcr_tmdr[0] = 1;
 		}
-		LOG(("Z180 '%s' TMDR0H rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		LOG(("Z180 '%s' TMDR0H rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_RLDR0L:
-		data = cpustate->IO_RLDR0L & Z180_RLDR0L_RMASK;
-		LOG(("Z180 '%s' RLDR0L rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_RLDR0L & Z180_RLDR0L_RMASK;
+		LOG(("Z180 '%s' RLDR0L rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_RLDR0H:
-		data = cpustate->IO_RLDR0H & Z180_RLDR0H_RMASK;
-		LOG(("Z180 '%s' RLDR0H rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_RLDR0H & Z180_RLDR0H_RMASK;
+		LOG(("Z180 '%s' RLDR0H rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_TCR:
-		data = (cpustate->IO_TCR & Z180_TCR_RMASK) | (cpustate->tif[0] << 6) | (cpustate->tif[1] << 7);
+		data = (IO_TCR & Z180_TCR_RMASK) | (m_tif[0] << 6) | (m_tif[1] << 7);
 
-		if(cpustate->read_tcr_tmdr[0])
+		if(m_read_tcr_tmdr[0])
 		{
-			cpustate->tif[0] = 0; // reset TIF0
-			cpustate->read_tcr_tmdr[0] = 0;
+			m_tif[0] = 0; // reset TIF0
+			m_read_tcr_tmdr[0] = 0;
 		}
 		else
 		{
-			cpustate->read_tcr_tmdr[0] = 1;
+			m_read_tcr_tmdr[0] = 1;
 		}
 
-		if(cpustate->read_tcr_tmdr[1])
+		if(m_read_tcr_tmdr[1])
 		{
-			cpustate->tif[1] = 0; // reset TIF1
-			cpustate->read_tcr_tmdr[1] = 0;
+			m_tif[1] = 0; // reset TIF1
+			m_read_tcr_tmdr[1] = 0;
 		}
 		else
 		{
-			cpustate->read_tcr_tmdr[1] = 1;
+			m_read_tcr_tmdr[1] = 1;
 		}
 
-		LOG(("Z180 '%s' TCR    rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		LOG(("Z180 '%s' TCR    rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IO11:
-		data = cpustate->IO_IO11 & Z180_IO11_RMASK;
-		LOG(("Z180 '%s' IO11   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IO11 & Z180_IO11_RMASK;
+		LOG(("Z180 '%s' IO11   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_ASEXT0:
-		data = cpustate->IO_ASEXT0 & Z180_ASEXT0_RMASK;
-		LOG(("Z180 '%s' ASEXT0 rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_ASEXT0 & Z180_ASEXT0_RMASK;
+		LOG(("Z180 '%s' ASEXT0 rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_ASEXT1:
-		data = cpustate->IO_ASEXT1 & Z180_ASEXT1_RMASK;
-		LOG(("Z180 '%s' ASEXT1 rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_ASEXT1 & Z180_ASEXT1_RMASK;
+		LOG(("Z180 '%s' ASEXT1 rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_TMDR1L:
-		data = cpustate->tmdr_value[1] & Z180_TMDR1L_RMASK;
-		LOG(("Z180 '%s' TMDR1L rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = m_tmdr_value[1] & Z180_TMDR1L_RMASK;
+		LOG(("Z180 '%s' TMDR1L rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		/* if timer is counting, latch the MSB and set the latch flag */
-		if ((cpustate->IO_TCR & Z180_TCR_TDE1) == 0)
+		if ((IO_TCR & Z180_TCR_TDE1) == 0)
 		{
-			cpustate->tmdr_latch |= 2;
-			cpustate->tmdrh[1] = (cpustate->tmdr_value[1] & 0xff00) >> 8;
+			m_tmdr_latch |= 2;
+			m_tmdrh[1] = (m_tmdr_value[1] & 0xff00) >> 8;
 		}
 
-		if(cpustate->read_tcr_tmdr[1])
+		if(m_read_tcr_tmdr[1])
 		{
-			cpustate->tif[1] = 0; // reset TIF1
-			cpustate->read_tcr_tmdr[1] = 0;
+			m_tif[1] = 0; // reset TIF1
+			m_read_tcr_tmdr[1] = 0;
 		}
 		else
 		{
-			cpustate->read_tcr_tmdr[1] = 1;
+			m_read_tcr_tmdr[1] = 1;
 		}
 		break;
 
 	case Z180_TMDR1H:
 		/* read latched value? */
-		if (cpustate->tmdr_latch & 2)
+		if (m_tmdr_latch & 2)
 		{
-			cpustate->tmdr_latch &= ~2;
-			data = cpustate->tmdrh[1];
+			m_tmdr_latch &= ~2;
+			data = m_tmdrh[1];
 		}
 		else
 		{
-			data = (cpustate->tmdr_value[1] & 0xff00) >> 8;
+			data = (m_tmdr_value[1] & 0xff00) >> 8;
 		}
 
-		if(cpustate->read_tcr_tmdr[1])
+		if(m_read_tcr_tmdr[1])
 		{
-			cpustate->tif[1] = 0; // reset TIF1
-			cpustate->read_tcr_tmdr[1] = 0;
+			m_tif[1] = 0; // reset TIF1
+			m_read_tcr_tmdr[1] = 0;
 		}
 		else
 		{
-			cpustate->read_tcr_tmdr[1] = 1;
+			m_read_tcr_tmdr[1] = 1;
 		}
-		LOG(("Z180 '%s' TMDR1H rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		LOG(("Z180 '%s' TMDR1H rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_RLDR1L:
-		data = cpustate->IO_RLDR1L & Z180_RLDR1L_RMASK;
-		LOG(("Z180 '%s' RLDR1L rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_RLDR1L & Z180_RLDR1L_RMASK;
+		LOG(("Z180 '%s' RLDR1L rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_RLDR1H:
-		data = cpustate->IO_RLDR1H & Z180_RLDR1H_RMASK;
-		LOG(("Z180 '%s' RLDR1H rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_RLDR1H & Z180_RLDR1H_RMASK;
+		LOG(("Z180 '%s' RLDR1H rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_FRC:
-		data = cpustate->IO_FRC & Z180_FRC_RMASK;
-		LOG(("Z180 '%s' FRC    rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_FRC & Z180_FRC_RMASK;
+		LOG(("Z180 '%s' FRC    rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IO19:
-		data = cpustate->IO_IO19 & Z180_IO19_RMASK;
-		LOG(("Z180 '%s' IO19   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IO19 & Z180_IO19_RMASK;
+		LOG(("Z180 '%s' IO19   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_ASTC0L:
-		data = cpustate->IO_ASTC0L & Z180_ASTC0L_RMASK;
-		LOG(("Z180 '%s' ASTC0L rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_ASTC0L & Z180_ASTC0L_RMASK;
+		LOG(("Z180 '%s' ASTC0L rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_ASTC0H:
-		data = cpustate->IO_ASTC0H & Z180_ASTC0H_RMASK;
-		LOG(("Z180 '%s' ASTC0H rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_ASTC0H & Z180_ASTC0H_RMASK;
+		LOG(("Z180 '%s' ASTC0H rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_ASTC1L:
-		data = cpustate->IO_ASTC1L & Z180_ASTC1L_RMASK;
-		LOG(("Z180 '%s' ASTC1L rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_ASTC1L & Z180_ASTC1L_RMASK;
+		LOG(("Z180 '%s' ASTC1L rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_ASTC1H:
-		data = cpustate->IO_ASTC1H & Z180_ASTC1H_RMASK;
-		LOG(("Z180 '%s' ASTC1H rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_ASTC1H & Z180_ASTC1H_RMASK;
+		LOG(("Z180 '%s' ASTC1H rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_CMR:
-		data = cpustate->IO_CMR & Z180_CMR_RMASK;
-		LOG(("Z180 '%s' CMR    rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_CMR & Z180_CMR_RMASK;
+		LOG(("Z180 '%s' CMR    rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_CCR:
-		data = cpustate->IO_CCR & Z180_CCR_RMASK;
-		LOG(("Z180 '%s' CCR    rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_CCR & Z180_CCR_RMASK;
+		LOG(("Z180 '%s' CCR    rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_SAR0L:
-		data = cpustate->IO_SAR0L & Z180_SAR0L_RMASK;
-		LOG(("Z180 '%s' SAR0L  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_SAR0L & Z180_SAR0L_RMASK;
+		LOG(("Z180 '%s' SAR0L  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_SAR0H:
-		data = cpustate->IO_SAR0H & Z180_SAR0H_RMASK;
-		LOG(("Z180 '%s' SAR0H  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_SAR0H & Z180_SAR0H_RMASK;
+		LOG(("Z180 '%s' SAR0H  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_SAR0B:
-		data = cpustate->IO_SAR0B & Z180_SAR0B_RMASK;
-		LOG(("Z180 '%s' SAR0B  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_SAR0B & Z180_SAR0B_RMASK;
+		LOG(("Z180 '%s' SAR0B  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_DAR0L:
-		data = cpustate->IO_DAR0L & Z180_DAR0L_RMASK;
-		LOG(("Z180 '%s' DAR0L  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_DAR0L & Z180_DAR0L_RMASK;
+		LOG(("Z180 '%s' DAR0L  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_DAR0H:
-		data = cpustate->IO_DAR0H & Z180_DAR0H_RMASK;
-		LOG(("Z180 '%s' DAR0H  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_DAR0H & Z180_DAR0H_RMASK;
+		LOG(("Z180 '%s' DAR0H  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_DAR0B:
-		data = cpustate->IO_DAR0B & Z180_DAR0B_RMASK;
-		LOG(("Z180 '%s' DAR0B  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_DAR0B & Z180_DAR0B_RMASK;
+		LOG(("Z180 '%s' DAR0B  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_BCR0L:
-		data = cpustate->IO_BCR0L & Z180_BCR0L_RMASK;
-		LOG(("Z180 '%s' BCR0L  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_BCR0L & Z180_BCR0L_RMASK;
+		LOG(("Z180 '%s' BCR0L  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_BCR0H:
-		data = cpustate->IO_BCR0H & Z180_BCR0H_RMASK;
-		LOG(("Z180 '%s' BCR0H  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_BCR0H & Z180_BCR0H_RMASK;
+		LOG(("Z180 '%s' BCR0H  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_MAR1L:
-		data = cpustate->IO_MAR1L & Z180_MAR1L_RMASK;
-		LOG(("Z180 '%s' MAR1L  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_MAR1L & Z180_MAR1L_RMASK;
+		LOG(("Z180 '%s' MAR1L  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_MAR1H:
-		data = cpustate->IO_MAR1H & Z180_MAR1H_RMASK;
-		LOG(("Z180 '%s' MAR1H  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_MAR1H & Z180_MAR1H_RMASK;
+		LOG(("Z180 '%s' MAR1H  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_MAR1B:
-		data = cpustate->IO_MAR1B & Z180_MAR1B_RMASK;
-		LOG(("Z180 '%s' MAR1B  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_MAR1B & Z180_MAR1B_RMASK;
+		LOG(("Z180 '%s' MAR1B  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IAR1L:
-		data = cpustate->IO_IAR1L & Z180_IAR1L_RMASK;
-		LOG(("Z180 '%s' IAR1L  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IAR1L & Z180_IAR1L_RMASK;
+		LOG(("Z180 '%s' IAR1L  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IAR1H:
-		data = cpustate->IO_IAR1H & Z180_IAR1H_RMASK;
-		LOG(("Z180 '%s' IAR1H  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IAR1H & Z180_IAR1H_RMASK;
+		LOG(("Z180 '%s' IAR1H  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IAR1B:
-		data = cpustate->IO_IAR1B & Z180_IAR1B_RMASK;
-		LOG(("Z180 '%s' IAR1B  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IAR1B & Z180_IAR1B_RMASK;
+		LOG(("Z180 '%s' IAR1B  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_BCR1L:
-		data = cpustate->IO_BCR1L & Z180_BCR1L_RMASK;
-		LOG(("Z180 '%s' BCR1L  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_BCR1L & Z180_BCR1L_RMASK;
+		LOG(("Z180 '%s' BCR1L  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_BCR1H:
-		data = cpustate->IO_BCR1H & Z180_BCR1H_RMASK;
-		LOG(("Z180 '%s' BCR1H  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_BCR1H & Z180_BCR1H_RMASK;
+		LOG(("Z180 '%s' BCR1H  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_DSTAT:
-		data = cpustate->IO_DSTAT & Z180_DSTAT_RMASK;
-		LOG(("Z180 '%s' DSTAT  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_DSTAT & Z180_DSTAT_RMASK;
+		LOG(("Z180 '%s' DSTAT  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_DMODE:
-		data = cpustate->IO_DMODE & Z180_DMODE_RMASK;
-		LOG(("Z180 '%s' DMODE  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_DMODE & Z180_DMODE_RMASK;
+		LOG(("Z180 '%s' DMODE  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_DCNTL:
-		data = cpustate->IO_DCNTL & Z180_DCNTL_RMASK;
-		LOG(("Z180 '%s' DCNTL  rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_DCNTL & Z180_DCNTL_RMASK;
+		LOG(("Z180 '%s' DCNTL  rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IL:
-		data = cpustate->IO_IL & Z180_IL_RMASK;
-		LOG(("Z180 '%s' IL     rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IL & Z180_IL_RMASK;
+		LOG(("Z180 '%s' IL     rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_ITC:
-		data = cpustate->IO_ITC & Z180_ITC_RMASK;
-		LOG(("Z180 '%s' ITC    rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_ITC & Z180_ITC_RMASK;
+		LOG(("Z180 '%s' ITC    rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IO35:
-		data = cpustate->IO_IO35 & Z180_IO35_RMASK;
-		LOG(("Z180 '%s' IO35   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IO35 & Z180_IO35_RMASK;
+		LOG(("Z180 '%s' IO35   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_RCR:
-		data = cpustate->IO_RCR & Z180_RCR_RMASK;
-		LOG(("Z180 '%s' RCR    rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_RCR & Z180_RCR_RMASK;
+		LOG(("Z180 '%s' RCR    rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IO37:
-		data = cpustate->IO_IO37 & Z180_IO37_RMASK;
-		LOG(("Z180 '%s' IO37   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IO37 & Z180_IO37_RMASK;
+		LOG(("Z180 '%s' IO37   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_CBR:
-		data = cpustate->IO_CBR & Z180_CBR_RMASK;
-		LOG(("Z180 '%s' CBR    rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_CBR & Z180_CBR_RMASK;
+		LOG(("Z180 '%s' CBR    rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_BBR:
-		data = cpustate->IO_BBR & Z180_BBR_RMASK;
-		LOG(("Z180 '%s' BBR    rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_BBR & Z180_BBR_RMASK;
+		LOG(("Z180 '%s' BBR    rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_CBAR:
-		data = cpustate->IO_CBAR & Z180_CBAR_RMASK;
-		LOG(("Z180 '%s' CBAR   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_CBAR & Z180_CBAR_RMASK;
+		LOG(("Z180 '%s' CBAR   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IO3B:
-		data = cpustate->IO_IO3B & Z180_IO3B_RMASK;
-		LOG(("Z180 '%s' IO3B   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IO3B & Z180_IO3B_RMASK;
+		LOG(("Z180 '%s' IO3B   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IO3C:
-		data = cpustate->IO_IO3C & Z180_IO3C_RMASK;
-		LOG(("Z180 '%s' IO3C   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IO3C & Z180_IO3C_RMASK;
+		LOG(("Z180 '%s' IO3C   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IO3D:
-		data = cpustate->IO_IO3D & Z180_IO3D_RMASK;
-		LOG(("Z180 '%s' IO3D   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IO3D & Z180_IO3D_RMASK;
+		LOG(("Z180 '%s' IO3D   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_OMCR:
-		data = cpustate->IO_OMCR & Z180_OMCR_RMASK;
-		LOG(("Z180 '%s' OMCR   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_OMCR & Z180_OMCR_RMASK;
+		LOG(("Z180 '%s' OMCR   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 
 	case Z180_IOCR:
-		data = cpustate->IO_IOCR & Z180_IOCR_RMASK;
-		LOG(("Z180 '%s' IOCR   rd $%02x ($%02x)\n", cpustate->device->tag(), data, cpustate->io[port & 0x3f]));
+		data = IO_IOCR & Z180_IOCR_RMASK;
+		LOG(("Z180 '%s' IOCR   rd $%02x ($%02x)\n", tag(), data, m_io[port & 0x3f]));
 		break;
 	}
 
 	return data;
 }
 
-static void z180_writecontrol(z180_state *cpustate, offs_t port, UINT8 data)
+void z180_device::z180_writecontrol(offs_t port, UINT8 data)
 {
 	/* normal external write port */
-	cpustate->iospace->write_byte(port, data);
+	m_iospace->write_byte(port, data);
 
 	/* remap internal I/O registers */
-	if((port & (cpustate->IO_IOCR & 0xc0)) == (cpustate->IO_IOCR & 0xc0))
-		port = port - (cpustate->IO_IOCR & 0xc0);
+	if((port & (IO_IOCR & 0xc0)) == (IO_IOCR & 0xc0))
+		port = port - (IO_IOCR & 0xc0);
 
 	/* store the data in the internal register */
 	switch (port + Z180_CNTLA0)
 	{
 	case Z180_CNTLA0:
-		LOG(("Z180 '%s' CNTLA0 wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_CNTLA0_WMASK));
-		cpustate->IO_CNTLA0 = (cpustate->IO_CNTLA0 & ~Z180_CNTLA0_WMASK) | (data & Z180_CNTLA0_WMASK);
+		LOG(("Z180 '%s' CNTLA0 wr $%02x ($%02x)\n", tag(), data,  data & Z180_CNTLA0_WMASK));
+		IO_CNTLA0 = (IO_CNTLA0 & ~Z180_CNTLA0_WMASK) | (data & Z180_CNTLA0_WMASK);
 		break;
 
 	case Z180_CNTLA1:
-		LOG(("Z180 '%s' CNTLA1 wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_CNTLA1_WMASK));
-		cpustate->IO_CNTLA1 = (cpustate->IO_CNTLA1 & ~Z180_CNTLA1_WMASK) | (data & Z180_CNTLA1_WMASK);
+		LOG(("Z180 '%s' CNTLA1 wr $%02x ($%02x)\n", tag(), data,  data & Z180_CNTLA1_WMASK));
+		IO_CNTLA1 = (IO_CNTLA1 & ~Z180_CNTLA1_WMASK) | (data & Z180_CNTLA1_WMASK);
 		break;
 
 	case Z180_CNTLB0:
-		LOG(("Z180 '%s' CNTLB0 wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_CNTLB0_WMASK));
-		cpustate->IO_CNTLB0 = (cpustate->IO_CNTLB0 & ~Z180_CNTLB0_WMASK) | (data & Z180_CNTLB0_WMASK);
+		LOG(("Z180 '%s' CNTLB0 wr $%02x ($%02x)\n", tag(), data,  data & Z180_CNTLB0_WMASK));
+		IO_CNTLB0 = (IO_CNTLB0 & ~Z180_CNTLB0_WMASK) | (data & Z180_CNTLB0_WMASK);
 		break;
 
 	case Z180_CNTLB1:
-		LOG(("Z180 '%s' CNTLB1 wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_CNTLB1_WMASK));
-		cpustate->IO_CNTLB1 = (cpustate->IO_CNTLB1 & ~Z180_CNTLB1_WMASK) | (data & Z180_CNTLB1_WMASK);
+		LOG(("Z180 '%s' CNTLB1 wr $%02x ($%02x)\n", tag(), data,  data & Z180_CNTLB1_WMASK));
+		IO_CNTLB1 = (IO_CNTLB1 & ~Z180_CNTLB1_WMASK) | (data & Z180_CNTLB1_WMASK);
 		break;
 
 	case Z180_STAT0:
-		LOG(("Z180 '%s' STAT0  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_STAT0_WMASK));
-		cpustate->IO_STAT0 = (cpustate->IO_STAT0 & ~Z180_STAT0_WMASK) | (data & Z180_STAT0_WMASK);
+		LOG(("Z180 '%s' STAT0  wr $%02x ($%02x)\n", tag(), data,  data & Z180_STAT0_WMASK));
+		IO_STAT0 = (IO_STAT0 & ~Z180_STAT0_WMASK) | (data & Z180_STAT0_WMASK);
 		break;
 
 	case Z180_STAT1:
-		LOG(("Z180 '%s' STAT1  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_STAT1_WMASK));
-		cpustate->IO_STAT1 = (cpustate->IO_STAT1 & ~Z180_STAT1_WMASK) | (data & Z180_STAT1_WMASK);
+		LOG(("Z180 '%s' STAT1  wr $%02x ($%02x)\n", tag(), data,  data & Z180_STAT1_WMASK));
+		IO_STAT1 = (IO_STAT1 & ~Z180_STAT1_WMASK) | (data & Z180_STAT1_WMASK);
 		break;
 
 	case Z180_TDR0:
-		LOG(("Z180 '%s' TDR0   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_TDR0_WMASK));
-		cpustate->IO_TDR0 = (cpustate->IO_TDR0 & ~Z180_TDR0_WMASK) | (data & Z180_TDR0_WMASK);
+		LOG(("Z180 '%s' TDR0   wr $%02x ($%02x)\n", tag(), data,  data & Z180_TDR0_WMASK));
+		IO_TDR0 = (IO_TDR0 & ~Z180_TDR0_WMASK) | (data & Z180_TDR0_WMASK);
 		break;
 
 	case Z180_TDR1:
-		LOG(("Z180 '%s' TDR1   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_TDR1_WMASK));
-		cpustate->IO_TDR1 = (cpustate->IO_TDR1 & ~Z180_TDR1_WMASK) | (data & Z180_TDR1_WMASK);
+		LOG(("Z180 '%s' TDR1   wr $%02x ($%02x)\n", tag(), data,  data & Z180_TDR1_WMASK));
+		IO_TDR1 = (IO_TDR1 & ~Z180_TDR1_WMASK) | (data & Z180_TDR1_WMASK);
 		break;
 
 	case Z180_RDR0:
-		LOG(("Z180 '%s' RDR0   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_RDR0_WMASK));
-		cpustate->IO_RDR0 = (cpustate->IO_RDR0 & ~Z180_RDR0_WMASK) | (data & Z180_RDR0_WMASK);
+		LOG(("Z180 '%s' RDR0   wr $%02x ($%02x)\n", tag(), data,  data & Z180_RDR0_WMASK));
+		IO_RDR0 = (IO_RDR0 & ~Z180_RDR0_WMASK) | (data & Z180_RDR0_WMASK);
 		break;
 
 	case Z180_RDR1:
-		LOG(("Z180 '%s' RDR1   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_RDR1_WMASK));
-		cpustate->IO_RDR1 = (cpustate->IO_RDR1 & ~Z180_RDR1_WMASK) | (data & Z180_RDR1_WMASK);
+		LOG(("Z180 '%s' RDR1   wr $%02x ($%02x)\n", tag(), data,  data & Z180_RDR1_WMASK));
+		IO_RDR1 = (IO_RDR1 & ~Z180_RDR1_WMASK) | (data & Z180_RDR1_WMASK);
 		break;
 
 	case Z180_CNTR:
-		LOG(("Z180 '%s' CNTR   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_CNTR_WMASK));
-		cpustate->IO_CNTR = (cpustate->IO_CNTR & ~Z180_CNTR_WMASK) | (data & Z180_CNTR_WMASK);
+		LOG(("Z180 '%s' CNTR   wr $%02x ($%02x)\n", tag(), data,  data & Z180_CNTR_WMASK));
+		IO_CNTR = (IO_CNTR & ~Z180_CNTR_WMASK) | (data & Z180_CNTR_WMASK);
 		break;
 
 	case Z180_TRDR:
-		LOG(("Z180 '%s' TRDR   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_TRDR_WMASK));
-		cpustate->IO_TRDR = (cpustate->IO_TRDR & ~Z180_TRDR_WMASK) | (data & Z180_TRDR_WMASK);
+		LOG(("Z180 '%s' TRDR   wr $%02x ($%02x)\n", tag(), data,  data & Z180_TRDR_WMASK));
+		IO_TRDR = (IO_TRDR & ~Z180_TRDR_WMASK) | (data & Z180_TRDR_WMASK);
 		break;
 
 	case Z180_TMDR0L:
-		LOG(("Z180 '%s' TMDR0L wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_TMDR0L_WMASK));
-		cpustate->IO_TMDR0L = data & Z180_TMDR0L_WMASK;
-		cpustate->tmdr_value[0] = (cpustate->tmdr_value[0] & 0xff00) | cpustate->IO_TMDR0L;
+		LOG(("Z180 '%s' TMDR0L wr $%02x ($%02x)\n", tag(), data,  data & Z180_TMDR0L_WMASK));
+		IO_TMDR0L = data & Z180_TMDR0L_WMASK;
+		m_tmdr_value[0] = (m_tmdr_value[0] & 0xff00) | IO_TMDR0L;
 		break;
 
 	case Z180_TMDR0H:
-		LOG(("Z180 '%s' TMDR0H wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_TMDR0H_WMASK));
-		cpustate->IO_TMDR0H = data & Z180_TMDR0H_WMASK;
-		cpustate->tmdr_value[0] = (cpustate->tmdr_value[0] & 0x00ff) | (cpustate->IO_TMDR0H << 8);
+		LOG(("Z180 '%s' TMDR0H wr $%02x ($%02x)\n", tag(), data,  data & Z180_TMDR0H_WMASK));
+		IO_TMDR0H = data & Z180_TMDR0H_WMASK;
+		m_tmdr_value[0] = (m_tmdr_value[0] & 0x00ff) | (IO_TMDR0H << 8);
 		break;
 
 	case Z180_RLDR0L:
-		LOG(("Z180 '%s' RLDR0L wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_RLDR0L_WMASK));
-		cpustate->IO_RLDR0L = (cpustate->IO_RLDR0L & ~Z180_RLDR0L_WMASK) | (data & Z180_RLDR0L_WMASK);
+		LOG(("Z180 '%s' RLDR0L wr $%02x ($%02x)\n", tag(), data,  data & Z180_RLDR0L_WMASK));
+		IO_RLDR0L = (IO_RLDR0L & ~Z180_RLDR0L_WMASK) | (data & Z180_RLDR0L_WMASK);
 		break;
 
 	case Z180_RLDR0H:
-		LOG(("Z180 '%s' RLDR0H wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_RLDR0H_WMASK));
-		cpustate->IO_RLDR0H = (cpustate->IO_RLDR0H & ~Z180_RLDR0H_WMASK) | (data & Z180_RLDR0H_WMASK);
+		LOG(("Z180 '%s' RLDR0H wr $%02x ($%02x)\n", tag(), data,  data & Z180_RLDR0H_WMASK));
+		IO_RLDR0H = (IO_RLDR0H & ~Z180_RLDR0H_WMASK) | (data & Z180_RLDR0H_WMASK);
 		break;
 
 	case Z180_TCR:
-		LOG(("Z180 '%s' TCR    wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_TCR_WMASK));
+		LOG(("Z180 '%s' TCR    wr $%02x ($%02x)\n", tag(), data,  data & Z180_TCR_WMASK));
 		{
-			UINT16 old = cpustate->IO_TCR;
+			UINT16 old = IO_TCR;
 			/* Force reload on state change */
-			cpustate->IO_TCR = (cpustate->IO_TCR & ~Z180_TCR_WMASK) | (data & Z180_TCR_WMASK);
-			if (!(old & Z180_TCR_TDE0) && (cpustate->IO_TCR & Z180_TCR_TDE0))
-				cpustate->tmdr_value[0] = 0; //cpustate->IO_RLDR0L | (cpustate->IO_RLDR0H << 8);
-			if (!(old & Z180_TCR_TDE1) && (cpustate->IO_TCR & Z180_TCR_TDE1))
-				cpustate->tmdr_value[1] = 0; //cpustate->IO_RLDR1L | (cpustate->IO_RLDR1H << 8);
+			IO_TCR = (IO_TCR & ~Z180_TCR_WMASK) | (data & Z180_TCR_WMASK);
+			if (!(old & Z180_TCR_TDE0) && (IO_TCR & Z180_TCR_TDE0))
+				m_tmdr_value[0] = 0; //IO_RLDR0L | (IO_RLDR0H << 8);
+			if (!(old & Z180_TCR_TDE1) && (IO_TCR & Z180_TCR_TDE1))
+				m_tmdr_value[1] = 0; //IO_RLDR1L | (IO_RLDR1H << 8);
 		}
 
 		break;
 
 	case Z180_IO11:
-		LOG(("Z180 '%s' IO11   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IO11_WMASK));
-		cpustate->IO_IO11 = (cpustate->IO_IO11 & ~Z180_IO11_WMASK) | (data & Z180_IO11_WMASK);
+		LOG(("Z180 '%s' IO11   wr $%02x ($%02x)\n", tag(), data,  data & Z180_IO11_WMASK));
+		IO_IO11 = (IO_IO11 & ~Z180_IO11_WMASK) | (data & Z180_IO11_WMASK);
 		break;
 
 	case Z180_ASEXT0:
-		LOG(("Z180 '%s' ASEXT0 wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_ASEXT0_WMASK));
-		cpustate->IO_ASEXT0 = (cpustate->IO_ASEXT0 & ~Z180_ASEXT0_WMASK) | (data & Z180_ASEXT0_WMASK);
+		LOG(("Z180 '%s' ASEXT0 wr $%02x ($%02x)\n", tag(), data,  data & Z180_ASEXT0_WMASK));
+		IO_ASEXT0 = (IO_ASEXT0 & ~Z180_ASEXT0_WMASK) | (data & Z180_ASEXT0_WMASK);
 		break;
 
 	case Z180_ASEXT1:
-		LOG(("Z180 '%s' ASEXT1 wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_ASEXT1_WMASK));
-		cpustate->IO_ASEXT1 = (cpustate->IO_ASEXT1 & ~Z180_ASEXT1_WMASK) | (data & Z180_ASEXT1_WMASK);
+		LOG(("Z180 '%s' ASEXT1 wr $%02x ($%02x)\n", tag(), data,  data & Z180_ASEXT1_WMASK));
+		IO_ASEXT1 = (IO_ASEXT1 & ~Z180_ASEXT1_WMASK) | (data & Z180_ASEXT1_WMASK);
 		break;
 
 	case Z180_TMDR1L:
-		LOG(("Z180 '%s' TMDR1L wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_TMDR1L_WMASK));
-		cpustate->IO_TMDR1L = data & Z180_TMDR1L_WMASK;
-		cpustate->tmdr_value[1] = (cpustate->tmdr_value[1] & 0xff00) | cpustate->IO_TMDR1L;
+		LOG(("Z180 '%s' TMDR1L wr $%02x ($%02x)\n", tag(), data,  data & Z180_TMDR1L_WMASK));
+		IO_TMDR1L = data & Z180_TMDR1L_WMASK;
+		m_tmdr_value[1] = (m_tmdr_value[1] & 0xff00) | IO_TMDR1L;
 		break;
 
 	case Z180_TMDR1H:
-		LOG(("Z180 '%s' TMDR1H wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_TMDR1H_WMASK));
-		cpustate->IO_TMDR1H = data & Z180_TMDR1H_WMASK;
-		cpustate->tmdr_value[1] = (cpustate->tmdr_value[1] & 0x00ff) | cpustate->IO_TMDR1H;
+		LOG(("Z180 '%s' TMDR1H wr $%02x ($%02x)\n", tag(), data,  data & Z180_TMDR1H_WMASK));
+		IO_TMDR1H = data & Z180_TMDR1H_WMASK;
+		m_tmdr_value[1] = (m_tmdr_value[1] & 0x00ff) | IO_TMDR1H;
 		break;
 
 	case Z180_RLDR1L:
-		LOG(("Z180 '%s' RLDR1L wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_RLDR1L_WMASK));
-		cpustate->IO_RLDR1L = (cpustate->IO_RLDR1L & ~Z180_RLDR1L_WMASK) | (data & Z180_RLDR1L_WMASK);
+		LOG(("Z180 '%s' RLDR1L wr $%02x ($%02x)\n", tag(), data,  data & Z180_RLDR1L_WMASK));
+		IO_RLDR1L = (IO_RLDR1L & ~Z180_RLDR1L_WMASK) | (data & Z180_RLDR1L_WMASK);
 		break;
 
 	case Z180_RLDR1H:
-		LOG(("Z180 '%s' RLDR1H wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_RLDR1H_WMASK));
-		cpustate->IO_RLDR1H = (cpustate->IO_RLDR1H & ~Z180_RLDR1H_WMASK) | (data & Z180_RLDR1H_WMASK);
+		LOG(("Z180 '%s' RLDR1H wr $%02x ($%02x)\n", tag(), data,  data & Z180_RLDR1H_WMASK));
+		IO_RLDR1H = (IO_RLDR1H & ~Z180_RLDR1H_WMASK) | (data & Z180_RLDR1H_WMASK);
 		break;
 
 	case Z180_FRC:
-		LOG(("Z180 '%s' FRC    wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_FRC_WMASK));
-		cpustate->IO_FRC = (cpustate->IO_FRC & ~Z180_FRC_WMASK) | (data & Z180_FRC_WMASK);
+		LOG(("Z180 '%s' FRC    wr $%02x ($%02x)\n", tag(), data,  data & Z180_FRC_WMASK));
+		IO_FRC = (IO_FRC & ~Z180_FRC_WMASK) | (data & Z180_FRC_WMASK);
 		break;
 
 	case Z180_IO19:
-		LOG(("Z180 '%s' IO19   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IO19_WMASK));
-		cpustate->IO_IO19 = (cpustate->IO_IO19 & ~Z180_IO19_WMASK) | (data & Z180_IO19_WMASK);
+		LOG(("Z180 '%s' IO19   wr $%02x ($%02x)\n", tag(), data,  data & Z180_IO19_WMASK));
+		IO_IO19 = (IO_IO19 & ~Z180_IO19_WMASK) | (data & Z180_IO19_WMASK);
 		break;
 
 	case Z180_ASTC0L:
-		LOG(("Z180 '%s' ASTC0L wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_ASTC0L_WMASK));
-		cpustate->IO_ASTC0L = (cpustate->IO_ASTC0L & ~Z180_ASTC0L_WMASK) | (data & Z180_ASTC0L_WMASK);
+		LOG(("Z180 '%s' ASTC0L wr $%02x ($%02x)\n", tag(), data,  data & Z180_ASTC0L_WMASK));
+		IO_ASTC0L = (IO_ASTC0L & ~Z180_ASTC0L_WMASK) | (data & Z180_ASTC0L_WMASK);
 		break;
 
 	case Z180_ASTC0H:
-		LOG(("Z180 '%s' ASTC0H wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_ASTC0H_WMASK));
-		cpustate->IO_ASTC0H = (cpustate->IO_ASTC0H & ~Z180_ASTC0H_WMASK) | (data & Z180_ASTC0H_WMASK);
+		LOG(("Z180 '%s' ASTC0H wr $%02x ($%02x)\n", tag(), data,  data & Z180_ASTC0H_WMASK));
+		IO_ASTC0H = (IO_ASTC0H & ~Z180_ASTC0H_WMASK) | (data & Z180_ASTC0H_WMASK);
 		break;
 
 	case Z180_ASTC1L:
-		LOG(("Z180 '%s' ASTC1L wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_ASTC1L_WMASK));
-		cpustate->IO_ASTC1L = (cpustate->IO_ASTC1L & ~Z180_ASTC1L_WMASK) | (data & Z180_ASTC1L_WMASK);
+		LOG(("Z180 '%s' ASTC1L wr $%02x ($%02x)\n", tag(), data,  data & Z180_ASTC1L_WMASK));
+		IO_ASTC1L = (IO_ASTC1L & ~Z180_ASTC1L_WMASK) | (data & Z180_ASTC1L_WMASK);
 		break;
 
 	case Z180_ASTC1H:
-		LOG(("Z180 '%s' ASTC1H wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_ASTC1H_WMASK));
-		cpustate->IO_ASTC1H = (cpustate->IO_ASTC1H & ~Z180_ASTC1H_WMASK) | (data & Z180_ASTC1H_WMASK);
+		LOG(("Z180 '%s' ASTC1H wr $%02x ($%02x)\n", tag(), data,  data & Z180_ASTC1H_WMASK));
+		IO_ASTC1H = (IO_ASTC1H & ~Z180_ASTC1H_WMASK) | (data & Z180_ASTC1H_WMASK);
 		break;
 
 	case Z180_CMR:
-		LOG(("Z180 '%s' CMR    wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_CMR_WMASK));
-		cpustate->IO_CMR = (cpustate->IO_CMR & ~Z180_CMR_WMASK) | (data & Z180_CMR_WMASK);
+		LOG(("Z180 '%s' CMR    wr $%02x ($%02x)\n", tag(), data,  data & Z180_CMR_WMASK));
+		IO_CMR = (IO_CMR & ~Z180_CMR_WMASK) | (data & Z180_CMR_WMASK);
 		break;
 
 	case Z180_CCR:
-		LOG(("Z180 '%s' CCR    wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_CCR_WMASK));
-		cpustate->IO_CCR = (cpustate->IO_CCR & ~Z180_CCR_WMASK) | (data & Z180_CCR_WMASK);
+		LOG(("Z180 '%s' CCR    wr $%02x ($%02x)\n", tag(), data,  data & Z180_CCR_WMASK));
+		IO_CCR = (IO_CCR & ~Z180_CCR_WMASK) | (data & Z180_CCR_WMASK);
 		break;
 
 	case Z180_SAR0L:
-		LOG(("Z180 '%s' SAR0L  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_SAR0L_WMASK));
-		cpustate->IO_SAR0L = (cpustate->IO_SAR0L & ~Z180_SAR0L_WMASK) | (data & Z180_SAR0L_WMASK);
+		LOG(("Z180 '%s' SAR0L  wr $%02x ($%02x)\n", tag(), data,  data & Z180_SAR0L_WMASK));
+		IO_SAR0L = (IO_SAR0L & ~Z180_SAR0L_WMASK) | (data & Z180_SAR0L_WMASK);
 		break;
 
 	case Z180_SAR0H:
-		LOG(("Z180 '%s' SAR0H  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_SAR0H_WMASK));
-		cpustate->IO_SAR0H = (cpustate->IO_SAR0H & ~Z180_SAR0H_WMASK) | (data & Z180_SAR0H_WMASK);
+		LOG(("Z180 '%s' SAR0H  wr $%02x ($%02x)\n", tag(), data,  data & Z180_SAR0H_WMASK));
+		IO_SAR0H = (IO_SAR0H & ~Z180_SAR0H_WMASK) | (data & Z180_SAR0H_WMASK);
 		break;
 
 	case Z180_SAR0B:
-		LOG(("Z180 '%s' SAR0B  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_SAR0B_WMASK));
-		cpustate->IO_SAR0B = (cpustate->IO_SAR0B & ~Z180_SAR0B_WMASK) | (data & Z180_SAR0B_WMASK);
+		LOG(("Z180 '%s' SAR0B  wr $%02x ($%02x)\n", tag(), data,  data & Z180_SAR0B_WMASK));
+		IO_SAR0B = (IO_SAR0B & ~Z180_SAR0B_WMASK) | (data & Z180_SAR0B_WMASK);
 		break;
 
 	case Z180_DAR0L:
-		LOG(("Z180 '%s' DAR0L  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_DAR0L_WMASK));
-		cpustate->IO_DAR0L = (cpustate->IO_DAR0L & ~Z180_DAR0L_WMASK) | (data & Z180_DAR0L_WMASK);
+		LOG(("Z180 '%s' DAR0L  wr $%02x ($%02x)\n", tag(), data,  data & Z180_DAR0L_WMASK));
+		IO_DAR0L = (IO_DAR0L & ~Z180_DAR0L_WMASK) | (data & Z180_DAR0L_WMASK);
 		break;
 
 	case Z180_DAR0H:
-		LOG(("Z180 '%s' DAR0H  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_DAR0H_WMASK));
-		cpustate->IO_DAR0H = (cpustate->IO_DAR0H & ~Z180_DAR0H_WMASK) | (data & Z180_DAR0H_WMASK);
+		LOG(("Z180 '%s' DAR0H  wr $%02x ($%02x)\n", tag(), data,  data & Z180_DAR0H_WMASK));
+		IO_DAR0H = (IO_DAR0H & ~Z180_DAR0H_WMASK) | (data & Z180_DAR0H_WMASK);
 		break;
 
 	case Z180_DAR0B:
-		LOG(("Z180 '%s' DAR0B  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_DAR0B_WMASK));
-		cpustate->IO_DAR0B = (cpustate->IO_DAR0B & ~Z180_DAR0B_WMASK) | (data & Z180_DAR0B_WMASK);
+		LOG(("Z180 '%s' DAR0B  wr $%02x ($%02x)\n", tag(), data,  data & Z180_DAR0B_WMASK));
+		IO_DAR0B = (IO_DAR0B & ~Z180_DAR0B_WMASK) | (data & Z180_DAR0B_WMASK);
 		break;
 
 	case Z180_BCR0L:
-		LOG(("Z180 '%s' BCR0L  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_BCR0L_WMASK));
-		cpustate->IO_BCR0L = (cpustate->IO_BCR0L & ~Z180_BCR0L_WMASK) | (data & Z180_BCR0L_WMASK);
+		LOG(("Z180 '%s' BCR0L  wr $%02x ($%02x)\n", tag(), data,  data & Z180_BCR0L_WMASK));
+		IO_BCR0L = (IO_BCR0L & ~Z180_BCR0L_WMASK) | (data & Z180_BCR0L_WMASK);
 		break;
 
 	case Z180_BCR0H:
-		LOG(("Z180 '%s' BCR0H  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_BCR0H_WMASK));
-		cpustate->IO_BCR0H = (cpustate->IO_BCR0H & ~Z180_BCR0H_WMASK) | (data & Z180_BCR0H_WMASK);
+		LOG(("Z180 '%s' BCR0H  wr $%02x ($%02x)\n", tag(), data,  data & Z180_BCR0H_WMASK));
+		IO_BCR0H = (IO_BCR0H & ~Z180_BCR0H_WMASK) | (data & Z180_BCR0H_WMASK);
 		break;
 
 	case Z180_MAR1L:
-		LOG(("Z180 '%s' MAR1L  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_MAR1L_WMASK));
-		cpustate->IO_MAR1L = (cpustate->IO_MAR1L & ~Z180_MAR1L_WMASK) | (data & Z180_MAR1L_WMASK);
+		LOG(("Z180 '%s' MAR1L  wr $%02x ($%02x)\n", tag(), data,  data & Z180_MAR1L_WMASK));
+		IO_MAR1L = (IO_MAR1L & ~Z180_MAR1L_WMASK) | (data & Z180_MAR1L_WMASK);
 		break;
 
 	case Z180_MAR1H:
-		LOG(("Z180 '%s' MAR1H  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_MAR1H_WMASK));
-		cpustate->IO_MAR1H = (cpustate->IO_MAR1H & ~Z180_MAR1H_WMASK) | (data & Z180_MAR1H_WMASK);
+		LOG(("Z180 '%s' MAR1H  wr $%02x ($%02x)\n", tag(), data,  data & Z180_MAR1H_WMASK));
+		IO_MAR1H = (IO_MAR1H & ~Z180_MAR1H_WMASK) | (data & Z180_MAR1H_WMASK);
 		break;
 
 	case Z180_MAR1B:
-		LOG(("Z180 '%s' MAR1B  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_MAR1B_WMASK));
-		cpustate->IO_MAR1B = (cpustate->IO_MAR1B & ~Z180_MAR1B_WMASK) | (data & Z180_MAR1B_WMASK);
+		LOG(("Z180 '%s' MAR1B  wr $%02x ($%02x)\n", tag(), data,  data & Z180_MAR1B_WMASK));
+		IO_MAR1B = (IO_MAR1B & ~Z180_MAR1B_WMASK) | (data & Z180_MAR1B_WMASK);
 		break;
 
 	case Z180_IAR1L:
-		LOG(("Z180 '%s' IAR1L  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IAR1L_WMASK));
-		cpustate->IO_IAR1L = (cpustate->IO_IAR1L & ~Z180_IAR1L_WMASK) | (data & Z180_IAR1L_WMASK);
+		LOG(("Z180 '%s' IAR1L  wr $%02x ($%02x)\n", tag(), data,  data & Z180_IAR1L_WMASK));
+		IO_IAR1L = (IO_IAR1L & ~Z180_IAR1L_WMASK) | (data & Z180_IAR1L_WMASK);
 		break;
 
 	case Z180_IAR1H:
-		LOG(("Z180 '%s' IAR1H  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IAR1H_WMASK));
-		cpustate->IO_IAR1H = (cpustate->IO_IAR1H & ~Z180_IAR1H_WMASK) | (data & Z180_IAR1H_WMASK);
+		LOG(("Z180 '%s' IAR1H  wr $%02x ($%02x)\n", tag(), data,  data & Z180_IAR1H_WMASK));
+		IO_IAR1H = (IO_IAR1H & ~Z180_IAR1H_WMASK) | (data & Z180_IAR1H_WMASK);
 		break;
 
 	case Z180_IAR1B:
-		LOG(("Z180 '%s' IAR1B  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IAR1B_WMASK));
-		cpustate->IO_IAR1B = (cpustate->IO_IAR1B & ~Z180_IAR1B_WMASK) | (data & Z180_IAR1B_WMASK);
+		LOG(("Z180 '%s' IAR1B  wr $%02x ($%02x)\n", tag(), data,  data & Z180_IAR1B_WMASK));
+		IO_IAR1B = (IO_IAR1B & ~Z180_IAR1B_WMASK) | (data & Z180_IAR1B_WMASK);
 		break;
 
 	case Z180_BCR1L:
-		LOG(("Z180 '%s' BCR1L  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_BCR1L_WMASK));
-		cpustate->IO_BCR1L = (cpustate->IO_BCR1L & ~Z180_BCR1L_WMASK) | (data & Z180_BCR1L_WMASK);
+		LOG(("Z180 '%s' BCR1L  wr $%02x ($%02x)\n", tag(), data,  data & Z180_BCR1L_WMASK));
+		IO_BCR1L = (IO_BCR1L & ~Z180_BCR1L_WMASK) | (data & Z180_BCR1L_WMASK);
 		break;
 
 	case Z180_BCR1H:
-		LOG(("Z180 '%s' BCR1H  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_BCR1H_WMASK));
-		cpustate->IO_BCR1H = (cpustate->IO_BCR1H & ~Z180_BCR1H_WMASK) | (data & Z180_BCR1H_WMASK);
+		LOG(("Z180 '%s' BCR1H  wr $%02x ($%02x)\n", tag(), data,  data & Z180_BCR1H_WMASK));
+		IO_BCR1H = (IO_BCR1H & ~Z180_BCR1H_WMASK) | (data & Z180_BCR1H_WMASK);
 		break;
 
 	case Z180_DSTAT:
-		LOG(("Z180 '%s' DSTAT  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_DSTAT_WMASK));
-		cpustate->IO_DSTAT = (cpustate->IO_DSTAT & ~Z180_DSTAT_WMASK) | (data & Z180_DSTAT_WMASK);
+		LOG(("Z180 '%s' DSTAT  wr $%02x ($%02x)\n", tag(), data,  data & Z180_DSTAT_WMASK));
+		IO_DSTAT = (IO_DSTAT & ~Z180_DSTAT_WMASK) | (data & Z180_DSTAT_WMASK);
 		if ((data & (Z180_DSTAT_DE1 | Z180_DSTAT_DWE1)) == Z180_DSTAT_DE1)
-			cpustate->IO_DSTAT |= Z180_DSTAT_DME;  /* DMA enable */
+			IO_DSTAT |= Z180_DSTAT_DME;  /* DMA enable */
 		if ((data & (Z180_DSTAT_DE0 | Z180_DSTAT_DWE0)) == Z180_DSTAT_DE0)
-			cpustate->IO_DSTAT |= Z180_DSTAT_DME;  /* DMA enable */
+			IO_DSTAT |= Z180_DSTAT_DME;  /* DMA enable */
 		break;
 
 	case Z180_DMODE:
-		LOG(("Z180 '%s' DMODE  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_DMODE_WMASK));
-		cpustate->IO_DMODE = (cpustate->IO_DMODE & ~Z180_DMODE_WMASK) | (data & Z180_DMODE_WMASK);
+		LOG(("Z180 '%s' DMODE  wr $%02x ($%02x)\n", tag(), data,  data & Z180_DMODE_WMASK));
+		IO_DMODE = (IO_DMODE & ~Z180_DMODE_WMASK) | (data & Z180_DMODE_WMASK);
 		break;
 
 	case Z180_DCNTL:
-		LOG(("Z180 '%s' DCNTL  wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_DCNTL_WMASK));
-		cpustate->IO_DCNTL = (cpustate->IO_DCNTL & ~Z180_DCNTL_WMASK) | (data & Z180_DCNTL_WMASK);
+		LOG(("Z180 '%s' DCNTL  wr $%02x ($%02x)\n", tag(), data,  data & Z180_DCNTL_WMASK));
+		IO_DCNTL = (IO_DCNTL & ~Z180_DCNTL_WMASK) | (data & Z180_DCNTL_WMASK);
 		break;
 
 	case Z180_IL:
-		LOG(("Z180 '%s' IL     wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IL_WMASK));
-		cpustate->IO_IL = (cpustate->IO_IL & ~Z180_IL_WMASK) | (data & Z180_IL_WMASK);
+		LOG(("Z180 '%s' IL     wr $%02x ($%02x)\n", tag(), data,  data & Z180_IL_WMASK));
+		IO_IL = (IO_IL & ~Z180_IL_WMASK) | (data & Z180_IL_WMASK);
 		break;
 
 	case Z180_ITC:
-		LOG(("Z180 '%s' ITC    wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_ITC_WMASK));
-		cpustate->IO_ITC = (cpustate->IO_ITC & ~Z180_ITC_WMASK) | (data & Z180_ITC_WMASK);
+		LOG(("Z180 '%s' ITC    wr $%02x ($%02x)\n", tag(), data,  data & Z180_ITC_WMASK));
+		IO_ITC = (IO_ITC & ~Z180_ITC_WMASK) | (data & Z180_ITC_WMASK);
 		break;
 
 	case Z180_IO35:
-		LOG(("Z180 '%s' IO35   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IO35_WMASK));
-		cpustate->IO_IO35 = (cpustate->IO_IO35 & ~Z180_IO35_WMASK) | (data & Z180_IO35_WMASK);
+		LOG(("Z180 '%s' IO35   wr $%02x ($%02x)\n", tag(), data,  data & Z180_IO35_WMASK));
+		IO_IO35 = (IO_IO35 & ~Z180_IO35_WMASK) | (data & Z180_IO35_WMASK);
 		break;
 
 	case Z180_RCR:
-		LOG(("Z180 '%s' RCR    wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_RCR_WMASK));
-		cpustate->IO_RCR = (cpustate->IO_RCR & ~Z180_RCR_WMASK) | (data & Z180_RCR_WMASK);
+		LOG(("Z180 '%s' RCR    wr $%02x ($%02x)\n", tag(), data,  data & Z180_RCR_WMASK));
+		IO_RCR = (IO_RCR & ~Z180_RCR_WMASK) | (data & Z180_RCR_WMASK);
 		break;
 
 	case Z180_IO37:
-		LOG(("Z180 '%s' IO37   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IO37_WMASK));
-		cpustate->IO_IO37 = (cpustate->IO_IO37 & ~Z180_IO37_WMASK) | (data & Z180_IO37_WMASK);
+		LOG(("Z180 '%s' IO37   wr $%02x ($%02x)\n", tag(), data,  data & Z180_IO37_WMASK));
+		IO_IO37 = (IO_IO37 & ~Z180_IO37_WMASK) | (data & Z180_IO37_WMASK);
 		break;
 
 	case Z180_CBR:
-		LOG(("Z180 '%s' CBR    wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_CBR_WMASK));
-		cpustate->IO_CBR = (cpustate->IO_CBR & ~Z180_CBR_WMASK) | (data & Z180_CBR_WMASK);
-		z180_mmu(cpustate);
+		LOG(("Z180 '%s' CBR    wr $%02x ($%02x)\n", tag(), data,  data & Z180_CBR_WMASK));
+		IO_CBR = (IO_CBR & ~Z180_CBR_WMASK) | (data & Z180_CBR_WMASK);
+		z180_mmu();
 		break;
 
 	case Z180_BBR:
-		LOG(("Z180 '%s' BBR    wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_BBR_WMASK));
-		cpustate->IO_BBR = (cpustate->IO_BBR & ~Z180_BBR_WMASK) | (data & Z180_BBR_WMASK);
-		z180_mmu(cpustate);
+		LOG(("Z180 '%s' BBR    wr $%02x ($%02x)\n", tag(), data,  data & Z180_BBR_WMASK));
+		IO_BBR = (IO_BBR & ~Z180_BBR_WMASK) | (data & Z180_BBR_WMASK);
+		z180_mmu();
 		break;
 
 	case Z180_CBAR:
-		LOG(("Z180 '%s' CBAR   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_CBAR_WMASK));
-		cpustate->IO_CBAR = (cpustate->IO_CBAR & ~Z180_CBAR_WMASK) | (data & Z180_CBAR_WMASK);
-		z180_mmu(cpustate);
+		LOG(("Z180 '%s' CBAR   wr $%02x ($%02x)\n", tag(), data,  data & Z180_CBAR_WMASK));
+		IO_CBAR = (IO_CBAR & ~Z180_CBAR_WMASK) | (data & Z180_CBAR_WMASK);
+		z180_mmu();
 		break;
 
 	case Z180_IO3B:
-		LOG(("Z180 '%s' IO3B   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IO3B_WMASK));
-		cpustate->IO_IO3B = (cpustate->IO_IO3B & ~Z180_IO3B_WMASK) | (data & Z180_IO3B_WMASK);
+		LOG(("Z180 '%s' IO3B   wr $%02x ($%02x)\n", tag(), data,  data & Z180_IO3B_WMASK));
+		IO_IO3B = (IO_IO3B & ~Z180_IO3B_WMASK) | (data & Z180_IO3B_WMASK);
 		break;
 
 	case Z180_IO3C:
-		LOG(("Z180 '%s' IO3C   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IO3C_WMASK));
-		cpustate->IO_IO3C = (cpustate->IO_IO3C & ~Z180_IO3C_WMASK) | (data & Z180_IO3C_WMASK);
+		LOG(("Z180 '%s' IO3C   wr $%02x ($%02x)\n", tag(), data,  data & Z180_IO3C_WMASK));
+		IO_IO3C = (IO_IO3C & ~Z180_IO3C_WMASK) | (data & Z180_IO3C_WMASK);
 		break;
 
 	case Z180_IO3D:
-		LOG(("Z180 '%s' IO3D   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IO3D_WMASK));
-		cpustate->IO_IO3D = (cpustate->IO_IO3D & ~Z180_IO3D_WMASK) | (data & Z180_IO3D_WMASK);
+		LOG(("Z180 '%s' IO3D   wr $%02x ($%02x)\n", tag(), data,  data & Z180_IO3D_WMASK));
+		IO_IO3D = (IO_IO3D & ~Z180_IO3D_WMASK) | (data & Z180_IO3D_WMASK);
 		break;
 
 	case Z180_OMCR:
-		LOG(("Z180 '%s' OMCR   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_OMCR_WMASK));
-		cpustate->IO_OMCR = (cpustate->IO_OMCR & ~Z180_OMCR_WMASK) | (data & Z180_OMCR_WMASK);
+		LOG(("Z180 '%s' OMCR   wr $%02x ($%02x)\n", tag(), data,  data & Z180_OMCR_WMASK));
+		IO_OMCR = (IO_OMCR & ~Z180_OMCR_WMASK) | (data & Z180_OMCR_WMASK);
 		break;
 
 	case Z180_IOCR:
-		LOG(("Z180 '%s' IOCR   wr $%02x ($%02x)\n", cpustate->device->tag(), data,  data & Z180_IOCR_WMASK));
-		cpustate->IO_IOCR = (cpustate->IO_IOCR & ~Z180_IOCR_WMASK) | (data & Z180_IOCR_WMASK);
+		LOG(("Z180 '%s' IOCR   wr $%02x ($%02x)\n", tag(), data,  data & Z180_IOCR_WMASK));
+		IO_IOCR = (IO_IOCR & ~Z180_IOCR_WMASK) | (data & Z180_IOCR_WMASK);
 		break;
 	}
 }
 
-static int z180_dma0(z180_state *cpustate, int max_cycles)
+int z180_device::z180_dma0(int max_cycles)
 {
-	offs_t sar0 = 65536 * cpustate->IO_SAR0B + 256 * cpustate->IO_SAR0H + cpustate->IO_SAR0L;
-	offs_t dar0 = 65536 * cpustate->IO_DAR0B + 256 * cpustate->IO_DAR0H + cpustate->IO_DAR0L;
-	int bcr0 = 256 * cpustate->IO_BCR0H + cpustate->IO_BCR0L;
-	int count = (cpustate->IO_DMODE & Z180_DMODE_MMOD) ? bcr0 : 1;
+	offs_t sar0 = 65536 * IO_SAR0B + 256 * IO_SAR0H + IO_SAR0L;
+	offs_t dar0 = 65536 * IO_DAR0B + 256 * IO_DAR0H + IO_DAR0L;
+	int bcr0 = 256 * IO_BCR0H + IO_BCR0L;
+	int count = (IO_DMODE & Z180_DMODE_MMOD) ? bcr0 : 1;
 	int cycles = 0;
 
 	if (bcr0 == 0)
 	{
-		cpustate->IO_DSTAT &= ~Z180_DSTAT_DE0;
+		IO_DSTAT &= ~Z180_DSTAT_DE0;
 		return 0;
 	}
 
@@ -1638,82 +1605,82 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 		/* last transfer happening now? */
 		if (bcr0 == 1)
 		{
-			cpustate->iol |= Z180_TEND0;
+			m_iol |= Z180_TEND0;
 		}
-		switch( cpustate->IO_DMODE & (Z180_DMODE_SM | Z180_DMODE_DM) )
+		switch( IO_DMODE & (Z180_DMODE_SM | Z180_DMODE_DM) )
 		{
 		case 0x00:  /* memory SAR0+1 to memory DAR0+1 */
-			cpustate->program->write_byte(dar0++, cpustate->program->read_byte(sar0++));
+			m_program->write_byte(dar0++, m_program->read_byte(sar0++));
 			break;
 		case 0x04:  /* memory SAR0-1 to memory DAR0+1 */
-			cpustate->program->write_byte(dar0++, cpustate->program->read_byte(sar0--));
+			m_program->write_byte(dar0++, m_program->read_byte(sar0--));
 			break;
 		case 0x08:  /* memory SAR0 fixed to memory DAR0+1 */
-			cpustate->program->write_byte(dar0++, cpustate->program->read_byte(sar0));
+			m_program->write_byte(dar0++, m_program->read_byte(sar0));
 			break;
 		case 0x0c:  /* I/O SAR0 fixed to memory DAR0+1 */
-			if (cpustate->iol & Z180_DREQ0)
+			if (m_iol & Z180_DREQ0)
 			{
-				cpustate->program->write_byte(dar0++, IN(cpustate, sar0));
+				m_program->write_byte(dar0++, IN(sar0));
 				/* edge sensitive DREQ0 ? */
-				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
+				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
-					cpustate->iol &= ~Z180_DREQ0;
+					m_iol &= ~Z180_DREQ0;
 					count = 0;
 				}
 			}
 			break;
 		case 0x10:  /* memory SAR0+1 to memory DAR0-1 */
-			cpustate->program->write_byte(dar0--, cpustate->program->read_byte(sar0++));
+			m_program->write_byte(dar0--, m_program->read_byte(sar0++));
 			break;
 		case 0x14:  /* memory SAR0-1 to memory DAR0-1 */
-			cpustate->program->write_byte(dar0--, cpustate->program->read_byte(sar0--));
+			m_program->write_byte(dar0--, m_program->read_byte(sar0--));
 			break;
 		case 0x18:  /* memory SAR0 fixed to memory DAR0-1 */
-			cpustate->program->write_byte(dar0--, cpustate->program->read_byte(sar0));
+			m_program->write_byte(dar0--, m_program->read_byte(sar0));
 			break;
 		case 0x1c:  /* I/O SAR0 fixed to memory DAR0-1 */
-			if (cpustate->iol & Z180_DREQ0)
+			if (m_iol & Z180_DREQ0)
 			{
-				cpustate->program->write_byte(dar0--, IN(cpustate, sar0));
+				m_program->write_byte(dar0--, IN(sar0));
 				/* edge sensitive DREQ0 ? */
-				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
+				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
-					cpustate->iol &= ~Z180_DREQ0;
+					m_iol &= ~Z180_DREQ0;
 					count = 0;
 				}
 			}
 			break;
 		case 0x20:  /* memory SAR0+1 to memory DAR0 fixed */
-			cpustate->program->write_byte(dar0, cpustate->program->read_byte(sar0++));
+			m_program->write_byte(dar0, m_program->read_byte(sar0++));
 			break;
 		case 0x24:  /* memory SAR0-1 to memory DAR0 fixed */
-			cpustate->program->write_byte(dar0, cpustate->program->read_byte(sar0--));
+			m_program->write_byte(dar0, m_program->read_byte(sar0--));
 			break;
 		case 0x28:  /* reserved */
 			break;
 		case 0x2c:  /* reserved */
 			break;
 		case 0x30:  /* memory SAR0+1 to I/O DAR0 fixed */
-			if (cpustate->iol & Z180_DREQ0)
+			if (m_iol & Z180_DREQ0)
 			{
-				OUT(cpustate, dar0, cpustate->program->read_byte(sar0++));
+				OUT(dar0, m_program->read_byte(sar0++));
 				/* edge sensitive DREQ0 ? */
-				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
+				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
-					cpustate->iol &= ~Z180_DREQ0;
+					m_iol &= ~Z180_DREQ0;
 					count = 0;
 				}
 			}
 			break;
 		case 0x34:  /* memory SAR0-1 to I/O DAR0 fixed */
-			if (cpustate->iol & Z180_DREQ0)
+			if (m_iol & Z180_DREQ0)
 			{
-				OUT(cpustate, dar0, cpustate->program->read_byte(sar0--));
+				OUT(dar0, m_program->read_byte(sar0--));
 				/* edge sensitive DREQ0 ? */
-				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
+				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
-					cpustate->iol &= ~Z180_DREQ0;
+					m_iol &= ~Z180_DREQ0;
 					count = 0;
 				}
 			}
@@ -1730,379 +1697,229 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 			break;
 	}
 
-	cpustate->IO_SAR0L = sar0;
-	cpustate->IO_SAR0H = sar0 >> 8;
-	cpustate->IO_SAR0B = sar0 >> 16;
-	cpustate->IO_DAR0L = dar0;
-	cpustate->IO_DAR0H = dar0 >> 8;
-	cpustate->IO_DAR0B = dar0 >> 16;
-	cpustate->IO_BCR0L = bcr0;
-	cpustate->IO_BCR0H = bcr0 >> 8;
+	IO_SAR0L = sar0;
+	IO_SAR0H = sar0 >> 8;
+	IO_SAR0B = sar0 >> 16;
+	IO_DAR0L = dar0;
+	IO_DAR0H = dar0 >> 8;
+	IO_DAR0B = dar0 >> 16;
+	IO_BCR0L = bcr0;
+	IO_BCR0H = bcr0 >> 8;
 
 	/* DMA terminal count? */
 	if (bcr0 == 0)
 	{
-		cpustate->iol &= ~Z180_TEND0;
-		cpustate->IO_DSTAT &= ~Z180_DSTAT_DE0;
+		m_iol &= ~Z180_TEND0;
+		IO_DSTAT &= ~Z180_DSTAT_DE0;
 		/* terminal count interrupt enabled? */
-		if (cpustate->IO_DSTAT & Z180_DSTAT_DIE0 && cpustate->IFF1)
-			cpustate->int_pending[Z180_INT_DMA0] = 1;
+		if (IO_DSTAT & Z180_DSTAT_DIE0 && m_IFF1)
+			m_int_pending[Z180_INT_DMA0] = 1;
 	}
 	return cycles;
 }
 
-static int z180_dma1(z180_state *cpustate)
+int z180_device::z180_dma1()
 {
-	offs_t mar1 = 65536 * cpustate->IO_MAR1B + 256 * cpustate->IO_MAR1H + cpustate->IO_MAR1L;
-	offs_t iar1 = 256 * cpustate->IO_IAR1H + cpustate->IO_IAR1L;
-	int bcr1 = 256 * cpustate->IO_BCR1H + cpustate->IO_BCR1L;
+	offs_t mar1 = 65536 * IO_MAR1B + 256 * IO_MAR1H + IO_MAR1L;
+	offs_t iar1 = 256 * IO_IAR1H + IO_IAR1L;
+	int bcr1 = 256 * IO_BCR1H + IO_BCR1L;
 	int cycles = 0;
 
-	if ((cpustate->iol & Z180_DREQ1) == 0)
+	if ((m_iol & Z180_DREQ1) == 0)
 		return 0;
 
 	/* counter is zero? */
 	if (bcr1 == 0)
 	{
-		cpustate->IO_DSTAT &= ~Z180_DSTAT_DE1;
+		IO_DSTAT &= ~Z180_DSTAT_DE1;
 		return 0;
 	}
 
 	/* last transfer happening now? */
 	if (bcr1 == 1)
 	{
-		cpustate->iol |= Z180_TEND1;
+		m_iol |= Z180_TEND1;
 	}
 
-	switch (cpustate->IO_DCNTL & (Z180_DCNTL_DIM1 | Z180_DCNTL_DIM0))
+	switch (IO_DCNTL & (Z180_DCNTL_DIM1 | Z180_DCNTL_DIM0))
 	{
 	case 0x00:  /* memory MAR1+1 to I/O IAR1 fixed */
-		cpustate->iospace->write_byte(iar1, cpustate->program->read_byte(mar1++));
+		m_iospace->write_byte(iar1, m_program->read_byte(mar1++));
 		break;
 	case 0x01:  /* memory MAR1-1 to I/O IAR1 fixed */
-		cpustate->iospace->write_byte(iar1, cpustate->program->read_byte(mar1--));
+		m_iospace->write_byte(iar1, m_program->read_byte(mar1--));
 		break;
 	case 0x02:  /* I/O IAR1 fixed to memory MAR1+1 */
-		cpustate->program->write_byte(mar1++, cpustate->iospace->read_byte(iar1));
+		m_program->write_byte(mar1++, m_iospace->read_byte(iar1));
 		break;
 	case 0x03:  /* I/O IAR1 fixed to memory MAR1-1 */
-		cpustate->program->write_byte(mar1--, cpustate->iospace->read_byte(iar1));
+		m_program->write_byte(mar1--, m_iospace->read_byte(iar1));
 		break;
 	}
 
 	/* edge sensitive DREQ1 ? */
-	if (cpustate->IO_DCNTL & Z180_DCNTL_DIM1)
-		cpustate->iol &= ~Z180_DREQ1;
+	if (IO_DCNTL & Z180_DCNTL_DIM1)
+		m_iol &= ~Z180_DREQ1;
 
-	cpustate->IO_MAR1L = mar1;
-	cpustate->IO_MAR1H = mar1 >> 8;
-	cpustate->IO_MAR1B = mar1 >> 16;
-	cpustate->IO_BCR1L = bcr1;
-	cpustate->IO_BCR1H = bcr1 >> 8;
+	IO_MAR1L = mar1;
+	IO_MAR1H = mar1 >> 8;
+	IO_MAR1B = mar1 >> 16;
+	IO_BCR1L = bcr1;
+	IO_BCR1H = bcr1 >> 8;
 
 	/* DMA terminal count? */
 	if (bcr1 == 0)
 	{
-		cpustate->iol &= ~Z180_TEND1;
-		cpustate->IO_DSTAT &= ~Z180_DSTAT_DE1;
-		if (cpustate->IO_DSTAT & Z180_DSTAT_DIE1 && cpustate->IFF1)
-			cpustate->int_pending[Z180_INT_DMA1] = 1;
+		m_iol &= ~Z180_TEND1;
+		IO_DSTAT &= ~Z180_DSTAT_DE1;
+		if (IO_DSTAT & Z180_DSTAT_DIE1 && m_IFF1)
+			m_int_pending[Z180_INT_DMA1] = 1;
 	}
 
 	/* six cycles per transfer (minimum) */
 	return 6 + cycles;
 }
 
-static void z180_write_iolines(z180_state *cpustate, UINT32 data)
+void z180_device::z180_write_iolines(UINT32 data)
 {
-	UINT32 changes = cpustate->iol ^ data;
+	UINT32 changes = m_iol ^ data;
 
 	/* I/O asynchronous clock 0 (active high) or DREQ0 (mux) */
 	if (changes & Z180_CKA0)
 	{
-		LOG(("Z180 '%s' CKA0   %d\n", cpustate->device->tag(), data & Z180_CKA0 ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_CKA0) | (data & Z180_CKA0);
+		LOG(("Z180 '%s' CKA0   %d\n", tag(), data & Z180_CKA0 ? 1 : 0));
+		m_iol = (m_iol & ~Z180_CKA0) | (data & Z180_CKA0);
 	}
 
 	/* I/O asynchronous clock 1 (active high) or TEND1 (mux) */
 	if (changes & Z180_CKA1)
 	{
-		LOG(("Z180 '%s' CKA1   %d\n", cpustate->device->tag(), data & Z180_CKA1 ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_CKA1) | (data & Z180_CKA1);
+		LOG(("Z180 '%s' CKA1   %d\n", tag(), data & Z180_CKA1 ? 1 : 0));
+		m_iol = (m_iol & ~Z180_CKA1) | (data & Z180_CKA1);
 	}
 
 	/* I/O serial clock (active high) */
 	if (changes & Z180_CKS)
 	{
-		LOG(("Z180 '%s' CKS    %d\n", cpustate->device->tag(), data & Z180_CKS ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_CKS) | (data & Z180_CKS);
+		LOG(("Z180 '%s' CKS    %d\n", tag(), data & Z180_CKS ? 1 : 0));
+		m_iol = (m_iol & ~Z180_CKS) | (data & Z180_CKS);
 	}
 
 	/* I   clear to send 0 (active low) */
 	if (changes & Z180_CTS0)
 	{
-		LOG(("Z180 '%s' CTS0   %d\n", cpustate->device->tag(), data & Z180_CTS0 ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_CTS0) | (data & Z180_CTS0);
+		LOG(("Z180 '%s' CTS0   %d\n", tag(), data & Z180_CTS0 ? 1 : 0));
+		m_iol = (m_iol & ~Z180_CTS0) | (data & Z180_CTS0);
 	}
 
 	/* I   clear to send 1 (active low) or RXS (mux) */
 	if (changes & Z180_CTS1)
 	{
-		LOG(("Z180 '%s' CTS1   %d\n", cpustate->device->tag(), data & Z180_CTS1 ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_CTS1) | (data & Z180_CTS1);
+		LOG(("Z180 '%s' CTS1   %d\n", tag(), data & Z180_CTS1 ? 1 : 0));
+		m_iol = (m_iol & ~Z180_CTS1) | (data & Z180_CTS1);
 	}
 
 	/* I   data carrier detect (active low) */
 	if (changes & Z180_DCD0)
 	{
-		LOG(("Z180 '%s' DCD0   %d\n", cpustate->device->tag(), data & Z180_DCD0 ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_DCD0) | (data & Z180_DCD0);
+		LOG(("Z180 '%s' DCD0   %d\n", tag(), data & Z180_DCD0 ? 1 : 0));
+		m_iol = (m_iol & ~Z180_DCD0) | (data & Z180_DCD0);
 	}
 
 	/* I   data request DMA ch 0 (active low) or CKA0 (mux) */
 	if (changes & Z180_DREQ0)
 	{
-		LOG(("Z180 '%s' DREQ0  %d\n", cpustate->device->tag(), data & Z180_DREQ0 ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_DREQ0) | (data & Z180_DREQ0);
+		LOG(("Z180 '%s' DREQ0  %d\n", tag(), data & Z180_DREQ0 ? 1 : 0));
+		m_iol = (m_iol & ~Z180_DREQ0) | (data & Z180_DREQ0);
 	}
 
 	/* I   data request DMA ch 1 (active low) */
 	if (changes & Z180_DREQ1)
 	{
-		LOG(("Z180 '%s' DREQ1  %d\n", cpustate->device->tag(), data & Z180_DREQ1 ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_DREQ1) | (data & Z180_DREQ1);
+		LOG(("Z180 '%s' DREQ1  %d\n", tag(), data & Z180_DREQ1 ? 1 : 0));
+		m_iol = (m_iol & ~Z180_DREQ1) | (data & Z180_DREQ1);
 	}
 
 	/* I   asynchronous receive data 0 (active high) */
 	if (changes & Z180_RXA0)
 	{
-		LOG(("Z180 '%s' RXA0   %d\n", cpustate->device->tag(), data & Z180_RXA0 ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_RXA0) | (data & Z180_RXA0);
+		LOG(("Z180 '%s' RXA0   %d\n", tag(), data & Z180_RXA0 ? 1 : 0));
+		m_iol = (m_iol & ~Z180_RXA0) | (data & Z180_RXA0);
 	}
 
 	/* I   asynchronous receive data 1 (active high) */
 	if (changes & Z180_RXA1)
 	{
-		LOG(("Z180 '%s' RXA1   %d\n", cpustate->device->tag(), data & Z180_RXA1 ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_RXA1) | (data & Z180_RXA1);
+		LOG(("Z180 '%s' RXA1   %d\n", tag(), data & Z180_RXA1 ? 1 : 0));
+		m_iol = (m_iol & ~Z180_RXA1) | (data & Z180_RXA1);
 	}
 
 	/* I   clocked serial receive data (active high) or CTS1 (mux) */
 	if (changes & Z180_RXS)
 	{
-		LOG(("Z180 '%s' RXS    %d\n", cpustate->device->tag(), data & Z180_RXS ? 1 : 0));
-		cpustate->iol = (cpustate->iol & ~Z180_RXS) | (data & Z180_RXS);
+		LOG(("Z180 '%s' RXS    %d\n", tag(), data & Z180_RXS ? 1 : 0));
+		m_iol = (m_iol & ~Z180_RXS) | (data & Z180_RXS);
 	}
 
 	/*   O request to send (active low) */
 	if (changes & Z180_RTS0)
 	{
-		LOG(("Z180 '%s' RTS0   won't change output\n", cpustate->device->tag()));
+		LOG(("Z180 '%s' RTS0   won't change output\n", tag()));
 	}
 
 	/*   O transfer end 0 (active low) or CKA1 (mux) */
 	if (changes & Z180_TEND0)
 	{
-		LOG(("Z180 '%s' TEND0  won't change output\n", cpustate->device->tag()));
+		LOG(("Z180 '%s' TEND0  won't change output\n", tag()));
 	}
 
 	/*   O transfer end 1 (active low) */
 	if (changes & Z180_TEND1)
 	{
-		LOG(("Z180 '%s' TEND1  won't change output\n", cpustate->device->tag()));
+		LOG(("Z180 '%s' TEND1  won't change output\n", tag()));
 	}
 
 	/*   O transfer out (PRT channel, active low) or A18 (mux) */
 	if (changes & Z180_A18_TOUT)
 	{
-		LOG(("Z180 '%s' TOUT   won't change output\n", cpustate->device->tag()));
+		LOG(("Z180 '%s' TOUT   won't change output\n", tag()));
 	}
 
 	/*   O asynchronous transmit data 0 (active high) */
 	if (changes & Z180_TXA0)
 	{
-		LOG(("Z180 '%s' TXA0   won't change output\n", cpustate->device->tag()));
+		LOG(("Z180 '%s' TXA0   won't change output\n", tag()));
 	}
 
 	/*   O asynchronous transmit data 1 (active high) */
 	if (changes & Z180_TXA1)
 	{
-		LOG(("Z180 '%s' TXA1   won't change output\n", cpustate->device->tag()));
+		LOG(("Z180 '%s' TXA1   won't change output\n", tag()));
 	}
 
 	/*   O clocked serial transmit data (active high) */
 	if (changes & Z180_TXS)
 	{
-		LOG(("Z180 '%s' TXS    won't change output\n", cpustate->device->tag()));
+		LOG(("Z180 '%s' TXS    won't change output\n", tag()));
 	}
 }
 
 
-static CPU_INIT( z180 )
+void z180_device::device_start()
 {
-	z180_state *cpustate = get_safe_token(device);
-	if (device->static_config() != NULL)
-		cpustate->daisy.init(device, (const z80_daisy_config *)device->static_config());
-	cpustate->irq_callback = irqcallback;
-
-	SZHVC_add = auto_alloc_array(device->machine(), UINT8, 2*256*256);
-	SZHVC_sub = auto_alloc_array(device->machine(), UINT8, 2*256*256);
-
-	/* set up the state table */
-	{
-		device_state_interface *state;
-		device->interface(state);
-		state->state_add(Z180_PC,         "PC",        cpustate->PC.w.l);
-		state->state_add(STATE_GENPC,     "GENPC",     cpustate->_PCD).noshow();
-		state->state_add(STATE_GENPCBASE, "GENPCBASE", cpustate->PREPC.w.l).noshow();
-		state->state_add(Z180_SP,         "SP",        cpustate->_SPD);
-		state->state_add(STATE_GENSP,     "GENSP",     cpustate->SP.w.l).noshow();
-		state->state_add(STATE_GENFLAGS,  "GENFLAGS",  cpustate->AF.b.l).noshow().formatstr("%8s");
-		state->state_add(Z180_A,          "A",         cpustate->_A).noshow();
-		state->state_add(Z180_B,          "B",         cpustate->_B).noshow();
-		state->state_add(Z180_C,          "C",         cpustate->_C).noshow();
-		state->state_add(Z180_D,          "D",         cpustate->_D).noshow();
-		state->state_add(Z180_E,          "E",         cpustate->_E).noshow();
-		state->state_add(Z180_H,          "H",         cpustate->_H).noshow();
-		state->state_add(Z180_L,          "L",         cpustate->_L).noshow();
-		state->state_add(Z180_AF,         "AF",        cpustate->AF.w.l);
-		state->state_add(Z180_BC,         "BC",        cpustate->BC.w.l);
-		state->state_add(Z180_DE,         "DE",        cpustate->DE.w.l);
-		state->state_add(Z180_HL,         "HL",        cpustate->HL.w.l);
-		state->state_add(Z180_IX,         "IX",        cpustate->IX.w.l);
-		state->state_add(Z180_IY,         "IY",        cpustate->IY.w.l);
-		state->state_add(Z180_AF2,        "AF2",       cpustate->AF2.w.l);
-		state->state_add(Z180_BC2,        "BC2",       cpustate->BC2.w.l);
-		state->state_add(Z180_DE2,        "DE2",       cpustate->DE2.w.l);
-		state->state_add(Z180_HL2,        "HL2",       cpustate->HL2.w.l);
-		state->state_add(Z180_R,          "R",         cpustate->rtemp).callimport().callexport();
-		state->state_add(Z180_I,          "I",         cpustate->I);
-		state->state_add(Z180_IM,         "IM",        cpustate->IM).mask(0x3);
-		state->state_add(Z180_IFF1,       "IFF1",      cpustate->IFF1).mask(0x1);
-		state->state_add(Z180_IFF2,       "IFF2",      cpustate->IFF2).mask(0x1);
-		state->state_add(Z180_HALT,       "HALT",      cpustate->HALT).mask(0x1);
-
-		state->state_add(Z180_IOLINES,    "IOLINES",   cpustate->ioltemp).mask(0xffffff).callimport();
-
-		state->state_add(Z180_CNTLA0,     "CNTLA0",    cpustate->IO_CNTLA0);
-		state->state_add(Z180_CNTLA1,     "CNTLA1",    cpustate->IO_CNTLA1);
-		state->state_add(Z180_CNTLB0,     "CNTLB0",    cpustate->IO_CNTLB0);
-		state->state_add(Z180_CNTLB1,     "CNTLB1",    cpustate->IO_CNTLB1);
-		state->state_add(Z180_STAT0,      "STAT0",     cpustate->IO_STAT0);
-		state->state_add(Z180_STAT1,      "STAT1",     cpustate->IO_STAT1);
-		state->state_add(Z180_TDR0,       "TDR0",      cpustate->IO_TDR0);
-		state->state_add(Z180_TDR1,       "TDR1",      cpustate->IO_TDR1);
-		state->state_add(Z180_RDR0,       "RDR0",      cpustate->IO_RDR0);
-		state->state_add(Z180_RDR1,       "RDR1",      cpustate->IO_RDR1);
-		state->state_add(Z180_CNTR,       "CNTR",      cpustate->IO_CNTR);
-		state->state_add(Z180_TRDR,       "TRDR",      cpustate->IO_TRDR);
-		state->state_add(Z180_TMDR0L,     "TMDR0L",    cpustate->IO_TMDR0L);
-		state->state_add(Z180_TMDR0H,     "TMDR0H",    cpustate->IO_TMDR0H);
-		state->state_add(Z180_RLDR0L,     "RLDR0L",    cpustate->IO_RLDR0L);
-		state->state_add(Z180_RLDR0H,     "RLDR0H",    cpustate->IO_RLDR0H);
-		state->state_add(Z180_TCR,        "TCR",       cpustate->IO_TCR);
-		state->state_add(Z180_IO11,       "IO11",      cpustate->IO_IO11);
-		state->state_add(Z180_ASEXT0,     "ASEXT0",    cpustate->IO_ASEXT0);
-		state->state_add(Z180_ASEXT1,     "ASEXT1",    cpustate->IO_ASEXT1);
-		state->state_add(Z180_TMDR1L,     "TMDR1L",    cpustate->IO_TMDR1L);
-		state->state_add(Z180_TMDR1H,     "TMDR1H",    cpustate->IO_TMDR1H);
-		state->state_add(Z180_RLDR1L,     "RLDR1L",    cpustate->IO_RLDR1L);
-		state->state_add(Z180_RLDR1H,     "RLDR1H",    cpustate->IO_RLDR1H);
-		state->state_add(Z180_FRC,        "FRC",       cpustate->IO_FRC);
-		state->state_add(Z180_IO19,       "IO19",      cpustate->IO_IO19);
-		state->state_add(Z180_ASTC0L,     "ASTC0L",    cpustate->IO_ASTC0L);
-		state->state_add(Z180_ASTC0H,     "ASTC0H",    cpustate->IO_ASTC0H);
-		state->state_add(Z180_ASTC1L,     "ASTC1L",    cpustate->IO_ASTC1L);
-		state->state_add(Z180_ASTC1H,     "ASTC1H",    cpustate->IO_ASTC1H);
-		state->state_add(Z180_CMR,        "CMR",       cpustate->IO_CMR);
-		state->state_add(Z180_CCR,        "CCR",       cpustate->IO_CCR);
-		state->state_add(Z180_SAR0L,      "SAR0L",     cpustate->IO_SAR0L);
-		state->state_add(Z180_SAR0H,      "SAR0H",     cpustate->IO_SAR0H);
-		state->state_add(Z180_SAR0B,      "SAR0B",     cpustate->IO_SAR0B);
-		state->state_add(Z180_DAR0L,      "DAR0L",     cpustate->IO_DAR0L);
-		state->state_add(Z180_DAR0H,      "DAR0H",     cpustate->IO_DAR0H);
-		state->state_add(Z180_DAR0B,      "DAR0B",     cpustate->IO_DAR0B);
-		state->state_add(Z180_BCR0L,      "BCR0L",     cpustate->IO_BCR0L);
-		state->state_add(Z180_BCR0H,      "BCR0H",     cpustate->IO_BCR0H);
-		state->state_add(Z180_MAR1L,      "MAR1L",     cpustate->IO_MAR1L);
-		state->state_add(Z180_MAR1H,      "MAR1H",     cpustate->IO_MAR1H);
-		state->state_add(Z180_MAR1B,      "MAR1B",     cpustate->IO_MAR1B);
-		state->state_add(Z180_IAR1L,      "IAR1L",     cpustate->IO_IAR1L);
-		state->state_add(Z180_IAR1H,      "IAR1H",     cpustate->IO_IAR1H);
-		state->state_add(Z180_IAR1B,      "IAR1B",     cpustate->IO_IAR1B);
-		state->state_add(Z180_BCR1L,      "BCR1L",     cpustate->IO_BCR1L);
-		state->state_add(Z180_BCR1H,      "BCR1H",     cpustate->IO_BCR1H);
-		state->state_add(Z180_DSTAT,      "DSTAT",     cpustate->IO_DSTAT);
-		state->state_add(Z180_DMODE,      "DMODE",     cpustate->IO_DMODE);
-		state->state_add(Z180_DCNTL,      "DCNTL",     cpustate->IO_DCNTL);
-		state->state_add(Z180_IL,         "IL",        cpustate->IO_IL);
-		state->state_add(Z180_ITC,        "ITC",       cpustate->IO_ITC);
-		state->state_add(Z180_IO35,       "IO35",      cpustate->IO_IO35);
-		state->state_add(Z180_RCR,        "RCR",       cpustate->IO_RCR);
-		state->state_add(Z180_IO37,       "IO37",      cpustate->IO_IO37);
-		state->state_add(Z180_CBR,        "CBR",       cpustate->IO_CBR).callimport();
-		state->state_add(Z180_BBR,        "BBR",       cpustate->IO_BBR).callimport();
-		state->state_add(Z180_CBAR,       "CBAR",      cpustate->IO_CBAR).callimport();
-		state->state_add(Z180_IO3B,       "IO3B",      cpustate->IO_IO3B);
-		state->state_add(Z180_IO3C,       "IO3C",      cpustate->IO_IO3C);
-		state->state_add(Z180_IO3D,       "IO3D",      cpustate->IO_IO3D);
-		state->state_add(Z180_OMCR,       "OMCR",      cpustate->IO_OMCR);
-		state->state_add(Z180_IOCR,       "IOCR",      cpustate->IO_IOCR);
-	}
-
-	device->save_item(NAME(cpustate->AF.w.l));
-	device->save_item(NAME(cpustate->BC.w.l));
-	device->save_item(NAME(cpustate->DE.w.l));
-	device->save_item(NAME(cpustate->HL.w.l));
-	device->save_item(NAME(cpustate->IX.w.l));
-	device->save_item(NAME(cpustate->IY.w.l));
-	device->save_item(NAME(cpustate->PC.w.l));
-	device->save_item(NAME(cpustate->SP.w.l));
-	device->save_item(NAME(cpustate->AF2.w.l));
-	device->save_item(NAME(cpustate->BC2.w.l));
-	device->save_item(NAME(cpustate->DE2.w.l));
-	device->save_item(NAME(cpustate->HL2.w.l));
-	device->save_item(NAME(cpustate->R));
-	device->save_item(NAME(cpustate->R2));
-	device->save_item(NAME(cpustate->IFF1));
-	device->save_item(NAME(cpustate->IFF2));
-	device->save_item(NAME(cpustate->HALT));
-	device->save_item(NAME(cpustate->IM));
-	device->save_item(NAME(cpustate->I));
-	device->save_item(NAME(cpustate->nmi_state));
-	device->save_item(NAME(cpustate->nmi_pending));
-	device->save_item(NAME(cpustate->irq_state));
-	device->save_item(NAME(cpustate->int_pending));
-	device->save_item(NAME(cpustate->timer_cnt));
-	device->save_item(NAME(cpustate->dma0_cnt));
-	device->save_item(NAME(cpustate->dma1_cnt));
-	device->save_item(NAME(cpustate->after_EI));
-
-	device->save_item(NAME(cpustate->tif));
-
-	device->save_item(NAME(cpustate->read_tcr_tmdr));
-	device->save_item(NAME(cpustate->tmdr_value));
-	device->save_item(NAME(cpustate->tmdrh));
-	device->save_item(NAME(cpustate->tmdr_latch));
-
-	device->save_item(NAME(cpustate->io));
-	device->save_item(NAME(cpustate->iol));
-	device->save_item(NAME(cpustate->ioltemp));
-
-	device->save_item(NAME(cpustate->mmu));
-
-}
-
-/****************************************************************************
- * Reset registers to their initial values
- ****************************************************************************/
-static CPU_RESET( z180 )
-{
-	z180_state *cpustate = get_safe_token(device);
 	int i, p;
 	int oldval, newval, val;
 	UINT8 *padd, *padc, *psub, *psbc;
+
+	if (static_config() != NULL)
+	{
+		m_daisy.init(this, (const z80_daisy_config *)static_config());
+	}
+
 	/* allocate big flag arrays once */
+	SZHVC_add = auto_alloc_array(machine(), UINT8, 2*256*256);
+	SZHVC_sub = auto_alloc_array(machine(), UINT8, 2*256*256);
+
 	padd = &SZHVC_add[  0*256];
 	padc = &SZHVC_add[256*256];
 	psub = &SZHVC_sub[  0*256];
@@ -2173,206 +1990,357 @@ static CPU_RESET( z180 )
 		if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
 	}
 
-	cpustate->_PPC = 0;
-	cpustate->_PCD = 0;
-	cpustate->_SPD = 0;
-	cpustate->_AFD = 0;
-	cpustate->_BCD = 0;
-	cpustate->_DED = 0;
-	cpustate->_HLD = 0;
-	cpustate->_IXD = 0;
-	cpustate->_IYD = 0;
-	cpustate->AF2.d = 0;
-	cpustate->BC2.d = 0;
-	cpustate->DE2.d = 0;
-	cpustate->HL2.d = 0;
-	cpustate->R = 0;
-	cpustate->R2 = 0;
-	cpustate->IFF1 = 0;
-	cpustate->IFF2 = 0;
-	cpustate->HALT = 0;
-	cpustate->IM = 0;
-	cpustate->I = 0;
-	cpustate->tmdr_latch = 0;
-	cpustate->read_tcr_tmdr[0] = 0;
-	cpustate->read_tcr_tmdr[1] = 0;
-	cpustate->iol = 0;
-	memset(cpustate->io, 0, sizeof(cpustate->io));
-	memset(cpustate->mmu, 0, sizeof(cpustate->mmu));
-	cpustate->tmdrh[0] = 0;
-	cpustate->tmdrh[1] = 0;
-	cpustate->tmdr_value[0] = 0xffff;
-	cpustate->tmdr_value[1] = 0xffff;
-	cpustate->tif[0] = 0;
-	cpustate->tif[1] = 0;
-	cpustate->nmi_state = CLEAR_LINE;
-	cpustate->nmi_pending = 0;
-	cpustate->irq_state[0] = CLEAR_LINE;
-	cpustate->irq_state[1] = CLEAR_LINE;
-	cpustate->irq_state[2] = CLEAR_LINE;
-	cpustate->after_EI = 0;
-	cpustate->ea = 0;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->iospace = &device->space(AS_IO);
-	cpustate->device = device;
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+	m_iospace = &space(AS_IO);
 
-	memcpy(cpustate->cc, (UINT8 *)cc_default, sizeof(cpustate->cc));
-	cpustate->_IX = cpustate->_IY = 0xffff; /* IX and IY are FFFF after a reset! */
-	cpustate->_F = ZF;          /* Zero flag is set */
+	/* set up the state table */
+	{
+		state_add(Z180_PC,         "PC",        m_PC.w.l);
+		state_add(STATE_GENPC,     "GENPC",     _PCD).noshow();
+		state_add(STATE_GENPCBASE, "GENPCBASE", m_PREPC.w.l).noshow();
+		state_add(Z180_SP,         "SP",        _SPD);
+		state_add(STATE_GENSP,     "GENSP",     m_SP.w.l).noshow();
+		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_AF.b.l).noshow().formatstr("%8s");
+		state_add(Z180_A,          "A",         _A).noshow();
+		state_add(Z180_B,          "B",         _B).noshow();
+		state_add(Z180_C,          "C",         _C).noshow();
+		state_add(Z180_D,          "D",         _D).noshow();
+		state_add(Z180_E,          "E",         _E).noshow();
+		state_add(Z180_H,          "H",         _H).noshow();
+		state_add(Z180_L,          "L",         _L).noshow();
+		state_add(Z180_AF,         "AF",        m_AF.w.l);
+		state_add(Z180_BC,         "BC",        m_BC.w.l);
+		state_add(Z180_DE,         "DE",        m_DE.w.l);
+		state_add(Z180_HL,         "HL",        m_HL.w.l);
+		state_add(Z180_IX,         "IX",        m_IX.w.l);
+		state_add(Z180_IY,         "IY",        m_IY.w.l);
+		state_add(Z180_AF2,        "AF2",       m_AF2.w.l);
+		state_add(Z180_BC2,        "BC2",       m_BC2.w.l);
+		state_add(Z180_DE2,        "DE2",       m_DE2.w.l);
+		state_add(Z180_HL2,        "HL2",       m_HL2.w.l);
+		state_add(Z180_R,          "R",         m_rtemp).callimport().callexport();
+		state_add(Z180_I,          "I",         m_I);
+		state_add(Z180_IM,         "IM",        m_IM).mask(0x3);
+		state_add(Z180_IFF1,       "IFF1",      m_IFF1).mask(0x1);
+		state_add(Z180_IFF2,       "IFF2",      m_IFF2).mask(0x1);
+		state_add(Z180_HALT,       "HALT",      m_HALT).mask(0x1);
 
-	for (i=0; i <= Z180_INT_MAX; i++)
-		cpustate->int_pending[i] = 0;
+		state_add(Z180_IOLINES,    "IOLINES",   m_ioltemp).mask(0xffffff).callimport();
 
-	cpustate->timer_cnt = 0;
-	cpustate->dma0_cnt = 0;
-	cpustate->dma1_cnt = 0;
+		state_add(Z180_CNTLA0,     "CNTLA0",    IO_CNTLA0);
+		state_add(Z180_CNTLA1,     "CNTLA1",    IO_CNTLA1);
+		state_add(Z180_CNTLB0,     "CNTLB0",    IO_CNTLB0);
+		state_add(Z180_CNTLB1,     "CNTLB1",    IO_CNTLB1);
+		state_add(Z180_STAT0,      "STAT0",     IO_STAT0);
+		state_add(Z180_STAT1,      "STAT1",     IO_STAT1);
+		state_add(Z180_TDR0,       "TDR0",      IO_TDR0);
+		state_add(Z180_TDR1,       "TDR1",      IO_TDR1);
+		state_add(Z180_RDR0,       "RDR0",      IO_RDR0);
+		state_add(Z180_RDR1,       "RDR1",      IO_RDR1);
+		state_add(Z180_CNTR,       "CNTR",      IO_CNTR);
+		state_add(Z180_TRDR,       "TRDR",      IO_TRDR);
+		state_add(Z180_TMDR0L,     "TMDR0L",    IO_TMDR0L);
+		state_add(Z180_TMDR0H,     "TMDR0H",    IO_TMDR0H);
+		state_add(Z180_RLDR0L,     "RLDR0L",    IO_RLDR0L);
+		state_add(Z180_RLDR0H,     "RLDR0H",    IO_RLDR0H);
+		state_add(Z180_TCR,        "TCR",       IO_TCR);
+		state_add(Z180_IO11,       "IO11",      IO_IO11);
+		state_add(Z180_ASEXT0,     "ASEXT0",    IO_ASEXT0);
+		state_add(Z180_ASEXT1,     "ASEXT1",    IO_ASEXT1);
+		state_add(Z180_TMDR1L,     "TMDR1L",    IO_TMDR1L);
+		state_add(Z180_TMDR1H,     "TMDR1H",    IO_TMDR1H);
+		state_add(Z180_RLDR1L,     "RLDR1L",    IO_RLDR1L);
+		state_add(Z180_RLDR1H,     "RLDR1H",    IO_RLDR1H);
+		state_add(Z180_FRC,        "FRC",       IO_FRC);
+		state_add(Z180_IO19,       "IO19",      IO_IO19);
+		state_add(Z180_ASTC0L,     "ASTC0L",    IO_ASTC0L);
+		state_add(Z180_ASTC0H,     "ASTC0H",    IO_ASTC0H);
+		state_add(Z180_ASTC1L,     "ASTC1L",    IO_ASTC1L);
+		state_add(Z180_ASTC1H,     "ASTC1H",    IO_ASTC1H);
+		state_add(Z180_CMR,        "CMR",       IO_CMR);
+		state_add(Z180_CCR,        "CCR",       IO_CCR);
+		state_add(Z180_SAR0L,      "SAR0L",     IO_SAR0L);
+		state_add(Z180_SAR0H,      "SAR0H",     IO_SAR0H);
+		state_add(Z180_SAR0B,      "SAR0B",     IO_SAR0B);
+		state_add(Z180_DAR0L,      "DAR0L",     IO_DAR0L);
+		state_add(Z180_DAR0H,      "DAR0H",     IO_DAR0H);
+		state_add(Z180_DAR0B,      "DAR0B",     IO_DAR0B);
+		state_add(Z180_BCR0L,      "BCR0L",     IO_BCR0L);
+		state_add(Z180_BCR0H,      "BCR0H",     IO_BCR0H);
+		state_add(Z180_MAR1L,      "MAR1L",     IO_MAR1L);
+		state_add(Z180_MAR1H,      "MAR1H",     IO_MAR1H);
+		state_add(Z180_MAR1B,      "MAR1B",     IO_MAR1B);
+		state_add(Z180_IAR1L,      "IAR1L",     IO_IAR1L);
+		state_add(Z180_IAR1H,      "IAR1H",     IO_IAR1H);
+		state_add(Z180_IAR1B,      "IAR1B",     IO_IAR1B);
+		state_add(Z180_BCR1L,      "BCR1L",     IO_BCR1L);
+		state_add(Z180_BCR1H,      "BCR1H",     IO_BCR1H);
+		state_add(Z180_DSTAT,      "DSTAT",     IO_DSTAT);
+		state_add(Z180_DMODE,      "DMODE",     IO_DMODE);
+		state_add(Z180_DCNTL,      "DCNTL",     IO_DCNTL);
+		state_add(Z180_IL,         "IL",        IO_IL);
+		state_add(Z180_ITC,        "ITC",       IO_ITC);
+		state_add(Z180_IO35,       "IO35",      IO_IO35);
+		state_add(Z180_RCR,        "RCR",       IO_RCR);
+		state_add(Z180_IO37,       "IO37",      IO_IO37);
+		state_add(Z180_CBR,        "CBR",       IO_CBR).callimport();
+		state_add(Z180_BBR,        "BBR",       IO_BBR).callimport();
+		state_add(Z180_CBAR,       "CBAR",      IO_CBAR).callimport();
+		state_add(Z180_IO3B,       "IO3B",      IO_IO3B);
+		state_add(Z180_IO3C,       "IO3C",      IO_IO3C);
+		state_add(Z180_IO3D,       "IO3D",      IO_IO3D);
+		state_add(Z180_OMCR,       "OMCR",      IO_OMCR);
+		state_add(Z180_IOCR,       "IOCR",      IO_IOCR);
+	}
+
+	save_item(NAME(m_AF.w.l));
+	save_item(NAME(m_BC.w.l));
+	save_item(NAME(m_DE.w.l));
+	save_item(NAME(m_HL.w.l));
+	save_item(NAME(m_IX.w.l));
+	save_item(NAME(m_IY.w.l));
+	save_item(NAME(m_PC.w.l));
+	save_item(NAME(m_SP.w.l));
+	save_item(NAME(m_AF2.w.l));
+	save_item(NAME(m_BC2.w.l));
+	save_item(NAME(m_DE2.w.l));
+	save_item(NAME(m_HL2.w.l));
+	save_item(NAME(m_R));
+	save_item(NAME(m_R2));
+	save_item(NAME(m_IFF1));
+	save_item(NAME(m_IFF2));
+	save_item(NAME(m_HALT));
+	save_item(NAME(m_IM));
+	save_item(NAME(m_I));
+	save_item(NAME(m_nmi_state));
+	save_item(NAME(m_nmi_pending));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_int_pending));
+	save_item(NAME(m_timer_cnt));
+	save_item(NAME(m_dma0_cnt));
+	save_item(NAME(m_dma1_cnt));
+	save_item(NAME(m_after_EI));
+
+	save_item(NAME(m_tif));
+
+	save_item(NAME(m_read_tcr_tmdr));
+	save_item(NAME(m_tmdr_value));
+	save_item(NAME(m_tmdrh));
+	save_item(NAME(m_tmdr_latch));
+
+	save_item(NAME(m_io));
+	save_item(NAME(m_iol));
+	save_item(NAME(m_ioltemp));
+
+	save_item(NAME(m_mmu));
+
+	m_icountptr = &m_icount;
+}
+
+/****************************************************************************
+ * Reset registers to their initial values
+ ****************************************************************************/
+void z180_device::device_reset()
+{
+	_PPC = 0;
+	_PCD = 0;
+	_SPD = 0;
+	_AFD = 0;
+	_BCD = 0;
+	_DED = 0;
+	_HLD = 0;
+	_IXD = 0;
+	_IYD = 0;
+	m_AF2.d = 0;
+	m_BC2.d = 0;
+	m_DE2.d = 0;
+	m_HL2.d = 0;
+	m_R = 0;
+	m_R2 = 0;
+	m_IFF1 = 0;
+	m_IFF2 = 0;
+	m_HALT = 0;
+	m_IM = 0;
+	m_I = 0;
+	m_tmdr_latch = 0;
+	m_read_tcr_tmdr[0] = 0;
+	m_read_tcr_tmdr[1] = 0;
+	m_iol = 0;
+	memset(m_io, 0, sizeof(m_io));
+	memset(m_mmu, 0, sizeof(m_mmu));
+	m_tmdrh[0] = 0;
+	m_tmdrh[1] = 0;
+	m_tmdr_value[0] = 0xffff;
+	m_tmdr_value[1] = 0xffff;
+	m_tif[0] = 0;
+	m_tif[1] = 0;
+	m_nmi_state = CLEAR_LINE;
+	m_nmi_pending = 0;
+	m_irq_state[0] = CLEAR_LINE;
+	m_irq_state[1] = CLEAR_LINE;
+	m_irq_state[2] = CLEAR_LINE;
+	m_after_EI = 0;
+	m_ea = 0;
+
+	memcpy(m_cc, (UINT8 *)cc_default, sizeof(m_cc));
+	_IX = _IY = 0xffff; /* IX and IY are FFFF after a reset! */
+	_F = ZF;          /* Zero flag is set */
+
+	for (int i=0; i <= Z180_INT_MAX; i++)
+	{
+		m_int_pending[i] = 0;
+	}
+
+	m_timer_cnt = 0;
+	m_dma0_cnt = 0;
+	m_dma1_cnt = 0;
 
 	/* reset io registers */
-	cpustate->IO_CNTLA0  = Z180_CNTLA0_RESET;
-	cpustate->IO_CNTLA1  = Z180_CNTLA1_RESET;
-	cpustate->IO_CNTLB0  = Z180_CNTLB0_RESET;
-	cpustate->IO_CNTLB1  = Z180_CNTLB1_RESET;
-	cpustate->IO_STAT0   = Z180_STAT0_RESET;
-	cpustate->IO_STAT1   = Z180_STAT1_RESET;
-	cpustate->IO_TDR0    = Z180_TDR0_RESET;
-	cpustate->IO_TDR1    = Z180_TDR1_RESET;
-	cpustate->IO_RDR0    = Z180_RDR0_RESET;
-	cpustate->IO_RDR1    = Z180_RDR1_RESET;
-	cpustate->IO_CNTR    = Z180_CNTR_RESET;
-	cpustate->IO_TRDR    = Z180_TRDR_RESET;
-	cpustate->IO_TMDR0L  = Z180_TMDR0L_RESET;
-	cpustate->IO_TMDR0H  = Z180_TMDR0H_RESET;
-	cpustate->IO_RLDR0L  = Z180_RLDR0L_RESET;
-	cpustate->IO_RLDR0H  = Z180_RLDR0H_RESET;
-	cpustate->IO_TCR       = Z180_TCR_RESET;
-	cpustate->IO_IO11    = Z180_IO11_RESET;
-	cpustate->IO_ASEXT0  = Z180_ASEXT0_RESET;
-	cpustate->IO_ASEXT1  = Z180_ASEXT1_RESET;
-	cpustate->IO_TMDR1L  = Z180_TMDR1L_RESET;
-	cpustate->IO_TMDR1H  = Z180_TMDR1H_RESET;
-	cpustate->IO_RLDR1L  = Z180_RLDR1L_RESET;
-	cpustate->IO_RLDR1H  = Z180_RLDR1H_RESET;
-	cpustate->IO_FRC       = Z180_FRC_RESET;
-	cpustate->IO_IO19    = Z180_IO19_RESET;
-	cpustate->IO_ASTC0L  = Z180_ASTC0L_RESET;
-	cpustate->IO_ASTC0H  = Z180_ASTC0H_RESET;
-	cpustate->IO_ASTC1L  = Z180_ASTC1L_RESET;
-	cpustate->IO_ASTC1H  = Z180_ASTC1H_RESET;
-	cpustate->IO_CMR       = Z180_CMR_RESET;
-	cpustate->IO_CCR       = Z180_CCR_RESET;
-	cpustate->IO_SAR0L   = Z180_SAR0L_RESET;
-	cpustate->IO_SAR0H   = Z180_SAR0H_RESET;
-	cpustate->IO_SAR0B   = Z180_SAR0B_RESET;
-	cpustate->IO_DAR0L   = Z180_DAR0L_RESET;
-	cpustate->IO_DAR0H   = Z180_DAR0H_RESET;
-	cpustate->IO_DAR0B   = Z180_DAR0B_RESET;
-	cpustate->IO_BCR0L   = Z180_BCR0L_RESET;
-	cpustate->IO_BCR0H   = Z180_BCR0H_RESET;
-	cpustate->IO_MAR1L   = Z180_MAR1L_RESET;
-	cpustate->IO_MAR1H   = Z180_MAR1H_RESET;
-	cpustate->IO_MAR1B   = Z180_MAR1B_RESET;
-	cpustate->IO_IAR1L   = Z180_IAR1L_RESET;
-	cpustate->IO_IAR1H   = Z180_IAR1H_RESET;
-	cpustate->IO_IAR1B   = Z180_IAR1B_RESET;
-	cpustate->IO_BCR1L   = Z180_BCR1L_RESET;
-	cpustate->IO_BCR1H   = Z180_BCR1H_RESET;
-	cpustate->IO_DSTAT   = Z180_DSTAT_RESET;
-	cpustate->IO_DMODE   = Z180_DMODE_RESET;
-	cpustate->IO_DCNTL   = Z180_DCNTL_RESET;
-	cpustate->IO_IL    = Z180_IL_RESET;
-	cpustate->IO_ITC       = Z180_ITC_RESET;
-	cpustate->IO_IO35    = Z180_IO35_RESET;
-	cpustate->IO_RCR       = Z180_RCR_RESET;
-	cpustate->IO_IO37    = Z180_IO37_RESET;
-	cpustate->IO_CBR       = Z180_CBR_RESET;
-	cpustate->IO_BBR       = Z180_BBR_RESET;
-	cpustate->IO_CBAR    = Z180_CBAR_RESET;
-	cpustate->IO_IO3B    = Z180_IO3B_RESET;
-	cpustate->IO_IO3C    = Z180_IO3C_RESET;
-	cpustate->IO_IO3D    = Z180_IO3D_RESET;
-	cpustate->IO_OMCR    = Z180_OMCR_RESET;
-	cpustate->IO_IOCR    = Z180_IOCR_RESET;
+	IO_CNTLA0  = Z180_CNTLA0_RESET;
+	IO_CNTLA1  = Z180_CNTLA1_RESET;
+	IO_CNTLB0  = Z180_CNTLB0_RESET;
+	IO_CNTLB1  = Z180_CNTLB1_RESET;
+	IO_STAT0   = Z180_STAT0_RESET;
+	IO_STAT1   = Z180_STAT1_RESET;
+	IO_TDR0    = Z180_TDR0_RESET;
+	IO_TDR1    = Z180_TDR1_RESET;
+	IO_RDR0    = Z180_RDR0_RESET;
+	IO_RDR1    = Z180_RDR1_RESET;
+	IO_CNTR    = Z180_CNTR_RESET;
+	IO_TRDR    = Z180_TRDR_RESET;
+	IO_TMDR0L  = Z180_TMDR0L_RESET;
+	IO_TMDR0H  = Z180_TMDR0H_RESET;
+	IO_RLDR0L  = Z180_RLDR0L_RESET;
+	IO_RLDR0H  = Z180_RLDR0H_RESET;
+	IO_TCR       = Z180_TCR_RESET;
+	IO_IO11    = Z180_IO11_RESET;
+	IO_ASEXT0  = Z180_ASEXT0_RESET;
+	IO_ASEXT1  = Z180_ASEXT1_RESET;
+	IO_TMDR1L  = Z180_TMDR1L_RESET;
+	IO_TMDR1H  = Z180_TMDR1H_RESET;
+	IO_RLDR1L  = Z180_RLDR1L_RESET;
+	IO_RLDR1H  = Z180_RLDR1H_RESET;
+	IO_FRC       = Z180_FRC_RESET;
+	IO_IO19    = Z180_IO19_RESET;
+	IO_ASTC0L  = Z180_ASTC0L_RESET;
+	IO_ASTC0H  = Z180_ASTC0H_RESET;
+	IO_ASTC1L  = Z180_ASTC1L_RESET;
+	IO_ASTC1H  = Z180_ASTC1H_RESET;
+	IO_CMR       = Z180_CMR_RESET;
+	IO_CCR       = Z180_CCR_RESET;
+	IO_SAR0L   = Z180_SAR0L_RESET;
+	IO_SAR0H   = Z180_SAR0H_RESET;
+	IO_SAR0B   = Z180_SAR0B_RESET;
+	IO_DAR0L   = Z180_DAR0L_RESET;
+	IO_DAR0H   = Z180_DAR0H_RESET;
+	IO_DAR0B   = Z180_DAR0B_RESET;
+	IO_BCR0L   = Z180_BCR0L_RESET;
+	IO_BCR0H   = Z180_BCR0H_RESET;
+	IO_MAR1L   = Z180_MAR1L_RESET;
+	IO_MAR1H   = Z180_MAR1H_RESET;
+	IO_MAR1B   = Z180_MAR1B_RESET;
+	IO_IAR1L   = Z180_IAR1L_RESET;
+	IO_IAR1H   = Z180_IAR1H_RESET;
+	IO_IAR1B   = Z180_IAR1B_RESET;
+	IO_BCR1L   = Z180_BCR1L_RESET;
+	IO_BCR1H   = Z180_BCR1H_RESET;
+	IO_DSTAT   = Z180_DSTAT_RESET;
+	IO_DMODE   = Z180_DMODE_RESET;
+	IO_DCNTL   = Z180_DCNTL_RESET;
+	IO_IL    = Z180_IL_RESET;
+	IO_ITC       = Z180_ITC_RESET;
+	IO_IO35    = Z180_IO35_RESET;
+	IO_RCR       = Z180_RCR_RESET;
+	IO_IO37    = Z180_IO37_RESET;
+	IO_CBR       = Z180_CBR_RESET;
+	IO_BBR       = Z180_BBR_RESET;
+	IO_CBAR    = Z180_CBAR_RESET;
+	IO_IO3B    = Z180_IO3B_RESET;
+	IO_IO3C    = Z180_IO3C_RESET;
+	IO_IO3D    = Z180_IO3D_RESET;
+	IO_OMCR    = Z180_OMCR_RESET;
+	IO_IOCR    = Z180_IOCR_RESET;
 
-	cpustate->daisy.reset();
-	z180_mmu(cpustate);
+	m_daisy.reset();
+	z180_mmu();
 }
 
 /* Handle PRT timers, decreasing them after 20 clocks and returning the new icount base that needs to be used for the next check */
-static void clock_timers(z180_state *cpustate)
+void z180_device::clock_timers()
 {
-	cpustate->timer_cnt++;
-	if (cpustate->timer_cnt >= 20)
+	m_timer_cnt++;
+	if (m_timer_cnt >= 20)
 	{
-		cpustate->timer_cnt = 0;
+		m_timer_cnt = 0;
 		/* Programmable Reload Timer 0 */
-		if(cpustate->IO_TCR & Z180_TCR_TDE0)
+		if(IO_TCR & Z180_TCR_TDE0)
 		{
-			if(cpustate->tmdr_value[0] == 0)
+			if(m_tmdr_value[0] == 0)
 			{
-				cpustate->tmdr_value[0] = cpustate->IO_RLDR0L | (cpustate->IO_RLDR0H << 8);
-				cpustate->tif[0] = 1;
+				m_tmdr_value[0] = IO_RLDR0L | (IO_RLDR0H << 8);
+				m_tif[0] = 1;
 			}
 			else
-				cpustate->tmdr_value[0]--;
+				m_tmdr_value[0]--;
 		}
 
 		/* Programmable Reload Timer 1 */
-		if(cpustate->IO_TCR & Z180_TCR_TDE1)
+		if(IO_TCR & Z180_TCR_TDE1)
 		{
-			if(cpustate->tmdr_value[1] == 0)
+			if(m_tmdr_value[1] == 0)
 			{
-				cpustate->tmdr_value[1] = cpustate->IO_RLDR1L | (cpustate->IO_RLDR1H << 8);
-				cpustate->tif[1] = 1;
+				m_tmdr_value[1] = IO_RLDR1L | (IO_RLDR1H << 8);
+				m_tif[1] = 1;
 			}
 			else
-				cpustate->tmdr_value[1]--;
+				m_tmdr_value[1]--;
 		}
 
-		if((cpustate->IO_TCR & Z180_TCR_TIE0) && cpustate->tif[0])
+		if((IO_TCR & Z180_TCR_TIE0) && m_tif[0])
 		{
 			// check if we can take the interrupt
-			if(cpustate->IFF1 && !cpustate->after_EI)
+			if(m_IFF1 && !m_after_EI)
 			{
-				cpustate->int_pending[Z180_INT_PRT0] = 1;
+				m_int_pending[Z180_INT_PRT0] = 1;
 			}
 		}
 
-		if((cpustate->IO_TCR & Z180_TCR_TIE1) && cpustate->tif[1])
+		if((IO_TCR & Z180_TCR_TIE1) && m_tif[1])
 		{
 			// check if we can take the interrupt
-			if(cpustate->IFF1 && !cpustate->after_EI)
+			if(m_IFF1 && !m_after_EI)
 			{
-				cpustate->int_pending[Z180_INT_PRT1] = 1;
+				m_int_pending[Z180_INT_PRT1] = 1;
 			}
 		}
 
 	}
 }
 
-static int check_interrupts(z180_state *cpustate)
+int z180_device::check_interrupts()
 {
 	int i;
 	int cycles = 0;
 
 	/* check for IRQs before each instruction */
-	if (cpustate->IFF1 && !cpustate->after_EI)
+	if (m_IFF1 && !m_after_EI)
 	{
-		if (cpustate->irq_state[0] != CLEAR_LINE && (cpustate->IO_ITC & Z180_ITC_ITE0) == Z180_ITC_ITE0)
-			cpustate->int_pending[Z180_INT_IRQ0] = 1;
+		if (m_irq_state[0] != CLEAR_LINE && (IO_ITC & Z180_ITC_ITE0) == Z180_ITC_ITE0)
+			m_int_pending[Z180_INT_IRQ0] = 1;
 
-		if (cpustate->irq_state[1] != CLEAR_LINE && (cpustate->IO_ITC & Z180_ITC_ITE1) == Z180_ITC_ITE1)
-			cpustate->int_pending[Z180_INT_IRQ1] = 1;
+		if (m_irq_state[1] != CLEAR_LINE && (IO_ITC & Z180_ITC_ITE1) == Z180_ITC_ITE1)
+			m_int_pending[Z180_INT_IRQ1] = 1;
 
-		if (cpustate->irq_state[2] != CLEAR_LINE && (cpustate->IO_ITC & Z180_ITC_ITE2) == Z180_ITC_ITE2)
-			cpustate->int_pending[Z180_INT_IRQ2] = 1;
+		if (m_irq_state[2] != CLEAR_LINE && (IO_ITC & Z180_ITC_ITE2) == Z180_ITC_ITE2)
+			m_int_pending[Z180_INT_IRQ2] = 1;
 	}
 
 	for (i = 0; i <= Z180_INT_MAX; i++)
-		if (cpustate->int_pending[i])
+		if (m_int_pending[i])
 		{
-			cycles += take_interrupt(cpustate, i);
-			cpustate->int_pending[i] = 0;
+			cycles += take_interrupt(i);
+			m_int_pending[i] = 0;
 			break;
 		}
 
@@ -2383,83 +2351,82 @@ static int check_interrupts(z180_state *cpustate)
  * Handle I/O and timers
  ****************************************************************************/
 
-static void handle_io_timers(z180_state *cpustate, int cycles)
+void z180_device::handle_io_timers(int cycles)
 {
 	while (cycles-- > 0)
 	{
-		clock_timers(cpustate);
+		clock_timers();
 	}
 }
 
 /****************************************************************************
  * Execute 'cycles' T-states. Return number of T-states really executed
  ****************************************************************************/
-static CPU_EXECUTE( z180 )
+void z180_device::execute_run()
 {
-	z180_state *cpustate = get_safe_token(device);
 	int curcycles;
 
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
 	/* to just check here */
-	if (cpustate->nmi_pending)
+	if (m_nmi_pending)
 	{
-		LOG(("Z180 '%s' take NMI\n", cpustate->device->tag()));
-		cpustate->_PPC = -1;            /* there isn't a valid previous program counter */
-		LEAVE_HALT(cpustate);       /* Check if processor was halted */
+		LOG(("Z180 '%s' take NMI\n", tag()));
+		_PPC = -1;            /* there isn't a valid previous program counter */
+		LEAVE_HALT();       /* Check if processor was halted */
 
 		/* disable DMA transfers!! */
-		cpustate->IO_DSTAT &= ~Z180_DSTAT_DME;
+		IO_DSTAT &= ~Z180_DSTAT_DME;
 
-		cpustate->IFF2 = cpustate->IFF1;
-		cpustate->IFF1 = 0;
-		PUSH(cpustate,  PC );
-		cpustate->_PCD = 0x0066;
-		cpustate->icount -= 11;
-		cpustate->nmi_pending = 0;
-		handle_io_timers(cpustate, 11);
+		m_IFF2 = m_IFF1;
+		m_IFF1 = 0;
+		PUSH( PC );
+		_PCD = 0x0066;
+		m_icount -= 11;
+		m_nmi_pending = 0;
+		handle_io_timers(11);
 	}
 
 again:
 	/* check if any DMA transfer is running */
-	if ((cpustate->IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
+	if ((IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
 	{
 		/* check if DMA channel 0 is running and also is in burst mode */
-		if ((cpustate->IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
-			(cpustate->IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
+		if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
+			(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			debugger_instruction_hook(device, cpustate->_PCD);
+			debugger_instruction_hook(this, _PCD);
 
 			/* FIXME z180_dma0 should be handled in handle_io_timers */
-			curcycles = z180_dma0(cpustate, cpustate->icount);
-			cpustate->icount -= curcycles;
-			handle_io_timers(cpustate, curcycles);
+			curcycles = z180_dma0(m_icount);
+			m_icount -= curcycles;
+			handle_io_timers(curcycles);
 		}
 		else
 		{
 			do
 			{
-				curcycles = check_interrupts(cpustate);
-				cpustate->icount -= curcycles;
-				handle_io_timers(cpustate, curcycles);
-				cpustate->after_EI = 0;
+				curcycles = check_interrupts();
+				m_icount -= curcycles;
+				handle_io_timers(curcycles);
+				m_after_EI = 0;
 
-				cpustate->_PPC = cpustate->_PCD;
-				debugger_instruction_hook(device, cpustate->_PCD);
+				_PPC = _PCD;
+				debugger_instruction_hook(this, _PCD);
 
-				if (!cpustate->HALT)
+				if (!m_HALT)
 				{
-					cpustate->R++;
-					cpustate->extra_cycles = 0;
-					curcycles = exec_op(cpustate,ROP(cpustate));
-					curcycles += cpustate->extra_cycles;
+					m_R++;
+					m_extra_cycles = 0;
+					curcycles = exec_op(ROP());
+					curcycles += m_extra_cycles;
 				}
 				else
 					curcycles = 3;
 
-				cpustate->icount -= curcycles;
+				m_icount -= curcycles;
 
-				handle_io_timers(cpustate, curcycles);
+				handle_io_timers(curcycles);
 
 				/* FIXME:
 				 * For simultaneous DREQ0 and DREQ1 requests, channel 0 has priority
@@ -2469,68 +2436,65 @@ again:
 				 * channel 1 releases control of the bus.
 				 *
 				 */
-				curcycles = z180_dma0(cpustate, 6);
-				cpustate->icount -= curcycles;
-				handle_io_timers(cpustate, curcycles);
+				curcycles = z180_dma0(6);
+				m_icount -= curcycles;
+				handle_io_timers(curcycles);
 
-				curcycles = z180_dma1(cpustate);
-				cpustate->icount -= curcycles;
-				handle_io_timers(cpustate, curcycles);
+				curcycles = z180_dma1();
+				m_icount -= curcycles;
+				handle_io_timers(curcycles);
 
 				/* If DMA is done break out to the faster loop */
-				if ((cpustate->IO_DSTAT & Z180_DSTAT_DME) != Z180_DSTAT_DME)
+				if ((IO_DSTAT & Z180_DSTAT_DME) != Z180_DSTAT_DME)
 					break;
-			} while( cpustate->icount > 0 );
+			} while( m_icount > 0 );
 		}
 	}
 
-	if (cpustate->icount > 0)
+	if (m_icount > 0)
 	{
 		do
 		{
-			curcycles = check_interrupts(cpustate);
-			cpustate->icount -= curcycles;
-			handle_io_timers(cpustate, curcycles);
-			cpustate->after_EI = 0;
+			curcycles = check_interrupts();
+			m_icount -= curcycles;
+			handle_io_timers(curcycles);
+			m_after_EI = 0;
 
-			cpustate->_PPC = cpustate->_PCD;
-			debugger_instruction_hook(device, cpustate->_PCD);
+			_PPC = _PCD;
+			debugger_instruction_hook(this, _PCD);
 
-			if (!cpustate->HALT)
+			if (!m_HALT)
 			{
-				cpustate->R++;
-				cpustate->extra_cycles = 0;
-				curcycles = exec_op(cpustate,ROP(cpustate));
-				curcycles += cpustate->extra_cycles;
+				m_R++;
+				m_extra_cycles = 0;
+				curcycles = exec_op(ROP());
+				curcycles += m_extra_cycles;
 			}
 			else
 				curcycles = 3;
 
-			cpustate->icount -= curcycles;
-			handle_io_timers(cpustate, curcycles);
+			m_icount -= curcycles;
+			handle_io_timers(curcycles);
 
 			/* If DMA is started go to check the mode */
-			if ((cpustate->IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
+			if ((IO_DSTAT & Z180_DSTAT_DME) == Z180_DSTAT_DME)
 				goto again;
-		} while( cpustate->icount > 0 );
+		} while( m_icount > 0 );
 	}
-
-	//cpustate->old_icount -= cpustate->icount;
 }
 
 /****************************************************************************
  * Burn 'cycles' T-states. Adjust R register for the lost time
  ****************************************************************************/
-static CPU_BURN( z180 )
+void z180_device::execute_burn(INT32 cycles)
 {
 	/* FIXME: This is not appropriate for dma */
-	z180_state *cpustate = get_safe_token(device);
 	while ( (cycles > 0) )
 	{
-		handle_io_timers(cpustate, 3);
+		handle_io_timers(3);
 		/* NOP takes 3 cycles per instruction */
-		cpustate->R += 1;
-		cpustate->icount -= 3;
+		m_R += 1;
+		m_icount -= 3;
 		cycles -= 3;
 	}
 }
@@ -2538,37 +2502,36 @@ static CPU_BURN( z180 )
 /****************************************************************************
  * Set IRQ line state
  ****************************************************************************/
-static void set_irq_line(z180_state *cpustate, int irqline, int state)
+void z180_device::execute_set_input(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
 		/* mark an NMI pending on the rising edge */
-		if (cpustate->nmi_state == CLEAR_LINE && state != CLEAR_LINE)
-			cpustate->nmi_pending = 1;
-		cpustate->nmi_state = state;
+		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE)
+			m_nmi_pending = 1;
+		m_nmi_state = state;
 	}
 	else
 	{
-		LOG(("Z180 '%s' set_irq_line %d = %d\n",cpustate->device->tag() , irqline,state));
+		LOG(("Z180 '%s' set_irq_line %d = %d\n",tag() , irqline,state));
 
 		/* update the IRQ state */
-		cpustate->irq_state[irqline] = state;
-		if (cpustate->daisy.present())
-			cpustate->irq_state[0] = cpustate->daisy.update_irq_state();
+		m_irq_state[irqline] = state;
+		if (m_daisy.present())
+			m_irq_state[0] = m_daisy.update_irq_state();
 
 		/* the main execute loop will take the interrupt */
 	}
 }
 
 /* logical to physical address translation */
-static CPU_TRANSLATE( z180 )
+bool z180_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
 {
-	if (space == AS_PROGRAM)
+	if (spacenum == AS_PROGRAM)
 	{
-		z180_state *cpustate = get_safe_token(device);
-		*address = MMU_REMAP_ADDR(cpustate, *address);
+		address = MMU_REMAP_ADDR(address);
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -2576,25 +2539,23 @@ static CPU_TRANSLATE( z180 )
  * STATE IMPORT/EXPORT
  **************************************************************************/
 
-static CPU_IMPORT_STATE( z180 )
+void z180_device::state_import(const device_state_entry &entry)
 {
-	z180_state *cpustate = get_safe_token(device);
-
 	switch (entry.index())
 	{
 		case Z180_R:
-			cpustate->R = cpustate->rtemp & 0x7f;
-			cpustate->R2 = cpustate->rtemp & 0x80;
+			m_R = m_rtemp & 0x7f;
+			m_R2 = m_rtemp & 0x80;
 			break;
 
 		case Z180_CBR:
 		case Z180_BBR:
 		case Z180_CBAR:
-			z180_mmu(cpustate);
+			z180_mmu();
 			break;
 
 		case Z180_IOLINES:
-			z180_write_iolines(cpustate, cpustate->ioltemp);
+			z180_write_iolines(m_ioltemp);
 			break;
 
 		default:
@@ -2604,18 +2565,16 @@ static CPU_IMPORT_STATE( z180 )
 }
 
 
-static CPU_EXPORT_STATE( z180 )
+void z180_device::state_export(const device_state_entry &entry)
 {
-	z180_state *cpustate = get_safe_token(device);
-
 	switch (entry.index())
 	{
 		case Z180_R:
-			cpustate->rtemp = (cpustate->R & 0x7f) | (cpustate->R2 & 0x80);
+			m_rtemp = (m_R & 0x7f) | (m_R2 & 0x80);
 			break;
 
 		case Z180_IOLINES:
-			cpustate->ioltemp = cpustate->iol;
+			m_ioltemp = m_iol;
 			break;
 
 		default:
@@ -2624,115 +2583,21 @@ static CPU_EXPORT_STATE( z180 )
 	}
 }
 
-static CPU_EXPORT_STRING( z180 )
+void z180_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	z180_state *cpustate = get_safe_token(device);
-
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
 			string.printf("%c%c%c%c%c%c%c%c",
-				cpustate->AF.b.l & 0x80 ? 'S':'.',
-				cpustate->AF.b.l & 0x40 ? 'Z':'.',
-				cpustate->AF.b.l & 0x20 ? '5':'.',
-				cpustate->AF.b.l & 0x10 ? 'H':'.',
-				cpustate->AF.b.l & 0x08 ? '3':'.',
-				cpustate->AF.b.l & 0x04 ? 'P':'.',
-				cpustate->AF.b.l & 0x02 ? 'N':'.',
-				cpustate->AF.b.l & 0x01 ? 'C':'.');
+				m_AF.b.l & 0x80 ? 'S':'.',
+				m_AF.b.l & 0x40 ? 'Z':'.',
+				m_AF.b.l & 0x20 ? '5':'.',
+				m_AF.b.l & 0x10 ? 'H':'.',
+				m_AF.b.l & 0x08 ? '3':'.',
+				m_AF.b.l & 0x04 ? 'P':'.',
+				m_AF.b.l & 0x02 ? 'N':'.',
+				m_AF.b.l & 0x01 ? 'C':'.');
 			break;
 	}
 }
 
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( z180 )
-{
-	z180_state *cpustate = get_safe_token(device);
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  set_irq_line(cpustate, INPUT_LINE_NMI, info->i);    break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ0:       set_irq_line(cpustate, Z180_IRQ0, info->i);         break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ1:       set_irq_line(cpustate, Z180_IRQ1, info->i);         break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ2:       set_irq_line(cpustate, Z180_IRQ2, info->i);         break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op:      cpustate->cc[Z180_TABLE_op] = (UINT8 *)info->p;     break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb:      cpustate->cc[Z180_TABLE_cb] = (UINT8 *)info->p;     break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed:      cpustate->cc[Z180_TABLE_ed] = (UINT8 *)info->p;     break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy:      cpustate->cc[Z180_TABLE_xy] = (UINT8 *)info->p;     break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:    cpustate->cc[Z180_TABLE_xycb] = (UINT8 *)info->p;   break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex:      cpustate->cc[Z180_TABLE_ex] = (UINT8 *)info->p;     break;
-	}
-}
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-CPU_GET_INFO( z180 )
-{
-	z180_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(z180_state);           break;
-		case CPUINFO_INT_INPUT_LINES:                   info->i = 3;                            break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0xff;                         break;
-		case CPUINFO_INT_ENDIANNESS:                    info->i = ENDIANNESS_LITTLE;            break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:              info->i = 1;                            break;
-		case CPUINFO_INT_CLOCK_DIVIDER:                 info->i = 1;                            break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:         info->i = 1;                            break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:         info->i = 4;                            break;
-		case CPUINFO_INT_MIN_CYCLES:                    info->i = 1;                            break;
-		case CPUINFO_INT_MAX_CYCLES:                    info->i = 16;                           break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:            info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:        info->i = 20;                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:        info->i = 0;                            break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:             info->i = 8;                            break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:             info->i = 16;                           break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:             info->i = 0;                            break;
-
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = cpustate->nmi_state;          break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ0:       info->i = cpustate->irq_state[0];       break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ1:       info->i = cpustate->irq_state[1];       break;
-		case CPUINFO_INT_INPUT_STATE + Z180_IRQ2:       info->i = cpustate->irq_state[2];       break;
-
-		/* --- the following bits of info are returned as pointers --- */
-		case CPUINFO_FCT_SET_INFO:      info->setinfo = CPU_SET_INFO_NAME(z180);                break;
-		case CPUINFO_FCT_INIT:          info->init = CPU_INIT_NAME(z180);                       break;
-		case CPUINFO_FCT_RESET:         info->reset = CPU_RESET_NAME(z180);                     break;
-		case CPUINFO_FCT_EXECUTE:       info->execute = CPU_EXECUTE_NAME(z180);                 break;
-		case CPUINFO_FCT_BURN:          info->burn = CPU_BURN_NAME(z180);                       break;
-		case CPUINFO_FCT_DISASSEMBLE:   info->disassemble = CPU_DISASSEMBLE_NAME(z180);         break;
-		case CPUINFO_FCT_TRANSLATE:     info->translate = CPU_TRANSLATE_NAME(z180);             break;
-		case CPUINFO_FCT_IMPORT_STATE:  info->import_state = CPU_IMPORT_STATE_NAME(z180);       break;
-		case CPUINFO_FCT_EXPORT_STATE:  info->export_state = CPU_EXPORT_STATE_NAME(z180);       break;
-		case CPUINFO_FCT_EXPORT_STRING: info->export_string = CPU_EXPORT_STRING_NAME(z180);     break;
-
-		/* --- the following bits of info are returned as pointers to functions --- */
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:           info->icount = &cpustate->icount;       break;
-
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op:      info->p = (void *)cpustate->cc[Z180_TABLE_op];  break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb:      info->p = (void *)cpustate->cc[Z180_TABLE_cb];  break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed:      info->p = (void *)cpustate->cc[Z180_TABLE_ed];  break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy:      info->p = (void *)cpustate->cc[Z180_TABLE_xy];  break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:    info->p = (void *)cpustate->cc[Z180_TABLE_xycb];    break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex:      info->p = (void *)cpustate->cc[Z180_TABLE_ex];  break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:                          strcpy(info->s, "Z180");                break;
-		case CPUINFO_STR_SHORTNAME:                     strcpy(info->s, "z180");                break;
-		case CPUINFO_STR_FAMILY:                    strcpy(info->s, "Zilog Z8x180");        break;
-		case CPUINFO_STR_VERSION:                   strcpy(info->s, "0.4");                 break;
-		case CPUINFO_STR_SOURCE_FILE:                       strcpy(info->s, __FILE__);              break;
-		case CPUINFO_STR_CREDITS:                   strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(Z180, z180);
