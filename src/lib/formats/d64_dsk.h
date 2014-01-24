@@ -65,7 +65,7 @@ protected:
 	virtual int get_disk_id_offset(const format &f);
 	void get_disk_id(const format &f, io_generic *io, UINT8 &id1, UINT8 &id2);
 	floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int track, int sector_count, UINT8 id1, UINT8 id2, int gap_2);
-	void build_sector_description(const format &f, UINT8 *sectdata, desc_s *sectors, int sector_count, UINT8 *errordata) const;
+	void build_sector_description(const format &f, UINT8 *sectdata, offs_t sect_offs, offs_t error_offs, desc_s *sectors, int sector_count) const;
 	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
 
 	static const format file_formats[];
