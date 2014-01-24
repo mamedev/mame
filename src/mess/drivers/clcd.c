@@ -30,6 +30,10 @@ public:
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
 		m_bank4(*this, "bank4"),
+		m_lcd_scrollx(0),
+		m_lcd_scrolly(0),
+		m_lcd_mode(0),
+		m_lcd_size(0),
 		m_mmu_mode(MMU_MODE_KERN),
 		m_mmu_saved_mode(MMU_MODE_KERN),
 		m_mmu_offset1(0),
@@ -53,18 +57,15 @@ public:
 	{
 	}
 
-	TILE_GET_INFO_MEMBER(get_clcd_tilemap_tile_info)
-	{
-		int code  = m_ram->pointer()[((tile_index / 80) * 128) + (tile_index % 80) + 0x800];
-
-		SET_TILE_INFO_MEMBER(0, code & 0x7f, ( code & 0x80 ) >> 7, 0);
-	}
-
 	virtual void driver_start()
 	{
 		m_mmu_mode = MMU_MODE_TEST;
 		update_mmu_mode(MMU_MODE_KERN);
 
+		save_item(NAME(m_lcd_scrollx));
+		save_item(NAME(m_lcd_scrolly));
+		save_item(NAME(m_lcd_mode));
+		save_item(NAME(m_lcd_size));
 		save_item(NAME(m_mmu_mode));
 		save_item(NAME(m_mmu_saved_mode));
 		save_item(NAME(m_mmu_offset1));
@@ -78,15 +79,58 @@ public:
 		save_item(NAME(m_key_shift));
 	}
 
-	virtual void video_start()
-	{
-		m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(clcd_state::get_clcd_tilemap_tile_info),this), TILEMAP_SCAN_ROWS, 6, 8, 80, 16);
-	}
-
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
-		m_tilemap->mark_all_dirty();
-		m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		if (m_lcd_mode & LCD_MODE_GRAPH)
+		{
+			for (int y=0; y<128; y++)
+			{
+				int offset = (m_lcd_scrolly * 128) + m_lcd_scrollx + (y*64);
+
+				for (int x = 0; x < 60; x++)
+				{
+					UINT8 bit = m_ram->pointer()[offset++];
+					bitmap.pix16(y, (x*8)+0) = (bit>>7) & 1;
+					bitmap.pix16(y, (x*8)+1) = (bit>>6) & 1;
+					bitmap.pix16(y, (x*8)+2) = (bit>>5) & 1;
+					bitmap.pix16(y, (x*8)+3) = (bit>>4) & 1;
+					bitmap.pix16(y, (x*8)+4) = (bit>>3) & 1;
+					bitmap.pix16(y, (x*8)+5) = (bit>>2) & 1;
+					bitmap.pix16(y, (x*8)+6) = (bit>>1) & 1;
+					bitmap.pix16(y, (x*8)+7) = (bit>>0) & 1;
+				}
+			}
+		}
+		else
+		{
+			UINT8 *chargen = memregion("maincpu")->base() + 0x1f700;
+			int chrw = (m_lcd_size & LCD_SIZE_CHRW) ? 8 : 6;
+
+			for (int y=0; y<16; y++)
+			{
+				int offset = (m_lcd_scrolly * 128) + m_lcd_scrollx + (y * 128);
+
+				for (int x=0; x<480; x++)
+				{
+					UINT8 ch = m_ram->pointer()[offset + (x / chrw)];
+					UINT8 bit = chargen[((ch & 127) * chrw) + (x % chrw)];
+					if (ch & 128)
+					{
+						bit = ~bit;
+					}
+
+					bitmap.pix16(y*8+0, x) = (bit>>0) & 1;
+					bitmap.pix16(y*8+1, x) = (bit>>1) & 1;
+					bitmap.pix16(y*8+2, x) = (bit>>2) & 1;
+					bitmap.pix16(y*8+3, x) = (bit>>3) & 1;
+					bitmap.pix16(y*8+4, x) = (bit>>4) & 1;
+					bitmap.pix16(y*8+5, x) = (bit>>5) & 1;
+					bitmap.pix16(y*8+6, x) = (bit>>6) & 1;
+					bitmap.pix16(y*8+7, x) = (bit>>7) & 1;
+				}
+			}
+		}
+
 		return 0;
 	}
 
@@ -114,6 +158,16 @@ public:
 		MMU_MODE_APPL,
 		MMU_MODE_RAM,
 		MMU_MODE_TEST
+	};
+
+	enum
+	{
+		LCD_MODE_GRAPH = 2,
+	};
+
+	enum
+	{
+		LCD_SIZE_CHRW = 4,
 	};
 
 	void update_mmu_mode(int new_mode)
@@ -295,9 +349,24 @@ public:
 		return m_mmu_offset5;
 	}
 
-	WRITE8_MEMBER( lcd_w )
+	WRITE8_MEMBER( lcd_scrollx_w )
 	{
-		/// TODO: support bitmap and different font sizes
+		m_lcd_scrollx = data;
+	}
+
+	WRITE8_MEMBER( lcd_scrolly_w )
+	{
+		m_lcd_scrolly = data;
+	}
+
+	WRITE8_MEMBER( lcd_mode_w )
+	{
+		m_lcd_mode = data;
+	}
+
+	WRITE8_MEMBER( lcd_size_w )
+	{
+		m_lcd_size = data;
 	}
 
 	WRITE8_MEMBER( via0_pa_w )
@@ -391,8 +460,11 @@ private:
 	required_device<address_map_bank_device> m_bank2;
 	required_device<address_map_bank_device> m_bank3;
 	required_device<address_map_bank_device> m_bank4;
-	tilemap_t *m_tilemap;
 	virtual void palette_init();
+	int m_lcd_scrollx;
+	int m_lcd_scrolly;
+	int m_lcd_mode;
+	int m_lcd_size;
 	int m_mmu_mode;
 	int m_mmu_saved_mode;
 	UINT8 m_mmu_offset1;
@@ -472,7 +544,10 @@ static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
 	AM_RANGE(0xfe00, 0xfe00) AM_MIRROR(0x7f) AM_WRITE(mmu_offset3_w)
 	AM_RANGE(0xfe80, 0xfe80) AM_MIRROR(0x7f) AM_WRITE(mmu_offset4_w)
 	AM_RANGE(0xff00, 0xff00) AM_MIRROR(0x7f) AM_WRITE(mmu_offset5_w)
-	AM_RANGE(0xff80, 0xff83) AM_MIRROR(0x7c) AM_WRITE(lcd_w)
+	AM_RANGE(0xff80, 0xff80) AM_MIRROR(0x7c) AM_WRITE(lcd_scrollx_w)
+	AM_RANGE(0xff81, 0xff81) AM_MIRROR(0x7c) AM_WRITE(lcd_scrolly_w)
+	AM_RANGE(0xff82, 0xff82) AM_MIRROR(0x7c) AM_WRITE(lcd_mode_w)
+	AM_RANGE(0xff83, 0xff83) AM_MIRROR(0x7c) AM_WRITE(lcd_size_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -578,21 +653,6 @@ void clcd_state::palette_init()
 	palette_set_color(machine(), 3, MAKE_RGB(32,240,32));
 }
 
-static const gfx_layout charset_6x8 =
-{
-	6,8,
-	128,
-	1,
-	{ 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8 },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	6*8
-};
-
-static GFXDECODE_START( clcd )
-	GFXDECODE_ENTRY( "maincpu", 0x1f700, charset_6x8, 0, 1 )
-GFXDECODE_END
-
 static MACHINE_CONFIG_START( clcd, clcd_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M65C02, 2000000)
@@ -643,7 +703,6 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_GFXDECODE(clcd)
 
 	MCFG_RAM_ADD( "ram" )
 	MCFG_RAM_DEFAULT_VALUE(0)
