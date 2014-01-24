@@ -7,16 +7,16 @@
  *
  *          +--------------+
  *       A4 |1     ++    16| B4
- *       ??3 |2           15| ??3
+ *       S3 |2           15| S4
  *       A3 |3           14| C4
  *       B3 |4    7483   13| C0
  *      VCC |5           12| GND
- *       ??3 |6           11| B1
+ *       S2 |6           11| B1
  *       B2 |7           10| A1
- *       A2 |8            9| ??3
+ *       A2 |8            9| S1
  *          +--------------+
  *
- *          ?? = (A + B + C) & 0x0f
+ *          S = (A + B + C0) & 0x0f
  *
  *          C4 = (A + B + C) > 15 ? 1 : 0
  *
@@ -41,6 +41,9 @@
 		NET_CONNECT(_name, B4, _B4)                                                 \
 		NET_CONNECT(_name, C0, _CI)
 
+#define TTL_7483_DIP(_name)                                                         \
+        NET_REGISTER_DEV(7483_dip, _name)
+
 NETLIB_DEVICE(7483,
 	netlist_ttl_input_t m_C0;
 	netlist_ttl_input_t m_A1;
@@ -54,12 +57,15 @@ NETLIB_DEVICE(7483,
 
 	UINT8 m_lastr;
 
-	netlist_ttl_output_t m_SA;
-	netlist_ttl_output_t m_SB;
-	netlist_ttl_output_t m_SC;
-	netlist_ttl_output_t m_SD;
+	netlist_ttl_output_t m_S1;
+	netlist_ttl_output_t m_S2;
+	netlist_ttl_output_t m_S3;
+	netlist_ttl_output_t m_S4;
 	netlist_ttl_output_t m_C4;
 
+);
+
+NETLIB_DEVICE_DERIVED(7483_dip, 7483,
 );
 
 #endif /* NLD_7483_H_ */

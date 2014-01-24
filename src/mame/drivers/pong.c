@@ -135,15 +135,17 @@ static NETLIST_START(pong_schematics)
 
     TTL_7404_INVERT(e4d, STOPG)
 
-    RES(RYf, 50)   // output impedance
-    RES(RYc, 50)   // output impedance
+    RES(RYf, 50)   // output impedance - not in schematics, hack (till better proxies exist)
+    RES(RYc, 50)   // output impedance - not in schematics, hack (till better proxies exist)
 
     TTL_7404_INVERT(c9f, RYc.2)
     TTL_7404_INVERT(c9c, RYf.2)
     NET_C(c9f.Q, RYf.1)
     NET_C(c9c.Q, RYc.1)
 
-    SWITCH2(coinsw,  RYc.2, RYf.2)
+    SWITCH2(coinsw)
+    NET_C(RYc.2, coinsw.1)
+    NET_C(RYf.2, coinsw.2)
 
     NET_C(coinsw.Q, GND)
 
@@ -372,10 +374,10 @@ static NETLIST_START(pong_schematics)
     TTL_7404_INVERT(ic_c4a, ic_b6a)
 
     TTL_7483(ic_b4, ic_a4c, ic_a4b, ic_b6a, low, ic_c4a, high, high, low, low)
-    ALIAS(a6, ic_b4.SA)
-    ALIAS(b6, ic_b4.SB)
-    ALIAS(c6, ic_b4.SC)
-    ALIAS(d6, ic_b4.SD)
+    ALIAS(a6, ic_b4.S1)
+    ALIAS(b6, ic_b4.S2)
+    ALIAS(c6, ic_b4.S3)
+    ALIAS(d6, ic_b4.S4)
 
     // ----------------------------------------------------------------------------------------
     // serve monoflop
@@ -544,8 +546,12 @@ static NETLIST_START(pong_schematics)
     TTL_7402_NOR(ic_f5b, L, Missed)
     TTL_7490(ic_c7, ic_f5b, ic_c7.QA, SRST, SRST, low, low)
     TTL_74107(ic_c8a, ic_c7.QD, high, high, SRSTQ)
-    SWITCH2(sw1a, high, ic_c7.QC)
+    SWITCH2(sw1a)
     PARAM(sw1a.POS, 0)
+
+    NET_C(sw1a.1, high)
+    NET_C(sw1a.2, ic_c7.QC)
+
     TTL_7410_NAND(ic_d8a, ic_c7.QA, sw1a.Q, ic_c8a.Q)       // would be nand2 for 11 instead of 15 points, need a switch dev!
 
     ALIAS(StopG1Q, ic_d8a.Q)
@@ -559,8 +565,13 @@ static NETLIST_START(pong_schematics)
     TTL_7402_NOR(ic_f5a, R, Missed)
     TTL_7490(ic_d7, ic_f5a, ic_d7.QA, SRST, SRST, low, low)
     TTL_74107(ic_c8b, ic_d7.QD, high, high, SRSTQ)
-    SWITCH2(sw1b, high, ic_d7.QC)
+    SWITCH2(sw1b)
     PARAM(sw1b.POS, 0)
+
+    NET_C(sw1b.1, high)
+    NET_C(sw1b.2, ic_d7.QC)
+
+
     TTL_7410_NAND(ic_d8b, ic_d7.QA, sw1b.Q, ic_c8b.Q)       // would be nand2 for 11 instead of 15 points, need a switch dev!
 
     ALIAS(StopG2Q, ic_d8b.Q)

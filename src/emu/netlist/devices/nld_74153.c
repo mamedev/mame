@@ -41,3 +41,41 @@ NETLIB_UPDATE(74153)
 		OUTLOGIC(m_Y, 0, delay[0]);
 	}
 }
+
+
+NETLIB_START(74153_dip)
+{
+    register_sub(m_1, "1");
+    register_sub(m_2, "2");
+
+    connect(m_1.m_A, m_2.m_A);
+    connect(m_1.m_B, m_2.m_B);
+
+    register_subalias("1", m_1.m_G);
+    register_subalias("2", m_1.m_B);    // m_2.m_B
+    register_subalias("3", m_1.m_C[3]);
+    register_subalias("4", m_1.m_C[2]);
+    register_subalias("5", m_1.m_C[1]);
+    register_subalias("6", m_1.m_C[0]);
+    register_subalias("7", m_1.m_Y);
+
+    register_subalias("9", m_2.m_Y);
+    register_subalias("10", m_2.m_C[0]);
+    register_subalias("11", m_2.m_C[1]);
+    register_subalias("12", m_2.m_C[2]);
+    register_subalias("13", m_2.m_C[3]);
+
+    register_subalias("14", m_1.m_A);   // m_2.m_B
+    register_subalias("15", m_2.m_G);
+}
+
+NETLIB_UPDATE(74153_dip)
+{
+}
+
+NETLIB_RESET(74153_dip)
+{
+    m_1.do_reset();
+    m_2.do_reset();
+}
+
