@@ -15,6 +15,8 @@
 #include "machine/bankdev.h"
 #include "machine/mos6551.h"
 #include "machine/ram.h"
+#include "machine/serial.h"
+#include "sound/speaker.h"
 #include "rendlay.h"
 #include "mcfglgcy.h"
 
@@ -83,21 +85,22 @@ public:
 	{
 		if (m_lcd_mode & LCD_MODE_GRAPH)
 		{
-			for (int y=0; y<128; y++)
+			for (int y = 0; y < 128; y++)
 			{
-				int offset = (m_lcd_scrolly * 128) + m_lcd_scrollx + (y*64);
+				int offset = (m_lcd_scrolly * 128) + (y * 64);
 
 				for (int x = 0; x < 60; x++)
 				{
 					UINT8 bit = m_ram->pointer()[offset++];
-					bitmap.pix16(y, (x*8)+0) = (bit>>7) & 1;
-					bitmap.pix16(y, (x*8)+1) = (bit>>6) & 1;
-					bitmap.pix16(y, (x*8)+2) = (bit>>5) & 1;
-					bitmap.pix16(y, (x*8)+3) = (bit>>4) & 1;
-					bitmap.pix16(y, (x*8)+4) = (bit>>3) & 1;
-					bitmap.pix16(y, (x*8)+5) = (bit>>2) & 1;
-					bitmap.pix16(y, (x*8)+6) = (bit>>1) & 1;
-					bitmap.pix16(y, (x*8)+7) = (bit>>0) & 1;
+
+					bitmap.pix16(y, (x * 8) + 0) = (bit >> 7) & 1;
+					bitmap.pix16(y, (x * 8) + 1) = (bit >> 6) & 1;
+					bitmap.pix16(y, (x * 8) + 2) = (bit >> 5) & 1;
+					bitmap.pix16(y, (x * 8) + 3) = (bit >> 4) & 1;
+					bitmap.pix16(y, (x * 8) + 4) = (bit >> 3) & 1;
+					bitmap.pix16(y, (x * 8) + 5) = (bit >> 2) & 1;
+					bitmap.pix16(y, (x * 8) + 6) = (bit >> 1) & 1;
+					bitmap.pix16(y, (x * 8) + 7) = (bit >> 0) & 1;
 				}
 			}
 		}
@@ -106,27 +109,27 @@ public:
 			UINT8 *chargen = memregion("maincpu")->base() + 0x1f700;
 			int chrw = (m_lcd_size & LCD_SIZE_CHRW) ? 8 : 6;
 
-			for (int y=0; y<16; y++)
+			for (int y = 0; y < 16; y++)
 			{
-				int offset = (m_lcd_scrolly * 128) + m_lcd_scrollx + (y * 128);
+				int offset = (m_lcd_scrolly * 128) + (m_lcd_scrollx & 0x7f) + (y * 128);
 
-				for (int x=0; x<480; x++)
+				for (int x = 0; x < 480; x++)
 				{
 					UINT8 ch = m_ram->pointer()[offset + (x / chrw)];
-					UINT8 bit = chargen[((ch & 127) * chrw) + (x % chrw)];
-					if (ch & 128)
+					UINT8 bit = chargen[((ch & 0x7f) * chrw) + (x % chrw)];
+					if (ch & 0x80)
 					{
 						bit = ~bit;
 					}
 
-					bitmap.pix16(y*8+0, x) = (bit>>0) & 1;
-					bitmap.pix16(y*8+1, x) = (bit>>1) & 1;
-					bitmap.pix16(y*8+2, x) = (bit>>2) & 1;
-					bitmap.pix16(y*8+3, x) = (bit>>3) & 1;
-					bitmap.pix16(y*8+4, x) = (bit>>4) & 1;
-					bitmap.pix16(y*8+5, x) = (bit>>5) & 1;
-					bitmap.pix16(y*8+6, x) = (bit>>6) & 1;
-					bitmap.pix16(y*8+7, x) = (bit>>7) & 1;
+					bitmap.pix16((y * 8) + 0, x) = (bit >> 0) & 1;
+					bitmap.pix16((y * 8) + 1, x) = (bit >> 1) & 1;
+					bitmap.pix16((y * 8) + 2, x) = (bit >> 2) & 1;
+					bitmap.pix16((y * 8) + 3, x) = (bit >> 3) & 1;
+					bitmap.pix16((y * 8) + 4, x) = (bit >> 4) & 1;
+					bitmap.pix16((y * 8) + 5, x) = (bit >> 5) & 1;
+					bitmap.pix16((y * 8) + 6, x) = (bit >> 6) & 1;
+					bitmap.pix16((y * 8) + 7, x) = (bit >> 7) & 1;
 				}
 			}
 		}
@@ -176,7 +179,7 @@ public:
 		{
 			m_mmu_mode = new_mode;
 
-			switch( m_mmu_mode )
+			switch (m_mmu_mode)
 			{
 			case MMU_MODE_KERN:
 				m_bank1->set_bank(0x04 + 0x00);
@@ -349,34 +352,34 @@ public:
 		return m_mmu_offset5;
 	}
 
-	WRITE8_MEMBER( lcd_scrollx_w )
+	WRITE8_MEMBER(lcd_scrollx_w)
 	{
 		m_lcd_scrollx = data;
 	}
 
-	WRITE8_MEMBER( lcd_scrolly_w )
+	WRITE8_MEMBER(lcd_scrolly_w)
 	{
 		m_lcd_scrolly = data;
 	}
 
-	WRITE8_MEMBER( lcd_mode_w )
+	WRITE8_MEMBER(lcd_mode_w)
 	{
 		m_lcd_mode = data;
 	}
 
-	WRITE8_MEMBER( lcd_size_w )
+	WRITE8_MEMBER(lcd_size_w)
 	{
 		m_lcd_size = data;
 	}
 
-	WRITE8_MEMBER( via0_pa_w )
+	WRITE8_MEMBER(via0_pa_w)
 	{
 		m_key_column = data;
 	}
 
-	int read_column( int column )
+	int read_column(int column)
 	{
-		switch( column )
+		switch (column)
 		{
 		case 0:
 			return m_col0->read();
@@ -406,42 +409,42 @@ public:
 		return 0;
 	}
 
-	WRITE8_MEMBER( via0_pb_w )
+	WRITE8_MEMBER(via0_pb_w)
 	{
 		write_key_poll(data & 1);
 	}
 
-	WRITE_LINE_MEMBER( write_key_poll )
+	WRITE_LINE_MEMBER(write_key_poll)
 	{
-		if( m_key_poll != state )
+		if (m_key_poll != state)
 		{
 			m_key_poll = state;
 
-			if( m_key_poll != 0 )
+			if (m_key_poll != 0)
 			{
 				m_key_shift = m_special->read();
 
-				for( int i = 0; i < 8; i++ )
+				for (int i = 0; i < 8; i++)
 				{
-					if( ( m_key_column & ( 128 >> i ) ) == 0 )
+					if ((m_key_column & (128 >> i)) == 0)
 					{
-						m_key_shift |= read_column( i ) << 8;
+						m_key_shift |= read_column(i) << 8;
 					}
 				}
 			}
 		}
 	}
 
-	WRITE_LINE_MEMBER( via0_cb1_w )
+	WRITE_LINE_MEMBER(via0_cb1_w)
 	{
 		int newm_key_clk = state & 1;
-		if( m_key_clk != newm_key_clk )
+		if (m_key_clk != newm_key_clk)
 		{
 			m_key_clk = newm_key_clk;
 
-			if( m_key_clk )
+			if (m_key_clk)
 			{
-				m_via0->write_cb2( ( m_key_shift & 0x8000 ) != 0 );
+				m_via0->write_cb2((m_key_shift & 0x8000) != 0);
 				m_key_shift <<= 1;
 			}
 		}
@@ -487,7 +490,7 @@ private:
 	required_ioport m_special;
 };
 
-static NVRAM_HANDLER( clcd )
+static NVRAM_HANDLER(clcd)
 {
 	clcd_state *state = machine.driver_data<clcd_state>();
 
@@ -653,7 +656,7 @@ void clcd_state::palette_init()
 	palette_set_color(machine(), 3, MAKE_RGB(32,240,32));
 }
 
-static MACHINE_CONFIG_START( clcd, clcd_state )
+static MACHINE_CONFIG_START(clcd, clcd_state)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)
@@ -666,8 +669,19 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 
 	MCFG_DEVICE_ADD("via1", VIA6522, 0)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
+	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
+	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, tx))
+	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, rts_w))
+	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, dtr_w))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, NULL)
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", mos6551_device, rxd_w))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("acia", mos6551_device, dcd_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE("acia", mos6551_device, dsr_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("acia", mos6551_device, cts_w))
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(clcd_banked_mem)
@@ -701,12 +715,16 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	MCFG_PALETTE_LENGTH(4)
 
-	MCFG_RAM_ADD( "ram" )
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_RAM_ADD("ram")
 	MCFG_RAM_DEFAULT_VALUE(0)
-	MCFG_RAM_DEFAULT_SIZE( "128k" )
+	MCFG_RAM_DEFAULT_SIZE("128k")
 	MCFG_NVRAM_HANDLER(clcd)
 MACHINE_CONFIG_END
 
@@ -721,4 +739,4 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                         FULLNAME       FLAGS */
-COMP( 1985, clcd,   0,      0,       clcd,      clcd, driver_device,     0, "Commodore Business Machines", "LCD (Prototype)", GAME_NO_SOUND )
+COMP( 1985, clcd,   0,      0,       clcd,      clcd, driver_device,     0, "Commodore Business Machines", "LCD (Prototype)", 0 )
