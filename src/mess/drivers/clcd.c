@@ -32,6 +32,7 @@ public:
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
 		m_bank4(*this, "bank4"),
+		m_chargen(*this, "chargen"),
 		m_lcd_scrollx(0),
 		m_lcd_scrolly(0),
 		m_lcd_mode(0),
@@ -106,7 +107,12 @@ public:
 		}
 		else
 		{
-			UINT8 *chargen = memregion("maincpu")->base() + 0x1f700;
+			UINT8 *font = m_chargen->base();
+			if (m_lcd_mode & LCD_MODE_ALT)
+			{
+				font += 1024;
+			}
+
 			int chrw = (m_lcd_size & LCD_SIZE_CHRW) ? 8 : 6;
 
 			for (int y = 0; y < 16; y++)
@@ -116,7 +122,7 @@ public:
 				for (int x = 0; x < 480; x++)
 				{
 					UINT8 ch = m_ram->pointer()[offset + (x / chrw)];
-					UINT8 bit = chargen[((ch & 0x7f) * chrw) + (x % chrw)];
+					UINT8 bit = font[((ch & 0x7f) * chrw) + (x % chrw)];
 					if (ch & 0x80)
 					{
 						bit = ~bit;
@@ -165,12 +171,13 @@ public:
 
 	enum
 	{
-		LCD_MODE_GRAPH = 2,
+		LCD_MODE_ALT = 1,
+		LCD_MODE_GRAPH = 2
 	};
 
 	enum
 	{
-		LCD_SIZE_CHRW = 4,
+		LCD_SIZE_CHRW = 4
 	};
 
 	void update_mmu_mode(int new_mode)
@@ -463,6 +470,7 @@ private:
 	required_device<address_map_bank_device> m_bank2;
 	required_device<address_map_bank_device> m_bank3;
 	required_device<address_map_bank_device> m_bank4;
+	required_memory_region m_chargen;
 	virtual void palette_init();
 	int m_lcd_scrollx;
 	int m_lcd_scrolly;
@@ -732,6 +740,9 @@ ROM_START( clcd )
 	ROM_LOAD( "sept-m-13apr.u104",  0x08000, 0x8000, CRC(41028c3c) SHA1(fcab6f0bbeef178eb8e5ecf82d9c348d8f318a8f))
 	ROM_LOAD( "sizapr.u103",        0x10000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
 	ROM_LOAD( "kizapr.u102",        0x18000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
+
+	ROM_REGION( 0x20000, "chargen", 0 )
+	ROM_LOAD( "chargen",      0x000000, 0x000800, BAD_DUMP CRC(02301a0d) SHA1(9f5123f488da8609ef8c27f561543e35cc91eb58) ) 
 ROM_END
 
 
