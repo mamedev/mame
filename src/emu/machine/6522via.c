@@ -359,24 +359,17 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		case TIMER_SHIFT:
 			m_out_cb1 = !m_out_cb1;
 
-			if (!m_out_cb1)
+			if (!m_out_cb1 && (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr)))
 			{
-				if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
-				{
-					shift_out();
-				}
-
-				m_cb1_handler(m_out_cb1);
-
-				if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
-				{
-					shift_in();
-				}
+				shift_out();
 			}
-			else
+
+			if (m_out_cb1 && (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr)))
 			{
-				m_cb1_handler(m_out_cb1);
+				shift_in();
 			}
+
+			m_cb1_handler(m_out_cb1);
 
 			if (SO_T2_RATE(m_acr) || m_shift_counter || !m_out_cb1)
 			{
