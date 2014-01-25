@@ -649,11 +649,8 @@ INPUT_PORTS_END
 
 void clcd_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(32,240,32));
-	palette_set_color(machine(), 1, MAKE_RGB(32,32,32));
-
-	palette_set_color(machine(), 2, MAKE_RGB(32,32,32));
-	palette_set_color(machine(), 3, MAKE_RGB(32,240,32));
+	palette_set_color(machine(), 0, MAKE_RGB(32,64,32));
+	palette_set_color(machine(), 1, MAKE_RGB(8,16,8));
 }
 
 static MACHINE_CONFIG_START(clcd, clcd_state)
@@ -669,7 +666,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 
 	MCFG_DEVICE_ADD("via1", VIA6522, 0)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
-	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
 	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
@@ -715,7 +712,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_LENGTH(4)
+	MCFG_PALETTE_LENGTH(2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
