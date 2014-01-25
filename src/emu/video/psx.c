@@ -435,11 +435,13 @@ void psxgpu_device::updatevisiblearea()
 		break;
 	}
 
+#if defined( MAME_DEBUG )
 	if( m_debug.b_mesh || m_debug.b_texture )
 	{
 		n_screenheight = 1024;
 		n_screenwidth = 1024;
 	}
+#endif
 
 	visarea.set(0, n_screenwidth - 1, 0, n_screenheight - 1);
 	machine().primary_screen->configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
