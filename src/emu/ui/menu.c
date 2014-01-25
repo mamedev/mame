@@ -1049,7 +1049,7 @@ UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container
 	clear_free_list(machine);
 
 	/* if the menus are to be hidden, return a cancel here */
-	if ((ui_input_pressed(machine, IPT_UI_CONFIGURE) && !stack_has_special_main_menu()) || menu_stack == NULL)
+	if (ui_is_menu_active() && ((ui_input_pressed(machine, IPT_UI_CONFIGURE) && !stack_has_special_main_menu()) || menu_stack == NULL))
 		return UI_HANDLER_CANCEL;
 
 	return 0;

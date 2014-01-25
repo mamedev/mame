@@ -20,10 +20,13 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* initialization */
+// initialization
 void ui_gfx_init(running_machine &machine);
 
-/* master handler */
+// returns 'true' if the internal graphics viewer has relevance
+bool ui_gfx_is_relevant(running_machine &machine);
+
+// master handler
 UINT32 ui_gfx_ui_handler(running_machine &machine, render_container *container, UINT32 state);
 
 
