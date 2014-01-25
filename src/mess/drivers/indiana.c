@@ -40,8 +40,8 @@ static ADDRESS_MAP_START(indiana_mem, AS_PROGRAM, 32, indiana_state)
 	AM_RANGE(0x00000000, 0x0000ffff) AM_MIRROR(0x7f800000) AM_ROM AM_REGION("user1", 0) // 64Kb of EPROM
 	AM_RANGE(0x00100000, 0x00107fff) AM_MIRROR(0x7f8f8000) AM_RAM // SRAM 32Kb of SRAM
 	AM_RANGE(0x00200000, 0x002fffff) AM_DEVREADWRITE8(MFP_TAG, mc68901_device, read, write, 0xffffffff) AM_MIRROR(0x7f800000) // MFP
-	AM_RANGE(0x00400000, 0x004fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, io16_r, io16_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC IO
-	AM_RANGE(0x00500000, 0x005fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, prog16_r, prog16_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC MEM
+	AM_RANGE(0x00400000, 0x004fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, io16_swap_r, io16_swap_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC IO
+	AM_RANGE(0x00500000, 0x005fffff) AM_DEVREADWRITE16(ISABUS_TAG, isa16_device, prog16_swap_r, prog16_swap_w, 0xffffffff) AM_MIRROR(0x7f800000) // 16 bit PC MEM
 	AM_RANGE(0x00600000, 0x006fffff) AM_DEVREADWRITE8(ISABUS_TAG, isa16_device, io_r, io_w, 0xffffffff) AM_MIRROR(0x7f800000) // 8 bit PC IO
 	AM_RANGE(0x00700000, 0x007fffff) AM_DEVREADWRITE8(ISABUS_TAG, isa16_device, prog_r, prog_w, 0xffffffff) AM_MIRROR(0x7f800000) // 8 bit PC MEM
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM // 4 MB RAM
@@ -130,6 +130,7 @@ static MACHINE_CONFIG_START( indiana, indiana_state )
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa1", indiana_isa_cards, "vga", false)
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa2", indiana_isa_cards, "fdc_at", false)
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa3", indiana_isa_cards, "comat", false)
+	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa4", indiana_isa_cards, "ide", false)
 
 	MCFG_MC68901_ADD(MFP_TAG, XTAL_16MHz/4, mfp_interface)
 	MCFG_SERIAL_KEYBOARD_ADD("keyboard", keyboard_interface, 1200)

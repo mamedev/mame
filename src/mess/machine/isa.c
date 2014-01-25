@@ -677,22 +677,56 @@ void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_
 
 READ16_MEMBER(isa16_device::prog16_r)
 {
-	return m_prgspace->read_word(offset, mem_mask);
+	return m_prgspace->read_word(offset<<1, mem_mask);
 }
 
 WRITE16_MEMBER(isa16_device::prog16_w)
 {
-	m_prgspace->write_word(offset, data, mem_mask);
+	m_prgspace->write_word(offset<<1, data, mem_mask);
 }
 
 READ16_MEMBER(isa16_device::io16_r)
 {
-	return m_iospace->read_word(offset, mem_mask);
+	return m_iospace->read_word(offset<<1, mem_mask);
 }
 
 WRITE16_MEMBER(isa16_device::io16_w)
 {
-	m_iospace->write_word(offset, data, mem_mask);
+	m_iospace->write_word(offset<<1, data, mem_mask);
+}
+
+READ16_MEMBER(isa16_device::prog16_swap_r)
+{
+	UINT16 rv;
+	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+
+	rv = m_prgspace->read_word(offset<<1, mem_mask);
+
+	return (rv<<8) | (rv>>8);
+}
+
+WRITE16_MEMBER(isa16_device::prog16_swap_w)
+{
+	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+	data = (data<<8) | (data>>8);
+	m_prgspace->write_word(offset<<1, data, mem_mask);
+}
+
+READ16_MEMBER(isa16_device::io16_swap_r)
+{
+	UINT16 rv;
+	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+
+	rv = m_iospace->read_word(offset<<1, mem_mask);
+
+	return (rv<<8) | (rv>>8);
+}
+
+WRITE16_MEMBER(isa16_device::io16_swap_w)
+{
+	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+	data = (data<<8) | (data>>8);
+	m_iospace->write_word(offset<<1, data, mem_mask);
 }
 
 // interrupt request from isa card

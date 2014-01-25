@@ -366,6 +366,11 @@ public:
 	DECLARE_WRITE16_MEMBER(prog16_w);
 	DECLARE_READ16_MEMBER(io16_r);
 	DECLARE_WRITE16_MEMBER(io16_w);
+	// byte-swapped versions of 16-bit accessors
+	DECLARE_READ16_MEMBER(prog16_swap_r);
+	DECLARE_WRITE16_MEMBER(prog16_swap_w);
+	DECLARE_READ16_MEMBER(io16_swap_r);
+	DECLARE_WRITE16_MEMBER(io16_swap_w);
 
 protected:
 	// device-level overrides
