@@ -32,7 +32,7 @@ public:
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
 		m_bank4(*this, "bank4"),
-		m_chargen(*this, "chargen"),
+		m_lcd_char_rom(*this, "lcd_char_rom"),
 		m_lcd_scrollx(0),
 		m_lcd_scrolly(0),
 		m_lcd_mode(0),
@@ -107,7 +107,7 @@ public:
 		}
 		else
 		{
-			UINT8 *font = m_chargen->base();
+			UINT8 *font = m_lcd_char_rom->base();
 			if (m_lcd_mode & LCD_MODE_ALT)
 			{
 				font += 1024;
@@ -470,7 +470,7 @@ private:
 	required_device<address_map_bank_device> m_bank2;
 	required_device<address_map_bank_device> m_bank3;
 	required_device<address_map_bank_device> m_bank4;
-	required_memory_region m_chargen;
+	required_memory_region m_lcd_char_rom;
 	virtual void palette_init();
 	int m_lcd_scrollx;
 	int m_lcd_scrolly;
@@ -741,8 +741,8 @@ ROM_START( clcd )
 	ROM_LOAD( "sizapr.u103",        0x10000, 0x8000, CRC(0aa91d9f) SHA1(f0842f370607f95d0a0ec6afafb81bc063c32745))
 	ROM_LOAD( "kizapr.u102",        0x18000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
 
-	ROM_REGION( 0x20000, "chargen", 0 )
-	ROM_LOAD( "chargen",      0x000000, 0x000800, BAD_DUMP CRC(02301a0d) SHA1(9f5123f488da8609ef8c27f561543e35cc91eb58) ) 
+	ROM_REGION( 0x20000, "lcd_char_rom", 0 )
+	ROM_LOAD( "lcd_char_rom",      0x000000, 0x000800, BAD_DUMP CRC(7db9d225) SHA1(0a8835fa182efa55d027828b42aa554608795274) )
 ROM_END
 
 
