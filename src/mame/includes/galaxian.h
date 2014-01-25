@@ -7,7 +7,9 @@
 ***************************************************************************/
 
 #include "machine/i8255.h"
+#include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/digitalk.h"
 
 /* we scale horizontally by 3 to render stars correctly */
 #define GALAXIAN_XSCALE         3
@@ -36,16 +38,28 @@ class galaxian_state : public driver_device
 public:
 	galaxian_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_audio2(*this, "audio2"),
+			m_dac(*this, "dac"),
+			m_ay8910_0(*this, "8910.0"),
+			m_ay8910_1(*this, "8910.1"),
+			m_ay8910_2(*this, "8910.2"),
+			m_digitalker(*this, "digitalker"),
 			m_ppi8255_0(*this, "ppi8255_0"),
 			m_ppi8255_1(*this, "ppi8255_1"),
 			m_ppi8255_2(*this, "ppi8255_2"),
 			m_spriteram(*this, "spriteram"),
-			m_videoram(*this, "videoram"),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_audio2(*this, "audio2"),
-			m_dac(*this, "dac") { }
+			m_videoram(*this, "videoram") { }
 
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audio2;
+	optional_device<dac_device> m_dac;
+	optional_device<ay8910_device> m_ay8910_0;
+	optional_device<ay8910_device> m_ay8910_1;
+	optional_device<ay8910_device> m_ay8910_2;
+	optional_device<digitalker_device> m_digitalker;
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;
 	optional_device<i8255_device>  m_ppi8255_2;
@@ -294,8 +308,4 @@ public:
 	void mshuttle_decode(const UINT8 convtable[8][16]);
 	void common_init(galaxian_draw_bullet_func draw_bullet,galaxian_draw_background_func draw_background,
 		galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_audio2;
-	optional_device<dac_device> m_dac;
 };

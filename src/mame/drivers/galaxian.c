@@ -412,10 +412,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/i8255.h"
-#include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
-#include "sound/digitalk.h"
 #include "sound/discrete.h"
 #include "audio/cclimber.h"
 #include "audio/galaxian.h"
@@ -507,8 +505,8 @@ READ8_MEMBER(galaxian_state::konami_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x20) result &= machine().device<ay8910_device>("8910.1")->data_r(space, 0);
-	if (offset & 0x80) result &= machine().device<ay8910_device>("8910.0")->data_r(space, 0);
+	if (offset & 0x20) result &= m_ay8910_1->data_r(space, 0);
+	if (offset & 0x80) result &= m_ay8910_0->data_r(space, 0);
 	return result;
 }
 
@@ -518,14 +516,14 @@ WRITE8_MEMBER(galaxian_state::konami_ay8910_w)
 	/* AV 4,5 ==> AY8910 #2 */
 	/* the decoding here is very simplistic, and you can address two simultaneously */
 	if (offset & 0x10)
-		machine().device<ay8910_device>("8910.1")->address_w(space, 0, data);
+		m_ay8910_1->address_w(space, 0, data);
 	else if (offset & 0x20)
-		machine().device<ay8910_device>("8910.1")->data_w(space, 0, data);
+		m_ay8910_1->data_w(space, 0, data);
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		machine().device<ay8910_device>("8910.0")->address_w(space, 0, data);
+		m_ay8910_0->address_w(space, 0, data);
 	else if (offset & 0x80)
-		machine().device<ay8910_device>("8910.0")->data_w(space, 0, data);
+		m_ay8910_0->data_w(space, 0, data);
 }
 
 
@@ -895,7 +893,7 @@ READ8_MEMBER(galaxian_state::frogger_ay8910_r)
 {
 	/* the decoding here is very simplistic */
 	UINT8 result = 0xff;
-	if (offset & 0x40) result &= machine().device<ay8910_device>("8910.0")->data_r(space, 0);
+	if (offset & 0x40) result &= m_ay8910_0->data_r(space, 0);
 	return result;
 }
 
@@ -905,9 +903,9 @@ WRITE8_MEMBER(galaxian_state::frogger_ay8910_w)
 	/* the decoding here is very simplistic */
 	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
-		machine().device<ay8910_device>("8910.0")->data_w(space, 0, data);
+		m_ay8910_0->data_w(space, 0, data);
 	else if (offset & 0x80)
-		machine().device<ay8910_device>("8910.0")->address_w(space, 0, data);
+		m_ay8910_0->address_w(space, 0, data);
 }
 
 
@@ -974,9 +972,9 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x08) result &= machine().device<ay8910_device>("8910.2")->data_r(space, 0);
-	if (offset & 0x20) result &= machine().device<ay8910_device>("8910.1")->data_r(space, 0);
-	if (offset & 0x80) result &= machine().device<ay8910_device>("8910.0")->data_r(space, 0);
+	if (offset & 0x08) result &= m_ay8910_2->data_r(space, 0);
+	if (offset & 0x20) result &= m_ay8910_1->data_r(space, 0);
+	if (offset & 0x80) result &= m_ay8910_0->data_r(space, 0);
 	return result;
 }
 
@@ -984,12 +982,12 @@ READ8_MEMBER(galaxian_state::scorpion_ay8910_r)
 WRITE8_MEMBER(galaxian_state::scorpion_ay8910_w)
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
-	if (offset & 0x04) machine().device<ay8910_device>("8910.2")->address_w(space, 0, data);
-	if (offset & 0x08) machine().device<ay8910_device>("8910.2")->data_w(space, 0, data);
-	if (offset & 0x10) machine().device<ay8910_device>("8910.1")->address_w(space, 0, data);
-	if (offset & 0x20) machine().device<ay8910_device>("8910.1")->data_w(space, 0, data);
-	if (offset & 0x40) machine().device<ay8910_device>("8910.0")->address_w(space, 0, data);
-	if (offset & 0x80) machine().device<ay8910_device>("8910.0")->data_w(space, 0, data);
+	if (offset & 0x04) m_ay8910_2->address_w(space, 0, data);
+	if (offset & 0x08) m_ay8910_2->data_w(space, 0, data);
+	if (offset & 0x10) m_ay8910_1->address_w(space, 0, data);
+	if (offset & 0x20) m_ay8910_1->data_w(space, 0, data);
+	if (offset & 0x40) m_ay8910_0->address_w(space, 0, data);
+	if (offset & 0x80) m_ay8910_0->data_w(space, 0, data);
 }
 
 
@@ -1024,16 +1022,14 @@ WRITE8_MEMBER(galaxian_state::scorpion_protection_w)
 
 READ8_MEMBER(galaxian_state::scorpion_digitalker_intr_r)
 {
-	digitalker_device *digitalker = machine().device<digitalker_device>("digitalker");
-	return digitalker->digitalker_0_intr_r();
+	return m_digitalker->digitalker_0_intr_r();
 }
 
 WRITE8_MEMBER(galaxian_state::scorpion_digitalker_control_w)
 {
-	digitalker_device *device = machine().device<digitalker_device>("digitalker");
-	device->digitalker_0_cs_w(data & 1 ? ASSERT_LINE : CLEAR_LINE);
-	device->digitalker_0_cms_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
-	device->digitalker_0_wr_w(data & 4 ? ASSERT_LINE : CLEAR_LINE);
+	m_digitalker->digitalker_0_cs_w(data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	m_digitalker->digitalker_0_cms_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
+	m_digitalker->digitalker_0_wr_w(data & 4 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static I8255A_INTERFACE( scorpion_ppi8255_1_intf )
@@ -1105,7 +1101,7 @@ WRITE8_MEMBER(galaxian_state::zigzag_ay8910_w)
 			/* bit 0 = WRITE */
 			/* bit 1 = C/D */
 			if ((offset & 1) != 0)
-				machine().device<ay8910_device>("aysnd")->data_address_w(space, offset >> 1, m_zigzag_ay8910_latch);
+				m_ay8910_0->data_address_w(space, offset >> 1, m_zigzag_ay8910_latch);
 			break;
 
 		case 0x100:
@@ -1197,21 +1193,21 @@ WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_cs_w)
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_control_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		machine().device<ay8910_device>("aysnd")->address_w(space, offset, data);
+		m_ay8910_0->address_w(space, offset, data);
 }
 
 
 WRITE8_MEMBER(galaxian_state::mshuttle_ay8910_data_w)
 {
 	if (!m_mshuttle_ay8910_cs)
-		machine().device<ay8910_device>("aysnd")->data_w(space, offset, data);
+		m_ay8910_0->data_w(space, offset, data);
 }
 
 
 READ8_MEMBER(galaxian_state::mshuttle_ay8910_data_r)
 {
 	if (!m_mshuttle_ay8910_cs)
-		return machine().device<ay8910_device>("aysnd")->data_r(space, offset);
+		return m_ay8910_0->data_r(space, offset);
 	return 0xff;
 }
 
@@ -1692,8 +1688,8 @@ static ADDRESS_MAP_START( jumpbug_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_DEVWRITE("8910.0", ay8910_device, data_w)
+	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_DEVWRITE("8910.0", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6002, 0x6006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
@@ -1824,8 +1820,8 @@ static ADDRESS_MAP_START( checkman_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("8910.0", ay8910_device, address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("8910.0", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -1834,8 +1830,8 @@ static ADDRESS_MAP_START( checkmaj_sound_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xa002, 0xa002) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("8910.0", ay8910_device, address_data_w)
+	AM_RANGE(0xa002, 0xa002) AM_DEVREAD("8910.0", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 
@@ -5284,7 +5280,7 @@ static MACHINE_CONFIG_DERIVED( zigzag, galaxian_base )
 	MCFG_CPU_PROGRAM_MAP(galaxian_map_base)  /* no discrete sound */
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("aysnd", AY8910, 1789750)
+	MCFG_SOUND_ADD("8910.0", AY8910, 1789750)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -5361,7 +5357,7 @@ static MACHINE_CONFIG_DERIVED( jumpbug, galaxian_base )
 	MCFG_CPU_PROGRAM_MAP(jumpbug_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("aysnd", AY8910, 1789750)
+	MCFG_SOUND_ADD("8910.0", AY8910, 1789750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -5375,7 +5371,7 @@ static MACHINE_CONFIG_DERIVED( checkman, mooncrst )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)   /* NMIs are triggered by the main CPU */
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("aysnd", AY8910, 1789750)
+	MCFG_SOUND_ADD("8910.0", AY8910, 1789750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -5393,7 +5389,7 @@ static MACHINE_CONFIG_DERIVED( checkmaj, galaxian_base )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq0", galaxian_state, checkmaj_irq0_gen, "screen", 0, 8)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("aysnd", AY8910, 1620000)
+	MCFG_SOUND_ADD("8910.0", AY8910, 1620000)
 	MCFG_SOUND_CONFIG(checkmaj_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2)
 MACHINE_CONFIG_END
@@ -5407,7 +5403,7 @@ static MACHINE_CONFIG_DERIVED( mshuttle, galaxian_base )
 	MCFG_CPU_IO_MAP(mshuttle_portmap)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("aysnd", AY8910, GALAXIAN_PIXEL_CLOCK/3/4)
+	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/4)
 	MCFG_SOUND_CONFIG(cclimber_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
