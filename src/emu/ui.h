@@ -91,6 +91,8 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef UINT32 (*ui_callback)(running_machine &, render_container *, UINT32);
+
 typedef INT32 (*slider_update)(running_machine &machine, void *arg, astring *string, INT32 newval);
 
 struct slider_state
@@ -119,77 +121,80 @@ struct slider_state
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* main init/exit routines */
+// main init/exit routines
 int ui_init(running_machine &machine);
 
-/* initialize ui lists */
+// initialize ui lists
 void ui_initialize(running_machine &machine);
 
-/* display the startup screens */
+// set a UI handler
+UINT32 ui_set_handler(ui_callback callback, UINT32 param);
+
+// display the startup screens
 int ui_display_startup_screens(running_machine &machine, int first_time, int show_disclaimer);
 
-/* set the current text to display at startup */
+// set the current text to display at startup
 void ui_set_startup_text(running_machine &machine, const char *text, int force);
 
-/* once-per-frame update and render */
+// once-per-frame update and render
 void ui_update_and_render(running_machine &machine, render_container *container);
 
-/* returns the current UI font */
+// returns the current UI font
 render_font *ui_get_font(running_machine &machine);
 
-/* returns the line height of the font used by the UI system */
+// returns the line height of the font used by the UI system
 float ui_get_line_height(running_machine &machine);
 
-/* returns the width of a character or string in the UI font */
+// returns the width of a character or string in the UI font
 float ui_get_char_width(running_machine &machine, unicode_char ch);
 float ui_get_string_width(running_machine &machine, const char *s);
 
-/* draw an outlined box filled with a given color */
+// draw an outlined box filled with a given color
 void ui_draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 
-/* simple text draw at the given coordinates */
+// simple text draw at the given coordinates
 void ui_draw_text(render_container *container, const char *buf, float x, float y);
 
-/* full-on text draw with all the options */
+// full-on text draw with all the options
 void ui_draw_text_full(render_container *container, const char *origs, float x, float y, float wrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight);
 
-/* draw a multi-line message with a box around it */
+// draw a multi-line message with a box around it
 void ui_draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
 
-/* display a temporary message at the bottom of the screen */
+// display a temporary message at the bottom of the screen
 void CLIB_DECL ui_popup_time(int seconds, const char *text, ...) ATTR_PRINTF(2,3);
 
-/* get/set whether or not the FPS is displayed */
+// get/set whether or not the FPS is displayed
 void ui_show_fps_temp(double seconds);
 void ui_set_show_fps(bool show);
 bool ui_get_show_fps(void);
 
-/* get/set whether or not the profiler is displayed */
+// get/set whether or not the profiler is displayed
 void ui_set_show_profiler(bool show);
 bool ui_get_show_profiler(void);
 
-/* force the menus to display */
+// force the menus to display
 void ui_show_menu(void);
 
-/* force the mouse visibility status */
+// force the mouse visibility status
 void ui_show_mouse(bool status);
 
-/* return true if a menu is displayed */
+// return true if a menu is displayed
 bool ui_is_menu_active(void);
 
-/* print the game info string into a buffer */
+// print the game info string into a buffer
 astring &game_info_astring(running_machine &machine, astring &string);
 
-/* get the list of sliders */
+// get the list of sliders
 const slider_state *ui_get_slider_list(void);
 
-/* paste */
+// paste
 void ui_paste(running_machine &machine);
 
-/* returns whether the natural keyboard is active */
+// returns whether the natural keyboard is active
 bool ui_get_use_natural_keyboard(running_machine &machine);
 
-/* specifies whether the natural keyboard is active */
+// specifies whether the natural keyboard is active
 void ui_set_use_natural_keyboard(running_machine &machine, bool use_natural_keyboard);
 
 #endif  /* __USRINTRF_H__ */

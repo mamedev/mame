@@ -235,7 +235,7 @@ render_target *ui_input_find_mouse(running_machine &machine, INT32 *x, INT32 *y,
     detected
 -------------------------------------------------*/
 
-int ui_input_pressed(running_machine &machine, int code)
+bool ui_input_pressed(running_machine &machine, int code)
 {
 	return ui_input_pressed_repeat(machine, code, 0);
 }
@@ -248,7 +248,7 @@ int ui_input_pressed(running_machine &machine, int code)
     is triggered
 -------------------------------------------------*/
 
-int ui_input_pressed_repeat(running_machine &machine, int code, int speed)
+bool ui_input_pressed_repeat(running_machine &machine, int code, int speed)
 {
 	ui_input_private *uidata = machine.ui_input_data;
 	int pressed = FALSE;
@@ -274,7 +274,7 @@ g_profiler.start(PROFILER_INPUT);
 
 		/* otherwise, reset pressed = 0 */
 		else
-			pressed = FALSE;
+			pressed = false;
 	}
 
 	/* if we're not pressed, reset the memory field */

@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    uigfx.c
+    ui/viewgfx.c
 
     Internal graphics viewer.
 
@@ -15,7 +15,7 @@
 #include "render.h"
 #include "rendfont.h"
 #include "rendutil.h"
-#include "uigfx.h"
+#include "ui/viewgfx.h"
 
 
 

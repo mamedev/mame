@@ -142,7 +142,6 @@ EMUOBJS = \
 	$(EMUOBJ)/tilemap.o \
 	$(EMUOBJ)/timer.o \
 	$(EMUOBJ)/ui.o \
-	$(EMUOBJ)/uigfx.o \
 	$(EMUOBJ)/uiinput.o \
 	$(EMUOBJ)/ui/swlist.o \
 	$(EMUOBJ)/ui/menu.o \
@@ -154,6 +153,7 @@ EMUOBJS = \
 	$(EMUOBJ)/ui/imginfo.o \
 	$(EMUOBJ)/ui/bbcontrl.o \
 	$(EMUOBJ)/ui/tapectrl.o \
+	$(EMUOBJ)/ui/viewgfx.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
 	$(EMUOBJ)/debug/debugcmd.o \

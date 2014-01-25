@@ -20,7 +20,7 @@
 #include "uiinput.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
-#include "uigfx.h"
+#include "ui/viewgfx.h"
 #include <ctype.h>
 
 
@@ -40,7 +40,7 @@ enum
     LOCAL VARIABLES
 ***************************************************************************/
 
-/* list of natural keyboard keys that are not associated with UI_EVENT_CHARs */
+// list of natural keyboard keys that are not associated with UI_EVENT_CHARs 
 static const input_item_id non_char_keys[] =
 {
 	ITEM_ID_ESC,
@@ -88,52 +88,54 @@ static const input_item_id non_char_keys[] =
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/* font for rendering */
+// font for rendering 
 static render_font *ui_font;
 
-/* current UI handler */
-static UINT32 (*ui_handler_callback)(running_machine &, render_container *, UINT32);
+// current UI handler 
+static ui_callback ui_handler_callback;
 static UINT32 ui_handler_param;
 
-/* flag to track single stepping */
+// flag to track single stepping 
 static bool single_step;
 
-/* FPS counter display */
+// FPS counter display 
 static bool showfps;
 static osd_ticks_t showfps_end;
 
-/* profiler display */
+// profiler display 
 static bool show_profiler;
 
-/* popup text display */
+// popup text display 
 static osd_ticks_t popup_text_end;
 
-/* messagebox buffer */
+// messagebox buffer 
 static astring messagebox_text;
 static rgb_t messagebox_backcolor;
 
-/* slider info */
+// slider info 
 static slider_state *slider_list;
 static slider_state *slider_current;
 
-/* natural keyboard info */
+// natural keyboard info 
 static bool ui_use_natural_keyboard;
 static UINT8 non_char_keys_down[(ARRAY_LENGTH(non_char_keys) + 7) / 8];
 
-
+// mouse
 static render_texture *ui_mouse_arrow_texture;
 static bool ui_mouse_show;
+
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
 static void ui_exit(running_machine &machine);
 
-/* text generators */
+// text generators 
 static astring &disclaimer_string(running_machine &machine, astring &buffer);
 static astring &warnings_string(running_machine &machine, astring &buffer);
 
-/* UI handlers */
+// UI handlers 
 static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state);
 static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state);
 static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);
@@ -141,7 +143,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state);
 static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state);
 
-/* slider controls */
+// slider controls 
 static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg);
 static slider_state *slider_init(running_machine &machine);
 static INT32 slider_volume(running_machine &machine, void *arg, astring *string, INT32 newval);
@@ -173,52 +175,39 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, astring *st
     INLINE FUNCTIONS
 ***************************************************************************/
 
-/*-------------------------------------------------
-    ui_set_handler - set a callback/parameter
-    pair for the current UI handler
--------------------------------------------------*/
-
-INLINE UINT32 ui_set_handler(UINT32 (*callback)(running_machine &, render_container *, UINT32), UINT32 param)
-{
-	ui_handler_callback = callback;
-	ui_handler_param = param;
-	return param;
-}
-
-
-/*-------------------------------------------------
-    is_breakable_char - is a given unicode
-    character a possible line break?
--------------------------------------------------*/
+//-------------------------------------------------
+//  is_breakable_char - is a given unicode
+//  character a possible line break?
+//-------------------------------------------------
 
 INLINE int is_breakable_char(unicode_char ch)
 {
-	/* regular spaces and hyphens are breakable */
+	// regular spaces and hyphens are breakable
 	if (ch == ' ' || ch == '-')
 		return TRUE;
 
-	/* In the following character sets, any character is breakable:
-	    Hiragana (3040-309F)
-	    Katakana (30A0-30FF)
-	    Bopomofo (3100-312F)
-	    Hangul Compatibility Jamo (3130-318F)
-	    Kanbun (3190-319F)
-	    Bopomofo Extended (31A0-31BF)
-	    CJK Strokes (31C0-31EF)
-	    Katakana Phonetic Extensions (31F0-31FF)
-	    Enclosed CJK Letters and Months (3200-32FF)
-	    CJK Compatibility (3300-33FF)
-	    CJK Unified Ideographs Extension A (3400-4DBF)
-	    Yijing Hexagram Symbols (4DC0-4DFF)
-	    CJK Unified Ideographs (4E00-9FFF) */
+	// In the following character sets, any character is breakable:
+	//  Hiragana (3040-309F)
+	//  Katakana (30A0-30FF)
+	//  Bopomofo (3100-312F)
+	//  Hangul Compatibility Jamo (3130-318F)
+	//  Kanbun (3190-319F)
+	//  Bopomofo Extended (31A0-31BF)
+	//  CJK Strokes (31C0-31EF)
+	//  Katakana Phonetic Extensions (31F0-31FF)
+	//  Enclosed CJK Letters and Months (3200-32FF)
+	//  CJK Compatibility (3300-33FF)
+	//  CJK Unified Ideographs Extension A (3400-4DBF)
+	//  Yijing Hexagram Symbols (4DC0-4DFF)
+	//  CJK Unified Ideographs (4E00-9FFF)
 	if (ch >= 0x3040 && ch <= 0x9fff)
 		return TRUE;
 
-	/* Hangul Syllables (AC00-D7AF) are breakable */
+	// Hangul Syllables (AC00-D7AF) are breakable
 	if (ch >= 0xac00 && ch <= 0xd7af)
 		return TRUE;
 
-	/* CJK Compatibility Ideographs (F900-FAFF) are breakable */
+	// CJK Compatibility Ideographs (F900-FAFF) are breakable
 	if (ch >= 0xf900 && ch <= 0xfaff)
 		return TRUE;
 
@@ -231,9 +220,9 @@ INLINE int is_breakable_char(unicode_char ch)
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-/*-------------------------------------------------
-    ui_init - set up the user interface
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_init - set up the user interface
+//-------------------------------------------------
 static const UINT32 mouse_bitmap[] = {
 	0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,
 	0x09a46f30,0x81ac7c43,0x24af8049,0x00ad7d45,0x00a8753a,0x00a46f30,0x009f6725,0x009b611c,0x00985b14,0x0095560d,0x00935308,0x00915004,0x00904e02,0x008f4e01,0x008f4d00,0x008f4d00,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,0x00ffffff,
@@ -271,17 +260,17 @@ static const UINT32 mouse_bitmap[] = {
 
 int ui_init(running_machine &machine)
 {
-	/* make sure we clean up after ourselves */
+	// make sure we clean up after ourselves 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_exit), &machine));
 
-	/* initialize the other UI bits */
+	// initialize the other UI bits 
 	ui_menu::init(machine);
 	ui_gfx_init(machine);
 
-	/* reset globals */
+	// reset globals 
 	single_step = false;
 	ui_set_handler(handler_messagebox, 0);
-	/* retrieve options */
+	// retrieve options 
 	ui_use_natural_keyboard = machine.options().natural_keyboard();
 	bitmap_argb32 *ui_mouse_bitmap = auto_alloc(machine, bitmap_argb32(32, 32));
 	UINT32 *dst = &ui_mouse_bitmap->pix32(0);
@@ -292,33 +281,47 @@ int ui_init(running_machine &machine)
 }
 
 
-/*-------------------------------------------------
-    ui_exit - clean up ourselves on exit
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_exit - clean up ourselves on exit
+//-------------------------------------------------
 
 static void ui_exit(running_machine &machine)
 {
 	machine.render().texture_free(ui_mouse_arrow_texture);
-	/* free the font */
+	// free the font 
 	machine.render().font_free(ui_font);
 	ui_font = NULL;
 }
 
 
-/*-------------------------------------------------
-    ui_initialize - initialize ui lists
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_initialize - initialize ui lists
+//-------------------------------------------------
 
 void ui_initialize(running_machine &machine)
 {
-	/* initialize the on-screen display system */
+	// initialize the on-screen display system 
 	slider_list = slider_current = slider_init(machine);
 }
 
-/*-------------------------------------------------
-    ui_display_startup_screens - display the
-    various startup screens
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  ui_set_handler - set a callback/parameter
+//  pair for the current UI handler
+//-------------------------------------------------
+
+UINT32 ui_set_handler(ui_callback callback, UINT32 param)
+{
+	ui_handler_callback = callback;
+	ui_handler_param = param;
+	return param;
+}
+
+
+//-------------------------------------------------
+//  ui_display_startup_screens - display the
+//  various startup screens
+//-------------------------------------------------
 
 int ui_display_startup_screens(running_machine &machine, int first_time, int show_disclaimer)
 {
@@ -328,19 +331,19 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 	int show_warnings = TRUE;
 	int state;
 
-	/* disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
-	   or if we are debugging */
+	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
+	// or if we are debugging
 	if (!first_time || (str > 0 && str < 60*5) || &machine.system() == &GAME_NAME(___empty) || (machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 
-	/* loop over states */
+	// loop over states
 	ui_set_handler(handler_ingame, 0);
 	for (state = 0; state < maxstate && !machine.scheduled_event_pending() && !ui_menu::stack_has_special_main_menu(); state++)
 	{
-		/* default to standard colors */
+		// default to standard colors
 		messagebox_backcolor = UI_BACKGROUND_COLOR;
 
-		/* pick the next state */
+		// pick the next state
 		switch (state)
 		{
 			case 0:
@@ -365,20 +368,20 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 				break;
 		}
 
-		/* clear the input memory */
+		// clear the input memory
 		machine.input().reset_polling();
 		while (machine.input().poll_switches() != INPUT_CODE_INVALID) ;
 
-		/* loop while we have a handler */
+		// loop while we have a handler
 		while (ui_handler_callback != handler_ingame && !machine.scheduled_event_pending() && !ui_menu::stack_has_special_main_menu())
 			machine.video().frame_update();
 
-		/* clear the handler and force an update */
+		// clear the handler and force an update
 		ui_set_handler(handler_ingame, 0);
 		machine.video().frame_update();
 	}
 
-	/* if we're the empty driver, force the menus on */
+	// if we're the empty driver, force the menus on
 	if (ui_menu::stack_has_special_main_menu())
 		ui_set_handler(ui_menu::ui_handler, 0);
 
@@ -386,21 +389,21 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 }
 
 
-/*-------------------------------------------------
-    ui_set_startup_text - set the text to display
-    at startup
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_set_startup_text - set the text to display
+//  at startup
+//-------------------------------------------------
 
 void ui_set_startup_text(running_machine &machine, const char *text, int force)
 {
 	static osd_ticks_t lastupdatetime = 0;
 	osd_ticks_t curtime = osd_ticks();
 
-	/* copy in the new text */
+	// copy in the new text
 	messagebox_text.cpy(text);
 	messagebox_backcolor = UI_BACKGROUND_COLOR;
 
-	/* don't update more than 4 times/second */
+	// don't update more than 4 times/second
 	if (force || (curtime - lastupdatetime) > osd_ticks_per_second() / 4)
 	{
 		lastupdatetime = curtime;
@@ -409,17 +412,17 @@ void ui_set_startup_text(running_machine &machine, const char *text, int force)
 }
 
 
-/*-------------------------------------------------
-    ui_update_and_render - update the UI and
-    render it; called by video.c
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_update_and_render - update the UI and
+//  render it; called by video.c
+//-------------------------------------------------
 
 void ui_update_and_render(running_machine &machine, render_container *container)
 {
-	/* always start clean */
+	// always start clean
 	container->empty();
 
-	/* if we're paused, dim the whole screen */
+	// if we're paused, dim the whole screen
 	if (machine.phase() >= MACHINE_PHASE_RESET && (single_step || machine.paused()))
 	{
 		int alpha = (1.0f - machine.options().pause_brightness()) * 255.0f;
@@ -431,15 +434,15 @@ void ui_update_and_render(running_machine &machine, render_container *container)
 			container->add_rect(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
-	/* render any cheat stuff at the bottom */
+	// render any cheat stuff at the bottom
 	if (machine.phase() >= MACHINE_PHASE_RESET)
 		machine.cheat().render_text(*container);
 
-	/* call the current UI handler */
+	// call the current UI handler
 	assert(ui_handler_callback != NULL);
 	ui_handler_param = (*ui_handler_callback)(machine, container, ui_handler_param);
 
-	/* display any popup messages */
+	// display any popup messages
 	if (osd_ticks() < popup_text_end)
 		ui_draw_text_box(container, messagebox_text, JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
 	else
@@ -460,29 +463,29 @@ void ui_update_and_render(running_machine &machine, render_container *container)
 		}
 	}
 
-	/* cancel takes us back to the ingame handler */
+	// cancel takes us back to the ingame handler
 	if (ui_handler_param == UI_HANDLER_CANCEL)
 		ui_set_handler(handler_ingame, 0);
 }
 
 
-/*-------------------------------------------------
-    ui_get_font - return the UI font
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_get_font - return the UI font
+//-------------------------------------------------
 
 render_font *ui_get_font(running_machine &machine)
 {
-	/* allocate the font and messagebox string */
+	// allocate the font and messagebox string
 	if (ui_font == NULL)
 		ui_font = machine.render().font_alloc(machine.options().ui_font());
 	return ui_font;
 }
 
 
-/*-------------------------------------------------
-    ui_get_line_height - return the current height
-    of a line
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_get_line_height - return the current height
+//  of a line
+//-------------------------------------------------
 
 float ui_get_line_height(running_machine &machine)
 {
@@ -492,28 +495,28 @@ float ui_get_line_height(running_machine &machine)
 	float one_to_one_line_height;
 	float scale_factor;
 
-	/* compute the font pixel height at the nominal size */
+	// compute the font pixel height at the nominal size
 	one_to_one_line_height = (float)raw_font_pixel_height / (float)target_pixel_height;
 
-	/* determine the scale factor */
+	// determine the scale factor
 	scale_factor = UI_TARGET_FONT_HEIGHT / one_to_one_line_height;
 
-	/* if our font is small-ish, do integral scaling */
+	// if our font is small-ish, do integral scaling
 	if (raw_font_pixel_height < 24)
 	{
-		/* do we want to scale smaller? only do so if we exceed the threshhold */
+		// do we want to scale smaller? only do so if we exceed the threshhold
 		if (scale_factor <= 1.0f)
 		{
 			if (one_to_one_line_height < UI_MAX_FONT_HEIGHT || raw_font_pixel_height < 12)
 				scale_factor = 1.0f;
 		}
 
-		/* otherwise, just ensure an integral scale factor */
+		// otherwise, just ensure an integral scale factor
 		else
 			scale_factor = floor(scale_factor);
 	}
 
-	/* otherwise, just make sure we hit an even number of pixels */
+	// otherwise, just make sure we hit an even number of pixels
 	else
 	{
 		INT32 height = scale_factor * one_to_one_line_height * (float)target_pixel_height;
@@ -524,10 +527,10 @@ float ui_get_line_height(running_machine &machine)
 }
 
 
-/*-------------------------------------------------
-    ui_get_char_width - return the width of a
-    single character
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_get_char_width - return the width of a
+//  single character
+//-------------------------------------------------
 
 float ui_get_char_width(running_machine &machine, unicode_char ch)
 {
@@ -535,10 +538,10 @@ float ui_get_char_width(running_machine &machine, unicode_char ch)
 }
 
 
-/*-------------------------------------------------
-    ui_get_string_width - return the width of a
-    character string
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_get_string_width - return the width of a
+//  character string
+//-------------------------------------------------
 
 float ui_get_string_width(running_machine &machine, const char *s)
 {
@@ -546,11 +549,11 @@ float ui_get_string_width(running_machine &machine, const char *s)
 }
 
 
-/*-------------------------------------------------
-    ui_draw_outlined_box - add primitives to draw
-    an outlined box with the given background
-    color
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_draw_outlined_box - add primitives to draw
+//  an outlined box with the given background
+//  color
+//-------------------------------------------------
 
 void ui_draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor)
 {
@@ -562,9 +565,9 @@ void ui_draw_outlined_box(render_container *container, float x0, float y0, float
 }
 
 
-/*-------------------------------------------------
-    ui_draw_text - simple text renderer
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_draw_text - simple text renderer
+//-------------------------------------------------
 
 void ui_draw_text(render_container *container, const char *buf, float x, float y)
 {
@@ -572,11 +575,11 @@ void ui_draw_text(render_container *container, const char *buf, float x, float y
 }
 
 
-/*-------------------------------------------------
-    ui_draw_text_full - full featured text
-    renderer with word wrapping, justification,
-    and full size computation
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_draw_text_full - full featured text
+//  renderer with word wrapping, justification,
+//  and full size computation
+//-------------------------------------------------
 
 void ui_draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight)
 {
@@ -590,13 +593,13 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 	float maxwidth = 0;
 	float aspect = machine.render().ui_aspect();
 
-	/* if we don't want wrapping, guarantee a huge wrapwidth */
+	// if we don't want wrapping, guarantee a huge wrapwidth
 	if (wrap == WRAP_NEVER)
 		wrapwidth = 1000000.0f;
 	if (wrapwidth <= 0)
 		return;
 
-	/* loop over lines */
+	// loop over lines
 	while (*s != 0)
 	{
 		const char *lastbreak = NULL;
@@ -607,51 +610,51 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 		float curwidth = 0;
 		float curx = x;
 
-		/* get the current character */
+		// get the current character
 		scharcount = uchar_from_utf8(&schar, s, ends - s);
 		if (scharcount == -1)
 			break;
 
-		/* if the line starts with a tab character, center it regardless */
+		// if the line starts with a tab character, center it regardless
 		if (schar == '\t')
 		{
 			s += scharcount;
 			line_justify = JUSTIFY_CENTER;
 		}
 
-		/* remember the starting position of the line */
+		// remember the starting position of the line
 		linestart = s;
 
-		/* loop while we have characters and are less than the wrapwidth */
+		// loop while we have characters and are less than the wrapwidth
 		while (*s != 0 && curwidth <= wrapwidth)
 		{
 			float chwidth;
 
-			/* get the current chcaracter */
+			// get the current chcaracter
 			scharcount = uchar_from_utf8(&schar, s, ends - s);
 			if (scharcount == -1)
 				break;
 
-			/* if we hit a newline, stop immediately */
+			// if we hit a newline, stop immediately
 			if (schar == '\n')
 				break;
 
-			/* get the width of this character */
+			// get the width of this character
 			chwidth = ui_get_font(machine)->char_width(lineheight, aspect, schar);
 
-			/* if we hit a space, remember the location and width *without* the space */
+			// if we hit a space, remember the location and width *without* the space
 			if (schar == ' ')
 			{
 				lastbreak = s;
 				lastbreak_width = curwidth;
 			}
 
-			/* add the width of this character and advance */
+			// add the width of this character and advance
 			curwidth += chwidth;
 			s += scharcount;
 
-			/* if we hit any non-space breakable character, remember the location and width
-			   *with* the breakable character */
+			// if we hit any non-space breakable character, remember the location and width
+			// *with* the breakable character
 			if (schar != ' ' && is_breakable_char(schar) && curwidth <= wrapwidth)
 			{
 				lastbreak = s;
@@ -659,23 +662,23 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 			}
 		}
 
-		/* if we accumulated too much for the current width, we need to back off */
+		// if we accumulated too much for the current width, we need to back off
 		if (curwidth > wrapwidth)
 		{
-			/* if we're word wrapping, back up to the last break if we can */
+			// if we're word wrapping, back up to the last break if we can
 			if (wrap == WRAP_WORD)
 			{
-				/* if we hit a break, back up to there with the appropriate width */
+				// if we hit a break, back up to there with the appropriate width
 				if (lastbreak != NULL)
 				{
 					s = lastbreak;
 					curwidth = lastbreak_width;
 				}
 
-				/* if we didn't hit a break, back up one character */
+				// if we didn't hit a break, back up one character
 				else if (s > linestart)
 				{
-					/* get the previous character */
+					// get the previous character
 					s = (const char *)utf8_previous_char(s);
 					scharcount = uchar_from_utf8(&schar, s, ends - s);
 					if (scharcount == -1)
@@ -685,16 +688,16 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 				}
 			}
 
-			/* if we're truncating, make sure we have enough space for the ... */
+			// if we're truncating, make sure we have enough space for the ...
 			else if (wrap == WRAP_TRUNCATE)
 			{
-				/* add in the width of the ... */
+				// add in the width of the ...
 				curwidth += 3.0f * ui_get_font(machine)->char_width(lineheight, aspect, '.');
 
-				/* while we are above the wrap width, back up one character */
+				// while we are above the wrap width, back up one character
 				while (curwidth > wrapwidth && s > linestart)
 				{
-					/* get the previous character */
+					// get the previous character
 					s = (const char *)utf8_previous_char(s);
 					scharcount = uchar_from_utf8(&schar, s, ends - s);
 					if (scharcount == -1)
@@ -705,24 +708,24 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 			}
 		}
 
-		/* align according to the justfication */
+		// align according to the justfication
 		if (line_justify == JUSTIFY_CENTER)
 			curx += (origwrapwidth - curwidth) * 0.5f;
 		else if (line_justify == JUSTIFY_RIGHT)
 			curx += origwrapwidth - curwidth;
 
-		/* track the maximum width of any given line */
+		// track the maximum width of any given line
 		if (curwidth > maxwidth)
 			maxwidth = curwidth;
 
-		/* if opaque, add a black box */
+		// if opaque, add a black box 
 		if (draw == DRAW_OPAQUE)
 			container->add_rect(curx, cury, curx + curwidth, cury + lineheight, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
-		/* loop from the line start and add the characters */
+		// loop from the line start and add the characters
 		while (linestart < s)
 		{
-			/* get the current character */
+			// get the current character
 			unicode_char linechar;
 			int linecharcount = uchar_from_utf8(&linechar, linestart, ends - linestart);
 			if (linecharcount == -1)
@@ -736,7 +739,7 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 			linestart += linecharcount;
 		}
 
-		/* append ellipses if needed */
+		// append ellipses if needed
 		if (wrap == WRAP_TRUNCATE && *s != 0 && draw != DRAW_NONE)
 		{
 			container->add_char(curx, cury, lineheight, aspect, fgcolor, *ui_get_font(machine), '.');
@@ -747,14 +750,14 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 			curx += ui_get_font(machine)->char_width(lineheight, aspect, '.');
 		}
 
-		/* if we're not word-wrapping, we're done */
+		// if we're not word-wrapping, we're done
 		if (wrap != WRAP_WORD)
 			break;
 
-		/* advance by a row */
+		// advance by a row
 		cury += lineheight;
 
-		/* skip past any spaces at the beginning of the next line */
+		// skip past any spaces at the beginning of the next line
 		scharcount = uchar_from_utf8(&schar, s, ends - s);
 		if (scharcount == -1)
 			break;
@@ -771,7 +774,7 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 			}
 	}
 
-	/* report the width and height of the resulting space */
+	// report the width and height of the resulting space
 	if (totalwidth)
 		*totalwidth = maxwidth;
 	if (totalheight)
@@ -779,10 +782,10 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 }
 
 
-/*-------------------------------------------------
-    ui_draw_text_box - draw a multiline text
-    message with a box around it
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_draw_text_box - draw a multiline text
+//  message with a box around it
+//-------------------------------------------------
 
 void ui_draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor)
 {
@@ -796,11 +799,11 @@ void ui_draw_text_box(render_container *container, const char *text, int justify
 	// limit this iteration to a finite number of passes
 	for (int pass = 0; pass < 5; pass++)
 	{
-		/* determine the target location */
+		// determine the target location
 		target_x = xpos - 0.5f * target_width;
 		target_y = ypos - 0.5f * target_height;
 
-		/* make sure we stay on-screen */
+		// make sure we stay on-screen
 		if (target_x < UI_BOX_LR_BORDER)
 			target_x = UI_BOX_LR_BORDER;
 		if (target_x + target_width + UI_BOX_LR_BORDER > 1.0f)
@@ -810,19 +813,19 @@ void ui_draw_text_box(render_container *container, const char *text, int justify
 		if (target_y + target_height + UI_BOX_TB_BORDER > 1.0f)
 			target_y = 1.0f - UI_BOX_TB_BORDER - target_height;
 
-		/* compute the multi-line target width/height */
+		// compute the multi-line target width/height
 		ui_draw_text_full(container, text, target_x, target_y, target_width + 0.00001f,
 					justify, WRAP_WORD, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &target_width, &target_height);
 		if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
 			target_height = floor((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
 
-		/* if we match our last value, we're done */
+		// if we match our last value, we're done
 		if (target_height == last_target_height)
 			break;
 		last_target_height = target_height;
 	}
 
-	/* add a box around that */
+	// add a box around that
 	ui_draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
 						target_y - UI_BOX_TB_BORDER,
 						target_x + target_width + UI_BOX_LR_BORDER,
@@ -832,30 +835,30 @@ void ui_draw_text_box(render_container *container, const char *text, int justify
 }
 
 
-/*-------------------------------------------------
-    ui_popup_time - popup a message for a specific
-    amount of time
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_popup_time - popup a message for a specific
+//  amount of time
+//-------------------------------------------------
 
 void CLIB_DECL ui_popup_time(int seconds, const char *text, ...)
 {
 	va_list arg;
 
-	/* extract the text */
+	// extract the text
 	va_start(arg,text);
 	messagebox_text.vprintf(text, arg);
 	messagebox_backcolor = UI_BACKGROUND_COLOR;
 	va_end(arg);
 
-	/* set a timer */
+	// set a timer
 	popup_text_end = osd_ticks() + osd_ticks_per_second() * seconds;
 }
 
 
-/*-------------------------------------------------
-    ui_show_fps_temp - show the FPS counter for
-    a specific period of time
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_show_fps_temp - show the FPS counter for
+//  a specific period of time
+//-------------------------------------------------
 
 void ui_show_fps_temp(double seconds)
 {
@@ -864,9 +867,9 @@ void ui_show_fps_temp(double seconds)
 }
 
 
-/*-------------------------------------------------
-    ui_set_show_fps - show/hide the FPS counter
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_set_show_fps - show/hide the FPS counter
+//-------------------------------------------------
 
 void ui_set_show_fps(bool show)
 {
@@ -879,10 +882,10 @@ void ui_set_show_fps(bool show)
 }
 
 
-/*-------------------------------------------------
-    ui_get_show_fps - return the current FPS
-    counter visibility state
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_get_show_fps - return the current FPS
+//  counter visibility state
+//-------------------------------------------------
 
 bool ui_get_show_fps(void)
 {
@@ -890,9 +893,9 @@ bool ui_get_show_fps(void)
 }
 
 
-/*-------------------------------------------------
-    ui_set_show_profiler - show/hide the profiler
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_set_show_profiler - show/hide the profiler
+//-------------------------------------------------
 
 void ui_set_show_profiler(bool show)
 {
@@ -901,10 +904,10 @@ void ui_set_show_profiler(bool show)
 }
 
 
-/*-------------------------------------------------
-    ui_get_show_profiler - return the current
-    profiler visibility state
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_get_show_profiler - return the current
+//  profiler visibility state
+//-------------------------------------------------
 
 bool ui_get_show_profiler(void)
 {
@@ -912,9 +915,9 @@ bool ui_get_show_profiler(void)
 }
 
 
-/*-------------------------------------------------
-    ui_show_menu - show the menus
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_show_menu - show the menus
+//-------------------------------------------------
 
 void ui_show_menu(void)
 {
@@ -922,19 +925,20 @@ void ui_show_menu(void)
 }
 
 
-/*-------------------------------------------------
-    ui_show_mouse - change mouse status
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_show_mouse - change mouse status
+//-------------------------------------------------
 
 void ui_show_mouse(bool status)
 {
 	ui_mouse_show = status;
 }
 
-/*-------------------------------------------------
-    ui_is_menu_active - return true if the menu
-    UI handler is active
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  ui_is_menu_active - return true if the menu
+//  UI handler is active
+//-------------------------------------------------
 
 bool ui_is_menu_active(void)
 {
@@ -947,10 +951,10 @@ bool ui_is_menu_active(void)
     TEXT GENERATORS
 ***************************************************************************/
 
-/*-------------------------------------------------
-    disclaimer_string - print the disclaimer
-    text to the given buffer
--------------------------------------------------*/
+//-------------------------------------------------
+//  disclaimer_string - print the disclaimer
+//  text to the given buffer
+//-------------------------------------------------
 
 static astring &disclaimer_string(running_machine &machine, astring &string)
 {
@@ -961,10 +965,10 @@ static astring &disclaimer_string(running_machine &machine, astring &string)
 }
 
 
-/*-------------------------------------------------
-    warnings_string - print the warning flags
-    text to the given buffer
--------------------------------------------------*/
+//-------------------------------------------------
+//  warnings_string - print the warning flags
+//  text to the given buffer
+//-------------------------------------------------
 
 static astring &warnings_string(running_machine &machine, astring &string)
 {
@@ -982,11 +986,11 @@ static astring &warnings_string(running_machine &machine, astring &string)
 
 	string.reset();
 
-	/* if no warnings, nothing to return */
+	// if no warnings, nothing to return
 	if (rom_load_warnings(machine) == 0 && rom_load_knownbad(machine) == 0 && !(machine.system().flags & WARNING_FLAGS) && software_load_warnings_message(machine).len()==0)
 		return string;
 
-	/* add a warning if any ROMs were loaded with warnings */
+	// add a warning if any ROMs were loaded with warnings
 	if (rom_load_warnings(machine) > 0)
 	{
 		string.cat("One or more ROMs/CHDs for this game are incorrect. The ");
@@ -1001,20 +1005,20 @@ static astring &warnings_string(running_machine &machine, astring &string)
 		if (machine.system().flags & WARNING_FLAGS)
 			string.cat("\n");
 	}
-	/* if we have at least one warning flag, print the general header */
+	// if we have at least one warning flag, print the general header
 	if ((machine.system().flags & WARNING_FLAGS) || rom_load_knownbad(machine) > 0)
 	{
 		string.cat("There are known problems with this ");
 		string.cat(emulator_info::get_gamenoun());
 		string.cat("\n\n");
 
-		/* add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP */
+		// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
 		if (rom_load_knownbad(machine) > 0) {
 			string.cat("One or more ROMs/CHDs for this ");
 			string.cat(emulator_info::get_gamenoun());
 			string.cat(" have not been correctly dumped.\n");
 		}
-		/* add one line per warning flag */
+		// add one line per warning flag
 		if (machine.system().flags & GAME_IMPERFECT_KEYBOARD)
 			string.cat("The keyboard emulation may not be 100% accurate.\n");
 		if (machine.system().flags & GAME_IMPERFECT_COLORS)
@@ -1030,14 +1034,14 @@ static astring &warnings_string(running_machine &machine, astring &string)
 		if (machine.system().flags & GAME_NO_COCKTAIL)
 			string.cat("Screen flipping in cocktail mode is not supported.\n");
 
-		/* check if external artwork is present before displaying this warning? */
+		// check if external artwork is present before displaying this warning?
 		if (machine.system().flags & GAME_REQUIRES_ARTWORK)
 			string.cat("The game requires external artwork files\n");
 
-		/* if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger */
+		// if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger
 		if (machine.system().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
 		{
-			/* add the strings for these warnings */
+			// add the strings for these warnings
 			if (machine.system().flags & GAME_UNEMULATED_PROTECTION)
 				string.cat("The game has protection which isn't fully emulated.\n");
 			if (machine.system().flags & GAME_NOT_WORKING) {
@@ -1055,20 +1059,20 @@ static astring &warnings_string(running_machine &machine, astring &string)
 				string.cat(".\n");
 			}
 
-			/* find the parent of this driver */
+			// find the parent of this driver
 			driver_enumerator drivlist(machine.options());
 			int maindrv = drivlist.find(machine.system());
 			int clone_of = drivlist.non_bios_clone(maindrv);
 			if (clone_of != -1)
 				maindrv = clone_of;
 
-			/* scan the driver list for any working clones and add them */
+			// scan the driver list for any working clones and add them
 			bool foundworking = false;
 			while (drivlist.next())
 				if (drivlist.current() == maindrv || drivlist.clone() == maindrv)
 					if ((drivlist.driver().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL)) == 0)
 					{
-						/* this one works, add a header and display the name of the clone */
+						// this one works, add a header and display the name of the clone
 						if (!foundworking)
 							string.cat("\n\nThere are working clones of this game: ");
 						else
@@ -1082,34 +1086,34 @@ static astring &warnings_string(running_machine &machine, astring &string)
 		}
 	}
 
-	/* add the 'press OK' string */
+	// add the 'press OK' string
 	string.cat("\n\nType OK or move the joystick left then right to continue");
 	return string;
 }
 
 
-/*-------------------------------------------------
-    game_info_astring - populate an allocated
-    string with the game info text
--------------------------------------------------*/
+//-------------------------------------------------
+//  game_info_astring - populate an allocated
+//  string with the game info text
+//-------------------------------------------------
 
 astring &game_info_astring(running_machine &machine, astring &string)
 {
-	/* print description, manufacturer, and CPU: */
+	// print description, manufacturer, and CPU:
 	astring tempstr;
 	string.printf("%s\n%s %s\nDriver: %s\n\nCPU:\n", machine.system().description, machine.system().year, machine.system().manufacturer, core_filename_extract_base(tempstr, machine.system().source_file).cstr());
 
-	/* loop over all CPUs */
+	// loop over all CPUs
 	execute_interface_iterator execiter(machine.root_device());
 	tagmap_t<UINT8> exectags;
 	for (device_execute_interface *exec = execiter.first(); exec != NULL; exec = execiter.next())
 	{
 		if (exectags.add(exec->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
 			continue;
-		/* get cpu specific clock that takes internal multiplier/dividers into account */
+		// get cpu specific clock that takes internal multiplier/dividers into account
 		int clock = exec->device().clock();
 
-		/* count how many identical CPUs we have */
+		// count how many identical CPUs we have 
 		int count = 1;
 		const char *name = exec->device().name();
 		execute_interface_iterator execinneriter(machine.root_device());
@@ -1120,19 +1124,19 @@ astring &game_info_astring(running_machine &machine, astring &string)
 					count++;
 		}
 
-		/* if more than one, prepend a #x in front of the CPU name */
+		// if more than one, prepend a #x in front of the CPU name 
 		if (count > 1)
 			string.catprintf("%d" UTF8_MULTIPLY, count);
 		string.cat(name);
 
-		/* display clock in kHz or MHz */
+		// display clock in kHz or MHz 
 		if (clock >= 1000000)
 			string.catprintf(" %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
 		else
 			string.catprintf(" %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
 	}
 
-	/* loop over all sound chips */
+	// loop over all sound chips 
 	sound_interface_iterator snditer(machine.root_device());
 	tagmap_t<UINT8> soundtags;
 	bool found_sound = false;
@@ -1141,12 +1145,12 @@ astring &game_info_astring(running_machine &machine, astring &string)
 		if (soundtags.add(sound->device().tag(), 1, FALSE) == TMERR_DUPLICATE)
 			continue;
 
-		/* append the Sound: string */
+		// append the Sound: string 
 		if (!found_sound)
 			string.cat("\nSound:\n");
 		found_sound = true;
 
-		/* count how many identical sound chips we have */
+		// count how many identical sound chips we have 
 		int count = 1;
 		sound_interface_iterator sndinneriter(machine.root_device());
 		for (device_sound_interface *scan = sndinneriter.first(); scan != NULL; scan = sndinneriter.next())
@@ -1155,12 +1159,12 @@ astring &game_info_astring(running_machine &machine, astring &string)
 				if (soundtags.add(scan->device().tag(), 1, FALSE) != TMERR_DUPLICATE)
 					count++;
 		}
-		/* if more than one, prepend a #x in front of the CPU name */
+		// if more than one, prepend a #x in front of the CPU name 
 		if (count > 1)
 			string.catprintf("%d" UTF8_MULTIPLY, count);
 		string.cat(sound->device().name());
 
-		/* display clock in kHz or MHz */
+		// display clock in kHz or MHz 
 		int clock = sound->device().clock();
 		if (clock >= 1000000)
 			string.catprintf(" %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
@@ -1170,7 +1174,7 @@ astring &game_info_astring(running_machine &machine, astring &string)
 			string.cat("\n");
 	}
 
-	/* display screen information */
+	// display screen information 
 	string.cat("\nVideo:\n");
 	screen_device_iterator scriter(machine.root_device());
 	int scrcount = scriter.count();
@@ -1209,10 +1213,10 @@ astring &game_info_astring(running_machine &machine, astring &string)
     UI HANDLERS
 ***************************************************************************/
 
-/*-------------------------------------------------
-    handler_messagebox - displays the current
-    messagebox_text string but handles no input
--------------------------------------------------*/
+//-------------------------------------------------
+//  handler_messagebox - displays the current
+//  messagebox_text string but handles no input
+//-------------------------------------------------
 
 static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state)
 {
@@ -1221,25 +1225,25 @@ static UINT32 handler_messagebox(running_machine &machine, render_container *con
 }
 
 
-/*-------------------------------------------------
-    handler_messagebox_ok - displays the current
-    messagebox_text string and waits for an OK
--------------------------------------------------*/
+//-------------------------------------------------
+//  handler_messagebox_ok - displays the current
+//  messagebox_text string and waits for an OK
+//-------------------------------------------------
 
 static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state)
 {
-	/* draw a standard message window */
+	// draw a standard message window 
 	ui_draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
-	/* an 'O' or left joystick kicks us to the next state */
+	// an 'O' or left joystick kicks us to the next state 
 	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
 		state++;
 
-	/* a 'K' or right joystick exits the state */
+	// a 'K' or right joystick exits the state 
 	else if (state == 1 && (machine.input().code_pressed_once(KEYCODE_K) || ui_input_pressed(machine, IPT_UI_RIGHT)))
 		state = UI_HANDLER_CANCEL;
 
-	/* if the user cancels, exit out completely */
+	// if the user cancels, exit out completely 
 	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		machine.schedule_exit();
@@ -1250,35 +1254,36 @@ static UINT32 handler_messagebox_ok(running_machine &machine, render_container *
 }
 
 
-/*-------------------------------------------------
-    handler_messagebox_anykey - displays the
-    current messagebox_text string and waits for
-    any keypress
--------------------------------------------------*/
+//-------------------------------------------------
+//  handler_messagebox_anykey - displays the
+//  current messagebox_text string and waits for
+//  any keypress
+//-------------------------------------------------
 
 static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state)
 {
-	/* draw a standard message window */
+	// draw a standard message window 
 	ui_draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
-	/* if the user cancels, exit out completely */
+	// if the user cancels, exit out completely 
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		machine.schedule_exit();
 		state = UI_HANDLER_CANCEL;
 	}
 
-	/* if any key is pressed, just exit */
+	// if any key is pressed, just exit 
 	else if (machine.input().poll_switches() != INPUT_CODE_INVALID)
 		state = UI_HANDLER_CANCEL;
 
 	return state;
 }
 
-/*-------------------------------------------------
-    process_natural_keyboard - processes any
-    natural keyboard input
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  process_natural_keyboard - processes any
+//  natural keyboard input
+//-------------------------------------------------
 
 static void process_natural_keyboard(running_machine &machine)
 {
@@ -1289,72 +1294,74 @@ static void process_natural_keyboard(running_machine &machine)
 	UINT8 *key_down_ptr;
 	UINT8 key_down_mask;
 
-	/* loop while we have interesting events */
+	// loop while we have interesting events 
 	while (ui_input_pop_event(machine, &event))
 	{
-		/* if this was a UI_EVENT_CHAR event, post it */
+		// if this was a UI_EVENT_CHAR event, post it 
 		if (event.event_type == UI_EVENT_CHAR)
 			machine.ioport().natkeyboard().post(event.ch);
 	}
 
-	/* process natural keyboard keys that don't get UI_EVENT_CHARs */
+	// process natural keyboard keys that don't get UI_EVENT_CHARs 
 	for (i = 0; i < ARRAY_LENGTH(non_char_keys); i++)
 	{
-		/* identify this keycode */
+		// identify this keycode 
 		itemid = non_char_keys[i];
 		code = machine.input().code_from_itemid(itemid);
 
-		/* ...and determine if it is pressed */
+		// ...and determine if it is pressed 
 		pressed = machine.input().code_pressed(code);
 
-		/* figure out whey we are in the key_down map */
+		// figure out whey we are in the key_down map 
 		key_down_ptr = &non_char_keys_down[i / 8];
 		key_down_mask = 1 << (i % 8);
 
 		if (pressed && !(*key_down_ptr & key_down_mask))
 		{
-			/* this key is now down */
+			// this key is now down 
 			*key_down_ptr |= key_down_mask;
 
-			/* post the key */
+			// post the key 
 			machine.ioport().natkeyboard().post(UCHAR_MAMEKEY_BEGIN + code.item_id());
 		}
 		else if (!pressed && (*key_down_ptr & key_down_mask))
 		{
-			/* this key is now up */
+			// this key is now up 
 			*key_down_ptr &= ~key_down_mask;
 		}
 	}
 }
 
-/*-------------------------------------------------
-    ui_paste - does a paste from the keyboard
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  ui_paste - does a paste from the keyboard
+//-------------------------------------------------
 
 void ui_paste(running_machine &machine)
 {
-	/* retrieve the clipboard text */
+	// retrieve the clipboard text 
 	char *text = osd_get_clipboard_text();
 
-	/* was a result returned? */
+	// was a result returned? 
 	if (text != NULL)
 	{
-		/* post the text */
+		// post the text 
 		machine.ioport().natkeyboard().post_utf8(text);
 
-		/* free the string */
+		// free the string 
 		osd_free(text);
 	}
 }
 
-/*-------------------------------------------------
-    ui_image_handler_ingame - execute display
-    callback function for each image device
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  ui_image_handler_ingame - execute display
+//  callback function for each image device
+//-------------------------------------------------
 
 void ui_image_handler_ingame(running_machine &machine)
 {
-	/* run display routine for devices */
+	// run display routine for devices 
 	if (machine.phase() == MACHINE_PHASE_RUNNING)
 	{
 		image_interface_iterator iter(machine.root_device());
@@ -1363,16 +1370,17 @@ void ui_image_handler_ingame(running_machine &machine)
 	}
 }
 
-/*-------------------------------------------------
-    handler_ingame - in-game handler takes care
-    of the standard keypresses
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  handler_ingame - in-game handler takes care
+//  of the standard keypresses
+//-------------------------------------------------
 
 static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state)
 {
 	bool is_paused = machine.paused();
 
-	/* first draw the FPS counter */
+	// first draw the FPS counter 
 	if (showfps || osd_ticks() < showfps_end)
 	{
 		astring tempstring;
@@ -1382,33 +1390,33 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 	else
 		showfps_end = 0;
 
-	/* draw the profiler if visible */
+	// draw the profiler if visible 
 	if (show_profiler)
 	{
 		const char *text = g_profiler.text(machine);
 		ui_draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 
-	/* if we're single-stepping, pause now */
+	// if we're single-stepping, pause now 
 	if (single_step)
 	{
 		machine.pause();
 		single_step = false;
 	}
 
-	/* determine if we should disable the rest of the UI */
+	// determine if we should disable the rest of the UI 
 	bool ui_disabled = (machine.ioport().has_keyboard() && !machine.ui_active());
 
-	/* is ScrLk UI toggling applicable here? */
+	// is ScrLk UI toggling applicable here? 
 	if (machine.ioport().has_keyboard())
 	{
-		/* are we toggling the UI with ScrLk? */
+		// are we toggling the UI with ScrLk? 
 		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
 		{
-			/* toggle the UI */
+			// toggle the UI 
 			machine.set_ui_active(!machine.ui_active());
 
-			/* display a popup indicating the new status */
+			// display a popup indicating the new status 
 			if (machine.ui_active())
 			{
 				ui_popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
@@ -1432,13 +1440,13 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 		}
 	}
 
-	/* is the natural keyboard enabled? */
+	// is the natural keyboard enabled? 
 	if (ui_get_use_natural_keyboard(machine) && (machine.phase() == MACHINE_PHASE_RUNNING))
 		process_natural_keyboard(machine);
 
 	if (!ui_disabled)
 	{
-		/* paste command */
+		// paste command 
 		if (ui_input_pressed(machine, IPT_UI_PASTE))
 			ui_paste(machine);
 	}
@@ -1455,21 +1463,21 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 			return ui_set_handler(handler_confirm_quit, 0);
 	}
 
-	/* turn on menus if requested */
+	// turn on menus if requested 
 	if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
 		return ui_set_handler(ui_menu::ui_handler, 0);
 
-	/* if the on-screen display isn't up and the user has toggled it, turn it on */
+	// if the on-screen display isn't up and the user has toggled it, turn it on 
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
 		return ui_set_handler(ui_menu_sliders::ui_handler, 1);
 
-	/* handle a reset request */
+	// handle a reset request 
 	if (ui_input_pressed(machine, IPT_UI_RESET_MACHINE))
 		machine.schedule_hard_reset();
 	if (ui_input_pressed(machine, IPT_UI_SOFT_RESET))
 		machine.schedule_soft_reset();
 
-	/* handle a request to display graphics/palette */
+	// handle a request to display graphics/palette 
 	if (ui_input_pressed(machine, IPT_UI_SHOW_GFX))
 	{
 		if (!is_paused)
@@ -1477,28 +1485,28 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 		return ui_set_handler(ui_gfx_ui_handler, is_paused);
 	}
 
-	/* handle a save state request */
+	// handle a save state request 
 	if (ui_input_pressed(machine, IPT_UI_SAVE_STATE))
 	{
 		machine.pause();
 		return ui_set_handler(handler_load_save, LOADSAVE_SAVE);
 	}
 
-	/* handle a load state request */
+	// handle a load state request 
 	if (ui_input_pressed(machine, IPT_UI_LOAD_STATE))
 	{
 		machine.pause();
 		return ui_set_handler(handler_load_save, LOADSAVE_LOAD);
 	}
 
-	/* handle a save snapshot request */
+	// handle a save snapshot request 
 	if (ui_input_pressed(machine, IPT_UI_SNAPSHOT))
 		machine.video().save_active_screen_snapshots();
 
-	/* toggle pause */
+	// toggle pause 
 	if (ui_input_pressed(machine, IPT_UI_PAUSE))
 	{
-		/* with a shift key, it is single step */
+		// with a shift key, it is single step 
 		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
 		{
 			single_step = true;
@@ -1508,11 +1516,11 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 			machine.toggle_pause();
 	}
 
-	/* handle a toggle cheats request */
+	// handle a toggle cheats request 
 	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CHEAT))
 		machine.cheat().set_enable(!machine.cheat().enabled());
 
-	/* toggle movie recording */
+	// toggle movie recording 
 	if (ui_input_pressed(machine, IPT_UI_RECORD_MOVIE))
 	{
 		if (!machine.video().is_recording())
@@ -1527,45 +1535,45 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 		}
 	}
 
-	/* toggle profiler display */
+	// toggle profiler display 
 	if (ui_input_pressed(machine, IPT_UI_SHOW_PROFILER))
 		ui_set_show_profiler(!ui_get_show_profiler());
 
-	/* toggle FPS display */
+	// toggle FPS display 
 	if (ui_input_pressed(machine, IPT_UI_SHOW_FPS))
 		ui_set_show_fps(!ui_get_show_fps());
 
-	/* increment frameskip? */
+	// increment frameskip? 
 	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_INC))
 	{
-		/* get the current value and increment it */
+		// get the current value and increment it 
 		int newframeskip = machine.video().frameskip() + 1;
 		if (newframeskip > MAX_FRAMESKIP)
 			newframeskip = -1;
 		machine.video().set_frameskip(newframeskip);
 
-		/* display the FPS counter for 2 seconds */
+		// display the FPS counter for 2 seconds 
 		ui_show_fps_temp(2.0);
 	}
 
-	/* decrement frameskip? */
+	// decrement frameskip? 
 	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_DEC))
 	{
-		/* get the current value and decrement it */
+		// get the current value and decrement it 
 		int newframeskip = machine.video().frameskip() - 1;
 		if (newframeskip < -1)
 			newframeskip = MAX_FRAMESKIP;
 		machine.video().set_frameskip(newframeskip);
 
-		/* display the FPS counter for 2 seconds */
+		// display the FPS counter for 2 seconds 
 		ui_show_fps_temp(2.0);
 	}
 
-	/* toggle throttle? */
+	// toggle throttle? 
 	if (ui_input_pressed(machine, IPT_UI_THROTTLE))
 		machine.video().toggle_throttle();
 
-	/* check for fast forward */
+	// check for fast forward 
 	if (machine.ioport().type_pressed(IPT_UI_FAST_FORWARD))
 	{
 		machine.video().set_fastforward(true);
@@ -1578,10 +1586,10 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 }
 
 
-/*-------------------------------------------------
-    handler_load_save - leads the user through
-    specifying a game to save or load
--------------------------------------------------*/
+//-------------------------------------------------
+//  handler_load_save - leads the user through
+//  specifying a game to save or load
+//-------------------------------------------------
 
 static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state)
 {
@@ -1589,31 +1597,31 @@ static UINT32 handler_load_save(running_machine &machine, render_container *cont
 	input_code code;
 	char file = 0;
 
-	/* if we're not in the middle of anything, skip */
+	// if we're not in the middle of anything, skip 
 	if (state == LOADSAVE_NONE)
 		return 0;
 
-	/* okay, we're waiting for a key to select a slot; display a message */
+	// okay, we're waiting for a key to select a slot; display a message 
 	if (state == LOADSAVE_SAVE)
 		ui_draw_message_window(container, "Select position to save to");
 	else
 		ui_draw_message_window(container, "Select position to load from");
 
-	/* check for cancel key */
+	// check for cancel key 
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
-		/* display a popup indicating things were cancelled */
+		// display a popup indicating things were cancelled 
 		if (state == LOADSAVE_SAVE)
 			popmessage("Save cancelled");
 		else
 			popmessage("Load cancelled");
 
-		/* reset the state */
+		// reset the state 
 		machine.resume();
 		return UI_HANDLER_CANCEL;
 	}
 
-	/* check for A-Z or 0-9 */
+	// check for A-Z or 0-9 
 	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; id++)
 		if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
 			file = id - ITEM_ID_A + 'a';
@@ -1628,7 +1636,7 @@ static UINT32 handler_load_save(running_machine &machine, render_container *cont
 	if (file == 0)
 		return state;
 
-	/* display a popup indicating that the save will proceed */
+	// display a popup indicating that the save will proceed 
 	sprintf(filename, "%c", file);
 	if (state == LOADSAVE_SAVE)
 	{
@@ -1641,16 +1649,16 @@ static UINT32 handler_load_save(running_machine &machine, render_container *cont
 		machine.schedule_load(filename);
 	}
 
-	/* remove the pause and reset the state */
+	// remove the pause and reset the state 
 	machine.resume();
 	return UI_HANDLER_CANCEL;
 }
 
 
-/*-------------------------------------------------
- handler_confirm_quit - leads the user through
- confirming quit emulation
- -------------------------------------------------*/
+//-------------------------------------------------
+//  handler_confirm_quit - leads the user through
+//  confirming quit emulation
+//-------------------------------------------------
 
 static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
 {
@@ -1661,11 +1669,11 @@ static UINT32 handler_confirm_quit(running_machine &machine, render_container *c
 	ui_draw_text_box(container, quit_message, JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	machine.pause();
 
-	/* if the user press ENTER, quit the game */
+	// if the user press ENTER, quit the game 
 	if (ui_input_pressed(machine, IPT_UI_SELECT))
 		machine.schedule_exit();
 
-	/* if the user press ESC, just continue */
+	// if the user press ESC, just continue 
 	else if (ui_input_pressed(machine, IPT_UI_CANCEL))
 	{
 		machine.resume();
@@ -1680,9 +1688,9 @@ static UINT32 handler_confirm_quit(running_machine &machine, render_container *c
     SLIDER CONTROLS
 ***************************************************************************/
 
-/*-------------------------------------------------
-    ui_get_slider_list - get the list of sliders
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_get_slider_list - get the list of sliders
+//-------------------------------------------------
 
 const slider_state *ui_get_slider_list(void)
 {
@@ -1690,9 +1698,9 @@ const slider_state *ui_get_slider_list(void)
 }
 
 
-/*-------------------------------------------------
-    slider_alloc - allocate a new slider entry
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_alloc - allocate a new slider entry
+//-------------------------------------------------
 
 static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
 {
@@ -1711,10 +1719,10 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 }
 
 
-/*-------------------------------------------------
-    slider_init - initialize the list of slider
-    controls
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_init - initialize the list of slider
+//  controls
+//-------------------------------------------------
 
 static slider_state *slider_init(running_machine &machine)
 {
@@ -1725,11 +1733,11 @@ static slider_state *slider_init(running_machine &machine)
 	astring string;
 	int item;
 
-	/* add overall volume */
+	// add overall volume 
 	*tailptr = slider_alloc(machine, "Master Volume", -32, 0, 0, 1, slider_volume, NULL);
 	tailptr = &(*tailptr)->next;
 
-	/* add per-channel volume */
+	// add per-channel volume 
 	mixer_input info;
 	for (item = 0; machine.sound().indexed_mixer_input(item, info); item++)
 	{
@@ -1742,7 +1750,7 @@ static slider_state *slider_init(running_machine &machine)
 		tailptr = &(*tailptr)->next;
 	}
 
-	/* add analog adjusters */
+	// add analog adjusters 
 	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->first_field(); field != NULL; field = field->next())
 			if (field->type() == IPT_ADJUSTER)
@@ -1752,7 +1760,7 @@ static slider_state *slider_init(running_machine &machine)
 				tailptr = &(*tailptr)->next;
 			}
 
-	/* add CPU overclocking (cheat only) */
+	// add CPU overclocking (cheat only) 
 	if (machine.options().cheat())
 	{
 		execute_interface_iterator iter(machine.root_device());
@@ -1765,7 +1773,7 @@ static slider_state *slider_init(running_machine &machine)
 		}
 	}
 
-	/* add screen parameters */
+	// add screen parameters 
 	screen_device_iterator scriter(machine.root_device());
 	for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
 	{
@@ -1775,7 +1783,7 @@ static slider_state *slider_init(running_machine &machine)
 		int defyoffset = floor(screen->yoffset() * 1000.0f + 0.5f);
 		void *param = (void *)screen;
 
-		/* add refresh rate tweaker */
+		// add refresh rate tweaker 
 		if (machine.options().cheat())
 		{
 			string.printf("%s Refresh Rate", slider_get_screen_desc(*screen));
@@ -1783,7 +1791,7 @@ static slider_state *slider_init(running_machine &machine)
 			tailptr = &(*tailptr)->next;
 		}
 
-		/* add standard brightness/contrast/gamma controls per-screen */
+		// add standard brightness/contrast/gamma controls per-screen 
 		string.printf("%s Brightness", slider_get_screen_desc(*screen));
 		*tailptr = slider_alloc(machine, string, 100, 1000, 2000, 10, slider_brightness, param);
 		tailptr = &(*tailptr)->next;
@@ -1794,7 +1802,7 @@ static slider_state *slider_init(running_machine &machine)
 		*tailptr = slider_alloc(machine, string, 100, 1000, 3000, 50, slider_gamma, param);
 		tailptr = &(*tailptr)->next;
 
-		/* add scale and offset controls per-screen */
+		// add scale and offset controls per-screen 
 		string.printf("%s Horiz Stretch", slider_get_screen_desc(*screen));
 		*tailptr = slider_alloc(machine, string, 500, defxscale, 1500, 2, slider_xscale, param);
 		tailptr = &(*tailptr)->next;
@@ -1821,7 +1829,7 @@ static slider_state *slider_init(running_machine &machine)
 			int defyoffset = floor(config.m_overposy * 1000.0f + 0.5f);
 			void *param = (void *)laserdisc;
 
-			/* add scale and offset controls per-overlay */
+			// add scale and offset controls per-overlay 
 			string.printf("Laserdisc '%s' Horiz Stretch", laserdisc->tag());
 			*tailptr = slider_alloc(machine, string, 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
 			tailptr = &(*tailptr)->next;
@@ -1839,7 +1847,7 @@ static slider_state *slider_init(running_machine &machine)
 	for (screen_device *screen = scriter.first(); screen != NULL; screen = scriter.next())
 		if (screen->screen_type() == SCREEN_TYPE_VECTOR)
 		{
-			/* add flicker control */
+			// add flicker control 
 			*tailptr = slider_alloc(machine, "Vector Flicker", 0, 0, 1000, 10, slider_flicker, NULL);
 			tailptr = &(*tailptr)->next;
 			*tailptr = slider_alloc(machine, "Beam Width", 10, 100, 1000, 10, slider_beam, NULL);
@@ -1848,7 +1856,7 @@ static slider_state *slider_init(running_machine &machine)
 		}
 
 #ifdef MAME_DEBUG
-	/* add crosshair adjusters */
+	// add crosshair adjusters 
 	for (port = machine.ioport().first_port(); port != NULL; port = port->next())
 		for (field = port->first_field(); field != NULL; field = field->next())
 			if (field->crosshair_axis() != CROSSHAIR_AXIS_NONE && field->player() == 0)
@@ -1867,9 +1875,9 @@ static slider_state *slider_init(running_machine &machine)
 }
 
 
-/*-------------------------------------------------
-    slider_volume - global volume slider callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_volume - global volume slider callback
+//-------------------------------------------------
 
 static INT32 slider_volume(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -1881,10 +1889,10 @@ static INT32 slider_volume(running_machine &machine, void *arg, astring *string,
 }
 
 
-/*-------------------------------------------------
-    slider_mixervol - single channel volume
-    slider callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_mixervol - single channel volume
+//  slider callback
+//-------------------------------------------------
 
 static INT32 slider_mixervol(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -1903,10 +1911,10 @@ static INT32 slider_mixervol(running_machine &machine, void *arg, astring *strin
 }
 
 
-/*-------------------------------------------------
-    slider_adjuster - analog adjuster slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_adjuster - analog adjuster slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_adjuster(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -1925,10 +1933,10 @@ static INT32 slider_adjuster(running_machine &machine, void *arg, astring *strin
 }
 
 
-/*-------------------------------------------------
-    slider_overclock - CPU overclocker slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_overclock - CPU overclocker slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_overclock(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -1941,9 +1949,9 @@ static INT32 slider_overclock(running_machine &machine, void *arg, astring *stri
 }
 
 
-/*-------------------------------------------------
-    slider_refresh - refresh rate slider callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_refresh - refresh rate slider callback
+//-------------------------------------------------
 
 static INT32 slider_refresh(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -1965,10 +1973,10 @@ static INT32 slider_refresh(running_machine &machine, void *arg, astring *string
 }
 
 
-/*-------------------------------------------------
-    slider_brightness - screen brightness slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_brightness - screen brightness slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_brightness(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -1987,10 +1995,10 @@ static INT32 slider_brightness(running_machine &machine, void *arg, astring *str
 }
 
 
-/*-------------------------------------------------
-    slider_contrast - screen contrast slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_contrast - screen contrast slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_contrast(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2009,9 +2017,9 @@ static INT32 slider_contrast(running_machine &machine, void *arg, astring *strin
 }
 
 
-/*-------------------------------------------------
-    slider_gamma - screen gamma slider callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_gamma - screen gamma slider callback
+//-------------------------------------------------
 
 static INT32 slider_gamma(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2030,10 +2038,10 @@ static INT32 slider_gamma(running_machine &machine, void *arg, astring *string, 
 }
 
 
-/*-------------------------------------------------
-    slider_xscale - screen horizontal scale slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_xscale - screen horizontal scale slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_xscale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2052,10 +2060,10 @@ static INT32 slider_xscale(running_machine &machine, void *arg, astring *string,
 }
 
 
-/*-------------------------------------------------
-    slider_yscale - screen vertical scale slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_yscale - screen vertical scale slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_yscale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2074,10 +2082,10 @@ static INT32 slider_yscale(running_machine &machine, void *arg, astring *string,
 }
 
 
-/*-------------------------------------------------
-    slider_xoffset - screen horizontal position
-    slider callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_xoffset - screen horizontal position
+//  slider callback
+//-------------------------------------------------
 
 static INT32 slider_xoffset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2096,10 +2104,10 @@ static INT32 slider_xoffset(running_machine &machine, void *arg, astring *string
 }
 
 
-/*-------------------------------------------------
-    slider_yoffset - screen vertical position
-    slider callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_yoffset - screen vertical position
+//  slider callback
+//-------------------------------------------------
 
 static INT32 slider_yoffset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2118,10 +2126,10 @@ static INT32 slider_yoffset(running_machine &machine, void *arg, astring *string
 }
 
 
-/*-------------------------------------------------
-    slider_overxscale - screen horizontal scale slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_overxscale - screen horizontal scale slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_overxscale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2140,10 +2148,10 @@ static INT32 slider_overxscale(running_machine &machine, void *arg, astring *str
 }
 
 
-/*-------------------------------------------------
-    slider_overyscale - screen vertical scale slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_overyscale - screen vertical scale slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_overyscale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2162,10 +2170,10 @@ static INT32 slider_overyscale(running_machine &machine, void *arg, astring *str
 }
 
 
-/*-------------------------------------------------
-    slider_overxoffset - screen horizontal position
-    slider callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_overxoffset - screen horizontal position
+//  slider callback
+//-------------------------------------------------
 
 static INT32 slider_overxoffset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2184,10 +2192,10 @@ static INT32 slider_overxoffset(running_machine &machine, void *arg, astring *st
 }
 
 
-/*-------------------------------------------------
-    slider_overyoffset - screen vertical position
-    slider callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_overyoffset - screen vertical position
+//  slider callback
+//-------------------------------------------------
 
 static INT32 slider_overyoffset(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2206,10 +2214,10 @@ static INT32 slider_overyoffset(running_machine &machine, void *arg, astring *st
 }
 
 
-/*-------------------------------------------------
-    slider_flicker - vector flicker slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_flicker - vector flicker slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_flicker(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2221,10 +2229,11 @@ static INT32 slider_flicker(running_machine &machine, void *arg, astring *string
 	return floor(vector->get_flicker() * 10.0f + 0.5f);
 }
 
-/*-------------------------------------------------
-    slider_beam - vector beam width slider
-    callback
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  slider_beam - vector beam width slider
+//  callback
+//-------------------------------------------------
 
 static INT32 slider_beam(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
@@ -2237,10 +2246,10 @@ static INT32 slider_beam(running_machine &machine, void *arg, astring *string, I
 }
 
 
-/*-------------------------------------------------
-    slider_get_screen_desc - returns the
-    description for a given screen
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_get_screen_desc - returns the
+//  description for a given screen
+//-------------------------------------------------
 
 static char *slider_get_screen_desc(screen_device &screen)
 {
@@ -2256,10 +2265,10 @@ static char *slider_get_screen_desc(screen_device &screen)
 	return descbuf;
 }
 
-/*-------------------------------------------------
-    slider_crossscale - crosshair scale slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_crossscale - crosshair scale slider
+//  callback
+//-------------------------------------------------
 
 #ifdef MAME_DEBUG
 static INT32 slider_crossscale(running_machine &machine, void *arg, astring *string, INT32 newval)
@@ -2275,10 +2284,10 @@ static INT32 slider_crossscale(running_machine &machine, void *arg, astring *str
 #endif
 
 
-/*-------------------------------------------------
-    slider_crossoffset - crosshair scale slider
-    callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  slider_crossoffset - crosshair scale slider
+//  callback
+//-------------------------------------------------
 
 #ifdef MAME_DEBUG
 static INT32 slider_crossoffset(running_machine &machine, void *arg, astring *string, INT32 newval)
@@ -2294,10 +2303,10 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, astring *st
 #endif
 
 
-/*-------------------------------------------------
-    ui_get_use_natural_keyboard - returns
-    whether the natural keyboard is active
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_get_use_natural_keyboard - returns
+//  whether the natural keyboard is active
+//-------------------------------------------------
 
 bool ui_get_use_natural_keyboard(running_machine &machine)
 {
@@ -2305,11 +2314,10 @@ bool ui_get_use_natural_keyboard(running_machine &machine)
 }
 
 
-
-/*-------------------------------------------------
-    ui_set_use_natural_keyboard - specifies
-    whether the natural keyboard is active
--------------------------------------------------*/
+//-------------------------------------------------
+//  ui_set_use_natural_keyboard - specifies
+//  whether the natural keyboard is active
+//-------------------------------------------------
 
 void ui_set_use_natural_keyboard(running_machine &machine, bool use_natural_keyboard)
 {

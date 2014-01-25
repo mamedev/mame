@@ -21,6 +21,9 @@ public:
 	virtual ~ui_menu_image_info();
 	virtual void populate();
 	virtual void handle();
+
+private:
+	void image_info_astring(running_machine &machine, astring &string);
 };
 
 #endif // __UI_IMGINFO_H__
