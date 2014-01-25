@@ -956,7 +956,7 @@ ROM_START( galhustl )
 	ROM_LOAD( "galhstl5.u5", 0x00000, 0x80000, CRC(44a18f15) SHA1(1217cf7fbbb442358b15016099efeface5dcbd22) )
 ROM_END
 
-ROM_START( pgalvip )
+ROM_START( pgalvip ) // this set has extra data roms for the gfx
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "afega_15.ue17", 0x00000, 0x20000, CRC(050060ca) SHA1(1e2a1d6aaf5038269d192baf3520f4af7a299325) )
 	ROM_LOAD16_BYTE( "afega_16.ud17", 0x00001, 0x20000, CRC(d32e4052) SHA1(632d9affee92a526c0e9399230ecf485922c6df4) )
@@ -973,6 +973,23 @@ ROM_START( pgalvip )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "afega_17.u5", 0x00000, 0x80000, CRC(a8a50745) SHA1(e51963947c7a7556b8531d172b9d7bf9f321b21b) )
+ROM_END
+
+ROM_START( pgalvipa ) // this set is more like Gals Hustler
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "pgalvip_3.ue17", 0x00000, 0x80000, CRC(a48e8255) SHA1(7e8f1747420ff0d599d340915712827ca2eb3092) )
+	ROM_LOAD16_BYTE( "pgalvip_4.ud17", 0x00001, 0x80000, CRC(829a2085) SHA1(3ff5f2bb730572202cd427abd7f91dd886537ab6) )
+
+	ROM_REGION16_BE( 0x100000, "maincpudata", ROMREGION_ERASEFF ) /* 68000 Data */
+
+	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "pgalvip_1.ub6", 0x00000, 0x20000,  CRC(d32a6c0c) SHA1(6f16043ed1e174b42de83462e2ea7a601bac6678) )
+	ROM_RELOAD(               0x40000, 0x20000 )
+	ROM_LOAD( "pgalvip_2.uc6", 0xc0000, 0x80000,  CRC(2168e54a) SHA1(87534334b16d3ddc3daefcb1b8086aff44157ccf) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "pgalvip_5.u5", 0x00000, 0x80000, CRC(2d6e5a90) SHA1(b5487e5764d83dfecd982a8614d213c9075fbee4) )
 ROM_END
 
 /*
@@ -1052,6 +1069,7 @@ GAME( 1996, missmw96, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "C
 GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
 GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
 GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", GAME_NO_COCKTAIL )
-GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P", GAME_IMPERFECT_GRAPHICS ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
+GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", GAME_IMPERFECT_GRAPHICS ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
+GAME( 1997, pgalvipa, 0,        galhustl, galhustl,  driver_device, 0, ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", 0 )
 GAME( 1997, galhustl, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International",        "Gals Hustler", 0 ) // hack of the above?
 GAME( 1995, zipzap,   0,        zipzap,   zipzap,    driver_device, 0, ROT90, "Barko Corp",               "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
