@@ -2456,9 +2456,6 @@ ROM_START( viprp1 )
 	ROM_LOAD("flash0_blank_regionbe.u1053", 0x000000, 0x100000, CRC(a4c181d0) SHA1(0aeea4cac4030f60ee77d62deca6b67c318c0866) )
 ROM_END
 
-
-
-
 ROM_START( viprp1k )
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
 	ROM_LOAD32_BYTE("(__viprp1k)seibu1.211", 0x000000, 0x80000, CRC(5495c930) SHA1(056237965aefa4c0ea7782e0ee5ba1b58a045d7a) )
@@ -2490,7 +2487,6 @@ ROM_START( viprp1k )
 	ROM_REGION( 0x100000, "soundflash1", 0 ) /* on SPI motherboard */
 	ROM_LOAD("flash0_blank_region24.u1053", 0x000000, 0x100000, CRC(72a33dc4) SHA1(65a52f576ca4d240418fedd9a4922edcd6c0c8d1) )
 ROM_END
-
 
 ROM_START( viprp1u )
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) /* i386 program */
@@ -3670,21 +3666,6 @@ ROM_END
 
 
 /*****************************************************************************/
-
-// regions seen
-// 01 = JAPAN
-// 10 = USA (usually Fabtek)
-// 20 = Taiwan
-// 22 = Hong Kong (usually Metrotainment)
-// 24 = Korea (usually Dream Island)
-// 80 = Germany (usually Tuning) (possibly just Europe?)
-// 82 = Austria
-// 92 = Italy
-// 9c = Switzerland
-// 9e = Australia
-// be = World?
-
-// (we could probably complete this list by looking at some of the program roms)
 
 /* SPI */
 GAME( 1995, senkyu,     0,        spi,     spi_3button, seibuspi_state, senkyu,   ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
