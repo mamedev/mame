@@ -650,7 +650,7 @@ INPUT_PORTS_END
 void clcd_state::palette_init()
 {
 	palette_set_color(machine(), 0, MAKE_RGB(32,64,32));
-	palette_set_color(machine(), 1, MAKE_RGB(8,16,8));
+	palette_set_color(machine(), 1, MAKE_RGB(2,4,2));
 }
 
 static MACHINE_CONFIG_START(clcd, clcd_state)
