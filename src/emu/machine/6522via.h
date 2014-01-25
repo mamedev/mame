@@ -38,10 +38,6 @@
 #define MCFG_VIA6522_WRITEPB_HANDLER(_devcb) \
 	devcb = &via6522_device::set_writepb_handler(*device, DEVCB2_##_devcb);
 
-// NOT USED
-#define MCFG_VIA6522_CA1_HANDLER(_devcb) \
-	devcb = &via6522_device::set_ca1_handler(*device, DEVCB2_##_devcb);
-
 #define MCFG_VIA6522_CA2_HANDLER(_devcb) \
 	devcb = &via6522_device::set_ca2_handler(*device, DEVCB2_##_devcb);
 
@@ -76,7 +72,6 @@ public:
 	template<class _Object> static devcb2_base &set_writepa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_a_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_writepb_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_b_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_ca1_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_ca1_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_ca2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_ca2_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cb1_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb1_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cb2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb2_handler.set_callback(object); }
@@ -157,7 +152,6 @@ private:
 	devcb2_write8 m_out_a_handler;
 	devcb2_write8 m_out_b_handler;
 
-	devcb2_write_line m_ca1_handler;
 	devcb2_write_line m_ca2_handler;
 	devcb2_write_line m_cb1_handler;
 	devcb2_write_line m_cb2_handler;

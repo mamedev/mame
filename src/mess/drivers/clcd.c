@@ -82,6 +82,12 @@ public:
 		save_item(NAME(m_key_shift));
 	}
 
+	void palette_init()
+	{
+		palette_set_color(machine(), 0, MAKE_RGB(36,72,36));
+		palette_set_color(machine(), 1, MAKE_RGB(2,4,2));
+	}
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		if (m_lcd_mode & LCD_MODE_GRAPH)
@@ -449,7 +455,7 @@ public:
 		{
 			m_key_clk = newm_key_clk;
 
-			if (m_key_clk)
+			if (!m_key_clk)
 			{
 				m_via0->write_cb2((m_key_shift & 0x8000) != 0);
 				m_key_shift <<= 1;
@@ -471,7 +477,6 @@ private:
 	required_device<address_map_bank_device> m_bank3;
 	required_device<address_map_bank_device> m_bank4;
 	required_memory_region m_lcd_char_rom;
-	virtual void palette_init();
 	int m_lcd_scrollx;
 	int m_lcd_scrolly;
 	int m_lcd_mode;
@@ -653,13 +658,6 @@ static INPUT_PORTS_START( clcd )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // clears screen and goes into infinite loop
 INPUT_PORTS_END
-
-
-void clcd_state::palette_init()
-{
-	palette_set_color(machine(), 0, MAKE_RGB(32,64,32));
-	palette_set_color(machine(), 1, MAKE_RGB(2,4,2));
-}
 
 static MACHINE_CONFIG_START(clcd, clcd_state)
 	/* basic machine hardware */

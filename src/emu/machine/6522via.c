@@ -152,7 +152,6 @@ via6522_device::via6522_device(const machine_config &mconfig, const char *tag, d
 		m_in_b_handler(*this),
 		m_out_a_handler(*this),
 		m_out_b_handler(*this),
-		m_ca1_handler(*this),
 		m_ca2_handler(*this),
 		m_cb1_handler(*this),
 		m_cb2_handler(*this),
@@ -178,7 +177,6 @@ void via6522_device::device_start()
 	m_in_b_handler.resolve();
 	m_out_a_handler.resolve_safe();
 	m_out_b_handler.resolve_safe();
-	m_ca1_handler.resolve();
 	m_cb1_handler.resolve_safe();
 	m_ca2_handler.resolve_safe();
 	m_cb2_handler.resolve_safe();
@@ -242,11 +240,11 @@ void via6522_device::device_start()
 void via6522_device::device_reset()
 {
 	m_out_a = 0;
-	m_out_ca2 = 0;
+	m_out_ca2 = 1;
 	m_ddr_a = 0;
 	m_out_b = 0;
-	m_out_cb1 = 0;
-	m_out_cb2 = 0;
+	m_out_cb1 = 1;
+	m_out_cb2 = 1;
 	m_ddr_b = 0;
 
 	m_t1cl = 0;
@@ -262,6 +260,10 @@ void via6522_device::device_reset()
 	m_t1_active = 0;
 	m_t2_active = 0;
 	m_shift_counter = 0;
+
+	m_ca2_handler(m_out_ca2);
+	m_cb1_handler(m_out_cb1);
+	m_cb2_handler(m_out_cb2);
 }
 
 
@@ -354,11 +356,10 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-		// shift timer
 		case TIMER_SHIFT:
 			m_out_cb1 = !m_out_cb1;
 
-			if (m_out_cb1)
+			if (!m_out_cb1)
 			{
 				if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 				{
@@ -377,7 +378,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				m_cb1_handler(m_out_cb1);
 			}
 
-			if (SO_T2_RATE(m_acr) || m_shift_counter || m_out_cb1)
+			if (SO_T2_RATE(m_acr) || m_shift_counter || !m_out_cb1)
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 				{
@@ -390,7 +391,6 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			}
 			break;
 
-		// t1 timeout
 		case TIMER_T1:
 			if (T1_CONTINUOUS (m_acr))
 			{
@@ -421,7 +421,6 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			}
 			break;
 
-		// t2 timeout
 		case TIMER_T2:
 			m_t2_active = 0;
 			m_time2 = machine().time();
@@ -433,8 +432,8 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			break;
 
 		case TIMER_CA2:
-			m_ca2_handler(1);
 			m_out_ca2 = 1;
+			m_ca2_handler(m_out_ca2);
 			break;
 	}
 }
@@ -507,29 +506,14 @@ READ8_MEMBER( via6522_device::read )
 
 		CLR_PA_INT();
 
-		/* If CA2 is configured as output and in pulse or handshake mode,
-		   CA2 is set now */
-		if (CA2_PULSE_OUTPUT(m_pcr))
+		if (m_out_ca2 && (CA2_PULSE_OUTPUT(m_pcr) || CA2_AUTO_HS(m_pcr)))
 		{
-			/* call the CA2 output function */
-			m_ca2_handler(0);
 			m_out_ca2 = 0;
+			m_ca2_handler(m_out_ca2);
+		}
 
+		if (CA2_PULSE_OUTPUT(m_pcr))
 			m_ca2_timer->adjust(clocks_to_attotime(1));
-		}
-		/* If CA2 is configured as output and in pulse or handshake mode,
-		   CA2 is set now */
-		else if (CA2_AUTO_HS(m_pcr))
-		{
-			if (m_out_ca2)
-			{
-				/* set CA2 */
-				m_out_ca2 = 0;
-
-				/* call the CA2 output function */
-				m_ca2_handler(0);
-			}
-		}
 
 		break;
 
@@ -671,18 +655,10 @@ WRITE8_MEMBER( via6522_device::write )
 
 		CLR_PB_INT();
 
-		/* If CB2 is configured as output and in pulse or handshake mode,
-		   CB2 is set now */
-		if (CB2_AUTO_HS(m_pcr))
+		if (m_out_cb2 && CB2_AUTO_HS(m_pcr))
 		{
-			if (m_out_cb2)
-			{
-				/* set CB2 */
-				m_out_cb2 = 0;
-
-				/* call the CB2 output function */
-				m_cb2_handler(0);
-			}
+			m_out_cb2 = 0;
+			m_cb2_handler(m_out_cb2);
 		}
 		break;
 
@@ -697,27 +673,14 @@ WRITE8_MEMBER( via6522_device::write )
 
 		CLR_PA_INT();
 
-		/* If CA2 is configured as output and in pulse or handshake mode,
-		   CA2 is set now */
-		if (CA2_PULSE_OUTPUT(m_pcr))
+		if (m_out_ca2 && (CA2_PULSE_OUTPUT(m_pcr) || CA2_AUTO_HS(m_pcr)))
 		{
-			/* call the CA2 output function */
-			m_ca2_handler(0);
 			m_out_ca2 = 0;
+			m_ca2_handler(m_out_ca2);
+		}
 
+		if (CA2_PULSE_OUTPUT(m_pcr))
 			m_ca2_timer->adjust(clocks_to_attotime(1));
-		}
-		else if (CA2_AUTO_HS(m_pcr))
-		{
-			if (m_out_ca2)
-			{
-				/* set CA2 */
-				m_out_ca2 = 0;
-
-				/* call the CA2 output function */
-				m_ca2_handler(0);
-			}
-		}
 
 		break;
 
@@ -835,13 +798,13 @@ WRITE8_MEMBER( via6522_device::write )
 			logerror("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag(), data);
 		}
 
-		if (CA2_FIX_OUTPUT(data) && CA2_OUTPUT_LEVEL(data) ^ m_out_ca2)
+		if (CA2_FIX_OUTPUT(data) && m_out_ca2 != CA2_OUTPUT_LEVEL(data))
 		{
 			m_out_ca2 = CA2_OUTPUT_LEVEL(data);
 			m_ca2_handler(m_out_ca2);
 		}
 
-		if (CB2_FIX_OUTPUT(data) && CB2_OUTPUT_LEVEL(data) ^ m_out_cb2)
+		if (CB2_FIX_OUTPUT(data) && m_out_cb2 != CB2_OUTPUT_LEVEL(data))
 		{
 			m_out_cb2 = CB2_OUTPUT_LEVEL(data);
 			m_cb2_handler(m_out_cb2);
@@ -952,18 +915,10 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 
 			set_int(INT_CA1);
 
-			/* CA2 is configured as output and in pulse or handshake mode,
-			   CA2 is cleared now */
-			if (CA2_AUTO_HS(m_pcr))
+			if (!m_out_ca2 && CA2_AUTO_HS(m_pcr))
 			{
-				if (!m_out_ca2)
-				{
-					/* clear CA2 */
-					m_out_ca2 = 1;
-
-					/* call the CA2 output function */
-					m_ca2_handler(1);
-				}
+				m_out_ca2 = 1;
+				m_ca2_handler(m_out_ca2);
 			}
 		}
 	}
@@ -1037,18 +992,10 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
 
 			set_int(INT_CB1);
 
-			/* CB2 is configured as output and in pulse or handshake mode,
-			   CB2 is cleared now */
-			if (CB2_AUTO_HS(m_pcr))
+			if (!m_out_cb2 && CB2_AUTO_HS(m_pcr))
 			{
-				if (!m_out_cb2)
-				{
-					/* clear CB2 */
-					m_out_cb2 = 1;
-
-					/* call the CB2 output function */
-					m_cb2_handler(1);
-				}
+				m_out_cb2 = 1;
+				m_cb2_handler(1);
 			}
 		}
 	}
