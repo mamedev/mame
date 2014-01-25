@@ -106,7 +106,7 @@ enum
 ***************************************************************************/
 
 #define LOG_ACCESSES    0
-#define LOG_REGISTERS   1
+#define LOG_REGISTERS   0
 
 #define LOG_8514        1
 
