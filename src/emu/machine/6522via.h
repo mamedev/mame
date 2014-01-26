@@ -144,6 +144,11 @@ private:
 	void write_pa(int line, int state);
 	void write_pb(int line, int state);
 
+	UINT8 input_pa();
+	void output_pa();
+	UINT8 input_pb();
+	void output_pb();
+
 	// TODO: REMOVE THESE
 	devcb2_read8 m_in_a_handler;
 	devcb2_read8 m_in_b_handler;
@@ -163,6 +168,7 @@ private:
 	UINT8 m_out_a;
 	UINT8 m_out_ca2;
 	UINT8 m_ddr_a;
+	UINT8 m_latch_a;
 
 	UINT8 m_in_b;
 	UINT8 m_in_cb1;
@@ -171,11 +177,14 @@ private:
 	UINT8 m_out_cb1;
 	UINT8 m_out_cb2;
 	UINT8 m_ddr_b;
+	UINT8 m_latch_b;
 
 	UINT8 m_t1cl;
 	UINT8 m_t1ch;
 	UINT8 m_t1ll;
 	UINT8 m_t1lh;
+	int m_t1_pb7;
+
 	UINT8 m_t2cl;
 	UINT8 m_t2ch;
 	UINT8 m_t2ll;
