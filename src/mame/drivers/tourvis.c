@@ -14,23 +14,35 @@
 
     Known games:
 
-    Special Criminal Investigation
-    Power League IV
+    Aero Blaster (label shows "Vol. 33")
+    After Burner
+    Bonk
+    Columns
+    Cyber Core
+    Dead Moon
+    Doraenon
+    Down Load
+    Dungeon Explorer
+    Final Lap
     Final Match Tennis
     Formation Soccer
-    Super Volley ball
-    Rastan Saga II
-    Dungeon Explorer
     Legendary Axe
-    Thunder Blade
-    USA Pro Basketball
+    Mr. Heli
     Out Run
-    After Burner
-    Final Lap
-    Columns
+    Power Eleven
+    Power League IV
     Power Sports
+    Puzzle Boy
+    Rastan Saga II
     Saigo no Nindou
     Son Son II
+    Special Criminal Investigation
+    Super Star Soldier (label shows "Vol. 30")
+    Super Volley ball
+    Thunder Blade
+    USA Pro Basketball
+    Vigilante
+    Volfied
 
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
@@ -393,7 +405,7 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 1, "55", "U4-55" ) \
 	ROMX_LOAD( "u4-55_am27c256.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 2, "52", "U4-52" ) \
-	ROMX_LOAD( "bios.29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) )
+	ROMX_LOAD( "u4-52_am27c256.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) )
 
 
 ROM_START(tourvis)
