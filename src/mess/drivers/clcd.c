@@ -14,6 +14,7 @@
 #include "machine/6522via.h"
 #include "machine/bankdev.h"
 #include "machine/mos6551.h"
+#include "machine/msm58321.h"
 #include "machine/ram.h"
 #include "machine/serial.h"
 #include "sound/speaker.h"
@@ -27,6 +28,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via0(*this, "via0"),
+		m_rtc(*this, "rtc"),
 		m_ram(*this,"ram"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -80,6 +82,8 @@ public:
 		save_item(NAME(m_key_poll));
 		save_item(NAME(m_key_column));
 		save_item(NAME(m_key_shift));
+
+		m_rtc->cs1_w(1);
 	}
 
 	void palette_init()
@@ -424,7 +428,8 @@ public:
 
 	WRITE8_MEMBER(via0_pb_w)
 	{
-		write_key_poll(data & 1);
+		write_key_poll((data >> 0) & 1);
+		m_rtc->cs2_w((data >> 1) & 1);
 	}
 
 	WRITE_LINE_MEMBER(write_key_poll)
@@ -463,6 +468,17 @@ public:
 		}
 	}
 
+	WRITE8_MEMBER(via1_pa_w)
+	{
+		m_rtc->d0_w((data>>0) & 1);
+		m_rtc->d1_w((data>>1) & 1);
+		m_rtc->d2_w((data>>2) & 1);
+		m_rtc->d3_w((data>>3) & 1);
+		m_rtc->read_w((data>>4) & 1);
+		m_rtc->write_w((data>>5) & 1);
+		m_rtc->address_write_w((data>>6) & 1);
+	}
+
 	ram_device *ram()
 	{
 		return m_ram;
@@ -471,6 +487,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;
+	required_device<msm58321_device> m_rtc;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_bank1;
 	required_device<address_map_bank_device> m_bank2;
@@ -671,6 +688,7 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, irq_line))
 
 	MCFG_DEVICE_ADD("via1", VIA6522, 0)
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(clcd_state, via1_pa_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m65c02_device, nmi_line))
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
@@ -709,6 +727,15 @@ static MACHINE_CONFIG_START(clcd, clcd_state)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+
+	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL_32_768kHz)
+	MCFG_MSM58321_D0_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa0))
+	MCFG_MSM58321_D1_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa1))
+	MCFG_MSM58321_D2_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa2))
+	MCFG_MSM58321_D3_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa3))
+	MCFG_MSM58321_BUSY_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa7))
+	MCFG_MSM58321_YEAR0(1984)
+	MCFG_MSM58321_DEFAULT_24H(true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
