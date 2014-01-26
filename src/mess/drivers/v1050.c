@@ -671,13 +671,6 @@ static I8214_INTERFACE( pic_intf )
 	DEVCB_NULL
 };
 
-// MSM58321 Interface
-
-static MSM58321_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL
-};
-
 // Display 8255A Interface
 
 WRITE8_MEMBER(v1050_state::disp_ppi_pc_w)
@@ -864,6 +857,19 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pb_w )
 	m_int_mask = data;
 }
 
+READ8_MEMBER( v1050_state::rtc_ppi_pa_r )
+{
+	return m_rtc_ppi_pa;
+}
+
+WRITE8_MEMBER( v1050_state::rtc_ppi_pa_w )
+{
+	m_rtc->d0_w((data >> 0) & 1);
+	m_rtc->d1_w((data >> 1) & 1);
+	m_rtc->d2_w((data >> 2) & 1);
+	m_rtc->d3_w((data >> 3) & 1);
+}
+
 READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
 {
 	/*
@@ -881,7 +887,7 @@ READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
 
 	*/
 
-	return m_rtc->busy_r() << 3;
+	return m_rtc_ppi_pc;
 }
 
 WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
@@ -909,8 +915,8 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
 
 static I8255A_INTERFACE( rtc_ppi_intf )
 {
-	DEVCB_DEVICE_MEMBER(MSM58321RS_TAG, msm58321_device, read),
-	DEVCB_DEVICE_MEMBER(MSM58321RS_TAG, msm58321_device, write),
+	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pa_r),
+	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pa_w),
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pb_w),
 	DEVCB_DRIVER_MEMBER(v1050_state, rtc_ppi_pc_r),
@@ -1119,7 +1125,14 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 
 	// devices
 	MCFG_I8214_ADD(UPB8214_TAG, XTAL_16MHz/4, pic_intf)
-	MCFG_MSM58321_ADD(MSM58321RS_TAG, XTAL_32_768kHz, rtc_intf)
+
+	MCFG_DEVICE_ADD(MSM58321RS_TAG, MSM58321, XTAL_32_768kHz)
+	MCFG_MSM58321_D0_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_0_w))
+	MCFG_MSM58321_D1_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_1_w))
+	MCFG_MSM58321_D2_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_2_w))
+	MCFG_MSM58321_D3_HANDLER(WRITELINE(v1050_state, rtc_ppi_pa_3_w))
+	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(v1050_state, rtc_ppi_pc_3_w))
+
 	MCFG_I8255A_ADD(I8255A_DISP_TAG, disp_ppi_intf)
 	MCFG_I8255A_ADD(I8255A_MISC_TAG, misc_ppi_intf)
 	MCFG_I8255A_ADD(I8255A_RTC_TAG, rtc_ppi_intf)
