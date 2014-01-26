@@ -221,12 +221,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_upd7759(*this, "upd"),
-		m_duart68681(*this, "duart68681") { }
+		m_duart68681(*this, "duart68681"),
+		m_pia(*this, "pia") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8052_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<duartn68681_device> m_duart68681;
+	required_device<pia6821_device> m_pia;
 
 	int m_vsync_latch_preset;
 	UINT8 m_p1;
@@ -245,6 +247,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_w);
 	DECLARE_READ8_MEMBER(b_read);
 	DECLARE_WRITE8_MEMBER(b_writ);
+	DECLARE_WRITE16_MEMBER(pia_lsb_w);
 	DECLARE_DRIVER_INIT(screenpl);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -680,7 +683,10 @@ WRITE16_MEMBER(maygayv1_state::maygay_8279_w)
 
 
 
-
+WRITE16_MEMBER(maygayv1_state::pia_lsb_w)
+{
+	m_pia->write(space, offset, data >> 8);
+}
 
 
 WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
@@ -702,7 +708,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, maygayv1_state )
 	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
 	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
 	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff)
-	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREADWRITE8("pia", pia6821_device, read, write, 0xff)
+	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREAD8("pia", pia6821_device, read, 0xff) AM_WRITE(pia_lsb_w)
 ADDRESS_MAP_END
 
 
