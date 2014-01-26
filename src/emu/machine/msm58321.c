@@ -14,10 +14,7 @@
     TODO:
 
     - leap year
-    - stop
     - test
-    - reset
-    - busy
     - reference registers
 
 */
@@ -262,12 +259,16 @@ void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	switch (id)
 	{
 	case TIMER_CLOCK:
-		advance_seconds();
+		if (!m_stop)
+			advance_seconds();
 		break;
 
 	case TIMER_BUSY:
-		m_busy = !m_busy;
-		m_busy_handler(m_busy);
+		if (!m_cs1 || !m_cs2 || !m_write || m_address != REGISTER_RESET)
+		{
+			m_busy = !m_busy;
+			m_busy_handler(m_busy);
+		}
 		break;
 	}
 }
@@ -414,6 +415,12 @@ void msm58321_device::update_input()
 			{
 			case REGISTER_RESET:
 				if (LOG) logerror("MSM58321 '%s' Reset\n", tag());
+
+				if (!m_busy)
+				{
+					m_busy = 1;
+					m_busy_handler(m_busy);
+				}
 				break;
 
 			case REGISTER_REF0:
