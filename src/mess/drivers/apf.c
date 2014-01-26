@@ -37,6 +37,7 @@ casino - appears to work (need instructions)
 catena - works
 hangman - works
 pinball - works
+movblock - works
 rocket patrol - works, some bad colours
 space destroyer - works but you must use -ram 9K option
 ufo - works
@@ -629,5 +630,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME     PARENT     COMPAT  MACHINE     INPUT      CLASS          INIT         COMPANY               FULLNAME */
-CONS(1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   driver_device,  0,   "APF Electronics Inc", "APF Imagination Machine" , 0 )
+COMP(1979, apfimag,  apfm1000,  0,      apfimag,    apfimag,   driver_device,  0,   "APF Electronics Inc", "APF Imagination Machine" , 0 )
 CONS(1978, apfm1000, 0,         0,      apfm1000,   apfm1000,  driver_device,  0,   "APF Electronics Inc", "APF M-1000" , 0 )
