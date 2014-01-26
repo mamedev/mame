@@ -119,6 +119,7 @@ void netlist_factory_t::initialize()
     ENTRY(7420_dip,             TTL_7420_DIP,           "-")
     ENTRY(7425_dip,             TTL_7425_DIP,           "-")
     ENTRY(7427_dip,             TTL_7427_DIP,           "-")
+    ENTRY(7430_dip,             TTL_7430_DIP,           "-")
     ENTRY(7448_dip,             TTL_7448_DIP,           "-")
     ENTRY(7450_dip,             TTL_7450_DIP,           "-")
     ENTRY(7474_dip,             TTL_7474_DIP,           "-")
@@ -129,6 +130,7 @@ void netlist_factory_t::initialize()
     ENTRY(74107_dip,            TTL_74107_DIP,          "-")
     ENTRY(74153_dip,            TTL_74153_DIP,          "-")
     ENTRY(9316_dip,             TTL_9316_DIP,           "-")
+    ENTRY(NE555_dip,            NE555_DIP,              "-")
 }
 
 netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const

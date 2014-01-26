@@ -99,7 +99,7 @@ NETLIB_START(7474_dip)
     register_subalias("10", m_2.m_PREQ);
     register_subalias("11", m_2.sub.m_CLK);
     register_subalias("12", m_2.m_D);
-    register_subalias("13", m_1.m_CLRQ);
+    register_subalias("13", m_2.m_CLRQ);
     // register_subalias("14", ); ==> VCC
 }
 

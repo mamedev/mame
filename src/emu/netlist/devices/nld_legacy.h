@@ -19,10 +19,8 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_RSFF(_name, _S, _R)                                                  \
-		NET_REGISTER_DEV(nicRSFF, _name)                                            \
-		NET_CONNECT(_name, S, _S)                                                   \
-		NET_CONNECT(_name, R, _R)
+#define NETDEV_RSFF(_name)                                                          \
+		NET_REGISTER_DEV(nicRSFF, _name)
 
 // ----------------------------------------------------------------------------------------
 // Devices ...

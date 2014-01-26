@@ -21,6 +21,7 @@ TODO:
 #include "astring.h"
 
 //#define TEST_SOUND
+#define PONGD   (0)
 
 /*
  * H count width to 512
@@ -82,6 +83,15 @@ enum input_changed_enum
 	IC_VR1,
 	IC_VR2
 };
+
+#if PONGD
+#include "../../nl_examples/tdice.c"
+
+#undef SRST
+#undef VCC
+#undef GND
+#endif
+
 
 static NETLIST_START(pong_schematics)
     SOLVER(Solver)
@@ -718,6 +728,18 @@ static NETLIST_START(pong_fast)
 
 NETLIST_END()
 
+#if PONGD
+
+static NETLIST_START(pongd)
+
+    NETLIST_INCLUDE(pongdoubles)
+
+    NETDEV_ANALOG_CALLBACK(sound_cb, AUDIO, pong_state, sound_cb, "")
+    NETDEV_ANALOG_CALLBACK(video_cb, videomix, fixedfreq_device, update_vid, "fixfreq")
+
+NETLIST_END()
+#endif
+
 #ifdef TEST_SOUND
 static NETLIST_START(test)
 
@@ -796,6 +818,36 @@ static INPUT_PORTS_START( pong )
 
 INPUT_PORTS_END
 
+#if PONGD
+static INPUT_PORTS_START( pongd )
+#if 0
+    PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
+    PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)   NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot0")
+
+    PORT_START( "PADDLE1" ) /* fake input port for player 2 paddle */
+    PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0) PORT_PLAYER(2) NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot1")
+#endif
+
+    PORT_START("IN0") /* fake as well */
+    PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw")
+    PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw")
+
+#if 0
+    PORT_DIPNAME( 0x06, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_SWITCH)
+    PORT_DIPSETTING(    0x00, "11" )
+    PORT_DIPSETTING(    0x06, "15" )
+
+    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Antenna") NETLIST_LOGIC_PORT_CHANGED("maincpu", "antenna")
+
+    PORT_START("VR1")
+    PORT_ADJUSTER( 50, "VR1 - 50k, Paddle 1 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr0")
+    PORT_START("VR2")
+    PORT_ADJUSTER( 50, "VR2 - 50k, Paddle 2 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr1")
+#endif
+INPUT_PORTS_END
+
+#endif
+
 static MACHINE_CONFIG_START( pong, pong_state )
 
 	/* basic machine hardware */
@@ -840,6 +892,44 @@ static MACHINE_CONFIG_DERIVED( pongf, pong )
 
 MACHINE_CONFIG_END
 
+#if PONGD
+static MACHINE_CONFIG_START( pongd, pong_state )
+
+    /* basic machine hardware */
+    MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+    MCFG_NETLIST_SETUP(pongd)
+
+#if 0
+    MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
+    MCFG_NETLIST_ANALOG_INPUT_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
+    MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr1", "ic_a9_R.R")
+    MCFG_NETLIST_ANALOG_INPUT_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
+    MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "ic_b9_POT.DIAL")
+    MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "ic_a9_POT.DIAL")
+#endif
+    MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "DIPSW1.POS", 0, 0x01)
+    MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "DIPSW2.POS", 0, 0x01)
+    MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "COIN_SW.POS", 0, 0x01)
+    MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw", "START_SW.POS", 0, 0x01)
+#if 0
+    MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
+#endif
+
+    /* video hardware */
+
+    //MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_ntsc720)
+    //MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_pongX2)
+    MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_pong)
+
+    /* sound hardware */
+    MCFG_SPEAKER_STANDARD_MONO("mono")
+    MCFG_SOUND_ADD("dac", DAC, 48000)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+MACHINE_CONFIG_END
+
+#endif
+
 /***************************************************************************
 
   Game driver(s)
@@ -855,6 +945,12 @@ ROM_START( pongf ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( pongd ) /* dummy to satisfy game entry*/
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
 
 GAME( 1972, pong,  0, pong, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E) external", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING)
 GAME( 1972, pongf,  0, pongf, pong, driver_device,  0, ROT0, "Atari", "Pong (Rev E)", GAME_SUPPORTS_SAVE )
+#if PONGD
+GAME( 1974, pongd,  0, pongd, pongd, driver_device,  0, ROT0, "Atari", "Pong Doubles", GAME_SUPPORTS_SAVE )
+#endif
