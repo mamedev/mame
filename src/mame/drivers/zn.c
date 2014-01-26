@@ -64,9 +64,11 @@ public:
 	DECLARE_WRITE8_MEMBER(zn_qsound_w);
 	DECLARE_WRITE8_MEMBER(bank_coh1000t_w);
 	DECLARE_WRITE8_MEMBER(fx1a_sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(taitofx1b_volume_w);
-	DECLARE_WRITE16_MEMBER(taitofx1b_sound_w);
-	DECLARE_READ16_MEMBER(taitofx1b_sound_r);
+	DECLARE_WRITE16_MEMBER(fx1b_volume_w);
+	DECLARE_WRITE16_MEMBER(fx1b_sound_w);
+	DECLARE_READ16_MEMBER(fx1b_sound_r);
+	DECLARE_WRITE8_MEMBER(fx1b_fram_w);
+	DECLARE_READ8_MEMBER(fx1b_fram_r);
 	DECLARE_WRITE8_MEMBER(coh1002e_bank_w);
 	DECLARE_WRITE8_MEMBER(coh1002e_latch_w);
 	DECLARE_WRITE16_MEMBER(bam2_mcu_w);
@@ -89,6 +91,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vt83c461_16_w);
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
+	DECLARE_DRIVER_INIT(coh1000tb);
 	DECLARE_DRIVER_INIT(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000ta);
@@ -117,8 +120,7 @@ private:
 	UINT16 m_bam2_mcu_command;
 	int m_jdredd_gun_mux;
 
-	size_t m_nbajamex_eeprom_size;
-	UINT8 *m_nbajamex_eeprom;
+	UINT8 m_fx1b_fram[0x200];
 
 	UINT16 vt83c461_latch;
 
@@ -1161,34 +1163,49 @@ static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 	MCFG_TC0140SYT_ADD("tc0140syt", coh1000ta_tc0140syt_intf)
 MACHINE_CONFIG_END
 
-WRITE16_MEMBER(zn_state::taitofx1b_volume_w)
+WRITE16_MEMBER(zn_state::fx1b_volume_w)
 {
-	verboselog(1, "taitofx1_volume_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog(1, "fx1b_volume_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
-WRITE16_MEMBER(zn_state::taitofx1b_sound_w)
+WRITE16_MEMBER(zn_state::fx1b_sound_w)
 {
-	verboselog(1, "taitofx1_sound_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog(1, "fx1b_sound_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
-READ16_MEMBER(zn_state::taitofx1b_sound_r)
+READ16_MEMBER(zn_state::fx1b_sound_r)
 {
 	UINT32 data = 0; // bit 0 = busy?
-	verboselog(1, "taitofx1_sound_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog(1, "fx1b_sound_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
+}
+
+WRITE8_MEMBER(zn_state::fx1b_fram_w)
+{
+	m_fx1b_fram[offset] = data;
+}
+
+READ8_MEMBER(zn_state::fx1b_fram_r)
+{
+	return m_fx1b_fram[offset];
 }
 
 static ADDRESS_MAP_START(coh1000tb_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
-	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_RAM AM_SHARE("m66220fp")
+	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_READWRITE8(fx1b_fram_r, fx1b_fram_w, 0x00ff00ff)
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
-	AM_RANGE(0x1fb80000, 0x1fb8ffff) AM_WRITE16(taitofx1b_volume_w, 0xffffffff)
-	AM_RANGE(0x1fba0000, 0x1fbaffff) AM_WRITE16(taitofx1b_sound_w, 0xffffffff)
-	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_READ16(taitofx1b_sound_r, 0x0000ffff)
+	AM_RANGE(0x1fb80000, 0x1fb8ffff) AM_WRITE16(fx1b_volume_w, 0xffffffff)
+	AM_RANGE(0x1fba0000, 0x1fbaffff) AM_WRITE16(fx1b_sound_w, 0xffffffff)
+	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_READ16(fx1b_sound_r, 0x0000ffff)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comm with the MN10200
 
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
+
+DRIVER_INIT_MEMBER(zn_state,coh1000tb)
+{
+	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram, ARRAY_LENGTH(m_fx1b_fram));
+}
 
 MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 {
@@ -1200,7 +1217,7 @@ static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_2mb_vram)
 	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000tb)
-	//MCFG_NVRAM_ADD_0FILL("fm1208s") // where is this hooked up?
+	MCFG_NVRAM_ADD_1FILL("fm1208s")
 
 	MCFG_MB3773_ADD("mb3773")
 
@@ -4762,18 +4779,19 @@ GAME( 1995, psyforce,  taitofx1, coh1000ta, zn, driver_device, 0, ROT0, "Taito",
 GAME( 1995, psyforcej, psyforce, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, psyforcex, psyforce, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, mgcldate,  mgcldtex, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, raystorm,  taitofx1, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "Ray Storm (Ver 2.06A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, raystormo, raystorm, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "Ray Storm (Ver 2.05O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, raystormu, raystorm, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "Ray Storm (Ver 2.05A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, raystormj, raystorm, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "Ray Storm (Ver 2.05J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, ftimpact,  ftimpcta, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, ftimpactu, ftimpcta, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, ftimpactj, ftimpcta, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, ftimpcta,  taitofx1, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, mgcldtex,  taitofx1, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdarius,   gdarius2, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "G-Darius (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdariusb,  gdarius2, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "G-Darius (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdarius2,  taitofx1, coh1000tb, zn, driver_device, 0, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+GAME( 1996, raystorm,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.06A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, raystormo, raystorm, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, raystormu, raystorm, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, raystormj, raystorm, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, ftimpact,  ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, ftimpactu, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, ftimpactj, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, ftimpcta,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdarius,   gdarius2, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdariusb,  gdarius2, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdarius2,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Eighting / Raizing */
 
