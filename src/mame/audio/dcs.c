@@ -90,6 +90,7 @@
             San Francisco Rush: 2049 (1998)
 
     Unknown other DCS boards:
+        * NBA Jam Extreme
         * NBA Showtime
         * NBA Showtime / NFL Blitz 2000 Gold
         * Cart Fury
