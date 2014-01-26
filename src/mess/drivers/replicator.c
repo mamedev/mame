@@ -1,4 +1,4 @@
-/*
+﻿/*
   Replicator 1 desktop 3d printer
 
   driver by Felipe Corrêa da Silva Sanches <fsanches@metamaquina.com.br>
@@ -692,4 +692,4 @@ ROM_START( replica1 )
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY          FULLNAME */
-CONS(2012, replica1,    0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", GAME_NOT_WORKING)
+COMP(2012, replica1,    0,        0,        replicator,    replicator, replicator_state,    replicator,    "Makerbot", "Replicator 1 desktop 3d printer", GAME_NOT_WORKING)
