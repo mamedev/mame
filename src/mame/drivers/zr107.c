@@ -257,7 +257,7 @@ UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &b
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	sharc_set_flag_input(machine().device("dsp"), 1, ASSERT_LINE);
+	machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -305,7 +305,7 @@ UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bit
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
 
-	sharc_set_flag_input(machine().device("dsp"), 1, ASSERT_LINE);
+	machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -670,11 +670,6 @@ static INPUT_PORTS_START( jetwave )
 
 INPUT_PORTS_END
 
-static const sharc_config sharc_cfg =
-{
-	BOOT_MODE_EPROM
-};
-
 
 /* ADC0838 Interface */
 
@@ -758,7 +753,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
 	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
-	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(750000))// Very high sync needed to prevent lockups - why?
@@ -818,7 +813,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
 	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
-	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2000000)) // Very high sync needed to prevent lockups - why?

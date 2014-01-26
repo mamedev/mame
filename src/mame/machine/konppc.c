@@ -225,12 +225,12 @@ static void dsp_comm_sharc_w(address_space &space, int board, int offset, UINT32
 		case CGBOARD_TYPE_GTICLUB:
 		{
 			//machine.device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
-			sharc_set_flag_input(space.machine().device("dsp"), 0, ASSERT_LINE);
+			space.machine().device<adsp21062_device>("dsp")->set_flag_input(0, ASSERT_LINE);
 
 			if (offset == 1)
 			{
 				if (data & 0x03)
-					space.machine().device("dsp")->execute().set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+					space.machine().device<adsp21062_device>("dsp")->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 			}
 			break;
 		}
@@ -239,7 +239,7 @@ static void dsp_comm_sharc_w(address_space &space, int board, int offset, UINT32
 		case CGBOARD_TYPE_HANGPLT:
 		{
 			const char *dsptag = (board == 0) ? "dsp" : "dsp2";
-			device_t *device = space.machine().device(dsptag);
+			adsp21062_device *device = space.machine().device<adsp21062_device>(dsptag);
 
 			if (offset == 1)
 			{
@@ -247,7 +247,7 @@ static void dsp_comm_sharc_w(address_space &space, int board, int offset, UINT32
 
 				if (data & 0x01 || data & 0x10)
 				{
-					sharc_set_flag_input(device, 1, ASSERT_LINE);
+					device->set_flag_input(1, ASSERT_LINE);
 				}
 
 				if (texture_bank[board] != NULL)
@@ -354,25 +354,25 @@ WRITE32_HANDLER( cgboard_1_shared_sharc_w )
 static UINT32 nwk_fifo_r(address_space &space, int board)
 {
 	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
-	device_t *device = space.machine().device(dsptag);
+	adsp21062_device *device = space.machine().device<adsp21062_device>(dsptag);
 	UINT32 data;
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
 	{
-		sharc_set_flag_input(device, 1, CLEAR_LINE);
+		device->set_flag_input(1, CLEAR_LINE);
 	}
 	else
 	{
-		sharc_set_flag_input(device, 1, ASSERT_LINE);
+		device->set_flag_input(1, ASSERT_LINE);
 	}
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_full)
 	{
-		sharc_set_flag_input(device, 2, ASSERT_LINE);
+		device->set_flag_input(2, ASSERT_LINE);
 	}
 	else
 	{
-		sharc_set_flag_input(device, 2, CLEAR_LINE);
+		device->set_flag_input(2, CLEAR_LINE);
 	}
 
 	data = nwk_fifo[board][nwk_fifo_read_ptr[board]];
@@ -385,18 +385,18 @@ static UINT32 nwk_fifo_r(address_space &space, int board)
 static void nwk_fifo_w(running_machine &machine, int board, UINT32 data)
 {
 	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
-	device_t *device = machine.device(dsptag);
+	adsp21062_device *device = machine.device<adsp21062_device>(dsptag);
 
 	if (nwk_fifo_write_ptr[board] < nwk_fifo_half_full_w)
 	{
-		sharc_set_flag_input(device, 1, ASSERT_LINE);
+		device->set_flag_input(1, ASSERT_LINE);
 	}
 	else
 	{
-		sharc_set_flag_input(device, 1, CLEAR_LINE);
+		device->set_flag_input(1, CLEAR_LINE);
 	}
 
-	sharc_set_flag_input(device, 2, ASSERT_LINE);
+	device->set_flag_input(2, ASSERT_LINE);
 
 	nwk_fifo[board][nwk_fifo_write_ptr[board]] = data;
 	nwk_fifo_write_ptr[board]++;

@@ -134,11 +134,11 @@ static int copro_fifoin_pop(device_t *device, UINT32 *result)
 	{
 		if (state->m_copro_fifoin_num == 0)
 		{
-			sharc_set_flag_input(device, 0, ASSERT_LINE);
+			dynamic_cast<adsp21062_device *>(device)->set_flag_input(0, ASSERT_LINE);
 		}
 		else
 		{
-			sharc_set_flag_input(device, 0, CLEAR_LINE);
+			dynamic_cast<adsp21062_device *>(device)->set_flag_input(0, CLEAR_LINE);
 		}
 	}
 
@@ -195,7 +195,7 @@ static void copro_fifoin_push(device_t *device, UINT32 data)
 	// clear FIFO empty flag on SHARC
 	if (state->m_dsp_type == DSP_TYPE_SHARC)
 	{
-		sharc_set_flag_input(device, 0, CLEAR_LINE);
+		dynamic_cast<adsp21062_device *>(device)->set_flag_input(0, CLEAR_LINE);
 	}
 }
 
@@ -233,11 +233,11 @@ static UINT32 copro_fifoout_pop(address_space &space)
 	{
 		if (state->m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			sharc_set_flag_input(space.machine().device("dsp"), 1, ASSERT_LINE);
+			space.machine().device<adsp21062_device>("dsp")->set_flag_input(1, ASSERT_LINE);
 		}
 		else
 		{
-			sharc_set_flag_input(space.machine().device("dsp"), 1, CLEAR_LINE);
+			space.machine().device<adsp21062_device>("dsp")->set_flag_input(1, CLEAR_LINE);
 		}
 	}
 
@@ -269,13 +269,13 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 	{
 		if (state->m_copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			sharc_set_flag_input(device, 1, ASSERT_LINE);
+			dynamic_cast<adsp21062_device *>(device)->set_flag_input(1, ASSERT_LINE);
 
 			//device->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 		}
 		else
 		{
-			sharc_set_flag_input(device, 1, CLEAR_LINE);
+			dynamic_cast<adsp21062_device *>(device)->set_flag_input(1, CLEAR_LINE);
 
 			//device->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
@@ -689,7 +689,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 	{
 		if (m_dsp_type == DSP_TYPE_SHARC)
 		{
-			sharc_external_dma_write(machine().device("dsp"), m_coprocnt, data & 0xffff);
+			machine().device<adsp21062_device>("dsp")->external_dma_write(m_coprocnt, data & 0xffff);
 		}
 		else if (m_dsp_type == DSP_TYPE_TGP)
 		{
@@ -721,7 +721,7 @@ WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 		(strcmp(machine().system().name, "vonj" ) == 0) ||
 		(strcmp(machine().system().name, "rchase2" ) == 0))
 	{
-		sharc_external_iop_write(machine().device("dsp"), offset, data);
+		machine().device<adsp21062_device>("dsp")->external_iop_write(offset, data);
 	}
 	else
 	{
@@ -732,7 +732,7 @@ WRITE32_MEMBER(model2_state::copro_sharc_iop_w)
 		else
 		{
 			m_iop_data |= (data & 0xffff) << 16;
-			sharc_external_iop_write(machine().device("dsp"), offset, m_iop_data);
+			machine().device<adsp21062_device>("dsp")->external_iop_write(offset, m_iop_data);
 		}
 		m_iop_write_num++;
 	}
@@ -805,7 +805,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_fifo_w)
 {
 	if (m_geoctl & 0x80000000)
 	{
-		sharc_external_dma_write(machine().device("dsp2"), m_geocnt, data & 0xffff);
+		machine().device<adsp21062_device>("dsp2")->external_dma_write(m_geocnt, data & 0xffff);
 
 		m_geocnt++;
 	}
@@ -819,7 +819,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_iop_w)
 {
 	if ((strcmp(machine().system().name, "schamp" ) == 0))
 	{
-		sharc_external_iop_write(machine().device("dsp2"), offset, data);
+		machine().device<adsp21062_device>("dsp2")->external_iop_write(offset, data);
 	}
 	else
 	{
@@ -830,7 +830,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_iop_w)
 		else
 		{
 			m_geo_iop_data |= (data & 0xffff) << 16;
-			sharc_external_iop_write(machine().device("dsp2"), offset, m_geo_iop_data);
+			machine().device<adsp21062_device>("dsp2")->external_iop_write(offset, m_geo_iop_data);
 		}
 		m_geo_iop_write_num++;
 	}
@@ -2087,11 +2087,6 @@ static MACHINE_CONFIG_DERIVED( srallyc, model2a )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)
 MACHINE_CONFIG_END
 
-static const sharc_config sharc_cfg =
-{
-	BOOT_MODE_HOST
-};
-
 /* 2B-CRX */
 static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_CPU_ADD("maincpu", I960, 25000000)
@@ -2102,11 +2097,11 @@ static MACHINE_CONFIG_START( model2b, model2_state )
 	MCFG_CPU_PROGRAM_MAP(model2_snd)
 
 	MCFG_CPU_ADD("dsp", ADSP21062, 40000000)
-	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_HOST)
 	MCFG_CPU_DATA_MAP(copro_sharc_map)
 
 	//MCFG_CPU_ADD("dsp2", ADSP21062, 40000000)
-	//MCFG_CPU_CONFIG(sharc_cfg)
+	//MCFG_SHARC_BOOT_MODE(BOOT_MODE_HOST)
 	//MCFG_CPU_DATA_MAP(geo_sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))

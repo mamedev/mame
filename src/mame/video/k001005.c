@@ -97,7 +97,7 @@ void k001005_device::device_start()
 	int i, width, height;
 
 	m_cpu = machine().device(m_cpu_tag);
-	m_dsp = machine().device(m_dsp_tag);
+	m_dsp = machine().device<adsp21062_device>(m_dsp_tag);
 	m_k001006_1 = machine().device(m_k001006_1_tag);
 	m_k001006_2 = machine().device(m_k001006_2_tag);
 
@@ -271,18 +271,18 @@ READ32_MEMBER( k001005_device::read )
 				if (m_fifo_read_ptr < 0x3ff)
 				{
 					//m_dsp->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
-					sharc_set_flag_input(m_dsp, 1, CLEAR_LINE);
+					m_dsp->set_flag_input(1, CLEAR_LINE);
 				}
 				else
 				{
 					//m_dsp->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-					sharc_set_flag_input(m_dsp, 1, ASSERT_LINE);
+					m_dsp->set_flag_input(1, ASSERT_LINE);
 				}
 			}
 			else
 			{
 				//m_dsp->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-				sharc_set_flag_input(m_dsp, 1, ASSERT_LINE);
+				m_dsp->set_flag_input(1, ASSERT_LINE);
 			}
 
 			m_fifo_read_ptr++;
@@ -324,18 +324,18 @@ WRITE32_MEMBER( k001005_device::write )
 				if (m_fifo_write_ptr < 0x400)
 				{
 					//m_dsp->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-					sharc_set_flag_input(m_dsp, 1, ASSERT_LINE);
+					m_dsp->set_flag_input(1, ASSERT_LINE);
 				}
 				else
 				{
 					//m_dsp->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
-					sharc_set_flag_input(m_dsp, 1, CLEAR_LINE);
+					m_dsp->set_flag_input(1, CLEAR_LINE);
 				}
 			}
 			else
 			{
 				//m_dsp->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-				sharc_set_flag_input(m_dsp, 1, ASSERT_LINE);
+				m_dsp->set_flag_input(1, ASSERT_LINE);
 			}
 
 		//  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());

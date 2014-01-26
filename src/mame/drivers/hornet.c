@@ -885,10 +885,6 @@ static INPUT_PORTS_START( sscope )
 	PORT_BIT( 0x7ff, 0x3ff, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_INVERT
 INPUT_PORTS_END
 
-static const sharc_config sharc_cfg =
-{
-	BOOT_MODE_EPROM
-};
 
 /* PowerPC interrupts
 
@@ -984,7 +980,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
 	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
-	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc0_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -1067,7 +1063,7 @@ static const voodoo_config voodoo_r_intf =
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 
 	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
-	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc1_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(hornet_state,hornet_2board)
