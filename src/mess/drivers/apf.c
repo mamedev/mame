@@ -7,33 +7,9 @@ PeT   around February 2008:
  fixed apfm1000 pads
  added apf video mode
 
-todo for apf m1000:
- add exact cpu/video timing. memory controller+6847 memory operations hold cpu
-  (backgammon relies on exact video timing)
- support special cartridges (basic, space destroyer)
 
-
-0000- 2000-2003 PIA of M1000. is itself repeated until 3fff.
-She controls " keypads ", the way of video and the loudspeaker. Putting to 0 one of the 4 least
-significant bits of 2002, the corresponding line of keys is ***reflxed mng in 2000 (32 keys altogether).
-The other four bits of 2002 control the video way. Bit 0 of 2003 controls the interruptions. Bit 3 of 2003 controls
-the loudspeaker. 4000-47ff ROM of M1000. is repeated until 5fff and in e000-ffff. 6000-6003 PIA of the APF.
-is itself repeated until 63ff. She controls the keyboard of the APF and the cassette. The value of the
-number that represents the three bits less significant of 6002 they determine the line of eight
-keys that it is ***reflxed mng in 6000. Bit 4 of 6002 controls the motor of the cassette. Bit 5 of
-6002 activates or deactivates the recording. Bit 5 of 6002 indicates the level of recording in
-the cassette. 6400-64ff would be the interface Here series, optional. 6500-66ff would be the
-disk controller Here, optional. 6800-77ff ROM (" cartridge ") 7800-7fff Probably ROM. The BASIC
-leaves frees this zone. 8000-9fff ROM (" cartridge ") A000-BFFF ram (8 Kb) C000-DFFF ram
-additional (8 Kb) E000-FFFF ROM of M1000 (to see 4000-47FF) The interruption activates with
-the vertical synchronism of the video. routine that it executes is in the ROM of M1000
-and puts the video in way text during a short interval, so that the first line is seen of
-text screen in the superior part of the graphical screen.
-
-
-6600, 6500-6503 wd179x disc controller? 6400, 6401
-
-
+APF M1000/MP1000 and Imagination Machine
+----------------------------------------
 - The M1000 contains the RAM, ROM, CPU, PIA0, handsets, Video and cart slot, and thus was a TV Game computer.
 - The MPA-10 was a base unit containing the main keyboard, custom cassette recorder and PIA1.
 - When the two were joined, they formed the Imagination Machine.
@@ -72,6 +48,7 @@ ToDo:
 - Some bad colours or graphics
 - Tape loading is not very reliable
 - Add back the disk support when we can get some info on it
+  (6600, 6500-6503 wd179x disc controller? 6400, 6401)
 - Need disk-based software
 
 
@@ -108,8 +85,7 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
-	DECLARE_READ8_MEMBER(apf_mc6847_videoram_r);
-	DECLARE_WRITE_LINE_MEMBER(apf_mc6847_fs_w);
+	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_READ8_MEMBER(pia0_porta_r);
 	DECLARE_WRITE8_MEMBER(pia0_portb_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
@@ -146,7 +122,7 @@ private:
 };
 
 
-READ8_MEMBER( apf_state::apf_mc6847_videoram_r )
+READ8_MEMBER( apf_state::videoram_r )
 {
 	if BIT(m_pad_data, 7) // AG line
 	{
@@ -175,11 +151,6 @@ READ8_MEMBER( apf_state::apf_mc6847_videoram_r )
 		m_crtc->as_w(BIT(data, 7));
 		return data;
 	}
-}
-
-WRITE_LINE_MEMBER( apf_state::apf_mc6847_fs_w )
-{
-	m_pia0->cb1_w(state);
 }
 
 READ8_MEMBER( apf_state::pia0_porta_r )
@@ -332,26 +303,6 @@ READ8_MEMBER( apf_state::apf_wd179x_data_r)
 	return wd17xx_data_r(m_fdc, space, offset); // should this be inverted like the rest?
 }
 
-#if 0
-static ADDRESS_MAP_START( apf_imagination_map, AS_PROGRAM, 8, apf_state )
-	AM_RANGE( 0x0000, 0x03ff) AM_RAM AM_SHARE("p_videoram") AM_MIRROR(0x1c00)
-	AM_RANGE( 0x2000, 0x3fff) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
-	AM_RANGE( 0x4000, 0x47ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
-	AM_RANGE( 0x6000, 0x63ff) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
-	AM_RANGE( 0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
-	AM_RANGE( 0x6500, 0x6500) AM_READWRITE(apf_wd179x_status_r, apf_wd179x_command_w)
-	AM_RANGE( 0x6501, 0x6501) AM_READWRITE(apf_wd179x_track_r, apf_wd179x_track_w)
-	AM_RANGE( 0x6502, 0x6502) AM_READWRITE(apf_wd179x_sector_r, apf_wd179x_sector_w)
-	AM_RANGE( 0x6503, 0x6503) AM_READWRITE(apf_wd179x_data_r, apf_wd179x_data_w)
-	AM_RANGE( 0x6600, 0x6600) AM_WRITE(apf_dischw_w)
-	AM_RANGE( 0x6800, 0x77ff) AM_ROM
-	AM_RANGE( 0x7800, 0x7fff) AM_NOP
-	AM_RANGE( 0x8000, 0x9fff) AM_ROM
-	AM_RANGE( 0xa000, 0xdfff) AM_RAM
-	AM_RANGE( 0xe000, 0xe7ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
-ADDRESS_MAP_END
-#endif
-
 static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
 	AM_RANGE( 0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x2000, 0x3fff) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
@@ -366,6 +317,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
 	AM_IMPORT_FROM(apfm1000_map)
 	AM_RANGE( 0x6000, 0x63ff) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	// These need to be confirmed, then reworked to modern standards
+	//AM_RANGE( 0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
+	//AM_RANGE( 0x6500, 0x6500) AM_READWRITE(apf_wd179x_status_r, apf_wd179x_command_w)
+	//AM_RANGE( 0x6501, 0x6501) AM_READWRITE(apf_wd179x_track_r, apf_wd179x_track_w)
+	//AM_RANGE( 0x6502, 0x6502) AM_READWRITE(apf_wd179x_sector_r, apf_wd179x_sector_w)
+	//AM_RANGE( 0x6503, 0x6503) AM_READWRITE(apf_wd179x_data_r, apf_wd179x_data_w)
+	//AM_RANGE( 0x6600, 0x6600) AM_WRITE(apf_dischw_w)
 ADDRESS_MAP_END
 
 
@@ -581,9 +539,9 @@ static const floppy_interface apfimag_floppy_interface =
 static const mc6847_interface apf_mc6847_intf =
 {
 	"screen",
-	DEVCB_DRIVER_MEMBER(apf_state, apf_mc6847_videoram_r),
+	DEVCB_DRIVER_MEMBER(apf_state, videoram_r),
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_mc6847_fs_w)
+	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, cb1_w)
 };
 
 static MACHINE_CONFIG_START( apfm1000, apf_state )
@@ -650,7 +608,7 @@ MACHINE_CONFIG_END
 ROM_START(apfm1000)
 	ROM_REGION(0x0800,"roms", 0)
 	ROM_SYSTEM_BIOS( 0, "0", "Standard" )
-	ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1), ROM_BIOS(1) )
+	ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "trash", "Trash II" )
 	ROMX_LOAD("trash-ii.bin", 0x0000, 0x0800, CRC(3bd8640a) SHA1(da4cd8163990adbc5acd3eab604b41e1066bb832), ROM_BIOS(2) )
 	ROM_IGNORE(0x0800)
@@ -661,7 +619,8 @@ ROM_END
 
 #define rom_apfimag rom_apfm1000
 
-//ROM_LOAD("apf-m1000rom.bin", 0x0000, 0x0800, CRC(cc6ac840) SHA1(1110a234bcad99bd0894ad44c591389d16376ca4) )
+// old rom, has a bad byte at 0087.
+//ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1), ROM_BIOS(1) )
 
 /***************************************************************************
 
