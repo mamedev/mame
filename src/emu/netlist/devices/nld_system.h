@@ -11,6 +11,7 @@
 
 #include "../nl_setup.h"
 #include "../nl_base.h"
+#include "../analog/nld_twoterm.h"
 
 // ----------------------------------------------------------------------------------------
 // Macros
@@ -155,7 +156,7 @@ protected:
 };
 
 // ----------------------------------------------------------------------------------------
-// DIODE_to_a
+// nld_base_d_to_a_proxy
 // ----------------------------------------------------------------------------------------
 
 class nld_base_d_to_a_proxy : public netlist_device_t
@@ -183,7 +184,7 @@ protected:
 private:
 };
 
-
+#if 1
 class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 {
 public:
@@ -219,5 +220,53 @@ protected:
 private:
     netlist_analog_output_t m_Q;
 };
+#else
+class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
+{
+public:
+    ATTR_COLD nld_d_to_a_proxy(netlist_output_t &out_proxied)
+            : nld_base_d_to_a_proxy(out_proxied)
+    {
+    }
+
+    ATTR_COLD virtual ~nld_d_to_a_proxy() {}
+
+protected:
+    ATTR_COLD void start()
+    {
+        nld_base_d_to_a_proxy::start();
+
+        register_sub(m_R, "R");
+        register_output("_Q", m_Q);
+        register_subalias("Q", m_R.m_N);
+
+        connect(m_Q, m_R.m_P);
+
+        m_Q.initial(0);
+        m_R.set_R(m_family_desc->m_R_low);
+    }
+
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(0);
+        m_R.set_R(m_family_desc->m_R_low);
+    }
+
+    ATTR_COLD virtual netlist_core_terminal_t &out()
+    {
+        return m_R.m_N;
+    }
+
+    ATTR_HOT ATTR_ALIGN void update()
+    {
+        m_R.set_R(INPLOGIC(m_I) ? m_family_desc->m_R_high : m_family_desc->m_R_low);
+        OUTANALOG(m_Q, INPLOGIC(m_I) ? m_family_desc->m_high_V : m_family_desc->m_low_V, NLTIME_FROM_NS(1));
+    }
+
+private:
+    netlist_analog_output_t m_Q;
+    nld_R_base m_R;
+};
+#endif
 
 #endif /* NLD_SYSTEM_H_ */

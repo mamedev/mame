@@ -392,7 +392,8 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 	{
         nld_base_d_to_a_proxy *proxy = get_d_a_proxy(out);
 
-        proxy->out().net().register_con(in);
+        connect_terminals(proxy->out(), in);
+        //proxy->out().net().register_con(in);
 	}
 	else
 	{
@@ -440,17 +441,13 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
 			out.net().merge_net(&in.net());
 		else
 			out.net().register_con(in);
-
 	}
 	else if (out.isFamily(netlist_terminal_t::LOGIC))
 	{
 		NL_VERBOSE_OUT(("connect_terminal_output: connecting proxy\n"));
 		nld_base_d_to_a_proxy *proxy = get_d_a_proxy(out);
 
-		if (in.has_net())
-			proxy->out().net().merge_net(&in.net());
-		else
-			proxy->out().net().register_con(in);
+		connect_terminals(proxy->out(), in);
 	}
 	else
 	{
@@ -494,6 +491,7 @@ void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_cor
 void netlist_setup_t::connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2)
 {
 	NL_VERBOSE_OUT(("Connecting %s to %s\n", t1.name().cstr(), t2.name().cstr()));
+
 	// FIXME: amend device design so that warnings can be turned into errors
 	//        Only variable inputs have this issue
 	if (t1.isType(netlist_core_terminal_t::OUTPUT) && t2.isType(netlist_core_terminal_t::INPUT))
@@ -577,11 +575,13 @@ void netlist_setup_t::resolve_inputs()
     for (netlist_net_t * const * pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
         (*pn)->late_save_register();
 
+    pstring errstr("");
+
     NL_VERBOSE_OUT(("looking for terminals not connected ...\n"));
     for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
     {
         if (!entry->object()->has_net())
-            netlist().error("Found terminal %s without a net\n",
+            errstr += pstring::sprintf("Found terminal %s without a net\n",
                     entry->object()->name().cstr());
         // FIXME: need a warning callback ....
 #if 0
@@ -590,6 +590,8 @@ void netlist_setup_t::resolve_inputs()
                     entry->object()->name().cstr());
 #endif
     }
+    if (errstr != "")
+        netlist().error("%s", errstr.cstr());
 
 
     NL_VERBOSE_OUT(("looking for two terms connected to rail nets ...\n"));

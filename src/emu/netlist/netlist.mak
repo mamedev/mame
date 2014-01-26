@@ -40,6 +40,7 @@ NETLISTOBJS+= \
 	$(NETLISTOBJ)/devices/nld_7420.o \
 	$(NETLISTOBJ)/devices/nld_7425.o \
 	$(NETLISTOBJ)/devices/nld_7427.o \
+	$(NETLISTOBJ)/devices/nld_7430.o \
 	$(NETLISTOBJ)/devices/nld_7448.o \
 	$(NETLISTOBJ)/devices/nld_7450.o \
 	$(NETLISTOBJ)/devices/nld_7474.o \

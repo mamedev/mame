@@ -260,6 +260,8 @@ struct netlist_logic_family_desc_t
     double m_high_thresh_V;
     double m_low_V;
     double m_high_V;
+    double m_R_low;
+    double m_R_high;
 };
 
 /* Terminals inherit the family description from the netlist_device
