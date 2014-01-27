@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "sound/wave.h"
 #include "machine/ram.h"
 #include "bus/centronics/ctronics.h"
 #include "video/mc6847.h"
@@ -26,31 +27,29 @@ class phc25_state : public driver_device
 {
 public:
 	phc25_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_vdg(*this, MC6847_TAG),
-			m_centronics(*this, CENTRONICS_TAG),
-			m_cassette(*this, "cassette"),
-			m_video_ram(*this, "video_ram")
+		: driver_device(mconfig, type, tag)
+		, m_video_ram(*this, "video_ram")
+		, m_maincpu(*this, Z80_TAG)
+		, m_vdg(*this, MC6847_TAG)
+		, m_centronics(*this, CENTRONICS_TAG)
+		, m_cassette(*this, "cassette")
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6847_base_device> m_vdg;
-	required_device<centronics_device> m_centronics;
-	required_device<cassette_image_device> m_cassette;
-
-	virtual void video_start();
 
 	DECLARE_READ8_MEMBER( port40_r );
 	DECLARE_WRITE8_MEMBER( port40_w );
 	DECLARE_READ8_MEMBER( video_ram_r );
-
 	static UINT8 ntsc_char_rom_r(running_machine &machine, UINT8 ch, int line);
 	static UINT8 pal_char_rom_r(running_machine &machine, UINT8 ch, int line);
 
-	/* video state */
-	required_shared_ptr<UINT8> m_video_ram;
+private:
+	virtual void video_start();
 	UINT8 *m_char_rom;
+	bool m_ag;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6847_base_device> m_vdg;
+	required_device<centronics_device> m_centronics;
+	required_device<cassette_image_device> m_cassette;
 };
 
 #endif
