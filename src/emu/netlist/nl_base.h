@@ -389,6 +389,7 @@ public:
 	//ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
 
 	ATTR_COLD void set_net(netlist_net_t &anet);
+    ATTR_COLD inline void clear_net() { m_net = NULL; }
 	ATTR_COLD inline bool has_net() const { return (m_net != NULL); }
 	ATTR_HOT inline const netlist_net_t & RESTRICT net() const { return *m_net;}
 	ATTR_HOT inline netlist_net_t & RESTRICT net() { return *m_net;}
@@ -724,6 +725,7 @@ public:
 
 	ATTR_COLD void initial(const netlist_sig_t val);
 
+    ATTR_COLD bool has_proxy() { return (m_proxy != NULL); }
 	ATTR_COLD nld_base_d_to_a_proxy *get_proxy() { return m_proxy; }
     ATTR_COLD void set_proxy(nld_base_d_to_a_proxy *proxy) { m_proxy = proxy; }
 

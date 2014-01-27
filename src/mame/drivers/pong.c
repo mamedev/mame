@@ -63,7 +63,7 @@ fixedfreq_interface fixedfreq_mode_pong = {
 	H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL,
 	V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL,
 	1,  /* non-interlaced */
-	0.32
+	0.30
 };
 
 fixedfreq_interface fixedfreq_mode_pongX2 = {
@@ -71,7 +71,7 @@ fixedfreq_interface fixedfreq_mode_pongX2 = {
 	(H_TOTAL-67) * 2, (H_TOTAL-40) * 2, (H_TOTAL-8) * 2, (H_TOTAL) * 2,
 	V_TOTAL-22,V_TOTAL-19,V_TOTAL-16,V_TOTAL,
 	1,  /* non-interlaced */
-	0.32
+	0.30
 };
 
 enum input_changed_enum
@@ -134,8 +134,9 @@ static NETLIST_START(pong_schematics)
     /* Coin, antenna and startup circuit */
 
     ANALOG_INPUT(STOPG, 0)
-    ALIAS(SRSTQ, RYf.2)
-    ALIAS(SRST, RYc.2)
+    
+    ALIAS(SRSTQ, c9f.Q)
+    ALIAS(SRST, c9c.Q)
 
     /* SRSTQ has a diode to +3V to protect against overvoltage - omitted */
 
@@ -145,6 +146,16 @@ static NETLIST_START(pong_schematics)
 
     TTL_7404_INVERT(e4d, STOPG)
 
+#if 1
+
+    TTL_7404_INVERT(c9f, c9c.Q)
+    TTL_7404_INVERT(c9c, c9f.Q)
+
+    SWITCH2(coinsw)
+    NET_C(c9c.Q, coinsw.1)
+    NET_C(c9f.Q, coinsw.2)
+
+#else
     RES(RYf, 50)   // output impedance - not in schematics, hack (till better proxies exist)
     RES(RYc, 50)   // output impedance - not in schematics, hack (till better proxies exist)
 
@@ -156,7 +167,7 @@ static NETLIST_START(pong_schematics)
     SWITCH2(coinsw)
     NET_C(RYc.2, coinsw.1)
     NET_C(RYf.2, coinsw.2)
-
+#endif
     NET_C(coinsw.Q, GND)
 
     /* Antenna circuit */

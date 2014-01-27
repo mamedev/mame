@@ -184,7 +184,7 @@ protected:
 private:
 };
 
-#if 1
+#if 0
 class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 {
 public:

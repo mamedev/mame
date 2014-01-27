@@ -18,7 +18,7 @@ netlist_logic_family_desc_t netlist_family_ttl =
         0.3, // m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
         3.4, // m_high_V
         10.0, // m_g_low;
-        130.0, //  m_g_high;
+        130.0, //130.0, //  m_g_high;
 };
 
 // ----------------------------------------------------------------------------------------

@@ -366,6 +366,18 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
         proxy->init(netlist(), x);
         register_dev(proxy, x);
 
+        /* connect all existing terminals to new net */
+
+        netlist_core_terminal_t *p = out.net().m_head;
+        while (p != NULL)
+        {
+            netlist_core_terminal_t *np = p->m_update_list_next;
+            p->clear_net(); // de-link from all nets ...
+            connect(proxy->out(), *p);
+            p = np;
+        }
+        out.net().m_head = NULL; // clear the list
+        out.net().m_num_cons = 0;
         out.net().register_con(proxy->m_I);
         out_cast.set_proxy(proxy);
 
@@ -488,9 +500,22 @@ void netlist_setup_t::connect_terminals(netlist_core_terminal_t &t1, netlist_cor
 	}
 }
 
-void netlist_setup_t::connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2)
+static netlist_core_terminal_t &resolve_proxy(netlist_core_terminal_t &term)
+{
+    if (term.isType(netlist_core_terminal_t::OUTPUT) && term.isFamily(netlist_core_terminal_t::LOGIC))
+    {
+        netlist_logic_output_t &out = dynamic_cast<netlist_logic_output_t &>(term);
+        if (out.has_proxy())
+            return out.get_proxy()->out();
+    }
+    return term;
+}
+
+void netlist_setup_t::connect(netlist_core_terminal_t &t1_in, netlist_core_terminal_t &t2_in)
 {
 	NL_VERBOSE_OUT(("Connecting %s to %s\n", t1.name().cstr(), t2.name().cstr()));
+	netlist_core_terminal_t &t1 = resolve_proxy(t1_in);
+	netlist_core_terminal_t &t2 = resolve_proxy(t2_in);
 
 	// FIXME: amend device design so that warnings can be turned into errors
 	//        Only variable inputs have this issue
