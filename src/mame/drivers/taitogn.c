@@ -558,7 +558,7 @@ MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 	m_control = 0;
 
 	// halt sound CPU since it has no valid program at start
-	m_mn10200->set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
+	m_mn10200->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
@@ -778,6 +778,8 @@ INPUT_PORTS_END
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */ \
 	ROM_REGION( 0x200000, "biosflash", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "v1",   "G-NET Bios v1" ) \
 		ROM_LOAD16_WORD_BIOS(0, "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
@@ -1006,8 +1008,8 @@ GAME( 1998, chaosheaj,chaoshea, coh3002t, coh3002t, driver_device, 0, ROT0,   "T
 GAME( 1998, raycris,  taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Ray Crisis (V2.03J)", GAME_IMPERFECT_SOUND )
 GAME( 1999, spuzbobl, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Super Puzzle Bobble (V2.05O)", GAME_IMPERFECT_SOUND )
 GAME( 1999, spuzboblj,spuzbobl, coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Super Puzzle Bobble (V2.04J)", GAME_IMPERFECT_SOUND )
-GAME( 1999, gobyrc,   taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // custom inputs need calibrating
-GAME( 1999, rcdego,   gobyrc,   coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // custom inputs need calibrating
+GAME( 1999, gobyrc,   taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // custom inputs need calibrating, likely needs mcu emulation
+GAME( 1999, rcdego,   gobyrc,   coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // "
 GAME( 1999, flipmaze, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito / Moss", "Flip Maze (V2.04J)", GAME_IMPERFECT_SOUND )
 GAME( 2001, shikigam, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT270, "Alfa System / Taito", "Shikigami no Shiro (V2.03J)", GAME_IMPERFECT_SOUND )
 GAME( 2003, sianniv,  taitogn,  coh3002t, coh3002t, driver_device, 0, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // IRQ at the wrong time

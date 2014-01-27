@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fx1b_fram_w);
 	DECLARE_READ8_MEMBER(fx1b_fram_r);
 	DECLARE_WRITE8_MEMBER(coh1002e_bank_w);
-	DECLARE_WRITE8_MEMBER(coh1002e_latch_w);
+	DECLARE_WRITE8_MEMBER(coh1002e_sound_irq_w);
 	DECLARE_WRITE16_MEMBER(bam2_mcu_w);
 	DECLARE_READ16_MEMBER(bam2_mcu_r);
 	DECLARE_READ16_MEMBER(bam2_unk_r);
@@ -122,7 +122,7 @@ private:
 
 	UINT8* m_fx1b_fram;
 
-	UINT16 vt83c461_latch;
+	UINT16 m_vt83c461_latch;
 
 	required_device<psxgpu_device> m_gpu;
 	required_device<screen_device> m_gpu_screen;
@@ -1418,12 +1418,12 @@ READ16_MEMBER(zn_state::vt83c461_32_r)
 	if( offset == 0x1f0/2 )
 	{
 		UINT32 data = m_vt83c461->read_cs0(space, 0, 0xffffffff);
-		vt83c461_latch = data >> 16;
+		m_vt83c461_latch = data >> 16;
 		return data & 0xffff;
 	}
 	else if( offset == 0x1f2/2 )
 	{
-		return vt83c461_latch;
+		return m_vt83c461_latch;
 	}
 	else
 	{
@@ -1613,18 +1613,16 @@ WRITE8_MEMBER(zn_state::coh1002e_bank_w)
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
-WRITE8_MEMBER(zn_state::coh1002e_latch_w)
+WRITE8_MEMBER(zn_state::coh1002e_sound_irq_w)
 {
-	if (offset)
-		m_audiocpu->set_input_line(2, HOLD_LINE);   // irq 2 on the 68k
-	else
-		soundlatch_byte_w(space, 0, data);
+	m_audiocpu->set_input_line(2, HOLD_LINE); // irq 2 on the 68k
 }
 
 static ADDRESS_MAP_START(coh1002e_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fa10300, 0x1fa10303) AM_WRITE8(coh1002e_bank_w, 0x000000ff)
-	AM_RANGE(0x1fb00000, 0x1fb00007) AM_WRITE8(coh1002e_latch_w, 0x000000ff)
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(soundlatch_byte_w, 0x000000ff)
+	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002e_sound_irq_w, 0x000000ff)
 
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
@@ -2690,7 +2688,9 @@ INPUT_PORTS_END
 
 #define CPZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1000c.353", 0x0000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a) )
+	ROM_LOAD( "coh-1000c.353", 0x0000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( cpzn1 )
 	CPZN1_BIOS
@@ -3062,7 +3062,9 @@ ROM_END
 
 #define CPZN2_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-3002c.353", 0x0000000, 0x080000, CRC(e860ea8b) SHA1(66e7e1d4e426466b8f48a2ba055a91b475569504) )
+	ROM_LOAD( "coh-3002c.353", 0x0000000, 0x080000, CRC(e860ea8b) SHA1(66e7e1d4e426466b8f48a2ba055a91b475569504) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( cpzn2 )
 	CPZN2_BIOS
@@ -3605,7 +3607,9 @@ ROM_END
 
 #define TPS_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1002m.353", 0x0000000, 0x080000, CRC(69ffbcb4) SHA1(03eb2febfab3fcde716defff291babd9392de965) )
+	ROM_LOAD( "coh-1002m.353", 0x0000000, 0x080000, CRC(69ffbcb4) SHA1(03eb2febfab3fcde716defff291babd9392de965) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( tps )
 	TPS_BIOS
@@ -3854,7 +3858,9 @@ ROM_END
 
 #define KN_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1002v.353", 0x0000000, 0x080000, CRC(5ff165f3) SHA1(8f59314c1093446b9bcb06d232244da6df78e206) )
+	ROM_LOAD( "coh-1002v.353", 0x0000000, 0x080000, CRC(5ff165f3) SHA1(8f59314c1093446b9bcb06d232244da6df78e206) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( vspsx )
 	KN_BIOS
@@ -3919,7 +3925,9 @@ ROM_END
 
 #define TAITOFX1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1000t.353", 0x0000000, 0x080000, CRC(e3f23b6e) SHA1(e18907cf8c6ba54d96edba0a9a00487a90219e0d) )
+	ROM_LOAD( "coh-1000t.353", 0x0000000, 0x080000, CRC(e3f23b6e) SHA1(e18907cf8c6ba54d96edba0a9a00487a90219e0d) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( taitofx1 )
 	TAITOFX1_BIOS
@@ -4286,7 +4294,9 @@ ROM_END
 
 #define PSARC95_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1002e.353", 0x000000, 0x080000, CRC(910f3a8b) SHA1(cd68532967a25f476a6d73473ec6b6f4df2e1689) )
+	ROM_LOAD( "coh-1002e.353", 0x000000, 0x080000, CRC(910f3a8b) SHA1(cd68532967a25f476a6d73473ec6b6f4df2e1689) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( psarc95 )
 	PSARC95_BIOS
@@ -4543,7 +4553,9 @@ ROM_END
 
 #define TW_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1000w.353", 0x000000, 0x080000, CRC(45e8a4b4) SHA1(815488d8563c85f97fbc3384ff21f08e4c88b7b7) )
+	ROM_LOAD( "coh-1000w.353", 0x000000, 0x080000, CRC(45e8a4b4) SHA1(815488d8563c85f97fbc3384ff21f08e4c88b7b7) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( atpsx )
 	TW_BIOS
@@ -4567,7 +4579,9 @@ ROM_END
 
 #define AC_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1000a.353", 0x0000000, 0x080000, CRC(8d8d0764) SHA1(7ee83d317190bb1cef2f8f01c81eaaae47150ebb) )
+	ROM_LOAD( "coh-1000a.353", 0x0000000, 0x080000, CRC(8d8d0764) SHA1(7ee83d317190bb1cef2f8f01c81eaaae47150ebb) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( acpsx )
 	AC_BIOS
@@ -4630,7 +4644,9 @@ ROM_END
 
 #define ATLUS_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1001l.353", 0x000000, 0x080000, CRC(6721146b) SHA1(9511d24bfe25eb180fb2db0835b131cb4a12730e) )
+	ROM_LOAD( "coh-1001l.353", 0x000000, 0x080000, CRC(6721146b) SHA1(9511d24bfe25eb180fb2db0835b131cb4a12730e) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( atluspsx )
 	ATLUS_BIOS
