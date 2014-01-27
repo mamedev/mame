@@ -163,19 +163,19 @@ private:
 	devcb2_write_line m_irq_handler;
 
 	UINT8 m_in_a;
-	UINT8 m_in_ca1;
-	UINT8 m_in_ca2;
+	int m_in_ca1;
+	int m_in_ca2;
 	UINT8 m_out_a;
-	UINT8 m_out_ca2;
+	int m_out_ca2;
 	UINT8 m_ddr_a;
 	UINT8 m_latch_a;
 
 	UINT8 m_in_b;
-	UINT8 m_in_cb1;
-	UINT8 m_in_cb2;
+	int m_in_cb1;
+	int m_in_cb2;
 	UINT8 m_out_b;
-	UINT8 m_out_cb1;
-	UINT8 m_out_cb2;
+	int m_out_cb1;
+	int m_out_cb2;
 	UINT8 m_ddr_b;
 	UINT8 m_latch_b;
 
@@ -183,8 +183,6 @@ private:
 	UINT8 m_t1ch;
 	UINT8 m_t1ll;
 	UINT8 m_t1lh;
-	int m_t1_pb7;
-
 	UINT8 m_t2cl;
 	UINT8 m_t2ch;
 	UINT8 m_t2ll;
@@ -200,6 +198,7 @@ private:
 	emu_timer *m_t1;
 	attotime m_time1;
 	UINT8 m_t1_active;
+	int m_t1_pb7;
 	emu_timer *m_t2;
 	attotime m_time2;
 	UINT8 m_t2_active;
