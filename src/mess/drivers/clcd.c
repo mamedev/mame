@@ -50,6 +50,7 @@ public:
 		m_key_poll(0),
 		m_key_column(0),
 		m_key_shift(0),
+		m_key_force_format(0),
 		m_col0(*this, "COL0"),
 		m_col1(*this, "COL1"),
 		m_col2(*this, "COL2"),
@@ -449,6 +450,13 @@ public:
 						m_key_shift |= read_column(i) << 8;
 					}
 				}
+
+				if (m_key_force_format)
+				{
+					m_key_shift = 0x15; // Simulate holding CBM+SHIFT+STOP if you have no NVRAM
+
+					m_key_force_format--;
+				}
 			}
 		}
 	}
@@ -484,6 +492,11 @@ public:
 		return m_ram;
 	}
 
+	void force_format()
+	{
+		m_key_force_format = 10;
+	}
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;
@@ -509,6 +522,7 @@ private:
 	int m_key_poll;
 	int m_key_column;
 	UINT16 m_key_shift;
+	int m_key_force_format;
 	required_ioport m_col0;
 	required_ioport m_col1;
 	required_ioport m_col2;
@@ -534,12 +548,7 @@ static NVRAM_HANDLER(clcd)
 	}
 	else
 	{
-		// leave whatever ram device defaulted to
-
-		//// HACK: this forces ram to be initialised
-		UINT8 *ROM = state->memregion("maincpu")->base();
-		ROM[0x185bb] = 0xea;
-		ROM[0x185bc] = 0xea;
+		state->force_format();
 	}
 }
 
