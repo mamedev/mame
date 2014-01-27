@@ -98,10 +98,6 @@ void gb_rom_device::shared_reset()
 	m_ram_bank = 0;
 	m_latch_bank = 0;
 	m_latch_bank2 = 1;
-
-	has_rumble = FALSE;
-	has_timer = FALSE;
-	has_battery = FALSE;
 }
 
 //-------------------------------------------------
@@ -142,10 +138,6 @@ void megaduck_rom_device::device_reset()
 	m_ram_bank = 0;
 	m_latch_bank = 0;
 	m_latch_bank2 = 1;
-
-	has_rumble = FALSE;
-	has_timer = FALSE;
-	has_battery = FALSE;
 }
 
 

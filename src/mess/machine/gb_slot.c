@@ -39,7 +39,10 @@ device_gb_cart_interface::device_gb_cart_interface(const machine_config &mconfig
 		m_rom(NULL),
 		m_ram(NULL),
 		m_rom_size(0),
-		m_ram_size(0)
+		m_ram_size(0),
+		has_rumble(FALSE), 
+		has_timer(FALSE), 
+		has_battery(FALSE)
 {
 }
 
