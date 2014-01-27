@@ -288,6 +288,22 @@ WRITE8_MEMBER( at_state::at_portb_w )
 	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
 }
 
+READ8_MEMBER( at_state::ps2_portb_r )
+{
+	UINT8 data = m_at_speaker;
+	data &= ~0xd0; /* AT BIOS don't likes this being set */
+
+	/* 0x10 is the dram refresh line bit, 15.085us. */
+	data |= (machine().time().as_ticks(66291) & 1) ? 0x10 : 0;
+
+	if (m_pit8254->get_output(2))
+		data |= 0x20;
+	else
+		data &= ~0x20; /* ps2m30 wants this */
+
+	return data;
+}
+
 
 /**********************************************************
  *
