@@ -224,8 +224,6 @@ void apf_state::machine_reset()
 {
 	m_portb = 0;
 	m_ca2 = 0;
-	m_crtc->gm1_w(1);
-	m_crtc->gm2_w(1);
 
 	if (m_cass) // apfimag only
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -542,7 +540,16 @@ static const mc6847_interface apf_mc6847_intf =
 	"screen",
 	DEVCB_DRIVER_MEMBER(apf_state, videoram_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, cb1_w)
+	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, cb1_w),
+
+	DEVCB_NULL,                 /* AG */
+	DEVCB_LINE_VCC,             /* GM2 */
+	DEVCB_LINE_VCC,             /* GM1 */
+	DEVCB_NULL,                 /* GM0 */
+	DEVCB_NULL,                 /* CSS */
+	DEVCB_NULL,                 /* AS */
+	DEVCB_LINE_GND,             /* INTEXT */
+	DEVCB_NULL,                 /* INV */
 };
 
 static MACHINE_CONFIG_START( apfm1000, apf_state )
