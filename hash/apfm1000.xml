@@ -187,4 +187,28 @@ $9C00 to $9FFF 1k empty space (39936 to 40959)
 			</dataarea>
 		</part>
 	</software>
+
+<!-- Homebrew -->
+
+	<software name="columns" supported="no">
+		<description>Columns / Targets / Bacteria / Autopista</description>
+		<year>????</year>
+		<publisher>Enrique Collado</publisher>
+		<part name="cart" interface="apfm1000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="columns.bin" size="3733" crc="71c2955c" sha1="7e571e32ff05c92c7be7d2e42a0868538a7c5800" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="movblock" supported="no">
+		<description>Move Block</description>
+		<year>2010</year>
+		<publisher>Adam Trionfo</publisher>
+		<part name="cart" interface="apfm1000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="movblock.bin" size="4096" crc="f77f72f4" sha1="2cf3a82d584b2a2e4c7e5ae751da8d0255c2295a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
