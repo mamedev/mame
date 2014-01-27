@@ -14,7 +14,10 @@
 #ifndef __UI_FILESEL_H__
 #define __UI_FILESEL_H__
 
-class ui_menu_confirm_save_as : public ui_menu {
+// ======================> ui_menu_confirm_save_as
+
+class ui_menu_confirm_save_as : public ui_menu
+{
 public:
 	ui_menu_confirm_save_as(running_machine &machine, render_container *container, bool *yes);
 	virtual ~ui_menu_confirm_save_as();
@@ -22,10 +25,14 @@ public:
 	virtual void handle();
 
 private:
-	bool *yes;
+	bool *m_yes;
 };
 
-class ui_menu_file_create : public ui_menu {
+
+// ======================> ui_menu_file_create
+
+class ui_menu_file_create : public ui_menu
+{
 public:
 	ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file);
 	virtual ~ui_menu_file_create();
@@ -34,14 +41,18 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-	device_image_interface *image;
-	astring &current_directory, &current_file;
-	const image_device_format *current_format;
-	//int confirm_save_as_yes;
-	char filename_buffer[1024];
+	device_image_interface *		m_image;
+	astring &						m_current_directory;
+	astring &						m_current_file;
+	const image_device_format *		m_current_format;
+	char							m_filename_buffer[1024];
 };
 
-class ui_menu_file_selector : public ui_menu {
+
+// ======================> ui_menu_file_selector
+
+class ui_menu_file_selector : public ui_menu
+{
 public:
 	enum { R_EMPTY, R_SOFTLIST, R_CREATE, R_FILE };
 	ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool has_empty, bool has_softlist, bool has_create, int *result);
@@ -51,7 +62,8 @@ public:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 private:
-	enum file_selector_entry_type {
+	enum file_selector_entry_type
+	{
 		SELECTOR_ENTRY_TYPE_EMPTY,
 		SELECTOR_ENTRY_TYPE_CREATE,
 		SELECTOR_ENTRY_TYPE_SOFTWARE_LIST,
@@ -60,7 +72,8 @@ private:
 		SELECTOR_ENTRY_TYPE_FILE
 	};
 
-	struct file_selector_entry {
+	struct file_selector_entry
+	{
 		file_selector_entry *next;
 
 		file_selector_entry_type type;
@@ -68,21 +81,29 @@ private:
 		const char *fullpath;
 	};
 
-	device_image_interface *image;
-	astring &current_directory, &current_file;
-	bool has_empty, has_softlist, has_create;
-	int *result;
+	// internal state
+	device_image_interface *	m_image;
+	astring &					m_current_directory;
+	astring &					m_current_file;
+	bool						m_has_empty;
+	bool						m_has_softlist;
+	bool						m_has_create;
+	int *						m_result;
+	file_selector_entry *		m_entrylist;
+	char						m_filename_buffer[1024];
 
-	file_selector_entry *entrylist;
-	char filename_buffer[1024];
-
+	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
 	file_selector_entry *append_entry(file_selector_entry_type entry_type, const char *entry_basename, const char *entry_fullpath);
 	file_selector_entry *append_dirent_entry(const osd_directory_entry *dirent);
 	void append_entry_menu_item(const file_selector_entry *entry);
 };
 
-class ui_menu_select_format : public ui_menu {
+
+// ======================> ui_menu_select_format
+
+class ui_menu_select_format : public ui_menu
+{
 public:
 	ui_menu_select_format(running_machine &machine, render_container *container,
 							class floppy_image_format_t **formats, int ext_match, int total_usable, int *result);
@@ -91,12 +112,18 @@ public:
 	virtual void handle();
 
 private:
-	floppy_image_format_t **formats;
-	int ext_match, total_usable;
-	int *result;
+	// internal state
+	floppy_image_format_t **	m_formats;
+	int							m_ext_match;
+	int							m_total_usable;
+	int *						m_result;
 };
 
-class ui_menu_select_rw : public ui_menu {
+
+// ======================> ui_menu_select_rw
+
+class ui_menu_select_rw : public ui_menu
+{
 public:
 	enum { READONLY, READWRITE, WRITE_OTHER, WRITE_DIFF };
 	ui_menu_select_rw(running_machine &machine, render_container *container,
@@ -106,8 +133,9 @@ public:
 	virtual void handle();
 
 private:
-	bool can_in_place;
-	int *result;
+	// internal state
+	bool		m_can_in_place;
+	int *		m_result;
 };
 
 // helper
