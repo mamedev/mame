@@ -6,9 +6,9 @@
 
         Skeleton driver.
 
-****************************************************************************/
+****************************************************************************
 
-/*
+
 
     http://www.geocities.jp/sanyo_phc_25/
 
@@ -19,25 +19,21 @@
     16KB RAM
     6KB video RAM
 
-*/
+    LOCK key (CAPSLOCK) selects upper-case/lower-case on international version
+    (phc25), and selects hiragana/upper-case on Japanese version (phc25j).
 
-/*
+
 
     TODO:
 
-    - MC6847 mode selection lines
+    - MC6847 mode selection lines (should be ok now but need more testing)
     - tune cassette trigger level
     - accurate video timing
 
     - sound isn't working (should be a keyclick)
-    - backspace and return are very slow, while other keys are way too fast
-    - Basic and screen drawing are sluggish
-    - Screen attribute bits need to be found out
+    - screen attribute bit 7 is unknown
 
-10 SCREEN 2,1,1:CLS
-20 FOR X=0 TO 8
-30 LINE(X*24,0)-(X*24+16,191),X,BF
-40 NEXT
+
 
 10 SCREEN3,1,1:COLOR,,1:CLS
 20 X1=INT(RND(1)*256):Y1=INT(RND(1)*192):X2=INT(RND(1)*256):Y2=INT(RND(1)*192):C=INT(RND(1)*4)+1:LINE(X1,Y1)-(X2,Y2),C:GOTO 20
@@ -94,7 +90,7 @@ WRITE8_MEMBER( phc25_state::port40_w )
 
 	    0       cassette output
 	    1       cassette motor
-	    2       MC6847 INT/EXT
+	    2       LED in the LOCK button (on = uppercase)
 	    3       centronics strobe
 	    4
 	    5       MC6847 GM1
@@ -114,9 +110,10 @@ WRITE8_MEMBER( phc25_state::port40_w )
 
 	/* MC6847 */
 	m_ag = BIT(data, 7);
-	m_vdg->intext_w(BIT(data, 2));
+	m_vdg->intext_w(1);
 	m_vdg->gm0_w(BIT(data, 5));
-	m_vdg->gm1_w(BIT(data, 6));
+	m_vdg->gm1_w(1);
+	m_vdg->css_w(BIT(data, 6));
 	m_vdg->ag_w(m_ag);
 }
 
@@ -277,7 +274,9 @@ READ8_MEMBER( phc25_state::video_ram_r )
 	{
 		offset &= 0x7ff;
 		m_vdg->inv_w(BIT(m_video_ram[offset | 0x800], 0)); // cursor attribute
-		//m_vdg->css_w(BIT(m_video_ram[offset | 0x800], 7)); // unknown attribute
+		m_vdg->as_w(BIT(m_video_ram[offset | 0x800], 1)); // screen2 lores attribute
+		m_vdg->css_w(BIT(m_video_ram[offset | 0x800], 2)); // css attribute
+		// bit 7 is set for all text (not spaces), meaning is unknown
 		return m_video_ram[offset];
 	}
 }
@@ -287,6 +286,12 @@ UINT8 phc25_state::pal_char_rom_r(running_machine &machine, UINT8 ch, int line)
 	phc25_state *state = machine.driver_data<phc25_state>();
 
 	return state->m_char_rom[((ch - 2) * 12) + line + 4];
+}
+
+// irq is inverted in emulation, so we need this trampoline
+WRITE_LINE_MEMBER( phc25_state::irq_w )
+{
+	m_maincpu->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 UINT8 phc25_state::ntsc_char_rom_r(running_machine &machine, UINT8 ch, int line)
@@ -302,7 +307,7 @@ static const mc6847_interface ntsc_vdg_intf =
 	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
 
 	DEVCB_NULL,                                         /* horizontal sync */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     /* field sync */
+	DEVCB_DRIVER_LINE_MEMBER(phc25_state, irq_w),       /* field sync */
 
 	DEVCB_NULL,                                         /* AG */
 	DEVCB_NULL,                                         /* GM2 */
@@ -322,7 +327,7 @@ static const mc6847_interface pal_vdg_intf =
 	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
 
 	DEVCB_NULL,                                         /* horizontal sync */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     /* field sync */
+	DEVCB_DRIVER_LINE_MEMBER(phc25_state, irq_w),       /* field sync */
 
 	DEVCB_NULL,                                         /* AG */
 	DEVCB_NULL,                                         /* GM2 */
@@ -370,7 +375,7 @@ static const cassette_interface phc25_cassette_interface =
 
 static MACHINE_CONFIG_START( phc25, phc25_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000 )  // divide by 3 to make keyboard usable
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(phc25_mem)
 	MCFG_CPU_IO_MAP(phc25_io)
 
