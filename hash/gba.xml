@@ -5533,10 +5533,10 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="amenopgr">
-		<description>Army Men - Operation Green (Euro, USA)</description>
+		<description>Army Men - Operation Green (USA)</description>
 		<year>2001</year>
 		<publisher>3DO Company</publisher>
-		<info name="serial" value="AGB-AMEE-USA, AGB-AMEP"/>
+		<info name="serial" value="AGB-AMEE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="army men - operation green (usa, europe) (en,fr,de,es,it).bin" size="4194304" crc="6d174e28" sha1="b0fa4769cddbc66bc333ad45658524a4aeeec755" offset="000000" />
@@ -19581,7 +19581,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="jonnymos">
-		<description>Jonny Moseley Mad Trix (Euro, USA)</description>
+		<description>Jonny Moseley Mad Trix (USA)</description>
 		<year>2002</year>
 		<publisher>3DO Company</publisher>
 		<info name="serial" value="AGB-AJME-USA"/>

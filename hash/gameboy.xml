@@ -3818,10 +3818,10 @@
 
 	<software name="daffy">
 		<!-- Notes: SGB enhanced -->
-		<description>Daffy Duck - The Marvin Missions (Euro)</description>
+		<description>Daffy Duck - The Marvin Missions (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-YS-NOE-1"/>
+		<info name="serial" value="DMG-YS-USA, DMG-YS-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
@@ -3846,12 +3846,13 @@
 		</part>
 	</software>
 
-	<software name="daffyu" cloneof="daffy">
+<!-- This dump has been verified from an European cart by NoIntro guys, the duffy set is still unverified (maybe a Rev.1?) -->
+	<software name="daffya" cloneof="daffy">
 		<!-- Notes: SGB enhanced -->
-		<description>Daffy Duck - The Marvin Missions (USA)</description>
+		<description>Daffy Duck - The Marvin Missions (Euro, USA, Alt)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-YS-USA"/>
+		<info name="serial" value="DMG-YS-USA, DMG-YS-NOE"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -4273,10 +4274,10 @@
 
 	<software name="dkonga" cloneof="dkong">
 		<!-- Notes: SGB enhanced, also released by NP in 2000-03 -->
-		<description>Donkey Kong (Jpn)</description>
+		<description>Donkey Kong (Jpn, USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-QDA"/>
+		<info name="serial" value="DMG-QDA, DMG-QD-USA"/>
 		<info name="release" value="19940614 (JPN)"/>
 		<info name="alt_title" value="ドンキーコング"/>
 		<part name="cart" interface="gameboy_cart">
@@ -9131,7 +9132,7 @@
 	</software>
 
 	<software name="karakuri">
-		<description>Karakuri Kengouden Musashi Road (Jpn)</description>
+		<description>Karakuri Kengouden Musashi Lord (Jpn)</description>
 		<year>1991</year>
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="DMG-MUJ"/>
