@@ -6008,6 +6008,72 @@ ROM_START( derbyo2k )
 	ROM_LOAD( "mpr-22238.ic16s", 0x8000000, 0x800000, CRC(fb3e55da) SHA1(d547ee5b47e6e6fec9e447460300c828fbff8f2e) )
 ROM_END
 
+ROM_START( starhrse )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x4800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr23625.ic22", 0x000000, 0x0400000, CRC(7300bc6c) SHA1(f0bfff190c9f02895cc1f98eb695f327c948fca3) ) 
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD( "mpr23231.ic1",  0x0800000, 0x1000000, CRC(e41ddc53) SHA1(f565d68d8ce4010a2181b0343fa49bfdc81ba4cf) ) 
+	ROM_LOAD( "mpr23232.ic2",  0x1800000, 0x1000000, CRC(30f963a0) SHA1(dc56203ceae20f7a7354e505dd7f27cbce5c70e0) ) 
+	ROM_LOAD( "mpr23233.ic3",  0x2800000, 0x1000000, CRC(d6451cab) SHA1(6508e27d0370b19df01150da7baf4875479c166a) ) 
+	ROM_LOAD( "mpr23234.ic4",  0x3800000, 0x1000000, CRC(44044c14) SHA1(4934cb8d5f9b4085ffb5ddc711343f488aae4c4d) ) 
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(951684e4) SHA1(0beaf5827064252293223b946c04b8698e7207bb) ) 
+ROM_END
+
+ROM_START( starhrct )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x9800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr23626.ic22", 0x0000000, 0x200000, CRC(d5893a19) SHA1(861624ef3e5061b6ed9d6c4714e35fa508643b05) ) 
+	ROM_RELOAD( 0x400000, 0x200000)
+	ROM_LOAD( "28f640.ic1s",   0x0800000, 0x800000, CRC(e45ab26f) SHA1(1e40ae9778a026b0f4c3c9681cf5d08397b72c48) ) 
+	ROM_LOAD( "28f640.ic2s",   0x1000000, 0x800000, CRC(4d0e4e64) SHA1(4fe1c35f4cf34391eb1e4486bde92bd6104f05f2) ) 
+	ROM_LOAD( "28f640.ic3s",   0x1800000, 0x800000, CRC(a18c7ce7) SHA1(1e4fb63c0d8f901b077590ccc0af4bba3135f56c) ) 
+	ROM_LOAD( "28f640.ic4s",   0x2000000, 0x800000, CRC(82001b50) SHA1(d06e70d2ae4cf0635872663c5b6f1dbbd12897e0) ) 
+	ROM_LOAD( "28f640.ic5s",   0x2800000, 0x800000, CRC(5e4af8b2) SHA1(98598a0f5932cf79f54ff79cfa03632550dee373) ) 
+	ROM_LOAD( "28f640.ic6s",   0x3000000, 0x800000, CRC(2950c543) SHA1(041548e79afcadc1b0e3524432ed52320f395f3e) ) 
+	ROM_LOAD( "28f640.ic7s",   0x3800000, 0x800000, CRC(a2bb8ebb) SHA1(c5329cedf5f746c0d684d8dea301a0786909ea1d) ) 
+	ROM_LOAD( "28f640.ic8s",   0x4000000, 0x800000, CRC(fde9b537) SHA1(b186da26bef43b483fd32c486bb018dc631bf485) ) 
+	ROM_LOAD( "28f640.ic9s",   0x4800000, 0x800000, CRC(4db3e79a) SHA1(de2480792e7dfc01195000607be90fd4b29fdcc0) ) 
+	ROM_LOAD( "28f640.ic10s",  0x5000000, 0x800000, CRC(37167167) SHA1(e379d20bcda84e6aaa0b930dce95d97812cd45d6) ) 
+	ROM_LOAD( "28f640.ic11s",  0x5800000, 0x800000, CRC(927f1edb) SHA1(64f2f2f4546cc6b45ee78aeae68ce829cb57a124) ) 
+	ROM_LOAD( "28f640.ic12s",  0x6000000, 0x800000, CRC(05de610d) SHA1(715124a3e7a23589c4ca9f0dccd55a21f7d48123) ) 
+	ROM_LOAD( "28f640.ic13s",  0x6800000, 0x800000, CRC(17ed44c3) SHA1(ec34276006c3be7bd6d23c11314b0369a082e1ef) ) 
+	ROM_LOAD( "28f640.ic14s",  0x7000000, 0x800000, CRC(66d7e2a1) SHA1(69178d4995ac3c2d73d953544101d23da1812f65) ) 
+	ROM_LOAD( "28f640.ic15s",  0x7800000, 0x800000, CRC(0c701416) SHA1(6c9e882e2a00768f5e0a28d38a5695c65594d8dd) ) 
+	ROM_LOAD( "28f640.ic16s",  0x8000000, 0x800000, CRC(5d8e6e8d) SHA1(03045f3a9257632c325eba9752855b42355dff6c) ) 
+	ROM_LOAD( "28f640.ic17s",  0x8800000, 0x800000, CRC(b4c40606) SHA1(4f187dfe44bd89c90b6fa4b90f16222bc0a74d22) ) 
+	// .18s chip is not present but is tested for an FF fill (pull-up resistors on the PCB's data bus presumably accomplish this)
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(1557297e) SHA1(41e8a7a8eaf5076b124d378afdf97e328d100e72) ) 
+ROM_END
+
+ROM_START( starhrcl )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x7000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr23627.ic22", 0x0000000, 0x0400000, CRC(7caccc5e) SHA1(86bff30b76b4b02467b37341582062de5c507a39) ) 
+	ROM_LOAD( "mpr23275.ic1",  0x0800000, 0x1000000, CRC(ffc62eab) SHA1(bb9dd3cc6540de1c194df99d5629583216f4c557) ) 
+	ROM_LOAD( "mpr23276.ic2",  0x1800000, 0x1000000, CRC(8b7ce666) SHA1(2848786659349598e019fbb05c92ed3ce6e2ec11) ) 
+	ROM_LOAD( "mpr23277.ic3",  0x2800000, 0x1000000, CRC(47a6f9c5) SHA1(9af5c3129a44fcffb87b1b021d8812e0b695967f) ) 
+	ROM_LOAD( "mpr23278.ic4",  0x3800000, 0x1000000, CRC(c12b189c) SHA1(7743500400a4e23a5e97a53ee16775c32d9abd5d) ) 
+	ROM_LOAD( "mpr23279.ic5",  0x4800000, 0x1000000, CRC(b8b39559) SHA1(082c9b6926557654c3f3bf00d741f32c560b50ce) ) 
+	ROM_LOAD( "mpr23280.ic6",  0x5800000, 0x1000000, CRC(b1c8daa2) SHA1(a05fb374156ea013e35502abccc92f5117c39daa) ) 
+	ROM_LOAD( "mpr23281.ic7",  0x6800000, 0x0800000, CRC(c0378369) SHA1(c728a181eddb01b9f8574669d4550baed559a5a4) ) 
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(4929e940) SHA1(f8c4277ca0ae5e36b2eed033cc731b8fc4fccafc) ) 
+ROM_END
 
 /* GD-ROM titles - a PIC supplies a decryption key
 
@@ -8223,6 +8289,9 @@ ROM_END
 /* 0048 */ GAME( 2001, alienfnt, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Alien Front (Rev T)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0048 */ GAME( 2001, alienfnta, alienfnt,naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Alien Front (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0052 */ GAME( 2000, derbyo2k, naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Derby Owners Club 2000 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0054 */ GAME( 2000, starhrse, naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (big screens)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0055 */ GAME( 2000, starhrct, naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (server)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0056 */ GAME( 2000, starhrcl, naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (client)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0064 */ GAME( 2001, wrungp,   naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Wave Runner GP", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0068 */ GAME( 2001, crakndj2, naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ Part 2", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0073 */ GAME( 2001, inunoos,  naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Inu No Osanpo / Dog Walking (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
