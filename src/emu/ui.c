@@ -336,6 +336,11 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 	if (!first_time || (str > 0 && str < 60*5) || &machine.system() == &GAME_NAME(___empty) || (machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 
+	#ifdef SDLMAME_EMSCRIPTEN
+	// also disable for the JavaScript port since the startup screens do not run asynchronously
+	show_gameinfo = show_warnings = show_disclaimer = FALSE;
+	#endif
+
 	// loop over states
 	ui_set_handler(handler_ingame, 0);
 	for (state = 0; state < maxstate && !machine.scheduled_event_pending() && !ui_menu::stack_has_special_main_menu(); state++)
