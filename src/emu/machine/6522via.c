@@ -108,16 +108,6 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-inline void via6522_device::set_irq_line(int state)
-{
-	if (m_irq != state)
-	{
-		m_irq_handler(state);
-		m_irq = state;
-	}
-}
-
-
 UINT16 via6522_device::get_counter1_value()
 {
 	UINT16 val;
@@ -163,8 +153,7 @@ via6522_device::via6522_device(const machine_config &mconfig, const char *tag, d
 		m_in_cb1(0),
 		m_in_cb2(0),
 		m_pcr(0),
-		m_acr(0),
-		m_irq(CLEAR_LINE)
+		m_acr(0)
 {
 }
 
@@ -231,7 +220,6 @@ void via6522_device::device_start()
 	save_item(NAME(m_acr));
 	save_item(NAME(m_ier));
 	save_item(NAME(m_ifr));
-	save_item(NAME(m_irq));
 	save_item(NAME(m_t1_active));
 	save_item(NAME(m_t1_pb7));
 	save_item(NAME(m_t2_active));
@@ -278,22 +266,43 @@ void via6522_device::device_reset()
 }
 
 
+void via6522_device::output_irq()
+{
+	if (m_ier & m_ifr & 0x7f)
+	{
+		if ((m_ifr & INT_ANY) == 0)
+		{
+			m_ifr |= INT_ANY;
+			m_irq_handler(ASSERT_LINE);
+		}
+	}
+	else
+	{
+		if (m_ifr & INT_ANY)
+		{
+			m_ifr &= ~INT_ANY;
+			m_irq_handler(CLEAR_LINE);
+		}
+	}
+}
+
+
 /*-------------------------------------------------
     via_set_int - external interrupt check
 -------------------------------------------------*/
 
 void via6522_device::set_int(int data)
 {
-	m_ifr |= data;
-	if (TRACE_VIA)
+	if (!(m_ifr & data))
 	{
-		logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
-	}
+		m_ifr |= data;
 
-	if (m_ier & m_ifr)
-	{
-		m_ifr |= INT_ANY;
-		set_irq_line(ASSERT_LINE);
+		output_irq();
+
+		if (TRACE_VIA)
+		{
+			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
+		}
 	}
 }
 
@@ -304,20 +313,16 @@ void via6522_device::set_int(int data)
 
 void via6522_device::clear_int(int data)
 {
-	m_ifr = (m_ifr & ~data) & 0x7f;
+	if (m_ifr & data)
+	{
+		m_ifr &= ~data;
 
-	if (TRACE_VIA)
-	{
-		logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
-	}
+		output_irq();
 
-	if (m_ifr & m_ier)
-	{
-		m_ifr |= INT_ANY;
-	}
-	else
-	{
-		set_irq_line(CLEAR_LINE);
+		if (TRACE_VIA)
+		{
+			logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
+		}
 	}
 }
 
@@ -339,10 +344,7 @@ void via6522_device::shift_out()
 
 		if (m_shift_counter == 0)
 		{
-			if (!(m_ifr & INT_SR))
-			{
-				set_int(INT_SR);
-			}
+			set_int(INT_SR);
 		}
 	}
 }
@@ -355,10 +357,7 @@ void via6522_device::shift_in()
 
 	if (m_shift_counter == 0)
 	{
-		if (!(m_ifr & INT_SR))
-		{
-			set_int(INT_SR);
-		}
+		set_int(INT_SR);
 	}
 }
 
@@ -415,20 +414,14 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				output_pb();
 			}
 
-			if (!(m_ifr & INT_T1))
-			{
-				set_int(INT_T1);
-			}
+			set_int(INT_T1);
 			break;
 
 		case TIMER_T2:
 			m_t2_active = 0;
 			m_time2 = machine().time();
 
-			if (!(m_ifr & INT_T2))
-			{
-				set_int(INT_T2);
-			}
+			set_int(INT_T2);
 			break;
 
 		case TIMER_CA2:
@@ -828,22 +821,7 @@ WRITE8_MEMBER( via6522_device::write )
 			m_ier &= ~(data & 0x7f);
 		}
 
-		if (m_ifr & INT_ANY)
-		{
-			if (((m_ifr & m_ier) & 0x7f) == 0)
-			{
-				m_ifr &= ~INT_ANY;
-				set_irq_line(CLEAR_LINE);
-			}
-		}
-		else
-		{
-			if ((m_ier & m_ifr) & 0x7f)
-			{
-				m_ifr |= INT_ANY;
-				set_irq_line(ASSERT_LINE);
-			}
-		}
+		output_irq();
 		break;
 
 	case VIA_IFR:
@@ -906,13 +884,10 @@ WRITE_LINE_MEMBER( via6522_device::write_ca2 )
 	{
 		m_in_ca2 = state;
 
-		/* CA2 is in input mode */
 		if (CA2_INPUT(m_pcr))
 		{
-			/* handle the active transition */
 			if ((m_in_ca2 && CA2_LOW_TO_HIGH(m_pcr)) || (!m_in_ca2 && CA2_HIGH_TO_LOW(m_pcr)))
 			{
-				/* mark the IRQ */
 				set_int(INT_CA2);
 			}
 		}
@@ -976,13 +951,10 @@ WRITE_LINE_MEMBER( via6522_device::write_cb2 )
 	{
 		m_in_cb2 = state;
 
-		/* CB2 is in input mode */
 		if (CB2_INPUT(m_pcr))
 		{
-			/* handle the active transition */
 			if ((m_in_cb2 && CB2_LOW_TO_HIGH(m_pcr)) || (!m_in_cb2 && CB2_HIGH_TO_LOW(m_pcr)))
 			{
-				/* mark the IRQ */
 				set_int(INT_CB2);
 			}
 		}

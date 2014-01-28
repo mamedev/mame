@@ -136,7 +136,6 @@ private:
 
 	UINT16 get_counter1_value();
 
-	inline void set_irq_line(int state);
 	void set_int(int data);
 	void clear_int(int data);
 	void shift_out();
@@ -148,6 +147,7 @@ private:
 	void output_pa();
 	UINT8 input_pb();
 	void output_pb();
+	void output_irq();
 
 	// TODO: REMOVE THESE
 	devcb2_read8 m_in_a_handler;
@@ -193,7 +193,6 @@ private:
 	UINT8 m_acr;
 	UINT8 m_ier;
 	UINT8 m_ifr;
-	int m_irq;
 
 	emu_timer *m_t1;
 	attotime m_time1;
