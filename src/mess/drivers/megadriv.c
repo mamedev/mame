@@ -760,6 +760,12 @@ ROM_START( megacd2j )
 	ROMX_LOAD( "mpr-15398.bin", 0x000000,  0x020000, CRC(1e4344e6) SHA1(4d1251a6973d932e734ae5e8c6b9b55eb40e4143), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
 ROM_END
 
+ROM_START( aiwamcd )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	/* v2.11 */
+	ROM_LOAD( "mpr-15768-t.bin", 0x000000,  0x020000, CRC(8052c7a0) SHA1(219d284dcf63ce366a4dc6d1ff767a0d2eea283d) )
+ROM_END
+
 ROM_START( laseract )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_SYSTEM_BIOS(0, "v104", "v1.04")
@@ -770,8 +776,10 @@ ROM_END
 
 ROM_START( laseractj )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	/* v1.02 */
-	ROM_LOAD( "laseractive_bios_1_02_j.bin", 0x000000,  0x020000, CRC(00eedb3a) SHA1(26237b333db4a4c6770297fa5e655ea95840d5d9) )
+	ROM_SYSTEM_BIOS(0, "v105", "v1.05")
+	ROMX_LOAD( "mega-ld 1.05 bios.bin", 0x000000,  0x020000, CRC(474aaa44) SHA1(b3b1d880e288b6dc79eec0ff1b0480c229ec141d), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "v102", "v1.02")
+	ROMX_LOAD( "laseractive_bios_1_02_j.bin", 0x000000,  0x020000, CRC(00eedb3a) SHA1(26237b333db4a4c6770297fa5e655ea95840d5d9), ROM_BIOS(2) )
 ROM_END
 
 ROM_START( xeye )
@@ -852,6 +860,7 @@ CONS( 1991, megacda,    segacd,    0,      md_scd,          md, md_cons_state,  
 CONS( 1993, segacd2,    0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, megacd2,    segacd2,   0,      md_scd,          md, md_cons_state,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", GAME_NOT_WORKING )
 CONS( 1993, megacd2j,   segacd2,   0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD 2 (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, aiwamcd,    segacd2,   0,      mdj_scd,         md, md_cons_state,     md_jpn,    "AIWA",   "Mega-CD CSD-G1M (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, laseract,   0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Pioneer","LaserActive (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, laseractj,  laseract,  0,      mdj_scd,         md, md_cons_state,     md_jpn,    "Pioneer","LaserActive (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, xeye,       0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "JVC",    "X'eye (USA, NTSC)", GAME_NOT_WORKING )
