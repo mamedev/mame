@@ -43687,6 +43687,34 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+<!-- This is was on a Famicom PCB, but it already contains the US code... -->
+	<software name="batmanrjup" cloneof="batmanrj">
+		<description>Batman - Return of the Joker (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sunsoft5a" />
+			<feature name="pcb" value="SAP-E301" />
+			<feature name="ic1" value="SUNSOFT 5A" />
+			<feature name="ic2" value="74F04PC" />
+			<feature name="ic3" value="PRG" />
+			<feature name="ic4" value="CHR0" />
+			<feature name="ic5" value="HM6264ALP-12" />
+			<feature name="ic6" value="CHR1" />
+			<feature name="cart_back_label" value="REV-A" />
+			<dataarea name="prg" size="131072">
+				<rom name="batman roj final ver 0.0 prg" size="131072" crc="42fd0ab5" sha1="8208d96c73a3198828a567855fa76f35331497f3" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="batman roj final ver 0.0 c0" size="131072" crc="36862705" sha1="957a6b1475c1d81d26e6c2aa3b780d5e36c15334" offset="00000" status="baddump" />
+				<rom name="batman roj final ver 0.0 c1" size="131072" crc="53c6f23a" sha1="c5c68b8a2c94c4bab7a9d4396e204f6ce3684313" offset="0x020000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmanrnp" cloneof="batmanrn">
 		<description>Batman Returns (Euro, Prototype)</description>
 		<year>1993</year>
@@ -44318,6 +44346,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="choujin sentai - jetman (japan).prg" size="131072" crc="4ba8fcb6" sha1="aceeec662e83b7d31ac2a8a2e70992ade147159c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yeagerfc" supported="partial">
+		<description>Chuck Yeager's Fighter Combat (USA, Prototype)</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="262144">
+				<rom name="chuck yeager.prg" size="262144" crc="10c06e27" sha1="0fa6bb5ebaaba3637959749a55ca51a86c010b57" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 16k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -49700,6 +49747,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="taan hak fung wan king tank (c).prg" size="32768" crc="c62aabb9" sha1="f7c1986cf3b44d27c3132a37c133dd6031b77902" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warwheel">
+		<description>War on Wheels (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="war on wheels.chr" size="262144" crc="dc6a3592" sha1="0c1c87a2c5f7c0fe61599a3dac225a2992ec56a8" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="war on wheels.prg" size="131072" crc="600f3b47" sha1="df1f012507db9a8b3d805a83ad22ceee95474197" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- is this really present on cart? the game seems to work even without this, but the header of the
+			released dump has VRAM... pics would be nice to have! -->
+			<!-- 16k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -75938,7 +76006,7 @@ to check why this is different -->
 	</software>
 
 <!-- The UNIF file contained separate PRG/CHR banks -->
-	<software name="mc_s24" supported="no">
+	<software name="mc_s24" supported="partial">
 		<description>Super 24 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -75949,9 +76017,9 @@ to check why this is different -->
 				<!-- whole image -->
 				<!--rom name="super 24-in-1 [u][p1].chr" size="2097152" crc="5cba7311" sha1="67c9bfecc51d2db94a8349aa003f0cecf9760ca3" offset="00000" status="baddump" /-->
 				<rom name="super 24-in-1 [u][p1].chr0" size="524288" crc="e8d9a7c6" sha1="8b9d7e465f9d4c67d182e7fd9d928b8d54e9c124" offset="00000" status="baddump" />
-				<rom name="super 24-in-1 [u][p1].chr1" size="524288" crc="34dd0da5" sha1="94abcd9f55d8d8405ee60dd4f56901085ae1d7be" offset="00000" status="baddump" />
-				<rom name="super 24-in-1 [u][p1].chr2" size="524288" crc="8feb348d" sha1="0e06754084941b724324fff3276e21eebdcb9a14" offset="00000" status="baddump" />
-				<rom name="super 24-in-1 [u][p1].chr3" size="524288" crc="5c1d64ff" sha1="f2662c98129630cbe134d38a990c81717ab05186" offset="00000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].chr1" size="524288" crc="34dd0da5" sha1="94abcd9f55d8d8405ee60dd4f56901085ae1d7be" offset="0x080000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].chr2" size="524288" crc="8feb348d" sha1="0e06754084941b724324fff3276e21eebdcb9a14" offset="0x100000" status="baddump" />
+				<rom name="super 24-in-1 [u][p1].chr3" size="524288" crc="5c1d64ff" sha1="f2662c98129630cbe134d38a990c81717ab05186" offset="0x180000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="2621440">
 				<!-- whole image -->
