@@ -77,6 +77,7 @@ Notes:
       EPM7064        - Altera EPM7064QC100 CPLD (QFP100)
       CAT702         - Protection chip labelled 'TT10' (DIP20)
       *              - Unpopulated position for additional KM416V1204BT-L5 RAMs
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 FC PCB  K91X0721B  M43X0337B
@@ -320,6 +321,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "emu.h"
 #include "audio/taito_zm.h"
 #include "cpu/psx/psx.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/at28c16.h"
 #include "machine/ataflash.h"
 #include "machine/bankdev.h"
@@ -341,6 +343,7 @@ public:
 		m_zndip(*this,"maincpu:sio0:zndip"),
 		m_maincpu(*this, "maincpu"),
 		m_mn10200(*this, "mn10200"),
+		m_mcu(*this, "mcu"),
 		m_flashbank(*this, "flashbank"),
 		m_mb3773(*this, "mb3773"),
 		m_zoom(*this, "taito_zoom")
@@ -361,10 +364,10 @@ public:
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
-	DECLARE_MACHINE_RESET(coh3002t);
 
 protected:
 	virtual void driver_start();
+	virtual void machine_reset();
 
 private:
 	UINT8 m_control;
@@ -381,6 +384,7 @@ private:
 	required_device<zndip_device> m_zndip;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mn10200;
+	required_device<cpu_device> m_mcu;
 	required_device<address_map_bank_device> m_flashbank;
 	required_device<mb3773_device> m_mb3773;
 	required_device<taito_zoom_device> m_zoom;
@@ -553,12 +557,15 @@ void taitogn_state::driver_start()
 	m_znsec1->init(tt16);
 }
 
-MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
+void taitogn_state::machine_reset()
 {
 	m_control = 0;
 
+	// don't bother emulating the mcu until we have the rom dump
+	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
 	// halt sound CPU since it has no valid program at start
-	m_mn10200->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
+	m_mn10200->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
@@ -600,11 +607,26 @@ static ADDRESS_MAP_START( taitogn_mp_map, AS_PROGRAM, 32, taitogn_state )
 	AM_IMPORT_FROM(taitogn_map)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, taitogn_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM // internal ROM
+	AM_RANGE(0xfe00, 0xffff) AM_RAM // internal RAM, registers
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, taitogn_state )
+ADDRESS_MAP_END
+
+static const UPD7810_CONFIG upd_config =
+{
+	TYPE_7810,  /* should be TYPE_78081 */
+	NULL        /* io_callback */
+};
+
 SLOT_INTERFACE_START(slot_ataflash)
 	SLOT_INTERFACE("ataflash", ATA_FLASH_PCCARD)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( coh3002t, taitogn_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP(taitogn_map)
@@ -617,6 +639,11 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
 
+	MCFG_CPU_ADD("mcu", UPD7807, XTAL_5MHz) // should be UPD78081
+	MCFG_CPU_CONFIG(upd_config)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_IO_MAP(mcu_io_map)
+
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
 
@@ -626,8 +653,6 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
-
-	MCFG_MACHINE_RESET_OVERRIDE(taitogn_state, coh3002t )
 
 	MCFG_AT28C16_ADD( "at28c16", 0 )
 	MCFG_DEVICE_ADD("rf5c296", RF5C296, 0)

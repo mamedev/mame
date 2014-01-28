@@ -12,6 +12,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/psx/psx.h"
 #include "cpu/z80/z80.h"
+#include "cpu/upd7810/upd7810.h"
 #include "video/psx.h"
 #include "machine/at28c16.h"
 #include "machine/nvram.h"
@@ -43,6 +44,7 @@ public:
 		m_zndip(*this,"maincpu:sio0:zndip"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu"),
 		m_ram(*this, "maincpu:ram"),
 		m_cbaj_fifo1(*this, "cbaj_fifo1"),
 		m_cbaj_fifo2(*this, "cbaj_fifo2"),
@@ -109,6 +111,7 @@ public:
 
 protected:
 	virtual void driver_start();
+	virtual void machine_reset();
 
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
@@ -131,6 +134,7 @@ private:
 	required_device<zndip_device> m_zndip;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_mcu;
 	required_device<ram_device> m_ram;
 	optional_device<fifo7200_device> m_cbaj_fifo1;
 	optional_device<fifo7200_device> m_cbaj_fifo2;
@@ -428,6 +432,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, zn_state )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, zn_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM // internal ROM
+	AM_RANGE(0xfe00, 0xffff) AM_RAM // internal RAM, registers
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, zn_state )
+ADDRESS_MAP_END
+
+static const UPD7810_CONFIG upd_config =
+{
+	TYPE_7810,  /* should be TYPE_78081 */
+	NULL        /* io_callback */
+};
+
 void zn_state::driver_start()
 {
 	int n_game;
@@ -445,7 +463,14 @@ void zn_state::driver_start()
 	}
 }
 
+void zn_state::machine_reset()
+{
+	// don't bother emulating the mcu until we have the rom dump
+	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
@@ -457,6 +482,11 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
+
+	MCFG_CPU_ADD("mcu", UPD7807, XTAL_5MHz) // should be UPD78081
+	MCFG_CPU_CONFIG(upd_config)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_IO_MAP(mcu_io_map)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
@@ -476,6 +506,7 @@ static MACHINE_CONFIG_DERIVED( zn1_2mb_vram, zn1_1mb_vram )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( zn2, zn_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
@@ -487,6 +518,11 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
+
+	MCFG_CPU_ADD("mcu", UPD7807, XTAL_5MHz) // should be UPD78081
+	MCFG_CPU_CONFIG(upd_config)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_IO_MAP(mcu_io_map)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
@@ -557,6 +593,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'CP01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board (Gallop Racer)
@@ -669,6 +706,8 @@ DRIVER_INIT_MEMBER(zn_state,coh1000c)
 MACHINE_RESET_MEMBER(zn_state,coh1000c)
 {
 	membank("bankedroms")->set_base(memregion("maskroms")->base()+ 0x400000 ); /* banked game rom */
+	
+	machine_reset();
 }
 
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
@@ -776,6 +815,7 @@ Notes:
       EPM7064        - Altera EPM7064QC100 CPLD (QFP100)
       CAT702         - Protection chip labelled 'CP10' (DIP20)
       *              - Unpopulated position for additional KM416V1204BT-L5 RAMs
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -927,6 +967,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'TT01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -1033,6 +1074,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'TT01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -1117,6 +1159,8 @@ ADDRESS_MAP_END
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
+
+	machine_reset();
 }
 
 static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
@@ -1211,6 +1255,8 @@ DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked game rom */
+
+	machine_reset();
 }
 
 static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_2mb_vram)
@@ -1289,6 +1335,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'TW01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -1513,6 +1560,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'ET01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Beastorizer Game board
@@ -1630,6 +1678,8 @@ ADDRESS_MAP_END
 MACHINE_RESET_MEMBER(zn_state,coh1002e)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
+
+	machine_reset();
 }
 
 static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
@@ -1765,6 +1815,8 @@ ADDRESS_MAP_END
 MACHINE_RESET_MEMBER(zn_state,bam2)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + 0x400000 );
+
+	machine_reset();
 }
 
 static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
@@ -1850,6 +1902,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'AC01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -2108,6 +2161,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'AT01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -2203,6 +2257,8 @@ ADDRESS_MAP_END
 MACHINE_RESET_MEMBER(zn_state,coh1001l)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked rom */
+
+	machine_reset();
 }
 
 static ADDRESS_MAP_START( atlus_snd_map, AS_PROGRAM, 16, zn_state )
@@ -2257,6 +2313,8 @@ ADDRESS_MAP_END
 MACHINE_RESET_MEMBER(zn_state,coh1002v)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() ); /* banked rom */
+
+	machine_reset();
 }
 
 static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
@@ -2320,6 +2378,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'MG01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board with sound
@@ -2439,6 +2498,8 @@ ADDRESS_MAP_END
 MACHINE_RESET_MEMBER(zn_state,coh1002m)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
+
+	machine_reset();
 }
 
 static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
