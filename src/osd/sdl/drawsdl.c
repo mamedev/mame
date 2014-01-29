@@ -461,7 +461,7 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 			if (!found)
 			{
 				mame_printf_verbose("window: Scale mode %s not supported!\n", sm->name);
-				ui_popup_time(3, "Scale mode %s not supported!", sm->name);
+				window->machine().ui().popup_time(3, "Scale mode %s not supported!", sm->name);
 			}
 		}
 	}
