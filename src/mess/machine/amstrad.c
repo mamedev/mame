@@ -2710,18 +2710,18 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 		static UINT8 prev_x,prev_y;
 		UINT8 data_x, data_y;
 
-		m_amx_mouse_data = 0;
+		m_amx_mouse_data = 0x0f;
 		data_x = m_io_mouse1->read_safe(0) & 0xff;
 		data_y = m_io_mouse2->read_safe(0) & 0xff;
 
-		if(data_x < prev_x)
-			m_amx_mouse_data |= 0x08;
 		if(data_x > prev_x)
-			m_amx_mouse_data |= 0x04;
-		if(data_y < prev_y)
-			m_amx_mouse_data |= 0x02;
+			m_amx_mouse_data &= ~0x08;
+		if(data_x < prev_x)
+			m_amx_mouse_data &= ~0x04;
 		if(data_y > prev_y)
-			m_amx_mouse_data |= 0x01;
+			m_amx_mouse_data &= ~0x02;
+		if(data_y < prev_y)
+			m_amx_mouse_data &= ~0x01;
 		m_amx_mouse_data |= (m_io_mouse3->read_safe(0) << 4);
 		prev_x = data_x;
 		prev_y = data_y;
