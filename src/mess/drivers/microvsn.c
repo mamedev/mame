@@ -202,14 +202,32 @@ MACHINE_RESET_MEMBER(microvision_state, microvision)
 	}
 }
 
-
+#if 0
+// This works for bowling, vegas slots
 UINT32 microvision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for ( int i = 0; i < 16; i++ )
+	static UINT8 coord[16] = {3,2,1,0,7,6,5,4,11,10,9,8,15,14,13,12};
+
+	for ( UINT8 i = 0; i < 16; i++ )
 	{
-		for ( int j = 0; j < 16; j++ )
+		for ( UINT8 j = 0; j < 16; j++ )
 		{
-			bitmap.pix16(i,j) = m_lcd[i][j];
+			bitmap.pix16(i,j) = m_lcd [coord[i]] [coord[j]];
+		}
+	}
+
+	return 0;
+}
+#endif
+
+// this works for pinball, blockbuster, phaser strike (remainder: its unknown what they should look like)
+UINT32 microvision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for ( UINT8 i = 0; i < 16; i++ )
+	{
+		for ( UINT8 j = 0; j < 16; j++ )
+		{
+			bitmap.pix16(i,j) = m_lcd [i] [j];
 		}
 	}
 
