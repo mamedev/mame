@@ -367,10 +367,29 @@ As far as I know, the KC compact used HD6845S only.
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( amx_mouse )
+	PORT_START("mouse_input1")
+	PORT_BIT(0xff , 0, IPT_MOUSE_X)	PORT_SENSITIVITY(100) PORT_KEYDELTA(10)	PORT_PLAYER(1) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+
+	PORT_START("mouse_input2")
+	PORT_BIT(0xff , 0, IPT_MOUSE_Y)	PORT_SENSITIVITY(100) PORT_KEYDELTA(10)	PORT_PLAYER(1) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+
+	PORT_START("mouse_input3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+
+	PORT_START("controller_type")
+	PORT_CONFNAME( 0x01, 0x00, "Joystick port device" )
+	PORT_CONFSETTING(0x00, "2-button Joystick" )
+	PORT_CONFSETTING(0x01, "AMX mouse interface" )
+
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( cpc464 )
 	PORT_INCLUDE(amstrad_keyboard)
 	PORT_INCLUDE(crtc_links)
+	PORT_INCLUDE(amx_mouse)
 INPUT_PORTS_END
 
 
@@ -396,6 +415,7 @@ static INPUT_PORTS_START( cpc664 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad f4")             PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 
 	PORT_INCLUDE(crtc_links)
+	PORT_INCLUDE(amx_mouse)
 INPUT_PORTS_END
 
 
@@ -427,6 +447,7 @@ static INPUT_PORTS_START( cpc6128 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Control")               PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_SHIFT_2)
 
 	PORT_INCLUDE(crtc_links)
+	PORT_INCLUDE(amx_mouse)
 INPUT_PORTS_END
 
 
@@ -494,6 +515,7 @@ static INPUT_PORTS_START( cpc6128f )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)          PORT_CHAR('w') PORT_CHAR('W')
 
 	PORT_INCLUDE(crtc_links)
+	PORT_INCLUDE(amx_mouse)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cpc6128s )
@@ -551,12 +573,14 @@ static INPUT_PORTS_START( kccomp )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Control")               PORT_CODE(KEYCODE_LALT)       PORT_CHAR(UCHAR_SHIFT_2)
 
 	PORT_INCLUDE(crtc_links)
+	PORT_INCLUDE(amx_mouse)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( plus )
 	PORT_INCLUDE(amstrad_keyboard)
 	PORT_INCLUDE(crtc_links)
+	PORT_INCLUDE(amx_mouse)
 
 	/* The CPC+ and GX4000 adds support for analogue controllers.
 	   Up to two joysticks or four paddles can be used, although the ASIC supports twice that.
@@ -738,6 +762,7 @@ static INPUT_PORTS_START( aleste )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("Funny looking Russian symbol")     PORT_CODE(KEYCODE_END)
 
 	PORT_INCLUDE(crtc_links)
+	PORT_INCLUDE(amx_mouse)
 INPUT_PORTS_END
 
 

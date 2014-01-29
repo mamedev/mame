@@ -2668,6 +2668,10 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 
 		if (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F])
 		{
+			if((m_io_ctrltype->read_safe(0) == 1) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)  // joystick 1
+			{
+				return m_amx_mouse_data;
+			}
 			return keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0xFF;
 		}
 		return 0xFF;
@@ -2699,6 +2703,30 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 			m_asic.ram[0x2c0f] &= (0x40 >> m_plus_irq_cause/2);
 		}
 		return (m_asic.ram[0x2805] & 0xf8) | m_plus_irq_cause;
+	}
+	// update AMX mouse inputs (normally done every 1/300th of a second)
+	if(m_io_ctrltype->read_safe(0) == 1)
+	{
+		static UINT8 prev_x,prev_y;
+		UINT8 data_x, data_y;
+
+		m_amx_mouse_data = 0;
+		data_x = m_io_mouse1->read_safe(0) & 0xff;
+		data_y = m_io_mouse2->read_safe(0) & 0xff;
+
+		if(data_x < prev_x)
+			m_amx_mouse_data |= 0x08;
+		if(data_x > prev_x)
+			m_amx_mouse_data |= 0x04;
+		if(data_y < prev_y)
+			m_amx_mouse_data |= 0x02;
+		if(data_y > prev_y)
+			m_amx_mouse_data |= 0x01;
+		m_amx_mouse_data |= (m_io_mouse3->read_safe(0) << 4);
+		prev_x = data_x;
+		prev_y = data_y;
+
+		m_amx_mouse_data |= (m_io_keyboard_row_9->read_safe(0) & 0x80);  // DEL key
 	}
 	return 0xFF;
 }
