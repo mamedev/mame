@@ -308,6 +308,19 @@ WRITE_LINE_MEMBER( ibm5150_mb_device::keyboard_clock_w )
 	}
 }
 
+WRITE_LINE_MEMBER( ec1841_mb_device::keyboard_clock_w )
+{
+	if (!m_ppi_keyboard_clear && !state && !m_ppi_shift_enable)
+	{
+		m_ppi_shift_enable = m_ppi_shift_register & 0x01;
+
+		m_ppi_shift_register >>= 1;
+		m_ppi_shift_register |= m_ppi_data_signal << 7;
+
+		m_pic8259->ir1_w(m_ppi_shift_enable);
+		m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
+	}
+}
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
 {
@@ -445,6 +458,12 @@ static const pc_kbdc_interface pc_kbdc_intf =
 static const pc_kbdc_interface pc_kbdc_intf_5150 =
 {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5150_mb_device, keyboard_clock_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, keyboard_data_w)
+};
+
+static const pc_kbdc_interface pc_kbdc_intf_ec1841 =
+{
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ec1841_mb_device, keyboard_clock_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, keyboard_data_w)
 };
 
@@ -890,7 +909,7 @@ static MACHINE_CONFIG_FRAGMENT( ec1841_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
 
 	MCFG_DEVICE_REMOVE("pc_kbdc")
-	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf_5150)
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf_ec1841)
 MACHINE_CONFIG_END
 
 

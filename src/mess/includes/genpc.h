@@ -78,7 +78,7 @@ public:
 	IRQ_CALLBACK_MEMBER(pc_irq_callback);
 
 	// interface to the keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
 
 	virtual DECLARE_READ8_MEMBER ( pc_ppi_porta_r );
@@ -131,7 +131,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 
 protected:
 	// device-level overrides
@@ -173,6 +173,8 @@ protected:
 public:
 	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
 	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	
+	virtual DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 };
 
 
