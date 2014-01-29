@@ -143,6 +143,10 @@ public:
 		m_io_keyboard_row_10(*this, "keyboard_row_10"),
 		m_io_solder_links(*this, "solder_links"),
 		m_io_green_display(*this, "green_display"),
+		m_io_ctrltype(*this,"controller_type"),
+		m_io_mouse1(*this,"mouse_input1"),
+		m_io_mouse2(*this,"mouse_input2"),
+		m_io_mouse3(*this,"mouse_input3"),
 		m_io_analog1(*this, "analog1"),
 		m_io_analog2(*this, "analog2"),
 		m_io_analog3(*this, "analog3"),
@@ -182,6 +186,7 @@ public:
 	int m_printer_bit8_selected;
 	unsigned char m_Psg_FunctionSelected;
 	int m_previous_ppi_portc_w;
+	UINT8 m_amx_mouse_data;
 	DECLARE_WRITE8_MEMBER(amstrad_plus_asic_4000_w);
 	DECLARE_WRITE8_MEMBER(amstrad_plus_asic_6000_w);
 	DECLARE_READ8_MEMBER(amstrad_plus_asic_4000_r);
@@ -270,6 +275,10 @@ protected:
 	optional_ioport m_io_keyboard_row_10;
 	required_ioport m_io_solder_links;
 	required_ioport m_io_green_display;
+	optional_ioport m_io_ctrltype;
+	optional_ioport m_io_mouse1;
+	optional_ioport m_io_mouse2;
+	optional_ioport m_io_mouse3;
 	optional_ioport m_io_analog1;
 	optional_ioport m_io_analog2;
 	optional_ioport m_io_analog3;
