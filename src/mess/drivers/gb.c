@@ -595,7 +595,7 @@ static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state )
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE("custom", gameboy_sound_device, sound_r, sound_w)      /* sound controller */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE("custom", gameboy_sound_device, wave_r, wave_w)        /* Wave RAM */
-	AM_RANGE(0xff40, 0xff7f) AM_DEVREAD("lcd", cgb_lcd_device, video_r) AM_WRITE(gbc_io2_w)        /* Other I/O and video controller */
+	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(gbc_io2_r, gbc_io2_w)        /* Other I/O and video controller */
 	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* high RAM */
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w)        /* Interrupt enable register */
 ADDRESS_MAP_END
