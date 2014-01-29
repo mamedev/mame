@@ -30,11 +30,11 @@
 
 ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
-	driverlist = global_alloc_array(const game_driver *, driver_list::total()+1);
+	m_driverlist = global_alloc_array(const game_driver *, driver_list::total()+1);
 	build_driver_list();
 	if(gamename)
-		strcpy(search, gamename);
-	matchlist[0] = -1;
+		strcpy(m_search, gamename);
+	m_matchlist[0] = -1;
 }
 
 
@@ -44,8 +44,8 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 
 ui_menu_select_game::~ui_menu_select_game()
 {
-	global_free(drivlist);
-	global_free(driverlist);
+	global_free(m_drivlist);
+	global_free(m_driverlist);
 }
 
 
@@ -58,8 +58,8 @@ ui_menu_select_game::~ui_menu_select_game()
 void ui_menu_select_game::build_driver_list()
 {
 	// start with an empty list
-	drivlist = global_alloc(driver_enumerator(machine().options()));
-	drivlist->exclude_all();
+	m_drivlist = global_alloc(driver_enumerator(machine().options()));
+	m_drivlist->exclude_all();
 
 	// open a path to the ROMs and find them in the array
 	file_enumerator path(machine().options().media_path());
@@ -77,19 +77,19 @@ void ui_menu_select_game::build_driver_list()
 			*dst++ = tolower((UINT8)*src);
 		*dst = 0;
 
-		int drivnum = drivlist->find(drivername);
+		int drivnum = m_drivlist->find(drivername);
 		if (drivnum != -1)
-			drivlist->include(drivnum);
+			m_drivlist->include(drivnum);
 	}
 
 	// now build the final list
-	drivlist->reset();
+	m_drivlist->reset();
 	int listnum = 0;
-	while (drivlist->next())
-		driverlist[listnum++] = &drivlist->driver();
+	while (m_drivlist->next())
+		m_driverlist[listnum++] = &m_drivlist->driver();
 
 	// NULL-terminate
-	driverlist[listnum] = NULL;
+	m_driverlist[listnum] = NULL;
 }
 
 
@@ -108,11 +108,11 @@ void ui_menu_select_game::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		// reset the error on any future menu_event
-		if (error)
-			error = false;
+		if (m_error)
+			m_error = false;
 
 		// handle selections
-		else if (menu_event->iptkey == IPT_UI_SELECT)
+		else 
 		{
 			switch(menu_event->iptkey)
 			{
@@ -130,7 +130,7 @@ void ui_menu_select_game::handle()
 	}
 
 	// if we're in an error state, overlay an error message
-	if (error)
+	if (m_error)
 		machine().ui().draw_text_box(container,
 							"The selected game is missing one or more required ROM or CHD images. "
 							"Please select a different game.\n\nPress any key to continue.",
@@ -170,7 +170,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 		else
 		{
 			reset(UI_MENU_RESET_REMEMBER_REF);
-			error = true;
+			m_error = true;
 		}
 	}
 }
@@ -184,7 +184,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 {
 	// escape pressed with non-empty text clears the text
-	if (search[0] != 0)
+	if (m_search[0] != 0)
 	{
 		// since we have already been popped, we must recreate ourself from scratch
 		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, NULL)));
@@ -198,21 +198,21 @@ void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 
 void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 {
-	int buflen = strlen(search);
+	int buflen = strlen(m_search);
 
 	// if it's a backspace and we can handle it, do so
 	if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
 	{
-		*(char *)utf8_previous_char(&search[buflen]) = 0;
-		rerandomize = true;
+		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
+		m_rerandomize = true;
 		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
 
 	// if it's any other key and we're not maxed out, update
 	else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
 	{
-		buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
-		search[buflen] = 0;
+		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
+		m_search[buflen] = 0;
 		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
 }
@@ -227,8 +227,8 @@ void ui_menu_select_game::populate()
 	int matchcount;
 	int curitem;
 
-	for (curitem = matchcount = 0; driverlist[curitem] != NULL && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
-		if (!(driverlist[curitem]->flags & GAME_NO_STANDALONE))
+	for (curitem = matchcount = 0; m_driverlist[curitem] != NULL && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
+		if (!(m_driverlist[curitem]->flags & GAME_NO_STANDALONE))
 			matchcount++;
 
 	// if nothing there, add a single multiline item and return
@@ -246,19 +246,19 @@ void ui_menu_select_game::populate()
 	}
 
 	// otherwise, rebuild the match list
-	assert(drivlist != NULL);
-	if (search[0] != 0 || matchlist[0] == -1 || rerandomize)
-		drivlist->find_approximate_matches(search, matchcount, matchlist);
-	rerandomize = false;
+	assert(m_drivlist != NULL);
+	if (m_search[0] != 0 || m_matchlist[0] == -1 || m_rerandomize)
+		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
+	m_rerandomize = false;
 
 	// iterate over entries
 	for (curitem = 0; curitem < matchcount; curitem++)
 	{
-		int curmatch = matchlist[curitem];
+		int curmatch = m_matchlist[curitem];
 		if (curmatch != -1)
 		{
-			int cloneof = drivlist->non_bios_clone(curmatch);
-			item_append(drivlist->driver(curmatch).name, drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)&drivlist->driver(curmatch));
+			int cloneof = m_drivlist->non_bios_clone(curmatch);
+			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
 		}
 	}
 
@@ -289,8 +289,8 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	int line;
 
 	// display the current typeahead
-	if (search[0] != 0)
-		tempbuf[0].printf("Type name or select: %s_", search);
+	if (m_search[0] != 0)
+		tempbuf[0].printf("Type name or select: %s_", m_search);
 	else
 		tempbuf[0].printf("Type name or select: (random)");
 

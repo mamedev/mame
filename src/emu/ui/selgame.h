@@ -29,15 +29,16 @@ public:
 	static void force_game_select(running_machine &machine, render_container *container);
 
 private:
+	// internal state
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
-	UINT8               error;
-	UINT8               rerandomize;
-	char                search[40];
-	int                 matchlist[VISIBLE_GAMES_IN_LIST];
-	const game_driver   **driverlist;
+	UINT8					m_error;
+	UINT8					m_rerandomize;
+	char					m_search[40];
+	int						m_matchlist[VISIBLE_GAMES_IN_LIST];
+	const game_driver **	m_driverlist;
+	driver_enumerator *		m_drivlist;
 
-	driver_enumerator *drivlist;
-
+	// internal methods
 	void build_driver_list();
 	void inkey_select(const ui_menu_event *menu_event);
 	void inkey_cancel(const ui_menu_event *menu_event);
