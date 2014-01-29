@@ -15,7 +15,7 @@
 #include "png.h"
 #include "harddisk.h"
 #include "config.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 
 #define LOG_LOAD 0
@@ -487,7 +487,8 @@ static void display_loading_rom_message(romload_private *romdata, const char *na
 	else
 		sprintf(buffer, "Loading Complete");
 
-	if (!ui_is_menu_active()) ui_set_startup_text(romdata->machine(), buffer, FALSE);
+	if (!romdata->machine().ui().is_menu_active())
+		romdata->machine().ui().set_startup_text(buffer, false);
 }
 
 

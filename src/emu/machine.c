@@ -261,7 +261,7 @@ void running_machine::start()
 
 	// create the video manager
 	m_video = auto_alloc(*this, video_manager(*this));
-	ui_init(*this);
+	m_ui = auto_alloc(*this, ui_manager(*this));
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -307,7 +307,7 @@ void running_machine::start()
 	// call the game driver's init function
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important
-	ui_set_startup_text(*this, "Initializing...", true);
+	ui().set_startup_text("Initializing...", true);
 
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(running_machine::reset_all_devices), this));
@@ -389,10 +389,10 @@ int running_machine::run(bool firstrun)
 		sound().ui_mute(false);
 
 		// initialize ui lists
-		ui_initialize(*this);
+		ui().initialize(*this);
 
 		// display the startup screens
-		ui_display_startup_screens(*this, firstrun, !settingsloaded);
+		ui().display_startup_screens(firstrun, !settingsloaded);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();

@@ -10,7 +10,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "uiinput.h"
 #include "render.h"
 #include "rendfont.h"
@@ -255,7 +255,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 	int total = state->palette.which ? colortable_palette_get_size(machine.colortable) : machine.total_colors();
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
 	const rgb_t *raw_color = palette_entry_list_raw(machine.palette);
-	render_font *ui_font = ui_get_font(machine);
+	render_font *ui_font = machine.ui().get_font();
 	float cellwidth, cellheight;
 	float chwidth, chheight;
 	float titlewidth;
@@ -265,7 +265,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 	int x, y, skip;
 
 	// add a half character padding for the box 
-	chheight = ui_get_line_height(machine);
+	chheight = machine.ui().get_line_height();
 	chwidth = ui_font->char_width(chheight, machine.render().ui_aspect(), '0');
 	boxbounds.x0 = 0.0f + 0.5f * chwidth;
 	boxbounds.x1 = 1.0f - 0.5f * chwidth;
@@ -292,7 +292,7 @@ static void palette_handler(running_machine &machine, render_container *containe
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
 
 	// go ahead and draw the outer box now 
-	ui_draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
+	machine.ui().draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
 
 	// draw the title 
 	x0 = 0.5f - 0.5f * titlewidth;
@@ -440,7 +440,7 @@ static void palette_handle_keys(running_machine &machine, ui_gfx_state *state)
 
 static void gfxset_handler(running_machine &machine, render_container *container, ui_gfx_state *state)
 {
-	render_font *ui_font = ui_get_font(machine);
+	render_font *ui_font = machine.ui().get_font();
 	int set = state->gfxset.set;
 	gfx_element *gfx = machine.gfx[set];
 	float fullwidth, fullheight;
@@ -461,7 +461,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 	char title[100];
 
 	// add a half character padding for the box 
-	chheight = ui_get_line_height(machine);
+	chheight = machine.ui().get_line_height();
 	chwidth = ui_font->char_width(chheight, machine.render().ui_aspect(), '0');
 	boxbounds.x0 = 0.0f + 0.5f * chwidth;
 	boxbounds.x1 = 1.0f - 0.5f * chwidth;
@@ -533,7 +533,7 @@ static void gfxset_handler(running_machine &machine, render_container *container
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
 
 	// go ahead and draw the outer box now 
-	ui_draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
+	machine.ui().draw_outlined_box(container, boxbounds.x0 - x0, boxbounds.y0, boxbounds.x1 + x0, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
 
 	// draw the title 
 	x0 = 0.5f - 0.5f * titlewidth;
@@ -844,7 +844,7 @@ static void gfxset_draw_item(running_machine &machine, gfx_element *gfx, int ind
 
 static void tilemap_handler(running_machine &machine, render_container *container, ui_gfx_state *state)
 {
-	render_font *ui_font = ui_get_font(machine);
+	render_font *ui_font = machine.ui().get_font();
 	float chwidth, chheight;
 	render_bounds mapboxbounds;
 	render_bounds boxbounds;
@@ -866,7 +866,7 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 		{ UINT32 temp = mapwidth; mapwidth = mapheight; mapheight = temp; }
 
 	// add a half character padding for the box 
-	chheight = ui_get_line_height(machine);
+	chheight = machine.ui().get_line_height();
 	chwidth = ui_font->char_width(chheight, machine.render().ui_aspect(), '0');
 	boxbounds.x0 = 0.0f + 0.5f * chwidth;
 	boxbounds.x1 = 1.0f - 0.5f * chwidth;
@@ -922,7 +922,7 @@ static void tilemap_handler(running_machine &machine, render_container *containe
 	}
 
 	// go ahead and draw the outer box now 
-	ui_draw_outlined_box(container, boxbounds.x0, boxbounds.y0, boxbounds.x1, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
+	machine.ui().draw_outlined_box(container, boxbounds.x0, boxbounds.y0, boxbounds.x1, boxbounds.y1, UI_GFXVIEWER_BG_COLOR);
 
 	// draw the title 
 	x0 = 0.5f - 0.5f * titlewidth;

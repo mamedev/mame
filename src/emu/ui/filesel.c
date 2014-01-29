@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "zippath.h"
 #include "ui/menu.h"
 #include "ui/filesel.h"
@@ -78,7 +78,7 @@ static void extra_text_draw_box(render_container *container, float origx1, float
 	float x1, y1, x2, y2, temp;
 
 	// get the size of the text
-	ui_draw_text_full(container,text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD,
+	container->manager().machine().ui().draw_text_full(container,text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD,
 		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &text_width, &text_height);
 	width = text_width + (2 * UI_BOX_LR_BORDER);
 	maxwidth = MAX(width, origx2 - origx1);
@@ -97,7 +97,7 @@ static void extra_text_draw_box(render_container *container, float origx1, float
 	}
 
 	// draw a box
-	ui_draw_outlined_box(container,x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	container->manager().machine().ui().draw_outlined_box(container,x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -106,7 +106,7 @@ static void extra_text_draw_box(render_container *container, float origx1, float
 	y2 -= UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui_draw_text_full(container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
+	container->manager().machine().ui().draw_text_full(container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
 						DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 }
 
@@ -284,7 +284,7 @@ void ui_menu_file_create::populate()
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Create", NULL, 0, ITEMREF_CREATE);
 
-	customtop = ui_get_line_height(machine()) + 3.0f * UI_BOX_TB_BORDER;
+	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 
@@ -313,7 +313,7 @@ void ui_menu_file_create::handle()
 						ui_menu::stack_pop(machine());
 					}
 					else
-						ui_popup_time(1, "Please enter a file extension too");
+						machine().ui().popup_time(1, "Please enter a file extension too");
 				}
 				break;
 
@@ -606,7 +606,7 @@ void ui_menu_file_selector::populate()
 		set_selection((void *) selected_entry);
 
 	// set up custom render proc
-	customtop = ui_get_line_height(machine()) + 3.0f * UI_BOX_TB_BORDER;
+	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 
 done:
 	if (directory != NULL)
@@ -659,7 +659,7 @@ void ui_menu_file_selector::handle()
 					if (err != FILERR_NONE)
 					{
 						// this path is problematic; present the user with an error and bail
-						ui_popup_time(1, "Error accessing %s", entry->fullpath);
+						machine().ui().popup_time(1, "Error accessing %s", entry->fullpath);
 						break;
 					}
 					m_current_directory.cpy(entry->fullpath);
@@ -690,7 +690,7 @@ void ui_menu_file_selector::handle()
 				update_selected = TRUE;
 
 				if (ARRAY_LENGTH(m_filename_buffer) > 0)
-					ui_popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					machine().ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 			}
 			// if it's any other key and we're not maxed out, update
 			else if (event->unichar >= ' ' && event->unichar < 0x7f)
@@ -700,7 +700,7 @@ void ui_menu_file_selector::handle()
 				update_selected = TRUE;
 
 				if (ARRAY_LENGTH(m_filename_buffer) > 0)
-					ui_popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					machine().ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 			}
 
 			if (update_selected)

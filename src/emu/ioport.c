@@ -95,7 +95,7 @@
 #include "config.h"
 #include "xmlfile.h"
 #include "profiler.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "uiinput.h"
 #include "debug/debugcon.h"
 
@@ -2031,7 +2031,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 	}
 
 	// if UI is active, ignore digital inputs
-	if (ui_is_menu_active())
+	if (machine().ui().is_menu_active())
 		return;
 
 	// if the state changed, look for switch down/switch up
@@ -2044,7 +2044,7 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 	}
 
 	// if we're a keyboard type and using natural keyboard, bail
-	if (m_type == IPT_KEYBOARD && ui_get_use_natural_keyboard(machine()))
+	if (m_type == IPT_KEYBOARD && machine().ui().use_natural_keyboard())
 		return;
 
 	// coin impulse option
@@ -2106,12 +2106,12 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 		if (machine().options().coin_lockout())
 		{
 			if (verbose)
-				ui_popup_time(3, "Coinlock disabled %s.", name());
+				machine().ui().popup_time(3, "Coinlock disabled %s.", name());
 			curstate = false;
 		}
 		else
 			if (verbose)
-				ui_popup_time(3, "Coinlock disabled, but broken through %s.", name());
+				machine().ui().popup_time(3, "Coinlock disabled, but broken through %s.", name());
 	}
 
 	// if we're active, set the appropriate bits in the digital state

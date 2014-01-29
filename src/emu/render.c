@@ -45,7 +45,7 @@
 #include "config.h"
 #include "drivenum.h"
 #include "xmlfile.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 
 
@@ -1916,7 +1916,7 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 	// convert target coordinates to float
 	float target_fx = (float)(target_x - root_xform.xoffs) / viswidth;
 	float target_fy = (float)(target_y - root_xform.yoffs) / visheight;
-	if (ui_is_menu_active())
+	if (manager().machine().ui().is_menu_active())
 	{
 		target_fx = (float)target_x / m_width;
 		target_fy = (float)target_y / m_height;

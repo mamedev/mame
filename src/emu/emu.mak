@@ -141,8 +141,8 @@ EMUOBJS = \
 	$(EMUOBJ)/sprite.o \
 	$(EMUOBJ)/tilemap.o \
 	$(EMUOBJ)/timer.o \
-	$(EMUOBJ)/ui.o \
 	$(EMUOBJ)/uiinput.o \
+	$(EMUOBJ)/ui/ui.o \
 	$(EMUOBJ)/ui/swlist.o \
 	$(EMUOBJ)/ui/menu.o \
 	$(EMUOBJ)/ui/mainmenu.o \

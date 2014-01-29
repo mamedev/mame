@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "osdnet.h"
 #include "emuopts.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"

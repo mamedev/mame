@@ -112,7 +112,7 @@ the decryption keys.
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "includes/cps1.h"
 
 
@@ -674,7 +674,7 @@ static void cps2_decrypt(running_machine &machine, const UINT32 *master_key, UIN
 		{
 			char loadingMessage[256]; // for displaying with UI
 			sprintf(loadingMessage, "Decrypting %d%%", i*100/0x10000);
-			ui_set_startup_text(machine, loadingMessage,FALSE);
+			machine.ui().set_startup_text(loadingMessage,FALSE);
 		}
 
 

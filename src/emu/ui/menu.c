@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "rendutil.h"
 #include "uiinput.h"
 #include "cheat.h"
@@ -401,7 +401,7 @@ void ui_menu::set_selection(void *selected_itemref)
 
 void ui_menu::draw(bool customonly)
 {
-	float line_height = ui_get_line_height(machine());
+	float line_height = machine().ui().get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float gutter_width = lr_arrow_width * 1.3f;
@@ -429,11 +429,11 @@ void ui_menu::draw(bool customonly)
 		float total_width;
 
 		/* compute width of left hand side */
-		total_width = gutter_width + ui_get_string_width(machine(), pitem.text) + gutter_width;
+		total_width = gutter_width + machine().ui().get_string_width(pitem.text) + gutter_width;
 
 		/* add in width of right hand side */
 		if (pitem.subtext)
-			total_width += 2.0f * gutter_width + ui_get_string_width(machine(), pitem.subtext);
+			total_width += 2.0f * gutter_width + machine().ui().get_string_width(pitem.subtext);
 
 		/* track the maximum */
 		if (total_width > visible_width)
@@ -474,7 +474,7 @@ void ui_menu::draw(bool customonly)
 	x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
 	y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
 	if (!customonly)
-		ui_draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+		machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	/* determine the first visible line based on the current selection */
 	top_line = selected - visible_lines / 2;
@@ -579,7 +579,7 @@ void ui_menu::draw(bool customonly)
 
 			/* if we don't have a subitem, just draw the string centered */
 			else if (pitem.subtext == NULL)
-				ui_draw_text_full(container, itemtext, effective_left, line_y, effective_width,
+				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
 							JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, NULL, NULL);
 
 			/* otherwise, draw the item on the left and the subitem text on the right */
@@ -590,14 +590,14 @@ void ui_menu::draw(bool customonly)
 				float item_width, subitem_width;
 
 				/* draw the left-side text */
-				ui_draw_text_full(container, itemtext, effective_left, line_y, effective_width,
+				machine().ui().draw_text_full(container, itemtext, effective_left, line_y, effective_width,
 							JUSTIFY_LEFT, WRAP_TRUNCATE, DRAW_NORMAL, fgcolor, bgcolor, &item_width, NULL);
 
 				/* give 2 spaces worth of padding */
 				item_width += 2.0f * gutter_width;
 
 				/* if the subitem doesn't fit here, display dots */
-				if (ui_get_string_width(machine(), subitem_text) > effective_width - item_width)
+				if (machine().ui().get_string_width(subitem_text) > effective_width - item_width)
 				{
 					subitem_text = "...";
 					if (itemnum == selected)
@@ -605,7 +605,7 @@ void ui_menu::draw(bool customonly)
 				}
 
 				/* draw the subitem right-justified */
-				ui_draw_text_full(container, subitem_text, effective_left + item_width, line_y, effective_width - item_width,
+				machine().ui().draw_text_full(container, subitem_text, effective_left + item_width, line_y, effective_width - item_width,
 							JUSTIFY_RIGHT, WRAP_TRUNCATE, DRAW_NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, NULL);
 
 				/* apply arrows */
@@ -645,7 +645,7 @@ void ui_menu::draw(bool customonly)
 		float target_x, target_y;
 
 		/* compute the multi-line target width/height */
-		ui_draw_text_full(container, pitem.subtext, 0, 0, visible_width * 0.75f,
+		machine().ui().draw_text_full(container, pitem.subtext, 0, 0, visible_width * 0.75f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
 
 		/* determine the target location */
@@ -655,11 +655,11 @@ void ui_menu::draw(bool customonly)
 			target_y = line_y - target_height - UI_BOX_TB_BORDER;
 
 		/* add a box around that */
-		ui_draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
+		machine().ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
 							target_y - UI_BOX_TB_BORDER,
 							target_x + target_width + UI_BOX_LR_BORDER,
 							target_y + target_height + UI_BOX_TB_BORDER, subitem_invert ? UI_SELECTED_BG_COLOR : UI_BACKGROUND_COLOR);
-		ui_draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
+		machine().ui().draw_text_full(container, pitem.subtext, target_x, target_y, target_width,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 	}
 
@@ -684,21 +684,21 @@ void ui_menu::draw_text_box()
 {
 	const char *text = item[0].text;
 	const char *backtext = item[1].text;
-	float line_height = ui_get_line_height(machine());
+	float line_height = machine().ui().get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	float gutter_width = lr_arrow_width;
 	float target_width, target_height, prior_width;
 	float target_x, target_y;
 
 	/* compute the multi-line target width/height */
-	ui_draw_text_full(container, text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER - 2.0f * gutter_width,
+	machine().ui().draw_text_full(container, text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER - 2.0f * gutter_width,
 				JUSTIFY_LEFT, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
 	target_height += 2.0f * line_height;
 	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
 		target_height = floor((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
 
 	/* maximum against "return to prior menu" text */
-	prior_width = ui_get_string_width(machine(), backtext) + 2.0f * gutter_width;
+	prior_width = machine().ui().get_string_width(backtext) + 2.0f * gutter_width;
 	target_width = MAX(target_width, prior_width);
 
 	/* determine the target location */
@@ -716,11 +716,11 @@ void ui_menu::draw_text_box()
 		target_y = 1.0f - UI_BOX_TB_BORDER - target_height;
 
 	/* add a box around that */
-	ui_draw_outlined_box(container, target_x - UI_BOX_LR_BORDER - gutter_width,
+	machine().ui().draw_outlined_box(container, target_x - UI_BOX_LR_BORDER - gutter_width,
 						target_y - UI_BOX_TB_BORDER,
 						target_x + target_width + gutter_width + UI_BOX_LR_BORDER,
 						target_y + target_height + UI_BOX_TB_BORDER, (item[0].flags & MENU_FLAG_REDTEXT) ?  UI_RED_COLOR : UI_BACKGROUND_COLOR);
-	ui_draw_text_full(container, text, target_x, target_y, target_width,
+	machine().ui().draw_text_full(container, text, target_x, target_y, target_width,
 				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	/* draw the "return to prior menu" text with a hilight behind it */
@@ -732,7 +732,7 @@ void ui_menu::draw_text_box()
 						UI_SELECTED_BG_COLOR,
 						hilight_texture,
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-	ui_draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
+	machine().ui().draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
 				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 
 	/* artificially set the hover to the last item so a double-click exits */
@@ -1049,7 +1049,7 @@ UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container
 	clear_free_list(machine);
 
 	/* if the menus are to be hidden, return a cancel here */
-	if (ui_is_menu_active() && ((ui_input_pressed(machine, IPT_UI_CONFIGURE) && !stack_has_special_main_menu()) || menu_stack == NULL))
+	if (machine.ui().is_menu_active() && ((ui_input_pressed(machine, IPT_UI_CONFIGURE) && !stack_has_special_main_menu()) || menu_stack == NULL))
 		return UI_HANDLER_CANCEL;
 
 	return 0;

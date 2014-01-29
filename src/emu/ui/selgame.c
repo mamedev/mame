@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "osdnet.h"
 #include "emuopts.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "rendutil.h"
 #include "cheat.h"
 #include "uiinput.h"
@@ -131,7 +131,7 @@ void ui_menu_select_game::handle()
 
 	// if we're in an error state, overlay an error message
 	if (error)
-		ui_draw_text_box(container,
+		machine().ui().draw_text_box(container,
 							"The selected game is missing one or more required ROM or CHD images. "
 							"Please select a different game.\n\nPress any key to continue.",
 							JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
@@ -270,8 +270,8 @@ void ui_menu_select_game::populate()
 	}
 
 	// configure the custom rendering
-	customtop = ui_get_line_height(machine()) + 3.0f * UI_BOX_TB_BORDER;
-	custombottom = 4.0f * ui_get_line_height(machine()) + 3.0f * UI_BOX_TB_BORDER;
+	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = 4.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 
@@ -295,7 +295,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		tempbuf[0].printf("Type name or select: (random)");
 
 	// get the size of the text
-	ui_draw_text_full(container, tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
@@ -307,7 +307,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui_draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -316,7 +316,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	y2 -= UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui_draw_text_full(container, tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	// determine the text to render below
@@ -386,7 +386,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	maxwidth = origx2 - origx1;
 	for (line = 0; line < 4; line++)
 	{
-		ui_draw_text_full(container, tempbuf[line], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		machine().ui().draw_text_full(container, tempbuf[line], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 							DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
@@ -406,7 +406,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		color = UI_YELLOW_COLOR;
 	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
 		color = UI_RED_COLOR;
-	ui_draw_outlined_box(container, x1, y1, x2, y2, color);
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, color);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -417,9 +417,9 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	// draw all lines
 	for (line = 0; line < 4; line++)
 	{
-		ui_draw_text_full(container, tempbuf[line], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		machine().ui().draw_text_full(container, tempbuf[line], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 							DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
-		y1 += ui_get_line_height(machine());
+		y1 += machine().ui().get_line_height();
 	}
 }
 
@@ -443,7 +443,7 @@ void ui_menu_select_game::force_game_select(running_machine &machine, render_con
 	ui_menu::stack_push(auto_alloc_clear(machine, ui_menu_select_game(machine, container, gamename)));
 
 	// force the menus on
-	ui_show_menu();
+	machine.ui().show_menu();
 
 	// make sure MAME is paused
 	machine.pause();

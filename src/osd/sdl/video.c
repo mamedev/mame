@@ -40,7 +40,7 @@
 // MAME headers
 #include "emu.h"
 #include "rendutil.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "emuopts.h"
 #include "uiinput.h"
 

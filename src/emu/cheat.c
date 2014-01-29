@@ -75,7 +75,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "xmlfile.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "cheat.h"
 #include "debug/debugcpu.h"
 
@@ -1231,8 +1231,8 @@ void cheat_manager::render_text(render_container &container)
 		if (m_output[linenum])
 		{
 			// output the text
-			ui_draw_text_full(&container, m_output[linenum],
-					0.0f, (float)linenum * ui_get_line_height(machine()), 1.0f,
+			machine().ui().draw_text_full(&container, m_output[linenum],
+					0.0f, (float)linenum * machine().ui().get_line_height(), 1.0f,
 					m_justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
 					ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 		}
@@ -1354,7 +1354,7 @@ void cheat_manager::frame_update()
 {
 	// set up for accumulating output
 	m_lastline = 0;
-	m_numlines = floor(1.0f / ui_get_line_height(machine()));
+	m_numlines = floor(1.0f / machine().ui().get_line_height());
 	m_numlines = MIN(m_numlines, ARRAY_LENGTH(m_output));
 	for (int linenum = 0; linenum < ARRAY_LENGTH(m_output); linenum++)
 		m_output[linenum].reset();

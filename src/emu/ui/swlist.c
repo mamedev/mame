@@ -10,7 +10,7 @@
  *********************************************************************/
 
 #include "emu.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "ui/swlist.h"
 
 
@@ -285,7 +285,7 @@ void ui_menu_software_list::handle()
 				update_selected = true;
 
 				if (ARRAY_LENGTH(m_filename_buffer) > 0)
-					ui_popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					machine().ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 			}
 			// if it's any other key and we're not maxed out, update
 			else if (event->unichar >= ' ' && event->unichar < 0x7f)
@@ -295,7 +295,7 @@ void ui_menu_software_list::handle()
 				update_selected = true;
 
 				if (ARRAY_LENGTH(m_filename_buffer) > 0)
-					ui_popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
+					machine().ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename_buffer);
 			}
 
 			if (update_selected)

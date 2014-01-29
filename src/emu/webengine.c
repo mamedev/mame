@@ -12,7 +12,7 @@
 #include "web/json/json.h"
 #include "emu.h"
 #include "emuopts.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "webengine.h"
 
 
@@ -117,7 +117,7 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 	Json::Value array(Json::arrayValue);
 
 	/* add all sliders */
-	for (curslider = ui_get_slider_list(); curslider != NULL; curslider = curslider->next)
+	for (curslider = machine().ui().get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
 		Json::Value data;
@@ -237,7 +237,7 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		int cnt = 0;
 		int id = atoi(cmd_id);
 		const slider_state *curslider;
-		for (curslider = ui_get_slider_list(); curslider != NULL; curslider = curslider->next)
+		for (curslider = machine().ui().get_slider_list(); curslider != NULL; curslider = curslider->next)
 		{
 			if (cnt==id)
 				(*curslider->update)(machine(), curslider->arg, NULL, atoi(cmd_val));

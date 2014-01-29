@@ -16,7 +16,7 @@
 #include <stdlib.h>
 
 #include "emu.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "ui/swlist.h"
 #include "ui/filemngr.h"
 #include "ui/filesel.h"
@@ -107,7 +107,7 @@ void ui_menu_file_manager::populate()
 		item_append(buffer, tmp_name.cstr(), 0, (void *) image);
 	}
 
-	custombottom = ui_get_line_height(machine()) + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 

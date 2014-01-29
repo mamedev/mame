@@ -13,7 +13,7 @@
 #include "png.h"
 #include "debugger.h"
 #include "debugint/debugint.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "aviio.h"
 #include "crsshair.h"
 #include "rendersw.c"
@@ -209,7 +209,7 @@ void video_manager::frame_update(bool debug)
 	}
 
 	// draw the user interface
-	ui_update_and_render(machine(), &machine().render().ui_container());
+	machine().ui().update_and_render(&machine().render().ui_container());
 
 	// update the internal render debugger
 	debugint_update_during_game(machine());
@@ -593,7 +593,7 @@ inline int video_manager::effective_frameskip() const
 inline bool video_manager::effective_throttle() const
 {
 	// if we're paused, or if the UI is active, we always throttle
-	if (machine().paused() || ui_is_menu_active())
+	if (machine().paused() || machine().ui().is_menu_active())
 		return true;
 
 	// if we're fast forwarding, we don't throttle

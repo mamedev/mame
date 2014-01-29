@@ -22,7 +22,7 @@
 #include "video/vector.h"
 #include "render.h"
 #include "rendutil.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "uiinput.h"
 
 // MAMEOS headers
