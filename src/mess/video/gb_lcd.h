@@ -13,15 +13,6 @@
 #define _NR_GB_VID_REGS     0x40
 
 
-enum
-{
-	GB_VIDEO_DMG = 1,
-	GB_VIDEO_MGB,
-	GB_VIDEO_SGB,
-	GB_VIDEO_CGB
-};
-
-
 struct layer_struct {
 	UINT8  enabled;
 	UINT8  *bg_tiles;
