@@ -1268,7 +1268,7 @@ void avr8_device::timer0_force_output_compare(int reg)
 
 void avr8_device::changed_tccr0b(UINT8 data)
 {
-  printf("changed_tccr0b: data=0x%02X\n", data);
+  if (VERBOSE_LEVEL) printf("changed_tccr0b: data=0x%02X\n", data);
 
 	UINT8 oldtccr = AVR8_TCCR0B;
 	UINT8 newtccr = data;
@@ -1497,7 +1497,7 @@ void avr8_device::update_timer1_input_edge_select()
 
 void avr8_device::changed_tccr1b(UINT8 data)
 {
-  printf("changed_tccr1b: data=0x%02X\n", data);
+  if (VERBOSE_LEVEL) printf("changed_tccr1b: data=0x%02X\n", data);
 
 	UINT8 oldtccr = AVR8_TCCR1B;
 	UINT8 newtccr = data;
@@ -1651,7 +1651,7 @@ void avr8_device::timer2_force_output_compare(int reg)
 
 void avr8_device::changed_tccr2b(UINT8 data)
 {
-  printf("changed_tccr2b: data=0x%02X\n", data);
+  if (VERBOSE_LEVEL) printf("changed_tccr2b: data=0x%02X\n", data);
 
 	UINT8 oldtccr = AVR8_TCCR2B;
 	UINT8 newtccr = data;
@@ -1788,7 +1788,7 @@ void avr8_device::update_timer_clock_source(UINT8 t, UINT8 clock_select)
   int prescale_values[8] = {0, 1, 8, 64, 256, 1024, -1, -1};
 	m_timer_prescale[t] = prescale_values[clock_select];
 
-  printf("update_timer_clock_source: t=%d cs=%d\n", t, clock_select);
+  if (VERBOSE_LEVEL) printf("update_timer_clock_source: t=%d cs=%d\n", t, clock_select);
 
   if (m_timer_prescale[t] == 0xFFFF){
     printf("[Timer #%d]: update_timer_clock_source: External trigger mode not implemented yet\n", t);
@@ -2297,14 +2297,14 @@ WRITE8_MEMBER( avr8_device::regs_w )
 				UINT16 addr = (m_r[AVR8_REGIDX_EEARH] & AVR8_EEARH_MASK) << 8;
 				addr |= m_r[AVR8_REGIDX_EEARL];
 				m_r[AVR8_REGIDX_EEDR] = m_eeprom[addr];
-        printf("EEPROM read @ 0x%04x data = 0x%02x\n", addr, m_eeprom[addr]);
+        if (VERBOSE_LEVEL) printf("EEPROM read @ 0x%04x data = 0x%02x\n", addr, m_eeprom[addr]);
 			}
 			if ((data & AVR8_EECR_EEPE_MASK) && (data & AVR8_EECR_EEMPE_MASK))
 			{
 				UINT16 addr = (m_r[AVR8_REGIDX_EEARH] & AVR8_EEARH_MASK) << 8;
 				addr |= m_r[AVR8_REGIDX_EEARL];
 				m_eeprom[addr] = m_r[AVR8_REGIDX_EEDR];
-        printf("EEPROM write @ 0x%04x data = 0x%02x ('%c')\n", addr, m_eeprom[addr], m_eeprom[addr]);
+        if (VERBOSE_LEVEL) printf("EEPROM write @ 0x%04x data = 0x%02x ('%c')\n", addr, m_eeprom[addr], m_eeprom[addr]);
 
   			m_r[offset] = data & ~AVR8_EECR_EEPE_MASK; //indicates that we've finished writing a value to the EEPROM.
                                                    //TODO: shouldn't this happen only after a certain dalay?
@@ -2897,7 +2897,7 @@ READ8_MEMBER( avr8_device::regs_r )
 /* Two-wire registers: */
 		case AVR8_REGIDX_TWCR:
       /*TODO: needed for Replicator 1
-      BLOQUEIA PROGRESSO DA EXECUÃ‡ÃƒO DO FIRMWARE no endereÃ§o 105EC*/
+      BLOQUEIA PROGRESSO DA EXECUÇÃO DO FIRMWARE no endereço 105EC*/
 			return m_r[offset];
 
 		case AVR8_REGIDX_TWSR:
