@@ -142,15 +142,15 @@ public:
 	void CLIB_DECL popup_time(int seconds, const char *text, ...);
 	void show_fps_temp(double seconds);
 	void set_show_fps(bool show);
-	bool show_fps(void);
+	bool show_fps() const;
 	bool show_fps_counter();
 	void set_show_profiler(bool show);
-	bool show_profiler();
+	bool show_profiler() const;
 	void show_menu();
 	void show_mouse(bool status);
 	bool is_menu_active();
 	void paste();
-	bool use_natural_keyboard();
+	bool use_natural_keyboard() const;
 	void set_use_natural_keyboard(bool use_natural_keyboard);
 	void image_handler_ingame();
 
