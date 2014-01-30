@@ -3,6 +3,7 @@ artwork/aperture.png -text svneol=unset#image/png
 artwork/white.png -text svneol=unset#image/png
 docs/SDL.txt svneol=native#text/plain
 docs/config.txt svneol=native#text/plain
+docs/floppy.txt svneol=native#text/plain
 docs/hlsl.txt svneol=native#text/plain
 docs/imgtool.txt svneol=native#text/plain
 docs/license.txt svneol=native#text/plain
