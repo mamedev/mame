@@ -101,14 +101,6 @@ static slider_state *slider_current;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-// UI handlers 
-static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state);
-static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state);
-static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);
-static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state);
-static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state);
-static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state);
-
 // slider controls 
 static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg);
 static slider_state *slider_init(running_machine &machine);
@@ -1232,7 +1224,7 @@ astring &ui_manager::game_info_astring(astring &string)
 //  messagebox_text string but handles no input
 //-------------------------------------------------
 
-static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state)
+UINT32 ui_manager::handler_messagebox(running_machine &machine, render_container *container, UINT32 state)
 {
 	machine.ui().draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
@@ -1244,7 +1236,7 @@ static UINT32 handler_messagebox(running_machine &machine, render_container *con
 //  messagebox_text string and waits for an OK
 //-------------------------------------------------
 
-static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state)
+UINT32 ui_manager::handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state)
 {
 	// draw a standard message window 
 	machine.ui().draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
@@ -1274,7 +1266,7 @@ static UINT32 handler_messagebox_ok(running_machine &machine, render_container *
 //  any keypress
 //-------------------------------------------------
 
-static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state)
+UINT32 ui_manager::handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state)
 {
 	// draw a standard message window 
 	machine.ui().draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
@@ -1390,7 +1382,7 @@ void ui_manager::image_handler_ingame()
 //  of the standard keypresses
 //-------------------------------------------------
 
-static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state)
+UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *container, UINT32 state)
 {
 	bool is_paused = machine.paused();
 
@@ -1603,7 +1595,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 //  specifying a game to save or load
 //-------------------------------------------------
 
-static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state)
+UINT32 ui_manager::handler_load_save(running_machine &machine, render_container *container, UINT32 state)
 {
 	char filename[20];
 	input_code code;
@@ -1672,7 +1664,7 @@ static UINT32 handler_load_save(running_machine &machine, render_container *cont
 //  confirming quit emulation
 //-------------------------------------------------
 
-static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
+UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state)
 {
 	astring quit_message("Are you sure you want to quit?\n\n");
 	quit_message.cat("Press ''UI Select'' (default: Enter) to quit,\n");
