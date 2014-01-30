@@ -745,7 +745,6 @@ static const floppy_interface atari_floppy_interface =
 
 static MACHINE_CONFIG_FRAGMENT( atari_fdc )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(atari_floppy_interface)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","a800_flop")
 MACHINE_CONFIG_END
 
 device_t *atari_fdc_device::atari_floppy_get_device_child(int drive)
