@@ -5389,6 +5389,7 @@ initdexp        // 2002.?? Initial D Arcade Stage (Export)
 clubkprz		// 2003.?? Club Kart Prize
 initdv3j        // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev C)
 initdv3jb       // 2004.01 Initial D Arcade Stage Ver. 3 (Japan) (Rev B)
+clubkpzb		// 2004.?? Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
 initdv3e        // 2004.05 Initial D Arcade Stage Ver. 3 (Export)
 				// 2004.06 World Club Champion Football Serie A 2002-2003 Ver.2
 				// 2004.07 Virtua Fighter 4 Final Tuned
