@@ -880,7 +880,7 @@ void ui_manager::set_show_fps(bool show)
 //  counter visibility state
 //-------------------------------------------------
 
-bool ui_manager::show_fps()
+bool ui_manager::show_fps() const
 {
 	return m_showfps || (m_showfps_end != 0);
 }
@@ -915,7 +915,7 @@ void ui_manager::set_show_profiler(bool show)
 //  profiler visibility state
 //-------------------------------------------------
 
-bool ui_manager::show_profiler()
+bool ui_manager::show_profiler() const
 {
 	return m_show_profiler;
 }
@@ -2312,7 +2312,7 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, astring *st
 //  whether the natural keyboard is active
 //-------------------------------------------------
 
-bool ui_manager::use_natural_keyboard()
+bool ui_manager::use_natural_keyboard() const
 {
 	return m_use_natural_keyboard;
 }
