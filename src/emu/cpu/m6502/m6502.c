@@ -66,8 +66,6 @@ void m6502_device::device_start()
 	else
 		mintf = new mi_default_normal;
 
-	sync_w.resolve_safe();
-
 	init();
 }
 
@@ -75,6 +73,8 @@ void m6502_device::init()
 {
 	mintf->program = &space(AS_PROGRAM);
 	mintf->direct = &mintf->program->direct();
+
+	sync_w.resolve_safe();
 
 	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
