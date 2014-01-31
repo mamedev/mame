@@ -33,10 +33,10 @@ protected:
 public:
 	DECLARE_WRITE8_MEMBER( k005289_control_A_w );
 	DECLARE_WRITE8_MEMBER( k005289_control_B_w );
-	DECLARE_WRITE8_MEMBER( k005289_pitch_A_w );
-	DECLARE_WRITE8_MEMBER( k005289_pitch_B_w );
-	DECLARE_WRITE8_MEMBER( k005289_keylatch_A_w );
-	DECLARE_WRITE8_MEMBER( k005289_keylatch_B_w );
+	DECLARE_WRITE8_MEMBER( ld1_w );
+	DECLARE_WRITE8_MEMBER( ld2_w );
+	DECLARE_WRITE8_MEMBER( tg1_w );
+	DECLARE_WRITE8_MEMBER( tg2_w );
 
 private:
 	void make_mixer_table(int voices);
