@@ -52,6 +52,7 @@
 // communication ports
 #include "machine/pc_lpt.h"
 #include "machine/isa_com.h"
+#include "machine/isa_pds.h"
 
 // other
 #include "machine/isa_finalchs.h"

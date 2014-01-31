@@ -849,6 +849,7 @@ $(MESSOBJ)/isa.a: \
 	$(MESS_MACHINE)/isa_aha1542.o   \
 	$(MESS_MACHINE)/isa_wd1002a_wx1.o\
 	$(MESS_MACHINE)/isa_dectalk.o \
+	$(MESS_MACHINE)/isa_pds.o \
 	$(MESS_VIDEO)/isa_cga.o     \
 	$(MESS_VIDEO)/isa_svga_cirrus.o \
 	$(MESS_VIDEO)/isa_ega.o     \
