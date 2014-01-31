@@ -306,9 +306,9 @@ INPUT_CHANGED_MEMBER(amstrad_state::cpc_monitor_changed)
 
 static INPUT_PORTS_START( crtc_links )
 
-/* the following are defined as dipswitches, but are in fact solder links on the
- * curcuit board. The links are open or closed when the PCB is made, and are set depending on which country
- * the Amstrad system was to go to (reference: http://amstrad.cpc.free.fr/article.php?sid=26)
+/* the following are solder links on the circuit board. The links are open or closed when the
+ * PCB is made, and are set depending on which country the Amstrad system was to go to
+ * (reference: http://amstrad.cpc.free.fr/article.php?sid=26)
 
 lk1 lk2 lk3 Manufacturer Name (CPC and CPC+ only):
 
@@ -326,21 +326,18 @@ lk4     Frequency
 1       50 Hz
 */
 	PORT_START("solder_links")
-	PORT_DIPNAME(0x07, 0x07, "Manufacturer Name")
-	PORT_DIPLOCATION("LK:3,2,1")
-	PORT_DIPSETTING(0x00, "Isp")
-	PORT_DIPSETTING(0x01, "Triumph")
-	PORT_DIPSETTING(0x02, "Saisho")
-	PORT_DIPSETTING(0x03, "Solavox")
-	PORT_DIPSETTING(0x04, "Awa")
-	PORT_DIPSETTING(0x05, "Schneider")
-	PORT_DIPSETTING(0x06, "Orion")
-	PORT_DIPSETTING(0x07, "Amstrad")
-
-	PORT_DIPNAME(0x10, 0x10, "TV Refresh Rate")
-	PORT_DIPLOCATION("LK:4")
-	PORT_DIPSETTING(0x00, "60 Hz")
-	PORT_DIPSETTING(0x10, "50 Hz")
+	PORT_CONFNAME(0x07, 0x07, "Manufacturer Name")
+	PORT_CONFSETTING(0x00, "Isp")
+	PORT_CONFSETTING(0x01, "Triumph")
+	PORT_CONFSETTING(0x02, "Saisho")
+	PORT_CONFSETTING(0x03, "Solavox")
+	PORT_CONFSETTING(0x04, "Awa")
+	PORT_CONFSETTING(0x05, "Schneider")
+	PORT_CONFSETTING(0x06, "Orion")
+	PORT_CONFSETTING(0x07, "Amstrad")
+	PORT_CONFNAME(0x10, 0x10, "TV Refresh Rate")
+	PORT_CONFSETTING(0x00, "60 Hz")
+	PORT_CONFSETTING(0x10, "50 Hz")
 
 /* Part number Manufacturer Type number
    UM6845      UMC          0
