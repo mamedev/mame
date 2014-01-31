@@ -577,6 +577,9 @@ ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::solve
         resched_cnt++;
     } while (resched && (resched_cnt < m_resched_loops / 3 ));
 
+    if (resched)
+        return m_fallback.solve_non_dynamic();
+
     return resched_cnt;
 }
 
@@ -770,7 +773,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
                 ms = new netlist_matrix_solver_direct_t<4,4>();
                 //ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
                 break;
-#if 1
+#if 0
             case 5:
                 ms = new netlist_matrix_solver_direct_t<5,5>();
                 //ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();

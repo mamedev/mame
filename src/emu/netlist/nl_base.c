@@ -435,7 +435,6 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
 	, m_in_queue(2)
 	, m_railterminal(NULL)
 {
-    //m_last.Analog = -123456789.0; // set to something we will never hit.
     m_last.Analog = 0.0; // set to something we will never hit.
     m_new.Analog = 0.0;
     m_cur.Analog = 0.0;
@@ -443,7 +442,6 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
 
 ATTR_COLD void netlist_net_t::reset()
 {
-    //m_last.Analog = -123456789.0; // set to something we will never hit.
     m_last.Analog = 0.0; // set to something we will never hit.
     m_cur.Analog = 0.0;
     m_last.Q = 0; // set to something we will never hit.

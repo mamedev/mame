@@ -51,15 +51,11 @@ NETLIB_RESET(ttl_input)
 
 NETLIB_UPDATE(ttl_input)
 {
-    //m_Q.net().m_new.Q = !(m_IN.Value() & 1);
-    //OUTLOGIC(m_Q, m_IN.Value() & 1, NLTIME_IMMEDIATE);
     OUTLOGIC(m_Q, m_IN.Value() & 1, netlist_time::from_nsec(1));
 }
 
 NETLIB_UPDATE_PARAM(ttl_input)
 {
-    //m_Q.net().m_new.Q = !(m_IN.Value() & 1);
-	//OUTLOGIC(m_Q, m_IN.Value() & 1, NLTIME_IMMEDIATE);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -83,5 +79,4 @@ NETLIB_UPDATE(analog_input)
 
 NETLIB_UPDATE_PARAM(analog_input)
 {
-    //OUTANALOG(m_Q, m_IN.Value(), NLTIME_IMMEDIATE);
 }

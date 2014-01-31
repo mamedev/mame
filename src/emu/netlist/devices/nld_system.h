@@ -98,7 +98,6 @@ protected:
 
     ATTR_COLD void reset()
     {
-        //m_Q.initial(0.001); // Make sure update outputs something
     }
 
     ATTR_HOT ATTR_ALIGN void update()

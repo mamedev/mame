@@ -119,15 +119,21 @@ public:
     ATTR_COLD virtual void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner)
     {
         netlist_matrix_solver_t::setup(nets, owner);
+        m_fallback.setup(nets, owner);
     }
 
     ATTR_HOT int solve_non_dynamic();
 
     ATTR_HOT inline const int N() const { if (m_N == 0) return m_nets.count(); else return m_N; }
 
-    ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
+    ATTR_COLD virtual void reset()
+    {
+        netlist_matrix_solver_t::reset();
+        m_fallback.reset();
+    }
 
 private:
+    netlist_matrix_solver_direct_t<m_N, _storage_N> m_fallback;
 };
 
 class netlist_matrix_solver_direct1_t: public netlist_matrix_solver_direct_t<1,1>
