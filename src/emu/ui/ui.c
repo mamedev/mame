@@ -540,11 +540,23 @@ float ui_manager::get_string_width(const char *s)
 
 void ui_manager::draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor)
 {
-	container->add_rect(x0, y0, x1, y1, backcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x0, y0, x1, y0, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x1, y0, x1, y1, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x1, y1, x0, y1, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	container->add_line(x0, y1, x0, y0, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	draw_outlined_box(container, x0, y0, x1, y1, UI_BORDER_COLOR, backcolor);
+}
+
+
+//-------------------------------------------------
+//  draw_outlined_box - add primitives to draw
+//  an outlined box with the given background
+//  color
+//-------------------------------------------------
+
+void ui_manager::draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor)
+{
+	container->add_rect(x0, y0, x1, y1, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x0, y0, x1, y0, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x1, y0, x1, y1, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x1, y1, x0, y1, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container->add_line(x0, y1, x0, y0, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 
@@ -1340,6 +1352,58 @@ void ui_manager::process_natural_keyboard()
 
 
 //-------------------------------------------------
+//  increase_frameskip
+//-------------------------------------------------
+
+void ui_manager::increase_frameskip()
+{
+	// get the current value and increment it 
+	int newframeskip = machine().video().frameskip() + 1;
+	if (newframeskip > MAX_FRAMESKIP)
+		newframeskip = -1;
+	machine().video().set_frameskip(newframeskip);
+
+	// display the FPS counter for 2 seconds 
+	machine().ui().show_fps_temp(2.0);
+}
+
+
+//-------------------------------------------------
+//  decrease_frameskip
+//-------------------------------------------------
+
+void ui_manager::decrease_frameskip()
+{
+	// get the current value and decrement it 
+	int newframeskip = machine().video().frameskip() - 1;
+	if (newframeskip < -1)
+		newframeskip = MAX_FRAMESKIP;
+	machine().video().set_frameskip(newframeskip);
+
+	// display the FPS counter for 2 seconds 
+	machine().ui().show_fps_temp(2.0);
+}
+
+
+//-------------------------------------------------
+//  can_paste
+//-------------------------------------------------
+
+bool ui_manager::can_paste()
+{
+	// retrieve the clipboard text 
+	char *text = osd_get_clipboard_text();
+
+	// free the string if allocated
+	if (text != NULL)
+		osd_free(text);
+
+	// did we have text?
+	return text != NULL;
+}
+
+
+//-------------------------------------------------
 //  paste - does a paste from the keyboard
 //-------------------------------------------------
 
@@ -1549,29 +1613,11 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 
 	// increment frameskip? 
 	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_INC))
-	{
-		// get the current value and increment it 
-		int newframeskip = machine.video().frameskip() + 1;
-		if (newframeskip > MAX_FRAMESKIP)
-			newframeskip = -1;
-		machine.video().set_frameskip(newframeskip);
-
-		// display the FPS counter for 2 seconds 
-		machine.ui().show_fps_temp(2.0);
-	}
+		machine.ui().increase_frameskip();
 
 	// decrement frameskip? 
 	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_DEC))
-	{
-		// get the current value and decrement it 
-		int newframeskip = machine.video().frameskip() - 1;
-		if (newframeskip < -1)
-			newframeskip = MAX_FRAMESKIP;
-		machine.video().set_frameskip(newframeskip);
-
-		// display the FPS counter for 2 seconds 
-		machine.ui().show_fps_temp(2.0);
-	}
+		machine.ui().decrease_frameskip();
 
 	// toggle throttle? 
 	if (ui_input_pressed(machine, IPT_UI_THROTTLE))

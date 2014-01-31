@@ -134,6 +134,7 @@ public:
 	float get_char_width(unicode_char ch);
 	float get_string_width(const char *s);
 	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
+	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
 	void draw_text(render_container *container, const char *buf, float x, float y);
 	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = NULL, float *totalheight = NULL);
 	void draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
@@ -149,10 +150,13 @@ public:
 	void show_menu();
 	void show_mouse(bool status);
 	bool is_menu_active();
+	bool can_paste();
 	void paste();
 	bool use_natural_keyboard() const;
 	void set_use_natural_keyboard(bool use_natural_keyboard);
 	void image_handler_ingame();
+	void increase_frameskip();
+	void decrease_frameskip();
 
 	// print the game info string into a buffer
 	astring &game_info_astring(astring &string);
