@@ -63,7 +63,7 @@ fixedfreq_interface fixedfreq_mode_pong = {
 	H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL,
 	V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL,
 	1,  /* non-interlaced */
-	0.30
+	0.31
 };
 
 fixedfreq_interface fixedfreq_mode_pongX2 = {
@@ -71,7 +71,7 @@ fixedfreq_interface fixedfreq_mode_pongX2 = {
 	(H_TOTAL-67) * 2, (H_TOTAL-40) * 2, (H_TOTAL-8) * 2, (H_TOTAL) * 2,
 	V_TOTAL-22,V_TOTAL-19,V_TOTAL-16,V_TOTAL,
 	1,  /* non-interlaced */
-	0.30
+	0.31
 };
 
 enum input_changed_enum
@@ -571,6 +571,7 @@ static NETLIST_START(pong_schematics)
     PARAM(sw1a.POS, 0)
 
     NET_C(sw1a.1, high)
+    //NET_C(sw1a.1, V5)
     NET_C(sw1a.2, ic_c7.QC)
 
     TTL_7410_NAND(ic_d8a, ic_c7.QA, sw1a.Q, ic_c8a.Q)       // would be nand2 for 11 instead of 15 points, need a switch dev!
@@ -590,6 +591,7 @@ static NETLIST_START(pong_schematics)
     PARAM(sw1b.POS, 0)
 
     NET_C(sw1b.1, high)
+    //NET_C(sw1b.1, V5)
     NET_C(sw1b.2, ic_d7.QC)
 
 

@@ -770,6 +770,16 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
                 ms = new netlist_matrix_solver_direct_t<4,4>();
                 //ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
                 break;
+#if 1
+            case 5:
+                ms = new netlist_matrix_solver_direct_t<5,5>();
+                //ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
+                break;
+            case 6:
+                ms = new netlist_matrix_solver_direct_t<6,6>();
+                //ms = new netlist_matrix_solver_gauss_seidel_t<4,4>();
+                break;
+#endif
             default:
                 //ms = new netlist_matrix_solver_direct_t<0,16>();
                 ms = new netlist_matrix_solver_gauss_seidel_t<0,16>();

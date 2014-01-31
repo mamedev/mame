@@ -98,7 +98,7 @@ protected:
 
     ATTR_COLD void reset()
     {
-        m_Q.initial(0.001); // Make sure update outputs something
+        //m_Q.initial(0.001); // Make sure update outputs something
     }
 
     ATTR_HOT ATTR_ALIGN void update()
@@ -140,7 +140,6 @@ protected:
 
     ATTR_COLD void reset()
     {
-        m_Q.initial(1);
     }
 
     ATTR_HOT ATTR_ALIGN void update()
@@ -204,7 +203,7 @@ protected:
 
     ATTR_COLD void reset()
     {
-        m_Q.initial(0);
+        //m_Q.initial(0);
     }
 
     ATTR_COLD virtual netlist_core_terminal_t &out()
@@ -240,16 +239,17 @@ protected:
         register_output("_Q", m_Q);
         register_subalias("Q", m_R.m_N);
 
-        connect(m_Q, m_R.m_P);
+        connect(m_R.m_P, m_Q);
 
-        m_Q.initial(0);
-        m_R.set_R(m_family_desc->m_R_low);
+        //m_Q.initial(m_family_desc->m_low_V);
+        //m_R.set_R(m_family_desc->m_R_low);
     }
 
     ATTR_COLD void reset()
     {
-        m_Q.initial(0);
-        m_R.set_R(m_family_desc->m_R_low);
+        //m_Q.initial(m_family_desc->m_low_V);
+        //m_R.set_R(m_family_desc->m_R_low);
+        m_R.do_reset();
     }
 
     ATTR_COLD virtual netlist_core_terminal_t &out()
@@ -259,8 +259,11 @@ protected:
 
     ATTR_HOT ATTR_ALIGN void update()
     {
-        m_R.set_R(INPLOGIC(m_I) ? m_family_desc->m_R_high : m_family_desc->m_R_low);
-        OUTANALOG(m_Q, INPLOGIC(m_I) ? m_family_desc->m_high_V : m_family_desc->m_low_V, NLTIME_FROM_NS(1));
+        double R = INPLOGIC(m_I) ? m_family_desc->m_R_high : m_family_desc->m_R_low;
+        double V = INPLOGIC(m_I) ? m_family_desc->m_high_V : m_family_desc->m_low_V;
+        //printf("%f %f\n", R, V);
+        m_R.set_R(R);
+        OUTANALOG(m_Q, V, NLTIME_FROM_NS(0));
     }
 
 private:

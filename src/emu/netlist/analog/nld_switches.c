@@ -35,10 +35,6 @@ NETLIB_RESET(switch2)
 
 NETLIB_UPDATE(switch2)
 {
-}
-
-NETLIB_UPDATE_PARAM(switch2)
-{
     if (m_POS.Value() == 0)
     {
         m_R[0].set_R(R_ON);
@@ -52,4 +48,9 @@ NETLIB_UPDATE_PARAM(switch2)
 
     m_R[0].update_dev();
     m_R[1].update_dev();
+}
+
+NETLIB_UPDATE_PARAM(switch2)
+{
+    update();
 }

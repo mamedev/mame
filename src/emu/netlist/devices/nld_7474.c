@@ -77,8 +77,6 @@ NETLIB_RESET(7474sub)
     m_CLK.set_state(netlist_input_t::STATE_INP_LH);
 
     m_nextD = 0;
-    m_Q.initial(1);
-    m_QQ.initial(0);
 }
 
 NETLIB_START(7474_dip)

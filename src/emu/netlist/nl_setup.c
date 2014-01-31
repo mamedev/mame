@@ -353,6 +353,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 {
     assert(out.isFamily(netlist_terminal_t::LOGIC));
 
+    //printf("proxy for %s\n", out.name().cstr());;
     netlist_logic_output_t &out_cast = dynamic_cast<netlist_logic_output_t &>(out);
     nld_base_d_to_a_proxy *proxy = out_cast.get_proxy();
 
@@ -366,6 +367,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
         proxy->init(netlist(), x);
         register_dev(proxy, x);
 
+#if 1
         /* connect all existing terminals to new net */
 
         netlist_core_terminal_t *p = out.net().m_head;
@@ -378,6 +380,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
         }
         out.net().m_head = NULL; // clear the list
         out.net().m_num_cons = 0;
+#endif
         out.net().register_con(proxy->m_I);
         out_cast.set_proxy(proxy);
 

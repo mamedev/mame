@@ -16,9 +16,9 @@ netlist_logic_family_desc_t netlist_family_ttl =
         0.8, // m_low_thresh_V
         2.0, // m_high_thresh_V
         0.3, // m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-        3.4, // m_high_V
-        10.0, // m_g_low;
-        130.0, //130.0, //  m_g_high;
+        3.7, // m_high_V
+        1.0, // m_R_low;
+        130.0, //  m_R_high;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -435,15 +435,16 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
 	, m_in_queue(2)
 	, m_railterminal(NULL)
 {
-    m_last.Analog = -123456789.0; // set to something we will never hit.
+    //m_last.Analog = -123456789.0; // set to something we will never hit.
+    m_last.Analog = 0.0; // set to something we will never hit.
     m_new.Analog = 0.0;
     m_cur.Analog = 0.0;
 };
 
 ATTR_COLD void netlist_net_t::reset()
 {
-    m_last.Analog = -123456789.0; // set to something we will never hit.
-    m_new.Analog = 0.0;
+    //m_last.Analog = -123456789.0; // set to something we will never hit.
+    m_last.Analog = 0.0; // set to something we will never hit.
     m_cur.Analog = 0.0;
     m_last.Q = 0; // set to something we will never hit.
     m_new.Q = 0;
@@ -632,7 +633,7 @@ ATTR_COLD void netlist_logic_output_t::initial(const netlist_sig_t val)
 {
 	net().m_cur.Q = val;
 	net().m_new.Q = val;
-	net().m_last.Q = !val;
+    net().m_last.Q = val;
 }
 
 // ----------------------------------------------------------------------------------------

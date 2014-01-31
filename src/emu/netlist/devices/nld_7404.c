@@ -13,7 +13,6 @@ NETLIB_START(7404)
 
 NETLIB_RESET(7404)
 {
-    m_Q.initial(1);
 }
 
 NETLIB_UPDATE(7404)
