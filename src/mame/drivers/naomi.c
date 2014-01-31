@@ -7571,6 +7571,21 @@ ROM_START( vf4evoct )
 	ROM_LOAD( "vf4evoct-key.bin", 0, 4, CRC(c37dae2b) SHA1(c42dc01b5918db36e7eb2aca523e2f4df567725a) )
 ROM_END
 
+ROM_START( hopper )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr24083.ic11", 0x000000, 0x400000, CRC(2733e65a) SHA1(4a5d109d0531bebd8e8f585789adce98cac2ab93) ) 
+
+	ROM_REGION( 0x40000, "flash", ROMREGION_ERASEFF)
+	ROM_LOAD( "315-6358a.ic2", 0x000000, 0x020008, CRC(ef442e67) SHA1(70ac91e2ca1ff2dfba48d566e4de68bd8b82f282) ) 
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(ddedf494) SHA1(f1529615711a9871051cd09c2a9b95c90d356874) ) 
+ROM_END
+
 ROM_START( clubkrte )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8405,6 +8420,7 @@ ROM_END
 // 0123 Star Horse Progress (Rev A)
 /* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0128 */ GAME( 2002, shootpl,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0130B */GAME( 2002, hopper,   naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "SWP Hopper Board", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0136 */ GAME( 2001, shootplm, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Medal", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomim1, naomi,   naomi_state, kick4csh,ROT0, "Sega", "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0150 */ GAME( 2003, mtkob2,   naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K3 2nd", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
