@@ -47,6 +47,7 @@
 //-------------------------------------------------
 
 const device_type NES_NROM = &device_creator<nes_nrom_device>;
+const device_type NES_NROM368 = &device_creator<nes_nrom368_device>;
 const device_type NES_FCBASIC = &device_creator<nes_fcbasic_device>;
 const device_type NES_AXROM = &device_creator<nes_axrom_device>;
 const device_type NES_BXROM = &device_creator<nes_bxrom_device>;
@@ -56,6 +57,7 @@ const device_type NES_GXROM = &device_creator<nes_gxrom_device>;
 const device_type NES_UXROM = &device_creator<nes_uxrom_device>;
 const device_type NES_UXROM_CC = &device_creator<nes_uxrom_cc_device>;
 const device_type NES_UN1ROM = &device_creator<nes_un1rom_device>;
+const device_type NES_NOCHR = &device_creator<nes_nochr_device>;
 
 
 nes_nrom_device::nes_nrom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
@@ -67,6 +69,11 @@ nes_nrom_device::nes_nrom_device(const machine_config &mconfig, device_type type
 nes_nrom_device::nes_nrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, NES_NROM, "NES Cart NROM PCB", tag, owner, clock, "nes_nrom", __FILE__),
 						device_nes_cart_interface( mconfig, *this )
+{
+}
+
+nes_nrom368_device::nes_nrom368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: nes_nrom_device(mconfig, NES_NROM368, "NES Cart NROM-368 PCB", tag, owner, clock, "nes_nrom368", __FILE__)
 {
 }
 
@@ -117,6 +124,11 @@ nes_uxrom_cc_device::nes_uxrom_cc_device(const machine_config &mconfig, const ch
 
 nes_un1rom_device::nes_un1rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_UN1ROM, "NES Cart UN1ROM PCB", tag, owner, clock, "nes_un1rom", __FILE__)
+{
+}
+
+nes_nochr_device::nes_nochr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: nes_nrom_device(mconfig, NES_NOCHR, "NES Cart NoCash NOCHR PCB", tag, owner, clock, "nes_nochr", __FILE__)
 {
 }
 
@@ -270,6 +282,39 @@ void nes_un1rom_device::pcb_reset()
 
  -------------------------------------------------*/
 
+/*-------------------------------------------------
+ 
+ NROM-368 board emulation
+ 
+ iNES: mapper 0 with 3xPRG banks
+ This is an homebrew extension to map linearly 46KB
+ or PRG in boards with no PRG bankswitch logic
+ 
+ In MESS: Supported
+ 
+ -------------------------------------------------*/
+
+READ8_MEMBER(nes_nrom368_device::read_l)
+{
+	LOG_MMC(("nrom368 read_l, offset: %04x\n", offset));
+	offset += 0x100;
+	if (offset >= 0x800)
+		return m_prg[offset - 0x800];
+	else
+		return m_open_bus;
+}
+
+READ8_MEMBER(nes_nrom368_device::read_m)
+{
+	LOG_MMC(("nrom368 read_m, offset: %04x\n", offset));
+	return m_prg[0x1800 + (offset & 0x1fff)];
+}
+
+READ8_MEMBER(nes_nrom368_device::read_h)
+{
+	LOG_MMC(("nrom368 read_h, offset: %04x\n", offset));
+	return m_prg[0x3800 + (offset & 0x7fff)];
+}
 
 /*-------------------------------------------------
 
@@ -500,4 +545,29 @@ WRITE8_MEMBER(nes_un1rom_device::write_h)
 	data = account_bus_conflict(offset, data);
 
 	prg16_89ab(data >> 2);
+}
+
+/*-------------------------------------------------
+ 
+ NoCash NOCHR board emulation
+ 
+ This is an homebrew PCB design on a single chip
+ (+possibly CIC) which uses the NTRAM as CHRRAM!
+ 
+ iNES: mapper 218
+ 
+ In MESS: Not Supported.
+ 
+ -------------------------------------------------*/
+
+WRITE8_MEMBER(nes_nochr_device::chr_w)
+{
+	int bank = offset >> 10;
+	m_nt_access[bank & 0x03][offset & 0x3ff] = data;
+}
+
+READ8_MEMBER(nes_nochr_device::chr_r)
+{
+	int bank = offset >> 10;
+	return m_nt_access[bank & 0x03][offset & 0x3ff];
 }

@@ -15,6 +15,7 @@ static const nes_pcb pcb_list[] =
 {
 	{ "nrom",             STD_NROM },
 	{ "hvc_basic",        HVC_FAMBASIC },
+	{ "nrom368",          STD_NROM368 },
 	{ "nrom_gg",          GG_NROM },
 	{ "uxrom",            STD_UXROM },
 	{ "unrom_cc",         UXROM_CC },
@@ -298,6 +299,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_43272",        UNL_43272 },
 	{ "tf1201",           UNL_TF1201 },
 	{ "unl_cfight",       UNL_CITYFIGHT },
+	{ "nocash_nochr",     NOCASH_NOCHR },
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
@@ -307,6 +309,8 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "a9746",            UNSUPPORTED_BOARD },
+	{ "dance2k",          UNSUPPORTED_BOARD },
+	{ "pec586",           UNSUPPORTED_BOARD },
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };

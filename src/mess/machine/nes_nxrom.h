@@ -23,6 +23,20 @@ public:
 };
 
 
+// ======================> nes_nrom368_device
+
+class nes_nrom368_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_nrom368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual DECLARE_READ8_MEMBER(read_l);
+	virtual DECLARE_READ8_MEMBER(read_m);
+	virtual DECLARE_READ8_MEMBER(read_h);
+};
+
+
 // ======================> nes_fcbasic_device
 
 class nes_fcbasic_device : public nes_nrom_device
@@ -168,9 +182,24 @@ public:
 };
 
 
+// ======================> nes_nochr_device
+
+class nes_nochr_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_nochr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// device-level overrides
+	virtual DECLARE_READ8_MEMBER(chr_r);
+	virtual DECLARE_WRITE8_MEMBER(chr_w);
+};
+
+
 
 // device type definition
 extern const device_type NES_NROM;
+extern const device_type NES_NROM368;
 extern const device_type NES_FCBASIC;
 extern const device_type NES_AXROM;
 extern const device_type NES_BXROM;
@@ -180,5 +209,6 @@ extern const device_type NES_GXROM;
 extern const device_type NES_UXROM;
 extern const device_type NES_UXROM_CC;
 extern const device_type NES_UN1ROM;
+extern const device_type NES_NOCHR;
 
 #endif

@@ -485,7 +485,7 @@ public:
 
 private:
 	void update_banks();
-	UINT8 m_reg[4];
+	UINT8 m_reg[3];
 };
 
 

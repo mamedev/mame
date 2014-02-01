@@ -710,7 +710,6 @@ void nes_bmc_12in1_device::pcb_reset()
 	m_reg[0] = 0;
 	m_reg[1] = 0;
 	m_reg[2] = 0;
-	m_reg[3] = 0;
 	update_banks();
 }
 
@@ -1884,38 +1883,37 @@ WRITE8_MEMBER(nes_bmc_64y2k_device::write_h)
 
  iNES:
 
- In MESS: Preliminary Supported.
+ In MESS: Supported.
 
  -------------------------------------------------*/
 
 void nes_bmc_12in1_device::update_banks()
 {
-	int bank = (m_reg[3] & 3) << 3;
+	int bank = (m_reg[2] & 3) << 3;
 
-	chr4_0((m_reg[1] >> 3) | (bank << 2), m_chr_source);
-	chr4_4((m_reg[2] >> 3) | (bank << 2), m_chr_source);
+	chr4_0((m_reg[0] >> 3) | (bank << 2), m_chr_source);
+	chr4_4((m_reg[1] >> 3) | (bank << 2), m_chr_source);
 
-	if (m_reg[3] & 8)
-		prg32(((m_reg[2] & 7) >> 1) | bank);
+	if (m_reg[2] & 8)
+		prg32(((m_reg[0] & 7) >> 1) | bank);
 	else
 	{
-		prg16_89ab((m_reg[1] & 7) | bank);
+		prg16_89ab((m_reg[0] & 7) | bank);
 		prg16_cdef(7 | bank);
 	}
 
-	set_nt_mirroring(!BIT(m_reg[3], 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(BIT(m_reg[2], 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 WRITE8_MEMBER(nes_bmc_12in1_device::write_h)
 {
 	LOG_MMC(("bmc_12in1 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset)
+	switch (offset & 0x6000)
 	{
-		case 0xafff: m_reg[0] = data; break;
-		case 0xbfff: m_reg[1] = data; break;
-		case 0xdfff: m_reg[2] = data; break;
-		case 0xefff: m_reg[3] = data; break;
+		case 0x2000: m_reg[0] = data; break;
+		case 0x4000: m_reg[1] = data; break;
+		case 0x6000: m_reg[2] = data; break;
 	}
 	update_banks();
 }
