@@ -377,9 +377,10 @@ static INPUT_PORTS_START( amx_mouse )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
 
 	PORT_START("controller_type")
-	PORT_CONFNAME( 0x01, 0x00, "Joystick port device" )
+	PORT_CONFNAME( 0x03, 0x00, "Joystick port device" )
 	PORT_CONFSETTING(0x00, "2-button Joystick" )
 	PORT_CONFSETTING(0x01, "AMX mouse interface" )
+	PORT_CONFSETTING(0x02, "Nothing" )
 
 INPUT_PORTS_END
 

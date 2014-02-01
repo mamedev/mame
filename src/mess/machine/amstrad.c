@@ -2668,9 +2668,13 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 
 		if (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F])
 		{
-			if((m_io_ctrltype->read_safe(0) == 1) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)  // joystick 1
+			if((m_io_ctrltype->read_safe(0) == 1) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
 			{
 				return m_amx_mouse_data;
+			}
+			if((m_io_ctrltype->read_safe(0) == 2) && (m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F) == 9)
+			{
+				return (keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0x80) | 0x7f;
 			}
 			return keyrow[m_ppi_port_outputs[amstrad_ppi_PortC] & 0x0F]->read_safe(0) & 0xFF;
 		}
