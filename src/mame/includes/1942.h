@@ -27,7 +27,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_palette_bank;
 	UINT8 m_scroll[2];
-	rgb_t palette[256];
 	void create_palette();
 	void palette_init_1942p();
 	DECLARE_WRITE8_MEMBER(c1942p_palette_w);
