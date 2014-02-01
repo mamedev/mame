@@ -102,21 +102,31 @@ static char giant_string_buffer[65536] = { 0 };
 #ifdef SDLMAME_EMSCRIPTEN
 #include <emscripten.h>
 
-static device_scheduler * scheduler;
+static running_machine * jsmess_machine;
 
 void js_main_loop() {
+	device_scheduler * scheduler;
+	scheduler = &(jsmess_machine->scheduler());
 	attotime stoptime = scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60));
 	while (scheduler->time() < stoptime) {
 		scheduler->timeslice();
 	}
 }
 
-void js_set_main_loop(device_scheduler &sched) {
-	scheduler = &sched;
+void js_set_main_loop(running_machine * machine) {
+	jsmess_machine = machine;
 	EM_ASM (
 		JSMESS.running = true;
 	);
 	emscripten_set_main_loop(&js_main_loop, 0, 1);
+}
+
+running_machine * js_get_machine() {
+	return jsmess_machine;
+}
+
+ui_manager * js_get_ui() {
+	return &(jsmess_machine->ui());
 }
 #endif
 
@@ -408,7 +418,7 @@ int running_machine::run(bool firstrun)
 
 			#ifdef SDLMAME_EMSCRIPTEN
 			//break out to our async javascript loop and halt
-			js_set_main_loop(m_scheduler);
+			js_set_main_loop(this);
 			#endif
 
 			// execute CPUs if not paused
