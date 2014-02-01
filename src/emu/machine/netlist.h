@@ -118,7 +118,7 @@ public:
 
 protected:
 
-	void vfatalerror(const char *format, va_list ap) const
+	void vfatalerror(const loglevel_e level, const char *format, va_list ap) const
 	{
 		emu_fatalerror error(format, ap);
 		throw error;
