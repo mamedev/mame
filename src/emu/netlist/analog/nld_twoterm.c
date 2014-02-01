@@ -137,12 +137,19 @@ NETLIB_START(C)
 	register_param("C", m_C, 1e-6);
 
 	// set up the element
-    set(m_C.Value() / 1e-9, 0.0, 0.0);
+    //set(NETLIST_GMIN, 0.0, -5.0 / NETLIST_GMIN);
+    set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
+}
+
+NETLIB_RESET(C)
+{
+    //set(NETLIST_GMIN, 0.0, -5.0 / NETLIST_GMIN);
+    set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 }
 
 NETLIB_UPDATE_PARAM(C)
 {
-	step_time(1.0/48000.0);
+	//step_time(1.0/48000.0);
 }
 
 NETLIB_UPDATE(C)

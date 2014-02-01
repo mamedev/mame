@@ -332,7 +332,7 @@ void netlist_parser::device(const pstring &dev_type)
 	net_device_t_base_factory *f = m_setup.factory().factory_by_name(dev_type, m_setup);
 	netlist_device_t *dev;
 	nl_util::pstring_list termlist = f->term_param_list();
-	pstring def_param = f->def_param();
+	nl_util::pstring_list def_params = f->def_params();
 	token_t tok;
 
 	int cnt;
@@ -344,23 +344,26 @@ void netlist_parser::device(const pstring &dev_type)
 
 	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
 
-	if (def_param != "")
-	{
-        pstring paramfq = devname + "." + def_param;
-	    NL_VERBOSE_OUT(("Defparam: %s\n", def_param.cstr()));
-	    require_token(m_tok_comma);
+    cnt = 0;
+    while (cnt < def_params.count())
+    {
+        pstring paramfq = devname + "." + def_params[cnt];
 
-	    tok = get_token();
-	    if (tok.is_type(STRING))
-	    {
+        NL_VERBOSE_OUT(("Defparam: %s\n", def_param.cstr()));
+        printf("Defparam: %s\n", def_params[cnt].cstr());
+        require_token(m_tok_comma);
+        tok = get_token();
+        if (tok.is_type(STRING))
+        {
             m_setup.register_param(paramfq, tok.str());
-	    }
-	    else
-	    {
-	        double val = eval_param(tok);
-	        m_setup.register_param(paramfq, val);
-	    }
-	}
+        }
+        else
+        {
+            double val = eval_param(tok);
+            m_setup.register_param(paramfq, val);
+        }
+        cnt++;
+    }
 
 	tok = get_token();
 	cnt = 0;

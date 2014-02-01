@@ -159,6 +159,7 @@ public:
 
 protected:
 	ATTR_COLD virtual void start();
+    ATTR_COLD virtual void reset();
 	ATTR_COLD virtual void update_param();
 	ATTR_HOT ATTR_ALIGN void update();
 

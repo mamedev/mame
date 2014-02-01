@@ -271,10 +271,24 @@ ATTR_COLD void netlist_base_t::error(const char *format, ...) const
 {
 	va_list ap;
 	va_start(ap, format);
-	//emu_fatalerror error(format, ap);
-	vfatalerror(format, ap);
+	vfatalerror(NL_ERROR, format, ap);
 	va_end(ap);
-	//throw error;
+}
+
+ATTR_COLD void netlist_base_t::warning(const char *format, ...) const
+{
+    va_list ap;
+    va_start(ap, format);
+    vfatalerror(NL_WARNING, format, ap);
+    va_end(ap);
+}
+
+ATTR_COLD void netlist_base_t::log(const char *format, ...) const
+{
+    va_list ap;
+    va_start(ap, format);
+    vfatalerror(NL_LOG, format, ap);
+    va_end(ap);
 }
 
 
@@ -435,15 +449,16 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
 	, m_in_queue(2)
 	, m_railterminal(NULL)
 {
-    m_last.Analog = 0.0; // set to something we will never hit.
+    m_last.Analog = 0.0;
     m_new.Analog = 0.0;
     m_cur.Analog = 0.0;
 };
 
 ATTR_COLD void netlist_net_t::reset()
 {
-    m_last.Analog = 0.0; // set to something we will never hit.
+    m_last.Analog = 0.0;
     m_cur.Analog = 0.0;
+    m_new.Analog = 0.0;
     m_last.Q = 0; // set to something we will never hit.
     m_new.Q = 0;
     m_cur.Q = 0;
@@ -587,7 +602,18 @@ ATTR_COLD netlist_terminal_t::netlist_terminal_t()
 , m_Idr(0.0)
 , m_go(NETLIST_GMIN)
 , m_gt(NETLIST_GMIN)
+, m_otherterm(NULL)
 {
+}
+
+
+ATTR_COLD void netlist_terminal_t::reset()
+{
+    //netlist_terminal_core_terminal_t::reset();
+    set_state(STATE_INP_ACTIVE);
+    m_Idr = 0.0;
+    m_go = NETLIST_GMIN;
+    m_gt = NETLIST_GMIN;
 }
 
 ATTR_COLD void netlist_core_terminal_t::set_net(netlist_net_t &anet)
@@ -608,6 +634,7 @@ netlist_output_t::netlist_output_t(const type_t atype, const family_t afamily)
 	, m_my_net(NET, afamily)
 {
 	//m_net = new net_net_t(NET_DIGITAL);
+    set_state(STATE_OUT);
 	this->set_net(m_my_net);
 }
 
@@ -797,10 +824,10 @@ ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::term_param_list
         return nl_util::pstring_list();
 }
 
-ATTR_COLD const pstring net_device_t_base_factory::def_param()
+ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::def_params()
 {
     if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-        return "";
+        return nl_util::pstring_list();
     else
-        return m_def_param;
+        return nl_util::split(m_def_param, ",");
 }

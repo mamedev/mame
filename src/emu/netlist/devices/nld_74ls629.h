@@ -6,11 +6,11 @@
  *  SN74LS629: VOLTAGE-CONTROLLED OSCILLATORS
  *
  *          +--------------+
- *      2FC |1     ++    14| VCC
- *      1FC |2           13| QSC VCC
- *     1RNG |3           12| 2RNG
- *     1CX1 |4  74LS629  11| 2CX1
- *     1CX2 |5           10| 2CX2
+ *      2FC |1     ++    16| VCC
+ *      1FC |2           15| QSC VCC
+ *     1RNG |3           14| 2RNG
+ *     1CX1 |4  74LS629  13| 2CX1
+ *     1CX2 |5           12| 2CX2
  *     1ENQ |6           11| 2ENQ
  *       1Y |7           10| 2Y
  *  OSC GND |8            9| GND
@@ -44,6 +44,7 @@ NETLIB_SUBDEVICE(SN74LS629clk,
 );
 
 NETLIB_DEVICE_WITH_PARAMS(SN74LS629,
+public:
 	NETLIB_NAME(SN74LS629clk) m_clock;
     NETLIB_NAME(R_base) m_R_FC;
     NETLIB_NAME(R_base) m_R_RNG;
@@ -55,10 +56,14 @@ NETLIB_DEVICE_WITH_PARAMS(SN74LS629,
 	netlist_param_double_t m_CAP;
 );
 
-#define SN74LS629_DIP(_name)                                                      \
-        NET_REGISTER_DEV(SN74LS629_dip, _name)
+#define SN74LS629_DIP(_name, _cap1, _cap2)                                        \
+        NET_REGISTER_DEV(SN74LS629_dip, _name)                                    \
+        NETDEV_PARAMI(_name, 1.CAP, _cap1)                                        \
+        NETDEV_PARAMI(_name, 2.CAP, _cap2)
 
-NETLIB_DEVICE_DERIVED(SN74LS629_dip, SN74LS629,
+NETLIB_DEVICE(SN74LS629_dip,
+    NETLIB_NAME(SN74LS629) m_1;
+    NETLIB_NAME(SN74LS629) m_2;
 );
 
 

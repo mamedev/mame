@@ -562,7 +562,7 @@ void netlist_setup_t::resolve_inputs()
 {
     bool has_twoterms = false;
 
-	NL_VERBOSE_OUT(("Resolving ...\n"));
+	netlist().log("Resolving inputs ...");
 	for (const link_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
 	{
 		const pstring t1s = entry->e1;
@@ -581,14 +581,14 @@ void netlist_setup_t::resolve_inputs()
 			//VERBOSE_OUT(("%s %d\n", out->netdev()->name(), *out->Q_ptr()));
 	}
 
-	NL_VERBOSE_OUT(("deleting empty nets ...\n"));
+    netlist().log("deleting empty nets ...");
 
 	// delete empty nets ...
 	for (netlist_net_t *const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
 	{
 		if ((*pn)->m_head == NULL)
 		{
-			NL_VERBOSE_OUT(("Deleting net ...\n"));
+		    netlist().log("Deleting net %s ...", (*pn)->name().cstr());
 			netlist_net_t *to_delete = *pn;
 			netlist().m_nets.remove(to_delete);
 			if (!to_delete->isRailNet())
@@ -598,31 +598,28 @@ void netlist_setup_t::resolve_inputs()
 	}
 
     /* now that nets were deleted ... register all net items */
-    NL_VERBOSE_OUT(("late state saving for nets ...\n"));
+	netlist().log("late state saving for nets ...");
 
     for (netlist_net_t * const * pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
         (*pn)->late_save_register();
 
     pstring errstr("");
 
-    NL_VERBOSE_OUT(("looking for terminals not connected ...\n"));
+    netlist().log("looking for terminals not connected ...");
     for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
     {
         if (!entry->object()->has_net())
             errstr += pstring::sprintf("Found terminal %s without a net\n",
                     entry->object()->name().cstr());
-        // FIXME: need a warning callback ....
-#if 0
         else if (entry->object()->net().num_cons() == 0)
-            netlist().error("Found terminal %s without connections\n",
+            netlist().warning("Found terminal %s without connections",
                     entry->object()->name().cstr());
-#endif
     }
     if (errstr != "")
         netlist().error("%s", errstr.cstr());
 
 
-    NL_VERBOSE_OUT(("looking for two terms connected to rail nets ...\n"));
+    netlist().log("looking for two terms connected to rail nets ...\n");
     for (tagmap_devices_t::entry_t *entry = netlist().m_devices.first(); entry != NULL; entry = netlist().m_devices.next(entry))
     {
         NETLIB_NAME(twoterm) *t = dynamic_cast<NETLIB_NAME(twoterm) *>(entry->object());
@@ -635,7 +632,7 @@ void netlist_setup_t::resolve_inputs()
         }
     }
 
-    NL_VERBOSE_OUT(("initialize solver ...\n"));
+    netlist().log("initialize solver ...\n");
 
 	if (m_netlist.solver() == NULL)
 	{

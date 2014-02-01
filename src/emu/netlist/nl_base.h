@@ -463,12 +463,7 @@ protected:
 		netlist_core_terminal_t::save_register();
 	}
 
-	ATTR_COLD virtual void reset()
-	{
-	    set_state(STATE_INP_ACTIVE);
-	}
-
-
+	ATTR_COLD virtual void reset();
 };
 
 
@@ -495,6 +490,7 @@ public:
 protected:
     ATTR_COLD virtual void reset()
     {
+        //netlist_core_terminal_t::reset();
         set_state(STATE_INP_ACTIVE);
     }
 
@@ -617,7 +613,7 @@ public:
 	}
 
 	ATTR_HOT inline void push_to_queue(const netlist_time delay);
-	ATTR_HOT bool is_queued() { return m_in_queue == 1; }
+	ATTR_HOT bool inline is_queued() const { return m_in_queue == 1; }
 
 	/* internal state support
 	 * FIXME: get rid of this and implement export/import in MAME
@@ -708,6 +704,7 @@ public:
 	ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
     ATTR_COLD virtual void reset()
     {
+        //netlist_core_terminal_t::reset();
         set_state(STATE_OUT);
     }
 
@@ -1073,6 +1070,8 @@ public:
 	ATTR_COLD netlist_net_t *find_net(const pstring &name);
 
 	ATTR_COLD void error(const char *format, ...) const;
+    ATTR_COLD void warning(const char *format, ...) const;
+    ATTR_COLD void log(const char *format, ...) const;
 
 	template<class _C>
 	netlist_list_t<_C> get_device_list()
@@ -1092,8 +1091,16 @@ public:
 
 protected:
 
+	enum loglevel_e
+	{
+	    NL_ERROR,
+	    NL_WARNING,
+	    NL_LOG,
+	};
+
 	// any derived netlist must override this ...
-	virtual void vfatalerror(const char *format, va_list ap) const = 0;
+	virtual void vfatalerror(const loglevel_e level,
+	        const char *format, va_list ap) const = 0;
 
 	/* from netlist_object */
     ATTR_COLD virtual void reset();
@@ -1188,6 +1195,8 @@ ATTR_HOT inline void netlist_input_t::activate_lh()
 
 ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
 {
+    if (is_queued())
+        return;
 	// if (m_in_queue == 1) return; FIXME: check this at some time
 	m_time = netlist().time() + delay;
 	m_in_queue = (m_active > 0) ? 1 : 0;     /* queued ? */
@@ -1268,7 +1277,7 @@ public:
 	ATTR_COLD const pstring &classname() const { return m_classname; }
     ATTR_COLD const pstring &param_desc() const { return m_def_param; }
     ATTR_COLD const nl_util::pstring_list term_param_list();
-    ATTR_COLD const pstring def_param();
+    ATTR_COLD const nl_util::pstring_list def_params();
 
 protected:
 	pstring m_name;                             /* device name */

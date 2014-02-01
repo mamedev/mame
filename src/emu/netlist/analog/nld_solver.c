@@ -146,7 +146,9 @@ ATTR_HOT inline bool netlist_matrix_solver_t::solve()
 
     netlist_time now = owner().netlist().time();
     netlist_time delta = now - m_last_step;
-    if (delta >= netlist_time::from_nsec(1)) // always update capacitors
+
+    if (delta < netlist_time::from_nsec(1)) // always update capacitors
+        delta = delta < netlist_time::from_nsec(1);
     {
         NL_VERBOSE_OUT(("Step!\n"));
         /* update all terminals for new time step */

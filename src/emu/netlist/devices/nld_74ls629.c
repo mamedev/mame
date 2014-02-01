@@ -55,7 +55,7 @@ NETLIB_START(SN74LS629clk)
 
 NETLIB_RESET(SN74LS629clk)
 {
-    m_enableq = 0;
+    m_enableq = 1;
     m_inc = netlist_time::zero;
 }
 
@@ -160,32 +160,39 @@ NETLIB_UPDATE_PARAM(SN74LS629)
 {
     //printf("updating %s to %f\n", name().cstr(), m_R.Value());
     update_dev();
-    //m_clock.update_dev();
 }
 
-#if 0
+
+
 NETLIB_START(SN74LS629_dip)
 {
-    NETLIB_NAME(SN74LS629)::start();
+    register_sub(m_1, "1");
+    register_sub(m_2, "2");
 
-    register_subalias("1",  m_R3.m_N);      // Pin 1
-    register_subalias("2",    m_TRIG);      // Pin 2
-    register_subalias("3",    m_OUT);       // Pin 3
-    register_subalias("4",   m_RESET);      // Pin 4
-    register_subalias("5", m_R1.m_N);       // Pin 5
-    register_subalias("6",  m_THRES);       // Pin 6
-    register_subalias("7", m_RDIS.m_P);     // Pin 7
-    register_subalias("8",  m_R1.m_P);      // Pin 8
+    register_subalias("1",  m_2.m_FC);
+    register_subalias("2",  m_1.m_FC);
+    register_subalias("3",  m_1.m_RNG);
+
+    register_subalias("6",  m_1.m_ENQ);
+    register_subalias("7",  m_1.m_clock.m_Y);
+
+    register_subalias("8",  m_1.m_R_FC.m_N);
+    register_subalias("9",  m_1.m_R_FC.m_N);
+    connect(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
+
+    register_subalias("10",  m_2.m_clock.m_Y);
+
+    register_subalias("11",  m_2.m_ENQ);
+    register_subalias("14",  m_2.m_RNG);
 
 }
 
 NETLIB_UPDATE(SN74LS629_dip)
 {
-    NETLIB_NAME(SN74LS629)::update();
 }
 
 NETLIB_RESET(SN74LS629_dip)
 {
-    NETLIB_NAME(SN74LS629)::reset();
+    m_1.do_reset();
+    m_2.do_reset();
 }
-#endif
