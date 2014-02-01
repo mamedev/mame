@@ -1746,6 +1746,7 @@ $(MESSOBJ)/robotron.a:          \
 $(MESSOBJ)/roland.a:            \
 	$(MESS_DRIVERS)/rmt32.o     \
 	$(MESS_DRIVERS)/rd110.o     \
+	$(MESS_DRIVERS)/rsc55.o     \
 
 $(MESSOBJ)/rockwell.a:          \
 	$(MESS_MACHINE)/aim65.o     \
