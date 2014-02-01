@@ -113,6 +113,9 @@ void js_main_loop() {
 
 void js_set_main_loop(device_scheduler &sched) {
 	scheduler = &sched;
+	EM_ASM (
+		JSMESS.running = true;
+	);
 	emscripten_set_main_loop(&js_main_loop, 0, 1);
 }
 #endif
