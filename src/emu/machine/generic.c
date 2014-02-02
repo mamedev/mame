@@ -553,8 +553,3 @@ CUSTOM_INPUT_MEMBER( driver_device::custom_port_read )
 	return ioport(tag)->read();
 }
 
-// legacy
-void generic_pulse_irq_line(device_t *device, int irqline, int cycles) { device->machine().driver_data()->generic_pulse_irq_line(device->execute(), irqline, cycles); }
-
-// legacy
-INTERRUPT_GEN( irq2_line_hold ) { device->machine().driver_data()->irq2_line_hold(*device); }
