@@ -61,14 +61,14 @@ public:
 	bool skip_this_frame() const { return m_skipping_this_frame; }
 	int speed_factor() const { return m_speed; }
 	int frameskip() const { return m_auto_frameskip ? -1 : m_frameskip_level; }
-	bool throttled() const { return m_throttle; }
+	bool throttled() const { return throttle_rate() != 0; }
+	float throttle_rate() const { return m_throttle_rate; }
 	bool fastforward() const { return m_fastforward; }
 	bool is_recording() const { return (m_mngfile != NULL || m_avifile != NULL); }
 
 	// setters
-	void set_speed_factor(int speed) { m_speed = speed; }
 	void set_frameskip(int frameskip);
-	void set_throttled(bool throttled = true) { m_throttle = throttled; }
+	void set_throttle_rate(float throttle_rate) { m_throttle_rate = throttle_rate; }
 	void set_fastforward(bool ffwd = true) { m_fastforward = ffwd; }
 	void set_output_changed() { m_output_changed = true; }
 
@@ -141,7 +141,7 @@ private:
 	UINT32              m_overall_valid_counter;    // number of consecutive valid time periods
 
 	// configuration
-	bool                m_throttle;                 // flag: TRUE if we're currently throttled
+	float               m_throttle_rate;            // target rate for throttling (0 = no throttle)
 	bool                m_fastforward;              // flag: TRUE if we're currently fast-forwarding
 	UINT32              m_seconds_to_run;           // number of seconds to run before quitting
 	bool                m_auto_frameskip;           // flag: TRUE if we're automatically frameskipping
