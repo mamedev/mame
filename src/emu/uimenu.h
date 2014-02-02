@@ -168,9 +168,9 @@ private:
 	static bitmap_rgb32 *hilight_bitmap;
 	static render_texture *hilight_texture, *arrow_texture;
 
-	bool special_main_menu;
-
-	running_machine &   m_machine;          /* machine we are attached to */
+	bool				special_main_menu;
+	running_machine &	m_machine;          /* machine we are attached to */
+	int					top_line;
 
 	void draw(bool customonly);
 	void draw_text_box();

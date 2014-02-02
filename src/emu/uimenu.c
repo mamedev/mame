@@ -132,6 +132,7 @@ void ui_menu::exit(running_machine &machine)
 ui_menu::ui_menu(running_machine &machine, render_container *_container) : m_machine(machine)
 {
 	special_main_menu = false;
+	top_line = -1;
 	container = _container;
 
 	reset(UI_MENU_RESET_SELECT_FIRST);
@@ -412,7 +413,6 @@ void ui_menu::draw(bool customonly)
 	float visible_top, visible_left;
 	int selected_subitem_too_big = FALSE;
 	int visible_lines;
-	int top_line;
 	int itemnum, linenum;
 	int mouse_hit, mouse_button;
 	render_target *mouse_target;
@@ -475,12 +475,19 @@ void ui_menu::draw(bool customonly)
 	if (!customonly)
 		ui_draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
-	/* determine the first visible line based on the current selection */
-	top_line = selected - visible_lines / 2;
+	// do we have to invalidate the first visible selection?
+	if ((top_line + 1 > selected) || (top_line + visible_lines - 2 < selected))
+		top_line = -1;
+
+	// determine the first visible line based on the current selection (if we need to)
 	if (top_line < 0)
-		top_line = 0;
-	if (top_line + visible_lines >= numitems)
-		top_line = numitems - visible_lines;
+	{
+		top_line = selected - visible_lines / 2;
+		if (top_line < 0)
+			top_line = 0;
+		if (top_line + visible_lines >= numitems)
+			top_line = numitems - visible_lines;
+	}
 
 	/* determine effective positions taking into account the hilighting arrows */
 	effective_width = visible_width - 2.0f * gutter_width;

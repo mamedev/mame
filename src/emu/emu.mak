@@ -64,6 +64,7 @@ OBJDIRS += \
 	$(EMUOBJ)/netlist/devices \
 	$(EMUOBJ)/layout \
 	$(EMUOBJ)/imagedev \
+	$(EMUOBJ)/ui \
 	$(EMUOBJ)/video \
 
 OSDSRC = $(SRC)/osd
@@ -148,6 +149,7 @@ EMUOBJS = \
 	$(EMUOBJ)/uiswlist.o \
 	$(EMUOBJ)/uimain.o \
 	$(EMUOBJ)/uimenu.o \
+	$(EMUOBJ)/ui/selgame.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
 	$(EMUOBJ)/debug/debugcmd.o \

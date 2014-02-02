@@ -344,27 +344,6 @@ public:
 	virtual void handle();
 };
 
-class ui_menu_select_game : public ui_menu {
-public:
-	ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename);
-	virtual ~ui_menu_select_game();
-	virtual void populate();
-	virtual void handle();
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
-
-private:
-	enum { VISIBLE_GAMES_IN_LIST = 15 };
-	UINT8               error;
-	UINT8               rerandomize;
-	char                search[40];
-	int                 matchlist[VISIBLE_GAMES_IN_LIST];
-	const game_driver   **driverlist;
-
-	driver_enumerator *drivlist;
-
-	void build_driver_list();
-};
-
 class ui_menu_bios_selection : public ui_menu {
 public:
 	ui_menu_bios_selection(running_machine &machine, render_container *container);
