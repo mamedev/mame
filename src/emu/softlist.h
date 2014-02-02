@@ -9,7 +9,7 @@
 #ifndef __SOFTLIST_H_
 #define __SOFTLIST_H_
 
-#include "uimenu.h"
+#include "ui/menu.h"
 #include "expat.h"
 #include "pool.h"
 

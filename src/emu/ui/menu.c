@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    uimenu.c
+    menu.c
 
     Internal MAME menus for the user interface.
 
@@ -31,8 +31,6 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-ui_menu *ui_menu::menu_stack;
-ui_menu *ui_menu::menu_free;
 bitmap_rgb32 *ui_menu::hilight_bitmap;
 render_texture *ui_menu::hilight_texture;
 render_texture *ui_menu::arrow_texture;
@@ -113,7 +111,7 @@ void ui_menu::exit(running_machine &machine)
 {
 	/* free menus */
 	ui_menu::stack_reset(machine);
-	ui_menu::clear_free_list(machine);
+	ui_stackable::clear_free_list(machine);
 
 	/* free textures */
 	machine.render().texture_free(hilight_texture);
@@ -129,11 +127,10 @@ void ui_menu::exit(running_machine &machine)
 /*-------------------------------------------------
     ui_menu - menu constructor
 -------------------------------------------------*/
-ui_menu::ui_menu(running_machine &machine, render_container *_container) : m_machine(machine)
+ui_menu::ui_menu(running_machine &machine, render_container *_container)
+	: ui_stackable(machine, _container)
 {
-	special_main_menu = false;
 	top_line = -1;
-	container = _container;
 
 	reset(UI_MENU_RESET_SELECT_FIRST);
 }
@@ -156,6 +153,17 @@ ui_menu::~ui_menu()
 	/* free the item array */
 	if (item)
 		auto_free(machine(), item);
+}
+
+
+/*-------------------------------------------------
+    reset - free all items in the menu,
+    and all memory allocated from the memory pool
+-------------------------------------------------*/
+
+void ui_menu::reset()
+{
+	reset(UI_MENU_RESET_SELECT_FIRST);
 }
 
 
@@ -190,26 +198,6 @@ void ui_menu::reset(ui_menu_reset_options options)
 		item_append("Exit", NULL, 0, NULL);
 	else
 		item_append("Return to Previous Menu", NULL, 0, NULL);
-}
-
-
-/*-------------------------------------------------
-    is_special_main_menu - returns whether the
-    menu has special needs
--------------------------------------------------*/
-bool ui_menu::is_special_main_menu() const
-{
-	return special_main_menu;
-}
-
-
-/*-------------------------------------------------
-    set_special_main_menu - set whether the
-    menu has special needs
--------------------------------------------------*/
-void ui_menu::set_special_main_menu(bool special)
-{
-	special_main_menu = special;
 }
 
 
@@ -945,85 +933,6 @@ void ui_menu::validate_selection(int scandir)
 
 
 
-/*-------------------------------------------------
-    clear_free_list - clear out anything
-    accumulated in the free list
--------------------------------------------------*/
-
-void ui_menu::clear_free_list(running_machine &machine)
-{
-	while (menu_free != NULL)
-	{
-		ui_menu *menu = menu_free;
-		menu_free = menu->parent;
-		auto_free(machine, menu);
-	}
-}
-
-
-
-/***************************************************************************
-    MENU STACK MANAGEMENT
-***************************************************************************/
-
-/*-------------------------------------------------
-    ui_menu::stack_reset - reset the menu stack
--------------------------------------------------*/
-
-void ui_menu::stack_reset(running_machine &machine)
-{
-	while (menu_stack != NULL)
-		ui_menu::stack_pop(machine);
-}
-
-
-/*-------------------------------------------------
-    stack_push - push a new menu onto the
-    stack
--------------------------------------------------*/
-
-void ui_menu::stack_push(ui_menu *menu)
-{
-	menu->parent = menu_stack;
-	menu_stack = menu;
-	menu->reset(UI_MENU_RESET_SELECT_FIRST);
-	ui_input_reset(menu->machine());
-}
-
-
-/*-------------------------------------------------
-    stack_pop - pop a menu from the stack
--------------------------------------------------*/
-
-void ui_menu::stack_pop(running_machine &machine)
-{
-	if (menu_stack != NULL)
-	{
-		ui_menu *menu = menu_stack;
-		menu_stack = menu->parent;
-		menu->parent = menu_free;
-		menu_free = menu;
-		ui_input_reset(machine);
-	}
-}
-
-
-/*-------------------------------------------------
-    ui_menu::stack_has_special_main_menu -
-    check in the special main menu is in the stack
--------------------------------------------------*/
-
-bool ui_menu::stack_has_special_main_menu()
-{
-	ui_menu *menu;
-
-	for (menu = menu_stack; menu != NULL; menu = menu->parent)
-		if (menu->is_special_main_menu())
-			return true;
-
-	return false;
-}
-
 void ui_menu::do_handle()
 {
 	if(!populated())
@@ -1052,7 +961,7 @@ UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container
 		menu_stack->do_handle();
 
 	/* clear up anything pending to be released */
-	clear_free_list(machine);
+	ui_stackable::clear_free_list(machine);
 
 	/* if the menus are to be hidden, return a cancel here */
 	if ((ui_input_pressed(machine, IPT_UI_CONFIGURE) && !stack_has_special_main_menu()) || menu_stack == NULL)

@@ -11,13 +11,13 @@
 
 #pragma once
 
-#ifndef __SELGAME_H__
-#define __SELGAME_H__
+#ifndef __UI_SELGAME_H__
+#define __UI_SELGAME_H__
 
 #include "emu.h"
 #include "emuopts.h"
 #include "ui.h"
-#include "uimenu.h"
+#include "ui/menu.h"
 #include "drivenum.h"
 
 
@@ -54,4 +54,4 @@ private:
 };
 
 
-#endif  /* __SELGAME_H__ */
+#endif  /* __UI_SELGAME_H__ */
