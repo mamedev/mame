@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    selgame.h
+    selgame.c
 
     Game selector
 
@@ -60,7 +60,7 @@ void ui_menu_select_game::build_driver_list()
 		char *dst = drivername;
 		const char *src;
 
-		/* build a name for it */
+		// build a name for it
 		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; src++)
 			*dst++ = tolower((UINT8)*src);
 		*dst = 0;
@@ -192,11 +192,11 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 {
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
 
-	/* special case for configure inputs */
+	// special case for configure inputs
 	if ((FPTR)driver == 1)
 		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_groups(machine(), container)));
 
-	/* anything else is a driver */
+	// anything else is a driver
 	else
 	{
 		// audit the game first to see if we're going to work
