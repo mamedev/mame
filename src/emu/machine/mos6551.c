@@ -67,7 +67,8 @@ mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, d
 		m_ext_rxc(0),
 		m_cts(1),
 		m_dsr(1),
-		m_dcd(1)
+		m_dcd(1),
+		m_chip_type(MOS6551_TYPE_MOS)
 {
 }
 
@@ -103,7 +104,20 @@ void mos6551_device::device_start()
 void mos6551_device::device_reset()
 {
 	m_ctrl = 0;
-	m_cmd = CMD_RIE;
+
+	switch (m_chip_type)
+	{
+		case MOS6551_TYPE_MOS:
+			m_cmd = CMD_RIE; 
+			break;
+
+		case MOS6551_TYPE_ROCKWELL:
+			m_cmd = 0;
+			break;
+
+		default:
+			fatalerror("mos6551: unknown type %d", m_chip_type);
+	}
 
 	transmit_register_reset();
 	receive_register_reset();
@@ -111,6 +125,16 @@ void mos6551_device::device_reset()
 	update_serial();
 }
 
+//-------------------------------------------------
+//  static_set_type - configuration helper to set
+//  the chip type
+//-------------------------------------------------
+
+void mos6551_device::static_set_type(device_t &device, int type)
+{
+	mos6551_device &mos = downcast<mos6551_device &>(device);
+	mos.m_chip_type = type;
+}
 
 void mos6551_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -321,7 +345,11 @@ WRITE8_MEMBER( mos6551_device::write )
 
 	case 1:
 		// programmed reset
-		m_cmd = (m_cmd & 0xe0) | CMD_RIE;
+		m_cmd = (m_cmd & 0xe0);
+		if (m_chip_type == MOS6551_TYPE_MOS)
+		{
+			m_cmd |= CMD_RIE;
+		}
 		m_st &= ~ST_OR;
 		update_serial();
 		break;
