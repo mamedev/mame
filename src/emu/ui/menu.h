@@ -128,10 +128,6 @@ public:
 	/* changes the index of the currently selected menu item */
 	void set_selection(void *selected_itemref);
 
-	/* Global initialization */
-	static void init(running_machine &machine);
-	static void exit(running_machine &machine);
-
 	/* master handler */
 	static UINT32 ui_handler(running_machine &machine, render_container *container, UINT32 state);
 
@@ -145,9 +141,6 @@ public:
 	virtual void handle() = 0;
 
 private:
-	static bitmap_rgb32 *hilight_bitmap;
-	static render_texture *hilight_texture, *arrow_texture;
-
 	int					top_line;
 
 	void draw(bool customonly);
@@ -157,7 +150,6 @@ private:
 	void clear_free_list();
 
 	inline bool exclusive_input_pressed(int key, int repeat);
-	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 };
 
 #endif  /* __UI_MENU_H__ */

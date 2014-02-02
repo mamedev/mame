@@ -20,30 +20,59 @@
 
 ui_stackable *ui_stackable::menu_stack;
 ui_stackable *ui_stackable::menu_free;
+bitmap_rgb32 *ui_stackable::hilight_bitmap;
+render_texture *ui_stackable::hilight_texture;
+render_texture *ui_stackable::arrow_texture;
 
 
 /***************************************************************************
-    MENU STACK MANAGEMENT
+    STATIC METHODS
 ***************************************************************************/
 
 //-------------------------------------------------
-//  ctor
+//  init - initialize the menu system
 //-------------------------------------------------
 
-ui_stackable::ui_stackable(running_machine &machine, render_container *_container)
-	: m_machine(machine)
+void ui_stackable::init(running_machine &machine)
 {
-	container = _container;
-	special_main_menu = false;
+	int x;
+
+	// initialize the menu stack
+	stack_reset(machine);
+
+	// create a texture for hilighting items
+	hilight_bitmap = auto_bitmap_rgb32_alloc(machine, 256, 1);
+	for (x = 0; x < 256; x++)
+	{
+		int alpha = 0xff;
+		if (x < 25) alpha = 0xff * x / 25;
+		if (x > 256 - 25) alpha = 0xff * (255 - x) / 25;
+		hilight_bitmap->pix32(0, x) = MAKE_ARGB(alpha,0xff,0xff,0xff);
+	}
+	hilight_texture = machine.render().texture_alloc();
+	hilight_texture->set_bitmap(*hilight_bitmap, hilight_bitmap->cliprect(), TEXFORMAT_ARGB32);
+
+	// create a texture for arrow icons
+	arrow_texture = machine.render().texture_alloc(render_triangle);
+
+	// add an exit callback to free memory
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_stackable::exit), &machine));
 }
 
 
 //-------------------------------------------------
-//  dtor
+//  exit - clean up after ourselves
 //-------------------------------------------------
 
-ui_stackable::~ui_stackable()
+void ui_stackable::exit(running_machine &machine)
 {
+	// free menus
+	ui_menu::stack_reset(machine);
+	ui_stackable::clear_free_list(machine);
+
+	// free textures
+	machine.render().texture_free(hilight_texture);
+	machine.render().texture_free(arrow_texture);
 }
 
 
@@ -102,6 +131,86 @@ bool ui_stackable::stack_has_special_main_menu()
 			return true;
 
 	return false;
+}
+
+
+//-------------------------------------------------
+//  render_triangle - render a triangle that
+//  is used for up/down arrows and left/right
+//  indicators
+//-------------------------------------------------
+
+void ui_stackable::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param)
+{
+	int halfwidth = dest.width() / 2;
+	int height = dest.height();
+	int x, y;
+
+	// start with all-transparent
+	dest.fill(MAKE_ARGB(0x00,0x00,0x00,0x00));
+
+	// render from the tip to the bottom
+	for (y = 0; y < height; y++)
+	{
+		int linewidth = (y * (halfwidth - 1) + (height / 2)) * 255 * 2 / height;
+		UINT32 *target = &dest.pix32(y, halfwidth);
+
+		// don't antialias if height < 12
+		if (dest.height() < 12)
+		{
+			int pixels = (linewidth + 254) / 255;
+			if (pixels % 2 == 0) pixels++;
+			linewidth = pixels * 255;
+		}
+
+		// loop while we still have data to generate
+		for (x = 0; linewidth > 0; x++)
+		{
+			int dalpha;
+
+			// first column we only consume one pixel
+			if (x == 0)
+			{
+				dalpha = MIN(0xff, linewidth);
+				target[x] = MAKE_ARGB(dalpha,0xff,0xff,0xff);
+			}
+
+			// remaining columns consume two pixels, one on each side
+			else
+			{
+				dalpha = MIN(0x1fe, linewidth);
+				target[x] = target[-x] = MAKE_ARGB(dalpha/2,0xff,0xff,0xff);
+			}
+
+			// account for the weight we consumed
+			linewidth -= dalpha;
+		}
+	}
+}
+
+
+/***************************************************************************
+    MENU STACK MANAGEMENT
+***************************************************************************/
+
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+ui_stackable::ui_stackable(running_machine &machine, render_container *_container)
+	: m_machine(machine)
+{
+	container = _container;
+	special_main_menu = false;
+}
+
+
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
+ui_stackable::~ui_stackable()
+{
 }
 
 
@@ -214,6 +323,17 @@ void ui_stackable::draw_text_box(const char *text, int justify, float xpos, floa
 
 
 //-------------------------------------------------
+//  highlight
+//-------------------------------------------------
+
+void ui_stackable::highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor)
+{
+	container->add_quad(x0, y0, x1, y1, bgcolor, hilight_texture,
+						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+}
+
+
+//-------------------------------------------------
 //  input_pop_event
 //-------------------------------------------------
 
@@ -239,12 +359,22 @@ bool ui_stackable::input_pressed(int key, int repeat)
 
 bool ui_stackable::find_mouse(float &mouse_x, float &mouse_y)
 {
+	bool mouse_button;
+	return find_mouse(mouse_x, mouse_y, mouse_button);
+}
+
+
+//-------------------------------------------------
+//  find_mouse
+//-------------------------------------------------
+
+bool ui_stackable::find_mouse(float &mouse_x, float &mouse_y, bool &mouse_button)
+{
 	bool result = false;
 	mouse_x = -1;
 	mouse_y = -1;
 
 	INT32 mouse_target_x, mouse_target_y;
-	bool mouse_button;
 	render_target *mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
 	if (mouse_target != NULL)
 	{

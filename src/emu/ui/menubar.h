@@ -145,9 +145,11 @@ private:
 	// instance variables
 	menu_item		m_menus;
 	menu_item *		m_selected;
+	menu_item *		m_drag;
+	bool			m_dragged;
 	float			m_mouse_x, m_mouse_y;
+	bool			m_mouse_button;
 	float			m_checkmark_width;
-	float			m_submenu_expander_width;
 
 	// selection walking
 	bool walk_selection_previous();
@@ -160,6 +162,8 @@ private:
 	// miscellaneous
 	void draw_child_menu(menu_item *menu, float x, float y);
 	void draw_menu_item_text(menu_item *mi, float x0, float y0, float x1, float y1, bool decorations);
+	bool event_loop();
+	bool poll_keyboard();
 	bool input_pressed_safe(int key);
 	void invoke_selection();
 };

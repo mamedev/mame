@@ -19,7 +19,6 @@
 #define	UI_MENU_COLOR			UI_RED_COLOR
 #define UI_MENU_COLOR_SELECTED	UI_GREEN_COLOR
 #define CHECKMARK				"x "
-#define SUBMENU_EXPANDER		" >"
 
 
 //**************************************************************************
@@ -34,8 +33,9 @@ ui_menubar::ui_menubar(running_machine &machine, render_container *container)
 	: ui_stackable(machine, container)
 {
 	m_selected = NULL;
+	m_drag = NULL;
+	m_dragged = false;
 	m_checkmark_width = -1;
-	m_submenu_expander_width = -1;
 }
 
 
@@ -83,11 +83,9 @@ void ui_menubar::do_handle()
 	// measure standard string widths (if necessary)
 	if (m_checkmark_width <= 0)
 		m_checkmark_width = get_string_width(CHECKMARK);
-	if (m_submenu_expander_width <= 0)
-		m_submenu_expander_width = get_string_width(SUBMENU_EXPANDER);
 
 	m_menus.clear_area_recursive();
-	find_mouse(m_mouse_x, m_mouse_y);
+	find_mouse(m_mouse_x, m_mouse_y, m_mouse_button);
 
 	float text_height = get_line_height();
 	float spacing = text_height / 10;
@@ -114,39 +112,89 @@ void ui_menubar::do_handle()
 			false);
 
 		// child menu open?
-		if (m_selected && (m_selected->is_child_of(mi) || (m_selected == mi)))
+		menu_item *current_menu = m_selected ? m_selected : m_drag;
+		if (current_menu && (current_menu->is_child_of(mi) || (current_menu == mi)))
 			draw_child_menu(mi, x, y + text_height + (spacing * 3));
 
 		x += width + spacing * 4;
 	}
 
 	// loop while we have interesting events
-	bool stop = false;
-	ui_event local_menu_event;
-	while (input_pop_event(local_menu_event) && !stop)
+	while(!event_loop())
 	{
+	}
+}
+
+
+//-------------------------------------------------
+//  event_loop
+//-------------------------------------------------
+
+bool ui_menubar::event_loop()
+{
+	bool done;
+	ui_event local_menu_event;
+	if (input_pop_event(local_menu_event))
+	{
+		done = false;
+
+		// find the menu item we're pointing at
+		menu_item *mi = m_menus.find_point(m_mouse_x, m_mouse_y);
+
 		switch (local_menu_event.event_type)
 		{
-			case UI_EVENT_CHAR:
-				stop = true;
+			case UI_EVENT_MOUSE_DOWN:
+				if (mi != NULL)
+				{
+					m_selected = mi;
+					m_drag = mi;
+					m_dragged = false;
+				}
 				break;
 
-			case UI_EVENT_MOUSE_DOWN:
+			case UI_EVENT_MOUSE_MOVE:
+				if (m_drag != NULL)
 				{
-					menu_item *mi = m_menus.find_point(m_mouse_x, m_mouse_y);
-					if (mi)
+					if (m_selected != mi)
 					{
 						m_selected = mi;
-						return;
+						done = true;
+					}
+					if (mi != NULL && m_drag != mi)
+					{
+						m_dragged = true;
+						m_drag = mi;
 					}
 				}
 				break;
 
+			case UI_EVENT_MOUSE_UP:
+				if (m_selected && m_selected == mi && m_selected->is_invokable())
+					invoke_selection();
+				m_drag = NULL;
+				done = true;
+				break;
+
 			default:
+				done = poll_keyboard();
 				break;
 		}
 	}
+	else
+	{
+		// no more events; we're done
+		done = true;
+	}
+	return done;
+}
 
+
+//-------------------------------------------------
+//  poll_keyboard
+//-------------------------------------------------
+
+bool ui_menubar::poll_keyboard()
+{
 	int code_previous_menu;
 	int code_next_menu;
 	int code_child_menu = IPT_INVALID;
@@ -177,6 +225,7 @@ void ui_menubar::do_handle()
 			code_parent_menu = IPT_UI_LEFT;
 	}
 
+	bool result = true;
 	if (input_pressed_safe(code_previous_menu))
 		walk_selection_previous();
 	else if (input_pressed_safe(code_next_menu))
@@ -191,6 +240,10 @@ void ui_menubar::do_handle()
 		walk_selection_next_peer();
 	else if (input_pressed_safe(code_selected))
 		invoke_selection();
+	else
+		result = false;	// didn't do anything
+
+	return result;
 }
 
 
@@ -322,8 +375,7 @@ void ui_menubar::draw_child_menu(menu_item *menu, float x, float y)
 	{
 		// get the width of this entire menu item
 		float width = get_string_width(mi->name())
-			+ m_checkmark_width
-			+ (mi->has_children() ? m_submenu_expander_width : 0);
+			+ (m_checkmark_width * 2);
 
 		// and aggregate the results
 		max_width = MAX(max_width, width);
@@ -392,8 +444,12 @@ void ui_menubar::draw_menu_item_text(menu_item *mi, float x0, float y0, float x1
 	{
 		// normal
 		fgcolor = UI_TEXT_COLOR;
-		bgcolor = UI_BACKGROUND_COLOR;
+		bgcolor = UI_TEXT_BG_COLOR;
 	}
+
+	// highlight?
+	if (bgcolor != UI_TEXT_BG_COLOR)
+		highlight(x0, y0, x1, y1, bgcolor);
 
 	// do we have to draw additional decorations?
 	if (decorations)
@@ -405,7 +461,17 @@ void ui_menubar::draw_menu_item_text(menu_item *mi, float x0, float y0, float x1
 
 		// expanders?
 		if (mi->child())
-			draw_text(SUBMENU_EXPANDER, x0, y0, x1 - x0, JUSTIFY_RIGHT);
+		{
+			float lr_arrow_width = 0.4f * (y1 - y0) * machine().render().ui_aspect();
+			container->add_quad(
+				x1 - lr_arrow_width,
+				y0 + (0.1f * (y1 - y0)),
+				x1,
+				y0 + (0.9f * (y1 - y0)),
+				fgcolor,
+				arrow_texture,
+				PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(ROT90));
+		}
 	}
 
 	draw_text(mi->name(), x0, y0, fgcolor, bgcolor);
