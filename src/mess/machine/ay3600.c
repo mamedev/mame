@@ -264,17 +264,6 @@ static const unsigned char ay3600_key_remap_2e[2][9*8][4] =
 
 #define AY3600_KEYS_LENGTH          128
 
-// IIgs keymod flags
-#define A2_KEYMOD_SHIFT     1
-#define A2_KEYMOD_CONTROL   2
-#define A2_KEYMOD_CAPSLOCK  4
-#define A2_KEYMOD_REPEAT    8
-#define A2_KEYMOD_KEYPAD    0x10
-#define A2_KEYMOD_MODLATCH  0x20
-#define A2_KEYMOD_COMMAND   0x40
-#define A2_KEYMOD_OPTION    0x80
-
-
 
 /***************************************************************************
     HELPER FUNCTIONS
@@ -327,7 +316,7 @@ int AY3600_init(running_machine &machine)
 	state->m_keywaiting = 0;
 	state->m_keycode = 0;
 	state->m_keystilldown = 0;
-	state->m_keymodreg = A2_KEYMOD_CAPSLOCK;    // caps lock on
+	state->m_keymodreg = AY3600_KEYMOD_CAPSLOCK;    // caps lock on
 
 	state->m_last_key = 0xff;   /* necessary for special repeat key behaviour */
 	state->m_last_key_unmodified = 0xff;    /* necessary for special repeat key behaviour */
@@ -370,13 +359,13 @@ static TIMER_CALLBACK(AY3600_poll)
 	{
 		caps_lock = 1;
 		set_led_status(machine,1,1);
-		state->m_keymodreg |= A2_KEYMOD_CAPSLOCK;
+		state->m_keymodreg |= AY3600_KEYMOD_CAPSLOCK;
 	}
 	else
 	{
 		caps_lock = 0;
 		set_led_status(machine,1,0);
-		state->m_keymodreg &= ~A2_KEYMOD_CAPSLOCK;
+		state->m_keymodreg &= ~AY3600_KEYMOD_CAPSLOCK;
 	}
 
 	switchkey = A2_KEY_NORMAL;
@@ -385,42 +374,42 @@ static TIMER_CALLBACK(AY3600_poll)
 	if (state->apple2_pressed_specialkey(SPECIALKEY_SHIFT))
 	{
 		switchkey |= A2_KEY_SHIFT;
-		state->m_keymodreg |= A2_KEYMOD_SHIFT;
+		state->m_keymodreg |= AY3600_KEYMOD_SHIFT;
 	}
 	else
 	{
-		state->m_keymodreg &= ~A2_KEYMOD_SHIFT;
+		state->m_keymodreg &= ~AY3600_KEYMOD_SHIFT;
 	}
 
 	/* control key check - only one control key on the left side on the Apple */
 	if (state->apple2_pressed_specialkey(SPECIALKEY_CONTROL))
 	{
 		switchkey |= A2_KEY_CONTROL;
-		state->m_keymodreg |= A2_KEYMOD_CONTROL;
+		state->m_keymodreg |= AY3600_KEYMOD_CONTROL;
 	}
 	else
 	{
-		state->m_keymodreg &= ~A2_KEYMOD_CONTROL;
+		state->m_keymodreg &= ~AY3600_KEYMOD_CONTROL;
 	}
 
 	/* apple key check */
 	if (state->apple2_pressed_specialkey(SPECIALKEY_BUTTON0))
 	{
-		state->m_keymodreg |= A2_KEYMOD_COMMAND;
+		state->m_keymodreg |= AY3600_KEYMOD_COMMAND;
 	}
 	else
 	{
-		state->m_keymodreg &= ~A2_KEYMOD_COMMAND;
+		state->m_keymodreg &= ~AY3600_KEYMOD_COMMAND;
 	}
 
 	/* option key check */
 	if (state->apple2_pressed_specialkey(SPECIALKEY_BUTTON1))
 	{
-		state->m_keymodreg |= A2_KEYMOD_OPTION;
+		state->m_keymodreg |= AY3600_KEYMOD_OPTION;
 	}
 	else
 	{
-		state->m_keymodreg &= ~A2_KEYMOD_OPTION;
+		state->m_keymodreg &= ~AY3600_KEYMOD_OPTION;
 	}
 
 	/* reset key check */
@@ -445,7 +434,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	/* run through real keys and see what's being pressed */
 	num_ports = a2_has_keypad(state) ? 9 : 7;
 
-	state->m_keymodreg &= ~A2_KEYMOD_KEYPAD;
+	state->m_keymodreg &= ~AY3600_KEYMOD_KEYPAD;
 
 	for (port = 0; port < num_ports; port++)
 	{
@@ -469,7 +458,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 				if (port == 8)
 				{
-					state->m_keymodreg |= A2_KEYMOD_KEYPAD;
+					state->m_keymodreg |= AY3600_KEYMOD_KEYPAD;
 				}
 
 				/* prevent overflow */
@@ -491,7 +480,7 @@ static TIMER_CALLBACK(AY3600_poll)
 		}
 	}
 
-	state->m_keymodreg &= ~A2_KEYMOD_REPEAT;
+	state->m_keymodreg &= ~AY3600_KEYMOD_REPEAT;
 
 	if (!any_key_pressed)
 	{
@@ -514,7 +503,7 @@ static TIMER_CALLBACK(AY3600_poll)
 			state->m_keywaiting = 1;
 			state->m_keycode = state->m_last_key;
 			state->m_keycode_unmodified = state->m_last_key_unmodified;
-			state->m_keymodreg |= A2_KEYMOD_REPEAT;
+			state->m_keymodreg |= AY3600_KEYMOD_REPEAT;
 		}
 	}
 	state->m_keystilldown = (state->m_last_key_unmodified == state->m_keycode_unmodified);

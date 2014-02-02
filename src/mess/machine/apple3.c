@@ -119,15 +119,40 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 	switch(offset)
 	{
+		/* keystrobe */
 		case 0x00: case 0x01: case 0x02: case 0x03:
 		case 0x04: case 0x05: case 0x06: case 0x07:
 			result = AY3600_keydata_strobe_r(machine());
 			break;
 
+		/* modifier keys */
 		case 0x08: case 0x09: case 0x0A: case 0x0B:
 		case 0x0C: case 0x0D: case 0x0E: case 0x0F:
-			/* modifier keys */
-			result = 0x7d;
+			{
+				UINT8 tmp = AY3600_keymod_r(machine());
+
+				result = 0x7e;
+				if (tmp & AY3600_KEYMOD_SHIFT)
+				{
+					result &= ~0x02;
+				}
+				if (tmp & AY3600_KEYMOD_CONTROL)
+				{
+					result &= ~0x04;
+				}
+				if (tmp & AY3600_KEYMOD_CAPSLOCK)
+				{
+					result &= ~0x08;
+				}
+				if (tmp & AY3600_KEYMOD_COMMAND)
+				{
+					result &= ~0x10;
+				}
+				if (tmp & AY3600_KEYMOD_OPTION)
+				{
+					result &= ~0x20;
+				}
+			}
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
