@@ -179,6 +179,44 @@ protected:
 };
 
 
+class iqunlim_state : public socrates_state
+{
+public:
+	iqunlim_state(const machine_config &mconfig, device_type type, const char *tag)
+		: socrates_state(mconfig, type, tag),
+			m_bank1(*this, "bank1"),
+			m_bank2(*this, "bank2"),
+			m_bank3(*this, "bank3"),
+			m_bank4(*this, "bank4")
+		{ }
+
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER( colors_w );
+	DECLARE_READ8_MEMBER( rombank_r );
+	DECLARE_WRITE8_MEMBER( rombank_w );
+	DECLARE_READ8_MEMBER( rambank_r );
+	DECLARE_WRITE8_MEMBER( rambank_w );
+	DECLARE_READ8_MEMBER( video_regs_r );
+	DECLARE_WRITE8_MEMBER( video_regs_w );
+	DECLARE_READ8_MEMBER( status_r );
+
+protected:
+	virtual void machine_start();
+	virtual void machine_reset();
+	int get_color(int index, int y);
+
+private:
+	UINT8   m_rombank[2];
+	UINT8   m_rambank;
+	UINT8   m_colors[8];
+	UINT8   m_video_regs[4];
+};
+
 /* Defines */
 
 /* Components */
@@ -728,6 +766,157 @@ WRITE8_MEMBER(socrates_state::socrates_sound_w)
 	}
 }
 
+
+
+//-----------------------------------------------------------------------------
+//
+//        IQ Unlimited
+//
+//-----------------------------------------------------------------------------
+
+int iqunlim_state::get_color(int index, int y)
+{
+	if (index < 8)
+		return m_colors[index];
+	else
+		return m_videoram[0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff)];
+}
+
+UINT32 iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// bitmap layer
+	for (int y=0; y<224; y++)
+	{
+		if (y >= m_video_regs[0x03])    break;
+		for (int x=0; x<128; x++)
+		{
+			UINT8 data = m_videoram[(m_scroll_offset + y) * 0x80 + x];
+
+			for(int b=0; b<2; b++)
+			{
+				bitmap.pix16(y, x*2 + b) = get_color(data & 0x0f, y);
+				data >>= 4;
+			}
+		}
+	}
+
+	// text layer
+	for (int y=0; y<28; y++)
+	{
+		for (int x=0; x<40; x++)
+		{
+			UINT8 c = m_videoram[0x8400 + (y - 1) * 0x40 + x];
+			UINT8 *gfx = &m_videoram[0x8000 + (c & 0x7f) * 8];
+
+			for (int cy=0; cy<8; cy++)
+			{
+				int py = y * 8 + cy;
+				if (py >= m_video_regs[0x03])
+				{
+					UINT8 col0 = get_color(0x0e, py);
+					UINT8 col1 = get_color(0x0f, py);
+					UINT8 data = 0;
+
+					if (y > 0 && y < 26)
+						data = gfx[cy] ^ (c & 0x80 ? 0xff : 0);
+
+					if (x == 0) bitmap.plot_box(0, py, 8 + 40*6 + 8, 1, col0);
+					for (int cx=0; cx<6; cx++)
+					{
+						int px = 8 + x*6 + cx;
+						bitmap.pix16(py, px) = BIT(data, 7) ? col1 : col0;
+						data <<= 1;
+					}
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
+READ8_MEMBER( iqunlim_state::status_r )
+{
+	// ---x ----    main battery status
+	// --x- ----    backup battery status
+
+	return 0x30;
+}
+
+READ8_MEMBER( iqunlim_state::video_regs_r )
+{
+	return m_video_regs[offset];
+}
+
+WRITE8_MEMBER( iqunlim_state::video_regs_w )
+{
+	m_video_regs[offset] = data;
+}
+
+void iqunlim_state::machine_start()
+{
+	UINT8 *bios = memregion("bios")->base();
+	UINT8 *cart = memregion("cart")->base();
+	UINT8 *ram  = memregion("vram")->base();
+	m_bank1->configure_entries(0x00, 0x10, bios, 0x4000);
+	m_bank1->configure_entries(0x10, 0x10, cart , 0x4000);
+	m_bank1->configure_entries(0x20, 0x10, bios + 0x40000, 0x4000);
+	m_bank1->configure_entries(0x30, 0x10, cart + 0x40000 , 0x4000);
+
+	m_bank2->configure_entries(0x00, 0x10, bios, 0x4000);
+	m_bank2->configure_entries(0x10, 0x10, cart , 0x4000);
+	m_bank2->configure_entries(0x20, 0x10, bios + 0x40000, 0x4000);
+	m_bank2->configure_entries(0x30, 0x10, cart + 0x40000 , 0x4000);
+
+	m_bank3->configure_entries(0x00, 0x08, ram, 0x4000);
+	m_bank4->configure_entries(0x00, 0x08, ram, 0x4000);
+}
+
+void iqunlim_state::machine_reset()
+{
+	socrates_state::machine_reset();
+
+	m_rambank = m_rombank[0] = m_rombank[1] = 0;
+	memset(m_colors, 0, 8);
+	memset(m_video_regs, 0, 4);
+
+	m_bank1->set_entry(0x00);
+	m_bank2->set_entry(0x00);
+	m_bank3->set_entry(0x00);
+	m_bank4->set_entry(0x00);
+}
+
+READ8_MEMBER( iqunlim_state::rombank_r )
+{
+	return m_rombank[offset];
+}
+
+WRITE8_MEMBER( iqunlim_state::rombank_w )
+{
+	memory_bank *bank = offset ? m_bank1 : m_bank2;
+	bank->set_entry(data & 0x3f);
+
+	m_rombank[offset] = data;
+}
+
+READ8_MEMBER( iqunlim_state::rambank_r )
+{
+	return m_rambank;
+}
+
+WRITE8_MEMBER( iqunlim_state::rambank_w )
+{
+	m_bank3->set_entry(((data>>2) & 0x0c) | ((data>>0) & 0x03));
+	m_bank4->set_entry(((data>>4) & 0x0c) | ((data>>2) & 0x03));
+	m_rambank = data;
+}
+
+WRITE8_MEMBER( iqunlim_state::colors_w )
+{
+	m_colors[offset] = data;
+}
+
+
 /******************************************************************************
  Address Maps
 ******************************************************************************/
@@ -769,6 +958,29 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	AM_RANGE(0x60, 0x60) AM_READWRITE(read_f3, reset_speech) AM_MIRROR(0xF) /* reset the speech module, or perhaps fire an NMI?  */
 	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(iqunlim_mem, AS_PROGRAM, 8, iqunlim_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( iqunlim_io , AS_IO, 8, iqunlim_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_READWRITE(rombank_r, rombank_w) AM_MIRROR(0x06)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(rambank_r, rambank_w) AM_MIRROR(0x07)
+	AM_RANGE(0x10, 0x17) AM_WRITE(socrates_sound_w) AM_MIRROR (0x08)
+	AM_RANGE(0x20, 0x21) AM_WRITE(socrates_scroll_w) AM_MIRROR (0x0e)
+	AM_RANGE(0x70, 0x73) AM_READWRITE(video_regs_r, video_regs_w) AM_MIRROR (0x0c)
+	AM_RANGE(0x80, 0x81) AM_WRITENOP // LCD
+	AM_RANGE(0xb1, 0xb1) AM_WRITENOP
+	AM_RANGE(0xa0, 0xa0) AM_READ(status_r) AM_MIRROR(0x0f)
+	AM_RANGE(0xe0, 0xe7) AM_WRITE(colors_w) AM_MIRROR(0x08)
+ADDRESS_MAP_END
+
 
 
 /******************************************************************************
@@ -957,6 +1169,9 @@ static INPUT_PORTS_START( socrates )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( iqunlimz )
+INPUT_PORTS_END
+
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
@@ -1056,6 +1271,33 @@ static MACHINE_CONFIG_DERIVED( socrates_pal, socrates )
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 */
+
+static MACHINE_CONFIG_START( iqunlimz, iqunlim_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) /* not accurate */
+	MCFG_CPU_PROGRAM_MAP(iqunlim_mem)
+	MCFG_CPU_IO_MAP(iqunlim_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", iqunlim_state,  assert_irq)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(iqunlim_state, screen_update)
+	MCFG_SCREEN_SIZE(256, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
+	MCFG_PALETTE_LENGTH(256)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+MACHINE_CONFIG_END
+
 /******************************************************************************
  ROM Definitions
 ******************************************************************************/
@@ -1158,6 +1400,15 @@ ROM_START(profweis)
 	ROM_FILL(0x4000, 0xc000, 0xff) // last 3 vsms aren't present, FF fill
 ROM_END
 
+ROM_START( iqunlimz )
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD( "vtech.bin", 0x000000, 0x080000, CRC(f100c8a7) SHA1(6ad2a8accae2dd5c5c46ae953eef33cdd1ea3cf9) )
+
+	ROM_REGION( 0x80000, "cart", ROMREGION_ERASEFF )
+	ROM_CART_LOAD( "cart", 0, 0x80000, 0 )
+
+	ROM_REGION( 0x20000, "vram", ROMREGION_ERASE )
+ROM_END
 
 
 /******************************************************************************
@@ -1170,3 +1421,5 @@ COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates_state
 COMP( 1988, profweis,   socrates,   0,      socrates_pal,   socrates, socrates_state, socrates, "Video Technology/Yeno",        "Professor Weiss-Alles", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // German PAL, 1988 title copyright
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
+
+COMP( 1991, iqunlimz, 0,       0,     iqunlimz,  iqunlimz, driver_device, 0,  "Video Technology", "IQ Unlimited (Z80)", GAME_NOT_WORKING | GAME_NO_SOUND)

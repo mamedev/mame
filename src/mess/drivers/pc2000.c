@@ -678,12 +678,6 @@ ROM_START( misterx )
 	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
 ROM_END
 
-ROM_START( iqunlimz )
-	ROM_REGION( 0x80000, "bios", 0 )
-	ROM_LOAD( "vtech.bin", 0x000000, 0x080000, CRC(f100c8a7) SHA1(6ad2a8accae2dd5c5c46ae953eef33cdd1ea3cf9) )
-
-	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
-ROM_END
 
 /* Driver */
 
@@ -698,4 +692,3 @@ COMP( 19??, gl5000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "V
 COMP( 19??, gl5005x,  0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 5005X (Germany)", GAME_IS_SKELETON)
 COMP( 19??, gl6000sl, 0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 6000SL (Germany)", GAME_IS_SKELETON)
 COMP( 199?, gln,      0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader Notebook", GAME_NOT_WORKING)
-COMP( 1991, iqunlimz, gl2000,  0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "IQ Unlimited (Z80)", GAME_NOT_WORKING)
