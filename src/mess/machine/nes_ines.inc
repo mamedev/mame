@@ -191,7 +191,7 @@ static const nes_mmc mmc_list[] =
 	{ 159, BANDAI_LZ93EX1 }, // with 24c01
 	{ 160, SACHEN_SA009 },
 	// 161 Unused
-	// 162 Unused
+	{ 162, WAIXING_FS304},	// not confirmed, but a lot of chinese releases use it like this...
 	{ 163, NANJING_BOARD},
 	{ 164, WAIXING_FFV },
 	{ 165, WAIXING_SH2 },
