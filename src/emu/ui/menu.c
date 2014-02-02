@@ -58,7 +58,7 @@ inline bool ui_menu_item::is_selectable() const
 
 inline bool ui_menu::exclusive_input_pressed(int key, int repeat)
 {
-	if (menu_event.iptkey == IPT_INVALID && ui_input_pressed_repeat(machine(), key, repeat))
+	if (menu_event.iptkey == IPT_INVALID && input_pressed(key, repeat))
 	{
 		menu_event.iptkey = key;
 		return true;
@@ -402,9 +402,7 @@ void ui_menu::draw(bool customonly)
 	int selected_subitem_too_big = FALSE;
 	int visible_lines;
 	int itemnum, linenum;
-	int mouse_hit, mouse_button;
-	render_target *mouse_target;
-	INT32 mouse_target_x, mouse_target_y;
+	bool mouse_hit;
 	float mouse_x = -1, mouse_y = -1;
 
 	/* compute the width and height of the full menu */
@@ -482,15 +480,9 @@ void ui_menu::draw(bool customonly)
 	effective_left = visible_left + gutter_width;
 
 	/* locate mouse */
-	mouse_hit = FALSE;
-	mouse_button = FALSE;
+	mouse_hit = false;
 	if (!customonly)
-	{
-		mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
-		if (mouse_target != NULL)
-			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
-				mouse_hit = TRUE;
-	}
+		mouse_hit = find_mouse(mouse_x, mouse_y);
 
 	/* loop over visible lines */
 	hover = numitems + 1;
@@ -745,7 +737,7 @@ void ui_menu::handle_events()
 	ui_event local_menu_event;
 
 	/* loop while we have interesting events */
-	while (ui_input_pop_event(machine(), &local_menu_event) && !stop)
+	while (input_pop_event(local_menu_event) && !stop)
 	{
 		switch (local_menu_event.event_type)
 		{

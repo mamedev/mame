@@ -44,7 +44,7 @@ struct ui_input_private
 	render_target *             current_mouse_target;
 	INT32                       current_mouse_x;
 	INT32                       current_mouse_y;
-	int                         current_mouse_down;
+	bool                        current_mouse_down;
 
 	/* popped states; ring buffer of ui_events */
 	ui_event                    events[EVENT_QUEUE_SIZE];
@@ -113,13 +113,13 @@ void ui_input_frame_update(running_machine &machine)
     onto the queue
 -------------------------------------------------*/
 
-int ui_input_push_event(running_machine &machine, ui_event evt)
+bool ui_input_push_event(running_machine &machine, ui_event evt)
 {
 	ui_input_private *uidata = machine.ui_input_data;
 
 	/* we may be called before the UI is initialized */
 	if (uidata == NULL)
-		return FALSE;
+		return false;
 
 	/* some pre-processing (this is an icky place to do this stuff!) */
 	switch (evt.event_type)
@@ -140,11 +140,11 @@ int ui_input_push_event(running_machine &machine, ui_event evt)
 			break;
 
 		case UI_EVENT_MOUSE_DOWN:
-			uidata->current_mouse_down = TRUE;
+			uidata->current_mouse_down = true;
 			break;
 
 		case UI_EVENT_MOUSE_UP:
-			uidata->current_mouse_down = FALSE;
+			uidata->current_mouse_down = false;
 			break;
 
 		default:
@@ -154,11 +154,11 @@ int ui_input_push_event(running_machine &machine, ui_event evt)
 
 	/* is the queue filled up? */
 	if ((uidata->events_end + 1) % ARRAY_LENGTH(uidata->events) == uidata->events_start)
-		return FALSE;
+		return false;
 
 	uidata->events[uidata->events_end++] = evt;
 	uidata->events_end %= ARRAY_LENGTH(uidata->events);
-	return TRUE;
+	return true;
 }
 
 
@@ -166,21 +166,21 @@ int ui_input_push_event(running_machine &machine, ui_event evt)
     ui_input_pop_event - pops an event off of the queue
 -------------------------------------------------*/
 
-int ui_input_pop_event(running_machine &machine, ui_event *evt)
+bool ui_input_pop_event(running_machine &machine, ui_event *evt)
 {
 	ui_input_private *uidata = machine.ui_input_data;
-	int result;
+	bool result;
 
 	if (uidata->events_start != uidata->events_end)
 	{
 		*evt = uidata->events[uidata->events_start++];
 		uidata->events_start %= ARRAY_LENGTH(uidata->events);
-		result = TRUE;
+		result = true;
 	}
 	else
 	{
 		memset(evt, 0, sizeof(*evt));
-		result = FALSE;
+		result = false;
 	}
 	return result;
 }
@@ -211,7 +211,7 @@ void ui_input_reset(running_machine &machine)
     location of the mouse
 -------------------------------------------------*/
 
-render_target *ui_input_find_mouse(running_machine &machine, INT32 *x, INT32 *y, int *button)
+render_target *ui_input_find_mouse(running_machine &machine, INT32 *x, INT32 *y, bool *button)
 {
 	ui_input_private *uidata = machine.ui_input_data;
 	if (x != NULL)

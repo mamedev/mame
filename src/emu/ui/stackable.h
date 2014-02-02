@@ -16,6 +16,7 @@
 
 #include "render.h"
 #include "ui.h"
+#include "uiinput.h"
 
 
 //**************************************************************************
@@ -59,14 +60,19 @@ protected:
 	// static methods
 	static void clear_free_list(running_machine &machine);
 
-	// methods
+	// rendering
 	float get_line_height();
 	float get_char_width(unicode_char ch);
 	float get_string_width(const char *s);
 	void draw_outlined_box(float x0, float y0, float x1, float y1, rgb_t backcolor = UI_TEXT_COLOR);
-	void draw_text(const char *origs, float x, float y);
+	void draw_text(const char *origs, float x, float y, rgb_t fgcolor = UI_TEXT_COLOR, rgb_t bgcolor = UI_TEXT_BG_COLOR);
 	void draw_text(const char *origs, float x, float y, float origwrapwidth, int justify = JUSTIFY_LEFT, int wrap = WRAP_WORD, int draw = DRAW_NORMAL, rgb_t fgcolor = UI_TEXT_COLOR, rgb_t bgcolor = UI_TEXT_BG_COLOR, float *totalwidth = NULL, float *totalheight = NULL);
 	void draw_text_box(const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
+
+	// input
+	bool input_pop_event(ui_event &event);
+	bool input_pressed(int key, int repeat = 0);
+	bool find_mouse(float &mouse_x, float &mouse_y);
 
 private:
 	static ui_stackable *menu_free;

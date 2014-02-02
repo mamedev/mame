@@ -26,6 +26,10 @@ ui_stackable *ui_stackable::menu_free;
     MENU STACK MANAGEMENT
 ***************************************************************************/
 
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
 ui_stackable::ui_stackable(running_machine &machine, render_container *_container)
 	: m_machine(machine)
 {
@@ -34,14 +38,18 @@ ui_stackable::ui_stackable(running_machine &machine, render_container *_containe
 }
 
 
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
 ui_stackable::~ui_stackable()
 {
 }
 
 
-/*-------------------------------------------------
-    stack_reset - reset the menu stack
--------------------------------------------------*/
+//-------------------------------------------------
+//  stack_reset - reset the menu stack
+//-------------------------------------------------
 
 void ui_stackable::stack_reset(running_machine &machine)
 {
@@ -50,10 +58,9 @@ void ui_stackable::stack_reset(running_machine &machine)
 }
 
 
-/*-------------------------------------------------
-    stack_push - push a new menu onto the
-    stack
--------------------------------------------------*/
+//-------------------------------------------------
+//  stack_push - push a new menu onto the stack
+//-------------------------------------------------
 
 void ui_stackable::stack_push(ui_stackable *menu)
 {
@@ -64,9 +71,9 @@ void ui_stackable::stack_push(ui_stackable *menu)
 }
 
 
-/*-------------------------------------------------
-    stack_pop - pop a menu from the stack
--------------------------------------------------*/
+//-------------------------------------------------
+//  stack_pop - pop a menu from the stack
+//-------------------------------------------------
 
 void ui_stackable::stack_pop(running_machine &machine)
 {
@@ -81,10 +88,10 @@ void ui_stackable::stack_pop(running_machine &machine)
 }
 
 
-/*-------------------------------------------------
-    ui_stackable::stack_has_special_main_menu -
-    check in the special main menu is in the stack
--------------------------------------------------*/
+//-------------------------------------------------
+//  stack_has_special_main_menu - check in the
+//	special main menu is in the stack
+//-------------------------------------------------
 
 bool ui_stackable::stack_has_special_main_menu()
 {
@@ -98,30 +105,32 @@ bool ui_stackable::stack_has_special_main_menu()
 }
 
 
-/*-------------------------------------------------
-    is_special_main_menu - returns whether the
-    menu has special needs
--------------------------------------------------*/
+//-------------------------------------------------
+//  is_special_main_menu - returns whether the
+//  menu has special needs
+//-------------------------------------------------
+
 bool ui_stackable::is_special_main_menu() const
 {
 	return special_main_menu;
 }
 
 
-/*-------------------------------------------------
-    set_special_main_menu - set whether the
-    menu has special needs
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_special_main_menu - set whether the
+//  menu has special needs
+//-------------------------------------------------
+
 void ui_stackable::set_special_main_menu(bool special)
 {
 	special_main_menu = special;
 }
 
 
-/*-------------------------------------------------
-    clear_free_list - clear out anything
-    accumulated in the free list
--------------------------------------------------*/
+//-------------------------------------------------
+//  clear_free_list - clear out anything
+//  accumulated in the free list
+//-------------------------------------------------
 
 void ui_stackable::clear_free_list(running_machine &machine)
 {
@@ -134,9 +143,9 @@ void ui_stackable::clear_free_list(running_machine &machine)
 }
 
 
-/*-------------------------------------------------
-    get_line_height
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_line_height
+//-------------------------------------------------
 
 float ui_stackable::get_line_height()
 {
@@ -144,9 +153,9 @@ float ui_stackable::get_line_height()
 }
 
 
-/*-------------------------------------------------
-    get_char_width
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_char_width
+//-------------------------------------------------
 
 float ui_stackable::get_char_width(unicode_char ch)
 {
@@ -154,9 +163,9 @@ float ui_stackable::get_char_width(unicode_char ch)
 }
 
 
-/*-------------------------------------------------
-    get_string_width
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_string_width
+//-------------------------------------------------
 
 float ui_stackable::get_string_width(const char *s)
 {
@@ -164,9 +173,9 @@ float ui_stackable::get_string_width(const char *s)
 }
 
 
-/*-------------------------------------------------
-    draw_outlined_box
--------------------------------------------------*/
+//-------------------------------------------------
+//  draw_outlined_box
+//-------------------------------------------------
 
 void ui_stackable::draw_outlined_box(float x0, float y0, float x1, float y1, rgb_t backcolor)
 {
@@ -174,19 +183,19 @@ void ui_stackable::draw_outlined_box(float x0, float y0, float x1, float y1, rgb
 }
 
 
-/*-------------------------------------------------
-    draw_text
--------------------------------------------------*/
+//-------------------------------------------------
+//  draw_text
+//-------------------------------------------------
 
-void ui_stackable::draw_text(const char *origs, float x, float y)
+void ui_stackable::draw_text(const char *origs, float x, float y, rgb_t fgcolor, rgb_t bgcolor)
 {
-	draw_text(origs, x, y, 1.0f - x);
+	draw_text(origs, x, y, 1.0f - x, JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, fgcolor, bgcolor);
 }
 
 
-/*-------------------------------------------------
-    draw_text
--------------------------------------------------*/
+//-------------------------------------------------
+//  draw_text
+//-------------------------------------------------
 
 void ui_stackable::draw_text(const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight)
 {
@@ -194,11 +203,54 @@ void ui_stackable::draw_text(const char *origs, float x, float y, float origwrap
 }
 
 
-/*-------------------------------------------------
-    draw_text_box
--------------------------------------------------*/
+//-------------------------------------------------
+//  draw_text_box
+//-------------------------------------------------
 
 void ui_stackable::draw_text_box(const char *text, int justify, float xpos, float ypos, rgb_t backcolor)
 {
 	ui_draw_text_box(container, text, justify, xpos, ypos, backcolor);
+}
+
+
+//-------------------------------------------------
+//  input_pop_event
+//-------------------------------------------------
+
+bool ui_stackable::input_pop_event(ui_event &event)
+{
+	return ui_input_pop_event(machine(), &event);
+}
+
+
+//-------------------------------------------------
+//  input_pressed
+//-------------------------------------------------
+
+bool ui_stackable::input_pressed(int key, int repeat)
+{
+	return ui_input_pressed_repeat(machine(), key, repeat);
+}
+
+
+//-------------------------------------------------
+//  find_mouse
+//-------------------------------------------------
+
+bool ui_stackable::find_mouse(float &mouse_x, float &mouse_y)
+{
+	bool result = false;
+	mouse_x = -1;
+	mouse_y = -1;
+
+	INT32 mouse_target_x, mouse_target_y;
+	bool mouse_button;
+	render_target *mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
+	if (mouse_target != NULL)
+	{
+		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+			result = true;
+	}
+
+	return result;
 }

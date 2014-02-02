@@ -1233,7 +1233,7 @@ static void handle_mouse(running_machine &machine)
 {
 	render_target * mouse_target;
 	INT32           x,y;
-	int             button;
+	bool            button;
 
 	if (menu != NULL)
 		return;

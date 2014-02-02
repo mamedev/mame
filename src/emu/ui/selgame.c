@@ -16,9 +16,9 @@
 #include "audit.h"
 
 
-/*-------------------------------------------------
-    ctor
--------------------------------------------------*/
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
 
 ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
@@ -28,9 +28,9 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 }
 
 
-/*-------------------------------------------------
-    dtor
--------------------------------------------------*/
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
 
 ui_menu_select_game::~ui_menu_select_game()
 {
@@ -38,10 +38,10 @@ ui_menu_select_game::~ui_menu_select_game()
 }
 
 
-/*-------------------------------------------------
-    build_driver_list - build a list of available
-	drivers
--------------------------------------------------*/
+//-------------------------------------------------
+//  build_driver_list - build a list of available
+//	drivers
+//-------------------------------------------------
 
 void ui_menu_select_game::build_driver_list()
 {
@@ -90,10 +90,10 @@ void ui_menu_select_game::build_driver_list()
 }
 
 
-/*-------------------------------------------------
-    driver_list_compare - qsort callback for
-	alphebetizing driver lists
--------------------------------------------------*/
+//-------------------------------------------------
+//  driver_list_compare - qsort callback for
+//	alphebetizing driver lists
+//-------------------------------------------------
 
 int ui_menu_select_game::driver_list_compare(const void *p1, const void *p2)
 {
@@ -103,9 +103,9 @@ int ui_menu_select_game::driver_list_compare(const void *p1, const void *p2)
 }
 
 
-/*-------------------------------------------------
-    populate
--------------------------------------------------*/
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
 
 void ui_menu_select_game::populate()
 {
@@ -139,9 +139,9 @@ void ui_menu_select_game::populate()
 }
 
 
-/*-------------------------------------------------
-    handle - handle the game select menu
--------------------------------------------------*/
+//-------------------------------------------------
+//  handle - handle the game select menu
+//-------------------------------------------------
 
 void ui_menu_select_game::handle()
 {
@@ -196,9 +196,9 @@ void ui_menu_select_game::handle()
 }
 
 
-/*-------------------------------------------------
-    inkey_select
--------------------------------------------------*/
+//-------------------------------------------------
+//  inkey_select
+//-------------------------------------------------
 
 void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 {
@@ -234,9 +234,9 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 }
 
 
-/*-------------------------------------------------
-    inkey_cancel
--------------------------------------------------*/
+//-------------------------------------------------
+//  inkey_cancel
+//-------------------------------------------------
 
 void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 {
@@ -249,9 +249,9 @@ void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 }
 
 
-/*-------------------------------------------------
-    inkey_special
--------------------------------------------------*/
+//-------------------------------------------------
+//  inkey_special
+//-------------------------------------------------
 
 void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 {
@@ -275,9 +275,9 @@ void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 }
 
 
-/*-------------------------------------------------
-    inkey_toggle_ui
--------------------------------------------------*/
+//-------------------------------------------------
+//  inkey_toggle_ui
+//-------------------------------------------------
 
 void ui_menu_select_game::inkey_toggle_ui(const ui_menu_event *menu_event)
 {
@@ -285,9 +285,9 @@ void ui_menu_select_game::inkey_toggle_ui(const ui_menu_event *menu_event)
 }
 
 
-/*-------------------------------------------------
-    select_searched_item
--------------------------------------------------*/
+//-------------------------------------------------
+//  select_searched_item
+//-------------------------------------------------
 
 void ui_menu_select_game::select_searched_item()
 {
@@ -311,9 +311,9 @@ void ui_menu_select_game::select_searched_item()
 }
 
 
-/*-------------------------------------------------
-    custom_render - perform our special rendering
--------------------------------------------------*/
+//-------------------------------------------------
+//  custom_render - perform our special rendering
+//-------------------------------------------------
 
 void ui_menu_select_game::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
@@ -352,7 +352,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
-	ui_draw_text_full(container, tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	draw_text(tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	/* determine the text to render below */
@@ -442,7 +442,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		color = UI_YELLOW_COLOR;
 	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
 		color = UI_RED_COLOR;
-	ui_draw_outlined_box(container, x1, y1, x2, y2, color);
+	draw_outlined_box(x1, y1, x2, y2, color);
 
 	/* take off the borders */
 	x1 += UI_BOX_LR_BORDER;

@@ -2993,7 +2993,7 @@ g_profiler.start(PROFILER_INPUT);
 
 	// perform mouse hit testing
 	INT32 mouse_target_x, mouse_target_y;
-	int mouse_button;
+	bool mouse_button;
 	render_target *mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
 
 	// if the button is pressed, map the point and determine what was hit

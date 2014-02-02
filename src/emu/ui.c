@@ -447,7 +447,7 @@ void ui_update_and_render(running_machine &machine, render_container *container)
 	if (ui_mouse_show || (ui_is_menu_active() && machine.options().ui_mouse()))
 	{
 		INT32 mouse_target_x, mouse_target_y;
-		int mouse_button;
+		bool mouse_button;
 		render_target *mouse_target = ui_input_find_mouse(machine, &mouse_target_x, &mouse_target_y, &mouse_button);
 
 		if (mouse_target != NULL)
