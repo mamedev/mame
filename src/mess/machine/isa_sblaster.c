@@ -1280,8 +1280,8 @@ void sb_device::device_reset()
 	m_rx_waiting = m_tx_waiting = 0;
 
 	// MIDI is 31250 baud, 8-N-1
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(31250);
-	set_data_frame(8, 1, PARITY_NONE, false);
 }
 
 UINT8 sb_device::dack_r(int line)

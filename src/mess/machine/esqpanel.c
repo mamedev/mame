@@ -64,9 +64,9 @@ void esqpanel_device::device_start()
 void esqpanel_device::device_reset()
 {
 	// panel comms is at 62500 baud (double the MIDI rate), 8N2
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 	set_rcv_rate(62500);
 	set_tra_rate(62500);
-	set_data_frame(8, 2, PARITY_NONE, false);
 
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;

@@ -24,6 +24,7 @@ tekkenjb   Tekken (TE1/VER.B)                      COH-100             "        
 tekken2    Tekken 2 Ver.B (TES3/VER.D)             COH-110             SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C406     6
 tekken2ub  Tekken 2 Ver.B (TES3/VER.B)             COH-100             SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C406     6
 tekken2ab  Tekken 2 Ver.B (TES2/VER.B)             COH-100             "                        "                       "        "
+tekken2jc  Tekken 2 Ver.B (TES1/VER.C)             COH-100             "                        "                       "        "
 tekken2aa  Tekken 2 (TES2/VER.A)                   COH-100             "                        "                       "        "
 souledge   Soul Edge Ver. II (SO4/VER.C)           COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C409     6
 souledgeuc Soul Edge Ver. II (SO3/VER.C)           COH-100 / COH-110   "                        "                       "        "
@@ -1503,6 +1504,31 @@ ROM_START( tekken2aa )
 	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
 ROM_END
 
+ROM_START( tekken2jc )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "tes1verc.2l",  0x0000000, 0x100000, CRC(abcb4981) SHA1(5122b2107184a4465f2e9583556b7d3d6ae37444) )
+	ROM_LOAD16_BYTE( "tes1verc.2j",  0x0000001, 0x100000, CRC(d936bf5f) SHA1(bb59cd294d0b7d30efa65b070cdc01b6f7a23739) )
+	ROM_LOAD16_BYTE( "tes1verb.2k",  0x0200000, 0x100000, CRC(668ca712) SHA1(67100db4c6a3ca62d3f62f6fcef974ce017e2c9e) )
+	ROM_LOAD16_BYTE( "tes1verb.2f",  0x0200001, 0x100000, CRC(c4f66a0a) SHA1(1b3dd33d7e6d9122826bf8be0dbbc088e4cc41e8) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "tes1rom0l.ic6", 0x0000000, 0x200000, CRC(fc904ede) SHA1(cea378ba86f94beadb3d67685f1b8c141f478abe) )
+	ROM_LOAD16_BYTE( "tes1rom0u.ic5", 0x0000001, 0x200000, CRC(57b38f5d) SHA1(edb4beab47b1339a5b1bc8071086abfcba57722e) )
+	ROM_LOAD16_BYTE( "tes1rom1l.ic8", 0x0400000, 0x200000, CRC(aa48f04b) SHA1(f7383d2b3a84c4e649a27c0ad1e6af4702ec0a17) )
+	ROM_LOAD16_BYTE( "tes1rom1u.ic3", 0x0400001, 0x200000, CRC(b147c543) SHA1(c4b18c218999ec73d04c92e06fb3e6165ceebf2b) )
+	ROM_LOAD16_BYTE( "tes1rom2l.ic7", 0x0800000, 0x200000, CRC(b08da52c) SHA1(31fe2021d0fe37c16555650dd10d26ed80d9b493) )
+	ROM_LOAD16_BYTE( "tes1rom2u.ic4", 0x0800001, 0x200000, CRC(8a1561b8) SHA1(ebc02c9e7033d54aefb5034c97a3c8cd749b5600) )
+	ROM_LOAD16_BYTE( "tes1rom3l.ic9", 0x0c00000, 0x200000, CRC(d5ac0f18) SHA1(342d063f7974bd1f90b5ca4832dfa4fbc9605453) )
+	ROM_LOAD16_BYTE( "tes1rom3u.ic1", 0x0c00001, 0x200000, CRC(44ed509d) SHA1(27e26aaf5ce72ab686f3f05743b1d91b5334b4e0) )
+
+	ROM_REGION16_LE( 0x100000, "c76", 0 ) /* sound data and MCU BIOS */
+	ROM_LOAD( "tes1sprog.6d", 0x0000000, 0x040000, CRC(af18759f) SHA1(aabd7d1384925781d37f860605a5d4622e0fc2e4) )
+	ROM_LOAD( "c76.bin",      0x040000, 0x004000, CRC(399faac7) SHA1(ceb184ef0486caf715dd997101999785f67a40b8) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
+ROM_END
+
 ROM_START( xevi3dg )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "xv31vera.2l",  0x0000000, 0x100000, CRC(419e0f13) SHA1(876ae81c9fde18cdec792f3dfee682761ac99730) )
@@ -1534,6 +1560,7 @@ GAME( 1994, tekkenjb,   tekken,   tekken,     tekken,     driver_device, 0, ROT0
 GAME( 1996, tekken2,    0,        tekken2,    tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.D)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, tekken2ub,  tekken2,  tekken2o,   tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 Ver.B (US, TES3/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, tekken2ab,  tekken2,  tekken2o,   tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 Ver.B (Asia, TES2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, tekken2jc,  tekken2,  tekken2o,   tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 Ver.B (Japan, TES1/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, tekken2aa,  tekken2,  tekken2o,   tekken,     driver_device, 0, ROT0, "Namco", "Tekken 2 (Asia, TES2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, souledge,   0,        souledge,   souledge,   driver_device, 0, ROT0, "Namco", "Soul Edge Ver. II (World, SO4/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, souledgeuc, souledge, souledge,   souledge,   driver_device, 0, ROT0, "Namco", "Soul Edge Ver. II (US, SO3/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

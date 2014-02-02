@@ -271,6 +271,7 @@ static MC6845_UPDATE_ROW( atamanot_update_row )
 static MC6845_INTERFACE( ssingles_mc6845_intf )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,                       /* before pixel update callback */
 	ssingles_update_row,        /* row update callback */
@@ -285,6 +286,7 @@ static MC6845_INTERFACE( ssingles_mc6845_intf )
 static MC6845_INTERFACE( atamanot_mc6845_intf )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,                       /* before pixel update callback */
 	atamanot_update_row,        /* row update callback */

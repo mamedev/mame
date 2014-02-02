@@ -112,6 +112,7 @@ void i8089_channel::clr(int m, int b, int o)
 
 void i8089_channel::dec_r(int r)
 {
+	m_icount += 3;
 	set_reg(r, m_r[r].w - 1);
 }
 
@@ -173,7 +174,8 @@ void i8089_channel::jnbt(int m, int b, INT16 d, int o)
 
 void i8089_channel::jnz_r(int r, INT16 d)
 {
-	if(m_r[r].w)
+	m_icount += 5;
+	if(m_r[r].w & 0xffff)
 		set_reg(TP, m_r[TP].w + d);
 }
 
@@ -191,7 +193,7 @@ void i8089_channel::jnzb(int m, INT16 d, int o)
 
 void i8089_channel::jz_r(int r, INT16 d)
 {
-	if(!m_r[r].w)
+	if(!(m_r[r].w & 0xffff))
 		set_reg(TP, m_r[TP].w + d);
 }
 
@@ -230,7 +232,7 @@ void i8089_channel::mov_mr(int m, int r, int o)
 
 void i8089_channel::mov_rm(int r, int m, int o)
 {
-	set_reg(r, LWR(m, o));
+	set_reg(r, (INT32)LWR(m, o), 1);
 }
 
 void i8089_channel::mov_mm(int m1, int m2, int o1, int o2)
@@ -286,7 +288,7 @@ void i8089_channel::movi_mi(int m, INT16 i, int o)
 void i8089_channel::movp_mp(int m, int p, int o)
 {
 	m_iop->write_word(m_r[m].t, o, m_r[p].w & 0xffff);
-	m_iop->write_byte(m_r[m].t, o + 2, (m_r[p].w >> 12 & 0xf0) | (m_r[p].t << 3));
+	m_iop->write_byte(m_r[m].t, o + 2, ((m_r[p].w >> 12) & 0xf0) | (m_r[p].t << 3));
 }
 
 // move memory to pointer (restore)
@@ -295,7 +297,7 @@ void i8089_channel::movp_pm(int p, int m, int o)
 	UINT16 offset = m_iop->read_word(m_r[m].t, o);
 	UINT16 segment = m_iop->read_byte(m_r[m].t, o + 2);
 
-	set_reg(p, ((segment << 4) + offset) & 0xfffff, segment >> 3 & 0x01);
+	set_reg(p, (((segment & 0xf0) << 12) + offset) & 0xfffff, segment >> 3 & 0x01);
 }
 
 // no operation
@@ -315,7 +317,7 @@ void i8089_channel::not_m(int m, int o)
 
 void i8089_channel::not_rm(int r, int m, int o)
 {
-	set_reg(r, ~LWR(m, o));
+	set_reg(r, ~(INT32)LWR(m, o));
 }
 
 void i8089_channel::notb_m(int m, int o)

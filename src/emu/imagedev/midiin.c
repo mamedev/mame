@@ -44,9 +44,9 @@ void midiin_device::device_reset()
 	m_xmit_read = m_xmit_write = 0;
 
 	// we don't Rx, we Tx at 31250 8-N-1
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rcv_rate(0);
 	set_tra_rate(31250);
-	set_data_frame(8, 1, PARITY_NONE, false);
 }
 
 /*-------------------------------------------------

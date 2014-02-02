@@ -12,193 +12,178 @@
 #include "formats/trd_dsk.h"
 #include "machine/wd17xx.h"
 #include "machine/beta.h"
-#include "devlegcy.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-struct beta_disk_state
+
+const device_type BETA_DISK = &device_creator<beta_disk_device>;
+
+beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__),
+	m_betadisk_status(0),
+	m_betadisk_active(0)
 {
-	UINT8 betadisk_status;
-	UINT8 betadisk_active;
-
-	device_t *wd179x;
-};
-
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-INLINE beta_disk_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == BETA_DISK);
-
-	return (beta_disk_state *)downcast<beta_disk_device *>(device)->token();
 }
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-int betadisk_is_active(device_t *device)
+void beta_disk_device::device_start()
 {
-	beta_disk_state *beta = get_safe_token(device);
+	astring tempstring;
 
-	return beta->betadisk_active;
+	/* validate arguments */
+	assert(tag() != NULL);
+
+	/* find our WD179x */
+	tempstring.printf("%s:%s", tag(), "wd179x");
+	m_wd179x = machine().device(tempstring);
 }
 
-void betadisk_enable(device_t *device)
-{
-	beta_disk_state *beta = get_safe_token(device);
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
-	beta->betadisk_active = 1;
+void beta_disk_device::device_reset()
+{
 }
 
-void betadisk_disable(device_t *device)
+int beta_disk_device::is_active()
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	beta->betadisk_active = 0;
+	return m_betadisk_active;
 }
 
-void betadisk_clear_status(device_t *device)
+void beta_disk_device::enable()
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	beta->betadisk_status = 0;
+	m_betadisk_active = 1;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( betadisk_wd179x_intrq_w )
+void beta_disk_device::disable()
 {
-	beta_disk_state *beta = get_safe_token(device->owner());
+	m_betadisk_active = 0;
+}
 
+void beta_disk_device::clear_status()
+{
+	m_betadisk_status = 0;
+}
+
+static WRITE_LINE_DEVICE_HANDLER(wd179x_intrq_w)
+{
+	beta_disk_device *beta = dynamic_cast<beta_disk_device *>(device->owner());
+	
 	if (state)
-		beta->betadisk_status |= (1<<7);
+		beta->m_betadisk_status |= (1<<7);
 	else
-		beta->betadisk_status &=~(1<<7);
+		beta->m_betadisk_status &=~(1<<7);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( betadisk_wd179x_drq_w )
+static WRITE_LINE_DEVICE_HANDLER(wd179x_drq_w)
 {
-	beta_disk_state *beta = get_safe_token(device->owner());
-
+	beta_disk_device *beta = dynamic_cast<beta_disk_device *>(device->owner());
+	
 	if (state)
-		beta->betadisk_status |= (1<<6);
+		beta->m_betadisk_status |= (1<<6);
 	else
-		beta->betadisk_status &=~(1<<6);
+		beta->m_betadisk_status &=~(1<<6);
 }
 
 static const wd17xx_interface beta_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(betadisk_wd179x_intrq_w),
-	DEVCB_LINE(betadisk_wd179x_drq_w),
+	DEVCB_LINE(wd179x_intrq_w),
+	DEVCB_LINE(wd179x_drq_w),
 	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
 };
 
-READ8_DEVICE_HANDLER(betadisk_status_r)
+READ8_MEMBER(beta_disk_device::status_r)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		return wd17xx_status_r(beta->wd179x, space, offset);
+	if (m_betadisk_active==1) {
+		return wd17xx_status_r(m_wd179x, space, offset);
 	} else {
 		return 0xff;
 	}
 }
 
-READ8_DEVICE_HANDLER(betadisk_track_r)
+READ8_MEMBER(beta_disk_device::track_r)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		return wd17xx_track_r(beta->wd179x, space, offset);
+	if (m_betadisk_active==1) {
+		return wd17xx_track_r(m_wd179x, space, offset);
 	} else {
 		return 0xff;
 	}
 }
 
-READ8_DEVICE_HANDLER(betadisk_sector_r)
+READ8_MEMBER(beta_disk_device::sector_r)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		return wd17xx_sector_r(beta->wd179x, space, offset);
+	if (m_betadisk_active==1) {
+		return wd17xx_sector_r(m_wd179x, space, offset);
 	} else {
 		return 0xff;
 	}
 }
 
-READ8_DEVICE_HANDLER(betadisk_data_r)
+READ8_MEMBER(beta_disk_device::data_r)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		return wd17xx_data_r(beta->wd179x, space, offset);
+	if (m_betadisk_active==1) {
+		return wd17xx_data_r(m_wd179x, space, offset);
 	} else {
 		return 0xff;
 	}
 }
 
-READ8_DEVICE_HANDLER(betadisk_state_r)
+READ8_MEMBER(beta_disk_device::state_r)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		return beta->betadisk_status;
+	if (m_betadisk_active==1) {
+		return m_betadisk_status;
 	} else {
 		return 0xff;
 	}
 }
 
-WRITE8_DEVICE_HANDLER(betadisk_param_w)
+WRITE8_MEMBER(beta_disk_device::param_w)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		wd17xx_set_drive(beta->wd179x, data & 3);
-		wd17xx_set_side (beta->wd179x,(data & 0x10) ? 0 : 1 );
-		wd17xx_dden_w(beta->wd179x, !BIT(data, 5));
+	if (m_betadisk_active==1) {
+		wd17xx_set_drive(m_wd179x, data & 3);
+		wd17xx_set_side (m_wd179x,(data & 0x10) ? 0 : 1 );
+		wd17xx_dden_w(m_wd179x, !BIT(data, 5));
 		if ((data & 0x04) == 0) // reset
 		{
-			wd17xx_reset(beta->wd179x);
+			wd17xx_reset(m_wd179x);
 		}
-		beta->betadisk_status = (data & 0x3f) | beta->betadisk_status;
+		m_betadisk_status = (data & 0x3f) | m_betadisk_status;
 	}
 }
 
-WRITE8_DEVICE_HANDLER(betadisk_command_w)
+WRITE8_MEMBER(beta_disk_device::command_w)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		wd17xx_command_w(beta->wd179x, space, offset, data);
+	if (m_betadisk_active==1) {
+		wd17xx_command_w(m_wd179x, space, offset, data);
 	}
 }
 
-WRITE8_DEVICE_HANDLER(betadisk_track_w)
+WRITE8_MEMBER(beta_disk_device::track_w)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		wd17xx_track_w(beta->wd179x, space, offset, data);
+	if (m_betadisk_active==1) {
+		wd17xx_track_w(m_wd179x, space, offset, data);
 	}
 }
 
-WRITE8_DEVICE_HANDLER(betadisk_sector_w)
+WRITE8_MEMBER(beta_disk_device::sector_w)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		wd17xx_sector_w(beta->wd179x, space, offset, data);
+	if (m_betadisk_active==1) {
+		wd17xx_sector_w(m_wd179x, space, offset, data);
 	}
 }
 
-WRITE8_DEVICE_HANDLER(betadisk_data_w)
+WRITE8_MEMBER(beta_disk_device::data_w)
 {
-	beta_disk_state *beta = get_safe_token(device);
-
-	if (beta->betadisk_active==1) {
-		wd17xx_data_w(beta->wd179x, space, offset, data);
+	if (m_betadisk_active==1) {
+		wd17xx_data_w(m_wd179x, space, offset, data);
 	}
 }
 
@@ -301,48 +286,6 @@ ROM_START( beta_disk )
 	ROM_LOAD( "trd503.rom",     0x00000, 0x4000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c))
 ROM_END
 
-
-/*-------------------------------------------------
-    DEVICE_START( beta_disk )
--------------------------------------------------*/
-
-static DEVICE_START( beta_disk )
-{
-	beta_disk_state *beta = get_safe_token(device);
-	astring tempstring;
-
-	/* validate arguments */
-	assert(device->tag() != NULL);
-
-	/* find our WD179x */
-	tempstring.printf("%s:%s", device->tag(), "wd179x");
-	beta->wd179x = device->machine().device(tempstring);
-}
-
-const device_type BETA_DISK = &device_creator<beta_disk_device>;
-
-beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__)
-{
-	m_token = global_alloc_clear(beta_disk_state);
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void beta_disk_device::device_start()
-{
-	DEVICE_START_NAME( beta_disk )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void beta_disk_device::device_reset()
-{
-}
 
 //-------------------------------------------------
 //  device_mconfig_additions - return a pointer to

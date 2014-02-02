@@ -733,10 +733,10 @@ WRITE8_MEMBER(calomega_state::pia0_bout_w)
 	logerror("PIA0: Port B out: %02X\n", data);
 }
 
-WRITE8_MEMBER(calomega_state::pia0_ca2_w)
+WRITE_LINE_MEMBER(calomega_state::pia0_ca2_w)
 {
 	/* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
-	logerror("PIA0: CA2: %02X\n", data);
+	logerror("PIA0: CA2: %02X\n", state);
 }
 
 
@@ -2410,21 +2410,6 @@ GFXDECODE_END
    40  |      CA1       | U34 (556, pin 5)
 
 */
-static const pia6821_interface sys903_pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(calomega_state,s903_mux_port_r),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(calomega_state,lamps_903a_w),       /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
 
 /********** Systems 903/904 PIA-1 (U39) wiring **********
 
@@ -2472,21 +2457,6 @@ static const pia6821_interface sys903_pia0_intf =
    40  |      CA1       | GND
 
 */
-static const pia6821_interface sys903_pia1_intf =
-{
-	DEVCB_INPUT_PORT("SW1"),        /* port A in */
-	DEVCB_NULL,                     /* port B in */
-	DEVCB_NULL,                     /* line CA1 in */
-	DEVCB_NULL,                     /* line CB1 in */
-	DEVCB_NULL,                     /* line CA2 in */
-	DEVCB_NULL,                     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(calomega_state,lamps_903b_w),   /* port A out */
-	DEVCB_DRIVER_MEMBER(calomega_state,s903_mux_w),     /* port B out */
-	DEVCB_NULL,                     /* line CA2 out */
-	DEVCB_NULL,                     /* port CB2 out */
-	DEVCB_NULL,                     /* IRQA */
-	DEVCB_NULL                      /* IRQB */
-};
 
 /********** System 905 PIA-0 (U48) wiring **********
 
@@ -2534,21 +2504,6 @@ static const pia6821_interface sys903_pia1_intf =
    40  |      CA1       | N/C
 
 */
-static const pia6821_interface sys905_pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(calomega_state,s905_mux_port_r),    /* port A in */
-	DEVCB_NULL,                     /* port B in */
-	DEVCB_NULL,                     /* line CA1 in */
-	DEVCB_NULL,                     /* line CB1 in */
-	DEVCB_NULL,                     /* line CA2 in */
-	DEVCB_NULL,                     /* line CB2 in */
-	DEVCB_NULL,                     /* port A out */
-	DEVCB_DRIVER_MEMBER(calomega_state,lamps_905_w),        /* port B out */
-	DEVCB_NULL,                     /* line CA2 out */
-	DEVCB_NULL,                     /* port CB2 out */
-	DEVCB_NULL,                     /* IRQA */
-	DEVCB_NULL                      /* IRQB */
-};
 
 /********** Systems 905 PIA-1 (U63) wiring **********
 
@@ -2596,57 +2551,6 @@ static const pia6821_interface sys905_pia0_intf =
    40  |      CA1       | GND
 
 */
-static const pia6821_interface sys905_pia1_intf =
-{
-	DEVCB_INPUT_PORT("SW1"),    /* port A in */
-	DEVCB_NULL,                 /* port B in */
-	DEVCB_NULL,                 /* line CA1 in */
-	DEVCB_NULL,                 /* line CB1 in */
-	DEVCB_NULL,                 /* line CA2 in */
-	DEVCB_NULL,                 /* line CB2 in */
-	DEVCB_NULL,                 /* port A out */
-	DEVCB_DRIVER_MEMBER(calomega_state,s905_mux_w), /* port B out */
-	DEVCB_NULL,                 /* line CA2 out */
-	DEVCB_NULL,                 /* port CB2 out */
-	DEVCB_NULL,                 /* IRQA */
-	DEVCB_NULL                  /* IRQB */
-};
-
-
-/********** System 906 PIA-0  **********/
-static const pia6821_interface sys906_pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(calomega_state,pia0_ain_r),     /* port A in */     /* Valid input port. Each polled value is stored at $0538 */
-	DEVCB_DRIVER_MEMBER(calomega_state,pia0_bin_r),     /* port B in */
-	DEVCB_NULL,                     /* line CA1 in */
-	DEVCB_NULL,                     /* line CB1 in */
-	DEVCB_NULL,                     /* line CA2 in */
-	DEVCB_NULL,                     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(calomega_state,pia0_aout_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(calomega_state,pia0_bout_w),        /* port B out */
-	DEVCB_DRIVER_MEMBER(calomega_state,pia0_ca2_w),     /* line CA2 out */  /* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
-	DEVCB_NULL,                     /* port CB2 out */
-	DEVCB_NULL,                     /* IRQA */
-	DEVCB_NULL                      /* IRQB */
-};
-
-/********** System 906 PIA-1  **********/
-static const pia6821_interface sys906_pia1_intf =
-{
-	DEVCB_DRIVER_MEMBER(calomega_state,pia1_ain_r),     /* port A in */
-	DEVCB_DRIVER_MEMBER(calomega_state,pia1_bin_r),     /* port B in */
-	DEVCB_NULL,                     /* line CA1 in */
-	DEVCB_NULL,                     /* line CB1 in */
-	DEVCB_NULL,                     /* line CA2 in */
-	DEVCB_NULL,                     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(calomega_state,pia1_aout_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(calomega_state,pia1_bout_w),        /* port B out */
-	DEVCB_NULL,                     /* line CA2 out */
-	DEVCB_NULL,                     /* port CB2 out */
-	DEVCB_NULL,                     /* IRQA */
-	DEVCB_NULL                      /* IRQB */
-};
-
 
 /*************************************************
 *                 ACIA Interface                 *
@@ -2709,6 +2613,7 @@ static const ay8910_interface sys906_ay8912_intf =
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -2733,8 +2638,14 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PIA6821_ADD("pia0", sys903_pia0_intf)
-	MCFG_PIA6821_ADD("pia1", sys903_pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(calomega_state,s903_mux_port_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state,lamps_903a_w))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(calomega_state, lamps_903b_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state, s903_mux_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2783,8 +2694,12 @@ static MACHINE_CONFIG_DERIVED( sys905, sys903 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sys905_map)
 
-	MCFG_PIA6821_MODIFY("pia0", sys905_pia0_intf)
-	MCFG_PIA6821_MODIFY("pia1", sys905_pia1_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_READPA_HANDLER(READ8(calomega_state,s905_mux_port_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state,lamps_905_w))
+
+	MCFG_DEVICE_MODIFY("pia1")
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state, s905_mux_w))
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8912")
@@ -2801,8 +2716,18 @@ static MACHINE_CONFIG_DERIVED( sys906, sys903 )
 	MCFG_CPU_REPLACE("maincpu", M65C02, CPU_CLOCK)  /* guess */
 	MCFG_CPU_PROGRAM_MAP(sys906_map)
 
-	MCFG_PIA6821_MODIFY("pia0", sys906_pia0_intf)
-	MCFG_PIA6821_MODIFY("pia1", sys906_pia1_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_READPA_HANDLER(READ8(calomega_state, pia0_ain_r))
+	MCFG_PIA_READPB_HANDLER(READ8(calomega_state, pia0_bin_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(calomega_state, pia0_aout_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state, pia0_bout_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(calomega_state, pia0_ca2_w))
+
+	MCFG_DEVICE_MODIFY("pia1")
+	MCFG_PIA_READPA_HANDLER(READ8(calomega_state, pia1_ain_r))
+	MCFG_PIA_READPB_HANDLER(READ8(calomega_state, pia1_bin_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(calomega_state, pia1_aout_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(calomega_state, pia1_bout_w))
 
 	MCFG_GFXDECODE(sys906)
 

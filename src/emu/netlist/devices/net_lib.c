@@ -72,6 +72,11 @@ NETLIB_START(nic7448)
 	register_subalias("g", sub.m_g);
 }
 
+NETLIB_RESET(nic7448)
+{
+    sub.do_reset();
+}
+
 NETLIB_UPDATE(nic7448)
 {
 	if (INPLOGIC(m_BIQ) && !INPLOGIC(m_LTQ))
@@ -103,8 +108,6 @@ NETLIB_UPDATE(nic7448)
 
 NETLIB_START(nic7448_sub)
 {
-	m_state = 0;
-
 	register_input("A0", m_A0);
 	register_input("A1", m_A1);
 	register_input("A2", m_A2);
@@ -122,6 +125,11 @@ NETLIB_START(nic7448_sub)
 	save(NAME(m_state));
 }
 
+NETLIB_RESET(nic7448_sub)
+{
+    m_state = 0;
+}
+
 NETLIB_UPDATE(nic7448_sub)
 {
 	UINT8 v;
@@ -137,6 +145,8 @@ NETLIB_FUNC_VOID(nic7448_sub, update_outputs, (UINT8 v))
 	assert(v<16);
 	if (v != m_state)
 	{
+	    // max transfer time is 100 NS */
+
 		OUTLOGIC(m_a, tab7448[v][0], NLTIME_FROM_NS(100));
 		OUTLOGIC(m_b, tab7448[v][1], NLTIME_FROM_NS(100));
 		OUTLOGIC(m_c, tab7448[v][2], NLTIME_FROM_NS(100));
@@ -175,6 +185,10 @@ NETLIB_START(nic7450)
 	register_input("I3", m_I2);
 	register_input("I4", m_I3);
 	register_output("Q", m_Q);
+}
+
+NETLIB_RESET(nic7450)
+{
 }
 
 NETLIB_UPDATE(nic7450)
@@ -219,71 +233,70 @@ NETLIB_UPDATE(nic7450)
 
 
 #define xstr(s) # s
-#define ENTRY1(_nic, _name) register_device<_nic>( # _name, xstr(_nic) );
-#define ENTRY(_nic, _name) ENTRY1(NETLIB_NAME(_nic), _name)
+#define ENTRY1(_nic, _name, _defparam) register_device<_nic>( # _name, xstr(_nic), _defparam );
+#define ENTRY(_nic, _name, _defparam) ENTRY1(NETLIB_NAME(_nic), _name, _defparam)
 
-netlist_factory::netlist_factory()
+netlist_factory_t::netlist_factory_t()
 {
 }
 
-netlist_factory::~netlist_factory()
+netlist_factory_t::~netlist_factory_t()
 {
-	for (list_t::entry_t *e = m_list.first(); e != NULL; e = m_list.next(e))
+	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
 	{
-		net_device_t_base_factory *p = e->object();
+		net_device_t_base_factory *p = *e;
 		delete p;
 	}
 	m_list.reset();
 }
 
-void netlist_factory::initialize()
+void netlist_factory_t::initialize()
 {
-	ENTRY(R,                    NETDEV_R)
-	ENTRY(POT,                  NETDEV_POT)
-	ENTRY(C,                    NETDEV_C)
-	ENTRY(D,                    NETDEV_D)
-	ENTRY(VCVS,                 NETDEV_VCVS)
-	ENTRY(VCCS,                 NETDEV_VCCS)
-	ENTRY(QPNP_switch,          NETDEV_QPNP)
-	ENTRY(QNPN_switch,          NETDEV_QNPN)
-	ENTRY(ttl_const,            NETDEV_TTL_CONST)
-	ENTRY(analog_const,         NETDEV_ANALOG_CONST)
-	ENTRY(logic_input,          NETDEV_LOGIC_INPUT)
-	ENTRY(analog_input,         NETDEV_ANALOG_INPUT)
-	ENTRY(log,                  NETDEV_LOG)
-	ENTRY(logD,                 NETDEV_LOGD)
-	ENTRY(clock,                NETDEV_CLOCK)
-	ENTRY(mainclock,            NETDEV_MAINCLOCK)
-	ENTRY(solver,               NETDEV_SOLVER)
-	ENTRY(nicMultiSwitch,       NETDEV_SWITCH2)
-	ENTRY(nicRSFF,              NETDEV_RSFF)
-	ENTRY(7400,                 TTL_7400_NAND)
-	ENTRY(7402,                 TTL_7402_NOR)
-	ENTRY(nic7404,              TTL_7404_INVERT)
-	ENTRY(7410,                 TTL_7410_NAND)
-	ENTRY(7420,                 TTL_7420_NAND)
-	ENTRY(7425,                 TTL_7425_NOR)
-	ENTRY(7427,                 TTL_7427_NOR)
-	ENTRY(7430,                 TTL_7430_NAND)
-	ENTRY(nic7450,              TTL_7450_ANDORINVERT)
-	ENTRY(7486,                 TTL_7486_XOR)
-	ENTRY(nic7448,              TTL_7448)
-	ENTRY(7474,                 TTL_7474)
-	ENTRY(7483,                 TTL_7483)
-	ENTRY(7490,                 TTL_7490)
-	ENTRY(7493,                 TTL_7493)
-	ENTRY(nic74107,             TTL_74107)
-	ENTRY(nic74107A,            TTL_74107A)
-	ENTRY(nic74153,             TTL_74153)
-	ENTRY(9316,                 TTL_9316)
-	ENTRY(NE555,                NETDEV_NE555)
+	ENTRY(R,                    NETDEV_R,               "R")
+	ENTRY(POT,                  NETDEV_POT,             "R")
+	ENTRY(C,                    NETDEV_C,               "C")
+	ENTRY(D,                    NETDEV_D,               "model")
+	ENTRY(VCVS,                 NETDEV_VCVS,            "-")
+	ENTRY(VCCS,                 NETDEV_VCCS,            "-")
+    ENTRY(QBJT_EB,              NETDEV_QBJT_EB,         "model")
+	ENTRY(QBJT_switch,          NETDEV_QBJT_SW,         "model")
+	ENTRY(ttl_input,            NETDEV_TTL_INPUT,       "IN")
+	ENTRY(analog_input,         NETDEV_ANALOG_INPUT,    "IN")
+	ENTRY(log,                  NETDEV_LOG,             "+I")
+	ENTRY(logD,                 NETDEV_LOGD,            "+I,I2")
+	ENTRY(clock,                NETDEV_CLOCK,           "-")   // FIXME
+	ENTRY(mainclock,            NETDEV_MAINCLOCK,       "-")   // FIXME
+	ENTRY(solver,               NETDEV_SOLVER,          "-")   // FIXME
+    ENTRY(gnd,                  NETDEV_GND,             "-")
+	ENTRY(switch2,              NETDEV_SWITCH2,         "+i1,i2")
+	ENTRY(nicRSFF,              NETDEV_RSFF,            "+S,R")
+	ENTRY(7400,                 TTL_7400_NAND,          "+A,B")
+	ENTRY(7402,                 TTL_7402_NOR,           "+A,B")
+	ENTRY(nic7404,              TTL_7404_INVERT,        "+A")
+	ENTRY(7410,                 TTL_7410_NAND,          "+A,B,C")
+	ENTRY(7420,                 TTL_7420_NAND,          "+A,B,C,D")
+	ENTRY(7425,                 TTL_7425_NOR,           "+A,B,C,D")
+	ENTRY(7427,                 TTL_7427_NOR,           "+A,B,C")
+	ENTRY(7430,                 TTL_7430_NAND,          "+A,B,C,D,E,F,G,H")
+	ENTRY(nic7450,              TTL_7450_ANDORINVERT,   "+I1,I2,I3,I4")
+	ENTRY(7486,                 TTL_7486_XOR,           "+A,B")
+	ENTRY(nic7448,              TTL_7448,               "+A0,A1,A2,A3,LTQ,BIQ,RBIQ")
+	ENTRY(7474,                 TTL_7474,               "+CLK,D,CLRQ,PREQ")
+	ENTRY(7483,                 TTL_7483,               "+A1,A2,A3,A4,B1,B2,B3,B4,C0")
+	ENTRY(7490,                 TTL_7490,               "+CLK,R1,R2,R91,R92")
+	ENTRY(7493,                 TTL_7493,               "+CLKA,CLKB,R1,R2")
+	ENTRY(nic74107,             TTL_74107,              "+CLK,J,K,CLRQ")
+	ENTRY(nic74107A,            TTL_74107A,             "+CLK,J,K,CLRQ")
+	ENTRY(nic74153,             TTL_74153,              "+C0,C1,C2,C3,A,B,G")
+	ENTRY(9316,                 TTL_9316,               "+CLK,ENP,ENT,CLRQ,LOADQ,A,B,C,D")
+	ENTRY(NE555,                NETDEV_NE555,           "-")
 }
 
-netlist_device_t *netlist_factory::new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const
+netlist_device_t *netlist_factory_t::new_device_by_classname(const pstring &classname, netlist_setup_t &setup) const
 {
-	for (list_t::entry_t *e = m_list.first(); e != NULL; e = m_list.next(e))
+	for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
 	{
-		net_device_t_base_factory *p = e->object();
+		net_device_t_base_factory *p = *e;
 		if (strcmp(p->classname(), classname) == 0)
 		{
 			netlist_device_t *ret = p->Create();
@@ -291,22 +304,27 @@ netlist_device_t *netlist_factory::new_device_by_classname(const pstring &classn
 		}
 		p++;
 	}
-	setup.netlist().xfatalerror("Class %s not found!\n", classname.cstr());
+	setup.netlist().error("Class %s not found!\n", classname.cstr());
 	return NULL; // appease code analysis
 }
 
-netlist_device_t *netlist_factory::new_device_by_name(const pstring &name, netlist_setup_t &setup) const
+netlist_device_t *netlist_factory_t::new_device_by_name(const pstring &name, netlist_setup_t &setup) const
 {
-	for (list_t::entry_t *e = m_list.first(); e != NULL; e = m_list.next(e))
-	{
-		net_device_t_base_factory *p = e->object();
-		if (strcmp(p->name(), name) == 0)
-		{
-			netlist_device_t *ret = p->Create();
-			return ret;
-		}
-		p++;
-	}
-	setup.netlist().xfatalerror("Class %s not found!\n", name.cstr());
-	return NULL; // appease code analysis
+    net_device_t_base_factory *f = factory_by_name(name, setup);
+    return f->Create();
+}
+
+net_device_t_base_factory * netlist_factory_t::factory_by_name(const pstring &name, netlist_setup_t &setup) const
+{
+    for (net_device_t_base_factory * const *e = m_list.first(); e != NULL; e = m_list.next(e))
+    {
+        net_device_t_base_factory *p = *e;
+        if (strcmp(p->name(), name) == 0)
+        {
+            return p;
+        }
+        p++;
+    }
+    setup.netlist().error("Class %s not found!\n", name.cstr());
+    return NULL; // appease code analysis
 }

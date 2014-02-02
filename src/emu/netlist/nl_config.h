@@ -16,7 +16,6 @@
 //  SETUP
 //============================================================
 
-#define USE_DELEGATES           (0)
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc
  * This is intended for non-mame usage.
@@ -24,12 +23,18 @@
  */
 #define USE_PMFDELEGATES        (0)
 
-// Next if enabled adds 20% performance ... but is not guaranteed to be absolutely timing correct.
+// This used to add 20% performance ... but is not guaranteed to be absolutely timing correct.
+// Update 01.01.2014: Currently, enabling this has no observable impact on performance.
+
 #define USE_DEACTIVE_DEVICE     (0)
+
+#define USE_OPENMP              (0)
 
 // Use nano-second resolution - Sufficient for now
 #define NETLIST_INTERNAL_RES        (U64(1000000000))
 //#define NETLIST_INTERNAL_RES      (U64(1000000000000))
+
+#define USE_ALTERNATE_SCHEDULING (1)
 
 #define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
 
@@ -54,14 +59,35 @@ typedef UINT8 netlist_sig_t;
 #endif
 
 //============================================================
-//  MACROS
+//  General Macros
 //============================================================
+
+#if defined(_OPENMP)
+#define HAS_OPENMP ( _OPENMP >= 200805 )
+#else
+#define HAS_OPENMP (0)
+#endif
 
 // prevent implicit copying
 #define NETLIST_PREVENT_COPYING(_name)          \
 	private:                                    \
 		_name(const _name &);                   \
 		_name &operator=(const _name &);
+
+#if defined(__GNUC__) && (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))
+#if !defined(__ppc__) && !defined (__PPC__) && !defined(__ppc64__) && !defined(__PPC64__)
+#define ATTR_ALIGN __attribute__ ((aligned(128)))
+#else
+#define ATTR_ALIGN
+#endif
+#else
+#define ATTR_ALIGN
+#endif
+
+//============================================================
+//  Performance tracking
+//============================================================
+
 #if NL_KEEP_STATISTICS
 #define add_to_stat(v,x)        do { v += (x); } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)
@@ -74,6 +100,11 @@ typedef UINT8 netlist_sig_t;
 #define end_timing(v)           do { } while (0)
 #endif
 
+
+//============================================================
+//  Performance tracking
+//============================================================
+
 // Compiling without mame ?
 
 #ifndef ATTR_HOT
@@ -85,15 +116,14 @@ typedef UINT8 netlist_sig_t;
 #define ATTR_COLD
 #endif
 
-#if defined(__GNUC__) && (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))
-#if !defined(__ppc__) && !defined (__PPC__) && !defined(__ppc64__) && !defined(__PPC64__)
-#define ATTR_ALIGN __attribute__ ((aligned(128)))
-#else
-#define ATTR_ALIGN
-#endif
-#else
-#define ATTR_ALIGN
-#endif
+//============================================================
+//  WARNINGS
+//============================================================
 
+#if (USE_OPENMP)
+#if (!(HAS_OPENMP))
+#warning To use openmp compile and link with "-fopenmp"
+#endif
+#endif
 
 #endif /* NLCONFIG_H_ */

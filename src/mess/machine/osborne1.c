@@ -253,24 +253,7 @@ WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
 }
 
 
-const pia6821_interface osborne1_ieee_pia_config =
-{
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),    /* in_a_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, ieee_pia_pb_r),             /* in_b_func */
-	DEVCB_NULL,                         /* in_ca1_func */
-	DEVCB_NULL,                         /* in_cb1_func */
-	DEVCB_NULL,                         /* in_ca2_func */
-	DEVCB_NULL,                         /* in_cb2_func */
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),    /* out_a_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, ieee_pia_pb_w),             /* out_b_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ifc_w),   /* out_ca2_func */
-	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ren_w),   /* out_cb2_func */
-	DEVCB_DRIVER_LINE_MEMBER(osborne1_state, ieee_pia_irq_a_func),  /* irq_a_func */
-	DEVCB_NULL                          /* irq_b_func */
-};
-
-
-WRITE8_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
+WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
 {
 }
 
@@ -309,23 +292,6 @@ WRITE_LINE_MEMBER( osborne1_state::video_pia_irq_a_func )
 	m_pia_1_irq_state = state;
 	m_maincpu->set_input_line(0, ( m_pia_1_irq_state ) ? ASSERT_LINE : CLEAR_LINE);
 }
-
-
-const pia6821_interface osborne1_video_pia_config =
-{
-	DEVCB_NULL,                             /* in_a_func */
-	DEVCB_NULL,                             /* in_b_func */
-	DEVCB_NULL,                             /* in_ca1_func */
-	DEVCB_NULL,                             /* in_cb1_func */
-	DEVCB_NULL,                             /* in_ca2_func */
-	DEVCB_NULL,                             /* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, video_pia_port_a_w),        /* out_a_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, video_pia_port_b_w),        /* out_b_func */
-	DEVCB_NULL,                             /* out_ca2_func */
-	DEVCB_DRIVER_MEMBER(osborne1_state, video_pia_out_cb2_dummy),       /* out_cb2_func */
-	DEVCB_DRIVER_LINE_MEMBER(osborne1_state, video_pia_irq_a_func),     /* irq_a_func */
-	DEVCB_NULL                              /* irq_b_func */
-};
 
 
 //static const struct aica6850_interface osborne1_6850_config =

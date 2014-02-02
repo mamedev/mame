@@ -401,28 +401,6 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
 
 
 
-//-------------------------------------------------
-//  pia0_config
-//-------------------------------------------------
-
-const pia6821_interface coco_state::pia0_config =
-{
-	DEVCB_NULL,                                                 /* port A input */
-	DEVCB_NULL,                                                 /* port B input */
-	DEVCB_NULL,                                                 /* CA1 input */
-	DEVCB_NULL,                                                 /* CB1 input */
-	DEVCB_NULL,                                                 /* CA2 input */
-	DEVCB_NULL,                                                 /* CB2 input */
-	DEVCB_DRIVER_MEMBER(coco_state, pia0_pa_w),                 /* port A output */
-	DEVCB_DRIVER_MEMBER(coco_state, pia0_pb_w),                 /* port B output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_ca2_w),           /* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_cb2_w),           /* CB2 output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_irq_a),           /* IRQA output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia0_irq_b)            /* IRQB output */
-};
-
-
-
 /***************************************************************************
   PIA1 ($FF20-$FF3F) (Chip U4)
 
@@ -579,28 +557,6 @@ WRITE_LINE_MEMBER( coco_state::pia1_firq_b )
 {
 	recalculate_firq();
 }
-
-
-
-//-------------------------------------------------
-//  pia1_config
-//-------------------------------------------------
-
-const pia6821_interface coco_state::pia1_config =
-{
-	DEVCB_DRIVER_MEMBER(coco_state, pia1_pa_r),                 /* port A input */
-	DEVCB_DRIVER_MEMBER(coco_state, pia1_pb_r),                 /* port B input */
-	DEVCB_NULL,                                                 /* CA1 input */
-	DEVCB_NULL,                                                 /* CB1 input */
-	DEVCB_NULL,                                                 /* CA2 input */
-	DEVCB_NULL,                                                 /* CB2 input */
-	DEVCB_DRIVER_MEMBER(coco_state, pia1_pa_w),                 /* port A output */
-	DEVCB_DRIVER_MEMBER(coco_state, pia1_pb_w),                 /* port B output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_ca2_w),           /* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_cb2_w),           /* CB2 output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_firq_a),          /* IRQA output */
-	DEVCB_DRIVER_LINE_MEMBER(coco_state, pia1_firq_b)           /* IRQB output */
-};
 
 
 

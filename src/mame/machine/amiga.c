@@ -348,7 +348,7 @@ TIMER_CALLBACK_MEMBER(amiga_state::scanline_callback)
 	}
 
 	/* on every scanline, clock the second CIA TOD */
-	mos6526_tod_w(m_cia_0, 1);
+	mos6526_tod_w(m_cia_1, 1);
 
 	/* render up to this scanline */
 	if (!m_screen->update_partial(scanline))

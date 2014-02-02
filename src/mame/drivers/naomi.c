@@ -221,7 +221,7 @@ There are also 2 types of carts manufactured by Namco: MASK-B, MASK-C
 |                OSC1                                         |
 |                     IC41     IC42                    IC22   | male side
 |                                               IC45          |
-|                JJ                                            |
+|                JJ                                           |
 |                PP                                           |
 |                34 IC37                                      |
 |        ----CN3----                       ----CN1----        |
@@ -336,9 +336,10 @@ Sega Tetris                                     840-0018C  22909    6 (64Mb)   p
 Slashout                                        840-0041C  23341   17 (64Mb)   ?        315-6213  317-0286-COM   joystick + 4 buttons
 Spawn In the Demon's Hand (Rev B)               841-0005C  22977B  10 (64Mb)   ?        315-6213  317-5051-COM   joystick + 4 buttons
 The Typing of the Dead (Rev A)                  840-0026C  23021A  20 (64Mb)   present  315-6213  not present
+Touch de UNO! / Unou Nouryoku Check Machine     840-0008C  22073    4 (64Mb)   present  315-6213  317-0255-JPN
 Toy Fighter / Waffupu                           840-0011C  22035   10 (64Mb)   ?        315-6212  317-0257-COM   joystick + 3 buttons
 Virtua NBA                                      840-0021C  23073   21 (64Mb)   present  315-6213  not present
-Virtua NBA (original)                           840-0021C  23073   21 (64Mb)   ?        315-6213  not present    Inside Cart label 840-0021B (Outside C)
+Virtua NBA (original)                           840-0021C  23073   21 (64Mb)   ?        315-6213  not present
 Virtua Striker 2 Ver. 2000 (Rev C)              840-0010C  21929C  14 (64Mb)   present  315-6213  317-0258-COM   joystick + 3 buttons (+1x 32Mb)
 Virtua Tennis / Power Smash                     840-0015C  22927   11 (64Mb)   present  315-6213  317-0263-COM
 Zombie Revenge                                  840-0003C  21707   19 (64Mb)   ?        315-6213  317-0249-COM   joystick + 3 buttons
@@ -390,6 +391,7 @@ Games known to use this PCB include....
                                                Sticker    EPROM   MASKROMs   25LC040  A54SX32
 Game                                           on cart    IC11#   # of SOP44 IC13S#   IC1#          Notes
 ----------------------------------------------------------------------------------------------------------------------------
+Club Kart Prize                                840-0129C  ?       16 (64Mb)  present  317-0368-COM  no sticker on ic11
 Giant Gram 2000                                840-0039C  23377   20 (64Mb)  present  317-0296-COM
 Kick '4' Cash                                  840-0140C  24212   16 (64Mb)  present  317-0397-COM
 Marvel Vs. Capcom 2 New Age of Heroes (Rev A)  841-0007C  23085A  14 (64Mb)  present  317-5058-COM  +2x 32Mb (full cart #:841-0007C-03)
@@ -564,6 +566,7 @@ Notes:
 /Shin Nihon Prowrestling Toukon                                                                                                       /FL0 & FL1 have pin55 raised from PCB.
 \Retsuden 4 Arcade Edition (Ver. A)  F2X   25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1        \They are connected togheter and go to pin89 on 2K.
 World Kicks (Ver. A)                 F2X   25209801  2 (32Mb)  10 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK2-WK3
+World Kicks PCB                      F2X   25509801  ? (??Mb)   ? (128Mb)  ?            ?         ?         ?
 
 (1) note: the number in the game code has the following meaning: 1 = Japan, 2 = Asia, 3 = US, 4 = World.
 
@@ -7219,8 +7222,9 @@ ROM_START( ndcfboxa )
 	DISK_IMAGE_READONLY( "gds-0042a", 0, SHA1(619fd9ebd52fb418526f741ddacbd3edf7dcb4f5) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	// PIC and sticker unknown
-	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, NO_DUMP )
+	//PIC16C621A (317-0567-EXP)
+	//(sticker 253-5508-0567)
+	ROM_LOAD("317-0567-exp.pic", 0x00, 0x4000, NO_DUMP ) 
 ROM_END
 
 /*
@@ -7454,6 +7458,37 @@ ROM_START( clubkrte )
 	ROM_LOAD( "mpr-22701.ic9",  0x8800000, 0x1000000, CRC(0fa92fd7) SHA1(67a1cf085101884a17a4783d0d509ab198aa6425) )
 	ROM_LOAD( "mpr-22702.ic10", 0x9800000, 0x1000000, CRC(e302b582) SHA1(787192ed9f9a08541eecc3128855485cad802a42) )
 	ROM_LOAD( "mpr-22703.ic11", 0xa800000, 0x1000000, CRC(702b8b4a) SHA1(3a8dfde458f341e7db20664382b9fce2b6e5d462) )
+ROM_END
+
+ROM_START( clubkprz )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-24065.ic11", 0x000000, 0x400000, CRC(7c331cb8) SHA1(f7e1cffbad576482a91bc1dc9129c689f0bebb25) ) 
+	ROM_LOAD32_WORD( "opr-24066.17s", 0x0800000, 0x800000, CRC(b22cfa7b) SHA1(e0f795dc9d3a2dd1869f85f3eedd0f8d703a1be8) ) 
+	ROM_LOAD32_WORD( "opr-24067.18",  0x0800002, 0x800000, CRC(0d2d1290) SHA1(a26fa82fc87d6ed60095b2e778b649fcbb8bb1ee) ) 
+	ROM_LOAD32_WORD( "opr-24068.19s", 0x1800000, 0x800000, CRC(d320009b) SHA1(76677eacd18770d091fc19e31be3d84410ed3256) ) 
+	ROM_LOAD32_WORD( "opr-24069.20",  0x1800002, 0x800000, CRC(56145c73) SHA1(a74a97a431a315f86a1b25d1fc9cc1fb93146776) ) 
+	ROM_LOAD32_WORD( "opr-24070.21s", 0x2800000, 0x800000, CRC(10a0c315) SHA1(337902393e215d94954f123c6b016925486c3374) ) 
+	ROM_LOAD32_WORD( "opr-24071.22",  0x2800002, 0x800000, CRC(040e1329) SHA1(cebf8bc48a745811bcc6bce0ad880eca392428f9) ) 
+	ROM_LOAD32_WORD( "opr-24072.23s", 0x3800000, 0x800000, CRC(1e9834e4) SHA1(a226689190739a39016b78c881f92b9bbb8d830e) ) 
+	ROM_LOAD32_WORD( "opr-24073.24",  0x3800002, 0x800000, CRC(51fb7d42) SHA1(fb0bffeb181b1f3efcfa22aabda1bea926d9048b) ) 
+	ROM_LOAD32_WORD( "opr-24074.25s", 0x4800000, 0x800000, CRC(636625fe) SHA1(fffd766cf14e66d10071a342573535ac708f87b7) ) 
+	ROM_LOAD32_WORD( "opr-24075.26",  0x4800002, 0x800000, CRC(9eee9689) SHA1(831ac7713cc4f47679609361f0e1c67bb028e795) ) 
+	ROM_LOAD32_WORD( "opr-24076.27s", 0x5800000, 0x800000, CRC(a89a5555) SHA1(c2c0eeb50f1afe6c7c3d978a99c6eaac96062bf0) ) 
+	ROM_LOAD32_WORD( "opr-24077.28",  0x5800002, 0x800000, CRC(1e11d0aa) SHA1(1cc4dd05e1fbd0fde669b40aa49098c14eafd035) ) 
+	ROM_LOAD32_WORD( "opr-24078.29",  0x6800000, 0x800000, CRC(a83f5f88) SHA1(ef0787cf84847e74fa3bb38d7133d87607df84fb) ) 
+	ROM_LOAD32_WORD( "opr-24079.30s", 0x6800002, 0x800000, CRC(57efa68f) SHA1(5dd863dfb035489de3bbb3c3f72ee5d87ec322be) ) 
+	ROM_LOAD32_WORD( "opr-24080.31",  0x7800000, 0x800000, CRC(307c480e) SHA1(6e52f252f557988e52c42d495713a374507b5895) ) 
+	ROM_LOAD32_WORD( "opr-24081.32s", 0x7800002, 0x800000, CRC(61085bdc) SHA1(48fe7f34bb5f50825b3c77d587e07f3adab1cf86) ) 
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "at25010.ic3s", 0x000000, 0x000084, CRC(0142d8be) SHA1(5922b6c47b12b19e1fa7bbe9aae391905038a7ff) ) 
+
+	ROM_REGION( 4, "rom_key", 0 )	// 317-0368-COM
+	ROM_LOAD( "clubkprz-key.bin", 0x000000, 0x000004, CRC(c9ed13c1) SHA1(2907985375cd5b04846e7214d200926be64d06fd) ) 
 ROM_END
 
 /**********************************************
@@ -8153,7 +8188,7 @@ ROM_END
 /* 0004 */ GAME( 1999, ringout,  naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Ring Out 4x4", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0005 */ GAME( 1999, alpilota, naomi,    naomim2, alpilota,naomi_state, naomi,   ROT0, "Sega", "Airline Pilots (Rev A)", GAME_FLAGS ) /* specific BIOS "airlbios" needed */
 /* 0007 */ GAME( 1999, ggram2,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Giant Gram: All Japan Pro Wrestling 2 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-/* 0008 */ GAME( 1999, tduno,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch de Uno!", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0008 */ GAME( 1999, tduno,    naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Touch de Uno! / Unou Nouryoku Check Machine", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0010 */ GAME( 1999, vs2_2k,   naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0011 */ GAME( 1999, toyfight, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Toy Fighter", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0012 */ GAME( 1999, smlg99,   naomi,    naomim2, dybbnao, naomi_state, naomi,   ROT0, "Sega", "Super Major League '99", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8207,6 +8242,8 @@ ROM_END
 // 0166 Touch De Zunou (Japan) (Rev A)
 /* 0170 */ GAME( 2007, pokasuka, naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Pokasuka Ghost", GAME_FLAGS )
 /* 0175 */ GAME( 2007, asndynmt, naomi,    naomim4, naomi,   naomi_state, naomi,   ROT0, "Sega", "Asian Dynamite", GAME_FLAGS )
+// 0177 Rythm Tengoku (Japan)
+// 00xx Mayjinsen (Formation Battle in May) - prototype, never released
 
 /* 840-xxxxx (Sega Naomi 2 cart games) */
 /* 0046 */ GAME( 2001, wldrider, naomi2,  naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8217,7 +8254,7 @@ ROM_END
 /* 0087 */ GAME( 2002, kingrt66, naomi2,  naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "King of Route 66 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0095 */ GAME( 2002, soulsurf, naomi2,  naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "Soul Surfer (Rev A)", GAME_FLAGS )
 /* 0106 */ GAME( 2002, vf4evoct, naomi2,  naomi2m1, naomi, naomi_state, vf4evoct, ROT0, "Sega", "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-// 0129 Club Kart Prize
+/* 0129 */ GAME( 2003, clubkprz, naomi2,  naomi2m1, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart Prize", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */ GAME( 1999, pstone,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8256,6 +8293,7 @@ ROM_END
 // 25469801 Ninja Assault (NJA2 Ver. A)
 /* 25469801 */ GAME( 2000, ninjaslt, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Ninja Assault (NJA3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25469801 */ GAME( 2000, ninjaslt4,ninjaslt,naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Ninja Assault (NJA4 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+// 25509801 World Kicks PCB
 /* 25709801 */ GAME( 2001, gunsur2,  naomi,   naomi,  naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF1)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25709801 */ GAME( 2001, gunsur2e, gunsur2, naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF2 Ver. E)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazan,    naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Mazan: Flash of the Blade (MAZ2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8263,7 +8301,9 @@ ROM_END
 
 /* GDS-xxxx (Sega GD-ROM games) */
 /* 0001  */ GAME( 2000, confmiss, naomigd, naomigd,  hotd2,   naomi_state, naomigd, ROT0, "Sega", "Confidential Mission (GDS-0001)", GAME_FLAGS )
-// 0002  Shakatto Tambourine
+// 0002  Shakatto Tambourine (GDS-0002)
+// 0002A Shakatto Tambourine (Rev A) (GDS-0002A)
+// 0002B Shakatto Tambourine (Rev B) (GDS-0002B)
 /* 0003  */ GAME( 2000, sprtjam,  naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Sports Jam (GDS-0003)", GAME_FLAGS )
 /* 0004  */ GAME( 2000, slashout, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Slashout (GDS-0004)", GAME_FLAGS )
 /* 0005  */ GAME( 2001, spkrbtl,  naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Spikers Battle (GDS-0005)", GAME_FLAGS )
@@ -8278,11 +8318,11 @@ ROM_END
 // 0012A Virtua Fighter 4 (Rev A)
 /* 0012B */ GAME( 2001, vf4b,     vf4,     naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 (Rev B) (GDS-0012B)", GAME_FLAGS )
 /* 0012C */ GAME( 2001, vf4c,     vf4,     naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 (Rev C) (GDS-0012C)", GAME_FLAGS )
-/* 0013  */ GAME( 2001, shaktmsp, naomigd, naomigd,  shaktamb,naomi_state, naomigd, ROT0, "Sega", "Shakatto Tambourine 2K1 SPR (GDS-0013)", GAME_FLAGS )
+/* 0013  */ GAME( 2001, shaktmsp, naomigd, naomigd, shaktamb, naomi_state, naomigd, ROT0, "Sega", "Shakatto Tambourine 2K1 SPR (GDS-0013)", GAME_FLAGS )
 /* 0014  */ GAME( 2001, beachspi, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Beach Spikers (GDS-0014)", GAME_FLAGS )
 // 0015  Virtua Tennis 2 / Power Smash 2
 /* 0015A */ GAME( 2001, vtennis2, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_FLAGS )
-/* 0016  */ GAME( 2001, shaktamb, naomigd, naomigd,  shaktamb,naomi_state, naomigd, ROT0, "Sega", "Shakatto Tambourine Cho Powerup Chu 2K1 AUT (GDS-0016)", GAME_FLAGS )
+/* 0016  */ GAME( 2001, shaktamb, naomigd, naomigd, shaktamb, naomi_state, naomigd, ROT0, "Sega", "Shakatto Tambourine Cho Powerup Chu 2K1 AUT (GDS-0016)", GAME_FLAGS )
 /* 0017  */ GAME( 2001, keyboard, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "La Keyboard (GDS-0017)", GAME_FLAGS )
 /* 0018  */ GAME( 2001, lupinsho, naomigd, naomigd,  hotd2,   naomi_state, naomigd, ROT0, "Sega / Eighting", "Lupin The Third - The Shooting (GDS-0018)", GAME_FLAGS )
 // 0018A Lupin The Third - The Shooting (Rev A)

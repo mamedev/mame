@@ -142,6 +142,7 @@ WRITE_LINE_MEMBER( wangpc_mvc_device::vsync_w )
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,
+	0,0,0,0,
 	10,
 	NULL,
 	wangpc_mvc_update_row,

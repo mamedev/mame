@@ -160,76 +160,6 @@ ADDRESS_MAP_END
 
 
 
-/*************************************
- *
- *  PIA interfaces
- *
- *************************************/
-
-static const pia6821_interface qixsnd_pia_0_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(qix_state,sync_sndpia1_porta_w),            /* port A out */
-	DEVCB_DRIVER_MEMBER(qix_state,qix_vol_w),                   /* port B out */
-	DEVCB_DEVICE_LINE_MEMBER("sndpia1", pia6821_device, ca1_w),     /* line CA2 out */
-	DEVCB_DRIVER_MEMBER(qix_state,qix_flip_screen_w),                               /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_dint),                                       /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_dint)                                        /* IRQB */
-};
-
-static const pia6821_interface qixsnd_pia_1_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DEVICE_MEMBER("sndpia0", pia6821_device, porta_w),            /* port A out */
-	DEVCB_DRIVER_MEMBER(qix_state,qix_dac_w),               /* port B out */
-	DEVCB_DEVICE_LINE_MEMBER("sndpia0", pia6821_device, ca1_w), /* line CA2 out */
-	DEVCB_NULL,     /* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_sint),                               /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_sint)                                /* IRQB */
-};
-
-static const pia6821_interface qixsnd_pia_2_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(qix_state,sndpia_2_warning_w),  /* port A out */
-	DEVCB_DRIVER_MEMBER(qix_state,sndpia_2_warning_w),  /* port B out */
-	DEVCB_DRIVER_MEMBER(qix_state,sndpia_2_warning_w),  /* line CA2 out */
-	DEVCB_DRIVER_MEMBER(qix_state,sndpia_2_warning_w),  /* line CB2 out */
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-static const pia6821_interface slithersnd_pia_0_intf =
-{
-	DEVCB_INPUT_PORT("P2"),     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(qix_state,slither_coinctl_w),   /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DRIVER_MEMBER(qix_state,qix_flip_screen_w),   /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_dint),           /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(qix_state,qix_pia_dint)            /* IRQB */
-};
-
 
 //-------------------------------------------------
 //  sn76496_config psg_intf
@@ -251,9 +181,26 @@ MACHINE_CONFIG_FRAGMENT( qix_audio )
 	MCFG_CPU_ADD("audiocpu", M6802, SOUND_CLOCK_OSC/2)      /* 0.92 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MCFG_PIA6821_ADD("sndpia0", qixsnd_pia_0_intf)
-	MCFG_PIA6821_ADD("sndpia1", qixsnd_pia_1_intf)
-	MCFG_PIA6821_ADD("sndpia2", qixsnd_pia_2_intf)
+	MCFG_DEVICE_ADD("sndpia0", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(qix_state, sync_sndpia1_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qix_vol_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("sndpia1", pia6821_device, ca1_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(qix_state, qix_flip_screen_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(qix_state, qix_pia_dint))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(qix_state, qix_pia_dint))
+
+	MCFG_DEVICE_ADD("sndpia1", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("sndpia0", pia6821_device, porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state,qix_dac_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("sndpia0", pia6821_device, ca1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(qix_state, qix_pia_sint))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(qix_state, qix_pia_sint))
+
+	MCFG_DEVICE_ADD("sndpia2", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(qix_state, sndpia_2_warning_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, sndpia_2_warning_w))
+	MCFG_PIA_CA2_HANDLER(WRITE8(qix_state, sndpia_2_warning_w))
+	MCFG_PIA_CB2_HANDLER(WRITE8(qix_state, sndpia_2_warning_w))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -265,7 +212,12 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( slither_audio )
-	MCFG_PIA6821_ADD("sndpia0", slithersnd_pia_0_intf)
+	MCFG_DEVICE_ADD("sndpia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("P2"))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_coinctl_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(qix_state, qix_flip_screen_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(qix_state, qix_pia_dint))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(qix_state, qix_pia_dint))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

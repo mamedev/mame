@@ -118,8 +118,8 @@ public:
 
 	optional_device<mc6854_device> m_mc6854;
 
-	DECLARE_WRITE8_MEMBER( to7_set_cassette_motor );
-	DECLARE_WRITE8_MEMBER( mo5_set_cassette_motor );
+	DECLARE_WRITE_LINE_MEMBER( to7_set_cassette_motor );
+	DECLARE_WRITE_LINE_MEMBER( mo5_set_cassette_motor );
 	DECLARE_WRITE_LINE_MEMBER( thom_dev_irq_0 );
 	DECLARE_WRITE_LINE_MEMBER( thom_irq_1 );
 	DECLARE_WRITE_LINE_MEMBER( thom_firq_1 );
@@ -129,13 +129,13 @@ public:
 	DECLARE_WRITE8_MEMBER( to7_timer_cp2_out );
 	DECLARE_READ8_MEMBER( to7_timer_port_in );
 	DECLARE_WRITE8_MEMBER( to7_timer_tco_out );
-	DECLARE_WRITE8_MEMBER( to7_sys_cb2_out );
+	DECLARE_WRITE_LINE_MEMBER( to7_sys_cb2_out );
 	DECLARE_WRITE8_MEMBER( to7_sys_portb_out );
 	DECLARE_READ8_MEMBER( to7_sys_porta_in );
 	DECLARE_READ8_MEMBER( to7_sys_portb_in );
 	DECLARE_WRITE_LINE_MEMBER( to7_io_ack );
 	DECLARE_WRITE8_MEMBER( to7_io_portb_out );
-	DECLARE_WRITE8_MEMBER( to7_io_cb2_out );
+	DECLARE_WRITE_LINE_MEMBER( to7_io_cb2_out );
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_cb );
 	DECLARE_WRITE_LINE_MEMBER( to7_modem_tx_w );
 	DECLARE_READ8_MEMBER( to7_modem_mea8000_r );
@@ -143,13 +143,13 @@ public:
 	DECLARE_READ8_MEMBER( to7_game_porta_in );
 	DECLARE_READ8_MEMBER( to7_game_portb_in );
 	DECLARE_WRITE8_MEMBER( to7_game_portb_out );
-	DECLARE_WRITE8_MEMBER( to7_game_cb2_out );
+	DECLARE_WRITE_LINE_MEMBER( to7_game_cb2_out );
 	TIMER_CALLBACK_MEMBER( to7_game_update_cb );
 	DECLARE_READ8_MEMBER( to7_midi_r );
 	DECLARE_WRITE8_MEMBER( to7_midi_w );
 	DECLARE_MACHINE_RESET( to7 );
 	DECLARE_MACHINE_START( to7 );
-	DECLARE_WRITE8_MEMBER( to770_sys_cb2_out );
+	DECLARE_WRITE_LINE_MEMBER( to770_sys_cb2_out );
 	DECLARE_READ8_MEMBER( to770_sys_porta_in );
 	void to7_update_cart_bank_postload();
 	void to770_update_ram_bank_postload();
@@ -224,13 +224,13 @@ public:
 	DECLARE_WRITE8_MEMBER( mo6_ext_w );
 	DECLARE_WRITE_LINE_MEMBER( mo6_centronics_busy );
 	DECLARE_WRITE8_MEMBER( mo6_game_porta_out );
-	DECLARE_WRITE8_MEMBER( mo6_game_cb2_out );
+	DECLARE_WRITE_LINE_MEMBER( mo6_game_cb2_out );
 	TIMER_CALLBACK_MEMBER( mo6_game_update_cb );
 	DECLARE_READ8_MEMBER( mo6_sys_porta_in );
 	DECLARE_READ8_MEMBER( mo6_sys_portb_in );
 	DECLARE_WRITE8_MEMBER( mo6_sys_porta_out );
 	DECLARE_WRITE8_MEMBER( mo6_sys_portb_out );
-	DECLARE_WRITE8_MEMBER( mo6_sys_cb2_out );
+	DECLARE_WRITE_LINE_MEMBER( mo6_sys_cb2_out );
 	DECLARE_READ8_MEMBER( mo6_gatearray_r );
 	DECLARE_WRITE8_MEMBER( mo6_gatearray_w );
 	DECLARE_READ8_MEMBER( mo6_vreg_r );
@@ -550,19 +550,6 @@ protected:
 
 /*----------- defined in machine/thomson.c -----------*/
 
-extern const pia6821_interface to7_pia6821_sys;
-extern const pia6821_interface to7_pia6821_io;
-extern const pia6821_interface to7_pia6821_modem;
-extern const pia6821_interface to7_pia6821_game;
-extern const pia6821_interface to770_pia6821_sys;
-extern const pia6821_interface mo5_pia6821_sys;
-extern const pia6821_interface to9_pia6821_sys;
-extern const pia6821_interface to8_pia6821_sys;
-extern const pia6821_interface to9p_pia6821_sys;
-extern const pia6821_interface mo6_pia6821_game;
-extern const pia6821_interface mo6_pia6821_sys;
-extern const pia6821_interface mo5nr_pia6821_sys;
-extern const pia6821_interface mo5nr_pia6821_game;
 extern const centronics_interface to7_centronics_config;
 extern const centronics_interface mo6_centronics_config;
 extern const mc6846_interface to7_timer;

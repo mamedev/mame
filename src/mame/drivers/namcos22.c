@@ -1590,22 +1590,72 @@ WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
 }
 
 
-READ32_MEMBER(namcos22_state::namcos22_keycus_r)
+READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 {
-	// this chip is also used for reading random values in some games
-	// for example in timecris to determine where certain enemies will emerge
-	// but it is not yet understood how this works
-//  printf("Hit keycus mask %x PC=%x\n", mem_mask, space.device().safe_pc());
+	// Like other Namco hardware, this chip is used for protection as well as
+	// reading random values in some games for example in timecris to determine
+	// where certain enemies will emerge.
+	// It works in combination with keycus_w, but not yet understood how.
+	
+//  printf("Hit keycus offs %x mask %x PC=%x\n", offset, mem_mask, space.device().safe_pc());
 
-	if (ACCESSING_BITS_0_15)
-		return m_keycus_id;
-	if (ACCESSING_BITS_16_31)
-		return m_keycus_id << 16;
+	// protection (not used for all games)
+	// note: some games will XOR this register against a magic value, but that doesn't mean
+	// that the magic value is the keycus id. For example dirtdash XORs against $2c79, but its
+	// keycus id is $01a2 evident from a simple compare.
+	switch (m_gametype)
+	{
+		case NAMCOS22_RIDGE_RACER2:
+			if (offset == 0) return 0x0172;
+			break;
+		
+		case NAMCOS22_ACE_DRIVER:
+			if (offset == 3) return 0x0173;
+			break;
+		
+		case NAMCOS22_CYBER_COMMANDO:
+			if (offset == 1) return 0x0185;
+			break;
 
-	return 0;
+		case NAMCOS22_ALPINE_RACER:
+			if (offset == 1) return 0x0187;
+			break;
+
+		case NAMCOS22_CYBER_CYCLES:
+			if (offset == 0xf) return 0x0387;
+			break;
+
+		case NAMCOS22_VICTORY_LAP:
+			if (offset == 2) return 0x0188;
+			break;
+
+		case NAMCOS22_DIRT_DASH:
+			if (offset == 0) return 0x01a2;
+			break;
+
+		case NAMCOS22_ALPINE_SURFER:
+			if (offset == 1) return 0x01a9;
+			break;
+
+		case NAMCOS22_TOKYO_WARS:
+			if (offset == 4) return 0x01a8;
+			break;
+		
+		default:
+			break;
+	}
+	
+	// pick a random number, but don't pick the same twice in a row
+	UINT16 old_rng = m_keycus_rng;
+	do
+	{
+		m_keycus_rng = machine().rand() & 0xffff;
+	} while(m_keycus_rng == old_rng);
+
+	return m_keycus_rng;
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_keycus_w)
+WRITE16_MEMBER(namcos22_state::namcos22_keycus_w)
 {
 	// for obfuscating keycus and/or random seed?
 }
@@ -1693,7 +1743,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
 	 *     C389? (Cyber Cycles)
 	 *     C392? (Ace Driver Victory Lap)
 	 */
-	AM_RANGE(0x20000000, 0x2000000f) AM_READWRITE(namcos22_keycus_r, namcos22_keycus_w)
+	AM_RANGE(0x20000000, 0x2000000f) AM_READWRITE16(namcos22_keycus_r, namcos22_keycus_w, 0xffffffff)
 
 	/**
 	 * C139 SCI Buffer
@@ -1874,7 +1924,7 @@ ADDRESS_MAP_END
 // Super System 22
 static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32, namcos22_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namcos22_keycus_r, namcos22_keycus_w)
+	AM_RANGE(0x400000, 0x40001f) AM_READWRITE16(namcos22_keycus_r, namcos22_keycus_w, 0xffffffff)
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
 	AM_RANGE(0x420000, 0x42000f) AM_READ(namcos22_sci_r) AM_WRITEONLY /* C139 SCI registers */
 	AM_RANGE(0x440000, 0x440003) AM_READWRITE16(namcos22_dipswitch_r, namcos22_cpuleds_w, 0xffffffff)
@@ -5496,7 +5546,7 @@ void namcos22_state::namcos22_init(int game_type)
 {
 	m_gametype = game_type;
 
-	m_keycus_id = 0;
+	m_keycus_rng = 0;
 	m_su_82 = 0;
 	m_irq_state = 0;
 	m_p4 = 0;
@@ -5508,32 +5558,24 @@ DRIVER_INIT_MEMBER(namcos22_state,ridgeraj)
 {
 	namcos22_init(NAMCOS22_RIDGE_RACER);
 	install_c74_speedup();
-
-	m_keycus_id = 0x0172;
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,ridger2j)
 {
 	namcos22_init(NAMCOS22_RIDGE_RACER2);
 	install_c74_speedup();
-
-	m_keycus_id = 0x0172;
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,acedrvr)
 {
 	namcos22_init(NAMCOS22_ACE_DRIVER);
 	install_c74_speedup();
-
-	m_keycus_id = 0x0173;
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,victlap)
 {
 	namcos22_init(NAMCOS22_VICTORY_LAP);
 	install_c74_speedup();
-
-	m_keycus_id = 0x0188;
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,raveracw)
@@ -5546,8 +5588,6 @@ DRIVER_INIT_MEMBER(namcos22_state,cybrcomm)
 {
 	namcos22_init(NAMCOS22_CYBER_COMMANDO);
 	install_c74_speedup();
-
-	m_keycus_id = 0x0185;
 }
 
 
@@ -5555,8 +5595,6 @@ DRIVER_INIT_MEMBER(namcos22_state,alpiner)
 {
 	namcos22_init(NAMCOS22_ALPINE_RACER);
 	install_130_speedup();
-
-	m_keycus_id = 0x0187;
 
 	m_motor_status = 2;
 }
@@ -5566,8 +5604,6 @@ DRIVER_INIT_MEMBER(namcos22_state,alpiner2)
 	namcos22_init(NAMCOS22_ALPINE_RACER_2);
 	install_130_speedup();
 
-	m_keycus_id = 0x0187;
-
 	m_motor_status = 2;
 }
 
@@ -5575,8 +5611,6 @@ DRIVER_INIT_MEMBER(namcos22_state,alpinesa)
 {
 	namcos22_init(NAMCOS22_ALPINE_SURFER);
 	install_141_speedup();
-
-	m_keycus_id = 0x01a9;
 
 	m_motor_status = 2;
 }
@@ -5591,7 +5625,8 @@ DRIVER_INIT_MEMBER(namcos22_state,propcycl)
 {
 	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 
-	/* patch out strange routine (uninitialized-eprom related?) */
+	// patch out strange routine (uninitialized-eeprom related?)
+	// maybe needs more accurate 28C64 eeprom device emulation
 	ROM[0x1992C/4] = 0x4e754e75;
 
 	/**
@@ -5614,8 +5649,6 @@ DRIVER_INIT_MEMBER(namcos22_state,cybrcyc)
 {
 	namcos22_init(NAMCOS22_CYBER_CYCLES);
 	install_130_speedup();
-
-	m_keycus_id = 0x0387;
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,timecris)
@@ -5628,8 +5661,6 @@ DRIVER_INIT_MEMBER(namcos22_state,tokyowar)
 {
 	namcos22_init(NAMCOS22_TOKYO_WARS);
 	install_141_speedup();
-
-	m_keycus_id = 0x01a8;
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,aquajet)
@@ -5642,16 +5673,12 @@ DRIVER_INIT_MEMBER(namcos22_state,adillor)
 {
 	namcos22_init(NAMCOS22_ARMADILLO_RACING);
 	install_141_speedup();
-
-	m_keycus_id = 0x59b7;
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,dirtdash)
 {
 	namcos22_init(NAMCOS22_DIRT_DASH);
 	install_141_speedup();
-
-	m_keycus_id = 0x01a2;
 }
 
 

@@ -111,6 +111,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
 
+	DECLARE_WRITE_LINE_MEMBER( sio_rx_w ) { m_sio_rx = state; }
+	DECLARE_WRITE_LINE_MEMBER( sio_pin_w ) { m_sio_pin = state; }
+
 	void update_interrupt();
 
 	// CPU state
@@ -126,6 +129,10 @@ public:
 
 	// video state
 	UINT8 m_lcd_data;
+
+	// sio state
+	int m_sio_rx;
+	int m_sio_pin;
 };
 
 #endif

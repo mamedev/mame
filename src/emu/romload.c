@@ -506,7 +506,7 @@ static void display_rom_load_results(romload_private *romdata, bool from_list)
 	{
 		/* create the error message and exit fatally */
 		mame_printf_error("%s", romdata->errorstring.cstr());
-		fatalerror_exitcode(romdata->machine(), MAMERR_MISSING_FILES, "ERROR: required files are missing, the %s cannot be run.",emulator_info::get_gamenoun());
+		fatalerror_exitcode(romdata->machine(), MAMERR_MISSING_FILES, "Required files are missing, the %s cannot be run.",emulator_info::get_gamenoun());
 	}
 
 	/* if we had warnings, output them, but continue */

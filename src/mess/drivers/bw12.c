@@ -356,6 +356,7 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 static MC6845_INTERFACE( bw12_mc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	bw12_update_row,
@@ -400,11 +401,6 @@ READ8_MEMBER( bw12_state::pia_pa_r )
 	return data;
 }
 
-READ_LINE_MEMBER( bw12_state::pia_cb1_r )
-{
-	return m_key_stb;
-}
-
 WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
 {
 	if (state)
@@ -418,22 +414,6 @@ WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
 		}
 	}
 }
-
-static const pia6821_interface pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(bw12_state, pia_pa_r),                  /* port A input */
-	DEVCB_NULL,                                                 /* port B input */
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, ack_r),     /* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(bw12_state, pia_cb1_r),            /* CB1 input */
-	DEVCB_NULL,                                                 /* CA2 input */
-	DEVCB_NULL,                                                 /* CB2 input */
-	DEVCB_NULL,                                                 /* port A output */
-	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),  /* port B output */
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),      /* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(bw12_state, pia_cb2_w),            /* CB2 output */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),             /* IRQA output */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)              /* IRQB output */
-};
 
 /* Centronics Interface */
 
@@ -650,7 +630,16 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
-	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
+
+	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(bw12_state, pia_pa_r))
+	MCFG_PIA_READCA1_HANDLER(DEVREADLINE(CENTRONICS_TAG, centronics_device, ack_r))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8(CENTRONICS_TAG, centronics_device, write))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(bw12_state, pia_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE(Z80_TAG, z80_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE(Z80_TAG, z80_device, irq_line))
+
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
 	MCFG_PIT8253_ADD(PIT8253_TAG, pit_intf)
 	MCFG_AY3600_ADD(AY3600PRO002_TAG, 0, bw12_ay3600_intf)

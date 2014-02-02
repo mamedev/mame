@@ -735,10 +735,6 @@ static const floppy_interface c1541_floppy_interface =
 };
 
 
-//-------------------------------------------------
-//  pia6821_interface pia0_intf
-//-------------------------------------------------
-
 READ8_MEMBER( c1541_prologic_dos_classic_device::pia_r )
 {
 	return m_pia->read(space, (offset >> 2) & 0x03);
@@ -778,23 +774,6 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 
 	m_centronics->write(space, 0, data);
 }
-
-static const pia6821_interface pia_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1541_prologic_dos_classic_device, pia_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, ack_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1541_prologic_dos_classic_device, pia_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1541_prologic_dos_classic_device, pia_pb_w),
-	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 //-------------------------------------------------
@@ -915,7 +894,13 @@ static MACHINE_CONFIG_FRAGMENT( c1541pdc )
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1541pdc_mem)
 
-	MCFG_PIA6821_ADD(MC6821_TAG, pia_intf)
+	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(c1541_prologic_dos_classic_device, pia_pb_r))
+	MCFG_PIA_READCA1_HANDLER(DEVREADLINE(CENTRONICS_TAG, centronics_device, ack_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c1541_prologic_dos_classic_device, pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c1541_prologic_dos_classic_device, pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, strobe_w))
+
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 MACHINE_CONFIG_END
 

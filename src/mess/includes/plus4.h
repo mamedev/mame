@@ -31,6 +31,7 @@
 #define SCREEN_TAG          "screen"
 #define CONTROL1_TAG        "joy1"
 #define CONTROL2_TAG        "joy2"
+#define PET_USER_PORT_TAG     "user"
 
 class plus4_state : public driver_device
 {
@@ -48,7 +49,7 @@ public:
 			m_joy1(*this, CONTROL1_TAG),
 			m_joy2(*this, CONTROL2_TAG),
 			m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
-			m_user(*this, PLUS4_USER_PORT_TAG),
+			m_user(*this, PET_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_kernal(*this, "kernal"),
@@ -80,7 +81,7 @@ public:
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<plus4_expansion_slot_device> m_exp;
-	optional_device<plus4_user_port_device> m_user;
+	optional_device<pet_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_memory_region m_kernal;
@@ -116,7 +117,14 @@ public:
 	DECLARE_READ8_MEMBER( ted_rom_r );
 	DECLARE_READ8_MEMBER( ted_k_r );
 
-	DECLARE_WRITE8_MEMBER( spi_kb_w );
+	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb1 ) { if (state) m_kb |= 2; else m_kb &= ~2; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb2 ) { if (state) m_kb |= 4; else m_kb &= ~4; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb3 ) { if (state) m_kb |= 8; else m_kb &= ~8; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb4 ) { if (state) m_kb |= 16; else m_kb &= ~16; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb5 ) { if (state) m_kb |= 32; else m_kb &= ~32; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb6 ) { if (state) m_kb |= 64; else m_kb &= ~64; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb7 ) { if (state) m_kb |= 128; else m_kb &= ~128; }
 
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 

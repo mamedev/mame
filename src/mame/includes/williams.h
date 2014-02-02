@@ -135,12 +135,12 @@ public:
 	DECLARE_WRITE8_MEMBER(playball_snd_cmd_w);
 	DECLARE_WRITE8_MEMBER(blaster_snd_cmd_w);
 	DECLARE_WRITE8_MEMBER(williams2_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(williams_port_select_w);
+	DECLARE_WRITE_LINE_MEMBER(williams_port_select_w);
 	DECLARE_READ8_MEMBER(williams_49way_port_0_r);
 	DECLARE_READ8_MEMBER(williams_input_port_49way_0_5_r);
-	DECLARE_WRITE8_MEMBER(lottofun_coin_lock_w);
+	DECLARE_WRITE_LINE_MEMBER(lottofun_coin_lock_w);
 	DECLARE_READ8_MEMBER(tshoot_input_port_0_3_r);
-	DECLARE_WRITE8_MEMBER(tshoot_maxvol_w);
+	DECLARE_WRITE_LINE_MEMBER(tshoot_maxvol_w);
 	DECLARE_WRITE8_MEMBER(tshoot_lamp_w);
 	void williams2_postload();
 	void defender_postload();
@@ -179,40 +179,9 @@ public:
 	DECLARE_MACHINE_START(joust2);
 	DECLARE_MACHINE_RESET(joust2);
 	TIMER_CALLBACK_MEMBER(joust2_deferred_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(joust2_pia_3_cb1_w);
+	DECLARE_WRITE_LINE_MEMBER(joust2_pia_3_cb1_w);
 	DECLARE_WRITE8_MEMBER(joust2_snd_cmd_w);
 };
-
-/*----------- defined in machine/williams.c -----------*/
-
-/* Generic old-Williams PIA interfaces */
-extern const pia6821_interface williams_pia_0_intf;
-extern const pia6821_interface williams_muxed_pia_0_intf;
-extern const pia6821_interface williams_49way_pia_0_intf;
-extern const pia6821_interface williams_49way_muxed_pia_0_intf;
-extern const pia6821_interface williams_pia_1_intf;
-extern const pia6821_interface williams_snd_pia_intf;
-extern const pia6821_interface williams_snd_pia_b_intf;
-
-/* Game-specific old-Williams PIA interfaces */
-extern const pia6821_interface lottofun_pia_0_intf;
-extern const pia6821_interface sinistar_snd_pia_intf;
-extern const pia6821_interface playball_pia_1_intf;
-extern const pia6821_interface blaster_pia_1_intf;
-extern const pia6821_interface spdball_pia_3_intf;
-
-/* Generic later-Williams PIA interfaces */
-extern const pia6821_interface williams2_muxed_pia_0_intf;
-extern const pia6821_interface williams2_pia_1_intf;
-extern const pia6821_interface williams2_snd_pia_intf;
-
-/* Game-specific later-Williams PIA interfaces */
-extern const pia6821_interface mysticm_pia_0_intf;
-extern const pia6821_interface mysticm_pia_1_intf;
-extern const pia6821_interface tshoot_pia_0_intf;
-extern const pia6821_interface tshoot_pia_1_intf;
-extern const pia6821_interface tshoot_snd_pia_intf;
-extern const pia6821_interface joust2_pia_1_intf;
 
 /*----------- defined in video/williams.c -----------*/
 

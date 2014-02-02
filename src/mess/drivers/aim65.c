@@ -155,23 +155,6 @@ static const riot6532_interface aim65_riot_interface =
 	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
 };
 
-/* R6520 interface U1 */
-static const pia6821_interface aim65_pia_config =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pia_a_w),
-	DEVCB_DRIVER_MEMBER(aim65_state, aim65_pia_b_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 // Deck 1 can play and record
 static const cassette_interface aim65_1_cassette_interface =
 {
@@ -337,7 +320,9 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6502_device, irq_line))
 
-	MCFG_PIA6821_ADD("pia6821", aim65_pia_config)
+	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aim65_state, aim65_pia_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aim65_state, aim65_pia_b_w))
 
 	MCFG_CASSETTE_ADD( "cassette", aim65_1_cassette_interface )
 	MCFG_CASSETTE_ADD( "cassette2", aim65_2_cassette_interface )

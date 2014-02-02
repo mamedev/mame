@@ -503,10 +503,6 @@ static TMS9928A_INTERFACE( vdp_intf )
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
 };
 
-/*-------------------------------------------------
-    pia6821_interface pia_intf
--------------------------------------------------*/
-
 WRITE8_MEMBER( crvision_state::pia_pa_w )
 {
 	/*
@@ -604,26 +600,6 @@ READ8_MEMBER( crvision_state::pia_pb_r )
 
 	return data;
 }
-
-static const pia6821_interface pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(crvision_state, pia_pa_r),      // input A
-	DEVCB_DRIVER_MEMBER(crvision_state, pia_pb_r),      // input B
-	DEVCB_LINE_VCC,                                     // input CA1 (+5V)
-	DEVCB_DEVICE_LINE_MEMBER(SN76489_TAG, sn76496_base_device, ready_r),    // input CB1
-	DEVCB_LINE_VCC,                                     // input CA2 (+5V)
-	DEVCB_LINE_VCC,                                     // input CB2 (+5V)
-	DEVCB_DRIVER_MEMBER(crvision_state, pia_pa_w),      // output A
-	DEVCB_DEVICE_MEMBER(SN76489_TAG, sn76496_base_device, write),       // output B
-	DEVCB_NULL,                                         // output CA2
-	DEVCB_NULL,                                         // output CB2 (SN76489 pin CE_)
-	DEVCB_NULL,                                         // irq A
-	DEVCB_NULL                                          // irq B
-};
-
-/*-------------------------------------------------
-    pia6821_interface lasr2001_pia_intf
--------------------------------------------------*/
 
 READ8_MEMBER( laser2001_state::pia_pa_r )
 {
@@ -731,22 +707,6 @@ WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
 		m_centronics->strobe_w(state);
 	}
 }
-
-static const pia6821_interface lasr2001_pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pa_r),             // input A
-	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pb_r),             // input B
-	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_ca1_r),       // input CA1
-	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_cb1_r),       // input CB1
-	DEVCB_LINE_GND,                                             // input CA2
-	DEVCB_LINE_VCC,                                             // input CB2 (+5V)
-	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pa_w),             // output A
-	DEVCB_DRIVER_MEMBER(laser2001_state, pia_pb_w),             // output B
-	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_ca2_w),       // output CA2
-	DEVCB_DRIVER_LINE_MEMBER(laser2001_state, pia_cb2_w),       // output CB2
-	DEVCB_NULL,                                                 // irq A (floating)
-	DEVCB_NULL                                                  // irq B (floating)
-};
 
 /*-------------------------------------------------
     cassette_interface crvision_cassette_interface
@@ -953,7 +913,13 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_CPU_PROGRAM_MAP(crvision_map)
 
 	// devices
-	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
+	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(crvision_state, pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(crvision_state, pia_pb_r))
+	MCFG_PIA_READCB1_HANDLER(DEVREADLINE(SN76489_TAG, sn76496_base_device, ready_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(crvision_state, pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8(SN76489_TAG, sn76496_base_device, write))
+
 	MCFG_CASSETTE_ADD("cassette", crvision_cassette_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 
@@ -1014,7 +980,16 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_CPU_PROGRAM_MAP(lasr2001_map)
 
 	// devices
-	MCFG_PIA6821_ADD(PIA6821_TAG, lasr2001_pia_intf)
+	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(laser2001_state, pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(laser2001_state, pia_pb_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(laser2001_state, pia_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(laser2001_state, pia_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(laser2001_state, pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(laser2001_state, pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(laser2001_state, pia_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(laser2001_state, pia_cb2_w))
+
 	MCFG_CASSETTE_ADD("cassette", lasr2001_cassette_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 

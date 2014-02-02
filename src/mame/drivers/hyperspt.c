@@ -83,6 +83,18 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( roadf_sound_map, AS_PROGRAM, 8, hyperspt_state )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_RAM
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
+	AM_RANGE(0xa000, 0xa000) AM_NOP // No VLM
+	AM_RANGE(0xc000, 0xdfff) AM_NOP // No VLM
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
@@ -341,6 +353,10 @@ static MACHINE_CONFIG_DERIVED( roadf, hyperspt )
 	MCFG_CPU_PROGRAM_MAP(roadf_map)
 	MCFG_GFXDECODE(roadf)
 	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
+	
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(roadf_sound_map)
+	MCFG_DEVICE_REMOVE("vlm")
 MACHINE_CONFIG_END
 
 

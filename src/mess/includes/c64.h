@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/c64/exp.h"
-#include "bus/c64/user.h"
+#include "bus/vic20/user.h"
 #include "bus/pet/cass.h"
 #include "bus/vcs/ctrl.h"
 #include "cpu/m6502/m6510.h"
@@ -29,6 +29,7 @@
 #define SCREEN_TAG      "screen"
 #define CONTROL1_TAG    "joy1"
 #define CONTROL2_TAG    "joy2"
+#define PET_USER_PORT_TAG     "user"
 
 class c64_state : public driver_device
 {
@@ -45,7 +46,7 @@ public:
 			m_joy1(*this, CONTROL1_TAG),
 			m_joy2(*this, CONTROL2_TAG),
 			m_exp(*this, C64_EXPANSION_SLOT_TAG),
-			m_user(*this, C64_USER_PORT_TAG),
+			m_user(*this, PET_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_basic(*this, "basic"),
@@ -84,7 +85,7 @@ public:
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<c64_expansion_slot_device> m_exp;
-	required_device<c64_user_port_device> m_user;
+	required_device<pet_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
 	optional_memory_region m_basic;
@@ -139,6 +140,19 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
 
+	DECLARE_READ8_MEMBER( cia2_pb_r );
+	DECLARE_WRITE8_MEMBER( cia2_pb_w );
+
+	DECLARE_WRITE_LINE_MEMBER( write_user_pa2 ) { m_user_pa2 = state; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb0 ) { if (state) m_user_pb |= 1; else m_user_pb &= ~1; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb1 ) { if (state) m_user_pb |= 2; else m_user_pb &= ~2; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb2 ) { if (state) m_user_pb |= 4; else m_user_pb &= ~4; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb3 ) { if (state) m_user_pb |= 8; else m_user_pb &= ~8; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb4 ) { if (state) m_user_pb |= 16; else m_user_pb &= ~16; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb5 ) { if (state) m_user_pb |= 32; else m_user_pb &= ~32; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb6 ) { if (state) m_user_pb |= 64; else m_user_pb &= ~64; }
+	DECLARE_WRITE_LINE_MEMBER( write_user_pb7 ) { if (state) m_user_pb |= 128; else m_user_pb &= ~128; }
+
 	// memory state
 	int m_loram;
 	int m_hiram;
@@ -155,6 +169,9 @@ public:
 	int m_exp_irq;
 	int m_exp_nmi;
 	int m_exp_dma;
+
+	int m_user_pa2;
+	int m_user_pb;
 };
 
 

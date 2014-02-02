@@ -40,7 +40,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// device_sms_control_port_interface overrides
@@ -51,8 +50,9 @@ private:
 	required_ioport m_rfire_sw;
 	required_device<sms_control_port_device> m_subctrl_port;
 
-	UINT8 m_rapid_fire_state;
-	const attotime m_rapid_fire_interval;
+	UINT8 m_read_state;
+	attotime m_start_time;
+	const attotime m_interval;
 };
 
 

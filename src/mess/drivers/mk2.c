@@ -81,7 +81,7 @@ public:
 static ADDRESS_MAP_START(mk2_mem , AS_PROGRAM, 8, mk2_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) // m6504
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
-	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE_LEGACY("miot", mos6530_r, mos6530_w)
+	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", mos6530_device, read, write)
 	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram
 	AM_RANGE( 0x0c00, 0x0fff) AM_ROM // rriot rom
 	AM_RANGE( 0x1000, 0x1fff) AM_ROM
@@ -137,7 +137,7 @@ READ8_MEMBER( mk2_state::mk2_read_a )
 	int data=0xff;
 	int help=ioport("BLACK")->read() | ioport("WHITE")->read(); // looks like white and black keys are the same!
 
-	switch (mos6530_portb_out_get(m_miot)&0x7)
+	switch (m_miot->portb_out_get()&0x7)
 	{
 	case 4:
 		if (BIT(help, 5)) data&=~0x1; //F
@@ -159,7 +159,7 @@ READ8_MEMBER( mk2_state::mk2_read_a )
 
 WRITE8_MEMBER( mk2_state::mk2_write_a )
 {
-	UINT8 temp = mos6530_portb_out_get(m_miot);
+	UINT8 temp = m_miot->portb_out_get();
 
 	m_led[temp & 3] |= data;
 }

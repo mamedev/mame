@@ -607,12 +607,13 @@ static MC6845_UPDATE_ROW( cga_update_row )
 static MC6845_INTERFACE( mc6845_cga_intf )
 {
 	false,              /* show border area */
+	0,0,0,0,            /* visarea adjustment */
 	8,                  /* numbers of pixels per video memory address */
 	NULL,               /* begin_update */
 	cga_update_row,     /* update_row */
 	NULL,               /* end_update */
-	DEVCB_NULL,             /* on_de_changed */
-	DEVCB_NULL,             /* on_cur_changed */
+	DEVCB_NULL,         /* on_de_changed */
+	DEVCB_NULL,         /* on_cur_changed */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, hsync_changed),    /* on_hsync_changed */
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa8_cga_device, vsync_changed),    /* on_vsync_changed */
 	NULL

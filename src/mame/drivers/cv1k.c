@@ -110,7 +110,7 @@ Dipswitches & Push Buttons:
  S1 (DIL SWITCH) Half Pitch DIL Switch x 1, function unknown
  S2 (DIL SWITCH) Half Pitch DIL Switch x 4, SW1=Setup, other switches unknown
  S3 (MICRO PUSH BUTTON) Test switch, same as on the JAMMA connector
-.
+
 Connectors:
  P2 (IDC CONNECTOR 20 PIN) function unknown, P2 is not always mounted
  P4 (IDC CONNECTOR 14 PIN) JTAG connector
@@ -152,6 +152,7 @@ Touchscreen
  - Used for mmmbanc, needs SH3 serial support.
 
 Remaining Video issues
+ - measure h/v video timing
  - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB until after the graphics are fully loaded, it still displays 'please wait' until that point.
  - is the use of the 'scroll' registers 100% correct? (related to above?)
  - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
@@ -215,11 +216,13 @@ public:
     DECLARE_DRIVER_INIT(espgal2);
 };
 
-/***************************************************************************
-                                Video Hardware
-***************************************************************************/
+
+#define MASTER_CLOCK  XTAL_12_8MHz
+#define CPU_CLOCK     (MASTER_CLOCK * 8)
 
 
+
+/**************************************************************************/
 
 UINT32 cv1k_state::screen_update_cv1k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -402,10 +405,6 @@ INPUT_PORTS_END
 
 
 
-#define CAVE_CPU_CLOCK 12800000 * 8
-#define CAVE_CPU_CLOCK_D 166666666
-
-
 // none of this is verified
 // (the sh3 is different to the sh4 anyway, should be changed)
 static const struct sh4_config sh4cpu_config = {
@@ -418,7 +417,7 @@ static const struct sh4_config sh4cpu_config = {
 	1,
 	1, // md7 (master?)
 	0,
-	CAVE_CPU_CLOCK // influences music sequencing in ddpdfk at least
+	CPU_CLOCK // influences music sequencing in ddpdfk at least
 };
 
 
@@ -439,7 +438,7 @@ MACHINE_RESET_MEMBER( cv1k_state, cv1k )
 
 static MACHINE_CONFIG_START( cv1k, cv1k_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH3BE, CAVE_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", SH3BE, CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(cv1k_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
@@ -462,7 +461,7 @@ static MACHINE_CONFIG_START( cv1k, cv1k_state )
 	MCFG_MACHINE_RESET_OVERRIDE(cv1k_state, cv1k)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YMZ770_ADD("ymz770", 16384000)
+	MCFG_YMZ770_ADD("ymz770", XTAL_16_384MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -473,7 +472,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cv1k_d, cv1k )
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", SH3BE, CAVE_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", SH3BE, CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)
 	MCFG_CPU_PROGRAM_MAP(cv1k_d_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
@@ -483,364 +482,6 @@ static MACHINE_CONFIG_DERIVED( cv1k_d, cv1k )
 	MCFG_EPIC12_SET_MAINRAMSIZE(0x1000000)
 MACHINE_CONFIG_END
 
-/* unused code, alt idct32 functions from metallic */
-#if 0 // variable free version
-
-#define fast_sincos__sin_15pi_div_64_ ( 0.6715589548)
-#define	fast_sincos__cos_15pi_div_64_ ( 0.7409511254)
-#define fast_sincos__cos_13pi_div_64_ ( 0.8032075315)
-#define	fast_sincos__sin_13pi_div_64_ ( 0.5956993045)
-#define fast_sincos__cos_11pi_div_64_ ( 0.8577286100)
-#define	fast_sincos__sin_11pi_div_64_ ( 0.5141027442)
-#define fast_sincos__cos_9pi_div_64_  ( 0.9039892931)
-#define	fast_sincos__sin_9pi_div_64_  ( 0.4275550934)
-#define fast_sincos__cos_7pi_div_64_  ( 0.9415440652)
-#define	fast_sincos__sin_7pi_div_64_  ( 0.3368898534)
-#define fast_sincos__sin_5pi_div_64_  ( 0.2429801799)
-#define	fast_sincos__cos_5pi_div_64_  ( 0.9700312532)
-#define fast_sincos__cos_3pi_div_64_  ( 0.9891765100)
-#define	fast_sincos__sin_3pi_div_64_  ( 0.1467304745)
-#define fast_sincos__cos_pi_div_64_   ( 0.9987954562)
-#define	fast_sincos__sin_pi_div_64_   ( 0.0490676743)
-#define fast_sincos__sin_7pi_div_32_  ( 0.6343932842)
-#define	fast_sincos__cos_7pi_div_32_  ( 0.7730104534)
-#define fast_sincos__sin_5pi_div_32_  ( 0.4713967368)
-#define	fast_sincos__cos_5pi_div_32_  ( 0.8819212643)
-#define fast_sincos__sin_3pi_div_32_  ( 0.2902846773)
-#define	fast_sincos__cos_3pi_div_32_  ( 0.9569403357)
-#define fast_sincos__sin_pi_div_32_   ( 0.0980171403)
-#define	fast_sincos__cos_pi_div_32_   ( 0.9951847267)
-#define fast_sincos__cos_3pi_div_16_  ( 0.8314696123)
-#define	fast_sincos__sin_3pi_div_16_  ( 0.5555702330)
-#define fast_sincos__sin_pi_div_16_   ( 0.1950903220)
-#define	fast_sincos__cos_pi_div_16_   ( 0.9807852804)
-#define fast_sincos__sin_pi_div_8_    ( 0.3826834324)
-#define	fast_sincos__cos_pi_div_8_    ( 0.9238795325)
-#define fast_sincos__sin_pi_div_4_    ( 0.7071067812)
-
-
-#define SPLIT( var2, base, diff) \
-	var2 = base - diff; \
-
-void mpeg_audio::idct32(const double *src, double *dst)
-{
-	dst[7] = (((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_))) * fast_sincos__cos_pi_div_8_ + ((((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) - (((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_))) * fast_sincos__sin_pi_div_8_) + (((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_))) * fast_sincos__sin_pi_div_8_ - ((((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) - (((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_))) * fast_sincos__cos_pi_div_8_);
-	dst[9] = (((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_))) * fast_sincos__cos_pi_div_8_ + ((((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) - (((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_))) * fast_sincos__sin_pi_div_8_) - (((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_))) * fast_sincos__sin_pi_div_8_ - ((((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) - (((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_))) * fast_sincos__cos_pi_div_8_);
-	dst[23] = (((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_))) * fast_sincos__sin_pi_div_8_ - ((((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) - (((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_))) * fast_sincos__cos_pi_div_8_) + (((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_))) * fast_sincos__cos_pi_div_8_ + ((((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) - (((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_))) * fast_sincos__sin_pi_div_8_);
-	dst[25] = (((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_))) * fast_sincos__sin_pi_div_8_ - ((((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) - (((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_))) * fast_sincos__cos_pi_div_8_) - (((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_))) * fast_sincos__cos_pi_div_8_ + ((((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) - (((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_))) * fast_sincos__sin_pi_div_8_);
-	dst[15] = ((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) + (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_))) - ((((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) + (((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_))))*fast_sincos__sin_pi_div_4_) + ((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) + (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_))) - ((((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) + (((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_))))*fast_sincos__sin_pi_div_4_);
-	dst[17] = ((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) + (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_))) - ((((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) + (((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_))))*fast_sincos__sin_pi_div_4_) - ((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) + (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_))) - ((((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) + (((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_))))*fast_sincos__sin_pi_div_4_);
-	dst[31] = ((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) + (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_))) + ((((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) + (((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)));;
-	dst[1] = ((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) + ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) + (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) + ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_))) + ((((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) + ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) + (((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) + ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)));
-
-	dst[11] = (((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) + ((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_)) + (((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) - ((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_));
-	dst[13] = (((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) + ((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_)) - (((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) - ((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_));
-	dst[19] = (((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) - ((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_)) + (((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) + ((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_));
-	dst[21] = (((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) - ((((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_)) - (((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) + ((((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) - ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_));
-	dst[27] = (((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_) + ((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__cos_pi_div_16_)) + (((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) + ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_));
-	dst[29] = (((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_) + ((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__cos_pi_div_16_)) - (((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__sin_pi_div_16_) + ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_));
-	dst[3] = (((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_) + ((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__sin_pi_div_16_)) + (((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) + ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_));
-	dst[5] = (((((src[2] - src[29]) * fast_sincos__cos_5pi_div_64_ + (src[13] - src[18]) * fast_sincos__sin_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__sin_11pi_div_64_ + (src[5] - src[26]) * fast_sincos__cos_11pi_div_64_)) * fast_sincos__sin_3pi_div_16_ + (((src[14] - src[17]) * fast_sincos__sin_3pi_div_64_ + (src[1] - src[30]) * fast_sincos__cos_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__cos_13pi_div_64_ + (src[9] - src[22]) * fast_sincos__sin_13pi_div_64_)) * fast_sincos__cos_3pi_div_16_) + ((((src[0] - src[31]) * fast_sincos__cos_pi_div_64_ + (src[15] - src[16]) * fast_sincos__sin_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__sin_15pi_div_64_ + (src[7] - src[24]) * fast_sincos__cos_15pi_div_64_)) * fast_sincos__cos_pi_div_16_ + (((src[12] - src[19]) * fast_sincos__sin_7pi_div_64_ + (src[3] - src[28]) * fast_sincos__cos_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__cos_9pi_div_64_ + (src[11] - src[20]) * fast_sincos__sin_9pi_div_64_)) * fast_sincos__sin_pi_div_16_)) - (((((src[0] - src[31]) * fast_sincos__sin_pi_div_64_ - (src[15] - src[16]) * fast_sincos__cos_pi_div_64_) - ((src[8] - src[23]) * fast_sincos__cos_15pi_div_64_ - (src[7] - src[24]) * fast_sincos__sin_15pi_div_64_)) * fast_sincos__sin_pi_div_16_ - (((src[12] - src[19]) * fast_sincos__cos_7pi_div_64_ - (src[3] - src[28]) * fast_sincos__sin_7pi_div_64_) - ((src[4] - src[27]) * fast_sincos__sin_9pi_div_64_ - (src[11] - src[20]) * fast_sincos__cos_9pi_div_64_)) * fast_sincos__cos_pi_div_16_) + ((((src[2] - src[29]) * fast_sincos__sin_5pi_div_64_ - (src[13] - src[18]) * fast_sincos__cos_5pi_div_64_) - ((src[10] - src[21]) * fast_sincos__cos_11pi_div_64_ - (src[5] - src[26]) * fast_sincos__sin_11pi_div_64_)) * fast_sincos__cos_3pi_div_16_ - (((src[14] - src[17]) * fast_sincos__cos_3pi_div_64_ - (src[1] - src[30]) * fast_sincos__sin_3pi_div_64_) - ((src[6] - src[25]) * fast_sincos__sin_13pi_div_64_ - (src[9] - src[22]) * fast_sincos__cos_13pi_div_64_)) * fast_sincos__sin_3pi_div_16_));
-
-	dst[0] = ((((src[0] + src[31]) + (src[15] + src[16])) + ((src[7] + src[24]) + (src[8] + src[23]))) + (((src[3] + src[28]) + (src[12] + src[19])) + ((src[4] + src[27]) + (src[11] + src[20])))) + ((((src[1] + src[30]) + (src[14] + src[17])) + ((src[6] + src[25]) + (src[9] + src[22]))) + (((src[2] + src[29]) + (src[13] + src[18])) + ((src[5] + src[26]) + (src[10] + src[21]))));
-	dst[16]	= (((((src[0] + src[31]) + (src[15] + src[16])) + ((src[7] + src[24]) + (src[8] + src[23]))) + (((src[3] + src[28]) + (src[12] + src[19])) + ((src[4] + src[27]) + (src[11] + src[20])))) - ((((src[1] + src[30]) + (src[14] + src[17])) + ((src[6] + src[25]) + (src[9] + src[22]))) + (((src[2] + src[29]) + (src[13] + src[18])) + ((src[5] + src[26]) + (src[10] + src[21])))))*fast_sincos__sin_pi_div_4_;
-	dst[8] = ((((src[0] + src[31]) + (src[15] + src[16])) + ((src[7] + src[24]) + (src[8] + src[23]))) - (((src[3] + src[28]) + (src[12] + src[19])) + ((src[4] + src[27]) + (src[11] + src[20])))) * fast_sincos__cos_pi_div_8_ + ((((src[1] + src[30]) + (src[14] + src[17])) + ((src[6] + src[25]) + (src[9] + src[22]))) - (((src[2] + src[29]) + (src[13] + src[18])) + ((src[5] + src[26]) + (src[10] + src[21])))) * fast_sincos__sin_pi_div_8_;
-	dst[24] = ((((src[0] + src[31]) + (src[15] + src[16])) + ((src[7] + src[24]) + (src[8] + src[23]))) - (((src[3] + src[28]) + (src[12] + src[19])) + ((src[4] + src[27]) + (src[11] + src[20])))) * fast_sincos__sin_pi_div_8_ - ((((src[1] + src[30]) + (src[14] + src[17])) + ((src[6] + src[25]) + (src[9] + src[22]))) - (((src[2] + src[29]) + (src[13] + src[18])) + ((src[5] + src[26]) + (src[10] + src[21])))) * fast_sincos__cos_pi_div_8_;
-	dst[12] = ((((((src[0] + src[31]) + (src[15] + src[16])) - ((src[7] + src[24]) + (src[8] + src[23]))) * fast_sincos__cos_pi_div_16_ + (((src[3] + src[28]) + (src[12] + src[19])) - ((src[4] + src[27]) + (src[11] + src[20]))) * fast_sincos__sin_pi_div_16_) - ((((src[2] + src[29]) + (src[13] + src[18])) - ((src[5] + src[26]) + (src[10] + src[21]))) * fast_sincos__sin_3pi_div_16_ + (((src[1] + src[30]) + (src[14] + src[17])) - ((src[6] + src[25]) + (src[9] + src[22]))) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) + ((((((src[0] + src[31]) + (src[15] + src[16])) - ((src[7] + src[24]) + (src[8] + src[23]))) * fast_sincos__sin_pi_div_16_ - (((src[3] + src[28]) + (src[12] + src[19])) - ((src[4] + src[27]) + (src[11] + src[20]))) * fast_sincos__cos_pi_div_16_) - ((((src[2] + src[29]) + (src[13] + src[18])) - ((src[5] + src[26]) + (src[10] + src[21]))) * fast_sincos__cos_3pi_div_16_ - (((src[1] + src[30]) + (src[14] + src[17])) - ((src[6] + src[25]) + (src[9] + src[22]))) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_);
-	dst[20] = ((((((src[0] + src[31]) + (src[15] + src[16])) - ((src[7] + src[24]) + (src[8] + src[23]))) * fast_sincos__cos_pi_div_16_ + (((src[3] + src[28]) + (src[12] + src[19])) - ((src[4] + src[27]) + (src[11] + src[20]))) * fast_sincos__sin_pi_div_16_) - ((((src[2] + src[29]) + (src[13] + src[18])) - ((src[5] + src[26]) + (src[10] + src[21]))) * fast_sincos__sin_3pi_div_16_ + (((src[1] + src[30]) + (src[14] + src[17])) - ((src[6] + src[25]) + (src[9] + src[22]))) * fast_sincos__cos_3pi_div_16_))*fast_sincos__sin_pi_div_4_) - ((((((src[0] + src[31]) + (src[15] + src[16])) - ((src[7] + src[24]) + (src[8] + src[23]))) * fast_sincos__sin_pi_div_16_ - (((src[3] + src[28]) + (src[12] + src[19])) - ((src[4] + src[27]) + (src[11] + src[20]))) * fast_sincos__cos_pi_div_16_) - ((((src[2] + src[29]) + (src[13] + src[18])) - ((src[5] + src[26]) + (src[10] + src[21]))) * fast_sincos__cos_3pi_div_16_ - (((src[1] + src[30]) + (src[14] + src[17])) - ((src[6] + src[25]) + (src[9] + src[22]))) * fast_sincos__sin_3pi_div_16_))*fast_sincos__sin_pi_div_4_);
-	dst[4] = ((((src[0] + src[31]) + (src[15] + src[16])) - ((src[7] + src[24]) + (src[8] + src[23]))) * fast_sincos__cos_pi_div_16_ + (((src[3] + src[28]) + (src[12] + src[19])) - ((src[4] + src[27]) + (src[11] + src[20]))) * fast_sincos__sin_pi_div_16_) + ((((src[2] + src[29]) + (src[13] + src[18])) - ((src[5] + src[26]) + (src[10] + src[21]))) * fast_sincos__sin_3pi_div_16_ + (((src[1] + src[30]) + (src[14] + src[17])) - ((src[6] + src[25]) + (src[9] + src[22]))) * fast_sincos__cos_3pi_div_16_);
-	dst[28] = ((((src[0] + src[31]) + (src[15] + src[16])) - ((src[7] + src[24]) + (src[8] + src[23]))) * fast_sincos__sin_pi_div_16_ - (((src[3] + src[28]) + (src[12] + src[19])) - ((src[4] + src[27]) + (src[11] + src[20]))) * fast_sincos__cos_pi_div_16_) + ((((src[2] + src[29]) + (src[13] + src[18])) - ((src[5] + src[26]) + (src[10] + src[21]))) * fast_sincos__cos_3pi_div_16_ - (((src[1] + src[30]) + (src[14] + src[17])) - ((src[6] + src[25]) + (src[9] + src[22]))) * fast_sincos__sin_3pi_div_16_);
-
-	dst[6] = (((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__cos_pi_div_32_ + ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__sin_pi_div_32_) - (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__sin_7pi_div_32_ + ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__cos_7pi_div_32_)) * fast_sincos__cos_pi_div_8_ + ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__sin_3pi_div_32_ + ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__cos_3pi_div_32_) - (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__cos_5pi_div_32_ + ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__sin_5pi_div_32_)) * fast_sincos__sin_pi_div_8_) + (((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__sin_pi_div_32_ - ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__cos_pi_div_32_) - (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__cos_7pi_div_32_ - ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__sin_7pi_div_32_)) * fast_sincos__sin_pi_div_8_ - ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__cos_3pi_div_32_ - ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__sin_3pi_div_32_) - (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__sin_5pi_div_32_ - ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__cos_5pi_div_32_)) * fast_sincos__cos_pi_div_8_);
-	dst[10] = (((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__cos_pi_div_32_ + ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__sin_pi_div_32_) - (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__sin_7pi_div_32_ + ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__cos_7pi_div_32_)) * fast_sincos__cos_pi_div_8_ + ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__sin_3pi_div_32_ + ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__cos_3pi_div_32_) - (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__cos_5pi_div_32_ + ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__sin_5pi_div_32_)) * fast_sincos__sin_pi_div_8_) - (((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__sin_pi_div_32_ - ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__cos_pi_div_32_) - (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__cos_7pi_div_32_ - ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__sin_7pi_div_32_)) * fast_sincos__sin_pi_div_8_ - ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__cos_3pi_div_32_ - ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__sin_3pi_div_32_) - (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__sin_5pi_div_32_ - ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__cos_5pi_div_32_)) * fast_sincos__cos_pi_div_8_);
-	dst[22] = (((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__cos_pi_div_32_ + ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__sin_pi_div_32_) - (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__sin_7pi_div_32_ + ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__cos_7pi_div_32_)) * fast_sincos__sin_pi_div_8_ - ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__sin_3pi_div_32_ + ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__cos_3pi_div_32_) - (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__cos_5pi_div_32_ + ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__sin_5pi_div_32_)) * fast_sincos__cos_pi_div_8_) + (((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__sin_pi_div_32_ - ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__cos_pi_div_32_) - (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__cos_7pi_div_32_ - ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__sin_7pi_div_32_)) * fast_sincos__cos_pi_div_8_ + ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__cos_3pi_div_32_ - ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__sin_3pi_div_32_) - (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__sin_5pi_div_32_ - ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__cos_5pi_div_32_)) * fast_sincos__sin_pi_div_8_);
-	dst[26] = (((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__cos_pi_div_32_ + ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__sin_pi_div_32_) - (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__sin_7pi_div_32_ + ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__cos_7pi_div_32_)) * fast_sincos__sin_pi_div_8_ - ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__sin_3pi_div_32_ + ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__cos_3pi_div_32_) - (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__cos_5pi_div_32_ + ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__sin_5pi_div_32_)) * fast_sincos__cos_pi_div_8_) - (((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__sin_pi_div_32_ - ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__cos_pi_div_32_) - (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__cos_7pi_div_32_ - ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__sin_7pi_div_32_)) * fast_sincos__cos_pi_div_8_ + ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__cos_3pi_div_32_ - ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__sin_3pi_div_32_) - (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__sin_5pi_div_32_ - ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__cos_5pi_div_32_)) * fast_sincos__sin_pi_div_8_);
-	dst[30] = ((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__sin_pi_div_32_ - ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__cos_pi_div_32_) + (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__cos_7pi_div_32_ - ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__sin_7pi_div_32_)) + ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__cos_3pi_div_32_ - ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__sin_3pi_div_32_) + (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__sin_5pi_div_32_ - ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__cos_5pi_div_32_));
-	dst[2] = ((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__cos_pi_div_32_ + ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__sin_pi_div_32_) + (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__sin_7pi_div_32_ + ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__cos_7pi_div_32_)) + ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__sin_3pi_div_32_ + ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__cos_3pi_div_32_) + (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__cos_5pi_div_32_ + ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__sin_5pi_div_32_));
-	dst[14] =  ((((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__cos_pi_div_32_ + ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__sin_pi_div_32_) + (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__sin_7pi_div_32_ + ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__cos_7pi_div_32_)) - ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__sin_3pi_div_32_ + ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__cos_3pi_div_32_) + (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__cos_5pi_div_32_ + ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__sin_5pi_div_32_)))*fast_sincos__sin_pi_div_4_) + ((((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__sin_pi_div_32_ - ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__cos_pi_div_32_) + (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__cos_7pi_div_32_ - ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__sin_7pi_div_32_)) - ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__cos_3pi_div_32_ - ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__sin_3pi_div_32_) + (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__sin_5pi_div_32_ - ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__cos_5pi_div_32_)))*fast_sincos__sin_pi_div_4_);
-	dst[18] =  ((((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__cos_pi_div_32_ + ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__sin_pi_div_32_) + (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__sin_7pi_div_32_ + ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__cos_7pi_div_32_)) - ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__sin_3pi_div_32_ + ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__cos_3pi_div_32_) + (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__cos_5pi_div_32_ + ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__sin_5pi_div_32_)))*fast_sincos__sin_pi_div_4_) - ((((((src[0] + src[31]) - (src[15] + src[16])) * fast_sincos__sin_pi_div_32_ - ((src[7] + src[24]) - (src[8] + src[23])) * fast_sincos__cos_pi_div_32_) + (((src[4] + src[27]) - (src[11] + src[20])) * fast_sincos__cos_7pi_div_32_ - ((src[3] + src[28]) - (src[12] + src[19])) * fast_sincos__sin_7pi_div_32_)) - ((((src[6] + src[25]) - (src[9] + src[22])) * fast_sincos__cos_3pi_div_32_ - ((src[1] + src[30]) - (src[14] + src[17])) * fast_sincos__sin_3pi_div_32_) + (((src[2] + src[29]) - (src[13] + src[18])) * fast_sincos__sin_5pi_div_32_ - ((src[5] + src[26]) - (src[10] + src[21])) * fast_sincos__cos_5pi_div_32_)))*fast_sincos__sin_pi_div_4_);
-}
-#endif
-
-#if 0 // optimized for compiler version
-const double fast_sincos[] = {
-	0.6715589548 /*sin15pi/64*/	, 0.7409511254, /*cos*/
-	0.8032075315 /*cos13pi/64*/	, 0.5956993045, /*sin*/
-	0.8577286100 /*cos11pi/64*/	, 0.5141027442, /*sin*/
-	0.9039892931 /*cos9pi/64*/	, 0.4275550934, /*sin*/
-	0.9415440652 /*cos7pi/64*/	, 0.3368898534, /*sin*/
-	0.2429801799 /*sin5pi/64*/	, 0.9700312532, /*cos*/
-	0.9891765100 /*cos3pi/64*/	, 0.1467304745, /*sin*/
-	0.9987954562 /*cospi/64*/	, 0.0490676743, /*sin*/
-	0.6343932842 /*sin7pi/32*/	, 0.7730104534, /*cos*/
-	0.4713967368 /*sin5pi/32*/	, 0.8819212643, /*cos*/
-	0.2902846773 /*sin3pi/32*/	, 0.9569403357, /*cos*/
-	0.0980171403 /*sinpi/32*/	, 0.9951847267, /*cos*/
-	0.8314696123 /*cos3pi/16*/	, 0.5555702330, /*sin*/
-	0.1950903220 /*sinpi/16*/	, 0.9807852804, /*cos*/
-	0.3826834324 /*sinpi/8*/	, 0.9238795325, /*cos*/
-	0.7071067812 /*sinpi/4*/,
-};
-const UINT32 _sin_15pi_div_64 = 0,  _cos_15pi_div_64 = 1;
-const UINT32 _cos_13pi_div_64 = 2,  _sin_13pi_div_64 = 3;
-const UINT32 _cos_11pi_div_64 = 4,  _sin_11pi_div_64 = 5;
-const UINT32 _cos_9pi_div_64  = 6,  _sin_9pi_div_64  = 7;
-const UINT32 _cos_7pi_div_64  = 8,  _sin_7pi_div_64  = 9;
-const UINT32 _sin_5pi_div_64  = 10, _cos_5pi_div_64  = 11;
-const UINT32 _cos_3pi_div_64  = 12, _sin_3pi_div_64  = 13;
-const UINT32 _cos_pi_div_64   = 14, _sin_pi_div_64   = 15;
-const UINT32 _sin_7pi_div_32  = 16, _cos_7pi_div_32  = 17;
-const UINT32 _sin_5pi_div_32  = 18, _cos_5pi_div_32  = 19;
-const UINT32 _sin_3pi_div_32  = 20, _cos_3pi_div_32  = 21;
-const UINT32 _sin_pi_div_32   = 22, _cos_pi_div_32   = 23;
-const UINT32 _cos_3pi_div_16  = 24, _sin_3pi_div_16  = 25;
-const UINT32 _sin_pi_div_16   = 26, _cos_pi_div_16   = 27;
-const UINT32 _sin_pi_div_8    = 28, _cos_pi_div_8    = 29;
-const UINT32 _sin_pi_div_4    = 30;
-
-
-#define SPLIT( var1, var2, base, diff) \
-	var1 = base + diff; \
-	var2 = base - diff; \
-
-// from MetalliC
-void mpeg_audio::idct32(const double *src, double *dst)
-{
-	double l0,l1,l2,l3,l4,l5,l6,l7,l8,l9,l10,l11,l12,l13,l14,l15;
-	double r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15;
-
-	// input
-	SPLIT( l0, r0, src[0], src[31] );
-	SPLIT( l1, r1, src[1], src[30] );
-	SPLIT( l2, r2, src[2], src[29] );
-	SPLIT( l3, r3, src[3], src[28] );
-	SPLIT( l4, r4, src[4], src[27] );
-	SPLIT( l5, r5, src[5], src[26] );
-	SPLIT( l6, r6, src[6], src[25] );
-	SPLIT( l7, r7, src[7], src[24] );
-	SPLIT( l8, r8, src[8], src[23] );
-	SPLIT( l9, r9, src[9], src[22] ); 
-	SPLIT(l10, r10, src[10], src[21] );
-	SPLIT(l11, r11, src[11], src[20] );
-	SPLIT(l12, r12, src[12], src[19] );
-	SPLIT(l13, r13, src[13], src[18] );
-	SPLIT(l14, r14, src[14], src[17] );
-	SPLIT(l15, r15, src[15], src[16] );
-
-	// process
-	double temp3  = l0 + l15;
-	double temp2  = l0 - l15;
-
-	double temp0  = l1 + l14;
-	double temp1  = l1 - l14;
-
-	l0   = l2 + l13;
-	l2  = l2 - l13;
-
-	l1   = l3 + l12;
-	l3 = l3 - l12;
-
-	l14   = l4 + l11;
-	l4  = l4 - l11;
-
-	l15   = l5 + l10;
-	l5  = l5 - l10;
-
-	double temp5   = l6 + l9;
-	l6 = l6 - l9;
-
-	double temp6   = l7 + l8;
-	l7  = l7 - l8;
-
-	l8  = temp3 + temp6;
-	temp3  = temp3 - temp6;
-
-	l9  = temp0 + temp5;
-	temp0  = temp0 - temp5;
-
-	l10 = l0 + l15;
-	double temp4 = l0 - l15;
-
-	l11 = l1 + l14;
-	l13  = l1 - l14;
-
-	l0   = l8 + l11;
-	l8  = l8 - l11;
-
-	l1   = l9 + l10;
-	l9  = l9 - l10;
-
-	////
-
-	l10 = l0 + l1;
-
-	l1   = (l0 - l1)*fast_sincos[_sin_pi_div_4];
-	l14   = l8 * fast_sincos[_cos_pi_div_8] + l9 * fast_sincos[_sin_pi_div_8];
-	l8  = l8 * fast_sincos[_sin_pi_div_8] - l9 * fast_sincos[_cos_pi_div_8];
-	l9  = temp3 * fast_sincos[_cos_pi_div_16] + l13 * fast_sincos[_sin_pi_div_16];
-	temp3  = temp3 * fast_sincos[_sin_pi_div_16] - l13 * fast_sincos[_cos_pi_div_16];
-	l13  = temp4 * fast_sincos[_sin_3pi_div_16] + temp0 * fast_sincos[_cos_3pi_div_16];
-	temp0  = temp4 * fast_sincos[_cos_3pi_div_16] - temp0 * fast_sincos[_sin_3pi_div_16];
-	l15   = l9 + l13;
-	temp5   = (l9 - l13)*fast_sincos[_sin_pi_div_4];
-	l13  = temp3 + temp0;
-	temp6   = (temp3 - temp0)*fast_sincos[_sin_pi_div_4];
-	temp0  = temp5 + temp6;
-	l9  = temp5 - temp6;
-	temp5   = temp2 * fast_sincos[_cos_pi_div_32] + l7 * fast_sincos[_sin_pi_div_32];
-	temp2  = temp2 * fast_sincos[_sin_pi_div_32] - l7 * fast_sincos[_cos_pi_div_32];
-	temp6   = l6 * fast_sincos[_sin_3pi_div_32] + temp1 * fast_sincos[_cos_3pi_div_32];
-	temp1  = l6 * fast_sincos[_cos_3pi_div_32] - temp1 * fast_sincos[_sin_3pi_div_32];
-	double temp7   = l2 * fast_sincos[_cos_5pi_div_32] + l5 * fast_sincos[_sin_5pi_div_32];
-	l2  = l2 * fast_sincos[_sin_5pi_div_32] - l5 * fast_sincos[_cos_5pi_div_32];
-	l5  = l4 * fast_sincos[_sin_7pi_div_32] + l3 * fast_sincos[_cos_7pi_div_32];
-	l3 = l4 * fast_sincos[_cos_7pi_div_32] - l3 * fast_sincos[_sin_7pi_div_32];
-	l4  = temp5 + l5;
-	temp3  = temp5 - l5;
-	l5  = temp6 + temp7;
-	l7  = temp6 - temp7;
-	temp5   = l4 + l5;
-	temp6   = (l4 - l5)*fast_sincos[_sin_pi_div_4];
-	temp7   = temp3 * fast_sincos[_cos_pi_div_8] + l7 * fast_sincos[_sin_pi_div_8];
-	temp3  = temp3 * fast_sincos[_sin_pi_div_8] - l7 * fast_sincos[_cos_pi_div_8];
-	double temp8   = temp2 + l3;
-	temp2  = temp2 - l3;
-	l3 = temp1 + l2;
-	temp1  = temp1 - l2;
-	l2  = temp8 + l3;
-	l7  = (temp8 - l3)*fast_sincos[_sin_pi_div_4];
-	l3 = temp2 * fast_sincos[_cos_pi_div_8] + temp1 * fast_sincos[_sin_pi_div_8];
-	temp2  = temp2 * fast_sincos[_sin_pi_div_8] - temp1 * fast_sincos[_cos_pi_div_8];
-	temp1  = temp7 + temp2;
-	l5  = temp7 - temp2;
-	temp2  = temp6 + l7;
-	l4  = temp6 - l7;
-	l7  = temp3 + l3;
-	temp3  = temp3 - l3;
-	temp6   = r0 * fast_sincos[_cos_pi_div_64] + r15 * fast_sincos[_sin_pi_div_64];
-	r0 = r0 * fast_sincos[_sin_pi_div_64] - r15 * fast_sincos[_cos_pi_div_64];
-	temp7   = r14 * fast_sincos[_sin_3pi_div_64] + r1 * fast_sincos[_cos_3pi_div_64];
-	r1 = r14 * fast_sincos[_cos_3pi_div_64] - r1 * fast_sincos[_sin_3pi_div_64];
-	r14 = r2 * fast_sincos[_cos_5pi_div_64] + r13 * fast_sincos[_sin_5pi_div_64];
-	r2 = r2 * fast_sincos[_sin_5pi_div_64] - r13 * fast_sincos[_cos_5pi_div_64];
-	r13 = r12 * fast_sincos[_sin_7pi_div_64] + r3 * fast_sincos[_cos_7pi_div_64];
-	r3 = r12 * fast_sincos[_cos_7pi_div_64] - r3 * fast_sincos[_sin_7pi_div_64];
-	r12 = r4 * fast_sincos[_cos_9pi_div_64] + r11 * fast_sincos[_sin_9pi_div_64];
-	r4 = r4 * fast_sincos[_sin_9pi_div_64] - r11 * fast_sincos[_cos_9pi_div_64];
-	r11 = r10 * fast_sincos[_sin_11pi_div_64] + r5 * fast_sincos[_cos_11pi_div_64];
-	r5 = r10 * fast_sincos[_cos_11pi_div_64] - r5 * fast_sincos[_sin_11pi_div_64];
-	r10 = r6 * fast_sincos[_cos_13pi_div_64] + r9 * fast_sincos[_sin_13pi_div_64];
-	r6 = r6 * fast_sincos[_sin_13pi_div_64] - r9 * fast_sincos[_cos_13pi_div_64];
-	r9 = r8 * fast_sincos[_sin_15pi_div_64] + r7 * fast_sincos[_cos_15pi_div_64];
-	r7 = r8 * fast_sincos[_cos_15pi_div_64] - r7 * fast_sincos[_sin_15pi_div_64];
-	r8 = temp6 + r9;
-	l3 = temp6 - r9;
-	r9 = temp7 + r10;
-	r15 = temp7 - r10;
-	temp6   = r14 + r11;
-	r14 = r14 - r11;
-	temp7   = r13 + r12;
-	r13 = r13 - r12;
-	r12 = r8 + temp7;
-	r8 = r8 - temp7;
-	r11 = r9 + temp6;
-	r9 = r9 - temp6;
-	temp6   = r12 + r11;
-	temp7   = (r12 - r11)*fast_sincos[_sin_pi_div_4];
-	r11 = r8 * fast_sincos[_cos_pi_div_8] + r9 * fast_sincos[_sin_pi_div_8];
-	r8 = r8 * fast_sincos[_sin_pi_div_8] - r9 * fast_sincos[_cos_pi_div_8];
-	r9 = l3 * fast_sincos[_cos_pi_div_16] + r13 * fast_sincos[_sin_pi_div_16];
-	l3 = l3 * fast_sincos[_sin_pi_div_16] - r13 * fast_sincos[_cos_pi_div_16];
-	r13 = r14 * fast_sincos[_sin_3pi_div_16] + r15 * fast_sincos[_cos_3pi_div_16];
-	r15 = r14 * fast_sincos[_cos_3pi_div_16] - r15 * fast_sincos[_sin_3pi_div_16];
-	r14 = r13 + r9;
-	temp8   = (r9 - r13)*fast_sincos[_sin_pi_div_4];
-	r13 = r15 + l3;
-	l3 = (l3 - r15)*fast_sincos[_sin_pi_div_4];
-	r15 = temp8 + l3;
-	r9 = temp8 - l3;
-	temp8   = r0 + r7;
-	r0 = r0 - r7;
-	r7 = r1 + r6;
-	r1 = r1 - r6;
-	r6 = r2 + r5;
-	r2 = r2 - r5;
-	r5 = r3 + r4;
-	r3 = r3 - r4;
-	r4 = temp8 + r5;
-	l3 = temp8 - r5;
-	temp8   = r7 + r6;
-	r7 = r7 - r6;
-	r6 = r4 + temp8;
-	r4 = (r4 - temp8)*fast_sincos[_sin_pi_div_4];
-	r5 = l3 * fast_sincos[_cos_pi_div_8] + r7 * fast_sincos[_sin_pi_div_8];
-	l3 = l3 * fast_sincos[_sin_pi_div_8] - r7 * fast_sincos[_cos_pi_div_8];
-	r7 = r0 * fast_sincos[_cos_pi_div_16] + r3 * fast_sincos[_sin_pi_div_16];
-	r0 = r0 * fast_sincos[_sin_pi_div_16] - r3 * fast_sincos[_cos_pi_div_16];
-	r3 = r2 * fast_sincos[_sin_3pi_div_16] + r1 * fast_sincos[_cos_3pi_div_16];
-	r1 = r2 * fast_sincos[_cos_3pi_div_16] - r1 * fast_sincos[_sin_3pi_div_16];
-	temp8   = r7 + r3;
-	r7 = (r7 - r3)*fast_sincos[_sin_pi_div_4];
-	r3 = r0 + r1;
-	r0 = (r0 - r1)*fast_sincos[_sin_pi_div_4];
-	r1 = r7 + r0;
-	r7 = r7 - r0;
-	r0 = r14 + r3;
-	r14 = r14 - r3;
-
-	r3 = r11 + l3;
-	r11 = r11 - l3;
-
-	l3 = r15 + r7;
-	r15 = r15 - r7;
-
-	r7 = temp7 + r4;
-	r12 = temp7 - r4;
-
-	r4 = r9 + r1;
-	r9 = r9 - r1;
-
-	r1 = r8 + r5;
-	r8 = r8 - r5;
-	r5 = r13 + temp8;
-	r13 = r13 - temp8;
-	
-	// output 
-
-	dst[0] = l10;
-	dst[1] = temp6;
-	dst[2] = temp5;
-	dst[3] = r0;
-	dst[4] = l15;
-	dst[5] = r14;
-	dst[6] = temp1;
-	dst[7] = r3;
-	dst[8] = l14;
-	dst[9] = r11;
-	dst[10] = l5;
-	dst[11] = l3;
-	dst[12] = temp0;
-	dst[13] = r15;
-	dst[14] = temp2;
-	dst[15] = r7;
-	dst[16]	= l1;
-	dst[17] = r12;
-	dst[18] = l4;
-	dst[19] = r4;
-	dst[20] = l9;
-	dst[21] = r9;
-	dst[22] = l7;
-	dst[23] = r1;
-	dst[24] = l8;
-	dst[25] = r8;
-	dst[26] = temp3;
-	dst[27] = r5;
-	dst[28] = l13;
-	dst[29] = r13;
-	dst[30] = l2;
-	dst[31] = r6;
-}
-#endif
 
 
 /**************************************************
@@ -1246,14 +887,3 @@ GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, espgal2,   ROT270, "
 
 // CMDL01 Medal Mahjong Moukari Bancho
 GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, espgal2,   ROT0,   "Cave", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",           GAME_NOT_WORKING )
-
-
-
-
-
-
-
-
-
-
-

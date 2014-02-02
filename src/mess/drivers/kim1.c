@@ -145,8 +145,8 @@ protected:
 
 static ADDRESS_MAP_START(kim1_map, AS_PROGRAM, 8, kim1_state)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE_LEGACY("miot_u3", mos6530_r, mos6530_w )
-	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE_LEGACY("miot_u2", mos6530_r, mos6530_w )
+	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u3", mos6530_device, read, write )
+	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u2", mos6530_device, read, write )
 	AM_RANGE(0x1780, 0x17bf) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x17c0, 0x17ff) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_ROM
@@ -242,7 +242,7 @@ WRITE8_MEMBER( kim1_state::kim1_u2_write_a )
 
 READ8_MEMBER( kim1_state::kim1_u2_read_b )
 {
-	if ( mos6530_portb_out_get(m_riot2) & 0x20 )
+	if ( m_riot2->portb_out_get() & 0x20 )
 		return 0xFF;
 
 	return 0x7F | ( m_311_output ^ 0x80 );

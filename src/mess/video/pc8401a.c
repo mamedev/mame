@@ -59,6 +59,7 @@ static MC6845_UPDATE_ROW( pc8441a_update_row )
 static MC6845_INTERFACE( pc8441a_mc6845_interface )
 {
 	false,
+	0,0,0,0,
 	6,
 	NULL,
 	pc8441a_update_row,

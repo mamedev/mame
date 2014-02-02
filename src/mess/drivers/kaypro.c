@@ -151,6 +151,7 @@ static const z80_daisy_config kaypro2x_daisy_chain[] =
 static MC6845_INTERFACE( kaypro2x_crtc )
 {
 	false,
+	0,0,0,0,        /* visarea adjustment */
 	7,              /* number of dots per character */
 	NULL,
 	kaypro2x_update_row,        /* handler to display a scanline */

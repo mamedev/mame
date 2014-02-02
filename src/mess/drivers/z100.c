@@ -186,7 +186,7 @@ public:
 	DECLARE_WRITE8_MEMBER(video_pia_A_w);
 	DECLARE_WRITE8_MEMBER(video_pia_B_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
-	DECLARE_WRITE8_MEMBER(video_pia_CB2_w);
+	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
 	UINT8 *m_gvram;
 	UINT8 m_keyb_press,m_keyb_status;
 	UINT8 m_vram_enable;
@@ -617,6 +617,7 @@ READ8_MEMBER( z100_state::get_slave_ack )
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -662,42 +663,10 @@ WRITE_LINE_MEMBER( z100_state::video_pia_CA2_w )
 		m_gvram[i] = m_clr_val;
 }
 
-WRITE8_MEMBER( z100_state::video_pia_CB2_w )
+WRITE_LINE_MEMBER( z100_state::video_pia_CB2_w )
 {
-	m_clr_val = (data & 1) ? 0x00 : 0xff;
+	m_clr_val = (state & 1) ? 0x00 : 0xff;
 }
-
-static const pia6821_interface pia0_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(z100_state, video_pia_A_w),     /* port A out */
-	DEVCB_DRIVER_MEMBER(z100_state, video_pia_B_w),     /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(z100_state, video_pia_CA2_w),      /* line CA2 out */
-	DEVCB_DRIVER_MEMBER(z100_state, video_pia_CB2_w),       /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface pia1_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
 
 static const wd17xx_interface z207_interface =
 {
@@ -778,8 +747,13 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(z100_state, z100_pic_irq), VCC, READ8(z100_state, get_slave_ack) )
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir3_w), GND, NULL )
 
-	MCFG_PIA6821_ADD("pia0", pia0_intf)
-	MCFG_PIA6821_ADD("pia1", pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(z100_state, video_pia_A_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(z100_state, video_pia_B_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(z100_state, video_pia_CA2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(z100_state, video_pia_CB2_w))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
 	MCFG_FD1797_ADD("z207_fdc",z207_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(z100_floppy_interface)

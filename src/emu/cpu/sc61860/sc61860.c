@@ -119,11 +119,11 @@ void sc61860_device::device_start()
 	m_reset.resolve();
 	m_brk.resolve();
 	m_x.resolve();
-	m_ina.resolve();
-	m_outa.resolve();
-	m_inb.resolve();
-	m_outb.resolve();
-	m_outc.resolve();
+	m_ina.resolve_safe(0);
+	m_outa.resolve_safe();
+	m_inb.resolve_safe(0);
+	m_outb.resolve_safe();
+	m_outc.resolve_safe();
 
 	m_p = 0;
 	m_q = 0;

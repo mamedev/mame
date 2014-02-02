@@ -278,40 +278,6 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("{ }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 INPUT_PORTS_END
 
-/* System - for keyboard, video, general housekeeping */
-static const pia6821_interface pegasus_pia_s_intf=
-{
-	DEVCB_NULL,                     /* port A input */
-	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_keyboard_r), /* port B input */
-	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_cassette_r), /* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_keyboard_irq), /* CB1 input */
-	DEVCB_NULL,                     /* CA2 input */
-	DEVCB_NULL,                     /* CB2 input */
-	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_keyboard_w), /* port A output */
-	DEVCB_DRIVER_MEMBER(pegasus_state, pegasus_controls_w), /* port B output */
-	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_cassette_w), /* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(pegasus_state, pegasus_firq_clr), /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
-};
-
-/* User interface - for connection of external equipment */
-static const pia6821_interface pegasus_pia_u_intf=
-{
-	DEVCB_NULL,     /* port A input */
-	DEVCB_NULL,     /* port B input */
-	DEVCB_NULL,     /* CA1 input */
-	DEVCB_NULL,     /* CB1 input */
-	DEVCB_NULL,     /* CA2 input */
-	DEVCB_NULL,     /* CB2 input */
-	DEVCB_NULL,     /* port A output */
-	DEVCB_NULL,     /* port B output */
-	DEVCB_NULL,     /* CA2 output */
-	DEVCB_NULL,     /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
-};
-
 static const cassette_interface pegasus_cassette_interface =
 {
 	cassette_default_formats,
@@ -521,8 +487,21 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_PIA6821_ADD( "pia_s", pegasus_pia_s_intf )
-	MCFG_PIA6821_ADD( "pia_u", pegasus_pia_u_intf )
+	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(pegasus_state, pegasus_keyboard_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(pegasus_state, pegasus_cassette_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(pegasus_state, pegasus_keyboard_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(pegasus_state, pegasus_keyboard_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(pegasus_state, pegasus_controls_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(pegasus_state, pegasus_cassette_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(pegasus_state, pegasus_firq_clr))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+
+	MCFG_DEVICE_ADD( "pia_u", PIA6821, 0)
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_1)

@@ -929,59 +929,6 @@ UINT32 coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-/* Declare PIA structure */
-
-/* PIA 0 */
-static const pia6821_interface pia_0_intf =
-{
-	DEVCB_INPUT_PORT("PIA0.A"),     /* port A in */
-	DEVCB_INPUT_PORT("PIA0.B"),     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-/* PIA 1 */
-static const pia6821_interface pia_1_intf =
-{
-	DEVCB_INPUT_PORT("PIA1.A"),     /* port A in */
-	DEVCB_INPUT_PORT("PIA1.B"),     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-/* PIA 2 */
-static const pia6821_interface pia_2_intf =
-{
-	DEVCB_INPUT_PORT("PIA2.A"),     /* port A in */
-	DEVCB_INPUT_PORT("PIA2.B"),     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
 
 
 static const ay8910_interface ay8912_interface =
@@ -997,6 +944,7 @@ static const ay8910_interface ay8912_interface =
 static MC6845_INTERFACE( h46505_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -1014,9 +962,17 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
 
-	MCFG_PIA6821_ADD("pia0", pia_0_intf)
-	MCFG_PIA6821_ADD("pia1", pia_1_intf)
-	MCFG_PIA6821_ADD("pia2", pia_2_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("PIA0.A"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("PIA0.B"))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("PIA1.A"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("PIA1.B"))
+
+	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("PIA2.A"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("PIA2.B"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

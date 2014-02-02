@@ -14,7 +14,6 @@
 #ifndef __MAGIC_FORMEL__
 #define __MAGIC_FORMEL__
 
-
 #include "emu.h"
 #include "exp.h"
 #include "machine/6821pia.h"
@@ -61,11 +60,10 @@ private:
 
 	UINT8 m_rom_bank;
 	UINT8 m_ram_bank;
-	int m_pb7_ff;
-	int m_cb2_ff;
-	int m_rom_oe;
 	int m_ram_oe;
 	int m_pb7;
+	int m_u9a;
+	int m_u9b;
 };
 
 

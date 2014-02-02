@@ -59,16 +59,19 @@ public:
 
 	dai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_pit(*this, "pit8253"),
 		m_tms5501(*this, "tms5501"),
 		m_sound(*this, "custom"),
-		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG) { }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<tms5501_device> m_tms5501;
 	required_device<dai_sound_device> m_sound;
+	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
 
 	UINT8 m_paddle_select;
 	UINT8 m_paddle_enable;
@@ -89,10 +92,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cassette;
-	required_device<ram_device> m_ram;
 	void dai_update_memory(int dai_rom_bank);
+	IRQ_CALLBACK_MEMBER(int_ack);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -103,7 +104,6 @@ protected:
 
 extern const struct pit8253_interface dai_pit8253_intf;
 extern const i8255_interface dai_ppi82555_intf;
-extern const tms5501_interface dai_tms5501_interface;
 
 
 /*----------- defined in video/dai.c -----------*/

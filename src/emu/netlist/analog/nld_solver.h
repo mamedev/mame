@@ -22,33 +22,45 @@
 
 class NETLIB_NAME(solver);
 
+/* FIXME: these should become proper devices */
+
 class netlist_matrix_solver_t
 {
 public:
 	typedef netlist_list_t<netlist_matrix_solver_t *> list_t;
 	typedef netlist_core_device_t::list_t dev_list_t;
 
+	netlist_matrix_solver_t() : m_resched(false), m_owner(NULL) {}
+
 	ATTR_COLD void setup(netlist_net_t::list_t &nets, NETLIB_NAME(solver) &owner);
 
 	// return true if a reschedule is needed ...
 	ATTR_HOT bool solve();
+    ATTR_HOT int solve_non_dynamic();
 	ATTR_HOT void step(const netlist_time delta);
 	ATTR_HOT void update_inputs();
 
-	ATTR_HOT inline bool is_dynamic() { return m_dynamic.count() > 0; }
+	ATTR_HOT void schedule();
 
-	inline const NETLIB_NAME(solver) &owner() const;
+	ATTR_HOT inline bool is_dynamic() { return m_dynamic.count() > 0; }
+    ATTR_HOT inline bool is_timestep() { return m_steps.count() > 0; }
+
+	ATTR_HOT inline const NETLIB_NAME(solver) &owner() const;
+	ATTR_COLD void reset();
 
 	double m_accuracy;
 	double m_convergence_factor;
+	int m_resched_loops;
 
 private:
 	netlist_net_t::list_t m_nets;
 	dev_list_t m_dynamic;
-	dev_list_t m_inps;
+	netlist_core_terminal_t::list_t m_inps;
 	dev_list_t m_steps;
+    bool m_resched;
+    netlist_time m_last_step;
 
-	NETLIB_NAME(solver) *m_owner;
+    NETLIB_NAME(solver) *m_owner;
 };
 
 NETLIB_DEVICE_WITH_PARAMS(solver,
@@ -64,6 +76,7 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 		netlist_param_double_t m_sync_delay;
 		netlist_param_double_t m_accuracy;
 		netlist_param_double_t m_convergence;
+        netlist_param_int_t m_resched_loops;
 
 		netlist_time m_inc;
 		netlist_time m_last_step;
@@ -72,21 +85,20 @@ NETLIB_DEVICE_WITH_PARAMS(solver,
 		netlist_matrix_solver_t::list_t m_mat_solvers;
 public:
 
-		~NETLIB_NAME(solver)();
+		ATTR_COLD ~NETLIB_NAME(solver)();
 
-		ATTR_HOT inline void schedule();
+		ATTR_HOT inline void schedule1();
 
 		ATTR_COLD void post_start();
 );
 
-inline void NETLIB_NAME(solver)::schedule()
+ATTR_HOT inline void NETLIB_NAME(solver)::schedule1()
 {
-	// FIXME: time should be parameter;
 	if (!m_Q_sync.net().is_queued())
 		m_Q_sync.net().push_to_queue(m_nt_sync_delay);
 }
 
-inline const NETLIB_NAME(solver) &netlist_matrix_solver_t::owner() const
+ATTR_HOT inline const NETLIB_NAME(solver) &netlist_matrix_solver_t::owner() const
 {
 	return *m_owner;
 }

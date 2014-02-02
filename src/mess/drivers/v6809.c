@@ -192,7 +192,8 @@ MC6845_ON_UPDATE_ADDR_CHANGED( v6809_update_addr )
 static MC6845_INTERFACE( v6809_crtc )
 {
 	false,
-	8,              /* number of dots per character */
+	0,0,0,0,                /* visarea adjustment */
+	8,                      /* number of dots per character */
 	NULL,
 	v6809_update_row,       /* handler to display a scanline */
 	NULL,
@@ -273,41 +274,6 @@ WRITE8_MEMBER( v6809_state::pa_w )
 	}
 }
 
-// port A = drive select and 2 control lines ; port B = keyboard
-// CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
-static const pia6821_interface pia0_intf =
-{
-	DEVCB_NULL,     /* port A input */
-	DEVCB_DRIVER_MEMBER(v6809_state, pb_r),     /* port B input */
-	DEVCB_NULL,     /* CA1 input */
-	DEVCB_NULL,     /* CB1 input */
-	DEVCB_NULL,     /* CA2 input */
-	DEVCB_NULL,     /* CB2 input */
-	DEVCB_DRIVER_MEMBER(v6809_state, pa_w),     /* port A output */
-	DEVCB_NULL,     /* port B output */
-	DEVCB_NULL,     /* CA2 output */
-	DEVCB_NULL,     /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
-};
-
-// no idea what this does
-static const pia6821_interface pia1_intf =
-{
-	DEVCB_NULL,     /* port A input */
-	DEVCB_NULL,     /* port B input */
-	DEVCB_NULL,     /* CA1 input */
-	DEVCB_NULL,     /* CB1 input */
-	DEVCB_NULL,     /* CA2 input */
-	DEVCB_NULL,     /* CB2 input */
-	DEVCB_NULL,     /* port A output */
-	DEVCB_NULL,     /* port B output */
-	DEVCB_NULL,     /* CA2 output */
-	DEVCB_NULL,     /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
-};
-
 // this should output 1 to enable sound, then output 0 after a short time
 // however it continuously outputs 1
 WRITE_LINE_MEMBER( v6809_state::speaker_en_w )
@@ -384,8 +350,20 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_16MHz / 8, v6809_crtc)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
-	MCFG_PIA6821_ADD("pia0", pia0_intf)
-	MCFG_PIA6821_ADD("pia1", pia1_intf)
+
+// port A = drive select and 2 control lines ; port B = keyboard
+// CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(v6809_state, pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(v6809_state, pa_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+
+// no idea what this does
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)
 	MCFG_ACIA6850_ADD("acia0", mc6850_intf)
 	MCFG_ACIA6850_ADD("acia1", mc6850_intf)

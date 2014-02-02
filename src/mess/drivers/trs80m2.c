@@ -428,6 +428,7 @@ WRITE_LINE_MEMBER( trs80m2_state::vsync_w )
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	trs80m2_update_row,

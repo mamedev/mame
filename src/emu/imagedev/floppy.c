@@ -11,14 +11,21 @@
 #include "formats/imageutl.h"
 #include "uiimage.h"
 
+
 // device type definition
 const device_type FLOPPY_CONNECTOR = &device_creator<floppy_connector>;
+
+// generic 3" drives
 const device_type FLOPPY_3_SSDD = &device_creator<floppy_3_ssdd>;
 const device_type FLOPPY_3_DSDD = &device_creator<floppy_3_dsdd>;
+
+// generic 3.5" drives
 const device_type FLOPPY_35_SSDD = &device_creator<floppy_35_ssdd>;
 const device_type FLOPPY_35_DD = &device_creator<floppy_35_dd>;
 const device_type FLOPPY_35_HD = &device_creator<floppy_35_hd>;
 const device_type FLOPPY_35_ED = &device_creator<floppy_35_ed>;
+
+// generic 5.25" drives
 const device_type FLOPPY_525_SSSD_35T = &device_creator<floppy_525_sssd_35t>;
 const device_type FLOPPY_525_SD_35T = &device_creator<floppy_525_sd_35t>;
 const device_type FLOPPY_525_SSSD = &device_creator<floppy_525_sssd>;
@@ -28,13 +35,58 @@ const device_type FLOPPY_525_DD = &device_creator<floppy_525_dd>;
 const device_type FLOPPY_525_SSQD = &device_creator<floppy_525_ssqd>;
 const device_type FLOPPY_525_QD = &device_creator<floppy_525_qd>;
 const device_type FLOPPY_525_HD = &device_creator<floppy_525_hd>;
+
+// generic 8" drives
 const device_type FLOPPY_8_SSSD = &device_creator<floppy_8_sssd>;
 const device_type FLOPPY_8_DSSD = &device_creator<floppy_8_dssd>;
 const device_type FLOPPY_8_SSDD = &device_creator<floppy_8_ssdd>;
 const device_type FLOPPY_8_DSDD = &device_creator<floppy_8_dsdd>;
+
+// epson 3.5" drives
+#if 0
+const device_type EPSON_SMD_110 = &device_creator<epson_smd_110>;
+const device_type EPSON_SMD_120 = &device_creator<epson_smd_120>;
+const device_type EPSON_SMD_125 = &device_creator<epson_smd_125>;
+const device_type EPSON_SMD_130 = &device_creator<epson_smd_130>;
+const device_type EPSON_SMD_140 = &device_creator<epson_smd_140>;
+const device_type EPSON_SMD_150 = &device_creator<epson_smd_150>;
+const device_type EPSON_SMD_160 = &device_creator<epson_smd_160>;
+#endif
+const device_type EPSON_SMD_165 = &device_creator<epson_smd_165>;
+#if 0
+const device_type EPSON_SMD_170 = &device_creator<epson_smd_170>;
+const device_type EPSON_SMD_180 = &device_creator<epson_smd_180>;
+const device_type EPSON_SMD_240L = &device_creator<epson_smd_240l>;
+const device_type EPSON_SMD_280HL = &device_creator<epson_smd_280hl>;
+const device_type EPSON_SMD_440L = &device_creator<epson_smd_440l>;
+const device_type EPSON_SMD_449L = &device_creator<epson_smd_449l>;
+const device_type EPSON_SMD_480LM = &device_creator<epson_smd_480lm>;
+const device_type EPSON_SMD_489M = &device_creator<epson_smd_489m>;
+#endif
+
+// epson 5.25" drives
+#if 0
+const device_type EPSON_SD_311 = &device_creator<epson_sd_311>;
+#endif
+const device_type EPSON_SD_320 = &device_creator<epson_sd_320>;
+const device_type EPSON_SD_321 = &device_creator<epson_sd_321>;
+#if 0
+const device_type EPSON_SD_521L = &device_creator<epson_sd_531l>;
+const device_type EPSON_SD_525 = &device_creator<epson_sd_525>;
+const device_type EPSON_SD_543 = &device_creator<epson_sd_543>;
+const device_type EPSON_SD_545 = &device_creator<epson_sd_545>;
+const device_type EPSON_SD_560 = &device_creator<epson_sd_560>;
+const device_type EPSON_SD_580L = &device_creator<epson_sd_580l>;
+const device_type EPSON_SD_581L = &device_creator<epson_sd_581l>;
+const device_type EPSON_SD_621L = &device_creator<epson_sd_621l>;
+const device_type EPSON_SD_680L = &device_creator<epson_sd_680l>;
+#endif
+
+// sony 3.5" drives
 const device_type SONY_OA_D31V = &device_creator<sony_oa_d31v>;
 const device_type SONY_OA_D32W = &device_creator<sony_oa_d32w>;
 const device_type SONY_OA_D32V = &device_creator<sony_oa_d32v>;
+
 
 const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
@@ -300,7 +352,7 @@ bool floppy_image_device::call_load()
 	best_format->load(&io, form_factor, image);
 	output_format = is_readonly() ? 0 : best_format;
 
-	revolution_start_time = motor_always_on ? machine().time() : attotime::never;
+	revolution_start_time = mon ? attotime::never : machine().time();
 	revolution_count = 0;
 
 	index_resync();
@@ -1455,6 +1507,124 @@ void floppy_8_dsdd::handled_variants(UINT32 *variants, int &var_count) const
 //**************************************************************************
 //  SPECIFIC FLOPPY DRIVE DEFINITIONS
 //**************************************************************************
+
+//-------------------------------------------------
+//  epson smd-165
+//
+//  track to track: 6 ms
+//  average: 97 ms
+//  setting time: 15 ms
+//  motor start time: 1 s
+//
+//-------------------------------------------------
+
+epson_smd_165::epson_smd_165(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, EPSON_SD_321, "EPSON SMD-165 Floppy Disk Drive", tag, owner, clock, "epson_smd_165", __FILE__)
+{
+}
+
+epson_smd_165::~epson_smd_165()
+{
+}
+
+void epson_smd_165::setup_characteristics()
+{
+	form_factor = floppy_image::FF_35;
+	tracks = 40;
+	sides = 2;
+	set_rpm(300);
+}
+
+void epson_smd_165::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::DSSD;
+}
+
+//-------------------------------------------------
+//  epson sd-320
+//
+//  track to track: 15 ms
+//  average: 220 ms
+//  setting time: 15 ms
+//  head load time: 35 ms
+//  motor start time: 0.5 s
+//
+//  dip switch ss1
+//  1 = drive select 0
+//  2 = drive select 1
+//  3 = drive select 2
+//  4 = drive select 3
+//  5 = head load from pin 4
+//  6 = head load from drive select
+//
+//  dic switch ss2
+//  hs = load controlled by head-load
+//  ms = load controlled by motor enable
+//
+//  dic switch ss3
+//  ds = in-use led by drive select
+//  hl = in-use led by head load
+//
+//-------------------------------------------------
+
+epson_sd_320::epson_sd_320(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, EPSON_SD_320, "EPSON SD-320 Mini-Floppy Disk Drive", tag, owner, clock, "epson_sd_320", __FILE__)
+{
+}
+
+epson_sd_320::~epson_sd_320()
+{
+}
+
+void epson_sd_320::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 40;
+	sides = 2;
+	set_rpm(300);
+}
+
+void epson_sd_320::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::DSDD;
+}
+
+//-------------------------------------------------
+//  epson sd-321
+//
+//  same as sd-320, but no head-load selenoid
+//
+//-------------------------------------------------
+
+epson_sd_321::epson_sd_321(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, EPSON_SD_321, "EPSON SD-321 Mini-Floppy Disk Drive", tag, owner, clock, "epson_sd_321", __FILE__)
+{
+}
+
+epson_sd_321::~epson_sd_321()
+{
+}
+
+void epson_sd_321::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 40;
+	sides = 2;
+	set_rpm(300);
+}
+
+void epson_sd_321::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::DSDD;
+}
 
 //-------------------------------------------------
 //  sony oa-d31v

@@ -295,22 +295,6 @@ void csc_state::machine_start()
 	save_item(NAME(m_selector));
 }
 
-static const pia6821_interface pia0_config =
-{
-	DEVCB_NULL, DEVCB_DRIVER_MEMBER(csc_state, pia0_pb_r),
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(csc_state, pia0_pa_w), DEVCB_DRIVER_MEMBER(csc_state, pia0_pb_w),
-	DEVCB_DRIVER_LINE_MEMBER(csc_state, pia0_ca2_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
-static const pia6821_interface pia1_config =
-{
-	DEVCB_DRIVER_MEMBER(csc_state, pia1_pa_r), DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(csc_state, pia1_ca1_r), DEVCB_DRIVER_LINE_MEMBER(csc_state, pia1_cb1_r), DEVCB_NULL, DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(csc_state, pia1_pa_w), DEVCB_DRIVER_MEMBER(csc_state, pia1_pb_w),
-	DEVCB_DRIVER_LINE_MEMBER(csc_state, pia1_ca2_w), DEVCB_DRIVER_LINE_MEMBER(csc_state, pia1_cb2_w), DEVCB_NULL, DEVCB_NULL
-};
-
 /* Machine driver */
 static MACHINE_CONFIG_START( csc, csc_state )
 	/* basic machine hardware */
@@ -321,8 +305,20 @@ static MACHINE_CONFIG_START( csc, csc_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", csc_state, irq_timer, attotime::from_hz(38400/64))
 
-	MCFG_PIA6821_ADD("pia0", pia0_config)
-	MCFG_PIA6821_ADD("pia1", pia1_config)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(csc_state, pia0_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(csc_state, pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(csc_state, pia0_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(csc_state, pia0_ca2_w))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(csc_state, pia1_pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(csc_state, pia1_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(csc_state, pia1_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(csc_state, pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(csc_state, pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(csc_state, pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(csc_state, pia1_cb2_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

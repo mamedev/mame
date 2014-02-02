@@ -21,7 +21,7 @@ Quick PCB sketch:
   |                   13l    13i    13h                                        |
   |                                                                            |
   |    PROM           11l    11i    11h      S2636            S2621    XTAL    |
-|6-|                                                                   ?MHz    |
+|6-|                                                                 14.31818  |
   |                          10i    10h      S2636                             |
 |5-|                                                                           |
 |--|                          8i     8h      S2636                   S2650A    |
@@ -43,8 +43,6 @@ Quick PCB sketch:
   |                                                                           |--|
   ------------------------------------------------------------------------------
 
-XTAL label is not readable on any PCB?
-
 Astro Wars (port of Astro Fighter) is on a stripped down board of Galaxia,
 using only one 2636 chip, less RAM, and no PROM.
 
@@ -54,9 +52,10 @@ HW has many similarities with quasar.c / cvs.c / zac2650.c
 
 TODO:
 - fix colors, there's no color prom?!
+- stars background should be multi color
+- improve sound, maybe part discrete
 - improve bullets
 - accurate astrowar sprite/bg sync
-- XTAL
 
 */
 
@@ -151,7 +150,6 @@ static ADDRESS_MAP_START( galaxia_io_map, AS_IO, 8, galaxia_state )
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(galaxia_collision_r, galaxia_ctrlport_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(galaxia_collision_clear, galaxia_dataport_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 
@@ -289,11 +287,13 @@ static const s2636_interface astrowar_s2636_config =
 
 
 static MACHINE_CONFIG_START( galaxia, galaxia_state )
+
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 2000000)      /* ? MHz */
+	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/8)
 	MCFG_CPU_PROGRAM_MAP(galaxia_mem_map)
 	MCFG_CPU_IO_MAP(galaxia_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state,  galaxia_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state, galaxia_interrupt)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(cvs_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -319,16 +319,17 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( astrowar, galaxia_state )
+
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 2000000)      /* ? MHz */
+	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/8)
 	MCFG_CPU_PROGRAM_MAP(astrowar_mem_map)
 	MCFG_CPU_IO_MAP(galaxia_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state,  galaxia_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state, galaxia_interrupt)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(cvs_state, write_s2650_flag))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -350,8 +351,6 @@ static MACHINE_CONFIG_START( astrowar, galaxia_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-
 MACHINE_CONFIG_END
 
 
@@ -382,6 +381,70 @@ ROM_START( galaxia )
 	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
 ROM_END
 
+ROM_START( galaxiaa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "galaxia.8h",  0x00000, 0x0400, CRC(f3b4ffde) SHA1(15b004e7821bfc145158b1e9435f061c524f6b86) )
+	ROM_LOAD( "galaxia.10h", 0x00400, 0x0400, CRC(6d07fdd4) SHA1(d7d4b345a055275d59951788569db370bccd5195) )
+	ROM_LOAD( "galaxia.11h", 0x00800, 0x0400, CRC(1520eb3d) SHA1(3683174da701e1124af0f9c2ee4a9a84f3fea33a) )
+	ROM_LOAD( "galaxia.13h", 0x00c00, 0x0400, CRC(c4482770) SHA1(aee983cc3d80989f49aea4138961bb623039484a) )
+	ROM_LOAD( "galaxia.8i",  0x01000, 0x0400, CRC(45b88599) SHA1(3b79c21db1aa9d80fac81ac5a554e438805febd1) )
+	ROM_LOAD( "galaxia.10i", 0x02000, 0x0400, CRC(76bd9fe3) SHA1(1abc8e40063aaa9140ea5e0341127eb0a7e86c88) )
+	ROM_LOAD( "galaxia.11i", 0x02400, 0x0400, CRC(4456808a) SHA1(f9e8cfdde0e17f13f1be297b2b4503ccc959b33c) )
+	ROM_LOAD( "galaxia.13i", 0x02800, 0x0400, CRC(cf653b9a) SHA1(fef5943de60cb5ba2459fc6ae7419e29c96a76cd) )
+	ROM_LOAD( "galaxia.11l", 0x02c00, 0x0400, CRC(50c6a645) SHA1(46638907bc393df6be25fc7461d73047d1746ffc) )
+	ROM_LOAD( "galaxia.13l", 0x03000, 0x0400, CRC(3a9c38c7) SHA1(d1e934092b69c0f3f9636eba05a1d8a6d9588e6b) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
+	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
+
+	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
+	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
+ROM_END
+
+ROM_START( galaxiab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "galaxia.8h",  0x00000, 0x0400, CRC(f3b4ffde) SHA1(15b004e7821bfc145158b1e9435f061c524f6b86) )
+	ROM_LOAD( "galaxia.10h", 0x00400, 0x0400, CRC(6d07fdd4) SHA1(d7d4b345a055275d59951788569db370bccd5195) )
+	ROM_LOAD( "galaxia.11h", 0x00800, 0x0400, CRC(1520eb3d) SHA1(3683174da701e1124af0f9c2ee4a9a84f3fea33a) )
+	ROM_LOAD( "galaxia.13h", 0x00c00, 0x0400, CRC(1d22219b) SHA1(6ab8ea8c78db30d80de98879018726d0420d30fe) ) // only 1 bit difference compared with set 1/2, however not considered a bad dump since it was found on two boards
+	ROM_LOAD( "galaxia.8i",  0x01000, 0x0400, CRC(45b88599) SHA1(3b79c21db1aa9d80fac81ac5a554e438805febd1) )
+	ROM_LOAD( "galaxia.10i", 0x02000, 0x0400, CRC(76bd9fe3) SHA1(1abc8e40063aaa9140ea5e0341127eb0a7e86c88) )
+	ROM_LOAD( "galaxia.11i", 0x02400, 0x0400, CRC(4456808a) SHA1(f9e8cfdde0e17f13f1be297b2b4503ccc959b33c) )
+	ROM_LOAD( "galaxia.13i", 0x02800, 0x0400, CRC(cf653b9a) SHA1(fef5943de60cb5ba2459fc6ae7419e29c96a76cd) )
+	ROM_LOAD( "galaxia.11l", 0x02c00, 0x0400, CRC(50c6a645) SHA1(46638907bc393df6be25fc7461d73047d1746ffc) )
+	ROM_LOAD( "galaxia.13l", 0x03000, 0x0400, CRC(3a9c38c7) SHA1(d1e934092b69c0f3f9636eba05a1d8a6d9588e6b) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
+	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
+
+	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
+	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
+ROM_END
+
+ROM_START( galaxiac )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "galaxia.8h",  0x00000, 0x0400, CRC(f3b4ffde) SHA1(15b004e7821bfc145158b1e9435f061c524f6b86) )
+	ROM_LOAD( "galaxia.10h", 0x00400, 0x0400, CRC(6d07fdd4) SHA1(d7d4b345a055275d59951788569db370bccd5195) )
+	ROM_LOAD( "galaxia.11h", 0x00800, 0x0400, CRC(5682d56f) SHA1(15afb3296e93f8371d36b686ce372f917bd5b771) )
+	ROM_LOAD( "galaxia.13h", 0x00c00, 0x0400, CRC(80dafe84) SHA1(8a71a05f1b0ddba36bf748a4801f3a78f63af1db) )
+	ROM_LOAD( "galaxia.8i",  0x01000, 0x0400, CRC(45b88599) SHA1(3b79c21db1aa9d80fac81ac5a554e438805febd1) )
+	ROM_LOAD( "galaxia.10i", 0x02000, 0x0400, CRC(76bd9fe3) SHA1(1abc8e40063aaa9140ea5e0341127eb0a7e86c88) )
+	ROM_LOAD( "galaxia.11i", 0x02400, 0x0400, CRC(4456808a) SHA1(f9e8cfdde0e17f13f1be297b2b4503ccc959b33c) )
+	ROM_LOAD( "galaxia.13i", 0x02800, 0x0400, CRC(ffe86fdb) SHA1(67b02a5c39dbe515b6d68583c8831b0dae15374a) )
+	ROM_LOAD( "galaxia.11l", 0x02c00, 0x0400, CRC(8e3f5343) SHA1(6298be9bb33975854cb3d009b89913b1a8018aee) )
+	ROM_LOAD( "galaxia.13l", 0x03000, 0x0400, CRC(3a9c38c7) SHA1(d1e934092b69c0f3f9636eba05a1d8a6d9588e6b) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "galaxia.1d", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) ) // taken from parent
+	ROM_LOAD( "galaxia.3d", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) ) // taken from parent
+
+	ROM_REGION( 0x0200, "proms", 0 ) // unknown function
+	ROM_LOAD( "prom.11o", 0x0000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
+ROM_END
+
+
 ROM_START( astrowar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "astro.8h",  0x00000, 0x0400, CRC(b0ec246c) SHA1(f9123b5e317938655f5e8b3f8a5810d0b2b7c7af) )
@@ -401,5 +464,8 @@ ROM_START( astrowar )
 ROM_END
 
 
-GAME( 1979, galaxia,  0, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1980, astrowar, 0, astrowar, galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxia,  0,       galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiaa, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiab, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 3)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxiac, galaxia, galaxia,  galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Galaxia (set 4)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1980, astrowar, 0,       astrowar, galaxia, driver_device, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

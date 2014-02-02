@@ -437,22 +437,6 @@ WRITE_LINE_MEMBER(mpu3_state::pia_ic3_ca2_w)
 	ic11_update(mstate);
 }
 
-static const pia6821_interface pia_ic3_intf =
-{
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic3_porta_r),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic3_portb_w),        /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic3_ca2_w),         /* line CA2 out */
-	DEVCB_NULL,                         /* port CB2 out */
-	DEVCB_NULL,                         /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq)               /* IRQB */
-};
-
 READ8_MEMBER(mpu3_state::pia_ic4_porta_r)
 {
 	if (m_ic11_active)
@@ -536,22 +520,6 @@ WRITE_LINE_MEMBER(mpu3_state::pia_ic4_cb2_w)
 	m_triac_ic4=state;
 }
 
-static const pia6821_interface pia_ic4_intf =
-{
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic4_porta_r),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic4_porta_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic4_portb_w),        /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic4_ca2_w),     /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic4_cb2_w),     /* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq),      /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
 WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
 {
@@ -614,22 +582,6 @@ WRITE_LINE_MEMBER(mpu3_state::pia_ic5_cb2_w)
 	m_triac_ic5 = state;
 }
 
-static const pia6821_interface pia_ic5_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic5_portb_r),    /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic5_porta_w),    /* port A out */
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic5_portb_w),    /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic5_ca2_w),     /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,pia_ic5_cb2_w),     /* port CB2 out */
-	DEVCB_NULL,         /* IRQA */
-	DEVCB_NULL          /* IRQB */
-};
-
 
 /* IC6, AUX ports*/
 READ8_MEMBER(mpu3_state::pia_ic6_porta_r)
@@ -665,22 +617,6 @@ WRITE8_MEMBER(mpu3_state::pia_ic6_portb_w)
 	LOG(("%s: IC6 PIA Port B Set to %2x (AUX2)\n", machine().describe_context(),data));
 	m_aux2_input = data;
 }
-
-static const pia6821_interface pia_ic6_intf =
-{
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic6_porta_r),        /* port A in */
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic6_portb_r),        /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic6_porta_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(mpu3_state,pia_ic6_portb_w),        /* port B out */
-	DEVCB_NULL,         /* line CA2 out */
-	DEVCB_NULL,         /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq),              /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mpu3_state,cpu0_irq)               /* IRQB */
-};
 
 static INPUT_PORTS_START( mpu3 )
 	PORT_START("ORANGE1")
@@ -925,10 +861,34 @@ static MACHINE_CONFIG_START( mpu3base, mpu3_state )
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
 
-	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
-	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)
-	MCFG_PIA6821_ADD("pia_ic5", pia_ic5_intf)
-	MCFG_PIA6821_ADD("pia_ic6", pia_ic6_intf)
+	MCFG_DEVICE_ADD("pia_ic3", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(mpu3_state, pia_ic3_porta_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mpu3_state, pia_ic3_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(mpu3_state, pia_ic3_ca2_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(mpu3_state, cpu0_irq))
+
+	MCFG_DEVICE_ADD("pia_ic4", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(mpu3_state, pia_ic4_porta_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mpu3_state, pia_ic4_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mpu3_state, pia_ic4_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(mpu3_state, pia_ic4_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(mpu3_state, pia_ic4_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(mpu3_state, cpu0_irq))
+
+	MCFG_DEVICE_ADD("pia_ic5", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(mpu3_state, pia_ic5_portb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mpu3_state, pia_ic5_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mpu3_state, pia_ic5_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(mpu3_state, pia_ic5_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(mpu3_state, pia_ic5_cb2_w))
+
+	MCFG_DEVICE_ADD("pia_ic6", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(mpu3_state, pia_ic6_porta_r))
+	MCFG_PIA_READPB_HANDLER(READ8(mpu3_state, pia_ic6_portb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mpu3_state, pia_ic6_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mpu3_state, pia_ic6_portb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(mpu3_state, cpu0_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(mpu3_state, cpu0_irq))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

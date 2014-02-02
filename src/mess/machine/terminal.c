@@ -138,14 +138,12 @@ static const UINT8 terminal_font[256*16] =
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_io_term_frame(*this, "TERM_FRAME"),
 		m_io_term_conf(*this, "TERM_CONF")
 {
 }
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock, "generic_terminal", __FILE__),
-		m_io_term_frame(*this, "TERM_FRAME"),
 		m_io_term_conf(*this, "TERM_CONF")
 {
 }
@@ -328,7 +326,6 @@ machine_config_constructor generic_terminal_device::device_mconfig_additions() c
 void generic_terminal_device::device_start()
 {
 	m_keyboard_func.resolve(m_keyboard_cb, *this);
-	m_timer = timer_alloc();
 }
 
 void generic_terminal_device::device_config_complete()
@@ -416,8 +413,8 @@ const device_type GENERIC_TERMINAL = &device_creator<generic_terminal_device>;
 
 static INPUT_PORTS_START(serial_terminal)
 	PORT_INCLUDE(generic_terminal)
-	PORT_START("TERM_FRAME")
-	PORT_CONFNAME(0x0f, 0x06, "Baud") PORT_CHANGED_MEMBER(DEVICE_SELF, serial_terminal_device, update_frame, 0)
+	PORT_START("TERM_TXBAUD")
+	PORT_CONFNAME(0xff, 0x06, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
 	PORT_CONFSETTING( 0x0d, "110")
 	PORT_CONFSETTING( 0x00, "150")
 	PORT_CONFSETTING( 0x01, "300")
@@ -432,11 +429,51 @@ static INPUT_PORTS_START(serial_terminal)
 	PORT_CONFSETTING( 0x0a, "38400")
 	PORT_CONFSETTING( 0x0b, "57600")
 	PORT_CONFSETTING( 0x0c, "115200")
-	PORT_CONFNAME(0x30, 0x00, "Format") PORT_CHANGED_MEMBER(DEVICE_SELF, serial_terminal_device, update_frame, 0)
-	PORT_CONFSETTING( 0x00, "8N1")
-	PORT_CONFSETTING( 0x10, "7E1")
-	PORT_CONFSETTING( 0x20, "8N2")
-	PORT_CONFSETTING( 0x30, "8E1")
+
+	PORT_START("TERM_RXBAUD")
+	PORT_CONFNAME(0xff, 0x06, "RX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
+	PORT_CONFSETTING( 0x0d, "110")
+	PORT_CONFSETTING( 0x00, "150")
+	PORT_CONFSETTING( 0x01, "300")
+	PORT_CONFSETTING( 0x02, "600")
+	PORT_CONFSETTING( 0x03, "1200")
+	PORT_CONFSETTING( 0x04, "2400")
+	PORT_CONFSETTING( 0x05, "4800")
+	PORT_CONFSETTING( 0x06, "9600")
+	PORT_CONFSETTING( 0x07, "14400")
+	PORT_CONFSETTING( 0x08, "19200")
+	PORT_CONFSETTING( 0x09, "28800")
+	PORT_CONFSETTING( 0x0a, "38400")
+	PORT_CONFSETTING( 0x0b, "57600")
+	PORT_CONFSETTING( 0x0c, "115200")
+
+	PORT_START("TERM_STARTBITS")
+	PORT_CONFNAME(0xff, 0x01, "Start Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
+	PORT_CONFSETTING( 0x00, "0")
+	PORT_CONFSETTING( 0x01, "1")
+
+	PORT_START("TERM_DATABITS")
+	PORT_CONFNAME(0xff, 0x03, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
+	PORT_CONFSETTING( 0x00, "5")
+	PORT_CONFSETTING( 0x01, "6")
+	PORT_CONFSETTING( 0x02, "7")
+	PORT_CONFSETTING( 0x03, "8")
+	PORT_CONFSETTING( 0x04, "9")
+
+	PORT_START("TERM_PARITY")
+	PORT_CONFNAME(0xff, 0x00, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
+	PORT_CONFSETTING( 0x00, "None")
+	PORT_CONFSETTING( 0x01, "Odd")
+	PORT_CONFSETTING( 0x02, "Even")
+	PORT_CONFSETTING( 0x03, "Mark")
+	PORT_CONFSETTING( 0x04, "Space")
+
+	PORT_START("TERM_STOPBITS")
+	PORT_CONFNAME(0xff, 0x01, "Stop Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, serial_terminal_device, update_serial)
+	PORT_CONFSETTING( 0x00, "0")
+	PORT_CONFSETTING( 0x01, "1")
+	PORT_CONFSETTING( 0x02, "1.5")
+	PORT_CONFSETTING( 0x03, "2")
 INPUT_PORTS_END
 
 ioport_constructor serial_terminal_device::device_input_ports() const
@@ -447,7 +484,13 @@ ioport_constructor serial_terminal_device::device_input_ports() const
 serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock, "serial_terminal", __FILE__),
 		device_serial_interface(mconfig, *this),
-		device_serial_port_interface(mconfig, *this)
+		device_serial_port_interface(mconfig, *this),
+		m_io_term_txbaud(*this, "TERM_TXBAUD"),
+		m_io_term_rxbaud(*this, "TERM_RXBAUD"),
+		m_io_term_startbits(*this, "TERM_STARTBITS"),
+		m_io_term_databits(*this, "TERM_DATABITS"),
+		m_io_term_parity(*this, "TERM_PARITY"),
+		m_io_term_stopbits(*this, "TERM_STOPBITS")
 {
 }
 
@@ -464,55 +507,46 @@ void serial_terminal_device::device_config_complete()
 	}
 }
 
-static int rates[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200, 110};
-
 void serial_terminal_device::device_start()
 {
-	int baud = clock();
-	if(!baud) baud = 9600;
 	m_owner = dynamic_cast<serial_port_device *>(owner());
 	m_out_tx_func.resolve(m_out_tx_cb, *this);
 	m_slot = m_owner && 1;
-	m_timer = timer_alloc();
-	set_rcv_rate(baud);
-	set_tra_rate(baud);
-	set_data_frame(8, 1, PARITY_NONE, false);
 }
 
-INPUT_CHANGED_MEMBER(serial_terminal_device::update_frame)
+WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
 {
-	device_reset();
+	static const int m_baud[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200, 110};
+	static const int m_startbits[] = {0, 1};
+	static const int m_databits[] = {5, 6, 7, 8, 9};
+	static const parity_t m_parity[] = {PARITY_NONE, PARITY_ODD, PARITY_EVEN, PARITY_MARK, PARITY_SPACE};
+	static const stop_bits_t m_stopbits[] = {STOP_BITS_0, STOP_BITS_1, STOP_BITS_1_5, STOP_BITS_2};
+
+	UINT8 startbits = m_io_term_startbits->read();
+	UINT8 databits = m_io_term_databits->read();
+	UINT8 parity = m_io_term_parity->read();
+	UINT8 stopbits = m_io_term_stopbits->read();
+
+	set_data_frame(m_startbits[startbits], m_databits[databits], m_parity[parity], m_stopbits[stopbits]);
+
+	UINT8 txbaud = m_io_term_txbaud->read();
+	set_tra_rate(m_baud[txbaud]);
+
+	UINT8 rxbaud = m_io_term_rxbaud->read();
+	set_rcv_rate(m_baud[rxbaud]);
 }
 
 void serial_terminal_device::device_reset()
 {
 	generic_terminal_device::device_reset();
+
 	m_rbit = 1;
 	if(m_slot)
 		m_owner->out_rx(m_rbit);
 	else
 		m_out_tx_func(m_rbit);
 
-	UINT8 val = m_io_term_frame->read();
-	set_tra_rate(rates[val & 0x0f]);
-	set_rcv_rate(rates[val & 0x0f]);
-
-	switch(val & 0x30)
-	{
-	case 0x10:
-		set_data_frame(7, 1, PARITY_EVEN, false);
-		break;
-	case 0x00:
-	default:
-		set_data_frame(8, 1, PARITY_NONE, false);
-		break;
-	case 0x20:
-		set_data_frame(8, 2, PARITY_NONE, false);
-		break;
-	case 0x30:
-		set_data_frame(8, 1, PARITY_EVEN, false);
-		break;
-	}
+	update_serial(0);
 }
 
 void serial_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

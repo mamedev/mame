@@ -121,15 +121,16 @@ MC6845_UPDATE_ROW( dmd64_update_row )
 
 MC6845_INTERFACE( decodmd3_6845_intf )
 {
-	false,                                  /* show border area */
-	16,                                     /* number of pixels per video memory address */
-	NULL,                                   /* begin_update */
-	dmd64_update_row,                                   /* update_row */
-	NULL,                                   /* end_update */
-	DEVCB_NULL,      /* on_de_changed */
-	DEVCB_NULL,      /* on_cur_changed */
-	DEVCB_NULL,      /* on_hsync_changed */
-	DEVCB_NULL,      /* on_vsync_changed */
+	false,              /* show border area */
+	0,0,0,0,            /* visarea adjustment */
+	16,                 /* number of pixels per video memory address */
+	NULL,               /* begin_update */
+	dmd64_update_row,   /* update_row */
+	NULL,               /* end_update */
+	DEVCB_NULL,         /* on_de_changed */
+	DEVCB_NULL,         /* on_cur_changed */
+	DEVCB_NULL,         /* on_hsync_changed */
+	DEVCB_NULL,         /* on_vsync_changed */
 	NULL
 };
 

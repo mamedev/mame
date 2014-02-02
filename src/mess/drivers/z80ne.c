@@ -99,7 +99,6 @@
 #include "machine/ram.h"
 
 /* peripheral chips */
-#include "machine/kr2376.h"
 #include "machine/wd17xx.h"
 
 /* Layout */

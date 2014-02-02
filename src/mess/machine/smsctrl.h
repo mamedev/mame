@@ -118,6 +118,7 @@ extern const device_type SMS_CONTROL_PORT;
 #include "machine/sms_lphaser.h"
 #include "machine/sms_paddle.h"
 #include "machine/sms_sports.h"
+#include "machine/sms_sportsjp.h"
 #include "machine/sms_rfu.h"
 
 SLOT_INTERFACE_EXTERN( sms_control_port_devices );

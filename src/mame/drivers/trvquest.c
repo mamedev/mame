@@ -153,6 +153,9 @@ MACHINE_START_MEMBER(gameplan_state,trvquest)
 	save_item(NAME(m_video_y));
 	save_item(NAME(m_video_command));
 	save_item(NAME(m_video_data));
+
+	/* this is needed for trivia quest */
+	m_via_0->write_pb5(1);
 }
 
 MACHINE_RESET_MEMBER(gameplan_state,trvquest)
@@ -193,7 +196,6 @@ static MACHINE_CONFIG_START( trvquest, gameplan_state )
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
-	MCFG_VIA6522_READPB_HANDLER(READ8(gameplan_state,vblank_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, video_data_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, gameplan_video_command_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, video_command_trigger_w))

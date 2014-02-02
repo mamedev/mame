@@ -913,12 +913,12 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
 //  popmessage("Lamps B: %02X", data);
 }
 
-WRITE8_MEMBER(funworld_state::pia1_ca2_w)
+WRITE_LINE_MEMBER(funworld_state::pia1_ca2_w)
 {
 /* TAB and Impera games are writing 0x01 constantly, and 0x00 with each screen change.
    This line is tied to sort of reset circuitery.
 */
-//  popmessage("PIA1 CA2: %02X", data);
+//  popmessage("PIA1 CA2: %02X", state);
 }
 
 
@@ -2408,7 +2408,6 @@ GFXDECODE_END
 *    PIA Interfaces    *
 ***********************/
 
-static const pia6821_interface pia0_intf =
 /*
     TAB light green board
     ---------------------
@@ -2466,36 +2465,6 @@ static const pia6821_interface pia0_intf =
          '-----------------'                         '-----------------'
 
 */
-{
-	DEVCB_INPUT_PORT("IN0"),    /* port A in */
-	DEVCB_INPUT_PORT("IN1"),    /* port B in */
-	DEVCB_NULL,                 /* line CA1 in */
-	DEVCB_NULL,                 /* line CB1 in */
-	DEVCB_NULL,                 /* line CA2 in */
-	DEVCB_NULL,                 /* line CB2 in */
-	DEVCB_NULL,                 /* port A out */
-	DEVCB_NULL,                 /* port B out */
-	DEVCB_NULL,                 /* line CA2 out */
-	DEVCB_NULL,                 /* port CB2 out */
-	DEVCB_NULL,                 /* IRQA */
-	DEVCB_NULL                  /* IRQB */
-};
-
-static const pia6821_interface pia1_intf =
-{
-	DEVCB_INPUT_PORT("IN2"),    /* port A in */
-	DEVCB_INPUT_PORT("DSW"),    /* port B in */
-	DEVCB_NULL,                 /* line CA1 in */
-	DEVCB_NULL,                 /* line CB1 in */
-	DEVCB_NULL,                 /* line CA2 in */
-	DEVCB_NULL,                 /* line CB2 in */
-	DEVCB_NULL,                 /* port A out */
-	DEVCB_NULL,                 /* port B out */
-	DEVCB_DRIVER_MEMBER(funworld_state, pia1_ca2_w),    /* line CA2 out */
-	DEVCB_NULL,                 /* port CB2 out */
-	DEVCB_NULL,                 /* IRQA */
-	DEVCB_NULL                  /* IRQB */
-};
 
 /* these ports are set to output anyway, but this quietens the log */
 READ8_MEMBER(funworld_state::funquiz_ay8910_a_r)
@@ -2539,6 +2508,7 @@ static const ay8910_interface funquiz_ay8910_intf =
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -2563,8 +2533,14 @@ static MACHINE_CONFIG_START( fw1stpal, funworld_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PIA6821_ADD("pia0", pia0_intf)
-	MCFG_PIA6821_ADD("pia1", pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(funworld_state, pia1_ca2_w))
 
 	/* video hardware */
 

@@ -202,6 +202,20 @@ void mos6551_device::update_serial()
 {
 	int brg = m_ctrl & CTRL_BRG_MASK;
 
+	int data_bits_count;
+	switch (m_ctrl & CTRL_WL_MASK)
+	{
+	case CTRL_WL_8: default: data_bits_count = 8; break;
+	case CTRL_WL_7: data_bits_count = 7; break;
+	case CTRL_WL_6: data_bits_count = 6; break;
+	case CTRL_WL_5: data_bits_count = 5; break;
+	}
+
+	parity_t parity = PARITY_NONE;
+	stop_bits_t stop_bits = STOP_BITS_1;
+
+	set_data_frame(1, data_bits_count, parity, stop_bits);
+
 	if (brg == CTRL_BRG_16X_EXTCLK)
 	{
 		set_rcv_rate(m_ext_rxc / 16);
@@ -221,20 +235,6 @@ void mos6551_device::update_serial()
 		{
 			set_rcv_rate(m_ext_rxc / 16);
 		}
-
-		int num_data_bits = 8;
-		int stop_bit_count = 1;
-		int parity_code = PARITY_NONE;
-
-		switch (m_ctrl & CTRL_WL_MASK)
-		{
-		case CTRL_WL_8: num_data_bits = 8; break;
-		case CTRL_WL_7: num_data_bits = 7; break;
-		case CTRL_WL_6: num_data_bits = 6; break;
-		case CTRL_WL_5: num_data_bits = 5; break;
-		}
-
-		set_data_frame(num_data_bits, stop_bit_count, parity_code, false);
 	}
 
 	if (m_cmd & CMD_DTR)

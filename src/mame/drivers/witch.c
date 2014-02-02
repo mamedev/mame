@@ -31,7 +31,7 @@ ES-9104 PCB:
 |  VR1     ES8712    BAT1             |
 +-------------------------------------+
 
-       Z80A: Two Z80A CPUs frequency unknown (3MHz? 12MHz/4) (CPU2 used mainly for sound effects)
+       Z80A: Two Z80A CPUs frequency unknown (4MHz? 12MHz/3) (CPU2 used mainly for sound effects)
      YM2203: Two Yamaha YM2203+YM3014B sound chip combos. Frequency unknown (music + sound effects + video scrolling access)
       M5202: OKI M5202 ADPCM Speech Synthesis IC @ 384kHz
      ES8712: Excellent System ES-8712 Streaming single channel ADPCM, frequency unknown (samples)
@@ -721,7 +721,7 @@ F180 kkkbbppp ; Read onPORT 0xA005
 	PORT_DIPSETTING(    0x00, DEF_STR(High) )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW5:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW5:6" )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown Use" )   PORT_DIPLOCATION("SW5:7") /* As defined in the Excellent System version manual */
+	PORT_DIPNAME( 0x40, 0x00, "Unknown Use" )   PORT_DIPLOCATION("SW5:7") /* As defined in the Excellent System version manual */
 	PORT_DIPSETTING(    0x40, "Matrix" )
 	PORT_DIPSETTING(    0x00, "Straight (Normal)" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW5:8" )
@@ -827,12 +827,12 @@ INTERRUPT_GEN_MEMBER(witch_state::witch_sub_interrupt)
 
 static MACHINE_CONFIG_START( witch, witch_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)    /* 3MHz?? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 3)    /* 4MHz?? */
 	MCFG_CPU_PROGRAM_MAP(map_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_main_interrupt)
 
 	/* 2nd z80 */
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 4)    /* 3MHz?? */
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 3)    /* 4MHz?? */
 	MCFG_CPU_PROGRAM_MAP(map_sub)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_sub_interrupt)
 

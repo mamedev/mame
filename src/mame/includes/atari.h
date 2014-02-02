@@ -17,13 +17,7 @@
 
 /*----------- defined in machine/atari.c -----------*/
 
-extern const pia6821_interface atarixl_pia_interface;
-
-/* These handlers are needed by MESS Atari 8bit drivers (for their custom pia_interface) */
-DECLARE_READ8_DEVICE_HANDLER(atari_pia_pa_r);
-DECLARE_READ8_DEVICE_HANDLER(atari_pia_pb_r);
-DECLARE_WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w);
-WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w);
+void a600xl_mmu(running_machine &machine, UINT8 new_mmu);
 
 
 /* This is needed in MESS as well for Atari 8bit drivers */

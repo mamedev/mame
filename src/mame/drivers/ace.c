@@ -40,20 +40,21 @@ A1                   2101            2101
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
-#include "ace.lh"
-
 #define MASTER_CLOCK XTAL_18MHz
 
-// ace_state was also defined in mess/drivers/ace.c
+
 class aceal_state : public driver_device
 {
 public:
 	aceal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_scoreram(*this, "scoreram"),
 		m_ram2(*this, "ram2"),
-		m_characterram(*this, "characterram"),
-		m_maincpu(*this, "maincpu") { }
+		m_characterram(*this, "characterram")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
 
 	/* video-related */
 	required_shared_ptr<UINT8> m_scoreram;
@@ -72,7 +73,6 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ace_postload();
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -129,8 +129,8 @@ UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitma
 
 void aceal_state::palette_init()
 {
-	palette_set_color(machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* white */
-	palette_set_color(machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* black */
+	palette_set_color(machine(), 0, MAKE_RGB(0x00,0x00,0x00)); /* black */
+	palette_set_color(machine(), 1, MAKE_RGB(0xff,0xff,0xff)); /* white */
 }
 
 
@@ -362,7 +362,6 @@ static MACHINE_CONFIG_START( ace, aceal_state )
 
 	/* sound hardware */
 	/* ???? */
-
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -385,4 +384,4 @@ ROM_START( ace )
 ROM_END
 
 
-GAMEL(1976, ace, 0, ace, ace, driver_device, 0, ROT0, "Allied Leisure", "Ace", GAME_SUPPORTS_SAVE | GAME_NO_SOUND, layout_ace ) // color overlay assumed from flyer
+GAME( 1976, ace, 0, ace, ace, driver_device, 0, ROT0, "Allied Leisure", "Ace", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )

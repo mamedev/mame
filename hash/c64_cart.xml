@@ -6260,38 +6260,38 @@
 		</part>
 	</software>
 
-	<software name="formel64" supported="no">
-		<description>Formel 64</description>
+	<software name="magicfrm">
+		<description>Magic Formel (v1.1)</description>
 		<year>1986</year>
 		<publisher>Grewe Computertechnik</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="magic_formel" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
-			<dataarea name="romh" size="0x10000">
+			<dataarea name="romh" size="0x20000">
 				<rom name="magic_formel_v1.1_1986_ori.bin" size="0x10000" crc="71dc4e30" sha1="329c4e73150e4520cc11924e220210cec3bf78f6" offset="0x0000" />
 			</dataarea>
 			<dataarea name="ram" size="0x2000"/>
 		</part>
 	</software>
 
-	<software name="magicfor" cloneof="formel64" supported="no">
-		<description>Magic Formel</description>
+	<software name="magicfrm12" cloneof="magicfrm">
+		<description>Magic Formel (v1.2)</description>
 		<year>1986</year>
 		<publisher>Grewe Computertechnik</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="magic_formel" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
-			<dataarea name="romh" size="0x10000">
+			<dataarea name="romh" size="0x20000">
 				<rom name="magic_formel_v1.2_1986_ori.bin" size="0x10000" crc="dfc8b7f3" sha1="7c2e12ee2836157af9f811e1c9017bff542c8cfa" offset="0x0000" />
 			</dataarea>
 			<dataarea name="ram" size="0x2000"/>
 		</part>
 	</software>
 
-	<software name="magicf20" cloneof="formel64" supported="no">
-		<description>Magic Formel 2.0</description>
+	<software name="magicfrm20" cloneof="magicfrm">
+		<description>Magic Formel (v2.0)</description>
 		<year>1987</year>
 		<publisher>Grewe Computertechnik</publisher>
 		<part name="cart" interface="c64_cart">
@@ -6300,7 +6300,7 @@
 			<feature name="game" value="1" />
 			<dataarea name="romh" size="0x20000">
 				<rom name="magic_formel_v2.0_1987_1st_eprom.bin" size="0x10000" crc="030e0031" sha1="a78323a25fc9e93f6008669948c93afe2b14a63f" offset="0x00000" />
-				<rom name="magic_formel_v2.0_1987_2nd_eprom.bin" size="0x8000" crc="5d5ce3e8" sha1="80db6efd099c66fccd0d6337226c3f786bed5b71" offset="0x18000" />
+				<rom name="magic_formel_v2.0_1987_2nd_eprom.bin" size="0x8000" crc="5d5ce3e8" sha1="80db6efd099c66fccd0d6337226c3f786bed5b71" offset="0x10000" />
 			</dataarea>
 			<dataarea name="ram" size="0x2000"/>
 		</part>

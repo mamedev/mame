@@ -192,24 +192,6 @@ INTERRUPT_GEN_MEMBER(nyny_state::update_pia_1)
 }
 
 
-static const pia6821_interface pia_1_intf =
-{
-	DEVCB_INPUT_PORT("IN0"),        /* port A in */
-	DEVCB_INPUT_PORT("IN1"),        /* port B in */
-	DEVCB_NULL,                     /* line CA1 in */
-	DEVCB_NULL,                     /* line CB1 in */
-	DEVCB_NULL,                     /* line CA2 in */
-	DEVCB_NULL,                     /* line CB2 in */
-	DEVCB_NULL,                     /* port A out */
-	DEVCB_NULL,                     /* port B out */
-	DEVCB_NULL,                     /* line CA2 out */
-	DEVCB_NULL,                     /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq),      /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq)       /* IRQB */
-};
-
-
-
 /*************************************
  *
  *  PIA2
@@ -233,24 +215,6 @@ WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
 	/* bits 5-7 go to the music board connector */
 	audio_2_command_w(m_maincpu->space(AS_PROGRAM), 0, data & 0xe0);
 }
-
-
-static const pia6821_interface pia_2_intf =
-{
-	DEVCB_NULL,                     /* port A in */
-	DEVCB_NULL,                     /* port B in */
-	DEVCB_NULL,                     /* line CA1 in */
-	DEVCB_NULL,                     /* line CB1 in */
-	DEVCB_NULL,                     /* line CA2 in */
-	DEVCB_NULL,                     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(nyny_state,pia_2_port_a_w), /* port A out */
-	DEVCB_DRIVER_MEMBER(nyny_state,pia_2_port_b_w), /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,flipscreen_w),      /* line CA2 out */
-	DEVCB_NULL,                     /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_firq),     /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(nyny_state,main_cpu_irq)       /* IRQB */
-};
-
 
 
 /*************************************
@@ -428,6 +392,7 @@ WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,                  /* show border area */
+	0,0,0,0,                /* visarea adjustment */
 	8,                      /* number of pixels per video memory address */
 	begin_update,           /* before pixel update callback */
 	update_row,             /* row update callback */
@@ -725,8 +690,18 @@ static MACHINE_CONFIG_START( nyny, nyny_state )
 	/* 74LS123 */
 	MCFG_TTL74123_ADD("ic48_1", ic48_1_config)
 
-	MCFG_PIA6821_ADD("pia1", pia_1_intf)
-	MCFG_PIA6821_ADD("pia2", pia_2_intf)
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(nyny_state, main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(nyny_state, main_cpu_irq))
+
+	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(nyny_state,pia_2_port_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(nyny_state,pia_2_port_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(nyny_state,flipscreen_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(nyny_state,main_cpu_firq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(nyny_state,main_cpu_irq))
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

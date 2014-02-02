@@ -232,6 +232,7 @@ static MC6845_UPDATE_ROW( update_row )
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,              /* show border area */
+	0,0,0,0,            /* visarea adjustment */
 	8,                  /* number of pixels per video memory address */
 	NULL,               /* before pixel update callback */
 	update_row,         /* row update callback */
@@ -275,22 +276,6 @@ READ_LINE_MEMBER( tavernie_state::ca1_r )
 	return (m_cass->input() > +0.01);
 }
 
-static const pia6821_interface mc6821_intf =
-{
-	DEVCB_DRIVER_MEMBER(tavernie_state, pa_r),     /* port A input */
-	DEVCB_NULL,     /* port B input */
-	DEVCB_DRIVER_LINE_MEMBER(tavernie_state, ca1_r),     /* CA1 input */
-	DEVCB_NULL,     /* CB1 input */
-	DEVCB_NULL,     /* CA2 input */
-	DEVCB_NULL,     /* CB2 input */
-	DEVCB_DRIVER_MEMBER(tavernie_state, pa_w),     /* port A output */
-	DEVCB_DRIVER_MEMBER(tavernie_state, pb_w),     /* port B output */
-	DEVCB_NULL,     /* CA2 output */
-	DEVCB_NULL,     /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
-};
-
 READ8_MEMBER( tavernie_state::pb_ivg_r )
 {
 	UINT8 ret = m_term_data;
@@ -302,22 +287,6 @@ WRITE8_MEMBER( tavernie_state::pa_ivg_w )
 {
 // bits 0-3 are attribute bits
 }
-
-static const pia6821_interface pia_ivg_intf =
-{
-	DEVCB_NULL,     /* port A input */
-	DEVCB_DRIVER_MEMBER(tavernie_state, pb_ivg_r),     /* port B input */
-	DEVCB_NULL,     /* CA1 input */
-	DEVCB_NULL,     /* CB1 input */
-	DEVCB_NULL,     /* CA2 input */
-	DEVCB_NULL,     /* CB2 input */
-	DEVCB_DRIVER_MEMBER(tavernie_state, pa_ivg_w),     /* port A output */
-	DEVCB_NULL,     /* port B output */
-	DEVCB_NULL,     /* CA2 output */
-	DEVCB_DEVICE_LINE_MEMBER("beeper", beep_device, set_state),     /* CB2 output */
-	DEVCB_NULL,    /* IRQA output */
-	DEVCB_NULL     /* IRQB output */
-};
 
 // all i/o lines connect to the 40-pin expansion connector
 static const ptm6840_interface mc6840_intf =
@@ -369,7 +338,14 @@ static MACHINE_CONFIG_START( cpu09, tavernie_state )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rx))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_PIA6821_ADD("pia", mc6821_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(tavernie_state, pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(tavernie_state, ca1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tavernie_state, pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tavernie_state, pb_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+
 	MCFG_PTM6840_ADD("ptm", mc6840_intf)
 	MCFG_ACIA6850_ADD("acia", mc6850_intf)
 MACHINE_CONFIG_END
@@ -398,7 +374,12 @@ static MACHINE_CONFIG_DERIVED( ivg09, cpu09 )
 	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000, mc6845_intf) // unknown clock
-	MCFG_PIA6821_ADD("pia_ivg", pia_ivg_intf)
+
+	MCFG_DEVICE_ADD("pia_ivg", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(tavernie_state, pb_ivg_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tavernie_state, pa_ivg_w))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("beeper", beep_device, set_state))
+
 	MCFG_FD1795x_ADD("fdc", XTAL_8MHz / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

@@ -197,18 +197,6 @@ WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
 	m_sq1panel->rx_w(state);
 }
 
-static const duartn68681_config duart_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(esqkt_state, duart_irq_handler),
-	DEVCB_DRIVER_LINE_MEMBER(esqkt_state, duart_tx_a),
-	DEVCB_DRIVER_LINE_MEMBER(esqkt_state, duart_tx_b),
-	DEVCB_DRIVER_MEMBER(esqkt_state, duart_input),
-	DEVCB_DRIVER_MEMBER(esqkt_state, duart_output),
-
-	500000, 500000,    // IP3, IP4
-	1000000, 1000000, // IP5, IP6
-};
-
 static const es5506_interface es5506_config =
 {
 	"waverom",  /* Bank 0 */
@@ -253,7 +241,14 @@ static MACHINE_CONFIG_START( kt, esqkt_state )
 
 	MCFG_ESQPANEL2x40_SQ1_ADD("sq1panel", esqpanel_config)
 
-	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
+	MCFG_DUARTN68681_ADD("duart", 4000000)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esqkt_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_a))
+	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esqkt_state, duart_tx_b))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(esqkt_state, duart_input))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esqkt_state, duart_output))
+	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
+	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart", duartn68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx

@@ -40,6 +40,7 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/econet \
 	$(EMUOBJ)/bus/ep64 \
 	$(EMUOBJ)/bus/ieee488 \
+	$(EMUOBJ)/bus/imi7000 \
 	$(EMUOBJ)/bus/isbx \
 	$(EMUOBJ)/bus/pc_kbd \
 	$(EMUOBJ)/bus/pet \
@@ -60,8 +61,6 @@ OBJDIRS += \
 	$(EMUOBJ)/bus/z88 \
 	$(EMUOBJ)/drivers \
 	$(EMUOBJ)/machine \
-	$(EMUOBJ)/netlist \
-	$(EMUOBJ)/netlist/devices \
 	$(EMUOBJ)/layout \
 	$(EMUOBJ)/imagedev \
 	$(EMUOBJ)/ui \
@@ -147,10 +146,10 @@ EMUOBJS = \
 	$(EMUOBJ)/uiimage.o \
 	$(EMUOBJ)/uiinput.o \
 	$(EMUOBJ)/uiswlist.o \
-	$(EMUOBJ)/uimain.o \
 	$(EMUOBJ)/ui/menu.o \
 	$(EMUOBJ)/ui/menubar.o \
 	$(EMUOBJ)/ui/emenubar.o \
+	$(EMUOBJ)/ui/miscmenu.o \
 	$(EMUOBJ)/ui/selgame.o \
 	$(EMUOBJ)/ui/stackable.o \
 	$(EMUOBJ)/validity.o \

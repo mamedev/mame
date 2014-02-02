@@ -121,15 +121,6 @@ WRITE8_MEMBER(ht68k_state::duart_output)
 	if (m_floppy) {m_floppy->ss_w(BIT(data,3) ? 0 : 1);}
 }
 
-static const duartn68681_config ht68k_duart68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(ht68k_state, duart_irq_handler),
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx), //serial channel CON (console, for terminal, 9600 baud)
-	DEVCB_DRIVER_LINE_MEMBER(ht68k_state, duart_txb), // serial channel AUX (auxiliary, for modem or other serial device, 1200 baud)
-	DEVCB_DRIVER_MEMBER(ht68k_state, duart_input),
-	DEVCB_DRIVER_MEMBER(ht68k_state, duart_output)
-};
-
 static SLOT_INTERFACE_START( ht68k_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -143,7 +134,13 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("duart68681", duartn68681_device, rx_a_w))
 
 	/* video hardware */
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8MHz / 2, ht68k_duart68681_config )
+	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8MHz / 2 )
+	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(ht68k_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("rs232", serial_port_device, tx))
+	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(ht68k_state, duart_txb))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(ht68k_state, duart_input))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(ht68k_state, duart_output))
 
 	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )
 

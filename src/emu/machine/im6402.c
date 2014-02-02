@@ -367,15 +367,15 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 	{
 		if (LOG) logerror("IM6402 '%s' Control Register Load\n", tag());
 
-		int word_length = 5 + ((m_cls2 << 1) | m_cls1);
-		float stop_bits = 1 + (m_sbs ? ((word_length == 5) ? 0.5 : 1) : 0);
-		int parity_code;
+		int data_bit_count = 5 + ((m_cls2 << 1) | m_cls1);
+		stop_bits_t stop_bits = (m_sbs ? ((data_bit_count == 5) ? STOP_BITS_1_5 : STOP_BITS_2) : STOP_BITS_1);
+		parity_t parity;
 
-		if (m_pi) parity_code = PARITY_NONE;
-		else if (m_epe) parity_code = PARITY_EVEN;
-		else parity_code = PARITY_ODD;
+		if (m_pi) parity = PARITY_NONE;
+		else if (m_epe) parity = PARITY_EVEN;
+		else parity = PARITY_ODD;
 
-		set_data_frame(word_length, stop_bits, parity_code, false);
+		set_data_frame(1, data_bit_count, parity, stop_bits);
 	}
 }
 

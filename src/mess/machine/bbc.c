@@ -18,7 +18,6 @@
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "includes/bbc.h"
-#include "machine/upd7002.h"
 #include "machine/i8271.h"
 #include "machine/mc146818.h"
 #include "bus/centronics/ctronics.h"
@@ -582,7 +581,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 				return m_acia->data_read(space,0);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) return 0xfe;                                /* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) return uPD7002_r(machine().device("upd7002"), space, myo-0x18);         /* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) return m_upd7002->read(space, myo-0x18);    /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) return 0xfe;                                /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) return bbcm_wd1770l_read(space, myo-0x24);  /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) return bbcm_wd1770_read(space, myo-0x28);   /* disc control latch */
@@ -616,7 +615,7 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 				m_acia->data_write(space, 0, data);
 		}
 		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10, data);     /* Serial System Chip */
-		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(machine().device("upd7002"), space, myo-0x18, data);         /* A to D converter */
+		if ((myo>=0x18) && (myo<=0x1f)) m_upd7002->write(space, myo-0x18, data);    /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20, data);      /* VideoULA */
 		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24, data);  /* 1770 */
 		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28, data);   /* disc control latch */
@@ -736,7 +735,8 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 {
 	static const char *const colnames[] = {
 		"COL0", "COL1", "COL2", "COL3", "COL4",
-		"COL5", "COL6", "COL7", "COL8", "COL9"
+		"COL5", "COL6", "COL7", "COL8", "COL9",
+		"COL10", "COL11", "COL12"
 	};
 
 	/* only do auto scan if keyboard is not enabled */
@@ -746,7 +746,8 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
 		m_column = (m_column + 1) % 16;
-		if (m_column < 10)
+
+		if (m_column < 13)
 		{
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
@@ -766,45 +767,6 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 		}
 	}
 }
-
-
-INTERRUPT_GEN_MEMBER(bbc_state::bbcm_keyscan)
-{
-	static const char *const colnames[] = {
-		"COL0", "COL1", "COL2", "COL3", "COL4",
-		"COL5", "COL6", "COL7", "COL8", "COL9"
-	};
-
-	/* only do auto scan if keyboard is not enabled */
-	if (m_b3_keyboard == 1)
-	{
-		/* KBD IC1 4 bit addressable counter */
-		/* KBD IC3 4 to 10 line decoder */
-		/* keyboard not enabled so increment counter */
-		m_column = (m_column + 1) % 16;
-
-		/* this IF should be removed as soon as the dip switches (keyboard keys) are set for the master */
-		if (m_column < 10)
-		{
-			/* KBD IC4 8 input NAND gate */
-			/* set the value of via_system ca2, by checking for any keys
-			     being pressed on the selected m_column */
-			if ((ioport(colnames[m_column])->read() | 0x01) != 0xff)
-			{
-				m_via6522_0->write_ca2(1);
-			}
-			else
-			{
-				m_via6522_0->write_ca2(0);
-			}
-		}
-		else
-		{
-			m_via6522_0->write_ca2(0);
-		}
-	}
-}
-
 
 
 int bbc_state::bbc_keyboard(address_space &space, int data)
@@ -814,7 +776,8 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 	int res;
 	static const char *const colnames[] = {
 		"COL0", "COL1", "COL2", "COL3", "COL4",
-		"COL5", "COL6", "COL7", "COL8", "COL9"
+		"COL5", "COL6", "COL7", "COL8", "COL9",
+		"COL10", "COL11", "COL12"
 	};
 
 	m_column = data & 0x0f;
@@ -822,7 +785,7 @@ int bbc_state::bbc_keyboard(address_space &space, int data)
 
 	bit = 0;
 
-	if (m_column < 10)
+	if (m_column < 13)
 	{
 		res = ioport(colnames[m_column])->read();
 	}
@@ -995,6 +958,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b6_caps_lock_led = 1;
 				/* call caps lock led update */
+				output_set_value("capslock_led", m_b6_caps_lock_led);
 			}
 			break;
 		case 7:
@@ -1002,6 +966,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b7_shift_lock_led = 1;
 				/* call shift lock led update */
+				output_set_value("shiftlock_led", m_b7_shift_lock_led);
 			}
 			break;
 		}
@@ -1080,6 +1045,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b6_caps_lock_led = 0;
 				/* call caps lock led update */
+				output_set_value("capslock_led", m_b6_caps_lock_led);
 			}
 			break;
 		case 7:
@@ -1087,6 +1053,7 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 			{
 				m_b7_shift_lock_led = 0;
 				/* call shift lock led update */
+				output_set_value("shiftlock_led", m_b7_shift_lock_led);
 			}
 			break;
 		}
@@ -1210,7 +1177,7 @@ static UPD7002_EOC(BBC_uPD7002_EOC)
 	via_0->write_cb1(data);
 }
 
-const uPD7002_interface bbc_uPD7002 =
+const upd7002_interface bbc_uPD7002 =
 {
 	BBC_get_analogue_input,
 	BBC_uPD7002_EOC
@@ -1291,7 +1258,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 		{
 			if (m_wav_len>(9*3))
 			{
-				//this is to long to recive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
+				//this is too long to receive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
 				logerror ("Cassette length %d\n",m_wav_len);
 				m_nr_high_tones = 0;
 				m_dcd_cass = 0;
@@ -1430,6 +1397,7 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 		m_cass_out_phase = 0;
 		m_cass_out_samples_to_go = 4;
 	}
+	output_set_value("motor_led", !status);
 }
 
 

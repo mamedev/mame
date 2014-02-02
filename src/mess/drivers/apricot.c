@@ -292,6 +292,7 @@ static MC6845_UPDATE_ROW( apricot_update_row )
 static MC6845_INTERFACE( apricot_mc6845_intf )
 {
 	false,
+	0,0,0,0,
 	10,
 	NULL,
 	apricot_update_row,

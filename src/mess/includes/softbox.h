@@ -6,14 +6,14 @@
 #define __SOFTBOX__
 
 #include "emu.h"
+#include "bus/ieee488/ieee488.h"
+#include "bus/imi7000/imi7000.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"
 #include "includes/corvushd.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "bus/ieee488/ieee488.h"
-#include "machine/imi5000h.h"
 #include "machine/serial.h"
 
 #define Z80_TAG         "z80"

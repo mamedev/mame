@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, smf
 /**********************************************************************
 
     SpeedDOS / Burst Nibbler 1541/1571 Parallel Cable emulation
@@ -65,7 +65,7 @@ device_c64_floppy_parallel_interface::~device_c64_floppy_parallel_interface()
 
 c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_BN1541, "C64 Burst Nibbler 1541/1571 Parallel Cable", tag, owner, clock, "c64_bn1541", __FILE__),
-	device_c64_user_port_interface(mconfig, *this),
+	device_pet_user_port_interface(mconfig, *this),
 	device_c64_floppy_parallel_interface(mconfig, *this)
 {
 }
@@ -106,7 +106,14 @@ void c64_bn1541_device::parallel_data_w(UINT8 data)
 {
 	if (LOG) logerror("1541 parallel data %02x\n", data);
 
-	m_parallel_data = data;
+	output_c((data>>0)&1);
+	output_d((data>>1)&1);
+	output_e((data>>2)&1);
+	output_f((data>>3)&1);
+	output_h((data>>4)&1);
+	output_j((data>>5)&1);
+	output_k((data>>6)&1);
+	output_l((data>>7)&1);
 }
 
 
@@ -118,40 +125,28 @@ void c64_bn1541_device::parallel_strobe_w(int state)
 {
 	if (LOG) logerror("1541 parallel strobe %u\n", state);
 
-	m_slot->cia_flag2_w(state);
+	output_b(state);
 }
 
 
 //-------------------------------------------------
-//  c64_pb_r - port B read
+//  update_output
 //-------------------------------------------------
 
-UINT8 c64_bn1541_device::c64_pb_r(address_space &space, offs_t offset)
+void c64_bn1541_device::update_output()
 {
-	return m_parallel_data;
-}
-
-
-//-------------------------------------------------
-//  c64_pb_w - port B write
-//-------------------------------------------------
-
-void c64_bn1541_device::c64_pb_w(address_space &space, offs_t offset, UINT8 data)
-{
-	if (LOG) logerror("C64 parallel data %02x\n", data);
-
 	if (m_other != NULL)
 	{
-		m_other->parallel_data_w(data);
+		m_other->parallel_data_w(m_parallel_output);
 	}
 }
 
 
 //-------------------------------------------------
-//  c64_pc2_w - CIA2 PC write
+//  input_8 - CIA2 PC write
 //-------------------------------------------------
 
-void c64_bn1541_device::c64_pc2_w(int state)
+WRITE_LINE_MEMBER(c64_bn1541_device::input_8)
 {
 	if (LOG) logerror("C64 parallel strobe %u\n", state);
 

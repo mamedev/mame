@@ -73,6 +73,13 @@ typedef void (*mc6845_on_update_addr_changed_func)(mc6845_device *device, int ad
 struct mc6845_interface
 {
 	bool m_show_border_area;        /* visible screen area (false) active display (true) active display + blanking */
+
+	/* visible screen area adjustment */
+	int m_visarea_adjust_min_x;
+	int m_visarea_adjust_max_x;
+	int m_visarea_adjust_min_y;
+	int m_visarea_adjust_max_y;
+
 	int m_hpixels_per_column;       /* number of pixels per video memory address */
 
 	/* if specified, this gets called before any pixel update,

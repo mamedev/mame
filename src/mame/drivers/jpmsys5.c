@@ -529,22 +529,6 @@ WRITE_LINE_MEMBER(jpmsys5_state::u29_cb2_w)
 	logerror("Alarm override enabled \n");
 }
 
-static const pia6821_interface pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(jpmsys5_state,u29_porta_r),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(jpmsys5_state,u29_portb_w),        /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,u29_ca2_w),         /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,u29_cb2_w),         /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,pia_irq),              /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(jpmsys5_state,pia_irq)               /* IRQB */
-};
-
 /*************************************
  *
  *  6840 PTM
@@ -669,7 +653,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
  *************************************/
 
 static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(68000_map)
 
 	MCFG_ACIA6850_ADD("acia6850_0", acia0_if)
@@ -700,7 +684,13 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_PIA6821_ADD("6821pia", pia_intf)
+	MCFG_DEVICE_ADD("6821pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(jpmsys5_state, u29_porta_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(jpmsys5_state, u29_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(jpmsys5_state, u29_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(jpmsys5_state, u29_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
@@ -858,6 +848,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
 	m_vfd->reset();
 }
 
+
 /*************************************
  *
  *  Machine driver
@@ -866,7 +857,8 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
 
 // later (incompatible with earlier revision) motherboards used a YM2413
 MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map)
 
 	MCFG_ACIA6850_ADD("acia6850_0", acia0_if)
@@ -887,7 +879,13 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_PIA6821_ADD("6821pia", pia_intf)
+	MCFG_DEVICE_ADD("6821pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(jpmsys5_state, u29_porta_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(jpmsys5_state, u29_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(jpmsys5_state, u29_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(jpmsys5_state, u29_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
@@ -896,7 +894,7 @@ MACHINE_CONFIG_END
 
 // the first rev PCB used an SAA1099
 MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(68000_awp_map_saa)
 
 	MCFG_ACIA6850_ADD("acia6850_0", acia0_if)
@@ -916,7 +914,13 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_SAA1099_ADD("saa", 4000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_PIA6821_ADD("6821pia", pia_intf)
+	MCFG_DEVICE_ADD("6821pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(jpmsys5_state, u29_porta_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(jpmsys5_state, u29_portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(jpmsys5_state, u29_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(jpmsys5_state, u29_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(jpmsys5_state, pia_irq))
 
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("6840ptm", ptm_intf)

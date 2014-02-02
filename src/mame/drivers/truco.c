@@ -221,7 +221,7 @@ WRITE8_MEMBER(truco_state::porta_w)
 	logerror("Port A writes: %2x\n", data);
 }
 
-WRITE8_MEMBER(truco_state::pia_ca2_w)
+WRITE_LINE_MEMBER(truco_state::pia_ca2_w)
 {
 /*  PIA CA2 line is connected to IC U19, leg 11.
     The IC was successfully identified as MAX691.
@@ -244,14 +244,14 @@ WRITE8_MEMBER(truco_state::portb_w)
 		logerror("Port B writes: %2x\n", data);
 }
 
-WRITE8_MEMBER(truco_state::pia_irqa_w)
+WRITE_LINE_MEMBER(truco_state::pia_irqa_w)
 {
-		logerror("PIA irq A: %2x\n", data);
+	logerror("PIA irq A: %2x\n", state);
 }
 
-WRITE8_MEMBER(truco_state::pia_irqb_w)
+WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
 {
-		logerror("PIA irq B: %2x\n", data);
+	logerror("PIA irq B: %2x\n", state);
 }
 
 
@@ -406,35 +406,13 @@ INTERRUPT_GEN_MEMBER(truco_state::truco_interrupt)
 
 
 /*******************************************
-*              PIA Interfaces              *
-*******************************************/
-/*
-
-*/
-static const pia6821_interface pia0_intf =
-{
-	DEVCB_INPUT_PORT("P1"),     /* port A in */
-	DEVCB_INPUT_PORT("JMPRS"),  /* port B in */
-	DEVCB_NULL,                 /* line CA1 in ??? */
-	DEVCB_NULL,                 /* line CB1 in ??? */
-	DEVCB_NULL,                 /* line CA2 in */
-	DEVCB_NULL,                 /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(truco_state,porta_w),       /* port A out */
-	DEVCB_DRIVER_MEMBER(truco_state,portb_w),       /* port B out */
-	DEVCB_DRIVER_MEMBER(truco_state,pia_ca2_w), /* line CA2 out */
-	DEVCB_NULL,                 /* port CB2 out */
-	DEVCB_DRIVER_MEMBER(truco_state,pia_irqa_w),    /* IRQA */
-	DEVCB_DRIVER_MEMBER(truco_state,pia_irqb_w) /* IRQB */
-};
-
-
-/*******************************************
 *              CRTC Interface              *
 *******************************************/
 
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -459,8 +437,14 @@ static MACHINE_CONFIG_START( truco, truco_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", truco_state,  truco_interrupt)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))    /* 1.6 seconds */
 
-	MCFG_PIA6821_ADD("pia0", pia0_intf)
-
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("P1"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("JMPRS"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(truco_state,porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(truco_state,portb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(truco_state,pia_ca2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(truco_state,pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(truco_state,pia_irqb_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

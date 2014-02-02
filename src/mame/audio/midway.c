@@ -636,27 +636,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  6821 PIA interface
-//-------------------------------------------------
-
-static const pia6821_interface csdeluxe_pia_intf =
-{
-	DEVCB_NULL,     // port A in
-	DEVCB_NULL,     // port B in
-	DEVCB_NULL,     // line CA1 in
-	DEVCB_NULL,     // line CB1 in
-	DEVCB_NULL,     // line CA2 in
-	DEVCB_NULL,     // line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, porta_w),  // port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, portb_w),  // port B out
-	DEVCB_NULL,     // line CA2 out
-	DEVCB_NULL,     // port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, irq_w),   // IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_chip_squeak_deluxe_device, irq_w)    // IRQB
-};
-
-
-//-------------------------------------------------
 //  machine configuration
 //-------------------------------------------------
 
@@ -664,7 +643,11 @@ static MACHINE_CONFIG_FRAGMENT(midway_chip_squeak_deluxe)
 	MCFG_CPU_ADD("cpu", M68000, CSDELUXE_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(csdeluxe_map)
 
-	MCFG_PIA6821_ADD("pia", csdeluxe_pia_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_chip_squeak_deluxe_device, porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_chip_squeak_deluxe_device, portb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_chip_squeak_deluxe_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_chip_squeak_deluxe_device, irq_w))
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
@@ -823,27 +806,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  6821 PIA interface
-//-------------------------------------------------
-
-static const pia6821_interface soundsgood_pia_intf =
-{
-	DEVCB_NULL,     // port A in
-	DEVCB_NULL,     // port B in
-	DEVCB_NULL,     // line CA1 in
-	DEVCB_NULL,     // line CB1 in
-	DEVCB_NULL,     // line CA2 in
-	DEVCB_NULL,     // line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, porta_w), // port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, portb_w), // port B out
-	DEVCB_NULL,     // line CA2 out
-	DEVCB_NULL,     // port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, irq_w),  // IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_sounds_good_device, irq_w)   // IRQB
-};
-
-
-//-------------------------------------------------
 //  machine configuration
 //-------------------------------------------------
 
@@ -851,7 +813,11 @@ static MACHINE_CONFIG_FRAGMENT(midway_sounds_good)
 	MCFG_CPU_ADD("cpu", M68000, SOUNDSGOOD_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(soundsgood_map)
 
-	MCFG_PIA6821_ADD("pia", soundsgood_pia_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_sounds_good_device, porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_sounds_good_device, portb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
@@ -1004,27 +970,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  6821 PIA interface
-//-------------------------------------------------
-
-static const pia6821_interface turbocs_pia_intf =
-{
-	DEVCB_NULL,     // port A in
-	DEVCB_NULL,     // port B in
-	DEVCB_NULL,     // line CA1 in
-	DEVCB_NULL,     // line CB1 in
-	DEVCB_NULL,     // line CA2 in
-	DEVCB_NULL,     // line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, porta_w),       // port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, portb_w),       // port B out
-	DEVCB_NULL,     // line CA2 out
-	DEVCB_NULL,     // port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, irq_w),    // IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_turbo_chip_squeak_device, irq_w)     // IRQB
-};
-
-
-//-------------------------------------------------
 //  machine configuration
 //-------------------------------------------------
 
@@ -1032,7 +977,11 @@ static MACHINE_CONFIG_FRAGMENT(midway_turbo_chip_squeak)
 	MCFG_CPU_ADD("cpu", M6809E, TURBOCS_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(turbocs_map)
 
-	MCFG_PIA6821_ADD("pia", turbocs_pia_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_turbo_chip_squeak_device, porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_turbo_chip_squeak_device, portb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_turbo_chip_squeak_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_turbo_chip_squeak_device, irq_w))
 
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
@@ -1233,43 +1182,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  6821 PIA interfaces
-//-------------------------------------------------
-
-static const pia6821_interface squawkntalk_pia0_intf =
-{
-	DEVCB_NULL,     // port A in
-	DEVCB_NULL,     // port B in
-	DEVCB_NULL,     // line CA1 in
-	DEVCB_NULL,     // line CB1 in
-	DEVCB_NULL,     // line CA2 in
-	DEVCB_NULL,     // line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, porta1_w),  // port A out
-	DEVCB_NULL,     // port B out
-	DEVCB_NULL,     // line CA2 out
-	DEVCB_NULL,     // port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w),    // IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w)     // IRQB
-};
-
-static const pia6821_interface squawkntalk_pia1_intf =
-{
-	DEVCB_NULL,     // port A in
-	DEVCB_NULL,     // port B in
-	DEVCB_NULL,     // line CA1 in
-	DEVCB_NULL,     // line CB1 in
-	DEVCB_NULL,     // line CA2 in
-	DEVCB_NULL,     // line CB2 in
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, porta2_w),      // port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, portb2_w),      // port B out
-	DEVCB_NULL,     // line CA2 out
-	DEVCB_NULL,     // port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w),    // IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, midway_squawk_n_talk_device, irq_w)     // IRQB
-};
-
-
-//-------------------------------------------------
 //  machine configuration
 //-------------------------------------------------
 
@@ -1277,8 +1189,16 @@ static MACHINE_CONFIG_FRAGMENT(midway_squawk_n_talk)
 	MCFG_CPU_ADD("cpu", M6802, SQUAWKTALK_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(squawkntalk_map)
 
-	MCFG_PIA6821_ADD("pia0", squawkntalk_pia0_intf)
-	MCFG_PIA6821_ADD("pia1", squawkntalk_pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_squawk_n_talk_device, porta1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(midway_squawk_n_talk_device, porta2_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(midway_squawk_n_talk_device, portb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_squawk_n_talk_device, irq_w))
 
 	// only used on Discs of Tron, which is stereo
 	MCFG_SOUND_ADD("tms5200", TMS5200, 640000)

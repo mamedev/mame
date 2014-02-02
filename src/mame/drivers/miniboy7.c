@@ -396,6 +396,7 @@ GFXDECODE_END
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -405,27 +406,6 @@ static MC6845_INTERFACE( mc6845_intf )
 	DEVCB_NULL, /* HSYNC callback */
 	DEVCB_NULL, /* VSYNC callback */
 	NULL        /* update address callback */
-};
-
-
-/*********************************
-*         PIA Interface          *
-*********************************/
-
-static const pia6821_interface miniboy7_pia0_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
 };
 
 
@@ -456,7 +436,7 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", miniboy7_state,  nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_PIA6821_ADD("pia0", miniboy7_pia0_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

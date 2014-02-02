@@ -694,22 +694,6 @@ READ8_MEMBER(mpu4vid_state::pia_ic5_porta_track_r)
 	return data;
 }
 
-static const pia6821_interface pia_ic5t_intf =
-{
-	DEVCB_DRIVER_MEMBER(mpu4vid_state,pia_ic5_porta_track_r),       /* port A in */
-	DEVCB_DRIVER_MEMBER(mpu4_state, pia_ic5_portb_r),   /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state, pia_ic5_ca2_w),        /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state, pia_ic5_cb2_w),        /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state, cpu0_irq),         /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mpu4_state, cpu0_irq)          /* IRQB */
-};
-
 
 /*************************************
  *
@@ -1296,7 +1280,7 @@ static void video_reset(device_t *device)
 /* machine start (called only once) */
 MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 {
-	mpu4_config_common(machine());
+	mpu4_config_common();
 
 	m_mod_number=4; //No AY chip
 	/* setup communications */
@@ -1313,7 +1297,7 @@ MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
 {
 	m_vfd->reset(); //for debug ports only
 
-	mpu4_stepper_reset(this);
+	mpu4_stepper_reset();
 
 	m_lamp_strobe    = 0;
 	m_lamp_strobe2   = 0;
@@ -1485,7 +1469,10 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( crmaze, mpu4_vid )
-	MCFG_PIA6821_MODIFY("pia_ic5", pia_ic5t_intf)
+	MCFG_DEVICE_MODIFY("pia_ic5")
+	MCFG_PIA_READPA_HANDLER(READ8(mpu4vid_state, pia_ic5_porta_track_r))
+	MCFG_PIA_WRITEPA_HANDLER(NULL)
+	MCFG_PIA_WRITEPB_HANDLER(NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mating, crmaze )

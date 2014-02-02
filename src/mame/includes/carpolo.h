@@ -122,7 +122,4 @@ public:
 
 /*----------- defined in machine/carpolo.c -----------*/
 
-extern const pia6821_interface carpolo_pia0_intf;
-extern const pia6821_interface carpolo_pia1_intf;
-
 void carpolo_74148_3s_cb(device_t *device);

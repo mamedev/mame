@@ -467,7 +467,7 @@ static void dview_draw_title(DView *dv)
 	}
 }
 
-static int dview_on_mouse(DView *dv, int mx, int my, int button)
+static int dview_on_mouse(DView *dv, int mx, int my, bool button)
 {
 	int clicked = (button && !dview_is_state(dv, VIEW_STATE_BUTTON));
 	int handled = TRUE;

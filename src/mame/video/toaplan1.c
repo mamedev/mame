@@ -217,6 +217,11 @@ void toaplan1_state::toaplan1_create_tilemaps()
 	m_pf2_tilemap->set_transparent_pen(0);
 	m_pf3_tilemap->set_transparent_pen(0);
 	m_pf4_tilemap->set_transparent_pen(0);
+	
+	m_pf1_tilemap->set_scrolldy(0, 0x100); m_pf1_tilemap->set_scrolldx(0, -0x28);
+	m_pf2_tilemap->set_scrolldy(0, 0x100); m_pf2_tilemap->set_scrolldx(0, -0x28);
+	m_pf3_tilemap->set_scrolldy(0, 0x100); m_pf3_tilemap->set_scrolldx(0, -0x28);
+	m_pf4_tilemap->set_scrolldy(0, 0x100); m_pf4_tilemap->set_scrolldx(0, -0x28);
 
 	memset(m_empty_tile, 0x00, sizeof(m_empty_tile));
 }

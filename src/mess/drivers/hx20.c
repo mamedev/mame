@@ -213,7 +213,7 @@ READ8_MEMBER( hx20_state::main_p1_r )
 	data |= m_kbrequest << 5;
 
 	// serial
-	data |= m_sio->pin_r() << 6;
+	data |= m_sio_pin << 6;
 
 	return data;
 }
@@ -271,7 +271,7 @@ READ8_MEMBER( hx20_state::main_p2_r )
 	if (m_slave_sio)
 		data |= m_slave_rx << 3;
 	else
-		data |= m_sio->rx_r() << 3;
+		data |= m_sio_rx << 3;
 
 	return data;
 }
@@ -851,6 +851,8 @@ static MACHINE_CONFIG_START( hx20, hx20_state )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, default_cassette_interface)
 	MCFG_EPSON_SIO_ADD("sio", "tf20")
+	MCFG_EPSON_SIO_RX(WRITELINE(hx20_state, sio_rx_w))
+	MCFG_EPSON_SIO_PIN(WRITELINE(hx20_state, sio_pin_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

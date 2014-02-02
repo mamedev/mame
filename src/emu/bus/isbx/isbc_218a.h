@@ -59,7 +59,7 @@ private:
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
-	bool m_reset;
+	bool m_reset, m_motor;
 };
 
 

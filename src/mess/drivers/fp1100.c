@@ -321,6 +321,7 @@ static const UPD7810_CONFIG fp1100_slave_cpu_config = { TYPE_7801, NULL };
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	fp1100_update_row,      /* row update callback */

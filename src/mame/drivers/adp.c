@@ -316,15 +316,6 @@ MACHINE_RESET_MEMBER(adp_state,skattv)
 	m_register_active = 0;
 }
 
-static const duartn68681_config skattv_duart68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(adp_state, duart_irq_handler),
-	DEVCB_DEVICE_LINE_MEMBER("microtouch", microtouch_serial_device, rx),
-	DEVCB_NULL,
-	DEVCB_INPUT_PORT("DSW1"),
-	DEVCB_NULL
-};
-
 PALETTE_INIT_MEMBER(adp_state,adp)
 {
 	int i;
@@ -640,7 +631,11 @@ static MACHINE_CONFIG_START( quickjac, adp_state )
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
+	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW1"))
+
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", duartn68681_device, rx_a_w) )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -672,7 +667,11 @@ static MACHINE_CONFIG_START( skattv, adp_state )
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
+	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW1"))
+
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", duartn68681_device, rx_a_w) )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -700,7 +699,11 @@ static MACHINE_CONFIG_START( backgamn, adp_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(backgamn_mem)
 
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
+	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 )
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(adp_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+	MCFG_DUARTN68681_INPORT_CALLBACK(IOPORT("DSW1"))
+
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", duartn68681_device, rx_a_w) )
 
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)

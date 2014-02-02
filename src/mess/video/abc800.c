@@ -272,6 +272,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,
+	0,0,0,0,
 	ABC800_CHAR_WIDTH,
 	NULL,
 	abc800m_update_row,

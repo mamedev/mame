@@ -147,14 +147,12 @@ BUSOBJS += $(BUSOBJ)/c64/westermann.o
 BUSOBJS += $(BUSOBJ)/c64/xl80.o
 BUSOBJS += $(BUSOBJ)/c64/zaxxon.o
 BUSOBJS += $(BUSOBJ)/c64/user.o
-BUSOBJS += $(BUSOBJ)/c64/4cga.o
 BUSOBJS += $(BUSOBJ)/c64/4dxh.o
 BUSOBJS += $(BUSOBJ)/c64/4ksa.o
 BUSOBJS += $(BUSOBJ)/c64/4tba.o
 BUSOBJS += $(BUSOBJ)/c64/16kb.o
 BUSOBJS += $(BUSOBJ)/c64/bn1541.o
 BUSOBJS += $(BUSOBJ)/c64/geocable.o
-BUSOBJS += $(BUSOBJ)/c64/vic1011.o
 endif
 
 
@@ -281,6 +279,17 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/isbx/isbx.h,BUSES += IMI7000
+#-------------------------------------------------
+
+ifneq ($(filter IMI7000,$(BUSES)),)
+BUSOBJS += $(BUSOBJ)/imi7000/imi7000.o
+BUSOBJS += $(BUSOBJ)/imi7000/imi5000h.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/bus/isbx/isbx.h,BUSES += ISBX
 #-------------------------------------------------
 
@@ -337,6 +346,7 @@ BUSOBJS += $(BUSOBJ)/pet/exp.o
 BUSOBJS += $(BUSOBJ)/pet/64k.o
 BUSOBJS += $(BUSOBJ)/pet/superpet.o
 BUSOBJS += $(BUSOBJ)/pet/user.o
+BUSOBJS += $(BUSOBJ)/pet/petuja.o
 endif
 
 
@@ -426,6 +436,7 @@ BUSOBJS += $(BUSOBJ)/vic20/vic1111.o
 BUSOBJS += $(BUSOBJ)/vic20/vic1112.o
 BUSOBJS += $(BUSOBJ)/vic20/vic1210.o
 BUSOBJS += $(BUSOBJ)/vic20/user.o
+BUSOBJS += $(BUSOBJ)/vic20/4cga.o
 BUSOBJS += $(BUSOBJ)/vic20/vic1011.o
 endif
 
@@ -560,5 +571,6 @@ endif
 
 ifneq ($(filter CENTRONICS,$(BUSES)),)
 BUSOBJS += $(BUSOBJ)/centronics/ctronics.o
+BUSOBJS += $(BUSOBJ)/centronics/comxpl80.o
 BUSOBJS += $(BUSOBJ)/centronics/covox.o
 endif

@@ -71,7 +71,6 @@ public:
 		, m_crtc(*this, "mc6845")
 	{ }
 
-	DECLARE_READ8_MEMBER(pb_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE8_MEMBER(a6809_address_w);
@@ -86,7 +85,6 @@ public:
 private:
 	UINT8 m_cass_data[4];
 	bool m_cass_state;
-	UINT8 m_term_data;
 	UINT8 m_video_index;
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cass;
@@ -117,7 +115,14 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( a6809_state, a6809)
 {
-	m_term_data = 0;
+	m_via->write_pb0(0);
+	m_via->write_pb1(0);
+	m_via->write_pb2(0);
+	m_via->write_pb3(0);
+	m_via->write_pb4(0);
+	m_via->write_pb5(0);
+	m_via->write_pb6(0);
+	m_via->write_pb7(0);
 }
 
 static MC6845_UPDATE_ROW( a6809_update_row )
@@ -127,6 +132,7 @@ static MC6845_UPDATE_ROW( a6809_update_row )
 static MC6845_INTERFACE( a6809_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	12,
 	NULL,
 	a6809_update_row,
@@ -188,11 +194,6 @@ WRITE8_MEMBER( a6809_state::a6809_register_w )
 		m_cursor_address = data | (temq & 0x3f00);
 }
 
-READ8_MEMBER( a6809_state::pb_r )
-{
-	return m_term_data | m_cass_data[2];
-}
-
 WRITE_LINE_MEMBER( a6809_state::cass_w )
 {
 	m_cass_state = state;
@@ -217,16 +218,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_p)
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_cass_data[2] = ((m_cass_data[1] < 12) ? 128 : 0);
+		m_via->write_pb7(m_cass_data[1] < 12);
 		m_cass_data[1] = 0;
 	}
 }
 
 WRITE8_MEMBER( a6809_state::kbd_put )
 {
-	m_term_data = data & 0x7f;
-	if (data == 8) m_term_data = 0x7f; // allow backspace to work
+	UINT8 d = data & 0x7f;
+	if (d == 8) d = 0x7f; // allow backspace to work
 
+	m_via->write_pb0((d>>0)&1);
+	m_via->write_pb1((d>>1)&1);
+	m_via->write_pb2((d>>2)&1);
+	m_via->write_pb3((d>>3)&1);
+	m_via->write_pb4((d>>4)&1);
+	m_via->write_pb5((d>>5)&1);
+	m_via->write_pb6((d>>6)&1);
 	m_via->write_cb1(1);
 	m_via->write_cb1(0);
 }
@@ -259,7 +267,6 @@ static MACHINE_CONFIG_START( a6809, a6809_state )
 
 	/* Devices */
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
-	MCFG_VIA6522_READPB_HANDLER(READ8(a6809_state, pb_r))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(a6809_state, cass_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
 

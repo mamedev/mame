@@ -141,8 +141,24 @@ static MACHINE_CONFIG_START( dragon_base, dragon_state )
 	MCFG_CPU_PROGRAM_MAP(dragon_mem)
 
 	// devices
-	MCFG_PIA6821_ADD(PIA0_TAG, dragon_state::pia0_config)
-	MCFG_PIA6821_ADD(PIA1_TAG, dragon_state::pia1_config)
+	MCFG_DEVICE_ADD(PIA0_TAG, PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_state, pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(coco_state, pia0_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(coco_state, pia0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(coco_state, pia0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia0_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia0_irq_b))
+
+	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(coco_state, pia1_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(coco_state, pia1_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_state, pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(coco_state, pia1_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(coco_state, pia1_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(coco_state, pia1_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(coco_state, pia1_firq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(coco_state, pia1_firq_b))
+
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL_4_433619MHz, dragon_state::sam6883_config)
 	MCFG_CASSETTE_ADD("cassette", dragon_state::coco_cassette_interface)
 	MCFG_PRINTER_ADD(PRINTER_TAG)
@@ -210,7 +226,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	// pia 2
-	MCFG_PIA6821_ADD( PIA2_TAG, dragon_alpha_state::pia2_config )
+	MCFG_DEVICE_ADD( PIA2_TAG, PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dragon_alpha_state, pia2_pa_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(dragon_alpha_state, pia2_firq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(dragon_alpha_state, pia2_firq_b))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tanodr64, dragon_base )

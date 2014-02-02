@@ -10,18 +10,18 @@
 #include "nl_parser.h"
 #include "nl_util.h"
 #include "devices/nld_system.h"
-#include "devices/nld_solver.h"
-#include "devices/nld_twoterm.h"
+#include "analog/nld_solver.h"
+#include "analog/nld_twoterm.h"
 
 static NETLIST_START(base)
-	NETDEV_TTL_CONST(ttlhigh, 1)
-	NETDEV_TTL_CONST(ttllow, 0)
-    NETDEV_ANALOG_CONST(GND, 0)
+	NETDEV_TTL_INPUT(ttlhigh, 1)
+	NETDEV_TTL_INPUT(ttllow, 0)
+    NETDEV_GND()
 
 	NET_MODEL(".model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
 	NET_MODEL(".model 1N4148 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)")
 	NET_MODEL(".MODEL BC237B NPN(IS=1.8E-14 ISE=5.0E-14 ISC=1.72E-13 XTI=3 BF=400 BR=35.5 IKF=0.14 IKR=0.03 XTB=1.5 VAF=80 VAR=12.5 VJE=0.58 VJC=0.54 RE=0.6 RC=0.25 RB=0.56 CJE=13E-12 CJC=4E-12 XCJC=0.75 FC=0.5 NF=0.9955 NR=1.005 NE=1.46 NC=1.27 MJE=0.33 MJC=0.33 TF=0.64E-9 TR=50.72E-9 EG=1.11 KF=0 AF=1 VCEO=45V ICRATING=100M MFG=ZETEX)")
-
+	NET_MODEL(".model BC556B PNP(IS=3.83E-14 NF=1.008 ISE=1.22E-14 NE=1.528 BF=344.4 IKF=0.08039 VAF=21.11 NR=1.005 ISC=2.85E-13 NC=1.28 BR=14.84 IKR=0.047 VAR=32.02 RB=1 IRB=1.00E-06 RBM=1 RE=0.6202 RC=0.5713 XTB=0 EG=1.11 XTI=3 CJE=1.23E-11 VJE=0.6106 MJE=0.378 TF=5.60E-10 XTF=3.414 VTF=5.23 ITF=0.1483 PTF=0 CJC=1.08E-11 VJC=0.1022 MJC=0.3563 XCJC=0.6288 TR=1.00E-32 CJS=0 VJS=0.75 MJS=0.333 FC=0.8027 Vceo=65 Icrating=100m mfg=Philips)")
 NETLIST_END()
 
 
@@ -60,7 +60,7 @@ netlist_setup_t::~netlist_setup_t()
 netlist_device_t *netlist_setup_t::register_dev(netlist_device_t *dev, const pstring &name)
 {
 	if (!(netlist().m_devices.add(name, dev, false)==TMERR_NONE))
-		netlist().xfatalerror("Error adding %s to device list\n", name.cstr());
+		netlist().error("Error adding %s to device list\n", name.cstr());
 	return dev;
 }
 
@@ -86,18 +86,18 @@ void netlist_setup_t::remove_dev(const pstring &name)
 	netlist_device_t *dev = netlist().m_devices.find(name);
 	pstring temp = name + ".";
 	if (dev == NULL)
-		netlist().xfatalerror("Device %s does not exist\n", name.cstr());
+		netlist().error("Device %s does not exist\n", name.cstr());
 
 	//remove_start_with<tagmap_input_t>(m_inputs, temp);
 	remove_start_with<tagmap_terminal_t>(m_terminals, temp);
 	remove_start_with<tagmap_param_t>(m_params, temp);
 
-	tagmap_link_t::entry_t *p = m_links.first();
+	const link_t *p = m_links.first();
 	while (p != NULL)
 	{
-		tagmap_link_t::entry_t *n = m_links.next(p);
-		if (temp.equals(p->object().e1.substr(0,temp.len())) || temp.equals(p->object().e2.substr(0,temp.len())))
-			m_links.remove(p->object());
+	    const link_t *n = m_links.next(p);
+		if (temp.equals(p->e1.substr(0,temp.len())) || temp.equals(p->e2.substr(0,temp.len())))
+			m_links.remove(*p);
 		p = n;
 	}
 	netlist().m_devices.remove(name);
@@ -112,7 +112,7 @@ void netlist_setup_t::register_alias(const pstring &alias, const pstring &out)
 {
 	//if (!(m_alias.add(alias, new nstring(out), false)==TMERR_NONE))
 	if (!(m_alias.add(alias, out, false)==TMERR_NONE))
-		netlist().xfatalerror("Error adding alias %s to alias list\n", alias.cstr());
+		netlist().error("Error adding alias %s to alias list\n", alias.cstr());
 }
 
 pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in)
@@ -142,11 +142,11 @@ pstring netlist_setup_t::objtype_as_astr(netlist_object_t &in)
 			break;
 	}
 	// FIXME: noreturn
-	netlist().xfatalerror("Unknown object type %d\n", in.type());
+	netlist().error("Unknown object type %d\n", in.type());
 	return "Error";
 }
 
-void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const pstring &name, netlist_object_t &obj, const netlist_input_t::state_e state)
+void netlist_setup_t::register_object(netlist_device_t &dev, const pstring &name, netlist_object_t &obj)
 {
 	switch (obj.type())
 	{
@@ -156,12 +156,12 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
 			{
 				netlist_core_terminal_t &term = dynamic_cast<netlist_core_terminal_t &>(obj);
 				if (obj.isType(netlist_terminal_t::OUTPUT))
-					dynamic_cast<netlist_output_t &>(term).init_object(upd_dev, dev.name() + "." + name);
+					dynamic_cast<netlist_output_t &>(term).init_object(dev, dev.name() + "." + name);
 				else
-					term.init_object(upd_dev, dev.name() + "." + name, state);
+					term.init_object(dev, dev.name() + "." + name);
 
 				if (!(m_terminals.add(term.name(), &term, false)==TMERR_NONE))
-					netlist().xfatalerror("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), term.name().cstr());
+					netlist().error("Error adding %s %s to terminal list\n", objtype_as_astr(term).cstr(), term.name().cstr());
 				NL_VERBOSE_OUT(("%s %s\n", objtype_as_astr(term).cstr(), name.cstr()));
 			}
 			break;
@@ -180,7 +180,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", temp.cstr(), val->cstr()));
 							double vald = 0;
 							if (sscanf(val.cstr(), "%lf", &vald) != 1)
-								netlist().xfatalerror("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
+								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<netlist_param_double_t &>(param).initial(vald);
 						}
 						break;
@@ -190,7 +190,7 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
 							NL_VERBOSE_OUT(("Found parameter ... %s : %s\n", name.cstr(), val->cstr()));
 							int vald = 0;
 							if (sscanf(val.cstr(), "%d", &vald) != 1)
-								netlist().xfatalerror("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
+								netlist().error("Invalid number conversion %s : %s\n", name.cstr(), val.cstr());
 							dynamic_cast<netlist_param_int_t &>(param).initial(vald);
 						}
 						break;
@@ -207,30 +207,31 @@ void netlist_setup_t::register_object(netlist_device_t &dev, netlist_core_device
 							{
 								if (m_models[i].ucase().startsWith(search))
 								{
-									int pl=m_models[i].find("(");
-									int pr=m_models[i].find("(");
-									dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i].substr(pl+1,pr-pl-1));
+									//int pl=m_models[i].find("(");
+									//int pr=m_models[i].find(")");
+									//dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i].substr(pl+1,pr-pl-1));
+                                    dynamic_cast<netlist_param_model_t &>(param).initial(m_models[i]);
 									found = true;
 									break;
 								}
 							}
 							if (!found)
-								netlist().xfatalerror("Model %s not found\n", val.cstr());
+								netlist().error("Model %s not found\n", val.cstr());
 						}
 						break;
 						default:
-							netlist().xfatalerror("Parameter is not supported %s : %s\n", name.cstr(), val.cstr());
+							netlist().error("Parameter is not supported %s : %s\n", name.cstr(), val.cstr());
 					}
 				}
 				if (!(m_params.add(name, &param, false)==TMERR_NONE))
-					netlist().xfatalerror("Error adding parameter %s to parameter list\n", name.cstr());
+					netlist().error("Error adding parameter %s to parameter list\n", name.cstr());
 			}
 			break;
 		case netlist_terminal_t::DEVICE:
-			netlist().xfatalerror("Device registration not yet supported - \n", name.cstr());
+			netlist().error("Device registration not yet supported - \n", name.cstr());
 			break;
 		case netlist_terminal_t::NETLIST:
-			netlist().xfatalerror("Netlist registration not yet supported - \n", name.cstr());
+			netlist().error("Netlist registration not yet supported - \n", name.cstr());
 			break;
 	}
 }
@@ -254,7 +255,7 @@ void netlist_setup_t::register_param(const pstring &param, const pstring &value)
 {
 	//if (!(m_params_temp.add(param, new nstring(value), false)==TMERR_NONE))
 	if (!(m_params_temp.add(param, value, false)==TMERR_NONE))
-		netlist().xfatalerror("Error adding parameter %s to parameter list\n", param.cstr());
+		netlist().error("Error adding parameter %s to parameter list\n", param.cstr());
 }
 
 const pstring netlist_setup_t::resolve_alias(const pstring &name) const
@@ -274,9 +275,9 @@ const pstring netlist_setup_t::resolve_alias(const pstring &name) const
 		pstring dname = ret;
 		netlist_device_t *dev = netlist().m_devices.find(dname.substr(0,p));
 		if (dev == NULL)
-			netlist().xfatalerror("Device for %s not found\n", name.cstr());
+			netlist().error("Device for %s not found\n", name.cstr());
 		int c = atoi(ret.substr(p+2,ret.len()-p-3));
-		temp = dev->name() + "." + dev->m_terminals[c];
+		temp = dev->m_terminals[c];
 		// reresolve ....
 		do {
 			ret = temp;
@@ -302,7 +303,7 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 		ret = m_terminals.find(s);
 	}
 	if (ret == NULL && required)
-		netlist().xfatalerror("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
+		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
 	if (ret != NULL)
 		NL_VERBOSE_OUT(("Found input %s\n", tname.cstr()));
 	return ret;
@@ -322,11 +323,11 @@ netlist_core_terminal_t *netlist_setup_t::find_terminal(const pstring &terminal_
 		ret = m_terminals.find(s);
 	}
 	if (ret == NULL && required)
-		netlist().xfatalerror("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
+		netlist().error("terminal %s(%s) not found!\n", terminal_in.cstr(), tname.cstr());
 	if (ret != NULL && ret->type() != atype)
 	{
 		if (required)
-			netlist().xfatalerror("object %s(%s) found but wrong type\n", terminal_in.cstr(), tname.cstr());
+			netlist().error("object %s(%s) found but wrong type\n", terminal_in.cstr(), tname.cstr());
 		else
 			ret = NULL;
 	}
@@ -342,12 +343,35 @@ netlist_param_t *netlist_setup_t::find_param(const pstring &param_in, bool requi
 
 	ret = m_params.find(outname);
 	if (ret == NULL && required)
-		netlist().xfatalerror("parameter %s(%s) not found!\n", param_in.cstr(), outname.cstr());
+		netlist().error("parameter %s(%s) not found!\n", param_in.cstr(), outname.cstr());
 	if (ret != NULL)
 		NL_VERBOSE_OUT(("Found parameter %s\n", outname.cstr()));
 	return ret;
 }
 
+nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
+{
+    assert(out.isFamily(netlist_terminal_t::LOGIC));
+
+    netlist_logic_output_t &out_cast = dynamic_cast<netlist_logic_output_t &>(out);
+    nld_base_d_to_a_proxy *proxy = out_cast.get_proxy();
+
+    if (proxy == NULL)
+    {
+        // create a new one ...
+        proxy = new nld_d_to_a_proxy(out);
+        pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
+        m_proxy_cnt++;
+
+        proxy->init(netlist(), x);
+        register_dev(proxy, x);
+
+        out.net().register_con(proxy->m_I);
+        out_cast.set_proxy(proxy);
+
+    }
+    return proxy;
+}
 
 void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t &out)
 {
@@ -366,15 +390,9 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 	}
 	else if (out.isFamily(netlist_terminal_t::LOGIC) && in.isFamily(netlist_terminal_t::ANALOG))
 	{
-		nld_d_to_a_proxy *proxy = new nld_d_to_a_proxy(out);
-		pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
-		m_proxy_cnt++;
+        nld_base_d_to_a_proxy *proxy = get_d_a_proxy(out);
 
-		proxy->init(netlist(), x);
-		register_dev(proxy, x);
-
-		proxy->m_Q.net().register_con(in);
-		out.net().register_con(proxy->m_I);
+        proxy->out().net().register_con(in);
 	}
 	else
 	{
@@ -408,7 +426,7 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
 	}
 	else
 	{
-		netlist().xfatalerror("Netlist: Severe Error");
+		netlist().error("Netlist: Severe Error");
 	}
 }
 
@@ -427,23 +445,16 @@ void netlist_setup_t::connect_terminal_output(netlist_terminal_t &in, netlist_ou
 	else if (out.isFamily(netlist_terminal_t::LOGIC))
 	{
 		NL_VERBOSE_OUT(("connect_terminal_output: connecting proxy\n"));
-		nld_d_to_a_proxy *proxy = new nld_d_to_a_proxy(out);
-		pstring x = pstring::sprintf("proxy_da_%d", m_proxy_cnt);
-		m_proxy_cnt++;
-
-		proxy->init(netlist(), x);
-		register_dev(proxy, x);
-
-		out.net().register_con(proxy->m_I);
+		nld_base_d_to_a_proxy *proxy = get_d_a_proxy(out);
 
 		if (in.has_net())
-			proxy->m_Q.net().merge_net(&in.net());
+			proxy->out().net().merge_net(&in.net());
 		else
-			proxy->m_Q.net().register_con(in);
+			proxy->out().net().register_con(in);
 	}
 	else
 	{
-		netlist().xfatalerror("Netlist: Severe Error");
+		netlist().error("Netlist: Severe Error");
 	}
 }
 
@@ -518,7 +529,7 @@ void netlist_setup_t::connect(netlist_core_terminal_t &t1, netlist_core_terminal
 		connect_terminals(dynamic_cast<netlist_terminal_t &>(t1), dynamic_cast<netlist_terminal_t &>(t2));
 	}
 	else
-		netlist().xfatalerror("Connecting %s to %s not supported!\n", t1.name().cstr(), t2.name().cstr());
+		netlist().error("Connecting %s to %s not supported!\n", t1.name().cstr(), t2.name().cstr());
 }
 
 void netlist_setup_t::resolve_inputs()
@@ -526,10 +537,10 @@ void netlist_setup_t::resolve_inputs()
     bool has_twoterms = false;
 
 	NL_VERBOSE_OUT(("Resolving ...\n"));
-	for (tagmap_link_t::entry_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
+	for (const link_t *entry = m_links.first(); entry != NULL; entry = m_links.next(entry))
 	{
-		const pstring t1s = entry->object().e1;
-		const pstring t2s = entry->object().e2;
+		const pstring t1s = entry->e1;
+		const pstring t2s = entry->e2;
 		netlist_core_terminal_t *t1 = find_terminal(t1s);
 		netlist_core_terminal_t *t2 = find_terminal(t2s);
 
@@ -547,12 +558,12 @@ void netlist_setup_t::resolve_inputs()
 	NL_VERBOSE_OUT(("deleting empty nets ...\n"));
 
 	// delete empty nets ...
-	for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+	for (netlist_net_t *const *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
 	{
-		if (pn->object()->m_head == NULL)
+		if ((*pn)->m_head == NULL)
 		{
 			NL_VERBOSE_OUT(("Deleting net ...\n"));
-			netlist_net_t *to_delete = pn->object();
+			netlist_net_t *to_delete = *pn;
 			netlist().m_nets.remove(to_delete);
 			if (!to_delete->isRailNet())
 				delete to_delete;
@@ -563,15 +574,21 @@ void netlist_setup_t::resolve_inputs()
     /* now that nets were deleted ... register all net items */
     NL_VERBOSE_OUT(("late state saving for nets ...\n"));
 
-    for (netlist_net_t::list_t::entry_t *pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
-        pn->object()->late_save_register();
+    for (netlist_net_t * const * pn = netlist().m_nets.first(); pn != NULL; pn = netlist().m_nets.next(pn))
+        (*pn)->late_save_register();
 
     NL_VERBOSE_OUT(("looking for terminals not connected ...\n"));
     for (tagmap_terminal_t::entry_t *entry = m_terminals.first(); entry != NULL; entry = m_terminals.next(entry))
     {
         if (!entry->object()->has_net())
-            netlist().xfatalerror("Found terminal %s without a net\n",
+            netlist().error("Found terminal %s without a net\n",
                     entry->object()->name().cstr());
+        // FIXME: need a warning callback ....
+#if 0
+        else if (entry->object()->net().num_cons() == 0)
+            netlist().error("Found terminal %s without connections\n",
+                    entry->object()->name().cstr());
+#endif
     }
 
 
@@ -583,7 +600,7 @@ void netlist_setup_t::resolve_inputs()
         {
             has_twoterms = true;
             if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
-                netlist().xfatalerror("Found device %s connected only to railterminals %s/%s\n",
+                netlist().error("Found device %s connected only to railterminals %s/%s\n",
                         t->name().cstr(), t->m_N.net().name().cstr(), t->m_P.net().name().cstr());
         }
     }
@@ -593,7 +610,7 @@ void netlist_setup_t::resolve_inputs()
 	if (m_netlist.solver() == NULL)
 	{
 	    if (!has_twoterms)
-	        netlist().xfatalerror("No solver found for this net although analog elements are present\n");
+	        netlist().error("No solver found for this net although analog elements are present\n");
 	}
 	else
 		m_netlist.solver()->post_start();
@@ -622,6 +639,7 @@ void netlist_setup_t::start_devices()
 	/* find the main clock and solver ... */
 	bool has_mainclock = false;
     bool has_solver = false;
+    bool has_gnd = false;
 
 	for (tagmap_devices_t::entry_t *entry = netlist().m_devices.first(); entry != NULL; entry = netlist().m_devices.next(entry))
 	{
@@ -629,17 +647,24 @@ void netlist_setup_t::start_devices()
 		if (dynamic_cast<NETLIB_NAME(mainclock)*>(dev) != NULL)
 		{
 		    if (has_mainclock)
-		        m_netlist.xfatalerror("Found more than one mainclock");
+		        m_netlist.error("Found more than one mainclock");
 			m_netlist.set_mainclock_dev(dynamic_cast<NETLIB_NAME(mainclock)*>(dev));
 			has_mainclock = true;
 		}
 		if (dynamic_cast<NETLIB_NAME(solver)*>(dev) != NULL)
 		{
 		    if (has_solver)
-                m_netlist.xfatalerror("Found more than one solver");
+                m_netlist.error("Found more than one solver");
 			m_netlist.set_solver_dev(dynamic_cast<NETLIB_NAME(solver)*>(dev));
 			has_solver = true;
 		}
+        if (dynamic_cast<NETLIB_NAME(gnd)*>(dev) != NULL)
+        {
+            if (has_gnd)
+                m_netlist.error("Found more than one gnd node");
+            m_netlist.set_gnd_dev(dynamic_cast<NETLIB_NAME(gnd)*>(dev));
+            has_gnd = true;
+        }
 	}
 
 	NL_VERBOSE_OUT(("Initializing devices ...\n"));

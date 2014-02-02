@@ -151,48 +151,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  pia6821_interface pia0_intf
-//-------------------------------------------------
-
-static const pia6821_interface pia0_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  pia6821_interface pia1_intf
-//-------------------------------------------------
-
-static const pia6821_interface pia1_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  ptm6840_interface ptm_intf
 //-------------------------------------------------
 
@@ -306,8 +264,8 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
 	MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)
 
 	// devices
-	MCFG_PIA6821_ADD(MC6821_0_TAG, pia0_intf)
-	MCFG_PIA6821_ADD(MC6821_1_TAG, pia1_intf)
+	MCFG_DEVICE_ADD(MC6821_0_TAG, PIA6821, 0)
+	MCFG_DEVICE_ADD(MC6821_1_TAG, PIA6821, 0)
 	MCFG_PTM6840_ADD(MC6840_TAG, ptm_intf)
 	MCFG_ACIA6850_ADD(MC6850_0_TAG, acia0_intf)
 	MCFG_ACIA6850_ADD(MC6850_1_TAG, acia1_intf)

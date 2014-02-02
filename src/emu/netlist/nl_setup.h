@@ -107,7 +107,7 @@ public:
 
 	netlist_base_t &netlist() { return m_netlist; }
 	const netlist_base_t &netlist() const { return m_netlist; }
-	netlist_factory &factory() { return m_factory; }
+	netlist_factory_t &factory() { return m_factory; }
 
 	netlist_device_t *register_dev(netlist_device_t *dev, const pstring &name);
 	void remove_dev(const pstring &name);
@@ -118,7 +118,7 @@ public:
 	void register_param(const pstring &param, const pstring &value);
 	void register_param(const pstring &param, const double value);
 
-	void register_object(netlist_device_t &dev, netlist_core_device_t &upd_dev, const pstring &name, netlist_object_t &obj, netlist_input_t::state_e state);
+	void register_object(netlist_device_t &dev, const pstring &name, netlist_object_t &obj);
 	void connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
 
 	netlist_core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
@@ -147,7 +147,7 @@ private:
 	tagmap_link_t   m_links;
 	tagmap_nstring_t m_params_temp;
 
-	netlist_factory m_factory;
+	netlist_factory_t m_factory;
 
 	netlist_list_t<pstring> m_models;
 
@@ -162,6 +162,7 @@ private:
 	pstring objtype_as_astr(netlist_object_t &in);
 
 	const pstring resolve_alias(const pstring &name) const;
+	nld_base_d_to_a_proxy *get_d_a_proxy(netlist_output_t &out);
 };
 
 #endif /* NLSETUP_H_ */

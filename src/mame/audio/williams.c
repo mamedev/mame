@@ -203,27 +203,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  6821 PIA interface
-//-------------------------------------------------
-
-static const pia6821_interface cvsd_pia_intf =
-{
-	DEVCB_NULL,     // port A in
-	DEVCB_NULL,     // port B in
-	DEVCB_NULL,     // line CA1 in
-	DEVCB_NULL,     // line CB1 in
-	DEVCB_NULL,     // line CA2 in
-	DEVCB_NULL,     // line CB2 in
-	DEVCB_DEVICE_MEMBER("dac", dac_device, write_unsigned8),        // port A out
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, talkback_w),     // port B out
-	DEVCB_NULL,     // line CA2 out
-	DEVCB_NULL,     // port CB2 out
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, pia_irqa),  // IRQA
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, williams_cvsd_sound_device, pia_irqb)   // IRQB
-};
-
-
-//-------------------------------------------------
 //  machine configuration
 //-------------------------------------------------
 
@@ -231,7 +210,11 @@ static MACHINE_CONFIG_FRAGMENT( williams_cvsd_sound )
 	MCFG_CPU_ADD("cpu", M6809E, CVSD_MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
-	MCFG_PIA6821_ADD("pia", cvsd_pia_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_cvsd_sound_device, talkback_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_cvsd_sound_device, pia_irqa))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_cvsd_sound_device, pia_irqb))
 
 	MCFG_YM2151_ADD("ym2151", CVSD_FM_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(williams_cvsd_sound_device, ym2151_irq_w))

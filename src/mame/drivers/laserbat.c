@@ -178,7 +178,6 @@ static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state )
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(laserbat_csound2_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 
@@ -191,7 +190,6 @@ static ADDRESS_MAP_START( catnmous_io_map, AS_IO, 8, laserbat_state )
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // unknown
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 // the same as in zaccaria.c ?
@@ -614,22 +612,6 @@ WRITE8_MEMBER(laserbat_state::zaccaria_port0b_w)
 	m_last_port0b = data;
 }
 
-static const pia6821_interface pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0a_r),      /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0a_w),      /* port A out */
-	DEVCB_DRIVER_MEMBER(laserbat_state,zaccaria_port0b_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(laserbat_state,zaccaria_irq0a),        /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(laserbat_state,zaccaria_irq0b)     /* IRQB */
-};
-
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -773,8 +755,12 @@ static MACHINE_CONFIG_START( catnmous, laserbat_state )
 	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(laserbat_state, zaccaria_cb1_toggle,  (double)3580000/4096)
 
-	MCFG_PIA6821_ADD("pia", pia_intf)
-
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(laserbat_state, zaccaria_port0a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(laserbat_state, zaccaria_port0a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(laserbat_state, zaccaria_port0b_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(laserbat_state, zaccaria_irq0a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(laserbat_state, zaccaria_irq0b))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

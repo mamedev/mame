@@ -60,7 +60,6 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 protected:
-	optional_ioport m_io_term_frame;
 	required_ioport m_io_term_conf;
 
 	virtual void term_write(UINT8 data);
@@ -70,7 +69,6 @@ protected:
 	virtual void send_key(UINT8 code) { m_keyboard_func(0, code); }
 	UINT8 m_buffer[TERMINAL_WIDTH*50]; // make big enough for teleprinter
 	UINT8 m_x_pos;
-	emu_timer *m_timer;
 private:
 	void scroll_line();
 	void write_char(UINT8 data);
@@ -98,7 +96,8 @@ public:
 	virtual void tx(UINT8 state) { rx_w(state); }
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_INPUT_CHANGED_MEMBER(update_frame);
+	DECLARE_WRITE_LINE_MEMBER(update_serial);
+
 protected:
 	virtual void device_start();
 	virtual void device_config_complete();
@@ -109,7 +108,15 @@ protected:
 	virtual void rcv_complete();
 	virtual void input_callback(UINT8 state) { m_input_state = state; }
 	virtual void send_key(UINT8 code);
+
 private:
+	required_ioport m_io_term_txbaud;
+	required_ioport m_io_term_rxbaud;
+	required_ioport m_io_term_startbits;
+	required_ioport m_io_term_databits;
+	required_ioport m_io_term_parity;
+	required_ioport m_io_term_stopbits;
+
 	serial_port_device *m_owner;
 	bool m_slot;
 	UINT8 m_curr_key;

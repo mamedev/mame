@@ -964,9 +964,21 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,zwackery)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,zwackery)
 
-	MCFG_PIA6821_ADD("pia0", zwackery_pia0_intf)
-	MCFG_PIA6821_ADD("pia1", zwackery_pia1_intf)
-	MCFG_PIA6821_ADD("pia2", zwackery_pia2_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mcr68_state, zwackery_pia0_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(mcr68_state, zwackery_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(mcr68_state, zwackery_pia_irq))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(mcr68_state,zwackery_port_1_r))
+	MCFG_PIA_READPB_HANDLER(READ8(mcr68_state, zwackery_port_2_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mcr68_state, zwackery_pia1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(mcr68_state, zwackery_ca2_w))
+
+	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(mcr68_state, zwackery_port_3_r))
+	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

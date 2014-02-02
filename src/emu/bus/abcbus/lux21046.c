@@ -796,22 +796,22 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, devi
 }
 
 abc830_device::abc830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: luxor_55_21046_device(mconfig, ABC830, "ABC 830", tag, owner, clock, "lux21046", __FILE__)
+	: luxor_55_21046_device(mconfig, ABC830, "ABC 830", tag, owner, clock, "abc830", __FILE__)
 {
 }
 
 abc832_device::abc832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: luxor_55_21046_device(mconfig, ABC832, "ABC 832", tag, owner, clock, "lux21046", __FILE__)
+	: luxor_55_21046_device(mconfig, ABC832, "ABC 832", tag, owner, clock, "abc832", __FILE__)
 {
 }
 
 abc834_device::abc834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: luxor_55_21046_device(mconfig, ABC834, "ABC 834", tag, owner, clock, "lux21046", __FILE__)
+	: luxor_55_21046_device(mconfig, ABC834, "ABC 834", tag, owner, clock, "abc834", __FILE__)
 {
 }
 
 abc838_device::abc838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: luxor_55_21046_device(mconfig, ABC838, "ABC 838", tag, owner, clock, "lux21046", __FILE__)
+	: luxor_55_21046_device(mconfig, ABC838, "ABC 838", tag, owner, clock, "abc838", __FILE__)
 {
 }
 

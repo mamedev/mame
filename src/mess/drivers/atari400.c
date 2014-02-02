@@ -41,7 +41,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
-#include "machine/ataridev.h"
+#include "machine/atarifdc.h"
 #include "imagedev/cartslot.h"
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
@@ -52,6 +52,11 @@
 #include "drivlgcy.h"
 #include "scrlegcy.h"
 
+#define ATARI_5200  0
+#define ATARI_400   1
+#define ATARI_800   2
+#define ATARI_600XL 3
+#define ATARI_800XL 4
 
 /******************************************************************************
     Atari 800 memory map (preliminary)
@@ -320,6 +325,8 @@ public:
 
 	void ms_atari_machine_start(int type, int has_cart);
 	void ms_atari800xl_machine_start(int type, int has_cart);
+
+	WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(machine(), data); }
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -2396,90 +2403,26 @@ static const pokey_interface atari_pokey_interface =
 		DEVCB_INPUT_PORT("analog_7")
 	},
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("fdc", atari_serin_r),
-	DEVCB_DEVICE_HANDLER("fdc", atari_serout_w)
+	DEVCB_DEVICE_MEMBER("fdc", atari_fdc_device, serin_r),
+	DEVCB_DEVICE_MEMBER("fdc", atari_fdc_device, serout_w)
 };
 
 
-static const pia6821_interface atari_pia_interface =
+/**************************************************************
+ *
+ * PIA interface
+ *
+ **************************************************************/
+
+READ8_DEVICE_HANDLER(atari_pia_pa_r)
 {
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
+	return space.machine().root_device().ioport("djoy_0_1")->read_safe(0);
+}
 
-static const pia6821_interface a600xl_pia_interface =
+READ8_DEVICE_HANDLER(atari_pia_pb_r)
 {
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DEVICE_HANDLER("pia", a600xl_pia_pb_w),       /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface a1200xl_pia_interface =
-{
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(a400_state, a1200xl_pia_pb_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface a800xl_pia_interface =
-{
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(a400_state,a800xl_pia_pb_w),        /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface xegs_pia_interface =
-{
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(a400_state,xegs_pia_pb_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DEVICE_LINE("fdc",atarifdc_pia_cb2_w),        /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
+	return space.machine().root_device().ioport("djoy_2_3")->read_safe(0);
+}
 
 // FIXME: should there be anything connected where other system have the fdc?
 static const pokey_interface a5200_pokey_interface =
@@ -2498,23 +2441,6 @@ static const pokey_interface a5200_pokey_interface =
 	DEVCB_NULL, // FIXME: is there anything connected here?
 	DEVCB_NULL  // FIXME: is there anything connected here?
 };
-
-static const pia6821_interface a5200_pia_interface =
-{
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pa_r),        /* port A in */
-	DEVCB_DEVICE_HANDLER("pia", atari_pia_pb_r),    /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */  // FIXME: is there anything connected here
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
 
 /**************************************************************
  *
@@ -2560,7 +2486,10 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 
 	MCFG_VIDEO_START(atari)
 
-	MCFG_PIA6821_ADD( "pia", atari_pia_interface )
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("djoy_0_1"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("djoy_2_3"))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("fdc", atari_fdc_device, pia_cb2_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2581,7 +2510,7 @@ static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_ATARI_FDC_ADD("fdc")
+	MCFG_DEVICE_ADD("fdc", ATARI_FDC, 0)
 MACHINE_CONFIG_END
 
 
@@ -2667,7 +2596,8 @@ static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)    // FIXME?
 	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
 
-	MCFG_PIA6821_MODIFY( "pia", a600xl_pia_interface )
+	MCFG_DEVICE_MODIFY("pia")
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a600xl_pia_pb_w))
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )    // FIXME?
 
@@ -2692,7 +2622,8 @@ static MACHINE_CONFIG_DERIVED( a800xl, atari_common )
 	MCFG_CPU_PROGRAM_MAP(a800xl_mem)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", a800xl_interrupt, "screen", 0, 1)
 
-	MCFG_PIA6821_MODIFY( "pia", a800xl_pia_interface )
+	MCFG_DEVICE_MODIFY("pia")
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a800xl_pia_pb_w))
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
@@ -2721,7 +2652,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a1200xl, a800xl )
 
-	MCFG_PIA6821_MODIFY( "pia", a1200xl_pia_interface )
+	MCFG_DEVICE_MODIFY("pia")
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, a1200xl_pia_pb_w))
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( xegs, a800xl )
@@ -2731,7 +2664,8 @@ static MACHINE_CONFIG_DERIVED( xegs, a800xl )
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, xegs )
 
-	MCFG_PIA6821_MODIFY( "pia", xegs_pia_interface )
+	MCFG_DEVICE_MODIFY("pia")
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(a400_state, xegs_pia_pb_w))
 
 	MCFG_DEVICE_REMOVE("cart1")
 	MCFG_DEVICE_REMOVE("cart_list")
@@ -2762,7 +2696,10 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_PIA6821_MODIFY( "pia", a5200_pia_interface )
+	MCFG_DEVICE_MODIFY("pia")
+	MCFG_PIA_READPA_HANDLER(NULL) // FIXME: is there anything connected here
+	MCFG_PIA_READPB_HANDLER(NULL) // FIXME: is there anything connected here
+	MCFG_PIA_CB2_HANDLER(NULL) // FIXME: is there anything connected here
 
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 

@@ -21,7 +21,7 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ8_MEMBER(serial_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
+	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	UINT8 m_t_c;
 	UINT8 m_out_offs;
 	required_device<cpu_device> m_maincpu;
@@ -53,7 +53,7 @@ static ADDRESS_MAP_START(zac_2_io, AS_IO, 8, zac_2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(data_r,data_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(serial_r,serial_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(serial_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( zac_2 )
@@ -164,7 +164,7 @@ READ8_MEMBER( zac_2_state::serial_r )
 	return 0;
 }
 
-WRITE8_MEMBER( zac_2_state::serial_w )
+WRITE_LINE_MEMBER( zac_2_state::serial_w )
 {
 // to printer
 }
@@ -202,6 +202,7 @@ static MACHINE_CONFIG_START( zac_2, zac_2_state )
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_2_map)
 	MCFG_CPU_IO_MAP(zac_2_io)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(zac_2_state, serial_w))
 	MCFG_NVRAM_ADD_0FILL("ram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_2_inttimer", zac_2_state, zac_2_inttimer, attotime::from_hz(200))

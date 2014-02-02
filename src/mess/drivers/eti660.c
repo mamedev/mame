@@ -212,22 +212,6 @@ WRITE8_MEMBER( eti660_state::pia_pa_w )
 	m_keylatch = data & 0x0f;
 }
 
-static const pia6821_interface eti660_mc6821_intf =
-{
-	DEVCB_DRIVER_MEMBER(eti660_state, pia_pa_r),                                /* port A input */
-	DEVCB_NULL,                                                 /* port B input */
-	DEVCB_NULL,                                                 /* CA1 input */
-	DEVCB_NULL,                                                 /* CB1 input */
-	DEVCB_NULL,                                                 /* CA2 input */
-	DEVCB_NULL,                                                 /* CB2 input */
-	DEVCB_DRIVER_MEMBER(eti660_state, pia_pa_w),                                /* port A output */
-	DEVCB_NULL,                                                 /* port B output */
-	DEVCB_NULL,                                                 /* CA2 output */
-	DEVCB_NULL,                                                 /* CB2 output */
-	DEVCB_NULL,                                                 /* IRQA output */
-	DEVCB_NULL                                                  /* IRQB output */
-};
-
 /* Machine Drivers */
 
 static const cassette_interface eti660_cassette_interface =
@@ -257,7 +241,10 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_PIA6821_ADD(MC6821_TAG, eti660_mc6821_intf)
+	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(eti660_state, pia_pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eti660_state, pia_pa_w))
+
 	MCFG_CASSETTE_ADD("cassette", eti660_cassette_interface)
 
 	/* internal ram */

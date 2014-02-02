@@ -18,7 +18,7 @@
 
     NOTES:
     - First 128k of main program ROM is the BIOS, and after that is a 64-bit MIPS ELF image.
-    - Text layer is (almost?) identical to System 22 & Super System 22.
+    - Text layer is identical to System 22 & Super System 22.
 
     TODO:
     - There are currently no differences seen between System 23 (Time Crisis 2) and
@@ -75,9 +75,9 @@
         clear: c0.Compare = 10d880
         raise: c0.Count   = 10c8e0
                c0.Compare = 10d880
-*/
 
-/*
+
+****************************************************************************
 
 Namco System 23 and Super System 23 Hardware Overview (last updated 7th April 2013 at 12.49am)
 Namco, 1997 - 2000
@@ -4161,6 +4161,51 @@ ROM_START( timecrs2v4a )
 ROM_END
 
 
+ROM_START( aking )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_LOAD16_BYTE( "ag1vera.ic2",   0x000000, 0x200000, CRC(dc98fefb) SHA1(d173c5c6d23f1dae61d448bb6fae27daca525221) )
+	ROM_LOAD16_BYTE( "ag1vera.ic1",   0x000001, 0x200000, CRC(f1a08d5c) SHA1(f11bee1093b237067b84ddec8e1bca0b70fc6678) )
+
+	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "ag1vera.ic3",   0x000000, 0x080000, CRC(266ac71c) SHA1(648a64adc0e4a2cefd71c31a6a71359b6c196430) )
+
+	ROM_REGION( 0x40000, "iocpu", 0 )   /* I/O board MB90F574 MCU code */
+	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flashrom
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data roms */
+	ROM_LOAD16_BYTE( "ag1mtah.2j",  0x0000000, 0x800000, CRC(f2d8ca9d) SHA1(8158d13d74f2aae7c0d1238619ce1ad3a17d8047) )
+	ROM_LOAD16_BYTE( "ag1mtal.2h",  0x0000001, 0x800000, CRC(7facbfd4) SHA1(c42988e274a1b4f40f4b4379e94653ef07429c58) )
+	ROM_LOAD16_BYTE( "ag1mtbh.2m",  0x1000000, 0x800000, CRC(890bdb52) SHA1(a38f039187448ee328547582eab22813ce625615) )
+	ROM_LOAD16_BYTE( "ag1mtbl.2f",  0x1000001, 0x800000, CRC(62d771c9) SHA1(69a47af1366d351157131472756fd05e0fdbf87f) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )   /* texture tiles */
+	ROM_LOAD( "ag1cgll.4m",  0x0000000, 0x800000, CRC(9db7e939) SHA1(7be8d6f6d1e236f2655784493bdf4f9869ecd6eb) )
+	ROM_LOAD( "ag1cglm.4k",  0x0800000, 0x800000, CRC(17792dba) SHA1(367676870820e44b0092d5ff6d4ee4e80bbf91d2) )
+	ROM_LOAD( "ag1cgum.4j",  0x1000000, 0x800000, CRC(5dfa863d) SHA1(a1cde62f00dd8b70538a8eba2aa7ec497cdcaa5c) )
+	ROM_LOAD( "ag1cguu.4f",  0x1800000, 0x800000, CRC(86396786) SHA1(d20121eb7d595567cd3438c66ae4c07dbaaaaeb8) )
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )   /* texture tilemap 0-15 */
+	ROM_LOAD( "ag1ccrl.7f",  0x000000, 0x400000, CRC(86bbe1f9) SHA1(3d8484aadc48638ad2b6806118416ac69345e35a) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )        /* texture tilemap 16-17 + attr */
+	ROM_LOAD( "ag1ccrh.7e",  0x000000, 0x200000, CRC(abe2aab1) SHA1(b43ddf9b0f4a7ac75dc16fa5b2ed86ac5a273a50) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 ) /* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "ag1pt0h.7a",  0x0000000, 0x400000, CRC(b5582ca7) SHA1(0e48b7e3595f9be4e9403a2db939ec140726a880) )
+	ROM_LOAD32_WORD_SWAP( "ag1pt0l.7c",  0x0000002, 0x400000, CRC(10e7f54f) SHA1(caf1d28991a9d082b5ddc5def62586b09fa8aff2) )
+	ROM_LOAD32_WORD_SWAP( "ag1pt1h.5a",  0x0800000, 0x400000, CRC(25e4776a) SHA1(31e7c9dd3aba01e425839a0ffe1eb0001ac16770) )
+	ROM_LOAD32_WORD_SWAP( "ag1pt1l.5c",  0x0800002, 0x400000, CRC(5d3d7099) SHA1(d80d6b692c513945857bcd2c8cfc12b8ec0f3be5) )
+	ROM_LOAD32_WORD_SWAP( "ag1pt2h.4a",  0x1000000, 0x400000, CRC(f0eb9012) SHA1(a867f09162e0b0a4eead0bd212df76ba1abb2c19) )
+	ROM_LOAD32_WORD_SWAP( "ag1pt2l.4c",  0x1000002, 0x400000, CRC(bf92c054) SHA1(9d676c3bb63bf29d7b18fe5d7e6912a922f06350) )
+	ROM_LOAD32_WORD_SWAP( "ag1pt3h.3a",  0x1800000, 0x400000, CRC(e11a12ce) SHA1(4ee78a4d7ada9c26734132baac47b0cbede3d4fd) )
+	ROM_LOAD32_WORD_SWAP( "ag1pt3l.3c",  0x1800002, 0x400000, CRC(04b475db) SHA1(3ea28e51185dc2c2bfa50a87031580524eaacc4a) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "ag1wavel.2c", 0x000000, 0x800000, CRC(d7fefbd4) SHA1(2cf31661feb6aef40621621897be8e0bc248c1d9) )
+	ROM_LOAD( "ag1waveh.2a", 0x800000, 0x800000, CRC(37a61daa) SHA1(34632809f49975d9dc4c76b09ef896df0bc03a52) )
+ROM_END
+
+
 ROM_START( 500gp )
 	/* r4650-generic-xrom-generic: NMON 1.0.8-sys23-19990105 P for SYSTEM23 P1 */
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
@@ -4176,10 +4221,6 @@ ROM_START( 500gp )
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data roms */
 	ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000000, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
 	ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000001, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
-
-		/* COMMON FUJII YASUI WAKAO KURE INOUE
-		 * 0x000000..0x57ffff: all 0xff
-		 */
 	ROM_LOAD16_BYTE( "5gp1mtbh.2m",  0x1000000, 0x800000, CRC(352360e8) SHA1(d621dfac3385059c52d215f6623901589a8658a3) )
 	ROM_LOAD16_BYTE( "5gp1mtbl.2f",  0x1000001, 0x800000, CRC(66640606) SHA1(c69a0219748241c49315d7464f8156f8068e9cf5) )
 
@@ -4833,6 +4874,7 @@ GAME( 1998, panicprk,    0,        s23,         s23,       namcos23_state, s23, 
 GAME( 1998, gunwars,     0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",     GAME_FLAGS )
 GAME( 1998, raceon,      0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Race On! (RO2 Ver. A)",        GAME_FLAGS )
 GAME( 1998, 500gp,       0,        ss23,        s23,       namcos23_state, s23, ROT0, "Namco", "500 GP (5GP3 Ver. C)",         GAME_FLAGS )
+GAME( 1998, aking,       0,        ss23,        s23,       namcos23_state, s23, ROT0, "Namco", "Angler King (AG1 Ver. A)",     GAME_FLAGS )
 GAME( 1999, finfurl2,    0,        gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
 GAME( 1999, finfurl2j,   finfurl2, gmen,        s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
 GAME( 2000, crszone,     0,        ss23e2,      s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)",   GAME_FLAGS )

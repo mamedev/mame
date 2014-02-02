@@ -4,6 +4,7 @@
  */
 
 #include "nld_7493.h"
+#include "../nl_setup.h"
 
 NETLIB_START(7493)
 {
@@ -22,18 +23,30 @@ NETLIB_START(7493)
 	register_subalias("QC", C.m_Q);
 	register_subalias("QD", D.m_Q);
 
-	register_link_internal(C, C.m_I, B.m_Q, netlist_input_t::STATE_INP_HL);
-	register_link_internal(D, D.m_I, C.m_Q, netlist_input_t::STATE_INP_HL);
+	connect(C.m_I, B.m_Q);
+	connect(D.m_I, C.m_Q);
+}
+
+NETLIB_RESET(7493)
+{
+    A.do_reset();
+    B.do_reset();
+    C.do_reset();
+    D.do_reset();
 }
 
 NETLIB_START(7493ff)
 {
-	m_reset = 0;
-
-	register_input("CLK", m_I, netlist_input_t::STATE_INP_HL);
+	register_input("CLK", m_I);
 	register_output("Q", m_Q);
 
 	save(NAME(m_reset));
+}
+
+NETLIB_RESET(7493ff)
+{
+    m_reset = 0;
+    m_I.set_state(netlist_input_t::STATE_INP_HL);
 }
 
 NETLIB_UPDATE(7493ff)

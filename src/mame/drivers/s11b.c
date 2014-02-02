@@ -167,38 +167,6 @@ WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
 		m_bg_hc55516->digit_w(data);
 }
 
-static const pia6821_interface pia21_intf =
-{
-	DEVCB_DRIVER_MEMBER(s11_state, dac_r),      /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_LINE_GND,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, sound_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, sol2_w),     /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_ca2_w),       /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_cb2_w),       /* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
-};
-
-static const pia6821_interface pia24_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_LINE_GND,     /* line CA1 in */
-	DEVCB_LINE_GND,     /* line CB1 in */
-	DEVCB_LINE_VCC,     /* line CA2 in */
-	DEVCB_LINE_VCC,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, lamp0_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, lamp1_w),        /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia24_cb2_w),       /* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
-};
-
 WRITE8_MEMBER( s11b_state::dig1_w )
 {
 	UINT32 seg = get_segment2();
@@ -214,22 +182,6 @@ WRITE8_MEMBER( s11b_state::dig1_w )
 	}
 	set_segment2(seg);
 }
-
-static const pia6821_interface pia28_intf =
-{
-	DEVCB_DRIVER_MEMBER(s11_state, pia28_w7_r),     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, dig0_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(s11b_state, dig1_w),        /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_ca2_w),       /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_cb2_w),       /* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),       /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
-};
 
 WRITE8_MEMBER( s11b_state::pia2c_pa_w )
 {
@@ -263,38 +215,6 @@ WRITE8_MEMBER( s11b_state::pia2c_pb_w )
 	set_segment1(seg);
 }
 
-static const pia6821_interface pia2c_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pa_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(s11b_state, pia2c_pb_w),        /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),   /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
-};
-
-static const pia6821_interface pia30_intf =
-{
-	DEVCB_DRIVER_MEMBER(s11_state, switch_r),       /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_LINE_GND,     /* line CA1 in */
-	DEVCB_LINE_GND,     /* line CB1 in */
-	DEVCB_LINE_VCC,     /* line CA2 in */
-	DEVCB_LINE_VCC,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, switch_w),       /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia30_cb2_w),       /* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),   /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
-};
-
 WRITE8_MEMBER( s11b_state::pia34_pa_w )
 {
 	UINT32 seg = get_segment2();
@@ -311,59 +231,11 @@ WRITE8_MEMBER( s11b_state::pia34_pa_w )
 	set_segment2(seg);
 }
 
-static const pia6821_interface pia34_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11b_state, pia34_pa_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia34_pb_w),     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia34_cb2_w),       /* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),   /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)        /* IRQB */
-};
-
-static const pia6821_interface pias_intf =
-{
-	DEVCB_DRIVER_MEMBER(s11_state, dac_r),      /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),        /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, sound_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, dac_w),      /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca2_w),        /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_cb2_w),        /* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),       /* IRQA */
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)        /* IRQB */
-};
-
 WRITE_LINE_MEMBER( s11b_state::pia40_ca2_w)
 {
 	if(state == ASSERT_LINE)
 		m_ym->reset();
 }
-
-static const pia6821_interface pia40_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),        /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_LINE_VCC,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),     /* port A out */
-	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),     /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11b_state, pia40_ca2_w),      /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),       /* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),     /* IRQA */
-	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)       /* IRQB */
-};
 
 DRIVER_INIT_MEMBER( s11b_state, s11b )
 {
@@ -390,12 +262,51 @@ static MACHINE_CONFIG_START( s11b, s11b_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	/* Devices */
-	MCFG_PIA6821_ADD("pia21", pia21_intf)
-	MCFG_PIA6821_ADD("pia24", pia24_intf)
-	MCFG_PIA6821_ADD("pia28", pia28_intf)
-	MCFG_PIA6821_ADD("pia2c", pia2c_intf)
-	MCFG_PIA6821_ADD("pia30", pia30_intf)
-	MCFG_PIA6821_ADD("pia34", pia34_intf)
+	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(s11_state, dac_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, sol2_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia21_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia21_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+
+	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, lamp1_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia24_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+
+	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(s11_state, pia28_w7_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11a_state, dig0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11b_state, dig1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia28_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia28_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+
+	MCFG_DEVICE_ADD("pia2c", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11b_state, pia2c_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11b_state, pia2c_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+
+	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(s11_state, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, switch_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia30_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+
+	MCFG_DEVICE_ADD("pia34", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11b_state, pia34_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia34_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia34_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Add the soundcard */
@@ -410,7 +321,14 @@ static MACHINE_CONFIG_START( s11b, s11b_state )
 	MCFG_SOUND_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
 
-	MCFG_PIA6821_ADD("pias", pias_intf)
+	MCFG_DEVICE_ADD("pias", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(s11_state, dac_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, dac_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pias_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pias_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 
 	/* Add the background music card */
 	MCFG_CPU_ADD("bgcpu", M6809E, XTAL_8MHz) // MC68B09E (note: schematics show this as 8mhz/2, but games crash very quickly with that speed?)
@@ -428,7 +346,14 @@ static MACHINE_CONFIG_START( s11b, s11b_state )
 	MCFG_SOUND_ADD("hc55516_bg", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
 
-	MCFG_PIA6821_ADD("pia40", pia40_intf)
+	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, pia40_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia40_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s11b_state, pia40_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia40_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, firq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, nmi_line))
+
 MACHINE_CONFIG_END
 
 /*-----------------------

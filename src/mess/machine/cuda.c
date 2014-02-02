@@ -39,7 +39,6 @@
 #include "emu.h"
 #include "cuda.h"
 #include "cpu/m6805/m6805.h"
-#include "machine/6522via.h"
 #include "sound/asc.h"
 #include "includes/mac.h"
 
@@ -130,10 +129,11 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
                     printf("CU ADB: 0->1 time %lld\n", machine().time().as_ticks(1000000) - last_adb_time);
                 }*/
 
+				// allow the linechange handler to override us
 				adb_in = (data & 0x80) ? true : false;
 
 				m_adb_dtime = (int)(machine().time().as_ticks(1000000) - last_adb_time);
-				m_out_adb_func(((data & 0x80) >> 7) ^ 1);
+				write_linechange(((data & 0x80) >> 7) ^ 1);
 
 				last_adb = data & 0x80;
 				last_adb_time = machine().time().as_ticks(1000000);
@@ -155,6 +155,7 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 					printf("CU-> VIA_DATA: %d (PC=%x)\n", (data>>5)&1, m_maincpu->pc());
 					#endif
 					via_data = (data>>5) & 1;
+					write_via_data(via_data);
 				}
 				if (via_clock != ((data>>4)&1))
 				{
@@ -162,8 +163,7 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 					printf("CU-> VIA_CLOCK: %d (PC=%x)\n", ((data>>4)&1)^1, m_maincpu->pc());
 					#endif
 					via_clock = (data>>4) & 1;
-					via6522_device *via1 = machine().device<via6522_device>("via6522_0");
-					via1->write_cb1(via_clock);
+					write_via_clock(via_clock);
 				}
 			}
 			break;
@@ -178,8 +178,8 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 				// falling edge, should reset the machine too
 				if ((ports[2] & 8) && !(data&8))
 				{
-					m_out_reset_func(ASSERT_LINE);
-					m_out_reset_func(CLEAR_LINE);
+					write_reset(ASSERT_LINE);
+					write_reset(CLEAR_LINE);
 
 					// if PRAM's waiting to be loaded, transfer it now
 					if (!pram_loaded)
@@ -383,6 +383,10 @@ WRITE8_MEMBER( cuda_device::pram_w )
 cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CUDA, "Apple Cuda", tag, owner, clock, "cuda", __FILE__),
 	device_nvram_interface(mconfig, *this),
+	write_reset(*this),
+	write_linechange(*this),
+	write_via_clock(*this),
+	write_via_data(*this),
 	m_maincpu(*this, CUDA_CPU_TAG)
 {
 }
@@ -404,8 +408,10 @@ void cuda_device::static_set_type(device_t &device, int type)
 
 void cuda_device::device_start()
 {
-	m_out_reset_func.resolve(m_out_reset_cb, *this);
-	m_out_adb_func.resolve(m_out_adb_cb, *this);
+	write_reset.resolve_safe();
+	write_linechange.resolve_safe();
+	write_via_clock.resolve_safe();
+	write_via_data.resolve_safe();
 
 	m_timer = timer_alloc(0, NULL);
 	m_prog_timer = timer_alloc(1, NULL);
@@ -502,21 +508,6 @@ void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 				m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
 			}
 		}
-	}
-}
-
-void cuda_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cuda_interface *intf = reinterpret_cast<const cuda_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<cuda_interface *>(this) = *intf;
-	}
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
 	}
 }
 

@@ -332,20 +332,20 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("L") PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("O") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F13")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F13") PORT_CODE(KEYCODE_PRTSCR)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F12") PORT_CODE(KEYCODE_F12)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KBD11")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(";")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)  
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)      
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // FIXME - duplicate "Return"
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("P") PORT_CODE(KEYCODE_P)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Additional Options")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Additional Options (F14)") PORT_CODE(KEYCODE_SCRLOCK)
 
 	PORT_START("KBD12")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH)
@@ -353,7 +353,7 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Select") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Help")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Help (F15)") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Find") PORT_CODE(KEYCODE_INSERT)
 
@@ -363,8 +363,8 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("'") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Previous") PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Do (F16)") 
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Insert Here") PORT_CODE(KEYCODE_HOME)
 
 	PORT_START("KBD14")
@@ -388,7 +388,7 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F17")
 
 	PORT_START("KBD16")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num .") PORT_CODE(KEYCODE_DEL_PAD)  // "." on num.pad
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 3") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
@@ -402,7 +402,7 @@ INPUT_PORTS_START( lk201 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num ,") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num -")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF4") PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F20")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F20") PORT_CODE(KEYCODE_PAUSE)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F19")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -429,6 +429,7 @@ ioport_constructor lk201_device::device_input_ports() const
 lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LK201, "DEC LK201 keyboard", tag, owner, clock, "lk201", __FILE__),
 	device_serial_interface(mconfig, *this),
+	m_tx_write(*this),
 	m_maincpu(*this, LK201_CPU_TAG),
 	m_speaker(*this, LK201_SPK_TAG),
 	m_kbd0(*this, "KBD0"),
@@ -458,6 +459,7 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 
 void lk201_device::device_start()
 {
+	m_tx_write.resolve_safe();
 }
 
 
@@ -467,8 +469,8 @@ void lk201_device::device_start()
 
 void lk201_device::device_reset()
 {
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(4800);
-	set_data_frame(8, 1, PARITY_NONE, false);
 
 	sci_status = (SCSR_TC | SCSR_TDRE);
 
@@ -489,10 +491,10 @@ void lk201_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void lk201_device::rcv_complete()
 {
-	printf("lk201 got %02x\n", get_received_char());
 	sci_status |= SCSR_RDRF;
 	update_interrupts();
 	receive_register_extract();
+//	printf("lk201 got %02x\n", get_received_char());
 }
 
 void lk201_device::tra_complete()
@@ -503,7 +505,8 @@ void lk201_device::tra_complete()
 
 void lk201_device::tra_callback()
 {
-	transmit_register_send_bit();
+	int bit = transmit_register_send_bit();
+	m_tx_write(bit);
 }
 
 void lk201_device::input_callback(UINT8 state)
@@ -596,10 +599,10 @@ void lk201_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 			if (((data & 0x80) == 0) && (ports[offset] & 0x80))
 			{
 				// Lower nibble contains the LED values (1 = on, 0 = off)
-				output_set_value("led_wait", (led_data & 0x1) == 0);
-				output_set_value("led_comp", (led_data & 0x2) == 0);
-				output_set_value("led_hold", (led_data & 0x4) == 0);
-				output_set_value("led_lock", (led_data & 0x8) == 0);
+				output_set_value("led_wait"   , (led_data & 0x1) == 0);
+				output_set_value("led_compose", (led_data & 0x2) == 0);
+				output_set_value("led_hold"   , (led_data & 0x4) == 0);
+				output_set_value("led_lock"   , (led_data & 0x8) == 0);
 			}
 			break;
 	}
@@ -657,6 +660,7 @@ WRITE8_MEMBER( lk201_device::sci_w )
 			break;
 
 		case SCI_SCDR:	// Data
+//			printf("LK201: sending %02x\n", data);
 			transmit_register_setup(data);
 			sci_status &= ~(SCSR_TC | SCSR_TDRE);
 			m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);

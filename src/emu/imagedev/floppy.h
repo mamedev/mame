@@ -199,225 +199,44 @@ protected:
 	astring try_file(astring location, astring name, bool has_crc, UINT32 crc);
 };
 
-class floppy_3_ssdd : public floppy_image_device {
-public:
-	floppy_3_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_3_ssdd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_3"; }
-protected:
-	virtual void setup_characteristics();
-};
 
-class floppy_3_dsdd : public floppy_image_device {
-public:
-	floppy_3_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_3_dsdd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_3"; }
-protected:
-	virtual void setup_characteristics();
-};
+#define DECLARE_FLOPPY_IMAGE_DEVICE(_name, _interface) \
+	class _name : public floppy_image_device { \
+	public: \
+		_name(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock); \
+		virtual ~_name(); \
+		virtual void handled_variants(UINT32 *variants, int &var_count) const; \
+		virtual const char *image_interface() const { return _interface; } \
+	protected: \
+		virtual void setup_characteristics(); \
+	};
 
-class floppy_35_ssdd : public floppy_image_device {
-public:
-	floppy_35_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_35_ssdd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_3_5"; }
-protected:
-	virtual void setup_characteristics();
-};
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_3_ssdd, "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_3_dsdd, "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_35_ssdd, "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_35_dd, "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_35_hd, "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_35_ed, "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_sssd_35t, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_sd_35t, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_sssd, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_sd, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_ssdd, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_dd, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_ssqd, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_qd, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_525_hd, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_8_sssd, "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_8_dssd, "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_8_ssdd, "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(floppy_8_dsdd, "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(epson_smd_165, "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(epson_sd_320, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(epson_sd_321, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d31v, "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d32w, "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(sony_oa_d32v, "floppy_3_5")
 
-class floppy_35_dd : public floppy_image_device {
-public:
-	floppy_35_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_35_dd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_3_5"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_35_hd : public floppy_image_device {
-public:
-	floppy_35_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_35_hd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_3_5"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_35_ed : public floppy_image_device {
-public:
-	floppy_35_ed(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_35_ed();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_3_5"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_525_sssd_35t : public floppy_image_device {
-public:
-	floppy_525_sssd_35t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_525_sssd_35t();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_5_25"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_525_sd_35t : public floppy_image_device {
-public:
-	floppy_525_sd_35t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_525_sd_35t();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_5_25"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_525_sssd : public floppy_image_device {
-public:
-	floppy_525_sssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_525_sssd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_5_25"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_525_sd : public floppy_image_device {
-public:
-	floppy_525_sd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_525_sd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_5_25"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_525_ssdd : public floppy_image_device {
-public:
-	floppy_525_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_525_ssdd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_5_25"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_525_dd : public floppy_image_device {
-public:
-	floppy_525_dd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_525_dd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_5_25"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_525_ssqd : public floppy_image_device {
-public:
-	floppy_525_ssqd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_525_ssqd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_5_25"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_525_qd : public floppy_image_device {
-public:
-	floppy_525_qd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_525_qd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_5_25"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_525_hd : public floppy_image_device {
-public:
-	floppy_525_hd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_525_hd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_5_25"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_8_sssd : public floppy_image_device {
-public:
-	floppy_8_sssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_8_sssd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_8"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_8_dssd : public floppy_image_device {
-public:
-	floppy_8_dssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_8_dssd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_8"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_8_ssdd : public floppy_image_device {
-public:
-	floppy_8_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_8_ssdd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_8"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class floppy_8_dsdd : public floppy_image_device {
-public:
-	floppy_8_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~floppy_8_dsdd();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_8"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class sony_oa_d31v : public floppy_image_device {
-public:
-	sony_oa_d31v(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~sony_oa_d31v();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_3_5"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class sony_oa_d32w : public floppy_image_device {
-public:
-	sony_oa_d32w(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~sony_oa_d32w();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_3_5"; }
-protected:
-	virtual void setup_characteristics();
-};
-
-class sony_oa_d32v : public floppy_image_device {
-public:
-	sony_oa_d32v(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~sony_oa_d32v();
-	virtual void handled_variants(UINT32 *variants, int &var_count) const;
-	virtual const char *image_interface() const { return "floppy_3_5"; }
-protected:
-	virtual void setup_characteristics();
-};
 
 class floppy_connector: public device_t,
 						public device_slot_interface
@@ -459,6 +278,9 @@ extern const device_type FLOPPY_8_SSSD;
 extern const device_type FLOPPY_8_DSSD;
 extern const device_type FLOPPY_8_SSDD;
 extern const device_type FLOPPY_8_DSDD;
+extern const device_type EPSON_SMD_165;
+extern const device_type EPSON_SD_320;
+extern const device_type EPSON_SD_321;
 extern const device_type SONY_OA_D31V;
 extern const device_type SONY_OA_D32W;
 extern const device_type SONY_OA_D32V;

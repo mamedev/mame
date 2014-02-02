@@ -77,35 +77,29 @@ READ8_DEVICE_HANDLER( frogger_portB_r )
 	return frogger_timer[(space.machine().device<cpu_device>("audiocpu")->total_cycles()/512) % 10];
 }
 
-WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
+WRITE8_MEMBER( scramble_state::scramble_sh_irqtrigger_w )
 {
-	ttl7474_device *target = space.machine().device<ttl7474_device>("konami_7474");
-
 	/* the complement of bit 3 is connected to the flip-flop's clock */
-	target->clock_w((~data & 0x08) >> 3);
+	m_konami_7474->clock_w((~data & 0x08) >> 3);
 
 	/* bit 4 is sound disable */
-	space.machine().sound().system_mute((data & 0x10) >> 4);
+	machine().sound().system_mute((data & 0x10) >> 4);
 }
 
-WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
+WRITE8_MEMBER( scramble_state::mrkougar_sh_irqtrigger_w )
 {
-	ttl7474_device *target = space.machine().device<ttl7474_device>("konami_7474");
-
 	/* the complement of bit 3 is connected to the flip-flop's clock */
-	target->clock_w((~data & 0x08) >> 3);
+	m_konami_7474->clock_w((~data & 0x08) >> 3);
 }
 
-static IRQ_CALLBACK(scramble_sh_irq_callback)
+IRQ_CALLBACK_MEMBER(scramble_state::scramble_sh_irq_callback)
 {
-	ttl7474_device *target = device->machine().device<ttl7474_device>("konami_7474");
-
 	/* interrupt acknowledge clears the flip-flop --
 	   we need to pulse the CLR line because MAME's core never clears this
 	   line, only asserts it */
-	target->clear_w(0);
+	m_konami_7474->clear_w(0);
 
-	target->clear_w(1);
+	m_konami_7474->clear_w(1);
 
 	return 0xff;
 }
@@ -161,12 +155,12 @@ WRITE8_MEMBER(scramble_state::frogger_filter_w)
 	filter_w(machine().device("filter.0.2"), (offset >> 10) & 3);
 }
 
-void scramble_sh_init(running_machine &machine)
+void scramble_state::sh_init()
 {
-	machine.device("audiocpu")->execute().set_irq_acknowledge_callback(scramble_sh_irq_callback);
+	m_audiocpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(scramble_state::scramble_sh_irq_callback),this));
 
 	/* PR is always 0, D is always 1 */
-	machine.device<ttl7474_device>("konami_7474")->d_w(1);
+	m_konami_7474->d_w(1);
 }
 
 

@@ -7,15 +7,7 @@ Atari Fire Truck + Super Bug + Monte Carlo video emulation
 #include "emu.h"
 #include "includes/firetrk.h"
 
-
-
-
-
-
-
 static const rectangle playfield_window(0x02a, 0x115, 0x000, 0x0ff);
-
-
 
 
 void firetrk_state::palette_init()

@@ -52,15 +52,6 @@ enum
 #define MODE_STOP_BITS      ((m_mr[0] >> 6) & 0x03)
 
 
-enum
-{
-	STOP_BITS_INVALID = 0,
-	STOP_BITS_1,
-	STOP_BITS_1_5,
-	STOP_BITS_2
-};
-
-
 #define SYN1            m_sync[0]
 #define SYN2            m_sync[1]
 #define DLE             m_sync[2]
@@ -347,22 +338,36 @@ WRITE8_MEMBER( mc2661_device::write )
 
 		if (m_mode_index == 0)
 		{
-			int word_length = 5 + MODE_CHARACTER;
-			float stop_bits = 0;
-			int parity_code;
+			int data_bit_count = 5 + MODE_CHARACTER;
+			parity_t parity;
+
+			if (!MODE_PARITY) parity = PARITY_NONE;
+			else if (MODE_PARITY_EVEN) parity = PARITY_EVEN;
+			else parity = PARITY_ODD;
+
+			stop_bits_t stop_bits;
 
 			switch (MODE_STOP_BITS)
 			{
-			case STOP_BITS_1:   stop_bits = 1;      break;
-			case STOP_BITS_1_5: stop_bits = 1.5;    break;
-			case STOP_BITS_2:   stop_bits = 2;      break;
+			case 0:
+			default:
+				stop_bits = STOP_BITS_0;
+				break;
+
+			case 1:
+				stop_bits = STOP_BITS_1;
+				break;
+
+			case 2:
+				stop_bits = STOP_BITS_1_5;
+				break;
+
+			case 3:
+				stop_bits = STOP_BITS_2;
+				break;
 			}
 
-			if (!MODE_PARITY) parity_code = PARITY_NONE;
-			else if (MODE_PARITY_EVEN) parity_code = PARITY_EVEN;
-			else parity_code = PARITY_ODD;
-
-			set_data_frame(word_length, stop_bits, parity_code, false);
+			set_data_frame(1, data_bit_count, parity, stop_bits);
 		}
 		if(m_mode_index == 1)
 		{

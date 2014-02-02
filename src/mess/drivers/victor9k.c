@@ -299,9 +299,16 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 	}
 }
 
+WRITE_LINE_MEMBER(victor9k_state::vert_w)
+{
+	m_via2->write_pa7(state);
+	m_pic->ir7_w(state);
+}
+
 static MC6845_INTERFACE( hd46505s_intf )
 {
 	false,
+	0,0,0,0,
 	10,
 	NULL,
 	victor9k_update_row,
@@ -309,7 +316,7 @@ static MC6845_INTERFACE( hd46505s_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir7_w),
+	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, vert_w),
 	NULL
 };
 
@@ -442,36 +449,16 @@ WRITE8_MEMBER( victor9k_state::via1_pa_w )
 	m_ieee488->dio_w(data);
 }
 
-READ8_MEMBER( victor9k_state::via1_pb_r )
+DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_nfrd )
 {
-	/*
+	m_via1->write_pb6(state);
+	m_via1->write_ca1(state);
+}
 
-	    bit     description
-
-	    PB0     DAV
-	    PB1     EOI
-	    PB2     REN
-	    PB3     ATN
-	    PB4     IFC
-	    PB5     SRQ
-	    PB6     NRFD
-	    PB7     NDAC
-
-	*/
-
-	UINT8 data = 0;
-
-	// IEEE-488
-	data |= m_ieee488->dav_r();
-	data |= m_ieee488->eoi_r() << 1;
-	data |= m_ieee488->ren_r() << 2;
-	data |= m_ieee488->atn_r() << 3;
-	data |= m_ieee488->ifc_r() << 4;
-	data |= m_ieee488->srq_r() << 5;
-	data |= m_ieee488->nrfd_r() << 6;
-	data |= m_ieee488->ndac_r() << 7;
-
-	return data;
+DECLARE_WRITE_LINE_MEMBER( victor9k_state::write_ndac )
+{
+	m_via1->write_pb7(state);
+	m_via1->write_ca2(state);
 }
 
 WRITE8_MEMBER( victor9k_state::via1_pb_w )
@@ -511,41 +498,6 @@ WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
 	m_via1_irq = state;
 
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
-}
-
-
-READ8_MEMBER( victor9k_state::via2_pa_r )
-{
-	/*
-
-	    bit     description
-
-	    PA0
-	    PA1
-	    PA2     RIA
-	    PA3     DSRA
-	    PA4     RIB
-	    PA5     DSRB
-	    PA6     KBDATA
-	    PA7     VERT
-
-	*/
-
-	UINT8 data = 0;
-
-	// serial
-	data |= m_rs232a->ri_r() << 2;
-	data |= m_rs232a->dsr_r() << 3;
-	data |= m_rs232b->ri_r() << 4;
-	data |= m_rs232b->dsr_r() << 5;
-
-	// keyboard data
-	data |= m_kb->kbdata_r() << 6;
-
-	// vertical sync
-	data |= m_crtc->vsync_r() << 7;
-
-	return data;
 }
 
 WRITE8_MEMBER( victor9k_state::via2_pa_w )
@@ -593,6 +545,21 @@ WRITE8_MEMBER( victor9k_state::via2_pb_w )
 	m_cont = data >> 5;
 }
 
+
+WRITE_LINE_MEMBER( victor9k_state::write_ria )
+{
+	m_upd7201->ria_w(state);
+	m_via2->write_pa2(state);
+}
+
+
+WRITE_LINE_MEMBER( victor9k_state::write_rib )
+{
+	m_upd7201->rib_w(state);
+	m_via2->write_pa4(state);
+}
+
+
 WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 {
 	m_via2_irq = state;
@@ -601,81 +568,33 @@ WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 }
 
 
-READ8_MEMBER( victor9k_state::via3_pa_r )
-{
-	/*
+/*
+    bit    description
 
-	    bit     description
-
-	    PA0     J5-16
-	    PA1     J5-18
-	    PA2     J5-20
-	    PA3     J5-22
-	    PA4     J5-24
-	    PA5     J5-26
-	    PA6     J5-28
-	    PA7     J5-30
-
-	*/
-
-	return 0;
-}
-
-WRITE8_MEMBER( victor9k_state::via3_pa_w )
-{
-	/*
-
-	    bit     description
-
-	    PA0     J5-16
-	    PA1     J5-18
-	    PA2     J5-20
-	    PA3     J5-22
-	    PA4     J5-24
-	    PA5     J5-26
-	    PA6     J5-28
-	    PA7     J5-30
-
-	*/
-}
-
-READ8_MEMBER( victor9k_state::via3_pb_r )
-{
-	/*
-
-	    bit     description
-
-	    PB0     J5-32
-	    PB1     J5-34
-	    PB2     J5-36
-	    PB3     J5-38
-	    PB4     J5-40
-	    PB5     J5-42
-	    PB6     J5-44
-	    PB7     J5-46
-
-	*/
-
-	return 0;
-}
+    PA0    J5-16
+    PA1    J5-18
+    PA2    J5-20
+    PA3    J5-22
+    PA4    J5-24
+    PA5    J5-26
+    PA6    J5-28
+    PA7    J5-30
+    PB0    J5-32
+    PB1    J5-34
+    PB2    J5-36
+    PB3    J5-38
+    PB4    J5-40
+    PB5    J5-42
+    PB6    J5-44
+    PB7    J5-46
+    CA1    J5-12
+    CB1    J5-48
+    CA2    J5-14
+    CB2    J5-50
+*/
 
 WRITE8_MEMBER( victor9k_state::via3_pb_w )
 {
-	/*
-
-	    bit     description
-
-	    PB0     J5-32
-	    PB1     J5-34
-	    PB2     J5-36
-	    PB3     J5-38
-	    PB4     J5-40
-	    PB5     J5-42
-	    PB6     J5-44
-	    PB7     J5-46
-
-	*/
-
 	// codec clock output
 	m_ssda->rx_clk_w(BIT(data, 7));
 	m_ssda->tx_clk_w(BIT(data, 7));
@@ -743,25 +662,20 @@ WRITE_LINE_MEMBER( victor9k_state::via4_irq_w )
 }
 
 
-READ8_MEMBER( victor9k_state::via5_pa_r )
-{
-	/*
+/*
 
-	    bit     description
+	bit     description
 
-	    PA0     E0
-	    PA1     E1
-	    PA2     I1
-	    PA3     E2
-	    PA4     E4
-	    PA5     E5
-	    PA6     I7
-	    PA7     E6
+	PA0     E0
+	PA1     E1
+	PA2     I1
+	PA3     E2
+	PA4     E4
+	PA5     E5
+	PA6     I7
+	PA7     E6
 
-	*/
-
-	return 0;
-}
+*/
 
 WRITE8_MEMBER( victor9k_state::via5_pb_w )
 {
@@ -945,6 +859,11 @@ WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 	m_pic->ir6_w(state ? CLEAR_LINE : ASSERT_LINE);
 }
 
+WRITE_LINE_MEMBER( victor9k_state::kbdata_w )
+{
+	m_via2->write_cb2(state);
+	m_via2->write_pa6(state);
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( victor9k_floppies )
@@ -1068,8 +987,15 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	// devices
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_NRFD_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_ca1))
-	MCFG_IEEE488_NDAC_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_ca2))
+	MCFG_IEEE488_DAV_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb0))
+	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb1))
+	MCFG_IEEE488_REN_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb2))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb3))
+	MCFG_IEEE488_IFC_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb4))
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_pb5))
+	MCFG_IEEE488_NRFD_CALLBACK(WRITELINE(victor9k_state, write_nfrd))
+	MCFG_IEEE488_NDAC_CALLBACK(WRITELINE(victor9k_state, write_ndac))
+
 	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8088_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_30MHz/30, mpsc_intf)
@@ -1077,26 +1003,17 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 
 	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL_30MHz/30)
 	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(victor9k_state, via1_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via1_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via1_pb_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(victor9k_state, codec_vol_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via1_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_READPA_HANDLER(READ8(victor9k_state, via2_pa_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via2_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via2_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via2_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_3_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_READPA_HANDLER(READ8(victor9k_state, via3_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(victor9k_state, via3_pb_r))
-	// CA1 J5-12
-	// CB1 J5-48
-	// CA2 J5-14
-	// CB2 J5-50
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor9k_state, via3_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via3_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via3_irq_w))
 
@@ -1107,8 +1024,6 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via4_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_5_TAG, VIA6522, XTAL_30MHz/30)
-	MCFG_VIA6522_READPA_HANDLER(READ8(victor9k_state, via5_pa_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor9k_state, via5_pb_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor9k_state, via5_irq_w))
 
 	MCFG_DEVICE_ADD(M6522_6_TAG, VIA6522, XTAL_30MHz/30)
@@ -1126,18 +1041,20 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ria_w))
+	MCFG_RS232_OUT_RI_HANDLER(WRITELINE(victor9k_state, write_ria))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsa_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(M6522_2_TAG, via6522_device, write_pa3))
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxb_w))
 	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rib_w))
+	MCFG_RS232_OUT_RI_HANDLER(WRITELINE(victor9k_state, write_ria))
 	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))
+	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(M6522_2_TAG, via6522_device, write_pa5))
 
 	MCFG_DEVICE_ADD(VICTOR9K_KEYBOARD_TAG, VICTOR9K_KEYBOARD, 0)
 	MCFG_VICTOR9K_KBRDY_HANDLER(WRITELINE(victor9k_state, kbrdy_w))
-	MCFG_VICTOR9K_KBDATA_HANDLER(DEVWRITELINE(M6522_2_TAG, via6522_device, write_cb2))
+	MCFG_VICTOR9K_KBDATA_HANDLER(WRITELINE(victor9k_state, kbdata_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

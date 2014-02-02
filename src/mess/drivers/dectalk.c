@@ -390,16 +390,6 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_txa)
 #endif
 }
 
-static const duartn68681_config dectalk_duart_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dectalk_state, dectalk_duart_irq_handler), /* irq callback */
-	DEVCB_DRIVER_LINE_MEMBER(dectalk_state, dectalk_duart_txa),         /* serial transmit A (alternate) */
-	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),          /* serial transmit B (main/local terminal) */
-	DEVCB_DRIVER_MEMBER(dectalk_state, dectalk_duart_input),            /* input port */
-	DEVCB_DRIVER_MEMBER(dectalk_state, dectalk_duart_output),           /* output port */
-};
-
-
 /* FIFO and TMS32010 stuff */
 #define SPC_INITIALIZE state->m_m68k_spcflags_latch&0x1 // speech initialize flag
 #define SPC_IRQ_ENABLED ((state->m_m68k_spcflags_latch&0x40)>>6) // irq enable flag
@@ -890,7 +880,12 @@ static MACHINE_CONFIG_START( dectalk, dectalk_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
 	MCFG_CPU_IO_MAP(m68k_io)
-	MCFG_DUARTN68681_ADD( "duartn68681", XTAL_3_6864MHz, dectalk_duart_config ) /* 2681 duart (not 68681!); Y3 3.6864MHz Xtal */
+	MCFG_DUARTN68681_ADD( "duartn68681", XTAL_3_6864MHz ) /* 2681 duart (not 68681!); Y3 3.6864MHz Xtal */
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(dectalk_state, dectalk_duart_txa))
+	MCFG_DUARTN68681_B_TX_CALLBACK(DEVWRITELINE("rs232", serial_port_device, tx))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(dectalk_state, dectalk_duart_input))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, dectalk_duart_output))
 
 	MCFG_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
 	MCFG_CPU_PROGRAM_MAP(tms32010_mem)

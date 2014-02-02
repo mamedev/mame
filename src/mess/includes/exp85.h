@@ -3,6 +3,11 @@
 #ifndef __EXP85__
 #define __EXP85__
 
+#include "emu.h"
+#include "imagedev/cassette.h"
+#include "machine/serial.h"
+#include "sound/speaker.h"
+
 #define SCREEN_TAG      "screen"
 #define I8085A_TAG      "u100"
 #define I8155_TAG       "u106"
@@ -14,7 +19,7 @@ public:
 	exp85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I8085A_TAG),
-			m_terminal(*this, TERMINAL_TAG),
+			m_rs232(*this, "rs232"),
 			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
 			m_rom(*this, I8085A_TAG),
@@ -22,7 +27,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<serial_terminal_device> m_terminal;
+	required_device<rs232_port_device> m_rs232;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_memory_region m_rom;

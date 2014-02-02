@@ -424,9 +424,6 @@ void mc68901_device::device_start()
 	save_item(NAME(m_receive_pending));
 	save_item(NAME(m_gpio_input));
 	save_item(NAME(m_gpio_output));
-	save_item(NAME(m_rxtx_word));
-	save_item(NAME(m_rxtx_start));
-	save_item(NAME(m_rxtx_stop));
 	save_item(NAME(m_rsr_read));
 	save_item(NAME(m_next_rsr));
 }
@@ -913,7 +910,17 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 	case REGISTER_UCR:
 		{
-		int parity_code = PARITY_NONE;
+		int data_bit_count;
+
+		switch (data & 0x60)
+		{
+		case UCR_WORD_LENGTH_8: default: data_bit_count = 8; break;
+		case UCR_WORD_LENGTH_7: data_bit_count = 7; break;
+		case UCR_WORD_LENGTH_6: data_bit_count = 6; break;
+		case UCR_WORD_LENGTH_5: data_bit_count = 5; break;
+		}
+
+		parity_t parity;
 
 		if (data & UCR_PARITY_ENABLED)
 		{
@@ -921,52 +928,52 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			{
 				if (LOG) logerror("MC68901 '%s' Parity : Even\n", tag());
 
-				parity_code = PARITY_EVEN;
+				parity = PARITY_EVEN;
 			}
 			else
 			{
 				if (LOG) logerror("MC68901 '%s' Parity : Odd\n", tag());
 
-				parity_code = PARITY_ODD;
+				parity = PARITY_ODD;
 			}
 		}
 		else
 		{
 			if (LOG) logerror("MC68901 '%s' Parity : Disabled\n", tag());
+
+			parity = PARITY_NONE;
 		}
 
-		switch (data & 0x60)
-		{
-		case UCR_WORD_LENGTH_8: m_rxtx_word = 8; break;
-		case UCR_WORD_LENGTH_7: m_rxtx_word = 7; break;
-		case UCR_WORD_LENGTH_6: m_rxtx_word = 6; break;
-		case UCR_WORD_LENGTH_5: m_rxtx_word = 5; break;
-		}
+		if (LOG) logerror("MC68901 '%s' Word Length : %u bits\n", tag(), data_bit_count);
 
-		if (LOG) logerror("MC68901 '%s' Word Length : %u bits\n", tag(), m_rxtx_word);
 
-		bool sync = false;
+		int start_bits;
+		stop_bits_t stop_bits;
+
 		switch (data & 0x18)
 		{
 		case UCR_START_STOP_0_0:
-			m_rxtx_start = 0;
-			m_rxtx_stop = 0;
-			sync = true;
+		default:
+			start_bits = 0;
+			stop_bits = STOP_BITS_0;
 			if (LOG) logerror("MC68901 '%s' Start Bits : 0, Stop Bits : 0, Format : synchronous\n", tag());
 			break;
+
 		case UCR_START_STOP_1_1:
-			m_rxtx_start = 1;
-			m_rxtx_stop = 1;
+			start_bits = 1;
+			stop_bits = STOP_BITS_1;
 			if (LOG) logerror("MC68901 '%s' Start Bits : 1, Stop Bits : 1, Format : asynchronous\n", tag());
 			break;
+
 		case UCR_START_STOP_1_15:
-			m_rxtx_start = 1;
-			m_rxtx_stop = 1;
+			start_bits = 1;
+			stop_bits = STOP_BITS_1_5;
 			if (LOG) logerror("MC68901 '%s' Start Bits : 1, Stop Bits : 1.5, Format : asynchronous\n", tag());
 			break;
+
 		case UCR_START_STOP_1_2:
-			m_rxtx_start = 1;
-			m_rxtx_stop = 2;
+			start_bits = 1;
+			stop_bits = STOP_BITS_2;
 			if (LOG) logerror("MC68901 '%s' Start Bits : 1, Stop Bits : 2, Format : asynchronous\n", tag());
 			break;
 		}
@@ -980,7 +987,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 			if (LOG) logerror("MC68901 '%s' Rx/Tx Clock Divisor : 1\n", tag());
 		}
 
-		set_data_frame(m_rxtx_word, m_rxtx_stop, parity_code, sync);
+		set_data_frame(start_bits, data_bit_count, parity, stop_bits);
 
 		m_ucr = data;
 		}

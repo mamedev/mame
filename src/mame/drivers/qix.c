@@ -549,12 +549,62 @@ as-is. Tim Lindquist 1-17-03 */
 INPUT_PORTS_END
 
 
-
 /*************************************
  *
  *  Machine drivers
  *
  *************************************/
+
+/***************************************************************************
+
+    Qix has 6 PIAs on board:
+
+    From the ROM I/O schematic:
+
+    PIA 0 = U11: (mapped to $9400 on the data CPU)
+        port A = external input (input_port_0)
+        port B = external input (input_port_1) (coin)
+
+    PIA 1 = U20: (mapped to $9800/$9900 on the data CPU)
+        port A = external input (input_port_2)
+        port B = external input (input_port_3)
+
+    PIA 2 = U30: (mapped to $9c00 on the data CPU)
+        port A = external input (input_port_4)
+        port B = external output (coin control)
+
+
+    From the data/sound processor schematic:
+
+    PIA 3 = U20: (mapped to $9000 on the data CPU)
+        port A = data CPU to sound CPU communication
+        port B = stereo volume control, 2 4-bit values
+        CA1 = interrupt signal from sound CPU
+        CA2 = interrupt signal to sound CPU
+        CB1 = VS input signal (vertical sync)
+        CB2 = INV output signal (cocktail flip)
+        IRQA = /DINT1 signal
+        IRQB = /DINT1 signal
+
+    PIA 4 = U8: (mapped to $4000 on the sound CPU)
+        port A = sound CPU to data CPU communication
+        port B = DAC value (port B)
+        CA1 = interrupt signal from data CPU
+        CA2 = interrupt signal to data CPU
+        IRQA = /SINT1 signal
+        IRQB = /SINT1 signal
+
+    PIA 5 = U7: (never actually used, mapped to $2000 on the sound CPU)
+        port A = unused
+        port B = sound CPU to TMS5220 communication
+        CA1 = interrupt signal from TMS5220
+        CA2 = write signal to TMS5220
+        CB1 = ready signal from TMS5220
+        CB2 = read signal to TMS5220
+        IRQA = /SINT2 signal
+        IRQB = /SINT2 signal
+
+***************************************************************************/
 
 static MACHINE_CONFIG_START( qix_base, qix_state )
 
@@ -568,9 +618,17 @@ static MACHINE_CONFIG_START( qix_base, qix_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PIA6821_ADD("pia0", qix_pia_0_intf)
-	MCFG_PIA6821_ADD("pia1", qix_pia_1_intf)
-	MCFG_PIA6821_ADD("pia2", qix_pia_2_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("P1"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("COIN"))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("SPARE"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
+
+	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("P2"))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qix_coinctl_w))
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(qix_video)
@@ -581,6 +639,12 @@ static MACHINE_CONFIG_DERIVED( qix, qix_base )
 	MCFG_FRAGMENT_ADD(qix_audio)
 MACHINE_CONFIG_END
 
+/***************************************************************************
+
+    Games with an MCU need to handle coins differently, and provide
+    communication with the MCU
+
+***************************************************************************/
 
 static MACHINE_CONFIG_DERIVED( mcu, qix )
 
@@ -591,8 +655,12 @@ static MACHINE_CONFIG_DERIVED( mcu, qix )
 
 	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
 
-	MCFG_PIA6821_MODIFY("pia0", qixmcu_pia_0_intf)
-	MCFG_PIA6821_MODIFY("pia2", qixmcu_pia_2_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_READPB_HANDLER(READ8(qix_state, qixmcu_coin_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qixmcu_coin_w))
+
+	MCFG_DEVICE_MODIFY("pia2")
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qixmcu_coinctrl_w))
 MACHINE_CONFIG_END
 
 
@@ -608,6 +676,14 @@ static MACHINE_CONFIG_DERIVED( zookeep, mcu )
 MACHINE_CONFIG_END
 
 
+
+/***************************************************************************
+
+    Slither uses 2 SN76489's for sound instead of the 6802+DAC; these
+    are accessed via the PIAs.
+
+***************************************************************************/
+
 static MACHINE_CONFIG_DERIVED( slither, qix_base )
 
 	/* basic machine hardware */
@@ -615,8 +691,15 @@ static MACHINE_CONFIG_DERIVED( slither, qix_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
 
-	MCFG_PIA6821_MODIFY("pia1", slither_pia_1_intf)
-	MCFG_PIA6821_MODIFY("pia2", slither_pia_2_intf)
+	MCFG_DEVICE_MODIFY("pia1")
+	MCFG_PIA_READPA_HANDLER(READ8(qix_state, slither_trak_lr_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_76489_0_w))
+	MCFG_PIA_READPB_HANDLER(NULL)
+
+	MCFG_DEVICE_MODIFY("pia2")
+	MCFG_PIA_READPA_HANDLER(READ8(qix_state, slither_trak_ud_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_76489_1_w))
+	MCFG_PIA_READPB_HANDLER(NULL)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(slither_video)

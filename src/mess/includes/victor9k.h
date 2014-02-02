@@ -62,6 +62,7 @@ public:
 			m_fdc_cpu(*this, I8048_TAG),
 			m_ieee488(*this, IEEE488_TAG),
 			m_pic(*this, I8259A_TAG),
+			m_upd7201(*this, UPD7201_TAG),
 			m_ssda(*this, MC6852_TAG),
 			m_via1(*this, M6522_1_TAG),
 			m_via2(*this, M6522_2_TAG),
@@ -99,6 +100,7 @@ public:
 	required_device<cpu_device> m_fdc_cpu;
 	required_device<ieee488_device> m_ieee488;
 	required_device<pic8259_device> m_pic;
+	required_device<upd7201_device> m_upd7201;
 	required_device<mc6852_device> m_ssda;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
@@ -125,19 +127,18 @@ public:
 	DECLARE_WRITE8_MEMBER( da_w );
 
 	DECLARE_WRITE8_MEMBER( via1_pa_w );
-	DECLARE_READ8_MEMBER( via1_pb_r );
+	DECLARE_WRITE_LINE_MEMBER( write_nfrd );
+	DECLARE_WRITE_LINE_MEMBER( write_ndac );
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( codec_vol_w );
 
-	DECLARE_READ8_MEMBER( via2_pa_r );
 	DECLARE_WRITE8_MEMBER( via2_pa_w );
 	DECLARE_WRITE8_MEMBER( via2_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( write_ria );
+	DECLARE_WRITE_LINE_MEMBER( write_rib );
 	DECLARE_WRITE_LINE_MEMBER( via2_irq_w );
 
-	DECLARE_READ8_MEMBER( via3_pa_r );
-	DECLARE_READ8_MEMBER( via3_pb_r );
-	DECLARE_WRITE8_MEMBER( via3_pa_w );
 	DECLARE_WRITE8_MEMBER( via3_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via3_irq_w );
 
@@ -146,7 +147,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mode_w );
 	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
 
-	DECLARE_READ8_MEMBER( via5_pa_r );
 	DECLARE_WRITE8_MEMBER( via5_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
 
@@ -157,6 +157,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drw_w );
 	DECLARE_WRITE_LINE_MEMBER( erase_w );
 	DECLARE_WRITE_LINE_MEMBER( kbrdy_w );
+	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
+	DECLARE_WRITE_LINE_MEMBER( vert_w );
 	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ssda_irq_w );

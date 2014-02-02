@@ -281,41 +281,6 @@ WRITE8_MEMBER( zorba_state::pia0_porta_w )
 	m_floppy1->get_device()->mon_w(BIT(data, 4));
 }
 
-// port A - disk select etc, beeper
-// port B - parallel interface
-static const pia6821_interface pia0_intf =
-{
-	DEVCB_NULL, /* port A input */
-	DEVCB_NULL, /* port B input */
-	DEVCB_NULL, /* CA1 input */
-	DEVCB_NULL, /* CB1 input */
-	DEVCB_NULL, /* CA2 input */
-	DEVCB_NULL, /* CB2 input */
-	DEVCB_DRIVER_MEMBER(zorba_state, pia0_porta_w), /* port A output */
-	DEVCB_NULL, /* port B output */
-	DEVCB_NULL, /* CA2 output */
-	DEVCB_NULL, /* CB2 output */
-	DEVCB_NULL, /* IRQA output */
-	DEVCB_NULL  /* IRQB output */
-};
-
-// IEEE488 interface
-static const pia6821_interface pia1_intf =
-{
-	DEVCB_NULL, /* port A input */
-	DEVCB_NULL, /* port B input */
-	DEVCB_NULL, /* CA1 input */
-	DEVCB_NULL, /* CB1 input */
-	DEVCB_NULL, /* CA2 input */
-	DEVCB_NULL, /* CB2 input */
-	DEVCB_NULL, /* port A output */
-	DEVCB_NULL, /* port B output */
-	DEVCB_NULL, /* CA2 output */
-	DEVCB_NULL, /* CB2 output */
-	DEVCB_NULL, /* IRQA output */
-	DEVCB_NULL  /* IRQB output */
-};
-
 static const struct pit8253_interface pit_intf =
 {
 	{
@@ -456,8 +421,15 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_I8251_ADD("uart0", u0_intf)
 	MCFG_I8251_ADD("uart1", u1_intf)
 	MCFG_I8251_ADD("uart2", u2_intf)
-	MCFG_PIA6821_ADD("pia0", pia0_intf)
-	MCFG_PIA6821_ADD("pia1", pia1_intf)
+
+// port A - disk select etc, beeper
+// port B - parallel interface
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zorba_state, pia0_porta_w))
+
+// IEEE488 interface
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+
 	MCFG_PIT8254_ADD( "pit", pit_intf)
 	MCFG_I8275_ADD("crtc", XTAL_14_31818MHz/7, 8, zorba_update_chr, DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))

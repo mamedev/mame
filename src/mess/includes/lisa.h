@@ -207,10 +207,8 @@ public:
 	TIMER_CALLBACK_MEMBER(set_COPS_ready);
 	DECLARE_WRITE8_MEMBER(COPS_via_out_a);
 	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_ca2);
-	DECLARE_READ8_MEMBER(COPS_via_in_b);
 	DECLARE_WRITE8_MEMBER(COPS_via_out_b);
 	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_cb2);
-	DECLARE_READ8_MEMBER(parallel_via_in_b);
 
 	void field_interrupts();
 	void set_parity_error_pending(int value);

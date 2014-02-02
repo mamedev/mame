@@ -1014,6 +1014,32 @@ ROM_START( windheata )
 	ROM_LOAD( "677a10.5n", 0x400000, 0x200000, CRC(d8f77a68) SHA1(ff251863ef096f0864f6cbe6caa43b0aa299d9ee) )
 ROM_END
 
+ROM_START( jetwave )
+	ROM_REGION(0x200000, "user1", 0)    /* PowerPC program roms */
+	ROM_LOAD32_BYTE( "678eab01.20u", 0x000003, 0x080000, CRC(bc657198) SHA1(e521bb2c1b1a3ae934c98ce1656d35821fc287c9) ) /* Program version EAB, EUR v1.04 */
+	ROM_LOAD32_BYTE( "678eab02.17u", 0x000002, 0x080000, CRC(a9a57090) SHA1(ae0273b00c64687f8f835aba531580654edd1097) )
+	ROM_LOAD32_BYTE( "678eab03.15u", 0x000001, 0x080000, CRC(483aaff0) SHA1(86e011337532f6ff0174393758784b276143ba10) )
+	ROM_LOAD32_BYTE( "678eab04.13u", 0x000000, 0x080000, CRC(c7580d72) SHA1(6a5652365a85917ac48b0f1ced70b9c311e89a4f) )
+
+	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
+	ROM_LOAD16_WORD_SWAP( "678a07.19l", 0x000000, 0x020000, CRC(bb3f5875) SHA1(97f80d9b55d4177217b7cd1ba14e8ed2d64376bb) )
+
+	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_LOAD32_WORD_SWAP( "685a05.10u", 0x000000, 0x200000, CRC(00e59741) SHA1(d799910d4e85482b0e92a3cc9043f81d97b2fb02) )
+	ROM_LOAD32_WORD_SWAP( "685a06.8u",  0x000002, 0x200000, CRC(fc98c6a5) SHA1(a84583bb7296fa9e0c284b2ac59e2dc7b2689eee) )
+
+	ROM_REGION(0x800000, "gfx1", 0) /* Texture data */
+	ROM_LOAD32_BYTE( "678a13.18d", 0x000000, 0x200000, CRC(ccf75722) SHA1(f48d21dfc4f82adbb4c9c841a809267cfd028a3d) )
+	ROM_LOAD32_BYTE( "678a14.13d", 0x000001, 0x200000, CRC(333a1ab4) SHA1(79df4a98b7871eba4157307a7709da8f8b5da39b) )
+	ROM_LOAD32_BYTE( "678a15.9d",  0x000002, 0x200000, CRC(58b670f8) SHA1(5d4facb00e34de3ad11ed60c19835918a9cf6cb9) )
+	ROM_LOAD32_BYTE( "678a16.4d",  0x000003, 0x200000, CRC(137b9bff) SHA1(5052c1fa30cc1d6affd78f48d483415dca89d10b) )
+
+	ROM_REGION(0x600000, "shared", 0)   /* Sound data */
+	ROM_LOAD( "678a08.5r", 0x000000, 0x200000, CRC(4aeb61ad) SHA1(ec6872cb2e4776849963f48c1c245ca7697849e0) )
+	ROM_LOAD( "678a09.3r", 0x200000, 0x200000, CRC(39baef23) SHA1(9f7bda0f9c06eee94703f9ceb06975c8e28338cc) )
+	ROM_LOAD( "678a10.5n", 0x400000, 0x200000, CRC(0508280e) SHA1(a36c5dc377b0ba597f131bd9dfc6019e7fc2d243) )
+ROM_END
+
 ROM_START( waveshrk )
 	ROM_REGION(0x200000, "user1", 0)    /* PowerPC program roms */
 	ROM_LOAD32_BYTE( "678uab01.20u", 0x000003, 0x080000, CRC(a9b9ceed) SHA1(36f0d18481d7c3e7358e02473e54bc6b52d5c26b) ) /* Program version UAB, USA v1.04 */
@@ -1040,7 +1066,7 @@ ROM_START( waveshrk )
 	ROM_LOAD( "678a10.5n", 0x400000, 0x200000, CRC(0508280e) SHA1(a36c5dc377b0ba597f131bd9dfc6019e7fc2d243) )
 ROM_END
 
-ROM_START( jetwave )
+ROM_START( jetwavej )
 	ROM_REGION(0x200000, "user1", 0)    /* PowerPC program roms */
 	ROM_LOAD32_BYTE( "678jab01.20u", 0x000003, 0x080000, CRC(fa3da5cc) SHA1(33307e701e6eb28d44e0653ac3f1de47fc17779d) ) /* Program version JAB, JPN v1.04 */
 	ROM_LOAD32_BYTE( "678jab02.17u", 0x000002, 0x080000, CRC(01c6713e) SHA1(68e27c018f974e820ba2e99d89a743e53faf1e65) )
@@ -1073,5 +1099,7 @@ GAME( 1996, windheat, 0,        zr107,   windheat, zr107_state, zr107,   ROT0, "
 GAME( 1996, windheatu,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, windheatj,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, windheata,windheat, zr107,   windheat, zr107_state, zr107,   ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, waveshrk, 0,        jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, jetwave,  waveshrk, jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, jetwave,  0,        jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, waveshrk, jetwave,  jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, jetwavej, jetwave,  jetwave, jetwave,  zr107_state, jetwave, ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", GAME_IMPERFECT_GRAPHICS )
+

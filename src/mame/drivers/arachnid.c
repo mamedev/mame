@@ -89,17 +89,17 @@ public:
 	virtual void machine_start();
 	DECLARE_READ8_MEMBER( pia_u4_pa_r );
 	DECLARE_READ8_MEMBER( pia_u4_pb_r );
-	DECLARE_READ8_MEMBER( pia_u4_pca_r );
-	DECLARE_READ8_MEMBER( pia_u4_pcb_r );
+	DECLARE_READ_LINE_MEMBER( pia_u4_pca_r );
+	DECLARE_READ_LINE_MEMBER( pia_u4_pcb_r );
 	DECLARE_WRITE8_MEMBER( pia_u4_pa_w );
 	DECLARE_WRITE8_MEMBER( pia_u4_pb_w );
-	DECLARE_WRITE8_MEMBER( pia_u4_pca_w );
-	DECLARE_WRITE8_MEMBER( pia_u4_pcb_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_u4_pca_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_u4_pcb_w );
 
 	DECLARE_READ8_MEMBER( pia_u17_pa_r );
-	DECLARE_READ8_MEMBER( pia_u17_pca_r );
+	DECLARE_READ_LINE_MEMBER( pia_u17_pca_r );
 	DECLARE_WRITE8_MEMBER( pia_u17_pb_w );
-	DECLARE_WRITE8_MEMBER( pia_u17_pcb_w );
+	DECLARE_WRITE_LINE_MEMBER( pia_u17_pcb_w );
 
 	DECLARE_WRITE8_MEMBER(ptm_o1_callback);
 
@@ -268,10 +268,6 @@ static const ptm6840_interface ptm_intf =
 };
 
 
-/*-------------------------------------------------
-    pia6821_interface pia_xx_intf
--------------------------------------------------*/
-
 UINT8 arachnid_state::read_keyboard(int pa)
 {
 	int i;
@@ -298,10 +294,6 @@ UINT8 arachnid_state::read_keyboard(int pa)
 
 	return 0xff;
 }
-
-/*-------------------------------------------------
-    pia6821_interface pia_u4_intf
--------------------------------------------------*/
 
 READ8_MEMBER( arachnid_state::pia_u4_pa_r )
 {
@@ -339,21 +331,21 @@ READ8_MEMBER( arachnid_state::pia_u4_pb_r )
 	return data;
 }
 
-READ8_MEMBER( arachnid_state::pia_u4_pca_r )
+READ_LINE_MEMBER( arachnid_state::pia_u4_pca_r )
 {
 	// CA1 - SW1 Coin In (Coin Door)
 
-	UINT8 data = 0xff;
+	UINT8 data = 1;
 	data &= ioport("SW1")->read();
 
 	return data;
 }
 
-READ8_MEMBER( arachnid_state::pia_u4_pcb_r )
+READ_LINE_MEMBER( arachnid_state::pia_u4_pcb_r )
 {
 	// CB1 - SW2 Test Mode (Coin Door)
 
-	UINT8 data = 0xff;
+	UINT8 data = 1;
 	data &= ioport("SW2")->read();
 
 	return data;
@@ -373,11 +365,11 @@ READ8_MEMBER( arachnid_state::pia_u17_pa_r )
 	return data;
 }
 
-READ8_MEMBER( arachnid_state::pia_u17_pca_r )
+READ_LINE_MEMBER( arachnid_state::pia_u17_pca_r )
 {
 	// CA1 - 1000 HZ Input
 
-	UINT8 data = 0xff;
+	UINT8 data = 1;
 
 	return data;
 }
@@ -392,12 +384,12 @@ WRITE8_MEMBER( arachnid_state::pia_u4_pb_w )
 	// PA0 thru PA7 Pulses to Switch Matrix Part II
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u4_pca_w )
+WRITE_LINE_MEMBER( arachnid_state::pia_u4_pca_w )
 {
 	// CA1 - Remove Darts Lamp
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u4_pcb_w )
+WRITE_LINE_MEMBER( arachnid_state::pia_u4_pcb_w )
 {
 	// CB2 - Throw Darts Lamp
 }
@@ -414,42 +406,10 @@ WRITE8_MEMBER( arachnid_state::pia_u17_pb_w )
 	// PB7 - N/C
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u17_pcb_w )
+WRITE_LINE_MEMBER( arachnid_state::pia_u17_pcb_w )
 {
 	// CB2 - Target Lamp
 }
-
-static const pia6821_interface pia_u4_intf =
-{
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pa_r),   // input A - From Switch Matrix
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pb_r),   // input B - From Switch Matrix
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pca_r),  // input CA1 - SW1 Coin In (Coin Door)
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pcb_r),  // input CB1 - SW2 Test Mode (Coin Door)
-	DEVCB_NULL,                                         // input CA2
-	DEVCB_NULL,                                         // input CB2
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pa_w),   // output A - To Switch Matrix
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pb_w),   // output B - To Switch Matrix
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pca_w),  // output CA2 - Remove Darts Lamp
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u4_pcb_w),  // output CB2 - Throw Darts Lamp
-	DEVCB_NULL,                                         // irq A
-	DEVCB_NULL                                          // irq B
-};
-
-static const pia6821_interface pia_u17_intf =
-{
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pa_r),  // input A - Select, Player Change, Coin, Test, DIPSW1
-	DEVCB_NULL,                                         // input B
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pca_r), // input CA1 - 1000 Hz Input
-	DEVCB_NULL,                                         // input CB1
-	DEVCB_NULL,                                         // input CA2
-	DEVCB_NULL,                                         // input CB2
-	DEVCB_NULL,                                         // output A
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pb_w),  // output B - Select Lamp, Player Change Lamp
-	DEVCB_NULL,                                         // output CA2
-	DEVCB_DRIVER_MEMBER(arachnid_state, pia_u17_pcb_w), // output CB2 - Target Lamp
-	DEVCB_NULL,                                         // irq A
-	DEVCB_NULL                                          // irq B
-};
 
 /***************************************************************************
     MACHINE INITIALIZATION
@@ -477,8 +437,21 @@ static MACHINE_CONFIG_START( arachnid, arachnid_state )
 	MCFG_CPU_PROGRAM_MAP(arachnid_map)
 
 	// devices
-	MCFG_PIA6821_ADD(PIA6821_U4_TAG, pia_u4_intf)
-	MCFG_PIA6821_ADD(PIA6821_U17_TAG, pia_u17_intf)
+	MCFG_DEVICE_ADD(PIA6821_U4_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(arachnid_state, pia_u4_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(arachnid_state, pia_u4_pb_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(arachnid_state, pia_u4_pca_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(arachnid_state, pia_u4_pcb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(arachnid_state, pia_u4_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(arachnid_state, pia_u4_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(arachnid_state, pia_u4_pca_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(arachnid_state, pia_u4_pcb_w))
+
+	MCFG_DEVICE_ADD(PIA6821_U17_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(arachnid_state, pia_u17_pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(arachnid_state, pia_u17_pca_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(arachnid_state, pia_u17_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(arachnid_state, pia_u17_pcb_w))
 
 	// video hardware
 	MCFG_TMS9928A_ADD( TMS9118_TAG, TMS9118, vdp_intf )

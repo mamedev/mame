@@ -66,7 +66,7 @@ public:
 	DECLARE_READ8_MEMBER(portfd_r);
 	DECLARE_READ8_MEMBER(portfe_r);
 	DECLARE_READ8_MEMBER(sense_r);
-	DECLARE_WRITE8_MEMBER(flag_w);
+	DECLARE_WRITE_LINE_MEMBER(flag_w);
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_WRITE8_MEMBER(portf9_w);
@@ -88,9 +88,9 @@ private:
 };
 
 // flag led
-WRITE8_MEMBER( instruct_state::flag_w )
+WRITE_LINE_MEMBER( instruct_state::flag_w )
 {
-	output_set_value("led8", !BIT(data, 0));
+	output_set_value("led8", !state);
 }
 
 // user port
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
 	AM_RANGE(0xfd, 0xfd) AM_READ(portfd_r)
 	AM_RANGE(0xfe, 0xfe) AM_READ(portfe_r)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(port_r,port_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(sense_r,flag_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(sense_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -417,6 +417,7 @@ static MACHINE_CONFIG_START( instruct, instruct_state )
 	MCFG_CPU_PROGRAM_MAP(instruct_mem)
 	MCFG_CPU_IO_MAP(instruct_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(instruct_state, flag_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)

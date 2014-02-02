@@ -62,6 +62,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pa_r);
 	DECLARE_READ8_MEMBER(maxaflex_atari_pia_pb_r);
+	WRITE8_MEMBER(a600xl_pia_pb_w) { a600xl_mmu(machine(), data); }
+	WRITE_LINE_MEMBER(atari_pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
 	DECLARE_DRIVER_INIT(a600xl);
 	DECLARE_MACHINE_RESET(supervisor_board);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
@@ -390,23 +392,6 @@ READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pb_r)
 }
 
 
-const pia6821_interface maxaflex_atarixl_pia_interface =
-{
-	DEVCB_DRIVER_MEMBER(maxaflex_state,maxaflex_atari_pia_pa_r),        /* port A in */
-	DEVCB_DRIVER_MEMBER(maxaflex_state,maxaflex_atari_pia_pb_r),    /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_HANDLER(a600xl_pia_pb_w),     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_LINE(atari_pia_cb2_w),        /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-
 
 static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	/* basic machine hardware */
@@ -417,7 +402,12 @@ static MACHINE_CONFIG_START( a600xl, maxaflex_state )
 	MCFG_CPU_ADD("mcu", M68705, 3579545)
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
 
-	MCFG_PIA6821_ADD("pia", maxaflex_atarixl_pia_interface)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(maxaflex_state, maxaflex_atari_pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(maxaflex_state, maxaflex_atari_pia_pb_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maxaflex_state, a600xl_pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(maxaflex_state, atari_pia_cb2_w))
+
 	MCFG_TIMER_DRIVER_ADD("mcu_timer", maxaflex_state, mcu_timer_proc)
 
 	/* video hardware */

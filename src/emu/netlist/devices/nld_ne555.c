@@ -37,18 +37,26 @@ NETLIB_START(NE555)
 	register_subalias("DISCH", m_RDIS.m_P); // Pin 7
 	register_subalias("VCC",  m_R1.m_P);    // Pin 8
 
-	m_R1.set_R(5000);
-	m_R2.set_R(5000);
-	m_R3.set_R(5000);
-	m_RDIS.set_R(R_OFF);
-
-	setup().connect(m_R1.m_N, m_R2.m_P);
-	setup().connect(m_R2.m_N, m_R3.m_P);
-	setup().connect(m_RDIS.m_N, m_R3.m_N);
-
-	m_last_out = false;
+	connect(m_R1.m_N, m_R2.m_P);
+	connect(m_R2.m_N, m_R3.m_P);
+	connect(m_RDIS.m_N, m_R3.m_N);
 
 	save(NAME(m_last_out));
+}
+
+NETLIB_RESET(NE555)
+{
+    m_R1.do_reset();
+    m_R2.do_reset();
+    m_R3.do_reset();
+    m_RDIS.do_reset();
+
+    m_R1.set_R(5000);
+    m_R2.set_R(5000);
+    m_R3.set_R(5000);
+    m_RDIS.set_R(R_OFF);
+
+    m_last_out = false;
 }
 
 NETLIB_UPDATE(NE555)

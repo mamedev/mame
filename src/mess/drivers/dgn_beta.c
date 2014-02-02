@@ -340,9 +340,35 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(dgnbeta_palette) / 3)
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MCFG_PIA6821_ADD( PIA_0_TAG, dgnbeta_pia_intf[0] )
-	MCFG_PIA6821_ADD( PIA_1_TAG, dgnbeta_pia_intf[1] )
-	MCFG_PIA6821_ADD( PIA_2_TAG, dgnbeta_pia_intf[2] )
+	/* PIA 0 at $FC20-$FC23 I46 */
+	MCFG_DEVICE_ADD(PIA_0_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state,d_pia0_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state,d_pia0_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state,d_pia0_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state,d_pia0_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(dgn_beta_state,d_pia0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state,d_pia0_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state,d_pia0_irq_b))
+
+	/* PIA 1 at $FC24-$FC27 I63 */
+	MCFG_DEVICE_ADD(PIA_1_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state,d_pia1_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state,d_pia1_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state,d_pia1_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state,d_pia1_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state,d_pia1_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state,d_pia1_irq_b))
+
+	/* PIA 2 at FCC0-FCC3 I28 */
+	/* This seems to control the RAM paging system, and have the DRQ */
+	/* from the WD2797 */
+	MCFG_DEVICE_ADD(PIA_2_TAG, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(dgn_beta_state,d_pia2_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(dgn_beta_state,d_pia2_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(dgn_beta_state,d_pia2_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(dgn_beta_state,d_pia2_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(dgn_beta_state,d_pia2_irq_a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(dgn_beta_state,d_pia2_irq_b))
 
 	MCFG_WD2797_ADD(FDC_TAG, dgnbeta_wd17xx_interface )
 

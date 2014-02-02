@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "ieee488.h"
+#include "bus/imi7000/imi7000.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/harddriv.h"
 #include "includes/corvushd.h"

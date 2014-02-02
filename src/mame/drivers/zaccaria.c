@@ -528,38 +528,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static const pia6821_interface pia_0_config =
-{
-	DEVCB_DRIVER_MEMBER(zaccaria_state,zaccaria_port0a_r),  /* port A in */
-	DEVCB_NULL,                         /* port B in */
-	DEVCB_NULL,                         /* line CA1 in */
-	DEVCB_NULL,                         /* line CB1 in */
-	DEVCB_NULL,                         /* line CA2 in */
-	DEVCB_NULL,                         /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(zaccaria_state,zaccaria_port0a_w),  /* port A out */
-	DEVCB_DRIVER_MEMBER(zaccaria_state,zaccaria_port0b_w),  /* port B out */
-	DEVCB_NULL,                         /* line CA2 out */
-	DEVCB_NULL,                         /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(zaccaria_state,zaccaria_irq0a),            /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(zaccaria_state,zaccaria_irq0b)         /* IRQB */
-};
-
-static const pia6821_interface pia_1_config =
-{
-	DEVCB_DEVICE_MEMBER("tms", tms5220_device, status_r),  /* port A in */
-	DEVCB_NULL,                                     /* port B in */
-	DEVCB_NULL,                                     /* line CA1 in */
-	DEVCB_NULL,                                     /* line CB1 in */   // tms5220_intq_r, handled below in tms5220_config
-	DEVCB_NULL,                                     /* line CA2 in */   // tms5220_readyq_r, "
-	DEVCB_NULL,                                     /* line CB2 in */
-	DEVCB_DEVICE_MEMBER("tms", tms5220_device, data_w),    /* port A out */
-	DEVCB_DRIVER_MEMBER(zaccaria_state,zaccaria_port1b_w),              /* port B out */
-	DEVCB_NULL,                                     /* line CA2 out */
-	DEVCB_NULL,                                     /* port CB2 out */
-	DEVCB_NULL,                                     /* IRQA */
-	DEVCB_NULL                                      /* IRQB */
-};
-
 INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
 {
 	if(m_nmi_mask)
@@ -585,8 +553,18 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
-	MCFG_PIA6821_ADD( "pia0", pia_0_config )
-	MCFG_PIA6821_ADD( "pia1", pia_1_config )
+
+	MCFG_DEVICE_ADD( "pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(zaccaria_state, zaccaria_port0a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zaccaria_state, zaccaria_port0a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zaccaria_state, zaccaria_port0b_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(zaccaria_state, zaccaria_irq0a))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(zaccaria_state, zaccaria_irq0b))
+
+	MCFG_DEVICE_ADD( "pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(DEVREAD8("tms", tms5220_device, status_r))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("tms", tms5220_device, data_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zaccaria_state,zaccaria_port1b_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

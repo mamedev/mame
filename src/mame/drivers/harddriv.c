@@ -399,24 +399,6 @@ static const dsp32_config dsp32c_config =
 	hddsk_update_pif                /* a change has occurred on an output pin */
 };
 
-
-/*************************************
- *
- *  68681 DUART config
- *
- *************************************/
-
-static const duartn68681_config duart_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(harddriv_state, harddriv_duart_irq_handler),     /* irq callback */
-	DEVCB_NULL,                           /* serial transmit A */
-	DEVCB_NULL,                     /* serial transmit B */
-	DEVCB_NULL,                     /* input port */
-	DEVCB_NULL,                     /* output port */
-};
-
-
-
 /*************************************
  *
  *  Driver board memory maps
@@ -1353,7 +1335,8 @@ static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 	MCFG_M48T02_ADD("200e") // MK48T02
 	MCFG_EEPROM_2816_ADD("210e") // MK48Z02
 
-	MCFG_DUARTN68681_ADD("duartn68681", XTAL_3_6864MHz, duart_config)
+	MCFG_DUARTN68681_ADD("duartn68681", XTAL_3_6864MHz)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(harddriv_state, harddriv_duart_irq_handler))
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

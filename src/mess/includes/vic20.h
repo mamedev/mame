@@ -27,6 +27,7 @@
 #define IEC_TAG         "iec"
 #define SCREEN_TAG      "screen"
 #define CONTROL1_TAG    "joy1"
+#define PET_USER_PORT_TAG     "user"
 
 class vic20_state : public driver_device
 {
@@ -38,9 +39,9 @@ public:
 			m_via2(*this, M6522_2_TAG),
 			m_vic(*this, M6560_TAG),
 			m_iec(*this, CBM_IEC_TAG),
-			m_joy1(*this, CONTROL1_TAG),
+			m_joy(*this, CONTROL1_TAG),
 			m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
-			m_user(*this, VIC20_USER_PORT_TAG),
+			m_user(*this, PET_USER_PORT_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_basic(*this, "basic"),
@@ -64,9 +65,9 @@ public:
 	required_device<via6522_device> m_via2;
 	required_device<mos6560_device> m_vic;
 	required_device<cbm_iec_device> m_iec;
-	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy;
 	required_device<vic20_expansion_slot_device> m_exp;
-	required_device<vic20_user_port_device> m_user;
+	required_device<pet_user_port_device> m_user;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_memory_region m_basic;
@@ -95,8 +96,16 @@ public:
 	DECLARE_READ8_MEMBER( vic_lighty_cb );
 	DECLARE_READ8_MEMBER( vic_lightbut_cb );
 
+	DECLARE_WRITE_LINE_MEMBER( write_light_pen );
+	DECLARE_WRITE_LINE_MEMBER( write_user_joy0 );
+	DECLARE_WRITE_LINE_MEMBER( write_user_joy1 );
+	DECLARE_WRITE_LINE_MEMBER( write_user_joy2 );
+	DECLARE_WRITE_LINE_MEMBER( write_user_light_pen );
+	DECLARE_WRITE_LINE_MEMBER( write_user_cassette_switch );
+
 	DECLARE_READ8_MEMBER( via1_pa_r );
 	DECLARE_WRITE8_MEMBER( via1_pa_w );
+	DECLARE_WRITE8_MEMBER( via1_pb_w );
 
 	DECLARE_READ8_MEMBER( via2_pa_r );
 	DECLARE_READ8_MEMBER( via2_pb_r );
@@ -109,6 +118,12 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_vc20 );
 	// keyboard state
 	int m_key_col;
+	int m_light_pen;
+	int m_user_joy0;
+	int m_user_joy1;
+	int m_user_joy2;
+	int m_user_light_pen;
+	int m_user_cassette_switch;
 
 	enum
 	{

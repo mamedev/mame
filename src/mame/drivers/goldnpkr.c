@@ -3512,137 +3512,13 @@ static GFXDECODE_START( wcrdxtnd )
 GFXDECODE_END
 
 /*******************************************
-*              PIA Interfaces              *
-*******************************************/
-
-/***** Golden Poker Double Up *****/
-
-static const pia6821_interface goldnpkr_pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,goldnpkr_mux_port_r),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,lamps_a_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface goldnpkr_pia1_intf =
-{
-	DEVCB_INPUT_PORT("SW1"),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,sound_w),        /* port A out */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,mux_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-/***** Jack Potten's Poker & Witch Card *****/
-
-static const pia6821_interface pottnpkr_pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,pottnpkr_mux_port_r),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,mux_port_w),     /* port A out */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,lamps_a_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-/***** Witch Card (Falcon) *****/
-
-static const pia6821_interface wcfalcon_pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,pottnpkr_mux_port_r),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,mux_port_w),     /* port A out */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,lamps_a_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface wcfalcon_pia1_intf =
-{
-	DEVCB_INPUT_PORT("SW1"),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,wcfalcon_snd_w), /* port A out, custom handler due to address + data are muxed */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state,mux_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-/***** Bonne Chance! *****/
-
-static const pia6821_interface bchancep_pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia0_a_r),      /* port A in */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia0_b_r),      /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia0_a_w),      /* port A out */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia0_b_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface bchancep_pia1_intf =
-{
-	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia1_a_r),      /* port A in */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia1_b_r),      /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia1_a_w),      /* port A out */
-	DEVCB_DRIVER_MEMBER(goldnpkr_state, pia1_b_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-
-/*******************************************
 *              CRTC Interface              *
 *******************************************/
 
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -3819,8 +3695,14 @@ static MACHINE_CONFIG_START( goldnpkr_base, goldnpkr_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PIA6821_ADD("pia0", goldnpkr_pia0_intf)
-	MCFG_PIA6821_ADD("pia1", goldnpkr_pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, goldnpkr_mux_port_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, lamps_a_w))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, sound_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, mux_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3853,7 +3735,9 @@ static MACHINE_CONFIG_DERIVED( pottnpkr, goldnpkr_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pottnpkr_map)
 
-	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3869,7 +3753,9 @@ static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(witchcrd_map)
 
-	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
@@ -3888,8 +3774,11 @@ static MACHINE_CONFIG_DERIVED( wcfalcon, goldnpkr_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(witchcrd_falcon_map)
 
-	MCFG_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
-	MCFG_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+
+	MCFG_DEVICE_MODIFY("pia1")
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w)) /* port A out, custom handler due to address + data are muxed */
 
 	/* video hardware */
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
@@ -3908,7 +3797,9 @@ static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wildcard_map)
 
-	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
 //  MCFG_GFXDECODE(wildcard)
@@ -3929,7 +3820,9 @@ static MACHINE_CONFIG_DERIVED( wcrdxtnd, goldnpkr_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wcrdxtnd_map)
 
-	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE(wcrdxtnd)
@@ -3954,8 +3847,11 @@ static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 	MCFG_CPU_PROGRAM_MAP(wildcrdb_mcu_map)
 	MCFG_CPU_IO_MAP(wildcrdb_mcu_io_map)
 
-	MCFG_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
-	MCFG_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
+
+	MCFG_DEVICE_MODIFY("pia1")
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, wcfalcon_snd_w))
 
 	/* video hardware */
 //  MCFG_GFXDECODE(wildcard)
@@ -3976,7 +3872,9 @@ static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(genie_map)
 
-	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pottnpkr_mux_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, mux_port_w))
 
 	/* video hardware */
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
@@ -4008,8 +3906,17 @@ static MACHINE_CONFIG_DERIVED( bchancep, goldnpkr_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bchancep_map)
 
-	MCFG_PIA6821_MODIFY("pia0", bchancep_pia0_intf)
-	MCFG_PIA6821_MODIFY("pia1", bchancep_pia1_intf)
+	MCFG_DEVICE_MODIFY("pia0")
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pia0_a_r))
+	MCFG_PIA_READPB_HANDLER(READ8(goldnpkr_state, pia0_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, pia0_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, pia0_b_w))
+
+	MCFG_DEVICE_MODIFY("pia1")
+	MCFG_PIA_READPA_HANDLER(READ8(goldnpkr_state, pia1_a_r))
+	MCFG_PIA_READPB_HANDLER(READ8(goldnpkr_state, pia1_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(goldnpkr_state, pia1_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(goldnpkr_state, pia1_b_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

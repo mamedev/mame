@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:smf
 /**********************************************************************
 
     Commodore VIC-1011A/B RS-232C Adapter emulation
@@ -26,8 +26,8 @@
 
 // ======================> vic1011_device
 
-class vic1011_device :  public device_t,
-						public device_vic20_user_port_interface
+class vic1011_device : public device_t,
+	public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
@@ -36,16 +36,17 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	DECLARE_WRITE_LINE_MEMBER( rxd_w );
+	// device_pet_user_port_interface overrides
+	virtual DECLARE_WRITE_LINE_MEMBER( input_d );
+	virtual DECLARE_WRITE_LINE_MEMBER( input_e );
+	virtual DECLARE_WRITE_LINE_MEMBER( input_j );
+	virtual DECLARE_WRITE_LINE_MEMBER( input_m );
+
+	DECLARE_WRITE_LINE_MEMBER( output_rxd );
 
 protected:
 	// device-level overrides
 	virtual void device_start();
-
-	// device_vic20_user_port_interface overrides
-	virtual UINT8 vic20_pb_r(address_space &space, offs_t offset);
-	virtual void vic20_pb_w(address_space &space, offs_t offset, UINT8 data);
-	virtual void vic20_cb2_w(int state);
 
 private:
 	required_device<rs232_port_device> m_rs232;

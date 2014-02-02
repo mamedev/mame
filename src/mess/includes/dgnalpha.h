@@ -48,7 +48,11 @@ public:
 	required_device<ay8912_device> m_ay8912;
 	required_device<wd2797_device> m_fdc;
 
-	static const pia6821_interface pia2_config;
+	/* pia2 */
+	DECLARE_WRITE8_MEMBER( pia2_pa_w );
+	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
+	DECLARE_WRITE_LINE_MEMBER( pia2_firq_b );
+
 	static const ay8910_interface ay8912_interface;
 	static const wd17xx_interface fdc_interface;
 
@@ -66,11 +70,6 @@ protected:
 
 private:
 	UINT8 m_just_reset;
-
-	/* pia2 */
-	DECLARE_WRITE8_MEMBER( pia2_pa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia2_firq_b );
 
 	/* psg */
 	DECLARE_READ8_MEMBER( psg_porta_read );

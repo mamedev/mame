@@ -253,22 +253,6 @@ WRITE_LINE_MEMBER(spiders_state::audio_cpu_irq)
  *
  *************************************/
 
-static const pia6821_interface pia_1_intf =
-{
-	DEVCB_INPUT_PORT("IN0"),        /* port A in */
-	DEVCB_INPUT_PORT("IN1"),        /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq),       /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)        /* IRQB */
-};
-
 INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
 {
 	pia6821_device *pia1 = machine().device<pia6821_device>("pia1");
@@ -285,78 +269,6 @@ INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
 
 	/* CB2 - NOT CONNECTED */
 }
-
-
-
-/*************************************
- *
- *  PIA2 - Main CPU
- *
- *************************************/
-
-static const pia6821_interface pia_2_intf =
-{
-	DEVCB_DRIVER_MEMBER(spiders_state,gfx_rom_r),       /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(spiders_state,gfx_rom_intf_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,flipscreen_w),       /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_firq),      /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)        /* IRQB */
-};
-
-
-
-/*************************************
- *
- *  PIA3 - Main CPU
- *
- *************************************/
-
-static const pia6821_interface pia_3_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_ctrl_w),       /* port A out */
-	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_command_w),        /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq),       /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,main_cpu_irq)        /* IRQB */
-};
-
-
-
-/*************************************
- *
- *  PIA -  Audio CPU
- *
- *************************************/
-
-static const pia6821_interface pia_4_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_a_w),      /* port A out */
-	DEVCB_DRIVER_MEMBER(spiders_state, spiders_audio_b_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(spiders_state,audio_cpu_irq),      /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
 
 
 
@@ -508,6 +420,7 @@ WRITE_LINE_MEMBER(spiders_state::display_enable_changed)
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,                  /* show border area */
+	0,0,0,0,                /* visarea adjustment */
 	8,                      /* number of pixels per video memory address */
 	begin_update,           /* before pixel update callback */
 	update_row,             /* row update callback */
@@ -709,10 +622,29 @@ static MACHINE_CONFIG_START( spiders, spiders_state )
 
 	/* 74LS123 */
 
-	MCFG_PIA6821_ADD("pia1", pia_1_intf)
-	MCFG_PIA6821_ADD("pia2", pia_2_intf)
-	MCFG_PIA6821_ADD("pia3", pia_3_intf)
-	MCFG_PIA6821_ADD("pia4", pia_4_intf)
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+
+	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(spiders_state,gfx_rom_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state,gfx_rom_intf_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(spiders_state,flipscreen_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state,main_cpu_firq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+
+	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(spiders_state, spiders_audio_ctrl_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state, spiders_audio_command_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+
+	MCFG_DEVICE_ADD("pia4", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(spiders_state, spiders_audio_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state, spiders_audio_b_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state, audio_cpu_irq))
 
 	MCFG_TTL74123_ADD("ic60", ic60_intf)
 

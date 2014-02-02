@@ -31,22 +31,6 @@ static ADDRESS_MAP_START( s11c_bg_map, AS_PROGRAM, 8, s11c_bg_device )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bgbank")
 ADDRESS_MAP_END
 
-static const pia6821_interface pia40_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_LINE_VCC,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER,s11c_bg_device, pia40_pa_w),     /* port A out */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER,s11c_bg_device, pia40_pb_w),     /* port B out */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,s11c_bg_device, pia40_ca2_w),      /* line CA2 out */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,s11c_bg_device, pia40_cb2_w),       /* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),     /* IRQA */
-	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)       /* IRQB */
-};
-
 WRITE8_MEMBER( s11c_bg_device::pia40_pa_w )
 {
 	m_dac1->write_unsigned8(data);
@@ -94,7 +78,13 @@ MACHINE_CONFIG_FRAGMENT( s11c_bg )
 	MCFG_SOUND_ADD("hc55516_bg", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 
-	MCFG_PIA6821_ADD("pia40", pia40_intf)
+	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11c_bg_device, pia40_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11c_bg_device, pia40_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s11c_bg_device, pia40_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s11c_bg_device, pia40_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, firq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("bgcpu", m6809e_device, nmi_line))
 MACHINE_CONFIG_END
 
 machine_config_constructor s11c_bg_device::device_mconfig_additions() const

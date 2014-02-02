@@ -699,43 +699,6 @@ static GFXDECODE_START( megadpkr )
 GFXDECODE_END
 
 
-/*******************************************
-*              PIA Interfaces              *
-*******************************************/
-
-static const pia6821_interface megadpkr_pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(blitz_state,megadpkr_mux_port_r),   /* port A in */
-	DEVCB_NULL,                 /* port B in */
-	DEVCB_NULL,                 /* line CA1 in */
-	DEVCB_NULL,                 /* line CB1 in */
-	DEVCB_NULL,                 /* line CA2 in */
-	DEVCB_NULL,                 /* line CB2 in */
-	DEVCB_NULL,                 /* port A out */
-	DEVCB_DRIVER_MEMBER(blitz_state,lamps_a_w), /* port B out */
-	DEVCB_NULL,                 /* line CA2 out */
-	DEVCB_NULL,                 /* port CB2 out */
-	DEVCB_NULL,                 /* IRQA */
-	DEVCB_NULL                  /* IRQB */
-};
-
-static const pia6821_interface megadpkr_pia1_intf =
-{
-	DEVCB_INPUT_PORT("SW1"),    /* port A in */
-	DEVCB_NULL,                 /* port B in */
-	DEVCB_NULL,                 /* line CA1 in */
-	DEVCB_NULL,                 /* line CB1 in */
-	DEVCB_NULL,                 /* line CA2 in */
-	DEVCB_NULL,                 /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(blitz_state,sound_w),       /* port A out */
-	DEVCB_DRIVER_MEMBER(blitz_state,mux_w),     /* port B out */
-	DEVCB_NULL,                 /* line CA2 out */
-	DEVCB_NULL,                 /* port CB2 out */
-	DEVCB_NULL,                 /* IRQA */
-	DEVCB_NULL                  /* IRQB */
-};
-
-
 /********************************************
 *               CRTC Interface              *
 ********************************************/
@@ -743,6 +706,7 @@ static const pia6821_interface megadpkr_pia1_intf =
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -803,8 +767,14 @@ static MACHINE_CONFIG_START( megadpkr, blitz_state )
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PIA6821_ADD("pia0", megadpkr_pia0_intf)
-	MCFG_PIA6821_ADD("pia1", megadpkr_pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(blitz_state, megadpkr_mux_port_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blitz_state, lamps_a_w))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(blitz_state, sound_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blitz_state, mux_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

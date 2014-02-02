@@ -11,7 +11,7 @@
 
 #include "selgame.h"
 #include "uiinput.h"
-#include "uimain.h"
+#include "ui/miscmenu.h"
 #include "ui/emenubar.h"
 #include "audit.h"
 
@@ -111,18 +111,6 @@ void ui_menu_select_game::populate()
 {
 	// if nothing there, add a single multiline item and return
 	if (driver_count == 0)
-	{
-		astring txt;
-		txt.printf("No %s found. Please check the rompath specified in the %s.ini file.\n\n"
-					"If this is your first time using %s, please see the config.txt file in "
-					"the docs directory for information on configuring %s.",
-					emulator_info::get_gamesnoun(),
-					emulator_info::get_configname(),
-					emulator_info::get_appname(),emulator_info::get_appname() );
-		item_append(txt.cstr(), NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
-		return;
-	}
-
 	// populate all menu items
 	for (int curitem = 0; curitem < driver_count; curitem++)
 	{

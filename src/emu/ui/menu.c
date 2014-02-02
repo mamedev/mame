@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    menu.c
+    ui/menu.c
 
     Internal MAME menus for the user interface.
 
@@ -15,8 +15,8 @@
 #include "rendutil.h"
 #include "uiinput.h"
 #include "cheat.h"
-#include "uimain.h"
 #include "ui/emenubar.h"
+#include "ui/miscmenu.h"
 #include <ctype.h>
 
 

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    menu.h
+    ui/menu.h
 
     Internal MAME menus for the user interface.
 

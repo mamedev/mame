@@ -335,23 +335,6 @@ static const ay8910_interface demoneye_ay8910_interface =
 };
 
 
-static const pia6821_interface demoneye_pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_latch_2_r),      /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_data_w),         /* port A out */
-	DEVCB_DRIVER_MEMBER(redalert_state,demoneye_ay8910_latch_1_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-
 
 /*************************************
  *
@@ -379,7 +362,10 @@ MACHINE_CONFIG_FRAGMENT( demoneye_audio )
 	MCFG_CPU_PROGRAM_MAP(demoneye_audio_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(redalert_state, irq0_line_hold,  REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
 
-	MCFG_PIA6821_ADD("sndpia", demoneye_pia_intf)
+	MCFG_DEVICE_ADD("sndpia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(redalert_state, demoneye_ay8910_latch_2_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(redalert_state, demoneye_ay8910_data_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(redalert_state, demoneye_ay8910_latch_1_w))
 
 	MCFG_SOUND_START_OVERRIDE( redalert_state, demoneye )
 

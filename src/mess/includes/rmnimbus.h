@@ -396,7 +396,8 @@ public:
 		m_ay8910(*this, AY8910_TAG),
 		m_scsibus(*this, SCSIBUS_TAG ":host"),
 		m_ram(*this, RAM_TAG),
-		m_eeprom(*this, ER59256_TAG)
+		m_eeprom(*this, ER59256_TAG),
+		m_via(*this, VIA_TAG)
 	{
 	}
 
@@ -406,6 +407,7 @@ public:
 	required_device<scsicb_device> m_scsibus;
 	required_device<ram_device> m_ram;
 	required_device<er59256_device> m_eeprom;
+	required_device<via6522_device> m_via;
 
 	UINT32 m_debug_machine;
 //  i186_state m_i186;
@@ -468,7 +470,6 @@ public:
 	DECLARE_READ16_MEMBER(sio_serial_receive);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
-	DECLARE_READ8_MEMBER(nimbus_via_read_portb);
 	DECLARE_WRITE8_MEMBER(nimbus_via_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_ack_w);

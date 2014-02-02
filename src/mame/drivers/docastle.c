@@ -37,7 +37,7 @@ c002      DSWA
 c003      IN0
           bit 4-7 = joystick player 2
           bit 0-3 = joystick player 1
-c004      flipscreen (proper cocktail mode implemented by Chad Hendrickson Aug 1, 1999)
+c004      flipscreen
 c005      IN1
           bit 7 = START 2
           bit 6 = unused
@@ -89,7 +89,7 @@ read:
 e000-e008 data from first CPU
 c003      bit 0-3 = joystick
           bit 4-7 = ?
-c004      flipscreen (proper cocktail mode implemented by Chad Hendrickson Aug 1, 1999)
+c004      flipscreen
 c005      bit 0 = fire
           bit 1 = fire (again?!)
           bit 2 = ?
@@ -134,16 +134,15 @@ TODO:
   12) Mr do moves. Kills 'A' monster. Shows winning extra Mr do.
 
   Small changes to the CPU speed or refresh rate alter the demo timing and can cause
-  the above sequence (not) to work (e.g. Mr Do might not fill all monsters at once
+  the above sequence (not) to work (e.g. Mr Do might not kill all monsters at once
   on the first round).
   Note that this only works in the dorunrun2 set. The dorunrun set works slightly
   differently, however it hasn't been compared with the real board so it might be
   right.
-- unknown ports 0 and 2
+
 - bad communication in idsoccer
 - adpcm status in idsoccer
 - real values for the adpcm interface in idsoccer
-- handle flipscreen on/off based on address line A7 (cX0X/cX8X)
 
 
 2008-08
@@ -153,13 +152,23 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/msm5205.h"
 #include "sound/sn76496.h"
 #include "includes/docastle.h"
 
 
 
 /* Read/Write Handlers */
+WRITE_LINE_MEMBER(docastle_state::docastle_tint)
+{
+	if (state)
+	{
+		int ma6 = m_crtc->get_ma() & 0x40;
+		if (ma6 && !m_prev_ma6) // MA6 rising edge
+			m_slave->set_input_line(0, HOLD_LINE);
+		m_prev_ma6 = ma6;
+	}
+}
+
 WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 {
 	if (m_adpcm_pos >= memregion("adpcm")->bytes())
@@ -220,10 +229,9 @@ static ADDRESS_MAP_START( docastle_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_READWRITE(docastle_flipscreen_off_r, docastle_flipscreen_off_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x0080) AM_MASK(0x0080) AM_READWRITE(flipscreen_r, flipscreen_w)
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc084, 0xc084) AM_READWRITE(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("sn1", sn76489a_device, write)
 	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("sn3", sn76489a_device, write)
@@ -240,8 +248,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( docastle_io_map, AS_IO, 8, docastle_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_NOP // goes to CRT 46505S
-	AM_RANGE(0x02, 0x02) AM_NOP // goes to CRT 46505S
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
 
@@ -267,10 +275,9 @@ static ADDRESS_MAP_START( dorunrun_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_READWRITE(docastle_flipscreen_off_r, docastle_flipscreen_off_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x0080) AM_MASK(0x0080) AM_READWRITE(flipscreen_r, flipscreen_w)
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc084, 0xc084) AM_READWRITE(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
 	AM_RANGE(0xe000, 0xe008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
 ADDRESS_MAP_END
 
@@ -295,10 +302,9 @@ static ADDRESS_MAP_START( idsoccer_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(docastle_flipscreen_off_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x0080) AM_MASK(0x0080) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(flipscreen_w)
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc084, 0xc084) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(docastle_flipscreen_on_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("sn1", sn76489a_device, write)
 	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("sn2", sn76489a_device, write)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("sn3", sn76489a_device, write)
@@ -544,6 +550,36 @@ static GFXDECODE_START( docastle )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     0, 32*2 )
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  6845 CRTC interface
+ *
+ *************************************/
+
+/*
+The games program the CRTC for a width of 32 characters (256 pixels).
+However, the DE output from the CRTC is first ANDed with the NAND of
+MA1 through MA4, and then delayed by 8 pixel clocks; this effectively
+blanks the first 8 pixels and last 8 pixels of each line.
+*/
+
+static MC6845_INTERFACE( crtc_intf )
+{
+	false,      /* show border area */
+	8,-8,0,0,   /* visarea adjustment */
+	8,          /* number of pixels per video memory address */
+	NULL,       /* before pixel update callback */
+	NULL,       /* row update callback */
+	NULL,       /* after pixel update callback */
+	DEVCB_NULL, /* callback for display state changes */
+	DEVCB_NULL, /* callback for cursor state changes */
+	DEVCB_DRIVER_LINE_MEMBER(docastle_state, docastle_tint), /* HSYNC callback */
+	DEVCB_NULL, /* VSYNC callback */
+	NULL        /* update address callback */
+};
+
+
 /* Sound Interfaces */
 
 static const msm5205_interface msm5205_config =
@@ -575,6 +611,7 @@ void docastle_state::machine_reset()
 		m_buffer1[i] = 0;
 	}
 
+	m_prev_ma6 = 0;
 	m_adpcm_pos = m_adpcm_idle = 0;
 	m_adpcm_data = -1;
 	m_adpcm_status = 0;
@@ -582,6 +619,7 @@ void docastle_state::machine_reset()
 
 void docastle_state::machine_start()
 {
+	save_item(NAME(m_prev_ma6));
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_adpcm_idle));
@@ -596,28 +634,24 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map)
 	MCFG_CPU_IO_MAP(docastle_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, irq0_line_hold)
 
 	MCFG_CPU_ADD("slave", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(docastle_state, irq0_line_hold,  8*60)
 
 	MCFG_CPU_ADD("cpu3", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map3)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state,  nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
 	/* video hardware */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16, crtc_intf)
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.60) // measured on pcb, real refresh rate should be derived from XTAL_9_828MHz, how?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 
 	MCFG_GFXDECODE(docastle)
 	MCFG_PALETTE_LENGTH(512)
-
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -642,7 +676,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( dorunrun, docastle )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dorunrun_map)
 
@@ -656,7 +689,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(idsoccer_map)
 
@@ -1101,8 +1133,8 @@ GAME( 1984, dorunrun2, dorunrun, dorunrun, dorunrun, driver_device, 0, ROT0,   "
 GAME( 1984, dorunrunc, dorunrun, docastle, dorunrun, driver_device, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1984, dorunrunca,dorunrun, docastle, dorunrun, driver_device, 0, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, spiero,    dorunrun, dorunrun, dorunrun, driver_device, 0, ROT0,   "Universal", "Super Pierrot (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, dowild,    0,        dorunrun, dowild, driver_device,   0, ROT0,   "Universal", "Mr. Do's Wild Ride", GAME_SUPPORTS_SAVE )
-GAME( 1984, jjack,     0,        dorunrun, jjack, driver_device,    0, ROT270, "Universal", "Jumping Jack", GAME_SUPPORTS_SAVE )
+GAME( 1984, dowild,    0,        dorunrun, dowild,   driver_device, 0, ROT0,   "Universal", "Mr. Do's Wild Ride", GAME_SUPPORTS_SAVE )
+GAME( 1984, jjack,     0,        dorunrun, jjack,    driver_device, 0, ROT270, "Universal", "Jumping Jack", GAME_SUPPORTS_SAVE )
 GAME( 1984, kickridr,  0,        dorunrun, kickridr, driver_device, 0, ROT0,   "Universal", "Kick Rider", GAME_SUPPORTS_SAVE )
 GAME( 1985, idsoccer,  0,        idsoccer, idsoccer, driver_device, 0, ROT0,   "Universal", "Indoor Soccer (set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1985, idsoccera, idsoccer, idsoccer, idsoccer, driver_device, 0, ROT0,   "Universal", "Indoor Soccer (set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )

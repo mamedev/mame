@@ -3,9 +3,10 @@
 Asterix
 
 TODO:
-the konami logo: in the original the outline is drawn, then there's a slight
-delay of 1 or 2 seconds, then it fills from the top to the bottom with the
-colour, including the word "Konami"
+ - the konami logo: in the original the outline is drawn, then there's a slight
+   delay of 1 or 2 seconds, then it fills from the top to the bottom with the
+   colour, including the word "Konami"
+ - Verify clocks, PCB has 2 OSCs. 32MHz & 24MHz
 
 ***************************************************************************/
 
@@ -270,11 +271,11 @@ void asterix_state::machine_reset()
 static MACHINE_CONFIG_START( asterix, asterix_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) // 12MHz
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", asterix_state,  asterix_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4) // 8MHz Z80E ??
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
@@ -298,11 +299,11 @@ static MACHINE_CONFIG_START( asterix, asterix_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K053260_ADD("k053260", 4000000)
+	MCFG_K053260_ADD("k053260", XTAL_32MHz/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

@@ -20,7 +20,8 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/terminal.h"
+#include "machine/6850acia.h"
+#include "machine/serial.h"
 #include "imagedev/snapquik.h"
 
 
@@ -30,44 +31,15 @@ public:
 	altair_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG),
 	m_ram(*this, "ram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(sio_status_r);
-	DECLARE_READ8_MEMBER(sio_data_r);
-	DECLARE_READ8_MEMBER(sio_key_status_r);
-	DECLARE_WRITE8_MEMBER(sio_command_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT8 m_term_data;
 	required_shared_ptr<UINT8> m_ram;
 	virtual void machine_reset();
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 };
 
 
-
-READ8_MEMBER(altair_state::sio_status_r)
-{
-	return (m_term_data) ? 1 : 2;
-}
-
-WRITE8_MEMBER(altair_state::sio_command_w)
-{
-}
-
-READ8_MEMBER(altair_state::sio_data_r)
-{
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER(altair_state::sio_key_status_r)
-{
-	return (m_term_data) ? 0x40 : 0x01;
-}
 
 static ADDRESS_MAP_START(altair_mem, AS_PROGRAM, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -79,9 +51,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(altair_io, AS_IO, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_READ(sio_key_status_r)
-	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_READ(sio_data_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE( 0x10, 0x10 ) AM_READWRITE(sio_status_r,sio_command_w)
+	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
+	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0x10) AM_DEVREADWRITE("mc6850", acia6850_device, status_read, control_write)
+	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_DEVREADWRITE("mc6850", acia6850_device, data_read, data_write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -108,19 +80,21 @@ void altair_state::machine_reset()
 {
 	// Set startup addess done by turn-key
 	m_maincpu->set_state_int(I8085_PC, 0xFD00);
-
-	m_term_data = 0;
 }
 
-WRITE8_MEMBER( altair_state::kbd_put )
-{
-	m_term_data = data;
-}
+//-------------------------------------------------
+//  ACIA6850_INTERFACE( acia0_intf )
+//-------------------------------------------------
 
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+static ACIA6850_INTERFACE( acia0_intf )
 {
-	DEVCB_DRIVER_MEMBER(altair_state, kbd_put)
+	153600, // TODO: these are set using jumpers S3/S2/S1/S0
+	153600,
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_NULL
 };
+
 
 static MACHINE_CONFIG_START( altair, altair_state )
 	/* basic machine hardware */
@@ -128,9 +102,13 @@ static MACHINE_CONFIG_START( altair, altair_state )
 	MCFG_CPU_PROGRAM_MAP(altair_mem)
 	MCFG_CPU_IO_MAP(altair_io)
 
-
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+	MCFG_ACIA6850_ADD("mc6850", acia0_intf)
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_rx))
+	MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_dcd))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("mc6850", acia6850_device, write_cts))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", altair_state, altair, "bin", 0)

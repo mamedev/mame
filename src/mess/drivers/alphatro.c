@@ -398,6 +398,7 @@ void alphatro_state::palette_init()
 static MC6845_INTERFACE( alphatro_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	alphatro_update_row,

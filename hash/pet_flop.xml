@@ -296,13 +296,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="hardbox-utils.d80" size="533248" crc="13e90ead" sha1="99449d79c6bca9f291afb672a67025419cbd1199" offset="0" />
+				<rom name="hardbox-utils.d80" size="533248" crc="12741d20" sha1="72d2e63a1325308fb343b321ce505cf8888cc48e" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="hardbox-utils.d64" size="174848" crc="4e1880e3" sha1="0e6bb17f7361be3be5f05ba55fb307a89cfc1897" offset="0" />
+				<rom name="hardbox-utils.d64" size="174848" crc="3d8e6192" sha1="f29bf1c2b5513f52c5d70d1192436fa002265bb0" offset="0" />
 			</dataarea>
 		</part>
 	</software>

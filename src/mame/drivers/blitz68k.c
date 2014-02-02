@@ -1668,6 +1668,7 @@ WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
 static MC6845_INTERFACE( mc6845_intf_irq1 )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -1682,6 +1683,7 @@ static MC6845_INTERFACE( mc6845_intf_irq1 )
 static MC6845_INTERFACE( mc6845_intf_irq3 )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -1696,6 +1698,7 @@ static MC6845_INTERFACE( mc6845_intf_irq3 )
 static MC6845_INTERFACE( mc6845_intf_irq5 )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

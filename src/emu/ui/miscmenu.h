@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    uimain.h
+    ui/miscmenu.h
 
     Internal MAME menus for the user interface.
 
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef __UIMAIN_H__
-#define __UIMAIN_H__
+#ifndef __UI_MISCMENU_H__
+#define __UI_MISCMENU_H__
 
 #include "crsshair.h"
 #include "drivenum.h"
@@ -312,4 +312,4 @@ public:
 private:
 };
 
-#endif  /* __UIMAIN_H__ */
+#endif  /* __UI_MISCMENU_H__ */

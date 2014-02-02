@@ -95,68 +95,6 @@ static void execute_beta_key_dump(running_machine &machine, int ref, int params,
 #define INVALID_KEYROW  -1          /* no ketrow selected */
 #define NO_KEY_PRESSED  0x7F            /* retrurned by hardware if no key pressed */
 
-const pia6821_interface dgnbeta_pia_intf[] =
-{
-	/* PIA 0 at $FC20-$FC23 I46 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_pa_r),
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_pb_r),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2       */
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_pa_w),
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_pb_w),
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia0_cb2_w),
-		/*irqs   : A/B         */
-		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia0_irq_a),
-		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia0_irq_b)
-	},
-
-	/* PIA 1 at $FC24-$FC27 I63 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia1_pa_r),
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia1_pb_r),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2       */
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia1_pa_w),
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia1_pb_w),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*irqs   : A/B         */
-		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia1_irq_a),
-		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia1_irq_b)
-	},
-
-	/* PIA 2 at FCC0-FCC3 I28 */
-	/* This seems to control the RAM paging system, and have the DRQ */
-	/* from the WD2797 */
-	{
-		/*inputs : A/B,CA/B1,CA/B2 */
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia2_pa_r),
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia2_pb_r),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*outputs: A/B,CA/B2       */
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia2_pa_w),
-		DEVCB_DRIVER_MEMBER(dgn_beta_state,d_pia2_pb_w),
-		DEVCB_NULL,
-		DEVCB_NULL,
-		/*irqs   : A/B         */
-		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia2_irq_a),
-		DEVCB_DRIVER_LINE_MEMBER(dgn_beta_state,d_pia2_irq_b)
-	}
-};
-
 // Info for bank switcher
 struct bank_info_entry
 {
@@ -578,13 +516,13 @@ WRITE8_MEMBER(dgn_beta_state::d_pia0_pb_w)
 	m_d_pia0_pb_last=data;
 }
 
-WRITE8_MEMBER(dgn_beta_state::d_pia0_cb2_w)
+WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_cb2_w)
 {
 	int RowNo;
 	LOG_KEYBOARD(("\nCB2 Write\n"));
 
 	/* load keyrow on rising edge of CB2 */
-	if((data==1) && (m_d_pia0_cb2_last==0))
+	if((state==1) && (m_d_pia0_cb2_last==0))
 	{
 		RowNo=SelectedKeyrow(this, m_RowShifter);
 		m_Keyrow=GetKeyRow(this, RowNo);
@@ -597,7 +535,7 @@ WRITE8_MEMBER(dgn_beta_state::d_pia0_cb2_w)
 		if (VERBOSE) debug_console_printf(machine(), "rowshifter clocked, value=%3X, RowNo=%d, Keyrow=%2X\n",m_RowShifter,RowNo,m_Keyrow);
 	}
 
-	m_d_pia0_cb2_last=data;
+	m_d_pia0_cb2_last=state;
 }
 
 

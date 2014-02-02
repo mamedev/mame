@@ -21,11 +21,10 @@ public:
 	void net_alias();
 	void netdev_param();
 	void net_c();
-	void netdev_const(const pstring &dev_name);
 	void netdev_device(const pstring &dev_type);
-	void netdev_device(const pstring &dev_type, const pstring &default_param, bool isString = false);
     void netdev_netlist_start();
     void netdev_netlist_end();
+    void net_model();
 
     void error(const char *format, ...);
 private:
@@ -37,7 +36,9 @@ private:
     pstring getname2_ext(char sep1, char sep2, const char *allowed);
 	void check_char(char ctocheck);
 	double eval_param();
+    pstring getstring();
 
+    unsigned char peekc();
 	unsigned char getc();
 	void ungetc();
 	bool eof() { return *m_px == 0; }

@@ -23,6 +23,7 @@ NETLIST_START(opamp)
     NETDEV_PARAM(clk.FREQ, 1000) // 1000 Hz
     NETDEV_SOLVER(Solver)
     NETDEV_PARAM(Solver.FREQ, 48000)
+    NETDEV_PARAM(Solver.ACCURACY, 1e-6)
 
     /* Wiring up the opamp */
 

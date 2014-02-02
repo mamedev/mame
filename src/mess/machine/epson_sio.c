@@ -29,8 +29,8 @@ const device_type EPSON_SIO = &device_creator<epson_sio_device>;
 //  device_epson_sio_interface - constructor
 //-------------------------------------------------
 
-device_epson_sio_interface::device_epson_sio_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+device_epson_sio_interface::device_epson_sio_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device)
 {
 	m_slot = dynamic_cast<epson_sio_device *>(device.owner());
 }
@@ -55,7 +55,9 @@ device_epson_sio_interface::~device_epson_sio_interface()
 
 epson_sio_device::epson_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, EPSON_SIO, "EPSON SIO port", tag, owner, clock, "epson_sio", __FILE__),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		m_write_rx(*this),
+		m_write_pin(*this)
 {
 }
 
@@ -76,6 +78,9 @@ epson_sio_device::~epson_sio_device()
 void epson_sio_device::device_start()
 {
 	m_cart = dynamic_cast<device_epson_sio_interface *>(get_card_device());
+
+	m_write_rx.resolve_safe();
+	m_write_pin.resolve_safe();
 }
 
 
@@ -98,26 +103,6 @@ WRITE_LINE_MEMBER( epson_sio_device::pout_w )
 {
 	if (m_cart != NULL)
 		m_cart->pout_w(state);
-}
-
-READ_LINE_MEMBER( epson_sio_device::rx_r )
-{
-	int state = 1;
-
-	if (m_cart != NULL)
-		state = m_cart->rx_r();
-
-	return state;
-}
-
-READ_LINE_MEMBER( epson_sio_device::pin_r )
-{
-	int state = 1;
-
-	if (m_cart != NULL)
-		state = m_cart->pin_r();
-
-	return state;
 }
 
 

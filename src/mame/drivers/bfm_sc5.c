@@ -214,22 +214,6 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 	logerror("bfm_sc5_duart_output_w\n");
 }
 
-
-static const duartn68681_config bfm_sc5_duart68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(bfm_sc5_state, bfm_sc5_duart_irq_handler),
-	DEVCB_DRIVER_LINE_MEMBER(bfm_sc5_state, bfm_sc5_duart_txa),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(bfm_sc5_state, bfm_sc5_duart_input_r),
-	DEVCB_DRIVER_MEMBER(bfm_sc5_state, bfm_sc5_duart_output_w),
-	// TODO: What are the actual frequencies?
-	16000000/2/8,     /* IP2/RxCB clock */
-	16000000/2/16,    /* IP3/TxCA clock */
-	16000000/2/16,    /* IP4/RxCA clock */
-	16000000/2/8,     /* IP5/TxCB clock */
-};
-
-
 MACHINE_CONFIG_START( bfm_sc5, bfm_sc5_state )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_CPU_PROGRAM_MAP(sc5_map)
@@ -238,8 +222,12 @@ MACHINE_CONFIG_START( bfm_sc5, bfm_sc5_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_DUARTN68681_ADD("duart68681", 16000000/4, bfm_sc5_duart68681_config) // ?? Mhz
-
+	MCFG_DUARTN68681_ADD("duart68681", 16000000/4) // ?? Mhz
+	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(bfm_sc5_state, bfm_sc5_duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(bfm_sc5_state, bfm_sc5_duart_txa))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(bfm_sc5_state, bfm_sc5_duart_input_r))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(bfm_sc5_state, bfm_sc5_duart_output_w))
 
 	MCFG_BFMBDA_ADD("vfd0",0)
 

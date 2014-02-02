@@ -676,6 +676,7 @@ static MC6845_UPDATE_ROW( update_row )
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	update_row,       /* row update callback */
@@ -915,16 +916,6 @@ WRITE8_MEMBER(bml3_state::bml3_piaA_w)
 	}
 }
 
-static const pia6821_interface bml3_pia_config =
-{
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-
-	DEVCB_DRIVER_MEMBER(bml3_state, bml3_piaA_w),   /* port A output */
-	DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-};
-
-
 WRITE_LINE_MEMBER( bml3_state::bml3_acia_tx_w )
 {
 	//logerror("%02x TAPE\n",state);
@@ -1018,7 +1009,10 @@ static MACHINE_CONFIG_START( bml3_common, bml3_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(H_CLOCK/2))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
-	MCFG_PIA6821_ADD("pia6821", bml3_pia_config)
+
+	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(bml3_state, bml3_piaA_w))
+
 	MCFG_ACIA6850_ADD("acia6850", bml3_acia_if)
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 

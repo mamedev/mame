@@ -46,11 +46,11 @@
 #include "cpu/m6502/m65sc02.h"
 #include "machine/6522via.h"
 #include "machine/mc146818.h"       /* RTC & CMOS RAM */
-#include "machine/upd7002.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/econet/econet.h"
 #include "sound/tms5220.h"          /* Speech */
 #include "video/saa5050.h"          /* Teletext */
+#include "bbc.lh"
 
 /* Devices */
 #include "imagedev/flopdrv.h"
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)          /*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_disc_r, bbc_disc_w)                               /*    fe80-fe9f  8271 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)          /*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)                    /*    fe80-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)          /*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)                    /*    fe80-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)                                                  /*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", upd7002_device, read, write)            /*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)                                 /*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
@@ -308,10 +308,6 @@ INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-/* 2008-05 FP:
-Small note about natural keyboard support: currently,
-- "Copy" is mapped to 'F11'
-- "Shift Lock" is mapped to 'F12'                      */
 
 /*  Port                                        Key description                 Emulated key                    Natural key         Shift 1         Shift 2 (Ctrl) */
 
@@ -321,8 +317,8 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")                  PORT_CODE(KEYCODE_Q)            PORT_CHAR('Q')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F0")                 PORT_CODE(KEYCODE_F1)           PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !")                PORT_CODE(KEYCODE_1)            PORT_CHAR('1')      PORT_CHAR('!')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPSLOCK")           PORT_CODE(KEYCODE_CAPSLOCK)     PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))    PORT_TOGGLE
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFTLOCK")          PORT_CODE(KEYCODE_LALT)         PORT_CHAR(UCHAR_MAMEKEY(LALT))        PORT_TOGGLE
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPSLOCK")           PORT_CODE(KEYCODE_CAPSLOCK)     PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFTLOCK")          PORT_CODE(KEYCODE_LALT)         PORT_CHAR(UCHAR_MAMEKEY(LALT))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TAB")                PORT_CODE(KEYCODE_TAB)          PORT_CHAR('\t')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESCAPE")             PORT_CODE(KEYCODE_ESC)          PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
@@ -337,9 +333,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")                 PORT_CODE(KEYCODE_F2)           PORT_CHAR(UCHAR_MAMEKEY(F2))
 
 	PORT_START("COL2")  /* KEYBOARD COLUMN 2 */
-	PORT_DIPNAME(0x01, 0x01, "DIP 8 (Not Used)")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")                  PORT_CODE(KEYCODE_4)            PORT_CHAR('4')      PORT_CHAR('$')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")                  PORT_CODE(KEYCODE_E)            PORT_CHAR('E')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")                  PORT_CODE(KEYCODE_D)            PORT_CHAR('D')
@@ -349,9 +343,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2")                 PORT_CODE(KEYCODE_F3)           PORT_CHAR(UCHAR_MAMEKEY(F3))
 
 	PORT_START("COL3")  /* KEYBOARD COLUMN 3 */
-	PORT_DIPNAME(0x01, 0x01, "DIP 7 (Not Used)")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %")                PORT_CODE(KEYCODE_5)            PORT_CHAR('5')      PORT_CHAR('%')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")                  PORT_CODE(KEYCODE_T)            PORT_CHAR('T')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")                  PORT_CODE(KEYCODE_R)            PORT_CHAR('R')
@@ -361,9 +353,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3")                 PORT_CODE(KEYCODE_F4)           PORT_CHAR(UCHAR_MAMEKEY(F4))
 
 	PORT_START("COL4")  /* KEYBOARD COLUMN 4 */
-	PORT_DIPNAME(0x01, 0x01, "DIP 6 (Disc Speed 1)")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4")                 PORT_CODE(KEYCODE_F5)           PORT_CHAR(UCHAR_MAMEKEY(F5))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 \\")               PORT_CODE(KEYCODE_7)            PORT_CHAR('7')      PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 &")                PORT_CODE(KEYCODE_6)            PORT_CHAR('6')      PORT_CHAR('&')
@@ -373,9 +363,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5")                 PORT_CODE(KEYCODE_F6)           PORT_CHAR(UCHAR_MAMEKEY(F6))
 
 	PORT_START("COL5")  /* KEYBOARD COLUMN 5 */
-	PORT_DIPNAME(0x01, 0x01, "DIP 5 (Disc Speed 0)")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 (")                PORT_CODE(KEYCODE_8)            PORT_CHAR('8')      PORT_CHAR('(')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")                  PORT_CODE(KEYCODE_I)            PORT_CHAR('I')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")                  PORT_CODE(KEYCODE_U)            PORT_CHAR('U')
@@ -385,9 +373,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6")                 PORT_CODE(KEYCODE_F7)           PORT_CHAR(UCHAR_MAMEKEY(F7))
 
 	PORT_START("COL6")  /* KEYBOARD COLUMN 6 */
-	PORT_DIPNAME(0x01, 0x01, "DIP 4 (Shift Break)")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7")                 PORT_CODE(KEYCODE_F8)           PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 )")                PORT_CODE(KEYCODE_9)            PORT_CHAR('9')      PORT_CHAR(')')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")                  PORT_CODE(KEYCODE_O)            PORT_CHAR('O')
@@ -397,9 +383,7 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8")                 PORT_CODE(KEYCODE_F9)           PORT_CHAR(UCHAR_MAMEKEY(F9))
 
 	PORT_START("COL7")  /* KEYBOARD COLUMN 7 */
-	PORT_DIPNAME(0x01, 0x01, "DIP 3 (Mode bit 2)")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- =")                PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('-')      PORT_CHAR('=')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")                  PORT_CODE(KEYCODE_0)            PORT_CHAR('0')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")                  PORT_CODE(KEYCODE_P)            PORT_CHAR('P')
@@ -409,11 +393,9 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F9")                 PORT_CODE(KEYCODE_F10)          PORT_CHAR(UCHAR_MAMEKEY(F10))
 
 	PORT_START("COL8")  /* KEYBOARD COLUMN 8 */
-	PORT_DIPNAME(0x01, 0x01, "DIP 2 (Mode bit 1)")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^ ~")                PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('^') PORT_CHAR('~')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("_ POUND")            PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('_') PORT_CHAR('\xa3')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("_ \xC2\xA3")         PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('_') PORT_CHAR('\xA3')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ {")                PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(": *")                PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("] }")                PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']') PORT_CHAR('}')
@@ -421,13 +403,11 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |")               PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('\\') PORT_CHAR('|')
 
 	PORT_START("COL9")  /* KEYBOARD COLUMN 9 */
-	PORT_DIPNAME(0x01, 0x01, "DIP 1 (Mode bit 0)")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT")               PORT_CODE(KEYCODE_LEFT)         PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN")               PORT_CODE(KEYCODE_DOWN)         PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UP")                 PORT_CODE(KEYCODE_UP)           PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER")              PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RETURN")             PORT_CODE(KEYCODE_ENTER)        PORT_CHAR(13)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DELETE")             PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("COPY")               PORT_CODE(KEYCODE_END)          PORT_CHAR(UCHAR_MAMEKEY(END))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT")              PORT_CODE(KEYCODE_RIGHT)        PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
@@ -435,17 +415,90 @@ static INPUT_PORTS_START(bbc_keyboard)
 	PORT_START("BRK")  /* BREAK */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")              PORT_CODE(KEYCODE_F12)          PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_state, trigger_reset, 0)
 
-	/* Keyboard columns 10 -> 15 are reserved for BBC Master */
+	/* Keyboard columns 10 -> 12 are reserved for BBC Master */
 	PORT_START("COL10")
 	PORT_START("COL11")
 	PORT_START("COL12")
-	PORT_START("COL13")
-	PORT_START("COL14")
-	PORT_START("COL15")
 
 	PORT_START("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START(bbc_keypad)
+	PORT_MODIFY("COL10")  /* KEYBOARD COLUMN 10 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 6")           PORT_CODE(KEYCODE_6_PAD)        PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 8")           PORT_CODE(KEYCODE_8_PAD)        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad +")           PORT_CODE(KEYCODE_PLUS_PAD)     PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad /")           PORT_CODE(KEYCODE_SLASH_PAD)    PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad #")           PORT_CODE(KEYCODE_NUMLOCK)      PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 0")           PORT_CODE(KEYCODE_0_PAD)        PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 4")           PORT_CODE(KEYCODE_4_PAD)        PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+
+	PORT_MODIFY("COL11")  /* KEYBOARD COLUMN 11 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 7")           PORT_CODE(KEYCODE_7_PAD)        PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 9")           PORT_CODE(KEYCODE_9_PAD)        PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad -")           PORT_CODE(KEYCODE_MINUS_PAD)    PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad DELETE")      PORT_CODE(KEYCODE_DEL_PAD)      PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad *")           PORT_CODE(KEYCODE_ASTERISK)     PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 1")           PORT_CODE(KEYCODE_1_PAD)        PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 5")           PORT_CODE(KEYCODE_5_PAD)        PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+
+	PORT_MODIFY("COL12")  /* KEYBOARD COLUMN 12 */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad RETURN")      PORT_CODE(KEYCODE_ENTER_PAD)    PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad .")           PORT_CODE(KEYCODE_STOP)         PORT_CHAR(UCHAR_MAMEKEY(STOP))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad ,")           PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(UCHAR_MAMEKEY(COMMA))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 3")           PORT_CODE(KEYCODE_3_PAD)        PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 2")           PORT_CODE(KEYCODE_2_PAD)        PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START(bbc_dipswitch)
+	PORT_MODIFY("COL2")  /* KEYBOARD COLUMN 2 */
+	PORT_DIPNAME(0x01, 0x01, "DIP 8 (Default File System)")
+	PORT_DIPSETTING(   0x00, "NFS" )
+	PORT_DIPSETTING(   0x01, "DFS" )
+
+	PORT_MODIFY("COL3")  /* KEYBOARD COLUMN 3 */
+	PORT_DIPNAME(0x01, 0x01, "DIP 7 (Not Used)")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+
+	PORT_MODIFY("COL4")  /* KEYBOARD COLUMN 4 */
+	PORT_DIPNAME(0x01, 0x01, "DIP 6 (Disc Timings)")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+
+	PORT_MODIFY("COL5")  /* KEYBOARD COLUMN 5 */
+	PORT_DIPNAME(0x01, 0x01, "DIP 5 (Disc Timings)")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+
+	PORT_MODIFY("COL6")  /* KEYBOARD COLUMN 6 */
+	PORT_DIPNAME(0x01, 0x01, "DIP 4 (Boot)")
+	PORT_DIPSETTING(   0x00, "SHIFT" )
+	PORT_DIPSETTING(   0x01, "SHIFT-BREAK" )
+
+	PORT_MODIFY("COL7")  /* KEYBOARD COLUMN 7 */
+	PORT_DIPNAME(0x01, 0x01, "DIP 3 (Screen Mode)")
+	PORT_DIPSETTING(   0x00, "+0" )
+	PORT_DIPSETTING(   0x01, "+4" )
+
+	PORT_MODIFY("COL8")  /* KEYBOARD COLUMN 8 */
+	PORT_DIPNAME(0x01, 0x01, "DIP 2 (Screen Mode)")
+	PORT_DIPSETTING(   0x00, "+0" )
+	PORT_DIPSETTING(   0x01, "+2" )
+
+	PORT_MODIFY("COL9")  /* KEYBOARD COLUMN 9 */
+	PORT_DIPNAME(0x01, 0x01, "DIP 1 (Screen Mode)")
+	PORT_DIPSETTING(   0x00, "+0" )
+	PORT_DIPSETTING(   0x01, "+1" )
 INPUT_PORTS_END
 
 
@@ -491,16 +544,19 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbca)
 	PORT_INCLUDE(bbc_keyboard)
+	PORT_INCLUDE(bbc_dipswitch)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbcb)
 	PORT_INCLUDE(bbc_config)
 	PORT_INCLUDE(bbc_keyboard)
+	PORT_INCLUDE(bbc_dipswitch)
 	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bbcm)
 	PORT_INCLUDE(bbc_keyboard)
+	PORT_INCLUDE(bbc_keypad)
 	PORT_INCLUDE(bbc_joy)
 INPUT_PORTS_END
 
@@ -667,6 +723,8 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_SIZE(640, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
@@ -675,8 +733,11 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_PALETTE_INIT_OVERRIDE(bbc_state, bbc)
 	MCFG_SAA5050_ADD("saa5050", XTAL_12MHz/2, trom_intf)
 
+	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbca)
+
+	MCFG_DEFAULT_LAYOUT(layout_bbc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -697,7 +758,7 @@ static MACHINE_CONFIG_START( bbca, bbc_state )
 	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
-	/* devices */
+	/* system via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
@@ -725,7 +786,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 //  MCFG_SOUND_ADD("tms5220", TMS5220, 640000)
 //  MCFG_TMS52XX_SPEECHROM("vsm")
 
-	/* devices */
+	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
@@ -733,6 +794,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
+	/* adc */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 
 	/* printer */
@@ -773,9 +835,11 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	/* devices */
+	/* system via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
@@ -783,6 +847,7 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbca )
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, strobe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_user_irq_w))
 
+	/* adc */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
 
 	/* printer */
@@ -843,7 +908,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_CPU_ADD("maincpu", M65SC02, 2000000)        /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbcm_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state, bbcb_vsync)      /* screen refresh interrupts */
-	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcm_keyscan, 1000)        /* scan keyboard */
+	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* internal ram */
@@ -854,18 +919,21 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, bbcm)
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, bbcm)
 
+	MCFG_DEFAULT_LAYOUT(layout_bbc)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
-	MCFG_SCREEN_SIZE(800, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 300-1)
+	MCFG_SCREEN_SIZE(640, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(bbc_state, bbc)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
 
 	MCFG_SAA5050_ADD("saa5050", XTAL_12MHz/2, trom_intf)
 
+	/* crtc */
 	MCFG_MC6845_ADD("mc6845", MC6845, "screen", 2000000, bbc_mc6845_intf)
 	MCFG_VIDEO_START_OVERRIDE(bbc_state, bbcm)
 
@@ -899,13 +967,16 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 
 	/* acia */
 	MCFG_ACIA6850_ADD("acia6850", bbc_acia6850_interface)
+
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(bbc_state, write_rxd_serial))
 	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
-	/* devices */
+	/* adc */
 	MCFG_UPD7002_ADD("upd7002", bbc_uPD7002)
+
+	/* system via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
@@ -913,6 +984,7 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_portb))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(bbc_state, bbcb_via_system_irq_w))
 
+	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_user_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("centronics", centronics_device, write))
@@ -1108,8 +1180,8 @@ ROM_START(bbcb)
 	//ROM_LOAD("torchz80_094.bin", 0x0000, 0x2000, CRC(49989bd4) SHA1(62b57c858a3baa4ff943c31f77d331c414772a61))
 	//ROM_LOAD("torchz80_102.bin", 0x0000, 0x2000, CRC(2eb40a21) SHA1(e6ee738e5f2f8556002b79d18caa8ef21f14e08d))
 
-	ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
-	ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
+	//ROM_REGION(0x8000, "vsm", 0) /* system speech PHROM */
+	//ROM_LOAD("phroma.bin", 0x0000, 0x4000, CRC(98e1bf9e) SHA1(b369809275cb67dfd8a749265e91adb2d2558ae6))
 ROM_END
 
 ROM_START(bbcb_de)
@@ -1454,7 +1526,7 @@ ROM_START(bbcmarm)
 
 	ROM_REGION(0x40,"rtc",0) /* mc146818 */
 	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
-	ROMX_LOAD("mos320a.cmos", 0x00, 0x40, CRC(56117257) SHA1(ed98563bef18f9d2a0b2d941cd20823d760fb127), ROM_BIOS(1))
+	ROMX_LOAD("mos320arm.cmos", 0x00, 0x40, CRC(56117257) SHA1(ed98563bef18f9d2a0b2d941cd20823d760fb127), ROM_BIOS(1))
 ROM_END
 
 

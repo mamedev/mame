@@ -448,38 +448,6 @@ WRITE_LINE_MEMBER( c1pmf_state::osi470_pia_cb2_w )
 {
 }
 
-static const pia6821_interface osi470_pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(c1pmf_state, osi470_pia_pa_r),
-	DEVCB_NULL, // read8_machine_func in_b_func,
-	DEVCB_NULL, // read8_machine_func in_ca1_func,
-	DEVCB_NULL, // read8_machine_func in_cb1_func,
-	DEVCB_NULL, // read8_machine_func in_ca2_func,
-	DEVCB_NULL, // read8_machine_func in_cb2_func,
-	DEVCB_DRIVER_MEMBER(c1pmf_state, osi470_pia_pa_w),
-	DEVCB_DRIVER_MEMBER(c1pmf_state, osi470_pia_pb_w),
-	DEVCB_NULL, // write8_machine_func out_ca2_func,
-	DEVCB_DRIVER_LINE_MEMBER(c1pmf_state, osi470_pia_cb2_w),
-	DEVCB_NULL, // void (*irq_a_func)(int state),
-	DEVCB_NULL, // void (*irq_b_func)(int state),
-};
-
-static const pia6821_interface pia_dummy_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* Memory Maps */
 
 static ADDRESS_MAP_START( osi600_mem, AS_PROGRAM, 8, sb2m600_state )
@@ -848,9 +816,9 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_PIA6821_ADD( "pia_1", pia_dummy_intf )
-	MCFG_PIA6821_ADD( "pia_2", pia_dummy_intf )
-	MCFG_PIA6821_ADD( "pia_3", pia_dummy_intf )
+	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia_3", PIA6821, 0)
 
 	/* cassette ACIA */
 	MCFG_ACIA6850_ADD("acia_0", osi600_acia_intf)
@@ -869,7 +837,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( c1pmf, c1p, c1pmf_state )
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1pmf_mem)
 
-	MCFG_PIA6821_ADD( "pia_0", osi470_pia_intf )
+	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(c1pmf_state, osi470_pia_pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c1pmf_state, osi470_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c1pmf_state, osi470_pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(c1pmf_state, osi470_pia_cb2_w))
 
 	/* floppy ACIA */
 	MCFG_ACIA6850_ADD("acia_1", osi470_acia_intf)

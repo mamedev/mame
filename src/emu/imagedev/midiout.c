@@ -38,9 +38,9 @@ void midiout_device::device_start()
 void midiout_device::device_reset()
 {
 	// we don't Tx, we Rx at 31250 8-N-1
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rcv_rate(31250);
 	set_tra_rate(0);
-	set_data_frame(8, 1, PARITY_NONE, false);
 }
 
 void midiout_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

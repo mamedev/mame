@@ -594,18 +594,6 @@ static SLOT_INTERFACE_START(midiout_slot)
 	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
 SLOT_INTERFACE_END
 
-static const duartn68681_config duart_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(esq1_state, duart_irq_handler),
-	DEVCB_DRIVER_LINE_MEMBER(esq1_state, duart_tx_a),
-	DEVCB_DRIVER_LINE_MEMBER(esq1_state, duart_tx_b),
-	DEVCB_DRIVER_MEMBER(esq1_state, duart_input),
-	DEVCB_DRIVER_MEMBER(esq1_state, duart_output),
-
-	500000, 500000, // IP3, IP4
-	1000000, 1000000, // IP5, IP6
-};
-
 static const esqpanel_interface esqpanel_config =
 {
 	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w)
@@ -615,7 +603,14 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)    // how fast is it?
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
-	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
+	MCFG_DUARTN68681_ADD("duart", 4000000)
+	MCFG_DUARTN68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(esq1_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_a))
+	MCFG_DUARTN68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
+	MCFG_DUARTN68681_INPORT_CALLBACK(READ8(esq1_state, duart_input))
+	MCFG_DUARTN68681_OUTPORT_CALLBACK(WRITE8(esq1_state, duart_output))
+
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")

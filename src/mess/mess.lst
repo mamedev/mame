@@ -323,6 +323,7 @@ svisionn
 tvlinkp
 
 // BANDAI
+sv8000    // Super Vision 8000
 wswan    // Bandai WonderSwan Handheld
 wscolor   // Bandai WonderSwan Color Handheld
 
@@ -1217,7 +1218,8 @@ gl2000 // 1993 Genius Leader 2000
 gl2000p // 1993 Genius Leader 2000 Plus
 gln // 199? Genius Leader Notebook
 itunlim  // 199? IT Unlimited
-iqunlim  // 199? IQ Unlimited
+iqunlim  // 199? IQ Unlimited (680x0)
+iqunlimz  // 1991 IQ Unlimited (Z80)
 gl3000s  // 199? Genius GL3000S
 glmmc  // 199? Genius Master Mega Color
 
@@ -1918,6 +1920,9 @@ batmantv    // The Batman, 2004
 //paintbox // 1981
 harriet // 1990
 
+// Fanuc
+fanucs15	// 1990
+
 //********** Misc **********************************************************
 
 ex800 // Epson EX-800 printer
@@ -2131,7 +2136,7 @@ cd2650
 pipbug
 elektor
 instruct
-dolphunk
+dauphin
 chaos
 z80dev
 pegasus
@@ -2315,4 +2320,7 @@ mkit09
 cpu09
 ivg09
 pulsarlb
+hprot1
+compclr2
+m6805evs
 

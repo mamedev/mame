@@ -32,6 +32,7 @@ static VIDEO_START( pc200 );
 static MC6845_INTERFACE( mc6845_aga_intf )
 {
 	false,              /* show border area */
+	0,0,0,0,            /* visarea adjustment */
 	8,                  /* numbers of pixels per video memory address */
 	NULL,               /* begin_update */
 	aga_update_row,     /* update_row */

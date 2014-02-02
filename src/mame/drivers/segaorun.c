@@ -1254,6 +1254,13 @@ static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
 	MCFG_CPU_PROGRAM_MAP(outrun_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( outrun_fd1089a, outrun )
+
+	// basic machine hardware
+	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(outrun_map)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
 
@@ -1290,12 +1297,9 @@ MACHINE_CONFIG_END
 //*************************************************************************************************************************
 //  Outrun
 //  CPU: 68000
-//   GAME BD  834-6065-02 (or 834-6065-04)
+//   GAME BD  834-6065-04
 //   CPU BD   837-6063-02 (or 837-6095)
 //   VIDEO BD 837-6064-02 (or 837-6096)
-//
-//  Note: GAME BD 834-6065-01 (or 834-6065-03) & CPU BD  837-6063-01
-//        Use EPR-10331 to EPR-10334 for the Main 68000 code, it's unknown if they are the same... they are not currently dumped
 //
 //  Note: Manuals for Upright Standard and Sitdown Standard list the same Main & Sub CPU EPR codes.
 //        Dipswitches are used to determine the machine type.
@@ -1357,9 +1361,14 @@ ROM_END
 //*************************************************************************************************************************
 //  Outrun
 //  CPU: 68000
-//   GAME BD  834-6065-02 (or 834-6065-04)
+//   GAME BD  834-6065-04
 //   CPU BD   837-6063-02
 //   VIDEO BD 837-6064-02
+//
+//  Note: Starting with revision A and going forward Outrun added support for Cabinet styles: Moving, Up Cockpit & Mini Up
+//        as well as moving the Demo Sounds dipswitch down from SWB-2 to SWB-3 to make room for Cabinet settings.
+//
+//        The Outrun Standard & Upright Type Owner's Manuals show program roms as EPR-10380A through EPR-10383A
 //
 ROM_START( outrunra )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
@@ -1416,13 +1425,17 @@ ROM_START( outrunra )
 ROM_END
 
 //*************************************************************************************************************************
-//  Outrun
+//  Outrun Deluxe
 //  CPU: 68000
-//   GAME BD  834-6065-??
-//   CPU BD   837-6063-??
+//   GAME BD  834-6065-02
+//   CPU BD   837-6063-02
 //   VIDEO BD 837-6064-01
 //
-ROM_START( outruno )
+//  Note: This is a Deluxe version. IE: Motor On / Off at SWB-1 and Demo Sounds at SWB-2
+//
+//        The Outrun Deluxe Type Owner's Manual show program roms as EPR-10380 through EPR-10383
+//
+ROM_START( outrundx )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10380.133", 0x000000, 0x10000, CRC(e339e87a) SHA1(ac319cdafb156adcf6be29ae1b82d46d3048022e) )
 	ROM_LOAD16_BYTE( "epr-10382.118", 0x000001, 0x10000, CRC(65248dd5) SHA1(4b75526df71bba0d588f47a65790a3d21b236302) )
@@ -1501,15 +1514,84 @@ ROM_START( outruno )
 ROM_END
 
 //*************************************************************************************************************************
-//  Outrun Deluxe
+//  Outrun Deluxe (Japan)
+//  CPU: FD1089A
+//   GAME BD  834-6065-01
+//   CPU BD   837-6063-01
+//   VIDEO BD 837-6064-02
+//
+//  Note: This is a Deluxe version. IE: Motor On / Off at SWB-1 and Demo Sounds at SWB-2
+//
+ROM_START( outrundxj )
+	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code - protected
+	ROM_LOAD16_BYTE( "epr-10331.ic133", 0x000000, 0x10000, CRC(64a7f657) SHA1(ababc9485a52bd55e90727335ab1d1037697bc6b) )
+	ROM_LOAD16_BYTE( "epr-10333.ic118", 0x000001, 0x10000, CRC(fce8394e) SHA1(359ce9f05caf091945fe857ffba037c5aada84e5) )
+	ROM_LOAD16_BYTE( "epr-10332.ic132", 0x020000, 0x10000, CRC(53d298d7) SHA1(6df0ad9758d99d53154d662b540211e9c7d2cd02) )
+	ROM_LOAD16_BYTE( "epr-10334.ic117", 0x020001, 0x10000, CRC(ff22ad0b) SHA1(41f7c075e0c84a16c0ac46e35bff5e9484920664) )
+
+	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
+	ROM_LOAD16_BYTE( "epr-10327a.76", 0x00000, 0x10000, CRC(e28a5baf) SHA1(f715bde96c73ed47035acf5a41630fdeb41bb2f9) )
+	ROM_LOAD16_BYTE( "epr-10329a.58", 0x00001, 0x10000, CRC(da131c81) SHA1(57d5219bd0e2fd886217e37e8773fd76be9b40eb) )
+	ROM_LOAD16_BYTE( "epr-10328a.75", 0x20000, 0x10000, CRC(d5ec5e5d) SHA1(a4e3cfca4d803e72bc4fcf91ab00e21bf3f8959f) )
+	ROM_LOAD16_BYTE( "epr-10330a.57", 0x20001, 0x10000, CRC(ba9ec82a) SHA1(2136c9572e26b7ae6de402c0cd53174407cc6018) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "opr-10268.99",  0x00000, 0x08000, CRC(95344b04) SHA1(b3480714b11fc49b449660431f85d4ba92f799ba) )
+	ROM_LOAD( "opr-10232.102", 0x08000, 0x08000, CRC(776ba1eb) SHA1(e3477961d19e694c97643066534a1f720e0c4327) )
+	ROM_LOAD( "opr-10267.100", 0x10000, 0x08000, CRC(a85bb823) SHA1(a7e0143dee5a47e679fd5155e58e717813912692) )
+	ROM_LOAD( "opr-10231.103", 0x18000, 0x08000, CRC(8908bcbf) SHA1(8e1237b640a6f26bdcbfd5e201dadb2687c4febb) )
+	ROM_LOAD( "opr-10266.101", 0x20000, 0x08000, CRC(9f6f1a74) SHA1(09164e858ebeedcff4d389524ddf89e7c216dcae) )
+	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
+
+	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
+	// VIDEO BD 837-6064-02 uses mask roms four times the size of those used on VIDEO BD 837-6064-01, same data
+	ROM_LOAD32_BYTE( "mpr-10371.9",  0x00000, 0x20000, CRC(7cc86208) SHA1(21320f945f7c8e990c97c9b1232a0f4b6bd00f8f) )
+	ROM_LOAD32_BYTE( "mpr-10373.10", 0x00001, 0x20000, CRC(b0d26ac9) SHA1(3a9ce8547cd43b7b04abddf9a9ab5634e0bbfaba) )
+	ROM_LOAD32_BYTE( "mpr-10375.11", 0x00002, 0x20000, CRC(59b60bd7) SHA1(e5d8c67e020608edd24ba87b7687b2ac2483ee7f) )
+	ROM_LOAD32_BYTE( "mpr-10377.12", 0x00003, 0x20000, CRC(17a1b04a) SHA1(9f7210cb4153ac9029a785dcd4b45f4513a4b008) )
+	ROM_LOAD32_BYTE( "mpr-10372.13", 0x80000, 0x20000, CRC(b557078c) SHA1(a3746a2da077a8df4932348f650a061f413e8430) )
+	ROM_LOAD32_BYTE( "mpr-10374.14", 0x80001, 0x20000, CRC(8051e517) SHA1(9c8509fbed170b4ac74c169da573393e54774f49) )
+	ROM_LOAD32_BYTE( "mpr-10376.15", 0x80002, 0x20000, CRC(f3b8f318) SHA1(a5f2532613f33a64441e0f75443c10ba78dccc6e) )
+	ROM_LOAD32_BYTE( "mpr-10378.16", 0x80003, 0x20000, CRC(a1062984) SHA1(4399030a155caf71f2dec7f75c4b65531ab53576) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
+	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-10187.88", 0x00000, 0x8000, CRC(a10abaa9) SHA1(01c8a819587a66d2ee4d255656e36fa0904377b0) )
+
+	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) // sound PCM data
+	ROM_LOAD( "opr-10193.66", 0x00000, 0x08000, CRC(bcd10dde) SHA1(417ce1d7242884640c5b14f4db8ee57cde7d085d) )
+	ROM_RELOAD(               0x08000, 0x08000 )
+	ROM_LOAD( "opr-10192.67", 0x10000, 0x08000, CRC(770f1270) SHA1(686bdf44d45c1d6002622f6658f037735382f3e0) )
+	ROM_RELOAD(               0x18000, 0x08000 )
+	ROM_LOAD( "opr-10191.68", 0x20000, 0x08000, CRC(20a284ab) SHA1(7c9027416d4122791ba53782fe2230cf02b7d506) )
+	ROM_RELOAD(               0x28000, 0x08000 )
+	ROM_LOAD( "opr-10190.69", 0x30000, 0x08000, CRC(7cab70e2) SHA1(a3c581d2b438630d0d4c39481dcfd85681c9f889) )
+	ROM_RELOAD(               0x38000, 0x08000 )
+	ROM_LOAD( "opr-10189.70", 0x40000, 0x08000, CRC(01366b54) SHA1(f467a6b807694d5832a985f5381c170d24aaee4e) )
+	ROM_RELOAD(               0x48000, 0x08000 )
+	ROM_LOAD( "opr-10188.71", 0x50000, 0x08000, CRC(bad30ad9) SHA1(f70dd3a6362c314adef313b064102f7a250401c8) )
+	ROM_RELOAD(               0x58000, 0x08000 )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-0019.key", 0x0000, 0x2000, CRC(6ff847c6) SHA1(e6b7bb77d0971c25eba3f168d939d0d5f1486537) )
+
+ROM_END
+
+//*************************************************************************************************************************
+//  Outrun Deluxe (ealier??)
 //  CPU: 68000
 //   GAME BD  834-6065 Rev A
 //   CPU BD   837-6063
 //   VIDEO BD 837-6064-01
 //
-ROM_START( outrundx )
+//  Note: This is a Deluxe version. IE: Motor On / Off at SWB-1 and Demo Sounds at SWB-2
+//
+ROM_START( outrundxa )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
-		// Earlier version of CPU BD?? uses half size eproms compared to the above sets
+	// Earlier version of CPU BD?? uses half size eproms compared to the above sets
 	ROM_LOAD16_BYTE( "epr-10183.115", 0x000000, 0x8000, CRC(3d992396) SHA1(8cef43799b71cfd36d3fea140afff7fe0bafcfc1) )
 	ROM_LOAD16_BYTE( "epr-10261.130", 0x000001, 0x8000, CRC(1d034847) SHA1(664b24c13f7885403328906682213e38c1ad994e) )
 	ROM_LOAD16_BYTE( "epr-10184.116", 0x010000, 0x8000, CRC(1a73dc46) SHA1(70f31619e80eb3d70747e7006e135c8bc0a31675) )
@@ -2389,18 +2471,19 @@ DRIVER_INIT_MEMBER(segaorun_state,shangon)
 //**************************************************************************
 
 //    YEAR, NAME,     PARENT,  MACHINE,         INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                                  LAYOUT
-GAMEL(1986, outrun,   0,       outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega", "Out Run (sitdown/upright, Rev B)", 0,                           layout_outrun ) // Upright/Sitdown determined by dipswitch settings
-GAMEL(1986, outrunra, outrun,  outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega", "Out Run (sitdown/upright, Rev A)", 0,                           layout_outrun ) // Upright/Sitdown determined by dipswitch settings
-GAMEL(1986, outruno,  outrun,  outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega", "Out Run (sitdown/upright)", 0,                                  layout_outrun ) // Upright/Sitdown determined by dipswitch settings
-GAMEL(1986, outrundx, outrun,  outrundx,        outrundx, segaorun_state,outrun,  ROT0,   "Sega", "Out Run (deluxe sitdown)", 0,                                   layout_outrun )
-GAMEL(1986, outrunb,  outrun,  outrun,          outrun,   segaorun_state,outrunb, ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
-GAME( 1987, shangon,  0,       shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega", "Super Hang-On (sitdown/upright, unprotected)", 0 )
-GAME( 1987, shangon3, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega", "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
-GAME( 1987, shangon2, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega", "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
-GAME( 1987, shangon1, shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega", "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) // bad program rom
-GAME( 1991, shangonle,shangon, shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega", "Limited Edition Hang-On", 0 )
-GAMEL(1989, toutrun,  0,       outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (Out Run upgrade, FD1094 317-0118)", 0,           layout_outrun ) // Cabinet determined by dipswitch settings
-GAMEL(1989, toutrunj, toutrun, outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (Japan, Out Run upgrade, FD1094 317-0117)", 0,    layout_outrun ) // Cabinet determined by dipswitch settings
-GAMEL(1989, toutrun3, toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-0107)", 0,                   layout_outrun )
-GAMEL(1989, toutrun2, toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (cockpit, FD1094 317-0106)", 0,                   layout_outrun )
-GAMEL(1989, toutrun1, toutrun, outrun_fd1094,   toutrunm, segaorun_state,outrun,  ROT0,   "Sega", "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0,            layout_outrun )
+GAMEL(1986, outrun,    0,       outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev B)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
+GAMEL(1986, outrunra,  outrun,  outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev A)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
+GAMEL(1986, outrundx,  outrun,  outrun,          outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown)", 0,                                layout_outrun )
+GAMEL(1986, outrundxj, outrun,  outrun_fd1089a,  outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (Japan, deluxe sitdown, FD1089A 317-0019)", 0,       layout_outrun ) // No Japanese text, different course order
+GAMEL(1986, outrundxa, outrun,  outrundx,        outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown earlier version)", 0,                layout_outrun )
+GAMEL(1986, outrunb,   outrun,  outrun,          outrun,   segaorun_state,outrunb, ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
+GAME( 1987, shangon,   0,       shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright, unprotected)", 0 )
+GAME( 1987, shangon3,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
+GAME( 1987, shangon2,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
+GAME( 1987, shangon1,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) // bad program rom
+GAME( 1991, shangonle, shangon, shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Limited Edition Hang-On", 0 )
+GAMEL(1989, toutrun,   0,       outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Out Run upgrade, FD1094 317-0118)", 0,        layout_outrun ) // Cabinet determined by dipswitch settings
+GAMEL(1989, toutrunj,  toutrun, outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, Out Run upgrade, FD1094 317-0117)", 0, layout_outrun ) // Cabinet determined by dipswitch settings
+GAMEL(1989, toutrun3,  toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (cockpit, FD1094 317-0107)", 0,                layout_outrun )
+GAMEL(1989, toutrun2,  toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (cockpit, FD1094 317-0106)", 0,                layout_outrun )
+GAMEL(1989, toutrun1,  toutrun, outrun_fd1094,   toutrunm, segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (deluxe cockpit, FD1094 317-0109)", 0,         layout_outrun )

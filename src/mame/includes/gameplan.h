@@ -89,7 +89,6 @@ public:
 	DECLARE_WRITE8_MEMBER(gameplan_video_command_w);
 	DECLARE_WRITE8_MEMBER(leprechn_video_command_w);
 	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
-	DECLARE_READ8_MEMBER(vblank_r);
 	void gameplan_get_pens( pen_t *pens );
 	void leprechn_get_pens( pen_t *pens );
 	DECLARE_WRITE_LINE_MEMBER(via_irq);

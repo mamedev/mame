@@ -193,6 +193,8 @@ public:
 	DECLARE_DRIVER_INIT(officeye);
 	DECLARE_DRIVER_INIT(crysking);
 	DECLARE_DRIVER_INIT(evosocc);
+	DECLARE_DRIVER_INIT(donghaer);
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -824,6 +826,75 @@ static INPUT_PORTS_START(crystal)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+
+static INPUT_PORTS_START(officeye)
+	PORT_START("P1_P2")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Red")  // RED
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Green")  // GREEN
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Blue") // BLUE
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Red")  // RED
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Green")  // GREEN
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Blue") // BLUE
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START2 ) // where is start3?
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3_P4")
+	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00ff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Pause ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Test ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+
 static const vr0_interface vr0_config =
 {
 	0x04800000
@@ -992,48 +1063,92 @@ DRIVER_INIT_MEMBER(crystal_state,evosocc)
 	Rom[WORD_XOR_LE(0x974ED2/2)] = 0x9001;  //PUSH R0
 }
 
+/* note on PIC protection from ElSemi (for actually emulating it instead of patching)
+
+The PIC uses a software UART bit banged on a single output pin of the main CPU:
+the data port is bit 0x20000000 on the PIO register, the same register where the EEPROM control lines are. The serial data is transmitted at 8 data bits, even parity, 1 stop bit. It's probably
+tricky to get it working properly because it doesn't rely on a clock signal, and so, the pic and main cpu must run in in parallel, and the bit lengths must match. The pic bit delay routine is just a loop.
+also it seems that bit 0x40000000 is the PIC reset.
+
+*/
+
 DRIVER_INIT_MEMBER(crystal_state,topbladv)
 {
+	// patches based on analysis of PIC dump
 	UINT16 *Rom = (UINT16*) memregion("user1")->base();
+	/* 
+		PIC Protection data:
+		- RAM ADDR - --PATCH--
+		62 0f 02 02 fc 90 01 90 
+		68 6a 02 02 04 90 01 90
+		2c cf 03 02 e9 df c2 c3 
+		00 e0 03 02 01 90 00 92
+	*/
 
-	Rom[WORD_XOR_LE(0x12d7a/2)] = 0x90FC;   //PUSH R7-R6-R5-R4-R3-R2
-	Rom[WORD_XOR_LE(0x12d7c/2)] = 0x9001;   //PUSH R0
+	Rom[WORD_XOR_LE(0x12d7a/2)]=0x90FC;	//PUSH R7-R6-R5-R4-R3-R2
+	Rom[WORD_XOR_LE(0x12d7c/2)]=0x9001;	//PUSH R0
 
-	Rom[WORD_XOR_LE(0x2fe18/2)] = 0x9001;   //PUSH R0
-	Rom[WORD_XOR_LE(0x2fe1a/2)] = 0x9200;   //PUSH SR
+	Rom[WORD_XOR_LE(0x18880/2)]=0x9004;	//PUSH R2
+	Rom[WORD_XOR_LE(0x18882/2)]=0x9001;	//PUSH R0
 
-	Rom[WORD_XOR_LE(0x18880/2)] = 0x9001;   //PUSH R0
-	Rom[WORD_XOR_LE(0x18882/2)] = 0x9200;   //PUSH SR
+	Rom[WORD_XOR_LE(0x2fe18/2)]=0x9001;	//PUSH R0
+	Rom[WORD_XOR_LE(0x2fe1a/2)]=0x9200;	//PUSH SR
 
-	Rom[WORD_XOR_LE(0xDACE/2)] = 0x901C;    //PUSH R4-R3-R2
-	Rom[WORD_XOR_LE(0xDAD0/2)] = 0x9001;    //PUSH R0
+	Rom[WORD_XOR_LE(0x2ED44/2)]=0xDFE9;	//CALL 0x3cf00
+	Rom[WORD_XOR_LE(0x2ED46/2)]=0xC3C2;	//MOV %SR0,%DR1
 
 }
 
 DRIVER_INIT_MEMBER(crystal_state,officeye)
 {
+	// patches based on analysis of PIC dump
 	UINT16 *Rom = (UINT16*) memregion("user1")->base();
 
-	Rom[WORD_XOR_LE(0x9c9e/2)] = 0x901C;    //PUSH R4-R3-R2
-	Rom[WORD_XOR_LE(0x9ca0/2)] = 0x9001;    //PUSH R0
+	/*
+		PIC Protection data:
+		- RAM ADDR - --PATCH--
+		0a 83 01 02 1c 90 01 90 
+		50 85 01 02 7c 90 01 90
+		4c 99 05 02 04 90 01 90 
+		3a c1 01 02 1c 90 01 90
+	*/
 
-	Rom[WORD_XOR_LE(0x9EE4/2)] = 0x907C;    //PUSH R6-R5-R4-R3-R2
-	Rom[WORD_XOR_LE(0x9EE6/2)] = 0x9001;    //PUSH R0
+	Rom[WORD_XOR_LE(0x9c9e/2)]=0x901C;	//PUSH R4-R3-R2
+	Rom[WORD_XOR_LE(0x9ca0/2)]=0x9001;	//PUSH R0
 
-	Rom[WORD_XOR_LE(0x4B2E0/2)] = 0x9004;   //PUSH R2
-	Rom[WORD_XOR_LE(0x4B2E2/2)] = 0x9001;   //PUSH R0
+	Rom[WORD_XOR_LE(0x9EE4/2)]=0x907C;	//PUSH R6-R5-R4-R3-R2
+	Rom[WORD_XOR_LE(0x9EE6/2)]=0x9001;	//PUSH R0
 
-/*
-    Rom[WORD_XOR_LE(0x18880/2)] = 0x9001; //PUSH R0
-    Rom[WORD_XOR_LE(0x18882/2)] = 0x9200; //PUSH SR
- */
+	Rom[WORD_XOR_LE(0x4B2E0/2)]=0x9004;	//PUSH R2
+	Rom[WORD_XOR_LE(0x4B2E2/2)]=0x9001;	//PUSH R0
+
+	Rom[WORD_XOR_LE(0xDACE/2)]=0x901c;	//PUSH R4-R3-R2
+	Rom[WORD_XOR_LE(0xDAD0/2)]=0x9001;	//PUSH R0
 }
+
+DRIVER_INIT_MEMBER(crystal_state, donghaer)
+{
+	UINT16 *Rom = (UINT16*)memregion("user1")->base();
+
+	Rom[WORD_XOR_LE(0x037A2 / 2)] = 0x9004;	// PUSH	%R2
+	Rom[WORD_XOR_LE(0x037A4 / 2)] = 0x8202;	// LD	(%SP,0x8),%R2
+
+	Rom[WORD_XOR_LE(0x03834 / 2)] = 0x9001;	// PUSH	%R0
+	Rom[WORD_XOR_LE(0x03836 / 2)] = 0x9200;	// PUSH %SR
+
+	Rom[WORD_XOR_LE(0x0AC9E / 2)] = 0x9004;	// PUSH	%R2
+	Rom[WORD_XOR_LE(0x0ACA0 / 2)] = 0x4081;	// LERI	0x81
+
+	Rom[WORD_XOR_LE(0x19C70 / 2)] = 0x900C;	// PUSH	%R2-%R3 
+	Rom[WORD_XOR_LE(0x19C72 / 2)] = 0x9001;	// PUSH %R0
+}
+
 
 
 
 GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft", "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga", "Evolution Soccer", 0 )
-GAME( 2003, topbladv, crysbios, topbladv, crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", GAME_NOT_WORKING ) // protection
-GAME( 2001, officeye,        0, crystal,  crystal, crystal_state,  officeye, ROT0, "Danbi", "Office Yeo In Cheon Ha (version 1.2)", GAME_NOT_WORKING ) // protection
-GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  officeye, ROT0, "Danbi", "Donggul Donggul Haerong", GAME_NOT_WORKING )
+GAME( 2003, topbladv, crysbios, topbladv, crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", 0 )
+GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi", "Office Yeo In Cheon Ha (version 1.2)", GAME_NOT_WORKING ) // still has some instability issues
+GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi", "Donggul Donggul Haerong", GAME_NOT_WORKING )

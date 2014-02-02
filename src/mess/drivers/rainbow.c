@@ -160,9 +160,8 @@ W16 pulls J2 printer port pin 1 to GND when set (chassis to logical GND).
 W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 ****************************************************************************/
 
-// Workarounds DO NOT APPLY to the 190-B ROM. Only enable when compiling the 'rainbow' driver -
+// Workaround DOES NOT APPLY to the 190-B ROM. Only enable when compiling the 'rainbow' driver -
 //#define FORCE_RAINBOW_100_LOGO
-#define KBD_DELAY 875 // (debounce delay). Recommended: 875.
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -175,7 +174,6 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "machine/i8251.h"
 #include "machine/dec_lk201.h"
-#include "sound/beep.h"
 #include "machine/nvram.h"
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
@@ -195,7 +193,6 @@ public:
 			m_inp8(*this, "MEMORY PRESENT"),
 			m_inp9(*this, "MONITOR TYPE"),
 
-		m_beep(*this, "beeper"),
 		m_crtc(*this, "vt100_video"),
 		m_i8088(*this, "maincpu"),
 		m_z80(*this, "subcpu"),
@@ -219,8 +216,6 @@ public:
 	required_ioport m_inp7;
 	required_ioport m_inp8;
 	required_ioport m_inp9;
-
-	required_device<beep_device> m_beep;
 
 	required_device<rainbow_video_device> m_crtc;
 	required_device<cpu_device> m_i8088;
@@ -252,10 +247,6 @@ public:
 	DECLARE_WRITE8_MEMBER(floating_bus_w);
 
 	DECLARE_READ8_MEMBER(hd_status_68_r);
-		// EMULATOR TRAP TO INTERCEPT KEYBOARD cmd in AH and PARAMETER in AL (port 90 = AL / port 91 = AH)
-		// TODO: beeper and led handling should better be handled by LK201 code.
-	DECLARE_WRITE8_MEMBER(PORT90_W);
-	DECLARE_WRITE8_MEMBER(PORT91_W);
 
 	DECLARE_READ8_MEMBER(i8088_latch_r);
 	DECLARE_WRITE8_MEMBER(i8088_latch_w);
@@ -327,42 +318,15 @@ void rainbow_state::machine_start()
 	save_item(NAME(m_kbd_tx_ready));
 	save_item(NAME(m_kbd_rx_ready));
 
+#ifdef FORCE_RAINBOW_100_LOGO
 	UINT8 *rom = memregion("maincpu")->base();
 
-
-#ifdef FORCE_RAINBOW_100_LOGO
 	rom[0xf4174]=0xeb; // jmps  RAINBOW100_LOGO__loc_33D
 	rom[0xf4175]=0x08;
 
 	rom[0xf4000 + 0x364a]= 0x0a;
 	rom[0xf4384]=0xeb; // JMPS  =>  BOOT80
 #endif
-
-	// Enables PORT90_W + PORT91_W via BIOS call (offset +$21 in HIGH ROM)
-	// F8 / FC ROM REGION (CHECK + PATCH)
-	if(rom[0xfc000 + 0x0022] == 0x22 && rom[0xfc000 + 0x0023] == 0x28)
-	{
-			rom[0xf4303]=0x00; // Disable CRC CHECK (F0 / F4 ROM)
-
-			rom[0xfc000 + 0x0022] =0xfe;  // jmp to offset $1922
-			rom[0xfc000 + 0x0023] =0x18;
-
-			rom[0xfc000 + 0x1922] =0xe6;  // out 90,al
-			rom[0xfc000 + 0x1923] =0x90;
-
-			rom[0xfc000 + 0x1924] =0x86;  //  xchg al,ah
-			rom[0xfc000 + 0x1925] =0xc4;
-
-			rom[0xfc000 + 0x1926] =0xe6;  // out 91,al
-			rom[0xfc000 + 0x1927] =0x91;
-
-			rom[0xfc000 + 0x1928] =0x86;  // xchg al,ah
-			rom[0xfc000 + 0x1929] =0xc4;
-
-			rom[0xfc000 + 0x192a] =0xe9;  // jmp (original jump offset $2846) e9 + 19 0f
-			rom[0xfc000 + 0x192b] =0x19;
-			rom[0xfc000 + 0x192c] =0x0f;
-	}
 
 }
 
@@ -443,9 +407,6 @@ static ADDRESS_MAP_START( rainbow8088_io , AS_IO, 8, rainbow_state)
 	//   - DOS 3 has a 1024 cylinder limit (32 MB).
 	//   - the custom boot loader that comes with 'WUTIL 3.2' allows 117 MB and 8 surfaces.
 	AM_RANGE (0x68, 0x68) AM_READ(hd_status_68_r)
-
-	AM_RANGE (0x90, 0x90) AM_WRITE(PORT90_W)
-	AM_RANGE (0x91, 0x91) AM_WRITE(PORT91_W)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(rainbowz80_mem, AS_PROGRAM, 8, rainbow_state)
@@ -468,9 +429,8 @@ ADDRESS_MAP_END
 
 /* Input ports */
 
-/* KEYBOARD (preliminary - transfer to DEC_LK201.xx as soon as possible) */
-static INPUT_PORTS_START( rainbow100b_in )
 /* DIP switches */
+static INPUT_PORTS_START( rainbow100b_in )
 		PORT_START("MONITOR TYPE")
 		PORT_DIPNAME( 0x03, 0x03, "MONOCHROME MONITOR")
 		PORT_DIPSETTING(    0x01, "PAPER WHITE" )
@@ -565,9 +525,6 @@ void rainbow_state::machine_reset()
 
 	m_KBD = 0;
 
-	m_beep->set_frequency(2000);
-		m_beep->set_state(0);
-
 	// RESET ALL LEDs
 	output_set_value("led1", 1);
 	output_set_value("led2", 1);
@@ -576,10 +533,12 @@ void rainbow_state::machine_reset()
 	output_set_value("led5", 1);
 	output_set_value("led6", 1);
 	output_set_value("led7", 1);
-	output_set_value("led8", 1);
-	output_set_value("led9", 1);
-	output_set_value("led10", 1);
-	output_set_value("led11", 1);
+
+	// GREEN KEYBOARD LEDs (1 = on, 0 = off):
+	output_set_value("led_wait", 0);    // led8 
+	output_set_value("led_compose", 0); // led9
+	output_set_value("led_lock", 0);    // led10
+	output_set_value("led_hold", 0);    // led11
 
 	MOTOR_DISABLE_counter = 2; // soon resets drv.LEDs
 	m_unit = 0;
@@ -758,87 +717,6 @@ WRITE8_MEMBER(rainbow_state::comm_control_w)
 //  printf("%02x to COMM.CONTROL REGISTER\n", data);
 }
 
-// EMULATOR TRAP (patched into ROM @ machine_start) via BIOS : call / offset +$21  (AL / AH)
-WRITE8_MEMBER(rainbow_state::PORT90_W)
-{
-	//printf("KBD COMMAND : %02x to AL (90)\n", data);
-
-	m_KBD = 0; // reset previous command.
-
-	if(MOTOR_DISABLE_counter == 0)
-	{
-	if (data == LK_CMD_POWER_UP) {      // Powerup (beep)
-		//m_beep->set_state(1);
-		//m_beep_counter=600;  // BELL = 125 ms
-	}
-
-	if (data == LK_CMD_BELL) {
-		m_KBD = data;
-		m_beep->set_state(1);
-		m_beep_counter=600;  // BELL = 125 ms
-	}
-
-	if (data == LK_CMD_SOUND_CLK) {    // emit a keyclick (2ms)
-		m_KBD = data;
-		m_beep->set_state(1);
-		m_beep_counter=25; // longer than calculated ( 9,6 )
-	}
-
-	if (data == LK_CMD_ENB_BELL) {   // enable the bell - PARAMETER: VOLUME!
-		m_KBD = data;
-	}
-
-	if (data == LK_CMD_ENB_KEYCLK) {   // enable the keyclick- PARAMETER: VOLUME!
-		m_KBD = data;
-	}
-
-	if (data == LK_CMD_LEDS_ON ) {  // light LEDs -
-		m_KBD = data;
-	}
-	if (data == LK_CMD_LEDS_OFF) {  // switch off LEDs -
-		m_KBD = data;
-	}
-
-	} // prevent beeps during disk load operations
-}
-
-WRITE8_MEMBER(rainbow_state::PORT91_W)
-{
-	// 4 leds, represented in the low 4 bits of a byte
-	if (m_KBD == LK_CMD_LEDS_ON) {  // light LEDs -
-		if (data & 1) { output_set_value("led8", 0); } //   KEYBOARD :  "Wait" LED
-		if (data & 2) { output_set_value("led9", 0); } //   KEYBOARD :  "Compose" LED
-		if (data & 4) { output_set_value("led10", 0); } //  KEYBOARD :  "Lock" LED
-		if (data & 8) { output_set_value("led11", 0); } //  KEYBOARD :  "Hold" LED
-		m_KBD = 0; // reset previous command.
-	}
-	if (m_KBD == LK_CMD_LEDS_OFF) {  // switch off LEDs -
-		if (data & 1) { output_set_value("led8", 1); } //   KEYBOARD :  "Wait" LED
-		if (data & 2) { output_set_value("led9", 1); } //   KEYBOARD :  "Compose" LED
-		if (data & 4) { output_set_value("led10", 1); } //  KEYBOARD :  "Lock" LED
-		if (data & 8) { output_set_value("led11", 1); } //  KEYBOARD :  "Hold" LED
-		m_KBD = 0; // reset previous command.
-	}
-
-	// NVRAM offet $A8 : BELL VOLUME (=> ENABLE BELL 0x23)
-	if ( (m_KBD == LK_CMD_BELL) || (m_KBD == LK_CMD_ENB_BELL) )    /* BOTH sound or enable bell have a parameter */
-	{   /* max volume is 0, lowest is 0x7 */
-//      printf("\n%02x BELL CMD has bell volume = %02x\n", m_KBD, 8 - (data & 7));
-		m_KBD = 0; // reset previous command.
-	}
-
-	// NVRAM offet $A9 = KEYCLICK VOLUME (=> ENABLE CLK 0x1b)
-	// NVRAM offset $8C = KEYCLICK ENABLE / DISABLE (0/1)
-	if ( ( m_KBD == LK_CMD_ENB_KEYCLK ) || ( m_KBD == LK_CMD_SOUND_CLK ) )  /* BOTH keyclick cmds have a parameter */
-	{   // max volume is 0, lowest is 0x7  - 87 (BELL VOL:1) and  80 (BELL VOL:8)
-//      printf("\n%02x CLICK CMD - keyclick volume = %02x\n", m_KBD, 8 - (data & 7));
-		m_KBD = 0; // reset previous command.
-	}
-
-if (m_KBD > 0)
-	printf("UNHANDLED PARAM FOR MODE: %02x / KBD PARAM %02x to AH (91) \n", m_KBD, data);
-
-}
 // 8088 reads port 0x00. See page 133 (4-34)
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
@@ -1146,7 +1024,7 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_rxready_w)
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 {
-//    printf("txready %d\n", state);
+//    printf("8251 txready %d\n", state);
 	m_kbd_tx_ready = (state == 1) ? true : false;
 	update_kbd_irq();
 }
@@ -1176,13 +1054,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 */
 	}
 
-	if (m_beep_counter > 1)
+	if (m_beep_counter > 0)
 			m_beep_counter--;
-	else
-		if ( m_beep_counter == 1 )
-		{   m_beep->set_state(0);
-			m_beep_counter = 0;
-		}
 }
 
 static const vt_video_interface video_interface =
@@ -1268,11 +1141,6 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 
 	MCFG_RAINBOW_VIDEO_ADD("vt100_video", video_interface)
 
-		/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-
 	MCFG_FD1793_ADD("wd1793", rainbow_wd17xx_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(floppy_intf)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","rainbow")
@@ -1281,6 +1149,8 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", rainbow_state, keyboard_tick, attotime::from_hz(4800*16))	// 8251 is set to /16 on the clock input
 
 	MCFG_LK201_ADD()
+	MCFG_LK201_SET_TX_CALLBACK(DEVWRITELINE("kbdser", i8251_device, write_rx))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1328,3 +1198,4 @@ ROM_END
 /*    YEAR  NAME         PARENT   COMPAT  MACHINE       INPUT      STATE          INIT COMPANY                         FULLNAME       FLAGS */
 COMP( 1983, rainbow   , 0      ,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
 COMP( 1985, rainb190, rainbow,      0,  rainbow, rainbow100b_in, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 190-B", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS)
+

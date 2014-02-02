@@ -42,24 +42,27 @@ public:
 		{
 			register_input(sIN[i], m_i[i], netlist_input_t::STATE_INP_ACTIVE);
 		}
-		m_Q.initial(1);
 		save(NAME(m_active));
+	}
+
+	ATTR_COLD void reset()
+	{
+        m_Q.initial(1);
+        m_active = 1;
 	}
 
 #if (USE_DEACTIVE_DEVICE)
 	ATTR_HOT void inc_active()
 	{
-		if (m_active == 0)
+		if (++m_active == 1)
 		{
 			update();
 		}
-		m_active++;
 	}
 
 	ATTR_HOT void dec_active()
 	{
-		m_active--;
-		if (m_active == 0)
+		if (--m_active == 0)
 		{
 			for (int i = 0; i< _numdev; i++)
 				m_i[i].inactivate();
@@ -81,7 +84,6 @@ public:
 	net_signal_t()
 	: netlist_device_t(), m_active(1)
 	{
-		m_Q.initial(1);
 	}
 
 	ATTR_COLD void start()
@@ -96,20 +98,24 @@ public:
 		save(NAME(m_active));
 	}
 
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(1);
+        m_active = 1;
+    }
+
 	#if (USE_DEACTIVE_DEVICE)
 		ATTR_HOT void inc_active()
 		{
-			if (m_active == 0)
+			if (++m_active == 1)
 			{
 				update();
 			}
-			m_active++;
 		}
 
 		ATTR_HOT void dec_active()
 		{
-			m_active--;
-			if (m_active == 0)
+			if (--m_active == 0)
 			{
 				for (int i = 0; i< _numdev; i++)
 					m_i[i].inactivate();
@@ -155,7 +161,6 @@ public:
 	xx_net_signal_t()
 	: netlist_device_t(), m_active(1)
 	{
-		m_Q.initial(1);
 	}
 
 	ATTR_COLD void start()
@@ -165,25 +170,29 @@ public:
 		register_output("Q", m_Q);
 		for (int i=0; i < 2; i++)
 		{
-			register_input(sIN[i], m_i[i], netlist_input_t::STATE_INP_ACTIVE);
+			register_input(sIN[i], m_i[i]);
 		}
 		save(NAME(m_active));
 	}
 
+    ATTR_COLD void reset()
+    {
+        m_Q.initial(1);
+        m_active = 1;
+    }
+
 	#if (USE_DEACTIVE_DEVICE)
 		ATTR_HOT void inc_active()
 		{
-			if (m_active == 0)
+			if (++m_active == 1)
 			{
 				update();
 			}
-			m_active++;
 		}
 
 		ATTR_HOT void dec_active()
 		{
-			m_active--;
-			if (m_active == 0)
+			if (--m_active == 0)
 			{
 				m_i[0].inactivate();
 				m_i[1].inactivate();

@@ -414,45 +414,11 @@ WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_irq)
 }
 
 
-static const pia6821_interface osbexec_pia0_config =
-{
-	DEVCB_DRIVER_MEMBER(osbexec_state, osbexec_pia0_a_r ),  /* in_a_func */         /* port A - banking */
-	DEVCB_DRIVER_MEMBER(osbexec_state, osbexec_pia0_b_r),   /* in_b_func */         /* modem / speaker */
-	DEVCB_NULL,                         /* in_ca1_func */       /* DMA IRQ */
-	DEVCB_NULL,                         /* in_cb1_func */       /* Vblank (rtc irq) */
-	DEVCB_NULL,                         /* in_ca2_func */
-	DEVCB_NULL,                         /* in_cb2_func */
-	DEVCB_DRIVER_MEMBER(osbexec_state, osbexec_pia0_a_w ),  /* out_a_func */        /* port A - banking */
-	DEVCB_DRIVER_MEMBER(osbexec_state, osbexec_pia0_b_w ),  /* out_b_func */        /* modem / speaker */
-	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia0_ca2_w ),   /* out_ca2_func */      /* Keyboard strobe */
-	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia0_cb2_w ),   /* out_cb2_func */      /* 60/50 */
-	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia0_irq ),     /* irq_a_func */        /* IRQ */
-	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia0_irq )      /* irq_b_func */        /* IRQ */
-};
-
-
 WRITE_LINE_MEMBER(osbexec_state::osbexec_pia1_irq)
 {
 	m_pia1_irq_state = state;
 	update_irq_state(machine());
 }
-
-
-static const pia6821_interface osbexec_pia1_config =
-{
-	DEVCB_NULL,                         /* in_a_func */
-	DEVCB_NULL,                         /* in_b_func */
-	DEVCB_NULL,                         /* in_ca1_func */
-	DEVCB_NULL,                         /* in_cb1_func */
-	DEVCB_NULL,                         /* in_ca2_func */
-	DEVCB_NULL,                         /* in_cb2_func */
-	DEVCB_NULL,                         /* out_a_func */
-	DEVCB_NULL,                         /* out_b_func */
-	DEVCB_NULL,                         /* out_ca2_func */
-	DEVCB_NULL,                         /* out_cb2_func */
-	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia1_irq ),     /* irq_a_func */
-	DEVCB_DRIVER_LINE_MEMBER(osbexec_state, osbexec_pia1_irq )      /* irq_b_func */
-};
 
 
 static Z80SIO_INTERFACE( osbexec_sio_config )
@@ -651,8 +617,19 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 
 //  MCFG_PIT8253_ADD( "pit", osbexec_pit_config )
 
-	MCFG_PIA6821_ADD( "pia_0", osbexec_pia0_config )
-	MCFG_PIA6821_ADD( "pia_1", osbexec_pia1_config )
+	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(osbexec_state, osbexec_pia0_a_r))
+	MCFG_PIA_READPB_HANDLER(READ8(osbexec_state, osbexec_pia0_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(osbexec_state, osbexec_pia0_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osbexec_state, osbexec_pia0_b_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(osbexec_state, osbexec_pia0_irq))
+
+	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(osbexec_state, osbexec_pia1_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(osbexec_state, osbexec_pia1_irq))
 
 	MCFG_Z80SIO2_ADD( "sio", MAIN_CLOCK/6, osbexec_sio_config )
 

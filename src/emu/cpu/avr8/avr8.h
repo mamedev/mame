@@ -162,25 +162,10 @@ protected:
 	UINT8 m_r[0x200];
 
 	// internal timers
-	UINT8 m_timer0_top;
-	INT32 m_timer0_increment;
-	UINT16 m_timer0_prescale;
-	UINT16 m_timer0_prescale_count;
-
-	UINT16 m_timer1_top;
-	INT32 m_timer1_increment;
-	UINT16 m_timer1_prescale;
-	UINT16 m_timer1_prescale_count;
-
-	UINT8 m_timer2_top;
-	INT32 m_timer2_increment;
-	UINT16 m_timer2_prescale;
-	UINT16 m_timer2_prescale_count;
-
-	UINT16 m_timer4_top;
-	INT32 m_timer4_increment;
-	UINT16 m_timer4_prescale;
-	UINT16 m_timer4_prescale_count;
+	INT32 m_timer_top[6];
+	UINT8 m_timer_increment[6];
+	UINT16 m_timer_prescale[6];
+	UINT16 m_timer_prescale_count[6];
 
 	// SPI
 	bool m_spi_active;
@@ -226,13 +211,13 @@ protected:
 
 	// timers
 	void timer_tick(int cycles);
+	void update_timer_clock_source(UINT8 timer, UINT8 selection);
+	void update_timer_waveform_gen_mode(UINT8 timer, UINT8 mode);
 
 	// timer 0
 	void timer0_tick();
 	void changed_tccr0a(UINT8 data);
 	void changed_tccr0b(UINT8 data);
-	void update_timer0_waveform_gen_mode();
-	void update_timer0_clock_source();
 	void update_ocr0(UINT8 newval, UINT8 reg);
 	void timer0_force_output_compare(int reg);
 
@@ -240,8 +225,6 @@ protected:
 	void timer1_tick();
 	void changed_tccr1a(UINT8 data);
 	void changed_tccr1b(UINT8 data);
-	void update_timer1_waveform_gen_mode();
-	void update_timer1_clock_source();
 	void update_timer1_input_noise_canceler();
 	void update_timer1_input_edge_select();
 	void update_ocr1(UINT16 newval, UINT8 reg);
@@ -250,30 +233,31 @@ protected:
 	void timer2_tick();
 	void changed_tccr2a(UINT8 data);
 	void changed_tccr2b(UINT8 data);
-	void update_timer2_waveform_gen_mode();
-	void update_timer2_clock_source();
 	void update_ocr2(UINT8 newval, UINT8 reg);
 	void timer2_force_output_compare(int reg);
 
 	// timer 3
-/*
 	void timer3_tick();
 	void changed_tccr3a(UINT8 data);
 	void changed_tccr3b(UINT8 data);
-	void update_timer3_waveform_gen_mode();
-	void update_timer3_clock_source();
-	void update_ocr3(UINT8 newval, UINT8 reg);
-	void timer3_force_output_compare(int reg);
-*/
+	void changed_tccr3c(UINT8 data);
+//	void update_ocr3(UINT8 newval, UINT8 reg);
+//	void timer3_force_output_compare(int reg);
 
 	// timer 4
 	void timer4_tick();
 	void changed_tccr4a(UINT8 data);
 	void changed_tccr4b(UINT8 data);
-	void update_timer4_waveform_gen_mode();
-	void update_timer4_clock_source();
+	void changed_tccr4c(UINT8 data);
 	//void update_ocr4(UINT8 newval, UINT8 reg);
 	//void timer4_force_output_compare(int reg);
+
+	// timer 5
+	void timer5_tick();
+	void changed_tccr5a(UINT8 data);
+	void changed_tccr5b(UINT8 data);
+//	void update_ocr5(UINT8 newval, UINT8 reg);
+//	void timer5_force_output_compare(int reg);
 
 	// address spaces
 	address_space *m_program;
@@ -707,7 +691,55 @@ enum
 	AVR8_REGIDX_PORTK,
 	AVR8_REGIDX_PINL,
 	AVR8_REGIDX_DDRL,
-	AVR8_REGIDX_PORTL
+	AVR8_REGIDX_PORTL,
+  //0x10C: Reserved
+  //0x10D: Reserved
+  //0x10E: Reserved
+  //0x10F: Reserved
+  //0x110: Reserved
+  //0x111: Reserved
+  //0x112: Reserved
+  //0x113: Reserved
+  //0x114: Reserved
+  //0x115: Reserved
+  //0x116: Reserved
+  //0x117: Reserved
+  //0x118: Reserved
+  //0x119: Reserved
+  //0x11A: Reserved
+  //0x11B: Reserved
+  //0x11C: Reserved
+  //0x11D: Reserved
+  //0x11E: Reserved
+  //0x11F: Reserved
+	AVR8_REGIDX_TCCR5A,
+	AVR8_REGIDX_TCCR5B,
+	AVR8_REGIDX_TCCR5C,
+  //0x123: Reserved
+	AVR8_REGIDX_TCNT5L,
+	AVR8_REGIDX_TCNT5H,
+	AVR8_REGIDX_ICR5L,
+	AVR8_REGIDX_ICR5H,
+	AVR8_REGIDX_OCR5AL,
+	AVR8_REGIDX_OCR5AH,
+	AVR8_REGIDX_OCR5BL,
+	AVR8_REGIDX_OCR5BH,
+	AVR8_REGIDX_OCR5CL,
+	AVR8_REGIDX_OCR5CH,
+  //0x12E: Reserved
+  //0x12F: Reserved
+	AVR8_REGIDX_UCSR3A,
+	AVR8_REGIDX_UCSR3B,
+	AVR8_REGIDX_UCSR3C,
+  //0x133: Reserved
+	AVR8_REGIDX_UBRR3L,
+	AVR8_REGIDX_UBRR3H,
+	AVR8_REGIDX_UDR3,
+  //0x137: Reserved
+  //  .
+  //  . up to
+  //  .
+  //0x1FF: Reserved
 };
 
 enum {
@@ -819,8 +851,6 @@ enum
   CKOUT = (1 << 6),
   CKDIV8 = (1 << 7),
 };
-
-#define AVR8_EECR_EERE          0x01
 
 #define AVR8_EEARH_MASK         0x01
 

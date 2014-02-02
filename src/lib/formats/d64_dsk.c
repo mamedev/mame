@@ -41,10 +41,10 @@ const d64_format::format d64_format::file_formats[] = {
 		floppy_image::FF_525, floppy_image::SSSD, 683, 35, 1, 256, 9, 8
 	},
 	{ // d64, dos 2, 40 tracks, head 48 tpi, stepper 96 tpi
-		floppy_image::FF_525, floppy_image::SSSD, 768, 35, 1, 256, 9, 8
+		floppy_image::FF_525, floppy_image::SSSD, 768, 40, 1, 256, 9, 8
 	},
 	{ // d64, dos 2, 42 tracks, head 48 tpi, stepper 96 tpi
-		floppy_image::FF_525, floppy_image::SSSD, 802, 35, 1, 256, 9, 8
+		floppy_image::FF_525, floppy_image::SSSD, 802, 42, 1, 256, 9, 8
 	},
 	{ // d71, dos 2, 35 tracks, 2 heads, head 48 tpi, stepper 96 tpi
 		floppy_image::FF_525, floppy_image::DSSD, 683, 35, 2, 256, 9, 8

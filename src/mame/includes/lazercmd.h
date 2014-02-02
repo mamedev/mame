@@ -1,3 +1,4 @@
+#include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 
 #define HORZ_RES        32
@@ -30,7 +31,7 @@ public:
 	{ }
 
 	/* device */
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;

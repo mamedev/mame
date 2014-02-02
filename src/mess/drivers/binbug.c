@@ -71,7 +71,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
 	DECLARE_READ8_MEMBER(binbug_serial_r);
-	DECLARE_WRITE8_MEMBER(binbug_serial_w);
+	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
 	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
 	virtual void video_start();
@@ -93,9 +93,9 @@ READ8_MEMBER( binbug_state::binbug_serial_r )
 	return m_keyboard->tx_r() & (m_cass->input() < 0.03);
 }
 
-WRITE8_MEMBER( binbug_state::binbug_serial_w )
+WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
 {
-	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
+	m_cass->output(state ? -1.0 : +1.0);
 }
 
 static ADDRESS_MAP_START(binbug_mem, AS_PROGRAM, 8, binbug_state)
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(binbug_io, AS_IO, 8, binbug_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(binbug_ctrl_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(binbug_serial_r,binbug_serial_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(binbug_serial_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -299,6 +299,7 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(binbug_mem)
 	MCFG_CPU_IO_MAP(binbug_io)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(binbug_state, binbug_serial_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

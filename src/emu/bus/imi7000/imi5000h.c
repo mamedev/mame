@@ -397,6 +397,8 @@ static MACHINE_CONFIG_FRAGMENT( imi5000h )
 	MCFG_Z80PIO_ADD(Z80PIO_0_TAG, XTAL_8MHz/2, pio0_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_2_TAG, XTAL_8MHz/2, pio2_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_3_TAG, XTAL_8MHz/2, pio3_intf)
+
+	//MCFG_HARDDISK_ADD("harddisk1")
 MACHINE_CONFIG_END
 
 
@@ -465,14 +467,15 @@ ioport_constructor imi5000h_device::device_input_ports() const
 //  imi5000h_device - constructor
 //-------------------------------------------------
 
-imi5000h_device::imi5000h_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IMI5000H, "IMI 5000H", tag, owner, clock, "imi5000h", __FILE__),
-		m_maincpu(*this, Z80_TAG),
-		m_ctc(*this, Z80CTC_TAG),
-		m_lsi11(*this, "LSI-11"),
-		m_mux(*this, "MUX"),
-		m_format(*this, "FORMAT"),
-		m_ub4(*this, "UB4")
+imi5000h_device::imi5000h_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, IMI5000H, "IMI 5000H", tag, owner, clock, "imi5000h", __FILE__),
+	device_imi7000_interface(mconfig, *this),
+	m_maincpu(*this, Z80_TAG),
+	m_ctc(*this, Z80CTC_TAG),
+	m_lsi11(*this, "LSI-11"),
+	m_mux(*this, "MUX"),
+	m_format(*this, "FORMAT"),
+	m_ub4(*this, "UB4")
 {
 }
 

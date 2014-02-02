@@ -249,8 +249,20 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	MCFG_PIA6821_ADD( "pia_0", osborne1_ieee_pia_config )
-	MCFG_PIA6821_ADD( "pia_1", osborne1_video_pia_config )
+	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
+	MCFG_PIA_READPB_HANDLER(READ8(osborne1_state, ieee_pia_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osborne1_state, ieee_pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, ieee_pia_irq_a_func))
+
+	MCFG_DEVICE_ADD( "pia_1", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(osborne1_state, video_pia_port_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osborne1_state, video_pia_port_b_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(osborne1_state, video_pia_out_cb2_dummy))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, video_pia_irq_a_func))
 
 	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 

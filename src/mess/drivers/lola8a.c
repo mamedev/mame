@@ -257,6 +257,7 @@ WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
 static MC6845_INTERFACE( hd46505sp_intf )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	lola8a_update_row,

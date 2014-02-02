@@ -34,7 +34,7 @@
 
 QUICKLOAD_LOAD_MEMBER( c64_state, cbm_c64 )
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
+	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
 
 
@@ -769,7 +769,7 @@ READ8_MEMBER( c64_state::cia2_pa_r )
 	UINT8 data = 0;
 
 	// user port
-	data |= m_user->pa2_r() << 2;
+	data |= m_user_pa2 << 2;
 
 	// IEC bus
 	data |= m_iec->clk_r() << 6;
@@ -800,7 +800,7 @@ WRITE8_MEMBER( c64_state::cia2_pa_w )
 	m_va15 = BIT(data, 1);
 
 	// user port
-	m_user->pa2_w(BIT(data, 2));
+	m_user->write_m(BIT(data, 2));
 
 	// IEC bus
 	m_iec->atn_w(!BIT(data, 3));
@@ -808,6 +808,22 @@ WRITE8_MEMBER( c64_state::cia2_pa_w )
 	m_iec->data_w(!BIT(data, 5));
 }
 
+READ8_MEMBER( c64_state::cia2_pb_r )
+{
+	return m_user_pb;
+}
+
+WRITE8_MEMBER( c64_state::cia2_pb_w )
+{
+	m_user->write_c((data>>0)&1);
+	m_user->write_d((data>>1)&1);
+	m_user->write_e((data>>2)&1);
+	m_user->write_f((data>>3)&1);
+	m_user->write_h((data>>4)&1);
+	m_user->write_j((data>>5)&1);
+	m_user->write_k((data>>6)&1);
+	m_user->write_l((data>>7)&1);
+}
 
 //-------------------------------------------------
 //  M6510_INTERFACE( cpu_intf )
@@ -981,7 +997,7 @@ WRITE_LINE_MEMBER( c64_state::exp_dma_w )
 
 WRITE_LINE_MEMBER( c64_state::exp_reset_w )
 {
-	if (state == ASSERT_LINE)
+	if (!state)
 	{
 		machine_reset();
 	}
@@ -1032,6 +1048,8 @@ void c64_state::machine_start()
 	save_item(NAME(m_exp_irq));
 	save_item(NAME(m_exp_nmi));
 	save_item(NAME(m_exp_dma));
+	save_item(NAME(m_user_pb));
+	save_item(NAME(m_user_pa2));
 }
 
 
@@ -1079,26 +1097,42 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, WRITELINE(c64_state, cia1_irq_w))
-	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt1_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp1_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4), DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
 	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c64_state, cia1_pa_r), NULL)
 	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c64_state, cia1_pb_r), WRITE8(c64_state, cia1_pb_w), NULL)
 	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, WRITELINE(c64_state, cia2_irq_w))
-	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp2_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6), DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
 	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c64_state, cia2_pa_r), WRITE8(c64_state, cia2_pa_w))
-	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(C64_USER_PORT_TAG, c64_user_port_device, pb_r), DEVWRITE8(C64_USER_PORT_TAG, c64_user_port_device, pb_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, pc2_w))
+	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c64_state, cia2_pb_r), WRITE8(c64_state, cia2_pb_w), DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
 	MCFG_CBM_IEC_ADD("c1541")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, atn_w))
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6567_TAG, mos6567_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, c64_expansion_cards, NULL)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(WRITELINE(c64_state, exp_irq_w), WRITELINE(c64_state, exp_nmi_w), WRITELINE(c64_state, exp_reset_w))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(READ8(c64_state, read), WRITE8(c64_state, write), WRITELINE(c64_state, exp_dma_w))
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, c64_user_port_cards, NULL, WRITELINE(c64_state, exp_reset_w))
-	MCFG_C64_USER_PORT_CIA1_CALLBACKS(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
-	MCFG_C64_USER_PORT_CIA2_CALLBACKS(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+
+	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, NULL)
+	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(c64_state, exp_reset_w))
+	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_6_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_7_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_9_HANDLER(DEVWRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_B_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(c64_state, write_user_pb0))
+	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(c64_state, write_user_pb1))
+	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(c64_state, write_user_pb2))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(c64_state, write_user_pb3))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(c64_state, write_user_pb4))
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(c64_state, write_user_pb5))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(c64_state, write_user_pb6))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(c64_state, write_user_pb7))
+	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(c64_state, write_user_pa2))
+
 	MCFG_QUICKLOAD_ADD("quickload", c64_state, cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
@@ -1192,26 +1226,42 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, WRITELINE(c64_state, cia1_irq_w))
-	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt1_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp1_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4), DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
 	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c64_state, cia1_pa_r), NULL)
 	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c64_state, cia1_pb_r), WRITE8(c64_state, cia1_pb_w), NULL)
-	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, WRITELINE(c64_state, cia2_irq_w))
-	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp2_w))
+	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, WRITELINE(c64_state, cia2_irq_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6), DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
 	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c64_state, cia2_pa_r), WRITE8(c64_state, cia2_pa_w))
-	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(C64_USER_PORT_TAG, c64_user_port_device, pb_r), DEVWRITE8(C64_USER_PORT_TAG, c64_user_port_device, pb_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, pc2_w))
+	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c64_state, cia2_pb_r), WRITE8(c64_state, cia2_pb_w), DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
 	MCFG_CBM_IEC_ADD("c1541")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, atn_w))
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, c64_expansion_cards, NULL)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(WRITELINE(c64_state, exp_irq_w), WRITELINE(c64_state, exp_nmi_w), WRITELINE(c64_state, exp_reset_w))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(READ8(c64_state, read), WRITE8(c64_state, write), WRITELINE(c64_state, exp_dma_w))
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, c64_user_port_cards, NULL, WRITELINE(c64_state, exp_reset_w))
-	MCFG_C64_USER_PORT_CIA1_CALLBACKS(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
-	MCFG_C64_USER_PORT_CIA2_CALLBACKS(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+
+	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, NULL)
+	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(c64_state, exp_reset_w))
+	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_6_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_7_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_9_HANDLER(DEVWRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_B_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(c64_state, write_user_pb0))
+	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(c64_state, write_user_pb1))
+	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(c64_state, write_user_pb2))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(c64_state, write_user_pb3))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(c64_state, write_user_pb4))
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(c64_state, write_user_pb5))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(c64_state, write_user_pb6))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(c64_state, write_user_pb7))
+	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(c64_state, write_user_pa2))
+
 	MCFG_QUICKLOAD_ADD("quickload", c64_state, cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
@@ -1283,26 +1333,41 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, WRITELINE(c64_state, cia1_irq_w))
-	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt1_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp1_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_4), DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_5))
 	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c64gs_state, cia1_pa_r), NULL)
-	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c64gs_state, cia1_pb_r), NULL, NULL)
-	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, WRITELINE(c64_state, cia2_irq_w))
-	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp2_w))
+	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c64gs_state, cia1_pb_r), WRITE8(c64gs_state, cia1_pb_w), NULL)
+	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, WRITELINE(c64_state, cia2_irq_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_6), DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_7))
 	MCFG_MOS6526_PORT_A_CALLBACKS(READ8(c64_state, cia2_pa_r), WRITE8(c64_state, cia2_pa_w))
-	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(C64_USER_PORT_TAG, c64_user_port_device, pb_r), DEVWRITE8(C64_USER_PORT_TAG, c64_user_port_device, pb_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, pc2_w))
+	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c64_state, cia2_pb_r), WRITE8(c64_state, cia2_pb_w), DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_8))
 	MCFG_CBM_IEC_ADD(NULL)
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, atn_w))
-
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, c64_expansion_cards, NULL)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(WRITELINE(c64_state, exp_irq_w), WRITELINE(c64_state, exp_nmi_w), WRITELINE(c64_state, exp_reset_w))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(READ8(c64_state, read), WRITE8(c64_state, write), WRITELINE(c64_state, exp_dma_w))
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, c64_user_port_cards, NULL, WRITELINE(c64_state, exp_reset_w))
-	MCFG_C64_USER_PORT_CIA1_CALLBACKS(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
-	MCFG_C64_USER_PORT_CIA2_CALLBACKS(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+
+	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, c64_user_port_cards, NULL)
+	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(c64_state, exp_reset_w))
+	MCFG_PET_USER_PORT_4_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_5_HANDLER(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_6_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w))
+	MCFG_PET_USER_PORT_7_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w))
+	MCFG_PET_USER_PORT_9_HANDLER(DEVWRITELINE(CBM_IEC_TAG, cbm_iec_device, atn_w))
+	MCFG_PET_USER_PORT_B_HANDLER(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(c64_state, write_user_pb0))
+	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(c64_state, write_user_pb1))
+	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(c64_state, write_user_pb2))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(c64_state, write_user_pb3))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(c64_state, write_user_pb4))
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(c64_state, write_user_pb5))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(c64_state, write_user_pb6))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(c64_state, write_user_pb7))
+	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(c64_state, write_user_pa2))
+
 	MCFG_QUICKLOAD_ADD("quickload", c64_state, cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list

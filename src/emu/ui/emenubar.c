@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "ui/emenubar.h"
 #include "ui/selgame.h"
-#include "uimain.h"
+#include "ui/miscmenu.h"
 #include "uiimage.h"
 #include "cheat.h"
 #include "imagedev/cassette.h"

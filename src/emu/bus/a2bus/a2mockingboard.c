@@ -40,15 +40,11 @@ static const ay8910_interface mockingboard_ay8910_interface =
 
 MACHINE_CONFIG_FRAGMENT( mockingboard )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_READPA_HANDLER(READ8(a2bus_ayboard_device, via1_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(a2bus_ayboard_device, via1_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via1_irq_w))
 
 	MCFG_DEVICE_ADD(VIA2_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_READPA_HANDLER(READ8(a2bus_ayboard_device, via2_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(a2bus_ayboard_device, via2_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via2_irq_w))
@@ -64,15 +60,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( phasor )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_READPA_HANDLER(READ8(a2bus_ayboard_device, via1_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(a2bus_ayboard_device, via1_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via1_irq_w))
 
 	MCFG_DEVICE_ADD(VIA2_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_READPA_HANDLER(READ8(a2bus_ayboard_device, via2_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(a2bus_ayboard_device, via2_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via2_irq_w))
@@ -95,15 +87,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( echoplus )
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_READPA_HANDLER(READ8(a2bus_ayboard_device, via1_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(a2bus_ayboard_device, via1_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via1_irq_w))
 
 	MCFG_DEVICE_ADD(VIA2_TAG, VIA6522, 1022727)
-	MCFG_VIA6522_READPA_HANDLER(READ8(a2bus_ayboard_device, via2_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(a2bus_ayboard_device, via2_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via2_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(a2bus_ayboard_device, via2_irq_w))
@@ -323,19 +311,9 @@ WRITE_LINE_MEMBER( a2bus_ayboard_device::via2_irq_w )
 	}
 }
 
-READ8_MEMBER( a2bus_ayboard_device::via1_in_a )
-{
-	return 0;
-}
-
 WRITE8_MEMBER( a2bus_ayboard_device::via1_out_a )
 {
 	m_porta1 = data;
-}
-
-READ8_MEMBER( a2bus_ayboard_device::via1_in_b )
-{
-	return 0;
 }
 
 WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
@@ -426,19 +404,9 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 	}
 }
 
-READ8_MEMBER( a2bus_ayboard_device::via2_in_a )
-{
-	return 0;
-}
-
 WRITE8_MEMBER( a2bus_ayboard_device::via2_out_a )
 {
 	m_porta2 = data;
-}
-
-READ8_MEMBER( a2bus_ayboard_device::via2_in_b )
-{
-	return 0;
 }
 
 WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )

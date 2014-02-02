@@ -1077,6 +1077,7 @@ bool floppy_image_format_t::type_no_data(int type) const
 		type == CRC_AMIGA_START ||
 		type == CRC_CBM_START ||
 		type == CRC_MACHEAD_START ||
+		type == CRC_FCS_START ||
 		type == CRC_END ||
 		type == SECTOR_LOOP_START ||
 		type == SECTOR_LOOP_END ||
@@ -1088,6 +1089,7 @@ bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *
 	return !type_no_data(type) &&
 		type != RAW &&
 		type != RAWBITS &&
+		type != FM &&
 		(type != CRC || (crcs[p1].type != CRC_CCITT && crcs[p1].type != CRC_CCITT_FM && crcs[p1].type != CRC_AMIGA));
 }
 
@@ -1114,6 +1116,9 @@ void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 		case CRC_MACHEAD_START:
 			crcs[desc[i].p1].type = CRC_MACHEAD;
 			break;
+		case CRC_FCS_START:
+			crcs[desc[i].p1].type = CRC_FCS;
+			break;
 		}
 
 	for(int i=0; desc[i].type != END; i++)
@@ -1132,6 +1137,7 @@ int floppy_image_format_t::crc_cells_size(int type) const
 	case CRC_AMIGA: return 64;
 	case CRC_CBM: return 10;
 	case CRC_MACHEAD: return 8;
+	case CRC_FCS: return 20;
 	default: return 0;
 	}
 }
@@ -1199,6 +1205,16 @@ void floppy_image_format_t::gcr5_w(UINT32 *buffer, int &offset, int n, UINT32 va
 	raw_w(buffer, offset, 5, e1, size);
 }
 
+void floppy_image_format_t::_8n1_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size)
+{
+	bit_w(buffer, offset++, 0);
+	for(int i=n-1; i>=0; i--) {
+		int bit = (val >> i) & 1;
+		bit_w(buffer, offset++, bit, size);
+	}
+	bit_w(buffer, offset++, 1);
+}
+
 void floppy_image_format_t::fixup_crc_amiga(UINT32 *buffer, const gen_crc_info *crc)
 {
 	UINT16 res = 0;
@@ -1257,6 +1273,11 @@ void floppy_image_format_t::fixup_crc_machead(UINT32 *buffer, const gen_crc_info
 	raw_w(buffer, offset, 8, gcr6fw_tb[v]);
 }
 
+void floppy_image_format_t::fixup_crc_fcs(UINT32 *buffer, const gen_crc_info *crc)
+{
+	// TODO
+}
+
 void floppy_image_format_t::fixup_crcs(UINT32 *buffer, gen_crc_info *crcs)
 {
 	for(int i=0; i != MAX_CRC_COUNT; i++)
@@ -1267,6 +1288,7 @@ void floppy_image_format_t::fixup_crcs(UINT32 *buffer, gen_crc_info *crcs)
 			case CRC_CCITT:   fixup_crc_ccitt(buffer, crcs+i); break;
 			case CRC_CCITT_FM:fixup_crc_ccitt_fm(buffer, crcs+i); break;
 			case CRC_MACHEAD: fixup_crc_machead(buffer, crcs+i); break;
+			case CRC_FCS:     fixup_crc_fcs(buffer, crcs+i); break;
 			}
 			if(crcs[i].fixup_mfm_clock) {
 				int offset = crcs[i].write + crc_cells_size(crcs[i].type);
@@ -1366,6 +1388,11 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 				gcr5_w(buffer, offset, 8, desc[index].p1);
 			break;
 
+		case _8N1:
+			for(int i=0; i<desc[index].p2; i++)
+				_8n1_w(buffer, offset, 8, desc[index].p1);
+			break;
+
 		case RAW:
 			for(int i=0; i<desc[index].p2; i++)
 				raw_w(buffer, offset, 16, desc[index].p1);
@@ -1390,6 +1417,10 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 
 		case TRACK_ID_GCR6:
 			raw_w(buffer, offset, 8, gcr6fw_tb[track & 0x3f]);
+			break;
+
+		case TRACK_ID_8N1:
+			_8n1_w(buffer, offset, 8, track);
 			break;
 
 		case HEAD_ID:
@@ -1422,6 +1453,10 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 
 		case SECTOR_ID_GCR6:
 			raw_w(buffer, offset, 8, gcr6fw_tb[sect[sector_idx].sector_id]);
+			break;
+
+		case SECTOR_ID_8N1:
+			_8n1_w(buffer, offset, 8, sect[sector_idx].sector_id);
 			break;
 
 		case SIZE_ID: {
@@ -1496,6 +1531,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 		case CRC_CCITT_START:
 		case CRC_CCITT_FM_START:
 		case CRC_MACHEAD_START:
+		case CRC_FCS_START:
 			crcs[desc[index].p1].start = offset;
 			break;
 
@@ -1568,6 +1604,13 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 				raw_w(buffer, offset, nb, gcr6_encode(va, vb, vc) >> (32-nb));
 			}
 			raw_w(buffer, offset, 32, gcr6_encode(ca, cb, cc));
+			break;
+		}
+
+		case SECTOR_DATA_8N1: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
+			for(int i=0; i != csect->size; i++)
+				_8n1_w(buffer, offset, 8, csect->data[i]);
 			break;
 		}
 

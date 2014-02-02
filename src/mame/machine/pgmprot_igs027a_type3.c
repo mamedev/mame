@@ -144,9 +144,6 @@ static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32, pgm_arm_type3_state )
 	AM_RANGE(0x48000000, 0x48000003) AM_READWRITE(svg_latch_arm_r, svg_latch_arm_w) /* 68k Latch */
 	AM_RANGE(0x40000018, 0x4000001b) AM_WRITE(svg_arm7_ram_sel_w) /* RAM SEL */
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
-
-//  AM_RANGE(0xc0000000, 0xffffffff) AM_RAM
-
 ADDRESS_MAP_END
 
 
@@ -161,8 +158,10 @@ MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 	if (!strcmp(machine().system().name, "theglad")) base = 0x3316;
 	if (!strcmp(machine().system().name, "theglad100")) base = 0x3316;
 	if (!strcmp(machine().system().name, "theglad101")) base = 0x3316;
-	if (!strcmp(machine().system().name, "happy6")) base = 0x3316;
+	if (!strcmp(machine().system().name, "happy6")) base = 0x3586;
+	if (!strcmp(machine().system().name, "happy6101")) base = 0x3586;
 	if (!strcmp(machine().system().name, "svgpcb")) base = 0x3a8e;
+	if (!strcmp(machine().system().name, "svg")) base = 0x3c3e;
 
 	if (base != -1)
 	{
@@ -255,12 +254,27 @@ READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
 	return m_arm_ram2[0x00c/4];
 }
 
+
+READ32_MEMBER(pgm_arm_type3_state::happy6_speedup_r )
+{
+	int pc = space.device().safe_pc();
+	if (pc == 0x0a08) space.device().execute().eat_cycles(500);
+	//else printf("theglad_speedup_r %08x\n", pc);
+	return m_arm_ram2[0x00c/4];
+}
+
 // installed over rom
 READ32_MEMBER(pgm_arm_type3_state::svg_speedup_r )
 {
 	int pc = space.device().safe_pc();
+	if (pc == 0xb90) space.device().execute().eat_cycles(500);
+	return m_armrom[0xb90/4];
+}
+
+READ32_MEMBER(pgm_arm_type3_state::svgpcb_speedup_r )
+{
+	int pc = space.device().safe_pc();
 	if (pc == 0x9e0) space.device().execute().eat_cycles(500);
-//  else printf("killbldp_speedup_r %08x\n", pc);
 	return m_armrom[0x9e0/4];
 }
 
@@ -397,37 +411,8 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xE121; base += 2;
 
 
-	if (is_svg == 0)
-	{
-		temp16[(base) / 2] = 0x0028; base += 2; // jump to 0x184
-		temp16[(base) / 2] = 0xEA00; base += 2;
-	}
-	else
-	{
-		temp16[(base) / 2] = 0x001c; base += 2; // jump to 0x154
-		temp16[(base) / 2] = 0xEA00; base += 2;
-
-		base = 0x154;
-
-		// this actually makes matters worse here
-//      temp16[(base) / 2] = 0x1010; base += 2;
-//      temp16[(base) / 2] = 0xe59f; base += 2;
-//      temp16[(base) / 2] = 0x0001; base += 2;
-//      temp16[(base) / 2] = 0xe3a0; base += 2;
-//      temp16[(base) / 2] = 0x0000; base += 2;
-//      temp16[(base) / 2] = 0xe581; base += 2;
-
-		temp16[(base) / 2] = 0xf000; base += 2;
-		temp16[(base) / 2] = 0xe59f; base += 2;
-		temp16[(base) / 2] = 0x0028; base += 2;
-		temp16[(base) / 2] = 0x0800; base += 2;
-		temp16[(base) / 2] = 0x0028; base += 2;
-		temp16[(base) / 2] = 0x0800; base += 2;
-
-//      temp16[(base) / 2] = 0x003c; base += 2;
-//      temp16[(base) / 2] = 0x1000; base += 2;
-
-	}
+	temp16[(base) / 2] = 0x0028; base += 2; // jump to 0x184
+	temp16[(base) / 2] = 0xEA00; base += 2;
 
 
 	base = 0;
@@ -495,9 +480,16 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xE3A0; base += 2;
 	temp16[(base) /2] = 0x0000; base += 2;
 	temp16[(base) /2] = 0xE581; base += 2;
-	temp16[(base) /2] = 0xF302; base += 2;
-	temp16[(base) /2] = 0xE3A0; base += 2;
-
+	if (is_svg == 0)
+	{ // jump to start of external rom
+		temp16[(base) / 2] = 0xF302; base += 2;
+		temp16[(base) / 2] = 0xE3A0; base += 2;
+	}
+	else
+	{
+		temp16[(base) / 2] = 0xf0b0; base += 2;
+		temp16[(base) / 2] = 0xe59f; base += 2;
+	}
 
 
 
@@ -525,39 +517,6 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
 }
 
-void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_svg(int base)
-{
-	// we don't have the correct internal ROM for this version, so insead we use the one we have and patch the jump table in the external ROM
-	int subroutine_addresses[] =
-	{
-		0,0,0,0,0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,
-		0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0,0x1B0
-	};
-	UINT16 *extprot = (UINT16 *)memregion("user1")->base();
-
-	for (int i = 0; i < 135; i++)
-	{
-		UINT32 addr = extprot[(base/2)] | (extprot[(base/2) + 1] << 16);
-		extprot[(base / 2)] = addr - subroutine_addresses[i];
-
-		base += 4;
-	}
-}
 
 void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base)
 {
@@ -658,9 +617,9 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
 	pgm_svg_decrypt(machine());
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad(1);
-	pgm_patch_external_arm_rom_jumptable_svg(0x53f10);
 	m_armrom = (UINT32 *)memregion("prot")->base();
-	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
+	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0xB90, 0xB93, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
+
 
 }
 
@@ -671,7 +630,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad(0);
 	m_armrom = (UINT32 *)memregion("prot")->base();
-	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
+	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(FUNC(pgm_arm_type3_state::svgpcb_speedup_r),this));
 
 }
 
@@ -832,7 +791,6 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
 	pgm_happy6_decrypt(machine());
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad(0);
-	pgm_patch_external_arm_rom_jumptable_theglada(0x5f1c0);
 
-	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
+	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::happy6_speedup_r),this));
 }

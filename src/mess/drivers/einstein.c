@@ -697,6 +697,7 @@ static const centronics_interface einstein_centronics_config =
 static MC6845_INTERFACE( einstein_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	einstein_6845_update_row,

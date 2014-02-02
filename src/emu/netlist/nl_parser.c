@@ -29,7 +29,7 @@ ATTR_COLD void netlist_parser::error(const char *format, ...)
         buf[bufp++] = *p++;
     buf[bufp] = 0;
 
-    m_setup.netlist().xfatalerror("line %d: error: %s\n\t\t%s\n", m_line, errmsg1.cstr(), buf);
+    m_setup.netlist().error("line %d: error: %s\n\t\t%s\n", m_line, errmsg1.cstr(), buf);
 
     //throw error;
 }
@@ -54,16 +54,8 @@ void netlist_parser::parse(const char *buf)
 			net_c();
 		else if (n == "NETDEV_PARAM")
 			netdev_param();
-		else if (n == "NETDEV_R")
-			netdev_device(n, "R");
-		else if (n == "NETDEV_C")
-			netdev_device(n, "C");
-		else if (n == "NETDEV_POT")
-			netdev_device(n, "R");
-		else if (n == "NETDEV_D")
-			netdev_device(n, "model", true);
-		else if ((n == "NETDEV_TTL_CONST") || (n == "NETDEV_ANALOG_CONST"))
-			netdev_const(n);
+		else if ((n == "NET_MODEL"))
+		    net_model();
 		else if (n == "NETLIST_START")
 		    netdev_netlist_start();
         else if (n == "NETLIST_END")
@@ -84,6 +76,15 @@ void netlist_parser::netdev_netlist_start()
 void netlist_parser::netdev_netlist_end()
 {
     // don't do much
+    skipws();
+    check_char(')');
+}
+
+void netlist_parser::net_model()
+{
+    // don't do much
+    pstring model = getstring();
+    m_setup.register_model(model);
     check_char(')');
 }
 
@@ -124,87 +125,58 @@ void netlist_parser::netdev_param()
 	check_char(')');
 }
 
-void netlist_parser::netdev_const(const pstring &dev_name)
-{
-	pstring name;
-	netlist_device_t *dev;
-	pstring paramfq;
-	double val;
-
-	skipws();
-	name = getname(',');
-	dev = m_setup.factory().new_device_by_name(dev_name, m_setup);
-	m_setup.register_dev(dev, name);
-	skipws();
-	val = eval_param();
-	paramfq = name + ".CONST";
-	NL_VERBOSE_OUT(("Parser: Const: %s %f\n", name.cstr(), val));
-	check_char(')');
-	m_setup.register_param(paramfq, val);
-}
-
 void netlist_parser::netdev_device(const pstring &dev_type)
 {
 	pstring devname;
+	net_device_t_base_factory *f = m_setup.factory().factory_by_name(dev_type, m_setup);
 	netlist_device_t *dev;
+	nl_util::pstring_list termlist = f->term_param_list();
+	pstring def_param = f->def_param();
+
 	int cnt;
 
 	skipws();
 	devname = getname2(',', ')');
-	dev = m_setup.factory().new_device_by_name(dev_type, m_setup);
+	dev = f->Create();
 	m_setup.register_dev(dev, devname);
+
 	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
+
+	if (def_param != "")
+	{
+        pstring paramfq = devname + "." + def_param;
+	    NL_VERBOSE_OUT(("Defparam: %s\n", def_param.cstr()));
+        check_char(',');
+	    skipws();
+	    if (peekc() == '"')
+	    {
+            pstring val = getstring();
+            m_setup.register_param(paramfq, val);
+	    }
+	    else
+	    {
+	        double val = eval_param();
+	        m_setup.register_param(paramfq, val);
+	    }
+	    if (termlist.count() > 0)
+	        check_char(',');
+	}
+
 	cnt = 0;
-	while (getc() != ')')
+	while (getc() != ')' && cnt < termlist.count())
 	{
 		skipws();
 		pstring output_name = getname2(',', ')');
-		pstring alias = pstring::sprintf("%s.[%d]", devname.cstr(), cnt);
-		NL_VERBOSE_OUT(("Parser: ID: %s %s\n", output_name.cstr(), alias.cstr()));
-		m_setup.register_link(alias, output_name);
+
+		m_setup.register_link(devname + "." + termlist[cnt], output_name);
+
 		skipws();
 		cnt++;
 	}
-/*
-    if (cnt != dev->m_terminals.count() && !dev->variable_input_count())
-        fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), dev->m_terminals.count(), cnt);
-    if (dev->variable_input_count())
-    {
-        NL_VERBOSE_OUT(("variable inputs %s: %d\n", dev->name().cstr(), cnt));
-    }
-    */
+    if (cnt != termlist.count())
+        fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), termlist.count(), cnt);
 }
 
-void netlist_parser::netdev_device(const pstring &dev_type, const pstring &default_param, bool isString)
-{
-	netlist_device_t *dev;
-
-	skipws();
-	pstring devname = getname2(',', ')');
-	pstring defparam = devname + "." + default_param;
-	dev = m_setup.factory().new_device_by_name(dev_type, m_setup);
-	m_setup.register_dev(dev, devname);
-	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
-	if (getc() != ')')
-	{
-		// have a default param
-		skipws();
-		if (isString)
-		{
-			pstring val = getname(')');
-			ungetc();
-			NL_VERBOSE_OUT(("Parser: Default param: %s %s\n", defparam.cstr(), val.cstr()));
-			m_setup.register_param(defparam, val);
-		}
-		else
-		{
-			double val = eval_param();
-			NL_VERBOSE_OUT(("Parser: Default param: %s %f\n", defparam.cstr(), val));
-			m_setup.register_param(defparam, val);
-		}
-	}
-	check_char(')');
-}
 
 // ----------------------------------------------------------------------------------------
 // private
@@ -268,6 +240,17 @@ void netlist_parser::skipws()
 	}
 }
 
+pstring netlist_parser::getstring()
+{
+    skipws();
+    check_char('"');
+    pstring ret = getname2_ext('"', 0, NULL);
+    check_char('"');
+    skipws();
+    return ret;
+}
+
+
 pstring netlist_parser::getname(char sep)
 {
 	pstring ret = getname2(sep, 0);
@@ -283,14 +266,14 @@ pstring netlist_parser::getname2(char sep1, char sep2)
 
 pstring netlist_parser::getname2_ext(char sep1, char sep2, const char *allowed)
 {
-    char buf[300];
+    char buf[1024];
     char *p1 = buf;
     char c=getc();
 
     while ((c != sep1) && (c != sep2))
     {
         char cU = toupper(c);
-        if (strchr(allowed, cU) != NULL)
+        if ((allowed == NULL) || strchr(allowed, cU) != NULL)
             *p1++ = c;
         else
         {
@@ -317,7 +300,7 @@ void netlist_parser::check_char(char ctocheck)
 double netlist_parser::eval_param()
 {
 	static const char *macs[6] = {"", "RES_K(", "RES_M(", "CAP_U(", "CAP_N(", "CAP_P("};
-	static const char *allowed = "RESKMUNPAC_0123456789E+-.";
+	static const char *allowed = "RESKMUNPAC_0123456789E(+-.";
 	static double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	int i;
 	int f=0;
@@ -329,12 +312,21 @@ double netlist_parser::eval_param()
 	for (i=1; i<6;i++)
 		if (strncmp(s.cstr(), macs[i], strlen(macs[i])) == 0)
 			f = i;
-	ret = s.substr(strlen(macs[f])).as_double(&e);
-	if ((f>0) && e)
+    if (f>0)
+        check_char(')');
+	s = s.substr(strlen(macs[f]));
+	ret = s.as_double(&e);
+//    if ((f>0) && e)
+	if (e)
 		error("Error with parameter ...\n");
-	if (f>0)
-		check_char(')');
 	return ret * facs[f];
+}
+
+unsigned char netlist_parser::peekc()
+{
+    unsigned char c = getc();
+    ungetc();
+    return c;
 }
 
 unsigned char netlist_parser::getc()

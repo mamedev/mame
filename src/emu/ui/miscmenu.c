@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    uimenu.c
+    miscmenu.c
 
     Internal MAME menus for the user interface.
 
@@ -17,7 +17,7 @@
 #include "cheat.h"
 #include "uiimage.h"
 #include "uiinput.h"
-#include "uimain.h"
+#include "ui/miscmenu.h"
 #include "audit.h"
 #include "crsshair.h"
 #include <ctype.h>
@@ -2269,5 +2269,3 @@ void ui_menu_quit_game::handle()
 	/* reset the menu stack */
 	ui_menu::stack_reset(machine());
 }
-
-

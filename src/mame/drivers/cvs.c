@@ -109,9 +109,14 @@ Todo & FIXME:
  *
  *************************************/
 
+WRITE_LINE_MEMBER(cvs_state::write_s2650_flag)
+{
+	m_s2650_flag = state;
+}
+
 READ8_MEMBER(cvs_state::cvs_video_or_color_ram_r)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 		return m_video_ram[offset];
 	else
 		return m_color_ram[offset];
@@ -119,7 +124,7 @@ READ8_MEMBER(cvs_state::cvs_video_or_color_ram_r)
 
 WRITE8_MEMBER(cvs_state::cvs_video_or_color_ram_w)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 		m_video_ram[offset] = data;
 	else
 		m_color_ram[offset] = data;
@@ -128,7 +133,7 @@ WRITE8_MEMBER(cvs_state::cvs_video_or_color_ram_w)
 
 READ8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_r)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 		return m_palette_ram[offset & 0x0f];
 	else
 		return m_bullet_ram[offset];
@@ -136,7 +141,7 @@ READ8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_r)
 
 WRITE8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_w)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 		m_palette_ram[offset & 0x0f] = data;
 	else
 		m_bullet_ram[offset] = data;
@@ -145,7 +150,7 @@ WRITE8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_w)
 
 READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
 		return m_s2636_0->work_ram_r(space, offset);
@@ -153,7 +158,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 	{
 		offset |= (0 * 0x800) | 0x400 | m_character_ram_page_start;
 		m_character_ram[offset] = data;
@@ -166,7 +171,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 
 READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
 		return m_s2636_1->work_ram_r(space, offset);
@@ -174,7 +179,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 	{
 		offset |= (1 * 0x800) | 0x400 | m_character_ram_page_start;
 		m_character_ram[offset] = data;
@@ -187,7 +192,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 
 READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
 		return m_s2636_2->work_ram_r(space, offset);
@@ -195,7 +200,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 {
-	if (*m_fo_state)
+	if (m_s2650_flag)
 	{
 		offset |= (2 * 0x800) | 0x400 | m_character_ram_page_start;
 		m_character_ram[offset] = data;
@@ -468,7 +473,6 @@ static ADDRESS_MAP_START( cvs_main_cpu_io_map, AS_IO, 8, cvs_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITE(audio_command_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_SHARE("fo_state")
 ADDRESS_MAP_END
 
 
@@ -1002,16 +1006,17 @@ MACHINE_RESET_MEMBER(cvs_state,cvs)
 static MACHINE_CONFIG_START( cvs, cvs_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 894886.25)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_main_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cvs_state,  cvs_main_cpu_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cvs_state, cvs_main_cpu_interrupt)
+	MCFG_S2650_FLAG_HANDLER(WRITELINE(cvs_state, write_s2650_flag))
 
-	MCFG_CPU_ADD("audiocpu", S2650, 894886.25)
+	MCFG_CPU_ADD("audiocpu", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_dac_cpu_io_map)
 
-	MCFG_CPU_ADD("speech", S2650, 894886.25)
+	MCFG_CPU_ADD("speech", S2650, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_speech_cpu_io_map)
 
@@ -1052,7 +1057,7 @@ static MACHINE_CONFIG_START( cvs, cvs_state )
 	MCFG_DAC_ADD("dac3")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("tms", TMS5100, 640000)
+	MCFG_SOUND_ADD("tms", TMS5100, XTAL_640kHz)
 	MCFG_SOUND_CONFIG(tms5100_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1640,7 +1645,7 @@ DRIVER_INIT_MEMBER(cvs_state,raiders)
 
 	offs_t offs;
 
-	/* data lines D1 and D5 swapped */
+	/* data lines D1 and D6 swapped */
 	for (offs = 0; offs < 0x7400; offs++)
 		ROM[offs] = BITSWAP8(ROM[offs],7,1,5,4,3,2,6,0);
 

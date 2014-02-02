@@ -335,8 +335,12 @@ static I8255A_INTERFACE( ppi1_intf )
 
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
-	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x10 ) // 7E1
+	DEVICE_INPUT_DEFAULTS( "TERM_TXBAUD", 0xff, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_RXBAUD", 0xff, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_STARTBITS", 0xff, 0x01 ) // 1
+	DEVICE_INPUT_DEFAULTS( "TERM_DATABITS", 0xff, 0x02 ) // 7
+	DEVICE_INPUT_DEFAULTS( "TERM_PARITY", 0xff, 0x02 ) // E
+	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x01 ) // 1
 DEVICE_INPUT_DEFAULTS_END
 
 
@@ -392,6 +396,7 @@ void softbox_state::ieee488_ifc(int state)
 }
 
 
+
 //**************************************************************************
 //  MACHINE CONFIGURATION
 //**************************************************************************
@@ -420,9 +425,8 @@ static MACHINE_CONFIG_START( softbox, softbox_state )
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "serial_terminal")
 	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rx))
 	MCFG_RS232_OUT_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
-
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
-	MCFG_IMI5000H_ADD("corvus1")
+	MCFG_IMI7000_BUS_ADD("imi5000h", NULL, NULL, NULL)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "softbox")

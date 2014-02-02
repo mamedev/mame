@@ -110,48 +110,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  pia6821_interface pia0_intf -
-//-------------------------------------------------
-
-static const pia6821_interface pia0_intf =
-{
-	DEVCB_NULL,     // input A
-	DEVCB_NULL,     // input B
-	DEVCB_NULL,     // input CA1
-	DEVCB_NULL,     // input CB1
-	DEVCB_NULL,     // input CA2
-	DEVCB_NULL,     // input CB2
-	DEVCB_NULL,     // output A
-	DEVCB_NULL,     // output B
-	DEVCB_NULL,     // output CA2
-	DEVCB_NULL,     // output CB2
-	DEVCB_NULL,     // irq A
-	DEVCB_NULL      // irq B
-};
-
-
-//-------------------------------------------------
-//  pia6821_interface pia1_intf -
-//-------------------------------------------------
-
-static const pia6821_interface pia1_intf =
-{
-	DEVCB_NULL,     // input A
-	DEVCB_NULL,     // input B
-	DEVCB_NULL,     // input CA1
-	DEVCB_NULL,     // input CB1
-	DEVCB_NULL,     // input CA2
-	DEVCB_NULL,     // input CB2
-	DEVCB_NULL,     // output A
-	DEVCB_NULL,     // output B
-	DEVCB_NULL,     // output CA2
-	DEVCB_NULL,     // output CB2
-	DEVCB_NULL,     // irq A
-	DEVCB_NULL      // irq B
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
 //-------------------------------------------------
 
@@ -159,8 +117,8 @@ static MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
 	MCFG_CPU_ADD(MC6802P_TAG, M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(multiscreen_mem)
 
-	MCFG_PIA6821_ADD(MC6821P_0_TAG, pia0_intf)
-	MCFG_PIA6821_ADD(MC6821P_1_TAG, pia1_intf)
+	MCFG_DEVICE_ADD(MC6821P_0_TAG, PIA6821, 0)
+	MCFG_DEVICE_ADD(MC6821P_1_TAG, PIA6821, 0)
 MACHINE_CONFIG_END
 
 

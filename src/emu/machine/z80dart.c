@@ -591,6 +591,7 @@ void z80dart_channel::device_reset()
 	// disable transmitter
 	m_wr[5] &= ~WR5_TX_ENABLE;
 	m_rr[0] |= RR0_TX_BUFFER_EMPTY;
+	m_rr[1] |= RR1_ALL_SENT;
 
 	// reset external lines
 	set_rts(1);
@@ -747,18 +748,16 @@ int z80dart_channel::get_clock_mode()
 //  get_stop_bits - get number of stop bits
 //-------------------------------------------------
 
-float z80dart_channel::get_stop_bits()
+device_serial_interface::stop_bits_t z80dart_channel::get_stop_bits()
 {
-	float bits = 1;
-
 	switch (m_wr[4] & WR4_STOP_BITS_MASK)
 	{
-	case WR4_STOP_BITS_1:       bits = 1;       break;
-	case WR4_STOP_BITS_1_5:     bits = 1.5;     break;
-	case WR4_STOP_BITS_2:       bits = 2;       break;
+	case WR4_STOP_BITS_1: return STOP_BITS_1;
+	case WR4_STOP_BITS_1_5: return STOP_BITS_1_5;
+	case WR4_STOP_BITS_2: return STOP_BITS_2;
 	}
 
-	return bits;
+	return STOP_BITS_0;
 }
 
 
@@ -966,7 +965,7 @@ void z80dart_channel::control_write(UINT8 data)
 	case 4:
 		LOG(("Z80DART \"%s\" Channel %c : Parity Enable %u\n", m_owner->tag(), 'A' + m_index, (data & WR4_PARITY_ENABLE) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Parity %s\n", m_owner->tag(), 'A' + m_index, (data & WR4_PARITY_EVEN) ? "Even" : "Odd"));
-		LOG(("Z80DART \"%s\" Channel %c : Stop Bits %f\n", m_owner->tag(), 'A' + m_index, get_stop_bits()));
+		LOG(("Z80DART \"%s\" Channel %c : Stop Bits %s\n", m_owner->tag(), 'A' + m_index, stop_bits_tostring(get_stop_bits())));
 		LOG(("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", m_owner->tag(), 'A' + m_index, get_clock_mode()));
 
 		update_serial();
@@ -1023,8 +1022,8 @@ UINT8 z80dart_channel::data_read()
 		// load data from the FIFO
 		data = m_rx_data_fifo[m_rx_fifo];
 
-		// load error status from the FIFO, retain overrun and parity errors
-		m_rr[1] = (m_rr[1] & (RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo];
+		// load error status from the FIFO
+		m_rr[1] = (m_rr[1] & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo];
 
 		// decrease FIFO pointer
 		m_rx_fifo--;
@@ -1302,6 +1301,22 @@ WRITE_LINE_MEMBER( z80dart_channel::txc_w )
 
 void z80dart_channel::update_serial()
 {
+	int data_bit_count = get_rx_word_length();
+	stop_bits_t stop_bits = get_stop_bits();
+
+	parity_t parity;
+	if (m_wr[4] & WR4_PARITY_ENABLE)
+	{
+		if (m_wr[4] & WR4_PARITY_EVEN)
+			parity = PARITY_EVEN;
+		else
+			parity = PARITY_ODD;
+	}
+	else
+		parity = PARITY_NONE;
+
+	set_data_frame(1, data_bit_count, parity, stop_bits);
+
 	int clocks = get_clock_mode();
 
 	if (m_rxc > 0)
@@ -1313,20 +1328,6 @@ void z80dart_channel::update_serial()
 	{
 		set_tra_rate(m_txc / clocks);
 	}
-
-	int num_data_bits = get_rx_word_length();
-	int stop_bit_count = get_stop_bits();
-	int parity_code = PARITY_NONE;
-
-	if (m_wr[1] & WR4_PARITY_ENABLE)
-	{
-		if (m_wr[1] & WR4_PARITY_EVEN)
-			parity_code = PARITY_EVEN;
-		else
-			parity_code = PARITY_ODD;
-	}
-
-	set_data_frame(num_data_bits, stop_bit_count, parity_code, false);
 }
 
 

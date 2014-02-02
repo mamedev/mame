@@ -174,22 +174,6 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 }
 
 
-static const pia6821_interface mc6821_intf =
-{
-	DEVCB_DRIVER_MEMBER(mkit09_state, pa_r),     /* port A input */
-	DEVCB_DRIVER_MEMBER(mkit09_state, pb_r),     /* port B input */
-	DEVCB_NULL,     /* CA1 input */
-	DEVCB_NULL,     /* CB1 input */
-	DEVCB_NULL,     /* CA2 input */
-	DEVCB_NULL,     /* CB2 input */
-	DEVCB_DRIVER_MEMBER(mkit09_state, pa_w),     /* port A output */
-	DEVCB_DRIVER_MEMBER(mkit09_state, pb_w),     /* port B output */
-	DEVCB_NULL,     /* CA2 output */
-	DEVCB_NULL,     /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0)     /* IRQB output */
-};
-
 static MACHINE_CONFIG_START( mkit09, mkit09_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
@@ -205,7 +189,14 @@ static MACHINE_CONFIG_START( mkit09, mkit09_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_PIA6821_ADD("pia", mc6821_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(mkit09_state, pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(mkit09_state, pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mkit09_state, pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mkit09_state, pb_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 MACHINE_CONFIG_END
 

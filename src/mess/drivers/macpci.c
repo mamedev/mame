@@ -92,12 +92,6 @@ struct cdrom_interface pippin_cdrom =
 	NULL
 };
 
-static const cuda_interface mac_cuda_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(macpci_state, cuda_reset_w),
-	DEVCB_DRIVER_LINE_MEMBER(macpci_state, cuda_adb_linechange_w)
-};
-
 static MACHINE_CONFIG_START( pippin, macpci_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 66000000)
@@ -135,7 +129,11 @@ static MACHINE_CONFIG_START( pippin, macpci_state )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(macpci_state,mac_via_irq))
 
 //  MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(macpci_state::set_scc_interrupt), static_cast<macpci_state *>(owner)))
-	MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
+	MCFG_CUDA_ADD(CUDA_341S0060)
+	MCFG_CUDA_RESET_CALLBACK(WRITELINE(macpci_state, cuda_reset_w))
+	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(macpci_state, cuda_adb_linechange_w))
+	MCFG_CUDA_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 

@@ -115,6 +115,7 @@ static MC6845_UPDATE_ROW( c64_xl80_update_row )
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,
+	0,0,0,0,
 	8,
 	NULL,
 	c64_xl80_update_row,

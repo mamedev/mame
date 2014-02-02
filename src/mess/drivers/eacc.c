@@ -232,22 +232,6 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
 	m_digit = data & 0xf8;
 }
 
-static const pia6821_interface eacc_mc6821_intf =
-{
-	DEVCB_NULL, /* port A input */
-	DEVCB_DRIVER_MEMBER(eacc_state, eacc_keyboard_r),   /* port B input - PB0,1,2 keyboard */
-	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_distance_r),  /* CA1 input - pulses as car moves */
-	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_cb1_r),   /* CB1 input - NMI pulse at 15Hz */
-	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_fuel_sensor_r),   /* CA2 input - pulses as fuel consumed */
-	DEVCB_NULL,                     /* CB2 input */
-	DEVCB_DRIVER_MEMBER(eacc_state, eacc_segment_w),    /* port A output */
-	DEVCB_DRIVER_MEMBER(eacc_state, eacc_digit_w),      /* port B output */
-	DEVCB_NULL,                     /* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(eacc_state, eacc_cb2_w),   /* CB2 output - high after boot complete */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB output */
-};
-
 
 /******************************************************************************
  Machine Drivers
@@ -260,7 +244,17 @@ static MACHINE_CONFIG_START( eacc, eacc_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_eacc)
 
-	MCFG_PIA6821_ADD("pia", eacc_mc6821_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(eacc_state, eacc_keyboard_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(eacc_state, eacc_distance_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(eacc_state, eacc_cb1_r))
+	MCFG_PIA_READCA2_HANDLER(READLINE(eacc_state, eacc_fuel_sensor_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eacc_state, eacc_segment_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(eacc_state, eacc_digit_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(eacc_state, eacc_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6802_cpu_device, irq_line))
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_nmi", eacc_state, eacc_nmi, attotime::from_hz(600))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("eacc_cb1", eacc_state, eacc_cb1, attotime::from_hz(30))

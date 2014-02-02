@@ -957,16 +957,6 @@ WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
 	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
 };
 
-static const duartn68681_config maygayv1_duart68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(maygayv1_state, duart_irq_handler),
-	DEVCB_DRIVER_LINE_MEMBER(maygayv1_state, duart_txa),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 READ8_MEMBER(maygayv1_state::data_to_i8031)
 {
 	return m_d68681_val;
@@ -987,24 +977,6 @@ WRITE8_MEMBER(maygayv1_state::b_writ)
 {
 	logerror("B WRITE %x\n",data);
 }
-
-
-/* U25 ST 2 9148 EF68B21P */
-static const pia6821_interface pia_intf =
-{
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),     /* port A in */
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_read),     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),     /* port A out */
-	DEVCB_DRIVER_MEMBER(maygayv1_state,b_writ),     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
 
 
 void maygayv1_state::machine_start()
@@ -1045,8 +1017,12 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_CPU_DATA_MAP(sound_data)
 	MCFG_CPU_IO_MAP(sound_io)
 
-	MCFG_PIA6821_ADD("pia", pia_intf)
-
+	/* U25 ST 2 9148 EF68B21P */
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(maygayv1_state, b_read))
+	MCFG_PIA_READPB_HANDLER(READ8(maygayv1_state, b_read))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(maygayv1_state, b_writ))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maygayv1_state, b_writ))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1061,8 +1037,9 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 
 	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_DUARTN68681_ADD("duart68681", DUART_CLOCK, maygayv1_duart68681_config)
-
+	MCFG_DUARTN68681_ADD("duart68681", DUART_CLOCK)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

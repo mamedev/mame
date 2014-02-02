@@ -40,57 +40,6 @@ READ8_MEMBER(mcr68_state::zwackery_port_3_r)
 }
 
 
-const pia6821_interface zwackery_pia0_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_INPUT_PORT("IN0"),        /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_pia0_w),       /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_pia_irq),     /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_pia_irq)      /* IRQB */
-};
-
-
-const pia6821_interface zwackery_pia1_intf =
-{
-	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_port_1_r),     /* port A in */
-	DEVCB_DRIVER_MEMBER(mcr68_state, zwackery_port_2_r),        /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_pia1_w),       /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(mcr68_state,zwackery_ca2_w),       /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-
-const pia6821_interface zwackery_pia2_intf =
-{
-	DEVCB_DRIVER_MEMBER(mcr68_state,zwackery_port_3_r),     /* port A in */
-	DEVCB_INPUT_PORT("DSW"),                /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-
 
 /*************************************
  *

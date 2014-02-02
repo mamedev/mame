@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( dai_mem , AS_PROGRAM, 8, dai_state )
 	AM_RANGE( 0xfc00, 0xfcff) AM_READWRITE(dai_pit_r, dai_pit_w) // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE( 0xfd00, 0xfdff) AM_READWRITE(dai_io_discrete_devices_r, dai_io_discrete_devices_w )
 	AM_RANGE( 0xfe00, 0xfeff) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0xff00, 0xffff) AM_DEVREADWRITE("tms5501", tms5501_device, read, write )
+	AM_RANGE( 0xff00, 0xff0f) AM_MIRROR(0xf0) AM_DEVICE("tms5501", tms5501_device, io_map)
 ADDRESS_MAP_END
 
 
@@ -232,7 +232,10 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_CASSETTE_ADD( "cassette", dai_cassette_interface )
 
 	/* tms5501 */
-	MCFG_TMS5501_ADD( "tms5501", 2000000, dai_tms5501_interface )
+	MCFG_DEVICE_ADD("tms5501", TMS5501, 2000000)
+	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
+	MCFG_TMS5501_XI_CALLBACK(READ8(dai_state, dai_keyboard_r))
+	MCFG_TMS5501_XO_CALLBACK(WRITE8(dai_state, dai_keyboard_w))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

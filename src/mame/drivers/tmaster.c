@@ -908,15 +908,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmaster_state::tm3k_interrupt)
 	// lev 2 triggered at the end of the blit
 }
 
-static const duartn68681_config tmaster_duart68681_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tmaster_state, duart_irq_handler),
-	DEVCB_DEVICE_LINE_MEMBER("microtouch", microtouch_serial_device, rx),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( tm, tmaster_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(tmaster_map)
@@ -924,7 +915,10 @@ static MACHINE_CONFIG_START( tm, tmaster_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(tmaster_state,tmaster)
 
-	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/, tmaster_duart68681_config )
+	MCFG_DUARTN68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/)
+	MCFG_DUARTN68681_IRQ_CALLBACK(WRITELINE(tmaster_state, duart_irq_handler))
+	MCFG_DUARTN68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_serial_device, rx))
+
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", 9600, DEVWRITELINE("duart68681", duartn68681_device, rx_a_w) )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

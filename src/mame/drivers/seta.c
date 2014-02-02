@@ -2731,7 +2731,7 @@ static ADDRESS_MAP_START( thunderlbl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")              // Coins
 //  AM_RANGE(0xb0000c, 0xb0000d) AM_READ(thunderl_protection_r  )   // Protection (not in wits)
-	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3")                 // P3 (wits)
+	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3") AM_WRITE(wiggie_soundlatch_w)                // P3 (wits)
 	AM_RANGE(0xb0000a, 0xb0000b) AM_READ_PORT("P4")                 // P4 (wits)
 /**/AM_RANGE(0xc00000, 0xc00001) AM_RAM                             // ? 0x4000
 /**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
@@ -8730,8 +8730,8 @@ MACHINE_CONFIG_END
 static ADDRESS_MAP_START( thunderlbl_sound_map, AS_PROGRAM, 8, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xdfff) AM_ROM//ROMBANK("bank1")
-	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0xdfff) AM_ROM
+	AM_RANGE(0xe800, 0xe800) AM_READ(wiggie_soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -8739,9 +8739,7 @@ static ADDRESS_MAP_START( thunderlbl_sound_portmap, AS_IO, 8, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	//AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE("upd", upd7759_device, control_w)
-	//AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_DEVREADWRITE("upd", upd7759_device, status_r, port_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(wiggie_soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -8759,7 +8757,7 @@ static MACHINE_CONFIG_DERIVED( thunderlbl, thunderl )
 	/* the sound hardware / program is ripped from Tetris (S16B) */
 	MCFG_DEVICE_REMOVE("x1snd")
 
-	MCFG_YM2151_ADD("ymsnd", 16000000/2)
+	MCFG_YM2151_ADD("ymsnd", 10000000/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -9126,38 +9124,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::inttoote_interrupt)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-static const pia6821_interface inttoote_pia0_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface inttoote_pia1_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
 static MSM6242_INTERFACE( rtc_intf )
 {
 	DEVCB_NULL
@@ -9170,8 +9136,8 @@ static MACHINE_CONFIG_START( inttoote, seta_state )
 	MCFG_CPU_PROGRAM_MAP(inttoote_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, inttoote_interrupt, "screen", 0, 1)
 
-	MCFG_PIA6821_ADD("pia0", inttoote_pia0_intf)
-	MCFG_PIA6821_ADD("pia1", inttoote_pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
@@ -11042,7 +11008,7 @@ GAME( 198?, setaroul, 0,        setaroul, setaroul, driver_device, 0,        ROT
 GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, driver_device, 0,        ROT0,   "Seta",                   "Dragon Unit / Castle of Dragon", 0 )
 GAME( 1989, wits,     0,        wits,     wits, driver_device,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
 GAME( 1990, thunderl, 0,        thunderl, thunderl, driver_device, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl,thunderlbl,thunderlbl, driver_device,0,        ROT90, "bootleg",                "Thunder & Lightning (bootleg with Tetris sound)" , GAME_NO_SOUND | GAME_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderlbl,thunderl,thunderlbl,thunderlbl, driver_device,0,        ROT90, "bootleg",                "Thunder & Lightning (bootleg with Tetris sound)" , GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL ) // Country/License: DSW
 GAME( 1994, wiggie,   0,        wiggie,   thunderl, seta_state, wiggie,   ROT270, "Promat",                 "Wiggie Waggie", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar, wiggie,   superbar, thunderl, seta_state, wiggie,   ROT270, "Promat",                 "Super Bar", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc, driver_device,  0,        ROT0,   "Seta (Visco license)",   "Jockey Club", 0 )

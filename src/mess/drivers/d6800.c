@@ -71,9 +71,6 @@ public:
 	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
 	DECLARE_READ8_MEMBER( d6800_keyboard_r );
 	DECLARE_WRITE8_MEMBER( d6800_keyboard_w );
-	DECLARE_READ_LINE_MEMBER( d6800_fn_key_r );
-	DECLARE_READ_LINE_MEMBER( d6800_keydown_r );
-	DECLARE_READ_LINE_MEMBER( d6800_rtc_pulse );
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
 	UINT32 screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_c);
@@ -96,9 +93,6 @@ protected:
 	required_ioport m_io_shift;
 private:
 	UINT8 m_rtc;
-	bool m_ca1;
-	bool m_ca2;
-	bool m_cb1;
 	bool m_cb2;
 	UINT8 m_cass_data[4];
 	UINT8 m_portb;
@@ -233,13 +227,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 		m_rtc = 0;
 
 	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
-	m_ca1 = (data == 255) ? 0 : 1;
-	m_ca2 = (bool)m_io_shift->read();
-	m_cb1 = (m_rtc) ? 1 : 0;
+	int ca1 = (data == 255) ? 0 : 1;
+	int ca2 = m_io_shift->read();
+	int cb1 = (m_rtc) ? 1 : 0;
 
-	m_pia->ca1_w(m_ca1);
-	m_pia->ca2_w(m_ca2);
-	m_pia->cb1_w(m_cb1);
+	m_pia->ca1_w(ca1);
+	m_pia->ca2_w(ca2);
+	m_pia->cb1_w(cb1);
 
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -253,21 +247,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 	}
 }
 
-
-READ_LINE_MEMBER( d6800_state::d6800_rtc_pulse )
-{
-	return m_cb1;
-}
-
-READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
-{
-	return m_ca1;
-}
-
-READ_LINE_MEMBER( d6800_state::d6800_fn_key_r )
-{
-	return m_ca2;
-}
 
 WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
 {
@@ -332,22 +311,6 @@ WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
 	*/
 
 }
-
-static const pia6821_interface d6800_mc6821_intf =
-{
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_keyboard_r), /* port A input */
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_cassette_r), /* port B input */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_keydown_r), /* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_rtc_pulse), /* CB1 input */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_fn_key_r),  /* CA2 input */
-	DEVCB_NULL,                     /* CB2 input */
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_keyboard_w), /* port A output */
-	DEVCB_DRIVER_MEMBER(d6800_state, d6800_cassette_w), /* port B output */
-	DEVCB_NULL,                     /* CA2 output */
-	DEVCB_DRIVER_LINE_MEMBER(d6800_state, d6800_screen_w),  /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB output */
-};
 
 /* Machine Initialization */
 
@@ -449,7 +412,15 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_PIA6821_ADD("pia", d6800_mc6821_intf)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(d6800_state, d6800_keyboard_r))
+	MCFG_PIA_READPB_HANDLER(READ8(d6800_state, d6800_cassette_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(d6800_state, d6800_keyboard_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(d6800_state, d6800_cassette_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(d6800_state, d6800_screen_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+
 	MCFG_CASSETTE_ADD("cassette", d6800_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_c", d6800_state, d6800_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))

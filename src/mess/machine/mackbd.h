@@ -11,6 +11,15 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
+#define MCFG_MACKBD_ADD(_tag) \
+    MCFG_DEVICE_ADD(_tag, MACKBD, 0)
+
+#define MCFG_MACKBD_REPLACE(_tag) \
+    MCFG_DEVICE_REPLACE(_tag, MACKBD, 0)
+
+#define MCFG_MACKBD_REMOVE(_tag) \
+    MCFG_DEVICE_REMOVE(_tag)
+
 #define MCFG_MACKBD_CLKOUT_HANDLER(_devcb) \
 	devcb = &mackbd_device::set_clkout_handler(*device, DEVCB2_##_devcb);
 

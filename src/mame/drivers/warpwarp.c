@@ -122,11 +122,6 @@ Notes:
 - There are images/videos on the net of kaitei and geebee running in 3bpp
   (aka 7 colors), this is assumed to be a homebrew repair or hack.
 
-
-TODO:
-- I arbitrarily assigned a uniform blue overlay to sos. I don't know how it's
-  supposed to be.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -135,7 +130,6 @@ TODO:
 
 #include "geebee.lh"
 #include "navarone.lh"
-#include "sos.lh"
 
 #define MASTER_CLOCK        XTAL_18_432MHz
 
@@ -143,7 +137,7 @@ TODO:
 /* Interrupt Gen */
 INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
 {
-	if(m_ball_on)
+	if (m_ball_on)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
@@ -377,15 +371,15 @@ static INPUT_PORTS_START( geebee )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x30, 0x10, "Replay" )        PORT_DIPLOCATION("DSW2:5,6")    // awards 1 credit
-	PORT_DIPSETTING(    0x10, "40k 80k" )       PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x20, "70k 140k" )      PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, "100k 200k" )     PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, "60k 120k" )      PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x20, "100k 200k" )     PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x30, "150k 300k" )     PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPNAME( 0x30, 0x10, "Replay" )            PORT_DIPLOCATION("DSW2:5,6")    // awards 1 credit
+	PORT_DIPSETTING(    0x10, "40k 80k" )           PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, "70k 140k" )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, "100k 200k" )         PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )     PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "60k 120k" )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, "100k 200k" )         PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x30, "150k 300k" )         PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )     PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -431,14 +425,14 @@ static INPUT_PORTS_START( navarone )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("DSW2:3,4")
-	PORT_DIPSETTING(    0x04, "5000" )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, "6000" )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x0c, "7000" )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x04, "6000" )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x08, "7000" )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x0c, "8000" )          PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x04, "5000" )                  PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "6000" )                  PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x0c, "7000" )                  PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )         PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x04, "6000" )                  PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x08, "7000" )                  PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x0c, "8000" )                  PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )         PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
@@ -564,7 +558,7 @@ static INPUT_PORTS_START( sos )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x20, 0x20, "Nudity" )        PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Nudity" )            PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -600,10 +594,10 @@ static INPUT_PORTS_START( bombbee )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )    PORT_DIPLOCATION("DSW1:3,4")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
-//  PORT_DIPSETTING(    0x08, "4" )             // duplicated setting
+//  PORT_DIPSETTING(    0x08, "4" ) // duplicated setting
 	PORT_DIPSETTING(    0x0c, "5" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSW1:5" )
-	PORT_DIPNAME( 0xe0, 0x00, "Replay" )        PORT_DIPLOCATION("DSW1:6,7,8")  // awards 1 credit
+	PORT_DIPNAME( 0xe0, 0x00, "Replay" )            PORT_DIPLOCATION("DSW1:6,7,8") // awards 1 credit
 	PORT_DIPSETTING(    0x00, "50000" )
 	PORT_DIPSETTING(    0x20, "60000" )
 	PORT_DIPSETTING(    0x40, "70000" )
@@ -660,14 +654,14 @@ static INPUT_PORTS_START( warpwarp )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("DSW1:5,6")
-	PORT_DIPSETTING(    0x00, "8k 30k 30k+" )   PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
-	PORT_DIPSETTING(    0x10, "10k 40k 40k+" )  PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
-	PORT_DIPSETTING(    0x20, "15k 60k 60k+" )  PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
-	PORT_DIPSETTING(0x30, DEF_STR( None ) ) PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
-	PORT_DIPSETTING(    0x00, "30k" )           PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
-	PORT_DIPSETTING(    0x10, "40k" )           PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
-	PORT_DIPSETTING(    0x20, "60k" )           PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
-	PORT_DIPSETTING(    0x30, DEF_STR( None ) ) PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x00, "8k 30k 30k+" )           PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
+	PORT_DIPSETTING(    0x10, "10k 40k 40k+" )          PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
+	PORT_DIPSETTING(    0x20, "15k 60k 60k+" )          PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
+	PORT_DIPSETTING(0x30, DEF_STR( None ) )             PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
+	PORT_DIPSETTING(    0x00, "30k" )                   PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x10, "40k" )                   PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x20, "60k" )                   PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x30, DEF_STR( None ) )         PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -732,7 +726,7 @@ static MACHINE_CONFIG_START( geebee, warpwarp_state )
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(geebee_map)
 	MCFG_CPU_IO_MAP(geebee_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -765,9 +759,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)      /* 18.432 MHz / 9 */
+	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)
 	MCFG_CPU_PROGRAM_MAP(bombbee_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state,  vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -987,18 +981,18 @@ DRIVER_INIT_MEMBER(warpwarp_state,warpwarp)
 
 
 /* B & W games */
-GAMEL(1978, geebee,   0,        geebee,   geebee, warpwarp_state,   geebee,   ROT90, "Namco", "Gee Bee (Japan)", 0, layout_geebee )
-GAMEL(1978, geebeeb,  geebee,   geebee,   geebeeb, warpwarp_state,  geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", 0, layout_geebee ) // Fratelli Bertolino
-GAMEL(1978, geebeeg,  geebee,   geebee,   geebee, warpwarp_state,   geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", 0, layout_geebee )
+GAMEL(1978, geebee,     0,        geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco", "Gee Bee (Japan)", 0, layout_geebee )
+GAMEL(1978, geebeeb,    geebee,   geebee,   geebeeb,   warpwarp_state, geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", 0, layout_geebee ) // Fratelli Bertolino
+GAMEL(1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", 0, layout_geebee )
 
-GAMEL(1980, navarone, 0,        navarone, navarone, warpwarp_state, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND, layout_navarone )
-GAME( 1980, kaitein,  kaitei,   navarone, kaitein, warpwarp_state,  kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 ) // pretty sure it didn't have a color overlay
-GAME( 1980, kaitei,   0,        navarone, kaitei, warpwarp_state,   kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", 0 ) // "
-GAMEL(1980, sos,      0,        navarone, sos, warpwarp_state,      sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND, layout_sos ) // developed by Shoei?
+GAMEL(1980, navarone,   0,        navarone, navarone,  warpwarp_state, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND, layout_navarone )
+GAME( 1980, kaitein,    kaitei,   navarone, kaitein,   warpwarp_state, kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", 0 ) // pretty sure it didn't have a color overlay
+GAME( 1980, kaitei,     0,        navarone, kaitei,    warpwarp_state, kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", 0 ) // "
+GAME( 1980, sos,        0,        navarone, sos,       warpwarp_state, sos,      ROT90, "Namco", "SOS", GAME_IMPERFECT_SOUND ) // developed by Shoei?
 
 /* Color games */
-GAME( 1979, bombbee,    0,        bombbee,  bombbee, warpwarp_state,  bombbee,  ROT90, "Namco", "Bomb Bee", 0 )
-GAME( 1979, cutieq,     0,        bombbee,  cutieq, warpwarp_state,   bombbee,  ROT90, "Namco", "Cutie Q", 0 )
-GAME( 1981, warpwarp,   0,        warpwarp, warpwarp, warpwarp_state, warpwarp, ROT90, "Namco", "Warp & Warp", 0 )
-GAME( 1981, warpwarpr,  warpwarp, warpwarp, warpwarpr, warpwarp_state,warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 1)", 0 )
-GAME( 1981, warpwarpr2, warpwarp, warpwarp, warpwarpr, warpwarp_state,warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 2)", 0 )
+GAME( 1979, bombbee,    0,        bombbee,  bombbee,   warpwarp_state, bombbee,  ROT90, "Namco", "Bomb Bee", 0 )
+GAME( 1979, cutieq,     0,        bombbee,  cutieq,    warpwarp_state, bombbee,  ROT90, "Namco", "Cutie Q", 0 )
+GAME( 1981, warpwarp,   0,        warpwarp, warpwarp,  warpwarp_state, warpwarp, ROT90, "Namco", "Warp & Warp", 0 )
+GAME( 1981, warpwarpr,  warpwarp, warpwarp, warpwarpr, warpwarp_state, warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 1)", 0 )
+GAME( 1981, warpwarpr2, warpwarp, warpwarp, warpwarpr, warpwarp_state, warpwarp, ROT90, "Namco (Rock-Ola license)", "Warp Warp (Rock-Ola set 2)", 0 )

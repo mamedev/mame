@@ -137,23 +137,6 @@ WRITE8_MEMBER(by133_state::by133_portb_w)
 	m_sound_port2 = data << 1 & 0x1f;
 }
 
-static const pia6821_interface videopia_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_DRIVER_MEMBER(by133_state,by133_portb_r),     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(by133_state,by133_portb_w),     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_cb2),        /* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_firq),       /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(by133_state,by133_firq)        /* IRQB */
-};
-
-
 void by133_state::machine_reset()
 {
 	m_sound_port2 = 2; // forced to 010 on /reset
@@ -172,8 +155,12 @@ static MACHINE_CONFIG_START( by133, by133_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MCFG_PIA6821_ADD("videopia", videopia_intf)
-
+	MCFG_DEVICE_ADD("videopia", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(by133_state, by133_portb_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(by133_state, by133_portb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(by133_state, by133_cb2))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(by133_state, by133_firq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(by133_state, by133_firq))
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, byvid_tms9928a_interface )

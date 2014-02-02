@@ -49,24 +49,22 @@ const device_type PIA6821 = &device_creator<pia6821_device>;
 
 pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PIA6821, "6822 PIA", tag, owner, clock, "pia6821", __FILE__),
+	m_in_a_handler(*this),
+	m_in_b_handler(*this),
+	m_in_ca1_handler(*this),
+	m_in_cb1_handler(*this),
+	m_in_ca2_handler(*this),
+	m_out_a_handler(*this),
+	m_out_b_handler(*this),
+	m_ca2_handler(*this),
+	m_cb2_handler(*this),
+	m_irqa_handler(*this),
+	m_irqb_handler(*this),
 	m_irq_a_state(0),
 	m_in_cb1(0),
 	m_ctl_b(0),
 	m_irq_b_state(0)
 {
-	memset(static_cast<pia6821_interface *>(this), 0, sizeof(pia6821_interface));
-}
-
-
-//-------------------------------------------------
-//  static_set_interface - set the interface
-//  struct
-//-------------------------------------------------
-
-void pia6821_device::static_set_interface(device_t &device, const pia6821_interface &interface)
-{
-	pia6821_device &ptm = downcast<pia6821_device &>(device);
-	static_cast<pia6821_interface &>(ptm) = interface;
 }
 
 
@@ -77,18 +75,17 @@ void pia6821_device::static_set_interface(device_t &device, const pia6821_interf
 void pia6821_device::device_start()
 {
 	// resolve callbacks
-	m_in_a_func.resolve(m_in_a_cb, *this);
-	m_in_b_func.resolve(m_in_b_cb, *this);
-	m_in_ca1_func.resolve(m_in_ca1_cb, *this);
-	m_in_cb1_func.resolve(m_in_cb1_cb, *this);
-	m_in_ca2_func.resolve(m_in_ca2_cb, *this);
-	m_in_cb2_func.resolve(m_in_cb2_cb, *this);
-	m_out_a_func.resolve(m_out_a_cb, *this);
-	m_out_b_func.resolve(m_out_b_cb, *this);
-	m_out_ca2_func.resolve(m_out_ca2_cb, *this);
-	m_out_cb2_func.resolve(m_out_cb2_cb, *this);
-	m_irq_a_func.resolve(m_irq_a_cb, *this);
-	m_irq_b_func.resolve(m_irq_b_cb, *this);
+	m_in_a_handler.resolve();
+	m_in_b_handler.resolve();
+	m_in_ca1_handler.resolve();
+	m_in_cb1_handler.resolve();
+	m_in_ca2_handler.resolve();
+	m_out_a_handler.resolve();
+	m_out_b_handler.resolve();
+	m_ca2_handler.resolve();
+	m_cb2_handler.resolve();
+	m_irqa_handler.resolve_safe();
+	m_irqb_handler.resolve_safe();
 
 	save_item(NAME(m_in_a));
 	save_item(NAME(m_in_ca1));
@@ -178,8 +175,8 @@ void pia6821_device::device_reset()
 
 
 	// clear the IRQs
-	m_irq_a_func(FALSE);
-	m_irq_b_func(FALSE);
+	m_irqa_handler(FALSE);
+	m_irqb_handler(FALSE);
 }
 
 
@@ -195,7 +192,7 @@ void pia6821_device::update_interrupts()
 	if (new_state != m_irq_a_state)
 	{
 		m_irq_a_state = new_state;
-		m_irq_a_func(m_irq_a_state);
+		m_irqa_handler(m_irq_a_state);
 	}
 
 	// then do IRQ B
@@ -204,7 +201,7 @@ void pia6821_device::update_interrupts()
 	if (new_state != m_irq_b_state)
 	{
 		m_irq_b_state = new_state;
-		m_irq_b_func(m_irq_b_state);
+		m_irqb_handler(m_irq_b_state);
 	}
 }
 
@@ -219,9 +216,9 @@ UINT8 pia6821_device::get_in_a_value()
 	UINT8 ret;
 
 	// update the input
-	if (!m_in_a_func.isnull())
+	if (!m_in_a_handler.isnull())
 	{
-		port_a_data = m_in_a_func(0);
+		port_a_data = m_in_a_handler(0);
 	}
 	else
 	{
@@ -271,9 +268,9 @@ UINT8 pia6821_device::get_in_b_value()
 		UINT8 port_b_data;
 
 		// update the input
-		if (!m_in_b_func.isnull())
+		if (!m_in_b_handler.isnull())
 		{
-			port_b_data = m_in_b_func(0);
+			port_b_data = m_in_b_handler(0);
 		}
 		else
 		{
@@ -347,9 +344,9 @@ void pia6821_device::set_out_ca2(int data)
 		m_out_ca2 = data;
 
 		// send to output function
-		if (!m_out_ca2_func.isnull())
+		if (!m_ca2_handler.isnull())
 		{
-			m_out_ca2_func(m_out_ca2);
+			m_ca2_handler(m_out_ca2);
 		}
 		else
 		{
@@ -378,9 +375,9 @@ void pia6821_device::set_out_cb2(int data)
 		m_last_out_cb2_z = z;
 
 		// send to output function
-		if (!m_out_cb2_func.isnull())
+		if (!m_cb2_handler.isnull())
 		{
-			m_out_cb2_func(m_out_cb2);
+			m_cb2_handler(m_out_cb2);
 		}
 		else
 		{
@@ -492,9 +489,9 @@ UINT8 pia6821_device::control_a_r()
 	UINT8 ret;
 
 	// update CA1 & CA2 if callback exists, these in turn may update IRQ's
-	if (!m_in_ca1_func.isnull())
+	if (!m_in_ca1_handler.isnull())
 	{
-		ca1_w(m_in_ca1_func());
+		ca1_w(m_in_ca1_handler());
 	}
 	else if(!m_logged_ca1_not_connected && (!m_in_ca1_pushed))
 	{
@@ -502,9 +499,9 @@ UINT8 pia6821_device::control_a_r()
 		m_logged_ca1_not_connected = true;
 	}
 
-	if (!m_in_ca2_func.isnull())
+	if (!m_in_ca2_handler.isnull())
 	{
-		ca2_w(m_in_ca2_func());
+		ca2_w(m_in_ca2_handler());
 	}
 	else if ( !m_logged_ca2_not_connected && C2_INPUT(m_ctl_a) && !m_in_ca2_pushed)
 	{
@@ -541,9 +538,9 @@ UINT8 pia6821_device::control_b_r()
 	UINT8 ret;
 
 	// update CB1 & CB2 if callback exists, these in turn may update IRQ's
-	if(!m_in_cb1_func.isnull())
+	if(!m_in_cb1_handler.isnull())
 	{
-		cb1_w(m_in_cb1_func());
+		cb1_w(m_in_cb1_handler());
 	}
 	else if(!m_logged_cb1_not_connected && !m_in_cb1_pushed)
 	{
@@ -551,13 +548,9 @@ UINT8 pia6821_device::control_b_r()
 		m_logged_cb1_not_connected = true;
 	}
 
-	if(!m_in_cb2_func.isnull())
+	if(!m_logged_cb2_not_connected && C2_INPUT(m_ctl_b) && !m_in_cb2_pushed)
 	{
-		cb2_w(m_in_cb2_func());
-	}
-	else if(!m_logged_cb2_not_connected && C2_INPUT(m_ctl_b) && !m_in_cb2_pushed)
-	{
-		logerror("PIA #%s: Error! No CB2 read handler. Three-state pin is undefined\n", tag());
+		logerror("PIA #%s: Error! Three-state pin is undefined\n", tag());
 		m_logged_cb2_not_connected = true;
 	}
 
@@ -639,9 +632,9 @@ void pia6821_device::send_to_out_a_func(const char* message)
 
 	LOG(("PIA #%s: %s = %02X\n", tag(), message, data));
 
-	if(!m_out_a_func.isnull())
+	if(!m_out_a_handler.isnull())
 	{
-		m_out_a_func(0, data);
+		m_out_a_handler((offs_t) 0, data);
 	}
 	else
 	{
@@ -666,9 +659,9 @@ void pia6821_device::send_to_out_b_func(const char* message)
 
 	LOG(("PIA #%s: %s = %02X\n", tag(), message, data));
 
-	if(!m_out_b_func.isnull())
+	if(!m_out_b_handler.isnull())
 	{
-		m_out_b_func(0, data);
+		m_out_b_handler((offs_t)0, data);
 	}
 	else
 	{
@@ -894,22 +887,12 @@ void pia6821_device::reg_w(UINT8 offset, UINT8 data)
 
 
 //-------------------------------------------------
-//  porta_r
-//-------------------------------------------------
-
-READ8_MEMBER( pia6821_device::porta_r )
-{
-	return m_in_a;
-}
-
-
-//-------------------------------------------------
 //  set_a_input
 //-------------------------------------------------
 
 void pia6821_device::set_a_input(UINT8 data, UINT8 z_mask)
 {
-	assert_always(m_in_a_func.isnull(), "pia6821_porta_w() called when in_a_func implemented");
+	assert_always(m_in_a_handler.isnull(), "pia6821_porta_w() called when in_a_func implemented");
 
 	LOG(("PIA #%s: set input port A = %02X\n", tag(), data));
 
@@ -923,7 +906,7 @@ void pia6821_device::set_a_input(UINT8 data, UINT8 z_mask)
 //  pia6821_porta_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( pia6821_device::porta_w )
+void pia6821_device::porta_w(UINT8 data)
 {
 	set_a_input(data, 0);
 }
@@ -938,16 +921,6 @@ UINT8 pia6821_device::a_output()
 	m_out_a_needs_pulled = false;
 
 	return get_out_a_value();
-}
-
-
-//-------------------------------------------------
-//  ca1_r
-//-------------------------------------------------
-
-READ_LINE_MEMBER( pia6821_device::ca1_r )
-{
-	return m_in_ca1;
 }
 
 
@@ -980,16 +953,6 @@ WRITE_LINE_MEMBER( pia6821_device::ca1_w )
 	// set the new value for CA1
 	m_in_ca1 = state;
 	m_in_ca1_pushed = true;
-}
-
-
-//-------------------------------------------------
-//  ca2_r
-//-------------------------------------------------
-
-READ_LINE_MEMBER( pia6821_device::ca2_r )
-{
-	return m_in_ca2;
 }
 
 
@@ -1047,22 +1010,12 @@ int pia6821_device::ca2_output_z()
 
 
 //-------------------------------------------------
-//  portb_r
-//-------------------------------------------------
-
-READ8_MEMBER( pia6821_device::portb_r )
-{
-	return m_in_b;
-}
-
-
-//-------------------------------------------------
 //  portb_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( pia6821_device::portb_w )
+void pia6821_device::portb_w(UINT8 data)
 {
-	assert_always(m_in_b_func.isnull(), "pia_set_input_b() called when in_b_func implemented");
+	assert_always(m_in_b_handler.isnull(), "pia_set_input_b() called when in_b_func implemented");
 
 	LOG(("PIA #%s: set input port B = %02X\n", tag(), data));
 
@@ -1080,16 +1033,6 @@ UINT8 pia6821_device::b_output()
 	m_out_b_needs_pulled = false;
 
 	return get_out_b_value();
-}
-
-
-//-------------------------------------------------
-//  cb1_r
-//-------------------------------------------------
-
-READ_LINE_MEMBER( pia6821_device::cb1_r )
-{
-	return m_in_cb1;
 }
 
 
@@ -1121,16 +1064,6 @@ WRITE_LINE_MEMBER( pia6821_device::cb1_w )
 	// set the new value for CB1
 	m_in_cb1 = state;
 	m_in_cb1_pushed = true;
-}
-
-
-//-------------------------------------------------
-//  cb2_r
-//-------------------------------------------------
-
-READ_LINE_MEMBER( pia6821_device::cb2_r )
-{
-	return m_in_cb2;
 }
 
 

@@ -67,13 +67,10 @@ public:
 	TIMER_CALLBACK_MEMBER(microtan_read_cassette);
 	TIMER_CALLBACK_MEMBER(microtan_pulse_nmi);
 	DECLARE_READ8_MEMBER(via_0_in_a);
-	DECLARE_READ8_MEMBER(via_0_in_b);
 	DECLARE_WRITE8_MEMBER(via_0_out_a);
 	DECLARE_WRITE8_MEMBER(via_0_out_b);
 	DECLARE_WRITE_LINE_MEMBER(via_0_out_ca2);
 	DECLARE_WRITE_LINE_MEMBER(via_0_out_cb2);
-	DECLARE_READ8_MEMBER(via_1_in_a);
-	DECLARE_READ8_MEMBER(via_1_in_b);
 	DECLARE_WRITE8_MEMBER(via_1_out_a);
 	DECLARE_WRITE8_MEMBER(via_1_out_b);
 	DECLARE_WRITE_LINE_MEMBER(via_1_out_ca2);

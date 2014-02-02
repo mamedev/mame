@@ -68,9 +68,14 @@
 
     2013/10/27 Robert Tuccitto  Modernized screen parameters for NTSC & PAL.
 
-    2013/11/03 Robert Tuccitto Fixed correctly typo under 26.7 7$.
+    2013/11/03 Robert Tuccitto  Fixed correctly typo under 26.7 7$.
 
-    2014/11/23 Robert Tuccitto Added NTSC Palette Notes
+    2013/11/23 Robert Tuccitto  Added NTSC Palette Notes.
+
+    2014/01/02 Robert Tuccitto  Corrected joystick buttons assignment & minor
+                                palette notes cleanup.
+    2014/01/09 Robert Tuccitto  Positional description for difficulty
+                                switches added. 
 ***************************************************************************/
 
 #include "emu.h"
@@ -131,10 +136,10 @@ static INPUT_PORTS_START( a7800 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
 
 	PORT_START("buttons")              /* IN1 */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)       PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(1)
 	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("vblank")               /* IN2 */
@@ -149,11 +154,11 @@ static INPUT_PORTS_START( a7800 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_DIPNAME(0x40, 0x40, "Left Difficulty Switch")
-	PORT_DIPSETTING(0x40, "A" )
-	PORT_DIPSETTING(0x00, "B" )
+	PORT_DIPSETTING(0x40, "A - Right Position" )
+	PORT_DIPSETTING(0x00, "B - Left Position" )
 	PORT_DIPNAME(0x80, 0x80, "Right Difficulty Switch")
-	PORT_DIPSETTING(0x80, "A" )
-	PORT_DIPSETTING(0x00, "B" )
+	PORT_DIPSETTING(0x80, "A - Right Position" )
+	PORT_DIPSETTING(0x00, "B - Left Position" )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -179,9 +184,8 @@ system run time.  180 degrees colorburst takes place at ~25.7 degrees (A
 near exact match of Hue 1x and 15x - To the naked eye they appear to be
 the same).
 
-However, if the system is adjusted within the first several minutes of
-running, the warm up, consistent system run time, causes Hue 15x (F$) to
-become stronger/darker gold (More brown then ultimately red-brown); as well
+However, consistent system run time causes Hue 15x (F$) to become 
+stronger/darker gold (More brown then ultimately red-brown); as well
 as leans Hue 14x (E$) more brown than green.  Once achieving a phase shift
 of 27.7, Hue 14x (E$) and Hue 15x (F$) near-exact match Hue 1x and 2x
 respectively.

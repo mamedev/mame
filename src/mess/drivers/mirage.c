@@ -55,13 +55,16 @@ class mirage_state : public driver_device
 {
 public:
 	mirage_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_fdc(*this, "wd1772")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_fdc(*this, "wd1772"),
+		m_via(*this, "via6522")
+	{
+	}
 
 	required_device<m6809e_device> m_maincpu;
 	required_device<wd1772_t> m_fdc;
+	required_device<via6522_device> m_via;
 
 	virtual void machine_reset();
 
@@ -76,8 +79,6 @@ public:
 	UINT32 screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
-	DECLARE_READ8_MEMBER(mirage_via_read_porta);
-	DECLARE_READ8_MEMBER(mirage_via_read_portb);
 
 	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
 
@@ -220,20 +221,6 @@ WRITE8_MEMBER(mirage_state::mirage_via_write_portb)
 	}
 }
 
-// port A: front panel
-READ8_MEMBER(mirage_state::mirage_via_read_porta)
-{
-	return 0;
-}
-
-// port B:
-//  bit 6: IN FDC disk ready
-//  bit 5: IN 5503 sync (?)
-READ8_MEMBER(mirage_state::mirage_via_read_portb)
-{
-	return 0x60;
-}
-
 static ACIA6850_INTERFACE( mirage_acia6850_interface )
 {
 	0,              // tx clock
@@ -255,8 +242,6 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("via6522", VIA6522, 1000000)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mirage_state, mirage_via_read_porta))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mirage_state, mirage_via_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mirage_state, mirage_via_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mirage_state, mirage_via_write_portb))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
@@ -292,6 +277,28 @@ DRIVER_INIT_MEMBER(mirage_state,mirage)
 
 	m_l_hi = m_r_hi = 9;
 	m_l_segs = m_r_segs = 0;
+
+	// port A: front panel
+	m_via->write_pa0(0);
+	m_via->write_pa1(0);
+	m_via->write_pa2(0);
+	m_via->write_pa3(0);
+	m_via->write_pa4(0);
+	m_via->write_pa5(0);
+	m_via->write_pa6(0);
+	m_via->write_pa7(0);
+
+	// port B:
+	//  bit 6: IN FDC disk ready
+	//  bit 5: IN 5503 sync (?)
+	m_via->write_pb0(0);
+	m_via->write_pb1(0);
+	m_via->write_pb2(0);
+	m_via->write_pb3(0);
+	m_via->write_pb4(0);
+	m_via->write_pb5(1);
+	m_via->write_pb6(1);
+	m_via->write_pb7(0);
 }
 
 CONS( 1984, enmirage, 0, 0, mirage, mirage, mirage_state, mirage, "Ensoniq", "Ensoniq Mirage", GAME_NOT_WORKING )

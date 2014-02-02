@@ -290,22 +290,6 @@ WRITE8_MEMBER( s6_state::sol1_w )
 		m_samples->start(0, 6); // knocker
 }
 
-static const pia6821_interface pia22_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_LINE_GND,     /* line CA1 in */
-	DEVCB_LINE_GND,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s6_state, sol0_w),      /* port A out */
-	DEVCB_DRIVER_MEMBER(s6_state, sol1_w),      /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia22_ca2_w),        /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia22_cb2_w),        /* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),        /* IRQA */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB */
-};
-
 WRITE8_MEMBER( s6_state::lamp0_w )
 {
 	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
@@ -314,22 +298,6 @@ WRITE8_MEMBER( s6_state::lamp0_w )
 WRITE8_MEMBER( s6_state::lamp1_w )
 {
 }
-
-static const pia6821_interface pia24_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_LINE_GND,     /* line CA1 in */
-	DEVCB_LINE_GND,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s6_state, lamp0_w),     /* port A out */
-	DEVCB_DRIVER_MEMBER(s6_state, lamp1_w),     /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia24_ca2_w),        /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia24_cb2_w),        /* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),        /* IRQA */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB */
-};
 
 READ_LINE_MEMBER( s6_state::pia28_ca1_r )
 {
@@ -377,22 +345,6 @@ WRITE8_MEMBER( s6_state::dig1_w )
 	m_data_ok = false;
 }
 
-static const pia6821_interface pia28_intf =
-{
-	DEVCB_DRIVER_MEMBER(s6_state, dips_r),      /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia28_ca1_r),        /* line CA1 in */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia28_cb1_r),        /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s6_state, dig0_w),      /* port A out */
-	DEVCB_DRIVER_MEMBER(s6_state, dig1_w),      /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia28_ca2_w),        /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia28_cb2_w),        /* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),        /* IRQA */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB */
-};
-
 READ8_MEMBER( s6_state::switch_r )
 {
 	char kbdrow[8];
@@ -404,22 +356,6 @@ WRITE8_MEMBER( s6_state::switch_w )
 {
 	m_kbdrow = data;
 }
-
-static const pia6821_interface pia30_intf =
-{
-	DEVCB_DRIVER_MEMBER(s6_state, switch_r),        /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_LINE_GND,     /* line CA1 in */
-	DEVCB_LINE_GND,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(s6_state, switch_w),        /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia30_ca2_w),        /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pia30_cb2_w),        /* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),        /* IRQA */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB */
-};
 
 READ_LINE_MEMBER( s6_state::pias_cb1_r )
 {
@@ -448,22 +384,6 @@ WRITE8_MEMBER( s6_state::dac_w )
 	m_dac->write_unsigned8(data);
 }
 
-static const pia6821_interface pias_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_DRIVER_MEMBER(s6_state, dac_r),       /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pias_cb1_r),     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s6_state, dac_w),       /* port A out */
-	DEVCB_DRIVER_MEMBER(s6_state, pias_pb_w),       /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pias_ca2_w),     /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s6_state, pias_cb2_w),     /* line CB2 out */
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),       /* IRQA */
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)        /* IRQB */
-};
-
 TIMER_DEVICE_CALLBACK_MEMBER( s6_state::irq)
 {
 	if (m_t_c > 0x70)
@@ -486,10 +406,41 @@ static MACHINE_CONFIG_START( s6, s6_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	/* Devices */
-	MCFG_PIA6821_ADD("pia22", pia22_intf)
-	MCFG_PIA6821_ADD("pia24", pia24_intf)
-	MCFG_PIA6821_ADD("pia28", pia28_intf)
-	MCFG_PIA6821_ADD("pia30", pia30_intf)
+	MCFG_DEVICE_ADD("pia22", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6_state, sol0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6_state, sol1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s6_state, pia22_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s6_state, pia22_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+
+	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6_state, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6_state, lamp1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s6_state, pia24_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s6_state, pia24_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+
+	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(s6_state, dips_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(s6_state, pia28_ca1_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(s6_state, pia28_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6_state, dig0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6_state, dig1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s6_state, pia28_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s6_state, pia28_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+
+	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(s6_state, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6_state, switch_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s6_state, pia30_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s6_state, pia30_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Add the soundcard */
@@ -501,7 +452,16 @@ static MACHINE_CONFIG_START( s6, s6_state )
 	MCFG_SPEAKER_STANDARD_MONO("speech")
 	MCFG_SOUND_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
-	MCFG_PIA6821_ADD("pias", pias_intf)
+
+	MCFG_DEVICE_ADD("pias", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(s6_state, dac_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(s6_state, pias_cb1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s6_state, dac_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s6_state, pias_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(s6_state, pias_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(s6_state, pias_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("audiocpu", m6802_cpu_device, irq_line))
 MACHINE_CONFIG_END
 
 

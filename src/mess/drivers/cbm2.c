@@ -41,12 +41,12 @@ static void cbmb_quick_sethiaddress(running_machine &machine, UINT16 hiaddress)
 
 QUICKLOAD_LOAD_MEMBER( cbm2_state, cbmb )
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, 0x10000, cbmb_quick_sethiaddress);
+	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0x10000, cbmb_quick_sethiaddress);
 }
 
 QUICKLOAD_LOAD_MEMBER( p500_state, p500 )
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbmb_quick_sethiaddress);
+	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbmb_quick_sethiaddress);
 }
 
 //**************************************************************************
@@ -1133,6 +1133,7 @@ static MC6845_UPDATE_ROW( crtc_update_row )
 static MC6845_INTERFACE( crtc_intf )
 {
 	false,
+	0,0,0,0,
 	9,
 	NULL,
 	crtc_update_row,

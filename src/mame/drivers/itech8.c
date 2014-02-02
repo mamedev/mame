@@ -522,33 +522,6 @@
 
 /*************************************
  *
- *  6821 PIA interface
- *
- *************************************/
-
-
-
-
-static const pia6821_interface pia_interface =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_DEVICE_LINE_MEMBER("ticket", ticket_dispenser_device, line_r),            /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(itech8_state,pia_porta_out),        /* port A out */
-	DEVCB_DRIVER_MEMBER(itech8_state, pia_portb_out),       /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-
-
-/*************************************
- *
  *  Interrupt handling
  *
  *************************************/
@@ -1741,7 +1714,10 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
 	MCFG_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
 	MCFG_CPU_PROGRAM_MAP(sound3812_map)
 
-	MCFG_PIA6821_ADD("pia", pia_interface)
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(DEVREADLINE("ticket", ticket_dispenser_device, line_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(itech8_state, pia_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(itech8_state, pia_portb_out))
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)

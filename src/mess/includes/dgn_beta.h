@@ -169,7 +169,7 @@ public:
 	DECLARE_WRITE8_MEMBER(d_pia0_pa_w);
 	DECLARE_READ8_MEMBER(d_pia0_pb_r);
 	DECLARE_WRITE8_MEMBER(d_pia0_pb_w);
-	DECLARE_WRITE8_MEMBER(d_pia0_cb2_w);
+	DECLARE_WRITE_LINE_MEMBER(d_pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(d_pia0_irq_a);
 	DECLARE_WRITE_LINE_MEMBER(d_pia0_irq_b);
 	DECLARE_READ8_MEMBER(d_pia1_pa_r);
@@ -216,7 +216,6 @@ public:
 /*----------- defined in machine/dgn_beta.c -----------*/
 
 extern const wd17xx_interface dgnbeta_wd17xx_interface;
-extern const pia6821_interface dgnbeta_pia_intf[];
 
 
 /*----------- defined in video/dgn_beta.c -----------*/

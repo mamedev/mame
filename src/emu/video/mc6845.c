@@ -100,6 +100,10 @@ void mc6845_device::device_config_complete()
 	else
 	{
 		m_show_border_area = false;
+		m_visarea_adjust_min_x = 0;
+		m_visarea_adjust_max_x = 0;
+		m_visarea_adjust_min_y = 0;
+		m_visarea_adjust_max_y = 0;
 		m_hpixels_per_column = 0;
 		m_begin_update = NULL;
 		m_update_row = NULL;
@@ -531,7 +535,7 @@ void mc6845_device::recompute_parameters(bool postload)
 			if(m_show_border_area)
 				visarea.set(0, horiz_pix_total+1, 0, vert_pix_total+1);
 			else
-				visarea.set(0, max_visible_x, 0, max_visible_y);
+				visarea.set(0 + m_visarea_adjust_min_x, max_visible_x + m_visarea_adjust_max_x, 0 + m_visarea_adjust_min_y, max_visible_y + m_visarea_adjust_max_y);
 
 			if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
@@ -1064,6 +1068,10 @@ void mc6845_device::device_start()
 	m_disp_start_addr = 0;
 
 	save_item(NAME(m_show_border_area));
+	save_item(NAME(m_visarea_adjust_min_x));
+	save_item(NAME(m_visarea_adjust_max_x));
+	save_item(NAME(m_visarea_adjust_min_y));
+	save_item(NAME(m_visarea_adjust_max_y));
 	save_item(NAME(m_hpixels_per_column));
 	save_item(NAME(m_register_address_latch));
 	save_item(NAME(m_horiz_char_total));

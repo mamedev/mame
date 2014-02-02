@@ -115,92 +115,10 @@ public:
 			m_msm6376(*this, "msm6376")
 	{}
 
-
-
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
-	required_device<cpu_device> m_maincpu;
-	optional_device<roc10937_t> m_vfd;
-	optional_device<ptm6840_device> m_6840ptm;
-	optional_device<pia6821_device> m_pia3;
-	optional_device<pia6821_device> m_pia4;
-	optional_device<pia6821_device> m_pia5;
-	optional_device<pia6821_device> m_pia6;
-	optional_device<pia6821_device> m_pia7;
-	optional_device<pia6821_device> m_pia8;
-	required_ioport m_orange1_port;
-	required_ioport m_orange2_port;
-	required_ioport m_black1_port;
-	required_ioport m_black2_port;
-	required_ioport m_dil1_port;
-	required_ioport m_dil2_port;
-	required_ioport m_aux1_port;
-	required_ioport m_aux2_port;
-	optional_memory_bank m_bank1;
-	optional_device<okim6376_device> m_msm6376;
-
-
-	int m_mod_number;
-	int m_mmtr_data;
-	int m_alpha_data_line;
-	int m_alpha_clock;
-	int m_ay8913_address;
-	int m_serial_data;
-	int m_signal_50hz;
-	int m_ic4_input_b;
-	int m_aux1_input;
-	int m_aux2_input;
-	int m_IC23G1;
-	int m_IC23G2A;
-	int m_IC23G2B;
-	int m_IC23GC;
-	int m_IC23GB;
-	int m_IC23GA;
-	int m_prot_col;
-	int m_lamp_col;
-	int m_init_col;
-	int m_reel_flag;
-	int m_ic23_active;
-	int m_led_lamp;
-	int m_link7a_connected;
-	emu_timer *m_ic24_timer;
-	int m_expansion_latch;
-	int m_global_volume;
-	int m_input_strobe;
-	UINT8 m_lamp_strobe;
-	UINT8 m_lamp_strobe2;
-	UINT8 m_lamp_strobe_ext;
-	UINT8 m_lamp_strobe_ext_persistence;
-	UINT8 m_led_strobe;
-	UINT8 m_ay_data;
-	int m_optic_pattern;
-	int m_active_reel;
-	int m_remote_meter;
-	int m_reel_mux;
-	int m_lamp_extender;
-	int m_last_b7;
-	int m_last_latch;
-	int m_lamp_sense;
-	int m_card_live;
-	int m_led_extender;
-	int m_bwb_bank;
-	int m_chr_state;
-	int m_chr_counter;
-	int m_chr_value;
-	int m_bwb_return;
-	int m_pageval;
-	int m_pageset;
-	int m_hopper;
-	int m_reels;
-	int m_chrdata;
-	int m_t1;
-	int m_t3l;
-	int m_t3h;
-	UINT8 m_numbanks;
-	mpu4_chr_table* m_current_chr_table;
-	const bwb_chr_table* m_bwb_chr_table1;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(bankswitch_r);
@@ -283,6 +201,109 @@ public:
 	DECLARE_MACHINE_START(mpu4bwb);
 	DECLARE_MACHINE_START(mpu4cry);
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	void lamp_extend_small(int data);
+	void lamp_extend_large(int data,int column,int active);
+	void led_write_latch(int latch, int data, int column);
+	void update_meters();
+	void mpu4_stepper_reset();
+	void ic23_update();
+	void ic24_output(int data);
+	void ic24_setup();
+	void update_ay(device_t *device);
+	void mpu4_install_mod4yam_space(address_space &space);
+	void mpu4_install_mod4oki_space(address_space &space);
+	void mpu4_install_mod4bwb_space(address_space &space);
+	void mpu4_config_common();
+	void mpu4_config_common_reels(int reels);
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<roc10937_t> m_vfd;
+	optional_device<ptm6840_device> m_6840ptm;
+	optional_device<pia6821_device> m_pia3;
+	optional_device<pia6821_device> m_pia4;
+	optional_device<pia6821_device> m_pia5;
+	optional_device<pia6821_device> m_pia6;
+	optional_device<pia6821_device> m_pia7;
+	optional_device<pia6821_device> m_pia8;
+	required_ioport m_orange1_port;
+	required_ioport m_orange2_port;
+	required_ioport m_black1_port;
+	required_ioport m_black2_port;
+	required_ioport m_dil1_port;
+	required_ioport m_dil2_port;
+	required_ioport m_aux1_port;
+	required_ioport m_aux2_port;
+	optional_memory_bank m_bank1;
+	optional_device<okim6376_device> m_msm6376;
+
+	enum
+	{
+		TIMER_IC24
+	};
+
+	int m_mod_number;
+	int m_mmtr_data;
+	int m_alpha_data_line;
+	int m_alpha_clock;
+	int m_ay8913_address;
+	int m_serial_data;
+	int m_signal_50hz;
+	int m_ic4_input_b;
+	int m_aux1_input;
+	int m_aux2_input;
+	int m_IC23G1;
+	int m_IC23G2A;
+	int m_IC23G2B;
+	int m_IC23GC;
+	int m_IC23GB;
+	int m_IC23GA;
+	int m_prot_col;
+	int m_lamp_col;
+	int m_init_col;
+	int m_reel_flag;
+	int m_ic23_active;
+	int m_led_lamp;
+	int m_link7a_connected;
+	emu_timer *m_ic24_timer;
+	int m_expansion_latch;
+	int m_global_volume;
+	int m_input_strobe;
+	UINT8 m_lamp_strobe;
+	UINT8 m_lamp_strobe2;
+	UINT8 m_lamp_strobe_ext;
+	UINT8 m_lamp_strobe_ext_persistence;
+	UINT8 m_led_strobe;
+	UINT8 m_ay_data;
+	int m_optic_pattern;
+	int m_active_reel;
+	int m_remote_meter;
+	int m_reel_mux;
+	int m_lamp_extender;
+	int m_last_b7;
+	int m_last_latch;
+	int m_lamp_sense;
+	int m_card_live;
+	int m_led_extender;
+	int m_bwb_bank;
+	int m_chr_state;
+	int m_chr_counter;
+	int m_chr_value;
+	int m_bwb_return;
+	int m_pageval;
+	int m_pageset;
+	int m_hopper;
+	int m_reels;
+	int m_chrdata;
+	int m_t1;
+	int m_t3l;
+	int m_t3h;
+	UINT8 m_numbanks;
+	mpu4_chr_table* m_current_chr_table;
+	const bwb_chr_table* m_bwb_chr_table1;
 };
 
 /* mpu4.c, used by mpu4vid.c */

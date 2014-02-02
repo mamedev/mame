@@ -305,7 +305,10 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_PALETTE_INIT_OVERRIDE(driver_device, black_and_white)
 
 
-	MCFG_PIA6821_ADD( "pia", apple1_pia0 )
+	MCFG_DEVICE_ADD( "pia", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(apple1_state,apple1_pia0_kbdin))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apple1_state,apple1_pia0_dspout))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(apple1_state,apple1_pia0_dsp_write_signal))
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)

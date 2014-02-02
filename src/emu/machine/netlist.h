@@ -56,13 +56,6 @@
 
 // MAME specific configuration
 
-#define MCFG_NETLIST_ADD(_tag, _setup, _clock )                                     \
-	MCFG_DEVICE_ADD(_tag, NETLIST_CPU, _clock)                                      \
-	MCFG_NETLIST_SETUP(_setup)
-
-#define MCFG_NETLIST_REPLACE(_tag, _setup)                                          \
-	MCFG_DEVICE_REPLACE(_tag, NETLIST_CPU, NETLIST_CLOCK)                           \
-	MCFG_NETLIST_SETUP(_setup)
 
 #define MCFG_NETLIST_SETUP(_setup)                                                  \
 	netlist_mame_device_t::static_set_constructor(*device, NETLIST_NAME(_setup));
@@ -101,6 +94,11 @@
 
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)
+
+#define NETDEV_SOUND_OUT(_name, _v)                                                 \
+        NET_REGISTER_DEV(sound, _name)                                              \
+        NETDEV_PARAM(_name.CHAN, _v)
+
 
 class netlist_mame_device_t;
 
@@ -155,7 +153,11 @@ public:
     int m_icount;
 
 protected:
-	// device_t overrides
+    // Custom to netlist ...
+
+    virtual void nl_register_devices() { };
+
+    // device_t overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_stop();
@@ -205,7 +207,11 @@ public:
     static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
 
 protected:
+    // netlist_mame_device_t
+    virtual void nl_register_devices();
+
     // device_t overrides
+
     //virtual void device_config_complete();
     virtual void device_start();
     //virtual void device_stop();
@@ -256,6 +262,51 @@ protected:
 private:
 
     int m_genPC;
+
+};
+
+class nld_sound;
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_sound_device_t
+// ----------------------------------------------------------------------------------------
+
+class netlist_mame_sound_device_t : public netlist_mame_device_t,
+                                    public device_sound_interface
+{
+public:
+
+    // construction/destruction
+    netlist_mame_sound_device_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    virtual ~netlist_mame_sound_device_t() {}
+
+    static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
+
+    // device_sound_interface overrides
+
+    virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+protected:
+    // netlist_mame_device_t
+    virtual void nl_register_devices();
+
+    // device_t overrides
+
+    //virtual void device_config_complete();
+    virtual void device_start();
+    //virtual void device_stop();
+    //virtual void device_reset();
+    //virtual void device_post_load();
+    //virtual void device_pre_save();
+    //virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+
+    static const int MAX_OUT = 10;
+    nld_sound *m_out[MAX_OUT];
+    sound_stream *m_stream;
+    int m_num_inputs;
+    int m_num_outputs;
 
 };
 
@@ -365,7 +416,7 @@ class NETLIB_NAME(analog_callback) : public netlist_device_t
 {
 public:
 	NETLIB_NAME(analog_callback)()
-		: netlist_device_t() { }
+		: netlist_device_t(), m_cpu_device(NULL) { }
 
 	ATTR_COLD void start()
 	{
@@ -373,6 +424,10 @@ public:
 		m_callback.bind_relative_to(downcast<netlist_mame_t &>(netlist()).machine().root_device());
 		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
 	}
+
+    ATTR_COLD void reset()
+    {
+    }
 
 	ATTR_COLD void register_callback(netlist_analog_output_delegate callback)
 	{
@@ -403,18 +458,22 @@ public:
 	ATTR_COLD void start()
 	{
 		register_input("IN", m_in);
-		m_cur = 0;
-		m_last_pos = 0;
-		m_last_buffer = netlist_time::zero;
-		m_sample = netlist_time::zero;  // FIXME: divide by zero
-		}
+		register_param("CHAN", m_channel, 0);
+        m_sample = netlist_time::from_hz(1); //sufficiently big enough
+	}
 
-	ATTR_HOT void sound_update()
+    ATTR_COLD void reset()
+    {
+        m_cur = 0;
+        m_last_pos = 0;
+        m_last_buffer = netlist_time::zero;
+    }
+
+	ATTR_HOT void sound_update(const netlist_time upto)
 	{
-		netlist_time current = netlist().time();
-		int pos = (current - m_last_buffer) / m_sample;
+		int pos = (upto - m_last_buffer) / m_sample;
 		if (pos >= BUFSIZE)
-			netlist().xfatalerror("sound %s: exceeded BUFSIZE\n", name().cstr());
+			netlist().error("sound %s: exceeded BUFSIZE\n", name().cstr());
 		while (m_last_pos < pos )
 		{
 			m_buffer[m_last_pos++] = m_cur;
@@ -424,23 +483,32 @@ public:
 	ATTR_HOT void update()
 	{
 		double val = INPANALOG(m_in);
-		sound_update();
-		m_cur = val;
+		sound_update(netlist().time());
+		m_cur = val * 1000;
 	}
+
+	ATTR_HOT void buffer_reset(netlist_time upto)
+	{
+	    m_last_pos = 0;
+	    m_last_buffer = upto;
+	}
+
+	netlist_param_int_t m_channel;
+    stream_sample_t *m_buffer;
+    netlist_time m_sample;
 
 private:
 	netlist_analog_input_t m_in;
-	netlist_time m_sample;
-	double m_cur;
+	stream_sample_t m_cur;
 	int m_last_pos;
 	netlist_time m_last_buffer;
-	stream_sample_t m_buffer[BUFSIZE];
 };
 
 
 // device type definition
 extern const device_type NETLIST_CORE;
 extern const device_type NETLIST_CPU;
+extern const device_type NETLIST_SOUND;
 extern const device_type NETLIST_ANALOG_INPUT;
 extern const device_type NETLIST_LOGIC_INPUT;
 

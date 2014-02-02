@@ -275,25 +275,21 @@ static void UpdateGfx(running_machine &machine)
 
 void namcona1_state::video_start()
 {
-	static const tilemap_get_info_delegate get_info[4] = {
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),this),
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),this),
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),this),
-		tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),this)
-	};
-	int i;
-
 	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::roz_get_info),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
 	m_roz_palette = -1;
 
-	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
+	for( int i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
 	{
-		m_bg_tilemap[i] = &machine().tilemap().create(get_info[i], TILEMAP_SCAN_ROWS, 8,8,64,64 );
 		m_tilemap_palette_bank[i] = -1;
 	}
+	
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
+	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
+	m_bg_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),this), TILEMAP_SCAN_ROWS, 8,8,64,64 );
 
-	m_shaperam           = auto_alloc_array(machine(), UINT16, 0x2000*4/2 );
-	m_cgram              = auto_alloc_array(machine(), UINT16, 0x1000*0x40/2 );
+	m_shaperam           = auto_alloc_array_clear(machine(), UINT16, 0x2000*4/2 );
+	m_cgram              = auto_alloc_array_clear(machine(), UINT16, 0x1000*0x40/2 );
 
 	machine().gfx[0] = auto_alloc( machine(), gfx_element( machine(), cg_layout_8bpp, (UINT8 *)m_cgram, machine().total_colors()/256, 0 ));
 	machine().gfx[1] = auto_alloc( machine(), gfx_element( machine(), cg_layout_4bpp, (UINT8 *)m_cgram, machine().total_colors()/16, 0 ));

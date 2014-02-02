@@ -18,18 +18,25 @@ enum
 	S2650_CTRL_PORT     = 0x0100,   /* M/~IO=0 D/~C=0 E/~NE=0 */
 	S2650_DATA_PORT     = 0x0101,   /* M/~IO=0 D/~C=1 E/~NE=0 */
 	S2650_SENSE_PORT    = 0x0102,   /* Fake Sense Line */
-	S2650_FO_PORT       = 0x0103    /* Fake FO Line */
 };
 
 
 extern const device_type S2650;
 
 
+#define MCFG_S2650_FLAG_HANDLER(_devcb) \
+	devcb = &s2650_device::set_flag_handler(*device, DEVCB2_##_devcb);
+
 class s2650_device : public cpu_device
 {
 public:
 	// construction/destruction
 	s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_WRITE_LINE_MEMBER(write_sense);
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_flag_handler(device_t &device, _Object object) { return downcast<s2650_device &>(device).m_flag_handler.set_callback(object); }
 
 protected:
 	// device-level overrides
@@ -64,6 +71,8 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
+	devcb2_write_line m_flag_handler;
+
 	UINT16  m_ppc;    /* previous program counter (page + iar) */
 	UINT16  m_page;   /* 8K page select register (A14..A13) */
 	UINT16  m_iar;    /* instruction address register (A12..A0) */
@@ -94,8 +103,6 @@ private:
 	void s2650_set_flag(int state);
 	int s2650_get_flag();
 	void s2650_set_sense(int state);
-	int s2650_get_sense();
-
 };
 
 

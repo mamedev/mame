@@ -23,18 +23,18 @@ const device_type SMS_SPORTS_PAD = &device_creator<sms_sports_pad_device>;
 
 CUSTOM_INPUT_MEMBER( sms_sports_pad_device::dir_pins_r )
 {
-	UINT8 data = 0xff;
+	UINT8 data = 0;
 
-	switch (m_sports_pad_state)
+	switch (m_read_state)
 	{
 	case 0:
-		data = (m_sports_x->read() >> 4);
+		data = m_sports_x->read() >> 4;
 		break;
 	case 1:
 		data = m_sports_x->read();
 		break;
 	case 2:
-		data = (m_sports_y->read() >> 4);
+		data = m_sports_y->read() >> 4;
 		break;
 	case 3:
 		data = m_sports_y->read();
@@ -48,7 +48,7 @@ CUSTOM_INPUT_MEMBER( sms_sports_pad_device::dir_pins_r )
 
 CUSTOM_INPUT_MEMBER( sms_sports_pad_device::th_pin_r )
 {
-	return m_sports_pad_last_data;
+	return m_last_data;
 }
 
 
@@ -56,16 +56,16 @@ INPUT_CHANGED_MEMBER( sms_sports_pad_device::th_pin_w )
 {
 	attotime cur_time = machine().time();
 
-	if (cur_time - m_sports_pad_last_time > m_sports_pad_interval)
+	if (cur_time - m_last_time > m_interval)
 	{
-		m_sports_pad_state = 0;
+		m_read_state = 0;
 	}
 	else
 	{
-		m_sports_pad_state = (m_sports_pad_state + 1) & 3;
+		m_read_state = (m_read_state + 1) & 3;
 	}
-	m_sports_pad_last_time = cur_time;
-	m_sports_pad_last_data = newval;
+	m_last_time = cur_time;
+	m_last_data = newval;
 }
 
 
@@ -118,7 +118,7 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 	m_sports_out(*this, "SPORTS_OUT"),
 	m_sports_x(*this, "SPORTS_X"),
 	m_sports_y(*this, "SPORTS_Y"),
-	m_sports_pad_interval(SPORTS_PAD_INTERVAL)
+	m_interval(SPORTS_PAD_INTERVAL)
 {
 }
 
@@ -129,17 +129,13 @@ sms_sports_pad_device::sms_sports_pad_device(const machine_config &mconfig, cons
 
 void sms_sports_pad_device::device_start()
 {
-	save_item(NAME(m_sports_pad_state));
-	save_item(NAME(m_sports_pad_last_data));
-	save_item(NAME(m_sports_pad_last_time));
-}
+	m_read_state = 0;
+	m_last_data = 0;
+	m_last_time = machine().time();
 
-
-void sms_sports_pad_device::device_reset()
-{
-	m_sports_pad_state = 0;
-	m_sports_pad_last_data = 0;
-	m_sports_pad_last_time = machine().time();
+	save_item(NAME(m_read_state));
+	save_item(NAME(m_last_data));
+	save_item(NAME(m_last_time));
 }
 
 

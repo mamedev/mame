@@ -54,16 +54,29 @@ enum
 };
 
 
-#define MCFG_SC61860_CONFIG(_reset, _brk, _x, _ina, _outa, _inb, _outb, _outc) \
-	sc61860_device::set_reset_cb(*device, DEVCB2_##_reset); \
-	sc61860_device::set_brk_cb(*device, DEVCB2_##_brk); \
-	sc61860_device::set_x_cb(*device, DEVCB2_##_x); \
-	sc61860_device::set_ina_cb(*device, DEVCB2_##_ina); \
-	sc61860_device::set_outa_cb(*device, DEVCB2_##_outa); \
-	sc61860_device::set_inb_cb(*device, DEVCB2_##_inb); \
-	sc61860_device::set_outb_cb(*device, DEVCB2_##_outb); \
-	sc61860_device::set_outc_cb(*device, DEVCB2_##_outc);
+#define MCFG_SC61860_READ_RESET_HANDLER(_devcb) \
+	devcb = &sc61860_device::set_reset_cb(*device, DEVCB2_##_devcb);
 
+#define MCFG_SC61860_READ_BRK_HANDLER(_devcb) \
+	devcb = &sc61860_device::set_brk_cb(*device, DEVCB2_##_devcb);
+
+#define MCFG_SC61860_READ_X_HANDLER(_devcb) \
+	devcb = &sc61860_device::set_x_cb(*device, DEVCB2_##_devcb);
+
+#define MCFG_SC61860_READ_A_HANDLER(_devcb) \
+	devcb = &sc61860_device::set_ina_cb(*device, DEVCB2_##_devcb);
+
+#define MCFG_SC61860_WRITE_A_HANDLER(_devcb) \
+	devcb = &sc61860_device::set_outa_cb(*device, DEVCB2_##_devcb);
+
+#define MCFG_SC61860_READ_B_HANDLER(_devcb) \
+	devcb = &sc61860_device::set_inb_cb(*device, DEVCB2_##_devcb);
+
+#define MCFG_SC61860_WRITE_B_HANDLER(_devcb) \
+	devcb = &sc61860_device::set_outb_cb(*device, DEVCB2_##_devcb);
+
+#define MCFG_SC61860_WRITE_C_HANDLER(_devcb) \
+	devcb = &sc61860_device::set_outc_cb(*device, DEVCB2_##_devcb);
 
 class sc61860_device : public cpu_device
 {

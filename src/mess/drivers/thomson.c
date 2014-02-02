@@ -604,17 +604,17 @@ const cassette_interface mo5_cassette_interface =
 
 const serial_image_interface to7_cc90232_config =
 {
-	2400, 7, 2, device_serial_interface::PARITY_NONE, 1, "to7_io"
+	2400, 7, device_serial_interface::STOP_BITS_2, device_serial_interface::PARITY_NONE, 1, "to7_io"
 };
 
 const serial_image_interface to7_rf57932_config =
 {
-	2400, 7, 2, device_serial_interface::PARITY_NONE, 1, "acia"
+	2400, 7, device_serial_interface::STOP_BITS_2, device_serial_interface::PARITY_NONE, 1, "acia"
 };
 
 const serial_image_interface to7_modem_config =
 {
-	2400, 7, 2, device_serial_interface::PARITY_NONE, 1, NULL
+	2400, 7, device_serial_interface::STOP_BITS_2, device_serial_interface::PARITY_NONE, 1, NULL
 };
 
 /* ------------ driver ------------ */
@@ -672,10 +672,32 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_MC6854_ADD( "mc6854", to7_network_iface )
 
 /* pia */
-	MCFG_PIA6821_ADD( THOM_PIA_SYS, to7_pia6821_sys )
-	MCFG_PIA6821_ADD( THOM_PIA_IO, to7_pia6821_io )
-	MCFG_PIA6821_ADD( THOM_PIA_GAME, to7_pia6821_game )
-	MCFG_PIA6821_ADD( THOM_PIA_MODEM, to7_pia6821_modem )
+	MCFG_DEVICE_ADD(THOM_PIA_SYS, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to7_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, to7_sys_portb_in))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_sys_portb_out))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, to7_set_cassette_motor))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_sys_cb2_out))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_firq_1))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
+
+	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(DEVREAD8("to7_io", to7_io_line_device, porta_in))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("to7_io", to7_io_line_device, porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_io_portb_out))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_io_cb2_out))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_firq_1))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
+
+	MCFG_DEVICE_ADD(THOM_PIA_GAME, PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to7_game_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, to7_game_portb_in))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to7_game_portb_out))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to7_game_cb2_out))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(thomson_state, thom_irq_1))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1))
+
+	MCFG_DEVICE_ADD(THOM_PIA_MODEM, PIA6821, 0)
 
 /* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
@@ -873,7 +895,11 @@ static MACHINE_CONFIG_DERIVED( to770, to7 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( to770)
 
-	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, to770_pia6821_sys )
+	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
+	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to770_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(NULL)
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to770_sys_portb_out))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, to770_sys_cb2_out))
 
 	MCFG_MC6846_MODIFY( "mc6846", to770_timer )
 
@@ -1061,7 +1087,14 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
-	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, mo5_pia6821_sys )
+	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
+	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo5_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo5_sys_portb_in))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo5_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, mo5_sys_portb_out))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
+	MCFG_PIA_CB2_HANDLER(NULL)
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* WARNING: differs from TO7 ! */
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")
@@ -1398,7 +1431,14 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( to9)
 
-	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, to9_pia6821_sys )
+	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
+	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to9_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(NULL)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, to9_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to9_sys_portb_out))
+	MCFG_PIA_CB2_HANDLER(NULL)
+	MCFG_PIA_IRQA_HANDLER(NULL)
+
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
 
 	MCFG_DEVICE_REMOVE("centronics")
@@ -1615,7 +1655,14 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( to8)
 
-	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, to8_pia6821_sys )
+	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
+	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to8_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(NULL)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, to9_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to8_sys_portb_out))
+	MCFG_PIA_CB2_HANDLER(NULL)
+	MCFG_PIA_IRQA_HANDLER(NULL)
+
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
 
 	MCFG_DEVICE_REMOVE("centronics")
@@ -1762,7 +1809,15 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( to9p)
 
-	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, to9p_pia6821_sys )
+	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
+	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, to9_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(NULL)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, to9_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, to8_sys_portb_out))
+	MCFG_PIA_CB2_HANDLER(NULL)
+	MCFG_PIA_IRQA_HANDLER(NULL)
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_firq_1))
+
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
 
 	MCFG_DEVICE_REMOVE("centronics")
@@ -2096,9 +2151,20 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
-	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, mo6_pia6821_sys )
+	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
+	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo6_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo6_sys_portb_in))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, mo6_sys_portb_out))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
+
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
-	MCFG_PIA6821_MODIFY( THOM_PIA_GAME, mo6_pia6821_game )
+
+	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_game_cb2_out))
 
 	MCFG_DEVICE_REMOVE("centronics")
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", mo6_centronics_config)
@@ -2321,9 +2387,19 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 
 	MCFG_DEVICE_REMOVE( "mc6846" )
 
-	MCFG_PIA6821_MODIFY( THOM_PIA_SYS, mo5nr_pia6821_sys )
+	MCFG_DEVICE_MODIFY(THOM_PIA_SYS)
+	MCFG_PIA_READPA_HANDLER(READ8(thomson_state, mo6_sys_porta_in))
+	MCFG_PIA_READPB_HANDLER(READ8(thomson_state, mo5nr_sys_portb_in))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo5nr_sys_porta_out))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(thomson_state, mo6_sys_portb_out))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(thomson_state, mo5_set_cassette_motor))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(thomson_state, mo6_sys_cb2_out))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(thomson_state, thom_irq_1)) /* differs from TO */
+
 	MCFG_DEVICE_REMOVE( THOM_PIA_IO )
-	MCFG_PIA6821_MODIFY( THOM_PIA_GAME, mo5nr_pia6821_game )
+
+	MCFG_DEVICE_MODIFY(THOM_PIA_GAME)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(thomson_state, mo6_game_porta_out))
 
 	MCFG_DEVICE_REMOVE("centronics")
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)

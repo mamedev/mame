@@ -107,45 +107,11 @@ WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
 	}
 }
 
-// 5F - PIA at 0x2100
-static const pia6821_interface cpu_pia21_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_LINE_GND,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, solenoid1_w),        /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, pia21_ca2_w),       /* line CA2 out */
-	DEVCB_NULL,       /* line CB2 out */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq),       /* IRQA */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq)       /* IRQB */
-};
-
 WRITE_LINE_MEMBER( decocpu_type1_device::pia21_ca2_w )
 {
 // sound ns
 	m_ca2 = state;
 }
-
-// 11D - PIA at 0x2400
-static const pia6821_interface cpu_pia24_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_LINE_GND,     /* line CA1 in */
-	DEVCB_LINE_GND,     /* line CB1 in */
-	DEVCB_LINE_VCC,     /* line CA2 in */
-	DEVCB_LINE_VCC,     /* line CB2 in */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, lamp0_w),        /* port A out */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, lamp1_w),     /* port B out */
-	DEVCB_NULL,       /* line CA2 out */
-	DEVCB_NULL,       /* line CB2 out */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq),       /* IRQA */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq)       /* IRQB */
-};
 
 WRITE8_MEMBER( decocpu_type1_device::lamp0_w )
 {
@@ -157,23 +123,6 @@ WRITE8_MEMBER( decocpu_type1_device::lamp1_w )
 {
 	m_write_lamp(1,data,0xff);
 }
-
-// 11B - PIA at 0x2800
-static const pia6821_interface cpu_pia28_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, display_strobe_r),     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, display_strobe_w),        /* port A out */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, display_out1_w),     /* port B out */
-	DEVCB_NULL,       /* line CA2 out */
-	DEVCB_NULL,       /* line CB2 out */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq),       /* IRQA */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq)       /* IRQB */
-};
 
 READ8_MEMBER( decocpu_type1_device::display_strobe_r )
 {
@@ -195,23 +144,6 @@ WRITE8_MEMBER( decocpu_type1_device::display_out1_w )
 	m_write_display(1,data,0xff);
 }
 
-// 9B - PIA at 0x2c00
-static const pia6821_interface cpu_pia2c_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, display_in3_r),     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, display_out2_w),        /* port A out */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, display_out3_w),     /* port B out */
-	DEVCB_NULL,       /* line CA2 out */
-	DEVCB_NULL,       /* line CB2 out */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq),       /* IRQA */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq)       /* IRQB */
-};
-
 WRITE8_MEMBER( decocpu_type1_device::display_out2_w )
 {
 	m_write_display(2,data,0xff);
@@ -227,23 +159,6 @@ READ8_MEMBER( decocpu_type1_device::display_in3_r )
 	return m_read_display(3);
 }
 
-// 8H - PIA at 0x3000
-static const pia6821_interface cpu_pia30_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, switch_r),     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_LINE_GND,     /* line CA1 in */
-	DEVCB_LINE_GND,     /* line CB1 in */
-	DEVCB_LINE_VCC,     /* line CA2 in */
-	DEVCB_LINE_VCC,     /* line CB2 in */
-	DEVCB_NULL,        /* port A out */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, switch_w),     /* port B out */
-	DEVCB_NULL,       /* line CA2 out */
-	DEVCB_NULL,       /* line CB2 out */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq),       /* IRQA */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq)       /* IRQB */
-};
-
 WRITE8_MEMBER( decocpu_type1_device::switch_w )
 {
 	m_write_switch(0,data,0xff);
@@ -253,23 +168,6 @@ READ8_MEMBER( decocpu_type1_device::switch_r )
 {
 	return m_read_switch(0);
 }
-
-// 7B - PIA at 0x3400
-static const pia6821_interface cpu_pia34_intf =
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, dmdstatus_r),     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, display_out4_w),        /* port A out */
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, sound_w),     /* port B out */
-	DEVCB_NULL,       /* line CA2 out */
-	DEVCB_NULL,       /* line CB2 out */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq),       /* IRQA */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, decocpu_type1_device, cpu_pia_irq)       /* IRQB */
-};
 
 READ8_MEMBER( decocpu_type1_device::dmdstatus_r )
 {
@@ -302,28 +200,54 @@ static MACHINE_CONFIG_FRAGMENT( decocpu1 )
 	MCFG_CPU_PROGRAM_MAP(decocpu1_map)
 
 	/* Devices */
-	MCFG_PIA6821_ADD("pia21", cpu_pia21_intf)
-	MCFG_PIA6821_ADD("pia24", cpu_pia24_intf)
-	MCFG_PIA6821_ADD("pia28", cpu_pia28_intf)
-	MCFG_PIA6821_ADD("pia2c", cpu_pia2c_intf)
-	MCFG_PIA6821_ADD("pia30", cpu_pia30_intf)
-	MCFG_PIA6821_ADD("pia34", cpu_pia34_intf)
+	MCFG_DEVICE_ADD("pia21", PIA6821, 0) // 5F - PIA at 0x2100
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, solenoid1_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(decocpu_type1_device, pia21_ca2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+
+	MCFG_DEVICE_ADD("pia24", PIA6821, 0) // 11D - PIA at 0x2400
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, lamp0_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, lamp1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+
+	MCFG_DEVICE_ADD("pia28", PIA6821, 0) // 11B - PIA at 0x2800
+	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, display_strobe_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_strobe_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+
+	MCFG_DEVICE_ADD("pia2c", PIA6821, 0) // 9B - PIA at 0x2c00
+	MCFG_PIA_READPB_HANDLER(READ8(decocpu_type1_device, display_in3_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out2_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, display_out3_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+
+	MCFG_DEVICE_ADD("pia30", PIA6821, 0) // 8H - PIA at 0x3000
+	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, switch_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, switch_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+
+	MCFG_DEVICE_ADD("pia34", PIA6821, 0) // 7B - PIA at 0x3400
+	MCFG_PIA_READPA_HANDLER(READ8(decocpu_type1_device, dmdstatus_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(decocpu_type1_device, display_out4_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(decocpu_type1_device, sound_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(decocpu_type1_device, cpu_pia_irq))
+
 	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( decocpu2 )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(decocpu2_map)
+	MCFG_FRAGMENT_ADD(decocpu1)
 
-	/* Devices */
-	MCFG_PIA6821_ADD("pia21", cpu_pia21_intf)
-	MCFG_PIA6821_ADD("pia24", cpu_pia24_intf)
-	MCFG_PIA6821_ADD("pia28", cpu_pia28_intf)
-	MCFG_PIA6821_ADD("pia2c", cpu_pia2c_intf)
-	MCFG_PIA6821_ADD("pia30", cpu_pia30_intf)
-	MCFG_PIA6821_ADD("pia34", cpu_pia34_intf)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(decocpu2_map)
 MACHINE_CONFIG_END
 
 machine_config_constructor decocpu_type1_device::device_mconfig_additions() const

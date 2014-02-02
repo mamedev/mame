@@ -170,7 +170,7 @@ INTERRUPT_GEN_MEMBER(toratora_state::toratora_timer)
 		m_last = ioport("INPUT")->read() & 0x0f;
 		generic_pulse_irq_line(device.execute(), 0, 1);
 	}
-	m_pia_u1->set_a_input(ioport("INPUT")->read() & 0x0f, 0);
+	m_pia_u1->porta_w(ioport("INPUT")->read() & 0x0f);
 	m_pia_u1->ca1_w(ioport("INPUT")->read() & 0x10);
 	m_pia_u1->ca2_w(ioport("INPUT")->read() & 0x20);
 }
@@ -291,64 +291,6 @@ WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_u3_w)
 	m_sn2->vco_w(state);
 }
 
-/*************************************
- *
- *  Machine setup
- *
- *************************************/
-
-static const pia6821_interface pia_u1_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(toratora_state,port_b_u1_w),        /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,main_cpu_irq),      /* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,main_cpu_irq)       /* IRQB */
-};
-
-
-static const pia6821_interface pia_u2_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(toratora_state,sn1_port_a_u2_u3_w),     /* port A out */
-	DEVCB_DRIVER_MEMBER(toratora_state,sn1_port_b_u2_u3_w),     /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,sn1_ca2_u2_u3_w),               /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-
-static const pia6821_interface pia_u3_intf =
-{
-	DEVCB_NULL,     /* port A in */
-	DEVCB_INPUT_PORT("DSW"),        /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_DRIVER_MEMBER(toratora_state,sn2_port_a_u2_u3_w),     /* port A out */
-	DEVCB_DRIVER_MEMBER(toratora_state,sn2_port_b_u2_u3_w),     /* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,sn2_ca2_u2_u3_w),               /* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(toratora_state,cb2_u3_w),                              /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-
-
 
 /*************************************
  *
@@ -444,10 +386,22 @@ static MACHINE_CONFIG_START( toratora, toratora_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(toratora_state, toratora_timer, 16)    /* timer counting at 16 Hz */
 
-	MCFG_PIA6821_ADD("pia_u1", pia_u1_intf)
-	MCFG_PIA6821_ADD("pia_u2", pia_u2_intf)
-	MCFG_PIA6821_ADD("pia_u3", pia_u3_intf)
+	MCFG_DEVICE_ADD("pia_u1", PIA6821, 0)
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,port_b_u1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(toratora_state,main_cpu_irq))
 
+	MCFG_DEVICE_ADD("pia_u2", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state, sn1_port_a_u2_u3_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state, sn1_port_b_u2_u3_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state, sn1_ca2_u2_u3_w))
+
+	MCFG_DEVICE_ADD("pia_u3", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(toratora_state,sn2_port_a_u2_u3_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(toratora_state,sn2_port_b_u2_u3_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(toratora_state,sn2_ca2_u2_u3_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(toratora_state,cb2_u3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

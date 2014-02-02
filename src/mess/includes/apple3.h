@@ -27,7 +27,14 @@ class apple3_state : public apple2_state
 {
 public:
 	apple3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: apple2_state(mconfig, type, tag) { }
+		: apple2_state(mconfig, type, tag),
+		m_via_0(*this, "via6522_0"),
+		m_via_1(*this, "via6522_1")
+	{
+	}
+
+	required_device<via6522_device> m_via_0;
+	required_device<via6522_device> m_via_1;
 
 	UINT32 m_flags;
 	UINT8 m_via_0_a;
@@ -61,8 +68,6 @@ public:
 	DECLARE_VIDEO_START(apple3);
 	UINT32 screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(apple3_interrupt);
-	DECLARE_READ8_MEMBER(apple3_via_1_in_a);
-	DECLARE_READ8_MEMBER(apple3_via_1_in_b);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_a);
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_b);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_a);

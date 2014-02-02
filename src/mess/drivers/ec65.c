@@ -28,22 +28,28 @@ class ec65_state : public driver_device
 public:
 	ec65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_via_0(*this, VIA6522_0_TAG),
-	m_p_videoram(*this, "videoram"),
+		m_via_0(*this, VIA6522_0_TAG),
+		m_via_1(*this, VIA6522_1_TAG),
+		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ8_MEMBER(ec65_via_read_a);
-	DECLARE_READ8_MEMBER(ec65_via_read_b);
-	DECLARE_WRITE8_MEMBER(ec65_via_write_a);
-	DECLARE_WRITE8_MEMBER(ec65_via_write_b);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 *m_p_chargen;
-	UINT8 m_keyboard_input;
-	optional_device<via6522_device> m_via_0;
+	required_device<via6522_device> m_via_0;
+	required_device<via6522_device> m_via_1;
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_reset();
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
+};
+
+class ec65k_state : public driver_device
+{
+public:
+	ec65k_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+	{
+	}
 };
 
 static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
@@ -69,22 +75,6 @@ static ADDRESS_MAP_START(ec65k_mem, AS_PROGRAM, 8, ec65_state)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static const pia6821_interface ec65_pia_interface=
-{
-	DEVCB_NULL,     /* port A input */
-	DEVCB_NULL,     /* port B input */
-	DEVCB_NULL,     /* CA1 input */
-	DEVCB_NULL,     /* CB1 input */
-	DEVCB_NULL,     /* CA2 input */
-	DEVCB_NULL,     /* CB2 input */
-	DEVCB_NULL,     /* port A output */
-	DEVCB_NULL,     /* port B output */
-	DEVCB_NULL,     /* CA2 output */
-	DEVCB_NULL,     /* CB2 output */
-	DEVCB_NULL,     /* IRQA output */
-	DEVCB_NULL      /* IRQB output */
-};
-
 static ACIA6850_INTERFACE( ec65_acia_intf )
 {
 	0,
@@ -94,24 +84,6 @@ static ACIA6850_INTERFACE( ec65_acia_intf )
 	DEVCB_NULL
 };
 
-READ8_MEMBER( ec65_state::ec65_via_read_a)
-{
-	return m_keyboard_input;
-}
-
-READ8_MEMBER( ec65_state::ec65_via_read_b)
-{
-	return 0xff;
-}
-
-WRITE8_MEMBER( ec65_state::ec65_via_write_a )
-{
-}
-
-WRITE8_MEMBER( ec65_state::ec65_via_write_b )
-{
-}
-
 /* Input ports */
 static INPUT_PORTS_START( ec65 )
 INPUT_PORTS_END
@@ -120,7 +92,14 @@ WRITE8_MEMBER( ec65_state::kbd_put )
 {
 	if (data)
 	{
-		m_keyboard_input = data;
+		m_via_0->write_pa0((data>>0)&1);
+		m_via_0->write_pa1((data>>1)&1);
+		m_via_0->write_pa2((data>>2)&1);
+		m_via_0->write_pa3((data>>3)&1);
+		m_via_0->write_pa4((data>>4)&1);
+		m_via_0->write_pa5((data>>5)&1);
+		m_via_0->write_pa6((data>>6)&1);
+		m_via_0->write_pa7((data>>7)&1);
 		m_via_0->write_ca1(1);
 		m_via_0->write_ca1(0);
 	}
@@ -134,6 +113,14 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 void ec65_state::machine_reset()
 {
+	m_via_1->write_pb0(1);
+	m_via_1->write_pb1(1);
+	m_via_1->write_pb2(1);
+	m_via_1->write_pb3(1);
+	m_via_1->write_pb4(1);
+	m_via_1->write_pb5(1);
+	m_via_1->write_pb6(1);
+	m_via_1->write_pb7(1);
 }
 
 void ec65_state::video_start()
@@ -174,6 +161,7 @@ static MC6845_UPDATE_ROW( ec65_update_row )
 static MC6845_INTERFACE( ec65_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8 /*?*/,
 	NULL,
 	ec65_update_row,
@@ -227,22 +215,18 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 
 
 	/* devices */
-	MCFG_PIA6821_ADD( PIA6821_TAG, ec65_pia_interface )
+	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
 	MCFG_ACIA6850_ADD(ACIA6850_TAG, ec65_acia_intf)
 
 	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL_4MHz / 4)
-	MCFG_VIA6522_READPA_HANDLER(READ8(ec65_state, ec65_via_read_a))
 
 	MCFG_DEVICE_ADD(VIA6522_1_TAG, VIA6522, XTAL_4MHz / 4)
-	MCFG_VIA6522_READPB_HANDLER(READ8(ec65_state, ec65_via_read_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(ec65_state, ec65_via_write_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(ec65_state, ec65_via_write_b))
 
 	MCFG_DEVICE_ADD(ACIA6551_TAG, MOS6551, XTAL_1_8432MHz)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ec65k, ec65_state )
+static MACHINE_CONFIG_START( ec65k, ec65k_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",G65816, XTAL_4MHz) // can use 4,2 or 1 MHz

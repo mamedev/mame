@@ -180,38 +180,6 @@ WRITE8_MEMBER(tugboat_state::tugboat_ctrl_w)
 	m_ctrl = data;
 }
 
-static const pia6821_interface pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(tugboat_state,tugboat_input_r),     /* port A in */
-	DEVCB_NULL,     /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_NULL,     /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
-static const pia6821_interface pia1_intf =
-{
-	DEVCB_INPUT_PORT("DSW"),            /* port A in */
-	DEVCB_DRIVER_MEMBER(tugboat_state,tugboat_ctrl_r),      /* port B in */
-	DEVCB_NULL,     /* line CA1 in */
-	DEVCB_NULL,     /* line CB1 in */
-	DEVCB_NULL,     /* line CA2 in */
-	DEVCB_NULL,     /* line CB2 in */
-	DEVCB_NULL,     /* port A out */
-	DEVCB_DRIVER_MEMBER(tugboat_state,tugboat_ctrl_w),      /* port B out */
-	DEVCB_NULL,     /* line CA2 out */
-	DEVCB_NULL,     /* port CB2 out */
-	DEVCB_NULL,     /* IRQA */
-	DEVCB_NULL      /* IRQB */
-};
-
 void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
@@ -352,9 +320,13 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)
 
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(tugboat_state,tugboat_input_r))
 
-	MCFG_PIA6821_ADD("pia0", pia0_intf)
-	MCFG_PIA6821_ADD("pia1", pia1_intf)
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
+	MCFG_PIA_READPB_HANDLER(READ8(tugboat_state, tugboat_ctrl_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tugboat_state, tugboat_ctrl_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

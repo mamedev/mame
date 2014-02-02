@@ -18,7 +18,7 @@
 #include "rendfont.h"
 #include "ui.h"
 #include "uiinput.h"
-#include "uimain.h"
+#include "ui/miscmenu.h"
 #include "uigfx.h"
 #include <ctype.h>
 

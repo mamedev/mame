@@ -295,6 +295,7 @@ GFXDECODE_END
 static MC6845_INTERFACE( dim68k_crtc )
 {
 	false,
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of dots per character - switchable 7 or 8 */
 	NULL,
 	dim68k_update_row,      /* handler to display a scanline */

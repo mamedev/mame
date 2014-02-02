@@ -317,8 +317,8 @@ public:
 	DECLARE_READ8_MEMBER(cashcade_r);
 	DECLARE_WRITE8_MEMBER(mk4_printer_w);
 	DECLARE_READ8_MEMBER(mk4_printer_r);
-	DECLARE_WRITE8_MEMBER(mkiv_pia_ca2);
-	DECLARE_WRITE8_MEMBER(mkiv_pia_cb2);
+	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_ca2);
+	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_cb2);
 	DECLARE_WRITE8_MEMBER(mkiv_pia_outb);
 	DECLARE_READ8_MEMBER(via_a_r);
 	DECLARE_READ8_MEMBER(via_b_r);
@@ -584,16 +584,16 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outa)
 }
 
 //output ca2
-WRITE8_MEMBER(aristmk4_state::mkiv_pia_ca2)
+WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_ca2)
 {
-	m_rtc_address_strobe = data;
+	m_rtc_address_strobe = state;
 	// logerror("address strobe %02X\n", address_strobe);
 }
 
 //output cb2
-WRITE8_MEMBER(aristmk4_state::mkiv_pia_cb2)
+WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_cb2)
 {
-	m_rtc_data_strobe = data;
+	m_rtc_data_strobe = state;
 	//logerror("data strobe: %02X\n", data);
 }
 
@@ -1549,28 +1549,13 @@ static const ay8910_interface ay8910_config2 =
 	DEVCB_DRIVER_MEMBER(aristmk4_state,pbltlp_out)  // Port B write - goes to lamps on the buttons x4 and light tower x4
 };
 
-static const pia6821_interface aristmk4_pia1_intf =
-{
-	DEVCB_DRIVER_MEMBER(aristmk4_state, mkiv_pia_ina),  // port A in
-	DEVCB_NULL, // port B in
-	DEVCB_NULL, // line CA1 in
-	DEVCB_NULL, // line CB1 in
-	DEVCB_NULL, // line CA2 in
-	DEVCB_NULL, // line CB2 in
-	DEVCB_DRIVER_MEMBER(aristmk4_state, mkiv_pia_outa), // port A out
-	DEVCB_DRIVER_MEMBER(aristmk4_state,mkiv_pia_outb),  // port B out
-	DEVCB_DRIVER_MEMBER(aristmk4_state,mkiv_pia_ca2),   // line CA2 out
-	DEVCB_DRIVER_MEMBER(aristmk4_state,mkiv_pia_cb2),   // port CB2 out
-	DEVCB_NULL, // IRQA
-	DEVCB_NULL  // IRQB
-};
-
 static MC6845_INTERFACE( mc6845_intf )
 {
 	/* in fact is a mc6845 driving 4 pixels by memory address.
 	that's why the big horizontal parameters */
 
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -1719,7 +1704,13 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, firq_line))
 	// CA1 is connected to +5V, CB1 is not connected.
 
-	MCFG_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
+	MCFG_DEVICE_ADD("pia6821_0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(aristmk4_state, mkiv_pia_ina))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outa))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(aristmk4_state, mkiv_pia_outb))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_ca2))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(aristmk4_state, mkiv_pia_cb2))
+
 	MCFG_MC6845_ADD("crtc", C6545_1, "screen", MAIN_CLOCK/8, mc6845_intf) // TODO: type is unknown
 	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
 

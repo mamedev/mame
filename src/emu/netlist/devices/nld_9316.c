@@ -29,18 +29,19 @@ NETLIB_START(9316)
 
 }
 
+NETLIB_RESET(9316)
+{
+    sub.do_reset();
+}
+
 NETLIB_START(9316_sub)
 {
-	m_cnt = 0;
-	m_loadq = 1;
-	m_ent = 1;
+	register_input("CLK", m_clk);
 
-	register_input("CLK", m_clk, netlist_input_t::STATE_INP_LH);
-
-	register_input("A", m_A, netlist_input_t::STATE_INP_PASSIVE);
-	register_input("B", m_B, netlist_input_t::STATE_INP_PASSIVE);
-	register_input("C", m_C, netlist_input_t::STATE_INP_PASSIVE);
-	register_input("D", m_D, netlist_input_t::STATE_INP_PASSIVE);
+	register_input("A", m_A);
+	register_input("B", m_B);
+	register_input("C", m_C);
+	register_input("D", m_D);
 
 	register_output("QA", m_QA);
 	register_output("QB", m_QB);
@@ -51,6 +52,19 @@ NETLIB_START(9316_sub)
 	save(NAME(m_cnt));
 	save(NAME(m_loadq));
 	save(NAME(m_ent));
+}
+
+NETLIB_RESET(9316_sub)
+{
+    m_clk.set_state(netlist_input_t::STATE_INP_LH);
+    m_A.set_state(netlist_input_t::STATE_INP_PASSIVE);
+    m_B.set_state(netlist_input_t::STATE_INP_PASSIVE);
+    m_C.set_state(netlist_input_t::STATE_INP_PASSIVE);
+    m_D.set_state(netlist_input_t::STATE_INP_PASSIVE);
+
+    m_cnt = 0;
+    m_loadq = 1;
+    m_ent = 1;
 }
 
 NETLIB_UPDATE(9316_sub)

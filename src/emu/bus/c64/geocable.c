@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Curt Coder
+	// license:BSD-3-Clause
+// copyright-holders:Curt Coder, smf
 /**********************************************************************
 
     geoCable Centronics Cable emulation
@@ -34,7 +34,7 @@ const device_type C64_GEOCABLE = &device_creator<c64_geocable_device>;
 
 WRITE_LINE_MEMBER( c64_geocable_device::busy_w )
 {
-	m_slot->cia_flag2_w(state);
+	output_b(state);
 }
 
 static const centronics_interface centronics_intf =
@@ -76,7 +76,7 @@ machine_config_constructor c64_geocable_device::device_mconfig_additions() const
 
 c64_geocable_device::c64_geocable_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_GEOCABLE, "C64 geoCable", tag, owner, clock, "c64_geocable", __FILE__),
-	device_c64_user_port_interface(mconfig, *this),
+	device_pet_user_port_interface(mconfig, *this),
 	m_centronics(*this, CENTRONICS_TAG)
 {
 }
@@ -92,20 +92,20 @@ void c64_geocable_device::device_start()
 
 
 //-------------------------------------------------
-//  c64_pb_w - port B write
+//  update_output
 //-------------------------------------------------
 
-void c64_geocable_device::c64_pb_w(address_space &space, offs_t offset, UINT8 data)
+void c64_geocable_device::update_output()
 {
-	m_centronics->write(space, 0, data);
+	m_centronics->write(m_parallel_output);
 }
 
 
 //-------------------------------------------------
-//  c64_pb_w - port B write
+//  input_8 - CIA2 PC write
 //-------------------------------------------------
 
-void c64_geocable_device::c64_pa2_w(int level)
+WRITE_LINE_MEMBER(c64_geocable_device::input_8)
 {
-	m_centronics->strobe_w(level);
+	m_centronics->strobe_w(state);
 }

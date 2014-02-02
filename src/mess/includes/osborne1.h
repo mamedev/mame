@@ -75,7 +75,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ieee_pia_irq_a_func);
 	DECLARE_READ8_MEMBER(ieee_pia_pb_r);
 	DECLARE_WRITE8_MEMBER(ieee_pia_pb_w);
-	DECLARE_WRITE8_MEMBER(video_pia_out_cb2_dummy);
+	DECLARE_WRITE_LINE_MEMBER(video_pia_out_cb2_dummy);
 	DECLARE_WRITE8_MEMBER(video_pia_port_a_w);
 	DECLARE_WRITE8_MEMBER(video_pia_port_b_w);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_irq_a_func);
@@ -120,14 +120,6 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
-
-
-/*----------- defined in machine/osborne1.c -----------*/
-
-extern const pia6821_interface osborne1_ieee_pia_config;
-extern const pia6821_interface osborne1_video_pia_config;
-
-
 
 
 // ======================> osborne1_daisy_device

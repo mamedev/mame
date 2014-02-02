@@ -116,11 +116,7 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "cpu/s2650/s2650.h"
 #include "includes/meadows.h"
-#include "sound/dac.h"
-#include "sound/samples.h"
 
 #include "deadeye.lh"
 #include "gypsyjug.lh"
@@ -214,7 +210,7 @@ INTERRUPT_GEN_MEMBER(meadows_state::meadows_interrupt)
 {
 	/* fake something toggling the sense input line of the S2650 */
 	m_main_sense_state ^= 1;
-	device.execute().set_input_line(1, m_main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->write_sense(m_main_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -310,7 +306,7 @@ INTERRUPT_GEN_MEMBER(meadows_state::audio_interrupt)
 {
 	/* fake something toggling the sense input line of the S2650 */
 	m_audio_sense_state ^= 1;
-	device.execute().set_input_line(1, m_audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->write_sense(m_audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -88,26 +88,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apf_mc6847_fs_w);
 	DECLARE_READ8_MEMBER(apf_m1000_pia_in_a_func);
 	DECLARE_READ8_MEMBER(apf_m1000_pia_in_b_func);
-	DECLARE_READ8_MEMBER(apf_m1000_pia_in_ca1_func);
-	DECLARE_READ8_MEMBER(apf_m1000_pia_in_cb1_func);
-	DECLARE_READ8_MEMBER(apf_m1000_pia_in_ca2_func);
-	DECLARE_READ8_MEMBER(apf_m1000_pia_in_cb2_func);
 	DECLARE_WRITE8_MEMBER(apf_m1000_pia_out_a_func);
 	DECLARE_WRITE8_MEMBER(apf_m1000_pia_out_b_func);
 	DECLARE_WRITE_LINE_MEMBER(apf_m1000_pia_out_ca2_func);
-	DECLARE_WRITE8_MEMBER(apf_m1000_pia_out_cb2_func);
+	DECLARE_WRITE_LINE_MEMBER(apf_m1000_pia_out_cb2_func);
 	DECLARE_WRITE_LINE_MEMBER(apf_m1000_irq_a_func);
 	DECLARE_WRITE_LINE_MEMBER(apf_m1000_irq_b_func);
 	DECLARE_READ8_MEMBER(apf_imagination_pia_in_a_func);
 	DECLARE_READ8_MEMBER(apf_imagination_pia_in_b_func);
-	DECLARE_READ8_MEMBER(apf_imagination_pia_in_ca1_func);
-	DECLARE_READ8_MEMBER(apf_imagination_pia_in_cb1_func);
-	DECLARE_READ8_MEMBER(apf_imagination_pia_in_ca2_func);
-	DECLARE_READ8_MEMBER(apf_imagination_pia_in_cb2_func);
 	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_a_func);
 	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_b_func);
-	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_ca2_func);
-	DECLARE_WRITE8_MEMBER(apf_imagination_pia_out_cb2_func);
+	DECLARE_WRITE_LINE_MEMBER(apf_imagination_pia_out_ca2_func);
+	DECLARE_WRITE_LINE_MEMBER(apf_imagination_pia_out_cb2_func);
 	DECLARE_WRITE_LINE_MEMBER(apf_imagination_irq_a_func);
 	DECLARE_WRITE_LINE_MEMBER(apf_imagination_irq_b_func);
 	DECLARE_WRITE8_MEMBER(apf_dischw_w);
@@ -166,26 +158,6 @@ READ8_MEMBER( apf_state::apf_m1000_pia_in_b_func)
 	return 0xff;
 }
 
-READ8_MEMBER( apf_state::apf_m1000_pia_in_ca1_func)
-{
-	return 0;
-}
-
-READ8_MEMBER( apf_state::apf_m1000_pia_in_cb1_func)
-{
-	return 0;
-}
-
-READ8_MEMBER( apf_state::apf_m1000_pia_in_ca2_func)
-{
-	return 0;
-}
-
-READ8_MEMBER( apf_state::apf_m1000_pia_in_cb2_func)
-{
-	return 0;
-}
-
 
 WRITE8_MEMBER( apf_state::apf_m1000_pia_out_a_func)
 {
@@ -208,9 +180,9 @@ WRITE_LINE_MEMBER( apf_state::apf_m1000_pia_out_ca2_func)
 	m_mc6847_css = state;
 }
 
-WRITE8_MEMBER( apf_state::apf_m1000_pia_out_cb2_func)
+WRITE_LINE_MEMBER( apf_state::apf_m1000_pia_out_cb2_func)
 {
-	m_speaker->level_w(data);
+	m_speaker->level_w(state);
 }
 
 /* use bit 0 to identify state of irq from pia 0 */
@@ -242,23 +214,6 @@ WRITE_LINE_MEMBER( apf_state::apf_m1000_irq_b_func )
 	apf_update_ints(0x02);
 }
 
-static const pia6821_interface apf_m1000_pia_interface=
-{
-	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_a_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_b_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_ca1_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_cb1_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_ca2_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_in_cb2_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_out_a_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_out_b_func),
-	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_m1000_pia_out_ca2_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_m1000_pia_out_cb2_func),
-	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_m1000_irq_a_func),
-	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_m1000_irq_b_func)
-};
-
-
 READ8_MEMBER( apf_state::apf_imagination_pia_in_a_func)
 {
 	return m_keyboard_data;
@@ -272,26 +227,6 @@ READ8_MEMBER( apf_state::apf_imagination_pia_in_b_func)
 		data =(1<<7);
 
 	return data;
-}
-
-READ8_MEMBER( apf_state::apf_imagination_pia_in_ca1_func)
-{
-	return 0;
-}
-
-READ8_MEMBER( apf_state::apf_imagination_pia_in_cb1_func)
-{
-	return 0;
-}
-
-READ8_MEMBER( apf_state::apf_imagination_pia_in_ca2_func)
-{
-	return 0;
-}
-
-READ8_MEMBER( apf_state::apf_imagination_pia_in_cb2_func)
-{
-	return 0;
 }
 
 
@@ -321,11 +256,11 @@ WRITE8_MEMBER( apf_state::apf_imagination_pia_out_b_func)
 	m_cass->output(BIT(data, 6) ? -1.0 : 1.0);
 }
 
-WRITE8_MEMBER( apf_state::apf_imagination_pia_out_ca2_func)
+WRITE_LINE_MEMBER( apf_state::apf_imagination_pia_out_ca2_func)
 {
 }
 
-WRITE8_MEMBER( apf_state::apf_imagination_pia_out_cb2_func)
+WRITE_LINE_MEMBER( apf_state::apf_imagination_pia_out_cb2_func)
 {
 }
 
@@ -338,23 +273,6 @@ WRITE_LINE_MEMBER( apf_state::apf_imagination_irq_b_func )
 {
 	apf_update_ints(0x08);
 }
-
-static const pia6821_interface apf_imagination_pia_interface=
-{
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_a_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_b_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_ca1_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_cb1_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_ca2_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_in_cb2_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_out_a_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_out_b_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_out_ca2_func),
-	DEVCB_DRIVER_MEMBER(apf_state, apf_imagination_pia_out_cb2_func),
-	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_imagination_irq_a_func),
-	DEVCB_DRIVER_LINE_MEMBER(apf_state, apf_imagination_irq_b_func)
-};
-
 
 void apf_state::machine_start()
 {
@@ -709,8 +627,26 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_PIA6821_ADD( "pia_0", apf_m1000_pia_interface )
-	MCFG_PIA6821_ADD( "pia_1", apf_imagination_pia_interface )
+	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(apf_state, apf_m1000_pia_in_a_func))
+	MCFG_PIA_READPB_HANDLER(READ8(apf_state, apf_m1000_pia_in_b_func))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(apf_state, apf_m1000_pia_out_a_func))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apf_state, apf_m1000_pia_out_b_func))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(apf_state, apf_m1000_pia_out_ca2_func))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(apf_state, apf_m1000_pia_out_cb2_func))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(apf_state, apf_m1000_irq_a_func))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(apf_state, apf_m1000_irq_b_func))
+
+	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(apf_state, apf_imagination_pia_in_a_func))
+	MCFG_PIA_READPB_HANDLER(READ8(apf_state, apf_imagination_pia_in_b_func))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(apf_state, apf_imagination_pia_out_a_func))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apf_state, apf_imagination_pia_out_b_func))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(apf_state, apf_imagination_pia_out_ca2_func))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(apf_state, apf_imagination_pia_out_cb2_func))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(apf_state, apf_imagination_irq_a_func))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(apf_state, apf_imagination_irq_b_func))
+
 	MCFG_CASSETTE_ADD( "cassette", apf_cassette_interface )
 	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface ) // TODO confirm type
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)

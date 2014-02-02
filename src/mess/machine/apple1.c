@@ -55,27 +55,6 @@
 **  Structures
 *****************************************************************************/
 
-/* Handlers for the PIA.  The inputs for Port B, CA1, and CB1 are
-   handled by writing to them at the moment when their values change,
-   rather than updating them when they are read; thus they don't need
-   handler functions. */
-
-const pia6821_interface apple1_pia0 =
-{
-	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_kbdin),                /* Port A input (keyboard) */
-	DEVCB_NULL,                                     /* Port B input (display status) */
-	DEVCB_NULL,                                     /* CA1 input (key pressed) */
-	DEVCB_NULL,                                     /* CB1 input (display ready) */
-	DEVCB_NULL,                                     /* CA2 not used as input */
-	DEVCB_NULL,                                     /* CB2 not used as input */
-	DEVCB_NULL,                                     /* Port A not used as output */
-	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_dspout),               /* Port B output (display) */
-	DEVCB_NULL,                                     /* CA2 not used as output */
-	DEVCB_DRIVER_MEMBER(apple1_state,apple1_pia0_dsp_write_signal), /* CB2 output (display write) */
-	DEVCB_NULL,                                     /* IRQA not connected */
-	DEVCB_NULL                                      /* IRQB not connected */
-};
-
 /* Use the same keyboard mapping as on a modern keyboard.  This is not
    the same as the keyboard mapping of the actual teletype-style
    keyboards used with the Apple I, but it's less likely to cause
@@ -380,7 +359,7 @@ WRITE8_MEMBER(apple1_state::apple1_pia0_dspout)
 	apple1_vh_dsp_w(data);
 }
 
-WRITE8_MEMBER(apple1_state::apple1_pia0_dsp_write_signal)
+WRITE_LINE_MEMBER(apple1_state::apple1_pia0_dsp_write_signal)
 {
 	device_t *device = machine().device("pia");
 	/* PIA output CB2 is inverted to become the DA signal, used to
@@ -390,14 +369,14 @@ WRITE8_MEMBER(apple1_state::apple1_pia0_dsp_write_signal)
 	   read bit 7 of port B to test whether the display has completed
 	   a write. */
 	pia6821_device *pia = downcast<pia6821_device *>(device);
-	pia->portb_w((!data) << 7);
+	pia->portb_w((!state) << 7);
 
 	/* Once DA is asserted, the display will wait until it can perform
 	   the write, when the cursor position is about to be refreshed.
 	   Only then will it assert \RDA to signal readiness for another
 	   write.  Thus the write delay depends on the cursor position and
 	   where the display is in the refresh cycle. */
-	if (!data)
+	if (!state)
 		machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(), timer_expired_delegate(FUNC(apple1_state::apple1_dsp_ready_start),this));
 }
 

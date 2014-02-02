@@ -294,38 +294,6 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 
 ************************************************************/
 
-static const pia6821_interface mekd2_s_mc6821_intf =
-{
-	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_key_r),      /* port A input */
-	DEVCB_NULL,                     /* port B input */
-	DEVCB_NULL,                     /* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, mekd2_key40_r),   /* CB1 input */
-	DEVCB_NULL,                     /* CA2 input */
-	DEVCB_NULL,                     /* CB2 input */
-	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_segment_w),  /* port A output */
-	DEVCB_DRIVER_MEMBER(mekd2_state, mekd2_digit_w),    /* port B output */
-	DEVCB_DRIVER_LINE_MEMBER(mekd2_state, mekd2_nmi_w), /* CA2 output */
-	DEVCB_NULL,                     /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_NMI)     /* IRQB output */
-};
-
-static const pia6821_interface mekd2_u_mc6821_intf =
-{
-	DEVCB_NULL,                     /* port A input */
-	DEVCB_NULL,                     /* port B input */
-	DEVCB_NULL,                     /* CA1 input */
-	DEVCB_NULL,                     /* CB1 input */
-	DEVCB_NULL,                     /* CA2 input */
-	DEVCB_NULL,                     /* CB2 input */
-	DEVCB_NULL,                     /* port A output */
-	DEVCB_NULL,                     /* port B output */
-	DEVCB_NULL,                     /* CA2 output */
-	DEVCB_NULL,                     /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)     /* IRQB output */
-};
-
 WRITE_LINE_MEMBER( mekd2_state::cass_w )
 {
 	m_cass_state = state;
@@ -416,8 +384,19 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	MCFG_CARTSLOT_LOAD(mekd2_state,mekd2_cart)
 
 	/* Devices */
-	MCFG_PIA6821_ADD("pia_s", mekd2_s_mc6821_intf)
-	MCFG_PIA6821_ADD("pia_u", mekd2_u_mc6821_intf)
+	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(mekd2_state, mekd2_key_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(mekd2_state, mekd2_key40_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mekd2_state, mekd2_segment_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(mekd2_state, mekd2_digit_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(mekd2_state, mekd2_nmi_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, nmi_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, nmi_line))
+
+	MCFG_DEVICE_ADD("pia_u", PIA6821, 0)
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6800_cpu_device, irq_line))
+
 	MCFG_ACIA6850_ADD("acia", mekd2_acia_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_c", mekd2_state, mekd2_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_p", mekd2_state, mekd2_p, attotime::from_hz(40000))

@@ -3278,32 +3278,32 @@ READ32_MEMBER( chihiro_state::usbctrl_r )
 {
 	if (offset == 0) { /* hack needed until usb (and jvs) is implemented */
 		if (usbhack_counter == 0) {
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6a79f,0x01);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6a7a0,0x00);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6b575,0x00);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6b576,0x00);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6b5af,0x75);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6b78a,0x75);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6b7ca,0x00);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x6b7b8,0x00);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x8f5b2,0x75);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x79a9e,0x74);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x79b80,0x74);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x79b97,0x74);
+			m_maincpu->space(0).write_byte(0x6a79f,0x01);
+			m_maincpu->space(0).write_byte(0x6a7a0,0x00);
+			m_maincpu->space(0).write_byte(0x6b575,0x00);
+			m_maincpu->space(0).write_byte(0x6b576,0x00);
+			m_maincpu->space(0).write_byte(0x6b5af,0x75);
+			m_maincpu->space(0).write_byte(0x6b78a,0x75);
+			m_maincpu->space(0).write_byte(0x6b7ca,0x00);
+			m_maincpu->space(0).write_byte(0x6b7b8,0x00);
+			m_maincpu->space(0).write_byte(0x8f5b2,0x75);
+			m_maincpu->space(0).write_byte(0x79a9e,0x74);
+			m_maincpu->space(0).write_byte(0x79b80,0x74);
+			m_maincpu->space(0).write_byte(0x79b97,0x74);
 		}
 		// after game loaded
 		if (usbhack_counter == 1) {
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x12e4cf,0x01);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x12e4d0,0x00);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x4793e,0x01);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x4793f,0x00);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x47aa3,0x01);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x47aa4,0x00);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x14f2b6,0x84);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x14f2d1,0x75);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x8732f,0x7d);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x87384,0x7d);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x87388,0xeb);
+			m_maincpu->space(0).write_byte(0x12e4cf,0x01);
+			m_maincpu->space(0).write_byte(0x12e4d0,0x00);
+			m_maincpu->space(0).write_byte(0x4793e,0x01);
+			m_maincpu->space(0).write_byte(0x4793f,0x00);
+			m_maincpu->space(0).write_byte(0x47aa3,0x01);
+			m_maincpu->space(0).write_byte(0x47aa4,0x00);
+			m_maincpu->space(0).write_byte(0x14f2b6,0x84);
+			m_maincpu->space(0).write_byte(0x14f2d1,0x75);
+			m_maincpu->space(0).write_byte(0x8732f,0x7d);
+			m_maincpu->space(0).write_byte(0x87384,0x7d);
+			m_maincpu->space(0).write_byte(0x87388,0xeb);
 		}
 		usbhack_counter++;
 	}
@@ -3766,10 +3766,10 @@ int chihiro_state::smbus_eeprom(int command,int rw,int data)
 		// hack to avoid hanging if eeprom contents are not correct
 		// this would need dumping the serial eeprom on the xbox board
 		if (command == 0) {
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x3b744,0x90);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x3b745,0x90);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x3b766,0xc9);
-			chihiro_devs.pic8259_1->machine().firstcpu->space(0).write_byte(0x3b767,0xc3);
+			m_maincpu->space(0).write_byte(0x3b744,0x90);
+			m_maincpu->space(0).write_byte(0x3b745,0x90);
+			m_maincpu->space(0).write_byte(0x3b766,0xc9);
+			m_maincpu->space(0).write_byte(0x3b767,0xc3);
 		}
 		data = dummyeeprom[command]+dummyeeprom[command+1]*256;
 		logerror("eeprom: %d %d %d\n",command,rw,data);
@@ -3916,7 +3916,7 @@ void chihiro_state::machine_start()
 	if (chihiro_devs.dimmboard != NULL) {
 		dimm_board_memory=chihiro_devs.dimmboard->memory(dimm_board_memory_size);
 	}
-	apust.space=&machine().firstcpu->space();
+	apust.space=&m_maincpu->space();
 	apust.timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(chihiro_state::audio_apu_timer),this),(void *)"APU Timer");
 	apust.timer->enable(false);
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)

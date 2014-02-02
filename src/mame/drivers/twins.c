@@ -58,11 +58,13 @@ class twins_state : public driver_device
 public:
 	twins_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_paletteram(*this, "paletteram") { }
 
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_videoram;
-	UINT16 *m_pal;
+	required_shared_ptr<UINT16> m_paletteram;
 	UINT16 m_paloff;
 	DECLARE_READ16_MEMBER(twins_port4_r);
 	DECLARE_WRITE16_MEMBER(twins_port4_w);
@@ -74,7 +76,6 @@ public:
 	DECLARE_VIDEO_START(twinsa);
 	UINT32 screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_twinsa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -91,7 +92,7 @@ WRITE16_MEMBER(twins_state::twins_port4_w)
 
 WRITE16_MEMBER(twins_state::port6_pal0_w)
 {
-	COMBINE_DATA(&m_pal[m_paloff]);
+	COMBINE_DATA(&m_paletteram[m_paloff]);
 	m_paloff = (m_paloff + 1) & 0xff;
 }
 
@@ -111,13 +112,14 @@ static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(port6_pal0_w)
+	AM_RANGE(0x0006, 0x0007) AM_WRITE(port6_pal0_w) AM_SHARE("paletteram")
 	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
 ADDRESS_MAP_END
 
 VIDEO_START_MEMBER(twins_state,twins)
 {
-	m_pal = auto_alloc_array(machine(), UINT16, 0x100);
+	save_item(NAME(m_paloff));
+	m_paloff = 0;
 }
 
 UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -131,7 +133,7 @@ UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bit
 	for (i=0;i<0x100;i++)
 	{
 		int dat,r,g,b;
-		dat = m_pal[i];
+		dat = m_paletteram[i];
 
 		r = dat & 0x1f;
 		r = BITSWAP8(r,7,6,5,0,1,2,3,4);
@@ -222,7 +224,8 @@ MACHINE_CONFIG_END
 
 VIDEO_START_MEMBER(twins_state,twinsa)
 {
-	m_pal = auto_alloc_array(machine(), UINT16, 0x1000);
+	save_item(NAME(m_paloff));
+	m_paloff = 0;
 }
 
 UINT32 twins_state::screen_update_twinsa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -236,9 +239,9 @@ UINT32 twins_state::screen_update_twinsa(screen_device &screen, bitmap_ind16 &bi
 	for (i=0;i<0x1000-3;i+=3)
 	{
 		int r,g,b;
-		r = m_pal[i];
-		g = m_pal[i+1];
-		b = m_pal[i+2];
+		r = m_paletteram[i];
+		g = m_paletteram[i+1];
+		b = m_paletteram[i+2];
 
 		palette_set_color_rgb(machine(),i/3, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
@@ -258,7 +261,7 @@ UINT32 twins_state::screen_update_twinsa(screen_device &screen, bitmap_ind16 &bi
 
 WRITE16_MEMBER(twins_state::twinsa_port4_w)
 {
-	m_pal[m_paloff&0xfff] = data;
+	m_paletteram[m_paloff&0xfff] = data;
 	m_paloff++;
 //  printf("paloff %04x\n",m_paloff);
 }
@@ -271,7 +274,7 @@ READ16_MEMBER(twins_state::twinsa_unk_r)
 static ADDRESS_MAP_START( twinsa_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(twinsa_unk_r, porte_paloff0_w)
 	AM_RANGE(0x0002, 0x0003) AM_WRITE(porte_paloff0_w)
-	AM_RANGE(0x0004, 0x0005) AM_WRITE(twinsa_port4_w) // palette on this set
+	AM_RANGE(0x0004, 0x0005) AM_WRITE(twinsa_port4_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE8("aysnd", ay8910_device, address_w, 0x00ff)
 	AM_RANGE(0x0010, 0x0011) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x0018, 0x0019) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
@@ -336,5 +339,5 @@ ROM_START( twinsa )
 	ROM_LOAD16_BYTE( "hp.bin", 0x000001, 0x080000, CRC(aaf74b83) SHA1(09bd76b9fc5cb7ba6ffe1a2581ffd5633fe440b3) )
 ROM_END
 
-GAME( 1994, twins,  0,     twins,  twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 1)", 0 )
-GAME( 1994, twinsa, twins, twinsa, twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 2)", 0 )
+GAME( 1994, twins,  0,     twins,  twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1994, twinsa, twins, twinsa, twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 2)", GAME_SUPPORTS_SAVE )

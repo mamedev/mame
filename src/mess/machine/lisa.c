@@ -387,6 +387,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_COPS_Ready = 0;
+	m_via0->write_pb6(m_COPS_Ready);
 
 	/*logerror("read_COPS_command : trying to send data to VIA\n");*/
 	COPS_send_data_if_possible();
@@ -557,6 +558,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 TIMER_CALLBACK_MEMBER(lisa_state::set_COPS_ready)
 {
 	m_COPS_Ready = 1;
+	m_via0->write_pb6(m_COPS_Ready);
 
 	/* impulsion width : +/- 20us */
 	machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(lisa_state::read_COPS_command),this));
@@ -620,6 +622,7 @@ void lisa_state::plug_keyboard()
 void lisa_state::init_COPS()
 {
 	m_COPS_Ready = 0;
+	m_via0->write_pb6(m_COPS_Ready);
 
 	reset_COPS();
 }
@@ -663,18 +666,6 @@ WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
     CB1 : not used
     CB2 (O) : sound output
 */
-READ8_MEMBER(lisa_state::COPS_via_in_b)
-{
-	int val = 0;
-
-	if (m_COPS_Ready)
-		val |= 0x40;
-
-	if (m_FDIR)
-		val |= 0x10;
-
-	return val;
-}
 
 WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 {
@@ -734,24 +725,6 @@ void lisa_state::COPS_via_irq_func(int val)
     CB1 : not used
     CB2 (I) : current parity latch value
 */
-READ8_MEMBER(lisa_state::parallel_via_in_b)
-{
-	int val = 0;
-
-	if (m_DISK_DIAG)
-		val |= 0x40;
-
-	/* tell there is no hard disk : */
-	val |= 0x1;
-
-	/* keep busy high to work around a bug??? */
-	//val |= 0x2;
-
-	return val;
-}
-
-
-
 
 
 
@@ -1010,6 +983,18 @@ void lisa_state::machine_reset()
 	m_video_address_latch = 0;
 	m_videoram_ptr = (UINT16 *) m_ram_ptr;
 
+	m_FDIR = 0;
+	m_via0->write_pb4(m_FDIR);
+
+	/* tell there is no hard disk : */
+	m_via1->write_pb0(1);
+
+	/* keep busy high to work around a bug??? */
+	//m_via1->write_pb1(1);
+
+	m_DISK_DIAG = 0;
+	m_via1->write_pb6(m_DISK_DIAG);
+
 	/* reset COPS keyboard/mouse controller */
 	init_COPS();
 
@@ -1177,9 +1162,11 @@ void lisa_state::lisa_fdc_ttl_glue_access(offs_t offset)
 		break;
 	case 6:
 		m_DISK_DIAG = offset & 1;
+		m_via1->write_pb6(m_DISK_DIAG);
 		break;
 	case 7:
 		m_FDIR = offset & 1; /* Interrupt request to 68k */
+		m_via0->write_pb4(m_FDIR);
 		field_interrupts();
 		break;
 	}

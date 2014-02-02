@@ -371,6 +371,7 @@ static const ins8250_interface h19_ace_interface =
 static MC6845_INTERFACE( h19_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8 /*?*/,
 	NULL,
 	h19_update_row,

@@ -471,6 +471,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 static MC6845_INTERFACE( pyl601_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8 /*?*/,
 	NULL,
 	pyl601_update_row,
@@ -485,6 +486,7 @@ static MC6845_INTERFACE( pyl601_crtc6845_interface )
 static MC6845_INTERFACE( pyl601a_crtc6845_interface )
 {
 	false,
+	0,0,0,0,
 	8 /*?*/,
 	NULL,
 	pyl601a_update_row,

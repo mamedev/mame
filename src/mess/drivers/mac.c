@@ -918,18 +918,6 @@ static const floppy_interface mac_floppy_interface =
 	NULL
 };
 
-static const cuda_interface mac_cuda_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, adb_linechange_w)
-};
-
-static const cuda_interface mac_egret_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w),
-	DEVCB_DRIVER_LINE_MEMBER(mac_state, adb_linechange_w)
-};
-
 static MACHINE_CONFIG_START( mac512ke, mac_state )
 
 	/* basic machine hardware */
@@ -971,7 +959,7 @@ static MACHINE_CONFIG_START( mac512ke, mac_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
-	MCFG_DEVICE_ADD(MACKBD_TAG, MACKBD, 0)
+ 	MCFG_MACKBD_ADD(MACKBD_TAG)
 #ifdef MAC_USE_EMULATED_KBD
 	MCFG_MACKBD_DATAOUT_HANDLER(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 	MCFG_MACKBD_CLKOUT_HANDLER(WRITELINE(mac_state, mac_kbd_clk_in))
@@ -1020,7 +1008,7 @@ static MACHINE_CONFIG_DERIVED( macse, macplus )
 	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
@@ -1029,7 +1017,7 @@ static MACHINE_CONFIG_DERIVED( macse, macplus )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,2560K,4M")
 
-	MCFG_DEVICE_REMOVE(MACKBD_TAG)
+	MCFG_MACKBD_REMOVE(MACKBD_TAG)
 
 	MCFG_MACPDS_BUS_ADD("sepds", "maincpu", macpds_intf)
 	MCFG_MACPDS_SLOT_ADD("sepds", "pds", mac_sepds_cards, NULL)
@@ -1044,7 +1032,7 @@ static MACHINE_CONFIG_DERIVED( macclasc, macplus )
 	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
@@ -1053,11 +1041,10 @@ static MACHINE_CONFIG_DERIVED( macclasc, macplus )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,2560K,4M")
 
-	MCFG_DEVICE_REMOVE(MACKBD_TAG)
+	MCFG_MACKBD_REMOVE(MACKBD_TAG)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macprtb, mac_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C15M)
 	MCFG_CPU_PROGRAM_MAP(macprtb_map)
@@ -1095,10 +1082,10 @@ static MACHINE_CONFIG_START( macprtb, mac_state )
 
 	MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a_pmu))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b_pmu))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a_pmu))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_pmu))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
@@ -1150,7 +1137,7 @@ static MACHINE_CONFIG_START( macii, mac_state )
 	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
@@ -1248,6 +1235,9 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M,10M")
 
+	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_egadb))
+
 	MCFG_NUBUS_SLOT_REMOVE("nb9")
 	MCFG_NUBUS_SLOT_REMOVE("nba")
 	MCFG_NUBUS_SLOT_REMOVE("nbb")
@@ -1263,7 +1253,11 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_EGRET_ADD(EGRET_341S0850, mac_egret_interface)
+	MCFG_EGRET_ADD(EGRET_341S0850)
+	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
+	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
+	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
@@ -1281,7 +1275,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( maccclas, maclc2 )
 
 	MCFG_EGRET_REMOVE()
-	MCFG_CUDA_ADD(CUDA_341S0788, mac_cuda_interface)    // should be 0417, but that version won't sync up properly with the '030 right now
+	MCFG_CUDA_ADD(CUDA_341S0788)    // should be 0417, but that version won't sync up properly with the '030 right now
+	MCFG_CUDA_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
+	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
+	MCFG_CUDA_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
+
+	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc3, maclc )
@@ -1304,13 +1305,24 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851, mac_egret_interface)
+	MCFG_EGRET_REPLACE(EGRET_341S0851)
+	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
+	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
+	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc520, maclc3 )
 
 	MCFG_EGRET_REMOVE()
-	MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
+	MCFG_CUDA_ADD(CUDA_341S0060)
+	MCFG_CUDA_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
+	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
+	MCFG_CUDA_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
+
+	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciivx, maclc )
@@ -1334,7 +1346,11 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M")
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851, mac_egret_interface)
+	MCFG_EGRET_REPLACE(EGRET_341S0851)
+	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
+	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
+	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciivi, maclc )
@@ -1358,7 +1374,11 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M")
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851, mac_egret_interface)
+	MCFG_EGRET_REPLACE(EGRET_341S0851)
+	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
+	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
+	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciix, macii )
@@ -1421,7 +1441,7 @@ static MACHINE_CONFIG_START( macse30, mac_state )
 	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
@@ -1479,17 +1499,17 @@ static MACHINE_CONFIG_START( macpb140, mac_state )
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
 	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b_via2pmu))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_via2pmu))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a_pmu))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b_pmu))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a_pmu))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b_pmu))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
 
 	/* internal ram */
@@ -1559,17 +1579,17 @@ static MACHINE_CONFIG_START( macpb160, mac_state )
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 783360)
 	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b_via2pmu))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_via2pmu))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 783360)
-	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b))
+	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state, mac_via2_in_a_pmu))
+	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state, mac_via2_in_b_pmu))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via2_out_a_pmu))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via2_out_b_pmu))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via2_irq))
 
 	/* internal ram */
@@ -1634,7 +1654,11 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_RAM_DEFAULT_SIZE("10M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,6M,8M,10M")
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851, mac_egret_interface)
+	MCFG_EGRET_REPLACE(EGRET_341S0851)
+	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
+	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
+	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciici, macii )
@@ -1697,7 +1721,14 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M,128M")
 
-	MCFG_EGRET_ADD(EGRET_344S0100, mac_egret_interface)
+	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_egadb))
+
+	MCFG_EGRET_ADD(EGRET_344S0100)
+	MCFG_EGRET_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
+	MCFG_EGRET_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
+	MCFG_EGRET_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
@@ -1742,7 +1773,7 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 
@@ -1758,7 +1789,11 @@ static MACHINE_CONFIG_START( pwrmac, mac_state )
 	MCFG_RAM_DEFAULT_SIZE("8M")
 	MCFG_RAM_EXTRA_OPTIONS("16M,32M,64M,128M")
 
-	MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
+	MCFG_CUDA_ADD(CUDA_341S0060)
+	MCFG_CUDA_RESET_CALLBACK(WRITELINE(mac_state, cuda_reset_w))
+	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(mac_state, adb_linechange_w))
+	MCFG_CUDA_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( macqd700, mac_state )
@@ -1799,7 +1834,7 @@ static MACHINE_CONFIG_START( macqd700, mac_state )
 	MCFG_VIA6522_READPA_HANDLER(READ8(mac_state,mac_via_in_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(mac_state,mac_via_in_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mac_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_bbadb))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(mac_state,mac_adb_via_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(mac_state,mac_via_irq))
 

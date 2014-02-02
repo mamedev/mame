@@ -41,7 +41,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_reset();
 
 	// device_sms_control_port_interface overrides
 	virtual UINT8 peripheral_r();
@@ -53,10 +52,10 @@ private:
 	required_ioport m_sports_x;
 	required_ioport m_sports_y;
 
-	UINT8 m_sports_pad_state;
-	UINT8 m_sports_pad_last_data;
-	const attotime m_sports_pad_interval;
-	attotime m_sports_pad_last_time;
+	UINT8 m_read_state;
+	UINT8 m_last_data;
+	const attotime m_interval;
+	attotime m_last_time;
 };
 
 

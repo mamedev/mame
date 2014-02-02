@@ -389,6 +389,7 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 static MC6845_INTERFACE( hp9k_mc6845_intf )
 {
 	false,
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of dots per character */
 	NULL,
 	NULL,       /* handler to display a scanline */

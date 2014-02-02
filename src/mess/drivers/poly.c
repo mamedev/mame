@@ -59,7 +59,6 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(pia1_b_in);
-	DECLARE_READ_LINE_MEMBER(pia1_cb1_in);
 	DECLARE_READ8_MEMBER(videoram_r);
 	UINT8 m_term_data;
 	bool m_term_key;
@@ -100,22 +99,6 @@ void poly_state::machine_reset()
 {
 }
 
-static const pia6821_interface poly_pia0_intf=
-{
-	DEVCB_NULL,                     /* port A input */
-	DEVCB_NULL, /* port B input */
-	DEVCB_NULL, /* CA1 input */
-	DEVCB_NULL, /* CB1 input */
-	DEVCB_NULL,                     /* CA2 input */
-	DEVCB_NULL,                     /* CB2 input */
-	DEVCB_NULL, /* port A output */
-	DEVCB_NULL, /* port B output */
-	DEVCB_NULL, /* CA2 output */
-	DEVCB_NULL, /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),    /* IRQA output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)     /* IRQB output */
-};
-
 READ8_MEMBER( poly_state::pia1_b_in )
 {
 // return ascii key value, bit 7 is the strobe value
@@ -124,28 +107,6 @@ READ8_MEMBER( poly_state::pia1_b_in )
 	return data;
 }
 
-READ_LINE_MEMBER( poly_state::pia1_cb1_in )
-{
-// return kbd strobe value
-	return 0;
-}
-
-
-static const pia6821_interface poly_pia1_intf=
-{
-	DEVCB_NULL,     /* port A input */
-	DEVCB_DRIVER_MEMBER(poly_state, pia1_b_in),     /* port B input */
-	DEVCB_NULL,     /* CA1 input */
-	DEVCB_DRIVER_LINE_MEMBER(poly_state, pia1_cb1_in),      /* CB1 input */
-	DEVCB_NULL,     /* CA2 input */
-	DEVCB_NULL,     /* CB2 input */
-	DEVCB_NULL,     /* port A output */
-	DEVCB_NULL,     /* port B output */
-	DEVCB_NULL,     /* CA2 output */
-	DEVCB_NULL,     /* CB2 output */
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
-};
 
 static const ptm6840_interface poly_ptm_intf =
 {
@@ -219,8 +180,17 @@ static MACHINE_CONFIG_START( poly, poly_state )
 
 	/* Devices */
 	MCFG_SAA5050_ADD("saa5050", 6000000, poly_saa5050_intf)
-	MCFG_PIA6821_ADD( "pia0", poly_pia0_intf )
-	MCFG_PIA6821_ADD( "pia1", poly_pia1_intf )
+
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(poly_state, pia1_b_in))
+	// CB1 kbd strobe
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+
 	MCFG_PTM6840_ADD("ptm", poly_ptm_intf)
 	MCFG_ACIA6850_ADD("acia", acia_intf)
 	MCFG_MC6854_ADD("adlc", adlc_intf)

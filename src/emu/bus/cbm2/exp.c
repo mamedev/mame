@@ -203,6 +203,7 @@ void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, UINT
 
 SLOT_INTERFACE_START( cbm2_expansion_cards )
 	SLOT_INTERFACE("24k", CBM2_24K)
+	SLOT_INTERFACE("hrga", CBM2_HRG_A)
+	SLOT_INTERFACE("hrgb", CBM2_HRG_B)
 	SLOT_INTERFACE_INTERNAL("standard", CBM2_STD)
-	SLOT_INTERFACE_INTERNAL("graphic", CBM2_GRAPHIC)
 SLOT_INTERFACE_END

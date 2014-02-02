@@ -74,7 +74,6 @@ public:
 	DECLARE_WRITE8_MEMBER( x_pia_pa_w );
 	DECLARE_WRITE8_MEMBER( x_pia_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( adot_w );
-	DECLARE_READ_LINE_MEMBER( viewcause_r );
 	DECLARE_WRITE_LINE_MEMBER( bufclk_w );
 	DECLARE_WRITE_LINE_MEMBER( x_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( x_pia_irqb_w );
@@ -82,9 +81,6 @@ public:
 	DECLARE_READ8_MEMBER( sa_r );
 	DECLARE_WRITE8_MEMBER( y_pia_pa_w );
 	DECLARE_WRITE8_MEMBER( sb_w );
-	DECLARE_READ_LINE_MEMBER( rdbyte_r );
-	DECLARE_READ_LINE_MEMBER( mdata_r );
-	DECLARE_READ_LINE_MEMBER( fmark_r );
 	DECLARE_WRITE_LINE_MEMBER( sot_w );
 	DECLARE_WRITE_LINE_MEMBER( y_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( y_pia_irqb_w );
@@ -92,7 +88,6 @@ public:
 	DECLARE_READ8_MEMBER( kb_pia_pa_r );
 	DECLARE_READ8_MEMBER( kb_pia_pb_r );
 	DECLARE_WRITE8_MEMBER( kb_pia_pb_w );
-	DECLARE_READ_LINE_MEMBER( key_r );
 	DECLARE_WRITE_LINE_MEMBER( kb_halt_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_pia_irqb_w );
@@ -100,10 +95,6 @@ public:
 	DECLARE_READ8_MEMBER( tape_pia_pa_r );
 	DECLARE_WRITE8_MEMBER( tape_pia_pa_w );
 	DECLARE_WRITE8_MEMBER( tape_pia_pb_w );
-	DECLARE_READ_LINE_MEMBER( rmark_r );
-	DECLARE_READ_LINE_MEMBER( lohole_r );
-	DECLARE_READ_LINE_MEMBER( filfnd_r );
-	DECLARE_READ_LINE_MEMBER( uphole_r );
 	DECLARE_WRITE_LINE_MEMBER( tape_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( tape_pia_irqb_w );
 
@@ -139,7 +130,6 @@ public:
 	// keyboard
 	int m_kbhalt;
 	int m_kc;
-	int m_key;
 
 	// GPIB
 	int m_talk;

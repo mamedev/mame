@@ -10,6 +10,10 @@
 #ifndef __TMS9927__
 #define __TMS9927__
 
+
+#define MCFG_TMS9927_VSYN_CALLBACK(_write) \
+	devcb = &tms9927_device::set_vsyn_wr_callback(*device, DEVCB2_##_write);
+
 /* interface */
 struct tms9927_interface
 {
@@ -27,6 +31,8 @@ public:
 	tms9927_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~tms9927_device() {}
 
+	template<class _Object> static devcb2_base &set_vsyn_wr_callback(device_t &device, _Object object) { return downcast<tms9927_device &>(device).m_write_vsyn.set_callback(object); }
+
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
 
@@ -40,12 +46,19 @@ protected:
 	virtual void device_start();
 	virtual void device_stop();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	enum
+	{
+		TIMER_VSYNC
+	};
 
 	void state_postload();
 	void recompute_parameters(int postload);
 	void generic_access(address_space &space, offs_t offset);
+
+	devcb2_write_line m_write_vsyn;
 
 	// internal state
 	const UINT8 *m_selfload;
@@ -60,6 +73,10 @@ private:
 	UINT8   m_valid_config;
 	UINT16  m_total_hpix, m_total_vpix;
 	UINT16  m_visible_hpix, m_visible_vpix;
+
+	int m_vsyn;
+
+	emu_timer *m_vsync_timer;
 };
 
 extern const device_type TMS9927;

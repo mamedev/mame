@@ -16,7 +16,7 @@
 #define NLTIME_FROM_NS(_t)  netlist_time::from_nsec(_t)
 #define NLTIME_FROM_US(_t)  netlist_time::from_usec(_t)
 #define NLTIME_FROM_MS(_t)  netlist_time::from_msec(_t)
-#define NLTIME_IMMEDIATE    netlist_time::from_nsec(0)
+#define NLTIME_IMMEDIATE    netlist_time::from_nsec(1)
 
 // ----------------------------------------------------------------------------------------
 // net_list_time

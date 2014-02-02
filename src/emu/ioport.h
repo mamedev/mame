@@ -1218,7 +1218,7 @@ public:
 	ioport_port *first_port() const { return m_portlist.first(); }
 	bool safe_to_read() const { return m_safe_to_read; }
 	natural_keyboard &natkeyboard() { return m_natkeyboard; }
-
+ 
 	// has... getters
 	bool has_configs() const { return m_has_configs; }
 	bool has_analog() const { return m_has_analog; }

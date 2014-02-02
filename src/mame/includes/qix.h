@@ -120,7 +120,7 @@ public:
 	DECLARE_READ8_MEMBER(slither_trak_lr_r);
 	DECLARE_READ8_MEMBER(slither_trak_ud_r);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
-	DECLARE_WRITE8_MEMBER(qix_flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(qix_flip_screen_w);
 	DECLARE_WRITE8_MEMBER(qix_dac_w);
 	DECLARE_WRITE8_MEMBER(qix_vol_w);
 	DECLARE_WRITE8_MEMBER(sndpia_2_warning_w);
@@ -133,17 +133,6 @@ public:
 	int kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table);
 	int kram3_decrypt(int address, int value);
 };
-
-
-/*----------- defined in machine/qix.c -----------*/
-
-extern const pia6821_interface qix_pia_0_intf;
-extern const pia6821_interface qix_pia_1_intf;
-extern const pia6821_interface qix_pia_2_intf;
-extern const pia6821_interface qixmcu_pia_0_intf;
-extern const pia6821_interface qixmcu_pia_2_intf;
-extern const pia6821_interface slither_pia_1_intf;
-extern const pia6821_interface slither_pia_2_intf;
 
 /*----------- defined in video/qix.c -----------*/
 

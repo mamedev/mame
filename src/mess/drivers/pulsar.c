@@ -16,8 +16,6 @@ The terminal must be set for 9600 baud, 7 bits, even parity, 1 stop bit.
 
 
 ToDo:
-- Hook up the rs232, once the bugs in z80dart/rs232 are sorted
-   (data from board is corrupt but from keyboard is fine)
 - Need software
 
 
@@ -46,7 +44,6 @@ X - Test off-board memory banks
 #include "machine/com8116.h"
 #include "machine/serial.h"
 #include "machine/wd_fdc.h"
-#include "machine/terminal.h"
 
 
 class pulsar_state : public driver_device
@@ -59,7 +56,6 @@ public:
 		, m_brg(*this, "brg")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
-		, m_terminal(*this, TERMINAL_TAG)
 		, m_rtc(*this, "rtc")
 	{ }
 
@@ -73,18 +69,14 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
+
 private:
-	UINT8 m_term_data;
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dart_device> m_dart;
 	required_device<com8116_device> m_brg;
 	required_device<fd1797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
-	required_device<generic_terminal_device> m_terminal;
 	required_device<msm5832_device> m_rtc;
 };
 
@@ -98,9 +90,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pulsar_io, AS_IO, 8, pulsar_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x0c) AM_DEVREADWRITE("z80dart", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(keyin_r) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE(0xc1, 0xc1) AM_READ(status_r)
+	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x0c) AM_DEVREADWRITE("z80dart", z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xf0, 0xff) AM_WRITE(baud_w)
@@ -196,17 +186,21 @@ static I8255_INTERFACE( ppi_intf )
 };
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x0f, 0x06 ) // 9600
-	DEVICE_INPUT_DEFAULTS( "TERM_FRAME", 0x30, 0x10 ) // 7E1
+	DEVICE_INPUT_DEFAULTS( "TERM_TXBAUD", 0xff, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_RXBAUD", 0xff, 0x06 ) // 9600
+	DEVICE_INPUT_DEFAULTS( "TERM_STARTBITS", 0xff, 0x01 ) // 1
+	DEVICE_INPUT_DEFAULTS( "TERM_DATABITS", 0xff, 0x02 ) // 7
+	DEVICE_INPUT_DEFAULTS( "TERM_PARITY", 0xff, 0x02 ) // E
+	DEVICE_INPUT_DEFAULTS( "TERM_STOPBITS", 0xff, 0x01 ) // 1
 DEVICE_INPUT_DEFAULTS_END
 
 static Z80DART_INTERFACE( dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER("rs232", rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -254,28 +248,6 @@ DRIVER_INIT_MEMBER( pulsar_state, pulsar )
 	membank("bankw1")->configure_entry(0, &main[0xf800]);
 }
 
-READ8_MEMBER( pulsar_state::keyin_r )
-{
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( pulsar_state::status_r )
-{
-	return (m_term_data) ? 5 : 4;
-}
-
-WRITE8_MEMBER( pulsar_state::kbd_put )
-{
-	m_term_data = data;
-}
-
-static GENERIC_TERMINAL_INTERFACE( terminal_intf )
-{
-	DEVCB_DRIVER_MEMBER(pulsar_state, kbd_put)
-};
-
 static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -289,13 +261,10 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, NULL, WRITELINE(pulsar_state, fr_w), WRITELINE(pulsar_state, ft_w))
 	MCFG_Z80DART_ADD("z80dart",  XTAL_4MHz, dart_intf )
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
-	//MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
-	//MCFG_RS232_OUT_DCD_HANDLER(DEVWRITELINE("z80dart", z80dart_device, dcda_w))
-	//MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ctsa_w))
-	//MCFG_RS232_OUT_RI_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ria_w))
-	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "serial_terminal")
+	MCFG_SERIAL_OUT_RX_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
+	MCFG_RS232_OUT_CTS_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ctsa_w))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("serial_terminal", terminal)
 	MCFG_FD1797x_ADD("fdc", XTAL_4MHz / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525dd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END

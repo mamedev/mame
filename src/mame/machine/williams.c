@@ -13,206 +13,6 @@
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 
-/*************************************
- *
- *  Generic old-Williams PIA interfaces
- *
- *************************************/
-
-/* Generic PIA 0, maps to input ports 0 and 1 */
-const pia6821_interface williams_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
-};
-
-/* Generic muxing PIA 0, maps to input ports 0/3 and 1; port select is CB2 */
-/* Generic dual muxing PIA 0, maps to input ports 0/3 and 1/4; port select is CB2 */
-/* muxing done in williams_mux_r */
-const pia6821_interface williams_muxed_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams_port_select_w),
-	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
-};
-
-/* Generic 49-way joystick PIA 0 for Sinistar/Blaster */
-const pia6821_interface williams_49way_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(williams_state,williams_49way_port_0_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
-};
-
-/* Muxing 49-way joystick PIA 0 for Blaster kit */
-const pia6821_interface williams_49way_muxed_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(williams_state,williams_input_port_49way_0_5_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams_port_select_w),
-	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
-};
-
-/* Generic PIA 1, maps to input port 2, sound command out, and IRQs */
-const pia6821_interface williams_pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
-};
-
-/* Generic PIA 2, maps to DAC data in and sound IRQs */
-const pia6821_interface williams_snd_pia_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq)
-};
-/* Same as above, but for second sound board */
-const pia6821_interface williams_snd_pia_b_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac_b", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq_b), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq_b)
-};
-
-
-
-/*************************************
- *
- *  Game-specific old-Williams PIA interfaces
- *
- *************************************/
-
-/* Special PIA 0 for Lotto Fun, to handle the controls and ticket dispenser */
-const pia6821_interface lottofun_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DEVICE_MEMBER("ticket", ticket_dispenser_device, write), DEVCB_DRIVER_MEMBER(williams_state,lottofun_coin_lock_w), DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
-};
-
-/* Special PIA 2 for Sinistar, to handle the CVSD */
-const pia6821_interface sinistar_snd_pia_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("cvsd", hc55516_device, digit_w), DEVCB_DEVICE_LINE_MEMBER("cvsd", hc55516_device, clock_w),
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq)
-};
-
-/* Special PIA 1 for PlayBall, doesn't set the high bits on sound commands */
-const pia6821_interface playball_pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,playball_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
-};
-
-/* Special PIA 1 for Blaster, to support two sound boards */
-const pia6821_interface blaster_pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,blaster_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
-};
-
-/* extra PIA 3 for Speed Ball */
-const pia6821_interface spdball_pia_3_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN3"), DEVCB_INPUT_PORT("IN4"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
-};
-
-
-
-/*************************************
- *
- *  Generic later-Williams PIA interfaces
- *
- *************************************/
-
-/* Generic muxing PIA 0, maps to input ports 0/3 and 1; port select is CA2 */
-const pia6821_interface williams2_muxed_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams_port_select_w), DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
-};
-
-/* Generic PIA 1, maps to input port 2, sound command out, and IRQs */
-const pia6821_interface williams2_pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
-};
-
-/* Generic PIA 2, maps to DAC data in and sound IRQs */
-const pia6821_interface williams2_snd_pia_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq)
-};
-
-
-
-/*************************************
- *
- *  Game-specific later-Williams PIA interfaces
- *
- *************************************/
-
-/* Mystic Marathon PIA 0 */
-const pia6821_interface mysticm_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_firq), DEVCB_DRIVER_LINE_MEMBER(williams_state,mysticm_main_irq)
-};
-
-/* Mystic Marathon PIA 1 */
-const pia6821_interface mysticm_pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,mysticm_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,mysticm_main_irq)
-};
-
-/* Turkey Shoot PIA 0 */
-const pia6821_interface tshoot_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(williams_state,tshoot_input_port_0_3_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,tshoot_lamp_w), DEVCB_DRIVER_MEMBER(williams_state,williams_port_select_w), DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,tshoot_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,tshoot_main_irq)
-};
-
-/* Turkey Shoot PIA 1 */
-const pia6821_interface tshoot_pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,tshoot_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,tshoot_main_irq)
-};
-
-/* Turkey Shoot PIA 2 */
-const pia6821_interface tshoot_snd_pia_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_DRIVER_MEMBER(williams_state,tshoot_maxvol_w),
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq)
-};
-
-/* Joust 2 PIA 1 */
-const pia6821_interface joust2_pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(joust2_state,joust2_snd_cmd_w), DEVCB_DRIVER_MEMBER(joust2_state,joust2_pia_3_cb1_w), DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
-	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
-};
-
-
 
 /*************************************
  *
@@ -572,9 +372,9 @@ WRITE8_MEMBER(williams_state::williams2_snd_cmd_w)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams_port_select_w)
+WRITE_LINE_MEMBER(williams_state::williams_port_select_w)
 {
-	m_port_select = data;
+	m_port_select = state;
 }
 
 CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
@@ -887,9 +687,9 @@ WRITE8_MEMBER(williams_state::blaster_bank_select_w)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::lottofun_coin_lock_w)
+WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
 {
-	coin_lockout_global_w(machine(), data & 1); /* bit 5 of PIC control port A */
+	coin_lockout_global_w(machine(), state & 1); /* bit 5 of PIC control port A */
 }
 
 
@@ -912,10 +712,10 @@ READ8_MEMBER(williams_state::tshoot_input_port_0_3_r)
 }
 
 
-WRITE8_MEMBER(williams_state::tshoot_maxvol_w)
+WRITE_LINE_MEMBER(williams_state::tshoot_maxvol_w)
 {
 	/* something to do with the sound volume */
-	logerror("tshoot maxvol = %d (%s)\n", data, machine().describe_context());
+	logerror("tshoot maxvol = %d (%s)\n", state, machine().describe_context());
 }
 
 
@@ -960,9 +760,9 @@ TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
 }
 
 
-WRITE8_MEMBER(joust2_state::joust2_pia_3_cb1_w)
+WRITE_LINE_MEMBER(joust2_state::joust2_pia_3_cb1_w)
 {
-	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
+	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0x100) | ((state << 8) & 0x100);
 	m_cvsd_sound->write(machine().driver_data()->generic_space(), 0, m_joust2_current_sound_data);
 }
 

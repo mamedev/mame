@@ -52,7 +52,7 @@ public:
 	virtual void dtr_w(UINT8 state) { m_dtr = state; check_state(); }
 	virtual void rts_w(UINT8 state) { m_rts = state; check_state(); m_old_rts = state; }
 protected:
-	virtual void set_frame() { set_data_frame(7, 2, PARITY_NONE, false); }
+	virtual void set_frame() { set_data_frame(1, 7, PARITY_NONE, STOP_BITS_2); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
 	virtual void device_reset() {m_old_rts = 0; serial_mouse_device::device_reset();}
 private:
@@ -68,7 +68,7 @@ public:
 	virtual void dtr_w(UINT8 state) { m_dtr = state; check_state(); }
 	virtual void rts_w(UINT8 state) { m_rts = state; check_state(); }
 protected:
-	virtual void set_frame() { set_data_frame(8, 2, PARITY_NONE, false); }
+	virtual void set_frame() { set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
 private:
 	void check_state() { set_mouse_enable((m_dtr && m_rts)?true:false); }

@@ -1,4 +1,11 @@
+/***************************************************************************
+
+    Namco System NB-1 hardware
+
+***************************************************************************/
+
 #include "namcos2.h"
+#include "machine/eeprompar.h"
 
 #define NAMCONB1_HTOTAL     (288)   /* wrong */
 #define NAMCONB1_HBSTART    (288)
@@ -22,14 +29,14 @@ public:
 		: namcos2_shared_state(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_mcu(*this,"mcu"),
-		m_nvmem32(*this, "nvmem32"),
+		m_eeprom(*this, "eeprom"),
 		m_spritebank32(*this, "spritebank32"),
 		m_tilebank32(*this, "tilebank32"),
 		m_namconb_shareram(*this, "namconb_share"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
-	required_shared_ptr<UINT32> m_nvmem32;
+	required_device<eeprom_parallel_28xx_device> m_eeprom;
 	required_shared_ptr<UINT32> m_spritebank32;
 	optional_shared_ptr<UINT32> m_tilebank32;
 	required_shared_ptr<UINT16> m_namconb_shareram;

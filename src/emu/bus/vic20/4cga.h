@@ -27,7 +27,7 @@
 // ======================> c64_4cga_device
 
 class c64_4cga_device : public device_t,
-						public device_c64_user_port_interface
+	public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
@@ -36,20 +36,29 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
+	DECLARE_WRITE_LINE_MEMBER(write_joy3_0) { if (state) m_joy3 |= 1; else m_joy3 &= ~1; update_output(); }
+	DECLARE_WRITE_LINE_MEMBER(write_joy3_1) { if (state) m_joy3 |= 2; else m_joy3 &= ~2; update_output(); }
+	DECLARE_WRITE_LINE_MEMBER(write_joy3_2) { if (state) m_joy3 |= 4; else m_joy3 &= ~4; update_output(); }
+	DECLARE_WRITE_LINE_MEMBER(write_joy3_3) { if (state) m_joy3 |= 8; else m_joy3 &= ~8; update_output(); }
+
+	DECLARE_WRITE_LINE_MEMBER(write_joy4_0) { if (state) m_joy4 |= 1; else m_joy4 &= ~1; update_output(); }
+	DECLARE_WRITE_LINE_MEMBER(write_joy4_1) { if (state) m_joy4 |= 2; else m_joy4 &= ~2; update_output(); }
+	DECLARE_WRITE_LINE_MEMBER(write_joy4_2) { if (state) m_joy4 |= 4; else m_joy4 &= ~4; update_output(); }
+	DECLARE_WRITE_LINE_MEMBER(write_joy4_3) { if (state) m_joy4 |= 8; else m_joy4 &= ~8; update_output(); }
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 
-	// device_c64_user_port_interface overrides
-	virtual UINT8 c64_pb_r(address_space &space, offs_t offset);
-	virtual void c64_pb_w(address_space &space, offs_t offset, UINT8 data);
+	// device_pet_user_port_interface overrides
+	virtual DECLARE_WRITE_LINE_MEMBER( input_l );
 
 private:
-	required_ioport m_fire;
-	required_ioport m_joy3;
-	required_ioport m_joy4;
+	void update_output();
 
 	int m_port;
+	UINT8 m_joy3;
+	UINT8 m_joy4;
 };
 
 

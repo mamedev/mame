@@ -344,7 +344,6 @@ public:
 	void svg_basic_init();
 	void pgm_create_dummy_internal_arm_region(int size);
 	void pgm_patch_external_arm_rom_jumptable_theglada(int base);
-	void pgm_patch_external_arm_rom_jumptable_svg(int base);
 	void pgm_create_dummy_internal_arm_region_theglad(int is_svg);
 	void pgm_descramble_happy6(UINT8* src);
 	void pgm_descramble_happy6_2(UINT8* src);
@@ -353,7 +352,9 @@ public:
 	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );
 	DECLARE_READ32_MEMBER( killbldp_speedup_r );
 	DECLARE_READ32_MEMBER( theglad_speedup_r );
+	DECLARE_READ32_MEMBER( happy6_speedup_r );
 	DECLARE_READ32_MEMBER( svg_speedup_r );
+	DECLARE_READ32_MEMBER( svgpcb_speedup_r );
 	DECLARE_MACHINE_RESET(pgm_arm_type3_reset);
 };
 

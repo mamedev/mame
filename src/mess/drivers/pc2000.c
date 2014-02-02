@@ -620,7 +620,7 @@ ROM_START( gl2000p )
 	ROM_CART_LOAD( "cart", 0, 0x40000, 0 )
 ROM_END
 
-ROM_START( gln )
+ROM_START( gln ) // not Z80 code
 	ROM_REGION( 0x80000, "bios", 0 )
 	ROM_LOAD( "27-5308-00_9524_d.bin", 0x000000, 0x080000, CRC(d1b994ee) SHA1(b5cf0810df0676712e4f30e279cc46c19b4277dd))
 
@@ -635,11 +635,19 @@ ROM_START( misterx )
 	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
 ROM_END
 
+ROM_START( iqunlimz )
+	ROM_REGION( 0x80000, "bios", 0 )
+	ROM_LOAD( "vtech.bin", 0x000000, 0x080000, CRC(f100c8a7) SHA1(6ad2a8accae2dd5c5c46ae953eef33cdd1ea3cf9) )
+
+	ROM_REGION( 0x40000, "cart", ROMREGION_ERASEFF )
+ROM_END
+
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1988, misterx, 0,       0,    misterx,    pc1000, driver_device,   0,  "Video Technology / Yeno",     "MisterX",      GAME_NOT_WORKING)
-COMP( 1993, pc2000,  0,       0,    pc2000,     pc2000, driver_device,   0,  "Video Technology",   "PreComputer 2000",      GAME_NOT_WORKING)
-COMP( 1993, gl2000,  0,       0,    pc2000,     pc2000, driver_device,   0,  "Video Technology",   "Genius Leader 2000",      GAME_NOT_WORKING)
-COMP( 1993, gl2000p,  gl2000,       0,    pc2000,     pc2000, driver_device,   0,  "Video Technology",   "Genius Leader 2000 Plus",      GAME_NOT_WORKING)
-COMP( 199?, gln,  0,       0,    pc2000,     pc2000, driver_device,   0,  "Video Technology",   "Genius Leader Notebook",      GAME_NOT_WORKING)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1988, misterx,  0,       0,     misterx,   pc1000, driver_device,   0,  "Video Technology / Yeno", "MisterX", GAME_NOT_WORKING)
+COMP( 1993, pc2000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "PreComputer 2000", GAME_NOT_WORKING)
+COMP( 1993, gl2000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000", GAME_NOT_WORKING)
+COMP( 1993, gl2000p,  gl2000,  0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000 Plus", GAME_NOT_WORKING)
+COMP( 199?, gln,      0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader Notebook", GAME_NOT_WORKING)
+COMP( 1991, iqunlimz, gl2000,  0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "IQ Unlimited (Z80)", GAME_NOT_WORKING)

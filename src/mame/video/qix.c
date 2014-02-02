@@ -81,9 +81,9 @@ WRITE_LINE_MEMBER(qix_state::display_enable_changed)
  *
  *************************************/
 
-WRITE8_MEMBER(qix_state::qix_flip_screen_w)
+WRITE_LINE_MEMBER(qix_state::qix_flip_screen_w)
 {
-	m_flip = data;
+	m_flip = state;
 }
 
 
@@ -385,6 +385,7 @@ ADDRESS_MAP_END
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,                              /* show border area */
+	0,0,0,0,                            /* visarea adjustment */
 	8,                                  /* number of pixels per video memory address */
 	begin_update,                       /* before pixel update callback */
 	update_row,                         /* row update callback */

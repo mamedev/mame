@@ -998,6 +998,7 @@ GFXDECODE_END
 static MC6845_INTERFACE( mc6845_intf )
 {
 	false,      /* show border area */
+	0,0,0,0,    /* visarea adjustment */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -1007,43 +1008,6 @@ static MC6845_INTERFACE( mc6845_intf )
 	DEVCB_NULL, /* HSYNC callback */
 	DEVCB_NULL, /* VSYNC callback */
 	NULL        /* update address callback */
-};
-
-
-/***********************
-*    PIA Interfaces    *
-***********************/
-
-static const pia6821_interface fclown_pia0_intf =
-{
-	DEVCB_DRIVER_MEMBER(_5clown_state,mux_port_r),  /* Port A IN        Multiplexed Ports read */
-	DEVCB_DRIVER_MEMBER(_5clown_state,pia0_b_r),    /* Port B IN        unknown (used) */
-	DEVCB_NULL,                 /* Line CA1 IN */
-	DEVCB_NULL,                 /* Line CB1 IN */
-	DEVCB_NULL,                 /* Line CA2 IN */
-	DEVCB_NULL,                 /* Line CA2 IN */
-	DEVCB_NULL,                 /* Port A OUT       NULL */
-	DEVCB_DRIVER_MEMBER(_5clown_state,counters_w),  /* Port B OUT       Counters */
-	DEVCB_NULL,                 /* Line CA2 OUT */
-	DEVCB_NULL,                 /* Line CB2 OUT */
-	DEVCB_NULL,                 /* IRQA */
-	DEVCB_NULL                  /* IRQB */
-};
-
-static const pia6821_interface fclown_pia1_intf =
-{
-	DEVCB_INPUT_PORT("SW4"),    /* Port A IN        4th DIP Switchs bank */
-	DEVCB_DRIVER_MEMBER(_5clown_state,pia1_b_r),    /* Port B IN        Check bit 2 to allow key out system to work */
-	DEVCB_NULL,                 /* Line CA1 IN */
-	DEVCB_NULL,                 /* Line CB1 IN */
-	DEVCB_NULL,                 /* Line CA2 IN */
-	DEVCB_NULL,                 /* Line CB2 IN */
-	DEVCB_DRIVER_MEMBER(_5clown_state,trigsnd_w),   /* Port A OUT       Trigger the audio CPU interrupts */
-	DEVCB_DRIVER_MEMBER(_5clown_state,mux_w),       /* Port B OUT       Multiplexed Ports selector */
-	DEVCB_NULL,                 /* Line CA2 OUT */
-	DEVCB_NULL,                 /* Line CB2 OUT */
-	DEVCB_NULL,                 /* IRQA */
-	DEVCB_NULL                  /* IRQB */
 };
 
 
@@ -1078,8 +1042,16 @@ static MACHINE_CONFIG_START( fclown, _5clown_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_PIA6821_ADD("pia0", fclown_pia0_intf)
-	MCFG_PIA6821_ADD("pia1", fclown_pia1_intf)
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(_5clown_state, mux_port_r))
+	MCFG_PIA_READPB_HANDLER(READ8(_5clown_state, pia0_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(_5clown_state, counters_w))
+
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("SW4"))
+	MCFG_PIA_READPB_HANDLER(READ8(_5clown_state, pia1_b_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(_5clown_state, trigsnd_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(_5clown_state, mux_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

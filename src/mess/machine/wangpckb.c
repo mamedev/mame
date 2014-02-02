@@ -417,7 +417,7 @@ void wangpc_keyboard_device::device_start()
 	// set serial callbacks
 	m_maincpu->i8051_set_serial_tx_callback(WRITE8_DELEGATE(wangpc_keyboard_device, mcs51_tx_callback));
 	m_maincpu->i8051_set_serial_rx_callback(READ8_DELEGATE(wangpc_keyboard_device, mcs51_rx_callback));
-	set_data_frame(8, 2, PARITY_NONE, false);
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 }
 
 
