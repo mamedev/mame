@@ -85,7 +85,7 @@ video_manager::video_manager(running_machine &machine)
 		m_overall_real_ticks(0),
 		m_overall_emutime(attotime::zero),
 		m_overall_valid_counter(0),
-		m_throttle(machine.options().throttle()),
+		m_throttle_rate(machine.options().throttle() ? 1.0f : 0.0f),
 		m_fastforward(false),
 		m_seconds_to_run(machine.options().seconds_to_run()),
 		m_auto_frameskip(machine.options().auto_frameskip()),
@@ -718,7 +718,7 @@ void video_manager::update_throttle(attotime emutime)
 
 		// compute conversion factors up front
 		osd_ticks_t ticks_per_second = osd_ticks_per_second();
-		attoseconds_t attoseconds_per_tick = ATTOSECONDS_PER_SECOND / ticks_per_second;
+		attoseconds_t attoseconds_per_tick = ATTOSECONDS_PER_SECOND / ticks_per_second * m_throttle_rate;
 
 		// if we're paused, emutime will not advance; instead, we subtract a fixed
 		// amount of time (1/60th of a second) from the emulated time that was passed in,
@@ -872,9 +872,12 @@ void video_manager::update_frameskip()
 	// if we're throttling and autoframeskip is on, adjust
 	if (effective_throttle() && effective_autoframeskip() && m_frameskip_counter == 0)
 	{
+		// calibrate the "adjusted speed" based on the target
+		double adjusted_speed_percent = m_speed_percent / m_throttle_rate;
+
 		// if we're too fast, attempt to increase the frameskip
 		double speed = m_speed * 0.001;
-		if (m_speed_percent >= 0.995 * speed)
+		if (adjusted_speed_percent >= 0.995 * speed)
 		{
 			// but only after 3 consecutive frames where we are too fast
 			if (++m_frameskip_adjust >= 3)
@@ -889,7 +892,7 @@ void video_manager::update_frameskip()
 		else
 		{
 			// if below 80% speed, be more aggressive
-			if (m_speed_percent < 0.80 *  speed)
+			if (adjusted_speed_percent < 0.80 *  speed)
 				m_frameskip_adjust -= (0.90 * speed - m_speed_percent) / 0.05;
 
 			// if we're close, only force it up to frameskip 8
@@ -1280,5 +1283,5 @@ bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bi
 
 void video_manager::toggle_throttle()
 {
-	set_throttled(!throttled());
+	set_throttle_rate(throttled() ? 0.0f : 1.0f);
 }
