@@ -18,12 +18,13 @@
         World Darts
         Xenon
         World Trophy Soccer
+		Delta Command (N.Y Warriors)
+		Blastaball
+		Aaargh
+		Pharaohs Match
 
     Other Arcadia games (not dumped):
 
-        Aaargh!
-        Blasta Ball
-        N.Y. Warriors
         Pool
         Rockford
 
@@ -82,6 +83,7 @@ public:
 	DECLARE_DRIVER_INIT(blast);
 	DECLARE_DRIVER_INIT(pm);
 	DECLARE_DRIVER_INIT(dlta);
+	DECLARE_DRIVER_INIT(argh);
 	void arcadia_init();
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 };
@@ -862,6 +864,35 @@ ROM_START( ar_dlta )
 ROM_END
 
 
+ROM_START( ar_argh )
+	ARCADIA_BIOS
+
+	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "argh-1-hi-11-28-87.u12",  0x000000, 0x10000, CRC(3b1f8075) SHA1(61aeff9f6a2dff6efe4276cb0bcbb80b495e26b6) )
+	ROM_LOAD16_BYTE( "argh-1-lo-11-28-87.u16",  0x000001, 0x10000, CRC(78b77071) SHA1(5848e30cfd08f9241f8ff9267fdcf2c87c72cdb0) )
+	ROM_LOAD16_BYTE( "argh-2-hi-11-28-87.u11",  0x020000, 0x10000, CRC(9604e1e9) SHA1(03c010fc7075db953b47282ce54097c4921e3560) )
+	ROM_LOAD16_BYTE( "argh-2-lo-11-28-87.u15",  0x020001, 0x10000, CRC(0c7c8133) SHA1(cd8013fa7c2d1c3a518c3e26e5b10c6c78b2a8ee) )
+	ROM_LOAD16_BYTE( "argh-3-hi-11-28-87.u10",  0x040000, 0x10000, CRC(84d60a2c) SHA1(7284db16642bd598390d63408113a0e9622f0b3d) )
+	ROM_LOAD16_BYTE( "argh-3-lo-11-28-87.u14",  0x040001, 0x10000, CRC(f43a6107) SHA1(2075739d7cbd8565df7a0333c1a16838df9aa97c) )
+	ROM_LOAD16_BYTE( "argh-4-hi-11-28-87.u9",   0x060000, 0x10000, CRC(7d9d514d) SHA1(a77a4db1ab0ae41e75fe334fcb1c16bb7627fa6d) )
+	ROM_LOAD16_BYTE( "argh-4-lo-11-28-87.u13",  0x060001, 0x10000, CRC(da797e5c) SHA1(59f000fa43f80d7730e8a5ca3f13571ff150ead2) )
+	ROM_LOAD16_BYTE( "argh-5-hi-11-28-87.u20",  0x080000, 0x10000, CRC(75a395c5) SHA1(3064028b78025bc3d9f96884d155f449ef285be9) )
+	ROM_LOAD16_BYTE( "argh-5-lo-11-28-87.u24",  0x080001, 0x10000, CRC(b69db0ed) SHA1(b47b46e0a69ba40c8b59864469b9836ff7a9b3fb) )
+	ROM_LOAD16_BYTE( "argh-6-hi-11-28-87.u19",  0x0a0000, 0x10000, CRC(f06ee4d5) SHA1(2555c97666ff319089d4e767b99718d21ab43f7d) )
+	ROM_LOAD16_BYTE( "argh-6-lo-11-28-87.u23",  0x0a0001, 0x10000, CRC(9d49526a) SHA1(604731ebdeb6961d6faccc44dc7c762275bc7b3e) )
+	ROM_LOAD16_BYTE( "argh-7-hi-11-28-87.u18",  0x0c0000, 0x10000, CRC(2fda9f36) SHA1(26431fad4aeaa068fa15de9803e818b93547edd6) )
+	ROM_LOAD16_BYTE( "argh-7-lo-11-28-87.u22",  0x0c0001, 0x10000, CRC(ad6f16d4) SHA1(91fb41db567eeccc0088ba3530049921d19f2df2) )
+	ROM_LOAD16_BYTE( "argh-8-hi-11-28-87.u17",  0x0e0000, 0x10000, CRC(06be1705) SHA1(dbbd0471a82075775279ef149862379211dead17) )
+	ROM_LOAD16_BYTE( "argh-8-lo-11-28-87.u21",  0x0e0001, 0x10000, CRC(48f7bed1) SHA1(9864de95f0ad73ec5982b37d35d3fc9776bb18fa) )
+	ROM_LOAD16_BYTE( "argh-9-hi-11-28-87.u28",  0x100000, 0x10000, CRC(f6ef5a54) SHA1(db8df6dd29392154fba65de73a641321baecba3c) )
+	ROM_LOAD16_BYTE( "argh-9-lo-11-28-87.u32",  0x100001, 0x10000, CRC(209fc834) SHA1(d190b84eb18ea6d9aee4279b63e7fe6029e173a9) )
+	ROM_LOAD16_BYTE( "argh-10-hi-11-28-87.u27", 0x120000, 0x10000, CRC(e75c9ac1) SHA1(5f1678e6946beaeb2e79853a2416d8565a84a815) )
+	ROM_LOAD16_BYTE( "argh-10-lo-11-28-87.u31", 0x120001, 0x10000, CRC(dc4da335) SHA1(449c1de89cb6ea6296196051bef5470765872285) )
+	ROM_LOAD16_BYTE( "argh-11-hi-11-28-87.u26", 0x140000, 0x10000, CRC(2932054f) SHA1(f03e71170bd24719c26427c3fbf4fdf1363bc64f) )
+	ROM_LOAD16_BYTE( "argh-11-lo-11-28-87.u30", 0x140001, 0x10000, CRC(3ebf8c30) SHA1(b2018b55cf2339fcf67b338fa2804afa2e47d577) )
+	ROM_LOAD16_BYTE( "argh-12-hi-11-28-87.u25", 0x160000, 0x10000, CRC(0e055d4a) SHA1(8993596018e90107623e04c24e91b02887d6252c) )
+	ROM_LOAD16_BYTE( "argh-12-lo-11-28-87.u29", 0x160001, 0x10000, CRC(940168b0) SHA1(7f86226d533a5d5a84fbcaeea5c4ac08e0e7df09) )
+ROM_END
 
 /*************************************
  *
@@ -881,7 +912,7 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 	#if 0
 	{
 		UINT8 *ROM = memregion(tag)->base();
-		int size = memregion(tag)->bytes();
+	//	int size = memregion(tag)->bytes();
 
 		FILE *fp;
 		char filename[256];
@@ -889,7 +920,9 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
-			fwrite(ROM, size, 1, fp);
+			for (i = 0; i < 0x20000; i++)
+				fwrite(&ROM[i*2], 1, 1, fp);
+
 			fclose(fp);
 		}
 	}
@@ -941,7 +974,7 @@ void arcadia_amiga_state::arcadia_init()
 DRIVER_INIT_MEMBER(arcadia_amiga_state,none) { arcadia_init(); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,airh) { arcadia_init(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,bowl) { arcadia_init(); generic_decode("user3", 7, 6, 0, 1, 2, 3, 4, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,blast){ arcadia_init(); generic_decode("user3", 4, 6, 5, 7, 3, 2, 1, 0); generic_decode("user3", 7,6,0,4, 3,2,1,5 );  generic_decode("user3", 7,6,5,4, 1,2,3,0 );  generic_decode("user3", 7,6,2,4,3,5,1,0);  generic_decode("user3", 7,6,3,4,5,2,1,0 );  generic_decode("user3", 7,6,4,5,3,2,1,0 );generic_decode("user3", 7,4,5,6,3,2,1,0 );  } // todo reduce to single bitswap
+DRIVER_INIT_MEMBER(arcadia_amiga_state,blast){ arcadia_init(); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,dart) { arcadia_init(); generic_decode("user3", 4, 0, 7, 6, 3, 1, 2, 5); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,ldrb) { arcadia_init(); generic_decode("user3", 2, 3, 4, 1, 0, 7, 5, 6); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,ninj) { arcadia_init(); generic_decode("user3", 1, 6, 5, 7, 4, 2, 0, 3); }
@@ -951,8 +984,8 @@ DRIVER_INIT_MEMBER(arcadia_amiga_state,socc) { arcadia_init(); generic_decode("u
 DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg) { arcadia_init(); generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon) { arcadia_init(); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,pm)   { arcadia_init(); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
-DRIVER_INIT_MEMBER(arcadia_amiga_state,dlta) { arcadia_init(); generic_decode("user3", 4, 6, 5, 7, 3, 2, 1, 0); generic_decode("user3", 7, 6, 0, 4, 3, 2, 1, 5); generic_decode("user3", 7, 6, 5, 4, 1, 2, 3, 0);  generic_decode("user3", 7, 6, 2, 4, 3, 5, 1, 0);  generic_decode("user3", 7, 6, 3, 4, 5, 2, 1, 0); generic_decode("user3", 7, 4, 5, 6, 3, 2, 1, 0);  generic_decode("user3", 7, 5, 6, 4, 3, 2, 1, 0); }
-
+DRIVER_INIT_MEMBER(arcadia_amiga_state,dlta) { arcadia_init(); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,argh) { arcadia_init(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
 
 
 /*************************************
@@ -1000,3 +1033,5 @@ GAME( 1988, ar_xeon,    ar_bios, arcadia, arcadia, arcadia_amiga_state, xeon,  R
 GAME( 1988, ar_pm,      ar_bios, arcadia, arcadia, arcadia_amiga_state, pm,  ROT0, "Arcadia Systems", "Pharaohs Match (Arcadia)", 0 )
 
 GAME( 1988, ar_dlta,      ar_bios, arcadia, arcadia, arcadia_amiga_state, dlta,  ROT0, "Arcadia Systems", "Delta Command (Arcadia)", 0 )
+
+GAME( 1988, ar_argh,      ar_bios, arcadia, arcadia, arcadia_amiga_state, argh,  ROT0, "Arcadia Systems", "Aaargh (Arcadia)", GAME_NOT_WORKING )
