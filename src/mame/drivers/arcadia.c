@@ -865,7 +865,12 @@ ROM_END
 
 
 ROM_START( ar_argh )
-	ARCADIA_BIOS
+	ROM_REGION16_BE(0x80000, "user1", 0 )
+	ROM_LOAD16_WORD( "kick12.rom", 0x000000, 0x040000, CRC(a6ce1636) SHA1(11f9e62cf299f72184835b7b2a70a16333fc0d88) )
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x040000 )
+
+	// this plugs directly into the a500 motherboard, no arcadia bios, just the a500 kickstart and game ROMs
+	ROM_REGION16_BE( 0x80000, "user2", ROMREGION_ERASEFF )
 
 	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "argh-1-hi-11-28-87.u12",  0x000000, 0x10000, CRC(3b1f8075) SHA1(61aeff9f6a2dff6efe4276cb0bcbb80b495e26b6) )
@@ -985,7 +990,7 @@ DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg) { arcadia_init(); generic_decode("u
 DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon) { arcadia_init(); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
 DRIVER_INIT_MEMBER(arcadia_amiga_state,pm)   { arcadia_init(); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
 DRIVER_INIT_MEMBER(arcadia_amiga_state,dlta) { arcadia_init(); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,argh) { arcadia_init(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,argh) { arcadia_init(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); memcpy(memregion("user2")->base(), memregion("user3")->base(), 0x80000); }
 
 
 /*************************************
@@ -1034,4 +1039,4 @@ GAME( 1988, ar_pm,      ar_bios, arcadia, arcadia, arcadia_amiga_state, pm,  ROT
 
 GAME( 1988, ar_dlta,      ar_bios, arcadia, arcadia, arcadia_amiga_state, dlta,  ROT0, "Arcadia Systems", "Delta Command (Arcadia)", 0 )
 
-GAME( 1988, ar_argh,      ar_bios, arcadia, arcadia, arcadia_amiga_state, argh,  ROT0, "Arcadia Systems", "Aaargh (Arcadia)", GAME_NOT_WORKING )
+GAME( 1988, ar_argh,      ar_bios, arcadia, arcadia, arcadia_amiga_state, argh,  ROT0, "Arcadia Systems", "Aaargh (Arcadia)", 0 )
