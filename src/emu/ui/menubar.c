@@ -32,8 +32,8 @@
 ui_menubar::ui_menubar(running_machine &machine, render_container *container)
 	: ui_stackable(machine, container)
 {
-	m_selected = NULL;
-	m_drag = NULL;
+	m_selected_item = NULL;
+	m_active_item = NULL;
 	m_dragged = false;
 	m_checkmark_width = -1;
 }
@@ -77,7 +77,7 @@ void ui_menubar::do_handle()
 	if (m_menus.is_empty())
 	{
 		menubar_build_menus();
-		m_selected = m_menus.child();
+		m_selected_item = m_menus.child();
 	}
 
 	// measure standard string widths (if necessary)
@@ -112,8 +112,7 @@ void ui_menubar::do_handle()
 			false);
 
 		// child menu open?
-		menu_item *current_menu = m_selected ? m_selected : m_drag;
-		if (current_menu && (current_menu->is_child_of(mi) || (current_menu == mi)))
+		if (is_child_menu_visible(mi))
 			draw_child_menu(mi, x, y + text_height + (spacing * 3));
 
 		x += width + spacing * 4;
@@ -146,32 +145,40 @@ bool ui_menubar::event_loop()
 			case UI_EVENT_MOUSE_DOWN:
 				if (mi != NULL)
 				{
-					m_selected = mi;
-					m_drag = mi;
+					m_selected_item = mi;
+					m_active_item = mi;
 					m_dragged = false;
 				}
 				break;
 
 			case UI_EVENT_MOUSE_MOVE:
-				if (m_drag != NULL)
+				// moving is only interesting if we have an active menu selection
+				if (m_active_item != NULL)
 				{
-					if (m_selected != mi)
+					// are we changing the active menu item?
+					if (m_active_item != mi)
 					{
-						m_selected = mi;
+						if (mi != NULL)
+							m_active_item = mi->has_children() ? mi->child() : mi;
+						m_dragged = true;
 						done = true;
 					}
-					if (mi != NULL && m_drag != mi)
+
+					// are we changing the selection?
+					if (m_selected_item != mi)
 					{
-						m_dragged = true;
-						m_drag = mi;
+						m_selected_item = mi;
+						done = true;
 					}
 				}
 				break;
 
 			case UI_EVENT_MOUSE_UP:
-				if (m_selected && m_selected == mi && m_selected->is_invokable())
+				if (m_selected_item && m_selected_item == mi && m_selected_item->is_invokable())
 					invoke_selection();
-				m_drag = NULL;
+				else if (m_dragged)
+					m_selected_item = NULL;					
+				m_active_item = NULL;
 				done = true;
 				break;
 
@@ -201,11 +208,11 @@ bool ui_menubar::poll_keyboard()
 	int code_parent_menu = IPT_INVALID;
 	int code_previous_peer = IPT_INVALID;
 	int code_next_peer = IPT_INVALID;
-	int code_selected = (m_selected && m_selected->is_invokable())
+	int code_selected = (m_selected_item && m_selected_item->is_invokable())
 		? IPT_UI_SELECT
 		: IPT_INVALID;
 
-	if (!m_selected || !m_selected->is_sub_menu())
+	if (!m_selected_item || !m_selected_item->is_sub_menu())
 	{
 		// no pull down menu selected
 		code_previous_menu = IPT_UI_LEFT;
@@ -217,11 +224,11 @@ bool ui_menubar::poll_keyboard()
 		// pull down menu selected
 		code_previous_menu = IPT_UI_UP;
 		code_next_menu = IPT_UI_DOWN;
-		if (m_selected->child())
+		if (m_selected_item->child())
 			code_child_menu = IPT_UI_SELECT;
 		code_previous_peer = IPT_UI_LEFT;
 		code_next_peer = IPT_UI_RIGHT;
-		if (m_selected->parent()->is_sub_menu())
+		if (m_selected_item->parent()->is_sub_menu())
 			code_parent_menu = IPT_UI_LEFT;
 	}
 
@@ -243,6 +250,10 @@ bool ui_menubar::poll_keyboard()
 	else
 		result = false;	// didn't do anything
 
+	// if we changed something, set the active item accordingly
+	if (result)
+		m_active_item = m_selected_item;
+
 	return result;
 }
 
@@ -257,7 +268,7 @@ void ui_menubar::invoke_selection()
 	ui_menu::stack_pop(machine());
 
 	// and invoke the selection
-	m_selected->invoke();
+	m_selected_item->invoke();
 }
 
 
@@ -267,15 +278,15 @@ void ui_menubar::invoke_selection()
 
 bool ui_menubar::walk_selection_previous()
 {
-	if (m_selected)
+	if (m_selected_item)
 	{
-		m_selected = m_selected->previous()
-			? m_selected->previous()
-			: m_selected->parent()->last_child();
+		m_selected_item = m_selected_item->previous()
+			? m_selected_item->previous()
+			: m_selected_item->parent()->last_child();
 	}
 	else
 	{
-		m_selected = m_menus.last_child();
+		m_selected_item = m_menus.last_child();
 	}
 	return true;
 }
@@ -287,15 +298,15 @@ bool ui_menubar::walk_selection_previous()
 
 bool ui_menubar::walk_selection_next()
 {
-	if (m_selected)
+	if (m_selected_item)
 	{
-		m_selected = m_selected->next()
-			? m_selected->next()
-			: m_selected->parent()->child();
+		m_selected_item = m_selected_item->next()
+			? m_selected_item->next()
+			: m_selected_item->parent()->child();
 	}
 	else
 	{
-		m_selected = m_menus.child();
+		m_selected_item = m_menus.child();
 	}
 	return true;
 }
@@ -308,9 +319,9 @@ bool ui_menubar::walk_selection_next()
 bool ui_menubar::walk_selection_child()
 {
 	bool result = false;
-	if (m_selected && m_selected->child())
+	if (m_selected_item && m_selected_item->child())
 	{
-		m_selected = m_selected->child();
+		m_selected_item = m_selected_item->child();
 		result = true;
 	}
 	return result;
@@ -324,9 +335,9 @@ bool ui_menubar::walk_selection_child()
 bool ui_menubar::walk_selection_parent()
 {
 	bool result = false;
-	if (m_selected && m_selected->parent() && m_selected->parent() != &m_menus)
+	if (m_selected_item && m_selected_item->parent() && m_selected_item->parent() != &m_menus)
 	{
-		m_selected = m_selected->parent();
+		m_selected_item = m_selected_item->parent();
 		result = true;
 	}
 	return result;
@@ -404,7 +415,7 @@ void ui_menubar::draw_child_menu(menu_item *menu, float x, float y)
 			true);
 
 		// child menu open?
-		if (m_selected && m_selected->is_child_of(mi))
+		if (is_child_menu_visible(mi))
 		{
 			draw_child_menu(
 				mi,
@@ -414,6 +425,17 @@ void ui_menubar::draw_child_menu(menu_item *menu, float x, float y)
 
 		my += text_height;
 	}
+}
+
+
+//-------------------------------------------------
+//  is_child_menu_visible
+//-------------------------------------------------
+
+bool ui_menubar::is_child_menu_visible(menu_item *menu) const
+{
+	menu_item *current_menu = m_active_item ? m_active_item : m_selected_item;
+	return (current_menu && (current_menu->is_child_of(menu) || (current_menu == menu)));
 }
 
 
@@ -428,7 +450,7 @@ void ui_menubar::draw_menu_item_text(menu_item *mi, float x0, float y0, float x1
 
 	// choose the color
 	rgb_t fgcolor, bgcolor;
-	if (mi == m_selected)
+	if (mi == m_selected_item)
 	{
 		// selected
 		fgcolor = UI_SELECTED_COLOR;

@@ -144,9 +144,9 @@ private:
 
 	// instance variables
 	menu_item		m_menus;
-	menu_item *		m_selected;
-	menu_item *		m_drag;
-	bool			m_dragged;
+	menu_item *		m_selected_item;		// current selection
+	menu_item *		m_active_item;			// active menu item
+	bool			m_dragged;				// have we dragged over at least one item?
 	float			m_mouse_x, m_mouse_y;
 	bool			m_mouse_button;
 	float			m_checkmark_width;
@@ -161,6 +161,7 @@ private:
 
 	// miscellaneous
 	void draw_child_menu(menu_item *menu, float x, float y);
+	bool is_child_menu_visible(menu_item *menu) const;
 	void draw_menu_item_text(menu_item *mi, float x0, float y0, float x1, float y1, bool decorations);
 	bool event_loop();
 	bool poll_keyboard();

@@ -30,7 +30,7 @@ private:
 
 	// menubar building
 	void build_file_menu();
-	void build_snapshot_menu();
+	void build_images_menu();
 	void build_options_menu();
 	void build_settings_menu();
 	void build_help_menu();
