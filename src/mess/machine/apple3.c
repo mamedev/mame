@@ -521,22 +521,6 @@ WRITE8_MEMBER(apple3_state::apple3_indexed_write)
 }
 
 
-
-DIRECT_UPDATE_MEMBER(apple3_state::apple3_opbase)
-{
-	UINT8 *opptr;
-
-	if ((address & 0xFF00) == 0x0000)
-	{
-		opptr = apple3_get_zpa_addr(address);
-		direct.explicit_configure(address, address, ~0, opptr - address);
-		address = ~0;
-	}
-	return address;
-}
-
-
-
 static void apple3_update_drives(device_t *device)
 {
 	apple3_state *state = device->machine().driver_data<apple3_state>();
@@ -622,8 +606,6 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_1->write_pb7(1);
 
 	apple3_update_memory();
-
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), this));
 }
 
 READ8_MEMBER(apple3_state::apple3_memory_r)
