@@ -811,11 +811,13 @@ UINT32 iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 
 	// text layer
+	bool mode_80 = m_video_regs[0x02] & 0x02;   // 80 chars mode
+	int line_len = mode_80 ? 80 : 40;
 	for (int y=0; y<28; y++)
 	{
-		for (int x=0; x<40; x++)
+		for (int x=0; x<line_len; x++)
 		{
-			UINT8 c = m_videoram[0x8400 + (y - 1) * 0x40 + x];
+			UINT8 c = m_videoram[0x8400 + (y - 1) * (mode_80 ? 0x80 : 0x40) + x];
 			UINT8 *gfx = &m_videoram[0x8000 + (c & 0x7f) * 8];
 
 			for (int cy=0; cy<8; cy++)
@@ -827,10 +829,12 @@ UINT32 iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					UINT8 col1 = get_color(0x0f, py);
 					UINT8 data = 0;
 
-					if (y > 0 && y < 26)
+					if (BIT(m_video_regs[0x02],4) && m_video_regs[0x00] == x && m_video_regs[0x01] == ((y - 1) + (0x400 / (mode_80 ? 0x80 : 0x40)))) // cursor position start at 0x8000
+						data = 0xff;
+					else if (y > 0 && y < 26)
 						data = gfx[cy] ^ (c & 0x80 ? 0xff : 0);
 
-					if (x == 0) bitmap.plot_box(0, py, 8 + 40*6 + 8, 1, col0);
+					if (x == 0) bitmap.plot_box(0, py, 8 + line_len*6 + 8, 1, col0);
 					for (int cx=0; cx<6; cx++)
 					{
 						int px = 8 + x*6 + cx;
@@ -860,6 +864,13 @@ READ8_MEMBER( iqunlim_state::video_regs_r )
 
 WRITE8_MEMBER( iqunlim_state::video_regs_w )
 {
+	if (offset == 2 && ((m_video_regs[offset] ^ data) & 0x02))
+	{
+		rectangle visarea = m_screen->visible_area();
+		visarea.set(0, (data & 0x02 ? 496 : 256) - 1, 0, 224 - 1);
+		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period().attoseconds);
+	}
+
 	m_video_regs[offset] = data;
 }
 
