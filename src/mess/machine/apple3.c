@@ -295,7 +295,6 @@ void apple3_state::apple3_update_memory()
 {
 	UINT16 bank;
 	UINT8 page;
-	UINT8 *ptr;
 
 	if (LOG_MEMORY)
 	{
