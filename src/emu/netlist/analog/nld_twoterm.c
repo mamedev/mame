@@ -137,14 +137,14 @@ NETLIB_START(C)
 	register_param("C", m_C, 1e-6);
 
 	// set up the element
-    //set(NETLIST_GMIN, 0.0, -5.0 / NETLIST_GMIN);
-    set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
+    set(NETLIST_GMIN, 0.0, -5.0 / NETLIST_GMIN);
+    //set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 }
 
 NETLIB_RESET(C)
 {
-    //set(NETLIST_GMIN, 0.0, -5.0 / NETLIST_GMIN);
-    set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
+    set(NETLIST_GMIN, 0.0, -5.0 / NETLIST_GMIN);
+    //set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 }
 
 NETLIB_UPDATE_PARAM(C)
