@@ -3,23 +3,23 @@
     drivers/apple3.c
 
     Apple ///
-
+ 
+    driver by Nathan Woods and R. Belmont
+ 
     Driver is not working yet; seems to get caught in an infinite loop on
     startup.  Special thanks to Chris Smolinski (author of the Sara emulator)
     for his input about this poorly known system.
+ 
+    Also thanks to Washington Apple Pi for the "Apple III DVD" containing the
+    technical manual, schematics, and software.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
-#include "machine/mos6551.h"
-#include "machine/6522via.h"
-#include "bus/a2bus/a2bus.h"
-#include "machine/ram.h"
 #include "machine/appldriv.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
@@ -89,6 +89,14 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_1_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple2_via_1_irq_func))
+
+	/* sound */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("c040", apple3_state, apple3_c040_tick, attotime::from_hz(2000))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

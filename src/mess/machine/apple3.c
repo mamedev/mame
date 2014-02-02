@@ -162,6 +162,23 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			AY3600_anykey_clearstrobe_r(machine());
 			break;
 
+		case 0x30: case 0x31: case 0x32: case 0x33:
+		case 0x34: case 0x35: case 0x36: case 0x37:
+		case 0x38: case 0x39: case 0x3A: case 0x3B:
+		case 0x3C: case 0x3D: case 0x3E: case 0x3F:
+			m_speaker_state ^= 1;
+			m_speaker->level_w(m_speaker_state);
+			result = 0xff;
+			break;
+
+		case 0x40: case 0x41: case 0x42: case 0x43:
+		case 0x44: case 0x45: case 0x46: case 0x47:
+		case 0x48: case 0x49: case 0x4A: case 0x4B:
+		case 0x4C: case 0x4D: case 0x4E: case 0x4F:
+			m_c040_time = 200;
+			result = 0xff;
+			break;
+
 		case 0x50: case 0x51: case 0x52: case 0x53:
 		case 0x54: case 0x55: case 0x56: case 0x57:
 			/* graphics softswitches */
@@ -233,6 +250,21 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
 			AY3600_anykey_clearstrobe_r(machine());
+			break;
+
+		case 0x30: case 0x31: case 0x32: case 0x33:
+		case 0x34: case 0x35: case 0x36: case 0x37:
+		case 0x38: case 0x39: case 0x3A: case 0x3B:
+		case 0x3C: case 0x3D: case 0x3E: case 0x3F:
+			m_speaker_state ^= 1;
+			m_speaker->level_w(m_speaker_state);
+			break;
+
+		case 0x40: case 0x41: case 0x42: case 0x43:
+		case 0x44: case 0x45: case 0x46: case 0x47:
+		case 0x48: case 0x49: case 0x4A: case 0x4B:
+		case 0x4C: case 0x4D: case 0x4E: case 0x4F:
+			m_c040_time = 200;
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
@@ -423,6 +455,7 @@ WRITE8_MEMBER(apple3_state::apple3_via_1_out_a)
 
 WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 {
+	m_dac->write_unsigned8(data<<2);
 	apple3_via_out(&m_via_1_b, data);
 }
 
@@ -442,6 +475,9 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 {
 	m_indir_count = 0;
 	m_sync = false;
+	m_speaker_state = 0;
+	m_speaker->level_w(0);
+	m_c040_time = 0;
 }
 
 
@@ -858,6 +894,16 @@ WRITE_LINE_MEMBER(apple3_state::apple3_sync_w)
 	if (m_sync)
 	{
 		m_indir_count = 0; 
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_c040_tick)
+{
+	if (m_c040_time > 0)
+	{
+		m_speaker_state ^= 1;
+		m_speaker->level_w(m_speaker_state);
+		m_c040_time--;
 	}
 }
 
