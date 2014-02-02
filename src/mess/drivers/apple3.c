@@ -66,7 +66,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(apple3_state, screen_update_apple3)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(apple3_state, apple2 )
+	MCFG_PALETTE_INIT_OVERRIDE(apple3_state, apple3 )
 
 	MCFG_VIDEO_START_OVERRIDE(apple3_state, apple3 )
 

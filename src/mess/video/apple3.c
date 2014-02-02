@@ -28,6 +28,26 @@
 #define AQUA    14
 #define WHITE   15
 
+// derived from the IIgs palette then adjusted to match Sara
+static const unsigned char apple3_palette[] =
+{
+	0x0, 0x0, 0x0,  /* Black         $0 */
+	0x5, 0x0, 0x5,  /* Magenta       $1 */
+	0x0, 0x0, 0x9,  /* Dark Blue     $2 */
+	0xD, 0x2, 0xD,  /* Purple        $3 */
+	0x0, 0x7, 0x2,  /* Dark Green    $4 */
+	0xa, 0xa, 0xa,  /* Light Gray    $5 */
+	0x2, 0x2, 0xF,  /* Medium Blue   $6 */
+	0x6, 0xA, 0xF,  /* Light Blue    $7 */
+	0x8, 0x5, 0x0,  /* Brown         $8 */
+	0xF, 0x6, 0x0,  /* Orange        $9 */
+	0x5, 0x5, 0x5,  /* Dark Gray     $A */
+	0xF, 0x9, 0xF,  /* Pink          $B */
+	0x1, 0xD, 0x0,  /* Light Green   $C */
+	0xe, 0xe, 0x0,  /* Yellow        $D */
+	0x4, 0xe, 0xd,  /* Cyan          $E */
+	0xF, 0xF, 0xF   /* White         $F */
+};
 
 static const UINT32 text_map[] =
 {
@@ -36,6 +56,19 @@ static const UINT32 text_map[] =
 	0x450, 0x4d0, 0x550, 0x5d0, 0x650, 0x6d0, 0x750, 0x7d0
 };
 
+
+PALETTE_INIT_MEMBER(apple3_state, apple3)
+{
+	int i;
+
+	for (i = 0; i < 16; i++)
+	{
+		palette_set_color_rgb(machine(), i,
+			apple3_palette[(3*i)]*17,
+			apple3_palette[(3*i)+1]*17,
+			apple3_palette[(3*i)+2]*17);
+	}
+}
 
 void apple3_state::apple3_write_charmem()
 {

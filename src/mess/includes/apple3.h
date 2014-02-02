@@ -94,6 +94,7 @@ public:
 	void apple3_via_out(UINT8 *var, UINT8 data);
 	UINT8 *apple3_get_indexed_addr(offs_t offset);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
+	DECLARE_PALETTE_INIT(apple3);
 
 	bool m_sync;
 	UINT8 m_indir_opcode;
