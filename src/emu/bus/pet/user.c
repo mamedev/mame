@@ -80,7 +80,14 @@ pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const 
 void pet_user_port_device::device_config_complete()
 {
 	m_card = dynamic_cast<device_pet_user_port_interface *>(get_card_device());
+}
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void pet_user_port_device::device_start()
+{
 	// resolve callbacks
 	m_3_handler.resolve_safe();
 	m_4_handler.resolve_safe();
@@ -99,14 +106,7 @@ void pet_user_port_device::device_config_complete()
 	m_k_handler.resolve_safe();
 	m_l_handler.resolve_safe();
 	m_m_handler.resolve_safe();
-}
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void pet_user_port_device::device_start()
-{
 	// pull up
 	m_3_handler(1);
 	m_4_handler(1);
