@@ -14,6 +14,7 @@
 #include "bus/centronics/ctronics.h"
 #include "video/mc6847.h"
 #include "sound/ay8910.h"
+#include "formats/phc25_cas.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "z80"
@@ -45,7 +46,7 @@ public:
 private:
 	virtual void video_start();
 	UINT8 *m_char_rom;
-	bool m_ag;
+	UINT8 m_port40;
 	required_shared_ptr<UINT8> m_video_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;

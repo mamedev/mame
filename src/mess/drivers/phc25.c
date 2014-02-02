@@ -26,8 +26,7 @@
 
     TODO:
 
-    - MC6847 mode selection lines (should be ok now but need more testing)
-    - tune cassette trigger level
+    - MC6847 mode selection lines
     - accurate video timing
 
     - sound isn't working (should be a keyclick)
@@ -41,6 +40,7 @@ RUN
 
 
 10 SCREEN2,1,1:CLS:FORX=0TO8:LINE(X*24,0)-(X*24+16,191),X,BF:NEXT
+RUN
 
 */
 
@@ -109,12 +109,12 @@ WRITE8_MEMBER( phc25_state::port40_w )
 	m_centronics->strobe_w(BIT(data, 3));
 
 	/* MC6847 */
-	m_ag = BIT(data, 7);
 	m_vdg->intext_w(1);
 	m_vdg->gm0_w(BIT(data, 5));
 	m_vdg->gm1_w(1);
 	m_vdg->css_w(BIT(data, 6));
-	m_vdg->ag_w(m_ag);
+	m_vdg->ag_w(BIT(data, 7));
+	m_port40 = data;
 }
 
 /* Memory Maps */
@@ -266,9 +266,16 @@ INPUT_PORTS_END
 
 READ8_MEMBER( phc25_state::video_ram_r )
 {
-	if (m_ag) // graphics (to be checked)
+	if BIT(m_port40, 7) // graphics
 	{
-		return m_video_ram[offset & 0x17ff];
+		if BIT(m_port40, 5)
+		{// screen 4
+			return m_video_ram[((offset & 0x1fe0)<<1) + (offset & 0x1f) + 0x800 ];
+		}
+		else
+		{// screen 3
+			return m_video_ram[((offset & 0x1fc0)<<1) + (offset & 0x3f) + 0x380 ];
+		}
 	}
 	else	// text
 	{
@@ -346,6 +353,7 @@ void phc25_state::video_start()
 {
 	/* find memory regions */
 	m_char_rom = memregion(Z80_TAG)->base() + 0x5000;
+	m_port40 = 0;
 }
 
 /* AY-3-8910 Interface */
@@ -364,9 +372,9 @@ static const ay8910_interface ay8910_intf =
 
 static const cassette_interface phc25_cassette_interface =
 {
-	cassette_default_formats,
+	phc25_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
 	NULL
 };
@@ -383,7 +391,7 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 1996750)
 	MCFG_SOUND_CONFIG(ay8910_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 

@@ -168,6 +168,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/pc_dsk.o      \
 	$(LIBOBJ)/formats/pc98_dsk.o    \
 	$(LIBOBJ)/formats/pc98fdi_dsk.o \
+	$(LIBOBJ)/formats/phc25_cas.o   \
 	$(LIBOBJ)/formats/pmd_cas.o     \
 	$(LIBOBJ)/formats/primoptp.o    \
 	$(LIBOBJ)/formats/pyldin_dsk.o  \
