@@ -104,6 +104,8 @@ class device_pet_user_port_interface;
 class pet_user_port_device : public device_t,
 	public device_slot_interface
 {
+	friend class device_pet_user_port_interface;
+
 public:
 	// construction/destruction
 	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -145,6 +147,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_l );
 	DECLARE_WRITE_LINE_MEMBER( write_m );
 
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete();
+
 	// device interface
 	devcb2_write_line m_3_handler;
 	devcb2_write_line m_4_handler;
@@ -164,11 +171,6 @@ public:
 	devcb2_write_line m_l_handler;
 	devcb2_write_line m_m_handler;
 
-protected:
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-
 	device_pet_user_port_interface *m_card;
 };
 
@@ -178,27 +180,11 @@ protected:
 // class representing interface-specific pet_expansion card
 class device_pet_user_port_interface : public device_slot_card_interface
 {
+	friend class pet_user_port_device;
+
 public:
 	device_pet_user_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_pet_user_port_interface();
-
-	virtual DECLARE_WRITE_LINE_MEMBER( input_3 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_4 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_5 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_6 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_7 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_8 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_9 ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_b ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_c ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_d ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_e ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_f ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_h ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_j ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_k ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_l ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) {}
 
 	DECLARE_WRITE_LINE_MEMBER( output_3 ) { m_slot->m_3_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( output_4 ) { m_slot->m_4_handler(state); }
@@ -219,6 +205,24 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( output_m ) { m_slot->m_m_handler(state); }
 
 protected:
+	virtual DECLARE_WRITE_LINE_MEMBER( input_3 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_4 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_5 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_6 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_7 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_8 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_9 ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_b ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_c ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_d ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_e ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_f ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_h ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_j ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_k ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_l ) {}
+	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) {}
+
 	pet_user_port_device *m_slot;
 };
 

@@ -712,7 +712,8 @@ void plus4_state::machine_reset()
 
 	if (m_user)
 	{
-		m_user->reset();
+		m_user->write_3(0);
+		m_user->write_3(1);
 	}
 
 	m_addr = 0;
