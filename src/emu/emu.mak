@@ -150,6 +150,7 @@ EMUOBJS = \
 	$(EMUOBJ)/uimain.o \
 	$(EMUOBJ)/ui/menu.o \
 	$(EMUOBJ)/ui/menubar.o \
+	$(EMUOBJ)/ui/emenubar.o \
 	$(EMUOBJ)/ui/selgame.o \
 	$(EMUOBJ)/ui/stackable.o \
 	$(EMUOBJ)/validity.o \

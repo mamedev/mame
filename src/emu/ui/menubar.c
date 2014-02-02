@@ -38,11 +38,12 @@ ui_menubar::menu_item::menu_item(const char *name, ui_menubar::menu_item *parent
 	m_last_child = NULL;
 	m_previous = NULL;
 	m_next = NULL;
+	clear_area();
 }
 
 
 //-------------------------------------------------
-//  menu_item::ctor
+//  menu_item::dtor
 //-------------------------------------------------
 
 ui_menubar::menu_item::~menu_item()
@@ -58,10 +59,37 @@ ui_menubar::menu_item::~menu_item()
 
 
 //-------------------------------------------------
+//  menu_item::set_area
+//-------------------------------------------------
+
+void ui_menubar::menu_item::set_area(float x0, float y0, float x1, float y1)
+{
+	m_x0 = x0;
+	m_y0 = y0;
+	m_x1 = x1;
+	m_y1 = y1;
+}
+
+
+//-------------------------------------------------
+//  menu_item::clear_area_recursive
+//-------------------------------------------------
+
+void ui_menubar::menu_item::clear_area_recursive()
+{
+	clear_area();
+	if (m_first_child)
+		m_first_child->clear_area_recursive();
+	if (m_next)
+		m_next->clear_area_recursive();
+}
+
+
+//-------------------------------------------------
 //  menu_item::append
 //-------------------------------------------------
 
-ui_menubar::menu_item *ui_menubar::menu_item::append(const char *name)
+ui_menubar::menu_item &ui_menubar::menu_item::append(const char *name)
 {
 	menu_item *child = new menu_item(name, this);
 	
@@ -73,7 +101,26 @@ ui_menubar::menu_item *ui_menubar::menu_item::append(const char *name)
 		m_first_child = child;
 	m_last_child = child;
 
-	return child;
+	return *child;
+}
+
+
+//-------------------------------------------------
+//  menu_item::find_point
+//-------------------------------------------------
+
+ui_menubar::menu_item *ui_menubar::menu_item::find_point(float x, float y)
+{
+	menu_item *result = NULL;
+
+	if ((x >= m_x0) && (y >= m_y0) && (x <= m_x1) && (y <= m_y1))
+		result = this;
+
+	if (!result && m_first_child)
+		result = m_first_child->find_point(x, y);
+	if (!result && m_next)
+		result = m_next->find_point(x, y);
+	return result;
 }
 
 
@@ -134,6 +181,7 @@ void ui_menubar::do_handle()
 	if (m_menus.is_empty())
 		build_menus();
 
+	m_menus.clear_area_recursive();
 	find_mouse(m_mouse_x, m_mouse_y);
 
 	float text_height = get_line_height();
@@ -160,7 +208,7 @@ void ui_menubar::do_handle()
 			y + spacing + text_height);
 
 		// child menu open?
-		if (m_selected && m_selected->is_child_of(mi))
+		if (m_selected && (m_selected->is_child_of(mi) || (m_selected == mi)))
 			draw_child_menu(mi, x, y + text_height + (spacing * 3));
 
 		x += width + spacing * 4;
@@ -177,6 +225,17 @@ void ui_menubar::do_handle()
 				stop = true;
 				break;
 
+			case UI_EVENT_MOUSE_DOWN:
+				{
+					menu_item *mi = m_menus.find_point(m_mouse_x, m_mouse_y);
+					if (mi)
+					{
+						m_selected = mi;
+						return;
+					}
+				}
+				break;
+
 			default:
 				break;
 		}
@@ -184,60 +243,140 @@ void ui_menubar::do_handle()
 
 	int code_previous_menu;
 	int code_next_menu;
-	int code_child_menu;
-	int code_previous_peer;
-	menu_item *current_menu;
+	int code_child_menu = IPT_INVALID;
+	int code_parent_menu = IPT_INVALID;
+	int code_previous_peer = IPT_INVALID;
+	int code_next_peer = IPT_INVALID;
 	if (!m_selected || !m_selected->is_sub_menu())
 	{
 		// no pull down menu selected
 		code_previous_menu = IPT_UI_LEFT;
 		code_next_menu = IPT_UI_RIGHT;
 		code_child_menu = IPT_UI_DOWN;
-		code_previous_peer = IPT_INVALID;
-		current_menu = &m_menus;
 	}
 	else
 	{
 		// pull down menu selected
 		code_previous_menu = IPT_UI_UP;
 		code_next_menu = IPT_UI_DOWN;
-		code_child_menu = IPT_UI_RIGHT;
+		if (m_selected->child())
+			code_child_menu = IPT_UI_SELECT;
 		code_previous_peer = IPT_UI_LEFT;
-		current_menu = m_selected->parent();
+		code_next_peer = IPT_UI_RIGHT;
+		if (m_selected->parent()->is_sub_menu())
+			code_parent_menu = IPT_UI_LEFT;
 	}
 
 	if (input_pressed(code_previous_menu))
-	{
-		// select previous menu
-		m_selected = !m_selected || !m_selected->previous()
-			? current_menu->last_child()
-			: m_selected->previous();
-	}
+		walk_selection_previous();
 	else if (input_pressed(code_next_menu))
-	{
-		// select next menu
-		m_selected = !m_selected || !m_selected->next()
-			? current_menu->child()
-			: m_selected->next();
-	}
-	else if (input_pressed(code_child_menu) && m_selected && m_selected->child())
-	{
-		// enter child menu
-		m_selected = m_selected->child();
-	}
+		walk_selection_next();
+	else if ((code_child_menu != IPT_INVALID) && input_pressed(code_child_menu))
+		walk_selection_child();
+	else if (input_pressed(IPT_UI_CANCEL) || (code_parent_menu != IPT_INVALID && input_pressed(code_parent_menu)))
+		walk_selection_parent();
 	else if (code_previous_peer != IPT_INVALID && input_pressed(code_previous_peer))
-	{
-		// go to the first child of the previous peer menu
-		m_selected = m_selected->parent()->previous() ? m_selected->parent()->last_child() : m_selected->parent()->previous();
-		if (m_selected->child())
-			m_selected = m_selected->child();
-	}
+		walk_selection_previous_peer();
+	else if (code_next_peer != IPT_INVALID && input_pressed(code_next_peer))
+		walk_selection_next_peer();
+}
 
-	else if (input_pressed(IPT_UI_CANCEL) && m_selected)
+
+//-------------------------------------------------
+//  walk_selection_previous
+//-------------------------------------------------
+
+bool ui_menubar::walk_selection_previous()
+{
+	if (m_selected)
 	{
-		// exit menu
-		m_selected = m_selected->parent();
+		m_selected = m_selected->previous()
+			? m_selected->previous()
+			: m_selected->parent()->last_child();
 	}
+	else
+	{
+		m_selected = m_menus.last_child();
+	}
+	return true;
+}
+
+
+//-------------------------------------------------
+//  walk_selection_next
+//-------------------------------------------------
+
+bool ui_menubar::walk_selection_next()
+{
+	if (m_selected)
+	{
+		m_selected = m_selected->next()
+			? m_selected->next()
+			: m_selected->parent()->child();
+	}
+	else
+	{
+		m_selected = m_menus.child();
+	}
+	return true;
+}
+
+
+//-------------------------------------------------
+//  walk_selection_child
+//-------------------------------------------------
+
+bool ui_menubar::walk_selection_child()
+{
+	bool result = false;
+	if (m_selected && m_selected->child())
+	{
+		m_selected = m_selected->child();
+		result = true;
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  walk_selection_parent
+//-------------------------------------------------
+
+bool ui_menubar::walk_selection_parent()
+{
+	bool result = false;
+	if (m_selected && m_selected->parent() && m_selected->parent() != &m_menus)
+	{
+		m_selected = m_selected->parent();
+		result = true;
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  walk_selection_previous_peer
+//-------------------------------------------------
+
+bool ui_menubar::walk_selection_previous_peer()
+{
+	bool result = walk_selection_parent() && walk_selection_previous();
+	if (result)
+		walk_selection_child();
+	return result;
+}
+
+
+//-------------------------------------------------
+//  walk_selection_next_peer
+//-------------------------------------------------
+
+bool ui_menubar::walk_selection_next_peer()
+{
+	bool result = walk_selection_parent() && walk_selection_next();
+	if (result)
+		walk_selection_child();
+	return result;
 }
 
 
@@ -300,6 +439,9 @@ void ui_menubar::draw_child_menu(menu_item *menu, float x, float y)
 
 void ui_menubar::draw_menu_item_text(menu_item *mi, float x0, float y0, float x1, float y1)
 {
+	// set our area
+	mi->set_area(x0, y0, x1, y1);
+
 	// choose the color
 	rgb_t fgcolor, bgcolor;
 	if (mi == m_selected)
@@ -322,35 +464,4 @@ void ui_menubar::draw_menu_item_text(menu_item *mi, float x0, float y0, float x1
 	}
 
 	draw_text(mi->name(), x0, y0, fgcolor, bgcolor);
-}
-
-
-//-------------------------------------------------
-//  do_handle
-//-------------------------------------------------
-
-void ui_menubar::build_menus()
-{
-	menu_item *file_menu = m_menus.append("File");
-	file_menu->append("Pause");
-	file_menu->append("Exit");
-
-	menu_item *snapshot_menu = m_menus.append("Snapshot");
-	snapshot_menu->append("Load snapshot...");
-	snapshot_menu->append("Save snapshot...");
-
-	menu_item *options_menu = m_menus.append("Options");
-	menu_item *throttle_menu = options_menu->append("Throttle");
-	throttle_menu->append("200%");
-	throttle_menu->append("100%");
-	throttle_menu->append("50%");
-	throttle_menu->append("20%");
-	throttle_menu->append("10%");
-	throttle_menu->append("Unthrottled");
-
-	menu_item *settings_menu = m_menus.append("Settings");
-	settings_menu->append("Foo");
-
-	menu_item *help_menu = m_menus.append("Help");
-	help_menu->append("About...");
 }

@@ -12,7 +12,7 @@
 #include "selgame.h"
 #include "uiinput.h"
 #include "uimain.h"
-#include "ui/menubar.h"
+#include "ui/emenubar.h"
 #include "audit.h"
 
 
@@ -281,7 +281,7 @@ void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 
 void ui_menu_select_game::inkey_toggle_ui(const ui_menu_event *menu_event)
 {
-	ui_menu::stack_push(auto_alloc_clear(machine(), ui_menubar(machine(), container)));
+	ui_menu::stack_push(auto_alloc_clear(machine(), ui_emu_menubar(machine(), container)));
 }
 
 
