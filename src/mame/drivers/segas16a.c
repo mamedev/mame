@@ -1975,6 +1975,16 @@ static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+/*
+static MACHINE_CONFIG_DERIVED( system16a_i8751_no7751, system16a_i8751 )
+	MCFG_DEVICE_REMOVE("n7751")
+	MCFG_DEVICE_REMOVE("dac")
+
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+*/
+
 static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
@@ -2502,7 +2512,7 @@ ROM_START( fantzonep )
 	ROM_LOAD16_BYTE( "epr-7384.24",  0x020001, 0x8000, CRC(fd909341) SHA1(2f1e01eb7d7b330c9c0dd98e5f8ed4973f0e93fb) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-7388.95",  0x00000, 0x08000, CRC(8eb02f6b) SHA1(80511b944b57541669010bd5a0ca52bc98eabd62) )
+	ROM_LOAD( "epr-7388.95",  0x00000, 0x08000, CRC(8eb02f6b) SHA1(80511b944b57541669010bd5a0ca52bc98eabd62) ) 
 	ROM_LOAD( "epr-7389.94",  0x08000, 0x08000, CRC(2f4f71b8) SHA1(ceb39e95cd43904b8e4f89c7227491e139fb3ca6) )
 	ROM_LOAD( "epr-7390.93",  0x10000, 0x08000, CRC(d90609c6) SHA1(4232f6ecb21f242c0c8d81e06b88bc742668609f) )
 
@@ -2517,6 +2527,42 @@ ROM_START( fantzonep )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-7391.12",  0x0000, 0x8000, CRC(c03e155e) SHA1(6bbdf308c47b96ba622329520b70fa0ea47248a4) ) // Original encrypted sound code
 ROM_END
+
+
+ROM_START( fantzonepr )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "ic43-prg-dd2c.bin",   0x000000, 0x8000, CRC(895436e1) SHA1(5cf294fc4fcbacab5d2696aa4f536a8f48d4c4ce) ) // different
+	ROM_LOAD16_BYTE( "ic26-prg20-658q.bin", 0x000001, 0x8000, CRC(a0d53b86) SHA1(02b8ba869c226d929b6b761982efc262467baafc) ) // different
+	ROM_LOAD16_BYTE( "ic42-prg13-eb1f.bin", 0x010000, 0x8000, CRC(a08e9d65) SHA1(e3f8b4f1dcdd7bcdd57ae295d721131b7cc33500) ) // different
+	ROM_LOAD16_BYTE( "ic25-prg15-2b8c.bin", 0x010001, 0x8000, CRC(7e6fdae0) SHA1(c00e7e4e78505ce731483275cfcad285999bbaf3) ) // different
+	ROM_LOAD16_BYTE( "epr-7387.41",         0x020000, 0x8000, CRC(0acd335d) SHA1(f39566a2069eefa7682c57c6521ea7a328738d06) ) // missing - assumed to be the same because the rom below is
+	ROM_LOAD16_BYTE( "ic24-prg20-2f57.bin", 0x020001, 0x8000, CRC(fd909341) SHA1(2f1e01eb7d7b330c9c0dd98e5f8ed4973f0e93fb) ) // MATCH
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // tiles 
+	ROM_LOAD( "ic95-1413.bin",  0x00000, 0x08000, CRC(158af770) SHA1(a02c500920770a987c9d8c78e0313cb3434c1873) ) // 96.661377%
+	ROM_LOAD( "ic94-3e96.bin",  0x08000, 0x08000, CRC(2fea4fe7) SHA1(891dbf163378e9ef55b97b4cb8ac02dab05f206c) ) // 96.710205%
+	ROM_LOAD( "ic93-de1b.bin",  0x10000, 0x08000, BAD_DUMP CRC(335fe57a) SHA1(93cfcfd1d06daa03b1b000460c4e0ff54aa9f317) ) // 72.341919%
+	ROM_LOAD( "epr-7390.93",  0x10000, 0x08000, CRC(d90609c6) SHA1(4232f6ecb21f242c0c8d81e06b88bc742668609f) ) // loading this because above is bad, should have differences tho :-(
+
+	ROM_REGION16_BE( 0x80000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "epr-7392.10",  0x00001, 0x8000, CRC(5bb7c8b6) SHA1(eaa0ed63ac4f66ee285757e842bdd7b005292600) ) // missing (assumed the same because of match below)
+	ROM_LOAD16_BYTE( "ic11-6235.bin",  0x00000, 0x8000, CRC(74ae4b57) SHA1(1f24b1faea765994b85f0e7ac8e944c8da22103f) ) // MATCH
+
+	ROM_LOAD16_BYTE( "ic17-5f7c.bin",  0x10001, 0x8000, CRC(9d5b5be8) SHA1(c54a6686e8d08525bafad24d40a17dae4b856e6c) ) // no match (seems bad) - ignore
+	ROM_LOAD16_BYTE( "epr-7393.17",  0x10001, 0x8000, CRC(14fc7e82) SHA1(ca7caca989a3577dd30ad4f66b0fcce712a454ef) ) // (assumed the same because of match below)
+	ROM_LOAD16_BYTE( "ic18-2614.bin",  0x10000, 0x8000, CRC(e05a1e25) SHA1(9691d9f0763b7483ee6912437902f22ab4b78a05) ) // MATCH
+
+	// these were missing, but it seems like they should be different?
+	ROM_LOAD16_BYTE( "ic23",  0x20001, 0x8000, BAD_DUMP CRC(531ca13f) SHA1(19e68bc515f6021e1145cff4f3f0e083839ee8f3) ) // misisng
+	ROM_LOAD16_BYTE( "ic24",  0x20000, 0x8000, BAD_DUMP CRC(68807b49) SHA1(0a189da8cdd2090e76d6d06c55b478abce60542d) ) // missing
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "ic12-sound-56-5.bin", 0x0000, 0x8000, CRC(e62ddff6) SHA1(bd601f1e43d96b8bfae0a880d031b418e6c953b0) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU (doesn't seem to be used?)
+	ROM_LOAD( "8751.bin", 0x00000, 0x1000, CRC(c0d325e6) SHA1(dbce2ebfab704e70b9b4a0ba442b09c5d137c878) )
+ROM_END
+
 
 
 //*************************************************************************************************************************
@@ -3470,6 +3516,7 @@ GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a
 GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1986, fantzonep,  fantzone, system16a_no7751,         fantzone,   segas16a_state,fantzonep,   ROT0,   "Sega", "Fantasy Zone (317-5000)", GAME_SUPPORTS_SAVE )
+GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // bad / missing gfx roms
 GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a, segas16a_state,passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", GAME_SUPPORTS_SAVE )
 GAME( 1987, sdi,        0,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
 GAME( 1987, shinobi,    0,        system16a,                shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 6, System 16A, unprotected)", GAME_SUPPORTS_SAVE )
