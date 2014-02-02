@@ -1285,3 +1285,22 @@ void video_manager::toggle_throttle()
 {
 	set_throttle_rate(throttled() ? 0.0f : 1.0f);
 }
+
+
+//-------------------------------------------------
+//	toggle_record_movie
+//-------------------------------------------------
+
+void video_manager::toggle_record_movie()
+{
+	if (!is_recording())
+	{
+		begin_recording(NULL, video_manager::MF_MNG);
+		popmessage("REC START");
+	}
+	else
+	{
+		end_recording();
+		popmessage("REC STOP");
+	}
+}

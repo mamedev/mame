@@ -74,6 +74,7 @@ public:
 
 	// misc
 	void toggle_throttle();
+	void toggle_record_movie();
 
 	// render a frame
 	void frame_update(bool debug = false);

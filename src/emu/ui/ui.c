@@ -1590,18 +1590,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 
 	// toggle movie recording 
 	if (ui_input_pressed(machine, IPT_UI_RECORD_MOVIE))
-	{
-		if (!machine.video().is_recording())
-		{
-			machine.video().begin_recording(NULL, video_manager::MF_MNG);
-			popmessage("REC START");
-		}
-		else
-		{
-			machine.video().end_recording();
-			popmessage("REC STOP");
-		}
-	}
+		machine.video().toggle_record_movie();
 
 	// toggle profiler display 
 	if (ui_input_pressed(machine, IPT_UI_SHOW_PROFILER))
