@@ -64,9 +64,6 @@ public:
 	DECLARE_WRITE8_MEMBER(zn_qsound_w);
 	DECLARE_WRITE8_MEMBER(bank_coh1000t_w);
 	DECLARE_WRITE8_MEMBER(fx1a_sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(fx1b_volume_w);
-	DECLARE_WRITE16_MEMBER(fx1b_sound_w);
-	DECLARE_READ16_MEMBER(fx1b_sound_r);
 	DECLARE_WRITE8_MEMBER(fx1b_fram_w);
 	DECLARE_READ8_MEMBER(fx1b_fram_r);
 	DECLARE_WRITE8_MEMBER(coh1002e_bank_w);
@@ -1175,23 +1172,6 @@ static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 	MCFG_TC0140SYT_ADD("tc0140syt", coh1000ta_tc0140syt_intf)
 MACHINE_CONFIG_END
 
-WRITE16_MEMBER(zn_state::fx1b_volume_w)
-{
-	verboselog(1, "fx1b_volume_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-}
-
-WRITE16_MEMBER(zn_state::fx1b_sound_w)
-{
-	verboselog(1, "fx1b_sound_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-}
-
-READ16_MEMBER(zn_state::fx1b_sound_r)
-{
-	UINT32 data = 0; // bit 0 = busy?
-	verboselog(1, "fx1b_sound_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	return data;
-}
-
 WRITE8_MEMBER(zn_state::fx1b_fram_w)
 {
 	m_fx1b_fram[offset] = data;
@@ -1206,11 +1186,11 @@ static ADDRESS_MAP_START(coh1000tb_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_READWRITE8(fx1b_fram_r, fx1b_fram_w, 0x00ff00ff)
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
-	AM_RANGE(0x1fb80000, 0x1fb8ffff) AM_WRITE16(fx1b_volume_w, 0xffffffff)
-	AM_RANGE(0x1fba0000, 0x1fbaffff) AM_WRITE16(fx1b_sound_w, 0xffffffff)
-	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_READ16(fx1b_sound_r, 0x0000ffff)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, global_volume_w, 0x0000ffff)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reset_control_w, 0xffff0000)
+	AM_RANGE(0x1fba0000, 0x1fba0003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, sound_irq_w, 0x0000ffff)
+	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_DEVREAD16("taito_zoom", taito_zoom_device, sound_irq_r, 0x0000ffff)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comm with the MN10200
-
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
@@ -3961,7 +3941,7 @@ ROM_START( ftimpcta )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION( 0x600000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
 	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 ROM_END
@@ -3979,7 +3959,7 @@ ROM_START( ftimpact )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION( 0x600000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
 	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 ROM_END
@@ -3997,7 +3977,7 @@ ROM_START( ftimpactu )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION( 0x600000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
 	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 ROM_END
@@ -4015,7 +3995,7 @@ ROM_START( ftimpactj )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION( 0x600000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
 	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 ROM_END
@@ -4033,7 +4013,7 @@ ROM_START( gdarius )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
 
-	ROM_REGION( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
 ROM_END
 
@@ -4050,7 +4030,7 @@ ROM_START( gdariusb )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
 
-	ROM_REGION( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
 ROM_END
 
@@ -4067,7 +4047,7 @@ ROM_START( gdarius2 )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
 
-	ROM_REGION( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
 ROM_END
 
@@ -4175,7 +4155,7 @@ ROM_START( raystorm )
 	ROM_REGION16_LE( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 ROM_END
 
@@ -4191,7 +4171,7 @@ ROM_START( raystormo )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 ROM_END
 
@@ -4207,7 +4187,7 @@ ROM_START( raystormu )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 ROM_END
 
@@ -4223,7 +4203,7 @@ ROM_START( raystormj )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION( 0x400000, "zsg2", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 ROM_END
 

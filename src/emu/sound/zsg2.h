@@ -17,26 +17,8 @@
 #define MCFG_ZSG2_REPLACE(_tag, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, ZSG2, _clock)
 
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-struct zsg2_interface
-{
-	const char *samplergn;
-};
-
-// 16 registers per channel, 48 channels
-struct zchan
-{
-	zchan()
-	{
-		memset(v, 0, sizeof(UINT16)*16);
-	}
-
-	UINT16 v[16];
-};
+#define MCFG_ZSG2_EXT_READ_HANDLER(_devcb) \
+	devcb = &zsg2_device::set_ext_read_handler(*device, DEVCB2_##_devcb);
 
 
 // ======================> zsg2_device
@@ -48,6 +30,12 @@ public:
 	zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~zsg2_device() { }
 
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<zsg2_device &>(device).m_ext_read_handler.set_callback(object); }
+
+	DECLARE_READ16_MEMBER(read);
+	DECLARE_WRITE16_MEMBER(write);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -55,27 +43,47 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-public:
-	DECLARE_READ16_MEMBER( zsg2_r );
-	DECLARE_WRITE16_MEMBER( zsg2_w );
+private:
+	// 16 registers per channel, 48 channels
+	struct zchan
+	{
+		zchan()
+		{
+			memset(v, 0, sizeof(UINT16)*16);
+		}
 
-public:
+		UINT16 v[16];
+		
+		bool is_playing;
+		INT16 *samples;
+		UINT32 cur_pos;
+		UINT32 step_ptr;
+		UINT32 step;
+		UINT32 start_pos;
+		UINT32 end_pos;
+		UINT32 loop_pos;
+		UINT32 page;
+	};
+
+	zchan m_chan[48];
+	UINT32 m_read_address;
+
+	UINT32 *m_mem_base;
+	UINT32 *m_mem_copy;
+	UINT32 m_mem_size;
+	UINT32 m_mem_blocks;
+	INT16 *m_full_samples;
+
+	sound_stream *m_stream;
+	
+	devcb2_read32 m_ext_read_handler;
+
+	UINT32 read_memory(UINT32 offset);
 	void chan_w(int chan, int reg, UINT16 data);
 	UINT16 chan_r(int chan, int reg);
-	void check_channel(int chan);
-	void keyon(int chan);
 	void control_w(int reg, UINT16 data);
 	UINT16 control_r(int reg);
-
-private:
-	zchan m_zc[48];
-	UINT16 m_act[3];
-	UINT16 m_alow;
-	UINT16 m_ahigh;
-	UINT8 *m_bank_samples;
-
-	int m_sample_rate;
-	sound_stream *m_stream;
+	INT16 *prepare_samples(UINT32 offset);
 };
 
 extern const device_type ZSG2;

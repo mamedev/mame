@@ -9,6 +9,11 @@ public:
 	taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~taito_zoom_device() {}
 
+	DECLARE_WRITE16_MEMBER(sound_irq_w);
+	DECLARE_READ16_MEMBER(sound_irq_r);
+	DECLARE_WRITE16_MEMBER(global_volume_w);
+	DECLARE_WRITE16_MEMBER(reset_control_w);
+
 	DECLARE_READ8_MEMBER(shared_ram_r);
 	DECLARE_WRITE8_MEMBER(shared_ram_w);
 	DECLARE_READ8_MEMBER(tms_ctrl_r);
@@ -20,9 +25,13 @@ protected:
 	virtual void device_reset();
 
 private:
+	
+	// devices/pointers
+	required_device<mn10200_device> m_soundcpu;
+	
 	// internal state
 	UINT8 m_tms_ctrl;
-	UINT8 m_snd_shared_ram[0x100];
+	UINT8* m_snd_shared_ram;
 };
 
 extern const device_type TAITO_ZOOM;

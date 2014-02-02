@@ -344,7 +344,11 @@ public:
 		m_mn10200(*this, "mn10200"),
 		m_flashbank(*this, "flashbank"),
 		m_mb3773(*this, "mb3773"),
-		m_zoom(*this, "taito_zoom")
+		m_zoom(*this, "taito_zoom"),
+		m_pgmflash(*this, "pgmflash"),
+		m_sndflash0(*this, "sndflash0"),
+		m_sndflash1(*this, "sndflash1"),
+		m_sndflash2(*this, "sndflash2")
 	{
 	}
 
@@ -362,6 +366,7 @@ public:
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
+	DECLARE_READ32_MEMBER(zsg2_ext_r);
 
 protected:
 	virtual void driver_start();
@@ -385,6 +390,10 @@ private:
 	required_device<address_map_bank_device> m_flashbank;
 	required_device<mb3773_device> m_mb3773;
 	required_device<taito_zoom_device> m_zoom;
+	required_device<intelfsh16_device> m_pgmflash;
+	required_device<intelfsh16_device> m_sndflash0;
+	required_device<intelfsh16_device> m_sndflash1;
+	required_device<intelfsh16_device> m_sndflash2;
 };
 
 
@@ -462,7 +471,7 @@ READ16_MEMBER(taitogn_state::hack1_r)
 	{
 	case 0:
 		m_v = m_v ^ 8;
-		// Probably something to do with sound
+		// Probably something to do with MCU
 		return m_v;
 	}
 
@@ -546,6 +555,18 @@ READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 	return ioport("P4")->read();
 }
 
+READ32_MEMBER(taitogn_state::zsg2_ext_r)
+{
+	offset *= 2;
+	
+	if (offset < 0x100000)
+		return m_sndflash0->read(offset) | m_sndflash0->read(offset | 1) << 16;
+	else if (offset < 0x200000)
+		return m_sndflash1->read(offset & 0xfffff) | m_sndflash0->read((offset & 0xfffff) | 1) << 16;
+	else
+		return m_sndflash2->read(offset & 0xfffff) | m_sndflash0->read((offset & 0xfffff) | 1) << 16;
+}
+
 // Init and reset
 
 void taitogn_state::driver_start()
@@ -581,7 +602,11 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE8(control_r, control_w, 0x000000ff)
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE16(control2_w, 0x0000ffff)
 	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE16(gn_1fb70000_r, gn_1fb70000_w, 0x0000ffff)
-	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comms with the MN10200, with additional comms at 1fb80000
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, global_volume_w, 0x0000ffff)
+	//AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reset_control_w, 0xffff0000)
+	AM_RANGE(0x1fba0000, 0x1fba0003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, sound_irq_w, 0x0000ffff)
+	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_DEVREAD16("taito_zoom", taito_zoom_device, sound_irq_r, 0x0000ffff)
+	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comms with the MN10200
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, taitogn_state )
@@ -654,6 +679,11 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000000)
 
 	MCFG_FRAGMENT_ADD( taito_zoom_sound )
+	MCFG_SOUND_REPLACE("zsg2", ZSG2, XTAL_25MHz/2)
+	MCFG_ZSG2_EXT_READ_HANDLER(READ32(taitogn_state, zsg2_ext_r))
+
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh3002t_mp, coh3002t )

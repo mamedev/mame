@@ -21,7 +21,7 @@ const device_type MN10200 = &device_creator<mn10200_device>;
 
 
 mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, MN10200, "Panasonic MN10200", tag, owner, clock, "mn10200", __FILE__)
+	: cpu_device(mconfig, MN10200, "MN10200", tag, owner, clock, "mn10200", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_io_config("data", ENDIANNESS_LITTLE, 8, 8, 0)
 {
@@ -1979,6 +1979,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
 	case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055: {
 	int irq = ((adr & 0x3f)>>1)-1;
+#if 0
 	if((m_icrh[irq] != data) && (data & 15)) {
 		printf("MN10200: irq %d enabled, level=%x, enable= %s %s %s %s\n", irq+1, (data >> 4) & 7,
 		data & 1 ? inames[irq][0] : "-",
@@ -1989,6 +1990,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	if((m_icrh[irq] != data) && !(data & 15)) {
 		printf("MN10200: irq %d disabled\n", irq+1);
 	}
+#endif
 	m_icrh[irq] = data;
 	break;
 	}
