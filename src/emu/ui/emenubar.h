@@ -22,10 +22,21 @@ public:
 	ui_emu_menubar(running_machine &machine, render_container *container);
 
 protected:
-	virtual void build_menus();
+	virtual void menubar_build_menus();
 
 private:
+	// dummy declaration for now, so that development is easier
 	char			m_dummy[256];
+
+	// menubar building
+	void build_file_menu();
+	void build_snapshot_menu();
+	void build_options_menu();
+	void build_settings_menu();
+	void build_help_menu();
+
+	// miscellaneous
+	void throttle(float f);
 };
 
 

@@ -55,7 +55,7 @@ private:
 	void inkey_select(const ui_menu_event *menu_event);
 	void inkey_cancel(const ui_menu_event *menu_event);
 	void inkey_special(const ui_menu_event *menu_event);
-	void inkey_toggle_ui(const ui_menu_event *menu_event);
+	void inkey_configure(const ui_menu_event *menu_event);
 };
 
 

@@ -841,6 +841,18 @@ void input_type_entry::configure_osd(const char *token, const char *name)
 }
 
 
+//-------------------------------------------------
+//  restore_default_seq - restores the sequence
+//	from the default
+//-------------------------------------------------
+
+void input_type_entry::restore_default_seq()
+{
+	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
+		m_seq[seqtype] = defseq(seqtype);
+}
+
+
 //**************************************************************************
 //  DIGITAL JOYSTICKS
 //**************************************************************************
@@ -2606,6 +2618,19 @@ time_t ioport_manager::initialize()
 			mame_printf_error("Input port errors:\n%s", errors.cstr());
 	}
 
+	// special case - change UI_CONFIGURE to be ScrLk on computers
+	if (has_keyboard())
+	{
+		for (input_type_entry *curtype = first_type(); curtype != NULL; curtype = curtype->next())
+		{
+			if (curtype->type() == IPT_UI_CONFIGURE)
+			{
+				curtype->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_SCRLOCK);
+				curtype->restore_default_seq();
+			}
+		}
+	}
+
 	// renumber player numbers for controller ports
 	int player_offset = 0;
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
@@ -2679,8 +2704,7 @@ void ioport_manager::init_port_types()
 	for (input_type_entry *curtype = first_type(); curtype != NULL; curtype = curtype->next())
 	{
 		// first copy all the OSD-updated sequences into our current state
-		for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
-			curtype->m_seq[seqtype] = curtype->defseq(seqtype);
+		curtype->restore_default_seq();
 
 		// also make a lookup table mapping type/player to the appropriate type list entry
 		m_type_to_entry[curtype->type()][curtype->player()] = curtype;

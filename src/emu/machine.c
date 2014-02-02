@@ -771,6 +771,19 @@ void running_machine::resume()
 
 
 //-------------------------------------------------
+//  toggle_pause - toggles the pause state
+//-------------------------------------------------
+
+void running_machine::toggle_pause()
+{
+	if (paused())
+		resume();
+	else
+		pause();
+}
+
+
+//-------------------------------------------------
 //  add_notifier - add a notifier of the
 //  given type
 //-------------------------------------------------

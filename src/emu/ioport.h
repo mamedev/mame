@@ -362,7 +362,7 @@ enum ioport_type
 		IPT_UI_NEXT_GROUP,
 		IPT_UI_ROTATE,
 		IPT_UI_SHOW_PROFILER,
-		IPT_UI_TOGGLE_UI,
+		IPT_UI_DUMMY1,				// REMOVE ME WHEN FINAL
 		IPT_UI_TOGGLE_DEBUG,
 		IPT_UI_PASTE,
 		IPT_UI_SAVE_STATE,
@@ -721,6 +721,7 @@ public:
 	const char *name() const { return m_name; }
 	input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) { return m_defseq[seqtype]; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const { return m_seq[seqtype]; }
+	void restore_default_seq();
 
 	// setters
 	void configure_osd(const char *token, const char *name);

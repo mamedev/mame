@@ -95,14 +95,14 @@ static UINT32 (*ui_handler_callback)(running_machine &, render_container *, UINT
 static UINT32 ui_handler_param;
 
 /* flag to track single stepping */
-static int single_step;
+static bool single_step;
 
 /* FPS counter display */
 static int showfps;
 static osd_ticks_t showfps_end;
 
 /* profiler display */
-static int show_profiler;
+static bool show_profiler;
 
 /* popup text display */
 static osd_ticks_t popup_text_end;
@@ -278,7 +278,7 @@ int ui_init(running_machine &machine)
 	ui_gfx_init(machine);
 
 	/* reset globals */
-	single_step = FALSE;
+	single_step = false;
 	ui_set_handler(handler_messagebox, 0);
 	/* retrieve options */
 	ui_use_natural_keyboard = machine.options().natural_keyboard();
@@ -1392,13 +1392,14 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 	if (single_step)
 	{
 		machine.pause();
-		single_step = FALSE;
+		single_step = false;
 	}
 
 	/* determine if we should disable the rest of the UI */
-	int ui_disabled = (machine.ioport().has_keyboard() && !machine.ui_active());
+	bool ui_disabled = false;
 
 	/* is ScrLk UI toggling applicable here? */
+#if 0
 	if (machine.ioport().has_keyboard())
 	{
 		/* are we toggling the UI with ScrLk? */
@@ -1430,6 +1431,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 			}
 		}
 	}
+#endif
 
 	/* is the natural keyboard enabled? */
 	if (ui_get_use_natural_keyboard(machine) && (machine.phase() == MACHINE_PHASE_RUNNING))
@@ -1500,13 +1502,11 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 		/* with a shift key, it is single step */
 		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
 		{
-			single_step = TRUE;
+			single_step = true;
 			machine.resume();
 		}
-		else if (machine.paused())
-			machine.resume();
 		else
-			machine.pause();
+			machine.toggle_pause();
 	}
 
 	/* handle a toggle cheats request */
