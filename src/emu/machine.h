@@ -297,6 +297,10 @@ private:
 	void soft_reset(void *ptr = NULL, INT32 param = 0);
 	void watchdog_fired(void *ptr = NULL, INT32 param = 0);
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
+	const char *image_parent_basename(device_t *device);
+	astring &nvram_filename(astring &result, device_t &device);	
+	void nvram_load();
+	void nvram_save();
 
 	// internal callbacks
 	static void logfile_callback(running_machine &machine, const char *buffer);

@@ -70,17 +70,6 @@ int coin_lockout_get_state(running_machine &machine, int num);
 void coin_lockout_global_w(running_machine &machine, int on);
 
 
-
-/* ----- NVRAM management ----- */
-
-/* load NVRAM from a file */
-void nvram_load(running_machine &machine);
-
-/* save NVRAM to a file */
-void nvram_save(running_machine &machine);
-
-
-
 /* ----- memory card management ----- */
 
 /* create a new memory card with the given index */
