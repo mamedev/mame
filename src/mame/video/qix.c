@@ -15,16 +15,6 @@
 
 /*************************************
  *
- *  Device tag
- *
- *************************************/
-
-#define MC6845_TAG      ("vid_u18")
-
-
-
-/*************************************
- *
  *  Static function prototypes
  *
  *************************************/
@@ -46,6 +36,10 @@ VIDEO_START_MEMBER(qix_state,qix)
 	/* allocate memory for the full video RAM */
 	m_videoram.allocate(256 * 256);
 
+	/* initialize the palette */
+	for (int x = 0; x < 0x400; x++)
+		set_pen(x);
+
 	/* set up save states */
 	save_item(NAME(m_flip));
 	save_item(NAME(m_palette_bank));
@@ -65,8 +59,8 @@ WRITE_LINE_MEMBER(qix_state::display_enable_changed)
 	/* on the rising edge, latch the scanline */
 	if (state)
 	{
-		UINT16 ma = downcast<mc6845_device *>(machine().device(MC6845_TAG))->get_ma();
-		UINT8 ra = downcast<mc6845_device *>(machine().device(MC6845_TAG))->get_ra();
+		UINT16 ma = m_crtc->get_ma();
+		UINT8 ra = m_crtc->get_ra();
 
 		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
 		*m_scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
@@ -208,6 +202,8 @@ WRITE8_MEMBER(qix_state::qix_paletteram_w)
 	if (((offset >> 8) == m_palette_bank) &&
 		(old_data != data))
 		m_screen->update_now();
+
+	set_pen(offset);
 }
 
 
@@ -225,10 +221,8 @@ WRITE8_MEMBER(qix_state::qix_palettebank_w)
 }
 
 
-void qix_state::get_pens( pen_t *pens)
+void qix_state::set_pen(int offs)
 {
-	offs_t offs;
-
 	/* this conversion table should be about right. It gives a reasonable */
 	/* gray scale in the test screen, and the red, green and blue squares */
 	/* in the same screen are barely visible, as the manual requires. */
@@ -252,24 +246,21 @@ void qix_state::get_pens( pen_t *pens)
 		0xff    /* value = 3, intensity = 3 */
 	};
 
-	for (offs = m_palette_bank << 8; offs < (m_palette_bank << 8) + NUM_PENS; offs++)
-	{
-		int bits, intensity, r, g, b;
+	int bits, intensity, r, g, b;
 
-		UINT8 data = m_paletteram[offs];
+	UINT8 data = m_paletteram[offs];
 
-		/* compute R, G, B from the table */
-		intensity = (data >> 0) & 0x03;
-		bits = (data >> 6) & 0x03;
-		r = table[(bits << 2) | intensity];
-		bits = (data >> 4) & 0x03;
-		g = table[(bits << 2) | intensity];
-		bits = (data >> 2) & 0x03;
-		b = table[(bits << 2) | intensity];
+	/* compute R, G, B from the table */
+	intensity = (data >> 0) & 0x03;
+	bits = (data >> 6) & 0x03;
+	r = table[(bits << 2) | intensity];
+	bits = (data >> 4) & 0x03;
+	g = table[(bits << 2) | intensity];
+	bits = (data >> 2) & 0x03;
+	b = table[(bits << 2) | intensity];
 
-		/* update the palette */
-		pens[offs & 0xff] = MAKE_RGB(r, g, b);
-	}
+	/* update the palette */
+	m_pens[offs] = MAKE_RGB(r, g, b);
 }
 
 
@@ -290,10 +281,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 	popmessage("self test leds: %d%d %d%d%d%d",BIT(leds,7),BIT(leds,5),BIT(leds,6),BIT(leds,4),BIT(leds,2),BIT(leds,3));
 #endif
 
-	/* create the pens */
-	state->get_pens(state->m_pens);
-
-	return state->m_pens;
+	return &(state->m_pens)[state->m_palette_bank << 8];
 }
 
 
@@ -421,11 +409,11 @@ MACHINE_CONFIG_FRAGMENT( qix_video )
 
 	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", QIX_CHARACTER_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("vid_u18", MC6845, "screen", QIX_CHARACTER_CLOCK, mc6845_intf)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100) /* from CRTC */
-	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("vid_u18", mc6845_device, screen_update)
 MACHINE_CONFIG_END
 
 
