@@ -458,3 +458,31 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		y1 += ui_get_line_height(machine());
 	}
 }
+
+
+//-------------------------------------------------
+//  force_game_select - force the game
+//  select menu to be visible and inescapable
+//-------------------------------------------------
+
+void ui_menu_select_game::force_game_select(running_machine &machine, render_container *container)
+{
+	char *gamename = (char *)machine.options().system_name();
+
+	// reset the menu stack
+	ui_menu::stack_reset(machine);
+
+	// add the quit entry followed by the game select entry
+	ui_menu *quit = auto_alloc_clear(machine, ui_menu_quit_game(machine, container));
+	quit->set_special_main_menu(true);
+	ui_menu::stack_push(quit);
+	ui_menu::stack_push(auto_alloc_clear(machine, ui_menu_select_game(machine, container, gamename)));
+
+	// force the menus on
+	ui_show_menu();
+
+	// make sure MAME is paused
+	machine.pause();
+}
+
+

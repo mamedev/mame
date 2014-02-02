@@ -17,48 +17,6 @@
 #include "crsshair.h"
 #include "drivenum.h"
 
-class ui_menu_main : public ui_menu {
-public:
-	ui_menu_main(running_machine &machine, render_container *container);
-	virtual ~ui_menu_main();
-	virtual void populate();
-	virtual void handle();
-
-private:
-	enum {
-		INPUT_GROUPS,
-		INPUT_SPECIFIC,
-		SETTINGS_DIP_SWITCHES,
-		SETTINGS_DRIVER_CONFIG,
-		ANALOG,
-		BOOKKEEPING,
-		GAME_INFO,
-		IMAGE_MENU_IMAGE_INFO,
-		IMAGE_MENU_FILE_MANAGER,
-		MESS_MENU_TAPE_CONTROL,
-		MESS_MENU_BITBANGER_CONTROL,
-		SLOT_DEVICES,
-		NETWORK_DEVICES,
-		KEYBOARD_MODE,
-		SLIDERS,
-		VIDEO_TARGETS,
-		VIDEO_OPTIONS,
-		CROSSHAIR,
-		CHEAT,
-		MEMORY_CARD,
-		SELECT_GAME,
-		BIOS_SELECTION,
-	};
-};
-
-class ui_menu_keyboard_mode : public ui_menu {
-public:
-	ui_menu_keyboard_mode(running_machine &machine, render_container *container);
-	virtual ~ui_menu_keyboard_mode();
-	virtual void populate();
-	virtual void handle();
-};
-
 class ui_menu_slot_devices : public ui_menu {
 public:
 	ui_menu_slot_devices(running_machine &machine, render_container *container);
@@ -353,7 +311,5 @@ public:
 
 private:
 };
-/* force game select menu */
-void ui_menu_force_game_select(running_machine &machine, render_container *container);
 
 #endif  /* __UIMAIN_H__ */

@@ -34,6 +34,9 @@ public:
 	virtual void handle();
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
+	// force game select menu
+	static void force_game_select(running_machine &machine, render_container *container);
+
 private:
 	// private driver list
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
@@ -57,6 +60,5 @@ private:
 	void inkey_special(const ui_menu_event *menu_event);
 	void inkey_configure(const ui_menu_event *menu_event);
 };
-
 
 #endif  /* __UI_SELGAME_H__ */

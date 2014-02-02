@@ -81,6 +81,7 @@
 #include "validity.h"
 #include "unzip.h"
 #include "debug/debugcon.h"
+#include "ui/selgame.h"
 
 #include <time.h>
 
@@ -483,7 +484,7 @@ void running_machine::schedule_exit()
 	if (m_exit_to_game_select && options().system_name()[0] != 0)
 	{
 		options().set_system_name("");
-		ui_menu_force_game_select(*this, &render().ui_container());
+		ui_menu_select_game::force_game_select(*this, &render().ui_container());
 	}
 
 	// otherwise, exit for real

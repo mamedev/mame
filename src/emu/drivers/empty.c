@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "render.h"
-#include "uimain.h"
+#include "ui/selgame.h"
 
 
 //**************************************************************************
@@ -29,7 +29,7 @@ public:
 	virtual void machine_start()
 	{
 		// force the UI to show the game select screen
-		ui_menu_force_game_select(machine(), &machine().render().ui_container());
+		ui_menu_select_game::force_game_select(machine(), &machine().render().ui_container());
 	}
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
