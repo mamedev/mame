@@ -10,7 +10,6 @@
         - fix MisterX LCD
         - MisterX bankswitch
         - dump the chargen
-        - verify pc2000 cartridge interface (I don't have dump for test it)
 
 ****************************************************************************/
 
@@ -46,8 +45,8 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	DECLARE_READ8_MEMBER( key_matrix_r );
 	DECLARE_WRITE8_MEMBER( key_matrix_w );
 	DECLARE_WRITE8_MEMBER( rombank1_w );
@@ -68,7 +67,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	DECLARE_READ8_MEMBER( kb_r );
 	DECLARE_READ8_MEMBER( lcdc_data_r );
 	DECLARE_WRITE8_MEMBER( lcdc_data_w );
@@ -107,9 +105,9 @@ WRITE8_MEMBER( pc2000_state::rombank1_w )
 
 WRITE8_MEMBER( pc2000_state::rombank2_w )
 {
-	if (data == 0x80)
+	if (data & 0x80)
 	{
-		m_bank2->set_entry(data & 0x10);   //cartridge
+		m_bank2->set_entry(data & 0x8f);   //cartridge
 	}
 	else
 	{
@@ -461,7 +459,7 @@ static INPUT_PORTS_START( pc1000 )
 INPUT_PORTS_END
 
 
-DEVICE_IMAGE_LOAD_MEMBER(pc1000_state, cart_load)
+DEVICE_IMAGE_LOAD_MEMBER(pc2000_state, cart_load)
 {
 	UINT8 *cart = memregion("cart")->base();
 
@@ -496,7 +494,7 @@ void pc2000_state::machine_start()
 
 	m_bank1->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank2->configure_entries(0, 0x10, bios, 0x4000);
-	m_bank2->configure_entry(0x10, cart);
+	m_bank2->configure_entries(0x80, 0x10, cart, 0x4000);
 }
 
 void pc2000_state::machine_reset()
@@ -567,8 +565,13 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_INTERFACE("pc2000_cart")
+	MCFG_CARTSLOT_INTERFACE("pc1000_cart")
+	MCFG_CARTSLOT_LOAD(pc2000_state, cart_load)
 	MCFG_CARTSLOT_NOT_MANDATORY
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gl2000, pc2000 )
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cart_list", "misterx")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( misterx, pc2000, pc1000_state )
@@ -687,8 +690,8 @@ ROM_END
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1988, misterx,  0,       0,     misterx,   pc1000, driver_device,   0,  "Video Technology / Yeno", "MisterX", GAME_NOT_WORKING)
 COMP( 1993, pc2000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "PreComputer 2000", GAME_NOT_WORKING)
-COMP( 1993, gl2000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000", GAME_NOT_WORKING)
-COMP( 1993, gl2000p,  gl2000,  0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000 Plus", GAME_NOT_WORKING)
+COMP( 1993, gl2000,   0,       0,     gl2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000", GAME_NOT_WORKING)
+COMP( 1993, gl2000p,  gl2000,  0,     gl2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 2000 Plus", GAME_NOT_WORKING)
 COMP( 19??, gl3000s,  0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 3000S (Germany)", GAME_IS_SKELETON)
 COMP( 19??, gl4004,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 4004 Quadro L (Germany)", GAME_IS_SKELETON)
 COMP( 19??, gl5000,   0,       0,     pc2000,    pc2000, driver_device,   0,  "Video Technology", "Genius Leader 5000 (Germany)", GAME_IS_SKELETON)
