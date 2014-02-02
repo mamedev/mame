@@ -116,7 +116,7 @@ static slider_state *slider_list;
 static slider_state *slider_current;
 
 /* natural keyboard info */
-static int ui_use_natural_keyboard;
+static bool ui_use_natural_keyboard;
 static UINT8 non_char_keys_down[(ARRAY_LENGTH(non_char_keys) + 7) / 8];
 
 
@@ -2300,7 +2300,7 @@ static INT32 slider_crossoffset(running_machine &machine, void *arg, astring *st
     whether the natural keyboard is active
 -------------------------------------------------*/
 
-int ui_get_use_natural_keyboard(running_machine &machine)
+bool ui_get_use_natural_keyboard(running_machine &machine)
 {
 	return ui_use_natural_keyboard;
 }
@@ -2312,7 +2312,7 @@ int ui_get_use_natural_keyboard(running_machine &machine)
     whether the natural keyboard is active
 -------------------------------------------------*/
 
-void ui_set_use_natural_keyboard(running_machine &machine, int use_natural_keyboard)
+void ui_set_use_natural_keyboard(running_machine &machine, bool use_natural_keyboard)
 {
 	ui_use_natural_keyboard = use_natural_keyboard;
 	astring error;

@@ -31,6 +31,13 @@ public:
 	virtual void reset();
 	virtual void do_handle();
 
+	// template methods
+	template<class _Stackable>
+	void push_menu()
+	{
+		stack_push(auto_alloc_clear(machine(), _Stackable(machine(), container)));
+	}
+
 protected:
 	class menu_item
 	{

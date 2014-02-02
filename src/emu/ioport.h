@@ -1219,6 +1219,12 @@ public:
 	bool safe_to_read() const { return m_safe_to_read; }
 	natural_keyboard &natkeyboard() { return m_natkeyboard; }
 
+	// has... getters
+	bool has_configs() const { return m_has_configs; }
+	bool has_analog() const { return m_has_analog; }
+	bool has_dips() const { return m_has_dips; }
+	bool has_bioses() const { return m_has_bioses; }
+
 	// type helpers
 	input_type_entry *first_type() const { return m_typelist.first(); }
 	bool type_pressed(ioport_type type, int player = 0);
@@ -1297,6 +1303,12 @@ private:
 	emu_file                m_playback_file;        // playback file (NULL if not recording)
 	UINT64                  m_playback_accumulated_speed; // accumulated speed during playback
 	UINT32                  m_playback_accumulated_frames; // accumulated frames during playback
+
+	// has...
+	bool					m_has_configs;
+	bool					m_has_analog;
+	bool					m_has_dips;
+	bool					m_has_bioses;
 };
 
 

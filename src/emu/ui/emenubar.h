@@ -36,7 +36,10 @@ private:
 	void build_help_menu();
 
 	// miscellaneous
+	void select_new_game();
 	void throttle(float f);
+	void set_natural_keyboard(bool use_natural_keyboard);
+	void video_options();
 };
 
 

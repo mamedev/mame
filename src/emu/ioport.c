@@ -2680,6 +2680,31 @@ time_t ioport_manager::initialize()
 	// register callbacks for when we load configurations
 	config_register(machine(), "input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
 
+	// calculate "has..." values
+	{
+		m_has_configs = false;
+		m_has_analog = false;
+		m_has_dips = false;
+		m_has_bioses = false;
+
+		// scan the input port array to see what options we need to enable
+		for (ioport_port *port = first_port(); port != NULL; port = port->next())
+			for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+			{
+				if (field->type() == IPT_DIPSWITCH)
+					m_has_dips = true;
+				if (field->type() == IPT_CONFIG)
+					m_has_configs = true;
+				if (field->is_analog())
+					m_has_analog = true;
+			}
+		device_iterator deviter(machine().root_device());
+		for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+			if (device->rom_region())
+				for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+					if (ROMENTRY_ISSYSTEM_BIOS(rom)) { m_has_bioses= true; break; }
+	}
+
 	// open playback and record files if specified
 	time_t basetime = playback_init();
 	record_init();

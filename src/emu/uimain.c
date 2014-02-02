@@ -110,29 +110,7 @@ ui_menu_main::ui_menu_main(running_machine &machine, render_container *container
 
 void ui_menu_main::populate()
 {
-	ioport_field *field;
-	ioport_port *port;
-	int has_configs = false;
-	int has_analog = false;
-	int has_dips = false;
-	int has_bioses = false;
 	astring menu_text;
-	/* scan the input port array to see what options we need to enable */
-	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
-		for (field = port->first_field(); field != NULL; field = field->next())
-		{
-			if (field->type() == IPT_DIPSWITCH)
-				has_dips = true;
-			if (field->type() == IPT_CONFIG)
-				has_configs = true;
-			if (field->is_analog())
-				has_analog = true;
-		}
-	device_iterator deviter(machine().root_device());
-	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
-		if (device->rom_region())
-			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
-				if (ROMENTRY_ISSYSTEM_BIOS(rom)) { has_bioses= true; break; }
 
 	/* add input menu items */
 	item_append("Input (general)", NULL, 0, (void *)INPUT_GROUPS);
@@ -141,11 +119,11 @@ void ui_menu_main::populate()
 	item_append(menu_text.cstr(), NULL, 0, (void *)INPUT_SPECIFIC);
 
 	/* add optional input-related menus */
-	if (has_analog)
+	if (machine().ioport().has_analog())
 		item_append("Analog Controls", NULL, 0, (void *)ANALOG);
-	if (has_dips)
+	if (machine().ioport().has_dips())
 		item_append("Dip Switches", NULL, 0, (void *)SETTINGS_DIP_SWITCHES);
-	if (has_configs)
+	if (machine().ioport().has_configs())
 	{
 		menu_text.printf("%s Configuration",emulator_info::get_capstartgamenoun());
 		item_append(menu_text.cstr(), NULL, 0, (void *)SETTINGS_DRIVER_CONFIG);
@@ -178,7 +156,7 @@ void ui_menu_main::populate()
 			item_append("Bitbanger Control", NULL, 0, (void *)MESS_MENU_BITBANGER_CONTROL);
 	}
 
-	if (has_bioses)
+	if (machine().ioport().has_bioses())
 		item_append("Bios Selection", NULL, 0, (void *)BIOS_SELECTION);
 
 	slot_interface_iterator slotiter(machine().root_device());

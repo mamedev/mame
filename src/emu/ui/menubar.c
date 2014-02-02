@@ -200,8 +200,11 @@ void ui_menubar::do_handle()
 
 void ui_menubar::invoke_selection()
 {
-	m_selected->invoke();
+	// first, we're ending the menu; pop us off first
 	ui_menu::stack_pop(machine());
+
+	// and invoke the selection
+	m_selected->invoke();
 }
 
 
@@ -354,7 +357,7 @@ void ui_menubar::draw_child_menu(menu_item *menu, float x, float y)
 			draw_child_menu(
 				mi,
 				x + max_width + (spacing * 2),
-				y);
+				my);
 		}
 
 		my += text_height;

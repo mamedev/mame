@@ -267,7 +267,7 @@ private:
 
 class ui_menu_sliders : public ui_menu {
 public:
-	ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode);
+	ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode = false);
 	virtual ~ui_menu_sliders();
 	virtual void populate();
 	virtual void handle();
