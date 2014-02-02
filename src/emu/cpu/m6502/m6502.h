@@ -44,7 +44,7 @@
 	downcast<m6502_device *>(device)->disable_direct();
 
 #define MCFG_M6502_SYNC_CALLBACK(_cb) \
-	devcb = &m6502_device::set_sync_callback(*device, DEVCB2_##_cb)
+	devcb = &m6502_device::set_sync_callback(*device, DEVCB2_##_cb);
 
 class m6502_device : public cpu_device {
 public:
