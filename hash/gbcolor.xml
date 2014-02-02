@@ -8697,7 +8697,7 @@ List of unconfirmed retail cartridge roms
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="flintstones, the - burgertime in bedrock (europe) (en,fr,de,es,it).bin" size="1048576" crc="ecccd908" sha1="80ec102f3cf45602c6facffcdd44232650897dab" offset="000000" />
+				<rom name="flintstones, the - burgertime in bedrock (europe) (beta).bin" size="1048576" crc="ecccd908" sha1="80ec102f3cf45602c6facffcdd44232650897dab" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
