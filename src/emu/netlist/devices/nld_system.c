@@ -56,6 +56,7 @@ NETLIB_UPDATE(ttl_input)
 
 NETLIB_UPDATE_PARAM(ttl_input)
 {
+    update();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -79,4 +80,5 @@ NETLIB_UPDATE(analog_input)
 
 NETLIB_UPDATE_PARAM(analog_input)
 {
+    update();
 }

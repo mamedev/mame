@@ -653,6 +653,7 @@ void netlist_setup_t::start_devices()
 		for (int i=0; i < ll.count(); i++)
 		{
 			NL_VERBOSE_OUT(("%d: <%s>\n",i, ll[i].cstr()));
+			printf("%d: <%s>\n",i, ll[i].cstr());
 			netlist_device_t *nc = factory().new_device_by_classname("nld_log", *this);
 			pstring name = "log_" + ll[i];
 			register_dev(nc, name);

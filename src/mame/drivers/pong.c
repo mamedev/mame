@@ -766,6 +766,11 @@ static NETLIST_START(test)
     SOLVER(Solver)
     PARAM(Solver.FREQ, 48000)
 
+    NETDEV_SOUND_IN(SND_IN)
+    PARAM(SND_IN.CHAN0, "tin.IN")
+
+    ANALOG_INPUT(tin, 0)
+
     // astable NAND Multivibrator
     RES(R1, 1000)
     CAP(C1, 1e-6)
@@ -777,6 +782,9 @@ static NETLIST_START(test)
 
     NETDEV_SOUND_OUT(CH0, 0)
     NET_C(CH0.IN, n2.Q)
+
+    NETDEV_SOUND_OUT(CH1, 1)
+    NET_C(CH1.IN, tin.Q)
 
 NETLIST_END()
 #endif
@@ -887,10 +895,14 @@ static MACHINE_CONFIG_START( pong, pong_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 48000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+#ifdef TEST_SOUND
+    MCFG_SOUND_ROUTE_EX(0, "snd_test", 1.0, 0)
+#else
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+#endif
 
 #ifdef TEST_SOUND
-    MCFG_SOUND_ADD("snd_test", NETLIST_SOUND, 24000)
+    MCFG_SOUND_ADD("snd_test", NETLIST_SOUND, 48000)
     MCFG_NETLIST_SETUP(test)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 #endif
