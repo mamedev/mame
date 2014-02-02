@@ -6,8 +6,7 @@
  
     driver by Nathan Woods and R. Belmont
  
-    Driver is not working yet; seems to get caught in an infinite loop on
-    startup.  Special thanks to Chris Smolinski (author of the Sara emulator)
+    Special thanks to Chris Smolinski (author of the Sara emulator)
     for his input about this poorly known system.
  
     Also thanks to Washington Apple Pi for the "Apple III DVD" containing the
