@@ -51,6 +51,11 @@ private:
 	void build_driver_list();
 	static int driver_list_compare(const void *p1, const void *p2);
 	void select_searched_item();
+
+	void inkey_select(const ui_menu_event *menu_event);
+	void inkey_cancel(const ui_menu_event *menu_event);
+	void inkey_special(const ui_menu_event *menu_event);
+	void inkey_toggle_ui(const ui_menu_event *menu_event);
 };
 
 

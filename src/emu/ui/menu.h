@@ -151,7 +151,7 @@ private:
 	int					top_line;
 
 	void draw(bool customonly);
-	void draw_text_box();
+	void draw_text_box_menu();
 	void handle_events();
 	void handle_keys(UINT32 flags);
 	void clear_free_list();

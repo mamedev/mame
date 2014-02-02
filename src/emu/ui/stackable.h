@@ -15,6 +15,7 @@
 #define __UI_STACKABLE_H__
 
 #include "render.h"
+#include "ui.h"
 
 
 //**************************************************************************
@@ -25,6 +26,7 @@ class ui_stackable
 {
 public:
 	ui_stackable(running_machine &machine, render_container *container);
+	virtual ~ui_stackable();
 
 	running_machine &machine() const { return m_machine; }
 
@@ -51,9 +53,20 @@ public:
 	virtual void do_handle() = 0;
 
 protected:
+	// variables
 	static ui_stackable *menu_stack;
 
+	// static methods
 	static void clear_free_list(running_machine &machine);
+
+	// methods
+	float get_line_height();
+	float get_char_width(unicode_char ch);
+	float get_string_width(const char *s);
+	void draw_outlined_box(float x0, float y0, float x1, float y1, rgb_t backcolor = UI_TEXT_COLOR);
+	void draw_text(const char *origs, float x, float y);
+	void draw_text(const char *origs, float x, float y, float origwrapwidth, int justify = JUSTIFY_LEFT, int wrap = WRAP_WORD, int draw = DRAW_NORMAL, rgb_t fgcolor = UI_TEXT_COLOR, rgb_t bgcolor = UI_TEXT_BG_COLOR, float *totalwidth = NULL, float *totalheight = NULL);
+	void draw_text_box(const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
 
 private:
 	static ui_stackable *menu_free;

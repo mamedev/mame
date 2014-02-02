@@ -34,6 +34,11 @@ ui_stackable::ui_stackable(running_machine &machine, render_container *_containe
 }
 
 
+ui_stackable::~ui_stackable()
+{
+}
+
+
 /*-------------------------------------------------
     stack_reset - reset the menu stack
 -------------------------------------------------*/
@@ -128,3 +133,72 @@ void ui_stackable::clear_free_list(running_machine &machine)
 	}
 }
 
+
+/*-------------------------------------------------
+    get_line_height
+-------------------------------------------------*/
+
+float ui_stackable::get_line_height()
+{
+	return ui_get_line_height(machine());
+}
+
+
+/*-------------------------------------------------
+    get_char_width
+-------------------------------------------------*/
+
+float ui_stackable::get_char_width(unicode_char ch)
+{
+	return ui_get_char_width(machine(), ch);
+}
+
+
+/*-------------------------------------------------
+    get_string_width
+-------------------------------------------------*/
+
+float ui_stackable::get_string_width(const char *s)
+{
+	return ui_get_string_width(machine(), s);
+}
+
+
+/*-------------------------------------------------
+    draw_outlined_box
+-------------------------------------------------*/
+
+void ui_stackable::draw_outlined_box(float x0, float y0, float x1, float y1, rgb_t backcolor)
+{
+	ui_draw_outlined_box(container, x0, y0, x1, y1, backcolor);
+}
+
+
+/*-------------------------------------------------
+    draw_text
+-------------------------------------------------*/
+
+void ui_stackable::draw_text(const char *origs, float x, float y)
+{
+	draw_text(origs, x, y, 1.0f - x);
+}
+
+
+/*-------------------------------------------------
+    draw_text
+-------------------------------------------------*/
+
+void ui_stackable::draw_text(const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight)
+{
+	ui_draw_text_full(container, origs, x, y, origwrapwidth, justify, wrap, draw, fgcolor, bgcolor, totalwidth, totalheight);
+}
+
+
+/*-------------------------------------------------
+    draw_text_box
+-------------------------------------------------*/
+
+void ui_stackable::draw_text_box(const char *text, int justify, float xpos, float ypos, rgb_t backcolor)
+{
+	ui_draw_text_box(container, text, justify, xpos, ypos, backcolor);
+}

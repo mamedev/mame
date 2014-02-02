@@ -280,7 +280,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 
 	/* draw the menu */
 	if (numitems > 1 && (item[0].flags & MENU_FLAG_MULTILINE) != 0)
-		draw_text_box();
+		draw_text_box_menu();
 	else
 		draw(flags & UI_MENU_PROCESS_CUSTOM_ONLY);
 
@@ -669,12 +669,12 @@ void ui_menu::custom_render(void *selectedref, float top, float bottom, float x,
 }
 
 /*-------------------------------------------------
-    draw_text_box - draw a multiline
+    draw_text_box_menu - draw a multiline
     word-wrapped text box with a menu item at the
     bottom
 -------------------------------------------------*/
 
-void ui_menu::draw_text_box()
+void ui_menu::draw_text_box_menu()
 {
 	const char *text = item[0].text;
 	const char *backtext = item[1].text;
