@@ -130,6 +130,28 @@ void netlist_mame_logic_input_t::device_start()
 	}
 }
 
+// ----------------------------------------------------------------------------------------
+// netlist_mame_t
+// ----------------------------------------------------------------------------------------
+
+void netlist_mame_t::vfatalerror(const loglevel_e level, const char *format, va_list ap) const
+{
+    pstring errstr = pstring(format).vprintf(ap);
+
+    switch (level)
+    {
+        case NL_WARNING:
+            logerror("netlist WARNING: %s\n", errstr.cstr());
+            break;
+        case NL_LOG:
+            logerror("netlist LOG: %s\n", errstr.cstr());
+            break;
+        case NL_ERROR:
+            emu_fatalerror error("netlist ERROR: %s\n", errstr.cstr());
+            throw error;
+            break;
+    }
+}
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_device_t

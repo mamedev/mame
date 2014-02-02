@@ -118,11 +118,7 @@ public:
 
 protected:
 
-	void vfatalerror(const loglevel_e level, const char *format, va_list ap) const
-	{
-		emu_fatalerror error(format, ap);
-		throw error;
-	}
+	void vfatalerror(const loglevel_e level, const char *format, va_list ap) const;
 
 private:
 	netlist_mame_device_t &m_parent;
