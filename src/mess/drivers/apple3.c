@@ -23,28 +23,8 @@
 #include "machine/appldriv.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
-	AM_RANGE(0x0000, 0x00FF) AM_READWRITE(apple3_00xx_r, apple3_00xx_w)
-	AM_RANGE(0x0100, 0x01FF) AM_RAMBANK("bank2")
-	AM_RANGE(0x0200, 0x1FFF) AM_RAMBANK("bank3")
-	AM_RANGE(0x2000, 0x9FFF) AM_RAMBANK("bank4")
-	AM_RANGE(0xA000, 0xBFFF) AM_RAMBANK("bank5")
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
 ADDRESS_MAP_END
-
-
-/* the Apple /// does some weird tricks whereby it monitors the SYNC pin
- * on the CPU to check for indexed instructions and directs them to
- * different memory locations */
-#if 0
-static const m6502_interface apple3_m6502_interface =
-{
-	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_read), /* read_indexed_func */
-	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_write),    /* write_indexed_func */
-	DEVCB_NULL, /* port_read_func */
-	DEVCB_NULL, /* port_write_func */
-	0x00,
-	0x00
-};
-#endif
 
 static const floppy_interface apple3_floppy_interface =
 {
@@ -71,9 +51,9 @@ static const struct a2bus_interface a2bus_intf =
 static MACHINE_CONFIG_START( apple3, apple3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
+	MCFG_M6502_SYNC_CALLBACK(WRITELINE(apple3_state, apple3_sync_w))
 	MCFG_CPU_PROGRAM_MAP(apple3_map)
-//  MCFG_CPU_CONFIG( apple3_m6502_interface )
-	MCFG_CPU_PERIODIC_INT_DRIVER(apple3_state, apple3_interrupt,  192)
+	MCFG_CPU_PERIODIC_INT_DRIVER(apple3_state, apple3_interrupt, 192)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(apple3_state, apple3 )

@@ -2333,6 +2333,9 @@ $(MESS_VIDEO)/apple2.o:     $(MESSSRC)/includes/apple2.h
 $(MESS_DRIVERS)/apple2gs.o: $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
 $(MESS_MACHINE)/apple2gs.o: $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
 $(MESS_VIDEO)/apple2gs.o:   $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
+$(MESS_DRIVERS)/apple3.o:   $(MESSSRC)/includes/apple3.h
+$(MESS_MACHINE)/apple3.o:   $(MESSSRC)/includes/apple3.h
+$(MESS_VIDEO)/apple3.o:     $(MESSSRC)/includes/apple3.h
 
 
 # $(MESSSRC)/drivers/apollo.c includes m68kcpu.h and m68kcpu.h now includes m68kops.h

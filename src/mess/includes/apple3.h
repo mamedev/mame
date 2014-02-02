@@ -54,6 +54,9 @@ public:
 	UINT8 m_last_n;
 	UINT8 *m_char_mem;
 	UINT32 *m_hgr_map;
+	DECLARE_READ8_MEMBER(apple3_memory_r);
+	DECLARE_WRITE8_MEMBER(apple3_memory_w);
+	DECLARE_WRITE_LINE_MEMBER(apple3_sync_w);
 	DECLARE_READ8_MEMBER(apple3_c0xx_r);
 	DECLARE_WRITE8_MEMBER(apple3_c0xx_w);
 	DECLARE_READ8_MEMBER(apple3_00xx_r);
@@ -84,11 +87,18 @@ public:
 	void apple3_profile_init(void);
 	void apple3_profile_statemachine(void);
 	UINT8 *apple3_bankaddr(UINT16 bank, offs_t offset);
-	void apple3_setbank(const char *mame_bank, UINT16 bank, offs_t offset);
 	UINT8 *apple3_get_zpa_addr(offs_t offset);
 	void apple3_update_memory();
 	void apple3_via_out(UINT8 *var, UINT8 data);
 	UINT8 *apple3_get_indexed_addr(offs_t offset);
+
+	bool m_sync;
+	UINT8 m_indir_opcode;
+	int m_indir_count;
+
+	UINT8 *m_bank2, *m_bank3, *m_bank4, *m_bank5, *m_bank8, *m_bank9;
+	UINT8 *m_bank10, *m_bank11;
+	UINT8 *m_bank6, *m_bank7;
 };
 
 
