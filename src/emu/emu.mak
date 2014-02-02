@@ -147,9 +147,11 @@ EMUOBJS = \
 	$(EMUOBJ)/uiinput.o \
 	$(EMUOBJ)/uiswlist.o \
 	$(EMUOBJ)/ui/menu.o \
-	$(EMUOBJ)/ui/mainmenu.o \
+	$(EMUOBJ)/ui/menubar.o \
+	$(EMUOBJ)/ui/emenubar.o \
 	$(EMUOBJ)/ui/miscmenu.o \
 	$(EMUOBJ)/ui/selgame.o \
+	$(EMUOBJ)/ui/stackable.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
 	$(EMUOBJ)/debug/debugcmd.o \

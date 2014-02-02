@@ -2618,6 +2618,19 @@ time_t ioport_manager::initialize()
 			mame_printf_error("Input port errors:\n%s", errors.cstr());
 	}
 
+	// special case - change UI_CONFIGURE to be ScrLk on computers
+	if (has_keyboard())
+	{
+		for (input_type_entry *curtype = first_type(); curtype != NULL; curtype = curtype->next())
+		{
+			if (curtype->type() == IPT_UI_CONFIGURE)
+			{
+				curtype->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_SCRLOCK);
+				curtype->restore_default_seq();
+			}
+		}
+	}
+
 	// renumber player numbers for controller ports
 	int player_offset = 0;
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())

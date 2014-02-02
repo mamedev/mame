@@ -18,7 +18,6 @@
 #include "rendfont.h"
 #include "ui.h"
 #include "uiinput.h"
-#include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
 #include "uigfx.h"
 #include <ctype.h>
@@ -1397,9 +1396,10 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 	}
 
 	/* determine if we should disable the rest of the UI */
-	bool ui_disabled = (machine.ioport().has_keyboard() && !machine.ui_active());
+	bool ui_disabled = false;
 
 	/* is ScrLk UI toggling applicable here? */
+#if 0
 	if (machine.ioport().has_keyboard())
 	{
 		/* are we toggling the UI with ScrLk? */
@@ -1431,6 +1431,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 			}
 		}
 	}
+#endif
 
 	/* is the natural keyboard enabled? */
 	if (ui_get_use_natural_keyboard(machine) && (machine.phase() == MACHINE_PHASE_RUNNING))

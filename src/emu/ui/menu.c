@@ -15,7 +15,7 @@
 #include "rendutil.h"
 #include "uiinput.h"
 #include "cheat.h"
-#include "ui/mainmenu.h"
+#include "ui/emenubar.h"
 #include "ui/miscmenu.h"
 #include <ctype.h>
 
@@ -27,16 +27,6 @@
 
 #define UI_MENU_POOL_SIZE       65536
 #define UI_MENU_ALLOC_ITEMS     256
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-ui_menu *ui_menu::menu_stack;
-ui_menu *ui_menu::menu_free;
-bitmap_rgb32 *ui_menu::hilight_bitmap;
-render_texture *ui_menu::hilight_texture;
-render_texture *ui_menu::arrow_texture;
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -61,7 +51,7 @@ inline bool ui_menu_item::is_selectable() const
 
 inline bool ui_menu::exclusive_input_pressed(int key, int repeat)
 {
-	if (menu_event.iptkey == IPT_INVALID && ui_input_pressed_repeat(machine(), key, repeat))
+	if (menu_event.iptkey == IPT_INVALID && input_pressed(key, repeat))
 	{
 		menu_event.iptkey = key;
 		return true;
@@ -75,54 +65,6 @@ inline bool ui_menu::exclusive_input_pressed(int key, int repeat)
     CORE SYSTEM MANAGEMENT
 ***************************************************************************/
 
-/*-------------------------------------------------
-    init - initialize the menu system
--------------------------------------------------*/
-
-void ui_menu::init(running_machine &machine)
-{
-	int x;
-
-	/* initialize the menu stack */
-	ui_menu::stack_reset(machine);
-
-	/* create a texture for hilighting items */
-	hilight_bitmap = auto_bitmap_rgb32_alloc(machine, 256, 1);
-	for (x = 0; x < 256; x++)
-	{
-		int alpha = 0xff;
-		if (x < 25) alpha = 0xff * x / 25;
-		if (x > 256 - 25) alpha = 0xff * (255 - x) / 25;
-		hilight_bitmap->pix32(0, x) = MAKE_ARGB(alpha,0xff,0xff,0xff);
-	}
-	hilight_texture = machine.render().texture_alloc();
-	hilight_texture->set_bitmap(*hilight_bitmap, hilight_bitmap->cliprect(), TEXFORMAT_ARGB32);
-
-	/* create a texture for arrow icons */
-	arrow_texture = machine.render().texture_alloc(render_triangle);
-
-	/* add an exit callback to free memory */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_menu::exit), &machine));
-}
-
-
-/*-------------------------------------------------
-    exit - clean up after ourselves
--------------------------------------------------*/
-
-void ui_menu::exit(running_machine &machine)
-{
-	/* free menus */
-	ui_menu::stack_reset(machine);
-	ui_menu::clear_free_list(machine);
-
-	/* free textures */
-	machine.render().texture_free(hilight_texture);
-	machine.render().texture_free(arrow_texture);
-}
-
-
-
 /***************************************************************************
     CORE MENU MANAGEMENT
 ***************************************************************************/
@@ -130,10 +72,10 @@ void ui_menu::exit(running_machine &machine)
 /*-------------------------------------------------
     ui_menu - menu constructor
 -------------------------------------------------*/
-ui_menu::ui_menu(running_machine &machine, render_container *_container) : m_machine(machine)
+ui_menu::ui_menu(running_machine &machine, render_container *_container)
+	: ui_stackable(machine, _container)
 {
-	special_main_menu = false;
-	container = _container;
+	top_line = -1;
 
 	reset(UI_MENU_RESET_SELECT_FIRST);
 }
@@ -156,6 +98,17 @@ ui_menu::~ui_menu()
 	/* free the item array */
 	if (item)
 		auto_free(machine(), item);
+}
+
+
+/*-------------------------------------------------
+    reset - free all items in the menu,
+    and all memory allocated from the memory pool
+-------------------------------------------------*/
+
+void ui_menu::reset()
+{
+	reset(UI_MENU_RESET_SELECT_FIRST);
 }
 
 
@@ -190,26 +143,6 @@ void ui_menu::reset(ui_menu_reset_options options)
 		item_append("Exit", NULL, 0, NULL);
 	else
 		item_append("Return to Previous Menu", NULL, 0, NULL);
-}
-
-
-/*-------------------------------------------------
-    is_special_main_menu - returns whether the
-    menu has special needs
--------------------------------------------------*/
-bool ui_menu::is_special_main_menu() const
-{
-	return special_main_menu;
-}
-
-
-/*-------------------------------------------------
-    set_special_main_menu - set whether the
-    menu has special needs
--------------------------------------------------*/
-void ui_menu::set_special_main_menu(bool special)
-{
-	special_main_menu = special;
 }
 
 
@@ -292,7 +225,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 
 	/* draw the menu */
 	if (numitems > 1 && (item[0].flags & MENU_FLAG_MULTILINE) != 0)
-		draw_text_box();
+		draw_text_box_menu();
 	else
 		draw(flags & UI_MENU_PROCESS_CUSTOM_ONLY);
 
@@ -401,7 +334,7 @@ void ui_menu::set_selection(void *selected_itemref)
 
 void ui_menu::draw(bool customonly)
 {
-	float line_height = ui_get_line_height(machine());
+	float line_height = get_line_height();
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float gutter_width = lr_arrow_width * 1.3f;
@@ -413,11 +346,8 @@ void ui_menu::draw(bool customonly)
 	float visible_top, visible_left;
 	int selected_subitem_too_big = FALSE;
 	int visible_lines;
-	int top_line;
 	int itemnum, linenum;
-	bool mouse_hit, mouse_button;
-	render_target *mouse_target;
-	INT32 mouse_target_x, mouse_target_y;
+	bool mouse_hit;
 	float mouse_x = -1, mouse_y = -1;
 
 	/* compute the width and height of the full menu */
@@ -476,12 +406,19 @@ void ui_menu::draw(bool customonly)
 	if (!customonly)
 		ui_draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
-	/* determine the first visible line based on the current selection */
-	top_line = selected - visible_lines / 2;
+	// do we have to invalidate the first visible selection?
+	if ((top_line + 1 > selected) || (top_line + visible_lines - 2 < selected))
+		top_line = -1;
+
+	// determine the first visible line based on the current selection (if we need to)
 	if (top_line < 0)
-		top_line = 0;
-	if (top_line + visible_lines >= numitems)
-		top_line = numitems - visible_lines;
+	{
+		top_line = selected - visible_lines / 2;
+		if (top_line < 0)
+			top_line = 0;
+		if (top_line + visible_lines >= numitems)
+			top_line = numitems - visible_lines;
+	}
 
 	/* determine effective positions taking into account the hilighting arrows */
 	effective_width = visible_width - 2.0f * gutter_width;
@@ -489,14 +426,8 @@ void ui_menu::draw(bool customonly)
 
 	/* locate mouse */
 	mouse_hit = false;
-	mouse_button = false;
 	if (!customonly)
-	{
-		mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
-		if (mouse_target != NULL)
-			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
-				mouse_hit = true;
-	}
+		mouse_hit = find_mouse(mouse_x, mouse_y);
 
 	/* loop over visible lines */
 	hover = numitems + 1;
@@ -540,8 +471,7 @@ void ui_menu::draw(bool customonly)
 
 			/* if we have some background hilighting to do, add a quad behind everything else */
 			if (bgcolor != UI_TEXT_BG_COLOR)
-				container->add_quad(line_x0, line_y0, line_x1, line_y1, bgcolor, hilight_texture,
-									PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 
 			/* if we're on the top line, display the up arrow */
 			if (linenum == 0 && top_line != 0)
@@ -675,12 +605,12 @@ void ui_menu::custom_render(void *selectedref, float top, float bottom, float x,
 }
 
 /*-------------------------------------------------
-    draw_text_box - draw a multiline
+    draw_text_box_menu - draw a multiline
     word-wrapped text box with a menu item at the
     bottom
 -------------------------------------------------*/
 
-void ui_menu::draw_text_box()
+void ui_menu::draw_text_box_menu()
 {
 	const char *text = item[0].text;
 	const char *backtext = item[1].text;
@@ -724,14 +654,12 @@ void ui_menu::draw_text_box()
 				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	/* draw the "return to prior menu" text with a hilight behind it */
-	container->add_quad(
-						target_x + 0.5f * UI_LINE_WIDTH,
-						target_y + target_height - line_height,
-						target_x + target_width - 0.5f * UI_LINE_WIDTH,
-						target_y + target_height,
-						UI_SELECTED_BG_COLOR,
-						hilight_texture,
-						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+	highlight(
+			target_x + 0.5f * UI_LINE_WIDTH,
+			target_y + target_height - line_height,
+			target_x + target_width - 0.5f * UI_LINE_WIDTH,
+			target_y + target_height,
+			UI_SELECTED_BG_COLOR);
 	ui_draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
 				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 
@@ -751,7 +679,7 @@ void ui_menu::handle_events()
 	ui_event local_menu_event;
 
 	/* loop while we have interesting events */
-	while (!stop && ui_input_pop_event(machine(), &local_menu_event))
+	while (input_pop_event(local_menu_event) && !stop)
 	{
 		switch (local_menu_event.event_type)
 		{
@@ -939,85 +867,6 @@ void ui_menu::validate_selection(int scandir)
 
 
 
-/*-------------------------------------------------
-    clear_free_list - clear out anything
-    accumulated in the free list
--------------------------------------------------*/
-
-void ui_menu::clear_free_list(running_machine &machine)
-{
-	while (menu_free != NULL)
-	{
-		ui_menu *menu = menu_free;
-		menu_free = menu->parent;
-		auto_free(machine, menu);
-	}
-}
-
-
-
-/***************************************************************************
-    MENU STACK MANAGEMENT
-***************************************************************************/
-
-/*-------------------------------------------------
-    ui_menu::stack_reset - reset the menu stack
--------------------------------------------------*/
-
-void ui_menu::stack_reset(running_machine &machine)
-{
-	while (menu_stack != NULL)
-		ui_menu::stack_pop(machine);
-}
-
-
-/*-------------------------------------------------
-    stack_push - push a new menu onto the
-    stack
--------------------------------------------------*/
-
-void ui_menu::stack_push(ui_menu *menu)
-{
-	menu->parent = menu_stack;
-	menu_stack = menu;
-	menu->reset(UI_MENU_RESET_SELECT_FIRST);
-	ui_input_reset(menu->machine());
-}
-
-
-/*-------------------------------------------------
-    stack_pop - pop a menu from the stack
--------------------------------------------------*/
-
-void ui_menu::stack_pop(running_machine &machine)
-{
-	if (menu_stack != NULL)
-	{
-		ui_menu *menu = menu_stack;
-		menu_stack = menu->parent;
-		menu->parent = menu_free;
-		menu_free = menu;
-		ui_input_reset(machine);
-	}
-}
-
-
-/*-------------------------------------------------
-    ui_menu::stack_has_special_main_menu -
-    check in the special main menu is in the stack
--------------------------------------------------*/
-
-bool ui_menu::stack_has_special_main_menu()
-{
-	ui_menu *menu;
-
-	for (menu = menu_stack; menu != NULL; menu = menu->parent)
-		if (menu->is_special_main_menu())
-			return true;
-
-	return false;
-}
-
 void ui_menu::do_handle()
 {
 	if(!populated())
@@ -1039,76 +888,18 @@ UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container
 {
 	/* if we have no menus stacked up, start with the main menu */
 	if (menu_stack == NULL)
-		stack_push(auto_alloc_clear(machine, ui_menu_main(machine, container)));
+		stack_push(auto_alloc_clear(machine, ui_emu_menubar(machine, container)));
 
 	/* update the menu state */
 	if (menu_stack != NULL)
 		menu_stack->do_handle();
 
 	/* clear up anything pending to be released */
-	clear_free_list(machine);
+	ui_stackable::clear_free_list(machine);
 
 	/* if the menus are to be hidden, return a cancel here */
 	if ((ui_input_pressed(machine, IPT_UI_CONFIGURE) && !stack_has_special_main_menu()) || menu_stack == NULL)
 		return UI_HANDLER_CANCEL;
 
 	return 0;
-}
-
-/***************************************************************************
-    MENU HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    render_triangle - render a triangle that
-    is used for up/down arrows and left/right
-    indicators
--------------------------------------------------*/
-
-void ui_menu::render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param)
-{
-	int halfwidth = dest.width() / 2;
-	int height = dest.height();
-	int x, y;
-
-	/* start with all-transparent */
-	dest.fill(MAKE_ARGB(0x00,0x00,0x00,0x00));
-
-	/* render from the tip to the bottom */
-	for (y = 0; y < height; y++)
-	{
-		int linewidth = (y * (halfwidth - 1) + (height / 2)) * 255 * 2 / height;
-		UINT32 *target = &dest.pix32(y, halfwidth);
-
-		/* don't antialias if height < 12 */
-		if (dest.height() < 12)
-		{
-			int pixels = (linewidth + 254) / 255;
-			if (pixels % 2 == 0) pixels++;
-			linewidth = pixels * 255;
-		}
-
-		/* loop while we still have data to generate */
-		for (x = 0; linewidth > 0; x++)
-		{
-			int dalpha;
-
-			/* first column we only consume one pixel */
-			if (x == 0)
-			{
-				dalpha = MIN(0xff, linewidth);
-				target[x] = MAKE_ARGB(dalpha,0xff,0xff,0xff);
-			}
-
-			/* remaining columns consume two pixels, one on each side */
-			else
-			{
-				dalpha = MIN(0x1fe, linewidth);
-				target[x] = target[-x] = MAKE_ARGB(dalpha/2,0xff,0xff,0xff);
-			}
-
-			/* account for the weight we consumed */
-			linewidth -= dalpha;
-		}
-	}
 }

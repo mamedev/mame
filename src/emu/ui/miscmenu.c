@@ -21,6 +21,7 @@
 #include "audit.h"
 #include "crsshair.h"
 #include <ctype.h>
+#include "ui/selgame.h"
 #include "imagedev/cassette.h"
 #include "imagedev/bitbngr.h"
 
@@ -72,41 +73,6 @@ UINT32 ui_menu_sliders::ui_handler(running_machine &machine, render_container *c
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    ui_menu_keyboard_mode - menu that
--------------------------------------------------*/
-
-ui_menu_keyboard_mode::ui_menu_keyboard_mode(running_machine &machine, render_container *container) : ui_menu(machine, container)
-{
-}
-
-void ui_menu_keyboard_mode::populate()
-{
-	int natural = ui_get_use_natural_keyboard(machine());
-	item_append("Keyboard Mode:", natural ? "Natural" : "Emulated", natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, NULL);
-}
-
-ui_menu_keyboard_mode::~ui_menu_keyboard_mode()
-{
-}
-
-void ui_menu_keyboard_mode::handle()
-{
-	int natural = ui_get_use_natural_keyboard(machine());
-
-	/* process the menu */
-	const ui_menu_event *menu_event = process(0);
-
-	if (menu_event != NULL)
-	{
-		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
-			ui_set_use_natural_keyboard(machine(), natural ^ true);
-			reset(UI_MENU_RESET_REMEMBER_REF);
-		}
-	}
-}
-
 
 /*-------------------------------------------------
     ui_slot_get_current_option - returns

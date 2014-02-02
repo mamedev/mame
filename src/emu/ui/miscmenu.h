@@ -17,14 +17,6 @@
 #include "crsshair.h"
 #include "drivenum.h"
 
-class ui_menu_keyboard_mode : public ui_menu {
-public:
-	ui_menu_keyboard_mode(running_machine &machine, render_container *container);
-	virtual ~ui_menu_keyboard_mode();
-	virtual void populate();
-	virtual void handle();
-};
-
 class ui_menu_slot_devices : public ui_menu {
 public:
 	ui_menu_slot_devices(running_machine &machine, render_container *container);
@@ -233,7 +225,7 @@ private:
 
 class ui_menu_sliders : public ui_menu {
 public:
-	ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode);
+	ui_menu_sliders(running_machine &machine, render_container *container, bool menuless_mode = false);
 	virtual ~ui_menu_sliders();
 	virtual void populate();
 	virtual void handle();

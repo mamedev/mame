@@ -81,6 +81,7 @@
 #include "validity.h"
 #include "unzip.h"
 #include "debug/debugcon.h"
+#include "ui/selgame.h"
 
 #include <time.h>
 

@@ -2,7 +2,7 @@
 
     ui/selgame.h
 
-    Internal MAME menus for the user interface.
+    Game selector
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -14,10 +14,19 @@
 #ifndef __UI_SELGAME_H__
 #define __UI_SELGAME_H__
 
+#include "emu.h"
+#include "emuopts.h"
+#include "ui.h"
+#include "ui/menu.h"
 #include "drivenum.h"
 
 
-class ui_menu_select_game : public ui_menu {
+//**************************************************************************
+//  GAME SELECTOR
+//**************************************************************************
+
+class ui_menu_select_game : public ui_menu
+{
 public:
 	ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename);
 	virtual ~ui_menu_select_game();
@@ -29,16 +38,27 @@ public:
 	static void force_game_select(running_machine &machine, render_container *container);
 
 private:
+	// private driver list
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
-	UINT8               error;
-	UINT8               rerandomize;
-	char                search[40];
-	int                 matchlist[VISIBLE_GAMES_IN_LIST];
-	const game_driver   **driverlist;
+	const game_driver   **driver_list;
+	int					driver_count;
 
-	driver_enumerator *drivlist;
+	// the selection
+	int					selection_up;
+	int					selection_down;
+
+	// other
+	bool				error;
+	char                search[40];
 
 	void build_driver_list();
+	static int driver_list_compare(const void *p1, const void *p2);
+	void select_searched_item();
+
+	void inkey_select(const ui_menu_event *menu_event);
+	void inkey_cancel(const ui_menu_event *menu_event);
+	void inkey_special(const ui_menu_event *menu_event);
+	void inkey_configure(const ui_menu_event *menu_event);
 };
 
 #endif  /* __UI_SELGAME_H__ */

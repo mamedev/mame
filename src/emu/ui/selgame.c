@@ -1,27 +1,19 @@
-/*********************************************************************
+/***************************************************************************
 
-    selgame.c
+    selgame.h
 
-    Internal MAME menus for the user interface.
+    Game selector
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
-*********************************************************************/
+***************************************************************************/
 
-#include "emu.h"
-#include "osdnet.h"
-#include "emuopts.h"
-#include "ui.h"
-#include "rendutil.h"
-#include "cheat.h"
-#include "uiimage.h"
+#include "selgame.h"
 #include "uiinput.h"
-#include "ui/selgame.h"
 #include "ui/miscmenu.h"
+#include "ui/emenubar.h"
 #include "audit.h"
-#include "crsshair.h"
-#include <ctype.h>
 
 
 //-------------------------------------------------
@@ -30,11 +22,9 @@
 
 ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
-	driverlist = global_alloc_array(const game_driver *, driver_list::total()+1);
 	build_driver_list();
 	if(gamename)
 		strcpy(search, gamename);
-	matchlist[0] = -1;
 }
 
 
@@ -44,10 +34,8 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 
 ui_menu_select_game::~ui_menu_select_game()
 {
-	global_free(drivlist);
-	global_free(driverlist);
+	global_free(driver_list);
 }
-
 
 
 //-------------------------------------------------
@@ -58,8 +46,8 @@ ui_menu_select_game::~ui_menu_select_game()
 void ui_menu_select_game::build_driver_list()
 {
 	// start with an empty list
-	drivlist = global_alloc(driver_enumerator(machine().options()));
-	drivlist->exclude_all();
+	driver_enumerator drivlist(machine().options());
+	drivlist.exclude_all();
 
 	// open a path to the ROMs and find them in the array
 	file_enumerator path(machine().options().media_path());
@@ -72,26 +60,71 @@ void ui_menu_select_game::build_driver_list()
 		char *dst = drivername;
 		const char *src;
 
-		// build a name for it
+		/* build a name for it */
 		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; src++)
 			*dst++ = tolower((UINT8)*src);
 		*dst = 0;
 
-		int drivnum = drivlist->find(drivername);
+		int drivnum = drivlist.find(drivername);
 		if (drivnum != -1)
-			drivlist->include(drivnum);
+			drivlist.include(drivnum);
 	}
 
 	// now build the final list
-	drivlist->reset();
-	int listnum = 0;
-	while (drivlist->next())
-		driverlist[listnum++] = &drivlist->driver();
+	drivlist.reset();
+
+	driver_count = 0;
+	driver_list = global_alloc_array(const game_driver *, driver_list::total()+1);
+	while (drivlist.next())
+	{
+		const game_driver *drv = &drivlist.driver();
+		if (!(drv->flags & GAME_NO_STANDALONE))
+			driver_list[driver_count++] = drv;
+	}
+
+	// sort
+	qsort(driver_list, driver_count, sizeof(driver_list[0]), driver_list_compare);
 
 	// NULL-terminate
-	driverlist[listnum] = NULL;
+	driver_list[driver_count] = NULL;
 }
 
+
+//-------------------------------------------------
+//  driver_list_compare - qsort callback for
+//	alphebetizing driver lists
+//-------------------------------------------------
+
+int ui_menu_select_game::driver_list_compare(const void *p1, const void *p2)
+{
+	const game_driver *d1 = *((const game_driver **) p1); 
+	const game_driver *d2 = *((const game_driver **) p2);
+	return core_stricmp(d1->name, d2->name);
+}
+
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
+
+void ui_menu_select_game::populate()
+{
+	// if nothing there, add a single multiline item and return
+	if (driver_count == 0)
+	// populate all menu items
+	for (int curitem = 0; curitem < driver_count; curitem++)
+	{
+		item_append(
+			driver_list[curitem]->name,
+			driver_list[curitem]->description,
+			0,
+			(void *) driver_list[curitem]);
+	}
+
+	// configure the custom rendering
+	customtop = ui_get_line_height(machine()) + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = 4.0f * ui_get_line_height(machine()) + 3.0f * UI_BOX_TB_BORDER;
+}
 
 
 //-------------------------------------------------
@@ -104,7 +137,17 @@ void ui_menu_select_game::handle()
 	ui_input_pressed(machine(), IPT_UI_PAUSE);
 
 	// process the menu
+	const game_driver *old_selection = (const game_driver *) get_selection();
 	const ui_menu_event *menu_event = process(0);
+	const game_driver *new_selection = (const game_driver *) get_selection();
+	
+	// has the selection changed?
+	if (old_selection != new_selection)
+	{
+		strcpy(search, new_selection ? new_selection->name : "");
+	}
+
+	// process events
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		// reset the error on any future menu_event
@@ -112,132 +155,147 @@ void ui_menu_select_game::handle()
 			error = false;
 
 		// handle selections
-		else if (menu_event->iptkey == IPT_UI_SELECT)
+		else
 		{
-			const game_driver *driver = (const game_driver *)menu_event->itemref;
-
-			// special case for configure inputs
-			if ((FPTR)driver == 1)
-				ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_groups(machine(), container)));
-
-			// anything else is a driver
-			else
+			switch(menu_event->iptkey)
 			{
-				// audit the game first to see if we're going to work
-				driver_enumerator enumerator(machine().options(), *driver);
-				enumerator.next();
-				media_auditor auditor(enumerator);
-				media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
-
-				// if everything looks good, schedule the new driver
-				if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE)
-				{
-					machine().schedule_new_driver(*driver);
-					ui_menu::stack_reset(machine());
-				}
-
-				// otherwise, display an error
-				else
-				{
-					reset(UI_MENU_RESET_REMEMBER_REF);
-					error = true;
-				}
-			}
-		}
-
-		// escape pressed with non-empty text clears the text
-		else if (menu_event->iptkey == IPT_UI_CANCEL && search[0] != 0)
-		{
-			// since we have already been popped, we must recreate ourself from scratch
-			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, NULL)));
-		}
-
-		// typed characters append to the buffer
-		else if (menu_event->iptkey == IPT_SPECIAL)
-		{
-			int buflen = strlen(search);
-
-			// if it's a backspace and we can handle it, do so
-			if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
-			{
-				*(char *)utf8_previous_char(&search[buflen]) = 0;
-				rerandomize = true;
-				reset(UI_MENU_RESET_SELECT_FIRST);
-			}
-
-			// if it's any other key and we're not maxed out, update
-			else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
-			{
-				buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
-				search[buflen] = 0;
-				reset(UI_MENU_RESET_SELECT_FIRST);
+				case IPT_UI_SELECT:
+					inkey_select(menu_event);
+					break;
+				case IPT_UI_CANCEL:
+					inkey_cancel(menu_event);
+					break;
+				case IPT_SPECIAL:
+					inkey_special(menu_event);
+					break;
+				case IPT_UI_CONFIGURE:
+					inkey_configure(menu_event);
+					break;
 			}
 		}
 	}
 
 	// if we're in an error state, overlay an error message
 	if (error)
-		ui_draw_text_box(container,
-							"The selected game is missing one or more required ROM or CHD images. "
-							"Please select a different game.\n\nPress any key to continue.",
-							JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+		draw_text_box(
+			"The selected game is missing one or more required ROM or CHD images. "
+			"Please select a different game.\n\nPress any key to continue.",
+			JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 }
 
 
 //-------------------------------------------------
-//  populate - populate the game select menu
+//  inkey_select
 //-------------------------------------------------
 
-void ui_menu_select_game::populate()
+void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 {
-	int matchcount;
-	int curitem;
+	const game_driver *driver = (const game_driver *)menu_event->itemref;
 
-	for (curitem = matchcount = 0; driverlist[curitem] != NULL && matchcount < VISIBLE_GAMES_IN_LIST; curitem++)
-		if (!(driverlist[curitem]->flags & GAME_NO_STANDALONE))
-			matchcount++;
+	/* special case for configure inputs */
+	if ((FPTR)driver == 1)
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_input_groups(machine(), container)));
 
-	// if nothing there, add a single multiline item and return
-	if (matchcount == 0)
+	/* anything else is a driver */
+	else
 	{
-		astring txt;
-		txt.printf("No %s found. Please check the rompath specified in the %s.ini file.\n\n"
-					"If this is your first time using %s, please see the config.txt file in "
-					"the docs directory for information on configuring %s.",
-					emulator_info::get_gamesnoun(),
-					emulator_info::get_configname(),
-					emulator_info::get_appname(),emulator_info::get_appname() );
-		item_append(txt.cstr(), NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
-		return;
-	}
+		// audit the game first to see if we're going to work
+		driver_enumerator enumerator(machine().options(), *driver);
+		enumerator.next();
+		media_auditor auditor(enumerator);
+		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
-	// otherwise, rebuild the match list
-	assert(drivlist != NULL);
-	if (search[0] != 0 || matchlist[0] == -1 || rerandomize)
-		drivlist->find_approximate_matches(search, matchcount, matchlist);
-	rerandomize = false;
-
-	// iterate over entries
-	for (curitem = 0; curitem < matchcount; curitem++)
-	{
-		int curmatch = matchlist[curitem];
-		if (curmatch != -1)
+		// if everything looks good, schedule the new driver
+		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE)
 		{
-			int cloneof = drivlist->non_bios_clone(curmatch);
-			item_append(drivlist->driver(curmatch).name, drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)&drivlist->driver(curmatch));
+			machine().schedule_new_driver(*driver);
+			ui_menu::stack_reset(machine());
+		}
+
+		// otherwise, display an error
+		else
+		{
+			reset(UI_MENU_RESET_REMEMBER_REF);
+			error = true;
 		}
 	}
+}
 
-	// if we're forced into this, allow general input configuration as well
-	if (ui_menu::stack_has_special_main_menu())
+
+//-------------------------------------------------
+//  inkey_cancel
+//-------------------------------------------------
+
+void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
+{
+	/* escape pressed with non-empty text clears the text */
+	if (search[0] != 0)
 	{
-		item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-		item_append("Configure General Inputs", NULL, 0, (void *)1);
+		// since we have already been popped, we must recreate ourself from scratch
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, NULL)));
+	}
+}
+
+
+//-------------------------------------------------
+//  inkey_special
+//-------------------------------------------------
+
+void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
+{
+	// typed characters append to the buffer
+	int buflen = strlen(search);
+
+	// if it's a backspace and we can handle it, do so
+	if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
+	{
+		*(char *)utf8_previous_char(&search[buflen]) = 0;
+		select_searched_item();
 	}
 
-	// configure the custom rendering
-	customtop = ui_get_line_height(machine()) + 3.0f * UI_BOX_TB_BORDER;
-	custombottom = 4.0f * ui_get_line_height(machine()) + 3.0f * UI_BOX_TB_BORDER;
+	// if it's any other key and we're not maxed out, update
+	else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
+	{
+		buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
+		search[buflen] = 0;
+		select_searched_item();
+	}
+}
+
+
+//-------------------------------------------------
+//  inkey_configure
+//-------------------------------------------------
+
+void ui_menu_select_game::inkey_configure(const ui_menu_event *menu_event)
+{
+	ui_menu::stack_push(auto_alloc_clear(machine(), ui_emu_menubar(machine(), container)));
+}
+
+
+//-------------------------------------------------
+//  select_searched_item
+//-------------------------------------------------
+
+void ui_menu_select_game::select_searched_item()
+{
+	// find the searched item
+	int first = 0;
+	int last = driver_count;
+	while(last > first)
+	{
+		int middle = (first + last) / 2;		
+		int rc = core_stricmp(search, driver_list[middle]->name);
+		if (rc < 0)
+			last = middle;
+		else if (rc > 0)
+			first = middle + 1;
+		else
+			first = last = middle;
+	}
+
+	// and set the selection
+	set_selection((void *) driver_list[first]);
 }
 
 
@@ -261,7 +319,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		tempbuf[0].printf("Type name or select: (random)");
 
 	// get the size of the text
-	ui_draw_text_full(container, tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	draw_text(tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
@@ -282,7 +340,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	y2 -= UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	ui_draw_text_full(container, tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	draw_text(tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	// determine the text to render below
@@ -372,7 +430,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		color = UI_YELLOW_COLOR;
 	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
 		color = UI_RED_COLOR;
-	ui_draw_outlined_box(container, x1, y1, x2, y2, color);
+	draw_outlined_box(x1, y1, x2, y2, color);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
