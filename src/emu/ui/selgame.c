@@ -1,4 +1,4 @@
-/*********************************************************************
+/***************************************************************************
 
     ui/selgame.c
 
@@ -7,7 +7,7 @@
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
-*********************************************************************/
+***************************************************************************/
 
 #include "emu.h"
 #include "osdnet.h"
@@ -176,7 +176,6 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 }
 
 
-
 //-------------------------------------------------
 //  inkey_cancel
 //-------------------------------------------------
@@ -198,6 +197,7 @@ void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
 
 void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 {
+	// typed characters append to the buffer
 	int buflen = strlen(m_search);
 
 	// if it's a backspace and we can handle it, do so
@@ -448,5 +448,3 @@ void ui_menu_select_game::force_game_select(running_machine &machine, render_con
 	// make sure MAME is paused
 	machine.pause();
 }
-
-
