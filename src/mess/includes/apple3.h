@@ -53,16 +53,10 @@ public:
 	UINT8 m_via_0_b;
 	UINT8 m_via_1_a;
 	UINT8 m_via_1_b;
+	int m_via_0_irq;
 	int m_via_1_irq;
 	int m_enable_mask;
 	offs_t m_zpa;
-	int m_profile_lastaddr;
-	UINT8 m_profile_gotstrobe;
-	UINT8 m_profile_readdata;
-	UINT8 m_profile_busycount;
-	UINT8 m_profile_busy;
-	UINT8 m_profile_online;
-	UINT8 m_profile_writedata;
 	UINT8 m_last_n;
 	UINT8 *m_char_mem;
 	UINT32 *m_hgr_map;
@@ -75,8 +69,6 @@ public:
 	DECLARE_WRITE8_MEMBER(apple3_00xx_w);
 	DECLARE_READ8_MEMBER(apple3_indexed_read);
 	DECLARE_WRITE8_MEMBER(apple3_indexed_write);
-	UINT8 apple3_profile_r(offs_t offset);
-	void apple3_profile_w(offs_t offset, UINT8 data);
 	DECLARE_DRIVER_INIT(apple3);
 	DECLARE_MACHINE_RESET(apple3);
 	DECLARE_VIDEO_START(apple3);
@@ -86,7 +78,8 @@ public:
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_b);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_a);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_b);
-	DECLARE_WRITE_LINE_MEMBER(apple2_via_1_irq_func);
+	DECLARE_WRITE_LINE_MEMBER(apple3_via_0_irq_func);
+	DECLARE_WRITE_LINE_MEMBER(apple3_via_1_irq_func);
 	void apple3_write_charmem();
 	void apple3_video_text40(bitmap_ind16 &bitmap);
 	void apple3_video_text80(bitmap_ind16 &bitmap);
@@ -95,8 +88,6 @@ public:
 	void apple3_video_graphics_chgr(bitmap_ind16 &bitmap);
 	void apple3_video_graphics_shgr(bitmap_ind16 &bitmap);
 	void apple3_video_graphics_chires(bitmap_ind16 &bitmap);
-	void apple3_profile_init(void);
-	void apple3_profile_statemachine(void);
 	UINT8 *apple3_bankaddr(UINT16 bank, offs_t offset);
 	UINT8 *apple3_get_zpa_addr(offs_t offset);
 	void apple3_update_memory();

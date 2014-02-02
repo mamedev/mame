@@ -78,16 +78,18 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_LEGACY_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_interface,1,4)
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_MOS6551_TYPE(MOS6551_TYPE_ROCKWELL)		// must be Rockwell or the ROM shows "ACIA" and doesn't POST
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_0_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_0_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_0_irq_func))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 2000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_1_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple2_via_1_irq_func))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_1_irq_func))
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -99,7 +101,8 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("512K")
 MACHINE_CONFIG_END
 
 
@@ -189,4 +192,4 @@ ROM_START(apple3)
 ROM_END
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    COMPANY             FULLNAME */
-COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state,    apple3,     "Apple Computer",   "Apple ///", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state,    apple3,     "Apple Computer",   "Apple ///", GAME_NOT_WORKING )

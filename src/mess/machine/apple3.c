@@ -41,76 +41,6 @@ static void apple3_update_drives(device_t *device);
 #define LOG_MEMORY      1
 #define LOG_INDXADDR    1
 
-
-
-/* ----------------------------------------------------------------------- */
-
-
-void apple3_state::apple3_profile_init(void)
-{
-}
-
-
-
-void apple3_state::apple3_profile_statemachine(void)
-{
-}
-
-
-
-UINT8 apple3_state::apple3_profile_r(offs_t offset)
-{
-	UINT8 result = 0;
-
-	offset %= 4;
-	apple3_profile_statemachine();
-
-	m_profile_lastaddr = offset;
-
-	switch(offset)
-	{
-		case 1:
-			m_profile_gotstrobe = 1;
-			apple3_profile_statemachine();
-			result = m_profile_readdata;
-			break;
-
-		case 2:
-			if (m_profile_busycount > 0)
-			{
-				m_profile_busycount--;
-				result = 0xFF;
-			}
-			else
-			{
-				result = m_profile_busy | m_profile_online;
-			}
-			break;
-	}
-	return result;
-}
-
-
-
-void apple3_state::apple3_profile_w(offs_t offset, UINT8 data)
-{
-	offset %= 4;
-	m_profile_lastaddr = -1;
-
-	switch(offset)
-	{
-		case 0:
-			m_profile_writedata = data;
-			m_profile_gotstrobe = 1;
-			break;
-	}
-	apple3_profile_statemachine();
-}
-
-
-
-/* ----------------------------------------------------------------------- */
-
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
 	mos6551_device *acia = machine().device<mos6551_device>("acia");
@@ -196,14 +126,6 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			result = 0x00;
 			break;
 
-		case 0xC0: case 0xC1: case 0xC2: case 0xC3:
-		case 0xC4: case 0xC5: case 0xC6: case 0xC7:
-		case 0xC8: case 0xC9: case 0xCA: case 0xCB:
-		case 0xCC: case 0xCD: case 0xCE: case 0xCF:
-			/* profile */
-			result = apple3_profile_r(offset);
-			break;
-
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
 		case 0xD4: case 0xD5: case 0xD6: case 0xD7:
 			/* external drive stuff */
@@ -274,14 +196,6 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 				m_flags |= 1 << ((offset - 0x50) / 2);
 			else
 				m_flags &= ~(1 << ((offset - 0x50) / 2));
-			break;
-
-		case 0xC0: case 0xC1: case 0xC2: case 0xC3:
-		case 0xC4: case 0xC5: case 0xC6: case 0xC7:
-		case 0xC8: case 0xC9: case 0xCA: case 0xCB:
-		case 0xCC: case 0xCD: case 0xCE: case 0xCF:
-			/* profile */
-			apple3_profile_w(offset, data);
 			break;
 
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
@@ -459,17 +373,32 @@ WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 	apple3_via_out(&m_via_1_b, data);
 }
 
-WRITE_LINE_MEMBER(apple3_state::apple2_via_1_irq_func)
+WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
 {
-	if (!m_via_1_irq && state)
+	m_via_1_irq = state;
+	if (m_via_1_irq || m_via_0_irq)
 	{
 		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	}
+	else
+	{
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
-	m_via_1_irq = state;
 }
 
 
+WRITE_LINE_MEMBER(apple3_state::apple3_via_0_irq_func)
+{
+	m_via_0_irq = state;
+	if (m_via_1_irq || m_via_0_irq)
+	{
+		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	}
+}
 
 MACHINE_RESET_MEMBER(apple3_state,apple3)
 {
@@ -632,19 +561,15 @@ const applefdc_interface apple3_fdc_interface =
 
 DRIVER_INIT_MEMBER(apple3_state,apple3)
 {
-	/* hack to get around VIA problem */
-	memregion("maincpu")->base()[0x0685] = 0x00;
-
 	m_enable_mask = 0;
 	apple3_update_drives(machine().device("fdc"));
 
 	AY3600_init(machine());
 
-	apple3_profile_init();
-
 	m_flags = 0;
 	m_via_0_a = ~0;
 	m_via_1_a = ~0;
+	m_via_0_irq = 0;
 	m_via_1_irq = 0;
 
 	/* these are here to appease the Apple /// confidence tests */
