@@ -118,6 +118,18 @@
 
 	<!-- Applications -->
 
+	<software name="10yrhvsc">
+		<description>High Voltage SID Collection 10 Years 1996-2006</description>
+		<year>2006</year>
+		<publisher>HVSC Crew</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349696">
+				<rom name="10_years_hvsc.d71" size="349696" crc="dfaf9092" sha1="253f27d5d9605b428a4968da0fddce545802e48f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="basic128">
 		<description>BASIC-128 v1.03</description>
 		<year>1985</year>
