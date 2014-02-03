@@ -24,18 +24,6 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-enum
-{
-	LOADSAVE_NONE,
-	LOADSAVE_LOAD,
-	LOADSAVE_SAVE
-};
-
-
-/***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
 
@@ -225,6 +213,7 @@ ui_manager::ui_manager(running_machine &machine)
 	ui_gfx_init(machine);
 
 	// reset instance variables 
+	m_menubar = NULL;
 	m_font = NULL;
 	m_handler_callback = NULL;
 	m_handler_param = 0;
@@ -359,10 +348,6 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 		// loop while we have a handler
 		while (m_handler_callback != handler_ingame && !machine().scheduled_event_pending() && !ui_menu::stack_has_special_main_menu())
 			machine().video().frame_update();
-
-		// clear the handler and force an update
-		set_handler(handler_ingame, 0);
-		machine().video().frame_update();
 	}
 
 	// if we're the empty driver, force the menus on
@@ -1447,190 +1432,46 @@ void ui_manager::image_handler_ingame()
 
 UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *container, UINT32 state)
 {
-	bool is_paused = machine.paused();
-
-	// first draw the FPS counter 
-	if (machine.ui().show_fps_counter())
-	{
-		astring tempstring;
-		machine.ui().draw_text_full(container, machine.video().speed_text(tempstring), 0.0f, 0.0f, 1.0f,
-					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
-	}
-
-	// draw the profiler if visible 
-	if (machine.ui().show_profiler())
-	{
-		const char *text = g_profiler.text(machine);
-		machine.ui().draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
-	}
-
-	// if we're single-stepping, pause now 
-	if (machine.ui().single_step())
-	{
-		machine.pause();
-		machine.ui().set_single_step(false);
-	}
-
-	// determine if we should disable the rest of the UI 
-	bool ui_disabled = (machine.ioport().has_keyboard() && !machine.ui_active());
-
-	// is ScrLk UI toggling applicable here? 
-	if (machine.ioport().has_keyboard())
-	{
-		// are we toggling the UI with ScrLk? 
-		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
-		{
-			// toggle the UI 
-			machine.set_ui_active(!machine.ui_active());
-
-			// display a popup indicating the new status 
-			if (machine.ui_active())
-			{
-				machine.ui().popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
-					"Keyboard Emulation Status",
-					"-------------------------",
-					"Mode: PARTIAL Emulation",
-					"UI:   Enabled",
-					"-------------------------",
-					"**Use ScrLock to toggle**");
-			}
-			else
-			{
-				machine.ui().popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
-					"Keyboard Emulation Status",
-					"-------------------------",
-					"Mode: FULL Emulation",
-					"UI:   Disabled",
-					"-------------------------",
-					"**Use ScrLock to toggle**");
-			}
-		}
-	}
-#endif
-
-	// is the natural keyboard enabled? 
-	if (machine.ui().use_natural_keyboard() && (machine.phase() == MACHINE_PHASE_RUNNING))
-		machine.ui().process_natural_keyboard();
-
-	if (!ui_disabled)
-	{
-		// paste command 
-		if (ui_input_pressed(machine, IPT_UI_PASTE))
-			machine.ui().paste();
-	}
-
-	machine.ui().image_handler_ingame();
-
-	if (ui_disabled) return ui_disabled;
-
-	if (ui_input_pressed(machine, IPT_UI_CANCEL))
-	{
-		if (!machine.options().confirm_quit())
-			machine.schedule_exit();
-		else
-			return machine.ui().set_handler(handler_confirm_quit, 0);
-	}
-
-	// turn on menus if requested 
-	if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
-		return machine.ui().set_handler(ui_menu::ui_handler, 0);
-
-	// if the on-screen display isn't up and the user has toggled it, turn it on 
-	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0 && ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
-		return machine.ui().set_handler(ui_menu_sliders::ui_handler, 1);
-
-	// handle a reset request 
-	if (ui_input_pressed(machine, IPT_UI_RESET_MACHINE))
-		machine.schedule_hard_reset();
-	if (ui_input_pressed(machine, IPT_UI_SOFT_RESET))
-		machine.schedule_soft_reset();
-
-	// handle a request to display graphics/palette 
-	if (ui_input_pressed(machine, IPT_UI_SHOW_GFX))
-	{
-		if (!is_paused)
-			machine.pause();
-		return machine.ui().set_handler(ui_gfx_ui_handler, is_paused);
-	}
-
-	// handle a save state request 
-	if (ui_input_pressed(machine, IPT_UI_SAVE_STATE))
-	{
-		machine.pause();
-		return machine.ui().set_handler(handler_load_save, LOADSAVE_SAVE);
-	}
-
-	// handle a load state request 
-	if (ui_input_pressed(machine, IPT_UI_LOAD_STATE))
-	{
-		machine.pause();
-		return machine.ui().set_handler(handler_load_save, LOADSAVE_LOAD);
-	}
-
-	// handle a save snapshot request 
-	if (ui_input_pressed(machine, IPT_UI_SNAPSHOT))
-		machine.video().save_active_screen_snapshots();
-
-	// toggle pause 
-	if (ui_input_pressed(machine, IPT_UI_PAUSE))
-	{
-		// with a shift key, it is single step 
-		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
-		{
-			machine.ui().set_single_step(true);
-			machine.resume();
-		}
-		else
-			machine.toggle_pause();
-	}
-
-	// handle a toggle cheats request 
-	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CHEAT))
-		machine.cheat().set_enable(!machine.cheat().enabled());
-
-	// toggle movie recording 
-	if (ui_input_pressed(machine, IPT_UI_RECORD_MOVIE))
-		machine.video().toggle_record_movie();
-
-	// toggle profiler display 
-	if (ui_input_pressed(machine, IPT_UI_SHOW_PROFILER))
-		machine.ui().set_show_profiler(!machine.ui().show_profiler());
-
-	// toggle FPS display 
-	if (ui_input_pressed(machine, IPT_UI_SHOW_FPS))
-		machine.ui().set_show_fps(!machine.ui().show_fps());
-
-	// increment frameskip? 
-	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_INC))
-		machine.ui().increase_frameskip();
-
-	// decrement frameskip? 
-	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_DEC))
-		machine.ui().decrease_frameskip();
-
-	// toggle throttle? 
-	if (ui_input_pressed(machine, IPT_UI_THROTTLE))
-		machine.video().toggle_throttle();
-
-	// check for fast forward 
-	if (machine.ioport().type_pressed(IPT_UI_FAST_FORWARD))
-	{
-		machine.video().set_fastforward(true);
-		machine.ui().show_fps_temp(0.5);
-	}
-	else
-		machine.video().set_fastforward(false);
-
-	return 0;
+	return machine.ui().handler_ingame_method(container, state);
 }
 
 
 //-------------------------------------------------
-//  handler_load_save - leads the user through
+//  handler_ingame_method - in-game handler takes 
+//  care of the standard keypresses
+//-------------------------------------------------
+
+UINT32 ui_manager::handler_ingame_method(render_container *container, UINT32 state)
+{
+	// no menubar? create it
+	if (m_menubar == NULL)
+		m_menubar = auto_alloc(machine(), ui_emu_menubar(machine()));
+ 
+	// handle!
+	m_menubar->handle(container);
+ 
+	// did we change out the handler?
+	if (m_handler_callback != handler_ingame)
+ 	{
+		// if so, flush the menubar...
+		auto_free(machine(), m_menubar);
+		m_menubar = NULL;
+		
+		// ...and then check to see if this is just a "refresh"
+		if (m_handler_callback == NULL)
+			m_handler_callback = handler_ingame;
+ 	}
+ 
+	return m_handler_param;
+}
+
+
+//-------------------------------------------------
+//  ui_handler_load_save - leads the user through
 //  specifying a game to save or load
 //-------------------------------------------------
 
-UINT32 ui_manager::handler_load_save(running_machine &machine, render_container *container, UINT32 state)
+UINT32 ui_manager::ui_handler_load_save(running_machine &machine, render_container *container, UINT32 state)
 {
 	char filename[20];
 	input_code code;

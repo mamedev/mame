@@ -29,6 +29,16 @@
 #define UI_MENU_ALLOC_ITEMS     256
 
 /***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+ui_menu *ui_menu::menu_stack;
+ui_menu *ui_menu::menu_free;
+bitmap_rgb32 *ui_menu::hilight_bitmap;
+render_texture *ui_menu::hilight_texture;
+render_texture *ui_menu::arrow_texture;
+
+/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
@@ -51,7 +61,7 @@ inline bool ui_menu_item::is_selectable() const
 
 inline bool ui_menu::exclusive_input_pressed(int key, int repeat)
 {
-	if (menu_event.iptkey == IPT_INVALID && input_pressed(key, repeat))
+	if (menu_event.iptkey == IPT_INVALID && ui_input_pressed_repeat(machine(), key, repeat))
 	{
 		menu_event.iptkey = key;
 		return true;
@@ -65,8 +75,6 @@ inline bool ui_menu::exclusive_input_pressed(int key, int repeat)
     CORE SYSTEM MANAGEMENT
 ***************************************************************************/
 
-<<<<<<< HEAD
-=======
 //-------------------------------------------------
 //  init - initialize the menu system
 //-------------------------------------------------
@@ -115,20 +123,10 @@ void ui_menu::exit(running_machine &machine)
 
 
 
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 /***************************************************************************
     CORE MENU MANAGEMENT
 ***************************************************************************/
 
-<<<<<<< HEAD
-/*-------------------------------------------------
-    ui_menu - menu constructor
--------------------------------------------------*/
-ui_menu::ui_menu(running_machine &machine, render_container *_container)
-	: ui_stackable(machine, _container)
-{
-	top_line = -1;
-=======
 //-------------------------------------------------
 //  ui_menu - menu constructor
 //-------------------------------------------------
@@ -137,7 +135,6 @@ ui_menu::ui_menu(running_machine &machine, render_container *_container) : m_mac
 {
 	m_special_main_menu = false;
 	container = _container;
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 
 	reset(UI_MENU_RESET_SELECT_FIRST);
 }
@@ -168,17 +165,6 @@ ui_menu::~ui_menu()
 //  and all memory allocated from the memory pool
 //-------------------------------------------------
 
-void ui_menu::reset()
-{
-	reset(UI_MENU_RESET_SELECT_FIRST);
-}
-
-
-/*-------------------------------------------------
-    reset - free all items in the menu,
-    and all memory allocated from the memory pool
--------------------------------------------------*/
-
 void ui_menu::reset(ui_menu_reset_options options)
 {
 	// based on the reset option, set the reset info 
@@ -208,12 +194,6 @@ void ui_menu::reset(ui_menu_reset_options options)
 }
 
 
-<<<<<<< HEAD
-/*-------------------------------------------------
-    populated - returns true if the menu
-    has any non-default items in it
--------------------------------------------------*/
-=======
 //-------------------------------------------------
 //  is_special_main_menu - returns whether the
 //  menu has special needs
@@ -240,7 +220,6 @@ void ui_menu::set_special_main_menu(bool special)
 //  populated - returns true if the menu
 //  has any non-default items in it
 //-------------------------------------------------
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 
 bool ui_menu::populated()
 {
@@ -316,7 +295,7 @@ const ui_menu_event *ui_menu::process(UINT32 flags)
 
 	// draw the menu 
 	if (numitems > 1 && (item[0].flags & MENU_FLAG_MULTILINE) != 0)
-		draw_text_box_menu();
+		draw_text_box();
 	else
 		draw(flags & UI_MENU_PROCESS_CUSTOM_ONLY);
 
@@ -425,11 +404,7 @@ void ui_menu::set_selection(void *selected_itemref)
 
 void ui_menu::draw(bool customonly)
 {
-<<<<<<< HEAD
-	float line_height = get_line_height();
-=======
 	float line_height = machine().ui().get_line_height();
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 	float lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	float ud_arrow_width = line_height * machine().render().ui_aspect();
 	float gutter_width = lr_arrow_width * 1.3f;
@@ -441,8 +416,11 @@ void ui_menu::draw(bool customonly)
 	float visible_top, visible_left;
 	int selected_subitem_too_big = FALSE;
 	int visible_lines;
+	int top_line;
 	int itemnum, linenum;
-	bool mouse_hit;
+	bool mouse_hit, mouse_button;
+	render_target *mouse_target;
+	INT32 mouse_target_x, mouse_target_y;
 	float mouse_x = -1, mouse_y = -1;
 
 	// compute the width and height of the full menu 
@@ -501,24 +479,12 @@ void ui_menu::draw(bool customonly)
 	if (!customonly)
 		machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
-<<<<<<< HEAD
-	// do we have to invalidate the first visible selection?
-	if ((top_line + 1 > selected) || (top_line + visible_lines - 2 < selected))
-		top_line = -1;
-
-	// determine the first visible line based on the current selection (if we need to)
-=======
 	// determine the first visible line based on the current selection 
 	top_line = selected - visible_lines / 2;
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 	if (top_line < 0)
-	{
-		top_line = selected - visible_lines / 2;
-		if (top_line < 0)
-			top_line = 0;
-		if (top_line + visible_lines >= numitems)
-			top_line = numitems - visible_lines;
-	}
+		top_line = 0;
+	if (top_line + visible_lines >= numitems)
+		top_line = numitems - visible_lines;
 
 	// determine effective positions taking into account the hilighting arrows 
 	effective_width = visible_width - 2.0f * gutter_width;
@@ -526,8 +492,14 @@ void ui_menu::draw(bool customonly)
 
 	// locate mouse 
 	mouse_hit = false;
+	mouse_button = false;
 	if (!customonly)
-		mouse_hit = find_mouse(mouse_x, mouse_y);
+	{
+		mouse_target = ui_input_find_mouse(machine(), &mouse_target_x, &mouse_target_y, &mouse_button);
+		if (mouse_target != NULL)
+			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, *container, mouse_x, mouse_y))
+				mouse_hit = true;
+	}
 
 	// loop over visible lines 
 	hover = numitems + 1;
@@ -571,11 +543,7 @@ void ui_menu::draw(bool customonly)
 
 			// if we have some background hilighting to do, add a quad behind everything else 
 			if (bgcolor != UI_TEXT_BG_COLOR)
-<<<<<<< HEAD
-				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
-=======
 				highlight(container, line_x0, line_y0, line_x1, line_y1, bgcolor);
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 
 			// if we're on the top line, display the up arrow 
 			if (linenum == 0 && top_line != 0)
@@ -708,21 +676,13 @@ void ui_menu::custom_render(void *selectedref, float top, float bottom, float x,
 {
 }
 
-<<<<<<< HEAD
-/*-------------------------------------------------
-    draw_text_box_menu - draw a multiline
-    word-wrapped text box with a menu item at the
-    bottom
--------------------------------------------------*/
-=======
 //-------------------------------------------------
 //  draw_text_box - draw a multiline
 //  word-wrapped text box with a menu item at the
 //  bottom
 //-------------------------------------------------
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 
-void ui_menu::draw_text_box_menu()
+void ui_menu::draw_text_box()
 {
 	const char *text = item[0].text;
 	const char *backtext = item[1].text;
@@ -765,16 +725,6 @@ void ui_menu::draw_text_box_menu()
 	machine().ui().draw_text_full(container, text, target_x, target_y, target_width,
 				JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
-<<<<<<< HEAD
-	/* draw the "return to prior menu" text with a hilight behind it */
-	highlight(
-			target_x + 0.5f * UI_LINE_WIDTH,
-			target_y + target_height - line_height,
-			target_x + target_width - 0.5f * UI_LINE_WIDTH,
-			target_y + target_height,
-			UI_SELECTED_BG_COLOR);
-	ui_draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
-=======
 	// draw the "return to prior menu" text with a hilight behind it 
 	highlight(
 						container,
@@ -784,7 +734,6 @@ void ui_menu::draw_text_box_menu()
 						target_y + target_height,
 						UI_SELECTED_BG_COLOR);
 	machine().ui().draw_text_full(container, backtext, target_x, target_y + target_height - line_height, target_width,
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 				JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NORMAL, UI_SELECTED_COLOR, UI_SELECTED_BG_COLOR, NULL, NULL);
 
 	// artificially set the hover to the last item so a double-click exits 
@@ -802,13 +751,8 @@ void ui_menu::handle_events()
 	int stop = FALSE;
 	ui_event local_menu_event;
 
-<<<<<<< HEAD
-	/* loop while we have interesting events */
-	while (input_pop_event(local_menu_event) && !stop)
-=======
 	// loop while we have interesting events 
 	while (!stop && ui_input_pop_event(machine(), &local_menu_event))
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 	{
 		switch (local_menu_event.event_type)
 		{
@@ -996,8 +940,6 @@ void ui_menu::validate_selection(int scandir)
 
 
 
-<<<<<<< HEAD
-=======
 //-------------------------------------------------
 //  clear_free_list - clear out anything
 //  accumulated in the free list
@@ -1077,7 +1019,6 @@ bool ui_menu::stack_has_special_main_menu()
 	return false;
 }
 
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 void ui_menu::do_handle()
 {
 	if(!populated())
@@ -1097,21 +1038,15 @@ void ui_menu::do_handle()
 
 UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container, UINT32 state)
 {
-	// if we have no menus stacked up, start with the main menu 
-	if (menu_stack == NULL)
-		stack_push(auto_alloc_clear(machine, ui_emu_menubar(machine, container)));
+	// if we have no menus stacked up, we have to have something
+	assert(menu_stack != NULL);
 
 	// update the menu state 
 	if (menu_stack != NULL)
 		menu_stack->do_handle();
 
-<<<<<<< HEAD
-	/* clear up anything pending to be released */
-	ui_stackable::clear_free_list(machine);
-=======
 	// clear up anything pending to be released 
 	clear_free_list(machine);
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d
 
 	// if the menus are to be hidden, return a cancel here 
 	if (machine.ui().is_menu_active() && ((ui_input_pressed(machine, IPT_UI_CONFIGURE) && !stack_has_special_main_menu()) || menu_stack == NULL))
@@ -1119,8 +1054,6 @@ UINT32 ui_menu::ui_handler(running_machine &machine, render_container *container
 
 	return 0;
 }
-<<<<<<< HEAD
-=======
 
 /***************************************************************************
     MENU HELPERS
@@ -1207,4 +1140,3 @@ void ui_menu::draw_arrow(render_container *container, float x0, float y0, float 
 		arrow_texture,
 		PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation));
 }
->>>>>>> 0542ebd7123a8973181973d0b2a49c390946d33d

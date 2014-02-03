@@ -15,31 +15,40 @@
 #define __UI_EMENUBAR_H__
 
 #include "ui/menubar.h"
+#include "imagedev/cassette.h"
+#include "imagedev/bitbngr.h"
 
 class ui_emu_menubar : public ui_menubar
 {
 public:
-	ui_emu_menubar(running_machine &machine, render_container *container);
+	ui_emu_menubar(running_machine &machine);
 
 protected:
 	virtual void menubar_build_menus();
+	virtual void menubar_draw_ui_elements();
 
 private:
-	// dummy declaration for now, so that development is easier
-	char			m_dummy[256];
-
 	// menubar building
 	void build_file_menu();
 	void build_images_menu();
+	bool build_software_list_menus(menu_item &menu, device_image_interface *image);
 	void build_options_menu();
+	void build_video_target_menu(menu_item &target_menu, render_target &target);
 	void build_settings_menu();
 	void build_help_menu();
 
 	// miscellaneous
+	bool is_softlist_relevant(const software_list_device *swlist, const char *interface, astring &list_description);
+	void set_ui_handler(UINT32 (*callback)(running_machine &, render_container *, UINT32), UINT32 param);
 	void select_new_game();
-	void throttle(float f);
-	void set_natural_keyboard(bool use_natural_keyboard);
-	void video_options();
+	void select_from_software_list(device_image_interface *image, const software_list_device *swlist);
+	void tape_control(cassette_image_device *image);
+	void bitbanger_control(bitbanger_device *image);
+	void load(device_image_interface *image);
+
+	// template methods
+	template<class _Menu>
+	void start_menu();
 };
 
 

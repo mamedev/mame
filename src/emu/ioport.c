@@ -2618,18 +2618,9 @@ time_t ioport_manager::initialize()
 			mame_printf_error("Input port errors:\n%s", errors.cstr());
 	}
 
-	// special case - change UI_CONFIGURE to be ScrLk on computers
+	// do we have a keyboard?  if so, we may need to change default UI keys in response
 	if (has_keyboard())
-	{
-		for (input_type_entry *curtype = first_type(); curtype != NULL; curtype = curtype->next())
-		{
-			if (curtype->type() == IPT_UI_CONFIGURE)
-			{
-				curtype->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_SCRLOCK);
-				curtype->restore_default_seq();
-			}
-		}
-	}
+		adjust_ui_seqs_for_keyboard();
 
 	// renumber player numbers for controller ports
 	int player_offset = 0;
@@ -2788,6 +2779,87 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 					machine().input().device_class(autoenable).enable();
 					break;
 				}
+}
+
+
+//-------------------------------------------------
+//  adjust_ui_seqs_for_keyboard - make adjustments
+//	to UI seqs in response to the existence of a
+//	keyboard
+//-------------------------------------------------
+
+void ioport_manager::adjust_ui_seqs_for_keyboard()
+{
+	// track used keys in a bool array
+	bool used_keys[ITEM_ID_MAXIMUM];
+	memset(used_keys, 0, sizeof(used_keys));
+
+	// iterate over ports and fields
+	for (ioport_port *port = first_port(); port != NULL; port = port->next())
+	{
+		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
+		{
+			// if we are at init, check IPT_KEYBOARD
+			if (field->type() == IPT_KEYBOARD && (!m_safe_to_read || field->enabled()))
+			{
+				const input_seq &defseq = field->defseq();
+				for (int codenum = 0; defseq[codenum] != input_seq::end_code; codenum++)
+				{
+					input_code code = defseq[codenum];
+					if (!code.internal() && !is_modifier_item_id(code.item_id()))
+						used_keys[code.item_id()] = true;
+				}
+			}
+		}
+	}
+
+	// now that we know which keys are used by keyboards, lets take a look at the UI
+	// shortcuts
+	for (input_type_entry *curtype = first_type(); curtype != NULL; curtype = curtype->next())
+	{
+		// we're only interested in "shortcut" UI keys
+		if (curtype->group() == IPG_UI_SHORTCUT)
+		{
+			const input_seq &defseq = curtype->defseq();
+			for (int codenum = 0; defseq[codenum] != input_seq::end_code; codenum++)
+			{
+				input_code code = defseq[codenum];
+				if (!code.internal() && !is_modifier_item_id(code.item_id()) && used_keys[code.item_id()])
+				{
+					// this shortcut is used by the keyboard; clear it
+					curtype->defseq().set();
+					curtype->restore_default_seq();
+					break;
+				}
+			}
+		}
+
+		// special case - change UI_CONFIGURE to be ScrLk on computers
+		if (curtype->type() == IPT_UI_CONFIGURE)
+		{
+			curtype->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_SCRLOCK);
+			curtype->restore_default_seq();
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  is_modifier_item_id - do we consider this input
+//	item id a modifier?
+//-------------------------------------------------
+
+bool ioport_manager::is_modifier_item_id(input_item_id item_id)
+{
+	return (item_id == ITEM_ID_LSHIFT)
+		|| (item_id == ITEM_ID_LSHIFT)
+		|| (item_id == ITEM_ID_RSHIFT)
+		|| (item_id == ITEM_ID_LCONTROL)
+		|| (item_id == ITEM_ID_RCONTROL)
+		|| (item_id == ITEM_ID_LALT)
+		|| (item_id == ITEM_ID_RALT)
+		|| (item_id == ITEM_ID_LWIN)
+		|| (item_id == ITEM_ID_RWIN);
 }
 
 

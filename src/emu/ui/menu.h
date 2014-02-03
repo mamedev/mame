@@ -15,7 +15,6 @@
 #define __UI_MENU_H__
 
 #include "render.h"
-#include "ui/stackable.h"
 
 
 /***************************************************************************
@@ -79,7 +78,7 @@ public:
 	inline bool is_selectable() const;
 };
 
-class ui_menu : public ui_stackable
+class ui_menu
 {
 public:
 	ui_menu(running_machine &machine, render_container *container);
@@ -160,6 +159,9 @@ public:
 
 	// Used by sliders 
 	void validate_selection(int scandir);
+	static ui_menu *menu_stack;
+
+	void do_handle();
 
 	// To be reimplemented in the menu subclass 
 	virtual void populate() = 0;
@@ -176,12 +178,14 @@ private:
 	running_machine &   m_machine;          // machine we are attached to
 
 	void draw(bool customonly);
-	void draw_text_box_menu();
+	void draw_text_box();
 	void handle_events();
 	void handle_keys(UINT32 flags);
 	void clear_free_list();
 
 	inline bool exclusive_input_pressed(int key, int repeat);
+	static void clear_free_list(running_machine &machine);
+	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 };
 
 #endif  // __UI_MENU_H__ 

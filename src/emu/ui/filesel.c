@@ -342,14 +342,13 @@ void ui_menu_file_create::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool has_empty, bool has_softlist, bool has_create, int *result)
-	: ui_menu(machine, container),
+ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool has_empty, bool has_create, int *result)
+ 	: ui_menu(machine, container),
 	  m_current_directory(current_directory),
 	  m_current_file(current_file)
 {
 	m_image = image;
 	m_has_empty = has_empty;
-	m_has_softlist = has_softlist;
 	m_has_create = has_create;
 	m_result = result;
 }
@@ -506,10 +505,6 @@ void ui_menu_file_selector::append_entry_menu_item(const file_selector_entry *en
 			text = "[create]";
 			break;
 
-		case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
-			text = "[software list]";
-			break;
-
 		case SELECTOR_ENTRY_TYPE_DRIVE:
 			text = entry->basename;
 			subtext = "[DRIVE]";
@@ -562,12 +557,6 @@ void ui_menu_file_selector::populate()
 	{
 		// add the "[create]" entry
 		append_entry(SELECTOR_ENTRY_TYPE_CREATE, NULL, NULL);
-	}
-
-	if (m_has_softlist)
-	{
-		// add the "[software list]" entry
-		append_entry(SELECTOR_ENTRY_TYPE_SOFTWARE_LIST, NULL, NULL);
 	}
 
 	// add the drives
@@ -644,11 +633,6 @@ void ui_menu_file_selector::handle()
 				case SELECTOR_ENTRY_TYPE_CREATE:
 					// create
 					*m_result = R_CREATE;
-					ui_menu::stack_pop(machine());
-					break;
-
-				case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
-					*m_result = R_SOFTLIST;
 					ui_menu::stack_pop(machine());
 					break;
 

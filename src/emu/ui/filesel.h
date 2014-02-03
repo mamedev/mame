@@ -54,8 +54,8 @@ private:
 class ui_menu_file_selector : public ui_menu
 {
 public:
-	enum { R_EMPTY, R_SOFTLIST, R_CREATE, R_FILE };
-	ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool has_empty, bool has_softlist, bool has_create, int *result);
+	enum { R_EMPTY, R_CREATE, R_FILE };
+	ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool has_empty, bool has_create, int *result);
 	virtual ~ui_menu_file_selector();
 	virtual void populate();
 	virtual void handle();
@@ -66,7 +66,6 @@ private:
 	{
 		SELECTOR_ENTRY_TYPE_EMPTY,
 		SELECTOR_ENTRY_TYPE_CREATE,
-		SELECTOR_ENTRY_TYPE_SOFTWARE_LIST,
 		SELECTOR_ENTRY_TYPE_DRIVE,
 		SELECTOR_ENTRY_TYPE_DIRECTORY,
 		SELECTOR_ENTRY_TYPE_FILE
@@ -86,7 +85,6 @@ private:
 	astring &					m_current_directory;
 	astring &					m_current_file;
 	bool						m_has_empty;
-	bool						m_has_softlist;
 	bool						m_has_create;
 	int *						m_result;
 	file_selector_entry *		m_entrylist;
