@@ -85,7 +85,8 @@ video_manager::video_manager(running_machine &machine)
 		m_overall_real_ticks(0),
 		m_overall_emutime(attotime::zero),
 		m_overall_valid_counter(0),
-		m_throttle_rate(machine.options().throttle() ? 1.0f : 0.0f),
+		m_throttled(machine.options().throttle()),
+		m_throttle_rate(1.0f),
 		m_fastforward(false),
 		m_seconds_to_run(machine.options().seconds_to_run()),
 		m_auto_frameskip(machine.options().auto_frameskip()),
@@ -1283,7 +1284,7 @@ bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bi
 
 void video_manager::toggle_throttle()
 {
-	set_throttle_rate(throttled() ? 0.0f : 1.0f);
+	set_throttled(!throttled());
 }
 
 
