@@ -600,8 +600,7 @@ static MACHINE_CONFIG_DERIVED( apfimag, apfm1000 )
 	MCFG_PIA_READPB_HANDLER(READ8(apf_state, pia1_portb_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apf_state, pia1_portb_w))
 
-	//MCFG_CASSETTE_ADD( "cassette", apf_cassette_interface )
-	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", apf_cassette_interface )
 	//MCFG_FD1793_ADD("fdc", default_wd17xx_interface ) // TODO confirm type
 	//MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)
 MACHINE_CONFIG_END
