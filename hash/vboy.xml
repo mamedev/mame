@@ -82,7 +82,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<info name="release" value="19951013"/>
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="innsmouth no yakata (japan).bin" size="1048576" crc="efd0ac36" sha1="8bb91e681959207be068796d540120565c174d37" offset="000000" />
+				<rom name="innsmouth no yakata (japan).bin" size="1048576" crc="83cb6a00" sha1="37e06e53ce2810e870835c48decdd6c72079bfda" offset="000000" />
 				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
