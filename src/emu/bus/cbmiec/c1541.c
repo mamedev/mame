@@ -613,7 +613,7 @@ READ8_MEMBER( c1541c_device::via0_pa_r )
 
 	*/
 
-	return !floppy_tk00_r(m_image);
+	return !m_floppy->trk00_r();
 }
 
 
@@ -644,7 +644,7 @@ READ8_MEMBER( base_c1541_device::via1_pb_r )
 	UINT8 data = 0;
 
 	// write protect sense
-	data |= !floppy_wpt_r(m_image) << 4;
+	data |= !m_floppy->wpt_r() << 4;
 
 	// SYNC detect line
 	data |= m_ga->sync_r() << 7;
@@ -699,40 +699,24 @@ WRITE_LINE_MEMBER( base_c1541_device::byte_w )
 	m_via1->write_ca1(state);
 }
 
-static C64H156_INTERFACE( ga_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1541_device, atn_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1541_device, byte_w)
-};
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( c1540_floppies )
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( c1540_floppies )
+    SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
+SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( c1541 )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-static LEGACY_FLOPPY_OPTIONS_START( c1541 )
-	LEGACY_FLOPPY_OPTION( c1541, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	LEGACY_FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
-//  floppy_interface c1541_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface c1541_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(c1541),
-	"floppy_5_25",
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( base_c1541_device::floppy_formats )
+    FLOPPY_D64_FORMAT,
+    FLOPPY_G64_FORMAT
+FLOPPY_FORMATS_END
 
 
 READ8_MEMBER( c1541_prologic_dos_classic_device::pia_r )
@@ -802,8 +786,10 @@ static MACHINE_CONFIG_FRAGMENT( c1541 )
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(C64H156_TAG, c64h156_device, oe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(base_c1541_device, via1_irq_w))
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
+	MCFG_64H156_ATN_CALLBACK(WRITELINE(base_c1541_device, atn_w))
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(base_c1541_device, byte_w))
+	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1540_floppies, "525ssqd", base_c1541_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -974,7 +960,7 @@ base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type
 		m_via0(*this, M6522_0_TAG),
 		m_via1(*this, M6522_1_TAG),
 		m_ga(*this, C64H156_TAG),
-		m_image(*this, FLOPPY_0),
+		m_floppy(*this, C64H156_TAG":0:525ssqd"),
 		m_address(*this, "ADDRESS"),
 		m_data_out(1),
 		m_via0_irq(CLEAR_LINE),
@@ -1075,7 +1061,7 @@ c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machi
 void base_c1541_device::device_start()
 {
 	// install image callbacks
-	m_ga->set_floppy(m_image);
+	m_ga->set_floppy(m_floppy);
 
 	// register for state saving
 	save_item(NAME(m_data_out));

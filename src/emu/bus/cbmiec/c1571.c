@@ -13,8 +13,7 @@
 
     TODO:
 
-    - modernize floppy
-        - refactor 64H156
+	- WD1770 set_floppy
     - 1571CR
         - MOS5710
     - ICT Mini Chief MC-20
@@ -23,7 +22,6 @@
 
 */
 
-#include "c1541.h"
 #include "c1571.h"
 
 
@@ -201,7 +199,7 @@ READ8_MEMBER( c1571_device::via0_pa_r )
 	UINT8 data = 0;
 
 	// track 0 sense
-	data |= floppy_tk00_r(m_image);
+	data |= m_floppy->trk00_r();
 
 	// byte ready
 	data |= m_ga->byte_r() << 7;
@@ -230,7 +228,7 @@ WRITE8_MEMBER( c1571_device::via0_pa_w )
 	m_ser_dir = BIT(data, 1);
 
 	// side select
-	m_ga->set_side(BIT(data, 2));
+	m_floppy->ss_w(BIT(data, 2));
 
 	// 1/2 MHz
 	int clock_1_2 = BIT(data, 5);
@@ -272,7 +270,7 @@ WRITE8_MEMBER( c1571cr_device::via0_pa_w )
 	*/
 
 	// side select
-	m_ga->set_side(BIT(data, 2));
+	m_floppy->ss_w(BIT(data, 2));
 
 	// 1/2 MHz
 	int clock_1_2 = BIT(data, 5);
@@ -429,7 +427,7 @@ READ8_MEMBER( c1571_device::via1_pb_r )
 	UINT8 data = 0;
 
 	// write protect sense
-	data |= !floppy_wpt_r(m_image) << 4;
+	data |= !m_floppy->wpt_r() << 4;
 
 	// SYNC detect line
 	data |= m_ga->sync_r() << 7;
@@ -490,12 +488,14 @@ WRITE_LINE_MEMBER( c1571_device::cia_pc_w )
 WRITE_LINE_MEMBER( c1571_device::cia_cnt_w )
 {
 	m_cnt_out = state;
+
 	update_iec();
 }
 
 WRITE_LINE_MEMBER( c1571_device::cia_sp_w )
 {
 	m_sp_out = state;
+
 	update_iec();
 }
 
@@ -555,95 +555,39 @@ WRITE8_MEMBER( mini_chief_device::cia_pb_w )
 WRITE_LINE_MEMBER( c1571_device::byte_w )
 {
 	m_via1->write_ca1(state);
+
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
 }
 
-static C64H156_INTERFACE( ga_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1571_device, byte_w)
-};
-
-
-//-------------------------------------------------
-//  SLOT_INTERFACE( c1570_floppies )
-//-------------------------------------------------
-/*
-static SLOT_INTERFACE_START( c1570_floppies )
-    SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
-*/
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( c1571_floppies )
 //-------------------------------------------------
-/*
+
 static SLOT_INTERFACE_START( c1571_floppies )
-    SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
-*/
-
-//-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( c1571 )
-//-------------------------------------------------
-
-static LEGACY_FLOPPY_OPTIONS_START( c1571 )
-	LEGACY_FLOPPY_OPTION( c1571, "g64,g71", "Commodore 1541/1571 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	LEGACY_FLOPPY_OPTION( c1571, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-	LEGACY_FLOPPY_OPTION( c1571, "d71", "Commodore 1571 Disk Image", d71_dsk_identify, d64_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
 
 
 //-------------------------------------------------
 //  floppy_interface c1571_floppy_interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1571_device::wpt_w )
+void c1571_device::wpt_callback(floppy_image_device *floppy, int state)
 {
 	m_via0->write_ca2(!state);
 }
 
-static const floppy_interface c1571_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1571_device, wpt_w),
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(c1571),
-	"floppy_5_25",
-	NULL
-};
-
 
 //-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( c1541 )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-static LEGACY_FLOPPY_OPTIONS_START( c1541 )
-	LEGACY_FLOPPY_OPTION( c1541, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	LEGACY_FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
-//  floppy_interface c1570_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface c1570_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1571_device, wpt_w),
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(c1541),
-	"floppy_5_25",
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( c1571_device::floppy_formats )
+	FLOPPY_D64_FORMAT,
+	FLOPPY_G64_FORMAT,
+	FLOPPY_D71_FORMAT
+FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
@@ -699,11 +643,11 @@ static MACHINE_CONFIG_FRAGMENT( c1570 )
 	MCFG_MOS6526_ADD(M6526_TAG, XTAL_16MHz/16, 0, WRITELINE(c1571_device, cia_irq_w))
 	MCFG_MOS6526_SERIAL_CALLBACKS(WRITELINE(c1571_device, cia_cnt_w), WRITELINE(c1571_device, cia_sp_w))
 	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c1571_device, cia_pb_r), WRITE8(c1571_device, cia_pb_w), WRITELINE(c1571_device, cia_pc_w))
+	
 	MCFG_WD1770x_ADD(WD1770_TAG, XTAL_16MHz/2)
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1570_floppy_interface)
-	//MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", c1570_floppies, "525ssdd", 0, c1571_device::floppy_formats)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1571_device, byte_w))
+	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -746,11 +690,11 @@ static MACHINE_CONFIG_FRAGMENT( c1571 )
 	MCFG_MOS6526_ADD(M6526_TAG, XTAL_16MHz/16, 0, WRITELINE(c1571_device, cia_irq_w))
 	MCFG_MOS6526_SERIAL_CALLBACKS(WRITELINE(c1571_device, cia_cnt_w), WRITELINE(c1571_device, cia_sp_w))
 	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c1571_device, cia_pb_r), WRITE8(c1571_device, cia_pb_w), WRITELINE(c1571_device, cia_pc_w))
+	
 	MCFG_WD1770x_ADD(WD1770_TAG, XTAL_16MHz/2)
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
-	//MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", c1571_floppies, "525dd", 0, c1571_device::floppy_formats)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1571_device, byte_w))
+	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -793,10 +737,9 @@ static MACHINE_CONFIG_FRAGMENT( c1571cr )
 	//MCFG_MOS5710_ADD(M5710_TAG, XTAL_16MHz/16, 0)
 
 	MCFG_WD1770x_ADD(WD1770_TAG, XTAL_16MHz/2)
-
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
-	//MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", c1571_floppies, "525dd", 0, c1571_device::floppy_formats)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1571_device, byte_w))
+	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -839,11 +782,11 @@ static MACHINE_CONFIG_FRAGMENT( mini_chief )
 	MCFG_MOS6526_ADD(M6526_TAG, XTAL_16MHz/16, 0, WRITELINE(c1571_device, cia_irq_w))
 	MCFG_MOS6526_SERIAL_CALLBACKS(WRITELINE(c1571_device, cia_cnt_w), WRITELINE(c1571_device, cia_sp_w))
 	MCFG_MOS6526_PORT_B_CALLBACKS(READ8(c1571_device, cia_pb_r), WRITE8(c1571_device, cia_pb_w), WRITELINE(c1571_device, cia_pc_w))
-	MCFG_WD1770x_ADD(WD1770_TAG, XTAL_16MHz/2)
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1571_floppy_interface)
-	//MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", c1571_floppies, "525dd", 0, c1571_device::floppy_formats)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+	MCFG_WD1770x_ADD(WD1770_TAG, XTAL_16MHz/2)
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c1571_device, byte_w))
+	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 
 	MCFG_ISA8_BUS_ADD(ISA_BUS_TAG, M6502_TAG, isabus_intf)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, "wd1002a_wx1", false)
@@ -904,7 +847,7 @@ c1571_device::c1571_device(const machine_config &mconfig, device_type type, cons
 		m_cia(*this, M6526_TAG),
 		m_fdc(*this, WD1770_TAG),
 		m_ga(*this, C64H156_TAG),
-		m_image(*this, FLOPPY_0),
+		m_floppy(*this, C64H156_TAG":0:525qd"),
 		m_address(*this, "ADDRESS"),
 		m_1_2mhz(0),
 		m_data_out(1),
@@ -927,7 +870,7 @@ c1571_device::c1571_device(const machine_config &mconfig, const char *tag, devic
 		m_cia(*this, M6526_TAG),
 		m_fdc(*this, WD1770_TAG),
 		m_ga(*this, C64H156_TAG),
-		m_image(*this, FLOPPY_0),
+		m_floppy(*this, C64H156_TAG":0:525qd"),
 		m_address(*this, "ADDRESS"),
 		m_1_2mhz(0),
 		m_data_out(1),
@@ -937,7 +880,6 @@ c1571_device::c1571_device(const machine_config &mconfig, const char *tag, devic
 		m_via0_irq(CLEAR_LINE),
 		m_via1_irq(CLEAR_LINE),
 		m_cia_irq(CLEAR_LINE)
-		//m_floppy(*this, WD1770_TAG":0:525dd")
 {
 }
 
@@ -948,7 +890,6 @@ c1571_device::c1571_device(const machine_config &mconfig, const char *tag, devic
 
 c1570_device::c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: c1571_device(mconfig, C1570, "C1570", tag, owner, clock, "c1570", __FILE__)
-		//m_floppy(*this, WD1770_TAG":0:525ssdd")
 {
 }
 
@@ -959,7 +900,6 @@ c1570_device::c1570_device(const machine_config &mconfig, const char *tag, devic
 
 c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: c1571_device(mconfig, C1571CR, "C1571CR", tag, owner, clock, "c1571cr", __FILE__)
-		//m_floppy(*this, WD1770_TAG":0:525dd")
 {
 }
 
@@ -970,7 +910,6 @@ c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, d
 
 mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: c1571_device(mconfig, MINI_CHIEF, "ICT Mini Chief", tag, owner, clock, "minichif", __FILE__)
-		//m_floppy(*this, WD1770_TAG":0:525dd")
 {
 }
 
@@ -982,8 +921,9 @@ mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *
 void c1571_device::device_start()
 {
 	// install image callbacks
-	m_ga->set_floppy(m_image);
+	m_ga->set_floppy(m_floppy);
 	//m_fdc->set_floppy(m_floppy);
+	m_floppy->setup_wpt_cb(floppy_image_device::wpt_cb(FUNC(c1571_device::wpt_callback), this));
 
 	// register for state saving
 	save_item(NAME(m_1_2mhz));

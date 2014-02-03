@@ -6,6 +6,8 @@
 
     Commodore 1541/1571 GCR disk image format
 
+    http://unusedino.de/ec64/technical/formats/g64.html
+
 *********************************************************************/
 
 #include "emu.h"
@@ -29,7 +31,7 @@ const char *g64_format::description() const
 
 const char *g64_format::extensions() const
 {
-	return "g64,g41,g71";
+	return "g64,g41";
 }
 
 const UINT32 g64_format::c1541_cell_size[] =
@@ -62,12 +64,13 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	}
 
 	int track_count = img[TRACK_COUNT];
+	int head = 0;
+	int splice_pos = 0;
 
 	for (int track = 0; track < track_count; track++)
 	{
 		offs_t track_offset = pick_integer_le(img, TRACK_OFFSET + (track * 4), 4);
 		if (track_offset > size) throw emu_fatalerror("g64_format: Track %u offset %06x out of bounds", track, track_offset);
-		if (!track_offset) continue;
 		
 		offs_t speed_zone = pick_integer_le(img, SPEED_ZONE + (track * 4), 4);
 		if (speed_zone > 3)	throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
@@ -75,12 +78,13 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		size_t max_cells = 200000000/cell_size;
 
 		size_t track_bytes = pick_integer_le(img, track_offset, 2);
-		track_offset += 2;
 		size_t track_cells = track_bytes * 8;
 
 		size_t track_size = MAX(track_cells, max_cells);
 		UINT32 *trackbuf = global_alloc_array_clear(UINT32, track_size);
 		offs_t trackbuf_offs = 0;
+
+		track_offset += 2;
 
 		while (trackbuf_offs < track_cells) {
 			for (int bit=7; bit>=0; bit--) {
@@ -89,13 +93,12 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			track_offset++;
 		}
 
-		// pad the remainder of the track with sync
+		// pad the remainder of the track with gap
+		int gap = 0;
 		while (trackbuf_offs < max_cells) {
-			bit_w(trackbuf, trackbuf_offs++, 1, cell_size);
+			bit_w(trackbuf, trackbuf_offs++, gap, cell_size);
+			gap = !gap;
 		}
-
-		int head = 0;
-		int splice_pos = 0;
 
 		generate_track_from_levels(track, head, trackbuf, track_size, splice_pos, image);
 		

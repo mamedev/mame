@@ -127,8 +127,10 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/csw_cas.o     \
 	$(LIBOBJ)/formats/d64_dsk.o     \
 	$(LIBOBJ)/formats/d67_dsk.o     \
+	$(LIBOBJ)/formats/d71_dsk.o     \
 	$(LIBOBJ)/formats/d80_dsk.o     \
 	$(LIBOBJ)/formats/d81_dsk.o     \
+	$(LIBOBJ)/formats/d82_dsk.o     \
 	$(LIBOBJ)/formats/d88_dsk.o     \
 	$(LIBOBJ)/formats/dfi_dsk.o     \
 	$(LIBOBJ)/formats/dim_dsk.o     \
