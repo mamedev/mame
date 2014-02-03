@@ -76,6 +76,9 @@
 	MCFG_DEVICE_ADD(_tag, ISA8, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
 	isa8_device::static_set_cputag(*device, _cputag);
+// include this in a driver to have ISA allocate it's own address spaces (e.g. non-x86)
+#define MCFG_ISA8_BUS_CUSTOM_SPACES() \
+	isa8_device::static_set_custom_spaces(*device);
 #define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
@@ -84,6 +87,8 @@
 	MCFG_DEVICE_ADD(_tag, ISA16, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
 	isa8_device::static_set_cputag(*device, _cputag);
+#define MCFG_ISA16_BUS_CUSTOM_SPACES() \
+	isa8_device::static_set_custom_spaces(*device);
 #define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
@@ -138,7 +143,8 @@ struct isa8bus_interface
 class device_isa8_card_interface;
 // ======================> isa8_device
 class isa8_device : public device_t,
-					public isa8bus_interface
+					public isa8bus_interface,
+					public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -146,13 +152,28 @@ public:
 	isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
+	static void static_set_custom_spaces(device_t &device);
 	template<class _iochck> void set_iochck_callback(_iochck iochck) { m_write_iochck.set_callback(iochck); }
+
+	// for ISA8, put the 8-bit configs in the primary slots and the 16-bit configs in the secondary
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const 
+	{ 
+		switch (spacenum)
+		{
+			case AS_PROGRAM: return &m_program_config;
+			case AS_IO:		 return &m_io_config;
+			case AS_DATA:  	 return &m_program16_config;
+			case AS_3:		 return &m_io16_config;
+			default:		 fatalerror("isa: invalid memory space!\n");
+		}
+	}
 
 	ATTR_DEPRECATED void install_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
 	ATTR_DEPRECATED void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name);
-	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map, device_t &device), int bits = 8, UINT64 unitmask = U64(0xffffffffffffffff)) {
-		m_maincpu->space(AS_IO).install_device(addrstart, addrend, device, map, bits, unitmask);
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map, device_t &device), int bits = 8, UINT64 unitmask = U64(0xffffffffffffffff)) 
+	{
+		m_iospace->install_device(addrstart, addrend, device, map, bits, unitmask);	
 	}
 	void install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data);
 	void install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region);
@@ -173,6 +194,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq2_w );
 	DECLARE_WRITE_LINE_MEMBER( drq3_w );
 
+	// 8 bit accessors for ISA-defined address spaces
+	DECLARE_READ8_MEMBER(prog_r);
+	DECLARE_WRITE8_MEMBER(prog_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
+
 	UINT8 dack_r(int line);
 	void dack_w(int line,UINT8 data);
 	void eop_w(int channels, int state);
@@ -181,6 +208,9 @@ public:
 	void set_nmi_state(bool enabled) { m_nmi_enabled = enabled; }
 
 	virtual void set_dma_channel(UINT8 channel, device_isa8_card_interface *dev, bool do_eop);
+
+	const address_space_config m_program_config, m_io_config, m_program16_config, m_io16_config;
+
 protected:
 	ATTR_DEPRECATED void install_space(address_spacenum spacenum, device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name);
 	ATTR_DEPRECATED void install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name);
@@ -193,6 +223,11 @@ protected:
 
 	// internal state
 	cpu_device   *m_maincpu;
+
+	// address spaces
+	address_space *m_iospace, *m_prgspace;
+	int m_iowidth, m_prgwidth;
+	bool m_allocspaces;
 
 	devcb_resolved_write_line   m_out_irq2_func;
 	devcb_resolved_write_line   m_out_irq3_func;
@@ -299,6 +334,19 @@ public:
 
 	void install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
 
+	// for ISA16, put the 16-bit configs in the primary slots and the 8-bit configs in the secondary
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const 
+	{ 
+		switch (spacenum)
+		{
+			case AS_PROGRAM: return &m_program16_config;
+			case AS_IO:		 return &m_io16_config;
+			case AS_DATA:	 return &m_program_config;
+			case AS_3:		 return &m_io_config;
+			default:		 fatalerror("isa: invalid memory space!\n");
+		}
+	}
+
 	DECLARE_WRITE_LINE_MEMBER( irq10_w );
 	DECLARE_WRITE_LINE_MEMBER( irq11_w );
 	DECLARE_WRITE_LINE_MEMBER( irq12_w );
@@ -312,6 +360,17 @@ public:
 
 	UINT16 dack16_r(int line);
 	void dack16_w(int line,UINT16 data);
+
+	// 16 bit accessors for ISA-defined address spaces
+	DECLARE_READ16_MEMBER(prog16_r);
+	DECLARE_WRITE16_MEMBER(prog16_w);
+	DECLARE_READ16_MEMBER(io16_r);
+	DECLARE_WRITE16_MEMBER(io16_w);
+	// byte-swapped versions of 16-bit accessors
+	DECLARE_READ16_MEMBER(prog16_swap_r);
+	DECLARE_WRITE16_MEMBER(prog16_swap_w);
+	DECLARE_READ16_MEMBER(io16_swap_r);
+	DECLARE_WRITE16_MEMBER(io16_swap_w);
 
 protected:
 	// device-level overrides

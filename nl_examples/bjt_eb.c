@@ -5,23 +5,26 @@
 
 
 #include "netlist/devices/net_lib.h"
+#include "netlist/analog/nld_twoterm.h"
 
 NETLIST_START(bjt)
     /* Standard stuff */
 
-    NETDEV_CLOCK(clk)
-    NETDEV_PARAM(clk.FREQ, 1000) // 1000 Hz
-    NETDEV_SOLVER(Solver)
-    NETDEV_PARAM(Solver.FREQ, 48000)
-    NETDEV_PARAM(Solver.ACCURACY, 1e-4)
-    NETDEV_ANALOG_INPUT(V5, 5)
-    NETDEV_ANALOG_INPUT(V3, 3.5)
+    CLOCK(clk)
+    PARAM(clk.FREQ, 10000) // 1000 Hz
+    SOLVER(Solver)
+    PARAM(Solver.FREQ, 48000)
+    PARAM(Solver.ACCURACY, 1e-4)
+    //PARAM(Solver.ACCURACY, 1e-6)
+    PARAM(Solver.RESCHED_LOOPS, 50)
+    ANALOG_INPUT(V5, 5)
+    ANALOG_INPUT(V3, 3.5)
 
     /* NPN - example */
 
-    NETDEV_QBJT_EB(Q, "BC237B")
-    NETDEV_R(RB, 1000)
-    NETDEV_R(RC, 1000)
+    QBJT_EB(Q, "BC237B")
+    RES(RB, 1000)
+    RES(RC, 1000)
 
     NET_C(RC.1, V5)
     NET_C(RC.2, Q.C)
@@ -30,7 +33,13 @@ NETLIST_START(bjt)
     NET_C(RB.2, Q.B)
     NET_C(Q.E, GND)
 
-    //NETDEV_LOG(logB, Q.B)
-    //NETDEV_LOG(logC, Q.C)
+    // put some load on Q.C
+
+    RES(RCE, 150000)
+    NET_C(RCE.1, Q.C)
+    NET_C(RCE.2, GND)
+
+    //LOG(logB, Q.B)
+    //LOG(logC, Q.C)
 
 NETLIST_END()

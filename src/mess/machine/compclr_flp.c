@@ -237,8 +237,9 @@ void compucolor_floppy_device::select_w(int state)
 
 bool compucolor_floppy_device::read_bit()
 {
-	attotime edge = m_floppy->get_next_transition(machine().time());
-	attotime next = machine().time() + m_period;
+	attotime when = machine().time();
+	attotime edge = m_floppy->get_next_transition(when);
+	attotime next = when + m_period;
 
 	return (edge.is_never() || edge >= next) ? 0 : 1;
 }

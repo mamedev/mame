@@ -7,10 +7,8 @@ To investigate:
   - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GB version?
 
 Undumped:
-- Elmo's ABCs DMG-AEAP-EUR
 - Mary-Kate and Ashley - Crush Course CGB-BCVP-UKV
 - Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
-- Rocket Power - Gettin' Air CGB-BRUP-EUR
 - San Francisco Rush 2049 (Euro, fr/de/nl) [small pic]
 
 nointro guys also list the following
@@ -2220,10 +2218,10 @@ List of verified retail cartridges rom dumps
 	</software>
 
 	<software name="rugmovie">
-		<description>The Rugrats Movie (Euro, USA)</description><!-- only Euro confirmed -->
+		<description>The Rugrats Movie (Euro)</description>
 		<year>1999</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="DMG-ARQE-USA, DMG-ARZP-(NOE/UKV)"/>
+		<info name="serial" value="DMG-ARZP-(NOE/UKV)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
@@ -5185,10 +5183,10 @@ List of unconfirmed retail cartridge roms
 	</software>
 
 	<software name="beautyu" cloneof="beauty">
-		<description>Beauty and the Beast - A Board Game Adventure (USA)</description>
+		<description>Beauty and the Beast - A Board Game Adventure (USA, Aus)</description>
 		<year>2000</year>
 		<publisher>Disney Interactive</publisher>
-		<info name="serial" value="DMG-AVUE-USA"/>
+		<info name="serial" value="DMG-AVUE-USA, DMG-AVUU-AUS"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<!-- cartridge ram -->
@@ -8283,8 +8281,8 @@ List of unconfirmed retail cartridge roms
 		<info name="serial" value="DMG-AE3P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
-			<dataarea name="rom" size="262144">
-				<rom name="elmo123ae3p.bin" size="262144" crc="a69f75d8" sha1="e005bdc3a30e76894f8ab9c43cb2e54817b4df56" offset="000000" />
+			<dataarea name="rom" size="1048576">
+				<rom name="elmo123ae3p.bin" size="1048576" crc="3bf7fcd4" sha1="841bda2e2c1542c44b45c98a390ba3320ef735cc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8303,6 +8301,19 @@ List of unconfirmed retail cartridge roms
 	</software>
 
 	<software name="elmoabc">
+		<description>Elmo's ABCs (Euro)</description>
+		<year>1999</year>
+		<publisher>NewKidCo</publisher>
+		<info name="serial" value="DMG-AEAP-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="elmo's abcs (europe).bin" size="1048576" crc="20158fbc" sha1="e98d4d4179ca13c22d0205f118470ecc795928b1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elmoabcu" cloneof="elmoabc">
 		<description>Elmo's ABCs (USA)</description>
 		<year>1999</year>
 		<publisher>NewKidCo</publisher>
@@ -8671,7 +8682,22 @@ List of unconfirmed retail cartridge roms
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="flintstones, the - burgertime in bedrock (europe) (en,fr,de,es,it).bin" size="1048576" crc="ecccd908" sha1="80ec102f3cf45602c6facffcdd44232650897dab" offset="000000" />
+				<rom name="flintstones, the - burgertime in bedrock (europe) (en,fr,de,es,it).bin" size="1048576" crc="a5b09726" sha1="2f7fb1afedd6c9657715b45397dc5492e40dfe45" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- The header is wrong, can it be a bad dump? a beta? investigations are needed on this older dump -->
+	<software name="flintbba" cloneof="flintbb">
+		<!-- Notes: GBC only -->
+		<description>The Flintstones - Burgertime in Bedrock (Euro, Alt?)</description>
+		<year>2001</year>
+		<publisher>Swing! Entertainment Media</publisher>
+		<info name="serial" value="CGB-BFSP-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="flintstones, the - burgertime in bedrock (europe) (beta).bin" size="1048576" crc="ecccd908" sha1="80ec102f3cf45602c6facffcdd44232650897dab" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12068,7 +12094,7 @@ List of unconfirmed retail cartridge roms
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="land before time, the (europe) (en,fr,de,es,it).bin" size="1048576" crc="5a385226" sha1="119271e27b7a338f716c5c3cf4dcff4846d6b810" offset="000000" />
+				<rom name="land before time, the (europe) (en,fr,de,es,it).bin" size="1048576" crc="f253e082" sha1="9d7a8b923116093b9ee9415603a4ac9d15dcf8e3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -18430,10 +18456,10 @@ List of unconfirmed retail cartridge roms
 
 	<software name="rocketp">
 		<!-- Notes: GBC only -->
-		<description>Rocket Power - Gettin' Air (USA)</description>
+		<description>Rocket Power - Gettin' Air (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>THQ;</publisher>
-		<info name="serial" value="CGB-BRUE-USA"/>
+		<info name="serial" value="CGB-BRUP-EUR, CGB-BRUE-USA"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
@@ -18689,6 +18715,19 @@ List of unconfirmed retail cartridge roms
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="rugrats in paris - the movie (europe) (en,es).bin" size="1048576" crc="35323432" sha1="5aa140068f3460f027f155566534b19500ad30e9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rugmovieu" cloneof="rugmovie">
+		<description>The Rugrats Movie (USA)</description>
+		<year>1999</year>
+		<publisher>THQ</publisher>
+		<info name="serial" value="DMG-ARQE-USA"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="the rugrats movie (usa).bin" size="1048576" crc="febe2606" sha1="c64ddf11c12d34f13d86e4a468b1eedacb698081" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23646,7 +23685,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-	<software name="iceage2" supported="no">
+	<software name="iceage2a" cloneof="iceage2" supported="no">
 		<description>Ice Age II (Chi)</description>
 		<year>20??</year>
 		<publisher>Sintax</publisher>
@@ -23695,6 +23734,103 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 
 <!-- Other Asian Pirate dumps to sort -->
+
+<!-- World WarCraft? -->
+	<software name="moshosj">
+		<description>Mo Shou Shi Ji - Zhan Shen (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="魔獸世紀-戰神"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="mo shou shi ji - zhan shen (unlicensed, chinese) [raw dump].bin" size="2097152" crc="80c4fd52" sha1="d2569f8176164cef1cc2a8bd94949ea9cd7dbbea" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fengzg2">
+		<description>Feng Zhi Gou II (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="风之谷II"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="feng zhi gou ii (unlicensed, chinese) [raw dump].bin" size="2097152" crc="842cb4fe" sha1="4322980e5b21332a71fb7fcadbf57a79aad6346b" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digigdb">
+		<description>2003 Shu Ma Bao Long - Ge Dou Ban (Chi)</description>
+		<year>2003?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="2003数码暴龙 格斗版"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="2003 shu ma bao long - ge dou ban (unlicensed, chinese) [raw dump].bin" size="2097152" crc="1219eec6" sha1="4a722c10e3893e04c67a66d0aea401d6d220ec7e" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192"> <!-- Internal header says 2K... -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lkrx5">
+		<description>Luo Ke Ren X5 (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="洛克人X5, 络克英雄EXE5 ~ Luo Ke Ying Xiong EXE5 (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="luo ke ying xiong exe5 (luo ke ren x5) (unlicensed, chinese) [raw dump].bin" size="2097152" crc="51f92403" sha1="c498a5fb261e921828831bff5c2c705453ea314e" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crash2c" cloneof="crash2">
+		<description>2003 Gu Huo Lang II - The Huge Adventure (Chi)</description>
+		<year>2003?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="2003 古惑狼II (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="2003 gu huo lang ii (unlicensed, chinese) [raw dump].bin" size="2097152" crc="74d71b0c" sha1="fcbb769de0896ae69fe1063fa5d87cf079c8606a" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceage2">
+		<description>Bing Yuan Li Xian Ji II (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="冰原歷險記II"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="bing yuan li xian ji ii (unlicensed, chinese) [raw dump].bin" size="2097152" crc="c4eba914" sha1="9e1c0c019630d7e4884ad3d5a447bd1acf668277" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 <!-- Pokemon Platinum? -->
 	<software name="pokeplat">

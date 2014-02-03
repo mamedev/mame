@@ -267,7 +267,7 @@ WRITE8_MEMBER( mos6530_device::write )
 			if (!port->out_port_func.isnull())
 				port->out_port_func(0, data);
 			else
-				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", tag(), 'A' + (offset & 1), space.machine().firstcpu->pc(), data);
+				logerror("%s 6530MIOT chip %s: Port %c is being written to but has no handler. %02X\n", machine().describe_context(), tag(), 'A' + (offset & 1), data);
 		}
 	}
 }
@@ -328,7 +328,7 @@ READ8_MEMBER( mos6530_device::read )
 				port->in = port->in_port_func(0);
 			}
 			else
-				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", tag(), 'A' + (offset & 1), space.machine().firstcpu->pc());
+				logerror("%s 6530MIOT chip %s: Port %c is being read but has no handler.\n", machine().describe_context(), tag(), 'A' + (offset & 1));
 
 			/* apply the DDR to the result */
 			val = (out & port->ddr) | (port->in & ~port->ddr);

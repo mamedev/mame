@@ -30,132 +30,160 @@
  check new fcw for switch to system mode
  and swap stack pointer if needed
  ******************************************/
-INLINE void CHANGE_FCW(z8000_state *cpustate, UINT16 fcw)
+void z8002_device::CHANGE_FCW(UINT16 fcw)
 {
 	UINT16 tmp;
-	if ((fcw ^ cpustate->fcw) & F_S_N) {          /* system/user mode change? */
-		tmp = cpustate->RW(15);
-		cpustate->RW(15) = cpustate->nspoff;
-		cpustate->nspoff = tmp;
+	if ((fcw ^ m_fcw) & F_S_N)            /* system/user mode change? */
+	{
+		tmp = RW(15);
+		RW(15) = m_nspoff;
+		m_nspoff = tmp;
 	}
-	if (cpustate->device->type() == Z8001) {
-		/* User mode R14 is used in user mode and non-segmented system mode.
-		   System mode R14 is only used in segmented system mode.
-		   There is no transition from user mode to non-segmented system mode,
-		   so this doesn't need to be handled here. */
-		if (fcw & F_S_N) {  /* new mode is system mode */
-			if (!(cpustate->fcw & F_S_N)                /* old mode was user mode */
-				|| ((fcw ^ cpustate->fcw) & F_SEG)) {   /* or switch between segmented and non-segmented */
-				tmp = cpustate->RW(14);
-				cpustate->RW(14) = cpustate->nspseg;
-				cpustate->nspseg = tmp;
-			}
-		}
-		else {  /* new mode is user mode */
-			if (cpustate->fcw & F_S_N          /* old mode was system mode */
-				&& cpustate->fcw & F_SEG) {    /* and was segmented */
-				tmp = cpustate->RW(14);
-				cpustate->RW(14) = cpustate->nspseg;
-				cpustate->nspseg = tmp;
-			}
-		}
-	}
-	else
-		fcw &= ~F_SEG;  /* never set segmented mode bit on Z8002 */
 
-	if (!(cpustate->fcw & F_NVIE) && (fcw & F_NVIE) && (cpustate->irq_state[0] != CLEAR_LINE))
-		cpustate->irq_req |= Z8000_NVI;
-	if (!(cpustate->fcw & F_VIE) && (fcw & F_VIE) && (cpustate->irq_state[1] != CLEAR_LINE))
-		cpustate->irq_req |= Z8000_VI;
-	cpustate->fcw = fcw;  /* set new cpustate->fcw */
+	fcw &= ~F_SEG;  /* never set segmented mode bit on Z8002 */
+
+	if (!(m_fcw & F_NVIE) && (fcw & F_NVIE) && (m_irq_state[0] != CLEAR_LINE))
+	{
+		m_irq_req |= Z8000_NVI;
+	}
+	if (!(m_fcw & F_VIE) && (fcw & F_VIE) && (m_irq_state[1] != CLEAR_LINE))
+	{
+		m_irq_req |= Z8000_VI;
+	}
+	m_fcw = fcw;  /* set new m_fcw */
 }
 
-INLINE UINT32 make_segmented_addr(UINT32 addr)
+void z8001_device::CHANGE_FCW(UINT16 fcw)
+{
+	UINT16 tmp;
+	if ((fcw ^ m_fcw) & F_S_N)            /* system/user mode change? */
+	{
+		tmp = RW(15);
+		RW(15) = m_nspoff;
+		m_nspoff = tmp;
+	}
+	/* User mode R14 is used in user mode and non-segmented system mode.
+	   System mode R14 is only used in segmented system mode.
+	   There is no transition from user mode to non-segmented system mode,
+	   so this doesn't need to be handled here. */
+	if (fcw & F_S_N)    /* new mode is system mode */
+	{
+		if (!(m_fcw & F_S_N)                /* old mode was user mode */
+		    || ((fcw ^ m_fcw) & F_SEG))     /* or switch between segmented and non-segmented */
+		{
+			tmp = RW(14);
+			RW(14) = m_nspseg;
+			m_nspseg = tmp;
+		}
+	}
+	else    /* new mode is user mode */
+	{
+		if (m_fcw & F_S_N          /* old mode was system mode */
+		    && m_fcw & F_SEG)      /* and was segmented */
+		{
+			tmp = RW(14);
+			RW(14) = m_nspseg;
+			m_nspseg = tmp;
+		}
+	}
+
+	if (!(m_fcw & F_NVIE) && (fcw & F_NVIE) && (m_irq_state[0] != CLEAR_LINE))
+	{
+		m_irq_req |= Z8000_NVI;
+	}
+	if (!(m_fcw & F_VIE) && (fcw & F_VIE) && (m_irq_state[1] != CLEAR_LINE))
+	{
+		m_irq_req |= Z8000_VI;
+	}
+	m_fcw = fcw;  /* set new m_fcw */
+}
+
+UINT32 z8002_device::make_segmented_addr(UINT32 addr)
 {
 	return ((addr & 0x007f0000) << 8) | 0x80000000 | (addr & 0xffff);
 }
 
-INLINE UINT32 segmented_addr(UINT32 addr)
+UINT32 z8002_device::segmented_addr(UINT32 addr)
 {
 	return ((addr & 0x7f000000) >> 8) | (addr & 0xffff);
 }
 
-INLINE UINT32 addr_from_reg(z8000_state *cpustate, int regno)
+UINT32 z8002_device::addr_from_reg(int regno)
 {
-	if (segmented_mode(cpustate))
-		return segmented_addr(cpustate->RL(regno));
+	if (segmented_mode())
+		return segmented_addr(RL(regno));
 	else
-		return cpustate->RW(regno);
+		return RW(regno);
 }
 
-INLINE void addr_to_reg(z8000_state *cpustate, int regno, UINT32 addr)
+void z8002_device::addr_to_reg(int regno, UINT32 addr)
 {
-	if (segmented_mode(cpustate)) {
+	if (segmented_mode()) {
 		UINT32 segaddr = make_segmented_addr(addr);
-		cpustate->RW(regno) = (cpustate->RW(regno) & 0x80ff) | ((segaddr >> 16) & 0x7f00);
-		cpustate->RW(regno | 1) = segaddr & 0xffff;
+		RW(regno) = (RW(regno) & 0x80ff) | ((segaddr >> 16) & 0x7f00);
+		RW(regno | 1) = segaddr & 0xffff;
 	}
 	else
-		cpustate->RW(regno) = addr;
+		RW(regno) = addr;
 }
 
-INLINE void add_to_addr_reg(z8000_state *cpustate, int regno, UINT16 addend)
+void z8002_device::add_to_addr_reg(int regno, UINT16 addend)
 {
-	if (segmented_mode(cpustate))
+	if (segmented_mode())
 		regno |= 1;
-	cpustate->RW(regno) += addend;
+	RW(regno) += addend;
 }
 
-INLINE void sub_from_addr_reg(z8000_state *cpustate, int regno, UINT16 subtrahend)
+void z8002_device::sub_from_addr_reg(int regno, UINT16 subtrahend)
 {
-	if (segmented_mode(cpustate))
+	if (segmented_mode())
 		regno |= 1;
-	cpustate->RW(regno) -= subtrahend;
+	RW(regno) -= subtrahend;
 }
 
-INLINE void set_pc(z8000_state *cpustate, UINT32 addr)
+void z8002_device::set_pc(UINT32 addr)
 {
-	if (segmented_mode(cpustate))
-		cpustate->pc = addr;
+	if (segmented_mode())
+		m_pc = addr;
 	else
-		cpustate->pc = (cpustate->pc & 0xffff0000) | (addr & 0xffff);
+		m_pc = (m_pc & 0xffff0000) | (addr & 0xffff);
 }
 
-INLINE void PUSHW(z8000_state *cpustate, UINT8 dst, UINT16 value)
+void z8002_device::PUSHW(UINT8 dst, UINT16 value)
 {
-	if (segmented_mode(cpustate))
-		cpustate->RW(dst | 1) -= 2;
+	if (segmented_mode())
+		RW(dst | 1) -= 2;
 	else
-		cpustate->RW(dst) -= 2;
-	WRMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst), value);
+		RW(dst) -= 2;
+	WRMEM_W(AS_DATA, addr_from_reg(dst), value);
 }
 
-INLINE UINT16 POPW(z8000_state *cpustate, UINT8 src)
+UINT16 z8002_device::POPW(UINT8 src)
 {
-	UINT16 result = RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src));
-	if (segmented_mode(cpustate))
-		cpustate->RW(src | 1) += 2;
+	UINT16 result = RDMEM_W(AS_DATA, addr_from_reg(src));
+	if (segmented_mode())
+		RW(src | 1) += 2;
 	else
-		cpustate->RW(src) += 2;
+		RW(src) += 2;
 	return result;
 }
 
-INLINE void PUSHL(z8000_state *cpustate, UINT8 dst, UINT32 value)
+void z8002_device::PUSHL(UINT8 dst, UINT32 value)
 {
-	if (segmented_mode(cpustate))
-		cpustate->RW(dst | 1) -= 4;
+	if (segmented_mode())
+		RW(dst | 1) -= 4;
 	else
-		cpustate->RW(dst) -= 4;
-	WRMEM_L(cpustate, AS_DATA,  addr_from_reg(cpustate, dst), value);
+		RW(dst) -= 4;
+	WRMEM_L(AS_DATA,  addr_from_reg(dst), value);
 }
 
-INLINE UINT32 POPL(z8000_state *cpustate, UINT8 src)
+UINT32 z8002_device::POPL(UINT8 src)
 {
-	UINT32 result = RDMEM_L(cpustate, AS_DATA, addr_from_reg(cpustate, src));
-	if (segmented_mode(cpustate))
-		cpustate->RW(src | 1) += 4;
+	UINT32 result = RDMEM_L(AS_DATA, addr_from_reg(src));
+	if (segmented_mode())
+		RW(src | 1) += 4;
 	else
-		cpustate->RW(src) += 4;
+		RW(src) += 4;
 	return result;
 }
 
@@ -165,7 +193,7 @@ INLINE UINT32 POPL(z8000_state *cpustate, UINT8 src)
 #define CHK_XXXL_ZS if (!result) SET_Z; else if ((INT32)result < 0) SET_S
 #define CHK_XXXQ_ZS if (!result) SET_Z; else if ((INT64)result < 0) SET_S
 
-#define CHK_XXXB_ZSP cpustate->fcw |= z8000_zsp[result]
+#define CHK_XXXB_ZSP m_fcw |= z8000_zsp[result]
 
 /* check carry for addition and subtraction */
 #define CHK_ADDX_C if (result < dest) SET_C
@@ -192,17 +220,17 @@ INLINE UINT32 POPL(z8000_state *cpustate, UINT8 src)
 #define CHK_SUBL_V if (((~value & dest & ~result) | (value & ~dest & result)) & S32) SET_V
 
 /* check for privileged instruction and trap if executed */
-#define CHECK_PRIVILEGED_INSTR() if (!(cpustate->fcw & F_S_N)) { cpustate->irq_req = Z8000_TRAP; return; }
+#define CHECK_PRIVILEGED_INSTR() if (!(m_fcw & F_S_N)) { m_irq_req = Z8000_TRAP; return; }
 
 /* if no EPU is present (it isn't), raise an extended intstuction trap */
-#define CHECK_EXT_INSTR()  if (!(cpustate->fcw & F_EPU)) { cpustate->irq_req = Z8000_EPU; return; }
+#define CHECK_EXT_INSTR()  if (!(m_fcw & F_EPU)) { m_irq_req = Z8000_EPU; return; }
 
 
 /******************************************
  add byte
  flags:  CZSVDH
  ******************************************/
-INLINE UINT8 ADDB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+UINT8 z8002_device::ADDB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest + value;
 	CLR_CZSVH;      /* first clear C, Z, S, P/V and H flags    */
@@ -218,7 +246,7 @@ INLINE UINT8 ADDB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  add word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 ADDW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT16 z8002_device::ADDW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest + value;
 	CLR_CZSV;       /* first clear C, Z, S, P/V flags          */
@@ -232,7 +260,7 @@ INLINE UINT16 ADDW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  add long
  flags:  CZSV--
  ******************************************/
-INLINE UINT32 ADDL(z8000_state *cpustate, UINT32 dest, UINT32 value)
+UINT32 z8002_device::ADDL(UINT32 dest, UINT32 value)
 {
 	UINT32 result = dest + value;
 	CLR_CZSV;       /* first clear C, Z, S, P/V flags          */
@@ -246,7 +274,7 @@ INLINE UINT32 ADDL(z8000_state *cpustate, UINT32 dest, UINT32 value)
  add with carry byte
  flags:  CZSVDH
  ******************************************/
-INLINE UINT8 ADCB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+UINT8 z8002_device::ADCB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest + value + GET_C;
 	CLR_CZSVH;      /* first clear C, Z, S, P/V and H flags    */
@@ -262,7 +290,7 @@ INLINE UINT8 ADCB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  add with carry word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 ADCW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT16 z8002_device::ADCW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest + value + GET_C;
 	CLR_CZSV;       /* first clear C, Z, S, P/V flags          */
@@ -276,7 +304,7 @@ INLINE UINT16 ADCW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  subtract byte
  flags:  CZSVDH
  ******************************************/
-INLINE UINT8 SUBB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+UINT8 z8002_device::SUBB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest - value;
 	CLR_CZSVH;      /* first clear C, Z, S, P/V and H flags    */
@@ -292,7 +320,7 @@ INLINE UINT8 SUBB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  subtract word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 SUBW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT16 z8002_device::SUBW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest - value;
 	CLR_CZSV;       /* first clear C, Z, S, P/V flags          */
@@ -306,7 +334,7 @@ INLINE UINT16 SUBW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  subtract long
  flags:  CZSV--
  ******************************************/
-INLINE UINT32 SUBL(z8000_state *cpustate, UINT32 dest, UINT32 value)
+UINT32 z8002_device::SUBL(UINT32 dest, UINT32 value)
 {
 	UINT32 result = dest - value;
 	CLR_CZSV;       /* first clear C, Z, S, P/V flags          */
@@ -320,7 +348,7 @@ INLINE UINT32 SUBL(z8000_state *cpustate, UINT32 dest, UINT32 value)
  subtract with carry byte
  flags:  CZSVDH
  ******************************************/
-INLINE UINT8 SBCB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+UINT8 z8002_device::SBCB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest - value - GET_C;
 	CLR_CZSVH;      /* first clear C, Z, S, P/V and H flags    */
@@ -336,7 +364,7 @@ INLINE UINT8 SBCB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  subtract with carry word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 SBCW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT16 z8002_device::SBCW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest - value - GET_C;
 	CLR_CZSV;       /* first clear C, Z, S, P/V flags          */
@@ -350,7 +378,7 @@ INLINE UINT16 SBCW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  logical or byte
  flags:  -ZSP--
  ******************************************/
-INLINE UINT8 ORB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+UINT8 z8002_device::ORB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest | value;
 	CLR_ZSP;        /* first clear Z, S, P/V flags             */
@@ -362,7 +390,7 @@ INLINE UINT8 ORB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  logical or word
  flags:  -ZS---
  ******************************************/
-INLINE UINT16 ORW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT16 z8002_device::ORW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest | value;
 	CLR_ZS;         /* first clear Z, and S flags              */
@@ -374,7 +402,7 @@ INLINE UINT16 ORW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  logical and byte
  flags:  -ZSP--
  ******************************************/
-INLINE UINT8 ANDB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+UINT8 z8002_device::ANDB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest & value;
 	CLR_ZSP;        /* first clear Z,S and P/V flags           */
@@ -386,7 +414,7 @@ INLINE UINT8 ANDB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  logical and word
  flags:  -ZS---
  ******************************************/
-INLINE UINT16 ANDW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT16 z8002_device::ANDW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest & value;
 	CLR_ZS;         /* first clear Z and S flags               */
@@ -398,7 +426,7 @@ INLINE UINT16 ANDW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  logical exclusive or byte
  flags:  -ZSP--
  ******************************************/
-INLINE UINT8 XORB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+UINT8 z8002_device::XORB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest ^ value;
 	CLR_ZSP;        /* first clear Z, S and P/V flags          */
@@ -410,7 +438,7 @@ INLINE UINT8 XORB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  logical exclusive or word
  flags:  -ZS---
  ******************************************/
-INLINE UINT16 XORW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT16 z8002_device::XORW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest ^ value;
 	CLR_ZS;         /* first clear Z and S flags               */
@@ -423,7 +451,7 @@ INLINE UINT16 XORW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  compare byte
  flags:  CZSV--
  ******************************************/
-INLINE void CPB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+void z8002_device::CPB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest - value;
 	CLR_CZSV;       /* first clear C, Z, S and P/V flags       */
@@ -436,7 +464,7 @@ INLINE void CPB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  compare word
  flags:  CZSV--
  ******************************************/
-INLINE void CPW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+void z8002_device::CPW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest - value;
 	CLR_CZSV;
@@ -449,7 +477,7 @@ INLINE void CPW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  compare long
  flags:  CZSV--
  ******************************************/
-INLINE void CPL(z8000_state *cpustate, UINT32 dest, UINT32 value)
+void z8002_device::CPL(UINT32 dest, UINT32 value)
 {
 	UINT32 result = dest - value;
 	CLR_CZSV;
@@ -462,7 +490,7 @@ INLINE void CPL(z8000_state *cpustate, UINT32 dest, UINT32 value)
  complement byte
  flags: -ZSP--
  ******************************************/
-INLINE UINT8 COMB(z8000_state *cpustate, UINT8 dest)
+UINT8 z8002_device::COMB(UINT8 dest)
 {
 	UINT8 result = ~dest;
 	CLR_ZSP;
@@ -474,7 +502,7 @@ INLINE UINT8 COMB(z8000_state *cpustate, UINT8 dest)
  complement word
  flags: -ZS---
  ******************************************/
-INLINE UINT16 COMW(z8000_state *cpustate, UINT16 dest)
+UINT16 z8002_device::COMW(UINT16 dest)
 {
 	UINT16 result = ~dest;
 	CLR_ZS;
@@ -486,7 +514,7 @@ INLINE UINT16 COMW(z8000_state *cpustate, UINT16 dest)
  negate byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 NEGB(z8000_state *cpustate, UINT8 dest)
+UINT8 z8002_device::NEGB(UINT8 dest)
 {
 	UINT8 result = (UINT8) -dest;
 	CLR_CZSV;
@@ -500,7 +528,7 @@ INLINE UINT8 NEGB(z8000_state *cpustate, UINT8 dest)
  negate word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 NEGW(z8000_state *cpustate, UINT16 dest)
+UINT16 z8002_device::NEGW(UINT16 dest)
 {
 	UINT16 result = (UINT16) -dest;
 	CLR_CZSV;
@@ -514,7 +542,7 @@ INLINE UINT16 NEGW(z8000_state *cpustate, UINT16 dest)
  test byte
  flags:  -ZSP--
  ******************************************/
-INLINE void TESTB(z8000_state *cpustate, UINT8 result)
+void z8002_device::TESTB(UINT8 result)
 {
 	CLR_ZSP;
 	CHK_XXXB_ZSP;   /* set Z and S flags for result byte       */
@@ -524,7 +552,7 @@ INLINE void TESTB(z8000_state *cpustate, UINT8 result)
  test word
  flags:  -ZS---
  ******************************************/
-INLINE void TESTW(z8000_state *cpustate, UINT16 dest)
+void z8002_device::TESTW(UINT16 dest)
 {
 	CLR_ZS;
 	if (!dest) SET_Z; else if (dest & S16) SET_S;
@@ -534,7 +562,7 @@ INLINE void TESTW(z8000_state *cpustate, UINT16 dest)
  test long
  flags:  -ZS---
  ******************************************/
-INLINE void TESTL(z8000_state *cpustate, UINT32 dest)
+void z8002_device::TESTL(UINT32 dest)
 {
 	CLR_ZS;
 	if (!dest) SET_Z; else if (dest & S32) SET_S;
@@ -544,7 +572,7 @@ INLINE void TESTL(z8000_state *cpustate, UINT32 dest)
  increment byte
  flags: -ZSV--
  ******************************************/
-INLINE UINT8 INCB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+UINT8 z8002_device::INCB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest + value;
 	CLR_ZSV;
@@ -557,7 +585,7 @@ INLINE UINT8 INCB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  increment word
  flags: -ZSV--
  ******************************************/
-INLINE UINT16 INCW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT16 z8002_device::INCW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest + value;
 	CLR_ZSV;
@@ -570,7 +598,7 @@ INLINE UINT16 INCW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  decrement byte
  flags: -ZSV--
  ******************************************/
-INLINE UINT8 DECB(z8000_state *cpustate, UINT8 dest, UINT8 value)
+UINT8 z8002_device::DECB(UINT8 dest, UINT8 value)
 {
 	UINT8 result = dest - value;
 	CLR_ZSV;
@@ -583,7 +611,7 @@ INLINE UINT8 DECB(z8000_state *cpustate, UINT8 dest, UINT8 value)
  decrement word
  flags: -ZSV--
  ******************************************/
-INLINE UINT16 DECW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT16 z8002_device::DECW(UINT16 dest, UINT16 value)
 {
 	UINT16 result = dest - value;
 	CLR_ZSV;
@@ -596,7 +624,7 @@ INLINE UINT16 DECW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  multiply words
  flags:  CZSV--
  ******************************************/
-INLINE UINT32 MULTW(z8000_state *cpustate, UINT16 dest, UINT16 value)
+UINT32 z8002_device::MULTW(UINT16 dest, UINT16 value)
 {
 	UINT32 result = (INT32)(INT16)dest * (INT16)value;
 	CLR_CZSV;
@@ -604,7 +632,7 @@ INLINE UINT32 MULTW(z8000_state *cpustate, UINT16 dest, UINT16 value)
 	if(!value)
 	{
 		/* multiplication with zero is faster */
-		cpustate->icount += (70-18);
+		m_icount += (70-18);
 	}
 	if((INT32)result < -0x7fff || (INT32)result >= 0x7fff) SET_C;
 	return result;
@@ -614,19 +642,19 @@ INLINE UINT32 MULTW(z8000_state *cpustate, UINT16 dest, UINT16 value)
  multiply longs
  flags:  CZSV--
  ******************************************/
-INLINE UINT64 MULTL(z8000_state *cpustate, UINT32 dest, UINT32 value)
+UINT64 z8002_device::MULTL(UINT32 dest, UINT32 value)
 {
 	UINT64 result = (INT64)(INT32)dest * (INT32)value;
 	if(!value)
 	{
 		/* multiplication with zero is faster */
-		cpustate->icount += (282 - 30);
+		m_icount += (282 - 30);
 	}
 	else
 	{
 		int n;
 		for(n = 0; n < 32; n++)
-			if(dest & (1L << n)) cpustate->icount -= 7;
+			if(dest & (1L << n)) m_icount -= 7;
 	}
 	CLR_CZSV;
 	CHK_XXXQ_ZS;
@@ -638,7 +666,7 @@ INLINE UINT64 MULTL(z8000_state *cpustate, UINT32 dest, UINT32 value)
  divide long by word
  flags: CZSV--
  ******************************************/
-INLINE UINT32 DIVW(z8000_state *cpustate, UINT32 dest, UINT16 value)
+UINT32 z8002_device::DIVW(UINT32 dest, UINT16 value)
 {
 	UINT32 result = dest;
 	UINT16 remainder = 0;
@@ -682,7 +710,7 @@ INLINE UINT32 DIVW(z8000_state *cpustate, UINT32 dest, UINT16 value)
  divide quad word by long
  flags: CZSV--
  ******************************************/
-INLINE UINT64 DIVL(z8000_state *cpustate, UINT64 dest, UINT32 value)
+UINT64 z8002_device::DIVL(UINT64 dest, UINT32 value)
 {
 	UINT64 result = dest;
 	UINT32 remainder = 0;
@@ -726,7 +754,7 @@ INLINE UINT64 DIVL(z8000_state *cpustate, UINT64 dest, UINT32 value)
  rotate left byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 RLB(z8000_state *cpustate, UINT8 dest, UINT8 twice)
+UINT8 z8002_device::RLB(UINT8 dest, UINT8 twice)
 {
 	UINT8 result = (dest << 1) | (dest >> 7);
 	CLR_CZSV;
@@ -741,7 +769,7 @@ INLINE UINT8 RLB(z8000_state *cpustate, UINT8 dest, UINT8 twice)
  rotate left word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 RLW(z8000_state *cpustate, UINT16 dest, UINT8 twice)
+UINT16 z8002_device::RLW(UINT16 dest, UINT8 twice)
 {
 	UINT16 result = (dest << 1) | (dest >> 15);
 	CLR_CZSV;
@@ -756,7 +784,7 @@ INLINE UINT16 RLW(z8000_state *cpustate, UINT16 dest, UINT8 twice)
  rotate left through carry byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 RLCB(z8000_state *cpustate, UINT8 dest, UINT8 twice)
+UINT8 z8002_device::RLCB(UINT8 dest, UINT8 twice)
 {
 	UINT8 c = dest & S08;
 	UINT8 result = (dest << 1) | GET_C;
@@ -776,7 +804,7 @@ INLINE UINT8 RLCB(z8000_state *cpustate, UINT8 dest, UINT8 twice)
  rotate left through carry word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 RLCW(z8000_state *cpustate, UINT16 dest, UINT8 twice)
+UINT16 z8002_device::RLCW(UINT16 dest, UINT8 twice)
 {
 	UINT16 c = dest & S16;
 	UINT16 result = (dest << 1) | GET_C;
@@ -796,7 +824,7 @@ INLINE UINT16 RLCW(z8000_state *cpustate, UINT16 dest, UINT8 twice)
  rotate right byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 RRB(z8000_state *cpustate, UINT8 dest, UINT8 twice)
+UINT8 z8002_device::RRB(UINT8 dest, UINT8 twice)
 {
 	UINT8 result = (dest >> 1) | (dest << 7);
 	CLR_CZSV;
@@ -810,7 +838,7 @@ INLINE UINT8 RRB(z8000_state *cpustate, UINT8 dest, UINT8 twice)
  rotate right word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 RRW(z8000_state *cpustate, UINT16 dest, UINT8 twice)
+UINT16 z8002_device::RRW(UINT16 dest, UINT8 twice)
 {
 	UINT16 result = (dest >> 1) | (dest << 15);
 	CLR_CZSV;
@@ -824,7 +852,7 @@ INLINE UINT16 RRW(z8000_state *cpustate, UINT16 dest, UINT8 twice)
  rotate right through carry byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 RRCB(z8000_state *cpustate, UINT8 dest, UINT8 twice)
+UINT8 z8002_device::RRCB(UINT8 dest, UINT8 twice)
 {
 	UINT8 c = dest & 1;
 	UINT8 result = (dest >> 1) | (GET_C << 7);
@@ -844,7 +872,7 @@ INLINE UINT8 RRCB(z8000_state *cpustate, UINT8 dest, UINT8 twice)
  rotate right through carry word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 RRCW(z8000_state *cpustate, UINT16 dest, UINT8 twice)
+UINT16 z8002_device::RRCW(UINT16 dest, UINT8 twice)
 {
 	UINT16 c = dest & 1;
 	UINT16 result = (dest >> 1) | (GET_C << 15);
@@ -864,7 +892,7 @@ INLINE UINT16 RRCW(z8000_state *cpustate, UINT16 dest, UINT8 twice)
  shift dynamic arithmetic byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 SDAB(z8000_state *cpustate, UINT8 dest, INT8 count)
+UINT8 z8002_device::SDAB(UINT8 dest, INT8 count)
 {
 	INT8 result = (INT8) dest;
 	UINT8 c = 0;
@@ -889,7 +917,7 @@ INLINE UINT8 SDAB(z8000_state *cpustate, UINT8 dest, INT8 count)
  shift dynamic arithmetic word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 SDAW(z8000_state *cpustate, UINT16 dest, INT8 count)
+UINT16 z8002_device::SDAW(UINT16 dest, INT8 count)
 {
 	INT16 result = (INT16) dest;
 	UINT16 c = 0;
@@ -914,7 +942,7 @@ INLINE UINT16 SDAW(z8000_state *cpustate, UINT16 dest, INT8 count)
  shift dynamic arithmetic long
  flags:  CZSV--
  ******************************************/
-INLINE UINT32 SDAL(z8000_state *cpustate, UINT32 dest, INT8 count)
+UINT32 z8002_device::SDAL(UINT32 dest, INT8 count)
 {
 	INT32 result = (INT32) dest;
 	UINT32 c = 0;
@@ -939,7 +967,7 @@ INLINE UINT32 SDAL(z8000_state *cpustate, UINT32 dest, INT8 count)
  shift dynamic logic byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 SDLB(z8000_state *cpustate, UINT8 dest, INT8 count)
+UINT8 z8002_device::SDLB(UINT8 dest, INT8 count)
 {
 	UINT8 result = dest;
 	UINT8 c = 0;
@@ -964,7 +992,7 @@ INLINE UINT8 SDLB(z8000_state *cpustate, UINT8 dest, INT8 count)
  shift dynamic logic word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 SDLW(z8000_state *cpustate, UINT16 dest, INT8 count)
+UINT16 z8002_device::SDLW(UINT16 dest, INT8 count)
 {
 	UINT16 result = dest;
 	UINT16 c = 0;
@@ -989,7 +1017,7 @@ INLINE UINT16 SDLW(z8000_state *cpustate, UINT16 dest, INT8 count)
  shift dynamic logic long
  flags:  CZSV--
  ******************************************/
-INLINE UINT32 SDLL(z8000_state *cpustate, UINT32 dest, INT8 count)
+UINT32 z8002_device::SDLL(UINT32 dest, INT8 count)
 {
 	UINT32 result = dest;
 	UINT32 c = 0;
@@ -1014,7 +1042,7 @@ INLINE UINT32 SDLL(z8000_state *cpustate, UINT32 dest, INT8 count)
  shift left arithmetic byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 SLAB(z8000_state *cpustate, UINT8 dest, UINT8 count)
+UINT8 z8002_device::SLAB(UINT8 dest, UINT8 count)
 {
 	UINT8 c = (count) ? (dest << (count - 1)) & S08 : 0;
 	UINT8 result = (UINT8)((INT8)dest << count);
@@ -1029,7 +1057,7 @@ INLINE UINT8 SLAB(z8000_state *cpustate, UINT8 dest, UINT8 count)
  shift left arithmetic word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 SLAW(z8000_state *cpustate, UINT16 dest, UINT8 count)
+UINT16 z8002_device::SLAW(UINT16 dest, UINT8 count)
 {
 	UINT16 c = (count) ? (dest << (count - 1)) & S16 : 0;
 	UINT16 result = (UINT16)((INT16)dest << count);
@@ -1044,7 +1072,7 @@ INLINE UINT16 SLAW(z8000_state *cpustate, UINT16 dest, UINT8 count)
  shift left arithmetic long
  flags:  CZSV--
  ******************************************/
-INLINE UINT32 SLAL(z8000_state *cpustate, UINT32 dest, UINT8 count)
+UINT32 z8002_device::SLAL(UINT32 dest, UINT8 count)
 {
 	UINT32 c = (count) ? (dest << (count - 1)) & S32 : 0;
 	UINT32 result = (UINT32)((INT32)dest << count);
@@ -1059,7 +1087,7 @@ INLINE UINT32 SLAL(z8000_state *cpustate, UINT32 dest, UINT8 count)
  shift left logic byte
  flags:  CZS---
  ******************************************/
-INLINE UINT8 SLLB(z8000_state *cpustate, UINT8 dest, UINT8 count)
+UINT8 z8002_device::SLLB(UINT8 dest, UINT8 count)
 {
 	UINT8 c = (count) ? (dest << (count - 1)) & S08 : 0;
 	UINT8 result = dest << count;
@@ -1073,7 +1101,7 @@ INLINE UINT8 SLLB(z8000_state *cpustate, UINT8 dest, UINT8 count)
  shift left logic word
  flags:  CZS---
  ******************************************/
-INLINE UINT16 SLLW(z8000_state *cpustate, UINT16 dest, UINT8 count)
+UINT16 z8002_device::SLLW(UINT16 dest, UINT8 count)
 {
 	UINT16 c = (count) ? (dest << (count - 1)) & S16 : 0;
 	UINT16 result = dest << count;
@@ -1087,7 +1115,7 @@ INLINE UINT16 SLLW(z8000_state *cpustate, UINT16 dest, UINT8 count)
  shift left logic long
  flags:  CZS---
  ******************************************/
-INLINE UINT32 SLLL(z8000_state *cpustate, UINT32 dest, UINT8 count)
+UINT32 z8002_device::SLLL(UINT32 dest, UINT8 count)
 {
 	UINT32 c = (count) ? (dest << (count - 1)) & S32 : 0;
 	UINT32 result = dest << count;
@@ -1101,7 +1129,7 @@ INLINE UINT32 SLLL(z8000_state *cpustate, UINT32 dest, UINT8 count)
  shift right arithmetic byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 SRAB(z8000_state *cpustate, UINT8 dest, UINT8 count)
+UINT8 z8002_device::SRAB(UINT8 dest, UINT8 count)
 {
 	UINT8 c = (count) ? ((INT8)dest >> (count - 1)) & 1 : 0;
 	UINT8 result = (UINT8)((INT8)dest >> count);
@@ -1115,7 +1143,7 @@ INLINE UINT8 SRAB(z8000_state *cpustate, UINT8 dest, UINT8 count)
  shift right arithmetic word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 SRAW(z8000_state *cpustate, UINT16 dest, UINT8 count)
+UINT16 z8002_device::SRAW(UINT16 dest, UINT8 count)
 {
 	UINT8 c = (count) ? ((INT16)dest >> (count - 1)) & 1 : 0;
 	UINT16 result = (UINT16)((INT16)dest >> count);
@@ -1129,7 +1157,7 @@ INLINE UINT16 SRAW(z8000_state *cpustate, UINT16 dest, UINT8 count)
  shift right arithmetic long
  flags:  CZSV--
  ******************************************/
-INLINE UINT32 SRAL(z8000_state *cpustate, UINT32 dest, UINT8 count)
+UINT32 z8002_device::SRAL(UINT32 dest, UINT8 count)
 {
 	UINT8 c = (count) ? ((INT32)dest >> (count - 1)) & 1 : 0;
 	UINT32 result = (UINT32)((INT32)dest >> count);
@@ -1143,7 +1171,7 @@ INLINE UINT32 SRAL(z8000_state *cpustate, UINT32 dest, UINT8 count)
  shift right logic byte
  flags:  CZSV--
  ******************************************/
-INLINE UINT8 SRLB(z8000_state *cpustate, UINT8 dest, UINT8 count)
+UINT8 z8002_device::SRLB(UINT8 dest, UINT8 count)
 {
 	UINT8 c = (count) ? (dest >> (count - 1)) & 1 : 0;
 	UINT8 result = dest >> count;
@@ -1157,7 +1185,7 @@ INLINE UINT8 SRLB(z8000_state *cpustate, UINT8 dest, UINT8 count)
  shift right logic word
  flags:  CZSV--
  ******************************************/
-INLINE UINT16 SRLW(z8000_state *cpustate, UINT16 dest, UINT8 count)
+UINT16 z8002_device::SRLW(UINT16 dest, UINT8 count)
 {
 	UINT8 c = (count) ? (dest >> (count - 1)) & 1 : 0;
 	UINT16 result = dest >> count;
@@ -1171,7 +1199,7 @@ INLINE UINT16 SRLW(z8000_state *cpustate, UINT16 dest, UINT8 count)
  shift right logic long
  flags:  CZSV--
  ******************************************/
-INLINE UINT32 SRLL(z8000_state *cpustate, UINT32 dest, UINT8 count)
+UINT32 z8002_device::SRLL(UINT32 dest, UINT8 count)
 {
 	UINT8 c = (count) ? (dest >> (count - 1)) & 1 : 0;
 	UINT32 result = dest >> count;
@@ -1185,448 +1213,448 @@ INLINE UINT32 SRLL(z8000_state *cpustate, UINT32 dest, UINT8 count)
  invalid
  flags:  ------
  ******************************************/
-static void  zinvalid(z8000_state *cpustate)
+void z8002_device::zinvalid()
 {
-	logerror("Z8000 invalid opcode %04x: %04x\n", cpustate->pc, cpustate->op[0]);
+	logerror("Z8000 invalid opcode %04x: %04x\n", m_pc, m_op[0]);
 }
 
 /******************************************
  addb    rbd,imm8
  flags:  CZSVDH
  ******************************************/
-static void  Z00_0000_dddd_imm8(z8000_state *cpustate)
+void z8002_device::Z00_0000_dddd_imm8()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM8(OP1);
-	cpustate->RB(dst) = ADDB(cpustate, cpustate->RB(dst), imm8);
+	RB(dst) = ADDB(RB(dst), imm8);
 }
 
 /******************************************
  addb    rbd,@rs
  flags:  CZSVDH
  ******************************************/
-static void Z00_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z00_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = ADDB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RB(dst) = ADDB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  add     rd,imm16
  flags:  CZSV--
  ******************************************/
-static void Z01_0000_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z01_0000_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM16(OP1);
-	cpustate->RW(dst) = ADDW(cpustate, cpustate->RW(dst), imm16);
+	RW(dst) = ADDW(RW(dst), imm16);
 }
 
 /******************************************
  add     rd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z01_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z01_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = ADDW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RW(dst) = ADDW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  subb    rbd,imm8
  flags:  CZSVDH
  ******************************************/
-static void Z02_0000_dddd_imm8(z8000_state *cpustate)
+void z8002_device::Z02_0000_dddd_imm8()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM8(OP1);
-	cpustate->RB(dst) = SUBB(cpustate, cpustate->RB(dst), imm8);
+	RB(dst) = SUBB(RB(dst), imm8);
 }
 
 /******************************************
  subb    rbd,@rs
  flags:  CZSVDH
  ******************************************/
-static void Z02_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z02_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = SUBB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src))); /* EHC */
+	RB(dst) = SUBB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src))); /* EHC */
 }
 
 /******************************************
  sub     rd,imm16
  flags:  CZSV--
  ******************************************/
-static void Z03_0000_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z03_0000_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM16(OP1);
-	cpustate->RW(dst) = SUBW(cpustate, cpustate->RW(dst), imm16);
+	RW(dst) = SUBW(RW(dst), imm16);
 }
 
 /******************************************
  sub     rd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z03_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z03_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = SUBW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RW(dst) = SUBW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  orb     rbd,imm8
  flags:  CZSP--
  ******************************************/
-static void Z04_0000_dddd_imm8(z8000_state *cpustate)
+void z8002_device::Z04_0000_dddd_imm8()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM8(OP1);
-	cpustate->RB(dst) = ORB(cpustate, cpustate->RB(dst), imm8);
+	RB(dst) = ORB(RB(dst), imm8);
 }
 
 /******************************************
  orb     rbd,@rs
  flags:  CZSP--
  ******************************************/
-static void Z04_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z04_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = ORB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RB(dst) = ORB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  or      rd,imm16
  flags:  CZS---
  ******************************************/
-static void Z05_0000_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z05_0000_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM16(OP1);
-	cpustate->RW(dst) = ORW(cpustate, cpustate->RW(dst), imm16);
+	RW(dst) = ORW(RW(dst), imm16);
 }
 
 /******************************************
  or      rd,@rs
  flags:  CZS---
  ******************************************/
-static void Z05_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z05_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = ORW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RW(dst) = ORW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  andb    rbd,imm8
  flags:  -ZSP--
  ******************************************/
-static void Z06_0000_dddd_imm8(z8000_state *cpustate)
+void z8002_device::Z06_0000_dddd_imm8()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM8(OP1);
-	cpustate->RB(dst) = ANDB(cpustate, cpustate->RB(dst), imm8);
+	RB(dst) = ANDB(RB(dst), imm8);
 }
 
 /******************************************
  andb    rbd,@rs
  flags:  -ZSP--
  ******************************************/
-static void Z06_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z06_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = ANDB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RB(dst) = ANDB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  and     rd,imm16
  flags:  -ZS---
  ******************************************/
-static void Z07_0000_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z07_0000_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM16(OP1);
-	cpustate->RW(dst) = ANDW(cpustate, cpustate->RW(dst), imm16);
+	RW(dst) = ANDW(RW(dst), imm16);
 }
 
 /******************************************
  and     rd,@rs
  flags:  -ZS---
  ******************************************/
-static void Z07_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z07_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = ANDW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RW(dst) = ANDW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  xorb    rbd,imm8
  flags:  -ZSP--
  ******************************************/
-static void Z08_0000_dddd_imm8(z8000_state *cpustate)
+void z8002_device::Z08_0000_dddd_imm8()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM8(OP1);
-	cpustate->RB(dst) = XORB(cpustate, cpustate->RB(dst), imm8);
+	RB(dst) = XORB(RB(dst), imm8);
 }
 
 /******************************************
  xorb    rbd,@rs
  flags:  -ZSP--
  ******************************************/
-static void Z08_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z08_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = XORB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RB(dst) = XORB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  xor     rd,imm16
  flags:  -ZS---
  ******************************************/
-static void Z09_0000_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z09_0000_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM16(OP1);
-	cpustate->RW(dst) = XORW(cpustate, cpustate->RW(dst), imm16);
+	RW(dst) = XORW(RW(dst), imm16);
 }
 
 /******************************************
  xor     rd,@rs
  flags:  -ZS---
  ******************************************/
-static void Z09_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z09_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = XORW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RW(dst) = XORW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  cpb     rbd,imm8
  flags:  CZSV--
  ******************************************/
-static void Z0A_0000_dddd_imm8(z8000_state *cpustate)
+void z8002_device::Z0A_0000_dddd_imm8()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM8(OP1);
-	CPB(cpustate, cpustate->RB(dst), imm8);
+	CPB(RB(dst), imm8);
 }
 
 /******************************************
  cpb     rbd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z0A_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z0A_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	CPB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  cp      rd,imm16
  flags:  CZSV--
  ******************************************/
-static void Z0B_0000_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z0B_0000_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM16(OP1);
-	CPW(cpustate, cpustate->RW(dst), imm16);
+	CPW(RW(dst), imm16);
 }
 
 /******************************************
  cp      rd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z0B_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z0B_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	CPW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate,src)));
+	CPW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  comb    @rd
  flags:  -ZSP--
  ******************************************/
-static void Z0C_ddN0_0000(z8000_state *cpustate)
+void z8002_device::Z0C_ddN0_0000()
 {
 	GET_DST(OP0,NIB3);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_B(cpustate, AS_DATA, addr, COMB(cpustate, RDMEM_B(cpustate, AS_DATA, addr)));
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_B(AS_DATA, addr, COMB(RDMEM_B(AS_DATA, addr)));
 }
 
 /******************************************
  cpb     @rd,imm8
  flags:  CZSV--
  ******************************************/
-static void Z0C_ddN0_0001_imm8(z8000_state *cpustate)
+void z8002_device::Z0C_ddN0_0001_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM8(OP1);
-	CPB(cpustate, RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), imm8); // @@@done
+	CPB(RDMEM_B(AS_DATA, addr_from_reg(dst)), imm8); // @@@done
 }
 
 /******************************************
  negb    @rd
  flags:  CZSV--
  ******************************************/
-static void Z0C_ddN0_0010(z8000_state *cpustate)
+void z8002_device::Z0C_ddN0_0010()
 {
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_B(cpustate, AS_DATA,  addr, NEGB(cpustate, RDMEM_B(cpustate, AS_DATA, addr)));
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_B(AS_DATA,  addr, NEGB(RDMEM_B(AS_DATA, addr)));
 }
 
 /******************************************
  testb   @rd
  flags:  -ZSP--
  ******************************************/
-static void Z0C_ddN0_0100(z8000_state *cpustate)
+void z8002_device::Z0C_ddN0_0100()
 {
 	GET_DST(OP0,NIB2);
-	TESTB(cpustate, RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
+	TESTB(RDMEM_B(AS_DATA, addr_from_reg(dst)));
 }
 
 /******************************************
  ldb     @rd,imm8
  flags:  ------
  ******************************************/
-static void Z0C_ddN0_0101_imm8(z8000_state *cpustate)
+void z8002_device::Z0C_ddN0_0101_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM8(OP1);
-	WRMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst), imm8);
+	WRMEM_B(AS_DATA, addr_from_reg(dst), imm8);
 }
 
 /******************************************
  tsetb   @rd
  flags:  --S---
  ******************************************/
-static void Z0C_ddN0_0110(z8000_state *cpustate)
+void z8002_device::Z0C_ddN0_0110()
 {
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	if (RDMEM_B(cpustate, AS_DATA, addr) & S08) SET_S; else CLR_S;
-	WRMEM_B(cpustate, AS_DATA, addr, 0xff);
+	UINT32 addr = addr_from_reg(dst);
+	if (RDMEM_B(AS_DATA, addr) & S08) SET_S; else CLR_S;
+	WRMEM_B(AS_DATA, addr, 0xff);
 }
 
 /******************************************
  clrb    @rd
  flags:  ------
  ******************************************/
-static void Z0C_ddN0_1000(z8000_state *cpustate)
+void z8002_device::Z0C_ddN0_1000()
 {
 	GET_DST(OP0,NIB2);
-	WRMEM_B(cpustate, AS_DATA,  addr_from_reg(cpustate, dst), 0);
+	WRMEM_B(AS_DATA,  addr_from_reg(dst), 0);
 }
 
 /******************************************
  com     @rd
  flags:  -ZS---
  ******************************************/
-static void Z0D_ddN0_0000(z8000_state *cpustate)
+void z8002_device::Z0D_ddN0_0000()
 {
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_W(cpustate, AS_DATA, addr, COMW(cpustate, RDMEM_W(cpustate, AS_DATA, addr)));
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_W(AS_DATA, addr, COMW(RDMEM_W(AS_DATA, addr)));
 }
 
 /******************************************
  cp      @rd,imm16
  flags:  CZSV--
  ******************************************/
-static void Z0D_ddN0_0001_imm16(z8000_state *cpustate)
+void z8002_device::Z0D_ddN0_0001_imm16()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
-	CPW(cpustate, RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), imm16);
+	CPW(RDMEM_W(AS_DATA, addr_from_reg(dst)), imm16);
 }
 
 /******************************************
  neg     @rd
  flags:  CZSV--
  ******************************************/
-static void Z0D_ddN0_0010(z8000_state *cpustate)
+void z8002_device::Z0D_ddN0_0010()
 {
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_W(cpustate, AS_DATA, addr, NEGW(cpustate, RDMEM_W(cpustate, AS_DATA, addr)));
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_W(AS_DATA, addr, NEGW(RDMEM_W(AS_DATA, addr)));
 }
 
 /******************************************
  test    @rd
  flags:  -ZS---
  ******************************************/
-static void Z0D_ddN0_0100(z8000_state *cpustate)
+void z8002_device::Z0D_ddN0_0100()
 {
 	GET_DST(OP0,NIB2);
-	TESTW(cpustate, RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
+	TESTW(RDMEM_W(AS_DATA, addr_from_reg(dst)));
 }
 
 /******************************************
  ld      @rd,imm16
  flags:  ------
  ******************************************/
-static void Z0D_ddN0_0101_imm16(z8000_state *cpustate)
+void z8002_device::Z0D_ddN0_0101_imm16()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
-	WRMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst), imm16);
+	WRMEM_W(AS_DATA, addr_from_reg(dst), imm16);
 }
 
 /******************************************
  tset    @rd
  flags:  --S---
  ******************************************/
-static void Z0D_ddN0_0110(z8000_state *cpustate)
+void z8002_device::Z0D_ddN0_0110()
 {
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	if (RDMEM_W(cpustate, AS_DATA, addr) & S16) SET_S; else CLR_S;
-	WRMEM_W(cpustate, AS_DATA, addr, 0xffff);
+	UINT32 addr = addr_from_reg(dst);
+	if (RDMEM_W(AS_DATA, addr) & S16) SET_S; else CLR_S;
+	WRMEM_W(AS_DATA, addr, 0xffff);
 }
 
 /******************************************
  clr     @rd
  flags:  ------
  ******************************************/
-static void Z0D_ddN0_1000(z8000_state *cpustate)
+void z8002_device::Z0D_ddN0_1000()
 {
 	GET_DST(OP0,NIB2);
-	WRMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst), 0);
+	WRMEM_W(AS_DATA, addr_from_reg(dst), 0);
 }
 
 /******************************************
  push    @rd,imm16
  flags:  ------
  ******************************************/
-static void Z0D_ddN0_1001_imm16(z8000_state *cpustate)
+void z8002_device::Z0D_ddN0_1001_imm16()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
-	PUSHW(cpustate, dst, imm16);
+	PUSHW(dst, imm16);
 }
 
 /******************************************
  ext0e   imm8
  flags:  ------
  ******************************************/
-static void Z0E_imm8(z8000_state *cpustate)
+void z8002_device::Z0E_imm8()
 {
 	CHECK_EXT_INSTR();
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: ext0e  $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: ext0e  $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -1636,12 +1664,12 @@ static void Z0E_imm8(z8000_state *cpustate)
  ext0f   imm8
  flags:  ------
  ******************************************/
-static void Z0F_imm8(z8000_state *cpustate)
+void z8002_device::Z0F_imm8()
 {
 	CHECK_EXT_INSTR();
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: ext0f  $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: ext0f  $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -1651,245 +1679,245 @@ static void Z0F_imm8(z8000_state *cpustate)
  cpl     rrd,imm32
  flags:  CZSV--
  ******************************************/
-static void Z10_0000_dddd_imm32(z8000_state *cpustate)
+void z8002_device::Z10_0000_dddd_imm32()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM32;
-	CPL(cpustate, cpustate->RL(dst), imm32);
+	CPL(RL(dst), imm32);
 }
 
 /******************************************
  cpl     rrd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z10_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z10_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	CPL(cpustate, cpustate->RL(dst), RDMEM_L(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPL(RL(dst), RDMEM_L(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  pushl   @rd,@rs
  flags:  ------
  ******************************************/
-static void Z11_ddN0_ssN0(z8000_state *cpustate)
+void z8002_device::Z11_ddN0_ssN0()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	PUSHL(cpustate, dst, RDMEM_L(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	PUSHL(dst, RDMEM_L(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  subl    rrd,imm32
  flags:  CZSV--
  ******************************************/
-static void Z12_0000_dddd_imm32(z8000_state *cpustate)
+void z8002_device::Z12_0000_dddd_imm32()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM32;
-	cpustate->RL(dst) = SUBL(cpustate, cpustate->RL(dst), imm32);
+	RL(dst) = SUBL(RL(dst), imm32);
 }
 
 /******************************************
  subl    rrd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z12_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z12_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = SUBL(cpustate, cpustate->RL(dst), RDMEM_L(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RL(dst) = SUBL(RL(dst), RDMEM_L(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  push    @rd,@rs
  flags:  ------
  ******************************************/
-static void Z13_ddN0_ssN0(z8000_state *cpustate)
+void z8002_device::Z13_ddN0_ssN0()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	PUSHW(cpustate, dst, RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	PUSHW(dst, RDMEM_W(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  ldl     rrd,imm32
  flags:  ------
  ******************************************/
-static void Z14_0000_dddd_imm32(z8000_state *cpustate)
+void z8002_device::Z14_0000_dddd_imm32()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM32;
-	cpustate->RL(dst) = imm32;
+	RL(dst) = imm32;
 }
 
 /******************************************
  ldl     rrd,@rs
  flags:  ------
  ******************************************/
-static void Z14_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z14_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = RDMEM_L(cpustate,  AS_DATA, addr_from_reg(cpustate, src));
+	RL(dst) = RDMEM_L( AS_DATA, addr_from_reg(src));
 }
 
 /******************************************
  popl    rd,@rs
  flags:  ------
  ******************************************/
-static void Z15_ssN0_ddN0(z8000_state *cpustate)
+void z8002_device::Z15_ssN0_ddN0()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = POPL(cpustate, src);
+	RL(dst) = POPL(src);
 }
 
 /******************************************
  addl    rrd,imm32
  flags:  CZSV--
  ******************************************/
-static void Z16_0000_dddd_imm32(z8000_state *cpustate)
+void z8002_device::Z16_0000_dddd_imm32()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM32;
-	cpustate->RL(dst) = ADDL(cpustate, cpustate->RL(dst), imm32);
+	RL(dst) = ADDL(RL(dst), imm32);
 }
 
 /******************************************
  addl    rrd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z16_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z16_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = ADDL(cpustate, cpustate->RL(dst), RDMEM_L(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RL(dst) = ADDL(RL(dst), RDMEM_L(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  pop     @rd,@rs
  flags:  ------
  ******************************************/
-static void Z17_ssN0_ddN0(z8000_state *cpustate)
+void z8002_device::Z17_ssN0_ddN0()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	WRMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst), POPW(cpustate, src));
+	WRMEM_W(AS_DATA, addr_from_reg(dst), POPW(src));
 }
 
 /******************************************
  multl   rqd,imm32
  flags:  CZSV--
  ******************************************/
-static void Z18_00N0_dddd_imm32(z8000_state *cpustate)
+void z8002_device::Z18_00N0_dddd_imm32()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM32;
-	cpustate->RQ(dst) = MULTL(cpustate, cpustate->RQ(dst), imm32);
+	RQ(dst) = MULTL(RQ(dst), imm32);
 }
 
 /******************************************
  multl   rqd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z18_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z18_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RQ(dst) = MULTL(cpustate, cpustate->RQ(dst), cpustate->RL(src)); //@@@
+	RQ(dst) = MULTL(RQ(dst), RL(src)); //@@@
 }
 
 /******************************************
  mult    rrd,imm16
  flags:  CZSV--
  ******************************************/
-static void Z19_0000_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z19_0000_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM16(OP1);
-	cpustate->RL(dst) = MULTW(cpustate, cpustate->RL(dst), imm16);
+	RL(dst) = MULTW(RL(dst), imm16);
 }
 
 /******************************************
  mult    rrd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z19_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z19_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = MULTW(cpustate, cpustate->RL(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RL(dst) = MULTW(RL(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  divl    rqd,imm32
  flags:  CZSV--
  ******************************************/
-static void Z1A_0000_dddd_imm32(z8000_state *cpustate)
+void z8002_device::Z1A_0000_dddd_imm32()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM32;
-	cpustate->RQ(dst) = DIVL(cpustate, cpustate->RQ(dst), imm32);
+	RQ(dst) = DIVL(RQ(dst), imm32);
 }
 
 /******************************************
  divl    rqd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z1A_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z1A_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RQ(dst) = DIVL(cpustate, cpustate->RQ(dst), RDMEM_L(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RQ(dst) = DIVL(RQ(dst), RDMEM_L(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  div     rrd,imm16
  flags:  CZSV--
  ******************************************/
-static void Z1B_0000_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z1B_0000_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM16(OP1);
-	cpustate->RL(dst) = DIVW(cpustate, cpustate->RL(dst), imm16);
+	RL(dst) = DIVW(RL(dst), imm16);
 }
 
 /******************************************
  div     rrd,@rs
  flags:  CZSV--
  ******************************************/
-static void Z1B_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z1B_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = DIVW(cpustate, cpustate->RL(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	RL(dst) = DIVW(RL(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 }
 
 /******************************************
  testl   @rd
  flags:  -ZS---
  ******************************************/
-static void Z1C_ddN0_1000(z8000_state *cpustate)
+void z8002_device::Z1C_ddN0_1000()
 {
 	GET_DST(OP0,NIB2);
-	TESTL(cpustate, RDMEM_L(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
+	TESTL(RDMEM_L(AS_DATA, addr_from_reg(dst)));
 }
 
 /******************************************
  ldm     @rd,rs,n
  flags:  ------
  ******************************************/
-static void Z1C_ddN0_1001_0000_ssss_0000_nmin1(z8000_state *cpustate)
+void z8002_device::Z1C_ddN0_1001_0000_ssss_0000_nmin1()
 {
 	GET_DST(OP0,NIB2);
 	GET_CNT(OP1,NIB3);
 	GET_SRC(OP1,NIB1);
-	UINT32 addr = addr_from_reg(cpustate, dst);
+	UINT32 addr = addr_from_reg(dst);
 	while (cnt-- >= 0) {
-		WRMEM_W(cpustate, AS_DATA, addr, cpustate->RW(src));
-		addr = addr_add(cpustate, addr, 2);
+		WRMEM_W(AS_DATA, addr, RW(src));
+		addr = addr_add(addr, 2);
 		src = (src+1) & 15;
 	}
 }
@@ -1898,15 +1926,15 @@ static void Z1C_ddN0_1001_0000_ssss_0000_nmin1(z8000_state *cpustate)
  ldm     rd,@rs,n
  flags:  ------
  ******************************************/
-static void Z1C_ssN0_0001_0000_dddd_0000_nmin1(z8000_state *cpustate)
+void z8002_device::Z1C_ssN0_0001_0000_dddd_0000_nmin1()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB3);
 	GET_DST(OP1,NIB1);
-	UINT32 addr = addr_from_reg(cpustate, src);
+	UINT32 addr = addr_from_reg(src);
 	while (cnt-- >= 0) {
-		cpustate->RW(dst) = RDMEM_W(cpustate, AS_DATA, addr);
-		addr = addr_add(cpustate, addr, 2);
+		RW(dst) = RDMEM_W(AS_DATA, addr);
+		addr = addr_add(addr, 2);
 		dst = (dst+1) & 15;
 	}
 }
@@ -1915,38 +1943,38 @@ static void Z1C_ssN0_0001_0000_dddd_0000_nmin1(z8000_state *cpustate)
  ldl     @rd,rrs
  flags:  ------
  ******************************************/
-static void Z1D_ddN0_ssss(z8000_state *cpustate)
+void z8002_device::Z1D_ddN0_ssss()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	WRMEM_L(cpustate, AS_DATA,  addr_from_reg(cpustate, dst), cpustate->RL(src));
+	WRMEM_L(AS_DATA,  addr_from_reg(dst), RL(src));
 }
 
 /******************************************
  jp      cc,rd
  flags:  ------
  ******************************************/
-static void Z1E_ddN0_cccc(z8000_state *cpustate)
+void z8002_device::Z1E_ddN0_cccc()
 {
 	GET_CCC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	switch (cc) {
-		case  0: if (CC0) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case  1: if (CC1) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case  2: if (CC2) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case  3: if (CC3) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case  4: if (CC4) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case  5: if (CC5) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case  6: if (CC6) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case  7: if (CC7) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case  8: if (CC8) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case  9: if (CC9) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case 10: if (CCA) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case 11: if (CCB) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case 12: if (CCC) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case 13: if (CCD) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case 14: if (CCE) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
-		case 15: if (CCF) set_pc(cpustate, addr_from_reg(cpustate, dst)); break;
+		case  0: if (CC0) set_pc(addr_from_reg(dst)); break;
+		case  1: if (CC1) set_pc(addr_from_reg(dst)); break;
+		case  2: if (CC2) set_pc(addr_from_reg(dst)); break;
+		case  3: if (CC3) set_pc(addr_from_reg(dst)); break;
+		case  4: if (CC4) set_pc(addr_from_reg(dst)); break;
+		case  5: if (CC5) set_pc(addr_from_reg(dst)); break;
+		case  6: if (CC6) set_pc(addr_from_reg(dst)); break;
+		case  7: if (CC7) set_pc(addr_from_reg(dst)); break;
+		case  8: if (CC8) set_pc(addr_from_reg(dst)); break;
+		case  9: if (CC9) set_pc(addr_from_reg(dst)); break;
+		case 10: if (CCA) set_pc(addr_from_reg(dst)); break;
+		case 11: if (CCB) set_pc(addr_from_reg(dst)); break;
+		case 12: if (CCC) set_pc(addr_from_reg(dst)); break;
+		case 13: if (CCD) set_pc(addr_from_reg(dst)); break;
+		case 14: if (CCE) set_pc(addr_from_reg(dst)); break;
+		case 15: if (CCF) set_pc(addr_from_reg(dst)); break;
 	}
 }
 
@@ -1954,451 +1982,451 @@ static void Z1E_ddN0_cccc(z8000_state *cpustate)
  call    @rd
  flags:  ------
  ******************************************/
-static void Z1F_ddN0_0000(z8000_state *cpustate)
+void z8002_device::Z1F_ddN0_0000()
 {
 	GET_DST(OP0,NIB2);
-	if (segmented_mode(cpustate))
-		PUSHL(cpustate, SP, make_segmented_addr(cpustate->pc));
+	if (segmented_mode())
+		PUSHL(SP, make_segmented_addr(m_pc));
 	else
-		PUSHW(cpustate, SP, cpustate->pc);
-	set_pc(cpustate, addr_from_reg(cpustate, dst));
+		PUSHW(SP, m_pc);
+	set_pc(addr_from_reg(dst));
 }
 
 /******************************************
  ldb     rbd,@rs
  flags:  ------
  ******************************************/
-static void Z20_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z20_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src));
+	RB(dst) = RDMEM_B(AS_DATA, addr_from_reg(src));
 }
 
 /******************************************
  ld      rd,imm16
  flags:  ------
  ******************************************/
-static void Z21_0000_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z21_0000_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM16(OP1);
-	cpustate->RW(dst) = imm16;
+	RW(dst) = imm16;
 }
 
 /******************************************
  ld      rd,@rs
  flags:  ------
  ******************************************/
-static void Z21_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z21_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src));
+	RW(dst) = RDMEM_W(AS_DATA, addr_from_reg(src));
 }
 
 /******************************************
  resb    rbd,rs
  flags:  ------
  ******************************************/
-static void Z22_0000_ssss_0000_dddd_0000_0000(z8000_state *cpustate)
+void z8002_device::Z22_0000_ssss_0000_dddd_0000_0000()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP1,NIB1);
-	cpustate->RB(dst) = cpustate->RB(dst) & ~(1 << (cpustate->RW(src) & 7));
+	RB(dst) = RB(dst) & ~(1 << (RW(src) & 7));
 }
 
 /******************************************
  resb    @rd,imm4
  flags:  ------
  ******************************************/
-static void Z22_ddN0_imm4(z8000_state *cpustate)
+void z8002_device::Z22_ddN0_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_B(cpustate, AS_DATA, addr, RDMEM_B(cpustate, AS_DATA, addr) & ~bit);
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_B(AS_DATA, addr, RDMEM_B(AS_DATA, addr) & ~bit);
 }
 
 /******************************************
  res     rd,rs
  flags:  ------
  ******************************************/
-static void Z23_0000_ssss_0000_dddd_0000_0000(z8000_state *cpustate)
+void z8002_device::Z23_0000_ssss_0000_dddd_0000_0000()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP1,NIB1);
-	cpustate->RW(dst) = cpustate->RW(dst) & ~(1 << (cpustate->RW(src) & 15));
+	RW(dst) = RW(dst) & ~(1 << (RW(src) & 15));
 }
 
 /******************************************
  res     @rd,imm4
  flags:  ------
  ******************************************/
-static void Z23_ddN0_imm4(z8000_state *cpustate)
+void z8002_device::Z23_ddN0_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_W(cpustate, AS_DATA, addr, RDMEM_W(cpustate, AS_DATA, addr) & ~bit);
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_W(AS_DATA, addr, RDMEM_W(AS_DATA, addr) & ~bit);
 }
 
 /******************************************
  setb    rbd,rs
  flags:  ------
  ******************************************/
-static void Z24_0000_ssss_0000_dddd_0000_0000(z8000_state *cpustate)
+void z8002_device::Z24_0000_ssss_0000_dddd_0000_0000()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP1,NIB1);
-	cpustate->RB(dst) = cpustate->RB(dst) | (1 << (cpustate->RW(src) & 7));
+	RB(dst) = RB(dst) | (1 << (RW(src) & 7));
 }
 
 /******************************************
  setb    @rd,imm4
  flags:  ------
  ******************************************/
-static void Z24_ddN0_imm4(z8000_state *cpustate)
+void z8002_device::Z24_ddN0_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_B(cpustate, AS_DATA, addr, RDMEM_B(cpustate, AS_DATA, addr) | bit);
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_B(AS_DATA, addr, RDMEM_B(AS_DATA, addr) | bit);
 }
 
 /******************************************
  set     rd,rs
  flags:  ------
  ******************************************/
-static void Z25_0000_ssss_0000_dddd_0000_0000(z8000_state *cpustate)
+void z8002_device::Z25_0000_ssss_0000_dddd_0000_0000()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP1,NIB1);
-	cpustate->RW(dst) = cpustate->RW(dst) | (1 << (cpustate->RW(src) & 15));
+	RW(dst) = RW(dst) | (1 << (RW(src) & 15));
 }
 
 /******************************************
  set     @rd,imm4
  flags:  ------
  ******************************************/
-static void Z25_ddN0_imm4(z8000_state *cpustate)
+void z8002_device::Z25_ddN0_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_W(cpustate, AS_DATA, addr, RDMEM_W(cpustate, AS_DATA, addr) | bit);
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_W(AS_DATA, addr, RDMEM_W(AS_DATA, addr) | bit);
 }
 
 /******************************************
  bitb    rbd,rs
  flags:  -Z----
  ******************************************/
-static void Z26_0000_ssss_0000_dddd_0000_0000(z8000_state *cpustate)
+void z8002_device::Z26_0000_ssss_0000_dddd_0000_0000()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP1,NIB1);
-	if (cpustate->RB(dst) & (1 << (cpustate->RW(src) & 7))) CLR_Z; else SET_Z;
+	if (RB(dst) & (1 << (RW(src) & 7))) CLR_Z; else SET_Z;
 }
 
 /******************************************
  bitb    @rd,imm4
  flags:  -Z----
  ******************************************/
-static void Z26_ddN0_imm4(z8000_state *cpustate)
+void z8002_device::Z26_ddN0_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	if (RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)) & bit) CLR_Z; else SET_Z;
+	if (RDMEM_B(AS_DATA, addr_from_reg(dst)) & bit) CLR_Z; else SET_Z;
 }
 
 /******************************************
  bit     rd,rs
  flags:  -Z----
  ******************************************/
-static void Z27_0000_ssss_0000_dddd_0000_0000(z8000_state *cpustate)
+void z8002_device::Z27_0000_ssss_0000_dddd_0000_0000()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP1,NIB1);
-	if (cpustate->RW(dst) & (1 << (cpustate->RW(src) & 15))) CLR_Z; else SET_Z;
+	if (RW(dst) & (1 << (RW(src) & 15))) CLR_Z; else SET_Z;
 }
 
 /******************************************
  bit     @rd,imm4
  flags:  -Z----
  ******************************************/
-static void Z27_ddN0_imm4(z8000_state *cpustate)
+void z8002_device::Z27_ddN0_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	if (RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst)) & bit) CLR_Z; else SET_Z;
+	if (RDMEM_W(AS_DATA, addr_from_reg(dst)) & bit) CLR_Z; else SET_Z;
 }
 
 /******************************************
  incb    @rd,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z28_ddN0_imm4m1(z8000_state *cpustate)
+void z8002_device::Z28_ddN0_imm4m1()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_B(cpustate, AS_DATA,  addr, INCB(cpustate, RDMEM_B(cpustate, AS_DATA, addr), i4p1));
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_B(AS_DATA,  addr, INCB(RDMEM_B(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  inc     @rd,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z29_ddN0_imm4m1(z8000_state *cpustate)
+void z8002_device::Z29_ddN0_imm4m1()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_W(cpustate, AS_DATA, addr, INCW(cpustate, RDMEM_W(cpustate, AS_DATA, addr), i4p1));
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_W(AS_DATA, addr, INCW(RDMEM_W(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  decb    @rd,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z2A_ddN0_imm4m1(z8000_state *cpustate)
+void z8002_device::Z2A_ddN0_imm4m1()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_B(cpustate, AS_DATA, addr, DECB(cpustate, RDMEM_B(cpustate, AS_DATA, addr), i4p1));
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_B(AS_DATA, addr, DECB(RDMEM_B(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  dec     @rd,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z2B_ddN0_imm4m1(z8000_state *cpustate)
+void z8002_device::Z2B_ddN0_imm4m1()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_W(cpustate, AS_DATA, addr, DECW(cpustate, RDMEM_W(cpustate, AS_DATA, addr), i4p1));
+	UINT32 addr = addr_from_reg(dst);
+	WRMEM_W(AS_DATA, addr, DECW(RDMEM_W(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  exb     rbd,@rs
  flags:  ------
  ******************************************/
-static void Z2C_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z2C_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, src);
-	UINT8 tmp = RDMEM_B(cpustate,  AS_DATA, addr);
-	WRMEM_B(cpustate, AS_DATA, addr, cpustate->RB(dst));
-	cpustate->RB(dst) = tmp;
+	UINT32 addr = addr_from_reg(src);
+	UINT8 tmp = RDMEM_B( AS_DATA, addr);
+	WRMEM_B(AS_DATA, addr, RB(dst));
+	RB(dst) = tmp;
 }
 
 /******************************************
  ex      rd,@rs
  flags:  ------
  ******************************************/
-static void Z2D_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z2D_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	UINT32 addr = addr_from_reg(cpustate, src);
-	UINT16 tmp = RDMEM_W(cpustate, AS_DATA, addr);
-	WRMEM_W(cpustate, AS_DATA, addr, cpustate->RW(dst));
-	cpustate->RW(dst) = tmp;
+	UINT32 addr = addr_from_reg(src);
+	UINT16 tmp = RDMEM_W(AS_DATA, addr);
+	WRMEM_W(AS_DATA, addr, RW(dst));
+	RW(dst) = tmp;
 }
 
 /******************************************
  ldb     @rd,rbs
  flags:  ------
  ******************************************/
-static void Z2E_ddN0_ssss(z8000_state *cpustate)
+void z8002_device::Z2E_ddN0_ssss()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	WRMEM_B(cpustate, AS_DATA,  addr_from_reg(cpustate, dst), cpustate->RB(src));
+	WRMEM_B(AS_DATA,  addr_from_reg(dst), RB(src));
 }
 
 /******************************************
  ld      @rd,rs
  flags:  ------
  ******************************************/
-static void Z2F_ddN0_ssss(z8000_state *cpustate)
+void z8002_device::Z2F_ddN0_ssss()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	WRMEM_W(cpustate, AS_DATA,  addr_from_reg(cpustate, dst), cpustate->RW(src));
+	WRMEM_W(AS_DATA,  addr_from_reg(dst), RW(src));
 }
 
 /******************************************
  ldrb    rbd,dsp16
  flags:  ------
  ******************************************/
-static void Z30_0000_dddd_dsp16(z8000_state *cpustate)
+void z8002_device::Z30_0000_dddd_dsp16()
 {
 	GET_DST(OP0,NIB3);
 	GET_DSP16;
-	cpustate->RB(dst) = RDMEM_B(cpustate, AS_PROGRAM, dsp16);
+	RB(dst) = RDMEM_B(AS_PROGRAM, dsp16);
 }
 
 /******************************************
  ldb     rbd,rs(idx16)
  flags:  ------
  ******************************************/
-static void Z30_ssN0_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z30_ssN0_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX16(OP1);
-	idx16 = addr_add(cpustate, addr_from_reg(cpustate, src), idx16);
-	cpustate->RB(dst) = RDMEM_B(cpustate, AS_DATA, idx16);
+	idx16 = addr_add(addr_from_reg(src), idx16);
+	RB(dst) = RDMEM_B(AS_DATA, idx16);
 }
 
 /******************************************
  ldr     rd,dsp16
  flags:  ------
  ******************************************/
-static void Z31_0000_dddd_dsp16(z8000_state *cpustate)
+void z8002_device::Z31_0000_dddd_dsp16()
 {
 	GET_DST(OP0,NIB3);
 	GET_DSP16;
-	cpustate->RW(dst) = RDMEM_W(cpustate, AS_PROGRAM, dsp16);
+	RW(dst) = RDMEM_W(AS_PROGRAM, dsp16);
 }
 
 /******************************************
  ld      rd,rs(idx16)
  flags:  ------
  ******************************************/
-static void Z31_ssN0_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z31_ssN0_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX16(OP1);
-	idx16 = addr_add(cpustate, addr_from_reg(cpustate, src), idx16);
-	cpustate->RW(dst) = RDMEM_W(cpustate, AS_DATA, idx16);
+	idx16 = addr_add(addr_from_reg(src), idx16);
+	RW(dst) = RDMEM_W(AS_DATA, idx16);
 }
 
 /******************************************
  ldrb    dsp16,rbs
  flags:  ------
  ******************************************/
-static void Z32_0000_ssss_dsp16(z8000_state *cpustate)
+void z8002_device::Z32_0000_ssss_dsp16()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DSP16;
-	WRMEM_B(cpustate, AS_PROGRAM,  dsp16, cpustate->RB(src));
+	WRMEM_B(AS_PROGRAM,  dsp16, RB(src));
 }
 
 /******************************************
  ldb     rd(idx16),rbs
  flags:  ------
  ******************************************/
-static void Z32_ddN0_ssss_imm16(z8000_state *cpustate)
+void z8002_device::Z32_ddN0_ssss_imm16()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_IDX16(OP1);
-	idx16 = addr_add(cpustate, addr_from_reg(cpustate, dst), idx16);
-	WRMEM_B(cpustate, AS_DATA,  idx16, cpustate->RB(src));
+	idx16 = addr_add(addr_from_reg(dst), idx16);
+	WRMEM_B(AS_DATA,  idx16, RB(src));
 }
 
 /******************************************
  ldr     dsp16,rs
  flags:  ------
  ******************************************/
-static void Z33_0000_ssss_dsp16(z8000_state *cpustate)
+void z8002_device::Z33_0000_ssss_dsp16()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DSP16;
-	WRMEM_W(cpustate, AS_PROGRAM,  dsp16, cpustate->RW(src));
+	WRMEM_W(AS_PROGRAM,  dsp16, RW(src));
 }
 
 /******************************************
  ld      rd(idx16),rs
  flags:  ------
  ******************************************/
-static void Z33_ddN0_ssss_imm16(z8000_state *cpustate)
+void z8002_device::Z33_ddN0_ssss_imm16()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_IDX16(OP1);
-	idx16 = addr_add(cpustate, addr_from_reg(cpustate,dst), idx16);
-	WRMEM_W(cpustate, AS_DATA,  idx16, cpustate->RW(src));
+	idx16 = addr_add(addr_from_reg(dst), idx16);
+	WRMEM_W(AS_DATA,  idx16, RW(src));
 }
 
 /******************************************
  ldar    prd,dsp16
  flags:  ------
  ******************************************/
-static void Z34_0000_dddd_dsp16(z8000_state *cpustate)
+void z8002_device::Z34_0000_dddd_dsp16()
 {
 	GET_DST(OP0,NIB3);
 	GET_DSP16;
-	addr_to_reg(cpustate, dst, dsp16);
+	addr_to_reg(dst, dsp16);
 }
 
 /******************************************
  lda     prd,rs(idx16)
  flags:  ------
  ******************************************/
-static void Z34_ssN0_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z34_ssN0_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX16(OP1);
-	if (segmented_mode(cpustate)) {
-		cpustate->RL(dst) = cpustate->RL(src);
+	if (segmented_mode()) {
+		RL(dst) = RL(src);
 	}
 	else {
-		cpustate->RW(dst) = cpustate->RW(src);
+		RW(dst) = RW(src);
 	}
-	add_to_addr_reg(cpustate, dst, idx16);
+	add_to_addr_reg(dst, idx16);
 }
 
 /******************************************
  ldrl    rrd,dsp16
  flags:  ------
  ******************************************/
-static void Z35_0000_dddd_dsp16(z8000_state *cpustate)
+void z8002_device::Z35_0000_dddd_dsp16()
 {
 	GET_DST(OP0,NIB3);
 	GET_DSP16;
-	cpustate->RL(dst) = RDMEM_L(cpustate, AS_PROGRAM, dsp16);
+	RL(dst) = RDMEM_L(AS_PROGRAM, dsp16);
 }
 
 /******************************************
  ldl     rrd,rs(idx16)
  flags:  ------
  ******************************************/
-static void Z35_ssN0_dddd_imm16(z8000_state *cpustate)
+void z8002_device::Z35_ssN0_dddd_imm16()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX16(OP1);
-	idx16 = addr_add(cpustate, addr_from_reg(cpustate, src), idx16);
-	cpustate->RL(dst) = RDMEM_L(cpustate, AS_DATA, idx16);
+	idx16 = addr_add(addr_from_reg(src), idx16);
+	RL(dst) = RDMEM_L(AS_DATA, idx16);
 }
 
 /******************************************
  bpt
  flags:  ------
  ******************************************/
-static void Z36_0000_0000(z8000_state *cpustate)
+void z8002_device::Z36_0000_0000()
 {
-	/* execute break point trap cpustate->irq_req */
-	cpustate->irq_req = Z8000_TRAP;
+	/* execute break point trap m_irq_req */
+	m_irq_req = Z8000_TRAP;
 }
 
 /******************************************
  rsvd36
  flags:  ------
  ******************************************/
-static void Z36_imm8(z8000_state *cpustate)
+void z8002_device::Z36_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd36 $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: rsvd36 $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -2408,35 +2436,35 @@ static void Z36_imm8(z8000_state *cpustate)
  ldrl    dsp16,rrs
  flags:  ------
  ******************************************/
-static void Z37_0000_ssss_dsp16(z8000_state *cpustate)
+void z8002_device::Z37_0000_ssss_dsp16()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DSP16;
-	WRMEM_L(cpustate, AS_PROGRAM,  dsp16, cpustate->RL(src));
+	WRMEM_L(AS_PROGRAM,  dsp16, RL(src));
 }
 
 /******************************************
  ldl     rd(idx16),rrs
  flags:  ------
  ******************************************/
-static void Z37_ddN0_ssss_imm16(z8000_state *cpustate)
+void z8002_device::Z37_ddN0_ssss_imm16()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_IDX16(OP1);
-	idx16 = addr_add(cpustate, addr_from_reg(cpustate, dst), idx16);
-	WRMEM_L(cpustate, AS_DATA,  idx16, cpustate->RL(src));
+	idx16 = addr_add(addr_from_reg(dst), idx16);
+	WRMEM_L(AS_DATA,  idx16, RL(src));
 }
 
 /******************************************
  rsvd38
  flags:  ------
  ******************************************/
-static void Z38_imm8(z8000_state *cpustate)
+void z8002_device::Z38_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd38 $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: rsvd38 $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -2446,38 +2474,38 @@ static void Z38_imm8(z8000_state *cpustate)
  ldps    @rs
  flags:  CZSVDH
  ******************************************/
-static void Z39_ssN0_0000(z8000_state *cpustate)
+void z8002_device::Z39_ssN0_0000()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	UINT16 fcw;
-	if (segmented_mode(cpustate)) {
-		UINT32 addr = addr_from_reg(cpustate, src);
-		fcw = RDMEM_W(cpustate, AS_DATA, addr + 2);
-		set_pc(cpustate, segmented_addr(RDMEM_L(cpustate, AS_DATA, addr + 4)));
+	if (segmented_mode()) {
+		UINT32 addr = addr_from_reg(src);
+		fcw = RDMEM_W(AS_DATA, addr + 2);
+		set_pc(segmented_addr(RDMEM_L(AS_DATA, addr + 4)));
 	}
 	else {
-		fcw = RDMEM_W(cpustate, AS_DATA,  cpustate->RW(src));
-		set_pc(cpustate, RDMEM_W(cpustate, AS_DATA, (UINT16)(cpustate->RW(src) + 2)));
+		fcw = RDMEM_W(AS_DATA,  RW(src));
+		set_pc(RDMEM_W(AS_DATA, (UINT16)(RW(src) + 2)));
 	}
-	if ((fcw ^ cpustate->fcw) & F_SEG) printf("ldps 1 (0x%05x): changing from %ssegmented mode to %ssegmented mode\n", cpustate->pc, (cpustate->fcw & F_SEG) ? "non-" : "", (fcw & F_SEG) ? "" : "non-");
-	CHANGE_FCW(cpustate, fcw); /* check for user/system mode change */
+	if ((fcw ^ m_fcw) & F_SEG) printf("ldps 1 (0x%05x): changing from %ssegmented mode to %ssegmented mode\n", m_pc, (m_fcw & F_SEG) ? "non-" : "", (fcw & F_SEG) ? "" : "non-");
+	CHANGE_FCW(fcw); /* check for user/system mode change */
 }
 
 /******************************************
  inib(r) @rd,@rs,ra
  flags:  ---V--
  ******************************************/
-static void Z3A_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_0000_0000_aaaa_dddd_x000()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst), RDPORT_B(cpustate,  0, cpustate->RW(src)));
-	add_to_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_B(AS_DATA, addr_from_reg(dst), RDPORT_B( 0, RW(src)));
+	add_to_addr_reg(dst, 1);
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2485,17 +2513,17 @@ static void Z3A_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
  sinibr  @rd,@rs,ra
  flags:  ------
  ******************************************/
-static void Z3A_ssss_0001_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_0001_0000_aaaa_dddd_x000()
 {//@@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_B(cpustate, AS_DATA,  cpustate->RW(dst), RDPORT_B(cpustate,  1, cpustate->RW(src)));
-	cpustate->RW(dst)++;
-	cpustate->RW(src)++;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_B(AS_DATA,  RW(dst), RDPORT_B( 1, RW(src)));
+	RW(dst)++;
+	RW(src)++;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2503,16 +2531,16 @@ static void Z3A_ssss_0001_0000_aaaa_dddd_x000(z8000_state *cpustate)
  outibr  @rd,@rs,ra
  flags:  ---V--
  ******************************************/
-static void Z3A_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_0010_0000_aaaa_dddd_x000()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRPORT_B(cpustate,  0, cpustate->RW(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
-	add_to_addr_reg(cpustate, src, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRPORT_B( 0, RW(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
+	add_to_addr_reg(src, 1);
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2520,65 +2548,65 @@ static void Z3A_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
  soutibr @rd,@rs,ra
  flags:  ------
  ******************************************/
-static void Z3A_ssss_0011_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_0011_0000_aaaa_dddd_x000()
 {//@@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRPORT_B(cpustate,  1, cpustate->RW(dst), RDMEM_B(cpustate, AS_DATA, cpustate->RW(src)));
-	cpustate->RW(dst)++;
-	cpustate->RW(src)++;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRPORT_B( 1, RW(dst), RDMEM_B(AS_DATA, RW(src)));
+	RW(dst)++;
+	RW(src)++;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  inb     rbd,imm16
  flags:  ------
  ******************************************/
-static void Z3A_dddd_0100_imm16(z8000_state *cpustate)
+void z8002_device::Z3A_dddd_0100_imm16()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
-	cpustate->RB(dst) = RDPORT_B(cpustate,  0, imm16);
+	RB(dst) = RDPORT_B( 0, imm16);
 }
 
 /******************************************
  sinb    rbd,imm16
  flags:  ------
  ******************************************/
-static void Z3A_dddd_0101_imm16(z8000_state *cpustate)
+void z8002_device::Z3A_dddd_0101_imm16()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
-	cpustate->RB(dst) = RDPORT_B(cpustate,  1, imm16);
+	RB(dst) = RDPORT_B( 1, imm16);
 }
 
 /******************************************
  outb    imm16,rbs
  flags:  ---V--
  ******************************************/
-static void Z3A_ssss_0110_imm16(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_0110_imm16()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_IMM16(OP1);
-	WRPORT_B(cpustate,  0, imm16, cpustate->RB(src));
+	WRPORT_B( 0, imm16, RB(src));
 }
 
 /******************************************
  soutb   imm16,rbs
  flags:  ------
  ******************************************/
-static void Z3A_ssss_0111_imm16(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_0111_imm16()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_IMM16(OP1);
-	WRPORT_B(cpustate,  1, imm16, cpustate->RB(src));
+	WRPORT_B( 1, imm16, RB(src));
 }
 
 /******************************************
@@ -2586,17 +2614,17 @@ static void Z3A_ssss_0111_imm16(z8000_state *cpustate)
  indbr   @rd,@rs,rba
  flags:  ---V--
  ******************************************/
-static void Z3A_ssss_1000_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_1000_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_B(cpustate, AS_DATA,  cpustate->RW(dst), RDPORT_B(cpustate,  0, cpustate->RW(src)));
-	cpustate->RW(dst)--;
-	cpustate->RW(src)--;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_B(AS_DATA,  RW(dst), RDPORT_B( 0, RW(src)));
+	RW(dst)--;
+	RW(src)--;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2604,17 +2632,17 @@ static void Z3A_ssss_1000_0000_aaaa_dddd_x000(z8000_state *cpustate)
  sindbr  @rd,@rs,rba
  flags:  ------
  ******************************************/
-static void Z3A_ssss_1001_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_1001_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_B(cpustate, AS_DATA,  cpustate->RW(dst), RDPORT_B(cpustate,  1, cpustate->RW(src)));
-	cpustate->RW(dst)--;
-	cpustate->RW(src)--;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_B(AS_DATA,  RW(dst), RDPORT_B( 1, RW(src)));
+	RW(dst)--;
+	RW(src)--;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2622,17 +2650,17 @@ static void Z3A_ssss_1001_0000_aaaa_dddd_x000(z8000_state *cpustate)
  outdbr  @rd,@rs,rba
  flags:  ---V--
  ******************************************/
-static void Z3A_ssss_1010_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_1010_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRPORT_B(cpustate,  0, cpustate->RW(dst), RDMEM_B(cpustate, AS_DATA, cpustate->RW(src)));
-	cpustate->RW(dst)--;
-	cpustate->RW(src)--;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRPORT_B( 0, RW(dst), RDMEM_B(AS_DATA, RW(src)));
+	RW(dst)--;
+	RW(src)--;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2640,17 +2668,17 @@ static void Z3A_ssss_1010_0000_aaaa_dddd_x000(z8000_state *cpustate)
  soutdbr @rd,@rs,rba
  flags:  ------
  ******************************************/
-static void Z3A_ssss_1011_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3A_ssss_1011_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRPORT_B(cpustate,  1, cpustate->RW(dst), RDMEM_B(cpustate, AS_DATA, cpustate->RW(src)));
-	cpustate->RW(dst)--;
-	cpustate->RW(src)--;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRPORT_B( 1, RW(dst), RDMEM_B(AS_DATA, RW(src)));
+	RW(dst)--;
+	RW(src)--;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2658,17 +2686,17 @@ static void Z3A_ssss_1011_0000_aaaa_dddd_x000(z8000_state *cpustate)
  inir    @rd,@rs,ra
  flags:  ---V--
  ******************************************/
-static void Z3B_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_0000_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_W(cpustate, AS_DATA,  cpustate->RW(dst), RDPORT_W(cpustate,  0, cpustate->RW(src)));
-	cpustate->RW(dst) += 2;
-	cpustate->RW(src) += 2;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_W(AS_DATA,  RW(dst), RDPORT_W( 0, RW(src)));
+	RW(dst) += 2;
+	RW(src) += 2;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2676,17 +2704,17 @@ static void Z3B_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
  sinir   @rd,@rs,ra
  flags:  ------
  ******************************************/
-static void Z3B_ssss_0001_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_0001_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_W(cpustate, AS_DATA,  cpustate->RW(dst), RDPORT_W(cpustate,  1, cpustate->RW(src)));
-	cpustate->RW(dst) += 2;
-	cpustate->RW(src) += 2;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_W(AS_DATA,  RW(dst), RDPORT_W( 1, RW(src)));
+	RW(dst) += 2;
+	RW(src) += 2;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2694,17 +2722,17 @@ static void Z3B_ssss_0001_0000_aaaa_dddd_x000(z8000_state *cpustate)
  outir   @rd,@rs,ra
  flags:  ---V--
  ******************************************/
-static void Z3B_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_0010_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRPORT_W(cpustate,  0, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, cpustate->RW(src)));
-	cpustate->RW(dst) += 2;
-	cpustate->RW(src) += 2;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRPORT_W( 0, RW(dst), RDMEM_W(AS_DATA, RW(src)));
+	RW(dst) += 2;
+	RW(src) += 2;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2712,65 +2740,65 @@ static void Z3B_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
  soutir  @rd,@rs,ra
  flags:  ------
  ******************************************/
-static void Z3B_ssss_0011_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_0011_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRPORT_W(cpustate,  1, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, cpustate->RW(src)));
-	cpustate->RW(dst) += 2;
-	cpustate->RW(src) += 2;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRPORT_W( 1, RW(dst), RDMEM_W(AS_DATA, RW(src)));
+	RW(dst) += 2;
+	RW(src) += 2;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  in      rd,imm16
  flags:  ------
  ******************************************/
-static void Z3B_dddd_0100_imm16(z8000_state *cpustate)
+void z8002_device::Z3B_dddd_0100_imm16()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
-	cpustate->RW(dst) = RDPORT_W(cpustate,  0, imm16);
+	RW(dst) = RDPORT_W( 0, imm16);
 }
 
 /******************************************
  sin     rd,imm16
  flags:  ------
  ******************************************/
-static void Z3B_dddd_0101_imm16(z8000_state *cpustate)
+void z8002_device::Z3B_dddd_0101_imm16()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
-	cpustate->RW(dst) = RDPORT_W(cpustate,  1, imm16);
+	RW(dst) = RDPORT_W( 1, imm16);
 }
 
 /******************************************
  out     imm16,rs
  flags:  ---V--
  ******************************************/
-static void Z3B_ssss_0110_imm16(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_0110_imm16()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_IMM16(OP1);
-	WRPORT_W(cpustate,  0, imm16, cpustate->RW(src));
+	WRPORT_W( 0, imm16, RW(src));
 }
 
 /******************************************
  sout    imm16,rbs
  flags:  ------
  ******************************************/
-static void Z3B_ssss_0111_imm16(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_0111_imm16()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_IMM16(OP1);
-	WRPORT_W(cpustate,  1, imm16, cpustate->RW(src));
+	WRPORT_W( 1, imm16, RW(src));
 }
 
 /******************************************
@@ -2778,17 +2806,17 @@ static void Z3B_ssss_0111_imm16(z8000_state *cpustate)
  indr    @rd,@rs,ra
  flags:  ---V--
  ******************************************/
-static void Z3B_ssss_1000_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_1000_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_W(cpustate, AS_DATA,  cpustate->RW(dst), RDPORT_W(cpustate,  0, cpustate->RW(src)));
-	cpustate->RW(dst) -= 2;
-	cpustate->RW(src) -= 2;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_W(AS_DATA,  RW(dst), RDPORT_W( 0, RW(src)));
+	RW(dst) -= 2;
+	RW(src) -= 2;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2796,17 +2824,17 @@ static void Z3B_ssss_1000_0000_aaaa_dddd_x000(z8000_state *cpustate)
  sindr   @rd,@rs,ra
  flags:  ------
  ******************************************/
-static void Z3B_ssss_1001_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_1001_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_W(cpustate, AS_DATA,  cpustate->RW(dst), RDPORT_W(cpustate,  1, cpustate->RW(src)));
-	cpustate->RW(dst) -= 2;
-	cpustate->RW(src) -= 2;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_W(AS_DATA,  RW(dst), RDPORT_W( 1, RW(src)));
+	RW(dst) -= 2;
+	RW(src) -= 2;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2814,17 +2842,17 @@ static void Z3B_ssss_1001_0000_aaaa_dddd_x000(z8000_state *cpustate)
  outdr   @rd,@rs,ra
  flags:  ---V--
  ******************************************/
-static void Z3B_ssss_1010_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_1010_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRPORT_W(cpustate,  0, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, cpustate->RW(src)));
-	cpustate->RW(dst) -= 2;
-	cpustate->RW(src) -= 2;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRPORT_W( 0, RW(dst), RDMEM_W(AS_DATA, RW(src)));
+	RW(dst) -= 2;
+	RW(src) -= 2;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
@@ -2832,989 +2860,989 @@ static void Z3B_ssss_1010_0000_aaaa_dddd_x000(z8000_state *cpustate)
  soutdr  @rd,@rs,ra
  flags:  ------
  ******************************************/
-static void Z3B_ssss_1011_0000_aaaa_dddd_x000(z8000_state *cpustate)
+void z8002_device::Z3B_ssss_1011_0000_aaaa_dddd_x000()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRPORT_W(cpustate,  1, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, cpustate->RW(src)));
-	cpustate->RW(dst) -= 2;
-	cpustate->RW(src) -= 2;
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRPORT_W( 1, RW(dst), RDMEM_W(AS_DATA, RW(src)));
+	RW(dst) -= 2;
+	RW(src) -= 2;
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  inb     rbd,@rs
  flags:  ------
  ******************************************/
-static void Z3C_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z3C_ssss_dddd()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_DST(OP0,NIB3);
-	cpustate->RB(dst) = RDPORT_B(cpustate,  0, cpustate->RW(src));
+	RB(dst) = RDPORT_B( 0, RW(src));
 }
 
 /******************************************
  in      rd,@rs
  flags:  ------
  ******************************************/
-static void Z3D_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z3D_ssss_dddd()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_DST(OP0,NIB3);
-	cpustate->RW(dst) = RDPORT_W(cpustate,  0, cpustate->RW(src));
+	RW(dst) = RDPORT_W( 0, RW(src));
 }
 
 /******************************************
  outb    @rd,rbs
  flags:  ---V--
  ******************************************/
-static void Z3E_dddd_ssss(z8000_state *cpustate)
+void z8002_device::Z3E_dddd_ssss()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
-	WRPORT_B(cpustate,  0, cpustate->RW(dst), cpustate->RB(src));
+	WRPORT_B( 0, RW(dst), RB(src));
 }
 
 /******************************************
  out     @rd,rs
  flags:  ---V--
  ******************************************/
-static void Z3F_dddd_ssss(z8000_state *cpustate)
+void z8002_device::Z3F_dddd_ssss()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
-	WRPORT_W(cpustate,  0, cpustate->RW(dst), cpustate->RW(src));
+	WRPORT_W( 0, RW(dst), RW(src));
 }
 
 /******************************************
  addb    rbd,addr
  flags:  CZSVDH
  ******************************************/
-static void Z40_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z40_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RB(dst) = ADDB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	RB(dst) = ADDB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  addb    rbd,addr(rs)
  flags:  CZSVDH
  ******************************************/
-static void Z40_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z40_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RB(dst) = ADDB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RB(dst) = ADDB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  add     rd,addr
  flags:  CZSV--
  ******************************************/
-static void Z41_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z41_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RW(dst) = ADDW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr)); /* EHC */
+	RW(dst) = ADDW(RW(dst), RDMEM_W(AS_DATA, addr)); /* EHC */
 }
 
 /******************************************
  add     rd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z41_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z41_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RW(dst) = ADDW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));    /* ASG */
+	addr = addr_add(addr, RW(src));
+	RW(dst) = ADDW(RW(dst), RDMEM_W(AS_DATA, addr));    /* ASG */
 }
 
 /******************************************
  subb    rbd,addr
  flags:  CZSVDH
  ******************************************/
-static void Z42_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z42_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RB(dst) = SUBB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr)); /* EHC */
+	RB(dst) = SUBB(RB(dst), RDMEM_B(AS_DATA, addr)); /* EHC */
 }
 
 /******************************************
  subb    rbd,addr(rs)
  flags:  CZSVDH
  ******************************************/
-static void Z42_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z42_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RB(dst) = SUBB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RB(dst) = SUBB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  sub     rd,addr
  flags:  CZSV--
  ******************************************/
-static void Z43_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z43_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RW(dst) = SUBW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	RW(dst) = SUBW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  sub     rd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z43_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z43_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RW(dst) = SUBW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RW(dst) = SUBW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  orb     rbd,addr
  flags:  CZSP--
  ******************************************/
-static void Z44_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z44_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RB(dst) = ORB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	RB(dst) = ORB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  orb     rbd,addr(rs)
  flags:  CZSP--
  ******************************************/
-static void Z44_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z44_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RB(dst) = ORB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RB(dst) = ORB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  or      rd,addr
  flags:  CZS---
  ******************************************/
-static void Z45_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z45_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RW(dst) = ORW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	RW(dst) = ORW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  or      rd,addr(rs)
  flags:  CZS---
  ******************************************/
-static void Z45_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z45_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RW(dst) = ORW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RW(dst) = ORW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  andb    rbd,addr
  flags:  -ZSP--
  ******************************************/
-static void Z46_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z46_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RB(dst) = ANDB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	RB(dst) = ANDB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  andb    rbd,addr(rs)
  flags:  -ZSP--
  ******************************************/
-static void Z46_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z46_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RB(dst) = ANDB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RB(dst) = ANDB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  and     rd,addr
  flags:  -ZS---
  ******************************************/
-static void Z47_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z47_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RW(dst) = ANDW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	RW(dst) = ANDW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  and     rd,addr(rs)
  flags:  -ZS---
  ******************************************/
-static void Z47_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z47_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RW(dst) = ANDW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RW(dst) = ANDW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  xorb    rbd,addr
  flags:  -ZSP--
  ******************************************/
-static void Z48_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z48_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RB(dst) = XORB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	RB(dst) = XORB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  xorb    rbd,addr(rs)
  flags:  -ZSP--
  ******************************************/
-static void Z48_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z48_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RB(dst) = XORB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RB(dst) = XORB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  xor     rd,addr
  flags:  -ZS---
  ******************************************/
-static void Z49_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z49_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RW(dst) = XORW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	RW(dst) = XORW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  xor     rd,addr(rs)
  flags:  -ZS---
  ******************************************/
-static void Z49_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z49_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RW(dst) = XORW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RW(dst) = XORW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  cpb     rbd,addr
  flags:  CZSV--
  ******************************************/
-static void Z4A_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z4A_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	CPB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	CPB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  cpb     rbd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z4A_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z4A_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	CPB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	CPB(RB(dst), RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  cp      rd,addr
  flags:  CZSV--
  ******************************************/
-static void Z4B_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z4B_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	CPW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	CPW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  cp      rd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z4B_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z4B_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	CPW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	CPW(RW(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  comb    addr
  flags:  -ZSP--
  ******************************************/
-static void Z4C_0000_0000_addr(z8000_state *cpustate)
+void z8002_device::Z4C_0000_0000_addr()
 {
 	GET_ADDR(OP1);
-	WRMEM_B(cpustate, AS_DATA,  addr, COMB(cpustate, RDMEM_W(cpustate, AS_DATA, addr)));
+	WRMEM_B(AS_DATA,  addr, COMB(RDMEM_W(AS_DATA, addr)));
 }
 
 /******************************************
  cpb     addr,imm8
  flags:  CZSV--
  ******************************************/
-static void Z4C_0000_0001_addr_imm8(z8000_state *cpustate)
+void z8002_device::Z4C_0000_0001_addr_imm8()
 {
 	GET_ADDR(OP1);
 	GET_IMM8(OP2);
-	CPB(cpustate, RDMEM_B(cpustate, AS_DATA, addr), imm8);
+	CPB(RDMEM_B(AS_DATA, addr), imm8);
 }
 
 /******************************************
  negb    addr
  flags:  CZSV--
  ******************************************/
-static void Z4C_0000_0010_addr(z8000_state *cpustate)
+void z8002_device::Z4C_0000_0010_addr()
 {
 	GET_ADDR(OP1);
-	WRMEM_B(cpustate, AS_DATA,  addr, NEGB(cpustate, RDMEM_B(cpustate, AS_DATA, addr)));
+	WRMEM_B(AS_DATA,  addr, NEGB(RDMEM_B(AS_DATA, addr)));
 }
 
 /******************************************
  testb   addr
  flags:  -ZSP--
  ******************************************/
-static void Z4C_0000_0100_addr(z8000_state *cpustate)
+void z8002_device::Z4C_0000_0100_addr()
 {
 	GET_ADDR(OP1);
-	TESTB(cpustate, RDMEM_B(cpustate, AS_DATA, addr));
+	TESTB(RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  ldb     addr,imm8
  flags:  ------
  ******************************************/
-static void Z4C_0000_0101_addr_imm8(z8000_state *cpustate)
+void z8002_device::Z4C_0000_0101_addr_imm8()
 {
 	GET_ADDR(OP1);
 	GET_IMM8(OP2);
-	WRMEM_B(cpustate, AS_DATA,  addr, imm8);
+	WRMEM_B(AS_DATA,  addr, imm8);
 }
 
 /******************************************
  tsetb   addr
  flags:  --S---
  ******************************************/
-static void Z4C_0000_0110_addr(z8000_state *cpustate)
+void z8002_device::Z4C_0000_0110_addr()
 {
 	GET_ADDR(OP1);
-	if (RDMEM_B(cpustate, AS_DATA, addr) & S08) SET_S; else CLR_S;
-	WRMEM_B(cpustate, AS_DATA, addr, 0xff);
+	if (RDMEM_B(AS_DATA, addr) & S08) SET_S; else CLR_S;
+	WRMEM_B(AS_DATA, addr, 0xff);
 }
 
 /******************************************
  clrb    addr
  flags:  ------
  ******************************************/
-static void Z4C_0000_1000_addr(z8000_state *cpustate)
+void z8002_device::Z4C_0000_1000_addr()
 {
 	GET_ADDR(OP1);
-	WRMEM_B(cpustate, AS_DATA,  addr, 0);
+	WRMEM_B(AS_DATA,  addr, 0);
 }
 
 /******************************************
  comb    addr(rd)
  flags:  -ZSP--
  ******************************************/
-static void Z4C_ddN0_0000_addr(z8000_state *cpustate)
+void z8002_device::Z4C_ddN0_0000_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, COMB(cpustate, RDMEM_B(cpustate, AS_DATA, addr)));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, COMB(RDMEM_B(AS_DATA, addr)));
 }
 
 /******************************************
  cpb     addr(rd),imm8
  flags:  CZSV--
  ******************************************/
-static void Z4C_ddN0_0001_addr_imm8(z8000_state *cpustate)
+void z8002_device::Z4C_ddN0_0001_addr_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
 	GET_IMM8(OP2);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	CPB(cpustate, RDMEM_B(cpustate, AS_DATA, addr), imm8);
+	addr = addr_add(addr, RW(dst));
+	CPB(RDMEM_B(AS_DATA, addr), imm8);
 }
 
 /******************************************
  negb    addr(rd)
  flags:  CZSV--
  ******************************************/
-static void Z4C_ddN0_0010_addr(z8000_state *cpustate)
+void z8002_device::Z4C_ddN0_0010_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, NEGB(cpustate, RDMEM_B(cpustate, AS_DATA, addr)));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, NEGB(RDMEM_B(AS_DATA, addr)));
 }
 
 /******************************************
  testb   addr(rd)
  flags:  -ZSP--
  ******************************************/
-static void Z4C_ddN0_0100_addr(z8000_state *cpustate)
+void z8002_device::Z4C_ddN0_0100_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	TESTB(cpustate, RDMEM_B(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(dst));
+	TESTB(RDMEM_B(AS_DATA, addr));
 }
 
 /******************************************
  ldb     addr(rd),imm8
  flags:  ------
  ******************************************/
-static void Z4C_ddN0_0101_addr_imm8(z8000_state *cpustate)
+void z8002_device::Z4C_ddN0_0101_addr_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
 	GET_IMM8(OP2);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, imm8);
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, imm8);
 }
 
 /******************************************
  tsetb   addr(rd)
  flags:  --S---
  ******************************************/
-static void Z4C_ddN0_0110_addr(z8000_state *cpustate)
+void z8002_device::Z4C_ddN0_0110_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	if (RDMEM_B(cpustate, AS_DATA, addr) & S08) SET_S; else CLR_S;
-	WRMEM_B(cpustate, AS_DATA, addr, 0xff);
+	addr = addr_add(addr, RW(dst));
+	if (RDMEM_B(AS_DATA, addr) & S08) SET_S; else CLR_S;
+	WRMEM_B(AS_DATA, addr, 0xff);
 }
 
 /******************************************
  clrb    addr(rd)
  flags:  ------
  ******************************************/
-static void Z4C_ddN0_1000_addr(z8000_state *cpustate)
+void z8002_device::Z4C_ddN0_1000_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, 0);
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, 0);
 }
 
 /******************************************
  com     addr
  flags:  -ZS---
  ******************************************/
-static void Z4D_0000_0000_addr(z8000_state *cpustate)
+void z8002_device::Z4D_0000_0000_addr()
 {
 	GET_ADDR(OP1);
-	WRMEM_W(cpustate, AS_DATA,  addr, COMW(cpustate, RDMEM_W(cpustate, AS_DATA, addr)));
+	WRMEM_W(AS_DATA,  addr, COMW(RDMEM_W(AS_DATA, addr)));
 }
 
 /******************************************
  cp      addr,imm16
  flags:  CZSV--
  ******************************************/
-static void Z4D_0000_0001_addr_imm16(z8000_state *cpustate)
+void z8002_device::Z4D_0000_0001_addr_imm16()
 {
 	GET_ADDR(OP1);
 	GET_IMM16(OP2);
-	CPW(cpustate, RDMEM_W(cpustate, AS_DATA, addr), imm16);
+	CPW(RDMEM_W(AS_DATA, addr), imm16);
 }
 
 /******************************************
  neg     addr
  flags:  CZSV--
  ******************************************/
-static void Z4D_0000_0010_addr(z8000_state *cpustate)
+void z8002_device::Z4D_0000_0010_addr()
 {
 	GET_ADDR(OP1);
-	WRMEM_W(cpustate, AS_DATA,  addr, NEGW(cpustate, RDMEM_W(cpustate, AS_DATA, addr)));
+	WRMEM_W(AS_DATA,  addr, NEGW(RDMEM_W(AS_DATA, addr)));
 }
 
 /******************************************
  test    addr
  flags:  ------
  ******************************************/
-static void Z4D_0000_0100_addr(z8000_state *cpustate)
+void z8002_device::Z4D_0000_0100_addr()
 {
 	GET_ADDR(OP1);
-	TESTW(cpustate, RDMEM_W(cpustate, AS_DATA, addr));
+	TESTW(RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  ld      addr,imm16
  flags:  ------
  ******************************************/
-static void Z4D_0000_0101_addr_imm16(z8000_state *cpustate)
+void z8002_device::Z4D_0000_0101_addr_imm16()
 {
 	GET_ADDR(OP1);
 	GET_IMM16(OP2);
-	WRMEM_W(cpustate, AS_DATA,  addr, imm16);
+	WRMEM_W(AS_DATA,  addr, imm16);
 }
 
 /******************************************
  tset    addr
  flags:  --S---
  ******************************************/
-static void Z4D_0000_0110_addr(z8000_state *cpustate)
+void z8002_device::Z4D_0000_0110_addr()
 {
 	GET_ADDR(OP1);
-	if (RDMEM_W(cpustate, AS_DATA, addr) & S16) SET_S; else CLR_S;
-	WRMEM_W(cpustate, AS_DATA, addr, 0xffff);
+	if (RDMEM_W(AS_DATA, addr) & S16) SET_S; else CLR_S;
+	WRMEM_W(AS_DATA, addr, 0xffff);
 }
 
 /******************************************
  clr     addr
  flags:  ------
  ******************************************/
-static void Z4D_0000_1000_addr(z8000_state *cpustate)
+void z8002_device::Z4D_0000_1000_addr()
 {
 	GET_ADDR(OP1);
-	WRMEM_W(cpustate, AS_DATA,  addr, 0);
+	WRMEM_W(AS_DATA,  addr, 0);
 }
 
 /******************************************
  com     addr(rd)
  flags:  -ZS---
  ******************************************/
-static void Z4D_ddN0_0000_addr(z8000_state *cpustate)
+void z8002_device::Z4D_ddN0_0000_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, COMW(cpustate, RDMEM_W(cpustate, AS_DATA, addr)));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, COMW(RDMEM_W(AS_DATA, addr)));
 }
 
 /******************************************
  cp      addr(rd),imm16
  flags:  CZSV--
  ******************************************/
-static void Z4D_ddN0_0001_addr_imm16(z8000_state *cpustate)
+void z8002_device::Z4D_ddN0_0001_addr_imm16()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
 	GET_IMM16(OP2);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	CPW(cpustate, RDMEM_W(cpustate, AS_DATA, addr), imm16);
+	addr = addr_add(addr, RW(dst));
+	CPW(RDMEM_W(AS_DATA, addr), imm16);
 }
 
 /******************************************
  neg     addr(rd)
  flags:  CZSV--
  ******************************************/
-static void Z4D_ddN0_0010_addr(z8000_state *cpustate)
+void z8002_device::Z4D_ddN0_0010_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, NEGW(cpustate, RDMEM_W(cpustate, AS_DATA, addr)));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, NEGW(RDMEM_W(AS_DATA, addr)));
 }
 
 /******************************************
  test    addr(rd)
  flags:  ------
  ******************************************/
-static void Z4D_ddN0_0100_addr(z8000_state *cpustate)
+void z8002_device::Z4D_ddN0_0100_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	TESTW(cpustate, RDMEM_W(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(dst));
+	TESTW(RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  ld      addr(rd),imm16
  flags:  ------
  ******************************************/
-static void Z4D_ddN0_0101_addr_imm16(z8000_state *cpustate)
+void z8002_device::Z4D_ddN0_0101_addr_imm16()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
 	GET_IMM16(OP2);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, imm16);
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, imm16);
 }
 
 /******************************************
  tset    addr(rd)
  flags:  --S---
  ******************************************/
-static void Z4D_ddN0_0110_addr(z8000_state *cpustate)
+void z8002_device::Z4D_ddN0_0110_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	if (RDMEM_W(cpustate, AS_DATA, addr) & S16) SET_S; else CLR_S;
-	WRMEM_W(cpustate, AS_DATA, addr, 0xffff);
+	addr = addr_add(addr, RW(dst));
+	if (RDMEM_W(AS_DATA, addr) & S16) SET_S; else CLR_S;
+	WRMEM_W(AS_DATA, addr, 0xffff);
 }
 
 /******************************************
  clr     addr(rd)
  flags:  ------
  ******************************************/
-static void Z4D_ddN0_1000_addr(z8000_state *cpustate)
+void z8002_device::Z4D_ddN0_1000_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, 0);
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, 0);
 }
 
 /******************************************
  ldb     addr(rd),rbs
  flags:  ------
  ******************************************/
-static void Z4E_ddN0_ssN0_addr(z8000_state *cpustate)
+void z8002_device::Z4E_ddN0_ssN0_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, cpustate->RB(src));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, RB(src));
 }
 
 /******************************************
  cpl     rrd,addr
  flags:  CZSV--
  ******************************************/
-static void Z50_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z50_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	CPL(cpustate, cpustate->RL(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	CPL(RL(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  cpl     rrd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z50_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z50_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	CPL(cpustate, cpustate->RL(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	CPL(RL(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  pushl   @rd,addr
  flags:  ------
  ******************************************/
-static void Z51_ddN0_0000_addr(z8000_state *cpustate)
+void z8002_device::Z51_ddN0_0000_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	PUSHL(cpustate, dst, RDMEM_L(cpustate, AS_DATA, addr));
+	PUSHL(dst, RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  pushl   @rd,addr(rs)
  flags:  ------
  ******************************************/
-static void Z51_ddN0_ssN0_addr(z8000_state *cpustate)
+void z8002_device::Z51_ddN0_ssN0_addr()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	PUSHL(cpustate, dst, RDMEM_L(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	PUSHL(dst, RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  subl    rrd,addr
  flags:  CZSV--
  ******************************************/
-static void Z52_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z52_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RL(dst) = SUBL(cpustate, cpustate->RL(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	RL(dst) = SUBL(RL(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  subl    rrd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z52_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z52_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RL(dst) = SUBL(cpustate, cpustate->RL(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RL(dst) = SUBL(RL(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  push    @rd,addr
  flags:  ------
  ******************************************/
-static void Z53_ddN0_0000_addr(z8000_state *cpustate)
+void z8002_device::Z53_ddN0_0000_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	PUSHW(cpustate, dst, RDMEM_W(cpustate, AS_DATA, addr));
+	PUSHW(dst, RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  push    @rd,addr(rs)
  flags:  ------
  ******************************************/
-static void Z53_ddN0_ssN0_addr(z8000_state *cpustate)
+void z8002_device::Z53_ddN0_ssN0_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP0,NIB3);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	PUSHW(cpustate, dst, RDMEM_W(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	PUSHW(dst, RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  ldl     rrd,addr
  flags:  ------
  ******************************************/
-static void Z54_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z54_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RL(dst) = RDMEM_L(cpustate, AS_DATA, addr);
+	RL(dst) = RDMEM_L(AS_DATA, addr);
 }
 
 /******************************************
  ldl     rrd,addr(rs)
  flags:  ------
  ******************************************/
-static void Z54_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z54_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RL(dst) = RDMEM_L(cpustate, AS_DATA, addr);
+	addr = addr_add(addr, RW(src));
+	RL(dst) = RDMEM_L(AS_DATA, addr);
 }
 
 /******************************************
  popl    addr,@rs
  flags:  ------
  ******************************************/
-static void Z55_ssN0_0000_addr(z8000_state *cpustate)
+void z8002_device::Z55_ssN0_0000_addr()
 {
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	WRMEM_L(cpustate, AS_DATA,  addr, POPL(cpustate, src));
+	WRMEM_L(AS_DATA,  addr, POPL(src));
 }
 
 /******************************************
  popl    addr(rd),@rs
  flags:  ------
  ******************************************/
-static void Z55_ssN0_ddN0_addr(z8000_state *cpustate)
+void z8002_device::Z55_ssN0_ddN0_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_L(cpustate, AS_DATA,  addr, POPL(cpustate, src));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_L(AS_DATA,  addr, POPL(src));
 }
 
 /******************************************
  addl    rrd,addr
  flags:  CZSV--
  ******************************************/
-static void Z56_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z56_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RL(dst) = ADDL(cpustate, cpustate->RL(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	RL(dst) = ADDL(RL(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  addl    rrd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z56_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z56_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RL(dst) = ADDL(cpustate, cpustate->RL(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RL(dst) = ADDL(RL(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  pop     addr,@rs
  flags:  ------
  ******************************************/
-static void Z57_ssN0_0000_addr(z8000_state *cpustate)
+void z8002_device::Z57_ssN0_0000_addr()
 {
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	WRMEM_W(cpustate, AS_DATA,  addr, POPW(cpustate, src));
+	WRMEM_W(AS_DATA,  addr, POPW(src));
 }
 
 /******************************************
  pop     addr(rd),@rs
  flags:  ------
  ******************************************/
-static void Z57_ssN0_ddN0_addr(z8000_state *cpustate)
+void z8002_device::Z57_ssN0_ddN0_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, POPW(cpustate, src));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, POPW(src));
 }
 
 /******************************************
  multl   rqd,addr
  flags:  CZSV--
  ******************************************/
-static void Z58_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z58_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RQ(dst) = MULTL(cpustate, cpustate->RQ(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	RQ(dst) = MULTL(RQ(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  multl   rqd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z58_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z58_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RQ(dst) = MULTL(cpustate, cpustate->RQ(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RQ(dst) = MULTL(RQ(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  mult    rrd,addr
  flags:  CZSV--
  ******************************************/
-static void Z59_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z59_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RL(dst) = MULTW(cpustate, cpustate->RL(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	RL(dst) = MULTW(RL(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  mult    rrd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z59_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z59_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RL(dst) = MULTW(cpustate, cpustate->RL(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RL(dst) = MULTW(RL(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  divl    rqd,addr
  flags:  CZSV--
  ******************************************/
-static void Z5A_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z5A_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RQ(dst) = DIVL(cpustate, cpustate->RQ(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	RQ(dst) = DIVL(RQ(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  divl    rqd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z5A_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z5A_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RQ(dst) = DIVL(cpustate, cpustate->RQ(dst), RDMEM_L(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RQ(dst) = DIVL(RQ(dst), RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  div     rrd,addr
  flags:  CZSV--
  ******************************************/
-static void Z5B_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z5B_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RL(dst) = DIVW(cpustate, cpustate->RL(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	RL(dst) = DIVW(RL(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  div     rrd,addr(rs)
  flags:  CZSV--
  ******************************************/
-static void Z5B_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z5B_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RL(dst) = DIVW(cpustate, cpustate->RL(dst), RDMEM_W(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(src));
+	RL(dst) = DIVW(RL(dst), RDMEM_W(AS_DATA, addr));
 }
 
 /******************************************
  ldm     rd,addr,n
  flags:  ------
  ******************************************/
-static void Z5C_0000_0001_0000_dddd_0000_nmin1_addr(z8000_state *cpustate)
+void z8002_device::Z5C_0000_0001_0000_dddd_0000_nmin1_addr()
 {
 	GET_DST(OP1,NIB1);
 	GET_CNT(OP1,NIB3);
 	GET_ADDR(OP2);
 	while (cnt-- >= 0) {
-		cpustate->RW(dst) = RDMEM_W(cpustate, AS_DATA, addr);
+		RW(dst) = RDMEM_W(AS_DATA, addr);
 		dst = (dst+1) & 15;
-		addr = addr_add (cpustate, addr, 2);
+		addr = addr_add (addr, 2);
 	}
 }
 
@@ -3822,25 +3850,25 @@ static void Z5C_0000_0001_0000_dddd_0000_nmin1_addr(z8000_state *cpustate)
  testl   addr
  flags:  -ZS---
  ******************************************/
-static void Z5C_0000_1000_addr(z8000_state *cpustate)
+void z8002_device::Z5C_0000_1000_addr()
 {
 	GET_ADDR(OP1);
-	TESTL(cpustate, RDMEM_L(cpustate, AS_DATA, addr));
+	TESTL(RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  ldm     addr,rs,n
  flags:  ------
  ******************************************/
-static void Z5C_0000_1001_0000_ssss_0000_nmin1_addr(z8000_state *cpustate)
+void z8002_device::Z5C_0000_1001_0000_ssss_0000_nmin1_addr()
 {
 	GET_SRC(OP1,NIB1);
 	GET_CNT(OP1,NIB3);
 	GET_ADDR(OP2);
 	while (cnt-- >= 0) {
-		WRMEM_W(cpustate, AS_DATA,  addr, cpustate->RW(src));
+		WRMEM_W(AS_DATA,  addr, RW(src));
 		src = (src+1) & 15;
-		addr = addr_add (cpustate, addr, 2);
+		addr = addr_add (addr, 2);
 	}
 }
 
@@ -3848,29 +3876,29 @@ static void Z5C_0000_1001_0000_ssss_0000_nmin1_addr(z8000_state *cpustate)
  testl   addr(rd)
  flags:  -ZS---
  ******************************************/
-static void Z5C_ddN0_1000_addr(z8000_state *cpustate)
+void z8002_device::Z5C_ddN0_1000_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	TESTL(cpustate, RDMEM_L(cpustate, AS_DATA, addr));
+	addr = addr_add(addr, RW(dst));
+	TESTL(RDMEM_L(AS_DATA, addr));
 }
 
 /******************************************
  ldm     addr(rd),rs,n
  flags:  ------
  ******************************************/
-static void Z5C_ddN0_1001_0000_ssN0_0000_nmin1_addr(z8000_state *cpustate)
+void z8002_device::Z5C_ddN0_1001_0000_ssN0_0000_nmin1_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB1);
 	GET_CNT(OP1,NIB3);
 	GET_ADDR(OP2);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
+	addr = addr_add(addr, RW(dst));
 	while (cnt-- >= 0) {
-		WRMEM_W(cpustate, AS_DATA,  addr, cpustate->RW(src));
+		WRMEM_W(AS_DATA,  addr, RW(src));
 		src = (src+1) & 15;
-		addr = addr_add(cpustate, addr, 2);
+		addr = addr_add(addr, 2);
 	}
 }
 
@@ -3878,17 +3906,17 @@ static void Z5C_ddN0_1001_0000_ssN0_0000_nmin1_addr(z8000_state *cpustate)
  ldm     rd,addr(rs),n
  flags:  ------
  ******************************************/
-static void Z5C_ssN0_0001_0000_dddd_0000_nmin1_addr(z8000_state *cpustate)
+void z8002_device::Z5C_ssN0_0001_0000_dddd_0000_nmin1_addr()
 {
 	GET_SRC(OP0,NIB2);
 	GET_DST(OP1,NIB1);
 	GET_CNT(OP1,NIB3);
 	GET_ADDR(OP2);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
+	addr = addr_add(addr, RW(src));
 	while (cnt-- >= 0) {
-		cpustate->RW(dst) = RDMEM_W(cpustate, AS_DATA, addr);
+		RW(dst) = RDMEM_W(AS_DATA, addr);
 		dst = (dst+1) & 15;
-		addr = addr_add(cpustate, addr, 2);
+		addr = addr_add(addr, 2);
 	}
 }
 
@@ -3896,51 +3924,51 @@ static void Z5C_ssN0_0001_0000_dddd_0000_nmin1_addr(z8000_state *cpustate)
  ldl     addr,rrs
  flags:  ------
  ******************************************/
-static void Z5D_0000_ssss_addr(z8000_state *cpustate)
+void z8002_device::Z5D_0000_ssss_addr()
 {
 	GET_SRC(OP0,NIB3);
 	GET_ADDR(OP1);
-	WRMEM_L(cpustate, AS_DATA,  addr, cpustate->RL(src));
+	WRMEM_L(AS_DATA,  addr, RL(src));
 }
 
 /******************************************
  ldl     addr(rd),rrs
  flags:  ------
  ******************************************/
-static void Z5D_ddN0_ssss_addr(z8000_state *cpustate)
+void z8002_device::Z5D_ddN0_ssss_addr()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_L(cpustate, AS_DATA,  addr, cpustate->RL(src));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_L(AS_DATA,  addr, RL(src));
 }
 
 /******************************************
  jp      cc,addr
  flags:  ------
  ******************************************/
-static void Z5E_0000_cccc_addr(z8000_state *cpustate)
+void z8002_device::Z5E_0000_cccc_addr()
 {
 	GET_CCC(OP0,NIB3);
 	GET_ADDR(OP1);
 	switch (cc) {
-		case  0: if (CC0) set_pc(cpustate, addr); break;
-		case  1: if (CC1) set_pc(cpustate, addr); break;
-		case  2: if (CC2) set_pc(cpustate, addr); break;
-		case  3: if (CC3) set_pc(cpustate, addr); break;
-		case  4: if (CC4) set_pc(cpustate, addr); break;
-		case  5: if (CC5) set_pc(cpustate, addr); break;
-		case  6: if (CC6) set_pc(cpustate, addr); break;
-		case  7: if (CC7) set_pc(cpustate, addr); break;
-		case  8: if (CC8) set_pc(cpustate, addr); break;
-		case  9: if (CC9) set_pc(cpustate, addr); break;
-		case 10: if (CCA) set_pc(cpustate, addr); break;
-		case 11: if (CCB) set_pc(cpustate, addr); break;
-		case 12: if (CCC) set_pc(cpustate, addr); break;
-		case 13: if (CCD) set_pc(cpustate, addr); break;
-		case 14: if (CCE) set_pc(cpustate, addr); break;
-		case 15: if (CCF) set_pc(cpustate, addr); break;
+		case  0: if (CC0) set_pc(addr); break;
+		case  1: if (CC1) set_pc(addr); break;
+		case  2: if (CC2) set_pc(addr); break;
+		case  3: if (CC3) set_pc(addr); break;
+		case  4: if (CC4) set_pc(addr); break;
+		case  5: if (CC5) set_pc(addr); break;
+		case  6: if (CC6) set_pc(addr); break;
+		case  7: if (CC7) set_pc(addr); break;
+		case  8: if (CC8) set_pc(addr); break;
+		case  9: if (CC9) set_pc(addr); break;
+		case 10: if (CCA) set_pc(addr); break;
+		case 11: if (CCB) set_pc(addr); break;
+		case 12: if (CCC) set_pc(addr); break;
+		case 13: if (CCD) set_pc(addr); break;
+		case 14: if (CCE) set_pc(addr); break;
+		case 15: if (CCF) set_pc(addr); break;
 	}
 }
 
@@ -3948,29 +3976,29 @@ static void Z5E_0000_cccc_addr(z8000_state *cpustate)
  jp      cc,addr(rd)
  flags:  ------
  ******************************************/
-static void Z5E_ddN0_cccc_addr(z8000_state *cpustate)
+void z8002_device::Z5E_ddN0_cccc_addr()
 {
 	GET_CCC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
+	addr = addr_add(addr, RW(dst));
 	switch (cc) {
-		case  0: if (CC0) set_pc(cpustate, addr); break;
-		case  1: if (CC1) set_pc(cpustate, addr); break;
-		case  2: if (CC2) set_pc(cpustate, addr); break;
-		case  3: if (CC3) set_pc(cpustate, addr); break;
-		case  4: if (CC4) set_pc(cpustate, addr); break;
-		case  5: if (CC5) set_pc(cpustate, addr); break;
-		case  6: if (CC6) set_pc(cpustate, addr); break;
-		case  7: if (CC7) set_pc(cpustate, addr); break;
-		case  8: if (CC8) set_pc(cpustate, addr); break;
-		case  9: if (CC9) set_pc(cpustate, addr); break;
-		case 10: if (CCA) set_pc(cpustate, addr); break;
-		case 11: if (CCB) set_pc(cpustate, addr); break;
-		case 12: if (CCC) set_pc(cpustate, addr); break;
-		case 13: if (CCD) set_pc(cpustate, addr); break;
-		case 14: if (CCE) set_pc(cpustate, addr); break;
-		case 15: if (CCF) set_pc(cpustate, addr); break;
+		case  0: if (CC0) set_pc(addr); break;
+		case  1: if (CC1) set_pc(addr); break;
+		case  2: if (CC2) set_pc(addr); break;
+		case  3: if (CC3) set_pc(addr); break;
+		case  4: if (CC4) set_pc(addr); break;
+		case  5: if (CC5) set_pc(addr); break;
+		case  6: if (CC6) set_pc(addr); break;
+		case  7: if (CC7) set_pc(addr); break;
+		case  8: if (CC8) set_pc(addr); break;
+		case  9: if (CC9) set_pc(addr); break;
+		case 10: if (CCA) set_pc(addr); break;
+		case 11: if (CCB) set_pc(addr); break;
+		case 12: if (CCC) set_pc(addr); break;
+		case 13: if (CCD) set_pc(addr); break;
+		case 14: if (CCE) set_pc(addr); break;
+		case 15: if (CCF) set_pc(addr); break;
 	}
 }
 
@@ -3978,517 +4006,517 @@ static void Z5E_ddN0_cccc_addr(z8000_state *cpustate)
  call    addr
  flags:  ------
  ******************************************/
-static void Z5F_0000_0000_addr(z8000_state *cpustate)
+void z8002_device::Z5F_0000_0000_addr()
 {
 	GET_ADDR(OP1);
-	if (segmented_mode(cpustate))
-		PUSHL(cpustate, SP, make_segmented_addr(cpustate->pc));
+	if (segmented_mode())
+		PUSHL(SP, make_segmented_addr(m_pc));
 	else
-		PUSHW(cpustate, SP, cpustate->pc);
-	set_pc(cpustate, addr);
+		PUSHW(SP, m_pc);
+	set_pc(addr);
 }
 
 /******************************************
  call    addr(rd)
  flags:  ------
  ******************************************/
-static void Z5F_ddN0_0000_addr(z8000_state *cpustate)
+void z8002_device::Z5F_ddN0_0000_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	if (segmented_mode(cpustate))
-		PUSHL(cpustate, SP, make_segmented_addr(cpustate->pc));
+	if (segmented_mode())
+		PUSHL(SP, make_segmented_addr(m_pc));
 	else
-		PUSHW(cpustate, SP, cpustate->pc);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	set_pc(cpustate, addr);
+		PUSHW(SP, m_pc);
+	addr = addr_add(addr, RW(dst));
+	set_pc(addr);
 }
 
 /******************************************
  ldb     rbd,addr
  flags:  ------
  ******************************************/
-static void Z60_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z60_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RB(dst) = RDMEM_B(cpustate, AS_DATA, addr);
+	RB(dst) = RDMEM_B(AS_DATA, addr);
 }
 
 /******************************************
  ldb     rbd,addr(rs)
  flags:  ------
  ******************************************/
-static void Z60_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z60_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RB(dst) = RDMEM_B(cpustate, AS_DATA, addr);
+	addr = addr_add(addr, RW(src));
+	RB(dst) = RDMEM_B(AS_DATA, addr);
 }
 
 /******************************************
  ld      rd,addr
  flags:  ------
  ******************************************/
-static void Z61_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z61_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	cpustate->RW(dst) = RDMEM_W(cpustate, AS_DATA, addr);
+	RW(dst) = RDMEM_W(AS_DATA, addr);
 }
 
 /******************************************
  ld      rd,addr(rs)
  flags:  ------
  ******************************************/
-static void Z61_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z61_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	cpustate->RW(dst) = RDMEM_W(cpustate, AS_DATA, addr);
+	addr = addr_add(addr, RW(src));
+	RW(dst) = RDMEM_W(AS_DATA, addr);
 }
 
 /******************************************
  resb    addr,imm4
  flags:  ------
  ******************************************/
-static void Z62_0000_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z62_0000_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_ADDR(OP1);
-	WRMEM_B(cpustate, AS_DATA,  addr, RDMEM_B(cpustate, AS_DATA, addr) & ~bit);
+	WRMEM_B(AS_DATA,  addr, RDMEM_B(AS_DATA, addr) & ~bit);
 }
 
 /******************************************
  resb    addr(rd),imm4
  flags:  ------
  ******************************************/
-static void Z62_ddN0_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z62_ddN0_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, RDMEM_B(cpustate, AS_DATA, addr) & ~bit);
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, RDMEM_B(AS_DATA, addr) & ~bit);
 }
 
 /******************************************
  res     addr,imm4
  flags:  ------
  ******************************************/
-static void Z63_0000_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z63_0000_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_ADDR(OP1);
-	WRMEM_W(cpustate, AS_DATA,  addr, RDMEM_W(cpustate, AS_DATA, addr) & ~bit);
+	WRMEM_W(AS_DATA,  addr, RDMEM_W(AS_DATA, addr) & ~bit);
 }
 
 /******************************************
  res     addr(rd),imm4
  flags:  ------
  ******************************************/
-static void Z63_ddN0_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z63_ddN0_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, RDMEM_W(cpustate, AS_DATA, addr) & ~bit);
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, RDMEM_W(AS_DATA, addr) & ~bit);
 }
 
 /******************************************
  setb    addr,imm4
  flags:  ------
  ******************************************/
-static void Z64_0000_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z64_0000_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_ADDR(OP1);
-	WRMEM_B(cpustate, AS_DATA,  addr, RDMEM_B(cpustate, AS_DATA, addr) | bit);
+	WRMEM_B(AS_DATA,  addr, RDMEM_B(AS_DATA, addr) | bit);
 }
 
 /******************************************
  setb    addr(rd),imm4
  flags:  ------
  ******************************************/
-static void Z64_ddN0_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z64_ddN0_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, RDMEM_B(cpustate, AS_DATA, addr) | bit);
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, RDMEM_B(AS_DATA, addr) | bit);
 }
 
 /******************************************
  set     addr,imm4
  flags:  ------
  ******************************************/
-static void Z65_0000_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z65_0000_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_ADDR(OP1);
-	WRMEM_W(cpustate, AS_DATA,  addr, RDMEM_W(cpustate, AS_DATA, addr) | bit);
+	WRMEM_W(AS_DATA,  addr, RDMEM_W(AS_DATA, addr) | bit);
 }
 
 /******************************************
  set     addr(rd),imm4
  flags:  ------
  ******************************************/
-static void Z65_ddN0_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z65_ddN0_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, RDMEM_W(cpustate, AS_DATA, addr) | bit);
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, RDMEM_W(AS_DATA, addr) | bit);
 }
 
 /******************************************
  bitb    addr,imm4
  flags:  -Z----
  ******************************************/
-static void Z66_0000_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z66_0000_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_ADDR(OP1);
-	if (RDMEM_B(cpustate, AS_DATA, addr) & bit) CLR_Z; else SET_Z;
+	if (RDMEM_B(AS_DATA, addr) & bit) CLR_Z; else SET_Z;
 }
 
 /******************************************
  bitb    addr(rd),imm4
  flags:  -Z----
  ******************************************/
-static void Z66_ddN0_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z66_ddN0_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	if (RDMEM_B(cpustate, AS_DATA, addr) & bit) CLR_Z; else SET_Z;
+	addr = addr_add(addr, RW(dst));
+	if (RDMEM_B(AS_DATA, addr) & bit) CLR_Z; else SET_Z;
 }
 
 /******************************************
  bit     addr,imm4
  flags:  -Z----
  ******************************************/
-static void Z67_0000_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z67_0000_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_ADDR(OP1);
-	if (RDMEM_W(cpustate, AS_DATA, addr) & bit) CLR_Z; else SET_Z;
+	if (RDMEM_W(AS_DATA, addr) & bit) CLR_Z; else SET_Z;
 }
 
 /******************************************
  bit     addr(rd),imm4
  flags:  -Z----
  ******************************************/
-static void Z67_ddN0_imm4_addr(z8000_state *cpustate)
+void z8002_device::Z67_ddN0_imm4_addr()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	if (RDMEM_W(cpustate, AS_DATA, addr) & bit) CLR_Z; else SET_Z;
+	addr = addr_add(addr, RW(dst));
+	if (RDMEM_W(AS_DATA, addr) & bit) CLR_Z; else SET_Z;
 }
 
 /******************************************
  incb    addr,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z68_0000_imm4m1_addr(z8000_state *cpustate)
+void z8002_device::Z68_0000_imm4m1_addr()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_ADDR(OP1);
-	WRMEM_B(cpustate, AS_DATA,  addr, INCB(cpustate, RDMEM_B(cpustate, AS_DATA, addr), i4p1));
+	WRMEM_B(AS_DATA,  addr, INCB(RDMEM_B(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  incb    addr(rd),imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z68_ddN0_imm4m1_addr(z8000_state *cpustate)
+void z8002_device::Z68_ddN0_imm4m1_addr()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, INCB(cpustate, RDMEM_B(cpustate, AS_DATA, addr), i4p1));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, INCB(RDMEM_B(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  inc     addr,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z69_0000_imm4m1_addr(z8000_state *cpustate)
+void z8002_device::Z69_0000_imm4m1_addr()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_ADDR(OP1);
-	WRMEM_W(cpustate, AS_DATA,  addr, INCW(cpustate, RDMEM_W(cpustate, AS_DATA, addr), i4p1));
+	WRMEM_W(AS_DATA,  addr, INCW(RDMEM_W(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  inc     addr(rd),imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z69_ddN0_imm4m1_addr(z8000_state *cpustate)
+void z8002_device::Z69_ddN0_imm4m1_addr()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, INCW(cpustate, RDMEM_W(cpustate, AS_DATA, addr), i4p1));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, INCW(RDMEM_W(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  decb    addr,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z6A_0000_imm4m1_addr(z8000_state *cpustate)
+void z8002_device::Z6A_0000_imm4m1_addr()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_ADDR(OP1);
-	WRMEM_B(cpustate, AS_DATA,  addr, DECB(cpustate, RDMEM_B(cpustate, AS_DATA, addr), i4p1));
+	WRMEM_B(AS_DATA,  addr, DECB(RDMEM_B(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  decb    addr(rd),imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z6A_ddN0_imm4m1_addr(z8000_state *cpustate)
+void z8002_device::Z6A_ddN0_imm4m1_addr()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, DECB(cpustate, RDMEM_B(cpustate, AS_DATA, addr), i4p1));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, DECB(RDMEM_B(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  dec     addr,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z6B_0000_imm4m1_addr(z8000_state *cpustate)
+void z8002_device::Z6B_0000_imm4m1_addr()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_ADDR(OP1);
-	WRMEM_W(cpustate, AS_DATA,  addr, DECW(cpustate, RDMEM_W(cpustate, AS_DATA, addr), i4p1));
+	WRMEM_W(AS_DATA,  addr, DECW(RDMEM_W(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  dec     addr(rd),imm4m1
  flags:  -ZSV--
  ******************************************/
-static void Z6B_ddN0_imm4m1_addr(z8000_state *cpustate)
+void z8002_device::Z6B_ddN0_imm4m1_addr()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, DECW(cpustate, RDMEM_W(cpustate, AS_DATA, addr), i4p1));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, DECW(RDMEM_W(AS_DATA, addr), i4p1));
 }
 
 /******************************************
  exb     rbd,addr
  flags:  ------
  ******************************************/
-static void Z6C_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z6C_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	UINT8 tmp = RDMEM_B(cpustate, AS_DATA, addr);
-	WRMEM_B(cpustate, AS_DATA, addr, cpustate->RB(dst));
-	cpustate->RB(dst) = tmp;
+	UINT8 tmp = RDMEM_B(AS_DATA, addr);
+	WRMEM_B(AS_DATA, addr, RB(dst));
+	RB(dst) = tmp;
 }
 
 /******************************************
  exb     rbd,addr(rs)
  flags:  ------
  ******************************************/
-static void Z6C_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z6C_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
 	UINT8 tmp;
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	tmp = RDMEM_B(cpustate, AS_DATA, addr);
-	WRMEM_B(cpustate, AS_DATA, addr, cpustate->RB(dst));
-	cpustate->RB(dst) = tmp;
+	addr = addr_add(addr, RW(src));
+	tmp = RDMEM_B(AS_DATA, addr);
+	WRMEM_B(AS_DATA, addr, RB(dst));
+	RB(dst) = tmp;
 }
 
 /******************************************
  ex      rd,addr
  flags:  ------
  ******************************************/
-static void Z6D_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z6D_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR(OP1);
-	UINT16 tmp = RDMEM_W(cpustate, AS_DATA, addr);
-	WRMEM_W(cpustate, AS_DATA,  addr, cpustate->RW(dst));
-	cpustate->RW(dst) = tmp;
+	UINT16 tmp = RDMEM_W(AS_DATA, addr);
+	WRMEM_W(AS_DATA,  addr, RW(dst));
+	RW(dst) = tmp;
 }
 
 /******************************************
  ex      rd,addr(rs)
  flags:  ------
  ******************************************/
-static void Z6D_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z6D_ssN0_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
 	UINT16 tmp;
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	tmp = RDMEM_W(cpustate, AS_DATA, addr);
-	WRMEM_W(cpustate, AS_DATA,  addr, cpustate->RW(dst));
-	cpustate->RW(dst) = tmp;
+	addr = addr_add(addr, RW(src));
+	tmp = RDMEM_W(AS_DATA, addr);
+	WRMEM_W(AS_DATA,  addr, RW(dst));
+	RW(dst) = tmp;
 }
 
 /******************************************
  ldb     addr,rbs
  flags:  ------
  ******************************************/
-static void Z6E_0000_ssss_addr(z8000_state *cpustate)
+void z8002_device::Z6E_0000_ssss_addr()
 {
 	GET_SRC(OP0,NIB3);
 	GET_ADDR(OP1);
-	WRMEM_B(cpustate, AS_DATA,  addr, cpustate->RB(src));
+	WRMEM_B(AS_DATA,  addr, RB(src));
 }
 
 /******************************************
  ldb     addr(rd),rbs
  flags:  ------
  ******************************************/
-static void Z6E_ddN0_ssss_addr(z8000_state *cpustate)
+void z8002_device::Z6E_ddN0_ssss_addr()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_B(cpustate, AS_DATA,  addr, cpustate->RB(src));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_B(AS_DATA,  addr, RB(src));
 }
 
 /******************************************
  ld      addr,rs
  flags:  ------
  ******************************************/
-static void Z6F_0000_ssss_addr(z8000_state *cpustate)
+void z8002_device::Z6F_0000_ssss_addr()
 {
 	GET_SRC(OP0,NIB3);
 	GET_ADDR(OP1);
-	WRMEM_W(cpustate, AS_DATA,  addr, cpustate->RW(src));
+	WRMEM_W(AS_DATA,  addr, RW(src));
 }
 
 /******************************************
  ld      addr(rd),rs
  flags:  ------
  ******************************************/
-static void Z6F_ddN0_ssss_addr(z8000_state *cpustate)
+void z8002_device::Z6F_ddN0_ssss_addr()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(dst));
-	WRMEM_W(cpustate, AS_DATA,  addr, cpustate->RW(src));
+	addr = addr_add(addr, RW(dst));
+	WRMEM_W(AS_DATA,  addr, RW(src));
 }
 
 /******************************************
  ldb     rbd,rs(rx)
  flags:  ------
  ******************************************/
-static void Z70_ssN0_dddd_0000_xxxx_0000_0000(z8000_state *cpustate)
+void z8002_device::Z70_ssN0_dddd_0000_xxxx_0000_0000()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
-	cpustate->RB(dst) = RDMEM_B(cpustate, AS_DATA, addr_add(cpustate, addr_from_reg(cpustate, src), cpustate->RW(idx)));
+	RB(dst) = RDMEM_B(AS_DATA, addr_add(addr_from_reg(src), RW(idx)));
 }
 
 /******************************************
  ld      rd,rs(rx)
  flags:  ------
  ******************************************/
-static void Z71_ssN0_dddd_0000_xxxx_0000_0000(z8000_state *cpustate)
+void z8002_device::Z71_ssN0_dddd_0000_xxxx_0000_0000()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
-	cpustate->RW(dst) = RDMEM_W(cpustate, AS_DATA, addr_add(cpustate, addr_from_reg(cpustate, src), cpustate->RW(idx)));
+	RW(dst) = RDMEM_W(AS_DATA, addr_add(addr_from_reg(src), RW(idx)));
 }
 
 /******************************************
  ldb     rd(rx),rbs
  flags:  ------
  ******************************************/
-static void Z72_ddN0_ssss_0000_xxxx_0000_0000(z8000_state *cpustate)
+void z8002_device::Z72_ddN0_ssss_0000_xxxx_0000_0000()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
-	WRMEM_B(cpustate, AS_DATA,  addr_add(cpustate, addr_from_reg(cpustate, dst), cpustate->RW(idx)), cpustate->RB(src));
+	WRMEM_B(AS_DATA,  addr_add(addr_from_reg(dst), RW(idx)), RB(src));
 }
 
 /******************************************
  ld      rd(rx),rs
  flags:  ------
  ******************************************/
-static void Z73_ddN0_ssss_0000_xxxx_0000_0000(z8000_state *cpustate)
+void z8002_device::Z73_ddN0_ssss_0000_xxxx_0000_0000()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
-	WRMEM_W(cpustate, AS_DATA,  addr_add(cpustate, addr_from_reg(cpustate, dst), cpustate->RW(idx)), cpustate->RW(src));
+	WRMEM_W(AS_DATA,  addr_add(addr_from_reg(dst), RW(idx)), RW(src));
 }
 
 /******************************************
  lda     prd,rs(rx)
  flags:  ------
  ******************************************/
-static void Z74_ssN0_dddd_0000_xxxx_0000_0000(z8000_state *cpustate)
+void z8002_device::Z74_ssN0_dddd_0000_xxxx_0000_0000()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
-	if (segmented_mode(cpustate)) {
-		cpustate->RL(dst) = cpustate->RL(src);
+	if (segmented_mode()) {
+		RL(dst) = RL(src);
 	}
 	else {
-		cpustate->RW(dst) = cpustate->RW(src);
+		RW(dst) = RW(src);
 	}
-	add_to_addr_reg(cpustate, dst, cpustate->RW(idx));
+	add_to_addr_reg(dst, RW(idx));
 }
 
 /******************************************
  ldl     rrd,rs(rx)
  flags:  ------
  ******************************************/
-static void Z75_ssN0_dddd_0000_xxxx_0000_0000(z8000_state *cpustate)
+void z8002_device::Z75_ssN0_dddd_0000_xxxx_0000_0000()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
-	cpustate->RL(dst) = RDMEM_L(cpustate, AS_DATA, addr_add(cpustate, addr_from_reg(cpustate, src), cpustate->RW(idx)));
+	RL(dst) = RDMEM_L(AS_DATA, addr_add(addr_from_reg(src), RW(idx)));
 }
 
 /******************************************
  lda     prd,addr
  flags:  ------
  ******************************************/
-static void Z76_0000_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z76_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR_RAW(OP1);
-	if (segmented_mode(cpustate)) {
-		cpustate->RL(dst) = addr;
+	if (segmented_mode()) {
+		RL(dst) = addr;
 	}
 	else {
-		cpustate->RW(dst) = addr;
+		RW(dst) = addr;
 	}
 }
 
@@ -4496,41 +4524,41 @@ static void Z76_0000_dddd_addr(z8000_state *cpustate)
  lda     prd,addr(rs)
  flags:  ------
  ******************************************/
-static void Z76_ssN0_dddd_addr(z8000_state *cpustate)
+void z8002_device::Z76_ssN0_dddd_addr()
 {//@@@
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_ADDR_RAW(OP1);
-	if (segmented_mode(cpustate)) {
-		cpustate->RL(dst) = addr;
+	if (segmented_mode()) {
+		RL(dst) = addr;
 	}
 	else {
-		cpustate->RW(dst) = addr;
+		RW(dst) = addr;
 	}
-	add_to_addr_reg(cpustate, dst, cpustate->RW(src));
+	add_to_addr_reg(dst, RW(src));
 }
 
 /******************************************
  ldl     rd(rx),rrs
  flags:  ------
  ******************************************/
-static void Z77_ddN0_ssss_0000_xxxx_0000_0000(z8000_state *cpustate)
+void z8002_device::Z77_ddN0_ssss_0000_xxxx_0000_0000()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
-	WRMEM_L(cpustate, AS_DATA,  addr_add(cpustate, addr_from_reg(cpustate, dst), cpustate->RW(idx)), cpustate->RL(src));
+	WRMEM_L(AS_DATA,  addr_add(addr_from_reg(dst), RW(idx)), RL(src));
 }
 
 /******************************************
  rsvd78
  flags:  ------
  ******************************************/
-static void Z78_imm8(z8000_state *cpustate)
+void z8002_device::Z78_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd78 $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: rsvd78 $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -4540,79 +4568,79 @@ static void Z78_imm8(z8000_state *cpustate)
  ldps    addr
  flags:  CZSVDH
  ******************************************/
-static void Z79_0000_0000_addr(z8000_state *cpustate)
+void z8002_device::Z79_0000_0000_addr()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_ADDR(OP1);
 	UINT16 fcw;
-	if (segmented_mode(cpustate)) {
-		fcw = RDMEM_W(cpustate, AS_DATA,  addr + 2);
-		set_pc(cpustate, segmented_addr(RDMEM_L(cpustate, AS_DATA, addr + 4)));
+	if (segmented_mode()) {
+		fcw = RDMEM_W(AS_DATA,  addr + 2);
+		set_pc(segmented_addr(RDMEM_L(AS_DATA, addr + 4)));
 	}
 	else {
-		fcw = RDMEM_W(cpustate, AS_DATA, addr);
-		set_pc(cpustate, RDMEM_W(cpustate, AS_DATA, (UINT16)(addr + 2)));
+		fcw = RDMEM_W(AS_DATA, addr);
+		set_pc(RDMEM_W(AS_DATA, (UINT16)(addr + 2)));
 	}
-	CHANGE_FCW(cpustate, fcw); /* check for user/system mode change */
+	CHANGE_FCW(fcw); /* check for user/system mode change */
 }
 
 /******************************************
  ldps    addr(rs)
  flags:  CZSVDH
  ******************************************/
-static void Z79_ssN0_0000_addr(z8000_state *cpustate)
+void z8002_device::Z79_ssN0_0000_addr()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	GET_ADDR(OP1);
 	UINT16 fcw;
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-	if (segmented_mode(cpustate)) {
-		fcw = RDMEM_W(cpustate, AS_DATA,  addr + 2);
-		set_pc(cpustate, segmented_addr(RDMEM_L(cpustate, AS_DATA, addr + 4)));
+	addr = addr_add(addr, RW(src));
+	if (segmented_mode()) {
+		fcw = RDMEM_W(AS_DATA,  addr + 2);
+		set_pc(segmented_addr(RDMEM_L(AS_DATA, addr + 4)));
 	}
 	else {
-		fcw = RDMEM_W(cpustate, AS_DATA, addr);
-		cpustate->pc    = RDMEM_W(cpustate, AS_DATA, (UINT16)(addr + 2));
+		fcw = RDMEM_W(AS_DATA, addr);
+		m_pc    = RDMEM_W(AS_DATA, (UINT16)(addr + 2));
 	}
-	if ((fcw ^ cpustate->fcw) & F_SEG) printf("ldps 3 (0x%05x): changing from %ssegmented mode to %ssegmented mode\n", cpustate->pc, (fcw & F_SEG) ? "non-" : "", (fcw & F_SEG) ? "" : "non-");
-	CHANGE_FCW(cpustate, fcw); /* check for user/system mode change */
+	if ((fcw ^ m_fcw) & F_SEG) printf("ldps 3 (0x%05x): changing from %ssegmented mode to %ssegmented mode\n", m_pc, (fcw & F_SEG) ? "non-" : "", (fcw & F_SEG) ? "" : "non-");
+	CHANGE_FCW(fcw); /* check for user/system mode change */
 }
 
 /******************************************
  halt
  flags:  ------
  ******************************************/
-static void Z7A_0000_0000(z8000_state *cpustate)
+void z8002_device::Z7A_0000_0000()
 {
 	CHECK_PRIVILEGED_INSTR();
-	cpustate->irq_req |= Z8000_HALT;
-	if (cpustate->icount > 0) cpustate->icount = 0;
+	m_irq_req |= Z8000_HALT;
+	if (m_icount > 0) m_icount = 0;
 }
 
 /******************************************
  iret
  flags:  CZSVDH
  ******************************************/
-static void Z7B_0000_0000(z8000_state *cpustate)
+void z8002_device::Z7B_0000_0000()
 {
 	UINT16 tag, fcw;
 	CHECK_PRIVILEGED_INSTR();
-	tag = POPW(cpustate, SP);   /* get type tag */
-	fcw = POPW(cpustate, SP);   /* get cpustate->fcw  */
-	if (segmented_mode(cpustate))
-		set_pc(cpustate, segmented_addr(POPL(cpustate, SP)));
+	tag = POPW(SP);   /* get type tag */
+	fcw = POPW(SP);   /* get m_fcw  */
+	if (segmented_mode())
+		set_pc(segmented_addr(POPL(SP)));
 	else
-		cpustate->pc    = POPW(cpustate, SP);   /* get cpustate->pc   */
-	CHANGE_FCW(cpustate, fcw);       /* check for user/system mode change */
-	LOG(("Z8K '%s' IRET tag $%04x, fcw $%04x, pc $%04x\n", cpustate->device->tag(), tag, fcw, cpustate->pc));
+		m_pc    = POPW(SP);   /* get m_pc   */
+	CHANGE_FCW(fcw);       /* check for user/system mode change */
+	LOG(("Z8K '%s' IRET tag $%04x, fcw $%04x, pc $%04x\n", this->tag(), tag, fcw, m_pc));
 }
 
 /******************************************
  mset
  flags:  ------
  ******************************************/
-static void Z7B_0000_1000(z8000_state *cpustate)
+void z8002_device::Z7B_0000_1000()
 {
 	CHECK_PRIVILEGED_INSTR();
 	/* set mu-0 line */
@@ -4622,7 +4650,7 @@ static void Z7B_0000_1000(z8000_state *cpustate)
  mres
  flags:  ------
  ******************************************/
-static void Z7B_0000_1001(z8000_state *cpustate)
+void z8002_device::Z7B_0000_1001()
 {
 	CHECK_PRIVILEGED_INSTR();
 	/* reset mu-0 line */
@@ -4632,7 +4660,7 @@ static void Z7B_0000_1001(z8000_state *cpustate)
  mbit
  flags:  CZS---
  ******************************************/
-static void Z7B_0000_1010(z8000_state *cpustate)
+void z8002_device::Z7B_0000_1010()
 {
 	CHECK_PRIVILEGED_INSTR();
 	/* test mu-I line */
@@ -4642,7 +4670,7 @@ static void Z7B_0000_1010(z8000_state *cpustate)
  mreq    rd
  flags:  -ZS---
  ******************************************/
-static void Z7B_dddd_1101(z8000_state *cpustate)
+void z8002_device::Z7B_dddd_1101()
 {
 	CHECK_PRIVILEGED_INSTR();
 	/* test mu-I line, invert cascade to mu-0  */
@@ -4652,58 +4680,58 @@ static void Z7B_dddd_1101(z8000_state *cpustate)
  di      i2
  flags:  ------
  ******************************************/
-static void Z7C_0000_00ii(z8000_state *cpustate)
+void z8002_device::Z7C_0000_00ii()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_IMM2(OP0,NIB3);
-	UINT16 fcw = cpustate->fcw;
+	UINT16 fcw = m_fcw;
 	fcw &= (imm2 << 11) | 0xe7ff;
-	CHANGE_FCW(cpustate, fcw);
+	CHANGE_FCW(fcw);
 }
 
 /******************************************
  ei      i2
  flags:  ------
  ******************************************/
-static void Z7C_0000_01ii(z8000_state *cpustate)
+void z8002_device::Z7C_0000_01ii()
 {
 	CHECK_PRIVILEGED_INSTR();
 	GET_IMM2(OP0,NIB3);
-	UINT16 fcw = cpustate->fcw;
+	UINT16 fcw = m_fcw;
 	fcw |= ((~imm2) << 11) & 0x1800;
-	CHANGE_FCW(cpustate, fcw);
+	CHANGE_FCW(fcw);
 }
 
 /******************************************
  ldctl   rd,ctrl
  flags:  ------
  ******************************************/
-static void Z7D_dddd_0ccc(z8000_state *cpustate)
+void z8002_device::Z7D_dddd_0ccc()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_IMM3(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	switch (imm3) {
 		case 2:
-			cpustate->RW(dst) = cpustate->fcw;
+			RW(dst) = m_fcw;
 			break;
 		case 3:
-			cpustate->RW(dst) = cpustate->refresh;
+			RW(dst) = m_refresh;
 			break;
 		case 4:
-			cpustate->RW(dst) = cpustate->psapseg;
+			RW(dst) = m_psapseg;
 			break;
 		case 5:
-			cpustate->RW(dst) = cpustate->psapoff;
+			RW(dst) = m_psapoff;
 			break;
 		case 6:
-			cpustate->RW(dst) = cpustate->nspseg;
+			RW(dst) = m_nspseg;
 			break;
 		case 7:
-			cpustate->RW(dst) = cpustate->nspoff;
+			RW(dst) = m_nspoff;
 			break;
 		default:
-			LOG(("Z8K '%s' LDCTL R%d,%d\n", cpustate->device->tag(), dst, imm3));
+			LOG(("Z8K '%s' LDCTL R%d,%d\n", tag(), dst, imm3));
 	}
 }
 
@@ -4711,7 +4739,7 @@ static void Z7D_dddd_0ccc(z8000_state *cpustate)
  ldctl   ctrl,rs
  flags:  ------
  ******************************************/
-static void Z7D_ssss_1ccc(z8000_state *cpustate)
+void z8002_device::Z7D_ssss_1ccc()
 {//@@@
 	CHECK_PRIVILEGED_INSTR();
 	GET_IMM3(OP0,NIB3);
@@ -4720,27 +4748,27 @@ static void Z7D_ssss_1ccc(z8000_state *cpustate)
 		case 2:
 			{
 				UINT16 fcw;
-				fcw = cpustate->RW(src);
-				CHANGE_FCW(cpustate, fcw); /* check for user/system mode change */
+				fcw = RW(src);
+				CHANGE_FCW(fcw); /* check for user/system mode change */
 			}
 			break;
 		case 3:
-			cpustate->refresh = cpustate->RW(src);
+			m_refresh = RW(src);
 			break;
 		case 4:
-			cpustate->psapseg = cpustate->RW(src);
+			m_psapseg = RW(src);
 			break;
 		case 5:
-			cpustate->psapoff = cpustate->RW(src);
+			m_psapoff = RW(src);
 			break;
 		case 6:
-			cpustate->nspseg = cpustate->RW(src);
+			m_nspseg = RW(src);
 			break;
 		case 7:
-			cpustate->nspoff = cpustate->RW(src);
+			m_nspoff = RW(src);
 			break;
 		default:
-			LOG(("Z8K '%s' LDCTL %d,R%d\n", cpustate->device->tag(), imm3, src));
+			LOG(("Z8K '%s' LDCTL %d,R%d\n", tag(), imm3, src));
 	}
 }
 
@@ -4748,11 +4776,11 @@ static void Z7D_ssss_1ccc(z8000_state *cpustate)
  rsvd7e
  flags:  ------
  ******************************************/
-static void Z7E_imm8(z8000_state *cpustate)
+void z8002_device::Z7E_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd7e $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: rsvd7e $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -4762,11 +4790,11 @@ static void Z7E_imm8(z8000_state *cpustate)
  sc      imm8
  flags:  CZSVDH
  ******************************************/
-static void Z7F_imm8(z8000_state *cpustate)
+void z8002_device::Z7F_imm8()
 {
 	GET_IMM8(0);
 	/* execute system call via IRQ */
-	cpustate->irq_req = Z8000_SYSCALL | imm8;
+	m_irq_req = Z8000_SYSCALL | imm8;
 
 }
 
@@ -4774,211 +4802,211 @@ static void Z7F_imm8(z8000_state *cpustate)
  addb    rbd,rbs
  flags:  CZSVDH
  ******************************************/
-static void Z80_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z80_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = ADDB(cpustate, cpustate->RB(dst), cpustate->RB(src));
+	RB(dst) = ADDB(RB(dst), RB(src));
 }
 
 /******************************************
  add     rd,rs
  flags:  CZSV--
  ******************************************/
-static void Z81_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z81_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = ADDW(cpustate, cpustate->RW(dst), cpustate->RW(src));
+	RW(dst) = ADDW(RW(dst), RW(src));
 }
 
 /******************************************
  subb    rbd,rbs
  flags:  CZSVDH
  ******************************************/
-static void Z82_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z82_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = SUBB(cpustate, cpustate->RB(dst), cpustate->RB(src));
+	RB(dst) = SUBB(RB(dst), RB(src));
 }
 
 /******************************************
  sub     rd,rs
  flags:  CZSV--
  ******************************************/
-static void Z83_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z83_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = SUBW(cpustate, cpustate->RW(dst), cpustate->RW(src));
+	RW(dst) = SUBW(RW(dst), RW(src));
 }
 
 /******************************************
  orb     rbd,rbs
  flags:  CZSP--
  ******************************************/
-static void Z84_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z84_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = ORB(cpustate, cpustate->RB(dst), cpustate->RB(src));
+	RB(dst) = ORB(RB(dst), RB(src));
 }
 
 /******************************************
  or      rd,rs
  flags:  CZS---
  ******************************************/
-static void Z85_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z85_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = ORW(cpustate, cpustate->RW(dst), cpustate->RW(src));
+	RW(dst) = ORW(RW(dst), RW(src));
 }
 
 /******************************************
  andb    rbd,rbs
  flags:  -ZSP--
  ******************************************/
-static void Z86_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z86_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = ANDB(cpustate, cpustate->RB(dst), cpustate->RB(src));
+	RB(dst) = ANDB(RB(dst), RB(src));
 }
 
 /******************************************
  and     rd,rs
  flags:  -ZS---
  ******************************************/
-static void Z87_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z87_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = ANDW(cpustate, cpustate->RW(dst), cpustate->RW(src));
+	RW(dst) = ANDW(RW(dst), RW(src));
 }
 
 /******************************************
  xorb    rbd,rbs
  flags:  -ZSP--
  ******************************************/
-static void Z88_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z88_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = XORB(cpustate, cpustate->RB(dst), cpustate->RB(src));
+	RB(dst) = XORB(RB(dst), RB(src));
 }
 
 /******************************************
  xor     rd,rs
  flags:  -ZS---
  ******************************************/
-static void Z89_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z89_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = XORW(cpustate, cpustate->RW(dst), cpustate->RW(src));
+	RW(dst) = XORW(RW(dst), RW(src));
 }
 
 /******************************************
  cpb     rbd,rbs
  flags:  CZSV--
  ******************************************/
-static void Z8A_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z8A_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	CPB(cpustate, cpustate->RB(dst), cpustate->RB(src));
+	CPB(RB(dst), RB(src));
 }
 
 /******************************************
  cp      rd,rs
  flags:  CZSV--
  ******************************************/
-static void Z8B_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z8B_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	CPW(cpustate, cpustate->RW(dst), cpustate->RW(src));
+	CPW(RW(dst), RW(src));
 }
 
 /******************************************
  comb    rbd
  flags:  -ZSP--
  ******************************************/
-static void Z8C_dddd_0000(z8000_state *cpustate)
+void z8002_device::Z8C_dddd_0000()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RB(dst) = COMB(cpustate, cpustate->RB(dst));
+	RB(dst) = COMB(RB(dst));
 }
 
 /******************************************
  negb    rbd
  flags:  CZSV--
  ******************************************/
-static void Z8C_dddd_0010(z8000_state *cpustate)
+void z8002_device::Z8C_dddd_0010()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RB(dst) = NEGB(cpustate, cpustate->RB(dst));
+	RB(dst) = NEGB(RB(dst));
 }
 
 /******************************************
  testb   rbd
  flags:  -ZSP--
  ******************************************/
-static void Z8C_dddd_0100(z8000_state *cpustate)
+void z8002_device::Z8C_dddd_0100()
 {
 	GET_DST(OP0,NIB2);
-	TESTB(cpustate, cpustate->RB(dst));
+	TESTB(RB(dst));
 }
 
 /******************************************
  tsetb   rbd
  flags:  --S---
  ******************************************/
-static void Z8C_dddd_0110(z8000_state *cpustate)
+void z8002_device::Z8C_dddd_0110()
 {
 	GET_DST(OP0,NIB2);
-	if (cpustate->RB(dst) & S08) SET_S; else CLR_S;
-	cpustate->RB(dst) = 0xff;
+	if (RB(dst) & S08) SET_S; else CLR_S;
+	RB(dst) = 0xff;
 }
 
 /******************************************
  ldctlb rbd,flags
  flags:  CZSVDH
  ******************************************/
-static void Z8C_dddd_0001(z8000_state *cpustate)
+void z8002_device::Z8C_dddd_0001()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RB(dst) = cpustate->fcw & 0xfc;
+	RB(dst) = m_fcw & 0xfc;
 }
 
 /******************************************
  clrb    rbd
  flags:  ------
  ******************************************/
-static void Z8C_dddd_1000(z8000_state *cpustate)
+void z8002_device::Z8C_dddd_1000()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RB(dst) = 0;
+	RB(dst) = 0;
 }
 
 /******************************************
  ldctlb flags,rbd
  flags:  ------
  ******************************************/
-static void Z8C_dddd_1001(z8000_state *cpustate)
+void z8002_device::Z8C_dddd_1001()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->fcw &= ~0x00fc;
-	cpustate->fcw |= (cpustate->RB(dst) & 0xfc);
+	m_fcw &= ~0x00fc;
+	m_fcw |= (RB(dst) & 0xfc);
 }
 
 /******************************************
  nop
  flags:  ------
  ******************************************/
-static void Z8D_0000_0111(z8000_state *cpustate)
+void z8002_device::Z8D_0000_0111()
 {
 	/* nothing */
 }
@@ -4987,90 +5015,90 @@ static void Z8D_0000_0111(z8000_state *cpustate)
  com     rd
  flags:  -ZS---
  ******************************************/
-static void Z8D_dddd_0000(z8000_state *cpustate)
+void z8002_device::Z8D_dddd_0000()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RW(dst) = COMW(cpustate, cpustate->RW(dst));
+	RW(dst) = COMW(RW(dst));
 }
 
 /******************************************
  neg     rd
  flags:  CZSV--
  ******************************************/
-static void Z8D_dddd_0010(z8000_state *cpustate)
+void z8002_device::Z8D_dddd_0010()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RW(dst) = NEGW(cpustate, cpustate->RW(dst));
+	RW(dst) = NEGW(RW(dst));
 }
 
 /******************************************
  test    rd
  flags:  ------
  ******************************************/
-static void Z8D_dddd_0100(z8000_state *cpustate)
+void z8002_device::Z8D_dddd_0100()
 {
 	GET_DST(OP0,NIB2);
-	TESTW(cpustate, cpustate->RW(dst));
+	TESTW(RW(dst));
 }
 
 /******************************************
  tset    rd
  flags:  --S---
  ******************************************/
-static void Z8D_dddd_0110(z8000_state *cpustate)
+void z8002_device::Z8D_dddd_0110()
 {
 	GET_DST(OP0,NIB2);
-	if (cpustate->RW(dst) & S16) SET_S; else CLR_S;
-	cpustate->RW(dst) = 0xffff;
+	if (RW(dst) & S16) SET_S; else CLR_S;
+	RW(dst) = 0xffff;
 }
 
 /******************************************
  clr     rd
  flags:  ------
  ******************************************/
-static void Z8D_dddd_1000(z8000_state *cpustate)
+void z8002_device::Z8D_dddd_1000()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RW(dst) = 0;
+	RW(dst) = 0;
 }
 
 /******************************************
  setflg  imm4
  flags:  CZSV--
  ******************************************/
-static void Z8D_imm4_0001(z8000_state *cpustate)
+void z8002_device::Z8D_imm4_0001()
 {
-	cpustate->fcw |= cpustate->op[0] & 0x00f0;
+	m_fcw |= m_op[0] & 0x00f0;
 }
 
 /******************************************
  resflg  imm4
  flags:  CZSV--
  ******************************************/
-static void Z8D_imm4_0011(z8000_state *cpustate)
+void z8002_device::Z8D_imm4_0011()
 {
-	cpustate->fcw &= ~(cpustate->op[0] & 0x00f0);
+	m_fcw &= ~(m_op[0] & 0x00f0);
 }
 
 /******************************************
  comflg  flags
  flags:  CZSP--
  ******************************************/
-static void Z8D_imm4_0101(z8000_state *cpustate)
+void z8002_device::Z8D_imm4_0101()
 {
-	cpustate->fcw ^= (cpustate->op[0] & 0x00f0);
+	m_fcw ^= (m_op[0] & 0x00f0);
 }
 
 /******************************************
  ext8e   imm8
  flags:  ------
  ******************************************/
-static void Z8E_imm8(z8000_state *cpustate)
+void z8002_device::Z8E_imm8()
 {
 	CHECK_EXT_INSTR();
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: ext8e  $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: ext8e  $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -5080,12 +5108,12 @@ static void Z8E_imm8(z8000_state *cpustate)
  ext8f   imm8
  flags:  ------
  ******************************************/
-static void Z8F_imm8(z8000_state *cpustate)
+void z8002_device::Z8F_imm8()
 {
 	CHECK_EXT_INSTR();
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: ext8f  $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: ext8f  $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -5095,155 +5123,155 @@ static void Z8F_imm8(z8000_state *cpustate)
  cpl     rrd,rrs
  flags:  CZSV--
  ******************************************/
-static void Z90_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z90_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	CPL(cpustate, cpustate->RL(dst), cpustate->RL(src));
+	CPL(RL(dst), RL(src));
 }
 
 /******************************************
  pushl   @rd,rrs
  flags:  ------
  ******************************************/
-static void Z91_ddN0_ssss(z8000_state *cpustate)
+void z8002_device::Z91_ddN0_ssss()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	PUSHL(cpustate, dst, cpustate->RL(src));
+	PUSHL(dst, RL(src));
 }
 
 /******************************************
  subl    rrd,rrs
  flags:  CZSV--
  ******************************************/
-static void Z92_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z92_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = SUBL(cpustate, cpustate->RL(dst), cpustate->RL(src));
+	RL(dst) = SUBL(RL(dst), RL(src));
 }
 
 /******************************************
  push    @rd,rs
  flags:  ------
  ******************************************/
-static void Z93_ddN0_ssss(z8000_state *cpustate)
+void z8002_device::Z93_ddN0_ssss()
 {
 	GET_SRC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	PUSHW(cpustate, dst, cpustate->RW(src));
+	PUSHW(dst, RW(src));
 }
 
 /******************************************
  ldl     rrd,rrs
  flags:  ------
  ******************************************/
-static void Z94_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z94_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = cpustate->RL(src);
+	RL(dst) = RL(src);
 }
 
 /******************************************
  popl    rrd,@rs
  flags:  ------
  ******************************************/
-static void Z95_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z95_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = POPL(cpustate, src);
+	RL(dst) = POPL(src);
 }
 
 /******************************************
  addl    rrd,rrs
  flags:  CZSV--
  ******************************************/
-static void Z96_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z96_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = ADDL(cpustate, cpustate->RL(dst), cpustate->RL(src));
+	RL(dst) = ADDL(RL(dst), RL(src));
 }
 
 /******************************************
  pop     rd,@rs
  flags:  ------
  ******************************************/
-static void Z97_ssN0_dddd(z8000_state *cpustate)
+void z8002_device::Z97_ssN0_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = POPW(cpustate, src);
+	RW(dst) = POPW(src);
 }
 
 /******************************************
  multl   rqd,rrs
  flags:  CZSV--
  ******************************************/
-static void Z98_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z98_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RQ(dst) = MULTL(cpustate, cpustate->RQ(dst), cpustate->RL(src));
+	RQ(dst) = MULTL(RQ(dst), RL(src));
 }
 
 /******************************************
  mult    rrd,rs
  flags:  CZSV--
  ******************************************/
-static void Z99_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z99_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = MULTW(cpustate, cpustate->RL(dst), cpustate->RW(src));
+	RL(dst) = MULTW(RL(dst), RW(src));
 }
 
 /******************************************
  divl    rqd,rrs
  flags:  CZSV--
  ******************************************/
-static void Z9A_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z9A_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RQ(dst) = DIVL(cpustate, cpustate->RQ(dst), cpustate->RL(src));
+	RQ(dst) = DIVL(RQ(dst), RL(src));
 }
 
 /******************************************
  div     rrd,rs
  flags:  CZSV--
  ******************************************/
-static void Z9B_ssss_dddd(z8000_state *cpustate)
+void z8002_device::Z9B_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RL(dst) = DIVW(cpustate, cpustate->RL(dst), cpustate->RW(src));
+	RL(dst) = DIVW(RL(dst), RW(src));
 }
 
 /******************************************
  testl   rrd
  flags:  -ZS---
  ******************************************/
-static void Z9C_dddd_1000(z8000_state *cpustate)
+void z8002_device::Z9C_dddd_1000()
 {
 	GET_DST(OP0,NIB2);
 	CLR_ZS;
-	if (!cpustate->RL(dst)) SET_Z;
-	else if (cpustate->RL(dst) & S32) SET_S;
+	if (!RL(dst)) SET_Z;
+	else if (RL(dst) & S32) SET_S;
 }
 
 /******************************************
  rsvd9d
  flags:  ------
  ******************************************/
-static void Z9D_imm8(z8000_state *cpustate)
+void z8002_device::Z9D_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd9d $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: rsvd9d $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -5253,46 +5281,46 @@ static void Z9D_imm8(z8000_state *cpustate)
  ret     cc
  flags:  ------
  ******************************************/
-static void Z9E_0000_cccc(z8000_state *cpustate)
+void z8002_device::Z9E_0000_cccc()
 {
 	GET_CCC(OP0,NIB3);
-	if (segmented_mode(cpustate))
+	if (segmented_mode())
 		switch (cc) {
-			case  0: if (CC0) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case  1: if (CC1) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case  2: if (CC2) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case  3: if (CC3) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case  4: if (CC4) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case  5: if (CC5) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case  6: if (CC6) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case  7: if (CC7) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case  8: if (CC8) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case  9: if (CC9) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case 10: if (CCA) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case 11: if (CCB) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case 12: if (CCC) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case 13: if (CCD) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case 14: if (CCE) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
-			case 15: if (CCF) set_pc(cpustate, segmented_addr(POPL(cpustate, SP))); break;
+			case  0: if (CC0) set_pc(segmented_addr(POPL(SP))); break;
+			case  1: if (CC1) set_pc(segmented_addr(POPL(SP))); break;
+			case  2: if (CC2) set_pc(segmented_addr(POPL(SP))); break;
+			case  3: if (CC3) set_pc(segmented_addr(POPL(SP))); break;
+			case  4: if (CC4) set_pc(segmented_addr(POPL(SP))); break;
+			case  5: if (CC5) set_pc(segmented_addr(POPL(SP))); break;
+			case  6: if (CC6) set_pc(segmented_addr(POPL(SP))); break;
+			case  7: if (CC7) set_pc(segmented_addr(POPL(SP))); break;
+			case  8: if (CC8) set_pc(segmented_addr(POPL(SP))); break;
+			case  9: if (CC9) set_pc(segmented_addr(POPL(SP))); break;
+			case 10: if (CCA) set_pc(segmented_addr(POPL(SP))); break;
+			case 11: if (CCB) set_pc(segmented_addr(POPL(SP))); break;
+			case 12: if (CCC) set_pc(segmented_addr(POPL(SP))); break;
+			case 13: if (CCD) set_pc(segmented_addr(POPL(SP))); break;
+			case 14: if (CCE) set_pc(segmented_addr(POPL(SP))); break;
+			case 15: if (CCF) set_pc(segmented_addr(POPL(SP))); break;
 		}
 	else
 		switch (cc) {
-			case  0: if (CC0) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case  1: if (CC1) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case  2: if (CC2) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case  3: if (CC3) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case  4: if (CC4) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case  5: if (CC5) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case  6: if (CC6) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case  7: if (CC7) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case  8: if (CC8) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case  9: if (CC9) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case 10: if (CCA) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case 11: if (CCB) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case 12: if (CCC) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case 13: if (CCD) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case 14: if (CCE) set_pc(cpustate, POPW(cpustate, SP)); break;
-			case 15: if (CCF) set_pc(cpustate, POPW(cpustate, SP)); break;
+			case  0: if (CC0) set_pc(POPW(SP)); break;
+			case  1: if (CC1) set_pc(POPW(SP)); break;
+			case  2: if (CC2) set_pc(POPW(SP)); break;
+			case  3: if (CC3) set_pc(POPW(SP)); break;
+			case  4: if (CC4) set_pc(POPW(SP)); break;
+			case  5: if (CC5) set_pc(POPW(SP)); break;
+			case  6: if (CC6) set_pc(POPW(SP)); break;
+			case  7: if (CC7) set_pc(POPW(SP)); break;
+			case  8: if (CC8) set_pc(POPW(SP)); break;
+			case  9: if (CC9) set_pc(POPW(SP)); break;
+			case 10: if (CCA) set_pc(POPW(SP)); break;
+			case 11: if (CCB) set_pc(POPW(SP)); break;
+			case 12: if (CCC) set_pc(POPW(SP)); break;
+			case 13: if (CCD) set_pc(POPW(SP)); break;
+			case 14: if (CCE) set_pc(POPW(SP)); break;
+			case 15: if (CCF) set_pc(POPW(SP)); break;
 		}
 }
 
@@ -5300,11 +5328,11 @@ static void Z9E_0000_cccc(z8000_state *cpustate)
  rsvd9f
  flags:  ------
  ******************************************/
-static void Z9F_imm8(z8000_state *cpustate)
+void z8002_device::Z9F_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd9f $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: rsvd9f $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -5314,169 +5342,169 @@ static void Z9F_imm8(z8000_state *cpustate)
  ldb     rbd,rbs
  flags:  ------
  ******************************************/
-static void ZA0_ssss_dddd(z8000_state *cpustate)
+void z8002_device::ZA0_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = cpustate->RB(src);
+	RB(dst) = RB(src);
 }
 
 /******************************************
  ld      rd,rs
  flags:  ------
  ******************************************/
-static void ZA1_ssss_dddd(z8000_state *cpustate)
+void z8002_device::ZA1_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = cpustate->RW(src);
+	RW(dst) = RW(src);
 }
 
 /******************************************
  resb    rbd,imm4
  flags:  ------
  ******************************************/
-static void ZA2_dddd_imm4(z8000_state *cpustate)
+void z8002_device::ZA2_dddd_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	cpustate->RB(dst) &= ~bit;
+	RB(dst) &= ~bit;
 }
 
 /******************************************
  res     rd,imm4
  flags:  ------
  ******************************************/
-static void ZA3_dddd_imm4(z8000_state *cpustate)
+void z8002_device::ZA3_dddd_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	cpustate->RW(dst) &= ~bit;
+	RW(dst) &= ~bit;
 }
 
 /******************************************
  setb    rbd,imm4
  flags:  ------
  ******************************************/
-static void ZA4_dddd_imm4(z8000_state *cpustate)
+void z8002_device::ZA4_dddd_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	cpustate->RB(dst) |= bit;
+	RB(dst) |= bit;
 }
 
 /******************************************
  set     rd,imm4
  flags:  ------
  ******************************************/
-static void ZA5_dddd_imm4(z8000_state *cpustate)
+void z8002_device::ZA5_dddd_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	cpustate->RW(dst) |= bit;
+	RW(dst) |= bit;
 }
 
 /******************************************
  bitb    rbd,imm4
  flags:  -Z----
  ******************************************/
-static void ZA6_dddd_imm4(z8000_state *cpustate)
+void z8002_device::ZA6_dddd_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	if (cpustate->RB(dst) & bit) CLR_Z; else SET_Z;
+	if (RB(dst) & bit) CLR_Z; else SET_Z;
 }
 
 /******************************************
  bit     rd,imm4
  flags:  -Z----
  ******************************************/
-static void ZA7_dddd_imm4(z8000_state *cpustate)
+void z8002_device::ZA7_dddd_imm4()
 {
 	GET_BIT(OP0);
 	GET_DST(OP0,NIB2);
-	if (cpustate->RW(dst) & bit) CLR_Z; else SET_Z;
+	if (RW(dst) & bit) CLR_Z; else SET_Z;
 }
 
 /******************************************
  incb    rbd,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void ZA8_dddd_imm4m1(z8000_state *cpustate)
+void z8002_device::ZA8_dddd_imm4m1()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	cpustate->RB(dst) = INCB(cpustate, cpustate->RB(dst), i4p1);
+	RB(dst) = INCB(RB(dst), i4p1);
 }
 
 /******************************************
  inc     rd,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void ZA9_dddd_imm4m1(z8000_state *cpustate)
+void z8002_device::ZA9_dddd_imm4m1()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	cpustate->RW(dst) = INCW(cpustate, cpustate->RW(dst), i4p1);
+	RW(dst) = INCW(RW(dst), i4p1);
 }
 
 /******************************************
  decb    rbd,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void ZAA_dddd_imm4m1(z8000_state *cpustate)
+void z8002_device::ZAA_dddd_imm4m1()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	cpustate->RB(dst) = DECB(cpustate, cpustate->RB(dst), i4p1);
+	RB(dst) = DECB(RB(dst), i4p1);
 }
 
 /******************************************
  dec     rd,imm4m1
  flags:  -ZSV--
  ******************************************/
-static void ZAB_dddd_imm4m1(z8000_state *cpustate)
+void z8002_device::ZAB_dddd_imm4m1()
 {
 	GET_I4M1(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	cpustate->RW(dst) = DECW(cpustate, cpustate->RW(dst), i4p1);
+	RW(dst) = DECW(RW(dst), i4p1);
 }
 
 /******************************************
  exb     rbd,rbs
  flags:  ------
  ******************************************/
-static void ZAC_ssss_dddd(z8000_state *cpustate)
+void z8002_device::ZAC_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	UINT8 tmp = cpustate->RB(src);
-	cpustate->RB(src) = cpustate->RB(dst);
-	cpustate->RB(dst) = tmp;
+	UINT8 tmp = RB(src);
+	RB(src) = RB(dst);
+	RB(dst) = tmp;
 }
 
 /******************************************
  ex      rd,rs
  flags:  ------
  ******************************************/
-static void ZAD_ssss_dddd(z8000_state *cpustate)
+void z8002_device::ZAD_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	UINT16 tmp = cpustate->RW(src);
-	cpustate->RW(src) = cpustate->RW(dst);
-	cpustate->RW(dst) = tmp;
+	UINT16 tmp = RW(src);
+	RW(src) = RW(dst);
+	RW(dst) = tmp;
 }
 
 /******************************************
  tccb    cc,rbd
  flags:  ------
  ******************************************/
-static void ZAE_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZAE_dddd_cccc()
 {
 	GET_CCC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	UINT8 tmp = cpustate->RB(dst) & ~1;
+	UINT8 tmp = RB(dst) & ~1;
 	switch (cc) {
 		case  0: if (CC0) tmp |= 1; break;
 		case  1: if (CC1) tmp |= 1; break;
@@ -5495,18 +5523,18 @@ static void ZAE_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) tmp |= 1; break;
 		case 15: if (CCF) tmp |= 1; break;
 	}
-	cpustate->RB(dst) = tmp;
+	RB(dst) = tmp;
 }
 
 /******************************************
  tcc     cc,rd
  flags:  ------
  ******************************************/
-static void ZAF_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZAF_dddd_cccc()
 {
 	GET_CCC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
-	UINT16 tmp = cpustate->RW(dst) & ~1;
+	UINT16 tmp = RW(dst) & ~1;
 	switch (cc) {
 		case  0: if (CC0) tmp |= 1; break;
 		case  1: if (CC1) tmp |= 1; break;
@@ -5525,57 +5553,57 @@ static void ZAF_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) tmp |= 1; break;
 		case 15: if (CCF) tmp |= 1; break;
 	}
-	cpustate->RW(dst) = tmp;
+	RW(dst) = tmp;
 }
 
 /******************************************
  dab     rbd
  flags:  CZS---
  ******************************************/
-static void ZB0_dddd_0000(z8000_state *cpustate)
+void z8002_device::ZB0_dddd_0000()
 {
 	GET_DST(OP0,NIB2);
 	UINT8 result;
-	UINT16 idx = cpustate->RB(dst);
-	if (cpustate->fcw & F_C)    idx |= 0x100;
-	if (cpustate->fcw & F_H)    idx |= 0x200;
-	if (cpustate->fcw & F_DA) idx |= 0x400;
+	UINT16 idx = RB(dst);
+	if (m_fcw & F_C)    idx |= 0x100;
+	if (m_fcw & F_H)    idx |= 0x200;
+	if (m_fcw & F_DA) idx |= 0x400;
 	result = Z8000_dab[idx];
 	CLR_CZS;
 	CHK_XXXB_ZS;
 	if (Z8000_dab[idx] & 0x100) SET_C;
-	cpustate->RB(dst) = result;
+	RB(dst) = result;
 }
 
 /******************************************
  extsb   rd
  flags:  ------
  ******************************************/
-static void ZB1_dddd_0000(z8000_state *cpustate)
+void z8002_device::ZB1_dddd_0000()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RW(dst) = (cpustate->RW(dst) & 0xff) | ((cpustate->RW(dst) & S08) ? 0xff00 : 0x0000);
+	RW(dst) = (RW(dst) & 0xff) | ((RW(dst) & S08) ? 0xff00 : 0x0000);
 }
 
 /******************************************
  extsl   rqd
  flags:  ------
  ******************************************/
-static void ZB1_dddd_0111(z8000_state *cpustate)
+void z8002_device::ZB1_dddd_0111()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RQ(dst) = CONCAT_64((cpustate->RQ(dst) & S32) ?
-		0xfffffffful : 0, EXTRACT_64LO(cpustate->RQ(dst)));
+	RQ(dst) = CONCAT_64((RQ(dst) & S32) ?
+		0xfffffffful : 0, EXTRACT_64LO(RQ(dst)));
 }
 
 /******************************************
  exts    rrd
  flags:  ------
  ******************************************/
-static void ZB1_dddd_1010(z8000_state *cpustate)
+void z8002_device::ZB1_dddd_1010()
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RL(dst) = (cpustate->RL(dst) & 0xffff) | ((cpustate->RL(dst) & S16) ?
+	RL(dst) = (RL(dst) & 0xffff) | ((RL(dst) & S16) ?
 		0xffff0000ul : 0x00000000ul);
 }
 
@@ -5585,47 +5613,47 @@ static void ZB1_dddd_1010(z8000_state *cpustate)
  srlb    rbd,imm8
  flags:  CZSV--
  ******************************************/
-static void ZB2_dddd_0001_imm8(z8000_state *cpustate)
+void z8002_device::ZB2_dddd_0001_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM8(OP1);
 	if (imm8 & S08)
-		cpustate->RB(dst) = SRLB(cpustate, cpustate->RB(dst), -(INT8)imm8);
+		RB(dst) = SRLB(RB(dst), -(INT8)imm8);
 	else
-		cpustate->RB(dst) = SLLB(cpustate, cpustate->RB(dst), imm8);
+		RB(dst) = SLLB(RB(dst), imm8);
 }
 
 /******************************************
  sdlb    rbd,rs
  flags:  CZS---
  ******************************************/
-static void ZB2_dddd_0011_0000_ssss_0000_0000(z8000_state *cpustate)
+void z8002_device::ZB2_dddd_0011_0000_ssss_0000_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB1);
-	cpustate->RB(dst) = SRLB(cpustate, cpustate->RB(dst), (INT8)cpustate->RW(src));
+	RB(dst) = SRLB(RB(dst), (INT8)RW(src));
 }
 
 /******************************************
  rlb     rbd,imm1or2
  flags:  CZSV--
  ******************************************/
-static void ZB2_dddd_00I0(z8000_state *cpustate)
+void z8002_device::ZB2_dddd_00I0()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM1(OP0,NIB3);
-	cpustate->RB(dst) = RLB(cpustate, cpustate->RB(dst), imm1);
+	RB(dst) = RLB(RB(dst), imm1);
 }
 
 /******************************************
  rrb     rbd,imm1or2
  flags:  CZSV--
  ******************************************/
-static void ZB2_dddd_01I0(z8000_state *cpustate)
+void z8002_device::ZB2_dddd_01I0()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM1(OP0,NIB3);
-	cpustate->RB(dst) = RRB(cpustate, cpustate->RB(dst), imm1);
+	RB(dst) = RRB(RB(dst), imm1);
 }
 
 /******************************************
@@ -5634,47 +5662,47 @@ static void ZB2_dddd_01I0(z8000_state *cpustate)
  srab    rbd,imm8
  flags:  CZSV--
  ******************************************/
-static void ZB2_dddd_1001_imm8(z8000_state *cpustate)
+void z8002_device::ZB2_dddd_1001_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM8(OP1);
 	if (imm8 & S08)
-		cpustate->RB(dst) = SRAB(cpustate, cpustate->RB(dst), -(INT8)imm8);
+		RB(dst) = SRAB(RB(dst), -(INT8)imm8);
 	else
-		cpustate->RB(dst) = SLAB(cpustate, cpustate->RB(dst), imm8);
+		RB(dst) = SLAB(RB(dst), imm8);
 }
 
 /******************************************
  sdab    rbd,rs
  flags:  CZSV--
  ******************************************/
-static void ZB2_dddd_1011_0000_ssss_0000_0000(z8000_state *cpustate)
+void z8002_device::ZB2_dddd_1011_0000_ssss_0000_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB1);
-	cpustate->RB(dst) = SDAB(cpustate, cpustate->RB(dst), (INT8) cpustate->RW(src));
+	RB(dst) = SDAB(RB(dst), (INT8) RW(src));
 }
 
 /******************************************
  rlcb    rbd,imm1or2
  flags:  -Z----
  ******************************************/
-static void ZB2_dddd_10I0(z8000_state *cpustate)
+void z8002_device::ZB2_dddd_10I0()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM1(OP0,NIB3);
-	cpustate->RB(dst) = RLCB(cpustate, cpustate->RB(dst), imm1);
+	RB(dst) = RLCB(RB(dst), imm1);
 }
 
 /******************************************
  rrcb    rbd,imm1or2
  flags:  -Z----
  ******************************************/
-static void ZB2_dddd_11I0(z8000_state *cpustate)
+void z8002_device::ZB2_dddd_11I0()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM1(OP0,NIB3);
-	cpustate->RB(dst) = RRCB(cpustate, cpustate->RB(dst), imm1);
+	RB(dst) = RRCB(RB(dst), imm1);
 }
 
 /******************************************
@@ -5683,36 +5711,36 @@ static void ZB2_dddd_11I0(z8000_state *cpustate)
  srl     rd,imm8
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_0001_imm8(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_0001_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
 	if (imm16 & S16)
-		cpustate->RW(dst) = SRLW(cpustate, cpustate->RW(dst), -(INT16)imm16);
+		RW(dst) = SRLW(RW(dst), -(INT16)imm16);
 	else
-		cpustate->RW(dst) = SLLW(cpustate, cpustate->RW(dst), imm16);
+		RW(dst) = SLLW(RW(dst), imm16);
 }
 
 /******************************************
  sdl     rd,rs
  flags:  CZS---
  ******************************************/
-static void ZB3_dddd_0011_0000_ssss_0000_0000(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_0011_0000_ssss_0000_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB1);
-	cpustate->RW(dst) = SDLW(cpustate, cpustate->RW(dst), (INT8)cpustate->RW(src));
+	RW(dst) = SDLW(RW(dst), (INT8)RW(src));
 }
 
 /******************************************
  rl      rd,imm1or2
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_00I0(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_00I0()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM1(OP0,NIB3);
-	cpustate->RW(dst) = RLW(cpustate, cpustate->RW(dst), imm1);
+	RW(dst) = RLW(RW(dst), imm1);
 }
 
 /******************************************
@@ -5721,36 +5749,36 @@ static void ZB3_dddd_00I0(z8000_state *cpustate)
  srll    rrd,imm8
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_0101_imm8(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_0101_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
 	if (imm16 & S16)
-		cpustate->RL(dst) = SRLL(cpustate, cpustate->RL(dst), -(INT16)imm16);
+		RL(dst) = SRLL(RL(dst), -(INT16)imm16);
 	else
-		cpustate->RL(dst) = SLLL(cpustate, cpustate->RL(dst), imm16);
+		RL(dst) = SLLL(RL(dst), imm16);
 }
 
 /******************************************
  sdll    rrd,rs
  flags:  CZS---
  ******************************************/
-static void ZB3_dddd_0111_0000_ssss_0000_0000(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_0111_0000_ssss_0000_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB1);
-	cpustate->RL(dst) = SDLL(cpustate, cpustate->RL(dst), cpustate->RW(src) & 0xff);
+	RL(dst) = SDLL(RL(dst), RW(src) & 0xff);
 }
 
 /******************************************
  rr      rd,imm1or2
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_01I0(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_01I0()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM1(OP0,NIB3);
-	cpustate->RW(dst) = RRW(cpustate, cpustate->RW(dst), imm1);
+	RW(dst) = RRW(RW(dst), imm1);
 }
 
 /******************************************
@@ -5759,36 +5787,36 @@ static void ZB3_dddd_01I0(z8000_state *cpustate)
  sra     rd,imm8
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_1001_imm8(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_1001_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
 	if (imm16 & S16)
-		cpustate->RW(dst) = SRAW(cpustate, cpustate->RW(dst), -(INT16)imm16);
+		RW(dst) = SRAW(RW(dst), -(INT16)imm16);
 	else
-		cpustate->RW(dst) = SLAW(cpustate, cpustate->RW(dst), imm16);
+		RW(dst) = SLAW(RW(dst), imm16);
 }
 
 /******************************************
  sda     rd,rs
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_1011_0000_ssss_0000_0000(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_1011_0000_ssss_0000_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB1);
-	cpustate->RW(dst) = SDAW(cpustate, cpustate->RW(dst), (INT8)cpustate->RW(src));
+	RW(dst) = SDAW(RW(dst), (INT8)RW(src));
 }
 
 /******************************************
  rlc     rd,imm1or2
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_10I0(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_10I0()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM1(OP0,NIB3);
-	cpustate->RW(dst) = RLCW(cpustate, cpustate->RW(dst), imm1);
+	RW(dst) = RLCW(RW(dst), imm1);
 }
 
 /******************************************
@@ -5797,115 +5825,115 @@ static void ZB3_dddd_10I0(z8000_state *cpustate)
  sral    rrd,imm8
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_1101_imm8(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_1101_imm8()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM16(OP1);
 	if (imm16 & S16)
-		cpustate->RL(dst) = SRAL(cpustate, cpustate->RL(dst), -(INT16)imm16);
+		RL(dst) = SRAL(RL(dst), -(INT16)imm16);
 	else
-		cpustate->RL(dst) = SLAL(cpustate, cpustate->RL(dst), imm16);
+		RL(dst) = SLAL(RL(dst), imm16);
 }
 
 /******************************************
  sdal    rrd,rs
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_1111_0000_ssss_0000_0000(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_1111_0000_ssss_0000_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB1);
-	cpustate->RL(dst) = SDAL(cpustate, cpustate->RL(dst), cpustate->RW(src) & 0xff);
+	RL(dst) = SDAL(RL(dst), RW(src) & 0xff);
 }
 
 /******************************************
  rrc     rd,imm1or2
  flags:  CZSV--
  ******************************************/
-static void ZB3_dddd_11I0(z8000_state *cpustate)
+void z8002_device::ZB3_dddd_11I0()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM1(OP0,NIB3);
-	cpustate->RW(dst) = RRCW(cpustate, cpustate->RW(dst), imm1);
+	RW(dst) = RRCW(RW(dst), imm1);
 }
 
 /******************************************
  adcb    rbd,rbs
  flags:  CZSVDH
  ******************************************/
-static void ZB4_ssss_dddd(z8000_state *cpustate)
+void z8002_device::ZB4_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = ADCB(cpustate, cpustate->RB(dst), cpustate->RB(src));
+	RB(dst) = ADCB(RB(dst), RB(src));
 }
 
 /******************************************
  adc     rd,rs
  flags:  CZSV--
  ******************************************/
-static void ZB5_ssss_dddd(z8000_state *cpustate)
+void z8002_device::ZB5_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = ADCW(cpustate, cpustate->RW(dst), cpustate->RW(src));
+	RW(dst) = ADCW(RW(dst), RW(src));
 }
 
 /******************************************
  sbcb    rbd,rbs
  flags:  CZSVDH
  ******************************************/
-static void ZB6_ssss_dddd(z8000_state *cpustate)
+void z8002_device::ZB6_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RB(dst) = SBCB(cpustate, cpustate->RB(dst), cpustate->RB(src));
+	RB(dst) = SBCB(RB(dst), RB(src));
 }
 
 /******************************************
  sbc     rd,rs
  flags:  CZSV--
  ******************************************/
-static void ZB7_ssss_dddd(z8000_state *cpustate)
+void z8002_device::ZB7_ssss_dddd()
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = SBCW(cpustate, cpustate->RW(dst), cpustate->RW(src));
+	RW(dst) = SBCW(RW(dst), RW(src));
 }
 
 /******************************************
  trtib   @rd,@rs,rr
  flags:  -ZSV--
  ******************************************/
-static void ZB8_ddN0_0010_0000_rrrr_ssN0_0000(z8000_state *cpustate)
+void z8002_device::ZB8_ddN0_0010_0000_rrrr_ssN0_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	UINT8 xlt = RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
-	cpustate->RB(1) = xlt;  /* load RH1 */
+	UINT8 xlt = RDMEM_B(AS_DATA, addr_from_reg(src) + RDMEM_B(AS_DATA, addr_from_reg(dst)));
+	RB(1) = xlt;  /* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
-	add_to_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	add_to_addr_reg(dst, 1);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
  trtirb  @rd,@rs,rbr
  flags:  -ZSV--
  ******************************************/
-static void ZB8_ddN0_0110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
+void z8002_device::ZB8_ddN0_0110_0000_rrrr_ssN0_1110()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	UINT8 xlt = RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
-	cpustate->RB(1) = xlt;  /* load RH1 */
+	UINT8 xlt = RDMEM_B(AS_DATA, addr_from_reg(src) + RDMEM_B(AS_DATA, addr_from_reg(dst)));
+	RB(1) = xlt;  /* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
-	add_to_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) {
+	add_to_addr_reg(dst, 1);
+	if (--RW(cnt)) {
 		CLR_V;
 		if (!xlt)
-		cpustate->pc -= 4;
+		m_pc -= 4;
 	}
 	else SET_V;
 }
@@ -5914,35 +5942,35 @@ static void ZB8_ddN0_0110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
  trtdb   @rd,@rs,rbr
  flags:  -ZSV--
  ******************************************/
-static void ZB8_ddN0_1010_0000_rrrr_ssN0_0000(z8000_state *cpustate)
+void z8002_device::ZB8_ddN0_1010_0000_rrrr_ssN0_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	UINT8 xlt = RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
-	cpustate->RB(1) = xlt;  /* load RH1 */
+	UINT8 xlt = RDMEM_B(AS_DATA, addr_from_reg(src) + RDMEM_B(AS_DATA, addr_from_reg(dst)));
+	RB(1) = xlt;  /* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
-	sub_from_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	sub_from_addr_reg(dst, 1);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
  trtdrb  @rd,@rs,rbr
  flags:  -ZSV--
  ******************************************/
-static void ZB8_ddN0_1110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
+void z8002_device::ZB8_ddN0_1110_0000_rrrr_ssN0_1110()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	UINT8 xlt = RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
-	cpustate->RB(1) = xlt;  /* load RH1 */
+	UINT8 xlt = RDMEM_B(AS_DATA, addr_from_reg(src) + RDMEM_B(AS_DATA, addr_from_reg(dst)));
+	RB(1) = xlt;  /* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
-	sub_from_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) {
+	sub_from_addr_reg(dst, 1);
+	if (--RW(cnt)) {
 		CLR_V;
 		if (!xlt)
-		cpustate->pc -= 4;
+		m_pc -= 4;
 	}
 	else SET_V;
 }
@@ -5951,75 +5979,75 @@ static void ZB8_ddN0_1110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
  trib    @rd,@rs,rbr
  flags:  -ZSV--
  ******************************************/
-static void ZB8_ddN0_0000_0000_rrrr_ssN0_0000(z8000_state *cpustate)
+void z8002_device::ZB8_ddN0_0000_0000_rrrr_ssN0_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	UINT8 xlt = RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
-	WRMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst), xlt);
-	cpustate->RB(1) = xlt;  /* destroy RH1 */
-	add_to_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	UINT8 xlt = RDMEM_B(AS_DATA, addr_from_reg(src) + RDMEM_B(AS_DATA, addr_from_reg(dst)));
+	WRMEM_B(AS_DATA, addr_from_reg(dst), xlt);
+	RB(1) = xlt;  /* destroy RH1 */
+	add_to_addr_reg(dst, 1);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
  trirb   @rd,@rs,rbr
  flags:  -ZSV--
  ******************************************/
-static void ZB8_ddN0_0100_0000_rrrr_ssN0_0000(z8000_state *cpustate)
+void z8002_device::ZB8_ddN0_0100_0000_rrrr_ssN0_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	UINT8 xlt = RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
-	WRMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst), xlt);
-	cpustate->RB(1) = xlt;  /* destroy RH1 */
-	add_to_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; cpustate->pc -= 4; } else SET_V;
+	UINT8 xlt = RDMEM_B(AS_DATA, addr_from_reg(src) + RDMEM_B(AS_DATA, addr_from_reg(dst)));
+	WRMEM_B(AS_DATA, addr_from_reg(dst), xlt);
+	RB(1) = xlt;  /* destroy RH1 */
+	add_to_addr_reg(dst, 1);
+	if (--RW(cnt)) { CLR_V; m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  trdb    @rd,@rs,rbr
  flags:  -ZSV--
  ******************************************/
-static void ZB8_ddN0_1000_0000_rrrr_ssN0_0000(z8000_state *cpustate)
+void z8002_device::ZB8_ddN0_1000_0000_rrrr_ssN0_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	UINT8 xlt = RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
-	WRMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst), xlt);
-	cpustate->RB(1) = xlt;  /* destroy RH1 */
-	sub_from_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	UINT8 xlt = RDMEM_B(AS_DATA, addr_from_reg(src) + RDMEM_B(AS_DATA, addr_from_reg(dst)));
+	WRMEM_B(AS_DATA, addr_from_reg(dst), xlt);
+	RB(1) = xlt;  /* destroy RH1 */
+	sub_from_addr_reg(dst, 1);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
  trdrb   @rd,@rs,rbr
  flags:  -ZSV--
  ******************************************/
-static void ZB8_ddN0_1100_0000_rrrr_ssN0_0000(z8000_state *cpustate)
+void z8002_device::ZB8_ddN0_1100_0000_rrrr_ssN0_0000()
 {
 	GET_DST(OP0,NIB2);
 	GET_SRC(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	UINT8 xlt = RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)));
-	WRMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst), xlt);
-	cpustate->RB(1) = xlt;  /* destroy RH1 */
-	sub_from_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; cpustate->pc -= 4; } else SET_V;
+	UINT8 xlt = RDMEM_B(AS_DATA, addr_from_reg(src) + RDMEM_B(AS_DATA, addr_from_reg(dst)));
+	WRMEM_B(AS_DATA, addr_from_reg(dst), xlt);
+	RB(1) = xlt;  /* destroy RH1 */
+	sub_from_addr_reg(dst, 1);
+	if (--RW(cnt)) { CLR_V; m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  rsvdb9
  flags:  ------
  ******************************************/
-static void ZB9_imm8(z8000_state *cpustate)
+void z8002_device::ZB9_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvdb9 $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: rsvdb9 $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -6030,13 +6058,13 @@ static void ZB9_imm8(z8000_state *cpustate)
  cpib    rbd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBA_ssN0_0000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_0000_0000_rrrr_dddd_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6055,8 +6083,8 @@ static void ZBA_ssN0_0000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	add_to_addr_reg(cpustate, src, 1);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	add_to_addr_reg(src, 1);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
@@ -6064,29 +6092,29 @@ static void ZBA_ssN0_0000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
  ldibr   @rd,@rs,rr
  flags:  ---V--
  ******************************************/
-static void ZBA_ssN0_0001_0000_rrrr_ddN0_x000(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_0001_0000_rrrr_ddN0_x000()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);  /* repeat? */
-	WRMEM_B(cpustate, AS_DATA,  addr_from_reg(cpustate, dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
-	add_to_addr_reg(cpustate, src, 1);
-	add_to_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_B(AS_DATA,  addr_from_reg(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
+	add_to_addr_reg(src, 1);
+	add_to_addr_reg(dst, 1);
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpsib   @rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBA_ssN0_0010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_0010_0000_rrrr_ddN0_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPB(cpustate, RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPB(RDMEM_B(AS_DATA, addr_from_reg(dst)), RDMEM_B(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6105,22 +6133,22 @@ static void ZBA_ssN0_0010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	add_to_addr_reg(cpustate, src, 1);
-	add_to_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
+	add_to_addr_reg(src, 1);
+	add_to_addr_reg(dst, 1);
+	if (--RW(cnt)) { CLR_V; if (!(m_fcw & F_Z)) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpirb   rbd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBA_ssN0_0100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_0100_0000_rrrr_dddd_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6139,21 +6167,21 @@ static void ZBA_ssN0_0100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	add_to_addr_reg(cpustate, src, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
+	add_to_addr_reg(src, 1);
+	if (--RW(cnt)) { CLR_V; if (!(m_fcw & F_Z)) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpsirb  @rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBA_ssN0_0110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_0110_0000_rrrr_ddN0_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPB(cpustate, RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPB(RDMEM_B(AS_DATA, addr_from_reg(dst)), RDMEM_B(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6172,22 +6200,22 @@ static void ZBA_ssN0_0110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	add_to_addr_reg(cpustate, src, 1);
-	add_to_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
+	add_to_addr_reg(src, 1);
+	add_to_addr_reg(dst, 1);
+	if (--RW(cnt)) { CLR_V; if (!(m_fcw & F_Z)) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpdb    rbd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBA_ssN0_1000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_1000_0000_rrrr_dddd_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6206,8 +6234,8 @@ static void ZBA_ssN0_1000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	sub_from_addr_reg(cpustate, src, 1);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	sub_from_addr_reg(src, 1);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
@@ -6215,29 +6243,29 @@ static void ZBA_ssN0_1000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
  lddbr   @rs,@rd,rr
  flags:  ---V--
  ******************************************/
-static void ZBA_ssN0_1001_0000_rrrr_ddN0_x000(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_1001_0000_rrrr_ddN0_x000()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_B(cpustate, AS_DATA,  addr_from_reg(cpustate, dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
-	sub_from_addr_reg(cpustate, src, 1);
-	sub_from_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_B(AS_DATA,  addr_from_reg(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
+	sub_from_addr_reg(src, 1);
+	sub_from_addr_reg(dst, 1);
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpsdb   @rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBA_ssN0_1010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_1010_0000_rrrr_ddN0_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPB(cpustate, RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPB(RDMEM_B(AS_DATA, addr_from_reg(dst)), RDMEM_B(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6256,22 +6284,22 @@ static void ZBA_ssN0_1010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	sub_from_addr_reg(cpustate, src, 1);
-	sub_from_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	sub_from_addr_reg(src, 1);
+	sub_from_addr_reg(dst, 1);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
  cpdrb   rbd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBA_ssN0_1100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_1100_0000_rrrr_dddd_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPB(cpustate, cpustate->RB(dst), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPB(RB(dst), RDMEM_B(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6290,21 +6318,21 @@ static void ZBA_ssN0_1100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	sub_from_addr_reg(cpustate, src, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
+	sub_from_addr_reg(src, 1);
+	if (--RW(cnt)) { CLR_V; if (!(m_fcw & F_Z)) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpsdrb  @rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBA_ssN0_1110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
+void z8002_device::ZBA_ssN0_1110_0000_rrrr_ddN0_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPB(cpustate, RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), RDMEM_B(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPB(RDMEM_B(AS_DATA, addr_from_reg(dst)), RDMEM_B(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6323,22 +6351,22 @@ static void ZBA_ssN0_1110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	sub_from_addr_reg(cpustate, src, 1);
-	sub_from_addr_reg(cpustate, dst, 1);
-	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
+	sub_from_addr_reg(src, 1);
+	sub_from_addr_reg(dst, 1);
+	if (--RW(cnt)) { CLR_V; if (!(m_fcw & F_Z)) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpi     rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBB_ssN0_0000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_0000_0000_rrrr_dddd_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6357,8 +6385,8 @@ static void ZBB_ssN0_0000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	add_to_addr_reg(cpustate, src, 2);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	add_to_addr_reg(src, 2);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
@@ -6366,29 +6394,29 @@ static void ZBB_ssN0_0000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
  ldir    @rd,@rs,rr
  flags:  ---V--
  ******************************************/
-static void ZBB_ssN0_0001_0000_rrrr_ddN0_x000(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_0001_0000_rrrr_ddN0_x000()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_W(cpustate, AS_DATA,  addr_from_reg(cpustate, dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
-	add_to_addr_reg(cpustate, src, 2);
-	add_to_addr_reg(cpustate, dst, 2);
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_W(AS_DATA,  addr_from_reg(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
+	add_to_addr_reg(src, 2);
+	add_to_addr_reg(dst, 2);
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpsi    @rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBB_ssN0_0010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_0010_0000_rrrr_ddN0_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPW(cpustate, RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPW(RDMEM_W(AS_DATA, addr_from_reg(dst)), RDMEM_W(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6407,22 +6435,22 @@ static void ZBB_ssN0_0010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	add_to_addr_reg(cpustate, src, 2);
-	add_to_addr_reg(cpustate, dst, 2);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	add_to_addr_reg(src, 2);
+	add_to_addr_reg(dst, 2);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
  cpir    rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBB_ssN0_0100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_0100_0000_rrrr_dddd_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6441,21 +6469,21 @@ static void ZBB_ssN0_0100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	add_to_addr_reg(cpustate, src, 2);
-	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
+	add_to_addr_reg(src, 2);
+	if (--RW(cnt)) { CLR_V; if (!(m_fcw & F_Z)) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpsir   @rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBB_ssN0_0110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_0110_0000_rrrr_ddN0_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPW(cpustate, RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPW(RDMEM_W(AS_DATA, addr_from_reg(dst)), RDMEM_W(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6474,22 +6502,22 @@ static void ZBB_ssN0_0110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	add_to_addr_reg(cpustate, src, 2);
-	add_to_addr_reg(cpustate, dst, 2);
-	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
+	add_to_addr_reg(src, 2);
+	add_to_addr_reg(dst, 2);
+	if (--RW(cnt)) { CLR_V; if (!(m_fcw & F_Z)) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpd     rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBB_ssN0_1000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_1000_0000_rrrr_dddd_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6508,8 +6536,8 @@ static void ZBB_ssN0_1000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	sub_from_addr_reg(cpustate, src, 2);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	sub_from_addr_reg(src, 2);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
@@ -6517,29 +6545,29 @@ static void ZBB_ssN0_1000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
  lddr    @rs,@rd,rr
  flags:  ---V--
  ******************************************/
-static void ZBB_ssN0_1001_0000_rrrr_ddN0_x000(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_1001_0000_rrrr_ddN0_x000()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB1);
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
-	WRMEM_W(cpustate, AS_DATA,  addr_from_reg(cpustate, dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
-	sub_from_addr_reg(cpustate, src, 2);
-	sub_from_addr_reg(cpustate, dst, 2);
-	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
+	WRMEM_W(AS_DATA,  addr_from_reg(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
+	sub_from_addr_reg(src, 2);
+	sub_from_addr_reg(dst, 2);
+	if (--RW(cnt)) { CLR_V; if (cc == 0) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpsd    @rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBB_ssN0_1010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_1010_0000_rrrr_ddN0_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPW(cpustate, RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPW(RDMEM_W(AS_DATA, addr_from_reg(dst)), RDMEM_W(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6558,22 +6586,22 @@ static void ZBB_ssN0_1010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	sub_from_addr_reg(cpustate, src, 2);
-	sub_from_addr_reg(cpustate, dst, 2);
-	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
+	sub_from_addr_reg(src, 2);
+	sub_from_addr_reg(dst, 2);
+	if (--RW(cnt)) CLR_V; else SET_V;
 }
 
 /******************************************
  cpdr    rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBB_ssN0_1100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_1100_0000_rrrr_dddd_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPW(cpustate, cpustate->RW(dst), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPW(RW(dst), RDMEM_W(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6592,21 +6620,21 @@ static void ZBB_ssN0_1100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	sub_from_addr_reg(cpustate, src, 2);
-	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
+	sub_from_addr_reg(src, 2);
+	if (--RW(cnt)) { CLR_V; if (!(m_fcw & F_Z)) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  cpsdr   @rd,@rs,rr,cc
  flags:  CZSV--
  ******************************************/
-static void ZBB_ssN0_1110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
+void z8002_device::ZBB_ssN0_1110_0000_rrrr_ddN0_cccc()
 {
 	GET_SRC(OP0,NIB2);
 	GET_CCC(OP1,NIB3);
 	GET_DST(OP1,NIB2);
 	GET_CNT(OP1,NIB1);
-	CPW(cpustate, RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, dst)), RDMEM_W(cpustate, AS_DATA, addr_from_reg(cpustate, src)));
+	CPW(RDMEM_W(AS_DATA, addr_from_reg(dst)), RDMEM_W(AS_DATA, addr_from_reg(src)));
 	switch (cc) {
 		case  0: if (CC0) SET_Z; else CLR_Z; break;
 		case  1: if (CC1) SET_Z; else CLR_Z; break;
@@ -6625,59 +6653,59 @@ static void ZBB_ssN0_1110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	sub_from_addr_reg(cpustate, src, 2);
-	sub_from_addr_reg(cpustate, dst, 2);
-	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
+	sub_from_addr_reg(src, 2);
+	sub_from_addr_reg(dst, 2);
+	if (--RW(cnt)) { CLR_V; if (!(m_fcw & F_Z)) m_pc -= 4; } else SET_V;
 }
 
 /******************************************
  rrdb    rbb,rba
  flags:  -Z----
  ******************************************/
-static void ZBC_aaaa_bbbb(z8000_state *cpustate)
+void z8002_device::ZBC_aaaa_bbbb()
 {
-	UINT8 b = cpustate->op[0] & 15;
-	UINT8 a = (cpustate->op[0] >> 4) & 15;
-	UINT8 tmp = cpustate->RB(b);
-	cpustate->RB(a) = (cpustate->RB(a) >> 4) | (cpustate->RB(b) << 4);
-	cpustate->RB(b) = (cpustate->RB(b) & 0xf0) | (tmp & 0x0f);
-	if (cpustate->RB(b)) CLR_Z; else SET_Z;
+	UINT8 b = m_op[0] & 15;
+	UINT8 a = (m_op[0] >> 4) & 15;
+	UINT8 tmp = RB(b);
+	RB(a) = (RB(a) >> 4) | (RB(b) << 4);
+	RB(b) = (RB(b) & 0xf0) | (tmp & 0x0f);
+	if (RB(b)) CLR_Z; else SET_Z;
 }
 
 /******************************************
  ldk     rd,imm4
  flags:  ------
  ******************************************/
-static void ZBD_dddd_imm4(z8000_state *cpustate)
+void z8002_device::ZBD_dddd_imm4()
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM4(OP0,NIB3);
-	cpustate->RW(dst) = imm4;
+	RW(dst) = imm4;
 }
 
 /******************************************
  rldb    rbb,rba
  flags:  -Z----
  ******************************************/
-static void ZBE_aaaa_bbbb(z8000_state *cpustate)
+void z8002_device::ZBE_aaaa_bbbb()
 {
-	UINT8 b = cpustate->op[0] & 15;
-	UINT8 a = (cpustate->op[0] >> 4) & 15;
-	UINT8 tmp = cpustate->RB(a);
-	cpustate->RB(a) = (cpustate->RB(a) << 4) | (cpustate->RB(b) & 0x0f);
-	cpustate->RB(b) = (cpustate->RB(b) & 0xf0) | (tmp >> 4);
-	if (cpustate->RB(b)) CLR_Z; else SET_Z;
+	UINT8 b = m_op[0] & 15;
+	UINT8 a = (m_op[0] >> 4) & 15;
+	UINT8 tmp = RB(a);
+	RB(a) = (RB(a) << 4) | (RB(b) & 0x0f);
+	RB(b) = (RB(b) & 0xf0) | (tmp >> 4);
+	if (RB(b)) CLR_Z; else SET_Z;
 }
 
 /******************************************
  rsvdbf
  flags:  ------
  ******************************************/
-static void ZBF_imm8(z8000_state *cpustate)
+void z8002_device::ZBF_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvdbf $%02x\n", cpustate->device->tag(), cpustate->pc, imm8));
-	if (cpustate->fcw & F_EPU) {
+	LOG(("Z8K '%s' %04x: rsvdbf $%02x\n", tag(), m_pc, imm8));
+	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
 	}
@@ -6688,64 +6716,64 @@ static void ZBF_imm8(z8000_state *cpustate)
  ldb     rbd,imm8   (long version)
  flags:  ------
  ******************************************/
-static void  Z20_0000_dddd_imm8(z8000_state *cpustate)
+void z8002_device::Z20_0000_dddd_imm8()
 {
 	GET_DST(OP0,NIB3);
 	GET_IMM8(OP1);
-	cpustate->RB(dst) = imm8;
+	RB(dst) = imm8;
 }
 
 /******************************************
  ldb     rbd,imm8
  flags:  ------
  ******************************************/
-static void ZC_dddd_imm8(z8000_state *cpustate)
+void z8002_device::ZC_dddd_imm8()
 {
 	GET_DST(OP0,NIB1);
 	GET_IMM8(0);
-	cpustate->RB(dst) = imm8;
+	RB(dst) = imm8;
 }
 
 /******************************************
  calr    dsp12
  flags:  ------
  ******************************************/
-static void ZD_dsp12(z8000_state *cpustate)
+void z8002_device::ZD_dsp12()
 {
-	INT16 dsp12 = cpustate->op[0] & 0xfff;
-	if (segmented_mode(cpustate))
-		PUSHL(cpustate, SP, make_segmented_addr(cpustate->pc));
+	INT16 dsp12 = m_op[0] & 0xfff;
+	if (segmented_mode())
+		PUSHL(SP, make_segmented_addr(m_pc));
 	else
-		PUSHW(cpustate, SP, cpustate->pc);
+		PUSHW(SP, m_pc);
 	dsp12 = (dsp12 & 2048) ? 4096 - 2 * (dsp12 & 2047) : -2 * (dsp12 & 2047);
-	set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp12));
+	set_pc(addr_add(m_pc, dsp12));
 }
 
 /******************************************
  jr      cc,dsp8
  flags:  ------
  ******************************************/
-static void ZE_cccc_dsp8(z8000_state *cpustate)
+void z8002_device::ZE_cccc_dsp8()
 {
 	GET_DSP8;
 	GET_CCC(OP0,NIB1);
 	switch (cc) {
-		case  0: if (CC0) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  1: if (CC1) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  2: if (CC2) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  3: if (CC3) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  4: if (CC4) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  5: if (CC5) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  6: if (CC6) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  7: if (CC7) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  8: if (CC8) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  9: if (CC9) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  10: if (CCA) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  11: if (CCB) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  12: if (CCC) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  13: if (CCD) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  14: if (CCE) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
-		case  15: if (CCF) set_pc(cpustate, addr_add(cpustate, cpustate->pc, dsp8 * 2)); break;
+		case  0: if (CC0) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  1: if (CC1) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  2: if (CC2) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  3: if (CC3) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  4: if (CC4) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  5: if (CC5) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  6: if (CC6) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  7: if (CC7) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  8: if (CC8) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  9: if (CC9) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  10: if (CCA) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  11: if (CCB) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  12: if (CCC) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  13: if (CCD) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  14: if (CCE) set_pc(addr_add(m_pc, dsp8 * 2)); break;
+		case  15: if (CCF) set_pc(addr_add(m_pc, dsp8 * 2)); break;
 	}
 }
 
@@ -6753,13 +6781,13 @@ static void ZE_cccc_dsp8(z8000_state *cpustate)
  dbjnz   rbd,dsp7
  flags:  ------
  ******************************************/
-static void ZF_dddd_0dsp7(z8000_state *cpustate)
+void z8002_device::ZF_dddd_0dsp7()
 {
 	GET_DST(OP0,NIB1);
 	GET_DSP7;
-	cpustate->RB(dst) -= 1;
-	if (cpustate->RB(dst)) {
-		set_pc(cpustate, addr_sub(cpustate, cpustate->pc, 2 * dsp7));
+	RB(dst) -= 1;
+	if (RB(dst)) {
+		set_pc(addr_sub(m_pc, 2 * dsp7));
 	}
 }
 
@@ -6767,12 +6795,12 @@ static void ZF_dddd_0dsp7(z8000_state *cpustate)
  djnz    rd,dsp7
  flags:  ------
  ******************************************/
-static void ZF_dddd_1dsp7(z8000_state *cpustate)
+void z8002_device::ZF_dddd_1dsp7()
 {
 	GET_DST(OP0,NIB1);
 	GET_DSP7;
-	cpustate->RW(dst) -= 1;
-	if (cpustate->RW(dst)) {
-		set_pc(cpustate, addr_sub(cpustate, cpustate->pc, 2 * dsp7));
+	RW(dst) -= 1;
+	if (RW(dst)) {
+		set_pc(addr_sub(m_pc, 2 * dsp7));
 	}
 }

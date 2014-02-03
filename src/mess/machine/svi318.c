@@ -510,7 +510,7 @@ static const UINT8 cc_ex[0x100] = {
 DRIVER_INIT_MEMBER(svi318_state,svi318)
 {
 	/* z80 stuff */
-	z80_set_cycle_tables( m_maincpu, cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
+	m_maincpu->z80_set_cycle_tables( cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 
 	memset(&m_svi, 0, sizeof (m_svi) );
 

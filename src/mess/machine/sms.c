@@ -858,18 +858,13 @@ MACHINE_START_MEMBER(sms_state,sms)
 		save_item(NAME(m_io_ctrl_reg));
 		save_item(NAME(m_ctrl1_th_latch));
 		save_item(NAME(m_ctrl2_th_latch));
+		save_item(NAME(m_ctrl1_th_state));
+		save_item(NAME(m_ctrl2_th_state));
 	}
 
 	if (m_is_gamegear)
 	{
 		save_item(NAME(m_gg_sio));
-	}
-	else
-	{
-		save_item(NAME(m_ctrl1_th_state));
-		save_item(NAME(m_ctrl2_th_state));
-		save_item(NAME(m_sscope_state));
-		save_item(NAME(m_frame_sscope_state));
 	}
 
 	if (m_is_sdisp)
@@ -892,6 +887,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 	// a bunch of SG1000 carts (compatible with SG1000 Mark III) can access directly system RAM... let's install here the necessary handlers
 	// TODO: are BASIC and Music actually compatible with Mark III??
+	// TODO: handle device slot switching for when running on a SMS.
 	if (m_cartslot->get_type() == SEGA8_BASIC_L3 || m_cartslot->get_type() == SEGA8_MUSIC_EDITOR
 			|| m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA || m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
 	{
@@ -911,6 +907,10 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 		m_bios_port = 0;
 		m_ctrl1_th_latch = 0;
 		m_ctrl2_th_latch = 0;
+		m_ctrl1_th_state = 1;
+		m_ctrl2_th_state = 1;
+		// TODO: change to work also with other device slots and handle SMS slot switching.
+		m_lphaser_x_offs = (m_cartslot->m_cart) ? m_cartslot->m_cart->get_lphaser_xoffs() : 44;
 	}
 
 	if (m_is_gamegear)
@@ -924,15 +924,6 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 		m_gg_sio[2] = 0x00;
 		m_gg_sio[3] = 0xff;
 		m_gg_sio[4] = 0x00;
-	}
-	else
-	{
-		m_ctrl1_th_state = 1;
-		m_ctrl2_th_state = 1;
-		m_lphaser_x_offs = (m_cartslot->m_cart) ? m_cartslot->m_cart->get_lphaser_xoffs() : 44;
-
-		m_sscope_state = 0;
-		m_frame_sscope_state = 0;
 	}
 
 	if (m_is_sdisp)
@@ -1070,6 +1061,8 @@ VIDEO_START_MEMBER(sms_state,sms1)
 	m_main_scr->register_screen_bitmap(m_prevright_bitmap);
 	save_item(NAME(m_prevleft_bitmap));
 	save_item(NAME(m_prevright_bitmap));
+	save_item(NAME(m_sscope_state));
+	save_item(NAME(m_frame_sscope_state));
 
 	// Allow sscope screens to have crosshair, useful for the game missil3d
 	crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
@@ -1087,6 +1080,9 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 		if (sscope_binocular_hack & 0x02)
 			m_prevright_bitmap.fill(RGB_BLACK);
 	}
+
+	m_sscope_state = 0;
+	m_frame_sscope_state = 0;
 }
 
 

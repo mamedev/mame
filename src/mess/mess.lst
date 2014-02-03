@@ -116,6 +116,7 @@ laseractj // 1993 Pioneer LaserActive (Japan)
 xeye      // 1993 JVC X'eye (USA)
 wmega    // 1992 Sega Wondermega (Japan)
 wmegam2 // 1993 Victor Wondermega M2 (Japan)
+aiwamcd // 1994 AIWA Mega-CD CSD-G1M (Japan)
 cdx    // 1994 Sega CDX (USA)
 multmega  // 1994 Sega Multi-Mega (Europe)
 32x    // 1994 Sega 32X (USA)
@@ -351,6 +352,7 @@ mu100   // 1997 MU-100
 mt32
 cm32l
 d110
+sc55	// 1991 Sound Canvas SC-55
 
 //***************COMPUTERS**************************************************
 
@@ -1222,6 +1224,11 @@ iqunlim  // 199? IQ Unlimited (680x0)
 iqunlimz  // 1991 IQ Unlimited (Z80)
 gl3000s  // 199? Genius GL3000S
 glmmc  // 199? Genius Master Mega Color
+gl4004 // Genius Leader 4004 Quadro L (Germany)
+gl5000 // Genius Leader 5000 (Germany)
+gl5005x // Genius Leader 5005X (Germany)
+gl6000sl // Genius Leader 6000SL (Germany)
+
 
 // Tangerine
 microtan  // 1979 Microtan 65
@@ -2323,4 +2330,4 @@ pulsarlb
 hprot1
 compclr2
 m6805evs
-
+mx2178

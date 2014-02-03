@@ -47,6 +47,7 @@ public:
 		m_cbaj_fifo1(*this, "cbaj_fifo1"),
 		m_cbaj_fifo2(*this, "cbaj_fifo2"),
 		m_mb3773(*this, "mb3773"),
+		m_zoom(*this, "taito_zoom"),
 		m_vt83c461(*this, "ide")
 	{
 	}
@@ -63,11 +64,10 @@ public:
 	DECLARE_WRITE8_MEMBER(zn_qsound_w);
 	DECLARE_WRITE8_MEMBER(bank_coh1000t_w);
 	DECLARE_WRITE8_MEMBER(fx1a_sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(taitofx1b_volume_w);
-	DECLARE_WRITE16_MEMBER(taitofx1b_sound_w);
-	DECLARE_READ16_MEMBER(taitofx1b_sound_r);
+	DECLARE_WRITE8_MEMBER(fx1b_fram_w);
+	DECLARE_READ8_MEMBER(fx1b_fram_r);
 	DECLARE_WRITE8_MEMBER(coh1002e_bank_w);
-	DECLARE_WRITE8_MEMBER(coh1002e_latch_w);
+	DECLARE_WRITE8_MEMBER(coh1002e_sound_irq_w);
 	DECLARE_WRITE16_MEMBER(bam2_mcu_w);
 	DECLARE_READ16_MEMBER(bam2_mcu_r);
 	DECLARE_READ16_MEMBER(bam2_unk_r);
@@ -88,7 +88,6 @@ public:
 	DECLARE_WRITE16_MEMBER(vt83c461_16_w);
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
-	DECLARE_DRIVER_INIT(coh1000ta);
 	DECLARE_DRIVER_INIT(coh1000tb);
 	DECLARE_DRIVER_INIT(coh1000c);
 	DECLARE_MACHINE_RESET(coh1000c);
@@ -118,10 +117,9 @@ private:
 	UINT16 m_bam2_mcu_command;
 	int m_jdredd_gun_mux;
 
-	size_t m_nbajamex_eeprom_size;
-	UINT8 *m_nbajamex_eeprom;
+	UINT8* m_fx1b_fram;
 
-	UINT16 vt83c461_latch;
+	UINT16 m_vt83c461_latch;
 
 	required_device<psxgpu_device> m_gpu;
 	required_device<screen_device> m_gpu_screen;
@@ -134,6 +132,7 @@ private:
 	optional_device<fifo7200_device> m_cbaj_fifo1;
 	optional_device<fifo7200_device> m_cbaj_fifo2;
 	optional_device<mb3773_device> m_mb3773;
+	optional_device<taito_zoom_device> m_zoom;
 	optional_device<vt83c461_device> m_vt83c461;
 };
 
@@ -444,6 +443,7 @@ void zn_state::driver_start()
 }
 
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
@@ -455,6 +455,9 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
+
+	// 5MHz NEC uPD78081 MCU:
+	// we don't have a 78K0 emulation core yet..
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
@@ -474,6 +477,7 @@ static MACHINE_CONFIG_DERIVED( zn1_2mb_vram, zn1_1mb_vram )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( zn2, zn_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
@@ -485,6 +489,9 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
+
+	// 5MHz NEC uPD78081 MCU:
+	// we don't have a 78K0 emulation core yet..
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
@@ -555,6 +562,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'CP01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board (Gallop Racer)
@@ -774,6 +782,7 @@ Notes:
       EPM7064        - Altera EPM7064QC100 CPLD (QFP100)
       CAT702         - Protection chip labelled 'CP10' (DIP20)
       *              - Unpopulated position for additional KM416V1204BT-L5 RAMs
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -925,6 +934,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'TT01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -1031,6 +1041,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'TT01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -1108,16 +1119,9 @@ static ADDRESS_MAP_START(coh1000ta_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
 	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x000000ff)
 	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff0000)
-	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM AM_SHARE("fm1208s")
 
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
-
-DRIVER_INIT_MEMBER(zn_state,coh1000ta)
-{
-	memory_share *eeprom = memshare("fm1208s");
-	machine().device<nvram_device>("fm1208s")->set_base(eeprom->ptr(), eeprom->bytes());
-}
 
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
@@ -1155,7 +1159,6 @@ static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)    /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(fx1a_sound_map)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
-	MCFG_NVRAM_ADD_0FILL("fm1208s")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL_16MHz/2)
 	MCFG_YM2610_IRQ_HANDLER(WRITELINE(zn_state, irqhandler))
@@ -1169,39 +1172,32 @@ static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 	MCFG_TC0140SYT_ADD("tc0140syt", coh1000ta_tc0140syt_intf)
 MACHINE_CONFIG_END
 
-WRITE16_MEMBER(zn_state::taitofx1b_volume_w)
+WRITE8_MEMBER(zn_state::fx1b_fram_w)
 {
-	verboselog(1, "taitofx1_volume_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	m_fx1b_fram[offset] = data;
 }
 
-WRITE16_MEMBER(zn_state::taitofx1b_sound_w)
+READ8_MEMBER(zn_state::fx1b_fram_r)
 {
-	verboselog(1, "taitofx1_sound_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-}
-
-READ16_MEMBER(zn_state::taitofx1b_sound_r)
-{
-	UINT32 data = 0; // bit 0 = busy?
-	verboselog(1, "taitofx1_sound_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	return data;
+	return m_fx1b_fram[offset];
 }
 
 static ADDRESS_MAP_START(coh1000tb_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
-	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_RAM AM_SHARE("m66220fp")
+	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_READWRITE8(fx1b_fram_r, fx1b_fram_w, 0x00ff00ff)
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
-	AM_RANGE(0x1fb80000, 0x1fb8ffff) AM_WRITE16(taitofx1b_volume_w, 0xffffffff)
-	AM_RANGE(0x1fba0000, 0x1fbaffff) AM_WRITE16(taitofx1b_sound_w, 0xffffffff)
-	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_READ16(taitofx1b_sound_r, 0x0000ffff)
-	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM AM_SHARE("fm1208s")
-
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, global_volume_w, 0x0000ffff)
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reset_control_w, 0xffff0000)
+	AM_RANGE(0x1fba0000, 0x1fba0003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, sound_irq_w, 0x0000ffff)
+	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_DEVREAD16("taito_zoom", taito_zoom_device, sound_irq_r, 0x0000ffff)
+	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comm with the MN10200
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 {
-	memory_share *fm1208s = memshare("fm1208s");
-	machine().device<nvram_device>("fm1208s")->set_base(fm1208s->ptr(), fm1208s->bytes());
+	m_fx1b_fram = auto_alloc_array(machine(), UINT8, 0x200);
+	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram, 0x200);
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000tb)
@@ -1214,7 +1210,7 @@ static MACHINE_CONFIG_DERIVED(coh1000tb, zn1_2mb_vram)
 	MCFG_CPU_PROGRAM_MAP(coh1000tb_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000tb)
-	MCFG_NVRAM_ADD_0FILL("fm1208s")
+	MCFG_NVRAM_ADD_1FILL("fm1208s")
 
 	MCFG_MB3773_ADD("mb3773")
 
@@ -1285,6 +1281,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'TW01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -1414,12 +1411,12 @@ READ16_MEMBER(zn_state::vt83c461_32_r)
 	if( offset == 0x1f0/2 )
 	{
 		UINT32 data = m_vt83c461->read_cs0(space, 0, 0xffffffff);
-		vt83c461_latch = data >> 16;
+		m_vt83c461_latch = data >> 16;
 		return data & 0xffff;
 	}
 	else if( offset == 0x1f2/2 )
 	{
-		return vt83c461_latch;
+		return m_vt83c461_latch;
 	}
 	else
 	{
@@ -1509,6 +1506,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'ET01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Beastorizer Game board
@@ -1609,18 +1607,16 @@ WRITE8_MEMBER(zn_state::coh1002e_bank_w)
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
-WRITE8_MEMBER(zn_state::coh1002e_latch_w)
+WRITE8_MEMBER(zn_state::coh1002e_sound_irq_w)
 {
-	if (offset)
-		m_audiocpu->set_input_line(2, HOLD_LINE);   // irq 2 on the 68k
-	else
-		soundlatch_byte_w(space, 0, data);
+	m_audiocpu->set_input_line(2, HOLD_LINE); // irq 2 on the 68k
 }
 
 static ADDRESS_MAP_START(coh1002e_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fa10300, 0x1fa10303) AM_WRITE8(coh1002e_bank_w, 0x000000ff)
-	AM_RANGE(0x1fb00000, 0x1fb00007) AM_WRITE8(coh1002e_latch_w, 0x000000ff)
+	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(soundlatch_byte_w, 0x000000ff)
+	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002e_sound_irq_w, 0x000000ff)
 
 	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
@@ -1848,6 +1844,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'AC01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -2106,6 +2103,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'AT01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board
@@ -2318,6 +2316,7 @@ Notes:
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'MG01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 Game board with sound
@@ -2564,18 +2563,14 @@ static INPUT_PORTS_START( zn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
+	PORT_DIPNAME( 0x01, 0x01, "Freeze" )                PORT_DIPLOCATION("S551:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("S551:2") // bios testmode
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "S551:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "S551:4" ) // game testmode in some games
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zn4w )
@@ -2686,7 +2681,9 @@ INPUT_PORTS_END
 
 #define CPZN1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1000c.353", 0x0000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a) )
+	ROM_LOAD( "coh-1000c.353", 0x0000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( cpzn1 )
 	CPZN1_BIOS
@@ -3058,7 +3055,9 @@ ROM_END
 
 #define CPZN2_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-3002c.353", 0x0000000, 0x080000, CRC(e860ea8b) SHA1(66e7e1d4e426466b8f48a2ba055a91b475569504) )
+	ROM_LOAD( "coh-3002c.353", 0x0000000, 0x080000, CRC(e860ea8b) SHA1(66e7e1d4e426466b8f48a2ba055a91b475569504) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( cpzn2 )
 	CPZN2_BIOS
@@ -3601,7 +3600,9 @@ ROM_END
 
 #define TPS_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1002m.353", 0x0000000, 0x080000, CRC(69ffbcb4) SHA1(03eb2febfab3fcde716defff291babd9392de965) )
+	ROM_LOAD( "coh-1002m.353", 0x0000000, 0x080000, CRC(69ffbcb4) SHA1(03eb2febfab3fcde716defff291babd9392de965) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( tps )
 	TPS_BIOS
@@ -3850,7 +3851,9 @@ ROM_END
 
 #define KN_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1002v.353", 0x0000000, 0x080000, CRC(5ff165f3) SHA1(8f59314c1093446b9bcb06d232244da6df78e206) )
+	ROM_LOAD( "coh-1002v.353", 0x0000000, 0x080000, CRC(5ff165f3) SHA1(8f59314c1093446b9bcb06d232244da6df78e206) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( vspsx )
 	KN_BIOS
@@ -3915,7 +3918,9 @@ ROM_END
 
 #define TAITOFX1_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1000t.353", 0x0000000, 0x080000, CRC(e3f23b6e) SHA1(e18907cf8c6ba54d96edba0a9a00487a90219e0d) )
+	ROM_LOAD( "coh-1000t.353", 0x0000000, 0x080000, CRC(e3f23b6e) SHA1(e18907cf8c6ba54d96edba0a9a00487a90219e0d) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( taitofx1 )
 	TAITOFX1_BIOS
@@ -3936,9 +3941,9 @@ ROM_START( ftimpcta )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION( 0x600000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
-	ROM_LOAD( "e25-05.28",    0x0040000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
+	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 ROM_END
 
 ROM_START( ftimpact )
@@ -3954,9 +3959,9 @@ ROM_START( ftimpact )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION( 0x600000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
-	ROM_LOAD( "e25-05.28",    0x0040000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
+	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 ROM_END
 
 ROM_START( ftimpactu )
@@ -3972,9 +3977,9 @@ ROM_START( ftimpactu )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION( 0x600000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
-	ROM_LOAD( "e25-05.28",    0x0040000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
+	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 ROM_END
 
 ROM_START( ftimpactj )
@@ -3990,9 +3995,9 @@ ROM_START( ftimpactj )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e25-10.14",    0x0000000, 0x080000, CRC(2b2ad1b1) SHA1(6d064d0b6805d43ce42929ac8f5645b56384f53c) )
 
-	ROM_REGION( 0x600000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x600000, "zsg2", 0 )
 	ROM_LOAD( "e25-04.27",    0x0000000, 0x400000, CRC(09a66d35) SHA1(f0df24bc9bfc9eb0f5150dc035c19fc5b8a39bf9) )
-	ROM_LOAD( "e25-05.28",    0x0040000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
+	ROM_LOAD( "e25-05.28",    0x0400000, 0x200000, CRC(3fb57636) SHA1(aa38bfac11ecf10fd55143cf4525a2a529be8bb6) )
 ROM_END
 
 ROM_START( gdarius )
@@ -4008,7 +4013,7 @@ ROM_START( gdarius )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
 
-	ROM_REGION( 0x400000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
 ROM_END
 
@@ -4025,7 +4030,7 @@ ROM_START( gdariusb )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
 
-	ROM_REGION( 0x400000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
 ROM_END
 
@@ -4042,7 +4047,7 @@ ROM_START( gdarius2 )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e39-07.14",    0x0000000, 0x080000, CRC(2252c7c1) SHA1(92b9908e0d87cad6587f1acc0eef69eaae8c6a98) )
 
-	ROM_REGION( 0x400000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e39-04.27",    0x0000000, 0x400000, CRC(6ee35e68) SHA1(fdfe63203d8cecf84cb869039fb893d5b63cdd67) )
 ROM_END
 
@@ -4150,7 +4155,7 @@ ROM_START( raystorm )
 	ROM_REGION16_LE( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION( 0x400000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 ROM_END
 
@@ -4166,7 +4171,7 @@ ROM_START( raystormo )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION( 0x400000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 ROM_END
 
@@ -4182,7 +4187,7 @@ ROM_START( raystormu )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION( 0x400000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 ROM_END
 
@@ -4198,7 +4203,7 @@ ROM_START( raystormj )
 	ROM_REGION( 0x080000, "mn10200", 0 )
 	ROM_LOAD( "e24-09.14",    0x0000000, 0x080000, CRC(808589e1) SHA1(46ada4c6d68c2462186a0b962abb435ee740c0ba) )
 
-	ROM_REGION( 0x400000, "zsg1", 0 )
+	ROM_REGION32_LE( 0x400000, "zsg2", 0 )
 	ROM_LOAD( "e24-04.27",    0x0000000, 0x400000, CRC(f403493a) SHA1(3e49fd2a060a3893e26f14cc3cf47c4ba91e17d4) )
 ROM_END
 
@@ -4282,7 +4287,9 @@ ROM_END
 
 #define PSARC95_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1002e.353", 0x000000, 0x080000, CRC(910f3a8b) SHA1(cd68532967a25f476a6d73473ec6b6f4df2e1689) )
+	ROM_LOAD( "coh-1002e.353", 0x000000, 0x080000, CRC(910f3a8b) SHA1(cd68532967a25f476a6d73473ec6b6f4df2e1689) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( psarc95 )
 	PSARC95_BIOS
@@ -4539,7 +4546,9 @@ ROM_END
 
 #define TW_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1000w.353", 0x000000, 0x080000, CRC(45e8a4b4) SHA1(815488d8563c85f97fbc3384ff21f08e4c88b7b7) )
+	ROM_LOAD( "coh-1000w.353", 0x000000, 0x080000, CRC(45e8a4b4) SHA1(815488d8563c85f97fbc3384ff21f08e4c88b7b7) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( atpsx )
 	TW_BIOS
@@ -4563,7 +4572,9 @@ ROM_END
 
 #define AC_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1000a.353", 0x0000000, 0x080000, CRC(8d8d0764) SHA1(7ee83d317190bb1cef2f8f01c81eaaae47150ebb) )
+	ROM_LOAD( "coh-1000a.353", 0x0000000, 0x080000, CRC(8d8d0764) SHA1(7ee83d317190bb1cef2f8f01c81eaaae47150ebb) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( acpsx )
 	AC_BIOS
@@ -4626,7 +4637,9 @@ ROM_END
 
 #define ATLUS_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
-	ROM_LOAD( "coh-1001l.353", 0x000000, 0x080000, CRC(6721146b) SHA1(9511d24bfe25eb180fb2db0835b131cb4a12730e) )
+	ROM_LOAD( "coh-1001l.353", 0x000000, 0x080000, CRC(6721146b) SHA1(9511d24bfe25eb180fb2db0835b131cb4a12730e) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */
 
 ROM_START( atluspsx )
 	ATLUS_BIOS
@@ -4766,28 +4779,29 @@ GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, driver_device, 0, ROT270, "Video S
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000t.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, taitofx1, 0,         coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Taito FX1", GAME_IS_BIOS_ROOT )
+GAME( 1995, taitofx1, 0,         coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Taito FX1", GAME_IS_BIOS_ROOT )
 
-GAME( 1995, sfchamp,   taitofx1, coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.5O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, sfchampo,  sfchamp,  coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, sfchampu,  sfchamp,  coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, sfchampj,  sfchamp,  coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, psyforce,  taitofx1, coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Psychic Force (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, psyforcej, psyforce, coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Psychic Force (Ver 2.4J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, psyforcex, psyforce, coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, mgcldate,  mgcldtex, coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, raystorm,  taitofx1, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.06A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, raystormo, raystorm, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, raystormu, raystorm, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, raystormj, raystorm, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, ftimpact,  ftimpcta, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, ftimpactu, ftimpcta, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, ftimpactj, ftimpcta, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, ftimpcta,  taitofx1, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, mgcldtex,  taitofx1, coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdarius,   gdarius2, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdariusb,  gdarius2, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1997, gdarius2,  taitofx1, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, sfchamp,   taitofx1, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.5O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, sfchampo,  sfchamp,  coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, sfchampu,  sfchamp,  coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, sfchampj,  sfchamp,  coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, psyforce,  taitofx1, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, psyforcej, psyforce, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, psyforcex, psyforce, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, mgcldate,  mgcldtex, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, mgcldtex,  taitofx1, coh1000ta, zn, driver_device, 0, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+GAME( 1996, raystorm,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.06A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, raystormo, raystorm, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, raystormu, raystorm, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, raystormj, raystorm, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, ftimpact,  ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, ftimpactu, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, ftimpactj, ftimpcta, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, ftimpcta,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdarius,   gdarius2, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdariusb,  gdarius2, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1997, gdarius2,  taitofx1, coh1000tb, zn, zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Eighting / Raizing */
 

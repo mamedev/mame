@@ -16,7 +16,9 @@ netlist_logic_family_desc_t netlist_family_ttl =
         0.8, // m_low_thresh_V
         2.0, // m_high_thresh_V
         0.3, // m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-        3.4, // m_high_V
+        3.7, // m_high_V
+        1.0, // m_R_low;
+        130.0, //  m_R_high;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -269,10 +271,24 @@ ATTR_COLD void netlist_base_t::error(const char *format, ...) const
 {
 	va_list ap;
 	va_start(ap, format);
-	//emu_fatalerror error(format, ap);
-	vfatalerror(format, ap);
+	vfatalerror(NL_ERROR, format, ap);
 	va_end(ap);
-	//throw error;
+}
+
+ATTR_COLD void netlist_base_t::warning(const char *format, ...) const
+{
+    va_list ap;
+    va_start(ap, format);
+    vfatalerror(NL_WARNING, format, ap);
+    va_end(ap);
+}
+
+ATTR_COLD void netlist_base_t::log(const char *format, ...) const
+{
+    va_list ap;
+    va_start(ap, format);
+    vfatalerror(NL_LOG, format, ap);
+    va_end(ap);
 }
 
 
@@ -285,13 +301,6 @@ ATTR_COLD void netlist_base_t::error(const char *format, ...) const
 // ----------------------------------------------------------------------------------------
 // net_core_device_t
 // ----------------------------------------------------------------------------------------
-
-#if 0
-ATTR_COLD netlist_core_device_t::netlist_core_device_t()
-: netlist_object_t(DEVICE, GENERIC), m_family_desc(NULL)
-{
-}
-#endif
 
 ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
 : netlist_object_t(DEVICE, afamily), m_family_desc(NULL)
@@ -440,16 +449,16 @@ ATTR_COLD netlist_net_t::netlist_net_t(const type_t atype, const family_t afamil
 	, m_in_queue(2)
 	, m_railterminal(NULL)
 {
-    m_last.Analog = -123456789.0; // set to something we will never hit.
+    m_last.Analog = 0.0;
     m_new.Analog = 0.0;
     m_cur.Analog = 0.0;
 };
 
 ATTR_COLD void netlist_net_t::reset()
 {
-    m_last.Analog = -123456789.0; // set to something we will never hit.
-    m_new.Analog = 0.0;
+    m_last.Analog = 0.0;
     m_cur.Analog = 0.0;
+    m_new.Analog = 0.0;
     m_last.Q = 0; // set to something we will never hit.
     m_new.Q = 0;
     m_cur.Q = 0;
@@ -535,13 +544,20 @@ ATTR_HOT inline void netlist_net_t::update_devs()
 
 	assert(this->isRailNet());
 
-	const UINT32 masks[4] = { 1, 5, 3, 1 };
+	static const UINT32 masks[4] = { 1, 5, 3, 1 };
+    const UINT32 mask = masks[ (m_last.Q  << 1) | m_new.Q ];
+
     m_cur = m_new;
     m_in_queue = 2; /* mark as taken ... */
 
-    const UINT32 mask = masks[ (m_last.Q  << 1) | m_cur.Q ];
-
     netlist_core_terminal_t *p = m_head;
+#if 0
+    do
+    {
+        update_dev(p, mask);
+        p = p->m_update_list_next;
+    } while (p != NULL);
+#else
     switch (m_num_cons)
     {
     case 2:
@@ -558,6 +574,7 @@ ATTR_HOT inline void netlist_net_t::update_devs()
         } while (p != NULL);
         break;
     }
+#endif
     m_last = m_cur;
 }
 
@@ -585,7 +602,18 @@ ATTR_COLD netlist_terminal_t::netlist_terminal_t()
 , m_Idr(0.0)
 , m_go(NETLIST_GMIN)
 , m_gt(NETLIST_GMIN)
+, m_otherterm(NULL)
 {
+}
+
+
+ATTR_COLD void netlist_terminal_t::reset()
+{
+    //netlist_terminal_core_terminal_t::reset();
+    set_state(STATE_INP_ACTIVE);
+    m_Idr = 0.0;
+    m_go = NETLIST_GMIN;
+    m_gt = NETLIST_GMIN;
 }
 
 ATTR_COLD void netlist_core_terminal_t::set_net(netlist_net_t &anet)
@@ -606,6 +634,7 @@ netlist_output_t::netlist_output_t(const type_t atype, const family_t afamily)
 	, m_my_net(NET, afamily)
 {
 	//m_net = new net_net_t(NET_DIGITAL);
+    set_state(STATE_OUT);
 	this->set_net(m_my_net);
 }
 
@@ -629,7 +658,7 @@ ATTR_COLD void netlist_logic_output_t::initial(const netlist_sig_t val)
 {
 	net().m_cur.Q = val;
 	net().m_new.Q = val;
-	net().m_last.Q = !val;
+    net().m_last.Q = val;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -795,10 +824,10 @@ ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::term_param_list
         return nl_util::pstring_list();
 }
 
-ATTR_COLD const pstring net_device_t_base_factory::def_param()
+ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::def_params()
 {
     if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-        return "";
+        return nl_util::pstring_list();
     else
-        return m_def_param;
+        return nl_util::split(m_def_param, ",");
 }

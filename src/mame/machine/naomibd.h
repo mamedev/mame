@@ -4,16 +4,16 @@
 #include "machine/naomig1.h"
 #include "machine/naomicrypt.h"
 
-#define MCFG_NAOMI_BOARD_ADD(_tag, type, _eeprom_tag, _irq_cb)    \
+#define MCFG_NAOMI_BOARD_ADD(_tag, type, _eeprom_tag, _actel_tag, _irq_cb)    \
 	MCFG_NAOMI_G1_ADD(_tag, type, _irq_cb)                        \
-	naomi_board::static_set_eeprom_tag(*device, _eeprom_tag);
+	naomi_board::static_set_eeprom_tag(*device, _eeprom_tag, _actel_tag);
 
 class naomi_board : public naomi_g1_device
 {
 public:
 	naomi_board(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
-	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag);
+	static void static_set_eeprom_tag(device_t &device, const char *_eeprom_tag, const char *_actel_tag);
 
 	// Can be patched in the underlying class
 	virtual DECLARE_ADDRESS_MAP(submap, 16);
@@ -24,6 +24,7 @@ public:
 	DECLARE_WRITE16_MEMBER(rom_data_w);             // 5f7008
 	DECLARE_WRITE16_MEMBER(dma_offseth_w);          // 5f700c
 	DECLARE_WRITE16_MEMBER(dma_offsetl_w);          // 5f7010
+	DECLARE_READ16_MEMBER(actel_r);					// 5f7014
 	DECLARE_WRITE16_MEMBER(dma_count_w);            // 5f7014
 
 	DECLARE_WRITE16_MEMBER(boardid_w);              // 5f7078
@@ -52,6 +53,7 @@ private:
 	bool pio_ready, dma_ready;
 
 	const char *eeprom_tag;
+	const char *actel_tag;
 	class x76f100_device *eeprom;
 };
 

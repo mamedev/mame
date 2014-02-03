@@ -1,11 +1,12 @@
 /*************************************************************************
 
-    Vapour Trail
+    Vapor Trail
 
 *************************************************************************/
 
 #include "video/bufsprite.h"
 #include "video/deco16ic.h"
+#include "video/decmxc06.h"
 
 class vaportra_state : public driver_device
 {
@@ -16,6 +17,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
+		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers */
@@ -32,6 +34,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
+	required_device<deco_mxc06_device> m_spritegen;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE16_MEMBER(vaportra_sound_w);
 	DECLARE_READ16_MEMBER(vaportra_control_r);

@@ -25,7 +25,7 @@
 
 #include "emu.h"
 #include "machine/nes_namcot.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 #include "cpu/m6502/m6502.h"
 
@@ -576,7 +576,7 @@ WRITE8_MEMBER(nes_namcot163_device::chr_w)
 	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
 	{
 		// CIRAM!!!
-		ui_popup_time(10, "CIRAM mapped to VRAM. Please contact MAMEDevs.");
+		machine().ui().popup_time(10, "CIRAM mapped to VRAM. Please contact MAMEDevs.");
 
 		if (!m_nt_writable[bank & 0x03])
 			return;
@@ -591,7 +591,7 @@ READ8_MEMBER(nes_namcot163_device::chr_r)
 	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
 	{
 		// CIRAM!!!
-		ui_popup_time(10, "CIRAM mapped to VRAM. Please contact MAMEDevs.");
+		machine().ui().popup_time(10, "CIRAM mapped to VRAM. Please contact MAMEDevs.");
 		return m_nt_access[bank & 0x03][offset & 0x3ff];
 	}
 	// or ROM, accessed as usual

@@ -141,17 +141,19 @@ EMUOBJS = \
 	$(EMUOBJ)/sprite.o \
 	$(EMUOBJ)/tilemap.o \
 	$(EMUOBJ)/timer.o \
-	$(EMUOBJ)/ui.o \
-	$(EMUOBJ)/uigfx.o \
-	$(EMUOBJ)/uiimage.o \
 	$(EMUOBJ)/uiinput.o \
-	$(EMUOBJ)/uiswlist.o \
+	$(EMUOBJ)/ui/ui.o \
+	$(EMUOBJ)/ui/swlist.o \
 	$(EMUOBJ)/ui/menu.o \
 	$(EMUOBJ)/ui/menubar.o \
 	$(EMUOBJ)/ui/emenubar.o \
 	$(EMUOBJ)/ui/miscmenu.o \
 	$(EMUOBJ)/ui/selgame.o \
-	$(EMUOBJ)/ui/stackable.o \
+	$(EMUOBJ)/ui/filesel.o \
+	$(EMUOBJ)/ui/imginfo.o \
+	$(EMUOBJ)/ui/bbcontrl.o \
+	$(EMUOBJ)/ui/tapectrl.o \
+	$(EMUOBJ)/ui/viewgfx.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
 	$(EMUOBJ)/debug/debugcmd.o \

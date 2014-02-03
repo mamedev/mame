@@ -382,6 +382,23 @@ protected:
 		}
 	}
 
+	// template function for external bytes
+	template<int bits_per_pixel, int xscale>
+	ATTR_FORCE_INLINE void emit_extbytes(const UINT8 *data, int length, pixel_t *RESTRICT pixels, UINT16 color_base, const pixel_t *RESTRICT palette)
+	{
+		for (int i = 0; i < length; i++)
+		{
+			for (int j = 0; j < (8 / bits_per_pixel); j++)
+			{
+				for (int k = 0; k < xscale; k++)
+				{
+					UINT16 color = color_base + BIT(data[i], 7-j);
+					pixels[(i * (8 / bits_per_pixel) + j) * xscale + k] = palette[color];
+				}
+			}
+		}
+	}
+
 	// template function for emitting samples
 	template<int xscale>
 	UINT32 emit_mc6847_samples(UINT8 mode, const UINT8 *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
@@ -429,7 +446,7 @@ protected:
 			for (int i = 0; i < length; i++)
 			{
 				UINT8 byte = get_char_rom(machine(), data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
-				emit_graphics<2, xscale * 2>(&byte, 1, &pixels[i * 8], (mode & MODE_CSS) ? 14 : 12, palette);
+				emit_extbytes<1, xscale>(&byte, 1, &pixels[i * 8], (mode & MODE_CSS) ? 14 : 12, palette);
 			}
 			result = length * 8 * xscale;
 		}

@@ -39,21 +39,21 @@
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_R(_name, _R)                                                         \
+#define RES(_name, _R)                                                         \
 		NET_REGISTER_DEV(R, _name)                                                  \
 		NETDEV_PARAMI(_name, R, _R)
 
-#define NETDEV_POT(_name, _R)                                                       \
+#define POT(_name, _R)                                                       \
 		NET_REGISTER_DEV(POT, _name)                                                \
 		NETDEV_PARAMI(_name, R, _R)
 
 
-#define NETDEV_C(_name, _C)                                                         \
+#define CAP(_name, _C)                                                         \
 		NET_REGISTER_DEV(C, _name)                                                  \
 		NETDEV_PARAMI(_name, C, _C)
 
 /* Generic Diode */
-#define NETDEV_D(_name,  _model)                                                    \
+#define DIODE(_name,  _model)                                                    \
 		NET_REGISTER_DEV(D, _name)                                                  \
 		NETDEV_PARAMI(_name, model, _model)
 
@@ -85,6 +85,18 @@ public:
 	}
 
     ATTR_HOT inline double deltaV() { return m_P.net().Q_Analog()- m_N.net().Q_Analog(); }
+
+    ATTR_HOT void set_mat(double a11, double a12, double a21, double a22, double r1, double r2)
+    {
+        m_P.m_gt = a11;
+        m_P.m_go = -a12;
+        m_N.m_gt = a22;
+        m_N.m_go = -a21;
+
+        m_P.m_Idr = -r1;
+        m_N.m_Idr = -r2;
+
+    }
 
 protected:
 	ATTR_COLD virtual void start();
@@ -147,6 +159,7 @@ public:
 
 protected:
 	ATTR_COLD virtual void start();
+    ATTR_COLD virtual void reset();
 	ATTR_COLD virtual void update_param();
 	ATTR_HOT ATTR_ALIGN void update();
 
@@ -183,19 +196,21 @@ public:
 
             const double eVDVt = exp(m_Vd * m_VtInv);
             m_Id = m_Is * (eVDVt - 1.0);
-            m_G = m_Is * m_VtInv * eVDVt;
+            m_G = m_Is * m_VtInv * eVDVt + NETLIST_GMIN;
         }
         else
         {
 #if defined(_MSC_VER) && _MSC_VER < 1800
             m_Vd = m_Vd + log((nVd - m_Vd) * m_VtInv + 1.0) * m_Vt;
 #else
-            m_Vd = m_Vd + log1p((nVd - m_Vd) * m_VtInv) * m_Vt;
+            double a = (nVd - m_Vd) * m_VtInv;
+            if (a<1e-12 - 1.0) a = 1e-12 - 1.0;
+            m_Vd = m_Vd + log1p(a) * m_Vt;
 #endif
             const double eVDVt = exp(m_Vd * m_VtInv);
             m_Id = m_Is * (eVDVt - 1.0);
 
-            m_G = m_Is * m_VtInv * eVDVt;
+            m_G = m_Is * m_VtInv * eVDVt + NETLIST_GMIN;
         }
 
         //printf("nVd %f m_Vd %f Vcrit %f\n", nVd, m_Vd, m_Vcrit);
@@ -212,9 +227,10 @@ public:
         m_VtInv = 1.0 / m_Vt;
     }
 
-    ATTR_HOT inline double I() { return m_Id; }
-    ATTR_HOT inline double G() { return m_G; }
-    ATTR_HOT inline double Ieq() { return (m_Id - m_Vd * m_G); }
+    ATTR_HOT inline double I() const { return m_Id; }
+    ATTR_HOT inline double G() const { return m_G; }
+    ATTR_HOT inline double Ieq() const { return (m_Id - m_Vd * m_G); }
+    ATTR_HOT inline double Vd() const { return m_Vd; }
 
     /* owning object must save those ... */
 

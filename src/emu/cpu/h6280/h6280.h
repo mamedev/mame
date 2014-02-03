@@ -15,6 +15,8 @@
 #ifndef __H6280_H__
 #define __H6280_H__
 
+#include "emu.h"
+
 #define LAZY_FLAGS  0
 
 /***************************************************************************
@@ -44,13 +46,6 @@ enum
 	H6280_M7,
 	H6280_M8
 };
-
-#define H6280_RESET_VEC 0xfffe
-#define H6280_NMI_VEC   0xfffc
-#define H6280_TIMER_VEC 0xfffa
-#define H6280_IRQ1_VEC  0xfff8
-#define H6280_IRQ2_VEC  0xfff6          /* Aka BRK vector */
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -92,7 +87,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state);
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : NULL ); }
 	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
 
 	// device_disasm_interface overrides
@@ -115,11 +110,221 @@ protected:
 	UINT8 read_opcode();
 	UINT8 read_opcode_arg();
 
-	// include the macros
-	#include "h6280ops.h"
+#undef PROTOTYPES
+#define PROTOTYPES(prefix) \
+	void prefix##_00(); void prefix##_01(); void prefix##_02(); void prefix##_03(); \
+	void prefix##_04(); void prefix##_05(); void prefix##_06(); void prefix##_07(); \
+	void prefix##_08(); void prefix##_09(); void prefix##_0a(); void prefix##_0b(); \
+	void prefix##_0c(); void prefix##_0d(); void prefix##_0e(); void prefix##_0f(); \
+	void prefix##_10(); void prefix##_11(); void prefix##_12(); void prefix##_13(); \
+	void prefix##_14(); void prefix##_15(); void prefix##_16(); void prefix##_17(); \
+	void prefix##_18(); void prefix##_19(); void prefix##_1a(); void prefix##_1b(); \
+	void prefix##_1c(); void prefix##_1d(); void prefix##_1e(); void prefix##_1f(); \
+	void prefix##_20(); void prefix##_21(); void prefix##_22(); void prefix##_23(); \
+	void prefix##_24(); void prefix##_25(); void prefix##_26(); void prefix##_27(); \
+	void prefix##_28(); void prefix##_29(); void prefix##_2a(); void prefix##_2b(); \
+	void prefix##_2c(); void prefix##_2d(); void prefix##_2e(); void prefix##_2f(); \
+	void prefix##_30(); void prefix##_31(); void prefix##_32(); void prefix##_33(); \
+	void prefix##_34(); void prefix##_35(); void prefix##_36(); void prefix##_37(); \
+	void prefix##_38(); void prefix##_39(); void prefix##_3a(); void prefix##_3b(); \
+	void prefix##_3c(); void prefix##_3d(); void prefix##_3e(); void prefix##_3f(); \
+	void prefix##_40(); void prefix##_41(); void prefix##_42(); void prefix##_43(); \
+	void prefix##_44(); void prefix##_45(); void prefix##_46(); void prefix##_47(); \
+	void prefix##_48(); void prefix##_49(); void prefix##_4a(); void prefix##_4b(); \
+	void prefix##_4c(); void prefix##_4d(); void prefix##_4e(); void prefix##_4f(); \
+	void prefix##_50(); void prefix##_51(); void prefix##_52(); void prefix##_53(); \
+	void prefix##_54(); void prefix##_55(); void prefix##_56(); void prefix##_57(); \
+	void prefix##_58(); void prefix##_59(); void prefix##_5a(); void prefix##_5b(); \
+	void prefix##_5c(); void prefix##_5d(); void prefix##_5e(); void prefix##_5f(); \
+	void prefix##_60(); void prefix##_61(); void prefix##_62(); void prefix##_63(); \
+	void prefix##_64(); void prefix##_65(); void prefix##_66(); void prefix##_67(); \
+	void prefix##_68(); void prefix##_69(); void prefix##_6a(); void prefix##_6b(); \
+	void prefix##_6c(); void prefix##_6d(); void prefix##_6e(); void prefix##_6f(); \
+	void prefix##_70(); void prefix##_71(); void prefix##_72(); void prefix##_73(); \
+	void prefix##_74(); void prefix##_75(); void prefix##_76(); void prefix##_77(); \
+	void prefix##_78(); void prefix##_79(); void prefix##_7a(); void prefix##_7b(); \
+	void prefix##_7c(); void prefix##_7d(); void prefix##_7e(); void prefix##_7f(); \
+	void prefix##_80(); void prefix##_81(); void prefix##_82(); void prefix##_83(); \
+	void prefix##_84(); void prefix##_85(); void prefix##_86(); void prefix##_87(); \
+	void prefix##_88(); void prefix##_89(); void prefix##_8a(); void prefix##_8b(); \
+	void prefix##_8c(); void prefix##_8d(); void prefix##_8e(); void prefix##_8f(); \
+	void prefix##_90(); void prefix##_91(); void prefix##_92(); void prefix##_93(); \
+	void prefix##_94(); void prefix##_95(); void prefix##_96(); void prefix##_97(); \
+	void prefix##_98(); void prefix##_99(); void prefix##_9a(); void prefix##_9b(); \
+	void prefix##_9c(); void prefix##_9d(); void prefix##_9e(); void prefix##_9f(); \
+	void prefix##_a0(); void prefix##_a1(); void prefix##_a2(); void prefix##_a3(); \
+	void prefix##_a4(); void prefix##_a5(); void prefix##_a6(); void prefix##_a7(); \
+	void prefix##_a8(); void prefix##_a9(); void prefix##_aa(); void prefix##_ab(); \
+	void prefix##_ac(); void prefix##_ad(); void prefix##_ae(); void prefix##_af(); \
+	void prefix##_b0(); void prefix##_b1(); void prefix##_b2(); void prefix##_b3(); \
+	void prefix##_b4(); void prefix##_b5(); void prefix##_b6(); void prefix##_b7(); \
+	void prefix##_b8(); void prefix##_b9(); void prefix##_ba(); void prefix##_bb(); \
+	void prefix##_bc(); void prefix##_bd(); void prefix##_be(); void prefix##_bf(); \
+	void prefix##_c0(); void prefix##_c1(); void prefix##_c2(); void prefix##_c3(); \
+	void prefix##_c4(); void prefix##_c5(); void prefix##_c6(); void prefix##_c7(); \
+	void prefix##_c8(); void prefix##_c9(); void prefix##_ca(); void prefix##_cb(); \
+	void prefix##_cc(); void prefix##_cd(); void prefix##_ce(); void prefix##_cf(); \
+	void prefix##_d0(); void prefix##_d1(); void prefix##_d2(); void prefix##_d3(); \
+	void prefix##_d4(); void prefix##_d5(); void prefix##_d6(); void prefix##_d7(); \
+	void prefix##_d8(); void prefix##_d9(); void prefix##_da(); void prefix##_db(); \
+	void prefix##_dc(); void prefix##_dd(); void prefix##_de(); void prefix##_df(); \
+	void prefix##_e0(); void prefix##_e1(); void prefix##_e2(); void prefix##_e3(); \
+	void prefix##_e4(); void prefix##_e5(); void prefix##_e6(); void prefix##_e7(); \
+	void prefix##_e8(); void prefix##_e9(); void prefix##_ea(); void prefix##_eb(); \
+	void prefix##_ec(); void prefix##_ed(); void prefix##_ee(); void prefix##_ef(); \
+	void prefix##_f0(); void prefix##_f1(); void prefix##_f2(); void prefix##_f3(); \
+	void prefix##_f4(); void prefix##_f5(); void prefix##_f6(); void prefix##_f7(); \
+	void prefix##_f8(); void prefix##_f9(); void prefix##_fa(); void prefix##_fb(); \
+	void prefix##_fc(); void prefix##_fd(); void prefix##_fe(); void prefix##_ff();
 
-	// include the opcode macros and functions
-	#include "tblh6280.inc"
+	PROTOTYPES(op);
+
+	UINT32 translated(UINT16 addr);
+	void h6280_cycles(int cyc);
+	void set_nz(UINT8 n);
+	void clear_t();
+	void do_interrupt(UINT16 vector);
+	void check_and_take_irq_lines();
+	void check_irq_lines();
+	void check_vdc_vce_penalty(UINT16 addr);
+	void bra(bool cond);
+	void ea_zpg();
+	void ea_tflg();
+	void ea_zpx();
+	void ea_zpy();
+	void ea_abs();
+	void ea_abx();
+	void ea_aby();
+	void ea_zpi();
+	void ea_idx();
+	void ea_idy();
+	void ea_ind();
+	void ea_iax();
+	UINT8 rd_imm();
+	UINT8 rd_zpg();
+	UINT8 rd_zpx();
+	UINT8 rd_zpy();
+	UINT8 rd_abs();
+	UINT8 rd_abx();
+	UINT8 rd_aby();
+	UINT8 rd_zpi();
+	UINT8 rd_idx();
+	UINT8 rd_idy();
+	UINT8 rd_tfl();
+	void wr_zpg(UINT8 tmp);
+	void wr_zpx(UINT8 tmp);
+	void wr_zpy(UINT8 tmp);
+	void wr_abs(UINT8 tmp);
+	void wr_abx(UINT8 tmp);
+	void wr_aby(UINT8 tmp);
+	void wr_zpi(UINT8 tmp);
+	void wr_idx(UINT8 tmp);
+	void wr_idy(UINT8 tmp);
+	void wb_ea(UINT8 tmp);
+	void wb_eaz(UINT8 tmp);
+	void compose_p(UINT8 set, UINT8 clr);
+	void tadc(UINT8 tmp);
+	void adc(UINT8 tmp);
+	void tand(UINT8 tmp);
+	void and_a(UINT8 tmp);
+	UINT8 asl(UINT8 tmp);
+	void bbr(int bit, UINT8 tmp);
+	void bbs(int bit, UINT8 tmp);
+	void bcc();
+	void bcs();
+	void beq();
+	void bit(UINT8 tmp);
+	void bmi();
+	void bne();
+	void bpl();
+	void brk();
+	void bsr();
+	void bvc();
+	void bvs();
+	void cla();
+	void clc();
+	void cld();
+	void cli();
+	void clv();
+	void clx();
+	void cly();
+	void cmp(UINT8 tmp);
+	void cpx(UINT8 tmp);
+	void cpy(UINT8 tmp);
+	UINT8 dec(UINT8 tmp);
+	void dex();
+	void dey();
+	void teor(UINT8 tmp);
+	void eor(UINT8 tmp);
+	UINT8 inc(UINT8 tmp);
+	void inx();
+	void iny();
+	void jmp();
+	void jsr();
+	void lda(UINT8 tmp);
+	void ldx(UINT8 tmp);
+	void ldy(UINT8 tmp);
+	UINT8 lsr(UINT8 tmp);
+	void nop();
+	void tora(UINT8 tmp);
+	void ora(UINT8 tmp);
+	void pha();
+	void php();
+	void phx();
+	void phy();
+	void pla();
+	void plp();
+	void plx();
+	void ply();
+	UINT8 rmb(int bit, UINT8 tmp);
+	UINT8 rol(UINT8 tmp);
+	UINT8 ror(UINT8 tmp);
+	void rti();
+	void rts();
+	void sax();
+	void say();
+	void tsbc(UINT8 tmp);
+	void sbc(UINT8 tmp);
+	void sec();
+	void sed();
+	void sei();
+	void set();
+	UINT8 smb(int bit, UINT8 tmp);
+	void st0(UINT8 tmp);
+	void st1(UINT8 tmp);
+	void st2(UINT8 tmp);
+	UINT8 sta();
+	UINT8 stx();
+	UINT8 sty();
+	UINT8 stz();
+	void sxy();
+	void tai();
+	void tam(UINT8 tmp);
+	void tax();
+	void tay();
+	void tdd();
+	void tia();
+	void tii();
+	void tin();
+	void tma(UINT8 tmp);
+	UINT8 trb(UINT8 tmp);
+	UINT8 tsb(UINT8 tmp);
+	void tsx();
+	void tst(UINT8 imm, UINT8 tmp);
+	void txa();
+	void txs();
+	void tya();
+	void csh();
+	void csl();
+
+	enum
+	{
+		H6280_RESET_VEC = 0xfffe,
+		H6280_NMI_VEC =  0xfffc,
+		H6280_TIMER_VEC = 0xfffa,
+		H6280_IRQ1_VEC = 0xfff8,
+		H6280_IRQ2_VEC = 0xfff6 /* Aka BRK vector */
+	};
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -166,8 +371,5 @@ protected:
 };
 
 extern const device_type H6280;
-
-
-CPU_DISASSEMBLE( h6280 );
 
 #endif /* __H6280_H__ */

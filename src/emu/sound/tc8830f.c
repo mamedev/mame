@@ -8,7 +8,7 @@
     Very preliminary...
 
     TODO:
-    - ADM decoder
+    - improve ADM decoder
     - remaining commands
     - manual control
     - chip read
@@ -26,7 +26,18 @@ const device_type TC8830F = &device_creator<tc8830f_device>;
 
 tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC8830F, "TC8830F", tag, owner, clock, "tc8830f", __FILE__),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_playing(false),
+		m_address(0),
+		m_stop_address(0),
+		m_bitcount(0),
+		m_bitrate(0),
+		m_prevbits(0),
+		m_delta(1),
+		m_output(0),
+		m_command(0),
+		m_cmd_rw(0),
+		m_phrase(0)
 {
 }
 
@@ -34,10 +45,10 @@ tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, d
 void tc8830f_device::device_start()
 {
 	// create the stream
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / 0x10, this);
+	m_stream = stream_alloc(0, 1, clock() / 0x10);
 
-	m_mem_base = (UINT8 *)device().machine().root_device().memregion(":tc8830f")->base();
-	m_mem_mask = device().machine().root_device().memregion(":tc8830f")->bytes() - 1;
+	m_mem_base = *region();
+	m_mem_mask = region()->bytes() - 1;
 
 	// register for savestates
 	save_item(NAME(m_playing));
@@ -45,6 +56,9 @@ void tc8830f_device::device_start()
 	save_item(NAME(m_stop_address));
 	save_item(NAME(m_bitcount));
 	save_item(NAME(m_bitrate));
+	save_item(NAME(m_prevbits));
+	save_item(NAME(m_delta));
+	save_item(NAME(m_output));
 	save_item(NAME(m_command));
 	save_item(NAME(m_cmd_rw));
 	save_item(NAME(m_phrase));
@@ -69,9 +83,10 @@ void tc8830f_device::device_clock_changed()
 
 void tc8830f_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	INT32 mix = 0;
+
 	for (int i = 0; i < samples; i++)
 	{
-		int mix = 0;
 		if (m_playing)
 		{
 			// get bit
@@ -84,10 +99,34 @@ void tc8830f_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					m_playing = false;
 			}
 
-			// compute sample
-			// this is a placeholder until ADM is implemented
-			mix = bit * 0x7fff;
+			// compute sample, ADM decoding
+			// if previous bits are 111 or 000, delta increases exponentially
+			// otherwise, delta decreases linearly
+			if ((m_prevbits & 7) == 7 || (m_prevbits & 7) == 0)
+			{
+				if (m_delta < 0x2000)
+					m_delta <<= 1;
+			}
+			else
+				m_delta -= 8;
+			if (m_delta <= 0)
+				m_delta = 1;
+			
+			// determine direction
+			if (bit)
+				m_output += m_delta;
+			else
+				m_output -= m_delta;
+			
+			if (m_output > 32767)
+				m_output = 32767;
+			else if (m_output < -32768)
+				m_output = -32768;
+			
+			m_prevbits = m_prevbits << 1 | bit;
+			mix = m_output;
 		}
+		
 		outputs[0][i] = mix;
 	}
 }
@@ -100,6 +139,9 @@ void tc8830f_device::reset()
 	m_playing = false;
 	m_address = 0x100;
 	m_bitcount = 0;
+	m_prevbits = 0;
+	m_delta = 1;
+	m_output = 0;
 	m_cmd_rw = 0;
 
 	// in cpu control, enter play mode and reset bitrate
@@ -197,6 +239,9 @@ void tc8830f_device::write_p(UINT8 data)
 					m_stop_address = (m_mem_base[offs] | m_mem_base[offs|1]<<8 | m_mem_base[offs|2]<<16) & m_mem_mask;
 
 					m_bitcount = 0;
+					m_prevbits = 0;
+					m_delta = 1;
+					m_output = 0;
 					m_playing = true;
 					m_cmd_rw = -1;
 				}

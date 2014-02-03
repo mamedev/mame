@@ -152,10 +152,21 @@ public:
     pstring m_logs;
 protected:
 
-	void vfatalerror(const char *format, va_list ap) const
+	void vfatalerror(const loglevel_e level, const char *format, va_list ap) const
 	{
-		vprintf(format, ap);
-		throw;
+	    switch (level)
+	    {
+	        case NL_LOG:
+	        case NL_WARNING:
+                vprintf(format, ap);
+                printf("\n");
+                break;
+	        case NL_ERROR:
+	            vprintf(format, ap);
+                printf("\n");
+	            throw;
+	            break;
+	    }
 	}
 
 private:

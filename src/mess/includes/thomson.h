@@ -111,12 +111,11 @@ public:
 		m_acia(*this, "acia6850"),
 		m_mea8000(*this, "mea8000"),
 		m_ram(*this, RAM_TAG),
-		m_mc6846(*this, "mc6846") { }
+		m_mc6846(*this, "mc6846"),
+		m_mc6843(*this, "mc6843") { }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mo5_cartridge );
-
-	optional_device<mc6854_device> m_mc6854;
 
 	DECLARE_WRITE_LINE_MEMBER( to7_set_cassette_motor );
 	DECLARE_WRITE_LINE_MEMBER( mo5_set_cassette_motor );
@@ -306,6 +305,8 @@ public:
 	DECLARE_WRITE8_MEMBER( to9_floppy_w );
 	void thomson_index_callback(device_t *device, int state);
 	DECLARE_PALETTE_INIT(thom);
+	
+	optional_device<mc6854_device> m_mc6854;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -321,6 +322,7 @@ protected:
 	required_device<mea8000_device> m_mea8000;
 	required_device<ram_device> m_ram;
 	optional_device<mc6846_device> m_mc6846;
+	optional_device<mc6843_device> m_mc6843;
 
 	/* bank logging and optimisations */
 	int m_old_cart_bank;

@@ -109,6 +109,7 @@ const device_type M6809E = &device_creator<m6809e_device>;
 
 m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_lic_func(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16),
 	m_clock_divider(divider)
 {
@@ -123,6 +124,8 @@ void m6809_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
+
+	m_lic_func.resolve_safe();
 
 	// register our state for the debugger
 	astring tempstr;

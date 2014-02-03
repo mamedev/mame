@@ -91,6 +91,8 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef UINT32 (*ui_callback)(running_machine &, render_container *, UINT32);
+
 typedef INT32 (*slider_update)(running_machine &machine, void *arg, astring *string, INT32 newval);
 
 struct slider_state
@@ -106,90 +108,100 @@ struct slider_state
 };
 
 
+// ======================> ui_manager
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
+class ui_manager
+{
+public:
+	// construction/destruction
+	ui_manager(running_machine &machine);
 
-#define ui_draw_message_window(c, text) ui_draw_text_box(c, text, JUSTIFY_LEFT, 0.5f, 0.5f, UI_BACKGROUND_COLOR)
+	// getters
+	running_machine &machine() const { return m_machine; }
+	bool single_step() const { return m_single_step; }
 
+	// setters
+	void set_single_step(bool single_step) { m_single_step = single_step; }
+
+	// methods
+	void initialize(running_machine &machine);
+	UINT32 set_handler(ui_callback callback, UINT32 param);
+	void display_startup_screens(bool first_time, bool show_disclaimer);
+	void set_startup_text(const char *text, bool force);
+	void update_and_render(render_container *container);
+	render_font *get_font();
+	float get_line_height();
+	float get_char_width(unicode_char ch);
+	float get_string_width(const char *s);
+	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
+	void draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
+	void draw_text(render_container *container, const char *buf, float x, float y);
+	void draw_text_full(render_container *container, const char *origs, float x, float y, float origwrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = NULL, float *totalheight = NULL);
+	void draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
+	void draw_message_window(render_container *container, const char *text);
+
+	void CLIB_DECL popup_time(int seconds, const char *text, ...);
+	void show_fps_temp(double seconds);
+	void set_show_fps(bool show);
+	bool show_fps() const;
+	bool show_fps_counter();
+	void set_show_profiler(bool show);
+	bool show_profiler() const;
+	void show_menu();
+	void show_mouse(bool status);
+	bool is_menu_active();
+	bool can_paste();
+	void paste();
+	bool use_natural_keyboard() const;
+	void set_use_natural_keyboard(bool use_natural_keyboard);
+	void image_handler_ingame();
+	void increase_frameskip();
+	void decrease_frameskip();
+
+	// print the game info string into a buffer
+	astring &game_info_astring(astring &string);
+
+	// slider controls
+	const slider_state *get_slider_list(void);
+
+	// other
+	void process_natural_keyboard();
+
+private:
+	// instance variables
+	running_machine &		m_machine;
+	render_font *			m_font;
+	ui_callback				m_handler_callback;
+	UINT32					m_handler_param;
+	bool					m_single_step;
+	bool					m_showfps;
+	osd_ticks_t				m_showfps_end;
+	bool					m_show_profiler;
+	osd_ticks_t				m_popup_text_end;
+	bool					m_use_natural_keyboard;
+	UINT8 *					m_non_char_keys_down;
+	render_texture *		m_mouse_arrow_texture;
+	bool					m_mouse_show;
+
+	// text generators 
+	astring &disclaimer_string(astring &buffer);
+	astring &warnings_string(astring &buffer);
+
+	// UI handlers 
+	static UINT32 handler_messagebox(running_machine &machine, render_container *container, UINT32 state);
+	static UINT32 handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state);
+	static UINT32 handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state);
+	static UINT32 handler_ingame(running_machine &machine, render_container *container, UINT32 state);
+	static UINT32 handler_load_save(running_machine &machine, render_container *container, UINT32 state);
+	static UINT32 handler_confirm_quit(running_machine &machine, render_container *container, UINT32 state);
+
+	// private methods
+	void exit();
+};
 
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* main init/exit routines */
-int ui_init(running_machine &machine);
-
-/* initialize ui lists */
-void ui_initialize(running_machine &machine);
-
-/* display the startup screens */
-int ui_display_startup_screens(running_machine &machine, int first_time, int show_disclaimer);
-
-/* set the current text to display at startup */
-void ui_set_startup_text(running_machine &machine, const char *text, int force);
-
-/* once-per-frame update and render */
-void ui_update_and_render(running_machine &machine, render_container *container);
-
-/* returns the current UI font */
-render_font *ui_get_font(running_machine &machine);
-
-/* returns the line height of the font used by the UI system */
-float ui_get_line_height(running_machine &machine);
-
-/* returns the width of a character or string in the UI font */
-float ui_get_char_width(running_machine &machine, unicode_char ch);
-float ui_get_string_width(running_machine &machine, const char *s);
-
-/* draw an outlined box filled with a given color */
-void ui_draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);
-
-/* simple text draw at the given coordinates */
-void ui_draw_text(render_container *container, const char *buf, float x, float y);
-
-/* full-on text draw with all the options */
-void ui_draw_text_full(render_container *container, const char *origs, float x, float y, float wrapwidth, int justify, int wrap, int draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight);
-
-/* draw a multi-line message with a box around it */
-void ui_draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor);
-
-/* display a temporary message at the bottom of the screen */
-void CLIB_DECL ui_popup_time(int seconds, const char *text, ...) ATTR_PRINTF(2,3);
-
-/* get/set whether or not the FPS is displayed */
-void ui_show_fps_temp(double seconds);
-void ui_set_show_fps(int show);
-int ui_get_show_fps(void);
-
-/* get/set whether or not the profiler is displayed */
-void ui_set_show_profiler(int show);
-int ui_get_show_profiler(void);
-
-/* force the menus to display */
-void ui_show_menu(void);
-
-/* force the mouse visibility status */
-void ui_show_mouse(bool status);
-
-/* return true if a menu is displayed */
-bool ui_is_menu_active(void);
-
-/* print the game info string into a buffer */
-astring &game_info_astring(running_machine &machine, astring &string);
-
-/* get the list of sliders */
-const slider_state *ui_get_slider_list(void);
-
-/* paste */
-void ui_paste(running_machine &machine);
-
-/* returns whether the natural keyboard is active */
-bool ui_get_use_natural_keyboard(running_machine &machine);
-
-/* specifies whether the natural keyboard is active */
-void ui_set_use_natural_keyboard(running_machine &machine, bool use_natural_keyboard);
 
 #endif  /* __USRINTRF_H__ */

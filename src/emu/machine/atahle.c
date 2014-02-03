@@ -55,6 +55,7 @@ ata_hle_device::ata_hle_device(const machine_config &mconfig, device_type type, 
 	m_command(0),
 	m_device_control(0),
 	m_revert_to_defaults(true),
+	m_8bit_data_transfers(false),
 	m_csel(0),
 	m_daspin(0),
 	m_daspout(0),
@@ -251,6 +252,10 @@ bool ata_hle_device::set_features()
 {
 	switch (m_feature)
 	{
+	case IDE_SET_FEATURES_ENABLE_8BIT_DATA_TRANSFERS:
+		m_8bit_data_transfers = true;
+		return true;
+
 	case IDE_SET_FEATURES_TRANSFER_MODE:
 		switch (m_sector_count & IDE_TRANSFER_TYPE_MASK)
 		{
@@ -292,6 +297,10 @@ bool ata_hle_device::set_features()
 
 	case IDE_SET_FEATURES_DISABLE_REVERTING_TO_POWER_ON_DEFAULTS:
 		m_revert_to_defaults = false;
+		return true;
+
+	case IDE_SET_FEATURES_DISABLE_8BIT_DATA_TRANSFERS:
+		m_8bit_data_transfers = false;
 		return true;
 
 	case IDE_SET_FEATURES_ENABLE_REVERTING_TO_POWER_ON_DEFAULTS:
@@ -342,11 +351,11 @@ int ata_hle_device::ultra_dma_mode()
 	return bit_to_mode(m_identify_buffer[88]);
 }
 
-UINT16 ata_hle_device::read_data(UINT16 mem_mask)
+UINT16 ata_hle_device::read_data()
 {
 	/* fetch the correct amount of data */
 	UINT16 result = m_buffer[m_buffer_offset++];
-	if (ACCESSING_BITS_8_15)
+	if (!m_8bit_data_transfers)
 		result |= m_buffer[m_buffer_offset++] << 8;
 
 	/* if we're at the end of the buffer, handle it */
@@ -359,11 +368,11 @@ UINT16 ata_hle_device::read_data(UINT16 mem_mask)
 	return result;
 }
 
-void ata_hle_device::write_data(UINT16 data, UINT16 mem_mask)
+void ata_hle_device::write_data(UINT16 data)
 {
 	/* store the correct amount of data */
 	m_buffer[m_buffer_offset++] = data;
-	if (ACCESSING_BITS_8_15)
+	if (!m_8bit_data_transfers)
 		m_buffer[m_buffer_offset++] = data >> 8;
 
 	/* if we're at the end of the buffer, handle it */
@@ -538,7 +547,7 @@ UINT16 ata_hle_device::read_dma()
 		}
 		else
 		{
-			result = read_data(0xffff);
+			result = read_data();
 
 			if ((m_status & IDE_STATUS_DRQ) && single_word_dma_mode() >= 0)
 				set_dmarq(ASSERT_LINE);
@@ -598,7 +607,7 @@ READ16_MEMBER( ata_hle_device::read_cs0 )
 						}
 						else
 						{
-							result = read_data(mem_mask);
+							result = read_data();
 						}
 					}
 					else
@@ -733,7 +742,7 @@ void ata_hle_device::write_dma( UINT16 data )
 		}
 		else
 		{
-			write_data(data, 0xffff);
+			write_data(data);
 
 			if ((m_status & IDE_STATUS_DRQ) && single_word_dma_mode() >= 0)
 				set_dmarq(ASSERT_LINE);
@@ -776,7 +785,7 @@ WRITE16_MEMBER( ata_hle_device::write_cs0 )
 					}
 					else
 					{
-						write_data(data, mem_mask);
+						write_data(data);
 					}
 				}
 				break;

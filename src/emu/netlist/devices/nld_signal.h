@@ -47,7 +47,6 @@ public:
 
 	ATTR_COLD void reset()
 	{
-        m_Q.initial(1);
         m_active = 1;
 	}
 
@@ -100,7 +99,6 @@ public:
 
     ATTR_COLD void reset()
     {
-        m_Q.initial(1);
         m_active = 1;
     }
 
@@ -153,31 +151,26 @@ public:
 	INT32 m_active;
 };
 
-#if 1
 template <int _check, int _invert>
-class xx_net_signal_t: public netlist_device_t
+class net_signal_2inp_t: public netlist_device_t
 {
 public:
-	xx_net_signal_t()
+	net_signal_2inp_t()
 	: netlist_device_t(), m_active(1)
 	{
 	}
 
 	ATTR_COLD void start()
 	{
-		const char *sIN[2] = { "A", "B" };
-
 		register_output("Q", m_Q);
-		for (int i=0; i < 2; i++)
-		{
-			register_input(sIN[i], m_i[i]);
-		}
-		save(NAME(m_active));
+        register_input("A", m_i[0]);
+        register_input("B", m_i[1]);
+
+        save(NAME(m_active));
 	}
 
     ATTR_COLD void reset()
     {
-        m_Q.initial(1);
         m_active = 1;
     }
 
@@ -229,7 +222,6 @@ public:
 	INT32 m_active;
 
 };
-#endif
 
 // The following did not improve performance
 #if 0
@@ -297,11 +289,11 @@ public:
 
 
 template <int _check, int _invert>
-class net_signal_t<2, _check, _invert> : public xx_net_signal_t<_check, _invert>
+class net_signal_t<2, _check, _invert> : public net_signal_2inp_t<_check, _invert>
 {
 public:
 	net_signal_t()
-	: xx_net_signal_t<_check, _invert>() { }
+	: net_signal_2inp_t<_check, _invert>() { }
 };
 
 

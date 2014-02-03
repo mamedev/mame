@@ -460,7 +460,6 @@ public:
 	DECLARE_WRITE8_MEMBER(swyft_via0_w);
 	DECLARE_READ8_MEMBER(via0_pa_r);
 	DECLARE_WRITE8_MEMBER(via0_pa_w);
-	DECLARE_WRITE_LINE_MEMBER(via0_ca1_w);
 	DECLARE_WRITE_LINE_MEMBER(via0_ca2_w);
 	DECLARE_READ8_MEMBER(via0_pb_r);
 	DECLARE_WRITE8_MEMBER(via0_pb_w);
@@ -472,7 +471,6 @@ public:
 	DECLARE_WRITE8_MEMBER(swyft_via1_w);
 	DECLARE_READ8_MEMBER(via1_pa_r);
 	DECLARE_WRITE8_MEMBER(via1_pa_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_ca1_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
 	DECLARE_READ8_MEMBER(via1_pb_r);
 	DECLARE_WRITE8_MEMBER(via1_pb_w);
@@ -1375,11 +1373,6 @@ WRITE8_MEMBER( cat_state::via0_pa_w )
 	logerror("VIA0: Port A written with data of 0x%02x!\n", data);
 }
 
-WRITE_LINE_MEMBER ( cat_state::via0_ca1_w )
-{
-	logerror("VIA0: CA1 written with %d!\n", state);
-}
-
 WRITE_LINE_MEMBER ( cat_state::via0_ca2_w )
 {
 	logerror("VIA0: CA2 written with %d!\n", state);
@@ -1421,11 +1414,6 @@ READ8_MEMBER( cat_state::via1_pa_r )
 WRITE8_MEMBER( cat_state::via1_pa_w )
 {
 	logerror(" VIA1: Port A written with data of 0x%02x!\n", data);
-}
-
-WRITE_LINE_MEMBER ( cat_state::via1_ca1_w )
-{
-	logerror(" VIA1: CA1 written with %d!\n", state);
 }
 
 WRITE_LINE_MEMBER ( cat_state::via1_ca2_w )
@@ -1487,7 +1475,6 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_VIA6522_READPB_HANDLER(READ8(cat_state, via0_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cat_state, via0_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cat_state, via0_pb_w))
-	MCFG_VIA6522_CA1_HANDLER(WRITELINE(cat_state, via0_ca1_w))
 	MCFG_VIA6522_CB1_HANDLER(WRITELINE(cat_state, via0_cb1_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(cat_state, via0_ca2_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(cat_state, via0_cb2_w))
@@ -1498,7 +1485,6 @@ static MACHINE_CONFIG_START( swyft, cat_state )
 	MCFG_VIA6522_READPB_HANDLER(READ8(cat_state, via1_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(cat_state, via1_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cat_state, via1_pb_w))
-	MCFG_VIA6522_CA1_HANDLER(WRITELINE(cat_state, via1_ca1_w))
 	MCFG_VIA6522_CB1_HANDLER(WRITELINE(cat_state, via1_cb1_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(cat_state, via1_ca2_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(cat_state, via1_cb2_w))

@@ -92,6 +92,7 @@ public:
 	DECLARE_WRITE8_MEMBER(at_page8_w);
 	DECLARE_READ8_MEMBER(at_portb_r);
 	DECLARE_WRITE8_MEMBER(at_portb_w);
+	DECLARE_READ8_MEMBER(ps2_portb_r);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);

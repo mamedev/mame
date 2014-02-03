@@ -21,6 +21,7 @@ enum
 	STD_UXROM, STD_UN1ROM, UXROM_CC,
 	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT,
 	STD_SXROM_A, STD_SOROM, STD_SOROM_A,
+	STD_NROM368,//homebrew extension of NROM!
 	/* Discrete components boards (by various manufacturer) */
 	DIS_74X161X138, DIS_74X139X74,
 	DIS_74X377, DIS_74X161X161X32,
@@ -118,6 +119,7 @@ enum
 	WAIXING_DQ8, WAIXING_FFV, WAIXING_WXZS2, SUPERGAME_LIONKING, SUPERGAME_BOOGERMAN,
 	KAY_BOARD, HOSENKAN_BOARD, NITRA_TDA, GOUDER_37017, NANJING_BOARD,
 	WHIRLWIND_2706,
+	NOCASH_NOCHR,	// homebrew PCB design which uses NTRAM for CHRRAM
 	/* FFE boards, for mappers 6, 8, 17 */
 	FFE3_BOARD, FFE4_BOARD, FFE8_BOARD, TEST_BOARD,
 	/* Unsupported (for place-holder boards, with no working emulation) & no-board (at init) */

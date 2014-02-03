@@ -686,11 +686,6 @@ static INPUT_PORTS_START( nwktr )
 
 INPUT_PORTS_END
 
-static const sharc_config sharc_cfg =
-{
-	BOOT_MODE_EPROM
-};
-
 
 static double adc12138_input_callback( device_t *device, UINT8 input )
 {
@@ -757,7 +752,7 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
 	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
-	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(9000))

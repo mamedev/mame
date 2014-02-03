@@ -679,10 +679,6 @@ WRITE16_MEMBER(maygayv1_state::maygay_8279_w)
 }
 
 
-
-
-
-
 WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
 {
 	m_vsync_latch_preset = data & 0x0100;
@@ -702,7 +698,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, maygayv1_state )
 	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
 	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
 	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8("duart68681", duartn68681_device, read, write, 0xff)
-	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREADWRITE8("pia", pia6821_device, read, write, 0xff)
+	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREAD8("pia", pia6821_device, read, 0x00ff)
+	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVWRITE8("pia", pia6821_device, write, 0xff00)
 ADDRESS_MAP_END
 
 

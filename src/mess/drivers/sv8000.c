@@ -7,7 +7,7 @@
 
         2014/01/07 Skeleton driver.
 
-The Bandai Supoer Vision 8000 contains:
+The Bandai Super Vision 8000 contains:
 - NEC D78C (Z80)
 - AY-3-8910
 - AMI S68047P (6847 variant)
@@ -456,5 +456,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   INIT                  COMPANY   FULLNAME                            FLAGS */
-COMP( 1979, sv8000, 0,      0,       sv8000,  sv8000, driver_device,   0,   "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )
+CONS( 1979, sv8000, 0,      0,       sv8000,  sv8000, driver_device,   0,   "Bandai", "Super Vision 8000 (TV Jack 8000)", 0 )
 

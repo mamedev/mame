@@ -6,9 +6,9 @@
 
         Skeleton driver.
 
-****************************************************************************/
+****************************************************************************
 
-/*
+
 
     http://www.geocities.jp/sanyo_phc_25/
 
@@ -19,27 +19,28 @@
     16KB RAM
     6KB video RAM
 
-*/
+    LOCK key (CAPSLOCK) selects upper-case/lower-case on international version
+    (phc25), and selects hiragana/upper-case on Japanese version (phc25j).
 
-/*
+
 
     TODO:
 
     - MC6847 mode selection lines
-    - tune cassette trigger level
     - accurate video timing
 
-    10 SCREEN 2,1,1:CLS
-    20 FOR X=0 TO 8
-    30 LINE(X*24,0)-(X*24+16,191),X,BF
-    40 NEXT
-
-    10 SCREEN3,1,1:COLOR,,1:CLS
-    20 X1=INT(RND(1)*256):Y1=INT(RND(1)*192):X2=INT(RND(1)*256):Y2=INT(RND(1)*192):C=INT(RND(1)*4)+1:LINE(X1,Y1)-(X2,Y2),C:GOTO 20
-    RUN
+    - sound isn't working (should be a keyclick)
+    - screen attribute bit 7 is unknown
 
 
-    10 SCREEN2,1,1:CLS:FORX=0TO8:LINE(X*24,0)-(X*24+16,191),X,BF:NEXT
+
+10 SCREEN3,1,1:COLOR,,1:CLS
+20 X1=INT(RND(1)*256):Y1=INT(RND(1)*192):X2=INT(RND(1)*256):Y2=INT(RND(1)*192):C=INT(RND(1)*4)+1:LINE(X1,Y1)-(X2,Y2),C:GOTO 20
+RUN
+
+
+10 SCREEN2,1,1:CLS:FORX=0TO8:LINE(X*24,0)-(X*24+16,191),X,BF:NEXT
+RUN
 
 */
 
@@ -89,7 +90,7 @@ WRITE8_MEMBER( phc25_state::port40_w )
 
 	    0       cassette output
 	    1       cassette motor
-	    2       MC6847 INT/EXT
+	    2       LED in the LOCK button (on = uppercase)
 	    3       centronics strobe
 	    4
 	    5       MC6847 GM1
@@ -108,10 +109,12 @@ WRITE8_MEMBER( phc25_state::port40_w )
 	m_centronics->strobe_w(BIT(data, 3));
 
 	/* MC6847 */
-	m_vdg->intext_w(BIT(data, 2));
+	m_vdg->intext_w(1);
 	m_vdg->gm0_w(BIT(data, 5));
-	m_vdg->gm1_w(BIT(data, 6));
+	m_vdg->gm1_w(1);
+	m_vdg->css_w(BIT(data, 6));
 	m_vdg->ag_w(BIT(data, 7));
+	m_port40 = data;
 }
 
 /* Memory Maps */
@@ -263,7 +266,26 @@ INPUT_PORTS_END
 
 READ8_MEMBER( phc25_state::video_ram_r )
 {
-	return m_video_ram[offset & 0x17ff];
+	if BIT(m_port40, 7) // graphics
+	{
+		if BIT(m_port40, 5)
+		{// screen 4
+			return m_video_ram[((offset & 0x1fe0)<<1) + (offset & 0x1f) + 0x800 ];
+		}
+		else
+		{// screen 3
+			return m_video_ram[((offset & 0x1fc0)<<1) + (offset & 0x3f) + 0x380 ];
+		}
+	}
+	else	// text
+	{
+		offset &= 0x7ff;
+		m_vdg->inv_w(BIT(m_video_ram[offset | 0x800], 0)); // cursor attribute
+		m_vdg->as_w(BIT(m_video_ram[offset | 0x800], 1)); // screen2 lores attribute
+		m_vdg->css_w(BIT(m_video_ram[offset | 0x800], 2)); // css attribute
+		// bit 7 is set for all text (not spaces), meaning is unknown
+		return m_video_ram[offset];
+	}
 }
 
 UINT8 phc25_state::pal_char_rom_r(running_machine &machine, UINT8 ch, int line)
@@ -271,6 +293,12 @@ UINT8 phc25_state::pal_char_rom_r(running_machine &machine, UINT8 ch, int line)
 	phc25_state *state = machine.driver_data<phc25_state>();
 
 	return state->m_char_rom[((ch - 2) * 12) + line + 4];
+}
+
+// irq is inverted in emulation, so we need this trampoline
+WRITE_LINE_MEMBER( phc25_state::irq_w )
+{
+	m_maincpu->set_input_line(0, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 UINT8 phc25_state::ntsc_char_rom_r(running_machine &machine, UINT8 ch, int line)
@@ -286,7 +314,7 @@ static const mc6847_interface ntsc_vdg_intf =
 	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
 
 	DEVCB_NULL,                                         /* horizontal sync */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     /* field sync */
+	DEVCB_DRIVER_LINE_MEMBER(phc25_state, irq_w),       /* field sync */
 
 	DEVCB_NULL,                                         /* AG */
 	DEVCB_NULL,                                         /* GM2 */
@@ -306,7 +334,7 @@ static const mc6847_interface pal_vdg_intf =
 	DEVCB_DRIVER_MEMBER(phc25_state, video_ram_r),
 
 	DEVCB_NULL,                                         /* horizontal sync */
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),     /* field sync */
+	DEVCB_DRIVER_LINE_MEMBER(phc25_state, irq_w),       /* field sync */
 
 	DEVCB_NULL,                                         /* AG */
 	DEVCB_NULL,                                         /* GM2 */
@@ -325,6 +353,7 @@ void phc25_state::video_start()
 {
 	/* find memory regions */
 	m_char_rom = memregion(Z80_TAG)->base() + 0x5000;
+	m_port40 = 0;
 }
 
 /* AY-3-8910 Interface */
@@ -343,9 +372,9 @@ static const ay8910_interface ay8910_intf =
 
 static const cassette_interface phc25_cassette_interface =
 {
-	cassette_default_formats,
+	phc25_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL,
 	NULL
 };
@@ -354,7 +383,7 @@ static const cassette_interface phc25_cassette_interface =
 
 static MACHINE_CONFIG_START( phc25, phc25_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(phc25_mem)
 	MCFG_CPU_IO_MAP(phc25_io)
 
@@ -362,7 +391,9 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, 1996750)
 	MCFG_SOUND_CONFIG(ay8910_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	/* devices */
 	MCFG_CASSETTE_ADD("cassette", phc25_cassette_interface)
@@ -408,6 +439,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME            FLAGS */
-COMP( 1983, phc25,  0,      0,      pal,    phc25, driver_device,   0,      "Sanyo",    "PHC-25 (Europe)",  GAME_NOT_WORKING )
-COMP( 1983, phc25j, phc25,  0,      ntsc,   phc25j, driver_device,  0,      "Sanyo",    "PHC-25 (Japan)",   GAME_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS          INIT    COMPANY     FULLNAME            FLAGS */
+COMP( 1983, phc25,  0,      0,      pal,    phc25,  driver_device,  0,     "Sanyo",  "PHC-25 (Europe)",  GAME_NOT_WORKING )
+COMP( 1983, phc25j, phc25,  0,      ntsc,   phc25j, driver_device,  0,     "Sanyo",  "PHC-25 (Japan)",   GAME_NOT_WORKING )

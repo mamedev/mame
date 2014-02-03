@@ -1145,7 +1145,8 @@ WRITE8_MEMBER(nes_smb2jb_device::write_ex)
 
  iNES:
 
- In MESS: Supported.
+ In MESS: Partially Supported. Need to emulate IRQ
+ (needed by smb2 conversion?)
 
  -------------------------------------------------*/
 

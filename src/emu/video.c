@@ -13,7 +13,7 @@
 #include "png.h"
 #include "debugger.h"
 #include "debugint/debugint.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "aviio.h"
 #include "crsshair.h"
 #include "rendersw.c"
@@ -85,7 +85,8 @@ video_manager::video_manager(running_machine &machine)
 		m_overall_real_ticks(0),
 		m_overall_emutime(attotime::zero),
 		m_overall_valid_counter(0),
-		m_throttle(machine.options().throttle()),
+		m_throttled(machine.options().throttle()),
+		m_throttle_rate(1.0f),
 		m_fastforward(false),
 		m_seconds_to_run(machine.options().seconds_to_run()),
 		m_auto_frameskip(machine.options().auto_frameskip()),
@@ -209,7 +210,7 @@ void video_manager::frame_update(bool debug)
 	}
 
 	// draw the user interface
-	ui_update_and_render(machine(), &machine().render().ui_container());
+	machine().ui().update_and_render(&machine().render().ui_container());
 
 	// update the internal render debugger
 	debugint_update_during_game(machine());
@@ -593,7 +594,7 @@ inline int video_manager::effective_frameskip() const
 inline bool video_manager::effective_throttle() const
 {
 	// if we're paused, or if the UI is active, we always throttle
-	if (machine().paused() || ui_is_menu_active())
+	if (machine().paused() || machine().ui().is_menu_active())
 		return true;
 
 	// if we're fast forwarding, we don't throttle
@@ -601,7 +602,7 @@ inline bool video_manager::effective_throttle() const
 		return false;
 
 	// otherwise, it's up to the user
-	return m_throttle;
+	return throttled();
 }
 
 
@@ -718,7 +719,7 @@ void video_manager::update_throttle(attotime emutime)
 
 		// compute conversion factors up front
 		osd_ticks_t ticks_per_second = osd_ticks_per_second();
-		attoseconds_t attoseconds_per_tick = ATTOSECONDS_PER_SECOND / ticks_per_second;
+		attoseconds_t attoseconds_per_tick = ATTOSECONDS_PER_SECOND / ticks_per_second * m_throttle_rate;
 
 		// if we're paused, emutime will not advance; instead, we subtract a fixed
 		// amount of time (1/60th of a second) from the emulated time that was passed in,
@@ -872,9 +873,12 @@ void video_manager::update_frameskip()
 	// if we're throttling and autoframeskip is on, adjust
 	if (effective_throttle() && effective_autoframeskip() && m_frameskip_counter == 0)
 	{
+		// calibrate the "adjusted speed" based on the target
+		double adjusted_speed_percent = m_speed_percent / m_throttle_rate;
+
 		// if we're too fast, attempt to increase the frameskip
 		double speed = m_speed * 0.001;
-		if (m_speed_percent >= 0.995 * speed)
+		if (adjusted_speed_percent >= 0.995 * speed)
 		{
 			// but only after 3 consecutive frames where we are too fast
 			if (++m_frameskip_adjust >= 3)
@@ -889,7 +893,7 @@ void video_manager::update_frameskip()
 		else
 		{
 			// if below 80% speed, be more aggressive
-			if (m_speed_percent < 0.80 *  speed)
+			if (adjusted_speed_percent < 0.80 *  speed)
 				m_frameskip_adjust -= (0.90 * speed - m_speed_percent) / 0.05;
 
 			// if we're close, only force it up to frameskip 8
@@ -1184,7 +1188,6 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 }
 
 
-
 //-------------------------------------------------
 //  record_frame - record a frame of a movie
 //-------------------------------------------------
@@ -1249,12 +1252,11 @@ void video_manager::record_frame()
 }
 
 
-
-/*-------------------------------------------------
-    video_assert_out_of_range_pixels - assert if
-    any pixels in the given bitmap contain an
-    invalid palette index
--------------------------------------------------*/
+//-------------------------------------------------
+//  video_assert_out_of_range_pixels - assert if
+//  any pixels in the given bitmap contain an
+//  invalid palette index
+//-------------------------------------------------
 
 bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bitmap)
 {
@@ -1273,4 +1275,33 @@ bool video_assert_out_of_range_pixels(running_machine &machine, bitmap_ind16 &bi
 	}
 #endif
 	return false;
+}
+
+
+//-------------------------------------------------
+//	toggle_throttle
+//-------------------------------------------------
+
+void video_manager::toggle_throttle()
+{
+	set_throttled(!throttled());
+}
+
+
+//-------------------------------------------------
+//	toggle_record_movie
+//-------------------------------------------------
+
+void video_manager::toggle_record_movie()
+{
+	if (!is_recording())
+	{
+		begin_recording(NULL, video_manager::MF_MNG);
+		popmessage("REC START");
+	}
+	else
+	{
+		end_recording();
+		popmessage("REC STOP");
+	}
 }

@@ -5533,10 +5533,10 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="amenopgr">
-		<description>Army Men - Operation Green (Euro, USA)</description>
+		<description>Army Men - Operation Green (USA)</description>
 		<year>2001</year>
 		<publisher>3DO Company</publisher>
-		<info name="serial" value="AGB-AMEE-USA, AGB-AMEP"/>
+		<info name="serial" value="AGB-AMEE-USA"/>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="army men - operation green (usa, europe) (en,fr,de,es,it).bin" size="4194304" crc="6d174e28" sha1="b0fa4769cddbc66bc333ad45658524a4aeeec755" offset="000000" />
@@ -7071,7 +7071,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="bionicms">
-		<description>Bionicle - Maze of Shadows (Euro, Rev. A)</description>
+		<description>Bionicle - Maze of Shadows (Euro, Rev. 1)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="AGB-BILP"/>
@@ -11801,6 +11801,22 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="dokodemo">
+		<description>Dokodemo Taikyoku - Yakuman Advance (Jpn, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="AGB-AYAJ-JPN"/>
+		<info name="release" value="20011026"/>
+		<info name="alt_title" value="どこでも対局 役満アドバンス"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<feature name="pcb_type" value="GBA-SRAM" />
+			<dataarea name="rom" size="8388608">
+				<rom name="dokodemo taikyoku - yakuman advance (japan) (rev 1).bin" size="8388608" crc="a7279ed5" sha1="c02a52de3714f61913d7444857250101b6f9c329" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokodemoa" cloneof="dokodemo">
 		<description>Dokodemo Taikyoku - Yakuman Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
@@ -19565,7 +19581,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="jonnymos">
-		<description>Jonny Moseley Mad Trix (Euro, USA)</description>
+		<description>Jonny Moseley Mad Trix (USA)</description>
 		<year>2002</year>
 		<publisher>3DO Company</publisher>
 		<info name="serial" value="AGB-AJME-USA"/>
@@ -25174,6 +25190,22 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="minnashg">
+		<description>Minna no Soft Series - Minna no Shougi (Jpn, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>Success</publisher>
+		<info name="serial" value="AGB-BSGJ-JPN"/>
+		<info name="release" value="20040924"/>
+		<info name="alt_title" value="みんなのソフトシリーズ みんなの将棋 "/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="4194304">
+				<rom name="minna no soft series - minna no shougi (japan) (rev 1).bin" size="4194304" crc="c62c15c6" sha1="1b34d8bdf085e2276e103e72e29ce58867433068" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minnashga" cloneof="minnashg">
 		<description>Minna no Soft Series - Minna no Shougi (Jpn)</description>
 		<year>2004</year>
 		<publisher>Success</publisher>
@@ -26610,6 +26642,22 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="narutrpg">
+		<description>Naruto RPG - Uketsugareshi Hi no Ishi (Jpn, Rev. 1)</description>
+		<year>2004</year>
+		<publisher>Tomy</publisher>
+		<info name="serial" value="AGB-BNRJ-JPN"/>
+		<info name="release" value="20040722"/>
+		<info name="alt_title" value="NARUTO -ナルト- ナルトRPG 〜受けつがれし火の意志〜"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<feature name="pcb_type" value="GBA-SRAM" />
+			<dataarea name="rom" size="8388608">
+				<rom name="naruto rpg - uketsugareshi hi no ishi (japan) (rev 1).bin" size="8388608" crc="2bf6555a" sha1="df43ab9ac90a8a6500ac85daee1a15eb0f00afdf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="narutrpga" cloneof="narutrpg">
 		<description>Naruto RPG - Uketsugareshi Hi no Ishi (Jpn)</description>
 		<year>2004</year>
 		<publisher>Tomy</publisher>
@@ -26738,6 +26786,22 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="neoromnc">
+		<description>Neoromance Game - Harukanaru Toki no Naka de (Jpn, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="AGB-ARNJ-JPN"/>
+		<info name="release" value="20020823"/>
+		<info name="alt_title" value="遥かなるときの中で"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="pcb_type" value="GBA-EEPROM-64K" />
+			<dataarea name="rom" size="8388608">
+				<rom name="neoromance game - harukanaru toki no naka de (japan) (rev 1).bin" size="8388608" crc="e4fe52db" sha1="b231938a269f7d9a058560bc685d13b010d81812" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoromnca" cloneof="neoromnc">
 		<description>Neoromance Game - Harukanaru Toki no Naka de (Jpn)</description>
 		<year>2002</year>
 		<publisher>Koei</publisher>
@@ -29339,6 +29403,22 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="powrpkp3">
+		<description>Power Pro Kun Pocket 3 (Jpn, Rev. 1)</description>
+		<year>2001</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="AGB-AP3J-JPN (RK242-J1)"/>
+		<info name="release" value="20010321"/>
+		<info name="alt_title" value="パワプロクンポケット3"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_sram" />
+			<feature name="pcb_type" value="GBA-SRAM" />
+			<dataarea name="rom" size="8388608">
+				<rom name="power pro kun pocket 3 (japan) (rev 1).bin" size="8388608" crc="d8397194" sha1="ab501ba0c07e7fecbfb15e837b94a08252203c12" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powrpkp3a" cloneof="powrpkp3">
 		<description>Power Pro Kun Pocket 3 (Jpn)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
@@ -32342,6 +32422,22 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="shimurak">
+		<description>Shimura Ken no Baka Tonosama - Bakushou Tenka Touitsu Game (Jpn, Rev. 1)</description>
+		<year>2002</year>
+		<publisher>TDK Core</publisher>
+		<info name="serial" value="AGB-A64J-JPN"/>
+		<info name="release" value="20021206"/>
+		<info name="alt_title" value="志村けんのバカ殿様 爆笑 天下統一ゲーム"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_64k" />
+			<feature name="pcb_type" value="GBA-EEPROM-64K" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shimura ken no baka tonosama - bakushou tenka touitsu game (japan) (rev 1).bin" size="4194304" crc="5546b016" sha1="c7c94199bac6a1f69356413031b5a49cb30c93d1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shimuraka" cloneof="shimurak">
 		<description>Shimura Ken no Baka Tonosama - Bakushou Tenka Touitsu Game (Jpn)</description>
 		<year>2002</year>
 		<publisher>TDK Core</publisher>
@@ -33074,6 +33170,22 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 	</software>
 
 	<software name="stomv2bk">
+		<description>Simple 2960 Tomodachi Series Vol. 2 - The Block Kuzushi (Jpn, Rev. 1)</description>
+		<year>2003</year>
+		<publisher>D3 Publishing</publisher>
+		<info name="serial" value="AGB-AZ9J-JPN"/>
+		<info name="release" value="20030320"/>
+		<info name="alt_title" value="シンプルつくろうともだちシリーズ:SIMPLE2960ともだちシリーズVol.2 THE ブロックくずし"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="4194304">
+				<rom name="simple 2960 tomodachi series vol. 2 - the block kuzushi (japan) (rev 1).bin" size="4194304" crc="180901e3" sha1="442df022b9f4fa748f6ac471b222ecdf3448c667" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stomv2bka" cloneof="stomv2bk">
 		<description>Simple 2960 Tomodachi Series Vol. 2 - The Block Kuzushi (Jpn)</description>
 		<year>2003</year>
 		<publisher>D3 Publishing</publisher>
@@ -39284,6 +39396,22 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 	</software>
 
 	<software name="winpost">
+		<description>Winning Post for Game Boy Advance (Jpn, Rev. 2)</description>
+		<year>2001</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="AGB-AWPJ-JPN"/>
+		<info name="release" value="20010321"/>
+		<info name="alt_title" value="ウイニングポスト for ゲームボーイアドバンス"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_flash" />
+			<feature name="pcb_type" value="GBA-FLASH" />
+			<dataarea name="rom" size="4194304">
+				<rom name="winning post for game boy advance (japan) (rev 2).bin" size="4194304" crc="9fb4af0a" sha1="9151cf54475c4f773bdd9ab86a42d3e1ba462afa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winposta" cloneof="winpost">
 		<description>Winning Post for Game Boy Advance (Jpn)</description>
 		<year>2001</year>
 		<publisher>Koei</publisher>

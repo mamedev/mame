@@ -8,14 +8,6 @@
 
 *********************************************************************/
 
-/*
-
-	TODO:
-
-	- parse ascii hex into binary on load()
-
-*/
-
 #include "emu.h"
 #include "formats/ccvf_dsk.h"
 
@@ -46,7 +38,7 @@ const char *ccvf_format::extensions() const
 
 const ccvf_format::format ccvf_format::file_formats[] = {
 	{
-		floppy_image::FF_35, floppy_image::SSSD,
+		floppy_image::FF_525, floppy_image::SSSD,
 		(1./(9600*8))*1000000000, 10, 41, 1, 128, {}, 0, { 0,5,1,6,2,7,3,8,4,9 }
 	},
 	{}
@@ -54,14 +46,13 @@ const ccvf_format::format ccvf_format::file_formats[] = {
 
 int ccvf_format::identify(io_generic *io, UINT32 form_factor)
 {
-/*	char h[36];
+	char h[36];
 
 	io_generic_read(io, h, 0, 36);
 	if(!memcmp(h, "Compucolor Virtual Floppy Disk Image", 36))
 		return 100;
 
-	return 0;*/
-	return 100;
+	return 0;
 }
 
 floppy_image_format_t::desc_e* ccvf_format::get_desc_8n1(const format &f, int &current_size)
@@ -102,6 +93,28 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 *img = global_alloc_array(UINT8, size);
 	io_generic_read(io, img, 0, size);
 
+	astring ccvf = astring((const char *)img, size);
+	UINT8 *bytes = global_alloc_array(UINT8, 78720);
+
+	int start = 0, end = 0;
+	astring line;
+	offs_t byteoffs = 0;
+	char hex[3] = {0};
+	
+	do {
+		end = ccvf.chr(start, 10);
+		line.cpysubstr(ccvf, start, end);
+		if (line.find(0, "Compucolor Virtual Floppy Disk Image") &&	line.find(0, "Label") && line.find(0, "Track")) {
+			for (int byte = 0; byte < 32; byte++) {
+				if (byteoffs==78720) break;
+				hex[0]=line[byte * 2];
+				hex[1]=line[(byte * 2) + 1];
+				bytes[byteoffs++] = strtol(hex, NULL, 16);
+			}
+		}
+		start = end + 1;
+	} while (start > 0 && end != -1);
+
 	int pos = 0;
 	int total_size = 200000000/f.cell_size;
 	
@@ -110,8 +123,8 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		int offset = 0;
 	
 		for (int i=0; i<1920 && pos<size; i++, pos++) {
-			for (int bit=7; bit>=0; bit--) {
-				bit_w(buffer, offset++, BIT(img[pos], bit), f.cell_size);
+			for (int bit=0; bit<8; bit++) {
+				bit_w(buffer, offset++, BIT(bytes[pos], bit), f.cell_size);
 			}
 		}
 
@@ -130,17 +143,6 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	image->set_variant(f.variant);
 
 	return true;
-}
-
-void ccvf_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head)
-{
-	// TODO
-}
-
-bool ccvf_format::save(io_generic *io, floppy_image *image)
-{
-	// TODO
-	return false;
 }
 
 bool ccvf_format::supports_save() const

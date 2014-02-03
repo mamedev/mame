@@ -62,6 +62,8 @@
 #include "nld_7425.h"
 #include "nld_7427.h"
 #include "nld_7430.h"
+#include "nld_7448.h"
+#include "nld_7450.h"
 #include "nld_7474.h"
 #include "nld_7483.h"
 #include "nld_7486.h"
@@ -69,6 +71,7 @@
 #include "nld_7493.h"
 #include "nld_74107.h"
 #include "nld_74153.h"
+#include "nld_74ls629.h"
 #include "nld_9316.h"
 
 #include "nld_ne555.h"
@@ -81,72 +84,6 @@
 #include "../analog/nld_switches.h"
 #include "../analog/nld_twoterm.h"
 
-
 #include "nld_legacy.h"
-
-// ----------------------------------------------------------------------------------------
-// TTL Logic chips
-// ----------------------------------------------------------------------------------------
-
-#define TTL_7450_ANDORINVERT(_name, _I1, _I2, _I3, _I4)                             \
-		NET_REGISTER_DEV(nic7450, _name)                                            \
-		NET_CONNECT(_name, I1, _I1)                                                 \
-		NET_CONNECT(_name, I2, _I2)                                                 \
-		NET_CONNECT(_name, I3, _I3)                                                 \
-		NET_CONNECT(_name, I4, _I4)
-
-#define TTL_7448(_name, _A0, _A1, _A2, _A3, _LTQ, _BIQ, _RBIQ)                      \
-		NET_REGISTER_DEV(nic7448, _name)                                            \
-		NET_CONNECT(_name, A0, _A0)                                                 \
-		NET_CONNECT(_name, A1, _A1)                                                 \
-		NET_CONNECT(_name, A2, _A2)                                                 \
-		NET_CONNECT(_name, A3, _A3)                                                 \
-		NET_CONNECT(_name, LTQ, _LTQ)                                               \
-		NET_CONNECT(_name, BIQ, _BIQ)                                               \
-		NET_CONNECT(_name, RBIQ, _RBIQ)
-
-
-
-// ----------------------------------------------------------------------------------------
-// Standard devices ...
-// ----------------------------------------------------------------------------------------
-
-NETLIB_DEVICE(nic7450,
-	netlist_ttl_input_t m_I0;
-	netlist_ttl_input_t m_I1;
-	netlist_ttl_input_t m_I2;
-	netlist_ttl_input_t m_I3;
-	netlist_ttl_output_t m_Q;
-);
-
-
-NETLIB_SUBDEVICE(nic7448_sub,
-	ATTR_HOT void update_outputs(UINT8 v);
-	static const UINT8 tab7448[16][7];
-
-	netlist_ttl_input_t m_A0;
-	netlist_ttl_input_t m_A1;
-	netlist_ttl_input_t m_A2;
-	netlist_ttl_input_t m_A3;
-	netlist_ttl_input_t m_RBIQ;
-
-	UINT8 m_state;
-
-	netlist_ttl_output_t m_a;
-	netlist_ttl_output_t m_b;
-	netlist_ttl_output_t m_c;
-	netlist_ttl_output_t m_d;
-	netlist_ttl_output_t m_e;
-	netlist_ttl_output_t m_f;
-	netlist_ttl_output_t m_g;
-);
-
-NETLIB_DEVICE(nic7448,
-
-	NETLIB_NAME(nic7448_sub) sub;
-
-	netlist_ttl_input_t m_LTQ;
-	netlist_ttl_input_t m_BIQ;
-);
 
 #endif

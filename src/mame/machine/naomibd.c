@@ -56,7 +56,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, naomi_board)
 	AM_RANGE(0x04, 0x05) AM_READWRITE(rom_data_r, rom_data_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(dma_offseth_w)
 	AM_RANGE(0x08, 0x09) AM_WRITE(dma_offsetl_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(dma_count_w)
+	AM_RANGE(0x0a, 0x0b) AM_READWRITE(actel_r, dma_count_w)
 	AM_RANGE(0x3c, 0x3d) AM_WRITE(boardid_w)
 	AM_RANGE(0x3e, 0x3f) AM_READ(boardid_r)
 
@@ -67,12 +67,14 @@ naomi_board::naomi_board(const machine_config &mconfig, device_type type, const 
 	: naomi_g1_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	eeprom_tag = 0;
+	actel_tag = 0;
 }
 
-void naomi_board::static_set_eeprom_tag(device_t &device, const char *_eeprom_tag)
+void naomi_board::static_set_eeprom_tag(device_t &device, const char *_eeprom_tag, const char *_actel_tag)
 {
 	naomi_board &dev = downcast<naomi_board &>(device);
 	dev.eeprom_tag = _eeprom_tag;
+	dev.actel_tag = _actel_tag;
 }
 
 
@@ -202,6 +204,19 @@ READ16_MEMBER(naomi_board::boardid_r)
 READ16_MEMBER(naomi_board::default_r)
 {
 	logerror("NAOMIBD: unmapped read at %02x\n", offset);
+	return 0xffff;
+}
+
+READ16_MEMBER(naomi_board::actel_r)
+{
+	if (actel_tag)
+	{
+		if (memregion(actel_tag) != NULL)
+		{
+			return 0;
+		}
+	}
+
 	return 0xffff;
 }
 

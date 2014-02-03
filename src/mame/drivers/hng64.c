@@ -650,7 +650,7 @@ READ32_MEMBER(hng64_state::fight_io_r)
 
 	switch (offset*4)
 	{
-		case 0x000: return 0x00000400;
+		case 0x000:	return 0x00000400;
 		case 0x004: return ioport("SYSTEM")->read();
 		case 0x008: return ioport("P1_P2")->read();
 		case 0x600: return m_no_machine_error_code;
@@ -914,16 +914,17 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
 }
 
+/* Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown */
 WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
 {
-	if(data & 2) // clear current buffer
-	{
-		clear3d();
-	}
+	//if(data & 2) // swap buffers
+	//{
+	//	clear3d();
+	//}
 
-//  printf("%02x\n",data);
+//	printf("%02x\n",data);
 
-//  if(data & 1) // swap buffers?
+//	if(data & 1) // process DMA from 3d FIFO to framebuffer
 
 //  if(data & 4) // reset buffer count
 }
@@ -983,11 +984,11 @@ READ32_MEMBER(hng64_state::tcram_r)
    */
 READ32_MEMBER(hng64_state::unk_vreg_r)
 {
-//  m_unk_vreg_toggle^=0x8000;
+//	m_unk_vreg_toggle^=0x8000;
 
 	return 0;
 
-//  return ++m_unk_vreg_toggle;
+//	return ++m_unk_vreg_toggle;
 }
 
 /***** I don't think there is a soundram2, having it NOT hooked up causes xrally to copy the sound program to the expected location, see memory map note *****/
@@ -1892,11 +1893,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 
 	switch(scanline)
 	{
-		case 224*2: m_set_irq(0x0001);  break; // lv 0 vblank irq
-//      case 0*2:   m_set_irq(0x0002);  break; // lv 1
-//      case 32*2:  m_set_irq(0x0008);  break; // lv 2
-//      case 64*2:  m_set_irq(0x0008);  break; // lv 2
-		case 128*2: m_set_irq(0x0800);  break; // lv 11 network irq?
+		case 224*2:	m_set_irq(0x0001);  break; // lv 0 vblank irq
+//		case 0*2:   m_set_irq(0x0002);  break; // lv 1
+//		case 32*2:  m_set_irq(0x0008);  break; // lv 2
+//		case 64*2:  m_set_irq(0x0008);  break; // lv 2
+		case 128*2:	m_set_irq(0x0800);  break; // lv 11 network irq?
 	}
 }
 
@@ -1925,11 +1926,11 @@ void hng64_state::machine_reset()
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-//  m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//	m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
 //  m_comm->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 	// "Display List" init - ugly
-//  m_activeBuffer = 0;
+//	m_activeBuffer = 0;
 
 	/* For simulate MCU stepping */
 	m_mcu_fake_time = 0;

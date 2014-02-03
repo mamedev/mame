@@ -53,6 +53,9 @@ private:
 	UINT32 m_stop_address;
 	UINT8 m_bitcount;
 	UINT8 m_bitrate;
+	UINT8 m_prevbits;
+	int m_delta;
+	int m_output;
 	UINT8 m_command;
 	int m_cmd_rw;
 	UINT8 m_phrase;

@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "video/decocomn.h"
-#include "ui.h"
 
 
 const device_type DECOCOMN = &device_creator<decocomn_device>;

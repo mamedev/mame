@@ -42,10 +42,10 @@ const UINT32 g64_format::c1541_cell_size[] =
 
 int g64_format::identify(io_generic *io, UINT32 form_factor)
 {
-	UINT8 header[8];
+	char h[8];
 
-	io_generic_read(io, &header, 0, sizeof(header));
-	if ( memcmp( header, G64_FORMAT_HEADER, 8 ) == 0) {
+	io_generic_read(io, h, 0, 8);
+	if (!memcmp(h, G64_FORMAT_HEADER, 8)) {
 		return 100;
 	}
 	return 0;
@@ -57,71 +57,56 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 *img = global_alloc_array(UINT8, size);
 	io_generic_read(io, img, 0, size);
 
-	int version = img[0x08];
-	if (version)
-		throw emu_fatalerror("g64_format: Unsupported version %u", version);
-
-	int track_count = img[0x09];
-
-	int pos = 0x0c;
-	int track_offset[84*2];
-	for(int track = 0; track < track_count; track++) {
-		track_offset[track] = pick_integer_le(img, pos, 4);
-		pos += 4;
+	if (img[VERSION]) {
+		throw emu_fatalerror("g64_format: Unsupported version %u", img[VERSION]);
 	}
 
-	int speed_zone_offset[84*2];
-	for(int track = 0; track < track_count; track++) {
-		speed_zone_offset[track] = pick_integer_le(img, pos, 4);
-		pos += 4;
-	}
+	int track_count = img[TRACK_COUNT];
 
-	for(int track = 0; track < track_count; track++) {
-		int track_size = 0;
-		pos = track_offset[track];
-		if (pos > 0) {
-			track_size = pick_integer_le(img, pos, 2);
-			pos +=2;
+	for (int track = 0; track < track_count; track++)
+	{
+		offs_t track_offset = pick_integer_le(img, TRACK_OFFSET + (track * 4), 4);
+		if (track_offset > size) throw emu_fatalerror("g64_format: Track %u offset %06x out of bounds", track, track_offset);
+		if (!track_offset) continue;
+		
+		offs_t speed_zone = pick_integer_le(img, SPEED_ZONE + (track * 4), 4);
+		if (speed_zone > 3)	throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
+		size_t cell_size = c1541_cell_size[speed_zone];
+		size_t max_cells = 200000000/cell_size;
 
-			if (speed_zone_offset[track] > 3)
-				throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
+		size_t track_bytes = pick_integer_le(img, track_offset, 2);
+		track_offset += 2;
+		size_t track_cells = track_bytes * 8;
 
-			UINT32 cell_size = c1541_cell_size[speed_zone_offset[track]];
-			int total_size = 200000000/cell_size;
-			UINT32 *buffer = global_alloc_array_clear(UINT32, total_size);
-			int offset = 0;
+		size_t track_size = MAX(track_cells, max_cells);
+		UINT32 *trackbuf = global_alloc_array_clear(UINT32, track_size);
+		offs_t trackbuf_offs = 0;
 
-			for (int i=0; i<track_size; i++, pos++) {
-				for (int bit=7; bit>=0; bit--) {
-					bit_w(buffer, offset++, BIT(img[pos], bit), cell_size);
-					if (offset == total_size) break;
-				}
+		while (trackbuf_offs < track_cells) {
+			for (int bit=7; bit>=0; bit--) {
+				bit_w(trackbuf, trackbuf_offs++, BIT(img[track_offset], bit), cell_size);
 			}
-
-			if (offset < total_size) {
-				// pad the remainder of the track with sync
-				int count = (total_size-offset);
-				for (int i=0; i<count;i++) {
-					bit_w(buffer, offset++, 1, cell_size);
-				}
-			}
-
-			int physical_track = track >= 84 ? track - 84 : track;
-			int head = track >= 84;
-
-			generate_track_from_levels(physical_track, head, buffer, total_size, 0, image);
-			global_free(buffer);
+			track_offset++;
 		}
+
+		// pad the remainder of the track with sync
+		while (trackbuf_offs < max_cells) {
+			bit_w(trackbuf, trackbuf_offs++, 1, cell_size);
+		}
+
+		int head = 0;
+		int splice_pos = 0;
+
+		generate_track_from_levels(track, head, trackbuf, track_size, splice_pos, image);
+		
+		global_free(trackbuf);
 	}
+
+	global_free(img);
 
 	image->set_variant(floppy_image::SSSD);
 
 	return true;
-}
-
-bool g64_format::save(io_generic *io, floppy_image *image)
-{
-	return false;
 }
 
 bool g64_format::supports_save() const

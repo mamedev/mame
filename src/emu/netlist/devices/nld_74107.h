@@ -62,7 +62,7 @@
 #include "../nl_base.h"
 
 #define TTL_74107A(_name, _CLK, _J, _K, _CLRQ)                                      \
-		NET_REGISTER_DEV(nic74107A, _name)                                          \
+		NET_REGISTER_DEV(74107A, _name)                                             \
 		NET_CONNECT(_name, CLK, _CLK)                                               \
 		NET_CONNECT(_name, J,  _J)                                                  \
 		NET_CONNECT(_name, K,  _K)                                                  \
@@ -71,7 +71,10 @@
 #define TTL_74107(_name, _CLK, _J, _K, _CLRQ)                                       \
 		TTL_74107A(_name, _CLK, _J, _K, _CLRQ)
 
-NETLIB_SUBDEVICE(nic74107Asub,
+#define TTL_74107_DIP(_name)                                                         \
+        NET_REGISTER_DEV(74107_dip, _name)
+
+NETLIB_SUBDEVICE(74107Asub,
 	netlist_ttl_input_t m_clk;
 
 	netlist_ttl_output_t m_Q;
@@ -85,8 +88,9 @@ NETLIB_SUBDEVICE(nic74107Asub,
 
 );
 
-NETLIB_DEVICE(nic74107A,
-	NETLIB_NAME(nic74107Asub) sub;
+NETLIB_DEVICE(74107A,
+public:
+	NETLIB_NAME(74107Asub) sub;
 
 	netlist_ttl_input_t m_J;
 	netlist_ttl_input_t m_K;
@@ -94,13 +98,18 @@ NETLIB_DEVICE(nic74107A,
 
 );
 
-class NETLIB_NAME(nic74107) : public NETLIB_NAME(nic74107A)
+class NETLIB_NAME(74107) : public NETLIB_NAME(74107A)
 {
 public:
-	NETLIB_NAME(nic74107) ()
-	:   NETLIB_NAME(nic74107A) () {}
+	NETLIB_NAME(74107) ()
+	:   NETLIB_NAME(74107A) () {}
 
 };
 
+NETLIB_DEVICE(74107_dip,
+
+    NETLIB_NAME(74107) m_1;
+    NETLIB_NAME(74107) m_2;
+);
 
 #endif /* NLD_74107_H_ */

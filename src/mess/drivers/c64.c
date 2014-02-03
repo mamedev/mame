@@ -1064,7 +1064,9 @@ void c64_state::machine_reset()
 
 	m_iec->reset();
 	m_exp->reset();
-	m_user->reset();
+
+	m_user->write_3(0);
+	m_user->write_3(1);
 }
 
 

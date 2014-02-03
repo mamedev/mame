@@ -27,7 +27,7 @@
 // MAME headers
 #include "emu.h"
 #include "render.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "rendutil.h"
 #include "options.h"
 #include "emuopts.h"
@@ -1051,8 +1051,6 @@ int shaders::create_resources(bool reset)
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
 
-	bloom_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
-
 	initialized = true;
 
 	return 0;
@@ -1631,7 +1629,7 @@ void shaders::screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, 
 
 	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[2]);
 
-	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 	curr_effect->begin(&num_passes, 0);
@@ -1699,17 +1697,14 @@ void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta,
 	}
 
 	curr_effect = bloom_effect;
-	curr_effect->update_uniforms();
 
 	float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight, options->bloom_level2_weight, options->bloom_level3_weight };
 	float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight, options->bloom_level6_weight, options->bloom_level7_weight };
 	float weight89A[3]  = { options->bloom_level8_weight, options->bloom_level9_weight, options->bloom_level10_weight };
-	float temp0[2] = { 1024.0f, 512.0f };
 	curr_effect->set_vector("Level0123Weight", 4, weight0123);
 	curr_effect->set_vector("Level4567Weight", 4, weight4567);
 	curr_effect->set_vector("Level89AWeight", 3, weight89A);
-	curr_effect->set_vector("ScreenSize", 2, &screendims.c.x);
-	curr_effect->set_vector("TextureSize", 2, temp0);
+	curr_effect->set_vector("TargetSize", 2, &screendims.c.x);
 
 	curr_effect->set_texture("DiffuseA", rt->render_texture[2]);
 

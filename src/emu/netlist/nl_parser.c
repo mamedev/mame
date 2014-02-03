@@ -11,10 +11,184 @@
 //#define NL_VERBOSE_OUT(x) printf x
 
 // ----------------------------------------------------------------------------------------
-// A netlist parser
+// A simple tokenizer
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void netlist_parser::error(const char *format, ...)
+pstring ptokenizer::currentline_str()
+{
+    char buf[300];
+    int bufp = 0;
+    const char *p = m_line_ptr;
+    while (*p && *p != 10)
+        buf[bufp++] = *p++;
+    buf[bufp] = 0;
+    return pstring(buf);
+}
+
+
+void ptokenizer::skipeol()
+{
+    char c = getc();
+    while (c)
+    {
+        if (c == 10)
+        {
+            c = getc();
+            if (c != 13)
+                ungetc();
+            return;
+        }
+        c = getc();
+    }
+}
+
+
+unsigned char ptokenizer::getc()
+{
+    if (*m_px == 10)
+    {
+        m_line++;
+        m_line_ptr = m_px + 1;
+    }
+    if (*m_px)
+        return *(m_px++);
+    else
+        return *m_px;
+}
+
+void ptokenizer::ungetc()
+{
+    m_px--;
+}
+
+void ptokenizer::require_token(const token_id_t &token_num)
+{
+    require_token(get_token(), token_num);
+}
+
+void ptokenizer::require_token(const token_t tok, const token_id_t &token_num)
+{
+    if (!tok.is(token_num))
+    {
+        error("Error: expected token <%s> got <%s>\n", m_tokens[token_num.id()].cstr(), tok.str().cstr());
+    }
+}
+
+pstring ptokenizer::get_string()
+{
+    token_t tok = get_token();
+    if (!tok.is_type(STRING))
+    {
+        error("Error: expected a string, got <%s>\n", tok.str().cstr());
+    }
+    return tok.str();
+}
+
+pstring ptokenizer::get_identifier()
+{
+    token_t tok = get_token();
+    if (!tok.is_type(IDENTIFIER))
+    {
+        error("Error: expected an identifier, got <%s>\n", tok.str().cstr());
+    }
+    return tok.str();
+}
+
+ptokenizer::token_t ptokenizer::get_token()
+{
+    while (true)
+    {
+        token_t ret = get_token_internal();
+        if (ret.is_type(ENDOFFILE))
+            return ret;
+
+        if (ret.is(m_tok_comment_start))
+        {
+            do {
+                ret = get_token_internal();
+            } while (ret.is_not(m_tok_comment_end));
+        }
+        else if (ret.is(m_tok_line_comment))
+        {
+            skipeol();
+        }
+        else if (ret.str() == "#")
+        {
+            skipeol();
+        }
+        else
+            return ret;
+    }
+}
+
+ptokenizer::token_t ptokenizer::get_token_internal()
+{
+    /* skip ws */
+    char c = getc();
+    while (m_whitespace.find(c)>=0)
+    {
+        c = getc();
+        if (eof())
+        {
+            return token_t(ENDOFFILE);
+        }
+    }
+    if (m_identifier_chars.find(c)>=0)
+    {
+        /* read identifier till non identifier char */
+        pstring tokstr = "";
+        while (m_identifier_chars.find(c)>=0) {
+            tokstr += c;
+            c = getc();
+        }
+        ungetc();
+        token_id_t id = token_id_t(m_tokens.indexof(tokstr));
+        if (id.id() >= 0)
+            return token_t(id, tokstr);
+        else
+        {
+            return token_t(IDENTIFIER, tokstr);
+        }
+    }
+    else if (c == m_string)
+    {
+        pstring tokstr = "";
+        c = getc();
+        while (c != m_string)
+        {
+            tokstr += c;
+            c = getc();
+        }
+        return token_t(STRING, tokstr);
+    }
+    else
+    {
+        /* read identifier till first identifier char or ws */
+        pstring tokstr = "";
+        while ((m_identifier_chars.find(c)) < 0 && (m_whitespace.find(c) < 0)) {
+            tokstr += c;
+            /* expensive, check for single char tokens */
+            if (tokstr.len() == 1)
+            {
+                token_id_t id = token_id_t(m_tokens.indexof(tokstr));
+                if (id.id() >= 0)
+                    return token_t(id, tokstr);
+            }
+            c = getc();
+        }
+        ungetc();
+        token_id_t id = token_id_t(m_tokens.indexof(tokstr));
+        if (id.id() >= 0)
+            return token_t(id, tokstr);
+        else
+        {
+            return token_t(UNKNOWN, tokstr);
+        }
+    }
+
+}
+
+ATTR_COLD void ptokenizer::error(const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
@@ -22,14 +196,19 @@ ATTR_COLD void netlist_parser::error(const char *format, ...)
     pstring errmsg1 =pstring(format).vprintf(ap);
     va_end(ap);
 
-    char buf[300];
-    int bufp = 0;
-    const char *p = m_line_ptr;
-    while (*p && *p != 10)
-        buf[bufp++] = *p++;
-    buf[bufp] = 0;
+    verror(errmsg1, currentline_no(), currentline_str());
 
-    m_setup.netlist().error("line %d: error: %s\n\t\t%s\n", m_line, errmsg1.cstr(), buf);
+    //throw error;
+}
+
+// ----------------------------------------------------------------------------------------
+// A netlist parser
+// ----------------------------------------------------------------------------------------
+
+ATTR_COLD void netlist_parser::verror(pstring msg, int line_num, pstring line)
+{
+    m_setup.netlist().error("line %d: error: %s\n\t\t%s\n", line_num,
+            msg.cstr(), line.cstr());
 
     //throw error;
 }
@@ -37,77 +216,100 @@ ATTR_COLD void netlist_parser::error(const char *format, ...)
 
 void netlist_parser::parse(const char *buf)
 {
-	m_px = buf;
-	m_line_ptr = buf;
-	m_line = 1;
+    reset(buf);
+    set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
+    set_number_chars("01234567890eE-."); //FIXME: processing of numbers
+    char ws[5];
+    ws[0] = ' ';
+    ws[1] = 9;
+    ws[2] = 10;
+    ws[3] = 13;
+    ws[4] = 0;
+    set_whitespace(ws);
+    set_comment("/*", "*/", "//");
+    m_tok_param_left = register_token("(");
+    m_tok_param_right = register_token(")");
+    m_tok_comma = register_token(",");
 
-	while (!eof())
+    m_tok_ALIAS = register_token("ALIAS");
+    m_tok_NET_C = register_token("NET_C");
+    m_tok_PARAM = register_token("PARAM");
+    m_tok_NET_MODEL = register_token("PARAM");
+    m_tok_NETLIST_START = register_token("NETLIST_START");
+    m_tok_NETLIST_END = register_token("NETLIST_END");
+
+
+	while (true)
 	{
-		pstring n;
-		skipws();
-		if (eof()) break;
-		n = getname('(');
-		NL_VERBOSE_OUT(("Parser: Device: %s\n", n.cstr()));
-		if (n == "NET_ALIAS")
-			net_alias();
-		else if (n == "NET_C")
-			net_c();
-		else if (n == "NETDEV_PARAM")
-			netdev_param();
-		else if ((n == "NET_MODEL"))
-		    net_model();
-		else if (n == "NETLIST_START")
-		    netdev_netlist_start();
-        else if (n == "NETLIST_END")
+        token_t token = get_token();
+
+        if (token.is_type(ENDOFFILE))
+            return;
+
+        require_token(m_tok_param_left);
+        NL_VERBOSE_OUT(("Parser: Device: %s\n", n.cstr()));
+
+        if (token.is(m_tok_ALIAS))
+            net_alias();
+        else if (token.is(m_tok_NET_C))
+            net_c();
+        else if (token.is(m_tok_PARAM))
+            netdev_param();
+        else if (token.is(m_tok_NET_MODEL))
+            net_model();
+        else if (token.is(m_tok_NETLIST_START))
+            netdev_netlist_start();
+        else if (token.is(m_tok_NETLIST_END))
             netdev_netlist_end();
-		else
-			netdev_device(n);
+        else
+            device(token.str());
 	}
 }
 
 void netlist_parser::netdev_netlist_start()
 {
     // don't do much
-    skipws();
-    /*pstring dummyname = */ getname(')');
-    //check_char(')');
+    token_t name = get_token();
+    require_token(m_tok_param_right);
 }
 
 void netlist_parser::netdev_netlist_end()
 {
     // don't do much
-    skipws();
-    check_char(')');
+    require_token(m_tok_param_right);
 }
 
 void netlist_parser::net_model()
 {
     // don't do much
-    pstring model = getstring();
+    pstring model = get_string();
     m_setup.register_model(model);
-    check_char(')');
+    require_token(m_tok_param_right);
 }
 
 void netlist_parser::net_alias()
 {
-	pstring alias;
-	pstring out;
-	skipws();
-	alias = getname(',');
-	skipws();
-	out = getname(')');
+	pstring alias = get_identifier();
+
+	require_token(m_tok_comma);
+
+	pstring out = get_identifier();
+
+	require_token(m_tok_param_right);
+
 	NL_VERBOSE_OUT(("Parser: Alias: %s %s\n", alias.cstr(), out.cstr()));
 	m_setup.register_alias(alias, out);
 }
 
 void netlist_parser::net_c()
 {
-	pstring t1;
-	pstring t2;
-	skipws();
-	t1 = getname(',');
-	skipws();
-	t2 = getname(')');
+	pstring t1 = get_identifier();
+
+	require_token(m_tok_comma);
+	pstring t2 = get_identifier();
+
+    require_token(m_tok_param_right);
+
 	NL_VERBOSE_OUT(("Parser: Connect: %s %s\n", t1.cstr(), t2.cstr()));
 	m_setup.register_link(t1 , t2);
 }
@@ -116,65 +318,67 @@ void netlist_parser::netdev_param()
 {
 	pstring param;
 	double val;
-	skipws();
-	param = getname(',');
-	skipws();
-	val = eval_param();
+	param = get_identifier();
+	require_token(m_tok_comma);
+	val = eval_param(get_token());
 	NL_VERBOSE_OUT(("Parser: Param: %s %f\n", param.cstr(), val));
 	m_setup.register_param(param, val);
-	check_char(')');
+    require_token(m_tok_param_right);
 }
 
-void netlist_parser::netdev_device(const pstring &dev_type)
+void netlist_parser::device(const pstring &dev_type)
 {
 	pstring devname;
 	net_device_t_base_factory *f = m_setup.factory().factory_by_name(dev_type, m_setup);
 	netlist_device_t *dev;
 	nl_util::pstring_list termlist = f->term_param_list();
-	pstring def_param = f->def_param();
+	nl_util::pstring_list def_params = f->def_params();
+	token_t tok;
 
 	int cnt;
 
-	skipws();
-	devname = getname2(',', ')');
+	devname = get_identifier();
+
 	dev = f->Create();
 	m_setup.register_dev(dev, devname);
 
 	NL_VERBOSE_OUT(("Parser: IC: %s\n", devname.cstr()));
 
-	if (def_param != "")
-	{
-        pstring paramfq = devname + "." + def_param;
-	    NL_VERBOSE_OUT(("Defparam: %s\n", def_param.cstr()));
-        check_char(',');
-	    skipws();
-	    if (peekc() == '"')
-	    {
-            pstring val = getstring();
-            m_setup.register_param(paramfq, val);
-	    }
-	    else
-	    {
-	        double val = eval_param();
-	        m_setup.register_param(paramfq, val);
-	    }
-	    if (termlist.count() > 0)
-	        check_char(',');
-	}
+    cnt = 0;
+    while (cnt < def_params.count())
+    {
+        pstring paramfq = devname + "." + def_params[cnt];
 
+        NL_VERBOSE_OUT(("Defparam: %s\n", def_param.cstr()));
+        printf("Defparam: %s\n", def_params[cnt].cstr());
+        require_token(m_tok_comma);
+        tok = get_token();
+        if (tok.is_type(STRING))
+        {
+            m_setup.register_param(paramfq, tok.str());
+        }
+        else
+        {
+            double val = eval_param(tok);
+            m_setup.register_param(paramfq, val);
+        }
+        cnt++;
+    }
+
+	tok = get_token();
 	cnt = 0;
-	while (getc() != ')' && cnt < termlist.count())
+	while (tok.is(m_tok_comma) && cnt < termlist.count())
 	{
-		skipws();
-		pstring output_name = getname2(',', ')');
+		pstring output_name = get_identifier();
 
 		m_setup.register_link(devname + "." + termlist[cnt], output_name);
 
-		skipws();
 		cnt++;
+	    tok = get_token();
 	}
     if (cnt != termlist.count())
         fatalerror("netlist: input count mismatch for %s - expected %d found %d\n", devname.cstr(), termlist.count(), cnt);
+    require_token(tok, m_tok_param_right);
 }
 
 
@@ -182,167 +386,35 @@ void netlist_parser::netdev_device(const pstring &dev_type)
 // private
 // ----------------------------------------------------------------------------------------
 
-void netlist_parser::skipeol()
-{
-	char c = getc();
-	while (c)
-	{
-		if (c == 10)
-		{
-			c = getc();
-			if (c != 13)
-				ungetc();
-			return;
-		}
-		c = getc();
-	}
-}
 
-void netlist_parser::skipws()
+double netlist_parser::eval_param(const token_t tok)
 {
-	while (unsigned char c = getc())
-	{
-		switch (c)
-		{
-		case ' ':
-		case 9:
-		case 10:
-		case 13:
-			break;
-		case '#':
-		    skipeol(); // treat preprocessor defines as comments
-		    break;
-		case '/':
-			c = getc();
-			if (c == '/')
-			{
-				skipeol();
-			}
-			else if (c == '*')
-			{
-				int f=0;
-				while (!eof() )
-				{
-				    c = getc();
-					if (f == 0 && c == '*')
-						f=1;
-					else if (f == 1 && c== '/' )
-						break;
-					else
-						f=0;
-				}
-			}
-			break;
-		default:
-			ungetc();
-			return;
-		}
-	}
-}
-
-pstring netlist_parser::getstring()
-{
-    skipws();
-    check_char('"');
-    pstring ret = getname2_ext('"', 0, NULL);
-    check_char('"');
-    skipws();
-    return ret;
-}
-
-
-pstring netlist_parser::getname(char sep)
-{
-	pstring ret = getname2(sep, 0);
-	getc(); // undo the undo ...
-	return ret;
-}
-
-pstring netlist_parser::getname2(char sep1, char sep2)
-{
-    static const char *allowed = "0123456789_.ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    return getname2_ext(sep1, sep2, allowed);
-}
-
-pstring netlist_parser::getname2_ext(char sep1, char sep2, const char *allowed)
-{
-    char buf[1024];
-    char *p1 = buf;
-    char c=getc();
-
-    while ((c != sep1) && (c != sep2))
-    {
-        char cU = toupper(c);
-        if ((allowed == NULL) || strchr(allowed, cU) != NULL)
-            *p1++ = c;
-        else
-        {
-            *p1 = 0;
-            error("illegal character <%c> in name ...\n", c);
-        }
-        c = getc();
-    }
-    *p1 = 0;
-    ungetc();
-    return pstring(buf);
-}
-void netlist_parser::check_char(char ctocheck)
-{
-	skipws();
-	char c = getc();
-	if ( c == ctocheck)
-	{
-		return;
-	}
-	error("expected '%c' found '%c'\n", ctocheck, c);
-}
-
-double netlist_parser::eval_param()
-{
-	static const char *macs[6] = {"", "RES_K(", "RES_M(", "CAP_U(", "CAP_N(", "CAP_P("};
-	static const char *allowed = "RESKMUNPAC_0123456789E(+-.";
+	static const char *macs[6] = {"", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
 	static double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	int i;
 	int f=0;
 	bool e;
 	double ret;
+	pstring val;
 
-	pstring s = getname2_ext(')',',', allowed);
-
+	//printf("param %s\n", tok.m_token.cstr());
 	for (i=1; i<6;i++)
-		if (strncmp(s.cstr(), macs[i], strlen(macs[i])) == 0)
+		if (tok.str().equals(macs[i]))
 			f = i;
     if (f>0)
-        check_char(')');
-	s = s.substr(strlen(macs[f]));
-	ret = s.as_double(&e);
-//    if ((f>0) && e)
-	if (e)
+    {
+        require_token(m_tok_param_left);
+        val = get_identifier();
+    }
+    else
+        val = tok.str();
+
+    ret = val.as_double(&e);
+
+    if (e)
 		error("Error with parameter ...\n");
+	if (f>0)
+	    require_token(m_tok_param_right);
 	return ret * facs[f];
 }
 
-unsigned char netlist_parser::peekc()
-{
-    unsigned char c = getc();
-    ungetc();
-    return c;
-}
-
-unsigned char netlist_parser::getc()
-{
-    if (*m_px == 10)
-    {
-        m_line++;
-        m_line_ptr = m_px + 1;
-    }
-	if (*m_px)
-		return *(m_px++);
-	else
-		return *m_px;
-}
-
-void netlist_parser::ungetc()
-{
-	m_px--;
-}

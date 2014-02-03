@@ -154,11 +154,11 @@ WRITE32_MEMBER(ide_controller_32_device::write_cs0)
 
 WRITE32_MEMBER(ide_controller_32_device::write_cs1)
 {
-	if (ACCESSING_BITS_0_7)
+	if (ACCESSING_BITS_0_15)
 	{
 		ide_controller_device::write_cs1(space, (offset * 2), data, mem_mask);
 	}
-	else if (ACCESSING_BITS_16_23)
+	else if (ACCESSING_BITS_16_31)
 	{
 		ide_controller_device::write_cs1(space, (offset * 2) + 1, data >> 16, mem_mask >> 16);
 	}

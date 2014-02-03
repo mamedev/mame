@@ -26,7 +26,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "sound/ay8910.h"
@@ -44,7 +44,7 @@
     data for the end user
 -------------------------------------------------*/
 
-static void log_quickload(const char *type, UINT32 start, UINT32 length, UINT32 exec, const char *exec_format)
+static void log_quickload(running_machine &machine, const char *type, UINT32 start, UINT32 length, UINT32 exec, const char *exec_format)
 {
 	astring tempstring;
 
@@ -64,7 +64,7 @@ static void log_quickload(const char *type, UINT32 start, UINT32 length, UINT32 
 		tempstring.catprintf(exec_format, exec);
 	}
 
-	ui_popup_time(10, "%s", tempstring.cstr());
+	machine.ui().popup_time(10, "%s", tempstring.cstr());
 }
 
 /*******************************************************************
@@ -2527,7 +2527,7 @@ void spectrum_setup_scr(running_machine &machine, UINT8 *quickdata, UINT32 quick
 	for (i = 0; i < quicksize; i++)
 		space.write_byte(i + BASE_RAM, quickdata[i]);
 
-	log_quickload(quicksize == SCR_SIZE ? "SCREEN$" : "SCREEN$ (Mono)", BASE_RAM, quicksize, 0, EXEC_NA);
+	log_quickload(machine, quicksize == SCR_SIZE ? "SCREEN$" : "SCREEN$ (Mono)", BASE_RAM, quicksize, 0, EXEC_NA);
 }
 
 /*******************************************************************
@@ -2576,5 +2576,5 @@ void spectrum_setup_raw(running_machine &machine, UINT8 *quickdata, UINT32 quick
 	spectrum_border_update(machine, data);
 	logerror("Border color:%02X\n", data);
 
-	log_quickload("BYTES", start, len, 0, EXEC_NA);
+	log_quickload(machine, "BYTES", start, len, 0, EXEC_NA);
 }

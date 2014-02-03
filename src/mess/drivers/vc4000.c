@@ -707,7 +707,7 @@ CONS(1979, telngtcs, rwtrntcs,  0,        vc4000,    vc4000, driver_device,     
 CONS(1979, krvnjvtv, 0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "SOE",              "OC Jeu Video TV Karvan", GAME_IMPERFECT_GRAPHICS )    /* France */
 CONS(1979, oc2000,   krvnjvtv,  0,        vc4000,    vc4000, driver_device,      0,        "SOE",              "OC-2000",          GAME_IMPERFECT_GRAPHICS )          /* France */
 CONS(1980, mpt05,    0,         vc4000,   vc4000,    vc4000, driver_device,      0,        "ITMC",             "MPT-05",           GAME_IMPERFECT_GRAPHICS )          /* France */
-COMP(1979, elektor,  0,         0,        elektor,   elektor, driver_device,     0,        "Elektor",          "Elektor TV Games Computer", GAME_IMPERFECT_GRAPHICS )
+CONS(1979, elektor,  0,         0,        elektor,   elektor, driver_device,     0,        "Elektor",          "Elektor TV Games Computer", GAME_IMPERFECT_GRAPHICS )
 
 /*  Game List and Emulation Status
 

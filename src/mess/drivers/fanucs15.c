@@ -15,16 +15,8 @@
 	A16B-2200-0121/06C : Base 0 Board (1 ROM location but position is empty. -0120 has 6081 001A)
 
 	A16B-2200-0131/11B : Base 1 Board (15 ROMs on this board, 4040, 9030, AB02)
-		Fanuc FBI-A MB605111 (QFP100)
-		41256-12 (x18)
-		HD68HC000-12 (68000 "PMC CPU" @ 12MHz, PLCC68)
-		Fanuc SLC01 MB661128 (PLCC68)
-		Fanuc BOC MB605117U (QFP100)
-		HM53461-12 (x5)
-		MB81C79A-35 (SOP28)
-		24MHz OSC
-		15 EPROMs
-
+	    See detailed layout and description below.
+ 
 	A16B-2200-0150/03A : Conversational Board (4 ROMs on this board, 5A00, probably for Mill)
 	or
 	A16B-2200-0150/03A : Conversational Board (4 ROMs on this board, 5C30. 5C for 2 axis Lathe)
@@ -61,12 +53,254 @@
 	A20B-1003-0500/01A : Additional Graphic Board for 15TTF only (for TT, connects to A16B-2200-0160 Board. No info on this PCB)
 	A20B-1003-0240/07B : Connector Assembly Unit / IO Board
 	A20B-1003-0580/01A : PMC Cassette C (16000 Step + Pascal 128KB, small PCB in a yellow plastic box, contains just 2 EPROMs)
+ 
+ 
+	Fanuc System 15A Base 1 Board A16B-2200-013
 
-	Summary of CPUs:
-	68020-12 main CPU on "Base 2 board" "CNC CPU"
-	68000-12 sub CPU on "Base 1 board" "PMC CPU"
-	68000-10 graphics CPU on "Graphic board"
-	80286-8 mill/lathe interface CPU on "Conversation board"
+	PCB Layout
+	----------
+
+	A16B-2200-0131/03B (note 1 and 03B have been added/printed later)
+		   |--------------|     |---|
+	|------|     CA34     |-----|CA4|-------------------------------------|
+	|      |--------------|75463|---|    LL  LL                   MB81C79A|
+	|                       (x6)         LL  LL              |--------|   |
+	|                                             HM53461(x5)|MB605117|   |
+	|                                   FA8191               |        |   |
+	|4040002E.M27 4040001E.M23          FA8191               |        |   |
+	|                                                        |--------|   |
+	|                                                                     |
+	|                                    MC-122-41256A9A-12  |--------|   |
+	|AB02142A.K27 AB02141A.K23           MC-122-41256A9A-12  |MB661128|   |
+	|                         9030001E.J18                   |        |   |
+	|                                                        |        |   |
+	|                                                        |--------|   |
+	|AB02102A.H27 AB02101A.H23                                            |
+	|                                                                     |
+	|                                                                     |
+	|                                                                     |
+	|AB020C2A.F27 AB020C1A.F23              24MHz                         |
+	|                                                                     |
+	|                                                                     |
+	|                                                        |--------|   |
+	|AB02082A.E27 AB02081A.E23      |------|                 |MB605111|   |
+	|                               |68000 |                 |        |   |
+	|                               |      |                 |        |   |
+	|   |---------|                 |      |                 |--------|   |
+	|   |---------|                 |------|                              |
+	|      CNM1                                |-----------------------|  |
+	|------------------------------------------|          CNA          |--|
+											   |-----------------------|
+	Notes:
+		  MC-122-41256- NEC MC-122-41256A9A-12 256k RAM SIP module (with parity) containing NEC D41256L-12 32k x8 SRAM
+						2 SIP modules populated, 9 chips per module, 18 total RAMs, total 512k
+		  68000       - Hitachi HD68HC000-12 68000 CPU. Clock 24/2 (PLCC68)
+		  MB661128    - Fujitsu Fanuc SLC01 MB661128 (Serial Data Link Controller, PLCC68)
+		  MB605117    - Fujitsu Fanuc BOC MB605117U (DRAM/SRAM Interface Controller, QFP100)
+		  MB605111    - Fujitsu Fanuc FBI-A MB605111 (Global/Local Interface Controller, QFP100)
+		  HM53461     - Hitachi HM53461-12 64k x4-bit multiport CMOS video RAM (x5, SOJ24)
+		  MB81C79A    - Fujitsu MB81C79A-35 8k x 9-bit (72k) CMOS Static RAM (SOP28)
+		  FA8191      - Fanuc FA8191 RV07 custom ceramic module (contains resistors and transistors, SIL16)
+		  75463       - Texas Instruments SN75463 Dual High-Voltage, High-Current Peripheral Driver (DIP8)
+		  L           - LED
+		  CA34        - Connector for PMC Cassette C A02B-0094-C103 (holds 2 EPROMs containing the PMC Ladder)
+						The Ladder is specific and unique to each CNC machine, depending on capability and options.
+		  CA4         - Connector for cable joined to Servo Control Board A16B-2200-0090 or 16B-2200-0091
+		  CNA         - Connector plugs into motherboard slot CNA2 (BASE 1)
+		  CNM1        - 40 pin flat cable joined to optional board A16B-1600-0280/02A
+
+		  Note about EPROMs:
+							Software Series is denoted by the first 4 digits
+							ROM # (possibly relating to the memory location in hex) is the next 3 digits
+							Software Revision is the last letter
+							Both IC locations and ROM # are printed on this board
+
+		  ROM         IC         Memory     EPROM     Used
+		  Label       Location   Location   Type      For...
+		  -----------------------------------------------------------------------------------------
+		  9030001E    J18        381        27256     Digital Servo Control Program Version 9030 Revision E
+
+		  4040001E    M23        001        27C1001   PMC Control Program Version 4040 Revision E
+		  4040002E    M27        002        27C1001
+
+		  AB02081A    E23        081        27C1001   Boot Software Version AB02 Revision A
+		  AB02082A    E27        082        27C1001
+		  AB020C1A    F23        0C1        27C1001
+		  AB020C2A    F27        0C2        27C1001
+		  AB02101A    H23        101        27C1001
+		  AB02102A    H27        102        27C1001
+		  AB02141A    K23        141        27C1001
+		  AB02142A    K27        142        27C1001
+
+
+	Another identical board from a different machine contains the following EPROMs....
+	9030001F (known revisions exist up to at least rev M)
+	4040001D, 4040002D (known revisions exist up to at least rev I)
+	A202081G, A202082G
+	A2020C1G, A2020C2G
+	A202101G, A202102G
+
+	The complete boot software series is listed below:
+
+	15TA SOFTWARE SERIES (Single Turret 2 Axis Lathe)
+	|------+----+---------+---+---+---+---|
+	|S/W   |STEP|   CRT   |I/O|SER|SER|DNC|
+	|SERIES|    |         |   |   |   |   |
+	|      |1  2| 9M 14 9C|LNK|SPN|FB |1 2|
+	+------+----+---------+---+---+---+---+
+	|A201  |X   | X       |   |   |   |   |
+	|A202  |X   |    X    |   |   |   |   |
+	|A211  |   X| X       | X | X |   |X  |
+	|A212  |   X|    X    | X | X |   |X  |
+	|A219  |   X| X       | X | X | X |   |
+	|A220  |   X|    X    | X | X | X |   |
+	|A215  |   X| X       | X | X |   |  X|
+	|A216  |   X|    X    | X | X |   |  X|
+	|A217  |   X| X       | X | X | X |  X|
+	|A218  |   X|    X    | X | X | X |  X|
+	|A221  |   X|       X | X | X | ? |  ?|
+	|------+----+---------+---+---+---+---|
+	Notes:
+		  9M      - 9" Monochrome
+		  9C      - 9" Color
+		  14      - 14" Color
+		  SER SPN - Serial Spindle
+		  SER FB  - Serial FB ?
+		  DNC 1/2 - DNC (Direct NC) type 1 or type 2 for Direct PC to CNC program transfer operation
+
+
+	15TTA SOFTWARE SERIES (Twin Turret 4 Axis Lathe)
+	|------+----+---------+---+---+---+---|
+	|S/W   |STEP|   CRT   |I/O|SER|SER|DNC|
+	|SERIES|    |         |   |   |   |   |
+	|      |1  2| 9M 14 9C|LNK|SPN|FB |1 2|
+	+------+----+---------+---+---+---+---+
+	|A401  |X   | X       |   |   |   |   |
+	|A402  |X   |    X    |   |   |   |   |
+	|A411  |   X| X       | X | X |   |X  |
+	|A412  |   X|    X    | X | X |   |X  |
+	|A419  |   X| X       | X | X | X |   |
+	|A420  |   X|    X    | X | X | X |   |
+	|------+----+---------+---+---+---+---|
+
+
+	15TTF SOFTWARE SERIES (Twin Turret 4 Axis Lathe with FAPT)
+	|------+----+---------+---+---+---+---|
+	|S/W   |STEP|   CRT   |I/O|SER|SER|DNC|
+	|SERIES|    |         |   |   |   |   |
+	|      |1  2| 9M 14 9C|LNK|SPN|FB |1 2|
+	+------+----+---------+---+---+---+---+
+	|A502  |X   |       X |   |   |   |   |
+	|A512  |   X|       X | X | X |   |X  |
+	|A520  |   X|       X | X | X | X |   |
+	|------+----+---------+---+---+---+---|
+
+
+	15MA SOFTWARE SERIES (Mill With 3 Axes minimum XYZ)
+	|------+----+---------+---+---+---+---|---|
+	|S/W   |STEP|   CRT   |I/O|SER|SER|DNC|SUB|
+	|SERIES|    |         |   |   |   |   |   |
+	|      |1  2| 9M 14 9C|LNK|SPN|FB |1 2|CPU|
+	+------+----+---------+---+---+---+---+---|
+	|A001  |X   | X       |   |   |   |   |   |
+	|A002  |X   |    X    |   |   |   |   |   |
+	|A00A  |X   | X       |   |   |   |   |   |
+	|A00B  |X   |    X    |   |   |   |   |   |
+	|AA01  |X   | X       |   |   |   |   | X |
+	|AA02  |X   |    X    |   |   |   |   | X |
+	|A011  |   X| X       | X | X |   |X  |   |
+	|A012  |   X|    X    | X | X |   |X  |   |
+	|AA11  |   X| X       | X | X |   |X  | X |
+	|AA12  |   X|    X    | X | X |   |X  | X |
+	|A017  |   X| X       | X | X | X |  X|   |
+	|A018  |   X|    X    | X | X | X |  X|   |
+	|A019  |   X| X       | X | X | X |   |   |
+	|A01A  |   X| X       | X | X |   |X  |   |
+	|A01B  |   X|    X    | X | X |   |X  |   |
+	|A020  |   X|    X    | X | X | X |   |   |
+	|A021  |   X|        X| X | X | X |  ?|   |
+	|A027 (NEW STANDARD)  |   |   |   |   |   |
+	|A028 (NEW STANDARD)  |   |   |   |   |   |
+	|A041 (FOR OSI ONLY)  |   |   |   |   |   |
+	|A042 (FOR OSI ONLY)  |   |   |   |   |   |
+	|AA19  |   X| X       | X | X | X |   | X |
+	|AA20  |   X|    X    | X | X | X |   | X |
+	|AA13  |   X| X       | X | X | X |  X| X |
+	|AA14  |   X|    X    | X | X | X |  X| X |
+	|AA23  |   X| X       | X | X | X |   | X |
+	|AA24  |   X|    X    | X | X | X |   | X |
+	|AA26  |   X|    X    | X | X | X |  ?| X |
+	|AA27 (NEW STD)       |   |   |   |   |   |
+	|AA28 (NEW STD)       |   |   |   |   |   |
+	|AA41 (FOR OSI ONLY)  |   |   |   |   |   |
+	|AA42 (FOR OSI ONLY)  |   |   |   |   |   |
+	|---------------------+---+---+---+---+---|
+
+
+	Optional PCB A16B-1600-0280/02A
+	-------------------------------
+
+	|---------------------------|
+	|    181          182       |
+	|                           |
+	|                           |
+	|                           |
+	|    1C1          1C2       |
+	|                           |
+	|                           |
+	|                           |
+	|    201          202       |
+	|                           |
+	|                           |
+	|                           |
+	|    241          242       |
+	|                           |
+	|                           |
+	|                           |
+	|    281          282       |
+	|                           |
+	|                           |
+	|                           |
+	|    2C1          2C2       |
+	|                           |
+	|                           |
+	|   |---------|             |
+	|   |---------|             |
+	|      CNM1                 |
+	|---------------------------|
+	Notes:
+		  The A16B-1600-0280/02A board contains only 12 DIP32 sockets and some logic and
+		  bolts to the back of the BASE 1 board. The board extends the boot software memory
+		  storage space if additional EPROMS are required. Not all sockets are populated.
+		  Connector CNM1 joins with a 40 pin flat cable to the BASE 1 board connector CNM1
+		  IC locations are not printed on this board. Only the ROM # is printed at each
+		  socket location.
+
+		  ROM         IC         Memory     EPROM     Used For
+		  Label       Location   Location   Type
+		  ---------------------------------------------------------------------------------
+		  AB02281A    N/A        281        27C1001   Boot Software Version AB02 Revision A
+		  AB02282A    N/A        282        27C1001
+		  AB022C1A    N/A        2C1        27C1001
+		  AB022C2A    N/A        2C2        27C1001
+
+
+	15A EPROM population and option type
+	----------------+---------+-------------------------------------------
+	PCB NAME        |ROM #    | Option Type (Basic, Option A1/A2/A3 etc)
+	----------------|---------+-------------------------------------------
+	BASE 1 main     |081, 082 | B
+	BASE 1 main     |0C1, 0C2 | B
+	BASE 1 main     |101, 102 | A1 if step1 software, B if step2 software
+	BASE 1 main     |141, 142 | A2 (only used for foreign language option)
+	BASE 1 daughter |181, 182 | A3 (if used)
+	BASE 1 daughter |1C1, 1C2 | not used
+	BASE 1 daughter |201, 202 | not used
+	BASE 1 daughter |241, 242 | A6 (if used)
+	BASE 1 daughter |281, 282 | B when subcpu used
+	BASE 1 daughter |2C1, 2C2 | B when subcpu used
+	--------------------------+-------------------------------------------
+	Note: 2 MEG DRAM is required on BASE2 PCB when A3 or A6 is used 
  
 ****************************************************************************/
 

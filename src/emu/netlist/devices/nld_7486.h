@@ -40,8 +40,21 @@
 		NET_CONNECT(_name, B, _B)
 
 NETLIB_DEVICE(7486,
+public:
 		netlist_ttl_input_t m_A;
 		netlist_ttl_input_t m_B;
 		netlist_ttl_output_t m_Q;
 );
+
+#define TTL_7486_DIP(_name)                                                         \
+        NET_REGISTER_DEV(7486_dip, _name)
+
+NETLIB_DEVICE(7486_dip,
+
+    NETLIB_NAME(7486) m_1;
+    NETLIB_NAME(7486) m_2;
+    NETLIB_NAME(7486) m_3;
+    NETLIB_NAME(7486) m_4;
+);
+
 #endif /* NLD_7486_H_ */

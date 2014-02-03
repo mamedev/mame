@@ -37,7 +37,7 @@ public:
 			m_y7(*this, "Y7")
 	{ }
 
-	required_device<legacy_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;

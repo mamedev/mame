@@ -80,7 +80,7 @@ READ8_MEMBER( crtc_ega_device::register_r )
 
 WRITE8_MEMBER( crtc_ega_device::register_w )
 {
-	if (LOG)  logerror("CRTC_EGA PC %04x: reg 0x%02x = 0x%02x\n", machine().firstcpu->pc(), m_register_address_latch, data);
+	if (LOG)  logerror("%s CRTC_EGA: reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
 	switch (m_register_address_latch)
 	{

@@ -1636,8 +1636,8 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 void hng64_state::screen_eof_hng64(screen_device &screen, bool state)
 {
 	// rising edge
-	//if (state)
-	//  clear3d();
+	if (state)
+		clear3d();
 }
 
 void hng64_state::video_start()

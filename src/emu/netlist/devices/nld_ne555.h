@@ -22,8 +22,10 @@
 #include "../nl_base.h"
 #include "../analog/nld_twoterm.h"
 
-#define NETDEV_NE555(_name)                                                        \
+#define NE555(_name)                                                        \
 		NET_REGISTER_DEV(NE555, _name)
+
+
 NETLIB_DEVICE(NE555,
 	NETLIB_NAME(R) m_R1;
 	NETLIB_NAME(R) m_R2;
@@ -37,10 +39,15 @@ NETLIB_DEVICE(NE555,
 
 	bool m_last_out;
 
-	double clamp(const double v, const double a, const double b);
+	inline double clamp(const double v, const double a, const double b);
 
 );
 
+#define NE555_DIP(_name)                                                         \
+        NET_REGISTER_DEV(NE555_dip, _name)
+
+NETLIB_DEVICE_DERIVED(NE555_dip, NE555,
+);
 
 
 #endif /* NLD_NE555_H_ */

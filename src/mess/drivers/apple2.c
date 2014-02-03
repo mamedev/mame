@@ -214,6 +214,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "bus/a2bus/a2midi.h"
 #include "bus/a2bus/a2zipdrive.h"
 #include "bus/a2bus/a2applicard.h"
+#include "bus/a2bus/a2ultraterm.h"
 #include "bus/a2bus/a2estd80col.h"
 #include "bus/a2bus/a2eext80col.h"
 #include "bus/a2bus/a2eramworks3.h"
@@ -641,6 +642,8 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
 	SLOT_INTERFACE("aesms", A2BUS_AESMS)    /* Applied Engineering Super Music Synthesizer */
+	SLOT_INTERFACE("ultraterm", A2BUS_ULTRATERM)    /* Videx UltraTerm (original) */
+	SLOT_INTERFACE("ultratermenh", A2BUS_ULTRATERMENH)    /* Videx UltraTerm (enhanced //e) */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(apple2eaux_cards)

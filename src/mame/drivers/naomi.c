@@ -1611,7 +1611,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
-//  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
+//  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
 //  AM_RANGE(0x025f7c00, 0x025f7cff) AM_DEVREADWRITE32("powervr2", powervr2_device, pvr_ctrl_r, pvr_ctrl_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, U64(0xffffffffffffffff))
 
@@ -2544,7 +2544,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomi, naomi_base )
-	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", ":actel", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2560,7 +2560,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim1, naomi_base )
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M1_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", ":actel", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2568,7 +2568,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim2, naomi_base )
-	MCFG_NAOMI_M2_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M2_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", ":actel", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -2576,7 +2576,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomim4, naomi_base )
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M4_BOARD_ADD("rom_board", ":rom_key", "naomibd_eeprom", ":actel", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 /*
@@ -5625,19 +5625,19 @@ ROM_START( wldkicks )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "wk1fl1.2d",   0x0400000, 0x0400000, CRC(f833a543) SHA1(328b64f2790bfd0b63168a8a3175227e083b995d) )
-	ROM_LOAD( "wk1fl2.2c",   0x0c00000, 0x0400000, CRC(20ee71b0) SHA1(074e0c531e8770b0efd6464193bce7a284a3c057) )
-	ROM_LOAD( "wk1ma2.4m",   0x1000000, 0x1000000, CRC(650590ec) SHA1(bb9d5d5df2321df24ee0fb9e8bf2757d5277f8ea) )
-	ROM_RELOAD( 0x800000, 0x400000)
-	ROM_LOAD( "wk1ma3.4l",   0x2000000, 0x1000000, CRC(3b340dc0) SHA1(2412e41d5bd74d1233fb91f8ce2276a318bfc53d) )
-	ROM_LOAD( "wk1ma4.4k",   0x3000000, 0x1000000, CRC(263fbb16) SHA1(b5d3a3d085f9623d70030ca3c49afb84e25549e3) )
-	ROM_LOAD( "wk1ma5.4j",   0x4000000, 0x1000000, CRC(9697db68) SHA1(7926e2acff0519403afcba9bdb5f68de28b06c79) )
-	ROM_LOAD( "wk1ma6.4h",   0x5000000, 0x1000000, CRC(65017db3) SHA1(a66cd73cdfc9355df63da781a46aa832889f583a) )
-	ROM_LOAD( "wk1ma7.4f",   0x6000000, 0x1000000, CRC(902eea85) SHA1(aa7964eb85b468d4fe112f9f0faaf2fa3f1aa96b) )
-	ROM_LOAD( "wk1ma8.4e",   0x7000000, 0x1000000, CRC(90e917ed) SHA1(53d32ce0ae2b05fa55a95b8697927045d07f4e8a) )
-	ROM_LOAD( "wk1ma9.4d",   0x8000000, 0x1000000, CRC(1d227a05) SHA1(9f816bcdf0279785e0b37ab2f3c5eb5912114dd5) )
-	ROM_LOAD( "wk1ma10.4c",  0x9000000, 0x1000000, CRC(29635a54) SHA1(a3109d0f8f271e2183316846df2a6a819f6a9b20) )
-	ROM_LOAD( "wk1ma11.4b",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
+	ROM_LOAD( "wk1vera-fl1.2d", 0x0800000, 0x800000, CRC(b07c9323) SHA1(9eb61cb2e1127cc6aeccaa770ff127e34edd759b) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD( "wk1vera-fl2.2c", 0x1000000, 0x800000, CRC(d946656a) SHA1(b135848a23d6dc97bbce8a923cddb6b60668eedf) )
+
+	ROM_LOAD( "wk1ma3.4m",   0x2000000, 0x1000000, CRC(3b340dc0) SHA1(2412e41d5bd74d1233fb91f8ce2276a318bfc53d) )
+	ROM_LOAD( "wk1ma4.4l",   0x3000000, 0x1000000, CRC(263fbb16) SHA1(b5d3a3d085f9623d70030ca3c49afb84e25549e3) )
+	ROM_LOAD( "wk1ma5.4k",   0x4000000, 0x1000000, CRC(9697db68) SHA1(7926e2acff0519403afcba9bdb5f68de28b06c79) )
+	ROM_LOAD( "wk1ma6.4j",   0x5000000, 0x1000000, CRC(65017db3) SHA1(a66cd73cdfc9355df63da781a46aa832889f583a) )
+	ROM_LOAD( "wk1ma7.4h",   0x6000000, 0x1000000, CRC(902eea85) SHA1(aa7964eb85b468d4fe112f9f0faaf2fa3f1aa96b) )
+	ROM_LOAD( "wk1ma8.4f",   0x7000000, 0x1000000, CRC(90e917ed) SHA1(53d32ce0ae2b05fa55a95b8697927045d07f4e8a) )
+	ROM_LOAD( "wk1ma9.4e",   0x8000000, 0x1000000, CRC(1d227a05) SHA1(9f816bcdf0279785e0b37ab2f3c5eb5912114dd5) )
+	ROM_LOAD( "wk1ma10.4d",  0x9000000, 0x1000000, CRC(29635a54) SHA1(a3109d0f8f271e2183316846df2a6a819f6a9b20) )
+	ROM_LOAD( "wk1ma11.4c",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(c1e3000b) SHA1(36c2546833effe9452e2b3f7d31335fc5e349f49) )
@@ -5648,19 +5648,42 @@ ROM_START( wldkicksa )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_LOAD( "wk3vera_fl1.2d", 0x0400000, 0x800000, CRC(cfdd5c5d) SHA1(ffc5d38edb600462574d4ed8ce5ada8625d59c74) )
-	ROM_LOAD( "wk3vera_fl2.2c", 0x0c00000, 0x800000, CRC(ad2577d5) SHA1(f7b6bab001c5f5cf0b33a70cd0dfdca8f7d25921) )
-	ROM_LOAD( "wk1ma2.4m",   0x1000000, 0x1000000, CRC(650590ec) SHA1(bb9d5d5df2321df24ee0fb9e8bf2757d5277f8ea) )
-	ROM_RELOAD( 0x800000, 0x400000)
-	ROM_LOAD( "wk1ma3.4l",   0x2000000, 0x1000000, CRC(3b340dc0) SHA1(2412e41d5bd74d1233fb91f8ce2276a318bfc53d) )
-	ROM_LOAD( "wk1ma4.4k",   0x3000000, 0x1000000, CRC(263fbb16) SHA1(b5d3a3d085f9623d70030ca3c49afb84e25549e3) )
-	ROM_LOAD( "wk1ma5.4j",   0x4000000, 0x1000000, CRC(9697db68) SHA1(7926e2acff0519403afcba9bdb5f68de28b06c79) )
-	ROM_LOAD( "wk1ma6.4h",   0x5000000, 0x1000000, CRC(65017db3) SHA1(a66cd73cdfc9355df63da781a46aa832889f583a) )
-	ROM_LOAD( "wk1ma7.4f",   0x6000000, 0x1000000, CRC(902eea85) SHA1(aa7964eb85b468d4fe112f9f0faaf2fa3f1aa96b) )
-	ROM_LOAD( "wk1ma8.4e",   0x7000000, 0x1000000, CRC(90e917ed) SHA1(53d32ce0ae2b05fa55a95b8697927045d07f4e8a) )
-	ROM_LOAD( "wk1ma9.4d",   0x8000000, 0x1000000, CRC(1d227a05) SHA1(9f816bcdf0279785e0b37ab2f3c5eb5912114dd5) )
-	ROM_LOAD( "wk1ma10.4c",  0x9000000, 0x1000000, CRC(29635a54) SHA1(a3109d0f8f271e2183316846df2a6a819f6a9b20) )
-	ROM_LOAD( "wk1ma11.4b",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
+	ROM_LOAD( "wk3vera-fl1.2d", 0x0800000, 0x800000, CRC(cfdd5c5d) SHA1(ffc5d38edb600462574d4ed8ce5ada8625d59c74) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD( "wk3vera-fl2.2c", 0x1000000, 0x800000, CRC(ad2577d5) SHA1(f7b6bab001c5f5cf0b33a70cd0dfdca8f7d25921) )
+
+	ROM_LOAD( "wk1ma3.4m",   0x2000000, 0x1000000, CRC(3b340dc0) SHA1(2412e41d5bd74d1233fb91f8ce2276a318bfc53d) )
+	ROM_LOAD( "wk1ma4.4l",   0x3000000, 0x1000000, CRC(263fbb16) SHA1(b5d3a3d085f9623d70030ca3c49afb84e25549e3) )
+	ROM_LOAD( "wk1ma5.4k",   0x4000000, 0x1000000, CRC(9697db68) SHA1(7926e2acff0519403afcba9bdb5f68de28b06c79) )
+	ROM_LOAD( "wk1ma6.4j",   0x5000000, 0x1000000, CRC(65017db3) SHA1(a66cd73cdfc9355df63da781a46aa832889f583a) )
+	ROM_LOAD( "wk1ma7.4h",   0x6000000, 0x1000000, CRC(902eea85) SHA1(aa7964eb85b468d4fe112f9f0faaf2fa3f1aa96b) )
+	ROM_LOAD( "wk1ma8.4f",   0x7000000, 0x1000000, CRC(90e917ed) SHA1(53d32ce0ae2b05fa55a95b8697927045d07f4e8a) )
+	ROM_LOAD( "wk1ma9.4e",   0x8000000, 0x1000000, CRC(1d227a05) SHA1(9f816bcdf0279785e0b37ab2f3c5eb5912114dd5) )
+	ROM_LOAD( "wk1ma10.4d",  0x9000000, 0x1000000, CRC(29635a54) SHA1(a3109d0f8f271e2183316846df2a6a819f6a9b20) )
+	ROM_LOAD( "wk1ma11.4c",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
+
+	ROM_REGION( 4, "rom_key", 0 )
+	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(c1e3000b) SHA1(36c2546833effe9452e2b3f7d31335fc5e349f49) )
+ROM_END
+
+ROM_START( wldkicksb )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "wk2vera-fl1.2d", 0x0800000, 0x800000, CRC(5b380ec9) SHA1(ac7930f29a145502eae0420e0059ab20a70d26eb) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD( "wk2vera-fl2.2c", 0x1000000, 0x800000, CRC(ad2577d5) SHA1(f7b6bab001c5f5cf0b33a70cd0dfdca8f7d25921) )
+
+	ROM_LOAD( "wk1ma3.4m",   0x2000000, 0x1000000, CRC(3b340dc0) SHA1(2412e41d5bd74d1233fb91f8ce2276a318bfc53d) )
+	ROM_LOAD( "wk1ma4.4l",   0x3000000, 0x1000000, CRC(263fbb16) SHA1(b5d3a3d085f9623d70030ca3c49afb84e25549e3) )
+	ROM_LOAD( "wk1ma5.4k",   0x4000000, 0x1000000, CRC(9697db68) SHA1(7926e2acff0519403afcba9bdb5f68de28b06c79) )
+	ROM_LOAD( "wk1ma6.4j",   0x5000000, 0x1000000, CRC(65017db3) SHA1(a66cd73cdfc9355df63da781a46aa832889f583a) )
+	ROM_LOAD( "wk1ma7.4h",   0x6000000, 0x1000000, CRC(902eea85) SHA1(aa7964eb85b468d4fe112f9f0faaf2fa3f1aa96b) )
+	ROM_LOAD( "wk1ma8.4f",   0x7000000, 0x1000000, CRC(90e917ed) SHA1(53d32ce0ae2b05fa55a95b8697927045d07f4e8a) )
+	ROM_LOAD( "wk1ma9.4e",   0x8000000, 0x1000000, CRC(1d227a05) SHA1(9f816bcdf0279785e0b37ab2f3c5eb5912114dd5) )
+	ROM_LOAD( "wk1ma10.4d",  0x9000000, 0x1000000, CRC(29635a54) SHA1(a3109d0f8f271e2183316846df2a6a819f6a9b20) )
+	ROM_LOAD( "wk1ma11.4c",  0xa000000, 0x1000000, CRC(e96f312c) SHA1(0a92640277111aef5c6e9dab4218a8ae2196ce61) )
 
 	ROM_REGION( 4, "rom_key", 0 )
 	ROM_LOAD( "wldkicks-key.bin", 0, 4, CRC(c1e3000b) SHA1(36c2546833effe9452e2b3f7d31335fc5e349f49) )
@@ -6008,6 +6031,113 @@ ROM_START( derbyo2k )
 	ROM_LOAD( "mpr-22238.ic16s", 0x8000000, 0x800000, CRC(fb3e55da) SHA1(d547ee5b47e6e6fec9e447460300c828fbff8f2e) )
 ROM_END
 
+ROM_START( starhrse )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x4800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr23625.ic22", 0x000000, 0x0400000, CRC(7300bc6c) SHA1(f0bfff190c9f02895cc1f98eb695f327c948fca3) ) 
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD( "mpr23231.ic1",  0x0800000, 0x1000000, CRC(e41ddc53) SHA1(f565d68d8ce4010a2181b0343fa49bfdc81ba4cf) ) 
+	ROM_LOAD( "mpr23232.ic2",  0x1800000, 0x1000000, CRC(30f963a0) SHA1(dc56203ceae20f7a7354e505dd7f27cbce5c70e0) ) 
+	ROM_LOAD( "mpr23233.ic3",  0x2800000, 0x1000000, CRC(d6451cab) SHA1(6508e27d0370b19df01150da7baf4875479c166a) ) 
+	ROM_LOAD( "mpr23234.ic4",  0x3800000, 0x1000000, CRC(44044c14) SHA1(4934cb8d5f9b4085ffb5ddc711343f488aae4c4d) ) 
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(951684e4) SHA1(0beaf5827064252293223b946c04b8698e7207bb) ) 
+ROM_END
+
+ROM_START( starhrct )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x9800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr23626.ic22", 0x0000000, 0x200000, CRC(d5893a19) SHA1(861624ef3e5061b6ed9d6c4714e35fa508643b05) ) 
+	ROM_RELOAD( 0x400000, 0x200000)
+	ROM_LOAD( "28f640.ic1s",   0x0800000, 0x800000, CRC(e45ab26f) SHA1(1e40ae9778a026b0f4c3c9681cf5d08397b72c48) ) 
+	ROM_LOAD( "28f640.ic2s",   0x1000000, 0x800000, CRC(4d0e4e64) SHA1(4fe1c35f4cf34391eb1e4486bde92bd6104f05f2) ) 
+	ROM_LOAD( "28f640.ic3s",   0x1800000, 0x800000, CRC(a18c7ce7) SHA1(1e4fb63c0d8f901b077590ccc0af4bba3135f56c) ) 
+	ROM_LOAD( "28f640.ic4s",   0x2000000, 0x800000, CRC(82001b50) SHA1(d06e70d2ae4cf0635872663c5b6f1dbbd12897e0) ) 
+	ROM_LOAD( "28f640.ic5s",   0x2800000, 0x800000, CRC(5e4af8b2) SHA1(98598a0f5932cf79f54ff79cfa03632550dee373) ) 
+	ROM_LOAD( "28f640.ic6s",   0x3000000, 0x800000, CRC(2950c543) SHA1(041548e79afcadc1b0e3524432ed52320f395f3e) ) 
+	ROM_LOAD( "28f640.ic7s",   0x3800000, 0x800000, CRC(a2bb8ebb) SHA1(c5329cedf5f746c0d684d8dea301a0786909ea1d) ) 
+	ROM_LOAD( "28f640.ic8s",   0x4000000, 0x800000, CRC(fde9b537) SHA1(b186da26bef43b483fd32c486bb018dc631bf485) ) 
+	ROM_LOAD( "28f640.ic9s",   0x4800000, 0x800000, CRC(4db3e79a) SHA1(de2480792e7dfc01195000607be90fd4b29fdcc0) ) 
+	ROM_LOAD( "28f640.ic10s",  0x5000000, 0x800000, CRC(37167167) SHA1(e379d20bcda84e6aaa0b930dce95d97812cd45d6) ) 
+	ROM_LOAD( "28f640.ic11s",  0x5800000, 0x800000, CRC(927f1edb) SHA1(64f2f2f4546cc6b45ee78aeae68ce829cb57a124) ) 
+	ROM_LOAD( "28f640.ic12s",  0x6000000, 0x800000, CRC(05de610d) SHA1(715124a3e7a23589c4ca9f0dccd55a21f7d48123) ) 
+	ROM_LOAD( "28f640.ic13s",  0x6800000, 0x800000, CRC(17ed44c3) SHA1(ec34276006c3be7bd6d23c11314b0369a082e1ef) ) 
+	ROM_LOAD( "28f640.ic14s",  0x7000000, 0x800000, CRC(66d7e2a1) SHA1(69178d4995ac3c2d73d953544101d23da1812f65) ) 
+	ROM_LOAD( "28f640.ic15s",  0x7800000, 0x800000, CRC(0c701416) SHA1(6c9e882e2a00768f5e0a28d38a5695c65594d8dd) ) 
+	ROM_LOAD( "28f640.ic16s",  0x8000000, 0x800000, CRC(5d8e6e8d) SHA1(03045f3a9257632c325eba9752855b42355dff6c) ) 
+	ROM_LOAD( "28f640.ic17s",  0x8800000, 0x800000, CRC(b4c40606) SHA1(4f187dfe44bd89c90b6fa4b90f16222bc0a74d22) ) 
+	// .18s chip is not present but is tested for an FF fill (pull-up resistors on the PCB's data bus presumably accomplish this)
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(1557297e) SHA1(41e8a7a8eaf5076b124d378afdf97e328d100e72) ) 
+ROM_END
+
+ROM_START( starhrcl )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x7000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr23627.ic22", 0x0000000, 0x0400000, CRC(7caccc5e) SHA1(86bff30b76b4b02467b37341582062de5c507a39) ) 
+	ROM_LOAD( "mpr23275.ic1",  0x0800000, 0x1000000, CRC(ffc62eab) SHA1(bb9dd3cc6540de1c194df99d5629583216f4c557) ) 
+	ROM_LOAD( "mpr23276.ic2",  0x1800000, 0x1000000, CRC(8b7ce666) SHA1(2848786659349598e019fbb05c92ed3ce6e2ec11) ) 
+	ROM_LOAD( "mpr23277.ic3",  0x2800000, 0x1000000, CRC(47a6f9c5) SHA1(9af5c3129a44fcffb87b1b021d8812e0b695967f) ) 
+	ROM_LOAD( "mpr23278.ic4",  0x3800000, 0x1000000, CRC(c12b189c) SHA1(7743500400a4e23a5e97a53ee16775c32d9abd5d) ) 
+	ROM_LOAD( "mpr23279.ic5",  0x4800000, 0x1000000, CRC(b8b39559) SHA1(082c9b6926557654c3f3bf00d741f32c560b50ce) ) 
+	ROM_LOAD( "mpr23280.ic6",  0x5800000, 0x1000000, CRC(b1c8daa2) SHA1(a05fb374156ea013e35502abccc92f5117c39daa) ) 
+	ROM_LOAD( "mpr23281.ic7",  0x6800000, 0x0800000, CRC(c0378369) SHA1(c728a181eddb01b9f8574669d4550baed559a5a4) ) 
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(4929e940) SHA1(f8c4277ca0ae5e36b2eed033cc731b8fc4fccafc) ) 
+ROM_END
+
+/* prototype cartridges for games released on GD-ROM */
+
+ROM_START( puyofevp )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xc000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD( "ic17s.bin", 0x01000000, 0x800000, CRC(f51ce63b) SHA1(7642d5a78d103986ebe7bf9ecea7602490fcdfa2) ) 
+	ROM_LOAD32_WORD( "ic18s.bin", 0x01000002, 0x800000, CRC(7109decc) SHA1(91481f427d4d28c3ff1805eb00b63deb9d691b27) ) 
+	ROM_LOAD32_WORD( "ic19s.bin", 0x02000000, 0x800000, CRC(a58efa9c) SHA1(ff83c25ef4094c1033b906bd048569927b0828c2) ) 
+	ROM_LOAD32_WORD( "ic20s.bin", 0x02000002, 0x800000, CRC(6dee24b2) SHA1(ef6eb8aa239af6b02169618dd2594fc9c62086dc) ) 
+	ROM_LOAD32_WORD( "ic21s.bin", 0x03000000, 0x800000, CRC(9a0564c2) SHA1(71fa98fd4815a119ff2cbe07298fefc25a2cde79) ) 
+	ROM_LOAD32_WORD( "ic22s.bin", 0x03000002, 0x800000, CRC(df692133) SHA1(9433010ca070003d59a18239cd2637e6f9bffeae) ) 
+	ROM_LOAD32_WORD( "ic23s.bin", 0x04000000, 0x800000, CRC(61c98256) SHA1(a1e4e6fa7c2672d49ff6a0a5a239d9f405797248) ) 
+	ROM_LOAD32_WORD( "ic24s.bin", 0x04000002, 0x800000, CRC(c7e8ec24) SHA1(7cf7fc4954caff3fe2bb14964889d79250e6e4db) ) 
+	ROM_LOAD32_WORD( "ic25s.bin", 0x05000000, 0x800000, CRC(2cb47ef5) SHA1(3f6cea2ca7857bd441f9632cd295c5f57a3d59fc) ) 
+	ROM_LOAD32_WORD( "ic26s.bin", 0x05000002, 0x800000, CRC(f5b477d5) SHA1(f79d65bee22800dce2964666278c285d15c059e7) ) 
+	ROM_LOAD32_WORD( "ic27s.bin", 0x06000000, 0x800000, CRC(22c07470) SHA1(4e64b632a4dad2d6a565d90aa34a00739a2a4ad4) ) 
+	ROM_LOAD32_WORD( "ic28s.bin", 0x06000002, 0x800000, CRC(018233e0) SHA1(168430d66c59db49d113b65ae6dac9ddb9919661) ) 
+	ROM_LOAD32_WORD( "ic29s.bin", 0x07000000, 0x800000, CRC(96101b95) SHA1(b818f24b551eaf3a35d8eb23b7e7df2af5ceef5f) ) 
+	ROM_LOAD32_WORD( "ic30s.bin", 0x07000002, 0x800000, CRC(16dff39b) SHA1(b3899ab22056015ed3fd4ee06f687d9dca540ece) ) 
+	ROM_LOAD32_WORD( "ic31s.bin", 0x08000000, 0x800000, CRC(510c03dd) SHA1(1488a574590be8927bc8c403105b6fb72c829177) ) 
+	ROM_LOAD32_WORD( "ic32s.bin", 0x08000002, 0x800000, CRC(b184e263) SHA1(5089b13c160708c4ddee36e4fb89110ab6281690) ) 
+	ROM_LOAD32_WORD( "ic33s.bin", 0x09000000, 0x800000, CRC(be2a164b) SHA1(a1d93e84e7e35ec55e738dc27069295cd0610f27) ) 
+	ROM_LOAD32_WORD( "ic34s.bin", 0x09000002, 0x800000, CRC(01e0a163) SHA1(7730ce21e9041c70d39700d4ea2ff3adf54a315e) ) 
+	ROM_LOAD32_WORD( "ic35s.bin", 0x0a000000, 0x800000, CRC(ae0c1caa) SHA1(548c5e6cb0c99ba8f0a758bb66fb8d949b2da1a0) ) 
+	ROM_LOAD32_WORD( "ic36s.bin", 0x0a000002, 0x800000, CRC(6de8d5c7) SHA1(896520ab7cf458fddeacdad7a535976445048d8f) ) 
+	ROM_LOAD32_WORD( "ic37s.bin", 0x0b000000, 0x800000, CRC(fc89454c) SHA1(f0550e17930c71d81050f18eceb312fe82c084c2) ) 
+	ROM_LOAD32_WORD( "ic38s.bin", 0x0b000002, 0x800000, CRC(86954476) SHA1(ba2b31032321abf5ddfe7cff7803ae4fa944812c) ) 
+
+	ROM_COPY( "rom_board", 0x01000000, 0x00400000, 0x00800000 )
+	ROM_COPY( "rom_board", 0x01800000, 0x00c00000, 0x00400000 )
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(17150bc9) SHA1(c3af7d91e12141938d2b9e67eb9f5ff961cd09ff) ) 
+
+	// tell naomibd that this is an "actel" type IC18 cart, which changes the BIOS's ROM test behavior
+	ROM_REGION(0x4, "actel", ROMREGION_ERASE00)
+ROM_END
 
 /* GD-ROM titles - a PIC supplies a decryption key
 
@@ -7441,6 +7571,21 @@ ROM_START( vf4evoct )
 	ROM_LOAD( "vf4evoct-key.bin", 0, 4, CRC(c37dae2b) SHA1(c42dc01b5918db36e7eb2aca523e2f4df567725a) )
 ROM_END
 
+ROM_START( hopper )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr24083.ic11", 0x000000, 0x400000, CRC(2733e65a) SHA1(4a5d109d0531bebd8e8f585789adce98cac2ab93) ) 
+
+	ROM_REGION( 0x40000, "flash", ROMREGION_ERASEFF)
+	ROM_LOAD( "315-6358a.ic2", 0x000000, 0x020008, CRC(ef442e67) SHA1(70ac91e2ca1ff2dfba48d566e4de68bd8b82f282) ) 
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(ddedf494) SHA1(f1529615711a9871051cd09c2a9b95c90d356874) ) 
+ROM_END
+
 ROM_START( clubkrte )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -7483,12 +7628,50 @@ ROM_START( clubkprz )
 	ROM_LOAD32_WORD( "opr-24080.31",  0x7800000, 0x800000, CRC(307c480e) SHA1(6e52f252f557988e52c42d495713a374507b5895) ) 
 	ROM_LOAD32_WORD( "opr-24081.32s", 0x7800002, 0x800000, CRC(61085bdc) SHA1(48fe7f34bb5f50825b3c77d587e07f3adab1cf86) ) 
 
+	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
+
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
 	ROM_LOAD( "at25010.ic3s", 0x000000, 0x000084, CRC(0142d8be) SHA1(5922b6c47b12b19e1fa7bbe9aae391905038a7ff) ) 
 
 	ROM_REGION( 4, "rom_key", 0 )	// 317-0368-COM
 	ROM_LOAD( "clubkprz-key.bin", 0x000000, 0x000004, CRC(c9ed13c1) SHA1(2907985375cd5b04846e7214d200926be64d06fd) ) 
+
+	// tell naomibd that this is an "actel" type IC18 cart, which changes the BIOS's ROM test behavior
+	ROM_REGION(0x4, "actel", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( clubkpzb )
+	NAOMI2_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr24149.ic11", 0x000000, 0x400000, CRC(175b57a5) SHA1(de8ddd140c39d62a10d90ec46060d84c3b226c6b) ) 
+	ROM_LOAD32_WORD( "opr-24178.ic17s", 0x1000000, 0x800000, CRC(836764ca) SHA1(e91cf7abeb27013d33726029d060075fa6352610) ) 
+	ROM_LOAD32_WORD( "opr-24179.ic18",  0x1000002, 0x800000, CRC(03a0eb5b) SHA1(3f377d5a13d54c40c521f0faf6d50dc4fc077bb7) ) 
+	ROM_LOAD32_WORD( "opr-24180.ic19s", 0x2000000, 0x800000, CRC(6a6c41f4) SHA1(3b01476b0483ce5e2f7e208e618ad56769b5c064) ) 
+	ROM_LOAD32_WORD( "opr-24181.ic20",  0x2000002, 0x800000, CRC(38fd96fd) SHA1(c26ffc01529b4533c5e1448a774fa6e5f7e08080) ) 
+	ROM_LOAD32_WORD( "opr-24182.ic21s", 0x3000000, 0x800000, CRC(b1116d71) SHA1(c840ae3602055528e4282283e5bc99465c6b5d28) ) 
+	ROM_LOAD32_WORD( "opr-24183.ic22",  0x3000002, 0x800000, CRC(c1aef164) SHA1(e9a830a3a4bac4f5b2b40615bc43036aa0dd0a56) ) 
+	ROM_LOAD32_WORD( "opr-24184.ic23s", 0x4000000, 0x800000, CRC(4ce1b902) SHA1(41b2fb02e3b9a0bb6ea8c7d77a9fb92248d62bcc) ) 
+	ROM_LOAD32_WORD( "opr-24185.ic24",  0x4000002, 0x800000, CRC(94a4e6ab) SHA1(8738fcc75becf2acd5bc2c1be75e9a5c35359973) ) 
+	ROM_LOAD32_WORD( "opr-24186.ic25s", 0x5000000, 0x800000, CRC(6884d0e9) SHA1(74ef002a752fcd377c5e6e6c17334ca22e561c76) ) 
+	ROM_LOAD32_WORD( "opr-24187.ic26",  0x5000002, 0x800000, CRC(87c79534) SHA1(ab6e5246c388d0839ea6a45c8d2db035b33cd1d2) ) 
+	ROM_LOAD32_WORD( "opr-24188.ic27s", 0x6000000, 0x800000, CRC(cfe107a2) SHA1(2f98bc00aa2b2eea0a26452542098c389f5e836c) ) 
+	ROM_LOAD32_WORD( "opr-24189.ic28",  0x6000002, 0x800000, CRC(302de147) SHA1(442204439c509a6aa7dd25156bf17fb3853ae632) ) 
+	ROM_LOAD32_WORD( "opr-24190.ic29s", 0x7000000, 0x800000, CRC(71551313) SHA1(4b43d754b9511ae2d73ec04d7baf0e466337a82f) ) 
+	ROM_LOAD32_WORD( "opr-24191.ic30",  0x7000002, 0x800000, CRC(200cbeaf) SHA1(ccca2b873177d148a391cfcc8b1632856bd0e3b4) ) 
+	ROM_LOAD32_WORD( "opr-24192.ic31s", 0x8000000, 0x800000, CRC(869ef0ce) SHA1(227189dedfa72c56d9eedf5faeed9a4fd0a8393f) ) 
+	ROM_LOAD32_WORD( "opr-24193.ic32",  0x8000002, 0x800000, CRC(fb39946d) SHA1(d9fa077869709c6fda640bd4be18cf3db7ebe1d1) ) 
+
+	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
+
+	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
+	ROM_REGION(0x84, "some_eeprom", 0)
+	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(afff6471) SHA1(c1e1d349ff25191eba09cd7d7186fbe2c6565b81) ) 
+
+	// tell naomibd that this is an "actel" type IC18 cart, which changes the BIOS's ROM test behavior
+	ROM_REGION(0x4, "actel", ROMREGION_ERASE00)
 ROM_END
 
 /**********************************************
@@ -8223,6 +8406,9 @@ ROM_END
 /* 0048 */ GAME( 2001, alienfnt, naomi,    naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Alien Front (Rev T)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0048 */ GAME( 2001, alienfnta, alienfnt,naomim2, naomi,   naomi_state, naomi,   ROT0, "Sega", "Alien Front (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0052 */ GAME( 2000, derbyo2k, naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Derby Owners Club 2000 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0054 */ GAME( 2000, starhrse, naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (big screens)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0055 */ GAME( 2000, starhrct, naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (server)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0056 */ GAME( 2000, starhrcl, naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Star Horse (client)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0064 */ GAME( 2001, wrungp,   naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Wave Runner GP", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0068 */ GAME( 2001, crakndj2, naomi,    naomim2, crackndj,naomi_state, naomi,   ROT0, "Sega", "Crackin' DJ Part 2", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0073 */ GAME( 2001, inunoos,  naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Inu No Osanpo / Dog Walking (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8234,6 +8420,7 @@ ROM_END
 // 0123 Star Horse Progress (Rev A)
 /* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0128 */ GAME( 2002, shootpl,  naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0130B */GAME( 2002, hopper,   naomi,    naomi,   naomi,   naomi_state, naomi,   ROT0, "Sega", "SWP Hopper Board", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0136 */ GAME( 2001, shootplm, naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Shootout Pool Medal", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomim1, naomi,   naomi_state, kick4csh,ROT0, "Sega", "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0150 */ GAME( 2003, mtkob2,   naomi,    naomim1, naomi,   naomi_state, naomi,   ROT0, "Sega", "Mushiking The King Of Beetle 2K3 2nd", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8245,6 +8432,9 @@ ROM_END
 // 0177 Rythm Tengoku (Japan)
 // 00xx Mayjinsen (Formation Battle in May) - prototype, never released
 
+/* Cartridge prototypes of games released on GD-ROM */
+GAME( 2003, puyofevp, naomi, naomi, naomi, naomi_state, naomi, ROT0, "Sega", "Puyo Puyo Fever (prototype ver 0.01)", GAME_FLAGS )
+
 /* 840-xxxxx (Sega Naomi 2 cart games) */
 /* 0046 */ GAME( 2001, wldrider, naomi2,  naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0061 */ GAME( 2001, vstrik3c, naomi2,  naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "Virtua Striker 3 (USA, EXP, KOR, AUS) (Cart, Rev C)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8255,6 +8445,8 @@ ROM_END
 /* 0095 */ GAME( 2002, soulsurf, naomi2,  naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "Soul Surfer (Rev A)", GAME_FLAGS )
 /* 0106 */ GAME( 2002, vf4evoct, naomi2,  naomi2m1, naomi, naomi_state, vf4evoct, ROT0, "Sega", "Virtua Fighter 4 Evolution (Cartridge)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0129 */ GAME( 2003, clubkprz, naomi2,  naomi2m1, naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart Prize", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
+/* Note: the game's full name is exactly "Club Kart Prize Ver. B".  The "Ver. B" does not denote a new revision of Club Kart Prize; the different 840- number confirms this. */
+/* 0137 */ GAME( 2004, clubkpzb, naomi2,  naomi2,   naomi, naomi_state, naomi2,   ROT0, "Sega", "Club Kart Prize Ver. B", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
 
 /* 841-xxxxx ("Licensed by Sega" Naomi cart games)*/
 /* 0001 */ GAME( 1999, pstone,   naomi, naomim2, naomi,   naomi_state, naomi,  ROT0,  "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8288,6 +8480,7 @@ ROM_END
 /* Cart games on Namco custom ROM board */
 /* 25209801 */ GAME( 2000, wldkicks, naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "World Kicks (WK2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25209801 */ GAME( 2000, wldkicksa,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "World Kicks (WK3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 25209801 */ GAME( 2000, wldkicksb,wldkicks,naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "World Kicks (WK1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25349801 */ GAME( 2000, toukon4,  naomi,   naomim2,naomi, naomi_state, naomi, ROT0, "Capcom / Namco", "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 // 25469801 Ninja Assault (NJA1 Ver. A)
 // 25469801 Ninja Assault (NJA2 Ver. A)

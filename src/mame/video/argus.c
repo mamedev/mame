@@ -1003,9 +1003,6 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 
 		sy = 240 - sy;
 
-		fx = flipx;
-		fy = flipy;
-
 		if (m_flipscreen)
 		{
 			sx = 240 - sx;
@@ -1013,6 +1010,9 @@ void argus_state::butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 			flipx = !flipx;
 			flipy = !flipy;
 		}
+		
+		fx = flipx;
+		fy = flipy;
 
 		{
 			int i, j, td;

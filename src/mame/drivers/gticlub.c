@@ -256,7 +256,7 @@ public:
 	required_shared_ptr<UINT32> m_work_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_dsp;
+	required_device<adsp21062_device> m_dsp;
 	optional_device<cpu_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
 	required_device<adc1038_device> m_adc1038;
@@ -748,12 +748,6 @@ INTERRUPT_GEN_MEMBER(gticlub_state::gticlub_vblank)
 }
 
 
-static const sharc_config sharc_cfg =
-{
-	BOOT_MODE_EPROM
-};
-
-
 static int adc1038_input_callback( device_t *device, int input )
 {
 	int value = 0;
@@ -917,7 +911,7 @@ UINT32 gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg[1]);
 
 	//machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-	sharc_set_flag_input(machine().device("dsp"), 1, ASSERT_LINE);
+	m_dsp->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
@@ -964,7 +958,7 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
 	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
-	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -1068,11 +1062,11 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
 	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
-	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(hangplt_sharc0_map)
 
 	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
-	MCFG_CPU_CONFIG(sharc_cfg)
+	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(hangplt_sharc1_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    uigfx.h
+    ui/viewgfx.h
 
     Internal graphics viewer.
 
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef __UIGFX_H__
-#define __UIGFX_H__
+#ifndef __UI_VIEWGFX_H__
+#define __UI_VIEWGFX_H__
 
 
 
@@ -20,11 +20,14 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* initialization */
+// initialization
 void ui_gfx_init(running_machine &machine);
 
-/* master handler */
+// returns 'true' if the internal graphics viewer has relevance
+bool ui_gfx_is_relevant(running_machine &machine);
+
+// master handler
 UINT32 ui_gfx_ui_handler(running_machine &machine, render_container *container, UINT32 state);
 
 
-#endif  /* __UIGFX_H__ */
+#endif  /* __UI_VIEWGFX_H__ */

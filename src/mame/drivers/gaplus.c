@@ -217,8 +217,8 @@ static const namco_62xx_interface namco_62xx_intf =
 		//DEVCB_INPUT_PORT("IN1H")
 	},
 	{   /* port write handlers */
-		//DEVCB_HANDLER(out_0),
-		//DEVCB_HANDLER(out_1)
+		//DEVCB_DRIVER_MEMBER(out_0),
+		//DEVCB_DRIVER_MEMBER(out_1)
 	}
 };
 

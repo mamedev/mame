@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "cassette.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 
 #define ANIMATION_FPS       1
@@ -406,7 +406,7 @@ void cassette_image_device::call_display()
 	for (dev = iter.first(); dev != NULL && strcmp( dev->tag(), device().tag() ); dev = iter.next())
 		y += 1;
 
-	y *= ui_get_line_height(device().machine()) + 2.0f * UI_BOX_TB_BORDER;
+	y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 	/* choose which frame of the animation we are at */
 	n = ((int) position / ANIMATION_FPS) % ANIMATION_FRAMES;
 	/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
@@ -430,8 +430,8 @@ void cassette_image_device::call_display()
 		((int) length % 60),
 		(int) length);
 
-	/* draw the cassette */
-	ui_draw_text_box(&device().machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
+	// draw the cassette
+	device().machine().ui().draw_text_box(&device().machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
 
 	// make sure tape stops at end when playing
 	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)

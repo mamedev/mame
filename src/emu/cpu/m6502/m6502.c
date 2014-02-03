@@ -45,6 +45,7 @@ const device_type M6502 = &device_creator<m6502_device>;
 
 m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	cpu_device(mconfig, M6502, "M6502", tag, owner, clock, "m6502", __FILE__),
+	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16)
 {
 	direct_disabled = false;
@@ -52,6 +53,7 @@ m6502_device::m6502_device(const machine_config &mconfig, const char *tag, devic
 
 m6502_device::m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	sync_w(*this),
 	program_config("program", ENDIANNESS_LITTLE, 8, 16)
 {
 	direct_disabled = false;
@@ -71,6 +73,8 @@ void m6502_device::init()
 {
 	mintf->program = &space(AS_PROGRAM);
 	mintf->direct = &mintf->program->direct();
+
+	sync_w.resolve_safe();
 
 	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
@@ -141,6 +145,7 @@ void m6502_device::device_reset()
 	v_state = false;
 	end_cycles = 0;
 	sync = false;
+	sync_w(CLEAR_LINE);
 	inhibit_interrupts = false;
 }
 
@@ -652,9 +657,11 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *o
 void m6502_device::prefetch()
 {
 	sync = true;
+	sync_w(ASSERT_LINE);
 	NPC = PC;
 	IR = mintf->read_decrypted(PC);
 	sync = false;
+	sync_w(CLEAR_LINE);
 
 	if((nmi_state || ((irq_state || apu_irq_state) && !(P & F_I))) && !inhibit_interrupts) {
 		irq_taken = true;
@@ -666,9 +673,11 @@ void m6502_device::prefetch()
 void m6502_device::prefetch_noirq()
 {
 	sync = true;
+	sync_w(ASSERT_LINE);
 	NPC = PC;
 	IR = mintf->read_decrypted(PC);
 	sync = false;
+	sync_w(CLEAR_LINE);
 	PC++;
 }
 

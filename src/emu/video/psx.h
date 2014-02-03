@@ -280,7 +280,9 @@ private:
 
 	PACKET m_packet;
 
+#if defined( MAME_DEBUG )
 	psx_gpu_debug m_debug;
+#endif
 
 	UINT16 *p_p_vram[ 1024 ];
 

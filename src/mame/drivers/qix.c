@@ -28,17 +28,12 @@
     TODO:
         * The Kram encryption algorithm is not understood. I merely provide tables to
           decrypt it, derived by comparison with the not encrypted versions.
-          The kram3 set used to be playable with the implementation in the MAME M6809
-          CPU core, encrypting only the first byte in 10 xx and 11 xx opcodes.
-          This should get a cleaner implementation. Until then, kram3 is broken on purpose.
 
           According to the QIX and Kram schematics, these games should be using 68A90Es.
           The 6809E has a 'Last Instruction Cycle' pin that is likely tied in with the encryption:
           "LIC is HIGH during the last cycle of every instruction and its transition from
           HIGH to LOW will indicate that the first byte of an opcode will be latched at
           the end of the present bus cycle"
-          Personally I'd expose the LIC output in a similar manner that was done for the 6502
-          sync output and handle the decryption in the driver.
 
         * I applied the interleave change only to elecyoyo because these games are
           really sensitive to timing, and kram's service mode was disturbed by it (the
@@ -262,6 +257,21 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, qix_state )
 	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( kram3_main_map, AS_PROGRAM, 8, qix_state )
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
+	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
+	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE("sndpia0", pia6821_device, read, write)
+	AM_RANGE(0x9400, 0x97ff) AM_DEVREAD("pia0", pia6821_device, read) AM_WRITE(qix_pia_w)
+	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
+	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank0")
+ADDRESS_MAP_END
+
 
 
 static ADDRESS_MAP_START( zoo_main_map, AS_PROGRAM, 8, qix_state )
@@ -637,6 +647,14 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( qix, qix_base )
 	MCFG_FRAGMENT_ADD(qix_audio)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( kram3, qix )
+	MCFG_CPU_REPLACE("maincpu", M6809E, MAIN_CLOCK_OSC/4)  /* 1.25 MHz */
+	MCFG_CPU_PROGRAM_MAP(kram3_main_map)
+	MCFG_M6809E_LIC_CB(WRITELINE(qix_state,kram3_lic_maincpu_changed))
+
+	MCFG_FRAGMENT_ADD(kram3_video)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1345,11 +1363,12 @@ int qix_state::kram3_decrypt(int address, int value)
 
 DRIVER_INIT_MEMBER(qix_state,kram3)
 {
-	address_space &mainspace = m_maincpu->space(AS_PROGRAM);
-	address_space &videospace = m_videocpu->space(AS_PROGRAM);
 	//const UINT8 *patch;
 	UINT8 *rom, *decrypted;
 	int i;
+
+	assert(m_bank0);
+	assert(m_bank1);
 
 	/********************************
 
@@ -1370,26 +1389,40 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 	rom = memregion("maincpu")->base();
 	decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 
-	mainspace.set_decrypted_region(0xa000, 0xffff, decrypted);
-
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)
 	{
 		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
+
+	m_bank0->configure_entry(0, memregion("maincpu")->base() + 0xa000);
+	m_bank0->configure_entry(1, decrypted);
+	m_bank0->set_entry(0);
 
 	i = 0;
 	//patch = memregion("user2")->base();
 	rom = memregion("videocpu")->base();
 	decrypted = auto_alloc_array(machine(), UINT8, 0x6000);
 
-	videospace.set_decrypted_region(0xa000, 0xffff, decrypted);
-
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)
 	{
 		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
+
+	m_bank1->configure_entry(0, memregion("videocpu")->base() + 0xa000);
+	m_bank1->configure_entry(1, decrypted);
+	m_bank1->set_entry(0);
+}
+
+WRITE_LINE_MEMBER(qix_state::kram3_lic_maincpu_changed)
+{
+	m_bank0->set_entry( state ? 1 : 0 );
+}
+
+WRITE_LINE_MEMBER(qix_state::kram3_lic_videocpu_changed)
+{
+	m_bank1->set_entry( state ? 1 : 0 );
 }
 
 
@@ -1424,7 +1457,7 @@ GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, driver_device, 0,        ROT
 GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
 GAME( 1982, kram,     0,        mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram2,    kram,     mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, kram3,    kram,     qix,      kram,     qix_state,     kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1982, kram3,    kram,     kram3,    kram,     qix_state,     kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep,  0,        zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep,  qix_state,     zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", GAME_SUPPORTS_SAVE )

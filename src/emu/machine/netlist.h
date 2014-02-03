@@ -96,9 +96,11 @@
 	void _name(const double data, const attotime &time)
 
 #define NETDEV_SOUND_OUT(_name, _v)                                                 \
-        NET_REGISTER_DEV(sound, _name)                                              \
-        NETDEV_PARAM(_name.CHAN, _v)
+        NET_REGISTER_DEV(sound_out, _name)                                          \
+        PARAM(_name.CHAN, _v)
 
+#define NETDEV_SOUND_IN(_name)                                                      \
+        NET_REGISTER_DEV(sound_in, _name)
 
 class netlist_mame_device_t;
 
@@ -118,11 +120,7 @@ public:
 
 protected:
 
-	void vfatalerror(const char *format, va_list ap) const
-	{
-		emu_fatalerror error(format, ap);
-		throw error;
-	}
+	void vfatalerror(const loglevel_e level, const char *format, va_list ap) const;
 
 private:
 	netlist_mame_device_t &m_parent;
@@ -265,7 +263,8 @@ private:
 
 };
 
-class nld_sound;
+class nld_sound_out;
+class nld_sound_in;
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_sound_device_t
@@ -303,7 +302,8 @@ protected:
 private:
 
     static const int MAX_OUT = 10;
-    nld_sound *m_out[MAX_OUT];
+    nld_sound_out *m_out[MAX_OUT];
+    nld_sound_in *m_in;
     sound_stream *m_stream;
     int m_num_inputs;
     int m_num_outputs;
@@ -447,10 +447,10 @@ private:
 	netlist_mame_cpu_device_t *m_cpu_device;
 };
 
-class NETLIB_NAME(sound) : public netlist_device_t
+class NETLIB_NAME(sound_out) : public netlist_device_t
 {
 public:
-	NETLIB_NAME(sound)()
+	NETLIB_NAME(sound_out)()
 		: netlist_device_t() { }
 
 	static const int BUFSIZE = 2048;
@@ -504,6 +504,82 @@ private:
 	netlist_time m_last_buffer;
 };
 
+class NETLIB_NAME(sound_in) : public netlist_device_t
+{
+public:
+    NETLIB_NAME(sound_in)()
+        : netlist_device_t() { }
+
+    static const int BUFSIZE = 2048;
+
+    ATTR_COLD void start()
+    {
+        // clock part
+        register_output("Q", m_Q);
+        register_input("FB", m_feedback);
+
+        connect(m_feedback, m_Q);
+        m_inc = netlist_time::from_nsec(1);
+
+
+        for (int i=0; i<10; i++)
+            register_param(pstring::sprintf("CHAN%d", i), m_param_name[i], "");
+        m_num_channel = 0;
+    }
+
+    ATTR_COLD void reset()
+    {
+        m_pos = 0;
+        for (int i=0; i<10; i++)
+            m_buffer[i] = NULL;
+    }
+
+    ATTR_COLD int resolve()
+    {
+        m_pos = 0;
+        for (int i=0; i<10; i++)
+        {
+            if (m_param_name[i].Value() != "")
+            {
+                if (i != m_num_channel)
+                    netlist().error("sound input numbering has to be sequential!");
+                m_num_channel++;
+                m_param[i] = dynamic_cast<netlist_param_double_t *>(setup().find_param(m_param_name[i].Value(), true));
+            }
+        }
+        return m_num_channel;
+    }
+
+    ATTR_HOT void update()
+    {
+        for (int i=0; i<m_num_channel; i++)
+        {
+            if (m_buffer[i] == NULL)
+                break; // stop, called outside of stream_update
+            double v = m_buffer[i][m_pos];
+            m_param[i]->setTo(v / 1000.0);
+        }
+        m_pos++;
+        OUTLOGIC(m_Q, !m_Q.net().new_Q(), m_inc  );
+    }
+
+    ATTR_HOT void buffer_reset()
+    {
+        m_pos = 0;
+    }
+
+    netlist_param_str_t m_param_name[10];
+    netlist_param_double_t *m_param[10];
+    stream_sample_t *m_buffer[10];
+    netlist_time m_inc;
+
+private:
+    netlist_ttl_input_t m_feedback;
+    netlist_ttl_output_t m_Q;
+
+    int m_pos;
+    int m_num_channel;
+};
 
 // device type definition
 extern const device_type NETLIST_CORE;

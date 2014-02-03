@@ -6,7 +6,7 @@
     Namco Sound, Amuse by Cab, Nemesis schematics and whoever first
     figured out SCC!
 
-    The 005289 is a 2 channel sound generator, each channel gets it's
+    The 005289 is a 2 channel sound generator. Each channel gets its
     waveform from a prom (4 bits wide).
 
     (From Nemesis schematics)
@@ -18,10 +18,17 @@
 
     The second channel is the same as above except port B is used.
 
-    The 005289 has no data bus, so data values written don't matter.
+    The 005289 has 12 address inputs and 4 control inputs: LD1, LD2, TG1, TG2.
+    It has no data bus, so data values written don't matter.
+    When LD1 or LD2 is asserted, the 12 bit value on the address bus is
+    latched. Each of the two channels has its own latch.
+    When TG1 or TG2 is asserted, the frequency of the respective channel is
+    set to the previously latched value.
 
-    There are 4 unknown pins, LD1, LD2, TG1, TG2.  Two of them look to be
-    the selector for changing frequency.  The other two seem unused.
+    The 005289 itself is nothing but an address generator. Digital to analog
+    conversion, volume control and mixing of the channels is all done
+    externally via resistor networks and 4066 switches and is only implemented
+    here for convenience.
 
 ***************************************************************************/
 
@@ -205,19 +212,19 @@ WRITE8_MEMBER( k005289_device::k005289_control_B_w )
 }
 
 
-WRITE8_MEMBER( k005289_device::k005289_pitch_A_w )
+WRITE8_MEMBER( k005289_device::ld1_w )
 {
 	m_freq_latch[0] = 0x1000 - offset;
 }
 
 
-WRITE8_MEMBER( k005289_device::k005289_pitch_B_w )
+WRITE8_MEMBER( k005289_device::ld2_w )
 {
 	m_freq_latch[1] = 0x1000 - offset;
 }
 
 
-WRITE8_MEMBER( k005289_device::k005289_keylatch_A_w )
+WRITE8_MEMBER( k005289_device::tg1_w )
 {
 	m_stream->update();
 
@@ -225,7 +232,7 @@ WRITE8_MEMBER( k005289_device::k005289_keylatch_A_w )
 }
 
 
-WRITE8_MEMBER( k005289_device::k005289_keylatch_B_w )
+WRITE8_MEMBER( k005289_device::tg2_w )
 {
 	m_stream->update();
 

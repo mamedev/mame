@@ -31,10 +31,8 @@
 #define A0 BIT(offset, 0)
 #define VA12 BIT(va, 12)
 
-static void cbmb_quick_sethiaddress(running_machine &machine, UINT16 hiaddress)
+static void cbmb_quick_sethiaddress(address_space &space, UINT16 hiaddress)
 {
-	address_space &space = machine.firstcpu->space(AS_PROGRAM);
-
 	space.write_byte(0xf0046, hiaddress & 0xff);
 	space.write_byte(0xf0047, hiaddress >> 8);
 }

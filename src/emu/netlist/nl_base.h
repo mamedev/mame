@@ -260,6 +260,8 @@ struct netlist_logic_family_desc_t
     double m_high_thresh_V;
     double m_low_V;
     double m_high_V;
+    double m_R_low;
+    double m_R_high;
 };
 
 /* Terminals inherit the family description from the netlist_device
@@ -387,6 +389,7 @@ public:
 	//ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
 
 	ATTR_COLD void set_net(netlist_net_t &anet);
+    ATTR_COLD inline void clear_net() { m_net = NULL; }
 	ATTR_COLD inline bool has_net() const { return (m_net != NULL); }
 	ATTR_HOT inline const netlist_net_t & RESTRICT net() const { return *m_net;}
 	ATTR_HOT inline netlist_net_t & RESTRICT net() { return *m_net;}
@@ -460,12 +463,7 @@ protected:
 		netlist_core_terminal_t::save_register();
 	}
 
-	ATTR_COLD virtual void reset()
-	{
-	    set_state(STATE_INP_ACTIVE);
-	}
-
-
+	ATTR_COLD virtual void reset();
 };
 
 
@@ -492,6 +490,7 @@ public:
 protected:
     ATTR_COLD virtual void reset()
     {
+        //netlist_core_terminal_t::reset();
         set_state(STATE_INP_ACTIVE);
     }
 
@@ -553,7 +552,7 @@ public:
 	typedef netlist_list_t<netlist_net_t *> list_t;
 
 	friend class NETLIB_NAME(mainclock);
-	friend class netlist_matrix_solver_t;
+    friend class netlist_matrix_solver_t;
 	friend class netlist_logic_output_t;
 	friend class netlist_analog_output_t;
 
@@ -614,7 +613,7 @@ public:
 	}
 
 	ATTR_HOT inline void push_to_queue(const netlist_time delay);
-	ATTR_HOT bool is_queued() { return m_in_queue == 1; }
+	ATTR_HOT bool inline is_queued() const { return m_in_queue == 1; }
 
 	/* internal state support
 	 * FIXME: get rid of this and implement export/import in MAME
@@ -638,6 +637,7 @@ public:
 	typedef netlist_list_t<netlist_terminal_t *> terminal_list_t;
 
 	terminal_list_t m_terms;
+    terminal_list_t m_rails;  // FIXME: Make the solver use this !
 	netlist_matrix_solver_t *m_solver;
 
 	ATTR_HOT void solve();
@@ -659,13 +659,15 @@ public:
         netlist_object_t::save_register();
     }
 
-protected:
+//protected:  FIXME: needed by current solver code
 
     UINT32 m_num_cons;
 
 	hybrid_t m_last;
 	hybrid_t m_cur;
 	hybrid_t m_new;
+
+protected:
 
 	/* we don't use this to save state
 	 * because we may get deleted again ...
@@ -702,6 +704,7 @@ public:
 	ATTR_COLD void init_object(netlist_core_device_t &dev, const pstring &aname);
     ATTR_COLD virtual void reset()
     {
+        //netlist_core_terminal_t::reset();
         set_state(STATE_OUT);
     }
 
@@ -719,6 +722,7 @@ public:
 
 	ATTR_COLD void initial(const netlist_sig_t val);
 
+    ATTR_COLD bool has_proxy() { return (m_proxy != NULL); }
 	ATTR_COLD nld_base_d_to_a_proxy *get_proxy() { return m_proxy; }
     ATTR_COLD void set_proxy(nld_base_d_to_a_proxy *proxy) { m_proxy = proxy; }
 
@@ -1066,6 +1070,8 @@ public:
 	ATTR_COLD netlist_net_t *find_net(const pstring &name);
 
 	ATTR_COLD void error(const char *format, ...) const;
+    ATTR_COLD void warning(const char *format, ...) const;
+    ATTR_COLD void log(const char *format, ...) const;
 
 	template<class _C>
 	netlist_list_t<_C> get_device_list()
@@ -1085,8 +1091,16 @@ public:
 
 protected:
 
+	enum loglevel_e
+	{
+	    NL_ERROR,
+	    NL_WARNING,
+	    NL_LOG,
+	};
+
 	// any derived netlist must override this ...
-	virtual void vfatalerror(const char *format, va_list ap) const = 0;
+	virtual void vfatalerror(const loglevel_e level,
+	        const char *format, va_list ap) const = 0;
 
 	/* from netlist_object */
     ATTR_COLD virtual void reset();
@@ -1181,6 +1195,8 @@ ATTR_HOT inline void netlist_input_t::activate_lh()
 
 ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time delay)
 {
+    if (is_queued())
+        return;
 	// if (m_in_queue == 1) return; FIXME: check this at some time
 	m_time = netlist().time() + delay;
 	m_in_queue = (m_active > 0) ? 1 : 0;     /* queued ? */
@@ -1261,7 +1277,7 @@ public:
 	ATTR_COLD const pstring &classname() const { return m_classname; }
     ATTR_COLD const pstring &param_desc() const { return m_def_param; }
     ATTR_COLD const nl_util::pstring_list term_param_list();
-    ATTR_COLD const pstring def_param();
+    ATTR_COLD const nl_util::pstring_list def_params();
 
 protected:
 	pstring m_name;                             /* device name */

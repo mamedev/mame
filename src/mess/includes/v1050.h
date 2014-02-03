@@ -85,8 +85,11 @@ public:
 			m_sasibus(*this, SASIBUS_TAG ":host"),
 			m_rom(*this, Z80_TAG),
 			m_video_ram(*this, "video_ram"),
-			m_attr_ram(*this, "attr_ram")
-	{ }
+			m_attr_ram(*this, "attr_ram"),
+			m_rtc_ppi_pa(0),
+			m_rtc_ppi_pc(0)
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -130,6 +133,8 @@ public:
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_WRITE8_MEMBER( misc_ppi_pa_w );
 	DECLARE_WRITE8_MEMBER( misc_ppi_pc_w );
+	DECLARE_READ8_MEMBER( rtc_ppi_pa_r );
+	DECLARE_WRITE8_MEMBER( rtc_ppi_pa_w );
 	DECLARE_WRITE8_MEMBER( rtc_ppi_pb_w );
 	DECLARE_READ8_MEMBER( rtc_ppi_pc_r );
 	DECLARE_WRITE8_MEMBER( rtc_ppi_pc_w );
@@ -147,6 +152,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sasi_io_w);
 	DECLARE_READ8_MEMBER( sasi_status_r );
 	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
+
+	WRITE_LINE_MEMBER( rtc_ppi_pa_0_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 0)) | ((state & 1) << 0); }
+	WRITE_LINE_MEMBER( rtc_ppi_pa_1_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 1)) | ((state & 1) << 1); }
+	WRITE_LINE_MEMBER( rtc_ppi_pa_2_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 2)) | ((state & 1) << 2); }
+	WRITE_LINE_MEMBER( rtc_ppi_pa_3_w ){ m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 3)) | ((state & 1) << 3); }
+	UINT8 m_rtc_ppi_pa;
+	WRITE_LINE_MEMBER( rtc_ppi_pc_3_w ){ m_rtc_ppi_pc = (m_rtc_ppi_pc & ~(1 << 3)) | ((state & 1) << 3); }
+	UINT8 m_rtc_ppi_pc;
 
 	void bankswitch();
 	void update_fdc();

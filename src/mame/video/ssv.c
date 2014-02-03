@@ -137,7 +137,7 @@ Note: press Z to show some info on each sprite (debug builds only)
 #include "emu.h"
 #include "includes/ssv.h"
 #ifdef MAME_DEBUG
-#include "ui.h"
+#include "ui/ui.h"
 #endif
 
 
@@ -946,7 +946,7 @@ void ssv_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				if (machine().input().code_pressed(KEYCODE_Z))    /* Display some info on each sprite */
 				{   char buf[30];
 					sprintf(buf, "%02X",/*(s2[2] & ~0x3ff)>>8*/mode>>8);
-					ui_draw_text(&machine().render().ui_container(), buf, sx, sy);
+					machine().ui().draw_text(&machine().render().ui_container(), buf, sx, sy);
 				}
 				#endif
 

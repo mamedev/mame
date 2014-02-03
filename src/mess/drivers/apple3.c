@@ -3,48 +3,27 @@
     drivers/apple3.c
 
     Apple ///
-
-    Driver is not working yet; seems to get caught in an infinite loop on
-    startup.  Special thanks to Chris Smolinski (author of the Sara emulator)
+ 
+    driver by Nathan Woods and R. Belmont
+ 
+    Special thanks to Chris Smolinski (author of the Sara emulator)
     for his input about this poorly known system.
+ 
+    Also thanks to Washington Apple Pi for the "Apple III DVD" containing the
+    technical manual, schematics, and software.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
 #include "imagedev/flopdrv.h"
 #include "formats/ap2_dsk.h"
-#include "machine/mos6551.h"
-#include "machine/6522via.h"
-#include "bus/a2bus/a2bus.h"
-#include "machine/ram.h"
 #include "machine/appldriv.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
-	AM_RANGE(0x0000, 0x00FF) AM_READWRITE(apple3_00xx_r, apple3_00xx_w)
-	AM_RANGE(0x0100, 0x01FF) AM_RAMBANK("bank2")
-	AM_RANGE(0x0200, 0x1FFF) AM_RAMBANK("bank3")
-	AM_RANGE(0x2000, 0x9FFF) AM_RAMBANK("bank4")
-	AM_RANGE(0xA000, 0xBFFF) AM_RAMBANK("bank5")
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(apple3_memory_r, apple3_memory_w)
 ADDRESS_MAP_END
-
-
-/* the Apple /// does some weird tricks whereby it monitors the SYNC pin
- * on the CPU to check for indexed instructions and directs them to
- * different memory locations */
-#if 0
-static const m6502_interface apple3_m6502_interface =
-{
-	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_read), /* read_indexed_func */
-	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_write),    /* write_indexed_func */
-	DEVCB_NULL, /* port_read_func */
-	DEVCB_NULL, /* port_write_func */
-	0x00,
-	0x00
-};
-#endif
 
 static const floppy_interface apple3_floppy_interface =
 {
@@ -71,9 +50,9 @@ static const struct a2bus_interface a2bus_intf =
 static MACHINE_CONFIG_START( apple3, apple3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
+	MCFG_M6502_SYNC_CALLBACK(WRITELINE(apple3_state, apple3_sync_w))
 	MCFG_CPU_PROGRAM_MAP(apple3_map)
-//  MCFG_CPU_CONFIG( apple3_m6502_interface )
-	MCFG_CPU_PERIODIC_INT_DRIVER(apple3_state, apple3_interrupt,  192)
+	MCFG_CPU_PERIODIC_INT_DRIVER(apple3_state, apple3_interrupt, 192)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET_OVERRIDE(apple3_state, apple3 )
@@ -87,7 +66,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_SCREEN_UPDATE_DRIVER(apple3_state, screen_update_apple3)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT_OVERRIDE(apple3_state, apple2 )
+	MCFG_PALETTE_INIT_OVERRIDE(apple3_state, apple3 )
 
 	MCFG_VIDEO_START_OVERRIDE(apple3_state, apple3 )
 
@@ -99,20 +78,31 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_LEGACY_FLOPPY_APPLE_4_DRIVES_ADD(apple3_floppy_interface,1,4)
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, XTAL_1_8432MHz)
+	MCFG_MOS6551_TYPE(MOS6551_TYPE_ROCKWELL)		// must be Rockwell or the ROM shows "ACIA" and doesn't POST
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_0_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_0_out_b))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_0_irq_func))
 
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 2000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_1_out_b))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple2_via_1_irq_func))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_1_irq_func))
+
+	/* sound */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("c040", apple3_state, apple3_c040_tick, attotime::from_hz(2000))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("512K")
 MACHINE_CONFIG_END
 
 
@@ -191,8 +181,8 @@ static INPUT_PORTS_START( apple3 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT) 
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT) 
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 INPUT_PORTS_END
 
@@ -202,4 +192,4 @@ ROM_START(apple3)
 ROM_END
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    COMPANY             FULLNAME */
-COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state,    apple3,     "Apple Computer",   "Apple ///", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1980, apple3,     0,      0,      apple3,    apple3, apple3_state,    apple3,     "Apple Computer",   "Apple ///", GAME_NOT_WORKING )

@@ -826,7 +826,7 @@ void neogeo_state::video_start()
 	memset(m_palettes[0], 0x00, NUM_PENS * sizeof(UINT16));
 	memset(m_palettes[1], 0x00, NUM_PENS * sizeof(UINT16));
 	memset(m_pens, 0x00, NUM_PENS * sizeof(pen_t));
-	memset(m_videoram, 0x00, (0x8000 + 0x800) * 2);
+	memset(m_videoram, 0x00, (0x8000 + 0x800) * sizeof(UINT16));
 
 	compute_rgb_weights();
 	create_sprite_line_timer();
@@ -847,7 +847,7 @@ void neogeo_state::video_start()
 	/* register for state saving */
 	save_pointer(NAME(m_palettes[0]), NUM_PENS);
 	save_pointer(NAME(m_palettes[1]), NUM_PENS);
-	save_pointer(NAME(m_videoram), 0x20000/2);
+	save_pointer(NAME(m_videoram), 0x8000 + 0x800);
 	save_item(NAME(m_vram_offset));
 	save_item(NAME(m_vram_read_buffer));
 	save_item(NAME(m_vram_modulo));

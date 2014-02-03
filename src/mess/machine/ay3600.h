@@ -3,12 +3,21 @@
     ay3600.h
 
     Include file for AY3600 keyboard; used by Apple IIs
-
+								   
 ***************************************************************************/
 
 #ifndef AY3600_H
 #define AY3600_H
 
+// keymod flags returned by AY3600_keymod_r()
+#define AY3600_KEYMOD_SHIFT     1
+#define AY3600_KEYMOD_CONTROL   2
+#define AY3600_KEYMOD_CAPSLOCK  4
+#define AY3600_KEYMOD_REPEAT    8
+#define AY3600_KEYMOD_KEYPAD    0x10
+#define AY3600_KEYMOD_MODLATCH  0x20
+#define AY3600_KEYMOD_COMMAND   0x40
+#define AY3600_KEYMOD_OPTION    0x80
 
 /*----------- defined in machine/ay3600.c -----------*/
 

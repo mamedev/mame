@@ -63,11 +63,14 @@
 		NET_CONNECT(_name, C,    _C)                                                \
 		NET_CONNECT(_name, D,    _D)
 
+#define TTL_9316_DIP(_name)                                                         \
+        NET_REGISTER_DEV(9316_dip, _name)
+
 NETLIB_SUBDEVICE(9316_sub,
 	ATTR_HOT void update_outputs_all(const UINT8 cnt);
 	ATTR_HOT void update_outputs(const UINT8 cnt);
 
-	netlist_ttl_input_t m_clk;
+	netlist_ttl_input_t m_CLK;
 
 	netlist_ttl_input_t m_A;
 	netlist_ttl_input_t m_B;
@@ -91,6 +94,9 @@ NETLIB_DEVICE(9316,
 	netlist_ttl_input_t m_ENT;
 	netlist_ttl_input_t m_CLRQ;
 	netlist_ttl_input_t m_LOADQ;
+);
+
+NETLIB_DEVICE_DERIVED(9316_dip, 9316,
 );
 
 #endif /* NLD_9316_H_ */

@@ -10,7 +10,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "rendfont.h"
 #include "uiinput.h"
 #include "osdepend.h"
@@ -336,7 +336,7 @@ static void dview_draw_outlined_box(DView *dv, int rtype, int x, int y, int w, i
 	rectangle r;
 
 	dview_get_rect(dv, rtype, r);
-	ui_draw_outlined_box(dv->container, NX(dv, x + r.min_x), NY(dv, y + r.min_y),
+	dv->container->manager().machine().ui().draw_outlined_box(dv->container, NX(dv, x + r.min_x), NY(dv, y + r.min_y),
 			NX(dv, x + r.min_x + w), NY(dv, y + r.min_y + h), bg);
 }
 
@@ -1090,7 +1090,7 @@ static void render_editor(DView_edit *editor)
 
 	editor->container->empty();
 	/* get the size of the text */
-	ui_draw_text_full(editor->container, editor->str, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, 0.5);
@@ -1102,7 +1102,7 @@ static void render_editor(DView_edit *editor)
 	y2 = 0.45f - UI_BOX_TB_BORDER;
 
 	/* draw a box */
-	ui_draw_outlined_box(editor->container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	editor->container->manager().machine().ui().draw_outlined_box(editor->container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	/* take off the borders */
 	x1 += UI_BOX_LR_BORDER;
@@ -1111,7 +1111,7 @@ static void render_editor(DView_edit *editor)
 	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
-	ui_draw_text_full(editor->container, editor->str, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 }

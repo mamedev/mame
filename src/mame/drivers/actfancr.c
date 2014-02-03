@@ -29,7 +29,6 @@
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/actfancr.h"
-#include "video/decmxc06.h"
 
 /******************************************************************************/
 

@@ -11,9 +11,9 @@
  *       D1 |2           13| CLR2
  *     CLK1 |3           12| D2
  *      PR1 |4    7474   11| CLK2
- *       Q1 |5           10| Q2
- *      Q1Q |6            9| Q2Q
- *      GND |7            8| Y2
+ *       Q1 |5           10| PR2
+ *      Q1Q |6            9| Q2
+ *      GND |7            8| Q2Q
  *          +--------------+
  *
  *          +-----+-----+-----+---++---+-----+
@@ -51,8 +51,11 @@
 		NET_CONNECT(_name, CLRQ,  _CLRQ)                                            \
 		NET_CONNECT(_name, PREQ,  _PREQ)
 
+#define TTL_7474_DIP(_name)                                                         \
+        NET_REGISTER_DEV(7474_dip, _name)
+
 NETLIB_SUBDEVICE(7474sub,
-	netlist_ttl_input_t m_clk;
+	netlist_ttl_input_t m_CLK;
 
 	UINT8 m_nextD;
 	netlist_ttl_output_t m_Q;
@@ -62,12 +65,18 @@ NETLIB_SUBDEVICE(7474sub,
 );
 
 NETLIB_DEVICE(7474,
+public:
 	NETLIB_NAME(7474sub) sub;
 
 	netlist_ttl_input_t m_D;
-	netlist_ttl_input_t m_clrQ;
-	netlist_ttl_input_t m_preQ;
+	netlist_ttl_input_t m_CLRQ;
+	netlist_ttl_input_t m_PREQ;
 );
 
+NETLIB_DEVICE(7474_dip,
+
+    NETLIB_NAME(7474) m_1;
+    NETLIB_NAME(7474) m_2;
+);
 
 #endif /* NLD_7474_H_ */

@@ -16,12 +16,10 @@ enum UPD7810_TYPE
 	TYPE_7801,
 	TYPE_78C05,
 	TYPE_78C06,
-	TYPE_7810,
-	TYPE_7807
+	TYPE_7807,
+	TYPE_7810
 //  TYPE_78C10, // stop instruction added
 //  TYPE_78IV,
-//  TYPE_78K0,
-//  TYPE_78K0S
 //  millions of subtypes
 };
 

@@ -894,6 +894,38 @@ ROM_START( fantasiaa ) /* PCB silkscreened COMAD INDUSTRY CO.,LTD 940307 MADE IN
 	ROM_LOAD16_BYTE( "g-scr3_11.ul19a", 0x100000, 0x80000, CRC(6d00a4c5) SHA1(8fc0d78200b82ab87658d364ebe2f2e7239722e7) )
 ROM_END
 
+ROM_START( fantasiab )
+	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "fantasia_16",  0x000000, 0x80000, CRC(c5d93077) SHA1(da615ea0704e77e888dbda664fc9f9fd873edbfa) )
+	ROM_LOAD16_BYTE( "fantasia_13",  0x000001, 0x80000, CRC(d88529bd) SHA1(06eb928f4aefe101140140ba7a3ce416215f9e39) )
+	ROM_LOAD16_BYTE( "9.bg7",    0x100000, 0x80000, CRC(2a588393) SHA1(ef66ed94dd40a95a9b0fb5c3b075c1f654f60927) )
+	ROM_LOAD16_BYTE( "5.bg3",    0x100001, 0x80000, CRC(6160e0f0) SHA1(faec9d082c9039885afa4560aa87c05e9ecb5217) )
+	ROM_LOAD16_BYTE( "8.bg6",    0x200000, 0x80000, CRC(f776b743) SHA1(bd4d666ede454a56181e109745ac4b3203b2a87c) )
+	ROM_LOAD16_BYTE( "4.bg2",    0x200001, 0x80000, CRC(5df0dff2) SHA1(62ebd3c79f2e8ab30d6862cc4bf80f1b56f1f572) )
+	ROM_LOAD16_BYTE( "7.bg5",    0x300000, 0x80000, CRC(5707d861) SHA1(33f1cff693dfcb04edbf8738d3ea2a1884e6ff0c) )
+	ROM_LOAD16_BYTE( "3.bg1",    0x300001, 0x80000, CRC(36cb811a) SHA1(403cef012990b0e01b481b8afc6b5811e7137833) )
+	ROM_LOAD16_BYTE( "10.imag2", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
+	ROM_LOAD16_BYTE( "6.imag1",  0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_LOAD( "17.scr3",  0x00000, 0x80000, CRC(aadb6eb7) SHA1(6eaa994ad7b4e8341360eaf5ddb46240316b7274) )
+	/* SCR1 and SCR2 are unpopulated */
+
+	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "2.music1", 0x00000, 0x80000, CRC(22955efb) SHA1(791c18d1aa0c10810da05c199108f51f99fe1d49) )
+	ROM_RELOAD(           0x40000, 0x80000 )
+	ROM_LOAD( "1.music2", 0xc0000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) )
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )   /* sprites */
+
+	ROM_REGION( 0x200000, "gfx3", 0 )   /* tiles - encrypted */
+	ROM_LOAD16_BYTE( "15.obj3", 0x000001, 0x80000, CRC(46666768) SHA1(7281c4b45f6f9f6ad89fa2bb3f67f30433c0c513) )
+	ROM_LOAD16_BYTE( "12.obj1", 0x000000, 0x80000, CRC(4bd25be6) SHA1(9834f081c0390ccaa1234efd2393b6495e946c64) )
+	ROM_LOAD16_BYTE( "14.obj4", 0x100001, 0x80000, CRC(4e7e6ed4) SHA1(3e9e942e3de398edc8ac9f82769c3f41708d3741) )
+	ROM_LOAD16_BYTE( "11.obj2", 0x100000, 0x80000, CRC(6d00a4c5) SHA1(8fc0d78200b82ab87658d364ebe2f2e7239722e7) )
+ROM_END
+
 /*************************************
  *
  *  Generic driver initialization
@@ -942,5 +974,6 @@ GAME( 1990, galsnewa,  galsnew,  galsnew,  galsnewa, expro02_state, galsnew, ROT
 GAME( 1990, galsnewj,  galsnew,  galsnew,  galsnewj, expro02_state, galsnew, ROT90, "Kaneko (Taito license)",  "Gals Panic (Japan, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
 GAME( 1990, galsnewk,  galsnew,  galsnew,  galsnewj, expro02_state, galsnew, ROT90, "Kaneko (Inter license)",  "Gals Panic (Korea, EXPRO-02 PCB)", GAME_NO_COCKTAIL )
 
-GAME( 1994, fantasia,  0,        fantasia, fantasia, expro02_state, galsnew, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasia,  0,        fantasia, fantasia, expro02_state, galsnew, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantasiab, fantasia, fantasia, fantasia, expro02_state, galsnew, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, fantasiaa, fantasia, fantasia, fantasia, expro02_state, galsnew, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )

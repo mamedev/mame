@@ -8,7 +8,7 @@ The following board types are known to exist:
 4971-REV-C - used for i8021 based game(s). Found in Connect Four
 7924952D02 - used for shrink DIP version of the tms1100. Found in Super Blockbuster
 
-The "pcb" feature is used to indicate the baord type
+The "pcb" feature is used to indicate the board type
 The "paddle" feature is used to indicate whether there is paddle circuitry on the board
 The "rc" feature is used to indicate the source of the clock signal
 -->
@@ -62,22 +62,21 @@ The "rc" feature is used to indicate the source of the clock signal
 		</part>
 	</software>
 
-<!--
     <software name="bowling">
         <description>Bowling</description>
         <year>1979</year>
         <publisher>Milton Bradley</publisher>
 
         <part name="cart" interface="microvision_cart">
-            <!- - also seen with 4952 REV-A - ->
+            <!-- also seen with 4952 REV-A -->
             <feature name="pcb" value="4952-79 REV-B" />
             <feature name="paddle" value="no" />
             <feature name="rc" value="100pf/23.2K" />
             <dataarea name="rom" size="2048">
-                <rom name="mp3475nll_4972" size="2048" crc="" sha1="" offset="0" />
-
+                <rom name="mp3475nll_4972" size="2048" crc="460ac30e" sha1="93ffb75b82d1f48f451e0e1158d5a8d1cd465fe5" offset="0" />
+			</dataarea>
+		</part>
     </software>
--->
 
 	<software name="connect4">
 		<description>Connect Four</description>
@@ -141,7 +140,6 @@ The "rc" feature is used to indicate the source of the clock signal
 		</part>
 	</software>
 
-<!--
     <software name="pinball">
         <description>Pinball</description>
         <year>1980</year>
@@ -152,11 +150,10 @@ The "rc" feature is used to indicate the source of the clock signal
             <feature name="paddle" value="yes" />
             <feature name="rc" value="100pf/21.0K" />
             <dataarea name="rom" size="2048">
-                <rom name="mp3455nll_4974" size="2048" crc="" sha1="" offset="0" />
+                <rom name="mp3455nll_4974" size="2048" crc="e442cf83" sha1="595b99e31ae88c778cc5c811fd9007aa0749b993" offset="0" />
             </dataarea>
         </part>
     </software>
--->
 
 <!--
     <software name="seaduel">

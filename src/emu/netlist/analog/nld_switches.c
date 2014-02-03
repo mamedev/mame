@@ -18,8 +18,8 @@ NETLIB_START(switch2)
 
     connect(m_R[0].m_N, m_R[1].m_N);
 
-    register_subalias("i1", m_R[0].m_P);
-    register_subalias("i2", m_R[1].m_P);
+    register_subalias("1", m_R[0].m_P);
+    register_subalias("2", m_R[1].m_P);
 
     register_subalias("Q", m_R[0].m_N);
 }
@@ -35,10 +35,6 @@ NETLIB_RESET(switch2)
 
 NETLIB_UPDATE(switch2)
 {
-}
-
-NETLIB_UPDATE_PARAM(switch2)
-{
     if (m_POS.Value() == 0)
     {
         m_R[0].set_R(R_ON);
@@ -49,9 +45,12 @@ NETLIB_UPDATE_PARAM(switch2)
         m_R[0].set_R(R_OFF);
         m_R[1].set_R(R_ON);
     }
-    if (USE_ALTERNATE_SCHEDULING)
-    {
-        m_R[0].update_dev();
-        m_R[1].update_dev();
-    }
+
+    m_R[0].update_dev();
+    m_R[1].update_dev();
+}
+
+NETLIB_UPDATE_PARAM(switch2)
+{
+    update();
 }

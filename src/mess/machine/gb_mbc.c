@@ -132,10 +132,6 @@ void gb_rom_mbc_device::shared_reset()
 	m_ram_bank = 0;
 	m_ram_enable = 0;
 	m_mode = 0;
-
-	has_rumble = FALSE;
-	has_timer = FALSE;
-	has_battery = FALSE;
 }
 
 //-------------------------------------------------

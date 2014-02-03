@@ -1418,7 +1418,7 @@ WRITE_LINE_MEMBER(seattle_state::voodoo_stall)
 			/* if the CPU had a pending write, do it now */
 			if (m_cpu_stalled_on_voodoo)
 			{
-				address_space &space = machine().firstcpu->space(AS_PROGRAM);
+				address_space &space = m_maincpu->space(AS_PROGRAM);
 				voodoo_w(m_voodoo, space, m_cpu_stalled_offset, m_cpu_stalled_data, m_cpu_stalled_mem_mask);
 			}
 			m_cpu_stalled_on_voodoo = FALSE;

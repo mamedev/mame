@@ -23,6 +23,15 @@ static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ps2m30286_map, AS_PROGRAM, 16, at_state)
+        AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
+	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
+	AM_RANGE(0x0c8000, 0x0cffff) AM_ROM
+	AM_RANGE(0x0d0000, 0x0dffff) AM_RAM
+	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM
+	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0x0e0000)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( ps1_286_map, AS_PROGRAM, 16, at_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffff)
@@ -121,7 +130,9 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 
 READ8_MEMBER( at_state::ps1_kbdc_r )
 {
-	UINT8 ret = at_keybc_r(space, offset, mem_mask);
+        UINT8 ret;
+ 	if(offset == 0) ret = at_keybc_r(space, offset, mem_mask);
+ 	else ret = ps2_portb_r(space,offset, mem_mask);
 	return ret;
 }
 
@@ -440,19 +451,21 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ps2m30286, at_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, 12000000)
-	MCFG_CPU_PROGRAM_MAP(at16_map)
-	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_ADD("maincpu", I80286, 10000000)
+	MCFG_CPU_PROGRAM_MAP(ps2m30286_map)
+	MCFG_CPU_IO_MAP(ps1_286_io)
 	MCFG_80286_A20(at_state, at_286_a20)
 	MCFG_80286_SHUTDOWN(WRITELINE(at_state, at_shutdown))
 
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	
 	MCFG_FRAGMENT_ADD( at_motherboard )
 
 	MCFG_ISA16_BUS_ADD("isabus", ":maincpu", isabus_intf)
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", false)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", false)
 	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", false)
-	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "svga_et4k", false)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
@@ -816,6 +829,7 @@ ROM_END
 ROM_START( i8530h31 )
 	ROM_REGION(0x1000000,"maincpu", 0)
 	ROM_LOAD( "33f5381a.bin", 0xe0000, 0x20000, CRC(ff57057d) SHA1(d7f1777077a8df43c3c14d175b9709bd3969c4b1))
+	ROM_RELOAD(0xfe0000,0x20000)
 ROM_END
 
 /*

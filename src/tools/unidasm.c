@@ -135,6 +135,7 @@ CPU_DISASSEMBLE( minx );
 CPU_DISASSEMBLE( mips3be );
 CPU_DISASSEMBLE( mips3le );
 CPU_DISASSEMBLE( mn10200 );
+CPU_DISASSEMBLE( n8x300 );
 CPU_DISASSEMBLE( nec );
 CPU_DISASSEMBLE( nsc8105 );
 CPU_DISASSEMBLE( pdp1 );
@@ -201,6 +202,7 @@ CPU_DISASSEMBLE( z8000 );
 
 static const dasm_table_entry dasm_table[] =
 {
+	{ "8x300",      _16be,  0, CPU_DISASSEMBLE_NAME(n8x300) },
 	{ "adsp21xx",   _24le, -2, CPU_DISASSEMBLE_NAME(adsp21xx) },
 	{ "alpha8201",  _8bit,  0, CPU_DISASSEMBLE_NAME(alpha8201) },
 	{ "am29000",    _32be,  0, CPU_DISASSEMBLE_NAME(am29000) },

@@ -776,7 +776,7 @@ ROM_START( fantsy95 )
 	ROM_LOAD16_BYTE( "i-scr7.6",  0x400001, 0x80000, CRC(8662dd01) SHA1(a349c1cd965d3d51c20178fcce2f61ae76f4006a) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
+	ROM_LOAD( "(__1994)obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -799,7 +799,7 @@ ROM_START( newfant )
 	ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-		ROM_LOAD( "nf95obj1.13",  0x00000, 0x80000, CRC(e6d1bc71) SHA1(df0b6c1742c01991196659bab2691230323e7b8d) )
+	ROM_LOAD( "(__1995)nf95obj1.13",  0x00000, 0x80000, CRC(e6d1bc71) SHA1(df0b6c1742c01991196659bab2691230323e7b8d) )
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -809,26 +809,26 @@ ROM_START( newfant )
 ROM_END
 
 ROM_START( newfanta )
-		ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
-		ROM_LOAD16_BYTE( "prog2.12", 0x000000, 0x80000, CRC(de43a457) SHA1(91db13f63b46146131c58e775119ea3b073ca409) )
-		ROM_LOAD16_BYTE( "prog1.07", 0x000001, 0x80000, CRC(370b45be) SHA1(775873df9d3af803dbd1a392a45cad5f37b1b1c7) )
-		ROM_LOAD16_BYTE( "iscr2.10", 0x100000, 0x80000, CRC(4f2da2eb) SHA1(4f0b72327d1bdfad24d822953f45218bfae29cff) )
-		ROM_LOAD16_BYTE( "iscr1.05", 0x100001, 0x80000, CRC(63c6894f) SHA1(213544da570a167f3411357308c576805f6882f3) )
-		ROM_LOAD16_BYTE( "iscr4.09", 0x200000, 0x80000, CRC(725741ec) SHA1(3455cf0aed9653c66b8b2f905ad683687d517419) )
-		ROM_LOAD16_BYTE( "iscr3.04", 0x200001, 0x80000, CRC(51d6b362) SHA1(bcd57643ac9d79c150714ec6b6a2bb8a24acf7a5) )
-		ROM_LOAD16_BYTE( "iscr6.08", 0x300000, 0x80000, CRC(178b2ef3) SHA1(d3c092a282278968a319e06731481570f217d404) )
-		ROM_LOAD16_BYTE( "iscr5.03", 0x300001, 0x80000, CRC(d2b5c5fa) SHA1(80fde69bc5f4e958b5d57a5179b6e601192780f4) )
-		ROM_LOAD16_BYTE( "iscr8.11", 0x400000, 0x80000, CRC(f4148528) SHA1(4e27fff0b7ead068a159b3ed80c5793a6166fc4e) )
-		ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
+	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "prog2.12", 0x000000, 0x80000, CRC(de43a457) SHA1(91db13f63b46146131c58e775119ea3b073ca409) )
+	ROM_LOAD16_BYTE( "prog1.07", 0x000001, 0x80000, CRC(370b45be) SHA1(775873df9d3af803dbd1a392a45cad5f37b1b1c7) )
+	ROM_LOAD16_BYTE( "iscr2.10", 0x100000, 0x80000, CRC(4f2da2eb) SHA1(4f0b72327d1bdfad24d822953f45218bfae29cff) )
+	ROM_LOAD16_BYTE( "iscr1.05", 0x100001, 0x80000, CRC(63c6894f) SHA1(213544da570a167f3411357308c576805f6882f3) )
+	ROM_LOAD16_BYTE( "iscr4.09", 0x200000, 0x80000, CRC(725741ec) SHA1(3455cf0aed9653c66b8b2f905ad683687d517419) )
+	ROM_LOAD16_BYTE( "iscr3.04", 0x200001, 0x80000, CRC(51d6b362) SHA1(bcd57643ac9d79c150714ec6b6a2bb8a24acf7a5) )
+	ROM_LOAD16_BYTE( "iscr6.08", 0x300000, 0x80000, CRC(178b2ef3) SHA1(d3c092a282278968a319e06731481570f217d404) )
+	ROM_LOAD16_BYTE( "iscr5.03", 0x300001, 0x80000, CRC(d2b5c5fa) SHA1(80fde69bc5f4e958b5d57a5179b6e601192780f4) )
+	ROM_LOAD16_BYTE( "iscr8.11", 0x400000, 0x80000, CRC(f4148528) SHA1(4e27fff0b7ead068a159b3ed80c5793a6166fc4e) )
+	ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
-		ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
+	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
+	ROM_LOAD( "(__1994)obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
 
-		ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
-		/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
-		ROM_LOAD( "musc1.01", 0x00000, 0x80000, CRC(10347fce) SHA1(f5fbe8ef363fe18b7104be5d2fa92943d1a5d7a2) )
-		ROM_RELOAD(               0x40000, 0x80000 )
-		ROM_LOAD( "musc2.02", 0xc0000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
+	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "musc1.01", 0x00000, 0x80000, CRC(10347fce) SHA1(f5fbe8ef363fe18b7104be5d2fa92943d1a5d7a2) )
+	ROM_RELOAD(               0x40000, 0x80000 )
+	ROM_LOAD( "musc2.02", 0xc0000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
 ROM_END
 
 ROM_START( missw96 )
@@ -956,7 +956,7 @@ ROM_START( galhustl )
 	ROM_LOAD( "galhstl5.u5", 0x00000, 0x80000, CRC(44a18f15) SHA1(1217cf7fbbb442358b15016099efeface5dcbd22) )
 ROM_END
 
-ROM_START( pgalvip )
+ROM_START( pgalvip ) // this set has extra data roms for the gfx
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "afega_15.ue17", 0x00000, 0x20000, CRC(050060ca) SHA1(1e2a1d6aaf5038269d192baf3520f4af7a299325) )
 	ROM_LOAD16_BYTE( "afega_16.ud17", 0x00001, 0x20000, CRC(d32e4052) SHA1(632d9affee92a526c0e9399230ecf485922c6df4) )
@@ -973,6 +973,23 @@ ROM_START( pgalvip )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "afega_17.u5", 0x00000, 0x80000, CRC(a8a50745) SHA1(e51963947c7a7556b8531d172b9d7bf9f321b21b) )
+ROM_END
+
+ROM_START( pgalvipa ) // this set is more like Gals Hustler
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "pgalvip_3.ue17", 0x00000, 0x80000, CRC(a48e8255) SHA1(7e8f1747420ff0d599d340915712827ca2eb3092) )
+	ROM_LOAD16_BYTE( "pgalvip_4.ud17", 0x00001, 0x80000, CRC(829a2085) SHA1(3ff5f2bb730572202cd427abd7f91dd886537ab6) )
+
+	ROM_REGION16_BE( 0x100000, "maincpudata", ROMREGION_ERASEFF ) /* 68000 Data */
+
+	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "pgalvip_1.ub6", 0x00000, 0x20000,  CRC(d32a6c0c) SHA1(6f16043ed1e174b42de83462e2ea7a601bac6678) )
+	ROM_RELOAD(               0x40000, 0x20000 )
+	ROM_LOAD( "pgalvip_2.uc6", 0xc0000, 0x80000,  CRC(2168e54a) SHA1(87534334b16d3ddc3daefcb1b8086aff44157ccf) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "pgalvip_5.u5", 0x00000, 0x80000, CRC(2d6e5a90) SHA1(b5487e5764d83dfecd982a8614d213c9075fbee4) )
 ROM_END
 
 /*
@@ -1032,7 +1049,7 @@ ROM_START( supmodel )
 	ROM_LOAD16_BYTE( "i-scr7.6",  0x400001, 0x80000, CRC(19c73268) SHA1(aa6dc8c817a2e9707ea74e219ab34cf826223741) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* sprites */
-	ROM_LOAD( "obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
+	ROM_LOAD( "(__1994)obj1.13",  0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
 
 	ROM_REGION( 0x140000, "oki", 0 )    /* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -1044,14 +1061,15 @@ ROM_END
 GAME( 1990, galpanic, 0,        galpanic, galpanic,  driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
 GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device, 0, ROT90, "Kaneko",                   "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
 GAME( 1994, supmodel, 0,        supmodel, fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL )
-GAME( 1995, newfant,  0,        comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (set 1)", GAME_NO_COCKTAIL )
-GAME( 1994, newfanta, newfant,  comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (set 2)", GAME_NO_COCKTAIL )
+GAME( 1995, newfant,  0,        comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", GAME_NO_COCKTAIL ) // the only difference between the two is the gfx rom containing the copyright
+GAME( 1994, newfanta, newfant,  comad,    fantasia,  driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", GAME_NO_COCKTAIL )
 GAME( 1995, fantsy95, newfant,  comad,    fantasia,  driver_device, 0, ROT90, "Hi-max Technology Inc.",   "Fantasy '95", GAME_NO_COCKTAIL )
 GAME( 1996, missw96,  0,        comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude)", GAME_NO_COCKTAIL )
 GAME( 1996, missmw96, missw96,  comad,    missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", GAME_NO_COCKTAIL )
 GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
 GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
 GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", GAME_NO_COCKTAIL )
-GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P", GAME_IMPERFECT_GRAPHICS ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
+GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", GAME_IMPERFECT_GRAPHICS ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
+GAME( 1997, pgalvipa, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", 0 )
 GAME( 1997, galhustl, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International",        "Gals Hustler", 0 ) // hack of the above?
 GAME( 1995, zipzap,   0,        zipzap,   zipzap,    driver_device, 0, ROT90, "Barko Corp",               "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

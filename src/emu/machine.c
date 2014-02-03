@@ -103,18 +103,31 @@ static char giant_string_buffer[65536] = { 0 };
 #ifdef SDLMAME_EMSCRIPTEN
 #include <emscripten.h>
 
-static device_scheduler * scheduler;
+static running_machine * jsmess_machine;
 
 void js_main_loop() {
+	device_scheduler * scheduler;
+	scheduler = &(jsmess_machine->scheduler());
 	attotime stoptime = scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60));
 	while (scheduler->time() < stoptime) {
 		scheduler->timeslice();
 	}
 }
 
-void js_set_main_loop(device_scheduler &sched) {
-	scheduler = &sched;
+void js_set_main_loop(running_machine * machine) {
+	jsmess_machine = machine;
+	EM_ASM (
+		JSMESS.running = true;
+	);
 	emscripten_set_main_loop(&js_main_loop, 0, 1);
+}
+
+running_machine * js_get_machine() {
+	return jsmess_machine;
+}
+
+ui_manager * js_get_ui() {
+	return &(jsmess_machine->ui());
 }
 #endif
 
@@ -262,7 +275,7 @@ void running_machine::start()
 
 	// create the video manager
 	m_video = auto_alloc(*this, video_manager(*this));
-	ui_init(*this);
+	m_ui = auto_alloc(*this, ui_manager(*this));
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -308,7 +321,7 @@ void running_machine::start()
 	// call the game driver's init function
 	// this is where decryption is done and memory maps are altered
 	// so this location in the init order is important
-	ui_set_startup_text(*this, "Initializing...", true);
+	ui().set_startup_text("Initializing...", true);
 
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(running_machine::reset_all_devices), this));
@@ -386,14 +399,14 @@ int running_machine::run(bool firstrun)
 
 		// load the configuration settings and NVRAM
 		bool settingsloaded = config_load_settings(*this);
-		nvram_load(*this);
+		nvram_load();
 		sound().ui_mute(false);
 
 		// initialize ui lists
-		ui_initialize(*this);
+		ui().initialize(*this);
 
 		// display the startup screens
-		ui_display_startup_screens(*this, firstrun, !settingsloaded);
+		ui().display_startup_screens(firstrun, !settingsloaded);
 
 		// perform a soft reset -- this takes us to the running phase
 		soft_reset();
@@ -406,7 +419,7 @@ int running_machine::run(bool firstrun)
 
 			#ifdef SDLMAME_EMSCRIPTEN
 			//break out to our async javascript loop and halt
-			js_set_main_loop(m_scheduler);
+			js_set_main_loop(this);
 			#endif
 
 			// execute CPUs if not paused
@@ -429,7 +442,7 @@ int running_machine::run(bool firstrun)
 
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
-		nvram_save(*this);
+		nvram_save();
 		config_save_settings(*this);
 	}
 	catch (emu_fatalerror &fatal)
@@ -1208,6 +1221,119 @@ void running_machine::postload_all_devices()
 }
 
 
+/***************************************************************************
+    NVRAM MANAGEMENT
+***************************************************************************/
+
+const char *running_machine::image_parent_basename(device_t *device)
+{
+	device_t *dev = device;
+	while(dev != &root_device())
+	{
+		device_image_interface *intf = NULL;
+		if (dev!=NULL && dev->interface(intf))
+		{
+			return intf->basename_noext();
+		}
+		dev = dev->owner();
+	}
+	return NULL;
+}
+
+/*-------------------------------------------------
+    nvram_filename - returns filename of system's
+    NVRAM depending of selected BIOS
+-------------------------------------------------*/
+
+astring &running_machine::nvram_filename(astring &result, device_t &device)
+{
+	// start with either basename or basename_biosnum
+	result.cpy(basename());
+	if (root_device().system_bios() != 0 && root_device().default_bios() != root_device().system_bios())
+		result.catprintf("_%d", root_device().system_bios() - 1);
+
+	// device-based NVRAM gets its own name in a subdirectory
+	if (&device != &root_device())
+	{
+		// add per software nvrams into one folder
+		const char *software = image_parent_basename(&device);
+		if (software!=NULL && strlen(software)>0)
+		{
+			result.cat('\\').cat(software);
+		}
+		astring tag(device.tag());
+		tag.del(0, 1).replacechr(':', '_');
+		result.cat('\\').cat(tag);
+	}
+	return result;
+}
+
+/*-------------------------------------------------
+    nvram_load - load a system's NVRAM
+-------------------------------------------------*/
+
+void running_machine::nvram_load()
+{
+	if (config().m_nvram_handler != NULL)
+	{
+		astring filename;
+		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
+		if (file.open(nvram_filename(filename, root_device()), ".nv") == FILERR_NONE)
+		{
+			(*config().m_nvram_handler)(*this, &file, FALSE);
+			file.close();
+		}
+		else
+		{
+			(*config().m_nvram_handler)(*this, NULL, FALSE);
+		}
+	}
+
+	nvram_interface_iterator iter(root_device());
+	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
+	{
+		astring filename;
+		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
+		if (file.open(nvram_filename(filename, nvram->device())) == FILERR_NONE)
+		{
+			nvram->nvram_load(file);
+			file.close();
+		}
+		else
+			nvram->nvram_reset();
+	}
+}
+
+
+/*-------------------------------------------------
+    nvram_save - save a system's NVRAM
+-------------------------------------------------*/
+
+void running_machine::nvram_save()
+{
+	if (config().m_nvram_handler != NULL)
+	{
+		astring filename;
+		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file.open(nvram_filename(filename, root_device()), ".nv") == FILERR_NONE)
+		{
+			(*config().m_nvram_handler)(*this, &file, TRUE);
+			file.close();
+		}
+	}
+
+	nvram_interface_iterator iter(root_device());
+	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
+	{
+		astring filename;
+		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (file.open(nvram_filename(filename, nvram->device())) == FILERR_NONE)
+		{
+			nvram->nvram_save(file);
+			file.close();
+		}
+	}
+}
 
 //**************************************************************************
 //  CALLBACK ITEMS

@@ -90,6 +90,7 @@
             San Francisco Rush: 2049 (1998)
 
     Unknown other DCS boards:
+        * NBA Jam Extreme
         * NBA Showtime
         * NBA Showtime / NFL Blitz 2000 Gold
         * Cart Fury
@@ -1997,7 +1998,7 @@ static TIMER_DEVICE_CALLBACK( dcs_irq )
 		reg = dcs.ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(dcs.cpu,  ADSP2105_IRQ1, 1);
+		dcs.cpu->machine().driver_data()->generic_pulse_irq_line(*dcs.cpu,  ADSP2105_IRQ1, 1);
 	}
 
 	/* store it */

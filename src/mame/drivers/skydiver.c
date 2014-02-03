@@ -148,7 +148,7 @@ WRITE8_MEMBER(skydiver_state::skydiver_nmion_w)
 INTERRUPT_GEN_MEMBER(skydiver_state::skydiver_interrupt)
 {
 	/* Convert range data to divide value and write to sound */
-	address_space &space = machine().firstcpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	discrete_sound_w(m_discrete, space, SKYDIVER_RANGE_DATA, (0x01 << (~m_videoram[0x394] & 0x07)) & 0xff);   // Range 0-2
 
 	discrete_sound_w(m_discrete, space, SKYDIVER_RANGE3_EN,  m_videoram[0x394] & 0x08);       // Range 3 - note disable

@@ -16,8 +16,6 @@ NETLIB_START(nicRSFF)
 
 NETLIB_RESET(nicRSFF)
 {
-    m_Q.initial(0);
-    m_QQ.initial(1);
 }
 
 NETLIB_UPDATE(nicRSFF)

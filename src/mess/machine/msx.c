@@ -520,7 +520,7 @@ DRIVER_INIT_MEMBER(msx_state,msx)
 
 	msx_memory_init();
 
-	z80_set_cycle_tables( m_maincpu, cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
+	m_maincpu->z80_set_cycle_tables( cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(msx_state::msx2_interrupt)

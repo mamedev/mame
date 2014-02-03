@@ -53,7 +53,7 @@ protected:
 private:
 	// internal state
 	device_t *m_cpu;
-	device_t *m_dsp;
+	adsp21062_device *m_dsp;
 	device_t *m_k001006_1;
 	device_t *m_k001006_2;
 

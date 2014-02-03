@@ -105,6 +105,13 @@ void isa8_device::static_set_cputag(device_t &device, const char *tag)
 	isa.m_cputag = tag;
 }
 
+void isa8_device::static_set_custom_spaces(device_t &device)
+{
+	isa8_device &isa = downcast<isa8_device &>(device);
+
+	isa.m_allocspaces = true;
+}
+
 //-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
@@ -146,6 +153,11 @@ void isa8_device::device_config_complete()
 
 isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, ISA8, "ISA8", tag, owner, clock, "isa8", __FILE__),
+		device_memory_interface(mconfig, *this),
+		m_program_config("ISA 8-bit program", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
+		m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, NULL),
+		m_program16_config("ISA 16-bit program", ENDIANNESS_LITTLE, 16, 24, 0, NULL),
+		m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, NULL),
 		m_write_iochck(*this)
 {
 	for(int i=0;i<8;i++)
@@ -154,10 +166,17 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 		m_dma_eop[i] = false;
 	}
 	m_nmi_enabled = false;
+	m_iowidth = m_prgwidth = 0;
+	m_allocspaces = false;
 }
 
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_memory_interface(mconfig, *this),
+		m_program_config("ISA 8-bit program", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
+		m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, NULL),
+		m_program16_config("ISA 16-bit program", ENDIANNESS_LITTLE, 16, 24, 0, NULL),
+		m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, NULL),
 		m_write_iochck(*this)
 {
 	for(int i=0;i<8;i++)
@@ -166,6 +185,28 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 		m_dma_eop[i] = false;
 	}
 	m_nmi_enabled = false;
+	m_iowidth = m_prgwidth = 0;
+	m_allocspaces = false;
+}
+
+READ8_MEMBER(isa8_device::prog_r)
+{
+	return m_prgspace->read_byte(offset);
+}
+
+WRITE8_MEMBER(isa8_device::prog_w)
+{
+	m_prgspace->write_byte(offset, data);
+}
+
+READ8_MEMBER(isa8_device::io_r)
+{
+	return m_iospace->read_byte(offset);
+}
+
+WRITE8_MEMBER(isa8_device::io_w)
+{
+	m_iospace->write_byte(offset, data);
 }
 
 void isa8_device::set_dma_channel(UINT8 channel, device_isa8_card_interface *dev, bool do_eop)
@@ -192,6 +233,23 @@ void isa8_device::device_start()
 	m_out_drq1_func.resolve(m_out_drq1_cb, *this);
 	m_out_drq2_func.resolve(m_out_drq2_cb, *this);
 	m_out_drq3_func.resolve(m_out_drq3_cb, *this);
+
+	m_maincpu = subdevice<cpu_device>(m_cputag);
+
+	if (m_allocspaces)
+	{
+		m_iospace = &space(AS_IO);
+		m_prgspace = &space(AS_PROGRAM);
+		m_iowidth = m_iospace->data_width();
+		m_prgwidth = m_prgspace->data_width();
+	}
+	else	// use host CPU's program and I/O spaces directly
+	{
+		m_iospace = &m_maincpu->space(AS_IO); 
+		m_iowidth = m_maincpu->space_config(AS_IO)->m_databus_width; 
+		m_prgspace = &m_maincpu->space(AS_PROGRAM);
+		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width; 
+	}
 }
 
 //-------------------------------------------------
@@ -205,26 +263,42 @@ void isa8_device::device_reset()
 
 void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_space_func rhandler, const char* rhandler_name, write8_space_func whandler, const char *whandler_name)
 {
-	int buswidth = m_maincpu->space_config(spacenum)->m_databus_width;
-	address_space &space = m_maincpu->space(spacenum);
+	int buswidth;
+	address_space *space;
+
+	if (spacenum == AS_IO)
+	{
+		space = m_iospace;
+		buswidth = m_iowidth;
+	}
+	else if (spacenum == AS_PROGRAM)
+	{
+		space = m_prgspace;
+		buswidth = m_prgwidth;
+	}
+	else
+	{
+		fatalerror("Unknown space passed to isa8_device::install_space!\n");
+	}
+
 	switch(buswidth)
 	{
 		case 8:
-			space.install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
+			space->install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
 			break;
 		case 16:
-			space.install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
+			space->install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
 			break;
 		case 32:
 			if ((start % 4) == 0) {
 				if ((end-start)==1) {
-					space.install_legacy_readwrite_handler(start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
+					space->install_legacy_readwrite_handler(start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
 				} else {
-					space.install_legacy_readwrite_handler(start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+					space->install_legacy_readwrite_handler(start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
 				}
 			} else {
 				// we handle just misalligned by 2
-				space.install_legacy_readwrite_handler(start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
+				space->install_legacy_readwrite_handler(start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
 			}
 			break;
 		default:
@@ -236,26 +310,42 @@ void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t 
 
 void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
 {
-	int buswidth = m_maincpu->space_config(spacenum)->m_databus_width;
-	address_space &space = m_maincpu->space(spacenum);
+	int buswidth;
+	address_space *space;
+
+	if (spacenum == AS_IO)
+	{
+		space = m_iospace;
+		buswidth = m_iowidth;
+	}
+	else if (spacenum == AS_PROGRAM)
+	{
+		space = m_prgspace;
+		buswidth = m_prgwidth;
+	}
+	else
+	{
+		fatalerror("Unknown space passed to isa8_device::install_space!\n");
+	}
+
 	switch(buswidth)
 	{
 		case 8:
-			space.install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
+			space->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
 			break;
 		case 16:
-			space.install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
+			space->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
 			break;
 		case 32:
 			if ((start % 4) == 0) {
 				if ((end-start)==1) {
-					space.install_readwrite_handler(start, end+2, mask, mirror, rhandler, whandler, 0x0000ffff);
+					space->install_readwrite_handler(start, end+2, mask, mirror, rhandler, whandler, 0x0000ffff);
 				} else {
-					space.install_readwrite_handler(start, end,   mask, mirror, rhandler, whandler, 0xffffffff);
+					space->install_readwrite_handler(start, end,   mask, mirror, rhandler, whandler, 0xffffffff);
 				}
 			} else {
 				// we handle just misalligned by 2
-				space.install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
+				space->install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
 			}
 			break;
 		default:
@@ -267,26 +357,42 @@ void isa8_device::install_space(address_spacenum spacenum, offs_t start, offs_t 
 
 void isa8_device::install_space(address_spacenum spacenum, device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_device_func rhandler, const char* rhandler_name, write8_device_func whandler, const char *whandler_name)
 {
-	int buswidth = m_maincpu->space_config(spacenum)->m_databus_width;
-	address_space &space = m_maincpu->space(spacenum);
+	int buswidth;
+	address_space *space;
+
+	if (spacenum == AS_IO)
+	{
+		space = m_iospace;
+		buswidth = m_iowidth;
+	}
+	else if (spacenum == AS_PROGRAM)
+	{
+		space = m_prgspace;
+		buswidth = m_prgwidth;
+	}
+	else
+	{
+		fatalerror("Unknown space passed to isa8_device::install_space!\n");
+	}
+
 	switch(buswidth)
 	{
 		case 8:
-			space.install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
+			space->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
 			break;
 		case 16:
-			space.install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
+			space->install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff);
 			break;
 		case 32:
 			if ((start % 4) == 0) {
 				if ((end-start)==1) {
-					space.install_legacy_readwrite_handler(*dev, start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
+					space->install_legacy_readwrite_handler(*dev, start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
 				} else {
-					space.install_legacy_readwrite_handler(*dev, start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
+					space->install_legacy_readwrite_handler(*dev, start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
 				}
 			} else {
 				// we handle just misalligned by 2
-				space.install_legacy_readwrite_handler(*dev, start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
+				space->install_legacy_readwrite_handler(*dev, start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
 			}
 			break;
 		default:
@@ -322,15 +428,13 @@ void isa8_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t m
 
 void isa8_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank(start, end, mask, mirror, tag );
+	m_prgspace->install_readwrite_bank(start, end, mask, mirror, tag );
 	machine().root_device().membank(tag)->set_base(data);
 }
 
 void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.unmap_readwrite(start, end, mask, mirror);
+	m_prgspace->unmap_readwrite(start, end, mask, mirror);
 }
 
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
@@ -341,25 +445,22 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 		UINT8 *dest = machine().root_device().memregion("isa")->base() + start - 0xc0000;
 		memcpy(dest,src, end - start + 1);
 	} else {
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		space.install_read_bank(start, end, mask, mirror, tag);
-		space.unmap_write(start, end, mask, mirror);
+		m_prgspace->install_read_bank(start, end, mask, mirror, tag);
+		m_prgspace->unmap_write(start, end, mask, mirror);
 		machine().root_device().membank(tag)->set_base(machine().root_device().memregion(dev->subtag(tempstring, region))->base());
 	}
 }
 
 void isa8_device::unmap_rom(offs_t start, offs_t end, offs_t mask, offs_t mirror)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.unmap_read(start, end, mask, mirror);
+	m_prgspace->unmap_read(start, end, mask, mirror);
 }
 
 bool isa8_device::is_option_rom_space_available(offs_t start, int size)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	for(int i = 0; i < size; i += 4096) // 4KB granularity should be enough
-		if(space.get_read_ptr(start + i)) return false;
+		if(m_prgspace->get_read_ptr(start + i)) return false;
 	return true;
 }
 
@@ -548,23 +649,23 @@ void isa16_device::device_start()
 
 void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
 {
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
+	int buswidth = m_prgwidth;
 	switch(buswidth)
 	{
 		case 16:
-			m_maincpu->space(AS_IO).install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
+			m_iospace->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
 			break;
 		case 32:
-			m_maincpu->space(AS_IO).install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffffffff);
+			m_iospace->install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffffffff);
 			if ((start % 4) == 0) {
 				if ((end-start)==1) {
-					m_maincpu->space(AS_IO).install_readwrite_handler(start, end+2, mask, mirror, rhandler, whandler, 0x0000ffff);
+					m_iospace->install_readwrite_handler(start, end+2, mask, mirror, rhandler, whandler, 0x0000ffff);
 				} else {
-					m_maincpu->space(AS_IO).install_readwrite_handler(start, end,   mask, mirror, rhandler, whandler, 0xffffffff);
+					m_iospace->install_readwrite_handler(start, end,   mask, mirror, rhandler, whandler, 0xffffffff);
 				}
 			} else {
 				// we handle just misalligned by 2
-				m_maincpu->space(AS_IO).install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
+				m_iospace->install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
 			}
 
 			break;
@@ -572,6 +673,60 @@ void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_
 			fatalerror("ISA16: Bus width %d not supported\n", buswidth);
 			break;
 	}
+}
+
+READ16_MEMBER(isa16_device::prog16_r)
+{
+	return m_prgspace->read_word(offset<<1, mem_mask);
+}
+
+WRITE16_MEMBER(isa16_device::prog16_w)
+{
+	m_prgspace->write_word(offset<<1, data, mem_mask);
+}
+
+READ16_MEMBER(isa16_device::io16_r)
+{
+	return m_iospace->read_word(offset<<1, mem_mask);
+}
+
+WRITE16_MEMBER(isa16_device::io16_w)
+{
+	m_iospace->write_word(offset<<1, data, mem_mask);
+}
+
+READ16_MEMBER(isa16_device::prog16_swap_r)
+{
+	UINT16 rv;
+	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+
+	rv = m_prgspace->read_word(offset<<1, mem_mask);
+
+	return (rv<<8) | (rv>>8);
+}
+
+WRITE16_MEMBER(isa16_device::prog16_swap_w)
+{
+	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+	data = (data<<8) | (data>>8);
+	m_prgspace->write_word(offset<<1, data, mem_mask);
+}
+
+READ16_MEMBER(isa16_device::io16_swap_r)
+{
+	UINT16 rv;
+	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+
+	rv = m_iospace->read_word(offset<<1, mem_mask);
+
+	return (rv<<8) | (rv>>8);
+}
+
+WRITE16_MEMBER(isa16_device::io16_swap_w)
+{
+	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+	data = (data<<8) | (data>>8);
+	m_iospace->write_word(offset<<1, data, mem_mask);
 }
 
 // interrupt request from isa card
@@ -631,3 +786,5 @@ UINT16 device_isa16_card_interface::dack16_r(int line)
 void device_isa16_card_interface::dack16_w(int line,UINT16 data)
 {
 }
+
+

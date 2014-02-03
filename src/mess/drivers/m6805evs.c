@@ -75,4 +75,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT    COMPANY      FULLNAME */
-CONS( 1990, m6805evs, 0,        0,      m6805evs, m6805evs, driver_device, 0,    "Motorola",  "M68HC05EVS", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1990, m6805evs, 0,        0,      m6805evs, m6805evs, driver_device, 0,    "Motorola",  "M68HC05EVS", GAME_NOT_WORKING | GAME_NO_SOUND_HW )

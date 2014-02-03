@@ -98,7 +98,7 @@ static const ay8910_interface hustler_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_HANDLER(frogger_portB_r),
+	DEVCB_DRIVER_MEMBER(scramble_state, hustler_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -718,7 +718,7 @@ static const ay8910_interface scobra_ay8910_interface_2 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-	DEVCB_HANDLER(scramble_portB_r),
+	DEVCB_DRIVER_MEMBER(scramble_state, scramble_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

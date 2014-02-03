@@ -504,8 +504,8 @@ void isa8_hdc_device::hdc_command()
 	if (LOG_HDC_STATUS)
 	{
 		command_name = hdc_command_names[cmd] ? hdc_command_names[cmd] : "Unknown";
-		logerror("pc_hdc_command(): Executing command; pc=0x%08x cmd=0x%02x (%s) drv=%d\n",
-			(unsigned) machine().firstcpu->pc(), cmd, command_name, drv);
+		logerror("%s pc_hdc_command(): Executing command; cmd=0x%02x (%s) drv=%d\n",
+			machine().describe_context(), cmd, command_name, drv);
 	}
 
 	switch (cmd)
@@ -542,8 +542,8 @@ void isa8_hdc_device::hdc_command()
 
 			if (LOG_HDC_STATUS)
 			{
-				logerror("hdc read pc=0x%08x D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) machine().firstcpu->pc(), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
+				logerror("%s hdc read D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
+					machine().describe_context(), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
 			}
 
 			if (test_ready())
@@ -557,8 +557,8 @@ void isa8_hdc_device::hdc_command()
 
 			if (LOG_HDC_STATUS)
 			{
-				logerror("hdc write pc=0x%08x  D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) machine().firstcpu->pc(), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
+				logerror("%s hdc write  D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
+					machine().describe_context(), drv, cylinder[drv], head[drv], sector[drv], sector_cnt[drv], control[drv]);
 			}
 
 			if (test_ready())
@@ -672,7 +672,7 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) machine().firstcpu->pc());
+				logerror("%s pc_hdc_data_w(): Launching command\n", machine().describe_context());
 
 			status &= ~STA_COMMAND;
 			status &= ~STA_REQUEST;
@@ -795,7 +795,7 @@ static READ8_DEVICE_HANDLER(pc_HDC_r )
 	}
 
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_r(): pc=%06X offs=%d result=0x%02x\n", space.machine().firstcpu->pc(), offset, data);
+		logerror("%s pc_HDC_r(): offs=%d result=0x%02x\n", space.machine().describe_context(), offset, data);
 
 	return data;
 }
@@ -804,7 +804,7 @@ static WRITE8_DEVICE_HANDLER( pc_HDC_w )
 {
 	isa8_hdc_device *hdc  = downcast<isa8_hdc_device *>(device);
 	if (LOG_HDC_CALL)
-		logerror("pc_HDC_w(): pc=%06X offs=%d data=0x%02x\n", space.machine().firstcpu->pc(), offset, data);
+		logerror("%s pc_HDC_w(): offs=%d data=0x%02x\n", space.machine().describe_context(), offset, data);
 
 	switch( offset )
 	{

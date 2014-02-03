@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    uiswlist.h
+    ui/swlist.h
 
     Internal MAME user interface for software list.
 
@@ -9,8 +9,10 @@
 
 ***************************************************************************/
 
-#ifndef __UISWLIST_H__
-#define __UISWLIST_H__
+#ifndef __UI_SWLIST_H__
+#define __UI_SWLIST_H__
+
+// ======================> ui_menu_software_parts
 
 class ui_menu_software_parts : public ui_menu {
 public:
@@ -26,12 +28,16 @@ private:
 		const software_part *part;
 	};
 
-	const software_info *info;
-	const char *interface;
-	const software_part **selected_part;
-	bool opt_fmgr;
-	int *result;
+	// variables
+	const software_info *	m_info;
+	const char *			m_interface;
+	const software_part **	m_selected_part;
+	bool					m_opt_fmgr;
+	int *					m_result;
 };
+
+
+// ======================> ui_menu_software_list
 
 class ui_menu_software_list : public ui_menu {
 public:
@@ -48,16 +54,21 @@ private:
 		const char *long_name;
 	};
 
-	const software_list_device *swlist; /* currently selected list */
-	const char *interface;
-	astring &result;
-	entry_info *entrylist;
-	char filename_buffer[1024];
-	bool ordered_by_shortname;
+	// variables
+	const software_list_device *	m_swlist; // currently selected list
+	const char *					m_interface;
+	astring &						m_result;
+	entry_info *					m_entrylist;
+	char							m_filename_buffer[1024];
+	bool							m_ordered_by_shortname;
 
+	// functions
 	int compare_entries(const entry_info *e1, const entry_info *e2, bool shortname);
 	entry_info *append_software_entry(const software_info *swinfo);
 };
+
+
+// ======================> ui_menu_software
 
 class ui_menu_software : public ui_menu {
 public:
@@ -67,8 +78,8 @@ public:
 	virtual void handle();
 
 private:
-	const char *interface;
-	const software_list_device **result;
+	const char *					m_interface;
+	const software_list_device **	m_result;
 };
 
-#endif  /* __UISWLIST_H__ */
+#endif  /* __UI_SWLIST_H__ */

@@ -38,27 +38,20 @@ public:
 	static void force_game_select(running_machine &machine, render_container *container);
 
 private:
-	// private driver list
+	// internal state
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
-	const game_driver   **driver_list;
-	int					driver_count;
+	UINT8					m_error;
+	UINT8					m_rerandomize;
+	char					m_search[40];
+	int						m_matchlist[VISIBLE_GAMES_IN_LIST];
+	const game_driver **	m_driverlist;
+	driver_enumerator *		m_drivlist;
 
-	// the selection
-	int					selection_up;
-	int					selection_down;
-
-	// other
-	bool				error;
-	char                search[40];
-
+	// internal methods
 	void build_driver_list();
-	static int driver_list_compare(const void *p1, const void *p2);
-	void select_searched_item();
-
 	void inkey_select(const ui_menu_event *menu_event);
 	void inkey_cancel(const ui_menu_event *menu_event);
 	void inkey_special(const ui_menu_event *menu_event);
-	void inkey_configure(const ui_menu_event *menu_event);
 };
 
 #endif  /* __UI_SELGAME_H__ */

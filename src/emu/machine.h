@@ -119,6 +119,7 @@ class cheat_manager;
 class render_manager;
 class sound_manager;
 class video_manager;
+class ui_manager;
 class tilemap_manager;
 class debug_view_manager;
 class osd_interface;
@@ -198,6 +199,7 @@ public:
 	input_manager &input() const { assert(m_input != NULL); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != NULL); return *m_sound; }
 	video_manager &video() const { assert(m_video != NULL); return *m_video; }
+	ui_manager &ui() const { assert(m_ui != NULL); return *m_ui; }
 	tilemap_manager &tilemap() const { assert(m_tilemap != NULL); return *m_tilemap; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }
 	driver_device *driver_data() const { return &downcast<driver_device &>(root_device()); }
@@ -295,6 +297,10 @@ private:
 	void soft_reset(void *ptr = NULL, INT32 param = 0);
 	void watchdog_fired(void *ptr = NULL, INT32 param = 0);
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
+	const char *image_parent_basename(device_t *device);
+	astring &nvram_filename(astring &result, device_t &device);	
+	void nvram_load();
+	void nvram_save();
 
 	// internal callbacks
 	static void logfile_callback(running_machine &machine, const char *buffer);
@@ -319,6 +325,7 @@ private:
 	input_manager *         m_input;                // internal data from input.c
 	sound_manager *         m_sound;                // internal data from sound.c
 	video_manager *         m_video;                // internal data from video.c
+	ui_manager *            m_ui;                   // internal data from ui.c
 	tilemap_manager *       m_tilemap;              // internal data from tilemap.c
 	debug_view_manager *    m_debug_view;           // internal data from debugvw.c
 

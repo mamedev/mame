@@ -71,7 +71,10 @@ public:
 		m_rtc(*this, "rtc"),
 		m_palram(*this, "palram"),
 		m_maincpu(*this, "maincpu"),
-		m_beeper(*this, "beeper") { }
+		m_beeper(*this, "beeper"),
+		m_rtc_portc(0)
+	{
+	}
 
 	required_device<msm58321_device> m_rtc;
 	required_shared_ptr<UINT16> m_palram;
@@ -94,6 +97,8 @@ public:
 	DECLARE_WRITE8_MEMBER(upper_mask_w);
 	DECLARE_WRITE8_MEMBER(crtc_bank_w);
 	DECLARE_WRITE8_MEMBER(rtc_porta_w);
+	DECLARE_READ8_MEMBER(rtc_portc_r);
+	DECLARE_WRITE8_MEMBER(rtc_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(pc100_set_int_line);
 	UINT16 *m_kanji_rom;
 	UINT16 *m_vram;
@@ -121,6 +126,12 @@ public:
 	IRQ_CALLBACK_MEMBER(pc100_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
+
+	WRITE_LINE_MEMBER(rtc_portc_0_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 0)) | ((state & 1) << 0); }
+	WRITE_LINE_MEMBER(rtc_portc_1_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 1)) | ((state & 1) << 1); }
+	WRITE_LINE_MEMBER(rtc_portc_2_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
+	WRITE_LINE_MEMBER(rtc_portc_3_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
+	UINT8 m_rtc_portc;
 };
 
 void pc100_state::video_start()
@@ -363,9 +374,22 @@ WRITE8_MEMBER( pc100_state::rtc_porta_w )
     ---- ---x write
 */
 
-	m_rtc->write_w(data & 1);
-	m_rtc->read_w((data & 2) >> 1);
-	m_rtc->cs1_w((data & 4) >> 2);
+	m_rtc->write_w((data >> 0) & 1);
+	m_rtc->read_w((data >> 1) & 1);
+	m_rtc->cs1_w((data >> 2) & 1);
+}
+
+WRITE8_MEMBER( pc100_state::rtc_portc_w )
+{
+	m_rtc->d0_w((data >> 0) & 1);
+	m_rtc->d1_w((data >> 1) & 1);
+	m_rtc->d2_w((data >> 2) & 1);
+	m_rtc->d3_w((data >> 3) & 1);
+}
+
+READ8_MEMBER( pc100_state::rtc_portc_r )
+{
+	return m_rtc_portc;
 }
 
 static I8255A_INTERFACE( pc100_ppi8255_interface_1 )
@@ -374,8 +398,8 @@ static I8255A_INTERFACE( pc100_ppi8255_interface_1 )
 	DEVCB_DRIVER_MEMBER(pc100_state, rtc_porta_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER("rtc", msm58321_device, read),
-	DEVCB_DEVICE_MEMBER("rtc", msm58321_device, write)
+	DEVCB_DRIVER_MEMBER(pc100_state, rtc_portc_r),
+	DEVCB_DRIVER_MEMBER(pc100_state, rtc_portc_w)
 };
 
 
@@ -475,11 +499,6 @@ static SLOT_INTERFACE_START( pc100_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static MSM58321_INTERFACE( rtc_intf )
-{
-	DEVCB_NULL
-};
-
 #define MASTER_CLOCK 6988800
 
 static MACHINE_CONFIG_START( pc100, pc100_state )
@@ -497,7 +516,12 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_I8255_ADD( "ppi8255_2", pc100_ppi8255_interface_2 )
 	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pc100_state, pc100_set_int_line), GND, NULL )
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_MSM58321_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+
+	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL_32_768kHz)
+	MCFG_MSM58321_D0_HANDLER(WRITELINE(pc100_state, rtc_portc_0_w))
+	MCFG_MSM58321_D1_HANDLER(WRITELINE(pc100_state, rtc_portc_1_w))
+	MCFG_MSM58321_D2_HANDLER(WRITELINE(pc100_state, rtc_portc_2_w))
+	MCFG_MSM58321_D3_HANDLER(WRITELINE(pc100_state, rtc_portc_3_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525hd", floppy_image_device::default_floppy_formats)

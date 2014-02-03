@@ -78,9 +78,12 @@ deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *
 		m_wide(0),
 		m_bppmult(0),
 		m_bppmask(0)
-		//m_pf_control_0[8]
-		//m_pf_control_1[8]
 {
+	for (int i = 0; i < 8; i++)
+		{
+			m_pf_control_0[i] = 0;
+			m_pf_control_1[i] = 0;
+		}
 }
 
 void deco_bac06_device::device_start()
@@ -255,7 +258,12 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 	*/
 
 	if (machine().driver_data()->flip_screen())
-		src_y = (src_bitmap.height() - 256) - scrolly;
+		{
+			if (cliprect.max_y <= 31*8-1) // workaround till all drivers using this device are updated to raw params
+				src_y = (src_bitmap.height() - 256) - scrolly; //actfancr.c, madmotor.c, pcktgal.c and stadhero.c
+			else
+				src_y = (src_bitmap.height() - 256 - 8) - scrolly; // dec0.c and dec8.c have been updated to raw params
+		}
 	else
 		src_y = scrolly;
 
@@ -266,7 +274,12 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 			src_x=scrollx;
 
 		if (machine().driver_data()->flip_screen())
-			src_x=(src_bitmap.width() - 256) - src_x;
+			{
+				if (cliprect.max_x == 32*8-1) // workaround till all drivers using this device are updated to raw params
+					src_x=(src_bitmap.width() - 256) - src_x; //actfancr.c, madmotor.c, pcktgal.c and stadhero.c
+				else 
+					src_x=(src_bitmap.width() - 256 - 74) - src_x; // dec0.c and dec8.c have been updated to raw params
+			}
 
 		for (x=0; x<=cliprect.max_x; x++) {
 			if (col_scroll_enabled)

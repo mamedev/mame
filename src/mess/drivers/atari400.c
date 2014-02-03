@@ -2511,6 +2511,7 @@ static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("fdc", ATARI_FDC, 0)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","a800_flop")
 MACHINE_CONFIG_END
 
 

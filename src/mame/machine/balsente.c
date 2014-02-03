@@ -251,7 +251,7 @@ READ8_MEMBER(balsente_state::balsente_random_num_r)
 	UINT32 cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
-	cc = machine().firstcpu->total_cycles();
+	cc = m_maincpu->total_cycles();
 
 	/* 12.5 = 8 + 4 + 0.5 */
 	cc = (cc << 3) + (cc << 2) + (cc >> 1);

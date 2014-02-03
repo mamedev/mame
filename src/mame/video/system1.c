@@ -255,7 +255,7 @@ inline void system1_state::videoram_wait_states(cpu_device *cpu)
 READ8_MEMBER(system1_state::system1_videoram_r)
 {
 	UINT8 *videoram = m_videoram;
-	videoram_wait_states(machine().firstcpu);
+	videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	return videoram[offset];
 }
@@ -263,7 +263,7 @@ READ8_MEMBER(system1_state::system1_videoram_r)
 WRITE8_MEMBER(system1_state::system1_videoram_w)
 {
 	UINT8 *videoram = m_videoram;
-	videoram_wait_states(machine().firstcpu);
+	videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	videoram[offset] = data;
 

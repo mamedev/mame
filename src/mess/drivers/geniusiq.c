@@ -148,6 +148,52 @@ PCB - German Version:
  +------+    +--------------------------------------+    +-----------------------------------+    +----------+
 
 
+IQ Unlimited - GERMAN:
+      +------------------------------------------------------------------------------+
+      |                                                                              |
++-----+                                                                              |
+|                                                                                    |
+|                                                                                    |
+|                                                                                    |
+|  +----+                                                +---+                       |
+|  | A2 |                +----+                          |   |                       |
+|  |    |                | A4 |                          |A1 |        +-+            |
+|  +----+                +----+                          |   |        | |            |
+|                                                        |   |        +-+            |
+|                                                        |   |                       |
+|                                                        +---+                    +--+
+|                                                                                 |
+|                                                       +-------+                 |
++--+                                                    |65C5L5K|            +----+
+   |                                                    | HC374 |            |
++--+                         +----------+               +-------+            +--+
+|                            |DragonBall|                                       |
+| C         +----+           |EZ        |               +-------+             C |
+| A         | A3 |           |          |               |65C5L5K|             A |
+| R         +----+           |LSC414328P|               | HC374 |             R |
+| T                          |U16  IJ75C|               +-------+             T |
+| R                          | HHAV984S |                                     R |
+| I                          +----------+                                     I |
+| D  CARD 1 +------------+                                            CARD 0  D |
+| G         | AM29F0400  |                                                    G |
+| E         |            |     +------+                +--------+             E |
+|           +------------+     | LGS  |                |LHMN5KR7|               |
+| S                            |      |                |        |             S |
+| L                            |GM71C1|                |  1998  |             L |
+| O       GER                  |8163CJ|                |        |             O |
+| T       038                  |6     |                |27-06126|             T |
+|                              |      |                |-007    |               |
++--+                           |      |                |        |            +--+
+   |                           |      |                |  VTECH |            |
+   |                           +------+                +--------+            |
+   |                                                   35-19600-200  703139-G|
+   +-------------------------------------------------------------------------+
+
+A1 = 98AHCLT / 27-05992-0-0 / VTech
+A2 = 9932 HBL / C807U-1442 / 35016B / Japan
+A3 = ACT139
+A4 = MAX232
+
 
 Leader 8008 CX (German version)
 
@@ -846,12 +892,6 @@ ROM_START( iqunlim )
 	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
 ROM_END
 
-ROM_START( gl3000s ) // looks like Z80 code
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "27-5713-00.bin", 0x000000, 0x040000, CRC(18b113e0) SHA1(27a12893c38068efa35a99fa97a260dbfbd497e3) )
-
-	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
-ROM_END
 
 ROM_START( glmmc )
 	ROM_REGION(0x200000, "maincpu", 0)
@@ -869,5 +909,4 @@ COMP( 1998, iqtv512,    0,              0,    iqtv512,   geniusiq_de, driver_dev
 COMP( 1999, gl8008cx,   0,              0,    gl8008cx,  gl8008cx,    driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", GAME_IS_SKELETON)
 COMP( 1998, itunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IT Unlimited (UK)", GAME_NO_SOUND)
 COMP( 19??, iqunlim,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Vtech IQ Unlimited (Germany)", GAME_IS_SKELETON)
-COMP( 19??, gl3000s,    0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader 3000S (Germany)", GAME_IS_SKELETON)
 COMP( 19??, glmmc,      0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader Master Mega Color (Germany)", GAME_IS_SKELETON)

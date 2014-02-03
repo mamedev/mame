@@ -26,7 +26,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 
 // OSD headers
@@ -587,7 +587,7 @@ void sdlwindow_modify_prescale(running_machine &machine, sdl_window_info *window
 			execute_async_wait(destroy_all_textures_wt, &wp);
 			window->prescale = new_prescale;
 		}
-		ui_popup_time(1, "Prescale %d", window->prescale);
+		machine.ui().popup_time(1, "Prescale %d", window->prescale);
 	}
 }
 

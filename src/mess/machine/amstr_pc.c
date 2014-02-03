@@ -132,7 +132,7 @@ port 03de write/read
 
 DRIVER_INIT_MEMBER(amstrad_pc_state,pc1640)
 {
-	address_space &io_space = machine().firstcpu->space( AS_IO );
+	address_space &io_space = m_maincpu->space( AS_IO );
 
 	io_space.install_read_handler(0x278, 0x27b, read8_delegate(FUNC(amstrad_pc_state::pc1640_port278_r),this), 0xffff);
 	io_space.install_read_handler(0x4278, 0x427b, read8_delegate(FUNC(amstrad_pc_state::pc1640_port4278_r),this), 0xffff);

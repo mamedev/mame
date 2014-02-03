@@ -861,7 +861,8 @@ static void jamtable_disasm(running_machine &machine, address_space &space,UINT3
 
 static void jamtable_disasm_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space=machine.firstcpu->space();
+	chihiro_state *state = machine.driver_data<chihiro_state>();
+	address_space &space=state->m_maincpu->space();
 	UINT64  addr,size;
 
 	if (params < 2)
@@ -875,7 +876,8 @@ static void jamtable_disasm_command(running_machine &machine, int ref, int param
 
 static void dump_string_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space=machine.firstcpu->space();
+	chihiro_state *state = machine.driver_data<chihiro_state>();
+	address_space &space=state->m_maincpu->space();
 	UINT64  addr;
 	offs_t address;
 	UINT32 length,maximumlength;
@@ -914,7 +916,8 @@ static void dump_string_command(running_machine &machine, int ref, int params, c
 
 static void dump_process_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space=machine.firstcpu->space();
+	chihiro_state *state = machine.driver_data<chihiro_state>();
+	address_space &space=state->m_maincpu->space();
 	UINT64 addr;
 	offs_t address;
 
@@ -940,7 +943,8 @@ static void dump_process_command(running_machine &machine, int ref, int params, 
 
 static void dump_list_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space=machine.firstcpu->space();
+	chihiro_state *state = machine.driver_data<chihiro_state>();
+	address_space &space=state->m_maincpu->space();
 	UINT64 addr,offs,start,old;
 	offs_t address,offset;
 
@@ -987,14 +991,13 @@ static void dump_list_command(running_machine &machine, int ref, int params, con
 
 static void curthread_command(running_machine &machine, int ref, int params, const char **param)
 {
-	address_space &space=machine.firstcpu->space();
+	chihiro_state *state = machine.driver_data<chihiro_state>();
+	address_space &space=state->m_maincpu->space();
 	UINT64 fsbase;
 	UINT32 kthrd,topstack,tlsdata;
 	offs_t address;
-	cpuinfo cpu_info;
 
-	CPU_GET_INFO_NAME(i386)((legacy_cpu_device *)machine.firstcpu,CPUINFO_INT_REGISTER + 44,&cpu_info);
-	fsbase=cpu_info.i;
+	fsbase = state->m_maincpu->state_int(44);
 	address=(offs_t)fsbase+0x28;
 	if (!debug_cpu_translate(space,TRANSLATE_READ_DEBUG,&address))
 	{

@@ -42,4 +42,13 @@
 
 NETLIB_SIGNAL(7427, 3, 1, 0);
 
+#define TTL_7427_DIP(_name)                                                         \
+        NET_REGISTER_DEV(7427_dip, _name)
+
+NETLIB_DEVICE(7427_dip,
+
+    NETLIB_NAME(7427) m_1;
+    NETLIB_NAME(7427) m_2;
+    NETLIB_NAME(7427) m_3;
+);
 #endif /* NLD_7427_H_ */

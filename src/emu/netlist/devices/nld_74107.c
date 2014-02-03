@@ -5,7 +5,7 @@
 
 #include "nld_74107.h"
 
-NETLIB_START(nic74107Asub)
+NETLIB_START(74107Asub)
 {
 	register_input("CLK", m_clk);
 	register_output("Q", m_Q);
@@ -16,18 +16,16 @@ NETLIB_START(nic74107Asub)
 	save(NAME(m_F));
 }
 
-NETLIB_RESET(nic74107Asub)
+NETLIB_RESET(74107Asub)
 {
     m_clk.set_state(netlist_input_t::STATE_INP_HL);
-    m_Q.initial(0);
-    m_QQ.initial(1);
 
     m_Q1 = 0;
     m_Q2 = 0;
     m_F = 0;
 }
 
-NETLIB_START(nic74107A)
+NETLIB_START(74107A)
 {
 	register_sub(sub, "sub");
 
@@ -40,12 +38,12 @@ NETLIB_START(nic74107A)
 
 }
 
-NETLIB_RESET(nic74107A)
+NETLIB_RESET(74107A)
 {
     sub.reset();
 }
 
-ATTR_HOT inline void NETLIB_NAME(nic74107Asub)::newstate(const netlist_sig_t state)
+ATTR_HOT inline void NETLIB_NAME(74107Asub)::newstate(const netlist_sig_t state)
 {
 	const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 
@@ -53,7 +51,7 @@ ATTR_HOT inline void NETLIB_NAME(nic74107Asub)::newstate(const netlist_sig_t sta
 	OUTLOGIC(m_QQ, state ^ 1, delay[state]);
 }
 
-NETLIB_UPDATE(nic74107Asub)
+NETLIB_UPDATE(74107Asub)
 {
 	const netlist_sig_t t = m_Q.net().Q();
 	newstate((!t & m_Q1) | (t & m_Q2) | m_F);
@@ -61,7 +59,7 @@ NETLIB_UPDATE(nic74107Asub)
 		m_clk.inactivate();
 }
 
-NETLIB_UPDATE(nic74107A)
+NETLIB_UPDATE(74107A)
 {
 	const UINT8 JK = (INPLOGIC(m_J) << 1) | INPLOGIC(m_K);
 
@@ -99,4 +97,40 @@ NETLIB_UPDATE(nic74107A)
 	}
 	else if (!sub.m_Q2)
 		sub.m_clk.activate_hl();
+}
+
+NETLIB_START(74107_dip)
+{
+    register_sub(m_1, "1");
+    register_sub(m_2, "2");
+
+    register_subalias("1", m_1.m_J);
+    register_subalias("2", m_1.sub.m_QQ);
+    register_subalias("3", m_1.sub.m_Q);
+
+    register_subalias("4", m_1.m_K);
+    register_subalias("5", m_2.sub.m_Q);
+    register_subalias("6", m_2.sub.m_QQ);
+
+    // register_subalias("7", ); ==> GND
+
+    register_subalias("8", m_2.m_J);
+    register_subalias("9", m_2.sub.m_clk);
+    register_subalias("10", m_2.m_clrQ);
+
+    register_subalias("11", m_2.m_K);
+    register_subalias("12", m_1.sub.m_clk);
+    register_subalias("13", m_1.m_clrQ);
+
+    // register_subalias("14", ); ==> VCC
+}
+
+NETLIB_RESET(74107_dip)
+{
+    m_1.do_reset();
+    m_2.do_reset();
+}
+
+NETLIB_UPDATE(74107_dip)
+{
 }

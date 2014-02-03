@@ -30,6 +30,7 @@
 #include "machine/isa_wdxt_gen.h"
 #include "machine/isa_ide.h"
 #include "machine/isa_xtide.h"
+#include "machine/isa_side116.h"
 #include "machine/isa_aha1542.h"
 #include "machine/isa_wd1002a_wx1.h"
 
@@ -52,6 +53,7 @@
 // communication ports
 #include "machine/pc_lpt.h"
 #include "machine/isa_com.h"
+#include "machine/isa_pds.h"
 
 // other
 #include "machine/isa_finalchs.h"

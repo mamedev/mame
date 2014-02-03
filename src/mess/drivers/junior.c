@@ -69,7 +69,7 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(junior_state::junior_reset)
 {
 	if (newval == 0)
-		machine().firstcpu->reset();
+		m_maincpu->reset();
 }
 
 

@@ -749,21 +749,21 @@ MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 static MACHINE_CONFIG_START( tokio, bublbobl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
 	MCFG_CPU_PROGRAM_MAP(tokio_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 
 	MCFG_CPU_ADD("slave", Z80, MAIN_XTAL/4) // 6 MHz
 	MCFG_CPU_PROGRAM_MAP(tokio_slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_MACHINE_START_OVERRIDE(bublbobl_state,tokio)
-	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state,tokio)
+	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, tokio)
+	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, tokio)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -825,25 +825,25 @@ MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	// IRQs are triggered by the MCU
 
 	MCFG_CPU_ADD("slave", Z80, MAIN_XTAL/4) // 6 MHz
 	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
 
-	MCFG_CPU_ADD("mcu", M6801, 4000000) // actually 6801U4  // xtal is 4MHz, divided by 4 internally
+	MCFG_CPU_ADD("mcu", M6801, XTAL_4MHz) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state,  irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_MACHINE_START_OVERRIDE(bublbobl_state,bublbobl)
-	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state,bublbobl)
+	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, bublbobl)
+	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, bublbobl)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -884,12 +884,13 @@ MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 
 static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
 
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state,  irq0_line_hold)   // interrupt mode 1, unlike Bubble Bobble
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold) // interrupt mode 1, unlike Bubble Bobble
 
-	MCFG_MACHINE_START_OVERRIDE(bublbobl_state,boblbobl)
-	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state,boblbobl)
+	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, boblbobl)
+	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, boblbobl)
 
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
@@ -924,9 +925,11 @@ MACHINE_RESET_MEMBER(bublbobl_state,bub68705)
 }
 
 static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
+
+	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("mcu")
 
-	MCFG_CPU_ADD("mcu", M68705, 4000000)    // xtal is 4MHz, divided by 4 internally
+	MCFG_CPU_ADD("mcu", M68705, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
 	MCFG_CPU_PROGRAM_MAP(bootlegmcu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
 
@@ -943,12 +946,12 @@ MACHINE_CONFIG_END
  *************************************/
 ROM_START( tokio ) // newer japan set, has -1 revision of roms 02, 03 and 06
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* main CPU */
-	ROM_LOAD( "a71-02-1.ic4", 0x00000, 0x8000, CRC(BB8DABD7) SHA1(141E9F0C19BCF316477681369E2D98DFFDD8435D) )
+	ROM_LOAD( "a71-02-1.ic4", 0x00000, 0x8000, CRC(bb8dabd7) SHA1(141e9f0c19bcf316477681369e2d98dffdd8435d) )
 	/* ROMs banked at 8000-bfff */
-	ROM_LOAD( "a71-03-1.ic5", 0x10000, 0x8000, CRC(EE49B383) SHA1(D510A1D168542DF6A87C7D7C67A47CF776A51F29) )
+	ROM_LOAD( "a71-03-1.ic5", 0x10000, 0x8000, CRC(ee49b383) SHA1(d510a1d168542df6a87c7d7c67a47cf776a51f29) )
 	ROM_LOAD( "a71-04.ic6",   0x18000, 0x8000, CRC(a0a4ce0e) SHA1(c49bdcd85c760a5e7327d1b424772e1560f1a318) )
 	ROM_LOAD( "a71-05.ic7",   0x20000, 0x8000, CRC(6da0b945) SHA1(6c80b8333dd95657f99e6ba5b6e877733ac02a8c) )
-	ROM_LOAD( "a71-06-1.ic8", 0x28000, 0x8000, CRC(56927B3F) SHA1(33FB4E71B95664ECFF1F35F6782A14101982A56D) )
+	ROM_LOAD( "a71-06-1.ic8", 0x28000, 0x8000, CRC(56927b3f) SHA1(33fb4e71b95664ecff1f35f6782a14101982a56d) )
 
 	ROM_REGION( 0x10000, "slave", 0 )   /* video CPU */
 	ROM_LOAD( "a71-01.ic1",   0x00000, 0x8000, CRC(0867c707) SHA1(7129974f1252b28e9e338bd3c7fcb87210dcf412) )

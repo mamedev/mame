@@ -846,9 +846,11 @@ $(MESSOBJ)/isa.a: \
 	$(MESS_MACHINE)/isa_ssi2001.o   \
 	$(MESS_MACHINE)/isa_ide.o   \
 	$(MESS_MACHINE)/isa_xtide.o   \
+	$(MESS_MACHINE)/isa_side116.o	\
 	$(MESS_MACHINE)/isa_aha1542.o   \
 	$(MESS_MACHINE)/isa_wd1002a_wx1.o\
 	$(MESS_MACHINE)/isa_dectalk.o \
+	$(MESS_MACHINE)/isa_pds.o \
 	$(MESS_VIDEO)/isa_cga.o     \
 	$(MESS_VIDEO)/isa_svga_cirrus.o \
 	$(MESS_VIDEO)/isa_ega.o     \
@@ -1745,6 +1747,7 @@ $(MESSOBJ)/robotron.a:          \
 $(MESSOBJ)/roland.a:            \
 	$(MESS_DRIVERS)/rmt32.o     \
 	$(MESS_DRIVERS)/rd110.o     \
+	$(MESS_DRIVERS)/rsc55.o     \
 
 $(MESSOBJ)/rockwell.a:          \
 	$(MESS_MACHINE)/aim65.o     \
@@ -2247,6 +2250,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/ms0515.o    \
 	$(MESS_DRIVERS)/ms9540.o    \
 	$(MESS_DRIVERS)/mstation.o  \
+	$(MESS_DRIVERS)/mx2178.o    \
 	$(MESS_DRIVERS)/mycom.o     \
 	$(MESS_DRIVERS)/myvision.o  \
 	$(MESS_DRIVERS)/octopus.o   \
@@ -2329,6 +2333,9 @@ $(MESS_VIDEO)/apple2.o:     $(MESSSRC)/includes/apple2.h
 $(MESS_DRIVERS)/apple2gs.o: $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
 $(MESS_MACHINE)/apple2gs.o: $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
 $(MESS_VIDEO)/apple2gs.o:   $(MESSSRC)/includes/apple2.h $(MESSSRC)/includes/apple2gs.h
+$(MESS_DRIVERS)/apple3.o:   $(MESSSRC)/includes/apple3.h
+$(MESS_MACHINE)/apple3.o:   $(MESSSRC)/includes/apple3.h
+$(MESS_VIDEO)/apple3.o:     $(MESSSRC)/includes/apple3.h
 
 
 # $(MESSSRC)/drivers/apollo.c includes m68kcpu.h and m68kcpu.h now includes m68kops.h

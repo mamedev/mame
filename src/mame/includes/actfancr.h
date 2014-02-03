@@ -1,4 +1,5 @@
 #include "video/decbac06.h"
+#include "video/decmxc06.h"
 
 /*************************************************************************
 
@@ -15,7 +16,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tilegen1(*this, "tilegen1"),
-		m_tilegen2(*this, "tilegen2") { }
+		m_tilegen2(*this, "tilegen2"),
+		m_spritegen(*this, "spritegen") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_main_ram;
@@ -32,6 +34,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco_bac06_device> m_tilegen1;
 	required_device<deco_bac06_device> m_tilegen2;
+	required_device<deco_mxc06_device> m_spritegen;
 	DECLARE_WRITE8_MEMBER(triothep_control_select_w);
 	DECLARE_READ8_MEMBER(triothep_control_r);
 	DECLARE_WRITE8_MEMBER(actfancr_sound_w);

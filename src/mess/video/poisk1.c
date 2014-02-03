@@ -43,7 +43,7 @@ READ8_MEMBER(p1_state::p1_trap_r)
 	UINT8 data = m_video.trap[offset];
 	DBG_LOG(1,"trap",("R %.2x $%02x\n", 0x28+offset, data));
 	if (offset == 0)
-		space.machine().firstcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return data;
 }
 
@@ -54,7 +54,7 @@ WRITE8_MEMBER(p1_state::p1_trap_w)
 
 READ8_MEMBER(p1_state::p1_cga_r)
 {
-	space.machine().firstcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	return 0;
 }
 
@@ -66,7 +66,7 @@ WRITE8_MEMBER(p1_state::p1_cga_w)
 	m_video.trap[2] = data;
 	m_video.trap[1] = 0xC0 | ((port >> 8) & 0x3f);
 	m_video.trap[0] = port & 255;
-	space.machine().firstcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(p1_state::p1_vram_w)
@@ -77,7 +77,7 @@ WRITE8_MEMBER(p1_state::p1_vram_w)
 	m_video.trap[2] = data;
 	m_video.trap[1] = 0x80 | ((offset >> 8) & 0x3f);
 	m_video.trap[0] = offset & 255;
-	space.machine().firstcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 // CGA emulator
@@ -92,7 +92,7 @@ WRITE8_MEMBER(p1_state::p1_vram_w)
 
 WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 {
-	address_space &space_prg = machine().firstcpu->space(AS_PROGRAM);
+	address_space &space_prg = m_maincpu->space(AS_PROGRAM);
 	rectangle visarea;
 
 	DBG_LOG(1,"color_select_68",("W $%02x\n", data));
@@ -283,7 +283,7 @@ void p1_state::palette_init()
 
 void p1_state::video_start()
 {
-	address_space &space = machine().firstcpu->space( AS_PROGRAM );
+	address_space &space = m_maincpu->space( AS_PROGRAM );
 
 	DBG_LOG(0,"init",("video_start()\n"));
 

@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
 	AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
 #if ENABLE_UART_PRINTING
-	AM_RANGE(0x00301400, 0x00301403) AM_READ_LEGACY(uart_loopback_enable)
+	AM_RANGE(0x00301400, 0x00301403) AM_DEVREAD("scc68070", cdi68070_device, uart_loopback_enable)
 #endif
 	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
 	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)

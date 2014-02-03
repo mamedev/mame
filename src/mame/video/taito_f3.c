@@ -206,7 +206,7 @@ Playfield tile info:
 
 #include "emu.h"
 #include "includes/taito_f3.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 #define VERBOSE 0
 #define DARIUSG_KLUDGE
@@ -397,7 +397,7 @@ static void print_debug_info(running_machine &machine, bitmap_rgb32 &bitmap)
 	l[3]=f3_line_ram[0x15e0*2]&0xffff;
 	bufptr += sprintf(bufptr,"5000: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	ui_draw_text(&machine.render().ui_container(), buf, 60, 40);
+	machine.ui().draw_text(&machine.render().ui_container(), buf, 60, 40);
 }
 
 /******************************************************************************/

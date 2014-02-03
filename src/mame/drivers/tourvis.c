@@ -14,23 +14,35 @@
 
     Known games:
 
-    Special Criminal Investigation
-    Power League IV
+    Aero Blaster (label shows "Vol. 33")
+    After Burner
+    Bonk
+    Columns
+    Cyber Core
+    Dead Moon
+    Doraemon Meikyuu Daisakusen
+    Down Load
+    Dungeon Explorer
+    Final Lap
     Final Match Tennis
     Formation Soccer
-    Super Volley ball
-    Rastan Saga II
-    Dungeon Explorer
     Legendary Axe
-    Thunder Blade
-    USA Pro Basketball
+    Mr. Heli
     Out Run
-    After Burner
-    Final Lap
-    Columns
+    Power Eleven
+    Power League IV
     Power Sports
+    Puzzle Boy
+    Rastan Saga II
     Saigo no Nindou
     Son Son II
+    Special Criminal Investigation
+    Super Star Soldier (label shows "Vol. 30")
+    Super Volley ball
+    Thunder Blade
+    USA Pro Basketball
+    Vigilante
+    Volfied
 
  _______________________________________________________________________________________________________________________________________________
 |                                                                                                                                               |
@@ -389,17 +401,19 @@ MACHINE_CONFIG_END
 #define TOURVISION_BIOS \
 	ROM_REGION( 0x8000, "subcpu", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "60", "U4-60" ) \
-	ROMX_LOAD( "u4-60_am27c256.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(1) ) \
+	ROMX_LOAD( "u4-60.ic29", 0x0000, 0x8000, CRC(1fd27e22) SHA1(b103d365eac3fa447c2e9addddf6974b4403ed41), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS( 1, "55", "U4-55" ) \
-	ROMX_LOAD( "u4-55_am27c256.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
+	ROMX_LOAD( "u4-55.ic29", 0x0000, 0x8000, CRC(87cf66c1) SHA1(d6b42137be7a07a0e299c2d922328a6a9a2b7b8f), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 2, "52", "U4-52" ) \
-	ROMX_LOAD( "bios.29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) )
+	ROMX_LOAD( "u4-52.ic29", 0x0000, 0x8000, CRC(ffd7b0fe) SHA1(d1804865c91e925a01b05cf441e8458a3db23f50), ROM_BIOS(3) ) \
+	ROM_SYSTEM_BIOS( 3, "43", "U4-43" ) \
+	ROMX_LOAD( "u4-43.ic29", 0x0000, 0x8000, CRC(88da23f3) SHA1(9d24faa116129783e55c7f79a4a08902a236d5a6), ROM_BIOS(4) )
 
 
 ROM_START(tourvis)
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 
-	TOURVISION_BIOS
+	TOURVISION_BIOS /* BIOS rom type is 27C256 */
 ROM_END
 
 

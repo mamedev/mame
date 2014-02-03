@@ -11,7 +11,7 @@ _________________________________________________________________
         Math                    built-in                yes
         Patterns                built-in                yes
 18V400  Space War               TV Arcade I             yes
-18V401  Fun with Numbers        TV Arcade II            no, but Guru has one
+18V401  Fun with Numbers        TV Arcade II            yes
 18V402  Tennis/Squash           TV Arcade III           yes
 18V403  Baseball                TV Arcade IV            yes
 18V404  Speedway/Tag            TV Arcade               yes
@@ -56,6 +56,20 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
 				<rom name="spacewar.bin" size="0x200" crc="021551f2" sha1="4878ae6d313743d7e3bd45e05c6e5e0582d9febb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="funwnum">
+		<description>TV Arcade II: Fun with Numbers</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="serial" value="18V401" />
+		<info name="usage" value="Press 'Clear' and then '1' on Keypad A" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x200">
+				<rom name="fun-with-numbers.bin" size="0x200" crc="26ebe344" sha1="ede8731283d49666ddb63c1a52d6d270973d6dc8" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -38,10 +38,6 @@
 #define MCFG_VIA6522_WRITEPB_HANDLER(_devcb) \
 	devcb = &via6522_device::set_writepb_handler(*device, DEVCB2_##_devcb);
 
-// NOT USED
-#define MCFG_VIA6522_CA1_HANDLER(_devcb) \
-	devcb = &via6522_device::set_ca1_handler(*device, DEVCB2_##_devcb);
-
 #define MCFG_VIA6522_CA2_HANDLER(_devcb) \
 	devcb = &via6522_device::set_ca2_handler(*device, DEVCB2_##_devcb);
 
@@ -76,7 +72,6 @@ public:
 	template<class _Object> static devcb2_base &set_writepa_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_a_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_writepb_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_out_b_handler.set_callback(object); }
 
-	template<class _Object> static devcb2_base &set_ca1_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_ca1_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_ca2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_ca2_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cb1_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb1_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cb2_handler(device_t &device, _Object object) { return downcast<via6522_device &>(device).m_cb2_handler.set_callback(object); }
@@ -141,12 +136,18 @@ private:
 
 	UINT16 get_counter1_value();
 
-	inline void set_irq_line(int state);
 	void set_int(int data);
 	void clear_int(int data);
-	void shift();
+	void shift_out();
+	void shift_in();
 	void write_pa(int line, int state);
 	void write_pb(int line, int state);
+
+	UINT8 input_pa();
+	void output_pa();
+	UINT8 input_pb();
+	void output_pb();
+	void output_irq();
 
 	// TODO: REMOVE THESE
 	devcb2_read8 m_in_a_handler;
@@ -156,25 +157,27 @@ private:
 	devcb2_write8 m_out_a_handler;
 	devcb2_write8 m_out_b_handler;
 
-	devcb2_write_line m_ca1_handler;
 	devcb2_write_line m_ca2_handler;
 	devcb2_write_line m_cb1_handler;
 	devcb2_write_line m_cb2_handler;
 	devcb2_write_line m_irq_handler;
 
 	UINT8 m_in_a;
-	UINT8 m_in_ca1;
-	UINT8 m_in_ca2;
+	int m_in_ca1;
+	int m_in_ca2;
 	UINT8 m_out_a;
-	UINT8 m_out_ca2;
+	int m_out_ca2;
 	UINT8 m_ddr_a;
+	UINT8 m_latch_a;
 
 	UINT8 m_in_b;
-	UINT8 m_in_cb1;
-	UINT8 m_in_cb2;
+	int m_in_cb1;
+	int m_in_cb2;
 	UINT8 m_out_b;
-	UINT8 m_out_cb2;
+	int m_out_cb1;
+	int m_out_cb2;
 	UINT8 m_ddr_b;
+	UINT8 m_latch_b;
 
 	UINT8 m_t1cl;
 	UINT8 m_t1ch;
@@ -190,11 +193,11 @@ private:
 	UINT8 m_acr;
 	UINT8 m_ier;
 	UINT8 m_ifr;
-	int m_irq;
 
 	emu_timer *m_t1;
 	attotime m_time1;
 	UINT8 m_t1_active;
+	int m_t1_pb7;
 	emu_timer *m_t2;
 	attotime m_time2;
 	UINT8 m_t2_active;

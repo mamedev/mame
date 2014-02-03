@@ -53,4 +53,11 @@
 
 NETLIB_SIGNAL(7430, 8, 0, 0);
 
+#define TTL_7430_DIP(_name)                                                         \
+        NET_REGISTER_DEV(7430_dip, _name)
+
+NETLIB_DEVICE(7430_dip,
+
+    NETLIB_NAME(7430) m_1;
+);
 #endif /* NLD_7430_H_ */

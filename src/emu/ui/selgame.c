@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    selgame.c
+    ui/selgame.c
 
     Game selector
 
@@ -9,8 +9,15 @@
 
 ***************************************************************************/
 
-#include "selgame.h"
+#include "emu.h"
+#include "osdnet.h"
+#include "emuopts.h"
+#include "ui/ui.h"
+#include "rendutil.h"
+#include "cheat.h"
 #include "uiinput.h"
+#include "ui/filemngr.h"
+#include "ui/selgame.h"
 #include "ui/miscmenu.h"
 #include "ui/emenubar.h"
 #include "audit.h"
@@ -22,9 +29,11 @@
 
 ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container)
 {
+	m_driverlist = global_alloc_array(const game_driver *, driver_list::total()+1);
 	build_driver_list();
 	if(gamename)
-		strcpy(search, gamename);
+		strcpy(m_search, gamename);
+	m_matchlist[0] = -1;
 }
 
 
@@ -34,7 +43,8 @@ ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_contai
 
 ui_menu_select_game::~ui_menu_select_game()
 {
-	global_free(driver_list);
+	global_free(m_drivlist);
+	global_free(m_driverlist);
 }
 
 
@@ -46,8 +56,8 @@ ui_menu_select_game::~ui_menu_select_game()
 void ui_menu_select_game::build_driver_list()
 {
 	// start with an empty list
-	driver_enumerator drivlist(machine().options());
-	drivlist.exclude_all();
+	m_drivlist = global_alloc(driver_enumerator(machine().options()));
+	m_drivlist->exclude_all();
 
 	// open a path to the ROMs and find them in the array
 	file_enumerator path(machine().options().media_path());
@@ -65,41 +75,19 @@ void ui_menu_select_game::build_driver_list()
 			*dst++ = tolower((UINT8)*src);
 		*dst = 0;
 
-		int drivnum = drivlist.find(drivername);
+		int drivnum = m_drivlist->find(drivername);
 		if (drivnum != -1)
-			drivlist.include(drivnum);
+			m_drivlist->include(drivnum);
 	}
 
 	// now build the final list
-	drivlist.reset();
-
-	driver_count = 0;
-	driver_list = global_alloc_array(const game_driver *, driver_list::total()+1);
-	while (drivlist.next())
-	{
-		const game_driver *drv = &drivlist.driver();
-		if (!(drv->flags & GAME_NO_STANDALONE))
-			driver_list[driver_count++] = drv;
-	}
-
-	// sort
-	qsort(driver_list, driver_count, sizeof(driver_list[0]), driver_list_compare);
+	m_drivlist->reset();
+	int listnum = 0;
+	while (m_drivlist->next())
+		m_driverlist[listnum++] = &m_drivlist->driver();
 
 	// NULL-terminate
-	driver_list[driver_count] = NULL;
-}
-
-
-//-------------------------------------------------
-//  driver_list_compare - qsort callback for
-//	alphebetizing driver lists
-//-------------------------------------------------
-
-int ui_menu_select_game::driver_list_compare(const void *p1, const void *p2)
-{
-	const game_driver *d1 = *((const game_driver **) p1); 
-	const game_driver *d2 = *((const game_driver **) p2);
-	return core_stricmp(d1->name, d2->name);
+	m_driverlist[listnum] = NULL;
 }
 
 
@@ -151,11 +139,11 @@ void ui_menu_select_game::handle()
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
 		// reset the error on any future menu_event
-		if (error)
-			error = false;
+		if (m_error)
+			m_error = false;
 
 		// handle selections
-		else
+		else 
 		{
 			switch(menu_event->iptkey)
 			{
@@ -168,19 +156,16 @@ void ui_menu_select_game::handle()
 				case IPT_SPECIAL:
 					inkey_special(menu_event);
 					break;
-				case IPT_UI_CONFIGURE:
-					inkey_configure(menu_event);
-					break;
 			}
 		}
 	}
 
 	// if we're in an error state, overlay an error message
-	if (error)
-		draw_text_box(
-			"The selected game is missing one or more required ROM or CHD images. "
-			"Please select a different game.\n\nPress any key to continue.",
-			JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	if (m_error)
+		machine().ui().draw_text_box(container,
+							"The selected game is missing one or more required ROM or CHD images. "
+							"Please select a different game.\n\nPress any key to continue.",
+							JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 }
 
 
@@ -216,8 +201,50 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 		else
 		{
 			reset(UI_MENU_RESET_REMEMBER_REF);
-			error = true;
+			m_error = true;
 		}
+	}
+}
+
+
+//-------------------------------------------------
+//  inkey_cancel
+//-------------------------------------------------
+
+void ui_menu_select_game::inkey_cancel(const ui_menu_event *menu_event)
+{
+	// escape pressed with non-empty text clears the text
+	if (m_search[0] != 0)
+	{
+		// since we have already been popped, we must recreate ourself from scratch
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, NULL)));
+	}
+}
+
+
+//-------------------------------------------------
+//  inkey_special - typed characters append to the buffer
+//-------------------------------------------------
+
+void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
+{
+	// typed characters append to the buffer
+	int buflen = strlen(m_search);
+
+	// if it's a backspace and we can handle it, do so
+	if ((menu_event->unichar == 8 || menu_event->unichar == 0x7f) && buflen > 0)
+	{
+		*(char *)utf8_previous_char(&m_search[buflen]) = 0;
+		m_rerandomize = true;
+		reset(UI_MENU_RESET_SELECT_FIRST);
+	}
+
+	// if it's any other key and we're not maxed out, update
+	else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
+	{
+		buflen += utf8_from_uchar(&m_search[buflen], ARRAY_LENGTH(m_search) - buflen, menu_event->unichar);
+		m_search[buflen] = 0;
+		reset(UI_MENU_RESET_SELECT_FIRST);
 	}
 }
 
@@ -253,12 +280,21 @@ void ui_menu_select_game::inkey_special(const ui_menu_event *menu_event)
 		select_searched_item();
 	}
 
-	// if it's any other key and we're not maxed out, update
-	else if (menu_event->unichar >= ' ' && menu_event->unichar < 0x7f)
+	// otherwise, rebuild the match list
+	assert(m_drivlist != NULL);
+	if (m_search[0] != 0 || m_matchlist[0] == -1 || m_rerandomize)
+		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
+	m_rerandomize = false;
+
+	// iterate over entries
+	for (curitem = 0; curitem < matchcount; curitem++)
 	{
-		buflen += utf8_from_uchar(&search[buflen], ARRAY_LENGTH(search) - buflen, menu_event->unichar);
-		search[buflen] = 0;
-		select_searched_item();
+		int curmatch = m_matchlist[curitem];
+		if (curmatch != -1)
+		{
+			int cloneof = m_drivlist->non_bios_clone(curmatch);
+			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
+		}
 	}
 }
 
@@ -294,8 +330,9 @@ void ui_menu_select_game::select_searched_item()
 			first = last = middle;
 	}
 
-	// and set the selection
-	set_selection((void *) driver_list[first]);
+	// configure the custom rendering
+	customtop = machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = 4.0f * machine().ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
 
 
@@ -313,13 +350,13 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	int line;
 
 	// display the current typeahead
-	if (search[0] != 0)
-		tempbuf[0].printf("Type name or select: %s_", search);
+	if (m_search[0] != 0)
+		tempbuf[0].printf("Type name or select: %s_", m_search);
 	else
 		tempbuf[0].printf("Type name or select: (random)");
 
 	// get the size of the text
-	draw_text(tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
@@ -331,7 +368,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	y2 = origy1 - UI_BOX_TB_BORDER;
 
 	// draw a box
-	ui_draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -340,7 +377,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	y2 -= UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	draw_text(tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	// determine the text to render below
@@ -410,7 +447,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	maxwidth = origx2 - origx1;
 	for (line = 0; line < 4; line++)
 	{
-		ui_draw_text_full(container, tempbuf[line], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		machine().ui().draw_text_full(container, tempbuf[line], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 							DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
@@ -430,7 +467,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		color = UI_YELLOW_COLOR;
 	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
 		color = UI_RED_COLOR;
-	draw_outlined_box(x1, y1, x2, y2, color);
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, color);
 
 	// take off the borders
 	x1 += UI_BOX_LR_BORDER;
@@ -441,9 +478,9 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	// draw all lines
 	for (line = 0; line < 4; line++)
 	{
-		ui_draw_text_full(container, tempbuf[line], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		machine().ui().draw_text_full(container, tempbuf[line], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 							DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
-		y1 += ui_get_line_height(machine());
+		y1 += machine().ui().get_line_height();
 	}
 }
 
@@ -467,10 +504,8 @@ void ui_menu_select_game::force_game_select(running_machine &machine, render_con
 	ui_menu::stack_push(auto_alloc_clear(machine, ui_menu_select_game(machine, container, gamename)));
 
 	// force the menus on
-	ui_show_menu();
+	machine.ui().show_menu();
 
 	// make sure MAME is paused
 	machine.pause();
 }
-
-

@@ -9,18 +9,18 @@
 NETLIST_START(bjt)
     /* Standard stuff */
 
-    NETDEV_CLOCK(clk)
-    NETDEV_PARAM(clk.FREQ, 1000) // 1000 Hz
-    NETDEV_SOLVER(Solver)
-    NETDEV_PARAM(Solver.FREQ, 48000)
-    NETDEV_ANALOG_INPUT(V5, 5)
-    NETDEV_ANALOG_INPUT(V3, 3.5)
+    CLOCK(clk)
+    PARAM(clk.FREQ, 1000) // 1000 Hz
+    SOLVER(Solver)
+    PARAM(Solver.FREQ, 48000)
+    ANALOG_INPUT(V5, 5)
+    ANALOG_INPUT(V3, 3.5)
 
     /* NPN - example */
 
-    NETDEV_QJT_SW(Q, "BC237B")
-    NETDEV_R(RB, 1000)
-    NETDEV_R(RC, 1000)
+    QBJT_SW(Q, "BC237B")
+    RES(RB, 1000)
+    RES(RC, 1000)
 
     NET_C(RC.1, V5)
     NET_C(RC.2, Q.C)
@@ -30,9 +30,9 @@ NETLIST_START(bjt)
 
     /* PNP - example */
 
-    NETDEV_QPNP(Q1, "BC556B")
-    NETDEV_R(RB1, 1000)
-    NETDEV_R(RC1, 1000)
+    QBJT_SW(Q1, "BC556B")
+    RES(RB1, 1000)
+    RES(RC1, 1000)
 
     NET_C(RC1.1, GND)
     NET_C(RC1.2, Q1.C)
@@ -40,7 +40,7 @@ NETLIST_START(bjt)
     NET_C(RB1.2, Q1.B)
     NET_C(Q1.E, V3)
 
-    //NETDEV_LOG(logB, Q1.B)
-    //NETDEV_LOG(logC, Q1.C)
+    LOG(logB, Q.B)
+    LOG(logC, Q.C)
 
 NETLIST_END()

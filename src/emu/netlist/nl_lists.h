@@ -102,6 +102,16 @@ public:
 		return false;
 	}
 
+    ATTR_HOT inline int indexof(const _ListClass &elem) const
+    {
+        for (int i = 0; i < m_count; i++)
+        {
+            if (m_list[i] == elem)
+                return i;
+        }
+        return -1;
+    }
+
 	ATTR_HOT inline const _ListClass *first() const { return ((m_count > 0) ? &m_list[0] : NULL ); }
 	ATTR_HOT inline const _ListClass *next(const _ListClass *lc) const { return ((lc < last()) ? lc + 1 : NULL ); }
 	ATTR_HOT inline const _ListClass *last() const { return &m_list[m_count -1]; }
@@ -165,26 +175,15 @@ public:
 
 	ATTR_HOT ATTR_ALIGN void push(const entry_t &e)
 	{
-#if 0
-	    // less is more
-	    if (is_empty() || (e.time() <= (m_end - 1)->time()))
-		{
-			*m_end++ = e;
-			inc_stat(m_prof_end);
-		}
-		else
-#endif
-		{
-			entry_t * RESTRICT i = m_end++;
-			while ((i > &m_list[0]) && (e.time() > (i - 1)->time()) )
-			{
-			    i--;
-				*(i+1) = *i;
-				inc_stat(m_prof_sortmove);
-			}
-			*i = e;
-			inc_stat(m_prof_sort);
-		}
+        entry_t * RESTRICT i = m_end++;
+        while ((i > &m_list[0]) && (e.time() > (i - 1)->time()) )
+        {
+            i--;
+            *(i+1) = *i;
+            inc_stat(m_prof_sortmove);
+        }
+        *i = e;
+        inc_stat(m_prof_sort);
 		assert(m_end - m_list < _Size);
 	}
 

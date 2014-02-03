@@ -11,10 +11,10 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "drivenum.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "zippath.h"
-#include "uiimage.h"
-#include "uiswlist.h"
+#include "ui/filesel.h"
+#include "ui/swlist.h"
 
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE
@@ -300,7 +300,7 @@ void device_image_interface::message(const char *format, ...)
 	va_end(args);
 
 	/* display the popup for a standard amount of time */
-	ui_popup_time(5, "%s: %s",
+	device().machine().ui().popup_time(5, "%s: %s",
 		basename(),
 		buffer);
 }
@@ -1275,7 +1275,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 
 		case ENTTYPE_DIR:
 			/* a directory exists here - we can't save over it */
-			ui_popup_time(5, "Cannot save over directory");
+			machine().ui().popup_time(5, "Cannot save over directory");
 			can_create = false;
 			need_confirm = false;
 			break;

@@ -21,7 +21,7 @@
 #define NET_MODEL(_model)                                                           \
 	netlist.register_model(_model);
 
-#define NET_ALIAS(_alias, _name)                                                    \
+#define ALIAS(_alias, _name)                                                        \
 	netlist.register_alias(# _alias, # _name);
 
 #define NET_NEW(_type)  netlist.factory().new_device_by_classname(NETLIB_NAME_STR(_type), netlist)
@@ -41,7 +41,7 @@
 #define NET_C(_input, _output)                                                      \
 		netlist.register_link(NET_STR(_input) , NET_STR(_output));
 
-#define NETDEV_PARAM(_name, _val)                                                   \
+#define PARAM(_name, _val)                                                          \
 		netlist.register_param(# _name, _val);
 
 #define NETDEV_PARAMI(_name, _param, _val)                                          \

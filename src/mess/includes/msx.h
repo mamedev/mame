@@ -138,7 +138,7 @@ public:
 	void msx_ch_reset_core ();
 	void msx_memory_reset ();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	optional_device<v9938_device> m_v9938;
 	optional_device<v9958_device> m_v9958;
 	required_device<cassette_image_device> m_cassette;

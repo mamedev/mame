@@ -56,8 +56,7 @@ static const nes_mmc mmc_list[] =
 	{ 24, KONAMI_VRC6 },
 	{ 25, KONAMI_VRC4 },
 	{ 26, KONAMI_VRC6 },
-	{ 27, UNL_WORLDHERO },
-	// 27 World Hero board - Unsupported
+	{ 27, UNL_WORLDHERO },	// 27 World Hero board - Unsupported
 	// 28 Unused
 	// 29 Unused
 	// 30 Unused
@@ -133,8 +132,7 @@ static const nes_mmc mmc_list[] =
 	// 100 images hacked to work with nesticle?
 	// 101 Unused (Urusei Yatsura had been assigned to this mapper, but it's Mapper 87)
 	// 102 Unused
-	{ 103, UNL_2708 },
-	// 103 Bootleg cart 2708 (Doki Doki Panic - FDS Conversion) - Unsupported
+	{ 103, UNL_2708 },	// 103 Bootleg cart 2708 (Doki Doki Panic - FDS Conversion) - Unsupported
 	{ 104, CAMERICA_GOLDENFIVE },
 	{ 105, STD_EVENT },
 	{ 106, BTL_SMB3 },
@@ -193,7 +191,7 @@ static const nes_mmc mmc_list[] =
 	{ 159, BANDAI_LZ93EX1 }, // with 24c01
 	{ 160, SACHEN_SA009 },
 	// 161 Unused
-	// 162 Unused
+	{ 162, WAIXING_FS304},	// not confirmed, but a lot of chinese releases use it like this...
 	{ 163, NANJING_BOARD},
 	{ 164, WAIXING_FFV },
 	{ 165, WAIXING_SH2 },
@@ -249,7 +247,7 @@ static const nes_mmc mmc_list[] =
 	{ 215, SUPERGAME_BOOGERMAN },
 	{ 216, RCM_GS2015 },
 	{ 217, BMC_GOLDENCARD_6IN1 },
-	// 218 Unused
+	{ 218, NOCASH_NOCHR },
 	// 219 UNL-A9746 (according to Cah4e3's code, no dump available (yet)
 	// 220 Unused
 	{ 221, UNL_N625092 },
@@ -266,8 +264,7 @@ static const nes_mmc mmc_list[] =
 	{ 232, CAMERICA_BF9096 },
 	{ 233, BMC_SUPER22 },
 	{ 234, AVE_MAXI15 },
-	{ 235, BMC_GOLD150 },
-	// 235 Golden Game x-in-1 - Unsupported
+	{ 235, BMC_GOLD150 },	// 235 Golden Game x-in-1 - Unsupported
 	// 236 Game 800-in-1 - Unsupported
 	// 237 Unused
 	{ 238, UNL_603_5052 },
@@ -446,6 +443,35 @@ void nes_cart_slot_device::call_load_ines()
 	// a few mappers correspond to multiple PCBs, so we need a few additional checks and tweaks
 	switch (m_pcb_id)
 	{
+		case STD_NROM:
+			if (prg_size == 3 * 0x4000)	// NROM368 are padded with 2k empty data at start to accomplish with iNES standard
+			{
+				m_pcb_id = STD_NROM368;
+				fseek(0x810, SEEK_SET);
+				prg_size = 0xb800;
+			}
+			break;
+
+		case NOCASH_NOCHR:
+			// this mapper uses mirroring flags differently
+			m_cart->set_four_screen_vram(FALSE);
+			switch (local_options & 0x09)
+			{
+				case 0x00:
+					m_cart->set_mirroring(PPU_MIRROR_HORZ);
+					break;
+				case 0x01:
+					m_cart->set_mirroring(PPU_MIRROR_VERT);
+					break;
+				case 0x08:
+					m_cart->set_mirroring(PPU_MIRROR_LOW);
+					break;
+				case 0x09:
+					m_cart->set_mirroring(PPU_MIRROR_HIGH);
+					break;
+			}
+			break;
+
 		case STD_CNROM:
 			if (mapper == 185)
 			{
@@ -751,39 +777,44 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 	// solve mapper conflicts
 	switch (pcb_id)
 	{
+		case STD_NROM:
+			if (ROM[4] == 3)
+				pcb_id = STD_NROM368;
+			break;
+
 		case KONAMI_VRC2:
 			if (mapper == 23 && crc_hack)
-				m_pcb_id = KONAMI_VRC4; // this allows for konami_irq to be installed at reset
+				pcb_id = KONAMI_VRC4; // this allows for konami_irq to be installed at reset
 			break;
 
 		case STD_BXROM:
 			if (crc_hack)
-				m_pcb_id = AVE_NINA01; // Mapper 34 is used for 2 diff boards
+				pcb_id = AVE_NINA01; // Mapper 34 is used for 2 diff boards
 			break;
 
 		case BANDAI_LZ93:
 			if (crc_hack)
-				m_pcb_id = BANDAI_FJUMP2;   // Mapper 153 is used for 2 diff boards
+				pcb_id = BANDAI_FJUMP2;   // Mapper 153 is used for 2 diff boards
 			break;
 
 		case IREM_HOLYDIVR:
 			if (crc_hack)
-				m_pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
+				pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
 			break;
 
 		case WAIXING_WXZS:
 			if (crc_hack)
-				m_pcb_id = WAIXING_DQ8;    // Mapper 242 is used for 2 diff boards
+				pcb_id = WAIXING_DQ8;    // Mapper 242 is used for 2 diff boards
 			break;
 
 		case BMC_GOLD_7IN1:
 			if (crc_hack)
-				m_pcb_id = BMC_MARIOPARTY_7IN1;    // Mapper 52 is used for 2 diff boards
+				pcb_id = BMC_MARIOPARTY_7IN1;    // Mapper 52 is used for 2 diff boards
 			break;
 
 		case BTL_MARIOBABY:
 			if (crc_hack)
-				m_pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
+				pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
 			break;
 	}
 

@@ -157,10 +157,8 @@ ROM sockets:  UA3   2K or 4K character
 
 
 
-static void cbm_pet_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )
+static void cbm_pet_quick_sethiaddress( address_space &space, UINT16 hiaddress )
 {
-	address_space &space = machine.firstcpu->space(AS_PROGRAM);
-
 	space.write_byte(0x2e, hiaddress & 0xff);
 	space.write_byte(0x2c, hiaddress & 0xff);
 	space.write_byte(0x2a, hiaddress & 0xff);
@@ -1391,7 +1389,6 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_VIA6522_READPB_HANDLER(READ8(pet_state, via_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(pet_state, via_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(pet_state, via_pb_w))
-	MCFG_VIA6522_CA1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(pet_state, via_ca2_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(pet_state, via_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(pet_state, via_irq_w))
@@ -1708,7 +1705,6 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_VIA6522_READPB_HANDLER(READ8(pet_state, via_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(pet_state, via_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(pet_state, via_pb_w))
-	MCFG_VIA6522_CA1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(pet_state, via_ca2_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(pet_state, via_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(pet_state, via_irq_w))

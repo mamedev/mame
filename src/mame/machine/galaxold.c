@@ -13,16 +13,7 @@
 
 IRQ_CALLBACK_MEMBER(galaxold_state::hunchbkg_irq_callback)
 {
-	//galaxold_state *state = device->machine().driver_data<galaxold_state>();
-	/* for some reason a call to cputag_set_input_line
-	 * is significantly delayed ....
-	 *
-	 * state->m_maincpu->set_input_line(0, CLEAR_LINE);
-	 *
-	 * Therefore we reset the line without any detour ....
-	 */
-	device.machine().firstcpu->set_input_line(0, CLEAR_LINE);
-	//cpu_set_info(device->machine().firstcpu, CPUINFO_INT_INPUT_STATE + state->m_irq_line, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x03;
 }
 

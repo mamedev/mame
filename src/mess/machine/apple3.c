@@ -10,7 +10,17 @@
 
     VIA #1 (E VIA)
         CA2:    1 if key pressed, 0 otherwise
-
+ 
+    m_via_0_a: Environment register
+    	bit 7: 1 for 1 MHz, 0 for 2 MHz
+    	bit 6: 1 for I/O at C000-CFFF
+    	bit 5: 1 to enable video 
+    	bit 4: 1 to enable NMI/Reset 
+    	bit 3: 1 to write-protect RAM in system bank C000-FFFF
+    	bit 2: 1 to force primary stack at 0100-01FF
+    	bit 1: 1 for primary ROM, 0 for secondary (Apple III doesn't have a secondary ROM, so this should always be '1' when bit 0 is)
+    	bit 0: 1 to enable ROM in F000-FFFF
+ 
 ***************************************************************************/
 
 #include "emu.h"
@@ -31,76 +41,6 @@ static void apple3_update_drives(device_t *device);
 #define LOG_MEMORY      1
 #define LOG_INDXADDR    1
 
-
-
-/* ----------------------------------------------------------------------- */
-
-
-void apple3_state::apple3_profile_init(void)
-{
-}
-
-
-
-void apple3_state::apple3_profile_statemachine(void)
-{
-}
-
-
-
-UINT8 apple3_state::apple3_profile_r(offs_t offset)
-{
-	UINT8 result = 0;
-
-	offset %= 4;
-	apple3_profile_statemachine();
-
-	m_profile_lastaddr = offset;
-
-	switch(offset)
-	{
-		case 1:
-			m_profile_gotstrobe = 1;
-			apple3_profile_statemachine();
-			result = m_profile_readdata;
-			break;
-
-		case 2:
-			if (m_profile_busycount > 0)
-			{
-				m_profile_busycount--;
-				result = 0xFF;
-			}
-			else
-			{
-				result = m_profile_busy | m_profile_online;
-			}
-			break;
-	}
-	return result;
-}
-
-
-
-void apple3_state::apple3_profile_w(offs_t offset, UINT8 data)
-{
-	offset %= 4;
-	m_profile_lastaddr = -1;
-
-	switch(offset)
-	{
-		case 0:
-			m_profile_writedata = data;
-			m_profile_gotstrobe = 1;
-			break;
-	}
-	apple3_profile_statemachine();
-}
-
-
-
-/* ----------------------------------------------------------------------- */
-
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
 	mos6551_device *acia = machine().device<mos6551_device>("acia");
@@ -109,15 +49,40 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 	switch(offset)
 	{
+		/* keystrobe */
 		case 0x00: case 0x01: case 0x02: case 0x03:
 		case 0x04: case 0x05: case 0x06: case 0x07:
 			result = AY3600_keydata_strobe_r(machine());
 			break;
 
+		/* modifier keys */
 		case 0x08: case 0x09: case 0x0A: case 0x0B:
 		case 0x0C: case 0x0D: case 0x0E: case 0x0F:
-			/* modifier keys */
-			result = 0x7d;
+			{
+				UINT8 tmp = AY3600_keymod_r(machine());
+
+				result = 0x7e;
+				if (tmp & AY3600_KEYMOD_SHIFT)
+				{
+					result &= ~0x02;
+				}
+				if (tmp & AY3600_KEYMOD_CONTROL)
+				{
+					result &= ~0x04;
+				}
+				if (tmp & AY3600_KEYMOD_CAPSLOCK)
+				{
+					result &= ~0x08;
+				}
+				if (tmp & AY3600_KEYMOD_COMMAND)
+				{
+					result &= ~0x10;
+				}
+				if (tmp & AY3600_KEYMOD_OPTION)
+				{
+					result &= ~0x20;
+				}
+			}
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -125,6 +90,23 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x18: case 0x19: case 0x1A: case 0x1B:
 		case 0x1C: case 0x1D: case 0x1E: case 0x1F:
 			AY3600_anykey_clearstrobe_r(machine());
+			break;
+
+		case 0x30: case 0x31: case 0x32: case 0x33:
+		case 0x34: case 0x35: case 0x36: case 0x37:
+		case 0x38: case 0x39: case 0x3A: case 0x3B:
+		case 0x3C: case 0x3D: case 0x3E: case 0x3F:
+			m_speaker_state ^= 1;
+			m_speaker->level_w(m_speaker_state);
+			result = 0xff;
+			break;
+
+		case 0x40: case 0x41: case 0x42: case 0x43:
+		case 0x44: case 0x45: case 0x46: case 0x47:
+		case 0x48: case 0x49: case 0x4A: case 0x4B:
+		case 0x4C: case 0x4D: case 0x4E: case 0x4F:
+			m_c040_time = 200;
+			result = 0xff;
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53:
@@ -142,14 +124,6 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0x6C: case 0x6D: case 0x6E: case 0x6F:
 			/* unsure what these are */
 			result = 0x00;
-			break;
-
-		case 0xC0: case 0xC1: case 0xC2: case 0xC3:
-		case 0xC4: case 0xC5: case 0xC6: case 0xC7:
-		case 0xC8: case 0xC9: case 0xCA: case 0xCB:
-		case 0xCC: case 0xCD: case 0xCE: case 0xCF:
-			/* profile */
-			result = apple3_profile_r(offset);
 			break;
 
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
@@ -200,6 +174,21 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			AY3600_anykey_clearstrobe_r(machine());
 			break;
 
+		case 0x30: case 0x31: case 0x32: case 0x33:
+		case 0x34: case 0x35: case 0x36: case 0x37:
+		case 0x38: case 0x39: case 0x3A: case 0x3B:
+		case 0x3C: case 0x3D: case 0x3E: case 0x3F:
+			m_speaker_state ^= 1;
+			m_speaker->level_w(m_speaker_state);
+			break;
+
+		case 0x40: case 0x41: case 0x42: case 0x43:
+		case 0x44: case 0x45: case 0x46: case 0x47:
+		case 0x48: case 0x49: case 0x4A: case 0x4B:
+		case 0x4C: case 0x4D: case 0x4E: case 0x4F:
+			m_c040_time = 200;
+			break;
+
 		case 0x50: case 0x51: case 0x52: case 0x53:
 		case 0x54: case 0x55: case 0x56: case 0x57:
 			/* graphics softswitches */
@@ -207,14 +196,6 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 				m_flags |= 1 << ((offset - 0x50) / 2);
 			else
 				m_flags &= ~(1 << ((offset - 0x50) / 2));
-			break;
-
-		case 0xC0: case 0xC1: case 0xC2: case 0xC3:
-		case 0xC4: case 0xC5: case 0xC6: case 0xC7:
-		case 0xC8: case 0xC9: case 0xCA: case 0xCB:
-		case 0xCC: case 0xCD: case 0xCE: case 0xCF:
-			/* profile */
-			apple3_profile_w(offset, data);
 			break;
 
 		case 0xD0: case 0xD1: case 0xD2: case 0xD3:
@@ -269,28 +250,6 @@ UINT8 *apple3_state::apple3_bankaddr(UINT16 bank, offs_t offset)
 	return &m_ram->pointer()[offset];
 }
 
-
-
-void apple3_state::apple3_setbank(const char *mame_bank, UINT16 bank, offs_t offset)
-{
-	UINT8 *ptr;
-	ptr = apple3_bankaddr(bank, offset);
-	membank(mame_bank)->set_base(ptr);
-
-	#if 0
-	if (LOG_MEMORY)
-	{
-		#ifdef PTR64
-		//logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - m_ram->pointer());
-		#else
-		logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - m_ram->pointer());
-		#endif
-	}
-	#endif
-}
-
-
-
 UINT8 *apple3_state::apple3_get_zpa_addr(offs_t offset)
 {
 	m_zpa = (((offs_t) m_via_0_b) * 0x100) + offset;
@@ -303,27 +262,10 @@ UINT8 *apple3_state::apple3_get_zpa_addr(offs_t offset)
 		return apple3_bankaddr(m_via_1_a, m_zpa - 0x2000);
 }
 
-
-
-READ8_MEMBER(apple3_state::apple3_00xx_r)
-{
-	return *apple3_get_zpa_addr(offset);
-}
-
-
-
-WRITE8_MEMBER(apple3_state::apple3_00xx_w)
-{
-	*apple3_get_zpa_addr(offset) = data;
-}
-
-
-
 void apple3_state::apple3_update_memory()
 {
 	UINT16 bank;
 	UINT8 page;
-	address_space& space = m_maincpu->space(AS_PROGRAM);
 
 	if (LOG_MEMORY)
 	{
@@ -356,95 +298,46 @@ void apple3_state::apple3_update_memory()
 		bank = ~0;
 		page = 0x01;
 	}
-	apple3_setbank("bank2", bank, ((offs_t) page) * 0x100);
+	m_bank2 = apple3_bankaddr(bank, ((offs_t) page) * 0x100); 
 
 	/* bank 3 (0200-1FFF) */
-	apple3_setbank("bank3", ~0, 0x0200);
+	m_bank3 = apple3_bankaddr(~0, 0x0200); 
 
 	/* bank 4 (2000-9FFF) */
-	apple3_setbank("bank4", m_via_1_a, 0x0000);
+	m_bank4 = apple3_bankaddr(m_via_1_a, 0x0000); 
 
 	/* bank 5 (A000-BFFF) */
-	apple3_setbank("bank5", ~0, 0x2000);
+	m_bank5 = apple3_bankaddr(~0, 0x2000); 
 
-	/* install bank 8 (C000-CFFF) */
-	if (m_via_0_a & 0x40)
+	/* bank 8 (C000-C0FF) */
+	if (!(m_via_0_a & 0x40))
 	{
-		space.install_read_handler(0xC000, 0xC0FF, read8_delegate(FUNC(apple3_state::apple3_c0xx_r),this));
-		space.install_write_handler(0xC000, 0xC0FF, write8_delegate(FUNC(apple3_state::apple3_c0xx_w),this));
-	}
-	else
-	{
-		space.install_read_bank(0xC000, 0xC0FF, "bank8");
-		if (m_via_0_a & 0x08)
-			space.unmap_write(0xC000, 0xC0FF);
-		else
-			space.install_write_bank(0xC000, 0xC0FF, "bank8");
-		apple3_setbank("bank8", ~0, 0x4000);
+		m_bank8 = apple3_bankaddr(~0, 0x4000); 
 	}
 
-	/* install bank 9 (C100-C4FF) */
-	if (m_via_0_a & 0x40)
+	/* bank 9 (C100-C4FF) */
+	if (!(m_via_0_a & 0x40))
 	{
-		space.nop_readwrite(0xC100, 0xC4FF);
-	}
-	else
-	{
-		space.install_read_bank(0xC100, 0xC4FF, "bank9");
-		if (m_via_0_a & 0x08)
-			space.unmap_write(0xC100, 0xC4FF);
-		else
-			space.install_write_bank(0xC100, 0xC4FF, "bank9");
-		apple3_setbank("bank9", ~0, 0x4100);
+		m_bank9 = apple3_bankaddr(~0, 0x4100);                                  
 	}
 
-	/* install bank 10 (C500-C7FF) */
-	space.install_read_bank(0xC500, 0xC7FF, "bank10");
-	if (m_via_0_a & 0x08)
-		space.unmap_write(0xC500, 0xC7FF);
-	else
-		space.install_write_bank(0xC500, 0xC7FF, "bank10");
-	apple3_setbank("bank10", ~0, 0x4500);
+	/* bank 10 (C500-C7FF) */
+	m_bank10 = apple3_bankaddr(~0, 0x4500); 
 
-	/* install bank 11 (C800-CFFF) */
-	if (m_via_0_a & 0x40)
+	/* bank 11 (C800-CFFF) */
+	if (!(m_via_0_a & 0x40))
 	{
-		space.nop_readwrite(0xC800, 0xCFFF);
-	}
-	else
-	{
-		space.install_read_bank(0xC800, 0xCFFF, "bank11");
-		if (m_via_0_a & 0x08)
-			space.unmap_write(0xC800, 0xCFFF);
-		else
-			space.install_write_bank(0xC800, 0xCFFF, "bank11");
-		apple3_setbank("bank11", ~0, 0x4800);
+		m_bank11 = apple3_bankaddr(~0, 0x4800);
 	}
 
 	/* install bank 6 (D000-EFFF) */
-	space.install_read_bank(0xD000, 0xEFFF, "bank6");
-	if (m_via_0_a & 0x08)
-		space.unmap_write(0xD000, 0xEFFF);
-	else
-		space.install_write_bank(0xD000, 0xEFFF, "bank6");
-	apple3_setbank("bank6", ~0, 0x5000);
+	m_bank6 = apple3_bankaddr(~0, 0x5000);
 
 	/* install bank 7 (F000-FFFF) */
-	space.install_read_bank(0xF000, 0xFFFF, "bank7");
-	if (m_via_0_a & 0x09)
-		space.unmap_write(0xF000, 0xFFFF);
-	else
-		space.install_write_bank(0xF000, 0xFFFF, "bank7");
 	if (m_via_0_a & 0x01)
-		membank("bank7")->set_base(memregion("maincpu")->base());
+		m_bank7 = memregion("maincpu")->base();
 	else
-		apple3_setbank("bank7", ~0, 0x7000);
-
-	/* reinstall VIA handlers */
-	{
-		space.install_readwrite_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate(FUNC(via6522_device::read),m_via_0.target()), write8_delegate(FUNC(via6522_device::write),m_via_0.target()));
-		space.install_readwrite_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate(FUNC(via6522_device::read),m_via_1.target()), write8_delegate(FUNC(via6522_device::write),m_via_1.target()));
-	}
+		m_bank7 = apple3_bankaddr(~0, 0x7000);
 }
 
 
@@ -476,23 +369,44 @@ WRITE8_MEMBER(apple3_state::apple3_via_1_out_a)
 
 WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 {
+	m_dac->write_unsigned8(data<<2);
 	apple3_via_out(&m_via_1_b, data);
 }
 
-WRITE_LINE_MEMBER(apple3_state::apple2_via_1_irq_func)
+WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
 {
-	if (!m_via_1_irq && state)
+	m_via_1_irq = state;
+	if (m_via_1_irq || m_via_0_irq)
 	{
 		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	}
+	else
+	{
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
-	m_via_1_irq = state;
 }
 
 
+WRITE_LINE_MEMBER(apple3_state::apple3_via_0_irq_func)
+{
+	m_via_0_irq = state;
+	if (m_via_1_irq || m_via_0_irq)
+	{
+		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	}
+}
 
 MACHINE_RESET_MEMBER(apple3_state,apple3)
 {
+	m_indir_count = 0;
+	m_sync = false;
+	m_speaker_state = 0;
+	m_speaker->level_w(0);
+	m_c040_time = 0;
 }
 
 
@@ -556,15 +470,11 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 	}
 	else if ((offset >= 0xF000) && (m_via_0_a & 0x01))
 	{
-#if 0
 		/* The Apple /// Diagnostics seems to expect that indexed writes
 		 * always write to RAM.  That image jumps to an address that is
-		 * undefined unless this code is enabled.  However, the Sara
-		 * emulator does not have corresponding code here, though Chris
-		 * Smolinski does not rule out the possibility
-		 */
+		 * undefined unless this code is enabled. 
+		 */ 
 		result = apple3_bankaddr(~0, offset - 0x8000);
-#endif
 	}
 
 	return result;
@@ -599,22 +509,6 @@ WRITE8_MEMBER(apple3_state::apple3_indexed_write)
 	else if (addr != (UINT8 *) ~0)
 		*addr = data;
 }
-
-
-
-DIRECT_UPDATE_MEMBER(apple3_state::apple3_opbase)
-{
-	UINT8 *opptr;
-
-	if ((address & 0xFF00) == 0x0000)
-	{
-		opptr = apple3_get_zpa_addr(address);
-		direct.explicit_configure(address, address, ~0, opptr - address);
-		address = ~0;
-	}
-	return address;
-}
-
 
 
 static void apple3_update_drives(device_t *device)
@@ -667,19 +561,15 @@ const applefdc_interface apple3_fdc_interface =
 
 DRIVER_INIT_MEMBER(apple3_state,apple3)
 {
-	/* hack to get around VIA problem */
-	memregion("maincpu")->base()[0x0685] = 0x00;
-
 	m_enable_mask = 0;
 	apple3_update_drives(machine().device("fdc"));
 
 	AY3600_init(machine());
 
-	apple3_profile_init();
-
 	m_flags = 0;
 	m_via_0_a = ~0;
 	m_via_1_a = ~0;
+	m_via_0_irq = 0;
 	m_via_1_irq = 0;
 
 	/* these are here to appease the Apple /// confidence tests */
@@ -702,6 +592,243 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_1->write_pb7(1);
 
 	apple3_update_memory();
-
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), this));
 }
+
+READ8_MEMBER(apple3_state::apple3_memory_r)
+{
+	UINT8 rv = 0xff;
+
+	// (zp), y read
+	if (!space.debugger_access())
+	{
+		if (m_indir_count == 4)
+		{
+			UINT8 *test;
+//			printf("doing redirect on (zp),y, offset %x\n", offset);
+			test = apple3_get_indexed_addr(offset);
+
+			if (test)
+			{
+				return *test;
+			}
+		}
+	}
+
+	if (offset < 0x100)
+	{
+		rv = *apple3_get_zpa_addr(offset); 
+	}
+	else if (offset < 0x200)
+	{
+		rv = m_bank2[offset-0x100];
+	}
+	else if (offset < 0x2000)
+	{
+		rv = m_bank3[offset-0x200];
+	}
+	else if (offset < 0xa000)
+	{
+		rv = m_bank4[offset-0x2000];
+	}
+	else if (offset < 0xc000)
+	{
+		rv = m_bank5[offset-0xa000];
+	}
+	else if (offset < 0xc100)
+	{
+		if (m_via_0_a & 0x40)
+		{
+			rv = apple3_c0xx_r(space, offset-0xc000);
+		}
+		else
+		{
+			rv = m_bank8[offset - 0xc000];
+		}
+	}
+	else if (offset < 0xc500)
+	{
+		if (!(m_via_0_a & 0x40))
+		{
+			rv = m_bank9[offset - 0xc100];
+		}
+	}
+	else if (offset < 0xc800)
+	{
+		rv = m_bank10[offset - 0xc500];
+	}
+	else if (offset < 0xd000)
+	{
+		if (!(m_via_0_a & 0x40))
+		{
+			rv = m_bank11[offset - 0xc800];
+		}
+	}
+	else if (offset < 0xf000)
+	{
+		rv = m_bank6[offset - 0xd000];
+	}
+	else
+	{
+		if (offset >= 0xffd0 && offset <= 0xffdf)
+		{
+			rv = m_via_0->read(space, offset);
+		}
+		else if (offset >= 0xffe0 && offset <= 0xffef)
+		{
+			rv = m_via_1->read(space, offset);
+		}
+		else
+		{
+			rv = m_bank7[offset - 0xf000]; 
+		}
+	}
+
+	if (!space.debugger_access())
+	{
+		if (m_indir_count > 0) 
+		{
+			m_indir_count++;
+		}
+
+		// capture last opcode for indirect mode shenanigans
+		if (m_sync)
+		{
+			// 0xN1 with bit 4 set is a (zp),y opcode
+			if (((rv & 0x0f) == 0x1) && (rv & 0x10))
+			{
+//				printf("(zp),y %02x at %x\n", rv, offset);
+				m_indir_count = 1;
+				m_indir_opcode = rv;
+			}
+		}
+	}
+
+	return rv;
+}
+
+WRITE8_MEMBER(apple3_state::apple3_memory_w)
+{
+	if ((!space.debugger_access()) && (m_indir_count > 0))
+	{
+		UINT8 *test;
+//			printf("store (zp),y %02x at %x\n", data, offset);
+		test = apple3_get_indexed_addr(offset);
+
+		if (test)
+		{
+			*test = data;
+			return;
+		}
+	}
+
+	if (offset < 0x100)
+	{
+		*apple3_get_zpa_addr(offset) = data;
+		return;
+	}
+	else if (offset < 0x200)
+	{
+		m_bank2[offset-0x100] = data;
+	}
+	else if (offset < 0x2000)
+	{
+		m_bank3[offset-0x200] = data;
+	}
+	else if (offset < 0xa000)
+	{
+		m_bank4[offset-0x2000] = data;
+	}
+	else if (offset < 0xc000)
+	{
+		m_bank5[offset-0xa000] = data;
+	}
+	else if (offset < 0xc100)
+	{
+		if (m_via_0_a & 0x40)
+		{
+			apple3_c0xx_w(space, offset-0xc000, data);
+		}
+		else
+		{
+			// is this page write protected?
+			if (!(m_via_0_a & 0x08))
+			{
+				m_bank8[offset - 0xc000] = data;
+			}
+		}
+	}
+	else if (offset < 0xc500)
+	{
+		if (!(m_via_0_a & 0x40))
+		{
+			if (!(m_via_0_a & 0x08))
+			{
+				m_bank9[offset - 0xc100] = data;
+			}
+		}
+	}
+	else if (offset < 0xc800)
+	{
+		if (!(m_via_0_a & 0x08))
+		{
+			m_bank10[offset - 0xc500] = data;
+		}
+	}
+	else if (offset < 0xd000)
+	{
+		if (!(m_via_0_a & 0x40))
+		{
+			if (!(m_via_0_a & 0x08))
+			{
+				m_bank11[offset - 0xc800] = data;
+			}
+		}
+	}
+	else if (offset < 0xf000)
+	{
+		if (!(m_via_0_a & 0x08))
+		{
+			m_bank6[offset - 0xd000] = data;
+		}
+	}
+	else
+	{
+		if (offset >= 0xffd0 && offset <= 0xffdf)
+		{
+			m_via_0->write(space, offset, data);
+		}
+		else if (offset >= 0xffe0 && offset <= 0xffef)
+		{
+			m_via_1->write(space, offset, data);
+		}
+		else
+		{
+			if (!(m_via_0_a & 0x09))
+			{
+				m_bank7[offset - 0xf000] = data;
+			}
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(apple3_state::apple3_sync_w)
+{
+//	printf("sync: %d\n", state);
+	m_sync = (state == ASSERT_LINE) ? true : false;
+
+	if (m_sync)
+	{
+		m_indir_count = 0; 
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_c040_tick)
+{
+	if (m_c040_time > 0)
+	{
+		m_speaker_state ^= 1;
+		m_speaker->level_w(m_speaker_state);
+		m_c040_time--;
+	}
+}
+

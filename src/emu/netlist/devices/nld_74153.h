@@ -48,7 +48,7 @@
 #include "../nl_base.h"
 
 #define TTL_74153(_name, _C0, _C1, _C2, _C3, _A, _B, _G)                            \
-		NET_REGISTER_DEV(nic74153, _name)                                           \
+		NET_REGISTER_DEV(74153, _name)                                              \
 		NET_CONNECT(_name, C0, _C0)                                                 \
 		NET_CONNECT(_name, C1, _C1)                                                 \
 		NET_CONNECT(_name, C2, _C2)                                                 \
@@ -57,13 +57,31 @@
 		NET_CONNECT(_name, B, _B)                                                   \
 		NET_CONNECT(_name, G, _G)
 
-NETLIB_DEVICE(nic74153,
-	netlist_ttl_input_t m_C[4];
+#define TTL_74153_DIP(_name)                                                         \
+        NET_REGISTER_DEV(74153_dip, _name)
+
+NETLIB_SUBDEVICE(74153sub,
+    netlist_ttl_input_t m_C[4];
+    netlist_ttl_input_t m_G;
+
+    netlist_ttl_output_t m_Y;
+
+    int m_chan;
+);
+
+NETLIB_DEVICE(74153,
+public:
+    NETLIB_NAME(74153sub) m_sub;
 	netlist_ttl_input_t m_A;
 	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_G;
+);
 
-	netlist_ttl_output_t m_Y;
+NETLIB_DEVICE(74153_dip,
+
+    NETLIB_NAME(74153sub) m_1;
+    NETLIB_NAME(74153sub) m_2;
+    netlist_ttl_input_t m_A;
+    netlist_ttl_input_t m_B;
 );
 
 #endif /* NLD_74153_H_ */

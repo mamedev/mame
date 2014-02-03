@@ -14,7 +14,7 @@
 #define __CHEAT_H__
 
 #include "debug/express.h"
-#include "ui.h"
+#include "ui/ui.h"
 
 
 //**************************************************************************

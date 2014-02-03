@@ -1171,7 +1171,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 }
 
 #if ENABLE_UART_PRINTING
-READ16_HANDLER( uart_loopback_enable )
+READ16_MEMBER( cdi68070_device::uart_loopback_enable )
 {
 	return 0x1234;
 }

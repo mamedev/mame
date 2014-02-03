@@ -78,11 +78,11 @@ render_target *ui_input_find_mouse(running_machine &machine, INT32 *x, INT32 *y,
 /* ----- user interface sequence reading ----- */
 
 /* return TRUE if a key down for the given user interface sequence is detected */
-int ui_input_pressed(running_machine &machine, int code);
+bool ui_input_pressed(running_machine &machine, int code);
 
 /* return TRUE if a key down for the given user interface sequence is detected, or if
    autorepeat at the given speed is triggered */
-int ui_input_pressed_repeat(running_machine &machine, int code, int speed);
+bool ui_input_pressed_repeat(running_machine &machine, int code, int speed);
 
 
 

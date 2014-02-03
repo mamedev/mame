@@ -25,6 +25,18 @@
 		</part>
 	</software>
 
+	<software name="basic" supported="yes">
+		<description>APF Basic</description>
+		<year>1979</year>
+		<publisher>APF</publisher>
+		<info name="serial" value="AL100A" />
+		<part name="cart" interface="apfm1000_cart">
+			<dataarea name="rom" size="12288">
+				<rom name="basic_80.rom" size="8192" crc="a4c69fae" sha1="7f98aa482589bf7c5a26d338fec105e797ba43f6" offset="0" />
+				<rom name="basic_68.rom" size="4096" crc="ef049ab8" sha1="c4c12aade95dd89a4750fe7f89d57256c93da068" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
 	<software name="blckjack" supported="no">
 		<description>Blackjack</description>
 		<year>1979</year>
@@ -172,6 +184,30 @@ $9C00 to $9FFF 1k empty space (39936 to 40959)
 		<part name="cart" interface="apfm1000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="ufo.bin" size="4096" crc="0504d667" sha1="6e33593f9e7a4551bc31b347741d9ff87ce618ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Homebrew -->
+
+	<software name="columns" supported="no">
+		<description>Columns / Targets / Bacteria / Autopista</description>
+		<year>????</year>
+		<publisher>Enrique Collado</publisher>
+		<part name="cart" interface="apfm1000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="columns.bin" size="3733" crc="71c2955c" sha1="7e571e32ff05c92c7be7d2e42a0868538a7c5800" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="movblock" supported="no">
+		<description>Move Block</description>
+		<year>2010</year>
+		<publisher>Adam Trionfo</publisher>
+		<part name="cart" interface="apfm1000_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="movblock.bin" size="4096" crc="f77f72f4" sha1="2cf3a82d584b2a2e4c7e5ae751da8d0255c2295a" offset="0" />
 			</dataarea>
 		</part>
 	</software>

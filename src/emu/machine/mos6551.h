@@ -33,7 +33,10 @@
 
 #include "emu.h"
 
-
+// MOS 6551s reset with the RIE bit set in the command register
+#define MOS6551_TYPE_MOS		(0)
+// Rockwell (and Synertek) reset with all bits clear in the command register
+#define MOS6551_TYPE_ROCKWELL	(1)
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -51,6 +54,8 @@
 #define MCFG_MOS6551_DTR_HANDLER(_devcb) \
 	devcb = &mos6551_device::set_dtr_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_MOS6551_TYPE(_type) \
+	mos6551_device::static_set_type(*device, _type);
 
 
 //**************************************************************************
@@ -81,6 +86,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
 
 	void set_rxc(int clock);
+
+	// inline configuration helpers
+	static void static_set_type(device_t &device, int type);
 
 protected:
 	// device-level overrides
@@ -180,6 +188,8 @@ protected:
 	int m_cts;
 	int m_dsr;
 	int m_dcd;
+
+	int m_chip_type;
 
 	static const int brg_divider[16];
 };

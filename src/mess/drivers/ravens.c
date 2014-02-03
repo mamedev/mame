@@ -155,7 +155,7 @@ READ8_MEMBER( ravens_state::port17_r )
 
 	keyin = ioport("X2")->read();
 	if (!BIT(keyin, 0))
-		machine().firstcpu->reset();
+		m_maincpu->reset();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)

@@ -130,6 +130,28 @@ void netlist_mame_logic_input_t::device_start()
 	}
 }
 
+// ----------------------------------------------------------------------------------------
+// netlist_mame_t
+// ----------------------------------------------------------------------------------------
+
+void netlist_mame_t::vfatalerror(const loglevel_e level, const char *format, va_list ap) const
+{
+    pstring errstr = pstring(format).vprintf(ap);
+
+    switch (level)
+    {
+        case NL_WARNING:
+            logerror("netlist WARNING: %s\n", errstr.cstr());
+            break;
+        case NL_LOG:
+            logerror("netlist LOG: %s\n", errstr.cstr());
+            break;
+        case NL_ERROR:
+            emu_fatalerror error("netlist ERROR: %s\n", errstr.cstr());
+            throw error;
+            break;
+    }
+}
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_device_t
@@ -429,23 +451,42 @@ void netlist_mame_sound_device_t::device_start()
 
     LOG_DEV_CALLS(("device_start %s\n", tag()));
 
-    netlist_list_t<nld_sound *> outdevs = netlist().get_device_list<nld_sound *>();
+    // Configure outputs
+
+    netlist_list_t<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out *>();
     if (outdevs.count() == 0)
         fatalerror("No output devices");
 
     m_num_outputs = outdevs.count();
-    m_num_inputs = 0;
 
     /* resort channels */
     for (int i=0; i < MAX_OUT; i++) m_out[i] = NULL;
     for (int i=0; i < m_num_outputs; i++)
     {
         int chan = outdevs[i]->m_channel.Value();
+
+        netlist().log("Output %d on channel %d", i, chan);
+
         if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.count())
             fatalerror("illegal channel number");
         m_out[chan] = outdevs[i];
         m_out[chan]->m_sample = netlist_time::from_hz(clock());
         m_out[chan]->m_buffer = NULL;
+    }
+
+    // Configure inputs
+
+    m_num_inputs = 0;
+    m_in = NULL;
+
+    netlist_list_t<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in *>();
+    if (indevs.count() > 1)
+        fatalerror("A maximum of one input device is allowed!");
+    if (indevs.count() == 1)
+    {
+        m_in = indevs[0];
+        m_num_inputs = m_in->resolve();
+        m_in->m_inc = netlist_time::from_hz(clock());
     }
 
     /* initialize the stream(s) */
@@ -455,7 +496,8 @@ void netlist_mame_sound_device_t::device_start()
 
 void netlist_mame_sound_device_t::nl_register_devices()
 {
-    setup().factory().register_device<nld_sound>( "NETDEV_SOUND_OUT", "nld_sound", "+CHAN");
+    setup().factory().register_device<nld_sound_out>("NETDEV_SOUND_OUT", "nld_sound_out", "+CHAN");
+    setup().factory().register_device<nld_sound_in>("NETDEV_SOUND_IN", "nld_sound_in", "-");
 }
 
 
@@ -464,6 +506,14 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
     for (int i=0; i < m_num_outputs; i++)
     {
         m_out[i]->m_buffer = outputs[i];
+    }
+
+    if (m_num_inputs)
+        m_in->buffer_reset();
+
+    for (int i=0; i < m_num_inputs; i++)
+    {
+        m_in->m_buffer[i] = inputs[i];
     }
 
     netlist_time cur = netlist().time();

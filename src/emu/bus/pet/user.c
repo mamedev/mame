@@ -12,50 +12,12 @@
 #include "user.h"
 
 
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+// class pet_user_port_device
 
 const device_type PET_USER_PORT = &device_creator<pet_user_port_device>;
 
-
-
-//**************************************************************************
-//  CARD INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_pet_user_port_interface - constructor
-//-------------------------------------------------
-
-device_pet_user_port_interface::device_pet_user_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
-{
-	m_slot = dynamic_cast<pet_user_port_device *>(device.owner());
-}
-
-
-//-------------------------------------------------
-//  ~device_pet_user_port_interface - destructor
-//-------------------------------------------------
-
-device_pet_user_port_interface::~device_pet_user_port_interface()
-{
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  pet_user_port_device - constructor
-//-------------------------------------------------
-
 pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PET_USER_PORT, "VIC-20 user port", tag, owner, clock, "pet_user_port", __FILE__),
+	device_t(mconfig, PET_USER_PORT, "PET user port", tag, owner, clock, "pet_user_port", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_3_handler(*this),
 	m_4_handler(*this),
@@ -77,16 +39,13 @@ pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const 
 {
 }
 
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+void pet_user_port_device::device_config_complete()
+{
+	m_card = dynamic_cast<device_pet_user_port_interface *>(get_card_device());
+}
 
 void pet_user_port_device::device_start()
 {
-	m_card = dynamic_cast<device_pet_user_port_interface *>(get_card_device());
-
-	// resolve callbacks
 	m_3_handler.resolve_safe();
 	m_4_handler.resolve_safe();
 	m_5_handler.resolve_safe();
@@ -125,20 +84,6 @@ void pet_user_port_device::device_start()
 	m_m_handler(1);
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void pet_user_port_device::device_reset()
-{
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
-}
-
-
 WRITE_LINE_MEMBER( pet_user_port_device::write_3 ) { if (m_card != NULL) m_card->input_3(state); }
 WRITE_LINE_MEMBER( pet_user_port_device::write_4 ) { if (m_card != NULL) m_card->input_4(state); }
 WRITE_LINE_MEMBER( pet_user_port_device::write_5 ) { if (m_card != NULL) m_card->input_5(state); }
@@ -158,12 +103,18 @@ WRITE_LINE_MEMBER( pet_user_port_device::write_l ) { if (m_card != NULL) m_card-
 WRITE_LINE_MEMBER( pet_user_port_device::write_m ) { if (m_card != NULL) m_card->input_m(state); }
 
 
+// class device_pet_user_port_interface
 
+device_pet_user_port_interface::device_pet_user_port_interface(const machine_config &mconfig, device_t &device)
+	: device_slot_card_interface(mconfig,device)
+{
+	m_slot = dynamic_cast<pet_user_port_device *>(device.owner());
+}
 
+device_pet_user_port_interface::~device_pet_user_port_interface()
+{
+}
 
-//-------------------------------------------------
-//  SLOT_INTERFACE( pet_user_port_cards )
-//-------------------------------------------------
 
 #include "petuja.h"
 

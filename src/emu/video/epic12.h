@@ -112,11 +112,11 @@ public:
 
 	int m_is_unsafe;
 	int m_delay_scale;
-	legacy_cpu_device* m_maincpu;
+	cpu_device* m_maincpu;
 
 	static void set_delay_scale(device_t &device, int delay_scale);
 	static void set_is_unsafe(device_t &device, int is_unsafe);
-	static void set_cpu_device(device_t &device, legacy_cpu_device* maincpu);
+	static void set_cpu_device(device_t &device, cpu_device* maincpu);
 
 	void install_handlers(int addr1, int addr2);
 

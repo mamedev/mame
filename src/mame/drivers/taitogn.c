@@ -77,6 +77,7 @@ Notes:
       EPM7064        - Altera EPM7064QC100 CPLD (QFP100)
       CAT702         - Protection chip labelled 'TT10' (DIP20)
       *              - Unpopulated position for additional KM416V1204BT-L5 RAMs
+      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
 FC PCB  K91X0721B  M43X0337B
@@ -342,7 +343,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mn10200(*this, "mn10200"),
 		m_flashbank(*this, "flashbank"),
-		m_mb3773(*this, "mb3773")
+		m_mb3773(*this, "mb3773"),
+		m_zoom(*this, "taito_zoom"),
+		m_pgmflash(*this, "pgmflash"),
+		m_sndflash0(*this, "sndflash0"),
+		m_sndflash1(*this, "sndflash1"),
+		m_sndflash2(*this, "sndflash2")
 	{
 	}
 
@@ -360,10 +366,11 @@ public:
 	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
-	DECLARE_MACHINE_RESET(coh3002t);
+	DECLARE_READ32_MEMBER(zsg2_ext_r);
 
 protected:
 	virtual void driver_start();
+	virtual void machine_reset();
 
 private:
 	UINT8 m_control;
@@ -382,6 +389,11 @@ private:
 	required_device<cpu_device> m_mn10200;
 	required_device<address_map_bank_device> m_flashbank;
 	required_device<mb3773_device> m_mb3773;
+	required_device<taito_zoom_device> m_zoom;
+	required_device<intelfsh16_device> m_pgmflash;
+	required_device<intelfsh16_device> m_sndflash0;
+	required_device<intelfsh16_device> m_sndflash1;
+	required_device<intelfsh16_device> m_sndflash2;
 };
 
 
@@ -459,7 +471,7 @@ READ16_MEMBER(taitogn_state::hack1_r)
 	{
 	case 0:
 		m_v = m_v ^ 8;
-		// Probably something to do with sound
+		// Probably something to do with MCU
 		return m_v;
 	}
 
@@ -543,6 +555,18 @@ READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 	return ioport("P4")->read();
 }
 
+READ32_MEMBER(taitogn_state::zsg2_ext_r)
+{
+	offset *= 2;
+	
+	if (offset < 0x100000)
+		return m_sndflash0->read(offset) | m_sndflash0->read(offset | 1) << 16;
+	else if (offset < 0x200000)
+		return m_sndflash1->read(offset & 0xfffff) | m_sndflash0->read((offset & 0xfffff) | 1) << 16;
+	else
+		return m_sndflash2->read(offset & 0xfffff) | m_sndflash0->read((offset & 0xfffff) | 1) << 16;
+}
+
 // Init and reset
 
 void taitogn_state::driver_start()
@@ -551,12 +575,12 @@ void taitogn_state::driver_start()
 	m_znsec1->init(tt16);
 }
 
-MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
+void taitogn_state::machine_reset()
 {
 	m_control = 0;
 
 	// halt sound CPU since it has no valid program at start
-	m_mn10200->set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
+	m_mn10200->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
@@ -578,7 +602,11 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE8(control_r, control_w, 0x000000ff)
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE16(control2_w, 0x0000ffff)
 	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE16(gn_1fb70000_r, gn_1fb70000_w, 0x0000ffff)
-	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM // 256 bytes com zone with the mn102, low bytes of words only, with additional comm at 1fb80000
+	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, global_volume_w, 0x0000ffff)
+	//AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, reset_control_w, 0xffff0000)
+	AM_RANGE(0x1fba0000, 0x1fba0003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, sound_irq_w, 0x0000ffff)
+	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_DEVREAD16("taito_zoom", taito_zoom_device, sound_irq_r, 0x0000ffff)
+	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comms with the MN10200
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, taitogn_state )
@@ -603,6 +631,7 @@ SLOT_INTERFACE_START(slot_ataflash)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( coh3002t, taitogn_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP(taitogn_map)
@@ -614,6 +643,9 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
 	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
+	
+	// 5MHz NEC uPD78081 MCU:
+	// we don't have a 78K0 emulation core yet..
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
@@ -624,8 +656,6 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
-
-	MCFG_MACHINE_RESET_OVERRIDE(taitogn_state, coh3002t )
 
 	MCFG_AT28C16_ADD( "at28c16", 0 )
 	MCFG_DEVICE_ADD("rf5c296", RF5C296, 0)
@@ -649,6 +679,11 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000000)
 
 	MCFG_FRAGMENT_ADD( taito_zoom_sound )
+	MCFG_SOUND_REPLACE("zsg2", ZSG2, XTAL_25MHz/2)
+	MCFG_ZSG2_EXT_READ_HANDLER(READ32(taitogn_state, zsg2_ext_r))
+
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh3002t_mp, coh3002t )
@@ -714,16 +749,12 @@ static INPUT_PORTS_START( coh3002t )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "S551:1" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("S551:2") // bios testmode
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "S551:3" )
+	PORT_DIPNAME( 0x08, 0x08, "Test Mode" )             PORT_DIPLOCATION("S551:4") // game testmode
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -776,6 +807,8 @@ INPUT_PORTS_END
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
+	ROM_REGION( 0x2000, "mcu", 0 ) \
+	ROM_LOAD( "upd78081.655", 0x0000, 0x2000, NO_DUMP ) /* internal rom :( */ \
 	ROM_REGION( 0x200000, "biosflash", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "v1",   "G-NET Bios v1" ) \
 		ROM_LOAD16_WORD_BIOS(0, "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
@@ -783,7 +816,7 @@ INPUT_PORTS_END
 		ROM_LOAD16_WORD_BIOS(1, "flashv2.u30", 0x000000, 0x200000, CRC(CAE462D3) SHA1(f1b10846a8423d9fe021191c5876190857c3d2a4) ) \
 	ROM_REGION32_LE( 0x80000,  "mn10200", 0) \
 	ROM_FILL( 0, 0x80000, 0xff) \
-	ROM_REGION32_LE( 0x600000, "zsg1", 0) \
+	ROM_REGION32_LE( 0x600000, "zsg2", 0) \
 	ROM_FILL( 0, 0x600000, 0xff)
 
 ROM_START( taitogn )
@@ -1004,8 +1037,8 @@ GAME( 1998, chaosheaj,chaoshea, coh3002t, coh3002t, driver_device, 0, ROT0,   "T
 GAME( 1998, raycris,  taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Ray Crisis (V2.03J)", GAME_IMPERFECT_SOUND )
 GAME( 1999, spuzbobl, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Super Puzzle Bobble (V2.05O)", GAME_IMPERFECT_SOUND )
 GAME( 1999, spuzboblj,spuzbobl, coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Super Puzzle Bobble (V2.04J)", GAME_IMPERFECT_SOUND )
-GAME( 1999, gobyrc,   taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // custom inputs need calibrating
-GAME( 1999, rcdego,   gobyrc,   coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // custom inputs need calibrating
+GAME( 1999, gobyrc,   taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // custom inputs need calibrating, likely needs mcu emulation
+GAME( 1999, rcdego,   gobyrc,   coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // "
 GAME( 1999, flipmaze, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT0,   "Taito / Moss", "Flip Maze (V2.04J)", GAME_IMPERFECT_SOUND )
 GAME( 2001, shikigam, taitogn,  coh3002t, coh3002t, driver_device, 0, ROT270, "Alfa System / Taito", "Shikigami no Shiro (V2.03J)", GAME_IMPERFECT_SOUND )
 GAME( 2003, sianniv,  taitogn,  coh3002t, coh3002t, driver_device, 0, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // IRQ at the wrong time

@@ -76,6 +76,7 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	m_pal_write(0),
 	m_cmd_write(0),
 	m_read_ahead(0),
+	m_v9958_sp_mode(0),
 	m_address_latch(0),
 	m_vram_size(0),
 	m_int_state(0),

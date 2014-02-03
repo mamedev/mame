@@ -15,80 +15,12 @@
 #include "emu.h"
 #include "i8271.h"
 #include "imagedev/flopdrv.h"
-#include "devlegcy.h"
 
 /* data request */
 #define I8271_FLAGS_DATA_REQUEST 0x01
 /* data direction. If 0x02, then it is from fdc to cpu, else
 it is from cpu to fdc */
 #define I8271_FLAGS_DATA_DIRECTION 0x02
-
-struct i8271_t
-{
-	int flags;
-	int state;
-	unsigned char Command;
-	unsigned char StatusRegister;
-	unsigned char CommandRegister;
-	unsigned char ResultRegister;
-	unsigned char ParameterRegister;
-	unsigned char ResetRegister;
-	unsigned char data;
-
-	/* number of parameters required after command is specified */
-	unsigned long ParameterCount;
-	/* number of parameters written so far */
-	unsigned long ParameterCountWritten;
-
-	unsigned char CommandParameters[8];
-
-	/* current track for each drive */
-	unsigned long   CurrentTrack[2];
-
-	/* 2 bad tracks for drive 0, followed by 2 bad tracks for drive 1 */
-	unsigned long   BadTracks[4];
-
-	/* mode special register */
-	unsigned long Mode;
-
-
-	/* drive outputs */
-	int drive;
-	int side;
-
-	/* drive control output special register */
-	int drive_control_output;
-	/* drive control input special register */
-	int drive_control_input;
-
-	unsigned long StepRate;
-	unsigned long HeadSettlingTime;
-	unsigned long IndexCountBeforeHeadUnload;
-	unsigned long HeadLoadTime;
-
-	/* id on disc to find */
-	int ID_C;
-	int ID_H;
-	int ID_R;
-	int ID_N;
-
-	/* id of data for read/write */
-	int data_id;
-
-	int ExecutionPhaseTransferCount;
-	char *pExecutionPhaseData;
-	int ExecutionPhaseCount;
-
-	/* sector counter and id counter */
-	int Counter;
-
-	/* ==0, to cpu, !=0 =from cpu */
-	int data_direction;
-	const i8271_interface *intf;
-
-	emu_timer *data_timer;
-	emu_timer *command_complete_timer;
-};
 
 enum I8271_STATE_t
 {
@@ -153,55 +85,170 @@ enum I8271_STATE_t
 #define I8271_STATUS_INT_REQUEST    0x008
 #define I8271_STATUS_NON_DMA_REQUEST    0x004
 
-static void i8271_command_execute(device_t *device);
-static void i8271_command_continue(device_t *device);
-static void i8271_command_complete(device_t *device,int result, int int_rq);
-static void i8271_data_request(device_t *device);
-static void i8271_timed_data_request(device_t *device);
-/* locate sector for read/write operation */
-static int i8271_find_sector(device_t *device);
-/* do a read operation */
-static void i8271_do_read(device_t *device);
-static void i8271_do_write(device_t *device);
-static void i8271_do_read_id(device_t *device);
-static void i8271_set_irq_state(device_t *device,int);
-static void i8271_set_dma_drq(device_t *device);
-
-static TIMER_CALLBACK(i8271_data_timer_callback);
-static TIMER_CALLBACK(i8271_timed_command_complete_callback);
-
 #define VERBOSE 0
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 #define FDC_LOG(x) do { if (VERBOSE) logerror("I8271: %s\n",x); } while (0)
 #define FDC_LOG_COMMAND(x) do { if (VERBOSE) logerror("I8271: COMMAND %s\n",x); } while (0)
 
-static DEVICE_RESET( i8271 );
 
-INLINE i8271_t *get_safe_token(device_t *device)
+/* Device Interface */
+
+const device_type I8271 = &device_creator<i8271_device>;
+
+i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__),
+	m_flags(0),
+	m_state(0),
+	m_Command(0),
+	m_StatusRegister(0),
+	m_CommandRegister(0),
+	m_ResultRegister(0),
+	m_ParameterRegister(0),
+	m_ResetRegister(0),
+	m_data(0),
+	m_ParameterCount(0),
+	m_ParameterCountWritten(0),
+	m_Mode(0),
+	m_drive(0),
+	m_side(0),
+	m_drive_control_output(0),
+	m_drive_control_input(0),
+	m_StepRate(0),
+	m_HeadSettlingTime(0),
+	m_IndexCountBeforeHeadUnload(0),
+	m_HeadLoadTime(0),
+	//m_ID_C(0),
+	//m_ID_H(0),
+	m_ID_R(0),
+	m_ID_N(0),
+	m_data_id(0),
+	m_ExecutionPhaseTransferCount(0),
+	m_ExecutionPhaseCount(0),
+	m_Counter(0)
+	//m_data_direction(0)
 {
-	assert(device != NULL);
-	assert(device->type() == I8271);
-
-	return (i8271_t *)downcast<i8271_device *>(device)->token();
+	for (int i = 0; i < 8; i++ )
+	{
+		m_CommandParameters[i] = 0;
+	}
+	
+	for (int i = 0; i < 2; i++ )
+	{
+		m_CurrentTrack[i] = 0;
+	}
+	
+	for (int i = 0; i < 4; i++ )
+	{
+		m_BadTracks[i] = 0;
+	}
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-static device_t *current_image(device_t *device)
+void i8271_device::device_config_complete()
 {
-	i8271_t *i8271 = get_safe_token(device);
-	if (i8271->intf->floppy_drive_tags[i8271->drive]!=NULL) {
-		return device->machine().device(i8271->intf->floppy_drive_tags[i8271->drive]);
+	// inherit a copy of the static data
+	const i8271_interface *intf = reinterpret_cast<const i8271_interface *>(static_config());
+	if (intf != NULL)
+			*static_cast<i8271_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_interrupt_cb, 0, sizeof(m_interrupt_cb));
+		m_dma_request = NULL;
+		m_floppy_drive_tags[0] = "";
+		m_floppy_drive_tags[1] = "";
+	}
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void i8271_device::device_start()
+{
+	m_data_timer = timer_alloc(TIMER_DATA_CALLBACK);
+	m_command_complete_timer = timer_alloc(TIMER_TIMED_COMMAND_COMPLETE);
+	m_drive = 0;
+	m_pExecutionPhaseData = auto_alloc_array(machine(), char, 0x4000);
+	m_interrupt_func.resolve(m_interrupt_cb, *this);
+
+	// register for state saving
+	/*save_item(NAME(m_flags));
+	save_item(NAME(m_state));
+	save_item(NAME(m_Command));
+	save_item(NAME(m_StatusRegister));
+	save_item(NAME(m_CommandRegister));
+	save_item(NAME(m_ResultRegister));
+	save_item(NAME(m_ParameterRegister));
+	save_item(NAME(m_ResetRegister));
+	save_item(NAME(m_data));
+	//save_item(NAME(m_ParameterCount));
+	//save_item(NAME(m_ParameterCountWritten));
+	save_item(NAME(m_CommandParameters));
+	//save_item(NAME(m_CurrentTrack));
+	//save_item(NAME(m_BadTracks));
+	//save_item(NAME(m_Mode));
+	save_item(NAME(m_drive));
+	save_item(NAME(m_side));
+	save_item(NAME(m_drive_control_output));
+	save_item(NAME(m_drive_control_input));
+	//save_item(NAME(m_StepRate));
+	//save_item(NAME(m_HeadSettlingTime));
+	//save_item(NAME(m_IndexCountBeforeHeadUnload));
+	//save_item(NAME(m_HeadLoadTime));
+	save_item(NAME(m_ID_C));
+	save_item(NAME(m_ID_H));
+	save_item(NAME(m_ID_R));
+	save_item(NAME(m_ID_N));
+	save_item(NAME(m_data_id));
+	save_item(NAME(m_ExecutionPhaseTransferCount));
+	save_item(NAME(m_ExecutionPhaseCount));
+	save_item(NAME(m_Counter));
+	save_item(NAME(m_data_direction));
+	save_pointer(NAME(m_pExecutionPhaseData), 0x4000);*/
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void i8271_device::device_reset()
+{
+	m_StatusRegister = 0;  //I8271_STATUS_INT_REQUEST | I8271_STATUS_NON_DMA_REQUEST;
+	m_Mode = 0x0c0; /* bits 0, 1 are initialized to zero */
+	m_ParameterCountWritten = 0;
+	m_ParameterCount = 0;
+
+	/* if timer is active remove */
+	m_command_complete_timer->reset();
+	m_data_timer->reset();
+
+	/* clear irq */
+	set_irq_state(0);
+	/* clear dma */
+	set_dma_drq();
+}
+
+device_t *i8271_device::current_image()
+{
+	if (m_floppy_drive_tags[m_drive]!=NULL) {
+		return machine().device(m_floppy_drive_tags[m_drive]);
 	} else {
 		return NULL;
 	}
 }
 
 
-static void i8271_seek_to_track(device_t *device,int track)
+void i8271_device::seek_to_track(int track)
 {
-	device_t *img = current_image(device);
-	i8271_t *i8271 = get_safe_token(device);
+	device_t *img = current_image();
 	if (track==0)
 	{
 		/* seek to track 0 */
@@ -217,223 +264,209 @@ static void i8271_seek_to_track(device_t *device,int track)
 			floppy_drive_seek(img, -1);
 		}
 
-		i8271->CurrentTrack[i8271->drive] = 0;
+		m_CurrentTrack[m_drive] = 0;
 
 		/* failed to find track 0? */
 		if (StepCount==0)
 		{
 			/* Completion Type: operator intervation probably required for recovery */
 			/* Completion code: track 0 not found */
-			i8271->ResultRegister |= (2<<3) | 2<<1;
+			m_ResultRegister |= (2<<3) | 2<<1;
 		}
 
 		/* step out - towards track 0 */
-		i8271->drive_control_output &=~(1<<2);
+		m_drive_control_output &=~(1<<2);
 	}
 	else
 	{
 		signed int SignedTracks;
 
 		/* calculate number of tracks to seek */
-		SignedTracks = track - i8271->CurrentTrack[i8271->drive];
+		SignedTracks = track - m_CurrentTrack[m_drive];
 
 		/* step towards 0 */
-		i8271->drive_control_output &= ~(1<<2);
+		m_drive_control_output &= ~(1<<2);
 
 		if (SignedTracks>0)
 		{
 			/* step away from 0 */
-			i8271->drive_control_output |= (1<<2);
+			m_drive_control_output |= (1<<2);
 		}
 
 
 		/* seek to track 0 */
 		floppy_drive_seek(img, SignedTracks);
 
-		i8271->CurrentTrack[i8271->drive] = track;
+		m_CurrentTrack[m_drive] = track;
 	}
 }
 
-
-static TIMER_CALLBACK(i8271_data_timer_callback)
+void i8271_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	device_t *device = (device_t *)ptr;
-	i8271_t *i8271 = get_safe_token(device);
+	switch (id)
+	{
+	case TIMER_DATA_CALLBACK:
+		/* ok, trigger data request now */
+		data_request();
 
-	/* ok, trigger data request now */
-	i8271_data_request(device);
+		/* stop it */
+		m_data_timer->reset();
+		break;
+		
+	case TIMER_TIMED_COMMAND_COMPLETE:
+		command_complete(1,1);
 
-	/* stop it */
-	i8271->data_timer->reset();
+		/* stop it, but don't allow it to be free'd */
+		m_command_complete_timer->reset();
+		break;
+		
+	default:
+		break;
+	}
 }
-
+	
 /* setup a timed data request - data request will be triggered in a few usecs time */
-static void i8271_timed_data_request(device_t *device)
+void i8271_device::timed_data_request()
 {
 	int usecs;
-	i8271_t *i8271 = get_safe_token(device);
 	/* 64 for single density */
 	usecs = 64;
 
 	/* set timers */
-	i8271->command_complete_timer->reset();
-	i8271->data_timer->adjust(attotime::from_usec(usecs));
+	m_command_complete_timer->reset();
+	m_data_timer->adjust(attotime::from_usec(usecs));
 }
 
-
-static TIMER_CALLBACK(i8271_timed_command_complete_callback)
-{
-	device_t *device = (device_t *)ptr;
-	i8271_t *i8271 = get_safe_token(device);
-
-	i8271_command_complete(device,1,1);
-
-	/* stop it, but don't allow it to be free'd */
-	i8271->command_complete_timer->reset();
-}
 
 /* setup a irq to occur 128us later - in reality this would be much later, because the int would
 come after reading the two CRC bytes at least! This function is used when a irq is required at
 command completion. Required for read data and write data, where last byte could be missed! */
-static void i8271_timed_command_complete(device_t *device)
+void i8271_device::timed_command_complete()
 {
 	int usecs;
-	i8271_t *i8271 = get_safe_token(device);
-
+	
 	/* 64 for single density - 2 crc bytes later*/
 	usecs = 64*2;
 
 	/* set timers */
-	i8271->data_timer->reset();
-	i8271->command_complete_timer->adjust(attotime::from_usec(usecs));
+	m_data_timer->reset();
+	m_command_complete_timer->adjust(attotime::from_usec(usecs));
 }
 
-static void i8271_set_irq_state(device_t *device,int state)
+void i8271_device::set_irq_state(int state)
 {
-	i8271_t *i8271 = get_safe_token(device);
-	i8271->StatusRegister &= ~I8271_STATUS_INT_REQUEST;
+	m_StatusRegister &= ~I8271_STATUS_INT_REQUEST;
 	if (state)
 	{
-		i8271->StatusRegister |= I8271_STATUS_INT_REQUEST;
+		m_StatusRegister |= I8271_STATUS_INT_REQUEST;
 	}
 
-	if (i8271->intf->interrupt)
+	if (!m_interrupt_func.isnull())
+		m_interrupt_func(m_StatusRegister & I8271_STATUS_INT_REQUEST);
+}
+
+void i8271_device::set_dma_drq()
+{
+	if (m_dma_request)
 	{
-		i8271->intf->interrupt(device, (i8271->StatusRegister & I8271_STATUS_INT_REQUEST));
+		m_dma_request(*this, (m_flags & I8271_FLAGS_DATA_REQUEST), (m_flags & I8271_FLAGS_DATA_DIRECTION));
 	}
 }
 
-static void i8271_set_dma_drq(device_t *device)
+void i8271_device::load_bad_tracks(int surface)
 {
-	i8271_t *i8271 = get_safe_token(device);
-	if (i8271->intf->dma_request)
-	{
-		i8271->intf->dma_request(device, (i8271->flags & I8271_FLAGS_DATA_REQUEST), (i8271->flags & I8271_FLAGS_DATA_DIRECTION));
-	}
+	m_BadTracks[(surface<<1) + 0] = m_CommandParameters[1];
+	m_BadTracks[(surface<<1) + 1] = m_CommandParameters[2];
+	m_CurrentTrack[surface] = m_CommandParameters[3];
 }
 
-static void i8271_load_bad_tracks(device_t *device, int surface)
+void i8271_device::write_bad_track(int surface, int track, int data)
 {
-	i8271_t *i8271 = get_safe_token(device);
-	i8271->BadTracks[(surface<<1) + 0] = i8271->CommandParameters[1];
-	i8271->BadTracks[(surface<<1) + 1] = i8271->CommandParameters[2];
-	i8271->CurrentTrack[surface] = i8271->CommandParameters[3];
+	m_BadTracks[(surface<<1) + (track-1)] = data;
 }
 
-static void i8271_write_bad_track(device_t *device, int surface, int track, int data)
+void i8271_device::write_current_track(int surface, int track)
 {
-	i8271_t *i8271 = get_safe_token(device);
-	i8271->BadTracks[(surface<<1) + (track-1)] = data;
+	m_CurrentTrack[surface] = track;
 }
 
-static void i8271_write_current_track(device_t *device,int surface, int track)
+int i8271_device::read_current_track(int surface)
 {
-	i8271_t *i8271 = get_safe_token(device);
-	i8271->CurrentTrack[surface] = track;
+	return m_CurrentTrack[surface];
 }
 
-static int i8271_read_current_track(device_t *device,int surface)
+int i8271_device::read_bad_track(int surface, int track)
 {
-	i8271_t *i8271 = get_safe_token(device);
-	return i8271->CurrentTrack[surface];
+	return m_BadTracks[(surface<<1) + (track-1)];
 }
 
-static int i8271_read_bad_track(device_t *device,int surface, int track)
+void i8271_device::get_drive()
 {
-	i8271_t *i8271 = get_safe_token(device);
-	return i8271->BadTracks[(surface<<1) + (track-1)];
-}
-
-static void i8271_get_drive(device_t *device)
-{
-	i8271_t *i8271 = get_safe_token(device);
 	/* &40 = drive 0 side 0 */
 	/* &80 = drive 1 side 0 */
 
 
 
-	if (i8271->CommandRegister & (1<<6))
+	if (m_CommandRegister & (1<<6))
 	{
-		i8271->drive = 0;
+		m_drive = 0;
 	}
 
-	if (i8271->CommandRegister & (1<<7))
+	if (m_CommandRegister & (1<<7))
 	{
-		i8271->drive = 1;
+		m_drive = 1;
 	}
 
 }
 
-static void i8271_check_all_parameters_written(device_t *device)
+void i8271_device::check_all_parameters_written()
 {
-	i8271_t *i8271 = get_safe_token(device);
-	if (i8271->ParameterCount == i8271->ParameterCountWritten)
+	if (m_ParameterCount == m_ParameterCountWritten)
 	{
-		i8271->StatusRegister &= ~I8271_STATUS_COMMAND_FULL;
+		m_StatusRegister &= ~I8271_STATUS_COMMAND_FULL;
 
-		i8271_command_execute(device);
+		command_execute();
 	}
 }
 
 
-static void i8271_update_state(device_t *device)
+void i8271_device::update_state()
 {
-	i8271_t *i8271 = get_safe_token(device);
-	switch (i8271->state)
+	switch (m_state)
 	{
 		/* fdc reading data and passing it to cpu which must read it */
 		case I8271_STATE_EXECUTION_READ:
 		{
 	//      /* if data request has been cleared, i.e. caused by a read of the register */
-	//      if ((i8271->flags & I8271_FLAGS_DATA_REQUEST)==0)
+	//      if ((m_flags & I8271_FLAGS_DATA_REQUEST)==0)
 			{
 				/* setup data with byte */
-				i8271->data = i8271->pExecutionPhaseData[i8271->ExecutionPhaseCount];
+				m_data = m_pExecutionPhaseData[m_ExecutionPhaseCount];
 
-/*              logerror("read data %02x\n", i8271->data); */
+/*              logerror("read data %02x\n", m_data); */
 
 				/* update counters */
-				i8271->ExecutionPhaseCount++;
-				i8271->ExecutionPhaseTransferCount--;
+				m_ExecutionPhaseCount++;
+				m_ExecutionPhaseTransferCount--;
 
-			//  logerror("Count: %04x\n", i8271->ExecutionPhaseCount);
-			//  logerror("Remaining: %04x\n", i8271->ExecutionPhaseTransferCount);
+			//  logerror("Count: %04x\n", m_ExecutionPhaseCount);
+			//  logerror("Remaining: %04x\n", m_ExecutionPhaseTransferCount);
 
 				/* completed? */
-				if (i8271->ExecutionPhaseTransferCount==0)
+				if (m_ExecutionPhaseTransferCount==0)
 				{
 					/* yes */
 
 			//      logerror("sector read complete!\n");
 					/* continue command */
-					i8271_command_continue(device);
+					command_continue();
 				}
 				else
 				{
 					/* no */
 
 					/* issue data request */
-					i8271_timed_data_request(device);
+					timed_data_request();
 				}
 			}
 		}
@@ -443,25 +476,25 @@ static void i8271_update_state(device_t *device)
 		case I8271_STATE_EXECUTION_WRITE:
 		{
 			/* setup data with byte */
-			i8271->pExecutionPhaseData[i8271->ExecutionPhaseCount] = i8271->data;
+			m_pExecutionPhaseData[m_ExecutionPhaseCount] = m_data;
 			/* update counters */
-			i8271->ExecutionPhaseCount++;
-			i8271->ExecutionPhaseTransferCount--;
+			m_ExecutionPhaseCount++;
+			m_ExecutionPhaseTransferCount--;
 
 			/* completed? */
-			if (i8271->ExecutionPhaseTransferCount==0)
+			if (m_ExecutionPhaseTransferCount==0)
 			{
 				/* yes */
 
 				/* continue command */
-				i8271_command_continue(device);
+				command_continue();
 			}
 			else
 			{
 				/* no */
 
 				/* issue data request */
-				i8271_timed_data_request(device);
+				timed_data_request();
 			}
 		}
 		break;
@@ -471,113 +504,107 @@ static void i8271_update_state(device_t *device)
 	}
 }
 
-static void i8271_initialise_execution_phase_read(device_t *device,int transfer_size)
+void i8271_device::initialise_execution_phase_read(int transfer_size)
 {
-	i8271_t *i8271 = get_safe_token(device);
 	/* read */
-	i8271->flags |= I8271_FLAGS_DATA_DIRECTION;
-	i8271->ExecutionPhaseCount = 0;
-	i8271->ExecutionPhaseTransferCount = transfer_size;
-	i8271->state = I8271_STATE_EXECUTION_READ;
+	m_flags |= I8271_FLAGS_DATA_DIRECTION;
+	m_ExecutionPhaseCount = 0;
+	m_ExecutionPhaseTransferCount = transfer_size;
+	m_state = I8271_STATE_EXECUTION_READ;
 }
 
 
-static void i8271_initialise_execution_phase_write(device_t *device,int transfer_size)
+void i8271_device::initialise_execution_phase_write(int transfer_size)
 {
-	i8271_t *i8271 = get_safe_token(device);
 	/* write */
-	i8271->flags &= ~I8271_FLAGS_DATA_DIRECTION;
-	i8271->ExecutionPhaseCount = 0;
-	i8271->ExecutionPhaseTransferCount = transfer_size;
-	i8271->state = I8271_STATE_EXECUTION_WRITE;
+	m_flags &= ~I8271_FLAGS_DATA_DIRECTION;
+	m_ExecutionPhaseCount = 0;
+	m_ExecutionPhaseTransferCount = transfer_size;
+	m_state = I8271_STATE_EXECUTION_WRITE;
 }
 
 /* for data transfers */
-static void i8271_data_request(device_t *device)
+void i8271_device::data_request()
 {
-	i8271_t *i8271 = get_safe_token(device);
-	i8271->flags |= I8271_FLAGS_DATA_REQUEST;
+	m_flags |= I8271_FLAGS_DATA_REQUEST;
 
-	if ((i8271->Mode & 0x01)!=0)
+	if ((m_Mode & 0x01)!=0)
 	{
 		/* non-dma */
-		i8271->StatusRegister |= I8271_STATUS_NON_DMA_REQUEST;
+		m_StatusRegister |= I8271_STATUS_NON_DMA_REQUEST;
 		/* set int */
-		i8271_set_irq_state(device,1);
+		set_irq_state(1);
 	}
 	else
 	{
 		/* dma */
-		i8271->StatusRegister &= ~I8271_STATUS_NON_DMA_REQUEST;
+		m_StatusRegister &= ~I8271_STATUS_NON_DMA_REQUEST;
 
-		i8271_set_dma_drq(device);
+		set_dma_drq();
 	}
 }
 
-static void i8271_command_complete(device_t *device,int result, int int_rq)
+void i8271_device::command_complete(int result, int int_rq)
 {
-	i8271_t *i8271 = get_safe_token(device);
 	/* not busy, and not a execution phase data request in non-dma mode */
-	i8271->StatusRegister &= ~(I8271_STATUS_COMMAND_BUSY | I8271_STATUS_NON_DMA_REQUEST);
+	m_StatusRegister &= ~(I8271_STATUS_COMMAND_BUSY | I8271_STATUS_NON_DMA_REQUEST);
 
 	if (result)
 	{
-		i8271->StatusRegister |= I8271_STATUS_RESULT_FULL;
+		m_StatusRegister |= I8271_STATUS_RESULT_FULL;
 	}
 
 	if (int_rq)
 	{
 		/* trigger an int */
-		i8271_set_irq_state(device,1);
+		set_irq_state(1);
 	}
 
 	/* correct?? */
-	i8271->drive_control_output &=~1;
+	m_drive_control_output &=~1;
 }
 
 
 /* for data transfers */
-static void i8271_clear_data_request(device_t *device)
+void i8271_device::clear_data_request()
 {
-	i8271_t *i8271 = get_safe_token(device);
-	i8271->flags &= ~I8271_FLAGS_DATA_REQUEST;
+	m_flags &= ~I8271_FLAGS_DATA_REQUEST;
 
-	if ((i8271->Mode & 0x01)!=0)
+	if ((m_Mode & 0x01)!=0)
 	{
 		/* non-dma */
-		i8271->StatusRegister &= ~I8271_STATUS_NON_DMA_REQUEST;
+		m_StatusRegister &= ~I8271_STATUS_NON_DMA_REQUEST;
 		/* set int */
-		i8271_set_irq_state(device,0);
+		set_irq_state(0);
 	}
 	else
 	{
 		/* dma */
-		i8271_set_dma_drq(device);
+		set_dma_drq();
 	}
 }
 
 
-static void i8271_command_continue(device_t *device)
+void i8271_device::command_continue()
 {
-	i8271_t *i8271 = get_safe_token(device);
-	switch (i8271->Command)
+	switch (m_Command)
 	{
 		case I8271_COMMAND_READ_DATA_MULTI_RECORD:
 		case I8271_COMMAND_READ_DATA_SINGLE_RECORD:
 		{
 			/* completed all sectors? */
-			i8271->Counter--;
+			m_Counter--;
 			/* increment sector id */
-			i8271->ID_R++;
+			m_ID_R++;
 
 			/* end command? */
-			if (i8271->Counter==0)
+			if (m_Counter==0)
 			{
-				i8271_timed_command_complete(device);
+				timed_command_complete();
 				return;
 			}
 
-			i8271_do_read(device);
+			do_read();
 		}
 		break;
 
@@ -585,35 +612,35 @@ static void i8271_command_continue(device_t *device)
 		case I8271_COMMAND_WRITE_DATA_SINGLE_RECORD:
 		{
 			/* put the buffer to the sector */
-			floppy_drive_write_sector_data(current_image(device), i8271->side, i8271->data_id, i8271->pExecutionPhaseData, 1<<(i8271->ID_N+7),0);
+			floppy_drive_write_sector_data(current_image(), m_side, m_data_id, m_pExecutionPhaseData, 1<<(m_ID_N+7),0);
 
 			/* completed all sectors? */
-			i8271->Counter--;
+			m_Counter--;
 			/* increment sector id */
-			i8271->ID_R++;
+			m_ID_R++;
 
 			/* end command? */
-			if (i8271->Counter==0)
+			if (m_Counter==0)
 			{
-				i8271_timed_command_complete(device);
+				timed_command_complete();
 				return;
 			}
 
-			i8271_do_write(device);
+			do_write();
 		}
 		break;
 
 		case I8271_COMMAND_READ_ID:
 		{
-			i8271->Counter--;
+			m_Counter--;
 
-			if (i8271->Counter==0)
+			if (m_Counter==0)
 			{
-				i8271_timed_command_complete(device);
+				timed_command_complete();
 				return;
 			}
 
-			i8271_do_read_id(device);
+			do_read_id();
 		}
 		break;
 
@@ -622,68 +649,64 @@ static void i8271_command_continue(device_t *device)
 	}
 }
 
-static void i8271_do_read(device_t *device)
+void i8271_device::do_read()
 {
-	i8271_t *i8271 = get_safe_token(device);
 	/* find the sector */
-	if (i8271_find_sector(device))
+	if (find_sector())
 	{
 		/* get the sector into the buffer */
-		floppy_drive_read_sector_data(current_image(device), i8271->side, i8271->data_id, i8271->pExecutionPhaseData, 1<<(i8271->ID_N+7));
+		floppy_drive_read_sector_data(current_image(), m_side, m_data_id, m_pExecutionPhaseData, 1<<(m_ID_N+7));
 
 		/* initialise for reading */
-		i8271_initialise_execution_phase_read(device, 1<<(i8271->ID_N+7));
+		initialise_execution_phase_read(1<<(m_ID_N+7));
 
 		/* update state - gets first byte and triggers a data request */
-		i8271_timed_data_request(device);
+		timed_data_request();
 		return;
 	}
 	LOG(("error getting sector data\n"));
 
-	i8271_timed_command_complete(device);
+	timed_command_complete();
 }
 
-static void i8271_do_read_id(device_t *device)
+void i8271_device::do_read_id()
 {
 	chrn_id id;
-	i8271_t *i8271 = get_safe_token(device);
-
+	
 	/* get next id from disc */
-	floppy_drive_get_next_id(current_image(device), i8271->side,&id);
+	floppy_drive_get_next_id(current_image(), m_side,&id);
 
-	i8271->pExecutionPhaseData[0] = id.C;
-	i8271->pExecutionPhaseData[1] = id.H;
-	i8271->pExecutionPhaseData[2] = id.R;
-	i8271->pExecutionPhaseData[3] = id.N;
+	m_pExecutionPhaseData[0] = id.C;
+	m_pExecutionPhaseData[1] = id.H;
+	m_pExecutionPhaseData[2] = id.R;
+	m_pExecutionPhaseData[3] = id.N;
 
-	i8271_initialise_execution_phase_read(device, 4);
+	initialise_execution_phase_read(4);
 }
 
 
-static void i8271_do_write(device_t *device)
+void i8271_device::do_write()
 {
-	i8271_t *i8271 = get_safe_token(device);
 	/* find the sector */
-	if (i8271_find_sector(device))
+	if (find_sector())
 	{
 		/* initialise for reading */
-		i8271_initialise_execution_phase_write(device,1<<(i8271->ID_N+7));
+		initialise_execution_phase_write(1<<(m_ID_N+7));
 
 		/* update state - gets first byte and triggers a data request */
-		i8271_timed_data_request(device);
+		timed_data_request();
 		return;
 	}
 	LOG(("error getting sector data\n"));
 
-	i8271_timed_command_complete(device);
+	timed_command_complete();
 }
 
 
 
-static int i8271_find_sector(device_t *device)
+int i8271_device::find_sector()
 {
-	device_t *img = current_image(device);
-	i8271_t *i8271 = get_safe_token(device);
+	device_t *img = current_image();
 //  int track_count_attempt;
 
 //  track_count_attempt
@@ -698,16 +721,16 @@ static int i8271_find_sector(device_t *device)
 		chrn_id id;
 
 		/* get next id from disc */
-		if (floppy_drive_get_next_id(img, i8271->side,&id))
+		if (floppy_drive_get_next_id(img, m_side,&id))
 		{
 			/* tested on Amstrad CPC - All bytes must match, otherwise
 			a NO DATA error is reported */
-			if (id.R == i8271->ID_R)
+			if (id.R == m_ID_R)
 			{
 				/* TODO: Is this correct? What about bad tracks? */
-				if (id.C == i8271->CurrentTrack[i8271->drive])
+				if (id.C == m_CurrentTrack[m_drive])
 				{
-					i8271->data_id = id.data_id;
+					m_data_id = id.data_id;
 					return 1;
 				}
 				else
@@ -731,40 +754,39 @@ static int i8271_find_sector(device_t *device)
 
 	/* completion type: command/drive error */
 	/* completion code: sector not found */
-	i8271->ResultRegister |= (3<<3);
+	m_ResultRegister |= (3<<3);
 
 	return 0;
 }
 
-static void i8271_command_execute(device_t *device)
+void i8271_device::command_execute()
 {
-	i8271_t *i8271 = get_safe_token(device);
-	device_t *img = current_image(device);
+	device_t *img = current_image();
 
 	/* clear it = good completion status */
 	/* this will be changed if anything bad happens! */
-	i8271->ResultRegister = 0;
+	m_ResultRegister = 0;
 
-	switch (i8271->Command)
+	switch (m_Command)
 	{
 		case I8271_COMMAND_SPECIFY:
 		{
-			switch (i8271->CommandParameters[0])
+			switch (m_CommandParameters[0])
 			{
 				case 0x0d:
 				{
 					LOG(("Initialization\n"));
-					i8271->StepRate = i8271->CommandParameters[1];
-					i8271->HeadSettlingTime = i8271->CommandParameters[2];
-					i8271->IndexCountBeforeHeadUnload = (i8271->CommandParameters[3]>>4) & 0x0f;
-					i8271->HeadLoadTime = (i8271->CommandParameters[3] & 0x0f);
+					m_StepRate = m_CommandParameters[1];
+					m_HeadSettlingTime = m_CommandParameters[2];
+					m_IndexCountBeforeHeadUnload = (m_CommandParameters[3]>>4) & 0x0f;
+					m_HeadLoadTime = (m_CommandParameters[3] & 0x0f);
 				}
 				break;
 
 				case 0x010:
 				{
 					LOG(("Load bad Tracks Surface 0\n"));
-					i8271_load_bad_tracks(device,0);
+					load_bad_tracks(0);
 
 				}
 				break;
@@ -772,14 +794,14 @@ static void i8271_command_execute(device_t *device)
 				case 0x018:
 				{
 					LOG(("Load bad Tracks Surface 1\n"));
-					i8271_load_bad_tracks(device,1);
+					load_bad_tracks(1);
 
 				}
 				break;
 			}
 
 			/* no result */
-			i8271_command_complete(device,0,0);
+			command_complete(0,0);
 		}
 		break;
 
@@ -788,48 +810,48 @@ static void i8271_command_execute(device_t *device)
 			/* unknown - what is read when a special register that isn't allowed is specified? */
 			int data = 0x0ff;
 
-			switch (i8271->CommandParameters[0])
+			switch (m_CommandParameters[0])
 			{
 				case I8271_SPECIAL_REGISTER_MODE_REGISTER:
 				{
-					data = i8271->Mode;
+					data = m_Mode;
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_0_CURRENT_TRACK:
 				{
-					data = i8271_read_current_track(device, 0);
+					data = read_current_track(0);
 
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_1_CURRENT_TRACK:
 				{
-					data = i8271_read_current_track(device, 1);
+					data = read_current_track(1);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_1:
 				{
-					data = i8271_read_bad_track(device, 0,1);
+					data = read_bad_track(0,1);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_2:
 				{
-					data = i8271_read_bad_track(device, 0,2);
+					data = read_bad_track(0,2);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_1:
 				{
-					data = i8271_read_bad_track(device, 1,1);
+					data = read_bad_track(1,1);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_1_BAD_TRACK_2:
 				{
-					data = i8271_read_bad_track(device, 1,2);
+					data = read_bad_track(1,2);
 				}
 				break;
 
@@ -837,12 +859,12 @@ static void i8271_command_execute(device_t *device)
 				{
 					FDC_LOG_COMMAND("Read Drive Control Output port\n");
 
-					i8271_get_drive(device);
+					get_drive();
 
 					/* assumption: select bits reflect the select bits from the previous
 					command. i.e. read drive status */
-					data = (i8271->drive_control_output & ~0x0c0)
-						| (i8271->CommandRegister & 0x0c0);
+					data = (m_drive_control_output & ~0x0c0)
+						| (m_CommandRegister & 0x0c0);
 
 
 				}
@@ -862,38 +884,38 @@ static void i8271_command_execute(device_t *device)
 					FDC_LOG_COMMAND("Read Drive Control Input port\n");
 
 
-					i8271->drive_control_input = (1<<6) | (1<<2);
+					m_drive_control_input = (1<<6) | (1<<2);
 
 					/* bit 3 = 0 if write protected */
-					i8271->drive_control_input |= floppy_wpt_r(img) << 3;
+					m_drive_control_input |= floppy_wpt_r(img) << 3;
 
 					/* bit 1 = 0 if head at track 0 */
-					i8271->drive_control_input |= floppy_tk00_r(img) << 1;
+					m_drive_control_input |= floppy_tk00_r(img) << 1;
 
 					/* need to setup this register based on drive selected */
-					data = i8271->drive_control_input;
+					data = m_drive_control_input;
 				}
 				break;
 
 			}
 
-			i8271->ResultRegister = data;
+			m_ResultRegister = data;
 
-			i8271_command_complete(device,1,0);
+			command_complete(1,0);
 		}
 		break;
 
 
 		case I8271_COMMAND_WRITE_SPECIAL_REGISTER:
 		{
-			switch (i8271->CommandParameters[0])
+			switch (m_CommandParameters[0])
 			{
 				case I8271_SPECIAL_REGISTER_MODE_REGISTER:
 				{
 					/* TODO: Check bits 6-7 and 5-2 are valid */
-					i8271->Mode = i8271->CommandParameters[1];
+					m_Mode = m_CommandParameters[1];
 
-					if (i8271->Mode & 0x01)
+					if (m_Mode & 0x01)
 					{
 						LOG(("Mode: Non-DMA\n"));
 					}
@@ -902,7 +924,7 @@ static void i8271_command_execute(device_t *device)
 						LOG(("Mode: DMA\n"));
 					}
 
-					if (i8271->Mode & 0x02)
+					if (m_Mode & 0x02)
 					{
 						LOG(("Single actuator\n"));
 					}
@@ -916,28 +938,28 @@ static void i8271_command_execute(device_t *device)
 				case I8271_SPECIAL_REGISTER_SURFACE_0_CURRENT_TRACK:
 				{
 					LOG(("Surface 0 Current Track\n"));
-					i8271_write_current_track(device, 0, i8271->CommandParameters[1]);
+					write_current_track(0, m_CommandParameters[1]);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_1_CURRENT_TRACK:
 				{
 					LOG(("Surface 1 Current Track\n"));
-					i8271_write_current_track(device, 1, i8271->CommandParameters[1]);
+					write_current_track(1, m_CommandParameters[1]);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_1:
 				{
 					LOG(("Surface 0 Bad Track 1\n"));
-					i8271_write_bad_track(device, 0, 1, i8271->CommandParameters[1]);
+					write_bad_track(0, 1, m_CommandParameters[1]);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_SURFACE_0_BAD_TRACK_2:
 				{
 					LOG(("Surface 0 Bad Track 2\n"));
-					i8271_write_bad_track(device, 0, 2,i8271->CommandParameters[1]);
+					write_bad_track(0, 2,m_CommandParameters[1]);
 				}
 				break;
 
@@ -946,7 +968,7 @@ static void i8271_command_execute(device_t *device)
 					LOG(("Surface 1 Bad Track 1\n"));
 
 
-					i8271_write_bad_track(device, 1, 1, i8271->CommandParameters[1]);
+					write_bad_track(1, 1, m_CommandParameters[1]);
 				}
 				break;
 
@@ -954,66 +976,66 @@ static void i8271_command_execute(device_t *device)
 				{
 					LOG(("Surface 1 Bad Track 2\n"));
 
-					i8271_write_bad_track(device, 1, 2, i8271->CommandParameters[1]);
+					write_bad_track(1, 2, m_CommandParameters[1]);
 				}
 				break;
 
 				case I8271_SPECIAL_REGISTER_DRIVE_CONTROL_OUTPUT_PORT:
 				{
 //                  /* get drive selected */
-//                  i8271->drive = (i8271->CommandParameters[1]>>6) & 0x03;
+//                  m_drive = (m_CommandParameters[1]>>6) & 0x03;
 
 					FDC_LOG_COMMAND("Write Drive Control Output port\n");
 
 
-					if (i8271->CommandParameters[1] & 0x01)
+					if (m_CommandParameters[1] & 0x01)
 					{
 						LOG(("Write Enable\n"));
 					}
-					if (i8271->CommandParameters[1] & 0x02)
+					if (m_CommandParameters[1] & 0x02)
 					{
 						LOG(("Seek/Step\n"));
 					}
-					if (i8271->CommandParameters[1] & 0x04)
+					if (m_CommandParameters[1] & 0x04)
 					{
 						LOG(("Direction\n"));
 					}
-					if (i8271->CommandParameters[1] & 0x08)
+					if (m_CommandParameters[1] & 0x08)
 					{
 						LOG(("Load Head\n"));
 					}
-					if (i8271->CommandParameters[1] & 0x010)
+					if (m_CommandParameters[1] & 0x010)
 					{
 						LOG(("Low head current\n"));
 					}
-					if (i8271->CommandParameters[1] & 0x020)
+					if (m_CommandParameters[1] & 0x020)
 					{
 						LOG(("Write Fault Reset\n"));
 					}
 
-					LOG(("Select %02x\n", (i8271->CommandParameters[1] & 0x0c0)>>6));
+					LOG(("Select %02x\n", (m_CommandParameters[1] & 0x0c0)>>6));
 
 					/* get drive */
-					i8271_get_drive(device);
+					get_drive();
 
 					/* on bbc dfs 09 this is the side select output */
-					i8271->side = (i8271->CommandParameters[1]>>5) & 0x01;
+					m_side = (m_CommandParameters[1]>>5) & 0x01;
 
 					/* load head - on mini-sized drives this turns on the disc motor,
 					on standard-sized drives this loads the head and turns the motor on */
-					floppy_mon_w(img, !BIT(i8271->CommandParameters[1], 3));
+					floppy_mon_w(img, !BIT(m_CommandParameters[1], 3));
 					floppy_drive_set_ready_state(img, 1, 1);
 
 					/* step pin changed? if so perform a step in the direction indicated */
-					if (((i8271->drive_control_output^i8271->CommandParameters[1]) & (1<<1))!=0)
+					if (((m_drive_control_output^m_CommandParameters[1]) & (1<<1))!=0)
 					{
 						/* step pin changed state? */
 
-						if ((i8271->CommandParameters[1] & (1<<1))!=0)
+						if ((m_CommandParameters[1] & (1<<1))!=0)
 						{
 							signed int signed_tracks;
 
-							if ((i8271->CommandParameters[1] & (1<<2))!=0)
+							if ((m_CommandParameters[1] & (1<<2))!=0)
 							{
 								signed_tracks = 1;
 							}
@@ -1026,7 +1048,7 @@ static void i8271_command_execute(device_t *device)
 						}
 					}
 
-					i8271->drive_control_output = i8271->CommandParameters[1];
+					m_drive_control_output = m_CommandParameters[1];
 
 
 				}
@@ -1036,14 +1058,14 @@ static void i8271_command_execute(device_t *device)
 				{
 					FDC_LOG_COMMAND("Write Drive Control Input port\n");
 
-					//                  i8271->drive_control_input = i8271->CommandParameters[1];
+					//                  m_drive_control_input = m_CommandParameters[1];
 				}
 				break;
 
 			}
 
 			/* write doesn't supply a result */
-			i8271_command_complete(device,0,0);
+			command_complete(0,0);
 		}
 		break;
 
@@ -1051,7 +1073,7 @@ static void i8271_command_execute(device_t *device)
 		{
 			unsigned char status;
 
-			i8271_get_drive(device);
+			get_drive();
 
 			/* no write fault */
 			status = 0;
@@ -1060,15 +1082,15 @@ static void i8271_command_execute(device_t *device)
 
 			/* these two do not appear to be set at all! ?? */
 
-			if (i8271->intf->floppy_drive_tags[0]!=NULL) {
-				if (floppy_drive_get_flag_state(device->machine().device(i8271->intf->floppy_drive_tags[0]), FLOPPY_DRIVE_READY))
+			if (m_floppy_drive_tags[0]!=NULL) {
+				if (floppy_drive_get_flag_state(machine().device(m_floppy_drive_tags[0]), FLOPPY_DRIVE_READY))
 				{
 					status |= (1<<2);
 				}
 			}
 
-			if (i8271->intf->floppy_drive_tags[1]!=NULL) {
-				if (floppy_drive_get_flag_state(device->machine().device(i8271->intf->floppy_drive_tags[1]), FLOPPY_DRIVE_READY))
+			if (m_floppy_drive_tags[1]!=NULL) {
+				if (floppy_drive_get_flag_state(machine().device(m_floppy_drive_tags[1]), FLOPPY_DRIVE_READY))
 				{
 					status |= (1<<6);
 				}
@@ -1080,21 +1102,21 @@ static void i8271_command_execute(device_t *device)
 			/* bit 1 = 1 if head at track 0 */
 			status |= !floppy_tk00_r(img) << 1;
 
-			i8271->ResultRegister = status;
-			i8271_command_complete(device,1,0);
+			m_ResultRegister = status;
+			command_complete(1,0);
 
 		}
 		break;
 
 		case I8271_COMMAND_SEEK:
 		{
-			i8271_get_drive(device);
+			get_drive();
 
 
-			i8271_seek_to_track(device,i8271->CommandParameters[0]);
+			seek_to_track(m_CommandParameters[0]);
 
 			/* check for bad seek */
-			i8271_timed_command_complete(device);
+			timed_command_complete();
 
 		}
 		break;
@@ -1102,37 +1124,37 @@ static void i8271_command_execute(device_t *device)
 		case I8271_COMMAND_READ_DATA_MULTI_RECORD:
 		{
 			/* N value as stored in ID field */
-			i8271->ID_N = (i8271->CommandParameters[2]>>5) & 0x07;
+			m_ID_N = (m_CommandParameters[2]>>5) & 0x07;
 
 			/* starting sector id */
-			i8271->ID_R = i8271->CommandParameters[1];
+			m_ID_R = m_CommandParameters[1];
 
 			/* number of sectors to transfer */
-			i8271->Counter = i8271->CommandParameters[2] & 0x01f;
+			m_Counter = m_CommandParameters[2] & 0x01f;
 
 
 			FDC_LOG_COMMAND("READ DATA MULTI RECORD");
 
-			LOG(("Sector Count: %02x\n", i8271->Counter));
-			LOG(("Track: %02x\n",i8271->CommandParameters[0]));
-			LOG(("Sector: %02x\n", i8271->CommandParameters[1]));
-			LOG(("Sector Length: %02x bytes\n", 1<<(i8271->ID_N+7)));
+			LOG(("Sector Count: %02x\n", m_Counter));
+			LOG(("Track: %02x\n",m_CommandParameters[0]));
+			LOG(("Sector: %02x\n", m_CommandParameters[1]));
+			LOG(("Sector Length: %02x bytes\n", 1<<(m_ID_N+7)));
 
-			i8271_get_drive(device);
+			get_drive();
 
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */
-				i8271->ResultRegister = (2<<3);
-				i8271_timed_command_complete(device);
+				m_ResultRegister = (2<<3);
+				timed_command_complete();
 			}
 			else
 			{
-				i8271_seek_to_track(device,i8271->CommandParameters[0]);
+				seek_to_track(m_CommandParameters[0]);
 
 
-				i8271_do_read(device);
+				do_read();
 			}
 
 		}
@@ -1142,29 +1164,29 @@ static void i8271_command_execute(device_t *device)
 		{
 			FDC_LOG_COMMAND("READ DATA SINGLE RECORD");
 
-			i8271->ID_N = 0;
-			i8271->Counter = 1;
-			i8271->ID_R = i8271->CommandParameters[1];
+			m_ID_N = 0;
+			m_Counter = 1;
+			m_ID_R = m_CommandParameters[1];
 
-			LOG(("Sector Count: %02x\n", i8271->Counter));
-			LOG(("Track: %02x\n",i8271->CommandParameters[0]));
-			LOG(("Sector: %02x\n", i8271->CommandParameters[1]));
-			LOG(("Sector Length: %02x bytes\n", 1<<(i8271->ID_N+7)));
+			LOG(("Sector Count: %02x\n", m_Counter));
+			LOG(("Track: %02x\n",m_CommandParameters[0]));
+			LOG(("Sector: %02x\n", m_CommandParameters[1]));
+			LOG(("Sector Length: %02x bytes\n", 1<<(m_ID_N+7)));
 
-			i8271_get_drive(device);
+			get_drive();
 
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */
-				i8271->ResultRegister = (2<<3);
-				i8271_timed_command_complete(device);
+				m_ResultRegister = (2<<3);
+				timed_command_complete();
 			}
 			else
 			{
-				i8271_seek_to_track(device,i8271->CommandParameters[0]);
+				seek_to_track(m_CommandParameters[0]);
 
-				i8271_do_read(device);
+				do_read();
 			}
 
 		}
@@ -1173,31 +1195,31 @@ static void i8271_command_execute(device_t *device)
 		case I8271_COMMAND_WRITE_DATA_MULTI_RECORD:
 		{
 			/* N value as stored in ID field */
-			i8271->ID_N = (i8271->CommandParameters[2]>>5) & 0x07;
+			m_ID_N = (m_CommandParameters[2]>>5) & 0x07;
 
 			/* starting sector id */
-			i8271->ID_R = i8271->CommandParameters[1];
+			m_ID_R = m_CommandParameters[1];
 
 			/* number of sectors to transfer */
-			i8271->Counter = i8271->CommandParameters[2] & 0x01f;
+			m_Counter = m_CommandParameters[2] & 0x01f;
 
 			FDC_LOG_COMMAND("READ DATA MULTI RECORD");
 
-			LOG(("Sector Count: %02x\n", i8271->Counter));
-			LOG(("Track: %02x\n",i8271->CommandParameters[0]));
-			LOG(("Sector: %02x\n", i8271->CommandParameters[1]));
-			LOG(("Sector Length: %02x bytes\n", 1<<(i8271->ID_N+7)));
+			LOG(("Sector Count: %02x\n", m_Counter));
+			LOG(("Track: %02x\n",m_CommandParameters[0]));
+			LOG(("Sector: %02x\n", m_CommandParameters[1]));
+			LOG(("Sector Length: %02x bytes\n", 1<<(m_ID_N+7)));
 
-			i8271_get_drive(device);
+			get_drive();
 
-			i8271->drive_control_output &=~1;
+			m_drive_control_output &=~1;
 
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */
-				i8271->ResultRegister = (2<<3);
-				i8271_timed_command_complete(device);
+				m_ResultRegister = (2<<3);
+				timed_command_complete();
 			}
 			else
 			{
@@ -1205,16 +1227,16 @@ static void i8271_command_execute(device_t *device)
 				{
 					/* Completion type: operation intervention probably required for recovery */
 					/* Completion code: Drive write protected */
-					i8271->ResultRegister = (2<<3) | (1<<1);
-					i8271_timed_command_complete(device);
+					m_ResultRegister = (2<<3) | (1<<1);
+					timed_command_complete();
 				}
 				else
 				{
-					i8271->drive_control_output |=1;
+					m_drive_control_output |=1;
 
-					i8271_seek_to_track(device,i8271->CommandParameters[0]);
+					seek_to_track(m_CommandParameters[0]);
 
-					i8271_do_write(device);
+					do_write();
 				}
 			}
 		}
@@ -1224,25 +1246,25 @@ static void i8271_command_execute(device_t *device)
 		{
 			FDC_LOG_COMMAND("WRITE DATA SINGLE RECORD");
 
-			i8271->ID_N = 0;
-			i8271->Counter = 1;
-			i8271->ID_R = i8271->CommandParameters[1];
+			m_ID_N = 0;
+			m_Counter = 1;
+			m_ID_R = m_CommandParameters[1];
 
 
-			LOG(("Sector Count: %02x\n", i8271->Counter));
-			LOG(("Track: %02x\n",i8271->CommandParameters[0]));
-			LOG(("Sector: %02x\n", i8271->CommandParameters[1]));
-			LOG(("Sector Length: %02x bytes\n", 1<<(i8271->ID_N+7)));
-			i8271_get_drive(device);
+			LOG(("Sector Count: %02x\n", m_Counter));
+			LOG(("Track: %02x\n",m_CommandParameters[0]));
+			LOG(("Sector: %02x\n", m_CommandParameters[1]));
+			LOG(("Sector Length: %02x bytes\n", 1<<(m_ID_N+7)));
+			get_drive();
 
-			i8271->drive_control_output &=~1;
+			m_drive_control_output &=~1;
 
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */
-				i8271->ResultRegister = (2<<3);
-				i8271_timed_command_complete(device);
+				m_ResultRegister = (2<<3);
+				timed_command_complete();
 			}
 			else
 			{
@@ -1250,16 +1272,16 @@ static void i8271_command_execute(device_t *device)
 				{
 					/* Completion type: operation intervention probably required for recovery */
 					/* Completion code: Drive write protected */
-					i8271->ResultRegister = (2<<3) | (1<<1);
-					i8271_timed_command_complete(device);
+					m_ResultRegister = (2<<3) | (1<<1);
+					timed_command_complete();
 				}
 				else
 				{
-					i8271->drive_control_output |=1;
+					m_drive_control_output |=1;
 
-					i8271_seek_to_track(device,i8271->CommandParameters[0]);
+					seek_to_track(m_CommandParameters[0]);
 
-					i8271_do_write(device);
+					do_write();
 				}
 			}
 
@@ -1271,25 +1293,25 @@ static void i8271_command_execute(device_t *device)
 		{
 			FDC_LOG_COMMAND("READ ID");
 
-			LOG(("Track: %02x\n",i8271->CommandParameters[0]));
-			LOG(("ID Field Count: %02x\n", i8271->CommandParameters[2]));
+			LOG(("Track: %02x\n",m_CommandParameters[0]));
+			LOG(("ID Field Count: %02x\n", m_CommandParameters[2]));
 
-			i8271_get_drive(device);
+			get_drive();
 
 			if (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
 				/* Completion type: operation intervention probably required for recovery */
 				/* Completion code: Drive not ready */
-				i8271->ResultRegister = (2<<3);
-				i8271_timed_command_complete(device);
+				m_ResultRegister = (2<<3);
+				timed_command_complete();
 			}
 			else
 			{
-				i8271->Counter = i8271->CommandParameters[2];
+				m_Counter = m_CommandParameters[2];
 
-				i8271_seek_to_track(device,i8271->CommandParameters[0]);
+				seek_to_track(m_CommandParameters[0]);
 
-				i8271_do_read_id(device);
+				do_read_id();
 			}
 		}
 		break;
@@ -1302,29 +1324,28 @@ static void i8271_command_execute(device_t *device)
 
 
 
-WRITE8_DEVICE_HANDLER(i8271_w)
+WRITE8_MEMBER(i8271_device::write)
 {
-	i8271_t *i8271 = get_safe_token(device);
 	switch (offset & 3)
 	{
 		case 0:
 		{
 			LOG(("I8271 W Command Register: %02x\n", data));
 
-			i8271->CommandRegister = data;
-			i8271->Command = i8271->CommandRegister & 0x03f;
+			m_CommandRegister = data;
+			m_Command = m_CommandRegister & 0x03f;
 
-			i8271->StatusRegister |= I8271_STATUS_COMMAND_BUSY | I8271_STATUS_COMMAND_FULL;
-			i8271->StatusRegister &= ~I8271_STATUS_PARAMETER_FULL | I8271_STATUS_RESULT_FULL;
-			i8271->ParameterCountWritten = 0;
+			m_StatusRegister |= I8271_STATUS_COMMAND_BUSY | I8271_STATUS_COMMAND_FULL;
+			m_StatusRegister &= ~I8271_STATUS_PARAMETER_FULL | I8271_STATUS_RESULT_FULL;
+			m_ParameterCountWritten = 0;
 
-			switch (i8271->Command)
+			switch (m_Command)
 			{
 				case I8271_COMMAND_SPECIFY:
 				{
 					FDC_LOG_COMMAND("SPECIFY");
 
-					i8271->ParameterCount = 4;
+					m_ParameterCount = 4;
 				}
 				break;
 
@@ -1332,7 +1353,7 @@ WRITE8_DEVICE_HANDLER(i8271_w)
 				{
 					FDC_LOG_COMMAND("SEEK");
 
-					i8271->ParameterCount = 1;
+					m_ParameterCount = 1;
 				}
 				break;
 
@@ -1340,7 +1361,7 @@ WRITE8_DEVICE_HANDLER(i8271_w)
 				{
 					FDC_LOG_COMMAND("READ DRIVE STATUS");
 
-					i8271->ParameterCount = 0;
+					m_ParameterCount = 0;
 				}
 				break;
 
@@ -1348,7 +1369,7 @@ WRITE8_DEVICE_HANDLER(i8271_w)
 				{
 					FDC_LOG_COMMAND("READ SPECIAL REGISTER");
 
-					i8271->ParameterCount = 1;
+					m_ParameterCount = 1;
 				}
 				break;
 
@@ -1356,19 +1377,19 @@ WRITE8_DEVICE_HANDLER(i8271_w)
 				{
 					FDC_LOG_COMMAND("WRITE SPECIAL REGISTER");
 
-					i8271->ParameterCount = 2;
+					m_ParameterCount = 2;
 				}
 				break;
 
 				case I8271_COMMAND_FORMAT:
 				{
-					i8271->ParameterCount = 5;
+					m_ParameterCount = 5;
 				}
 				break;
 
 				case I8271_COMMAND_READ_ID:
 				{
-					i8271->ParameterCount = 3;
+					m_ParameterCount = 3;
 
 				}
 				break;
@@ -1380,7 +1401,7 @@ WRITE8_DEVICE_HANDLER(i8271_w)
 				case I8271_COMMAND_WRITE_DELETED_DATA_SINGLE_RECORD:
 				case I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_SINGLE_RECORD:
 				{
-					i8271->ParameterCount = 2;
+					m_ParameterCount = 2;
 				}
 				break;
 
@@ -1390,14 +1411,14 @@ WRITE8_DEVICE_HANDLER(i8271_w)
 				case I8271_COMMAND_WRITE_DELETED_DATA_MULTI_RECORD:
 				case I8271_COMMAND_VERIFY_DATA_AND_DELETED_DATA_MULTI_RECORD:
 				{
-					i8271->ParameterCount = 3;
+					m_ParameterCount = 3;
 				}
 				break;
 
 				case I8271_COMMAND_SCAN_DATA:
 				case I8271_COMMAND_SCAN_DATA_AND_DELETED_DATA:
 				{
-					i8271->ParameterCount = 5;
+					m_ParameterCount = 5;
 				}
 				break;
 
@@ -1408,37 +1429,37 @@ WRITE8_DEVICE_HANDLER(i8271_w)
 
 			}
 
-			i8271_check_all_parameters_written(device);
+			check_all_parameters_written();
 		}
 		break;
 
 		case 1:
 		{
 			LOG(("I8271 W Parameter Register: %02x\n",data));
-			i8271->ParameterRegister = data;
+			m_ParameterRegister = data;
 
-			if (i8271->ParameterCount!=0)
+			if (m_ParameterCount!=0)
 			{
-				i8271->CommandParameters[i8271->ParameterCountWritten] = data;
-				i8271->ParameterCountWritten++;
+				m_CommandParameters[m_ParameterCountWritten] = data;
+				m_ParameterCountWritten++;
 			}
 
-			i8271_check_all_parameters_written(device);
+			check_all_parameters_written();
 		}
 		break;
 
 		case 2:
 		{
 			LOG(("I8271 W Reset Register: %02x\n", data));
-			if (((data ^ i8271->ResetRegister) & 0x01)!=0)
+			if (((data ^ m_ResetRegister) & 0x01)!=0)
 			{
 				if ((data & 0x01)==0)
 				{
-					DEVICE_RESET_CALL( i8271 );
+					reset();
 				}
 			}
 
-			i8271->ResetRegister = data;
+			m_ResetRegister = data;
 
 
 		}
@@ -1449,29 +1470,28 @@ WRITE8_DEVICE_HANDLER(i8271_w)
 	}
 }
 
-READ8_DEVICE_HANDLER(i8271_r)
+READ8_MEMBER(i8271_device::read)
 {
-	i8271_t *i8271 = get_safe_token(device);
 	switch (offset & 3)
 	{
 		case 0:
 		{
 			/* bit 1,0 are zero other bits contain status data */
-			i8271->StatusRegister &= ~0x03;
-			LOG(("I8271 R Status Register: %02x\n",i8271->StatusRegister));
-			return i8271->StatusRegister;
+			m_StatusRegister &= ~0x03;
+			LOG(("I8271 R Status Register: %02x\n",m_StatusRegister));
+			return m_StatusRegister;
 		}
 
 		case 1:
 		{
-			if ((i8271->StatusRegister & I8271_STATUS_COMMAND_BUSY)==0)
+			if ((m_StatusRegister & I8271_STATUS_COMMAND_BUSY)==0)
 			{
 				/* clear IRQ */
-				i8271_set_irq_state(device,0);
+				set_irq_state(0);
 
-				i8271->StatusRegister &= ~I8271_STATUS_RESULT_FULL;
-				LOG(("I8271 R Result Register %02x\n",i8271->ResultRegister));
-				return i8271->ResultRegister;
+				m_StatusRegister &= ~I8271_STATUS_RESULT_FULL;
+				LOG(("I8271 R Result Register %02x\n",m_ResultRegister));
+				return m_ResultRegister;
 			}
 
 			/* not useful information when command busy */
@@ -1488,118 +1508,36 @@ READ8_DEVICE_HANDLER(i8271_r)
 
 
 /* to be completed! */
-READ8_DEVICE_HANDLER(i8271_dack_r)
+READ8_MEMBER(i8271_device::dack_r)
 {
-	return i8271_data_r(device, space, offset);
+	return data_r(space, offset);
 }
 
 /* to be completed! */
-WRITE8_DEVICE_HANDLER(i8271_dack_w)
+WRITE8_MEMBER(i8271_device::dack_w)
 {
-	i8271_data_w(device, space, offset, data);
+	data_w(space, offset, data);
 }
 
-	READ8_DEVICE_HANDLER(i8271_data_r)
+READ8_MEMBER(i8271_device::data_r)
 {
-	i8271_t *i8271 = get_safe_token(device);
+	clear_data_request();
 
-	i8271_clear_data_request(device);
+	update_state();
 
-	i8271_update_state(device);
-
-	//  logerror("I8271 R data: %02x\n",i8271->data);
+	//  logerror("I8271 R data: %02x\n",m_data);
 
 
-	return i8271->data;
+	return m_data;
 }
 
-WRITE8_DEVICE_HANDLER(i8271_data_w)
+WRITE8_MEMBER(i8271_device::data_w)
 {
-	i8271_t *i8271 = get_safe_token(device);
-	i8271->data = data;
+	m_data = data;
 
-//    logerror("I8271 W data: %02x\n",i8271->data);
+//    logerror("I8271 W data: %02x\n",m_data);
 
-	i8271_clear_data_request(device);
+	clear_data_request();
 
-	i8271_update_state(device);
-}
-
-
-/* Device Interface */
-
-static DEVICE_START( i8271 )
-{
-	i8271_t *i8271 = get_safe_token(device);
-	// validate arguments
-
-	assert(device != NULL);
-	assert(device->tag() != NULL);
-	assert(device->static_config() != NULL);
-
-	i8271->intf = (const i8271_interface*)device->static_config();
-
-	i8271->data_timer = device->machine().scheduler().timer_alloc(FUNC(i8271_data_timer_callback), (void *)device);
-	i8271->command_complete_timer = device->machine().scheduler().timer_alloc(FUNC(i8271_timed_command_complete_callback), (void *)device);
-	i8271->drive = 0;
-	i8271->pExecutionPhaseData = auto_alloc_array(device->machine(), char, 0x4000);
-
-	// register for state saving
-	//state_save_register_item(device->machine(), "i8271", device->tag(), 0, i8271->number);
-}
-
-static DEVICE_RESET( i8271 )
-{
-	i8271_t *i8271 = get_safe_token(device);
-
-	i8271->StatusRegister = 0;  //I8271_STATUS_INT_REQUEST | I8271_STATUS_NON_DMA_REQUEST;
-	i8271->Mode = 0x0c0; /* bits 0, 1 are initialized to zero */
-	i8271->ParameterCountWritten = 0;
-	i8271->ParameterCount = 0;
-
-	/* if timer is active remove */
-	i8271->command_complete_timer->reset();
-	i8271->data_timer->reset();
-
-	/* clear irq */
-	i8271_set_irq_state(device,0);
-	/* clear dma */
-	i8271_set_dma_drq(device);
-
-}
-
-const device_type I8271 = &device_creator<i8271_device>;
-
-i8271_device::i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, I8271, "Intel 8271", tag, owner, clock, "i8271", __FILE__)
-{
-	m_token = global_alloc_clear(i8271_t);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8271_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void i8271_device::device_start()
-{
-	DEVICE_START_NAME( i8271 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void i8271_device::device_reset()
-{
-	DEVICE_RESET_NAME( i8271 )(this);
+	update_state();
 }

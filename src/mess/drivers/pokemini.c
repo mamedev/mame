@@ -532,7 +532,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 	case 0x02:  /* CPU related?
                Bit 0-7 R/W Unknown
             */
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", machine().firstcpu->pc( ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", m_maincpu->pc(), offset, data );
 		break;
 	case 0x08:  /* Seconds-timer control
                Bit 0   R/W Timer enable
@@ -564,7 +564,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                Bit 5   R   Battery status: 0 - battery OK, 1 - battery low
                Bit 6-7     Unused
             */
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", machine().firstcpu->pc( ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", m_maincpu->pc(), offset, data );
 		break;
 	case 0x18:  /* Timer 1 pre-scale + enable
                Bit 0-2 R/W low timer 1 prescaler select
@@ -1423,7 +1423,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
                            Map size 2: 0x00 to 0x60
                Bit 7       Unused
             */
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", machine().firstcpu->pc( ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", m_maincpu->pc(), offset, data );
 		break;
 	case 0x87:  /* Sprite tile data memory offset (low)
                Bit 0-5     Always "0"
@@ -1464,7 +1464,7 @@ WRITE8_MEMBER(pokemini_state::pokemini_hwreg_w)
 //      lcd_data_w( data );
 		break;
 	default:
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", machine().firstcpu->pc( ), offset, data );
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", m_maincpu->pc(), offset, data );
 		break;
 	}
 	m_pm_reg[offset] = data;

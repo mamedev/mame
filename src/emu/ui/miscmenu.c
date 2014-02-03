@@ -12,11 +12,11 @@
 #include "emu.h"
 #include "osdnet.h"
 #include "emuopts.h"
-#include "ui.h"
+#include "ui/ui.h"
 #include "rendutil.h"
 #include "cheat.h"
-#include "uiimage.h"
 #include "uiinput.h"
+#include "ui/filemngr.h"
 #include "ui/miscmenu.h"
 #include "audit.h"
 #include "crsshair.h"
@@ -73,6 +73,42 @@ UINT32 ui_menu_sliders::ui_handler(running_machine &machine, render_container *c
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/
+
+/*-------------------------------------------------
+    ui_menu_keyboard_mode - menu that
+-------------------------------------------------*/
+
+ui_menu_keyboard_mode::ui_menu_keyboard_mode(running_machine &machine, render_container *container) : ui_menu(machine, container)
+{
+}
+
+void ui_menu_keyboard_mode::populate()
+{
+	bool natural = machine().ui().use_natural_keyboard();
+	item_append("Keyboard Mode:", natural ? "Natural" : "Emulated", natural ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, NULL);
+}
+
+ui_menu_keyboard_mode::~ui_menu_keyboard_mode()
+{
+}
+
+void ui_menu_keyboard_mode::handle()
+{
+	bool natural = machine().ui().use_natural_keyboard();
+
+	/* process the menu */
+	const ui_menu_event *menu_event = process(0);
+
+	if (menu_event != NULL)
+	{
+		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+		{
+			machine().ui().set_use_natural_keyboard(natural ^ true);
+			reset(UI_MENU_RESET_REMEMBER_REF);
+		}
+	}
+}
+
 
 /*-------------------------------------------------
     ui_slot_get_current_option - returns
@@ -954,7 +990,7 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	y2 = y1 + bottom;
 
 	/* draw extra menu area */
-	ui_draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 	y1 += (float)DIP_SWITCH_SPACING;
 
 	/* iterate over DIP switches */
@@ -999,11 +1035,11 @@ void ui_menu_settings_dip_switches::custom_render_one(float x1, float y1, float 
 	x1 += (x2 - x1 - numtoggles * switch_field_width) / 2;
 
 	/* draw the dip switch name */
-	ui_draw_text_full(  container,
+	machine().ui().draw_text_full(  container,
 						dip->name,
 						0,
 						y1 + (DIP_SWITCH_HEIGHT - UI_TARGET_FONT_HEIGHT) / 2,
-						x1 - ui_get_string_width(container->manager().machine(), " "),
+						x1 - machine().ui().get_string_width(" "),
 						JUSTIFY_RIGHT,
 						WRAP_NEVER,
 						DRAW_NORMAL,
@@ -1023,7 +1059,7 @@ void ui_menu_settings_dip_switches::custom_render_one(float x1, float y1, float 
 		float innerx1;
 
 		/* first outline the switch */
-		ui_draw_outlined_box(container, x1, y1, x1 + switch_field_width, y2, UI_BACKGROUND_COLOR);
+		machine().ui().draw_outlined_box(container, x1, y1, x1 + switch_field_width, y2, UI_BACKGROUND_COLOR);
 
 		/* compute x1/x2 for the inner filled in switch */
 		innerx1 = x1 + (switch_field_width - switch_width) / 2;
@@ -1319,7 +1355,7 @@ ui_menu_game_info::ui_menu_game_info(running_machine &machine, render_container 
 void ui_menu_game_info::populate()
 {
 	astring tempstring;
-	item_append(game_info_astring(machine(), tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
+	item_append(machine().ui().game_info_astring(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
 }
 
 void ui_menu_game_info::handle()
@@ -1663,7 +1699,7 @@ void ui_menu_sliders::populate()
 	astring tempstring;
 
 	/* add all sliders */
-	for (curslider = ui_get_slider_list(); curslider != NULL; curslider = curslider->next)
+	for (curslider = machine().ui().get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine(), curslider->arg, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;
@@ -1689,7 +1725,7 @@ void ui_menu_sliders::populate()
 		item_append(curslider->description, tempstring, flags, (void *)curslider);
 	}
 
-	custombottom = 2.0f * ui_get_line_height(machine()) + 2.0f * UI_BOX_TB_BORDER;
+	custombottom = 2.0f * machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
 }
 
 ui_menu_sliders::~ui_menu_sliders()
@@ -1707,7 +1743,7 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 	if (curslider != NULL)
 	{
 		float bar_left, bar_area_top, bar_width, bar_area_height, bar_top, bar_bottom, default_x, current_x;
-		float line_height = ui_get_line_height(machine());
+		float line_height = machine().ui().get_line_height();
 		float percentage, default_percentage;
 		astring tempstring;
 		float text_height;
@@ -1730,11 +1766,11 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 		x2 = 1.0f - UI_BOX_LR_BORDER;
 
 		/* draw extra menu area */
-		ui_draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+		machine().ui().draw_outlined_box(container, x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 		y1 += UI_BOX_TB_BORDER;
 
 		/* determine the text height */
-		ui_draw_text_full(container, tempstring, 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		machine().ui().draw_text_full(container, tempstring, 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
 					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
 
 		/* draw the thermometer */
@@ -1761,7 +1797,7 @@ void ui_menu_sliders::custom_render(void *selectedref, float top, float bottom, 
 		container->add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* draw the actual text */
-		ui_draw_text_full(container, tempstring, x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		machine().ui().draw_text_full(container, tempstring, x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
 					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, &text_height);
 	}
 }

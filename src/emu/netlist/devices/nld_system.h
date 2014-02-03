@@ -11,23 +11,24 @@
 
 #include "../nl_setup.h"
 #include "../nl_base.h"
+#include "../analog/nld_twoterm.h"
 
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------
 
-#define NETDEV_TTL_INPUT(_name, _v)                                                 \
+#define TTL_INPUT(_name, _v)                                                 \
 		NET_REGISTER_DEV(ttl_input, _name)                                          \
-		NETDEV_PARAM(_name.IN, _v)
+		PARAM(_name.IN, _v)
 
-#define NETDEV_ANALOG_INPUT(_name, _v)                                              \
+#define ANALOG_INPUT(_name, _v)                                              \
 		NET_REGISTER_DEV(analog_input, _name)                                       \
-		NETDEV_PARAM(_name.IN, _v)
+		PARAM(_name.IN, _v)
 
-#define NETDEV_MAINCLOCK(_name)                                                     \
+#define MAINCLOCK(_name)                                                     \
 		NET_REGISTER_DEV(mainclock, _name)
 
-#define NETDEV_CLOCK(_name)                                                         \
+#define CLOCK(_name)                                                         \
 		NET_REGISTER_DEV(clock, _name)
 
 #define NETDEV_GND()                                                                \
@@ -97,7 +98,6 @@ protected:
 
     ATTR_COLD void reset()
     {
-        m_Q.initial(0.001); // Make sure update outputs something
     }
 
     ATTR_HOT ATTR_ALIGN void update()
@@ -139,7 +139,6 @@ protected:
 
     ATTR_COLD void reset()
     {
-        m_Q.initial(1);
     }
 
     ATTR_HOT ATTR_ALIGN void update()
@@ -155,7 +154,7 @@ protected:
 };
 
 // ----------------------------------------------------------------------------------------
-// netdev_d_to_a
+// nld_base_d_to_a_proxy
 // ----------------------------------------------------------------------------------------
 
 class nld_base_d_to_a_proxy : public netlist_device_t
@@ -183,7 +182,7 @@ protected:
 private:
 };
 
-
+#if 0
 class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
 {
 public:
@@ -203,7 +202,7 @@ protected:
 
     ATTR_COLD void reset()
     {
-        m_Q.initial(0);
+        //m_Q.initial(0);
     }
 
     ATTR_COLD virtual netlist_core_terminal_t &out()
@@ -219,5 +218,57 @@ protected:
 private:
     netlist_analog_output_t m_Q;
 };
+#else
+class nld_d_to_a_proxy : public nld_base_d_to_a_proxy
+{
+public:
+    ATTR_COLD nld_d_to_a_proxy(netlist_output_t &out_proxied)
+            : nld_base_d_to_a_proxy(out_proxied)
+    {
+    }
+
+    ATTR_COLD virtual ~nld_d_to_a_proxy() {}
+
+protected:
+    ATTR_COLD void start()
+    {
+        nld_base_d_to_a_proxy::start();
+
+        register_sub(m_R, "R");
+        register_output("_Q", m_Q);
+        register_subalias("Q", m_R.m_N);
+
+        connect(m_R.m_P, m_Q);
+
+        //m_Q.initial(m_family_desc->m_low_V);
+        //m_R.set_R(m_family_desc->m_R_low);
+    }
+
+    ATTR_COLD void reset()
+    {
+        //m_Q.initial(m_family_desc->m_low_V);
+        //m_R.set_R(m_family_desc->m_R_low);
+        m_R.do_reset();
+    }
+
+    ATTR_COLD virtual netlist_core_terminal_t &out()
+    {
+        return m_R.m_N;
+    }
+
+    ATTR_HOT ATTR_ALIGN void update()
+    {
+        double R = INPLOGIC(m_I) ? m_family_desc->m_R_high : m_family_desc->m_R_low;
+        double V = INPLOGIC(m_I) ? m_family_desc->m_high_V : m_family_desc->m_low_V;
+        //printf("%f %f\n", R, V);
+        m_R.set_R(R);
+        OUTANALOG(m_Q, V, NLTIME_FROM_NS(0));
+    }
+
+private:
+    netlist_analog_output_t m_Q;
+    nld_R_base m_R;
+};
+#endif
 
 #endif /* NLD_SYSTEM_H_ */
