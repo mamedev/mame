@@ -61,7 +61,7 @@ NETLIB_SUBDEVICE(7474sub,
 	netlist_ttl_output_t m_Q;
 	netlist_ttl_output_t m_QQ;
 
-	ATTR_HOT inline void newstate(const UINT8 state);
+	ATTR_HOT inline void newstate(const UINT8 stateQ, const UINT8 stateQQ);
 );
 
 NETLIB_DEVICE(7474,

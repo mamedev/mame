@@ -66,7 +66,7 @@ const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input
 
 netlist_mame_analog_input_t::netlist_mame_analog_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
-			netlist_mame_sub_interface(*this),
+			netlist_mame_sub_interface(*owner),
 			m_param(0),
 			m_offset(0.0),
 			m_mult(1.0),
@@ -93,7 +93,7 @@ void netlist_mame_analog_input_t::static_set_mult_offset(device_t &device, const
 void netlist_mame_analog_input_t::device_start()
 {
 	LOG_DEV_CALLS(("start %s\n", tag()));
-	netlist_param_t *p = downcast<netlist_mame_device_t *>(this->owner())->setup().find_param(m_param_name);
+	netlist_param_t *p = this->nl_owner().setup().find_param(m_param_name);
 	m_param = dynamic_cast<netlist_param_double_t *>(p);
 	if (m_param == NULL)
 	{
@@ -103,7 +103,7 @@ void netlist_mame_analog_input_t::device_start()
 
 netlist_mame_logic_input_t::netlist_mame_logic_input_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, NETLIST_ANALOG_INPUT, "netlist analog input", tag, owner, clock, "netlist_analog_input", __FILE__),
-			netlist_mame_sub_interface(*this),
+			netlist_mame_sub_interface(*owner),
 			m_param(0),
 			m_mask(0xffffffff),
 			m_shift(0),

@@ -19,6 +19,8 @@ NETLIB_START(74107Asub)
 NETLIB_RESET(74107Asub)
 {
     m_clk.set_state(netlist_input_t::STATE_INP_HL);
+    m_Q.initial(0);
+    m_QQ.initial(1);
 
     m_Q1 = 0;
     m_Q2 = 0;
@@ -133,4 +135,7 @@ NETLIB_RESET(74107_dip)
 
 NETLIB_UPDATE(74107_dip)
 {
+    /* only called during startup */
+    m_1.update_dev();
+    m_2.update_dev();
 }

@@ -47,6 +47,7 @@ public:
 
 	ATTR_COLD void reset()
 	{
+        m_Q.initial(1);
         m_active = 1;
 	}
 
@@ -99,6 +100,7 @@ public:
 
     ATTR_COLD void reset()
     {
+        m_Q.initial(1);
         m_active = 1;
     }
 
@@ -171,6 +173,7 @@ public:
 
     ATTR_COLD void reset()
     {
+        m_Q.initial(1);
         m_active = 1;
     }
 
@@ -241,7 +244,7 @@ public:
 		{
 			register_input(sIN[i], m_i[i], netlist_input_t::STATE_INP_ACTIVE);
 		}
-		m_Q.initial(1);
+		//m_Q.initial(1);
 	}
 
 	ATTR_HOT ATTR_ALIGN void update()
