@@ -4,7 +4,7 @@
 
     formats/d71_dsk.h
 
-    Commodore 2040 sector disk image format
+    Commodore 1571 sector disk image format
 
 *********************************************************************/
 
