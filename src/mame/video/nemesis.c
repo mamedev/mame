@@ -180,10 +180,10 @@ WRITE16_MEMBER(nemesis_state::nemesis_palette_word_w)
 	    2400 Ohms
 	    4700 Ohms
 
-	    So the correct weights per bit are 8, 17, 33, 67, 130
+	    So the correct weights per bit are 8, 17, 33, 64, 133
 	*/
 
-	#define MULTIPLIER 8 * bit1 + 17 * bit2 + 33 * bit3 + 67 * bit4 + 130 * bit5
+	#define MULTIPLIER 8 * bit1 + 17 * bit2 + 33 * bit3 + 64 * bit4 + 133 * bit5
 
 	bit1 = BIT(data, 0);
 	bit2 = BIT(data, 1);

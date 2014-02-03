@@ -208,10 +208,20 @@ READ16_MEMBER(nemesis_state::selected_ip_word_r)
 }
 
 
+WRITE8_MEMBER(nemesis_state::nemesis_filter_w)
+{
+	int C1 = /* offset & 0x1000 ? 4700 : */ 0; // is this right? 4.7uF seems too large
+	int C2 = offset & 0x0800 ? 33 : 0;         // 0.033uF = 33 nF
+	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, (AY8910_INTERNAL_RESISTANCE + 12000) / 3, 0, 0, CAP_N(C1)); // unused?
+	m_filter2->filter_rc_set_RC(FLT_RC_LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
+	m_filter3->filter_rc_set_RC(FLT_RC_LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
+	m_filter4->filter_rc_set_RC(FLT_RC_LOWPASS, AY8910_INTERNAL_RESISTANCE + 1000, 10000, 0, CAP_N(C2));
+
+	// konamigt also uses bits 0x0018, what are they for?
+}
+
 WRITE8_MEMBER(nemesis_state::gx400_speech_start_w)
 {
-	/* the voice data is not in a rom but in sound RAM at $8000 */
-	m_vlm->set_rom(m_gx400_shared_ram + 0x4000);
 	m_vlm->st(1);
 	m_vlm->st(0);
 }
@@ -282,7 +292,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM     /* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
-	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
+	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
 	AM_RANGE(0x050000, 0x051fff) AM_RAM
 	AM_RANGE(0x050000, 0x0503ff) AM_SHARE("xscroll1")
@@ -349,7 +359,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM     /* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
-	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
+	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_SHARE("charram")
 	AM_RANGE(0x050000, 0x051fff) AM_RAM
 	AM_RANGE(0x050000, 0x0503ff) AM_SHARE("xscroll1")
@@ -392,6 +402,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("k005289", k005289_device, tg2_w)
 	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0xe007, 0xe007) AM_MIRROR(0x1ff8) AM_MASK(0x1ff8) AM_WRITE(nemesis_filter_w)
 	AM_RANGE(0xe086, 0xe086) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0xe106, 0xe106) AM_DEVWRITE("ay1", ay8910_device, data_w)
 	AM_RANGE(0xe205, 0xe205) AM_DEVREAD("ay2", ay8910_device, data_r)
@@ -400,7 +411,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x87ff) AM_RAM AM_SHARE("gx400_shared")
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("gx400_shared")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("voiceram")
 	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("k005289", k005289_device, ld1_w)
 	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("k005289", k005289_device, ld2_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("vlm", vlm5030_device, data_w)
@@ -409,6 +421,7 @@ static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("k005289", k005289_device, tg2_w)
 	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0xe007, 0xe007) AM_MIRROR(0x1ff8) AM_MASK(0x1ff8) AM_WRITE(nemesis_filter_w)
 	AM_RANGE(0xe030, 0xe030) AM_WRITE(gx400_speech_start_w)
 	AM_RANGE(0xe086, 0xe086) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0xe106, 0xe106) AM_DEVWRITE("ay1", ay8910_device, data_w)
@@ -499,7 +512,6 @@ static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM
 	AM_RANGE(0x060000, 0x061fff) AM_RAM_WRITE(salamander_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x100000, 0x13ffff) AM_ROM
 	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x070002, 0x070003) AM_READ_PORT("IN2")
 	AM_RANGE(0x070004, 0x070005) AM_READ_PORT("IN1")
@@ -508,6 +520,7 @@ static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x070010, 0x070011) AM_WRITE8(soundlatch_byte_w, 0x00ff)
 	AM_RANGE(0x070018, 0x070019) AM_WRITE(watchdog_reset16_w)   /* probably */
 	AM_RANGE(0x078000, 0x078001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
+	AM_RANGE(0x100000, 0x13ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_SHARE("videoram1")       /* VRAM */
 	AM_RANGE(0x201000, 0x201fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_SHARE("videoram2")
 	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_SHARE("colorram1")
@@ -791,11 +804,11 @@ static INPUT_PORTS_START( gwarrior )
 	KONAMI8_SYSTEM_UNK
 
 	PORT_START("IN1")
-	KONAMI8_B321(1)
+	KONAMI8_B123(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	KONAMI8_B321(2)
+	KONAMI8_B123(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW0")
@@ -1455,7 +1468,7 @@ GFXDECODE_END
 
 static const ay8910_interface ay8910_interface_1 =
 {
-	AY8910_LEGACY_OUTPUT,
+	AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_DRIVER_MEMBER(nemesis_state,nemesis_portA_r),
 	DEVCB_NULL,
@@ -1506,6 +1519,10 @@ void nemesis_state::machine_start()
 	save_item(NAME(m_tilemap_flip));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_irq_port_last));
+
+	/* gx400 voice data is not in a ROM but in sound RAM at $8000 */
+	if (m_vlm != NULL && memregion("vlm")->bytes() == 0x800)
+		m_vlm->set_rom(m_voiceram);
 }
 
 void nemesis_state::machine_reset()
@@ -1552,17 +1569,25 @@ static MACHINE_CONFIG_START( nemesis, nemesis_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) /* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)   /* fixed */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* verified with OST */
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
+	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
+	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+
+	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter4", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35) /* verified with OST */
-
-	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70) /* unused */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 
@@ -1595,17 +1620,28 @@ static MACHINE_CONFIG_START( gx400, nemesis_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) /* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* verified with OST */
+	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
+	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
+	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+
+	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter4", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35) /* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70) /* unused */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
 
@@ -1637,11 +1673,22 @@ static MACHINE_CONFIG_START( konamigt, nemesis_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
+	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
+	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+
+	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter4", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_K005289_ADD("k005289", 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -1677,11 +1724,22 @@ static MACHINE_CONFIG_START( rf2_gx400, nemesis_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
+	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
+	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+
+	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter4", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_K005289_ADD("k005289", 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -1990,6 +2048,8 @@ ROM_START( rf2 )
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
 	ROM_LOAD(      "400-a01.fse",  0x00000, 0x0100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
 	ROM_LOAD(      "400-a02.fse",  0x00100, 0x0100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+
+	ROM_REGION( 0x800, "vlm", ROMREGION_ERASE00 ) /* dummy region to set the correct vlm address mask */
 ROM_END
 
 ROM_START( twinbee )
@@ -2005,6 +2065,8 @@ ROM_START( twinbee )
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
 	ROM_LOAD(      "400-a01.fse",  0x00000, 0x0100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
 	ROM_LOAD(      "400-a02.fse",  0x00100, 0x0100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+
+	ROM_REGION( 0x800, "vlm", ROMREGION_ERASE00 ) /* dummy region to set the correct vlm address mask */
 ROM_END
 
 ROM_START( gradius )
@@ -2020,6 +2082,8 @@ ROM_START( gradius )
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
 	ROM_LOAD(      "400-a01.fse",  0x00000, 0x0100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
 	ROM_LOAD(      "400-a02.fse",  0x00100, 0x0100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+
+	ROM_REGION( 0x800, "vlm", ROMREGION_ERASE00 ) /* dummy region to set the correct vlm address mask */
 ROM_END
 
 ROM_START( gwarrior )
@@ -2035,6 +2099,8 @@ ROM_START( gwarrior )
 	ROM_REGION( 0x0200,  "k005289", 0 )      /* 2x 256 byte for 0005289 wavetable data */
 	ROM_LOAD(      "400-a01.fse",  0x00000, 0x0100, CRC(5827b1e8) SHA1(fa8cf5f868cfb08bce203baaebb6c4055ee2a000) )
 	ROM_LOAD(      "400-a02.fse",  0x00100, 0x0100, CRC(2f44f970) SHA1(7ab46f9d5d587665782cefc623b8de0124a6d38a) )
+
+	ROM_REGION( 0x800, "vlm", ROMREGION_ERASE00 ) /* dummy region to set the correct vlm address mask */
 ROM_END
 
 ROM_START( salamand )
@@ -2047,7 +2113,7 @@ ROM_START( salamand )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-d09.11j",      0x00000, 0x08000, CRC(5020972c) SHA1(04c752c3b7fd850a8a51ecd230b39e6edde9dd7e) )
 
-	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data? */
+	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
 	ROM_LOAD(      "587-d08.8g",       0x00000, 0x04000, CRC(f9ac6b82) SHA1(3370fc3a7f82e922e19d54afb3bca7b07fa4aa9a) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
@@ -2064,7 +2130,7 @@ ROM_START( salamandj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-d09.11j",      0x00000, 0x08000, CRC(5020972c) SHA1(04c752c3b7fd850a8a51ecd230b39e6edde9dd7e) )
 
-	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data? */
+	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
 	ROM_LOAD(      "587-d08.8g",       0x00000, 0x04000, CRC(f9ac6b82) SHA1(3370fc3a7f82e922e19d54afb3bca7b07fa4aa9a) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
@@ -2081,7 +2147,7 @@ ROM_START( lifefrce )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-k09.11j",  0x00000, 0x08000, CRC(2255fe8c) SHA1(6ee35575a15f593642b29020857ec466094ef495) )
 
-	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data? */
+	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
 	ROM_LOAD(      "587-k08.8g",  0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
@@ -2098,7 +2164,7 @@ ROM_START( lifefrcej )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-n09.11j",  0x00000, 0x08000, CRC(e8496150) SHA1(c7d40b6dc56849dfd8d080f1aaebad36c88d93df) )
 
-	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data? */
+	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data */
 	ROM_LOAD(      "587-k08.8g",  0x00000, 0x04000, CRC(7f0e9b41) SHA1(c9fc2723fac55691dfbb4cf9b3c472a42efa97c9) )
 
 	ROM_REGION( 0x20000, "k007232", 0 )    /* 007232 data */
@@ -2623,7 +2689,7 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(gx400_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state,  nmi_line_pulse)    /* interrupts are triggered by the main CPU */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", nemesis_state, nmi_line_pulse)    /* interrupts are triggered by the main CPU */
 
 
 	/* video hardware */
@@ -2643,17 +2709,28 @@ static MACHINE_CONFIG_START( bubsys, nemesis_state )
 
 	MCFG_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) /* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.20)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MCFG_SOUND_CONFIG(ay8910_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* verified with OST */
+	MCFG_SOUND_ROUTE(0, "filter2", 1.00)
+	MCFG_SOUND_ROUTE(1, "filter3", 1.00)
+	MCFG_SOUND_ROUTE(2, "filter4", 1.00)
+
+	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter4", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_K005289_ADD("k005289", 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35) /* verified with OST */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70) /* unused */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
 
