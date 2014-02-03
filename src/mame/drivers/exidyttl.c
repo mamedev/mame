@@ -113,6 +113,17 @@ static MACHINE_CONFIG_START( attack, exidyttl_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( deathrac, exidyttl_state )
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+	MCFG_NETLIST_SETUP(attack)
+
+	/* video hardware */
+	MCFG_FIXFREQ_ADD("fixfreq", "screen", fixedfreq_mode_attack)
+MACHINE_CONFIG_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -133,4 +144,60 @@ ROM_START( attckexd )
 ROM_END
 
 
-GAME( 1977, attckexd,  0, attack, 0, driver_device,  0, ROT0, "Exidy", "Attack [TTL]", GAME_IS_SKELETON )
+/***********
+
+ Exidy Death Race 1976
+ 
+ Drawing Name
+ ------------
+ 6331-36.E7	32x8	Right Gremlin
+ 6301-91.J10	256x4
+ 
+ 6331-36.R7	32x8	Left Gremlin
+ 6301-91.V10	256x4
+ 
+ 6301-92.V5		P1 (left car)
+ 6331-35.T7
+ 
+ 6301-92.J5		P2 (right car)
+ 6331-35.G7
+ 
+ 6301-97.M11		Image Generation
+ 6301-98.L11
+ 6301-99.K11
+ 6301-100.J11
+ 
+ 6331-33.P14		Score & Timer
+ 
+ 6331-31.A11		Timing / Sync
+ 6331-32.C12
+ 
+***********/ 
+
+
+ROM_START( deathrac )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "6301-100.j11",   0x0000, 0x0100, CRC(d751bd57) SHA1(a6208af40661bf3cd50363d2ece38cd3b9f6a7a0) )
+	ROM_LOAD( "6301-91.j10",    0x0000, 0x0100, CRC(c3823f0b) SHA1(42fe8c1e0f54b3f968a630dd564a8941410c5d86) )
+	ROM_LOAD( "6301-91.v10",    0x0000, 0x0100, CRC(c3823f0b) SHA1(42fe8c1e0f54b3f968a630dd564a8941410c5d86) )
+	ROM_LOAD( "6301-92.j5",     0x0000, 0x0100, CRC(82d7d25f) SHA1(d4b3a6655f91647545d493c2ff996daa66df0395) )
+	ROM_LOAD( "6301-92.v5",     0x0000, 0x0100, CRC(82d7d25f) SHA1(d4b3a6655f91647545d493c2ff996daa66df0395) )
+	ROM_LOAD( "6301-97.m11",    0x0000, 0x0100, CRC(2b02444f) SHA1(e1fc01f7271109515438542a223efc0042f794a5) )
+	ROM_LOAD( "6301-98.l11",    0x0000, 0x0100, CRC(0bdaf1eb) SHA1(67976e73bfdc4d42a520212d020dd52d51667674) )
+	ROM_LOAD( "6301-99.k11",    0x0000, 0x0100, CRC(34763c8f) SHA1(2012ace666e8b82a89a0c15511ee80173d9700bc) )
+
+	ROM_LOAD( "6331-31.a11",    0x0000, 0x0020, CRC(f304a1fb) SHA1(0f029274bb99723ebcc271d761e1500ca50b2738) )
+	ROM_LOAD( "6331-32.c12",    0x0000, 0x0020, CRC(f8dbd779) SHA1(55bdaf9eb1ba6185e20512c4874ebb625861508e) )
+	ROM_LOAD( "6331-33.p14",    0x0000, 0x0020, CRC(2e83bf80) SHA1(02fcc1e879c06759a21ef4f004fe7aa790814112) )
+	ROM_LOAD( "6331-36.e7",     0x0000, 0x0020, CRC(1358c8d5) SHA1(2fa1041f30f3a6775393714a65c416738b06b330) )
+	ROM_LOAD( "6331-36.g7",     0x0000, 0x0020, CRC(15e00a2a) SHA1(cd43d227a34e5444ed9d8a4acf5497df9c789c73) )
+	ROM_LOAD( "6331-36.r7",     0x0000, 0x0020, CRC(1358c8d5) SHA1(2fa1041f30f3a6775393714a65c416738b06b330) )
+	ROM_LOAD( "6331-36.t7",     0x0000, 0x0020, CRC(15e00a2a) SHA1(cd43d227a34e5444ed9d8a4acf5497df9c789c73) )
+ROM_END
+
+
+
+GAME( 1977, attckexd,  0, attack,   0, driver_device,  0, ROT0, "Exidy", "Attack [TTL]", GAME_IS_SKELETON )
+GAME( 1976, deathrac,  0, deathrac, 0, driver_device,  0, ROT0, "Exidy", "Death Race [TTL]", GAME_IS_SKELETON )

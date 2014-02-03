@@ -244,6 +244,25 @@ ROM_START( jetfight )
 ROM_END
 
 
+ROM_START( jetfighta )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0040, "shell", ROMREGION_ERASE00 )
+	ROM_LOAD( "004250.m1",     0x0000, 0x0020, CRC(bee62d20) SHA1(2ea5fd7b087004c37901d2a56da2d6f6dcce9e29) ) // Shell Rom
+	ROM_LOAD( "004250.j1",     0x0020, 0x0020, CRC(bee62d20) SHA1(2ea5fd7b087004c37901d2a56da2d6f6dcce9e29) ) // Shell Rom
+
+	ROM_REGION( 0x0020, "singleplayer", ROMREGION_ERASE00 )
+	ROM_LOAD( "004251.r5",     0x0000, 0x0020, CRC(bd95f87e) SHA1(4bd863104f1a7260b95f3fb2c13f40b7337d3dd9) ) // Single Player Rom
+
+	ROM_REGION( 0x0200, "score", ROMREGION_ERASE00 )
+	ROM_LOAD( "jet.a4",        0x0000, 0x0200, CRC(9e267e44) SHA1(b1c74ab275e30ed41c60e8490eaaf5211ec14ec5) ) // Score Rom
+
+	ROM_REGION( 0x0800, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "jet.j5",        0x0000, 0x0400, CRC(853d61b3) SHA1(c5e1b09153b813b7b4042246e5634cc83de9654c) ) // Picture & S.C. Rom A
+	ROM_LOAD( "jet.k5",        0x0400, 0x0400, CRC(a3fada62) SHA1(2efed600683e35ffa10acc5a301e736989c9f236) ) // Picture & S.C. Rom B
+ROM_END
+
+
 ROM_START( outlaw )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -392,15 +411,16 @@ ROM_END
 
 
 
-GAME(1975,  antiairc,  0,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Anti-Aircraft [TTL]",    GAME_IS_SKELETON)
-GAME(1975,  crshnscr,  0,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Crash 'n Score [TTL]",   GAME_IS_SKELETON)
-GAME(1976,  indy4,     0,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Indy 4 [TTL]",           GAME_IS_SKELETON)
-GAME(1975,  indy800,   0,  atarikee,   0,  driver_device, 0,  ROT90, "Atari/Kee",  "Indy 800 [TTL]",         GAME_IS_SKELETON)
-GAME(1975,  jetfight,  0,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter [TTL]",      GAME_IS_SKELETON)
-GAME(1976,  outlaw,    0,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Outlaw [TTL]",           GAME_IS_SKELETON)
-GAME(1975,  sharkjaw,  0,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Horror Games",  "Shark JAWS [TTL]",GAME_IS_SKELETON)
-GAME(1976,  stntcycl,  0,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Stunt Cycle [TTL]",      GAME_IS_SKELETON)
-GAME(1974,  tank,      0,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Tank/Tank II [TTL]",     GAME_IS_SKELETON)
+GAME(1975,  antiairc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Anti-Aircraft [TTL]",    GAME_IS_SKELETON)
+GAME(1975,  crshnscr,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Crash 'n Score [TTL]",   GAME_IS_SKELETON)
+GAME(1976,  indy4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Indy 4 [TTL]",           GAME_IS_SKELETON)
+GAME(1975,  indy800,   0,         atarikee,   0,  driver_device, 0,  ROT90, "Atari/Kee",  "Indy 800 [TTL]",         GAME_IS_SKELETON)
+GAME(1975,  jetfight,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter (Set1) [TTL]",      GAME_IS_SKELETON)
+GAME(1975,  jetfighta, jetfight,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter (Set2) [TTL]",      GAME_IS_SKELETON)
+GAME(1976,  outlaw,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Outlaw [TTL]",           GAME_IS_SKELETON)
+GAME(1975,  sharkjaw,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Horror Games",  "Shark JAWS [TTL]",GAME_IS_SKELETON)
+GAME(1976,  stntcycl,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Stunt Cycle [TTL]",      GAME_IS_SKELETON)
+GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Tank/Tank II [TTL]",     GAME_IS_SKELETON)
 
 // MISSING ROM DUMPS
 //GAME(1975,  astrotrf,  steeplec,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Astroturf [TTL]",GAME_IS_SKELETON)
