@@ -7265,6 +7265,7 @@ dmndrbya        // G4001 'DD' (c) 1986
 // the four digits number is the game ID stored at address 0x0108 of the program ROM
 // info on prototypes taken from http://www.members.tripod.com/fresa/proto/puzzle.htm
 neogeo
+mvs
 nam1975         // 0001 (c) 1990 SNK
 bstars          // 0002 (c) 1990 SNK
 bstarsh         // 0002 (c) 1990 SNK
@@ -12331,7 +12332,16 @@ manohman        // 199?, Merkur.
 // TTL logic games
 pong            // (c) 1972 Atari
 pongf           // (c) 1972 Atari - no subcycles
-
+antiairc        // (c) 1975 Atari
+crshnscr      // (c) 1975 Atari
+indy4           // (c) 1976 Atari
+indy800      // (c) 1975 Atari / Kee
+jetfight         // (c) 1975 Atari
+outlaw         // (c) 1976 Atari
+sharkjaw    // (c) 1975 Atari
+stntcycl       // (c) 1976 Atari
+tank             // (c) 1974 Atari
+attckexd      // (c) 1977 Exidy
 
 // JPM System 5 + Video Expansion 2
 monopoly    // Monopoly (JPM)
