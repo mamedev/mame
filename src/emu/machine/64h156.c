@@ -97,7 +97,7 @@ inline void c64h156_device::receive_bit()
 
 	if (m_zero_count >= m_cycles_until_random_flux) {
 		m_bit_sync = 1;
-		
+
 		m_zero_count = 0;
 		m_cycles_until_random_flux = (rand() % 367) + 33;
 	}
@@ -387,9 +387,10 @@ void c64h156_device::execute_run()
 		if (m_mtr)
 		{
 			receive_bit();
-			decode_bit();
 		}
 
+		decode_bit();
+		
 		m_icount--;
 	} while (m_icount > 0);
 }
