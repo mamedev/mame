@@ -3,15 +3,8 @@
 #ifndef __VLM5030_H__
 #define __VLM5030_H__
 
-
-	struct vlm5030_interface
-	{
-	int m_memory_size;    /* memory size of speech rom (0=memory region length) */
-	};
-
 	class vlm5030_device : public device_t,
-									public device_sound_interface,
-									public vlm5030_interface
+									public device_sound_interface
 	{
 	public:
 	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -37,7 +30,6 @@
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 

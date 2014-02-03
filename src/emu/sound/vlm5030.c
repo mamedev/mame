@@ -196,26 +196,6 @@ vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vlm5030_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const vlm5030_interface *intf = reinterpret_cast<const vlm5030_interface *>(static_config());
-	if (intf != NULL)
-	*static_cast<vlm5030_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	m_memory_size = 0;
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -233,12 +213,8 @@ void vlm5030_device::device_start()
 	device_reset();
 	m_phase = PH_IDLE;
 
-	m_rom = *region();
-	/* memory size */
-	if( m_memory_size == 0)
-		m_address_mask = region()->bytes()-1;
-	else
-		m_address_mask = m_memory_size-1;
+	m_rom = region()->base();
+	m_address_mask = (region()->bytes() - 1) & 0xffff;
 
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 440, this);
 

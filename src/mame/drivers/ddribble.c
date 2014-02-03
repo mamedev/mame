@@ -230,11 +230,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static const vlm5030_interface vlm5030_config =
-{
-	0x10000     /* memory size 64Kbyte * 2 bank */
-};
-
 
 
 void ddribble_state::machine_start()
@@ -311,7 +306,6 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(vlm5030_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_FILTER_RC_ADD("filter1", 0)
