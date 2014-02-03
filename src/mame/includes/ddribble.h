@@ -4,6 +4,7 @@
 
 ***************************************************************************/
 
+#include "sound/flt_rc.h"
 #include "sound/vlm5030.h"
 
 class ddribble_state : public driver_device
@@ -19,7 +20,10 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_snd_sharedram(*this, "snd_sharedram"),
 		m_maincpu(*this, "maincpu"),
-		m_vlm(*this, "vlm") { }
+		m_vlm(*this, "vlm"),
+		m_filter1(*this, "filter1"),
+		m_filter2(*this, "filter2"),
+		m_filter3(*this, "filter3") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -41,11 +45,11 @@ public:
 	int         m_int_enable_1;
 
 	/* devices */
-	device_t *m_filter1;
-	device_t *m_filter2;
-	device_t *m_filter3;
 	required_device<cpu_device> m_maincpu;
 	required_device<vlm5030_device> m_vlm;
+	required_device<filter_rc_device> m_filter1;
+	required_device<filter_rc_device> m_filter2;
+	required_device<filter_rc_device> m_filter3;
 
 	DECLARE_WRITE8_MEMBER(ddribble_bankswitch_w);
 	DECLARE_READ8_MEMBER(ddribble_sharedram_r);
