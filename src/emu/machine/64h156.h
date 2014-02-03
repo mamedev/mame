@@ -62,11 +62,11 @@
 #ifndef __C64H156__
 #define __C64H156__
 
-
 #include "emu.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
+#include "formats/d71_dsk.h"
 
 
 
@@ -74,12 +74,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_64H156_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD(_tag, C64H156, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_64H156_ATN_CALLBACK(_write) \
+	devcb = &c64h156_device::set_atn_wr_callback(*device, DEVCB2_##_write);
 
-#define C64H156_INTERFACE(_name) \
-	const c64h156_interface (_name) =
+#define MCFG_64H156_SYNC_CALLBACK(_write) \
+	devcb = &c64h156_device::set_sync_wr_callback(*device, DEVCB2_##_write);
+
+#define MCFG_64H156_BYTE_CALLBACK(_write) \
+	devcb = &c64h156_device::set_byte_wr_callback(*device, DEVCB2_##_write);
 
 
 
@@ -87,24 +89,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c64h156_interface
-
-struct c64h156_interface
-{
-	devcb_write_line    m_out_atn_cb;
-	devcb_write_line    m_out_sync_cb;
-	devcb_write_line    m_out_byte_cb;
-};
-
 // ======================> c64h156_device
 
 class c64h156_device :  public device_t,
-						public device_execute_interface,
-						public c64h156_interface
+						public device_execute_interface
 {
 public:
 	// construction/destruction
 	c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _Object> static devcb2_base &set_atn_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_atn.set_callback(object); }
+	template<class _Object> static devcb2_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_sync.set_callback(object); }
+	template<class _Object> static devcb2_base &set_byte_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_byte.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( yb_r );
 	DECLARE_WRITE8_MEMBER( yb_w );
@@ -120,17 +116,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( atni_w );
 	DECLARE_WRITE_LINE_MEMBER( atna_w );
 
-	void set_floppy(legacy_floppy_image_device *floppy);
+	void set_floppy(floppy_image_device *floppy);
 
-	void stp_w(int data);
-	void ds_w(int data);
-	void set_side(int side);
-
-	static void on_disk_change(device_image_interface &image);
+	void stp_w(int stp);
+	void ds_w(int ds);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// device_execute_interface overrides
@@ -139,36 +131,28 @@ protected:
 	int m_icount;
 
 	inline void set_atn_line();
-	inline void read_current_track();
-	inline void update_cycles_until_next_bit();
 	inline void receive_bit();
 	inline void decode_bit();
+	inline void get_next_edge(attotime when);
 
 private:
-	devcb_resolved_write_line   m_out_atn_func;
-	devcb_resolved_write_line   m_out_sync_func;
-	devcb_resolved_write_line   m_out_byte_func;
+	devcb2_write_line m_write_atn;
+	devcb2_write_line m_write_sync;
+	devcb2_write_line m_write_byte;
 
-	legacy_floppy_image_device *m_floppy;
-	optional_shared_ptr<UINT8> m_track_buffer;                  // track data buffer
-	optional_shared_ptr<UINT8> m_speed_buffer;                  // speed block buffer
+	floppy_image_device *m_floppy;
 
 	// track
+	attotime m_period;
+	attotime m_edge;
 	UINT16 m_shift;
-	int m_side;                             // disk side
-	int m_track_len;                        // track length
-	offs_t m_buffer_pos;                    // current byte position within track buffer
-	int m_bit_pos;                          // current bit position within track buffer byte
-	int m_bit_count;                        // current data byte bit counter
-	int m_cycles_until_next_bit;
-	int m_zero_count;
-	int m_cycles_until_random_flux;
 
 	// motors
 	int m_mtr;                              // spindle motor on
 
 	// signals
 	int m_accl;                             // 1/2 MHz select
+	int m_stp;
 	int m_ds;                               // density select
 	int m_soe;                              // serial output enable
 	int m_oe;                               // output enable (0 = write, 1 = read)
@@ -193,11 +177,12 @@ private:
 	int m_u4b;
 	int m_ue3;
 	int m_uc1b;
+	int m_zero_count;
+	int m_cycles_until_random_flux;
 
 	// write logic
 	UINT8 m_via_pa;
 	UINT8 m_ud3;
-	int m_wp;
 };
 
 

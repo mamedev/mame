@@ -308,6 +308,8 @@ protected:
 		RAWBITS,                //!< A value of p2 bits in p1 to be copied as-is, msb first
 		TRACK_ID,               //!< Track id byte, mfm-encoded
 		TRACK_ID_FM,            //!< Track id byte, fm-encoded
+		TRACK_ID_DOS2_GCR5,     //!< Track id byte, gcr5-encoded
+		TRACK_ID_DOS25_GCR5,    //!< Track id byte, gcr5-encoded
 		TRACK_ID_GCR6,          //!< Track id low 6 bits, gcr6-encoded
 		TRACK_ID_8N1,			//!< Track id byte, 8N1-encoded
 		HEAD_ID,                //!< Head id byte, mfm-encoded

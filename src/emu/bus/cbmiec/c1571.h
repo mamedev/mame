@@ -18,15 +18,12 @@
 #include "cbmiec.h"
 #include "bus/c64/bn1541.h"
 #include "cpu/m6502/m6502.h"
-#include "imagedev/flopdrv.h"
-#include "formats/d64_dsk.h"
-#include "formats/g64_dsk.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/isa.h"
+#include "machine/isa_wd1002a_wx1.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"
-#include "machine/isa_wd1002a_wx1.h"
 
 
 
@@ -45,8 +42,8 @@
 // ======================> c1571_device
 
 class c1571_device :  public device_t,
-						public device_cbm_iec_interface,
-						public device_c64_floppy_parallel_interface
+					  public device_cbm_iec_interface,
+					  public device_c64_floppy_parallel_interface
 {
 public:
 	// construction/destruction
@@ -81,6 +78,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( wpt_w );
 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	void wpt_callback(floppy_image_device *floppy, int state);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -110,8 +111,7 @@ protected:
 	required_device<mos6526_device> m_cia;
 	required_device<wd1770_t> m_fdc;
 	required_device<c64h156_device> m_ga;
-	required_device<legacy_floppy_image_device> m_image;
-	//required_device<floppy_image_device> m_floppy;
+	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
 
 	// signals

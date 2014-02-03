@@ -266,7 +266,9 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 			col = MAKE_RGB(255, 0, 0);
 		else
 		{
-			int colv = (int) ((m_vid - m_sync_threshold) / 3.2 * 255.0);
+			int colv = (int) ((m_vid - m_sync_threshold) / 3.7 * 255.0);
+			if (colv > 255)
+			    colv = 255;
 			col = MAKE_RGB(colv, colv, colv);
 		}
 

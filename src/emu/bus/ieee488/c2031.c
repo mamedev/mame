@@ -230,7 +230,7 @@ READ8_MEMBER( c2031_device::via1_pb_r )
 	UINT8 data = 0;
 
 	// write protect sense
-	data |= !floppy_wpt_r(m_image) << 4;
+	data |= !m_floppy->wpt_r() << 4;
 
 	// SYNC detect line
 	data |= m_ga->sync_r() << 7;
@@ -280,40 +280,24 @@ WRITE_LINE_MEMBER( c2031_device::byte_w )
 	m_via1->write_ca1(state);
 }
 
-static C64H156_INTERFACE( ga_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2031_device, byte_w)
-};
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( c2031_floppies )
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( c2031_floppies )
+    SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
+SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( c1541 )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-static LEGACY_FLOPPY_OPTIONS_START( c1541 )
-	LEGACY_FLOPPY_OPTION( c1541, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	LEGACY_FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
-//  floppy_interface c2031_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface c2031_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(c1541),
-	"floppy_5_25",
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( c2031_device::floppy_formats )
+	FLOPPY_D64_FORMAT,
+	FLOPPY_G64_FORMAT
+FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
@@ -341,8 +325,9 @@ static MACHINE_CONFIG_FRAGMENT( c2031 )
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(C64H156_TAG, c64h156_device, oe_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(c2031_device, via1_irq_w))
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c2031_floppy_interface)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(c2031_device, byte_w))
+	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c2031_floppies, "525ssqd", c2031_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -422,7 +407,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 		m_via0(*this, M6522_0_TAG),
 		m_via1(*this, M6522_1_TAG),
 		m_ga(*this, C64H156_TAG),
-		m_image(*this, FLOPPY_0),
+		m_floppy(*this, C64H156_TAG":0:525ssqd"),
 		m_address(*this, "ADDRESS"),
 		m_nrfd_out(1),
 		m_ndac_out(1),
@@ -440,7 +425,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 void c2031_device::device_start()
 {
 	// install image callbacks
-	m_ga->set_floppy(m_image);
+	m_ga->set_floppy(m_floppy);
 
 	// register for state saving
 	save_item(NAME(m_nrfd_out));

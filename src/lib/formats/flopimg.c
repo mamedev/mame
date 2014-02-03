@@ -1235,7 +1235,7 @@ void floppy_image_format_t::fixup_crc_cbm(UINT32 *buffer, const gen_crc_info *cr
 		v = v ^ gcr5bw_tb[bitn_r(buffer, o+5, 5)];
 	}
 	int offset = crc->write;
-	gcr5_w(buffer, offset, 8, v);
+	gcr5_w(buffer, offset, 10, v);
 }
 
 UINT16 floppy_image_format_t::calc_crc_ccitt(const UINT32 *buffer, int start, int end)
@@ -1385,7 +1385,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 
 		case GCR5:
 			for(int i=0; i<desc[index].p2; i++)
-				gcr5_w(buffer, offset, 8, desc[index].p1);
+				gcr5_w(buffer, offset, 10, desc[index].p1);
 			break;
 
 		case _8N1:
@@ -1413,6 +1413,14 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 
 		case TRACK_ID_FM:
 			fm_w(buffer, offset, 8, track);
+			break;
+
+		case TRACK_ID_DOS2_GCR5:
+			gcr5_w(buffer, offset, 10, 1 + (track >> 1) + (head * 35));
+			break;
+
+		case TRACK_ID_DOS25_GCR5:
+			gcr5_w(buffer, offset, 10, 1 + track + (head * 77));
 			break;
 
 		case TRACK_ID_GCR6:
@@ -1448,7 +1456,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			break;
 
 		case SECTOR_ID_GCR5:
-			gcr5_w(buffer, offset, 8, sect[sector_idx].sector_id);
+			gcr5_w(buffer, offset, 10, sect[sector_idx].sector_id);
 			break;
 
 		case SECTOR_ID_GCR6:
@@ -1575,7 +1583,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 		case SECTOR_DATA_GCR5: {
 			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
 			for(int i=0; i != csect->size; i++)
-				gcr5_w(buffer, offset, 8, csect->data[i]);
+				gcr5_w(buffer, offset, 10, csect->data[i]);
 			break;
 		}
 

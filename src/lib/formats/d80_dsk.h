@@ -4,7 +4,7 @@
 
     formats/d80_dsk.h
 
-    Commodore 8050/8250/SFD-1001 sector disk image format
+    Commodore 8050 sector disk image format
 
 *********************************************************************/
 
@@ -16,18 +16,22 @@
 class d80_format : public d64_format {
 public:
 	d80_format();
+	d80_format(const format *formats);
 
 	virtual const char *name() const;
 	virtual const char *description() const;
 	virtual const char *extensions() const;
 
 protected:
-	virtual int get_physical_track(const format &f, int track);
+	const format *formats;
+
+	virtual int get_physical_track(const format &f, int head, int track);
 	virtual UINT32 get_cell_size(const format &f, int track);
 	virtual int get_sectors_per_track(const format &f, int track);
 	virtual int get_disk_id_offset(const format &f);
+	floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2);
 
-	static const format formats[];
+	static const format file_formats[];
 
 	static const UINT32 cell_size[];
 	static const int speed_zone[];

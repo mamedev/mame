@@ -91,6 +91,7 @@ public:
 
 	UINT32* get_buffer() { return image->get_buffer(cyl, ss); }
 	UINT32 get_len() { return image->get_track_size(cyl, ss); }
+	int get_cyl() { return cyl; }
 
 	void mon_w(int state);
 	bool ready_r();

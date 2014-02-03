@@ -14,13 +14,9 @@
 #ifndef __C1551__
 #define __C1551__
 
-
 #include "emu.h"
 #include "exp.h"
 #include "cpu/m6502/m6510t.h"
-#include "imagedev/flopdrv.h"
-#include "formats/d64_dsk.h"
-#include "formats/g64_dsk.h"
 #include "machine/64h156.h"
 #include "machine/6525tpi.h"
 #include "machine/pla.h"
@@ -34,7 +30,7 @@
 // ======================> c1551_device
 
 class c1551_device :  public device_t,
-						public device_plus4_expansion_card_interface
+					  public device_plus4_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -63,6 +59,8 @@ public:
 	DECLARE_READ8_MEMBER( tpi1_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi1_pc_w );
 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -74,6 +72,12 @@ protected:
 	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 
 private:
+	enum
+	{
+		LED_POWER = 0,
+		LED_ACT
+	};
+
 	bool tpi1_selected(offs_t offset);
 
 	required_device<m6510t_device> m_maincpu;
@@ -81,7 +85,7 @@ private:
 	required_device<tpi6525_device> m_tpi1;
 	required_device<c64h156_device> m_ga;
 	required_device<pls100_device> m_pla;
-	required_device<legacy_floppy_image_device> m_image;
+	required_device<floppy_image_device> m_floppy;
 	required_device<plus4_expansion_slot_device> m_exp;
 	required_ioport m_jp1;
 

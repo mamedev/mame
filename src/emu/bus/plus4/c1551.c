@@ -24,13 +24,6 @@
 #define PLA_TAG         "u1"
 
 
-enum
-{
-	LED_POWER = 0,
-	LED_ACT
-};
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -86,7 +79,7 @@ READ8_MEMBER( c1551_device::port_r )
 	UINT8 data = 0;
 
 	// write protect sense
-	data |= !floppy_wpt_r(m_image) << 4;
+	data |= !m_floppy->wpt_r() << 4;
 
 	// byte latched
 	data |= m_ga->atn_r() << 7;
@@ -123,6 +116,7 @@ WRITE8_MEMBER( c1551_device::port_w )
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
 }
+
 
 //-------------------------------------------------
 //  tpi6525_interface tpi0_intf
@@ -357,43 +351,22 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  C64H156_INTERFACE( ga_intf )
+//  SLOT_INTERFACE( c1551_floppies )
 //-------------------------------------------------
 
-static C64H156_INTERFACE( ga_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c64h156_device, atni_w)
-};
+static SLOT_INTERFACE_START( c1551_floppies )
+    SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
+SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( c1541 )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-static LEGACY_FLOPPY_OPTIONS_START( c1541 )
-	LEGACY_FLOPPY_OPTION( c1541, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	LEGACY_FLOPPY_OPTION( c1541, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
-//  floppy_interface c1551_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface c1551_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(c1541),
-	"floppy_5_25",
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( c1551_device::floppy_formats )
+	FLOPPY_D64_FORMAT,
+	FLOPPY_G64_FORMAT
+FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
@@ -410,8 +383,9 @@ static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MCFG_TPI6525_ADD(M6523_0_TAG, tpi0_intf)
 	MCFG_TPI6525_ADD(M6523_1_TAG, tpi1_intf)
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1551_floppy_interface)
-	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL_16MHz)
+	MCFG_64H156_BYTE_CALLBACK(DEVWRITELINE(C64H156_TAG, c64h156_device, atni_w))
+	MCFG_FLOPPY_DRIVE_ADD(C64H156_TAG":0", c1551_floppies, "525ssqd", c1551_device::floppy_formats)
 
 	MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
@@ -467,7 +441,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 		m_tpi1(*this, M6523_1_TAG),
 		m_ga(*this, C64H156_TAG),
 		m_pla(*this, PLA_TAG),
-		m_image(*this, FLOPPY_0),
+		m_floppy(*this, C64H156_TAG":0:525ssqd"),
 		m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
 		m_jp1(*this, "JP1"),
 		m_tcbm_data(0xff),
@@ -490,7 +464,7 @@ void c1551_device::device_start()
 	m_irq_timer->adjust(attotime::zero, CLEAR_LINE);
 
 	// install image callbacks
-	m_ga->set_floppy(m_image);
+	m_ga->set_floppy(m_floppy);
 
 	// register for state saving
 	save_item(NAME(m_tcbm_data));

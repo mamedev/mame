@@ -13,15 +13,13 @@
 
     TODO:
 
-    http://staff.washington.edu/rrcc/uwweb/1541early/1540-2.GIF
+    http://personalpages.tds.net/~rcarlsen/cbm/1541/1541%20EARLY/1540-2.GIF
 
-    - model disk rotation for proper track alignment
     - write circuitry
-    - cycle exact M6502
     - cycle exact VIA
-    - refactor to use modern floppy system
 
     - get these running and we're golden
+    	- Bounty Bob Strikes Back (aligned halftracks)
         - Quiwi (speed change within track)
         - Defender of the Crown (V-MAX! v2, density checks)
         - Test Drive / Cabal (HLS, sub-cycle jitter)
@@ -29,9 +27,7 @@
 
 */
 
-#include "emu.h"
 #include "64h156.h"
-#include "formats/g64_dsk.h"
 
 
 
@@ -53,28 +49,6 @@
 
 const device_type C64H156 = &device_creator<c64h156_device>;
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c64h156_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const c64h156_interface *intf = reinterpret_cast<const c64h156_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<c64h156_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_atn_cb, 0, sizeof(m_out_atn_cb));
-		memset(&m_out_sync_cb, 0, sizeof(m_out_sync_cb));
-		memset(&m_out_byte_cb, 0, sizeof(m_out_byte_cb));
-	}
-}
-
 
 
 //**************************************************************************
@@ -87,55 +61,17 @@ void c64h156_device::device_config_complete()
 
 inline void c64h156_device::set_atn_line()
 {
-	m_out_atn_func(ATN);
+	m_write_atn(ATN);
 }
 
 
 //-------------------------------------------------
-//  read_current_track -
+//  get_next_edge -
 //-------------------------------------------------
 
-inline void c64h156_device::read_current_track()
+inline void c64h156_device::get_next_edge(attotime when)
 {
-	int track_length = G64_BUFFER_SIZE;
-
-	// read track data
-	floppy_drive_read_track_data_info_buffer(m_floppy, m_side, m_track_buffer, &track_length);
-
-	// extract track length
-	m_track_len = floppy_drive_get_current_track_size(m_floppy, m_side);
-
-	// set bit pointer to track start
-	m_buffer_pos = 0;
-	m_bit_pos = 7;
-	m_bit_count = 0;
-	m_zero_count = 0;
-
-	if (m_track_len)
-	{
-		memcpy(m_speed_buffer, m_track_buffer + m_track_len, G64_SPEED_BLOCK_SIZE);
-
-		update_cycles_until_next_bit();
-	}
-}
-
-
-//-------------------------------------------------
-//  update_cycles_until_next_bit -
-//-------------------------------------------------
-
-inline void c64h156_device::update_cycles_until_next_bit()
-{
-	int speed_offset = m_buffer_pos / 4;
-	int speed_shift = (3 - (m_buffer_pos % 4)) * 2;
-
-	UINT8 speed = m_speed_buffer[speed_offset];
-
-	int ds = (speed >> speed_shift) & 0x03;
-
-	m_cycles_until_next_bit = (16 - ds) * 4;
-
-	if (LOG) logerror("buff %04x:%u speed %04x shift %u ds %u cycles %u\n", m_buffer_pos, m_bit_pos, speed_offset, speed_shift, ds, m_cycles_until_next_bit);
+	m_edge = m_floppy->get_next_transition(when);
 }
 
 
@@ -145,63 +81,25 @@ inline void c64h156_device::update_cycles_until_next_bit()
 
 inline void c64h156_device::receive_bit()
 {
-	if (!m_track_len)
-	{
-		m_bit_sync = 0;
+	attotime when = machine().time();
+	attotime next = when + m_period;
+
+	m_bit_sync = (m_edge.is_never() || m_edge >= next) ? 0 : 1;
+
+	if (m_bit_sync) {
+		m_zero_count = 0;
+		m_cycles_until_random_flux = (rand() % 31) + 289;
+
+		get_next_edge(when);
+	} else {
+		m_zero_count++;
 	}
-	else
-	{
-		if (m_cycles_until_next_bit == 0)
-		{
-			m_bit_sync = BIT(m_track_buffer[m_buffer_pos], m_bit_pos);
 
-			if (m_bit_sync)
-			{
-				m_zero_count = 0;
-				m_cycles_until_random_flux = (rand() % 31) + 289;
-			}
-			else
-			{
-				m_zero_count++;
-			}
-
-			if (m_zero_count >= m_cycles_until_random_flux)
-			{
-				// receive phantom bit
-				if (LOG) logerror("PHANTOM BIT SYNC 1 after %u cycles\n", m_zero_count);
-
-				m_bit_sync = 1;
-
-				m_zero_count = 0;
-				m_cycles_until_random_flux = (rand() % 367) + 33;
-			}
-			else
-			{
-				if (LOG) logerror("BIT SYNC %u\n", m_bit_sync);
-			}
-
-			m_shift <<= 1;
-			m_shift |= m_bit_sync;
-
-			m_bit_pos--;
-			m_bit_count++;
-
-			if (m_bit_pos < 0)
-			{
-				m_bit_pos = 7;
-				m_buffer_pos++;
-
-				if (m_buffer_pos >= m_track_len)
-				{
-					// loop to the start of the track
-					m_buffer_pos = 0;
-				}
-			}
-
-			update_cycles_until_next_bit();
-		}
-
-		m_cycles_until_next_bit--;
+	if (m_zero_count >= m_cycles_until_random_flux) {
+		m_bit_sync = 1;
+		
+		m_zero_count = 0;
+		m_cycles_until_random_flux = (rand() % 367) + 33;
 	}
 }
 
@@ -231,7 +129,7 @@ inline void c64h156_device::decode_bit()
 		}
 	}
 
-	if (LOG) logerror("UE7 CTR %01x TC %u, ", m_ue7, ue7_tc);
+	if (LOG) logerror("%s UE7 CTR %01x TC %u, ", machine().time().as_string(),m_ue7, ue7_tc);
 
 	// UF4
 
@@ -306,11 +204,7 @@ inline void c64h156_device::decode_bit()
 		{
 			// clock UE3
 			m_ue3++;
-
-			if (m_ue3 == 16)
-			{
-				m_ue3 = 0;
-			}
+			m_ue3 &= 0x0f;
 
 			if (LOG) logerror("++");
 		}
@@ -334,7 +228,7 @@ inline void c64h156_device::decode_bit()
 	if (LOG) logerror("BYTE %u SOE %u\n", byte_sync, m_soe);
 
 	// UD3
-
+#ifdef WRITE_SUPPORTED
 	int uf3b = !(uc1b && uf4_qa && uf4_qb);
 
 	if (!uf3b)
@@ -349,19 +243,19 @@ inline void c64h156_device::decode_bit()
 
 		int uf5b = !(!uf4_qb && ud3_qh);
 
-		if (!m_oe && m_wp)
+		if (!m_oe && m_floppy->wpt_r())
 		{
 			// TODO write bit to disk
 			if (LOG) logerror("WRITE BIT %u\n", uf5b);
 		}
 	}
-
+#endif
 	// prepare for next cycle
 
 	if (m_block_sync != block_sync)
 	{
 		m_block_sync = block_sync;
-		m_out_sync_func(m_block_sync);
+		m_write_sync(m_block_sync);
 	}
 
 	if (m_byte_sync != byte_sync)
@@ -374,18 +268,16 @@ inline void c64h156_device::decode_bit()
 			{
 				m_accl_yb = m_ud2;
 				m_accl_byte_sync = byte_sync;
-				m_out_byte_func(m_accl_byte_sync);
+				m_write_byte(m_accl_byte_sync);
 			}
 		}
 		else
 		{
-			m_out_byte_func(m_byte_sync);
+			m_write_byte(m_byte_sync);
 		}
 	}
 
 	m_uf4_qb = uf4_qb;
-
-	m_bit_sync = 0;
 }
 
 
@@ -402,16 +294,16 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, C64H156, "64H156", tag, owner, clock, "c64h156", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
+		m_write_atn(*this),
+		m_write_sync(*this),
+		m_write_byte(*this),
 		m_floppy(NULL),
-		m_track_buffer(*this, "track_buffer"),
-		m_speed_buffer(*this, "speed_buffer"),
-		m_side(0),
-		m_track_len(0),
-		m_buffer_pos(0),
-		m_bit_pos(0),
-		m_bit_count(0),
+		m_period(attotime::from_hz(clock)),
+		m_edge(attotime::never),
+		m_shift(0),
 		m_mtr(0),
 		m_accl(0),
+		m_stp(-1),
 		m_ds(0),
 		m_soe(0),
 		m_oe(0),
@@ -432,7 +324,8 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 		m_u4b(0),
 		m_ue3(0),
 		m_uc1b(0),
-		m_wp(0)
+		m_zero_count(0),
+		m_cycles_until_random_flux(0)
 {
 }
 
@@ -446,27 +339,16 @@ void c64h156_device::device_start()
 	// set our instruction counter
 	m_icountptr = &m_icount;
 
-	// allocate track buffer
-	m_track_buffer.allocate(G64_BUFFER_SIZE);
-	m_speed_buffer.allocate(G64_SPEED_BLOCK_SIZE);
-
 	// resolve callbacks
-	m_out_atn_func.resolve(m_out_atn_cb, *this);
-	m_out_sync_func.resolve(m_out_sync_cb, *this);
-	m_out_byte_func.resolve(m_out_byte_cb, *this);
+	m_write_atn.resolve_safe();
+	m_write_sync.resolve_safe();
+	m_write_byte.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_shift));
-	save_item(NAME(m_side));
-	save_item(NAME(m_track_len));
-	save_item(NAME(m_buffer_pos));
-	save_item(NAME(m_bit_pos));
-	save_item(NAME(m_bit_count));
-	save_item(NAME(m_cycles_until_next_bit));
-	save_item(NAME(m_zero_count));
-	save_item(NAME(m_cycles_until_random_flux));
 	save_item(NAME(m_mtr));
 	save_item(NAME(m_accl));
+	save_item(NAME(m_stp));
 	save_item(NAME(m_ds));
 	save_item(NAME(m_soe));
 	save_item(NAME(m_oe));
@@ -489,7 +371,8 @@ void c64h156_device::device_start()
 	save_item(NAME(m_uc1b));
 	save_item(NAME(m_via_pa));
 	save_item(NAME(m_ud3));
-	save_item(NAME(m_wp));
+	save_item(NAME(m_zero_count));
+	save_item(NAME(m_cycles_until_random_flux));
 }
 
 
@@ -504,9 +387,8 @@ void c64h156_device::execute_run()
 		if (m_mtr)
 		{
 			receive_bit();
+			decode_bit();
 		}
-
-		decode_bit();
 
 		m_icount--;
 	} while (m_icount > 0);
@@ -608,7 +490,8 @@ WRITE_LINE_MEMBER( c64h156_device::ted_w )
 	if (m_accl && !m_accl_byte_sync && !state)
 	{
 		m_accl_byte_sync = 1;
-		m_out_byte_func(m_accl_byte_sync);
+
+		m_write_byte(m_accl_byte_sync);
 	}
 }
 
@@ -623,15 +506,11 @@ WRITE_LINE_MEMBER( c64h156_device::mtr_w )
 	{
 		if (LOG) logerror("MTR %u\n", state);
 
-		if (state)
-		{
-			// read track data
-			read_current_track();
-		}
-
-		floppy_mon_w(m_floppy, !state);
+		m_floppy->mon_w(!state);
 
 		m_mtr = state;
+
+		get_next_edge(machine().time());
 	}
 }
 
@@ -702,13 +581,9 @@ WRITE_LINE_MEMBER( c64h156_device::atna_w )
 //  set_floppy -
 //-------------------------------------------------
 
-void c64h156_device::set_floppy(legacy_floppy_image_device *floppy)
+void c64h156_device::set_floppy(floppy_image_device *floppy)
 {
 	m_floppy = floppy;
-
-	// install image callbacks
-	floppy_install_unload_proc(m_floppy, c64h156_device::on_disk_change);
-	floppy_install_load_proc(m_floppy, c64h156_device::on_disk_change);
 }
 
 
@@ -716,26 +591,37 @@ void c64h156_device::set_floppy(legacy_floppy_image_device *floppy)
 //  stp_w -
 //-------------------------------------------------
 
-void c64h156_device::stp_w(int data)
+void c64h156_device::stp_w(int stp)
 {
 	if (m_mtr)
 	{
-		int track = floppy_drive_get_current_track(m_floppy);
-		int tracks = (data - track) & 0x03;
-
-		if (tracks == 3)
+		if (m_stp != stp)
 		{
-			tracks = -1;
+			int track = m_floppy->get_cyl();
+			int tracks = (stp - track) & 0x03;
+
+			if (tracks == 3)
+			{
+				tracks = -1;
+			}
+
+			if (tracks == -1)
+			{
+				m_floppy->dir_w(1);
+				m_floppy->stp_w(1);
+				m_floppy->stp_w(0);
+			}
+			else if (tracks == 1)
+			{
+				m_floppy->dir_w(0);
+				m_floppy->stp_w(1);
+				m_floppy->stp_w(0);
+			}
 		}
 
-		if (tracks == -1 || tracks == 1)
-		{
-			// step read/write head
-			floppy_drive_seek(m_floppy, tracks);
+		m_stp = stp;
 
-			// read new track data
-			read_current_track();
-		}
+		get_next_edge(machine().time());
 	}
 }
 
@@ -744,35 +630,9 @@ void c64h156_device::stp_w(int data)
 //  ds_w - density select
 //-------------------------------------------------
 
-void c64h156_device::ds_w(int data)
+void c64h156_device::ds_w(int ds)
 {
-	m_ds = data;
-}
+	if (LOG) logerror("DS %u\n", ds & 0x03);
 
-
-//-------------------------------------------------
-//  set_side -
-//-------------------------------------------------
-
-void c64h156_device::set_side(int side)
-{
-	if (m_side != side)
-	{
-		m_side = side;
-
-		// read new track data
-		read_current_track();
-	}
-}
-
-
-//-------------------------------------------------
-//  on_disk_change -
-//-------------------------------------------------
-
-void c64h156_device::on_disk_change(device_image_interface &image)
-{
-	//m_wp = !floppy_wpt_r(image);
-
-	//read_current_track();
+	m_ds = ds & 0x03;
 }

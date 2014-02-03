@@ -17,14 +17,11 @@
 #include "emu.h"
 #include "cbmiec.h"
 #include "bus/c64/bn1541.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/m6502/m6502.h"
-#include "imagedev/flopdrv.h"
-#include "formats/d64_dsk.h"
-#include "formats/g64_dsk.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "bus/centronics/ctronics.h"
 
 
 
@@ -43,12 +40,16 @@
 // ======================> base_c1541_device
 
 class base_c1541_device :  public device_t,
-							public device_cbm_iec_interface,
-							public device_c64_floppy_parallel_interface
+						   public device_cbm_iec_interface,
+						   public device_c64_floppy_parallel_interface
 {
 public:
 	// construction/destruction
 	base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	virtual DECLARE_READ8_MEMBER( via0_pa_r );
@@ -62,9 +63,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual ioport_constructor device_input_ports() const;
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides
@@ -91,7 +90,7 @@ protected:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
-	required_device<legacy_floppy_image_device> m_image;
+	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
 
 	// IEC bus

@@ -562,7 +562,7 @@ UINT32 floppy_image_device::find_position(attotime &base, attotime when)
 		revc++;
 	}
 
-	return (delta*rpm/300).as_ticks(1000000000);
+	return (delta*rpm/300.).as_ticks(1000000000);
 }
 
 attotime floppy_image_device::get_next_transition(attotime from_when)
@@ -592,7 +592,7 @@ attotime floppy_image_device::get_next_transition(attotime from_when)
 		next_position = 200000000 + (buf[1] & floppy_image::TIME_MASK);
 
 	//  logerror("Floppy: cuspos=%d nextpos=%d\n", position, next_position);
-	return base + attotime::from_nsec(UINT64(next_position)*300/rpm);
+	return base + attotime::from_nsec(UINT64(next_position)*300./rpm);
 }
 
 void floppy_image_device::write_flux(attotime start, attotime end, int transition_count, const attotime *transitions)
