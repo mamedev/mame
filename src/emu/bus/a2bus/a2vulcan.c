@@ -61,6 +61,7 @@
 //**************************************************************************
 
 const device_type A2BUS_VULCAN = &device_creator<a2bus_vulcan_device>;
+const device_type A2BUS_VULCANGOLD = &device_creator<a2bus_vulcangold_device>;
 
 #define VULCAN_ROM_REGION  "vulcan_rom"
 #define VULCAN_ATA_TAG     "vulcan_ata"
@@ -72,6 +73,11 @@ MACHINE_CONFIG_END
 ROM_START( vulcan )
 	ROM_REGION(0x4000, VULCAN_ROM_REGION, 0)
 	ROM_LOAD( "ae vulcan rom v1.4.bin", 0x000000, 0x004000, CRC(798d5825) SHA1(1d668e856e33c6eeb10fe26975341afa8acb81f5) )
+ROM_END
+
+ROM_START( vulcangold )
+	ROM_REGION(0x4000, VULCAN_ROM_REGION, 0)
+	ROM_LOAD( "ae vulcan gold rom v2.0.bin", 0x000000, 0x004000, CRC(19bc3958) SHA1(96a22c2540fa603648a4e638e176eee76523b4e1) ) 
 ROM_END
 
 /***************************************************************************
@@ -92,9 +98,14 @@ machine_config_constructor a2bus_vulcanbase_device::device_mconfig_additions() c
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *a2bus_vulcanbase_device::device_rom_region() const
+const rom_entry *a2bus_vulcan_device::device_rom_region() const
 {
 	return ROM_NAME( vulcan );
+}
+
+const rom_entry *a2bus_vulcangold_device::device_rom_region() const
+{
+	return ROM_NAME( vulcangold );
 }
 
 //**************************************************************************
@@ -113,6 +124,11 @@ a2bus_vulcan_device::a2bus_vulcan_device(const machine_config &mconfig, const ch
 {
 }
 
+a2bus_vulcangold_device::a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	a2bus_vulcanbase_device(mconfig, A2BUS_VULCAN, "Applied Engineering Vulcan Gold IDE controller", tag, owner, clock, "a2vulgld", __FILE__)
+{
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -125,14 +141,20 @@ void a2bus_vulcanbase_device::device_start()
 	astring tempstring;
 	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, VULCAN_ROM_REGION))->base();
 
-	// disable 40 meg partition size limit / protection
-	m_rom[0x59e] = 0xea;
-	m_rom[0x59f] = 0xea;
-
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_rambank));
+}
+
+void a2bus_vulcan_device::device_start()
+{
+	// call base class
+	a2bus_vulcanbase_device::device_start();
+
+	// disable 40 meg partition size limit / protection in v1.4 ROMs
+	m_rom[0x59e] = 0xea;
+	m_rom[0x59f] = 0xea;
 }
 
 void a2bus_vulcanbase_device::device_reset()
@@ -177,7 +199,7 @@ UINT8 a2bus_vulcanbase_device::read_c0nx(address_space &space, UINT8 offset)
 			return m_ata->read_cs0(space, offset, 0xff);
 
 		default:
-//          printf("Read @ C0n%x\n", offset);
+			logerror("a2vulcan: unknown read @ C0n%x\n", offset);
 			break;
 
 	}

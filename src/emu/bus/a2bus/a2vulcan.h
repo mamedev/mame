@@ -2,7 +2,7 @@
 
     a2vulcan.h
 
-    Applied Engineering Vulcan IDE controller
+    Applied Engineering Vulcan and Vulcan Gold IDE controllers
 
 *********************************************************************/
 
@@ -27,7 +27,6 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const rom_entry *device_rom_region() const;
 
 protected:
 	virtual void device_start();
@@ -55,11 +54,25 @@ class a2bus_vulcan_device : public a2bus_vulcanbase_device
 {
 public:
 	a2bus_vulcan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual const rom_entry *device_rom_region() const;
+
+protected:
+	virtual void device_start();
+
+protected:
+};
+
+class a2bus_vulcangold_device : public a2bus_vulcanbase_device
+{
+public:
+	a2bus_vulcangold_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual const rom_entry *device_rom_region() const;
 
 protected:
 };
 
 // device type definition
 extern const device_type A2BUS_VULCAN;
+extern const device_type A2BUS_VULCANGOLD;
 
 #endif /* __A2BUS_VULCAN__ */
