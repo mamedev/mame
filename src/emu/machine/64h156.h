@@ -177,6 +177,8 @@ private:
 	int m_u4b;
 	int m_ue3;
 	int m_uc1b;
+	int m_zero_count;
+	int m_cycles_until_random_flux;
 
 	// write logic
 	UINT8 m_via_pa;

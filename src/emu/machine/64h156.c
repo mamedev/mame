@@ -87,7 +87,19 @@ inline void c64h156_device::receive_bit()
 	m_bit_sync = (m_edge.is_never() || m_edge >= next) ? 0 : 1;
 
 	if (m_bit_sync) {
+		m_zero_count = 0;
+		m_cycles_until_random_flux = (rand() % 31) + 289;
+
 		get_next_edge(when);
+	} else {
+		m_zero_count++;
+	}
+
+	if (m_zero_count >= m_cycles_until_random_flux) {
+		m_bit_sync = 1;
+		
+		m_zero_count = 0;
+		m_cycles_until_random_flux = (rand() % 367) + 33;
 	}
 }
 
@@ -311,7 +323,9 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 		m_u4a(0),
 		m_u4b(0),
 		m_ue3(0),
-		m_uc1b(0)
+		m_uc1b(0),
+		m_zero_count(0),
+		m_cycles_until_random_flux(0)
 {
 }
 
@@ -357,6 +371,8 @@ void c64h156_device::device_start()
 	save_item(NAME(m_uc1b));
 	save_item(NAME(m_via_pa));
 	save_item(NAME(m_ud3));
+	save_item(NAME(m_zero_count));
+	save_item(NAME(m_cycles_until_random_flux));
 }
 
 
