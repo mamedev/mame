@@ -7265,7 +7265,6 @@ dmndrbya        // G4001 'DD' (c) 1986
 // the four digits number is the game ID stored at address 0x0108 of the program ROM
 // info on prototypes taken from http://www.members.tripod.com/fresa/proto/puzzle.htm
 neogeo
-mvs
 nam1975         // 0001 (c) 1990 SNK
 bstars          // 0002 (c) 1990 SNK
 bstarsh         // 0002 (c) 1990 SNK
