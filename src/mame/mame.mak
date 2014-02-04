@@ -632,6 +632,7 @@ $(MAMEOBJ)/alba.a: \
 
 $(MAMEOBJ)/alliedl.a: \
 	$(DRIVERS)/ace.o \
+	$(DRIVERS)/aleisttl.o \
 	$(DRIVERS)/clayshoo.o \
 
 $(MAMEOBJ)/alpha.a: \
@@ -2066,6 +2067,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/cdi.o $(VIDEO)/mcd212.o $(MACHINE)/cdi070.o $(MACHINE)/cdislave.o $(MACHINE)/cdicdic.o \
 	$(DRIVERS)/cesclass.o \
 	$(DRIVERS)/chance32.o \
+	$(DRIVERS)/chicago.o \
 	$(DRIVERS)/chsuper.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
@@ -2093,6 +2095,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/ecoinf1.o \
 	$(DRIVERS)/ecoinf2.o \
 	$(DRIVERS)/ecoinf3.o \
+	$(DRIVERS)/electra.o \
 	$(DRIVERS)/epos.o $(VIDEO)/epos.o \
 	$(DRIVERS)/esd16.o $(VIDEO)/esd16.o \
 	$(DRIVERS)/esh.o \
