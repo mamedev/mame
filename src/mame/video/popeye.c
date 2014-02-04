@@ -329,9 +329,14 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		 * bit 0 /
 		 */
 
-		code = (spriteram[offs + 2] & 0x7f) + ((spriteram[offs + 3] & 0x10) << 3)
-							+ ((spriteram[offs + 3] & 0x04) << 6);
-		color = (spriteram[offs + 3] & 0x07) + 8*(*m_palettebank & 0x07);
+		color = (spriteram[offs + 3] & 0x07);
+		if (color == 0) continue;
+
+		code = (spriteram[offs + 2] & 0x7f)
+			+ ((spriteram[offs + 3] & 0x10) << 3)
+			+ ((spriteram[offs + 3] & 0x04) << 6);
+
+		color += (*m_palettebank & 0x07) << 3;
 		if (m_bitmap_type == TYPE_SKYSKIPR)
 		{
 			/* Two of the PROM address pins are tied together and one is not connected... */
@@ -352,8 +357,7 @@ void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			sy = 496 - sy;
 		}
 
-		if (spriteram[offs] != 0)
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code ^ 0x1ff,
 					color,
 					flipx,flipy,

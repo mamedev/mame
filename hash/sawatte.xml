@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="sawatte" description="Sega Sawatte Pico cartridges">
+
+	<software name="doraemon">
+		<description>Doraemon Norimono Daishuugou!</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="671-9317?"/>
+		<info name="alt_title" value="ドラえもん のリものだいしゅうごう!"/>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-20150-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-20150-t.ic1" size="524288" crc="5eebb20c" sha1="2230fcf87067c188c4c7229386873d3497e8aa65" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickkuda">
+		<description>Mickey no Kudamono Yasan</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="670-0405?"/>
+		<info name="alt_title" value="ミッキーのくだものやさん"/>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-19042" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19042.ic1" size="524288" crc="c2e06886" sha1="5b7a51c399ea508b23e24c3c9f240260a0933654" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puroland">
+		<description>Minna Oideyo! Sanrio Puroland</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="671-9681?"/>
+		<info name="alt_title" value="みんなおいでよ! サンリオピューロランド"/>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-20788-S" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-20788-s.ic1" size="524288" crc="524b296b" sha1="7c8fe0e73a34bb0879c931d64493c5bb77d4d6d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="okaissci">
+		<description>NHK Okaasan to Issho Do Re Mi Fa Do~nuts! - Camp ni Ikou!</description>
+		<year>1998</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="671-9683?"/>
+		<info name="alt_title" value="NHKおかあさんといっしょドレミファど～なっつ! キャンプにいこう！"/>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-20789-S" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-20789-s.ic1" size="524288" crc="3f56c8d9" sha1="e7fbf4db85d35a51adab71f7a27a5915a64c1845" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohpicn">
+		<description>Pooh no Picnic</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="670-0407?"/>
+		<info name="alt_title" value="プーさんのピクニック"/>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-19045" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19045.ic1" size="524288" crc="8acd5a54" sha1="8d1e5358c5ff552437ec6fa9509879b7196e3e5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micknako">
+		<description>Tokyo Disneyland - Mickey no Nakayoshi Kotankentai</description>
+		<year>1998</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="T-25502K?"/>
+		<info name="alt_title" value="東京ディズニーランド - ミッキーのなかよしたんけんたい"/>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-21836-S" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-21836-s.ic1" size="524288" crc="ea673a31" sha1="a7d48f6ffacda8b22febcc4fa30e766a92aa969e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micknatt">
+		<description>Tokyo Disneyland - Mickey no Nakayoshi Toon Town</description>
+		<year>1998</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="671-9292?, T-25501K?"/>
+		<info name="alt_title" value="東京ディズニーランド - ミッキーのなかよしトゥーンタウン"/>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-20287-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-20287-t.ic1" size="524288" crc="047198f1" sha1="5e35321fc105d2597e309e880b03709e1a11c1d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickshop">
+		<description>Tokyo Disneyland - Mickey to Minnie no Uki Uki Shopping</description>
+		<year>1998</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="671-9947?, T-25503K?"/>
+		<info name="alt_title" value="東京ディズニーランド - ミッキーとミニーのウキウキショッピング"/>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-20983-S" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-20983-s.ic1" size="524288" crc="035750ba" sha1="669a23458e7efa1fcbbb6ada555b6cba1c8425c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

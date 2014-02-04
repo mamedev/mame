@@ -3396,6 +3396,30 @@ ROM_START( masterwj )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
 
+
+
+ROM_START( yukiwo )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "ic33-rom0e.bin", 0x00000, 0x20000, CRC(a0dd51d9) SHA1(a4740bf08e26e1e576344c95d945df5d970738f2) )
+	ROM_LOAD16_BYTE( "ic24-e882.bin",  0x00001, 0x20000, CRC(d66f29d4) SHA1(0854f1a0943a20693e6cd02825666e39b4fe28ca) )
+	ROM_LOAD16_BYTE( "ic34-rom1e.bin", 0x40000, 0x10000, CRC(5ab7bc95) SHA1(393edefda5657853dccc21fa7848239789dbca65) )
+	ROM_LOAD16_BYTE( "ic25-rom10.bin", 0x40001, 0x10000, CRC(0571b986) SHA1(aba9ac5fa4bd86cfa037baf34980b6a72417836b) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "ic30-snd.bin", 0x00000, 0x4000, CRC(8632adb7) SHA1(a746ed0e7e2c2c216874b5729d59d7ed37689e4f) )
+	ROM_CONTINUE(           0x10000, 0x4000 ) /* banked stuff */
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "ic1-a010.bin", 0x000001, 0x020000, CRC(0030dce2) SHA1(649e0caf83b259814e1f0c2f6de40ebd8ea1a639) )
+	ROM_LOAD16_BYTE( "ic5-9df1.bin", 0x000000, 0x020000, CRC(0507b908) SHA1(72f9913ddec37cd4e6b0b611619d0195302eb7e8) )
+	ROM_LOAD16_BYTE( "ic3-1305.bin", 0x080001, 0x020000, CRC(8772b1a6) SHA1(961c8da0fcc3ce9dd334d7bcae75d8b93ded0bb4) )
+	ROM_LOAD16_BYTE( "ic7-7c16.bin", 0x080000, 0x020000, CRC(a366bffd) SHA1(0b68163c73a8a020edbcd016b175d269ce2ad825) )
+	ROM_LOAD16_BYTE( "ic2-6588.bin", 0x040001, 0x020000, CRC(25e79bc2) SHA1(f5b88ced9816338f45eb3430f7df0ecd5326321d) )
+	ROM_LOAD16_BYTE( "ic6-6f3f.bin", 0x040000, 0x020000, CRC(77afcf80) SHA1(93886ad1bddc3bce578f575598e55bdd6e31c5ee) )
+	ROM_LOAD16_BYTE( "ic4-9e5e.bin", 0x0c0001, 0x020000, CRC(3b30166b) SHA1(9450bcd30cf903cc0ae6c5f1cf2735ddd457e5f0) )
+	ROM_LOAD16_BYTE( "ic8-e28a.bin", 0x0c0000, 0x020000, CRC(1b3db354) SHA1(a8481799182e5a06e105a4600679d4544317a350) )
+ROM_END
+
 ROM_START( silentd )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "east-12-1.ic32", 0x00000, 0x20000, CRC(5883d362) SHA1(21c3af053fa92c26f119466ecd655697cc72ff3a) )
@@ -3555,32 +3579,46 @@ DRIVER_INIT_MEMBER(taitob_state,taito_b)
 GAME( 1989, masterw,  0,       masterw,  masterw,   taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, masterwu, masterw, masterw,  masterwu,  taitob_state, taito_b, ROT270, "Taito America Corporation", "Master of Weapon (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, masterwj, masterw, masterw,  masterwj,  taitob_state, taito_b, ROT270, "Taito Corporation", "Master of Weapon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, yukiwo,   masterw, masterw,  masterwj,  taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Yukiwo (World, prototype)", GAME_SUPPORTS_SAVE )
+
 GAME( 1988, nastar,   0,       rastsag2, nastar,    taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Nastar (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, nastarw,  nastar,  rastsag2, nastarw,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Nastar Warrior (US)", GAME_SUPPORTS_SAVE )
 GAME( 1988, rastsag2, nastar,  rastsag2, rastsag2,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Rastan Saga 2 (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1989, rambo3,   0,       rambo3,   rambo3,    taitob_state, taito_b, ROT0,   "Taito Europe Corporation", "Rambo III (Europe)", GAME_SUPPORTS_SAVE )
 GAME( 1989, rambo3u,  rambo3,  rambo3,   rambo3u,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Rambo III (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, rambo3p,  rambo3,  rambo3p,  rambo3p,   taitob_state, taito_b, ROT0,   "Taito Europe Corporation", "Rambo III (Europe, Proto?)", GAME_SUPPORTS_SAVE )
+
 GAME( 1989, crimec,   0,       crimec,   crimec,    taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Crime City (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, crimecu,  crimec,  crimec,   crimecu,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Crime City (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, crimecj,  crimec,  crimec,   crimecj,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Crime City (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1988, tetrist,  tetris,  tetrist,  tetrist,   taitob_state, taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Nastar Conversion Kit)", GAME_SUPPORTS_SAVE )
 GAME( 1988, tetrista, tetris,  tetrista, tetrist,   taitob_state, taito_b, ROT0,   "Sega", "Tetris (Japan, Taito B-System, Master of Weapon Conversion Kit)", GAME_SUPPORTS_SAVE )
+
 GAME( 1989, viofight, 0,       viofight, viofight,  taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Violence Fight (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, viofightu,viofight,viofight, viofightu, taitob_state, taito_b, ROT0,   "Taito America Corporation", "Violence Fight (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, viofightj,viofight,viofight, viofightj, taitob_state, taito_b, ROT0,   "Taito Corporation", "Violence Fight (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, ashura,   0,       ashura,   ashura,    taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Ashura Blaster (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj,   taitob_state, taito_b, ROT270, "Taito Corporation", "Ashura Blaster (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ashurau,  ashura,  ashura,   ashurau,   taitob_state, taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, hitice,   0,       hitice,   hitice,    taitob_state, taito_b, ROT0,   "Taito Corporation (Williams license)", "Hit the Ice (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1990, hiticej,  hitice,  hitice,   hiticej,   taitob_state, taito_b, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+
 GAME( 1991, selfeena, 0,       selfeena, selfeena,  taitob_state, taito_b, ROT0,   "East Technology", "Sel Feena", GAME_SUPPORTS_SAVE )
+
 GAME( 1992, silentd,  0,       silentd,  silentd,   taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Silent Dragon (World)", GAME_SUPPORTS_SAVE )
 GAME( 1992, silentdj, silentd, silentd,  silentdj,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Silent Dragon (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1992, silentdu, silentd, silentd,  silentdu,  taitob_state, taito_b, ROT0,   "Taito America Corporation", "Silent Dragon (US)", GAME_SUPPORTS_SAVE )
+
 GAME( 1993, ryujin,   0,       ryujin,   ryujin,    taitob_state, taito_b, ROT270, "Taito Corporation", "Ryu Jin (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1993, qzshowby, 0,       qzshowby, qzshowby,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Quiz Sekai wa SHOW by shobai (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1994, pbobble,  0,       pbobble,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Puzzle Bobble (Japan, B-System)", GAME_SUPPORTS_SAVE )
+
 GAME( 1994, spacedx,  0,       spacedx,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (US, v2.1)", GAME_SUPPORTS_SAVE )
 GAME( 1994, spacedxj, spacedx, spacedx,  pbobble,   taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.1)", GAME_SUPPORTS_SAVE )
 GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, taito_b, ROT0,   "Taito Corporation", "Space Invaders DX (Japan, v2.0)", GAME_SUPPORTS_SAVE )
