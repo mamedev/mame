@@ -423,6 +423,23 @@ INLINE void build_single_table(double rl, const ay_ym_param *par, int normalize,
 
 }
 
+INLINE void build_resisor_table(const ay_ym_param *par, INT32 *tab, int zero_is_off)
+{
+    int j;
+
+    for (j=0; j < par->res_count; j++)
+    {
+
+        if (zero_is_off && j == 0)
+        {
+            tab[j] = 1e6;
+        }
+        else
+            tab[j] = par->res[j];
+    }
+}
+
+
 INLINE UINT16 mix_3D(ay8910_context *psg)
 {
 	int indx = 0, chan;
@@ -690,11 +707,22 @@ static void build_mixer_table(ay8910_context *psg)
 		normalize = 1;
 	}
 
-	for (chan=0; chan < NUM_CHANNELS; chan++)
-	{
-		build_single_table(psg->intf->res_load[chan], psg->par, normalize, psg->vol_table[chan], psg->zero_is_off);
-		build_single_table(psg->intf->res_load[chan], psg->par_env, normalize, psg->env_table[chan], 0);
-	}
+    if ((psg->intf->flags & AY8910_RESISTOR_OUTPUT) != 0)
+    {
+        for (chan=0; chan < NUM_CHANNELS; chan++)
+        {
+            build_resisor_table(psg->par, psg->vol_table[chan], psg->zero_is_off);
+            build_resisor_table(psg->par_env, psg->env_table[chan], 0);
+        }
+    }
+    else
+    {
+        for (chan=0; chan < NUM_CHANNELS; chan++)
+        {
+            build_single_table(psg->intf->res_load[chan], psg->par, normalize, psg->vol_table[chan], psg->zero_is_off);
+            build_single_table(psg->intf->res_load[chan], psg->par_env, normalize, psg->env_table[chan], 0);
+        }
+    }
 	/*
 	 * The previous implementation added all three channels up instead of averaging them.
 	 * The factor of 3 will force the same levels if normalizing is used.
