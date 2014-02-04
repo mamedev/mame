@@ -103,15 +103,15 @@ WRITE8_MEMBER(taito_zoom_device::tms_ctrl_w)
 }
 
 
-static ADDRESS_MAP_START(taitozoom_map, AS_PROGRAM, 16, driver_device )
+ADDRESS_MAP_START( taitozoom_mn_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
-	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE("zsg2", zsg2_device, read, write)
-	AM_RANGE(0xe00000, 0xe000ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0xffff) // M66220FP for comms with maincpu
+	AM_RANGE(0x800000, 0x8007ff) AM_DEVREADWRITE("zsg2", zsg2_device, read, write)
 	AM_RANGE(0xc00000, 0xc00001) AM_RAM // TMS57002 comms
+	AM_RANGE(0xe00000, 0xe000ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0xffff) // M66220FP for comms with maincpu
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(taitozoom_io_map, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( taitozoom_mn_io_map, AS_IO, 8, driver_device )
 	AM_RANGE(MN10200_PORT1, MN10200_PORT1) AM_DEVREADWRITE("taito_zoom", taito_zoom_device, tms_ctrl_r, tms_ctrl_w)
 ADDRESS_MAP_END
 
@@ -156,8 +156,8 @@ MACHINE_CONFIG_FRAGMENT( taito_zoom_sound )
 	/* basic machine hardware */
 	MCFG_TAITO_ZOOM_ADD("taito_zoom")
 	MCFG_CPU_ADD("mn10200", MN10200, XTAL_25MHz/2)
-	MCFG_CPU_PROGRAM_MAP(taitozoom_map)
-	MCFG_CPU_IO_MAP(taitozoom_io_map)
+	MCFG_CPU_PROGRAM_MAP(taitozoom_mn_map)
+	MCFG_CPU_IO_MAP(taitozoom_mn_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 

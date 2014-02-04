@@ -2,6 +2,8 @@
 #include "cpu/tms57002/tms57002.h"
 #include "sound/zsg2.h"
 
+ADDRESS_MAP_EXTERN(taitozoom_mn_map, 16);
+
 class taito_zoom_device : public device_t
 
 {

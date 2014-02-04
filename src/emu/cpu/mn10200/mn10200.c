@@ -637,7 +637,7 @@ void mn10200_device::execute_run()
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 			m_cycles -= 1;
-			mn102_write_byte(m_a[(opcode>>2)&3], (UINT8)m_d[opcode & 3]);
+			mn102_write_byte(m_a[(opcode>>2)&3], (UINT8)m_d[opcode & 3]); // note: typo in manual
 			m_pc += 1;
 			break;
 
@@ -750,7 +750,7 @@ void mn10200_device::execute_run()
 
 		// mov dn, (imm16)
 		case 0xc0: case 0xc1: case 0xc2: case 0xc3:
-			m_cycles -= 2;
+			m_cycles -= 1;
 			mn102_write_word(mn102_read_word(m_pc+1), (UINT16)m_d[opcode & 3]);
 			m_pc += 3;
 			break;
@@ -771,7 +771,7 @@ void mn10200_device::execute_run()
 
 		// movbu (abs16), dn
 		case 0xcc: case 0xcd: case 0xce: case 0xcf:
-			m_cycles -= 2;
+			m_cycles -= 1;
 			m_d[opcode & 3] = mn102_read_byte(mn102_read_word(m_pc+1));
 			m_pc += 3;
 			break;
@@ -1065,7 +1065,7 @@ void mn10200_device::execute_run()
 				// mov (di, an), dm
 				case 1:
 				m_cycles -= 2;
-				m_d[opcode & 3] = mn102_read_word((m_a[(opcode>>2) & 3] + m_d[(opcode>>4) & 3]) & 0xffffff);
+				m_d[opcode & 3] = (INT16)mn102_read_word((m_a[(opcode>>2) & 3] + m_d[(opcode>>4) & 3]) & 0xffffff);
 				m_pc += 2;
 				break;
 
@@ -1375,8 +1375,8 @@ void mn10200_device::execute_run()
 
 				// mov psw, dn
 				case 0xf0: case 0xf1: case 0xf2: case 0xf3:
-				m_cycles -= 3;
-				m_d[(opcode>>2) & 3] = m_psw;
+				m_cycles -= 2;
+				m_d[opcode & 3] = m_psw;
 				m_pc += 2;
 				break;
 
@@ -1570,7 +1570,6 @@ void mn10200_device::execute_run()
 				do_jsr(m_pc+5+r24u(m_pc+2), m_pc+5);
 				break;
 
-
 				// mov (abs24, an), am
 				case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 				case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
@@ -1612,7 +1611,7 @@ void mn10200_device::execute_run()
 				// addnf imm8, an
 				case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 				m_cycles -= 2;
-				m_a[opcode & 3] = m_a[opcode & 3] +(INT8)mn102_read_byte(m_pc+2);
+				m_a[opcode & 3] = m_a[opcode & 3] + (INT8)mn102_read_byte(m_pc+2);
 				m_pc += 3;
 				break;
 
@@ -1766,7 +1765,6 @@ void mn10200_device::execute_run()
 				}
 				break;
 
-
 				// bnc label8
 				case 0xfe:
 				if(!(m_psw & 0x02)) {
@@ -1845,7 +1843,7 @@ void mn10200_device::execute_run()
 
 				// or imm16, dn
 				case 0x40: case 0x41: case 0x42: case 0x43:
-				m_cycles -= 3;
+				m_cycles -= 2;
 				test_nz16(m_d[opcode & 3] |= mn102_read_word(m_pc+2));
 				m_pc += 4;
 				break;
@@ -1876,10 +1874,9 @@ void mn10200_device::execute_run()
 				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
 				m_cycles -= 2;
-				m_d[opcode & 3] = (INT16)mn102_read_word((m_a[(opcode>>2) & 3] + (INT16)mn102_read_byte(m_pc+2)) & 0xffffff) & 0xffffff;
+				m_d[opcode & 3] = (INT16)mn102_read_word((m_a[(opcode>>2) & 3] + (INT16)mn102_read_word(m_pc+2)) & 0xffffff);
 				m_pc += 4;
 				break;
-
 
 				default:
 				unemul();
