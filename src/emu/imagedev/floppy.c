@@ -87,6 +87,9 @@ const device_type SONY_OA_D31V = &device_creator<sony_oa_d31v>;
 const device_type SONY_OA_D32W = &device_creator<sony_oa_d32w>;
 const device_type SONY_OA_D32V = &device_creator<sony_oa_d32v>;
 
+// ALPS 5.25" drives
+const device_type ALPS_3255190x = &device_creator<alps_3255190x>;
+
 
 const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
@@ -260,7 +263,6 @@ void floppy_image_device::device_start()
 {
 	rpm = 0;
 	motor_always_on = false;
-	setup_characteristics();
 
 	idx = 0;
 
@@ -276,6 +278,8 @@ void floppy_image_device::device_start()
 	image_dirty = false;
 	ready = true;
 	ready_counter = 0;
+
+	setup_characteristics();
 }
 
 void floppy_image_device::device_reset()
@@ -1729,4 +1733,35 @@ void sony_oa_d32v::handled_variants(UINT32 *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 	variants[var_count++] = floppy_image::SSDD;
+}
+
+
+//-------------------------------------------------
+//  ALPS 32551901 (black) / 32551902 (brown)
+//
+//  used in the Commodoere 1541 disk drive
+//-------------------------------------------------
+
+alps_3255190x::alps_3255190x(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, ALPS_3255190x, "ALPS 32551901/32551902 Floppy Drive", tag, owner, clock, "alps_3255190x", __FILE__)
+{
+}
+
+alps_3255190x::~alps_3255190x()
+{
+}
+
+void alps_3255190x::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 84;
+	sides = 1;
+	set_rpm(300);
+	cyl = 34;
+}
+
+void alps_3255190x::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
 }

@@ -705,7 +705,7 @@ WRITE_LINE_MEMBER( base_c1541_device::byte_w )
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( c1540_floppies )
-    SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
+    SLOT_INTERFACE( "525ssqd", ALPS_3255190x )
 SLOT_INTERFACE_END
 
 
