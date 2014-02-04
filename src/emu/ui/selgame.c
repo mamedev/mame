@@ -76,10 +76,20 @@ void ui_menu_select_game::build_driver_list()
 			drivlist.include(drivnum);
 	}
 
-	// now build the final list
-	drivlist.reset();
-
+	// count all drivers
 	m_driver_count = 0;
+	drivlist.reset();
+	while (drivlist.next())
+	{
+		const game_driver *drv = &drivlist.driver();
+		if (!(drv->flags & GAME_NO_STANDALONE))
+			m_driver_count++;
+	}
+
+	// now list them
+	m_driver_list = auto_alloc_array(machine(), const game_driver *, m_driver_count + 1);
+	m_driver_count = 0;
+	drivlist.reset();
 	while (drivlist.next())
 	{
 		const game_driver *drv = &drivlist.driver();
