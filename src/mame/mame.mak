@@ -1506,6 +1506,7 @@ $(MAMEOBJ)/psikyo.a: \
 
 $(MAMEOBJ)/ramtek.a: \
 	$(DRIVERS)/hitme.o $(AUDIO)/hitme.o \
+	$(DRIVERS)/ramtek.o \
 	$(DRIVERS)/starcrus.o $(VIDEO)/starcrus.o \
 
 $(MAMEOBJ)/rare.a: \
@@ -1770,6 +1771,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/taitojc.o $(VIDEO)/taitojc.o \
 	$(DRIVERS)/taitopjc.o $\
 	$(DRIVERS)/taitosj.o $(MACHINE)/taitosj.o $(VIDEO)/taitosj.o \
+	$(DRIVERS)/taitottl.o \
 	$(DRIVERS)/taitotz.o \
 	$(DRIVERS)/taitotx.o \
 	$(DRIVERS)/taitowlf.o \
