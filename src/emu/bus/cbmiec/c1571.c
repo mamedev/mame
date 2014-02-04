@@ -199,7 +199,7 @@ READ8_MEMBER( c1571_device::via0_pa_r )
 	UINT8 data = 0;
 
 	// track 0 sense
-	data |= m_floppy->trk00_r();
+	data |= (m_floppy->trk00_r() ? 0x01 : 0x00);
 
 	// byte ready
 	data |= m_ga->byte_r() << 7;
