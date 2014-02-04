@@ -19,6 +19,7 @@
  TM-025               Anti-Aircraft (1975)                                 A000951                            YES       003127
  TM-058               Breakout/Breakout Cocktail (1976)                    A004533                            NO
  TM-048               Crash 'N Score/Stock Car (1975)                      A004256                            YES       003186(x2), 003187(x2), 004248, 004247 
+ TM-030               Crossfire (1975)
  TM-003,005,011,020   Gran Trak 10/Trak 10/Formula K/Race Circuit (1974)   A000872,A000872 K3RT               YES       74186 Racetrack Prom (K5)
  TM-004,021           Gran Trak 20/Trak 20/Twin Racer (1974)               A001791(RT20),A001793(A20-K4DRTA)  YES       74186 Racetrack prom (K5)
  TM-006,035           Goal 4/World Cup/Coupe De Monde (1975)               A000823                            NO
@@ -48,7 +49,6 @@
  
  - Not Known to be released or produced, but at least announced.
  
- TM-030               Crossfire (Not Produced/Released)
  TM-024               Qwakers (Not Produced/Released)
  TM-017               World Cup Football (Not Produced/Released)
  
@@ -280,10 +280,19 @@ ROM_START( sharkjaw )
 ROM_END
 
 
+ROM_START( steeplec )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "003773-a.4c",  0x0000, 0x0100, CRC(5ddc49b6) SHA1(58eba996703cbb7b3f66ff97357e191c9a3ab340) ) // Bugle
+	ROM_LOAD( "003773-b.4d",  0x0100, 0x0100, CRC(e6994cde) SHA1(504f92dba0c8640d55c7412697868582043f3817) ) // Graphics
+ROM_END
+
+
 ROM_START( stntcycl )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
+	ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD( "004275.f1",  0x0000, 0x0200, CRC(4ed5a99d) SHA1(1e5f439bce72e78dfff76fd8f61187c6ef484a64) ) // Motorcycle & Bus
 
 	ROM_REGION( 0x0020, "score", ROMREGION_ERASE00 )
@@ -301,7 +310,7 @@ ROM_END
 
 
 /*	// NO DUMPED ROMS
- 
+
 // Astroturf
 ROM_START( astrotrf )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
@@ -310,15 +319,11 @@ ROM_START( astrotrf )
 	ROM_LOAD( "003774.c8",     0x0000, 0x0100, NO_DUMP ) // Bugle
 	ROM_LOAD( "003773-02.c4",  0x0100, 0x0100, NO_DUMP ) // Graphics (Astroturf - Rev.A)
 ROM_END
- 
-// Steeplechase
-ROM_START( steeplec )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
- 
-	ROM_REGION( 0x0400, "gfx", ROMREGION_ERASE00 ) // Region Size unknown, dump size unknown
-	ROM_LOAD( "003774.c8",     0x0000, 0x0100, NO_DUMP ) // Bugle
-	ROM_LOAD( "003773-01.d4",  0x0100, 0x0100, NO_DUMP ) // Graphics (Steeplechase - Rev.B)
-ROM_END
+
+// Crossfire
+// Unclear if this is 100% TTL or if it uses a ROM:
+// IC description in manual says a rom is used (74186 ROM)
+// but the parts list in the same manual mentions no IC 74186!
 
 // Gran Trak 10
 ROM_START( gtrak10 )  // Unknown size, assumed 2K Bytes
@@ -419,6 +424,7 @@ GAME(1975,  jetfight,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 GAME(1975,  jetfighta, jetfight,  atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Jet Fighter (Set2) [TTL]",      GAME_IS_SKELETON)
 GAME(1976,  outlaw,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Outlaw [TTL]",           GAME_IS_SKELETON)
 GAME(1975,  sharkjaw,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Horror Games",  "Shark JAWS [TTL]",GAME_IS_SKELETON)
+GAME(1975,  steeplec,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Steeplechase [TTL]",     GAME_IS_SKELETON)
 GAME(1976,  stntcycl,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Stunt Cycle [TTL]",      GAME_IS_SKELETON)
 GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Tank/Tank II [TTL]",     GAME_IS_SKELETON)
 
@@ -428,7 +434,6 @@ GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 //GAME(1974,  gtrak10,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 10/Trak 10/Formula K/Race Circuit [TTL]",GAME_IS_SKELETON) //?
 //GAME(1974,  gtrak20,   0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",  "Gran Trak 20/Trak 20/Twin Racer [TTL]",GAME_IS_SKELETON) //?
 //GAME(1974,  qwak,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      GAME_IS_SKELETON)
-//GAME(1975,  steeplec,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Steeplechase/Astroturf [TTL]",GAME_IS_SKELETON)
 
 // 100% TLL
 //GAME(1976,  breakout,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Breakout [TTL]",GAME_IS_SKELETON)
