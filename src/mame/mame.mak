@@ -632,6 +632,7 @@ $(MAMEOBJ)/alba.a: \
 
 $(MAMEOBJ)/alliedl.a: \
 	$(DRIVERS)/ace.o \
+	$(DRIVERS)/aleisttl.o \
 	$(DRIVERS)/clayshoo.o \
 
 $(MAMEOBJ)/alpha.a: \
@@ -1506,6 +1507,7 @@ $(MAMEOBJ)/psikyo.a: \
 
 $(MAMEOBJ)/ramtek.a: \
 	$(DRIVERS)/hitme.o $(AUDIO)/hitme.o \
+	$(DRIVERS)/ramtek.o \
 	$(DRIVERS)/starcrus.o $(VIDEO)/starcrus.o \
 
 $(MAMEOBJ)/rare.a: \
@@ -1770,6 +1772,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/taitojc.o $(VIDEO)/taitojc.o \
 	$(DRIVERS)/taitopjc.o $\
 	$(DRIVERS)/taitosj.o $(MACHINE)/taitosj.o $(VIDEO)/taitosj.o \
+	$(DRIVERS)/taitottl.o \
 	$(DRIVERS)/taitotz.o \
 	$(DRIVERS)/taitotx.o \
 	$(DRIVERS)/taitowlf.o \
@@ -2030,6 +2033,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/3x3puzzl.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/5clown.o \
+	$(DRIVERS)/a1supply.o \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/aces1.o \
 	$(DRIVERS)/acesp.o \
@@ -2046,6 +2050,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/attckufo.o \
 	$(DRIVERS)/avt.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
+	$(DRIVERS)/bailey.o \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/belatra.o \
 	$(DRIVERS)/bgt.o \
@@ -2064,6 +2069,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/cdi.o $(VIDEO)/mcd212.o $(MACHINE)/cdi070.o $(MACHINE)/cdislave.o $(MACHINE)/cdicdic.o \
 	$(DRIVERS)/cesclass.o \
 	$(DRIVERS)/chance32.o \
+	$(DRIVERS)/chicago.o \
 	$(DRIVERS)/chsuper.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
@@ -2091,6 +2097,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/ecoinf1.o \
 	$(DRIVERS)/ecoinf2.o \
 	$(DRIVERS)/ecoinf3.o \
+	$(DRIVERS)/electra.o \
 	$(DRIVERS)/epos.o $(VIDEO)/epos.o \
 	$(DRIVERS)/esd16.o $(VIDEO)/esd16.o \
 	$(DRIVERS)/esh.o \
@@ -2102,6 +2109,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/fresh.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
+	$(DRIVERS)/fungames.o \
 	$(DRIVERS)/funkball.o \
 	$(DRIVERS)/gambl186.o \
 	$(DRIVERS)/galaxi.o \
