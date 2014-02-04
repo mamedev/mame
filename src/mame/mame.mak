@@ -2033,6 +2033,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/3x3puzzl.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/5clown.o \
+	$(DRIVERS)/a1supply.o \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/aces1.o \
 	$(DRIVERS)/acesp.o \
@@ -2049,6 +2050,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/attckufo.o \
 	$(DRIVERS)/avt.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
+	$(DRIVERS)/bailey.o \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/belatra.o \
 	$(DRIVERS)/bgt.o \
@@ -2107,6 +2109,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/fresh.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
+	$(DRIVERS)/fungames.o \
 	$(DRIVERS)/funkball.o \
 	$(DRIVERS)/gambl186.o \
 	$(DRIVERS)/galaxi.o \
