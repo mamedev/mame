@@ -28,6 +28,9 @@ NETLIB_START(7420_dip)
 
 NETLIB_UPDATE(7420_dip)
 {
+    /* only called during startup */
+    m_1.update_dev();
+    m_2.update_dev();
 }
 
 NETLIB_RESET(7420_dip)

@@ -281,6 +281,9 @@ public:
 
     static void static_set_constructor(device_t &device, void (*setup_func)(netlist_setup_t &));
 
+    inline sound_stream *get_stream() { return m_stream; }
+
+
     // device_sound_interface overrides
 
     virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -318,14 +321,29 @@ class netlist_mame_sub_interface
 {
 public:
 	// construction/destruction
-	netlist_mame_sub_interface(netlist_mame_device_t &obj) : m_object(obj) {}
+	netlist_mame_sub_interface(device_t &aowner)
+    {
+	    m_owner = dynamic_cast<netlist_mame_device_t *>(&aowner);
+	    m_sound = dynamic_cast<netlist_mame_sound_device_t *>(&aowner);
+    }
 	virtual ~netlist_mame_sub_interface() { }
 
 	virtual void custom_netlist_additions(netlist_base_t &netlist) { }
 
-	inline netlist_mame_device_t &object() { return m_object; }
+	inline netlist_mame_device_t &nl_owner() const { return *m_owner; }
+
+	inline bool is_sound_device() const { return (m_sound != NULL); }
+
+	inline void update_to_current_time()
+	{
+	    printf("%p\n", m_sound);
+	    printf("%p\n", m_sound->get_stream());
+	    m_sound->get_stream()->update();
+	}
+
 private:
-	netlist_mame_device_t &m_object;
+	netlist_mame_device_t *m_owner;
+	netlist_mame_sound_device_t *m_sound;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -344,7 +362,19 @@ public:
 	static void static_set_name(device_t &device, const char *param_name);
 	static void static_set_mult_offset(device_t &device, const double mult, const double offset);
 
-	inline void write(const double val) { m_param->setTo(val * m_mult + m_offset); }
+	inline void write(const double val)
+	{
+	    if (is_sound_device())
+	    {
+	        update_to_current_time();
+	        m_param->setTo(val * m_mult + m_offset);
+	    }
+	    else
+	    {
+	        // FIXME: use device timer ....
+	        m_param->setTo(val * m_mult + m_offset);
+	    }
+	}
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed)
 	{
@@ -386,7 +416,19 @@ public:
 
 	static void static_set_params(device_t &device, const char *param_name, const UINT32 mask, const UINT32 shift);
 
-	inline void write(const UINT32 val) { m_param->setTo((val >> m_shift) & m_mask); }
+	inline void write(const UINT32 val)
+	{
+        if (is_sound_device())
+        {
+            update_to_current_time();
+            m_param->setTo((val >> m_shift) & m_mask);
+        }
+        else
+        {
+            // FIXME: use device timer ....
+            m_param->setTo((val >> m_shift) & m_mask);
+        }
+	}
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
 	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
@@ -510,7 +552,7 @@ public:
     NETLIB_NAME(sound_in)()
         : netlist_device_t() { }
 
-    static const int BUFSIZE = 2048;
+    static const int MAX_INPUT_CHANNELS = 10;
 
     ATTR_COLD void start()
     {
@@ -522,7 +564,7 @@ public:
         m_inc = netlist_time::from_nsec(1);
 
 
-        for (int i=0; i<10; i++)
+        for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
             register_param(pstring::sprintf("CHAN%d", i), m_param_name[i], "");
         m_num_channel = 0;
     }
@@ -530,14 +572,14 @@ public:
     ATTR_COLD void reset()
     {
         m_pos = 0;
-        for (int i=0; i<10; i++)
+        for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
             m_buffer[i] = NULL;
     }
 
     ATTR_COLD int resolve()
     {
         m_pos = 0;
-        for (int i=0; i<10; i++)
+        for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
         {
             if (m_param_name[i].Value() != "")
             {
@@ -568,9 +610,9 @@ public:
         m_pos = 0;
     }
 
-    netlist_param_str_t m_param_name[10];
-    netlist_param_double_t *m_param[10];
-    stream_sample_t *m_buffer[10];
+    netlist_param_str_t m_param_name[MAX_INPUT_CHANNELS];
+    netlist_param_double_t *m_param[MAX_INPUT_CHANNELS];
+    stream_sample_t *m_buffer[MAX_INPUT_CHANNELS];
     netlist_time m_inc;
 
 private:

@@ -71,6 +71,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	{
 		offs_t track_offset = pick_integer_le(img, TRACK_OFFSET + (track * 4), 4);
 		if (track_offset > size) throw emu_fatalerror("g64_format: Track %u offset %06x out of bounds", track, track_offset);
+		if (!track_offset) continue;
 		
 		offs_t speed_zone = pick_integer_le(img, SPEED_ZONE + (track * 4), 4);
 		if (speed_zone > 3)	throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
