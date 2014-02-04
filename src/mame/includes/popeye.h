@@ -13,7 +13,7 @@ public:
 	UINT8 m_prot0;
 	UINT8 m_prot1;
 	UINT8 m_prot_shift;
-	int m_dswbit;
+	UINT8 m_dswbit;
 	required_shared_ptr<UINT8> m_background_pos;
 	required_shared_ptr<UINT8> m_palettebank;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -33,7 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(popeye_bitmap_w);
 	DECLARE_WRITE8_MEMBER(skyskipr_bitmap_w);
 	DECLARE_WRITE8_MEMBER(popeye_portB_w);
-	DECLARE_READ8_MEMBER(popeye_portA_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dsw1_read);
 	DECLARE_DRIVER_INIT(skyskipr);
 	DECLARE_DRIVER_INIT(popeye);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
