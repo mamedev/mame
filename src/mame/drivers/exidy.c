@@ -1166,6 +1166,28 @@ ROM_START( mtrap4 )
 	ROM_LOAD( "mtl11d.bin",   0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
 ROM_END
 
+ROM_START( mtrapb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cpu.p2",  0xa000, 0x1000, CRC(a0faa3e5) SHA1(2a9259d945619a5188f8903f46ddadc685516c43) )
+	ROM_LOAD( "cpu.m2",  0xb000, 0x1000, CRC(d7378af9) SHA1(44c8ba4c84f51306e5bdd64e6c255d1c1018db72) )
+	ROM_LOAD( "cpu.l2",  0xc000, 0x1000, CRC(be667e64) SHA1(c5f686e3c403691f14992354af690dc89e1722f7) )
+	ROM_LOAD( "cpu.k2",  0xd000, 0x1000, CRC(69471f27) SHA1(17fe085cc4ebb527a0f85cf5a0a66778e0df443e) )
+	ROM_LOAD( "cpu.j2",  0xe000, 0x1000, CRC(1eb0c4c9) SHA1(b7049b86385798f1098945d07fe41b71ddbbc980) )
+	ROM_LOAD( "cpu.h2",  0xf000, 0x1000, CRC(16ea9a51) SHA1(59714f50c82b54f490c69fb5b91ac0aa16cb9abb) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "2564.j10",     0x6000, 0x2000, CRC(d4160aa8) SHA1(d3bae8fa54e71c397ec60f998a012e088588a2e4) )
+
+	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
+	ROM_LOAD( "mta2a.bin",    0x0000,0x1000,CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
+	ROM_LOAD( "mta3a.bin",    0x1000,0x1000,CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
+	ROM_LOAD( "mta4a.bin",    0x2000,0x1000,CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
+	ROM_LOAD( "mta1a.bin",    0x3000,0x1000,CRC(658482a6) SHA1(c0d770fbeaa7cb3e0eef47d8caa0f8a78841692e) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "2516.j6",   0x0000, 0x0800, CRC(c6e4d339) SHA1(b091923e4d52e93d7c567afba217a10b2a3735fc) )
+ROM_END
+
 
 ROM_START( venture )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1531,8 +1553,10 @@ DRIVER_INIT_MEMBER(exidy_state,fax)
  *************************************/
 
 GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, exidy_state, sidetrac, ROT0, "Exidy",   "Side Trak", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // "Side Track" on title screen, but cabinet/flyers/documentation clearly indicates otherwise, "Side Trak" it is
+
 GAME( 1980, targ,     0,       targ,     targ, exidy_state,     targ,     ROT0, "Exidy",   "Targ", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, targc,    targ,    targ,     targ, exidy_state,     targ,     ROT0, "Exidy",   "Targ (cocktail?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+
 GAME( 1980, spectar,  0,       spectar,  spectar, exidy_state,  spectar,  ROT0, "Exidy",   "Spectar (revision 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, spectar1, spectar, spectar,  spectar, exidy_state,  spectar,  ROT0, "Exidy",   "Spectar (revision 1?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, rallys,   spectar, rallys,   rallys, exidy_state,   rallys,   ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar, set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
@@ -1544,12 +1568,18 @@ GAME( 1980, phantom,  spectar, rallys,   phantoma, exidy_state, phantoma, ROT0, 
 GAME( 1981, mtrap,    0,       mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 5)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mtrap4,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (version 4)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mtrapb,   mtrap,   mtrap,    mtrap, exidy_state,    mtrap,    ROT0, "Exidy",   "Mouse Trap (bootleg)", GAME_SUPPORTS_SAVE )
+
 GAME( 1981, venture,  0,       venture,  venture, exidy_state,  venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, venture2, venture, venture,  venture, exidy_state,  venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, venture4, venture, venture,  venture, exidy_state,  venture,  ROT0, "Exidy",   "Venture (version 4)", GAME_SUPPORTS_SAVE )
+
 GAME( 1982, teetert,  0,       teetert,  teetert, exidy_state,  teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", GAME_SUPPORTS_SAVE )
+
 GAME( 1982, pepper2,  0,       pepper2,  pepper2, exidy_state,  pepper2,  ROT0, "Exidy",   "Pepper II (version 8)", GAME_SUPPORTS_SAVE )
 GAME( 1982, pepper27, pepper2, pepper2,  pepper2, exidy_state,  pepper2,  ROT0, "Exidy",   "Pepper II (version 7)", GAME_SUPPORTS_SAVE )
+
 GAME( 1982, hardhat,  0,       pepper2,  pepper2, exidy_state,  pepper2,  ROT0, "Exidy",   "Hard Hat", GAME_SUPPORTS_SAVE )
+
 GAME( 1983, fax,      0,       fax,      fax, exidy_state,      fax,      ROT0, "Exidy",   "FAX", GAME_SUPPORTS_SAVE )
 GAME( 1983, fax2,     fax,     fax,      fax, exidy_state,      fax,      ROT0, "Exidy",   "FAX 2", GAME_SUPPORTS_SAVE )

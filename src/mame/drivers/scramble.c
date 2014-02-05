@@ -2126,6 +2126,29 @@ ROM_START( hunchbks )
 	ROM_LOAD( "6e_prom.bin",  0x0000, 0x0020, CRC(01004d3f) SHA1(e53cbc54ea96e846481a67bbcccf6b1726e70f9c) )
 ROM_END
 
+ROM_START( hunchbks2 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "hb01.bin",  	  0x0000, 0x0800, CRC(fec3466a) SHA1(d8ec3b432f7037e99bf1ac1ba7911a34eff6869d) )
+	ROM_LOAD( "2e_hb02.bin",  0x0800, 0x0800, CRC(07de4229) SHA1(9f333509ae3d6c579f6d96caa172a0abe9eefb30) )
+	ROM_LOAD( "2f_hb03.bin",  0x2000, 0x0800, CRC(b75a0dfc) SHA1(c60c833f28c6de027d46f5a2a54ad5646ec58453) )
+	ROM_LOAD( "hb04.bin",     0x2800, 0x0800, CRC(731e349b) SHA1(cfa1ac322cdfe1d4d112b0a4dd85d3552a6e33d0) )
+	ROM_LOAD( "2j_hb05.bin",  0x4000, 0x0800, CRC(1bb78728) SHA1(aebfca355d937825217d069689f9b4d7a113b10a) )
+	ROM_LOAD( "2l_hb06.bin",  0x4800, 0x0800, CRC(f25ed680) SHA1(7854e4975a4f75916f60749ac24147c335927394) )
+	ROM_LOAD( "2m_hb07.bin",  0x6000, 0x0800, CRC(c72e0e17) SHA1(90da1e375733873bc592e11980bdaf8168bd5aea) )
+	ROM_LOAD( "2p_hb08.bin",  0x6800, 0x0800, CRC(412087b0) SHA1(4d6f343577ae73031f32cda8903c74e5a840e71d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "11d_snd.bin",  0x0000, 0x0800, CRC(88226086) SHA1(fe2da172313063e5b056fc8c8d8b2a5c64db5179) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "5f_hb09.bin",  0x0000, 0x0800, CRC(db489c3d) SHA1(df08607ad07222c1c1c4b3589b50b785bdeefbf2) )
+	ROM_LOAD( "5h_hb10.bin",  0x0800, 0x0800, CRC(3977650e) SHA1(1de05d6ceed3f2ed0925caa8235b63a93f03f61e) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6e_prom.bin",  0x0000, 0x0020, CRC(01004d3f) SHA1(e53cbc54ea96e846481a67bbcccf6b1726e70f9c) )
+ROM_END
+
+
 ROM_START( hncholms )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "hncholym.2d",  0x0000, 0x0800, CRC(fb453f9c) SHA1(e4c059b10af1aa8405958c0fd139fb84d08ec9f3) )
@@ -2264,23 +2287,39 @@ ROM_END
 GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 1)",           GAME_SUPPORTS_SAVE )
 GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",           GAME_SUPPORTS_SAVE )
 GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg?)",         GAME_SUPPORTS_SAVE )
+
 GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, mariner,      ROT90, "Amenip",              "Mariner",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",     GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+
 GAME( 1981, ckongs,   ckong,    ckongs,   ckongs,   scramble_state, ckongs,       ROT90, "bootleg",             "Crazy Kong (Scramble hardware)", GAME_SUPPORTS_SAVE )
+
 GAME( 1981, mars,     0,        mars,     mars,     scramble_state, mars,         ROT90, "Artic",               "Mars",                           GAME_SUPPORTS_SAVE )
+
 GAME( 1982, devilfsh, 0,        devilfsh, devilfsh, scramble_state, devilfsh,     ROT90, "Artic",               "Devil Fish",                     GAME_SUPPORTS_SAVE )
+
 GAME( 1983, newsin7,  0,        newsin7,  newsin7,  scramble_state, mars,         ROT90, "ATW USA, Inc.",       "New Sinbad 7",                   GAME_SUPPORTS_SAVE )
+
 GAME( 1984, mrkougar, 0,        mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar",                     GAME_SUPPORTS_SAVE )
 GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, scramble_state, mrkougar,     ROT90, "ATW",                 "Mr. Kougar (earlier)",           GAME_SUPPORTS_SAVE )
 GAME( 1983, mrkougb,  mrkougar, mrkougb,  mrkougar, scramble_state, mrkougb,      ROT90, "bootleg",             "Mr. Kougar (bootleg set 1)",     GAME_SUPPORTS_SAVE )
 GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, scramble_state, mrkougb,      ROT90, "bootleg",             "Mr. Kougar (bootleg set 2)",     GAME_SUPPORTS_SAVE )
+
 GAME( 1982, hotshock, 0,        hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker",           GAME_SUPPORTS_SAVE )
 GAME( 1982, hotshockb,hotshock, hotshock, hotshock, scramble_state, hotshock,     ROT90, "E.G. Felaco",         "Hot Shocker (early revision?)",  GAME_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
+
 GAME( 198?, conquer,  0,        hotshock, hotshock, driver_device,  0,            ROT90, "<unknown>",           "Conqueror",                      GAME_NOT_WORKING   )
+
 GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_state, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)",  GAME_SUPPORTS_SAVE )
+GAME( 1983, hunchbks2,hunchbak, hunchbks, hunchbks, scramble_state, scramble_ppi, ROT90, "bootleg (Sig)",       "Hunchback (Scramble hardware, bootleg)",  GAME_SUPPORTS_SAVE )
+
 GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_state, scramble_ppi, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic (Scramble hardware)", GAME_SUPPORTS_SAVE )
+
 GAME( 1983, cavelon,  0,        cavelon,  cavelon,  scramble_state, cavelon,      ROT90, "Jetsoft",             "Cavelon",                        GAME_SUPPORTS_SAVE )
+
 GAME( 1982, mimonscr, mimonkey, mimonscr, mimonscr, scramble_state, mimonscr,     ROT90, "bootleg",             "Mighty Monkey (bootleg on Scramble hardware)", GAME_SUPPORTS_SAVE )
+
 GAME( 1983, ad2083,   0,        ad2083,   ad2083,   scramble_state, ad2083,       ROT90, "Midcoin",             "A. D. 2083",                     GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+
 GAME( 1981, turpins,  turtles,  turpins,  turpins,  driver_device,  0,            ROT90, "bootleg",             "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
+
 GAME( 1983, harem,    0,        harem,    harem,    scramble_state, harem,        ROT90, "I.G.R.",              "Harem",                          GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // colors, missing speech?

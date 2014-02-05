@@ -175,6 +175,7 @@ zerotime        // hack
 starfght        // hack
 galaxbsf        // hack
 galaxianbl      // bootleg
+galaxbsf2		// bootleg
 kamakazi3       // Video Games (UK) Ltd., hack or bootleg?
 tst_galx        // Galaxian Test ROM
 gmgalax         // bootleg
@@ -335,6 +336,7 @@ hotshock        // (c) 1982 E.G. Felaco (Domino license)
 hotshockb       // bootleg
 conquer         // (c) 1982 ????
 hunchbks        // (c) 1983 Century
+hunchbks2		// bootleg
 hncholms        // (c) 1984 Century
 cavelon         // (c) 1983 Jetsoft
 sfx             // (c) 1983 Nichibutsu
@@ -376,6 +378,7 @@ billiard        // bootleg
 hustlerb        // bootleg
 hustlerb2       // bootleg
 hustlerb3       // bootleg
+hustlerb4		// bootleg
 frogger         // GX392 (c) 1981 Konami
 froggers1       // (c) 1981 Sega
 froggers2       // 834-0068 (c) 1981 Sega
@@ -1644,6 +1647,7 @@ intlaser        // (c) 1987
 blasted         // (c) 1988
 archrivl        // (c) 1989
 archrivla       // (c) 1989
+archrivlb		// bootleg
 trisport        // (c) 1989
 pigskin         // (c) 1990
 pigskina        // (c) 1990
@@ -3116,6 +3120,7 @@ sf2red          // hack
 sf2v004         // hack
 sf2acc          // hack
 sf2acca         // hack
+sf2ceblp			// hack
 sf2accp2        // hack
 sf2amf          // bootleg
 sf2dkot2        // hack
@@ -5673,6 +5678,7 @@ abattle2        // Sidam
 afire           // Rene Pierre
 acombat         // bootleg
 acombato        // bootleg
+acombat3		// bootleg
 sstarbtl        // bootleg
 spfghmk2        // (c) [1979] Data East Corporation
 spfghmk22       // (c) [1979] Data East Corporation
@@ -6623,6 +6629,7 @@ teetert         // (c) 1981
 mtrap           // (c) 1981
 mtrap3          // (c) 1981
 mtrap4          // (c) 1981
+mtrapb			// bootleg
 pepper2         // (c) 1982
 pepper27        // (c) 1982
 hardhat         // (c) 1982
@@ -8116,6 +8123,8 @@ desertdn        // (c) 1982 Video Optics
 intrepid        // (c) 1983 Nova Games Ltd.
 intrepid2       // (c) 1983 Nova Games Ltd.
 intrepidb       // bootleg
+intrepidb2      // bootleg
+intrepidb3      // bootleg
 zaryavos        // (c) 1983 Nova Games of Canada (prototype)
 timelimt        // (c) 1983 Chuo Co. Ltd
 progress        // (c) 1984 Chuo Co. Ltd
@@ -8677,6 +8686,7 @@ galsnewj        // (c) 1990 Kaneko
 galsnewk        // (c) 1990 Kaneko
 galpani2        // (c) 1993 Kaneko
 galpani2e       // (c) 1993 Kaneko
+galpani2e2		// (c) 1993 Kaneko
 galpani2g       // (c) 1993 Kaneko
 galpani2t       // (c) 1993 Kaneko
 galpani2i       // (c) 1993 Kaneko
@@ -8790,6 +8800,7 @@ pairlove        // (c) 1991 Athena
 blandia         // (c) 1992 Allumer
 blandiap        // (c) 1992 Allumer
 blockcar        // (c) 1992 Visco
+blockcarb		// bootleg
 qzkklogy        // (c) 1992 Tecmo
 neobattl        // (c) 1992 Banpresto / Sotsu Agency. Sunrise
 umanclub        // (c) 1992 Tsuburaya Prod. / Banpresto
@@ -10530,6 +10541,7 @@ tisuba          // (c) 1992 Subsino
 stisub          // (c) 1995 Subsino (Alpha license)
 tesorone        // (c) 1995 Subsino
 tesorone240     // (c) 1995 Subsino
+tesorone230     // (c) 1995 Subsino
 victor6         // (c) 1995 Subsino (Alpha license)
 victor6a        // (c) 1995 Subsino (Alpha license)
 victor6b        // (c) 1995 Subsino (Alpha license)
@@ -11135,6 +11147,8 @@ ejollyx5        // (c) 200? Solar Games
 grandprx        // (c) 200? 4fun
 supjolly        // (c) 200? unknown
 x5jokers        // (c) 200? Electronic Projects
+queenotg		//
+ejollyx9		//
 
 // Astro Corp.
 showhand        // (c) 2000  Astro Corp.

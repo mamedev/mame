@@ -909,6 +909,13 @@ static MACHINE_CONFIG_DERIVED( hustlerb, hustler )
 	MCFG_CPU_IO_MAP(hustlerb_sound_io_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( hustlerb4, hustler )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hustlerb_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( hustlerb3, hustler )
 
 	/* basic machine hardware */
@@ -1241,6 +1248,29 @@ ROM_START( hustlerb3 )
 	ROM_LOAD( "ic7.b3", 0x0000, 0x0020, CRC(4ac17114) SHA1(1fa34a556fe445a6bdabfe75b4b679cab6553c8b) )
 ROM_END
 
+ROM_START( hustlerb4 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // identical to hustlerb but in 6 roms instead of 3
+	ROM_LOAD( "1.d2",   0x0000, 0x0800, CRC(f87d75c7) SHA1(48f0f5289366a3c4dec86f5bb48d16a33745844d) )
+	ROM_LOAD( "2.e2",   0x0800, 0x0800, CRC(a639d4e1) SHA1(2130de635f41f915db26a5fcba9654ae140d0ecc) )
+	ROM_LOAD( "3.f2",   0x1000, 0x0800, CRC(1b75520e) SHA1(b4ebb69c0f17fde7a527d54ec8406b1b80798e0c) )
+	ROM_LOAD( "4.h2 ",  0x1800, 0x0800, CRC(fdea3165) SHA1(6120919445599ec9116d14d0baf4fb4e4720e473) )
+	ROM_LOAD( "5.j2",   0x2000, 0x0800, CRC(730100e1) SHA1(81e44d768ca4e654981c14660e12e355fe720636) )
+	ROM_LOAD( "6.l2",   0x2800, 0x0800, CRC(68dff552) SHA1(5dad38db45afbd79b5627a75b295fc920ad68856) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // closer to original sound system
+	ROM_LOAD( "topa.c5",  0x0000, 0x0800, CRC(9fc1d60f) SHA1(93386098199fd7655da8137a79857ffffebc62eb) )
+	ROM_LOAD( "topb.d5",  0x0800, 0x0800, CRC(3db57351) SHA1(e5075a7130a80d2bf24f0556c2589dff0625ee60) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "7.f5",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) )
+	ROM_LOAD( "8.h5",   0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mni6331.e6",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
+	
+	ROM_REGION( 0x0800, "unk", 0 )
+	ROM_LOAD( "top.c5",  0x0000, 0x0800, CRC(88226086) SHA1(fe2da172313063e5b056fc8c8d8b2a5c64db5179) )
+ROM_END 
 ROM_START( mimonkey )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mm1.2e",       0x0000, 0x1000, CRC(9019f1b1) SHA1(0c45f64e39b9a182f6162ab520ced6ef0686466c) )
@@ -1290,20 +1320,27 @@ ROM_START( mimonsco )
 ROM_END
 
 
-GAME( 1981, stratgyx,  0,        stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
+GAME( 1981, stratgyx,  0,        stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "Konami",                             "Strategy X", GAME_SUPPORTS_SAVE )
 GAME( 1981, stratgys,  stratgyx, stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "bootleg", "Strong X", GAME_SUPPORTS_SAVE )
-GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  scramble_state,  darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
-GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  scramble_state,  tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, rescue,    0,        rescue,    rescue,    scramble_state,  rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
-GAME( 1982, rescueb,   rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg (Videl Games)", "Rescue (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1982, aponow,    rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
-GAME( 1983, minefld,   0,        minefld,   minefld,   scramble_state,  minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustler,   0,        hustler,   hustler,   scramble_state,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerd,  hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "Konami (Dynamo Games license)", "Video Hustler (Dynamo Games)", GAME_SUPPORTS_SAVE )
-GAME( 1981, billiard,  hustler,  hustler,   hustler,   scramble_state,  billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler,   driver_device,   0,            ROT90,  "bootleg (Digimatic)", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb3, hustler,  hustlerb3, hustlerb3, scramble_state,  hustlerd,     ROT90,  "bootleg (Videotron)", "Video Pool (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
-GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  scramble_state,  stratgyx,     ROT0,   "bootleg",                            "Strong X", GAME_SUPPORTS_SAVE )
+
+GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  scramble_state,  darkplnt,     ROT180, "Stern Electronics",                  "Dark Planet", GAME_SUPPORTS_SAVE )
+
+GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  scramble_state,  tazmani2,     ROT90,  "Stern Electronics",                  "Tazz-Mania (set 2, alt hardware)", GAME_SUPPORTS_SAVE )
+
+GAME( 1982, rescue,    0,        rescue,    rescue,    scramble_state,  rescue,       ROT90,  "Stern Electronics",                  "Rescue", GAME_SUPPORTS_SAVE )
+GAME( 1982, rescueb,   rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg (Videl Games)",              "Rescue (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1982, aponow,    rescue,   rescue,    rescue,    scramble_state,  rescue,       ROT90,  "bootleg",                            "Apocaljpse Now (bootleg of Rescue)", GAME_SUPPORTS_SAVE )
+
+GAME( 1983, minefld,   0,        minefld,   minefld,   scramble_state,  minefld,      ROT90,  "Stern Electronics",                  "Minefield", GAME_SUPPORTS_SAVE )
+
+GAME( 1981, hustler,   0,        hustler,   hustler,   scramble_state,  hustler,      ROT90,  "Konami",                             "Video Hustler", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerd,  hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "Konami (Dynamo Games license)",      "Video Hustler (Dynamo Games)", GAME_SUPPORTS_SAVE )
+GAME( 1981, billiard,  hustler,  hustler,   hustler,   scramble_state,  billiard,     ROT90,  "bootleg",                            "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler,   driver_device,   0,            ROT90,  "bootleg (Digimatic)",                "Video Hustler (bootleg, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "bootleg",                            "Fatsy Gambler (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb3, hustler,  hustlerb3, hustlerb3, scramble_state,  hustlerd,     ROT90,  "bootleg (Videotron)",                "Video Pool (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb4, hustler,  hustlerb4, hustler,   driver_device,   0,            ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", GAME_SUPPORTS_SAVE )
+
+GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games",              "Mighty Monkey", GAME_SUPPORTS_SAVE )
+GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg",                            "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )

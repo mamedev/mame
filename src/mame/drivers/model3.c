@@ -2941,6 +2941,31 @@ ROM_START( bassdx ) /* step 1.0, Sega game ID# is 833-13476 BSS DX JPN, ROM boar
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
+/*
+In Mame getbass is marked as GET BASS STD, while my pcb came from a DLX cab. 
+Rom board 833-13317
+834-13318 sticker is on rom board too.
+On cage the follow sticker are present
+BSS-4500-CVT2
+833-13317 GAME BD BSS-CVT2
+ 
+I/O board 837-13283 (GET BASS MEC CONT BD in manual)  171-7558c
+
+epr20690.ic11 is controller board prg
+cpu is kl5c80a16cf
+this board have 4 switch (sw3 to sw6)
+a reset switch
+2 bank of 8 dip switch
+SW1 all off
+SW2 all off
+lh52256cn-70 ram (super cap backup)
+sega 315-5296
+sega 315-5649 both seem I/O chip
+gal16v8d (sega 315-6126)
+32 Mhz xtal
+93c45 eeprom
+*/
+
 ROM_START( getbass )    /* step 1.0, Sega game ID# is 833-13416 GET BASS STD, ROM board ID# 834-13417 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
@@ -3008,6 +3033,9 @@ ROM_START( getbass )    /* step 1.0, Sega game ID# is 833-13416 GET BASS STD, RO
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	ROM_REGION( 0x10000, "iocpu", 0 ) // kl5c80a16cf code
+	ROM_LOAD( "epr20690.ic11",  0x00000, 0x10000, CRC(b7da201d) SHA1(7e58eb45ee6ec78250ece7b4fcc4e955b8b4f084) )
 ROM_END
 
 ROM_START( lostwsga )   /* Step 1.5, PCB cage labeled 834-13172 THE LOST WORLD U/R. Sega game ID# is 833-13171, ROM board ID# 834-13172 REV.A */
@@ -4051,6 +4079,9 @@ ROM_START( swtrilgy )   /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	ROM_REGION( 0x10000, "ffcpu", 0 )   /* force feedback controller prg */
+	ROM_LOAD( "epr21119.ic8",  0x00000, 0x10000, CRC(65082b14) SHA1(6c3c192dd6ef3780c6202dd63fc6086328928818) )
 ROM_END
 
 ROM_START( swtrilgya )  /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 834-13587 STAR WARS TRILOGY, Security board ID# 837-13588-COM */

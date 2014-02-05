@@ -6959,6 +6959,31 @@ ROM_START( galaxbsf )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+ROM_START( galaxbsf2 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "gal00eg.ic41",      0x0000, 0x0400, CRC(7c44510c) SHA1(76b0831cb42cae0d56176d549f223b75e8275308) )
+	ROM_LOAD( "gal01eg.ic5",       0x0400, 0x0400, CRC(2a426500) SHA1(c6507a289833a751da7d6907c14bc6fcd4aafda6) )
+	ROM_LOAD( "gal02.ic6",         0x0800, 0x0400, CRC(30e28016) SHA1(07a621e5061d85a9559a920d76716ea4db61b674) )
+	ROM_LOAD( "gal03.ic7",         0x0c00, 0x0400, CRC(de7e7770) SHA1(b06043a1d898eb323ddabffd3d2a3b1f63df0e5e) )
+	ROM_LOAD( "gal04.ic8",         0x1000, 0x0400, CRC(a916c919) SHA1(b3e264ff92687022a0f2f551d5df36db848b48eb) )
+	ROM_LOAD( "gal05.ic9",         0x1400, 0x0400, CRC(9175882b) SHA1(d9943efcb9245af7f01aecc533a699bdefc7d283) )
+	ROM_LOAD( "gal06.ic10",        0x1800, 0x0400, CRC(1237b9da) SHA1(00e11532c599fca452a816683b361a24476b7100) )
+	ROM_LOAD( "gal07eg.ic11",      0x1c00, 0x0400, CRC(16144658) SHA1(2195814579d511c290b9d0cfe7386e2c24827627) )
+	ROM_LOAD( "gal08.ic12",        0x2000, 0x0400, CRC(901894cc) SHA1(a189a8ab0068e9acc3be7b8e87adc1eadfd6b708) )
+	ROM_LOAD( "gal09.ic13",        0x2400, 0x0400, CRC(5876f695) SHA1(e8c0d13066cfe4a409293b9e1380513099b35330) )
+
+	ROM_REGION( 0x0400, "unknown", 0 )
+	ROM_LOAD( "gal00eg.ic4",       0x0000, 0x0400, CRC(1038467f) SHA1(e34cc53a1203335cf9c9a94c3f96cab5a444a34a) ) 	// the first 0x100 bytes of this is ic41, the rest is different? should it bank in somehow to give extra features??
+	
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "galaxian.1h",       0x0000, 0x0800, CRC(39fb43a4) SHA1(4755609bd974976f04855d51e08ec0d62ab4bc07) )
+	ROM_LOAD( "galaxian.1k",       0x0800, 0x0800, CRC(7e3f56a2) SHA1(a9795d8b7388f404f3b0e2c6ce15d713a4c5bafa) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+
 ROM_START( galaxianbl ) // looks to be a fairly plain set with modified bonus lives etc.
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "gal00eg.ic4",       0x0000, 0x0400, CRC(7c44510c) SHA1(76b0831cb42cae0d56176d549f223b75e8275308) )
@@ -10545,6 +10570,7 @@ GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian_state, galaxian, RO
 GAME( 1979, starfght, galaxian, galaxian, swarm, galaxian_state,    galaxian, ROT90,  "bootleg (Jeutel)", "Star Fighter", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "bootleg", "Galaxian (bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl,galaxian,galaxian, galaxianbl,galaxian_state,galaxian, ROT90,  "bootleg", "Galaxian (bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galaxbsf2, galaxian,galaxian, galaxian, galaxian_state, galaxian, ROT90,  "bootleg", "Galaxian (bootleg, set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1980, supergx,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco / Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "<unknown>", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
 GAME( 1980, galaxrf,  galaxian, galaxian, galaxrf, galaxian_state,  galaxian, ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian (Recreativos Franco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
