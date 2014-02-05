@@ -13,9 +13,6 @@
 #define log_write(...)
 #define log_event(...)
 
-#define MEM_BYTE (0)
-#define MEM_WORD (1)
-
 enum mn10200_flag
 {
 	FLAG_ZF  = 0x0001, // zero flag
@@ -38,129 +35,20 @@ enum mn10200_flag
 
 const device_type MN10200 = &device_creator<mn10200_device>;
 
+static ADDRESS_MAP_START( mn1020012_internal_map, AS_PROGRAM, 16, mn10200_device )
+	AM_RANGE(0x00fc00, 0x00ffff) AM_READWRITE8(io_control_r, io_control_w, 0xffff)
+ADDRESS_MAP_END
 
 mn10200_device::mn10200_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, MN10200, "MN10200", tag, owner, clock, "mn10200", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
-	, m_io_config("data", ENDIANNESS_LITTLE, 8, 8, 0)
+	: cpu_device(mconfig, MN10200, "MN10200", tag, owner, clock, "mn10200", __FILE__),
+	m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, ADDRESS_MAP_NAME(mn1020012_internal_map)),
+	m_io_config("data", ENDIANNESS_LITTLE, 8, 8, 0)
 {
 }
 
 
-UINT8 mn10200_device::read_arg8(UINT32 address)
-{
-	address &= 0xffffff;
-	if (address >= 0xfc00 && address < 0x10000)
-	{
-		return mn10200_r(address-0xfc00, MEM_BYTE);
-	}
 
-	return m_program->read_byte(address);
-}
-
-UINT16 mn10200_device::read_arg16(UINT32 address)
-{
-	address &= 0xffffff;
-	if (address >= 0xfc00 && address < 0x10000)
-	{
-		return mn10200_r(address-0xfc00, MEM_WORD);
-	}
-
-	if (address & 1)
-	{
-		return m_program->read_byte(address) | (m_program->read_byte(address+1)<<8);
-	}
-
-	return m_program->read_word(address);
-}
-
-void mn10200_device::write_mem8(UINT32 address, UINT8 data)
-{
-	address &= 0xffffff;
-	if (address >= 0xfc00 && address < 0x10000)
-	{
-		mn10200_w(address-0xfc00, data, MEM_BYTE);
-		return;
-	}
-
-	m_program->write_byte(address, data);
-}
-
-void mn10200_device::write_mem16(UINT32 address, UINT16 data)
-{
-	address &= 0xffffff;
-	if (address >= 0xfc00 && address < 0x10000)
-	{
-		mn10200_w(address-0xfc00, data, MEM_WORD);
-		return;
-	}
-
-	if (address & 1)
-	{
-		m_program->write_byte(address, data&0xff);
-		m_program->write_byte(address+1, (data>>8)&0xff);
-		return;
-	}
-
-	m_program->write_word(address, data);
-}
-
-UINT32 mn10200_device::read_arg24(UINT32 address)
-{
-	address &= 0xffffff;
-	return read_arg16(address)|(read_arg8(address+2)<<16);
-}
-
-void mn10200_device::write_mem24(UINT32 address, UINT32 data)
-{
-	address &= 0xffffff;
-/*  if(adr == 0x4075aa || adr == 0x40689a || adr == 0x4075a2) {
-        log_write("TRACE", adr, val, MEM_LONG);
-    }*/
-	write_mem8(address, data);
-	write_mem8(address+1, data>>8);
-	write_mem8(address+2, data>>16);
-}
-
-UINT8 mn10200_device::read_mem8(UINT32 address)
-{
-	address &= 0xffffff;
-	if (address >= 0xfc00 && address < 0x10000)
-	{
-		return mn10200_r(address-0xfc00, MEM_BYTE);
-	}
-
-	return m_program->read_byte(address);
-}
-
-UINT16 mn10200_device::read_mem16(UINT32 address)
-{
-	address &= 0xffffff;
-	if (address >= 0xfc00 && address < 0x10000)
-	{
-		return mn10200_r(address-0xfc00, MEM_WORD);
-	}
-
-	if (address & 1)
-	{
-		return m_program->read_byte(address) | (m_program->read_byte(address+1)<<8);
-	}
-
-	return m_program->read_word(address);
-}
-
-UINT32 mn10200_device::read_mem24(UINT32 address)
-{
-	address &= 0xffffff;
-	return read_mem16(address)|(read_mem8(address+2)<<16);
-}
-
-void mn10200_device::mn102_change_pc(UINT32 pc)
-{
-	m_pc = pc & 0xffffff;
-}
-
-void mn10200_device::mn102_take_irq(int level, int group)
+void mn10200_device::take_irq(int level, int group)
 {
 	if(!(m_psw & FLAG_IE))
 	{
@@ -171,9 +59,9 @@ void mn10200_device::mn102_take_irq(int level, int group)
 //  if (group != 8) printf("MN10200: Taking irq L %d G %d pc=%x, a3=%x\n", level, group, m_pc, m_a[3]);
 
 	m_a[3] -= 6;
-	write_mem24(m_a[3]+2, m_pc);
+	write_mem24(m_a[3] + 2, m_pc);
 	write_mem16(m_a[3], m_psw);
-	mn102_change_pc(0x80008);
+	change_pc(0x80008);
 	m_psw = (m_psw & 0xf0ff) | (level << 8);
 	m_iagr = group << 1;
 }
@@ -255,7 +143,7 @@ void mn10200_device::timer_tick_simple(int tmr)
 		{
 //          printf("Timer %d IRQ! (Group %d in_grp %d ICRH %x ICRL %x\n", tmr, group, irq_in_grp, m_icrh[group], m_icrl[group]);
 			// try to take it now
-			mn102_take_irq(level, group + 1);
+			take_irq(level, group + 1);
 		}
 	}
 }
@@ -475,7 +363,7 @@ void mn10200_device::device_reset()
 
 	memset(m_d, 0, sizeof(m_d));
 	memset(m_a, 0, sizeof(m_a));
-	mn102_change_pc(0x80000);
+	change_pc(0x80000);
 	m_psw = 0;
 	m_nmicr = 0;
 	memset(m_icrl, 0, sizeof(m_icrl));
@@ -564,7 +452,7 @@ void mn10200_device::test_nz16(UINT16 v)
 
 void mn10200_device::do_jsr(UINT32 to, UINT32 ret)
 {
-	mn102_change_pc(to);
+	change_pc(to);
 	m_a[3] -= 4;
 	write_mem24(m_a[3], ret);
 }
@@ -574,7 +462,7 @@ void mn10200_device::do_branch(int offset, bool state)
 	if (state)
 	{
 		m_cycles -= offset + 1;
-		mn102_change_pc(m_pc + offset + 1 + (INT8)read_arg8(m_pc + offset));
+		change_pc(m_pc + offset + 1 + (INT8)read_arg8(m_pc + offset));
 	}
 	else
 	{
@@ -604,7 +492,7 @@ void mn10200_device::execute_set_input(int irqnum, int state)
 		if (m_icrl[7] & (1 << irqnum))
 		{
 			// try to take it now
-			mn102_take_irq(level, 8);
+			take_irq(level, 8);
 		}
 	}
 }
@@ -858,7 +746,7 @@ void mn10200_device::execute_run()
 		case 0xeb:
 			m_cycles -= 6;
 			m_psw = read_mem16(m_a[3]);
-			mn102_change_pc(read_mem24(m_a[3] + 2));
+			change_pc(read_mem24(m_a[3] + 2));
 			m_a[3] += 6;
 			break;
 
@@ -877,7 +765,7 @@ void mn10200_device::execute_run()
 				// jmp (an)
 				case 0x00: case 0x04: case 0x08: case 0x0c:
 					m_cycles -= 3;
-					mn102_change_pc(m_a[opcode >> 2 & 3]);
+					change_pc(m_a[opcode >> 2 & 3]);
 					break;
 
 				// jsr (an)
@@ -1480,7 +1368,7 @@ void mn10200_device::execute_run()
 				// jmp imm24
 				case 0xe0:
 					m_cycles -= 4;
-					mn102_change_pc(m_pc + 5 + read_arg24(m_pc + 2));
+					change_pc(m_pc + 5 + read_arg24(m_pc + 2));
 					break;
 
 				// jsr label24
@@ -1757,7 +1645,7 @@ void mn10200_device::execute_run()
 		// jmp label16
 		case 0xfc:
 			m_cycles -= 2;
-			mn102_change_pc(m_pc + 3 + (INT16)read_arg16(m_pc + 1));
+			change_pc(m_pc + 3 + (INT16)read_arg16(m_pc + 1));
 			break;
 
 		// jsr label16
@@ -1769,7 +1657,7 @@ void mn10200_device::execute_run()
 		// rts
 		case 0xfe:
 			m_cycles -= 5;
-			mn102_change_pc(read_mem24(m_a[3]));
+			change_pc(read_mem24(m_a[3]));
 			m_a[3] += 4;
 			break;
 
@@ -1793,15 +1681,9 @@ static const char *const inames[10][4] = {
 	{ "key", "a/d", "?", "?" }
 };
 
-void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
+WRITE8_MEMBER(mn10200_device::io_control_w)
 {
-	if(type == MEM_WORD) {
-	mn10200_w(adr, data & 0xff, MEM_BYTE);
-	mn10200_w(adr+1, (data>>8) & 0xff, MEM_BYTE);
-	return;
-	}
-
-	switch(adr) {
+	switch(offset) {
 	case 0x000:
 	if(data & 12) {
 		log_event("CPU", "Stop request");
@@ -1832,13 +1714,13 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
 	{
 		// note: writes here ack interrupts
-	m_icrl[((adr & 0x3f)>>1)-1] = data;
+	m_icrl[((offset & 0x3f)>>1)-1] = data;
 	}
 	break;
 
 	case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
 	case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055: {
-	int irq = ((adr & 0x3f)>>1)-1;
+	int irq = ((offset & 0x3f)>>1)-1;
 #if 0
 	if((m_icrh[irq] != data) && (data & 15)) {
 		printf("MN10200: irq %d enabled, level=%x, enable= %s %s %s %s\n", irq+1, (data >> 4) & 7,
@@ -1873,7 +1755,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	break;
 
 	case 0x180: case 0x190: {
-	int ser = (adr-0x180) >> 4;
+	int ser = (offset-0x180) >> 4;
 //    const char *parity[8] = { "no", "1", "2", "3", "l", "h", "even", "odd" };
 //    const char *source[4] = { "sbt0", "timer 8", "2", "timer 9" };
 	m_serial[ser].ctrll = data;
@@ -1886,7 +1768,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	}
 
 	case 0x181: case 0x191: {
-	int ser = (adr-0x180) >> 4;
+	int ser = (offset-0x180) >> 4;
 	m_serial[ser].ctrlh = data;
 //    log_event("MN102", "Serial %d transmit=%s, receive=%s, break=%s, proto=%s, order=%s",
 //        ser,
@@ -1897,7 +1779,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	}
 
 	case 0x182: case 0x192: {
-	int ser = (adr-0x180) >> 4;
+	int ser = (offset-0x180) >> 4;
 	m_serial[ser].buf = data;
 	log_event("MN102", "Serial %d buffer=%02x", ser, data);
 	break;
@@ -1915,9 +1797,9 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 
 	case 0x210: case 0x211: case 0x212: case 0x213: case 0x214:
 	case 0x215: case 0x216: case 0x217: case 0x218: case 0x219:
-		m_simple_timer[adr-0x210].base = data + 1;
-//      printf("MN10200: Timer %d value set %02x\n", adr-0x210, data);
-		refresh_timer(adr-0x210);
+		m_simple_timer[offset-0x210].base = data + 1;
+//      printf("MN10200: Timer %d value set %02x\n", offset-0x210, data);
+		refresh_timer(offset-0x210);
 		break;
 
 	case 0x21a:
@@ -1934,15 +1816,15 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	case 0x225: case 0x226: case 0x227: case 0x228: case 0x229:
 	{
 //      const char *source[4] = { "TMxIO", "cascade", "prescale 0", "prescale 1" };
-		m_simple_timer[adr-0x220].mode = data;
-//      printf("MN10200: Timer %d %s b6=%d, source=%s\n", adr-0x220, data & 0x80 ? "on" : "off", (data & 0x40) != 0, source[data & 3]);
+		m_simple_timer[offset-0x220].mode = data;
+//      printf("MN10200: Timer %d %s b6=%d, source=%s\n", offset-0x220, data & 0x80 ? "on" : "off", (data & 0x40) != 0, source[data & 3]);
 
 		if (data & 0x40)
 		{
-//          printf("MN10200: loading timer %d\n", adr-0x220);
-			m_simple_timer[adr-0x220].cur = m_simple_timer[adr-0x220].base;
+//          printf("MN10200: loading timer %d\n", offset-0x220);
+			m_simple_timer[offset-0x220].cur = m_simple_timer[offset-0x220].base;
 		}
-		refresh_timer(adr-0x220);
+		refresh_timer(offset-0x220);
 		break;
 	}
 
@@ -1963,7 +1845,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 //      const char *modes[4] = { "single", "double", "ioa", "iob" };
 //      const char *sources[8] = { "pres.0", "pres.1", "iob", "sysclk", "*4", "*1", "6", "7" };
 //      printf("MN10200: Timer %d comp=%s on_1=%s on_match=%s phase=%s source=%s\n",
-//          10 + ((adr-0x230) >> 4),
+//          10 + ((offset-0x230) >> 4),
 //          modes[data >> 6], data & 0x20 ? "cleared" : "not cleared",  data & 0x10 ? "cleared" : "not cleared",
 //          data & 8 ? "tff" : "rsff", sources[data & 7]);
 		break;
@@ -1973,7 +1855,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	{
 //      const char *modes[4] = { "up", "down", "up on ioa", "up on iob" };
 //      printf("MN10200: Timer %d %s ff=%s op=%s ext_trig=%s %s\n",
-//      10 + ((adr-0x230) >> 4),
+//      10 + ((offset-0x230) >> 4),
 //      data & 0x80 ? "enable" : "disable", data & 0x40 ? "operate" : "clear",
 //      modes[(data >> 4) & 3], data & 2 ? "on" : "off", data & 1 ? "one-shot" : "repeat");
 
@@ -1981,29 +1863,29 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	}
 
 	case 0x234: case 0x244: case 0x254:
-	log_event("MN102", "Timer %d ca=--%02x", 10 + ((adr-0x230) >> 4), data);
+	log_event("MN102", "Timer %d ca=--%02x", 10 + ((offset-0x230) >> 4), data);
 	break;
 
 	case 0x235: case 0x245: case 0x255:
-	log_event("MN102", "Timer %d ca=%02x--", 10 + ((adr-0x230) >> 4), data);
+	log_event("MN102", "Timer %d ca=%02x--", 10 + ((offset-0x230) >> 4), data);
 	break;
 
 	case 0x236: case 0x246: case 0x256:
-	log_event("MN102", "Timer %d ca read trigger", 10 + ((adr-0x230) >> 4));
+	log_event("MN102", "Timer %d ca read trigger", 10 + ((offset-0x230) >> 4));
 	break;
 
 	case 0x237: case 0x247: case 0x257: break;
 
 	case 0x238: case 0x248: case 0x258:
-	log_event("MN102", "Timer %d cb=--%02x", 10 + ((adr-0x230) >> 4), data);
+	log_event("MN102", "Timer %d cb=--%02x", 10 + ((offset-0x230) >> 4), data);
 	break;
 
 	case 0x239: case 0x249: case 0x259:
-	log_event("MN102", "Timer %d cb=%02x--", 10 + ((adr-0x230) >> 4), data);
+	log_event("MN102", "Timer %d cb=%02x--", 10 + ((offset-0x230) >> 4), data);
 	break;
 
 	case 0x23a: case 0x24a: case 0x25a:
-	log_event("MN102", "Timer %d cb read trigger", 10 + ((adr-0x230) >> 4));
+	log_event("MN102", "Timer %d cb read trigger", 10 + ((offset-0x230) >> 4));
 	break;
 
 	case 0x23b: case 0x24b: case 0x25b: break;
@@ -2011,7 +1893,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	case 0x260: case 0x261: {
 //    const char *mode[4] = { "sysbuf", "4-phase", "4-phase 1/2", "3" };
 //    log_event("MN102", "Sync Output %c timing=%s out=%s dir=%s mode=%s",
-//        adr == 0x261 ? 'B' : 'A',
+//        offset == 0x261 ? 'B' : 'A',
 //        data & 0x10 ? "12A" : "1", data & 8 ? "sync a" :"P13-10",
 //        data & 4 ? "ccw" : "cw", mode[data & 3]);
 	break;
@@ -2026,21 +1908,21 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	break;
 
 	case 0x280: case 0x290: case 0x2a0: case 0x2b0: case 0x2c0: case 0x2d0: case 0x2e0: case 0x2f0: {
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].adr = (m_dma[dma].adr & 0x00ffff00) | data;
 	logerror("MN10200: DMA %d adr=%06x\n", dma, m_dma[dma].adr);
 	break;
 	}
 
 	case 0x281: case 0x291: case 0x2a1: case 0x2b1: case 0x2c1: case 0x2d1: case 0x2e1: case 0x2f1: {
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].adr = (m_dma[dma].adr & 0x00ff00ff) | (data << 8);
 	logerror("MN10200: DMA %d adr=%06x\n", dma, m_dma[dma].adr);
 	break;
 	}
 
 	case 0x282: case 0x292: case 0x2a2: case 0x2b2: case 0x2c2: case 0x2d2: case 0x2e2: case 0x2f2: {
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].adr = (m_dma[dma].adr & 0x0000ffff) | (data << 16);
 	logerror("MN10200: DMA %d adr=%06x\n", dma, m_dma[dma].adr);
 	break;
@@ -2050,21 +1932,21 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	break;
 
 	case 0x284: case 0x294: case 0x2a4: case 0x2b4: case 0x2c4: case 0x2d4: case 0x2e4: case 0x2f4: {
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].count = (m_dma[dma].count & 0x00ffff00) | data;
 	logerror("MN10200: DMA %d count=%06x\n", dma, m_dma[dma].count);
 	break;
 	}
 
 	case 0x285: case 0x295: case 0x2a5: case 0x2b5: case 0x2c5: case 0x2d5: case 0x2e5: case 0x2f5: {
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].count = (m_dma[dma].count & 0x00ff00ff) | (data << 8);
 	logerror("MN10200: DMA %d count=%06x\n", dma, m_dma[dma].count);
 	break;
 	}
 
 	case 0x286: case 0x296: case 0x2a6: case 0x2b6: case 0x2c6: case 0x2d6: case 0x2e6: case 0x2f6: {
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].count = (m_dma[dma].count & 0x0000ffff) | (data << 16);
 	logerror("MN10200: DMA %d count=%06x\n", dma, m_dma[dma].count);
 	break;
@@ -2074,14 +1956,14 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	break;
 
 	case 0x288: case 0x298: case 0x2a8: case 0x2b8: case 0x2c8: case 0x2d8: case 0x2e8: case 0x2f8: {
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].iadr = (m_dma[dma].iadr & 0xff00) | data;
 	logerror("MN10200: DMA %d iadr=%03x\n", dma, m_dma[dma].iadr);
 	break;
 	}
 
 	case 0x289: case 0x299: case 0x2a9: case 0x2b9: case 0x2c9: case 0x2d9: case 0x2e9: case 0x2f9: {
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].iadr = (m_dma[dma].iadr & 0x00ff) | ((data & 3) << 8);
 	logerror("MN10200: DMA %d iadr=%03x\n", dma, m_dma[dma].iadr);
 	break;
@@ -2099,7 +1981,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 		"X0e", "X1e", "X0l", "X1l"
 	};
 
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].ctrll = data;
 	logerror("MN10200: DMA %d control ack=%s, trans=%s, start=%s\n",
 			dma,
@@ -2111,7 +1993,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 
 	case 0x28b: case 0x29b: case 0x2ab: case 0x2bb: case 0x2cb: case 0x2db: case 0x2eb: case 0x2fb: {
 	static const char *const tradr[4] = { "inc", "dec", "fixed", "reserved" };
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].ctrlh = data;
 	logerror("MN10200: DMA %d control %s irq=%s %s %s dir=%s %s %s\n",
 			dma,
@@ -2126,7 +2008,7 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 	}
 
 	case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc: {
-	int dma = (adr-0x280) >> 4;
+	int dma = (offset-0x280) >> 4;
 	m_dma[dma].irq = data & 7;
 	logerror("MN10200: DMA %d irq=%d\n", dma, data & 7);
 	break;
@@ -2214,19 +2096,14 @@ void mn10200_device::mn10200_w(UINT32 adr, UINT32 data, int type)
 
 
 	default:
-	log_event("MN102", "internal_w %04x, %02x (%03x)", adr+0xfc00, data, adr);
+	log_event("MN102", "internal_w %04x, %02x (%03x)", offset+0xfc00, data, adr);
 	break;
 	}
 }
 
-UINT32 mn10200_device::mn10200_r(UINT32 adr, int type)
+READ8_MEMBER(mn10200_device::io_control_r)
 {
-	if(type == MEM_WORD)
-	{
-		return mn10200_r(adr, MEM_BYTE) | (mn10200_r(adr+1, MEM_BYTE) << 8);
-	}
-
-	switch(adr) {
+	switch(offset) {
 	case 0x00e:
 	return m_iagr;
 
@@ -2235,11 +2112,11 @@ UINT32 mn10200_device::mn10200_r(UINT32 adr, int type)
 
 	case 0x042: case 0x044: case 0x046: case 0x048: case 0x04a:
 	case 0x04c: case 0x04e: case 0x050: case 0x052: case 0x054:
-	return m_icrl[((adr & 0x3f)>>1)-1];
+	return m_icrl[((offset & 0x3f)>>1)-1];
 
 	case 0x043: case 0x045: case 0x047: case 0x049: case 0x04b:
 	case 0x04d: case 0x04f: case 0x051: case 0x053: case 0x055:
-	return m_icrh[((adr & 0x3f)>>1)-1];
+	return m_icrh[((offset & 0x3f)>>1)-1];
 
 	case 0x056:
 	return 0;
@@ -2249,10 +2126,10 @@ UINT32 mn10200_device::mn10200_r(UINT32 adr, int type)
 	return 0x20;
 
 	case 0x180: case 0x190:
-	return m_serial[(adr-0x180) >> 4].ctrll;
+	return m_serial[(offset-0x180) >> 4].ctrll;
 
 	case 0x181: case 0x191:
-	return m_serial[(adr-0x180) >> 4].ctrlh;
+	return m_serial[(offset-0x180) >> 4].ctrlh;
 
 	case 0x182: {
 	static int zz;
@@ -2264,15 +2141,15 @@ UINT32 mn10200_device::mn10200_r(UINT32 adr, int type)
 
 	case 0x200: case 0x201: case 0x202: case 0x203: case 0x204:
 	case 0x205: case 0x206: case 0x207: case 0x208: case 0x209:
-//      printf("MN10200: timer %d value read = %d\n", adr-0x200, m_simple_timer[adr-0x200].cur);
-		return m_simple_timer[adr-0x200].cur;
+//      printf("MN10200: timer %d value read = %d\n", offset-0x200, m_simple_timer[offset-0x200].cur);
+		return m_simple_timer[offset-0x200].cur;
 
 	case 0x264: // port 1 data
 		return m_io->read_byte(MN10200_PORT1);
 
 	case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc:
 		{
-			int dma = (adr-0x280) >> 4;
+			int dma = (offset-0x280) >> 4;
 			return m_dma[dma].irq;
 		}
 
@@ -2286,7 +2163,7 @@ UINT32 mn10200_device::mn10200_r(UINT32 adr, int type)
 		return m_io->read_byte(MN10200_PORT3);
 
 	default:
-	log_event("MN102", "internal_r %04x (%03x)", adr+0xfc00, adr);
+	log_event("MN102", "internal_r %04x (%03x)", offset+0xfc00, adr);
 	}
 
 	return 0;
