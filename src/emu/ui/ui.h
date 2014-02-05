@@ -128,6 +128,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	bool single_step() const { return m_single_step; }
+	bool menubar_visible() { return m_menubar && m_menubar->is_visible(); }
 
 	// setters
 	void set_single_step(bool single_step) { m_single_step = single_step; }

@@ -30,6 +30,9 @@ public:
 	virtual void reset();
 	void handle(render_container *container);
 
+	// getters
+	bool is_visible() const { return m_menubar_visibility != MENUBAR_VISIBILITY_INVISIBLE; }
+
 protected:
 	class menu_item
 	{

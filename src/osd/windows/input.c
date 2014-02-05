@@ -173,6 +173,7 @@ static bool                 input_enabled;
 static osd_lock *           input_lock;
 static bool                 input_paused;
 static DWORD                last_poll;
+static bool					menubar_visible;
 
 // DirectInput variables
 static LPDIRECTINPUT        dinput;
@@ -532,6 +533,9 @@ void wininput_poll(running_machine &machine)
 {
 	bool hasfocus = winwindow_has_focus() && input_enabled;
 
+	// check menubar
+	menubar_visible = (machine.phase() > MACHINE_PHASE_INIT) && machine.ui().menubar_visible();
+
 	// ignore if not enabled
 	if (input_enabled)
 	{
@@ -572,7 +576,7 @@ void wininput_poll(running_machine &machine)
 bool wininput_should_hide_mouse(void)
 {
 	// if we are paused or disabled, no
-	if (input_paused || !input_enabled)
+	if (input_paused || !input_enabled || menubar_visible)
 		return false;
 
 	// if neither mice nor lightguns enabled in the core, then no
