@@ -743,6 +743,69 @@ static INPUT_PORTS_START( archrivl )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( archrivlb )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0c00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) 
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+
+	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(      0x0003, "Preset Time" )
+	PORT_DIPSETTING(      0x0002, "Preset + 10sec" )
+	PORT_DIPSETTING(      0x0001, "Preset + 20sec" )
+	PORT_DIPSETTING(      0x0000, "Preset + 30sec" )
+	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPSETTING(      0x0014, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Team Names" )        PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, "Default" )
+	PORT_DIPSETTING(      0x0000, "Hometown Heroes" )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( pigskin )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1444,6 +1507,53 @@ ROM_START( archrivla ) /* Reports as rev 2.0 5/03/89 */
 ROM_END
 
 
+ROM_START( archrivlb ) /* Reports as rev 2.0 5/03/89 */
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "4.bin",  0x00000, 0x10000, CRC(1d99cce6) SHA1(738d651de0bf1b4a1524a1d8835a060bfc4649a8) ) 
+	ROM_LOAD16_BYTE( "2.bin ", 0x00001, 0x10000, CRC(5d58a77b) SHA1(9a42bb89acd4e6b603215b14b4d411d14615f412) )
+	ROM_LOAD16_BYTE( "3.bin",  0x20000, 0x10000, CRC(d6d08ff7) SHA1(bbbd4b5c3218c9bb461b17e536191d40ab39f67c) )
+	ROM_LOAD16_BYTE( "1.bin",  0x20001, 0x10000, CRC(92f3a43d) SHA1(45fdcbacd65f5898d54cc2ac95639b7ee2c097e6) )
+
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )  /* Audio System board */
+	ROM_LOAD( "13.bin",   0x10000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) ) 
+	ROM_RELOAD(                           0x18000, 0x08000 )
+	ROM_RELOAD(                           0x20000, 0x08000 )
+	ROM_RELOAD(                           0x28000, 0x08000 )
+	ROM_LOAD( "12.bin", 0x30000, 0x08000, CRC(c4b3dc23) SHA1(87e6eaec82d749ad28e0fa3d0efecd8a4aaf5cd7) )
+	ROM_RELOAD(                           0x38000, 0x08000 )
+	ROM_RELOAD(                           0x40000, 0x08000 )
+	ROM_RELOAD(                           0x48000, 0x08000 )
+	ROM_LOAD( "11.bin", 0x50000, 0x08000, CRC(f7907a02) SHA1(3fabb2b7fd82e773d7b6db53c5328b5866d70617) )
+	ROM_RELOAD(                           0x58000, 0x08000 )
+	ROM_RELOAD(                           0x60000, 0x08000 )
+	ROM_RELOAD(                           0x68000, 0x08000 )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "5.bin", 0x00000, 0x10000, CRC(7eb3d7c6) SHA1(8544d04929cdb36fa7f0dcb67e0b7fd8c7b0fc2b) ) 
+	ROM_LOAD( "6.bin", 0x10000, 0x10000, CRC(31e68050) SHA1(e25871beb08a8706af70d277fa7305a1f4d7d3e2) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",   0x00000, 0x20000, CRC(148ce28c) SHA1(d7dc59d9ae8dc61ecc58a6172fd40aa3926b1f6f) )
+	ROM_LOAD( "8.bin",   0x20000, 0x20000, CRC(58187ac2) SHA1(0bd58598720c41b3c393d47b3b1d6b30696b3a6f) )
+	ROM_LOAD( "9.bin ",   0x40000, 0x20000, CRC(0dd1204e) SHA1(bdc9b74e7ae8f071d2eb3ce957eec484f02ef876) )
+	ROM_LOAD( "10.bin", 0x60000, 0x20000, CRC(eb3d0344) SHA1(9db7c7bca45f56550c9a9623f96565901968d0c3) )
+
+	ROM_REGION( 0x1200, "plds", 0 )
+	ROM_LOAD( "pls153.11j",   0x0000, 0x00eb, CRC(761c3b56) SHA1(06c1717face55cc5b05ec45be9525a3d25419b85) )
+	ROM_LOAD( "pls153.12j",   0x0100, 0x00eb, CRC(48eed036) SHA1(146b47ecb341b074acad0e4da2d81ff921bbaf7a) )
+	ROM_LOAD( "pls153.14h",   0x0200, 0x00eb, CRC(d4203273) SHA1(59fde5850ad55e257f10db857dfb9a1e929fc1ec) )
+	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8a.1j",  0x0a00, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8a.2j",  0x0c00, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal20l8a.9b",  0x0e00, 0x0144, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pl20x10a.14f", 0x1000, 0x00cc, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pl20x10a.15f", 0x1100, 0x00cc, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
+
 ROM_START( pigskin ) /* Initial boot screen reports KIT CODE REV 1.1K 8/01/90 */
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pigskin-k_a5_la1.a5",  0x00000, 0x10000, CRC(ab61c29b) SHA1(01cf2d9b3f41442280e614541d5651c6e46b4a4b) )
@@ -1666,6 +1776,29 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivl)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
 }
 
+READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
+{
+	return ioport("IN1")->read();
+}
+
+DRIVER_INIT_MEMBER(mcr68_state,archrivlb)
+{
+	mcr68_common_init(16, 0);
+
+	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
+	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
+
+	/* handle control writes */
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
+
+	/* 49-way joystick replaced by standard 8way stick */
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivlb_port_1_r),this));
+
+	/* 6840 is mapped to the lower 8 bits */
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
+}
+
+
 
 DRIVER_INIT_MEMBER(mcr68_state,pigskin)
 {
@@ -1697,14 +1830,21 @@ DRIVER_INIT_MEMBER(mcr68_state,trisport)
  *************************************/
 
 GAME( 1984, zwackery, 0,        zwackery, zwackery, mcr68_state, zwackery, ROT0,   "Bally Midway", "Zwackery", GAME_SUPPORTS_SAVE )
+
 GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, xenophob, ROT0,   "Bally Midway", "Xenophobe", GAME_SUPPORTS_SAVE )
+
 GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", GAME_SUPPORTS_SAVE )
+
 GAME( 1988, blasted,  0,        xenophob, blasted,  mcr68_state, blasted,  ROT0,   "Bally Midway", "Blasted", GAME_SUPPORTS_SAVE )
 GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", GAME_SUPPORTS_SAVE )
+
 GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", GAME_SUPPORTS_SAVE )
 GAME( 1989, archrivla,archrivl, archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", GAME_SUPPORTS_SAVE )
+GAME( 1989, archrivlb,archrivl, archrivl, archrivlb,mcr68_state, archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way Joystick bootleg)", GAME_SUPPORTS_SAVE )
+
 GAME( 1989, trisport, 0,        trisport, trisport, mcr68_state, trisport, ROT270, "Bally Midway", "Tri-Sports", GAME_SUPPORTS_SAVE )
+
 GAME( 1990, pigskin,  0,        pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)", GAME_SUPPORTS_SAVE )
 GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)", GAME_SUPPORTS_SAVE )
 GAME( 1990, pigskinb, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)", GAME_SUPPORTS_SAVE )
