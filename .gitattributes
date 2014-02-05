@@ -5511,6 +5511,7 @@ src/mame/layout/beaminv.lay svneol=native#text/xml
 src/mame/layout/bfm_sc4.lay svneol=native#text/xml
 src/mame/layout/bfm_sc5.lay svneol=native#text/xml
 src/mame/layout/bfmsys85.lay svneol=native#text/xml
+src/mame/layout/bingo.lay svneol=native#text/plain
 src/mame/layout/bingowng.lay svneol=native#text/xml
 src/mame/layout/blckjack.lay svneol=native#text/xml
 src/mame/layout/blockade.lay svneol=native#text/xml
