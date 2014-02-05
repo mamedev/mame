@@ -100,7 +100,8 @@ void ui_emu_menubar::menubar_draw_ui_elements()
 void ui_emu_menubar::menubar_build_menus()
 {
 	build_file_menu();
-	build_images_menu();
+	if (has_images())
+		build_images_menu();
 	build_options_menu();
 	build_settings_menu();
 	build_help_menu();
@@ -170,54 +171,52 @@ void ui_emu_menubar::build_file_menu()
 
 void ui_emu_menubar::build_images_menu()
 {
-	// we only have an images menu if we have image devices
+	// add the root "Images" menu
+	menu_item &images_menu = root_menu().append("Images");
+
+	// loop through all devices
 	image_interface_iterator iter(machine().root_device());
-	if (iter.first() != NULL)
+	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
-		// we have image slots; add the menu and start iterating
-		menu_item &images_menu = root_menu().append("Images");
-		for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
+		bool is_loaded = image->basename() != NULL;
+
+		astring buffer;
+		buffer.printf("%s (%s): \t%s",
+			image->device().name(),
+			image->brief_instance_name(),
+			is_loaded ? image->basename() : "[empty]");
+
+		// append the menu item for this device
+		menu_item &menu = images_menu.append(buffer);
+
+		// software list
+		if (image->image_interface() != NULL)
 		{
-			bool is_loaded = image->basename() != NULL;
+			if (build_software_list_menus(menu, image))
+				menu.append_separator();
+		}
 
-			astring buffer;
-			buffer.printf("%s (%s): \t%s",
-				image->device().name(),
-				image->brief_instance_name(),
-				is_loaded ? image->basename() : "[empty]");
+		// load
+		menu.append("Load...", &ui_emu_menubar::load, *this, image);
 
-			// append the menu item for this device
-			menu_item &menu = images_menu.append(buffer);
+		// unload
+		menu_item &unload_menu = menu.append("Unload", &device_image_interface::unload, *image);
+		unload_menu.set_enabled(is_loaded);
 
-			// software list
-			if (image->image_interface() != NULL)
-			{
-				if (build_software_list_menus(menu, image))
-					menu.append_separator();
-			}
+		// tape control
+		cassette_image_device *cassette = dynamic_cast<cassette_image_device *>(image);
+		if (cassette != NULL)
+		{
+			menu_item &control_menu = menu.append("Tape Control...", &ui_emu_menubar::tape_control, *this, cassette);
+			control_menu.set_enabled(is_loaded);
+		}
 
-			// load
-			menu.append("Load...", &ui_emu_menubar::load, *this, image);
-
-			// unload
-			menu_item &unload_menu = menu.append("Unload", &device_image_interface::unload, *image);
-			unload_menu.set_enabled(is_loaded);
-
-			// tape control
-			cassette_image_device *cassette = dynamic_cast<cassette_image_device *>(image);
-			if (cassette != NULL)
-			{
-				menu_item &control_menu = menu.append("Tape Control...", &ui_emu_menubar::tape_control, *this, cassette);
-				control_menu.set_enabled(is_loaded);
-			}
-
-			// bitbanger control
-			bitbanger_device *bitbanger = dynamic_cast<bitbanger_device *>(image);
-			if (bitbanger != NULL)
-			{
-				menu_item &control_menu = menu.append("Bitbanger Control...", &ui_emu_menubar::bitbanger_control, *this, bitbanger);
-				control_menu.set_enabled(is_loaded);
-			}
+		// bitbanger control
+		bitbanger_device *bitbanger = dynamic_cast<bitbanger_device *>(image);
+		if (bitbanger != NULL)
+		{
+			menu_item &control_menu = menu.append("Bitbanger Control...", &ui_emu_menubar::bitbanger_control, *this, bitbanger);
+			control_menu.set_enabled(is_loaded);
 		}
 	}
 }
@@ -577,4 +576,15 @@ void ui_emu_menubar::bitbanger_control(bitbanger_device *image)
 void ui_emu_menubar::load(device_image_interface *image)
 {
 	ui_menu::stack_push(image->get_selection_menu(machine(), container()));
+}
+
+
+//-------------------------------------------------
+//  has_images
+//-------------------------------------------------
+
+bool ui_emu_menubar::has_images()
+{
+	image_interface_iterator iter(machine().root_device());
+	return iter.first() != NULL;
 }

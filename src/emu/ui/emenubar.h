@@ -45,6 +45,7 @@ private:
 	void tape_control(cassette_image_device *image);
 	void bitbanger_control(bitbanger_device *image);
 	void load(device_image_interface *image);
+	bool has_images();
 
 	// template methods
 	template<class _Menu>
