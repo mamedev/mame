@@ -104,6 +104,7 @@ public:
 	UINT16 *     m_cps2_buffered_obj;
 	// game-specific
 	UINT16 *     m_gigaman2_dummyqsound_ram;
+	UINT16	sf2ceblp_prot;
 
 	/* video-related */
 	tilemap_t      *m_bg_tilemap[3];
@@ -192,6 +193,8 @@ public:
 	DECLARE_READ16_MEMBER(sf2rb_prot_r);
 	DECLARE_READ16_MEMBER(sf2rb2_prot_r);
 	DECLARE_READ16_MEMBER(sf2dongb_prot_r);
+	DECLARE_READ16_MEMBER(sf2ceblp_prot_r);
+	DECLARE_WRITE16_MEMBER(sf2ceblp_prot_w);
 	DECLARE_READ16_MEMBER(cps1_dsw_r);
 	DECLARE_WRITE16_MEMBER(cps1_coinctrl_w);
 	DECLARE_READ16_MEMBER(qsound_sharedram1_r);
@@ -234,6 +237,7 @@ public:
 	DECLARE_DRIVER_INIT(singbrd);
 	DECLARE_DRIVER_INIT(gigaman2);
 	DECLARE_DRIVER_INIT(sf2dongb);
+	DECLARE_DRIVER_INIT(sf2ceblp);
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap2_scan);

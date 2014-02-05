@@ -3116,6 +3116,7 @@ sf2red          // hack
 sf2v004         // hack
 sf2acc          // hack
 sf2acca         // hack
+sf2ceblp			// hack
 sf2accp2        // hack
 sf2amf          // bootleg
 sf2dkot2        // hack
@@ -5673,6 +5674,7 @@ abattle2        // Sidam
 afire           // Rene Pierre
 acombat         // bootleg
 acombato        // bootleg
+acombat3		// bootleg
 sstarbtl        // bootleg
 spfghmk2        // (c) [1979] Data East Corporation
 spfghmk22       // (c) [1979] Data East Corporation
@@ -8677,6 +8679,7 @@ galsnewj        // (c) 1990 Kaneko
 galsnewk        // (c) 1990 Kaneko
 galpani2        // (c) 1993 Kaneko
 galpani2e       // (c) 1993 Kaneko
+galpani2e2		// (c) 1993 Kaneko
 galpani2g       // (c) 1993 Kaneko
 galpani2t       // (c) 1993 Kaneko
 galpani2i       // (c) 1993 Kaneko
