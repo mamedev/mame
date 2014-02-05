@@ -161,6 +161,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 		m_input(NULL),
 		m_sound(NULL),
 		m_video(NULL),
+		m_ui(NULL),
 		m_tilemap(NULL),
 		m_debug_view(NULL),
 		m_current_phase(MACHINE_PHASE_PREINIT),

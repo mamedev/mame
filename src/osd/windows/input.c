@@ -169,9 +169,9 @@ typedef /*WINUSERAPI*/ BOOL (WINAPI *register_rawinput_devices_ptr)(IN PCRAWINPU
 //============================================================
 
 // global states
-static UINT8                input_enabled;
+static bool                 input_enabled;
 static osd_lock *           input_lock;
-static UINT8                input_paused;
+static bool                 input_paused;
 static DWORD                last_poll;
 
 // DirectInput variables
@@ -185,16 +185,16 @@ static get_rawinput_device_info_ptr     get_rawinput_device_info;
 static register_rawinput_devices_ptr    register_rawinput_devices;
 
 // keyboard states
-static UINT8                keyboard_win32_reported_key_down;
+static bool                 keyboard_win32_reported_key_down;
 static device_info *        keyboard_list;
 
 // mouse states
-static UINT8                mouse_enabled;
+static bool                 mouse_enabled;
 static device_info *        mouse_list;
 
 // lightgun states
 static UINT8                lightgun_shared_axis_mode;
-static UINT8                lightgun_enabled;
+static bool                 lightgun_enabled;
 static device_info *        lightgun_list;
 
 // joystick states
@@ -486,7 +486,7 @@ void wininput_init(running_machine &machine)
 	win32_init(machine);
 
 	// poll once to get the initial states
-	input_enabled = TRUE;
+	input_enabled = true;
 	wininput_poll(machine);
 }
 
@@ -516,7 +516,7 @@ static void wininput_exit(running_machine &machine)
 {
 	// acquire the lock and turn off input (this ensures everyone is done)
 	osd_lock_acquire(input_lock);
-	input_enabled = FALSE;
+	input_enabled = false;
 	osd_lock_release(input_lock);
 
 	// free the lock
@@ -530,7 +530,7 @@ static void wininput_exit(running_machine &machine)
 
 void wininput_poll(running_machine &machine)
 {
-	int hasfocus = winwindow_has_focus() && input_enabled;
+	bool hasfocus = winwindow_has_focus() && input_enabled;
 
 	// ignore if not enabled
 	if (input_enabled)
@@ -569,22 +569,22 @@ void wininput_poll(running_machine &machine)
 //  wininput_should_hide_mouse
 //============================================================
 
-int wininput_should_hide_mouse(void)
+bool wininput_should_hide_mouse(void)
 {
 	// if we are paused or disabled, no
 	if (input_paused || !input_enabled)
-		return FALSE;
+		return false;
 
 	// if neither mice nor lightguns enabled in the core, then no
 	if (!mouse_enabled && !lightgun_enabled)
-		return FALSE;
+		return false;
 
 	// if the window has a menu, no
 	if (win_window_list != NULL && win_has_menu(win_window_list))
-		return FALSE;
+		return false;
 
 	// otherwise, yes
-	return TRUE;
+	return true;
 }
 
 
@@ -1008,7 +1008,7 @@ static void win32_keyboard_poll(device_info *devinfo)
 	int keynum;
 
 	// clear the flag that says we detected a key down via win32
-	keyboard_win32_reported_key_down = FALSE;
+	keyboard_win32_reported_key_down = false;
 
 	// reset the keyboard state and then repopulate
 	memset(devinfo->keyboard.state, 0, sizeof(devinfo->keyboard.state));
@@ -1026,7 +1026,7 @@ static void win32_keyboard_poll(device_info *devinfo)
 				devinfo->keyboard.state[dik] = 0x80;
 
 			// set this flag so that we continue to use win32 until all keys are up
-			keyboard_win32_reported_key_down = TRUE;
+			keyboard_win32_reported_key_down = true;
 		}
 	}
 }

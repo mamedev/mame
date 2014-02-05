@@ -103,7 +103,7 @@ INLINE UINT8 READ8(rsp_state *rsp, UINT32 address)
 	UINT8 ret;
 	address = 0x04000000 | (address & 0xfff);
 	ret = rsp->program->read_byte(address);
-	printf("%04xr%02x\n", address & 0x0000ffff, ret);
+	//printf("%04xr%02x\n", address & 0x0000ffff, ret);
 	return ret;
 }
 
@@ -121,7 +121,7 @@ INLINE UINT16 READ16(rsp_state *rsp, UINT32 address)
 		ret = rsp->program->read_word(address);
 	}
 
-	printf("%04xr%04x\n", address & 0x0000ffff, ret);
+	//printf("%04xr%04x\n", address & 0x0000ffff, ret);
 
 	return ret;
 }
@@ -143,21 +143,21 @@ INLINE UINT32 READ32(rsp_state *rsp, UINT32 address)
 		ret = rsp->program->read_dword(address);
 	}
 
-	printf("%04xr%08x\n", address & 0x0000ffff, ret);
+	//printf("%04xr%08x\n", address & 0x0000ffff, ret);
 	return ret;
 }
 
 INLINE void WRITE8(rsp_state *rsp, UINT32 address, UINT8 data)
 {
 	address = 0x04000000 | (address & 0xfff);
-	printf("%04x:%02x\n", address & 0x0000ffff, data);
+	//printf("%04x:%02x\n", address & 0x0000ffff, data);
 	rsp->program->write_byte(address, data);
 }
 
 INLINE void WRITE16(rsp_state *rsp, UINT32 address, UINT16 data)
 {
 	address = 0x04000000 | (address & 0xfff);
-	printf("%04x:%04x\n", address & 0x0000ffff, data);
+	//printf("%04x:%04x\n", address & 0x0000ffff, data);
 
 	if(address & 1)
 	{
@@ -172,7 +172,7 @@ INLINE void WRITE16(rsp_state *rsp, UINT32 address, UINT16 data)
 INLINE void WRITE32(rsp_state *rsp, UINT32 address, UINT32 data)
 {
 	address = 0x04000000 | (address & 0xfff);
-	printf("%04x:%08x\n", address & 0x0000ffff, data);
+	//printf("%04x:%08x\n", address & 0x0000ffff, data);
 
 	if(address & 3)
 	{

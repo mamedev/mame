@@ -104,6 +104,7 @@ protected:
 	// generic variables
 	void    lcd_write(UINT8 control, UINT8 data);
 	void    speaker_write(UINT8 speaker);
+	bool    m_pla;
 
 	UINT8   m_lcd_latch[8];
 	UINT8   m_lcd_latch_index;
@@ -146,6 +147,7 @@ MACHINE_START_MEMBER(microvision_state, microvision)
 	save_item(NAME(m_lcd_latch_index));
 	save_item(NAME(m_lcd));
 	save_item(NAME(m_lcd_control_old));
+	save_item(NAME(m_pla));
 }
 
 
@@ -202,32 +204,35 @@ MACHINE_RESET_MEMBER(microvision_state, microvision)
 	}
 }
 
-#if 0
-// This works for bowling, vegas slots
+
 UINT32 microvision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static UINT8 coord[16] = {3,2,1,0,7,6,5,4,11,10,9,8,15,14,13,12};
-
-	for ( UINT8 i = 0; i < 16; i++ )
+	if (m_pla)
 	{
-		for ( UINT8 j = 0; j < 16; j++ )
+
+// This works for bowling, vegas slots, alien raiders
+
+		static UINT8 coord[16] = {3,2,1,0,7,6,5,4,11,10,9,8,15,14,13,12};
+
+		for ( UINT8 i = 0; i < 16; i++ )
 		{
-			bitmap.pix16(i,j) = m_lcd [coord[i]] [coord[j]];
+			for ( UINT8 j = 0; j < 16; j++ )
+			{
+				bitmap.pix16(i,j) = m_lcd [coord[i]] [coord[j]];
+			}
 		}
 	}
-
-	return 0;
-}
-#endif
+	else
 
 // this works for pinball, blockbuster, phaser strike (remainder: its unknown what they should look like)
-UINT32 microvision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for ( UINT8 i = 0; i < 16; i++ )
+
 	{
-		for ( UINT8 j = 0; j < 16; j++ )
+		for ( UINT8 i = 0; i < 16; i++ )
 		{
-			bitmap.pix16(i,j) = m_lcd [i] [j];
+			for ( UINT8 j = 0; j < 16; j++ )
+			{
+				bitmap.pix16(i,j) = m_lcd [i] [j];
+			}
 		}
 	}
 
@@ -476,6 +481,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 	UINT8 *rom1 = memregion("maincpu1")->base();
 	UINT8 *rom2 = memregion("maincpu2")->base();
 	UINT32 file_size;
+	m_pla = 0;
 
 	if (image.software_entry() == NULL)
 	{
@@ -505,6 +511,14 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 	{
 		// Copy rom contents
 		memcpy(rom1, image.get_software_region("rom"), file_size);
+
+		// Get PLA type
+		const char *pla = image.get_feature("pla");
+
+		if ( pla )
+		{
+			m_pla = 1;
+		}
 
 		// Set default setting for PCB type and RC type
 		m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;

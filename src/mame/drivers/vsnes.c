@@ -2719,8 +2719,32 @@ ROM_START( vstennisa )
 	PALETTE_STANDARD
 ROM_END
 
-ROM_START( wrecking )
+ROM_START( vstennisb )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "1d", 0x08000, 0x2000, CRC(34ba9922) SHA1(709d3034d98eaf519ab1a824483bf14470291dab) )
+	ROM_LOAD( "1c", 0x0a000, 0x2000, CRC(d4874908) SHA1(53c00468f87185dcc37f5f3874b395f639e7d34f) )
+	ROM_LOAD( "1b", 0x0c000, 0x2000, CRC(eee3fc51) SHA1(02e22506106026c84150e3d937d08d4bd2edefdd) )
+	ROM_LOAD( "1a", 0x0e000, 0x2000, CRC(83cc5e96) SHA1(edd5b7d466d2f7d5714c376cb781382d4e6c6fcc) )
+
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "2b",  0x0000, 0x2000, CRC(9de19c9c) SHA1(1cb65e423a6c2d2a56c67ad08ecf7e746551c322) )
+	ROM_LOAD( "2a",  0x2000, 0x2000, CRC(67a5800e) SHA1(7bad1b486d9dac962fa8c87984038be4ac6b699b) )
+
+	ROM_REGION( 0x10000,"sub", 0 ) /* 6502 memory */
+	ROM_LOAD( "6d", 0x08000, 0x2000, BAD_DUMP CRC(5da8a6a0) SHA1(a153a5bfb9e64978eb33d7ed4f4cf96d9bc7ee4a) )
+	ROM_LOAD( "6c", 0x0a000, 0x2000, BAD_DUMP CRC(154af5fe) SHA1(2459a31a3cd427609c427ade093b12abc3df2d78) )
+	ROM_LOAD( "6b", 0x0c000, 0x2000, BAD_DUMP CRC(0da89d4e) SHA1(f183729477b410e04ad5ccf8b7212f45bc0e466b) )
+	ROM_LOAD( "6a", 0x0e000, 0x2000, BAD_DUMP CRC(a5bc72be) SHA1(8046c2b7679d7a4bc9bd5a178404053113d3527e) )
+
+	ROM_REGION( 0x4000,"gfx2" , 0) /* PPU memory */
+	ROM_LOAD( "8b",  0x0000, 0x2000, CRC(c81e9260) SHA1(6d4809a05364cc05485ee1add833428529af2be6) )
+	ROM_LOAD( "8a",  0x2000, 0x2000, CRC(d91eb295) SHA1(6b69bcef5421a6bcde89a2d1f514853f9f7992c3) )
+
+	PALETTE_STANDARD
+ROM_END
+
+ROM_START( wrecking )
+ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "wr.1d",  0x08000, 0x02000, CRC(8897e1b9) SHA1(7d33f6ee78d8663d62e6e05e231fd3d19ad09baa) )
 	ROM_LOAD( "wr.1c",  0x0a000, 0x02000, CRC(d4dc5ebb) SHA1(bce9b2ebabe7b882f1bc71e2dd50906365521d78) )
 	ROM_LOAD( "wr.1b",  0x0c000, 0x02000, CRC(8ee4a454) SHA1(58e970780a2ef5d44950dba6b44e501d320c9588) )
@@ -2823,7 +2847,8 @@ GAME( 1988, vsfdf,    0,        vsnes,   vsfdf, vsnes_state,    vsfdf,    ROT0, 
 
 /* Dual games */
 GAME( 1984, vstennis, 0,        vsdual,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" , 0 )
-GAME( 1984, vstennisa,vstennis, vsdual,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set ?)" , 0 )
+GAME( 1984, vstennisa,vstennis, vsdual,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 2)" , 0 )
+GAME( 1984, vstennisb,vstennis, vsdual,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 3)" , GAME_IMPERFECT_GRAPHICS )
 GAME( 1984, wrecking, 0,        vsdual,  wrecking, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew", 0 )
 GAME( 1984, balonfgt, 0,        vsdual,  balonfgt, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)", 0 )
 GAME( 1984, vsmahjng, 0,        vsdual,  vsmahjng, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)" , 0 )
