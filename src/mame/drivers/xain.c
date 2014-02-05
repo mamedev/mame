@@ -684,7 +684,7 @@ ROM_END
 
 ROM_START( xsleenaj )
 	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "p9-0.ic66",    0x08000, 0x8000, CRC(370164be) SHA1(65c9951cac7dc3943fa4d5f9919ebb4c4f29b3ae) ) /* Need to verify proper rom label */
+	ROM_LOAD( "p9-01.ic66",   0x08000, 0x8000, CRC(370164be) SHA1(65c9951cac7dc3943fa4d5f9919ebb4c4f29b3ae) ) /* the '1' on the label was ink stamped */
 	ROM_LOAD( "pa-0.ic65",    0x04000, 0x4000, CRC(d22bf859) SHA1(9edb159bef2eba2c5d93c03c15fbcb87eea52236) ) /* Need to verify proper rom label */
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
