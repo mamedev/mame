@@ -569,6 +569,21 @@ void mn10200_device::do_jsr(UINT32 to, UINT32 ret)
 	write_mem24(m_a[3], ret);
 }
 
+void mn10200_device::do_branch(int offset, bool state)
+{
+	if (state)
+	{
+		m_cycles -= offset + 1;
+		mn102_change_pc(m_pc + offset + 1 + (INT8)read_arg8(m_pc + offset));
+	}
+	else
+	{
+		m_cycles -= offset;
+		m_pc += offset + 1;
+	}
+}
+
+
 // take an external IRQ
 void mn10200_device::execute_set_input(int irqnum, int state)
 {
@@ -786,148 +801,57 @@ void mn10200_device::execute_run()
 
 		// blt label8
 		case 0xe0:
-			if (((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_NF) || ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_VF)) // (VF^NF)=1
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_NF) || ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_VF)); // (VF^NF)=1
 			break;
 
 		// bgt label8
 		case 0xe1:
-			if (((m_psw & (FLAG_ZF|FLAG_NF|FLAG_VF)) == 0) || ((m_psw & (FLAG_ZF|FLAG_NF|FLAG_VF)) == (FLAG_NF|FLAG_VF))) // ((VF^NF)|ZF)=0
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, ((m_psw & (FLAG_ZF|FLAG_NF|FLAG_VF)) == 0) || ((m_psw & (FLAG_ZF|FLAG_NF|FLAG_VF)) == (FLAG_NF|FLAG_VF))); // ((VF^NF)|ZF)=0
 			break;
 
 		// bge label8
 		case 0xe2:
-			if (((m_psw & (FLAG_NF|FLAG_VF)) == 0) || ((m_psw & (FLAG_NF|FLAG_VF)) == (FLAG_NF|FLAG_VF))) // (VF^NF)=0
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, ((m_psw & (FLAG_NF|FLAG_VF)) == 0) || ((m_psw & (FLAG_NF|FLAG_VF)) == (FLAG_NF|FLAG_VF))); // (VF^NF)=0
 			break;
 
 		// ble label8
 		case 0xe3:
-			if ((m_psw & FLAG_ZF) || ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_NF) || ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_VF)) // ((VF^NF)|ZF)=1
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, (m_psw & FLAG_ZF) || ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_NF) || ((m_psw & (FLAG_NF|FLAG_VF)) == FLAG_VF)); // ((VF^NF)|ZF)=1
 			break;
 
 		// bcs label8
 		case 0xe4:
-			if (m_psw & FLAG_CF) // CF=1
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, m_psw & FLAG_CF); // CF=1
 			break;
 
 		// bhi label8
 		case 0xe5:
-			if (!(m_psw & (FLAG_ZF|FLAG_CF))) // (CF|ZF)=0
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, !(m_psw & (FLAG_ZF|FLAG_CF))); // (CF|ZF)=0
 			break;
 
 		// bcc label8
 		case 0xe6:
-			if (!(m_psw & FLAG_CF)) // CF=0
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, !(m_psw & FLAG_CF)); // CF=0
 			break;
 
 		// bls label8
 		case 0xe7:
-			if (m_psw & (FLAG_ZF|FLAG_CF)) // (CF|ZF)=1
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, m_psw & (FLAG_ZF|FLAG_CF)); // (CF|ZF)=1
 			break;
 
 		// beq label8
 		case 0xe8:
-			if (m_psw & FLAG_ZF) // ZF=1
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, m_psw & FLAG_ZF); // ZF=1
 			break;
 
 		// bne label8
 		case 0xe9:
-			if (!(m_psw & FLAG_ZF)) // ZF=0
-			{
-				m_cycles -= 2;
-				mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
-			}
-			else
-			{
-				m_cycles -= 1;
-				m_pc += 2;
-			}
+			do_branch(1, !(m_psw & FLAG_ZF)); // ZF=0
 			break;
 
 		// bra label8
 		case 0xea:
-			m_cycles -= 2;
-			mn102_change_pc(m_pc + 2 + (INT8)read_arg8(m_pc + 1));
+			do_branch(1, true);
 			break;
 
 		// rti
@@ -1341,7 +1265,7 @@ void mn10200_device::execute_run()
 				// ext dn
 				case 0xc1: case 0xc5: case 0xc9: case 0xcd:
 					m_cycles -= 3;
-					m_mdr = m_d[opcode >> 2 & 3] & 0x8000 ? 0xffff : 0x0000;
+					m_mdr = (m_d[opcode >> 2 & 3] & 0x8000) ? 0xffff : 0x0000;
 					m_pc += 2;
 					break;
 
@@ -1654,156 +1578,57 @@ void mn10200_device::execute_run()
 
 				// bltx label8
 				case 0xe0:
-					if (((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_NX) || ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_VX)) // (VX^NX)=1
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_NX) || ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_VX)); // (VX^NX)=1
 					break;
 
 				// bgtx label8
 				case 0xe1:
-					if (((m_psw & (FLAG_ZX|FLAG_NX|FLAG_VX)) == 0) || ((m_psw & (FLAG_ZX|FLAG_NX|FLAG_VX)) == (FLAG_NX|FLAG_VX))) // ((VX^NX)|ZX)=0
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, ((m_psw & (FLAG_ZX|FLAG_NX|FLAG_VX)) == 0) || ((m_psw & (FLAG_ZX|FLAG_NX|FLAG_VX)) == (FLAG_NX|FLAG_VX))); // ((VX^NX)|ZX)=0
 					break;
 
 				// bgex label8
 				case 0xe2:
-					if (((m_psw & (FLAG_NX|FLAG_VX)) == 0) || ((m_psw & (FLAG_NX|FLAG_VX)) == (FLAG_NX|FLAG_VX))) // (VX^NX)=0
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, ((m_psw & (FLAG_NX|FLAG_VX)) == 0) || ((m_psw & (FLAG_NX|FLAG_VX)) == (FLAG_NX|FLAG_VX))); // (VX^NX)=0
 					break;
 
 				// blex label8
 				case 0xe3:
-					if ((m_psw & FLAG_ZX) || ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_NX) || ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_VX)) // ((VX^NX)|ZX)=1
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, (m_psw & FLAG_ZX) || ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_NX) || ((m_psw & (FLAG_NX|FLAG_VX)) == FLAG_VX)); // ((VX^NX)|ZX)=1
 					break;
 
 				// bcsx label8
 				case 0xe4:
-					if (m_psw & FLAG_CX) // CX=1
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, m_psw & FLAG_CX); // CX=1
 					break;
 
 				// bhix label8
 				case 0xe5:
-					if (!(m_psw & (FLAG_ZX|FLAG_CX))) // (CX|ZX)=0
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, !(m_psw & (FLAG_ZX|FLAG_CX))); // (CX|ZX)=0
 					break;
 
 				// bccx label8
 				case 0xe6:
-					if (!(m_psw & FLAG_CX)) // CX=0
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, !(m_psw & FLAG_CX)); // CX=0
 					break;
 
 				// blsx label8
 				case 0xe7:
-					if (m_psw & (FLAG_ZX|FLAG_CX)) // (CX|ZX)=1
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, m_psw & (FLAG_ZX|FLAG_CX)); // (CX|ZX)=1
 					break;
 
 				// beqx label8
 				case 0xe8:
-					if (m_psw & FLAG_ZX) // ZX=1
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, m_psw & FLAG_ZX); // ZX=1
 					break;
 
 				// bnex label8
 				case 0xe9:
-					if (!(m_psw & FLAG_ZX)) // ZX=0
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, !(m_psw & FLAG_ZX)); // ZX=0
 					break;
 
 				// bnc label8
 				case 0xfe:
-					if (!(m_psw & FLAG_NF)) // NF=0
-					{
-						m_cycles -= 3;
-						mn102_change_pc(m_pc + 3 + (INT8)read_arg8(m_pc + 2));
-					}
-					else
-					{
-						m_cycles -= 2;
-						m_pc += 3;
-					}
+					do_branch(2, !(m_psw & FLAG_NF)); // NF=0
 					break;
 
 				default:

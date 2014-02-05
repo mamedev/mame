@@ -159,6 +159,7 @@ private:
 	UINT32 do_sub(UINT32 a, UINT32 b, UINT32 c);
 	void test_nz16(UINT16 v);
 	void do_jsr(UINT32 to, UINT32 ret);
+	void do_branch(int offset, bool state);
 	void mn10200_w(UINT32 adr, UINT32 data, int type);
 	UINT32 mn10200_r(UINT32 adr, int type);
 };
