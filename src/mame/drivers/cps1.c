@@ -8609,6 +8609,21 @@ ROM_START( sf2accp2 )
 ROM_END
 
 
+/*
+SF2' CE "bootleg"
+
+CPS1 motherboard (no dash)
+Original 88622-c-2 C board
+
+Bootleg B board with
+	PIC16c55 near PRG roms seem protected
+	8 dipswith near both sound roms and gfx roms
+	1,4,5,8 ON
+	2,3,6,7 OFF
+
+Sound rom match various romset
+*/
+
 ROM_START( sf2ceblp )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 
