@@ -832,6 +832,13 @@ static INPUT_PORTS_START( masterwu )
 	TAITO_COINAGE_US_LOC(SW1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( yukiwo )
+	PORT_INCLUDE(masterw)
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* This prototype doesn't seem to have the "Space Ship" option */
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( crimec )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "Hi Score" )          PORT_DIPLOCATION("SW1:1")
@@ -3545,7 +3552,7 @@ DRIVER_INIT_MEMBER(taitob_state,taito_b)
 GAME( 1989, masterw,  0,       masterw,  masterw,   taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, masterwu, masterw, masterw,  masterwu,  taitob_state, taito_b, ROT270, "Taito America Corporation", "Master of Weapon (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, masterwj, masterw, masterw,  masterwj,  taitob_state, taito_b, ROT270, "Taito Corporation", "Master of Weapon (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1989, yukiwo,   masterw, masterw,  masterwj,  taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Yukiwo (World, prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1989, yukiwo,   masterw, masterw,  yukiwo,    taitob_state, taito_b, ROT270, "Taito Corporation Japan", "Yukiwo (World, prototype)", GAME_SUPPORTS_SAVE )
 
 GAME( 1988, nastar,   0,       rastsag2, nastar,    taitob_state, taito_b, ROT0,   "Taito Corporation Japan", "Nastar (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, nastarw,  nastar,  rastsag2, nastarw,   taitob_state, taito_b, ROT0,   "Taito America Corporation", "Nastar Warrior (US)", GAME_SUPPORTS_SAVE )
