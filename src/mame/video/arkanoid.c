@@ -21,17 +21,8 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	if (flip_screen_x() != (data & 0x01))
-	{
-		flip_screen_x_set(data & 0x01);
-		m_bg_tilemap->mark_all_dirty();
-	}
-
-	if (flip_screen_y() != (data & 0x02))
-	{
-		flip_screen_y_set(data & 0x02);
-		m_bg_tilemap->mark_all_dirty();
-	}
+	flip_screen_x_set(data & 0x01);
+	flip_screen_y_set(data & 0x02);
 
 	/* bit 2 selects the input paddle */
 	m_paddle_select = data & 0x04;
@@ -76,17 +67,8 @@ WRITE8_MEMBER(arkanoid_state::brixian_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	if (flip_screen_x() != (data & 0x01))
-	{
-		flip_screen_x_set(data & 0x01);
-		m_bg_tilemap->mark_all_dirty();
-	}
-
-	if (flip_screen_y() != (data & 0x02))
-	{
-		flip_screen_y_set(data & 0x02);
-		m_bg_tilemap->mark_all_dirty();
-	}
+	flip_screen_x_set(data & 0x01);
+	flip_screen_y_set(data & 0x02);
 
 	/* bit 2 selects the input paddle */
 	/*  - not relevant to brixian */
@@ -125,17 +107,8 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	if (flip_screen_x() != (data & 0x01))
-	{
-		flip_screen_x_set(data & 0x01);
-		m_bg_tilemap->mark_all_dirty();
-	}
-
-	if (flip_screen_y() != (data & 0x02))
-	{
-		flip_screen_y_set(data & 0x02);
-		m_bg_tilemap->mark_all_dirty();
-	}
+	flip_screen_x_set(data & 0x01);
+	flip_screen_y_set(data & 0x02);
 
 	/* bit 2 selects the input paddle? */
 	m_paddle_select = data & 0x04;
@@ -169,18 +142,8 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
 {
 	/* bit 0 = flipx (or y?) */
-	if (flip_screen_x() != (data & 0x01))
-	{
-		flip_screen_x_set(data & 0x01);
-		m_bg_tilemap->mark_all_dirty();
-	}
-
-	/* bit 1 = flipy (or x?) */
-	if (flip_screen_y() != (data & 0x02))
-	{
-		flip_screen_y_set(data & 0x02);
-		m_bg_tilemap->mark_all_dirty();
-	}
+	flip_screen_x_set(data & 0x01);
+	flip_screen_y_set(data & 0x02);
 
 	/* bit 2 - 3 unknown */
 

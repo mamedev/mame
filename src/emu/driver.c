@@ -265,6 +265,8 @@ void driver_device::device_start()
 		video_start();
 
 	// save generic states
+	save_item(NAME(m_latch_clear_value));
+	save_item(NAME(m_latched_value));
 	save_item(NAME(m_flip_screen_x));
 	save_item(NAME(m_flip_screen_y));
 }
@@ -519,27 +521,6 @@ void driver_device::updateflip()
 {
 	// push the flip state to all tilemaps
 	machine().tilemap().set_flip_all((TILEMAP_FLIPX & m_flip_screen_x) | (TILEMAP_FLIPY & m_flip_screen_y));
-
-	// flip the visible area within the screen width/height
-	int width = m_screen->width();
-	int height = m_screen->height();
-	rectangle visarea = m_screen->visible_area();
-	if (m_flip_screen_x)
-	{
-		int temp = width - visarea.min_x - 1;
-		visarea.min_x = width - visarea.max_x - 1;
-		visarea.max_x = temp;
-	}
-	if (m_flip_screen_y)
-	{
-		int temp = height - visarea.min_y - 1;
-		visarea.min_y = height - visarea.max_y - 1;
-		visarea.max_y = temp;
-	}
-
-	// reconfigure the screen with the new visible area
-	attoseconds_t period = m_screen->frame_period().attoseconds;
-	m_screen->configure(width, height, visarea, period);
 }
 
 
@@ -556,8 +537,6 @@ void driver_device::flip_screen_set(UINT32 on)
 	// if something's changed, handle it
 	if (m_flip_screen_x != on || m_flip_screen_y != on)
 	{
-		if (!on)
-			updateflip(); // flip visarea back
 		m_flip_screen_x = m_flip_screen_y = on;
 		updateflip();
 	}
@@ -566,15 +545,15 @@ void driver_device::flip_screen_set(UINT32 on)
 
 //-------------------------------------------------
 //  flip_screen_set_no_update - set global flip
-//  do not call update_flip.
+//  do not call updateflip.
 //-------------------------------------------------
 
 void driver_device::flip_screen_set_no_update(UINT32 on)
 {
 	// flip_screen_y is not updated on purpose
 	// this function is for drivers which
-	// where writing to flip_screen_x to
-	// bypass update_flip
+	// were writing to flip_screen_x to
+	// bypass updateflip
 	if (on)
 		on = ~0;
 	m_flip_screen_x = on;

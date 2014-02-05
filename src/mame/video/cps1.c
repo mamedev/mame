@@ -2324,7 +2324,7 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 				CODE,                                               \
 				COLOR,                                              \
 				!(FLIPX),!(FLIPY),                                  \
-				511-16-(SX),255-16-(SY),    screen.priority(),0x02,15);                   \
+				512-16-(SX),256-16-(SY),    screen.priority(),0x02,15);                   \
 	else                                                            \
 		pdrawgfx_transpen(bitmap,\
 				cliprect,machine().gfx[2],                            \
@@ -2557,7 +2557,7 @@ void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 				CODE,                                                               \
 				COLOR,                                                              \
 				!(FLIPX),!(FLIPY),                                                  \
-				511-16-(SX),255-16-(SY), screen.priority(),primasks[priority],15);                 \
+				512-16-(SX),256-16-(SY), screen.priority(),primasks[priority],15);                 \
 	else                                                                            \
 		pdrawgfx_transpen(bitmap,\
 				cliprect,machine().gfx[2],                                            \
@@ -2720,8 +2720,8 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 				sy = (sy - m_stars2y) & 0xff;
 				if (flip_screen())
 				{
-					sx = 511 - sx;
-					sy = 255 - sy;
+					sx = 512 - sx;
+					sy = 256 - sy;
 				}
 
 				col = ((col & 0xe0) >> 1) + (screen.frame_number() / 16 & 0x0f);
@@ -2745,8 +2745,8 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 				sy = (sy - m_stars1y) & 0xff;
 				if (flip_screen())
 				{
-					sx = 511 - sx;
-					sy = 255 - sy;
+					sx = 512 - sx;
+					sy = 256 - sy;
 				}
 
 				col = ((col & 0xe0) >> 1) + (screen.frame_number() / 16 & 0x0f);
