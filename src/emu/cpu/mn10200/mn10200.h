@@ -137,12 +137,18 @@ private:
 	address_space *m_program;
 	address_space *m_io;
 
-	UINT8 mn102_read_byte(UINT32 address);
-	UINT16 mn102_read_word(UINT32 address);
-	void mn102_write_byte(UINT32 address, UINT8 data);
-	void mn102_write_word(UINT32 address, UINT16 data);
-	INT32 r24u(offs_t adr);
-	void w24(offs_t adr, UINT32 val);
+	UINT8 read_arg8(UINT32 address);
+	UINT16 read_arg16(UINT32 address);
+	INT32 read_arg24(offs_t adr);
+
+	UINT8 read_mem8(UINT32 address);
+	UINT16 read_mem16(UINT32 address);
+	INT32 read_mem24(offs_t adr);
+
+	void write_mem8(UINT32 address, UINT8 data);
+	void write_mem16(UINT32 address, UINT16 data);
+	void write_mem24(offs_t adr, UINT32 val);
+
 	void mn102_change_pc(UINT32 pc);
 	void mn102_take_irq(int level, int group);
 	void refresh_timer(int tmr);
