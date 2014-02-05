@@ -175,6 +175,7 @@ zerotime        // hack
 starfght        // hack
 galaxbsf        // hack
 galaxianbl      // bootleg
+galaxbsf2		// bootleg
 kamakazi3       // Video Games (UK) Ltd., hack or bootleg?
 tst_galx        // Galaxian Test ROM
 gmgalax         // bootleg
@@ -8796,6 +8797,7 @@ pairlove        // (c) 1991 Athena
 blandia         // (c) 1992 Allumer
 blandiap        // (c) 1992 Allumer
 blockcar        // (c) 1992 Visco
+blockcarb		// bootleg
 qzkklogy        // (c) 1992 Tecmo
 neobattl        // (c) 1992 Banpresto / Sotsu Agency. Sunrise
 umanclub        // (c) 1992 Tsuburaya Prod. / Banpresto
@@ -10536,6 +10538,7 @@ tisuba          // (c) 1992 Subsino
 stisub          // (c) 1995 Subsino (Alpha license)
 tesorone        // (c) 1995 Subsino
 tesorone240     // (c) 1995 Subsino
+tesorone230     // (c) 1995 Subsino
 victor6         // (c) 1995 Subsino (Alpha license)
 victor6a        // (c) 1995 Subsino (Alpha license)
 victor6b        // (c) 1995 Subsino (Alpha license)
@@ -11141,6 +11144,8 @@ ejollyx5        // (c) 200? Solar Games
 grandprx        // (c) 200? 4fun
 supjolly        // (c) 200? unknown
 x5jokers        // (c) 200? Electronic Projects
+queenotg		//
+ejollyx9		//
 
 // Astro Corp.
 showhand        // (c) 2000  Astro Corp.

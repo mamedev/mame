@@ -1340,5 +1340,7 @@ GAME( 1981, billiard,  hustler,  hustler,   hustler,   scramble_state,  billiard
 GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler,   driver_device,   0,            ROT90,  "bootleg (Digimatic)",                "Video Hustler (bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "bootleg",                            "Fatsy Gambler (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustlerb3, hustler,  hustlerb3, hustlerb3, scramble_state,  hustlerd,     ROT90,  "bootleg (Videotron)",                "Video Pool (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb4, hustler,  hustlerb4, hustler,   driver_device,   0,            ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", GAME_SUPPORTS_SAVE ) GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games",              "Mighty Monkey", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb4, hustler,  hustlerb4, hustler,   driver_device,   0,            ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", GAME_SUPPORTS_SAVE )
+
+GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games",              "Mighty Monkey", GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg",                            "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
