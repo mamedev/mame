@@ -13,7 +13,7 @@ The "paddle" feature is used to indicate whether there is paddle circuitry on th
 The "rc" feature is used to indicate the source of the clock signal
 -->
 
-<!--
+
     <software name="alienrdr">
         <description>Alien Raiders</description>
         <year>1981</year>
@@ -24,11 +24,10 @@ The "rc" feature is used to indicate the source of the clock signal
             <feature name="paddle" value="yes" />
             <feature name="rc" value="100pf/23.2K" />
             <dataarea name="rom" size="2048">
-                <rom name="m34009-n1" size="2048" crc="" sha1="" offset="0" />
+                <rom name="m34009-n1" size="2048" crc="b1632712" sha1="515040a3bf6386590c025e12a9512c98efdd7e1e" offset="0" />
             </dataarea>
         </part>
     </software>
--->
 
 <!--
     <software name="Baseball">
